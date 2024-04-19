@@ -1,187 +1,199 @@
-Return-Path: <netdev+bounces-89728-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89729-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B3758AB581
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 21:19:36 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3630A8AB588
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 21:22:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1235F282393
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 19:19:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6CA19B214BC
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 19:22:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75A9013C3F2;
-	Fri, 19 Apr 2024 19:19:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 357F213C825;
+	Fri, 19 Apr 2024 19:22:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IuaBnw1G"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zIeHq+Th"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f174.google.com (mail-il1-f174.google.com [209.85.166.174])
+Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECBF81D699;
-	Fri, 19 Apr 2024 19:19:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 798F313C679
+	for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 19:22:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713554370; cv=none; b=HX20reDsNHLopoxwSOzeSOBuB22/E+vIoII8WYZSuZna/tDvwJnLlalWE9OVpDTOyTb48jv4evUi0mzdWNng0YbFYTrh0hcC4445x1b463omYZqrBZwXaBn0GXhn0gESHCjLRq+By7dMeV96xa4AYf5/p5+80KAzDIUvQ2Xb26s=
+	t=1713554530; cv=none; b=i9aQ7/eqA+KrPX92fjwRQmPOI+thfEZNRKhTb87HqCvDp4fB4Bl0rRDGVinxWtanWukIMeDSYp+O0TwUUCuoe5S1rF6Gqd12YAaRN18ctJcy90G2qIMWGk7sGpPyuCo60bpPA5NebkohfwG7A+d2b7SLVf1Z4btEHZ7/C61Cp5Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713554370; c=relaxed/simple;
-	bh=WlfTa9fhttzPEidHyJjm2gyCIOgMLDUYCzU92aupMSM=;
+	s=arc-20240116; t=1713554530; c=relaxed/simple;
+	bh=0Yf1np1EiQRR1H+HojMtCteZkzQwyIMTFpovj1tcuSA=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=d4PC5ctLQc2YOAW8JWghdfy93Zh1gqJ+5uo9/A5zYTEDQYwECT5LAHujgaNe/9lyzB3cjhoPv2lSpbG0ctQAmZ8Xyf3DBe4sCP70qKiveoui7bySp3JAf3v0FNiE+33uYj3xMKH8Xk9NYUS30cExSN2lUmcjQm027b3I1FWXaUM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IuaBnw1G; arc=none smtp.client-ip=209.85.166.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f174.google.com with SMTP id e9e14a558f8ab-36b08fc1913so7576145ab.0;
-        Fri, 19 Apr 2024 12:19:28 -0700 (PDT)
+	 To:Cc:Content-Type; b=Kun5Tl4SDTzcxYx0iyNJZOM/CR5O3k5D+ljlLbS7X/CdxnFJKYuvzQq7douQR8IN28KLxsO/x4GTDetvFi+VSppgkrIwhRnmg4Em07CaDh3XdE64sn3orcLiQ1qAcMtjmhi/S/vhUmnohvUUnU8VRLawq1/1cJeqkzK184rR4Ao=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zIeHq+Th; arc=none smtp.client-ip=209.85.218.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a554afec54eso245751866b.1
+        for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 12:22:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713554368; x=1714159168; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WlfTa9fhttzPEidHyJjm2gyCIOgMLDUYCzU92aupMSM=;
-        b=IuaBnw1Gkfz6u/+2LmCS9hB8x5oHTshh1d/r6tRtVIyloh6O0E5ibYM83bh+iv2zJj
-         hCqa2gTZagdqA0wBdHFbIBUV1ao9lk89DP1gEY5MvSfWxXVqagGxYsVB0mnJZRbd0E2/
-         8ScmDj4h1yUZipxdOjGlplWsIRLyHDMKatHpWt/HU2Um49npUdHMG+v83ltvs3DNlEsx
-         HfvLDrp5vcu1vBOV3N43r4v8ji183d35wriLj7PanaS/VIhubG9FcfLz3+YOx+ukajB5
-         gHggDSYQ7xflVkqTBevLmYhCCK2jwud6ZDH6H8q72DpmsIWhKLUB2ESXqK5ApVwgKTzq
-         0otQ==
+        d=google.com; s=20230601; t=1713554527; x=1714159327; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=Cgxiaek1OC/UQSjtnluTE8oS+OxORZPByii8n2kRyX4=;
+        b=zIeHq+Thn7YTr3RpZM3b+1yEJ5ovU/PQYkZPXZhio6P7bZctZbZiLGj24cRFIg5oFw
+         kHsShSdrttqbvrsThk6/whQjz0PlCcUfi9PAf4QKVU5oX7NvZzjZaBMMDyrPYI9GHora
+         hI3hMxb4Xu1V3yVOfG25Gh/oSvOu8DBaJD58mNQty4nZZrLQpNnEVabb3PHEhYmbTzGA
+         lgOgUcUOb23NYEb7jAsI7wlpy/mr3hoJP9nOjpr1l7996mNf12bdNAiZCMNj5bHB4ACG
+         eqCJxOZKZ8nwG30IxCBu7PLmFtG7SkTk/KB2EkG/EC5tdC+3LWFoAcNftt/ysDAJgcOt
+         TXiA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713554368; x=1714159168;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=WlfTa9fhttzPEidHyJjm2gyCIOgMLDUYCzU92aupMSM=;
-        b=ATE+fjFuKZS5EvnEgQS+dLKiqDGHiwaZv2nqF7BlNClxAjoCuBeeMw63rb9lAQDe9T
-         4g9/PDAfZsJb13yQNVO38Dv0q+N0P1GZcR+9hyXAjzPcEtZc/K9JruPpcYU6FdNkLsLC
-         gZwEe3v6dGnx5+mCsGNr9k/OLGLJgQLMIOLMyUCzQHT2CXMYjpqzDTlv69jIht7JyQBf
-         Qk32rrAR1Mu6eIY10+HnIvKDhLQcXhLMt8pKijKtZFKRrBJV63WRuzr+7Rwecp+GfqyA
-         JD+mNy/HkroIqcxBozJuG8PGsi7ntOgllYEd4oysWoRB6+x4lnUjWjqXLiAX+Km82c4h
-         TbTw==
-X-Forwarded-Encrypted: i=1; AJvYcCVDVXwRDUSdyps/pbsFsowbF3GdZ4sAmwz7vh/prlmIb1ke9TpAhBQTwvtQAyhFAcrUtHtY/8yZT6x0xIIMndx2XjRuSrsyCcUwHQ==
-X-Gm-Message-State: AOJu0Yz6e2xi9MYh++ug6fzNGFMbVBibsdeyqW5iKiBhRUBsUqBcxpMO
-	EOahTwLdjbIaRDdAp2iaDhmZ3pJH5y9nxb4tZFgNQEa9ThmB/r3Ur1Dsb4znt3X0RNUcJUrkEtv
-	iyFQ9rNilfhapYjnW2JeueuhRYMc=
-X-Google-Smtp-Source: AGHT+IGeRV1g9peFjvgNiukEtx1N2Xy4RepVWJSm8X5REPeBNuoKUhiCcTz/zfTt2+l1zivtUmDXiPf6dGOXEQKsJUI=
-X-Received: by 2002:a05:6e02:1526:b0:36b:fa6e:5be7 with SMTP id
- i6-20020a056e02152600b0036bfa6e5be7mr2732230ilu.14.1713554367969; Fri, 19 Apr
- 2024 12:19:27 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1713554527; x=1714159327;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Cgxiaek1OC/UQSjtnluTE8oS+OxORZPByii8n2kRyX4=;
+        b=kYGNzCkiLzccF+1iVaQpt+i08RBJ+1unspgHuDxVCultYaza/+Q3o4Ae55mooXztvP
+         g9tz4tQOFc4XAbJE//UtWEVzIQk8WMP9UzGYTDQuxh6eoYFogDXQD2B9cAdHmiAPzgFO
+         spHliPKTVNuTdCzL1weylxYGtUeqVW9CICvmBukQ9RxKIa/iAOnw9qw6AZWvO9p2oh6G
+         E6XKXYtkvxSccaWIXivcN5SnnZ6Bdc7ip3e/jymsZlBmCKTLV6D91AT13z6j4N1Yjd09
+         OD1tsXauT0a0qXnADlw39k/HMeJI52iHee4GaG8q8yz/w06alnB4n9HOM7kEYIjgvKEV
+         2+Og==
+X-Forwarded-Encrypted: i=1; AJvYcCWCn1y2dQ5lqSjLqyVgn7qdI3QvXyb/FyY60zPDqTEKXcvunCkS6oqpgP2AcDpMHIfskhR/FYzL6EwaUGUpOndZSQ1D4cOJ
+X-Gm-Message-State: AOJu0YxSreg8OS1lkHWSxiJ6SYADsaB0xfe0jqG1QLb2c/yzBY34xT0r
+	3+mNzPq6mRyYQ/fqRsPji+lotaR4ZKz2zjQ5UPqsFi9ebZxiHhQceB8uIRvcageho1hHu6Fftjm
+	qX0XEfQ81KpMRjdB6KaA3qQCxP7u8TxUe1z5z
+X-Google-Smtp-Source: AGHT+IEBjBNkvxdmuTE9VnI6C88nKhqq8KjzGCHHIFj/6VLY3xCFjTvSpOxoFw/tjaW8RUkr6IZWX3lHaV1KlXwC0BQ=
+X-Received: by 2002:a17:906:f255:b0:a52:2284:d97f with SMTP id
+ gy21-20020a170906f25500b00a522284d97fmr2030488ejb.25.1713554526552; Fri, 19
+ Apr 2024 12:22:06 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1710173427.git.lucien.xin@gmail.com> <74d5db09-6b5c-4054-b9d3-542f34769083@samba.org>
- <CADvbK_dzVcDKsJ9RN9oc0K1Jwd+kYjxgE6q=ioRbVGhJx7Qznw@mail.gmail.com>
- <f427b422-6cfc-45ac-88eb-3e7694168b63@samba.org> <CADvbK_cA-RCLiUUWkyNsS=4OhkWrUWb68QLg28yO2=8PqNuGBQ@mail.gmail.com>
- <438496a6-7f90-403d-9558-4a813e842540@samba.org> <CADvbK_fkbOnhKL+Rb+pp+NF+VzppOQ68c=nk_6MSNjM_dxpCoQ@mail.gmail.com>
- <1456b69c-4ffd-4a08-b120-6a00abf1eb05@samba.org> <CADvbK_cQRpyzHG4UUOzfgmqLndvpx5Cd+d59rrqGRp0ic3PyxA@mail.gmail.com>
- <95922a2f-07a1-4555-acd2-c745e59bcb8e@samba.org>
-In-Reply-To: <95922a2f-07a1-4555-acd2-c745e59bcb8e@samba.org>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Fri, 19 Apr 2024 15:19:16 -0400
-Message-ID: <CADvbK_eR4++HbR_RncjV9N__M-uTHtmqcC+_Of1RKVw7Uqf9Cw@mail.gmail.com>
-Subject: Re: [RFC PATCH net-next 0/5] net: In-kernel QUIC implementation with
- Userspace handshake
-To: Stefan Metzmacher <metze@samba.org>
-Cc: network dev <netdev@vger.kernel.org>, davem@davemloft.net, kuba@kernel.org, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Steve French <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>, 
-	Chuck Lever III <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, 
-	Sabrina Dubroca <sd@queasysnail.net>, Tyler Fanelli <tfanelli@redhat.com>, 
-	Pengtao He <hepengtao@xiaomi.com>, 
-	"linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>, 
-	Samba Technical <samba-technical@lists.samba.org>
+References: <171328983017.3930751.9484082608778623495.stgit@firesoul>
+ <171328989335.3930751.3091577850420501533.stgit@firesoul> <CAJD7tkZFnQK9CFofp5rxa7Mv9wYH2vWF=Bb28Dchupm8LRt7Aw@mail.gmail.com>
+ <651a52ac-b545-4b25-b82f-ad3a2a57bf69@kernel.org> <lxzi557wfbrkrj6phdlub4nmtulzbegykbmroextadvssdyfhe@qarxog72lheh>
+ <CAJD7tkYJZgWOeFuTMYNoyH=9+uX2qaRdwc4cNuFN9wdhneuHfA@mail.gmail.com>
+ <6392f7e8-d14c-40f4-8a19-110dfffb9707@kernel.org> <gckdqiczjtyd5qdod6a7uyaxppbglg3fkgx2pideuscsyhdrmy@by6rlly6crmz>
+In-Reply-To: <gckdqiczjtyd5qdod6a7uyaxppbglg3fkgx2pideuscsyhdrmy@by6rlly6crmz>
+From: Yosry Ahmed <yosryahmed@google.com>
+Date: Fri, 19 Apr 2024 12:21:30 -0700
+Message-ID: <CAJD7tkbCzx1S9d0oK-wR7AY3O3ToBrEwKTaYTykE1WwczcYLBg@mail.gmail.com>
+Subject: Re: [PATCH v1 2/3] cgroup/rstat: convert cgroup_rstat_lock back to mutex
+To: Shakeel Butt <shakeel.butt@linux.dev>
+Cc: Jesper Dangaard Brouer <hawk@kernel.org>, tj@kernel.org, hannes@cmpxchg.org, 
+	lizefan.x@bytedance.com, cgroups@vger.kernel.org, longman@redhat.com, 
+	netdev@vger.kernel.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org, 
+	kernel-team@cloudflare.com, Arnaldo Carvalho de Melo <acme@kernel.org>, 
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>, mhocko@kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Fri, Apr 19, 2024 at 2:51=E2=80=AFPM Stefan Metzmacher <metze@samba.org>=
- wrote:
->
-> Hi Xin Long,
->
-> >> But I think its unavoidable for the ALPN and SNI fields on
-> >> the server side. As every service tries to use udp port 443
-> >> and somehow that needs to be shared if multiple services want to
-> >> use it.
-> >>
-> >> I guess on the acceptor side we would need to somehow detach low level
-> >> udp struct sock from the logical listen struct sock.
-> >>
-> >> And quic_do_listen_rcv() would need to find the correct logical listen=
-ing
-> >> socket and call quic_request_sock_enqueue() on the logical socket
-> >> not the lowlevel udo socket. The same for all stuff happening after
-> >> quic_request_sock_enqueue() at the end of quic_do_listen_rcv.
-> >>
-> > The implementation allows one low level UDP sock to serve for multiple
-> > QUIC socks.
+[..]
+> > > Perhaps we could experiment with always dropping the lock at CPU
+> > > boundaries instead?
+> > >
 > >
-> > Currently, if your 3 quic applications listen to the same address:port
-> > with SO_REUSEPORT socket option set, the incoming connection will choos=
-e
-> > one of your applications randomly with hash(client_addr+port) vi
-> > reuseport_select_sock() in quic_sock_lookup().
+> > I don't think this will be enough (always dropping the lock at CPU
+> > boundaries).  My measured "lock-hold" times that is blocking IRQ (and
+> > softirq) for too long.  When looking at prod with my new cgroup
+> > tracepoint script[2]. When contention occurs, I see many Yields
+> > happening and with same magnitude as Contended. But still see events
+> > with long "lock-hold" times, even-though yields are high.
 > >
-> > It should be easy to do a further match with ALPN between these 3 quic
-> > socks that listens to the same address:port to get the right quic sock,
-> > instead of that randomly choosing.
+> >  [2] https://github.com/xdp-project/xdp-project/blob/master/areas/latency/cgroup_rstat_tracepoint.bt
+> >
+> > Example output:
+> >
+> >  12:46:56 High Lock-contention: wait: 739 usec (0 ms) on CPU:56 comm:kswapd7
+> >  12:46:56 Long lock-hold time: 6381 usec (6 ms) on CPU:27 comm:kswapd3
+> >  12:46:56 Long lock-hold time: 18905 usec (18 ms) on CPU:100
+> > comm:kworker/u261:12
+> >
+> >  12:46:56  time elapsed: 36 sec (interval = 1 sec)
+> >   Flushes(2051) 15/interval (avg 56/sec)
+> >   Locks(44464) 1340/interval (avg 1235/sec)
+> >   Yields(42413) 1325/interval (avg 1178/sec)
+> >   Contended(42112) 1322/interval (avg 1169/sec)
+> >
+> > There is reported 15 flushes/sec, but locks are yielded quickly.
+> >
+> > More problematically (for softirq latency) we see a Long lock-hold time
+> > reaching 18 ms.  For network RX softirq I need lower than 0.5ms latency,
+> > to avoid RX-ring HW queue overflows.
+
+Here we are measuring yields against contention, but the main problem
+here is IRQ serving latency, which doesn't have to correlate with
+contention, right?
+
+Perhaps contention is causing us to yield the lock every nth cpu
+boundary, but apparently this is not enough for IRQ serving latency.
+Dropping the lock on each boundary should improve IRQ serving latency,
+regardless of the presence of contention.
+
+Let's focus on one problem at a time ;)
+
+> >
+> >
+> > --Jesper
+> > p.s. I'm seeing a pattern with kswapdN contending on this lock.
+> >
+> > @stack[697, kswapd3]:
+> >         __cgroup_rstat_lock+107
+> >         __cgroup_rstat_lock+107
+> >         cgroup_rstat_flush_locked+851
+> >         cgroup_rstat_flush+35
+> >         shrink_node+226
+> >         balance_pgdat+807
+> >         kswapd+521
+> >         kthread+228
+> >         ret_from_fork+48
+> >         ret_from_fork_asm+27
+> >
+> > @stack[698, kswapd4]:
+> >         __cgroup_rstat_lock+107
+> >         __cgroup_rstat_lock+107
+> >         cgroup_rstat_flush_locked+851
+> >         cgroup_rstat_flush+35
+> >         shrink_node+226
+> >         balance_pgdat+807
+> >         kswapd+521
+> >         kthread+228
+> >         ret_from_fork+48
+> >         ret_from_fork_asm+27
+> >
+> > @stack[699, kswapd5]:
+> >         __cgroup_rstat_lock+107
+> >         __cgroup_rstat_lock+107
+> >         cgroup_rstat_flush_locked+851
+> >         cgroup_rstat_flush+35
+> >         shrink_node+226
+> >         balance_pgdat+807
+> >         kswapd+521
+> >         kthread+228
+> >         ret_from_fork+48
+> >         ret_from_fork_asm+27
+> >
 >
-> Ah, that sounds good.
->
-> > The problem is to parse the TLS Client_Hello message to get the ALPN in
-> > quic_sock_lookup(), which is not a proper thing to do in kernel, and
-> > might be rejected by networking maintainers, I need to check with them.
->
-> Is the reassembling of CRYPTO frames done in the kernel or
-> userspace? Can you point me to the place in the code?
-In quic_inq_handshake_tail() in kernel, for Client Initial packet
-is processed when calling accept(), this is the path:
+> Can you simply replace mem_cgroup_flush_stats() in
+> prepare_scan_control() with the ratelimited version and see if the issue
+> still persists for your production traffic?
 
-quic_accept()-> quic_accept_sock_init() -> quic_packet_process() ->
-quic_packet_handshake_process() -> quic_frame_process() ->
-quic_frame_crypto_process() -> quic_inq_handshake_tail().
+With thresholding, the fact that we reach cgroup_rstat_flush() means
+that there is a high magnitude of pending updates. I think Jesper
+mentioned 128 CPUs before, that means 128 * 64 (MEMCG_CHARGE_BATCH)
+page-sized updates. That could be over 33 MBs with 4K page size.
 
-Note that it's with the accept sock, not the listen sock.
+I am not sure if it's fine to ignore such updates in shrink_node(),
+especially that it is called in a loop sometimes so I imagine we may
+want to see what changed after the last iteration.
 
 >
-> If it's really impossible to do in C code maybe
-> registering a bpf function in order to allow a listener
-> to check the intial quic packet and decide if it wants to serve
-> that connection would be possible as last resort?
-That's a smart idea! man.
-I think the bpf hook in reuseport_select_sock() is meant to do such
-selection.
+> Also were you able to get which specific stats are getting the most
+> updates?
 
-For the Client initial packet (the only packet you need to handle),
-I double you will need to do the reassembling, as Client Hello TLS message
-is always less than 400 byte in my env.
-
-But I think you need to do the decryption for the Client initial packet
-before decoding it then parsing the TLS message from its crypto frame.
-
-BTW, for the TLS message parse, I have some prototype code for
-TLS Handshake:
-https://github.com/lxin/tls_hs/blob/master/crypto/tls_hs.c#L2084
-
-The path to get ALPN:
-tls_msg_handle() -> tls_msg_ch_handle() -> tls_ext_handle()
-
-Hope it may be helpful to you.
-
->
-> > Will you be able to work around this by using Unix Domain Sockets pass
-> > the sockfd to another process?
->
-> Not really. As that would strict coordination between a lot of
-> independent projects.
->
-> > (Note that we're assuming all your 3 applications are using in-kernel Q=
-UIC)
->
-> Sure, but I guess for servers using port 443 that the only long term opti=
-on.
-> and I don't think it will be less performant than a userspace implementat=
-ion.
-Cool.
+This, on the other hand, would be very interesting. I think it is very
+possible that we don't actually have 33 MBs of updates, but rather we
+keep adding and subtracting from the same stat until we reach the
+threshold. This could especially be true for hot stats like slab
+allocations.
 
