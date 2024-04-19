@@ -1,102 +1,190 @@
-Return-Path: <netdev+bounces-89570-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89571-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE07F8AAC4A
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 11:58:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 883108AAC56
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 12:02:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3FF66B23144
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 09:58:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3F151280FE2
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 10:02:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21E088005E;
-	Fri, 19 Apr 2024 09:51:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C31667BB17;
+	Fri, 19 Apr 2024 10:02:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3C9080020
-	for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 09:51:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D04306FE14
+	for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 10:02:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.69
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713520311; cv=none; b=CdnJVav+zGsR9MExt/D0y7jS9SGo6Huu4TBJPscCwMqWzuZgtBm0mljkA2c2Oa1ehAIHx/TIrb/3Ib96bBUI03WM4+m03YfdWT43H7yfa3+wAO3LCukxkpqisROkp+slySbYZZQWWJIxxAhAjGnxLtCZpp+Cq4UT/+0dwPDbO0Y=
+	t=1713520957; cv=none; b=nbe9fz91vIxxpEmFj3PEqZCtg6aHA8z5dgj0bGp0enSMeN1h4cqUXuu5KCdxkTabSaRQP6boyr1ZqeHPcH9xRA2TE0zny6Ep0q5BScXCgnIKn/7huScdJFgaspCF/Fr+3NzL7ehoIh7gVX4dq5Js1zKELfB+6Y/kJyZKQP3YSvs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713520311; c=relaxed/simple;
-	bh=cFN/aI+5zfLuqoHxJOFDt2JTiuvP5XQdCg9UqO9XUwQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=diWZYPOl/xJU3AmtOdVtUW+PtTW4GR8BPDnl8w6rF8HbZoCQbvpAuGtqn1PggqhHs3MkmQiSgoZB+Tbs2qMFvAK+MIMeo7pO8fc6S9tyTvizU+w1abXKyq8N+45PFqO1LWLaa5xc2AqYGDK2Unj4yj1EEAsh9KaHZuamTlGJo0Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [112.20.112.218])
-	by gateway (Coremail) with SMTP id _____8Bx3+uyPiJm5L0pAA--.28711S3;
-	Fri, 19 Apr 2024 17:51:46 +0800 (CST)
-Received: from [192.168.100.8] (unknown [112.20.112.218])
-	by localhost.localdomain (Coremail) with SMTP id AQAAf8Cx6xKvPiJmuxmAAA--.50026S3;
-	Fri, 19 Apr 2024 17:51:44 +0800 (CST)
-Message-ID: <6877aa3a-3147-4cfd-892b-f23a2b3a1ffd@loongson.cn>
-Date: Fri, 19 Apr 2024 17:51:43 +0800
+	s=arc-20240116; t=1713520957; c=relaxed/simple;
+	bh=Tn22zvqABpEw2xzVGlUAUm5GrhlqYp+YGZ8SBmqcoJw=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=HrI3Et12qxAOtRmlSn/581uqUdLOqbo5tYtCgDDWEJr7R9Bb6coIPTyU4zQPDyrgbrA8MLfMV42w8fV2WxLfts/Iefl0iVVRuLv3oSgpKC+AOFgB+jUtQ23gOpiWFsiQ/U62xTy3NzXgPds+4Wr54AmWN0JOod4MApE/Hx0MLKc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-7da60b9a4f6so19959539f.0
+        for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 03:02:35 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713520955; x=1714125755;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ynPtKylq8X+4aLPDiT4qx8aIg5ZAy8z6WAeie2jrlxE=;
+        b=dLamProg6TyPuXpcchMz2EkmUOhZ3kKo+mlP81IWXQwuN92qtSDfHF71QrueVooLid
+         mfNeb3Qk+u1l9KdOBgdQygdKxvd+jf3ZWQdDkHMlnuUn26VEdhIWJ3ApFTvCvMrN84Rm
+         w9MFhJ/t0jz1BEmGDX07vIZitq1+eDXxk5/hwq8TazQe1oKZzt/cL3nYStOg6RrsY+aF
+         xjHXV3YVUUtM7VP1/Qa/LHyg8e59aHKFS/8SasMUMWBul3sLNR5jnnspVRQAUB2T6i24
+         0BzIEeBOTXwzbvIJoCmRU++iS5qyuVDyJTD4fRO/w6FM4C5M3E2ioFfj9c03cyPRJFmd
+         PRMQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVFpW+m+YQjlV/ZNTjUGfZc/rdS0UrSsQ7CcPJuG1fvvTrLjxXArnm+V2YwkaZ2RO4DurR5iZpQRVJStxAItlNSY8NttIKX
+X-Gm-Message-State: AOJu0YzIS923DXaGf102A6mfpuVESHSYLghhG1FYTKmRkmWsMLFVcFBk
+	+vwy+GSSZ9coBrNQqrR1fyoDUh02SeQ1rYJ8nfEUfYuBwaXNsnq8cdj1/mWzPge67fubjNKX4j0
+	oZyuNSXH02ZrqbYvVTq4uqvXdyldsbpwkI/+uT89Q+rhLO7vPZx515AQ=
+X-Google-Smtp-Source: AGHT+IGHd7JEGe67TGfzMYED7GMFT+xDRiBDq+5d4uGXSHkkfwvuvO0kElvRJkGh8gJahNVkE6H9QFN5VkYmqWeMBIHlCZAN7Gog
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v11 2/6] net: stmmac: Add multi-channel support
-To: Serge Semin <fancer.lancer@gmail.com>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com,
- alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com,
- chenhuacai@kernel.org, linux@armlinux.org.uk, guyinggang@loongson.cn,
- netdev@vger.kernel.org, chris.chenfeiyang@gmail.com, siyanteng01@gmail.com
-References: <cover.1712917541.git.siyanteng@loongson.cn>
- <5b6b5642a5f3e77ddf8bfe598f7c70887f9cc37f.1712917541.git.siyanteng@loongson.cn>
- <5v6ypjjtbq72ovb437p6n4fkq2z5a3nhkv6spjct2flvjaxmgq@ykrdiv7kk4kq>
- <636a0d00-3141-4d4d-85af-5232fd5b1820@loongson.cn>
- <juwqvnv22ky5avg72prgi2ocx7qy4kqldet4t4qfooerj3p6nn@lrnlkioxxevy>
-Content-Language: en-US
-From: Yanteng Si <siyanteng@loongson.cn>
-In-Reply-To: <juwqvnv22ky5avg72prgi2ocx7qy4kqldet4t4qfooerj3p6nn@lrnlkioxxevy>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:AQAAf8Cx6xKvPiJmuxmAAA--.50026S3
-X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
-X-Coremail-Antispam: 1Uk129KBj9xXoW7JF47AF18ZF4rKr1UXw18WFX_yoWxZrXEg3
-	9xCr43C340vFn7u3Zru3W7tF9rta40g3ykWFy0vr4Ig345JrnrJa1vkryfWw1xXayxGF9x
-	W3WDX347Z34avosvyTuYvTs0mTUanT9S1TB71UUUUjDqnTZGkaVYY2UrUUUUj1kv1TuYvT
-	s0mT0YCTnIWjqI5I8CrVACY4xI64kE6c02F40Ex7xfYxn0WfASr-VFAUDa7-sFnT9fnUUI
-	cSsGvfJTRUUUbfkYFVCjjxCrM7AC8VAFwI0_Jr0_Gr1l1xkIjI8I6I8E6xAIw20EY4v20x
-	vaj40_Wr0E3s1l1IIY67AEw4v_Jrv_JF1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxS
-	w2x7M28EF7xvwVC0I7IYx2IY67AKxVW5JVW7JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxV
-	WxJVW8Jr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
-	xVWxJr0_GcWln4kS14v26r126r1DM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12
-	xvs2x26I8E6xACxx1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1q
-	6rW5McIj6I8E87Iv67AKxVW8JVWxJwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr4
-	1lc7CjxVAaw2AFwI0_JF0_Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_
-	Gr1l4IxYO2xFxVAFwI0_Jw0_GFylx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67
-	AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8I
-	cVAFwI0_Gr0_Xr1lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI
-	8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVW8JVWxJwCI42IY6I8E87Iv6xkF7I0E14v2
-	6r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxU4Xo7DUUUU
+X-Received: by 2002:a05:6638:860d:b0:482:ced6:e5f5 with SMTP id
+ iu13-20020a056638860d00b00482ced6e5f5mr127743jab.1.1713520955110; Fri, 19 Apr
+ 2024 03:02:35 -0700 (PDT)
+Date: Fri, 19 Apr 2024 03:02:35 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000d84c150616702f04@google.com>
+Subject: [syzbot] [bpf?] [net?] WARNING in _prb_commit
+From: syzbot <syzbot+f86f028ee75b0f7e6e5d@syzkaller.appspotmail.com>
+To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
+	daniel@iogearbox.net, davem@davemloft.net, edumazet@google.com, 
+	jakub@cloudflare.com, john.fastabend@gmail.com, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+
+Hello,
+
+syzbot found the following issue on:
+
+HEAD commit:    fe46a7dd189e Merge tag 'sound-6.9-rc1' of git://git.kernel..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=16834853180000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=1a07d5da4eb21586
+dashboard link: https://syzkaller.appspot.com/bug?extid=f86f028ee75b0f7e6e5d
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/b42ab0fd4947/disk-fe46a7dd.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/b8a6e7231930/vmlinux-fe46a7dd.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/4fbf3e4ce6f8/bzImage-fe46a7dd.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+f86f028ee75b0f7e6e5d@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+------------[ cut here ]------------
+raw_local_irq_restore() called with IRQs enabled
+WARNING: CPU: 0 PID: 7777 at kernel/locking/irqflag-debug.c:10 warn_bogus_irq_restore+0x29/0x30 kernel/locking/irqflag-debug.c:10
+Modules linked in:
+CPU: 0 PID: 7777 Comm: syz-executor.2 Not tainted 6.8.0-syzkaller-08951-gfe46a7dd189e #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
+RIP: 0010:warn_bogus_irq_restore+0x29/0x30 kernel/locking/irqflag-debug.c:10
+Code: 90 f3 0f 1e fa 90 80 3d be b2 b5 04 00 74 06 90 e9 3c f8 03 00 c6 05 af b2 b5 04 01 90 48 c7 c7 00 c3 0c 8b e8 98 c2 7d f6 90 <0f> 0b 90 90 eb df 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90
+RSP: 0018:ffffc9000336f098 EFLAGS: 00010286
+RAX: 0000000000000000 RBX: ffffc9000336f210 RCX: ffffc9000e40e000
+RDX: 0000000000040000 RSI: ffffffff8150f3f6 RDI: 0000000000000001
+RBP: 0000000000000200 R08: 0000000000000001 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000001 R12: ffffc9000336f218
+R13: 1ffff9200066de15 R14: ffffffff8d785660 R15: 00000000ffffece4
+FS:  00007f130d20e6c0(0000) GS:ffff8880b9400000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000001b33226000 CR3: 00000000235ce000 CR4: 0000000000350ef0
+Call Trace:
+ <TASK>
+ _prb_commit+0x280/0x2e0 kernel/printk/printk_ringbuffer.c:1727
+ prb_final_commit+0x1a/0x50 kernel/printk/printk_ringbuffer.c:1780
+ vprintk_store+0xa6a/0xb70 kernel/printk/printk.c:2289
+ vprintk_emit kernel/printk/printk.c:2323 [inline]
+ vprintk_emit+0xac/0x5a0 kernel/printk/printk.c:2297
+ vprintk+0x7f/0xa0 kernel/printk/printk_safe.c:45
+ _printk+0xc8/0x100 kernel/printk/printk.c:2367
+ __report_bug lib/bug.c:195 [inline]
+ report_bug+0x4ac/0x580 lib/bug.c:219
+ handle_bug+0x3d/0x70 arch/x86/kernel/traps.c:239
+ exc_invalid_op+0x17/0x50 arch/x86/kernel/traps.c:260
+ asm_exc_invalid_op+0x1a/0x20 arch/x86/include/asm/idtentry.h:621
+RIP: 0010:__local_bh_enable_ip+0xc3/0x120 kernel/softirq.c:362
+Code: 00 e8 b1 6c 0b 00 e8 cc 68 42 00 fb 65 8b 05 0c f1 b0 7e 85 c0 74 52 5b 5d e9 d9 44 84 09 65 8b 05 4e a5 af 7e 85 c0 75 9e 90 <0f> 0b 90 eb 98 e8 f3 66 42 00 eb 99 48 89 ef e8 29 e0 19 00 eb a2
+RSP: 0018:ffffc9000336f568 EFLAGS: 00010046
+RAX: 0000000000000000 RBX: 0000000000000201 RCX: 1ffffffff1f3eed7
+RDX: 0000000000000000 RSI: 0000000000000201 RDI: ffffffff88cc0674
+RBP: ffffffff88cc0674 R08: 0000000000000000 R09: ffffed1002b75801
+R10: ffff888015bac00b R11: ffffffff9349a260 R12: fffffffffffffffe
+R13: ffff888015bac008 R14: ffff888015bac000 R15: 00000000049396b8
+ spin_unlock_bh include/linux/spinlock.h:396 [inline]
+ sock_hash_delete_elem+0x1f4/0x260 net/core/sock_map.c:947
+ bpf_prog_2c29ac5cdc6b1842+0x42/0x4a
+ bpf_dispatcher_nop_func include/linux/bpf.h:1234 [inline]
+ __bpf_prog_run include/linux/filter.h:657 [inline]
+ bpf_prog_run include/linux/filter.h:664 [inline]
+ __bpf_trace_run kernel/trace/bpf_trace.c:2381 [inline]
+ bpf_trace_run2+0x154/0x420 kernel/trace/bpf_trace.c:2420
+ __bpf_trace_console+0xc7/0x100 include/trace/events/printk.h:10
+ __traceiter_console+0x67/0xb0 include/trace/events/printk.h:10
+ trace_console include/trace/events/printk.h:10 [inline]
+ printk_sprint+0x1e9/0x300 kernel/printk/printk.c:2178
+ vprintk_store+0x4e4/0xb70 kernel/printk/printk.c:2273
+ vprintk_emit kernel/printk/printk.c:2323 [inline]
+ vprintk_emit+0xac/0x5a0 kernel/printk/printk.c:2297
+ vprintk+0x7f/0xa0 kernel/printk/printk_safe.c:45
+ _printk+0xc8/0x100 kernel/printk/printk.c:2367
+ __ext4_warning+0x19d/0x210 fs/ext4/super.c:1031
+ ext4_group_extend+0x4d0/0x570 fs/ext4/resize.c:1860
+ __ext4_ioctl+0x3617/0x4570 fs/ext4/ioctl.c:1316
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:904 [inline]
+ __se_sys_ioctl fs/ioctl.c:890 [inline]
+ __x64_sys_ioctl+0x196/0x220 fs/ioctl.c:890
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xd5/0x260 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x6d/0x75
+RIP: 0033:0x7f130c47de69
+Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 e1 20 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f130d20e0c8 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00007f130c5abf80 RCX: 00007f130c47de69
+RDX: 0000000020001412 RSI: 0000000040086607 RDI: 0000000000000008
+RBP: 00007f130c4ca47a R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 000000000000000b R14: 00007f130c5abf80 R15: 00007ffcc968f808
+ </TASK>
 
 
-在 2024/4/19 17:17, Serge Semin 写道:
-> The change in the patch 2/6 concerns the_generic_  DW MAC DMA IRQ
-> handler. You can't change the mask here without justification.
-> Moreover the generic DW MAC doesn't have the status flags behind the
-> mask you set. That's why earlier we find out a solution with creating
-> the Loongson-specific DMA IRQ-handler. You have it implemented in the
-> patch 6/6.
-Sorry, I misinterpreted your comment earlier.
->
-> So my question was mostly rhetorical. You should have dropped the mask
-> change in this patch ever since the Loongson-specific DMA
-> IRQ-handler was added to your series.
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-I see. I'll restore this mask.
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
-Thanks,
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
 
-Yanteng
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
 
+If you want to undo deduplication, reply with:
+#syz undup
 
