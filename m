@@ -1,74 +1,74 @@
-Return-Path: <netdev+bounces-89694-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89695-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58C4F8AB379
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 18:39:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC4228AB403
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 18:59:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DAF49B20E59
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 16:39:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7B4182856E3
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 16:59:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF7C4130AC8;
-	Fri, 19 Apr 2024 16:39:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C908B13A3E4;
+	Fri, 19 Apr 2024 16:59:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iUGs+ovK"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="l6NJClBx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35EA27E783
-	for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 16:39:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A8094C63A;
+	Fri, 19 Apr 2024 16:59:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713544757; cv=none; b=L62qjAwCAX1mR8bvwqCkatf2Xaz36IzrEePyplNgLwDgmLoSx7vlsiTjTR1xEeSt9On/GhUm7BF7V7dAjsFwPj9RXkc1CA0EMvvtZLWgQy/k2M9aYd2TrU7HVtCr4VpfFEUoGh6OfjoHtV5zE/icDs4vwQ92A2EgqEoN9YVVJy4=
+	t=1713545967; cv=none; b=mLIQ+0Wcg797t/aAFWWGOUAizSaeS3teRyxRAqaxhx2w5EvQSO2mA4A6Yv/grGDqWL7wl6cb66mRmbCcPpPIQCoYWvdRqGq2xbMRGdI5mPzXiY21utD6xYD0XvWtKRm+hrGJwbPpC3gMfr751aPOs1Rynkd+2S2WSfJ6dELk6eg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713544757; c=relaxed/simple;
-	bh=3NkTiJa/TXLO0yV1gWWIu/A4oAwsiIGI3eFfMCyq+gM=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=dEjngwTc697tr455Z6BwVwrYQohsVzpZiIRbl7Yf3PF/EO4I+N2dsRwGMiiVvKbffixti+2v8nBWFgzj3luQqYAuGayFRqqevsEq/MSj+1qi+kWKS5JzsSmG5YJBFZ75p5sf2ecq2DFlPxaX1E2ZiWVQINZ+VXqRs51N5ylIPco=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iUGs+ovK; arc=none smtp.client-ip=198.175.65.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1713544755; x=1745080755;
-  h=date:from:to:cc:subject:message-id:mime-version;
-  bh=3NkTiJa/TXLO0yV1gWWIu/A4oAwsiIGI3eFfMCyq+gM=;
-  b=iUGs+ovKI/JnIyrIZ+krq2ZLmrbaeLAO4rI6pALNa5yUAutbjjumnaiy
-   bIxwLvioFhGOmsAtUMlZfFp9bEZIUPMmwCQttzJGw/eU0vzDeAt7CJV2J
-   jNjhw4YG6zNDLiKOUUtgVAzK0HRFLmitrIyxV/bWFt486CpORr87jIZjo
-   yvHPXJVr2aul5swRhjMFZWhwiIS6b31H3npxmDtZ09ZdwBnhXDq49Naq9
-   34B8mEKvfBD2od7SsA/yQyh+JdleuvoQs9hisnHvOQf4CzMZNYNQib7Bz
-   +M1XtM+JHTt2bDZJgOu8cHnRDM2mNtDGx/0p9WX1M+goa2ffMcOlxxhpr
-   A==;
-X-CSE-ConnectionGUID: ePtU5MSGQQ2qGXGlBh4A6g==
-X-CSE-MsgGUID: VYzMg64rTUWkAM8McnNvCQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11049"; a="9269900"
-X-IronPort-AV: E=Sophos;i="6.07,214,1708416000"; 
-   d="scan'208";a="9269900"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Apr 2024 09:39:15 -0700
-X-CSE-ConnectionGUID: GBr3yQJwRru0w1fjeaE5uw==
-X-CSE-MsgGUID: JCGIEthTSVWI1ojZ2FyiRA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,214,1708416000"; 
-   d="scan'208";a="28202672"
-Received: from unknown (HELO 23c141fc0fd8) ([10.239.97.151])
-  by orviesa004.jf.intel.com with ESMTP; 19 Apr 2024 09:39:13 -0700
-Received: from kbuild by 23c141fc0fd8 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1rxrGY-000AJC-2w;
-	Fri, 19 Apr 2024 16:39:10 +0000
-Date: Sat, 20 Apr 2024 00:38:48 +0800
-From: kernel test robot <lkp@intel.com>
-To: "Kory Maincent (Dent Project)" <kory.maincent@bootlin.com>
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew@lunn.ch>
-Subject: [net-next:main 19/25] ld.lld: error: undefined symbol:
- devm_regulator_register
-Message-ID: <202404200036.D8ap1Mf5-lkp@intel.com>
+	s=arc-20240116; t=1713545967; c=relaxed/simple;
+	bh=Z7YH0CvhpgqXNh0KlZ+NJZMQQx43ZiBcsIHLxUcuADU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mvHBaKurKlRYcUpfnRA3x4/TPTNSej+La1GymcqhLb7j2OBDA4F4eH9qGZ7hH1PKDg11GT6Ir2yY5BQJYXymmb3uNr9U3D5dO1tjFeKNee4vvKEYKVTOtkF8vwYVQkR+OuBW0+FB7Op+3nQOjioyrPumKgVK6xMjTVFxxnBq144=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=l6NJClBx; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1134)
+	id 2988A20FDAA1; Fri, 19 Apr 2024 09:59:26 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 2988A20FDAA1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1713545966;
+	bh=y/qgfgGYyhPfmyF6SjIYu3rIjqvmvUNw7mws9b1MVpg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=l6NJClBxCk4a3k/YEHO3EnfhE/ohLexA50S4Hi2qR8Qzdu69a4ZZPtWL/fkQ1ll3D
+	 iHcC/QJx7eAd/vrlyRMiIoh+xHLLxlN3MeeNoiOnVI4PIQL/n2SXnvBeZUGSgL4YsK
+	 ON23nNvME5OhTSJ7q8Uq6sDmjvQS8ymfE7Jxk8fs=
+Date: Fri, 19 Apr 2024 09:59:26 -0700
+From: Shradha Gupta <shradhagupta@linux.microsoft.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Jason Gunthorpe <jgg@ziepe.ca>, Zhu Yanjun <yanjun.zhu@linux.dev>,
+	linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org,
+	linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Ajay Sharma <sharmaajay@microsoft.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+	Long Li <longli@microsoft.com>,
+	Michael Kelley <mikelley@microsoft.com>,
+	Shradha Gupta <shradhagupta@microsoft.com>,
+	Yury Norov <yury.norov@gmail.com>,
+	Konstantin Taranov <kotaranov@microsoft.com>,
+	Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
+Subject: Re: [PATCH net-next] net: mana: Add new device attributes for mana
+Message-ID: <20240419165926.GC506@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <1713174589-29243-1-git-send-email-shradhagupta@linux.microsoft.com>
+ <20240415161305.GO223006@ziepe.ca>
+ <56b0a8c1-50f6-41a9-9ea5-ed45ada58892@linux.dev>
+ <b34bfb11-98a3-4418-b482-14f2e50745d3@lunn.ch>
+ <20240418060108.GB13182@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+ <20240418175059.GZ223006@ziepe.ca>
+ <f3e7ea07-2903-4f19-ba86-94bba569dae9@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,42 +77,28 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <f3e7ea07-2903-4f19-ba86-94bba569dae9@lunn.ch>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 
-tree:   https://git.kernel.org/pub/scm/linux/kernel/git/davem/net-next.git main
-head:   4cad4efa6eb209cea88175e545020de55fe3c737
-commit: d83e13761d5b0568376963729abcccf6de5a43ba [19/25] net: pse-pd: Use regulator framework within PSE framework
-config: i386-randconfig-051-20240419 (https://download.01.org/0day-ci/archive/20240420/202404200036.D8ap1Mf5-lkp@intel.com/config)
-compiler: clang version 17.0.6 (https://github.com/llvm/llvm-project 6009708b4367171ccdbf4b5905cb6a803753fe18)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240420/202404200036.D8ap1Mf5-lkp@intel.com/reproduce)
+On Thu, Apr 18, 2024 at 08:42:59PM +0200, Andrew Lunn wrote:
+> > >From an RDMA perspective this is all available from other APIs already
+> > at least and I wouldn't want to see new sysfs unless there is a netdev
+> > justification.
+> 
+> It is unlikely there is a netdev justification. Configuration happens
+> via netlink, not sysfs.
+> 
+>     Andrew
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202404200036.D8ap1Mf5-lkp@intel.com/
+Thanks. Sure, it makes sense to make the generic attribute configurable
+through the netdevice ops or netlink implementation. I will keep that in
+mind while adding the next set of configuration attributes for the driver.
+These attributes(from the patch) however, are hardware specific(that show
+the maximum supported values by the hardware in most cases). We want them
+to be a part of sysfs so that they are readily available in the production
+for improving debuggability. I will change the names of these attribute to
+indicate the same to avoid possible confusion.
 
-All errors (new ones prefixed by >>):
-
->> ld.lld: error: undefined symbol: devm_regulator_register
-   >>> referenced by pse_core.c:308 (drivers/net/pse-pd/pse_core.c:308)
-   >>>               drivers/net/pse-pd/pse_core.o:(pse_controller_register) in archive vmlinux.a
---
->> ld.lld: error: undefined symbol: rdev_get_drvdata
-   >>> referenced by pse_core.c:212 (drivers/net/pse-pd/pse_core.c:212)
-   >>>               drivers/net/pse-pd/pse_core.o:(pse_pi_is_enabled) in archive vmlinux.a
-   >>> referenced by pse_core.c:230 (drivers/net/pse-pd/pse_core.c:230)
-   >>>               drivers/net/pse-pd/pse_core.o:(pse_pi_enable) in archive vmlinux.a
-   >>> referenced by pse_core.c:250 (drivers/net/pse-pd/pse_core.c:250)
-   >>>               drivers/net/pse-pd/pse_core.o:(pse_pi_disable) in archive vmlinux.a
---
->> ld.lld: error: undefined symbol: rdev_get_id
-   >>> referenced by pse_core.c:220 (drivers/net/pse-pd/pse_core.c:220)
-   >>>               drivers/net/pse-pd/pse_core.o:(pse_pi_is_enabled) in archive vmlinux.a
-   >>> referenced by pse_core.c:238 (drivers/net/pse-pd/pse_core.c:238)
-   >>>               drivers/net/pse-pd/pse_core.o:(pse_pi_enable) in archive vmlinux.a
-   >>> referenced by pse_core.c:258 (drivers/net/pse-pd/pse_core.c:258)
-   >>>               drivers/net/pse-pd/pse_core.o:(pse_pi_disable) in archive vmlinux.a
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Regards,
+Shradha.
 
