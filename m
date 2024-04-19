@@ -1,201 +1,255 @@
-Return-Path: <netdev+bounces-89683-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89684-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E9D98AB2DA
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 18:08:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C86798AB2E6
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 18:11:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8399BB20BE4
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 16:08:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7EB53281C99
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 16:11:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 755B0130AC4;
-	Fri, 19 Apr 2024 16:08:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F891130AEB;
+	Fri, 19 Apr 2024 16:11:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="Sf2Xlu6Q"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lO+zm+wQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE3E212F59E
-	for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 16:08:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDF4A12F5A7
+	for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 16:10:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713542897; cv=none; b=VvaLvirvEKq38IZ0hN5WOdH+aRdJTU7mcZTrEWcPPCavinXc+ka1JCN+9qyX0W+rZb5+fXnsfaR+moHBFklzpzgpeKek1moWaRclMb4WGuNxzJCwLK5lEYC7rmWL9iVjoMgyGmd/MnVDpvVQGozgfqIU+uQrnhMdYF7lPxGtsEs=
+	t=1713543061; cv=none; b=fRj9Uu+KymVmM6zkOzm+eqrclMV/tlVoV7m4WRnLa29BFy6l1zGEReLqb0Gg47LaXYwhURCVUs2WPYsMeZ4cYBEx+kiLf5YHf89K0wCa587DZMZNFUdXZPtxYwDUQkxdZtPsBUFdo6QckbLwvH6AyQFGMyd07p4h0l8LPtv9iBE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713542897; c=relaxed/simple;
-	bh=FYXvL+rq1vg5JorOHdN62ahNaVprMd1yoASqXtkzb80=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KFLpw/DaUgnUPyJ2hf3mv28IatF6jCEQoZQDS2lUchtK/CVUnDSCq+sEUkLGM0CwRxcIwsdFpxxd9QhfaOgdlBSj9sLpoRWXuYeheKVf5eTK7jhO9KST5Tn4z6aKKVNKsJnpA+9fvAPtNLqeZD3+232Kkd0WIKbiTSSmgKOR/b8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=Sf2Xlu6Q; arc=none smtp.client-ip=209.85.210.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-6ed627829e6so2394147b3a.1
-        for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 09:08:15 -0700 (PDT)
+	s=arc-20240116; t=1713543061; c=relaxed/simple;
+	bh=eehnBh85z63Z0xcgChT284gGFYhR6pCi5rFEzm5r/6Y=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=JgGlLuSnoz8bylptNRD0rDwlciIc6irj2PzXs9CJybnI7S7dzg+EP7OW39+nY4MqnRrcKIRvip7WnEh8vcHRzZwUydmwp684iN1sOkqtoQi43XHhqTbULbQxhd2rUHpyLwCmA2Xgmh9pX9/bP5OZgXyJ3pzAUrLtyILYGQnWwzI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lO+zm+wQ; arc=none smtp.client-ip=209.85.167.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-518b9527c60so2505030e87.0
+        for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 09:10:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1713542895; x=1714147695; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=4bA2qYmiZxHE8ktpVD1aLFjKcriisXRkhg5ejBTRO0Y=;
-        b=Sf2Xlu6QywJkg2o52xiJinlzjXhy9A21eLFxiTiPQaOIQE0OwczuEzUk7EIFv+zHCb
-         6iE0ezF2v16Ad81HLC7wRLRpn1/VGe0xCNk3UxUv+fFtdZ5GHA3azpzRzD8RPESEBmSa
-         4lkxuEl6hRoi5bghnQsmzA+rRSc3NZHVHG1mZUeOiyxEHzYtu1yMao0cjqSMPcn8Q28/
-         LA2DLwDvMoqH+20LEFpf0B4Hz3AH55IliId/7vFsTtpX/z38bwMWjpkHKsy6cVlSZOpX
-         huFaLvHh5tS9yJ8dXZ1eORs4kL4iZiKtwo2oMTmM6e+XoOp5Y1wVjjqSGSSDIoajUX2k
-         7aPQ==
+        d=google.com; s=20230601; t=1713543058; x=1714147858; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XvZWY6oOIREGJOabaKvGrU4sw1NszHWyxny0cVSevBo=;
+        b=lO+zm+wQXDhXc5xNwrZdqvYZhatH1WYuIvVqb21jPowpBuQPyy4+BDmRnRu8OFyMWJ
+         VlTGUAwj0O0Iy2XZj43ImCpok2oprYjxpajxW1Cfdrz4IWGUKsZxbBYP+TuB93LP4T5O
+         kJ4D/Tq1B493GnU/ceG3IG2Io01psJc1Xqn6CaCv2RL3l7XvT0TfH3tG+1+WVWXaDTB4
+         Ej7z0kgGXm6Hv5DeDradDWVdX5nQyMI9H344yREYH/kzqQf2zN7HyhUb9d0+lghnYPgb
+         eDU36mQDbRFh9wzAUWcYpiRS0ohVi4fGKwvrxgsjutmpxxSjBtTYBApJrTejo5mfkVnk
+         9P4A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713542895; x=1714147695;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4bA2qYmiZxHE8ktpVD1aLFjKcriisXRkhg5ejBTRO0Y=;
-        b=D7CKVZWP6tKy5R8FDL+xu03n4uTCE1TSDVYuD32wsk7hN5UfdNjB6A1/8fBc8R/JZS
-         wtz9X7keeC9RVHi8aJd/Arp+cOxuJ/0h9iRZs7+YsmiJSap9j9p1uKqoGOxzC8huRYCm
-         MCLfJdzSp2lc8b96GhXBxM/Y0uxNCkl4dAKJGI/yHkI9wp6hYPmuXBsFQAA9+mN1Y9L3
-         FG2zDQyulYRWPOYULS8/ORuKkyRRcvuPVAj+JzZzyjWAgKF+dqxSDac3VYPGSSSL7lmH
-         4XHbY4ekn+mILqXwCuYc5VmbJfV092tV+IWTjmm/gpnHsG/jMMBUbc+0EVRUv2tncml7
-         O5fA==
-X-Gm-Message-State: AOJu0Yxj9Bg/pfTWsC6PTy7TGdQiU93Hf2UaqjnIoUrevRkaaAeSRmuB
-	vEOr7uJa1A8Deum/DyEC2CHEeODm4qwL1aBvUyB/yE+yxFIbmqWd+FivaS9Zz+I=
-X-Google-Smtp-Source: AGHT+IFhe9C4VBtM4vnp8oYrZBPNX+QIYjAIfYhGrctc47Ljbn7X1aAixaJJ+SeozCJ8vfJ/HzckiA==
-X-Received: by 2002:a05:6a20:1055:b0:1a7:5bba:98bd with SMTP id gt21-20020a056a20105500b001a75bba98bdmr2661741pzc.36.1713542894950;
-        Fri, 19 Apr 2024 09:08:14 -0700 (PDT)
-Received: from ?IPV6:2a03:83e0:1256:2:c51:2090:e106:83fa? ([2620:10d:c090:500::5:d1b7])
-        by smtp.gmail.com with ESMTPSA id r8-20020a63fc48000000b005dbd0facb4dsm3235113pgk.61.2024.04.19.09.08.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 19 Apr 2024 09:08:14 -0700 (PDT)
-Message-ID: <89c29a49-0f32-4222-8c71-5317eb8b0d1a@davidwei.uk>
-Date: Fri, 19 Apr 2024 09:08:13 -0700
+        d=1e100.net; s=20230601; t=1713543058; x=1714147858;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=XvZWY6oOIREGJOabaKvGrU4sw1NszHWyxny0cVSevBo=;
+        b=Q/+W3X7NkJtI5w1rsoRUhJ0+RKQs6CSyRpk9N1IZcgPpNkT+b1HYFZLG3WqqWUXO1O
+         hfsXx/E81UXKAcy5kjVYjJZMoebyBuMLcR9GcdHuyuIP2c9GKysF5kOBjREh1oUGjVwa
+         t7TXuoDRqlgvXDmxwxG66TCq43X7ndVJ+ghYboGIIIsmwzm/tw+88QniTUF2HAxlObMX
+         1TErm7wTxYin/pjjFyvKHwHy0LugVTJRCSNgcg/zaYBteDd4MH2LOfOZy+46CcvKokg7
+         TlS4uJMFgH1P+i7KRLlew63tD+bntvshnxMD5a+cDukMVrRQ6qLYZ3GEX4RQwoSI8/CS
+         1AHA==
+X-Forwarded-Encrypted: i=1; AJvYcCVxeaduJAk0V1M+yVZo/B+Ik8kG+vdrwzSMRkH3I/hs4U6Sbi1TLxdaLbKP/S+EJAgVGhWkWKsLf+jsuKvVjSiM0SpSZKDL
+X-Gm-Message-State: AOJu0YzGKSZYkXbB5WN/wyv+QBf+tZttbiEyfTGK09EYmsfVIrAlK+yw
+	OF3E+a5Owx9IAAlumiale5fqn3ADluu0iz1p1F+dsfj60Ws6EmFv48bUmhsrfHeRHQ/OR2HnAy5
+	YNX7eNPIIXvoFLUMfgc260khnHuEeMIEVnbVE
+X-Google-Smtp-Source: AGHT+IGWGilLzy12Dv8VAke4188rPAQ0OKFvfkHiWvvb18jJsL6vHdLpif5ti5Rm1G+CqcDwXu04/IlUPjEMRABYurU=
+X-Received: by 2002:a19:5e1d:0:b0:51a:da5f:ef89 with SMTP id
+ s29-20020a195e1d000000b0051ada5fef89mr232134lfb.62.1713543057665; Fri, 19 Apr
+ 2024 09:10:57 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 1/2] netdevsim: add NAPI support
+References: <20240418195159.3461151-1-shailend@google.com> <20240418195159.3461151-10-shailend@google.com>
+ <20240418184851.5cc11647@kernel.org>
+In-Reply-To: <20240418184851.5cc11647@kernel.org>
+From: Mina Almasry <almasrymina@google.com>
+Date: Fri, 19 Apr 2024 09:10:42 -0700
+Message-ID: <CAHS8izO=Vc6Kxx620_y6v-3PtRL3_UFP6zDRfgLf85SXpP0+dQ@mail.gmail.com>
+Subject: Re: [RFC PATCH net-next 9/9] gve: Implement queue api
 To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-References: <20240416051527.1657233-1-dw@davidwei.uk>
- <20240416051527.1657233-2-dw@davidwei.uk>
- <20240416172730.1b588eef@kernel.org>
-Content-Language: en-GB
-From: David Wei <dw@davidwei.uk>
-In-Reply-To: <20240416172730.1b588eef@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Cc: Shailend Chand <shailend@google.com>, netdev@vger.kernel.org, davem@davemloft.net, 
+	edumazet@google.com, pabeni@redhat.com, willemb@google.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 2024-04-16 5:27 pm, Jakub Kicinski wrote:
-> On Mon, 15 Apr 2024 22:15:26 -0700 David Wei wrote:
->> Add NAPI support to netdevim, similar to veth.
->>
->> * Add a nsim_rq rx queue structure to hold a NAPI instance and a skb
->>   queue.
->> * During xmit, store the skb in the peer skb queue and schedule NAPI.
->> * During napi_poll(), drain the skb queue and pass up the stack.
->> * Add assoc between rxq and NAPI instance using netif_queue_set_napi().
-> 
->> +#define NSIM_RING_SIZE		256
->> +
->> +static int nsim_napi_rx(struct nsim_rq *rq, struct sk_buff *skb)
->> +{
->> +	if (list_count_nodes(&rq->skb_queue) > NSIM_RING_SIZE) {
->> +		dev_kfree_skb_any(skb);
->> +		return NET_RX_DROP;
->> +	}
->> +
->> +	list_add_tail(&skb->list, &rq->skb_queue);
-> 
-> Why not use struct sk_buff_head ?
-> It has a purge helper for freeing, and remembers its own length.
+On Thu, Apr 18, 2024 at 6:48=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Thu, 18 Apr 2024 19:51:59 +0000 Shailend Chand wrote:
+> > +static int gve_rx_queue_stop(struct net_device *dev, int idx,
+> > +                          void **out_per_q_mem)
+> > +{
+> > +     struct gve_priv *priv =3D netdev_priv(dev);
+> > +     struct gve_rx_ring *rx;
+> > +     int err;
+> > +
+> > +     if (!priv->rx)
+> > +             return -EAGAIN;
+> > +     if (idx < 0 || idx >=3D priv->rx_cfg.max_queues)
+> > +             return -ERANGE;
+>
+> A little too defensive? Core should not issue these > current real num
+> queues.
+>
+> > +     /* Destroying queue 0 while other queues exist is not supported i=
+n DQO */
+> > +     if (!gve_is_gqi(priv) && idx =3D=3D 0)
+> > +             return -ERANGE;
+> > +
+> > +     rx =3D kvzalloc(sizeof(*rx), GFP_KERNEL);
+>
+> Why allocate in the driver rather than let the core allocate based on
+> the declared size ?
+>
 
-Didn't know about sk_buff_head! Thanks, it's much better.
+Currently the ndos don't include an interface for the driver to
+declare the size, right? In theory we could add it to the ndos like
+so, if I understood you correctly (untested yet, just to illustrate
+what I'm thinking point):
 
-> 
->> +static int nsim_poll(struct napi_struct *napi, int budget)
->> +{
->> +	struct nsim_rq *rq = container_of(napi, struct nsim_rq, napi);
->> +	int done;
->> +
->> +	done = nsim_rcv(rq, budget);
->> +
->> +	if (done < budget && napi_complete_done(napi, done)) {
->> +		if (unlikely(!list_empty(&rq->skb_queue)))
->> +			napi_schedule(&rq->napi);
-> 
-> I think you can drop the re-check, NAPI has a built in protection 
-> for this kind of race.
+diff --git a/drivers/net/ethernet/google/gve/gve_main.c
+b/drivers/net/ethernet/google/gve/gve_main.c
+index 7c38dc06a392..efe3944b529a 100644
+--- a/drivers/net/ethernet/google/gve/gve_main.c
++++ b/drivers/net/ethernet/google/gve/gve_main.c
+@@ -2579,11 +2579,16 @@ static void gve_write_version(u8 __iomem
+*driver_version_register)
+  writeb('\n', driver_version_register);
+ }
 
-Would veth also want this dropped, or does it serve a different purpose
-there?
++static size_t gve_rx_queue_mem_get_size(void)
++{
++ return sizeof(struct gve_rx_ring);
++}
++
+ static int gve_rx_queue_stop(struct net_device *dev, int idx,
+-      void **out_per_q_mem)
++      void *out_per_q_mem)
+ {
+  struct gve_priv *priv =3D netdev_priv(dev);
+- struct gve_rx_ring *rx;
++ struct gve_rx_ring *rx =3D out_per_q_mem;
+  int err;
 
-> 
->> +	}
->> +
->> +	return done;
->> +}
-> 
->>  static int nsim_open(struct net_device *dev)
->>  {
->>  	struct netdevsim *ns = netdev_priv(dev);
->> -	struct page_pool_params pp = { 0 };
->> +	int err;
->> +
->> +	err = nsim_init_napi(ns);
->> +	if (err)
->> +		return err;
->> +
->> +	nsim_enable_napi(ns);
->>  
->> -	pp.pool_size = 128;
->> -	pp.dev = &dev->dev;
->> -	pp.dma_dir = DMA_BIDIRECTIONAL;
->> -	pp.netdev = dev;
->> +	netif_carrier_on(dev);
-> 
-> Why the carrier? It's on by default.
-> Should be a separate patch if needed.
+  if (!priv->rx)
+@@ -2595,9 +2600,6 @@ static int gve_rx_queue_stop(struct net_device
+*dev, int idx,
+  if (!gve_is_gqi(priv) && idx =3D=3D 0)
+  return -ERANGE;
 
-Symmetry, not sure if it was needed or not. Will remove.
+- rx =3D kvzalloc(sizeof(*rx), GFP_KERNEL);
+- if (!rx)
+- return -ENOMEM;
+  *rx =3D priv->rx[idx];
 
-> 
->> -	ns->pp = page_pool_create(&pp);
->> -	return PTR_ERR_OR_ZERO(ns->pp);
->> +	return 0;
->> +}
-> 
->> diff --git a/drivers/net/netdevsim/netdevsim.h b/drivers/net/netdevsim/netdevsim.h
->> index 7664ab823e29..87bf45ec4dd2 100644
->> --- a/drivers/net/netdevsim/netdevsim.h
->> +++ b/drivers/net/netdevsim/netdevsim.h
->> @@ -90,11 +90,18 @@ struct nsim_ethtool {
->>  	struct ethtool_fecparam fec;
->>  };
->>  
->> +struct nsim_rq {
->> +	struct napi_struct napi;
->> +	struct list_head skb_queue;
->> +	struct page_pool *page_pool;
-> 
-> You added the new page_pool pointer but didn't delete the one
-> I added recently to the device?
+  /* Single-queue destruction requires quiescence on all queues */
+@@ -2606,7 +2608,6 @@ static int gve_rx_queue_stop(struct net_device
+*dev, int idx,
+  /* This failure will trigger a reset - no need to clean up */
+  err =3D gve_adminq_destroy_single_rx_queue(priv, idx);
+  if (err) {
+- kvfree(rx);
+  return err;
+  }
 
-Yeah, sorry that slipped through the rebase.
+@@ -2618,7 +2619,6 @@ static int gve_rx_queue_stop(struct net_device
+*dev, int idx,
+  /* Turn the unstopped queues back up */
+  gve_turnup_and_check_status(priv);
 
-> 
->> +};
->> +
->>  struct netdevsim {
->>  	struct net_device *netdev;
->>  	struct nsim_dev *nsim_dev;
->>  	struct nsim_dev_port *nsim_dev_port;
->>  	struct mock_phc *phc;
->> +	struct nsim_rq *rq;
->>  
->>  	u64 tx_packets;
->>  	u64 tx_bytes;
-> 
+- *out_per_q_mem =3D rx;
+  return 0;
+ }
+
+@@ -2709,6 +2709,7 @@ static const struct netdev_queue_mgmt_ops
+gve_queue_mgmt_ops =3D {
+  .ndo_queue_mem_free =3D gve_rx_queue_mem_free,
+  .ndo_queue_start =3D gve_rx_queue_start,
+  .ndo_queue_stop =3D gve_rx_queue_stop,
++ .ndo_queue_mem_get_size =3D gve_rx_queue_mem_get_size,
+ };
+
+ static int gve_probe(struct pci_dev *pdev, const struct pci_device_id *ent=
+)
+diff --git a/include/net/netdev_queues.h b/include/net/netdev_queues.h
+index 337df0860ae6..0af08414d8eb 100644
+--- a/include/net/netdev_queues.h
++++ b/include/net/netdev_queues.h
+@@ -75,6 +75,7 @@ struct netdev_stat_ops {
+  * @ndo_queue_stop: Stop the RX queue at the specified index.
+  */
+ struct netdev_queue_mgmt_ops {
++ size_t (*ndo_queue_mem_get_size)(void);
+  void * (*ndo_queue_mem_alloc)(struct net_device *dev,
+         int idx);
+  void (*ndo_queue_mem_free)(struct net_device *dev,
+@@ -84,7 +85,7 @@ struct netdev_queue_mgmt_ops {
+     void *queue_mem);
+  int (*ndo_queue_stop)(struct net_device *dev,
+    int idx,
+-   void **out_queue_mem);
++   void *out_queue_mem);
+ };
+
+ /**
+diff --git a/net/core/devmem.c b/net/core/devmem.c
+index 01337de7d6a4..89c90e21f083 100644
+--- a/net/core/devmem.c
++++ b/net/core/devmem.c
+@@ -60,7 +60,8 @@ static int net_devmem_restart_rx_queue(struct
+net_device *dev, int rxq_idx)
+  void *old_mem;
+  int err;
+
+- if (!dev->queue_mgmt_ops->ndo_queue_stop ||
++ if (!dev->queue_mgmt_ops->ndo_queue_mem_get_size ||
++     !dev->queue_mgmt_ops->ndo_queue_stop ||
+      !dev->queue_mgmt_ops->ndo_queue_mem_free ||
+      !dev->queue_mgmt_ops->ndo_queue_mem_alloc ||
+      !dev->queue_mgmt_ops->ndo_queue_start)
+@@ -70,7 +71,11 @@ static int net_devmem_restart_rx_queue(struct
+net_device *dev, int rxq_idx)
+  if (!new_mem)
+  return -ENOMEM;
+
+- err =3D dev->queue_mgmt_ops->ndo_queue_stop(dev, rxq_idx, &old_mem);
++ old_mem =3D kvzalloc(dev->queue_mgmt_ops->ndo_queue_mem_get_size(),
++    GFP_KERNEL);
++ BUG_ON(!old_mem); /* TODO */
++
++ err =3D dev->queue_mgmt_ops->ndo_queue_stop(dev, rxq_idx, old_mem);
+  if (err)
+  goto err_free_new_mem;
+
+@@ -79,6 +84,7 @@ static int net_devmem_restart_rx_queue(struct
+net_device *dev, int rxq_idx)
+  goto err_start_queue;
+
+  dev->queue_mgmt_ops->ndo_queue_mem_free(dev, old_mem);
++ kvfree(old_mem);
+
+  return 0;
+
+
+I think maybe if we want to apply this change to mem_stop, then we
+should probably also apply this change to queue_mem_alloc as well,
+right? I.e. core will allocate the pointer, and ndo_queue_mem_alloc
+would allocate the actual resources and would fill in the entries of
+the pointer? Is this what you're looking for here?
+
+--
+Thanks,
+Mina
 
