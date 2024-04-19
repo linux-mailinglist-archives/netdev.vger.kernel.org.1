@@ -1,104 +1,146 @@
-Return-Path: <netdev+bounces-89690-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89692-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22EF68AB362
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 18:31:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5187D8AB36E
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 18:36:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4A7331C229EF
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 16:31:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 069A21F231EB
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 16:36:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 986C9130E4F;
-	Fri, 19 Apr 2024 16:31:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="DIv90rFk"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF5E4130E4F;
+	Fri, 19 Apr 2024 16:36:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83A1D1E502
-	for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 16:31:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61C3612F5A7
+	for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 16:36:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713544274; cv=none; b=sroMABKg7Hi4biLnqJaFiXrgokg6WWJq7BHV9g/Q0iOI8iZIb0DHq9svdn4MsnzoIIIqB/zzGot2pig/ra/u7/VtrTQS5if0VokPMOGqAmRELD6mx9SCWqX2kUKLNrdCR1z/n1XPghx2ZRe/Mp+GNGhltTWby944j/Jm6a/9HMA=
+	t=1713544590; cv=none; b=fmrQQQTeW9vtUR8brVNLTMSHBjnXuC9RoWH8yJFnNfja2qI5d55LSALZpE0qIqjip96hJDTxthKhnnjisqY2Ze0Q6yYG/cy2SxIz3O2CYrioqDGhamGsdzFE4ZDaEP6Q9hi1iWEXPpNxZBpOz/SlVTj7dLFTRg1fjwVGLTYaor8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713544274; c=relaxed/simple;
-	bh=Uak3nQX60wp3d+nPEjy5Ih1/XCbRSucCOAk1vaDdvSs=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=AFmpNvlmoJF9p36l7saMIjG96uXW8A0Bvgbj2DwrQLboMl4cUoMgr7g9j9Qw+0dpgeXFDCPZ23F1NWFe+rvsHDyHKUqpcVnc8kCU1qplNHl093RdGI6z4DEJZzhKrEmHp5klotVcnVO1ie16p912ads+J28nhFieBy/yRLq6eWE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=DIv90rFk; arc=none smtp.client-ip=209.85.210.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-6ead4093f85so2172549b3a.3
-        for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 09:31:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1713544272; x=1714149072; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Uak3nQX60wp3d+nPEjy5Ih1/XCbRSucCOAk1vaDdvSs=;
-        b=DIv90rFkeul7Sm4dbSWMtzFSSNqKlVx6q2vO2U9qeQvY2WSIBkv2C75RZE//mmRI2u
-         vtjVYAm6DnEodBWW33QXIi/An9AlmnDbZlERaF5w0QpLYbGbQj0CSoVNuJk7sXyvqsWS
-         WmABsx0TXsRkKIzPCWbe1CpnbIwZEhgH4tTyQrmEJ1bfJNtcFxgCldG1G6cZjkqQ9/YH
-         5bwJsEmWEw9/kKOzx7wp1VSL71oVMsbsxvt/7Wet5c5baY62GRoDHi2H4AArtNhsgnMM
-         OIzPm1iqmpqbCnHcXSlSNFURThdL1NkgWGkDvtHcYPUFDvz4Xsff6sGZbrfVwLCdn4e2
-         jrpg==
+	s=arc-20240116; t=1713544590; c=relaxed/simple;
+	bh=+C4DMii5zcb/bP9gJ9Q8qwtxYZLGxz+666DdY3d/UwY=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=YwpGhuISyrtMbXxfn9jkvzZDysd4WhVWw5X5koGcCvsGhM/SRy0CHS1Rc/M6OcM8HEHAocYpUAxeOfL5bjBe/EmL471uJjidEa3DIg1byBFg6sIMyHEXzye304MAZFd0Ld9KOGTANGJIvVAOgMhaJatTKYDF6qwielwYnVuxweM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-36a1c2b7172so24315265ab.1
+        for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 09:36:29 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713544272; x=1714149072;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Uak3nQX60wp3d+nPEjy5Ih1/XCbRSucCOAk1vaDdvSs=;
-        b=AbCt5utJnefJ2yX8IkyyGOVVhTcekYl7nzFJRcVx6iv/pqLZYHt+kjXnoU9K8Srpbm
-         PTazf9EfuwbyRuJG27BLS6kqQOr28/ViGB2zfLBEm/Ev2GX9PCfHhODIPvgJaIgWwiQH
-         gOWgu1jm6nBki2J3YC9tNecTCTuNHiWdQUGHn7Ii6UtNCAkQAntwKxizLW7subgpJ1S6
-         fUhlCLdtsDkdbvjmt+8P6H+m/GoT5q2ravXPIY8CZ3kD5zD0ilAasnG1biE1PEXdboYO
-         30n/UhyjCwmM1tUpiSy9if80bpRNV26b9w9/CZvBWcnVF45L2l1tFAyUhxBxLyDMDtLx
-         KHVA==
-X-Gm-Message-State: AOJu0YzAfuNJdl8nWy7jhs9DEd1zCLhyb13WoHv8CFkOSp14iUEkMpdz
-	62SozV94VK/AvTLNQ0ToC6GXcpH4eFNKe1D3kqMi+cXtAwqKnSIHDOuaO1n26JEJ5Lv/IhAusMx
-	M
-X-Google-Smtp-Source: AGHT+IETtJ3M/rO8sgG1P3yYUKRycpoP1Wg5eJ9EU9GzYAqzsDXELje4L0tgMYJjwi5qH45NuRfMBQ==
-X-Received: by 2002:a05:6a00:1942:b0:6ed:4288:68bc with SMTP id s2-20020a056a00194200b006ed428868bcmr3332970pfk.19.1713544271631;
-        Fri, 19 Apr 2024 09:31:11 -0700 (PDT)
-Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id z18-20020aa785d2000000b006ed03220122sm1718558pfn.16.2024.04.19.09.31.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 Apr 2024 09:31:11 -0700 (PDT)
-Date: Fri, 19 Apr 2024 09:31:08 -0700
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: "Tom, Deepak Abraham" <deepak-abraham.tom@hpe.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: 2nd RTM_NEWLINK notification with operstate down is always 1
- second delayed
-Message-ID: <20240419093108.0fb8c108@hermes.local>
-In-Reply-To: <DS7PR84MB3039BEC88FB54C62BD107CF6D70E2@DS7PR84MB3039.NAMPRD84.PROD.OUTLOOK.COM>
-References: <DS7PR84MB303940368E1CC7CE98A49E96D70F2@DS7PR84MB3039.NAMPRD84.PROD.OUTLOOK.COM>
-	<20240417153350.629168f8@hermes.local>
-	<DS7PR84MB3039BEC88FB54C62BD107CF6D70E2@DS7PR84MB3039.NAMPRD84.PROD.OUTLOOK.COM>
+        d=1e100.net; s=20230601; t=1713544588; x=1714149388;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=YJTgtM8/phEDPy29/U+rRcWoZ2PCF3g9CcR2GjEyFog=;
+        b=ncqXV+WmqB9b6jJrFjGk6rcjel9J1rpc2Dho8ZdV1rTu7NwPFZwtV6ps+EpYYKDKlk
+         Qqi0zzWO/EPxZThGHTfIqrZp1bipLSBdCIYSfGf5zNQwK3IlcEtkaI02m+zta1gNXwU9
+         VAaW1HuVIB8ZjZ+Mvg/V9wp6dRQXQ33c6pQAeTY5NT7QJ26J0khzXyZ52rYYSfnFva+R
+         XvzyeMf7EcbW4towH5t92OVop1hRAGpjn3z3ddhTXBFpSgqBycjjE8muuauKcQnA1R9J
+         mcgaxXuKqzXzNDlwD51pkLXDqKAxMdTSAAo+wFASG2OZjuUhshE9dnrOWpv23QNGnAeQ
+         JtBg==
+X-Forwarded-Encrypted: i=1; AJvYcCUh+WV8Qow54NSbIKXgO8p2h9NgW60bpwiRBLA7vlpkRMZYEJFmlUAn+oDtn5nD93WcaIMlHVA6UQnT82HRTyTcGejFesqC
+X-Gm-Message-State: AOJu0YyxEsNXBcBUcEqSvlmZvD4z7s0IHJTgHUeooOtMOj2lbDg4z3yD
+	D1KmV2HYSE3C8N5G9fThB+/212NiDqp7jFwMdKubisnim4aPjmnlBFwejVrsFTJno3tx8iOKzSy
+	62x1WQPLZ8efFRFMpnH5JHl1awd27i+s7d5VesmzYzVVQBS2GdMVU08E=
+X-Google-Smtp-Source: AGHT+IEcfUp0pVkcrvPKsDpRGGwGB97E/TmioptRlF21U/7NduERDQoFqDWTBQ9vkis37DE1AoYMsQmDlY8lMNNEgJF7hejmof9u
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a05:6e02:1d12:b0:36a:3c40:3e29 with SMTP id
+ i18-20020a056e021d1200b0036a3c403e29mr113388ila.3.1713544588580; Fri, 19 Apr
+ 2024 09:36:28 -0700 (PDT)
+Date: Fri, 19 Apr 2024 09:36:28 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000826ac1061675b0e3@google.com>
+Subject: [syzbot] [net?] KMSAN: uninit-value in unwind_dump
+From: syzbot <syzbot+355c5bb8c1445c871ee8@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, 18 Apr 2024 19:26:51 +0000
-"Tom, Deepak Abraham" <deepak-abraham.tom@hpe.com> wrote:
+Hello,
 
-> Maybe I'm missing something, but could you please explain how this really helps to not keep FRR busy?
-> If I understood this right, the link watch code does not ignore events but merely delays them. So any link transition will be propagated whether its scheduled urgently or not urgently.
-> So FRR will have to still deal with each transition keeping it busy with or without this change, unless FRR dampens flaps on its own?
->
+syzbot found the following issue on:
 
-A poor connection to a switch can cause repeated link down/up. I haven't seen it in person,
-but have had to deal with user reports of poor router connections.
+HEAD commit:    0bbac3facb5d Linux 6.9-rc4
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=13403bcb180000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=87a805e655619c64
+dashboard link: https://syzkaller.appspot.com/bug?extid=355c5bb8c1445c871ee8
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
 
-> Also from a design perspective, would it be better if FRR's issues with route flaps be dealt directly in FRR code itself? That way, in use cases where FRR does not come in to play, such a delay is not causing other consequences? Are there more such situations where such a delay is absolutely required?
+Unfortunately, I don't have any reproducer for this issue yet.
 
-Too late, now. Can't change Linux semantics without breaking many things. And it impacts not just FRR.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/93eb2bab28b5/disk-0bbac3fa.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/47a883d2dfaa/vmlinux-0bbac3fa.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/6bc56900ec1d/bzImage-0bbac3fa.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+355c5bb8c1445c871ee8@syzkaller.appspotmail.com
+
+WARNING: kernel stack frame pointer at ffff88813fd05fe8 in kworker/1:1:42 has bad value ffff888103513fe8
+unwind stack type:0 next_sp:ffff888103513fd8 mask:0x4 graph_idx:0
+=====================================================
+BUG: KMSAN: uninit-value in unwind_dump+0x5a0/0x730 arch/x86/kernel/unwind_frame.c:60
+ unwind_dump+0x5a0/0x730 arch/x86/kernel/unwind_frame.c:60
+ unwind_next_frame+0x2d6/0x470
+ arch_stack_walk+0x1ec/0x2d0 arch/x86/kernel/stacktrace.c:25
+ stack_trace_save+0xaa/0xe0 kernel/stacktrace.c:122
+ ref_tracker_free+0x103/0xec0 lib/ref_tracker.c:239
+ __netns_tracker_free include/net/net_namespace.h:348 [inline]
+ put_net_track include/net/net_namespace.h:363 [inline]
+ __sk_destruct+0x5aa/0xb70 net/core/sock.c:2204
+ sk_destruct net/core/sock.c:2223 [inline]
+ __sk_free+0x6de/0x760 net/core/sock.c:2234
+ sk_free+0x70/0xc0 net/core/sock.c:2245
+ deferred_put_nlk_sk+0x243/0x270 net/netlink/af_netlink.c:744
+ rcu_do_batch kernel/rcu/tree.c:2196 [inline]
+ rcu_core+0xa59/0x1e70 kernel/rcu/tree.c:2471
+ rcu_core_si+0x12/0x20 kernel/rcu/tree.c:2488
+ __do_softirq+0x1c0/0x7d7 kernel/softirq.c:554
+ invoke_softirq kernel/softirq.c:428 [inline]
+ __irq_exit_rcu kernel/softirq.c:633 [inline]
+ irq_exit_rcu+0x6a/0x130 kernel/softirq.c:645
+ instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1043 [inline]
+ sysvec_apic_timer_interrupt+0x83/0x90 arch/x86/kernel/apic/apic.c:1043
+
+Local variable tx created at:
+ ieee80211_get_buffered_bc+0x44/0x970 net/mac80211/tx.c:5886
+ mac80211_hwsim_beacon_tx+0x63b/0xb40 drivers/net/wireless/virtual/mac80211_hwsim.c:2303
+
+CPU: 1 PID: 42 Comm: kworker/1:1 Not tainted 6.9.0-rc4-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
+Workqueue: usb_hub_wq hub_event
+=====================================================
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
