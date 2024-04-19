@@ -1,144 +1,100 @@
-Return-Path: <netdev+bounces-89677-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89678-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B03E78AB209
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 17:37:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2EBAB8AB230
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 17:44:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3AB241F22DAA
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 15:37:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E03E7284E1C
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 15:44:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 510C312FF8C;
-	Fri, 19 Apr 2024 15:36:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4382512FF81;
+	Fri, 19 Apr 2024 15:44:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hTCtZ/rD"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="35+1MKQq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A444912E1E7;
-	Fri, 19 Apr 2024 15:36:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CA6A12FF73
+	for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 15:44:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713541007; cv=none; b=AXPXSlZ5XzglfLCGa31YumU3ZqdtvPCydyYQy5tmXKXfR89gNJu3FFgW8Q2dbevV6iaSRAyd4ZhOr5+CyubJr8sKY0GUM/GMKVja4I0Ks/L/9dvZcZT+viSCmM+a1Gq5j4hOaWB70egl8F5JcvPC2kYhZB9WKybb2hRYLHwlDqY=
+	t=1713541462; cv=none; b=DyG1N3RHCL4n6tQKJZG3OnQaeGAkwbPtdE49pK6hzRjgLXkAI3hwXtnGq2RIY3i3ax8kBXBEQ6sGfgyQHaqkAvqtP8dv61rmxN5h33+rI4E/YippiXdkcP45Zu4Edcm3tRn8CVXu2MsRw3UHEK9ZCkvV7bHmZAbG0tmD14Hh5TY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713541007; c=relaxed/simple;
-	bh=bXd2cF1r5wGgGn8qjmQ3gV0VuKXhxZccccWQSzrZm9Q=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=kg3g7ZZVAskH32H/WEQbaCXJNKCxvd8f195wXQ0q9MCD6KdsP/n8ggHlM3zbR+MY8waPByRDNy0ARBNXxGVZNBhNUpCy6G0+lEKDFThT9fp6P1YDDefMw7GlNYkE054SOnS7vRPD4FzMsdgmSYb5BhE1uvonJdvzIA0Ca82AquY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hTCtZ/rD; arc=none smtp.client-ip=209.85.221.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-34a7e47d164so287928f8f.3;
-        Fri, 19 Apr 2024 08:36:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713541004; x=1714145804; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dBCxnbysmOgF/ewLoKlev2MPx9AEH27+l/wXXPvFzlE=;
-        b=hTCtZ/rDjFcmpsxKKEFGcRQ8OivwwbPt5Qk0CWkrMgqojFPLVNgxswXfPkbtdX4aVO
-         m8vtNjLn87/eA8w0tM63PCTnVc7dSUKmgjvoUkRdjA1hbisDyQwEFVKesUrINn9VU1p4
-         Q6z1v3ZM3SFJZ6kS5XpN0gM1S1RwmnvXhTjYu2zG+n57MiUkmlLT9tynEdd9sgAkxD/O
-         RWpodTSgNPnyXxvNQvtqjCeUDz4T3oWHHpm8Iz86MFyNQ/1qxLeuI8/xyNqyvS14+SDD
-         HsyD5l8oa2dO/L3j3e6NmeFT7W1oSJSr5KInxPuvb4ZQ50sPtqwJQs4xI8avWOPIQWR9
-         eNSg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713541004; x=1714145804;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=dBCxnbysmOgF/ewLoKlev2MPx9AEH27+l/wXXPvFzlE=;
-        b=miUnJ4lEtQB4gIfY46dwapmecGN1XjuowgDKHker9qGlvc+nA/ulLhd/s3Xfa9J1KZ
-         VFUavhfH8sXJlQmZFiQJd0fo8vkVy/IdDMc7DBdiQsInwFvE+9BEh1ObjOjHQsgWzROI
-         e/AV7ViMXN2Q8FAcHbIe6VQ3UOQrjzczjT/Xce0vgOONrHWWjyrAvZiP1H24cRhfm7jp
-         DlNgn8I8/Dfhn2li4+x1ntL+lOZExLDYYREk2wYWqw2GFC4RR3H5aZjJs+4vN1QjjLdR
-         A0KwY8yyZYcDs/8qg/Mo6xQxcRWewLWDFsx65ScYBmkesJleof62rC7d7tAWumlAqTCN
-         WjFA==
-X-Forwarded-Encrypted: i=1; AJvYcCWKIe16iGbmQV1EiYhjvRJHKguTVyaSl1ZZ3WB4pDmUMP7CI/UOOgQfCJTiDlUWeVzUjj4eor8d9g+YqpRGq6fz3fRILQ6J2B4n9JV5Uxly6qEA55x0aH+xUIMuKDgZAJHi73ej
-X-Gm-Message-State: AOJu0YyMLO/Bc/1JsYhmCia3OD2JAo3hqoGyQgRXYk8jRIf5eZVXOfF9
-	p0/AsLWVH2CW40y5V32d28FD3qRPt5Ai5uaoZZ2S8xgBC47eIHfm
-X-Google-Smtp-Source: AGHT+IEEsUl+sziq8fG2MR4CX89/a844zgARc3ht6bS6rLiL+jkcyfjhn1daKZQG4bY/FTJ6M1A14Q==
-X-Received: by 2002:adf:f9ce:0:b0:349:bd11:1bf1 with SMTP id w14-20020adff9ce000000b00349bd111bf1mr1690575wrr.46.1713541003830;
-        Fri, 19 Apr 2024 08:36:43 -0700 (PDT)
-Received: from localhost ([146.70.204.204])
-        by smtp.gmail.com with ESMTPSA id u17-20020adfeb51000000b00347321735a6sm4693773wrn.66.2024.04.19.08.36.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 Apr 2024 08:36:43 -0700 (PDT)
-From: Richard Gobert <richardbgobert@gmail.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	dsahern@kernel.org,
-	willemdebruijn.kernel@gmail.com,
-	alexander.duyck@gmail.com,
-	aleksander.lobakin@intel.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Richard Gobert <richardbgobert@gmail.com>
-Subject: [PATCH net v2 3/3] net: gro: add flush check in udp_gro_receive_segment
-Date: Fri, 19 Apr 2024 17:35:42 +0200
-Message-Id: <20240419153542.121087-4-richardbgobert@gmail.com>
-In-Reply-To: <20240419153542.121087-1-richardbgobert@gmail.com>
-References: <20240419153542.121087-1-richardbgobert@gmail.com>
+	s=arc-20240116; t=1713541462; c=relaxed/simple;
+	bh=oOyN5ndXEzTFrTs86BkqGTcG1Eemswqeor8cyT2IO9s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=l7KMbbaXCZo4f5Ye+3tEonCuQihd4/mlpjnjwp+nOeytk2xvv271lqgjZ5pSBeMdTz5Rw36SW2PEZrJF0Bjqku/d+4TWE4WOGGic5YowvFdULLzjGWAxxNDSop0Kmvf40W1EDtxjWHYWKDM/jiO+ESuoNK+E9fJ2kQUUj4NHmRM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=35+1MKQq; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=iN98k+Obvr8DtYRE4/5wp95ZIX//nSrOyTZPUZv1hBs=; b=35+1MKQquJY71fp6sFWptYh3+D
+	1ZTedf//UNF+SYfnQ1Oa14yAnSr6OOBWS2LAV0VG4jTxsBbjK6QiVMvkw2r2RoSsXBAREMxlMM6yS
+	ZWMAVpSIi0iCg3W/yDzWJuTGwcAJgKuJf5IVJLXgsBzQn05WCASpqf8K4mh/pNQWG6ow=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rxqPD-00DSnv-Q1; Fri, 19 Apr 2024 17:44:03 +0200
+Date: Fri, 19 Apr 2024 17:44:03 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Simon Horman <horms@kernel.org>
+Cc: Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Dan Carpenter <dan.carpenter@linaro.org>, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next RFC] net: dsa: mv88e6xxx: Correct check for
+ empty list
+Message-ID: <6fff92e4-d4e4-4a41-ae5c-5bfb7e72c217@lunn.ch>
+References: <20240419-mv88e6xx-list_empty-v1-1-64fd6d1059a8@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240419-mv88e6xx-list_empty-v1-1-64fd6d1059a8@kernel.org>
 
-GRO-GSO path is supposed to be transparent and as such L3 flush checks are
-relevant to all UDP flows merging in GRO. This patch uses the same logic
-and code from tcp_gro_receive, terminating merge if flush is non zero.
+On Fri, Apr 19, 2024 at 01:17:48PM +0100, Simon Horman wrote:
+> Since commit a3c53be55c95 ("net: dsa: mv88e6xxx: Support multiple MDIO
+> busses") mv88e6xxx_default_mdio_bus() has checked that the
+> return value of list_first_entry() is non-NULL. This appears to be
+> intended to guard against the list chip->mdios being empty.
+> However, it is not the correct check as the implementation of
+> list_first_entry is not designed to return NULL for empty lists.
+> 
+> Instead check directly if the list is empty.
+> 
+> Flagged by Smatch
+> 
+> Signed-off-by: Simon Horman <horms@kernel.org>
 
-Fixes: 36707061d6ba ("udp: allow forwarding of plain (non-fraglisted) UDP GRO packets")
-Signed-off-by: Richard Gobert <richardbgobert@gmail.com>
----
- net/ipv4/udp_offload.c | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
+Hi Simon
 
-diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
-index fd29d21d579c..8721fe5beca2 100644
---- a/net/ipv4/udp_offload.c
-+++ b/net/ipv4/udp_offload.c
-@@ -471,6 +471,7 @@ static struct sk_buff *udp_gro_receive_segment(struct list_head *head,
- 	struct sk_buff *p;
- 	unsigned int ulen;
- 	int ret = 0;
-+	int flush;
- 
- 	/* requires non zero csum, for symmetry with GSO */
- 	if (!uh->check) {
-@@ -504,13 +505,22 @@ static struct sk_buff *udp_gro_receive_segment(struct list_head *head,
- 			return p;
- 		}
- 
-+		flush = NAPI_GRO_CB(p)->flush;
-+
-+		if (NAPI_GRO_CB(p)->flush_id != 1 ||
-+		    NAPI_GRO_CB(p)->count != 1 ||
-+		    !NAPI_GRO_CB(p)->is_atomic)
-+			flush |= NAPI_GRO_CB(p)->flush_id;
-+		else
-+			NAPI_GRO_CB(p)->is_atomic = false;
-+
- 		/* Terminate the flow on len mismatch or if it grow "too much".
- 		 * Under small packet flood GRO count could elsewhere grow a lot
- 		 * leading to excessive truesize values.
- 		 * On len mismatch merge the first packet shorter than gso_size,
- 		 * otherwise complete the GRO packet.
- 		 */
--		if (ulen > ntohs(uh2->len)) {
-+		if (ulen > ntohs(uh2->len) || flush) {
- 			pp = p;
- 		} else {
- 			if (NAPI_GRO_CB(skb)->is_flist) {
--- 
-2.36.1
+This looks good to me. I would not consider it a fix. As you say, it
+has been like this a long time and never bothered anybody, which is
+one of the stable rules. It might be possible to have an empty list,
+if there are no nodes in DT. But that is something which a novice
+would do when writing the DT, and so probably would of reported it.
 
+However, list_first_entry() does document:
+
+* Note, that list is expected to be not empty.
+
+So testing it first is wise.
+
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+
+Thanks
+	Andrew
 
