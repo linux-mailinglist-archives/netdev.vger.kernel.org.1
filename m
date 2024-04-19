@@ -1,88 +1,126 @@
-Return-Path: <netdev+bounces-89495-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89497-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 748438AA6A1
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 03:48:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 404028AA6AC
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 03:50:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 139EA1F2145A
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 01:48:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F10DD283E78
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 01:50:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72D8510FF;
-	Fri, 19 Apr 2024 01:48:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A10B15C3;
+	Fri, 19 Apr 2024 01:50:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ETu8oA44"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BNA5ASjL"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F4A510F9
-	for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 01:48:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6623610F9;
+	Fri, 19 Apr 2024 01:50:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713491333; cv=none; b=iRUGp6DFIHXyiP7PKbG1+NL3EQ57Pr2tUfr6mcM4x7AqNeZjEBNs85IYTt12Jx4tSrGlskaPzz3WoQk1dv93x5qDEqeHVMTgw5FdUZBPyaAlccf+wTil5GUAp8pb0j1PTdjm0qdgFXgz2DgtqLv2dv716Ukv8NntgR+B+AyhN80=
+	t=1713491430; cv=none; b=NxGkspXTwgB4jmintODjm7ytYJPxIjRrfLUndQlGwgsTug4Ru+0QA4sPQJejhvH0Hwdeq678+LQVxIcpeTqX90+esHJgWYSW7GksASy/gDzsgzzo5w+XPxpnGfvPSW2GXw5HMbNwT2wiB+mDZgRah47q154R9M1gnnJF4Uu2Zfs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713491333; c=relaxed/simple;
-	bh=uyN2zEzaurCu9qsoa8YFUXhVCYFkGFT1JmntTNiJje8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GTb5WFkfkTnk4lGSqRp0+t5HPiC1OfX3XPuJI2K4K9SfMbzm/Ie6ayiriLQIfePdTf8Z3q7t4KF/+ckuRvWd7Jw9WgG4gTWFv3dGM3pAjWwa9BnmkuMq/DyaB6LgH7qgvlSU4zZL0vZIuzVjzq1y/Dvv2w3fqnlzk/L0x6Maemw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ETu8oA44; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6CEA4C113CC;
-	Fri, 19 Apr 2024 01:48:52 +0000 (UTC)
+	s=arc-20240116; t=1713491430; c=relaxed/simple;
+	bh=8US40FU+8ErHCWlxLWXY/MDdXspdSrhsuMRmA/GFbTY=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=BepgEj4+Y6tZvpwP3uy1ggI43DahQjEcSdKnFp7EJzvUkzKl4xU3ghGY0990ZcDECpgnYd80y4vqButEdi+J+D1ht9SgRJovQfwTMouNnU5zPyirSzbgosBJegU4clWJoOowO1vD/mciBRs8L+WyTiGFuK+gTGIZoweIsh9dspk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BNA5ASjL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id EB338C3277B;
+	Fri, 19 Apr 2024 01:50:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713491332;
-	bh=uyN2zEzaurCu9qsoa8YFUXhVCYFkGFT1JmntTNiJje8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ETu8oA441r3gOsUIBPr3Fr/TvwbZlqTQVvBzo2Sbdz1RqgyYV1UbSosS0VB/dz0Bn
-	 lhR5+0UM6bKlpK/lCbSIjMcD3woQU0sU+FR0O9cbs2Yr98fx3EcdpcAJbCmLNCmvY4
-	 blDPwsG6yve8KtrMVI2E/LkcU4lqSRh3exmBobwddEubA1W2gNUqhMO9p0CPOlWCri
-	 q39lF4lbwa7+o96fFcyHhIfEqlxZteUpNubE+sguQ6x8MZeS9hB8cOmxmAgLU0spdA
-	 ydWV1HfLmS6tpVb/VyfQdyrFGc2RLbVKELlb+UTlz9uo6PfAXxJs+9T7T6Fn8jthP3
-	 AE1zSGWtTDg2g==
-Date: Thu, 18 Apr 2024 18:48:51 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Shailend Chand <shailend@google.com>
-Cc: netdev@vger.kernel.org, almasrymina@google.com, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, willemb@google.com
-Subject: Re: [RFC PATCH net-next 9/9] gve: Implement queue api
-Message-ID: <20240418184851.5cc11647@kernel.org>
-In-Reply-To: <20240418195159.3461151-10-shailend@google.com>
-References: <20240418195159.3461151-1-shailend@google.com>
-	<20240418195159.3461151-10-shailend@google.com>
+	s=k20201202; t=1713491430;
+	bh=8US40FU+8ErHCWlxLWXY/MDdXspdSrhsuMRmA/GFbTY=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=BNA5ASjLi6k8o2pwe0Zguld5TokTeERFqmSBSQ2dF9GjPpgZkXGdNR2SvcoUE3J9o
+	 ORpI2dsoOMOmBzwuYVX0TZTXCPNPWcNYWusL0udbsdpSf1BaJlqoP0odD7CH8eTDmu
+	 H6XU9OYWCjPxst/7h08r/k3kfLQnAcC2DXMkclpGjRJdNqS7p2Y5tuT/xd9n29ei3X
+	 eaolEkZxEvFg1vJOmg40u2tx8GzKkV+nwVcJnk76qcq6o3WRGhAlIBbTnmGnaIEC9N
+	 eNFnqUzs52QctYDAYTeqWD6/adTP7m+pI7lNJH1SePa3WmC2uGeCQQJn2t/ijEIdLE
+	 LMkwrGWoJRU1Q==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D9623C395C5;
+	Fri, 19 Apr 2024 01:50:29 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v9 01/14] ethtool: Expand Ethernet Power Equipment
+ with c33 (PoE) alongside PoDL
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171349142988.11062.4384284372209376821.git-patchwork-notify@kernel.org>
+Date: Fri, 19 Apr 2024 01:50:29 +0000
+References: <20240417-feature_poe-v9-1-242293fd1900@bootlin.com>
+In-Reply-To: <20240417-feature_poe-v9-1-242293fd1900@bootlin.com>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, corbet@lwn.net, mcgrof@kernel.org, russ.weight@linux.dev,
+ gregkh@linuxfoundation.org, rafael@kernel.org, robh+dt@kernel.org,
+ krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+ o.rempel@pengutronix.de, broonie@kernel.org, frowand.list@gmail.com,
+ andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
+ thomas.petazzoni@bootlin.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ devicetree@vger.kernel.org, dentproject@linuxfoundation.org,
+ kernel@pengutronix.de, maxime.chevallier@bootlin.com
 
-On Thu, 18 Apr 2024 19:51:59 +0000 Shailend Chand wrote:
-> +static int gve_rx_queue_stop(struct net_device *dev, int idx,
-> +			     void **out_per_q_mem)
-> +{
-> +	struct gve_priv *priv = netdev_priv(dev);
-> +	struct gve_rx_ring *rx;
-> +	int err;
-> +
-> +	if (!priv->rx)
-> +		return -EAGAIN;
-> +	if (idx < 0 || idx >= priv->rx_cfg.max_queues)
-> +		return -ERANGE;
+Hello:
 
-A little too defensive? Core should not issue these > current real num
-queues.
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-> +	/* Destroying queue 0 while other queues exist is not supported in DQO */
-> +	if (!gve_is_gqi(priv) && idx == 0)
-> +		return -ERANGE;
-> +
-> +	rx = kvzalloc(sizeof(*rx), GFP_KERNEL);
+On Wed, 17 Apr 2024 16:39:49 +0200 you wrote:
+> From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
+> 
+> In the current PSE interface for Ethernet Power Equipment, support is
+> limited to PoDL. This patch extends the interface to accommodate the
+> objects specified in IEEE 802.3-2022 145.2 for Power sourcing
+> Equipment (PSE).
+> 
+> [...]
 
-Why allocate in the driver rather than let the core allocate based on
-the declared size ?
+Here is the summary with links:
+  - [net-next,v9,01/14] ethtool: Expand Ethernet Power Equipment with c33 (PoE) alongside PoDL
+    https://git.kernel.org/netdev/net-next/c/b58be8db6327
+  - [net-next,v9,02/14] net: pse-pd: Introduce PSE types enumeration
+    https://git.kernel.org/netdev/net-next/c/47e0dd53c5eb
+  - [net-next,v9,03/14] net: ethtool: pse-pd: Expand pse commands with the PSE PoE interface
+    https://git.kernel.org/netdev/net-next/c/4d18e3ddf427
+  - [net-next,v9,04/14] netlink: specs: Modify pse attribute prefix
+    https://git.kernel.org/netdev/net-next/c/57b30d2a5475
+  - [net-next,v9,05/14] netlink: specs: Expand the pse netlink command with PoE interface
+    https://git.kernel.org/netdev/net-next/c/f8586411e40e
+  - [net-next,v9,06/14] MAINTAINERS: Add myself to pse networking maintainer
+    https://git.kernel.org/netdev/net-next/c/edd79f084ad4
+  - [net-next,v9,07/14] net: pse-pd: Add support for PSE PIs
+    https://git.kernel.org/netdev/net-next/c/9be9567a7c59
+  - [net-next,v9,08/14] dt-bindings: net: pse-pd: Add another way of describing several PSE PIs
+    https://git.kernel.org/netdev/net-next/c/b17181a88fb9
+  - [net-next,v9,09/14] net: pse-pd: Add support for setup_pi_matrix callback
+    https://git.kernel.org/netdev/net-next/c/29e28d1d7a16
+  - [net-next,v9,10/14] net: pse-pd: Use regulator framework within PSE framework
+    https://git.kernel.org/netdev/net-next/c/d83e13761d5b
+  - [net-next,v9,11/14] dt-bindings: net: pse-pd: Add bindings for PD692x0 PSE controller
+    https://git.kernel.org/netdev/net-next/c/9c1de033afad
+  - [net-next,v9,12/14] net: pse-pd: Add PD692x0 PSE controller driver
+    https://git.kernel.org/netdev/net-next/c/9a9938451890
+  - [net-next,v9,13/14] dt-bindings: net: pse-pd: Add bindings for TPS23881 PSE controller
+    https://git.kernel.org/netdev/net-next/c/f562202fedad
+  - [net-next,v9,14/14] net: pse-pd: Add TI TPS23881 PSE controller driver
+    https://git.kernel.org/netdev/net-next/c/20e6d190ffe1
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
