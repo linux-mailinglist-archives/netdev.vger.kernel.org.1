@@ -1,401 +1,289 @@
-Return-Path: <netdev+bounces-89640-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89641-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 921EC8AB048
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 16:08:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CCDB8AB055
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 16:10:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C250FB25C6B
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 14:08:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 32284285ABA
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 14:10:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E161E12F378;
-	Fri, 19 Apr 2024 14:05:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0298712E1C4;
+	Fri, 19 Apr 2024 14:06:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="XNKn9MzX"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Ko+OXcws"
 X-Original-To: netdev@vger.kernel.org
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2089.outbound.protection.outlook.com [40.107.220.89])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 798468565D;
-	Fri, 19 Apr 2024 14:05:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713535535; cv=none; b=mt7ftrnoBAGgfk8M3AU5NdThWUTornJzzRllkpT62E9J5BrxUh32yAFDoi8DkaATLfMFdN7tCowRsyT/uT5lxddzrQvZNwY1T021mnHW+FcWjs+Zi5JYiLTg+9wUu1ncDGB3OESAd2r4ioz2m69dfXIDoRphBQQ+eSyJB9VlxwI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713535535; c=relaxed/simple;
-	bh=f5NvPYvWSkOfW7nqTrzZAUGvlR2y3BQphtON8UO3/cE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=remcOjubjoXiPq6yFBOYW/DPWCtRDYKe4HZSzF72OsLlRJThqLU7DZt7fRHzrkMFnExWQ6r9pLOEpoHhTvkdbkGf3bbTLiT9w750Rn1PH3JeoAswy2Gf+/dvjPh/DbBWJolJ7pZjo36xWiEVbMHMJTu5EOCWSxpifb6sg3Ul9lE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=XNKn9MzX; arc=none smtp.client-ip=85.214.62.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from wsk (85-222-111-42.dynamic.chello.pl [85.222.111.42])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-	(No client certificate requested)
-	(Authenticated sender: lukma@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id 49E79885FA;
-	Fri, 19 Apr 2024 16:05:23 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1713535525;
-	bh=43SEtoRInOLXOPUiy3bMiJsEFmAQ9z9IlWRqSgyxzTk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=XNKn9MzXJRlQ4rZpIvVasXfQT0g/k279x9N9tKEU+n3hrMDGxor9ujH81QqWNpaKz
-	 pnzpXvZfe/LI+PR1hnwnay6MZjo9k7W0p5i9gpK1rSo/fWLBNq70y01l53nAU96Ops
-	 Pkh6E0W4C1+5ecung8Ui9XzODXf3rGtVffImIYEEVz242u7gnuvuEktMqxzYdAJ81n
-	 pzd5QZd5+s327m3tVuCHKkBkPZXpDUYjaPf0cd4FvbZ1UTSKiJPnYm6+I7bNHnlosT
-	 YFkbI6lLaQc00k28Wpts5GlNX/pOhj48t2rh3qtgQsp83QzDk2SFqir2Tn7SA9XHv7
-	 qYjZHjDR/zLng==
-Date: Fri, 19 Apr 2024 16:05:15 +0200
-From: Lukasz Majewski <lukma@denx.de>
-To: Casper Andersson <casper.casan@gmail.com>
-Cc: netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn
- <andrew@lunn.ch>, Eric Dumazet <edumazet@google.com>, Vladimir Oltean
- <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, Jakub
- Kicinski <kuba@kernel.org>, Oleksij Rempel <o.rempel@pengutronix.de>,
- Tristram.Ha@microchip.com, Sebastian Andrzej Siewior
- <bigeasy@linutronix.de>, Ravi Gunasekaran <r-gunasekaran@ti.com>, Simon
- Horman <horms@kernel.org>, Nikita Zhandarovich <n.zhandarovich@fintech.ru>,
- Murali Karicheri <m-karicheri2@ti.com>, Jiri Pirko <jiri@resnulli.us>, Dan
- Carpenter <dan.carpenter@linaro.org>, Ziyang Xuan
- <william.xuanziyang@huawei.com>, Shigeru Yoshida <syoshida@redhat.com>,
- "Ricardo B. Marliere" <ricardo@marliere.net>, linux-kernel@vger.kernel.org
-Subject: Re: [net-next PATCH v5 1/4] net: hsr: Provide RedBox support
- (HSR-SAN)
-Message-ID: <20240419160515.7bc88a9a@wsk>
-In-Reply-To: <8634rho41l.fsf@gmail.com>
-References: <20240415124928.1263240-1-lukma@denx.de>
-	<20240415124928.1263240-2-lukma@denx.de>
-	<86mspt7glf.fsf@gmail.com>
-	<20240416150359.7362c762@wsk>
-	<86bk66hjyf.fsf@gmail.com>
-	<20240418173706.206e6a2f@wsk>
-	<86mspploa3.fsf@gmail.com>
-	<20240419124223.2388295d@wsk>
-	<8634rho41l.fsf@gmail.com>
-Organization: denx.de
-X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B9E112FB0B
+	for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 14:06:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.89
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1713535598; cv=fail; b=Qdp/SXHttm8sTHjRAJhCrb2npvhCFg0NR8qV+Gm0q71jWFa1KEptutmhffLYDIVoSI0wvcRZRIXzD0nkJPkI7b81G7kOhtYxlt9VDKiPpFkcoh2Oytmy5XaryuonKBn3wcDNnAcLXg62PlFpuX63vObmq0gnhFFHaAptouscm0s=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1713535598; c=relaxed/simple;
+	bh=1h7GRqdV0O1XqeqTnanuGE25OqPTA1I1XxJihppgeVw=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=p4NIMEg+As/aRrm820WFWxRFJ6mUw8aNrLfou7KfajGYZlGjyXrhH2oZnlokDdwCJdr8fT3hC9q0MMqba2lstJDIGTDPubLS2qidf3zSHOg2Y3+cuESHioIvgMWuG+Jhew8+lZM5MjJ7SrN7UcwzbHQEMgncnQrtEBPlw0qFV0o=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Ko+OXcws; arc=fail smtp.client-ip=40.107.220.89
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=HFou+zjFw0j4ENegvvUB4KM7sk5cjkYJRQ+JGVrknE6XvgpUVMajQH5g42fYAAa/J8d1eYyDyTxxjSXaQXQzO7ltbTvclH4DAINzNEdUBYz12+ty+n2pLsCE/gYHY+uasa2jQyP08FjcB3+FucJu1SHliIRH+7y4o2X0bk6m5pIwYn3lMFqUQhSZ94Tl18r8mzeVjVk0hhTsszML/KUBz/rozpOYgwVYA0HkKJhjduO/FXak7X9F88Rtv4J4GYVJI6B1F34DVv8ptJSdZFIIwCu6l6n5MVMj99YZUtEXxg4MmM7Nm4r//VBi/Y0OU94igFbxeuOnX5Hcj6r6ez0Fzw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=1h7GRqdV0O1XqeqTnanuGE25OqPTA1I1XxJihppgeVw=;
+ b=YMSz/7pQ7m3sRSllW6/vC0fgQOD3Ms+g8lkrtiPRUFgf/9uPmbikemiCAjnFYoEEqqDTIecFcTPiJPz8cU3IKpifAgMzCjhsX4jNM+fsU1VjTRjdGwnppzDYkkP5gl2k2sNM357ZqQls0smJMcUAFWYqjXBfj0D2GWADcQeeUFqcoQFsY83LnFnvI8UgaNijCPrdoLYinhjst0tGN+hzn8pKNI4SD9PnNN8X2X/cMf6YwEjd5+xhVy5+KfJNt00s3MZV24a5+LDLz8um3y0hBvjfbHzn8ZJIMRGIXEkE/sS/WwXy1tNx2xKjTBTafPNBTNIN0zTSVoERIHPe+WDoKw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=1h7GRqdV0O1XqeqTnanuGE25OqPTA1I1XxJihppgeVw=;
+ b=Ko+OXcwsjJ1v///QEBzDzxO+UsCySyVho8p9mXkAJdSeNKg2ABEM5uu1XMMBRCZddu6rfwaxaVaFd/fkr1qt5RkG9Ns/V1J384w1VbB9gNPjlR9ln/XevUdhvbADcy+/vVcnV9FIBqSneh5C1dVpMwimgHBdOlVV3i8NRPRdT8eMCac9y+qSXlTi9uam89huMlBDSHJwKa4Uh+nUXtM12WWlpajeCfx5wzP5H7AKSA+00Fu7psFs0MV4qPDD4GHP8uKCPHPS18zXTnWHPSom9ZQPV6kPu+bNGPQrcqQ5TfeK+ZUWgJGFG/ubzxmCfFQKkGusRjYkTsdSJcvD9cbF5w==
+Received: from DM6PR12MB5565.namprd12.prod.outlook.com (2603:10b6:5:1b6::13)
+ by DS0PR12MB9348.namprd12.prod.outlook.com (2603:10b6:8:1a0::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7452.50; Fri, 19 Apr
+ 2024 14:06:27 +0000
+Received: from DM6PR12MB5565.namprd12.prod.outlook.com
+ ([fe80::a8dd:546d:6166:c101]) by DM6PR12MB5565.namprd12.prod.outlook.com
+ ([fe80::a8dd:546d:6166:c101%4]) with mapi id 15.20.7472.044; Fri, 19 Apr 2024
+ 14:06:27 +0000
+From: Dragos Tatulea <dtatulea@nvidia.com>
+To: Shay Drori <shayd@nvidia.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "oxana@cloudflare.com" <oxana@cloudflare.com>
+CC: "davem@davemloft.net" <davem@davemloft.net>, Rahul Rameshbabu
+	<rrameshbabu@nvidia.com>, "kernel-team@cloudflare.com"
+	<kernel-team@cloudflare.com>, "kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>, "edumazet@google.com"
+	<edumazet@google.com>, Saeed Mahameed <saeedm@nvidia.com>,
+	"Anatoli.Chechelnickiy@m.interpipe.biz"
+	<Anatoli.Chechelnickiy@m.interpipe.biz>, "leon@kernel.org" <leon@kernel.org>
+Subject: Re: mlx5 driver fails to detect NIC in 6.6.28
+Thread-Topic: mlx5 driver fails to detect NIC in 6.6.28
+Thread-Index: AQHaklekYwro6CBsoUOORjm1K8wlnbFvoNkA
+Date: Fri, 19 Apr 2024 14:06:26 +0000
+Message-ID: <3caa587882624d8289b4c1fe532c90b5b5ec29f4.camel@nvidia.com>
+References: <20240419124632.60294-1-oxana@cloudflare.com>
+In-Reply-To: <20240419124632.60294-1-oxana@cloudflare.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+user-agent: Evolution 3.50.4 (3.50.4-1.fc39) 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM6PR12MB5565:EE_|DS0PR12MB9348:EE_
+x-ms-office365-filtering-correlation-id: e1a5a6dc-160b-4692-130e-08dc6079e77c
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ hbUjpVsc4p8bffGV3Cy7uSoUG/WmTBokafYw5r7JhNqHERhn3X0U2Jbjt1ve9/SDdZPbe/2Wbk62gjSNIaJSFfy8+xSSacq2gN8+ofT0sQ3RMmX8++PX3hPREDPTgInV4e3o7BqvOjyVVeXFFnzCv8Z9oW7AHSV/dJGxLfT7EXlofJ+h9YFIv1wfNgUeOkI2cxGc5yykw/qMkp8InzhpxCJQpBU6HAMmXh0JfCebleXMSX4DWpNsV2uDmZnlEH/EFrJvwMHL6O0joyCtBkfcyaXw8zWVOATcb7wwvHknkPqQvWwrt0h9j9xAEnVtjoqnhk31e/O7rRh8Lc9ZRlgnMnWbfBkRHNMqbBK1Yn/RBO/6BxUTrVQsqm/CFD9ra9YP152DkPDChRmW5qO2oFUs/1rrhQEB0khxKL4H74v2D2fqBrbp+IZRcFOCJurchXxz+hoqIooco/VUlyS07k0F184MAA4VP+xAdCh+RrdmUKYY2ajsI3u3yGxF4CaEC/kYXBiVIdbH3XP7+h77ugsRTPXML5uQnSkzfBtQPSGMs73IIlHZCR5jafxB9IfQBlRrC8RsBKz78vmCkGOnw8XF0Tca0ehPYrKzDjQcr+KWtk0bTklOejkQ31F7td919XkUNFpObRs93GR7Bj6l22bI8/PGmWRj6Ly+dQJolpgjzXaWvLtfz60OdrjGH6VuFpeCWsIUK/bs7dQN5IZ/FlBXow==
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB5565.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(376005)(1800799015)(38070700009);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?Mi9YUEViUGtlcUlhTGNQUmJ0OXY4bHByL1dDYTVtM2dpTjYxZFR3cHNKWVkz?=
+ =?utf-8?B?ekJhZGczS05aWGtLRHpyZkpadHZxTUMrajRDaW9zQTFBVCs1eWZtSkh5cXk3?=
+ =?utf-8?B?RnB5ZlBpbHRFR1RYM1NMVG9ka21KaGJUVHU1dkFuTDd0WlNzYk5IbDhaRXVa?=
+ =?utf-8?B?THVCSzVEM0VnS3BHeFMxUDIzQ2V3T2dZbDR4Rm8vbU51OVM4OEdpM2FlNytx?=
+ =?utf-8?B?bXlLZHpKRTlYZVhtZWwyTkhNWjBYVHVzV0M5MW40OS95bEoyVHlVempqdXZS?=
+ =?utf-8?B?Y3RVVVZHdlFWWGlmMHA5cVlZQmg5WWJlMk5MbWMzcWlQMVF5Z2oxVFFHYklR?=
+ =?utf-8?B?UWVkaXJRdHN6b1J4dnVpVTF3U2s4TkQxb0MrSU5qaWtwTXRvZnhFMGdmamhW?=
+ =?utf-8?B?Umx4TDhCQzZQMzB1ZFRhQWhORjVjMTlkVmM4NDRpd1hGbkQxQlVtcUxpaUY1?=
+ =?utf-8?B?SVNlTjcvZUtDR2FseHg5TnViaFVEajArbVJrZWhWVTk4ekF6Z1ZMQmhkU0VO?=
+ =?utf-8?B?T0ZudkdjL1NYT1JsSkp1eUlTL2pVMXNPeXdrSE5oWk5UUEZGbU1sRlJqTVJi?=
+ =?utf-8?B?cmJ4SFhXZmU4RTRreDZwL3JacHlieWFKcjlnYWIzbWpyczZBS0NOVWtLVjdX?=
+ =?utf-8?B?b3VBYVBxQVB4WHZCTTR5ME5DdE1TTGVRaVBDOUt4T1pUZHRZR3laazVPZjFK?=
+ =?utf-8?B?NGlOMW9mWmxXTFQ4SXp5TlliQ0hlWHpXWkV0VDZuTTZrMEJFRmI2YzVxZ3N3?=
+ =?utf-8?B?M0pMQTJtQlBBZWRoRzFmaVNKTHRBbWVsUFJhOVJPOGh4dWNnUG9SWEJyWU9W?=
+ =?utf-8?B?R2EySFAxMUFZblpRVk5oZ0dGRWhzejRST3AyczFsbEdKbVBxbXBTdTRNVDFT?=
+ =?utf-8?B?WncyT0pMS2dwQjRRNEFVc3JNZUVPS2hINUhZcnBUZWFGSm5qU1YvYlU5aDZv?=
+ =?utf-8?B?Ukk3Wnk1dlFqVmdxeTNWLzF5bTh5d0dmVnNmaE1zZ3MxZy8ySm5xbHBrdmJr?=
+ =?utf-8?B?eDJ0cjZuajdDbDVyTjZrNjNDZ2szSEpvQ2VtV2o0cFdHbEtQS3lYcmFBa0My?=
+ =?utf-8?B?WjlyWnhLWHZzVzdFWHpvWFptbzgrZUEzQTFmeVVDb3RidG91N2JFOUE1ZmtD?=
+ =?utf-8?B?bVpFNjhBeU1hVmJXQ1VMUzNlWERJQTJodXFmOFJKcXlpNGczUURYcytuZjdr?=
+ =?utf-8?B?VysyV0EzVmxsdjRhMjh3bUVNMW4yZGZkM0VhTm1KYkVmaUJpZjE3MEtydjBv?=
+ =?utf-8?B?SXAvL0lJOW83QzV1bm43dURWYjBqUVlmaFdxbzl1bkxvdzFHZmJCUDZRUzh2?=
+ =?utf-8?B?QllwV2FHbDJFSlNIS0twZ0lBaFBrMTA1dnpiRTkyQ2lmSzk5NSt5dk9xdEtz?=
+ =?utf-8?B?RUY2MklxaENYcGRrZlB2Vno2djBWK1JWcVRleHowRG9Pcml5NlpEL3g2bUM1?=
+ =?utf-8?B?U1BiR1Jod2dqMElLOTJFQkx3VGxSWkRPVHBaSEFudDFHL0I1UVBjcWwwcW1E?=
+ =?utf-8?B?eTZsMzZRZHRYa2tnVDBVNllRc1pseW4vaFVsYkt6ZVZGTTRBQkVGSTYrWC9I?=
+ =?utf-8?B?QjVZdHVoZi8wQjBrWFpkZHo0ekI4TUR0RHVLUldlZGtJUUtRU3ZvQUFzSTZ5?=
+ =?utf-8?B?dDVOQXR5SlBITkxNYjRST1lFa0pmZGhTM211c3VtajdzV1VIMXhYNHAvV1hu?=
+ =?utf-8?B?eGZFK1M4cEZ6aXZkT1pMN3JuUW05UG1RbUVRSnQzMlJKWktZbk80eWNpZi9y?=
+ =?utf-8?B?Sm5FQVY1ekFFU3B3SmFtTldjN3NCaTFmYkE2OWhJNG55cVVsY2JQYnhocXpE?=
+ =?utf-8?B?ci9HN3hreHR1V05BZlBCdGdxZU15SU1JMFUxbUNlSjF0cHRIVXVXaEdBUnk2?=
+ =?utf-8?B?OFIzK3pGOFRPQjN0MVdBSzBGdk82Z3VlVStBRWIzRHVtZFNmdFVYTkpQaUMr?=
+ =?utf-8?B?L3JqVEZZNldPaGdMV2FqMEZwRzVTbHZlNHNqQkdUc2JZV1NJVzFNblZaNUx0?=
+ =?utf-8?B?TjV3MGVJMDE3YUVPNmE3LzRtUEpxUEczUkl3aDVqRU9pdUJnMkJwdHBDN3Ew?=
+ =?utf-8?B?TzFwSmFCaytBZ1Q2ejdvV0VVNVJwT1g3MTBEaGVQdWtPbS9GSVZrMUJ4UUgv?=
+ =?utf-8?B?a1JTTTJSNXBnOStkdUZ5c05HdkJQdU45UUNRenhpcUdzT3cyTHBVNkdrWDRD?=
+ =?utf-8?Q?MgP+1Go2TJxfaS5FnAnuYjAUbQZiDJ9pfj712Tpzg0Hr?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <C714A0BBEDBF0244A7F1BFDBCA809358@namprd12.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/LL=n12_LCt5cezsdP0qZhW3";
- protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB5565.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e1a5a6dc-160b-4692-130e-08dc6079e77c
+X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Apr 2024 14:06:27.0111
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: cIPfGmDn6PSWQB6K37PLhyrNnoSt5vZpWKMknCNh0t7Zg0jNBnlSrGJsWVa4frIwucYcyD6QfreqQID/13vu7A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB9348
 
---Sig_/LL=n12_LCt5cezsdP0qZhW3
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-
-Hi Casper,
-
-> On 2024-04-19 12:42 +0200, Lukasz Majewski wrote:
-> > Hi Casper,
-> > =20
-> >> On 2024-04-18 17:37 +0200, Lukasz Majewski wrote:
-> >> Hi Lukasz,
-> >>  =20
-> >> > Hi Casper,
-> >> >   =20
-> >> >> Hi,
-> >> >>=20
-> >> >> Sorry for the late reply, I was awaiting confirmation on what I
-> >> >> can say about the hardware I have access to. They won't let me
-> >> >> say the name :( but I can give some details.   =20
-> >> >
-> >> > Ok, good :-)
-> >> >
-> >> > At least I'm not alone and there is another person who can
-> >> > validate the code (or behaviour) on another HSR HW.
-> >> >
-> >> > (Some parts of the specification could be double checked on
-> >> > another HW as well).
-> >> >   =20
-> >> >>=20
-> >> >> On 2024-04-16 15:03 +0200, Lukasz Majewski wrote:   =20
-> >> >> >> On 2024-04-02 10:58 +0200, Lukasz Majewski wrote:     =20
-> >> >> >> > Changes for v3:
-> >> >> >> >
-> >> >> >> > - Modify frame passed Port C (Interlink) to have RedBox's
-> >> >> >> > source address (SA) This fixes issue with connecting L2
-> >> >> >> > switch to Interlink Port as switches drop frames with SA
-> >> >> >> > other than one registered in their (internal) routing
-> >> >> >> > tables.=20
-> >> >> >>      =20
-> >> >> >> > +	/* When HSR node is used as RedBox - the frame
-> >> >> >> > received from HSR ring
-> >> >> >> > +	 * requires source MAC address (SA) replacement to
-> >> >> >> > one which can be
-> >> >> >> > +	 * recognized by SAN devices (otherwise, frames
-> >> >> >> > are dropped by switch)
-> >> >> >> > +	 */
-> >> >> >> > +	if (port->type =3D=3D HSR_PT_INTERLINK)
-> >> >> >> > +		ether_addr_copy(eth_hdr(skb)->h_source,
-> >> >> >> > +
-> >> >> >> > port->hsr->macaddress_redbox);  =20
-> >> >> >>=20
-> >> >> >> I'm not really understanding the reason for this change. Can
-> >> >> >> you explain it in more detail?     =20
-> >> >> >
-> >> >> > According to the HSR standard [1] the RedBox device shall work
-> >> >> > as a "proxy" [*] between HSR network and SAN (i.e. "normal"
-> >> >> > ethernet) devices.
-> >> >> >
-> >> >> > This particular snippet handles the situation when frame from
-> >> >> > HSR node is supposed to be sent to SAN network. In that case
-> >> >> > the SA of HSR (SA_A) is replaced with SA of RedBox (SA_RB) as
-> >> >> > the MAC address of RedBox is known and used by SAN devices.
-> >> >> >
-> >> >> >
-> >> >> > Node A  hsr1  |=3D=3D=3D=3D=3D=3D| hsr1 Node Redbox |   |
-> >> >> > (SA_A) [**]   |	     |           eth3   |---| ethX SAN
-> >> >> > 	      |      |        	 (SA_RB)|   |  (e.g
-> >> >> > switch)
-> >> >> >
-> >> >> >
-> >> >> > (the =3D=3D=3D=3D=3D=3D represents duplicate link - like lan1,lan=
-2)
-> >> >> >
-> >> >> > If the SA_A would be passed to SAN (e.g. switch) the switch
-> >> >> > could get confused as also RedBox MAC address would be used.
-> >> >> > Hence, all the frames going out from "Node Redbox" have SA
-> >> >> > set to SA_RB.
-> >> >> >
-> >> >> > According to [1] - RedBox shall have the MAC address.
-> >> >> > This is similar to problem from [2].     =20
-> >> >>=20
-> >> >> Thanks for the explanation, but I still don't quite follow in
-> >> >> what way the SAN gets confused. "also RedBox MAC address would
-> >> >> be used", when does this happen? Do you mean that some frames
-> >> >> from Node A end up using the RedBox MAC address so it's best if
-> >> >> they all do?   =20
-> >> >
-> >> > The SAN (let's say it is a switch) can communicate with RedBox or
-> >> > Node A. In that way the DA is different for both (so SA on reply
-> >> > is also different). On my setup I've observed frames drop (caused
-> >> > probably by switch filtering of incoming traffic not matching the
-> >> > outgoing one).
-> >> >
-> >> > When I only use SA of RedBox on traffic going to SAN, the
-> >> > problem is gone.
-> >> >
-> >> > IMHO, such separation (i.e. to use only RedBox's SA on traffic
-> >> > going to SAN) is the "proxy" mentioned in the standard.
-> >> >   =20
-> >> >>=20
-> >> >> I see there is already some address replacement going on in the
-> >> >> HSR interface, as you pointed out in [2]. And I get your idea
-> >> >> of being a proxy. If no one else is opposed to this then I'm
-> >> >> fine with it too.  =20
-> >> >
-> >> > Ok.
-> >> >   =20
-> >> >> >> The standard does not say to modify the
-> >> >> >> SA. However, it also does not say to *not* modify it in
-> >> >> >> HSR-SAN mode like it does in other places. In HSR-HSR and
-> >> >> >> HSR-PRP mode modifying SA breaks the duplicate discard.     =20
-> >> >> >
-> >> >> > IMHO, the HSR-SAN shall be regarded as a "proxy" [*] between
-> >> >> > two types (and not fully compatible) networks.
-> >> >> >     =20
-> >> >> >> So keeping the same behavior for all
-> >> >> >> modes would be ideal.
-> >> >> >>=20
-> >> >> >> I imagine any HW offloaded solutions will not modify the SA,
-> >> >> >> so if possible the SW should also behave as such.     =20
-> >> >> >
-> >> >> > The HW offloading in most cases works with HSR-HSR setup
-> >> >> > (i.e. it duplicates frames automatically or discards them
-> >> >> > when recived - like ksz9477 [3]).
-> >> >> >
-> >> >> > I think that RedBox HW offloading would be difficult to
-> >> >> > achieve to comply with standard. One "rough" idea would be to
-> >> >> > configure aforementioned ksz9477 to pass all frames in its HW
-> >> >> > between SAN and HSR network (but then it wouldn't filter
-> >> >> > them).     =20
-> >> >>=20
-> >> >> I don't know anything about ksz9477. The hardware I have access
-> >> >> to is supposed to be compliant with 2016 version in an offloaded
-> >> >> situation for all modes (HSR-SAN, PRP-SAN, HSR-PRP, HSR-HSR).
-> >> >> =20
-> >> >
-> >> > Hmm... Interesting.
-> >> >
-> >> > As fair as I know - the ksz9477 driver from Microchip for RedBox
-> >> > sets internal (i.e. in chip) vlan for Node_A, Node_B and
-> >> > Interlink, so _all_ packets are flowing back and forth between
-> >> > HSR and SAN networks ....  =20
-> >> >> Though, I haven't
-> >> >> verified if the operation is fully according to standard.   =20
-> >> >
-> >> > You may use wireshark on device connected as SAN to redbox and
-> >> > then see if there are any frames (especially supervisory ones)
-> >> > passed from HSR network.   =20
-> >>=20
-> >> I realized I should clarify, what I'm running is non-upstream
-> >> software. =20
-> >
-> > Ok.
-> > =20
-> >> And by offloaded I mean the redbox forwarding is
-> >> offloaded. Supervision frames are still handled in SW and only
-> >> sent on HSR/PRP ports, and doesn't reach any SAN nodes. Basic
-> >> operation works as it should. =20
-> >
-> > Ok.
-> > =20
-> >>  =20
-> >> >> It does not
-> >> >> modify any addresses in HW.   =20
-> >> >
-> >> > By address - you mean the MAC addresses of nodes?   =20
-> >>=20
-> >> I mean that it forwards all frames without modification (except
-> >> HSR/PRP and VLAN tags). It does not update SMAC with the proxy MAC
-> >> like your implementation does. =20
-> >
-> > Hmm... I'm wondering how "proxy" is implemented then.
-> > Also, what is the purpose of ProxyNodeTable in that case? =20
->=20
-> The ProxyNodeTable becomes the same as the MAC table for the interlink
-> port. I.e. normal MAC learning, when a frame is sent by a SAN and
-> received on interlink the HW learns that that SMAC is on the interlink
-> port (until it ages out). This table can be read out and used for
-> supervision frames.
-
-Yes, this is how this patch handles it.
-
->=20
-> Though, the NodesTable I don't think is used in HW. As I understand
-> it's an optional feature.
-
-Yes.
-
->=20
-> >>  =20
-> >> >> Does it call
-> >> >> port_hsr_join and try to join as an HSR port?    =20
-> >> >
-> >> > No, not yet.
-> >> >
-> >> > The community (IIRC Vladimir Oltean) suggested to first implement
-> >> > the RedBox Interlink (HSR-SAN) in SW. Then, we may think about
-> >> > adding offloading support for it.
-> >> >   =20
-> >> >> Do we maybe need a
-> >> >> separate path or setting for configuring the interlink in the
-> >> >> different modes (SAN, HSR, PRP interlink)?   =20
-> >> >
-> >> > I think that it shall be handled as an extra parameter (like we
-> >> > do have now with 'supervision' or 'version') in ip link add.
-> >> >
-> >> > However, first I would like to have the "interlink" parameter
-> >> > added to iproute2 and then we can extend it to other modes if
-> >> > requred.   =20
-> >>=20
-> >> Alright, doing SW implementation first sounds good. From userspace
-> >> it can probably be an extra parameter. But for the driver
-> >> configuration maybe we want a port_interlink_join? (when it comes
-> >> to implementing that). =20
-> >
-> > IMHO, having port_interlink_join() may be useful in the future to
-> > provide offloading support.
-> > =20
-> >>=20
-> >>=20
-> >> I did some testing with veth interfaces (everything in SW) with
-> >> your patches. I tried to do a setup like yours
-> >>                =20
-> >>                   +-vethA---vethB-+
-> >>                   |               |
-> >> vethF---vethE---hsr0             hsr1
-> >>                   |               |
-> >>                   +-vethC---vethD-+
-> >>=20
-> >> Sending traffic from vethF results in 3 copies being seen on the
-> >> ring ports. One of which ends up being forwarded back to vethF
-> >> (with SMAC updated to the proxy address). I assume this is not
-> >> intended behavior. =20
-> >
-> > I've reported this [2] (i.e. duplicated packets on HSR network with
-> > veth) when I was checking hsr_ping.sh [1] script for regression.
-> >
-> > (However, I don't see the DUP pings on my KSZ9477 setup).
-> >
-> >  =20
-> >>=20
-> >> Setup:
-> >> ip link add dev vethA type veth peer name vethB
-> >> ip link add dev vethC type veth peer name vethD
-> >> ip link add dev vethE type veth peer name vethF
-> >> ip link set up dev vethA
-> >> ip link set up dev vethB
-> >> ip link set up dev vethC
-> >> ip link set up dev vethD
-> >> ip link set up dev vethE
-> >> ip link set up dev vethF
-> >>=20
-> >> ip link add name hsr0 type hsr slave1 vethA slave2 vethC interlink
-> >> vethE supervision 45 version 1 ip link add name hsr1 type hsr
-> >> slave1 vethB slave2 vethD supervision 45 version 1 ip link set dev
-> >> hsr0 up ip link set dev hsr1 up
-> >>=20
-> >> I used Nemesis to send random UDP broadcast packets but you could
-> >> use whatever: nemesis udp -d vethF -c 10000 -i 1  =20
-> >
-> > Ok, I will check nemesis load as well. =20
->=20
-> Nemesis doesn't do anything specific, just generates packets. The
-> command above sends a packet at 1 second intervals.
->=20
-> > Can you check the hsr_redbox.sh (from this patch set) and
-> > hsr_ping.sh ? =20
->=20
-> Running in SW I get the same results as you, hsr_redbox.sh passes and
-> hsr_ping.sh fails.
-
-Ok.
-
->=20
-> I haven't tried on HW. I'll see if I can find some time for it but it
-> might take more time to prepare.
-
-Ok. Thanks for help.
-
->=20
-> BR,
-> Casper
-
-
-Best regards,
-
-Lukasz Majewski
-
---
-
-DENX Software Engineering GmbH,      Managing Director: Erika Unter
-HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
-Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
-
---Sig_/LL=n12_LCt5cezsdP0qZhW3
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmYiehsACgkQAR8vZIA0
-zr16vAf/dadYUJk2OFHTR2s0U/JdMS4zN4xiENOCGD3kLqVthY8FhIP4Bj92+HQe
-toLREfcNZ0lJWUz9IvYba3DnMdjyoBaAzvTuz7BRuDYqkreeoJZsk5aPCaAAHrYw
-Jps2C+0ezx++Ft5VN+7EeG3OIVDIDoHCA4xl+EAFpLNgrIVd5ABRGPcuUmM+zdT6
-KxVhxkqgtTiBto7wNQR9PsPjgMWqAeGzWlvSDCCqu+6Twk4VJ6wOBcYXFQYYSo3R
-f7fYrPVx3meV+lfvMFbb/ChLym0xOEqOMc+iZqRgNGPUTW5UAYdQPBHzTNvmZPT/
-tL82QeCRJRxYxqj8e2+7LSn3sGm3tg==
-=IlLu
------END PGP SIGNATURE-----
-
---Sig_/LL=n12_LCt5cezsdP0qZhW3--
+T24gRnJpLCAyMDI0LTA0LTE5IGF0IDEzOjQ1ICswMTAwLCBPeGFuYSBLaGFyaXRvbm92YSB3cm90
+ZToNCj4gSGVsbG8sDQo+IA0KPiBOSUMgc3RvcHBlZCBiZWluZyBkZXRlY3RlZCBpbiBMaW51eCA2
+LjYuMjguIFRoZSBwcm9ibGVtIHdhcyBvYnNlcnZlZCBvbiANCj4gdHdvIHNlcnZlcnMsIGFmdGVy
+IHJldmVydGluZyBrZXJuZWwgdG8gNi42LjI1IChvdXIgY3VycmVudCBzdGFibGUgdmVyc2lvbikg
+DQo+IGV2ZXJ5dGhpbmcgcmV0dXJuZWQgdG8gbm9ybWFsLg0KPiANCj4gV2Ugc3VzcGVjdCBjb21t
+aXQgIm5ldC9tbHg1ZTogRG8gbm90IHByb2R1Y2UgbWV0YWRhdGEgZnJlZWxpc3QgZW50cmllcyBp
+biANCj4gVHggcG9ydCB0cyBXUUUgeG1pdCIsIGJ1dCB3ZSBoYXZlbid0IGRvbmUgYmlzZWN0IHll
+dC4gDQo+IA0KVGhlIGlzc3VlIGFwcGVhcnMgb25seSBpbiA2LjYuMjguIEJpc2VjdGV0IGRvd24g
+dG8gY29tbWl0ICJuZXQvbWx4NTogUmVnaXN0ZXINCmRldmxpbmsgZmlyc3QgdW5kZXIgZGV2bGlu
+ayBsb2NrIiB3aGljaCB3YXMgYWRkZWQgdG8gNi42LjI4LiBOb3RlIHRoYXQgbGF0ZXN0DQpzdGFi
+bGUgNi44IGRvZXNuJ3QgaGF2ZSB0aGlzIGlzc3VlLg0KDQpUcmllZCBxdWlja2x5IGxvb2tpbmcg
+YXJvdW5kIGFuZCBmb3VuZCB0aGF0ICJuZXQvbWx4NTogUmVzdG9yZSBtaXN0YWtlbmx5DQpkcm9w
+cGVkIHBhcnRzIGluIHJlZ2lzdGVyIGRldmxpbmsgZmxvdyIgd2FzIG1pc3NpbmcuIEJ1dCBpdCBk
+aWRuJ3QgaGVscA0KdW5mb3J0dW5hdGVseS4NCg0KQWRkaW5nIFNoYXkgYXMgaGUgcHJvYmFibHkg
+aGFzIG1vcmUgY29udGV4dC4NCg0KVGhhbmtzLA0KRHJhZ29zDQoNCg0KPiBUaGUga2VybmVsIGxv
+ZyBpcyBiZWxvdy4NCj4gDQo+IHJvb3RAbG9jYWxob3N0On4jIGlmY29uZmlnDQo+IGxvOiBmbGFn
+cz03MzxVUCxMT09QQkFDSyxSVU5OSU5HPiAgbXR1IDY1NTM2DQo+ICAgICAgICBpbmV0IDEyNy4w
+LjAuMSAgbmV0bWFzayAyNTUuMC4wLjANCj4gICAgICAgIGluZXQ2IDo6MSAgcHJlZml4bGVuIDEy
+OCAgc2NvcGVpZCAweDEwPGhvc3Q+DQo+ICAgICAgICBsb29wICB0eHF1ZXVlbGVuIDEwMDAgIChM
+b2NhbCBMb29wYmFjaykNCj4gICAgICAgIFJYIHBhY2tldHMgODAgIGJ5dGVzIDY0ODAgKDYuMyBL
+aUIpDQo+ICAgICAgICBSWCBlcnJvcnMgMCAgZHJvcHBlZCAwICBvdmVycnVucyAwICBmcmFtZSAw
+DQo+ICAgICAgICBUWCBwYWNrZXRzIDgwICBieXRlcyA2NDgwICg2LjMgS2lCKQ0KPiAgICAgICAg
+VFggZXJyb3JzIDAgIGRyb3BwZWQgMCBvdmVycnVucyAwICBjYXJyaWVyIDAgIGNvbGxpc2lvbnMg
+MA0KPiANCj4gcm9vdEBsb2NhbGhvc3Q6fiMgbHNwY2kgfCBncmVwIEV0aA0KPiBjMTowMC4wIEV0
+aGVybmV0IGNvbnRyb2xsZXI6IE1lbGxhbm94IFRlY2hub2xvZ2llcyBNVDI3NzEwIEZhbWlseSBb
+Q29ubmVjdFgtNCBMeF0NCj4gYzE6MDAuMSBFdGhlcm5ldCBjb250cm9sbGVyOiBNZWxsYW5veCBU
+ZWNobm9sb2dpZXMgTVQyNzcxMCBGYW1pbHkgW0Nvbm5lY3RYLTQgTHhdDQo+IA0KPiBbICAgMjMu
+NTE5MTEzXSBSSVA6IDAwMTA6ZXN3X3BvcnRfbWV0YWRhdGFfZ2V0IChkcml2ZXJzL25ldC9ldGhl
+cm5ldC9tZWxsYW5veC9tbHg1L2NvcmUvZXN3aXRjaF9vZmZsb2Fkcy5jOjQwOTUgZHJpdmVycy9u
+ZXQvZXRoZXJuZXQvbWVsbGFub3gvbWx4NS9jb3JlL2Vzd2l0Y2hfb2ZmbG9hZHMuYzoyNDQyKSBt
+bHg1X2NvcmUNCj4gWyAgIDIzLjUyNDI5M10gdXNiIDItMTogbmV3IFN1cGVyU3BlZWQgVVNCIGRl
+dmljZSBudW1iZXIgMiB1c2luZyB4aGNpX2hjZA0KPiBbIDIzLjUyODYwMl0gQ29kZTogZWIgOGUg
+MGYgMWYgMDAgOTAgOTAgOTAgOTAgOTAgOTAgOTAgOTAgOTAgOTAgOTAgOTAgOTAgOTAgOTAgOTAg
+MGYgMWYgNDQgMDAgMDAgNTMgNDggODkgZDMgZTggZjIgNWQgZWEgYzkgNDggOGIgODAgYjAgMDkg
+MDAgMDAgPDhiPiA4MCAxOCAxMSAwMCAwMCA4OCAwMyAzMSBjMCA4MCAyMyAwMSA1YiBlOSAzOCAx
+ZiBmMyBjOSAwZiAxZiA4NA0KPiBBbGwgY29kZQ0KPiA9PT09PT09PQ0KPiAgICAwOgllYiA4ZSAg
+ICAgICAgICAgICAgICAJam1wICAgIDB4ZmZmZmZmZmZmZmZmZmY5MA0KPiAgICAyOgkwZiAxZiAw
+MCAgICAgICAgICAgICAJbm9wbCAgICglcmF4KQ0KPiAgICA1Ogk5MCAgICAgICAgICAgICAgICAg
+ICAJbm9wDQo+ICAgIDY6CTkwICAgICAgICAgICAgICAgICAgIAlub3ANCj4gICAgNzoJOTAgICAg
+ICAgICAgICAgICAgICAgCW5vcA0KPiAgICA4Ogk5MCAgICAgICAgICAgICAgICAgICAJbm9wDQo+
+ICAgIDk6CTkwICAgICAgICAgICAgICAgICAgIAlub3ANCj4gICAgYToJOTAgICAgICAgICAgICAg
+ICAgICAgCW5vcA0KPiAgICBiOgk5MCAgICAgICAgICAgICAgICAgICAJbm9wDQo+ICAgIGM6CTkw
+ICAgICAgICAgICAgICAgICAgIAlub3ANCj4gICAgZDoJOTAgICAgICAgICAgICAgICAgICAgCW5v
+cA0KPiAgICBlOgk5MCAgICAgICAgICAgICAgICAgICAJbm9wDQo+ICAgIGY6CTkwICAgICAgICAg
+ICAgICAgICAgIAlub3ANCj4gICAxMDoJOTAgICAgICAgICAgICAgICAgICAgCW5vcA0KPiAgIDEx
+Ogk5MCAgICAgICAgICAgICAgICAgICAJbm9wDQo+ICAgMTI6CTkwICAgICAgICAgICAgICAgICAg
+IAlub3ANCj4gICAxMzoJOTAgICAgICAgICAgICAgICAgICAgCW5vcA0KPiAgIDE0Ogk5MCAgICAg
+ICAgICAgICAgICAgICAJbm9wDQo+ICAgMTU6CTBmIDFmIDQ0IDAwIDAwICAgICAgIAlub3BsICAg
+MHgwKCVyYXgsJXJheCwxKQ0KPiAgIDFhOgk1MyAgICAgICAgICAgICAgICAgICAJcHVzaCAgICVy
+YngNCj4gICAxYjoJNDggODkgZDMgICAgICAgICAgICAgCW1vdiAgICAlcmR4LCVyYngNCj4gICAx
+ZToJZTggZjIgNWQgZWEgYzkgICAgICAgCWNhbGwgICAweGZmZmZmZmZmYzllYTVlMTUNCj4gICAy
+MzoJNDggOGIgODAgYjAgMDkgMDAgMDAgCW1vdiAgICAweDliMCglcmF4KSwlcmF4DQo+ICAgMmE6
+Kgk4YiA4MCAxOCAxMSAwMCAwMCAgICAJbW92ICAgIDB4MTExOCglcmF4KSwlZWF4CQk8LS0gdHJh
+cHBpbmcgaW5zdHJ1Y3Rpb24NCj4gICAzMDoJODggMDMgICAgICAgICAgICAgICAgCW1vdiAgICAl
+YWwsKCVyYngpDQo+ICAgMzI6CTMxIGMwICAgICAgICAgICAgICAgIAl4b3IgICAgJWVheCwlZWF4
+DQo+ICAgMzQ6CTgwIDIzIDAxICAgICAgICAgICAgIAlhbmRiICAgJDB4MSwoJXJieCkNCj4gICAz
+NzoJNWIgICAgICAgICAgICAgICAgICAgCXBvcCAgICAlcmJ4DQo+ICAgMzg6CWU5IDM4IDFmIGYz
+IGM5ICAgICAgIAlqbXAgICAgMHhmZmZmZmZmZmM5ZjMxZjc1DQo+ICAgM2Q6CTBmICAgICAgICAg
+ICAgICAgICAgIAkuYnl0ZSAweGYNCj4gICAzZToJMWYgICAgICAgICAgICAgICAgICAgCShiYWQp
+DQo+ICAgM2Y6CTg0ICAgICAgICAgICAgICAgICAgIAkuYnl0ZSAweDg0DQo+IA0KPiBDb2RlIHN0
+YXJ0aW5nIHdpdGggdGhlIGZhdWx0aW5nIGluc3RydWN0aW9uDQo+ID09PT09PT09PT09PT09PT09
+PT09PT09PT09PT09PT09PT09PT09PT09PT0NCj4gICAgMDoJOGIgODAgMTggMTEgMDAgMDAgICAg
+CW1vdiAgICAweDExMTgoJXJheCksJWVheA0KPiAgICA2Ogk4OCAwMyAgICAgICAgICAgICAgICAJ
+bW92ICAgICVhbCwoJXJieCkNCj4gICAgODoJMzEgYzAgICAgICAgICAgICAgICAgCXhvciAgICAl
+ZWF4LCVlYXgNCj4gICAgYToJODAgMjMgMDEgICAgICAgICAgICAgCWFuZGIgICAkMHgxLCglcmJ4
+KQ0KPiAgICBkOgk1YiAgICAgICAgICAgICAgICAgICAJcG9wICAgICVyYngNCj4gICAgZToJZTkg
+MzggMWYgZjMgYzkgICAgICAgCWptcCAgICAweGZmZmZmZmZmYzlmMzFmNGINCj4gICAxMzoJMGYg
+ICAgICAgICAgICAgICAgICAgCS5ieXRlIDB4Zg0KPiAgIDE0OgkxZiAgICAgICAgICAgICAgICAg
+ICAJKGJhZCkNCj4gICAxNToJODQgICAgICAgICAgICAgICAgICAgCS5ieXRlIDB4ODQNCj4gWyAg
+IDIzLjUyODYwNF0gUlNQOiAwMDE4OmZmZmZjOTAwMGRiYmZiYTggRUZMQUdTOiAwMDAxMDI4Mg0K
+PiBbICAgMjMuNTMwODAyXSBodWIgMS0xOjEuMDogNCBwb3J0cyBkZXRlY3RlZA0KPiBbICAgMjMu
+NTM3NTc0XSBSQVg6IDAwMDAwMDAwMDAwMDAwMDAgUkJYOiBmZmZmYzkwMDBkYmJmYmZjIFJDWDog
+MDAwMDAwMDAwMDAwMDAyOA0KPiBbICAgMjMuNTM3NTc2XSBSRFg6IGZmZmZjOTAwMGRiYmZiZmMg
+UlNJOiAwMDAwMDAwMDAwMDAwMDEzIFJESTogZmZmZjg4ODExZWMzODAwMA0KPiBbICAgMjMuNTM3
+NTc4XSBSQlA6IGZmZmZmZmZmYzIzZmE1NjAgUjA4OiAwMDAwMDAwMDAwMDAwMDAwIFIwOTogMDAw
+MDAwMDAwMDAwMDAwMA0KPiBbICAgMjMuNTM3NTgwXSBSMTA6IDAwMDAwMDAwMDAwMzZlYTAgUjEx
+OiAwMDAwMDAwMDAwMDAwZGMwIFIxMjogZmZmZjg4OTg1MDEwNGYwMA0KPiBbICAgMjMuNTQ3NTY4
+XSB1c2IgMi0xOiBOZXcgVVNCIGRldmljZSBmb3VuZCwgaWRWZW5kb3I9MDVlMywgaWRQcm9kdWN0
+PTA2MjAsIGJjZERldmljZT05My4wMw0KPiBbICAgMjMuNTY0MjIyXSBSMTM6IGZmZmY4ODgxMDc1
+Y2E4NDAgUjE0OiBmZmZmODg4MTFlYzM4MDAwIFIxNTogMDAwMDAwMDAwMDAwMDAwMA0KPiBbICAg
+MjMuNTY0MjI0XSBGUzogIDAwMDAwMDAwMDAwMDAwMDAoMDAwMCkgR1M6ZmZmZjg4ODQzZmEwMDAw
+MCgwMDAwKSBrbmxHUzowMDAwMDAwMDAwMDAwMDAwDQo+IFsgICAyMy41NjQyMjZdIENTOiAgMDAx
+MCBEUzogMDAwMCBFUzogMDAwMCBDUjA6IDAwMDAwMDAwODAwNTAwMzMNCj4gWyAgIDIzLjU3MDE0
+M10gdXNiIDItMTogTmV3IFVTQiBkZXZpY2Ugc3RyaW5nczogTWZyPTEsIFByb2R1Y3Q9MiwgU2Vy
+aWFsTnVtYmVyPTANCj4gWyAgIDIzLjU3NDgzOV0gQ1IyOiAwMDAwMDAwMDAwMDAxMTE4IENSMzog
+MDAwMDAwMGM3YWY1YzAwMCBDUjQ6IDAwMDAwMDAwMDAzNTBlZjANCj4gWyAgIDIzLjU3NDg0MV0g
+Q2FsbCBUcmFjZToNCj4gWyAgIDIzLjU3NDg0NF0gIDxUQVNLPg0KPiBbICAgMjMuNTc0ODQ2XSA/
+IF9fZGllIChhcmNoL3g4Ni9rZXJuZWwvZHVtcHN0YWNrLmM6NDIxIGFyY2gveDg2L2tlcm5lbC9k
+dW1wc3RhY2suYzo0MzQpIA0KPiBbICAgMjMuNTkwNDg1XSA/IHBhZ2VfZmF1bHRfb29wcyAoYXJj
+aC94ODYvbW0vZmF1bHQuYzo3MDcpIA0KPiBbICAgMjMuNTkwNDkwXSA/IGdldF9wYWdlX2Zyb21f
+ZnJlZWxpc3QgKG1tL3BhZ2VfYWxsb2MuYzoxNTUzIG1tL3BhZ2VfYWxsb2MuYzozMTc3KSANCj4g
+WyAgIDIzLjYwNjEyOV0gPyBleGNfcGFnZV9mYXVsdCAoYXJjaC94ODYvaW5jbHVkZS9hc20vaXJx
+ZmxhZ3MuaDozNyBhcmNoL3g4Ni9pbmNsdWRlL2FzbS9pcnFmbGFncy5oOjcyIGFyY2gveDg2L21t
+L2ZhdWx0LmM6MTUwNCBhcmNoL3g4Ni9tbS9mYXVsdC5jOjE1NTIpIA0KPiBbICAgMjMuNjU1ODU2
+XSA/IGFzbV9leGNfcGFnZV9mYXVsdCAoYXJjaC94ODYvaW5jbHVkZS9hc20vaWR0ZW50cnkuaDo1
+NzApIA0KPiBbICAgMjMuNjcxNTAxXSA/IGVzd19wb3J0X21ldGFkYXRhX2dldCAoZHJpdmVycy9u
+ZXQvZXRoZXJuZXQvbWVsbGFub3gvbWx4NS9jb3JlL2Vzd2l0Y2hfb2ZmbG9hZHMuYzo0MDk1IGRy
+aXZlcnMvbmV0L2V0aGVybmV0L21lbGxhbm94L21seDUvY29yZS9lc3dpdGNoX29mZmxvYWRzLmM6
+MjQ0MikgbWx4NV9jb3JlDQo+IFsgICAyMy43OTA4MTJdID8gZXN3X3BvcnRfbWV0YWRhdGFfZ2V0
+IChkcml2ZXJzL25ldC9ldGhlcm5ldC9tZWxsYW5veC9tbHg1L2NvcmUvZXN3aXRjaF9vZmZsb2Fk
+cy5jOjQwOTUgZHJpdmVycy9uZXQvZXRoZXJuZXQvbWVsbGFub3gvbWx4NS9jb3JlL2Vzd2l0Y2hf
+b2ZmbG9hZHMuYzoyNDQyKSBtbHg1X2NvcmUNCj4gWyAgIDIzLjk1NTE4MF0gZGV2bGlua19ubF9w
+YXJhbV9maWxsLmNvbnN0cHJvcC4wIChuZXQvZGV2bGluay9wYXJhbS5jOjI2OCkgDQo+IFsgICAy
+My45NjEyNzZdID8gX19hbGxvY19za2IgKG5ldC9jb3JlL3NrYnVmZi5jOjY1MSAoZGlzY3JpbWlu
+YXRvciAxKSkgDQo+IFsgICAyMy45NzQ0OTBdID8gc3Jzb19yZXR1cm5fdGh1bmsgKGFyY2gveDg2
+L2xpYi9yZXRwb2xpbmUuUzoyMTcpIA0KPiBbICAgMjMuOTg3MDEzXSA/IF9fa21hbGxvY19ub2Rl
+X3RyYWNrX2NhbGxlciAobW0vc2xhYl9jb21tb24uYzoxMDI1IG1tL3NsYWJfY29tbW9uLmM6MTA0
+NikgDQo+IFsgICAyMy45ODcwMThdID8gc3Jzb19yZXR1cm5fdGh1bmsgKGFyY2gveDg2L2xpYi9y
+ZXRwb2xpbmUuUzoyMTcpIA0KPiBbICAgMjMuOTk3ODEyXSA/IGttYWxsb2NfcmVzZXJ2ZSAobmV0
+L2NvcmUvc2tidWZmLmM6NTg0KSANCj4gWyAgIDIzLjk5NzgxNl0gPyBzcnNvX3JldHVybl90aHVu
+ayAoYXJjaC94ODYvbGliL3JldHBvbGluZS5TOjIxNykgDQo+IFsgICAyNC4wMDcyMTddID8gX19h
+bGxvY19za2IgKG5ldC9jb3JlL3NrYnVmZi5jOjY2NikgDQo+IFsgICAyNC4wMDcyMjJdIGRldmxp
+bmtfcGFyYW1fbm90aWZ5LmNvbnN0cHJvcC4wIChuZXQvZGV2bGluay9wYXJhbS5jOjM1NCBuZXQv
+ZGV2bGluay9wYXJhbS5jOjMzMCkgDQo+IFsgICAyNC4wNTU1MTJdIGRldmxfcGFyYW1zX3JlZ2lz
+dGVyIChuZXQvZGV2bGluay9wYXJhbS5jOjY4NiAoZGlzY3JpbWluYXRvciAxKSkgDQo+IFsgICAy
+NC4wNTU1MTZdIGVzd19vZmZsb2Fkc19pbml0IChkcml2ZXJzL25ldC9ldGhlcm5ldC9tZWxsYW5v
+eC9tbHg1L2NvcmUvZXN3aXRjaF9vZmZsb2Fkcy5jOjI0ODIpIG1seDVfY29yZQ0KPiBbICAgMjQu
+MDY1MDA5XSBtbHg1X2Vzd2l0Y2hfaW5pdCAoZHJpdmVycy9uZXQvZXRoZXJuZXQvbWVsbGFub3gv
+bWx4NS9jb3JlL2Vzd2l0Y2guYzoxODcyKSBtbHg1X2NvcmUNCj4gWyAgIDI0LjE2NTIyOV0gbWx4
+NV9pbml0X29uZV9kZXZsX2xvY2tlZCAoZHJpdmVycy9uZXQvZXRoZXJuZXQvbWVsbGFub3gvbWx4
+NS9jb3JlL21haW4uYzoxMDIyIGRyaXZlcnMvbmV0L2V0aGVybmV0L21lbGxhbm94L21seDUvY29y
+ZS9tYWluLmM6MTQ0NykgbWx4NV9jb3JlDQo+IFsgICAyNC4xNzcwMDddIHByb2JlX29uZSAoZHJp
+dmVycy9uZXQvZXRoZXJuZXQvbWVsbGFub3gvbWx4NS9jb3JlL21haW4uYzoxNTA3IGRyaXZlcnMv
+bmV0L2V0aGVybmV0L21lbGxhbm94L21seDUvY29yZS9tYWluLmM6MTk0NykgbWx4NV9jb3JlDQo+
+IFsgICAyNC4xODcyOTZdIGxvY2FsX3BjaV9wcm9iZSAoZHJpdmVycy9wY2kvcGNpLWRyaXZlci5j
+OjMyNSkgDQo+IFsgICAyNC4xOTY2OThdIHdvcmtfZm9yX2NwdV9mbiAoa2VybmVsL3dvcmtxdWV1
+ZS5jOjU2MTggKGRpc2NyaW1pbmF0b3IgMSkpIA0KPiBbICAgMjQuMjA1OTg4XSBwcm9jZXNzX29u
+ZV93b3JrIChrZXJuZWwvd29ya3F1ZXVlLmM6MjYzMikgDQo+IFsgICAyNC4yMTU2MTJdIHdvcmtl
+cl90aHJlYWQgKGtlcm5lbC93b3JrcXVldWUuYzoyNjk0IChkaXNjcmltaW5hdG9yIDIpIGtlcm5l
+bC93b3JrcXVldWUuYzoyNzgxIChkaXNjcmltaW5hdG9yIDIpKSANCj4gWyAgIDI0LjIyNDk5OV0g
+PyBfX3BmeF93b3JrZXJfdGhyZWFkIChrZXJuZWwvd29ya3F1ZXVlLmM6MjcyNykgDQo+IFsgICAy
+NC4yMzQ5MTJdIGt0aHJlYWQgKGtlcm5lbC9rdGhyZWFkLmM6Mzg4KSANCj4gWyAgIDI0LjI0MzY0
+N10gPyBfX3BmeF9rdGhyZWFkIChrZXJuZWwva3RocmVhZC5jOjM0MSkgDQo+IFsgICAyNC4yNTI5
+ODhdIHJldF9mcm9tX2ZvcmsgKGFyY2gveDg2L2tlcm5lbC9wcm9jZXNzLmM6MTUzKSANCj4gWyAg
+IDI0LjI2MjEwM10gPyBfX3BmeF9rdGhyZWFkIChrZXJuZWwva3RocmVhZC5jOjM0MSkgDQo+IFsg
+ICAyNC4yNzEzNDddIHJldF9mcm9tX2ZvcmtfYXNtIChhcmNoL3g4Ni9lbnRyeS9lbnRyeV82NC5T
+OjMxNCkgDQo+IFsgICAyNC4yODA3NTRdICA8L1RBU0s+DQo+IA0KPiANCg0K
 
