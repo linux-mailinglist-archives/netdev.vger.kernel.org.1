@@ -1,87 +1,96 @@
-Return-Path: <netdev+bounces-89514-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89515-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D0C08AA86F
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 08:29:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37EA58AA89C
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 08:47:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4E8AE283A73
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 06:29:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E7FC2284714
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 06:47:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8160199A2;
-	Fri, 19 Apr 2024 06:28:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB21E3A1A8;
+	Fri, 19 Apr 2024 06:46:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BdDrdKlb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YKl8PeqU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f182.google.com (mail-yb1-f182.google.com [209.85.219.182])
+Received: from mail-yb1-f174.google.com (mail-yb1-f174.google.com [209.85.219.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62EA32745B;
-	Fri, 19 Apr 2024 06:28:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8585237165;
+	Fri, 19 Apr 2024 06:46:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713508136; cv=none; b=YSPOwkPiyeyw3SbsVqMI3K3KjiZ4JoiBhdNIBpKefrgxVhgGb4nYzhIWBq5qz2ayvznfkgjvZJ9QhOYwKdVTVNwN7B5jdLNe679cFMMFimhUWVSZIRqlVStTLmvBgsBHzjvQ9Tq0W7PlqFRrKj7bv8oCEq2WoD3BY/tL+ufZwWs=
+	t=1713509213; cv=none; b=kbY4gJJGvvU6ul1sK6Li5sP6aSYKukHTTUm9pjj10XVHBgH9jLy1hzEGxmxl43Ia3ZsxojCyW+fqLZkbPN6yQBRYUFLWt8RnAQdbSWLXiA8ymNh38r9o11hopvhG4rhu/ed9bhDDUIxdMZ2TOm1cusyDVvueZAocCeWMf0u/nZc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713508136; c=relaxed/simple;
-	bh=1UYTzjz+pfqOH0vYxIvJvyzR/zOW4BG72BXR0p1u154=;
+	s=arc-20240116; t=1713509213; c=relaxed/simple;
+	bh=6Lk2R6y1Ms4neAaNsZ7lhhpYZy6AgWbaZOXp8KTkQac=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gQeQ+pfkmoQ/+5DJEMXaJztTXjBYvH8ByKZzfetfH+2DZscYTmE8SWTCu4kLS+0V13oPsFUMHFYE43By5MhGsXkFNwi8I271zU09bQJJsIgyWK1kV1vL3FlbRpHLzC0OZEXs63Ylisaoct7Qt5X4LRQHzqBl/PLtnMAkz4K/63E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BdDrdKlb; arc=none smtp.client-ip=209.85.219.182
+	 Content-Type:Content-Disposition:In-Reply-To; b=QSFzIGSv6R7TDAZmb9MyMSczD1CQWilv/htrX2CQ42Pho0uHSuvsOvujGfaZ+0GLp/1Kq54so05tu729np8ykns212L7XGOi9rZ/5OteIDoZQoFbL6Tu1QkjWcEkV56jEL0R9DLpz/7CwP3hbx73dgLCTNJM+7OEc3Py51pgCY0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YKl8PeqU; arc=none smtp.client-ip=209.85.219.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f182.google.com with SMTP id 3f1490d57ef6-de46b71c1abso159610276.3;
-        Thu, 18 Apr 2024 23:28:52 -0700 (PDT)
+Received: by mail-yb1-f174.google.com with SMTP id 3f1490d57ef6-de4654c3423so177691276.0;
+        Thu, 18 Apr 2024 23:46:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713508131; x=1714112931; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1713509211; x=1714114011; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=mu6SkIqkO1DyCIz7So1K9fJm456SRdCmYKFj3MeAB8I=;
-        b=BdDrdKlbjei8+hR0R0+9m3ZAtitnVnDkgHzao7o87vYYH/4Ff06NXTF5kEgu06akCp
-         74GO0z8eSusDBO/0Hh8DskMqM/ZIo/N7KmP31ywejzSzta2mUV/yOdkSJnH7rQyagF/N
-         Jyz3TEmxddrHutwdlybuk5k5hRNnJoi4pFfcx//tt7LVCYwoq9nnG1CZn9+QIykenD6X
-         SnRl7+30682eOp8r1F5ZnbUF1oh7wsFYS2HPC42oeqUPCvO6aSSNQRHlM3eaXG6pAr2C
-         rtfqXlZbIoppnakSzAO+oyCIjeVs2Ht+meKRwXYA1zt1BqaTK/LjEBycRoK/3s9dc0oY
-         BzIw==
+        bh=XbSzBtnw4hgq7px4JzzkDwNDE3yBxvZABkHTmlQ2vAA=;
+        b=YKl8PeqUEBuNCxmpa+lR3tExhG5LmRS8jHb2fAMVCUhU7s5lGFalVM2hcx5Za++tvl
+         nKHwwmEEcgpxm0QbrVgzXoEfNRScRWugBrqlRFzNv40csy2j/P0zCS96ljTbDFNfpoyH
+         rlZ2xAdKPGW6sdZl9E21xtpwwhLklPnMEHzDrY5976lvYZQxepGkaJ9RMuglKCyT0/6U
+         I76BMr8MpCOkVlbeh9S3cNzm03+3RtMgu5w9w1IxqSpz579+MZ1l592nMCXizvyVR+jh
+         ylpVTQk3i3aCzcCqLE39LNEGTEIL8/6GuhMB7FMvYPuDB+PJAy2SEQWnvPSn5rEpsA3Q
+         inXA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713508131; x=1714112931;
+        d=1e100.net; s=20230601; t=1713509211; x=1714114011;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=mu6SkIqkO1DyCIz7So1K9fJm456SRdCmYKFj3MeAB8I=;
-        b=eGPGaTuetpdsK8TqpIl3ze9aKT2Rkv+t6uA34cp2FxSyk4WKxT+rcXPPtZiSWI8zNW
-         hhV+vuugSuuailA+zdqn606RHizmEyYT2tCJmfHtNdK7Ckhy9j56DZ+wrh4/YjW2HyMk
-         85bgCF8vPb3toh3o8vFmVRNRpcyGX7BRsKwWf56U+hQs+f4tXlr4eHn2zEdNA6L2t1c0
-         lYHTlo53+Fco+BplDr2Twa1izIHNWs56mYtH7OWx7LdSOUPzQVBRVrE0J0iNdT159cwd
-         gE0Jagw3hNeWcZNZTQXBWGORaqL+NgsbAYxiOp+C7p8EioSpEEHLRNUQytn36W6qNPnr
-         TyxA==
-X-Forwarded-Encrypted: i=1; AJvYcCXtXMevB2abGWepwXsbw7w5QxsXkyJX24IxdC/myr4k1dJoxQy/tunXLz2ddakqyjotU4XwKV1ZwnfU9HojNGUgZaTTjIvhYC6EFnmJORMI2vYGwIsAh5IloUq4EAjKh93xZRq2
-X-Gm-Message-State: AOJu0YzGCpgkNvIa5X3qF7jTQrFY6GZVXd82F77/4abT6l1GbL9sjXI3
-	x0vG69zhLUy8Ry/BS2p3AA/AkLZF4VChDQZUMbIsKl+43+pzYVrzIPmqSQ==
-X-Google-Smtp-Source: AGHT+IFDUH29AJHHr/RUj5RJX8g6snY89358+97NBy5vs/DROj+pB3IKyK024avmMDZ4GFdvckcpKg==
-X-Received: by 2002:a81:6c13:0:b0:60a:58b5:891c with SMTP id h19-20020a816c13000000b0060a58b5891cmr753592ywc.2.1713508131354;
-        Thu, 18 Apr 2024 23:28:51 -0700 (PDT)
+        bh=XbSzBtnw4hgq7px4JzzkDwNDE3yBxvZABkHTmlQ2vAA=;
+        b=riGWHki7eg9WL7MfMN25Uwz9p59+OEpKoCsNlmWi/2fx8GM2K+j1mUjjEveJEmmGpC
+         qoK4I1LBx0ThQYQUkwh3vaqvgaJRZ8n1DHpUAjdFCWs9oviUhNiehSXAxQwOnIWw5iKV
+         CSqK9uWopJyb8LdA61vdroqU2XJGy4BA8QZXJxJxZ/70vI2N2b8LfvLPzuNQKx7hxmMm
+         XI3dvCj1pmXicRZPvoBxy0IlR14ENaai4EFKdN4fEvnUepaXPYVuswPBhoF+9Nio0DrB
+         mzWEtaClsnqfzNovrs18Ir5V8wAHnhWRe1mhB2cSNGQkQKUEhNwTvPzEEhRrAi0bOEOk
+         mkFA==
+X-Forwarded-Encrypted: i=1; AJvYcCVE30Z1oDllOqGlLqdQ5h1P0BK7tXilBnH0u2dJZlvpz72/G9pAOgW8Gjolzx4B74P4QrXgn46fXew+XSg+PWQLMZTmbxMSHkMay63Z6a5SOUEuc0vcv40KrW4Jc5GHja0K90bE
+X-Gm-Message-State: AOJu0YyGQNM6FiVQQrI6DsP/TaCGd5urG7ccwRYguel0ukLdXiKFts5P
+	tlBgKEK/iKdIKbPJ3kI6QhGOPPtmG3+sPdvFNTfiKkQ54cHH6TBF
+X-Google-Smtp-Source: AGHT+IGLlCfPF0PKkwCVFiCiRzCfoD021zL84oexxmQJIgFwc875Wlv9wzHYbxGcRz0ExGpQvo1mlg==
+X-Received: by 2002:a0d:fb06:0:b0:61a:fac1:b045 with SMTP id l6-20020a0dfb06000000b0061afac1b045mr792092ywf.3.1713509211428;
+        Thu, 18 Apr 2024 23:46:51 -0700 (PDT)
 Received: from hoboy.vegasvil.org ([2600:1700:2430:6f6f:e2d5:5eff:fea5:802f])
-        by smtp.gmail.com with ESMTPSA id q39-20020a814327000000b00617f096f95asm667478ywa.16.2024.04.18.23.28.49
+        by smtp.gmail.com with ESMTPSA id p66-20020a0dcd45000000b0061b04dd1806sm666269ywd.50.2024.04.18.23.46.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Apr 2024 23:28:50 -0700 (PDT)
-Date: Thu, 18 Apr 2024 23:28:48 -0700
+        Thu, 18 Apr 2024 23:46:51 -0700 (PDT)
+Date: Thu, 18 Apr 2024 23:46:48 -0700
 From: Richard Cochran <richardcochran@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Mahesh Bandewar <maheshb@google.com>, Netdev <netdev@vger.kernel.org>,
-	Linux <linux-kernel@vger.kernel.org>,
-	David Miller <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Thomas Gleixner <tglx@linutronix.de>, Arnd Bergmann <arnd@arndb.de>,
-	Sagi Maimon <maimon.sagi@gmail.com>,
-	Jonathan Corbet <corbet@lwn.net>, John Stultz <jstultz@google.com>,
-	Mahesh Bandewar <mahesh@bandewar.net>
-Subject: Re: [PATCHv1 next] ptp: update gettimex64 to provide ts optionally
- in mono-raw base.
-Message-ID: <ZiIPIKM1rH7J-Pok@hoboy.vegasvil.org>
-References: <20240416215942.150202-1-maheshb@google.com>
- <20240417182445.019fb351@kernel.org>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	Arun Ramadoss <arun.ramadoss@microchip.com>,
+	Russell King <linux@armlinux.org.uk>, kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	UNGLinuxDriver@microchip.com,
+	linux-stm32@st-md-mailman.stormreply.com
+Subject: Re: [PATCH net-next v1 2/4] net: phy: micrel: lan8841: set default
+ PTP latency values
+Message-ID: <ZiITWEZgTx9aPqIy@hoboy.vegasvil.org>
+References: <20240417164316.1755299-1-o.rempel@pengutronix.de>
+ <20240417164316.1755299-3-o.rempel@pengutronix.de>
+ <c8e3f5d0-832b-4ab1-a65f-52f983ff110a@lunn.ch>
+ <ZiAtREiqPuvXkB4S@pengutronix.de>
+ <b44a4aee-f76f-4472-9b5c-343a09ed0d33@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -90,23 +99,36 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240417182445.019fb351@kernel.org>
+In-Reply-To: <b44a4aee-f76f-4472-9b5c-343a09ed0d33@lunn.ch>
 
-On Wed, Apr 17, 2024 at 06:24:45PM -0700, Jakub Kicinski wrote:
-> On Tue, 16 Apr 2024 14:59:42 -0700 Mahesh Bandewar wrote:
-> >  		if (extoff->n_samples > PTP_MAX_SAMPLES
-> > -		    || extoff->rsv[0] || extoff->rsv[1] || extoff->rsv[2]) {
-> > +		    || extoff->rsv[0] || extoff->rsv[1]
-> > +		    || (extoff->clockid != CLOCK_REALTIME
-> > +			&& extoff->clockid != CLOCK_MONOTONIC_RAW)) {
-> 
-> Since you're touching this condition it's probably a good opportunity
-> to fox the coding style.
+On Wed, Apr 17, 2024 at 10:23:07PM +0200, Andrew Lunn wrote:
+> I suggest you go read older messages from Richard. It was a discussion
+> with Microchip about one of their PHYs.
 
-What is the CodingStyle violation?
+My 2 cents:
 
-Is it starting a line with  ||  ?
+User space has all of the hooks needed to configure corrections for a
+given setup.
 
+Hard coding corrections in device drivers is bound to fail, based on
+prior experience with Vendors not knowing or caring how their products
+actually work.  Vendors will publish value X one year, then delete the
+info (to avoid embarrassment), then publish the new value Y, once
+customers have forgotten about X.
+
+So, prudent users will always calibrate their beloved systems, not
+trusting the Vendors to provide anything close to reasonable.
+
+Ergo, adding new magical correction in a kernel release causes
+regressions for prudent users.
+
+But, in the end, that doesn't matter, because prudent users are used
+to being abused by well-meaning yet misguided device driver authors.
+
+Prudent users are wise, and they will re-calibrate their systems
+before rolling out an updated kernel.
+
+After all, device driver authors leave them no other choice.
 
 Thanks,
 Richard
