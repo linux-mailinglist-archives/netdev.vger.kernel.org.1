@@ -1,114 +1,152 @@
-Return-Path: <netdev+bounces-89656-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89657-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B16E68AB120
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 16:56:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DA868AB143
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 17:04:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E36FD1C21853
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 14:56:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3340C1F22E04
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 15:04:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1D8A12F386;
-	Fri, 19 Apr 2024 14:56:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="qyfckNDu"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D019A12F385;
+	Fri, 19 Apr 2024 15:04:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f177.google.com (mail-yb1-f177.google.com [209.85.219.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [207.211.30.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78B797D07F
-	for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 14:56:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FEB37C08E
+	for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 15:04:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.211.30.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713538566; cv=none; b=R+3aW8/0wSWl52/dKH79mgKcZtaPujbjJZlxLkoLalpwN5uDt+bdwGSjQ+OKBab9u+SVLQgQFJBx5V/DfRFbZJmBwQU2POafjydF8h6bHOZ5RJLV2ldn+tEW+BN9EtxV+wB9GKVzNqxuV//CikgsEgTkwFDlVJw004JZAixFJ4E=
+	t=1713539063; cv=none; b=XzGpnW8UqPg2+NvMuzOcBRGX4XF0XfLlZEg9VMlBy32LRAvx+KJbc1BhNBX5B4tEXvRJHAaJw4sxExpMh3yTdTqkvtH5pf9S0Bp+jngK5S5xi8vTSbgFr3F8Xd1LLowE40+/NiXG9/wO+tCsWvZ+QJQNUqMKq9QjisyIiOgLWeI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713538566; c=relaxed/simple;
-	bh=fZ6egbJ58oe8djg//o9anbSRMQs0/bEKxO15c2sB8x0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lLcDxpSw/4KYuMWbDPRnSyN0PyR5nS7GMNJu8FfY/QfllBSEN0fFV4GIzRBRd7P/a2z4FBclvOfSOqkszgDP7TeZ0ye24zcHAgjXl6zhPIPqGM9Ypzc6GE43awIGU84lRQi/UbR4SkG3N66+NA6yTUVt9oL+Aza70vv0Au9mNQw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=qyfckNDu; arc=none smtp.client-ip=209.85.219.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-yb1-f177.google.com with SMTP id 3f1490d57ef6-d9b9adaf291so2213262276.1
-        for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 07:56:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1713538563; x=1714143363; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fZ6egbJ58oe8djg//o9anbSRMQs0/bEKxO15c2sB8x0=;
-        b=qyfckNDuVEoP+j9ejaxQrjvu1jKvZ/yQ4A4aeqs944o5cWXQy/8Wr3W9P4f7heUUoQ
-         7wkQbdwBFe/eoBO8Gr+v55uKmDhKDjv9yLJ89G9FwCWaHgXGTA2alL6VixKhB8FZ5Snu
-         tf3WPXjioBS8uq/3nzQZWdeZR+v0nxpBQxMtzCu0UMiWZGHQvrpgXY60PzjazvZCG/NK
-         ZzCdsZCXqHuI2aptHWJNz5LtxSbMhvvyeMRnkKPtViiBjXzqEhYPw2LYn9ozjH1IfYRT
-         cbuqR+0yTpCRsQT9hNRALTTLtrS686lNTfbl2GeJhWr1UuTv5nS8HAr7Q6RrUPxC+h0H
-         crhg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713538563; x=1714143363;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=fZ6egbJ58oe8djg//o9anbSRMQs0/bEKxO15c2sB8x0=;
-        b=qBNf0SmOuzx2bKnCsW8Yu35WiQ2/Ucv/YMTFW+TW0yRADwP0SswlXtnkBLJOWx2jOg
-         z24M2eS8wGt85Kg9RRrQM1A9HmDLmwrzwuwsgvU8MnVYAx8/fqFP6wmxYq5uRELneS7X
-         rW+CNCf35pJ+vPaTvBPYCTAmNF+NU7Hp1PwcGJ9lHucjGDAkP4fCQxFxTRvOxQ3Gaq66
-         epcEtHKIZTEdxL05oVunP4GsvRHgGaywt8zCqKDnMRxSU1IoyQyA+Ec/9gdNycSmF2Hk
-         3vnQH7vtrGpdr7lbG9A/4N+wAnvhMwFV/urRMSSLo0UyL+w3GIGOAOytnZZ0HYUxElAZ
-         2F0g==
-X-Forwarded-Encrypted: i=1; AJvYcCVmh7pl2PNTmne45l3DWPBQ9FUUXlFctQS7K3OEkjGCr8Q8DtXEq9lZ0/D1bX+8KT5KQHNXh7IjWQX67G9khfLcTvk9Y5Lp
-X-Gm-Message-State: AOJu0Ywj0AnEaTqsqHRXvCZQyoCoXyuA4eKhwIpKiHvhMFHu2+MRMjKA
-	oFY/eNGfIG9isRpATG9C3jE36OEPvUCeAE9Cce0L0YGq4SdrB84YvOSgKrTlE9mqZ3XQ1TYthpY
-	MabPg40emFHBLj1S5kvXCgagV3UNePqTpcquP
-X-Google-Smtp-Source: AGHT+IFcoIFftT/JtZByVpfirvuZuRERqN9daU0k6sXI971BhoczvC675liVI7NXpOWSmTkUGNco15bo2JBX+qBTtbg=
-X-Received: by 2002:a25:ac82:0:b0:dc7:48f8:ce2e with SMTP id
- x2-20020a25ac82000000b00dc748f8ce2emr2241753ybi.37.1713538563424; Fri, 19 Apr
- 2024 07:56:03 -0700 (PDT)
+	s=arc-20240116; t=1713539063; c=relaxed/simple;
+	bh=BfPC7rSyyC8PwFpTcUkxNnMuZ2RpZN5nSwew3yN8V08=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 In-Reply-To:Content-Type:Content-Disposition; b=BfNsVMjuIZgd/N3pcTAU8PaCZEp9PRbUtXT4nJn0FuZAnC6nmkp76u6JBKgwXBMr9rggYnxlj8cxPboPdE1cx40biYmL6qNak0/yoHieAO4nsCQ6xuUPNGRRiZ8e1waHGwddYpEUkmZ3WoXZmSw/Lha3L+p+o42VOl8nj/LMYFY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=none smtp.mailfrom=queasysnail.net; arc=none smtp.client-ip=207.211.30.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=queasysnail.net
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-323-7CD1Fwe2O922ruFHYjUJtg-1; Fri, 19 Apr 2024 11:04:11 -0400
+X-MC-Unique: 7CD1Fwe2O922ruFHYjUJtg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 364278E9E89;
+	Fri, 19 Apr 2024 15:04:10 +0000 (UTC)
+Received: from hog (unknown [10.39.193.137])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 93AC6581D0;
+	Fri, 19 Apr 2024 15:04:08 +0000 (UTC)
+Date: Fri, 19 Apr 2024 17:04:07 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Rahul Rameshbabu <rrameshbabu@nvidia.com>
+Cc: netdev@vger.kernel.org, stable@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Paolo Abeni <pabeni@redhat.com>, Gal Pressman <gal@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Yossi Kuperman <yossiku@nvidia.com>,
+	Benjamin Poirier <bpoirier@nvidia.com>,
+	Cosmin Ratiu <cratiu@nvidia.com>
+Subject: Re: [PATCH net-next 0/3] Resolve security issue in MACsec offload Rx
+ datapath
+Message-ID: <ZiKH52u_sjpm2mhf@hog>
+References: <20240419011740.333714-1-rrameshbabu@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240410140141.495384-1-jhs@mojatatu.com> <41736ea4e81666e911fee5b880d9430ffffa9a58.camel@redhat.com>
- <CAM0EoM=982OctjvSQpx0kR7e+JnQLhvZ=sM-tNB4xNiu7nhH5Q@mail.gmail.com>
- <CAM0EoM=VhVn2sGV40SYttQyaiCn8gKaKHTUqFxB_WzKrayJJfQ@mail.gmail.com>
- <CAADnVQ+-FBTQE+Mx09PHKStb5X=d1zPt_Q8QYUioUpyKC4TA7A@mail.gmail.com>
- <CAM0EoMknntbtdZY32yjA8pUHMONfZyO8gbxkm31eSKj19NBRhQ@mail.gmail.com>
- <CAADnVQKapK1iUrX+vED4pq4LGa8sM6V0FgYotvHOuuc+0D+K4A@mail.gmail.com>
- <CAM0EoMnHsxKHSqGVLWoYQGDDnY-Ew+hMvnY5_jzwfghRGe2EHA@mail.gmail.com> <CAADnVQLZcdOHKMdrm1vAAJyOAqPmf7vA5ejvYzkMz8GZpcJmcA@mail.gmail.com>
-In-Reply-To: <CAADnVQLZcdOHKMdrm1vAAJyOAqPmf7vA5ejvYzkMz8GZpcJmcA@mail.gmail.com>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Fri, 19 Apr 2024 10:55:52 -0400
-Message-ID: <CAM0EoM=i1_1+UyPKRejfdk_OXkSb4fO7sOeN+-DNRwED8NX_SA@mail.gmail.com>
-Subject: Re: [PATCH net-next v16 00/15] Introducing P4TC (series 1)
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, Network Development <netdev@vger.kernel.org>, deb.chatterjee@intel.com, 
-	Anjali Singhai Jain <anjali.singhai@intel.com>, namrata.limaye@intel.com, tom@sipanda.io, 
-	Marcelo Ricardo Leitner <mleitner@redhat.com>, Mahesh.Shirshyad@amd.com, tomasz.osinski@intel.com, 
-	Jiri Pirko <jiri@resnulli.us>, Cong Wang <xiyou.wangcong@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Vlad Buslov <vladbu@nvidia.com>, Simon Horman <horms@kernel.org>, 
-	khalidm@nvidia.com, =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>, 
-	victor@mojatatu.com, Pedro Tammela <pctammela@mojatatu.com>, Vipin.Jain@amd.com, 
-	dan.daly@intel.com, andy.fingerhut@gmail.com, chris.sommers@keysight.com, 
-	mattyk@nvidia.com, bpf <bpf@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20240419011740.333714-1-rrameshbabu@nvidia.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: queasysnail.net
+Content-Type: text/plain; charset=UTF-8
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Apr 19, 2024 at 10:49=E2=80=AFAM Alexei Starovoitov
-<alexei.starovoitov@gmail.com> wrote:
->
-> On Fri, Apr 19, 2024 at 7:45=E2=80=AFAM Jamal Hadi Salim <jhs@mojatatu.co=
-m> wrote:
-> >
-> > You dont get to decide that - I was talking to the networking people.
->
-> You think they want net-next PR to get derailed because of this?
+This should go to net, not net-next. It fixes a serious bug. Also
+please change the title to:
+  fix isolation of broadcast traffic with MACsec offload
 
-Why would it be derailed?
+"resolve security issue" is too vague.
 
-cheers,
-jamal
+2024-04-18, 18:17:14 -0700, Rahul Rameshbabu wrote:
+> Some device drivers support devices that enable them to annotate whether =
+a
+> Rx skb refers to a packet that was processed by the MACsec offloading
+> functionality of the device. Logic in the Rx handling for MACsec offload
+> does not utilize this information to preemptively avoid forwarding to the
+> macsec netdev currently. Because of this, things like multicast messages
+> such as ARP requests are forwarded to the macsec netdev whether the messa=
+ge
+> received was MACsec encrypted or not. The goal of this patch series is to
+> improve the Rx handling for MACsec offload for devices capable of
+> annotating skbs received that were decrypted by the NIC offload for MACse=
+c.
+>=20
+> Here is a summary of the issue that occurs with the existing logic today.
+>=20
+>     * The current design of the MACsec offload handling path tries to use
+>       "best guess" mechanisms for determining whether a packet associated
+>       with the currently handled skb in the datapath was processed via HW
+>       offload=E2=80=8B
+
+nit: there's a strange character after "offload" and at the end of a
+few other lines in this list
+
+>     * The best guess mechanism uses the following heuristic logic (in ord=
+er of
+>       precedence)
+>       - Check if header destination MAC address matches MACsec netdev MAC
+>         address -> forward to MACsec port
+>       - Check if packet is multicast traffic -> forward to MACsec port=E2=
+=80=8B
+                                                                   here ^
+
+>       - MACsec security channel was able to be looked up from skb offload
+>         context (mlx5 only) -> forward to MACsec port=E2=80=8B
+                                                  here ^
+
+>     * Problem: plaintext traffic can potentially solicit a MACsec encrypt=
+ed
+>       response from the offload device
+>       - Core aspect of MACsec is that it identifies unauthorized LAN conn=
+ections
+>         and excludes them from communication
+>         + This behavior can be seen when not enabling offload for MACsec=
+=E2=80=8B
+                                                                     here ^
+
+>       - The offload behavior violates this principle in MACsec
+>=20
+
+>=20
+> Link: https://github.com/Binary-Eater/macsec-rx-offload/blob/trunk/MACsec=
+_violation_in_core_stack_offload_rx_handling.pdf
+> Link: https://lore.kernel.org/netdev/87r0l25y1c.fsf@nvidia.com/
+> Link: https://lore.kernel.org/netdev/20231116182900.46052-1-rrameshbabu@n=
+vidia.com/
+> Cc: Sabrina Dubroca <sd@queasysnail.net>
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Rahul Rameshbabu <rrameshbabu@nvidia.com>
+
+I would put some Fixes tags on this series. Since we can't do anything
+about non-md_dst devices, I would say that the main patch fixes
+860ead89b851 ("net/macsec: Add MACsec skb_metadata_dst Rx Data path
+support"), and the driver patch fixes b7c9400cbc48 ("net/mlx5e:
+Implement MACsec Rx data path using MACsec skb_metadata_dst"). Jakub,
+Rahul, does that sound ok to both of you?
+
+--=20
+Sabrina
+
 
