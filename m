@@ -1,137 +1,123 @@
-Return-Path: <netdev+bounces-89697-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89698-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5447D8AB416
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 19:04:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EEB178AB425
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 19:08:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 09E4F1F22FB9
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 17:04:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8F2611F21D13
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 17:08:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3592C137927;
-	Fri, 19 Apr 2024 17:03:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B262B13174E;
+	Fri, 19 Apr 2024 17:08:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="g+SF+yfr"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kO20SppU"
 X-Original-To: netdev@vger.kernel.org
-Received: from fllv0016.ext.ti.com (fllv0016.ext.ti.com [198.47.19.142])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A4BF137C50;
-	Fri, 19 Apr 2024 17:03:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.142
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EEC856477
+	for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 17:08:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713546234; cv=none; b=gTPQFrFiuQWH7auBUvFDgEEKOLxH++1OyzdAY2f4kwOl4jsxnHdZFgj1o3pz0cb9KxYuMFwPY1p8urdI4OIM068pcHZT9QQrJbzSdAvr7S9N0tYRk+2F+jIu2sSfPk6vcX9Ox3wbQnnNgP6uUeQe08BQsOmmNDgJmJYMEF7Cxaw=
+	t=1713546524; cv=none; b=SAxh3S4+5RzTD0Kc9RPfWq1WqXBLZ+EjP9mAQsIMpRziy4gpS4/RdJirTpcMOZRU8b7mzpMN6AmIkCqtGpTA3nvv7w3jRL8ey4ns0muItVpjuFkyYBz7qsCQXnvxp9ZLbvzXjAuT2sN+AFfarLstH0zs3G2RvpNWU6f/vk8lmkU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713546234; c=relaxed/simple;
-	bh=QPtcxsnErCPN9wVboSbSwBYD9oCPYNM76lci9KbNS8o=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=FDxAzRHsdlnY5iyWCM4eH5vEjLGsie1mTCGcO/czvvxdlUK1tjqkwcjJLQGjGBV70ish6bdeUhdm4cZFSkVN4vqNnZGcRq1PnVhofmyqPIOGjQAvZ24YohsIVE3UkZvpVTG8zo+EJcQhVp4EpDfaTLts/OULIPJR5xu0C3RTbe8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=g+SF+yfr; arc=none smtp.client-ip=198.47.19.142
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from fllv0035.itg.ti.com ([10.64.41.0])
-	by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id 43JH3Rml007881;
-	Fri, 19 Apr 2024 12:03:27 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1713546207;
-	bh=2sBBZySipsaDQh6gta504lCyluXD40TKr8qXo3EeTnw=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=g+SF+yfrJ8X1kJ7leJTycFefJILN4OJVQCg6/hOaf/wroRyahFdbO+5utb3IMBU3K
-	 ZTb2lSnDmXli+C2UhZZNyFqeo1Z9CI/EPrCc39ptrAC7B5KRvlPUr8U9Jw0kWIOGSf
-	 hn/2j73TlfD32zvcFeBx+XhVSgcKsG59VC5VpbtY=
-Received: from DLEE114.ent.ti.com (dlee114.ent.ti.com [157.170.170.25])
-	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 43JH3R1o055295
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Fri, 19 Apr 2024 12:03:27 -0500
-Received: from DLEE115.ent.ti.com (157.170.170.26) by DLEE114.ent.ti.com
- (157.170.170.25) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Fri, 19
- Apr 2024 12:03:27 -0500
-Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DLEE115.ent.ti.com
- (157.170.170.26) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Fri, 19 Apr 2024 12:03:27 -0500
-Received: from [10.168.167.103] (udb0273976.dhcp.ti.com [10.168.167.103])
-	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 43JH3Q2S059335;
-	Fri, 19 Apr 2024 12:03:26 -0500
-Message-ID: <1cf9c10b-5cf3-412a-83a5-e6891a18c2f1@ti.com>
-Date: Fri, 19 Apr 2024 11:03:26 -0600
+	s=arc-20240116; t=1713546524; c=relaxed/simple;
+	bh=s4on6KqscIj+i61ZkHKc2rTAqi75W5FdAmg0f9wcHmM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PPABONk//TWrvK1FqnDE9kJth3mQsN07TC4jtDKFdSLxB8CzBgbNFCDhcfKkZGJwd3rwq+VE4NsfzuSmMCh8e9laB2rglrYaLxIyPQtqcVFYY9C1J0o282v2r6mNUQF0+Px9aPYJ7LFTtWrreb/mCRqH0sSp3ZRNOCeuMVAl1rQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kO20SppU; arc=none smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1713546523; x=1745082523;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=s4on6KqscIj+i61ZkHKc2rTAqi75W5FdAmg0f9wcHmM=;
+  b=kO20SppUB8KixFlt95NuscuV3HA/WYidYAAALVZnKkXwOWCvaIEWVxIc
+   nqNiDbxhZuetEGVr6r76fFaT1eBsTK+Y5yoSgyS+THXdB5w6TBUiJGgC3
+   NJXfdxlXXtTfedmOcYgvl7wv/QIGcQUXF2TFEriv5fwLjS1djcUYFDgo5
+   SLmKlg9+uEM5MtmGaAqVpdJLECHrNbNQsmnE+RlBKk3LTb9h840Ocwg8r
+   qx2B5IoSAa9uW9FpyW+iVMcS8/dKq9V7veKSE97f9sK9kJg44nJfk+vZ/
+   YuByfZEZVUhYEfsPScuXW0QWrhIVIfixRV6F/1n/QHkkTaeXLzmqtHHhc
+   w==;
+X-CSE-ConnectionGUID: t4ceL4CTQAenWDl+Rm9k2A==
+X-CSE-MsgGUID: /w5oG56ZT46Vrr4ZIKsJXA==
+X-IronPort-AV: E=McAfee;i="6600,9927,11049"; a="26674280"
+X-IronPort-AV: E=Sophos;i="6.07,214,1708416000"; 
+   d="scan'208";a="26674280"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Apr 2024 10:08:42 -0700
+X-CSE-ConnectionGUID: E5NBiPFlQxONdFc/Y4dRUg==
+X-CSE-MsgGUID: CCQlko+pSUSBYdl9YZXOHQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,214,1708416000"; 
+   d="scan'208";a="27847158"
+Received: from wasp.igk.intel.com (HELO GK3153-DR2-R750-36946.localdomain.com) ([10.102.20.192])
+  by fmviesa005.fm.intel.com with ESMTP; 19 Apr 2024 10:08:39 -0700
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	jacob.e.keller@intel.com,
+	michal.kubiak@intel.com,
+	maciej.fijalkowski@intel.com,
+	sridhar.samudrala@intel.com,
+	przemyslaw.kitszel@intel.com,
+	wojciech.drewek@intel.com,
+	pio.raczynski@gmail.com,
+	jiri@nvidia.com,
+	mateusz.polchlopek@intel.com,
+	shayd@nvidia.com
+Subject: [iwl-next v1 0/4] ice: prepare representor for SF support
+Date: Fri, 19 Apr 2024 19:13:32 +0200
+Message-ID: <20240419171336.11617-1-michal.swiatkowski@linux.intel.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: ethernet: ti: am65-cpts: Fix PTPv1 message type
- on TX packets
-To: Ravi Gunasekaran <r-gunasekaran@ti.com>, <s-vadapalli@ti.com>,
-        <rogerq@kernel.org>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <richardcochran@gmail.com>,
-        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, <srk@ti.com>,
-        <ed.trexel@hp.com>, <oem-support@audinate.com>
-References: <20240419080547.10682-1-r-gunasekaran@ti.com>
-Content-Language: en-US
-From: Jason Reeder <jreeder@ti.com>
-In-Reply-To: <20240419080547.10682-1-r-gunasekaran@ti.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+Content-Transfer-Encoding: 8bit
 
+Hi,
 
+This is a series to prepare port representor for supporting also
+subfunctions. We need correct devlink locking and the possibility to
+update parent VSI after port representor is created.
 
-On 4/19/24 02:05, Ravi Gunasekaran wrote:
-> From: Jason Reeder <jreeder@ti.com>
-> 
-> The CPTS, by design, captures the messageType (Sync, Delay_Req, etc.)
-> field from the second nibble of the PTP header which is defined in the
-> PTPv2 (1588-2008) specification. In the PTPv1 (1588-2002) specification
-> the first two bytes of the PTP header are defined as the versionType
-> which is always 0x0001. This means that any PTPv1 packets that are
-> tagged for TX timestamping by the CPTS will have their messageType set
-> to 0x0 which corresponds to a Sync message type. This causes issues
-> when a PTPv1 stack is expecting a Delay_Req (messageType: 0x1)
-> timestamp that never appears.
-> 
-> Fix this by checking if the ptp_class of the timestamped TX packet is
-> PTP_CLASS_V1 and then matching the PTP sequence ID to the stored
-> sequence ID in the skb->cb data structure. If the sequence IDs match
-> and the packet is of type PTPv1 then there is a chance that the
-> messageType has been incorrectly stored by the CPTS so overwrite the
-> messageType stored by the CPTS with the messageType from the skb->cb
-> data structure. This allows the PTPv1 stack to receive TX timestamps
-> for Delay_Req packets which are necessary to lock onto a PTP Leader.
-> 
-> Signed-off-by: Jason Reeder <jreeder@ti.com>
-> Signed-off-by: Ravi Gunasekaran <r-gunasekaran@ti.com>
-> ---
->   drivers/net/ethernet/ti/am65-cpts.c | 5 +++++
->   1 file changed, 5 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/ti/am65-cpts.c b/drivers/net/ethernet/ti/am65-cpts.c
-> index c66618d91c28..f89716b1cfb6 100644
-> --- a/drivers/net/ethernet/ti/am65-cpts.c
-> +++ b/drivers/net/ethernet/ti/am65-cpts.c
-> @@ -784,6 +784,11 @@ static bool am65_cpts_match_tx_ts(struct am65_cpts *cpts,
->   		struct am65_cpts_skb_cb_data *skb_cb =
->   					(struct am65_cpts_skb_cb_data *)skb->cb;
->   
-> +		if ((ptp_classify_raw(skb) & PTP_CLASS_V1) &&
-> +		    ((mtype_seqid & AM65_CPTS_EVENT_1_SEQUENCE_ID_MASK) ==
-> +		     (skb_cb->skb_mtype_seqid & AM65_CPTS_EVENT_1_SEQUENCE_ID_MASK)))
-> +			mtype_seqid = skb_cb->skb_mtype_seqid;
-> +
->   		if (mtype_seqid == skb_cb->skb_mtype_seqid) {
->   			u64 ns = event->timestamp;
->   
-> 
-> base-commit: a35e92ef04c07bd473404b9b73d489aea19a60a8
+Refactor how devlink lock is taken to suite the subfunction use case.
 
-++ Ed Trexel at HP and the Audinate support team for visibility and 
-'Tested-by' tags.
+VSI configuration needs to be done after port representor is created.
+Port representor needs only allocated VSI. It doesn't need to be
+configured before.
 
-Jason Reeder
+VSI needs to be reconfigured when update function is called.
+
+The code for this patchset was split from (too big) patchset [1].
+
+[1] https://lore.kernel.org/netdev/20240213072724.77275-1-michal.swiatkowski@linux.intel.com/
+
+Michal Swiatkowski (4):
+  ice: store representor ID in bridge port
+  ice: move devlink locking outside the port creation
+  ice: move VSI configuration outside repr setup
+  ice: update representor when VSI is ready
+
+ .../net/ethernet/intel/ice/devlink/devlink.c  |  2 -
+ .../ethernet/intel/ice/devlink/devlink_port.c |  4 +-
+ drivers/net/ethernet/intel/ice/ice_eswitch.c  | 83 +++++++++++++------
+ drivers/net/ethernet/intel/ice/ice_eswitch.h  | 14 +++-
+ .../net/ethernet/intel/ice/ice_eswitch_br.c   |  4 +-
+ .../net/ethernet/intel/ice/ice_eswitch_br.h   |  1 +
+ drivers/net/ethernet/intel/ice/ice_repr.c     | 16 ++--
+ drivers/net/ethernet/intel/ice/ice_repr.h     |  1 +
+ drivers/net/ethernet/intel/ice/ice_vf_lib.c   |  2 +-
+ 9 files changed, 88 insertions(+), 39 deletions(-)
+
+-- 
+2.42.0
+
 
