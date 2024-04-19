@@ -1,50 +1,47 @@
-Return-Path: <netdev+bounces-89610-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89612-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D7968AADFC
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 14:00:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DC1148AAE33
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 14:12:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C15091F21B83
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 12:00:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 91E611F21C15
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 12:12:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AA3983A06;
-	Fri, 19 Apr 2024 12:00:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t0REu8hx"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED7F083CC7;
+	Fri, 19 Apr 2024 12:12:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail-m25499.xmail.ntesmail.com (mail-m25499.xmail.ntesmail.com [103.129.254.99])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0463422064
-	for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 12:00:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4312378285;
+	Fri, 19 Apr 2024 12:12:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.129.254.99
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713528028; cv=none; b=KF42RmkPYIhSVKZ8CeenMzajVGiO619N+fV7yx/FPrWUZTvbtNDLclLaqelK42PogN4Tw+fl8V9vIP+aA5kIBLdmMNMPqW864EBYNj99j96fuinRsxeJc2xsPEO+7ixmHOTgsls74SkzKUp6zcrUbO9zYYwyffk8GNdZmembBn4=
+	t=1713528766; cv=none; b=Fk+MsmtDSYiauG3Wri77oc+a3ZseTDq7m02XcisARHpoOPu/KyX5U80JTl1z1+WwFLwNsHvCXbIH1qPBkqgaKM7o2NZWMNHFwLPEZHWkzV7k0i6gdGdxXfzywCPoJtZ6Ei/Yex4F2QrU5fPwauNT5puFAJEQlTdfVgfN9eEoxhw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713528028; c=relaxed/simple;
-	bh=msXl/O/E9/AQw5Qev7GQCxlxekUyA6kBRZl1RpaLlNc=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=oFHbMtC85pKJo34BAapr0Z4JgSEFn7433pkotFQcYPl1OjulXkLsZVrKlS0g2D7uxbaU4ms9hqRGZXmsJYMYwo2ouSoHnSlIDcBZDfmDuH4PYdUAhA9aLHyul+CKz0OAR23OqBMxXj5qRiJGSVk2+FYbJLaZbCgMNWTwT8UYyFw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t0REu8hx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 85477C2BD10;
-	Fri, 19 Apr 2024 12:00:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713528027;
-	bh=msXl/O/E9/AQw5Qev7GQCxlxekUyA6kBRZl1RpaLlNc=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=t0REu8hxLbweN2Pu+Tm3cmbuBegGsDCjUZdNX2JozyNsw+BpSZ7OLOeFTMlNw/LVJ
-	 7PPgvyl8SNQsnKH7ylucUyXTt1j/yLuGxZqMzvmt4rrMSYtZlrjiGme1OfIJfRrmrl
-	 K8ZPYG7fnAXoy8TcL3HnqKvbtGWaAAe3HNtcrmzvMW3L0rsjgvwqRe8M6uU87V6cFq
-	 iP3wuxXxEE/COaVsyFAzF/kfNmzfelW1t7yHQ3GzZX/D+kh/4nNceszTTx/O1fdkIA
-	 tiqk5RGyqWwVrx7gtyOiOKnCC5Xp3P98C+/KOURqOiDmZ+BF3fr+NfiU0haRbefMkc
-	 RcOtkSzFxRpOg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 752EFC43616;
-	Fri, 19 Apr 2024 12:00:27 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1713528766; c=relaxed/simple;
+	bh=KZGUHlRWEuj7dHpQ9LaQKSzrzqTzErAnF5h96rQdeJo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=df+Wz76eGw2j8kZMQhMIWr1ahw+qZzZ/Rv3QJNrCxgkV4LA3o/cnWZP5274YDUbuaUYbD1eSGIdHszHKGGRjG/3ikKEY0UBgBV2gDY7scFf4sFHc5enl7++pYSY8z3FDPudzJKjLuQtSp/ltonmPKWB3PZgk71QWfXHupAogvIg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=easystack.cn; spf=none smtp.mailfrom=easystack.cn; arc=none smtp.client-ip=103.129.254.99
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=easystack.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=easystack.cn
+Received: from localhost.localdomain (unknown [110.185.170.227])
+	by smtp.qiye.163.com (Hmail) with ESMTPA id 6F0EF56025F;
+	Fri, 19 Apr 2024 14:14:28 +0800 (CST)
+From: Jun Gu <jun.gu@easystack.cn>
+To: kuba@kernel.org
+Cc: dev@openvswitch.org,
+	echaudro@redhat.com,
+	jun.gu@easystack.cn,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH net-next v4] net: openvswitch: Check vport netdev name
+Date: Fri, 19 Apr 2024 14:14:25 +0800
+Message-Id: <20240419061425.132723-1-jun.gu@easystack.cn>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,41 +49,43 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] vxlan: drop packets from invalid src-address
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171352802747.22575.7295961597022710844.git-patchwork-notify@kernel.org>
-Date: Fri, 19 Apr 2024 12:00:27 +0000
-References: <20240418132908.38032-1-mail@david-bauer.net>
-In-Reply-To: <20240418132908.38032-1-mail@david-bauer.net>
-To: David Bauer <mail@david-bauer.net>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, amcohen@nvidia.com, netdev@vger.kernel.org,
- idosch@nvidia.com
+X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
+	tZV1koWUFJQjdXWS1ZQUlXWQ8JGhUIEh9ZQVlCTh8eVk5DGksYGh4dTxgfSlUZERMWGhIXJBQOD1
+	lXWRgSC1lBWUpKS1VKQ05VSkxLVUlJTFlXWRYaDxIVHRRZQVlPS0hVSk1PSUxOVUpLS1VKQktLWQ
+	Y+
+X-HM-Tid: 0a8ef4fdf7cc023dkunm6f0ef56025f
+X-HM-MType: 1
+X-HM-Sender-Digest: e1kMHhlZQR0aFwgeV1kSHx4VD1lBWUc6Ok06Pxw5Gjc0Th8uMRwoLA9N
+	GQkaFChVSlVKTEpITktMSU1DQ0JCVTMWGhIXVREOFVUcDjseGggCCA8aGBBVGBVFWVdZEgtZQVlK
+	SktVSkNOVUpMS1VJSUxZV1kIAVlBSkxJSjcG
 
-Hello:
+Ensure that the provided netdev name is not one of its aliases to
+prevent unnecessary creation and destruction of the vport by
+ovs-vswitchd.
 
-This patch was applied to netdev/net.git (main)
-by David S. Miller <davem@davemloft.net>:
+Signed-off-by: Jun Gu <jun.gu@easystack.cn>
+Acked-by: Eelco Chaudron <echaudro@redhat.com>
+---
+ net/openvswitch/vport-netdev.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-On Thu, 18 Apr 2024 15:29:08 +0200 you wrote:
-> The VXLAN driver currently does not check if the inner layer2
-> source-address is valid.
-> 
-> In case source-address snooping/learning is enabled, a entry in the FDB
-> for the invalid address is created with the layer3 address of the tunnel
-> endpoint.
-> 
-> [...]
-
-Here is the summary with links:
-  - [net,v2] vxlan: drop packets from invalid src-address
-    https://git.kernel.org/netdev/net/c/f58f45c1e5b9
-
-You are awesome, thank you!
+diff --git a/net/openvswitch/vport-netdev.c b/net/openvswitch/vport-netdev.c
+index 903537a5da22..618edc346c0f 100644
+--- a/net/openvswitch/vport-netdev.c
++++ b/net/openvswitch/vport-netdev.c
+@@ -78,7 +78,10 @@ struct vport *ovs_netdev_link(struct vport *vport, const char *name)
+ 	int err;
+ 
+ 	vport->dev = dev_get_by_name(ovs_dp_get_net(vport->dp), name);
+-	if (!vport->dev) {
++	/* Ensure that the device exists and that the provided
++	 * name is not one of its aliases.
++	 */
++	if (!vport->dev || strcmp(name, ovs_vport_name(vport))) {
+ 		err = -ENODEV;
+ 		goto error_free_vport;
+ 	}
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.25.1
 
 
