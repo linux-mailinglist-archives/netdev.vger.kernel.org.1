@@ -1,116 +1,155 @@
-Return-Path: <netdev+bounces-89588-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89590-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDCDC8AACA3
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 12:17:01 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CF568AACC6
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 12:24:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2BBEE1C21042
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 10:17:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F360DB21298
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 10:24:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F162B7BB17;
-	Fri, 19 Apr 2024 10:16:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tNIPxI5H"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A8D27E78B;
+	Fri, 19 Apr 2024 10:24:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4434745EF;
-	Fri, 19 Apr 2024 10:16:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E3807E586
+	for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 10:24:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713521816; cv=none; b=PTQbxDatjWDJnmFsXDXcwBAE51EwuPyUbaHjru51lP60NPJ/ANR8K85buPaaeqG1/PEaXN24rdgrK94oAg0YOIoGw6c+RsWUgfkx78NyHAq9qjXNnCRdcZaNGgl7h7ogN4bJVwqTHSgqaZlifM74TfQgIsewAsaQFaG9LKkkBno=
+	t=1713522273; cv=none; b=EEyzceaEuHSyUcetd+6BL4Z93hEadZ1Fx0V7VEjrhyCMXSKxvGvBcZfQXBIJWF0Gvw2Q3oonUd78BWqIp7xtIXPI0CD9h8p4vQASZApBAgJ5KR9WKLx4aD4vlK6eLVopsPZepwiK+PIDoHTMe4gqSmttZ6c0AMyMeAiuUfvBnfA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713521816; c=relaxed/simple;
-	bh=aC+QA5rjhgsuTqn2kdyip+wg1YmdpSU1U1t0y/JyVB4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BBEx+dtWFV8eTC2KaPcn+c36V/AZx7bQ2D9qhqkX5TMxEPRhevYPfZSQ1Chs2B/VD8qrbQLpf51NiJvHwCA8qeTxTNPNpM+0su3ow4F5i4WOkZFWJuss/9eUwAiQDZYfU4bi9z8rkV7qqxYKOAbl/SlGxQPGURg2kO/z/6g5zdk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tNIPxI5H; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A9E1AC072AA;
-	Fri, 19 Apr 2024 10:16:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713521816;
-	bh=aC+QA5rjhgsuTqn2kdyip+wg1YmdpSU1U1t0y/JyVB4=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=tNIPxI5HOVILSTXuczGUDtJGoDhmBpJGSxMEqBFvHNc2zXK33PEiKk4HM+8mTjKo/
-	 bu1QPvghvyq31zosBe16/stXNcEqYWg5NdaCyQQ+0r0jpOYs1k0v8NDfk93oso4wyk
-	 3jIMkkHrA7DgSmPunJ14oE0XNCHPHd0btuepG1tf77WZG83xIcjHaeL1Gzdw/tFMp1
-	 Dau3NJVvA9W6sTlorR3yNNq/IyMUo29+AmiNyDXYRERCMv0FSe56YLuG2ErpFVxtuG
-	 o8+arByas5NQ5ha1eVk7zFPlQHUct8n2jtqpmfHIuwRBE2lZiVWcAn6bP2VSZQrscQ
-	 qR9DgG4w1BvVg==
-Message-ID: <33295077-e969-427a-badb-3e29698f5cfb@kernel.org>
-Date: Fri, 19 Apr 2024 12:16:52 +0200
+	s=arc-20240116; t=1713522273; c=relaxed/simple;
+	bh=+DiI0BxzV0puyffxv6ErPq3JEhUJYpwR2RQVG7cIynk=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=Fa6EenRQQIwttBCvAW5uoqfuMpE6Soj5uYNc27Rl/Em60xbLc5U9VuIfDDp0sJHNgu/8CB4rZEjEA5zb63ZAzUsJsjwb7G8QEULysDWXd5zWu/3u8WvpUEzj+71wD4uVQ3K4N6GItIkbIYBVdd4gbRnAxF46c30w66XhdeJ6vhY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-7da41da873bso128031639f.3
+        for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 03:24:31 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713522271; x=1714127071;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=W8T+LrP3FTrNWtFlMf+a0V0ngQm8ygAEYwcLhda9KoM=;
+        b=Vyn1AVBtGL70iuNB+X5x8d3LKJWR6bDqGDeTWk28YIeo5fOVOR2pCCuOydHG4m7m/d
+         +20ypIONgphMco9uY4jWxsNv2Uqv2WUz4WIVO4+Oh+4TfqBZv0ynoRbb3/QrSKTxYTvb
+         mxdrZMmTM7+6bp9Rx+jy9nWm2iCXUHuQGVpngUvG1BqrP8uAXLry67XShw8IpES148SN
+         2pQ7DOFMuH8n9OeNyYrhXXoSF+fThAPUimdGdUvR3QFS1odbmAqEqrSFnkh8+5qALBTV
+         obkHN2mXMcsFpSU4o7boeBMZriPhQXZXi54oMdBpUtMKfKSLG34dY8jaRxXqtQJUCdHC
+         RyMQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXcvqhAzZle88r1LtPaAEeemai4w7V5YXjak6fnCGuONDQ7elbaJ8DS7YkxUqEo40na/VjfKuy7Gd2Vgp4b4nv8yNhR3Luo
+X-Gm-Message-State: AOJu0YyHR63QJ6Oyuv1X5J/lDIBvEOuFHzLxNmThhI0vB8nr4hK4KurE
+	R3ML1N5vsh/HH9rUezbPs/v4YCcXlzfm4BJeKV6P6QG1U49iNByuIyFFAA3N5E2EB0gf5t8P1GV
+	aedkItNrAFxGXAFAFO14ptVv+JxwUkAhKt7PkDAo6LKlJjshAG36znbc=
+X-Google-Smtp-Source: AGHT+IFEYOy6Q84qKdyfcggsy34sxX5xZMox4OLE9HaUUAL0X++4iiflE2rBu8Wh5oaLkEvASZBE0rJ5gTp9csF4esZ98XwENO/E
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 3/3] cgroup/rstat: introduce ratelimited rstat flushing
-To: Yosry Ahmed <yosryahmed@google.com>
-Cc: tj@kernel.org, hannes@cmpxchg.org, lizefan.x@bytedance.com,
- cgroups@vger.kernel.org, longman@redhat.com, netdev@vger.kernel.org,
- linux-mm@kvack.org, linux-kernel@vger.kernel.org, shakeel.butt@linux.dev,
- kernel-team@cloudflare.com, Arnaldo Carvalho de Melo <acme@kernel.org>,
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>, mhocko@kernel.org,
- Wei Xu <weixugc@google.com>
-References: <171328983017.3930751.9484082608778623495.stgit@firesoul>
- <171328990014.3930751.10674097155895405137.stgit@firesoul>
- <CAJD7tkbZAj3UQSHbu3kj1NG4QDowXWrohG4XM=7cX_a=QL-Shg@mail.gmail.com>
- <72e4a55e-a246-4e28-9d2e-d4f1ef5637c2@kernel.org>
- <CAJD7tkbNvo4nDek5HV7rpZRbARE7yc3y=ufVY5WMBkNH6oL4Mw@mail.gmail.com>
-Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <CAJD7tkbNvo4nDek5HV7rpZRbARE7yc3y=ufVY5WMBkNH6oL4Mw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6638:870e:b0:482:eade:a878 with SMTP id
+ iw14-20020a056638870e00b00482eadea878mr143626jab.1.1713522271080; Fri, 19 Apr
+ 2024 03:24:31 -0700 (PDT)
+Date: Fri, 19 Apr 2024 03:24:31 -0700
+In-Reply-To: <000000000000c6405606166fdc68@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000004860260616707e43@google.com>
+Subject: Re: [syzbot] [net?] WARNING in gre_tap_xmit (2)
+From: syzbot <syzbot+c298c9f0e46a3c86332b@syzkaller.appspotmail.com>
+To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
+	kuba@kernel.org, kuniyu@amazon.com, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+
+syzbot has found a reproducer for the following issue on:
+
+HEAD commit:    443574b03387 riscv, bpf: Fix kfunc parameters incompatibil..
+git tree:       bpf
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=149a7ec3180000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=6fb1be60a193d440
+dashboard link: https://syzkaller.appspot.com/bug?extid=c298c9f0e46a3c86332b
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=14a94f00980000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15bce6ab180000
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/3f355021a085/disk-443574b0.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/44cf4de7472a/vmlinux-443574b0.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/a99a36c7ad65/bzImage-443574b0.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+c298c9f0e46a3c86332b@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+WARNING: CPU: 0 PID: 5076 at include/linux/skbuff.h:2740 pskb_may_pull_reason include/linux/skbuff.h:2740 [inline]
+WARNING: CPU: 0 PID: 5076 at include/linux/skbuff.h:2740 pskb_may_pull include/linux/skbuff.h:2756 [inline]
+WARNING: CPU: 0 PID: 5076 at include/linux/skbuff.h:2740 pskb_network_may_pull include/linux/skbuff.h:3077 [inline]
+WARNING: CPU: 0 PID: 5076 at include/linux/skbuff.h:2740 pskb_inet_may_pull include/net/ip_tunnels.h:361 [inline]
+WARNING: CPU: 0 PID: 5076 at include/linux/skbuff.h:2740 gre_tap_xmit+0x4ff/0x6e0 net/ipv4/ip_gre.c:734
+Modules linked in:
+CPU: 0 PID: 5076 Comm: syz-executor172 Not tainted 6.8.0-syzkaller-05236-g443574b03387 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
+RIP: 0010:pskb_may_pull_reason include/linux/skbuff.h:2740 [inline]
+RIP: 0010:pskb_may_pull include/linux/skbuff.h:2756 [inline]
+RIP: 0010:pskb_network_may_pull include/linux/skbuff.h:3077 [inline]
+RIP: 0010:pskb_inet_may_pull include/net/ip_tunnels.h:361 [inline]
+RIP: 0010:gre_tap_xmit+0x4ff/0x6e0 net/ipv4/ip_gre.c:734
+Code: 00 4c 89 ef 48 89 ee 48 89 da e8 7c 8f fb ff 31 c0 48 83 c4 38 5b 41 5c 41 5d 41 5e 41 5f 5d c3 cc cc cc cc e8 62 55 9d f7 90 <0f> 0b 90 e9 09 fc ff ff 44 89 e7 89 ee e8 0f 57 9d f7 41 39 ec 0f
+RSP: 0018:ffffc9000391ee00 EFLAGS: 00010293
+RAX: ffffffff89f79b0e RBX: ffff88802e638498 RCX: ffff88802ee90000
+RDX: 0000000000000000 RSI: 00000000ffffffb6 RDI: 0000000000000000
+RBP: 00000000ffffffb6 R08: ffffffff89f79712 R09: 1ffffffff1f0d5cd
+R10: dffffc0000000000 R11: ffffffff89f79610 R12: 0000000000000000
+R13: ffff88802e6383c0 R14: ffff88807ade6000 R15: dffffc0000000000
+FS:  0000555593010380(0000) GS:ffff8880b9400000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000020010000 CR3: 0000000023c50000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ __netdev_start_xmit include/linux/netdevice.h:4903 [inline]
+ netdev_start_xmit include/linux/netdevice.h:4917 [inline]
+ xmit_one net/core/dev.c:3531 [inline]
+ dev_hard_start_xmit+0x26a/0x790 net/core/dev.c:3547
+ sch_direct_xmit+0x2b6/0x5f0 net/sched/sch_generic.c:343
+ __dev_xmit_skb net/core/dev.c:3760 [inline]
+ __dev_queue_xmit+0x1912/0x3b10 net/core/dev.c:4301
+ bond_start_xmit+0x1389/0x1c40 drivers/net/bonding/bond_main.c:5469
+ __netdev_start_xmit include/linux/netdevice.h:4903 [inline]
+ netdev_start_xmit include/linux/netdevice.h:4917 [inline]
+ xmit_one net/core/dev.c:3531 [inline]
+ dev_hard_start_xmit+0x26a/0x790 net/core/dev.c:3547
+ __dev_queue_xmit+0x19f4/0x3b10 net/core/dev.c:4335
+ packet_snd net/packet/af_packet.c:3083 [inline]
+ packet_sendmsg+0x4932/0x63d0 net/packet/af_packet.c:3115
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ __sock_sendmsg+0x221/0x270 net/socket.c:745
+ ____sys_sendmsg+0x525/0x7d0 net/socket.c:2584
+ ___sys_sendmsg net/socket.c:2638 [inline]
+ __sys_sendmsg+0x2b0/0x3a0 net/socket.c:2667
+ do_syscall_64+0xfb/0x240
+ entry_SYSCALL_64_after_hwframe+0x6d/0x75
+RIP: 0033:0x7fc685c982d9
+Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 d1 19 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffc6536ad28 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007fc685c982d9
+RDX: 00000000200400c4 RSI: 0000000020000180 RDI: 0000000000000003
+RBP: 00007ffc6536ad60 R08: 0000000000000000 R09: 0000000000000001
+R10: 0000000000000000 R11: 0000000000000246 R12: 00000000000f4240
+R13: 000000000001066e R14: 00007ffc6536ad44 R15: 00007ffc6536ad50
+ </TASK>
 
 
-On 18/04/2024 23.00, Yosry Ahmed wrote:
-> On Thu, Apr 18, 2024 at 4:00 AM Jesper Dangaard Brouer<hawk@kernel.org>  wrote:
->> On 18/04/2024 04.21, Yosry Ahmed wrote:
->>> On Tue, Apr 16, 2024 at 10:51 AM Jesper Dangaard Brouer<hawk@kernel.org>  wrote:
->>>> This patch aims to reduce userspace-triggered pressure on the global
->>>> cgroup_rstat_lock by introducing a mechanism to limit how often reading
->>>> stat files causes cgroup rstat flushing.
->>>>
-[...]
-
-> Taking a step back, I think this series is trying to address two
-> issues in one go: interrupt handling latency and lock contention.
-
-Yes, patch 2 and 3 are essentially independent and address two different 
-aspects.
-
-> While both are related because reducing flushing reduces irq
-> disablement, I think it would be better if we can fix that issue
-> separately with a more fundamental solution (e.g. using a mutex or
-> dropping the lock at each CPU boundary).
-> 
-> After that, we can more clearly evaluate the lock contention problem
-> with data purely about flushing latency, without taking into
-> consideration the irq handling problem.
-> 
-> Does this make sense to you?
-
-Yes, make sense.
-
-So, you are suggesting we start with the mutex change? (patch 2)
-(which still needs some adjustments/tuning)
-
-This make sense to me, as there are likely many solutions to reducing
-the pressure on the lock.
-
-With the tracepoint patch in-place, I/we can measure the pressure on the
-lock, and I plan to do this across our CF fleet.  Then we can slowly
-work on improving lock contention and evaluate this on our fleets.
-
---Jesper
-p.s.
-Setting expectations:
-  - Going on vacation today, so will resume work after 29th April.
+---
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
