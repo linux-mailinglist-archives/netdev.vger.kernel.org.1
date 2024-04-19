@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-89636-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89637-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB90A8AAFCE
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 15:54:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E53288AAFCF
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 15:54:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 86CA82828D2
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 13:54:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1A8791C2248A
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 13:54:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB98112C53D;
-	Fri, 19 Apr 2024 13:54:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C3EB12C81F;
+	Fri, 19 Apr 2024 13:54:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fAZF4DX2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jjQS3YQZ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5AD8A59
-	for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 13:54:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB0C912AAFD
+	for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 13:54:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713534874; cv=none; b=d4HLS1ee5r0w/8d9UphDAgVqVYDye84xKJ8IIPX5KgXiKlGOj9W5zWowQt4hmavW1VqohFRLCMVvHODjJh2p7l2SqKbdD2NDsMrHsIV6pHGFLfyitwnOBBgdK/VbwCcvjhcu+mD58Q1bbnXaCTw0K4ywiLkw7iC29qEYw0Az6v0=
+	t=1713534877; cv=none; b=Wi7wnWMhy6lUkEgL6lHJ1WUEXqcJkQbQR+0SL+ghgMnqoRSp0xTLifRrTi636Ri6jHFa5P1Ca/ONRuEci3TbR1/LGPEcs31n4Atn77guYanN9E5EbL4kUbJeGkuBROiBOtgw50i6HDYyqDkHiP1WwvB1+LA1Qj9BvXRFgcrTOBs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713534874; c=relaxed/simple;
-	bh=acPd/YxHJyslb2vlUSl9OkWKpvQBrLC3hvH2lycgiCE=;
+	s=arc-20240116; t=1713534877; c=relaxed/simple;
+	bh=aBTK1cJaMQMQrFN94QGOEJpdZKLOF9ZUWyTxuqqR9ZI=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=gGT2VeCh2h9LNH0Z0DnxMk8nhJ589VeUMjXKGBoxqihVO0eobJivpLZ16TnrCPi36+oTY4Or4exAPvDwYGUNIgkQI/8c07QSPMJGDPlkl68SRcojuJMIOM74dDRRywQe1fOW5Cs56BBvbU/G/eyX7YnbXbJcPXWcddX1XcJYxso=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fAZF4DX2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC861C32781;
-	Fri, 19 Apr 2024 13:54:31 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=oP/urvMpYtlpgJbvi5URxu1aNrbvq6wdToya/f8qpNPksVE+Q+N3bVlCKbZHKoF+ofuVSohldoQJLHsIfL4Oz6OpEJWvIKR+w5sdmOMvfSoQ87qLZB0CTH1m7NWcQW7sWRHLJs1D2WOZ7ilkNdcDd6WEaUcvyJ8UeXWccDCE1s4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jjQS3YQZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9AC0C2BD10;
+	Fri, 19 Apr 2024 13:54:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713534874;
-	bh=acPd/YxHJyslb2vlUSl9OkWKpvQBrLC3hvH2lycgiCE=;
+	s=k20201202; t=1713534877;
+	bh=aBTK1cJaMQMQrFN94QGOEJpdZKLOF9ZUWyTxuqqR9ZI=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=fAZF4DX26ViSaE7/DeKH/gqa8FhClflY3PwJlhNE/rHq+GXptUAisisyTtzwhlDce
-	 Si8Kzfhci+hNJNSFdQc4fUFto9lHKM/76l9fNdDJuhceZx3DzjvrQkAv8JhIITUcCR
-	 nR7LP0PXT6AG7pw4lWqw7Ykm9nIX/iw2bxpAWP1hK9Jae2QY/vXxR7QAEWfww3cW6o
-	 t9UHAVTYu48UcIAOm1zK/LPY3H/q8Gt5BpT2Z0d2anyIqynBb6ukNwctSMsYyZ/zWV
-	 HATz3z77QeGHSBUe99zdBSMhBNDr/yf/6MMCijn8WnhYD9E4dIXu2FY8G9I577yBK9
-	 nq1/huFwZsKVQ==
+	b=jjQS3YQZ8aXjG1ECwDUcQxy+tDl5xjyi+4y3b5WaP9ffi7H6Z1chXTxhXPXIAaihx
+	 UTxgKPREUHBoewxjRrAaI3QLnqXo54q3vgn3fDjvoUSkLHj04u3l3CbhAfTEKDZL58
+	 PaSnrF/AbdMW4SXWanCtwSO5SbvUm08PV5AiWs7dMa8jRAWc0S5dUT97FbbG/JVd2o
+	 y/3KD2RsbsgJrxOzWjmzAo36fYoh8dzyTABE/PSXfLi7m0S9CYRzHaySPzX1GxVsV7
+	 teFL2liTwxwbdZ4ntfMk4+4JdttKThKIsiQefF1rby13hdlymcleCtMhg+XkZ4pRBK
+	 gNKdTXlJnJUdQ==
 From: Simon Horman <horms@kernel.org>
-Date: Fri, 19 Apr 2024 14:54:18 +0100
-Subject: [PATCH net-next 2/4] net: lan966x: Correct spelling in comments
+Date: Fri, 19 Apr 2024 14:54:19 +0100
+Subject: [PATCH net-next 3/4] net: encx24j600: Correct spelling in comments
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,7 +52,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240419-lan743x-confirm-v1-2-2a087617a3e5@kernel.org>
+Message-Id: <20240419-lan743x-confirm-v1-3-2a087617a3e5@kernel.org>
 References: <20240419-lan743x-confirm-v1-0-2a087617a3e5@kernel.org>
 In-Reply-To: <20240419-lan743x-confirm-v1-0-2a087617a3e5@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>, 
@@ -71,87 +71,70 @@ Correct spelling in comments, as flagged by codespell.
 
 Signed-off-by: Simon Horman <horms@kernel.org>
 ---
- drivers/net/ethernet/microchip/lan966x/lan966x_ifh.h  | 2 +-
- drivers/net/ethernet/microchip/lan966x/lan966x_main.c | 4 ++--
- drivers/net/ethernet/microchip/lan966x/lan966x_main.h | 2 +-
- drivers/net/ethernet/microchip/lan966x/lan966x_port.c | 2 +-
- drivers/net/ethernet/microchip/lan966x/lan966x_vlan.c | 2 +-
- 5 files changed, 6 insertions(+), 6 deletions(-)
+ drivers/net/ethernet/microchip/encx24j600-regmap.c | 4 ++--
+ drivers/net/ethernet/microchip/encx24j600.c        | 6 ++++--
+ drivers/net/ethernet/microchip/encx24j600_hw.h     | 2 +-
+ 3 files changed, 7 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/net/ethernet/microchip/lan966x/lan966x_ifh.h b/drivers/net/ethernet/microchip/lan966x/lan966x_ifh.h
-index f3b1e0d31826..e706163ce9cc 100644
---- a/drivers/net/ethernet/microchip/lan966x/lan966x_ifh.h
-+++ b/drivers/net/ethernet/microchip/lan966x/lan966x_ifh.h
-@@ -78,7 +78,7 @@
- /* Classified internal priority for queuing */
- #define IFH_POS_QOS_CLASS            100
+diff --git a/drivers/net/ethernet/microchip/encx24j600-regmap.c b/drivers/net/ethernet/microchip/encx24j600-regmap.c
+index 443128adbcb6..3885d6fbace1 100644
+--- a/drivers/net/ethernet/microchip/encx24j600-regmap.c
++++ b/drivers/net/ethernet/microchip/encx24j600-regmap.c
+@@ -75,7 +75,7 @@ static int regmap_encx24j600_sfr_read(void *context, u8 reg, u8 *val,
+ 		if (unlikely(ret))
+ 			return ret;
+ 	} else {
+-		/* Translate registers that are more effecient using
++		/* Translate registers that are more efficient using
+ 		 * 3-byte SPI commands
+ 		 */
+ 		switch (reg) {
+@@ -129,7 +129,7 @@ static int regmap_encx24j600_sfr_update(struct encx24j600_context *ctx,
+ 		if (unlikely(ret))
+ 			return ret;
+ 	} else {
+-		/* Translate registers that are more effecient using
++		/* Translate registers that are more efficient using
+ 		 * 3-byte SPI commands
+ 		 */
+ 		switch (reg) {
+diff --git a/drivers/net/ethernet/microchip/encx24j600.c b/drivers/net/ethernet/microchip/encx24j600.c
+index cdc2872ace1b..b011bf5c2305 100644
+--- a/drivers/net/ethernet/microchip/encx24j600.c
++++ b/drivers/net/ethernet/microchip/encx24j600.c
+@@ -569,7 +569,7 @@ static void encx24j600_dump_config(struct encx24j600_priv *priv,
+ 	pr_info(DRV_NAME " MABBIPG: %04X\n", encx24j600_read_reg(priv,
+ 								 MABBIPG));
  
--/* Bit mask with eight cpu copy classses */
-+/* Bit mask with eight cpu copy classes */
- #define IFH_POS_CPUQ                 92
+-	/* PHY configuation */
++	/* PHY configuration */
+ 	pr_info(DRV_NAME " PHCON1:  %04X\n", encx24j600_read_phy(priv, PHCON1));
+ 	pr_info(DRV_NAME " PHCON2:  %04X\n", encx24j600_read_phy(priv, PHCON2));
+ 	pr_info(DRV_NAME " PHANA:   %04X\n", encx24j600_read_phy(priv, PHANA));
+@@ -837,7 +837,9 @@ static void encx24j600_hw_tx(struct encx24j600_priv *priv)
+ 		dump_packet("TX", priv->tx_skb->len, priv->tx_skb->data);
  
- /* Relearn + learn flags (*) */
-diff --git a/drivers/net/ethernet/microchip/lan966x/lan966x_main.c b/drivers/net/ethernet/microchip/lan966x/lan966x_main.c
-index 2635ef8958c8..b7e75da65834 100644
---- a/drivers/net/ethernet/microchip/lan966x/lan966x_main.c
-+++ b/drivers/net/ethernet/microchip/lan966x/lan966x_main.c
-@@ -276,7 +276,7 @@ static int lan966x_port_ifh_xmit(struct sk_buff *skb,
- 		++i;
- 	}
+ 	if (encx24j600_read_reg(priv, EIR) & TXABTIF)
+-		/* Last transmition aborted due to error. Reset TX interface */
++		/* Last transmission aborted due to error.
++		 * Reset TX interface
++		 */
+ 		encx24j600_reset_hw_tx(priv);
  
--	/* Inidcate EOF and valid bytes in the last word */
-+	/* Indicate EOF and valid bytes in the last word */
- 	lan_wr(QS_INJ_CTRL_GAP_SIZE_SET(1) |
- 	       QS_INJ_CTRL_VLD_BYTES_SET(skb->len < LAN966X_BUFFER_MIN_SZ ?
- 				     0 : last) |
-@@ -520,7 +520,7 @@ bool lan966x_hw_offload(struct lan966x *lan966x, u32 port, struct sk_buff *skb)
- 	u32 val;
+ 	/* Clear the TXIF flag if were previously set */
+diff --git a/drivers/net/ethernet/microchip/encx24j600_hw.h b/drivers/net/ethernet/microchip/encx24j600_hw.h
+index 34c5a289898c..2522f4f48b67 100644
+--- a/drivers/net/ethernet/microchip/encx24j600_hw.h
++++ b/drivers/net/ethernet/microchip/encx24j600_hw.h
+@@ -243,7 +243,7 @@ int devm_regmap_init_encx24j600(struct device *dev,
  
- 	/* The IGMP and MLD frames are not forward by the HW if
--	 * multicast snooping is enabled, therefor don't mark as
-+	 * multicast snooping is enabled, therefore don't mark as
- 	 * offload to allow the SW to forward the frames accordingly.
- 	 */
- 	val = lan_rd(lan966x, ANA_CPU_FWD_CFG(port));
-diff --git a/drivers/net/ethernet/microchip/lan966x/lan966x_main.h b/drivers/net/ethernet/microchip/lan966x/lan966x_main.h
-index caa9e0533c96..f8bebbcf77b2 100644
---- a/drivers/net/ethernet/microchip/lan966x/lan966x_main.h
-+++ b/drivers/net/ethernet/microchip/lan966x/lan966x_main.h
-@@ -326,7 +326,7 @@ struct lan966x {
- 
- 	u8 base_mac[ETH_ALEN];
- 
--	spinlock_t tx_lock; /* lock for frame transmition */
-+	spinlock_t tx_lock; /* lock for frame transmission */
- 
- 	struct net_device *bridge;
- 	u16 bridge_mask;
-diff --git a/drivers/net/ethernet/microchip/lan966x/lan966x_port.c b/drivers/net/ethernet/microchip/lan966x/lan966x_port.c
-index 2e83bbb9477e..fdfa4040d9ee 100644
---- a/drivers/net/ethernet/microchip/lan966x/lan966x_port.c
-+++ b/drivers/net/ethernet/microchip/lan966x/lan966x_port.c
-@@ -88,7 +88,7 @@ static void lan966x_port_link_down(struct lan966x_port *port)
- 		SYS_FRONT_PORT_MODE_HDX_MODE,
- 		lan966x, SYS_FRONT_PORT_MODE(port->chip_port));
- 
--	/* 8: Flush the queues accociated with the port */
-+	/* 8: Flush the queues associated with the port */
- 	lan_rmw(QSYS_SW_PORT_MODE_AGING_MODE_SET(3),
- 		QSYS_SW_PORT_MODE_AGING_MODE,
- 		lan966x, QSYS_SW_PORT_MODE(port->chip_port));
-diff --git a/drivers/net/ethernet/microchip/lan966x/lan966x_vlan.c b/drivers/net/ethernet/microchip/lan966x/lan966x_vlan.c
-index 3c44660128da..fa34a739c748 100644
---- a/drivers/net/ethernet/microchip/lan966x/lan966x_vlan.c
-+++ b/drivers/net/ethernet/microchip/lan966x/lan966x_vlan.c
-@@ -157,7 +157,7 @@ void lan966x_vlan_port_apply(struct lan966x_port *port)
- 
- 	pvid = lan966x_vlan_port_get_pvid(port);
- 
--	/* Ingress clasification (ANA_PORT_VLAN_CFG) */
-+	/* Ingress classification (ANA_PORT_VLAN_CFG) */
- 	/* Default vlan to classify for untagged frames (may be zero) */
- 	val = ANA_VLAN_CFG_VLAN_VID_SET(pvid);
- 	if (port->vlan_aware)
+ /* MAIPG */
+ /* value of the high byte is given by the reserved bits,
+- * value of the low byte is recomended setting of the
++ * value of the low byte is recommended setting of the
+  * IPG parameter.
+  */
+ #define MAIPGH_VAL 0x0C
 
 -- 
 2.43.0
