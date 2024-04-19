@@ -1,173 +1,129 @@
-Return-Path: <netdev+bounces-89613-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89614-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBC058AAE42
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 14:15:28 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A0898AAE51
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 14:18:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A12821F21CD1
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 12:15:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EDF12B21A40
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 12:17:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FA848529A;
-	Fri, 19 Apr 2024 12:15:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAD7B85633;
+	Fri, 19 Apr 2024 12:17:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="qtuopD0Y"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="szcWe7VO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A313B52F71;
-	Fri, 19 Apr 2024 12:15:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 938E683CD1
+	for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 12:17:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713528924; cv=none; b=nrcdSwFYDDG1S7G5BFKbXJMJRMeLylk+ey2xpVtqrbs/a70BFq9DqhSt0kS3Eo+BtGRcWP06/AqzlZ5ntxgePb99CvpXfh0/wvEw9zUrolYG9XWNuiyuaTtvEV32j9UzddCFvH6AC6/pxrYUho0b2A3gOcIdjjk2ZHCo7UfAfiY=
+	t=1713529074; cv=none; b=gN5ibW8lgP4xhMGiVzVJE3ShBZ04t4Tu5ONg9mUzc5d50NmvYjlTohv/3u3eW8OeHjVGlv7+jfDAT1aUGxtMMO1+BlMOn51E96/cm5t/cZ41TiKpGjVe+bjxRSsQiidjUKHGpHb091/Ga92qMTLNjvC6HuA7O+2cCpcDeOA4vD0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713528924; c=relaxed/simple;
-	bh=uJctjiwok9OAxi8V9EB9j1/O1K4QOMr78QQhPuVBSY8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=otbwIC/+nP5ElPX7JYLa8SO9q2Uy7NjwmhqxuetHsIS+XBvIlqHdnbMtUy4bsh/J0hvTuLIC04s/oAQAA8HQUtlftemW3HMSFUXdNZdewF8IvlctDQObFLpbF3j/6p2G64hw9GtwIOM0iRILJ3ANPHZcCHo0rNINQ0xcFdApV+g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=qtuopD0Y; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 43JBZCLo020693;
-	Fri, 19 Apr 2024 12:15:15 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : references : content-type : in-reply-to :
- mime-version; s=pp1; bh=XSwAKK1U4BbAzR0wUXsJ0kRA3eWzLRtYrhex8CN/Lbc=;
- b=qtuopD0YV+mtz024ohiwb+aYk2zP3zUUQi0G0yInoKE8MSAx7C49k9uoz3XNAwRtcGhf
- G/ldqQH8YbKAxEKC6YjCQQGpWp4seHs7ZBCep7ejPPMuNO5RzxSsLA7hc8P4Z5Ixznfv
- Y9+3hMZD9z4saXHOBY1P3XZmJBdSnDe3Bu4OmNvlirVgSE9zknHcYbL6oBYaXQc4MLoj
- 5ALKpnbqByWi+JSGlZNN287NM3w9deg+OyRYcooo9r959f2RuI5tTIQ+GtK8SQJZLiWg
- dbavR7PBhaVhYZ9DfoNhSdIiU8DKsSL89wRV6vbX3P+VxxBF7p9ZqKmgmBOsOfh7YMSO Gw== 
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xkqu2837b-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 19 Apr 2024 12:15:15 +0000
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 43J8uA1Z027929;
-	Fri, 19 Apr 2024 12:15:14 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3xkbmpbfgp-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 19 Apr 2024 12:15:14 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 43JCF8Qg52429204
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 19 Apr 2024 12:15:11 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id DF4682004D;
-	Fri, 19 Apr 2024 12:15:08 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 13BC620040;
-	Fri, 19 Apr 2024 12:15:08 +0000 (GMT)
-Received: from osiris (unknown [9.171.8.18])
-	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Fri, 19 Apr 2024 12:15:07 +0000 (GMT)
-Date: Fri, 19 Apr 2024 14:15:06 +0200
-From: Heiko Carstens <hca@linux.ibm.com>
-To: Arnd Bergmann <arnd@arndb.de>, Alexandra Winter <wintera@linux.ibm.com>,
-        Thorsten Winkler <twinkler@linux.ibm.com>
-Cc: Nathan Chancellor <nathan@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>, gor@linux.ibm.com,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>, wintera@linux.ibm.com,
-        twinkler@linux.ibm.com, linux-s390@vger.kernel.org,
-        Netdev <netdev@vger.kernel.org>, llvm@lists.linux.dev,
-        patches@lists.linux.dev
-Subject: Re: [PATCH 1/3] s390/vmlogrdr: Remove function pointer cast
-Message-ID: <20240419121506.23824-A-hca@linux.ibm.com>
-References: <20240417-s390-drivers-fix-cast-function-type-v1-0-fd048c9903b0@kernel.org>
- <20240417-s390-drivers-fix-cast-function-type-v1-1-fd048c9903b0@kernel.org>
- <20240418095438.6056-A-hca@linux.ibm.com>
- <20240418102549.6056-B-hca@linux.ibm.com>
- <20240418145121.GA1435416@dev-arch.thelio-3990X>
- <20240418151501.6056-C-hca@linux.ibm.com>
- <798df2d7-b13f-482a-8d4a-106c6492af01@app.fastmail.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <798df2d7-b13f-482a-8d4a-106c6492af01@app.fastmail.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: jtCq1dlQ4O8G1fc-sPJaSGTvo2WX1l6d
-X-Proofpoint-ORIG-GUID: jtCq1dlQ4O8G1fc-sPJaSGTvo2WX1l6d
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+	s=arc-20240116; t=1713529074; c=relaxed/simple;
+	bh=rP4E9wlAIMtsEvUFO1SYLHKQl2GUloFOgrHjdVFM2go=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=LyiQYeZdMMeG1+1olV55UqU9GX7cIXoUjyp08/DKDMOEmnlQha+LLenGOAvmRNHm0Kn3f2Xuj4pVsv9aErbbGaTvhytPi05hrNu/+4Mhkj2EKGnMAJ6N4yQY6REPcvJ3IxoOd4PmFLd+MbG2qIbQZGE4FxPRyRLGeFnCFnWzEH0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=szcWe7VO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 43CDFC072AA;
+	Fri, 19 Apr 2024 12:17:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713529074;
+	bh=rP4E9wlAIMtsEvUFO1SYLHKQl2GUloFOgrHjdVFM2go=;
+	h=From:Date:Subject:To:Cc:From;
+	b=szcWe7VOI3VW1niZHxLJkbY1aaFyMYSPmewNtV9NPj93Pf95nnMwJrUDjgD87fi++
+	 PUtgdkv4IuwFQyR8lmKfiiRTniyTVTMRJnVuZhnPXWX+NokwY5xqfPxXDGa3zeIwvZ
+	 ENMew5zdUixRL079ETB2ft3fTeghrCEndqAB/gSodutLuqr4/az2kpaR46y5m7gDPt
+	 CdskFs6ZPhOUqOIP9SnzHYhQfnL512iADCNtOUS8scZRqCTKN60R5AXYdfipPQzc28
+	 jihSsxFKLWjnb/8UR6jXmHsXFBpPxIqXXM/5QvvF+xvhqWAdH4n8YQn/RzonhAAI3y
+	 pjtsClL2kKGgA==
+From: Simon Horman <horms@kernel.org>
+Date: Fri, 19 Apr 2024 13:17:48 +0100
+Subject: [PATCH net-next RFC] net: dsa: mv88e6xxx: Correct check for empty
+ list
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-04-19_08,2024-04-19_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501 mlxscore=0
- clxscore=1015 lowpriorityscore=0 mlxlogscore=877 impostorscore=0
- malwarescore=0 spamscore=0 bulkscore=0 suspectscore=0 adultscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2404010000 definitions=main-2404190092
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20240419-mv88e6xx-list_empty-v1-1-64fd6d1059a8@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAOtgImYC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
+ vPSU3UzU4B8JSMDIxMDE0NL3dwyC4tUs4oK3ZzM4pL41NyCkkrdFHNjAxNjS6CaJGMloM6CotS
+ 0zAqwqdFKeaklunmpFSUKQW7OSrG1tQCVPoJLcwAAAA==
+To: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, 
+ Vladimir Oltean <olteanv@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Dan Carpenter <dan.carpenter@linaro.org>, 
+ netdev@vger.kernel.org
+X-Mailer: b4 0.12.3
 
-On Thu, Apr 18, 2024 at 09:46:18PM +0200, Arnd Bergmann wrote:
-> On Thu, Apr 18, 2024, at 17:15, Heiko Carstens wrote:
-> >> > > > -		/*
-> >> > > > -		 * The release function could be called after the
-> >> > > > -		 * module has been unloaded. It's _only_ task is to
-> >> > > > -		 * free the struct. Therefore, we specify kfree()
-> >> > > > -		 * directly here. (Probably a little bit obfuscating
-> >> > > > -		 * but legitime ...).
-> >> > > > -		 */
-> 
-> I think the way this should work is to have the allocation and
-> the release function in the iucv bus driver, with a function
-> roughly like
-> 
-> struct device *iucv_alloc_device(char *name,
->                const struct attribute_group *attrs,
->                void *priv)
-> {
->       dev = kzalloc(sizeof(struct device), GFP_KERNEL);
->       if (!dev)
->            return NULL;
-> 
->       dev_set_name(dev, "%s", name);
->       dev->bus = &iucv_bus;
->       dev->parent = iucv_root;
->       dev->groups = attrs;
->       dev_set_drvdata(dev, priv);
->       dev->release = iucv_free_dev;
->   
->       return dev;
-> }
-> 
-> Now the release function cannot go away as long as any module
-> is loaded that links against it, and those modules cannot
-> go away as long as the devices are in use.
-> 
-> I don't remember how iucv works, but if there is a way to
-> detect which system services exist, then the actual device
-> creation should also be separate from the driver using those
-> services, with another driver responsible for enumerating
-> the existing services and creating those devices.
+Since commit a3c53be55c95 ("net: dsa: mv88e6xxx: Support multiple MDIO
+busses") mv88e6xxx_default_mdio_bus() has checked that the
+return value of list_first_entry() is non-NULL. This appears to be
+intended to guard against the list chip->mdios being empty.
+However, it is not the correct check as the implementation of
+list_first_entry is not designed to return NULL for empty lists.
 
-I have the impression we have the same discussion like it happened 20
-years ago:
-https://lore.kernel.org/all/OF876C2271.59086B92-ONC1256E5A.00409933-C1256E5A.00427853@de.ibm.com/
+Instead check directly if the list is empty.
 
-Adding extra module dependencies won't help, since it just moves the
-potential races. However what could easily solve this problem is to
-make CONFIG_IUCV a boolean config option instead of tristate. If it
-would be compiled in, the release function cannot go away.
+Flagged by Smatch
 
-We have already "def_tristate y if S390" for IUCV, so it looks like
-this wouldn't change anything in real life. In addition with something
-like your proposed change, we should be fine.
+Signed-off-by: Simon Horman <horms@kernel.org>
+---
+I'm unsure if this should be considered a fix: it's been around since
+v4.11 and the patch is dated January 2017. Perhaps an empty list simply
+cannot occur. If so, the function could be simplified by not checking
+for an empty list. And, if mdio_bus->bus, then perhaps caller may be
+simplified not to check for an error condition.
 
-Plus we need to fix the potential bug you introduced with commit
-42af6bcbc351 ("tty: hvc-iucv: fix function pointer casts"). But at
-least this is also iucv_bus related.
+It is because I am unsure that I have marked this as an RFC.
 
-Alexandra, Thorsten, any objections if CONFIG_IUCV would be changed so
-it can only be compiled in or out, but not as a module anymore?
+diff --git a/drivers/net/dsa/mv88e6xxx/chip.c b/drivers/net/dsa/mv88e6xxx/chip.c
+index e950a634a3c7..a236c9fe6a74 100644
+--- a/drivers/net/dsa/mv88e6xxx/chip.c
++++ b/drivers/net/dsa/mv88e6xxx/chip.c
+@@ -131,10 +131,11 @@ struct mii_bus *mv88e6xxx_default_mdio_bus(struct mv88e6xxx_chip *chip)
+ {
+ 	struct mv88e6xxx_mdio_bus *mdio_bus;
+
++	if (list_empty(&chip->mdios))
++		return NULL;
++
+ 	mdio_bus = list_first_entry(&chip->mdios, struct mv88e6xxx_mdio_bus,
+ 				    list);
+-	if (!mdio_bus)
+-		return NULL;
+
+ 	return mdio_bus->bus;
+ }
+---
+ drivers/net/dsa/mv88e6xxx/chip.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/dsa/mv88e6xxx/chip.c b/drivers/net/dsa/mv88e6xxx/chip.c
+index e950a634a3c7..a236c9fe6a74 100644
+--- a/drivers/net/dsa/mv88e6xxx/chip.c
++++ b/drivers/net/dsa/mv88e6xxx/chip.c
+@@ -131,10 +131,11 @@ struct mii_bus *mv88e6xxx_default_mdio_bus(struct mv88e6xxx_chip *chip)
+ {
+ 	struct mv88e6xxx_mdio_bus *mdio_bus;
+ 
++	if (list_empty(&chip->mdios))
++		return NULL;
++
+ 	mdio_bus = list_first_entry(&chip->mdios, struct mv88e6xxx_mdio_bus,
+ 				    list);
+-	if (!mdio_bus)
+-		return NULL;
+ 
+ 	return mdio_bus->bus;
+ }
+
 
