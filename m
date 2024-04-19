@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-89634-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89635-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6ED3F8AAFCC
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 15:54:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 838948AAFCD
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 15:54:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9F3961C2181D
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 13:54:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 411DC2824E8
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 13:54:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE71B12B176;
-	Fri, 19 Apr 2024 13:54:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E643512CDBF;
+	Fri, 19 Apr 2024 13:54:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Kz2F82eS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cZ8+Jb59"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB2AAA59
-	for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 13:54:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2A80A59
+	for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 13:54:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713534868; cv=none; b=u2+d9+ydel/sS6v+fC9NRwo76U3HpLB+r2w5W2+MyWyj8zVKNI0WJyFdIQKmeZhcfye2EWDQ/7Vj1ZE/KW65/zG4lAzMGv74wIq9O4HgsX+udTRlp5MqFNdBHqihcX0fRP+6mx6YAtO+ljLt9v9QQWPqbX7P/HV8c89TpqFaHIc=
+	t=1713534871; cv=none; b=caHNz2bddcK/IEc3OfgA8+iD6zRK8ZcMGs/gAY4ERJ5xv7TNJyT9p30bSPl3hte/leO9MNSb2RW+TDYsfA/+2FFxB1K6gyM3kOHmw8LNL2fHbVxJ6ubUj6bP3VAPRZqKgaQ0EfUtS7uV7R6MKng9b4noxe9Ws8X4nMoOyDmU/Ok=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713534868; c=relaxed/simple;
-	bh=yChrZ19QUvriU+RMhHRAah20JT8+YXgxz5fTNxVIZno=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=NzbL2upsoDLLnfhJKLnZ9ZL37R4DJ3b1aMvcFCvJp9HWadtYWnrNKxbXDNvGAlbncK2d95WyKViWQaYtDB4hx7qIcp8n1CtL8URsaKPx+jHk5YA50FgLXooZsRNjcGIWQLsB9kRhiGFk0KKokg4Hgr9awNyVERENXfGRvTslArY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Kz2F82eS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94706C072AA;
-	Fri, 19 Apr 2024 13:54:25 +0000 (UTC)
+	s=arc-20240116; t=1713534871; c=relaxed/simple;
+	bh=OzMRWBNo7YdxJfApr3lYhVNbuE/9Y2hLwnq4sc4mhUA=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=DkDQNLcGDlPjdnDO6VPuQM/wKjFwoyxLirrYuomMIjAcGFSp8BtG75RCc24eWGbGW2VrxGrQoHk5t++/UKjrTAzBV3of4Lhwf3FWLA28MaT1uJttGIbZbYOpYbkYOiwkYl+uY3Mc9L5faUYI7JPGZxzic9GO3tfOxyA/hP/jXUk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cZ8+Jb59; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ACDD7C2BD10;
+	Fri, 19 Apr 2024 13:54:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713534868;
-	bh=yChrZ19QUvriU+RMhHRAah20JT8+YXgxz5fTNxVIZno=;
-	h=From:Subject:Date:To:Cc:From;
-	b=Kz2F82eSODfSaEihjuq0LReirSH84fZtpNTIWubTlPX+0U2SjOHDnNyyZEXAIowF+
-	 Wx5RG0gFtS5wWPItLO/6Wqe17ijnZ5HMz5rSSA2RdyZar2Ybl1XGNhx4UXjTA+lpR0
-	 nuoHyz3cXnEn6KueRcmByAl+V9fY7JLr9IkWShNPoAYv/prubzh9mr3zoGEW4/UYIQ
-	 r6/wZ5MyLNbtu4mv8f3I17u+QyD28d4wy1VfAs2/gVzDLAq4G0AfzgPm9IAFa7+tui
-	 RUnmPWOpEx+dVtcYvGxex3mHTBXzSmO3f0kN58jJ0+lPDUJFAYozGj4+LFc3Qemo8n
-	 5rtnQg0T71HXg==
+	s=k20201202; t=1713534871;
+	bh=OzMRWBNo7YdxJfApr3lYhVNbuE/9Y2hLwnq4sc4mhUA=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
+	b=cZ8+Jb59UMmrqX3TWyE1sHKT79qGxHbE72DvQX1xi3i9ASui2KXsYx/jDBNX4WpXi
+	 G7jQCJMqdgaN5W00ERcYJvgMezuBV/hfg64XWk+vpvS33RbNPLf4b9t0SYMMUBRPQe
+	 bPeRxf3mLDboz4nBRciNB1OKyHe8QbXzWTezsLQdO9olK0nrrbfT4JDbXLCq508lby
+	 /a/qUT47FvEglb5kMeiNB9mu9rcyeVhpijj3IGHknGnPs33hMn2UM9oqoW/WC6oPrF
+	 0tXmBf3DhBC4xLVVvA/8Nc+IYuVHMvTLUHRRDz784SCwxoH0asGZU2fJXq5FUXhlyw
+	 JGTXYy2bD3edA==
 From: Simon Horman <horms@kernel.org>
-Subject: [PATCH net-next 0/4] net: microchip: Correct spelling in comments
-Date: Fri, 19 Apr 2024 14:54:16 +0100
-Message-Id: <20240419-lan743x-confirm-v1-0-2a087617a3e5@kernel.org>
+Date: Fri, 19 Apr 2024 14:54:17 +0100
+Subject: [PATCH net-next 1/4] net: lan743x: Correct spelling in comments
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,9 +52,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAIh3ImYC/x3MQQqDMBBG4avIrDsQ04DEq5QuYvxTB3QsiUhAv
- HtDl9/ivYsKsqDQ2F2UcUqRXRv6R0dxCfoBy9xM1lhnXO95DTq4Z+W4a5K8sY9zCEiwg52oVd+
- MJPV/fJHiYEU96H3fP2Ir4l1rAAAA
+Message-Id: <20240419-lan743x-confirm-v1-1-2a087617a3e5@kernel.org>
+References: <20240419-lan743x-confirm-v1-0-2a087617a3e5@kernel.org>
+In-Reply-To: <20240419-lan743x-confirm-v1-0-2a087617a3e5@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>, 
  Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
  Paolo Abeni <pabeni@redhat.com>
@@ -67,36 +67,51 @@ Cc: Bryan Whitehead <bryan.whitehead@microchip.com>,
  netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 X-Mailer: b4 0.12.3
 
-Correct spelling in comments in Microchip drivers.
-Flagged by codespell.
+Correct spelling in comments, as flagged by codespell.
 
+Signed-off-by: Simon Horman <horms@kernel.org>
 ---
-Simon Horman (4):
-      net: lan743x: Correct spelling in comments
-      net: lan966x: Correct spelling in comments
-      net: encx24j600: Correct spelling in comments
-      net: sparx5: Correct spelling in comments
+ drivers/net/ethernet/microchip/lan743x_main.c | 4 ++--
+ drivers/net/ethernet/microchip/lan743x_ptp.c  | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
- drivers/net/ethernet/microchip/encx24j600-regmap.c       | 4 ++--
- drivers/net/ethernet/microchip/encx24j600.c              | 6 ++++--
- drivers/net/ethernet/microchip/encx24j600_hw.h           | 2 +-
- drivers/net/ethernet/microchip/lan743x_main.c            | 4 ++--
- drivers/net/ethernet/microchip/lan743x_ptp.c             | 2 +-
- drivers/net/ethernet/microchip/lan966x/lan966x_ifh.h     | 2 +-
- drivers/net/ethernet/microchip/lan966x/lan966x_main.c    | 4 ++--
- drivers/net/ethernet/microchip/lan966x/lan966x_main.h    | 2 +-
- drivers/net/ethernet/microchip/lan966x/lan966x_port.c    | 2 +-
- drivers/net/ethernet/microchip/lan966x/lan966x_vlan.c    | 2 +-
- drivers/net/ethernet/microchip/sparx5/sparx5_fdma.c      | 2 +-
- drivers/net/ethernet/microchip/sparx5/sparx5_packet.c    | 2 +-
- drivers/net/ethernet/microchip/sparx5/sparx5_port.c      | 2 +-
- drivers/net/ethernet/microchip/sparx5/sparx5_switchdev.c | 2 +-
- drivers/net/ethernet/microchip/vcap/vcap_ag_api.h        | 2 +-
- drivers/net/ethernet/microchip/vcap/vcap_api.c           | 4 ++--
- drivers/net/ethernet/microchip/vcap/vcap_api_client.h    | 2 +-
- drivers/net/ethernet/microchip/vcap/vcap_api_private.h   | 2 +-
- 18 files changed, 25 insertions(+), 23 deletions(-)
+diff --git a/drivers/net/ethernet/microchip/lan743x_main.c b/drivers/net/ethernet/microchip/lan743x_main.c
+index d37a49cd5c69..cee47729d022 100644
+--- a/drivers/net/ethernet/microchip/lan743x_main.c
++++ b/drivers/net/ethernet/microchip/lan743x_main.c
+@@ -803,7 +803,7 @@ static int lan743x_mdiobus_read_c22(struct mii_bus *bus, int phy_id, int index)
+ 	u32 val, mii_access;
+ 	int ret;
+ 
+-	/* comfirm MII not busy */
++	/* confirm MII not busy */
+ 	ret = lan743x_mac_mii_wait_till_not_busy(adapter);
+ 	if (ret < 0)
+ 		return ret;
+@@ -868,7 +868,7 @@ static int lan743x_mdiobus_read_c45(struct mii_bus *bus, int phy_id,
+ 	u32 mmd_access;
+ 	int ret;
+ 
+-	/* comfirm MII not busy */
++	/* confirm MII not busy */
+ 	ret = lan743x_mac_mii_wait_till_not_busy(adapter);
+ 	if (ret < 0)
+ 		return ret;
+diff --git a/drivers/net/ethernet/microchip/lan743x_ptp.c b/drivers/net/ethernet/microchip/lan743x_ptp.c
+index 2801f08bf1c9..80d9680b3830 100644
+--- a/drivers/net/ethernet/microchip/lan743x_ptp.c
++++ b/drivers/net/ethernet/microchip/lan743x_ptp.c
+@@ -555,7 +555,7 @@ static int lan743x_ptp_perout(struct lan743x_adapter *adapter, int on,
+ 			if (half == wf_high) {
+ 				/* It's 50% match. Use the toggle option */
+ 				pulse_width = PTP_GENERAL_CONFIG_CLOCK_EVENT_TOGGLE_;
+-				/* In this case, devide period value by 2 */
++				/* In this case, divide period value by 2 */
+ 				ts_period = ns_to_timespec64(div_s64(period64, 2));
+ 				period_sec = ts_period.tv_sec;
+ 				period_nsec = ts_period.tv_nsec;
 
-base-commit: 4cad4efa6eb209cea88175e545020de55fe3c737
+-- 
+2.43.0
 
 
