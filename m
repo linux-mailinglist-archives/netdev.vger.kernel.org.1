@@ -1,117 +1,159 @@
-Return-Path: <netdev+bounces-89559-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89560-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23C758AAB1B
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 11:02:41 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A15958AAB26
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 11:04:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A6CFBB23A0A
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 09:02:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3246C1F2141C
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 09:04:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2336B651B6;
-	Fri, 19 Apr 2024 09:02:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E5F1745EF;
+	Fri, 19 Apr 2024 09:04:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D7uc1pKF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1840665194
-	for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 09:02:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAB2565194;
+	Fri, 19 Apr 2024 09:04:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713517355; cv=none; b=g3nbrCn3ZWotjjoMJ7jrNiEjFmixpGzKjJf7hQI7ETJE2m5mv5XY685MpWgfMiytAGUCt3m+OX6aPkg7P0sDRseNHJ/u1jc9FHgkaFtstJ/l56Is4T++n8t3ARVWTPlMEt1pJMdp39bOxAwjkD7Z/CyM1bRTrly4+e48boEiQbk=
+	t=1713517448; cv=none; b=sbO+29Y9n8VMecoUUSdUQd2pEvnfrHPXMa7Jfk4UJwnv7SgHt8gdq013z4gR/i99fTx4onykH5Eel3Hyq6/tqOfyGG09gcu3LJPqVFqgeSz11i0PCIuPj7M4+ahLrosfDhwIX+H7+8sTlipHqmQhvvVe+ekJgz3HAEwgwxb5d+s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713517355; c=relaxed/simple;
-	bh=RB9AneP3F8aXP5eqS0plQxUxrv/bCQqwf0GdBN91ea0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hzwXjHhlkPfR3tqJUaP01fRQQBhSHlm1ZabAUumva0c2p84asxOn0C1eDBZ7c05Sba6qPNo0Dv2StJOfub3c0m3TtXbPmvfVI6ZQRaoQyh/A4ZhQExDJgvEEW2O1rLXkIlhV9s+ePCZszl7XcjUf21KXhXXkmDLVJLZmFFnIIcg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [112.20.112.218])
-	by gateway (Coremail) with SMTP id _____8DxurofMyJml7gpAA--.13430S3;
-	Fri, 19 Apr 2024 17:02:23 +0800 (CST)
-Received: from [192.168.100.8] (unknown [112.20.112.218])
-	by localhost.localdomain (Coremail) with SMTP id AQAAf8AxihIZMyJmcAyAAA--.35989S3;
-	Fri, 19 Apr 2024 17:02:18 +0800 (CST)
-Message-ID: <636a0d00-3141-4d4d-85af-5232fd5b1820@loongson.cn>
-Date: Fri, 19 Apr 2024 17:02:17 +0800
+	s=arc-20240116; t=1713517448; c=relaxed/simple;
+	bh=nyEbjzkCc7+KWWvrhINgBitJsBsfmKTLRX81KrOL4UY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RukL6C28wHp8wBLayz6g55k1okdoTKdwHykPh+qbn9Q09yvLMkURcEjuNsL4r9i57Y8zFC9A4G5UupX3o5KT8E0W52zcQWr1Hb3YTeTd4dQk/nmrY3RhCuZ4kFSYwEBN48EG7BMsF8ZfNtTo6jNqNPgHisBzIV6vDtZtRqrYvx0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=D7uc1pKF; arc=none smtp.client-ip=209.85.208.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-2d9fe2b37acso23167541fa.2;
+        Fri, 19 Apr 2024 02:04:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1713517445; x=1714122245; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=RZYagrKgL3oRgietAYozGj1whRQiP+RdxmQVuv0PkQ4=;
+        b=D7uc1pKFonaMVXKp5YNvXV3/0saeDj987UTchGspZhVVWCzaIH1XcpLfJzsFXgyGb4
+         keh8MziVO2J+B1dKS6WiCbKSnKep27OgcniIxtep9Sg5oi5D4Tt84ug/e1FgSlRDC0si
+         mEVzkzBepoiWesxLIWDPJTGhuDIJKtmz5u10QsIVCmvZz8wbqJk3MWdVvoAJfq8VUubJ
+         4w3uR9BZJpv0G7Zv/7CABsfF+XZHnYSWWMXT0sLEWHEyyf192n8GIfIFOUF8Mtkjb8fD
+         V2RBRmoauPPWpNCXRV2OeTwc/akkhF/6JxB0I16UImmqv5YLZQAY9Fc2H9wgg2xotJH/
+         Mpmw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713517445; x=1714122245;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=RZYagrKgL3oRgietAYozGj1whRQiP+RdxmQVuv0PkQ4=;
+        b=G3cIlbeOo+dM/hf21xXfruutsqhaMmte45qi+geXC9oLo0EfctPi1yt9eW1M6DvQ7Y
+         c+ieo5k12Bt632M0REtXp71kJ9qx9VcoiafFC1Hfg2yHdJeO+/5B+iK8Dblv3DCRM20J
+         YwCyjGV2gyEMdaoz3fUxXEgh/jSdKGD0N1VVR7u1i4kX6bHvPba1wiTNbTs9VuJFA4+j
+         B7f/dfpWPQUuMnTmXoO5gBJLx0N0BHBmf01HL1hoVVegaXznYbwaWsS9ZX7KP3131VcN
+         4ruwegu5bK4LDBJfxw/gay8UVGkxqLeV8eqqEAX8MmOOEsSszE7Q75wVB9XDIbDOa12X
+         riUQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXx3IEk64fhDwevjVORTvCD5WfdNwjkmubQNwihNN0dZuuglSdgtjb57VRRUS968jc7VncdOqZroWpvF+PqOtmlIl2c/YqZWu6pkaNzg0JjgqfXEnNaGzXeqTIwlBeywMvRGGZK
+X-Gm-Message-State: AOJu0YzC5JIE2C/38nLg/lQhin84zJNEBjXtaw8dNFPBbPpYDjVcoz7w
+	I9TsadvRFcB3ZKMlJZA6DuZQ8ah9gcebu+yIOh7MhZQFeAD+DPa5
+X-Google-Smtp-Source: AGHT+IGg1RrYLe0BtHyA885HiTeG8lWReO6DWGy/i3pNp212dINrX0hNxqF4nt96xYKpLfOiYPULBQ==
+X-Received: by 2002:a2e:b90d:0:b0:2d8:a921:dfbf with SMTP id b13-20020a2eb90d000000b002d8a921dfbfmr863882ljb.19.1713517444592;
+        Fri, 19 Apr 2024 02:04:04 -0700 (PDT)
+Received: from localhost (srv1.baikalchip.ru. [87.245.175.227])
+        by smtp.gmail.com with ESMTPSA id b10-20020a05651c032a00b002dcafaa0993sm355004ljp.14.2024.04.19.02.04.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 19 Apr 2024 02:04:04 -0700 (PDT)
+From: Serge Semin <fancer.lancer@gmail.com>
+To: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Yanteng Si <siyanteng@loongson.cn>,
+	Romain Gantois <romain.gantois@bootlin.com>
+Cc: Serge Semin <fancer.lancer@gmail.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Simon Horman <horms@kernel.org>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	Chen-Yu Tsai <wens@csie.org>,
+	Jernej Skrabec <jernej.skrabec@gmail.com>,
+	Samuel Holland <samuel@sholland.org>,
+	netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-sunxi@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH RESEND net-next v3 0/2] net: stmmac: Fix MAC-capabilities procedure
+Date: Fri, 19 Apr 2024 12:03:04 +0300
+Message-ID: <20240419090357.5547-1-fancer.lancer@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v11 2/6] net: stmmac: Add multi-channel support
-To: Serge Semin <fancer.lancer@gmail.com>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com,
- alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com,
- chenhuacai@kernel.org, linux@armlinux.org.uk, guyinggang@loongson.cn,
- netdev@vger.kernel.org, chris.chenfeiyang@gmail.com, siyanteng01@gmail.com
-References: <cover.1712917541.git.siyanteng@loongson.cn>
- <5b6b5642a5f3e77ddf8bfe598f7c70887f9cc37f.1712917541.git.siyanteng@loongson.cn>
- <5v6ypjjtbq72ovb437p6n4fkq2z5a3nhkv6spjct2flvjaxmgq@ykrdiv7kk4kq>
-Content-Language: en-US
-From: Yanteng Si <siyanteng@loongson.cn>
-In-Reply-To: <5v6ypjjtbq72ovb437p6n4fkq2z5a3nhkv6spjct2flvjaxmgq@ykrdiv7kk4kq>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-CM-TRANSID:AQAAf8AxihIZMyJmcAyAAA--.35989S3
-X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
-X-Coremail-Antispam: 1Uk129KBj93XoW7Cw17AFy5Cry5Cr45urWxuFX_yoW8XFW5pF
-	WUJas5uFn5Jw1xJa1DXa1xXFyYq343trWxuw4xKw1fua92gryaqFnFgayY9FnrAF43WF12
-	vFs0v3sxCF1vyrgCm3ZEXasCq-sJn29KB7ZKAUJUUUU3529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUBYb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
-	xVW8Jr0_Cr1UM2kKe7AKxVWUAVWUtwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
-	AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
-	AVWUtwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI4
-	8JMxkF7I0En4kS14v26r126r1DMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j
-	6r4UMxCIbckI1I0E14v26r126r1DMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwV
-	AFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv2
-	0xvE14v26r1I6r4UMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4
-	v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Gr0_Cr1lIxAIcVC2z280aVCY1x0267AK
-	xVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU8uc_3UUUUU==
+Content-Transfer-Encoding: 8bit
 
->>   
->> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c b/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
->> index daf79cdbd3ec..f161ec9ac490 100644
->> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
->> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
->> @@ -70,15 +70,17 @@ static void dwmac1000_dma_axi(void __iomem *ioaddr, struct stmmac_axi *axi)
->>   	writel(value, ioaddr + DMA_AXI_BUS_MODE);
->>   }
->>   
->> -static void dwmac1000_dma_init(void __iomem *ioaddr,
->> -			       struct stmmac_dma_cfg *dma_cfg, int atds)
->> +static void dwmac1000_dma_init_channel(struct stmmac_priv *priv,
->> +				       void __iomem *ioaddr,
->> +				       struct stmmac_dma_cfg *dma_cfg, u32 chan)
-> please create a pre-requisite/preparation patch with the atds argument
-> movement to the stmmac_dma_cfg structure as I suggested in v8:
-> https://lore.kernel.org/netdev/yzs6eqx2swdhaegxxcbijhtb5tkhkvvyvso2perkessv5swq47@ywmea5xswsug/
-> That will make this patch looking simpler and providing a single
-> coherent change.
-OK.
->>   	/* Clear the interrupt by writing a logic 1 to the CSR5[15-0] */
->> -	writel((intr_status & 0x1ffff), ioaddr + DMA_STATUS);
->> +	writel((intr_status & 0x7ffff), ioaddr + DMA_CHAN_STATUS(chan));
-> I'll ask once again:
->
-> "Isn't the mask change going to be implemented in the framework of the
-> Loongson-specific DMA-interrupt handler in some of the further
-> patches?"
->
-The future is not going to change.
+The series got born as a result of the discussions around the recent
+Yanteng' series adding the Loongson LS7A1000, LS2K1000, LS7A2000, LS2K2000
+MACs support:
+Link: https://lore.kernel.org/netdev/fu3f6uoakylnb6eijllakeu5i4okcyqq7sfafhp5efaocbsrwe@w74xe7gb6x7p
 
+In particular the Yanteng' patchset needed to implement the Loongson
+MAC-specific constraints applied to the link speed and link duplex mode.
+As a result of the discussion with Russel the next preliminary patch was
+born:
+Link: https://lore.kernel.org/netdev/df31e8bcf74b3b4ddb7ddf5a1c371390f16a2ad5.1712917541.git.siyanteng@loongson.cn
 
-Thanks,
+The patch above was a temporal solution utilized by Yanteng for further
+developments and to move on with the on-going review. This patchset is a
+refactored version of that single patch with formatting required for the
+fixes patches.
 
-Yanteng
+The main part of the series has already been merged in on v1 stage. The
+leftover is the cleanup patches which rename
+stmmac_ops::phylink_get_caps() callback to stmmac_ops::update_caps() and
+move the MAC-capabilities init/re-init to the phylink MAC-capabilities
+getter.
 
->
+Link: https://lore.kernel.org/netdev/20240412180340.7965-1-fancer.lancer@gmail.com/
+Changelog v2:
+- Add a new patch (Romain):
+  [PATCH net-next v2 1/2] net: stmmac: Rename phylink_get_caps() callback to update_caps()
+- Resubmit the leftover patches to net-next tree (Paolo).
+
+Link: https://lore.kernel.org/netdev/20240417140013.12575-1-fancer.lancer@gmail.com/
+Changelog v3:
+- Just resubmit (Jakub).
+
+Signed-off-by: Serge Semin <fancer.lancer@gmail.com>
+Cc: Maxime Coquelin <mcoquelin.stm32@gmail.com>
+Cc: Simon Horman <horms@kernel.org>
+Cc: Huacai Chen <chenhuacai@kernel.org>
+Cc: Chen-Yu Tsai <wens@csie.org>
+Cc: Jernej Skrabec <jernej.skrabec@gmail.com>
+Cc: Samuel Holland <samuel@sholland.org>
+Cc: netdev@vger.kernel.org
+Cc: linux-stm32@st-md-mailman.stormreply.com
+Cc: linux-arm-kernel@lists.infradead.org
+Cc: linux-sunxi@lists.linux.dev
+Cc: linux-kernel@vger.kernel.org
+
+Serge Semin (2):
+  net: stmmac: Rename phylink_get_caps() callback to update_caps()
+  net: stmmac: Move MAC caps init to phylink MAC caps getter
+
+ .../net/ethernet/stmicro/stmmac/dwmac4_core.c |  8 ++---
+ drivers/net/ethernet/stmicro/stmmac/hwif.h    |  8 ++---
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c | 36 +++++++++----------
+ 3 files changed, 25 insertions(+), 27 deletions(-)
+
+-- 
+2.43.0
 
 
