@@ -1,192 +1,147 @@
-Return-Path: <netdev+bounces-89732-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89733-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6D638AB5C0
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 21:51:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BFBF68AB5D1
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 22:00:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 879E91F2270E
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 19:51:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 725DF1F21555
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 20:00:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03E6213C916;
-	Fri, 19 Apr 2024 19:51:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 015E813CFA5;
+	Fri, 19 Apr 2024 20:00:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="no/tkbmQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hePROBT+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB5BA131188;
-	Fri, 19 Apr 2024 19:51:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9651513C9CB;
+	Fri, 19 Apr 2024 20:00:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713556270; cv=none; b=f6CbEJRv5DfKmFu0RDLmMRSCKw6UyHw3woocBuT5XpbpcyQQVZWLSxtyW9lpC1Gv6zdwAMg3BRhs/Rijo4qEnlWOttegtFMWw6WCPtjQuinAEqz6tVedEExKoZ2JlJlPcnTIwiXVthzvu/uol37Pw1mMwtUYqs7XpqJg/qXfDrs=
+	t=1713556842; cv=none; b=SE3wbmV8qDwQjD/+g32s18FwXpNNAg5Ib0NchlqfXCnmEXss6Cs3CiXoNHbFRyKXK+domDfSOGJ7j5ykMKrX8r+i5mrl7Y6gfD/EnC28zLh5+A/TvgaSxsQXm0ZaPnR0Yjc4kI0/84iN3OASp9gZWIuq5AJbekUxLqLPxpsF8qw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713556270; c=relaxed/simple;
-	bh=I+KaRSuYYHq33wzOX7I6A8aqVWCW9ldBZFg7/uknzuA=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=gwBkPmT/+2hAlzX5xkp342kY4qMHWrA4v0VtYNGrJYjrbhjUWfQjt4VJlarW6++7DNwrols26Tk+dcCE+N6tfJCJHTS2djnfnQjsxEjqSsN/VCZfcmQC6Bq9YSbEfE49C9iLqEk2oIvB/WD5ZGEo64i9bzNZB3cGnuL9YqrfclU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=no/tkbmQ; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1713556269; x=1745092269;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=I+KaRSuYYHq33wzOX7I6A8aqVWCW9ldBZFg7/uknzuA=;
-  b=no/tkbmQhuHqWNGiTmyi1SeRcFY3VOVMhTwqXLiUNIxwi7NY62vpYhpb
-   HOJ16Y8tK4HqzBMocFVcL5W4UmK+liUgWdlmy8yjBNuzmM3oZ0lOdHPsp
-   MMWi9vvYCwmdi9TIIg4dqwNNaUnHmPVkgdczf51J7kajz/hLF03K1ux2R
-   KdisCNMRJXHDRJ1HktA7w4lnCOZB0YeHkH8r4ChVScU2jHtNpDjxxpDOZ
-   a5pC6BjJ9qGMXg8Hjsv1DeTTzWRyIMLOWZ6Y0bzfXizQ1Dnd6P4RRzRId
-   8FRI36yfeAO4RXpMmJSQchIUXva3n+FpsIvjw+5yR/gfe7JgOo6pnfJba
-   Q==;
-X-CSE-ConnectionGUID: ClTWVIqbQ7KhaG7fr6gd8g==
-X-CSE-MsgGUID: GSGavcpDTxaDsROCsUY8wg==
-X-IronPort-AV: E=McAfee;i="6600,9927,11049"; a="9046272"
-X-IronPort-AV: E=Sophos;i="6.07,214,1708416000"; 
-   d="scan'208";a="9046272"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Apr 2024 12:51:08 -0700
-X-CSE-ConnectionGUID: Xe14cQuhRnyFFqD/ir7/JA==
-X-CSE-MsgGUID: lljCEdhZS5OOh17gqeJo+w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,214,1708416000"; 
-   d="scan'208";a="46723350"
-Received: from amlin-018-114.igk.intel.com ([10.102.18.114])
-  by fmviesa002.fm.intel.com with ESMTP; 19 Apr 2024 12:51:05 -0700
-From: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-To: netdev@vger.kernel.org
-Cc: vadim.fedorenko@linux.dev,
-	jiri@resnulli.us,
-	davem@davemloft.net,
-	rrameshbabu@nvidia.com,
-	linux-kernel@vger.kernel.org,
-	pabeni@redhat.com,
-	kuba@kernel.org,
-	mschmidt@redhat.com,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Subject: [PATCH net] dpll: fix dpll_pin_registration missing refcount
-Date: Fri, 19 Apr 2024 21:47:11 +0200
-Message-Id: <20240419194711.1075349-1-arkadiusz.kubalewski@intel.com>
-X-Mailer: git-send-email 2.38.1
+	s=arc-20240116; t=1713556842; c=relaxed/simple;
+	bh=1irIlRUcjlhAgXQYQkJd/oGHdCUHLQFxqqgY1XfLhP4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rpQ5GM0/X29Fn+zEyr17iQ0OjGTs8i2rF3WHCXqGpT98PL8igV4sIjBIBCngaK3AtR8lA8RQJXMxqa7GFcyuW1PX1kdBIuIMpi3/3z+hlG9Kz+BzjTClkm52stIqCZ44Qa4JkQY1Ea0y9lZljmporMsntjtjEbYAILm/NXe3dJQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hePROBT+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36E93C116B1;
+	Fri, 19 Apr 2024 20:00:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713556842;
+	bh=1irIlRUcjlhAgXQYQkJd/oGHdCUHLQFxqqgY1XfLhP4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=hePROBT+glizGF2HhWjQfOISipAvaDLeIwoPfB6eB/130EUaYxI8C9JiOZ0p4IuPP
+	 wJr3uvJ18Qdtvzvp+1EN21A1wIYXV57CwgYBWxwwSTpuZVC3Y+zaCK4bAzWjqyz19x
+	 of4ezj0xR0KrcZGKrma2TwE1tPaK9aqfe2f5ZULEd8dNouln7cfqCdOX1Qzu+4TMk8
+	 WLbPp6C0rIz8BNuB+lG6UD/vpJZsyvT1zRcqUNkcRP+vw16ocKGnhDqx8/KxOoGcQD
+	 fvWWbiJ1tqrYnX18IQfVwbrFy6dcbjd61pDUGP6pZkbtq0sqUsgCyvD6UjOkfp09sG
+	 phC1jK7//sNkA==
+Date: Fri, 19 Apr 2024 22:59:22 +0300
+From: Mike Rapoport <rppt@kernel.org>
+To: Song Liu <song@kernel.org>
+Cc: Mark Rutland <mark.rutland@arm.com>,
+	Peter Zijlstra <peterz@infradead.org>, linux-kernel@vger.kernel.org,
+	Alexandre Ghiti <alexghiti@rivosinc.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Bjorn Topel <bjorn@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	"David S. Miller" <davem@davemloft.net>,
+	Dinh Nguyen <dinguyen@kernel.org>,
+	Donald Dutile <ddutile@redhat.com>,
+	Eric Chanudet <echanude@redhat.com>,
+	Heiko Carstens <hca@linux.ibm.com>, Helge Deller <deller@gmx.de>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	Kent Overstreet <kent.overstreet@linux.dev>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nadav Amit <nadav.amit@gmail.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Puranjay Mohan <puranjay12@gmail.com>,
+	Rick Edgecombe <rick.p.edgecombe@intel.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+	Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
+	bpf@vger.kernel.org, linux-arch@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
+	linux-mm@kvack.org, linux-modules@vger.kernel.org,
+	linux-parisc@vger.kernel.org, linux-riscv@lists.infradead.org,
+	linux-s390@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org, loongarch@lists.linux.dev,
+	netdev@vger.kernel.org, sparclinux@vger.kernel.org, x86@kernel.org
+Subject: Re: [PATCH v4 05/15] mm: introduce execmem_alloc() and execmem_free()
+Message-ID: <ZiLNGgVSQ7_cg58y@kernel.org>
+References: <Zh4nJp8rv1qRBs8m@kernel.org>
+ <CAPhsuW6Pbg2k_Gu4dsBx+H8H5XCHvNdtEZJBPiG_eT0qqr9D1w@mail.gmail.com>
+ <ZiE91CJcNw7gBj9g@kernel.org>
+ <CAPhsuW4au6v8k8Ab7Ff6Yj64rGvZ7wkz=Xrgh8ZZtLyscpChqQ@mail.gmail.com>
+ <ZiFd567L4Zzm2okO@kernel.org>
+ <CAPhsuW5SL4_=ZXdHZV8o0KS+5Vf25UMvEKhRgFQLioFtf2pgoQ@mail.gmail.com>
+ <ZiIVVBgaDN4RsroT@kernel.org>
+ <CAPhsuW7WoU+a46FhqqH8f-3=ehxeD4wSgKDWegMin1pT49OSWw@mail.gmail.com>
+ <ZiKjmaDgz_56ovbv@kernel.org>
+ <CAPhsuW7Nj1Sa_9xQtTgHz9AmX39zdh2x2COqA-qmkfpfX9hNWw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAPhsuW7Nj1Sa_9xQtTgHz9AmX39zdh2x2COqA-qmkfpfX9hNWw@mail.gmail.com>
 
-In scenario where pin is registered with multiple parent pins via
-dpll_pin_on_pin_register(..), belonging to the same dpll device,
-and each time with the same set of ops/priv data, a reference
-between a pin and dpll is created once and then refcounted, at the same
-time the dpll_pin_registration is only checked for existence and created
-if does not exist. This is wrong, as for the same ops/priv data a
-registration shall be also refcounted, a child pin is also registered
-with dpll device, until each child is unregistered the registration data
-shall exist.
+On Fri, Apr 19, 2024 at 10:32:39AM -0700, Song Liu wrote:
+> On Fri, Apr 19, 2024 at 10:03 AM Mike Rapoport <rppt@kernel.org> wrote:
+> [...]
+> > > >
+> > > > [1] https://lore.kernel.org/all/20240411160526.2093408-1-rppt@kernel.org
+> > >
+> > > For the ROX to work, we need different users (module text, kprobe, etc.) to have
+> > > the same execmem_range. From [1]:
+> > >
+> > > static void *execmem_cache_alloc(struct execmem_range *range, size_t size)
+> > > {
+> > > ...
+> > >        p = __execmem_cache_alloc(size);
+> > >        if (p)
+> > >                return p;
+> > >       err = execmem_cache_populate(range, size);
+> > > ...
+> > > }
+> > >
+> > > We are calling __execmem_cache_alloc() without range. For this to work,
+> > > we can only call execmem_cache_alloc() with one execmem_range.
+> >
+> > Actually, on x86 this will "just work" because everything shares the same
+> > address space :)
+> >
+> > The 2M pages in the cache will be in the modules space, so
+> > __execmem_cache_alloc() will always return memory from that address space.
+> >
+> > For other architectures this indeed needs to be fixed with passing the
+> > range to __execmem_cache_alloc() and limiting search in the cache for that
+> > range.
+> 
+> I think we at least need the "map to" concept (initially proposed by Thomas)
+> to get this work. For example, EXECMEM_BPF and EXECMEM_KPROBE
+> maps to EXECMEM_MODULE_TEXT, so that all these actually share
+> the same range.
 
-Add refcount and check if all registrations are dropped before releasing
-dpll_pin_registration resources.
-
-Currently, the following crash/call trace is produced when ice driver is
-removed on the system with installed NIC which includes dpll device:
-
-WARNING: CPU: 51 PID: 9155 at drivers/dpll/dpll_core.c:809 dpll_pin_ops+0x20/0x30
-Call Trace:
- dpll_msg_add_pin_freq+0x37/0x1d0
- dpll_cmd_pin_get_one+0x1c0/0x400
- ? __nlmsg_put+0x63/0x80
- dpll_pin_event_send+0x93/0x140
- dpll_pin_on_pin_unregister+0x3f/0x100
- ice_dpll_deinit_pins+0xa1/0x230 [ice]
- ice_remove+0xf1/0x210 [ice]
-
-Fixes: b446631f355e ("dpll: fix dpll_xa_ref_*_del() for multiple registrations")
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Signed-off-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
----
- drivers/dpll/dpll_core.c | 17 +++++++++++++----
- 1 file changed, 13 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/dpll/dpll_core.c b/drivers/dpll/dpll_core.c
-index 64eaca80d736..7ababa327c0c 100644
---- a/drivers/dpll/dpll_core.c
-+++ b/drivers/dpll/dpll_core.c
-@@ -40,6 +40,7 @@ struct dpll_device_registration {
+Why?
  
- struct dpll_pin_registration {
- 	struct list_head list;
-+	refcount_t refcount;
- 	const struct dpll_pin_ops *ops;
- 	void *priv;
- };
-@@ -81,6 +82,7 @@ dpll_xa_ref_pin_add(struct xarray *xa_pins, struct dpll_pin *pin,
- 		reg = dpll_pin_registration_find(ref, ops, priv);
- 		if (reg) {
- 			refcount_inc(&ref->refcount);
-+			refcount_inc(&reg->refcount);
- 			return 0;
- 		}
- 		ref_exists = true;
-@@ -113,6 +115,7 @@ dpll_xa_ref_pin_add(struct xarray *xa_pins, struct dpll_pin *pin,
- 	reg->priv = priv;
- 	if (ref_exists)
- 		refcount_inc(&ref->refcount);
-+	refcount_set(&reg->refcount, 1);
- 	list_add_tail(&reg->list, &ref->registration_list);
- 
- 	return 0;
-@@ -131,8 +134,10 @@ static int dpll_xa_ref_pin_del(struct xarray *xa_pins, struct dpll_pin *pin,
- 		reg = dpll_pin_registration_find(ref, ops, priv);
- 		if (WARN_ON(!reg))
- 			return -EINVAL;
--		list_del(&reg->list);
--		kfree(reg);
-+		if (refcount_dec_and_test(&reg->refcount)) {
-+			list_del(&reg->list);
-+			kfree(reg);
-+		}
- 		if (refcount_dec_and_test(&ref->refcount)) {
- 			xa_erase(xa_pins, i);
- 			WARN_ON(!list_empty(&ref->registration_list));
-@@ -160,6 +165,7 @@ dpll_xa_ref_dpll_add(struct xarray *xa_dplls, struct dpll_device *dpll,
- 		reg = dpll_pin_registration_find(ref, ops, priv);
- 		if (reg) {
- 			refcount_inc(&ref->refcount);
-+			refcount_inc(&reg->refcount);
- 			return 0;
- 		}
- 		ref_exists = true;
-@@ -192,6 +198,7 @@ dpll_xa_ref_dpll_add(struct xarray *xa_dplls, struct dpll_device *dpll,
- 	reg->priv = priv;
- 	if (ref_exists)
- 		refcount_inc(&ref->refcount);
-+	refcount_set(&reg->refcount, 1);
- 	list_add_tail(&reg->list, &ref->registration_list);
- 
- 	return 0;
-@@ -211,8 +218,10 @@ dpll_xa_ref_dpll_del(struct xarray *xa_dplls, struct dpll_device *dpll,
- 		reg = dpll_pin_registration_find(ref, ops, priv);
- 		if (WARN_ON(!reg))
- 			return;
--		list_del(&reg->list);
--		kfree(reg);
-+		if (refcount_dec_and_test(&reg->refcount)) {
-+			list_del(&reg->list);
-+			kfree(reg);
-+		}
- 		if (refcount_dec_and_test(&ref->refcount)) {
- 			xa_erase(xa_dplls, i);
- 			WARN_ON(!list_empty(&ref->registration_list));
+> Does this make sense?
+> 
+> Song
 
-base-commit: ac1a21db32eda8a09076bad025d7b848dd086d28
 -- 
-2.38.1
-
+Sincerely yours,
+Mike.
 
