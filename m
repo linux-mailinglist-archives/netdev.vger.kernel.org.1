@@ -1,190 +1,248 @@
-Return-Path: <netdev+bounces-89702-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89703-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7ADB28AB42E
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 19:09:08 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id CCA1A8AB447
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 19:20:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 340DE286D35
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 17:09:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 26A84B21EA7
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 17:20:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13777139590;
-	Fri, 19 Apr 2024 17:08:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16E2313A267;
+	Fri, 19 Apr 2024 17:20:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Nt3Z2ZuI"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Sptj73s2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F20E13A877
-	for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 17:08:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4009613A25A
+	for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 17:20:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713546535; cv=none; b=guEC80aMvvx+zWjs/FzwKzCAB/jHmVjcnRYYfA6GgBn5EbkbuebhDtRPBZZuX76lP/w75pfvLyDtOOPxBjg1AOTX6ZsBE0IMdxOhVqOgOT8hcnpOr5EjrrGpCZZQxblz2ngRmBNAB0o3GbKdgZ+3xhDvSO8yhvJ1DpNn3IP6rTY=
+	t=1713547216; cv=none; b=FCIEfjhTrf/np4dy0e6Ths094ypk3bAtzUkMbYD8IC7WCDofnTO3LC73wI/dF7St8/64NGTC7SM5CMq/JSLXwoKfrC9Ozi6Ab4M6ClEHxwZFUGAeq3wPPQrOoh+LWIdQuQJoje95mkfDb1DZaX/oi16NSC89vOJWzS1jAwS0OS8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713546535; c=relaxed/simple;
-	bh=J45kRKvnHyS+3diwekn2tb6YqQK7kWm5g7ur8re4vSQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Qf61oDZdwHGAZWNb0dKMeS3oxfAcgczM5wPyoEwmXSKZwEuioifiVS3cSL/dM4XEuI3QjZul9KdetX3fswwFttOhgjR8lxjU8H5UWsRNDH3MvRlC94BcDweZxVuyDfiTbaQ+Dl4OU2JIwOui6KzlWI5aNm5B/bfGj771Her8S3U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Nt3Z2ZuI; arc=none smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1713546533; x=1745082533;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=J45kRKvnHyS+3diwekn2tb6YqQK7kWm5g7ur8re4vSQ=;
-  b=Nt3Z2ZuIjIQ2oGkYWWbI3TgxUV3jtsNPfuZaiIF2hRFVDDkbm+ajpjSh
-   3wOnagZAMQy3iwbPsKOcanxM5JUTWamAnl3dfMuVOc75Nd9+z52k0KmRq
-   Rmqk7xBTytlC9jYfbbeNghDftMp2s5pVomPQG/uSCYRmCdt6rbJ+UjdBq
-   D/u01467UaL5kDKy6K+HxbrqS0fdDcGd/RRpA8vQsL8UiXA1AG9DTZ9OM
-   hWVLbQCjY+rhzU0JdVLBI2+5MIafi9lGNtzw0aavdtVHSShLqJOMWzy00
-   +8JYqWkRExwDxw687v4iYXpDcaCSSc4BZdqgEjQzOMj+PJa8iJaBI3CfJ
-   Q==;
-X-CSE-ConnectionGUID: 0gtf+mQuRRuFx8JgBB5dvg==
-X-CSE-MsgGUID: PbNpmGhcQn+b33SXLjc0+Q==
-X-IronPort-AV: E=McAfee;i="6600,9927,11049"; a="26674312"
-X-IronPort-AV: E=Sophos;i="6.07,214,1708416000"; 
-   d="scan'208";a="26674312"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Apr 2024 10:08:53 -0700
-X-CSE-ConnectionGUID: cfX4Rg1cSZqYCJwqdh2Szw==
-X-CSE-MsgGUID: qvql3h4hTIemRdcXmvpDdg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,214,1708416000"; 
-   d="scan'208";a="27847181"
-Received: from wasp.igk.intel.com (HELO GK3153-DR2-R750-36946.localdomain.com) ([10.102.20.192])
-  by fmviesa005.fm.intel.com with ESMTP; 19 Apr 2024 10:08:50 -0700
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	jacob.e.keller@intel.com,
-	michal.kubiak@intel.com,
-	maciej.fijalkowski@intel.com,
-	sridhar.samudrala@intel.com,
-	przemyslaw.kitszel@intel.com,
-	wojciech.drewek@intel.com,
-	pio.raczynski@gmail.com,
-	jiri@nvidia.com,
-	mateusz.polchlopek@intel.com,
-	shayd@nvidia.com
-Subject: [iwl-next v1 4/4] ice: update representor when VSI is ready
-Date: Fri, 19 Apr 2024 19:13:36 +0200
-Message-ID: <20240419171336.11617-5-michal.swiatkowski@linux.intel.com>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20240419171336.11617-1-michal.swiatkowski@linux.intel.com>
-References: <20240419171336.11617-1-michal.swiatkowski@linux.intel.com>
+	s=arc-20240116; t=1713547216; c=relaxed/simple;
+	bh=cSD96dZA8YaoyKtxV3iCV+9k91KMiu/TeU1O0fsZG4M=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=FR7FkWjwhPq9LcYQSGafLvPhiyHnOLdPsl6embkj2sOGEWGP/pWbTOFcGrTzDhud0KIivPcSVMcyuDS63s8eWO/3xCe1ZHBm9qbvdqU64uhn0MXN9HJ37/fkug8il+8+j2Dw8OMuw9TNcwcxvwvK9cEceJBwiRqkO07F2+8/cl4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Sptj73s2; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1713547213;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=MlNhQ9jOOOG45mRQ0gJvHTy24gGJqnXppv0v9hZXrds=;
+	b=Sptj73s2cIbLUulHkVaW7ngvIkDWErlqJrj2SeMzbz2ZkFSKL3yI6HD4o5wtxV7tEcI9bo
+	zsg4r+0rhHnuMVunK0aulirVne+hMexzC2n9Iudb2FeiLfQuc8Wt81L1tTSbqRNRUaeGR3
+	Dgd6W4hlSesebwk+nMbPpz43K4/Tkww=
+Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com
+ [209.85.208.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-642-tLKl1U8iMZCHUBYwhROg0A-1; Fri, 19 Apr 2024 13:20:11 -0400
+X-MC-Unique: tLKl1U8iMZCHUBYwhROg0A-1
+Received: by mail-lj1-f197.google.com with SMTP id 38308e7fff4ca-2dca94d72c1so2738151fa.1
+        for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 10:20:11 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713547210; x=1714152010;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=MlNhQ9jOOOG45mRQ0gJvHTy24gGJqnXppv0v9hZXrds=;
+        b=ri1DpVul6y9Lf3KsCu1y2Ae912WcAavR792kN6V4gFg1e0KCb6YQEbv++CMVIclQ+3
+         +/t1v+vYszMGjcVhnUeYsHpU5Nt2EazLkd1kwG6GIAQxYev3qQEjGn1Y1LH0GgUgDFIj
+         WDk5mYMFPU+hrNwVYiiEgKptoNlg5X2/kPM2ipvxRY9xqFYFUmFJVwHXcMprIm8ROCaz
+         vZYCH7bWLB8MTikrs+QYEcYCCgJIS9dURYqEYaG/Abup9e+ke87xqG8guS0bBhXM+py2
+         h6k9MW7RWNRxeVQnuNlX8uYQRET/VnuxhiFNoizFT0izMORQG8n/jOERRvp14POuGRZ7
+         earA==
+X-Gm-Message-State: AOJu0Ywfpt55hq+km2Sezyev3HZnF4PvSwDcokodadr3Sw8P3UHSJIQI
+	Zk8eUrNpz1GlTZFV3PKklrsOoLyjXJLd0M2+7pfuenMaqN5mAGVakw1hajxNhnrfQX3BVnzDL3k
+	d3MxJdOfKwLK7YwmbLjg7f3gWn0+VHdjvdlPJEbCCplmqONbrBEPbSg==
+X-Received: by 2002:a2e:a496:0:b0:2d8:1b2a:6526 with SMTP id h22-20020a2ea496000000b002d81b2a6526mr1567775lji.4.1713547210163;
+        Fri, 19 Apr 2024 10:20:10 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGUQeMX2RH8rt2W/1pRzUhg4NPOYrbxdCHZ7pyu5cRh2Bd8fBbd3qwPTobl/NzyQwo7pDOWaQ==
+X-Received: by 2002:a2e:a496:0:b0:2d8:1b2a:6526 with SMTP id h22-20020a2ea496000000b002d81b2a6526mr1567753lji.4.1713547209706;
+        Fri, 19 Apr 2024 10:20:09 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-227-179.dyn.eolo.it. [146.241.227.179])
+        by smtp.gmail.com with ESMTPSA id bd27-20020a05600c1f1b00b00419d47edc51sm666301wmb.47.2024.04.19.10.20.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 19 Apr 2024 10:20:09 -0700 (PDT)
+Message-ID: <87cf4830e2e46c1882998162526e108fb424a0f7.camel@redhat.com>
+Subject: Re: [PATCH net-next v16 00/15] Introducing P4TC (series 1)
+From: Paolo Abeni <pabeni@redhat.com>
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: netdev@vger.kernel.org, deb.chatterjee@intel.com,
+ anjali.singhai@intel.com,  namrata.limaye@intel.com, tom@sipanda.io,
+ mleitner@redhat.com,  Mahesh.Shirshyad@amd.com, tomasz.osinski@intel.com,
+ jiri@resnulli.us,  xiyou.wangcong@gmail.com, davem@davemloft.net,
+ edumazet@google.com,  kuba@kernel.org, vladbu@nvidia.com, horms@kernel.org,
+ khalidm@nvidia.com,  toke@redhat.com, victor@mojatatu.com,
+ pctammela@mojatatu.com, Vipin.Jain@amd.com,  dan.daly@intel.com,
+ andy.fingerhut@gmail.com, chris.sommers@keysight.com,  mattyk@nvidia.com,
+ bpf@vger.kernel.org
+Date: Fri, 19 Apr 2024 19:20:07 +0200
+In-Reply-To: <CAM0EoM=VhVn2sGV40SYttQyaiCn8gKaKHTUqFxB_WzKrayJJfQ@mail.gmail.com>
+References: <20240410140141.495384-1-jhs@mojatatu.com>
+	 <41736ea4e81666e911fee5b880d9430ffffa9a58.camel@redhat.com>
+	 <CAM0EoM=982OctjvSQpx0kR7e+JnQLhvZ=sM-tNB4xNiu7nhH5Q@mail.gmail.com>
+	 <CAM0EoM=VhVn2sGV40SYttQyaiCn8gKaKHTUqFxB_WzKrayJJfQ@mail.gmail.com>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-In case of reset of VF VSI can be reallocated. To handle this case it
-should be properly updated.
+On Fri, 2024-04-19 at 08:08 -0400, Jamal Hadi Salim wrote:
+> On Thu, Apr 11, 2024 at 12:24=E2=80=AFPM Jamal Hadi Salim <jhs@mojatatu.c=
+om> wrote:
+> >=20
+> > On Thu, Apr 11, 2024 at 10:07=E2=80=AFAM Paolo Abeni <pabeni@redhat.com=
+> wrote:
+> > >=20
+> > > On Wed, 2024-04-10 at 10:01 -0400, Jamal Hadi Salim wrote:
+> > > > The only change that v16 makes is to add a nack to patch 14 on kfun=
+cs
+> > > > from Daniel and John. We strongly disagree with the nack; unfortuna=
+tely I
+> > > > have to rehash whats already in the cover letter and has been discu=
+ssed over
+> > > > and over and over again:
+> > >=20
+> > > I feel bad asking, but I have to, since all options I have here are
+> > > IMHO quite sub-optimal.
+> > >=20
+> > > How bad would be dropping patch 14 and reworking the rest with
+> > > alternative s/w datapath? (I guess restoring it from oldest revision =
+of
+> > > this series).
+> >=20
+> >=20
+> > We want to keep using ebpf  for the s/w datapath if that is not clear b=
+y now.
+> > I do not understand the obstructionism tbh. Are users allowed to use
+> > kfuncs as part of infra or not? My understanding is yes.
+> > This community is getting too political and my worry is that we have
+> > corporatism creeping in like it is in standards bodies.
+> > We started by not using ebpf. The same people who are objecting now
+> > went up in arms and insisted we use ebpf. As a member of this
+> > community, my motivation was to meet them in the middle by
+> > compromising. We invested another year to move to that middle ground.
+> > Now they are insisting we do not use ebpf because they dont like our
+> > design or how we are using ebpf or maybe it's not a use case they have
+> > any need for or some other politics. I lost track of the moving goal
+> > posts. Open source is about solving your itch. This code is entirely
+> > on TC, zero code changed in ebpf core. The new goalpost is based on
+> > emotional outrage over use of functions. The whole thing is getting
+> > extremely toxic.
+> >=20
+>=20
+> Paolo,
+> Following up since no movement for a week now;->
+> I am going to give benefit of doubt that there was miscommunication or
+> misunderstanding for all the back and forth that has happened so far
+> with the nackers. I will provide a summary below on the main points
+> raised and then provide responses:
+>=20
+> 1) "Use maps"
+>=20
+> It doesnt make sense for our requirement. The reason we are using TC
+> is because a) P4 has an excellent fit with TC match action paradigm b)
+> we are targeting both s/w and h/w and the TC model caters well for
+> this. The objects belong to TC, shared between s/w, h/w and control
+> plane (and netlink is the API). Maybe this diagram would help:
+> https://github.com/p4tc-dev/docs/blob/main/images/why-p4tc/p4tc-runtime-p=
+ipeline.png
+>=20
+> While the s/w part stands on its own accord (as elaborated many
+> times), for TC which has offloads, the s/w twin is introduced before
+> the h/w equivalent. This is what this series is doing.
+>=20
+> 2) "but ... it is not performant"
+> This has been brought up in regards to netlink and kfuncs. Performance
+> is a lower priority to P4 correctness and expressibility.
+> Netlink provides us the abstractions we need, it works with TC for
+> both s/w and h/w offload and has a lot of knowledge base for
+> expressing control plane APIs. We dont believe reinventing all that
+> makes sense.
+> Kfuncs are a means to an end - they provide us the gluing we need to
+> have an ebpf s/w datapath to the TC objects. Getting an extra
+> 10-100Kpps is not a driving factor.
+>=20
+> 3) "but you did it wrong, here's how you do it..."
+>=20
+> I gave up on responding to this - but do note this sentiment is a big
+> theme in the exchanges and consumed most of the electrons. We are
+> _never_ going to get any consensus with statements like "tc actions
+> are a mistake" or "use tcx".
+>=20
+> 4) "... drop the kfunc patch"
+>=20
+> kfuncs essentially boil down to function calls. They don't require any
+> special handling by the eBPF verifier nor introduce new semantics to
+> eBPF. They are similar in nature to the already existing kfuncs
+> interacting with other kernel objects such as nf_conntrack.
+> The precedence (repeated in conferences and email threads multiple
+> times) is: kfuncs dont have to be sent to ebpf list or reviewed by
+> folks in the ebpf world. And We believe that rule applies to us as
+> well. Either kfuncs (and frankly ebpf) is infrastructure glue or it's
+> not.
+>=20
+> Now for a little rant:
+>=20
+> Open source is not a zero-sum game. Ebpf already coexists with
+> netfilter, tc, etc and various subsystems happily.
+> I hope our requirement is clear and i dont have to keep justifying why
+> P4 or relitigate over and over again why we need TC. Open source is
+> about scratching your itch and our itch is totally contained within
+> TC. I cant help but feel that this community is getting way too
+> pervasive with politics and obscure agendas. I understand agendas, I
+> just dont understand the zero-sum thinking.
+> My view is this series should still be applied with the nacks since it
+> sits entirely on its own silo within networking/TC (and has nothing to
+> do with ebpf).
 
-Reload representor as vsi->vsi_num can be different than the one stored
-when representor was created.
+It's really hard for me - meaning I'll not do that - applying a series
+that has been so fiercely nacked, especially given that the other
+maintainers are not supporting it.
+        =20
+I really understand this is very bad for you.
+        =20
+Let me try to do an extreme attempt to find some middle ground between
+this series and the bpf folks.
 
-Instead of only changing antispoof do whole VSI configuration for
-eswitch.
+My understanding is that the most disliked item is the lifecycle for
+the objects allocated via the kfunc(s).=20
 
-Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
----
- drivers/net/ethernet/intel/ice/ice_eswitch.c | 21 +++++++++++++-------
- drivers/net/ethernet/intel/ice/ice_eswitch.h |  4 ++--
- drivers/net/ethernet/intel/ice/ice_vf_lib.c  |  2 +-
- 3 files changed, 17 insertions(+), 10 deletions(-)
+If I understand correctly, the hard requirement on bpf side is that any
+kernel object allocated by kfunc must be released at program unload
+time. p4tc postpone such allocation to recycle the structure.=C2=A0
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_eswitch.c b/drivers/net/ethernet/intel/ice/ice_eswitch.c
-index 998590223f02..4c1d29b8f105 100644
---- a/drivers/net/ethernet/intel/ice/ice_eswitch.c
-+++ b/drivers/net/ethernet/intel/ice/ice_eswitch.c
-@@ -176,16 +176,16 @@ void ice_eswitch_decfg_vsi(struct ice_vsi *vsi, const u8 *mac)
-  * @repr_id: representor ID
-  * @vsi: VSI for which port representor is configured
-  */
--void ice_eswitch_update_repr(unsigned long repr_id, struct ice_vsi *vsi)
-+void ice_eswitch_update_repr(unsigned long *repr_id, struct ice_vsi *vsi)
- {
- 	struct ice_pf *pf = vsi->back;
- 	struct ice_repr *repr;
--	int ret;
-+	int err;
- 
- 	if (!ice_is_switchdev_running(pf))
- 		return;
- 
--	repr = xa_load(&pf->eswitch.reprs, repr_id);
-+	repr = xa_load(&pf->eswitch.reprs, *repr_id);
- 	if (!repr)
- 		return;
- 
-@@ -195,12 +195,19 @@ void ice_eswitch_update_repr(unsigned long repr_id, struct ice_vsi *vsi)
- 	if (repr->br_port)
- 		repr->br_port->vsi = vsi;
- 
--	ret = ice_vsi_update_security(vsi, ice_vsi_ctx_clear_antispoof);
--	if (ret) {
--		ice_fltr_add_mac_and_broadcast(vsi, repr->parent_mac,
--					       ICE_FWD_TO_VSI);
-+	err = ice_eswitch_cfg_vsi(vsi, repr->parent_mac);
-+	if (err)
- 		dev_err(ice_pf_to_dev(pf), "Failed to update VSI of port representor %d",
- 			repr->id);
-+
-+	/* The VSI number is different, reload the PR with new id */
-+	if (repr->id != vsi->vsi_num) {
-+		xa_erase(&pf->eswitch.reprs, repr->id);
-+		repr->id = vsi->vsi_num;
-+		if (xa_insert(&pf->eswitch.reprs, repr->id, repr, GFP_KERNEL))
-+			dev_err(ice_pf_to_dev(pf), "Failed to reload port representor %d",
-+				repr->id);
-+		*repr_id = repr->id;
- 	}
- }
- 
-diff --git a/drivers/net/ethernet/intel/ice/ice_eswitch.h b/drivers/net/ethernet/intel/ice/ice_eswitch.h
-index 9a25606e9740..09194d514f9b 100644
---- a/drivers/net/ethernet/intel/ice/ice_eswitch.h
-+++ b/drivers/net/ethernet/intel/ice/ice_eswitch.h
-@@ -18,7 +18,7 @@ ice_eswitch_mode_set(struct devlink *devlink, u16 mode,
- 		     struct netlink_ext_ack *extack);
- bool ice_is_eswitch_mode_switchdev(struct ice_pf *pf);
- 
--void ice_eswitch_update_repr(unsigned long repr_id, struct ice_vsi *vsi);
-+void ice_eswitch_update_repr(unsigned long *repr_id, struct ice_vsi *vsi);
- 
- void ice_eswitch_stop_all_tx_queues(struct ice_pf *pf);
- 
-@@ -47,7 +47,7 @@ ice_eswitch_set_target_vsi(struct sk_buff *skb,
- 			   struct ice_tx_offload_params *off) { }
- 
- static inline void
--ice_eswitch_update_repr(unsigned long repr_id, struct ice_vsi *vsi) { }
-+ice_eswitch_update_repr(unsigned long *repr_id, struct ice_vsi *vsi) { }
- 
- static inline int ice_eswitch_configure(struct ice_pf *pf)
- {
-diff --git a/drivers/net/ethernet/intel/ice/ice_vf_lib.c b/drivers/net/ethernet/intel/ice/ice_vf_lib.c
-index c51e2482cad2..424975d972f6 100644
---- a/drivers/net/ethernet/intel/ice/ice_vf_lib.c
-+++ b/drivers/net/ethernet/intel/ice/ice_vf_lib.c
-@@ -950,7 +950,7 @@ int ice_reset_vf(struct ice_vf *vf, u32 flags)
- 		goto out_unlock;
- 	}
- 
--	ice_eswitch_update_repr(vf->repr_id, vsi);
-+	ice_eswitch_update_repr(&vf->repr_id, vsi);
- 
- 	/* if the VF has been reset allow it to come up again */
- 	ice_mbx_clear_malvf(&vf->mbx_info);
--- 
-2.42.0
+While there are other arguments, my reading of the past few iterations
+is that solving the above node should lift the nack, am I correct?
+
+Could p4tc pre-allocate all the p4tc_table_entry_act_bpf_kern entries
+and let p4a_runt_create_bpf() fail if the pool is empty? would that
+satisfy the bpf requirement?
+
+Otherwise could p4tc force free the p4tc_table_entry_act_bpf_kern at
+unload time?
+
+Thanks,
+
+Paolo
+
 
 
