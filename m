@@ -1,197 +1,247 @@
-Return-Path: <netdev+bounces-89712-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89711-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 990908AB4B3
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 20:04:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ACB078AB4AF
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 20:01:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C93271C21C30
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 18:03:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6F73F1C210FF
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 18:01:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B068E13AD1B;
-	Fri, 19 Apr 2024 18:03:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E27A413B297;
+	Fri, 19 Apr 2024 18:01:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="rNbjP+XE"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="fsog5Vf/"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2053.outbound.protection.outlook.com [40.107.236.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f175.google.com (mail-yb1-f175.google.com [209.85.219.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F59E13AD28;
-	Fri, 19 Apr 2024 18:03:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.53
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713549836; cv=fail; b=JfgpoYOU9rkWq8cK9Ti6UkZgXMjT1A+VyHOL4gLF3lUYQ09kXHL1xan++xzBbMDT0DzNh9LHAOk7BGuFDrs/plc+AOwz8mj4YsrXRtEvPWEPPGlE+d24oe1KXRd1sJ9AYrl22QTzAeitrXcPcqfxoDmEKDM8bcGiJeRvY8p6K4s=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713549836; c=relaxed/simple;
-	bh=j+i7GjWwjfw0XJyRi5Q2GlEaOvK9JlzdvmBaCHeMsEk=;
-	h=References:From:To:Cc:Subject:Date:In-reply-to:Message-ID:
-	 Content-Type:MIME-Version; b=O94KHr60SbUwcPPIXyMa1Uv4IzlT9df4jfC2FrqFWJUzlEcf0aveEuyQsZWMozNGO52EvHPTfeAJMHPUNtrHjXrXygWmvb9g0pZlp0EeCqqkpnvxEMy6Yru0BbQIVY5Rt6sv7N1yP+KEZ0I3wEB+byRTGgOFjdBMk+dmdIAG9KY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=rNbjP+XE; arc=fail smtp.client-ip=40.107.236.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=RcQhIXa8V194tGCFim+hNGnSheLwuBvPrxNh3qccxK4CdwLcGg3kfxvdwsf1najikcwvo1EaMiwzKyBw6l9EDzN+GjrcO89SLtE50ytxveKSMWyNOPn9YsU2oHB/NmPPdL8GHWjC2Ml7DRkzcq1dwLlJQvrcbtVXnu/EgBX05y8B3uimTGvuw+SUF+iDg/CAvlPi4X27A0JcDXxahx/yvMxBMhJfCeiNTA/Kevmuyp6B8jz/4qx5gJ2k5voAbkZt1AdEMD2AZiQ9BspKZcjy2P7qTmHd0rD+TBKh1UdFnIgUNewNxZyxdwuP6lQDL0WNZqhZ++yMC8APICfI3xWxtA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=DiWB7gzd1yi18Ib5jDj/p/4qp92KHmvD0IfOYxC6XA8=;
- b=oaNgiFfwZtZBn7+LAg3Zp9iwYeJZZGZq9Wijsu4G+vRL98rEKR/rR/b1jgtbbXwlJ+ki6oRQIa2OsrfQSxsuRmohdNraWR0ghICV7x9QU3hJRKm/NIBiETh8cxpcqr3IUgVaml2eI2Au/ZmXGI43UiCmOBM8K8pId7Hu5HtIkFo/kR55666Yij39qQdI0OGVnr/JnsCttnO9PQUCcJTIWFpRkkp3DCijc/NduDo5trgqtzDXIokaz9Lj1SxQ7ZWHx4HH+8PQyf9DLFCeJL8sOdoZ2MomR4dBIklV955Rr7CaluRFU1TiPo8tiEE//iz1aROfuTDtW59nQMBP0KTi9Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=DiWB7gzd1yi18Ib5jDj/p/4qp92KHmvD0IfOYxC6XA8=;
- b=rNbjP+XE8uepBv9p8W6fJCgPQm+qmV5rMo9oLwpC7R4brb/2bU3IfA5ZSaZOmD2Zgv3lwqUEgVkz6w0JXZBuEUv7HhNAWdN/ngSxwlB0uQboJcNLy8CSeaoAvmSR2VaYzsb6Rlr/Z1/QJwSK0pmT1OB6BpAkyUAKWJbI4EWZdh+8LFehCsFXFwxcBDSldZJaK9du0OwJBFSwRCFebZ90+uFowPdltBcQRCiA97+xcsTn6Qw/mJf3EISS4zqBqZHmbNCr2fVCmE8ztrG+j7ktz4zRlcJGrU6hR4dNE0+IXiaAcoTCxC1tcSvJv8Vr6jlj2ZrJ/eDLJ0WDHYZ6cmaO6Q==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from BYAPR12MB2743.namprd12.prod.outlook.com (2603:10b6:a03:61::28)
- by DS0PR12MB6656.namprd12.prod.outlook.com (2603:10b6:8:d2::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7472.41; Fri, 19 Apr
- 2024 18:03:50 +0000
-Received: from BYAPR12MB2743.namprd12.prod.outlook.com
- ([fe80::3ec0:1215:f4ed:9535]) by BYAPR12MB2743.namprd12.prod.outlook.com
- ([fe80::3ec0:1215:f4ed:9535%4]) with mapi id 15.20.7472.044; Fri, 19 Apr 2024
- 18:03:50 +0000
-References: <20240419011740.333714-1-rrameshbabu@nvidia.com>
- <20240419011740.333714-3-rrameshbabu@nvidia.com> <ZiKIUC6bTCDhlnRw@hog>
-User-agent: mu4e 1.10.8; emacs 28.2
-From: Rahul Rameshbabu <rrameshbabu@nvidia.com>
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: netdev@vger.kernel.org, stable@vger.kernel.org, Jakub Kicinski
- <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, "David S. Miller"
- <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, Gal Pressman
- <gal@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>, Yossi Kuperman
- <yossiku@nvidia.com>, Benjamin Poirier <bpoirier@nvidia.com>, Cosmin Ratiu
- <cratiu@nvidia.com>
-Subject: Re: [PATCH net-next 2/3] macsec: Detect if Rx skb is macsec-related
- for offloading devices that update md_dst
-Date: Fri, 19 Apr 2024 11:01:20 -0700
-In-reply-to: <ZiKIUC6bTCDhlnRw@hog>
-Message-ID: <87mspp6xh7.fsf@nvidia.com>
-Content-Type: text/plain
-X-ClientProxiedBy: SJ0PR13CA0181.namprd13.prod.outlook.com
- (2603:10b6:a03:2c3::6) To BYAPR12MB2743.namprd12.prod.outlook.com
- (2603:10b6:a03:61::28)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F3E7130A5B
+	for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 18:01:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.175
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1713549700; cv=none; b=iLevfjOSA9gOXe1CwIjFjFzODYyHUcIsWEeN0t3C4UtIegHmJpex6CgHC1SoTEzG5ys05I/dL8NE0uEs15B69tx0ppvYJJLCr7H9u3lKc5GKKqc+m5tdp/9vvKCb1ZzhC28uGVlmxniR0/tHAu8wv/7NFSzEnbACtuxCRHVXs1U=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1713549700; c=relaxed/simple;
+	bh=8kekxm8Yx3Geb4y9E0X0FQ1vYR/DYIP6a1bEnb/VXBs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UwCr8Ciba7OVQ+4Dw5JGA6zzGCL/w/Zlt6XcPeH5EJV2ogkS1viAecDCtIfl3DnwXanQ7gk6Vygi83mR2cJbzP0swzY81YpIceLY+9hgQGwjTJMXk6DCNwTsTurjhllA/b97Pre+Hm8XPCELpAT6MjxeVPa8f8Fecx5KtmrOUzI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=fsog5Vf/; arc=none smtp.client-ip=209.85.219.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-yb1-f175.google.com with SMTP id 3f1490d57ef6-de477949644so1561856276.1
+        for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 11:01:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1713549698; x=1714154498; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KZKv0qPX0PLba9CuD+UmXo7c2QNHJRapFN8pMZZC9+0=;
+        b=fsog5Vf/qFYrJTN2++K50UXBd8Vf3NZcmwtMxrlI/ASjHcPoSajczk7yofyKeG34OY
+         jLcvUaq3BxNY08dOfmkFsVogda7CLvTWOibVqJGA6YjISpGz4A4k54dGuhbJhfCYCFj3
+         97P8mdjmlTH1p8wiRt1+kRGi9ZpU8sWbNiT9dQ0sxcm7Mv369L5BY+mf/LX6ATQ9azh9
+         J5dVQ4tim2BGMQPToUFPAtS5B7ZUWJMrkFRtVi+Fbyuw1fegMJWpjNxWrc/CaM1q716B
+         va6UgYKG5ySmLUxzVwiZrgbj0IhL7L4rHoCSerJlclQh1fHhzdqeHUllXCKj9SRhmGRG
+         zW3g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713549698; x=1714154498;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=KZKv0qPX0PLba9CuD+UmXo7c2QNHJRapFN8pMZZC9+0=;
+        b=YC+wpreJoATznpil7Vi9bkV6R6227/eMplesQuUZsxqEIx6JwLkQhwO6q2tyf+vXNr
+         2fPrH0KwOJlCi0kALe1z6VIa5cFfxNSTZorsca2Rkx3wLWIo74/4g7PNV4qOLnfj8pba
+         UvJ+GoUqCGqj4KgQHBuTbk9PHLKCCXXdMXZQXK3Z3izc/NRfb+mGhTAFJWirHXKvdOa+
+         b4ba2vB4U9jyjBjeJWrwEHAV95XOR50oncouil70YUeFSFfXTrR2HmJ/ZighNhP6h/2S
+         p0Nsg5BaHwHDraU7o1723dR0z/+RwWYOQAb9mHQ+heKnMPXakuOyPp0ZHlFDhtU5OD+v
+         PdQg==
+X-Gm-Message-State: AOJu0YwMm6usO7D+12jnQKCem/k9Y1vS7tAk2bM9Fs7q/wrUdUlfIBKT
+	wp/aXh6GiY4JJ4/X/qLI9cJXhjrqf+SeHupIqtQ33cgg4zRV4H8hLMNZi2uNNYNB4E3oKhrZTne
+	8duSlPRd8RoNOXRPsoWBPE8Uu3rVh5sZxlFW1IilcwGFwHXQ=
+X-Google-Smtp-Source: AGHT+IEHKE3mkY41ExHHzu9FKKI0rKZxFft1TQpFw2fdluwirxG5oWVZDePAqVE9t6iBCjRipWwUe0A4rwe32XitJ6o=
+X-Received: by 2002:a5b:64a:0:b0:dcc:ae3:d8a0 with SMTP id o10-20020a5b064a000000b00dcc0ae3d8a0mr3348467ybq.48.1713549698080;
+ Fri, 19 Apr 2024 11:01:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BYAPR12MB2743:EE_|DS0PR12MB6656:EE_
-X-MS-Office365-Filtering-Correlation-Id: a5c0c49c-445a-424d-b46b-08dc609b10e3
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?HlW49ZGZ8tyR5Wzj0EP3sK5v7Es/3NxuqebiwDSCMa8f46+SWjM0aIM3qLZ1?=
- =?us-ascii?Q?9IqWfKAcDPmglfCwfXmsTjGmdGh0dbxFfN8jiu4LcOoZb9btqFhJu0BPuO+U?=
- =?us-ascii?Q?M/P/VlJ1n+wavuqwKQrr7hLgRgyMIgps6HUH4CwcM5kMrIAvzo/R7866efSo?=
- =?us-ascii?Q?6WKTBne/G0zE+g93OZfOy79Y4zza/lEWvzEPqQruqDETsgTp4t5AwZ761+h+?=
- =?us-ascii?Q?tgmNphfwZlfmh/0SNXePILJyBSiosjNlfaeLDlc0zzjmn2lM/mecU0mi/OBV?=
- =?us-ascii?Q?K5i7n7CLOkuuA1VDqWFgC0VrzqjO/Kl4gkX55FWhir6axFp7qEYDd3Z4csQZ?=
- =?us-ascii?Q?4r9sTsjudCO2BUn9ASZrK1rNZe+4WHqnQZQG6pLDSuTBnUXem4JxFozyPl+J?=
- =?us-ascii?Q?7thzVJlgL7qeco3jDLGW9z5u8MkC+fk+A8cpEZyD1DOvSWFY3e3+4as+LeyN?=
- =?us-ascii?Q?t+XUUxloEN0suqwKUXMputgS/zDqXv6LKku5RceIcWZP7g4+dwdkxwUgJmaH?=
- =?us-ascii?Q?ani7Fta/vzFt/IeVMAfZ4OdFbREh8rYmfTUNskGI7gs1oMfRLdpLdDzZKkv9?=
- =?us-ascii?Q?bS9aATIuArmPkLxDo6Yo+gyauclDkWKboKDU8y9+kzVT2n+9rVEVoRdK2aUi?=
- =?us-ascii?Q?y/CYm1pUFoiWEASKjwnN47IiBuKRwN+U5icAwRq8fuDH2FknurA6TKfxXWPk?=
- =?us-ascii?Q?cG9P2Y8+fU0jshN00zd9iORrfOLazP7XFD37eZdzvYjGt59KT8aUYAj8Y8CK?=
- =?us-ascii?Q?6Ffh7BC04wm37WWltkY9JOi4JIJTSDV1ZtPXWj1e8csm7kQnHS2JUCq46ma6?=
- =?us-ascii?Q?cxiWHvU7oM+/ahfM3hMnNaguPhypMqZD8LpoUT3Jo5UA/xMjW37NbbUYS19B?=
- =?us-ascii?Q?G36Q2rSzrOY+TN5LuGmIwsGsOEUBmbNXsreipEnEjpHHkG86Xj7yqBvPLEYe?=
- =?us-ascii?Q?n7L7s+5IPoyP0GgUdaoxycqhUzlyUfAPhaC2EUsmHmP+NHW6Cg6/u5pk/TeF?=
- =?us-ascii?Q?ETCWPjBkEuqDZ+K3BQfXYRD5ymcNScVFBipTLAuHS1X/A07K47u/kXKVJk+z?=
- =?us-ascii?Q?h1SEuNgpcb8Kg118NCdn1FfC5R5LzZcYkTdCOaVNNKbVsKKRhEJRAsfT5pyU?=
- =?us-ascii?Q?JHfkl+uP2mJHOPXEqrO+qSwTNrasZJlWGRYSCB+29xHqjqJMr8FrpXKnDD/O?=
- =?us-ascii?Q?WrcdgsceO07ZVIMn8fjsaBW6thV3dMwXR8s8xySTejKzII1sqaW52dQEwcLR?=
- =?us-ascii?Q?W4llWtJas1vRGdCo+IwJcDgNr8DNQuo2uPOzf1f4EA=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR12MB2743.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(1800799015)(376005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?QdYZmGYM1o+q+4DGnpRYVzIxKyAhkb627tac3Bsi7twWxxutYQPN9cPq2TiT?=
- =?us-ascii?Q?LS2Gl/7wgduvA5PhjsqZZitrO/ubmYemU+VPQoXx+kO/n3sMCWQFomXzJcmQ?=
- =?us-ascii?Q?mCiHvX1W2VqNbx0WYEZozL70KAcwYl23m1acChqLbcjcfNaCoDLCdTCthHiq?=
- =?us-ascii?Q?MsaktWLABwrwafL2ZeZ2UHuKNTXPLgWw9JowVgLDCSdfENMsuA2oS0FaQUNU?=
- =?us-ascii?Q?uqGLxMGpOMlQJPg/dcCc/RtvzIRe+xIc/feMOgSMqjV8sBAKC8L3UtrJZsSN?=
- =?us-ascii?Q?aMNOxDgiBWKJwGoLi2W9fmCDz/jgornLNkGgo2xlMIfs72+PshLBuOxlK684?=
- =?us-ascii?Q?qVjfNuc8X4vPOZdZQRdJgaVXIDIxsVEv8n+ARHTE2Z5/F70x0z/jooB0l1hy?=
- =?us-ascii?Q?oJO2kIUpAMjukUM2FvhUUpPPoj8tINXinMn10TSIrXPwFqzQRDJM3ZUJMLE9?=
- =?us-ascii?Q?ZJX6170pg7toqcqRsj1rg54zp9QlqBkS5UpoLB71KPmRt5FZR2X7aZoOMVnI?=
- =?us-ascii?Q?y/Zq9WVg8TtfAE+GP43wQtdWlxVFt71irjHeKW9u2oHJghB3JhMvxmNObvYU?=
- =?us-ascii?Q?ElWDl5NcqOkVTH+AdYKAbJBjgZz3PP7BcbeEo7ZfK7a/NEMfdn9zb060t0Of?=
- =?us-ascii?Q?6U7+gwC5zk3aBOy/VZanXUhTkMogIvwSFqNl4/JN7Gn7xq5MoRUSQsweQBX1?=
- =?us-ascii?Q?dDRznqcZUJHv5yxq6UwzmSiIHMasIpFJqHjf7ApVlgMgCr6QKBFoJwb+lPEo?=
- =?us-ascii?Q?TIVYeRC8B/SGwHNXv04Gl9te5WhZA65nEwsv3R/uTWQ7n1WoEbO3DBp5UOYv?=
- =?us-ascii?Q?0bWLXkCqsGG3nXngIizQ0obuHGODcUZjc4k1E7ydQq9KxXog2jeSslFEPWQW?=
- =?us-ascii?Q?rtQMg2VpjKzK+VATZfzpC/ehx4vx07XGv6J/V+587xJJ/oR681fTsCxoakqm?=
- =?us-ascii?Q?4bzSClgBZixTb9Sb/t5EZdfiWNJ4kgA2upmJDtVJv/QcBq4ZRQ05gVWi5v18?=
- =?us-ascii?Q?tHMbSoDy8q/yY9vfj2wxCCezbQF7CFE1eaKd7fDnnRJehT3XS17FKwWik3si?=
- =?us-ascii?Q?Tr1jCRw8fex1Y5zRL8fgFoGTPcupk8jdT8yMH5eDU12wuBLPuT7vp7ksczYU?=
- =?us-ascii?Q?NkNsgARNqtGAcOEj7vhXfxwGAyRnwfI0V7oNKGybpNGQUfMIi72k+AVvZd1Q?=
- =?us-ascii?Q?d4gCqXrKNM7enoxPS97XT8kg1qpJCvi8SqAAbrzeAYJilmdmDgVdO5mQa/Qi?=
- =?us-ascii?Q?QOqvrH5GUVUSZH9IpevIzv43NspIIEa/Ul0HSGJ+8m+MVh/Go4v1sIfYeuai?=
- =?us-ascii?Q?VpWJ9JEvusvKK8WwK6M0TXBKBz3slDwcgJaaJPTrkyc7FDV2wjQMjJxk5ElP?=
- =?us-ascii?Q?AzbRQacd5xtfiv93ya0tKF/yjcE4+3DSxfoRF83UIwOLRwDNNLGc6mgVQCZ1?=
- =?us-ascii?Q?QXuWrRb2+47n7k5VQO41yVb9I3m7OOqnaJ5vnyFGyz1VIoeGGoyzKJN1E/fO?=
- =?us-ascii?Q?Np8wNuFzRHQwCqwCZ5lKVOfmLjrgAl8nn9Qu4EDmYWJd07q4EliSl38LOymL?=
- =?us-ascii?Q?OwyAsl5An9dYo3sXljYRA3OQCwTo/wkwCdz1CXOeXdNU1u0MItB27zfUs0Gy?=
- =?us-ascii?Q?wQ=3D=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a5c0c49c-445a-424d-b46b-08dc609b10e3
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR12MB2743.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Apr 2024 18:03:50.0749
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: f55yDGu9qML+DPR7Oh040vfRvfk/jji0dIQt6M90onmkyzdSVpm19zOZdZQSaQPsQgGJ3Id7Q4FN9d0E5yyvlg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB6656
+References: <20240410140141.495384-1-jhs@mojatatu.com> <41736ea4e81666e911fee5b880d9430ffffa9a58.camel@redhat.com>
+ <CAM0EoM=982OctjvSQpx0kR7e+JnQLhvZ=sM-tNB4xNiu7nhH5Q@mail.gmail.com>
+ <CAM0EoM=VhVn2sGV40SYttQyaiCn8gKaKHTUqFxB_WzKrayJJfQ@mail.gmail.com> <87cf4830e2e46c1882998162526e108fb424a0f7.camel@redhat.com>
+In-Reply-To: <87cf4830e2e46c1882998162526e108fb424a0f7.camel@redhat.com>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Fri, 19 Apr 2024 14:01:26 -0400
+Message-ID: <CAM0EoMkJwR0K-fF7qo0PfRw4Sf+=2L0L=rOcH5A2ELwagLrZMw@mail.gmail.com>
+Subject: Re: [PATCH net-next v16 00/15] Introducing P4TC (series 1)
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, deb.chatterjee@intel.com, anjali.singhai@intel.com, 
+	namrata.limaye@intel.com, tom@sipanda.io, mleitner@redhat.com, 
+	Mahesh.Shirshyad@amd.com, tomasz.osinski@intel.com, jiri@resnulli.us, 
+	xiyou.wangcong@gmail.com, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, vladbu@nvidia.com, horms@kernel.org, khalidm@nvidia.com, 
+	toke@redhat.com, victor@mojatatu.com, pctammela@mojatatu.com, 
+	Vipin.Jain@amd.com, dan.daly@intel.com, andy.fingerhut@gmail.com, 
+	chris.sommers@keysight.com, mattyk@nvidia.com, bpf@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, 19 Apr, 2024 17:05:52 +0200 Sabrina Dubroca <sd@queasysnail.net> wrote:
-> 2024-04-18, 18:17:16 -0700, Rahul Rameshbabu wrote:
-<snip>
->> +			/* This datapath is insecure because it is unable to
->> +			 * enforce isolation of broadcast/multicast traffic and
->> +			 * unicast traffic with promiscuous mode on the macsec
->> +			 * netdev. Since the core stack has no mechanism to
->> +			 * check that the hardware did indeed receive MACsec
->> +			 * traffic, it is possible that the response handling
->> +			 * done by the MACsec port was to a plaintext packet.
->> +			 * This violates the MACsec protocol standard.
->> +			 */
->> +			DEBUG_NET_WARN_ON_ONCE(true);
+On Fri, Apr 19, 2024 at 1:20=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wro=
+te:
 >
-> If you insist on this warning (and I'm not convinced it's useful,
-> since if the HW is already built and cannot inform the driver, there's
-> nothing the driver implementer can do), I would move it somewhere into
-> the config path. macsec_update_offload would be a better location for
-> this kind of warning (maybe with a pr_warn (not limited to debug
-> configs) saying something like "MACsec offload on devices that don't
-> support md_dst are insecure: they do not provide proper isolation of
-> traffic"). The comment can stay here.
+> On Fri, 2024-04-19 at 08:08 -0400, Jamal Hadi Salim wrote:
+> > On Thu, Apr 11, 2024 at 12:24=E2=80=AFPM Jamal Hadi Salim <jhs@mojatatu=
+.com> wrote:
+> > >
+> > > On Thu, Apr 11, 2024 at 10:07=E2=80=AFAM Paolo Abeni <pabeni@redhat.c=
+om> wrote:
+> > > >
+> > > > On Wed, 2024-04-10 at 10:01 -0400, Jamal Hadi Salim wrote:
+> > > > > The only change that v16 makes is to add a nack to patch 14 on kf=
+uncs
+> > > > > from Daniel and John. We strongly disagree with the nack; unfortu=
+nately I
+> > > > > have to rehash whats already in the cover letter and has been dis=
+cussed over
+> > > > > and over and over again:
+> > > >
+> > > > I feel bad asking, but I have to, since all options I have here are
+> > > > IMHO quite sub-optimal.
+> > > >
+> > > > How bad would be dropping patch 14 and reworking the rest with
+> > > > alternative s/w datapath? (I guess restoring it from oldest revisio=
+n of
+> > > > this series).
+> > >
+> > >
+> > > We want to keep using ebpf  for the s/w datapath if that is not clear=
+ by now.
+> > > I do not understand the obstructionism tbh. Are users allowed to use
+> > > kfuncs as part of infra or not? My understanding is yes.
+> > > This community is getting too political and my worry is that we have
+> > > corporatism creeping in like it is in standards bodies.
+> > > We started by not using ebpf. The same people who are objecting now
+> > > went up in arms and insisted we use ebpf. As a member of this
+> > > community, my motivation was to meet them in the middle by
+> > > compromising. We invested another year to move to that middle ground.
+> > > Now they are insisting we do not use ebpf because they dont like our
+> > > design or how we are using ebpf or maybe it's not a use case they hav=
+e
+> > > any need for or some other politics. I lost track of the moving goal
+> > > posts. Open source is about solving your itch. This code is entirely
+> > > on TC, zero code changed in ebpf core. The new goalpost is based on
+> > > emotional outrage over use of functions. The whole thing is getting
+> > > extremely toxic.
+> > >
+> >
+> > Paolo,
+> > Following up since no movement for a week now;->
+> > I am going to give benefit of doubt that there was miscommunication or
+> > misunderstanding for all the back and forth that has happened so far
+> > with the nackers. I will provide a summary below on the main points
+> > raised and then provide responses:
+> >
+> > 1) "Use maps"
+> >
+> > It doesnt make sense for our requirement. The reason we are using TC
+> > is because a) P4 has an excellent fit with TC match action paradigm b)
+> > we are targeting both s/w and h/w and the TC model caters well for
+> > this. The objects belong to TC, shared between s/w, h/w and control
+> > plane (and netlink is the API). Maybe this diagram would help:
+> > https://github.com/p4tc-dev/docs/blob/main/images/why-p4tc/p4tc-runtime=
+-pipeline.png
+> >
+> > While the s/w part stands on its own accord (as elaborated many
+> > times), for TC which has offloads, the s/w twin is introduced before
+> > the h/w equivalent. This is what this series is doing.
+> >
+> > 2) "but ... it is not performant"
+> > This has been brought up in regards to netlink and kfuncs. Performance
+> > is a lower priority to P4 correctness and expressibility.
+> > Netlink provides us the abstractions we need, it works with TC for
+> > both s/w and h/w offload and has a lot of knowledge base for
+> > expressing control plane APIs. We dont believe reinventing all that
+> > makes sense.
+> > Kfuncs are a means to an end - they provide us the gluing we need to
+> > have an ebpf s/w datapath to the TC objects. Getting an extra
+> > 10-100Kpps is not a driving factor.
+> >
+> > 3) "but you did it wrong, here's how you do it..."
+> >
+> > I gave up on responding to this - but do note this sentiment is a big
+> > theme in the exchanges and consumed most of the electrons. We are
+> > _never_ going to get any consensus with statements like "tc actions
+> > are a mistake" or "use tcx".
+> >
+> > 4) "... drop the kfunc patch"
+> >
+> > kfuncs essentially boil down to function calls. They don't require any
+> > special handling by the eBPF verifier nor introduce new semantics to
+> > eBPF. They are similar in nature to the already existing kfuncs
+> > interacting with other kernel objects such as nf_conntrack.
+> > The precedence (repeated in conferences and email threads multiple
+> > times) is: kfuncs dont have to be sent to ebpf list or reviewed by
+> > folks in the ebpf world. And We believe that rule applies to us as
+> > well. Either kfuncs (and frankly ebpf) is infrastructure glue or it's
+> > not.
+> >
+> > Now for a little rant:
+> >
+> > Open source is not a zero-sum game. Ebpf already coexists with
+> > netfilter, tc, etc and various subsystems happily.
+> > I hope our requirement is clear and i dont have to keep justifying why
+> > P4 or relitigate over and over again why we need TC. Open source is
+> > about scratching your itch and our itch is totally contained within
+> > TC. I cant help but feel that this community is getting way too
+> > pervasive with politics and obscure agendas. I understand agendas, I
+> > just dont understand the zero-sum thinking.
+> > My view is this series should still be applied with the nacks since it
+> > sits entirely on its own silo within networking/TC (and has nothing to
+> > do with ebpf).
 >
+> It's really hard for me - meaning I'll not do that - applying a series
+> that has been so fiercely nacked, especially given that the other
+> maintainers are not supporting it.
+>
+> I really understand this is very bad for you.
+>
+> Let me try to do an extreme attempt to find some middle ground between
+> this series and the bpf folks.
+>
+> My understanding is that the most disliked item is the lifecycle for
+> the objects allocated via the kfunc(s).
+>
+> If I understand correctly, the hard requirement on bpf side is that any
+> kernel object allocated by kfunc must be released at program unload
+> time. p4tc postpone such allocation to recycle the structure.
+>
+> While there are other arguments, my reading of the past few iterations
+> is that solving the above node should lift the nack, am I correct?
+>
+> Could p4tc pre-allocate all the p4tc_table_entry_act_bpf_kern entries
+> and let p4a_runt_create_bpf() fail if the pool is empty? would that
+> satisfy the bpf requirement?
 
-I do not like the warning either. I left it mainly if it needed further
-discussion on the mailing list. Will remove it in my next revision. That
-said, it may make sense to advertise rx_uses_md_dst over netlink to
-annotate what macsec offload path a device uses? Just throwing out an
-idea here.
+Let me think about it and weigh the consequences.
 
->>  			if (ether_addr_equal_64bits(hdr->h_dest,
->>  						    ndev->dev_addr)) {
->>  				/* exact match, divert skb to this port */
+> Otherwise could p4tc force free the p4tc_table_entry_act_bpf_kern at
+> unload time?
 
---
-Thanks,
+This one wont work for us unfortunately. If we have entries added by
+the control plane with skip_sw just because the ebpf program is gone
+doesnt mean they disappear.
 
-Rahul Rameshbabu
+cheers,
+jamal
+
+ there are use cases where no entry is loaded by the s/w datap
+
+> Thanks,
+>
+> Paolo
+>
+>
 
