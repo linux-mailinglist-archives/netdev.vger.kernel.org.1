@@ -1,91 +1,200 @@
-Return-Path: <netdev+bounces-89612-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89611-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC1148AAE33
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 14:12:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B135A8AAE1E
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 14:08:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 91E611F21C15
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 12:12:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 15766282582
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 12:08:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED7F083CC7;
-	Fri, 19 Apr 2024 12:12:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33BB6839F1;
+	Fri, 19 Apr 2024 12:08:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="jk8z5RW5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-m25499.xmail.ntesmail.com (mail-m25499.xmail.ntesmail.com [103.129.254.99])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f179.google.com (mail-yb1-f179.google.com [209.85.219.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4312378285;
-	Fri, 19 Apr 2024 12:12:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.129.254.99
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81404883D
+	for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 12:08:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713528766; cv=none; b=Fk+MsmtDSYiauG3Wri77oc+a3ZseTDq7m02XcisARHpoOPu/KyX5U80JTl1z1+WwFLwNsHvCXbIH1qPBkqgaKM7o2NZWMNHFwLPEZHWkzV7k0i6gdGdxXfzywCPoJtZ6Ei/Yex4F2QrU5fPwauNT5puFAJEQlTdfVgfN9eEoxhw=
+	t=1713528513; cv=none; b=jPUcCSb6tFogJZ816qW7urGGPMePCSVpEKmz6Mhp63gkGdXNfMQanaiy6V+Mfv/Gm6aqaHHx8IGhy183y09DZWL6RHK+p9p/PL1JwXO2Ry7phLnS9SpIjYzNR61KEhLimoAknXCaxVNEke40SmLhW/RSK74W9PVdwuWv9Bd5mfU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713528766; c=relaxed/simple;
-	bh=KZGUHlRWEuj7dHpQ9LaQKSzrzqTzErAnF5h96rQdeJo=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=df+Wz76eGw2j8kZMQhMIWr1ahw+qZzZ/Rv3QJNrCxgkV4LA3o/cnWZP5274YDUbuaUYbD1eSGIdHszHKGGRjG/3ikKEY0UBgBV2gDY7scFf4sFHc5enl7++pYSY8z3FDPudzJKjLuQtSp/ltonmPKWB3PZgk71QWfXHupAogvIg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=easystack.cn; spf=none smtp.mailfrom=easystack.cn; arc=none smtp.client-ip=103.129.254.99
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=easystack.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=easystack.cn
-Received: from localhost.localdomain (unknown [110.185.170.227])
-	by smtp.qiye.163.com (Hmail) with ESMTPA id 6F0EF56025F;
-	Fri, 19 Apr 2024 14:14:28 +0800 (CST)
-From: Jun Gu <jun.gu@easystack.cn>
-To: kuba@kernel.org
-Cc: dev@openvswitch.org,
-	echaudro@redhat.com,
-	jun.gu@easystack.cn,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH net-next v4] net: openvswitch: Check vport netdev name
-Date: Fri, 19 Apr 2024 14:14:25 +0800
-Message-Id: <20240419061425.132723-1-jun.gu@easystack.cn>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1713528513; c=relaxed/simple;
+	bh=TPwZWr+fvsIrciadHC7iMjk2+n0Mu/ePTKE4tE12few=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=BjDbVs1TBSPekpC02jsKQTdO9ve65L8hOpBS8tCGdhVq5kCqkTH1PU+clDsZMsQ+CHbVjoeX6NROpNrGAGcaGpGK11zSxPtJ7eV427lsdSSNp8RhWr5c/q8VwlG+DKUNSt5NtQEVIsWngTb/XB2trTURy/y2WFlZ+qFmqKeo2dI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=jk8z5RW5; arc=none smtp.client-ip=209.85.219.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-yb1-f179.google.com with SMTP id 3f1490d57ef6-de467733156so1865717276.0
+        for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 05:08:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1713528510; x=1714133310; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rr+OMVO5d5MvCdE3P+I4S9XZRIo21TTh8S1kyZgJ53s=;
+        b=jk8z5RW5hgpd/GtJybWhsK3eVk1ZZXBmM2pxDr8PQNW2CvfnwpOBErdU+3G2EFe1sl
+         x7kG7rLPyPCDEUiNnd8uSjjShx1++G3E88ql/4RUigEDNv1OfQXNjpzzTB4+2ULWf1fc
+         Q02vLyO+VxQcbaM/ld9lvRxXFtdRINPMPzKJ+pF2nIaL6utRujqsuMKPVf5Mi2ooDxxf
+         eFy6Gk+W66DTsnPKZ1qkDaTpv6YJocl1Q8NaAkm0nQ3vP2r+mzkdFWt54JTSGeSwE00D
+         nbanWci4oCufsa16IMRXSpsshTUGixL/IXjWNbCFFexo/nE1vmYpne6lPgw2o/lLS7v8
+         pMsw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713528510; x=1714133310;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=rr+OMVO5d5MvCdE3P+I4S9XZRIo21TTh8S1kyZgJ53s=;
+        b=o+5ZS7d5hLOm5s9sXAC2Mdd/DCBWYpN/zLgjuE5ZamBKeEEM6Fpr7eEv42OmMZ+oxv
+         v81reVT6fxaC9uvZUnXi3v+Jt7A6Mas+ozcJ8a03F7UaB5jCCHrv3KBqcUomxQAW4v10
+         CAjHrXmksq05MteAIhJpT5jdPHqn8zonNRDC0c2nZVTBE7hqhR1emJ8h3oyEokuF5XTF
+         oQHKntQjB4EJkHCx0AMIUujWBIkDyUYGavOq+/L3RJmP93RybspB9AsD7G9wUG/VzxTg
+         sm9ZkhAaIwEXNvDmJtFD7lmcdV8V0SydQ4V4gOLPWYWJPGOZOC9/vbdwK1VK7K/JOq+U
+         GMsA==
+X-Gm-Message-State: AOJu0YymxMpAGFrZ787LeiHajWjX0uDmqAW5wJdsBI/Hvidsaz0bXZy8
+	VkuLTcmk/ZVUjY4LE7AEJHOMwbVCIEHg2OtzK8vTpdIW6wEPxg8QeXglJbVDx2C444Nd8XNu5XF
+	dXvM/vti3vtBRBp6GuCf0XmItGcHudhhKDUR6
+X-Google-Smtp-Source: AGHT+IFrs0x5TSC4YT1Qyhv88pMESj9mT65SnYFIqtW9G6G0q4pBcESAjoC6QdjLo9IWA9hluz4ZwCYtQFlfM4kziuY=
+X-Received: by 2002:a25:c541:0:b0:dd0:aa2c:4da5 with SMTP id
+ v62-20020a25c541000000b00dd0aa2c4da5mr2008966ybe.6.1713528510570; Fri, 19 Apr
+ 2024 05:08:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
-	tZV1koWUFJQjdXWS1ZQUlXWQ8JGhUIEh9ZQVlCTh8eVk5DGksYGh4dTxgfSlUZERMWGhIXJBQOD1
-	lXWRgSC1lBWUpKS1VKQ05VSkxLVUlJTFlXWRYaDxIVHRRZQVlPS0hVSk1PSUxOVUpLS1VKQktLWQ
-	Y+
-X-HM-Tid: 0a8ef4fdf7cc023dkunm6f0ef56025f
-X-HM-MType: 1
-X-HM-Sender-Digest: e1kMHhlZQR0aFwgeV1kSHx4VD1lBWUc6Ok06Pxw5Gjc0Th8uMRwoLA9N
-	GQkaFChVSlVKTEpITktMSU1DQ0JCVTMWGhIXVREOFVUcDjseGggCCA8aGBBVGBVFWVdZEgtZQVlK
-	SktVSkNOVUpMS1VJSUxZV1kIAVlBSkxJSjcG
+References: <20240410140141.495384-1-jhs@mojatatu.com> <41736ea4e81666e911fee5b880d9430ffffa9a58.camel@redhat.com>
+ <CAM0EoM=982OctjvSQpx0kR7e+JnQLhvZ=sM-tNB4xNiu7nhH5Q@mail.gmail.com>
+In-Reply-To: <CAM0EoM=982OctjvSQpx0kR7e+JnQLhvZ=sM-tNB4xNiu7nhH5Q@mail.gmail.com>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Fri, 19 Apr 2024 08:08:19 -0400
+Message-ID: <CAM0EoM=VhVn2sGV40SYttQyaiCn8gKaKHTUqFxB_WzKrayJJfQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v16 00/15] Introducing P4TC (series 1)
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, deb.chatterjee@intel.com, anjali.singhai@intel.com, 
+	namrata.limaye@intel.com, tom@sipanda.io, mleitner@redhat.com, 
+	Mahesh.Shirshyad@amd.com, tomasz.osinski@intel.com, jiri@resnulli.us, 
+	xiyou.wangcong@gmail.com, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, vladbu@nvidia.com, horms@kernel.org, khalidm@nvidia.com, 
+	toke@redhat.com, victor@mojatatu.com, pctammela@mojatatu.com, 
+	Vipin.Jain@amd.com, dan.daly@intel.com, andy.fingerhut@gmail.com, 
+	chris.sommers@keysight.com, mattyk@nvidia.com, bpf@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Ensure that the provided netdev name is not one of its aliases to
-prevent unnecessary creation and destruction of the vport by
-ovs-vswitchd.
+On Thu, Apr 11, 2024 at 12:24=E2=80=AFPM Jamal Hadi Salim <jhs@mojatatu.com=
+> wrote:
+>
+> On Thu, Apr 11, 2024 at 10:07=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> =
+wrote:
+> >
+> > On Wed, 2024-04-10 at 10:01 -0400, Jamal Hadi Salim wrote:
+> > > The only change that v16 makes is to add a nack to patch 14 on kfuncs
+> > > from Daniel and John. We strongly disagree with the nack; unfortunate=
+ly I
+> > > have to rehash whats already in the cover letter and has been discuss=
+ed over
+> > > and over and over again:
+> >
+> > I feel bad asking, but I have to, since all options I have here are
+> > IMHO quite sub-optimal.
+> >
+> > How bad would be dropping patch 14 and reworking the rest with
+> > alternative s/w datapath? (I guess restoring it from oldest revision of
+> > this series).
+>
+>
+> We want to keep using ebpf  for the s/w datapath if that is not clear by =
+now.
+> I do not understand the obstructionism tbh. Are users allowed to use
+> kfuncs as part of infra or not? My understanding is yes.
+> This community is getting too political and my worry is that we have
+> corporatism creeping in like it is in standards bodies.
+> We started by not using ebpf. The same people who are objecting now
+> went up in arms and insisted we use ebpf. As a member of this
+> community, my motivation was to meet them in the middle by
+> compromising. We invested another year to move to that middle ground.
+> Now they are insisting we do not use ebpf because they dont like our
+> design or how we are using ebpf or maybe it's not a use case they have
+> any need for or some other politics. I lost track of the moving goal
+> posts. Open source is about solving your itch. This code is entirely
+> on TC, zero code changed in ebpf core. The new goalpost is based on
+> emotional outrage over use of functions. The whole thing is getting
+> extremely toxic.
+>
 
-Signed-off-by: Jun Gu <jun.gu@easystack.cn>
-Acked-by: Eelco Chaudron <echaudro@redhat.com>
----
- net/openvswitch/vport-netdev.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+Paolo,
+Following up since no movement for a week now;->
+I am going to give benefit of doubt that there was miscommunication or
+misunderstanding for all the back and forth that has happened so far
+with the nackers. I will provide a summary below on the main points
+raised and then provide responses:
 
-diff --git a/net/openvswitch/vport-netdev.c b/net/openvswitch/vport-netdev.c
-index 903537a5da22..618edc346c0f 100644
---- a/net/openvswitch/vport-netdev.c
-+++ b/net/openvswitch/vport-netdev.c
-@@ -78,7 +78,10 @@ struct vport *ovs_netdev_link(struct vport *vport, const char *name)
- 	int err;
- 
- 	vport->dev = dev_get_by_name(ovs_dp_get_net(vport->dp), name);
--	if (!vport->dev) {
-+	/* Ensure that the device exists and that the provided
-+	 * name is not one of its aliases.
-+	 */
-+	if (!vport->dev || strcmp(name, ovs_vport_name(vport))) {
- 		err = -ENODEV;
- 		goto error_free_vport;
- 	}
--- 
-2.25.1
+1) "Use maps"
 
+It doesnt make sense for our requirement. The reason we are using TC
+is because a) P4 has an excellent fit with TC match action paradigm b)
+we are targeting both s/w and h/w and the TC model caters well for
+this. The objects belong to TC, shared between s/w, h/w and control
+plane (and netlink is the API). Maybe this diagram would help:
+https://github.com/p4tc-dev/docs/blob/main/images/why-p4tc/p4tc-runtime-pip=
+eline.png
+
+While the s/w part stands on its own accord (as elaborated many
+times), for TC which has offloads, the s/w twin is introduced before
+the h/w equivalent. This is what this series is doing.
+
+2) "but ... it is not performant"
+This has been brought up in regards to netlink and kfuncs. Performance
+is a lower priority to P4 correctness and expressibility.
+Netlink provides us the abstractions we need, it works with TC for
+both s/w and h/w offload and has a lot of knowledge base for
+expressing control plane APIs. We dont believe reinventing all that
+makes sense.
+Kfuncs are a means to an end - they provide us the gluing we need to
+have an ebpf s/w datapath to the TC objects. Getting an extra
+10-100Kpps is not a driving factor.
+
+3) "but you did it wrong, here's how you do it..."
+
+I gave up on responding to this - but do note this sentiment is a big
+theme in the exchanges and consumed most of the electrons. We are
+_never_ going to get any consensus with statements like "tc actions
+are a mistake" or "use tcx".
+
+4) "... drop the kfunc patch"
+
+kfuncs essentially boil down to function calls. They don't require any
+special handling by the eBPF verifier nor introduce new semantics to
+eBPF. They are similar in nature to the already existing kfuncs
+interacting with other kernel objects such as nf_conntrack.
+The precedence (repeated in conferences and email threads multiple
+times) is: kfuncs dont have to be sent to ebpf list or reviewed by
+folks in the ebpf world. And We believe that rule applies to us as
+well. Either kfuncs (and frankly ebpf) is infrastructure glue or it's
+not.
+
+Now for a little rant:
+
+Open source is not a zero-sum game. Ebpf already coexists with
+netfilter, tc, etc and various subsystems happily.
+I hope our requirement is clear and i dont have to keep justifying why
+P4 or relitigate over and over again why we need TC. Open source is
+about scratching your itch and our itch is totally contained within
+TC. I cant help but feel that this community is getting way too
+pervasive with politics and obscure agendas. I understand agendas, I
+just dont understand the zero-sum thinking.
+My view is this series should still be applied with the nacks since it
+sits entirely on its own silo within networking/TC (and has nothing to
+do with ebpf).
+
+cheers,
+jamal
 
