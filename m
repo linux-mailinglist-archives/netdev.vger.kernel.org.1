@@ -1,143 +1,149 @@
-Return-Path: <netdev+bounces-89737-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89738-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BCB6F8AB600
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 22:32:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DA1D8AB60D
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 22:40:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5CEA91F21EF8
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 20:32:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 007982837D2
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 20:40:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DD9010A1B;
-	Fri, 19 Apr 2024 20:32:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA55F125AB;
+	Fri, 19 Apr 2024 20:40:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="FHGa/hhi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37A0C101C5;
-	Fri, 19 Apr 2024 20:32:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D553D3232;
+	Fri, 19 Apr 2024 20:40:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.49.90
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713558749; cv=none; b=uu8Xcv8CTeRkdPMmFJuxujbCGqxBc+eTlgU1r6nISBg9p6HGQC0PRD46FKImkSz25ClysL7uRIpUGtYs6B/y4MO8bzw3UFgsFt/rAXLQdEVeg9bEtwHprjD4jVQNfpW0Xi79eE71Q7oc48P1LrN3KwaiyLXNMfO6rMgZFUZzN5E=
+	t=1713559203; cv=none; b=jxUc65iGH1bSDVMDie+wK/qP+mM+Knfn3JoEmt7xchAe9l9pZe+idhtfO1Mqi03P/NHcRAIom/gjrZWl+IbN3pV1b2q7He/8u2PTBSiYp86uk9wzWIbxdj87a++Y34JqzyW8A49DRhqx0P02kk27geRsZKyOwhIP1d5ORUNGQJ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713558749; c=relaxed/simple;
-	bh=iIpahAw5PpHy24asSke5uHmNqC/cfIbo+GffosFW+yU=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=kNAsLDkcZsM+vgLxmJ1ZNlXMHa4yFoNGHTRODtknFtHdXT6KJGTFhyGUBiRfwyGWt6ihDSkAHzd8z7b67/8Hb+cSfeVEfwvX6ybIIjLy9Zd/3JR52WhHKDmhucB+sGColeQYeM3xnKJ8IKl+pC4HicX1uyh82VrjiQKYKj3yf/M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
-Received: from [192.168.1.105] (178.176.73.253) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Fri, 19 Apr
- 2024 23:32:17 +0300
-Subject: Re: [net-next RFC v3 6/7] net: ravb: Use NAPI threaded mode on 1-core
- CPUs with GbEth IP
-To: Paul Barker <paul.barker.ct@bp.renesas.com>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-CC: =?UTF-8?Q?Niklas_S=c3=b6derlund?= <niklas.soderlund+renesas@ragnatech.se>,
-	Geert Uytterhoeven <geert+renesas@glider.be>, <netdev@vger.kernel.org>,
-	<linux-renesas-soc@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-References: <20240415094804.8016-1-paul.barker.ct@bp.renesas.com>
- <20240415094804.8016-7-paul.barker.ct@bp.renesas.com>
-From: Sergey Shtylyov <s.shtylyov@omp.ru>
-Organization: Open Mobile Platform
-Message-ID: <66667ef2-2e0b-3c31-66ad-d6d6514919c7@omp.ru>
-Date: Fri, 19 Apr 2024 23:32:16 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+	s=arc-20240116; t=1713559203; c=relaxed/simple;
+	bh=daj69iQuPmHlidj57wnECNVMqOAzumWf8ig+6xOnVlk=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=G7ixomxWIBAK0RoItfZvyCo42gogSMAfTE1kOsdtHkhci8EegNpfXvfuZdYxn91oWGmdAk6/ImDLAJIT96CYeKvsUvAjo+uxv/EsWyZJ2MKd3P9Cg3X1Va5UjdbAAaofClQAuN8tMGnO1hoeQUJEH/35Fde1wg186Z06TPrQ3X0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=FHGa/hhi; arc=none smtp.client-ip=52.95.49.90
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1713559202; x=1745095202;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=IRuBkaMcszXg+KTdvnEUlTUzHHfrN+PqN5MSTK6YgWM=;
+  b=FHGa/hhiDRMTtdjL9Og9qb9Hvg8QRZ75EEr0FKx75JySEegqDVgjYcxE
+   HusD6VPgFxqJpFANH35TMUzBIAJV+mhhLWzcFbhr7L2vY/WhuaWui2Dvf
+   HKqxfF01yLouKvvR66qDvufZcrq0QYmx0GSMUrnT86ZYXsDPQDH0DQ4bf
+   k=;
+X-IronPort-AV: E=Sophos;i="6.07,214,1708387200"; 
+   d="scan'208";a="401460617"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Apr 2024 20:39:58 +0000
+Received: from EX19MTAUWA002.ant.amazon.com [10.0.21.151:36091]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.25.238:2525] with esmtp (Farcaster)
+ id 8d75b2de-2a2e-4d6e-9655-a255832ceedf; Fri, 19 Apr 2024 20:39:57 +0000 (UTC)
+X-Farcaster-Flow-ID: 8d75b2de-2a2e-4d6e-9655-a255832ceedf
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Fri, 19 Apr 2024 20:39:57 +0000
+Received: from 88665a182662.ant.amazon.com (10.119.231.92) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Fri, 19 Apr 2024 20:39:54 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <syzbot+f3f3eef1d2100200e593@syzkaller.appspotmail.com>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<pabeni@redhat.com>, <syzkaller-bugs@googlegroups.com>, <kuniyu@amazon.com>
+Subject: Re: [syzbot] [net?] KASAN: slab-use-after-free Read in unix_del_edges
+Date: Fri, 19 Apr 2024 13:39:45 -0700
+Message-ID: <20240419203945.2526-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <000000000000c1fa0506166fdcfe@google.com>
+References: <000000000000c1fa0506166fdcfe@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240415094804.8016-7-paul.barker.ct@bp.renesas.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 04/19/2024 20:13:24
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 59
-X-KSE-AntiSpam-Info: Lua profiles 184817 [Apr 19 2024]
-X-KSE-AntiSpam-Info: Version: 6.1.0.4
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 18 0.3.18
- b9d6ada76958f07c6a68617a7ac8df800bc4166c
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {relay has no DNS name}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.73.253 in (user)
- b.barracudacentral.org}
-X-KSE-AntiSpam-Info:
-	127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;omp.ru:7.1.1
-X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.73.253
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 59
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 04/19/2024 20:17:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 4/19/2024 5:31:00 PM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D042UWB001.ant.amazon.com (10.13.139.160) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On 4/15/24 12:48 PM, Paul Barker wrote:
+From: syzbot <syzbot+f3f3eef1d2100200e593@syzkaller.appspotmail.com>
+Date: Fri, 19 Apr 2024 02:39:21 -0700
+> Hello,
+> 
+> syzbot found the following issue on:
+> 
+> HEAD commit:    7b4f2bc91c15 Add linux-next specific files for 20240418
+> git tree:       linux-next
+> console output: https://syzkaller.appspot.com/x/log.txt?x=14a54a53180000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=ae644165a243bf62
+> dashboard link: https://syzkaller.appspot.com/bug?extid=f3f3eef1d2100200e593
+> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=155e53af180000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=128b1d53180000
+> 
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/524a18e6c5be/disk-7b4f2bc9.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/029f1b84d653/vmlinux-7b4f2bc9.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/c02d1542e886/bzImage-7b4f2bc9.xz
+> 
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+f3f3eef1d2100200e593@syzkaller.appspotmail.com
 
-> NAPI Threaded mode (along with the previously enabled SW IRQ Coalescing)
-> is required to improve network stack performance for single core SoCs
-> using the GbEth IP (currently the RZ/G2L SoC family and the RZ/G3S SoC).
-> 
-> This patch gives the following improvements during testing with iperf3.
-> 
->   * RZ/G2UL:
->     * TCP TX: +32% bandwidth (638Mbps -> 841Mbps)
->     * TXP RX: +8.8% bandwidth (667Mbps -> 726Mbps)
->     * UDP RX: +104% bandwidth (53Mbps -> 108Mbps)
-> 
->   * RZ/G3S:
->     * TCP TX: 29% bandwidth (529Mbps -> 681Mbps)
->     * UDP RX: +1290% bandwidth (6.46Mbps -> 90Mbps)
-> 
->   * RZ/Five:
->     * UDP RX: Test no longer crashes (0 -> 20 Mbps)
-> 
-> This patch gives the following reductions in performance in the same
-> testing:
-> 
->   * RZ/G2UL:
->     * UDP TX: -7.5% bandwidth (594Mbps -> 549Mbps)
-> 
->   * RZ/G3S:
->     * UDP TX: -5% bandwidth (625Mbps -> 594Mbps)
-> 
-> These losses are considered acceptable given the benefits shown above.
-> If UDP TX bandwidth must be maximised for a particular use case, NAPI
-> threaded mode can be disabled at runtime via sysfs writes.
-> 
-> The improvement of UDP RX bandwidth for the single core SoCs (RZ/G2UL &
-> RZ/G3S) is particularly critical.
-> 
-> Signed-off-by: Paul Barker <paul.barker.ct@bp.renesas.com>
+#syz test: git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git main
 
-Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
-
-[...]
-
-MBR, Sergey
+diff --git a/net/unix/garbage.c b/net/unix/garbage.c
+index 95240a59808f..039c1c8c73f4 100644
+--- a/net/unix/garbage.c
++++ b/net/unix/garbage.c
+@@ -158,11 +158,14 @@ static void unix_add_edge(struct scm_fp_list *fpl, struct unix_edge *edge)
+ 	unix_update_graph(unix_edge_successor(edge));
+ }
+ 
++static bool gc_in_progress;
++
+ static void unix_del_edge(struct scm_fp_list *fpl, struct unix_edge *edge)
+ {
+ 	struct unix_vertex *vertex = edge->predecessor->vertex;
+ 
+-	unix_update_graph(unix_edge_successor(edge));
++	if (!gc_in_progress)
++		unix_update_graph(unix_edge_successor(edge));
+ 
+ 	list_del(&edge->vertex_entry);
+ 	vertex->out_degree--;
+@@ -237,8 +240,10 @@ void unix_del_edges(struct scm_fp_list *fpl)
+ 		unix_del_edge(fpl, edge);
+ 	} while (i < fpl->count_unix);
+ 
+-	receiver = fpl->edges[0].successor;
+-	receiver->scm_stat.nr_unix_fds -= fpl->count_unix;
++	if (!gc_in_progress) {
++		receiver = fpl->edges[0].successor;
++		receiver->scm_stat.nr_unix_fds -= fpl->count_unix;
++	}
+ 	WRITE_ONCE(unix_tot_inflight, unix_tot_inflight - fpl->count_unix);
+ out:
+ 	WRITE_ONCE(fpl->user->unix_inflight, fpl->user->unix_inflight - fpl->count);
+@@ -550,8 +555,6 @@ static void unix_walk_scc_fast(struct sk_buff_head *hitlist)
+ 	list_replace_init(&unix_visited_vertices, &unix_unvisited_vertices);
+ }
+ 
+-static bool gc_in_progress;
+-
+ static void __unix_gc(struct work_struct *work)
+ {
+ 	struct sk_buff_head hitlist;
 
