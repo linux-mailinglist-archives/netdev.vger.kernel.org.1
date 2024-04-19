@@ -1,176 +1,195 @@
-Return-Path: <netdev+bounces-89624-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89625-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2F938AAEDC
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 14:54:32 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id DDCBC8AAEDE
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 14:55:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8AA3D283AF2
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 12:54:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 48794B2260F
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 12:55:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CD6D8565D;
-	Fri, 19 Apr 2024 12:54:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1740C8529A;
+	Fri, 19 Apr 2024 12:55:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y4KDXKFw"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O18/6UxX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com [209.85.128.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E34E80022
-	for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 12:54:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 814741DFC7;
+	Fri, 19 Apr 2024 12:55:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713531268; cv=none; b=krFgu87pbXWH3+cBCaJsPxdOF+A3g+Ld1Mhv3AhTSGspOK3F/A+NuTKn6Plb8VQywLy8wIhtHJYoTO45TCpYl/UNQ8No0rykW6T+BO9Q0mFFbyycumJRXQ0zS1tRgQE2x4FN8SAtT0Ejq9lN76xGCI3yS87vGYzGjp6VN8Oo/GQ=
+	t=1713531305; cv=none; b=e+XDrvj977H9RD5IL4P2w9MemZx82Nhc0ShB6WUSAkCZ/eYAD2+FJvb3M5MzCYHsLYTweJX/oRkHOb7A6KlzD7/j1KY+QYS8icrhzy7EPbiRD1iSJHgfiHN88WvsWqerYMl6U+anPmjruqvAna5JRHzecO9KhwqNzEQcWjslpkY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713531268; c=relaxed/simple;
-	bh=Vi8RVGKvtTRJKhQGrAK+KGxIMFOR7j+BkbFN8Y8KUWg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=n6TrIWwKM70wuKGRfCu74TFP1B8u2O/QaMCO2pht6n488C/CdsCyTNPo7Ei0DLDRVKupm3a1j5kbHKhtpBMZoEKc/1xlXmLLC2VPPZCJe3L2EYKK9mvX74fHhQseel+tIB1UeMnALXO+ebvUPJm1u7R/oyudixVvgFphdSTTVnI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Y4KDXKFw; arc=none smtp.client-ip=209.85.214.176
+	s=arc-20240116; t=1713531305; c=relaxed/simple;
+	bh=AUCkt1kK8U9Sn/QbGufhk58XRsFaexENYXsHPMuK5JI=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=nl6kEEZj7w1aj68lHEHUy77CDf8VFYjeiw7xebhsqDCzMsBIjsMP8PppsEWvruwjs0vFb5LJ+E8jAnKTMpIxYVCWR2D0WHQl7U4/50t5E4t6v0myhUx1G9rEP0aSCvHSAkpw2iziqqY5J1NJ4zfd3HLMYTTZ9PwgRnOMx9yTUmQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=O18/6UxX; arc=none smtp.client-ip=209.85.128.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-1e0bec01232so16651815ad.3
-        for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 05:54:27 -0700 (PDT)
+Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-617dfcf80aeso22111597b3.3;
+        Fri, 19 Apr 2024 05:55:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713531267; x=1714136067; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=e1ptde74k3WYzhPH0umlAbgdQd31wn7b98/aCs2C+LU=;
-        b=Y4KDXKFwHrEVd9yj1tQoGmTn/xL8irD6aN3+RFkKRfGABURnctDEwFOdKWoqJs/dBj
-         w+Vwappzx8xNWAXJixEbGbd4SBrzj5gOyuc5AXhF0TjIdOcoho5xgKZHAe4d6NR7xyC8
-         azg1evN0E9mARilYDxnJIVG1WYwXmNSK9UucaWghwAtxbDztX99ls8nv0yox/Qk6wwW+
-         NLPJkrSe1S/EvEayU7NenZEmAj7nE1I+Dbeyqun8yg/Q+i5uDIz8yE/dXqNhjhmF1EGu
-         Q8ac/x+kUKf+T2I1RXd5U+h6V6VLU1X2704emNycHhar9qtJGiUTXCoRVVVHNMTaWyN8
-         56rw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713531267; x=1714136067;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1713531302; x=1714136102; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=e1ptde74k3WYzhPH0umlAbgdQd31wn7b98/aCs2C+LU=;
-        b=bfHGRFaQ/ElMqR5RJQJU3gw81rFHiz4w8RUQxcgkm1R8OakE75K/jwiw4ZBioDT8Lo
-         F32F9zP/Bo5oyrQBGJH5yrsR0U+PE54VMy2xh4g0VlxK6Tr2UVPe6Pglp/3AVAyEyS3b
-         IXyZ6R6awKIyaAhUUmKF+mNtFYctg8kJGQ88nXV7FqTQp9ahCV6WMPWMZC0gvzaLSbYq
-         p0cFq4xFBCQtCdpuAT9mez2zI/LiOxB0PFaaW2GgBBCnTLpQ9etfs8FuI8OxaSq6vJEy
-         z0cVcL6thkjrhwsQX0ieNFcBOMliXs4qam1itCR7rVarrJ2040leaeMSWkcM4BGchyId
-         wnvw==
-X-Forwarded-Encrypted: i=1; AJvYcCW4jUTjhW345zkcQ6wBtqmGj03tTh7/DppvWETWKLrqeVRZaIPOhuYWdJCKVeLprF4LZoDtd/zsKSQgrA/odK41JyIpQDrZ
-X-Gm-Message-State: AOJu0Yx8js6Xle3f5QH/jBbnTR4tb9xw06AStZPwUw755un0fQDy2CUB
-	BWlgHdXOfHe3fz9o5xhR8rnEOukwRY/9DuRtSpTeew5mJHom7k7V
-X-Google-Smtp-Source: AGHT+IHNgHHMxBHnlW+7hCO4BbgNwagABXy6hCXLU1OETb01yjoHQluESdOgU4/yP2uu2aJF8h3lLg==
-X-Received: by 2002:a17:902:db02:b0:1e0:a4c9:84cd with SMTP id m2-20020a170902db0200b001e0a4c984cdmr2470549plx.60.1713531266584;
-        Fri, 19 Apr 2024 05:54:26 -0700 (PDT)
-Received: from Laptop-X1 ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id bf5-20020a170902b90500b001e7b82f33eesm3268554plb.291.2024.04.19.05.54.24
+        bh=3k/zISqeTAlPurWEOHJktO+2lC/J+SuXwkImcovDbVY=;
+        b=O18/6UxXBZkT+qkGzNrpGuX9yL3DL4v0tDoG8hUZl7kn5j0aYQyPssDAaySqI4i2ow
+         pxALCZvwUzOq1lGsWQHY+NEKN6DckISQI2KDg+rat7Q2H9aiVi0fEGN4CzJz9VrrkZAR
+         Ehm0ETDIlz01go0qWrDyLP9uaSMNdgL+VTraBhImaac0l7Nuv1j0xUK3nYOdiwHhPgGS
+         Ld2uAUnCKbdK6MYt2t/wNhW15zGJXhPcu53pW2ebWHunGPOJrl2EY5snPGOf2S3daqy1
+         HYkgvNPher2ujyuZbw7/wv/dlA1CZz+ZiUWS1WxnYsWvDwh5/kV1k0GgJuL6xmmWywha
+         380A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713531302; x=1714136102;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=3k/zISqeTAlPurWEOHJktO+2lC/J+SuXwkImcovDbVY=;
+        b=Gz151NE5CnUy2x0ZuOCJxXCUZ9+10uJnU4AyXtNJV2doLHMUuydLwdEEQASumBwQ52
+         rd05lcx4VMy4f1NyUt3f/JInrsQOFMZuXLV8XhQVPeA+h+CNjyFu0Ox5ysEXJkclWZ+Z
+         MCLSb+9r1e5MVbzHmc3pf9XTe652JuC7sy5gAaH7bk3KkqPaDvTWhdC1vXZq1CH+Wjls
+         q2nib51WRCwIuOQCcvub7B2rW9JaQF7jpLTAN5qKRKMHFFBXfU9laJQFdUpRhxiPdNgz
+         LeZbO1rs+t4a+hLQHwuEEKgTNpa2WM+cXZQahe6sW8e5/oWK4wumwJlE3gcWfKJHfLR/
+         TR5w==
+X-Forwarded-Encrypted: i=1; AJvYcCW3gdbJJUOw7pKyTphSzXFiIH1RWufy5Upp/QFIkH6PWOw429bvZ84xJFX8tTXBm6uw2TkiNsWRf+RvmnNIndAQ97czHa+Yh3P3p2p96SOe
+X-Gm-Message-State: AOJu0Yy7ewrZ9ibqR/40fBk2WrIrCtS4FghTv85I2qIJ/efWQocK0Gk0
+	NCfnYb0cl6v3tl/F6jIpFlKgaaUOA6sGvIWKS3QLx/RsZCp0Cn4r
+X-Google-Smtp-Source: AGHT+IEbewqNCYrqVL68B212x1ovRfytMXJkimMl1lCcqOmm3OkF+bRUQ+dcGB4HpQH/Rh/ejOOIMA==
+X-Received: by 2002:a25:fc04:0:b0:dcd:63f8:ba32 with SMTP id v4-20020a25fc04000000b00dcd63f8ba32mr1528533ybd.65.1713531302258;
+        Fri, 19 Apr 2024 05:55:02 -0700 (PDT)
+Received: from localhost (73.84.86.34.bc.googleusercontent.com. [34.86.84.73])
+        by smtp.gmail.com with ESMTPSA id c18-20020a0ce152000000b0069b4d64ab0bsm1511115qvl.138.2024.04.19.05.55.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 Apr 2024 05:54:26 -0700 (PDT)
-Date: Fri, 19 Apr 2024 20:54:21 +0800
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: 'Simon Horman' <horms@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jay Vosburgh <j.vosburgh@gmail.com>,
-	Andy Gospodarek <andy@greyhouse.net>,
-	Ding Tianhong <dingtianhong@huawei.com>,
-	Sam Sun <samsun1006219@gmail.com>, netdev@vger.kernel.org
-Subject: Re: [PATCH net v4] bonding: Fix out-of-bounds read in
- bond_option_arp_ip_targets_set()
-Message-ID: <ZiJpfZQb_yA936Wh@Laptop-X1>
-References: <20240419-bond-oob-v4-1-69dd1a66db20@kernel.org>
+        Fri, 19 Apr 2024 05:55:01 -0700 (PDT)
+Date: Fri, 19 Apr 2024 08:55:01 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>, 
+ davem@davemloft.net
+Cc: netdev@vger.kernel.org, 
+ edumazet@google.com, 
+ pabeni@redhat.com, 
+ shuah@kernel.org, 
+ petrm@nvidia.com, 
+ linux-kselftest@vger.kernel.org, 
+ willemdebruijn.kernel@gmail.com, 
+ Jakub Kicinski <kuba@kernel.org>
+Message-ID: <662269a5a74a8_116a9b29483@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20240418233844.2762396-7-kuba@kernel.org>
+References: <20240418233844.2762396-1-kuba@kernel.org>
+ <20240418233844.2762396-7-kuba@kernel.org>
+Subject: Re: [PATCH net-next v4 6/7] selftests: drv-net: add a TCP ping test
+ case (and useful helpers)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240419-bond-oob-v4-1-69dd1a66db20@kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Apr 19, 2024 at 12:08:25PM +0100, 'Simon Horman' wrote:
-> From: Sam Sun <samsun1006219@gmail.com>
+Jakub Kicinski wrote:
+> More complex tests often have to spawn a background process,
+> like a server which will respond to requests or tcpdump.
 > 
-> In function bond_option_arp_ip_targets_set(), if newval->string is an
-> empty string, newval->string+1 will point to the byte after the
-> string, causing an out-of-bound read.
+> Add support for creating such processes using the with keyword:
 > 
-> BUG: KASAN: slab-out-of-bounds in strlen+0x7d/0xa0 lib/string.c:418
-> Read of size 1 at addr ffff8881119c4781 by task syz-executor665/8107
-> CPU: 1 PID: 8107 Comm: syz-executor665 Not tainted 6.7.0-rc7 #1
-> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
-> Call Trace:
->  <TASK>
->  __dump_stack lib/dump_stack.c:88 [inline]
->  dump_stack_lvl+0xd9/0x150 lib/dump_stack.c:106
->  print_address_description mm/kasan/report.c:364 [inline]
->  print_report+0xc1/0x5e0 mm/kasan/report.c:475
->  kasan_report+0xbe/0xf0 mm/kasan/report.c:588
->  strlen+0x7d/0xa0 lib/string.c:418
->  __fortify_strlen include/linux/fortify-string.h:210 [inline]
->  in4_pton+0xa3/0x3f0 net/core/utils.c:130
->  bond_option_arp_ip_targets_set+0xc2/0x910
-> drivers/net/bonding/bond_options.c:1201
->  __bond_opt_set+0x2a4/0x1030 drivers/net/bonding/bond_options.c:767
->  __bond_opt_set_notify+0x48/0x150 drivers/net/bonding/bond_options.c:792
->  bond_opt_tryset_rtnl+0xda/0x160 drivers/net/bonding/bond_options.c:817
->  bonding_sysfs_store_option+0xa1/0x120 drivers/net/bonding/bond_sysfs.c:156
->  dev_attr_store+0x54/0x80 drivers/base/core.c:2366
->  sysfs_kf_write+0x114/0x170 fs/sysfs/file.c:136
->  kernfs_fop_write_iter+0x337/0x500 fs/kernfs/file.c:334
->  call_write_iter include/linux/fs.h:2020 [inline]
->  new_sync_write fs/read_write.c:491 [inline]
->  vfs_write+0x96a/0xd80 fs/read_write.c:584
->  ksys_write+0x122/0x250 fs/read_write.c:637
->  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
->  do_syscall_64+0x40/0x110 arch/x86/entry/common.c:83
->  entry_SYSCALL_64_after_hwframe+0x63/0x6b
-> ---[ end trace ]---
+>   with bkg("my-daemon", ..):
+>      # my-daemon is alive in this block
 > 
-> Fix it by adding a check of string length before using it.
+> My initial thought was to add this support to cmd() directly
+> but it runs the command in the constructor, so by the time
+> we __enter__ it's too late to make sure we used "background=True".
 > 
-> Fixes: f9de11a16594 ("bonding: add ip checks when store ip target")
-> Signed-off-by: Yue Sun <samsun1006219@gmail.com>
-> Signed-off-by: Simon Horman <horms@kernel.org>
+> Second useful helper transplanted from net_helper.sh is
+> wait_port_listen().
+> 
+> The test itself uses socat, which insists on v6 addresses
+> being wrapped in [], it's not the only command which requires
+> this format, so add the wrapped address to env. The hope
+> is to save test code from checking if address is v6.
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 > ---
-> Changes in v4 (Simon):
-> - Correct  whitespace mangled patch; posting as requested by Sam Sun
-> - Link to v3: https://lore.kernel.org/r/CAEkJfYOnsLLiCrtgOpq2Upr+_W0dViYVHU8YdjJOi-mxD8H9oQ@mail.gmail.com
+>  .../selftests/drivers/net/lib/py/env.py       |  4 +++
+>  tools/testing/selftests/drivers/net/ping.py   | 24 ++++++++++++-
+>  tools/testing/selftests/net/lib/py/utils.py   | 35 +++++++++++++++++++
+>  3 files changed, 62 insertions(+), 1 deletion(-)
 > 
-> Changes in v3 (Sam Sun):
-> - According to Hangbin's opinion, change Fixes tag from 4fb0ef585eb2
->   ("bonding: convert arp_ip_target to use the new option API") to
->   f9de11a16594 ("bonding: add ip checks when store ip target").
-> - Link to v2: https://lore.kernel.org/r/CAEkJfYMdDQKY1C-wBZLiaJ=dCqfM9r=rykwwf+J-XHsFp7D9Ag@mail.gmail.com/
-> 
-> Changes in v2 (Sam Sun):
-> - According to Jay and Hangbin's opinion, remove target address in
->   netdev_err message since target is not initialized in error path and
->   will not provide useful information.
-> - Link to v1: https://lore.kernel.org/r/CAEkJfYPYF-nNB2oiXfXwjPG0VVB2Bd8Q8kAq+74J=R+4HkngWw@mail.gmail.com/
-> ---
->  drivers/net/bonding/bond_options.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/net/bonding/bond_options.c b/drivers/net/bonding/bond_options.c
-> index 0cacd7027e35..64a06e3399ee 100644
-> --- a/drivers/net/bonding/bond_options.c
-> +++ b/drivers/net/bonding/bond_options.c
-> @@ -1214,9 +1214,9 @@ static int bond_option_arp_ip_targets_set(struct bonding *bond,
->  	__be32 target;
+> diff --git a/tools/testing/selftests/drivers/net/lib/py/env.py b/tools/testing/selftests/drivers/net/lib/py/env.py
+> index 579c5b34e6fd..2f62270d59fa 100644
+> --- a/tools/testing/selftests/drivers/net/lib/py/env.py
+> +++ b/tools/testing/selftests/drivers/net/lib/py/env.py
+> @@ -110,6 +110,10 @@ from .remote import Remote
+>          self.addr = self.v6 if self.v6 else self.v4
+>          self.remote_addr = self.remote_v6 if self.remote_v6 else self.remote_v4
 >  
->  	if (newval->string) {
-> -		if (!in4_pton(newval->string+1, -1, (u8 *)&target, -1, NULL)) {
-> -			netdev_err(bond->dev, "invalid ARP target %pI4 specified\n",
-> -				   &target);
-> +		if (!(strlen(newval->string)) ||
-> +		    !in4_pton(newval->string + 1, -1, (u8 *)&target, -1, NULL)) {
-> +			netdev_err(bond->dev, "invalid ARP target I4 specified\n");
+> +        # Bracketed addresses, some commands need IPv6 to be inside []
+> +        self.baddr = f"[{self.v6}]" if self.v6 else self.v4
+> +        self.remote_baddr = f"[{self.remote_v6}]" if self.remote_v6 else self.remote_v4
+> +
+>          self.ifname = self.dev['ifname']
+>          self.ifindex = self.dev['ifindex']
+>  
+> diff --git a/tools/testing/selftests/drivers/net/ping.py b/tools/testing/selftests/drivers/net/ping.py
+> index 9f65a0764aab..15a0bdcb46e2 100755
+> --- a/tools/testing/selftests/drivers/net/ping.py
+> +++ b/tools/testing/selftests/drivers/net/ping.py
+> @@ -1,9 +1,12 @@
+>  #!/usr/bin/env python3
+>  # SPDX-License-Identifier: GPL-2.0
+>  
+> +import random
+> +
+>  from lib.py import ksft_run, ksft_exit
+> +from lib.py import ksft_eq
+>  from lib.py import NetDrvEpEnv
+> -from lib.py import cmd
+> +from lib.py import bkg, cmd, wait_port_listen
+>  
+>  
+>  def test_v4(cfg) -> None:
+> @@ -16,6 +19,25 @@ from lib.py import cmd
+>      cmd(f"ping -c 1 -W0.5 {cfg.v6}", host=cfg.remote)
+>  
+>  
+> +def test_tcp(cfg) -> None:
+> +    port = random.randrange(1024 + (1 << 15))
 
-Hi Simon, the error message should be "invalid ARP target specified\n"
+Intended to be 1024 + random.randrange(1 << 15)?
 
-Thanks
-Hangbin
+> +
+> +    with bkg(f"socat -t 2 -u TCP-LISTEN:{port} STDOUT", exit_wait=True) as nc:
+
+Perhaps add reuseaddr to all tests with hand picked ports?
+
+I guess that here the client initiates the close and hits the
+TIME_WAIT. But not sure.
+
+The odds of consecutive tests picking the same random ports are low.
+But as we add tests and they are run in continuous testing, that
+can become an annoying source of flaky runs.
+
+> +        wait_port_listen(port)
+> +
+> +        cmd(f"echo ping | socat -t 2 -u STDIN TCP:{cfg.baddr}:{port}",
+> +            shell=True, host=cfg.remote)
+> +    ksft_eq(nc.stdout.strip(), "ping")
+> +
+> +    port = random.randrange(1024 + (1 << 15))
+> +    with bkg(f"socat -t 2 -u TCP-LISTEN:{port} STDOUT", host=cfg.remote,
+> +             exit_wait=True) as nc:
+> +        wait_port_listen(port, host=cfg.remote)
+> +
+> +        cmd(f"echo ping | socat -t 2 -u STDIN TCP:{cfg.remote_baddr}:{port}", shell=True)
+> +    ksft_eq(nc.stdout.strip(), "ping")
+> +
+> +
 
