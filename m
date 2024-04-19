@@ -1,249 +1,330 @@
-Return-Path: <netdev+bounces-89509-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89510-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BBE38AA7D1
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 06:57:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 669D08AA80A
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 07:46:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 43C02B21501
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 04:57:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1E6B1285288
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 05:46:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 968798BE2;
-	Fri, 19 Apr 2024 04:56:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67420BA39;
+	Fri, 19 Apr 2024 05:46:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="Ubcp+33G";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="BQ3/qSU0"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Of6Zk3ml"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0434EC2;
-	Fri, 19 Apr 2024 04:56:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F074748E
+	for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 05:46:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713502618; cv=none; b=ZeMrgysCaUV4K+xrFVBeq7QzoeEM/d99ibk2mL/qy+9bZn7lraxoVbOXdou0/e7+L1Og8bVR0DQEZZUXWcoAGRiwPOT6P9ivqc2i+AZPouCQfMiyusem7B++l8GPT7jh6Jp6ElrItJroMieQ72aQRjSjbclOMz++dlqECJUnd7Q=
+	t=1713505604; cv=none; b=jY0ZdYA1wxjjfPyWeRqbz+LIcuus72M5xwnrtBq0Vpts1nq30gFbraSEgO2el2NGGoZTAAvTsYbn4FsfCBtxpbtL6PfUr+QDo2pwSB+MrV3gv+gNvfLLLv8MPcannHucNyo0mCMPqYopkzlU7EBa1B1P4Vv/mwPvuHTxYb7CWOw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713502618; c=relaxed/simple;
-	bh=LhcICYrRiV8xiViW1aHl2GXVz/KKPmpuIQ2A7GqnOoY=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:MIME-Version:
-	 Content-Type; b=UA6y6LOmtS5HpDm03M04drHOETwcX/hAT2gb5xM8ovSZOMv3j8U4+vlxH3h3cSWwjFfwb9O8EjH+LgYqEmv7Lbj3zC/tieXelrL/2EHLEMBLf0XWPauJK6rbrKqNqHlJKVnzebHtz9HwLC8g7tKyhi4oC2lEXzNN6FT8TVf3hWo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=Ubcp+33G; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=BQ3/qSU0; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1713502615;
+	s=arc-20240116; t=1713505604; c=relaxed/simple;
+	bh=3/4Om9XArS/GDgc6J3/7qGIMp+gqqVJhE716DUK3MIo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Tc3aUkabyrT1I/bqa45q2CFimNsZ+MaFUG9+3mFIGwP4W2NyAJh/B1UL85c2QArzOpQD/XYF/zKVOP8dwTe/qHjsGoiDE5MavZskJPokoIlsXvULNgrZUrkQcry1bUSyb/+McrEP0fAyrEtFvWsHv1PUB7xDrgsdXQT5ufrBUnc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Of6Zk3ml; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1713505601;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to; bh=uupDmNKjCkWvyJzlSeacjHDiwKRL52cSr4mj/5PyHbE=;
-	b=Ubcp+33GXD1D6YMtyUumZMG9dCmM1NvFOpKB3ePpKPp9FUGY3JD742t01872e+3hJRdvt3
-	Who4lGkyv94z7V0UOTOUYhdrjioKQQoUpACAWpfbMJy6/B+vuYC+XsrVRbf15BXNuaSyrp
-	1G9i/ab7rblbSDVg6gy9jmI4i4vUgahn4J9ud+KA7F4tYn0Li7orD0N2VTW1f7NPSYvbN+
-	Q2YX9Q2VyYy+uf3uvxHyj+svgcanlXeEIdrtDJ01jmcMjNi6f1we+zrOIUdoId7E33oH0h
-	vGWtd15/mbw4bJIwad9xA1CQ1ETDM60eKHa1JMmGJ2kHrbYWp2gOkM5q/3n4uA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1713502615;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to; bh=uupDmNKjCkWvyJzlSeacjHDiwKRL52cSr4mj/5PyHbE=;
-	b=BQ3/qSU0hDlNBGZZTPLG8xtJYVU98bQicJU5MO2P9OaLa5KRVzFRnG31XvCkYi2kYa26DP
-	5DYDXMYEhtZLeADw==
-To: Mahesh Bandewar <maheshb@google.com>, Netdev <netdev@vger.kernel.org>,
- Linux <linux-kernel@vger.kernel.org>, David Miller <davem@davemloft.net>,
- Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Richard Cochran
- <richardcochran@gmail.com>, Arnd Bergmann <arnd@arndb.de>, Sagi Maimon
- <maimon.sagi@gmail.com>
-Cc: Jonathan Corbet <corbet@lwn.net>, John Stultz <jstultz@google.com>,
- Mahesh Bandewar <mahesh@bandewar.net>, Mahesh Bandewar
- <maheshb@google.com>
-Subject: Re: [PATCHv2 next] ptp: update gettimex64 to provide ts optionally
- in mono-raw base.
-In-Reply-To: <20240418042706.1261473-1-maheshb@google.com>
-Date: Fri, 19 Apr 2024 06:56:43 +0200
-Message-ID: <87cyqmx850.ffs@tglx>
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xO5OkCkwVfVKhznHFvYo//+nXymux3RbsEsLQzsDhTY=;
+	b=Of6Zk3ml649QU9GPsrK5+htC7XgoOpB5PXab1+PrZA9seD1VLmBtKnGPWLH4txiQQAgkja
+	UB9GqOcsV3jI/+KFUhUACw6W+6wTmj3Lg6T1MCj8zi1WVxntjs58EgqFClIPkgSEdjVUha
+	VEq4BEGLTrmW3hBKLJI3BP0PLKjY9vY=
+Received: from mail-pl1-f197.google.com (mail-pl1-f197.google.com
+ [209.85.214.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-518-QBd6GRKXObyTu418MezCCA-1; Fri, 19 Apr 2024 01:46:38 -0400
+X-MC-Unique: QBd6GRKXObyTu418MezCCA-1
+Received: by mail-pl1-f197.google.com with SMTP id d9443c01a7336-1e2a1619cfcso17302525ad.0
+        for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 22:46:38 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713505597; x=1714110397;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=xO5OkCkwVfVKhznHFvYo//+nXymux3RbsEsLQzsDhTY=;
+        b=NS6Dy1GerWmXOFpZn9VIaFvctOgT12zVUKL21Sa7m7Fcbc4UkRVTPAIAWONjEUICoI
+         WIOpXuXHcaePckEHeuJtjBRM0R+izDyPYVALp1eWWt+/E1v8KBlx0JPzF8fHTn70hgWf
+         7Un02LDEvkuZCXr6PhEFSm0BJkwgtz2Ag9+7aICcOyFcP1ouw6yIcdjRAvqtrT6Q5GgR
+         CrLTGherf4RpglTuv/U3kb4Po5JxhAYzBPeuFS/Pq/triAgVcgdWvFXW/qpAEhLILSsy
+         CuYH80BH71vLmhw7WTKfHfeUrrxyTKDDsDWpqn4ZgyQYxbYbUfjyZzwMNc77ibEfH5NN
+         IdhA==
+X-Forwarded-Encrypted: i=1; AJvYcCUC6Ek5e4FrUZtGb0MD/mWNa4n4B9d0IasPfAeBKjHPk9SirlnzdSCqe1k2Pxia/urP3JgU67KJC6TWLByxIfJs6NfCsP/F
+X-Gm-Message-State: AOJu0YwSVqmPSHE0d2iNoWxAHK9UAU4b26fb4/r86ZxurYpRFoZ8JPRd
+	Vbof/Pq+zzuCXwqe3I7i8K7hDrn9g9PF6gdqbH4C8N8qWv6BMTYNyXP8eXnI4MmIcVKoVm1gncZ
+	rvIp7XHH3eqJ+3Zu36ABC5keQKfur/JxMGWqi2pVrNDavC+4pAnVtSmqW9i0e+W7XZ+qpGiPfOf
+	Jmu21wZhWDnTVpU6lAWTQGD1ANtxmc
+X-Received: by 2002:a17:902:eac4:b0:1e4:733c:eac8 with SMTP id p4-20020a170902eac400b001e4733ceac8mr1564863pld.8.1713505597577;
+        Thu, 18 Apr 2024 22:46:37 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGwFe19+RxU43RLScHY24LofgUdMQlkqsgimSTrwOI2sZGtTylbmMZL5BgEQ7w2OqGymSIoGarWayL68GsSCG4=
+X-Received: by 2002:a17:902:eac4:b0:1e4:733c:eac8 with SMTP id
+ p4-20020a170902eac400b001e4733ceac8mr1564849pld.8.1713505597239; Thu, 18 Apr
+ 2024 22:46:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <20240411025127.51945-1-xuanzhuo@linux.alibaba.com>
+ <20240411025127.51945-5-xuanzhuo@linux.alibaba.com> <CACGkMEvhejnVM=x2+PxnKXcyC4W4nAbhkt4-reWb-7=fYQ6qKw@mail.gmail.com>
+ <1713428960.80807-1-xuanzhuo@linux.alibaba.com> <CACGkMEvDQ1Zs3Ya0TR1O8SANDEmBQ-+_2iFt7dpBDeE=i+PExQ@mail.gmail.com>
+ <1713500472.3614385-1-xuanzhuo@linux.alibaba.com>
+In-Reply-To: <1713500472.3614385-1-xuanzhuo@linux.alibaba.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Fri, 19 Apr 2024 13:46:25 +0800
+Message-ID: <CACGkMEsDB+tMFEvRtyDAz83dkd9fpuh51u=KyUZkgh+gizmK7g@mail.gmail.com>
+Subject: Re: [PATCH vhost 4/6] virtio_net: big mode support premapped
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: virtualization@lists.linux.dev, "Michael S. Tsirkin" <mst@redhat.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Apr 17 2024 at 21:27, Mahesh Bandewar wrote:
+On Fri, Apr 19, 2024 at 12:23=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba.=
+com> wrote:
+>
+> On Fri, 19 Apr 2024 08:43:43 +0800, Jason Wang <jasowang@redhat.com> wrot=
+e:
+> > On Thu, Apr 18, 2024 at 4:35=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.aliba=
+ba.com> wrote:
+> > >
+> > > On Thu, 18 Apr 2024 14:25:06 +0800, Jason Wang <jasowang@redhat.com> =
+wrote:
+> > > > On Thu, Apr 11, 2024 at 10:51=E2=80=AFAM Xuan Zhuo <xuanzhuo@linux.=
+alibaba.com> wrote:
+> > > > >
+> > > > > In big mode, pre-mapping DMA is beneficial because if the pages a=
+re not
+> > > > > used, we can reuse them without needing to unmap and remap.
+> > > > >
+> > > > > We require space to store the DMA address. I use the page.dma_add=
+r to
+> > > > > store the DMA address from the pp structure inside the page.
+> > > > >
+> > > > > Every page retrieved from get_a_page() is mapped, and its DMA add=
+ress is
+> > > > > stored in page.dma_addr. When a page is returned to the chain, we=
+ check
+> > > > > the DMA status; if it is not mapped (potentially having been unma=
+pped),
+> > > > > we remap it before returning it to the chain.
+> > > > >
+> > > > > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> > > > > ---
+> > > > >  drivers/net/virtio_net.c | 98 +++++++++++++++++++++++++++++++++-=
+------
+> > > > >  1 file changed, 81 insertions(+), 17 deletions(-)
+> > > > >
+> > > > > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> > > > > index 4446fb54de6d..7ea7e9bcd5d7 100644
+> > > > > --- a/drivers/net/virtio_net.c
+> > > > > +++ b/drivers/net/virtio_net.c
+> > > > > @@ -50,6 +50,7 @@ module_param(napi_tx, bool, 0644);
+> > > > >
+> > > > >  #define page_chain_next(p)     ((struct page *)((p)->pp))
+> > > > >  #define page_chain_add(p, n)   ((p)->pp =3D (void *)n)
+> > > > > +#define page_dma_addr(p)       ((p)->dma_addr)
+> > > > >
+> > > > >  /* RX packet size EWMA. The average packet size is used to deter=
+mine the packet
+> > > > >   * buffer size when refilling RX rings. As the entire RX ring ma=
+y be refilled
+> > > > > @@ -434,6 +435,46 @@ skb_vnet_common_hdr(struct sk_buff *skb)
+> > > > >         return (struct virtio_net_common_hdr *)skb->cb;
+> > > > >  }
+> > > > >
+> > > > > +static void sg_fill_dma(struct scatterlist *sg, dma_addr_t addr,=
+ u32 len)
+> > > > > +{
+> > > > > +       sg->dma_address =3D addr;
+> > > > > +       sg->length =3D len;
+> > > > > +}
+> > > > > +
+> > > > > +static void page_chain_unmap(struct receive_queue *rq, struct pa=
+ge *p)
+> > > > > +{
+> > > > > +       virtqueue_dma_unmap_page_attrs(rq->vq, page_dma_addr(p), =
+PAGE_SIZE,
+> > > > > +                                      DMA_FROM_DEVICE, 0);
+> > > > > +
+> > > > > +       page_dma_addr(p) =3D DMA_MAPPING_ERROR;
+> > > > > +}
+> > > > > +
+> > > > > +static int page_chain_map(struct receive_queue *rq, struct page =
+*p)
+> > > > > +{
+> > > > > +       dma_addr_t addr;
+> > > > > +
+> > > > > +       addr =3D virtqueue_dma_map_page_attrs(rq->vq, p, 0, PAGE_=
+SIZE, DMA_FROM_DEVICE, 0);
+> > > > > +       if (virtqueue_dma_mapping_error(rq->vq, addr))
+> > > > > +               return -ENOMEM;
+> > > > > +
+> > > > > +       page_dma_addr(p) =3D addr;
+> > > > > +       return 0;
+> > > > > +}
+> > > > > +
+> > > > > +static void page_chain_release(struct receive_queue *rq)
+> > > > > +{
+> > > > > +       struct page *p, *n;
+> > > > > +
+> > > > > +       for (p =3D rq->pages; p; p =3D n) {
+> > > > > +               n =3D page_chain_next(p);
+> > > > > +
+> > > > > +               page_chain_unmap(rq, p);
+> > > > > +               __free_pages(p, 0);
+> > > > > +       }
+> > > > > +
+> > > > > +       rq->pages =3D NULL;
+> > > > > +}
+> > > > > +
+> > > > >  /*
+> > > > >   * put the whole most recent used list in the beginning for reus=
+e
+> > > > >   */
+> > > > > @@ -441,6 +482,13 @@ static void give_pages(struct receive_queue =
+*rq, struct page *page)
+> > > > >  {
+> > > > >         struct page *end;
+> > > > >
+> > > > > +       if (page_dma_addr(page) =3D=3D DMA_MAPPING_ERROR) {
+> > > >
+> > > > This looks strange, the map should be done during allocation. Under
+> > > > which condition could we hit this?
+> > >
+> > > This first page is umapped before we call page_to_skb().
+> > > The page can be put back to the link in case of failure.
+> >
+> > See below.
+> >
+> > >
+> > >
+> > > >
+> > > > > +               if (page_chain_map(rq, page)) {
+> > > > > +                       __free_pages(page, 0);
+> > > > > +                       return;
+> > > > > +               }
+> > > > > +       }
+> > > > > +
+> > > > >         /* Find end of list, sew whole thing into vi->rq.pages. *=
+/
+> > > > >         for (end =3D page; page_chain_next(end); end =3D page_cha=
+in_next(end));
+> > > > >
+> > > > > @@ -456,8 +504,15 @@ static struct page *get_a_page(struct receiv=
+e_queue *rq, gfp_t gfp_mask)
+> > > > >                 rq->pages =3D page_chain_next(p);
+> > > > >                 /* clear chain here, it is used to chain pages */
+> > > > >                 page_chain_add(p, NULL);
+> > > > > -       } else
+> > > > > +       } else {
+> > > > >                 p =3D alloc_page(gfp_mask);
+> > > > > +
+> > > > > +               if (page_chain_map(rq, p)) {
+> > > > > +                       __free_pages(p, 0);
+> > > > > +                       return NULL;
+> > > > > +               }
+> > > > > +       }
+> > > > > +
+> > > > >         return p;
+> > > > >  }
+> > > > >
+> > > > > @@ -613,8 +668,6 @@ static struct sk_buff *page_to_skb(struct vir=
+tnet_info *vi,
+> > > > >                         return NULL;
+> > > > >
+> > > > >                 page =3D page_chain_next(page);
+> > > > > -               if (page)
+> > > > > -                       give_pages(rq, page);
+> > > > >                 goto ok;
+> > > > >         }
+> > > > >
+> > > > > @@ -640,6 +693,7 @@ static struct sk_buff *page_to_skb(struct vir=
+tnet_info *vi,
+> > > > >                         skb_add_rx_frag(skb, 0, page, offset, len=
+, truesize);
+> > > > >                 else
+> > > > >                         page_to_free =3D page;
+> > > > > +               page =3D NULL;
+> > > > >                 goto ok;
+> > > > >         }
+> > > > >
+> > > > > @@ -657,6 +711,11 @@ static struct sk_buff *page_to_skb(struct vi=
+rtnet_info *vi,
+> > > > >         BUG_ON(offset >=3D PAGE_SIZE);
+> > > > >         while (len) {
+> > > > >                 unsigned int frag_size =3D min((unsigned)PAGE_SIZ=
+E - offset, len);
+> > > > > +
+> > > > > +               /* unmap the page before using it. */
+> > > > > +               if (!offset)
+> > > > > +                       page_chain_unmap(rq, page);
+> > > > > +
+> > > >
+> > > > This sounds strange, do we need a virtqueue_sync_for_cpu() helper h=
+ere?
+> > >
+> > > I think we do not need that. Because the umap api does it.
+> > > We do not work with DMA_SKIP_SYNC;
+> >
+> > Well, the problem is unmap is too heavyweight and it reduces the
+> > effort of trying to avoid map/umaps as much as possible.
+> >
+> > For example, for most of the case DMA sync is just a nop. And such
+> > unmap() cause strange code in give_pages() as we discuss above?
+>
+> YES. You are right. For the first page, we just need to sync for cpu.
+> And we do not need to check the dma status.
+> But here (in page_to_skb), we need to call unmap, because this page is pu=
+t
+> to the skb.
 
-Subject: ptp: update gettimex64 to provide ts optionally in mono-raw base.
+Right, but issue still,
 
-Can we please have proper sentences without cryptic abbreviations? This
-is not twatter or SMS.
+The only case that we may hit
 
-Aside of that this is not about updating gettimex64(). The fact that
-this is an UAPI change is the real important information. gettimex64()
-is only the kernel side implementation detail.
+        if (page_dma_addr(page) =3D=3D DMA_MAPPING_ERROR)
 
-   ptp/ioctl: Support MONOTONIC_RAW timestamps forPTP_SYS_OFFSET_EXTENDED
+is when the packet is smaller than GOOD_COPY_LEN.
 
-or something like that. 
+So if we sync_for_cpu for the head page, we don't do:
 
-> The current implementation of PTP_SYS_OFFSET_EXTENDED provides
-> PHC reads in the form of [pre-TS, PHC, post-TS]. These pre and
-> post timestamps are useful to measure the width of the PHC read.
-> However, the current implementation provides these timestamps in
-> CLOCK_REALTIME only. Since CLOCK_REALTIME is disciplined by NTP
-> or NTP-like service(s), the value is subjected to change. This
-> makes some applications that are very sensitive to time change
-> have these timestamps delivered in different time-base.
+1) unmap in the receive_big()
+2) do snyc_for_cpu() just before skb_put_data(), so the page could be
+recycled to the pool without unmapping?
 
-The last sentence does not make any sense to me.
+And I think we should do something similar for the mergeable case?
 
-> This patch updates the gettimex64 / ioctl op PTP_SYS_OFFSET_EXTENDED
+Btw, I found one the misleading comment introduced by f80bd740cb7c9
 
-git grep 'This patch' Documentation/process/
+        /* copy small packet so we can reuse these pages */
+        if (!NET_IP_ALIGN && len > GOOD_COPY_LEN && tailroom >=3D shinfo_si=
+ze) {
 
-> to provide these (sandwich) timestamps optionally in
-> CLOCK_MONOTONIC_RAW timebase while maintaining the default behavior
-> or giving them in CLOCK_REALTIME.
+We're not copying but building skb around the head page.
 
-This change log lacks a proper explanation why this is needed and what's
-the purpose and benefit.
+Thanks
 
-Aside of that it fails to mention that using the currently unused
-reserved field is correct because CLOCK_REALTIME == 0. 
+>
+> Thanks.
+>
+>
+> >
+> > Thanks
+> >
+>
 
-> ~# testptp -d /dev/ptp0 -x 3 -y raw
-> extended timestamp request returned 3 samples
-> sample # 0: mono-raw time before: 371.548640128
->             phc time: 371.579671788
->             mono-raw time after: 371.548640912
-> sample # 1: mono-raw time before: 371.548642104
->             phc time: 371.579673346
->             mono-raw time after: 371.548642490
-> sample # 2: mono-raw time before: 371.548643320
->             phc time: 371.579674652
->             mono-raw time after: 371.548643756
-> ~# testptp -d /dev/ptp0 -x 3 -y real
-> extended timestamp request returned 3 samples
-> sample # 0: system time before: 1713243413.403474250
->             phc time: 385.699915490
->             system time after: 1713243413.403474948
-> sample # 1: system time before: 1713243413.403476220
->             phc time: 385.699917168
->             system time after: 1713243413.403476642
-> sample # 2: system time before: 1713243413.403477555
->             phc time: 385.699918442
->             system time after: 1713243413.403477961
-
-That takes up a lot of space, but what's the actual value of this
-information? Especially as there is no actual test case for this which
-people can use to validate the changes.
-
-> diff --git a/include/linux/ptp_clock_kernel.h b/include/linux/ptp_clock_kernel.h
-> index 6e4b8206c7d0..7563da6db09b 100644
-> --- a/include/linux/ptp_clock_kernel.h
-> +++ b/include/linux/ptp_clock_kernel.h
-> @@ -47,10 +47,12 @@ struct system_device_crosststamp;
->   * struct ptp_system_timestamp - system time corresponding to a PHC timestamp
->   * @pre_ts: system timestamp before capturing PHC
->   * @post_ts: system timestamp after capturing PHC
-> + * @clockid: clockid used for cpaturing timestamp
-
-cpaturing?
-
-s/timestamp/the system timestamps/
-
-Precision matters not only for PTP.
-
->   */
->  struct ptp_system_timestamp {
->  	struct timespec64 pre_ts;
->  	struct timespec64 post_ts;
-> +	clockid_t clockid;
->  };
->  
->  /**
-> @@ -457,14 +459,34 @@ static inline ktime_t ptp_convert_timestamp(const ktime_t *hwtstamp,
->  
->  static inline void ptp_read_system_prets(struct ptp_system_timestamp *sts)
->  {
-> -	if (sts)
-> -		ktime_get_real_ts64(&sts->pre_ts);
-> +	if (sts) {
-> +		switch (sts->clockid) {
-> +		case CLOCK_REALTIME:
-> +			ktime_get_real_ts64(&sts->pre_ts);
-> +			break;
-> +		case CLOCK_MONOTONIC_RAW:
-> +			ktime_get_raw_ts64(&sts->pre_ts);
-> +			break;
-> +		default:
-> +			break;
-> +		}
-> +	}
->  }
->  
->  static inline void ptp_read_system_postts(struct ptp_system_timestamp *sts)
->  {
-> -	if (sts)
-> -		ktime_get_real_ts64(&sts->post_ts);
-> +	if (sts) {
-> +		switch (sts->clockid) {
-> +		case CLOCK_REALTIME:
-> +			ktime_get_real_ts64(&sts->post_ts);
-> +			break;
-> +		case CLOCK_MONOTONIC_RAW:
-> +			ktime_get_raw_ts64(&sts->post_ts);
-> +			break;
-> +		default:
-> +			break;
-> +		}
-> +	}
->  }
->  
->  #endif
-> diff --git a/include/uapi/linux/ptp_clock.h b/include/uapi/linux/ptp_clock.h
-> index 053b40d642de..fc5825e72330 100644
-> --- a/include/uapi/linux/ptp_clock.h
-> +++ b/include/uapi/linux/ptp_clock.h
-> @@ -157,7 +157,12 @@ struct ptp_sys_offset {
->  
->  struct ptp_sys_offset_extended {
->  	unsigned int n_samples; /* Desired number of measurements. */
-> -	unsigned int rsv[3];    /* Reserved for future use. */
-> +	/* The original implementation provided timestamps (always) in
-> +	 * REALTIME clock-base. Since CLOCK_REALTIME is 0, adding
-> +	 * clockid doesn't break backward compatibility.
-> +	 */
-
-This wants to be in the change log.
-
-If you want to document the evolution of this data structure in a
-comment, then 'original implementation' is not really the best wording
-to use.
-
-I'd rather see the documentation fixed so that it uses proper kernel doc
-style for the whole data structure instead of having this mix of inline
-and tail comments along with a properly structured version information.
-
-/**
- * ptp_sys_offset_extended - Data structure for IOCTL_PTP_.....
- *
- * @n_samples:		Desired number of samples
- * ....
- * @...
- *
- * History:
- * V1:	Initial implementation
- *
- * V2:  Use the first reserved field for @clockid. That's backwards
- *      compatible for V1 user space because CLOCK_REALTIME is 0 and
- *	the reserved fields must be 0.
- */
-
-Or something like that. Hmm?
-
-Thanks,
-
-        tglx
 
