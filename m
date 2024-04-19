@@ -1,175 +1,137 @@
-Return-Path: <netdev+bounces-89696-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89697-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DEE5D8AB411
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 19:03:49 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5447D8AB416
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 19:04:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 769931F230DE
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 17:03:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 09E4F1F22FB9
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 17:04:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6C64139562;
-	Fri, 19 Apr 2024 17:03:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3592C137927;
+	Fri, 19 Apr 2024 17:03:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RUL9Opqg"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="g+SF+yfr"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from fllv0016.ext.ti.com (fllv0016.ext.ti.com [198.47.19.142])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4608712FB05;
-	Fri, 19 Apr 2024 17:03:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A4BF137C50;
+	Fri, 19 Apr 2024 17:03:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.142
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713546219; cv=none; b=nsMz7ChFXQUquMH/1LJKq3fciYWxhRA0ojHrmOV2zgTnLwgDSI0uP3hI7whCDzM4lKcWELNsxkiG1+OSwAe9W2bB2tcaIZ3x1bAP9WILtbK3eH43ra+5gZZcbmjef9ZEjunkP+6Yr4ESfrCzPz0zhhRmFW47WgGlxNBIr4aoa34=
+	t=1713546234; cv=none; b=gTPQFrFiuQWH7auBUvFDgEEKOLxH++1OyzdAY2f4kwOl4jsxnHdZFgj1o3pz0cb9KxYuMFwPY1p8urdI4OIM068pcHZT9QQrJbzSdAvr7S9N0tYRk+2F+jIu2sSfPk6vcX9Ox3wbQnnNgP6uUeQe08BQsOmmNDgJmJYMEF7Cxaw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713546219; c=relaxed/simple;
-	bh=jFxi5qZrScF2xjH3z+fMU0rA+S3WPw/R5/k/PlfLlD4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=M4ek9+vpT8JzKWf48sYDBD4TxWUGYKv1hvrhUh3Nxip5z2b4Fob52CcB8CoHsXPt/W9HDsthfVmv2LjwHOndiQcFEbyBDywszlnNn/inRk2Nv3mrWehTUbqJpLdaW7CA7ZT0ICC3p1ge+5Moq7+VQFeIAPBt3ijBXdevda2RjWA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RUL9Opqg; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20D36C3277B;
-	Fri, 19 Apr 2024 17:03:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713546218;
-	bh=jFxi5qZrScF2xjH3z+fMU0rA+S3WPw/R5/k/PlfLlD4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=RUL9Opqg9lVQKyIEyIuq2xjKwlBEmIHBH/IVoveA6aP2JLQi0uzPvTDRn7OmSzfgD
-	 nIb4g/5o2RBtfUp3FCsBZLo4UMhQBN8itmVTPuHB1vCt7tnCtqGOlM7w17hYv3aiWy
-	 FPRpIYW/h0QBF2/1gYcg2KSSl6cBIyHw8P1BRp78GQ/1rnAZNqj1HgINRQQE2y6kx8
-	 pa/lP0BVFbrI+oqwHSJpzLJUH1OONwzfgc8jyKWmKgwbnoS/jGKAA+PE+NrL1eKBBr
-	 VPLO+D3Fy9QluAkUMgIaLcYTb9+hJ5Az7wIHrpBlSplLPGXqXzT9s0UFhk3C1grs7n
-	 akOPXTz5YdCXA==
-Date: Fri, 19 Apr 2024 20:02:17 +0300
-From: Mike Rapoport <rppt@kernel.org>
-To: Song Liu <song@kernel.org>
-Cc: Mark Rutland <mark.rutland@arm.com>,
-	Peter Zijlstra <peterz@infradead.org>, linux-kernel@vger.kernel.org,
-	Alexandre Ghiti <alexghiti@rivosinc.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Bjorn Topel <bjorn@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	"David S. Miller" <davem@davemloft.net>,
-	Dinh Nguyen <dinguyen@kernel.org>,
-	Donald Dutile <ddutile@redhat.com>,
-	Eric Chanudet <echanude@redhat.com>,
-	Heiko Carstens <hca@linux.ibm.com>, Helge Deller <deller@gmx.de>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	Kent Overstreet <kent.overstreet@linux.dev>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nadav Amit <nadav.amit@gmail.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Puranjay Mohan <puranjay12@gmail.com>,
-	Rick Edgecombe <rick.p.edgecombe@intel.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-	Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
-	bpf@vger.kernel.org, linux-arch@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
-	linux-mm@kvack.org, linux-modules@vger.kernel.org,
-	linux-parisc@vger.kernel.org, linux-riscv@lists.infradead.org,
-	linux-s390@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, loongarch@lists.linux.dev,
-	netdev@vger.kernel.org, sparclinux@vger.kernel.org, x86@kernel.org
-Subject: Re: [PATCH v4 05/15] mm: introduce execmem_alloc() and execmem_free()
-Message-ID: <ZiKjmaDgz_56ovbv@kernel.org>
-References: <20240415075241.GF40213@noisy.programming.kicks-ass.net>
- <Zh1lnIdgFeM1o8S5@FVFF77S0Q05N.cambridge.arm.com>
- <Zh4nJp8rv1qRBs8m@kernel.org>
- <CAPhsuW6Pbg2k_Gu4dsBx+H8H5XCHvNdtEZJBPiG_eT0qqr9D1w@mail.gmail.com>
- <ZiE91CJcNw7gBj9g@kernel.org>
- <CAPhsuW4au6v8k8Ab7Ff6Yj64rGvZ7wkz=Xrgh8ZZtLyscpChqQ@mail.gmail.com>
- <ZiFd567L4Zzm2okO@kernel.org>
- <CAPhsuW5SL4_=ZXdHZV8o0KS+5Vf25UMvEKhRgFQLioFtf2pgoQ@mail.gmail.com>
- <ZiIVVBgaDN4RsroT@kernel.org>
- <CAPhsuW7WoU+a46FhqqH8f-3=ehxeD4wSgKDWegMin1pT49OSWw@mail.gmail.com>
+	s=arc-20240116; t=1713546234; c=relaxed/simple;
+	bh=QPtcxsnErCPN9wVboSbSwBYD9oCPYNM76lci9KbNS8o=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=FDxAzRHsdlnY5iyWCM4eH5vEjLGsie1mTCGcO/czvvxdlUK1tjqkwcjJLQGjGBV70ish6bdeUhdm4cZFSkVN4vqNnZGcRq1PnVhofmyqPIOGjQAvZ24YohsIVE3UkZvpVTG8zo+EJcQhVp4EpDfaTLts/OULIPJR5xu0C3RTbe8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=g+SF+yfr; arc=none smtp.client-ip=198.47.19.142
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from fllv0035.itg.ti.com ([10.64.41.0])
+	by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id 43JH3Rml007881;
+	Fri, 19 Apr 2024 12:03:27 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1713546207;
+	bh=2sBBZySipsaDQh6gta504lCyluXD40TKr8qXo3EeTnw=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=g+SF+yfrJ8X1kJ7leJTycFefJILN4OJVQCg6/hOaf/wroRyahFdbO+5utb3IMBU3K
+	 ZTb2lSnDmXli+C2UhZZNyFqeo1Z9CI/EPrCc39ptrAC7B5KRvlPUr8U9Jw0kWIOGSf
+	 hn/2j73TlfD32zvcFeBx+XhVSgcKsG59VC5VpbtY=
+Received: from DLEE114.ent.ti.com (dlee114.ent.ti.com [157.170.170.25])
+	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 43JH3R1o055295
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Fri, 19 Apr 2024 12:03:27 -0500
+Received: from DLEE115.ent.ti.com (157.170.170.26) by DLEE114.ent.ti.com
+ (157.170.170.25) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Fri, 19
+ Apr 2024 12:03:27 -0500
+Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DLEE115.ent.ti.com
+ (157.170.170.26) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Fri, 19 Apr 2024 12:03:27 -0500
+Received: from [10.168.167.103] (udb0273976.dhcp.ti.com [10.168.167.103])
+	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 43JH3Q2S059335;
+	Fri, 19 Apr 2024 12:03:26 -0500
+Message-ID: <1cf9c10b-5cf3-412a-83a5-e6891a18c2f1@ti.com>
+Date: Fri, 19 Apr 2024 11:03:26 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAPhsuW7WoU+a46FhqqH8f-3=ehxeD4wSgKDWegMin1pT49OSWw@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: ethernet: ti: am65-cpts: Fix PTPv1 message type
+ on TX packets
+To: Ravi Gunasekaran <r-gunasekaran@ti.com>, <s-vadapalli@ti.com>,
+        <rogerq@kernel.org>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <richardcochran@gmail.com>,
+        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, <srk@ti.com>,
+        <ed.trexel@hp.com>, <oem-support@audinate.com>
+References: <20240419080547.10682-1-r-gunasekaran@ti.com>
+Content-Language: en-US
+From: Jason Reeder <jreeder@ti.com>
+In-Reply-To: <20240419080547.10682-1-r-gunasekaran@ti.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 
-On Fri, Apr 19, 2024 at 08:54:40AM -0700, Song Liu wrote:
-> On Thu, Apr 18, 2024 at 11:56 PM Mike Rapoport <rppt@kernel.org> wrote:
-> >
-> > On Thu, Apr 18, 2024 at 02:01:22PM -0700, Song Liu wrote:
-> > > On Thu, Apr 18, 2024 at 10:54 AM Mike Rapoport <rppt@kernel.org> wrote:
-> > > >
-> > > > On Thu, Apr 18, 2024 at 09:13:27AM -0700, Song Liu wrote:
-> > > > > On Thu, Apr 18, 2024 at 8:37 AM Mike Rapoport <rppt@kernel.org> wrote:
-> > > > > > > >
-> > > > > > > > I'm looking at execmem_types more as definition of the consumers, maybe I
-> > > > > > > > should have named the enum execmem_consumer at the first place.
-> > > > > > >
-> > > > > > > I think looking at execmem_type from consumers' point of view adds
-> > > > > > > unnecessary complexity. IIUC, for most (if not all) archs, ftrace, kprobe,
-> > > > > > > and bpf (and maybe also module text) all have the same requirements.
-> > > > > > > Did I miss something?
-> > > > > >
-> > > > > > It's enough to have one architecture with different constrains for kprobes
-> > > > > > and bpf to warrant a type for each.
-> > > > >
-> > > > > AFAICT, some of these constraints can be changed without too much work.
-> > > >
-> > > > But why?
-> > > > I honestly don't understand what are you trying to optimize here. A few
-> > > > lines of initialization in execmem_info?
-> > >
-> > > IIUC, having separate EXECMEM_BPF and EXECMEM_KPROBE makes it
-> > > harder for bpf and kprobe to share the same ROX page. In many use cases,
-> > > a 2MiB page (assuming x86_64) is enough for all BPF, kprobe, ftrace, and
-> > > module text. It is not efficient if we have to allocate separate pages for each
-> > > of these use cases. If this is not a problem, the current approach works.
-> >
-> > The caching of large ROX pages does not need to be per type.
-> >
-> > In the POC I've posted for caching of large ROX pages on x86 [1], the cache is
-> > global and to make kprobes and bpf use it it's enough to set a flag in
-> > execmem_info.
-> >
-> > [1] https://lore.kernel.org/all/20240411160526.2093408-1-rppt@kernel.org
+
+
+On 4/19/24 02:05, Ravi Gunasekaran wrote:
+> From: Jason Reeder <jreeder@ti.com>
 > 
-> For the ROX to work, we need different users (module text, kprobe, etc.) to have
-> the same execmem_range. From [1]:
+> The CPTS, by design, captures the messageType (Sync, Delay_Req, etc.)
+> field from the second nibble of the PTP header which is defined in the
+> PTPv2 (1588-2008) specification. In the PTPv1 (1588-2002) specification
+> the first two bytes of the PTP header are defined as the versionType
+> which is always 0x0001. This means that any PTPv1 packets that are
+> tagged for TX timestamping by the CPTS will have their messageType set
+> to 0x0 which corresponds to a Sync message type. This causes issues
+> when a PTPv1 stack is expecting a Delay_Req (messageType: 0x1)
+> timestamp that never appears.
 > 
-> static void *execmem_cache_alloc(struct execmem_range *range, size_t size)
-> {
-> ...
->        p = __execmem_cache_alloc(size);
->        if (p)
->                return p;
->       err = execmem_cache_populate(range, size);
-> ...
-> }
+> Fix this by checking if the ptp_class of the timestamped TX packet is
+> PTP_CLASS_V1 and then matching the PTP sequence ID to the stored
+> sequence ID in the skb->cb data structure. If the sequence IDs match
+> and the packet is of type PTPv1 then there is a chance that the
+> messageType has been incorrectly stored by the CPTS so overwrite the
+> messageType stored by the CPTS with the messageType from the skb->cb
+> data structure. This allows the PTPv1 stack to receive TX timestamps
+> for Delay_Req packets which are necessary to lock onto a PTP Leader.
 > 
-> We are calling __execmem_cache_alloc() without range. For this to work,
-> we can only call execmem_cache_alloc() with one execmem_range.
-
-Actually, on x86 this will "just work" because everything shares the same
-address space :)
-
-The 2M pages in the cache will be in the modules space, so
-__execmem_cache_alloc() will always return memory from that address space.
-
-For other architectures this indeed needs to be fixed with passing the
-range to __execmem_cache_alloc() and limiting search in the cache for that
-range.
- 
-> Did I miss something?
+> Signed-off-by: Jason Reeder <jreeder@ti.com>
+> Signed-off-by: Ravi Gunasekaran <r-gunasekaran@ti.com>
+> ---
+>   drivers/net/ethernet/ti/am65-cpts.c | 5 +++++
+>   1 file changed, 5 insertions(+)
 > 
-> Thanks,
-> Song
+> diff --git a/drivers/net/ethernet/ti/am65-cpts.c b/drivers/net/ethernet/ti/am65-cpts.c
+> index c66618d91c28..f89716b1cfb6 100644
+> --- a/drivers/net/ethernet/ti/am65-cpts.c
+> +++ b/drivers/net/ethernet/ti/am65-cpts.c
+> @@ -784,6 +784,11 @@ static bool am65_cpts_match_tx_ts(struct am65_cpts *cpts,
+>   		struct am65_cpts_skb_cb_data *skb_cb =
+>   					(struct am65_cpts_skb_cb_data *)skb->cb;
+>   
+> +		if ((ptp_classify_raw(skb) & PTP_CLASS_V1) &&
+> +		    ((mtype_seqid & AM65_CPTS_EVENT_1_SEQUENCE_ID_MASK) ==
+> +		     (skb_cb->skb_mtype_seqid & AM65_CPTS_EVENT_1_SEQUENCE_ID_MASK)))
+> +			mtype_seqid = skb_cb->skb_mtype_seqid;
+> +
+>   		if (mtype_seqid == skb_cb->skb_mtype_seqid) {
+>   			u64 ns = event->timestamp;
+>   
+> 
+> base-commit: a35e92ef04c07bd473404b9b73d489aea19a60a8
 
--- 
-Sincerely yours,
-Mike.
+++ Ed Trexel at HP and the Audinate support team for visibility and 
+'Tested-by' tags.
+
+Jason Reeder
 
