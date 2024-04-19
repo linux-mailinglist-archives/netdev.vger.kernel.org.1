@@ -1,126 +1,95 @@
-Return-Path: <netdev+bounces-89607-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89608-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 593D58AADC3
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 13:32:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 307178AADCE
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 13:40:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8B37F1C20F9A
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 11:32:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E54AF1C20906
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 11:40:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E179181AC3;
-	Fri, 19 Apr 2024 11:31:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A6D881720;
+	Fri, 19 Apr 2024 11:40:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dI9pphsJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZtqwZFy6"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B66291F5F5;
-	Fri, 19 Apr 2024 11:31:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 558E380029
+	for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 11:40:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713526305; cv=none; b=vFTZ0vW4a3pgnogwUXyXh03oZrtdYJBGDP3s1HI6y3jHmILl9swrujdy7h1xB0gqwa7QmPgfgCpqK6Jp1mByBB9slIRFEZlWCJna3VQoI+SpxjhK+sfEurDGrg5jv45zaD/ur48bjbNeX0W1AUDg7tKY9fRXl51ioYUBU3inJYw=
+	t=1713526827; cv=none; b=V4PImvL/N+shAv7pXQcKatvPBj1+LknlCb9Uo6cXFWBwT/TuQ52z4T2yAa8Ia/27pNoys6gN9Sr91m1a8Y72skdFs1eXysHZj4xaeK5jwvcz7X3bgbqaUcDzi35oiSK7EnDOXvi3K/jeGIFNvFOXYdQmJG/51Ovyk1b4RO8iBtg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713526305; c=relaxed/simple;
-	bh=E8GQZ30IgEfs2553uTgpC3VI6FZP4BY+8jCXkE4DTL0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nlhG5j0SO9QbWg0AZTjN9zFvYCyGiq4n5Xsv0VDIC6iDyi3N1p0X66icob0c7YDrHh376dZrVuqafiCXUXr6Z0YceX8xvUM0R3vBvapQitaTcfHbzC0iG5YDMC6Yrf4Cwk9OAW6zkuCJ/8cdx76fpLQZ3oxsrj4xj59e9ZXv70E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dI9pphsJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CBFB3C072AA;
-	Fri, 19 Apr 2024 11:31:40 +0000 (UTC)
+	s=arc-20240116; t=1713526827; c=relaxed/simple;
+	bh=iSlQtKREFBrk107DHLgvM9l6qc/wU0OliXspGWtgbxA=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=KJND4asV/2w2aRXGSHLK97ZDkv+qKWxqBw38EwGZIvAbPIW+iuMbAuvxCrQOpWNgLB0iNIw7NRaukLyFVVjCsitpGKN8ljXa6XzIYH3sqBNXGJmkaqNO0l3hlfdHAtRT3OqpKOi888Wx2yd9AMsYzs0YRpvfmT8w0Eg7GPNW9eo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZtqwZFy6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id CB11EC2BD10;
+	Fri, 19 Apr 2024 11:40:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713526303;
-	bh=E8GQZ30IgEfs2553uTgpC3VI6FZP4BY+8jCXkE4DTL0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=dI9pphsJgUI3ZaPbzwPgArztc1emHtKBW27UPNklZXQCi320J7nX0+x2uz4/+ofxt
-	 dzf2Ni1LmysBiKgK2MqM6uMf7IR7rsuGSoWGmTTDVhmiTGdOj1uhvVrHr7HA0Ye/2z
-	 ynYo1ppTvPGL4nS+Ef2RzSpwwA3S8E1ZBcyc1Aemqhsej+YBOq/5+hZwCSssQo6IVP
-	 Pixc3RFFZwID9PiElgBpHHgFXR66dbGh+EFsrf2rV8zVI3YsPkgYykemIZ3Yxbjk8O
-	 Wu1v/PxnnNg8kFMa00eTq6MByd0pXKV2qMT8tgwQWMpbPqBfx+mY913LyMmojYMaoE
-	 3ESGxZCvurS3g==
-Date: Fri, 19 Apr 2024 12:31:38 +0100
-From: Simon Horman <horms@kernel.org>
-To: Vadim Fedorenko <vadfed@meta.com>
-Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Mykola Lysenko <mykolal@fb.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>, netdev@vger.kernel.org,
-	linux-crypto@vger.kernel.org, bpf@vger.kernel.org
-Subject: Re: [PATCH bpf-next v9 4/4] selftests: bpf: crypto: add benchmark
- for crypto functions
-Message-ID: <20240419113138.GV3975545@kernel.org>
-References: <20240416204004.3942393-1-vadfed@meta.com>
- <20240416204004.3942393-5-vadfed@meta.com>
+	s=k20201202; t=1713526826;
+	bh=iSlQtKREFBrk107DHLgvM9l6qc/wU0OliXspGWtgbxA=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=ZtqwZFy6/+fzzU6ln/8okfJDlTehmbIz7H8ywsDt98P2zzPd/Ww1URq31ubpSpqSA
+	 v2xXWpxovk1aGvdXqH6jdqDlTIzs8YJZ043jqT9anZxMmkclwzBNHTRYNJ9DZ+HUZu
+	 5MO/S6lEimKQY+dFmq6hsW74FmXY/O7k0bSgfHf5oyIOtEHgu8OklBOD2SX4FC+Jtc
+	 St2d/HwVIKnKtQjPAa+tkvWe64BxzIiVQ3etDZl9f9giAJ+VLo7mJghbX/b8ZDbeK1
+	 MHrvz5jGvhGew5Y1hbfeXIMcM5q22GEymsj4kAd0EiCWXoE6dpYadw2Z0iVatKJ7t/
+	 L+Ab2Be/GPlWQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B9297C433E9;
+	Fri, 19 Apr 2024 11:40:26 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240416204004.3942393-5-vadfed@meta.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next 0/3] neighbour: convert neigh_dump_info() to RCU
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171352682675.11045.4640653458191585742.git-patchwork-notify@kernel.org>
+Date: Fri, 19 Apr 2024 11:40:26 +0000
+References: <20240418095106.3680616-1-edumazet@google.com>
+In-Reply-To: <20240418095106.3680616-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, dsahern@kernel.org, eric.dumazet@gmail.com
 
-On Tue, Apr 16, 2024 at 01:40:04PM -0700, Vadim Fedorenko wrote:
-> Some simple benchmarks are added to understand the baseline of
-> performance.
+Hello:
+
+This series was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
+
+On Thu, 18 Apr 2024 09:51:03 +0000 you wrote:
+> Remove RTNL requirement for "ip neighbour show" command.
 > 
-> Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
+> Eric Dumazet (3):
+>   neighbour: add RCU protection to neigh_tables[]
+>   neighbour: fix neigh_dump_info() return value
+>   neighbour: no longer hold RTNL in neigh_dump_info()
+> 
+> [...]
 
-...
+Here is the summary with links:
+  - [net-next,1/3] neighbour: add RCU protection to neigh_tables[]
+    https://git.kernel.org/netdev/net-next/c/f8f2eb9de69a
+  - [net-next,2/3] neighbour: fix neigh_dump_info() return value
+    https://git.kernel.org/netdev/net-next/c/7e4975f7e7fb
+  - [net-next,3/3] neighbour: no longer hold RTNL in neigh_dump_info()
+    https://git.kernel.org/netdev/net-next/c/ba0f78069423
 
-> diff --git a/tools/testing/selftests/bpf/benchs/bench_bpf_crypto.c b/tools/testing/selftests/bpf/benchs/bench_bpf_crypto.c
-> new file mode 100644
-> index 000000000000..86048f02e6ac
-> --- /dev/null
-> +++ b/tools/testing/selftests/bpf/benchs/bench_bpf_crypto.c
-> @@ -0,0 +1,190 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/* Copyright (c) 2024 Meta Platforms, Inc. and affiliates. */
-> +
-> +#include <argp.h>
-> +#include "bench.h"
-> +#include "crypto_bench.skel.h"
-> +#include "../progs/crypto_share.h"
-> +
-> +#define MAX_CIPHER_LEN 32
-> +static char *input;
-> +static struct crypto_ctx {
-> +	struct crypto_bench *skel;
-> +	int pfd;
-> +} ctx;
-> +
-> +static struct crypto_args {
-> +	u32 crypto_len;
-> +	char *crypto_cipher;
-> +} args = {
-> +	.crypto_len = 16,
-> +	.crypto_cipher = "ecb(aes)",
-> +};
-> +
-> +enum {
-> +	ARG_CRYPTO_LEN = 5000,
-> +	ARG_CRYPTO_CIPHER = 5001,
-> +};
-> +
-> +static const struct argp_option opts[] = {
-> +	{ "crypto-len", ARG_CRYPTO_LEN, "CRYPTO_LEN", 0,
-> +	  "Set the length of crypto buffer" },
-> +	{ "crypto-cipher", ARG_CRYPTO_CIPHER, "CRYPTO_CIPHER", 0,
-> +	  "Set the cipher to use (defaul:ecb(aes))" },
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-nit: should this be 'default' ?
 
-Flagged by checkpatch.pl --codespell
-
-> +	{},
-> +};
-
-...
 
