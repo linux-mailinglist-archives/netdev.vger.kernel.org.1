@@ -1,100 +1,138 @@
-Return-Path: <netdev+bounces-89783-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89784-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87A5A8AB8DA
-	for <lists+netdev@lfdr.de>; Sat, 20 Apr 2024 04:41:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 89ECF8AB909
+	for <lists+netdev@lfdr.de>; Sat, 20 Apr 2024 04:53:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2FDC61F214EE
-	for <lists+netdev@lfdr.de>; Sat, 20 Apr 2024 02:41:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3D0BC1F21B59
+	for <lists+netdev@lfdr.de>; Sat, 20 Apr 2024 02:53:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7F7B625;
-	Sat, 20 Apr 2024 02:41:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2C82883D;
+	Sat, 20 Apr 2024 02:52:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Cr1Eg8QQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25B1F1118C
-	for <netdev@vger.kernel.org>; Sat, 20 Apr 2024 02:41:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB37D79F5;
+	Sat, 20 Apr 2024 02:52:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713580892; cv=none; b=q4N7O56GLNQtltvFEVwB2sRgFIthLJaYiRRHkqplqD7qIjGvGL2BrKizhni5ii/EQGJRnTCwc3S2tp+oR6ThhEk/fGoDy2a5PFWCHts6Ht8QR0oV8wCih+vESK4H9biv3BA6/D3tyZjRV5eo19vOy3Bb6VM9K4fftocRF3pDsnc=
+	t=1713581560; cv=none; b=DpRlm1teMMkSMKy91IfQbjFla0k7fBR3+Xjb5AFmI9QFeDuxmm2O261f8jN/ADUMOeSYSdQsCqI+aV/I875EpJ4dCeAu1w9C5a/tb3zqr9SVFV2Zck4rlPr80ilMcVx/JmDbNO83rIJh2x9//gtBC71tlbXnk/nvgo8ThgDd03g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713580892; c=relaxed/simple;
-	bh=0lLZDHtuLC3gDotFJzEhLBZy+fIW+zuuu7IctPIsQDA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XTtrL/oV449p10tgMtBwCsUSfdEsclHn/JJR8MOuupkUE7DlRRXLKoK3r3S3ECipDE9Gl/9lzJkIDXZ87aSA9UyV1GsKmL1dU7n/hA7QAH7eG/0pDOrlvl2upEFxWbgbxl0GXv9M37vWEM7huxjn52CAq6eR3Lerkqa+rOtBnXo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [112.20.112.218])
-	by gateway (Coremail) with SMTP id _____8AxU_JXKyNmyEIAAA--.1639S3;
-	Sat, 20 Apr 2024 10:41:27 +0800 (CST)
-Received: from [192.168.100.8] (unknown [112.20.112.218])
-	by localhost.localdomain (Coremail) with SMTP id AQAAf8BxIeBUKyNmEosAAA--.3102S3;
-	Sat, 20 Apr 2024 10:41:25 +0800 (CST)
-Message-ID: <1abf101b-87b8-448a-bd2a-bc9fb7c28852@loongson.cn>
-Date: Sat, 20 Apr 2024 10:41:24 +0800
+	s=arc-20240116; t=1713581560; c=relaxed/simple;
+	bh=Ddgl4fer8XQqqIUUbAuPuEm3gp+8CbmSSS/skwlXGW8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=T70azMBWlfE3U2bbGwSoMvGGuWbQicX90saj5ueyRRYbhIqq/D4WzYoakLLSvC4GkWXwKRJ3hAEdIXYOxaEF9iIs0k5E/TzWXzOmkpaeXolo3SG8aX/6r+LALVIwjgiwH+a+C2Kcn5UbKYqAg0d35uiBuc6QJuso3QjhsnETFiw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Cr1Eg8QQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DCD79C072AA;
+	Sat, 20 Apr 2024 02:52:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713581560;
+	bh=Ddgl4fer8XQqqIUUbAuPuEm3gp+8CbmSSS/skwlXGW8=;
+	h=From:To:Cc:Subject:Date:From;
+	b=Cr1Eg8QQidKUEV8s36/aGRcIbioeQmSqtsw7/HFSAG3rI1b0p2fCsWTOENXof0So6
+	 Y32Vgi1Lb37W1BM5xiQaGWVr91pdq+FvNfpWvFPER1n9aOTHkelUH0UfP+yKrsD8yk
+	 RlZMWx6/TXG1TlPCmi+jE1yn0dUZYeEK2B6vhc1nFcGTmvLOMClwDkcqXpfX9fpk4i
+	 +NwBVFdE7rn4YVgWmmChZROrNzg1gmVJ1NmHyoZDJwUbPV/nAAYO9frV2vLnhwvq/k
+	 0A8rmqgt+FZoafgtN5kRUDFLtwUZEmbqxOlKoxjFt2DIcMqEVRJn9NQh3OsdxPMOtC
+	 UuNPC8di9mIlw==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	shuah@kernel.org,
+	petrm@nvidia.com,
+	linux-kselftest@vger.kernel.org,
+	willemdebruijn.kernel@gmail.com,
+	Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH net-next v5 0/7] selftests: drv-net: support testing with a remote system
+Date: Fri, 19 Apr 2024 19:52:30 -0700
+Message-ID: <20240420025237.3309296-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v11 5/6] net: stmmac: dwmac-loongson: Add full
- PCI support
-To: Serge Semin <fancer.lancer@gmail.com>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com,
- alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com,
- chenhuacai@kernel.org, linux@armlinux.org.uk, guyinggang@loongson.cn,
- netdev@vger.kernel.org, chris.chenfeiyang@gmail.com, siyanteng01@gmail.com
-References: <cover.1712917541.git.siyanteng@loongson.cn>
- <ae660c8872297b562ee4e62cd852ba96f307e079.1712917541.git.siyanteng@loongson.cn>
- <adnsyedexlqbncmadqzsr7f2vnqcvilzow4n3ibajxek4qes4m@pmwhb636j2qp>
-Content-Language: en-US
-From: Yanteng Si <siyanteng@loongson.cn>
-In-Reply-To: <adnsyedexlqbncmadqzsr7f2vnqcvilzow4n3ibajxek4qes4m@pmwhb636j2qp>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:AQAAf8BxIeBUKyNmEosAAA--.3102S3
-X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
-X-Coremail-Antispam: 1Uk129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7
-	ZEXasCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29K
-	BjDU0xBIdaVrnRJUUUBlb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26c
-	xKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r106r15M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vE
-	j48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Jr0_JF4l84ACjcxK6xIIjxv20xvEc7CjxV
-	AFwI0_Jr0_Gr1l84ACjcxK6I8E87Iv67AKxVWxJVW8Jr1l84ACjcxK6I8E87Iv6xkF7I0E
-	14v26r4j6r4UJwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07AIYIkI8VC2zVCFFI
-	0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUAVWUtwAv7VC2z280
-	aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxAIw28IcxkI7V
-	AKI48JMxAqzxv262kKe7AKxVWUXVWUAwCF54CYxVCY1x0262kKe7AKxVWUAVWUtwCFx2Iq
-	xVCFs4IE7xkEbVWUJVW8JwCFI7km07C267AKxVWUXVWUAwC20s026c02F40E14v26r1j6r
-	18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vI
-	r41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr
-	1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvE
-	x4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7IU8vD73UUUUU==
 
+Hi!
 
-在 2024/4/18 21:08, Serge Semin 写道:
->> -	np = dev_of_node(&pdev->dev);
->> -
->> -	if (!np) {
->> -		pr_info("dwmac_loongson_pci: No OF node\n");
->> -		return -ENODEV;
->> -	}
-> Hm, I see you dropping this snippet and never getting it back in this
-> patch. Thus after the patch is applied np will be left uninitialized,
-> which will completely break the driver. Please make sure it's fixed.
->
-> This problem has been introduced at the v9 stage, which I didn't have
-> time to review. There were no problem like that in v8.
+Implement support for tests which require access to a remote system /
+endpoint which can generate traffic.
+This series concludes the "groundwork" for upstream driver tests.
 
-Okay, I will restore it.
+I wanted to support the three models which came up in discussions:
+ - SW testing with netdevsim
+ - "local" testing with two ports on the same system in a loopback
+ - "remote" testing via SSH
+so there is a tiny bit of an abstraction which wraps up how "remote"
+commands are executed. Otherwise hopefully there's nothing surprising.
 
+I'm only adding a ping test. I had a bigger one written but I was
+worried we'll get into discussing the details of the test itself
+and how I chose to hack up netdevsim, instead of the test infra...
+So that test will be a follow up :)
 
-Thanks,
+v5:
+ - fix rand port generation, and wrap it in a helper in case
+   the random thing proves to be flaky
+ - reuseaddr
+ - explicitly select the address family
+v4: https://lore.kernel.org/all/20240418233844.2762396-1-kuba@kernel.org
+ - improve coding style of patch 5
+ - switch from netcat to socat (patch 6)
+ - support exit_wait for bkg() in context manager
+ - add require_XYZ() helpers (patch 7)
+ - increase timeouts a little (1,3 -> 5 sec)
+v3: https://lore.kernel.org/all/20240417231146.2435572-1-kuba@kernel.org
+ - first two patches are new
+ - make Remote::cmd() return Popen() object (patch 3)
+ - always operate on absolute paths (patch 3)
+ - last two patches are new
+v2: https://lore.kernel.org/all/20240416004556.1618804-1-kuba@kernel.org
+ - rename endpoint -> remote
+ - use 2001:db8:: v6 prefix
+ - add a note about persistent SSH connections
+ - add the kernel config
+v1: https://lore.kernel.org/all/20240412233705.1066444-1-kuba@kernel.org
 
-Yanteng
+Jakub Kicinski (7):
+  selftests: drv-net: define endpoint structures
+  selftests: drv-net: factor out parsing of the env
+  selftests: drv-net: construct environment for running tests which
+    require an endpoint
+  selftests: drv-net: add a trivial ping test
+  selftests: net: support matching cases by name prefix
+  selftests: drv-net: add a TCP ping test case (and useful helpers)
+  selftests: drv-net: add require_XYZ() helpers for validating env
+
+ tools/testing/selftests/drivers/net/Makefile  |   5 +-
+ .../testing/selftests/drivers/net/README.rst  |  33 ++++
+ .../selftests/drivers/net/lib/py/__init__.py  |   1 +
+ .../selftests/drivers/net/lib/py/env.py       | 175 ++++++++++++++++--
+ .../selftests/drivers/net/lib/py/remote.py    |  15 ++
+ .../drivers/net/lib/py/remote_netns.py        |  21 +++
+ .../drivers/net/lib/py/remote_ssh.py          |  39 ++++
+ tools/testing/selftests/drivers/net/ping.py   |  51 +++++
+ .../testing/selftests/net/lib/py/__init__.py  |   1 +
+ tools/testing/selftests/net/lib/py/ksft.py    |  13 +-
+ tools/testing/selftests/net/lib/py/netns.py   |  31 ++++
+ tools/testing/selftests/net/lib/py/utils.py   |  60 +++++-
+ 12 files changed, 416 insertions(+), 29 deletions(-)
+ create mode 100644 tools/testing/selftests/drivers/net/lib/py/remote.py
+ create mode 100644 tools/testing/selftests/drivers/net/lib/py/remote_netns.py
+ create mode 100644 tools/testing/selftests/drivers/net/lib/py/remote_ssh.py
+ create mode 100755 tools/testing/selftests/drivers/net/ping.py
+ create mode 100644 tools/testing/selftests/net/lib/py/netns.py
+
+-- 
+2.44.0
 
 
