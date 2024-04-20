@@ -1,109 +1,144 @@
-Return-Path: <netdev+bounces-89803-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89804-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 561A68ABA04
-	for <lists+netdev@lfdr.de>; Sat, 20 Apr 2024 08:40:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 269848ABA09
+	for <lists+netdev@lfdr.de>; Sat, 20 Apr 2024 09:01:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D8FA7B20E9A
-	for <lists+netdev@lfdr.de>; Sat, 20 Apr 2024 06:40:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 77BD1B20E14
+	for <lists+netdev@lfdr.de>; Sat, 20 Apr 2024 07:01:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4717FD530;
-	Sat, 20 Apr 2024 06:40:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E9A610A3E;
+	Sat, 20 Apr 2024 07:01:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=a16n.net header.i=@a16n.net header.b="pnUYP+Zr"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="H8GKubQ2"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out.a16n.net (smtp-out.a16n.net [87.98.181.171])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AD4F7F
-	for <netdev@vger.kernel.org>; Sat, 20 Apr 2024 06:40:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=87.98.181.171
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C2F5101CF
+	for <netdev@vger.kernel.org>; Sat, 20 Apr 2024 07:01:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713595219; cv=none; b=gFuByIP2CfgFmTJBzqqc6hRc2r79fr4k/j9Q7ECm3o9or6NFL7cpFFQ+2lQoAqkE448e0g/LQYF+2xIQczLBa+YoIg47xEX3vRxN3mFKVFwUGA1aKxlhXgQHmdb6VSpj060SUJrz/rLvpqJYXT0vjnWZE2G8RlpUyLAhZI2OyFA=
+	t=1713596480; cv=none; b=R0wYcvOlrxSzSqpuOk7uwPLqtXAGsBAAcSIBn52pAmiIgf6/jyAFFEI98mXT4YB4CZN5wXkRzQLnt/uRy8lMgI+w6F5A3icQW0UUUHAwDbPeGb2O/8svlwNQHuf5fG6MYclDyyt53N21IgI9e3plT7yv46z3S/HNKq8bHX8bOKM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713595219; c=relaxed/simple;
-	bh=9VBYOWLZltsj7hffFQc2+yWe1Fnyjz4y92cCEA3tzVw=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=DLlkPzvR9O8666djh9l0QPylbwSs5FkQH9X44nwL6L3oDUHgu2eMut7BASSsMuT0lxSHALArYIxckovylUBf/CRgl5RlBtViq0CbolueSxkSmoXBKeCRKy12Hjet+YfBkWMjTSFHFK3Zn3+nv2rhRhjo5SR19gMf/LjiYw717IU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=a16n.net; spf=pass smtp.mailfrom=a16n.net; dkim=pass (2048-bit key) header.d=a16n.net header.i=@a16n.net header.b=pnUYP+Zr; arc=none smtp.client-ip=87.98.181.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=a16n.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=a16n.net
-Received: from server.a16n.net (server.a16n.net [82.65.98.121])
-	by smtp-out.a16n.net (Postfix) with ESMTP id 2BDFC460497;
-	Sat, 20 Apr 2024 08:40:11 +0200 (CEST)
-Received: from ws.localdomain (unknown [192.168.13.254])
-	by server.a16n.net (Postfix) with ESMTPSA id 415EE801223;
-	Sat, 20 Apr 2024 08:40:11 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=a16n.net; s=a16n;
-	t=1713595211; bh=Wt9YHBfVZDqhegXzIUXVsXvslr7q8HBq2pAKdLyBOSY=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date;
-	b=pnUYP+ZrnXt1UItYMD9YtsqbkvCHJnD8ZFVbH4rYG0XcAl7SQhOJSO10dFcvc9IyA
-	 XeFvaw38XqtpIJ9sw46XQ64mUdFZFVjMplFT8IC2CSzdCo+uZYcMPzj+KXBCplPbpx
-	 ogGEkYmks2JVmHrv2l4iWU1gYKZBj5wscW8yAZ3j2XK4rxUXPxrRNIv+CHqOmXv+2J
-	 ThzastRyQKJDIWHRemeJr9u6JzQdZLnPsx2uZhyddMF+Kop/Kd5c1CYjMgMun38vZ6
-	 7Scvp4duezFA2NqZefmKkYDqh+pxa9lXtbGKZm7iRxiSx8kr8syKFGnU7WlGLLDzCu
-	 Xm4zjs68Xfrxg==
-Received: by ws.localdomain (Postfix, from userid 1000)
-	id 23D8D206C1; Sat, 20 Apr 2024 08:40:11 +0200 (CEST)
-From: =?utf-8?Q?Peter_M=C3=BCnster?= <pm@a16n.net>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: netdev@vger.kernel.org,  Michael Chan <michael.chan@broadcom.com>
-Subject: Re: [PATCH net v3] net: b44: set pause params only when interface
- is up
-In-Reply-To: <876ff4fa-1744-4929-9da8-8a10016c2f30@lunn.ch> (Andrew Lunn's
-	message of "Fri, 19 Apr 2024 23:14:10 +0200")
-References: <87o7a5yteb.fsf@a16n.net>
-	<876ff4fa-1744-4929-9da8-8a10016c2f30@lunn.ch>
-Date: Sat, 20 Apr 2024 08:40:10 +0200
-Message-ID: <87sezgy1th.fsf@a16n.net>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1713596480; c=relaxed/simple;
+	bh=ZMUUqOB4D5t5yMFOwxUxpJqh/1JOdrP1d4t4rajhJGU=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=gQdIsxIufE3w3f8/HRQEuxEAKipFOSq3J9AwwSHY34nDznq8AGb3DUEoQkh9krOLce6Y210N3Of4ZLkyxUsVh3uVzqL00mns/Vow4e36ZTRTlMhB5Iyu1Q+s1ih/uLryCYpmSSTQUfumSzza/Xc2Lmdg95ApHIaH5nGl/BSz4nk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=H8GKubQ2; arc=none smtp.client-ip=209.85.128.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-61b3b02f691so21238967b3.2
+        for <netdev@vger.kernel.org>; Sat, 20 Apr 2024 00:01:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1713596478; x=1714201278; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=P57su8mgviErUG7NWilf3GARZcpiMCmVmtOu5jbcJr4=;
+        b=H8GKubQ25xmtOqNHr9e3zX3S2/nE1OGNqUFYh+BoU9dJvFKzp6l2ri2QCoqOLp7nJ3
+         ymMQawra4ZO282vezM1kxpO6MbcU0Bqbma0kvp8xWu9UOAUim+COXEe26VI0/HHjkEOa
+         pVTPct0/0Xynz+9T3ndBEfl/YtDRgju3D+uPLTsKdBdZw8ZuscOaB5MTk4oJn9+FxZs4
+         W54ZtDVGkZ8JPIoMTx1vB2AI/cOhoSY7HSFsF0W/7kE0IBVSVmCPJuNa66t2X93jR1Pn
+         TvnaDFdRKh/ndt/ItALXyWQqlaaslrY/j1J4ThiGLSdqr+HGLxetAm+4olIJpS9Jkzgx
+         yUyw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713596478; x=1714201278;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=P57su8mgviErUG7NWilf3GARZcpiMCmVmtOu5jbcJr4=;
+        b=pzG15CO6Ut2MZzH2C1BaQZ8xwWKwR7Z9TFZScXZOcE7Dk1kmhyise5A9DocNp5L/rx
+         1BNjlNpchcBShs8vC/yF+QCuc70FIBS4yW5Nlnr9M7ydTrX/BRR/X1GM1wt2BI7Buil0
+         Z2rPli7RBv58bOIO2ySWoQ2cJNu/ec1+gpeyruT2m0ekeCZVLekuap0Dqpr2LmVu//iD
+         oFAJ+vs4dNUviG/971NcqnJHC4YolFmjCezUIQ3VlciGt4EaaC8tLIOXiQirk/ni+A1f
+         o8o25xS1vU2LESItPH3F7cuSf8njTgbYPy8/84tAAxCj88zaV0n7wbfefFCLqDX8IvSK
+         +3+A==
+X-Gm-Message-State: AOJu0Yyi/ITyU2tLtf5h5jdHjgEfyLeQBhHsH9/PBdvDql0Zp30wZFQZ
+	CXdA11SOjJ7rrE80VecGYK8Kz1stvLRf3dwXYqc/cWlWNA0yZzj8jZ8zX1KzHPf+IHbf7XRNWJM
+	ZCjFJWXC1mg==
+X-Google-Smtp-Source: AGHT+IFf2j7HIJXbSXSQDR9b/QLUS7qbiUTgGsKdvmYvHcwjk6Dxco80LBT3HKiDw9cfJUSlYXuYYyxX4l6XCA==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a05:6902:154f:b0:de5:78:34d2 with SMTP id
+ r15-20020a056902154f00b00de5007834d2mr62426ybu.6.1713596478100; Sat, 20 Apr
+ 2024 00:01:18 -0700 (PDT)
+Date: Sat, 20 Apr 2024 07:01:16 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-	micalg=pgp-sha1; protocol="application/pgp-signature"
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.44.0.769.g3c40516874-goog
+Message-ID: <20240420070116.4023672-1-edumazet@google.com>
+Subject: [PATCH v2 net] icmp: prevent possible NULL dereferences from icmp_build_probe()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, David Ahern <dsahern@kernel.org>, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>, Andreas Roeseler <andreas.a.roeseler@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 
---=-=-=
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+First problem is a double call to __in_dev_get_rcu(), because
+the second one could return NULL.
 
-On Fri, Apr 19 2024, Andrew Lunn wrote:
+if (__in_dev_get_rcu(dev) && __in_dev_get_rcu(dev)->ifa_list)
 
-> Still above the --- . Don't use attachments.
+Second problem is a read from dev->ip6_ptr with no NULL check:
 
-Ah, ok, sorry.
+if (!list_empty(&rcu_dereference(dev->ip6_ptr)->addr_list))
 
+Use the correct RCU API to fix these.
 
-> Lets see what Jakub says.
+v2: add missing include <net/addrconf.h>
 
-Ok, so I should wait before sending v4?
+Fixes: d329ea5bd884 ("icmp: add response to RFC 8335 PROBE messages")
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Cc: Andreas Roeseler <andreas.a.roeseler@gmail.com>
+---
+ net/ipv4/icmp.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
+diff --git a/net/ipv4/icmp.c b/net/ipv4/icmp.c
+index e63a3bf99617627e17669f9b3aaee1cbbf178ebf..437e782b9663bb59acb900c0558137ddd401cd02 100644
+--- a/net/ipv4/icmp.c
++++ b/net/ipv4/icmp.c
+@@ -92,6 +92,7 @@
+ #include <net/inet_common.h>
+ #include <net/ip_fib.h>
+ #include <net/l3mdev.h>
++#include <net/addrconf.h>
+ 
+ /*
+  *	Build xmit assembly blocks
+@@ -1032,6 +1033,8 @@ bool icmp_build_probe(struct sk_buff *skb, struct icmphdr *icmphdr)
+ 	struct icmp_ext_hdr *ext_hdr, _ext_hdr;
+ 	struct icmp_ext_echo_iio *iio, _iio;
+ 	struct net *net = dev_net(skb->dev);
++	struct inet6_dev *in6_dev;
++	struct in_device *in_dev;
+ 	struct net_device *dev;
+ 	char buff[IFNAMSIZ];
+ 	u16 ident_len;
+@@ -1115,10 +1118,15 @@ bool icmp_build_probe(struct sk_buff *skb, struct icmphdr *icmphdr)
+ 	/* Fill bits in reply message */
+ 	if (dev->flags & IFF_UP)
+ 		status |= ICMP_EXT_ECHOREPLY_ACTIVE;
+-	if (__in_dev_get_rcu(dev) && __in_dev_get_rcu(dev)->ifa_list)
++
++	in_dev = __in_dev_get_rcu(dev);
++	if (in_dev && rcu_access_pointer(in_dev->ifa_list))
+ 		status |= ICMP_EXT_ECHOREPLY_IPV4;
+-	if (!list_empty(&rcu_dereference(dev->ip6_ptr)->addr_list))
++
++	in6_dev = __in6_dev_get(dev);
++	if (in6_dev && !list_empty(&in6_dev->addr_list))
+ 		status |= ICMP_EXT_ECHOREPLY_IPV6;
++
+ 	dev_put(dev);
+ 	icmphdr->un.echo.sequence |= htons(status);
+ 	return true;
+-- 
+2.44.0.769.g3c40516874-goog
 
-> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-
-Another line to attach to the patch for v4?
-
-
-> We are picky about things like this
-
-No problem, I fully understand.
-
-=2D-=20
-           Peter
-
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iGoEARECACoWIQS/5hHRBUjla4uZVXU6jitvQ7HLaAUCZiNjSgwccG1AYTE2bi5u
-ZXQACgkQOo4rb0Oxy2jLUgCgnxiBb8dsN04RT07raCVL/Vi0WxQAoMwthu7wKx+c
-rjcWILPERTX6iRm2
-=jH6I
------END PGP SIGNATURE-----
---=-=-=--
 
