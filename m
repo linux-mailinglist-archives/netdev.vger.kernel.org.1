@@ -1,144 +1,157 @@
-Return-Path: <netdev+bounces-89804-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89805-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 269848ABA09
-	for <lists+netdev@lfdr.de>; Sat, 20 Apr 2024 09:01:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9AC028ABA1E
+	for <lists+netdev@lfdr.de>; Sat, 20 Apr 2024 09:35:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 77BD1B20E14
-	for <lists+netdev@lfdr.de>; Sat, 20 Apr 2024 07:01:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D05811C209A6
+	for <lists+netdev@lfdr.de>; Sat, 20 Apr 2024 07:35:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E9A610A3E;
-	Sat, 20 Apr 2024 07:01:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBD0214005;
+	Sat, 20 Apr 2024 07:35:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="H8GKubQ2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HstIwZ4k"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C2F5101CF
-	for <netdev@vger.kernel.org>; Sat, 20 Apr 2024 07:01:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90D4720EB;
+	Sat, 20 Apr 2024 07:35:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713596480; cv=none; b=R0wYcvOlrxSzSqpuOk7uwPLqtXAGsBAAcSIBn52pAmiIgf6/jyAFFEI98mXT4YB4CZN5wXkRzQLnt/uRy8lMgI+w6F5A3icQW0UUUHAwDbPeGb2O/8svlwNQHuf5fG6MYclDyyt53N21IgI9e3plT7yv46z3S/HNKq8bHX8bOKM=
+	t=1713598501; cv=none; b=NEJIQASP3Ux0IRBMlmLbRO1DwkcnRXowI+ccL0hzeoDZKOOfU8/RMng5REfSY15sIvPAzNlS6mvu+TCUmmUhN+BFpwP0C0eVoaEMIstQgbhVDGRD4clvXzmN0U3EWwboWhDps0TZVFWeJrUzCcWe2A99ek+g3H3KIYLKt2LVpNI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713596480; c=relaxed/simple;
-	bh=ZMUUqOB4D5t5yMFOwxUxpJqh/1JOdrP1d4t4rajhJGU=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=gQdIsxIufE3w3f8/HRQEuxEAKipFOSq3J9AwwSHY34nDznq8AGb3DUEoQkh9krOLce6Y210N3Of4ZLkyxUsVh3uVzqL00mns/Vow4e36ZTRTlMhB5Iyu1Q+s1ih/uLryCYpmSSTQUfumSzza/Xc2Lmdg95ApHIaH5nGl/BSz4nk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=H8GKubQ2; arc=none smtp.client-ip=209.85.128.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-61b3b02f691so21238967b3.2
-        for <netdev@vger.kernel.org>; Sat, 20 Apr 2024 00:01:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713596478; x=1714201278; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=P57su8mgviErUG7NWilf3GARZcpiMCmVmtOu5jbcJr4=;
-        b=H8GKubQ25xmtOqNHr9e3zX3S2/nE1OGNqUFYh+BoU9dJvFKzp6l2ri2QCoqOLp7nJ3
-         ymMQawra4ZO282vezM1kxpO6MbcU0Bqbma0kvp8xWu9UOAUim+COXEe26VI0/HHjkEOa
-         pVTPct0/0Xynz+9T3ndBEfl/YtDRgju3D+uPLTsKdBdZw8ZuscOaB5MTk4oJn9+FxZs4
-         W54ZtDVGkZ8JPIoMTx1vB2AI/cOhoSY7HSFsF0W/7kE0IBVSVmCPJuNa66t2X93jR1Pn
-         TvnaDFdRKh/ndt/ItALXyWQqlaaslrY/j1J4ThiGLSdqr+HGLxetAm+4olIJpS9Jkzgx
-         yUyw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713596478; x=1714201278;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=P57su8mgviErUG7NWilf3GARZcpiMCmVmtOu5jbcJr4=;
-        b=pzG15CO6Ut2MZzH2C1BaQZ8xwWKwR7Z9TFZScXZOcE7Dk1kmhyise5A9DocNp5L/rx
-         1BNjlNpchcBShs8vC/yF+QCuc70FIBS4yW5Nlnr9M7ydTrX/BRR/X1GM1wt2BI7Buil0
-         Z2rPli7RBv58bOIO2ySWoQ2cJNu/ec1+gpeyruT2m0ekeCZVLekuap0Dqpr2LmVu//iD
-         oFAJ+vs4dNUviG/971NcqnJHC4YolFmjCezUIQ3VlciGt4EaaC8tLIOXiQirk/ni+A1f
-         o8o25xS1vU2LESItPH3F7cuSf8njTgbYPy8/84tAAxCj88zaV0n7wbfefFCLqDX8IvSK
-         +3+A==
-X-Gm-Message-State: AOJu0Yyi/ITyU2tLtf5h5jdHjgEfyLeQBhHsH9/PBdvDql0Zp30wZFQZ
-	CXdA11SOjJ7rrE80VecGYK8Kz1stvLRf3dwXYqc/cWlWNA0yZzj8jZ8zX1KzHPf+IHbf7XRNWJM
-	ZCjFJWXC1mg==
-X-Google-Smtp-Source: AGHT+IFf2j7HIJXbSXSQDR9b/QLUS7qbiUTgGsKdvmYvHcwjk6Dxco80LBT3HKiDw9cfJUSlYXuYYyxX4l6XCA==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:6902:154f:b0:de5:78:34d2 with SMTP id
- r15-20020a056902154f00b00de5007834d2mr62426ybu.6.1713596478100; Sat, 20 Apr
- 2024 00:01:18 -0700 (PDT)
-Date: Sat, 20 Apr 2024 07:01:16 +0000
+	s=arc-20240116; t=1713598501; c=relaxed/simple;
+	bh=YQ9KfPtm5Gq9HYepBoPJrHlxAcwZYbjakD5piFpGBCI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XLxl6jNNEst2IqF5XyMzMm82Xg8yJj4+7+iWllu0I+9/7J/iwHLHvBsh8AuzwxMOwekkExF8wcmFVqi/Cg8qyyN3l4WwEDpA1H12Ki3o1gYt2QeHg7FwgCnr1Vof9BkqkBnCwGTNYSzmQ6N+NLAkyoeBp99rBZLphCBV9icN8UQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HstIwZ4k; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4FB26C113CE;
+	Sat, 20 Apr 2024 07:34:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713598501;
+	bh=YQ9KfPtm5Gq9HYepBoPJrHlxAcwZYbjakD5piFpGBCI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=HstIwZ4kXYt594F3dTAKefbjqk59LgLelJ4wfeugjHKdccg9U6QSsThvKUdOj6kpr
+	 cxBq3QX4LKiL1ekSZ4hlwHrg2Qo19wEMdjfcoqJC1hKB987QXK8Wq3oegsKl2zZTfI
+	 0ahwnVH2zTwg0WMFDB5bQY2DWepkh6sfONxxfG+SnniZiiLcfZnS8gmDD4/taXFr4a
+	 gNoyuT99b/yZU19nTHh4Wm4L6MjmbQoSYrPwuVYcHB2CCTGISZcttYnTQA36iEYp8c
+	 S1AEVNMPdbCPnyweb2c/fhVBUzL5EOQDTyFmN+U+fX6hUzHCENDjnN15hBAkD3dzc1
+	 3OfMh4fyGR7Ag==
+Date: Sat, 20 Apr 2024 10:33:38 +0300
+From: Mike Rapoport <rppt@kernel.org>
+To: Christophe Leroy <christophe.leroy@csgroup.eu>
+Cc: Masami Hiramatsu <masami.hiramatsu@gmail.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	Alexandre Ghiti <alexghiti@rivosinc.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	=?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Dinh Nguyen <dinguyen@kernel.org>,
+	Donald Dutile <ddutile@redhat.com>,
+	Eric Chanudet <echanude@redhat.com>,
+	Heiko Carstens <hca@linux.ibm.com>, Helge Deller <deller@gmx.de>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	Kent Overstreet <kent.overstreet@linux.dev>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nadav Amit <nadav.amit@gmail.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Puranjay Mohan <puranjay12@gmail.com>,
+	Rick Edgecombe <rick.p.edgecombe@intel.com>,
+	Russell King <linux@armlinux.org.uk>, Song Liu <song@kernel.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+	Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
+	"bpf@vger.kernel.org" <bpf@vger.kernel.org>,
+	"linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>,
+	"linux-mm@kvack.org" <linux-mm@kvack.org>,
+	"linux-modules@vger.kernel.org" <linux-modules@vger.kernel.org>,
+	"linux-parisc@vger.kernel.org" <linux-parisc@vger.kernel.org>,
+	"linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
+	"linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+	"linux-trace-kernel@vger.kernel.org" <linux-trace-kernel@vger.kernel.org>,
+	"linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+	"loongarch@lists.linux.dev" <loongarch@lists.linux.dev>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"sparclinux@vger.kernel.org" <sparclinux@vger.kernel.org>,
+	"x86@kernel.org" <x86@kernel.org>
+Subject: Re: [PATCH v4 14/15] kprobes: remove dependency on CONFIG_MODULES
+Message-ID: <ZiNv0jY7Ebw75iQl@kernel.org>
+References: <20240411160051.2093261-1-rppt@kernel.org>
+ <20240411160051.2093261-15-rppt@kernel.org>
+ <20240418061615.5fad23b954bf317c029acc4d@gmail.com>
+ <ZiKSffcTiP2c6fbs@kernel.org>
+ <321def3e-8bf1-4920-92dd-037b20f1272d@csgroup.eu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.44.0.769.g3c40516874-goog
-Message-ID: <20240420070116.4023672-1-edumazet@google.com>
-Subject: [PATCH v2 net] icmp: prevent possible NULL dereferences from icmp_build_probe()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, David Ahern <dsahern@kernel.org>, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, Andreas Roeseler <andreas.a.roeseler@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <321def3e-8bf1-4920-92dd-037b20f1272d@csgroup.eu>
 
-First problem is a double call to __in_dev_get_rcu(), because
-the second one could return NULL.
+On Fri, Apr 19, 2024 at 03:59:40PM +0000, Christophe Leroy wrote:
+> 
+> 
+> Le 19/04/2024 à 17:49, Mike Rapoport a écrit :
+> > Hi Masami,
+> > 
+> > On Thu, Apr 18, 2024 at 06:16:15AM +0900, Masami Hiramatsu wrote:
+> >> Hi Mike,
+> >>
+> >> On Thu, 11 Apr 2024 19:00:50 +0300
+> >> Mike Rapoport <rppt@kernel.org> wrote:
+> >>
+> >>> From: "Mike Rapoport (IBM)" <rppt@kernel.org>
+> >>>
+> >>> kprobes depended on CONFIG_MODULES because it has to allocate memory for
+> >>> code.
+> >>>
+> >>> Since code allocations are now implemented with execmem, kprobes can be
+> >>> enabled in non-modular kernels.
+> >>>
+> >>> Add #ifdef CONFIG_MODULE guards for the code dealing with kprobes inside
+> >>> modules, make CONFIG_KPROBES select CONFIG_EXECMEM and drop the
+> >>> dependency of CONFIG_KPROBES on CONFIG_MODULES.
+> >>
+> >> Thanks for this work, but this conflicts with the latest fix in v6.9-rc4.
+> >> Also, can you use IS_ENABLED(CONFIG_MODULES) instead of #ifdefs in
+> >> function body? We have enough dummy functions for that, so it should
+> >> not make a problem.
+> > 
+> > The code in check_kprobe_address_safe() that gets the module and checks for
+> > __init functions does not compile with IS_ENABLED(CONFIG_MODULES).
+> > I can pull it out to a helper or leave #ifdef in the function body,
+> > whichever you prefer.
+> 
+> As far as I can see, the only problem is MODULE_STATE_COMING.
+> Can we move 'enum module_state' out of #ifdef CONFIG_MODULES in module.h  ?
 
-if (__in_dev_get_rcu(dev) && __in_dev_get_rcu(dev)->ifa_list)
-
-Second problem is a read from dev->ip6_ptr with no NULL check:
-
-if (!list_empty(&rcu_dereference(dev->ip6_ptr)->addr_list))
-
-Use the correct RCU API to fix these.
-
-v2: add missing include <net/addrconf.h>
-
-Fixes: d329ea5bd884 ("icmp: add response to RFC 8335 PROBE messages")
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Cc: Andreas Roeseler <andreas.a.roeseler@gmail.com>
----
- net/ipv4/icmp.c | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
-
-diff --git a/net/ipv4/icmp.c b/net/ipv4/icmp.c
-index e63a3bf99617627e17669f9b3aaee1cbbf178ebf..437e782b9663bb59acb900c0558137ddd401cd02 100644
---- a/net/ipv4/icmp.c
-+++ b/net/ipv4/icmp.c
-@@ -92,6 +92,7 @@
- #include <net/inet_common.h>
- #include <net/ip_fib.h>
- #include <net/l3mdev.h>
-+#include <net/addrconf.h>
+There's dereference of 'struct module' there:
  
- /*
-  *	Build xmit assembly blocks
-@@ -1032,6 +1033,8 @@ bool icmp_build_probe(struct sk_buff *skb, struct icmphdr *icmphdr)
- 	struct icmp_ext_hdr *ext_hdr, _ext_hdr;
- 	struct icmp_ext_echo_iio *iio, _iio;
- 	struct net *net = dev_net(skb->dev);
-+	struct inet6_dev *in6_dev;
-+	struct in_device *in_dev;
- 	struct net_device *dev;
- 	char buff[IFNAMSIZ];
- 	u16 ident_len;
-@@ -1115,10 +1118,15 @@ bool icmp_build_probe(struct sk_buff *skb, struct icmphdr *icmphdr)
- 	/* Fill bits in reply message */
- 	if (dev->flags & IFF_UP)
- 		status |= ICMP_EXT_ECHOREPLY_ACTIVE;
--	if (__in_dev_get_rcu(dev) && __in_dev_get_rcu(dev)->ifa_list)
-+
-+	in_dev = __in_dev_get_rcu(dev);
-+	if (in_dev && rcu_access_pointer(in_dev->ifa_list))
- 		status |= ICMP_EXT_ECHOREPLY_IPV4;
--	if (!list_empty(&rcu_dereference(dev->ip6_ptr)->addr_list))
-+
-+	in6_dev = __in6_dev_get(dev);
-+	if (in6_dev && !list_empty(&in6_dev->addr_list))
- 		status |= ICMP_EXT_ECHOREPLY_IPV6;
-+
- 	dev_put(dev);
- 	icmphdr->un.echo.sequence |= htons(status);
- 	return true;
--- 
-2.44.0.769.g3c40516874-goog
+		(*probed_mod)->state != MODULE_STATE_COMING) {
+			...
+		}
 
+so moving out 'enum module_state' won't be enough.
+ 
+> >   
+> >> -- 
+> >> Masami Hiramatsu
+> > 
+
+-- 
+Sincerely yours,
+Mike.
 
