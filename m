@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-89797-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89798-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 683B48AB937
-	for <lists+netdev@lfdr.de>; Sat, 20 Apr 2024 05:30:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BDDD48AB93B
+	for <lists+netdev@lfdr.de>; Sat, 20 Apr 2024 05:30:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A12311C20BBC
-	for <lists+netdev@lfdr.de>; Sat, 20 Apr 2024 03:30:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F0AB31C20E84
+	for <lists+netdev@lfdr.de>; Sat, 20 Apr 2024 03:30:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8954E8C10;
-	Sat, 20 Apr 2024 03:30:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B5ACDDCB;
+	Sat, 20 Apr 2024 03:30:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ih8+tYUt"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PB4P6sNf"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 563B3205E12;
-	Sat, 20 Apr 2024 03:30:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35839DDA8;
+	Sat, 20 Apr 2024 03:30:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713583827; cv=none; b=EBs6ku1VXTdqzD4XxfMW2bfntT5TOcWMgDTP3UR9LJcFivOuw2qOgxqvs9MEvpfCN0ouTcZdPKDW+Usi3kUAh4KipzkrGknXy0lRiYp09bp/f5EGZ8m36Q8XwvqUlt+7bHCSZZvs7LpzGflPEExq+Qi7me0YvpRb2v7TbEtwVak=
+	t=1713583829; cv=none; b=DtHLlt7ZwFoPEozPzJOXuc0tMySWuSC5Gfgs2MQu9sY1aqwowBcyVGZZwpw86Gm6RqxydLpJPPuq3cGsCX5Ad2m5OpDdhPQZZEVLLjjR10JUZfRatlAUGZripArYBXWlCtl7gPvkqU26zUuInkX8fKwRZsEbcDzm7GsACN5fBdA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713583827; c=relaxed/simple;
-	bh=ge+p0vlGL3TK17rE/0pRocV+1Vdpj2kDg6BqmdERj0Y=;
+	s=arc-20240116; t=1713583829; c=relaxed/simple;
+	bh=SiGMpQbe8ZtWXyfF4V/sR/uPQM8brDvWkx4PDvxfjm0=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=QSNZtsi/CFcmDrP0+GFs9cN5csn0kaopmaTK31wxTwXcaRtV07CuYJGpyOnNV6enqH+rcmQJAeF2kwF46YKUROpZrX2PSo1XOphoaKMkmvXHkob5TRdOsLEQa54azt5qmWnoWbtL/GFn6FeS5AoJeeDCteWm1LOLPbXBrdH9cQ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ih8+tYUt; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id CC70EC2BD10;
-	Sat, 20 Apr 2024 03:30:26 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=cieL8alfRHLebQ7NDXdK3OtA/71LOaa8whqKszs4eSlEh8c0g6uRWMOEJwqVRKgOOTCLqwzurujlh+1ZrlvMdoPnlpYVWtoX3oPSgFomn1Ao01NJHCMOL/+AcT+WLmhXYPYpQiM8AyFUh71f4KaHO9pcrOXN2lYLidK2biroWj8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PB4P6sNf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 13469C32783;
+	Sat, 20 Apr 2024 03:30:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713583826;
-	bh=ge+p0vlGL3TK17rE/0pRocV+1Vdpj2kDg6BqmdERj0Y=;
+	s=k20201202; t=1713583829;
+	bh=SiGMpQbe8ZtWXyfF4V/sR/uPQM8brDvWkx4PDvxfjm0=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ih8+tYUtqQakxySPlijyM52BXGgjnDI+LNp/gSG7StKi0K8wcj+vyxH09YGozGJce
-	 zJp8O1bJTzorTwS3ih5Q2LPHUabagY2MwQ9NN9gHzQxPsNHedq0GWIZ2RFXPkPhfDM
-	 eg9qiFdhrdfB5cbWOiLfk1PYhaj5H0hPqCv/qY6brVuPC+h0GvcT6Ika8XgjQaujlw
-	 bz9NHAs/WnFN/YEuiEE0S4Eou4KIGb00lyG2GavLnnTKKC17/BINivsSv9Gdmidw6c
-	 Tui1uslspTdWYuvw4ySubTkbCx5/3+4fQ6N4wSXKeo8dTiEpG98TiyPxEn59F1bDg8
-	 BxzVy9CWwnWKw==
+	b=PB4P6sNfNtbuGq7Z5ejPY0xryH0mO+4UZZOJAuCovb7jkjgARj0vLFIUo71mB0Hsy
+	 NdAeKqTiuhKy/HeYpTAfJVNCC36KDK7xU42Vnhopyn5RZkydtK9eClECUu2But+FAu
+	 SzeKZ91xFjB7L4IqC4MDs3eDCCLp3fAZFCXoXLGHAZrNaHDAHh24EHd49r/t9nvWBP
+	 8Yln54mDULZeUUf+0uMmfEIRr3tG297e/XtvXIj8sSWXOr32VLLKvBiDZVPaRzpK9L
+	 NFRCMmWyQYGf0xZFFgEZ0QUWw3SlsvYg+XVaCDF1KbLb2pTpCAxAyRxnRxJjIARGMc
+	 1pDVNm/EJe3hg==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B80C4C43618;
-	Sat, 20 Apr 2024 03:30:26 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 07F7DC433E9;
+	Sat, 20 Apr 2024 03:30:29 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,38 +52,66 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v3] udp: preserve the connected status if only UDP cmsg
+Subject: Re: [PATCH net-next v2 00/12] testing: make netfilter selftests
+ functional in vng environment
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171358382675.21761.12628659317542908003.git-patchwork-notify@kernel.org>
-Date: Sat, 20 Apr 2024 03:30:26 +0000
-References: <20240418170610.867084-1-yick.xie@gmail.com>
-In-Reply-To: <20240418170610.867084-1-yick.xie@gmail.com>
-To: Yick Xie <yick.xie@gmail.com>
-Cc: willemdebruijn.kernel@gmail.com, willemb@google.com,
- netdev@vger.kernel.org, davem@davemloft.net, dsahern@kernel.org,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- linux-kernel@vger.kernel.org, stable@vger.kernel.org
+ <171358382902.21761.11464327013965926812.git-patchwork-notify@kernel.org>
+Date: Sat, 20 Apr 2024 03:30:29 +0000
+References: <20240418152744.15105-1-fw@strlen.de>
+In-Reply-To: <20240418152744.15105-1-fw@strlen.de>
+To: Florian Westphal <fw@strlen.de>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, netfilter-devel@vger.kernel.org,
+ pablo@netfilter.org
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri, 19 Apr 2024 01:06:10 +0800 you wrote:
-> If "udp_cmsg_send()" returned 0 (i.e. only UDP cmsg),
-> "connected" should not be set to 0. Otherwise it stops
-> the connected socket from using the cached route.
+On Thu, 18 Apr 2024 17:27:28 +0200 you wrote:
+> This is the second batch of the netfilter selftest move.
 > 
-> Fixes: 2e8de8576343 ("udp: add gso segment cmsg")
-> Signed-off-by: Yick Xie <yick.xie@gmail.com>
-> Cc: stable@vger.kernel.org
+> Changes since v1:
+> - makefile and kernel config are updated to have all required features
+> - fix makefile with missing bits to make kselftest-install work
+> - test it via vng as per
+>    https://github.com/linux-netdev/nipa/wiki/How-to-run-netdev-selftests-CI-style
+>    (Thanks Jakub!)
+> - squash a few fixes, e.g. nft_queue.sh v1 had a race w. NFNETLINK_QUEUE=m
+> - add a settings file with 8m timeout, for nft_concat_range.sh sake.
+>   That script can be sped up a bit, I think, but its not contained in
+>   this batch yet.
+> - toss the first two bogus rebase artifacts (Matthieu Baerts)
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v3] udp: preserve the connected status if only UDP cmsg
-    https://git.kernel.org/netdev/net/c/680d11f6e542
+  - [net-next,v2,01/12] selftests: netfilter: nft_queue.sh: move to lib.sh infra
+    https://git.kernel.org/netdev/net-next/c/03a1a62f3a3c
+  - [net-next,v2,02/12] selftests: netfilter: nft_queue.sh: shellcheck cleanups
+    https://git.kernel.org/netdev/net-next/c/cebb352269e7
+  - [net-next,v2,03/12] selftests: netfilter: nft_synproxy.sh: move to lib.sh infra
+    https://git.kernel.org/netdev/net-next/c/a849e06c8025
+  - [net-next,v2,04/12] selftests: netfilter: nft_zones_many.sh: move to lib.sh infra
+    https://git.kernel.org/netdev/net-next/c/c1a9d47b59d0
+  - [net-next,v2,05/12] selftests: netfilter: xt_string.sh: move to lib.sh infra
+    https://git.kernel.org/netdev/net-next/c/5067fec09403
+  - [net-next,v2,06/12] selftests: netfilter: xt_string.sh: shellcheck cleanups
+    https://git.kernel.org/netdev/net-next/c/c0f9a2b705c2
+  - [net-next,v2,07/12] selftests: netfilter: nft_nat_zones.sh: shellcheck cleanups
+    https://git.kernel.org/netdev/net-next/c/d6905f088d2b
+  - [net-next,v2,08/12] selftests: netfilter: conntrack_ipip_mtu.sh: shellcheck cleanups
+    https://git.kernel.org/netdev/net-next/c/05af10a88e75
+  - [net-next,v2,09/12] selftests: netfilter: nft_fib.sh: shellcheck cleanups
+    https://git.kernel.org/netdev/net-next/c/9b443c769b1b
+  - [net-next,v2,10/12] selftests: netfilter: nft_meta.sh: small shellcheck cleanup
+    https://git.kernel.org/netdev/net-next/c/4d7730154ed5
+  - [net-next,v2,11/12] selftests: netfilter: nft_audit.sh: add more skip checks
+    https://git.kernel.org/netdev/net-next/c/1f50b0fef936
+  - [net-next,v2,12/12] selftests: netfilter: update makefiles and kernel config
+    https://git.kernel.org/netdev/net-next/c/0b2e1db97b42
 
 You are awesome, thank you!
 -- 
