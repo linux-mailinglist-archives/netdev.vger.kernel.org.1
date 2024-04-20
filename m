@@ -1,113 +1,94 @@
-Return-Path: <netdev+bounces-89796-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89797-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3D6A8AB935
-	for <lists+netdev@lfdr.de>; Sat, 20 Apr 2024 05:25:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 683B48AB937
+	for <lists+netdev@lfdr.de>; Sat, 20 Apr 2024 05:30:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 31F03B21E7B
-	for <lists+netdev@lfdr.de>; Sat, 20 Apr 2024 03:25:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A12311C20BBC
+	for <lists+netdev@lfdr.de>; Sat, 20 Apr 2024 03:30:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1315883D;
-	Sat, 20 Apr 2024 03:25:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8954E8C10;
+	Sat, 20 Apr 2024 03:30:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZNwsrogw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ih8+tYUt"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B6B62563
-	for <netdev@vger.kernel.org>; Sat, 20 Apr 2024 03:25:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 563B3205E12;
+	Sat, 20 Apr 2024 03:30:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713583537; cv=none; b=Hx/kJmGBumUKEHT+4KUQKxAgc6L4t47mEdnkAKgIKWSm8CbpC23jqhkbLHsRr0hscrcQFzrStdq6VvbYxJgJ9AKBf3GGSqUijyUExnHH0HiDaRfzYo3FNRqsP1zVsJfokLvxOafYGRfqGttkmeEhnTxJQuuub0h22ZIS2Q8qmho=
+	t=1713583827; cv=none; b=EBs6ku1VXTdqzD4XxfMW2bfntT5TOcWMgDTP3UR9LJcFivOuw2qOgxqvs9MEvpfCN0ouTcZdPKDW+Usi3kUAh4KipzkrGknXy0lRiYp09bp/f5EGZ8m36Q8XwvqUlt+7bHCSZZvs7LpzGflPEExq+Qi7me0YvpRb2v7TbEtwVak=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713583537; c=relaxed/simple;
-	bh=g1O27Bq7G0LcA9XW/HZGo2PrUBu4rhv9VXjV8nCL9AA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OhdjmVCGPCqVtgNFpWkCnfLACQAxSxD42vUw1L7XlEsOUw0GOdE6MZHEHMLQGt1Ly6a0lTq8EkAPACuq1htxZtcjuQ+noHCf9EpcARL+yxKLbM09bZKSp0qtPlUhayca7VlJnhzMJRv9Rux3jzyqrjOa/OfOw0cGb445q5bu2+U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZNwsrogw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1753C072AA;
-	Sat, 20 Apr 2024 03:25:36 +0000 (UTC)
+	s=arc-20240116; t=1713583827; c=relaxed/simple;
+	bh=ge+p0vlGL3TK17rE/0pRocV+1Vdpj2kDg6BqmdERj0Y=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=QSNZtsi/CFcmDrP0+GFs9cN5csn0kaopmaTK31wxTwXcaRtV07CuYJGpyOnNV6enqH+rcmQJAeF2kwF46YKUROpZrX2PSo1XOphoaKMkmvXHkob5TRdOsLEQa54azt5qmWnoWbtL/GFn6FeS5AoJeeDCteWm1LOLPbXBrdH9cQ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ih8+tYUt; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id CC70EC2BD10;
+	Sat, 20 Apr 2024 03:30:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713583537;
-	bh=g1O27Bq7G0LcA9XW/HZGo2PrUBu4rhv9VXjV8nCL9AA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ZNwsrogwMYVrFShmzlGT+jDJjJZiPZK8AKaGY2r7d/Qt22rJqxDWvFYP73VcPo9jV
-	 ELPsCeks8LJ0Yq4abFhwz7bEzZc7B1bS/DhTovATVVQbM8eJUxCsQNgBS1Xvg5yOp7
-	 bG3A+b9Kc+9sGP+rv53FurI/AIG8dr68wI6na54LRZfa41DQZViDZPOG0S8IFxTXIj
-	 ygeHMWjcKoR8NH2T626MGOelY4MWCVm9Hk6DWfSZWJukeH2988pSCMyqCte+bwxL6Y
-	 wyh4SFjmF9/qj60aHk/OOrp3u5hywUnHICnXWD8QsTlJiUlJpVMjX1gcyudfBursxF
-	 DpAsfWn/vUZ6w==
-Date: Fri, 19 Apr 2024 20:25:35 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Mina Almasry <almasrymina@google.com>
-Cc: Shailend Chand <shailend@google.com>, netdev@vger.kernel.org,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- willemb@google.com
-Subject: Re: [RFC PATCH net-next 9/9] gve: Implement queue api
-Message-ID: <20240419202535.5c5097fe@kernel.org>
-In-Reply-To: <CAHS8izO=Vc6Kxx620_y6v-3PtRL3_UFP6zDRfgLf85SXpP0+dQ@mail.gmail.com>
-References: <20240418195159.3461151-1-shailend@google.com>
-	<20240418195159.3461151-10-shailend@google.com>
-	<20240418184851.5cc11647@kernel.org>
-	<CAHS8izO=Vc6Kxx620_y6v-3PtRL3_UFP6zDRfgLf85SXpP0+dQ@mail.gmail.com>
+	s=k20201202; t=1713583826;
+	bh=ge+p0vlGL3TK17rE/0pRocV+1Vdpj2kDg6BqmdERj0Y=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=ih8+tYUtqQakxySPlijyM52BXGgjnDI+LNp/gSG7StKi0K8wcj+vyxH09YGozGJce
+	 zJp8O1bJTzorTwS3ih5Q2LPHUabagY2MwQ9NN9gHzQxPsNHedq0GWIZ2RFXPkPhfDM
+	 eg9qiFdhrdfB5cbWOiLfk1PYhaj5H0hPqCv/qY6brVuPC+h0GvcT6Ika8XgjQaujlw
+	 bz9NHAs/WnFN/YEuiEE0S4Eou4KIGb00lyG2GavLnnTKKC17/BINivsSv9Gdmidw6c
+	 Tui1uslspTdWYuvw4ySubTkbCx5/3+4fQ6N4wSXKeo8dTiEpG98TiyPxEn59F1bDg8
+	 BxzVy9CWwnWKw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B80C4C43618;
+	Sat, 20 Apr 2024 03:30:26 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v3] udp: preserve the connected status if only UDP cmsg
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171358382675.21761.12628659317542908003.git-patchwork-notify@kernel.org>
+Date: Sat, 20 Apr 2024 03:30:26 +0000
+References: <20240418170610.867084-1-yick.xie@gmail.com>
+In-Reply-To: <20240418170610.867084-1-yick.xie@gmail.com>
+To: Yick Xie <yick.xie@gmail.com>
+Cc: willemdebruijn.kernel@gmail.com, willemb@google.com,
+ netdev@vger.kernel.org, davem@davemloft.net, dsahern@kernel.org,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ linux-kernel@vger.kernel.org, stable@vger.kernel.org
 
-On Fri, 19 Apr 2024 09:10:42 -0700 Mina Almasry wrote:
-> Currently the ndos don't include an interface for the driver to
-> declare the size, right? In theory we could add it to the ndos like
-> so, if I understood you correctly (untested yet, just to illustrate
-> what I'm thinking point):
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Fri, 19 Apr 2024 01:06:10 +0800 you wrote:
+> If "udp_cmsg_send()" returned 0 (i.e. only UDP cmsg),
+> "connected" should not be set to 0. Otherwise it stops
+> the connected socket from using the cached route.
 > 
-> diff --git a/drivers/net/ethernet/google/gve/gve_main.c
-> b/drivers/net/ethernet/google/gve/gve_main.c
-> index 7c38dc06a392..efe3944b529a 100644
-> --- a/drivers/net/ethernet/google/gve/gve_main.c
-> +++ b/drivers/net/ethernet/google/gve/gve_main.c
-> @@ -2579,11 +2579,16 @@ static void gve_write_version(u8 __iomem
-> *driver_version_register)
->   writeb('\n', driver_version_register);
->  }
+> Fixes: 2e8de8576343 ("udp: add gso segment cmsg")
+> Signed-off-by: Yick Xie <yick.xie@gmail.com>
+> Cc: stable@vger.kernel.org
 > 
-> +static size_t gve_rx_queue_mem_get_size(void)
-> +{
-> + return sizeof(struct gve_rx_ring);
-> +}
+> [...]
 
-> @@ -2709,6 +2709,7 @@ static const struct netdev_queue_mgmt_ops
-> gve_queue_mgmt_ops = {
->   .ndo_queue_mem_free = gve_rx_queue_mem_free,
->   .ndo_queue_start = gve_rx_queue_start,
->   .ndo_queue_stop = gve_rx_queue_stop,
-> + .ndo_queue_mem_get_size = gve_rx_queue_mem_get_size,
->  };
+Here is the summary with links:
+  - [net,v3] udp: preserve the connected status if only UDP cmsg
+    https://git.kernel.org/netdev/net/c/680d11f6e542
 
-I don't think we need to make it a callback, even, directly:
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-const struct netdev_queue_mgmt_ops gve_queue_mgmt_ops = {
-+	.queue_mem_size		= sizeof(struct gve_rx_ring),
- 	.ndo_queue_mem_free	= gve_rx_queue_mem_free,
- 	.ndo_queue_start	= gve_rx_queue_start,
- 	.ndo_queue_stop		= gve_rx_queue_stop,
 
-> I think maybe if we want to apply this change to mem_stop, then we
-> should probably also apply this change to queue_mem_alloc as well,
-> right? I.e. core will allocate the pointer, and ndo_queue_mem_alloc
-> would allocate the actual resources and would fill in the entries of
-> the pointer? Is this what you're looking for here?
-
-Yup. But thinking about it again, this may be more natural once we also
-have the open/close path use the queue API. IIUC for now the driver
-allocates the queue resources on open, without going via .ndo_queue_*
-If that's the case we can keep the code as you have it here.
 
