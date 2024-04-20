@@ -1,151 +1,94 @@
-Return-Path: <netdev+bounces-89830-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89831-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 088998ABCA9
-	for <lists+netdev@lfdr.de>; Sat, 20 Apr 2024 20:18:36 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E825B8ABCC7
+	for <lists+netdev@lfdr.de>; Sat, 20 Apr 2024 20:35:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6ACA21F21338
-	for <lists+netdev@lfdr.de>; Sat, 20 Apr 2024 18:18:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 53D95B20CBA
+	for <lists+netdev@lfdr.de>; Sat, 20 Apr 2024 18:35:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B11623B182;
-	Sat, 20 Apr 2024 18:18:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AmaCgrOV"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79F392629F;
+	Sat, 20 Apr 2024 18:35:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B0B32E3E5
-	for <netdev@vger.kernel.org>; Sat, 20 Apr 2024 18:18:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B3B017C66
+	for <netdev@vger.kernel.org>; Sat, 20 Apr 2024 18:35:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713637111; cv=none; b=f5J/4y9GKtmfPpcDDIuYVriBQE+CHQCGNq75Y+3bj2C+dAzXw3WpafULvQmR6YDY0jvWlveqCfWRcb7FyH36djcRmQZygdryxTL6kXvq9/4JoGm/2AkQsI/xd3GU9akSezAIaqbL5QBEh8MY2Lrtb6+vERKzY39bZtwN02uD4s8=
+	t=1713638106; cv=none; b=V/8qUi0jeI1Rl1C3ijrgcDcWHIlAbB+s/RxXm2hVVYIpG8LP6TEcEGpfnT1NMQaIWlKYBx4F5uZsn/e5+t5zNmQps0mF4U3T+yUmxGKPOrawRfTMXcsTJS51ZzqPeYo7YocjBO6pq4DT9/ghqoKkRi93ZWHH16oHNem7hsDxCc0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713637111; c=relaxed/simple;
-	bh=ts4FPlOyzVKMxbCvwKM4YpkwOuRdKBgIVy0ksYAFLwk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=s6on8sVmGSW0MW5kRqGk2z3KtXYV82qCDjG6KNiCXYtdcMAPlxSDoKcaUKEsXNUKQrEZ0MHVmR6XWyb1og6mRl3Ze1uN7hpT0KV39FGSly9ZFGadmebBBLCqg7ZF2annCRbwSMqWZXlyPwL6vTRIG3fGFBCrlXKuE64u/F792lA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AmaCgrOV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 84A95C072AA;
-	Sat, 20 Apr 2024 18:18:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713637110;
-	bh=ts4FPlOyzVKMxbCvwKM4YpkwOuRdKBgIVy0ksYAFLwk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=AmaCgrOVGiKi7yhckHOvlXcC3eOgXdiYgKk49e+u3FuePFZxOWL+vNWe0JGHfYa2Y
-	 JOak8FPZx3Xm6eMyWhswILqzP0mRn2qo/tyys9bZUw7yzsjyeL8S9NtiLErFUSNunV
-	 VqcygiTUG1Z8MXzZw25MRI8Otkp+h2YDF3/dfyjNn7sgYYbYktdY5djHjFsa2Lj/z5
-	 bRZQB95ZcxQ9O26gbdsfU50VrWfi6HFkPQFKY+Q0aW9kM8PpgfkNx6sdpzIpZ8Mx+y
-	 og6sL7afteF/L45R1ysiZlaexNmMFBaTEU27Jc5VkdXhc0VOl8mFZONQSnUDjzf8bY
-	 7Is4osfDNX9Lw==
-Date: Sat, 20 Apr 2024 19:18:26 +0100
-From: Simon Horman <horms@kernel.org>
-To: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	vinicius.gomes@intel.com, Stefan Wegrzyn <stefan.wegrzyn@intel.com>,
-	Jedrzej Jagielski <jedrzej.jagielski@intel.com>,
-	Jan Sokolowski <jan.sokolowski@intel.com>
-Subject: Re: [PATCH iwl-next v2 2/5] ixgbe: Add support for E610 device
- capabilities detection
-Message-ID: <20240420181826.GA42092@kernel.org>
-References: <20240415103435.6674-1-piotr.kwapulinski@intel.com>
- <20240415103435.6674-3-piotr.kwapulinski@intel.com>
+	s=arc-20240116; t=1713638106; c=relaxed/simple;
+	bh=hdYBH6iHeFdCwus1qkWibPK9xXXOODQaZ79r1j4yrBI=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=JUXTMDyvg66/X18ulaT38d2Wsojgx9BYOETsRC923sGzqOcl+6v03qT0xE+Zjpd1/JHfaSbSsC6o+50VmCu83WmZE90R+vE1maCskscrxj/0LpBA4sNYzfGVfZhsjXDRoIplENFWUQ8NmCnPZ1EG4AxJocmK3sQvo1k5y+ac93I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-36b323b64faso36360105ab.3
+        for <netdev@vger.kernel.org>; Sat, 20 Apr 2024 11:35:04 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713638104; x=1714242904;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=E/RSUERUuEiGuR/bt0u6YwzU2HAwP9JNrb2sLt0V+TM=;
+        b=W8sXNXoAZuopIa16AfWrE9t6QFuxJzfO1LI24VS59gULNwsrv1JhjMAm7QtlzMrVSY
+         GX5ThRdO5ck1hf0SSbEjkLK8sY6oJhe+uwVfCnbzUFNTgEKJmG2mn0w6KdvpqzEx81D5
+         l9jEUHy7ITfPT60jE0fbf9go7WcTacqqkqh9GheYgj2pznvaUtNuj2tq2xqlOVS8zNTI
+         Eq0GXnwtl9XFYX9QMXNysZADkTloddH0mXke162pU4gNnfeazFKV6rcWQrYxCGwffHk0
+         6A+P9iURHCvmBXo59L0lBldEVPEs3DaIPE4+YRa9YxQwN69Gv6fNtP8465XUqjST2Esn
+         cpJw==
+X-Forwarded-Encrypted: i=1; AJvYcCW8+Qlk8TQFc1aXNmwQC0GN/53E8qupw8lzlx+r+hifkcyvF3++TGBg0krAq0SARRvLmqHDdUzAOgB0EU2p5xrYJ6y/DN8g
+X-Gm-Message-State: AOJu0YwWH3XOjCa5vyZZJSotSojEMsj9GBo6pddHu7K6OktC/Vv05em1
+	NOMmpFV0r88/fT1QDGSijcfrfUbDlMqtI9ClolORVVUFVZibv2DWblJbKR9kAiokTO9lp6680Rq
+	zp0Oh702ZwBOOZioPFk5+KWescAjxToBWjJHrrykUlU7MyEiuEtO7xhA=
+X-Google-Smtp-Source: AGHT+IEIYRljOZ2wAtG68BgkwUPz1JJIzsBclxONGi2PdmpGI2v+nTHaehY42mQIKfag3/pz7z4wzM709vsB92+SFOsPU95f+07y
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240415103435.6674-3-piotr.kwapulinski@intel.com>
+X-Received: by 2002:a92:c267:0:b0:36b:fbab:9f14 with SMTP id
+ h7-20020a92c267000000b0036bfbab9f14mr386675ild.1.1713638104271; Sat, 20 Apr
+ 2024 11:35:04 -0700 (PDT)
+Date: Sat, 20 Apr 2024 11:35:04 -0700
+In-Reply-To: <000000000000c6405606166fdc68@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000007aa28106168b76c9@google.com>
+Subject: Re: [syzbot] [net?] WARNING in gre_tap_xmit (2)
+From: syzbot <syzbot+c298c9f0e46a3c86332b@syzkaller.appspotmail.com>
+To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, fw@strlen.de, 
+	horms@kernel.org, kuba@kernel.org, kuniyu@amazon.com, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Apr 15, 2024 at 12:34:32PM +0200, Piotr Kwapulinski wrote:
-> Add low level support for E610 device capabilities detection. The
-> capabilities are discovered via the Admin Command Interface. Discover the
-> following capabilities:
-> - function caps: vmdq, dcb, rss, rx/tx qs, msix, nvm, orom, reset
-> - device caps: vsi, fdir, 1588
-> - phy caps
-> 
-> Co-developed-by: Stefan Wegrzyn <stefan.wegrzyn@intel.com>
-> Signed-off-by: Stefan Wegrzyn <stefan.wegrzyn@intel.com>
-> Co-developed-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-> Signed-off-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-> Reviewed-by: Jan Sokolowski <jan.sokolowski@intel.com>
-> Signed-off-by: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
+syzbot has bisected this issue to:
 
-Hi Pitor,
+commit 219eee9c0d16f1b754a8b85275854ab17df0850a
+Author: Florian Westphal <fw@strlen.de>
+Date:   Fri Feb 16 11:36:57 2024 +0000
 
-A few minor nits from my side.
-No need to respin just because of these.
+    net: skbuff: add overflow debug check to pull/push helpers
 
-> ---
->  drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c | 517 ++++++++++++++++++
->  drivers/net/ethernet/intel/ixgbe/ixgbe_e610.h |  11 +
->  2 files changed, 528 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=167a954f180000
+start commit:   443574b03387 riscv, bpf: Fix kfunc parameters incompatibil..
+git tree:       bpf
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=157a954f180000
+console output: https://syzkaller.appspot.com/x/log.txt?x=117a954f180000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=6fb1be60a193d440
+dashboard link: https://syzkaller.appspot.com/bug?extid=c298c9f0e46a3c86332b
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=14a94f00980000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15bce6ab180000
 
-...
+Reported-by: syzbot+c298c9f0e46a3c86332b@syzkaller.appspotmail.com
+Fixes: 219eee9c0d16 ("net: skbuff: add overflow debug check to pull/push helpers")
 
-> +/**
-> + * ixgbe_get_num_per_func - determine number of resources per PF
-> + * @hw: pointer to the HW structure
-> + * @max: value to be evenly split between each PF
-> + *
-> + * Determine the number of valid functions by going through the bitmap returned
-> + * from parsing capabilities and use this to calculate the number of resources
-> + * per PF based on the max value passed in.
-> + *
-> + * Return: the number of resources per PF or 0, if no PH are available.
-> + */
-> +static u32 ixgbe_get_num_per_func(struct ixgbe_hw *hw, u32 max)
-> +{
-> +	const u32 IXGBE_CAPS_VALID_FUNCS_M = 0xFF;
-
-nit: Maybe this could simply be a #define?
-
-> +	u8 funcs = hweight8(hw->dev_caps.common_cap.valid_functions &
-> +			    IXGBE_CAPS_VALID_FUNCS_M);
-
-nit: Please consider using reverse xmas tree order - longest line to shortest -
-     for local variables in new Networking code
-
-> +
-> +	return funcs ? (max / funcs) : 0;
-> +}
-
-...
-
-> +/**
-> + * ixgbe_aci_disable_rxen - disable RX
-> + * @hw: pointer to the HW struct
-> + *
-> + * Request a safe disable of Receive Enable using ACI command (0x000C).
-> + *
-> + * Return: the exit code of the operation.
-> + */
-> +int ixgbe_aci_disable_rxen(struct ixgbe_hw *hw)
-> +{
-> +	struct ixgbe_aci_cmd_disable_rxen *cmd;
-> +	struct ixgbe_aci_desc desc;
-> +
-> +	cmd = &desc.params.disable_rxen;
-> +
-> +	ixgbe_fill_dflt_direct_cmd_desc(&desc, ixgbe_aci_opc_disable_rxen);
-> +
-> +	cmd->lport_num = (u8)hw->bus.func;
-
-nit: This cast seems unnecessary.
-     AFAICT the type of hw->bus.func is u8.
-
-> +
-> +	return ixgbe_aci_send_cmd(hw, &desc, NULL, 0);
-> +}
-
-...
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
