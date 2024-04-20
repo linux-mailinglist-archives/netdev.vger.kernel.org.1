@@ -1,97 +1,76 @@
-Return-Path: <netdev+bounces-89799-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89800-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C7358AB93D
-	for <lists+netdev@lfdr.de>; Sat, 20 Apr 2024 05:40:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2809A8AB947
+	for <lists+netdev@lfdr.de>; Sat, 20 Apr 2024 05:48:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A78391F2173F
-	for <lists+netdev@lfdr.de>; Sat, 20 Apr 2024 03:40:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1F4D81C2091C
+	for <lists+netdev@lfdr.de>; Sat, 20 Apr 2024 03:47:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03AAE8F5D;
-	Sat, 20 Apr 2024 03:40:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51BF98F6E;
+	Sat, 20 Apr 2024 03:47:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hGCX0zmZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AgSyx3jR"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0568205E20;
-	Sat, 20 Apr 2024 03:40:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E306205E12
+	for <netdev@vger.kernel.org>; Sat, 20 Apr 2024 03:47:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713584427; cv=none; b=n0T/QsAEjOuF0xFULUGh9OCB2J24h6mBTRY/twMtEx+rusGOu9f2nFTrnlEhgO3TR5/PfjPCuZQc0jhxJHLN0/EsewYm3ZcBuI1hdUEabZ/4HWpVlYBbiboLMljXfONVLQFKGhaGqXFEBWYRK8aFd8spYfAPEGDPYucy9XLfFHE=
+	t=1713584876; cv=none; b=JaVUTJkheY9d3MDtCXeeNFF1Sn09Xzc+pZffhndHJQgW6vSYxBrgXIFc7XDgMPRp7Vc698M1ZeIz6jYik3etUjtEIEKNfggUDzI/GZhJ2/HRa9JcawRfJ44uyjs4uNS1AH7075TRV51SdfE6MRvfTK4hdKTwuQvZYOpmSEhah0Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713584427; c=relaxed/simple;
-	bh=lDtOSzSqPPZ0dGZqkNge31vzyoqc90LYNfr3sVGBpcg=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=IKs1YkxflFNSgoMvxNWW+AN53f7L/HwJF2a4awpzPEQFmqzx9yntmZq48imSkCEDz3W86hLTOSzGu8+o2WUSlPeWahCcrjJFTkq+HFQbkiEM6v4HXL7K1jyD+9C63LCJRwUiTx3pp38Pvo9dP6kF299vBTOp2yT/8IbP/2cql+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hGCX0zmZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 8FE9FC2BD11;
-	Sat, 20 Apr 2024 03:40:27 +0000 (UTC)
+	s=arc-20240116; t=1713584876; c=relaxed/simple;
+	bh=J8O37Lq/C1eRN/zu7B23GwnAjTIkM6TSJFkBO5dKPFY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=D6ZSbsRDuGbM16juwV93jfIGJz26cLJHmhOYPJB4h+udmqlJlPuq+V9DfcWgPJpXb597xZLavibI8rrZXGa+g0+DE9Ygxa78DvS/pmyII7TlPQ22k6JcVmVRP9f5Waw+mB4daAaqWcX4mDT0bmLv49OSDdPGm5ZdfKvbq1gqMsg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AgSyx3jR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A5E8C113CC;
+	Sat, 20 Apr 2024 03:47:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713584427;
-	bh=lDtOSzSqPPZ0dGZqkNge31vzyoqc90LYNfr3sVGBpcg=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=hGCX0zmZ7i2woZjbqSYZDISyu4iuARiIbWUKO8YHomBokXQfciqz4lPp+mA47/I7M
-	 WXm5uGcH663RcB1rIN/UryIHG43Urh0SvYWo4S8y4lK1PbJj972Y86AmnT34a+lkqu
-	 wVkQjW+09kVFd/M8arHKNopzqGZ6dYQEGM/tMWx804uc4Cs2mq2BvmQF6OtulFWVH4
-	 h4kb9BBBcFbfPVqywrtmzVUKXXDhNPIvRaZ6d8MtKJta/wWjGeA6nFZ142SEJ8CUGX
-	 Tggu5spGIHJzQxj4UlQHrjGbmBZ5MP1p03OXC068kK3xwRnd6YyrK8Rm/J43KSnTzW
-	 ppqdR4oHXipOg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 7AD64C433E9;
-	Sat, 20 Apr 2024 03:40:27 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1713584875;
+	bh=J8O37Lq/C1eRN/zu7B23GwnAjTIkM6TSJFkBO5dKPFY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=AgSyx3jRHPZ0nG9q1CpSvdaG2iCSlgvqMUBtcCNCx24gVnuULgR0aKA3JxPGFI40P
+	 Kqv0sZ+o70hjbVHadO92/zI6xGyzaHRBoQ2jYw8mJd4tgaMhAjL4Ckd5Bqa2ASQyZh
+	 dZTDZK7dvCA39DSDyzaxi6rbJ0Ik8+EhIPRY7izu54448tCtHVvdX6Z10OgfpZjWc/
+	 mS3JmLpwqG0UPJV20SfkzNx1uWYZbqDgzie73L1H/4ErMW0D8YX0Repu+fm31hDlGW
+	 rE5sVQkK4ttmmNapU/HP8rqN2+EuEi8aM5K5TKscUbFTozBnPmaXObx2UyAMjvfo2x
+	 D1TM9OCbiALQA==
+Date: Fri, 19 Apr 2024 20:47:54 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: zijianzhang@bytedance.com
+Cc: netdev@vger.kernel.org, edumazet@google.com,
+ willemdebruijn.kernel@gmail.com, davem@davemloft.net,
+ cong.wang@bytedance.com, xiaochun.lu@bytedance.com
+Subject: Re: [PATCH net-next v2 0/3] net: A lightweight zero-copy
+ notification
+Message-ID: <20240419204754.3f3b7347@kernel.org>
+In-Reply-To: <20240419214819.671536-1-zijianzhang@bytedance.com>
+References: <20240419214819.671536-1-zijianzhang@bytedance.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] net: bcmasp: fix memory leak when bringing down
- interface
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171358442749.25664.16758202671415844398.git-patchwork-notify@kernel.org>
-Date: Sat, 20 Apr 2024 03:40:27 +0000
-References: <20240418180541.2271719-1-justin.chen@broadcom.com>
-In-Reply-To: <20240418180541.2271719-1-justin.chen@broadcom.com>
-To: Justin Chen <justin.chen@broadcom.com>
-Cc: netdev@vger.kernel.org, florian.fainelli@broadcom.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- horms@kernel.org, bcm-kernel-feedback-list@broadcom.com,
- linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Fri, 19 Apr 2024 21:48:16 +0000 zijianzhang@bytedance.com wrote:
+> Original title is "net: socket sendmsg MSG_ZEROCOPY_UARG"
+> https://lore.kernel.org/all/
+> 20240409205300.1346681-2-zijianzhang@bytedance.com/
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+AFAICT sparse reports this new warning:
 
-On Thu, 18 Apr 2024 11:05:41 -0700 you wrote:
-> When bringing down the TX rings we flush the rings but forget to
-> reclaimed the flushed packets. This leads to a memory leak since we
-> do not free the dma mapped buffers. This also leads to tx control
-> block corruption when bringing down the interface for power
-> management.
-> 
-> Fixes: 490cb412007d ("net: bcmasp: Add support for ASP2.0 Ethernet controller")
-> Signed-off-by: Justin Chen <justin.chen@broadcom.com>
-> Acked-by: Florian Fainelli <florian.fainelli@broadcom.com>
-> 
-> [...]
-
-Here is the summary with links:
-  - [net,v2] net: bcmasp: fix memory leak when bringing down interface
-    https://git.kernel.org/netdev/net/c/9f898fc2c31f
-
-You are awesome, thank you!
+net/core/sock.c:2864:26: warning: incorrect type in assignment (different address spaces)
+net/core/sock.c:2864:26:    expected void [noderef] __user *usr_addr
+net/core/sock.c:2864:26:    got void *
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
