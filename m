@@ -1,109 +1,100 @@
-Return-Path: <netdev+bounces-89782-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89783-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A23B58AB8D3
-	for <lists+netdev@lfdr.de>; Sat, 20 Apr 2024 04:40:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87A5A8AB8DA
+	for <lists+netdev@lfdr.de>; Sat, 20 Apr 2024 04:41:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CA04AB20E76
-	for <lists+netdev@lfdr.de>; Sat, 20 Apr 2024 02:40:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2FDC61F214EE
+	for <lists+netdev@lfdr.de>; Sat, 20 Apr 2024 02:41:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F1B6205E25;
-	Sat, 20 Apr 2024 02:40:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KAs80Wgm"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7F7B625;
+	Sat, 20 Apr 2024 02:41:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75F07205E13
-	for <netdev@vger.kernel.org>; Sat, 20 Apr 2024 02:40:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25B1F1118C
+	for <netdev@vger.kernel.org>; Sat, 20 Apr 2024 02:41:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713580823; cv=none; b=Qc/i9GECb3xsb17QV16sNxN1V3/JGhsgCUIjmZEW/+frNAyuu7tyipVEuqYu2fm50RjjeQLJIDapSvAz/fiaKAUnza562IDlt+RHuYU8x94E1RbIF/Hi6kbzwl5qF2abhf5uFAIKxF0W9W5pdOpJct0V6lciCJrTSvi4gqUrKK0=
+	t=1713580892; cv=none; b=q4N7O56GLNQtltvFEVwB2sRgFIthLJaYiRRHkqplqD7qIjGvGL2BrKizhni5ii/EQGJRnTCwc3S2tp+oR6ThhEk/fGoDy2a5PFWCHts6Ht8QR0oV8wCih+vESK4H9biv3BA6/D3tyZjRV5eo19vOy3Bb6VM9K4fftocRF3pDsnc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713580823; c=relaxed/simple;
-	bh=JR8K+sKrv3jAnvvXYeuOwy6Am6lqs8QLgYt4lR5Vy3E=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=TuPjM/rVR0srGhZiPSuFN/Eoq0KdoBcmOvylikuJyCHYJjeKwMFtz/zIswNa3RLZFOhY9j4Ry8v9CbI4IsEVEuZtlmPyZzx3cFckMoBntmi9yRVtxhZ4P6psWBAOLanxNwvht8+AVngbdgpuF5KkgkeQ6nBvnx3m+J1OQ45zb3w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KAs80Wgm; arc=none smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1713580821; x=1745116821;
-  h=date:from:to:cc:subject:message-id:mime-version;
-  bh=JR8K+sKrv3jAnvvXYeuOwy6Am6lqs8QLgYt4lR5Vy3E=;
-  b=KAs80WgmG1P7CLWAFg+YG1NQU2Yubtobdq0jBOAwG+5Jsd7fJN3tGuKZ
-   oNOYWDPZak4oPszMM40TwusDs2JMROtiVQs8bqnteKS2KRGdkP11h5uWT
-   fm33kHLR1WN5WnlyvKZSg73+qj+HpYsPBOnJj1kzUDPLvZhcFj4NiDF+r
-   Nv1kj8nLbajTbMjtUJPXpSPhEwdLpFQLK1CZFb9RJANCEnrM9bKKkgDjd
-   fAF4az0LWF9eu1lvTdPpyXmmo5IZN+xgdMBqYEyVDZyPyZjbpfKl/shDh
-   LTgju/L5bkTYLrqsfk6+hAPoAPXsVK0gRZ9gzTcm3q0mPK+j0UtUFBTKd
-   A==;
-X-CSE-ConnectionGUID: A1e3uZ2kRXukk7jEULDAmA==
-X-CSE-MsgGUID: h8RTS0L0REu6Kj4YmEqZiw==
-X-IronPort-AV: E=McAfee;i="6600,9927,11049"; a="26718423"
-X-IronPort-AV: E=Sophos;i="6.07,215,1708416000"; 
-   d="scan'208";a="26718423"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Apr 2024 19:40:20 -0700
-X-CSE-ConnectionGUID: YRlxpXtoS4ORORm1YnhB3w==
-X-CSE-MsgGUID: /5gKXhN0QrGh9ElXQvtZig==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,215,1708416000"; 
-   d="scan'208";a="24011173"
-Received: from unknown (HELO 23c141fc0fd8) ([10.239.97.151])
-  by orviesa007.jf.intel.com with ESMTP; 19 Apr 2024 19:40:19 -0700
-Received: from kbuild by 23c141fc0fd8 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1ry0eG-000Afs-20;
-	Sat, 20 Apr 2024 02:40:16 +0000
-Date: Sat, 20 Apr 2024 10:39:49 +0800
-From: kernel test robot <lkp@intel.com>
-To: "Kory Maincent (Dent Project)" <kory.maincent@bootlin.com>
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew@lunn.ch>
-Subject: [net-next:main 19/25] undefined reference to `rdev_get_drvdata'
-Message-ID: <202404201020.mqX2IOu7-lkp@intel.com>
+	s=arc-20240116; t=1713580892; c=relaxed/simple;
+	bh=0lLZDHtuLC3gDotFJzEhLBZy+fIW+zuuu7IctPIsQDA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XTtrL/oV449p10tgMtBwCsUSfdEsclHn/JJR8MOuupkUE7DlRRXLKoK3r3S3ECipDE9Gl/9lzJkIDXZ87aSA9UyV1GsKmL1dU7n/hA7QAH7eG/0pDOrlvl2upEFxWbgbxl0GXv9M37vWEM7huxjn52CAq6eR3Lerkqa+rOtBnXo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [112.20.112.218])
+	by gateway (Coremail) with SMTP id _____8AxU_JXKyNmyEIAAA--.1639S3;
+	Sat, 20 Apr 2024 10:41:27 +0800 (CST)
+Received: from [192.168.100.8] (unknown [112.20.112.218])
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8BxIeBUKyNmEosAAA--.3102S3;
+	Sat, 20 Apr 2024 10:41:25 +0800 (CST)
+Message-ID: <1abf101b-87b8-448a-bd2a-bc9fb7c28852@loongson.cn>
+Date: Sat, 20 Apr 2024 10:41:24 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v11 5/6] net: stmmac: dwmac-loongson: Add full
+ PCI support
+To: Serge Semin <fancer.lancer@gmail.com>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com,
+ alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com,
+ chenhuacai@kernel.org, linux@armlinux.org.uk, guyinggang@loongson.cn,
+ netdev@vger.kernel.org, chris.chenfeiyang@gmail.com, siyanteng01@gmail.com
+References: <cover.1712917541.git.siyanteng@loongson.cn>
+ <ae660c8872297b562ee4e62cd852ba96f307e079.1712917541.git.siyanteng@loongson.cn>
+ <adnsyedexlqbncmadqzsr7f2vnqcvilzow4n3ibajxek4qes4m@pmwhb636j2qp>
+Content-Language: en-US
+From: Yanteng Si <siyanteng@loongson.cn>
+In-Reply-To: <adnsyedexlqbncmadqzsr7f2vnqcvilzow4n3ibajxek4qes4m@pmwhb636j2qp>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:AQAAf8BxIeBUKyNmEosAAA--.3102S3
+X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
+X-Coremail-Antispam: 1Uk129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7
+	ZEXasCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29K
+	BjDU0xBIdaVrnRJUUUBlb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26c
+	xKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r106r15M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vE
+	j48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Jr0_JF4l84ACjcxK6xIIjxv20xvEc7CjxV
+	AFwI0_Jr0_Gr1l84ACjcxK6I8E87Iv67AKxVWxJVW8Jr1l84ACjcxK6I8E87Iv6xkF7I0E
+	14v26r4j6r4UJwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07AIYIkI8VC2zVCFFI
+	0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUAVWUtwAv7VC2z280
+	aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxAIw28IcxkI7V
+	AKI48JMxAqzxv262kKe7AKxVWUXVWUAwCF54CYxVCY1x0262kKe7AKxVWUAVWUtwCFx2Iq
+	xVCFs4IE7xkEbVWUJVW8JwCFI7km07C267AKxVWUXVWUAwC20s026c02F40E14v26r1j6r
+	18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vI
+	r41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr
+	1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvE
+	x4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7IU8vD73UUUUU==
 
-tree:   https://git.kernel.org/pub/scm/linux/kernel/git/davem/net-next.git main
-head:   4cad4efa6eb209cea88175e545020de55fe3c737
-commit: d83e13761d5b0568376963729abcccf6de5a43ba [19/25] net: pse-pd: Use regulator framework within PSE framework
-config: parisc-randconfig-001-20240419 (https://download.01.org/0day-ci/archive/20240420/202404201020.mqX2IOu7-lkp@intel.com/config)
-compiler: hppa-linux-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240420/202404201020.mqX2IOu7-lkp@intel.com/reproduce)
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202404201020.mqX2IOu7-lkp@intel.com/
+在 2024/4/18 21:08, Serge Semin 写道:
+>> -	np = dev_of_node(&pdev->dev);
+>> -
+>> -	if (!np) {
+>> -		pr_info("dwmac_loongson_pci: No OF node\n");
+>> -		return -ENODEV;
+>> -	}
+> Hm, I see you dropping this snippet and never getting it back in this
+> patch. Thus after the patch is applied np will be left uninitialized,
+> which will completely break the driver. Please make sure it's fixed.
+>
+> This problem has been introduced at the v9 stage, which I didn't have
+> time to review. There were no problem like that in v8.
 
-All errors (new ones prefixed by >>):
+Okay, I will restore it.
 
-   hppa-linux-ld: drivers/net/pse-pd/pse_core.o: in function `pse_pi_is_enabled':
->> (.text+0x1e0): undefined reference to `rdev_get_drvdata'
->> hppa-linux-ld: (.text+0x1fc): undefined reference to `rdev_get_id'
-   hppa-linux-ld: drivers/net/pse-pd/pse_core.o: in function `pse_pi_disable':
-   (.text+0x2a4): undefined reference to `rdev_get_drvdata'
-   hppa-linux-ld: (.text+0x2c0): undefined reference to `rdev_get_id'
-   hppa-linux-ld: drivers/net/pse-pd/pse_core.o: in function `pse_pi_enable':
-   (.text+0x388): undefined reference to `rdev_get_drvdata'
-   hppa-linux-ld: (.text+0x3a4): undefined reference to `rdev_get_id'
-   hppa-linux-ld: drivers/net/pse-pd/pse_core.o: in function `pse_controller_register.part.0':
->> (.text+0xd28): undefined reference to `devm_regulator_register'
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Thanks,
+
+Yanteng
+
 
