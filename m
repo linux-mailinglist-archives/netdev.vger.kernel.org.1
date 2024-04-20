@@ -1,48 +1,56 @@
-Return-Path: <netdev+bounces-89822-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89823-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B141A8ABBEB
-	for <lists+netdev@lfdr.de>; Sat, 20 Apr 2024 16:03:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id F32D18ABBF6
+	for <lists+netdev@lfdr.de>; Sat, 20 Apr 2024 16:18:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B1B1D1C20AD6
-	for <lists+netdev@lfdr.de>; Sat, 20 Apr 2024 14:03:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9BF3C1F21106
+	for <lists+netdev@lfdr.de>; Sat, 20 Apr 2024 14:18:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B9B922301;
-	Sat, 20 Apr 2024 14:03:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C9AA25761;
+	Sat, 20 Apr 2024 14:18:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="RF19qbky"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04C5426AF3
-	for <netdev@vger.kernel.org>; Sat, 20 Apr 2024 14:03:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF461219E2;
+	Sat, 20 Apr 2024 14:18:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713621798; cv=none; b=DMuHfzllmnxKFoOnbMigR2nn1eZtWBoWxGJElYlldGKIbj/ydb98xLm5oF3IeiqZ3nmQt9JUVZA1SPh9Fzdo9V/U6011DIm3JcN/tSWFE808medkkuYG2CrzBlSE8WA4MAF6ls1MvbyQZSROp/uXthr44OCA5yMQLGM+xBjavdM=
+	t=1713622683; cv=none; b=QNHT2r/21QujN9sAQKuPMkVe8COPuo5xa60FKieih8CKoF+XrSu6HVSj6DR5RJnwXk4idgC/prv7PVHj4x/vgXKb/Ltu55sok7Kl9ipGLU07hiflxEYDvBODcvVvK2R3jpu7SHAu/Et0P74b4hpL1Zm588CaT+IFNS9jHPvETAk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713621798; c=relaxed/simple;
-	bh=RHb2Csd+hNqFgC6JCAOCzps5vkPmfn6XSs9rG+0No2I=;
+	s=arc-20240116; t=1713622683; c=relaxed/simple;
+	bh=IhmcAAcxPMLNcXwD3ROydVIshE7mJpHYxjctvvOo53E=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YciakuoZ/IQ/VTvJFfjQtlCiLOpBcjjnerAyJtJXnZ67927gmWQemrTKxKrmO7zYLDDr+iodg3qIzui3OiQDgfI3U1zdNUK+nJDSULpVfpF+B+12tKpNDLLP83HTh/iEFVk1xzce8+5Y/AdmAArWPu2Fn0vquagHWKoSj3d1yLw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.97.1)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1ryBJ1-000000002Su-3Mqf;
-	Sat, 20 Apr 2024 14:03:03 +0000
-Date: Sat, 20 Apr 2024 15:02:57 +0100
-From: Daniel Golle <daniel@makrotopia.org>
-To: David Bauer <mail@david-bauer.net>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next] net l2tp: drop flow hash on forward
-Message-ID: <ZiPLEdv97kX39k21@makrotopia.org>
-References: <20240420133940.5476-1-mail@david-bauer.net>
+	 Content-Type:Content-Disposition:In-Reply-To; b=WN4pvFQmMmAN7ObvnRU/lWFtWUzQDLgOaTlmvJeBlbG/U3QYBx3vq6UIVzF+g3murf6fE8jC5POGWobIjXiiEJBcMVbWUnHv1CFd2cyB/JbNYGimKQUBGyLcpUGvIeQ73zeotv9Wf+vFpmDbqm25g9VG9pTRqlwmp3rSllFAT3M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=RF19qbky; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=wYKh7leSQOOv10U3kntigwhuQ5oEPTab1stw2kTMjeo=; b=RF19qbkyFprUxuCUrwZDTrTHF1
+	mFKmgTVVMeiJ+SmCj8BteLRCUCPLEBhVdq7T1odGFJnnYlnWx2o08cdMBHQnFfs4wzub6QAy6q/HO
+	iFPnWrkXCbwdP/BtxskV+q30Xhd8/1cm1dIcq4E6iYCLygu3kYQy1uploTN5Ht4YRQVM=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1ryBXK-00DVq5-Jz; Sat, 20 Apr 2024 16:17:50 +0200
+Date: Sat, 20 Apr 2024 16:17:50 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: renjun wang <renjunw0@foxmail.com>
+Cc: hkallweit1@gmail.com, linux@armlinux.org.uk, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: phy: update fields of mii_ioctl_data for
+ transferring C45 data.
+Message-ID: <01d9fc07-ffaf-4353-b4b2-d7fcaa146024@lunn.ch>
+References: <tencent_78F3412B4E523FEC8F19FADAC32475318706@qq.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -51,50 +59,36 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240420133940.5476-1-mail@david-bauer.net>
+In-Reply-To: <tencent_78F3412B4E523FEC8F19FADAC32475318706@qq.com>
 
-On Sat, Apr 20, 2024 at 03:39:40PM +0200, David Bauer wrote:
-> Drop the flow-hash of the skb when forwarding to the L2TP netdev.
+On Sat, Apr 20, 2024 at 08:41:10AM +0800, renjun wang wrote:
+> The phy_id is used as u32 type in function mdio_phy_id_is_c45()
+> with the 30th bit for distinguishing C22 and C45. The reg_num is
+> also used as u32 type in function mdiobus_c45_read() or someplace
+> else. For more C45 information needed and data structure alignment
+> consideration, change these two fields to __u32 type which can make
+> user space program transferring clause 45 type information to kernel
+> directly.
 > 
-> This avoids the L2TP qdisc from using the flow-hash from the outer
-> packet, which is identical for every flow within the tunnel.
-> 
-> This does not affect every platform but is specific for the ethernet
-> driver. It depends on the platform including L4 information in the
-> flow-hash.
-> 
-> One such example is the Mediatek Filogic MT798x family of networking
-> processors.
-> 
-> Signed-off-by: David Bauer <mail@david-bauer.net>
-
-While it's difficult to say which exact commit this fixes, I still
-consider it being a fix, as otherwise flow-offloading on mentioned
-platforms will face difficulties when using L2TP (right?).
-Hence maybe it should go via 'net' tree rather than via 'net-next'?
-
-The fix itself looks fine to me.
-
+> Signed-off-by: renjun wang <renjunw0@foxmail.com>
 > ---
->  net/l2tp/l2tp_eth.c | 3 +++
->  1 file changed, 3 insertions(+)
+>  include/uapi/linux/mii.h | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 > 
-> diff --git a/net/l2tp/l2tp_eth.c b/net/l2tp/l2tp_eth.c
-> index 39e487ccc468..8ba00ad433c2 100644
-> --- a/net/l2tp/l2tp_eth.c
-> +++ b/net/l2tp/l2tp_eth.c
-> @@ -127,6 +127,9 @@ static void l2tp_eth_dev_recv(struct l2tp_session *session, struct sk_buff *skb,
->  	/* checksums verified by L2TP */
->  	skb->ip_summed = CHECKSUM_NONE;
->  
-> +	/* drop outer flow-hash */
-> +	skb_clear_hash(skb);
-> +
->  	skb_dst_drop(skb);
->  	nf_reset_ct(skb);
->  
-> -- 
-> 2.43.0
-> 
-> 
+> diff --git a/include/uapi/linux/mii.h b/include/uapi/linux/mii.h
+
+Just adding a general point to others comments. You have to be very
+careful with changes to files inside include/uapi. These define the
+API between user space and the kernel. You cannot make changes which
+break existing binaries of user space tools.
+
+Sometimes you can add new members to the end of a structure. Sometimes
+you can add new enum values after all other enums, but you cannot make
+changes in the middle.
+
+
+    Andrew
+
+---
+pw-bot: cr
 
