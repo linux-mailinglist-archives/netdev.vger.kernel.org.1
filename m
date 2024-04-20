@@ -1,111 +1,462 @@
-Return-Path: <netdev+bounces-89769-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89770-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CCE938AB831
-	for <lists+netdev@lfdr.de>; Sat, 20 Apr 2024 02:49:00 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C38578AB834
+	for <lists+netdev@lfdr.de>; Sat, 20 Apr 2024 02:56:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 902472820F3
-	for <lists+netdev@lfdr.de>; Sat, 20 Apr 2024 00:48:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F215DB2138F
+	for <lists+netdev@lfdr.de>; Sat, 20 Apr 2024 00:56:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4EB4633;
-	Sat, 20 Apr 2024 00:48:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF2D27FD;
+	Sat, 20 Apr 2024 00:56:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="xy4UOldt"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="kMtNY03x"
 X-Original-To: netdev@vger.kernel.org
-Received: from out203-205-221-202.mail.qq.com (out203-205-221-202.mail.qq.com [203.205.221.202])
+Received: from out-176.mta0.migadu.com (out-176.mta0.migadu.com [91.218.175.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCB3138B;
-	Sat, 20 Apr 2024 00:48:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.221.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B7F838F
+	for <netdev@vger.kernel.org>; Sat, 20 Apr 2024 00:56:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713574135; cv=none; b=IsXijn8HAGBKE8di0PQHos/IlGuPswEGUrTRgC2VD+tvZ9KEscpVV7HNPUBpIZY2wE7UFvOwhl6gQuCl71KISE8jSX21IzJO49/LZR1mvzYyVaFiIQKcsTEpyZDuD3RYWiP1ActSwvlyfcAhT+RZ/H0iNbJeOLRmF1mctFaNE5I=
+	t=1713574573; cv=none; b=gyx4TlektnnjxnRVF37R2U2hjdivCYijLfCMkGDwQQ6T03u0wTXbqEBaLzv/GVvG9pXqs3qUXB3YrhzrIJ7KG8YjRu7I7Mk2I09uS070dpOy7GwMbgmQIUTwMRaQYOm5vlsJ9ifkXyWmXfyHJ1/euGTkHMJYfeDMS5rEXldqN3c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713574135; c=relaxed/simple;
-	bh=1OzfHfUjuOL8HBvY/WRL+t2/ivkZS5+gTq6FVR17Nx4=;
-	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=bGZ3DsLdGXgYnZ4Ak1061h1oCO2MVc6ecLniTsYDFTI/xxVjj6cRHT83YrvlUuEhQ1hF8jLEqFly4FyPQbE+lKj4EFLK9YSz/Sx5zgjW8JeK+xYvdMGwoiqg4rrU380WDlDOsCkNi8juRwO3EbvgbizepRnCdFJP8nWEKZlkcnA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com; spf=pass smtp.mailfrom=foxmail.com; dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b=xy4UOldt; arc=none smtp.client-ip=203.205.221.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foxmail.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
-	s=s201512; t=1713574124;
-	bh=p75aEPAFI48CpfiuqQ6DlpvF/5AH+93ALLOF8JLaB2c=;
-	h=From:To:Cc:Subject:Date;
-	b=xy4UOldtwKs3CuPla/zDeQCnyGXLEbbjXUVt43zI0cTGWKp6GxuCzZesGeqONp2u7
-	 V2Aj5VS3nPnlib9P/q73GbF3VkWMOOskJ55YPBWmUWdkrY7j8QXE4LuheqfCqxXtOP
-	 lVEjlKY6EBjMetrkcK/xZMsIDc8fYncJt6+s+xu0=
-Received: from localhost.localdomain ([171.223.89.44])
-	by newxmesmtplogicsvrszb9-0.qq.com (NewEsmtp) with SMTP
-	id A96298CD; Sat, 20 Apr 2024 08:42:22 +0800
-X-QQ-mid: xmsmtpt1713573742t47czu8gy
-Message-ID: <tencent_78F3412B4E523FEC8F19FADAC32475318706@qq.com>
-X-QQ-XMAILINFO: N8nyCa1bmgri4t3IFtmHT5/5TiWHblYu3u4ROrTv39Az0xKwH+E4en5VHR6xU+
-	 xWtp0uTOqlvL2nRrC1vE9RZaZSed9+BjR70A/JQEbzP+zUpLHJk/zQcDspmnPXBzrTdSwvLO6Y3S
-	 oQJKxDGAeXdeZOq0KnfXKzcdJzl/wNEJ391LH68Oh851O12JtBwweaaW5RoyemEImbJ5K1tMsRfQ
-	 2FHHBTO6XkTqwcf1kHQZMfJYsEnETx5a86BkhedzlDLxWkqjjRwmZehWffeD51Hu4NUjnlLAbGK6
-	 /KHR+htkkp3bFPg4j8H1vMYrFR5yVnTZoTr6euAwmW9pWEx2Ekqc6x0HS6R6U2DEy8l4xeHuBRX4
-	 MJkJq7jfloUnPSbmMt/29WzCa0F8Y0+1/ITmyUFMJQXXnVTLGaznWOp4sulEIHeZYjGlC3rs64JE
-	 UQbSXiXycyfkUpHMy+mkyxgFAiMTu3MMLtrqXpU9FscUMA5MS7uO2Q2zUIVOwV2md4KK2Ewd6+fV
-	 I0wp9MPAd5EOugWXOG2B2e8jd2SpGgJdafpXXm/FX+YYGKh9wIj4DtIpNjl4xV5Ky3s/0POdDhlg
-	 EFeYC1+1tH5oo95Ps4FAg/CGr3rYc/U0S1bpGMYWVdkC7RS+lVcGRc5oiXnTMrkT28faA0FTBzUR
-	 7vUigA21GObhlkMrg+9RrOHIvBZRyA3FGzLGbNrpLc/emnxEETcAZRCgBRD9Op5exiJKdWYNYS4l
-	 fkpHVnB5bLK6VXAXKJH/9c9PeOvpNCo2ezpY4Rfe6LhhnulucZQR2z3jah7vGjEOEjoIIsVyyxh5
-	 xb2cHCebeSrweAnhzHApHwJu2Nexdms3W7Qx/CzHLy33/50WP4b6JmeAxDsO/WyKu1rePhlpW+PL
-	 5i14ROKhVDs01PQNS9uoiud1PEt7hcsSpnqHfIb6V7tE6lyaZfYdHy4l7CToe/YJWYM+PIBl6ip5
-	 kkszw7mmgW7MTPF6DbTVtbNRrZxXPOc/cYlRGJWcRVLsDQTke3t+V75Yt86gi+J71yVxWo/k9LMW
-	 PGOWwPuNcW6sQ1Kk4W
-X-QQ-XMRINFO: OWPUhxQsoeAVDbp3OJHYyFg=
-From: renjun wang <renjunw0@foxmail.com>
-To: andrew@lunn.ch,
-	hkallweit1@gmail.com,
-	linux@armlinux.org.uk
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	renjun wang <renjunw0@foxmail.com>
-Subject: [PATCH] net: phy: update fields of mii_ioctl_data for transferring C45 data.
-Date: Sat, 20 Apr 2024 08:41:10 +0800
-X-OQ-MSGID: <20240420004110.39402-1-renjunw0@foxmail.com>
-X-Mailer: git-send-email 2.39.2
+	s=arc-20240116; t=1713574573; c=relaxed/simple;
+	bh=hBy6UTxY8N6D6OUw4axcPvqvdd9zcGecFDPuS3bAFvg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Xh/6nanjudyaRNbFdyZzbP3r7jpj027+5t6FGtQipw9GtiugygIPwfQSIiYEf6G1yiSQiHxTKZX4RnCDeUuO3GajRlof7G0Tj0QT6BU61S1HMWe6qEvs6fx06409VGnn24sITo0hLEhOVtWcS4Tpxd5wNP9LcG6sLzT2OpnMp/k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=kMtNY03x; arc=none smtp.client-ip=91.218.175.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <05869e15-fb3b-494f-bf80-43d5f0be89fa@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1713574568;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=TWxFuS8KOGm1Mkg9vTQ1ba95s1SAyh91PE+9f7p1nK4=;
+	b=kMtNY03xnAc1GKnOG82peaexe/8RtbdsmHf8Y0xObxrAE2IPkcRjhReayXG1ObZOv4xsQp
+	j5IrL9oV+whPXmEvaOB4T/svRdrS6ATTqDNE5WxzlNFvDz0wCvFft4x+5YSRxFMniD2eex
+	Lo4ViX8c90sVbKuvv6O+qHN6+dlB+wk=
+Date: Sat, 20 Apr 2024 01:56:06 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Subject: Re: [PATCH bpf-next v9 3/4] selftests: bpf: crypto skcipher algo
+ selftests
+To: Martin KaFai Lau <martin.lau@linux.dev>, Vadim Fedorenko <vadfed@meta.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
+ Alexei Starovoitov <ast@kernel.org>, Mykola Lysenko <mykolal@fb.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>, netdev@vger.kernel.org,
+ linux-crypto@vger.kernel.org, bpf@vger.kernel.org
+References: <20240416204004.3942393-1-vadfed@meta.com>
+ <20240416204004.3942393-4-vadfed@meta.com>
+ <60a88a78-d6d5-48b9-b894-47e4e54240df@linux.dev>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <60a88a78-d6d5-48b9-b894-47e4e54240df@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-The phy_id is used as u32 type in function mdio_phy_id_is_c45()
-with the 30th bit for distinguishing C22 and C45. The reg_num is
-also used as u32 type in function mdiobus_c45_read() or someplace
-else. For more C45 information needed and data structure alignment
-consideration, change these two fields to __u32 type which can make
-user space program transferring clause 45 type information to kernel
-directly.
+On 19/04/2024 22:38, Martin KaFai Lau wrote:
+> On 4/16/24 1:40 PM, Vadim Fedorenko wrote:
+>> +void test_crypto_sanity(void)
+>> +{
+>> +    struct crypto_syscall_args sargs = {
+>> +        .key_len = 16,
+>> +    };
+>> +    LIBBPF_OPTS(bpf_tc_hook, qdisc_hook, .attach_point = BPF_TC_EGRESS);
+>> +    LIBBPF_OPTS(bpf_tc_opts, tc_attach_enc);
+>> +    LIBBPF_OPTS(bpf_tc_opts, tc_attach_dec);
+>> +    LIBBPF_OPTS(bpf_test_run_opts, opts,
+>> +            .ctx_in = &sargs,
+>> +            .ctx_size_in = sizeof(sargs),
+>> +    );
+>> +    struct nstoken *nstoken = NULL;
+>> +    struct crypto_sanity *skel;
+>> +    char afalg_plain[16] = {0};
+>> +    char afalg_dst[16] = {0};
+>> +    struct sockaddr_in6 addr;
+>> +    int sockfd, err, pfd;
+>> +    socklen_t addrlen;
+>> +
+>> +    SYS(fail, "ip netns add %s", NS_TEST);
+>> +    SYS(fail, "ip -net %s -6 addr add %s/128 dev lo nodad", NS_TEST, 
+>> IPV6_IFACE_ADDR);
+>> +    SYS(fail, "ip -net %s link set dev lo up", NS_TEST);
+>> +
+>> +    nstoken = open_netns(NS_TEST);
+>> +    if (!ASSERT_OK_PTR(nstoken, "open_netns"))
+>> +        goto fail;
+> 
+> skel is not initialized. The "fail:" case needs it.
+> 
+>> +
+>> +    err = init_afalg();
+>> +    if (!ASSERT_OK(err, "AF_ALG init fail"))
+>> +        goto fail;
+>> +
+>> +    qdisc_hook.ifindex = if_nametoindex("lo");
+>> +    if (!ASSERT_GT(qdisc_hook.ifindex, 0, "if_nametoindex lo"))
+>> +        goto fail;
+>> +
+>> +    skel = crypto_sanity__open_and_load();
+>> +    if (!ASSERT_OK_PTR(skel, "skel open"))
+>> +        return;
+> 
+> The netns "crypto_sanity_ns" is not deleted.
+> 
 
-Signed-off-by: renjun wang <renjunw0@foxmail.com>
----
- include/uapi/linux/mii.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+I'll re-arrange skel init and open_netns. Dunno why it was moved, it 
+should be other way.
 
-diff --git a/include/uapi/linux/mii.h b/include/uapi/linux/mii.h
-index 39f7c44baf53..68c085b049de 100644
---- a/include/uapi/linux/mii.h
-+++ b/include/uapi/linux/mii.h
-@@ -176,8 +176,8 @@
- 
- /* This structure is used in all SIOCxMIIxxx ioctl calls */
- struct mii_ioctl_data {
--	__u16		phy_id;
--	__u16		reg_num;
-+	__u32		phy_id;
-+	__u32		reg_num;
- 	__u16		val_in;
- 	__u16		val_out;
- };
--- 
-2.39.2
+>> +
+>> +    memcpy(skel->bss->key, crypto_key, sizeof(crypto_key));
+>> +    snprintf(skel->bss->algo, 128, "%s", algo);
+>> +    pfd = bpf_program__fd(skel->progs.skb_crypto_setup);
+>> +    if (!ASSERT_GT(pfd, 0, "skb_crypto_setup fd"))
+>> +        goto fail;
+>> +
+>> +    err = bpf_prog_test_run_opts(pfd, &opts);
+>> +    if (!ASSERT_OK(err, "skb_crypto_setup") ||
+>> +        !ASSERT_OK(opts.retval, "skb_crypto_setup retval"))
+>> +        goto fail;
+>> +
+>> +    if (!ASSERT_OK(skel->bss->status, "skb_crypto_setup status"))
+>> +        goto fail;
+>> +
+>> +    err = crypto_sanity__attach(skel);
+> 
+> This attach is a left over from previous revision?
+> 
+
+Looks like it is.
+
+>> +    if (!ASSERT_OK(err, "crypto_sanity__attach"))
+>> +        goto fail;
+>> +
+>> +    err = bpf_tc_hook_create(&qdisc_hook);
+>> +    if (!ASSERT_OK(err, "create qdisc hook"))
+>> +        goto fail;
+>> +
+>> +    addrlen = sizeof(addr);
+>> +    err = make_sockaddr(AF_INET6, IPV6_IFACE_ADDR, UDP_TEST_PORT,
+>> +                (void *)&addr, &addrlen);
+>> +    if (!ASSERT_OK(err, "make_sockaddr"))
+>> +        goto fail;
+>> +
+>> +    tc_attach_enc.prog_fd = bpf_program__fd(skel->progs.encrypt_sanity);
+>> +    err = bpf_tc_attach(&qdisc_hook, &tc_attach_enc);
+>> +    if (!ASSERT_OK(err, "attach encrypt filter"))
+>> +        goto fail;
+>> +
+>> +    sockfd = socket(AF_INET6, SOCK_DGRAM, 0);
+>> +    if (!ASSERT_NEQ(sockfd, -1, "encrypt socket"))
+>> +        goto fail;
+>> +    err = sendto(sockfd, plain_text, sizeof(plain_text), 0, (void 
+>> *)&addr, addrlen);
+>> +    close(sockfd);
+>> +    if (!ASSERT_EQ(err, sizeof(plain_text), "encrypt send"))
+>> +        goto fail;
+>> +
+>> +    do_crypt_afalg(plain_text, afalg_dst, sizeof(afalg_dst), true);
+>> +
+>> +    bpf_tc_detach(&qdisc_hook, &tc_attach_enc);
+> 
+> Check error.
+> 
+> I suspect this detach should have failed because at least the 
+> tc_attach_enc.prog_fd is not 0.
+> 
+> The following attach (&tc_attach_"dec") may just happen to have a higher 
+> priority such that the left over here does not matter. It is still 
+> better to get it right.
+> 
+
+Ok, I'll follow the way of tc_opts test
+
+>> +    if (!ASSERT_OK(skel->bss->status, "encrypt status"))
+>> +        goto fail;
+>> +    if (!ASSERT_STRNEQ(skel->bss->dst, afalg_dst, sizeof(afalg_dst), 
+>> "encrypt AF_ALG"))
+>> +        goto fail;
+>> +
+>> +    tc_attach_dec.prog_fd = bpf_program__fd(skel->progs.decrypt_sanity);
+>> +    err = bpf_tc_attach(&qdisc_hook, &tc_attach_dec);
+>> +    if (!ASSERT_OK(err, "attach decrypt filter"))
+>> +        goto fail;
+>> +
+>> +    sockfd = socket(AF_INET6, SOCK_DGRAM, 0);
+>> +    if (!ASSERT_NEQ(sockfd, -1, "decrypt socket"))
+>> +        goto fail;
+>> +    err = sendto(sockfd, afalg_dst, sizeof(afalg_dst), 0, (void 
+>> *)&addr, addrlen);
+>> +    close(sockfd);
+>> +    if (!ASSERT_EQ(err, sizeof(afalg_dst), "decrypt send"))
+>> +        goto fail;
+>> +
+>> +    do_crypt_afalg(afalg_dst, afalg_plain, sizeof(afalg_plain), false);
+>> +
+>> +    bpf_tc_detach(&qdisc_hook, &tc_attach_dec);
+>> +    if (!ASSERT_OK(skel->bss->status, "decrypt status"))
+>> +        goto fail;
+>> +    if (!ASSERT_STRNEQ(skel->bss->dst, afalg_plain, 
+>> sizeof(afalg_plain), "decrypt AF_ALG"))
+>> +        goto fail;
+>> +
+>> +fail:
+>> +    if (nstoken) {
+> 
+> No need to check NULL. close_netns() can handle it.
+> 
+>> +        bpf_tc_hook_destroy(&qdisc_hook);
+> 
+> This also does not destroy the clsact qdisc. Although the function name 
+> feels like it would, from a quick look at bpf_tc_hook_destroy, it 
+> depends on both BPF_TC_INGRESS and BPF_TC_EGRESS are set in the 
+> qdisc_hook.attach_point.
+> 
+> I would skip the whole bpf_tc_hook_destroy. It will go away together 
+> with the netns.
+> 
+
+Got it
+
+> [ ... ]
+> 
+>> diff --git a/tools/testing/selftests/bpf/progs/crypto_sanity.c 
+>> b/tools/testing/selftests/bpf/progs/crypto_sanity.c
+>> new file mode 100644
+>> index 000000000000..57df5776bcaf
+>> --- /dev/null
+>> +++ b/tools/testing/selftests/bpf/progs/crypto_sanity.c
+>> @@ -0,0 +1,161 @@
+>> +// SPDX-License-Identifier: GPL-2.0
+>> +/* Copyright (c) 2024 Meta Platforms, Inc. and affiliates. */
+>> +
+>> +#include "vmlinux.h"
+>> +#include "bpf_tracing_net.h"
+>> +#include <bpf/bpf_helpers.h>
+>> +#include <bpf/bpf_endian.h>
+>> +#include <bpf/bpf_tracing.h>
+>> +#include "bpf_misc.h"
+>> +#include "bpf_kfuncs.h"
+>> +#include "crypto_common.h"
+>> +
+>> +unsigned char key[256] = {};
+>> +char algo[128] = {};
+>> +char dst[16] = {};
+>> +int status;
+>> +
+>> +static int skb_dynptr_validate(struct __sk_buff *skb, struct 
+>> bpf_dynptr *psrc)
+>> +{
+>> +    struct ipv6hdr ip6h;
+>> +    struct udphdr udph;
+>> +    u32 offset;
+>> +
+>> +    if (skb->protocol != __bpf_constant_htons(ETH_P_IPV6))
+>> +        return -1;
+>> +
+>> +    if (bpf_skb_load_bytes(skb, ETH_HLEN, &ip6h, sizeof(ip6h)))
+>> +        return -1;
+>> +
+>> +    if (ip6h.nexthdr != IPPROTO_UDP)
+>> +        return -1;
+>> +
+>> +    if (bpf_skb_load_bytes(skb, ETH_HLEN + sizeof(ip6h), &udph, 
+>> sizeof(udph)))
+>> +        return -1;
+>> +
+>> +    if (udph.dest != __bpf_constant_htons(UDP_TEST_PORT))
+>> +        return -1;
+>> +
+>> +    offset = ETH_HLEN + sizeof(ip6h) + sizeof(udph);
+>> +    if (skb->len < offset + 16)
+>> +        return -1;
+>> +
+>> +    /* let's make sure that 16 bytes of payload are in the linear 
+>> part of skb */
+>> +    bpf_skb_pull_data(skb, offset + 16);
+>> +    bpf_dynptr_from_skb(skb, 0, psrc);
+>> +    bpf_dynptr_adjust(psrc, offset, offset + 16);
+>> +
+>> +    return 0;
+>> +}
+>> +
+>> +SEC("syscall")
+>> +int skb_crypto_setup(struct crypto_syscall_args *ctx)
+>> +{
+>> +    struct bpf_crypto_params params = {
+>> +        .type = "skcipher",
+>> +        .key_len = ctx->key_len,
+>> +        .authsize = ctx->authsize,
+>> +    };
+>> +    struct bpf_crypto_ctx *cctx;
+>> +    int err = 0;
+>> +
+>> +    status = 0;
+>> +
+>> +    if (ctx->key_len > 255) {
+> 
+> key_len == 256 won't work ?
+
+Yeah, you are right, I'll adjust the check
+
+> 
+>> +        status = -EINVAL;
+>> +        return 0;
+>> +    }
+>> +
+>> +    __builtin_memcpy(&params.algo, algo, sizeof(algo));
+>> +    __builtin_memcpy(&params.key, key, sizeof(key));
+> 
+> It will be useful to comment here what problem was hit such that the key 
+> cannot be passed in the "struct crypto_syscall_args" and need to go back 
+> to the global variable.
+
+Ok, I'll add some details.
+
+> Instead of "key_len" in the crypto_syscall_args and the actual "key" in 
+> global, how about skip using the "struct crypto_syscall_args" altogether 
+> and put key_len (and authsize) in the global?
+> 
+> Put UDP_TEST_PORT as a global variable for config/filter usage also and 
+> the "crypto_share.h" can go away.
+> 
+
+Yeah, I can do it.
+
+>> +    cctx = bpf_crypto_ctx_create(&params, &err);
+>> +
+>> +    if (!cctx) {
+>> +        status = err;
+>> +        return 0;
+>> +    }
+>> +
+>> +    err = crypto_ctx_insert(cctx);
+>> +    if (err && err != -EEXIST)
+>> +        status = err;
+>> +
+>> +    return 0;
+>> +}
+>> +
+>> +SEC("tc")
+>> +int decrypt_sanity(struct __sk_buff *skb)
+>> +{
+>> +    struct __crypto_ctx_value *v;
+>> +    struct bpf_crypto_ctx *ctx;
+>> +    struct bpf_dynptr psrc, pdst, iv;
+>> +    int err;
+>> +
+>> +    err = skb_dynptr_validate(skb, &psrc);
+>> +    if (err < 0) {
+>> +        status = err;
+>> +        return TC_ACT_SHOT;
+>> +    }
+>> +
+>> +    v = crypto_ctx_value_lookup();
+>> +    if (!v) {
+>> +        status = -ENOENT;
+>> +        return TC_ACT_SHOT;
+>> +    }
+>> +
+>> +    ctx = v->ctx;
+>> +    if (!ctx) {
+>> +        status = -ENOENT;
+>> +        return TC_ACT_SHOT;
+>> +    }
+>> +
+>> +    bpf_dynptr_from_mem(dst, sizeof(dst), 0, &pdst);
+> 
+> dst is now a global which makes it easier to test the result. A comment 
+> here to note this point for people referencing this test for production 
+> use case and suggest a percpu map could be used.
+
+Ok
+
+> It will be useful to have dynptr working with stack memory in the future.
+
+Another follow-up?
+
+>> +    /* iv dynptr has to be initialized with 0 size, but proper memory 
+>> region
+>> +     * has to be provided anyway
+>> +     */
+>> +    bpf_dynptr_from_mem(dst, 0, 0, &iv);
+>> +
+>> +    status = bpf_crypto_decrypt(ctx, &psrc, &pdst, &iv);
+>> +
+>> +    return TC_ACT_SHOT;
+>> +}
+>> +
+>> +SEC("tc")
+>> +int encrypt_sanity(struct __sk_buff *skb)
+>> +{
+>> +    struct __crypto_ctx_value *v;
+>> +    struct bpf_crypto_ctx *ctx;
+>> +    struct bpf_dynptr psrc, pdst, iv;
+>> +    int err;
+>> +
+>> +    status = 0;
+>> +
+>> +    err = skb_dynptr_validate(skb, &psrc);
+>> +    if (err < 0) {
+>> +        status = err;
+>> +        return TC_ACT_SHOT;
+>> +    }
+>> +
+>> +    v = crypto_ctx_value_lookup();
+>> +    if (!v) {
+>> +        status = -ENOENT;
+>> +        return TC_ACT_SHOT;
+>> +    }
+>> +
+>> +    ctx = v->ctx;
+>> +    if (!ctx) {
+>> +        status = -ENOENT;
+>> +        return TC_ACT_SHOT;
+>> +    }
+>> +
+>> +    bpf_dynptr_from_mem(dst, sizeof(dst), 0, &pdst);
+>> +    /* iv dynptr has to be initialized with 0 size, but proper memory 
+>> region
+>> +     * has to be provided anyway
+>> +     */
+>> +    bpf_dynptr_from_mem(dst, 0, 0, &iv);
+>> +
+>> +    status = bpf_crypto_encrypt(ctx, &psrc, &pdst, &iv);
+>> +
+>> +    return TC_ACT_SHOT;
+>> +}
+>> +
+>> +char __license[] SEC("license") = "GPL";
+>> diff --git a/tools/testing/selftests/bpf/progs/crypto_share.h 
+>> b/tools/testing/selftests/bpf/progs/crypto_share.h
+>> new file mode 100644
+>> index 000000000000..c5a6ef65156d
+>> --- /dev/null
+>> +++ b/tools/testing/selftests/bpf/progs/crypto_share.h
+>> @@ -0,0 +1,10 @@
+>> +/* SPDX-License-Identifier: GPL-2.0 */
+>> +/* Copyright (c) 2024 Meta Platforms, Inc. and affiliates. */
+>> +
+>> +#define UDP_TEST_PORT 7777
+>> +
+>> +struct crypto_syscall_args {
+>> +    u32 key_len;
+>> +    u32 authsize;
+>> +};
+>> +
+> 
 
 
