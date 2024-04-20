@@ -1,75 +1,45 @@
-Return-Path: <netdev+bounces-89806-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89807-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 863A78ABA34
-	for <lists+netdev@lfdr.de>; Sat, 20 Apr 2024 10:01:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD8368ABA4C
+	for <lists+netdev@lfdr.de>; Sat, 20 Apr 2024 10:33:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8D2B71C20954
-	for <lists+netdev@lfdr.de>; Sat, 20 Apr 2024 08:01:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 25A331F2244D
+	for <lists+netdev@lfdr.de>; Sat, 20 Apr 2024 08:33:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6731C134BF;
-	Sat, 20 Apr 2024 08:00:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LL/DJwfF"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDFEA125C7;
+	Sat, 20 Apr 2024 08:33:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0C97F9DF;
-	Sat, 20 Apr 2024 08:00:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1182E38C;
+	Sat, 20 Apr 2024 08:33:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713600058; cv=none; b=SRPZK1w0Ahn4QrVfjNEJs1WHGS8lq3C0O5Hn/ihtDYf5pkowl3gk1cfNhzqqFX1dW6TOt7CUixjVmMzLAl0J88pOgwUzyGGPpD7bThg67calZ9n9DLT98RRFnHmHyMxsV7QvufjDi0TqE+dU7dbb87fhNhLaj10yDt/E6aGzw9k=
+	t=1713602010; cv=none; b=NxCF4DbMMsCojzU3BN+qVaisw/ojAiqoYumg8foA6v9GZOS0ZTXc3kJlN6ERcxfbEdN0bL4UJKuIM7QdEwiD04DTBHtZfETYJnfxlnWi3DOotM/T4LHxwfqI/hXQFbnLzmD4pzl3COf1shgLgszPMxcT5g+TV7TiX00iSv26Zvs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713600058; c=relaxed/simple;
-	bh=9W+5et6Duhaa8jDdVcnQR/bEQ3Ehiww5Gs44aP/8ks4=;
+	s=arc-20240116; t=1713602010; c=relaxed/simple;
+	bh=ozJf00ALOxbfst1CfKs7QsoFD3TOa+lAa1uCModcRhM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=W/8ZWBiS/jzqJ/0hOXcVnxk8jSfXAOs4oOlQmRGXw9tYn0ey+GxOsGsuIGmTVCn5gAHBodJebTDYhpdGNEgBw2IuuArX17Zvb4fT8hr7DxhNdRa8fJUPa7QLkZ+IXbThtGZX3k4K2Asxx58BGion8VF8+QEDLG6lz5zQIWJeczI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LL/DJwfF; arc=none smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-419d320b89aso4831735e9.1;
-        Sat, 20 Apr 2024 01:00:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713600055; x=1714204855; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=3FJTuQLLrIcpyiLjSGB9NaK1B+t4LSbC2liEoLME8Wo=;
-        b=LL/DJwfF7PYSDI5fI5NhWr/2PUvTxJqzZ3bo+ScC+Yr67AhjPNkwfryiL72U5vVM9n
-         gTePPnIaZM+NWGZGHh7DTGF33onF3zLZ2uoejieg7fG+1tOH5ReLRc4R9dsVqmqoqeRH
-         Uy8m8DmJACmNzQg31Br1DL0OOXJdyKeAcK1v/8jDet9m23dCa6NTS5zVkmkdpi3sCWnh
-         63bQSAmHWSfzeQpSbmQcqHBTZFddjW8NyQ+MzMuA9AaTNVCn1kQnidnI5bmUc3kvp1k3
-         JMtt2syvCFZc6gPBNLypkIfTFJ+pAuY2hgE7Ydvf0L/JPXHMoLajPUFcHA2cAw8ltycL
-         gDvA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713600055; x=1714204855;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3FJTuQLLrIcpyiLjSGB9NaK1B+t4LSbC2liEoLME8Wo=;
-        b=kCiZEV8cgGz4Punf0TjF6Pwl0AojbLACbWAPPA0IAA6DMMvm6BvSJp6wiee35TULB2
-         yKp1wTShPJ6lWnY+fj5TbDxC+xcF0aICmQG03oaH/UN/3qAQZmk1cUiquW33lYl1tHOS
-         Do1TdLQK9jkbB2yVu64OksUqoLBzePXR4fA7aZrvwhVEaGwqZDn4l7XMg9r7XMhWUBea
-         W4mqvHh8XRuPzIFjQ7RbsgfmEqUMuh9eJKZuwxuBb8+OsqrJPndU+jD2Tpj+kOiE4voV
-         jyXGoDA2XU2HZHagwYBMbRlA5GGD2542Nn43AUShbAfW6JH9/O7kBuQbTV8BXuO4B1PY
-         ICrA==
-X-Forwarded-Encrypted: i=1; AJvYcCVOS8b9JImuzyjc6ZipuPQWyJSQr7XeqLWUqcYXKx8Bv8QnpeNCu8Jl0M/CXHbZ7G0WvjuUB2c6HLNHp6HrVyWrFKO7ZT68SZGuGCHX
-X-Gm-Message-State: AOJu0Yz8LwyJG97IcSXsRyO3T5jibTeYy4Ju+LQee75t+2s8Fc5FeuLr
-	exlSAkqVpwPlqbdZgjSu5qbZH45hG/OvSMrswp7mtN3r9sy/YscD
-X-Google-Smtp-Source: AGHT+IHZPPWKIAQoMBIrcmjGXqx1s0z1HdgyOg4TQQqEIv1dx0DoZHdOuD/VNsg59eNGcHH6Mm9Gig==
-X-Received: by 2002:a05:600c:3b94:b0:416:9f45:e639 with SMTP id n20-20020a05600c3b9400b004169f45e639mr2946507wms.20.1713600054732;
-        Sat, 20 Apr 2024 01:00:54 -0700 (PDT)
-Received: from ?IPV6:2a01:c23:c16c:3b00:e5c2:ab7d:81e1:2621? (dynamic-2a01-0c23-c16c-3b00-e5c2-ab7d-81e1-2621.c23.pool.telefonica.de. [2a01:c23:c16c:3b00:e5c2:ab7d:81e1:2621])
-        by smtp.googlemail.com with ESMTPSA id s9-20020a05600c45c900b004163703fd6asm11948336wmo.1.2024.04.20.01.00.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 20 Apr 2024 01:00:54 -0700 (PDT)
-Message-ID: <2e81babf-2a69-4b41-9b34-6e8ed742b2c1@gmail.com>
-Date: Sat, 20 Apr 2024 10:00:54 +0200
+	 In-Reply-To:Content-Type; b=RZCVV10cjz8ogQ2qWNpNiqO0FrBuCVl00HI9+/HwXwjbPdqrobgQYHMHLz+cH9oISCpMO7YVb1wdPxjEEFHJ+FW+TD5y2+de5KpKBvr/xIfq8+Y396rXfJZTb6TOYCRw9uu0AjZbn4qILyWvSncfjkOpeyyrFJAD6M/nImDXL2c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4VM4XQ1jXvz4f3khR;
+	Sat, 20 Apr 2024 16:33:10 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.112])
+	by mail.maildlp.com (Postfix) with ESMTP id 8DDFB1A0903;
+	Sat, 20 Apr 2024 16:33:17 +0800 (CST)
+Received: from [10.67.111.192] (unknown [10.67.111.192])
+	by APP1 (Coremail) with SMTP id cCh0CgCHnQbLfSNmO6PhKQ--.65426S2;
+	Sat, 20 Apr 2024 16:33:17 +0800 (CST)
+Message-ID: <f80991aa-3a49-451a-9a82-ac57982dcb28@huaweicloud.com>
+Date: Sat, 20 Apr 2024 16:33:15 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,95 +47,193 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: phy: update fields of mii_ioctl_data for
- transferring C45 data.
-To: renjun wang <renjunw0@foxmail.com>, andrew@lunn.ch, linux@armlinux.org.uk
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <tencent_78F3412B4E523FEC8F19FADAC32475318706@qq.com>
+Subject: Re: [PATCH bpf-next v3 07/11] bpf: Fix a false rejection caused by
+ AND operation
 Content-Language: en-US
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-In-Reply-To: <tencent_78F3412B4E523FEC8F19FADAC32475318706@qq.com>
-Content-Type: text/plain; charset=UTF-8
+To: Eduard Zingerman <eddyz87@gmail.com>, bpf@vger.kernel.org,
+ netdev@vger.kernel.org, linux-security-module@vger.kernel.org,
+ linux-kselftest@vger.kernel.org
+Cc: Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
+ Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, Matt Bobrowski <mattbobrowski@google.com>,
+ Brendan Jackman <jackmanb@chromium.org>, Paul Moore <paul@paul-moore.com>,
+ James Morris <jmorris@namei.org>, "Serge E . Hallyn" <serge@hallyn.com>,
+ Khadija Kamran <kamrankhadijadj@gmail.com>,
+ Casey Schaufler <casey@schaufler-ca.com>,
+ Ondrej Mosnacek <omosnace@redhat.com>, Kees Cook <keescook@chromium.org>,
+ John Johansen <john.johansen@canonical.com>,
+ Lukas Bulwahn <lukas.bulwahn@gmail.com>,
+ Roberto Sassu <roberto.sassu@huawei.com>,
+ Shung-Hsi Yu <shung-hsi.yu@suse.com>
+References: <20240411122752.2873562-1-xukuohai@huaweicloud.com>
+ <20240411122752.2873562-8-xukuohai@huaweicloud.com>
+ <e62e2971301ca7f2e9eb74fc500c520285cad8f5.camel@gmail.com>
+From: Xu Kuohai <xukuohai@huaweicloud.com>
+In-Reply-To: <e62e2971301ca7f2e9eb74fc500c520285cad8f5.camel@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-CM-TRANSID:cCh0CgCHnQbLfSNmO6PhKQ--.65426S2
+X-Coremail-Antispam: 1UD129KBjvJXoW3XF4DuFyUAry8KFyrXF13Jwb_yoWxGr4kpF
+	WfG3ZFka1kXrW8Cw1Iqan8JFyakF4fAa17JFyUJryFyas8uF4FqFs0grWjyr98Ar4ruw42
+	vFnFqay8GryUCaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUkjb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Cr0_Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
+	0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
+	x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
+	0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1l42xK82IYc2Ij
+	64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x
+	8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a6rW5MIIYrxkI7VAKI48JMIIF0xvE
+	2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42
+	xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIE
+	c7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07UAkuxUUUUU=
+X-CM-SenderInfo: 50xn30hkdlqx5xdzvxpfor3voofrz/
 
-On 20.04.2024 02:41, renjun wang wrote:
-> The phy_id is used as u32 type in function mdio_phy_id_is_c45()
-> with the 30th bit for distinguishing C22 and C45. The reg_num is
-> also used as u32 type in function mdiobus_c45_read() or someplace
-> else. For more C45 information needed and data structure alignment
-> consideration, change these two fields to __u32 type which can make
-
-What do you mean with alignment consideration?
-
-> user space program transferring clause 45 type information to kernel
-> directly.
+On 4/20/2024 7:00 AM, Eduard Zingerman wrote:
+> On Thu, 2024-04-11 at 20:27 +0800, Xu Kuohai wrote:
+>> From: Xu Kuohai <xukuohai@huawei.com>
+>>
+>> With lsm return value check, the no-alu32 version test_libbpf_get_fd_by_id_opts
+>> is rejected by the verifier, and the log says:
+>>
+>>    0: R1=ctx() R10=fp0
+>>    ; int BPF_PROG(check_access, struct bpf_map *map, fmode_t fmode) @ test_libbpf_get_fd_by_id_opts.c:27
+>>    0: (b7) r0 = 0                        ; R0_w=0
+>>    1: (79) r2 = *(u64 *)(r1 +0)
+>>    func 'bpf_lsm_bpf_map' arg0 has btf_id 916 type STRUCT 'bpf_map'
+>>    2: R1=ctx() R2_w=trusted_ptr_bpf_map()
+>>    ; if (map != (struct bpf_map *)&data_input) @ test_libbpf_get_fd_by_id_opts.c:29
+>>    2: (18) r3 = 0xffff9742c0951a00       ; R3_w=map_ptr(map=data_input,ks=4,vs=4)
+>>    4: (5d) if r2 != r3 goto pc+4         ; R2_w=trusted_ptr_bpf_map() R3_w=map_ptr(map=data_input,ks=4,vs=4)
+>>    ; int BPF_PROG(check_access, struct bpf_map *map, fmode_t fmode) @ test_libbpf_get_fd_by_id_opts.c:27
+>>    5: (79) r0 = *(u64 *)(r1 +8)          ; R0_w=scalar() R1=ctx()
+>>    ; if (fmode & FMODE_WRITE) @ test_libbpf_get_fd_by_id_opts.c:32
+>>    6: (67) r0 <<= 62                     ; R0_w=scalar(smax=0x4000000000000000,umax=0xc000000000000000,smin32=0,smax32=umax32=0,var_off=(0x0; 0xc000000000000000))
+>>    7: (c7) r0 s>>= 63                    ; R0_w=scalar(smin=smin32=-1,smax=smax32=0)
+>>    ;  @ test_libbpf_get_fd_by_id_opts.c:0
+>>    8: (57) r0 &= -13                     ; R0_w=scalar(smax=0x7ffffffffffffff3,umax=0xfffffffffffffff3,smax32=0x7ffffff3,umax32=0xfffffff3,var_off=(0x0; 0xfffffffffffffff3))
+>>    ; int BPF_PROG(check_access, struct bpf_map *map, fmode_t fmode) @ test_libbpf_get_fd_by_id_opts.c:27
+>>    9: (95) exit
+>>
+>> And here is the C code of the prog.
+>>
+>> SEC("lsm/bpf_map")
+>> int BPF_PROG(check_access, struct bpf_map *map, fmode_t fmode)
+>> {
+>> 	if (map != (struct bpf_map *)&data_input)
+>> 		return 0;
+>>
+>> 	if (fmode & FMODE_WRITE)
+>> 		return -EACCES;
+>>
+>> 	return 0;
+>> }
+>>
+>> It is clear that the prog can only return either 0 or -EACCESS, and both
+>> values are legal.
+>>
+>> So why is it rejected by the verifier?
+>>
+>> The verifier log shows that the second if and return value setting
+>> statements in the prog is optimized to bitwise operations "r0 s>>= 63"
+>> and "r0 &= -13". The verifier correctly deduces that the the value of
+>> r0 is in the range [-1, 0] after verifing instruction "r0 s>>= 63".
+>> But when the verifier proceeds to verify instruction "r0 &= -13", it
+>> fails to deduce the correct value range of r0.
+>>
+>> 7: (c7) r0 s>>= 63                    ; R0_w=scalar(smin=smin32=-1,smax=smax32=0)
+>> 8: (57) r0 &= -13                     ; R0_w=scalar(smax=0x7ffffffffffffff3,umax=0xfffffffffffffff3,smax32=0x7ffffff3,umax32=0xfffffff3,var_off=(0x0; 0xfffffffffffffff3))
+>>
+>> So why the verifier fails to deduce the result of 'r0 &= -13'?
+>>
+>> The verifier uses tnum to track values, and the two ranges "[-1, 0]" and
+>> "[0, -1ULL]" are encoded to the same tnum. When verifing instruction
+>> "r0 &= -13", the verifier erroneously deduces the result from
+>> "[0, -1ULL] AND -13", which is out of the expected return range
+>> [-4095, 0].
+>>
+>> To fix it, this patch simply adds a special SCALAR32 case for the
+>> verifier. That is, when the source operand of the AND instruction is
+>> a constant and the destination operand changes from negative to
+>> non-negative and falls in range [-256, 256], deduce the result range
+>> by enumerating all possible AND results.
+>>
+>> Signed-off-by: Xu Kuohai <xukuohai@huawei.com>
+>> ---
 > 
-
-With this change you break userspace. And in general: If you make
-such a change, you should also use it.
-
-> Signed-off-by: renjun wang <renjunw0@foxmail.com>
-> ---
->  include/uapi/linux/mii.h | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+> Hello,
 > 
-> diff --git a/include/uapi/linux/mii.h b/include/uapi/linux/mii.h
-> index 39f7c44baf53..68c085b049de 100644
-> --- a/include/uapi/linux/mii.h
-> +++ b/include/uapi/linux/mii.h
-> @@ -176,8 +176,8 @@
->  
->  /* This structure is used in all SIOCxMIIxxx ioctl calls */
->  struct mii_ioctl_data {
-> -	__u16		phy_id;
-> -	__u16		reg_num;
-> +	__u32		phy_id;
-> +	__u32		reg_num;
->  	__u16		val_in;
->  	__u16		val_out;
->  };
+> Sorry for the delay, I had to think about this issue a bit.
+> I found the clang transformation that generates the pattern this patch
+> tries to handle.
+> It is located in DAGCombiner::SimplifySelectCC() method (see [1]).
+> The transformation happens as a part of DAG to DAG rewrites
+> (LLVM uses several internal representations:
+>   - generic optimizer uses LLVM IR, most of the work is done
+>     using this representation;
+>   - before instruction selection IR is converted to Selection DAG,
+>     some optimizations are applied at this stage,
+>     all such optimizations are a set of pattern replacements;
+>   - Selection DAG is converted to machine code, some optimizations
+>     are applied at the machine code level).
+> 
+> Full pattern is described as follows:
+> 
+>    // fold (select_cc seteq (and x, y), 0, 0, A) -> (and (sra (shl x)) A)
+>    // where y is has a single bit set.
+>    // A plaintext description would be, we can turn the SELECT_CC into an AND
+>    // when the condition can be materialized as an all-ones register.  Any
+>    // single bit-test can be materialized as an all-ones register with
+>    // shift-left and shift-right-arith.
+> 
+> For this particular test case the DAG is converted as follows:
+> 
+>                      .---------------- lhs         The meaning of this select_cc is:
+>                      |        .------- rhs         `lhs == rhs ? true value : false value`
+>                      |        | .----- true value
+>                      |        | |  .-- false value
+>                      v        v v  v
+>    (select_cc seteq (and X 2) 0 0 -13)
+>                            ^
+> ->                        '---------------.
+>    (and (sra (sll X 62) 63)                |
+>         -13)                               |
+>                                            |
+> Before pattern is applied, it checks that second 'and' operand has
+> only one bit set, (which is true for '2').
+> 
+> The pattern itself generates logical shift left / arithmetic shift
+> right pair, that ensures that result is either all ones (-1) or all
+> zeros (0). Hence, applying 'and' to shifts result and false value
+> generates a correct result.
+>
+
+Thanks for your detailed and invaluable explanation!
+
+> In my opinion the approach taken by this patch is sub-optimal:
+> - 512 iterations is too much;
+> - this does not cover all code that could be generated by the above
+>    mentioned LLVM transformation
+>    (e.g. second 'and' operand could be 1 << 16).
+> 
+> Instead, I suggest to make a special case for source or dst register
+> of '&=' operation being in range [-1,0].
+> Meaning that one of the '&=' operands is either:
+> - all ones, in which case the counterpart is the result of the operation;
+> - all zeros, in which case zero is the result of the operation;
+> - derive MIN and MAX values based on above two observations.
+>
+
+Totally agree, I'll cook a new patch as you suggested.
+
+> [1] https://github.com/llvm/llvm-project/blob/4523a267829c807f3fc8fab8e5e9613985a51565/llvm/lib/CodeGen/SelectionDAG/DAGCombiner.cpp#L5391
+> 
+> Best regards,
+> Eduard
 
 
