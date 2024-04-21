@@ -1,183 +1,281 @@
-Return-Path: <netdev+bounces-89872-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89873-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8DCC8ABFB4
-	for <lists+netdev@lfdr.de>; Sun, 21 Apr 2024 17:21:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 164FD8ABFBC
+	for <lists+netdev@lfdr.de>; Sun, 21 Apr 2024 17:45:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A56911C2039E
-	for <lists+netdev@lfdr.de>; Sun, 21 Apr 2024 15:21:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 335AE1C20A5A
+	for <lists+netdev@lfdr.de>; Sun, 21 Apr 2024 15:45:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5ED5318030;
-	Sun, 21 Apr 2024 15:21:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D266D182BD;
+	Sun, 21 Apr 2024 15:45:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="pY6/V6jn"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c/X4wOYZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2053.outbound.protection.outlook.com [40.107.212.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEE4A17BA2
-	for <netdev@vger.kernel.org>; Sun, 21 Apr 2024 15:21:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.212.53
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713712903; cv=fail; b=vDTFNV4vmwU57AzsSSwnpOJMf0HXhKewnbti03fkAeF4JPjiqjNtSNQbzENKNyylDsatsQCS3DK0duegCZeD7Av3eZG+Bq7BJsL9gGpgSxE4D/ryJPa/280cxPtd+QHZnGKAyGR9n4KdyLixBgJYV6Fe/EItyY/M+CgjkzGJTiw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713712903; c=relaxed/simple;
-	bh=y5BwR34/XS3Be5vC5kISZKvfLqChD91SzMkvfbnB9IE=;
-	h=References:From:To:Cc:Subject:Date:In-reply-to:Message-ID:
-	 Content-Type:MIME-Version; b=bffHBZ6i4Y9kyACp/l8u9WmL+osTZ/Rz6i9JjCxThN4SNrYHYr0bY6C5UdBgCOGfFy8/z4QLrJtUdART90kAzQcPsd6AuyhTVCbBvoXIncK66wJ1twgwUfgyTk5asM2GR5nqIj0B7pX1aW7boStCas1M01FrpgIP5K8azIVUsM4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=pY6/V6jn; arc=fail smtp.client-ip=40.107.212.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Xe2zOtO6oQWww2zulTaLDK9h+W5o/y08G3Yf5bbXzSEyHx2gfI+gAfr33gKVDUFGa/mcyBlHyv4dcOYHoG0rQUcOjHMvRRRS8M+aMiOsgQfzY//4rySnwWluNcivDgvrC7MwKHklGy6patwyQ6wJhwOYgbA0LWaWwg48qbAi4GyoqhB3qYdo3ceCENuXrvI2FVT09YxluodUPds4I9uTKD/IYiTELXc9Prd4SlWpmaCWx/SWSp+OHnMpirdIasx2ZhEt8nXgdqlBJu5o8JxON0a9FxucEFdc19HKNoK62hgBryM6Ag88w5hba1Exsclp7U2hEFdWDnlwRWGEhUjEjQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=rT8J5jew6DzObJesL8pX7IjWLkL0u1raUdDB9dRGMDE=;
- b=UqIiN2L4E3rdN3vjFlJ9oA9rjPY3oaE1jaOxKKnYz5KmENkujTTRDKPTe7IyS7I1q6PMC+G3oUOLNbXgM1z+yAGvcMsHLApOsU+dpf1oEoDl7wxPVwF/3ML8f0anC8l+vr30HtqyYXp96TXifnKEGYoSyZ4+ZHAZ/+1KqDNN7C0fnPptXNFnB+cLK/T4bYhIUmsq/yhrLMHSQg+Ejs/I2l8876e7/z8LoSqnIr1qjsdXYb5/+Gc5O4yqW+zVsH/6Ol2JYMd0HCkBQdWOCiZQL/RwnNAVrIJSix/vVf2YiwVF9B4cSL+OUUID/fvgy1tH0eAEDes0sTzEjJ1zXqYfug==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=rT8J5jew6DzObJesL8pX7IjWLkL0u1raUdDB9dRGMDE=;
- b=pY6/V6jnW50MtuN4XkzhnQ9v4rYGLrdkadC95hW8yt8Kkd9QYaoQqtqrChpniQQgUgyFm6XqPmdFjgzikxst4yaI5/07wHnhkUtDt0+PjkdzBzkkewiKXXNtKamhQWnB7JP5T+E6qug1hb2ze9z4H+wNRKj1IbQgJqAVykqiQ3BCc4zpgXi+bGaWPX+FKXSLN0Ai0LXqqsWSyqpj+kPrlj6aEoWxcJ29jV0tVIcPsztJoA3VfTYG2J2s2/BnspUjaNR/ex3qyCX12gTHMNJ4eU6nMOb7NR382Lb9TqhX5xo5d4mBEbU5qgo1lwMyVkjexVPsRk5hj1Wz6BSkl0jEdQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from BYAPR12MB2743.namprd12.prod.outlook.com (2603:10b6:a03:61::28)
- by CY8PR12MB7609.namprd12.prod.outlook.com (2603:10b6:930:99::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7472.44; Sun, 21 Apr
- 2024 15:21:38 +0000
-Received: from BYAPR12MB2743.namprd12.prod.outlook.com
- ([fe80::3ec0:1215:f4ed:9535]) by BYAPR12MB2743.namprd12.prod.outlook.com
- ([fe80::3ec0:1215:f4ed:9535%4]) with mapi id 15.20.7472.044; Sun, 21 Apr 2024
- 15:21:38 +0000
-References: <20240421143914.437810-1-tariqt@nvidia.com>
- <20240421145414.GF6832@unreal>
-User-agent: mu4e 1.10.8; emacs 28.2
-From: Rahul Rameshbabu <rrameshbabu@nvidia.com>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Tariq Toukan <tariqt@nvidia.com>, "David S. Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
- netdev@vger.kernel.org, Saeed Mahameed <saeedm@nvidia.com>, Gal Pressman
- <gal@nvidia.com>
-Subject: Re: [PATCH net-next] MAINTAINERS: Update Mellanox website links
-Date: Sun, 21 Apr 2024 08:19:24 -0700
-In-reply-to: <20240421145414.GF6832@unreal>
-Message-ID: <87sezeaghq.fsf@nvidia.com>
-Content-Type: text/plain
-X-ClientProxiedBy: BYAPR08CA0016.namprd08.prod.outlook.com
- (2603:10b6:a03:100::29) To BYAPR12MB2743.namprd12.prod.outlook.com
- (2603:10b6:a03:61::28)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 256E13D66
+	for <netdev@vger.kernel.org>; Sun, 21 Apr 2024 15:45:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.41
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1713714331; cv=none; b=ZVSAJmGWkA13eBwgse0n9wQ7TbgFcc4wMISbjo8NMOXqrCGV/rz9T0pypEvAvfCNvO3i+WkUB/ALG7Cq6+C9k+pT9zajyZiU2Y7K0ijDcay/KT9v+3dwTMUWvSNcRcVEX1ZQakblXJKS5BWTHdRtQNbrzXNICzhgIa8a9V80S9o=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1713714331; c=relaxed/simple;
+	bh=wXivgWQuhaa+X9h0/hWtA0DDVHxvswmtssxgaxNfhB4=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=ikHqXcXrOUSntpwnhYj6MXZUUJILUxzv0NDJh/RiZt5e+uJhc2Nr90gCNoo4BYrZ0hBWYIe8jid7aX8a3lSgiRFkibPzBWFJmqtN8HoF83orheoLyqOjBe8uiS7xZETrv6RaRSUCj8YGudNrVVgOJbIa7knMvAXMH5okZf6IHIw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=c/X4wOYZ; arc=none smtp.client-ip=209.85.219.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-6a07eefdd66so1137806d6.2
+        for <netdev@vger.kernel.org>; Sun, 21 Apr 2024 08:45:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1713714329; x=1714319129; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QaxRL9YI7BHyVZs/wy3WysFNG5pbsHdpsTtD3HHXe/M=;
+        b=c/X4wOYZ/9h5LTxAuP9cpW6FA5O+wZH/m7ji/xGNLestcNa1OymnifLMWS73msoY+N
+         lxJKLXkBotVcHmU0xHLTXrXDwK/lh54Z9YgJnQ1Nz2s4lP2HOo5iI/WZLerGmwaIYotD
+         iASwQTp/YyHckqhkHGwK3eTRvo4YLDjBi0gO98i7OBgD1u7Dm9EyoVbfh6rY0fLIw2ss
+         iHo9NARDXkDF/WXN+xiSi56jU7NU4xbSHKYfU0Xq78NP5oCZnjFF48L0Y54jLPy7u8a5
+         LPpZn/FqoPwzQT1QBAZYiPo7FBfdrOoGwnegx4pI5yVebvwLtgGSionm/Em34ur4XC6A
+         18KQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713714329; x=1714319129;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=QaxRL9YI7BHyVZs/wy3WysFNG5pbsHdpsTtD3HHXe/M=;
+        b=RaqEVeSHL7bSKtHbVpDAkYPtW4AkANwF5pEg1TwLr+sYPnyuxld3vw7505bhE2z0dv
+         dgc7nkEeD3crF9DYhl8qaQYbDWMwlRtI0JQ5dVkpA43OpRGZ5tOnIm1QT66mYcSP/ckt
+         rySTicoI8WeTF79O3i4UXpokwpuEe9rZh54PvmwMbHknvQdNr+5+wHHVlKhCbmbMP9FV
+         9pI9qUjfwyrdQbfHjHWxxyaTYCAUtnuiM6IlCr6uUwZxS1C8DFlXMoHLXky+00RUW6r7
+         irFbn4h8pEOwa5bs1IntCM+6C/8rUC6uI/Bqst2wTH1CsRt+ODTvGccqyZ0I9USTXQR3
+         E8PQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWN11Z6OI762SF64/lOIyOxUcmi8N1a2NNgbPvvqiM7Fd/1C39+99hp4m8RpRcoDIWcqx+8c1M9/L/kmEIvq3JHyGVBdlK0
+X-Gm-Message-State: AOJu0YxnQTW3bg7iiH5RXrC9CMsaOwyMvjaRAEJmpmYEx5aXy7R8v2LO
+	2hemRFcTRc/nDlN/cUYibPbVRSrkF2lK3g84SF31HiExqL+rgRky
+X-Google-Smtp-Source: AGHT+IHU+sw1IDABtxPgwBMX6adCV8Med2BSHd4+5e/nO/nN32rpqnNKo3BWXjJaG29Vg4ZPfeZjRw==
+X-Received: by 2002:a0c:e6ec:0:b0:69b:c808:49d7 with SMTP id m12-20020a0ce6ec000000b0069bc80849d7mr7406795qvn.46.1713714329025;
+        Sun, 21 Apr 2024 08:45:29 -0700 (PDT)
+Received: from localhost (73.84.86.34.bc.googleusercontent.com. [34.86.84.73])
+        by smtp.gmail.com with ESMTPSA id n1-20020a0c8c01000000b006a03f4d27b4sm2588331qvb.9.2024.04.21.08.45.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 21 Apr 2024 08:45:28 -0700 (PDT)
+Date: Sun, 21 Apr 2024 11:45:28 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: zijianzhang@bytedance.com, 
+ netdev@vger.kernel.org
+Cc: edumazet@google.com, 
+ willemdebruijn.kernel@gmail.com, 
+ davem@davemloft.net, 
+ kuba@kernel.org, 
+ cong.wang@bytedance.com, 
+ xiaochun.lu@bytedance.com, 
+ Zijian Zhang <zijianzhang@bytedance.com>
+Message-ID: <6625349824651_1dff99294db@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20240419214819.671536-3-zijianzhang@bytedance.com>
+References: <20240419214819.671536-1-zijianzhang@bytedance.com>
+ <20240419214819.671536-3-zijianzhang@bytedance.com>
+Subject: Re: [PATCH net-next v2 2/3] sock: add MSG_ZEROCOPY notification
+ mechanism based on msg_control
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BYAPR12MB2743:EE_|CY8PR12MB7609:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2925e10a-4b5e-4dbc-b45d-08dc6216bd55
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?lHIbzWvUgaRYty8GQsD1Qy29VpZZhnYeGHBOjvfSHm0a9ssdfy67b3a+ZkRd?=
- =?us-ascii?Q?ZBCIOBXq1wiOkCupRYr7MYQ87FwgA3DY7TjixzTKmH58ngF37d54fIxwn8a7?=
- =?us-ascii?Q?hZhCW+/U9N/mLw+/tVOVqrYxLzlv11QEtkNKfIkyVjs7Njmc0P5lHeNGmjOp?=
- =?us-ascii?Q?CH3RsjC7Y9n0pk8h/gIS7Dq66EjkFze8kDAsKW/FWtehi7xIhdB5HPevTyVf?=
- =?us-ascii?Q?4EedVb2TIAmBdTPnIhFMocIW2Dz/o7CWJ3fj1ENucAu64MuevJcK/5tBANmN?=
- =?us-ascii?Q?dZ3D70KNhVOr99sdzkajnmogKClWXg0K+ObmcBzklF4xrkg93KpzZHRZr4IY?=
- =?us-ascii?Q?/LZL0jt5RPGogoVXjI3R9KE8NJ3yqOcXETqCc3fkkvpLBUUIEvP4MTH9EHzw?=
- =?us-ascii?Q?xibtCaWJijnmlXDDcunDl7mrwxCO7iWmgjtiSpXGGC0wdx12v7wxwYrZGjgM?=
- =?us-ascii?Q?iVaLG29gdEbVgSAXjinL36mjP6aUW+Kmggjt7DM3C+lE8M5ALjwADBpyPttQ?=
- =?us-ascii?Q?8IVsnopjujV6gB8il5AJz8fDE1ILYS/x8pwSbBhpOrsoRsbQiHOANV1LwRWV?=
- =?us-ascii?Q?ocOCRJ8wAqEpMcaCnE+PQzr5fuYI4W0R3BLmx+oD+hMcWFdD6EsJaaQyISR7?=
- =?us-ascii?Q?9LONxKOnaV3HDRgfPg96lItHdZGTEDt0k0noW9ULLGDn7mIWCON048X5P+CH?=
- =?us-ascii?Q?s+cu3L4lRoPhv6eW2O4SLsxs59g9DwM15Qtz9NABstZcYsed+OGf/iibJ7+M?=
- =?us-ascii?Q?y8bGPKx4MW4pQr1ZjfYbK725wNlhLOrJTJtPGhTR2bWZTdNWYmYE8eHW3XJm?=
- =?us-ascii?Q?Bdh3UimhPCspv0eSoIyM8Sa1GDQVetzSS4ZawC6L65P718kBkd8v7l8HC7Lh?=
- =?us-ascii?Q?5T67VS7Cw9+Sr0/T+fbzUfkScmdpS7Hwvg1ASKKVZgPbEAmkNPJDjBgx328f?=
- =?us-ascii?Q?HcLLk5oBZ9t15/tm3ExQc2Te+fe/Wdb36mnT4K24GEeBN1H9RBT8RlfODKIp?=
- =?us-ascii?Q?JPtxOEcqQdksd9d7/Pl/BKlSTKxJim1qGhPDzhrAPQMFi9Ft14YFLdb5tKav?=
- =?us-ascii?Q?L984YGuk64wKsvbKA2e3zq16cJMH5VeDyRUOkgd4ld+HHCxD/6GwxyzJHAIi?=
- =?us-ascii?Q?Zhzw13kAZWr1tIg6hAIBTDzyd7VQIqbkNhKVKeku0ATc78uz5yO5UQ+njxT3?=
- =?us-ascii?Q?fDfy3J+1Dr9CEXa69jSWhO+OovQKpomagolwZtHEXWp8uVIJoxV+8obpC92R?=
- =?us-ascii?Q?qeG80ZR6fswkYVvdLHBWVyQWQVxzg8+v/SyP/pL8/g=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR12MB2743.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(1800799015)(366007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?k8ZBsqwU5aEMjjX7zg/orNcwJEANzdsKcyA9f79tatkLA+E7S4gNecxfmfqj?=
- =?us-ascii?Q?qWJIqTBYcoQDCXwS8iNYO74OSsLdSwTzwIFwNozuMYaYxqYkzLK3CrmnjGSS?=
- =?us-ascii?Q?luVQP9rdN0qmDCCMmxVHW61fncdgHfvQIa12usNk4zqP6bn1wgGqK97hgfUZ?=
- =?us-ascii?Q?zaI/lENfBDOeIc6HcpAQA1KqlrxDp7/7ve5Rlmw83p8o5PnqqrxwjCXZcjH8?=
- =?us-ascii?Q?W4yqk4oUsh/zoQWjsY1Bz24qmnDp79udzMmGo68br2EjJDcneKPO8tb8gdLB?=
- =?us-ascii?Q?Ac8kZUjDKdyEpq5+EUOCSo0PgRaFo/hl825dIcXscRDgvK9kaFJdpZse43dX?=
- =?us-ascii?Q?r9lvzzf/HMiqX4Fg2di6SUCgnqTqRfNd5VHqst8smIO1hBJJL/kdyyapTYBk?=
- =?us-ascii?Q?KFpOYgmF0IXhUHKJujEJ3L+PcpQtI0QCQjxxuz94MjQk1DbMsiIS20TvFxAM?=
- =?us-ascii?Q?VKXuWxeDokfzC2nXAY4Q/msoj/Cwk3E/8k6kz+neJxefu7mmctKKaYirs5sJ?=
- =?us-ascii?Q?5zfzac8irZDVmcfijOVCgHxB6PqCH/pEsQVoBpLlM5TslTmZWxM+9tily+HU?=
- =?us-ascii?Q?GpTyiWm/Nw00zKVKm4SiMjxttM1H7Hxo7oHkkowkuNok8hwxWhdsqMZ7MCtX?=
- =?us-ascii?Q?CmrkLcyl/eeKHZyAS++vL0u236h9faXvbB35YTlXMAiWFgAS5ILXaPBR4FdL?=
- =?us-ascii?Q?tt0/2g7Lve/liwTafyswQkHEOEcuBCl8l2YlaUSdPWfITXxkONM5eex9/Ezn?=
- =?us-ascii?Q?5j92knhqpt9EYTzhNIWPEwP3pOW7CQ2xrTGm7lLMGo/mZp5wySqWCgnIPzeL?=
- =?us-ascii?Q?4qWmeC0X1tD7r0hU6bBOMQhaQcCDWyJpTjlUrCda5TBLFTtphJMK9eKx3Pa2?=
- =?us-ascii?Q?vZMaM/drEauBuGxHk6wbWQDa5gD6PpzETAXNkEIXOebaaJBt/OAfVoghf1Bm?=
- =?us-ascii?Q?du4iKtP4euJmBGtVL4QkNoywDGbgVn+5Y2Gizy6ydnKNHL5AxDBQ56q1NnjL?=
- =?us-ascii?Q?v9wh2w+pbE563Sc7C036Li1MLGfH2UplBQrqVpXpcBgxmHJoT2p+RFLdsWzd?=
- =?us-ascii?Q?v2MGcQ/hrQ1oWgxuBPQioTFyAgnmrZZBtg9WXc7HIB5CUl5fxnGphDr20QRD?=
- =?us-ascii?Q?XLSvNtemGx1y/IwFFQxLlbmfZSA0wyH/1jJoQRS0GNQev10vDi5/EMk1J7g1?=
- =?us-ascii?Q?AQSPcPQG6yGD4jWCBV4WEgLuQgOSl3yj35CUqeX6uh9gFPba3gJpDBdJTLFF?=
- =?us-ascii?Q?aj3GE+VPv7Zl5RsTGIPYfLvKMObyctZig8ZJ4rcoTtlbReWd3Nx3X1yDX+6+?=
- =?us-ascii?Q?Sw3PiAD12+SiqMk1hRlgPQ9Qb2awPB2VPcEERANdSJQA+k9nYuiWsKCcxx0r?=
- =?us-ascii?Q?eRjNbO9LqjCTk3De/11LXykKwDsLuji+9tEP1UL1FzHzFH1V93GEU8X63uZu?=
- =?us-ascii?Q?7tlAnMdw1XsrxbbKR+TBlvisDkNJF1L7ITuKjHTiC61Zl7SbLrZDSmnMNe3f?=
- =?us-ascii?Q?F9dhHv4drIkrEUgZqFSvN2ohz/j/4x3dXY7JNMgHRB6TQMbk9GI23nSUeWw1?=
- =?us-ascii?Q?TXKOgPinm5P8SFdhNYl327AQDO7zEl6mIRTRd3Ee2TKpmR3hhzIo/DJbOR1r?=
- =?us-ascii?Q?RQ=3D=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2925e10a-4b5e-4dbc-b45d-08dc6216bd55
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR12MB2743.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Apr 2024 15:21:38.6300
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: G8SF35Cg6i62CNDfl0hvMhWXRqVORjHll+3uYdqD5de4TEPOIFym2kcLrgB+eajYcy32ChbIULZ9EJnewrZWtw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7609
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
+
+zijianzhang@ wrote:
+> From: Zijian Zhang <zijianzhang@bytedance.com>
+> 
+> The MSG_ZEROCOPY flag enables copy avoidance for socket send calls.
+> However, zerocopy is not a free lunch. Apart from the management of user
+> pages, the combination of poll + recvmsg to receive notifications incurs
+> unignorable overhead in the applications. The overhead of such sometimes
+> might be more than the CPU savings from zerocopy. We try to solve this
+> problem with a new notification mechanism based on msgcontrol.
+> This new mechanism aims to reduce the overhead associated with receiving
+> notifications by embedding them directly into user arguments passed with
+> each sendmsg control message. By doing so, we can significantly reduce
+> the complexity and overhead for managing notifications. In an ideal
+> pattern, the user will keep calling sendmsg with SO_ZC_NOTIFICATION
+> msg_control, and the notification will be delivered as soon as possible.
+> 
+> Signed-off-by: Zijian Zhang <zijianzhang@bytedance.com>
+> Signed-off-by: Xiaochun Lu <xiaochun.lu@bytedance.com>
+> ---
+>  arch/alpha/include/uapi/asm/socket.h  |  2 +
+>  arch/mips/include/uapi/asm/socket.h   |  2 +
+>  arch/parisc/include/uapi/asm/socket.h |  2 +
+>  arch/sparc/include/uapi/asm/socket.h  |  2 +
+>  include/uapi/asm-generic/socket.h     |  2 +
+>  include/uapi/linux/socket.h           | 16 ++++++
+>  net/core/sock.c                       | 70 +++++++++++++++++++++++++++
+>  7 files changed, 96 insertions(+)
+> 
+> diff --git a/arch/alpha/include/uapi/asm/socket.h b/arch/alpha/include/uapi/asm/socket.h
+> index e94f621903fe..b24622a9cd47 100644
+> --- a/arch/alpha/include/uapi/asm/socket.h
+> +++ b/arch/alpha/include/uapi/asm/socket.h
+> @@ -140,6 +140,8 @@
+>  #define SO_PASSPIDFD		76
+>  #define SO_PEERPIDFD		77
+>  
+> +#define SO_ZC_NOTIFICATION 78
+> +
+
+SCM_ for cmsgs
+
+>  /*
+>   * Desired design of maximum size and alignment (see RFC2553)
+>   */
+> @@ -35,4 +37,18 @@ struct __kernel_sockaddr_storage {
+>  #define SOCK_TXREHASH_DISABLED	0
+>  #define SOCK_TXREHASH_ENABLED	1
+>  
+> +#define SOCK_ZC_INFO_MAX 256
+> +
+> +struct zc_info_elem {
+> +	__u32 lo;
+> +	__u32 hi;
+> +	__u8 zerocopy;
+> +};
+> +
+> +struct zc_info_usr {
+> +	__u64 usr_addr;
+> +	unsigned int length;
+> +	struct zc_info_elem info[];
+> +};
+> +
+
+Don't pass a pointer to user memory, just have msg_control point to an
+array of zc_info_elem.
+
+>  #endif /* _UAPI_LINUX_SOCKET_H */
+> diff --git a/net/core/sock.c b/net/core/sock.c
+> index fe9195186c13..13f06480f2d8 100644
+> --- a/net/core/sock.c
+> +++ b/net/core/sock.c
+> @@ -2809,6 +2809,13 @@ int __sock_cmsg_send(struct sock *sk, struct cmsghdr *cmsg,
+>  		     struct sockcm_cookie *sockc)
+>  {
+>  	u32 tsflags;
+> +	int ret, zc_info_size, i = 0;
+> +	unsigned long flags;
+> +	struct sk_buff_head *q, local_q;
+> +	struct sk_buff *skb, *tmp;
+> +	struct sock_exterr_skb *serr;
+> +	struct zc_info_usr *zc_info_usr_p, *zc_info_kern_p;
+> +	void __user	*usr_addr;
+
+Please wrap the case in parentheses and define variables in that scope
+(Since there are so many variables for this case only.)
+
+>  
+>  	switch (cmsg->cmsg_type) {
+>  	case SO_MARK:
+> @@ -2842,6 +2849,69 @@ int __sock_cmsg_send(struct sock *sk, struct cmsghdr *cmsg,
+>  	case SCM_RIGHTS:
+>  	case SCM_CREDENTIALS:
+>  		break;
+> +	case SO_ZC_NOTIFICATION:
+> +		if (!sock_flag(sk, SOCK_ZEROCOPY) || sk->sk_family == PF_RDS)
+> +			return -EINVAL;
+> +
+
+Why allow PF_RDS without the sock flag set?
+
+> +		zc_info_usr_p = (struct zc_info_usr *)CMSG_DATA(cmsg);
+> +		if (zc_info_usr_p->length <= 0 || zc_info_usr_p->length > SOCK_ZC_INFO_MAX)
+> +			return -EINVAL;
+> +
+> +		zc_info_size = struct_size(zc_info_usr_p, info, zc_info_usr_p->length);
+> +		if (cmsg->cmsg_len != CMSG_LEN(zc_info_size))
+> +			return -EINVAL;
+
+By passing a straightforward array, the array len can be inferred from
+cmsg_len, simplifying all these checks.
+
+See for instance how SO_DEVMEM_DONTNEED returns an array of tokens to
+the kernel.
+
+> +
+> +		usr_addr = (void *)(uintptr_t)(zc_info_usr_p->usr_addr);
+> +		if (!access_ok(usr_addr, zc_info_size))
+> +			return -EFAULT;
+> +
+> +		zc_info_kern_p = kmalloc(zc_info_size, GFP_KERNEL);
+> +		if (!zc_info_kern_p)
+> +			return -ENOMEM;
+> +
+> +		q = &sk->sk_error_queue;
+> +		skb_queue_head_init(&local_q);
+> +		spin_lock_irqsave(&q->lock, flags);
+> +		skb = skb_peek(q);
+> +		while (skb && i < zc_info_usr_p->length) {
+> +			struct sk_buff *skb_next = skb_peek_next(skb, q);
+> +
+> +			serr = SKB_EXT_ERR(skb);
+> +			if (serr->ee.ee_errno == 0 &&
+> +			    serr->ee.ee_origin == SO_EE_ORIGIN_ZEROCOPY) {
+> +				zc_info_kern_p->info[i].hi = serr->ee.ee_data;
+> +				zc_info_kern_p->info[i].lo = serr->ee.ee_info;
+> +				zc_info_kern_p->info[i].zerocopy = !(serr->ee.ee_code
+> +								& SO_EE_CODE_ZEROCOPY_COPIED);
+> +				__skb_unlink(skb, q);
+> +				__skb_queue_tail(&local_q, skb);
+> +				i++;
+> +			}
+> +			skb = skb_next;
+> +		}
+> +		spin_unlock_irqrestore(&q->lock, flags);
+
+In almost all sane cases, all outstanding notifications can be passed
+to userspace.
+
+It may be interesting to experiment with briefly taking the lock to
+move to a private list. See for instance net_rx_action.
+
+Then if userspace cannot handle all notifications, the rest have to be
+spliced back. This can reorder notifications. But rare reordering is
+not a correctness issue.
+
+I would choose the more complex splice approach only if it shows
+benefit, i.e., if taking the lock does contend with error enqueue
+events.
+
+> +
+> +		zc_info_kern_p->usr_addr = zc_info_usr_p->usr_addr;
+> +		zc_info_kern_p->length = i;
+> +
+> +		ret = copy_to_user(usr_addr,
+> +				   zc_info_kern_p,
+> +					struct_size(zc_info_kern_p, info, i));
+
+You'll still need to support the gnarly MSG_CMSG_COMPAT version too.
+
+Wait, is this the reason to pass a usr_addr explicitly? To get around
+any compat issues?
+
+Or even the entire issue of having to copy msg_sys->msg_control to
+user if !msg_control_is_user.
+
+I suppose this simplifies a lot in terms of development. If making the
+user interface uglier.
+
+IMHO the sane interface should be used eventually. There may also be
+other uses of passing msg_control data up to userspace from sendmsg.
+
+But this approach works for now for evaluation and discussion.
 
 
-On Sun, 21 Apr, 2024 17:54:14 +0300 Leon Romanovsky <leon@kernel.org> wrote:
-> On Sun, Apr 21, 2024 at 05:39:14PM +0300, Tariq Toukan wrote:
->> From: Rahul Rameshbabu <rrameshbabu@nvidia.com>
->> 
->> Old mellanox.com domain is no longer functional. 
->
-> It is not true, the domain is still functional and www.mellanox.com
-> redirects to https://www.nvidia.com/en-us/networking/.
-
-I am not sure I consider redirecting to another site to be functional
-but will update the wording. Not sure how long that redirect will last.
-
->
-> Or change all links to point to that redirect or leave old links as is.
-> And I'm not sure that this patch makes any difference for mlx4.
-
-I am opting to use the link below so it will pick the
-language/geographical endpoint correctly.
-
-  https://www.nvidia.com/networking/
-
---
-Thanks,
-
-Rahul Rameshbabu
 
