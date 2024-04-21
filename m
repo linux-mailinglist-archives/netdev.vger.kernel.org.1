@@ -1,139 +1,103 @@
-Return-Path: <netdev+bounces-89879-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89880-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B50338AC05F
-	for <lists+netdev@lfdr.de>; Sun, 21 Apr 2024 19:55:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8CBE8AC0C2
+	for <lists+netdev@lfdr.de>; Sun, 21 Apr 2024 20:27:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3B63F1F2103E
-	for <lists+netdev@lfdr.de>; Sun, 21 Apr 2024 17:55:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 060851C20965
+	for <lists+netdev@lfdr.de>; Sun, 21 Apr 2024 18:27:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 333043A8CB;
-	Sun, 21 Apr 2024 17:55:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="tlwBeR8T"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B699B3BBE3;
+	Sun, 21 Apr 2024 18:27:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5C7379FD;
-	Sun, 21 Apr 2024 17:55:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BD0D3BB4B
+	for <netdev@vger.kernel.org>; Sun, 21 Apr 2024 18:27:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.58.85.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713722105; cv=none; b=VtgYgVVguiw+lh3R9mn1QkvhUKcjFGc5J9u5nmArtKm+7VZg69IhdA8YoZe0pTT84lu1DJKI5ojFNbbud8ZMk+kyA2LyUszutUZABV20/B3wku1UhyYiaMO5TceRDAB2XCJZz3MefZP4syaC9X+uFjgvWCwTThwkUduhVHj6yrU=
+	t=1713724061; cv=none; b=CybkFNbJ1M50PnZqCQBXAQ2mVFkzxePdedjLny7mBwEGnPzKM7IKNm2Gx9tUi9J3A3Yaw+eKONE++OAdFn8yrAvbLP21Rjf3GIwz2VWa+4wWDi6LXIiDZ7uQnYhfp1W51ahRgP5N8/bZ3MQDYxkZw/OVw55WUkRwV8rdnyOqIJk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713722105; c=relaxed/simple;
-	bh=Qaj9o+2NK19fCBbgW9Z+DVmAh2E8bkZ2Z7Is1K9MqHU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FBkgtGWgAXRFRRNv6Mo5OvEUno7N4igsAlqLfeNgmmTsGFVact9GKScuino2STx+ltqVaQxB0AOWzdEFtjR45JRNk/wCxhefvi6keRuFRIoXWz62wzVBxXwwGFH1hE8mW6G87Kfj+ozWAsg5P3htdSDjCo9S6gzdYcx54kuMFXM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=tlwBeR8T; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=mlipOm1BapM8HlNYoaxhyEbmDWmT73O1xUbpkHHF2aM=; b=tl
-	wBeR8TgSnIoJPSXFuCCm3yVByJfFFgfTw4x7h+30jW2dUC8iJR5f9XiRLyBPlm7FXyOi4bMVrpf56
-	kpBzydxzzutY3guROW6cvYq8iIn1j4BISS6i7fI7gHJYjd7m9jjbmZu13jrkZeUr3CqDfWQWRz0Fl
-	IuS0ej8m+8qt3tI=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rybOe-00DYZJ-NB; Sun, 21 Apr 2024 19:54:36 +0200
-Date: Sun, 21 Apr 2024 19:54:36 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Josua Mayer <josua@solid-run.com>
-Cc: Michael Hennerich <michael.hennerich@analog.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Alexandru Tachici <alexandru.tachici@analog.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Jon Nettleton <jon@solid-run.com>,
-	Yazan Shhady <yazan.shhady@solid-run.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next v2 1/2] dt-bindings: net: adin: add property for
- link-status pin polarity
-Message-ID: <ac8fba1b-93ef-4120-a03b-f91772ecb5df@lunn.ch>
-References: <20240420-adin-pin-polarity-v2-0-bf9714da7648@solid-run.com>
- <20240420-adin-pin-polarity-v2-1-bf9714da7648@solid-run.com>
- <41567aec-adf2-422a-867e-9087ef33ef36@lunn.ch>
- <b3c4301b-afae-44fb-86c5-94f23d363c0a@solid-run.com>
- <2c622947-3b54-4172-b009-0551f43c3504@lunn.ch>
- <1fe2dce3-972e-420e-b4e1-f07e15b6b35f@solid-run.com>
+	s=arc-20240116; t=1713724061; c=relaxed/simple;
+	bh=DrX/aOUpya+wdC6YAPycqP+a/l8gYMBC3Vp9aiMqsMc=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 MIME-Version:Content-Type; b=HY739Ldr9ROa8bSma1JJIjmc5Oh7FusdIuW5cjSCkLrzHN636lPLPXQTvDzAtkWsgw1M/beOsh7ZBQHJwwa8QpKUQ/0ZXN1CQnmqbPLAxrkw4PJYpz7Mwe7alO4wHlfeLNv+QCbE0mm6H9pHj9AkwS3NjOfNfqeFSCpvQsHYcmM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM; spf=pass smtp.mailfrom=aculab.com; arc=none smtp.client-ip=185.58.85.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aculab.com
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-310-kyIR6opLMWGTBd3F6Ox1sg-1; Sun, 21 Apr 2024 19:27:35 +0100
+X-MC-Unique: kyIR6opLMWGTBd3F6Ox1sg-1
+Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
+ (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Sun, 21 Apr
+ 2024 19:27:01 +0100
+Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
+ id 15.00.1497.048; Sun, 21 Apr 2024 19:27:01 +0100
+From: David Laight <David.Laight@ACULAB.COM>
+To: 'Mahesh Bandewar' <maheshb@google.com>, Netdev <netdev@vger.kernel.org>,
+	Linux <linux-kernel@vger.kernel.org>, David Miller <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, "Paolo
+ Abeni" <pabeni@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, "Richard
+ Cochran" <richardcochran@gmail.com>, Arnd Bergmann <arnd@arndb.de>, "Sagi
+ Maimon" <maimon.sagi@gmail.com>
+CC: Jonathan Corbet <corbet@lwn.net>, John Stultz <jstultz@google.com>,
+	"Mahesh Bandewar" <mahesh@bandewar.net>
+Subject: RE: [PATCHv2 next] ptp: update gettimex64 to provide ts optionally in
+ mono-raw base.
+Thread-Topic: [PATCHv2 next] ptp: update gettimex64 to provide ts optionally
+ in mono-raw base.
+Thread-Index: AQHakUipE9fygZJ1Ok680rZNup1+trFzDfZA
+Date: Sun, 21 Apr 2024 18:27:01 +0000
+Message-ID: <163538a0495840eca34f6fbd09533ae1@AcuMS.aculab.com>
+References: <20240418042706.1261473-1-maheshb@google.com>
+In-Reply-To: <20240418042706.1261473-1-maheshb@google.com>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <1fe2dce3-972e-420e-b4e1-f07e15b6b35f@solid-run.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
 
-> I merely don't like the idea that this makes no sense for the other
-> possible pin functions.
-> Once somebody uses this pin for different use-case, they will need
-> to solve it again.
+RnJvbTogTWFoZXNoIEJhbmRld2FyDQo+IFNlbnQ6IDE4IEFwcmlsIDIwMjQgMDU6MjcNCj4gDQo+
+IFRoZSBjdXJyZW50IGltcGxlbWVudGF0aW9uIG9mIFBUUF9TWVNfT0ZGU0VUX0VYVEVOREVEIHBy
+b3ZpZGVzDQo+IFBIQyByZWFkcyBpbiB0aGUgZm9ybSBvZiBbcHJlLVRTLCBQSEMsIHBvc3QtVFNd
+LiBUaGVzZSBwcmUgYW5kDQo+IHBvc3QgdGltZXN0YW1wcyBhcmUgdXNlZnVsIHRvIG1lYXN1cmUg
+dGhlIHdpZHRoIG9mIHRoZSBQSEMgcmVhZC4NCj4gSG93ZXZlciwgdGhlIGN1cnJlbnQgaW1wbGVt
+ZW50YXRpb24gcHJvdmlkZXMgdGhlc2UgdGltZXN0YW1wcyBpbg0KPiBDTE9DS19SRUFMVElNRSBv
+bmx5LiBTaW5jZSBDTE9DS19SRUFMVElNRSBpcyBkaXNjaXBsaW5lZCBieSBOVFANCj4gb3IgTlRQ
+LWxpa2Ugc2VydmljZShzKSwgdGhlIHZhbHVlIGlzIHN1YmplY3RlZCB0byBjaGFuZ2UuIFRoaXMN
+Cj4gbWFrZXMgc29tZSBhcHBsaWNhdGlvbnMgdGhhdCBhcmUgdmVyeSBzZW5zaXRpdmUgdG8gdGlt
+ZSBjaGFuZ2UNCj4gaGF2ZSB0aGVzZSB0aW1lc3RhbXBzIGRlbGl2ZXJlZCBpbiBkaWZmZXJlbnQg
+dGltZS1iYXNlLg0KLi4uDQoNCklzbid0IHVzaW5nIENMT0NLX1JFQUxUSU1FIGp1c3QgYSBiaWcg
+YnVnPw0KQXMgd2VsbCBhcyBtaW5vciAnY29ycmVjdGlvbnMnIGRvbmUgYnkgTlRQIGl0IHN1ZmZl
+cnMgZnJvbQ0KbWFqb3IgdGltZS13YXJwcyB0aGF0IGNhbiBqdW1wIGluIGVpdGhlciBkaXJlY3Rp
+b24gYnkgYXJiaXRyYXJ5IGFtb3VudHMuDQoNCklmIEkgdW5kZXJzdGFuZCB0aGUgaW50ZW50IG9m
+IHRoZSBVQVBJLCBhIHBvc3NpYmx5IHNvbHV0aW9uIGlzDQp0byBnZXQgdGhlIG9mZnNldCBiZXR3
+ZWVuIENMT0NLX1JFQUxUSU1FIGFuZCBDTE9DS19NT05BVE9OSUMgYW5kDQplbnN1cmUgdGhlIHNh
+bWUgb2Zmc2V0IGlzIGFkZGVkIENMT0NLX01PTkFUT05JQyBmb3IgdGhlIHByZS0gYW5kDQpwb3N0
+LSB0aW1lc3RhbXBzLg0KDQpUaGlzIGRvZXNuJ3Qgc29sdmUgdGhlIHByb2JsZW0gb2YgdGhlIE5U
+UCBhZGp1c3RlZCBjbG9jayBhbHdheXMNCnJ1bm5pbmcgc2xpZ2h0bHkgc2xvdyBvciBmYXN0Lg0K
+VGhlIGJpZyBOVFAgZXJyb3JzIGhhcHBlbiBpbiB0aGUgZmlyc3QgKElJUkMgdXAgdG8gfjIwIG1p
+bnMgYWZ0ZXIgYm9vdCkNCndoZW4gdGhlIHN5c3RlbSBjbG9jayBpcyBiZWluZyBzeW5jaHJvbmlz
+ZWQuDQpJdCByZWFsbHkgd291bGQgYmUgbmljZSBpZiB0aG9zZSBiaWcgYWRqdXN0bWVudHMgZGlk
+bid0IGFmZmVjdA0KQ0xPQ0tfTU9OQVRPTklDLg0KKGFzIGFuIGV4YW1wbGUgdHJ5IHNlbmRpbmcg
+UlRQIGF1ZGlvIGV2ZXJ5IDIwbXMpDQoNCglEYXZpZA0KDQotDQpSZWdpc3RlcmVkIEFkZHJlc3Mg
+TGFrZXNpZGUsIEJyYW1sZXkgUm9hZCwgTW91bnQgRmFybSwgTWlsdG9uIEtleW5lcywgTUsxIDFQ
+VCwgVUsNClJlZ2lzdHJhdGlvbiBObzogMTM5NzM4NiAoV2FsZXMpDQo=
 
-There are not too many different uses of this pin. The data sheet
-indicates you can connect it to the MAC to indicate link. You might
-also be able to use it with an external PTP stamper, using the start
-of frame indication.
-
-I don't know of any bindings for such use case, but something will be
-needed to describe how the pin is connected to the other device. And
-at that point, the active low property could be used.
-
-> >> This kind of configuration is much more like pinctrl than led.
-> >  
-> > So what is the pinctrl way of describing this? You should not be
-> > inventing something new if there is an existing mechanism to describe
-> > it. We want consistency, not 42 different ways of doing one thing.
-> I am mostly familiar with the
-> #define PIN_FUNCTION magic-numbers
-> pins = <PIN_FUNCTION more-magic-numbers>;
-> 
-> But on Marvell platforms there is:
-> marvell,pins =  "mpp1";
-> marvell,function = "gpio";
-> 
-> I also found more generic???:
-> Documentation/devicetree/bindings/pinctrl/pincfg-node.yaml
-> Documentation/devicetree/bindings/pinctrl/pinmux-node.yaml
-> which have output-high/output-low, function, pin.
-
-So that is probably your alternative if you want to not use the LED
-binding.
-
-> 
-> Interestingly LED_0 supports some non-led functions, too:
-> - collision detection
-> - carrier sense
-> - tx/rx start
-> - tx error
-> so polarity is also relevant to non-led usage of LED_0 pin.
-
-Collision detection is an LED usage, you just don't see it very often
-since half duplex is pretty unusual this century. Carrier sense is
-also similar age, from when Ethernet was CSMA/CD.
-
-Since they are not really used any more we don't have them in the LED
-framework, but i think we could implement them if somebody actually
-wanted them. My intention was to keep the LED framework KISS, since
-vendors tend to implement all sorts of odd LED blink reasons. But if
-nobody wants them, nobody has a good end user use case for them, why
-support them?
-
-       Andrew
 
