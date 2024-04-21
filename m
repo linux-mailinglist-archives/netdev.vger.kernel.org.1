@@ -1,205 +1,82 @@
-Return-Path: <netdev+bounces-89860-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89861-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6EBC48ABF03
-	for <lists+netdev@lfdr.de>; Sun, 21 Apr 2024 13:07:06 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73F488ABF19
+	for <lists+netdev@lfdr.de>; Sun, 21 Apr 2024 13:45:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ED3E61F21096
-	for <lists+netdev@lfdr.de>; Sun, 21 Apr 2024 11:07:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3ECB5B20A4F
+	for <lists+netdev@lfdr.de>; Sun, 21 Apr 2024 11:45:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 438D610A1E;
-	Sun, 21 Apr 2024 11:07:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ssi.bg header.i=@ssi.bg header.b="Oo17cw39"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90820DDDA;
+	Sun, 21 Apr 2024 11:45:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mg.ssi.bg (mg.ssi.bg [193.238.174.37])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7F7C10979;
-	Sun, 21 Apr 2024 11:06:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.238.174.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B47C625
+	for <netdev@vger.kernel.org>; Sun, 21 Apr 2024 11:45:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713697621; cv=none; b=Z2g3qNuRh37A/ESXd2iONr+zKBrLKnGMeRyaQulYGxJA+qTF7CDWaTPljlfykBodopLV1xENA6W1PXHUCRko3UxVsx8hVKTBbdVkPnj2B6FwMCOYrg9lb3sA9DxMU+/ws47RTWrkJGNA3gtNLzQdQW91hCz87AXaskcGRfRpS5Y=
+	t=1713699937; cv=none; b=YZ4dzvOeVSIYZOf1NfGZ13hAwPlRVH0E/AmYevYhq598+CAmyh0zQFp8XH+n6EdCTeNC6UaJY/yXdjmsAdltsr4TrvQX2ZcZuFL8M3hZXZGDViHsrOq3yl47F+kNXH+ZQ4CudEMGGqA48cQAXMRF64x25Ons0GYa/RCLDS7lWMQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713697621; c=relaxed/simple;
-	bh=Ner97hv7U1mBPZ7qaJ0aCMYKz05PKiaL1oq32Flq5kM=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=erXRPHu3JM6SNS+8E5M3OuonZGMA4atvWniACDxpgXtVun9em4OxH5Y/2LK4WzZcXAfNkEcgviHiKWKXQ+WwhAUegwi0Lrx7fAXYU9ZDEjxTeVaMpQ86P5PstFNiPVyAF4F53zN15u/LlD4gK7oZaV4wagzyoJ8rVb1dmApx2lM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ssi.bg; spf=pass smtp.mailfrom=ssi.bg; dkim=pass (1024-bit key) header.d=ssi.bg header.i=@ssi.bg header.b=Oo17cw39; arc=none smtp.client-ip=193.238.174.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ssi.bg
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ssi.bg
-Received: from mg.ssi.bg (localhost [127.0.0.1])
-	by mg.ssi.bg (Proxmox) with ESMTP id B7E242259D;
-	Sun, 21 Apr 2024 14:06:56 +0300 (EEST)
-Received: from ink.ssi.bg (ink.ssi.bg [193.238.174.40])
-	by mg.ssi.bg (Proxmox) with ESMTPS;
-	Sun, 21 Apr 2024 14:06:55 +0300 (EEST)
-Received: from ja.ssi.bg (unknown [213.16.62.126])
-	by ink.ssi.bg (Postfix) with ESMTPSA id C78509003A3;
-	Sun, 21 Apr 2024 14:06:51 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=ssi.bg; s=ink;
-	t=1713697612; bh=Ner97hv7U1mBPZ7qaJ0aCMYKz05PKiaL1oq32Flq5kM=;
-	h=Date:From:To:cc:Subject:In-Reply-To:References;
-	b=Oo17cw39RqVFmSeyRvUmdCHsEU1FaPd0u9V09OFQAlp9FG5U+d24X5XKJcyJLQEqX
-	 bFsqAcQ66fYVxCAUMavppPzonkErsY8ydeKAjqPz67W8Ty97QxT+ZSBr7WUwF1oPuL
-	 fC37q9i/k7LyaFrzzOFI5UiXT+iZYTmih+e/0GrQ=
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by ja.ssi.bg (8.17.1/8.17.1) with ESMTP id 43LB6nwL035464;
-	Sun, 21 Apr 2024 14:06:49 +0300
-Date: Sun, 21 Apr 2024 14:06:49 +0300 (EEST)
-From: Julian Anastasov <ja@ssi.bg>
-To: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
-cc: horms@verge.net.au, netdev@vger.kernel.org, lvs-devel@vger.kernel.org,
-        netfilter-devel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?Q?St=C3=A9phane_Graber?= <stgraber@stgraber.org>,
-        Christian Brauner <brauner@kernel.org>,
-        Pablo Neira Ayuso <pablo@netfilter.org>,
-        Jozsef Kadlecsik <kadlec@netfilter.org>,
-        Florian Westphal <fw@strlen.de>
-Subject: Re: [PATCH net-next v3 2/2] ipvs: allow some sysctls in non-init
- user namespaces
-In-Reply-To: <20240418145743.248109-2-aleksandr.mikhalitsyn@canonical.com>
-Message-ID: <b3c6447c-7ca4-022c-5f10-3aafff900ac5@ssi.bg>
-References: <20240418145743.248109-1-aleksandr.mikhalitsyn@canonical.com> <20240418145743.248109-2-aleksandr.mikhalitsyn@canonical.com>
+	s=arc-20240116; t=1713699937; c=relaxed/simple;
+	bh=nWpDQmZNg8zKVk12QskQ7NNS05C4fI/JmZBKLdKyu8Q=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=BFbh8zNaq7eGleB/TA/DHeDcfP2cZdd7m4liuFZCBtn+v1hIFR5Sv8CEkSvKoao8Js2tHki/4wsrVngZ/s4E361o/xciom0wOSx8lI1ewbd9VIq23H8ceU4Db/OWQ1ztJXGf/FZ6DYekEFznYuFt3hlRhsvACLZv016eSEI7ygY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-349a33a9667so503141f8f.3
+        for <netdev@vger.kernel.org>; Sun, 21 Apr 2024 04:45:35 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713699934; x=1714304734;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=nWpDQmZNg8zKVk12QskQ7NNS05C4fI/JmZBKLdKyu8Q=;
+        b=d2zdW3KZCrgBA4EnrjOZVujGft7IYOiiGPcCFuj59N7VtGg31t5e1PaI8dgSwHVgiW
+         I2YfiOkff2d+I0E67VDcOAUoCsvataCkHWE30TCT7xVCvUnUAIN9qt4TZJ2T2lUwEemI
+         hfNZqlbVUqFeGxdSh0qUTxQE8xfaYYTJTLgoju1ej/4sP3zztu78ik2WLpdYceCmEgIx
+         7S6IBOCpU6adgtJFKl39pp2K24oVmvYjjry+N7qyXWY8YlmAz+uwVv99axroIyXMxJhB
+         LVUUT91V2UF4PA5Ej3O1IiEpTIEzznssDTz1nvBevGbAj/ge2SDfmrGYlIYEebGPYnuz
+         hNQg==
+X-Forwarded-Encrypted: i=1; AJvYcCVhS+tpp6cmBxFwGEKygH2UrFO8z4IQPq+OfgMBQ+6Qq3bxZ62J27gYo00Pjop6AlJ76/DHiRYEF0x3eCcPX2ej3c0fh18P
+X-Gm-Message-State: AOJu0Yxyotm3M0c6JzeQKr6F/qphq/j7jbrs/56t53MzUNeGah/IFqav
+	O44L0zaSzy/JWuSIRQE8x7nu/XZn7AF1orBliDFCAFXWs89ES9n1
+X-Google-Smtp-Source: AGHT+IGKbDQdZLCEdcfv2ITJSmNJdZcmNMkVGtrt/JvZZ5rqfW0ovQOoE1Ke1UTdDiZ3RlrtCg8INg==
+X-Received: by 2002:a05:600c:4496:b0:419:db8f:dfa0 with SMTP id e22-20020a05600c449600b00419db8fdfa0mr3094191wmo.0.1713699934100;
+        Sun, 21 Apr 2024 04:45:34 -0700 (PDT)
+Received: from [10.50.4.180] (bzq-84-110-32-226.static-ip.bezeqint.net. [84.110.32.226])
+        by smtp.gmail.com with ESMTPSA id l23-20020a05600c1d1700b00418f99170f2sm10731705wms.32.2024.04.21.04.45.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 21 Apr 2024 04:45:33 -0700 (PDT)
+Message-ID: <f91bd5b3-79c6-46c6-be1d-9256b4755340@grimberg.me>
+Date: Sun, 21 Apr 2024 14:45:31 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="-1463811672-205715629-1713697611=:3044"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v24 04/20] net/tls,core: export get_netdev_for_sock
+To: Aurelien Aptel <aaptel@nvidia.com>, linux-nvme@lists.infradead.org,
+ netdev@vger.kernel.org, hch@lst.de, kbusch@kernel.org, axboe@fb.com,
+ chaitanyak@nvidia.com, davem@davemloft.net, kuba@kernel.org
+Cc: aurelien.aptel@gmail.com, smalin@nvidia.com, malin1024@gmail.com,
+ ogerlitz@nvidia.com, yorayz@nvidia.com, borisp@nvidia.com,
+ galshalom@nvidia.com, mgurtovoy@nvidia.com, edumazet@google.com,
+ pabeni@redhat.com, john.fastabend@gmail.com, daniel@iogearbox.net
+References: <20240404123717.11857-1-aaptel@nvidia.com>
+ <20240404123717.11857-5-aaptel@nvidia.com>
+Content-Language: he-IL, en-US
+From: Sagi Grimberg <sagi@grimberg.me>
+In-Reply-To: <20240404123717.11857-5-aaptel@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
-
----1463811672-205715629-1713697611=:3044
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
-
-
-	Hello,
-
-On Thu, 18 Apr 2024, Alexander Mikhalitsyn wrote:
-
-> Let's make all IPVS sysctls writtable even when
-> network namespace is owned by non-initial user namespace.
-> 
-> Let's make a few sysctls to be read-only for non-privileged users:
-> - sync_qlen_max
-> - sync_sock_size
-> - run_estimation
-> - est_cpulist
-> - est_nice
-> 
-> I'm trying to be conservative with this to prevent
-> introducing any security issues in there. Maybe,
-> we can allow more sysctls to be writable, but let's
-> do this on-demand and when we see real use-case.
-> 
-> This patch is motivated by user request in the LXC
-> project [1]. Having this can help with running some
-> Kubernetes [2] or Docker Swarm [3] workloads inside the system
-> containers.
-> 
-> Link: https://github.com/lxc/lxc/issues/4278 [1]
-> Link: https://github.com/kubernetes/kubernetes/blob/b722d017a34b300a2284b890448e5a605f21d01e/pkg/proxy/ipvs/proxier.go#L103 [2]
-> Link: https://github.com/moby/libnetwork/blob/3797618f9a38372e8107d8c06f6ae199e1133ae8/osl/namespace_linux.go#L682 [3]
-> 
-> Cc: Stéphane Graber <stgraber@stgraber.org>
-> Cc: Christian Brauner <brauner@kernel.org>
-> Cc: Julian Anastasov <ja@ssi.bg>
-> Cc: Simon Horman <horms@verge.net.au>
-> Cc: Pablo Neira Ayuso <pablo@netfilter.org>
-> Cc: Jozsef Kadlecsik <kadlec@netfilter.org>
-> Cc: Florian Westphal <fw@strlen.de>
-> Signed-off-by: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
-
-	Looks good to me, thanks!
-
-Acked-by: Julian Anastasov <ja@ssi.bg>
-
-> ---
->  net/netfilter/ipvs/ip_vs_ctl.c | 21 +++++++++++++++------
->  1 file changed, 15 insertions(+), 6 deletions(-)
-> 
-> diff --git a/net/netfilter/ipvs/ip_vs_ctl.c b/net/netfilter/ipvs/ip_vs_ctl.c
-> index 32be24f0d4e4..c3ba71aa2654 100644
-> --- a/net/netfilter/ipvs/ip_vs_ctl.c
-> +++ b/net/netfilter/ipvs/ip_vs_ctl.c
-> @@ -4270,6 +4270,7 @@ static int __net_init ip_vs_control_net_init_sysctl(struct netns_ipvs *ipvs)
->  	struct ctl_table *tbl;
->  	int idx, ret;
->  	size_t ctl_table_size = ARRAY_SIZE(vs_vars);
-> +	bool unpriv = net->user_ns != &init_user_ns;
->  
->  	atomic_set(&ipvs->dropentry, 0);
->  	spin_lock_init(&ipvs->dropentry_lock);
-> @@ -4284,12 +4285,6 @@ static int __net_init ip_vs_control_net_init_sysctl(struct netns_ipvs *ipvs)
->  		tbl = kmemdup(vs_vars, sizeof(vs_vars), GFP_KERNEL);
->  		if (tbl == NULL)
->  			return -ENOMEM;
-> -
-> -		/* Don't export sysctls to unprivileged users */
-> -		if (net->user_ns != &init_user_ns) {
-> -			tbl[0].procname = NULL;
-> -			ctl_table_size = 0;
-> -		}
->  	} else
->  		tbl = vs_vars;
->  	/* Initialize sysctl defaults */
-> @@ -4315,10 +4310,17 @@ static int __net_init ip_vs_control_net_init_sysctl(struct netns_ipvs *ipvs)
->  	ipvs->sysctl_sync_ports = 1;
->  	tbl[idx++].data = &ipvs->sysctl_sync_ports;
->  	tbl[idx++].data = &ipvs->sysctl_sync_persist_mode;
-> +
->  	ipvs->sysctl_sync_qlen_max = nr_free_buffer_pages() / 32;
-> +	if (unpriv)
-> +		tbl[idx].mode = 0444;
->  	tbl[idx++].data = &ipvs->sysctl_sync_qlen_max;
-> +
->  	ipvs->sysctl_sync_sock_size = 0;
-> +	if (unpriv)
-> +		tbl[idx].mode = 0444;
->  	tbl[idx++].data = &ipvs->sysctl_sync_sock_size;
-> +
->  	tbl[idx++].data = &ipvs->sysctl_cache_bypass;
->  	tbl[idx++].data = &ipvs->sysctl_expire_nodest_conn;
->  	tbl[idx++].data = &ipvs->sysctl_sloppy_tcp;
-> @@ -4341,15 +4343,22 @@ static int __net_init ip_vs_control_net_init_sysctl(struct netns_ipvs *ipvs)
->  	tbl[idx++].data = &ipvs->sysctl_conn_reuse_mode;
->  	tbl[idx++].data = &ipvs->sysctl_schedule_icmp;
->  	tbl[idx++].data = &ipvs->sysctl_ignore_tunneled;
-> +
->  	ipvs->sysctl_run_estimation = 1;
-> +	if (unpriv)
-> +		tbl[idx].mode = 0444;
->  	tbl[idx].extra2 = ipvs;
->  	tbl[idx++].data = &ipvs->sysctl_run_estimation;
->  
->  	ipvs->est_cpulist_valid = 0;
-> +	if (unpriv)
-> +		tbl[idx].mode = 0444;
->  	tbl[idx].extra2 = ipvs;
->  	tbl[idx++].data = &ipvs->sysctl_est_cpulist;
->  
->  	ipvs->sysctl_est_nice = IPVS_EST_NICE;
-> +	if (unpriv)
-> +		tbl[idx].mode = 0444;
->  	tbl[idx].extra2 = ipvs;
->  	tbl[idx++].data = &ipvs->sysctl_est_nice;
->  
-> -- 
-> 2.34.1
-> 
-> 
-
-Regards
-
---
-Julian Anastasov <ja@ssi.bg>
----1463811672-205715629-1713697611=:3044--
-
+Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
 
