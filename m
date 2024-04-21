@@ -1,281 +1,299 @@
-Return-Path: <netdev+bounces-89873-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89874-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 164FD8ABFBC
-	for <lists+netdev@lfdr.de>; Sun, 21 Apr 2024 17:45:35 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CB3E8ABFF0
+	for <lists+netdev@lfdr.de>; Sun, 21 Apr 2024 17:49:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 335AE1C20A5A
-	for <lists+netdev@lfdr.de>; Sun, 21 Apr 2024 15:45:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BCEE1B20B5A
+	for <lists+netdev@lfdr.de>; Sun, 21 Apr 2024 15:49:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D266D182BD;
-	Sun, 21 Apr 2024 15:45:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c/X4wOYZ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D45A01B969;
+	Sun, 21 Apr 2024 15:49:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 256E13D66
-	for <netdev@vger.kernel.org>; Sun, 21 Apr 2024 15:45:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.41
+Received: from relmlie5.idc.renesas.com (relmlor1.renesas.com [210.160.252.171])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1175018044;
+	Sun, 21 Apr 2024 15:49:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.160.252.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713714331; cv=none; b=ZVSAJmGWkA13eBwgse0n9wQ7TbgFcc4wMISbjo8NMOXqrCGV/rz9T0pypEvAvfCNvO3i+WkUB/ALG7Cq6+C9k+pT9zajyZiU2Y7K0ijDcay/KT9v+3dwTMUWvSNcRcVEX1ZQakblXJKS5BWTHdRtQNbrzXNICzhgIa8a9V80S9o=
+	t=1713714584; cv=none; b=IRu5o0XoGtzmgrKu8BUQSReyqB0anqLjvzO9tu09yLEkdaJaS32cb2uJoRnmgFneajDqiFGhRhXXm1v494/AWcE0XMccCWnrV+aAMinsbvMMa5IOJPLJevTSz0gVO3pytM6FjBQjCLsCIk/1N9ZpzyeVGpAi4OPRoW17AR5be24=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713714331; c=relaxed/simple;
-	bh=wXivgWQuhaa+X9h0/hWtA0DDVHxvswmtssxgaxNfhB4=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=ikHqXcXrOUSntpwnhYj6MXZUUJILUxzv0NDJh/RiZt5e+uJhc2Nr90gCNoo4BYrZ0hBWYIe8jid7aX8a3lSgiRFkibPzBWFJmqtN8HoF83orheoLyqOjBe8uiS7xZETrv6RaRSUCj8YGudNrVVgOJbIa7knMvAXMH5okZf6IHIw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=c/X4wOYZ; arc=none smtp.client-ip=209.85.219.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-6a07eefdd66so1137806d6.2
-        for <netdev@vger.kernel.org>; Sun, 21 Apr 2024 08:45:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713714329; x=1714319129; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QaxRL9YI7BHyVZs/wy3WysFNG5pbsHdpsTtD3HHXe/M=;
-        b=c/X4wOYZ/9h5LTxAuP9cpW6FA5O+wZH/m7ji/xGNLestcNa1OymnifLMWS73msoY+N
-         lxJKLXkBotVcHmU0xHLTXrXDwK/lh54Z9YgJnQ1Nz2s4lP2HOo5iI/WZLerGmwaIYotD
-         iASwQTp/YyHckqhkHGwK3eTRvo4YLDjBi0gO98i7OBgD1u7Dm9EyoVbfh6rY0fLIw2ss
-         iHo9NARDXkDF/WXN+xiSi56jU7NU4xbSHKYfU0Xq78NP5oCZnjFF48L0Y54jLPy7u8a5
-         LPpZn/FqoPwzQT1QBAZYiPo7FBfdrOoGwnegx4pI5yVebvwLtgGSionm/Em34ur4XC6A
-         18KQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713714329; x=1714319129;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=QaxRL9YI7BHyVZs/wy3WysFNG5pbsHdpsTtD3HHXe/M=;
-        b=RaqEVeSHL7bSKtHbVpDAkYPtW4AkANwF5pEg1TwLr+sYPnyuxld3vw7505bhE2z0dv
-         dgc7nkEeD3crF9DYhl8qaQYbDWMwlRtI0JQ5dVkpA43OpRGZ5tOnIm1QT66mYcSP/ckt
-         rySTicoI8WeTF79O3i4UXpokwpuEe9rZh54PvmwMbHknvQdNr+5+wHHVlKhCbmbMP9FV
-         9pI9qUjfwyrdQbfHjHWxxyaTYCAUtnuiM6IlCr6uUwZxS1C8DFlXMoHLXky+00RUW6r7
-         irFbn4h8pEOwa5bs1IntCM+6C/8rUC6uI/Bqst2wTH1CsRt+ODTvGccqyZ0I9USTXQR3
-         E8PQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWN11Z6OI762SF64/lOIyOxUcmi8N1a2NNgbPvvqiM7Fd/1C39+99hp4m8RpRcoDIWcqx+8c1M9/L/kmEIvq3JHyGVBdlK0
-X-Gm-Message-State: AOJu0YxnQTW3bg7iiH5RXrC9CMsaOwyMvjaRAEJmpmYEx5aXy7R8v2LO
-	2hemRFcTRc/nDlN/cUYibPbVRSrkF2lK3g84SF31HiExqL+rgRky
-X-Google-Smtp-Source: AGHT+IHU+sw1IDABtxPgwBMX6adCV8Med2BSHd4+5e/nO/nN32rpqnNKo3BWXjJaG29Vg4ZPfeZjRw==
-X-Received: by 2002:a0c:e6ec:0:b0:69b:c808:49d7 with SMTP id m12-20020a0ce6ec000000b0069bc80849d7mr7406795qvn.46.1713714329025;
-        Sun, 21 Apr 2024 08:45:29 -0700 (PDT)
-Received: from localhost (73.84.86.34.bc.googleusercontent.com. [34.86.84.73])
-        by smtp.gmail.com with ESMTPSA id n1-20020a0c8c01000000b006a03f4d27b4sm2588331qvb.9.2024.04.21.08.45.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 21 Apr 2024 08:45:28 -0700 (PDT)
-Date: Sun, 21 Apr 2024 11:45:28 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: zijianzhang@bytedance.com, 
- netdev@vger.kernel.org
-Cc: edumazet@google.com, 
- willemdebruijn.kernel@gmail.com, 
- davem@davemloft.net, 
- kuba@kernel.org, 
- cong.wang@bytedance.com, 
- xiaochun.lu@bytedance.com, 
- Zijian Zhang <zijianzhang@bytedance.com>
-Message-ID: <6625349824651_1dff99294db@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20240419214819.671536-3-zijianzhang@bytedance.com>
-References: <20240419214819.671536-1-zijianzhang@bytedance.com>
- <20240419214819.671536-3-zijianzhang@bytedance.com>
-Subject: Re: [PATCH net-next v2 2/3] sock: add MSG_ZEROCOPY notification
- mechanism based on msg_control
+	s=arc-20240116; t=1713714584; c=relaxed/simple;
+	bh=24WFs+X3sJEnTrjtAmAB0Gs4PLr+xIJa+qZJSCUe6Eg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=DHHEA1+qv0nbnmHvWEcsUxgtR66Z4AcR0XcvB9MPqUWHAr966nI9zv0mqyiDTGP27UTBuo1WDMXLqk18zcrh8ahx2jOdYFBa6I8m/QKw9afNQrRJxMlBuS5R91TLlX4eTRfHS/8g2zhCT4bBTvKoPIPvOXoty74VqDPhTDtvF8w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com; spf=pass smtp.mailfrom=bp.renesas.com; arc=none smtp.client-ip=210.160.252.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bp.renesas.com
+X-IronPort-AV: E=Sophos;i="6.07,218,1708354800"; 
+   d="asc'?scan'208";a="202133613"
+Received: from unknown (HELO relmlir5.idc.renesas.com) ([10.200.68.151])
+  by relmlie5.idc.renesas.com with ESMTP; 22 Apr 2024 00:49:34 +0900
+Received: from [10.226.92.17] (unknown [10.226.92.17])
+	by relmlir5.idc.renesas.com (Postfix) with ESMTP id 3D8854001960;
+	Mon, 22 Apr 2024 00:49:30 +0900 (JST)
+Message-ID: <bcddc226-7cbf-4994-94fe-eb70331f2bfa@bp.renesas.com>
+Date: Sun, 21 Apr 2024 16:49:29 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net-next RFC v3 4/7] net: ravb: Refactor GbEth RX code path
+To: Sergey Shtylyov <s.shtylyov@omp.ru>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: =?UTF-8?Q?Niklas_S=C3=B6derlund?=
+ <niklas.soderlund+renesas@ragnatech.se>,
+ Geert Uytterhoeven <geert+renesas@glider.be>, netdev@vger.kernel.org,
+ linux-renesas-soc@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20240415094804.8016-1-paul.barker.ct@bp.renesas.com>
+ <20240415094804.8016-5-paul.barker.ct@bp.renesas.com>
+ <897c3e16-7ded-bdea-08c7-14bf497bfc05@omp.ru>
+Content-Language: en-GB
+From: Paul Barker <paul.barker.ct@bp.renesas.com>
+Organization: Renesas Electronics Corporation
+In-Reply-To: <897c3e16-7ded-bdea-08c7-14bf497bfc05@omp.ru>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------xg9Mcdri72G3bjA0s0wRnWGN"
 
-zijianzhang@ wrote:
-> From: Zijian Zhang <zijianzhang@bytedance.com>
-> 
-> The MSG_ZEROCOPY flag enables copy avoidance for socket send calls.
-> However, zerocopy is not a free lunch. Apart from the management of user
-> pages, the combination of poll + recvmsg to receive notifications incurs
-> unignorable overhead in the applications. The overhead of such sometimes
-> might be more than the CPU savings from zerocopy. We try to solve this
-> problem with a new notification mechanism based on msgcontrol.
-> This new mechanism aims to reduce the overhead associated with receiving
-> notifications by embedding them directly into user arguments passed with
-> each sendmsg control message. By doing so, we can significantly reduce
-> the complexity and overhead for managing notifications. In an ideal
-> pattern, the user will keep calling sendmsg with SO_ZC_NOTIFICATION
-> msg_control, and the notification will be delivered as soon as possible.
-> 
-> Signed-off-by: Zijian Zhang <zijianzhang@bytedance.com>
-> Signed-off-by: Xiaochun Lu <xiaochun.lu@bytedance.com>
-> ---
->  arch/alpha/include/uapi/asm/socket.h  |  2 +
->  arch/mips/include/uapi/asm/socket.h   |  2 +
->  arch/parisc/include/uapi/asm/socket.h |  2 +
->  arch/sparc/include/uapi/asm/socket.h  |  2 +
->  include/uapi/asm-generic/socket.h     |  2 +
->  include/uapi/linux/socket.h           | 16 ++++++
->  net/core/sock.c                       | 70 +++++++++++++++++++++++++++
->  7 files changed, 96 insertions(+)
-> 
-> diff --git a/arch/alpha/include/uapi/asm/socket.h b/arch/alpha/include/uapi/asm/socket.h
-> index e94f621903fe..b24622a9cd47 100644
-> --- a/arch/alpha/include/uapi/asm/socket.h
-> +++ b/arch/alpha/include/uapi/asm/socket.h
-> @@ -140,6 +140,8 @@
->  #define SO_PASSPIDFD		76
->  #define SO_PEERPIDFD		77
->  
-> +#define SO_ZC_NOTIFICATION 78
-> +
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------xg9Mcdri72G3bjA0s0wRnWGN
+Content-Type: multipart/mixed; boundary="------------CLwMRD7GafHdis9yIYWe50yh";
+ protected-headers="v1"
+From: Paul Barker <paul.barker.ct@bp.renesas.com>
+To: Sergey Shtylyov <s.shtylyov@omp.ru>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: =?UTF-8?Q?Niklas_S=C3=B6derlund?=
+ <niklas.soderlund+renesas@ragnatech.se>,
+ Geert Uytterhoeven <geert+renesas@glider.be>, netdev@vger.kernel.org,
+ linux-renesas-soc@vger.kernel.org, linux-kernel@vger.kernel.org
+Message-ID: <bcddc226-7cbf-4994-94fe-eb70331f2bfa@bp.renesas.com>
+Subject: Re: [net-next RFC v3 4/7] net: ravb: Refactor GbEth RX code path
+References: <20240415094804.8016-1-paul.barker.ct@bp.renesas.com>
+ <20240415094804.8016-5-paul.barker.ct@bp.renesas.com>
+ <897c3e16-7ded-bdea-08c7-14bf497bfc05@omp.ru>
+In-Reply-To: <897c3e16-7ded-bdea-08c7-14bf497bfc05@omp.ru>
 
-SCM_ for cmsgs
+--------------CLwMRD7GafHdis9yIYWe50yh
+Content-Type: multipart/mixed; boundary="------------jUX5ulVGtLBX1k006EERRKd4"
 
->  /*
->   * Desired design of maximum size and alignment (see RFC2553)
->   */
-> @@ -35,4 +37,18 @@ struct __kernel_sockaddr_storage {
->  #define SOCK_TXREHASH_DISABLED	0
->  #define SOCK_TXREHASH_ENABLED	1
->  
-> +#define SOCK_ZC_INFO_MAX 256
-> +
-> +struct zc_info_elem {
-> +	__u32 lo;
-> +	__u32 hi;
-> +	__u8 zerocopy;
-> +};
-> +
-> +struct zc_info_usr {
-> +	__u64 usr_addr;
-> +	unsigned int length;
-> +	struct zc_info_elem info[];
-> +};
-> +
+--------------jUX5ulVGtLBX1k006EERRKd4
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-Don't pass a pointer to user memory, just have msg_control point to an
-array of zc_info_elem.
+On 19/04/2024 21:03, Sergey Shtylyov wrote:
+> On 4/15/24 12:48 PM, Paul Barker wrote:
+>=20
+>> We can reduce code duplication in ravb_rx_gbeth() and add comments to
+>> make the code flow easier to understand.
+>>
+>> Signed-off-by: Paul Barker <paul.barker.ct@bp.renesas.com>
+>> ---
+>>  drivers/net/ethernet/renesas/ravb_main.c | 70 ++++++++++++-----------=
+-
+>>  1 file changed, 35 insertions(+), 35 deletions(-)
+>>
+>> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/et=
+hernet/renesas/ravb_main.c
+>> index baa01bd81f2d..12618171f6d5 100644
+>> --- a/drivers/net/ethernet/renesas/ravb_main.c
+>> +++ b/drivers/net/ethernet/renesas/ravb_main.c
+>> @@ -818,47 +818,47 @@ static int ravb_rx_gbeth(struct net_device *ndev=
+, int budget, int q)
+>>  				stats->rx_missed_errors++;
+>>  		} else {
+>>  			die_dt =3D desc->die_dt & 0xF0;
+>> -			switch (die_dt) {
+>> -			case DT_FSINGLE:
+>> -				skb =3D ravb_get_skb_gbeth(ndev, entry, desc);
+>> +			skb =3D ravb_get_skb_gbeth(ndev, entry, desc);
+>> +			if (die_dt =3D=3D DT_FSINGLE || die_dt =3D=3D DT_FSTART) {
+>=20
+>    No, please keep using *switch* statement here...
 
->  #endif /* _UAPI_LINUX_SOCKET_H */
-> diff --git a/net/core/sock.c b/net/core/sock.c
-> index fe9195186c13..13f06480f2d8 100644
-> --- a/net/core/sock.c
-> +++ b/net/core/sock.c
-> @@ -2809,6 +2809,13 @@ int __sock_cmsg_send(struct sock *sk, struct cmsghdr *cmsg,
->  		     struct sockcm_cookie *sockc)
->  {
->  	u32 tsflags;
-> +	int ret, zc_info_size, i = 0;
-> +	unsigned long flags;
-> +	struct sk_buff_head *q, local_q;
-> +	struct sk_buff *skb, *tmp;
-> +	struct sock_exterr_skb *serr;
-> +	struct zc_info_usr *zc_info_usr_p, *zc_info_kern_p;
-> +	void __user	*usr_addr;
+That's a shame - I much prefer this version with reduced code
+duplication, especially when we add page pool support. Duplication with
+subtle differences leads to bugs, see [1] for an example.
 
-Please wrap the case in parentheses and define variables in that scope
-(Since there are so many variables for this case only.)
+[1]: https://lore.kernel.org/all/20240416120254.2620-4-paul.barker.ct@bp.=
+renesas.com/
 
->  
->  	switch (cmsg->cmsg_type) {
->  	case SO_MARK:
-> @@ -2842,6 +2849,69 @@ int __sock_cmsg_send(struct sock *sk, struct cmsghdr *cmsg,
->  	case SCM_RIGHTS:
->  	case SCM_CREDENTIALS:
->  		break;
-> +	case SO_ZC_NOTIFICATION:
-> +		if (!sock_flag(sk, SOCK_ZEROCOPY) || sk->sk_family == PF_RDS)
-> +			return -EINVAL;
-> +
+An alternative would be to drop this refactor patch, then when we add
+page pool support we instead use separate functions to avoid code
+duplication. At the end of the series, the switch would then look
+something like this:
 
-Why allow PF_RDS without the sock flag set?
+	switch (die_dt) {
+	case DT_FSINGLE:
+		skb =3D ravb_rx_build_skb(ndev, q, rx_buff, desc_len);
+		if (!skb)
+			break;
+		ravb_rx_finish_skb(ndev, q, skb);
+		rx_packets++;
+		break;
+	case DT_FSTART:
+		priv->rx_1st_skb =3D ravb_rx_build_skb(ndev, q, rx_buff, desc_len);
+		break;
+	case DT_FMID:
+		ravb_rx_add_frag(ndev, q, rx_buff, desc_len);
+		break;
+	case DT_FEND:
+		if (ravb_rx_add_frag(ndev, q, rx_buff, desc_len))
+			break;
+		ravb_rx_finish_skb(ndev, q, priv->rx_1st_skb);
+		rx_packets++;
+		priv->rx_1st_skb =3D NULL;
+	}
 
-> +		zc_info_usr_p = (struct zc_info_usr *)CMSG_DATA(cmsg);
-> +		if (zc_info_usr_p->length <= 0 || zc_info_usr_p->length > SOCK_ZC_INFO_MAX)
-> +			return -EINVAL;
-> +
-> +		zc_info_size = struct_size(zc_info_usr_p, info, zc_info_usr_p->length);
-> +		if (cmsg->cmsg_len != CMSG_LEN(zc_info_size))
-> +			return -EINVAL;
+Would you prefer that approach?
 
-By passing a straightforward array, the array len can be inferred from
-cmsg_len, simplifying all these checks.
+>=20
+>> +				/* Start of packet:
+>> +				 * Set initial data length.
+>> +				 */
+>>  				skb_put(skb, desc_len);
+>> +
+>> +				/* Save this SKB if the packet spans multiple
+>> +				 * descriptors.
+>> +				 */
+>> +				if (die_dt =3D=3D DT_FSTART)
+>> +					priv->rx_1st_skb =3D skb;
+>=20
+>    Hm, looks like we can do that under *case* DT_FSTART: and do
+> a fallthru to *case* DT_FSINGLE: after that...
 
-See for instance how SO_DEVMEM_DONTNEED returns an array of tokens to
-the kernel.
+A fallthrough would just have to be removed again when page pool support
+is added in a later patch in this series, since we will need to call
+napi_build_skb() before the skb is valid.
 
-> +
-> +		usr_addr = (void *)(uintptr_t)(zc_info_usr_p->usr_addr);
-> +		if (!access_ok(usr_addr, zc_info_size))
-> +			return -EFAULT;
-> +
-> +		zc_info_kern_p = kmalloc(zc_info_size, GFP_KERNEL);
-> +		if (!zc_info_kern_p)
-> +			return -ENOMEM;
-> +
-> +		q = &sk->sk_error_queue;
-> +		skb_queue_head_init(&local_q);
-> +		spin_lock_irqsave(&q->lock, flags);
-> +		skb = skb_peek(q);
-> +		while (skb && i < zc_info_usr_p->length) {
-> +			struct sk_buff *skb_next = skb_peek_next(skb, q);
-> +
-> +			serr = SKB_EXT_ERR(skb);
-> +			if (serr->ee.ee_errno == 0 &&
-> +			    serr->ee.ee_origin == SO_EE_ORIGIN_ZEROCOPY) {
-> +				zc_info_kern_p->info[i].hi = serr->ee.ee_data;
-> +				zc_info_kern_p->info[i].lo = serr->ee.ee_info;
-> +				zc_info_kern_p->info[i].zerocopy = !(serr->ee.ee_code
-> +								& SO_EE_CODE_ZEROCOPY_COPIED);
-> +				__skb_unlink(skb, q);
-> +				__skb_queue_tail(&local_q, skb);
-> +				i++;
-> +			}
-> +			skb = skb_next;
-> +		}
-> +		spin_unlock_irqrestore(&q->lock, flags);
+>=20
+>> +			} else {
+>> +				/* Continuing a packet:
+>> +				 * Move data into the saved SKB.
+>> +				 */
+>> +				skb_copy_to_linear_data_offset(priv->rx_1st_skb,
+>> +							       priv->rx_1st_skb->len,
+>> +							       skb->data,
+>> +							       desc_len);
+>> +				skb_put(priv->rx_1st_skb, desc_len);
+>> +				dev_kfree_skb(skb);
+>> +
+>> +				/* Set skb to point at the whole packet so that
+>> +				 * we only need one code path for finishing a
+>> +				 * packet.
+>> +				 */
+>> +				skb =3D priv->rx_1st_skb;
+>> +			}
+>> +
+>> +			if (die_dt =3D=3D DT_FSINGLE || die_dt =3D=3D DT_FEND) {
+>=20
+>    Again, keep using *switch*, please...
+>=20
+>> +				/* Finishing a packet:
+>> +				 * Determine protocol & checksum, hand off to
+>> +				 * NAPI and update our stats.
+>> +				 */
+>>  				skb->protocol =3D eth_type_trans(skb, ndev);
+>>  				if (ndev->features & NETIF_F_RXCSUM)
+>>  					ravb_rx_csum_gbeth(skb);
+>> +				stats->rx_bytes +=3D skb->len;
+>>  				napi_gro_receive(&priv->napi[q], skb);
+>>  				rx_packets++;
+> [...]
+>=20
+> MBR, Sergey
 
-In almost all sane cases, all outstanding notifications can be passed
-to userspace.
+Thanks,
 
-It may be interesting to experiment with briefly taking the lock to
-move to a private list. See for instance net_rx_action.
+--=20
+Paul Barker
+--------------jUX5ulVGtLBX1k006EERRKd4
+Content-Type: application/pgp-keys; name="OpenPGP_0x27F4B3459F002257.asc"
+Content-Disposition: attachment; filename="OpenPGP_0x27F4B3459F002257.asc"
+Content-Description: OpenPGP public key
+Content-Transfer-Encoding: quoted-printable
 
-Then if userspace cannot handle all notifications, the rest have to be
-spliced back. This can reorder notifications. But rare reordering is
-not a correctness issue.
+-----BEGIN PGP PUBLIC KEY BLOCK-----
 
-I would choose the more complex splice approach only if it shows
-benefit, i.e., if taking the lock does contend with error enqueue
-events.
+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3D
+=3DsIIN
+-----END PGP PUBLIC KEY BLOCK-----
 
-> +
-> +		zc_info_kern_p->usr_addr = zc_info_usr_p->usr_addr;
-> +		zc_info_kern_p->length = i;
-> +
-> +		ret = copy_to_user(usr_addr,
-> +				   zc_info_kern_p,
-> +					struct_size(zc_info_kern_p, info, i));
+--------------jUX5ulVGtLBX1k006EERRKd4--
 
-You'll still need to support the gnarly MSG_CMSG_COMPAT version too.
+--------------CLwMRD7GafHdis9yIYWe50yh--
 
-Wait, is this the reason to pass a usr_addr explicitly? To get around
-any compat issues?
+--------------xg9Mcdri72G3bjA0s0wRnWGN
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature.asc"
 
-Or even the entire issue of having to copy msg_sys->msg_control to
-user if !msg_control_is_user.
+-----BEGIN PGP SIGNATURE-----
 
-I suppose this simplifies a lot in terms of development. If making the
-user interface uglier.
+wnsEABYIACMWIQSiu8gv1Xr0fIw/aoLbaV4Vf/JGvQUCZiU1iQUDAAAAAAAKCRDbaV4Vf/JGvTlw
+AQDnB3KfNdwO0lfg0Wjfr8CyCnsYeU29PwI2i+uC1EkArQD/cd8yye5Erq8Vg9UrCX5yeI0lKjWo
+JeOmFYWWE+73jQ8=
+=sNrl
+-----END PGP SIGNATURE-----
 
-IMHO the sane interface should be used eventually. There may also be
-other uses of passing msg_control data up to userspace from sendmsg.
-
-But this approach works for now for evaluation and discussion.
-
-
+--------------xg9Mcdri72G3bjA0s0wRnWGN--
 
