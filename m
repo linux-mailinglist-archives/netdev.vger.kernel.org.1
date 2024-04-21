@@ -1,119 +1,124 @@
-Return-Path: <netdev+bounces-89854-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89856-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CCC78ABE90
-	for <lists+netdev@lfdr.de>; Sun, 21 Apr 2024 06:20:38 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87B648ABE9E
+	for <lists+netdev@lfdr.de>; Sun, 21 Apr 2024 07:35:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C25A8B20E3C
-	for <lists+netdev@lfdr.de>; Sun, 21 Apr 2024 04:20:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BE7E9B20B7F
+	for <lists+netdev@lfdr.de>; Sun, 21 Apr 2024 05:35:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DF88CA6B;
-	Sun, 21 Apr 2024 04:20:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="Vz/M4rz0"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1820279F2;
+	Sun, 21 Apr 2024 05:35:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-133.freemail.mail.aliyun.com (out30-133.freemail.mail.aliyun.com [115.124.30.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74A4A4431;
-	Sun, 21 Apr 2024 04:20:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.133
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D39538C
+	for <netdev@vger.kernel.org>; Sun, 21 Apr 2024 05:35:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713673227; cv=none; b=qqzl0b8oaN5uS9cq7k8HojO10wYUM5jGa6EUNAoBxM5KcJhEPg8yXv4IJTW0tR534MmIKgZ/MWsps6fJAe0B+x208zbYOIrH76XS3EUHZy6ZOMI/zkTjas4orHLpmnfOfauc00WbokgQ2iOqoBNxulIkzqVYWeFYL5xxGLViffQ=
+	t=1713677729; cv=none; b=XM9VtJwZ7a7j+H5pW+z5F2QlZYhGR3/ZIcsfE5erkY0fUJN6Y1nB60KZEpUChsEANXsV2BIYThy84hLDt4Cny3P/8PSTJccJtNyIP/5ciNBo4dUbGp5WePruuuQwdfwCM75Djlspi8/y9qQq/7FbyaErnRFJSJQxJWFXlS03D1o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713673227; c=relaxed/simple;
-	bh=PbyRkYuJytgE5iCU+AC5a5bJtUe0HIu2Mw1mFTE/GVs=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=JDy3q8BnMekwJ6arVKIyJfHowI4XW1EujUh9bCrElW8SVEnLoI0RnZy5eFpN0y+DuQ1rpkVONI/vMgeJiwWDr/awBP5SQz25TUXdNC+OipQ7y+lxdr9KTb5olzBh6g2UQ28P+Njy5TK3noJeZtBRn36K5dtQIFpJYK764Ws++28=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=Vz/M4rz0; arc=none smtp.client-ip=115.124.30.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1713673216; h=From:To:Subject:Date:Message-Id:MIME-Version;
-	bh=3Exkxp2sjjjIWtsxU2G5SREfLgBVMfFhoE2jzGKVPAw=;
-	b=Vz/M4rz04vZbP9HvFikC1UweAKDw1mobOircSi2iYztYNZ9xOnT08FU2y+4N1odAJtQhMquymb+IBbNtsNukY6QF2jDCckVmR7CUd+rfyG4Mp8Md+dgkm7OD3PWYah19mrLvrV841YQIQQWo+rgXNj6ETNMsmzTvIBGJjbCjJi8=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R211e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045170;MF=lulie@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0W4w6o4T_1713673213;
-Received: from localhost(mailfrom:lulie@linux.alibaba.com fp:SMTPD_---0W4w6o4T_1713673213)
-          by smtp.aliyun-inc.com;
-          Sun, 21 Apr 2024 12:20:14 +0800
-From: Philo Lu <lulie@linux.alibaba.com>
-To: netdev@vger.kernel.org,
-	bpf@vger.kernel.org
-Cc: edumazet@google.com,
-	davem@davemloft.net,
-	martin.lau@linux.dev,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	andrii@kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	dsahern@kernel.org,
-	xuanzhuo@linux.alibaba.com,
-	fred.cc@alibaba-inc.com
-Subject: [PATCH net-next 2/2] tcp: update sacked after tracepoint in __tcp_retransmit_skb
-Date: Sun, 21 Apr 2024 12:20:09 +0800
-Message-Id: <20240421042009.28046-3-lulie@linux.alibaba.com>
-X-Mailer: git-send-email 2.32.0.3.g01195cf9f
-In-Reply-To: <20240421042009.28046-1-lulie@linux.alibaba.com>
-References: <20240421042009.28046-1-lulie@linux.alibaba.com>
+	s=arc-20240116; t=1713677729; c=relaxed/simple;
+	bh=anEBq/tG108x822NWjTleMjemuyuJwJDEcvy4KcP1aw=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=ZjfEQ8UVjqnStkZtv5m3ntE9qEI122TP93HThljTjaIA8bWDNSNFi8Xi+F3mLjycTYAYg/a8pXlawU0nuKUigyqmBER9SOcxyI/G7W7O08L+JHcGQFHLKwYq5MUMQFGnp0SDKZL3CM6AUqOui4PUUBhr4cIH17V8c2xy2xrqUXo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [112.20.112.218])
+	by gateway (Coremail) with SMTP id _____8BxSfGUpSRmaw8AAA--.459S3;
+	Sun, 21 Apr 2024 13:35:16 +0800 (CST)
+Received: from [192.168.100.8] (unknown [112.20.112.218])
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8Cxjd6TpSRmRxIAAA--.477S3;
+	Sun, 21 Apr 2024 13:35:16 +0800 (CST)
+Message-ID: <932e5719-66d1-446d-b67c-4c87b00d63b0@loongson.cn>
+Date: Sun, 21 Apr 2024 13:35:15 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v11 6/6] net: stmmac: dwmac-loongson: Add
+ Loongson GNET support
+From: Yanteng Si <siyanteng@loongson.cn>
+To: Serge Semin <fancer.lancer@gmail.com>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com,
+ alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com,
+ chenhuacai@kernel.org, linux@armlinux.org.uk, guyinggang@loongson.cn,
+ netdev@vger.kernel.org, chris.chenfeiyang@gmail.com, siyanteng01@gmail.com
+References: <cover.1712917541.git.siyanteng@loongson.cn>
+ <9a8e5dfef0e9706e3d42bb20f59ea9ffa264dc8c.1712917541.git.siyanteng@loongson.cn>
+ <jd4wmvwgmuzmdun3np3icp3lfinzhedq7enp5axqxs62ev4q2z@pl2ogfkscmqn>
+ <da349ea7-e12f-4749-8c54-604f65780d9e@loongson.cn>
+Content-Language: en-US
+In-Reply-To: <da349ea7-e12f-4749-8c54-604f65780d9e@loongson.cn>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:AQAAf8Cxjd6TpSRmRxIAAA--.477S3
+X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
+X-Coremail-Antispam: 1Uk129KBj93XoW7KFy5ArWfCw4fCry3GF1fZrc_yoW8XrW7pr
+	9ayFyagry3Zrn2ywn3ZryDZFy0vr1Yyas5Gry8WF1UCFZ3Wr1YgryxuFWqvr17Ar4kZFy5
+	Xr409r48uFn093gCm3ZEXasCq-sJn29KB7ZKAUJUUUUx529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUU9Kb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
+	Gr0_Gr1UM2kKe7AKxVWUAVWUtwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07AIYI
+	kI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUAVWU
+	twAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JMx
+	kF7I0En4kS14v26r126r1DMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4U
+	MxCIbckI1I0E14v26r126r1DMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI
+	0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE
+	14v26r1I6r4UMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20x
+	vaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVWU
+	JVW8JbIYCTnIWIevJa73UjIFyTuYvjxUcbAwUUUUU
 
-Marking TCP_SKB_CB(skb)->sacked with TCPCB_EVER_RETRANS after the
-traceopint (trace_tcp_retransmit_skb), then we can get the
-retransmission efficiency by counting skbs w/ and w/o TCPCB_EVER_RETRANS
-mark in this tracepoint.
 
-We have discussed to achieve this with BPF_SOCK_OPS in [0], and using
-tracepoint is thought to be a better solution.
+在 2024/4/20 19:02, Yanteng Si 写道:
+>>> - memset(&res, 0, sizeof(res));
+>>> -    res.addr = pcim_iomap_table(pdev)[0];
+>>> +    /* GNET devices with dev revision 0x00 do not support manually
+>>> +     * setting the speed to 1000.
+>>> +     */
+>>> +    if (pdev->device == PCI_DEVICE_ID_LOONGSON_GNET &&
+>>> +        pdev->revision == 0x00)
+>>> +        plat->flags |= STMMAC_FLAG_DISABLE_FORCE_1000;
+>> Move this to the loongson_gnet_data() method.
+> Okay, But I noticed your comment at the end that we need to splite as a
+>
+> separate _pre-requisite/preparation_ patch, this fix is for gnet 
+> devices, there is no gnet at this time. So, if I understand you 
+> correctly, we should need two patches: net: stmmac: dwmac-loongson: 
+> Disable force 1000 net: stmmac: dwmac-loongson: Add Loongson GNET 
+> support net: stmmac: dwmac-loongson:  Move DISABLE_FORCE_1000 flag to 
+> loongson_gnet_data() method
 
-[0]
-https://lore.kernel.org/all/20240417124622.35333-1-lulie@linux.alibaba.com/
+Sorry, my email client messed things up.
 
-Signed-off-by: Philo Lu <lulie@linux.alibaba.com>
----
- net/ipv4/tcp_output.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+Okay, But I noticed your comment at the end that we need to splite as a
 
-diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
-index 61119d42b0fd2..e19e74e005c1b 100644
---- a/net/ipv4/tcp_output.c
-+++ b/net/ipv4/tcp_output.c
-@@ -3390,11 +3390,6 @@ int __tcp_retransmit_skb(struct sock *sk, struct sk_buff *skb, int segs)
- 		err = tcp_transmit_skb(sk, skb, 1, GFP_ATOMIC);
- 	}
- 
--	/* To avoid taking spuriously low RTT samples based on a timestamp
--	 * for a transmit that never happened, always mark EVER_RETRANS
--	 */
--	TCP_SKB_CB(skb)->sacked |= TCPCB_EVER_RETRANS;
--
- 	if (BPF_SOCK_OPS_TEST_FLAG(tp, BPF_SOCK_OPS_RETRANS_CB_FLAG))
- 		tcp_call_bpf_3arg(sk, BPF_SOCK_OPS_RETRANS_CB,
- 				  TCP_SKB_CB(skb)->seq, segs, err);
-@@ -3404,6 +3399,12 @@ int __tcp_retransmit_skb(struct sock *sk, struct sk_buff *skb, int segs)
- 	} else if (err != -EBUSY) {
- 		NET_ADD_STATS(sock_net(sk), LINUX_MIB_TCPRETRANSFAIL, segs);
- 	}
-+
-+	/* To avoid taking spuriously low RTT samples based on a timestamp
-+	 * for a transmit that never happened, always mark EVER_RETRANS
-+	 */
-+	TCP_SKB_CB(skb)->sacked |= TCPCB_EVER_RETRANS;
-+
- 	return err;
- }
- 
--- 
-2.32.0.3.g01195cf9f
+separate _pre-requisite/preparation_ patch, this fix is for gnet devices,
+
+there is no gnet at this time. So, if I understand you correctly, we should
+
+need two new patches:
+
+++ net: stmmac: dwmac-loongson: Disable force 1000
+
+     net: stmmac: dwmac-loongson: Add Loongson GNET support
+
+++ net: stmmac: dwmac-loongson:  Move DISABLE_FORCE_1000 flag to 
+loongson_gnet_data() method
+
+
+Thanks,
+
+Yanteng
+
 
 
