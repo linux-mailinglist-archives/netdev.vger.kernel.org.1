@@ -1,74 +1,53 @@
-Return-Path: <netdev+bounces-89884-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89885-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F6888AC0EF
-	for <lists+netdev@lfdr.de>; Sun, 21 Apr 2024 21:23:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B804C8AC0F7
+	for <lists+netdev@lfdr.de>; Sun, 21 Apr 2024 21:27:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3624D1F210EE
-	for <lists+netdev@lfdr.de>; Sun, 21 Apr 2024 19:23:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 493FB1F20FF4
+	for <lists+netdev@lfdr.de>; Sun, 21 Apr 2024 19:27:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F7EB3FE2E;
-	Sun, 21 Apr 2024 19:23:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7B103D38F;
+	Sun, 21 Apr 2024 19:27:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YJYXt8o3"
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="KlLXaYox"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FBAB17BA9
-	for <netdev@vger.kernel.org>; Sun, 21 Apr 2024 19:23:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F0621B5AA;
+	Sun, 21 Apr 2024 19:27:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713727420; cv=none; b=mhVYfY+23Fi2bizxCOxVOwuY7qz/BubPNgrQpHuwx0xATJt/DXsN+Nactkdbtsw6fwEAtJWWTDTBudTLro80QacdBcGOUujpS/V6kxn6RWDCjdGbOgg0Za+wFhFzIK/aE2MOlhTeEFNDtc2CJGTjculUVSRGUDrMJD62hyH9ABY=
+	t=1713727642; cv=none; b=BXHSgvFUcniEyqjy9PzwRqJF/9Sv/bDW43U+TGCI/hP668a2yDgOcSgKzI5O3svL3KGY8Y8LYsPwyUxyr4pnQB/9aILPEiqkA4WVVFfUct/qVT6W5igxKZuIBtLCnmgGBj/FJ//rSI6p3EKCMGfBRIe2mJ8meyZJFOzb0QFi+XI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713727420; c=relaxed/simple;
-	bh=ko3baWa0bXarvAUBkLoisnJ87lFgJ97JsurMB9rDxfk=;
+	s=arc-20240116; t=1713727642; c=relaxed/simple;
+	bh=GAiQliUylNkiqA3TIwITFNADrEWrsDeL0XHcKwxrq0I=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eeKTz+y9qsgAYMO8oOZ7EdvlPUvxbSje375mRrRlYu0tLUGfrbHk+zBHhujOxcuCGIxok9/2q6aIcG43/uOurgEdeD7fDbNV0BjGYoTrP+nRF3KbmjGqfa1bmhiOxUoaIdgJj/OFh2onW7RjfntXsflO9Qn9BySGTgqtmF9Gy+I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=YJYXt8o3; arc=none smtp.client-ip=209.85.160.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-437b3f256easo18510351cf.0
-        for <netdev@vger.kernel.org>; Sun, 21 Apr 2024 12:23:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1713727416; x=1714332216; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=mqhW4D4jLVsKH1utbHDn/iKJztmh2klhA7VKP20qINw=;
-        b=YJYXt8o3ISIOOewEaP0VkMBiYskRWkaijkP77qqV275dtOHf4fGO3AYekbZ2+NH9qu
-         ir2kRyADd48L3HOnKxn+logXIIFNoHhp1A10YbKNGrhXANPjHvI37n/YZ6uL7tx76YzQ
-         WE29s1Gxv8rnVw6yiiTbzOvewZ5JlqCetlyt8Pdj0UBLSq5CsNzNVcU3l/mEuGsgw1Kh
-         r3gp6K+bMoP9z4olFRBNCbmCAS7DtMS9meakHSUgVF/KOerCio3PRsCsrh1E61jGW/Z+
-         84t3TT6pTCgmCEDE3g4Bmbfj9fSQD2Vd5/5ReVYDzbolFDzDcMP/5miHVOUasFA5f+6N
-         gJrw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713727416; x=1714332216;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mqhW4D4jLVsKH1utbHDn/iKJztmh2klhA7VKP20qINw=;
-        b=MlHRMRY6rFLH+NqQiDF7DTBRdQJrbusc7T5L184Jv0QPrZVsesrt0wDe1JGAtF1SK3
-         pV65bwXt9NIAzsBVMSSEliY2tdyZHLQjGPKTt1qpw6YMaa2M2qely5y5EZwg4MhA8WBE
-         4fjlAWvttZ24Fu4UATILWl36pbcDO28p9g7xUcbiVc6E4MBQ+D+beXb8F0tqwa7cYMYn
-         YgzRt+8uIQnMLz9yfHnAF8kuhjSgZz3wEvJBiwJE+tmEpS3QtnH3Tc4QjYaDbcCQXxiH
-         T4/D71P8kI5Gs4aNceXMhoaLldW0K7C+UfYQ3+iVgrm8KgrUsY6EMTq+icSCmW9XQFRT
-         561g==
-X-Forwarded-Encrypted: i=1; AJvYcCUofNpEIAeto06WqhGEQzTGiQ5ec8mqPKa1bKzt80ytCV8eF924ge4zyjoOWw3609J54plRrWJTMYPDH5djRvTnQuywYoxd
-X-Gm-Message-State: AOJu0YxDs8s1zNSm95bF5RGDiiiqeOfddfnDKmltlm31DtPSaLwADqmF
-	KMKXBGxX1cm0B0O2CLSKgDozmIMmxuVdVybrt794iUfEIH8gYHanRvyWMcN6xTE=
-X-Google-Smtp-Source: AGHT+IFG+MgI9P5zvYhi3oK9zNce0+Wm/zV3xYro6FQoOvWRlykWswFzedE1EssCx/FegZrr7XDg8Q==
-X-Received: by 2002:a05:622a:1a02:b0:437:9f6e:81be with SMTP id f2-20020a05622a1a0200b004379f6e81bemr11102550qtb.25.1713727416517;
-        Sun, 21 Apr 2024 12:23:36 -0700 (PDT)
-Received: from [10.211.55.3] (c-73-228-159-35.hsd1.mn.comcast.net. [73.228.159.35])
-        by smtp.gmail.com with ESMTPSA id w2-20020ac84d02000000b00435163abba5sm3604873qtv.94.2024.04.21.12.23.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 21 Apr 2024 12:23:35 -0700 (PDT)
-Message-ID: <5d580dd8-8510-4754-982a-131ea994923e@linaro.org>
-Date: Sun, 21 Apr 2024 14:23:33 -0500
+	 In-Reply-To:Content-Type; b=B1EJHmnLzr2nNpncKl0Sbf/1XHmUw3rTFyE9yxrhGvOnxZ3TcU8RTg6+fWwRGyaG3wEuAm3k2tG+YNjygbiB5u1+ORfq+rYMEn5dbvKgmkkfwbunVvSkUZcm4DVm9Ltn+4bL7E21LrJqjsVffo81jlZFKEY17QoN4Novq02HHb8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=KlLXaYox; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=From:Cc:To:Date:Message-ID;
+	bh=Lg/qlzZwLKwph3NU6upqfUukKASnvxR4/ZL4TRGp+6o=; b=KlLXaYox3G9F3LYbGJTAvFrxGg
+	xBJoadfHfmxcDezhW4BpYBGR9p1Qb6JEHoQIxKPiryqsFy40bGj/1+ul4zmMNygrx8+7/WyLi/JBD
+	5RKN11OZOuP7U9XcPSm6QECnWitsinOgGtpNlT23eWSiVgMUNHoWKU/Lz4/WwRPbHj7bT52kXbVm+
+	CCIlqihXQj8aYs6kHxczweFkySYWCJHf2ulA6uAt+lIxCUxUs2tK2q4pA+CLv84DuAfRMWO9rEzMi
+	foTRb8LxGRFlLehgPvn4Me9vFdwxubEH/H+hCigRqvmTJHxhcQxcJVf2OWAOqYeGajSrO2ba8TYVE
+	1/tfZOcvUIxQHWw/YQGRGJti+sOmmz0xywWxsN09stps18tplAPS6n1ivyB4g/mIvA21TwA4Jx9kn
+	ZtgWaxNLiXJpTNL39KQbZSBTWiB761oZPvJDpK7+dBTWovqunkfet048tPa9BIUUmgwwMCjtwBNFp
+	RU5HH1kgeIfKdpDr5zv7p1nu;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1rycqC-007aLj-0t;
+	Sun, 21 Apr 2024 19:27:08 +0000
+Message-ID: <dc3815af-5b46-452b-8bcc-30a0934740a2@samba.org>
+Date: Sun, 21 Apr 2024 21:27:07 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,80 +55,122 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] mailmap: add entries for Alex Elder
-Content-Language: en-US
-To: Bjorn Andersson <andersson@kernel.org>, Alex Elder <elder@linaro.org>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, mka@chromium.org, quic_cpratapa@quicinc.com,
- quic_avuyyuru@quicinc.com, quic_jponduru@quicinc.com,
- quic_subashab@quicinc.com, elder@kernel.org, netdev@vger.kernel.org,
- linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20240421151732.2203345-1-elder@linaro.org>
- <kabhsybtcfg6ky46rwry462dpql2k6mcrnb7w7xtb5d2httg7r@lg6rbbmaiggp>
-From: Alex Elder <alex.elder@linaro.org>
-In-Reply-To: <kabhsybtcfg6ky46rwry462dpql2k6mcrnb7w7xtb5d2httg7r@lg6rbbmaiggp>
+Subject: Re: [RFC PATCH net-next 0/5] net: In-kernel QUIC implementation with
+ Userspace handshake
+To: Xin Long <lucien.xin@gmail.com>
+Cc: network dev <netdev@vger.kernel.org>, davem@davemloft.net,
+ kuba@kernel.org, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Steve French <smfrench@gmail.com>,
+ Namjae Jeon <linkinjeon@kernel.org>, Chuck Lever III
+ <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>,
+ Sabrina Dubroca <sd@queasysnail.net>, Tyler Fanelli <tfanelli@redhat.com>,
+ Pengtao He <hepengtao@xiaomi.com>,
+ "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
+ Samba Technical <samba-technical@lists.samba.org>
+References: <cover.1710173427.git.lucien.xin@gmail.com>
+ <74d5db09-6b5c-4054-b9d3-542f34769083@samba.org>
+ <CADvbK_dzVcDKsJ9RN9oc0K1Jwd+kYjxgE6q=ioRbVGhJx7Qznw@mail.gmail.com>
+ <f427b422-6cfc-45ac-88eb-3e7694168b63@samba.org>
+ <CADvbK_cA-RCLiUUWkyNsS=4OhkWrUWb68QLg28yO2=8PqNuGBQ@mail.gmail.com>
+ <438496a6-7f90-403d-9558-4a813e842540@samba.org>
+ <CADvbK_fkbOnhKL+Rb+pp+NF+VzppOQ68c=nk_6MSNjM_dxpCoQ@mail.gmail.com>
+ <1456b69c-4ffd-4a08-b120-6a00abf1eb05@samba.org>
+ <CADvbK_cQRpyzHG4UUOzfgmqLndvpx5Cd+d59rrqGRp0ic3PyxA@mail.gmail.com>
+ <95922a2f-07a1-4555-acd2-c745e59bcb8e@samba.org>
+ <CADvbK_eR4++HbR_RncjV9N__M-uTHtmqcC+_Of1RKVw7Uqf9Cw@mail.gmail.com>
+ <CADvbK_dEWNNA_i1maRk4cmAB_uk4G4x0eZfZbrVX=zJ+2H9o_A@mail.gmail.com>
+Content-Language: en-US, de-DE
+From: Stefan Metzmacher <metze@samba.org>
+In-Reply-To: <CADvbK_dEWNNA_i1maRk4cmAB_uk4G4x0eZfZbrVX=zJ+2H9o_A@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 4/21/24 11:16 AM, Bjorn Andersson wrote:
-> On Sun, Apr 21, 2024 at 10:17:32AM -0500, Alex Elder wrote:
->> Define my kernel.org address to be the canonical one, and add mailmap
->> entries for the various addresses (including typos) that have been
->> used over the years.
+Am 20.04.24 um 21:32 schrieb Xin Long:
+> On Fri, Apr 19, 2024 at 3:19 PM Xin Long <lucien.xin@gmail.com> wrote:
 >>
->> Signed-off-by: Alex Elder <elder@linaro.org>
->> ---
->>   .mailmap | 12 ++++++++++++
->>   1 file changed, 12 insertions(+)
+>> On Fri, Apr 19, 2024 at 2:51 PM Stefan Metzmacher <metze@samba.org> wrote:
+>>>
+>>> Hi Xin Long,
+>>>
+>>>>> But I think its unavoidable for the ALPN and SNI fields on
+>>>>> the server side. As every service tries to use udp port 443
+>>>>> and somehow that needs to be shared if multiple services want to
+>>>>> use it.
+>>>>>
+>>>>> I guess on the acceptor side we would need to somehow detach low level
+>>>>> udp struct sock from the logical listen struct sock.
+>>>>>
+>>>>> And quic_do_listen_rcv() would need to find the correct logical listening
+>>>>> socket and call quic_request_sock_enqueue() on the logical socket
+>>>>> not the lowlevel udo socket. The same for all stuff happening after
+>>>>> quic_request_sock_enqueue() at the end of quic_do_listen_rcv.
+>>>>>
+>>>> The implementation allows one low level UDP sock to serve for multiple
+>>>> QUIC socks.
+>>>>
+>>>> Currently, if your 3 quic applications listen to the same address:port
+>>>> with SO_REUSEPORT socket option set, the incoming connection will choose
+>>>> one of your applications randomly with hash(client_addr+port) vi
+>>>> reuseport_select_sock() in quic_sock_lookup().
+>>>>
+>>>> It should be easy to do a further match with ALPN between these 3 quic
+>>>> socks that listens to the same address:port to get the right quic sock,
+>>>> instead of that randomly choosing.
+>>>
+>>> Ah, that sounds good.
+>>>
+>>>> The problem is to parse the TLS Client_Hello message to get the ALPN in
+>>>> quic_sock_lookup(), which is not a proper thing to do in kernel, and
+>>>> might be rejected by networking maintainers, I need to check with them.
+>>>
+>>> Is the reassembling of CRYPTO frames done in the kernel or
+>>> userspace? Can you point me to the place in the code?
+>> In quic_inq_handshake_tail() in kernel, for Client Initial packet
+>> is processed when calling accept(), this is the path:
 >>
->> diff --git a/.mailmap b/.mailmap
->> index 8284692f96107..a78cd3d300eb1 100644
->> --- a/.mailmap
->> +++ b/.mailmap
->> @@ -38,6 +38,18 @@ Alexei Starovoitov <ast@kernel.org> <alexei.starovoitov@gmail.com>
->>   Alexei Starovoitov <ast@kernel.org> <ast@fb.com>
->>   Alexei Starovoitov <ast@kernel.org> <ast@plumgrid.com>
->>   Alexey Makhalov <alexey.amakhalov@broadcom.com> <amakhalov@vmware.com>
->> +Alex Elder <elder@kernel.org>
->> +Alex Elder <elder@kernel.org> <aelder@sgi.com>
->> +Alex Elder <elder@kernel.org> <alex.elder@linaro.org>
->> +Alex Elder <elder@kernel.org> <alex.elder@linary.org>
->> +Alex Elder <elder@kernel.org> <elder@dreamhost.com>
->> +Alex Elder <elder@kernel.org> <elder@dreawmhost.com>
->> +Alex Elder <elder@kernel.org> <elder@ieee.org>
->> +Alex Elder <elder@kernel.org> <elder@inktank.com>
->> +Alex Elder <elder@kernel.org> <elder@kernel.org>
->> +Alex Elder <elder@kernel.org> <elder@linaro.org>
->> +Alex Elder <elder@kernel.org> <elder@newdream.net>
->> +Alex Elder <elder@kernel.org> Alex Elder (Linaro) <elder@linaro.org>
-> 
-> Isn't this form (with the name in the middle) when you want to be able
-> to map one email with two different names, to two different addresses?
-> 
-> As described in last example in the "gitmailmap" man page?
-> 
-> I think thereby this would be a duplicate with the entry two lines
-> above?
-
-I interpreted this form as meaning "change both the
-name and the e-mail" but I tried deleting that last
-one and it still mapped properly.  I also just noticed
-that I mapped @kernel.org to @kernel.org, which is
-dumb.
-
-I'll send v2.  Thank you.
-
-					-Alex
-
-> 
-> Regards,
-> Bjorn
-> 
->>   Alex Hung <alexhung@gmail.com> <alex.hung@canonical.com>
->>   Alex Shi <alexs@kernel.org> <alex.shi@intel.com>
->>   Alex Shi <alexs@kernel.org> <alex.shi@linaro.org>
->> -- 
->> 2.40.1
+>> quic_accept()-> quic_accept_sock_init() -> quic_packet_process() ->
+>> quic_packet_handshake_process() -> quic_frame_process() ->
+>> quic_frame_crypto_process() -> quic_inq_handshake_tail().
 >>
+>> Note that it's with the accept sock, not the listen sock.
+>>
+>>>
+>>> If it's really impossible to do in C code maybe
+>>> registering a bpf function in order to allow a listener
+>>> to check the intial quic packet and decide if it wants to serve
+>>> that connection would be possible as last resort?
+>> That's a smart idea! man.
+>> I think the bpf hook in reuseport_select_sock() is meant to do such
+>> selection.
+>>
+>> For the Client initial packet (the only packet you need to handle),
+>> I double you will need to do the reassembling, as Client Hello TLS message
+>> is always less than 400 byte in my env.
+>>
+>> But I think you need to do the decryption for the Client initial packet
+>> before decoding it then parsing the TLS message from its crypto frame.
+> I created this patch:
+> 
+> https://github.com/lxin/quic/commit/aee0b7c77df3f39941f98bb901c73fdc560befb8
+> 
+> to do this decryption in quic_sock_look() before calling
+> reuseport_select_sock(), so that it provides the bpf selector with
+> a plain-text QUIC initial packet:
+> 
+> https://datatracker.ietf.org/doc/html/rfc9000#section-17.2.2
+> 
+> If it's complex for you to do the decryption for the initial packet in
+> the bpf selector, I will apply this patch. Please let me know.
 
+I guess in addition to quic_server_handshake(), which is called
+after accept(), there should be quic_server_prepare_listen()
+(and something similar for in kernel servers) that setup the reuseport
+magic for the socket, so that it's not needed in every application.
+
+It seems there is only a single ebpf program possible per
+reuseport group, so there has to be just a single one.
+
+But is it possible for in kernel servers to also register an epbf program?
+
+metze
 
