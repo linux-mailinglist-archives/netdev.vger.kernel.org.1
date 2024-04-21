@@ -1,187 +1,108 @@
-Return-Path: <netdev+bounces-89842-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89843-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06F518ABDCF
-	for <lists+netdev@lfdr.de>; Sun, 21 Apr 2024 02:09:00 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D06108ABDE0
+	for <lists+netdev@lfdr.de>; Sun, 21 Apr 2024 02:58:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 17E1B1C209A6
-	for <lists+netdev@lfdr.de>; Sun, 21 Apr 2024 00:08:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 801C91F21822
+	for <lists+netdev@lfdr.de>; Sun, 21 Apr 2024 00:58:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7E1136C;
-	Sun, 21 Apr 2024 00:08:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C0D717E9;
+	Sun, 21 Apr 2024 00:58:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ePSHcc6X"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f43.google.com (mail-io1-f43.google.com [209.85.166.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 005B8161;
-	Sun, 21 Apr 2024 00:08:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 108D363D;
+	Sun, 21 Apr 2024 00:58:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713658134; cv=none; b=GuLFA0TbA3CrWTvTA5mJDa97mwY/08f/rKX2atM21Ojrcd6ZuhSByun1ZHuRubGsOPcru5wC0AyyGpu7ZB4Oc/rYHZcp5GcqTqMs9yPLjCkguvn7ObjTf3dVy8j33+eKZ2EVHyzPnuYzjiXFXQG0j0vzAS/KtycWXDNGCZ1+xNM=
+	t=1713661128; cv=none; b=f3ZCOvnFQbsd27h87lUL+Q6afTtgIbNqBNxaC6CHtX6SVhVogFH8uUlTdXZlnr56E0MrYJMteJVlce7xfcLBNN/IRQEnFlhbjwy1YRv01jBbe1W8yBCymmCGKJxBvyxTC8kd6WowcuzOVvLZqSALAmZGeY+M+feXXSbhOdAz5gE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713658134; c=relaxed/simple;
-	bh=SV1WNsuQUfWW8r3HygOyF2sEn+ZsPEZW3vRuzkIb1jU=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=jBj0wOMt3rTV1KKT675XvfJMA8z4tkZzWCz6i75O4zlz3FOy9DO31zApYRcC6RfqIfsv3VpeHUJYVxbC1apUszwcF4U12KVeuFDIGHHEnLujj+5bo8VdBkCsa1q4YK1rEHXnndioMrnSUpvjofhKGPSzJyx6CK2ZsBb+qVTlfgE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.97.1)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1ryKl5-0000000045H-02wC;
-	Sun, 21 Apr 2024 00:08:39 +0000
-Date: Sun, 21 Apr 2024 01:08:31 +0100
-From: Daniel Golle <daniel@makrotopia.org>
-To: Qingfang Deng <dqfext@gmail.com>,
-	SkyLake Huang <SkyLake.Huang@mediatek.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: [PATCH net] net: phy: mediatek-ge-soc: follow netdev LED trigger
- semantics
-Message-ID: <4983a6b197ed999808c5690d01ec1ffb4f6407b7.1713656093.git.daniel@makrotopia.org>
+	s=arc-20240116; t=1713661128; c=relaxed/simple;
+	bh=ymC1QnVHxhOD2DDVfEZFRZeGCfvWjZCmsx/3+C3Nk8c=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=LyG8kGsB4IdaK6emhpm84py9i10BN1cFiqEmYRpPt+/QhzoUrb4t7XjmlywN5wzhmdjYO6siYfAqZ5GsGV7+k5S7nOkOa/3lKAgr/fRr5M9KN6pTKgHnQcyZ7/ZwyyD6W/AWgD77wP8nwxT2ZQBkNzD98jmxQPCeznT1ytti/fE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ePSHcc6X; arc=none smtp.client-ip=209.85.166.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-io1-f43.google.com with SMTP id ca18e2360f4ac-7da37436e36so116332539f.0;
+        Sat, 20 Apr 2024 17:58:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1713661126; x=1714265926; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=rotKs/HRBUThPvtoAm+JwDL8D8t3IdbuQt7JNy7S+eQ=;
+        b=ePSHcc6XNc5ZNYYdhgXPa1MtN1RcWBfT/u0TBCulbmiCtJuQi6Uo4QmJVqo2gpDjUf
+         6Abyjvz6p5vhLfUWKjSXOJuEVJ+2HAWw0SqB2d8/1+6WAyjkCj9J2ajDFuSQDn2xKyA5
+         BtxL8/93aPnoXTULPCMuxyh5tX665ImAI5XJoAKTddxdlnZqVgHgdmd6yDujrULp9Nvb
+         X7lsJanFRUlhbI0gJNR0AUe7Zo07MgG9soZIgWlGNkOoXCA5UTPvAwZVoLG4RceBzTbI
+         PQyBvZidChraM7WJ+hfksAidgIXSgmKrZauMRRbu3SbCU64IlSmnkv3W0EUr4Q7isXDg
+         gnkA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713661126; x=1714265926;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=rotKs/HRBUThPvtoAm+JwDL8D8t3IdbuQt7JNy7S+eQ=;
+        b=q0O2vyxK8sVMfvns3AJc93L+5NwG7QLayxMfmfIKQS9XNQB/GlQ4b2VbVFqt1IgLrY
+         hJphvSNFpaNx4vClUT7JkimUjLCML7eb9Z+LgH7Z/1GCBe+r3Z3bDdTRq1FAqzbDPBR+
+         vHikStSHIzWQHMAte/WXT3og79PaLPlv9IXR3OPX+eCY8wKKTUXAgDHU0fjCrHCg5bzE
+         ko4EHuHEBjixPipG22L32oocqDegNCrf25P6vnQbuudzRyCX4bZ4M9aDubZvsHif+c3k
+         GMo+b/lm4nIG1jZ7BYvyqj9TOlHi/EHu1NkOCImBA3wJcuTJB/11hitrh5lI+Owe33Zb
+         BCAQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWsJAQ3NlLdjM/rWBIzua6RSL6Nx4uKxGkl4IO1GV0cnsrOYfLy+MrAasl9zPpoJFsMuPWQBYmNIV7nR8SgiuBo+SOQRrUqzE4y+PKcj6H7
+X-Gm-Message-State: AOJu0YxpaN1krAaeCTNAalIkPiv4jD31MM3Kh/GzuniwXFkwO0L3Madd
+	6jiUXxpI9jNfGJJpSgFziJyaPBxNxF7oazrZo8Sl8e88Qoot8SO2
+X-Google-Smtp-Source: AGHT+IFRUyg8B7Uf8CxpRLgFfeKm7cudFal5LSALGN4uBXfPvkRBniXhEKfnlUL3Lni85Jo7QbuxLg==
+X-Received: by 2002:a92:c267:0:b0:36a:fe86:5fcc with SMTP id h7-20020a92c267000000b0036afe865fccmr8325083ild.0.1713661126149;
+        Sat, 20 Apr 2024 17:58:46 -0700 (PDT)
+Received: from ?IPV6:2601:282:1e82:2350:1518:4e26:8dc5:c7f9? ([2601:282:1e82:2350:1518:4e26:8dc5:c7f9])
+        by smtp.googlemail.com with ESMTPSA id p6-20020a92d286000000b003687fe513f2sm1416458ilp.2.2024.04.20.17.58.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 20 Apr 2024 17:58:45 -0700 (PDT)
+Message-ID: <11dbe8b4-7827-4c86-b870-c255214f069c@gmail.com>
+Date: Sat, 20 Apr 2024 18:58:44 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 1/4] netdev: support dumping a single netdev in
+ qstats
+Content-Language: en-US
+To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
+Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+ shuah@kernel.org, sdf@google.com, amritha.nambiar@intel.com,
+ linux-kselftest@vger.kernel.org
+References: <20240420023543.3300306-1-kuba@kernel.org>
+ <20240420023543.3300306-2-kuba@kernel.org>
+From: David Ahern <dsahern@gmail.com>
+In-Reply-To: <20240420023543.3300306-2-kuba@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Only blink if the link is up on a LED which is programmed to also
-indicate link-status.
+On 4/19/24 8:35 PM, Jakub Kicinski wrote:
+> Having to filter the right ifindex in the tests is a bit tedious.
+> Add support for dumping qstats for a single ifindex.
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+>  Documentation/netlink/specs/netdev.yaml |  1 +
+>  net/core/netdev-genl-gen.c              |  1 +
+>  net/core/netdev-genl.c                  | 52 ++++++++++++++++++-------
+>  3 files changed, 41 insertions(+), 13 deletions(-)
+> 
 
-Otherwise, if both LEDs are in use to indicate different speeds, the
-resulting blinking being inverted on LEDs which aren't switched on at
-a specific speed is quite counter-intuitive.
+Reviewed-by: David Ahern <dsahern@kernel.org>
 
-Also make sure that state left behind by reset or the bootloader is
-recognized correctly including the half-duplex and full-duplex bits as
-well as the (unsupported by Linux netdev trigger semantics) link-down
-bit.
-
-Fixes: c66937b0f8db ("net: phy: mediatek-ge-soc: support PHY LEDs")
-Signed-off-by: Daniel Golle <daniel@makrotopia.org>
----
- drivers/net/phy/mediatek-ge-soc.c | 43 +++++++++++++++++++------------
- 1 file changed, 26 insertions(+), 17 deletions(-)
-
-diff --git a/drivers/net/phy/mediatek-ge-soc.c b/drivers/net/phy/mediatek-ge-soc.c
-index 0f3a1538a8b8..f4f9412d0cd7 100644
---- a/drivers/net/phy/mediatek-ge-soc.c
-+++ b/drivers/net/phy/mediatek-ge-soc.c
-@@ -216,6 +216,9 @@
- #define   MTK_PHY_LED_ON_LINK1000		BIT(0)
- #define   MTK_PHY_LED_ON_LINK100		BIT(1)
- #define   MTK_PHY_LED_ON_LINK10			BIT(2)
-+#define   MTK_PHY_LED_ON_LINK			(MTK_PHY_LED_ON_LINK10 |\
-+						 MTK_PHY_LED_ON_LINK100 |\
-+						 MTK_PHY_LED_ON_LINK1000)
- #define   MTK_PHY_LED_ON_LINKDOWN		BIT(3)
- #define   MTK_PHY_LED_ON_FDX			BIT(4) /* Full duplex */
- #define   MTK_PHY_LED_ON_HDX			BIT(5) /* Half duplex */
-@@ -231,6 +234,12 @@
- #define   MTK_PHY_LED_BLINK_100RX		BIT(3)
- #define   MTK_PHY_LED_BLINK_10TX		BIT(4)
- #define   MTK_PHY_LED_BLINK_10RX		BIT(5)
-+#define   MTK_PHY_LED_BLINK_RX			(MTK_PHY_LED_BLINK_10RX |\
-+						 MTK_PHY_LED_BLINK_100RX |\
-+						 MTK_PHY_LED_BLINK_1000RX)
-+#define   MTK_PHY_LED_BLINK_TX			(MTK_PHY_LED_BLINK_10TX |\
-+						 MTK_PHY_LED_BLINK_100TX |\
-+						 MTK_PHY_LED_BLINK_1000TX)
- #define   MTK_PHY_LED_BLINK_COLLISION		BIT(6)
- #define   MTK_PHY_LED_BLINK_RX_CRC_ERR		BIT(7)
- #define   MTK_PHY_LED_BLINK_RX_IDLE_ERR		BIT(8)
-@@ -1247,11 +1256,9 @@ static int mt798x_phy_led_hw_control_get(struct phy_device *phydev, u8 index,
- 	if (blink < 0)
- 		return -EIO;
- 
--	if ((on & (MTK_PHY_LED_ON_LINK1000 | MTK_PHY_LED_ON_LINK100 |
--		   MTK_PHY_LED_ON_LINK10)) ||
--	    (blink & (MTK_PHY_LED_BLINK_1000RX | MTK_PHY_LED_BLINK_100RX |
--		      MTK_PHY_LED_BLINK_10RX | MTK_PHY_LED_BLINK_1000TX |
--		      MTK_PHY_LED_BLINK_100TX | MTK_PHY_LED_BLINK_10TX)))
-+	if ((on & (MTK_PHY_LED_ON_LINK | MTK_PHY_LED_ON_FDX | MTK_PHY_LED_ON_HDX |
-+		   MTK_PHY_LED_ON_LINKDOWN)) ||
-+	    (blink & (MTK_PHY_LED_BLINK_RX | MTK_PHY_LED_BLINK_TX)))
- 		set_bit(bit_netdev, &priv->led_state);
- 	else
- 		clear_bit(bit_netdev, &priv->led_state);
-@@ -1269,7 +1276,7 @@ static int mt798x_phy_led_hw_control_get(struct phy_device *phydev, u8 index,
- 	if (!rules)
- 		return 0;
- 
--	if (on & (MTK_PHY_LED_ON_LINK1000 | MTK_PHY_LED_ON_LINK100 | MTK_PHY_LED_ON_LINK10))
-+	if (on & MTK_PHY_LED_ON_LINK)
- 		*rules |= BIT(TRIGGER_NETDEV_LINK);
- 
- 	if (on & MTK_PHY_LED_ON_LINK10)
-@@ -1287,10 +1294,10 @@ static int mt798x_phy_led_hw_control_get(struct phy_device *phydev, u8 index,
- 	if (on & MTK_PHY_LED_ON_HDX)
- 		*rules |= BIT(TRIGGER_NETDEV_HALF_DUPLEX);
- 
--	if (blink & (MTK_PHY_LED_BLINK_1000RX | MTK_PHY_LED_BLINK_100RX | MTK_PHY_LED_BLINK_10RX))
-+	if (blink & MTK_PHY_LED_BLINK_RX)
- 		*rules |= BIT(TRIGGER_NETDEV_RX);
- 
--	if (blink & (MTK_PHY_LED_BLINK_1000TX | MTK_PHY_LED_BLINK_100TX | MTK_PHY_LED_BLINK_10TX))
-+	if (blink & MTK_PHY_LED_BLINK_TX)
- 		*rules |= BIT(TRIGGER_NETDEV_TX);
- 
- 	return 0;
-@@ -1323,15 +1330,19 @@ static int mt798x_phy_led_hw_control_set(struct phy_device *phydev, u8 index,
- 		on |= MTK_PHY_LED_ON_LINK1000;
- 
- 	if (rules & BIT(TRIGGER_NETDEV_RX)) {
--		blink |= MTK_PHY_LED_BLINK_10RX  |
--			 MTK_PHY_LED_BLINK_100RX |
--			 MTK_PHY_LED_BLINK_1000RX;
-+		blink |= (on & MTK_PHY_LED_ON_LINK) ?
-+			  (((on & MTK_PHY_LED_ON_LINK10) ? MTK_PHY_LED_BLINK_10RX : 0) |
-+			   ((on & MTK_PHY_LED_ON_LINK100) ? MTK_PHY_LED_BLINK_100RX : 0) |
-+			   ((on & MTK_PHY_LED_ON_LINK1000) ? MTK_PHY_LED_BLINK_1000RX : 0)) :
-+			  MTK_PHY_LED_BLINK_RX;
- 	}
- 
- 	if (rules & BIT(TRIGGER_NETDEV_TX)) {
--		blink |= MTK_PHY_LED_BLINK_10TX  |
--			 MTK_PHY_LED_BLINK_100TX |
--			 MTK_PHY_LED_BLINK_1000TX;
-+		blink |= (on & MTK_PHY_LED_ON_LINK) ?
-+			  (((on & MTK_PHY_LED_ON_LINK10) ? MTK_PHY_LED_BLINK_10TX : 0) |
-+			   ((on & MTK_PHY_LED_ON_LINK100) ? MTK_PHY_LED_BLINK_100TX : 0) |
-+			   ((on & MTK_PHY_LED_ON_LINK1000) ? MTK_PHY_LED_BLINK_1000TX : 0)) :
-+			  MTK_PHY_LED_BLINK_TX;
- 	}
- 
- 	if (blink || on)
-@@ -1344,9 +1355,7 @@ static int mt798x_phy_led_hw_control_set(struct phy_device *phydev, u8 index,
- 				MTK_PHY_LED0_ON_CTRL,
- 			     MTK_PHY_LED_ON_FDX     |
- 			     MTK_PHY_LED_ON_HDX     |
--			     MTK_PHY_LED_ON_LINK10  |
--			     MTK_PHY_LED_ON_LINK100 |
--			     MTK_PHY_LED_ON_LINK1000,
-+			     MTK_PHY_LED_ON_LINK,
- 			     on);
- 
- 	if (ret)
--- 
-2.44.0
 
 
