@@ -1,139 +1,145 @@
-Return-Path: <netdev+bounces-89888-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89889-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D865C8AC119
-	for <lists+netdev@lfdr.de>; Sun, 21 Apr 2024 21:45:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8646B8AC133
+	for <lists+netdev@lfdr.de>; Sun, 21 Apr 2024 22:23:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 67A931F2101F
-	for <lists+netdev@lfdr.de>; Sun, 21 Apr 2024 19:45:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE760280D5A
+	for <lists+netdev@lfdr.de>; Sun, 21 Apr 2024 20:23:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1587F41740;
-	Sun, 21 Apr 2024 19:45:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gzEiVPLI"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2308E43ACC;
+	Sun, 21 Apr 2024 20:23:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f53.google.com (mail-io1-f53.google.com [209.85.166.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A21A41232
-	for <netdev@vger.kernel.org>; Sun, 21 Apr 2024 19:45:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75CCE1BF20;
+	Sun, 21 Apr 2024 20:23:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713728706; cv=none; b=Kyhs5aefOzOeEMfMDbla/DyWln3t8/HrYB68Zalx55JtsmhNDwhsb2KN9q1GktPP44UqybmpgbhmOlqnRhA4blmKyt5aqVJm0x6QJHtATkzNRLPtjidlWxIv0Dx417jOWgtcvzjJh0d7P6q2y5hR3MEptCx3FvPjjQF7Xb/pgJI=
+	t=1713731034; cv=none; b=L6PPgqJ+ndxzmY7J6+IXSDwISU5H/KxdUpnt+VcEz8MzDI2V1+JJx/qAUkPMAnv74p2SJxBBiSI3mpztoAX/v/cJtTxUJrVFnXcP4hIEDYTVafhCvsBKY3KOZ56sE6H4IEbeoNI8vaBZyshcHSSfHznCiV/BKuvrXBXLT4OkGs0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713728706; c=relaxed/simple;
-	bh=WhM1lt196ZuyzGyrMGeZpHCQgesVgWk0mZDx/ZyriD0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=TECnAizob/8U+dghRT6SK8wgCtMoOjmc0Qr8OaUtTcxLCgSbIKuTlIayx72BrgLfM0p1fbBZqENgE1FUUxWQjfpJsCXJUGk42AbdW0vEp2HaqS8vN++m6lbANGmskzMILLyeNvao2eXdxB6kdRp+jwJfb0vGWsakRnsjYzQKQQE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=gzEiVPLI; arc=none smtp.client-ip=209.85.166.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-io1-f53.google.com with SMTP id ca18e2360f4ac-7d5e93b40feso191127639f.2
-        for <netdev@vger.kernel.org>; Sun, 21 Apr 2024 12:45:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1713728702; x=1714333502; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=hmwLPymoZsGTsCGnCkn4W1GBf4uY6ZtEmc4PE5gzS1Q=;
-        b=gzEiVPLIsBDLfHdSUHw//wPEA9kECf6BZSY+FxRIAyTV0FRPY98uNdAbC/nAwVL3ZE
-         hD6D3a2n7hBAOi2JlQSXKXNnyidBUSPhHbr9IoJr0Ojw8nZ2kZUWolnZ4lbyHrgJLO3R
-         qHWCzTF4CyHDNBOEguLBlVAs8ljSS2OYlPkxV9/Le8Mw4nGq+4g8U+LcON+A3aK0x9xi
-         O46Cl+Oj4J3Ym1to6MYJHTDOrq09kkE8wmCevjLp5Mc2nOQpQQwuB0s33jrsB5NztIDN
-         7ogAM2vhLRGKXqM3kaVXbd3j0BwC8uvPO+E7GrIqgu7qfqngPM87FranjxHGp0nAGe2E
-         pzgw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713728702; x=1714333502;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=hmwLPymoZsGTsCGnCkn4W1GBf4uY6ZtEmc4PE5gzS1Q=;
-        b=gUBMpxjN8k8fgdy4LrezkiMpBDHL+5CBSKqTpZIeo/zdcgZPz71h1ibm/YePYqdQt+
-         Z2nyouiHIiw5KvklgBvJft/Dp439E+0GQ49EZblcOQvOwV1sAX3K/msCi+n3bS7LhUK+
-         51IwRtC0uWyY0XQrWAtutcjqv55S5tKxQ1bgZdiHsmzTo3kX42T+JfSRG9vpAwC1FUzE
-         8g04aTuxIxkVqS0zXr5JbSmEZTiwRl5YojZTYtbpMI8xcg32T7CfmHEqNwe6x2f8O6Vk
-         hXnm4AQszrWAQBDk8jNxIv9VQQyU/9zySU7nrDM7bLPNbx6G8XBzVwhmmg3RaxjmRfIh
-         BCMg==
-X-Forwarded-Encrypted: i=1; AJvYcCWFlnZTTjQr4Wpq8EwUh2Sz/4ah/3cNUzpJsyrUHKT7vJlRZ7ahonOIYUBp9FaOoGn4Z9HjqsQEVRaZ0fg39Z4D8Kbs+EZA
-X-Gm-Message-State: AOJu0YwW6Ye2u7upYbN2/8M7D/Hgqclrr/22hC//HzTQ9WH7rz103Nik
-	TfBxm+okM+ReIv3J0cmq2qLegzLH7sTDi33JrN3GgBoEJOkXnBiQYdh7tVQ3RDk=
-X-Google-Smtp-Source: AGHT+IF7DiPJL/yIlJYiXPfNcpL2tc/oHWI9TirxRMVUc+S1ri40BymfZ1eUghsMJ8O7i3dM46HxhQ==
-X-Received: by 2002:a05:6e02:1a65:b0:36a:1104:2d6e with SMTP id w5-20020a056e021a6500b0036a11042d6emr10507360ilv.1.1713728702576;
-        Sun, 21 Apr 2024 12:45:02 -0700 (PDT)
-Received: from localhost.localdomain (c-73-228-159-35.hsd1.mn.comcast.net. [73.228.159.35])
-        by smtp.gmail.com with ESMTPSA id t11-20020a92dc0b000000b0036c1134a492sm35926iln.51.2024.04.21.12.45.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 21 Apr 2024 12:45:01 -0700 (PDT)
-From: Alex Elder <elder@linaro.org>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: akpm@linux-foundation.org,
-	andersson@kernel.org,
-	cdleonard@gmail.com,
-	elder@kernel.org,
-	geliang@kernel.org,
-	heiko@sntech.de,
-	matt@ranostay.sg,
-	matttbe@kernel.org,
-	mka@chromium.org,
-	o.rempel@pengutronix.de,
-	quic_avuyyuru@quicinc.com,
-	quic_bjorande@quicinc.com,
-	quic_cpratapa@quicinc.com,
-	quic_jponduru@quicinc.com,
-	quic_subashab@quicinc.com,
-	netdev@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] mailmap: add entries for Alex Elder
-Date: Sun, 21 Apr 2024 14:44:58 -0500
-Message-Id: <20240421194458.2205779-1-elder@linaro.org>
-X-Mailer: git-send-email 2.40.1
+	s=arc-20240116; t=1713731034; c=relaxed/simple;
+	bh=YHUxQDucqlt2tZ6/YcmABpo3iYb+1IqsFatlx4/NmYk=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=vEYBNfSo1ovhmiQIhO8JAa75Nyals7VxslO1j62G2ER+/kacYYvRQuxyM+89w5rzuTWdpHAQ6/b4XQm0vkRgdTUPWWQ/1YPMyU00qEU8iL/5VArpP0flPBqIfZWqtizrToSM3LOIHfq3j1BSo2nnifgqKR0GdZ6q+OgoeKXAn0o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from [192.168.1.105] (178.176.72.135) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Sun, 21 Apr
+ 2024 23:23:33 +0300
+Subject: Re: [net-next RFC v3 4/7] net: ravb: Refactor GbEth RX code path
+To: Paul Barker <paul.barker.ct@bp.renesas.com>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+CC: =?UTF-8?Q?Niklas_S=c3=b6derlund?= <niklas.soderlund+renesas@ragnatech.se>,
+	Geert Uytterhoeven <geert+renesas@glider.be>, <netdev@vger.kernel.org>,
+	<linux-renesas-soc@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+References: <20240415094804.8016-1-paul.barker.ct@bp.renesas.com>
+ <20240415094804.8016-5-paul.barker.ct@bp.renesas.com>
+ <897c3e16-7ded-bdea-08c7-14bf497bfc05@omp.ru>
+ <bcddc226-7cbf-4994-94fe-eb70331f2bfa@bp.renesas.com>
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+Message-ID: <aa375f97-a94a-66bf-e96c-2a8f75e2cf8b@omp.ru>
+Date: Sun, 21 Apr 2024 23:23:33 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <bcddc226-7cbf-4994-94fe-eb70331f2bfa@bp.renesas.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 04/21/2024 20:06:29
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 59
+X-KSE-AntiSpam-Info: Lua profiles 184824 [Apr 21 2024]
+X-KSE-AntiSpam-Info: Version: 6.1.0.4
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 18 0.3.18
+ b9d6ada76958f07c6a68617a7ac8df800bc4166c
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_uf_ne_domains}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {relay has no DNS name}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.72.135 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info:
+	lore.kernel.org:7.1.1;127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;omp.ru:7.1.1;178.176.72.135:7.1.2
+X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.72.135
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 59
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 04/21/2024 20:10:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 4/21/2024 5:54:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-Define my kernel.org address to be the canonical one, and add mailmap
-entries for the various addresses (including typos) that have been
-used over the years.
+On 4/21/24 6:49 PM, Paul Barker wrote:
+[...]
 
-Signed-off-by: Alex Elder <elder@linaro.org>
----
-v2: Deleted two unnecessary lines, after prompting by Bjorn.
-    Also copied those suggested by get_maintainer.pl.
+>>> We can reduce code duplication in ravb_rx_gbeth() and add comments to
+>>> make the code flow easier to understand.
+>>>
+>>> Signed-off-by: Paul Barker <paul.barker.ct@bp.renesas.com>
+>>> ---
+>>>  drivers/net/ethernet/renesas/ravb_main.c | 70 ++++++++++++------------
+>>>  1 file changed, 35 insertions(+), 35 deletions(-)
+>>>
+>>> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
+>>> index baa01bd81f2d..12618171f6d5 100644
+>>> --- a/drivers/net/ethernet/renesas/ravb_main.c
+>>> +++ b/drivers/net/ethernet/renesas/ravb_main.c
+>>> @@ -818,47 +818,47 @@ static int ravb_rx_gbeth(struct net_device *ndev, int budget, int q)
+>>>  				stats->rx_missed_errors++;
+>>>  		} else {
+>>>  			die_dt = desc->die_dt & 0xF0;
+>>> -			switch (die_dt) {
+>>> -			case DT_FSINGLE:
+>>> -				skb = ravb_get_skb_gbeth(ndev, entry, desc);
+>>> +			skb = ravb_get_skb_gbeth(ndev, entry, desc);
+>>> +			if (die_dt == DT_FSINGLE || die_dt == DT_FSTART) {
+>>
+>>    No, please keep using *switch* statement here...
+> 
+> That's a shame - I much prefer this version with reduced code
+> duplication, especially when we add page pool support. Duplication with
+> subtle differences leads to bugs, see [1] for an example.
+> 
+> [1]: https://lore.kernel.org/all/20240416120254.2620-4-paul.barker.ct@bp.renesas.com/
 
- .mailmap | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+   I wasn't clear enough probably, sorry about that.
+   What I meant to say was that your use of the *if* statement
+wasn't  actually justified. Please use the *switch* statement
+instead.
 
-diff --git a/.mailmap b/.mailmap
-index 8284692f96107..f932ce611898e 100644
---- a/.mailmap
-+++ b/.mailmap
-@@ -38,6 +38,16 @@ Alexei Starovoitov <ast@kernel.org> <alexei.starovoitov@gmail.com>
- Alexei Starovoitov <ast@kernel.org> <ast@fb.com>
- Alexei Starovoitov <ast@kernel.org> <ast@plumgrid.com>
- Alexey Makhalov <alexey.amakhalov@broadcom.com> <amakhalov@vmware.com>
-+Alex Elder <elder@kernel.org>
-+Alex Elder <elder@kernel.org> <aelder@sgi.com>
-+Alex Elder <elder@kernel.org> <alex.elder@linaro.org>
-+Alex Elder <elder@kernel.org> <alex.elder@linary.org>
-+Alex Elder <elder@kernel.org> <elder@dreamhost.com>
-+Alex Elder <elder@kernel.org> <elder@dreawmhost.com>
-+Alex Elder <elder@kernel.org> <elder@ieee.org>
-+Alex Elder <elder@kernel.org> <elder@inktank.com>
-+Alex Elder <elder@kernel.org> <elder@linaro.org>
-+Alex Elder <elder@kernel.org> <elder@newdream.net>
- Alex Hung <alexhung@gmail.com> <alex.hung@canonical.com>
- Alex Shi <alexs@kernel.org> <alex.shi@intel.com>
- Alex Shi <alexs@kernel.org> <alex.shi@linaro.org>
--- 
-2.40.1
+[...]
 
+> Thanks,
+
+MBR, Sergey
 
