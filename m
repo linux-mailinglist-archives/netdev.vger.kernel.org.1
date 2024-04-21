@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-89846-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89847-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36EA48ABE32
-	for <lists+netdev@lfdr.de>; Sun, 21 Apr 2024 03:09:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1B618ABE54
+	for <lists+netdev@lfdr.de>; Sun, 21 Apr 2024 03:51:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E6633280DA4
-	for <lists+netdev@lfdr.de>; Sun, 21 Apr 2024 01:09:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7014628130B
+	for <lists+netdev@lfdr.de>; Sun, 21 Apr 2024 01:51:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3CFF205E2E;
-	Sun, 21 Apr 2024 01:09:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AD5C1FA4;
+	Sun, 21 Apr 2024 01:51:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jVceRAAT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s3zrz3WV"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D89E205E2C
-	for <netdev@vger.kernel.org>; Sun, 21 Apr 2024 01:09:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 353E138C
+	for <netdev@vger.kernel.org>; Sun, 21 Apr 2024 01:51:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713661783; cv=none; b=kn2xciOkY4edEvMUOHFXJ/SaPBtLhuZIoTLKjdMAcPV/viIdIlK1ClpVPgMIxjI2opN+ngtDvPC8R/ouK2lPoYrwiI71m0ieG0MqDwukpSJkLZjlaEIJ28OkFv2r768QInscLdj6araEwtlUm7RvMl89aYCPbw56Cy+S6t79DVY=
+	t=1713664278; cv=none; b=SCFOmI5QYhuYpeJXsOVCypyhVdJCk1obSnzaOr2qLHQo12/Wnfs318o2ZCn3JTHFFo3bCRz9VIGPKEIqgrSitIZBT3oKtLKsoRHd2OHRc4TCbm+YiusT/fj0irndz4XmMcUuRMtkG22YJqCmu2zuB+fGMHjqX3LaW6x2PQYJ5bE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713661783; c=relaxed/simple;
-	bh=3Z5Hn1b+GxjUdE2zhcZmgQBjs1XkG/aQqoeHvMpihUQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Axanwd0vSNtOpFQU6F5DInKM2UaXU6akMI9soGwqoBx07RA+vjVpJ5xD2671inmrHbhRqox4S7imJwlFuFutCQwXR9ViMxBnIOg/pceeHnyI8lC01xGIz0Dsb+8D0aXpsaNbIARdl6sZM969dtTMlJ18OQobGXdUEoNJFRIuY9M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jVceRAAT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 568D5C072AA;
-	Sun, 21 Apr 2024 01:09:42 +0000 (UTC)
+	s=arc-20240116; t=1713664278; c=relaxed/simple;
+	bh=V63Hl+0d09bV/EgkpCeaWGAt9rZTvABgNHE90qihmgc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=hhpVgui6I5Z6frjTrXx3JRFQFKkdY5ExtShUOiUcqTxdOvvTDl+GVXosVgK+TU34KhcJnm1J2+PF6xbHtCOawg3rr3l5QfRrIb3nX4EP6KO534ayCbqoOSzHQw4Y9C8vTwReHhLnKQZUDWp18iqzN9GXX7ECOoOonY7PYVCFRL0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s3zrz3WV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 89E5FC072AA;
+	Sun, 21 Apr 2024 01:51:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713661783;
-	bh=3Z5Hn1b+GxjUdE2zhcZmgQBjs1XkG/aQqoeHvMpihUQ=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=jVceRAATucp3/XD0JkzcokhsZwpugMLZObcPPUfPYGeemsg6jqtk/3ZdlREQqNXGU
-	 iKBNBVyR83hUMyPuPG/XtR0qGjf8JbjenUSccMif6IfodncKiPrUdj2pKCftxJ/3fC
-	 tcZSMgDzRjF2FUbV9cjsUoQklmrTRbIXX5qvOutKMiZslDgDOe/FwoThCCtfnfN0vQ
-	 Qp3n3VFa3qX1PuBt3XAtgcERVUt/aH2OnqD/5FjkEWpT5bvKF/B989RyFugjBsOHTA
-	 Bm6eD+leDYX4edhqz1H5pj+K3Ij2WFt5+gYrVXOMEIOrT037FlXjxtLevHTeJESAHv
-	 GQWX3ZpuaqAkQ==
-Message-ID: <4013b9a0-7d7c-46e8-b579-68a3b06de2a3@kernel.org>
-Date: Sat, 20 Apr 2024 19:09:41 -0600
+	s=k20201202; t=1713664277;
+	bh=V63Hl+0d09bV/EgkpCeaWGAt9rZTvABgNHE90qihmgc=;
+	h=Date:Subject:To:References:From:In-Reply-To:From;
+	b=s3zrz3WVXBQtSlWxTtCTExuEMC/a0u8OO790pUEuwjQHxTJKW2+bzXAWMojYOWULu
+	 iMRcF4Kim0hxV9gSA+fVgNBfc15yxe7V3c0kUn+MPhHaSq+h54ye6cvYIPmicAUSOH
+	 graGARaywNyH4aHjOren8/HBE593XVJUzWEN/4UzYQgaSn1SLgmCjp2A0MtbZZmIld
+	 kAcHn8W3QwyGZjkP0FbtAUzOzC+SNGUZPm8gxea1OL9YFi+phiY+XDw8TinQhQZiWh
+	 siCEJE58cHNzQ2Xf1ugqhvmdrVG1d3KOlDRfSco+WyvFnC1P92rlHT2UjPBIwGaty+
+	 qiWWjertaHY9Q==
+Message-ID: <69e70f69-f314-4346-95d8-4ced8e7f66f0@kernel.org>
+Date: Sat, 20 Apr 2024 19:51:16 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,43 +50,31 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 net] icmp: prevent possible NULL dereferences from
- icmp_build_probe()
+Subject: Re: [PATCH iproute2-next 0/7] unused arguments
 Content-Language: en-US
-To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com,
- Andreas Roeseler <andreas.a.roeseler@gmail.com>
-References: <20240420070116.4023672-1-edumazet@google.com>
+To: Stephen Hemminger <stephen@networkplumber.org>, netdev@vger.kernel.org
+References: <20240413220516.7235-1-stephen@networkplumber.org>
 From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20240420070116.4023672-1-edumazet@google.com>
+In-Reply-To: <20240413220516.7235-1-stephen@networkplumber.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 4/20/24 1:01 AM, Eric Dumazet wrote:
-> First problem is a double call to __in_dev_get_rcu(), because
-> the second one could return NULL.
+On 4/13/24 4:04 PM, Stephen Hemminger wrote:
+> While looking at finishing JSON support for TC in all places,
+> noticed that there was a lot of places with left over unused
+> arguments.
 > 
-> if (__in_dev_get_rcu(dev) && __in_dev_get_rcu(dev)->ifa_list)
-> 
-> Second problem is a read from dev->ip6_ptr with no NULL check:
-> 
-> if (!list_empty(&rcu_dereference(dev->ip6_ptr)->addr_list))
-> 
-> Use the correct RCU API to fix these.
-> 
-> v2: add missing include <net/addrconf.h>
-> 
-> Fixes: d329ea5bd884 ("icmp: add response to RFC 8335 PROBE messages")
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> Cc: Andreas Roeseler <andreas.a.roeseler@gmail.com>
-> ---
->  net/ipv4/icmp.c | 12 ++++++++++--
->  1 file changed, 10 insertions(+), 2 deletions(-)
+> Stephen Hemminger (7):
+>   tc/u32: remove FILE argument
+>   tc/util: remove unused argument from print_tm
+>   tc/util: remove unused argument from print_action_control
+>   tc/police: remove unused argument to tc_print_police
+>   tc/util: remove unused argument from print_tcstats2_attr
+>   tc/action: remove unused args from tc_print_action
+>   tc/police: remove unused prototype police_print_xstats
 > 
 
-Reviewed-by: David Ahern <dsahern@kernel.org>
-
+applied the first 5. Patches 6 and 7 required too many adjustments -
+easier to respin the patch.
 
 
