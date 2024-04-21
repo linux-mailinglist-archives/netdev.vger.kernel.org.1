@@ -1,177 +1,191 @@
-Return-Path: <netdev+bounces-89900-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89901-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD8358AC217
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 01:22:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96B948AC218
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 01:23:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 41821B20E76
-	for <lists+netdev@lfdr.de>; Sun, 21 Apr 2024 23:22:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C41761C20A94
+	for <lists+netdev@lfdr.de>; Sun, 21 Apr 2024 23:23:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD6F344369;
-	Sun, 21 Apr 2024 23:22:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA6E345BEF;
+	Sun, 21 Apr 2024 23:22:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ld/QF3yY"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="IjERKFur";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="gbeOhgDI";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="IjERKFur";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="gbeOhgDI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A3A83D0CD
-	for <netdev@vger.kernel.org>; Sun, 21 Apr 2024 23:22:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B59544437;
+	Sun, 21 Apr 2024 23:22:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713741758; cv=none; b=BKuN+PiLFjc9LTQFdmG+WoecQwn8tfzrj6D/6OBPP7zluPttyNOoSpnZVjR8V2TgOoZjgjv4IfShav2Tm6gfbJA04jnpg1w4+95KKH6Eu+eGnjdAQKSvKymvqdxHifNd7IQTrzXZQ57R2ejM/SnuFjSPmTFlVhc6IlAMMBBr68c=
+	t=1713741779; cv=none; b=VHjECJhAweST09sRyVDbYTfC2uKMIMS87tVrU7M457DFlb7c3gROOFEGHyhClnvj9GistHxTQ2zzzB17F4WY9Oywj+kshCow2gSeKDC2tg4omYQF0ov5WQLn7ImDjQQ+bCNMKRSmQB9qCt3cwbUY/KQPUK2PQGBjNrQbKCioZN4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713741758; c=relaxed/simple;
-	bh=Dm7YHHjbjRbmSShic9KMChCcR3Z/hnf5d5z1pa2lpGU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=sNer/3VWij5s4TLFpjrR1A/7/jVqp+KmuDsoHRDjc+Ythxn/zw63zQBW//rIV4JRfdfsw27uzKF+RQpoDTSxKexDMDeCfsvYTPJPoSRCcZzt1TFFDQ9BdVRRV+xA9WM1KCt6cZMbcdkWabKdTHKuana+Yl/jnCcvqvb2N3IVLII=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ld/QF3yY; arc=none smtp.client-ip=209.85.221.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-343c7fae6e4so3464534f8f.1
-        for <netdev@vger.kernel.org>; Sun, 21 Apr 2024 16:22:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713741755; x=1714346555; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DddNeHQ6cJo82rLir+VkXAvxBH2Wkut/xxX6pZ+DNpc=;
-        b=ld/QF3yY3Y/tHCt8Xs1ZZ7CeMFaNMuWeu6n3BPFS9ylJiaU97JAvkuK8PJLXniyfNZ
-         VPr3i0vap3tcDaIckibkgFNPE8ULXjKwlUzWse6wHtI85BHyPT6g8n3LJK7qPBKesii3
-         OrI6hNJa7NFj+Ja1N7XA2Ery987BAqLMAdFnGu+UT3Vp37SMp5N8OqojPol7aVLnsFdZ
-         w57KY2J4B/9tUQ1cqV7vWrXvoPkfaAZjBC4cxlZSDYHZ7SbxghK0HTx2jdD0ZLPnLLLT
-         ZQkmSyaUEX0Ss71U6vbC531pH9vdtBnQ+5bAp81DgtgvYeCoi/gKrUSBbUcn2kdH91W9
-         EFTA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713741755; x=1714346555;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=DddNeHQ6cJo82rLir+VkXAvxBH2Wkut/xxX6pZ+DNpc=;
-        b=UviXLZYRGNicIuo9yKABMXLITtoLiFu09rFhxWzkOAEZzUHZtko8Zf9DXcrWIgOH76
-         VBXIkC/qo6yM13nYEoXGcCWlYpvAExzhdjscBu9CbZLQmzoS4WqL+kkUTO9KOmypm5Z+
-         k0rCwhl+jKBp7mAZJyrOPcaX1RwhUX5H07ddOuPijZepROtP9u+Y+LJcX3Ji3c2Y9Y3J
-         hmiFG39jws6PiwPb3pvYmUarhQR5J+hZSTzgPhINSwXy0R0nDJuSDHJuK9sJ71Ft5AvF
-         I3XcVcYtzT/oLdIbhqoHt04kgpQDc7GVL4c5LmcUftmPRSqd9SJXfX0sbddTGKV+Qzv2
-         5klw==
-X-Gm-Message-State: AOJu0YyKFWEyTY2HEQzPvmWhGq2+syz0UbXvMxEbjfJjxJ//89hXGe2w
-	Y6Ulizrt2CTiliESuGzmLZzDOiwYKOu9+BvrMzsaMvu95SqY13WfxtUl+Epz7JxiFq4T19gKUdJ
-	i6H2VoNql3Mpx8w+oy1ItBGb5i3Y=
-X-Google-Smtp-Source: AGHT+IH89qphMd3C98ZhHPGv1wkGUAnGP1DdZBi8LhtjrqsDcNxg8d27TLoybQP5+22pqAJJrYEC3u3w41jbABqpIvc=
-X-Received: by 2002:adf:e509:0:b0:34a:961:62cc with SMTP id
- j9-20020adfe509000000b0034a096162ccmr5300656wrm.44.1713741755158; Sun, 21 Apr
- 2024 16:22:35 -0700 (PDT)
+	s=arc-20240116; t=1713741779; c=relaxed/simple;
+	bh=x7/9k3VUkArG5pgm3qecA36nkdPnWUn28VxB8zg3sgs=;
+	h=Content-Type:MIME-Version:From:To:Cc:Subject:In-reply-to:
+	 References:Date:Message-id; b=tyKMaR3ZAWVwh6AxqwZwkDcFQzwMNbOtX6q2wh3cdiNwEUpYO+WxWncFlwH2dia4gP/m9/Id9ceq5l3A1iiArJqqR9Rq00hEx0gODmW5r/8uZaauyC/t9FPI33BglyjaI6NpjjbU7Jf8RtfbjgcTZo1pUiJUvC7ZvrcrcTZuUXU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=IjERKFur; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=gbeOhgDI; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=IjERKFur; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=gbeOhgDI; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id B492F3470C;
+	Sun, 21 Apr 2024 23:22:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1713741775; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=itTVdaSaWpVAwo/eRp+XlnufM44f07MOYwHHeFt+cBo=;
+	b=IjERKFurEfo0l04lIurGTVPkHlOCkl6lPkxF9FFO30jMUDg8cOfPI6XY9rl8cVahn77gHv
+	g8ly4QKY9rQkFxqbNmgmp5ht1aC6mspXRP/1LYq28jQzVqUW24M5ajthM+o7RL8KPzFcvs
+	aLCArjw/wQUL6S71p9/yy/hqMkLbDzE=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1713741775;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=itTVdaSaWpVAwo/eRp+XlnufM44f07MOYwHHeFt+cBo=;
+	b=gbeOhgDIjmhSRmotPdrLXo3RqSblX5SSy9WqeZrguDNV9/3Avxf/qeFAKKyZLXhH5QM+WM
+	o4AC2/uGGbOTkWAA==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=IjERKFur;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=gbeOhgDI
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1713741775; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=itTVdaSaWpVAwo/eRp+XlnufM44f07MOYwHHeFt+cBo=;
+	b=IjERKFurEfo0l04lIurGTVPkHlOCkl6lPkxF9FFO30jMUDg8cOfPI6XY9rl8cVahn77gHv
+	g8ly4QKY9rQkFxqbNmgmp5ht1aC6mspXRP/1LYq28jQzVqUW24M5ajthM+o7RL8KPzFcvs
+	aLCArjw/wQUL6S71p9/yy/hqMkLbDzE=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1713741775;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=itTVdaSaWpVAwo/eRp+XlnufM44f07MOYwHHeFt+cBo=;
+	b=gbeOhgDIjmhSRmotPdrLXo3RqSblX5SSy9WqeZrguDNV9/3Avxf/qeFAKKyZLXhH5QM+WM
+	o4AC2/uGGbOTkWAA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 5F37E13687;
+	Sun, 21 Apr 2024 23:22:49 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([10.150.64.162])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id ar9KAMmfJWYobAAAD6G6ig
+	(envelope-from <neilb@suse.de>); Sun, 21 Apr 2024 23:22:49 +0000
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <171217454226.1598374.8971335637623132496.stgit@ahduyck-xeon-server.home.arpa>
- <171217495098.1598374.12824051034972793514.stgit@ahduyck-xeon-server.home.arpa>
- <cb2519c4-0514-4237-94f8-6707263806a1@lunn.ch>
-In-Reply-To: <cb2519c4-0514-4237-94f8-6707263806a1@lunn.ch>
-From: Alexander Duyck <alexander.duyck@gmail.com>
-Date: Sun, 21 Apr 2024 16:21:57 -0700
-Message-ID: <CAKgT0UdaMtDtHevCX5cM+=4Z1krVCbQg56YJEiNX880H-+cxVg@mail.gmail.com>
-Subject: Re: [net-next PATCH 11/15] eth: fbnic: Enable Ethernet link setup
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: netdev@vger.kernel.org, Alexander Duyck <alexanderduyck@fb.com>, kuba@kernel.org, 
-	davem@davemloft.net, pabeni@redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From: "NeilBrown" <neilb@suse.de>
+To: "Lex Siegel" <usiegl00@gmail.com>
+Cc: "Chuck Lever" <chuck.lever@oracle.com>, "Jeff Layton" <jlayton@kernel.org>,
+ "Olga Kornievskaia" <kolga@netapp.com>, "Dai Ngo" <Dai.Ngo@oracle.com>,
+ "Tom Talpey" <tom@talpey.com>,
+ "Trond Myklebust" <trond.myklebust@hammerspace.com>,
+ "Anna Schumaker" <anna@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
+ "Paolo Abeni" <pabeni@redhat.com>, linux-nfs@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bpf@vger.kernel.org
+Subject: Re: [PATCH] xprtsock: Fix a loop in xs_tcp_setup_socket()
+In-reply-to: <20240420104801.94701-1-usiegl00@gmail.com>
+References: <20240420104801.94701-1-usiegl00@gmail.com>
+Date: Mon, 22 Apr 2024 09:22:35 +1000
+Message-id: <171374175513.12877.8993642908082014881@noble.neil.brown.name>
+X-Spam-Level: 
+X-Spamd-Result: default: False [-4.27 / 50.00];
+	DWL_DNSWL_MED(-2.00)[suse.de:dkim];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	BAYES_HAM(-0.76)[84.23%];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	ARC_NA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_SOME(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	R_RATELIMIT(0.00)[from(RLewrxuus8mos16izbn)];
+	RCVD_TLS_ALL(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,suse.de:dkim];
+	RCVD_COUNT_TWO(0.00)[2];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	DKIM_TRACE(0.00)[suse.de:+]
+X-Rspamd-Action: no action
+X-Rspamd-Queue-Id: B492F3470C
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Spam-Flag: NO
+X-Spam-Score: -4.27
 
-On Fri, Apr 5, 2024 at 2:51=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
->
-> > +#define FBNIC_CSR_START_PCS          0x10000 /* CSR section delimiter =
-*/
-> > +#define FBNIC_PCS_CONTROL1_0         0x10000         /* 0x40000 */
-> > +#define FBNIC_PCS_CONTROL1_RESET             CSR_BIT(15)
-> > +#define FBNIC_PCS_CONTROL1_LOOPBACK          CSR_BIT(14)
-> > +#define FBNIC_PCS_CONTROL1_SPEED_SELECT_ALWAYS       CSR_BIT(13)
-> > +#define FBNIC_PCS_CONTROL1_SPEED_ALWAYS              CSR_BIT(6)
->
-> This appears to be PCS control register 1, define in 45.2.3.1. Since
-> this is a standard register, please add it to mdio.h.
+On Sat, 20 Apr 2024, Lex Siegel wrote:
+> When using a bpf on kernel_connect(), the call can return -EPERM.
+> This causes xs_tcp_setup_socket() to loop forever, filling up the
+> syslog and causing the kernel to freeze up.
+>=20
+> Signed-off-by: Lex Siegel <usiegl00@gmail.com>
+> ---
+>  net/sunrpc/xprtsock.c | 2 ++
+>  1 file changed, 2 insertions(+)
+>=20
+> diff --git a/net/sunrpc/xprtsock.c b/net/sunrpc/xprtsock.c
+> index bb9b747d58a1..47b254806a08 100644
+> --- a/net/sunrpc/xprtsock.c
+> +++ b/net/sunrpc/xprtsock.c
+> @@ -2446,6 +2446,8 @@ static void xs_tcp_setup_socket(struct work_struct *w=
+ork)
+>  		/* Happens, for instance, if the user specified a link
+>  		 * local IPv6 address without a scope-id.
+>  		 */
+> +	case -EPERM:
+> +		/* Happens, for instance, if a bpf is preventing the connect */
 
-Actually all these bits are essentially there in the forms of:
-MDIO_CTRL1_RESET, MDIO_PCS_CTRL1_LOOPBACK, and MDIO_CTRL1_SPEEDSELEXT.
-I will base the driver on these values.
+This will propagate -EPERM up into other layers which might not be ready
+to handle it.
+It might be safer to map EPERM to an error we would be more likely to
+expect  from the network system - such as ECONNREFUSED or ENETDOWN.
 
-> > +#define FBNIC_PCS_VENDOR_VL_INTVL_0  0x10202         /* 0x40808 */
->
-> Could you explain how these registers map to 802.3 clause 45? Would
-> that be 3.1002? That would however put it in the reserved range 3.812
-> through 3.1799. The vendor range is 3.32768 through 3.65535.
+Better still would be for kernel_connect() to return a more normal error
+code - not EPERM.  If that cannot be achieved, then I think it would be
+best for the sunrpc code to map EPERM to something else at the place
+where kernel_connect() is called - catch it early.
 
-So from what I can tell the vendor specific registers are mapped into
-the middle of the range starting at register 512 instead of starting
-at 32768. So essentially offsets 512 - 612 and 1544 - 1639 appear to
-be used for the vendor specific registers. In addition we have an
-unused block of PCS registers that are unused from 1024 to 1536 as
-they were there for an unsupported speed configuration.
+NeilBrown
 
-> > +#define FBNIC_CSR_START_RSFEC                0x10800 /* CSR section de=
-limiter */
-> > +#define FBNIC_RSFEC_CONTROL(n)\
-> > +                             (0x10800 + 8 * (n))     /* 0x42000 + 32*n=
- */
-> > +#define FBNIC_RSFEC_CONTROL_AM16_COPY_DIS    CSR_BIT(3)
-> > +#define FBNIC_RSFEC_CONTROL_KP_ENABLE                CSR_BIT(8)
-> > +#define FBNIC_RSFEC_CONTROL_TC_PAD_ALTER     CSR_BIT(10)
-> > +#define FBNIC_RSFEC_MAX_LANES                        4
-> > +#define FBNIC_RSFEC_CCW_LO(n) \
-> > +                             (0x10802 + 8 * (n))     /* 0x42008 + 32*n=
- */
-> > +#define FBNIC_RSFEC_CCW_HI(n) \
-> > +                             (0x10803 + 8 * (n))     /* 0x4200c + 32*n=
- */
->
-> Is this Corrected Code Words Lower/Upper? 1.202 and 1.203?
 
-Yes and no, this is 3.802 and 3.803 which I assume is more or less the
-same thing but the PCS variant.
+>  	case -ECONNREFUSED:
+>  	case -ECONNRESET:
+>  	case -ENETDOWN:
+> --=20
+> 2.39.3
+>=20
+>=20
 
-> > +#define FBNIC_RSFEC_NCCW_LO(n) \
-> > +                             (0x10804 + 8 * (n))     /* 0x42010 + 32*n=
- */
-> > +#define FBNIC_RSFEC_NCCW_HI(n) \
-> > +                             (0x10805 + 8 * (n))     /* 0x42014 + 32*n=
- */
->
-> Which suggests this is Uncorrected code Words? 1.204, 1.205? I guess
-> the N is for Not?
-
-These are 3.804 and 3.805.
-
-From what I can tell the first 6 registers for the RSFEC are laid out
-in the same order. However we have 4 of these blocks that we have to
-work with and they are tightly packed such that the second block
-starts at offset 8 following the start of the first block.
-
-> > +#define FBNIC_RSFEC_SYMBLERR_LO(n) \
-> > +                             (0x10880 + 8 * (n))     /* 0x42200 + 32*n=
- */
-> > +#define FBNIC_RSFEC_SYMBLERR_HI(n) \
-> > +                             (0x10881 + 8 * (n))     /* 0x42204 + 32*n=
- */
->
-> And these are symbol count errors, 1.210 and 1.211?
-
-I think this is 3.600 and 3.601.  However we only have 8 sets of
-registers instead of 16.
-
-> If there are other registers which follow 802.3 it would be good to
-> add them to mdio.h, so others can share them.
-
-I will try to see what I can do. I will try to sort out what is device
-device specific such as our register layout versus what is shared such
-as PCS register layouts and such.
-
-Thanks,
-
-- Alex
 
