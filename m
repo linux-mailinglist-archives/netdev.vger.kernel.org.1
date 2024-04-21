@@ -1,94 +1,95 @@
-Return-Path: <netdev+bounces-89852-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89853-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A39558ABE89
-	for <lists+netdev@lfdr.de>; Sun, 21 Apr 2024 06:06:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E964E8ABE8E
+	for <lists+netdev@lfdr.de>; Sun, 21 Apr 2024 06:20:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9BE3BB20D0D
-	for <lists+netdev@lfdr.de>; Sun, 21 Apr 2024 04:06:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B6CEB1C208BC
+	for <lists+netdev@lfdr.de>; Sun, 21 Apr 2024 04:20:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E4F4610B;
-	Sun, 21 Apr 2024 04:06:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AE586FB1;
+	Sun, 21 Apr 2024 04:20:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="bK31KVB/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-133.freemail.mail.aliyun.com (out30-133.freemail.mail.aliyun.com [115.124.30.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E4224C8F
-	for <netdev@vger.kernel.org>; Sun, 21 Apr 2024 04:06:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.71
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 594AB205E22;
+	Sun, 21 Apr 2024 04:20:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713672370; cv=none; b=lOWloj00gFmXP+rlV/Jl4g6Eix0cseafpgvkqmPoORtBL1J7RkSs+aQbGxAn2/8p8M+SWzSQ3+2P1b9hYsox4i9Xh9ZZHSi8POGlNyKUlkZGjs1oJQqxPvd6YnEA9zrSbU7hYatRJMxnRFOuKcEGj9/8CA4BuKf40584F9kg6Zc=
+	t=1713673226; cv=none; b=C+oPbM0KzPJ6ypwupu70iTzHXeqtRQ36HRF6GKyWd+0GWcsL8ul4IPiolcnLhwI1sKQpmiv1qdVOQE7IpFif6mF1S1HvbKjJl2KsvAE0ZT1mGmvl/7QJDZbJek37mzM95pvXnlQBABrpqDRLcyOXbsJBtv5uddzgQB//5QVOcUs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713672370; c=relaxed/simple;
-	bh=ivnupM3viXPGONEHVF7SgtTpM+1Bg7+RollTeSsoAcc=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=S7FY8MKXRl9Tu0XGfszgDHPsHNdPxpeK24OhdjybZyUGGTdSCIQWYRbQcW/rgrTGGzfbIHAgliI3rdrA01RrSqU4Xh4mHZ6NXVQtVi5EZlrNFZMZIwPSCYaVkX3iOHAj2+HJvt6up4vuXN6t1DQT5oi9QJY380RS7sQnSdsNCMs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-7d5f08fdba8so437852439f.0
-        for <netdev@vger.kernel.org>; Sat, 20 Apr 2024 21:06:04 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713672364; x=1714277164;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UU7nndG2AnvwqiWCSKJ6rau9gqHABbkSdqnDcP3B6EE=;
-        b=hJlhZJCMXpN7UQwd3zzdQADunsEYzd3cUmjbHTAeH5tkN7fji58V8xntqRqhaFumiy
-         wnpwFOPEMvsP7ExwwjPXOFDb8vYXIBDQqgDExX/78dWKyZAK4Qr7xLk4pPF6qeZH+NZ8
-         +1vxoU5snijyQQXXlujx6bETJ0eGyN60YNDvmuZr9xdT2yUKaOidqueEx/jEmbqc8VCV
-         A6S5Fqc+tO9A20rAp14gvbniDQQzzRZuLVHwXR4PrlNhNB2WJT2a6Yd2VMLuOi9to22i
-         5deBtbHs8wtsmbJxY9bCSNBOCGhOH5LqY4bL9/3AgTrDvDyS/YsUg3915ezvHBcjzmm1
-         CmtQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXDth1L5SXWvg42Cu7w34+7XBTgnAc9cBSERmCYl/3d8219BH3ruRYuzggd2hr1M0hJKjUtVW7hd0/GAhDsEvkh/5iz2py9
-X-Gm-Message-State: AOJu0YycEkoiejptZJtIrbW0I6V1NKLFi0Pzj+45lmG8QllKqRdyN6tE
-	KJn7OhkpaFSQgbw+eZ51ZTVxgtbJKCOi7CYrihCwZiIeZE4yGJWnlr8Pj4lr6B4tUbm0Nbmui8F
-	vjtub5EL11EFWBBNtNFUMD6pUIULtQMT9eNamM0w2nvjKgJ+UP4+cltY=
-X-Google-Smtp-Source: AGHT+IHrmIgNYp/ns7pE6R2KqnJFtlVnW9sIUOTGXy0FKhzo9u5sqReX0dTErI4ygwlIkJAx+ytQE1wfPGIhgzhnWotOz+ClHbeG
+	s=arc-20240116; t=1713673226; c=relaxed/simple;
+	bh=Fia/NOQDg2NSKAvnGUjySIpAQpocq0N7R66l0Bxfznk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=usTK7C9rfRm7HMmvHm5eRUHo47Kqc5D4STAEYylZrIAlrlcufr/lsowMApKXbXvvJBGZF/MqwdZMMY4GaMSdn3usFFuCoTaVv1qtMuIqymxBl0962e/9csumkq/uKz7rFBRLJX3fMUHNdYp25u2xq9YziJtEf2kWZf3TAiAC05o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=bK31KVB/; arc=none smtp.client-ip=115.124.30.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1713673212; h=From:To:Subject:Date:Message-Id:MIME-Version;
+	bh=Nyr0azZbnC6nTJRwiHKGfZve/bodqQulNxxfMB3ftGo=;
+	b=bK31KVB/hR1MdbFYv/f1v+EcOfCz+pb4BvHJNYifiTGplGxYCKTJCX9SHcR6fkpe35/iocN6EowH8OYl0F4tWW2AnAlQ5va79yDv5bFDglLSSIIluRxekuIgiMxmVg0tQcH/ESUQhAEcF99lf4dJa9oayp65Ael8M/V3QJYojQo=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R131e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046056;MF=lulie@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0W4w6o3N_1713673209;
+Received: from localhost(mailfrom:lulie@linux.alibaba.com fp:SMTPD_---0W4w6o3N_1713673209)
+          by smtp.aliyun-inc.com;
+          Sun, 21 Apr 2024 12:20:11 +0800
+From: Philo Lu <lulie@linux.alibaba.com>
+To: netdev@vger.kernel.org,
+	bpf@vger.kernel.org
+Cc: edumazet@google.com,
+	davem@davemloft.net,
+	martin.lau@linux.dev,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	andrii@kernel.org,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	dsahern@kernel.org,
+	xuanzhuo@linux.alibaba.com,
+	fred.cc@alibaba-inc.com
+Subject: [PATCH net-next 0/2] tcp: update TCPCB_EVER_RETRANS after trace_tcp_retransmit_skb()
+Date: Sun, 21 Apr 2024 12:20:07 +0800
+Message-Id: <20240421042009.28046-1-lulie@linux.alibaba.com>
+X-Mailer: git-send-email 2.32.0.3.g01195cf9f
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:4109:b0:485:30d9:5e7b with SMTP id
- ay9-20020a056638410900b0048530d95e7bmr30128jab.0.1713672364352; Sat, 20 Apr
- 2024 21:06:04 -0700 (PDT)
-Date: Sat, 20 Apr 2024 21:06:04 -0700
-In-Reply-To: <000000000000c1fa0506166fdcfe@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000089f36106169370d0@google.com>
-Subject: Re: [syzbot] [net?] KASAN: slab-use-after-free Read in unix_del_edges
-From: syzbot <syzbot+f3f3eef1d2100200e593@syzkaller.appspotmail.com>
-To: axboe@kernel.dk, davem@davemloft.net, edumazet@google.com, 
-	hdanton@sina.com, kuba@kernel.org, kuni1840@gmail.com, kuniyu@amazon.com, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-syzbot has bisected this issue to:
+Move TCPCB_EVER_RETRANS updating after the trace_tcp_retransmit_skb()
+in __tcp_retransmit_skb(), and then we are aware of whether the skb has
+ever been retransmitted in this tracepoint. This can be used, e.g., to get
+retransmission efficiency by counting skbs w/ and w/o TCPCB_EVER_RETRANS
+(through bpf tracing programs).
 
-commit 77e5593aebba823bcbcf2c4b58b07efcd63933b8
-Author: Kuniyuki Iwashima <kuniyu@amazon.com>
-Date:   Mon Mar 25 20:24:20 2024 +0000
+For this purpose, TCPCB_EVER_RETRANS is also needed to be exposed to bpf.
+Previously, the flags are defined as macros in struct tcp_skb_cb. I moved them
+out into a new enum, and then they can be accessed with vmlinux.h.
 
-    af_unix: Skip GC if no cycle exists.
+We have discussed to achieve this with BPF_SOCK_OPS in [0], and using
+tracepoint is thought to be a better solution.
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=14bbda4f180000
-start commit:   7b4f2bc91c15 Add linux-next specific files for 20240418
-git tree:       linux-next
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=16bbda4f180000
-console output: https://syzkaller.appspot.com/x/log.txt?x=12bbda4f180000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=ae644165a243bf62
-dashboard link: https://syzkaller.appspot.com/bug?extid=f3f3eef1d2100200e593
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=155e53af180000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=128b1d53180000
+[0]
+https://lore.kernel.org/all/20240417124622.35333-1-lulie@linux.alibaba.com/
 
-Reported-by: syzbot+f3f3eef1d2100200e593@syzkaller.appspotmail.com
-Fixes: 77e5593aebba ("af_unix: Skip GC if no cycle exists.")
+Philo Lu (2):
+  tcp: move tcp_skb_cb->sacked flags to enum
+  tcp: update sacked after tracepoint in __tcp_retransmit_skb
 
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+ include/net/tcp.h     | 22 +++++++++++++---------
+ net/ipv4/tcp_output.c | 11 ++++++-----
+ 2 files changed, 19 insertions(+), 14 deletions(-)
+
+--
+2.32.0.3.g01195cf9f
+
 
