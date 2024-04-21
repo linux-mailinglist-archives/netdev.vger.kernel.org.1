@@ -1,160 +1,194 @@
-Return-Path: <netdev+bounces-89890-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89891-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4BD9D8AC138
-	for <lists+netdev@lfdr.de>; Sun, 21 Apr 2024 22:42:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF7C78AC13F
+	for <lists+netdev@lfdr.de>; Sun, 21 Apr 2024 23:07:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6E80C1C20473
-	for <lists+netdev@lfdr.de>; Sun, 21 Apr 2024 20:42:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 487381F20FD6
+	for <lists+netdev@lfdr.de>; Sun, 21 Apr 2024 21:07:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AE293A1A2;
-	Sun, 21 Apr 2024 20:42:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 921CF4437D;
+	Sun, 21 Apr 2024 21:07:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CNfD9/qz"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="E1B3q/2v"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
+Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 708B453A9;
-	Sun, 21 Apr 2024 20:42:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02497219F9
+	for <netdev@vger.kernel.org>; Sun, 21 Apr 2024 21:07:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713732125; cv=none; b=m3D/Pe5FSSXd+Hq7cWAQoXn/B4Ojva0s7thaniNLozuzBoP1KpL8ZjFilaXnn4piOEMQrMZVqA1dHcYE0qDkPxVFBMVJm8DEuDxgFdqaL2wxQLVbCgJENDoxmb/feXxehK8hYTI4GLaKSW3w+l71RvOe7ck8EdI63XMEsA9iqCA=
+	t=1713733644; cv=none; b=Ls5U2bJqJ6yEPWRq0UB86WjX5+ldekkLfMc7VQVMchR2fbVZVmuEOq6YtDu29jgfSntw08XU3ACtALQR9pKnzocGfrgau6gQGvv+LG1+BwrR2iYsfXRyaKRz2FoLhu2X96az2mec11u2DWSaQEqCrM0F58shor28STXdcLzIU/w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713732125; c=relaxed/simple;
-	bh=z4824Ee6qqvC/GnseeCAJpGQcHhKN07+uO/XSuUiVX4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QiL1629+eDmHX8VIf1Z3PbVtsVknp+wG1KCqqMJjV+4WGtT22AqAM7ZCoGYNkfypNtDtAbGT3hUjmOwLj8Lo+slEEngVUHgeguHXBrrCctx8pQYSIgP5Qjek0B784N61hYqGLEJCv431cxgDr6F/hygYKXu1j/ysNe7PEE3Si5Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CNfD9/qz; arc=none smtp.client-ip=209.85.221.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-343cfa6faf0so3571473f8f.0;
-        Sun, 21 Apr 2024 13:42:03 -0700 (PDT)
+	s=arc-20240116; t=1713733644; c=relaxed/simple;
+	bh=fw1TxB4UcuVOBhxihbMJeZ2PSmk3RcuwvuiKeCuLKws=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=RCe2EgHAnDzL+wd+q4vkMJY2kVjlG1PomgZJxsd3/W21esTepkbmdB20Tc0x2ApD0EZKW4td/aMfSLGMlBqcCLXpqHSQRlksy/D+i5RIb4BsrY+debkeEABK4sO12OnBO6uq65JO+7QIFtmq38LQywsXw2qj3Iq93uK3rVU5+Wo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=E1B3q/2v; arc=none smtp.client-ip=209.85.160.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-436ed871225so298761cf.1
+        for <netdev@vger.kernel.org>; Sun, 21 Apr 2024 14:07:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713732122; x=1714336922; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=aNPRXKeC6yyHWdrE6FYU8LBAnN64lHTdyumHo/WiS+U=;
-        b=CNfD9/qzhUxVcizi/rCwFYVfJNwXmrtpa0jupZMd3OpcBL0Qy2PG4mRzpAIwBaTFkC
-         gPZXgPhN185XVnYb0KKA4dekWsWoV7pxpATmc1eiofO+sserdehQYbOSw6ayATA4URlt
-         tzb2yjYJ0tQnOZNnmDax27zrTRMx2ocTsWwNVgXui0k16CRdReqiUVDAsGZRgyQgWy+o
-         VN6KhTvsoNXys/Kc9fvylWaO9U1dO0PE+fBVQL2sQm6bhiB4bkMOTe2W5Nzq06UmVWLI
-         xt4qK4YoS9TzwRnXNWK5eKs8SlnnuyGyX0F34Ps14hZZnvTirMGpyri67wrO61GxNpKf
-         mmkA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713732122; x=1714336922;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1713733642; x=1714338442; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=aNPRXKeC6yyHWdrE6FYU8LBAnN64lHTdyumHo/WiS+U=;
-        b=oDudI5/nkdAgmQ61WxmiV4SD5Xx02stwlj7vyWDxM2RXj7Y+iicCthKAI/o++5GHU7
-         il6ddLkCkBxK9KAaz6e26USB1rBMK8gzSpdgNE3Qr57S8F3c88Uttbs80+i6uUsm3E19
-         8fOq++8te77OciHWFceDQ0llSood/GJIVffOx6AcE6tP5ex8yM5fQ8UD64haDmXdpg0K
-         VFcGh3uLvUq3k6/38bWSOANSWk8TbDfc9KGWxdEVETtWv9hkGb+AMubAWvc7NOYs7MPr
-         FCR/lrU9AYLsc1XClqyu6NaBAQTPUUvWZl+e+FAWvD6OZEAO9FAKJhZjFyEFWikRIwcY
-         odFA==
-X-Forwarded-Encrypted: i=1; AJvYcCV1Ey5RnmgQWgAX+brOiKBt8xwAQsdd2qHWOuDWjuohY0PqFlX8xLtB5KTCqR5g743bWYd02eMiSJ2pg64DxycfWIXI0mebEaLeeq9KKHzeQ/Sbc+TU34U077Zz6ssIvZCaOpBOe68YdFxcZYi/BnRnOYdk+UcCV7eGzi2o3p+z
-X-Gm-Message-State: AOJu0YwwrCGkpkbXg+ZQlBHY6K8DGCHnkvVzJwCvsrv8OgY+sCB4Uw3R
-	Ww+ndyRKFToAT5FFDP8Hc2chVPjqvQeoowguw0J9oR7f6P8jvBhg9V3QhMhU
-X-Google-Smtp-Source: AGHT+IG5XSpMhWBthw2oiOgEK9uBpkPJ1mVBk29Xr2Q0Bsmq5YBrrBRZMUzwD1AikBpM/o6mx9JxJw==
-X-Received: by 2002:adf:e683:0:b0:345:605e:fa38 with SMTP id r3-20020adfe683000000b00345605efa38mr6152183wrm.60.1713732121412;
-        Sun, 21 Apr 2024 13:42:01 -0700 (PDT)
-Received: from fedora (host-79-27-41-113.retail.telecomitalia.it. [79.27.41.113])
-        by smtp.gmail.com with ESMTPSA id z13-20020a17090655cd00b00a4739efd7cesm4944632ejp.60.2024.04.21.13.42.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 21 Apr 2024 13:42:01 -0700 (PDT)
-Date: Sun, 21 Apr 2024 22:41:59 +0200
-From: Francesco Valla <valla.francesco@gmail.com>
-To: Oliver Hartkopp <socketcan@hartkopp.net>
-Cc: Vincent Mailhol <vincent.mailhol@gmail.com>,
-	Marc Kleine-Budde <mkl@pengutronix.de>, linux-can@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Simon Horman <horms@kernel.org>,
-	Bagas Sanjaya <bagasdotme@gmail.com>, fabio@redaril.me
-Subject: Re: [PATCH v2 1/1] Documentation: networking: document ISO
- 15765-2:2016
-Message-ID: <ZiV6FwQWECidli7D@fedora>
-References: <20240329133458.323041-2-valla.francesco@gmail.com>
- <20240329133458.323041-3-valla.francesco@gmail.com>
- <CAMZ6RqKLaYb+8EaeoFMHofcaBT5G2-qdqSb4do73xrgMvWMZaA@mail.gmail.com>
- <9f5ad308-f2a0-47be-85f3-d152bc98099a@hartkopp.net>
- <CAMZ6RqKGKcYd4hAM8AVV72t78H-Kt92NXowx6Q+YCw=AuSxKuw@mail.gmail.com>
- <64586257-3cf6-4c10-a30b-200b1ecc5e80@hartkopp.net>
- <Zh6qiDwbEnaJtTvl@fedora>
- <d4a55991-0ccc-4e8f-8acb-56077600c9e0@hartkopp.net>
- <CAMZ6RqJUHJdq30CrAzT26_RqpDOH_iMP8A6SKSAYrWBe-T+Oww@mail.gmail.com>
- <94638dbd-4768-4110-b85f-f158ced21ba0@hartkopp.net>
+        bh=oAu20l25ZV8ozJmVJz66xC1jDVBk272i4dhMpTfFjKQ=;
+        b=E1B3q/2vy83MDo8EDnheBGOb8ZI/gZD1n5nC12tipTvbj8bndysFpHfurYUt38VW9u
+         RZ2TGcO6yIivn2sgKWRiuQVohdIAKcY0PtQ8/DVardDxNQiZ9yaT5cdHT/QGRrO6Hx2i
+         h+1NtwJ/nhZypBrLz3Htjcs9nIcR/3Z+ZrXoM1/7M27DrO156FZIkvxckrsYUx5Ix46P
+         jqZqzEZXxjf8I6DaV4fOdYAt95ZXcrbBnjNoIV9S6dSROgtck+KcGjPYD574utMqZhTR
+         DwHijsx7zkJ1qQjUNccDsbQ1L+FolHLWhA+5QZZOmWHJZtORFahc94j1DzvBTwIO/63V
+         dGlQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713733642; x=1714338442;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=oAu20l25ZV8ozJmVJz66xC1jDVBk272i4dhMpTfFjKQ=;
+        b=ar2/7k6VgYjyZj4bugEYYV4ByISTmjMmL3K4zvIIKBRgu3m8PqX+Cx8Ehd/FqXiVzP
+         T0Qw7yIvL8tNLyHyMvVoODLtgIWAd+SNZVOADqSHXpIp/Mi3KuXTJ52TynjpovTXYZzX
+         FHMIs3cSLm2i0tvxFut79FEivLCR5ROxPLxD8EmW0S1EnMK+/HvdNqJOgQL6Dgf/zK5n
+         03YvlsMoskqC9PPcd3v8Wk6pYJejxjKHsIz3CREg0p+hp0+XgdLEBKeLDfl+NaS5ZM9Q
+         TRS5ZxbW+jF9UFfSvD42V2tfx/bNsjdOH9JY+JNJd/o8c84vELxTN6f2kPscaKa80ztt
+         NdAg==
+X-Forwarded-Encrypted: i=1; AJvYcCVHnDs/tLgh3QY1eTrO3xfBtOIwybupPtB66UWGZodunc3wn7phgHRwtZ8jp/aOrm59dzf1HKSrmEFq7uhzJjcfwg5Yh10j
+X-Gm-Message-State: AOJu0YzTi6g5m65j6WpXsHiU89KqimoJz4lv2mivOwDdFfP2oGkbU71D
+	qOWCW0kxXm730ywvc37gtHEQLuIVxd8LYHEiSqxnUJqQkvqXV/O+QhL8LTwSTmEKtrwqiIcxl3u
+	uGo6dSFLti2R9Zi8THLQ7H1+DmrsluSzxzfbO
+X-Google-Smtp-Source: AGHT+IHr59MZNmDtDIguYM0qeMzWhkE70syUGT2vovGBLJYMjCscL89E/NtxRAKBEkg8D1Xr87dbQoED9+Z8sMzqjdc=
+X-Received: by 2002:ac8:514e:0:b0:437:c5ff:ac05 with SMTP id
+ h14-20020ac8514e000000b00437c5ffac05mr285313qtn.1.1713733641590; Sun, 21 Apr
+ 2024 14:07:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <94638dbd-4768-4110-b85f-f158ced21ba0@hartkopp.net>
+References: <20240421175248.1692552-1-edumazet@google.com>
+In-Reply-To: <20240421175248.1692552-1-edumazet@google.com>
+From: Soheil Hassas Yeganeh <soheil@google.com>
+Date: Sun, 21 Apr 2024 17:06:45 -0400
+Message-ID: <CACSApvbc__=J-_hNReeDTNAj2_KJjQaseP+QnY2aQgQGbvkQwA@mail.gmail.com>
+Subject: Re: [PATCH net] net: fix sk_memory_allocated_{add|sub} vs softirqs
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+	Willem de Bruijn <willemb@google.com>, Neal Cardwell <ncardwell@google.com>, eric.dumazet@gmail.com, 
+	Jonathan Heathcote <jonathan.heathcote@bbc.co.uk>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sat, Apr 20, 2024 at 09:51:41PM +0200, Oliver Hartkopp wrote:
-> On 17.04.24 17:21, Vincent Mailhol wrote:
-> 
-> > If we bump the version to :2024, then I suggest to:
-> > 
-> >    - add a first patch in this series to update Kconfig.
-> >    - add your documentation as a second patch directly with the :2024 version.
-> > 
-> 
-> Ok.
-> 
-> > I can also use ISO 11898-1 as an example. Our documentation says that
-> > we support ISO 11898-1:2015. The previous version: ISO 11898-1:2003 is
-> > not mentioned a single time in the full kernel tree. Yet, I do not
-> > think that any one was ever confused that the kernel may not be
-> > compatible with ISO 11898-1:2003.
-> > 
-> > If you really think that there is a risk of confusion, then maybe just
-> > adding a sentence to say that we support ISO 15765-2:2024 and all
-> > previous versions would be enough?
-> > 
-> > But overall, I do not see the benefit to keep the older version.
-> 
-> We currently have different occurrences of the 15765-2 term:
-> 
-> $ git grep "15765-2"
-> include/uapi/linux/can.h:#define CAN_ISOTP      6 /* ISO 15765-2 Transport
-> Protocol */
-> include/uapi/linux/can/isotp.h: * Definitions for isotp CAN sockets (ISO
-> 15765-2:2016)
-> net/can/Kconfig:        tristate "ISO 15765-2:2016 CAN transport protocol"
-> net/can/Kconfig:          ISO 15765-2:2016 for 'classic' CAN and CAN FD
-> frame types.
-> net/can/isotp.c:/* isotp.c - ISO 15765-2 CAN transport protocol for protocol
-> family CAN
-> net/can/isotp.c:MODULE_DESCRIPTION("PF_CAN isotp 15765-2:2016 protocol");
-> net/can/isotp.c:/* ISO 15765-2:2016 supports more than 4095 byte per ISO PDU
-> as the FF_DL can
-> net/can/isotp.c:/* maximum PDU size before ISO 15765-2:2016 extension was
-> 4095 */
-> 
-> I've sent a patch to remove the ISO 15675-2 specification version/date where
-> possible:
-> https://lore.kernel.org/linux-can/20240420194746.4885-1-socketcan@hartkopp.net/T/#u
-> 
-> This also makes clear where the ISO 15765-2:2016 remains helpful IMHO.
-> 
-> I would be fine to remove the version/date in the documentation from
-> Francesco where possible too.
+On Sun, Apr 21, 2024 at 1:52=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
+wrote:
 >
+> Jonathan Heathcote reported a regression caused by blamed commit
+> on aarch64 architecture.
+>
+> x86 happens to have irq-safe __this_cpu_add_return()
+> and __this_cpu_sub(), but this is not generic.
+>
+> I think my confusion came from "struct sock" argument,
+> because these helpers are called with a locked socket.
+> But the memory accounting is per-proto (and per-cpu after
+> the blamed commit). We might cleanup these helpers later
+> to directly accept a "struct proto *proto" argument.
+>
+> Switch to this_cpu_add_return() and this_cpu_xchg()
+> operations, and get rid of preempt_disable()/preempt_enable() pairs.
+>
+> Fast path becomes a bit faster as a result :)
+>
+> Many thanks to Jonathan Heathcote for his awesome report and
+> investigations.
+>
+> Fixes: 3cd3399dd7a8 ("net: implement per-cpu reserves for memory_allocate=
+d")
+> Reported-by: Jonathan Heathcote <jonathan.heathcote@bbc.co.uk>
+> Closes: https://lore.kernel.org/netdev/VI1PR01MB42407D7947B2EA448F1E04EFD=
+10D2@VI1PR01MB4240.eurprd01.prod.exchangelabs.com/
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Cc: Soheil Hassas Yeganeh <soheil@google.com>
 
-Ok, I'll follow this path (first RFC for this patch was without dates).
-I'll try to send a revised v3, also with the details on the mixed
-addressing, as soon as possible.
+Acked-by: Soheil Hassas Yeganeh <soheil@google.com>
 
-Thank you
+Very nice catch! and thank you for the fix!
 
-Regards,
-Francesco
-
+> ---
+>  include/net/sock.h | 38 ++++++++++++++++++++------------------
+>  1 file changed, 20 insertions(+), 18 deletions(-)
+>
+> diff --git a/include/net/sock.h b/include/net/sock.h
+> index f57bfd8a2ad2deaedf3f351325ab9336ae040504..b4b553df7870c0290ae632c51=
+828ad7161ba332d 100644
+> --- a/include/net/sock.h
+> +++ b/include/net/sock.h
+> @@ -1410,32 +1410,34 @@ sk_memory_allocated(const struct sock *sk)
+>  #define SK_MEMORY_PCPU_RESERVE (1 << (20 - PAGE_SHIFT))
+>  extern int sysctl_mem_pcpu_rsv;
+>
+> +static inline void proto_memory_pcpu_drain(struct proto *proto)
+> +{
+> +       int val =3D this_cpu_xchg(*proto->per_cpu_fw_alloc, 0);
+> +
+> +       if (val)
+> +               atomic_long_add(val, proto->memory_allocated);
+> +}
+> +
+>  static inline void
+> -sk_memory_allocated_add(struct sock *sk, int amt)
+> +sk_memory_allocated_add(const struct sock *sk, int val)
+>  {
+> -       int local_reserve;
+> +       struct proto *proto =3D sk->sk_prot;
+>
+> -       preempt_disable();
+> -       local_reserve =3D __this_cpu_add_return(*sk->sk_prot->per_cpu_fw_=
+alloc, amt);
+> -       if (local_reserve >=3D READ_ONCE(sysctl_mem_pcpu_rsv)) {
+> -               __this_cpu_sub(*sk->sk_prot->per_cpu_fw_alloc, local_rese=
+rve);
+> -               atomic_long_add(local_reserve, sk->sk_prot->memory_alloca=
+ted);
+> -       }
+> -       preempt_enable();
+> +       val =3D this_cpu_add_return(*proto->per_cpu_fw_alloc, val);
+> +
+> +       if (unlikely(val >=3D READ_ONCE(sysctl_mem_pcpu_rsv)))
+> +               proto_memory_pcpu_drain(proto);
+>  }
+>
+>  static inline void
+> -sk_memory_allocated_sub(struct sock *sk, int amt)
+> +sk_memory_allocated_sub(const struct sock *sk, int val)
+>  {
+> -       int local_reserve;
+> +       struct proto *proto =3D sk->sk_prot;
+>
+> -       preempt_disable();
+> -       local_reserve =3D __this_cpu_sub_return(*sk->sk_prot->per_cpu_fw_=
+alloc, amt);
+> -       if (local_reserve <=3D -READ_ONCE(sysctl_mem_pcpu_rsv)) {
+> -               __this_cpu_sub(*sk->sk_prot->per_cpu_fw_alloc, local_rese=
+rve);
+> -               atomic_long_add(local_reserve, sk->sk_prot->memory_alloca=
+ted);
+> -       }
+> -       preempt_enable();
+> +       val =3D this_cpu_sub_return(*proto->per_cpu_fw_alloc, val);
+> +
+> +       if (unlikely(val <=3D -READ_ONCE(sysctl_mem_pcpu_rsv)))
+> +               proto_memory_pcpu_drain(proto);
+>  }
+>
+>  #define SK_ALLOC_PERCPU_COUNTER_BATCH 16
+> --
+> 2.44.0.769.g3c40516874-goog
+>
 
