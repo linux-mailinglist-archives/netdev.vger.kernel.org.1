@@ -1,92 +1,94 @@
-Return-Path: <netdev+bounces-89851-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89852-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1688B8ABE74
-	for <lists+netdev@lfdr.de>; Sun, 21 Apr 2024 05:10:32 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A39558ABE89
+	for <lists+netdev@lfdr.de>; Sun, 21 Apr 2024 06:06:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0EC082810F5
-	for <lists+netdev@lfdr.de>; Sun, 21 Apr 2024 03:10:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9BE3BB20D0D
+	for <lists+netdev@lfdr.de>; Sun, 21 Apr 2024 04:06:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D326B17E9;
-	Sun, 21 Apr 2024 03:10:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vK3BeeVz"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E4F4610B;
+	Sun, 21 Apr 2024 04:06:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD22338C
-	for <netdev@vger.kernel.org>; Sun, 21 Apr 2024 03:10:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E4224C8F
+	for <netdev@vger.kernel.org>; Sun, 21 Apr 2024 04:06:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.71
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713669027; cv=none; b=MKIJAAImDB0cEHQkhrkL+HZnBYf3/pIBqsB0gGX5Z0sZJtfFzp25mTqoJjuzBFIMAL3wjSh5knX6a0GssLwW4G9uNpPDaueNP/G18REcWVT6AdO1bfDi8vOequJIIlnUfv5WRGGYRnaZmWFPs0TvNepdKrtXGSu68USlkRd41ws=
+	t=1713672370; cv=none; b=lOWloj00gFmXP+rlV/Jl4g6Eix0cseafpgvkqmPoORtBL1J7RkSs+aQbGxAn2/8p8M+SWzSQ3+2P1b9hYsox4i9Xh9ZZHSi8POGlNyKUlkZGjs1oJQqxPvd6YnEA9zrSbU7hYatRJMxnRFOuKcEGj9/8CA4BuKf40584F9kg6Zc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713669027; c=relaxed/simple;
-	bh=ircFYc4kIlkRbj/zm9NBrQ2aQvD9SNZgzN634lMoxYY=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=GMWR2C6Zj/HkUbNDCAva39oftG+nLlKOnitAJ1SxpPh4hAmcY9fU6jumqoL6zlLcxN6REFm4uWVRIOz96wzwJkKY3m1etf0erpBuygMveOvK1QIeidkMxEIUK3T6Q5HXtE65/3/pi1YF0BqKaPjMivXJDfifTId+MdKqI5fw7/0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vK3BeeVz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 3B3DAC113CC;
-	Sun, 21 Apr 2024 03:10:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713669027;
-	bh=ircFYc4kIlkRbj/zm9NBrQ2aQvD9SNZgzN634lMoxYY=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=vK3BeeVzXvp23KjrMx57RjE3ilYCjlLkJS5KOBVDefzmwCV99D6fKsVaV3lLqiB9j
-	 Av85QdANpu1KTyduhnpxJ5lh3Wa1ftQ0WjCFiRSSaH0PkvCfdKV/KD4vRINmp9JmUZ
-	 2H08RPkDgNCYr04e8HXd3YkABvm42BLR/2J/R3NZ0vOeENJv/4uMOo4WoD5e5r2FdH
-	 Gnl7Cp4MnXkvNPGdrai02g8lPhLuQYa+qa/cDR2lVhhaTpvNnHjkBkIe9AsLe9OMmd
-	 0pk9W33YTRTjQvYEWtUVdUH3+5Z6vfPWF4WJCmqemxYjQT14LHliNHhvgLZs8/h52I
-	 xXmo/Z1A05CpA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 32EC4C43616;
-	Sun, 21 Apr 2024 03:10:27 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1713672370; c=relaxed/simple;
+	bh=ivnupM3viXPGONEHVF7SgtTpM+1Bg7+RollTeSsoAcc=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=S7FY8MKXRl9Tu0XGfszgDHPsHNdPxpeK24OhdjybZyUGGTdSCIQWYRbQcW/rgrTGGzfbIHAgliI3rdrA01RrSqU4Xh4mHZ6NXVQtVi5EZlrNFZMZIwPSCYaVkX3iOHAj2+HJvt6up4vuXN6t1DQT5oi9QJY380RS7sQnSdsNCMs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-7d5f08fdba8so437852439f.0
+        for <netdev@vger.kernel.org>; Sat, 20 Apr 2024 21:06:04 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713672364; x=1714277164;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=UU7nndG2AnvwqiWCSKJ6rau9gqHABbkSdqnDcP3B6EE=;
+        b=hJlhZJCMXpN7UQwd3zzdQADunsEYzd3cUmjbHTAeH5tkN7fji58V8xntqRqhaFumiy
+         wnpwFOPEMvsP7ExwwjPXOFDb8vYXIBDQqgDExX/78dWKyZAK4Qr7xLk4pPF6qeZH+NZ8
+         +1vxoU5snijyQQXXlujx6bETJ0eGyN60YNDvmuZr9xdT2yUKaOidqueEx/jEmbqc8VCV
+         A6S5Fqc+tO9A20rAp14gvbniDQQzzRZuLVHwXR4PrlNhNB2WJT2a6Yd2VMLuOi9to22i
+         5deBtbHs8wtsmbJxY9bCSNBOCGhOH5LqY4bL9/3AgTrDvDyS/YsUg3915ezvHBcjzmm1
+         CmtQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXDth1L5SXWvg42Cu7w34+7XBTgnAc9cBSERmCYl/3d8219BH3ruRYuzggd2hr1M0hJKjUtVW7hd0/GAhDsEvkh/5iz2py9
+X-Gm-Message-State: AOJu0YycEkoiejptZJtIrbW0I6V1NKLFi0Pzj+45lmG8QllKqRdyN6tE
+	KJn7OhkpaFSQgbw+eZ51ZTVxgtbJKCOi7CYrihCwZiIeZE4yGJWnlr8Pj4lr6B4tUbm0Nbmui8F
+	vjtub5EL11EFWBBNtNFUMD6pUIULtQMT9eNamM0w2nvjKgJ+UP4+cltY=
+X-Google-Smtp-Source: AGHT+IHrmIgNYp/ns7pE6R2KqnJFtlVnW9sIUOTGXy0FKhzo9u5sqReX0dTErI4ygwlIkJAx+ytQE1wfPGIhgzhnWotOz+ClHbeG
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] man: fix doc, ip link does support "change"
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171366902720.17190.8973003011969913650.git-patchwork-notify@kernel.org>
-Date: Sun, 21 Apr 2024 03:10:27 +0000
-References: <20240416013214.3131696-1-chenjiayunju@gmail.com>
-In-Reply-To: <20240416013214.3131696-1-chenjiayunju@gmail.com>
-To: Jiayun Chen <chenjiayunju@gmail.com>
-Cc: netdev@vger.kernel.org, shemminger@osdl.org, jiayunchen@smail.nju.edu.cn
+X-Received: by 2002:a05:6638:4109:b0:485:30d9:5e7b with SMTP id
+ ay9-20020a056638410900b0048530d95e7bmr30128jab.0.1713672364352; Sat, 20 Apr
+ 2024 21:06:04 -0700 (PDT)
+Date: Sat, 20 Apr 2024 21:06:04 -0700
+In-Reply-To: <000000000000c1fa0506166fdcfe@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000089f36106169370d0@google.com>
+Subject: Re: [syzbot] [net?] KASAN: slab-use-after-free Read in unix_del_edges
+From: syzbot <syzbot+f3f3eef1d2100200e593@syzkaller.appspotmail.com>
+To: axboe@kernel.dk, davem@davemloft.net, edumazet@google.com, 
+	hdanton@sina.com, kuba@kernel.org, kuni1840@gmail.com, kuniyu@amazon.com, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Hello:
+syzbot has bisected this issue to:
 
-This patch was applied to iproute2/iproute2.git (main)
-by Stephen Hemminger <stephen@networkplumber.org>:
+commit 77e5593aebba823bcbcf2c4b58b07efcd63933b8
+Author: Kuniyuki Iwashima <kuniyu@amazon.com>
+Date:   Mon Mar 25 20:24:20 2024 +0000
 
-On Tue, 16 Apr 2024 09:32:15 +0800 you wrote:
-> From: Jiayun Chen <jiayunchen@smail.nju.edu.cn>
-> 
-> ip link does support "change".
-> 
-> if (matches(*argv, "set") == 0 ||
->     matches(*argv, "change") == 0)
->     return iplink_modify(RTM_NEWLINK, 0,
->                  argc-1, argv+1);
-> 
-> [...]
+    af_unix: Skip GC if no cycle exists.
 
-Here is the summary with links:
-  - man: fix doc, ip link does support "change"
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=11543416d9bc
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=14bbda4f180000
+start commit:   7b4f2bc91c15 Add linux-next specific files for 20240418
+git tree:       linux-next
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=16bbda4f180000
+console output: https://syzkaller.appspot.com/x/log.txt?x=12bbda4f180000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=ae644165a243bf62
+dashboard link: https://syzkaller.appspot.com/bug?extid=f3f3eef1d2100200e593
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=155e53af180000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=128b1d53180000
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Reported-by: syzbot+f3f3eef1d2100200e593@syzkaller.appspotmail.com
+Fixes: 77e5593aebba ("af_unix: Skip GC if no cycle exists.")
 
-
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
