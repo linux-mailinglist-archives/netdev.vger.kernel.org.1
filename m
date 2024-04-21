@@ -1,98 +1,195 @@
-Return-Path: <netdev+bounces-89862-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89863-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10D018ABF1A
-	for <lists+netdev@lfdr.de>; Sun, 21 Apr 2024 13:47:42 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4610A8ABF8F
+	for <lists+netdev@lfdr.de>; Sun, 21 Apr 2024 16:22:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3A0131C203B5
-	for <lists+netdev@lfdr.de>; Sun, 21 Apr 2024 11:47:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C853A1F213E1
+	for <lists+netdev@lfdr.de>; Sun, 21 Apr 2024 14:22:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB32F1119A;
-	Sun, 21 Apr 2024 11:47:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF74A179AB;
+	Sun, 21 Apr 2024 14:22:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="pk8nNq/u";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="Okn0s4jM";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="pk8nNq/u";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="Okn0s4jM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64402205E21
-	for <netdev@vger.kernel.org>; Sun, 21 Apr 2024 11:47:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B597B1429B;
+	Sun, 21 Apr 2024 14:22:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713700057; cv=none; b=SQsMG2Rvg7ymHaHTK2zxyfulcEC3LcuQc2KIp0QUSA2baZmHntuDxtJmQzTHwT3VInQA4qO8MpRHr+1DhMGdTbTgLINhDKvwXHNRKNN4nBhnS9XvDhUPSMszoe/qQ5kbk/UCQFZZzcNrylt07ghouEDc4dzCgyG/ZWdXfldZtq8=
+	t=1713709367; cv=none; b=YZF1cWrA2R9YBPcM6vsWE19c5Ez3XuSRx/XNTrQZynoEI7ygt0VQq/KExeNAY/yzWGVkMrrv5Qd+UGHiDI6ugDBT6y9/D//y3w1v35baDe0oFvsrU/YzOBeRfajPRNNikbnJnlOo+oSbSIg/1ZMbhvAiNRiGdBgfdi2rwgBMPOc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713700057; c=relaxed/simple;
-	bh=aP1TO29NBuXe5pCqpYD2RdCc9hERIEFGZ3g4zELoWNo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=p0PVM4USt6GmXlHoDfqYQr0PbLjBG5dV6vBE+u9R9ahFFBC4/bMbFDZVJmkEPAbe863a9kav3ahGEQzSnuoW/J/4L65fYLyKNYvATPJcl3RZ8A4C/UotZltCynJm3V09HqxxsputuceJ5Ej+EAhn+Evv6CxPvGeuEdv+JKGbz5c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-346407b8c9aso954968f8f.0
-        for <netdev@vger.kernel.org>; Sun, 21 Apr 2024 04:47:36 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713700055; x=1714304855;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=KAO6uAdXhRWhSWqz75cahmrQkh7UglWpv3HCw64aE+A=;
-        b=oZPNTpf5eNtlSjmArRJcrZS4wy/84BjeeSl2mdzdwpH+luq4Ra9SLUW7U3TScSlXBT
-         Er+CU49KMO+IdzAbDPbmLfkotcIFymndWhwKIG0yaK3nR6+UxA1wejFvvrmra+LVvkaW
-         9/13CkCag72ZHVRAkh6Qx3szuKohhRYe83Jk6w2896v912vjbUgJls+6GJa+r/MkBNCm
-         ljYVlNPZWVbstdJf6Fh4DjwZxkjxtE9sp7p+Vnt9r00muOlZ5IjGqADBbfQDF9FtlBRr
-         72PuGoUKJQOZaRvCu9f85pCNvHgetp8YmvmLavH/fcYl4HXrgiBNriTvy5srTOOvDo1I
-         52Pw==
-X-Forwarded-Encrypted: i=1; AJvYcCU5H+5b51ssPa6h9fKRD5pywyivBTTizA3R+ORnX/X7SxKHWR0taUgO7t9KO/KnC6xbwJHRQtO7h7nlEMhncMinW5fmlIYT
-X-Gm-Message-State: AOJu0YxsurJdgcZch7sO0TYo841TKIs82ibKYY4LrxTU3tvcIgwZ3NXW
-	ReZle9Q20q7cV5wqTiDaoM/CxZmSmbdfe2loYFjk0kA+I6ieraXH
-X-Google-Smtp-Source: AGHT+IEYsKwwjclRwSZQ+wz8CcVL0uOlw9TVDRYNex6MSArZhtkZpO26JNCiL2dcx2Jn/fOIw62hTw==
-X-Received: by 2002:a05:6000:369:b0:349:fc93:1d9 with SMTP id f9-20020a056000036900b00349fc9301d9mr4706458wrf.2.1713700054707;
-        Sun, 21 Apr 2024 04:47:34 -0700 (PDT)
-Received: from [10.50.4.180] (bzq-84-110-32-226.static-ip.bezeqint.net. [84.110.32.226])
-        by smtp.gmail.com with ESMTPSA id v2-20020adfe282000000b00346ceb9e060sm9078419wri.103.2024.04.21.04.47.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 21 Apr 2024 04:47:34 -0700 (PDT)
-Message-ID: <3ab22e14-35eb-473e-a821-6dbddea96254@grimberg.me>
-Date: Sun, 21 Apr 2024 14:47:30 +0300
+	s=arc-20240116; t=1713709367; c=relaxed/simple;
+	bh=2FtL9q5lxhcTRJOh4mdw6XudRZaWyQsJmyja/hMn7jA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=uyybJQYCbtYhp9ZwnNxm8pL/74LNSeWfRdx5RX1Z0ZH/yosf24RMEk8H+sd87ZmqqkT+kUaCvH8Wcg9RKiXGbIvFMPfrmFalUBXjp4wQmmS+zTKJAUnNyUxDdGrRpASsyqB9bccaHjR6u7aC/8qXLCfPP4lw2St5IxvG3kHJidc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=pk8nNq/u; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=Okn0s4jM; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=pk8nNq/u; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=Okn0s4jM; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id A6AFF20F10;
+	Sun, 21 Apr 2024 14:22:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1713709357; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=0KmDhdcvtj9G8gCkXxDmU3FPVVKYh9jcF0fj66UTaHo=;
+	b=pk8nNq/uNsIMRYuD0NWcz7x4n0kNs6EHnm+YEvVKiGcN0YIST7MP7KCpm4Eqz7v46giAbL
+	a1UHzLexhHy9Qqz0Vl6LxD9AMOWXSGS62l6hC5tCP7iYbi+//vxh1OFR4FqKRzekXur3F/
+	IuDBOhhYdqTgtfWT7zTDJumpdbjp6U4=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1713709357;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=0KmDhdcvtj9G8gCkXxDmU3FPVVKYh9jcF0fj66UTaHo=;
+	b=Okn0s4jMQSfXtGQO5qA3yAlH9/dueBA7VD+nIUezvvsi27lcjW3Cekzb1ubDb9yjerVRXq
+	dqhvJP4HkgUpxABg==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b="pk8nNq/u";
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=Okn0s4jM
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1713709357; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=0KmDhdcvtj9G8gCkXxDmU3FPVVKYh9jcF0fj66UTaHo=;
+	b=pk8nNq/uNsIMRYuD0NWcz7x4n0kNs6EHnm+YEvVKiGcN0YIST7MP7KCpm4Eqz7v46giAbL
+	a1UHzLexhHy9Qqz0Vl6LxD9AMOWXSGS62l6hC5tCP7iYbi+//vxh1OFR4FqKRzekXur3F/
+	IuDBOhhYdqTgtfWT7zTDJumpdbjp6U4=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1713709357;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=0KmDhdcvtj9G8gCkXxDmU3FPVVKYh9jcF0fj66UTaHo=;
+	b=Okn0s4jMQSfXtGQO5qA3yAlH9/dueBA7VD+nIUezvvsi27lcjW3Cekzb1ubDb9yjerVRXq
+	dqhvJP4HkgUpxABg==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 7CD8913981;
+	Sun, 21 Apr 2024 14:22:37 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id WVR6Gy0hJWZZYQAAD6G6ig
+	(envelope-from <iluceno@suse.de>); Sun, 21 Apr 2024 14:22:37 +0000
+From: Ismael Luceno <iluceno@suse.de>
+To: linux-kernel@vger.kernel.org
+Cc: Ismael Luceno <iluceno@suse.de>,
+	Firo Yang <firo.yang@suse.com>,
+	Andreas Taschner <andreas.taschner@suse.com>,
+	=?UTF-8?q?Michal=20Kube=C4=8Dek?= <mkubecek@suse.com>,
+	Simon Horman <horms@verge.net.au>,
+	Julian Anastasov <ja@ssi.bg>,
+	lvs-devel@vger.kernel.org,
+	netfilter-devel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	coreteam@netfilter.org
+Subject: [PATCH v2] ipvs: Fix checksumming on GSO of SCTP packets
+Date: Sun, 21 Apr 2024 16:22:32 +0200
+Message-ID: <20240421142234.15764-1-iluceno@suse.de>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v24 01/20] net: Introduce direct data placement tcp
- offload
-To: Aurelien Aptel <aaptel@nvidia.com>, linux-nvme@lists.infradead.org,
- netdev@vger.kernel.org, hch@lst.de, kbusch@kernel.org, axboe@fb.com,
- chaitanyak@nvidia.com, davem@davemloft.net, kuba@kernel.org
-Cc: Boris Pismenny <borisp@nvidia.com>, aurelien.aptel@gmail.com,
- smalin@nvidia.com, malin1024@gmail.com, ogerlitz@nvidia.com,
- yorayz@nvidia.com, galshalom@nvidia.com, mgurtovoy@nvidia.com,
- edumazet@google.com, pabeni@redhat.com, dsahern@kernel.org, ast@kernel.org,
- jacob.e.keller@intel.com
-References: <20240404123717.11857-1-aaptel@nvidia.com>
- <20240404123717.11857-2-aaptel@nvidia.com>
-Content-Language: he-IL, en-US
-From: Sagi Grimberg <sagi@grimberg.me>
-In-Reply-To: <20240404123717.11857-2-aaptel@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spam-Level: 
+X-Spamd-Result: default: False [-2.51 / 50.00];
+	DWL_DNSWL_MED(-2.00)[suse.de:dkim];
+	MID_CONTAINS_FROM(1.00)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	BAYES_HAM(-0.00)[14.50%];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	DKIM_TRACE(0.00)[suse.de:+];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,suse.com:email,suse.de:dkim,suse.de:email]
+X-Rspamd-Action: no action
+X-Rspamd-Queue-Id: A6AFF20F10
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Spam-Flag: NO
+X-Spam-Score: -2.51
 
-> +int ulp_ddp_sk_add(struct net_device *netdev,
-> +		   struct sock *sk,
-> +		   struct ulp_ddp_config *config,
-> +		   const struct ulp_ddp_ulp_ops *ops)
-> +{
-> +	int ret;
-> +
-> +	/* put in ulp_ddp_sk_del() */
-> +	dev_hold(netdev);
-> +
-> +	config->io_cpu = sk->sk_incoming_cpu;
-> +	ret = netdev->netdev_ops->ulp_ddp_ops->sk_add(netdev, sk, config);
+It was observed in the wild that pairs of consecutive packets would leave
+the IPVS with the same wrong checksum, and the issue only went away when
+disabling GSO.
 
-Still don't understand why you need the io_cpu config if you are passing
-the sk to the driver...
+IPVS needs to avoid computing the SCTP checksum when using GSO.
+
+Fixes: 90017accff61 ("sctp: Add GSO support", 2016-06-02)
+Co-developed-by: Firo Yang <firo.yang@suse.com>
+Signed-off-by: Ismael Luceno <iluceno@suse.de>
+Tested-by: Andreas Taschner <andreas.taschner@suse.com>
+CC: Michal Kubeček <mkubecek@suse.com>
+CC: Simon Horman <horms@verge.net.au>
+CC: Julian Anastasov <ja@ssi.bg>
+CC: lvs-devel@vger.kernel.org
+CC: netfilter-devel@vger.kernel.org
+CC: netdev@vger.kernel.org
+CC: coreteam@netfilter.org
+---
+
+Notes:
+    Changes since v1:
+    * Added skb_is_gso before skb_is_gso_sctp.
+    * Added "Fixes" tag.
+
+ net/netfilter/ipvs/ip_vs_proto_sctp.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/net/netfilter/ipvs/ip_vs_proto_sctp.c b/net/netfilter/ipvs/ip_vs_proto_sctp.c
+index a0921adc31a9..1e689c714127 100644
+--- a/net/netfilter/ipvs/ip_vs_proto_sctp.c
++++ b/net/netfilter/ipvs/ip_vs_proto_sctp.c
+@@ -126,7 +126,8 @@ sctp_snat_handler(struct sk_buff *skb, struct ip_vs_protocol *pp,
+ 	if (sctph->source != cp->vport || payload_csum ||
+ 	    skb->ip_summed == CHECKSUM_PARTIAL) {
+ 		sctph->source = cp->vport;
+-		sctp_nat_csum(skb, sctph, sctphoff);
++		if (!skb_is_gso(skb) || !skb_is_gso_sctp(skb))
++			sctp_nat_csum(skb, sctph, sctphoff);
+ 	} else {
+ 		skb->ip_summed = CHECKSUM_UNNECESSARY;
+ 	}
+@@ -174,7 +175,8 @@ sctp_dnat_handler(struct sk_buff *skb, struct ip_vs_protocol *pp,
+ 	    (skb->ip_summed == CHECKSUM_PARTIAL &&
+ 	     !(skb_dst(skb)->dev->features & NETIF_F_SCTP_CRC))) {
+ 		sctph->dest = cp->dport;
+-		sctp_nat_csum(skb, sctph, sctphoff);
++		if (!skb_is_gso(skb) || !skb_is_gso_sctp(skb))
++			sctp_nat_csum(skb, sctph, sctphoff);
+ 	} else if (skb->ip_summed != CHECKSUM_PARTIAL) {
+ 		skb->ip_summed = CHECKSUM_UNNECESSARY;
+ 	}
+-- 
+2.43.0
+
 
