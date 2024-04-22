@@ -1,251 +1,281 @@
-Return-Path: <netdev+bounces-90175-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90174-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D68688ACF52
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 16:26:27 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6CAF8ACF4D
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 16:26:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8B929283A72
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 14:26:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5C9101F21492
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 14:26:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0B981514F2;
-	Mon, 22 Apr 2024 14:26:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C898C1509BC;
+	Mon, 22 Apr 2024 14:26:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZrfzRs6e"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="oj1LaLC/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE5DC1514D5
-	for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 14:26:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D62731509A1
+	for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 14:25:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713795973; cv=none; b=DvWL0UK7w4QX+kFrXC5U5Vg7NIxvgEs5Ij+bYrDAROGoGGH+motjBXVc6o5fpc/Xq+IP1xu32t/kdkELS/wXhQKQ1SDGQjHCUuTHJdRdDR91Nio8MMOhL51PUAyrJqUUZbbN6cx+3MEISLAbPLIIOq9OocPSqr0gBds36u5gLQ8=
+	t=1713795961; cv=none; b=Abhl/PsbvN8gCEOJXhsgMmWxVzlsnCAAi5kFmZf9RH/cOXEJ9T4FJRh2hef1cwjVh7i0xF5wjIZ1nXNM+n5utxC4XUcrDQd+nPTaDrDEs9zx8cmC6dkumkG0Ma7cYTtr5YcZZoUrhs6U6ojoaA497uRFqS5A+6dOJDn/lh7lO4w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713795973; c=relaxed/simple;
-	bh=/yWZ8xMYVRAL9qVEu9co7JGNHY4mKt21cBuo+1aE3y4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Tq3qc2mGa9p38z9j0tLt7/a1lZLC0PPCqdz5qC0axo8/x6TPamkr5bU0dlAl0HHh5MRj5W3EWVNgko7l1A85+NFZJY4kWSPXdC/6GPl/0zw2bygo5ylUIVdCUvmUiDHwVc8mtkyVH/qFfXB9Rs8Of2Jb8UxEwOIxPlH1ooGdBPg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZrfzRs6e; arc=none smtp.client-ip=209.85.208.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-571e13cd856so20900a12.0
-        for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 07:26:11 -0700 (PDT)
+	s=arc-20240116; t=1713795961; c=relaxed/simple;
+	bh=pEs2DOgHbEnlmxgz0Kbt4d7wfqqZXgBiD+OP4Iao7aw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Gy1B/V2F7hh3gt91yhmqeVMSnZC+sPfkdesaMztGom43FsZm1ltC7pKuUFrzi0Rozjqs74w79SKaPViyszbMBZDnI9syNP4PgReQCev0UZ7DPn/xT2QF/XYONEQSYWlECOtMX9gcaySvDAwrIpkG4jCV7mkOqM95LAnLXIAXmg0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=oj1LaLC/; arc=none smtp.client-ip=209.85.218.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a55b93f5540so118593566b.1
+        for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 07:25:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713795970; x=1714400770; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=s/daevu4P3VIlTkEgUGpd0CJgDiQmVPdHNlXHA6B3X8=;
-        b=ZrfzRs6e0jQxfowqgY5DwmOBz0d5F4mBU6DCTEMUGhEMmSCJClaCfIL8cIk3HwDTdP
-         tCahbLjlk2eXvcWbzBtGuL9NG0nHSDUWN78ZyrsQyx3V5OMRra2FqQ/NkNldYZKWvopB
-         /G4jHDpFDHFMXPr9RhgEBnGCOYENnCHOP/+5affwZDdFz9p+G8VI6Yzc2ZaUpQUVdtRp
-         XaD0nxkvw9JEUAxD3KHJHa9IA8zveUdLtEgdpM9uJD5OxSZHrOLdfyb9XJOUs5d8KAqS
-         QzhMIfvANdOfCBi9hKeSUb81p0HMlKzm8PF5WRIR9nPvpZUW9kqlPaz1QCEsc5NpqWt4
-         wbQA==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1713795958; x=1714400758; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=dIINu9KyBDBX/cBbMG71Op3zuuN85u67R5eLl+Z8CAA=;
+        b=oj1LaLC/0Npd+ApqHJ4eCRIQlx324izXZU+U/HcCvO3O4Fyt0BJVzdDMrrCfJYNPH8
+         uVgCFBgiR2ZZ85IeIRHscqVuHWQxlhv3xNoH/WX2mrfJmR1D0tpU0GZT4Ti40bMTof4V
+         fOwaQUgIy2DCfysV9V7mHVtGkuwuys7SRgCaGF0aLAs0snqJh/BacxWcbPg5JbiHGOfq
+         nvOqchs7jbd9DbuSVBBrxfCvMrEwkt0AqtHyg8Ksj5IepclkJCZrO037boIBHkecPecN
+         bDT6+1ab4ltyvIg3V6JRg+g97nWVquCJwU7HkQ6Y8Yv4iDNcwOdEE0+Ugj8ux4RAHnLl
+         V/7A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713795970; x=1714400770;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=s/daevu4P3VIlTkEgUGpd0CJgDiQmVPdHNlXHA6B3X8=;
-        b=EuiSKKUSJc1cTPDA1i1YU5uAgNs7y3Fa4H/jOXPBF2jdpR/iRFE4loRtFdjgepW2qR
-         SiHY3GglM+dxyoWWEOkdviI1iF5JjiwEdVF8p62NM6SbFDvGc67SqyLYu2j0EH7CBwhC
-         Ws4ERp2fAjLXxH6F1Ne9DqtZDDrMdFz12T3CpMUBzl1BXkp85a1ujQgDZIN5sNMx/CyR
-         53HVu3mhvV1SxQIULo9262Rq89I3lJ0K0FlSmIPr2KN6kVy3gupHHeTRT5unWiC0H1GR
-         9PvpCdrjI+cmfXq82udc3rBivk0V8bNrr7CPFokdE1XhvXAhCt/TcmXIVZF2JQHW7EOG
-         HWtA==
-X-Forwarded-Encrypted: i=1; AJvYcCUi6oIvFRuEMX7gQnI/DP4PLb+K3Fw/76fVm87j+N5Kny/b+pfEtvqpqAm5rRx8wnYbHai4PNNr23crakojUO1S6ATMmsVf
-X-Gm-Message-State: AOJu0YwsRjXO+StssBVV4OfYS0OGti+dmNDwWrPmFNe9iSCNf9LG9HPI
-	O4kE17RNtA6+eL1GLnm4DW1ZFgoUzkt0+G6AUTXfBXw6s9i19KrsXfcnbop79YkkiZCgv54iR4F
-	F6Ky/ABs1NA7P3dQurF9FkQvK2SrTTu9wKlSV
-X-Google-Smtp-Source: AGHT+IHWFSmfhvprZgn+nCdRa04clSFSSc40I/vhqKF2TQTEN+Vj6Dka/3FYf3k8+tC16MNhxFjYBjqGWHBtVZ+dHX4=
-X-Received: by 2002:a50:cbc8:0:b0:571:b9c7:2804 with SMTP id
- l8-20020a50cbc8000000b00571b9c72804mr217637edi.5.1713795969736; Mon, 22 Apr
- 2024 07:26:09 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1713795958; x=1714400758;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dIINu9KyBDBX/cBbMG71Op3zuuN85u67R5eLl+Z8CAA=;
+        b=w1yMyWKInnfANgY5T4tqq9eB3sfjr3QiZI4gCjYiLWawe4R+JqGEjWVmrqe2gKMGX3
+         VepXboaPy7Mlj16lLJtU9r9h5Z9ML9IvJThMgbyVdPTuFjQj881Cw20eLVGW3r7MKZsM
+         XxpUnmp192zU952JErUxnn5xZ3dqV4Ckw+ui4vX8TMVudvtZ7KJJk4FNxYUw5f8YwtPk
+         I8ml3JodfA1/xjPBCgmEjT3Kaha9+DIokOFXvEftaNtT4/OGvVE/gv022pIvspJfUkSN
+         N+X+srsZY2lb7TaXUiQbcs2l4k4dy3HsUhS9CgXJDiaWGIdEBOK2DimHVPVdW3xQAoqS
+         Efqg==
+X-Forwarded-Encrypted: i=1; AJvYcCXwcwu94IY6idz+B5tRs0+qQhZdrXl11Cvpy1s9/PNTYib1GBI1qA1s99Dj/iml0+yLVmQshUsA1V3qfSxr9ocfgqPqmyrt
+X-Gm-Message-State: AOJu0YzjadM2QjxVniMnGpHl9QcG/5laVZI8B05+YKxboB4uhF5E/AK/
+	P81WnegOnEYnmW6MSQMURnREyAT9PpQ9zMwEAlPOxIIjmun03wemFff2vNUb3pY=
+X-Google-Smtp-Source: AGHT+IFh1b4YvcxkXn79fjVZAVGT+9/f6mdpQVJpiEwFbDvIxWmfO30Zx7tHQFeDivtwsDwo7il/6g==
+X-Received: by 2002:a17:906:f1d6:b0:a55:5c04:89a4 with SMTP id gx22-20020a170906f1d600b00a555c0489a4mr6594385ejb.21.1713795958020;
+        Mon, 22 Apr 2024 07:25:58 -0700 (PDT)
+Received: from localhost (78-80-105-131.customers.tmcz.cz. [78.80.105.131])
+        by smtp.gmail.com with ESMTPSA id i22-20020a1709061cd600b00a55a10eb070sm2796438ejh.214.2024.04.22.07.25.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Apr 2024 07:25:57 -0700 (PDT)
+Date: Mon, 22 Apr 2024 16:25:56 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	horms@kernel.org, Carolyn Wyborny <carolyn.wyborny@intel.com>,
+	Jedrzej Jagielski <jedrzej.jagielski@intel.com>,
+	Jan Glaza <jan.glaza@intel.com>
+Subject: Re: [PATCH iwl-next v4 5/5] ixgbe: Enable link management in E610
+ device
+Message-ID: <ZiZzdAX-qI-7wCMC@nanopsycho>
+References: <20240422130611.2544-1-piotr.kwapulinski@intel.com>
+ <20240422130611.2544-6-piotr.kwapulinski@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <000000000000eac28e0616b026d1@google.com>
-In-Reply-To: <000000000000eac28e0616b026d1@google.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 22 Apr 2024 16:25:55 +0200
-Message-ID: <CANn89iKr4pY3wcMb=ONr8f5DU1X300XG8RoX7HU4_FEWSAJ9_w@mail.gmail.com>
-Subject: Re: [syzbot] [bpf?] [net?] WARNING in skb_ensure_writable
-To: syzbot <syzbot+0c4150bff9fff3bf023c@syzkaller.appspotmail.com>
-Cc: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
-	daniel@iogearbox.net, davem@davemloft.net, eddyz87@gmail.com, fw@strlen.de, 
-	haoluo@google.com, horms@kernel.org, john.fastabend@gmail.com, 
-	jolsa@kernel.org, kpsingh@kernel.org, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, martin.lau@linux.dev, netdev@vger.kernel.org, 
-	pabeni@redhat.com, sdf@google.com, song@kernel.org, 
-	syzkaller-bugs@googlegroups.com, yonghong.song@linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240422130611.2544-6-piotr.kwapulinski@intel.com>
 
-On Mon, Apr 22, 2024 at 4:21=E2=80=AFPM syzbot
-<syzbot+0c4150bff9fff3bf023c@syzkaller.appspotmail.com> wrote:
->
-> Hello,
->
-> syzbot found the following issue on:
->
-> HEAD commit:    4ac828960a60 Merge branch 'eee-linkmode-bitmaps'
-> git tree:       net-next
-> console+strace: https://syzkaller.appspot.com/x/log.txt?x=3D14710a5418000=
-0
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=3D57c41f64f37f5=
-1c5
-> dashboard link: https://syzkaller.appspot.com/bug?extid=3D0c4150bff9fff3b=
-f023c
-> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Deb=
-ian) 2.40
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=3D17cc49d8180=
-000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=3D12c8861618000=
-0
->
-> Downloadable assets:
-> disk image: https://storage.googleapis.com/syzbot-assets/f1bd74942969/dis=
-k-4ac82896.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/c99cbac61b8b/vmlinu=
-x-4ac82896.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/fa3d589c2a1c/b=
-zImage-4ac82896.xz
->
-> The issue was bisected to:
->
-> commit 219eee9c0d16f1b754a8b85275854ab17df0850a
-> Author: Florian Westphal <fw@strlen.de>
-> Date:   Fri Feb 16 11:36:57 2024 +0000
->
->     net: skbuff: add overflow debug check to pull/push helpers
->
-> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=3D166b3a4c18=
-0000
-> final oops:     https://syzkaller.appspot.com/x/report.txt?x=3D156b3a4c18=
-0000
-> console output: https://syzkaller.appspot.com/x/log.txt?x=3D116b3a4c18000=
-0
->
-> IMPORTANT: if you fix the issue, please add the following tag to the comm=
-it:
-> Reported-by: syzbot+0c4150bff9fff3bf023c@syzkaller.appspotmail.com
-> Fixes: 219eee9c0d16 ("net: skbuff: add overflow debug check to pull/push =
-helpers")
->
-> ------------[ cut here ]------------
-> WARNING: CPU: 1 PID: 5074 at include/linux/skbuff.h:2723 pskb_may_pull_re=
-ason include/linux/skbuff.h:2723 [inline]
-> WARNING: CPU: 1 PID: 5074 at include/linux/skbuff.h:2723 pskb_may_pull in=
-clude/linux/skbuff.h:2739 [inline]
-> WARNING: CPU: 1 PID: 5074 at include/linux/skbuff.h:2723 skb_ensure_writa=
-ble+0x2ef/0x440 net/core/skbuff.c:6103
-> Modules linked in:
-> CPU: 1 PID: 5074 Comm: syz-executor365 Not tainted 6.8.0-rc5-syzkaller-01=
-654-g4ac828960a60 #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS G=
-oogle 01/25/2024
-> RIP: 0010:pskb_may_pull_reason include/linux/skbuff.h:2723 [inline]
-> RIP: 0010:pskb_may_pull include/linux/skbuff.h:2739 [inline]
-> RIP: 0010:skb_ensure_writable+0x2ef/0x440 net/core/skbuff.c:6103
-> Code: e8 b6 f7 57 f8 4c 89 ef 31 f6 31 d2 b9 20 08 00 00 48 83 c4 28 5b 4=
-1 5c 41 5d 41 5e 41 5f 5d e9 17 04 fe ff e8 92 f7 57 f8 90 <0f> 0b 90 e9 3e=
- fd ff ff 44 89 f7 44 89 e6 e8 3e f9 57 f8 45 39 e6
-> RSP: 0018:ffffc900039ef8f8 EFLAGS: 00010293
-> RAX: ffffffff893b75de RBX: ffff88802c8a1000 RCX: ffff88802a155940
-> RDX: 0000000000000000 RSI: 00000000fb6014e4 RDI: 0000000000000000
-> RBP: 00000000fb6014e4 R08: ffffffff893b7317 R09: 1ffffffff1f0bcb5
-> R10: dffffc0000000000 R11: ffffffffa0000954 R12: 00000000fb6014e4
-> R13: ffff88802c8a1000 R14: ffffc90000b06030 R15: dffffc0000000000
-> FS:  0000555556fa9380(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000=
-000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 0000000001b7b398 CR3: 00000000241e8000 CR4: 00000000003506f0
-> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> Call Trace:
->  <TASK>
->  __bpf_try_make_writable net/core/filter.c:1665 [inline]
->  bpf_try_make_writable net/core/filter.c:1671 [inline]
->  ____bpf_skb_pull_data net/core/filter.c:1862 [inline]
->  bpf_skb_pull_data+0x7c/0x230 net/core/filter.c:1851
->  bpf_prog_ca74b6b79e086095+0x1d/0x1f
->  bpf_dispatcher_nop_func include/linux/bpf.h:1235 [inline]
->  __bpf_prog_run include/linux/filter.h:651 [inline]
->  bpf_prog_run include/linux/filter.h:658 [inline]
->  bpf_test_run+0x408/0x900 net/bpf/test_run.c:423
->  bpf_prog_test_run_skb+0xaf9/0x13a0 net/bpf/test_run.c:1056
->  bpf_prog_test_run+0x33a/0x3b0 kernel/bpf/syscall.c:4188
->  __sys_bpf+0x48d/0x810 kernel/bpf/syscall.c:5591
->  __do_sys_bpf kernel/bpf/syscall.c:5680 [inline]
->  __se_sys_bpf kernel/bpf/syscall.c:5678 [inline]
->  __x64_sys_bpf+0x7c/0x90 kernel/bpf/syscall.c:5678
->  do_syscall_64+0xf9/0x240
->  entry_SYSCALL_64_after_hwframe+0x6f/0x77
-> RIP: 0033:0x7f6a0471c4a9
-> Code: 48 83 c4 28 c3 e8 37 17 00 00 0f 1f 80 00 00 00 00 48 89 f8 48 89 f=
-7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff=
- ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-> RSP: 002b:00007ffcdcead7e8 EFLAGS: 00000246 ORIG_RAX: 0000000000000141
-> RAX: ffffffffffffffda RBX: 00007ffcdcead9b8 RCX: 00007f6a0471c4a9
-> RDX: 0000000000000050 RSI: 0000000020000080 RDI: 000000000000000a
-> RBP: 00007f6a0478f610 R08: 0000000000000000 R09: 00007ffcdcead9b8
-> R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000001
-> R13: 00007ffcdcead9a8 R14: 0000000000000001 R15: 0000000000000001
->  </TASK>
->
->
-> ---
-> This report is generated by a bot. It may contain errors.
-> See https://goo.gl/tpsmEJ for more information about syzbot.
-> syzbot engineers can be reached at syzkaller@googlegroups.com.
->
-> syzbot will keep track of this issue. See:
-> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-> For information about bisection process see: https://goo.gl/tpsmEJ#bisect=
-ion
->
-> If the report is already addressed, let syzbot know by replying with:
-> #syz fix: exact-commit-title
->
-> If you want syzbot to run the reproducer, reply with:
-> #syz test: git://repo/address.git branch-or-commit-hash
-> If you attach or paste a git patch, syzbot will apply it before testing.
->
-> If you want to overwrite report's subsystems, reply with:
-> #syz set subsystems: new-subsystem
-> (See the list of subsystem names on the web dashboard)
->
-> If the report is a duplicate of another one, reply with:
-> #syz dup: exact-subject-of-another-report
->
-> If you want to undo deduplication, reply with:
-> #syz undup
+Mon, Apr 22, 2024 at 03:06:11PM CEST, piotr.kwapulinski@intel.com wrote:
 
-Hmm... Not sure how to deal with this one... this is a 'false positive'
+[...]
 
-diff --git a/net/core/filter.c b/net/core/filter.c
-index 58e8e1a70aa752a2c045117e00d8797478da4738..a7cea6d717ef321215bc4cf9ab3=
-b83535c4eec98
-100644
---- a/net/core/filter.c
-+++ b/net/core/filter.c
-@@ -1662,6 +1662,11 @@ static DEFINE_PER_CPU(struct bpf_scratchpad, bpf_sp)=
-;
- static inline int __bpf_try_make_writable(struct sk_buff *skb,
-                                          unsigned int write_len)
- {
-+#if defined(CONFIG_DEBUG_NET)
-+       /* Avoid a splat in pskb_may_pull_reason() */
-+       if (write_len > INT_MAX)
-+               return -EINVAL;
-+#endif
-        return skb_ensure_writable(skb, write_len);
- }
+
+>diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe.h b/drivers/net/ethernet/intel/ixgbe/ixgbe.h
+>index 559b443..ea6df1e 100644
+>--- a/drivers/net/ethernet/intel/ixgbe/ixgbe.h
+>+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe.h
+>@@ -1,5 +1,5 @@
+> /* SPDX-License-Identifier: GPL-2.0 */
+>-/* Copyright(c) 1999 - 2018 Intel Corporation. */
+>+/* Copyright(c) 1999 - 2024 Intel Corporation. */
+> 
+> #ifndef _IXGBE_H_
+> #define _IXGBE_H_
+>@@ -20,6 +20,7 @@
+> #include "ixgbe_type.h"
+> #include "ixgbe_common.h"
+> #include "ixgbe_dcb.h"
+>+#include "ixgbe_e610.h"
+> #if IS_ENABLED(CONFIG_FCOE)
+> #define IXGBE_FCOE
+> #include "ixgbe_fcoe.h"
+>@@ -28,7 +29,6 @@
+> #include <linux/dca.h>
+> #endif
+> #include "ixgbe_ipsec.h"
+>-
+
+Leftover hunk?
+
+
+> #include <net/xdp.h>
+> 
+> /* common prefix used by pr_<> macros */
+
+[...]
+
+
+>+static const struct ixgbe_mac_operations mac_ops_e610 = {
+>+	.init_hw			= ixgbe_init_hw_generic,
+>+	.start_hw			= ixgbe_start_hw_X540,
+>+	.clear_hw_cntrs			= ixgbe_clear_hw_cntrs_generic,
+>+	.enable_rx_dma			= ixgbe_enable_rx_dma_generic,
+>+	.get_mac_addr			= ixgbe_get_mac_addr_generic,
+>+	.get_device_caps		= ixgbe_get_device_caps_generic,
+>+	.stop_adapter			= ixgbe_stop_adapter_generic,
+>+	.set_lan_id			= ixgbe_set_lan_id_multi_port_pcie,
+>+	.read_analog_reg8		= NULL,
+
+Pointless initialization, it's null already. You have many cases of
+this below.
+
+
+
+>+	.write_analog_reg8		= NULL,
+>+	.set_rxpba			= ixgbe_set_rxpba_generic,
+>+	.check_link			= ixgbe_check_link_e610,
+>+	.blink_led_start		= ixgbe_blink_led_start_X540,
+>+	.blink_led_stop			= ixgbe_blink_led_stop_X540,
+>+	.set_rar			= ixgbe_set_rar_generic,
+>+	.clear_rar			= ixgbe_clear_rar_generic,
+>+	.set_vmdq			= ixgbe_set_vmdq_generic,
+>+	.set_vmdq_san_mac		= ixgbe_set_vmdq_san_mac_generic,
+>+	.clear_vmdq			= ixgbe_clear_vmdq_generic,
+>+	.init_rx_addrs			= ixgbe_init_rx_addrs_generic,
+>+	.update_mc_addr_list		= ixgbe_update_mc_addr_list_generic,
+>+	.enable_mc			= ixgbe_enable_mc_generic,
+>+	.disable_mc			= ixgbe_disable_mc_generic,
+>+	.clear_vfta			= ixgbe_clear_vfta_generic,
+>+	.set_vfta			= ixgbe_set_vfta_generic,
+>+	.fc_enable			= ixgbe_fc_enable_generic,
+>+	.set_fw_drv_ver			= ixgbe_set_fw_drv_ver_x550,
+>+	.init_uta_tables		= ixgbe_init_uta_tables_generic,
+>+	.set_mac_anti_spoofing		= ixgbe_set_mac_anti_spoofing,
+>+	.set_vlan_anti_spoofing		= ixgbe_set_vlan_anti_spoofing,
+>+	.set_source_address_pruning	=
+>+				ixgbe_set_source_address_pruning_x550,
+>+	.set_ethertype_anti_spoofing	=
+>+				ixgbe_set_ethertype_anti_spoofing_x550,
+>+	.disable_rx_buff		= ixgbe_disable_rx_buff_generic,
+>+	.enable_rx_buff			= ixgbe_enable_rx_buff_generic,
+>+	.get_thermal_sensor_data	= NULL,
+>+	.init_thermal_sensor_thresh	= NULL,
+>+	.fw_recovery_mode		= NULL,
+>+	.enable_rx			= ixgbe_enable_rx_generic,
+>+	.disable_rx			= ixgbe_disable_rx_e610,
+>+	.led_on				= ixgbe_led_on_generic,
+>+	.led_off			= ixgbe_led_off_generic,
+>+	.init_led_link_act		= ixgbe_init_led_link_act_generic,
+>+	.reset_hw			= ixgbe_reset_hw_e610,
+>+	.get_media_type			= ixgbe_get_media_type_e610,
+>+	.get_san_mac_addr		= NULL,
+>+	.get_wwn_prefix			= NULL,
+>+	.setup_link			= ixgbe_setup_link_e610,
+>+	.get_link_capabilities		= ixgbe_get_link_capabilities_e610,
+>+	.get_bus_info			= ixgbe_get_bus_info_generic,
+>+	.setup_sfp			= NULL,
+>+	.acquire_swfw_sync		= ixgbe_acquire_swfw_sync_X540,
+>+	.release_swfw_sync		= ixgbe_release_swfw_sync_X540,
+>+	.init_swfw_sync			= ixgbe_init_swfw_sync_X540,
+>+	.prot_autoc_read		= prot_autoc_read_generic,
+>+	.prot_autoc_write		= prot_autoc_write_generic,
+>+	.setup_fc			= ixgbe_setup_fc_e610,
+>+	.fc_autoneg			= ixgbe_fc_autoneg_e610,
+>+};
+>+
+>+static const struct ixgbe_phy_operations phy_ops_e610 = {
+>+	.init				= ixgbe_init_phy_ops_e610,
+>+	.identify			= ixgbe_identify_phy_e610,
+>+	.read_reg			= NULL,
+>+	.write_reg			= NULL,
+>+	.read_reg_mdi			= NULL,
+>+	.write_reg_mdi			= NULL,
+>+	.identify_sfp			= ixgbe_identify_module_e610,
+>+	.reset				= NULL,
+>+	.setup_link_speed		= ixgbe_setup_phy_link_speed_generic,
+>+	.read_i2c_byte			= NULL,
+>+	.write_i2c_byte			= NULL,
+>+	.read_i2c_sff8472		= NULL,
+>+	.read_i2c_eeprom		= NULL,
+>+	.write_i2c_eeprom		= NULL,
+>+	.setup_link			= ixgbe_setup_phy_link_e610,
+>+	.set_phy_power			= NULL,
+>+	.check_overtemp			= NULL,
+>+	.enter_lplu			= ixgbe_enter_lplu_e610,
+>+	.handle_lasi			= NULL,
+>+	.read_i2c_byte_unlocked		= NULL,
+>+};
+>+
+>+static const struct ixgbe_eeprom_operations eeprom_ops_e610 = {
+>+	.init_params			= NULL,
+>+	.read				= ixgbe_read_ee_aci_e610,
+>+	.read_buffer			= NULL,
+>+	.write				= NULL,
+>+	.write_buffer			= NULL,
+>+	.validate_checksum		= ixgbe_validate_eeprom_checksum_e610,
+>+	.update_checksum		= NULL,
+>+	.calc_checksum			= NULL,
+>+};
+>+
+
+[...]
+
+
+>+/**
+>+ * ixgbe_process_link_status_event - process the link event
+>+ * @adapter: pointer to adapter structure
+>+ * @link_up: true if the physical link is up and false if it is down
+>+ * @link_speed: current link speed received from the link event
+>+ *
+>+ * Return: 0 on success and negative on failure.
+>+ */
+>+static int
+>+ixgbe_process_link_status_event(struct ixgbe_adapter *adapter, bool link_up,
+>+				u16 link_speed)
+>+{
+>+	struct ixgbe_hw *hw = &adapter->hw;
+>+	int status;
+>+
+>+	/* update the link info structures and re-enable link events,
+>+	 * don't bail on failure due to other book keeping needed
+
+Why don't you start the sentence with capital letter and end with "."?
+
+
+>+	 */
+>+	status = ixgbe_update_link_info(hw);
+>+	if (status)
+>+		e_dev_err("Failed to update link status, err %d aq_err %d\n",
+>+			  status, hw->aci.last_status);
+>+
+>+	ixgbe_check_link_cfg_err(adapter, hw->link.link_info.link_cfg_err);
+>+
+>+	/* Check if the link state is up after updating link info, and treat
+>+	 * this event as an UP event since the link is actually UP now.
+>+	 */
+>+	if (hw->link.link_info.link_info & IXGBE_ACI_LINK_UP)
+>+		link_up = true;
+>+
+>+	/* turn off PHY if media was removed */
+>+	if (!(adapter->flags2 & IXGBE_FLAG2_NO_MEDIA) &&
+>+	    !(hw->link.link_info.link_info & IXGBE_ACI_MEDIA_AVAILABLE)) {
+>+		(adapter->flags2 |= IXGBE_FLAG2_NO_MEDIA);
+>+		if (ixgbe_aci_set_link_restart_an(hw, false))
+>+			e_dev_err("can't set link to OFF\n");
+>+	}
+
+[...]
 
