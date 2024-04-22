@@ -1,315 +1,152 @@
-Return-Path: <netdev+bounces-90213-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90214-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 264588AD1DE
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 18:24:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 89DFC8AD27C
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 18:43:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 92B821F213B3
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 16:24:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 044241F21DCB
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 16:43:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DEBB15380B;
-	Mon, 22 Apr 2024 16:24:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EB7A153BFF;
+	Mon, 22 Apr 2024 16:42:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b/KvQ4Ex"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF783153582;
-	Mon, 22 Apr 2024 16:24:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36934153BF7;
+	Mon, 22 Apr 2024 16:42:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713803081; cv=none; b=N/9gs/We4RPQpctka2EUXsMMDVkUKhbTSj3BAZG/luiBNpY/6d9Dg3A5eeGRyEy5XtJXHEQcEs13x0pW8lfX3+VK4QF32akINNmi12GwwQH8hUPvtGebn2hJhrrgA193377tcmBlLQE3oGpLQnJSXBvwyhPY8RWrwCzlYYSr1Ds=
+	t=1713804133; cv=none; b=j9nVy3iTdobqmNFp+zVB7SZPDfqmSuAKFGuQnJkn0+mD+s5HRF4ceku+KK19mUcwpq9CRL9C6Aj0cpuwlTHjrjhNYcTEjGBXhmFYWOz2q+8etT15GezaaqMpuNsgVZoYCUTvug0w/AcGD5QcWZI5YK1dqQ73e9wFRsoTB61SfFc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713803081; c=relaxed/simple;
-	bh=HaD9uj6RJr8FOK2IkqY5S9vAt19PWx2ZyaWNJGKWrQ0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FXFYVXykcQJ/oknOXAzkb2prp6mgIkzBhGl84EGYgcSM1NmOQH9RUh6CJgukTaEvIYOjHAq6ufSUAG5Y3wb7hS7DTpsDb/v2xD2TdlkTxboC/MlbGSNd9Qph0TzyqnU71SUUHu4zUJH6I0WppQeZlmdQaTdOXKPEm6I23LTSmVM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.97.1)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1rywSZ-000000003hF-3pRt;
-	Mon, 22 Apr 2024 16:24:04 +0000
-Date: Mon, 22 Apr 2024 17:23:57 +0100
-From: Daniel Golle <daniel@makrotopia.org>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Chunfeng Yun <chunfeng.yun@mediatek.com>,
-	Vinod Koul <vkoul@kernel.org>,
-	Kishon Vijay Abraham I <kishon@kernel.org>,
-	Felix Fietkau <nbd@nbd.name>, John Crispin <john@phrozen.org>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Mark Lee <Mark-MC.Lee@mediatek.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Alexander Couzens <lynxis@fe80.eu>,
-	Qingfang Deng <dqfext@gmail.com>,
-	SkyLake Huang <SkyLake.Huang@mediatek.com>,
-	Philipp Zabel <p.zabel@pengutronix.de>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, linux-phy@lists.infradead.org
-Subject: Re: [RFC PATCH net-next v3 3/8] net: pcs: pcs-mtk-lynxi: add
- platform driver for MT7988
-Message-ID: <ZiaPHWXU-82QMrMt@makrotopia.org>
-References: <cover.1702352117.git.daniel@makrotopia.org>
- <8aa905080bdb6760875d62cb3b2b41258837f80e.1702352117.git.daniel@makrotopia.org>
- <ZXnV/Pk1PYxAm/jS@shell.armlinux.org.uk>
- <ZcLc7vJ4fPmRyuxn@makrotopia.org>
+	s=arc-20240116; t=1713804133; c=relaxed/simple;
+	bh=4k4l2I6DGmn+gj2ky1zg3DSJ96wBO9Y/fF4JVtQyMUw=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=W/49fHBM3N9nmdWZNc6IpQI+PCnKZa3FW9NFRV/dqDmrKpVJSIos1HWjfnl1ZvUJvAjGwNJiusqOp3nGgZWGyMZAxQ40Y1jAcCQdIeOAgcRJ2E8oET33FLmuZwiAlpPdAa1M1oXATU7hGu/O1E4WPArbgjb5VX4YDjy56s/7FZk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=b/KvQ4Ex; arc=none smtp.client-ip=209.85.214.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-1e5b6e8f662so35962175ad.0;
+        Mon, 22 Apr 2024 09:42:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1713804131; x=1714408931; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=kJ/s9bshwX2Z/U5SUCiWUY86dhIqbJUGtlQVX2ISVdU=;
+        b=b/KvQ4ExVqmKddxjtkltFTZA8xjaGylYDvtpyAAFC0HFjf+zGYSOOFc/ZAe4sa1IZw
+         bHnlwvVp0WErMqfs+c1MeIBqcvu8xPl1O4kkjapKVEwuQ0973EFKQ7UYklh5C/mWWNBt
+         ADIDxtF2JHmOtDOct5pvXbULwX3zlWbS/BOKU+8t1AnyD4kjrpFo2MBGJbXRJXoEUKPn
+         3A40ERdsmjIzadR0eD+LotnW/cJe7jCi+x2CnFkHxjA8ANsN8m9KNFtj1X6CdlymIkAa
+         g1uxDlZlO30XnOWm4Qi8o77ruXGEDUcuHeG01FNTft6JGryX3/CTNAXQZA9nYLQy02f4
+         /rLg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713804131; x=1714408931;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=kJ/s9bshwX2Z/U5SUCiWUY86dhIqbJUGtlQVX2ISVdU=;
+        b=Jjhx5n9zDJO/pzvhwTbNWv313ErPfuaQ7AqfOkj4qjwKs+toTSu1htvfARpipuKPIt
+         xYTOreRF2dI/hnA7UrpxHwZHXTwXZYtn6Kbp4723IzCHD41rb4Gq/eBKTQft/B9mdE9d
+         IciwO9ad/2mbs1kqLaSyFE9Ai/xs9YlUfO3oGzAh2m69XdRR6d02sn7xNc0pSsdMDs8V
+         kX/Hv5o1AaZAj0BO7Y08JkbyySXm50Igq7Oqj0YHAMAGaTw21YHOFATISbVoL9oi00Sj
+         lnmD+xVPBAR2t8dTuL8tbntmEkbc86J7HJy/tyKFUn4s4OisXWGGiQymjuJM1VYghDqj
+         A7dg==
+X-Forwarded-Encrypted: i=1; AJvYcCUPqxGYGtFRAyc8CCsYku3dM9LQ/VebXybl/GoVvDeVsJjekBJh49+xYoLlvPRHMVcy/9CaRVE4OGM5XDINFfpyK7ejc87/JNtiCEqiQlbOM5yxxEbjy9iy9EXSbrcMOc3PSoMGu940oqVNlbKugz+Q40hhBzv9nULvBiUXRbINlkTn2odvPwBejkE0NzcQ9oYx+HoI9M9c3jE1eT0=
+X-Gm-Message-State: AOJu0YwKnX+HVTzxsIdt8T0L60ncD2EmKLD9lxtnKuppEKH447deGt3I
+	FmeLJl0lwViOOEqyewCKdmcqDl41JH8crO7d1rWeaIC8KeezohE1
+X-Google-Smtp-Source: AGHT+IED/ttmM4v5ReF4QaWXjGqNL66DutVSsH/8jOtbJsWcX9E8Nfp6e2ZYUo/WyQMOpfHpKmMv3A==
+X-Received: by 2002:a17:902:d4c7:b0:1e2:76ad:cb2 with SMTP id o7-20020a170902d4c700b001e276ad0cb2mr10960924plg.15.1713804131274;
+        Mon, 22 Apr 2024 09:42:11 -0700 (PDT)
+Received: from [127.0.1.1] ([2001:ee0:50f5:5d0:f32d:f608:a763:3732])
+        by smtp.googlemail.com with ESMTPSA id p3-20020a170902780300b001e7b8c21ebesm8461702pll.225.2024.04.22.09.42.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Apr 2024 09:42:10 -0700 (PDT)
+From: Bui Quang Minh <minhquangbui99@gmail.com>
+Subject: [PATCH 0/5] Ensure the copied buf is NULL terminated
+Date: Mon, 22 Apr 2024 23:41:35 +0700
+Message-Id: <20240422-fix-oob-read-v1-0-e02854c30174@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZcLc7vJ4fPmRyuxn@makrotopia.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAD+TJmYC/x2MQQqAIBAAvyJ7bkFNsPpKdLBcay8aChGIf086D
+ sNMhUKZqcAiKmR6uHCKHdQg4LhcPAnZdwYttZFGawz8Yko7ZnIe1ezIhimMVinoyZ2p+3+3bq1
+ 91dxRI14AAAA=
+To: Jesse Brandeburg <jesse.brandeburg@intel.com>, 
+ Tony Nguyen <anthony.l.nguyen@intel.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Paul M Stillwell Jr <paul.m.stillwell.jr@intel.com>, 
+ Rasesh Mody <rmody@marvell.com>, Sudarsana Kalluru <skalluru@marvell.com>, 
+ GR-Linux-NIC-Dev@marvell.com, Krishna Gudipati <kgudipat@brocade.com>, 
+ Anil Gurumurthy <anil.gurumurthy@qlogic.com>, 
+ Sudarsana Kalluru <sudarsana.kalluru@qlogic.com>, 
+ "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>, 
+ "Martin K. Petersen" <martin.petersen@oracle.com>, 
+ Fabian Frederick <fabf@skynet.be>, Saurav Kashyap <skashyap@marvell.com>, 
+ Javed Hasan <jhasan@marvell.com>, GR-QLogic-Storage-Upstream@marvell.com, 
+ Nilesh Javali <nilesh.javali@cavium.com>, Arun Easi <arun.easi@cavium.com>, 
+ Manish Rangankar <manish.rangankar@cavium.com>, 
+ Vineeth Vijayan <vneethv@linux.ibm.com>, 
+ Peter Oberparleiter <oberpar@linux.ibm.com>, 
+ Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, 
+ Alexander Gordeev <agordeev@linux.ibm.com>, 
+ Christian Borntraeger <borntraeger@linux.ibm.com>, 
+ Sven Schnelle <svens@linux.ibm.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org, 
+ Saurav Kashyap <saurav.kashyap@cavium.com>, linux-s390@vger.kernel.org, 
+ Jens Axboe <axboe@kernel.dk>, Bui Quang Minh <minhquangbui99@gmail.com>
+X-Mailer: b4 0.13.0
 
-Hi Russell,
-Hi netdev crew,
+Hi everyone,
 
-I haven't received any reply for this email and am still waiting for
-clarification regarding how inter-driver dependencies should be modelled
-in that case of mtk_eth_soc. My search for good examples for that in the
-kernel code was quite frustrating and all I've found are supposedly bugs
-of that exact cathegory.
+I found that some drivers contains an out-of-bound read pattern like this
 
-Please see my questions mentioned in the previous email I've sent and
-also a summary of suggested solutions inline below:
+	kern_buf = memdup_user(user_buf, count);
+	...
+	sscanf(kern_buf, ...);
 
-On Wed, Feb 07, 2024 at 01:29:18AM +0000, Daniel Golle wrote:
-> Hi Russell,
-> 
-> sorry for the extended time it took me to get back to this patch and
-> the comments you made for it. Understanding the complete scope of the
-> problem took a while (plus there were holidays and other fun things),
-> and also brought up further questions which I hope you can help me
-> find good answers for, see below:
-> 
-> On Wed, Dec 13, 2023 at 04:04:12PM +0000, Russell King (Oracle) wrote:
-> > On Tue, Dec 12, 2023 at 03:47:18AM +0000, Daniel Golle wrote:
-> > > Introduce a proper platform MFD driver for the LynxI (H)SGMII PCS which
-> > > is going to initially be used for the MT7988 SoC.
-> > > 
-> > > Signed-off-by: Daniel Golle <daniel@makrotopia.org>
-> > 
-> > I made some specific suggestions about what I wanted to see for
-> > "getting" PCS in the previous review, and I'm disappointed that this
-> > patch set is still inventing its own solution.
-> > 
-> > > +struct phylink_pcs *mtk_pcs_lynxi_get(struct device *dev, struct device_node *np)
-> > > +{
-> > > +	struct platform_device *pdev;
-> > > +	struct mtk_pcs_lynxi *mpcs;
-> > > +
-> > > +	if (!np)
-> > > +		return NULL;
-> > > +
-> > > +	if (!of_device_is_available(np))
-> > > +		return ERR_PTR(-ENODEV);
-> > > +
-> > > +	if (!of_match_node(mtk_pcs_lynxi_of_match, np))
-> > > +		return ERR_PTR(-EINVAL);
-> > > +
-> > > +	pdev = of_find_device_by_node(np);
-> > > +	if (!pdev || !platform_get_drvdata(pdev)) {
-> > 
-> > This is racy - as I thought I described before, userspace can unbind
-> > the device in one thread, while another thread is calling this
-> > function. With just the right timing, this check succeeds, but...
-> > 
-> > > +		if (pdev)
-> > > +			put_device(&pdev->dev);
-> > > +		return ERR_PTR(-EPROBE_DEFER);
-> > > +	}
-> > > +
-> > > +	mpcs = platform_get_drvdata(pdev);
-> > 
-> > mpcs ends up being read as NULL here. Even if you did manage to get a
-> > valid pointer, "mpcs" being devm-alloced could be freed from under
-> > you at this point...
-> > 
-> > > +	device_link_add(dev, mpcs->dev, DL_FLAG_AUTOREMOVE_CONSUMER);
-> > 
-> > resulting in this accessing memory which has been freed.
-> > 
-> > The solution would be either to suppress the bind/unbind attributes
-> > (provided the underlying struct device can't go away, which probably
-> > also means ensuring the same of the MDIO bus. Aternatively, adding
-> > a lock around the remove path and around the checking of
-> > platform_get_drvdata() down to adding the device link would probably
-> > solve it.
-> > 
-> > However, I come back to my general point - this kind of stuff is
-> > hairy. Do we want N different implementations of it in various drivers
-> > with subtle bugs, or do we want _one_ implemenatation.
-> > 
-> > If we go with the one implemenation approach, then we need to think
-> > about whether we should be using device links or not. The problem
-> > could be for network interfaces where one struct device is
-> > associated with multiple network interfaces. Using device links has
-> > the unfortunate side effect that if the PCS for one of those network
-> > interfaces is removed, _all_ network interfaces disappear.
-> 
-> I agree, esp. on this MT7988 removal of a PCS which may then not
-> even be in use also impairs connectivity on the built-in gigE DSA
-> switch. It would be nice to try to avoid this.
-> 
-> > 
-> > My original suggestion was to hook into phylink to cause that to
-> > take the link down when an in-use PCS gets removed.
-> 
-> I took a deep dive into how this could be done correctly and how
-> similar things are done for other drivers. Apart from the PCS there
-> often also is a muxing-PHY involved, eg. MediaTek's XFI T-PHY in this
-> case (previously often called "pextp" for no apparent reason) or
-> Marvell's comphy (mvebu-comphy).
-> 
-> So let's try something simple on an already well-supported platform,
-> I thought and grabbed Marvell Armada CN9131-DB running vanilla Linux,
-> and it didn't even take some something racy, but plain:
-> 
-> ip link set eth6 up
-> cd /sys/bus/platform/drivers/mvebu-comphy
-> echo f2120000.phy > unbind
-> echo f4120000.phy > unbind
-> echo f6120000.phy > unbind
-> ip link set eth6 down
-> 
-> 
-> That was enough. The result is a kernel crash, and the same should
-> apply on popular platforms like the SolidRun MACCHIATOBin and other
-> similar boards.
-> 
-> So this gets me to think that there is a wider problem around
-> non-phylink-managed resources which may disappear while in use by
-> network drivers, and I guess that the same applies in many other
-> places. I don't have a SATA drive connected to that Marvell board, but
-> I can imagine what happens when suddenly removing the comphy instance
-> in charge of the SATA link and then a subsequent SATA hotplug event
-> happens or stuff like that...
-> 
-> Anyway, back to network subsystem and phylink:
-> 
-> Do you agree that we need a way to register (and unregister) PCS
-> providers with phylink, so we don't need *_get_by_of_node implementations
-> in each driver? If so, can you sketch out what the basic requirements
-> for an acceptable solution would be?
-> 
-> Also, do you agree that lack of handling of disappearing resources,
-> such as PHYs (*not* network PHYs, but PHYs as in drivers/phy/*) or
-> syscons, is already a problem right now which should be addressed?
-> 
-> If you imagine phylink to take care of the life-cycle of all link-
-> resources, what is vision about those things other than classic MDIO-
-> connected PHYs?
-> 
-> And well, of course, the easy fix for the example above would be:
-> diff --git a/drivers/phy/marvell/phy-mvebu-cp110-comphy.c b/drivers/phy/marvell/phy-mvebu-cp110-comphy.c
-> index b0dd133665986..9517c96319595 100644
-> --- a/drivers/phy/marvell/phy-mvebu-cp110-comphy.c
-> +++ b/drivers/phy/marvell/phy-mvebu-cp110-comphy.c
-> @@ -1099,6 +1099,7 @@ static const struct of_device_id mvebu_comphy_of_match_table[] = {
->  MODULE_DEVICE_TABLE(of, mvebu_comphy_of_match_table);
->  
->  static struct platform_driver mvebu_comphy_driver = {
-> +	.suppress_bind_attrs = true,
->  	.probe	= mvebu_comphy_probe,
->  	.driver	= {
->  		.name = "mvebu-comphy",
-> 
-> But that should then apply to every single driver in drivers/phy/...
-> 
+The sscanf can be replaced by some other string-related functions. This
+pattern can lead to out-of-bound read of kern_buf in string-related
+functions.
 
-My remaining questions are:
- - Is it ok to just use .suppress_bind_attrs = true for PCS and PHY
-   drivers to avoid having to care out hot-removal?
-   Those components are anyway built-into the SoC so removing them
-   is physically not possible.
+This series fix the above issue by replacing memdup_user with
+memdup_user_nul or allocating count + 1 buffer then writing the NULL
+terminator to end of buffer after userspace copying.
 
- - In case of driver removal (rmmod -f) imho using a device-link would
-   be sufficient to prevent the worst. However, we would have to live
-   with the all-or-nothing nature of that approach, ie. once e.g. the
-   USXGMII driver is being removed, *all* Ethernet interfaces would
-   disappear with it (even those not actually using USXGMII).
+Thanks,
+Quang Minh.
 
-If the solutions mentioned above do not sound agreeable, please suggest
-how a good solution would look like, ideally also share an example of
-any driver in the kernel where this is done in the way you would like
-to have things done.
+Signed-off-by: Bui Quang Minh <minhquangbui99@gmail.com>
+---
+Bui Quang Minh (5):
+      drivers/net/ethernet/intel-ice: ensure the copied buf is NULL terminated
+      drivers/net/brocade-bnad: ensure the copied buf is NULL terminated
+      drivers/scsi/bfa/bfad: ensure the copied buf is NULL terminated
+      drivers/scsi/qedf: ensure the copied buf is NULL terminated
+      drivers/s390/cio: ensure the copied buf is NULL terminated
 
-> 
-> > 
-> > > +
-> > > +	return &mpcs->pcs;
-> > > +}
-> > > +EXPORT_SYMBOL(mtk_pcs_lynxi_get);
-> > > +
-> > > +void mtk_pcs_lynxi_put(struct phylink_pcs *pcs)
-> > > +{
-> > > +	struct mtk_pcs_lynxi *cur, *mpcs = NULL;
-> > > +
-> > > +	if (!pcs)
-> > > +		return;
-> > > +
-> > > +	mutex_lock(&instance_mutex);
-> > > +	list_for_each_entry(cur, &mtk_pcs_lynxi_instances, node)
-> > > +		if (pcs == &cur->pcs) {
-> > > +			mpcs = cur;
-> > > +			break;
-> > > +		}
-> > > +	mutex_unlock(&instance_mutex);
-> > 
-> > I don't see what this loop gains us, other than checking that the "pcs"
-> > is still on the list and hasn't already been removed. If that is all
-> > that this is about, then I would suggest:
-> > 
-> > 	bool found = false;
-> > 
-> > 	if (!pcs)
-> > 		return;
-> > 
-> > 	mpcs = pcs_to_mtk_pcs_lynxi(pcs);
-> > 	mutex_lock(&instance_mutex);
-> > 	list_for_each_entry(cur, &mtk_pcs_lynxi_instances, node)
-> > 		if (cur == mpcs) {
-> > 			found = true;
-> > 			break;
-> > 		}
-> > 	mutex_unlock(&instance_mutex);
-> > 
-> > 	if (WARN_ON(!found))
-> > 		return;
-> > 
-> > which makes it more obvious why this exists.
-> 
-> The idea was not only to make sure it hasn't been removed, but also
-> to be sure that what ever the private data pointer points to has
-> actually been created by that very driver.
-> 
-> But yes, doing it in the way you suggest will work in the same way,
-> just when having my idea in mind it looks more fishy to use
-> pcs_to_mtk_pcs_lynxi() before we are 100% sure that what we dealing
-> with has previously been created by this driver.
-> 
-> 
-> Cheers
-> 
-> 
-> Daniel
-> 
+ drivers/net/ethernet/brocade/bna/bnad_debugfs.c | 4 ++--
+ drivers/net/ethernet/intel/ice/ice_debugfs.c    | 8 ++++----
+ drivers/s390/cio/cio_inject.c                   | 3 ++-
+ drivers/scsi/bfa/bfad_debugfs.c                 | 4 ++--
+ drivers/scsi/qedf/qedf_debugfs.c                | 2 +-
+ 5 files changed, 11 insertions(+), 10 deletions(-)
+---
+base-commit: ed30a4a51bb196781c8058073ea720133a65596f
+change-id: 20240422-fix-oob-read-19ae7f8f3711
+
+Best regards,
+-- 
+Bui Quang Minh <minhquangbui99@gmail.com>
+
 
