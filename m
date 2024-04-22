@@ -1,329 +1,192 @@
-Return-Path: <netdev+bounces-90170-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90171-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F29638ACF0F
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 16:12:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B1898ACF27
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 16:18:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 220BD1C20DAA
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 14:12:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D5B56282B7C
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 14:18:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 281CF1514C3;
-	Mon, 22 Apr 2024 14:12:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C60F51509B5;
+	Mon, 22 Apr 2024 14:18:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XZI2g4Uq"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DJGVNtdD"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C338414F9E1;
-	Mon, 22 Apr 2024 14:12:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35EA915099E
+	for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 14:18:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713795124; cv=none; b=I8NvMLwqdlQrL69bFqT3d0w6JhCFuJp58mH4j+iwVSK+pPnEAhObe1/JB9IdQQyFcr/XF9+6A/KxCZkqFpC/Qub5zmiLdQmgANRuFdUa2gbPa3HHAySNrMS1eQhezZttUupEirvnPm2HGG6ECYIr75FhebBS0rqX21fhTWzQRLY=
+	t=1713795532; cv=none; b=RtCgoDC9SITUwNt+0jN2AwHq1GDmN7P+lntWvOkjICL743zh/Asi4DK4wRKzwBg4vQvIdZ784VWqjV98Zvt0zfu/fAfpO18lVHOjb9I8UH1eiVQxlhtUJBkkh106PFjqunyB5d+bK/rI801ibNbh+mEHCr1UHGJoRBUIto8oi7M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713795124; c=relaxed/simple;
-	bh=63rvt2yz8r57hl8myRcuStiGVHTSpmv479F+BVPlgOk=;
-	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=EXwSD1gOrzC1UFPRGE5PVklfn2EoSRdpM7bDx5A8c6v9xGY92yUE7DYBMuHjcoWboURdTr2w4X7aiJpQwuRUlk6lCh0sCZljFPZTVx+fOjhme6Pl/doOqdc+R6TiLVs9/VPwgnkJtli8CrbQU9LQGi+34iQfac4+sgukfYDjUD4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XZI2g4Uq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CAAD5C32783;
-	Mon, 22 Apr 2024 14:11:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713795123;
-	bh=63rvt2yz8r57hl8myRcuStiGVHTSpmv479F+BVPlgOk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=XZI2g4UqcleGPHMCMSqV3/iC7oJP0tZWbpfXP00rfR9bLCRfpzFMwC9X4q54oxXMM
-	 DnhZrHtKfWP5KsKR0UwBwIDd4eHpEkLzxxX7LPi42cCObWXCldmkT2ETPDxFRfwhiK
-	 nyXLCvvf3mWcIJjGAf2BRpg+sGk/r9FACse9FCIZKTAIMRKChgqXwhJ7CqFLLV8oy/
-	 QLrmKiFkxPB4YBmwLg/Hf4QkKGO2SUvS8pCcc0bNoMWOtMRS3u0h3n+olJg1vGec5V
-	 55mbL/zgu8a6qrqHPaT4tJ+d8LCTGjRW/TTRHz6/VaV0UanNJA0VfQalKnV9xzPuaQ
-	 EUKZMBGXl8nFQ==
-Date: Mon, 22 Apr 2024 23:11:51 +0900
-From: Masami Hiramatsu (Google) <mhiramat@kernel.org>
-To: Mike Rapoport <rppt@kernel.org>
-Cc: linux-kernel@vger.kernel.org, Alexandre Ghiti <alexghiti@rivosinc.com>,
- Andrew Morton <akpm@linux-foundation.org>, =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?=
- <bjorn@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, Christophe
- Leroy <christophe.leroy@csgroup.eu>, "David S. Miller"
- <davem@davemloft.net>, Dinh Nguyen <dinguyen@kernel.org>, Donald Dutile
- <ddutile@redhat.com>, Eric Chanudet <echanude@redhat.com>, Heiko Carstens
- <hca@linux.ibm.com>, Helge Deller <deller@gmx.de>, Huacai Chen
- <chenhuacai@kernel.org>, Kent Overstreet <kent.overstreet@linux.dev>, Luis
- Chamberlain <mcgrof@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
- Masami Hiramatsu <mhiramat@kernel.org>, Michael Ellerman
- <mpe@ellerman.id.au>, Nadav Amit <nadav.amit@gmail.com>, Palmer Dabbelt
- <palmer@dabbelt.com>, Peter Zijlstra <peterz@infradead.org>, Rick Edgecombe
- <rick.p.edgecombe@intel.com>, Russell King <linux@armlinux.org.uk>, Sam
- Ravnborg <sam@ravnborg.org>, Song Liu <song@kernel.org>, Steven Rostedt
- <rostedt@goodmis.org>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
- Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
- bpf@vger.kernel.org, linux-arch@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
- linux-mm@kvack.org, linux-modules@vger.kernel.org,
- linux-parisc@vger.kernel.org, linux-riscv@lists.infradead.org,
- linux-s390@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org, loongarch@lists.linux.dev,
- netdev@vger.kernel.org, sparclinux@vger.kernel.org, x86@kernel.org
-Subject: Re: [PATCH v5 14/15] kprobes: remove dependency on CONFIG_MODULES
-Message-Id: <20240422231151.0d7c18ec1917887c7f323d4c@kernel.org>
-In-Reply-To: <20240422094436.3625171-15-rppt@kernel.org>
-References: <20240422094436.3625171-1-rppt@kernel.org>
-	<20240422094436.3625171-15-rppt@kernel.org>
-X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1713795532; c=relaxed/simple;
+	bh=5NebA/A3MQ0RArecgWlr/xbum8+gfgz73lLHgMGOtBA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Be7ncRX7Akvqi2XHiazyfWVgc2RyfKYrDI1ZyseQ9DJwDYGa9eaGJ5CK3D4S0MIL/GYj0GKjzVBbfHe5GN3g6mGWCCO8eLfaAFDbKHgaXAipjej8jiLUIyqzwPjplwWVUhjBcx+actvkpxQwPsTuJhmpgrrtFaphGYCDl8vgUFA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DJGVNtdD; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1713795530;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=RuEWgRbov+iY+KqOCft+xN2s/HWnJOwqATFyKi7m/SE=;
+	b=DJGVNtdDjiBvoaI/SDKGBSDMurlv/CLCBJeJqriuhGN1eXEvEKdIbLOi/DiKyKAhOffjba
+	PxYjKMAWB6QkzvptX1Lchap0vebsWOxUThUS2MRzml5vHkSGFQ/mQvrCSjejtdIwqGRPKA
+	18oL+OfHIfIM1bAQ8x71sDOydT5rBHk=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-652-EhPgEgi6M9qIz64AgTlrJQ-1; Mon, 22 Apr 2024 10:18:48 -0400
+X-MC-Unique: EhPgEgi6M9qIz64AgTlrJQ-1
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-349d779625eso3640965f8f.2
+        for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 07:18:48 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713795527; x=1714400327;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RuEWgRbov+iY+KqOCft+xN2s/HWnJOwqATFyKi7m/SE=;
+        b=OLLQ5tvL2eTqqvahByFp2PMVhhvB2bqRXI7kNTauqdH3J9uUjEHq0g7Av6t1UsOA85
+         8vVR6AHybyclbLEOi/5bzLsxeh8FR6GuPqtbW/6FJAlR8qQGx5cnuRvWpb1QWO+FlVFc
+         umL8625blkoi0nPeqJyPAcgUWo98RIZt+2NxhLhFw7K3Te4+KdePccAirnn/9BahPc5i
+         cJXLcyAkd8LiHFOWhgT8Mn7Zv+lRhiirCKes6UK1xEqheXXkECYqZpyYqIGB660S6z6D
+         8WFN5Hwm3QoNbtooKYZd6GAylb7Oou6CNknx/+1Pol3ROEsgNT8DKvao0uawxRSaOlGi
+         DD9g==
+X-Forwarded-Encrypted: i=1; AJvYcCW+AYfEa+oeDm7UkqhwcbyWo2eyfiLnpOts+afF6V6yoSn9cjiUWOwAdui3f8jK7kDZSdXzcEJZCxkc9OwEiG0trgskjIx4
+X-Gm-Message-State: AOJu0Yy5CeaBa02OI26cc+7lYcKorzXJsmVnMBR7mWcyXUpY/3PkcRjk
+	64xemJrzuXQBr9suc+lRmikoN2zpj8lYhgVWFX440fzr72fP2Vdln4cO6sUoyizIlZm7IC/Jfa5
+	u4Ofkqh7m/dumSxJeZyVW8xzRVKNsJL6ZJPF4RknLt+7QiAsDhhCo9Q==
+X-Received: by 2002:adf:ce91:0:b0:34b:58a2:dead with SMTP id r17-20020adfce91000000b0034b58a2deadmr209868wrn.33.1713795527120;
+        Mon, 22 Apr 2024 07:18:47 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGr5x0koTy4iow6GLkNZgdwaMcdEjJgD3/LWvrvM95SfAaGPPm7kmwZu+TuEABqDb/EvhKg4Q==
+X-Received: by 2002:adf:ce91:0:b0:34b:58a2:dead with SMTP id r17-20020adfce91000000b0034b58a2deadmr209834wrn.33.1713795526513;
+        Mon, 22 Apr 2024 07:18:46 -0700 (PDT)
+Received: from redhat.com ([2a06:c701:7429:3c00:dc4a:cd5:7b1c:f7c2])
+        by smtp.gmail.com with ESMTPSA id d4-20020a5d6dc4000000b00341ce80ea66sm12114246wrz.82.2024.04.22.07.18.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Apr 2024 07:18:46 -0700 (PDT)
+Date: Mon, 22 Apr 2024 10:18:41 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: syzbot <syzbot+6c21aeb59d0e82eb2782@syzkaller.appspotmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	pabeni@redhat.com, sgarzare@redhat.com,
+	syzkaller-bugs@googlegroups.com, virtualization@lists.linux.dev
+Subject: Re: [syzbot] [virt?] [net?] KMSAN: uninit-value in
+ vsock_assign_transport (2)
+Message-ID: <20240422101622-mutt-send-email-mst@kernel.org>
+References: <000000000000be4e1c06166fdc85@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <000000000000be4e1c06166fdc85@google.com>
 
-On Mon, 22 Apr 2024 12:44:35 +0300
-Mike Rapoport <rppt@kernel.org> wrote:
-
-> From: "Mike Rapoport (IBM)" <rppt@kernel.org>
+On Fri, Apr 19, 2024 at 02:39:20AM -0700, syzbot wrote:
+> Hello,
 > 
-> kprobes depended on CONFIG_MODULES because it has to allocate memory for
-> code.
+> syzbot found the following issue on:
 > 
-> Since code allocations are now implemented with execmem, kprobes can be
-> enabled in non-modular kernels.
+> HEAD commit:    8cd26fd90c1a Merge tag 'for-6.9-rc4-tag' of git://git.kern..
+> git tree:       upstream
+> console+strace: https://syzkaller.appspot.com/x/log.txt?x=102d27cd180000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=87a805e655619c64
+> dashboard link: https://syzkaller.appspot.com/bug?extid=6c21aeb59d0e82eb2782
+> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16e38c3b180000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=10e62fed180000
 > 
-> Add #ifdef CONFIG_MODULE guards for the code dealing with kprobes inside
-> modules, make CONFIG_KPROBES select CONFIG_EXECMEM and drop the
-> dependency of CONFIG_KPROBES on CONFIG_MODULES.
-
-Looks good to me.
-
-Acked-by: Masami Hiramatsu (Google) <mhiramat@kernel.org>
-
-Thank you!
-
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/488822aee24a/disk-8cd26fd9.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/ba40e322ba00/vmlinux-8cd26fd9.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/f30af1dfbc30/bzImage-8cd26fd9.xz
 > 
-> Signed-off-by: Mike Rapoport (IBM) <rppt@kernel.org>
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+6c21aeb59d0e82eb2782@syzkaller.appspotmail.com
+> 
+> =====================================================
+> BUG: KMSAN: uninit-value in vsock_assign_transport+0xb2a/0xb90 net/vmw_vsock/af_vsock.c:500
+>  vsock_assign_transport+0xb2a/0xb90 net/vmw_vsock/af_vsock.c:500
+>  vsock_connect+0x544/0x1560 net/vmw_vsock/af_vsock.c:1393
+>  __sys_connect_file net/socket.c:2048 [inline]
+>  __sys_connect+0x606/0x690 net/socket.c:2065
+>  __do_sys_connect net/socket.c:2075 [inline]
+>  __se_sys_connect net/socket.c:2072 [inline]
+>  __x64_sys_connect+0x91/0xe0 net/socket.c:2072
+>  x64_sys_call+0x3356/0x3b50 arch/x86/include/generated/asm/syscalls_64.h:43
+>  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+>  do_syscall_64+0xcf/0x1e0 arch/x86/entry/common.c:83
+>  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> 
+> Uninit was created at:
+>  __kmalloc_large_node+0x231/0x370 mm/slub.c:3921
+>  __do_kmalloc_node mm/slub.c:3954 [inline]
+>  __kmalloc_node+0xb07/0x1060 mm/slub.c:3973
+>  kmalloc_node include/linux/slab.h:648 [inline]
+>  kvmalloc_node+0xc0/0x2d0 mm/util.c:634
+>  kvmalloc include/linux/slab.h:766 [inline]
+>  vhost_vsock_dev_open+0x44/0x510 drivers/vhost/vsock.c:659
+>  misc_open+0x66b/0x760 drivers/char/misc.c:165
+>  chrdev_open+0xa5f/0xb80 fs/char_dev.c:414
+>  do_dentry_open+0x11f1/0x2120 fs/open.c:955
+>  vfs_open+0x7e/0xa0 fs/open.c:1089
+>  do_open fs/namei.c:3642 [inline]
+>  path_openat+0x4a3c/0x5b00 fs/namei.c:3799
+>  do_filp_open+0x20e/0x590 fs/namei.c:3826
+>  do_sys_openat2+0x1bf/0x2f0 fs/open.c:1406
+>  do_sys_open fs/open.c:1421 [inline]
+>  __do_sys_openat fs/open.c:1437 [inline]
+>  __se_sys_openat fs/open.c:1432 [inline]
+>  __x64_sys_openat+0x2a1/0x310 fs/open.c:1432
+>  x64_sys_call+0x3a64/0x3b50 arch/x86/include/generated/asm/syscalls_64.h:258
+>  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+>  do_syscall_64+0xcf/0x1e0 arch/x86/entry/common.c:83
+>  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> 
+> CPU: 1 PID: 5021 Comm: syz-executor390 Not tainted 6.9.0-rc4-syzkaller-00038-g8cd26fd90c1a #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
+> =====================================================
+> 
+> 
 > ---
->  arch/Kconfig                |  2 +-
->  include/linux/module.h      |  9 ++++++
->  kernel/kprobes.c            | 55 +++++++++++++++++++++++--------------
->  kernel/trace/trace_kprobe.c | 20 +++++++++++++-
->  4 files changed, 63 insertions(+), 23 deletions(-)
+> This report is generated by a bot. It may contain errors.
+> See https://goo.gl/tpsmEJ for more information about syzbot.
+> syzbot engineers can be reached at syzkaller@googlegroups.com.
 > 
-> diff --git a/arch/Kconfig b/arch/Kconfig
-> index 7006f71f0110..a48ce6a488b3 100644
-> --- a/arch/Kconfig
-> +++ b/arch/Kconfig
-> @@ -52,9 +52,9 @@ config GENERIC_ENTRY
->  
->  config KPROBES
->  	bool "Kprobes"
-> -	depends on MODULES
->  	depends on HAVE_KPROBES
->  	select KALLSYMS
-> +	select EXECMEM
->  	select TASKS_RCU if PREEMPTION
->  	help
->  	  Kprobes allows you to trap at almost any kernel address and
-> diff --git a/include/linux/module.h b/include/linux/module.h
-> index 1153b0d99a80..ffa1c603163c 100644
-> --- a/include/linux/module.h
-> +++ b/include/linux/module.h
-> @@ -605,6 +605,11 @@ static inline bool module_is_live(struct module *mod)
->  	return mod->state != MODULE_STATE_GOING;
->  }
->  
-> +static inline bool module_is_coming(struct module *mod)
-> +{
-> +        return mod->state == MODULE_STATE_COMING;
-> +}
-> +
->  struct module *__module_text_address(unsigned long addr);
->  struct module *__module_address(unsigned long addr);
->  bool is_module_address(unsigned long addr);
-> @@ -857,6 +862,10 @@ void *dereference_module_function_descriptor(struct module *mod, void *ptr)
->  	return ptr;
->  }
->  
-> +static inline bool module_is_coming(struct module *mod)
-> +{
-> +	return false;
-> +}
->  #endif /* CONFIG_MODULES */
->  
->  #ifdef CONFIG_SYSFS
-> diff --git a/kernel/kprobes.c b/kernel/kprobes.c
-> index ddd7cdc16edf..ca2c6cbd42d2 100644
-> --- a/kernel/kprobes.c
-> +++ b/kernel/kprobes.c
-> @@ -1588,7 +1588,7 @@ static int check_kprobe_address_safe(struct kprobe *p,
->  	}
->  
->  	/* Get module refcount and reject __init functions for loaded modules. */
-> -	if (*probed_mod) {
-> +	if (IS_ENABLED(CONFIG_MODULES) && *probed_mod) {
->  		/*
->  		 * We must hold a refcount of the probed module while updating
->  		 * its code to prohibit unexpected unloading.
-> @@ -1603,12 +1603,13 @@ static int check_kprobe_address_safe(struct kprobe *p,
->  		 * kprobes in there.
->  		 */
->  		if (within_module_init((unsigned long)p->addr, *probed_mod) &&
-> -		    (*probed_mod)->state != MODULE_STATE_COMING) {
-> +		    !module_is_coming(*probed_mod)) {
->  			module_put(*probed_mod);
->  			*probed_mod = NULL;
->  			ret = -ENOENT;
->  		}
->  	}
-> +
->  out:
->  	preempt_enable();
->  	jump_label_unlock();
-> @@ -2488,24 +2489,6 @@ int kprobe_add_area_blacklist(unsigned long start, unsigned long end)
->  	return 0;
->  }
->  
-> -/* Remove all symbols in given area from kprobe blacklist */
-> -static void kprobe_remove_area_blacklist(unsigned long start, unsigned long end)
-> -{
-> -	struct kprobe_blacklist_entry *ent, *n;
-> -
-> -	list_for_each_entry_safe(ent, n, &kprobe_blacklist, list) {
-> -		if (ent->start_addr < start || ent->start_addr >= end)
-> -			continue;
-> -		list_del(&ent->list);
-> -		kfree(ent);
-> -	}
-> -}
-> -
-> -static void kprobe_remove_ksym_blacklist(unsigned long entry)
-> -{
-> -	kprobe_remove_area_blacklist(entry, entry + 1);
-> -}
-> -
->  int __weak arch_kprobe_get_kallsym(unsigned int *symnum, unsigned long *value,
->  				   char *type, char *sym)
->  {
-> @@ -2570,6 +2553,25 @@ static int __init populate_kprobe_blacklist(unsigned long *start,
->  	return ret ? : arch_populate_kprobe_blacklist();
->  }
->  
-> +#ifdef CONFIG_MODULES
-> +/* Remove all symbols in given area from kprobe blacklist */
-> +static void kprobe_remove_area_blacklist(unsigned long start, unsigned long end)
-> +{
-> +	struct kprobe_blacklist_entry *ent, *n;
-> +
-> +	list_for_each_entry_safe(ent, n, &kprobe_blacklist, list) {
-> +		if (ent->start_addr < start || ent->start_addr >= end)
-> +			continue;
-> +		list_del(&ent->list);
-> +		kfree(ent);
-> +	}
-> +}
-> +
-> +static void kprobe_remove_ksym_blacklist(unsigned long entry)
-> +{
-> +	kprobe_remove_area_blacklist(entry, entry + 1);
-> +}
-> +
->  static void add_module_kprobe_blacklist(struct module *mod)
->  {
->  	unsigned long start, end;
-> @@ -2672,6 +2674,17 @@ static struct notifier_block kprobe_module_nb = {
->  	.priority = 0
->  };
->  
-> +static int kprobe_register_module_notifier(void)
-> +{
-> +	return register_module_notifier(&kprobe_module_nb);
-> +}
-> +#else
-> +static int kprobe_register_module_notifier(void)
-> +{
-> +	return 0;
-> +}
-> +#endif /* CONFIG_MODULES */
-> +
->  void kprobe_free_init_mem(void)
->  {
->  	void *start = (void *)(&__init_begin);
-> @@ -2731,7 +2744,7 @@ static int __init init_kprobes(void)
->  	if (!err)
->  		err = register_die_notifier(&kprobe_exceptions_nb);
->  	if (!err)
-> -		err = register_module_notifier(&kprobe_module_nb);
-> +		err = kprobe_register_module_notifier();
->  
->  	kprobes_initialized = (err == 0);
->  	kprobe_sysctls_init();
-> diff --git a/kernel/trace/trace_kprobe.c b/kernel/trace/trace_kprobe.c
-> index 14099cc17fc9..2cb2a3951b4f 100644
-> --- a/kernel/trace/trace_kprobe.c
-> +++ b/kernel/trace/trace_kprobe.c
-> @@ -111,6 +111,7 @@ static nokprobe_inline bool trace_kprobe_within_module(struct trace_kprobe *tk,
->  	return strncmp(module_name(mod), name, len) == 0 && name[len] == ':';
->  }
->  
-> +#ifdef CONFIG_MODULES
->  static nokprobe_inline bool trace_kprobe_module_exist(struct trace_kprobe *tk)
->  {
->  	char *p;
-> @@ -129,6 +130,12 @@ static nokprobe_inline bool trace_kprobe_module_exist(struct trace_kprobe *tk)
->  
->  	return ret;
->  }
-> +#else
-> +static inline bool trace_kprobe_module_exist(struct trace_kprobe *tk)
-> +{
-> +	return false;
-> +}
-> +#endif
->  
->  static bool trace_kprobe_is_busy(struct dyn_event *ev)
->  {
-> @@ -670,6 +677,7 @@ static int register_trace_kprobe(struct trace_kprobe *tk)
->  	return ret;
->  }
->  
-> +#ifdef CONFIG_MODULES
->  /* Module notifier call back, checking event on the module */
->  static int trace_kprobe_module_callback(struct notifier_block *nb,
->  				       unsigned long val, void *data)
-> @@ -704,6 +712,16 @@ static struct notifier_block trace_kprobe_module_nb = {
->  	.notifier_call = trace_kprobe_module_callback,
->  	.priority = 1	/* Invoked after kprobe module callback */
->  };
-> +static int trace_kprobe_register_module_notifier(void)
-> +{
-> +	return register_module_notifier(&trace_kprobe_module_nb);
-> +}
-> +#else
-> +static int trace_kprobe_register_module_notifier(void)
-> +{
-> +	return 0;
-> +}
-> +#endif /* CONFIG_MODULES */
->  
->  static int count_symbols(void *data, unsigned long unused)
->  {
-> @@ -1933,7 +1951,7 @@ static __init int init_kprobe_trace_early(void)
->  	if (ret)
->  		return ret;
->  
-> -	if (register_module_notifier(&trace_kprobe_module_nb))
-> +	if (trace_kprobe_register_module_notifier())
->  		return -EINVAL;
->  
->  	return 0;
-> -- 
-> 2.43.0
+> syzbot will keep track of this issue. See:
+> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 > 
+> If the report is already addressed, let syzbot know by replying with:
+> #syz fix: exact-commit-title
+> 
+> If you want syzbot to run the reproducer, reply with:
+> #syz test: git://repo/address.git branch-or-commit-hash
+> If you attach or paste a git patch, syzbot will apply it before testing.
+> 
+> If you want to overwrite report's subsystems, reply with:
+> #syz set subsystems: new-subsystem
+> (See the list of subsystem names on the web dashboard)
+> 
+> If the report is a duplicate of another one, reply with:
+> #syz dup: exact-subject-of-another-report
+> 
+> If you want to undo deduplication, reply with:
+> #syz undup
 
 
--- 
-Masami Hiramatsu (Google) <mhiramat@kernel.org>
+#syz test: https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git bcc17a060d93b198d8a17a9b87b593f41337ee28
+
+
+
 
