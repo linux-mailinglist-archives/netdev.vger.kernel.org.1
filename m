@@ -1,120 +1,163 @@
-Return-Path: <netdev+bounces-90109-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90116-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E8D18ACD38
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 14:47:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E11DF8ACD4E
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 14:50:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C74AFB24A72
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 12:47:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1E8F71C20D62
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 12:50:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE36814EC7D;
-	Mon, 22 Apr 2024 12:47:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QKVetmT4"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69C4414A09D;
+	Mon, 22 Apr 2024 12:49:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [207.211.30.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25D6114A61A
-	for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 12:47:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56D4A14A08D
+	for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 12:49:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.211.30.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713790045; cv=none; b=KGJyjoxjef2UF9VWOa3IxIILdrZQVc9jJ9OEslg/trVunwCxjl6pBFkaEYtFWe4zp6fDCWbje3xvq3pB9VZ6awcY4r46hUB4HOLXSCteqYTpCWDoVsTf49e5tL1LMsFpBODei/tVrMIyFcGDae3Rcm8sp87tgzpJ7CzAojsNu+4=
+	t=1713790196; cv=none; b=fj8OeM6liinhuU4YcruuVyl0iWjm+O8kWixMPQonYi/hpybRhFLJdLiq16px6UrjFTwNRNHIt57NnZScesNw9jtk3ESwgWPOwlYjFFIny5i0xqCqTiG/lUD+EedFyFbl5/zhfpzVQO3Ly8PNMhtur8U2JHBIOPZEFNwLjY/Xj3s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713790045; c=relaxed/simple;
-	bh=xK0xpJYoCLIITlC+CsYauUdtz62QeVeHRGmWzCiWf5I=;
+	s=arc-20240116; t=1713790196; c=relaxed/simple;
+	bh=J1qs4OtQ3EUqHG2y1IZiUT6xQ9dEJDRPWh2AmAIBqIY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WpXMlBxzkPEYmA1NF0P3A1Nk9flFY5fY3tb6nq9YUwFSeCCaJsosR7eEmsujOBg50oZsivuClAiS33uK2Py4K6ZaGRFnhyp1sinakDGjYo0H8XCwcXFmALVQxFJtTGg8l7xjBuwJ0/ZfkIi5QtMWwVO3qwlSb+OIreKZXxjPwY8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=QKVetmT4; arc=none smtp.client-ip=209.85.167.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-5196c755e82so6087887e87.0
-        for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 05:47:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1713790042; x=1714394842; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=tAq2BIio/WgpUEPdT8jPUBANtNcgUg2oMhI7FrVaEB0=;
-        b=QKVetmT4Qiv2LzM5bk/Rk+DI4aimjEbt6joAxLnYRDLX/FzEMNGF8e7jXAlwsrauwA
-         c0xHKqmpHy76N/L5OvbNpQ9raifbYLglRIU6o0U0C47ElT+tlsLhwzs8RywixlGPoKoT
-         BG2v89BzOhSKDFCFBbnEZsljWgBsLovuefUO0IenfK5GCcq3ZLK0NxUPLRJ2oHoVVTua
-         YPBlZ9cyYeMVcpGP+TANdwTW7jxweUyLoKH3IonGyLckFiGZ1k2H6OF55duhqQWGq77g
-         iKxLlyouFq8MohJmDXXj9VIzCMVkDB9FcPmUxoRzOyvl/Xv4+rdFnN0L94sombBSJL9J
-         Diaw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713790042; x=1714394842;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tAq2BIio/WgpUEPdT8jPUBANtNcgUg2oMhI7FrVaEB0=;
-        b=Hg4zAyNmaQklxL4/78C2JPebRWbrdr+NBdQNIx+REIcnbSnWCJu7/yAtp9MLmdeql7
-         9g9VuB16+MyftAgbVr9Z5cglqLHstTque0VoJK+dJBnv3q4RWkbEZ1DnsIveypUTRAuz
-         gemcHQ1DXsf4KFEC5Zh3XvLNPRS+bCZcFGGXsjm3I9M36fEx2YiLIh/Q3vBLQJvLUkj4
-         mf8OxJmuRiTK9iFH61dOghKRYgz6woft3NZPDbDGHllRU2nTVjPyMtMrygYA0fI2udt/
-         iQfBH20Ugz/cgFacQMRiJn3DsoX4OQXbfj8C7Zp/HQJ2mQQ7VX9TIK2MHOEwF86Zn4ar
-         F5kA==
-X-Forwarded-Encrypted: i=1; AJvYcCUWROmUpEacQaZmlzXmNt2UWYd3GsnQX1v6GlFui06RjuhiqzOmWEai2kAAvo9zxm2j9rxIRPPuxrBfs8GOWuPLJFKvbTpc
-X-Gm-Message-State: AOJu0YzBmgrBGUMF/4nvk9U23nJMqB0JQGJp8jXs/cJQN75EKdar52LJ
-	8BTBJ01l8nTAV2qaKgxVJYGDHIk4WQFGAVq8g2LYlofJt2p9e0utUBZIvjlX3NmNuGVO2JOxfX6
-	W
-X-Google-Smtp-Source: AGHT+IEMH8RihJNVGuEx0Di87sDBlhXnXygmj8MwWRwVHNTMdA9GYNd7ZTy8dfvJApZvwx5iiRjYLw==
-X-Received: by 2002:a05:6512:20c3:b0:51a:c3a6:9209 with SMTP id u3-20020a05651220c300b0051ac3a69209mr5156044lfr.68.1713790039896;
-        Mon, 22 Apr 2024 05:47:19 -0700 (PDT)
-Received: from localhost ([102.222.70.76])
-        by smtp.gmail.com with ESMTPSA id r25-20020a170906351900b00a55b5c365dfsm1248156eja.199.2024.04.22.05.47.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Apr 2024 05:47:19 -0700 (PDT)
-Date: Mon, 22 Apr 2024 15:47:15 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Jeongjun Park <aha310510@gmail.com>
-Cc: ajk@comnets.uni-bremen.de, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, linux-hams@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	syzkaller-bugs@googlegroups.com,
-	syzbot+8e03da5d64bc85098811@syzkaller.appspotmail.com
-Subject: Re: [PATCH] hams: Fix deadlock caused by unsafe-irq lock in sp_get()
-Message-ID: <bac3fb0d-2810-496d-b3ef-26a7f208ec51@moroto.mountain>
-References: <20240418173037.6714-1-aha310510@gmail.com>
+	 In-Reply-To:Content-Type:Content-Disposition; b=Db8btsirwoKFaPADVQlrpTw4ZDmdqFH/cojiI+Z6upQlledfONCQ8vWErSTfQ3ozgMivv5OSW0ZQCTFccUP+I9Ww3RORaGQ/dl1NGNQwDl2uazMeayveEya2eRK/AGinZfKG9vxUkEhG7ACPBicfLNsG7DUr2803k72Xuy4xMII=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=none smtp.mailfrom=queasysnail.net; arc=none smtp.client-ip=207.211.30.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=queasysnail.net
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-275-o-6D2PikPrqeVoNYz8-oTg-1; Mon, 22 Apr 2024 08:49:48 -0400
+X-MC-Unique: o-6D2PikPrqeVoNYz8-oTg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1830B834FBE;
+	Mon, 22 Apr 2024 12:49:48 +0000 (UTC)
+Received: from hog (unknown [10.39.193.137])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 4F973200AE7F;
+	Mon, 22 Apr 2024 12:49:46 +0000 (UTC)
+Date: Mon, 22 Apr 2024 14:49:44 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Steffen Klassert <steffen.klassert@secunet.com>
+Cc: Paul Davey <paul.davey@alliedtelesis.co.nz>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org
+Subject: Re: [PATCH net] xfrm: Preserve vlan tags for transport mode software
+ GRO
+Message-ID: <ZiZc6ApkxivqaILg@hog>
+References: <20240422025711.145577-1-paul.davey@alliedtelesis.co.nz>
+ <ZiY0Of0QuDOCPXHg@gauss3.secunet.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <ZiY0Of0QuDOCPXHg@gauss3.secunet.de>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.4
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: queasysnail.net
+Content-Type: text/plain; charset=UTF-8
 Content-Disposition: inline
-In-Reply-To: <20240418173037.6714-1-aha310510@gmail.com>
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Apr 19, 2024 at 02:30:37AM +0900, Jeongjun Park wrote:
-> 
-> read_lock() present in sp_get() is interrupt-vulnerable, so the function needs to be modified.
-> 
-> 
-> Reported-by: syzbot+8e03da5d64bc85098811@syzkaller.appspotmail.com
-> Signed-off-by: Jeongjun Park <aha310510@gmail.com>
-> ---
->  drivers/net/hamradio/6pack.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/hamradio/6pack.c b/drivers/net/hamradio/6pack.c
-> index 6ed38a3cdd73..f882682ff0c8 100644
-> --- a/drivers/net/hamradio/6pack.c
-> +++ b/drivers/net/hamradio/6pack.c
-> @@ -372,12 +372,13 @@ static DEFINE_RWLOCK(disc_data_lock);
->  static struct sixpack *sp_get(struct tty_struct *tty)
->  {
->  	struct sixpack *sp;
-> +	unsigned long flags;
->  
-> -	read_lock(&disc_data_lock);
-> +	flags = read_lock_irqsave(&disc_data_lock);
+2024-04-22, 11:56:09 +0200, Steffen Klassert wrote:
+> On Mon, Apr 22, 2024 at 02:56:20PM +1200, Paul Davey wrote:
+> > The software GRO path for esp transport mode uses skb_mac_header_rebuil=
+d
+> > prior to re-injecting the packet via the xfrm_napi_dev.  This only
+> > copies skb->mac_len bytes of header which may not be sufficient if the
+> > packet contains 802.1Q tags or other VLAN tags.  Worse copying only the
+> > initial header will leave a packet marked as being VLAN tagged but
+> > without the corresponding tag leading to mangling when it is later
+> > untagged.
+> >=20
+> > The VLAN tags are important when receiving the decrypted esp transport
+> > mode packet after GRO processing to ensure it is received on the correc=
+t
+> > interface.
+> >=20
+> > Therefore record the full mac header length in xfrm*_transport_input fo=
+r
+> > later use in correpsonding xfrm*_transport_finish to copy the entire ma=
+c
+> > header when rebuilding the mac header for GRO.  The skb->data pointer i=
+s
+> > left pointing skb->mac_header bytes after the start of the mac header a=
+s
+> > is expected by the network stack and network and transport header
+> > offsets reset to this location.
+> >=20
+> > Signed-off-by: Paul Davey <paul.davey@alliedtelesis.co.nz>
+>=20
+> Please add a 'Fixes:' tag so it can be backported to stable.
+>=20
+> > diff --git a/include/net/xfrm.h b/include/net/xfrm.h
+> > index 57c743b7e4fe..0331cfecb28b 100644
+> > --- a/include/net/xfrm.h
+> > +++ b/include/net/xfrm.h
+> > @@ -675,6 +675,9 @@ struct xfrm_mode_skb_cb {
+> > =20
+> >  =09/* Used by IPv6 only, zero for IPv4. */
+> >  =09u8 flow_lbl[3];
+> > +
+> > +=09/* Used to keep whole l2 header for transport mode GRO */
+> > +=09u32 orig_mac_len;
+>=20
+> xfrm_mode_skb_cb has already reached the maximum size of 48 bytes.
+> Adding more will overwrite data in the 'struct sk_buff'.
 
-This doesn't compile.  At least build test your patches.
+I thought we already had a BUILD_BUG_ON(sizeof(struct
+xfrm_mode_skb_cb) > sizeof_field(struct sk_buff, cb)) somewhere, but
+apparently not. I guess it's time to add one? (and xfrm_spi_skb_cb, xfrm_sk=
+b_cb)
 
-regards,
-dan carpenter
+diff --git a/net/xfrm/xfrm_input.c b/net/xfrm/xfrm_input.c
+index 161f535c8b94..afc8b3c881e2 100644
+--- a/net/xfrm/xfrm_input.c
++++ b/net/xfrm/xfrm_input.c
+@@ -793,6 +793,8 @@ void __init xfrm_input_init(void)
+ =09int err;
+ =09int i;
+=20
++=09BUILD_BUG_ON(sizeof(struct xfrm_mode_skb_cb) > sizeof_field(struct sk_b=
+uff, cb));
++
+ =09init_dummy_netdev(&xfrm_napi_dev);
+ =09err =3D gro_cells_init(&gro_cells, &xfrm_napi_dev);
+ =09if (err)
+
+
+Actually it looks like we still have 4B in xfrm_mode_skb_cb:
+
+struct xfrm_mode_skb_cb {
+=09struct xfrm_tunnel_skb_cb  header;               /*     0    32 */
+=09__be16                     id;                   /*    32     2 */
+=09__be16                     frag_off;             /*    34     2 */
+=09u8                         ihl;                  /*    36     1 */
+=09u8                         tos;                  /*    37     1 */
+=09u8                         ttl;                  /*    38     1 */
+=09u8                         protocol;             /*    39     1 */
+=09u8                         optlen;               /*    40     1 */
+=09u8                         flow_lbl[3];          /*    41     3 */
+
+=09/* size: 48, cachelines: 1, members: 9 */
+=09/* padding: 4 */
+=09/* last cacheline: 48 bytes */
+};
+
+flow_lbl ends at 44, so adding orig_mac_len should be fine. I don't
+see any config options that would increase the size of
+xfrm_mode_skb_cb compared to what I already have.
+
+--=20
+Sabrina
 
 
