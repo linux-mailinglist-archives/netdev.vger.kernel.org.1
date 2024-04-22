@@ -1,60 +1,67 @@
-Return-Path: <netdev+bounces-90308-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90309-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B61718AD9D2
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 01:59:31 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7E598AD9F3
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 02:02:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6B8731F21965
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 23:59:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7CEB7B252D0
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 00:02:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 972761591F3;
-	Mon, 22 Apr 2024 23:54:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E777815B966;
+	Mon, 22 Apr 2024 23:55:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hXeHw7Dn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bmMNefCi"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DA6A1591ED;
-	Mon, 22 Apr 2024 23:54:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC8C015B575;
+	Mon, 22 Apr 2024 23:55:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713830093; cv=none; b=K20ePfU3z4mHSlidg+7xj/23j1rdpiBtoFAdbrwujzt29UBw4UglRhJLnPfDYCjl3+SZowsZjm1c0i7l8yjyhMvw3JhFdpyEXg5xGO2H/yNMyx1KTGqAL27vxSkHoDBL+quUtNDUHkOtLWzoSBVxuQxt1IqLzor5e8GCZ9C30tg=
+	t=1713830134; cv=none; b=HICNhFgnbxvS9/Ahlf32FkfP/wJWkodjNE92iIj8Aa9Kv+hM/UxNBhOth1rtyPtVK1s7bhwrExWjYppsGQAbJe9Em75xw+drEH0bL6k8Z1KD2hnbgQ9MgK4ah+iWjuVCQAgbuuRQ4yFiZXTVoUD8Tmq2GrBBvtbtq+CLYFrjFi4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713830093; c=relaxed/simple;
-	bh=tYvNNEbb6+cfkfdbJ91DjfKB+ny9/OmOrztmcSftBkg=;
+	s=arc-20240116; t=1713830134; c=relaxed/simple;
+	bh=WrcENzlMWj81bXD8h4Oy1nbVfXMzWJChZl026RY/cDU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=tEGZcX32XOFzPh9LIMhh5CF9fECQbCSzyvRI585Tx8O84U87VNs6KIHSGsfL3qFcG5q6V1P4FD94g6D2oblCaiPf9qIpfKR22BWq+E9P/0OB4Mp1xYBrvsRuJ50lPSJHpQn/kD9DD8VU1kTJtyhSXLvLPJS90579EFNiVOjSJvA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hXeHw7Dn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39D05C32782;
-	Mon, 22 Apr 2024 23:54:52 +0000 (UTC)
+	 MIME-Version; b=DgTsGxw+ngdh2rvQxtr7D8qvAA0Vaj7AogoOnJUt59y6z9n2mxt2onWrHgtdwVEgB53XB4OJpJMDU7smhI8d8mVWXDoi1uIgMom7hTnIduMkioxPG7xaC+TyOMpGm/ECjUnaA/F57qWo58fOEcDdgbfSFaw5KHTHC6MnWHfOU64=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bmMNefCi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DEAD0C32782;
+	Mon, 22 Apr 2024 23:55:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713830093;
-	bh=tYvNNEbb6+cfkfdbJ91DjfKB+ny9/OmOrztmcSftBkg=;
+	s=k20201202; t=1713830134;
+	bh=WrcENzlMWj81bXD8h4Oy1nbVfXMzWJChZl026RY/cDU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=hXeHw7DnPA1VzgFa3PP8Pan1heyI8XqY8hV8H18PiFAJtov1/N2p1uNdjVGtdyHVx
-	 9qgSRgYL4Jdpq8iHpZytPZKbIkWT4Tc+RBaypOd6SKqGtCdWiPbiUmuNZ+dVDbRA88
-	 nNvzdBk91AQ29+6Cbx9j6o6NmKgxo14J2hn7wGjZQZTXrPUllB6DsD1Oo4pCtLUkzc
-	 mMd/6KEKRig0YU86NhOSpmo/N+EA50zpE5o/NwcQX5D3ojVUgNjyVMLi8S/DIFl2ua
-	 Hj5LO+Q8zhlKm5awnKfLAyE/SM4v24tEtIgPLuUXta0JXjL6EGQLictX3VaeVu4uqH
-	 2uqWOmEapq8HQ==
+	b=bmMNefCiwZcq2KKFkyh1Jsom5W859BQuFjLtZ8i+NZpd7z0Yspm7CZi8+FANlk/HC
+	 3PF7p/3Np4e+qVTs1tvx30AmZ8c4lNue0hB+lmvIsejx4Beo36V7Q/8lNLFqBg4ytz
+	 PkRVbTZvMUVMtrByRsWZzH9D/YO2soQ71oRH/bqZfAyplkE+Uk7XKYg1nvRCSanOeB
+	 KuN5gNfAzlcjnWqtotXh+3WjPehYEmjZcqKCnBMlcVdVOzmCafqNBVSwxL0dz6fjWs
+	 wQNHjHxmez92HABhle8cZ4R9vmU4e2atFS/q27ENsCTHkHkPYS07VOmLs4ZKyhyLmr
+	 kaD/G1N3+9YOQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Eric Dumazet <edumazet@google.com>,
-	syzbot <syzkaller@googlegroups.com>,
-	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-	Jakub Kicinski <kuba@kernel.org>,
+Cc: Rick Edgecombe <rick.p.edgecombe@intel.com>,
+	Michael Kelley <mhklinux@outlook.com>,
+	Kuppuswamy Sathyanarayanan <sathyanarayanan.kuppuswamy@linux.intel.com>,
+	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+	Wei Liu <wei.liu@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
+	kys@microsoft.com,
+	haiyangz@microsoft.com,
+	decui@microsoft.com,
 	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
 	pabeni@redhat.com,
+	linux-hyperv@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.8 25/43] nfc: llcp: fix nfc_llcp_setsockopt() unsafe copies
-Date: Mon, 22 Apr 2024 19:14:11 -0400
-Message-ID: <20240422231521.1592991-25-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.8 37/43] hv_netvsc: Don't free decrypted memory
+Date: Mon, 22 Apr 2024 19:14:23 -0400
+Message-ID: <20240422231521.1592991-37-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240422231521.1592991-1-sashal@kernel.org>
 References: <20240422231521.1592991-1-sashal@kernel.org>
@@ -69,91 +76,51 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.8.7
 Content-Transfer-Encoding: 8bit
 
-From: Eric Dumazet <edumazet@google.com>
+From: Rick Edgecombe <rick.p.edgecombe@intel.com>
 
-[ Upstream commit 7a87441c9651ba37842f4809224aca13a554a26f ]
+[ Upstream commit bbf9ac34677b57506a13682b31a2a718934c0e31 ]
 
-syzbot reported unsafe calls to copy_from_sockptr() [1]
+In CoCo VMs it is possible for the untrusted host to cause
+set_memory_encrypted() or set_memory_decrypted() to fail such that an
+error is returned and the resulting memory is shared. Callers need to
+take care to handle these errors to avoid returning decrypted (shared)
+memory to the page allocator, which could lead to functional or security
+issues.
 
-Use copy_safe_from_sockptr() instead.
+The netvsc driver could free decrypted/shared pages if
+set_memory_decrypted() fails. Check the decrypted field in the gpadl
+to decide whether to free the memory.
 
-[1]
-
-BUG: KASAN: slab-out-of-bounds in copy_from_sockptr_offset include/linux/sockptr.h:49 [inline]
- BUG: KASAN: slab-out-of-bounds in copy_from_sockptr include/linux/sockptr.h:55 [inline]
- BUG: KASAN: slab-out-of-bounds in nfc_llcp_setsockopt+0x6c2/0x850 net/nfc/llcp_sock.c:255
-Read of size 4 at addr ffff88801caa1ec3 by task syz-executor459/5078
-
-CPU: 0 PID: 5078 Comm: syz-executor459 Not tainted 6.8.0-syzkaller-08951-gfe46a7dd189e #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
-Call Trace:
- <TASK>
-  __dump_stack lib/dump_stack.c:88 [inline]
-  dump_stack_lvl+0x241/0x360 lib/dump_stack.c:114
-  print_address_description mm/kasan/report.c:377 [inline]
-  print_report+0x169/0x550 mm/kasan/report.c:488
-  kasan_report+0x143/0x180 mm/kasan/report.c:601
-  copy_from_sockptr_offset include/linux/sockptr.h:49 [inline]
-  copy_from_sockptr include/linux/sockptr.h:55 [inline]
-  nfc_llcp_setsockopt+0x6c2/0x850 net/nfc/llcp_sock.c:255
-  do_sock_setsockopt+0x3b1/0x720 net/socket.c:2311
-  __sys_setsockopt+0x1ae/0x250 net/socket.c:2334
-  __do_sys_setsockopt net/socket.c:2343 [inline]
-  __se_sys_setsockopt net/socket.c:2340 [inline]
-  __x64_sys_setsockopt+0xb5/0xd0 net/socket.c:2340
- do_syscall_64+0xfd/0x240
- entry_SYSCALL_64_after_hwframe+0x6d/0x75
-RIP: 0033:0x7f7fac07fd89
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 91 18 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fff660eb788 EFLAGS: 00000246 ORIG_RAX: 0000000000000036
-RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 00007f7fac07fd89
-RDX: 0000000000000000 RSI: 0000000000000118 RDI: 0000000000000004
-RBP: 0000000000000000 R08: 0000000000000002 R09: 0000000000000000
-R10: 0000000020000a80 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
-
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Reported-by: syzbot <syzkaller@googlegroups.com>
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Link: https://lore.kernel.org/r/20240408082845.3957374-4-edumazet@google.com
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
+Signed-off-by: Michael Kelley <mhklinux@outlook.com>
+Reviewed-by: Kuppuswamy Sathyanarayanan <sathyanarayanan.kuppuswamy@linux.intel.com>
+Acked-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+Link: https://lore.kernel.org/r/20240311161558.1310-4-mhklinux@outlook.com
+Signed-off-by: Wei Liu <wei.liu@kernel.org>
+Message-ID: <20240311161558.1310-4-mhklinux@outlook.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/nfc/llcp_sock.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ drivers/net/hyperv/netvsc.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/net/nfc/llcp_sock.c b/net/nfc/llcp_sock.c
-index 819157bbb5a2c..d5344563e525c 100644
---- a/net/nfc/llcp_sock.c
-+++ b/net/nfc/llcp_sock.c
-@@ -252,10 +252,10 @@ static int nfc_llcp_setsockopt(struct socket *sock, int level, int optname,
- 			break;
- 		}
+diff --git a/drivers/net/hyperv/netvsc.c b/drivers/net/hyperv/netvsc.c
+index a6fcbda64ecc6..2b6ec979a62f2 100644
+--- a/drivers/net/hyperv/netvsc.c
++++ b/drivers/net/hyperv/netvsc.c
+@@ -154,8 +154,11 @@ static void free_netvsc_device(struct rcu_head *head)
+ 	int i;
  
--		if (copy_from_sockptr(&opt, optval, sizeof(u32))) {
--			err = -EFAULT;
-+		err = copy_safe_from_sockptr(&opt, sizeof(opt),
-+					     optval, optlen);
-+		if (err)
- 			break;
--		}
+ 	kfree(nvdev->extension);
+-	vfree(nvdev->recv_buf);
+-	vfree(nvdev->send_buf);
++
++	if (!nvdev->recv_buf_gpadl_handle.decrypted)
++		vfree(nvdev->recv_buf);
++	if (!nvdev->send_buf_gpadl_handle.decrypted)
++		vfree(nvdev->send_buf);
+ 	bitmap_free(nvdev->send_section_map);
  
- 		if (opt > LLCP_MAX_RW) {
- 			err = -EINVAL;
-@@ -274,10 +274,10 @@ static int nfc_llcp_setsockopt(struct socket *sock, int level, int optname,
- 			break;
- 		}
- 
--		if (copy_from_sockptr(&opt, optval, sizeof(u32))) {
--			err = -EFAULT;
-+		err = copy_safe_from_sockptr(&opt, sizeof(opt),
-+					     optval, optlen);
-+		if (err)
- 			break;
--		}
- 
- 		if (opt > LLCP_MAX_MIUX) {
- 			err = -EINVAL;
+ 	for (i = 0; i < VRSS_CHANNEL_MAX; i++) {
 -- 
 2.43.0
 
