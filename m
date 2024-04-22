@@ -1,129 +1,93 @@
-Return-Path: <netdev+bounces-90065-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90070-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF59E8AC9F9
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 11:55:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 304D88ACA04
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 11:57:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6F44AB21801
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 09:55:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C3AB2B22064
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 09:57:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3549A142633;
-	Mon, 22 Apr 2024 09:54:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="SuQAJ1u5"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3AF013E3EB;
+	Mon, 22 Apr 2024 09:55:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [205.139.111.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40AE91304AF
-	for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 09:54:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E2C913DDCB
+	for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 09:54:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.139.111.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713779679; cv=none; b=JKtTu/Ju3XHLnbBTvkpCboAfPAzM2xVb+KRkI+3bWUHMin5MOGK3G0EylZR8D1SPT3PhotfJgoSgh2GB2hwD4ju2Vlmib07QiMIhbW9BZUu6xnpRks70a0O4W7VbFLOxlalG73JTOPWdHzsGXxo4deYGOKf7cbT4b28b4aJ7tsY=
+	t=1713779700; cv=none; b=o4T8UWfv3YFqGEAn2CYLpNrBLZ44LRvJKCwHfkPa7lwZE6G2owP/u9aKpG0Kk6Z4BDDY1FPybUpW8IRVwnsL7Gvo8HT13Xi8j1z3HZ2UkiLmt6FG6W/pqI1fC/bl+GS+eGPUcTGOjnZxf/1C0wGJbrV8L2stEGSaDB1hMSYdowk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713779679; c=relaxed/simple;
-	bh=hl5oJbsNf4gzOInXJ8W066yRacSaTuoXx+ReKspm1Yg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gdHeQjxcA9ETFP3WLvqtk+mPSoARw1uM8uAoBOnF8M6lQh+bYPZ9SCVeoXC0tPViK2WWGTfKwUNKA2uVn7xIZA7RaiGziSAIqxt76VsA9mw/6Xm2j1HAGo8k998VfOGOpPByn1MyOwYT9qn7DxMqIVNiV85nS0Ox3tSNNr2u8A4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=SuQAJ1u5; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-41a4f291f60so5681085e9.3
-        for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 02:54:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=6wind.com; s=google; t=1713779675; x=1714384475; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=rHPfb79adxY9tsrQzERreXnc7LYXAY8HlWJ0DAd35OA=;
-        b=SuQAJ1u56U4u4jM5sFdYUiMmK7OAGCZ+f/sTeNpVCepaME/GsxnbwJHGFwa3Udmy78
-         f97gzP8QzGu645BQEopiqhedm53kPpqgxe7nqXmgEb7Rov8VvGYc1RuOlduEAWvs6tIh
-         1AuXJUrR3+3CGymNscl0XwADukIctOFKe30RDMTkpoNzDsOOP5YmBEI2B6HhkcGCdqI8
-         OJmUgfzoKy+VD5C4sHeo44Xiu2H2s7q0A7VuMYPq0PALw6VCXe9hR8+afdsKxseuFVpw
-         rQyYxoNqvKxv5no0P+RDcTmrw0rIkAVMgRADp9142cxXFCVcv1yR4Rvqwxtw6XXcDk35
-         rJnQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713779675; x=1714384475;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=rHPfb79adxY9tsrQzERreXnc7LYXAY8HlWJ0DAd35OA=;
-        b=tMURSSPLJQDBdrU26KSw8w9Alq8O5M1xCehGmT4QXZFmQLk2sjmVAihjGgx+aPVNDF
-         I0a1SOsReTQfdkzQ4+LWvbgoQu3acDL6zRxhM6lBaMPKxR+mLahYKcX2PreYOz87FhG8
-         q8N5KpHoqSXGCqgXtZgcNbXVfPJN7GVsYSsD+lgqI6wAb9+dszsWwvdeC/ZlIKyhtHbA
-         p6CpWLNiqsLYHt72iICi6f/2zm0gp/jkielQ+Jqwa97nM3jLB+06WV2gVIWxdvOYIPoS
-         7Rx2vr/0BVPBVJL+Ka3TccAaDhSUec21eKDQZG0cZ39y7zuWVs66SOKf2wSYCotQFhvJ
-         uo+w==
-X-Forwarded-Encrypted: i=1; AJvYcCU8zzNhUMNg32kBxuVqTs8ti7TGdsfB2WgMPpvKAR4OpMrob5Z2UUKaUh6SXp06ZlZrOyx6Rcr0G8lodEfpQZA6YkKxJJi8
-X-Gm-Message-State: AOJu0YxmBwbfbtwLB8jF6VvhP8LzJqY+Q8avj/3VvKXw7ZaF8GgX13HU
-	EQ+HY0LxEGsM+loBoEH4eUrwj8PkmBjApV7qBxCjKf99piL7M44vmSIwBfgTr0k=
-X-Google-Smtp-Source: AGHT+IFnKBxF0gq6pwmneb2wszkAlBvEBLNC1etoafugT39Z3xKvZlPAjYKb6coeYTrU7hXBv59eMw==
-X-Received: by 2002:a05:600c:3549:b0:417:29a3:3f59 with SMTP id i9-20020a05600c354900b0041729a33f59mr5739555wmq.36.1713779675526;
-        Mon, 22 Apr 2024 02:54:35 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:b41:c160:bf25:d37c:a088:52d2? ([2a01:e0a:b41:c160:bf25:d37c:a088:52d2])
-        by smtp.gmail.com with ESMTPSA id h19-20020a05600c351300b00414659ba8c2sm16199455wmq.37.2024.04.22.02.54.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 22 Apr 2024 02:54:34 -0700 (PDT)
-Message-ID: <796e4bce-2e10-4aea-9d97-3b492616a4f8@6wind.com>
-Date: Mon, 22 Apr 2024 11:54:33 +0200
+	s=arc-20240116; t=1713779700; c=relaxed/simple;
+	bh=6q/ZRJ/g/sWksZ+7vdhwG6t29DJyBi+EgE2kDbBD+oc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 In-Reply-To:Content-Type:Content-Disposition; b=ToWmhh/yXFGT4Mj+bufOUughc7Go6p8NqLj+hb+efpFkNdzeLorwmeF4LAAyTQGk1KaqzU665Rk6+OgN8zr0TPZ2m0tyyw2GXH8d+bKR6DS9lBdLYwZo+pu0+SYoa1YIrl3EhmvtvQQj0pENxv4RCf3QLbCe8EBo7nuSXiW4K9E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=none smtp.mailfrom=queasysnail.net; arc=none smtp.client-ip=205.139.111.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=queasysnail.net
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-452-HQeiAEzjN7u5ly7_y_lhvQ-1; Mon,
+ 22 Apr 2024 05:54:47 -0400
+X-MC-Unique: HQeiAEzjN7u5ly7_y_lhvQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 61EE03C40B54;
+	Mon, 22 Apr 2024 09:54:47 +0000 (UTC)
+Received: from hog (unknown [10.39.193.137])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 93B80C13FA6;
+	Mon, 22 Apr 2024 09:54:45 +0000 (UTC)
+Date: Mon, 22 Apr 2024 11:54:44 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Antony Antony <antony.antony@secunet.com>
+Cc: Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>, netdev@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	devel@linux-ipsec.org, Leon Romanovsky <leon@kernel.org>,
+	Eyal Birger <eyal.birger@gmail.com>,
+	Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Subject: Re: [PATCH ipsec-next v11 2/4] xfrm: Add dir validation to "out"
+ data path lookup
+Message-ID: <ZiYz5Om5OtivN7cV@hog>
+References: <cover.1713737786.git.antony.antony@secunet.com>
+ <bae7627414f03223034371142fa870a430cb3c5e.1713737786.git.antony.antony@secunet.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: nicolas.dichtel@6wind.com
-Subject: Re: [devel-ipsec] [PATCH ipsec-next v10 1/3] xfrm: Add Direction to
- the SA in or out
-To: Sabrina Dubroca <sd@queasysnail.net>, Antony Antony <antony@phenome.org>
-Cc: Antony Antony <antony.antony@secunet.com>,
- Steffen Klassert <steffen.klassert@secunet.com>,
- Herbert Xu <herbert@gondor.apana.org.au>, netdev@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- devel@linux-ipsec.org, Leon Romanovsky <leon@kernel.org>,
- Eyal Birger <eyal.birger@gmail.com>
-References: <0e0d997e634261fcdf16cf9f07c97d97af7370b6.1712828282.git.antony.antony@secunet.com>
- <Zh0b3gfnr99ddaYM@hog> <Zh4kYUjvDtUq69-h@Antony2201.local>
- <Zh44gO885KtSjBHC@hog> <ZiWNh-Hz9TYWVofO@Antony2201.local>
- <ZiYq729Q1AF2Xq8M@hog>
-From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Content-Language: en-US
-Organization: 6WIND
-In-Reply-To: <ZiYq729Q1AF2Xq8M@hog>
+In-Reply-To: <bae7627414f03223034371142fa870a430cb3c5e.1713737786.git.antony.antony@secunet.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.8
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: queasysnail.net
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Le 22/04/2024 à 11:16, Sabrina Dubroca a écrit :
-[snip]
->>>> And also this looks like a general cleanup up to me. I wonder how Steffen 
->>>> would add such a check for the upcoming PCPU attribute! Should that be 
->>>> prohibited DELSA or XFRM_MSG_FLUSHSA or DELSA?
->>>
->>> IMO, new attributes should be rejected in any handler that doesn't use
->>> them. That's not a general cleanup because it's a new attribute, and
->>> the goal is to allow us to decide later if we want to use that
->>> attribute in DELSA etc. Maybe in one year, we want to make DELSA able
->>> to match on SA_DIR. If we don't reject SA_DIR from DELSA now, we won't
->>> be able to do that. That's why I'm insisting on this.
->>
->> I have implemented a method to reject in v11, even though it is not my 
->> preference:) My argument xfrm has no precedence of limiting unused 
->> attributes in most types. We are not enforcing on all attributes such as 
->> upcoming PCPU.
-> 
-> I'll ask Steffen to enforce it there as well :)
-> I think it's a mistake that old netlink APIs were too friendly to invalid input.
-+1
+2024-04-22, 00:27:48 +0200, Antony Antony wrote:
+> diff --git a/net/xfrm/xfrm_proc.c b/net/xfrm/xfrm_proc.c
+> index 5f9bf8e5c933..98606f1078f7 100644
+> --- a/net/xfrm/xfrm_proc.c
+> +++ b/net/xfrm/xfrm_proc.c
+> @@ -41,6 +41,7 @@ static const struct snmp_mib xfrm_mib_list[] =3D {
+>  =09SNMP_MIB_ITEM("XfrmFwdHdrError", LINUX_MIB_XFRMFWDHDRERROR),
+>  =09SNMP_MIB_ITEM("XfrmOutStateInvalid", LINUX_MIB_XFRMOUTSTATEINVALID),
+>  =09SNMP_MIB_ITEM("XfrmAcquireError", LINUX_MIB_XFRMACQUIREERROR),
+> +=09SNMP_MIB_ITEM("XfrmOutStateDirError", LINUX_MIB_XFRMOUTSTATEDIRERROR)=
+,
 
-This is an old problem in Netlink. There has been work during the last years to
-be more strict about new attributes.
+This needs a corresponding entry in Documentation/networking/xfrm_proc.rst
 
-For example, see
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=56738f4608417
+--=20
+Sabrina
+
 
