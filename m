@@ -1,232 +1,200 @@
-Return-Path: <netdev+bounces-90273-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90274-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BEA6F8AD63B
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 22:58:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D71058AD647
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 23:04:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 36F3B1F22290
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 20:58:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4DD381F214C8
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 21:04:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28A9D1C69C;
-	Mon, 22 Apr 2024 20:58:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCA7E1C6AF;
+	Mon, 22 Apr 2024 21:04:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EFiV1A11"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GY/pgGWV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f173.google.com (mail-il1-f173.google.com [209.85.166.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B8AA1D545;
-	Mon, 22 Apr 2024 20:58:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FA1A1BC53
+	for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 21:04:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713819507; cv=none; b=le1sjgeqeCx0caWA3xhhoX3HtmFVpEOwmbdHVNmabhORd5ZNbO+yNX8tyAj3f0w4KFlmr7N4TTSOsHq8bgCFmfa92maJGyAfexvVbqqeF2DkJt3dCZAqRY3+9TtuZLHLrCaNJ7/sFr1qW8nQnTNmG+2DHj6gGoit5RfshS4kd1o=
+	t=1713819865; cv=none; b=jA1pFAXdFvQJXZxhDZOVvjRQ0n14ov6ml2PTX/dtaX1jvJGzFJEK+m9Wl5FE2MCDY656LZup8eCmI+lCJSeQySZsw825SXs9QF0w5JxiKeq3s7aZwc8V1240MchQPGq5afazOMQuke1vmn782lIxJmjwAXCJU7p0J6I5tIyMNq8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713819507; c=relaxed/simple;
-	bh=BwnqGMnVETwc0KXdR3xkHpOq8Kccp1bF5FE6wwjmlG4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bdIf2K/50XEf7vpQN+V1qfEY/7cBMGXOLkTKFx0yUC+IEn9pj1CtnJBHlh+tiT9o95gK2JtnJeV6RXrefP/2NzQDAkfx+5e77R1dachS+DD/NAQwP1L65y/KI5tC8b9g6vfz/BUU4jW72yKYq26QrYyxEXPdRwh+3sD/MKfF658=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EFiV1A11; arc=none smtp.client-ip=209.85.166.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f173.google.com with SMTP id e9e14a558f8ab-36a06a409caso25654225ab.3;
-        Mon, 22 Apr 2024 13:58:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713819504; x=1714424304; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BwnqGMnVETwc0KXdR3xkHpOq8Kccp1bF5FE6wwjmlG4=;
-        b=EFiV1A11vdztVbSQyXjQCb2v1ERGmn2IGvQFBBswiQjfDvBQYkZj/pz5gxchtJOmk/
-         T8suoRZDL+IJR/jADTIrm4dKprPSclYg3L3X4K6eH4GCn86ZvR1kyIfxMOmftYUKF3z+
-         N6thhJGMG5cyJjkzzOPcuhMjrA1P0Srg4cW6lUmhB+NJ3qfKfg+Qbb7bnQgthg1Uz7KR
-         m+5ZdcUmsig016d74Ty2F/7HkYQoP261UUA9ZnptDi3USJw0pL9/XO74eFHxY9WnuaWf
-         F3y4o2qn08Bbc81j1v7iALFMkb4A54EYRQU2kZgnXSjzVy92t6xfHA7U1jvRD9vkGU99
-         JvGA==
+	s=arc-20240116; t=1713819865; c=relaxed/simple;
+	bh=W171TFM5VU0GmHCaO6R45CQK9rr900bDzzrfhGJgbJU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ll2kVpSiVu0RIJvqVkUpvIc9a6sVk2ggG1vL/oKV+RGlTiISyfjeIls+iPNl5/WFYLshStuOZNWIu2AP5/JnOH5K7956zjn04V55fFMbmaH5OqhnjpZ6vfq1zIoWfcWSpMhTf+5g1wxuSudvHopISpqW6BYBs2RY68DheZMtLbA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GY/pgGWV; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1713819862;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=DCBlw9Y3eyV4XXcYVaIC/t/CS+f8jLueDhczaKF6fWs=;
+	b=GY/pgGWVo0YwH1FYmEDMePDq/mH8dRCPuFu6ESek2FXmsBdGMrq3rXugi0Q683NgrT1iDS
+	62CEQcO1Q94yZHDaQYyXammcqCgLCrzHsuyf2CMP/5fsb2VC8qVoKtq8LrkdMzzxXYwhVR
+	6KD+OKgQIVnMJA/psmL6ptbmnS3G9hM=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-10-WCnl3qArNjC50Uq_9xlYYA-1; Mon, 22 Apr 2024 17:04:20 -0400
+X-MC-Unique: WCnl3qArNjC50Uq_9xlYYA-1
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-34b5bece899so249597f8f.3
+        for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 14:04:19 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713819504; x=1714424304;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=BwnqGMnVETwc0KXdR3xkHpOq8Kccp1bF5FE6wwjmlG4=;
-        b=uU1pWQp0OpyUsA4m61RDK7bLKJMtUV9Uhaa3G3iL1RfXW3divoUrLA9ogG1dW/Skgf
-         kPXzkXTqBg8wOspzgLnn2AII8pfYwDJp7fGMQVIXkHZ/DhmKr6aYL20ETXd01eXLaDM+
-         SGUrWNy9H5c+PF6N+/+7R+cnz4IKyjsWkqetByV5gHL4ifbvgGbmId3C8DAv6N70seSy
-         jM2QmKkX3mtu5rPH/k+fD/0DTuJ7fkzWe48J0zwoPuSg014mNoKTDqqVk6LHJNwPAy7s
-         VzZrpGc1wMfWspNIEFWETXIf2lbJ4r/b5XqLkFpkvWv8s1ojMME60WMmA4h4dDiBTL+7
-         9hhA==
-X-Forwarded-Encrypted: i=1; AJvYcCX54nd5wtl/A4rgCmCH8yMpyDNmto5D3TA/Z6Hca3VPvbl+wLer/sAoFQVUY9IwoQ7Y5nWmO57dZscssXdVswhnUlACHM8B+hNuoQ==
-X-Gm-Message-State: AOJu0YwjKktXnFT357TT58HFksC9bLAxnCbWIWECkoubQXiP6cs0d+jE
-	Hh5mhmdqErKngYgXCR3B25czE4pi0F70k0+AaEcCA4TnNErrfHgaUyZEMGppqEZ7WMa1j0WEhEj
-	eLfWD1UR2NJ6iShEOW/5dp2e9na4=
-X-Google-Smtp-Source: AGHT+IGRzFPzanVbdKTkjs+7WbgWV7Jna9PHJzH4lPSB8bJtMM4YppisUzmtRljQeTDF2p1jdE9qhiCDzku+geR5RtQ=
-X-Received: by 2002:a05:6e02:1a6d:b0:36c:cda:e2fc with SMTP id
- w13-20020a056e021a6d00b0036c0cdae2fcmr6998387ilv.16.1713819504551; Mon, 22
- Apr 2024 13:58:24 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1713819859; x=1714424659;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DCBlw9Y3eyV4XXcYVaIC/t/CS+f8jLueDhczaKF6fWs=;
+        b=jl54HMZUx428V/RnN+8+XV5E9CHOl/cf9dtAfTiTguUD9MX4BUz95zGtXMEJwZ6Dod
+         jXqMwAX8Zez8g0VaMWblIpHTV3FDXMW15aFsX4FovbTA3GsxwlHQmTkHB01zlmmSbeF8
+         Cdxxo+Ay0tlUTsak7a68FzmYRp1vBVm+ZGy191R04pYHroDLiTY/0ZGYu78H7JUcVb8J
+         bNruPU6UmT38i67/HL/W1JclbxvqrNwFYwpmNr6BzQ1XWcWIu4GBUZ8YF/3E8OvVyBOf
+         Cxf7t6ovk3NWyJQfAZXrm1mzDYps5J0xKGghgKVPkJjBhP3d955vfOAz0THcxVz77aTh
+         0+tQ==
+X-Gm-Message-State: AOJu0YxKsqjGpLkcDne/Qzr+qq0A5qOxFxV2UWMOTgQFhbzjjyMJZCES
+	lPoBZ1mC6gHRuwtsl3EI3cXRHi4fJe4jQs06sQP6LnQD4NSUQwHifVkKXMVo0sz+uAGvvew+332
+	0iUKYZmvVzSzeeGx86ouSA09JreyCT/GoNLntwgEg25MaykQYxcrKwA==
+X-Received: by 2002:adf:e80c:0:b0:34a:9adc:c36e with SMTP id o12-20020adfe80c000000b0034a9adcc36emr6730137wrm.40.1713819858621;
+        Mon, 22 Apr 2024 14:04:18 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFv7PHtb4y8fNhZfRcBU265fpkd1KK31Zm+V98qWA5end8Pwrx3mlxsQybYi5iYjw+SD9chew==
+X-Received: by 2002:adf:e80c:0:b0:34a:9adc:c36e with SMTP id o12-20020adfe80c000000b0034a9adcc36emr6730112wrm.40.1713819858107;
+        Mon, 22 Apr 2024 14:04:18 -0700 (PDT)
+Received: from redhat.com ([2a06:c701:7429:3c00:dc4a:cd5:7b1c:f7c2])
+        by smtp.gmail.com with ESMTPSA id r7-20020a05600c35c700b0041638a085d3sm21513127wmq.15.2024.04.22.14.04.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Apr 2024 14:04:17 -0700 (PDT)
+Date: Mon, 22 Apr 2024 17:04:14 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
+	davem@davemloft.net, edumazet@google.com, parav@nvidia.com,
+	jasowang@redhat.com, xuanzhuo@linux.alibaba.com, shuah@kernel.org,
+	petrm@nvidia.com, liuhangbin@gmail.com, vladimir.oltean@nxp.com,
+	bpoirier@nvidia.com, idosch@nvidia.com,
+	virtualization@lists.linux.dev
+Subject: Re: [patch net-next v4 0/6] selftests: virtio_net: introduce initial
+ testing infrastructure
+Message-ID: <20240422170405-mutt-send-email-mst@kernel.org>
+References: <20240418160830.3751846-1-jiri@resnulli.us>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1710173427.git.lucien.xin@gmail.com> <74d5db09-6b5c-4054-b9d3-542f34769083@samba.org>
- <CADvbK_dzVcDKsJ9RN9oc0K1Jwd+kYjxgE6q=ioRbVGhJx7Qznw@mail.gmail.com>
- <f427b422-6cfc-45ac-88eb-3e7694168b63@samba.org> <CADvbK_cA-RCLiUUWkyNsS=4OhkWrUWb68QLg28yO2=8PqNuGBQ@mail.gmail.com>
- <438496a6-7f90-403d-9558-4a813e842540@samba.org> <CADvbK_fkbOnhKL+Rb+pp+NF+VzppOQ68c=nk_6MSNjM_dxpCoQ@mail.gmail.com>
- <1456b69c-4ffd-4a08-b120-6a00abf1eb05@samba.org> <CADvbK_cQRpyzHG4UUOzfgmqLndvpx5Cd+d59rrqGRp0ic3PyxA@mail.gmail.com>
- <95922a2f-07a1-4555-acd2-c745e59bcb8e@samba.org> <CADvbK_eR4++HbR_RncjV9N__M-uTHtmqcC+_Of1RKVw7Uqf9Cw@mail.gmail.com>
- <CADvbK_dEWNNA_i1maRk4cmAB_uk4G4x0eZfZbrVX=zJ+2H9o_A@mail.gmail.com> <dc3815af-5b46-452b-8bcc-30a0934740a2@samba.org>
-In-Reply-To: <dc3815af-5b46-452b-8bcc-30a0934740a2@samba.org>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Mon, 22 Apr 2024 16:58:13 -0400
-Message-ID: <CADvbK_e7i08GAiOenJNTP_m+-MeYjSf7J-vkF+hgRfYGNCjkwQ@mail.gmail.com>
-Subject: Re: [RFC PATCH net-next 0/5] net: In-kernel QUIC implementation with
- Userspace handshake
-To: Stefan Metzmacher <metze@samba.org>, Martin KaFai Lau <kafai@fb.com>
-Cc: network dev <netdev@vger.kernel.org>, davem@davemloft.net, kuba@kernel.org, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Steve French <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>, 
-	Chuck Lever III <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, 
-	Sabrina Dubroca <sd@queasysnail.net>, Tyler Fanelli <tfanelli@redhat.com>, 
-	Pengtao He <hepengtao@xiaomi.com>, 
-	"linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>, 
-	Samba Technical <samba-technical@lists.samba.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240418160830.3751846-1-jiri@resnulli.us>
 
-On Sun, Apr 21, 2024 at 3:27=E2=80=AFPM Stefan Metzmacher <metze@samba.org>=
- wrote:
->
-> Am 20.04.24 um 21:32 schrieb Xin Long:
-> > On Fri, Apr 19, 2024 at 3:19=E2=80=AFPM Xin Long <lucien.xin@gmail.com>=
- wrote:
-> >>
-> >> On Fri, Apr 19, 2024 at 2:51=E2=80=AFPM Stefan Metzmacher <metze@samba=
-.org> wrote:
-> >>>
-> >>> Hi Xin Long,
-> >>>
-> >>>>> But I think its unavoidable for the ALPN and SNI fields on
-> >>>>> the server side. As every service tries to use udp port 443
-> >>>>> and somehow that needs to be shared if multiple services want to
-> >>>>> use it.
-> >>>>>
-> >>>>> I guess on the acceptor side we would need to somehow detach low le=
-vel
-> >>>>> udp struct sock from the logical listen struct sock.
-> >>>>>
-> >>>>> And quic_do_listen_rcv() would need to find the correct logical lis=
-tening
-> >>>>> socket and call quic_request_sock_enqueue() on the logical socket
-> >>>>> not the lowlevel udo socket. The same for all stuff happening after
-> >>>>> quic_request_sock_enqueue() at the end of quic_do_listen_rcv.
-> >>>>>
-> >>>> The implementation allows one low level UDP sock to serve for multip=
-le
-> >>>> QUIC socks.
-> >>>>
-> >>>> Currently, if your 3 quic applications listen to the same address:po=
-rt
-> >>>> with SO_REUSEPORT socket option set, the incoming connection will ch=
-oose
-> >>>> one of your applications randomly with hash(client_addr+port) vi
-> >>>> reuseport_select_sock() in quic_sock_lookup().
-> >>>>
-> >>>> It should be easy to do a further match with ALPN between these 3 qu=
-ic
-> >>>> socks that listens to the same address:port to get the right quic so=
-ck,
-> >>>> instead of that randomly choosing.
-> >>>
-> >>> Ah, that sounds good.
-> >>>
-> >>>> The problem is to parse the TLS Client_Hello message to get the ALPN=
- in
-> >>>> quic_sock_lookup(), which is not a proper thing to do in kernel, and
-> >>>> might be rejected by networking maintainers, I need to check with th=
-em.
-> >>>
-> >>> Is the reassembling of CRYPTO frames done in the kernel or
-> >>> userspace? Can you point me to the place in the code?
-> >> In quic_inq_handshake_tail() in kernel, for Client Initial packet
-> >> is processed when calling accept(), this is the path:
-> >>
-> >> quic_accept()-> quic_accept_sock_init() -> quic_packet_process() ->
-> >> quic_packet_handshake_process() -> quic_frame_process() ->
-> >> quic_frame_crypto_process() -> quic_inq_handshake_tail().
-> >>
-> >> Note that it's with the accept sock, not the listen sock.
-> >>
-> >>>
-> >>> If it's really impossible to do in C code maybe
-> >>> registering a bpf function in order to allow a listener
-> >>> to check the intial quic packet and decide if it wants to serve
-> >>> that connection would be possible as last resort?
-> >> That's a smart idea! man.
-> >> I think the bpf hook in reuseport_select_sock() is meant to do such
-> >> selection.
-> >>
-> >> For the Client initial packet (the only packet you need to handle),
-> >> I double you will need to do the reassembling, as Client Hello TLS mes=
-sage
-> >> is always less than 400 byte in my env.
-> >>
-> >> But I think you need to do the decryption for the Client initial packe=
-t
-> >> before decoding it then parsing the TLS message from its crypto frame.
-> > I created this patch:
-> >
-> > https://github.com/lxin/quic/commit/aee0b7c77df3f39941f98bb901c73fdc560=
-befb8
-> >
-> > to do this decryption in quic_sock_look() before calling
-> > reuseport_select_sock(), so that it provides the bpf selector with
-> > a plain-text QUIC initial packet:
-> >
-> > https://datatracker.ietf.org/doc/html/rfc9000#section-17.2.2
-> >
-> > If it's complex for you to do the decryption for the initial packet in
-> > the bpf selector, I will apply this patch. Please let me know.
->
-> I guess in addition to quic_server_handshake(), which is called
-> after accept(), there should be quic_server_prepare_listen()
-> (and something similar for in kernel servers) that setup the reuseport
-> magic for the socket, so that it's not needed in every application.
-It's done when calling listen(), see quic_inet_listen()->quic_hash()
-where only listening sockets with its sk_reuseport set will be
-added into the reuseport group.
+On Thu, Apr 18, 2024 at 06:08:24PM +0200, Jiri Pirko wrote:
+> From: Jiri Pirko <jiri@nvidia.com>
+> 
+> This patchset aims at introducing very basic initial infrastructure
+> for virtio_net testing, namely it focuses on virtio feature testing.
+> 
+> The first patch adds support for debugfs for virtio devices, allowing
+> user to filter features to pretend to be driver that is not capable
+> of the filtered feature.
 
-It means SO_REUSEPORT sockopt must be set for every socket
-before calling listen().
 
->
-> It seems there is only a single ebpf program possible per
-> reuseport group, so there has to be just a single one.
-Yes, a single ebpf program per reuseport group should work.
-see prepare_sk_fds() in kernel selftests for select_reuseport bfp.
+virtio things:
 
->
-> But is it possible for in kernel servers to also register an epbf program=
-?
-Good question. TBH, I don't really know much about epbf programming.
-I guess the real problem is how you pass the .o file to kernel space?
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
 
-Another question is, in the selftests:
-tools/testing/selftests/bpf/prog_tests/select_reuseport.c
-tools/testing/selftests/bpf/progs/test_select_reuseport_kern.c
+> Example:
+> $ cat /sys/bus/virtio/devices/virtio0/features
+> 1110010111111111111101010000110010000000100000000000000000000000
+> $ echo "5" >/sys/kernel/debug/virtio/virtio0/filter_feature_add
+> $ cat /sys/kernel/debug/virtio/virtio0/filter_features
+> 5
+> $ echo "virtio0" > /sys/bus/virtio/drivers/virtio_net/unbind
+> $ echo "virtio0" > /sys/bus/virtio/drivers/virtio_net/bind
+> $ cat /sys/bus/virtio/devices/virtio0/features
+> 1110000111111111111101010000110010000000100000000000000000000000
+> 
+> Leverage that in the last patch that lays ground for virtio_net
+> selftests testing, including very basic F_MAC feature test.
+> 
+> To run this, do:
+> $ make -C tools/testing/selftests/ TARGETS=drivers/net/virtio_net/ run_tests
+> 
+> It is assumed, as with lot of other selftests in the net group,
+> that there are netdevices connected back-to-back. In this case,
+> two virtio_net devices connected back to back. If you use "tap" qemu
+> netdevice type, to configure this loop on a hypervisor, one may use
+> this script:
+> #!/bin/bash
+> 
+> DEV1="$1"
+> DEV2="$2"
+> 
+> sudo tc qdisc add dev $DEV1 clsact
+> sudo tc qdisc add dev $DEV2 clsact
+> sudo tc filter add dev $DEV1 ingress protocol all pref 1 matchall action mirred egress redirect dev $DEV2
+> sudo tc filter add dev $DEV2 ingress protocol all pref 1 matchall action mirred egress redirect dev $DEV1
+> sudo ip link set $DEV1 up
+> sudo ip link set $DEV2 up
+> 
+> Another possibility is to use virtme-ng like this:
+> $ vng --network=loop
+> or directly:
+> $ vng --network=loop -- make -C tools/testing/selftests/ TARGETS=drivers/net/virtio_net/ run_tests
+> 
+> "loop" network type will take care of creating two "hubport" qemu netdevs
+> putting them into a single hub.
+> 
+> To do it manually with qemu, pass following command line options:
+> -nic hubport,hubid=1,id=nd0,model=virtio-net-pci
+> -nic hubport,hubid=1,id=nd1,model=virtio-net-pci
+> 
+> ---
+> v3->v4:
+> - addressed comments from Petr and Benjamin, more or less cosmetical
+>   issues. See individual patches changelog for details.
+> - extended cover letter by vng usage
+> v2->v3:
+> - added forgotten kdoc entry in patch #1.
+> v1->v2:
+> - addressed comments from Jakub and Benjamin, see individual
+>   patches #3, #5 and #6 for details.
+> 
+> Jiri Pirko (6):
+>   virtio: add debugfs infrastructure to allow to debug virtio features
+>   selftests: forwarding: move initial root check to the beginning
+>   selftests: forwarding: add ability to assemble NETIFS array by driver
+>     name
+>   selftests: forwarding: add check_driver() helper
+>   selftests: forwarding: add wait_for_dev() helper
+>   selftests: virtio_net: add initial tests
+> 
+>  MAINTAINERS                                   |   1 +
+>  drivers/virtio/Kconfig                        |   9 ++
+>  drivers/virtio/Makefile                       |   1 +
+>  drivers/virtio/virtio.c                       |   8 ++
+>  drivers/virtio/virtio_debug.c                 | 109 +++++++++++++++
+>  include/linux/virtio.h                        |  35 +++++
+>  tools/testing/selftests/Makefile              |   1 +
+>  .../selftests/drivers/net/virtio_net/Makefile |  15 ++
+>  .../drivers/net/virtio_net/basic_features.sh  | 131 ++++++++++++++++++
+>  .../selftests/drivers/net/virtio_net/config   |   2 +
+>  .../net/virtio_net/virtio_net_common.sh       |  99 +++++++++++++
+>  tools/testing/selftests/net/forwarding/lib.sh |  70 +++++++++-
+>  12 files changed, 477 insertions(+), 4 deletions(-)
+>  create mode 100644 drivers/virtio/virtio_debug.c
+>  create mode 100644 tools/testing/selftests/drivers/net/virtio_net/Makefile
+>  create mode 100755 tools/testing/selftests/drivers/net/virtio_net/basic_features.sh
+>  create mode 100644 tools/testing/selftests/drivers/net/virtio_net/config
+>  create mode 100644 tools/testing/selftests/drivers/net/virtio_net/virtio_net_common.sh
+> 
+> -- 
+> 2.44.0
 
-it created a global reuseport_array, and then added these sockets
-into this array for the later lookup, but these sockets are all created
-in the same process.
-
-But your case is that the sockets are created in different processes.
-I'm not sure if it's possible to add sockets from different processes
-into the same reuseport_array?
-
-Added Martin who introduced BPF_PROG_TYPE_SK_REUSEPORT,
-I guess he may know the answers.
-
-Thanks.
 
