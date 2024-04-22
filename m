@@ -1,141 +1,193 @@
-Return-Path: <netdev+bounces-89928-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89933-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 976788AC451
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 08:40:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B7FC8AC4F2
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 09:13:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4E2F0282E49
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 06:40:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 264951F21F0B
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 07:13:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0515B47A7A;
-	Mon, 22 Apr 2024 06:40:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63CD95026B;
+	Mon, 22 Apr 2024 07:12:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=fritzc.com header.i=@fritzc.com header.b="DdZz0iIY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fritzc.com (mail.fritzc.com [213.160.72.247])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DB5F1391;
-	Mon, 22 Apr 2024 06:40:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A68F75029E;
+	Mon, 22 Apr 2024 07:12:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.160.72.247
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713768003; cv=none; b=M6SwIOTBA1Ii3l2mSo2viwyA7CF+9yawJwUoDz3kZFmq4dYXtPODXM+fef9l3rWJzgpMWw185UXMXBM3OE2MgLQ6X+3cOw6DCRNLfXHAatWBHQmmrnoD+WfuTgGxTfCAuYqbF2xkpjKW6NVTriuJpky74zeegBW0eoBi7V4u69o=
+	t=1713769931; cv=none; b=J1y9sRpKRhWe24nOYAB91PkJJfDxrErBeXdicDyzz26KxFL/Xfo0p+haJAmLBYyAVmt+fLADu0oTFFDG+IT5pg4qFzDChghIQs/uIs7Z08Uf4t5Zb4+P8Lfe9S04uWtfrUAYCoAlATcIs435siIqCpBoLneNQIPh43CYqCW9akM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713768003; c=relaxed/simple;
-	bh=GyFEmL6NH/ZWyt1loGOak01X2cUqqWZ4MMmyVbjqWmc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gW9fAXWdYLtLMsV2QbutQ2EkXTM3Oo5dvGD57Ms+LijTySZRXlhjzLlPvj/ac3ZGgY2UIjjblXtRuhxZlp7Dybju8W32eDRRukVSg4gjlyq4kOLSQRMsdTYtHFfCBd9RwW4LmAS5evBSvErPcT+1ccoMVAHagwLf8e4pR6GHXNE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-a559b919303so172355266b.1;
-        Sun, 21 Apr 2024 23:40:01 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713768000; x=1714372800;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QJMq++kg1PghWv8jRnf8Je6kb0hKjRSJ/QT0tPfaRy8=;
-        b=sq6C1Zewda+/qxrxuvcXbO6VB9KWKsx0SRV+S0v9317G5EFzmrUpU7BBEo6ELbXzYE
-         nqhgZY6SHBSHuyzHWmviW9MCmneyHfGDKslO9/8GPmAxQLm7PxvaXssyJKD8ZpWSWRlr
-         FhPoYSBobX1aQXIfcFvDwT5u+M5WLqUc+5AJY9KAvf7/kUJYnC2It/uGfigDV0reWjAE
-         20499ftt1EGiIEsxdiZWdXWiuKxM/fKoB4CBo2OsqzYfasMaVuSTQruBIVOELumhYEUa
-         u55mD6YgPatQnDOkdrrY2UmpwjIQXNPBAsMk0nq1gihxdiSSyYi2Ajur+2zlSicmk2Vk
-         R+bg==
-X-Forwarded-Encrypted: i=1; AJvYcCWfnyFdHPfXivp9xkgj1sYxsnT5OKHJOp+9XkWChnqM9EpGhxMzPd8GwDe/+iQoKFwxZk3IvmA+gDUuygSpQRpB+tU9rm/SSsW9f5BQDexPs2A2OYzyrPHg1svOG490OHyuXt2f7K7CiSLcH71uDTpm/ZT9j+rky4j7VuNeq/5s
-X-Gm-Message-State: AOJu0YyrdXtq4Kyw/HV1fZ+SJmRyzLDiiqDNZJQP3F6LqgAQD607WNQ/
-	E7/XzsVbo6k4HFSUefb3xwgFyVqvYeeooLa7zc03PfMRCWORSKSz
-X-Google-Smtp-Source: AGHT+IGtLBGFSoN5TNSBuIxWdgRvEyQ19u5EHulCguBs5Optxu4BICaGHpZvw6N/6zjcZ4exXIGR0A==
-X-Received: by 2002:a17:906:584e:b0:a51:e05f:2455 with SMTP id h14-20020a170906584e00b00a51e05f2455mr6626810ejs.48.1713768000390;
-        Sun, 21 Apr 2024 23:40:00 -0700 (PDT)
-Received: from ?IPV6:2a0b:e7c0:0:107::aaaa:69? ([2a0b:e7c0:0:107::aaaa:69])
-        by smtp.gmail.com with ESMTPSA id gc24-20020a170906c8d800b00a55ac217235sm1586981ejb.90.2024.04.21.23.39.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 21 Apr 2024 23:40:00 -0700 (PDT)
-Message-ID: <0032f249-7787-4875-a782-0847c04d5c9c@kernel.org>
-Date: Mon, 22 Apr 2024 08:39:58 +0200
+	s=arc-20240116; t=1713769931; c=relaxed/simple;
+	bh=hpSwpq8t85oJgWzBAb0sGwMKMZLQnDwXbtThMElaBjk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=KJSE4fa7U4IuxTdBT9dZ1f17AKl9xWvfY70ObiVzWAr1EvUEj+EVnH7R4IBuorov1dGocUH76F7TLJuSjBqoGy0hLlHYgyVOrJVZVtFtzabZl2+bFEA6rr+YjfbA+O7s/r9hPW9zdQ7S39we8M0wPTgMvkR/pIq9NeMWcTRseEE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hexdev.de; spf=pass smtp.mailfrom=hexdev.de; dkim=pass (1024-bit key) header.d=fritzc.com header.i=@fritzc.com header.b=DdZz0iIY; arc=none smtp.client-ip=213.160.72.247
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hexdev.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hexdev.de
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=fritzc.com;
+	s=dkim; h=Content-Transfer-Encoding:MIME-Version:Message-Id:Date:Subject:Cc:
+	To:From:Sender:Reply-To:Content-Type:Content-ID:Content-Description:
+	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=SF2ECz2nkc3iAx/gW3lWEA5oZJYY9ghIYAkmZKvVY/E=; b=DdZz0iIY61cgM89iG8hhc4U/c4
+	mhqwc4EVqseuKe+ULiMA6LSl6sb1C4prfUGYE7zdiZTN1VsrpLMQVjJi+N8vWXVxTcYdDfyk8APay
+	s+OkZDqeIWSkmnmvFaQJZte4EAu6BvupRWS3Uc2DcWyCOcaa1/0TKsVr0hOILvdm4SIM=;
+Received: from 127.0.0.1
+	by fritzc.com with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim latest)
+	(envelope-from <christoph.fritz@hexdev.de>)
+	id 1rynWe-001JRH-2R;
+	Mon, 22 Apr 2024 08:51:41 +0200
+From: Christoph Fritz <christoph.fritz@hexdev.de>
+To: Oliver Hartkopp <socketcan@hartkopp.net>,
+	Marc Kleine-Budde <mkl@pengutronix.de>,
+	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Jiri Kosina <jikos@kernel.org>,
+	Benjamin Tissoires <bentiss@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Jiri Slaby <jirislaby@kernel.org>
+Cc: Andreas Lauser <andreas.lauser@mercedes-benz.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	linux-can@vger.kernel.org,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-input@vger.kernel.org,
+	linux-serial@vger.kernel.org
+Subject: [PATCH 00/11] LIN Bus support for Linux
+Date: Mon, 22 Apr 2024 08:51:03 +0200
+Message-Id: <20240422065114.3185505-1-christoph.fritz@hexdev.de>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net,v3] net: ppp: Fix deadlock caused by unsafe-irq lock
- in ap_get()
-To: Jakub Kicinski <kuba@kernel.org>, Jeongjun Park <aha310510@gmail.com>
-Cc: syzbot+393d0ef63475d9bb1f16@syzkaller.appspotmail.com,
- davem@davemloft.net, edumazet@google.com, linux-kernel@vger.kernel.org,
- linux-ppp@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com,
- gregkh@linuxfoundation.org, syzkaller-bugs@googlegroups.com
-References: <000000000000423dd10611261d47@google.com>
- <20240419183815.30147-1-aha310510@gmail.com>
- <20240419173108.30cf9090@kernel.org>
-Content-Language: en-US
-From: Jiri Slaby <jirislaby@kernel.org>
-Autocrypt: addr=jirislaby@kernel.org; keydata=
- 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
-In-Reply-To: <20240419173108.30cf9090@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 20. 04. 24, 2:31, Jakub Kicinski wrote:
-> On Sat, 20 Apr 2024 03:38:15 +0900 Jeongjun Park wrote:
->> read_lock() present in ap_get() is interrupt-vulnerable, so the function needs to be modified.
->>
->>
->> Reported-by: syzbot+393d0ef63475d9bb1f16@syzkaller.appspotmail.com
-> 
-> Improve the commit message to explain the problem more clearly.
+This series is introducing basic Local Interconnect Network (LIN) (ISO
+17987) [0] support to the Linux kernel, along with two drivers that make
+use of it: An advanced USB adapter and a lightweight serdev driver (for
+UARTs equipped with a LIN transceiver).
 
-Esp. I would like to see the stack trace leading to the problem (be it 
-generated or investigated).
+The LIN bus is common in the automotive industry for connecting
+low-level devices like side mirrors, seats, ambient lights, etc.
 
-thanks,
+The LIN bus is a lower-cost bus system with a subset of features of CAN.
+Its earlier specification (before ISO) is publicly accessible [1].
+
+This series of patches follows up on a discussion initiated by an RFC
+patch series [2].
+
+The core of this series is the first patch, which implements the CAN_LIN
+glue driver. It basically utilizes the CAN interface on one side and
+for device drivers on the other side it creates a rx() function and
+several callbacks.
+
+This approach is non-invasive, as LIN frames (nearly identical to CAN
+frames) are just treated as a special case of CAN frames. This approach
+eliminates the need for a separate API for LIN, allowing the use of
+existing CAN tools, including the CAN broadcast manager.
+
+For the responder part of LIN, when a device responds to a controller
+request, it can reply on up to LIN its 64 possible IDs (0...63) with a
+maximum of 8 bytes payload.  The response must be sent relatively
+quickly, so offloading is used (which is used by most devices anyway).
+Devices that do not support offloading (like the lightweight serdev)
+handle the list of responses in the driver on a best-effort basis.
+
+The CAN broadcast manager (bcm) makes a good interface for the LIN
+userland interface, bcm is therefore enhanced to handle the
+configuration of these offload RX frames, so that the device can handle
+the response on its own.  As a basic alternative, a sysfs file per LIN
+identifier gets also introduced.
+
+The USB device driver for the hexLIN [3] adapter uses the HID protocol
+and is located in the drivers/hid directory. Which is a bit uncommon for
+a CAN device, but this is a LIN device and mainly a hid driver (and all
+hid drivers go into drivers/hid).
+
+The other driver, the UART lin-serdev driver requires support for break
+detection, this is addressed by two serdev patches.
+
+The lin-serdev driver has been tested on an ARM SoC, on its uart
+(uart-pl011) an adapter board (hexLIN-tty [4]) has been used.  As a
+sidenote, in that tty serial driver (amba-pl011.c) it was necessary to
+disable DMA_ENGINE to accurately detect breaks [5].
+
+The functions for generating LIN-Breaks and checksums, originally from
+a line discipline driver named sllin [6], have been adopted into the
+lin-serdev driver.
+
+To make use of the LIN mode configuration (commander or responder)
+option, a patch for iproute2 [7] has been made.
+
+The lin-utils [8] provide userland tools for reference, testing, and
+evaluation. These utilities are currently separate but may potentially
+be integrated into can-utils in the future.
+
+[0]: https://en.wikipedia.org/wiki/Local_Interconnect_Network
+[1]: https://www.lin-cia.org/fileadmin/microsites/lin-cia.org/resources/documents/LIN_2.2A.pdf
+[2]: https://lwn.net/Articles/916049/
+[3]: https://hexdev.de/hexlin
+[4]: https://hexdev.de/hexlin#tty
+[5]: https://github.com/raspberrypi/linux/issues/5985
+[6]: https://github.com/lin-bus/linux-lin/blob/master/sllin/sllin.c
+[7]: https://github.com/ch-f/iproute2/tree/lin-feature
+[8]: https://github.com/ch-f/lin-utils
+
+Christoph Fritz (11):
+  can: Add LIN bus as CAN abstraction
+  HID: hexLIN: Add support for USB LIN bus adapter
+  tty: serdev: Add flag buffer aware receive_buf_fp()
+  tty: serdev: Add method to enable break flags
+  dt-bindings: net: can: Add serdev LIN bus dt bindings
+  can: Add support for serdev LIN adapters
+  can: lin: Add special frame id for rx offload config
+  can: bcm: Add LIN answer offloading for responder mode
+  can: lin: Handle rx offload config frames
+  can: lin: Support setting LIN mode
+  HID: hexLIN: Implement ability to update lin mode
+
+ .../bindings/net/can/linux,lin-serdev.yaml    |  29 +
+ drivers/hid/Kconfig                           |  19 +
+ drivers/hid/Makefile                          |   1 +
+ drivers/hid/hid-hexlin.c                      | 594 ++++++++++++++++++
+ drivers/hid/hid-ids.h                         |   1 +
+ drivers/hid/hid-quirks.c                      |   3 +
+ drivers/net/can/Kconfig                       |  26 +
+ drivers/net/can/Makefile                      |   2 +
+ drivers/net/can/lin-serdev.c                  | 467 ++++++++++++++
+ drivers/net/can/lin.c                         | 547 ++++++++++++++++
+ drivers/tty/serdev/core.c                     |  11 +
+ drivers/tty/serdev/serdev-ttyport.c           |  19 +-
+ include/linux/serdev.h                        |  19 +-
+ include/net/lin.h                             | 105 ++++
+ include/uapi/linux/can/bcm.h                  |   5 +-
+ include/uapi/linux/can/netlink.h              |   2 +
+ net/can/bcm.c                                 |  74 ++-
+ 17 files changed, 1918 insertions(+), 6 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/net/can/linux,lin-serdev.yaml
+ create mode 100644 drivers/hid/hid-hexlin.c
+ create mode 100644 drivers/net/can/lin-serdev.c
+ create mode 100644 drivers/net/can/lin.c
+ create mode 100644 include/net/lin.h
+
 -- 
-js
-suse labs
+2.39.2
 
 
