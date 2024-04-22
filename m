@@ -1,91 +1,117 @@
-Return-Path: <netdev+bounces-89902-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89908-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FF608AC280
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 03:11:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF5A08AC2A2
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 03:54:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7B9791F20F42
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 01:11:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 636081F21231
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 01:54:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 625931109;
-	Mon, 22 Apr 2024 01:11:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 550B5DF49;
+	Mon, 22 Apr 2024 01:54:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="JuhPcqjK"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+Received: from out199-1.us.a.mail.aliyun.com (out199-1.us.a.mail.aliyun.com [47.90.199.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9028810FD;
-	Mon, 22 Apr 2024 01:11:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D025746E
+	for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 01:54:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=47.90.199.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713748308; cv=none; b=OEado03h+wkPCCPqO3jkoAFmjODBcOKR7xGRd2PmGSr8jRaArusKMqjOIqBWFCcBg2BkvjcxKMm3f6iYiAFeHRfR+4/aeEAwqvoZeHtjr7kKzX93RRSy8HbPqxZ9pd3SoKz6AXHN5ZNxQTYFdCKbWtTNelccIYkt8hltoeqVOKs=
+	t=1713750864; cv=none; b=LfZ/Fvt3tjBwB/0o+us12kbdarquO57fwK+/aoe/yDXbAXjE9VAg/jt7pLWEBp52JzQMu3w6B5IFRb7jm+yOg30Oq4FkswFrSmFfoKMROIURQMOdRyEuaUxNNY1W9nemDHbCZnMvcXrSjHz+4kfVYlNDKESx3xlU2Sh0uiZU2pY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713748308; c=relaxed/simple;
-	bh=pb8XSFdHSsldxcufWu9UmZV9xZHG679siZZgcIEnJFE=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=A6hL/NCSNjkixYRgSzE71KqSPXovXHNKRnFA1Zzdu2ZDr7CDzsJmtl6v60Kl9F+XndIre5zqQazu2w8uL0aXBf/bBQM3YjICnZ0jv6PfRXFQtlkudoDW/anKMDDXljg423vPE7VAfX9pLmtF+UcqIWWTZtR+vdqITCCQSSB9+HM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.48])
-	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4VN6Zb0NkPz1R8nM;
-	Mon, 22 Apr 2024 09:08:39 +0800 (CST)
-Received: from dggpemd500003.china.huawei.com (unknown [7.185.36.29])
-	by mail.maildlp.com (Postfix) with ESMTPS id 6C28A18007A;
-	Mon, 22 Apr 2024 09:11:37 +0800 (CST)
-Received: from localhost.localdomain (10.175.101.6) by
- dggpemd500003.china.huawei.com (7.185.36.29) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Mon, 22 Apr 2024 09:11:36 +0800
-From: gaoxingwang <gaoxingwang1@huawei.com>
-To: <davem@davemloft.net>, <dsahern@kernel.org>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<yanan@huawei.com>
-Subject: [PATCH] net: ipv6: fix wrong start position when receive hop-by-hop fragment
-Date: Mon, 22 Apr 2024 09:10:52 +0800
-Message-ID: <20240422011052.2932165-1-gaoxingwang1@huawei.com>
-X-Mailer: git-send-email 2.27.0
+	s=arc-20240116; t=1713750864; c=relaxed/simple;
+	bh=ZSd37NZmwRJpjHAS9ajLmdk+WDKEomc1d5hGfAfOCQU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=dvD9+u5xbQysDr9zw8PbAGuL5lMWBP7kDFrhwlbyLg6nI82G8ynY4TIY2yZG1mHJz3lDqE3FqIesTMTlZJzWyBfAd+x9/G/KZKCB5/aLywht/PWdKvnvRo6MLJiw4YO7UCL5Aoj2HICRuM8dTL/5pvMquOV9+BtSvl1YjSIGFxY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=JuhPcqjK; arc=none smtp.client-ip=47.90.199.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1713750845; h=From:To:Subject:Date:Message-Id:MIME-Version;
+	bh=qfFyaumVlpjGsrE/xHi1bO0ootxsSU/JVlrBiwyRb2Y=;
+	b=JuhPcqjK87pHvG4qtkoiwMHypo3F46cXD4p8+c/ouKKJFiJmstkMN3///MOIap/rQYylhDfMY+FnsWZtGa5YK2wZyY3Ve48YtReWu9iaEtpjQNb0CwJfLEUL85SSf2IzZ/rrmF3V5bNzqSJxZgpoq2SqOhhT3qL8Bp/1k1Y1agg=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R141e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045192;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=9;SR=0;TI=SMTPD_---0W4y4sJ2_1713750843;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W4y4sJ2_1713750843)
+          by smtp.aliyun-inc.com;
+          Mon, 22 Apr 2024 09:54:04 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: virtualization@lists.linux.dev
+Cc: "Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Subject: [PATCH vhost v1 0/7] virtio_net: rx enable premapped mode by default
+Date: Mon, 22 Apr 2024 09:53:56 +0800
+Message-Id: <20240422015403.72526-1-xuanzhuo@linux.alibaba.com>
+X-Mailer: git-send-email 2.32.0.3.g01195cf9f
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-Git-Hash: 2c089e81de7e
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- dggpemd500003.china.huawei.com (7.185.36.29)
 
-In IPv6, ipv6_rcv_core will parse the hop-by-hop type extension header and increase skb->transport_header by one extension header length.
-But if there are more other extension headers like fragment header at this time, the skb->transport_header points to the second extension header,
-not the transport layer header or the first extension header.
+Actually, for the virtio drivers, we can enable premapped mode whatever
+the value of use_dma_api. Because we provide the virtio dma apis.
+So the driver can enable premapped mode unconditionally.
 
-This will result in the start and nexthdrp variable not pointing to the same position in ipv6frag_thdr_trunced,
-and ipv6_skip_exthdr returning incorrect offset and frag_off.Sometimes, the length of the last sharded packet is smaller than the calculated incorrect offset, resulting in packet loss.
-We can use network header to offset and calculate the correct position to solve this problem.
+This patch set makes the big mode of virtio-net to support premapped mode.
+And enable premapped mode for rx by default.
 
-Fixes: 9d9e937b1c8b (ipv6/netfilter: Discard first fragment not including all headers)
-Signed-off-by: Gao Xingwang <gaoxingwang1@huawei.com>
----
- net/ipv6/reassembly.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Based on the following points, we do not use page pool to manage these
+    pages:
 
-diff --git a/net/ipv6/reassembly.c b/net/ipv6/reassembly.c
-index 5ebc47da1000..b3fc3a53cbbe 100644
---- a/net/ipv6/reassembly.c
-+++ b/net/ipv6/reassembly.c
-@@ -369,7 +369,7 @@ static int ipv6_frag_rcv(struct sk_buff *skb)
- 	 * the source of the fragment, with the Pointer field set to zero.
- 	 */
- 	nexthdr = hdr->nexthdr;
--	if (ipv6frag_thdr_truncated(skb, skb_transport_offset(skb), &nexthdr)) {
-+	if (ipv6frag_thdr_truncated(skb, skb_network_offset(skb) + siezof(struct ipv6hdr), &nexthdr)) {
- 		__IP6_INC_STATS(net, __in6_dev_get_safely(skb->dev),
- 				IPSTATS_MIB_INHDRERRORS);
- 		icmpv6_param_prob(skb, ICMPV6_HDR_INCOMP, 0);
--- 
-2.27.0
+    1. virtio-net uses the DMA APIs wrapped by virtio core. Therefore,
+       we can only prevent the page pool from performing DMA operations, and
+       let the driver perform DMA operations on the allocated pages.
+    2. But when the page pool releases the page, we have no chance to
+       execute dma unmap.
+    3. A solution to #2 is to execute dma unmap every time before putting
+       the page back to the page pool. (This is actually a waste, we don't
+       execute unmap so frequently.)
+    4. But there is another problem, we still need to use page.dma_addr to
+       save the dma address. Using page.dma_addr while using page pool is
+       unsafe behavior.
+
+    More:
+        https://lore.kernel.org/all/CACGkMEu=Aok9z2imB_c5qVuujSh=vjj1kx12fy9N7hqyi+M5Ow@mail.gmail.com/
+
+Please review.
+
+
+v1:
+    1. discussed for using page pool
+    2. use dma sync to replace the unmap for the first page
+
+Thanks.
+
+
+Xuan Zhuo (7):
+  virtio_ring: introduce dma map api for page
+  virtio_ring: enable premapped mode whatever use_dma_api
+  virtio_net: replace private by pp struct inside page
+  virtio_net: big mode support premapped
+  virtio_net: enable premapped by default
+  virtio_net: rx remove premapped failover code
+  virtio_net: remove the misleading comment
+
+ drivers/net/virtio_net.c     | 243 +++++++++++++++++++++++------------
+ drivers/virtio/virtio_ring.c |  59 ++++++++-
+ include/linux/virtio.h       |   7 +
+ 3 files changed, 222 insertions(+), 87 deletions(-)
+
+--
+2.32.0.3.g01195cf9f
 
 
