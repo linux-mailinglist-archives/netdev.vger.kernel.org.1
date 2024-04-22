@@ -1,78 +1,358 @@
-Return-Path: <netdev+bounces-90243-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90244-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4AE3F8AD424
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 20:45:04 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5409E8AD44E
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 20:49:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7CAF31C21057
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 18:45:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 88601B25D53
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 18:49:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D600C154BFF;
-	Mon, 22 Apr 2024 18:45:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C5E6156F59;
+	Mon, 22 Apr 2024 18:46:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I/fHrcaO"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vuZ4leAg"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD5E515443B;
-	Mon, 22 Apr 2024 18:45:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5D0B156F27
+	for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 18:46:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713811501; cv=none; b=SjHR2fTQS5vdS3B+ajTnMgT6UkW2EZAWmsr1FImHChP4nMKbwGPeJGHeDGtxTTO+kR530m+weVfTNFW8En/fXaGyYCkduQRlBOHB1nmtZ7rKW9z2/3mnZdh77XsQF3undNm17WRLc0R7dNuFTStE0RzEgtAjfnGgMpDXt7tAOn0=
+	t=1713811588; cv=none; b=h2cnTVt1aRWOLNXFDF9Zgqda6O18M6FXDKM5A2O1wwf0VW2JO4FEFJgp3GSVfgp76WL8PjL2PQO+kfPC4CW67+/GGJa4E3OBIVoLJZv3qnLEpZTIMJgAZ3uu4auVSjnc1pISPMuT4+qF2v8ymFrpN9jlUMOqsZaPG68ZmFGgoN0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713811501; c=relaxed/simple;
-	bh=vwry6iTBcupii6vruuEf2saDqUhPlSYQSZ2MuEN49sU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NXQcK2U1xV+BjLKC3c3AaxxDwlKTeB3l7JWC/rdrlnXRnL3d6cAiL56ibl+D8OQ6vnHO4X5wo/TZf5zfLHL9QVs5uVrY6SFQi5FIvxbJRg7nKU7AdcTpBIov/wN6XzoXaGeeO2fMqOWtEqC7YU/hOwpiOM1LfnIpJ4Ns6E9oPMI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I/fHrcaO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0F06C113CC;
-	Mon, 22 Apr 2024 18:45:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713811501;
-	bh=vwry6iTBcupii6vruuEf2saDqUhPlSYQSZ2MuEN49sU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=I/fHrcaOUVto2u66JzHJdFRlrvYzBrCjnyxNVHi7Bs1YjfGCthcQGg/9EDm90/3R9
-	 VXyRbsJAtw1PIKpaq5Gmm7CAa+pts7tJfL2tMwrsY7n/QlsMCa+I1DFQTc8qSIsjGU
-	 2l1XK9+zLiFzFKz6GbwKxkL8N9tfs3EXp7dQRf0+lQovcU73Q3dOYc1mzxSzcd9+dx
-	 qvFdH2yqDdjQis2BkJMBLWU39tIKn3FvnKaJCkE15r45vt/JTTVrJfxXg9tAN5Dfyw
-	 S7I6QU3nPToYjdRftzK4OUTG1vq7DtsssJYjuT4WA1H1lMYHkr7V6bs80MwdJmjFR8
-	 TthpTpSSJYwLQ==
-Date: Mon, 22 Apr 2024 11:44:59 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Chintan Vankar <c-vankar@ti.com>
-Cc: Julien Panis <jpanis@baylibre.com>, Arnd Bergmann <arnd@arndb.de>, Dan
- Carpenter <dan.carpenter@linaro.org>, Heiner Kallweit
- <hkallweit1@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>, Andrew
- Lunn <andrew@lunn.ch>, Roger Quadros <rogerq@kernel.org>, Richard Cochran
- <richardcochran@gmail.com>, Paolo Abeni <pabeni@redhat.com>, Eric Dumazet
- <edumazet@google.com>, "David S. Miller" <davem@davemloft.net>,
- <s-vadapalli@ti.com>, <linux-kernel@vger.kernel.org>,
- <netdev@vger.kernel.org>
-Subject: Re: [PATCH net-next v8 0/2] Enable RX HW timestamp for PTP packets
- using CPTS FIFO
-Message-ID: <20240422114459.46dd016c@kernel.org>
-In-Reply-To: <67c7f423-18ce-4804-8be9-cc4521733cd2@ti.com>
-References: <20240419082626.57225-1-c-vankar@ti.com>
-	<67c7f423-18ce-4804-8be9-cc4521733cd2@ti.com>
+	s=arc-20240116; t=1713811588; c=relaxed/simple;
+	bh=noHXfVMJV+yXJVx0vjokRg9H1rF7im7quabjLuDwldk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bC68zS6hdawi+V6LH7szgUmUbzHniZm/3XN+FWCIorS5xcpd1+UZt8fyVYoRPqIPX7e83BY9GfQvifc/M8aUO05gjm78UzjevFjLTnpvWW8jZ68e32Nw7QuhGYwLq5WKd0WBZMzwYv1e9B/ai8nFqdXjgVDe+6JDh84NBUPCM+A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vuZ4leAg; arc=none smtp.client-ip=91.218.175.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <c90fcc07-38bf-4d0c-9729-5c071134e4e1@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1713811585;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Hmx5bIC9HXhYXvBA5QU87uwq6RGHLvRpwGDnjq22S+Y=;
+	b=vuZ4leAgw32yhPRgHio+YtpCjzv1H4dHtDy0TivOTncN32ArN5czGV5iz5prcT5D3wDHoi
+	ahs0/U5jkJoiGF9yc/FjHxd6yCYqpbbtGaQeo6LnPzm/U0u4r1Xa3SD657PZZEbLYmPPNz
+	FR4oSCPUfKKHPcwTmVFHKs7EJ9K3XkU=
+Date: Mon, 22 Apr 2024 11:46:19 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Subject: Re: [RFC PATCH bpf-next v4 2/2] net: Add additional bit to support
+ clockid_t timestamp type
+To: "Abhishek Chauhan (ABC)" <quic_abchauha@quicinc.com>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Andrew Halaney <ahalaney@redhat.com>,
+ Martin KaFai Lau <martin.lau@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, bpf <bpf@vger.kernel.org>,
+ kernel@quicinc.com
+References: <20240418004308.1009262-1-quic_abchauha@quicinc.com>
+ <20240418004308.1009262-3-quic_abchauha@quicinc.com>
+ <66216f3ec638b_f648a294ec@willemb.c.googlers.com.notmuch>
+ <cb922600-783e-4741-be85-260d1ded5bdb@quicinc.com>
+ <c6f33a36-1fac-4738-8a4f-c930b544ba62@linux.dev>
+ <6b6bd108-817c-4a58-8b69-6c2dde436575@quicinc.com>
+ <79ca7697-339a-4f72-ab12-5a3094b294f3@quicinc.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+Content-Language: en-US
+In-Reply-To: <79ca7697-339a-4f72-ab12-5a3094b294f3@quicinc.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, 22 Apr 2024 17:09:41 +0530 Chintan Vankar wrote:
-> Is it possible to merge this series if no further comment ?
+On 4/19/24 6:13 PM, Abhishek Chauhan (ABC) wrote:
+> 
+> 
+> On 4/18/2024 5:30 PM, Abhishek Chauhan (ABC) wrote:
+>>
+>>
+>> On 4/18/2024 2:57 PM, Martin KaFai Lau wrote:
+>>> On 4/18/24 1:10 PM, Abhishek Chauhan (ABC) wrote:
+>>>>>>    #ifdef CONFIG_NET_XGRESS
+>>>>>>        __u8            tc_at_ingress:1;    /* See TC_AT_INGRESS_MASK */
+>>>>>>        __u8            tc_skip_classify:1;
+>>>>>> @@ -1096,10 +1100,12 @@ struct sk_buff {
+>>>>>>     */
+>>>>>>    #ifdef __BIG_ENDIAN_BITFIELD
+>>>>>>    #define SKB_MONO_DELIVERY_TIME_MASK    (1 << 7)
+>>>>>> -#define TC_AT_INGRESS_MASK        (1 << 6)
+>>>>>> +#define SKB_TAI_DELIVERY_TIME_MASK    (1 << 6)
+>>>>>
+>>>>> SKB_TSTAMP_TYPE_BIT2_MASK?
+>>>
+>>> nit. Shorten it to just SKB_TSTAMP_TYPE_MASK?
+>>>
+>> Okay i will do the same. Noted!
+>>> #ifdef __BIG_ENDIAN_BITFIELD
+>>> #define SKB_TSTAMP_TYPE_MASK    (3 << 6)
+>>> #define SKB_TSTAMP_TYPE_RSH    (6)    /* more on this later */
+>>> #else
+>>> #define SKB_TSTAMP_TYPE_MASK    (3)
+>>> #endif
+>>>
+>>>>>
+>>>> I was thinking to keep it as TAI because it will confuse developers. I hope thats okay.
+>>>
+>>> I think it is not very useful to distinguish each bit since it is an enum value now. It becomes more like the "pkt_type:3" and its PKT_TYPE_MAX.
+>>> I see what you are saying.
+>>>>>> +#define TC_AT_INGRESS_MASK        (1 << 5)
+>>>>>>    #else
+>>>>>>    #define SKB_MONO_DELIVERY_TIME_MASK    (1 << 0)
+>>>>>> -#define TC_AT_INGRESS_MASK        (1 << 1)
+>>>>>> +#define SKB_TAI_DELIVERY_TIME_MASK    (1 << 1)
+>>>>>> +#define TC_AT_INGRESS_MASK        (1 << 2)
+>>>>>>    #endif
+>>>>>>    #define SKB_BF_MONO_TC_OFFSET        offsetof(struct sk_buff, __mono_tc_offset)
+>>>>>>    @@ -4206,6 +4212,11 @@ static inline void skb_set_delivery_time(struct sk_buff *skb, ktime_t kt,
+>>>>>>        case CLOCK_MONOTONIC:
+>>>>>>            skb->tstamp_type = SKB_CLOCK_MONO;
+>>>>>>            break;
+>>>>>> +    case CLOCK_TAI:
+>>>>>> +        skb->tstamp_type = SKB_CLOCK_TAI;
+>>>>>> +        break;
+>>>>>> +    default:
+>>>>>> +        WARN_ONCE(true, "clockid %d not supported", tstamp_type);
+>>>>>
+>>>>> and set to 0 and default tstamp_type?
+>>>>> Actually thinking about it. I feel if its unsupported just fall back to default is the correct thing. I will take care of this.
+>>>>>>        }
+>>>>>>    }
+>>>>>
+>>>>>>    >
+>>>>>    @@ -9372,10 +9378,16 @@ static struct bpf_insn *bpf_convert_tstamp_type_read(const struct bpf_insn *si,
+>>>>>>        *insn++ = BPF_LDX_MEM(BPF_B, tmp_reg, skb_reg,
+>>>>>>                      SKB_BF_MONO_TC_OFFSET);
+>>>>>>        *insn++ = BPF_JMP32_IMM(BPF_JSET, tmp_reg,
+>>>>>> -                SKB_MONO_DELIVERY_TIME_MASK, 2);
+>>>>>> +                SKB_MONO_DELIVERY_TIME_MASK | SKB_TAI_DELIVERY_TIME_MASK, 2);
+>>>>>> +    *insn++ = BPF_JMP32_IMM(BPF_JSET, tmp_reg,
+>>>>>> +                SKB_MONO_DELIVERY_TIME_MASK, 3);
+>>>>>> +    *insn++ = BPF_JMP32_IMM(BPF_JSET, tmp_reg,
+>>>>>> +                SKB_TAI_DELIVERY_TIME_MASK, 4);
+>>>>>>        *insn++ = BPF_MOV32_IMM(value_reg, BPF_SKB_TSTAMP_UNSPEC);
+>>>>>>        *insn++ = BPF_JMP_A(1);
+>>>>>>        *insn++ = BPF_MOV32_IMM(value_reg, BPF_SKB_TSTAMP_DELIVERY_MONO);
+>>>>>> +    *insn++ = BPF_JMP_A(1);
+>>>>>> +    *insn++ = BPF_MOV32_IMM(value_reg, BPF_SKB_TSTAMP_DELIVERY_TAI);
+>>>
+>>> With SKB_TSTAMP_TYPE_MASK defined like above, this could be simplified like this (untested):
+>>>
+>> Let me think this through and raise it as part of the next rfc patch.
+>>> static struct bpf_insn *bpf_convert_tstamp_type_read(const struct bpf_insn *si,
+>>>                                                       struct bpf_insn *insn)
+>>> {
+>>>      __u8 value_reg = si->dst_reg;
+>>>      __u8 skb_reg = si->src_reg;
+>>>
+>>>      BUILD_BUG_ON(__SKB_CLOCK_MAX != BPF_SKB_TSTAMP_DELIVERY_TAI);
+>>>      *insn++ = BPF_LDX_MEM(BPF_B, value_reg, skb_reg, SKB_BF_MONO_TC_OFFSET);
+>>>      *insn++ = BPF_ALU32_IMM(BPF_AND, value_reg, SKB_TSTAMP_TYPE_MASK);
+>>> #ifdef __BIG_ENDIAN_BITFIELD
+>>>      *insn++ = BPF_ALU32_IMM(BPF_RSH, value_reg, SKB_TSTAMP_TYPE_RSH);
+>>> #else
+>>>      BUILD_BUG_ON(!(SKB_TSTAMP_TYPE_MASK & 0x1));
+>>> #endif
+>>>
+>>>      return insn;
+>>> }
+>>>
+>>>>>>          return insn;
+>>>>>>    }
+>>>>>> @@ -9418,10 +9430,26 @@ static struct bpf_insn *bpf_convert_tstamp_read(const struct bpf_prog *prog,
+>>>>>>            __u8 tmp_reg = BPF_REG_AX;
+>>>>>>              *insn++ = BPF_LDX_MEM(BPF_B, tmp_reg, skb_reg, SKB_BF_MONO_TC_OFFSET);
+>>>>>> +        /*check if all three bits are set*/
+>>>>>>            *insn++ = BPF_ALU32_IMM(BPF_AND, tmp_reg,
+>>>>>> -                    TC_AT_INGRESS_MASK | SKB_MONO_DELIVERY_TIME_MASK);
+>>>>>> -        *insn++ = BPF_JMP32_IMM(BPF_JNE, tmp_reg,
+>>>>>> -                    TC_AT_INGRESS_MASK | SKB_MONO_DELIVERY_TIME_MASK, 2);
+>>>>>> +                    TC_AT_INGRESS_MASK | SKB_MONO_DELIVERY_TIME_MASK |
+>>>>>> +                    SKB_TAI_DELIVERY_TIME_MASK);
+>>>>>> +        /*if all 3 bits are set jump 3 instructions and clear the register */
+>>>>>> +        *insn++ = BPF_JMP32_IMM(BPF_JEQ, tmp_reg,
+>>>>>> +                    TC_AT_INGRESS_MASK | SKB_MONO_DELIVERY_TIME_MASK |
+>>>>>> +                    SKB_TAI_DELIVERY_TIME_MASK, 4);
+>>>>>> +        /*Now check Mono is set with ingress mask if so clear */
+>>>>>> +        *insn++ = BPF_JMP32_IMM(BPF_JEQ, tmp_reg,
+>>>>>> +                    TC_AT_INGRESS_MASK | SKB_MONO_DELIVERY_TIME_MASK, 3);
+>>>>>> +        /*Now Check tai is set with ingress mask if so clear */
+>>>>>> +        *insn++ = BPF_JMP32_IMM(BPF_JEQ, tmp_reg,
+>>>>>> +                    TC_AT_INGRESS_MASK | SKB_TAI_DELIVERY_TIME_MASK, 2);
+>>>>>> +        /*Now Check tai and mono are set if so clear */
+>>>>>> +        *insn++ = BPF_JMP32_IMM(BPF_JEQ, tmp_reg,
+>>>>>> +                    SKB_MONO_DELIVERY_TIME_MASK |
+>>>>>> +                    SKB_TAI_DELIVERY_TIME_MASK, 1);
+>>>
+>>> Same as the bpf_convert_tstamp_type_read, this could be simplified with SKB_TSTAMP_TYPE_MASK.
+>>>
+> Willem and Martin,
+> When do we clear the tstamp and make it 0 in bpf_convert_tstamp_read? meaning which configuration?
 
-Perhaps you are blocked by us not merging this, yet.
-In that case, to avoid sitting idly, may I politely suggest
-reading the Linux kernel process documentation. Especially the part
-which explains whether it's polite to ping maintainers (after less 
-than two work days).
+When the bpf prog does not check the skb->tstamp_type. It is
+the "if (!prog->tstamp_type_access)" in bpf_convert_tstamp_read().
+
+If bpf prog does not check the skb->tstamp_type and it is at ingress,
+bpf prog expects recv tstamp (ie. real clock), so it needs to clear
+out the tstamp (i.e read as 0 tstamp).
+
+> I see previously(current upstream code) if mono_delivery is set and tc_ingress_mask is set
+> upstream code used to set the tstamp as 0.
+> 
+> Which means with addition of tai mask the new implementation should take care of following cases(correct me if i am wrong)
+> 1. ( tai mask set + ingress mask set ) = Clear tstamp
+> 2. ( mono mask set + ingress mask set ) = Clear tstamp
+> 3. ( mono mask set + tai mask set + ingress mask set ) = Clear tstamp
+> 4. ( No mask set ) = Clear tstamp
+> 5. ( Tai mask set + mono mask set ) = Clear tstamp
+
+No need to check the individual mono and tai bit here. Check the
+tstamp_type as a whole. Like in pseudo C:
+
+if (skb->tc_at_ingress && skb->tstamp_type)
+	value_reg = 0;
+
+untested code for tstamp_read() and tstamp_write():
+
+static struct bpf_insn *bpf_convert_tstamp_read(const struct bpf_prog *prog,
+                                                 const struct bpf_insn *si,
+                                                 struct bpf_insn *insn)
+{
+	__u8 value_reg = si->dst_reg;
+	__u8 skb_reg = si->src_reg;
+
+#ifdef CONFIG_NET_XGRESS
+	/* If the tstamp_type is read,
+	 * the bpf prog is aware the tstamp could have delivery time.
+	 * Thus, read skb->tstamp as is if tstamp_type_access is true.
+	 */
+	if (!prog->tstamp_type_access) {
+		/* AX is needed because src_reg and dst_reg could be the same */
+		__u8 tmp_reg = BPF_REG_AX;
+
+		*insn++ = BPF_LDX_MEM(BPF_B, tmp_reg, skb_reg, SKB_BF_MONO_TC_OFFSET);
+		*insn++ = BPF_JMP32_IMM(BPF_JSET, tmp_reg, TC_AT_INGRESS_MASK, 1);
+		/* goto <read> */
+		BPF_JMP_A(4);
+		*insn++ = BPF_JMP32_IMM(BPF_JSET, tmp_reg, SKB_TSTAMP_TYPE_MASK, 1);
+		/* goto <read> */
+		BPF_JMP_A(2);
+		/* skb->tc_at_ingress && skb->tstamp_type,
+		 * read 0 as the (rcv) timestamp.
+		 */
+		*insn++ = BPF_MOV64_IMM(value_reg, 0);
+		*insn++ = BPF_JMP_A(1);
+	}
+#endif
+
+	/* <read>: value_reg = skb->tstamp */
+	*insn++ = BPF_LDX_MEM(BPF_DW, value_reg, skb_reg,
+			      offsetof(struct sk_buff, tstamp));
+	return insn;
+}
+
+static struct bpf_insn *bpf_convert_tstamp_write(const struct bpf_prog *prog,
+                                                  const struct bpf_insn *si,
+	                                         struct bpf_insn *insn)
+{
+	__u8 value_reg = si->src_reg;
+	__u8 skb_reg = si->dst_reg;
+
+#ifdef CONFIG_NET_XGRESS
+	/* If the tstamp_type is read,
+	 * the bpf prog is aware the tstamp could have delivery time.
+	 * Thus, write skb->tstamp as is if tstamp_type_access is true.
+	 * Otherwise, writing at ingress will have to clear the
+	 * mono_delivery_time (skb->tstamp_type:1)bit also.
+	 */
+         if (!prog->tstamp_type_access) {
+		__u8 tmp_reg = BPF_REG_AX;
+
+		*insn++ = BPF_LDX_MEM(BPF_B, tmp_reg, skb_reg, SKB_BF_MONO_TC_OFFSET);
+		/* Writing __sk_buff->tstamp as ingress, goto <clear> */
+		*insn++ = BPF_JMP32_IMM(BPF_JSET, tmp_reg, TC_AT_INGRESS_MASK, 1);
+		/* goto <store> */
+		*insn++ = BPF_JMP_A(2);
+		/* <clear>: skb->tstamp_type */
+		*insn++ = BPF_ALU32_IMM(BPF_AND, tmp_reg, ~SKB_TSTAMP_TYPE_MASK);
+		*insn++ = BPF_STX_MEM(BPF_B, skb_reg, tmp_reg, SKB_BF_MONO_TC_OFFSET);
+	}
+#endif
+
+	/* <store>: skb->tstamp = tstamp */
+	*insn++ = BPF_RAW_INSN(BPF_CLASS(si->code) | BPF_DW | BPF_MEM,
+			       skb_reg, value_reg, offsetof(struct sk_buff, tstamp), si->imm);
+         return insn;
+}
+
+> 
+> This leaves us with only two values which can be support which is 0x1 and 0x2
+> 
+> This means the tstamp_type should be either 0x1(mono) and tstamp_type 0x2 (tai) to set the value_reg with tstamp
+> Is my understanding correct ?
+> 
+> Do you think the below simplified version looks okay ?
+> 
+> static struct bpf_insn *bpf_convert_tstamp_read(const struct bpf_prog *prog,
+> 						const struct bpf_insn *si,
+> 						struct bpf_insn *insn)
+> {
+> 	__u8 value_reg = si->dst_reg;
+> 	__u8 skb_reg = si->src_reg;
+> 
+> BUILD_BUG_ON(__SKB_CLOCK_MAX != BPF_SKB_TSTAMP_DELIVERY_TAI);
+> #ifdef CONFIG_NET_XGRESS
+> 	/* If the tstamp_type is read,
+> 	 * the bpf prog is aware the tstamp could have delivery time.
+> 	 * Thus, read skb->tstamp as is if tstamp_type_access is true.
+> 	 */
+> 	if (!prog->tstamp_type_access) {
+> 		/* AX is needed because src_reg and dst_reg could be the same */
+> 		__u8 tmp_reg = BPF_REG_AX;
+> 
+> 		*insn++ = BPF_LDX_MEM(BPF_B, tmp_reg, skb_reg, SKB_BF_MONO_TC_OFFSET);
+> 		/* check if all three bits are set*/
+> 		*insn++ = BPF_ALU32_IMM(BPF_AND, tmp_reg,
+> 					TC_AT_INGRESS_MASK | SKB_TSTAMP_TYPE_MASK);
+> 
+> 		/* If the value of tmp_reg is 7,6,5,4,3,0 which means invalid
+> 		 * configuration set the tstamp to 0, value 0x1 and 0x2
+> 		 * is correct configuration
+> 		 */
+> #ifdef __BIG_ENDIAN_BITFIELD
+> 		*insn++ = BPF_JMP32_IMM(BPF_JEQ, tmp_reg, 0x1 << SKB_TSTAMP_TYPE_RSH, 3);
+> 		*insn++ = BPF_JMP32_IMM(BPF_JEQ, tmp_reg, 0x2 << SKB_TSTAMP_TYPE_RSH, 2);
+> #endif
+> 		*insn++ = BPF_JMP32_IMM(BPF_JEQ, tmp_reg, 0x1, 3);
+> 		*insn++ = BPF_JMP32_IMM(BPF_JEQ, tmp_reg, 0x2, 2);
+> #endif
+> 		/* skb->tc_at_ingress && skb->tstamp_type:2,
+> 		 * read 0 as the (rcv) timestamp.
+> 		 */
+> 		*insn++ = BPF_MOV64_IMM(value_reg, 0);
+> 		*insn++ = BPF_JMP_A(1);
+> 	}
+> #endif
+> 
+> 	*insn++ = BPF_LDX_MEM(BPF_DW, value_reg, skb_reg,
+> 			      offsetof(struct sk_buff, tstamp));
+> 	return insn;
+> }
+> 
+> 
+
 
