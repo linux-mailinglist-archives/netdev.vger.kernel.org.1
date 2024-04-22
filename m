@@ -1,77 +1,100 @@
-Return-Path: <netdev+bounces-90142-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90143-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8DDE18ACDDB
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 15:09:49 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8780E8ACDE0
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 15:11:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 45BC51F2152D
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 13:09:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 257241F21324
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 13:11:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC7A414F123;
-	Mon, 22 Apr 2024 13:09:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29F2614A4C6;
+	Mon, 22 Apr 2024 13:11:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Y/Axa+nT"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="a9YZkNlK"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9155314F121
-	for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 13:09:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4B3F145342;
+	Mon, 22 Apr 2024 13:11:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713791345; cv=none; b=Jo4SaxNyVHjjdS2nd3HN1cjh1L6wJfeJOPkSxs6vj3JbxSkoCIhZAoQADS5xAr55NYaSHUd0dHwUv7rhCPxISrFvMlLQC7/JYgd1JwrFdV423amL40Hldrx0GR7IOh+OabVOCaMR2SqYTTgpWqEIXz9l1fyD8d0Etn+UeWo90n4=
+	t=1713791512; cv=none; b=TGAfSycbu041Dl01GocytjAjIS6in8laZhUmuD+LT7qoghkeWCTaioY0t53COX+AhMAXOnNGOMGOcHV/ZLOfC1z8U6RVSxNcD2A9n3pVP2Ym9NDERqK4L+KTPvQ9new1FR5S3zRxuiR760ypnUbTiU5kKHwxw4tfbDdt62yhQEk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713791345; c=relaxed/simple;
-	bh=1IFyZIEF5CkhE87tcVH8Y+W3bdgf1GLQBPeC1eWFxnE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZFg3RtP84aqMgymrjmWaXtJJB4N/wLmimb33gD2wP1uMZLrqcKbzDHqkFJT7u88a702PBlqqFYIzFQNFKhq+47W792hl57JTAjtxiaE50VJEuKXcHPGEX2Zb/yG/Dy328qa9EAVGVi3ENnvVu8i43T0I1xDfP9lCOfUo96yOPqs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Y/Axa+nT; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=0tExVYQkgh/QamuMLTOQ4cMZPcA9+abAxScGFT1jSxo=; b=Y/
-	Axa+nTbrQvLvq+T8cbVslMYPX86wla3eZ8AKqHFrS6GH6lbU8mtUaJrgSqkbtMgN5yTA6xvEM5cGW
-	Iz/6CBZVKm3kff2Y0cwMK5XXhVlFPnUF+aBmbk4p3nOJvDN3Qb10QAa5VeDxp6O7uJfi97DYugw3A
-	MxH/ONbRO5gUcMk=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rytPp-00DcLS-AG; Mon, 22 Apr 2024 15:09:01 +0200
-Date: Mon, 22 Apr 2024 15:09:01 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>
-Cc: netdev@vger.kernel.org, Russell King <rmk+kernel@armlinux.org.uk>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Subject: Re: [PATCH net-next 1/2] net: sfp: update comment for FS SFP-10G-T
- quirk
-Message-ID: <ac68c1fe-e3b8-4eb0-b3d6-a8b460af858f@lunn.ch>
-References: <20240422094435.25913-1-kabel@kernel.org>
+	s=arc-20240116; t=1713791512; c=relaxed/simple;
+	bh=b0OIR1zmVRRcfPpquWcVfHQRerazw8AgYLcFxkmJuc0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=SlrTLbkqMd68Fwf7Pd/Vcxy5Y2cBtfxn9syaNIlQAioYdwYsYLSXneTz6D0CZu2MObY7j7DLpTGbRd67wzT/3XXGVEdU781++CuFLartBzWpwF+DtuLySU3F8KpZhaJxKoEHVZ2LHJzWg+UAAgoFzhe5jBKoSGapN65acnkz/0c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=a9YZkNlK; arc=none smtp.client-ip=217.70.183.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id F0114C000A;
+	Mon, 22 Apr 2024 13:11:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1713791502;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=b0OIR1zmVRRcfPpquWcVfHQRerazw8AgYLcFxkmJuc0=;
+	b=a9YZkNlK+WGya+h7GFWF9yG08NjACd3/1d3sB9esGhqipSJKJqtPwtNjAtsqE2yYC+71mb
+	PdSgGs+jC5f8bBVRy+tBP1lpfPmV3IyLFWLJ9XvldKB4hGSO0leUVIr45zKHFeKdlFuwww
+	1wwouix8aWrI+YEujfGdhTeZNcqjKMIfEQautrVk7igD7c594fzGgTjbtyMS45o9a8bSh0
+	mApr0s/eUvMYJuN4v/0BEvQEV3mecJVKrFXv9dcm4Sc3cJURwEXtFLOS/380qUve/9w+TH
+	WTDng2qK1Nc0pQmGrouN+5PtdAFupJSN87fiunTQuTmPv7zS12+SjlQKipA4RA==
+Date: Mon, 22 Apr 2024 15:11:39 +0200
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Oleksij Rempel <o.rempel@pengutronix.de>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn
+ <andrew@lunn.ch>
+Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Kyle Swenson <kyle.swenson@est.tech>, kernel
+ test robot <lkp@intel.com>
+Subject: Re: [PATCH net-next 0/3] net: pse-pd: Fixes for few small issues
+Message-ID: <20240422151139.2e2f7bc5@kmaincent-XPS-13-7390>
+In-Reply-To: <20240422150234.49d98b73@kmaincent-XPS-13-7390>
+References: <20240422-fix_poe-v1-0-811c8c0b9da7@bootlin.com>
+	<20240422150234.49d98b73@kmaincent-XPS-13-7390>
+Organization: bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240422094435.25913-1-kabel@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: kory.maincent@bootlin.com
 
-On Mon, Apr 22, 2024 at 11:44:34AM +0200, Marek Behún wrote:
-> Update the comment for the Fibrestore SFP-10G-T module: since commit
-> e9301af385e7 ("net: sfp: fix PHY discovery for FS SFP-10G-T module")
-> we also do a 4 second wait before probing the PHY.
-> 
-> Fixes: e9301af385e7 ("net: sfp: fix PHY discovery for FS SFP-10G-T module")
-> Signed-off-by: Marek Behún <kabel@kernel.org>
+On Mon, 22 Apr 2024 15:02:34 +0200
+Kory Maincent <kory.maincent@bootlin.com> wrote:
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> On Mon, 22 Apr 2024 14:50:47 +0200
+> "Kory Maincent (Dent Project)" <kory.maincent@bootlin.com> wrote:
+>=20
+> > From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
+> >=20
+> > This patch series fix few issues in PSE net subsystem like Regulator
+> > dependency, PSE regulator type and kernel Documentation.
+> >=20
+> > Signed-off-by: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
+>=20
+> Found out I had a git configuration that adds "Dent Project" to my sob. I
+> don't want that, and will send a v2 without it.=20
+> I will wait a week for review before the v2, so please do not merge this
+> version.
+> Sorry for the noise.
 
-    Andrew
+---
+pw-bot: cr
+
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
