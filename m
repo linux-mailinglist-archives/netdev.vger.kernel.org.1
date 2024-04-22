@@ -1,281 +1,187 @@
-Return-Path: <netdev+bounces-90174-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90176-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6CAF8ACF4D
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 16:26:06 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5746B8ACF6F
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 16:31:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5C9101F21492
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 14:26:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0E87F1F21852
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 14:31:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C898C1509BC;
-	Mon, 22 Apr 2024 14:26:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DC243D0D5;
+	Mon, 22 Apr 2024 14:31:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="oj1LaLC/"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZyMdN45R"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D62731509A1
-	for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 14:25:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF8581E4A1
+	for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 14:31:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713795961; cv=none; b=Abhl/PsbvN8gCEOJXhsgMmWxVzlsnCAAi5kFmZf9RH/cOXEJ9T4FJRh2hef1cwjVh7i0xF5wjIZ1nXNM+n5utxC4XUcrDQd+nPTaDrDEs9zx8cmC6dkumkG0Ma7cYTtr5YcZZoUrhs6U6ojoaA497uRFqS5A+6dOJDn/lh7lO4w=
+	t=1713796310; cv=none; b=Ov8R01Oka+yOiCubpIAH0pPrCEZJxcAABAsdwd47bFbXjLTRbG7uUN4Has7Fh7gYqUZeEk6ASgRYHOHxGaYEAOoyRS4NsKM6Izi41MYFHirfztIGoWHDn/1315XiOUnsio4oK0p3H9tMUXStEisML6YzxoHaPZuxbnrRyp5jrWw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713795961; c=relaxed/simple;
-	bh=pEs2DOgHbEnlmxgz0Kbt4d7wfqqZXgBiD+OP4Iao7aw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Gy1B/V2F7hh3gt91yhmqeVMSnZC+sPfkdesaMztGom43FsZm1ltC7pKuUFrzi0Rozjqs74w79SKaPViyszbMBZDnI9syNP4PgReQCev0UZ7DPn/xT2QF/XYONEQSYWlECOtMX9gcaySvDAwrIpkG4jCV7mkOqM95LAnLXIAXmg0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=oj1LaLC/; arc=none smtp.client-ip=209.85.218.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a55b93f5540so118593566b.1
-        for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 07:25:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1713795958; x=1714400758; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=dIINu9KyBDBX/cBbMG71Op3zuuN85u67R5eLl+Z8CAA=;
-        b=oj1LaLC/0Npd+ApqHJ4eCRIQlx324izXZU+U/HcCvO3O4Fyt0BJVzdDMrrCfJYNPH8
-         uVgCFBgiR2ZZ85IeIRHscqVuHWQxlhv3xNoH/WX2mrfJmR1D0tpU0GZT4Ti40bMTof4V
-         fOwaQUgIy2DCfysV9V7mHVtGkuwuys7SRgCaGF0aLAs0snqJh/BacxWcbPg5JbiHGOfq
-         nvOqchs7jbd9DbuSVBBrxfCvMrEwkt0AqtHyg8Ksj5IepclkJCZrO037boIBHkecPecN
-         bDT6+1ab4ltyvIg3V6JRg+g97nWVquCJwU7HkQ6Y8Yv4iDNcwOdEE0+Ugj8ux4RAHnLl
-         V/7A==
+	s=arc-20240116; t=1713796310; c=relaxed/simple;
+	bh=pzmC56HFWs/QTkhB91JQ7NJkOCAI0HM6A928WLI6WQg=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=kxiqsvmL2FuNn7qCzXmbo69NykDfsaEE7GQJkv6Ukv7LdL5xl1Jiz0erODGp5DGgWRJFeQztvMfCubX8jT+2Hta6RDqz9wI9/6RByjbSFKr9pSKm/zjNBCBywj+qLx4K/ZUFv5VdHzhmlRBySfdwSBmxJG9OW72/DzgYHDoEfZw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZyMdN45R; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1713796307;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mhkGPPHbdmj1oVdDbXBZ1Ge+SsAT/eWQ0YBbLSXrT28=;
+	b=ZyMdN45RT/soQ3fyy306vD6u0T4CNZrSXSFu8kbzC3ejl+i8B8gmMcBdzCqHe+g5VSFidj
+	1RJezsB2f1xC7PGxjLjms9LwyaLm7v+UR+PJNtqY1A7gFN7Emj5KNdGoDDZ/WJA1xx55XB
+	VxAtJmDFMDIOeqCkaxm+PfymGnBEv0U=
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
+ [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-658-u6xqa1moNI2JlZoKenD4NQ-1; Mon, 22 Apr 2024 10:31:46 -0400
+X-MC-Unique: u6xqa1moNI2JlZoKenD4NQ-1
+Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-6a049c7d190so62949186d6.0
+        for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 07:31:46 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713795958; x=1714400758;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dIINu9KyBDBX/cBbMG71Op3zuuN85u67R5eLl+Z8CAA=;
-        b=w1yMyWKInnfANgY5T4tqq9eB3sfjr3QiZI4gCjYiLWawe4R+JqGEjWVmrqe2gKMGX3
-         VepXboaPy7Mlj16lLJtU9r9h5Z9ML9IvJThMgbyVdPTuFjQj881Cw20eLVGW3r7MKZsM
-         XxpUnmp192zU952JErUxnn5xZ3dqV4Ckw+ui4vX8TMVudvtZ7KJJk4FNxYUw5f8YwtPk
-         I8ml3JodfA1/xjPBCgmEjT3Kaha9+DIokOFXvEftaNtT4/OGvVE/gv022pIvspJfUkSN
-         N+X+srsZY2lb7TaXUiQbcs2l4k4dy3HsUhS9CgXJDiaWGIdEBOK2DimHVPVdW3xQAoqS
-         Efqg==
-X-Forwarded-Encrypted: i=1; AJvYcCXwcwu94IY6idz+B5tRs0+qQhZdrXl11Cvpy1s9/PNTYib1GBI1qA1s99Dj/iml0+yLVmQshUsA1V3qfSxr9ocfgqPqmyrt
-X-Gm-Message-State: AOJu0YzjadM2QjxVniMnGpHl9QcG/5laVZI8B05+YKxboB4uhF5E/AK/
-	P81WnegOnEYnmW6MSQMURnREyAT9PpQ9zMwEAlPOxIIjmun03wemFff2vNUb3pY=
-X-Google-Smtp-Source: AGHT+IFh1b4YvcxkXn79fjVZAVGT+9/f6mdpQVJpiEwFbDvIxWmfO30Zx7tHQFeDivtwsDwo7il/6g==
-X-Received: by 2002:a17:906:f1d6:b0:a55:5c04:89a4 with SMTP id gx22-20020a170906f1d600b00a555c0489a4mr6594385ejb.21.1713795958020;
-        Mon, 22 Apr 2024 07:25:58 -0700 (PDT)
-Received: from localhost (78-80-105-131.customers.tmcz.cz. [78.80.105.131])
-        by smtp.gmail.com with ESMTPSA id i22-20020a1709061cd600b00a55a10eb070sm2796438ejh.214.2024.04.22.07.25.57
+        d=1e100.net; s=20230601; t=1713796306; x=1714401106;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=mhkGPPHbdmj1oVdDbXBZ1Ge+SsAT/eWQ0YBbLSXrT28=;
+        b=eyJw23aORzQmAGRYq1jFdM3sYgPwP07EWYBpSi6o31iGxmmvbb+kwj2HhZF6XOx3V8
+         xxkODJnqj6W6Rj2s1fN6e6gG0PG+8mB9MHRWYN2smU52Gwo4H07qS3n7Fvmx6G1H/C0V
+         plndyXLbNvNpnJTha6hG2gjFqx0VXB2+NmMWmYGKVIibQ4SMh7uqZZKr6JG3fHvK0P0h
+         YSxzteAA/qhf78qmMDpJh+V8g0Pi9Y+ICJ2BxYhyj3Rp1bucpnu2p2PTr2T8iGN3xExZ
+         5Dd8EE2riNfoCh/6gwo2pc3f41F1Hch82ESeuOD45WI7epUAldm4/1G5GDxjdH5v3UN5
+         rtSQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVmmG5NwE/0tzUMsWsqeo7+/8Dt6uTIZAr9sOEwu0M7/z6Nb5BwPa7btEKfc4azg8VJf2gYQxG8HBhAmaCN9MsP76eg7393
+X-Gm-Message-State: AOJu0Yz0gLnvDiCaj/PMuvkFFrrRAdTxIyorGv65vysierMlfbaZRK+7
+	UpDJxtsPauEG5Pw29r3fYEggmESYoR5lLupN4bo58O6DXXDYAGszEtco5l9QwiBejTVfPiXhfCO
+	L9tqgNSEBy8bVVjfkJIpnV2SRrT1Bgd/DoglMRc3tr8K/OGsbpvZlaw==
+X-Received: by 2002:ad4:424f:0:b0:69b:1a43:27f5 with SMTP id l15-20020ad4424f000000b0069b1a4327f5mr10265939qvq.35.1713796305990;
+        Mon, 22 Apr 2024 07:31:45 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFgAG0VNYTVd95FVX0FTRiJkrXveidEN6CjszexmNNUFWwDrDgOvzjbXwvC9ZePvx8e1ZiGoQ==
+X-Received: by 2002:ad4:424f:0:b0:69b:1a43:27f5 with SMTP id l15-20020ad4424f000000b0069b1a4327f5mr10265921qvq.35.1713796305582;
+        Mon, 22 Apr 2024 07:31:45 -0700 (PDT)
+Received: from vschneid-thinkpadt14sgen2i.remote.csb (213-44-141-166.abo.bbox.fr. [213.44.141.166])
+        by smtp.gmail.com with ESMTPSA id g12-20020a0cf08c000000b006913aa64629sm4260487qvk.22.2024.04.22.07.31.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Apr 2024 07:25:57 -0700 (PDT)
-Date: Mon, 22 Apr 2024 16:25:56 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	horms@kernel.org, Carolyn Wyborny <carolyn.wyborny@intel.com>,
-	Jedrzej Jagielski <jedrzej.jagielski@intel.com>,
-	Jan Glaza <jan.glaza@intel.com>
-Subject: Re: [PATCH iwl-next v4 5/5] ixgbe: Enable link management in E610
- device
-Message-ID: <ZiZzdAX-qI-7wCMC@nanopsycho>
-References: <20240422130611.2544-1-piotr.kwapulinski@intel.com>
- <20240422130611.2544-6-piotr.kwapulinski@intel.com>
+        Mon, 22 Apr 2024 07:31:45 -0700 (PDT)
+From: Valentin Schneider <vschneid@redhat.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: dccp@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-rt-users@vger.kernel.org, "David S.
+ Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, mleitner@redhat.com, David Ahern
+ <dsahern@kernel.org>, Juri Lelli <juri.lelli@redhat.com>, Tomas Glozar
+ <tglozar@redhat.com>, Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+ Thomas Gleixner <tglx@linutronix.de>
+Subject: Re: [PATCH v5 0/2] tcp/dcpp: Un-pin tw_timer
+In-Reply-To: <CANn89iJRev5Kn_jEgimDfyHosmiyYeaz2gHRGS2tcFC-yMbGaQ@mail.gmail.com>
+References: <20240415113436.3261042-1-vschneid@redhat.com>
+ <CANn89iJYX8e_3Or9a5Q55NuQ8ZAHfYL+p_SpM0yz91sdj4HqtQ@mail.gmail.com>
+ <xhsmhmspu8zlj.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
+ <CANn89iJRev5Kn_jEgimDfyHosmiyYeaz2gHRGS2tcFC-yMbGaQ@mail.gmail.com>
+Date: Mon, 22 Apr 2024 16:31:41 +0200
+Message-ID: <xhsmhbk618o4y.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240422130611.2544-6-piotr.kwapulinski@intel.com>
-
-Mon, Apr 22, 2024 at 03:06:11PM CEST, piotr.kwapulinski@intel.com wrote:
-
-[...]
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
 
->diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe.h b/drivers/net/ethernet/intel/ixgbe/ixgbe.h
->index 559b443..ea6df1e 100644
->--- a/drivers/net/ethernet/intel/ixgbe/ixgbe.h
->+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe.h
->@@ -1,5 +1,5 @@
-> /* SPDX-License-Identifier: GPL-2.0 */
->-/* Copyright(c) 1999 - 2018 Intel Corporation. */
->+/* Copyright(c) 1999 - 2024 Intel Corporation. */
-> 
-> #ifndef _IXGBE_H_
-> #define _IXGBE_H_
->@@ -20,6 +20,7 @@
-> #include "ixgbe_type.h"
-> #include "ixgbe_common.h"
-> #include "ixgbe_dcb.h"
->+#include "ixgbe_e610.h"
-> #if IS_ENABLED(CONFIG_FCOE)
-> #define IXGBE_FCOE
-> #include "ixgbe_fcoe.h"
->@@ -28,7 +29,6 @@
-> #include <linux/dca.h>
-> #endif
-> #include "ixgbe_ipsec.h"
->-
+Apologies for the delayed reply, I was away for most of last week;
 
-Leftover hunk?
+On 16/04/24 17:01, Eric Dumazet wrote:
+> On Mon, Apr 15, 2024 at 4:33=E2=80=AFPM Valentin Schneider <vschneid@redh=
+at.com> wrote:
+>>
+>> On 15/04/24 14:35, Eric Dumazet wrote:
+>> > On Mon, Apr 15, 2024 at 1:34=E2=80=AFPM Valentin Schneider <vschneid@r=
+edhat.com> wrote:
+>> >> v4 -> v5
+>> >> ++++++++
+>> >>
+>> >> o Rebased against latest Linus' tree
+>> >> o Converted tw_timer into a delayed work following Jakub's bug report=
+ on v4
+>> >>   http://lore.kernel.org/r/20240411100536.224fa1e7@kernel.org
+>> >
+>> > What was the issue again ?
+>> >
+>> > Please explain precisely why it was fundamentally tied to the use of
+>> > timers (and this was not possible to fix the issue without
+>> > adding work queues and more dependencies to TCP stack)
+>>
+>> In v4 I added the use of the ehash lock to serialize arming the timewait
+>> timer vs destroying it (inet_twsk_schedule() vs inet_twsk_deschedule_put=
+()).
+>>
+>> Unfortunately, holding a lock both in a timer callback and in the context
+>> in which it is destroyed is invalid. AIUI the issue is as follows:
+>>
+>>   CPUx                        CPUy
+>>   spin_lock(foo);
+>>                               <timer fires>
+>>                               call_timer_fn()
+>>                                 spin_lock(foo) // blocks
+>>   timer_shutdown_sync()
+>>     __timer_delete_sync()
+>>       __try_to_del_timer_sync() // looped as long as timer is running
+>>                        <deadlock>
+>>
+>> In our case, we had in v4:
+>>
+>>   inet_twsk_deschedule_put()
+>>     spin_lock(ehash_lock);
+>>                                           tw_timer_handler()
+>>                                             inet_twsk_kill()
+>>                                               spin_lock(ehash_lock);
+>>                                               __inet_twsk_kill();
+>>     timer_shutdown_sync(&tw->tw_timer);
+>>
+>> The fix here is to move the timer deletion to a non-timer
+>> context. Workqueues fit the bill, and as the tw_timer_handler() would ju=
+st queue
+>> a work item, I converted it to a delayed_work.
+>
+> I do not like this delayed work approach.
+>
+> Adding more dependencies to the TCP stack is not very nice from a
+> maintainer point of view.
+>
+> Why couldn't you call timer_shutdown_sync() before grabbing the lock ?
 
+We need the timer_shutdown_sync() and mod_timer() of tw->tw_timer to be
+serialized in some way. If they aren't, we have the following race:
 
-> #include <net/xdp.h>
-> 
-> /* common prefix used by pr_<> macros */
+                             tcp_time_wait()
+                               inet_twsk_hashdance()
+  inet_twsk_deschedule_put()
+    // Returns 0 because not pending, but prevents future arming
+    timer_shutdown_sync()
+                               inet_twsk_schedule()
+                                 // Returns 0 as if timer had been succesfu=
+lly armed
+                                 mod_timer()
 
-[...]
+This means inet_twsk_deschedule_put() doesn't end up calling
+inet_twsk_kill() (because the timer wasn't pending when it got shutdown),
+but inet_twsk_schedule() doesn't arm it either despite the hashdance()
+having updated the refcounts.
 
+If we leave the deschedule as a del_timer_sync(), the timer ends up armed
+in inet_twsk_schedule(), but that means waiting for the timer to fire to
+clean up the resources despite having called inet_twsk_deschedule_put().
 
->+static const struct ixgbe_mac_operations mac_ops_e610 = {
->+	.init_hw			= ixgbe_init_hw_generic,
->+	.start_hw			= ixgbe_start_hw_X540,
->+	.clear_hw_cntrs			= ixgbe_clear_hw_cntrs_generic,
->+	.enable_rx_dma			= ixgbe_enable_rx_dma_generic,
->+	.get_mac_addr			= ixgbe_get_mac_addr_generic,
->+	.get_device_caps		= ixgbe_get_device_caps_generic,
->+	.stop_adapter			= ixgbe_stop_adapter_generic,
->+	.set_lan_id			= ixgbe_set_lan_id_multi_port_pcie,
->+	.read_analog_reg8		= NULL,
-
-Pointless initialization, it's null already. You have many cases of
-this below.
-
-
-
->+	.write_analog_reg8		= NULL,
->+	.set_rxpba			= ixgbe_set_rxpba_generic,
->+	.check_link			= ixgbe_check_link_e610,
->+	.blink_led_start		= ixgbe_blink_led_start_X540,
->+	.blink_led_stop			= ixgbe_blink_led_stop_X540,
->+	.set_rar			= ixgbe_set_rar_generic,
->+	.clear_rar			= ixgbe_clear_rar_generic,
->+	.set_vmdq			= ixgbe_set_vmdq_generic,
->+	.set_vmdq_san_mac		= ixgbe_set_vmdq_san_mac_generic,
->+	.clear_vmdq			= ixgbe_clear_vmdq_generic,
->+	.init_rx_addrs			= ixgbe_init_rx_addrs_generic,
->+	.update_mc_addr_list		= ixgbe_update_mc_addr_list_generic,
->+	.enable_mc			= ixgbe_enable_mc_generic,
->+	.disable_mc			= ixgbe_disable_mc_generic,
->+	.clear_vfta			= ixgbe_clear_vfta_generic,
->+	.set_vfta			= ixgbe_set_vfta_generic,
->+	.fc_enable			= ixgbe_fc_enable_generic,
->+	.set_fw_drv_ver			= ixgbe_set_fw_drv_ver_x550,
->+	.init_uta_tables		= ixgbe_init_uta_tables_generic,
->+	.set_mac_anti_spoofing		= ixgbe_set_mac_anti_spoofing,
->+	.set_vlan_anti_spoofing		= ixgbe_set_vlan_anti_spoofing,
->+	.set_source_address_pruning	=
->+				ixgbe_set_source_address_pruning_x550,
->+	.set_ethertype_anti_spoofing	=
->+				ixgbe_set_ethertype_anti_spoofing_x550,
->+	.disable_rx_buff		= ixgbe_disable_rx_buff_generic,
->+	.enable_rx_buff			= ixgbe_enable_rx_buff_generic,
->+	.get_thermal_sensor_data	= NULL,
->+	.init_thermal_sensor_thresh	= NULL,
->+	.fw_recovery_mode		= NULL,
->+	.enable_rx			= ixgbe_enable_rx_generic,
->+	.disable_rx			= ixgbe_disable_rx_e610,
->+	.led_on				= ixgbe_led_on_generic,
->+	.led_off			= ixgbe_led_off_generic,
->+	.init_led_link_act		= ixgbe_init_led_link_act_generic,
->+	.reset_hw			= ixgbe_reset_hw_e610,
->+	.get_media_type			= ixgbe_get_media_type_e610,
->+	.get_san_mac_addr		= NULL,
->+	.get_wwn_prefix			= NULL,
->+	.setup_link			= ixgbe_setup_link_e610,
->+	.get_link_capabilities		= ixgbe_get_link_capabilities_e610,
->+	.get_bus_info			= ixgbe_get_bus_info_generic,
->+	.setup_sfp			= NULL,
->+	.acquire_swfw_sync		= ixgbe_acquire_swfw_sync_X540,
->+	.release_swfw_sync		= ixgbe_release_swfw_sync_X540,
->+	.init_swfw_sync			= ixgbe_init_swfw_sync_X540,
->+	.prot_autoc_read		= prot_autoc_read_generic,
->+	.prot_autoc_write		= prot_autoc_write_generic,
->+	.setup_fc			= ixgbe_setup_fc_e610,
->+	.fc_autoneg			= ixgbe_fc_autoneg_e610,
->+};
->+
->+static const struct ixgbe_phy_operations phy_ops_e610 = {
->+	.init				= ixgbe_init_phy_ops_e610,
->+	.identify			= ixgbe_identify_phy_e610,
->+	.read_reg			= NULL,
->+	.write_reg			= NULL,
->+	.read_reg_mdi			= NULL,
->+	.write_reg_mdi			= NULL,
->+	.identify_sfp			= ixgbe_identify_module_e610,
->+	.reset				= NULL,
->+	.setup_link_speed		= ixgbe_setup_phy_link_speed_generic,
->+	.read_i2c_byte			= NULL,
->+	.write_i2c_byte			= NULL,
->+	.read_i2c_sff8472		= NULL,
->+	.read_i2c_eeprom		= NULL,
->+	.write_i2c_eeprom		= NULL,
->+	.setup_link			= ixgbe_setup_phy_link_e610,
->+	.set_phy_power			= NULL,
->+	.check_overtemp			= NULL,
->+	.enter_lplu			= ixgbe_enter_lplu_e610,
->+	.handle_lasi			= NULL,
->+	.read_i2c_byte_unlocked		= NULL,
->+};
->+
->+static const struct ixgbe_eeprom_operations eeprom_ops_e610 = {
->+	.init_params			= NULL,
->+	.read				= ixgbe_read_ee_aci_e610,
->+	.read_buffer			= NULL,
->+	.write				= NULL,
->+	.write_buffer			= NULL,
->+	.validate_checksum		= ixgbe_validate_eeprom_checksum_e610,
->+	.update_checksum		= NULL,
->+	.calc_checksum			= NULL,
->+};
->+
-
-[...]
-
-
->+/**
->+ * ixgbe_process_link_status_event - process the link event
->+ * @adapter: pointer to adapter structure
->+ * @link_up: true if the physical link is up and false if it is down
->+ * @link_speed: current link speed received from the link event
->+ *
->+ * Return: 0 on success and negative on failure.
->+ */
->+static int
->+ixgbe_process_link_status_event(struct ixgbe_adapter *adapter, bool link_up,
->+				u16 link_speed)
->+{
->+	struct ixgbe_hw *hw = &adapter->hw;
->+	int status;
->+
->+	/* update the link info structures and re-enable link events,
->+	 * don't bail on failure due to other book keeping needed
-
-Why don't you start the sentence with capital letter and end with "."?
-
-
->+	 */
->+	status = ixgbe_update_link_info(hw);
->+	if (status)
->+		e_dev_err("Failed to update link status, err %d aq_err %d\n",
->+			  status, hw->aci.last_status);
->+
->+	ixgbe_check_link_cfg_err(adapter, hw->link.link_info.link_cfg_err);
->+
->+	/* Check if the link state is up after updating link info, and treat
->+	 * this event as an UP event since the link is actually UP now.
->+	 */
->+	if (hw->link.link_info.link_info & IXGBE_ACI_LINK_UP)
->+		link_up = true;
->+
->+	/* turn off PHY if media was removed */
->+	if (!(adapter->flags2 & IXGBE_FLAG2_NO_MEDIA) &&
->+	    !(hw->link.link_info.link_info & IXGBE_ACI_MEDIA_AVAILABLE)) {
->+		(adapter->flags2 |= IXGBE_FLAG2_NO_MEDIA);
->+		if (ixgbe_aci_set_link_restart_an(hw, false))
->+			e_dev_err("can't set link to OFF\n");
->+	}
-
-[...]
 
