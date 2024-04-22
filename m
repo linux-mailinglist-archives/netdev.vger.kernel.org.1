@@ -1,127 +1,125 @@
-Return-Path: <netdev+bounces-90310-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90311-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FA298ADA4C
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 02:09:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 08F118ADAE0
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 02:23:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3B3AA1C20433
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 00:09:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2428D1C20894
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 00:22:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4C1B16F26C;
-	Mon, 22 Apr 2024 23:57:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FE181C68BD;
+	Mon, 22 Apr 2024 23:59:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KfI2qZAx"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="e8DmAxcU"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7606716F265;
-	Mon, 22 Apr 2024 23:57:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFAEC158DC4
+	for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 23:59:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713830226; cv=none; b=DjnwTkmzGxbdy/ZPpdUZYp9hADgMFyo1qm9TjC5xXnTdbP8W5zJGymKjgDAakjnyvD0SPzZGpzCBkGtNOACkjs2x4G5jHNMjc/n1K639ANInCyacLiAn2afrBQngee77UutZlM4f8gfTB7v7vScrqSsA9CrWjdd/B8ysuXtOVJc=
+	t=1713830356; cv=none; b=LUzfBMgQ1ucvFzLGLWtF/ROAFmX4lsDv/dQiMLdxjyOhyZ1r7iXF8RgeEmzrD0aeVJh68DJtFuT4jriN506da/LJO86W/3OcEyMiyUG6z4vOdW1M4MD4wvFIsWoH/2pOf7hYtUHvSeLppsQRjhY7IV0wL9kyHMo+ek1OJmoyheg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713830226; c=relaxed/simple;
-	bh=hbF//MQ3NjhgP0EtEYpKMD7hF56CxP2QRjffX7aq5Ws=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=tKmIigKfvNOzeyAw+zxMS6UcIBKbEFaGtnrfZjbgsT9rxW0mMnJw/0TBQDc14uUOSEdWrZHq2iIDnXVWTiTOkh8bawjhEte+FqHoOsVyH/vBsZjqDgXcxdapXSw5eHz6TonB8vqly9YyHnp417+n627kOWCqutsE4IG4GMBTbis=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KfI2qZAx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99408C32782;
-	Mon, 22 Apr 2024 23:57:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713830226;
-	bh=hbF//MQ3NjhgP0EtEYpKMD7hF56CxP2QRjffX7aq5Ws=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=KfI2qZAxay+GXMZNxPTHTDX0rCf68hl+FwKYv04csxdeha1MazNOKENAH5YLx38tG
-	 tUQ8gOCZIzN8RaCQhAy54/mQ+Gj8PmXz51q84UUJ1HatQhWHd5VYX2R40yoJEptNML
-	 3aSohMv9cEhJxsJGZshad/hLJPp+w8mezxZInB47aE0YuuDZQEYW6EaSVWji1OvlSn
-	 XSLUs5X5B5cdK6vsXVwz3IhwO3qPEW/LRtS4L9wHydrXZD8kra1QBK4Qbt0WDrZuRN
-	 JJXOorGvykRl/bVyjUk6+PXI5S3XLHPsiUNt0cA0yR7X72/o/21XSar6nfv6bQeYAR
-	 XacNDyYEd7UqQ==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Cc: Rick Edgecombe <rick.p.edgecombe@intel.com>,
-	Michael Kelley <mhklinux@outlook.com>,
-	Kuppuswamy Sathyanarayanan <sathyanarayanan.kuppuswamy@linux.intel.com>,
-	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-	Wei Liu <wei.liu@kernel.org>,
-	Sasha Levin <sashal@kernel.org>,
-	kys@microsoft.com,
-	haiyangz@microsoft.com,
-	decui@microsoft.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.6 25/29] hv_netvsc: Don't free decrypted memory
-Date: Mon, 22 Apr 2024 19:17:06 -0400
-Message-ID: <20240422231730.1601976-25-sashal@kernel.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240422231730.1601976-1-sashal@kernel.org>
-References: <20240422231730.1601976-1-sashal@kernel.org>
+	s=arc-20240116; t=1713830356; c=relaxed/simple;
+	bh=8L63JIwnwmZAI3e/0tCpZQevcNqEGvJ07Yin96lY8fQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Kgc+eDeeQtxYpdaLuhEzByue6076XPXvR1EtGfva/0dMT1r7LC8oPBOqvyeLF13kL2XlKxSrR89M5kMqbYX8jQzE/pxkSjzc+L2xqSZv9u2/De4sGmQYZgkIFZxOdtMIStcPn3F0jnDYG1cw9nP1sbziMVqNcaJDLsSJsxeZgKs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=e8DmAxcU; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=/LeTDTS8PHN0NBsm0pmbbubUmVgU6AGm/CDT9Mc/8h8=; b=e8
+	DmAxcUZRD/xA31Z+Pzh755Jj5qZBfbjMtnSLHGtQP92xRlPaiTPnlxWGrHb9jsZDDSl/KxtAkbxdp
+	5QI0gceOK57x18arRkbFwmYUoyx0OAdloIrpQroIVbvIt/WhhUMw6gdt+vG3SoXL/N2hgpmNmnz/R
+	h384GupefPquSjU=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rz3Z2-00Df1l-Kn; Tue, 23 Apr 2024 01:59:12 +0200
+Date: Tue, 23 Apr 2024 01:59:12 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: SIMON BABY <simonkbaby@gmail.com>
+Cc: netdev@vger.kernel.org
+Subject: Re: Ping failing with DSA enumerated ports with macb driver
+Message-ID: <3041e5a8-b3c9-450e-8b4a-b541cd9ffe64@lunn.ch>
+References: <CAEFUPH0hr9jX0NCTu1vCGQvkCJ87DjLrcg8iCVO7A2vRhmfVgQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.6.28
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAEFUPH0hr9jX0NCTu1vCGQvkCJ87DjLrcg8iCVO7A2vRhmfVgQ@mail.gmail.com>
 
-From: Rick Edgecombe <rick.p.edgecombe@intel.com>
+> oot@sama7g5ek-sd:~# tcpdump -i eth0
+> 
+> tcpdump: verbose output suppressed, use -v[v]... for full protocol decode
+> 
+> listening on eth0, link-type DSA_TAG_DSA (Marvell DSA), snapshot length 262144
+> bytes
+> 
+> 19:09:06.730472 DSA port 8.0 > CPU, VLAN 1472u, 04:91:62:f2:fd:1c (oui Unknown)
 
-[ Upstream commit bbf9ac34677b57506a13682b31a2a718934c0e31 ]
+This does not make any sense. This is the wrong direction. And VLAN
+1472 ???
 
-In CoCo VMs it is possible for the untrusted host to cause
-set_memory_encrypted() or set_memory_decrypted() to fail such that an
-error is returned and the resulting memory is shared. Callers need to
-take care to handle these errors to avoid returning decrypted (shared)
-memory to the page allocator, which could lead to functional or security
-issues.
+> > Broadcast Null Information, send seq 0, rcv seq 0, Flags [Command], length
+> 307
+> 
+>         0x0000:  0000 0000 4011 78f7 0000 0000 ffff ffff  ....@.x.........
+> 
+>         0x0010:  0044 0043 0123 8af2 0101 0600 d429 7f9b  .D.C.#.......)..
+> 
+>         0x0020:  00bc 0000 0000 0000 0000 0000 0000 0000  ................
+> 
+>         0x0030:  0000 0000 0491 62f2 fd1c 0000 0000 0000  ......b.........
+> 
+>         0x0040:  0000 0000 0000 0000 0000 0000 0000 0000  ................
+> 
+>         0x0050:  0000 0000 0000 0000 0000 0000 0000 0000  ................
+> 
+>         0x0060:  0000 0000 0000 0000 0000 0000 0000 0000  ................
+> 
+>         0x0070:  0000 0000 0000 0000 0000 0000 0000 0000  ................
+> 
+>         0x0080:  0000 0000 0000 0000 0000 0000 0000 0000  ................
+> 
+>         0x0090:  0000 0000 0000 0000 0000 0000 0000 0000  ................
+> 
+>         0x00a0:  0000 0000 0000 0000 0000 0000 0000 0000  ................
+> 
+>         0x00b0:  0000 0000 0000 0000 0000 0000 0000 0000  ................
+> 
+>         0x00c0:  0000 0000 0000 0000 0000 0000 0000 0000  ................
+> 
+>         0x00d0:  0000 0000 0000 0000 0000 0000 0000 0000  ................
+> 
+>         0x00e0:  0000 0000 0000 0000 0000 0000 0000 0000  ................
+> 
+>         0x00f0:  0000 0000 0000 0000 0000 0000 0000 0000  ................
+> 
+>         0x0100:  0000 0000 6382 5363 3501 013d 0701 0491  ....c.Sc5..=....
+> 
+>         0x0110:  62f2 fd1c 370a 0103 060c 0f1a 212a 7879  b...7.......!*xy
+> 
+>         0x0120:  3902 0240 0c0c 7361 6d61 3767 3565 6b2d  9..@..sama7g5ek-
+> 
+>         0x0130:  7364 ff                                  sd.
 
-The netvsc driver could free decrypted/shared pages if
-set_memory_decrypted() fails. Check the decrypted field in the gpadl
-to decide whether to free the memory.
+This is too long for an ARP, which is typically 42 bytes.
 
-Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
-Signed-off-by: Michael Kelley <mhklinux@outlook.com>
-Reviewed-by: Kuppuswamy Sathyanarayanan <sathyanarayanan.kuppuswamy@linux.intel.com>
-Acked-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
-Link: https://lore.kernel.org/r/20240311161558.1310-4-mhklinux@outlook.com
-Signed-off-by: Wei Liu <wei.liu@kernel.org>
-Message-ID: <20240311161558.1310-4-mhklinux@outlook.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- drivers/net/hyperv/netvsc.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+Try running tcpdump with e and v options. And then think about what
+you see.
 
-diff --git a/drivers/net/hyperv/netvsc.c b/drivers/net/hyperv/netvsc.c
-index 4f9658a741024..b2f27e505f76c 100644
---- a/drivers/net/hyperv/netvsc.c
-+++ b/drivers/net/hyperv/netvsc.c
-@@ -154,8 +154,11 @@ static void free_netvsc_device(struct rcu_head *head)
- 	int i;
- 
- 	kfree(nvdev->extension);
--	vfree(nvdev->recv_buf);
--	vfree(nvdev->send_buf);
-+
-+	if (!nvdev->recv_buf_gpadl_handle.decrypted)
-+		vfree(nvdev->recv_buf);
-+	if (!nvdev->send_buf_gpadl_handle.decrypted)
-+		vfree(nvdev->send_buf);
- 	bitmap_free(nvdev->send_section_map);
- 
- 	for (i = 0; i < VRSS_CHANNEL_MAX; i++) {
--- 
-2.43.0
-
+    Andrew
 
