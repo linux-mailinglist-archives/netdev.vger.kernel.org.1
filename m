@@ -1,50 +1,48 @@
-Return-Path: <netdev+bounces-90075-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90077-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7C4F8ACA75
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 12:20:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 47E2F8ACA99
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 12:30:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 49BF2B211BF
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 10:20:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BFA65B21C85
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 10:30:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DEF513E405;
-	Mon, 22 Apr 2024 10:20:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VJpsG7u+"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC19D1422A8;
+	Mon, 22 Apr 2024 10:30:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F95913E400;
-	Mon, 22 Apr 2024 10:20:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90EDE1420BE;
+	Mon, 22 Apr 2024 10:30:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713781226; cv=none; b=Z2pNK4MayppOdaIVO1wrjMMdGvmhyovGpu6t4RA8p9zd1w5iQQ5SpuGT0dJYQr5Tdibv07jBXhfk1IXwBhmI7CyMtXrKc4n3fjBshskjHDAKSKxlYaAADDwLjEN/AV8EQGJOTfVS/WFEjRyQm/qCim0DjwniJ1n0Gm7HEL3d4bY=
+	t=1713781828; cv=none; b=N907gtfH4zD+KH3oib7kKzS6296ZqxNd6pz4EkY09mcxepcW/VKnt4MM657tgWxCbtoj/zi33yuIyIUZLUrMRsbjEcmS+Rl7QONBVs2wVq2xJmqG13YFVCG4nsV/iu/Um1GMNHD/FO7WZnHlOGbLOwqAtmCnh7niqfT2zoOhXw0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713781226; c=relaxed/simple;
-	bh=KWnDJr/vke6VyUyWZSFuKxAuSKm3NU6ZKvea+XUVAG0=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=J5uUvmh8bwxgKRIn6avgryCVS4EKF1Zh8c2xoiYnYDC3EluqUYhh7C/kYIzdwmwl797NeU3fchwTHAB4ieeUqTz2MwUGXuMsX52y66zgsgH1a4jnfiCqLKe09n6844V/wKvtHp3GIV7uXcErjjCXBIH3y/u1HNywxq4/6AQ1J7Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VJpsG7u+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id F06AFC3277B;
-	Mon, 22 Apr 2024 10:20:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713781226;
-	bh=KWnDJr/vke6VyUyWZSFuKxAuSKm3NU6ZKvea+XUVAG0=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=VJpsG7u+Vu/rK06JTFF83QpByhgS9QJxiuUT719r6Fj0e2EXuwO+HcZbNcK1OQUYf
-	 Er95kSJ6/RqEMvBcwYyNyiZzg3jeFkmw4t8hhc0kW2UzEDBhV/lwmIVQ/ZrA+mN0Jk
-	 r/jjP96xeN1WpiCfH1QFcF8mRbtypsba6W7RKe8nbTTtMp8+uGQ1GLtiHNJrpNJxjv
-	 cFuoOxYktc6evPkLOPiKIDpq5cmy5R4HQGyMaB5WnxHe/cIPAC4F67ZmUtYcXDR7jb
-	 f+cCBfOBpThSn1ypeRFP+nAkUuD+Q452h1Hegj/cSHT48Sb49Ce3EYjDxSFvZC+qOz
-	 YNJJHmUF51uRw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id DE602C4339F;
-	Mon, 22 Apr 2024 10:20:25 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1713781828; c=relaxed/simple;
+	bh=3MQhatjy3nFgVtpGbogJCThiA7pafumKB69E/FV0Lkg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Ag8lzgnaGKpfpb3pLju2mHRzixonf2V6qWG+EA2YyBIxnQbpWynqxeJIj7Xr7zI0XAuvJw1t4q2bCrOOOOHn933fye5wxpqdBapFSQfhOGB68f5LkwJUNu8JgpMdOkxqid2khZhyvxw0NS9VskUkA366vz8XWob/SFIADm78Law=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=breakpoint.cc; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=breakpoint.cc
+Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
+	(envelope-from <fw@breakpoint.cc>)
+	id 1ryqwA-0006xD-9o; Mon, 22 Apr 2024 12:30:14 +0200
+From: Florian Westphal <fw@strlen.de>
+To: <netdev@vger.kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	<netfilter-devel@vger.kernel.org>,
+	pablo@netfilter.org
+Subject: [PATCH net-next] selftests: netfilter: nft_zones_many.sh: set ct sysctl after ruleset load
+Date: Mon, 22 Apr 2024 12:25:42 +0200
+Message-ID: <20240422102546.2494-1-fw@strlen.de>
+X-Mailer: git-send-email 2.43.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,48 +50,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] mailmap: add entries for Alex Elder
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171378122590.13831.3067166469576978992.git-patchwork-notify@kernel.org>
-Date: Mon, 22 Apr 2024 10:20:25 +0000
-References: <20240421194458.2205779-1-elder@linaro.org>
-In-Reply-To: <20240421194458.2205779-1-elder@linaro.org>
-To: Alex Elder <elder@linaro.org>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, akpm@linux-foundation.org, andersson@kernel.org,
- cdleonard@gmail.com, elder@kernel.org, geliang@kernel.org, heiko@sntech.de,
- matt@ranostay.sg, matttbe@kernel.org, mka@chromium.org,
- o.rempel@pengutronix.de, quic_avuyyuru@quicinc.com,
- quic_bjorande@quicinc.com, quic_cpratapa@quicinc.com,
- quic_jponduru@quicinc.com, quic_subashab@quicinc.com, netdev@vger.kernel.org,
- linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Hello:
+nf_conntrack_udp_timeout sysctl only exist once conntrack module is loaded,
+if this test runs standalone on a modular kernel sysctl setting fails,
+this can result in test failure as udp conntrack entries expire too fast.
 
-This patch was applied to netdev/net.git (main)
-by David S. Miller <davem@davemloft.net>:
+Signed-off-by: Florian Westphal <fw@strlen.de>
+---
+ tools/testing/selftests/net/netfilter/nft_zones_many.sh | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-On Sun, 21 Apr 2024 14:44:58 -0500 you wrote:
-> Define my kernel.org address to be the canonical one, and add mailmap
-> entries for the various addresses (including typos) that have been
-> used over the years.
-> 
-> Signed-off-by: Alex Elder <elder@linaro.org>
-> ---
-> v2: Deleted two unnecessary lines, after prompting by Bjorn.
->     Also copied those suggested by get_maintainer.pl.
-> 
-> [...]
-
-Here is the summary with links:
-  - mailmap: add entries for Alex Elder
-    https://git.kernel.org/netdev/net/c/70dcdf5f8c41
-
-You are awesome, thank you!
+diff --git a/tools/testing/selftests/net/netfilter/nft_zones_many.sh b/tools/testing/selftests/net/netfilter/nft_zones_many.sh
+index db53de348783..4ad75038f6ff 100755
+--- a/tools/testing/selftests/net/netfilter/nft_zones_many.sh
++++ b/tools/testing/selftests/net/netfilter/nft_zones_many.sh
+@@ -28,7 +28,6 @@ fi
+ test_zones() {
+ 	local max_zones=$1
+ 
+-ip netns exec "$ns1" sysctl -q net.netfilter.nf_conntrack_udp_timeout=3600
+ ip netns exec "$ns1" nft -f /dev/stdin<<EOF
+ flush ruleset
+ table inet raw {
+@@ -46,6 +45,9 @@ if [ "$?" -ne 0 ];then
+ 	echo "SKIP: Cannot add nftables rules"
+ 	exit $ksft_skip
+ fi
++
++	ip netns exec "$ns1" sysctl -q net.netfilter.nf_conntrack_udp_timeout=3600
++
+ 	(
+ 		echo "add element inet raw rndzone {"
+ 	for i in $(seq 1 "$max_zones");do
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.43.2
 
 
