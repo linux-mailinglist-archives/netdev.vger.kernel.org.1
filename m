@@ -1,200 +1,136 @@
-Return-Path: <netdev+bounces-90274-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90275-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D71058AD647
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 23:04:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BBF278AD664
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 23:14:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4DD381F214C8
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 21:04:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EE4091C20CC4
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 21:14:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCA7E1C6AF;
-	Mon, 22 Apr 2024 21:04:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCC3B1BF24;
+	Mon, 22 Apr 2024 21:14:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GY/pgGWV"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="USQ/LheI"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from out-176.mta0.migadu.com (out-176.mta0.migadu.com [91.218.175.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FA1A1BC53
-	for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 21:04:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17BB51B800
+	for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 21:14:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713819865; cv=none; b=jA1pFAXdFvQJXZxhDZOVvjRQ0n14ov6ml2PTX/dtaX1jvJGzFJEK+m9Wl5FE2MCDY656LZup8eCmI+lCJSeQySZsw825SXs9QF0w5JxiKeq3s7aZwc8V1240MchQPGq5afazOMQuke1vmn782lIxJmjwAXCJU7p0J6I5tIyMNq8=
+	t=1713820479; cv=none; b=bov0+le4Z3StefXw4cFgH+ob7CAckVuyjxoSRQMbWv/byeWOLi2r275DpyKoSVunYWBf1qBgoQlwAEEp0OueBbO2PwUMkW19CikWTWp5oi4IVDq4yH7al06EOkd5ky8t2DTDWQcSeMBViRHmww6JPByIKRQLl7FmNCROqAkkvw8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713819865; c=relaxed/simple;
-	bh=W171TFM5VU0GmHCaO6R45CQK9rr900bDzzrfhGJgbJU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ll2kVpSiVu0RIJvqVkUpvIc9a6sVk2ggG1vL/oKV+RGlTiISyfjeIls+iPNl5/WFYLshStuOZNWIu2AP5/JnOH5K7956zjn04V55fFMbmaH5OqhnjpZ6vfq1zIoWfcWSpMhTf+5g1wxuSudvHopISpqW6BYBs2RY68DheZMtLbA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GY/pgGWV; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1713819862;
+	s=arc-20240116; t=1713820479; c=relaxed/simple;
+	bh=cRWZVwE66IktVunkaU/Js89Orpl0ItQMJLYsLnFC5EI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Qg/6T0dBMTREGKjxvoMDaDPyf2SQGR5U7ncwZpgft498GcMrV7CUK+p/LXIJ7ve23IIe3f9mr/M24g9VbOXBbZQoVMLKMJ+nQAM4sIzKdo+CB42HJNHsanh5BX4TOVrYQ7uyawbl5ipf3XqNHvRaQPLtQLdA0dyjKBS8HNW6n40=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=USQ/LheI; arc=none smtp.client-ip=91.218.175.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <8c9e51b2-5401-4d58-a319-ed620fadcc63@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1713820476;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=DCBlw9Y3eyV4XXcYVaIC/t/CS+f8jLueDhczaKF6fWs=;
-	b=GY/pgGWVo0YwH1FYmEDMePDq/mH8dRCPuFu6ESek2FXmsBdGMrq3rXugi0Q683NgrT1iDS
-	62CEQcO1Q94yZHDaQYyXammcqCgLCrzHsuyf2CMP/5fsb2VC8qVoKtq8LrkdMzzxXYwhVR
-	6KD+OKgQIVnMJA/psmL6ptbmnS3G9hM=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-10-WCnl3qArNjC50Uq_9xlYYA-1; Mon, 22 Apr 2024 17:04:20 -0400
-X-MC-Unique: WCnl3qArNjC50Uq_9xlYYA-1
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-34b5bece899so249597f8f.3
-        for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 14:04:19 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713819859; x=1714424659;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DCBlw9Y3eyV4XXcYVaIC/t/CS+f8jLueDhczaKF6fWs=;
-        b=jl54HMZUx428V/RnN+8+XV5E9CHOl/cf9dtAfTiTguUD9MX4BUz95zGtXMEJwZ6Dod
-         jXqMwAX8Zez8g0VaMWblIpHTV3FDXMW15aFsX4FovbTA3GsxwlHQmTkHB01zlmmSbeF8
-         Cdxxo+Ay0tlUTsak7a68FzmYRp1vBVm+ZGy191R04pYHroDLiTY/0ZGYu78H7JUcVb8J
-         bNruPU6UmT38i67/HL/W1JclbxvqrNwFYwpmNr6BzQ1XWcWIu4GBUZ8YF/3E8OvVyBOf
-         Cxf7t6ovk3NWyJQfAZXrm1mzDYps5J0xKGghgKVPkJjBhP3d955vfOAz0THcxVz77aTh
-         0+tQ==
-X-Gm-Message-State: AOJu0YxKsqjGpLkcDne/Qzr+qq0A5qOxFxV2UWMOTgQFhbzjjyMJZCES
-	lPoBZ1mC6gHRuwtsl3EI3cXRHi4fJe4jQs06sQP6LnQD4NSUQwHifVkKXMVo0sz+uAGvvew+332
-	0iUKYZmvVzSzeeGx86ouSA09JreyCT/GoNLntwgEg25MaykQYxcrKwA==
-X-Received: by 2002:adf:e80c:0:b0:34a:9adc:c36e with SMTP id o12-20020adfe80c000000b0034a9adcc36emr6730137wrm.40.1713819858621;
-        Mon, 22 Apr 2024 14:04:18 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFv7PHtb4y8fNhZfRcBU265fpkd1KK31Zm+V98qWA5end8Pwrx3mlxsQybYi5iYjw+SD9chew==
-X-Received: by 2002:adf:e80c:0:b0:34a:9adc:c36e with SMTP id o12-20020adfe80c000000b0034a9adcc36emr6730112wrm.40.1713819858107;
-        Mon, 22 Apr 2024 14:04:18 -0700 (PDT)
-Received: from redhat.com ([2a06:c701:7429:3c00:dc4a:cd5:7b1c:f7c2])
-        by smtp.gmail.com with ESMTPSA id r7-20020a05600c35c700b0041638a085d3sm21513127wmq.15.2024.04.22.14.04.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Apr 2024 14:04:17 -0700 (PDT)
-Date: Mon, 22 Apr 2024 17:04:14 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
-	davem@davemloft.net, edumazet@google.com, parav@nvidia.com,
-	jasowang@redhat.com, xuanzhuo@linux.alibaba.com, shuah@kernel.org,
-	petrm@nvidia.com, liuhangbin@gmail.com, vladimir.oltean@nxp.com,
-	bpoirier@nvidia.com, idosch@nvidia.com,
-	virtualization@lists.linux.dev
-Subject: Re: [patch net-next v4 0/6] selftests: virtio_net: introduce initial
- testing infrastructure
-Message-ID: <20240422170405-mutt-send-email-mst@kernel.org>
-References: <20240418160830.3751846-1-jiri@resnulli.us>
+	bh=id/YHTuxfiovFyVUV8xQXCNmiVtMWYMuhwFovv6HFqU=;
+	b=USQ/LheIMQi2h389U2fetydS4vuPWvPxQCTPTXCiOGyzPogVxgMEdizJ9hUrrDENIDnX/p
+	6QMONIa69osC/0d0S8Fwj3lpbSL/DrquhSwWkBoviUK0Ldoj9HRwgy2i5tIdxLHHRyupWx
+	efcpyH4+CJUr69ZPnKjRGIM55vFzhfo=
+Date: Mon, 22 Apr 2024 14:14:26 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240418160830.3751846-1-jiri@resnulli.us>
+Subject: Re: [PATCH v2 bpf-next 4/6] selftests/bpf: Add IPv4 and IPv6 sockaddr
+ test cases
+To: Jordan Rife <jrife@google.com>
+Cc: bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ netdev@vger.kernel.org, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
+ Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+ Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>,
+ Shuah Khan <shuah@kernel.org>, Kui-Feng Lee <thinker.li@gmail.com>,
+ Artem Savkov <asavkov@redhat.com>, Dave Marchevsky <davemarchevsky@fb.com>,
+ Menglong Dong <imagedong@tencent.com>, Daniel Xu <dxu@dxuuu.xyz>,
+ David Vernet <void@manifault.com>, Daan De Meyer <daan.j.demeyer@gmail.com>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+References: <20240412165230.2009746-1-jrife@google.com>
+ <20240412165230.2009746-5-jrife@google.com>
+ <3df13496-a644-4a3a-9f9b-96ccc070f2a3@linux.dev>
+ <CADKFtnQDJbSFRS4oyEsn3ZBDAN7T6EvxXUNdrz1kU3Bnhzfgug@mail.gmail.com>
+ <f164369a-2b6b-45e0-8e3e-aa0035038cb6@linux.dev>
+ <CADKFtnQHy0MFeDNg6x2gzUJpuyaF6ELLyMg3tTxze3XV28qo7w@mail.gmail.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <CADKFtnQHy0MFeDNg6x2gzUJpuyaF6ELLyMg3tTxze3XV28qo7w@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, Apr 18, 2024 at 06:08:24PM +0200, Jiri Pirko wrote:
-> From: Jiri Pirko <jiri@nvidia.com>
+On 4/18/24 9:37 AM, Jordan Rife wrote:
+>> The test_sock_addr.{c,sh} can be retired as long as all its tests are migrated
+>> to sock_addr.c
 > 
-> This patchset aims at introducing very basic initial infrastructure
-> for virtio_net testing, namely it focuses on virtio feature testing.
+> test_sock_addr.c has a few more test dimensions than
+> prog_tests/sock_addr.c currently does, so it covers a few more
+> scenarios.
 > 
-> The first patch adds support for debugfs for virtio devices, allowing
-> user to filter features to pretend to be driver that is not capable
-> of the filtered feature.
+> struct sock_addr_test {
+>      const char *descr;
+>      /* BPF prog properties */
+>      load_fn loadfn;
+>      enum bpf_attach_type expected_attach_type;
+>      enum bpf_attach_type attach_type;
+>      /* Socket properties */
+>      int domain;
+>      int type;
+>      /* IP:port pairs for BPF prog to override */
+>      const char *requested_ip;
+>      unsigned short requested_port;
+>      const char *expected_ip;
+>      unsigned short expected_port;
+>      const char *expected_src_ip;
+>      /* Expected test result */
+>      enum {
+>          LOAD_REJECT,
+>          ATTACH_REJECT,
+>          ATTACH_OKAY,
+>          SYSCALL_EPERM,
+>          SYSCALL_ENOTSUPP,
+>          SUCCESS,
+>      } expected_result;
+> };
+> 
+> We focus on the "happy path" scenarios currently in
+> prog_tests/sock_addr.c while test_sock_addr.c has test cases that
+> cover a range of scenarios where loading or attaching a BPF program
+> should fail. There are also a few asm tests that use program loader
+> functions like sendmsg4_rw_asm_prog_load which specifies a series of
+> BPF instructions directly rather than loading one of the skeletons.
+> Adding in these test dimensions and migrating the test cases is a
+> slightly bigger lift for this patch series. Do we want to try to
+> migrate all of these to prog_tests/sock_addr.c in order to fully
+> retire it?
 
+I don't want to keep this set hostage too much until everything is migrated from 
+test_sock_addr.c. As long as for the tests you find useful in test_sock_addr.c 
+in this patch set and moved them to prog_tests/sock_addr.c, it is heading in the 
+right direction. For the moved test, please remove them from test_sock_addr.c so 
+that it is clear what else needs to be done.
 
-virtio things:
-
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
-
-> Example:
-> $ cat /sys/bus/virtio/devices/virtio0/features
-> 1110010111111111111101010000110010000000100000000000000000000000
-> $ echo "5" >/sys/kernel/debug/virtio/virtio0/filter_feature_add
-> $ cat /sys/kernel/debug/virtio/virtio0/filter_features
-> 5
-> $ echo "virtio0" > /sys/bus/virtio/drivers/virtio_net/unbind
-> $ echo "virtio0" > /sys/bus/virtio/drivers/virtio_net/bind
-> $ cat /sys/bus/virtio/devices/virtio0/features
-> 1110000111111111111101010000110010000000100000000000000000000000
-> 
-> Leverage that in the last patch that lays ground for virtio_net
-> selftests testing, including very basic F_MAC feature test.
-> 
-> To run this, do:
-> $ make -C tools/testing/selftests/ TARGETS=drivers/net/virtio_net/ run_tests
-> 
-> It is assumed, as with lot of other selftests in the net group,
-> that there are netdevices connected back-to-back. In this case,
-> two virtio_net devices connected back to back. If you use "tap" qemu
-> netdevice type, to configure this loop on a hypervisor, one may use
-> this script:
-> #!/bin/bash
-> 
-> DEV1="$1"
-> DEV2="$2"
-> 
-> sudo tc qdisc add dev $DEV1 clsact
-> sudo tc qdisc add dev $DEV2 clsact
-> sudo tc filter add dev $DEV1 ingress protocol all pref 1 matchall action mirred egress redirect dev $DEV2
-> sudo tc filter add dev $DEV2 ingress protocol all pref 1 matchall action mirred egress redirect dev $DEV1
-> sudo ip link set $DEV1 up
-> sudo ip link set $DEV2 up
-> 
-> Another possibility is to use virtme-ng like this:
-> $ vng --network=loop
-> or directly:
-> $ vng --network=loop -- make -C tools/testing/selftests/ TARGETS=drivers/net/virtio_net/ run_tests
-> 
-> "loop" network type will take care of creating two "hubport" qemu netdevs
-> putting them into a single hub.
-> 
-> To do it manually with qemu, pass following command line options:
-> -nic hubport,hubid=1,id=nd0,model=virtio-net-pci
-> -nic hubport,hubid=1,id=nd1,model=virtio-net-pci
-> 
-> ---
-> v3->v4:
-> - addressed comments from Petr and Benjamin, more or less cosmetical
->   issues. See individual patches changelog for details.
-> - extended cover letter by vng usage
-> v2->v3:
-> - added forgotten kdoc entry in patch #1.
-> v1->v2:
-> - addressed comments from Jakub and Benjamin, see individual
->   patches #3, #5 and #6 for details.
-> 
-> Jiri Pirko (6):
->   virtio: add debugfs infrastructure to allow to debug virtio features
->   selftests: forwarding: move initial root check to the beginning
->   selftests: forwarding: add ability to assemble NETIFS array by driver
->     name
->   selftests: forwarding: add check_driver() helper
->   selftests: forwarding: add wait_for_dev() helper
->   selftests: virtio_net: add initial tests
-> 
->  MAINTAINERS                                   |   1 +
->  drivers/virtio/Kconfig                        |   9 ++
->  drivers/virtio/Makefile                       |   1 +
->  drivers/virtio/virtio.c                       |   8 ++
->  drivers/virtio/virtio_debug.c                 | 109 +++++++++++++++
->  include/linux/virtio.h                        |  35 +++++
->  tools/testing/selftests/Makefile              |   1 +
->  .../selftests/drivers/net/virtio_net/Makefile |  15 ++
->  .../drivers/net/virtio_net/basic_features.sh  | 131 ++++++++++++++++++
->  .../selftests/drivers/net/virtio_net/config   |   2 +
->  .../net/virtio_net/virtio_net_common.sh       |  99 +++++++++++++
->  tools/testing/selftests/net/forwarding/lib.sh |  70 +++++++++-
->  12 files changed, 477 insertions(+), 4 deletions(-)
->  create mode 100644 drivers/virtio/virtio_debug.c
->  create mode 100644 tools/testing/selftests/drivers/net/virtio_net/Makefile
->  create mode 100755 tools/testing/selftests/drivers/net/virtio_net/basic_features.sh
->  create mode 100644 tools/testing/selftests/drivers/net/virtio_net/config
->  create mode 100644 tools/testing/selftests/drivers/net/virtio_net/virtio_net_common.sh
-> 
-> -- 
-> 2.44.0
+[ Side note for future migration attempt, at least for the LOAD_REJECT one, it 
+probably makes sense to write it like progs/verifier_*.c ]
 
 
