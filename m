@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-90199-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90200-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B11D68AD0E9
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 17:33:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA2238AD0EB
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 17:33:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3DE2A1F2305B
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 15:33:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EB2481C2217A
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 15:33:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F78C153518;
-	Mon, 22 Apr 2024 15:33:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35DAE15351E;
+	Mon, 22 Apr 2024 15:33:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="UJIJw/IR"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="AJDFeMwx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
+Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C075153503
-	for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 15:33:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 438C2153515
+	for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 15:33:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713799990; cv=none; b=fnKIoVfdK+LGUmTF5YkJ/t8aohc3PfojHYAJU5+9ZpL93c0bysGSbQqTwACmS5vIGkkKwe77jzb/VJb+qHx2oopi0C2FdivHmuCsI4+84fh6dn6H5XXssI38aSTX539sLO+lMZ0sxIplP9P3QvDkLpMu3Df3SOXE63jC5zpP3vM=
+	t=1713799992; cv=none; b=Z9MegM9C+OgMfsOKXk+745R519eP8mHl7Enz/lKdrRmlFDXwCERrEMiOckgvqbnJB9B5Yb0e/GGqJDE7VUgIDPhAaVZ/mdopTLYTrlwYcWi8rGixfuliK3QfHdPkvH5AQTVeh30VTlaxgphiQf41JCwZpSikf1JOHneSNzCawuo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713799990; c=relaxed/simple;
-	bh=6+cdGuSohVVcZsEtEaB+WUeWNhRp735twxzPhawYX2g=;
+	s=arc-20240116; t=1713799992; c=relaxed/simple;
+	bh=KaPtkaLJNQOUy4iNERAIFKq6ktm9TFozVxBCBQD6Z0I=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=AcxBQbxm8drQVnD6Ei1gBaFLHoj7qJ82Bf6Mhn1RKH2KfkS1d//wWY4L7e+S5hJT2xQDGqvlIRdVi8A5aaRrvH8hru9rr5s1ceuuuIJFgLxAP3bZm/TaHUD84wBcSFrBOIXOsGmLJW7AX0Ao0/BIS91FKJXekOiu0L6GY3PFams=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=UJIJw/IR; arc=none smtp.client-ip=209.85.218.42
+	 MIME-Version; b=kGxo5r+Jkhl9Isg1rhROVTLcPibOuGv2TTiP2majM0Ff6RvNYm1YDV0a2YeJwgzamo+54hfitBftz9vIbapkfNqkwWW5u/MO/DcCPQiMZra8WWv44clOj4XCaRM0rRi3Mq+JZ9fh/6PTB371nDPls6gmZKSZWt31U4q2M69+2b8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=AJDFeMwx; arc=none smtp.client-ip=209.85.208.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a55bdf477e5so92373066b.3
-        for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 08:33:07 -0700 (PDT)
+Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-2d895e2c6efso68956301fa.0
+        for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 08:33:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1713799986; x=1714404786; darn=vger.kernel.org;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1713799987; x=1714404787; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=vIem1pG4tCyS+CC0IvtQjtNP5aTmhFvjHO5o/QyAp+k=;
-        b=UJIJw/IRdzk6eTwX+5xUAi4idJeMK8vQn3WiHxSycGUzaMHGzkEkf8NnWohWG/eUqe
-         414PoHEHiKDwO+C6Rx6tlDBv8rz97VG+lW2V8PIBQkMq3rcY6U79LWNEzgzgZ1yWibLb
-         2sx8/mpf+scqP7l7fTEju8jrh0OB8d/s9Ti0Aft/72z5jsv242Fn3caBPQiDM+Qo5Lj2
-         U2+qDr2wIHD5FgQEc/Wq9j+H9copJI87NKpAw68oTVlmJDRSJg76dCcE1VqqFyL6L1Gb
-         dEKDEjEydWFV1wwcv0a7kDv1pK13QH4sdNBQbSsrpz1BJ/AvvucNmjHLBmNZpq0YLSIQ
-         InJA==
+        bh=SQl5qEwVKE01f/9GRHQkz4a3z973Yhrxj9l6Q9lKgg8=;
+        b=AJDFeMwxGkoqumIgAxJAYdWpCiKRDPIPL6eF2mNyoCXcOnkSVcPaAKq0B9dUeRdZJ3
+         eflO9Rx7dw6vKEOGuYXtCm2sygLGY8Q+aUoBzARaFwWcJKO6u1VASE+tZ05VvCz2N+Bp
+         1FXS0NAsNrCEWiWU+rSR1zOfQqKTgttPc1/n3RR2XbbB2age+tZsCugOFNmPs7F40AQH
+         CceGIkb3uKJYWhCaMEAz5kiBnelQMRtuf5zBvIybsQIOlKsO65FXsg1IJ8au/eRfR12L
+         OmeKRmUiy0i3RVAlejJaO+vaouTBpYjWP57f3JYTpkfz+UplkDmduG1gpbiXz/duDUA2
+         gIMg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713799986; x=1714404786;
+        d=1e100.net; s=20230601; t=1713799987; x=1714404787;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=vIem1pG4tCyS+CC0IvtQjtNP5aTmhFvjHO5o/QyAp+k=;
-        b=eIzQFzNffPbguGloyszy/WcaMnuFtxsza95QAti0oAkmj78R43gyleQ6CRKnYgKwSY
-         HcDoXTfs9w5DRo4cIkwSD5PG6KcoC83rBzfD0poVjg+cbXn9KwKaBiWaCshGx1xOgyYb
-         wHTK5qcYTEsntQmSnjY959Vtu9mDzBDJiOx9KLFIwyn1Dr37Z1DXLmtgV3/v/f3RDHWI
-         PamKpt+x0WbH09PD84+0Xkkhcg2uMaT5FzbINZq3G+YzYJzm21utQ/LOw+HooyRGTDqI
-         TUAYhi3XYP0wZ7Fk278uMY5gptFdjkwFtiJMRJ68E7n/364ufHi0WDPsylhDM+gFgwIO
-         /xEQ==
-X-Gm-Message-State: AOJu0Yxel1lhKAM/Dwsan218VYGfH7dSU7xss/2LubYdRfgu5xB/si5a
-	ZxpB9iFApncZwL9F7iICfM8dN3xWL8dGs/XM8Yzxzr6reHe6Rm7g3R3CWc3dDO8KjKbAY8hZXUD
-	3
-X-Google-Smtp-Source: AGHT+IHZxiCjv3PxfVxFhbjoiKLm4tC4vFaZ6WexwMO+eLrX31HdzLkB5sGmevyLmCXlx9BQa3r2rQ==
-X-Received: by 2002:a17:906:d89:b0:a55:b272:e90b with SMTP id m9-20020a1709060d8900b00a55b272e90bmr4068053eji.35.1713799985011;
-        Mon, 22 Apr 2024 08:33:05 -0700 (PDT)
+        bh=SQl5qEwVKE01f/9GRHQkz4a3z973Yhrxj9l6Q9lKgg8=;
+        b=kNeB4oJuKU/UCs6UjKQk8YMtPkF0TRzsoLmrc4biFtP5wuh6GF5PYutm4iUlq+tu3I
+         jIba8K/gUCO5GHN6VM/ulC2KAyOa15cNBJJkzPq/Po02laOjvORHZGJldlrkY+1Azolq
+         h7rQlHimTvpUKOQOAG4po/nv9LbKHXa190QL0CCr2srL4p/7fKqFH2ieubGqIRknSICK
+         2+tqbejzGuTfz12naXiLqOnqN1SjTvGiecWXG11dJKZ4m03pRVPflGWMhH6pra9c5fRN
+         FTmlZvS2FMc7YtojygrZPurahm32rygcsSDPomyjeM387QFG8ldNxBQivHXm+QjPzq1c
+         Q7lA==
+X-Gm-Message-State: AOJu0Yy33ipluYBxNbsZNOdqOxmeXEIs5h/NUuhd/lm2NL1TXbgkFAAH
+	HgtiKp6hI4QtH31yQElu2fJaXZe0pIM8mtukFy1PbcsrZgSyT2msQl76D7e3nk+jh8Sj+Lu4rAQ
+	f
+X-Google-Smtp-Source: AGHT+IGlcxXfKgORGsiWYGG7is1cgixCK8Z1Y5WaBaCSGJYErcWa1XDZsrmGBwn5EZpXUNHomnJ1Hw==
+X-Received: by 2002:a2e:b607:0:b0:2dc:d2c5:ee9 with SMTP id r7-20020a2eb607000000b002dcd2c50ee9mr5633241ljn.2.1713799987076;
+        Mon, 22 Apr 2024 08:33:07 -0700 (PDT)
 Received: from localhost (78-80-105-131.customers.tmcz.cz. [78.80.105.131])
-        by smtp.gmail.com with ESMTPSA id z2-20020a1709063ac200b00a4e1a9e1ab4sm5854096ejd.157.2024.04.22.08.33.04
+        by smtp.gmail.com with ESMTPSA id p19-20020a05640210d300b00572033ec969sm1836276edu.60.2024.04.22.08.33.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Apr 2024 08:33:04 -0700 (PDT)
+        Mon, 22 Apr 2024 08:33:06 -0700 (PDT)
 From: Jiri Pirko <jiri@resnulli.us>
 To: netdev@vger.kernel.org
 Cc: kuba@kernel.org,
@@ -84,9 +84,9 @@ Cc: kuba@kernel.org,
 	bpoirier@nvidia.com,
 	idosch@nvidia.com,
 	virtualization@lists.linux.dev
-Subject: [patch net-next v5 1/5] virtio: add debugfs infrastructure to allow to debug virtio features
-Date: Mon, 22 Apr 2024 17:32:56 +0200
-Message-ID: <20240422153303.3860947-1-jiri@resnulli.us>
+Subject: [patch net-next v5 2/5] selftests: forwarding: add ability to assemble NETIFS array by driver name
+Date: Mon, 22 Apr 2024 17:32:57 +0200
+Message-ID: <20240422153303.3860947-2-jiri@resnulli.us>
 X-Mailer: git-send-email 2.44.0
 In-Reply-To: <20240418160830.3751846-1-jiri@resnulli.us>
 References: <20240418160830.3751846-1-jiri@resnulli.us>
@@ -100,296 +100,81 @@ Content-Transfer-Encoding: 8bit
 
 From: Jiri Pirko <jiri@nvidia.com>
 
-Currently there is no way for user to set what features the driver
-should obey or not, it is hard wired in the code.
+Allow driver tests to work without specifying the netdevice names.
+Introduce a possibility to search for available netdevices according to
+set driver name. Allow test to specify the name by setting
+NETIF_FIND_DRIVER variable.
 
-In order to be able to debug the device behavior in case some feature is
-disabled, introduce a debugfs infrastructure with couple of files
-allowing user to see what features the device advertises and
-to set filter for features used by driver.
-
-Example:
-$cat /sys/bus/virtio/devices/virtio0/features
-1110010111111111111101010000110010000000100000000000000000000000
-$ echo "5" >/sys/kernel/debug/virtio/virtio0/filter_feature_add
-$ cat /sys/kernel/debug/virtio/virtio0/filter_features
-5
-$ echo "virtio0" > /sys/bus/virtio/drivers/virtio_net/unbind
-$ echo "virtio0" > /sys/bus/virtio/drivers/virtio_net/bind
-$ cat /sys/bus/virtio/devices/virtio0/features
-1110000111111111111101010000110010000000100000000000000000000000
-
-Note that sysfs "features" now already exists, this patch does not
-touch it.
+Note that user overrides this either by passing netdevice names on the
+command line or by declaring NETIFS array in custom forwarding.config
+configuration file.
 
 Signed-off-by: Jiri Pirko <jiri@nvidia.com>
+Reviewed-by: Petr Machata <petrm@nvidia.com>
 ---
 v4->v5:
-- added exported symbols, adjusted Kconfig a bit (whitespace)
+- rebased on top of previous patch removal
 v3->v4:
-- s/know/now/ typo fix in description
-v2->v3:
-- added missing kdoc for debugfs_filter_features struct field
+- rebased on top of changes in patch #2
+- reworded NETIF_FIND_DRIVER comment to explicitly refer to "importer"
+- simplified driver_name_get() avoiding else branch
+- s/find_netif/netif_find_driver/
+v1->v2:
+- removed unnecessary "-p" and "-e" options
+- removed unnecessary "! -z" from the check
+- moved NETIF_FIND_DRIVER declaration from the config options
 ---
- drivers/virtio/Kconfig        |  10 +++
- drivers/virtio/Makefile       |   1 +
- drivers/virtio/virtio.c       |   8 +++
- drivers/virtio/virtio_debug.c | 114 ++++++++++++++++++++++++++++++++++
- include/linux/virtio.h        |  35 +++++++++++
- 5 files changed, 168 insertions(+)
- create mode 100644 drivers/virtio/virtio_debug.c
+ tools/testing/selftests/net/forwarding/lib.sh | 37 +++++++++++++++++++
+ 1 file changed, 37 insertions(+)
 
-diff --git a/drivers/virtio/Kconfig b/drivers/virtio/Kconfig
-index c17193544268..6284538a8184 100644
---- a/drivers/virtio/Kconfig
-+++ b/drivers/virtio/Kconfig
-@@ -178,4 +178,14 @@ config VIRTIO_DMA_SHARED_BUFFER
- 	 This option adds a flavor of dma buffers that are backed by
- 	 virtio resources.
+diff --git a/tools/testing/selftests/net/forwarding/lib.sh b/tools/testing/selftests/net/forwarding/lib.sh
+index 7913c6ee418d..9d6802c6c023 100644
+--- a/tools/testing/selftests/net/forwarding/lib.sh
++++ b/tools/testing/selftests/net/forwarding/lib.sh
+@@ -84,6 +84,43 @@ declare -A NETIFS=(
+ # e.g. a low-power board.
+ : "${KSFT_MACHINE_SLOW:=no}"
  
-+config VIRTIO_DEBUG
-+	bool "Debug facilities"
-+	depends on VIRTIO
-+	help
-+	  Enable this to expose debug facilities over debugfs.
-+	  This allows to debug features, to see what features the device
-+	  advertises and to set filter for features used by driver.
++##############################################################################
++# Find netifs by test-specified driver name
 +
-+	  If unsure, say N.
++driver_name_get()
++{
++	local dev=$1; shift
++	local driver_path="/sys/class/net/$dev/device/driver"
 +
- endif # VIRTIO_MENU
-diff --git a/drivers/virtio/Makefile b/drivers/virtio/Makefile
-index 73ace62af440..58b2b0489fc9 100644
---- a/drivers/virtio/Makefile
-+++ b/drivers/virtio/Makefile
-@@ -13,3 +13,4 @@ obj-$(CONFIG_VIRTIO_INPUT) += virtio_input.o
- obj-$(CONFIG_VIRTIO_VDPA) += virtio_vdpa.o
- obj-$(CONFIG_VIRTIO_MEM) += virtio_mem.o
- obj-$(CONFIG_VIRTIO_DMA_SHARED_BUFFER) += virtio_dma_buf.o
-+obj-$(CONFIG_VIRTIO_DEBUG) += virtio_debug.o
-diff --git a/drivers/virtio/virtio.c b/drivers/virtio/virtio.c
-index 9510c551dce8..b968b2aa5f4d 100644
---- a/drivers/virtio/virtio.c
-+++ b/drivers/virtio/virtio.c
-@@ -274,6 +274,9 @@ static int virtio_dev_probe(struct device *_d)
- 	else
- 		dev->features = driver_features_legacy & device_features;
++	if [[ -L $driver_path ]]; then
++		basename `realpath $driver_path`
++	fi
++}
++
++netif_find_driver()
++{
++	local ifnames=`ip -j link show | jq -r ".[].ifname"`
++	local count=0
++
++	for ifname in $ifnames
++	do
++		local driver_name=`driver_name_get $ifname`
++		if [[ ! -z $driver_name && $driver_name == $NETIF_FIND_DRIVER ]]; then
++			count=$((count + 1))
++			NETIFS[p$count]="$ifname"
++		fi
++	done
++}
++
++# Whether to find netdevice according to the driver speficied by the importer
++: "${NETIF_FIND_DRIVER:=}"
++
++if [[ $NETIF_FIND_DRIVER ]]; then
++	unset NETIFS
++	declare -A NETIFS
++	netif_find_driver
++fi
++
+ net_forwarding_dir=$(dirname "$(readlink -e "${BASH_SOURCE[0]}")")
  
-+	/* When debugging, user may filter some features by hand. */
-+	virtio_debug_device_filter_features(dev);
-+
- 	/* Transport features always preserved to pass to finalize_features. */
- 	for (i = VIRTIO_TRANSPORT_F_START; i < VIRTIO_TRANSPORT_F_END; i++)
- 		if (device_features & (1ULL << i))
-@@ -465,6 +468,8 @@ int register_virtio_device(struct virtio_device *dev)
- 	/* Acknowledge that we've seen the device. */
- 	virtio_add_status(dev, VIRTIO_CONFIG_S_ACKNOWLEDGE);
- 
-+	virtio_debug_device_init(dev);
-+
- 	/*
- 	 * device_add() causes the bus infrastructure to look for a matching
- 	 * driver.
-@@ -496,6 +501,7 @@ void unregister_virtio_device(struct virtio_device *dev)
- 	int index = dev->index; /* save for after device release */
- 
- 	device_unregister(&dev->dev);
-+	virtio_debug_device_exit(dev);
- 	ida_free(&virtio_index_ida, index);
- }
- EXPORT_SYMBOL_GPL(unregister_virtio_device);
-@@ -590,11 +596,13 @@ static int virtio_init(void)
- {
- 	if (bus_register(&virtio_bus) != 0)
- 		panic("virtio bus registration failed");
-+	virtio_debug_init();
- 	return 0;
- }
- 
- static void __exit virtio_exit(void)
- {
-+	virtio_debug_exit();
- 	bus_unregister(&virtio_bus);
- 	ida_destroy(&virtio_index_ida);
- }
-diff --git a/drivers/virtio/virtio_debug.c b/drivers/virtio/virtio_debug.c
-new file mode 100644
-index 000000000000..95c8fc7705bb
---- /dev/null
-+++ b/drivers/virtio/virtio_debug.c
-@@ -0,0 +1,114 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+
-+#include <linux/virtio.h>
-+#include <linux/virtio_config.h>
-+#include <linux/debugfs.h>
-+
-+static struct dentry *virtio_debugfs_dir;
-+
-+static int virtio_debug_device_features_show(struct seq_file *s, void *data)
-+{
-+	struct virtio_device *dev = s->private;
-+	u64 device_features;
-+	unsigned int i;
-+
-+	device_features = dev->config->get_features(dev);
-+	for (i = 0; i < BITS_PER_LONG_LONG; i++) {
-+		if (device_features & (1ULL << i))
-+			seq_printf(s, "%u\n", i);
-+	}
-+	return 0;
-+}
-+DEFINE_SHOW_ATTRIBUTE(virtio_debug_device_features);
-+
-+static int virtio_debug_filter_features_show(struct seq_file *s, void *data)
-+{
-+	struct virtio_device *dev = s->private;
-+	unsigned int i;
-+
-+	for (i = 0; i < BITS_PER_LONG_LONG; i++) {
-+		if (dev->debugfs_filter_features & (1ULL << i))
-+			seq_printf(s, "%u\n", i);
-+	}
-+	return 0;
-+}
-+DEFINE_SHOW_ATTRIBUTE(virtio_debug_filter_features);
-+
-+static int virtio_debug_filter_features_clear(void *data, u64 val)
-+{
-+	struct virtio_device *dev = data;
-+
-+	if (val == 1)
-+		dev->debugfs_filter_features = 0;
-+	return 0;
-+}
-+
-+DEFINE_DEBUGFS_ATTRIBUTE(virtio_debug_filter_features_clear_fops, NULL,
-+			 virtio_debug_filter_features_clear, "%llu\n");
-+
-+static int virtio_debug_filter_feature_add(void *data, u64 val)
-+{
-+	struct virtio_device *dev = data;
-+
-+	if (val >= BITS_PER_LONG_LONG)
-+		return -EINVAL;
-+	dev->debugfs_filter_features |= BIT_ULL_MASK(val);
-+	return 0;
-+}
-+
-+DEFINE_DEBUGFS_ATTRIBUTE(virtio_debug_filter_feature_add_fops, NULL,
-+			 virtio_debug_filter_feature_add, "%llu\n");
-+
-+static int virtio_debug_filter_feature_del(void *data, u64 val)
-+{
-+	struct virtio_device *dev = data;
-+
-+	if (val >= BITS_PER_LONG_LONG)
-+		return -EINVAL;
-+	dev->debugfs_filter_features &= ~BIT_ULL_MASK(val);
-+	return 0;
-+}
-+
-+DEFINE_DEBUGFS_ATTRIBUTE(virtio_debug_filter_feature_del_fops, NULL,
-+			 virtio_debug_filter_feature_del, "%llu\n");
-+
-+void virtio_debug_device_init(struct virtio_device *dev)
-+{
-+	dev->debugfs_dir = debugfs_create_dir(dev_name(&dev->dev),
-+					      virtio_debugfs_dir);
-+	debugfs_create_file("device_features", 0400, dev->debugfs_dir, dev,
-+			    &virtio_debug_device_features_fops);
-+	debugfs_create_file("filter_features", 0400, dev->debugfs_dir, dev,
-+			    &virtio_debug_filter_features_fops);
-+	debugfs_create_file("filter_features_clear", 0200, dev->debugfs_dir, dev,
-+			    &virtio_debug_filter_features_clear_fops);
-+	debugfs_create_file("filter_feature_add", 0200, dev->debugfs_dir, dev,
-+			    &virtio_debug_filter_feature_add_fops);
-+	debugfs_create_file("filter_feature_del", 0200, dev->debugfs_dir, dev,
-+			    &virtio_debug_filter_feature_del_fops);
-+}
-+EXPORT_SYMBOL_GPL(virtio_debug_device_init);
-+
-+void virtio_debug_device_filter_features(struct virtio_device *dev)
-+{
-+	dev->features &= ~dev->debugfs_filter_features;
-+}
-+EXPORT_SYMBOL_GPL(virtio_debug_device_filter_features);
-+
-+void virtio_debug_device_exit(struct virtio_device *dev)
-+{
-+	debugfs_remove_recursive(dev->debugfs_dir);
-+}
-+EXPORT_SYMBOL_GPL(virtio_debug_device_exit);
-+
-+void virtio_debug_init(void)
-+{
-+	virtio_debugfs_dir = debugfs_create_dir("virtio", NULL);
-+}
-+EXPORT_SYMBOL_GPL(virtio_debug_init);
-+
-+void virtio_debug_exit(void)
-+{
-+	debugfs_remove_recursive(virtio_debugfs_dir);
-+}
-+EXPORT_SYMBOL_GPL(virtio_debug_exit);
-diff --git a/include/linux/virtio.h b/include/linux/virtio.h
-index 26c4325aa373..96fea920873b 100644
---- a/include/linux/virtio.h
-+++ b/include/linux/virtio.h
-@@ -126,6 +126,8 @@ struct virtio_admin_cmd {
-  * @vqs: the list of virtqueues for this device.
-  * @features: the features supported by both driver and device.
-  * @priv: private pointer for the driver's use.
-+ * @debugfs_dir: debugfs directory entry.
-+ * @debugfs_filter_features: features to be filtered set by debugfs.
-  */
- struct virtio_device {
- 	int index;
-@@ -141,6 +143,10 @@ struct virtio_device {
- 	struct list_head vqs;
- 	u64 features;
- 	void *priv;
-+#ifdef CONFIG_VIRTIO_DEBUG
-+	struct dentry *debugfs_dir;
-+	u64 debugfs_filter_features;
-+#endif
- };
- 
- #define dev_to_virtio(_dev)	container_of_const(_dev, struct virtio_device, dev)
-@@ -237,4 +243,33 @@ void virtqueue_dma_sync_single_range_for_cpu(struct virtqueue *_vq, dma_addr_t a
- void virtqueue_dma_sync_single_range_for_device(struct virtqueue *_vq, dma_addr_t addr,
- 						unsigned long offset, size_t size,
- 						enum dma_data_direction dir);
-+
-+#ifdef CONFIG_VIRTIO_DEBUG
-+void virtio_debug_device_init(struct virtio_device *dev);
-+void virtio_debug_device_exit(struct virtio_device *dev);
-+void virtio_debug_device_filter_features(struct virtio_device *dev);
-+void virtio_debug_init(void);
-+void virtio_debug_exit(void);
-+#else
-+static inline void virtio_debug_device_init(struct virtio_device *dev)
-+{
-+}
-+
-+static inline void virtio_debug_device_exit(struct virtio_device *dev)
-+{
-+}
-+
-+static inline void virtio_debug_device_filter_features(struct virtio_device *dev)
-+{
-+}
-+
-+static inline void virtio_debug_init(void)
-+{
-+}
-+
-+static inline void virtio_debug_exit(void)
-+{
-+}
-+#endif
-+
- #endif /* _LINUX_VIRTIO_H */
+ if [[ -f $net_forwarding_dir/forwarding.config ]]; then
 -- 
 2.44.0
 
