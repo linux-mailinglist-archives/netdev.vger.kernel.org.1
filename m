@@ -1,118 +1,123 @@
-Return-Path: <netdev+bounces-90073-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90074-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 653F08ACA47
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 12:09:29 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B3558ACA67
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 12:17:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 203E128325E
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 10:09:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BB618B211BF
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 10:17:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E5AA13DDBF;
-	Mon, 22 Apr 2024 10:08:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="dPP0TSga"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5048513E3E5;
+	Mon, 22 Apr 2024 10:17:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4195513DBB2;
-	Mon, 22 Apr 2024 10:08:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2342B56452
+	for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 10:17:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713780496; cv=none; b=mmYY5cOt2afxKbQQ4kPyaE0FACOgIZOXvDlmRlNfxzrsynY45kSLQFBudmobIGUiB1siFqRU9eS4P+G0SaARxVvXttNnWcOaqY6C7EY7oNAWPD1AKh2+lnuJQQpnosYdAaArO9wxzZQx7TLJyuPpTgK/pxDWcSAvGu2icbiVnRQ=
+	t=1713781060; cv=none; b=K1UE7sxnhBb40pR41cvNGJ50jvJfHRhwA8eUGpgT24phqcYIbe39ieVQA8YZuDKFDq2nf8D+CM2cfu/vXp0hPtRRaoPv7EFM0yqxDAxdCn93SUZxeH7zF0ejnM8+J7+u0VZJd+vOfgSbngboZqoPUGdp4gGMq0w1fKhIwV38TvM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713780496; c=relaxed/simple;
-	bh=5t1Bfop7a73SP2Xoc+JjPX3eauf9YdecV0ZqhsEjPCA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BuVBuBEZino09RyhkDxIP2acCOjRvDSwGJGjunQk80gNsJG2ypDsgxgzlpO2fy3w39zcBOZcD2XdKl0Fq6hiAYcVt1JnjBrM6QxWCuQ5eS5OI8gQeMPAaH7E63SE3jFOvfhtwhnlHJgWR5kFsFR/rZRUvGKEey8nFXYGOJPUm8M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=dPP0TSga; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1134)
-	id 5A40E20FEB70; Mon, 22 Apr 2024 03:08:09 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 5A40E20FEB70
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1713780489;
-	bh=p/91VOpGr+sXlA4jv/RAoPR3l3/fwg6j5nhp26gdg74=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=dPP0TSgaJivoAFhSsrYk9liFUNizFn+wcBwR9iR/96vvpWhIJ69DCFlE4IpyE5UuF
-	 0XveB92uwHC46KXjCMY1uBItDd0eSw0IfWb6BHVAM9EH4fQ6s9Qny5cJhpK2ClRmmL
-	 nxtJWq6M81hbyyDZt/fiDiPALWzxvP39K2cVGn94=
-Date: Mon, 22 Apr 2024 03:08:09 -0700
-From: Shradha Gupta <shradhagupta@linux.microsoft.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Jason Gunthorpe <jgg@ziepe.ca>, Zhu Yanjun <yanjun.zhu@linux.dev>,
-	linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org,
-	linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Ajay Sharma <sharmaajay@microsoft.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Long Li <longli@microsoft.com>,
-	Michael Kelley <mikelley@microsoft.com>,
-	Shradha Gupta <shradhagupta@microsoft.com>,
-	Yury Norov <yury.norov@gmail.com>,
-	Konstantin Taranov <kotaranov@microsoft.com>,
-	Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
-Subject: Re: [PATCH net-next] net: mana: Add new device attributes for mana
-Message-ID: <20240422100809.GA9873@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-References: <1713174589-29243-1-git-send-email-shradhagupta@linux.microsoft.com>
- <20240415161305.GO223006@ziepe.ca>
- <56b0a8c1-50f6-41a9-9ea5-ed45ada58892@linux.dev>
- <b34bfb11-98a3-4418-b482-14f2e50745d3@lunn.ch>
- <20240418060108.GB13182@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
- <20240418175059.GZ223006@ziepe.ca>
- <f3e7ea07-2903-4f19-ba86-94bba569dae9@lunn.ch>
- <20240419165926.GC506@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
- <fc345b4d-0747-4ca3-aee0-c53064cc7fe1@lunn.ch>
+	s=arc-20240116; t=1713781060; c=relaxed/simple;
+	bh=umlnba0C2TDoEPymjKm0fR+gjnADNaKh1UaG9HzAnrA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=UEHyMt72n+W0Mxw84P96ij95lq4cZBuYSZ3iElSwjqJtv4Jt11kcmXDQbtF0+IKiEromYcrvq9b0p3x1TGUXjXaRjCBNnsK+AXR995fk84/8xM3gjbzQbBVDlEsAEAY6K9Z3kK81IIP9lfee/jpnsBZuOD7IVcOCa1gsZjCV9FQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [112.20.112.218])
+	by gateway (Coremail) with SMTP id _____8BxFvA_OSZmDsEAAA--.4259S3;
+	Mon, 22 Apr 2024 18:17:35 +0800 (CST)
+Received: from [192.168.100.8] (unknown [112.20.112.218])
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8CxTN48OSZmbz0BAA--.5514S3;
+	Mon, 22 Apr 2024 18:17:33 +0800 (CST)
+Message-ID: <0b918781-05bc-4d79-8d5d-52692e773706@loongson.cn>
+Date: Mon, 22 Apr 2024 18:17:32 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <fc345b4d-0747-4ca3-aee0-c53064cc7fe1@lunn.ch>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v11 4/6] net: stmmac: dwmac-loongson: Introduce
+ GMAC setup
+To: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com,
+ alexandre.torgue@foss.st.com, joabreu@synopsys.com, fancer.lancer@gmail.com
+Cc: Jose.Abreu@synopsys.com, chenhuacai@kernel.org, linux@armlinux.org.uk,
+ guyinggang@loongson.cn, netdev@vger.kernel.org, chris.chenfeiyang@gmail.com,
+ siyanteng01@gmail.com
+References: <cover.1712917541.git.siyanteng@loongson.cn>
+ <6f0ac42c1b60db318b7d746254a9b310dd03aa32.1712917541.git.siyanteng@loongson.cn>
+Content-Language: en-US
+From: Yanteng Si <siyanteng@loongson.cn>
+In-Reply-To: <6f0ac42c1b60db318b7d746254a9b310dd03aa32.1712917541.git.siyanteng@loongson.cn>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:AQAAf8CxTN48OSZmbz0BAA--.5514S3
+X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
+X-Coremail-Antispam: 1Uk129KBj9xXoW7Gry5uF4xKw13Ww1rtFyxWFX_yoWfuFbE9r
+	W8X3WkW345Awn7tw4UW34xArZrWrW7XF4fCrn2qr4ktw1rC3sxWrWv9wnFgw4UWa15JFna
+	yr1DWanxAw1q9osvyTuYvTs0mTUanT9S1TB71UUUUj7qnTZGkaVYY2UrUUUUj1kv1TuYvT
+	s0mT0YCTnIWjqI5I8CrVACY4xI64kE6c02F40Ex7xfYxn0WfASr-VFAUDa7-sFnT9fnUUI
+	cSsGvfJTRUUUbfxYFVCjjxCrM7AC8VAFwI0_Jr0_Gr1l1xkIjI8I6I8E6xAIw20EY4v20x
+	vaj40_Wr0E3s1l1IIY67AEw4v_Jrv_JF1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxS
+	w2x7M28EF7xvwVC0I7IYx2IY67AKxVW8JVW5JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxV
+	W8JVWxJwA2z4x0Y4vEx4A2jsIE14v26r4UJVWxJr1l84ACjcxK6I8E87Iv6xkF7I0E14v2
+	6r4UJVWxJr1ln4kS14v26r126r1DM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12
+	xvs2x26I8E6xACxx1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r12
+	6r1DMcIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr4
+	1lc7CjxVAaw2AFwI0_JF0_Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_
+	Gr1l4IxYO2xFxVAFwI0_JF0_Jw1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67
+	AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8I
+	cVAFwI0_JFI_Gr1lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI
+	8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v2
+	6r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x07j5o7tUUUUU=
 
-On Fri, Apr 19, 2024 at 08:51:02PM +0200, Andrew Lunn wrote:
-> On Fri, Apr 19, 2024 at 09:59:26AM -0700, Shradha Gupta wrote:
-> > On Thu, Apr 18, 2024 at 08:42:59PM +0200, Andrew Lunn wrote:
-> > > > >From an RDMA perspective this is all available from other APIs already
-> > > > at least and I wouldn't want to see new sysfs unless there is a netdev
-> > > > justification.
-> > > 
-> > > It is unlikely there is a netdev justification. Configuration happens
-> > > via netlink, not sysfs.
-> > > 
-> > >     Andrew
-> > 
-> > Thanks. Sure, it makes sense to make the generic attribute configurable
-> > through the netdevice ops or netlink implementation. I will keep that in
-> > mind while adding the next set of configuration attributes for the driver.
-> > These attributes(from the patch) however, are hardware specific(that show
-> > the maximum supported values by the hardware in most cases).
-> 
->         ndev->max_mtu = gc->adapter_mtu - ETH_HLEN;
->         ndev->min_mtu = ETH_MIN_MTU;
-> 
-> This does not appear to be specific to your device. This is very
-> generic. We already have /sys/class/net/eth42/mtu, why not add
-> /sys/class/net/eth42/max_mtu and /sys/class/net/eth42/min_mtu for
-> every driver?
-> 
-> Are these values really hardware specific? Are they really unique to
-> your hardware? I have to wounder because you clearly did not think
-> much about MTU, and how it is actually generic...
-> 
->      Andrew
-That makes sense. I will make these as generic attributes in the next version.
-Thanks.
+Hi all
+
+在 2024/4/12 19:28, Yanteng Si 写道:
+> @@ -42,6 +45,12 @@ static int loongson_default_data(struct plat_stmmacenet_data *plat)
+>   	plat->dma_cfg->pblx8 = true;
+>   
+>   	plat->multicast_filter_bins = 256;
+> +	plat->clk_ref_rate = 125000000;
+> +	plat->clk_ptp_rate = 125000000;
+> +
+
+> +	plat->tx_queues_to_use = 1;
+> +	plat->rx_queues_to_use = 1;
+
+Sorry, I forgot to delete them.
+
+
+This part of the code has been moved to loongson_dwmac_probe() in this 
+patch set, Why?
+
+
+Because we have two different gnet devices: the 2k2000 supports multiple 
+channels,
+
+the 7a2000 only supports single channels, and all GMAC devices only 
+support single channels.
+
+
+If we keep this part of the code here, we will get GMAC_VERSION again in 
+gnet_data()
+
+  to distinguish them, which will make the code more complex. We can use 
+GMAC_VERSION
+
+in probe to distinguish them easily.
+
+
+  so the patch will be redesigned in v12.
+
+
+Thanks,
+
+Yanteng
+
 
