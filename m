@@ -1,95 +1,98 @@
-Return-Path: <netdev+bounces-90235-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90236-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C61028AD3CB
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 20:21:33 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8F7C8AD3E6
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 20:28:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 02A331C20C3F
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 18:21:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 37F3CB232DF
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 18:28:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55BBF154437;
-	Mon, 22 Apr 2024 18:21:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E12F815444B;
+	Mon, 22 Apr 2024 18:28:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="tjLyfdoY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gp+3Dx2N"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66F43154427
-	for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 18:21:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAB8915443B;
+	Mon, 22 Apr 2024 18:28:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713810089; cv=none; b=ur6AoeeyP5g4rqDs3Yy8wWE3TRJXuP5uaRA3gFn+B2vGEo4K89rqLMwL8rAyWBt2jxEg4eOyOUZz9hyrx/jIUoqQeFDlbquJv2m7E8f5M28Rjl6bOsODad+55UoXF0glCYab69AAslA1qu4IUzuFdHRrGcBjZMM0zu6FnyO51d8=
+	t=1713810481; cv=none; b=m4vxKD/Kc/FBc/p2soD70T6G5DcNGRWm83M6EFEi1jYkOjeUXQTHzGCok0TRIL0LDPAWhweMXnZhA19oEFCvCSkbujztsK+LKX+rKRwLEAg15LjUX9ODatRvwzDPtGjFG1NNjSBUP/9ypGPoHmmhvNz96Xa7P82jOfc7LN6qRaI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713810089; c=relaxed/simple;
-	bh=pxvs25+vP3QcPTv2/oPlNPm/ewBkHajTSWRX4YnZGDM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Kb49cQMvl8g8mx9GJYvxlCN5yOGB/9SKumV7Nn8lunbpDo3/0YO+v9gR7N7iRC3Ne2UWc4kc20eFsTgGvm4ckEkU0jj4EBCzoRSRaZACinz+IGnPYUUtr/QMw5TrdCPZKkyDItSdq1Za0/tW6ksF+sGQbsTIUV5AblsLKKQ7Mls=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=tjLyfdoY; arc=none smtp.client-ip=91.218.175.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <ce9252ef-21e2-4b09-9797-590f5eaa2869@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1713810085;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=lVWarZ3dFiQoDizzXByr5aA5jsGVjVJadznYtDZd72E=;
-	b=tjLyfdoYYh2vRSDrvdWtjyx8VrZihMFcFgZleOzJ2dJYOLDIOced4oW+Prgns0g/rsJBmW
-	kgYC4hfl1s6inC6mcM+T/mZmfLEziqjBGOiDvheqbIOKRK8uFCF1cI0ZUWndWeKUTJzAE9
-	TlC+dPVoscaghVhoJ1SUvx0/AtbBem4=
-Date: Mon, 22 Apr 2024 11:21:18 -0700
+	s=arc-20240116; t=1713810481; c=relaxed/simple;
+	bh=TebqyUasjtfC4W0N5+ZbzWhVoia1pG5BkHfAupOsIMM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZtqFaTqHUG6sF2RUgBVQsakPqocn1na2cBH3wOHru6BIAmtCkz8XE+iBoNAWquGseEV1aqu24jcZkH/8ThTot6RKQpVarW6+XbSIMAROm/ZVEL7RPp7iHYYz44J+Nz4tdSUrb4QgcJhTEHZUvzNLJp7uFFLoe+25QU38A+/E2iw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gp+3Dx2N; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A183AC113CC;
+	Mon, 22 Apr 2024 18:27:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713810481;
+	bh=TebqyUasjtfC4W0N5+ZbzWhVoia1pG5BkHfAupOsIMM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=gp+3Dx2NQ/u2cLRwU3jsX4GbyGO2CI1l9t1pqP4tI2gfFdzq36b1Fdu9aCag/Tqxd
+	 D1cYSLLCngdN0FwzDl55AKwIXyc3qcG2NdvSJjulpdnkZwYnUZwhkqwxZqPGS+QK82
+	 mlT7VhOkd5W6fJqC+h4Azxb3Jn11Gayq8ymScsf2Vg8L6dP/Yj+1gzHwm41KcCl5Hm
+	 Wjfrg27YF0PTu3OlYIWnFvD5aB7YqCK108NX1D0eNu/Ku10gmXoRawokW2rGnbEB1Z
+	 q5UicrQAMaqk838nIrt1hsEfMv7jLMTx09C3MEHioC5A2xboKD8tJr0jBombWuklga
+	 x/IWnw8rHRcPw==
+Date: Mon, 22 Apr 2024 19:27:55 +0100
+From: Simon Horman <horms@kernel.org>
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: edumazet@google.com, dsahern@kernel.org, matttbe@kernel.org,
+	martineau@kernel.org, geliang@kernel.org, kuba@kernel.org,
+	pabeni@redhat.com, davem@davemloft.net, rostedt@goodmis.org,
+	mhiramat@kernel.org, mathieu.desnoyers@efficios.com,
+	atenart@kernel.org, mptcp@lists.linux.dev, netdev@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org,
+	Jason Xing <kernelxing@tencent.com>
+Subject: Re: [PATCH net-next v7 1/7] net: introduce rstreason to detect why
+ the RST is sent
+Message-ID: <20240422182755.GD42092@kernel.org>
+References: <20240422030109.12891-1-kerneljasonxing@gmail.com>
+ <20240422030109.12891-2-kerneljasonxing@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf] xdp: use flags field to disambiguate broadcast
- redirect
-To: =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-Cc: syzbot+af9492708df9797198d6@syzkaller.appspotmail.com,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>,
- Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Jakub Kicinski <kuba@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>,
- Hangbin Liu <liuhangbin@gmail.com>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, bpf@vger.kernel.org, netdev@vger.kernel.org
-References: <20240418071840.156411-1-toke@redhat.com>
- <d7938afa-fb2f-4872-b449-6ecaf5e29360@linux.dev> <878r18tjr2.fsf@toke.dk>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <878r18tjr2.fsf@toke.dk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240422030109.12891-2-kerneljasonxing@gmail.com>
 
-On 4/20/24 3:24 AM, Toke Høiland-Jørgensen wrote:
->>   From reading the "waits for...NAPI being the relevant context here..." comment
->> in dev_map_free(), I wonder if moving synchronize_rcu() before
->> bpf_clear_redirect_map() would also work? Actually, does it need to call
->> bpf_clear_redirect_map(). The on-going xdp_do_redirect() should be the last one
->> using the map in ri->map anyway and no xdp prog can set it again to
->>   ri->map.
-> I think we do need to retain the current behaviour, because of the
-> decoupling between the helper and the return code. Otherwise, you could
+On Mon, Apr 22, 2024 at 11:01:03AM +0800, Jason Xing wrote:
 
-Forgot there could be a disconnect here.
+...
 
-Applied. Thanks.
+> diff --git a/include/net/rstreason.h b/include/net/rstreason.h
 
-> have a program that calls the bpf_redirect_map() helper, but returns a
-> different value (say, XDP_DROP). In this case, the map pointer will
-> stick around in struct bpf_redirect_info, and if a subsequent XDP
-> program then returns XDP_REDIRECT (*without*  calling
-> bpf_redirect_map()), it will use the stale pointer value and cause a
+...
 
+> +/**
+> + * There are three parts in order:
+> + * 1) reset reason in MPTCP: only for MPTCP use
+> + * 2) skb drop reason: relying on drop reasons for such as passive reset
+> + * 3) independent reset reason: such as active reset reasons
+> + */
+
+Hi Jason,
+
+A minor nit from my side.
+
+'/**' denotes the beginning of a Kernel doc,
+but other than that, this comment is not a Kernel doc.
+
+FWIIW, I would suggest providing a proper Kernel doc for enum sk_rst_reason.
+But another option would be to simply make this a normal comment,
+starting with "/* There are"
+
+> +enum sk_rst_reason {
+
+...
 
