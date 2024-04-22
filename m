@@ -1,114 +1,135 @@
-Return-Path: <netdev+bounces-90134-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90135-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F20C8ACD89
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 14:55:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA9C48ACDAD
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 15:02:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C16871C21C2C
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 12:55:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 527BE1F20F54
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 13:02:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5954153BD4;
-	Mon, 22 Apr 2024 12:51:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA47614A4C4;
+	Mon, 22 Apr 2024 13:02:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="i59he1T0"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="bfDaePoo"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEEDC14F13C;
-	Mon, 22 Apr 2024 12:51:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84A78746E
+	for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 13:02:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713790279; cv=none; b=j03HXtrrdJIZz8EjjZdZU793J4T+8T6DsoPXkPLdp68PJMGHwHMas0RIu9tqagn7bmYXDcmIaQ5X8upeAif+BXgbSAoWmjrgqEIWHuPrRe2D3oeiF49WurL+a9Nvrl2jYNr1A3dP6AkT6aaNP3KB5U9cq6AM1CeIKHOAA8ducPA=
+	t=1713790940; cv=none; b=c2TilLTHHyFmWmxU2tpZ+gwsCK3DevmqLldYATtc3oAVy3Q0tWH1uj3BzfbX3ViTNaBLE3CZ/fXOATo0V/OuK/bcuSlmXkghqgPvdpg5aI6IDwyZw2ICx5VH9PpbNQa0lfSXfaUWeJr+d8my4lIzEyxUF1STkMmHUvKaYOO3B6g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713790279; c=relaxed/simple;
-	bh=VrKavGaAza0SYYHTP4vDCQZC/hQ8AFa3VvI7kF71uqE=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=L8PHKrCSxomOWmgN5ytuimEQX60AKbDuOGXALTKxjll5jm5ro396HdHeNndyLSB0cplenxDXWLwck4vs57plU64a8Maw5TI2xuXUBUoT+yF1cwYwpZhmjq+CbMUV/jEAdHqonBBT+Rw3PuhM1j3NPOpGFzulU9RQDh5Dn2HKb+U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=i59he1T0; arc=none smtp.client-ip=217.70.183.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 99AD36000D;
-	Mon, 22 Apr 2024 12:51:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1713790276;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=HN6nZnig5iFISzyn77RTNiJeFQAc1efrKa9cbrzw86Y=;
-	b=i59he1T0nN1VQllDQ+6inR921WP53OTiIQMRSg5ajz0z5q1n9HkBDDHugm4qmUY0FkYL6T
-	gY7VCfi8MHR/6ReiM0SN7zXySAR5Ex82CvbxxmU0ut+OhDhFAlKvmrYafxdO3dsZ2dOxT0
-	mhgMRLQmapJU2OJ8B83kS8xUgGxHPfWa16WBZ9G2bwGrXjK8ktULU8W0av3F8R0CuI/qbq
-	dS/dffcprVdaiq5gAPOPzkkqkiJj73O0BvhX2RGyoNAPyAybbvThNJjmYQ3x8XmcRIhiOZ
-	4PZLQz3CSwjzHsI+FOHT898LFoiB/JBcPFsJ17gePx3tx7X8LcsMXXUrlmaSCg==
-From: "Kory Maincent (Dent Project)" <kory.maincent@bootlin.com>
-Date: Mon, 22 Apr 2024 14:50:50 +0200
-Subject: [PATCH net-next 3/3] net: pse-pd: Kconfig: Add missing Regulator
- API dependency
+	s=arc-20240116; t=1713790940; c=relaxed/simple;
+	bh=HiztFdgqaV8KD4r9t+kYvJXPXgbRU5w9CQbYk3ihQqA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JREqXoho0hQIQNqFJfNxnkuM1KyG2VsZ1nPFnwG9iNlphxwZwbPdpKBwn08I2SWq01oL/Bm38aHXJsynYj/apM8nKS9zynbgJyb/SNI0hqPtiHlFXSHbGqCsnYWgbTJcAiFUJABtK5dv5j7FTGIX3eWHzmihm4uvNOcpuCjqZGI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=bfDaePoo; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-41a0979b9aeso10848645e9.3
+        for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 06:02:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1713790932; x=1714395732; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=qm99+1pJ8lbqw/SE/f1RwUN3qOZS7r1xsqomwM1clCE=;
+        b=bfDaePoo7hOaamusFoD0TN/JyQq6eTgAvC04Bo6r/GqCvOAqj1LPjQa610Uvy5aLCh
+         CF6bMCh0bxeRQYdgKZxOcDzUTELL2LK/1jHEvX87JxwGLsOREcnBaPPcV+rcMyu8gUcw
+         e8m3S65rYkjDfI3mg9shKYIZaID+KCw+s3M4XH+a5tTrWk2KNSporOvmfNDrRMjO5lvw
+         FmO51Wrc2UcEAJvaPshjOC6/pmRtzRAy0RynuSwxZi6UM+laBbu1iNWdQ4O6I7C2QPoo
+         A7dH3mLqil7nclbC2xCKlvuFHobCCPwZx1xaM6nqtL1zLc8IwZEzkVwcOP4iXEkfBPVh
+         DQNw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713790932; x=1714395732;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qm99+1pJ8lbqw/SE/f1RwUN3qOZS7r1xsqomwM1clCE=;
+        b=luY6TajELn/Q9lyjsGHIrleGNZUCA9w9+Rhl71LfLyd9dl1kPVjAmzmNuBGPUL2/w5
+         8BoegRe+2lBBNnFgZbfVDnKosik7YXwbNir5I8rXPd0/dBAOLCTWY/eCWSCpIXPenqnN
+         Lc2VWIImpyRNi0F87tq4Xe8KuDNjFXU9KFsb4r78BKKuayVKXSljI8Lnd3i70BICft44
+         el+4xnmT8O2sIApt70PTRracKPwcwTjdEVDauaswGYhBawJGNmSPtM1DW/FQ4RkVzXuT
+         0hy04J9mHccCCZGeLGzHj+tbXjliHRWjLU9qhp31vczGAhl8Dte5TP3h4WlO/xXEL8sZ
+         Gnmw==
+X-Forwarded-Encrypted: i=1; AJvYcCXTUzrCPmrIuhYJg2tRX59ADbMJP0ZgLSgNlWUToZ7EPlwKAOpa0V1HUqMFMq/gzvN1iV8l9Ue69LuM7Ixsuyitr/lDSgBa
+X-Gm-Message-State: AOJu0YxAbUKvJeJJuQhvX4ouTfHlaFC2BPCIaJ8KzT+mH4ht8UUK2IV+
+	37fDcuNNy9FptakECpx7ZXEV/EmSDHvwSiYf1yh6xJmQiB0bMNH/6BzArPsgkus=
+X-Google-Smtp-Source: AGHT+IG3NklYHUNy3UDg5EkitlWCH3cW4NlqKxBNkiYa584fYnuPfopZscWVPOTdu1h6QogJnanWFA==
+X-Received: by 2002:a05:600c:46c8:b0:414:d95:cc47 with SMTP id q8-20020a05600c46c800b004140d95cc47mr9577310wmo.30.1713790932386;
+        Mon, 22 Apr 2024 06:02:12 -0700 (PDT)
+Received: from localhost (78-80-105-131.customers.tmcz.cz. [78.80.105.131])
+        by smtp.gmail.com with ESMTPSA id bg5-20020a05600c3c8500b00419f419236fsm8281965wmb.41.2024.04.22.06.02.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Apr 2024 06:02:11 -0700 (PDT)
+Date: Mon, 22 Apr 2024 15:02:10 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	jacob.e.keller@intel.com, michal.kubiak@intel.com,
+	maciej.fijalkowski@intel.com, sridhar.samudrala@intel.com,
+	przemyslaw.kitszel@intel.com, wojciech.drewek@intel.com,
+	pio.raczynski@gmail.com, jiri@nvidia.com,
+	mateusz.polchlopek@intel.com, shayd@nvidia.com
+Subject: Re: [iwl-next v1 0/4] ice: prepare representor for SF support
+Message-ID: <ZiZf0k-38srn486H@nanopsycho>
+References: <20240419171336.11617-1-michal.swiatkowski@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240422-fix_poe-v1-3-811c8c0b9da7@bootlin.com>
-References: <20240422-fix_poe-v1-0-811c8c0b9da7@bootlin.com>
-In-Reply-To: <20240422-fix_poe-v1-0-811c8c0b9da7@bootlin.com>
-To: Oleksij Rempel <o.rempel@pengutronix.de>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Andrew Lunn <andrew@lunn.ch>
-Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Kyle Swenson <kyle.swenson@est.tech>, 
- "Kory Maincent (Dent Project)" <kory.maincent@bootlin.com>, 
- kernel test robot <lkp@intel.com>
-X-Mailer: b4 0.14-dev
-X-GND-Sasl: kory.maincent@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240419171336.11617-1-michal.swiatkowski@linux.intel.com>
 
-From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
+Fri, Apr 19, 2024 at 07:13:32PM CEST, michal.swiatkowski@linux.intel.com wrote:
+>Hi,
+>
+>This is a series to prepare port representor for supporting also
+>subfunctions. We need correct devlink locking and the possibility to
+>update parent VSI after port representor is created.
+>
+>Refactor how devlink lock is taken to suite the subfunction use case.
+>
+>VSI configuration needs to be done after port representor is created.
+>Port representor needs only allocated VSI. It doesn't need to be
+>configured before.
+>
+>VSI needs to be reconfigured when update function is called.
+>
+>The code for this patchset was split from (too big) patchset [1].
+>
+>[1] https://lore.kernel.org/netdev/20240213072724.77275-1-michal.swiatkowski@linux.intel.com/
+>
+>Michal Swiatkowski (4):
+>  ice: store representor ID in bridge port
+>  ice: move devlink locking outside the port creation
+>  ice: move VSI configuration outside repr setup
+>  ice: update representor when VSI is ready
 
-The PSE (Power Sourcing Equipment) API now relies on the Regulator API.
-However, the Regulator dependency was missing from Kconfig. This patch
-adds the necessary dependency, resolving the issue of the missing
-dependency and ensuring proper functionality of the PSE API.
+FWIW, looks fine to me.
 
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/oe-kbuild-all/202404201020.mqX2IOu7-lkp@intel.com/
-Closes: https://lore.kernel.org/oe-kbuild-all/202404200036.D8ap1Mf5-lkp@intel.com/
-Fixes: d83e13761d5b ("net: pse-pd: Use regulator framework within PSE framework")
-Signed-off-by: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
----
- drivers/net/pse-pd/Kconfig | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/pse-pd/Kconfig b/drivers/net/pse-pd/Kconfig
-index 80cf373a5a0e..577ea904b3d9 100644
---- a/drivers/net/pse-pd/Kconfig
-+++ b/drivers/net/pse-pd/Kconfig
-@@ -5,6 +5,7 @@
- 
- menuconfig PSE_CONTROLLER
- 	bool "Ethernet Power Sourcing Equipment Support"
-+	depends on REGULATOR
- 	help
- 	  Generic Power Sourcing Equipment Controller support.
- 
-@@ -14,7 +15,6 @@ if PSE_CONTROLLER
- 
- config PSE_REGULATOR
- 	tristate "Regulator based PSE controller"
--	depends on REGULATOR || COMPILE_TEST
- 	help
- 	  This module provides support for simple regulator based Ethernet Power
- 	  Sourcing Equipment without automatic classification support. For
-
--- 
-2.34.1
-
+>
+> .../net/ethernet/intel/ice/devlink/devlink.c  |  2 -
+> .../ethernet/intel/ice/devlink/devlink_port.c |  4 +-
+> drivers/net/ethernet/intel/ice/ice_eswitch.c  | 83 +++++++++++++------
+> drivers/net/ethernet/intel/ice/ice_eswitch.h  | 14 +++-
+> .../net/ethernet/intel/ice/ice_eswitch_br.c   |  4 +-
+> .../net/ethernet/intel/ice/ice_eswitch_br.h   |  1 +
+> drivers/net/ethernet/intel/ice/ice_repr.c     | 16 ++--
+> drivers/net/ethernet/intel/ice/ice_repr.h     |  1 +
+> drivers/net/ethernet/intel/ice/ice_vf_lib.c   |  2 +-
+> 9 files changed, 88 insertions(+), 39 deletions(-)
+>
+>-- 
+>2.42.0
+>
+>
 
