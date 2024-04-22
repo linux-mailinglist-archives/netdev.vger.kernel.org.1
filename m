@@ -1,77 +1,102 @@
-Return-Path: <netdev+bounces-90276-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90279-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4EDBA8AD675
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 23:18:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0902D8AD68D
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 23:30:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8A7881C210F2
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 21:18:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 208AB1C21828
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 21:30:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F76C1CA8A;
-	Mon, 22 Apr 2024 21:18:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF9AF1CD20;
+	Mon, 22 Apr 2024 21:30:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eITaOV40"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Tm1b9YqI"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4936E18AED;
-	Mon, 22 Apr 2024 21:18:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 961591CAB9;
+	Mon, 22 Apr 2024 21:30:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713820727; cv=none; b=r3RM7NhX1MalWv5Iehl/+P6PVbFAmzTsLcejBg4EkWmp96yKIRashDgA/vyjf7+rvf3OcU7KOKstWJUtesrZCf0t4k+i8cKS7Y5LadtafQGkOF68fmcTEYQ1GcPIU9oMQHHJYueJ5nZUOhliHU4H4Hw6igLUkt615mGx6TVwhEI=
+	t=1713821429; cv=none; b=Q7bRPxh8yEwYIVECJ13bnQDMFS4cs5PvEnpJF+lv/AZ0N1hAZcaLgElxx9/VEDqPa688HhytXq7PesZL2fnR4+HSMpI40eJ+2QxPdZMswfgqpKzezGU2c+MnFGvWqM1Du0XNREiBvSo8nezqP7mVwNK7C46x9o7b0U6oK5hd3a0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713820727; c=relaxed/simple;
-	bh=Z5BqwV8ZIk41Y+uHxvy26VgiNZxO6gbGO5GOBT3uXTY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=aML5Yk1F6aWz52eJhHK1xfat4z2zl2l8b0b1YR9LV069yGHZMo73sW1dOpIAgH5MZ9KvCS1qhVO3EMRTuDD/rZrxW8r8wukn6T/1M3ZGlR2L3j5kWjUY+BxVR+JbXLcRD8SFsMpK+7fNhbz8PQVpVx+U9uKMx6XntjTyAEw0lbA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eITaOV40; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F548C113CC;
-	Mon, 22 Apr 2024 21:18:46 +0000 (UTC)
+	s=arc-20240116; t=1713821429; c=relaxed/simple;
+	bh=+MWDh4eam1mec7YkpjYmojj0wm6twFqAbTY7wxEKGxg=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=EMxK2clQ7f3ZsfDDuDPZKD2oliKh3C77GrYr95VaV9+G5Codb1WwpJALFjm9tumyYcDSqOIdQL9imZ2sApoV234truk78Yijzl65siWisZSxhSetJFimTiC5zFKgL012TUB8R2dzgolLUnEoD3Cr84SDHNAT6yxAb6VRPl5hdI8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Tm1b9YqI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 30031C2BD11;
+	Mon, 22 Apr 2024 21:30:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713820726;
-	bh=Z5BqwV8ZIk41Y+uHxvy26VgiNZxO6gbGO5GOBT3uXTY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=eITaOV40DGC5NxR4Bjq6ZcPh5jJqE4+18KcTMDfji+g+f2epu5eve2OYRCfrSCJjV
-	 1L2vvNJe1N6Z5XcXmYF633k9GMRs5Pw2tjKr+vd141bzEUIkvSOglttIYdpndpwyT4
-	 KEHbOorKU87S9XEg8WiDHLeQTUIDTrTRgCi2INe0tFkWWNLLrbv9RXWiCsvKX6ivOA
-	 1aCbH0gm37+SCG9/0VFLzqdZCye+yDZdGpqyFI6X0JG/4EH7yyS38AdXiXRyElh3Yd
-	 2i+siD+3heC4luIV+UNcI6ockeFuHWi4OfqPekRfruAiPuOsuZfGKMkJXmxZV69VCL
-	 x9+mRkGRw3iEQ==
-Date: Mon, 22 Apr 2024 14:18:45 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Sai Krishna <saikrishnag@marvell.com>
-Cc: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
- <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
- <sgoutham@marvell.com>, <gakula@marvell.com>, <hkelam@marvell.com>,
- <sbhatta@marvell.com>
-Subject: Re: [net-next PATCH v2] octeontx2-pf: Add ucast filter count
- configurability via devlink.
-Message-ID: <20240422141845.108b9c87@kernel.org>
-In-Reply-To: <20240418190031.1115865-1-saikrishnag@marvell.com>
-References: <20240418190031.1115865-1-saikrishnag@marvell.com>
+	s=k20201202; t=1713821429;
+	bh=+MWDh4eam1mec7YkpjYmojj0wm6twFqAbTY7wxEKGxg=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Tm1b9YqI/m5bnQY6lWhSzYJqnahgKyXaRTYJAdahs40lAMMcmZhgH775gKe+DIguq
+	 Go2jiXbEF0DkDQvOq2qRaMORMMN9XjNw628K02fygYwi3e8gXMyT0Bw6/WfWoAEjpJ
+	 UbyL50WZBtmqCr2Hoc3cYEEQn5AzaR+7qlcIosuPstYVvkl17sLxD5pDoUcUZ3+SeS
+	 ud5KhudroduD/fuzsDJxOgfxxUa0ECrfoCMA9MxR3J2a5gJkJK+MJbIXxpPunbbMWB
+	 oYoL1tgszcTV+se6YkvV/SaDch6DtaEdtNT4XCn3CYbnZGA0Tv++aKAyTsJ4Rf1Z9P
+	 bVIRODx5CrgvQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 1319CC43443;
+	Mon, 22 Apr 2024 21:30:29 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v2 0/5] net: dsa: vsc73xx: convert to PHYLINK and do
+ some cleanup
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171382142907.1995.10883580544289239545.git-patchwork-notify@kernel.org>
+Date: Mon, 22 Apr 2024 21:30:29 +0000
+References: <20240417205048.3542839-1-paweldembicki@gmail.com>
+In-Reply-To: <20240417205048.3542839-1-paweldembicki@gmail.com>
+To: Pawel Dembicki <paweldembicki@gmail.com>
+Cc: netdev@vger.kernel.org, andrew@lunn.ch, f.fainelli@gmail.com,
+ olteanv@gmail.com, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, linux@armlinux.org.uk, linux-kernel@vger.kernel.org
 
-On Fri, 19 Apr 2024 00:30:31 +0530 Sai Krishna wrote:
-> +	DEVLINK_PARAM_DRIVER(OTX2_DEVLINK_PARAM_ID_UCAST_FLT_CNT,
-> +			     "unicast_filter_count", DEVLINK_PARAM_TYPE_U8,
-> +			     BIT(DEVLINK_PARAM_CMODE_RUNTIME),
-> +			     otx2_dl_ucast_flt_cnt_get, otx2_dl_ucast_flt_cnt_set,
-> +			     otx2_dl_ucast_flt_cnt_validate),
+Hello:
 
-All devlink params must be documented (Documentation/networking/devlink)
-including the explanation of the tradeoffs involved in changing the
-setting.
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Wed, 17 Apr 2024 22:50:43 +0200 you wrote:
+> This patch series is a result of splitting a larger patch series [0],
+> where some parts needed to be refactored.
+> 
+> The first patch switches from a poll loop to read_poll_timeout.
+> 
+> The second patch is a simple conversion to phylink because adjust_link
+> won't work anymore.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,v2,1/5] net: dsa: vsc73xx: use read_poll_timeout instead delay loop
+    https://git.kernel.org/netdev/net-next/c/eb7e33d01db3
+  - [net-next,v2,2/5] net: dsa: vsc73xx: convert to PHYLINK
+    https://git.kernel.org/netdev/net-next/c/21fc3416ea11
+  - [net-next,v2,3/5] net: dsa: vsc73xx: use macros for rgmii recognition
+    https://git.kernel.org/netdev/net-next/c/12af94b2955f
+  - [net-next,v2,4/5] net: dsa: vsc73xx: Add define for max num of ports
+    https://git.kernel.org/netdev/net-next/c/6cc5280a0889
+  - [net-next,v2,5/5] net: dsa: vsc73xx: add structure descriptions
+    https://git.kernel.org/netdev/net-next/c/96944aafaaa6
+
+You are awesome, thank you!
 -- 
-pw-bot: cr
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
