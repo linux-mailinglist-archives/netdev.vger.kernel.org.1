@@ -1,154 +1,124 @@
-Return-Path: <netdev+bounces-89980-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89979-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2CB58AC6F6
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 10:27:20 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 267F08AC6F1
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 10:27:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D8D8281BCD
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 08:27:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C777C1F20CA5
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 08:27:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 638A4524A0;
-	Mon, 22 Apr 2024 08:26:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D699E50297;
+	Mon, 22 Apr 2024 08:26:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ssi.bg header.i=@ssi.bg header.b="c/S7mFL+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G/liFmLi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mg.ssi.bg (mg.ssi.bg [193.238.174.37])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB06551C33;
-	Mon, 22 Apr 2024 08:26:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.238.174.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A467651C46;
+	Mon, 22 Apr 2024 08:26:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713774412; cv=none; b=GCdkDiSm8XuhD/GYzPOAaIsqLb/eOFqq28VbL2kqsGHra58nN5hi8Lvky9h1NP7OMUqcGoGpn0aiZfdcrzEKcxHyojwrBRGdlunCOf8pGdrpfXNkHWKFsItAdlR31apcqW0zWmLkyKpxVF7MpToZggLQp8OXYXfg2VH2jQcNKsI=
+	t=1713774409; cv=none; b=U8GtCXvcLhrPakMdQQEWsTJafHwRHqBuqrFbHiuyfXydXOIjifpvGeAU26O++C9WXuBxiJRIC05BGrOeVVLIvTNORfbzknvdk9+nXnEcJK3hhqkIsGhdBUmfi1isD5rHtkjw/I1L6dwPqKAfizXzL+M3/rImrGH1n/VhsPKPBvM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713774412; c=relaxed/simple;
-	bh=y37r8XxZzttygEhBfvdyYxE8grygu1uvu5+ykK8tHnk=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=TlawR0eGuNwdfni3gn+tKAxFqgEq1/al0VyzGXOK7WV+vm7vRDweMD74Wudb5Kg4Zp4jXjzuiE7XMFEsXiA554Ucw1oW/TX0ST+2+4f+AmYHcXxCIteHDxoYBPIFF90ScD3cVb8ib7J7phehBUsIrs6FlSAGGyrEbjs1/YCVwlg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ssi.bg; spf=pass smtp.mailfrom=ssi.bg; dkim=pass (1024-bit key) header.d=ssi.bg header.i=@ssi.bg header.b=c/S7mFL+; arc=none smtp.client-ip=193.238.174.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ssi.bg
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ssi.bg
-Received: from mg.ssi.bg (localhost [127.0.0.1])
-	by mg.ssi.bg (Proxmox) with ESMTP id DD2CA25ACE;
-	Mon, 22 Apr 2024 11:26:45 +0300 (EEST)
-Received: from ink.ssi.bg (ink.ssi.bg [193.238.174.40])
-	by mg.ssi.bg (Proxmox) with ESMTPS;
-	Mon, 22 Apr 2024 11:26:44 +0300 (EEST)
-Received: from ja.ssi.bg (unknown [213.16.62.126])
-	by ink.ssi.bg (Postfix) with ESMTPSA id A1D67900394;
-	Mon, 22 Apr 2024 11:26:40 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=ssi.bg; s=ink;
-	t=1713774401; bh=y37r8XxZzttygEhBfvdyYxE8grygu1uvu5+ykK8tHnk=;
-	h=Date:From:To:cc:Subject:In-Reply-To:References;
-	b=c/S7mFL+JgNg1gjRTl5ehh6B7tYlTW1idzbuAX5bHSOOp9T4lyqUerFVOz4fVjNX3
-	 2iwfZDd8prnAKZ+lswrjbDUmbtFoS1c1dB4/c+nQvnHtpb9p8CdQlaeOR6yslo1IAK
-	 niJDzGzR8lbSfTQTbkUgNicTfqKQv903EsPUfSe4=
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by ja.ssi.bg (8.17.1/8.17.1) with ESMTP id 43M8QctX040757;
-	Mon, 22 Apr 2024 11:26:39 +0300
-Date: Mon, 22 Apr 2024 11:26:38 +0300 (EEST)
-From: Julian Anastasov <ja@ssi.bg>
-To: Ismael Luceno <iluceno@suse.de>
-cc: linux-kernel@vger.kernel.org, Firo Yang <firo.yang@suse.com>,
-        Andreas Taschner <andreas.taschner@suse.com>,
-        =?UTF-8?Q?Michal_Kube=C4=8Dek?= <mkubecek@suse.com>,
-        Simon Horman <horms@verge.net.au>, lvs-devel@vger.kernel.org,
-        netfilter-devel@vger.kernel.org, netdev@vger.kernel.org,
-        coreteam@netfilter.org
-Subject: Re: [PATCH v2] ipvs: Fix checksumming on GSO of SCTP packets
-In-Reply-To: <20240421142234.15764-1-iluceno@suse.de>
-Message-ID: <5a1b5536-a8ba-4438-9ed2-23819f1846a6@ssi.bg>
-References: <20240421142234.15764-1-iluceno@suse.de>
+	s=arc-20240116; t=1713774409; c=relaxed/simple;
+	bh=DqdqDFnZ+YUvebT1NAXo2ShsLjrf3XUSBWmbdnKI6HU=;
+	h=Date:Content-Type:MIME-Version:From:To:Cc:In-Reply-To:References:
+	 Message-Id:Subject; b=kvl56KNdxwD+v9WhNHQAgRhjw4rbDXHcqmB7FgpMlMlFu9yT2TOwpdiWgS+7uMGXGMTHwsD1GEwIl8Pb1U3+XF03Tp7bcv3t+JWrd6uSOOk8H8x6oaG+MSUxRpNt7c5XmhtUhTKmLFDWw8zt8co8Iw18Thfx2069tsMuo39iMPk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G/liFmLi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B0ABC113CC;
+	Mon, 22 Apr 2024 08:26:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713774409;
+	bh=DqdqDFnZ+YUvebT1NAXo2ShsLjrf3XUSBWmbdnKI6HU=;
+	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
+	b=G/liFmLilfjZ4Kj7Wt6Z0/xwSTwm2ArRgNWKX4SxDyvFYPIVG24dXQS/1bvlOsEER
+	 qC+o3FLrUReL6eFdAUf0V+kdrSwbou1U9WWrfMRG0Y2j3+/sTS8QtLtDE2Mu84QyFX
+	 9wVhclxgKv3im2Vr9l30p0SE9FKVfyUBrqw/QmcLIuv2QDKq62QvC3UA8483h6+Utv
+	 thqfRKH3PP8ZPfLDsty4JSq9h2WyQzG99bOHggcJQRHfRD+5VZlxDE408FNsJAd9tI
+	 H9QcePwBKNtZtDONjDhryImErCE4LnREClbrvS6z9EaUXHd5jgYBwlVsa8IszblwB8
+	 /3+rPX0kxgpFQ==
+Date: Mon, 22 Apr 2024 03:26:48 -0500
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="-1463811672-2077803110-1713774400=:25471"
+From: Rob Herring <robh@kernel.org>
+To: Christoph Fritz <christoph.fritz@hexdev.de>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+ linux-input@vger.kernel.org, linux-serial@vger.kernel.org, 
+ Oliver Hartkopp <socketcan@hartkopp.net>, netdev@vger.kernel.org, 
+ "David S . Miller" <davem@davemloft.net>, 
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Benjamin Tissoires <bentiss@kernel.org>, linux-can@vger.kernel.org, 
+ Marc Kleine-Budde <mkl@pengutronix.de>, Jakub Kicinski <kuba@kernel.org>, 
+ Jiri Slaby <jirislaby@kernel.org>, Jiri Kosina <jikos@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, Eric Dumazet <edumazet@google.com>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
+ Jonathan Corbet <corbet@lwn.net>, devicetree@vger.kernel.org, 
+ Andreas Lauser <andreas.lauser@mercedes-benz.com>
+In-Reply-To: <20240422065114.3185505-6-christoph.fritz@hexdev.de>
+References: <20240422065114.3185505-1-christoph.fritz@hexdev.de>
+ <20240422065114.3185505-6-christoph.fritz@hexdev.de>
+Message-Id: <171377440691.455449.12311389300613565393.robh@kernel.org>
+Subject: Re: [PATCH 05/11] dt-bindings: net: can: Add serdev LIN bus dt
+ bindings
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
 
----1463811672-2077803110-1713774400=:25471
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
-
-
-	Hello,
-
-On Sun, 21 Apr 2024, Ismael Luceno wrote:
-
-> It was observed in the wild that pairs of consecutive packets would leave
-> the IPVS with the same wrong checksum, and the issue only went away when
-> disabling GSO.
+On Mon, 22 Apr 2024 08:51:08 +0200, Christoph Fritz wrote:
+> Add documentation of device tree bindings for serdev UART LIN-Bus
+> devices equipped with LIN transceivers.
 > 
-> IPVS needs to avoid computing the SCTP checksum when using GSO.
-> 
-> Fixes: 90017accff61 ("sctp: Add GSO support", 2016-06-02)
-> Co-developed-by: Firo Yang <firo.yang@suse.com>
-> Signed-off-by: Ismael Luceno <iluceno@suse.de>
-> Tested-by: Andreas Taschner <andreas.taschner@suse.com>
-> CC: Michal Kubeček <mkubecek@suse.com>
-> CC: Simon Horman <horms@verge.net.au>
-> CC: Julian Anastasov <ja@ssi.bg>
-> CC: lvs-devel@vger.kernel.org
-> CC: netfilter-devel@vger.kernel.org
-> CC: netdev@vger.kernel.org
-> CC: coreteam@netfilter.org
-
-	Looks good to me, thanks!
-
-Acked-by: Julian Anastasov <ja@ssi.bg>
-
-	As scripts/checkpatch.pl --strict /tmp/file.patch complains
-about Co-developed-by and Signed-off-by lines you may want to
-send v3...
-
+> Signed-off-by: Christoph Fritz <christoph.fritz@hexdev.de>
 > ---
+>  .../bindings/net/can/linux,lin-serdev.yaml    | 29 +++++++++++++++++++
+>  1 file changed, 29 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/net/can/linux,lin-serdev.yaml
 > 
-> Notes:
->     Changes since v1:
->     * Added skb_is_gso before skb_is_gso_sctp.
->     * Added "Fixes" tag.
-> 
->  net/netfilter/ipvs/ip_vs_proto_sctp.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
-> 
-> diff --git a/net/netfilter/ipvs/ip_vs_proto_sctp.c b/net/netfilter/ipvs/ip_vs_proto_sctp.c
-> index a0921adc31a9..1e689c714127 100644
-> --- a/net/netfilter/ipvs/ip_vs_proto_sctp.c
-> +++ b/net/netfilter/ipvs/ip_vs_proto_sctp.c
-> @@ -126,7 +126,8 @@ sctp_snat_handler(struct sk_buff *skb, struct ip_vs_protocol *pp,
->  	if (sctph->source != cp->vport || payload_csum ||
->  	    skb->ip_summed == CHECKSUM_PARTIAL) {
->  		sctph->source = cp->vport;
-> -		sctp_nat_csum(skb, sctph, sctphoff);
-> +		if (!skb_is_gso(skb) || !skb_is_gso_sctp(skb))
-> +			sctp_nat_csum(skb, sctph, sctphoff);
->  	} else {
->  		skb->ip_summed = CHECKSUM_UNNECESSARY;
->  	}
-> @@ -174,7 +175,8 @@ sctp_dnat_handler(struct sk_buff *skb, struct ip_vs_protocol *pp,
->  	    (skb->ip_summed == CHECKSUM_PARTIAL &&
->  	     !(skb_dst(skb)->dev->features & NETIF_F_SCTP_CRC))) {
->  		sctph->dest = cp->dport;
-> -		sctp_nat_csum(skb, sctph, sctphoff);
-> +		if (!skb_is_gso(skb) || !skb_is_gso_sctp(skb))
-> +			sctp_nat_csum(skb, sctph, sctphoff);
->  	} else if (skb->ip_summed != CHECKSUM_PARTIAL) {
->  		skb->ip_summed = CHECKSUM_UNNECESSARY;
->  	}
-> -- 
-> 2.43.0
 
-Regards
+My bot found errors running 'make dt_binding_check' on your patch:
 
---
-Julian Anastasov <ja@ssi.bg>
----1463811672-2077803110-1713774400=:25471--
+yamllint warnings/errors:
+
+dtschema/dtc warnings/errors:
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/can/linux,lin-serdev.yaml: 'maintainers' is a required property
+	hint: Metaschema for devicetree binding documentation
+	from schema $id: http://devicetree.org/meta-schemas/base.yaml#
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/can/linux,lin-serdev.yaml: 'oneOf' conditional failed, one must be fixed:
+	'unevaluatedProperties' is a required property
+	'additionalProperties' is a required property
+	hint: Either unevaluatedProperties or additionalProperties must be present
+	from schema $id: http://devicetree.org/meta-schemas/core.yaml#
+Error: Documentation/devicetree/bindings/net/can/linux,lin-serdev.example.dts:18.9-15 syntax error
+FATAL ERROR: Unable to parse input tree
+make[2]: *** [scripts/Makefile.lib:427: Documentation/devicetree/bindings/net/can/linux,lin-serdev.example.dtb] Error 1
+make[2]: *** Waiting for unfinished jobs....
+make[1]: *** [/builds/robherring/dt-review-ci/linux/Makefile:1430: dt_binding_check] Error 2
+make: *** [Makefile:240: __sub-make] Error 2
+
+doc reference errors (make refcheckdocs):
+
+See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20240422065114.3185505-6-christoph.fritz@hexdev.de
+
+The base for the series is generally the latest rc1. A different dependency
+should be noted in *this* patch.
+
+If you already ran 'make dt_binding_check' and didn't see the above
+error(s), then make sure 'yamllint' is installed and dt-schema is up to
+date:
+
+pip3 install dtschema --upgrade
+
+Please check and re-submit after running the above command yourself. Note
+that DT_SCHEMA_FILES can be set to your schema file to speed up checking
+your schema. However, it must be unset to test all examples with your schema.
 
 
