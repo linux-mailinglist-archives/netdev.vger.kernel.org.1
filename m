@@ -1,136 +1,77 @@
-Return-Path: <netdev+bounces-90275-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90276-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBF278AD664
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 23:14:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4EDBA8AD675
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 23:18:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EE4091C20CC4
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 21:14:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8A7881C210F2
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 21:18:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCC3B1BF24;
-	Mon, 22 Apr 2024 21:14:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F76C1CA8A;
+	Mon, 22 Apr 2024 21:18:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="USQ/LheI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eITaOV40"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-176.mta0.migadu.com (out-176.mta0.migadu.com [91.218.175.176])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17BB51B800
-	for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 21:14:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4936E18AED;
+	Mon, 22 Apr 2024 21:18:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713820479; cv=none; b=bov0+le4Z3StefXw4cFgH+ob7CAckVuyjxoSRQMbWv/byeWOLi2r275DpyKoSVunYWBf1qBgoQlwAEEp0OueBbO2PwUMkW19CikWTWp5oi4IVDq4yH7al06EOkd5ky8t2DTDWQcSeMBViRHmww6JPByIKRQLl7FmNCROqAkkvw8=
+	t=1713820727; cv=none; b=r3RM7NhX1MalWv5Iehl/+P6PVbFAmzTsLcejBg4EkWmp96yKIRashDgA/vyjf7+rvf3OcU7KOKstWJUtesrZCf0t4k+i8cKS7Y5LadtafQGkOF68fmcTEYQ1GcPIU9oMQHHJYueJ5nZUOhliHU4H4Hw6igLUkt615mGx6TVwhEI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713820479; c=relaxed/simple;
-	bh=cRWZVwE66IktVunkaU/Js89Orpl0ItQMJLYsLnFC5EI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Qg/6T0dBMTREGKjxvoMDaDPyf2SQGR5U7ncwZpgft498GcMrV7CUK+p/LXIJ7ve23IIe3f9mr/M24g9VbOXBbZQoVMLKMJ+nQAM4sIzKdo+CB42HJNHsanh5BX4TOVrYQ7uyawbl5ipf3XqNHvRaQPLtQLdA0dyjKBS8HNW6n40=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=USQ/LheI; arc=none smtp.client-ip=91.218.175.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <8c9e51b2-5401-4d58-a319-ed620fadcc63@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1713820476;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=id/YHTuxfiovFyVUV8xQXCNmiVtMWYMuhwFovv6HFqU=;
-	b=USQ/LheIMQi2h389U2fetydS4vuPWvPxQCTPTXCiOGyzPogVxgMEdizJ9hUrrDENIDnX/p
-	6QMONIa69osC/0d0S8Fwj3lpbSL/DrquhSwWkBoviUK0Ldoj9HRwgy2i5tIdxLHHRyupWx
-	efcpyH4+CJUr69ZPnKjRGIM55vFzhfo=
-Date: Mon, 22 Apr 2024 14:14:26 -0700
+	s=arc-20240116; t=1713820727; c=relaxed/simple;
+	bh=Z5BqwV8ZIk41Y+uHxvy26VgiNZxO6gbGO5GOBT3uXTY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=aML5Yk1F6aWz52eJhHK1xfat4z2zl2l8b0b1YR9LV069yGHZMo73sW1dOpIAgH5MZ9KvCS1qhVO3EMRTuDD/rZrxW8r8wukn6T/1M3ZGlR2L3j5kWjUY+BxVR+JbXLcRD8SFsMpK+7fNhbz8PQVpVx+U9uKMx6XntjTyAEw0lbA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eITaOV40; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F548C113CC;
+	Mon, 22 Apr 2024 21:18:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713820726;
+	bh=Z5BqwV8ZIk41Y+uHxvy26VgiNZxO6gbGO5GOBT3uXTY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=eITaOV40DGC5NxR4Bjq6ZcPh5jJqE4+18KcTMDfji+g+f2epu5eve2OYRCfrSCJjV
+	 1L2vvNJe1N6Z5XcXmYF633k9GMRs5Pw2tjKr+vd141bzEUIkvSOglttIYdpndpwyT4
+	 KEHbOorKU87S9XEg8WiDHLeQTUIDTrTRgCi2INe0tFkWWNLLrbv9RXWiCsvKX6ivOA
+	 1aCbH0gm37+SCG9/0VFLzqdZCye+yDZdGpqyFI6X0JG/4EH7yyS38AdXiXRyElh3Yd
+	 2i+siD+3heC4luIV+UNcI6ockeFuHWi4OfqPekRfruAiPuOsuZfGKMkJXmxZV69VCL
+	 x9+mRkGRw3iEQ==
+Date: Mon, 22 Apr 2024 14:18:45 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Sai Krishna <saikrishnag@marvell.com>
+Cc: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
+ <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+ <sgoutham@marvell.com>, <gakula@marvell.com>, <hkelam@marvell.com>,
+ <sbhatta@marvell.com>
+Subject: Re: [net-next PATCH v2] octeontx2-pf: Add ucast filter count
+ configurability via devlink.
+Message-ID: <20240422141845.108b9c87@kernel.org>
+In-Reply-To: <20240418190031.1115865-1-saikrishnag@marvell.com>
+References: <20240418190031.1115865-1-saikrishnag@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v2 bpf-next 4/6] selftests/bpf: Add IPv4 and IPv6 sockaddr
- test cases
-To: Jordan Rife <jrife@google.com>
-Cc: bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
- netdev@vger.kernel.org, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
- Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>,
- Shuah Khan <shuah@kernel.org>, Kui-Feng Lee <thinker.li@gmail.com>,
- Artem Savkov <asavkov@redhat.com>, Dave Marchevsky <davemarchevsky@fb.com>,
- Menglong Dong <imagedong@tencent.com>, Daniel Xu <dxu@dxuuu.xyz>,
- David Vernet <void@manifault.com>, Daan De Meyer <daan.j.demeyer@gmail.com>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-References: <20240412165230.2009746-1-jrife@google.com>
- <20240412165230.2009746-5-jrife@google.com>
- <3df13496-a644-4a3a-9f9b-96ccc070f2a3@linux.dev>
- <CADKFtnQDJbSFRS4oyEsn3ZBDAN7T6EvxXUNdrz1kU3Bnhzfgug@mail.gmail.com>
- <f164369a-2b6b-45e0-8e3e-aa0035038cb6@linux.dev>
- <CADKFtnQHy0MFeDNg6x2gzUJpuyaF6ELLyMg3tTxze3XV28qo7w@mail.gmail.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <CADKFtnQHy0MFeDNg6x2gzUJpuyaF6ELLyMg3tTxze3XV28qo7w@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
 
-On 4/18/24 9:37 AM, Jordan Rife wrote:
->> The test_sock_addr.{c,sh} can be retired as long as all its tests are migrated
->> to sock_addr.c
-> 
-> test_sock_addr.c has a few more test dimensions than
-> prog_tests/sock_addr.c currently does, so it covers a few more
-> scenarios.
-> 
-> struct sock_addr_test {
->      const char *descr;
->      /* BPF prog properties */
->      load_fn loadfn;
->      enum bpf_attach_type expected_attach_type;
->      enum bpf_attach_type attach_type;
->      /* Socket properties */
->      int domain;
->      int type;
->      /* IP:port pairs for BPF prog to override */
->      const char *requested_ip;
->      unsigned short requested_port;
->      const char *expected_ip;
->      unsigned short expected_port;
->      const char *expected_src_ip;
->      /* Expected test result */
->      enum {
->          LOAD_REJECT,
->          ATTACH_REJECT,
->          ATTACH_OKAY,
->          SYSCALL_EPERM,
->          SYSCALL_ENOTSUPP,
->          SUCCESS,
->      } expected_result;
-> };
-> 
-> We focus on the "happy path" scenarios currently in
-> prog_tests/sock_addr.c while test_sock_addr.c has test cases that
-> cover a range of scenarios where loading or attaching a BPF program
-> should fail. There are also a few asm tests that use program loader
-> functions like sendmsg4_rw_asm_prog_load which specifies a series of
-> BPF instructions directly rather than loading one of the skeletons.
-> Adding in these test dimensions and migrating the test cases is a
-> slightly bigger lift for this patch series. Do we want to try to
-> migrate all of these to prog_tests/sock_addr.c in order to fully
-> retire it?
+On Fri, 19 Apr 2024 00:30:31 +0530 Sai Krishna wrote:
+> +	DEVLINK_PARAM_DRIVER(OTX2_DEVLINK_PARAM_ID_UCAST_FLT_CNT,
+> +			     "unicast_filter_count", DEVLINK_PARAM_TYPE_U8,
+> +			     BIT(DEVLINK_PARAM_CMODE_RUNTIME),
+> +			     otx2_dl_ucast_flt_cnt_get, otx2_dl_ucast_flt_cnt_set,
+> +			     otx2_dl_ucast_flt_cnt_validate),
 
-I don't want to keep this set hostage too much until everything is migrated from 
-test_sock_addr.c. As long as for the tests you find useful in test_sock_addr.c 
-in this patch set and moved them to prog_tests/sock_addr.c, it is heading in the 
-right direction. For the moved test, please remove them from test_sock_addr.c so 
-that it is clear what else needs to be done.
-
-[ Side note for future migration attempt, at least for the LOAD_REJECT one, it 
-probably makes sense to write it like progs/verifier_*.c ]
-
+All devlink params must be documented (Documentation/networking/devlink)
+including the explanation of the tradeoffs involved in changing the
+setting.
+-- 
+pw-bot: cr
 
