@@ -1,171 +1,151 @@
-Return-Path: <netdev+bounces-90221-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90222-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 867608AD2CE
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 18:56:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17C608AD2E1
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 18:59:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AA1C91C20E45
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 16:56:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id ACA1E1F2170B
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 16:59:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86C05153824;
-	Mon, 22 Apr 2024 16:56:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 590F5154BF1;
+	Mon, 22 Apr 2024 16:58:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HuArZazZ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="w3gEzs5B"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
+Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F9A9152197;
-	Mon, 22 Apr 2024 16:56:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D3AA154440
+	for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 16:58:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713804986; cv=none; b=j14faVxe/edwTDqOKfR81noYWutEcBbq7yLUc9T7B7PxGKDRA4Fkdq02o+NwasKQmM1+JkBuGUKHAkbpVTz9S6RaYAvQUckGuBS64b7w1S2fnkxILoVLG1zEKNEeKCXpvT+EW5+6c+0sC30JcpRR1WdX5y5RrprirLYhq1xYocc=
+	t=1713805137; cv=none; b=E9ouBsIAeG1W4Q0c6VCqGpgf98gUAVG56Dz8LlOZGlCoNUPLi7t3KGYi6gCiF1eGkQkZuqRptZGeFjK8AfWz+pk3d5548tJ2CESo64IPccf2lxA5vxqrZkM/V060RtsSbMSvyReSkDBkXOXFxGRBQPP00KwRO830N7ko5ojHCy0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713804986; c=relaxed/simple;
-	bh=epyq96Q/BEQILWBmybkdBBkT6+BvOaud2QIeKDhtbak=;
-	h=Date:From:To:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=FrvKBLIi+EGzy0qF/P7tFOYpvlrG2QCgA5EEsJErej6d25lVGDxp0u9vUwz6F3MwdRPdAEhBqUiwGYdTnQM4wDO1e16+gfCCYauSyfx4866orUhmPyExUprq1HU7JExm+DM5CXrZ0eJBf6tg5WL+aZRH1OwnL4sCKe0r8vWwQvg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HuArZazZ; arc=none smtp.client-ip=209.85.222.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-790605809cbso210943785a.3;
-        Mon, 22 Apr 2024 09:56:24 -0700 (PDT)
+	s=arc-20240116; t=1713805137; c=relaxed/simple;
+	bh=42EMrMvFh2ZV66zX6eNpZFgHHLKM9doa/59H98DurJ4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=BHn44sWhuqrj6EOUjGlzR/G7iGwHjw0FK8g4dZ5QSHcTqzcGUemrKAZH/+/7wIWz3pZgBg6QCkaGfVF3EPa0i/vis5PPSBLyFjah9jvJcxUZrlGwaMEKAAWCzzW/v4s4vyBTlH05qSfQL65LfCS+XU2cmyl+q7rvp/l9yAJKlJ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=w3gEzs5B; arc=none smtp.client-ip=209.85.167.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-51ab4ee9df8so4399569e87.1
+        for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 09:58:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713804984; x=1714409784; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:to:from:date:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1713805133; x=1714409933; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=eYGnqB6cLZlaQwsHWZl+iTgeW0O4NVhhWrlNqA0+Fpc=;
-        b=HuArZazZyPisN75wzamw6TTgWdWe7ddW7rF6lDZuNHLKuhJSzlj0fsV7BlzzOWKWhJ
-         Eg45vk5i8BCUNmnOtIeGEniGtm1754xgD/Uapfo6D71pqOVzFKnvRR42RsxaoI5lr4d8
-         Zukb2TDYqXqKtQZuKRh5a18gzj5ga0GF1q3nq1v6QpKf+QuEP5mGweWn271XUG9mtr7y
-         f0ZEGbU3uGJ0GVzAtAlkuCZDLonux9pqtewR6gh4ioaRrdJkJ2w4C3vwSwEOc9Pi0X8N
-         NNZZhXZTNIVs3dg3nwNSnb0aCdE15HkfoJ3JNodYP8m49ghiZFTlJumMsIfrhjscFVkk
-         je0w==
+        bh=c/GHqxJH3jaz8y1htWNLtBU/umNHY1Pspc/g52t/wus=;
+        b=w3gEzs5BjHfChpSnzRlsFXINHL47QMoOWiFHY/fDGJCZZWAZCakeaHz+rDdGLkvval
+         WFs+v6Wk/DsgM8XgKovBQq+NxOnB0XOXi1DTilkoLZVDGTkIZRhi1zYe59scUJsNUNIi
+         s2RN51LhUPWUrO3mhD072LYXUL6XU677aQG4PoOatzQI1qkuoS9+K2lgo8G48yDHxSBN
+         ZIA7A5YIlfkAQealeIa+TufbkzoGC6l5c5kM9GqoMZIPDf/JrR0fCYTaVwVL67HdE4rj
+         5VVL8f+o2PmREwebpbJNhPFUJQqJhjMxNEwzJr5SdaUCOc9W0ul5wQil6MKFr8Ooz5Ma
+         cs1A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713804984; x=1714409784;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:to:from:date:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1713805133; x=1714409933;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=eYGnqB6cLZlaQwsHWZl+iTgeW0O4NVhhWrlNqA0+Fpc=;
-        b=OPgKa7xiNZIM6nEh2DPemkOZ30gqltPSiVYgJeFF0EoqVg79RQohrS5fVqnVugE5Ug
-         8hqaUehyjytAIEKP+eEoFsI/0u4Oc5cYX0sLgHV/AE6yArMHfLFM65dZLZpkcqIuEkhW
-         no8HWL1bZHOXKGA8rkrFqcUESj59c7ygbqgM9kCsL8QOPDRJmu8vQMPvhh6AoA+NaBVD
-         YOS2QugEjc+/kcCikYKA7CdbItKBBMGSFgxII+lxawqGeq7BDgCO6+WpH+NcwIoQpZBU
-         I/bQL1LroFvG6QGFydUaUP+NeU8WsTgPlJzonmEkOqgZYHRiGRu9/DPTxkoQN+BGVYdQ
-         ZbSQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWO7zTkllMyVI0HhqosAwt9WHgaPyzXMyq/Fs0D49mbyOzhPI7yP6MhsZOCOqo/vXz/uO1xu+uH1bcNl4Jtzf85E7TOl/r8qs7JrmtjbPcknprsao3K+J3fxMGOzX6vwpbLS8Nf
-X-Gm-Message-State: AOJu0Yw2RX8n4LoKFQi0jRL4aMKWRT0y+vm61paCyB00r2lUzJlo92tM
-	98Z8r3dg3xX29d/HomYm+/mJIL8rfh97q3/w51fxd2cy5brhiRe8txcR+3lZ
-X-Google-Smtp-Source: AGHT+IHHhEKyCvaDtIqtpp9aqlubXMkT2nu6x0/tEHLDk0WG4A9N5hQwNDzjDYpkWuIxUOPphCw0dQ==
-X-Received: by 2002:ad4:4485:0:b0:6a0:412f:8496 with SMTP id m5-20020ad44485000000b006a0412f8496mr11314151qvt.52.1713804983800;
-        Mon, 22 Apr 2024 09:56:23 -0700 (PDT)
-Received: from localhost (164.146.150.34.bc.googleusercontent.com. [34.150.146.164])
-        by smtp.gmail.com with ESMTPSA id z12-20020a0cf00c000000b006a0441c4d15sm4377553qvk.38.2024.04.22.09.56.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Apr 2024 09:56:23 -0700 (PDT)
-Date: Mon, 22 Apr 2024 12:56:23 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Richard Gobert <richardbgobert@gmail.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- davem@davemloft.net, 
- edumazet@google.com, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- dsahern@kernel.org, 
- alexander.duyck@gmail.com, 
- aleksander.lobakin@intel.com, 
- netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org
-Message-ID: <662696b7c257_7539294ba@willemb.c.googlers.com.notmuch>
-In-Reply-To: <ae7af8b6-0952-434d-8178-8042a2db6bc9@gmail.com>
-References: <20240419153542.121087-1-richardbgobert@gmail.com>
- <20240419153542.121087-2-richardbgobert@gmail.com>
- <6622bd416e567_1241e229425@willemb.c.googlers.com.notmuch>
- <ae7af8b6-0952-434d-8178-8042a2db6bc9@gmail.com>
-Subject: Re: [PATCH net v2 1/3] net: gro: add {inner_}network_offset to
- napi_gro_cb
+        bh=c/GHqxJH3jaz8y1htWNLtBU/umNHY1Pspc/g52t/wus=;
+        b=ki1UX9ibICLah58Ois93+DmTwXYv4oPplA7qoTM9UW/QSEUteSopDmBME2t9RLnYLq
+         EKDYN1sMR5SBiRvu/T78g3xrZ6wiwCSoZwiiNAAOf78MR/NuUYqqXm+P3j9VapZcZ3Sn
+         v3y8TbF1UORmmWE2mpMXXfpLpoTxBaUqD9q57MkVHOQ3JvV2CuHRsqLNKm6vBXh0VjIo
+         nD098esO7AopOHtJK2IjYucO3Sn6kN4JSRjD1tkGC2ZiAGmNQaw4khXoeJebI0gAjVwb
+         ttCw3MU065qjOVEPrtPCCOW9NCcajqlW+kgDEuyq/jvXg93nPrDDQ1pwfhcFAe5LEEsG
+         7a1g==
+X-Forwarded-Encrypted: i=1; AJvYcCUBFaymtiBO3WFkweyVHkDo9dHCZ3lI2SW7lCIs/ET5CgNYA7jRysRmp5JadYK8FuWF4iXhWvqq/+VRl3DTAyNo2gBaalz6
+X-Gm-Message-State: AOJu0Ywm8mf5/zTYbYXvVzuKvYPp+vWfY+VJg0NUozDEcBcNWvrlo4dw
+	j1MENLeYY2QNCAii/V//irisBoStMoF4ixcAWFm6VHsfcCSbpJIXr6qOGhCgZeWwoHI4gY54DqA
+	GLn8JPeT2hpN7ZLku5nN4qUjMeNI54gq5Plku
+X-Google-Smtp-Source: AGHT+IGQs6EYS26GO07gglIJCpPi+nxAzSr30qdzDEDGdL78TtOqrG3x1lwMSg9IktjYezwLd4U6fVyKCAI4XtZeibc=
+X-Received: by 2002:ac2:5627:0:b0:516:c763:b4f5 with SMTP id
+ b7-20020ac25627000000b00516c763b4f5mr6640305lff.3.1713805133247; Mon, 22 Apr
+ 2024 09:58:53 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+References: <20240418195159.3461151-1-shailend@google.com> <20240418195159.3461151-10-shailend@google.com>
+ <20240418184851.5cc11647@kernel.org> <CAHS8izO=Vc6Kxx620_y6v-3PtRL3_UFP6zDRfgLf85SXpP0+dQ@mail.gmail.com>
+ <20240419202535.5c5097fe@kernel.org>
+In-Reply-To: <20240419202535.5c5097fe@kernel.org>
+From: Mina Almasry <almasrymina@google.com>
+Date: Mon, 22 Apr 2024 09:58:38 -0700
+Message-ID: <CAHS8izOEbZ6wdw2=pPt_P1F81qQxjw83foeQ9baZk0XwYEmmpg@mail.gmail.com>
+Subject: Re: [RFC PATCH net-next 9/9] gve: Implement queue api
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Shailend Chand <shailend@google.com>, netdev@vger.kernel.org, davem@davemloft.net, 
+	edumazet@google.com, pabeni@redhat.com, willemb@google.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Richard Gobert wrote:
-> Willem de Bruijn wrote:
-> > Richard Gobert wrote:
-> >> This patch adds network_offset and inner_network_offset to napi_gro_cb, and
-> >> makes sure both are set correctly. In the common path there's only one
-> >> write (skb_gro_reset_offset, which replaces skb_set_network_header).
-> >>
-> >> Signed-off-by: Richard Gobert <richardbgobert@gmail.com>
-> >> ---
-> >>  drivers/net/geneve.c           |  1 +
-> >>  drivers/net/vxlan/vxlan_core.c |  1 +
-> >>  include/net/gro.h              | 18 ++++++++++++++++--
-> >>  net/8021q/vlan_core.c          |  2 ++
-> >>  net/core/gro.c                 |  1 +
-> >>  net/ethernet/eth.c             |  1 +
-> >>  net/ipv4/af_inet.c             |  5 +----
-> >>  net/ipv4/gre_offload.c         |  1 +
-> >>  net/ipv6/ip6_offload.c         |  8 ++++----
-> >>  9 files changed, 28 insertions(+), 10 deletions(-)
-> >>
-> > 
-> >> +static inline int skb_gro_network_offset(const struct sk_buff *skb)
-> >> +{
-> >> +	return NAPI_GRO_CB(skb)->network_offsets[NAPI_GRO_CB(skb)->encap_mark];
-> >> +}
-> >> +
-> > 
-> > 
-> >> @@ -236,8 +236,6 @@ INDIRECT_CALLABLE_SCOPE struct sk_buff *ipv6_gro_receive(struct list_head *head,
-> >>  	if (unlikely(!iph))
-> >>  		goto out;
-> >>  
-> >> -	skb_set_network_header(skb, off);
-> >> -
-> > 
-> > Especially for net, this is still a large patch.
-> > 
-> > Can we avoid touching all those tunnel callbacks and just set the
-> > offsets in inet_gro_receive and ipv6_gro_receive themselves, just
-> > as skb_set_network_header now:
-> > 
-> > @@ -236,7 +236,7 @@ INDIRECT_CALLABLE_SCOPE struct sk_buff *ipv6_gro_receive(struct list_head *head,
-> >         if (unlikely(!iph))
-> >                 goto out;
-> >  
-> > -       skb_set_network_header(skb, off);
-> > +       NAPI_GRO_CB(skb)->network_offsets[NAPI_GRO_CB(skb)->encap_mark] = off;
-> > 
-> 
-> Thanks for the reply!
-> 
-> Setting network_offset on dev_gro_receive and inner_network_offset only
-> in the tunnel callbacks is the best option IMO. I agree that
-> we want a small patch to net that solves the problem, although I 
-> think always using ->encap_mark in the common path is not ideal. 
+On Fri, Apr 19, 2024 at 8:25=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
 >
-> We can avoid changing all the tunnel callbacks by always setting
-> inner_network_offset in {ipv6,inet}_gro_receive and initialize
-> network_offset to 0 in dev_gro_receive. It will result in a small
-> change, without using ->encap_mark.
-> 
-> What are your thoughts?
+> On Fri, 19 Apr 2024 09:10:42 -0700 Mina Almasry wrote:
+> > Currently the ndos don't include an interface for the driver to
+> > declare the size, right? In theory we could add it to the ndos like
+> > so, if I understood you correctly (untested yet, just to illustrate
+> > what I'm thinking point):
+> >
+> > diff --git a/drivers/net/ethernet/google/gve/gve_main.c
+> > b/drivers/net/ethernet/google/gve/gve_main.c
+> > index 7c38dc06a392..efe3944b529a 100644
+> > --- a/drivers/net/ethernet/google/gve/gve_main.c
+> > +++ b/drivers/net/ethernet/google/gve/gve_main.c
+> > @@ -2579,11 +2579,16 @@ static void gve_write_version(u8 __iomem
+> > *driver_version_register)
+> >   writeb('\n', driver_version_register);
+> >  }
+> >
+> > +static size_t gve_rx_queue_mem_get_size(void)
+> > +{
+> > + return sizeof(struct gve_rx_ring);
+> > +}
+>
+> > @@ -2709,6 +2709,7 @@ static const struct netdev_queue_mgmt_ops
+> > gve_queue_mgmt_ops =3D {
+> >   .ndo_queue_mem_free =3D gve_rx_queue_mem_free,
+> >   .ndo_queue_start =3D gve_rx_queue_start,
+> >   .ndo_queue_stop =3D gve_rx_queue_stop,
+> > + .ndo_queue_mem_get_size =3D gve_rx_queue_mem_get_size,
+> >  };
+>
+> I don't think we need to make it a callback, even, directly:
+>
+> const struct netdev_queue_mgmt_ops gve_queue_mgmt_ops =3D {
+> +       .queue_mem_size         =3D sizeof(struct gve_rx_ring),
+>         .ndo_queue_mem_free     =3D gve_rx_queue_mem_free,
+>         .ndo_queue_start        =3D gve_rx_queue_start,
+>         .ndo_queue_stop         =3D gve_rx_queue_stop,
+>
+> > I think maybe if we want to apply this change to mem_stop, then we
+> > should probably also apply this change to queue_mem_alloc as well,
+> > right? I.e. core will allocate the pointer, and ndo_queue_mem_alloc
+> > would allocate the actual resources and would fill in the entries of
+> > the pointer? Is this what you're looking for here?
+>
+> Yup. But thinking about it again, this may be more natural once we also
+> have the open/close path use the queue API. IIUC for now the driver
+> allocates the queue resources on open, without going via .ndo_queue_*
+> If that's the case we can keep the code as you have it here.
 
-That works. It's a bit ugly that inner_network_offset will always be
-set, even if a packet only traverses inet_gro_receive once. What is
-your concern with testing encap_mark?
+Yes, as currently written the queue API funcs & gve_open/close use the
+same internal gve helpers, but they do not go via .ndo_queue_*.
 
-How do you want to detect in udp[46]_lib_lookup_skb which of the two
-offsets to use? That would still be encap_mark based?
+OK, sounds like you would like us to keep this bit of the code as we
+have it here. Let us know if you have any other feedback. I think
+we're working through final testing/polishing/code reviewing
+internally and will be submitting something very similar to this as
+non-RFC for review, with whatever feedback we receive in the meantime.
 
+--=20
+Thanks,
+Mina
 
