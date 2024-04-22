@@ -1,43 +1,43 @@
-Return-Path: <netdev+bounces-90192-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90194-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0FAF8AD0BF
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 17:30:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D58E8AD0C3
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 17:30:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 572E928B5FE
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 15:30:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5441028B67A
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 15:30:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE385153503;
-	Mon, 22 Apr 2024 15:29:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BF3A153579;
+	Mon, 22 Apr 2024 15:29:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="EuwJCodq"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="rNwk/Kl+"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2079.outbound.protection.outlook.com [40.107.243.79])
+Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2048.outbound.protection.outlook.com [40.107.212.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 330EF153507
-	for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 15:29:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.79
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C260A153509
+	for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 15:29:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.212.48
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713799774; cv=fail; b=bS7xM2EjTKaLtvq49AgHd67sk0cVCi418LAvUGdsEHijgA2LDbB5z/WDIyUydLWH600++Q1ckZMTZCDtcW8XHDys4e3n5gfUkK/OEyiFTAYTtlVLi+K+bU2Jlf7r2RN0sl4EEfwncNQ9YGzguhvDQBHT8Z4ggAqmwNACwH5SOxk=
+	t=1713799780; cv=fail; b=HtDDwyc/z+REFnLzBwOyvTDgbCgc40dJYF+6Q1MpMvX4248+G8SSShiwb3RJREjg2DT4bGfDnKqkvgN+Imopyr0jIiR9c0yFCpqEBHWo2aJt+i+2TJbJcxsp5xLHlc8UsIcQ5uXiWaVI1Rr3FNlFODT8WOHZf+oTnF0UkDgB4MM=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713799774; c=relaxed/simple;
-	bh=ah0+LJyFNCpGgK3fuca8RLUJpg+s3d7XaoFAmLM5Urk=;
+	s=arc-20240116; t=1713799780; c=relaxed/simple;
+	bh=JvMkbAnssz3dpC8ZYOIh0aqoFB9Zq+UeSo1pYZTFONc=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=uQMwJAqhlzauxJij28Mjy0zlpZ27h0amTEjuaKZxPicAgLc6XvFrFJz6w5fo8MgAa77rc7bUWKmDWd+sDMyxccvQfGH3aM5eltvPQQxCoVhb626T95hJYu1GPkPgIT7iuqvivySzSfTx+wPhUuf0TwHk9MudeFBkYHfO3MLoIdA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=EuwJCodq; arc=fail smtp.client-ip=40.107.243.79
+	 MIME-Version:Content-Type; b=k9GPsvB4nvg9eTsAZM1FICQTJTebiirwUjg+9WhcACTHIM546wTeXJaU2ZCPk15S8vwg9d3IuQolTO0lJwbEI0BC6z5nID5lCvPEeXC71mh9QJSkndvPRJT/8CdqE/wtn5mIWFUhKc+MwWq7hvJ5QG0KIH1lQJRCQEsTL6o3QqM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=rNwk/Kl+; arc=fail smtp.client-ip=40.107.212.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=LgzknUWe836y3RPpo0cUP0VFy/NkyXppY+pIUFxzeNe0RGyQf06ZpMRrtSwucbuu7UERTYkon8Ucz3n8+yOcyeDkN4OoxB5yV7W9AWJMrv4Q93aCyTnWXMt/klSsGBaaQnA/A094lj7DWXtgoAp66bU8OKknZoetL59MO4vxDn5JXCgTLEI8BVbwZsltvj39QUhCbyx/BKlT+mS7tmdTLgRrjgXtRBAYY3kQXWxL0JzhIE1ctdlmj8YdOx0ONrArWBCLuynkHzYi8dEDH/af9daDyz1AY2e4jbZKb9lGZbTs6jOXpmlsBvv/3nZq159DcCn4xfy3mngNPVeZr6RQ+w==
+ b=V41dZq0rBm880waRPvLD41xxuahQlvrxYl7+lTXV9DLL1Zb7sG4cctr+L+tkOeRXhZfGnF6sJ8qRE+H87xe01syVFd9CocUPm2Z+N77eIdhLWPzGiNvdZXCwhioC7cQ5Mw3aCMKs32m9rfh1/Wyq8LGzwqYh9whQFkleI6rPMCXjgbT5o1exLozuPe2nSuG7kyOjkjMUDsZnqUDsYX/8d7iRR93g5N/lPpgqrS/qrH326JH/tbn/7OMEL4KR9DOBBT0rqJPe4B3U0KlfWIB118UCwg6vc10+kyctaxQCAKMJgKoBOZnZBoJpvZ9rD29daBehixQBxYj6OH00X5n8iw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=KhmyKFOoc8Zl0G2Njk26RHjMiNWjqgZz6uqc8ameXAc=;
- b=AQT9UFtgmW4J8fQZWHtyVwKooC9xg+tjzFH7W98AWBUi7XHr8v/TJ2gY2Y/EA+s7+sEaTuRD/Kx2gV4x92qz9onraiCBMmWxn0buKA55SK/mHgfg0O98FNp2NTkNML8/TyTW6ViNfC9K5jmRB6qMfP8kB98mUcz7FQvUM7Gq474E1peL9Ox20wppVzPplh9Y0oIAZqm77sMKViPAaM2CD+Sti2OEZZEjqX897qS3Bg+Vv9z0LLFT+k2iHd6fisOmKf70y+KUGN0rnhvguZml8JGq/2WBLa3beQn19BNhv1X7c6ntQxdO/okYD3j7HiaO42WROn8iSXdz0i/V3V1MOQ==
+ bh=WKvk8bsSXpMlMC26dyda5yn3mBdLJJBTHbIKxZ+AZJY=;
+ b=LseeEHx1mTl9HQ0rcrEE1JDm/E6DNTDcF8hY968p/t3O6nmRx9VJPvW5mQZt0W/MgUA8Ap3it7lditGN6dpQB0f1MFZ9xCSfNwu0+WUj0RP/H4TA1LRtN1GJvBr38f7ljRMSMzuGi4A/j6xf16QRIRfypMl5EBYEpe6dvlPRDfdHm9CNe1OYKUGqGK18pxc7mwBeHN/V3v7I2eAr6sJqfKINphZHjpTTvAsEQgnMWOgP7/3PLyFxsXot0VPEd+SfFSIxczPUm9nBl8ttaCIpfqUeB1KgdI3Wc+OTkTTc9vR8gctcwNQ8J8Xpko7qSkEPwaAq3rIKI7vFtlmwyovLEQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  216.228.117.161) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
@@ -45,18 +45,18 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=KhmyKFOoc8Zl0G2Njk26RHjMiNWjqgZz6uqc8ameXAc=;
- b=EuwJCodqZPilnntEs0+FCbVSOr7zBgkLjJYu+lTxRc8PM0/Y2fJvOKL30MjPhrgvn+UPE9nT7NvExxgPr62IbLiGI5N7MVmtHI5JtfzON+Xt7uUL7qLowrZV4hIqncD5Po9SWpvNUMIDFHCpw1x803x9n9+5CFht4tlRxz84JfeXyW4cWVH2Iu+RpcZ4lnSeBQLdMuLfdRXp7nDX8Dw75goJkNCEBiI/pX8kE7Pl9qL9KYElzsBbh3xgwQJ0Q1aCsf3dZzDu+7k000Uh2Tq1ErQfMU3CbCXKUaGuPZhswq7pmqsixtYydLVk5ormD9ZX5jRkMQ0yBZ0BOwAjLZ9vzw==
-Received: from CH0P221CA0044.NAMP221.PROD.OUTLOOK.COM (2603:10b6:610:11d::27)
- by IA1PR12MB8335.namprd12.prod.outlook.com (2603:10b6:208:3fa::19) with
+ bh=WKvk8bsSXpMlMC26dyda5yn3mBdLJJBTHbIKxZ+AZJY=;
+ b=rNwk/Kl+HtPz1mxhpQztE4r1UxelbEUeAhHoVjzzU7v1njZADdR5e+lJh+nptd20sLZL+5GKEAv6t00ilcW1Jb0DGXwgF8K0jfDJuISlx7y81c49tH6eq9NPzgEbxw8ry7ex4QI05ZTArPOp1RBYc6tr5qaNpdA6ZsXbHRQ6rdBrJ1Bq7mZXM02jsfWVDg/Zae1bztNV3SHuPbVT4VEWHRPWGwPQfDz+MEvodfZWmTfgLOnxf5v7+G2aCX3LunnO1q0+YZt9Q8I1x9S4B1QROg5YZAdoMkiaFqebd/f9xvhBqCim8heeVJ/QneLHV5/ACXHFh7xft51qujlEJ89LUQ==
+Received: from CH0PR04CA0012.namprd04.prod.outlook.com (2603:10b6:610:76::17)
+ by CYYPR12MB8856.namprd12.prod.outlook.com (2603:10b6:930:c0::8) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7472.44; Mon, 22 Apr
- 2024 15:29:30 +0000
-Received: from CH2PEPF00000147.namprd02.prod.outlook.com
- (2603:10b6:610:11d:cafe::2) by CH0P221CA0044.outlook.office365.com
- (2603:10b6:610:11d::27) with Microsoft SMTP Server (version=TLS1_2,
+ 2024 15:29:35 +0000
+Received: from CH2PEPF00000145.namprd02.prod.outlook.com
+ (2603:10b6:610:76:cafe::4b) by CH0PR04CA0012.outlook.office365.com
+ (2603:10b6:610:76::17) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7495.34 via Frontend
- Transport; Mon, 22 Apr 2024 15:29:30 +0000
+ Transport; Mon, 22 Apr 2024 15:29:35 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
@@ -64,17 +64,17 @@ Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
  216.228.117.161 as permitted sender) receiver=protection.outlook.com;
  client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
 Received: from mail.nvidia.com (216.228.117.161) by
- CH2PEPF00000147.mail.protection.outlook.com (10.167.244.104) with Microsoft
+ CH2PEPF00000145.mail.protection.outlook.com (10.167.244.102) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7519.19 via Frontend Transport; Mon, 22 Apr 2024 15:29:29 +0000
+ 15.20.7519.19 via Frontend Transport; Mon, 22 Apr 2024 15:29:35 +0000
 Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
  (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Mon, 22 Apr
- 2024 08:29:13 -0700
+ 2024 08:29:18 -0700
 Received: from localhost.localdomain (10.126.231.35) by rnnvmail201.nvidia.com
  (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Mon, 22 Apr
- 2024 08:29:09 -0700
+ 2024 08:29:13 -0700
 From: Petr Machata <petrm@nvidia.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
@@ -82,9 +82,9 @@ To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 CC: Ido Schimmel <idosch@nvidia.com>, Jiri Pirko <jiri@resnulli.us>, "Petr
  Machata" <petrm@nvidia.com>, Alexander Zubkov <green@qrator.net>,
 	<mlxsw@nvidia.com>
-Subject: [PATCH net 6/9] mlxsw: spectrum_acl_tcam: Fix memory leak during rehash
-Date: Mon, 22 Apr 2024 17:25:59 +0200
-Message-ID: <d5edd4f4503934186ae5cfe268503b16345b4e0f.1713797103.git.petrm@nvidia.com>
+Subject: [PATCH net 7/9] mlxsw: spectrum_acl_tcam: Fix warning during rehash
+Date: Mon, 22 Apr 2024 17:26:00 +0200
+Message-ID: <cc17eed86b41dd829d39b07906fec074a9ce580e.1713797103.git.petrm@nvidia.com>
 X-Mailer: git-send-email 2.44.0
 In-Reply-To: <cover.1713797103.git.petrm@nvidia.com>
 References: <cover.1713797103.git.petrm@nvidia.com>
@@ -100,127 +100,169 @@ X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
  rnnvmail201.nvidia.com (10.129.68.8)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH2PEPF00000147:EE_|IA1PR12MB8335:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9c545214-888f-4dad-3b1b-08dc62e100a3
+X-MS-TrafficTypeDiagnostic: CH2PEPF00000145:EE_|CYYPR12MB8856:EE_
+X-MS-Office365-Filtering-Correlation-Id: afca5b89-ead3-4950-277a-08dc62e103ed
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?/XX/48Jiekk3q9TH8ijwTfXy1/wJrKvb1nPDbJRJu5QAZ7psJy8EMkVpNTpV?=
- =?us-ascii?Q?+PoRnvdnJyj+7SWK2m4CNtnfNZM8eC73+wLdD6F4I5kCEtyZF3RY48r7QWrx?=
- =?us-ascii?Q?QoTG7VosVDO36coZblRBOFmCdZhXfzNL/hr32Cm23gBEplR+lEWcwROOKwKF?=
- =?us-ascii?Q?38SqGAzp/MMqHHzXkUXChXG802/3lI91/Lu0A3+QKEYtH7YKtrpQLV5wpH71?=
- =?us-ascii?Q?HXXL0h5TtVHU1iDTpUhnTUL5nFcO7ZwyguypblCDXGk0MPjTbGqWboZhm+cc?=
- =?us-ascii?Q?8rI8HtmImK/4v53iG8et4dl/RCnlw6v+9+OdMtcLveTY0rY1mYxmnfg+BLYu?=
- =?us-ascii?Q?BrfXNDtHmLsU4mNwjyPTfInNPQlUCJcjK49RguoOyLIHvENKwBkKSeYxQaRF?=
- =?us-ascii?Q?iYY9Fen1F9aBBgSEwhXSB3rmzj6rhEb4gchowT1Dl0+9fJ5hIgPjoLYDaiIY?=
- =?us-ascii?Q?8X4sOSq6r1jiqaLue+OlgSkHlnNfZRzVS3yKo7uaJ1PRoyIxDDOO8abctiJi?=
- =?us-ascii?Q?HqbwFKsyNBak7/TvQxOGRqVylIN/BT4ch879YVSVjBN1aoSGGJ4aFvcFlkRp?=
- =?us-ascii?Q?F/U6dEjpnCM5Zi3gM1p0vu7enc3PW4xGsMbnCOrubg61c3zbmDu2BhhCV8+z?=
- =?us-ascii?Q?KQLe3t3XlfMBlMuXAo9Elx74PWovw9vv/BkTUe+ZKjmcga5Yz5sLb2tI/7wz?=
- =?us-ascii?Q?nNllVNlRcWp5dRqdqPaxBEZMiLkAMk7zrLAxV06kbTmgnUMHOd5pyOgeDMSl?=
- =?us-ascii?Q?+jUYmYaYoLuIqBTsy5PHjWeSO1BMkFS45tH7ZOKfPjslYgjvQ9HHvgcvyBrc?=
- =?us-ascii?Q?BvxyMrMCn5xHMVL0XiARvbHZloQ8Eqj6UX0M5aGs3/WhPOUsBxVUAYiJI2BK?=
- =?us-ascii?Q?y8M+IM0ZqfP3pIJok1qBtJwbdFRVtg19XyxKdtIvB+xphlTz7vb/M63B1zk3?=
- =?us-ascii?Q?/4gPL6idpPYpIDJxBcZsiHxwJKtMuou7YegUtsu6lJYGJ8TyGVXOOifYF1Sc?=
- =?us-ascii?Q?1Y6FXyO7gzgYdT4RMWDr/sOUWNEdvZH/ZYhXTc3RvTis8Fh4SEDcSQVI20b+?=
- =?us-ascii?Q?o3iapfLnaM5EokNiYl/ue9NTrkh12rrW/BtozcjnzZwX/7fTPzq+gf5+vLYh?=
- =?us-ascii?Q?HvvPvxi3zUpY78BDr07NIlZc9LKwDgLSY86WAaBPpI4EbV5TJXLsrX19NFIk?=
- =?us-ascii?Q?yiCRmFg5Z3zcUsBbYHQYGY8aZK7hssNqqS25I+En4R2Z8x0qPipLdRMM52Pn?=
- =?us-ascii?Q?GXlccLw0ptfGXLOE0OtjXFZjBPf1QX701fMVsSX7lxkLR6uBxS0GAfKhESl6?=
- =?us-ascii?Q?XHr8YOugZQJVZkaxzYsMlaGgtfacXgRekXpWoW1IC4ntm5BgCSoR371TuMgm?=
- =?us-ascii?Q?yloKsGdmkJwU7cxQZESWdvKQztk8?=
+	=?us-ascii?Q?DnddqTMoSA2WxJ/Fg88Rnmr3ZOXVNy+1Gh6T2RhmiZix9fxpWt5Oa4KFF++l?=
+ =?us-ascii?Q?oIRJ1LIn5iZ/65+TubxTQPEZVejP3n5VVN7rWKUL6/l8f0U6IePODMYx/kbK?=
+ =?us-ascii?Q?M6+s7jTTOQR0LKu5NzZeApBrSw+3jQ12yhYxg7lQ1p+yRkxT7BNpjCdT3Hbd?=
+ =?us-ascii?Q?LSlU8f7LcE4ZD2J/eTAiZ15e31VdCNxOLOzSzkwqyLcmOj1XYPBGhnA8FSWC?=
+ =?us-ascii?Q?fvrZ05GBSBApg+LPmQ7uYK3PSLXnDne/lGAeWX8KTa9akfGhZ6OHZfbg4awv?=
+ =?us-ascii?Q?YaCenGRimmx6d5ISmPyUu+8gG9KPR1zlCahjWYjN04r9w9FTypBU+5bWc/1T?=
+ =?us-ascii?Q?6rCU4LW6NRdM2qmgcl1ajnF5OvsMS03wDlMADcqOPPqDbCHJGB/UjEKYETWF?=
+ =?us-ascii?Q?sZVhsn0dTh3BzrG/TFibIMZuh7ZsHeEiRZ4kD4srSifjhn6fXrRW6LdMp2ti?=
+ =?us-ascii?Q?RoYUHCz/5twl3lmHx8dFpvxQzupuwHeKYatVmmteRZjTRWZOY303CTlKNxsI?=
+ =?us-ascii?Q?u2eQksnTmTq3DxeMgQqKmTg/tfd1uBO45POvanOiYpi4GkLQzvepSE5cgz5r?=
+ =?us-ascii?Q?EMSRHBpRK7TlHXSNt/8cuEC9vPy+TApWv0hKq8KFG+61Sar9ysDZ0kquPCwl?=
+ =?us-ascii?Q?9kUVjSEO9bT8lc7JmeAvQNjF2TY71PoHPJEu7saEN9PXKDRv5GWTgmlmGKw5?=
+ =?us-ascii?Q?RoEX8I1ori29oUbdA4R6GuFIBQdqgNZ3olfD3RmoU0ENlXS38B5wtOaoyviV?=
+ =?us-ascii?Q?g+j5vr86DjXp+DZAp0QMGqLtY8LhaEIMmpnTrH8aFsV3wy5T45Kh0mlUPfkz?=
+ =?us-ascii?Q?lcHvH1YzRej/9efMq02tF/FEKuUHSGhdqpbQ7s3I+w9YKWZR0roGut018Z8V?=
+ =?us-ascii?Q?Z/EFdNe+LTrvrlSAPzxfpDPMmQgYwPGKjI7K/GzL1CDLw6M9JUftRu1rYqUJ?=
+ =?us-ascii?Q?7jwykzuMUs8ExljiYZ7CUChZkYt769X+KlQLM6UXVLt9ffasw+7GEv5uCGQF?=
+ =?us-ascii?Q?MCZt428wGeEkG9+4SBt4FI7uDkdKN8B0F63bzSbtALw50zLaC40uX7wviR6f?=
+ =?us-ascii?Q?Pf8USf+GrNwLC8EJ+94XN/M6/p6hCbIvT9V8ev6qClHH+2h5dKJT8hxrS3t+?=
+ =?us-ascii?Q?SGTbUYU4h2M1oeYLJ6rCT+tL3oUA2AmxBzer8Z/QPoO4ComGTI6Mx1WgYZWm?=
+ =?us-ascii?Q?9bOtNrUj+6RNX024tvOk2vb3Sv3lqmPIoKRVlFJclI9F/jozwbIowPW69mya?=
+ =?us-ascii?Q?zXyRzfCKABP3WHzPVmOyWPAifiod2RjRtlLn90iCUP3JZLVroythOOdyJVCw?=
+ =?us-ascii?Q?7arWV9U4PbyEwpkyM8wzvoD8XLfOUXxRegrVc8Me0INS5Omg3psYn6CS9pJs?=
+ =?us-ascii?Q?mL80WL4=3D?=
 X-Forefront-Antispam-Report:
 	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(82310400014)(1800799015)(36860700004)(376005);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Apr 2024 15:29:29.6066
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Apr 2024 15:29:35.1242
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9c545214-888f-4dad-3b1b-08dc62e100a3
+X-MS-Exchange-CrossTenant-Network-Message-Id: afca5b89-ead3-4950-277a-08dc62e103ed
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	CH2PEPF00000147.namprd02.prod.outlook.com
+	CH2PEPF00000145.namprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB8335
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYYPR12MB8856
 
 From: Ido Schimmel <idosch@nvidia.com>
 
-The rehash delayed work migrates filters from one region to another.
-This is done by iterating over all chunks (all the filters with the same
-priority) in the region and in each chunk iterating over all the
-filters.
+As previously explained, the rehash delayed work migrates filters from
+one region to another. This is done by iterating over all chunks (all
+the filters with the same priority) in the region and in each chunk
+iterating over all the filters.
 
-If the migration fails, the code tries to migrate the filters back to
-the old region. However, the rollback itself can also fail in which case
-another migration will be erroneously performed. Besides the fact that
-this ping pong is not a very good idea, it also creates a problem.
+When the work runs out of credits it stores the current chunk and entry
+as markers in the per-work context so that it would know where to resume
+the migration from the next time the work is scheduled.
 
-Each virtual chunk references two chunks: The currently used one
-('vchunk->chunk') and a backup ('vchunk->chunk2'). During migration the
-first holds the chunk we want to migrate filters to and the second holds
-the chunk we are migrating filters from.
-
-The code currently assumes - but does not verify - that the backup chunk
-does not exist (NULL) if the currently used chunk does not reference the
-target region. This assumption breaks when we are trying to rollback a
-rollback, resulting in the backup chunk being overwritten and leaked
+Upon error, the chunk marker is reset to NULL, but without resetting the
+entry markers despite being relative to it. This can result in migration
+being resumed from an entry that does not belong to the chunk being
+migrated. In turn, this will eventually lead to a chunk being iterated
+over as if it is an entry. Because of how the two structures happen to
+be defined, this does not lead to KASAN splats, but to warnings such as
 [1].
 
-Fix by not rolling back a failed rollback and add a warning to avoid
-future cases.
+Fix by creating a helper that resets all the markers and call it from
+all the places the currently only reset the chunk marker. For good
+measures also call it when starting a completely new rehash. Add a
+warning to avoid future cases.
 
 [1]
-WARNING: CPU: 5 PID: 1063 at lib/parman.c:291 parman_destroy+0x17/0x20
+WARNING: CPU: 7 PID: 1076 at drivers/net/ethernet/mellanox/mlxsw/core_acl_flex_keys.c:407 mlxsw_afk_encode+0x242/0x2f0
 Modules linked in:
-CPU: 5 PID: 1063 Comm: kworker/5:11 Tainted: G        W          6.9.0-rc2-custom-00784-gc6a05c468a0b #14
+CPU: 7 PID: 1076 Comm: kworker/7:24 Tainted: G        W          6.9.0-rc3-custom-00880-g29e61d91b77b #29
 Hardware name: Mellanox Technologies Ltd. MSN3700/VMOD0005, BIOS 5.11 01/06/2019
 Workqueue: mlxsw_core mlxsw_sp_acl_tcam_vregion_rehash_work
-RIP: 0010:parman_destroy+0x17/0x20
+RIP: 0010:mlxsw_afk_encode+0x242/0x2f0
 [...]
 Call Trace:
  <TASK>
- mlxsw_sp_acl_atcam_region_fini+0x19/0x60
- mlxsw_sp_acl_tcam_region_destroy+0x49/0xf0
- mlxsw_sp_acl_tcam_vregion_rehash_work+0x1f1/0x470
+ mlxsw_sp_acl_atcam_entry_add+0xd9/0x3c0
+ mlxsw_sp_acl_tcam_entry_create+0x5e/0xa0
+ mlxsw_sp_acl_tcam_vchunk_migrate_all+0x109/0x290
+ mlxsw_sp_acl_tcam_vregion_rehash_work+0x6c/0x470
  process_one_work+0x151/0x370
  worker_thread+0x2cb/0x3e0
  kthread+0xd0/0x100
  ret_from_fork+0x34/0x50
- ret_from_fork_asm+0x1a/0x30
  </TASK>
 
-Fixes: 843500518509 ("mlxsw: spectrum_acl: Do rollback as another call to mlxsw_sp_acl_tcam_vchunk_migrate_all()")
+Fixes: 6f9579d4e302 ("mlxsw: spectrum_acl: Remember where to continue rehash migration")
 Signed-off-by: Ido Schimmel <idosch@nvidia.com>
 Tested-by: Alexander Zubkov <green@qrator.net>
 Reviewed-by: Petr Machata <petrm@nvidia.com>
 Signed-off-by: Petr Machata <petrm@nvidia.com>
 ---
- drivers/net/ethernet/mellanox/mlxsw/spectrum_acl_tcam.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ .../mellanox/mlxsw/spectrum_acl_tcam.c        | 20 ++++++++++++++++---
+ 1 file changed, 17 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/net/ethernet/mellanox/mlxsw/spectrum_acl_tcam.c b/drivers/net/ethernet/mellanox/mlxsw/spectrum_acl_tcam.c
-index 568ae7092fe0..0902eb7651e1 100644
+index 0902eb7651e1..e8c607886621 100644
 --- a/drivers/net/ethernet/mellanox/mlxsw/spectrum_acl_tcam.c
 +++ b/drivers/net/ethernet/mellanox/mlxsw/spectrum_acl_tcam.c
-@@ -1200,6 +1200,8 @@ mlxsw_sp_acl_tcam_vchunk_migrate_start(struct mlxsw_sp *mlxsw_sp,
- {
- 	struct mlxsw_sp_acl_tcam_chunk *new_chunk;
+@@ -730,6 +730,17 @@ static void mlxsw_sp_acl_tcam_vregion_rehash_work(struct work_struct *work)
+ 		mlxsw_sp_acl_tcam_vregion_rehash_work_schedule(vregion);
+ }
  
-+	WARN_ON(vchunk->chunk2);
++static void
++mlxsw_sp_acl_tcam_rehash_ctx_vchunk_reset(struct mlxsw_sp_acl_tcam_rehash_ctx *ctx)
++{
++	/* The entry markers are relative to the current chunk and therefore
++	 * needs to be reset together with the chunk marker.
++	 */
++	ctx->current_vchunk = NULL;
++	ctx->start_ventry = NULL;
++	ctx->stop_ventry = NULL;
++}
 +
- 	new_chunk = mlxsw_sp_acl_tcam_chunk_create(mlxsw_sp, vchunk, region);
- 	if (IS_ERR(new_chunk))
- 		return PTR_ERR(new_chunk);
-@@ -1334,6 +1336,8 @@ mlxsw_sp_acl_tcam_vregion_migrate(struct mlxsw_sp *mlxsw_sp,
- 	err = mlxsw_sp_acl_tcam_vchunk_migrate_all(mlxsw_sp, vregion,
- 						   ctx, credits);
- 	if (err) {
-+		if (ctx->this_is_rollback)
-+			return err;
- 		/* In case migration was not successful, we need to swap
- 		 * so the original region pointer is assigned again
+ static void
+ mlxsw_sp_acl_tcam_rehash_ctx_vchunk_changed(struct mlxsw_sp_acl_tcam_vchunk *vchunk)
+ {
+@@ -752,7 +763,7 @@ mlxsw_sp_acl_tcam_rehash_ctx_vregion_changed(struct mlxsw_sp_acl_tcam_vregion *v
+ 	 * the current chunk pointer to make sure all chunks
+ 	 * are properly migrated.
+ 	 */
+-	vregion->rehash.ctx.current_vchunk = NULL;
++	mlxsw_sp_acl_tcam_rehash_ctx_vchunk_reset(&vregion->rehash.ctx);
+ }
+ 
+ static struct mlxsw_sp_acl_tcam_vregion *
+@@ -1220,7 +1231,7 @@ mlxsw_sp_acl_tcam_vchunk_migrate_end(struct mlxsw_sp *mlxsw_sp,
+ {
+ 	mlxsw_sp_acl_tcam_chunk_destroy(mlxsw_sp, vchunk->chunk2);
+ 	vchunk->chunk2 = NULL;
+-	ctx->current_vchunk = NULL;
++	mlxsw_sp_acl_tcam_rehash_ctx_vchunk_reset(ctx);
+ }
+ 
+ static int
+@@ -1252,6 +1263,8 @@ mlxsw_sp_acl_tcam_vchunk_migrate_one(struct mlxsw_sp *mlxsw_sp,
+ 		ventry = list_first_entry(&vchunk->ventry_list,
+ 					  typeof(*ventry), list);
+ 
++	WARN_ON(ventry->vchunk != vchunk);
++
+ 	list_for_each_entry_from(ventry, &vchunk->ventry_list, list) {
+ 		/* During rollback, once we reach the ventry that failed
+ 		 * to migrate, we are done.
+@@ -1343,7 +1356,7 @@ mlxsw_sp_acl_tcam_vregion_migrate(struct mlxsw_sp *mlxsw_sp,
  		 * to vregion->region.
+ 		 */
+ 		swap(vregion->region, vregion->region2);
+-		ctx->current_vchunk = NULL;
++		mlxsw_sp_acl_tcam_rehash_ctx_vchunk_reset(ctx);
+ 		ctx->this_is_rollback = true;
+ 		err2 = mlxsw_sp_acl_tcam_vchunk_migrate_all(mlxsw_sp, vregion,
+ 							    ctx, credits);
+@@ -1402,6 +1415,7 @@ mlxsw_sp_acl_tcam_vregion_rehash_start(struct mlxsw_sp *mlxsw_sp,
+ 
+ 	ctx->hints_priv = hints_priv;
+ 	ctx->this_is_rollback = false;
++	mlxsw_sp_acl_tcam_rehash_ctx_vchunk_reset(ctx);
+ 
+ 	return 0;
+ 
 -- 
 2.43.0
 
