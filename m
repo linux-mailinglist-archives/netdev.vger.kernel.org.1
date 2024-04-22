@@ -1,47 +1,74 @@
-Return-Path: <netdev+bounces-90014-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90018-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E18C8AC85F
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 11:06:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 566DD8AC882
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 11:10:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9778E1F21455
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 09:06:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7A0FD1C20BD9
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 09:10:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22DC713D2B9;
-	Mon, 22 Apr 2024 09:04:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D331013B5B9;
+	Mon, 22 Apr 2024 09:09:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="g1zr40s7"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MzutU8zp"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-101.freemail.mail.aliyun.com (out30-101.freemail.mail.aliyun.com [115.124.30.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F62313DDB7;
-	Mon, 22 Apr 2024 09:04:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5C4D4D135
+	for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 09:09:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713776679; cv=none; b=SAvAf8d4LMUbkS1gSTRzvZFoEYmDhYSxmztTLd1+MQQN5yYZsDIM75btn9psS9fb8ePSP+4uPKXmKriF0GkredMbvVlmKxP9umZPkEsZYl2kxMXzo+iu+vmR3LKYGDIrRGCMvhNvAbhQ5DadQF06PRlS4lrLoBydqiilQSh4ldg=
+	t=1713776969; cv=none; b=QeF2dswFfZFJBefVLkUjMH5F9SSMrbhadiKVE8WvTQ+t3Q/uPfCRKCmeAjzsmmMBeA1O3AesS74gOof0eunmDwWQB0c3X3VYKDMfl/eeYMbBU43PXeabsRAgbWuIiNrh6gJWsamkjFJz3io8Uu+KW/rH45ZArU0haZWYqVNBT9E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713776679; c=relaxed/simple;
-	bh=VCDi0b6H9++Q/mdIE6+PmeVSPcSFlEcG/DW7KI2h1Uc=;
+	s=arc-20240116; t=1713776969; c=relaxed/simple;
+	bh=8m19qLdf29pEm/VzH4JgtpczDeV+bliD1AeIwpYRejs=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VWhhxSJiWweFqG4oiaLi4aNdBtq8rH1bN9RLh8W67mCboW7kQbhq7I1teRTM31XPzgzOysoMA1kV6+qSE3mXo7EjmDXtaz2GpISzt/4+s26X4YXZmi4FCV5Knnh8S0i8nmfpMT2WwCx4ebXav+SU42pWY2FL2vskMwcBHmh1GGU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=g1zr40s7; arc=none smtp.client-ip=115.124.30.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1713776650; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=YBdh3d4NG7zhEjgVLeaTSgMeUhDFAFZPUPg3nLFAOF8=;
-	b=g1zr40s7du7qcE1X3YS3A7kFpRjI1q/LkOzcz/hySxUSSuqDQ3OJwiUJUd601kZhJ0lSSFEB6P9NTqVojOUXmonYGPjm8T180KWYWeS2AAl3cSHVE6VCDoEracSPnLHkVpblADfP5KqmbfaARf3cqVy/FhLiO0YkuiMkSIj8cDI=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R911e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046059;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=23;SR=0;TI=SMTPD_---0W50qzB3_1713776646;
-Received: from 30.221.148.142(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0W50qzB3_1713776646)
-          by smtp.aliyun-inc.com;
-          Mon, 22 Apr 2024 17:04:08 +0800
-Message-ID: <6509d9f4-09b1-43ee-ab38-8949f51a806d@linux.alibaba.com>
-Date: Mon, 22 Apr 2024 17:04:06 +0800
+	 In-Reply-To:Content-Type; b=ZPjGncFBBJkLSl1XBlDEFt6hbTEaYVBEl9ja42WkfsQ5lBKykUuAe2anWSilKwT3YYyuioANDitD0s9M5bickwgMGkvkUzfDkonYtXnE+hRFEhBCxSNCIpHkZfFuThF9NYPD8o5FlQtflcDAAJJFqjQbddI78FrHVvxbRJ3sFuk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=MzutU8zp; arc=none smtp.client-ip=209.85.218.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-a519e1b0e2dso461746466b.2
+        for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 02:09:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1713776965; x=1714381765; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=MVnsBi/2di8OtHUeRH2ceG9hJW0onPTuiuqTPjaoRvA=;
+        b=MzutU8zpC6EY0mtyc64KeVh6ByM322xDycF9Fhv/38UhoSU+RjSR9pkqflh3zJKDsA
+         qcqSn2L76o0Kr8R5gcGgRLFgbwIMshvPGqyZncpa8eOsIrfcDl9iwN7vJ5N3w4Qnzeg/
+         UY59+jjr7eC/a73tdSFldmXuccJDG5rGJPWamOmdXfj82BtSkqEdpmdEM+Zw33NWkH4W
+         xrKiE/FPBN9Xic9lz7eeBl0TbaE4TauT/PcfgpXyi6ImF06srCtrF4Rzq8z/qUo2s6Uu
+         bzdghS0xvYg5elQj9tIYQQBSRiN3Y2MWfK5ciJyqdDL2695eAj76a5gA3M7otvTDAJbU
+         uc7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713776965; x=1714381765;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=MVnsBi/2di8OtHUeRH2ceG9hJW0onPTuiuqTPjaoRvA=;
+        b=MMe96uqI96/LsAtvOSDYGGNnRiqa/L+li2lr6+6gEyMukk/OeISemQvGEftHBNhBFv
+         UUr+ygdBPwGPluGpmESCeTv54HOjY0IZ6rIynMB8k9HYpmX8IDdX3Sx/+bdouusVPBQ6
+         tzcNTPTyTk4+Q+8eQEYMbBCSUxgVRwAffzNX9a7qykwab89JPbdbjBbefRiZaadagSnL
+         DLdPBetfy0Rcyl42yrjZh/hVxpVuiNPecBx3xXmfZdMfK3RVUjc67OKkJg2UgkR1fIAW
+         +YbbYHZX5rAUbMKcNTlxXu0Di45vNE/t50A/YVIRdeMJq6bTMvWDEB/fSnQrX7r7tihk
+         VxVg==
+X-Gm-Message-State: AOJu0YwSbmigejhWD2i3lxx71A8H6MYwGZjSV6XRG4fseUdogj6P2BgW
+	6Mb3zzonPsd6kbWr83bWOKvCNg3Pq03eJdtptyRJKuUAZ1uqo/1H7cbIyxbR3T4=
+X-Google-Smtp-Source: AGHT+IH75RVxqjVtQoh+VeqXSHs2g8R5M8yoHuKif3v7GPyDcnY3ZXFHn7VyfQASiagE3Jrv4lC6sg==
+X-Received: by 2002:a17:906:a158:b0:a55:75cf:2fd8 with SMTP id bu24-20020a170906a15800b00a5575cf2fd8mr6505161ejb.61.1713776965057;
+        Mon, 22 Apr 2024 02:09:25 -0700 (PDT)
+Received: from [192.168.1.20] ([178.197.223.16])
+        by smtp.gmail.com with ESMTPSA id m16-20020a1709061ed000b00a51c0c0cb86sm5541478ejj.22.2024.04.22.02.09.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 22 Apr 2024 02:09:23 -0700 (PDT)
+Message-ID: <7c768d6f-5668-4ec2-b372-f49b5a040ec8@linaro.org>
+Date: Mon, 22 Apr 2024 11:09:22 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -49,98 +76,85 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v9 2/4] ethtool: provide customized dim profile
- management
-To: Brett Creeley <bcreeley@amd.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, "David S . Miller"
+Subject: Re: [PATCH v3 5/5] arm64: dts: qcom: sa8775p-ride: remove tx-sched-sp
+ property
+To: Flavio Suligoi <f.suligoi@asem.it>, "David S . Miller"
  <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Jason Wang <jasowang@redhat.com>,
- "Michael S . Tsirkin" <mst@redhat.com>,
- Ratheesh Kannoth <rkannoth@marvell.com>,
- Alexander Lobakin <aleksander.lobakin@intel.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Tal Gilboa <talgi@nvidia.com>,
- Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
- Maxime Chevallier <maxime.chevallier@bootlin.com>,
- Jiri Pirko <jiri@resnulli.us>, Paul Greenwalt <paul.greenwalt@intel.com>,
- Ahmed Zaki <ahmed.zaki@intel.com>, Vladimir Oltean
- <vladimir.oltean@nxp.com>, Kory Maincent <kory.maincent@bootlin.com>,
- Andrew Lunn <andrew@lunn.ch>, "justinstitt@google.com"
- <justinstitt@google.com>,
- "open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>,
- "open list:VIRTIO CORE AND NET DRIVERS" <virtualization@lists.linux.dev>
-References: <20240417155546.25691-1-hengqi@linux.alibaba.com>
- <20240417155546.25691-3-hengqi@linux.alibaba.com>
- <c59ebd40-fe9c-477f-9ed5-958163470f03@amd.com>
-From: Heng Qi <hengqi@linux.alibaba.com>
-In-Reply-To: <c59ebd40-fe9c-477f-9ed5-958163470f03@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+ Jose Abreu <joabreu@synopsys.com>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20240422090402.33397-1-f.suligoi@asem.it>
+ <20240422090402.33397-6-f.suligoi@asem.it>
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Content-Language: en-US
+Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
+ 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
+ D2GYIS41Kv4Isx2dEFh+/Q==
+In-Reply-To: <20240422090402.33397-6-f.suligoi@asem.it>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+
+On 22/04/2024 11:04, Flavio Suligoi wrote:
+> Strict priority for the tx scheduler is by default in Linux driver, so the
+> tx-sched-sp property was removed in commit aed6864035b1 ("net: stmmac:
+> platform: Delete a redundant condition branch").
+> 
+> So we can safely remove this property from this device-tree.
+> 
+> Signed-off-by: Flavio Suligoi <f.suligoi@asem.it>
+> ---
 
 
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
-在 2024/4/21 下午11:53, Brett Creeley 写道:
-> On 4/17/2024 8:55 AM, Heng Qi wrote:
->> Caution: This message originated from an External Source. Use proper 
->> caution when opening attachments, clicking links, or responding.
->>
->>
->> The NetDIM library, currently leveraged by an array of NICs, delivers
->> excellent acceleration benefits. Nevertheless, NICs vary significantly
->> in their dim profile list prerequisites.
->>
->> Specifically, virtio-net backends may present diverse sw or hw device
->> implementation, making a one-size-fits-all parameter list impractical.
->> On Alibaba Cloud, the virtio DPU's performance under the default DIM
->> profile falls short of expectations, partly due to a mismatch in
->> parameter configuration.
->>
->> I also noticed that ice/idpf/ena and other NICs have customized
->> profilelist or placed some restrictions on dim capabilities.
->>
->> Motivated by this, I tried adding new params for "ethtool -C" that 
->> provides
->> a per-device control to modify and access a device's interrupt 
->> parameters.
->>
->> Usage
->> ========
->> The target NIC is named ethx.
->>
->> Assume that ethx only declares support for 
->> ETHTOOL_COALESCE_RX_EQE_PROFILE
->> in ethtool_ops->supported_coalesce_params.
->>
->> 1. Query the currently customized list of the device
->>
->> $ ethtool -c ethx
->> ...
->> rx-eqe-profile:
->> {.usec =   1, .pkts = 256, .comps =   0,},
->> {.usec =   8, .pkts = 256, .comps =   0,},
->> {.usec =  64, .pkts = 256, .comps =   0,},
->> {.usec = 128, .pkts = 256, .comps =   0,},
->> {.usec = 256, .pkts = 256, .comps =   0,}
->> rx-cqe-profile:   n/a
->> tx-eqe-profile:   n/a
->> tx-cqe-profile:   n/a
->>
->> 2. Tune
->> $ ethtool -C ethx rx-eqe-profile 1,1,0_2,2,0_3,3,0_4,4,0_5,5,0
->
-> With all of this work to support custom dim profiles (which I think is 
-> a great idea FWIW), I wonder if it would be worth supporting a dynamic 
-> number of profile entries instead of being hard-coded to 5?
->
-
-In my practice, I have not found that fewer or more profile entries lead 
-to better performance.
-
-Thanks.
-
-> Thanks,
->
-> Brett
->
-> <snip>
+Best regards,
+Krzysztof
 
 
