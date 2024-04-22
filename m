@@ -1,110 +1,134 @@
-Return-Path: <netdev+bounces-90228-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90229-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D7C98AD335
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 19:16:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FA9A8AD338
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 19:17:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C85361F21FCF
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 17:16:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2051E1C20FEE
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 17:17:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 268B9153BCF;
-	Mon, 22 Apr 2024 17:15:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 321D0153BC9;
+	Mon, 22 Apr 2024 17:17:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="HCw3zqTp"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Wo8loNqB"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C0752EB11
-	for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 17:15:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEB27146A6A
+	for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 17:17:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713806158; cv=none; b=EABYj2goaH69+c7U+6VKo7X77WpUzd2kyYJ6XOegqoANCelMoZqTfkiYqVELtCrJxaP941zxdsyn4QmvQgb596sD9ZC3xM5Cv+Seyq17442BGMRwKm1c70lt6deYBTSvQoLOI/44PgH6cgbbfWvt/Xp88Je2ymx6cNPpkBj3RXg=
+	t=1713806259; cv=none; b=CLeIlbRnBOklioFd7QmuX5omO88aXV/fYccC2ihSbJmXOZf+S1aKu8v6gjuDJv0koJGnTJFjk4Jjx9SQzUthmNwdFPjtAchHC2cSoyDksFKZL4PRq1Va847zTUDcSgvyPB4zuJ1d6uPcl6Tx/WC6HUKaTh3uI2bHMGGDHON0G1E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713806158; c=relaxed/simple;
-	bh=LHwzPMPACKrOm/Zer9UyhwdPK/j7FZiobBiBTWSq7UI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CVyXICXVoidIAMAHsP0I3ahw2LPYo6N1jRMhtsMu25A7SxTmJMNX8eMgSrl14nqIpCAUjR57lEtSG9pc3TgH1KeZ17Pw+DNQRdPKY2KOqKXgHhvQuY9wUSwi+rAQhWVCX5aSVQaDTGjEbw95yu8a3OSHAm8B+A3xiHxcH5RwXBo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=HCw3zqTp; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=R+nP1AF96X8HBCWz9txu13aAuPaYvcjiIkqi79byxFM=; b=HC
-	w3zqTp6VSeit5buP6KAImqN86FTLj6UxCs1nXPKu3obYXkprMdnPB455ULX8ioEPzaxJBxEW9WUnG
-	ypNngHvpH/yneZvs03qB4t/im5vH+jFRNITNkuLTQe6wAQvUb1MNQsn5L7ueXkCaoldhS01d0zUQI
-	bEkwUe7lJ+6pK3Q=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1ryxGj-00DdXa-8t; Mon, 22 Apr 2024 19:15:53 +0200
-Date: Mon, 22 Apr 2024 19:15:53 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: SIMON BABY <simonkbaby@gmail.com>
-Cc: netdev@vger.kernel.org
-Subject: Re: Support needed for integrating Marvel 88e6390 with microchip
- SAMA7 processor (DSA)
-Message-ID: <c8134442-0080-4a63-9812-8d1d23339f3c@lunn.ch>
-References: <CAEFUPH0SoiOef1t8GS+Ch2a2sk+95PfF9Fnz_tPoveRJy2eAuw@mail.gmail.com>
- <f3739191-1c13-481a-af70-f517f2dd75de@lunn.ch>
- <CAEFUPH0BFxnjxT-sX=pwgJnaLhEZajELJzsc227am3AOWye51g@mail.gmail.com>
- <CAEFUPH20drisR7W8-Hb4XpFs1O0zaGN72yiNgRWXmQFSS2vSyw@mail.gmail.com>
- <CAEFUPH2POB-3jn_vjVS5CraJvOyhNSGLtA0hFvnNZsA+OL6eWg@mail.gmail.com>
+	s=arc-20240116; t=1713806259; c=relaxed/simple;
+	bh=3nJ6+hZKfHxCRKFyn7lieKLntV/eqdbSRDmmg5CaoGY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Ww2ZjHHbPbIHT685pTvsqi0H3IfINsXAkkSyk8aZTyD2YdCpGk2OQVZCZ7c09mTqgflpHNqIGTRCwsv1Bfx6d8bxvOxBcaHrYHje5GoaP+ZYcuF4X3LHGkTO/HfhBUjphqG2Ot3nWsxTqF4WSwbUd6ew3MziAAWMg5qohlkwMJo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Wo8loNqB; arc=none smtp.client-ip=209.85.216.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-2a559928f46so3040827a91.0
+        for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 10:17:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1713806257; x=1714411057; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=GfkfMM0Gd7QcKtCwQ7pRhrklxD1aCU/CWRwllYd5MuI=;
+        b=Wo8loNqB9blsVRqGW66reMxcGXJH6ba+07R2iNUNoJiYZ9zN0yyV32ZaMclM2DDipi
+         tCkpD5ZAL87ZpGB7+9eot3/lrvDwGrnQi8LApK1598Abls/OA+FJWrD9kLxni4RIKPJ6
+         alA9gb4UcbOysiIJP1QxD3ku8e0mAgAFRFMh3wccNe4VFoGPy7Th5WWuoODKk5+TyTZl
+         Vo5fBzVNRDW9+ITwWDZIBtT92eLudYUKPG6OY6w8D0wHdoazZCf6bK7p5drdyCWrj7zY
+         s0VYTiaVL9xtvcdWABf7oTZ9Gt7Z1zoEH2B6s6sN5LhLrmz1Lj83ubSanwebQwReV8Zx
+         7xhw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713806257; x=1714411057;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=GfkfMM0Gd7QcKtCwQ7pRhrklxD1aCU/CWRwllYd5MuI=;
+        b=vNk+vqjdRngkVPfM2GTIqvIf/T+7Qlq3eatSYck++yJvOBI2KY6QYI79RvYkryE79X
+         /b+ZGtyt6HqVjb6aakHxOVtpZlSCAIWJksNiqQvj6oHqMebORWW3Vt0B9VhHfZGnA3jL
+         +1Ca+j9vKR0UZNL58D5dk/RIGYKJ6FWa2iYEwaaw09nrqmE8YKC7l8t47gYhi/fw9jva
+         tUJJz0CKiqiD7dCpwAuNfe8zkUbpD8V6jCLbAoq6Zp35wh9ek8mlY3FmQjQH8dH1ZPXV
+         gIQaclnDaiGuunrAetSlDqeAew/mzUpQmUAeyvuZQVeMjneYdmZd5AAj0TwvFoViLlT1
+         m8Rg==
+X-Forwarded-Encrypted: i=1; AJvYcCU7TBBU4I9LpZNVAGp5a/kMw7vuyO6SsK/YRpEl5YUt45rTRv4ffZANlyorknMMJcfNoBdzekFK1wv6X5Z7nMzDO7P6zvAq
+X-Gm-Message-State: AOJu0YwEh7TY/UmGCqwYW3s2V4HUL/X+CXxlOQGY0edHoepH9seCPSb8
+	ja/WNkqrEQsYXfj/vaYyVofb13HZg9H5YQTAK52hTXsN0tII+4SHWpTL8lb2L1VZweMZ+m9fRqP
+	TcfOLhsLt+ZWwc/X7Bco8aqFKk8Y=
+X-Google-Smtp-Source: AGHT+IGPky+Vq52g9Z2lHtIKPek4u8RvACyM+G9UsNqAU6wtPgV9tbVZqORhjep+U/OtFKqHjFR3kR4uAFEmvwVpMck=
+X-Received: by 2002:a17:90a:d990:b0:2ab:ca7d:658b with SMTP id
+ d16-20020a17090ad99000b002abca7d658bmr8889234pjv.4.1713806257020; Mon, 22 Apr
+ 2024 10:17:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAEFUPH2POB-3jn_vjVS5CraJvOyhNSGLtA0hFvnNZsA+OL6eWg@mail.gmail.com>
+References: <ZiYu9NJ/ClR8uSkH@v4bel-B760M-AORUS-ELITE-AX>
+In-Reply-To: <ZiYu9NJ/ClR8uSkH@v4bel-B760M-AORUS-ELITE-AX>
+From: Dmitry Safonov <0x7f454c46@gmail.com>
+Date: Mon, 22 Apr 2024 18:17:25 +0100
+Message-ID: <CAJwJo6aYsC9yDWLpuyPDuEObVk3sxeRgOmoJgRgwwn-7OBKH3w@mail.gmail.com>
+Subject: Re: [PATCH] tcp: Fix Use-After-Free in tcp_ao_connect_init
+To: Hyunwoo Kim <v4bel@theori.io>
+Cc: edumazet@google.com, imv4bel@gmail.com, davem@davemloft.net, 
+	dsahern@kernel.org, kuba@kernel.org, pabeni@redhat.com, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Apr 22, 2024 at 09:43:11AM -0700, SIMON BABY wrote:
-> Hello Andrew,
-> 
-> I was doing some traffic related tests with dsa slave ports. I have connected
-> the lan2 port to my laptop and configured an IP address (same network). However
-> I could not ping the addresses. Do I have to change the MAC address of the lan2
-> interface as well? I can see lan2 is transmitting packets but nothing Rx. The
-> MAC addresses of both the CPU port and lan2 are the same. 
+On Mon, 22 Apr 2024 at 10:33, Hyunwoo Kim <v4bel@theori.io> wrote:
+>
+> Since call_rcu, which is called in the hlist_for_each_entry_rcu traversal
+> of tcp_ao_connect_init, is not part of the RCU read critical section, it
+> is possible that the RCU grace period will pass during the traversal and
+> the key will be free.
+>
+> To prevent this, it should be changed to hlist_for_each_entry_safe.
+>
+> Fixes: 7c2ffaf21bd6 ("net/tcp: Calculate TCP-AO traffic keys")
+> Signed-off-by: Hyunwoo Kim <v4bel@theori.io>
 
-The MAC address should be fine.
+Thank you,
 
-What does tcpdump/wireshark on your laptop show? Does it receive the packets?
-Does it reply?
- 
-> eth0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1504
->         inet 192.162.0.111  netmask 255.255.255.0  broadcast 192.162.0.255
->         inet6 fe80::691:62ff:fef2:fd1c  prefixlen 64  scopeid 0x20<link>
->         ether 04:91:62:f2:fd:1c  txqueuelen 1000  (Ethernet)
->         RX packets 0  bytes 0 (0.0 B)
->         RX errors 24  dropped 0  overruns 0  frame 24
+Acked-by: Dmitry Safonov <0x7f454c46@gmail.com>
 
-RX errors and frame errors does not look good. You should investigate
-that. Maybe wireshark will give you a clue.
 
->         TX packets 74  bytes 8301 (8.1 KiB)
->         TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
->         device interrupt 172
-> 
-> lan2: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
->         inet 192.168.0.120  netmask 255.255.255.0  broadcast 192.168.0.255
->         inet6 fe80::691:62ff:fef2:fd1c  prefixlen 64  scopeid 0x20<link>
->         ether 04:91:62:f2:fd:1c  txqueuelen 1000  (Ethernet)
->         RX packets 0  bytes 0 (0.0 B)
->         RX errors 0  dropped 0  overruns 0  frame 0
->         TX packets 25  bytes 2092 (2.0 KiB)
->         TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+> ---
+>  net/ipv4/tcp_ao.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>
+> diff --git a/net/ipv4/tcp_ao.c b/net/ipv4/tcp_ao.c
+> index 3afeeb68e8a7..781b67a52571 100644
+> --- a/net/ipv4/tcp_ao.c
+> +++ b/net/ipv4/tcp_ao.c
+> @@ -1068,6 +1068,7 @@ void tcp_ao_connect_init(struct sock *sk)
+>  {
+>         struct tcp_sock *tp = tcp_sk(sk);
+>         struct tcp_ao_info *ao_info;
+> +       struct hlist_node *next;
+>         union tcp_ao_addr *addr;
+>         struct tcp_ao_key *key;
+>         int family, l3index;
+> @@ -1090,7 +1091,7 @@ void tcp_ao_connect_init(struct sock *sk)
+>         l3index = l3mdev_master_ifindex_by_index(sock_net(sk),
+>                                                  sk->sk_bound_dev_if);
+>
+> -       hlist_for_each_entry_rcu(key, &ao_info->head, node) {
+> +       hlist_for_each_entry_safe(key, next, &ao_info->head, node) {
+>                 if (!tcp_ao_key_cmp(key, l3index, addr, key->prefixlen, family, -1, -1))
+>                         continue;
+>
+> --
+> 2.34.1
+>
 
-Developers stopped using ifconfig many years ago.
 
-	Andrew
-
+--
+             Dmitry
 
