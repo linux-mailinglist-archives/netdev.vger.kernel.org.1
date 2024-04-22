@@ -1,178 +1,138 @@
-Return-Path: <netdev+bounces-90237-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90239-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0572E8AD3FB
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 20:32:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA2818AD40D
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 20:34:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 297A21C2031B
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 18:32:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7AFE81F2197E
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 18:34:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95C6613F442;
-	Mon, 22 Apr 2024 18:32:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4423B13EFE1;
+	Mon, 22 Apr 2024 18:34:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="so5WSWIf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cqSjeSi8"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FE2F1B977
-	for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 18:32:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20C77154422
+	for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 18:34:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713810731; cv=none; b=PpxRMnO5lFGVQSnCa+548I0iq9aO/31Wl5NmoPZe+2uikxPqqerw3lBnpoUU1mOrzfBgIoUZbnmQCKODyEC/Pi27regARnTsPOcm+y1hpBMMbyqAY0BLi1QmB1yJV2rrT8jtZsumrOL6p6US7nKhGwlgeOBz3Bd5M7rJi07Fu7w=
+	t=1713810850; cv=none; b=O0YNYg7OzpjePx9gAQleD8bm7jVbgfc8385e5ZQUnYvu/+P7InT3dkBFiC63Fb54LgWcFRwItSmReH2dhXcvnC93QyyE2iXHCNFevbtMB6YfAowmB6B9t4itFZoUaEPvsNR/bP/ff5lPxoEcg5URwpufZD4IhTN9/0VBZ7ir6K4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713810731; c=relaxed/simple;
-	bh=kXqg48OQIw7Y2/Rm0Gf0L41p9Mxor/5YuKqrYipPbXQ=;
+	s=arc-20240116; t=1713810850; c=relaxed/simple;
+	bh=QroLROb+9J7wSIEprVbwfLzUrvYKKxYTKioKMoX5Bek=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IlBmCY0LWVuEZ8bTcSGA1tQDTRCSpbPh+Puq7tvOwdiJS5k4TLD2JyUuXA5Y2Zg4zYPZouxR5LP5rbFlwCtnYJfMfuFlEeN7bCtJR0cl1kdXjbDlvo3J0YqoUGF+ow5Kfw9GNTF5j3ib8X0j+7ReMIwho7qmuh5a1nSa1VY7XnI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=so5WSWIf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 596FDC113CC;
-	Mon, 22 Apr 2024 18:32:09 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=WD1wgDL9zxY+EYOt0GP+FbSEVFnGeIBOc1CCLrzJrIL5OFMS1pCDA/UOdykr7Tt/WQFLQXr2THegSN2BBpMrft6mR7LqdJBcr7V+2+7ZTP2n92mC1qWV1sJbQOhxyqSoGUH10C4KMbvx5JmGklxPr2yeUwyDOecVfWrBh1rnteA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cqSjeSi8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93E70C113CC;
+	Mon, 22 Apr 2024 18:34:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713810731;
-	bh=kXqg48OQIw7Y2/Rm0Gf0L41p9Mxor/5YuKqrYipPbXQ=;
+	s=k20201202; t=1713810849;
+	bh=QroLROb+9J7wSIEprVbwfLzUrvYKKxYTKioKMoX5Bek=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=so5WSWIfseLg9jSBsYDq8G3T2sxBCeXkKqa3RwnUj8v67Wk4MzcIjJyHR1+heGvWm
-	 GSOBe/ttAJqknImtTQ2rN7j7Q4TmkT2YrYSWlDZ+KdlAGLTD53Q6XhVDJ+HO0qgXgo
-	 mGx3XcWTI4uRiiqpe0Vb/hljLcXo0cJht9bVOsiW2ZxLiCemiQzPzsluUp4YHQkkqD
-	 tGRIh7Nho+pjvj45i7hmi3PzZQhSNrPY9sGCVAoygNN7wV/PACL4Ts3xWyFpwwDC/s
-	 cKkPoiUEMGCh+5Yjc0BKhQIhZm/M4CHlJ9/lJ7Mv0qLEKb/oClzAgHa5LAgX0WbNEa
-	 +euGn6Ld3w79g==
-Date: Mon, 22 Apr 2024 19:32:06 +0100
+	b=cqSjeSi8TEvqI5wneEPi0zyEuZxbYm44qu+veD4nRwiVzjwwhgeP28II30ghV32/E
+	 xoCB0JNvPxJLXWBaEyQbjNUthO1i3IpYMMWpnEQaAu0+TjBLHMX8pB08omY1KL8gRS
+	 RSzVIJoh+YDGY69VXqe3aLMTuFD6sltTDShw3pfxLSjBMeGY5zWrQA2b1FTHZvQvKW
+	 Y5jKxpDu/0BaAgeocipSFPKWkLFoP8b7q8CVxihC74cAknvjnKPvmY1WjKoSF0HtyM
+	 MqjIh07f2BLM0/7cyhMAqaUzx8IXsl5uXR1/CmvR8qX/z4ZCyaIef05RkBfxzoaTJH
+	 Zy389wsXuGSFw==
+Date: Mon, 22 Apr 2024 19:34:05 +0100
 From: Simon Horman <horms@kernel.org>
-To: "Kwapulinski, Piotr" <piotr.kwapulinski@intel.com>
-Cc: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"Gomes, Vinicius" <vinicius.gomes@intel.com>,
-	"Wegrzyn, Stefan" <stefan.wegrzyn@intel.com>,
-	"Jagielski, Jedrzej" <jedrzej.jagielski@intel.com>,
-	"Sokolowski, Jan" <jan.sokolowski@intel.com>
-Subject: Re: [PATCH iwl-next v2 2/5] ixgbe: Add support for E610 device
- capabilities detection
-Message-ID: <20240422183206.GE42092@kernel.org>
-References: <20240415103435.6674-1-piotr.kwapulinski@intel.com>
- <20240415103435.6674-3-piotr.kwapulinski@intel.com>
- <20240420181826.GA42092@kernel.org>
- <DM6PR11MB461069F903C65507AB64228BF3122@DM6PR11MB4610.namprd11.prod.outlook.com>
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: Eric Dumazet <edumazet@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
+	netdev@vger.kernel.org, eric.dumazet@gmail.com
+Subject: Re: tdc [Was: Re: [PATCH v2 net-next 00/14] net_sched: first series
+ for RTNL-less] qdisc dumps
+Message-ID: <20240422183405.GF42092@kernel.org>
+References: <20240418073248.2952954-1-edumazet@google.com>
+ <CAM0EoMmi0KE6+Nr6E=HqsnMee=8uia57mv0Go8Uu_uNrsVw9Dw@mail.gmail.com>
+ <20240418150816.GG3975545@kernel.org>
+ <CAM0EoM=Cen-0ctMkBvDL-jsuwPKGetz4yTG+RpmW7dXjjeVaQg@mail.gmail.com>
+ <20240419071809.GT3975545@kernel.org>
+ <CAM0EoMnLDrpoU21K85fun2ncN3r3ucF3p6ajw0H_-XoEsyDn5w@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <DM6PR11MB461069F903C65507AB64228BF3122@DM6PR11MB4610.namprd11.prod.outlook.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAM0EoMnLDrpoU21K85fun2ncN3r3ucF3p6ajw0H_-XoEsyDn5w@mail.gmail.com>
 
-On Mon, Apr 22, 2024 at 10:41:47AM +0000, Kwapulinski, Piotr wrote:
-> >-----Original Message-----
-> >From: Simon Horman <horms@kernel.org> 
-> >Sent: Saturday, April 20, 2024 8:18 PM
-> >To: Kwapulinski, Piotr <piotr.kwapulinski@intel.com>
-> >Cc: intel-wired-lan@lists.osuosl.org; netdev@vger.kernel.org; Gomes, Vinicius <vinicius.gomes@intel.com>; Wegrzyn, Stefan <stefan.wegrzyn@intel.com>; Jagielski, Jedrzej <jedrzej.jagielski@intel.com>; Sokolowski, Jan <jan.sokolowski@intel.com>
-> >Subject: Re: [PATCH iwl-next v2 2/5] ixgbe: Add support for E610 device capabilities detection
+On Fri, Apr 19, 2024 at 10:24:52AM -0400, Jamal Hadi Salim wrote:
+> On Fri, Apr 19, 2024 at 3:18 AM Simon Horman <horms@kernel.org> wrote:
 > >
-> >On Mon, Apr 15, 2024 at 12:34:32PM +0200, Piotr Kwapulinski wrote:
-> >> Add low level support for E610 device capabilities detection. The 
-> >> capabilities are discovered via the Admin Command Interface. Discover 
-> >> the following capabilities:
-> >> - function caps: vmdq, dcb, rss, rx/tx qs, msix, nvm, orom, reset
-> >> - device caps: vsi, fdir, 1588
-> >> - phy caps
-> >> 
-> >> Co-developed-by: Stefan Wegrzyn <stefan.wegrzyn@intel.com>
-> >> Signed-off-by: Stefan Wegrzyn <stefan.wegrzyn@intel.com>
-> >> Co-developed-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-> >> Signed-off-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-> >> Reviewed-by: Jan Sokolowski <jan.sokolowski@intel.com>
-> >> Signed-off-by: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
+> > On Thu, Apr 18, 2024 at 07:05:08PM -0400, Jamal Hadi Salim wrote:
+> > > On Thu, Apr 18, 2024 at 11:08 AM Simon Horman <horms@kernel.org> wrote:
+> > > >
+> > > > On Thu, Apr 18, 2024 at 06:23:27AM -0400, Jamal Hadi Salim wrote:
+> > > > > On Thu, Apr 18, 2024 at 3:32 AM Eric Dumazet <edumazet@google.com> wrote:
+> > > > > >
+> > > > > > Medium term goal is to implement "tc qdisc show" without needing
+> > > > > > to acquire RTNL.
+> > > > > >
+> > > > > > This first series makes the requested changes in 14 qdisc.
+> > > > > >
+> > > > > > Notes :
+> > > > > >
+> > > > > >  - RTNL is still held in "tc qdisc show", more changes are needed.
+> > > > > >
+> > > > > >  - Qdisc returning many attributes might want/need to provide
+> > > > > >    a consistent set of attributes. If that is the case, their
+> > > > > >    dump() method could acquire the qdisc spinlock, to pair the
+> > > > > >    spinlock acquision in their change() method.
+> > > > > >
+> > > > >
+> > > > > For the series:
+> > > > > Reviewed-by: Jamal Hadi Salim<jhs@mojatatu.com>
+> > > > >
+> > > > > Not a show-stopper, we'll run the tdc tests after (and use this as an
+> > > > > opportunity to add more tests if needed).
+> > > > > For your next series we'll try to do that after you post.
+> > > >
+> > > > Hi Jamal,
+> > > >
+> > > > On the topic of tdc, I noticed the following both
+> > > > with and without this series applied. Is this something
+> > > > you are aware of?
+> > > >
+> > > > not ok 990 ce7d - Add mq Qdisc to multi-queue device (4 queues)
+> > > >
+> > >
+> > > Since you said it also happens before Eric's patch, I took a look in
+> > > the test and nothing seems to stand out. Which iproute2 version are
+> > > you using?
+> > > We are running tdc in tandem with net-next (and iproute2-next) via
+> > > nipa for a while now and didn't see this problem pop up. So I am
+> > > guessing something in your setup?
 > >
-> >Hi Pitor,
+> > Thanks Jamal,
 > >
-> >A few minor nits from my side.
-> >No need to respin just because of these.
+> > I appreciate you checking this.
+> > I agree it seems likely that it relates to my environment.
+> > And I'll try out iproute2-next.
 > >
-> >> ---
-> >>  drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c | 517 
-> >> ++++++++++++++++++  drivers/net/ethernet/intel/ixgbe/ixgbe_e610.h |  
-> >> 11 +
-> >>  2 files changed, 528 insertions(+)
-> >> 
-> >> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c 
-> >> b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
-> >
-> >...
-> >
-> >> +/**
-> >> + * ixgbe_get_num_per_func - determine number of resources per PF
-> >> + * @hw: pointer to the HW structure
-> >> + * @max: value to be evenly split between each PF
-> >> + *
-> >> + * Determine the number of valid functions by going through the 
-> >> +bitmap returned
-> >> + * from parsing capabilities and use this to calculate the number of 
-> >> +resources
-> >> + * per PF based on the max value passed in.
-> >> + *
-> >> + * Return: the number of resources per PF or 0, if no PH are available.
-> >> + */
-> >> +static u32 ixgbe_get_num_per_func(struct ixgbe_hw *hw, u32 max) {
-> >> +	const u32 IXGBE_CAPS_VALID_FUNCS_M = 0xFF;
-> >
-> >nit: Maybe this could simply be a #define?
-> Hello,
-> will do
 > 
-> >
-> >> +	u8 funcs = hweight8(hw->dev_caps.common_cap.valid_functions &
-> >> +			    IXGBE_CAPS_VALID_FUNCS_M);
-> >
-> >nit: Please consider using reverse xmas tree order - longest line to shortest -
-> >     for local variables in new Networking code
-> Will do
-> 
-> >
-> >> +
-> >> +	return funcs ? (max / funcs) : 0;
-> >> +}
-> >
-> >...
-> >
-> >> +/**
-> >> + * ixgbe_aci_disable_rxen - disable RX
-> >> + * @hw: pointer to the HW struct
-> >> + *
-> >> + * Request a safe disable of Receive Enable using ACI command (0x000C).
-> >> + *
-> >> + * Return: the exit code of the operation.
-> >> + */
-> >> +int ixgbe_aci_disable_rxen(struct ixgbe_hw *hw) {
-> >> +	struct ixgbe_aci_cmd_disable_rxen *cmd;
-> >> +	struct ixgbe_aci_desc desc;
-> >> +
-> >> +	cmd = &desc.params.disable_rxen;
-> >> +
-> >> +	ixgbe_fill_dflt_direct_cmd_desc(&desc, ixgbe_aci_opc_disable_rxen);
-> >> +
-> >> +	cmd->lport_num = (u8)hw->bus.func;
-> >
-> >nit: This cast seems unnecessary.
-> >     AFAICT the type of hw->bus.func is u8.
-> Will do
+> Yeah, that would work although i think what you showed earlier should
+> have worked with just iproute2. Actually one thing comes to mind
+> noticing you are using tdc.py - that test uses netdevsim. You may have
+> to modprobe netdevsim. If you run it via tdc.sh it would probe and
+> load it for you
 
-Thanks. FWIIW, I think I noticed a similar cast at least once more
-elsewhere in the patchset
+Thanks, tdc.sh seems to work better,
+as does invoking TDC via make (which calls tdc.sh).
 
-> 
-> >
-> >> +
-> >> +	return ixgbe_aci_send_cmd(hw, &desc, NULL, 0); }
-> >
-> >...
-> Thank you for review
-> Piotr
-> 
+...
+
 
