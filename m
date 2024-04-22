@@ -1,231 +1,173 @@
-Return-Path: <netdev+bounces-89919-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89920-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CD028AC2E6
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 05:02:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D39078AC30A
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 05:32:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 14434280E0D
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 03:02:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 02A161C20A0C
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 03:32:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EB90D272;
-	Mon, 22 Apr 2024 03:01:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE7B9E552;
+	Mon, 22 Apr 2024 03:32:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QAhDch7F"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N0g4WYsT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBA58DDAB;
-	Mon, 22 Apr 2024 03:01:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52D3F2579;
+	Mon, 22 Apr 2024 03:32:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713754910; cv=none; b=XdahOUkBHsA1H0xXqoDLIg+7GCNSDPZyPv4xN37/+8pEQbZUkNR4D4SmZPyhFm+Onb6E+01unwj5j8e7VQHvUmD2enltUyFFLFVC4mfENisZieWklyxsMsowpUsy7pabrxVLc0CxahHi2gMNqIF5tqs77H2wm5qNi69e1ClHBNs=
+	t=1713756737; cv=none; b=BP5WOifLEBN5V0LXsicizJi+d/jbqO31hdrSF2jAR8zRbtyb4WrL1ckmt+h5ZtSci2jkFVHJ7DVnFMfQRFJcifB/Y3lTHMkXRHnVzdujpNbOj5muAZBHSg+WHTpNANh5uquoV3TnUuWGVSXucrOJUUsthKag6VHy6Q3DSEcTyMQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713754910; c=relaxed/simple;
-	bh=CxYn1VGv9BVyoGnuPJvlhKLzgZNZDmrSRnQIudaVJAg=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Dz9xi2BxBBC924KcsVtACe05ZrlEawkvLPNEUpskSjtirHpwAuxIK0em3jC5fBTw3Ph8gQPOAEqg90BoZX+iCnjOxwd7dDhG7sXFDDyq169KpsseBRWsCDN78StiLHt1eFgmSfHezUL8uj8VxI+i/0QTHrLRZEewYjOWSCF1RXs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QAhDch7F; arc=none smtp.client-ip=209.85.214.176
+	s=arc-20240116; t=1713756737; c=relaxed/simple;
+	bh=8ZxelrFYDpIWsgv+hfq9Z0QBnO4jg4SnHI12pHxjFZA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=VMYjilUqHQl/+89fCPM76CDrBdSL0VrO6Xza1/7UpYZdeCfMH9vQMb5fcXJKLFOeZBbdpjerZfs2Sa4TbCQhDMgtZ3vA9J/9dLvm+SqQu9iIGRp9l2OECI6M6Ewfu5AKBid62k4qzFW3CPW+czWkYLmg9YCgD73oVuysp8h4YNo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=N0g4WYsT; arc=none smtp.client-ip=209.85.215.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-1e9bcff8a8cso1650185ad.3;
-        Sun, 21 Apr 2024 20:01:48 -0700 (PDT)
+Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-5dbd519bde6so2794150a12.1;
+        Sun, 21 Apr 2024 20:32:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713754908; x=1714359708; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1713756735; x=1714361535; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=5p8+XBCRL6Hrr61VyGsGU7K/4kprn5SAx6dJ5viCQ54=;
-        b=QAhDch7FEE3tnW1fmaNhVkxVxqNHkFA6qbrHqihccjIMpl4LnCFqxzOaTMqlOjNYf2
-         hwud7zR3CieX+22Gj0e+7DBc8B3vrnaNsXrDwZNuvPrA27hmZEizuOhap/IplQ4jo38W
-         1FDTphBBgEZVsfipSFimtYziBtuWQy3qzTUdMwuHjC9SqAxBMYD8JW2aF9vQuLLXrrnY
-         3ZWpHyUXUeip7xKAagHPGF5URI+QCE8JL1yBP80jDkN0D8iQ7NSaIGcIob9bnSHO6dgO
-         KqCl8AUZLf5AK2jBBRBV+GwC7BycCSp4rH9LyE+gqBRXVmMyebEDxf0NMv511ExwiFc3
-         5Mog==
+        bh=4/ZJL1pTmzEwFyLqE8i5v/vS2NbXGhujrhuWi0OmhOc=;
+        b=N0g4WYsTdpDfXjuiDqQo/orzBSZ26QmyasdXvRn91F5Y5QiEZ1v1WYsfQ0ZFEj0E0M
+         zUkTrlkUuhWCsxVUZx+cZh+AZb7mE9fXy97xJ8O32C/Emk7eAieKiLRXlJT9+XsheZzx
+         yn74aSf8Z/J2lFzAp4/HEKf0g6igeXCR5NdJw86PJ4OXkm6I0pOxd1QwBuw2P+PR230T
+         J9a/MnPTQ/JBD/A/LoDUYfiDmuDKbl4IIb3TTXkq9muCAF7R+Na/Zr3anNxgWka6tI1b
+         P3Ics0ZNJCZYY2XWUZ/OrLsjW/4mdve03Vou7YbPbRRvVQ9jKBxfO/zDMisd+OSvdNOZ
+         UJOA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713754908; x=1714359708;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1713756735; x=1714361535;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=5p8+XBCRL6Hrr61VyGsGU7K/4kprn5SAx6dJ5viCQ54=;
-        b=HPJWW77H8zjyyFiWJn52OpoEF5Hs+ZpXOVMWS4oPP1qMq3b6hjU7MHya9Omj2JI8LE
-         rhhqQIfaENUp5mgDIX/yowcFH1Ci881AKWCaWjxgu6BM329tnqOSTDTUeInAZU+LhDIL
-         qKKYheYCdwcuPBc6c793C3k0izB2+yantyKnFOuRm7TeWRUhpIL/c0IGpuF2w6xjWFYa
-         zqtq83vvHIV7NpTszWPfJQayk2Z0JT7V+9V7z0kUuz8XjupWWTBOn+X1LJl7BfLNh5AZ
-         PSXlIIqKJtvP8pKoqwKqmVlYamcVKnWaXdZQpjx9MyWtSCzz6cn7y0Jiq4+1zcDMpxL4
-         vkgQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU7Xhh36zmVezINxgKQUe3478LTJIND5BQBdYwbG5hyRBwo9aSlcX6lRaxhSXGi5hJl6fxnybWEyS1VCVDkO79W8loMZjvEBHsxh4F+frs0fQA8K/bj7v4HZ3nRBIV9ejBwH3HvpziT1U37
-X-Gm-Message-State: AOJu0YxmLD4/k6oxi81y6sgC/rUR4ndPZLj9qs6mePneJ41Ea79ZGTrx
-	7HkMYtIbL15tj7EK95n3FlTA/tnTLmxpuOjP3QW0vvtTvnZCpgFf
-X-Google-Smtp-Source: AGHT+IEmXSE6/YbEiEkDZXkV8Th4sWtQd6TKpikTRSCaVLJJfKnpX6D6nSHGbo4EvC969UyO0qiD4A==
-X-Received: by 2002:a17:903:11d1:b0:1e7:f944:b000 with SMTP id q17-20020a17090311d100b001e7f944b000mr9643112plh.24.1713754908124;
-        Sun, 21 Apr 2024 20:01:48 -0700 (PDT)
-Received: from KERNELXING-MB0.tencent.com ([43.132.141.21])
-        by smtp.gmail.com with ESMTPSA id b5-20020a170902d60500b001e421f98ebdsm6966009plp.280.2024.04.21.20.01.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 21 Apr 2024 20:01:47 -0700 (PDT)
-From: Jason Xing <kerneljasonxing@gmail.com>
-To: edumazet@google.com,
-	dsahern@kernel.org,
-	matttbe@kernel.org,
-	martineau@kernel.org,
-	geliang@kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	davem@davemloft.net,
-	rostedt@goodmis.org,
-	mhiramat@kernel.org,
-	mathieu.desnoyers@efficios.com,
-	atenart@kernel.org
-Cc: mptcp@lists.linux.dev,
-	netdev@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org,
-	kerneljasonxing@gmail.com,
-	Jason Xing <kernelxing@tencent.com>
-Subject: [PATCH net-next v7 7/7] rstreason: make it work in trace world
-Date: Mon, 22 Apr 2024 11:01:09 +0800
-Message-Id: <20240422030109.12891-8-kerneljasonxing@gmail.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20240422030109.12891-1-kerneljasonxing@gmail.com>
-References: <20240422030109.12891-1-kerneljasonxing@gmail.com>
+        bh=4/ZJL1pTmzEwFyLqE8i5v/vS2NbXGhujrhuWi0OmhOc=;
+        b=aUhmci8XZ/zDay8e6FjIyKThsxzZDaUhPwZWc3AtUxHZjqF+8+Y4Sh7qazQ/855vEH
+         yOXjyLEy9tb8Z1f/N+LtWzdUZza3F8xDatVPkbNk8EcrAvRSX1X3GZOnZ5NmU7JD+LP0
+         HJxfDpti5UxaXMH28swqve4JVmh10bp1xcPsCgkco3TlguUvL/N7biwdFAdtaEBe+yLU
+         bnb0PDesrPUtmGqlEdx6RyWjSbZ9SYqJK8LNWPcC3cjMJaUp7PrOqoOK+73h0tXUgTGE
+         Mi6wzBoaGbLjqLYOCJISqGnYWUBHFIZpX21jHPEdRXVs6dTwFuHmeI8x8Axkr1g+is3n
+         21pA==
+X-Forwarded-Encrypted: i=1; AJvYcCVBytpF5xSNM9qsRM/L+IMAsZ0PmhlCs3PpCnJCYYjqEfDqkJIxGwtETOjYVzCf/OVm8aeaoU0E4qrV6f7taDdxQX3REWRKH34UJ1QybWfnGeTDdg/0YPwQMMl2oWhg170A92b8EL5EpojfW5FkCa5c2b2BHwThreyFypozbmAUxaBpnEo9iUYf0jeFCLaYHSgfZ6O2
+X-Gm-Message-State: AOJu0YzEI1gJwK0PaFikDs70iJiV2VxA+JO+iUbg9kxjPlX/JftvU5wG
+	vrR1oeBQr9+jiufgnLmx3eTJkHax92G+MDLALah7B65C7To8orI4cxsSMd+MT98l7GXykaXzwm2
+	alcSzs95hgxbDda3HBugEpTf38sQ=
+X-Google-Smtp-Source: AGHT+IEPRvtxI6/g1huUDW70lpXzs8IjQOSCtUsfVTl265mSKB6kl1T3yNXxP4qPGJnDIw87Ykgbrpi4qjFfagWlu/c=
+X-Received: by 2002:a05:6a21:191:b0:1a7:5fe0:1c99 with SMTP id
+ le17-20020a056a21019100b001a75fe01c99mr10040642pzb.46.1713756735513; Sun, 21
+ Apr 2024 20:32:15 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240420104801.94701-1-usiegl00@gmail.com> <171374175513.12877.8993642908082014881@noble.neil.brown.name>
+In-Reply-To: <171374175513.12877.8993642908082014881@noble.neil.brown.name>
+From: Lex Siegel <usiegl00@gmail.com>
+Date: Mon, 22 Apr 2024 12:32:04 +0900
+Message-ID: <CAHCWhjScokCi7u_98-i6E_xHaSJnFGY6dnkv9-C5-yrpihVJFg@mail.gmail.com>
+Subject: Re: [PATCH] xprtsock: Fix a loop in xs_tcp_setup_socket()
+To: NeilBrown <neilb@suse.de>
+Cc: Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, 
+	Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>, 
+	Trond Myklebust <trond.myklebust@hammerspace.com>, Anna Schumaker <anna@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, linux-nfs@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bpf@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Jason Xing <kernelxing@tencent.com>
+> Better still would be for kernel_connect() to return a more normal error
+> code - not EPERM.  If that cannot be achieved, then I think it would be
+> best for the sunrpc code to map EPERM to something else at the place
+> where kernel_connect() is called - catch it early.
 
-At last, we should let it work by introducing this reset reason in
-trace world.
+The question is whether a permission error, EPERM, should cause a retry or
+return. Currently xs_tcp_setup_socket() is retrying. For the retry to clear=
+,
+the connect call will have to not return a permission error to halt the ret=
+ry
+attempts.
 
-One of the possible expected outputs is:
-... tcp_send_reset: skbaddr=xxx skaddr=xxx src=xxx dest=xxx
-state=TCP_ESTABLISHED reason=NOT_SPECIFIED
+This is a default behavior because EPERM is not an explicit case of the swi=
+tch
+statement. Because bpf appropriately uses EPERM to show that the kernel_con=
+nect
+was not permitted, it highlights the return handling for this case is missi=
+ng.
+It is unlikely that retry was ever the intended result.
 
-Signed-off-by: Jason Xing <kernelxing@tencent.com>
-Reviewed-by: Steven Rostedt (Google) <rostedt@goodmis.org>
----
- include/trace/events/tcp.h | 26 ++++++++++++++++++++++----
- net/ipv4/tcp_ipv4.c        |  2 +-
- net/ipv4/tcp_output.c      |  2 +-
- net/ipv6/tcp_ipv6.c        |  2 +-
- 4 files changed, 25 insertions(+), 7 deletions(-)
+Upstream, the bpf that caused this is at:
+https://github.com/cilium/cilium/blob/v1.15/bpf/bpf_sock.c#L336
 
-diff --git a/include/trace/events/tcp.h b/include/trace/events/tcp.h
-index 5c04a61a11c2..49b5ee091cf6 100644
---- a/include/trace/events/tcp.h
-+++ b/include/trace/events/tcp.h
-@@ -11,6 +11,7 @@
- #include <net/ipv6.h>
- #include <net/tcp.h>
- #include <linux/sock_diag.h>
-+#include <net/rstreason.h>
- 
- /*
-  * tcp event with arguments sk and skb
-@@ -74,20 +75,32 @@ DEFINE_EVENT(tcp_event_sk_skb, tcp_retransmit_skb,
- 	TP_ARGS(sk, skb)
- );
- 
-+#undef FN
-+#define FN(reason)	TRACE_DEFINE_ENUM(SK_RST_REASON_##reason);
-+DEFINE_RST_REASON(FN, FN)
-+
-+#undef FN
-+#undef FNe
-+#define FN(reason)	{ SK_RST_REASON_##reason, #reason },
-+#define FNe(reason)	{ SK_RST_REASON_##reason, #reason }
-+
- /*
-  * skb of trace_tcp_send_reset is the skb that caused RST. In case of
-  * active reset, skb should be NULL
-  */
- TRACE_EVENT(tcp_send_reset,
- 
--	TP_PROTO(const struct sock *sk, const struct sk_buff *skb),
-+	TP_PROTO(const struct sock *sk,
-+		 const struct sk_buff *skb,
-+		 const enum sk_rst_reason reason),
- 
--	TP_ARGS(sk, skb),
-+	TP_ARGS(sk, skb, reason),
- 
- 	TP_STRUCT__entry(
- 		__field(const void *, skbaddr)
- 		__field(const void *, skaddr)
- 		__field(int, state)
-+		__field(enum sk_rst_reason, reason)
- 		__array(__u8, saddr, sizeof(struct sockaddr_in6))
- 		__array(__u8, daddr, sizeof(struct sockaddr_in6))
- 	),
-@@ -113,14 +126,19 @@ TRACE_EVENT(tcp_send_reset,
- 			 */
- 			TP_STORE_ADDR_PORTS_SKB(skb, th, entry->daddr, entry->saddr);
- 		}
-+		__entry->reason = reason;
- 	),
- 
--	TP_printk("skbaddr=%p skaddr=%p src=%pISpc dest=%pISpc state=%s",
-+	TP_printk("skbaddr=%p skaddr=%p src=%pISpc dest=%pISpc state=%s reason=%s",
- 		  __entry->skbaddr, __entry->skaddr,
- 		  __entry->saddr, __entry->daddr,
--		  __entry->state ? show_tcp_state_name(__entry->state) : "UNKNOWN")
-+		  __entry->state ? show_tcp_state_name(__entry->state) : "UNKNOWN",
-+		  __print_symbolic(__entry->reason, DEFINE_RST_REASON(FN, FNe)))
- );
- 
-+#undef FN
-+#undef FNe
-+
- /*
-  * tcp event with arguments sk
-  *
-diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-index 06f8a24801b2..5db2d55b65af 100644
---- a/net/ipv4/tcp_ipv4.c
-+++ b/net/ipv4/tcp_ipv4.c
-@@ -871,7 +871,7 @@ static void tcp_v4_send_reset(const struct sock *sk, struct sk_buff *skb,
- 	if (sk)
- 		arg.bound_dev_if = sk->sk_bound_dev_if;
- 
--	trace_tcp_send_reset(sk, skb);
-+	trace_tcp_send_reset(sk, skb, reason);
- 
- 	BUILD_BUG_ON(offsetof(struct sock, sk_bound_dev_if) !=
- 		     offsetof(struct inet_timewait_sock, tw_bound_dev_if));
-diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
-index 276d9d541b01..b08ffb17d5a0 100644
---- a/net/ipv4/tcp_output.c
-+++ b/net/ipv4/tcp_output.c
-@@ -3612,7 +3612,7 @@ void tcp_send_active_reset(struct sock *sk, gfp_t priority,
- 	/* skb of trace_tcp_send_reset() keeps the skb that caused RST,
- 	 * skb here is different to the troublesome skb, so use NULL
- 	 */
--	trace_tcp_send_reset(sk, NULL);
-+	trace_tcp_send_reset(sk, NULL, SK_RST_REASON_NOT_SPECIFIED);
- }
- 
- /* Send a crossed SYN-ACK during socket establishment.
-diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
-index d8c74e90698b..966a6a9b0f44 100644
---- a/net/ipv6/tcp_ipv6.c
-+++ b/net/ipv6/tcp_ipv6.c
-@@ -1133,7 +1133,7 @@ static void tcp_v6_send_reset(const struct sock *sk, struct sk_buff *skb,
- 			label = ip6_flowlabel(ipv6h);
- 	}
- 
--	trace_tcp_send_reset(sk, skb);
-+	trace_tcp_send_reset(sk, skb, reason);
- 
- 	tcp_v6_send_response(sk, skb, seq, ack_seq, 0, 0, 0, oif, 1,
- 			     ipv6_get_dsfield(ipv6h), label, priority, txhash,
--- 
-2.37.3
+This cilium bpf code has two return statuses, EPERM and ENXIO, that fall
+through to the default case of retrying. Here, cilium expects both of these
+statuses to indicate the connect failed. A retry is not the intended result=
+.
 
+Handling this case without a retry aligns this code with the udp behavior. =
+This
+precedence for passing EPERM back up the stack was set in 3dedbb5ca10ef.
+
+I will amend my patch to include an explicit case for ENXIO as well, as thi=
+s is
+also in cilium's bpf and will cause the same bug to occur.
+
+
+On Mon, Apr 22, 2024 at 8:22=E2=80=AFAM NeilBrown <neilb@suse.de> wrote:
+>
+> On Sat, 20 Apr 2024, Lex Siegel wrote:
+> > When using a bpf on kernel_connect(), the call can return -EPERM.
+> > This causes xs_tcp_setup_socket() to loop forever, filling up the
+> > syslog and causing the kernel to freeze up.
+> >
+> > Signed-off-by: Lex Siegel <usiegl00@gmail.com>
+> > ---
+> >  net/sunrpc/xprtsock.c | 2 ++
+> >  1 file changed, 2 insertions(+)
+> >
+> > diff --git a/net/sunrpc/xprtsock.c b/net/sunrpc/xprtsock.c
+> > index bb9b747d58a1..47b254806a08 100644
+> > --- a/net/sunrpc/xprtsock.c
+> > +++ b/net/sunrpc/xprtsock.c
+> > @@ -2446,6 +2446,8 @@ static void xs_tcp_setup_socket(struct work_struc=
+t *work)
+> >               /* Happens, for instance, if the user specified a link
+> >                * local IPv6 address without a scope-id.
+> >                */
+> > +     case -EPERM:
+> > +             /* Happens, for instance, if a bpf is preventing the conn=
+ect */
+>
+> This will propagate -EPERM up into other layers which might not be ready
+> to handle it.
+> It might be safer to map EPERM to an error we would be more likely to
+> expect  from the network system - such as ECONNREFUSED or ENETDOWN.
+>
+> Better still would be for kernel_connect() to return a more normal error
+> code - not EPERM.  If that cannot be achieved, then I think it would be
+> best for the sunrpc code to map EPERM to something else at the place
+> where kernel_connect() is called - catch it early.
+>
+> NeilBrown
+>
+>
+> >       case -ECONNREFUSED:
+> >       case -ECONNRESET:
+> >       case -ENETDOWN:
+> > --
+> > 2.39.3
+> >
+> >
+>
 
