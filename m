@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-90145-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90146-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4A218ACDEC
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 15:13:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A1CBD8ACDED
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 15:13:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9EFF1284293
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 13:13:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 56BE61F2136F
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 13:13:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 014DF14F123;
-	Mon, 22 Apr 2024 13:13:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7824214F122;
+	Mon, 22 Apr 2024 13:13:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="iaeG34/B"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Cm0hEvLG"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 893AD14658A
-	for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 13:12:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02F5514658A;
+	Mon, 22 Apr 2024 13:13:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713791579; cv=none; b=qmqJ4CzCeR1vJP+fkUEhFtD9Tqsz/xMuRda0FsN8EfkyiEOjAAYoAY2EFZFF0HmtivtyIdszV4kXlSDxbOFimoYe0dH1iHzBugxNy0EbcbwkXu2eFoxlaikd8VaSXIDr1AFmycX/CrYY7MpC6PPqA0lO1dWWUEjUbFS//YayI2w=
+	t=1713791633; cv=none; b=hjRaUStNoFP8a44myOL3EkMbHqQlOHHLVP/XjomwCNYLNXk1j9h8YkU8Fnhpnnejv3JFOCjM0qWruW2GcKSU2kuU7U3oeOxNp4uR40LA5i2cHxbCnOvbvpIaVEhtjULfkfQA4cugjcsh6ks3M4WpdAyZ4lNONlbm/9FQgBcD9tI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713791579; c=relaxed/simple;
-	bh=7Th6jpk5aqSC6dBRXOwcObhu3Sl2iC28B6SAo0gBYE4=;
+	s=arc-20240116; t=1713791633; c=relaxed/simple;
+	bh=TJQh1ADD/TSrkcvnzZ7emzpjU95BZJD0dcxvuRp3blU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TeRg8hSjc2A14v1cKN/lf8JuXfMh/IKtZNzQTZJ2z5rUzc441zn5QKEYkz44EZaRK+a0lcCcXkWX2z9YFL3rKaBiXjoiU+EW+q0VBglBE8jSknd8yJaRBtit7FzrLRXPLSP7OIGdesxokN+D9qCLoOq5QqDNL+wPgLvPVBTHr1M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=iaeG34/B; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=a9SucA9ow4AXlrCbE+YX04xggtZfjJWyhiWkzHiemk/a/d3tE5abpaHbPgL6pgme1p+udRHwinNECDQAkgpALbeJDTCwiFUNGK5T4D+PoQCx5mu6x0t/5dhfEVdWX+m93M0MywYre5fPqRXayGDEc1tKclA2cCnbCuSPlsOdZ+U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Cm0hEvLG; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,26 +36,27 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=qtHRFvl89JvL1VkMkuSsXHtXNT5MbEuBWsWE6zwIe70=; b=iaeG34/BIjOtWn6rcPUoP4fJ5y
-	ws2g1/rJHPZWQ0Vg1SrbOpYVIjYbQLwRioqoihv8HOQlvZuhFEMCG/Bu6TkEnX9RvY17JAUegy3mN
-	JtjjdgjTqpNHKnH7Uxg1Lr0pC74sDEfIV7i0AMhuJ/X2pUaFjepNQINyD3BOXFPGJmZk=;
+	bh=lqh3lXxat5JOwnSVIY/snEUX8+W3d9tAXaIgm8E4lbo=; b=Cm0hEvLG2ypeXAORhOA9NzpDqX
+	6x0tKb/MQiOVS1N63AnNu9EvUgti59UAbmqpiTXqgU3YdZMuiueyooE+vrZNiteIJqFR71cyR+GSJ
+	9YevbPv0+q9XcVL9Z8s7ge0XuVY9g3kH4ym05S0A1weASH0eH6DopDO30afbSUcXQiUo=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1rytTb-00DcOM-DZ; Mon, 22 Apr 2024 15:12:55 +0200
-Date: Mon, 22 Apr 2024 15:12:55 +0200
+	id 1rytUP-00DcPY-7u; Mon, 22 Apr 2024 15:13:45 +0200
+Date: Mon, 22 Apr 2024 15:13:45 +0200
 From: Andrew Lunn <andrew@lunn.ch>
-To: Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>
-Cc: netdev@vger.kernel.org, Russell King <rmk+kernel@armlinux.org.uk>,
-	Raju Lakkaraju <Raju.Lakkaraju@microchip.com>,
-	Frank Wunderlich <frank-w@public-files.de>,
-	Simon Horman <simon.horman@corigine.com>,
-	Eric Woudstra <ericwouds@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Subject: Re: [PATCH net-next 2/2] net: sfp: enhance quirk for Fibrestore 2.5G
- copper SFP module
-Message-ID: <4e07c66a-fd5d-4640-8a26-c64426aa3c7e@lunn.ch>
-References: <20240422094435.25913-1-kabel@kernel.org>
- <20240422094435.25913-2-kabel@kernel.org>
+To: "Kory Maincent (Dent Project)" <kory.maincent@bootlin.com>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Kyle Swenson <kyle.swenson@est.tech>
+Subject: Re: [PATCH net-next 1/3] net: pse-pd: pse_core: Add missing kdoc
+ return description
+Message-ID: <bd88df2b-0e7b-48fd-8f5b-701df58458b4@lunn.ch>
+References: <20240422-fix_poe-v1-0-811c8c0b9da7@bootlin.com>
+ <20240422-fix_poe-v1-1-811c8c0b9da7@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,22 +65,17 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240422094435.25913-2-kabel@kernel.org>
+In-Reply-To: <20240422-fix_poe-v1-1-811c8c0b9da7@bootlin.com>
 
-> The PHY inside the module is Realtek RTL8221B-VB-CG PHY, for which
-> the realtek driver we only recently gained support to set it up via
-> clause 45 accesses.
+On Mon, Apr 22, 2024 at 02:50:48PM +0200, Kory Maincent (Dent Project) wrote:
+> From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
+> 
+> Add missing kernel documentation return description.
+> This allows to remove all warning from kernel-doc test script.
+> 
+> Signed-off-by: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
 
-This sentence does not parse very well.
-
-The PHY inside the module is a Realtek RTL8221B-VB-CG. The realtek
-driver recently gained support to set it up via clause 45 accesses.
-
-???
-
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
     Andrew
-
----
-pw-bot: cr
 
