@@ -1,170 +1,232 @@
-Return-Path: <netdev+bounces-90272-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90273-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97B0F8AD62A
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 22:55:22 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BEA6F8AD63B
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 22:58:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E0F22B2112F
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 20:55:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 36F3B1F22290
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 20:58:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC0751BC53;
-	Mon, 22 Apr 2024 20:55:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28A9D1C69C;
+	Mon, 22 Apr 2024 20:58:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YqgVx54B"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EFiV1A11"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f173.google.com (mail-il1-f173.google.com [209.85.166.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E36418654
-	for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 20:55:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B8AA1D545;
+	Mon, 22 Apr 2024 20:58:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713819314; cv=none; b=Oa/Zc/WkPf3nP4QLBFaU4VPmibOyp5lSdRGN29KArv6Ph3Yf55AYphMYdGiye2v0UMjuocQQ3ALuygbD6bvfNuEC5of4xuOZYzYf76Kw0tZhSz5gD0xvv1EvC/KAYSiFAoKAlLC/yrcqTBcWbmv+vdny1HhZssHQ47/PRp2s/WA=
+	t=1713819507; cv=none; b=le1sjgeqeCx0caWA3xhhoX3HtmFVpEOwmbdHVNmabhORd5ZNbO+yNX8tyAj3f0w4KFlmr7N4TTSOsHq8bgCFmfa92maJGyAfexvVbqqeF2DkJt3dCZAqRY3+9TtuZLHLrCaNJ7/sFr1qW8nQnTNmG+2DHj6gGoit5RfshS4kd1o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713819314; c=relaxed/simple;
-	bh=7NPx0m69QGK/K52N5RPTJZOB/2IxrbETFrl7bRUu6hI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SPlrd9XptRUIXC4KFrkWCJ2K37OYdhe1c4+qLVJ8Z4tCtBMvmV5IHLA1xKI4U+XyNhoT76O8Lj+LTpi/EVDmcaTLx30VuE0he5VVPanhhqEXZvUflFkNbNZJC9OldBzUKc7kGLAp1QrkBT3KPJX+LCdaZ6geeYfwOOFVRUyIq5s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YqgVx54B; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1713819312;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=NIMZzutzj5URGu2VjD1bhrmGI/gglErZUqfLIOoWVfY=;
-	b=YqgVx54BdBPyYLjv8XFR/tlXmR3Dz9FIhVDLB8qXxRVVDkQ1pkCprlVt0TOFf/KTD8ivLs
-	GuGpv2DZBU4NIGqvyldhyeK01Tja/bXbplFCAesRVpCFDzqYpqE4Y8YBbMz0NnSkpY9Qna
-	2yPRSAK8h5pUctUS0xDgw6cvWx/Fl+8=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-175-BIeMeAmmPs6m_xxXDAPJsw-1; Mon, 22 Apr 2024 16:55:10 -0400
-X-MC-Unique: BIeMeAmmPs6m_xxXDAPJsw-1
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-41a1eb33994so6162965e9.1
-        for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 13:55:10 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713819309; x=1714424109;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+	s=arc-20240116; t=1713819507; c=relaxed/simple;
+	bh=BwnqGMnVETwc0KXdR3xkHpOq8Kccp1bF5FE6wwjmlG4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=bdIf2K/50XEf7vpQN+V1qfEY/7cBMGXOLkTKFx0yUC+IEn9pj1CtnJBHlh+tiT9o95gK2JtnJeV6RXrefP/2NzQDAkfx+5e77R1dachS+DD/NAQwP1L65y/KI5tC8b9g6vfz/BUU4jW72yKYq26QrYyxEXPdRwh+3sD/MKfF658=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EFiV1A11; arc=none smtp.client-ip=209.85.166.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f173.google.com with SMTP id e9e14a558f8ab-36a06a409caso25654225ab.3;
+        Mon, 22 Apr 2024 13:58:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1713819504; x=1714424304; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=NIMZzutzj5URGu2VjD1bhrmGI/gglErZUqfLIOoWVfY=;
-        b=kD0vBMNYul6QB+/8jxC48dgRbFz5ARv6dY/ShQG55uv8VHQ+tG/yvN8UFv32VPm1VH
-         RIY5mrA/kWpwhTdZRrloFP3wnbnxlUe9X2QVi3wFJX5tFpCCyaaaoSLDqVQIXnh+bccj
-         oCZdWeDOG/xqLKhFlOnR7nIqqwEumX3Lv6wXeZRm4XqjUtxWhsuu13Ejusn9HOeZIjaE
-         yLNYlekz2+LuQ4MkXGcI+qZEnvFGnNRz7MxnxkpINDWKSr7UCPgYj6XA4lqjgAnHxSO6
-         /NMX8Uc/V6ubd/22R7JiaHGF6Hb9X3qKPGmrDzCnhTd+MqCxUPkwrJTUQMU3sunV5cYg
-         567w==
-X-Gm-Message-State: AOJu0YzabGZmeN2X6QS/8p1N+WTkanM+1CmprSxr8r63Q93XzKdv2BDk
-	h/L323BMZ7TqTO1tz1UbVn4/xr1SC1ZwJ7DcTxtEzjyudkyfu70WdRQgM6+8YcUftYdbpibQcsW
-	8DDV0e376VEGrQaB8pWsgXmfc0++nt/jdcwB6xDmW+QY5X9o2kQakZw==
-X-Received: by 2002:a05:600c:1c1c:b0:419:ea21:2d83 with SMTP id j28-20020a05600c1c1c00b00419ea212d83mr7428168wms.0.1713819308937;
-        Mon, 22 Apr 2024 13:55:08 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHpNSfsyjNS+1cIbZ2IqGyPSbY18hXu6dedSNGqEbkI9BXf4Gw8EwTjzkQX4Y3Oxp7OeMckzg==
-X-Received: by 2002:a05:600c:1c1c:b0:419:ea21:2d83 with SMTP id j28-20020a05600c1c1c00b00419ea212d83mr7428147wms.0.1713819308421;
-        Mon, 22 Apr 2024 13:55:08 -0700 (PDT)
-Received: from redhat.com ([2a06:c701:7429:3c00:dc4a:cd5:7b1c:f7c2])
-        by smtp.gmail.com with ESMTPSA id n33-20020a05600c502100b0041a652a501fsm3976008wmr.13.2024.04.22.13.55.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Apr 2024 13:55:07 -0700 (PDT)
-Date: Mon, 22 Apr 2024 16:55:04 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Heng Qi <hengqi@linux.alibaba.com>
-Cc: netdev@vger.kernel.org, virtualization@lists.linux.dev,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Jason Wang <jasowang@redhat.com>, Brett Creeley <bcreeley@amd.com>,
-	Ratheesh Kannoth <rkannoth@marvell.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH RESEND net-next v7 0/4] ethtool: provide the dim profile
- fine-tuning channel
-Message-ID: <20240422165456-mutt-send-email-mst@kernel.org>
-References: <20240415133807.116394-1-hengqi@linux.alibaba.com>
+        bh=BwnqGMnVETwc0KXdR3xkHpOq8Kccp1bF5FE6wwjmlG4=;
+        b=EFiV1A11vdztVbSQyXjQCb2v1ERGmn2IGvQFBBswiQjfDvBQYkZj/pz5gxchtJOmk/
+         T8suoRZDL+IJR/jADTIrm4dKprPSclYg3L3X4K6eH4GCn86ZvR1kyIfxMOmftYUKF3z+
+         N6thhJGMG5cyJjkzzOPcuhMjrA1P0Srg4cW6lUmhB+NJ3qfKfg+Qbb7bnQgthg1Uz7KR
+         m+5ZdcUmsig016d74Ty2F/7HkYQoP261UUA9ZnptDi3USJw0pL9/XO74eFHxY9WnuaWf
+         F3y4o2qn08Bbc81j1v7iALFMkb4A54EYRQU2kZgnXSjzVy92t6xfHA7U1jvRD9vkGU99
+         JvGA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713819504; x=1714424304;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=BwnqGMnVETwc0KXdR3xkHpOq8Kccp1bF5FE6wwjmlG4=;
+        b=uU1pWQp0OpyUsA4m61RDK7bLKJMtUV9Uhaa3G3iL1RfXW3divoUrLA9ogG1dW/Skgf
+         kPXzkXTqBg8wOspzgLnn2AII8pfYwDJp7fGMQVIXkHZ/DhmKr6aYL20ETXd01eXLaDM+
+         SGUrWNy9H5c+PF6N+/+7R+cnz4IKyjsWkqetByV5gHL4ifbvgGbmId3C8DAv6N70seSy
+         jM2QmKkX3mtu5rPH/k+fD/0DTuJ7fkzWe48J0zwoPuSg014mNoKTDqqVk6LHJNwPAy7s
+         VzZrpGc1wMfWspNIEFWETXIf2lbJ4r/b5XqLkFpkvWv8s1ojMME60WMmA4h4dDiBTL+7
+         9hhA==
+X-Forwarded-Encrypted: i=1; AJvYcCX54nd5wtl/A4rgCmCH8yMpyDNmto5D3TA/Z6Hca3VPvbl+wLer/sAoFQVUY9IwoQ7Y5nWmO57dZscssXdVswhnUlACHM8B+hNuoQ==
+X-Gm-Message-State: AOJu0YwjKktXnFT357TT58HFksC9bLAxnCbWIWECkoubQXiP6cs0d+jE
+	Hh5mhmdqErKngYgXCR3B25czE4pi0F70k0+AaEcCA4TnNErrfHgaUyZEMGppqEZ7WMa1j0WEhEj
+	eLfWD1UR2NJ6iShEOW/5dp2e9na4=
+X-Google-Smtp-Source: AGHT+IGRzFPzanVbdKTkjs+7WbgWV7Jna9PHJzH4lPSB8bJtMM4YppisUzmtRljQeTDF2p1jdE9qhiCDzku+geR5RtQ=
+X-Received: by 2002:a05:6e02:1a6d:b0:36c:cda:e2fc with SMTP id
+ w13-20020a056e021a6d00b0036c0cdae2fcmr6998387ilv.16.1713819504551; Mon, 22
+ Apr 2024 13:58:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240415133807.116394-1-hengqi@linux.alibaba.com>
+References: <cover.1710173427.git.lucien.xin@gmail.com> <74d5db09-6b5c-4054-b9d3-542f34769083@samba.org>
+ <CADvbK_dzVcDKsJ9RN9oc0K1Jwd+kYjxgE6q=ioRbVGhJx7Qznw@mail.gmail.com>
+ <f427b422-6cfc-45ac-88eb-3e7694168b63@samba.org> <CADvbK_cA-RCLiUUWkyNsS=4OhkWrUWb68QLg28yO2=8PqNuGBQ@mail.gmail.com>
+ <438496a6-7f90-403d-9558-4a813e842540@samba.org> <CADvbK_fkbOnhKL+Rb+pp+NF+VzppOQ68c=nk_6MSNjM_dxpCoQ@mail.gmail.com>
+ <1456b69c-4ffd-4a08-b120-6a00abf1eb05@samba.org> <CADvbK_cQRpyzHG4UUOzfgmqLndvpx5Cd+d59rrqGRp0ic3PyxA@mail.gmail.com>
+ <95922a2f-07a1-4555-acd2-c745e59bcb8e@samba.org> <CADvbK_eR4++HbR_RncjV9N__M-uTHtmqcC+_Of1RKVw7Uqf9Cw@mail.gmail.com>
+ <CADvbK_dEWNNA_i1maRk4cmAB_uk4G4x0eZfZbrVX=zJ+2H9o_A@mail.gmail.com> <dc3815af-5b46-452b-8bcc-30a0934740a2@samba.org>
+In-Reply-To: <dc3815af-5b46-452b-8bcc-30a0934740a2@samba.org>
+From: Xin Long <lucien.xin@gmail.com>
+Date: Mon, 22 Apr 2024 16:58:13 -0400
+Message-ID: <CADvbK_e7i08GAiOenJNTP_m+-MeYjSf7J-vkF+hgRfYGNCjkwQ@mail.gmail.com>
+Subject: Re: [RFC PATCH net-next 0/5] net: In-kernel QUIC implementation with
+ Userspace handshake
+To: Stefan Metzmacher <metze@samba.org>, Martin KaFai Lau <kafai@fb.com>
+Cc: network dev <netdev@vger.kernel.org>, davem@davemloft.net, kuba@kernel.org, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Steve French <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>, 
+	Chuck Lever III <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, 
+	Sabrina Dubroca <sd@queasysnail.net>, Tyler Fanelli <tfanelli@redhat.com>, 
+	Pengtao He <hepengtao@xiaomi.com>, 
+	"linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>, 
+	Samba Technical <samba-technical@lists.samba.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Apr 15, 2024 at 09:38:03PM +0800, Heng Qi wrote:
-> The NetDIM library provides excellent acceleration for many modern
-> network cards. However, the default profiles of DIM limits its maximum
-> capabilities for different NICs, so providing a way which the NIC can
-> be custom configured is necessary.
-> 
-> Currently, interaction with the driver is still based on the commonly
-> used "ethtool -C".
-> 
-> Since the profile now exists in netdevice, adding a function similar
-> to net_dim_get_rx_moderation_dev() with netdevice as argument is
-> nice, but this would be better along with cleaning up the rest of
-> the drivers, which we can get to very soon after this set.
-> 
-> Please review, thank you very much!
+On Sun, Apr 21, 2024 at 3:27=E2=80=AFPM Stefan Metzmacher <metze@samba.org>=
+ wrote:
+>
+> Am 20.04.24 um 21:32 schrieb Xin Long:
+> > On Fri, Apr 19, 2024 at 3:19=E2=80=AFPM Xin Long <lucien.xin@gmail.com>=
+ wrote:
+> >>
+> >> On Fri, Apr 19, 2024 at 2:51=E2=80=AFPM Stefan Metzmacher <metze@samba=
+.org> wrote:
+> >>>
+> >>> Hi Xin Long,
+> >>>
+> >>>>> But I think its unavoidable for the ALPN and SNI fields on
+> >>>>> the server side. As every service tries to use udp port 443
+> >>>>> and somehow that needs to be shared if multiple services want to
+> >>>>> use it.
+> >>>>>
+> >>>>> I guess on the acceptor side we would need to somehow detach low le=
+vel
+> >>>>> udp struct sock from the logical listen struct sock.
+> >>>>>
+> >>>>> And quic_do_listen_rcv() would need to find the correct logical lis=
+tening
+> >>>>> socket and call quic_request_sock_enqueue() on the logical socket
+> >>>>> not the lowlevel udo socket. The same for all stuff happening after
+> >>>>> quic_request_sock_enqueue() at the end of quic_do_listen_rcv.
+> >>>>>
+> >>>> The implementation allows one low level UDP sock to serve for multip=
+le
+> >>>> QUIC socks.
+> >>>>
+> >>>> Currently, if your 3 quic applications listen to the same address:po=
+rt
+> >>>> with SO_REUSEPORT socket option set, the incoming connection will ch=
+oose
+> >>>> one of your applications randomly with hash(client_addr+port) vi
+> >>>> reuseport_select_sock() in quic_sock_lookup().
+> >>>>
+> >>>> It should be easy to do a further match with ALPN between these 3 qu=
+ic
+> >>>> socks that listens to the same address:port to get the right quic so=
+ck,
+> >>>> instead of that randomly choosing.
+> >>>
+> >>> Ah, that sounds good.
+> >>>
+> >>>> The problem is to parse the TLS Client_Hello message to get the ALPN=
+ in
+> >>>> quic_sock_lookup(), which is not a proper thing to do in kernel, and
+> >>>> might be rejected by networking maintainers, I need to check with th=
+em.
+> >>>
+> >>> Is the reassembling of CRYPTO frames done in the kernel or
+> >>> userspace? Can you point me to the place in the code?
+> >> In quic_inq_handshake_tail() in kernel, for Client Initial packet
+> >> is processed when calling accept(), this is the path:
+> >>
+> >> quic_accept()-> quic_accept_sock_init() -> quic_packet_process() ->
+> >> quic_packet_handshake_process() -> quic_frame_process() ->
+> >> quic_frame_crypto_process() -> quic_inq_handshake_tail().
+> >>
+> >> Note that it's with the accept sock, not the listen sock.
+> >>
+> >>>
+> >>> If it's really impossible to do in C code maybe
+> >>> registering a bpf function in order to allow a listener
+> >>> to check the intial quic packet and decide if it wants to serve
+> >>> that connection would be possible as last resort?
+> >> That's a smart idea! man.
+> >> I think the bpf hook in reuseport_select_sock() is meant to do such
+> >> selection.
+> >>
+> >> For the Client initial packet (the only packet you need to handle),
+> >> I double you will need to do the reassembling, as Client Hello TLS mes=
+sage
+> >> is always less than 400 byte in my env.
+> >>
+> >> But I think you need to do the decryption for the Client initial packe=
+t
+> >> before decoding it then parsing the TLS message from its crypto frame.
+> > I created this patch:
+> >
+> > https://github.com/lxin/quic/commit/aee0b7c77df3f39941f98bb901c73fdc560=
+befb8
+> >
+> > to do this decryption in quic_sock_look() before calling
+> > reuseport_select_sock(), so that it provides the bpf selector with
+> > a plain-text QUIC initial packet:
+> >
+> > https://datatracker.ietf.org/doc/html/rfc9000#section-17.2.2
+> >
+> > If it's complex for you to do the decryption for the initial packet in
+> > the bpf selector, I will apply this patch. Please let me know.
+>
+> I guess in addition to quic_server_handshake(), which is called
+> after accept(), there should be quic_server_prepare_listen()
+> (and something similar for in kernel servers) that setup the reuseport
+> magic for the socket, so that it's not needed in every application.
+It's done when calling listen(), see quic_inet_listen()->quic_hash()
+where only listening sockets with its sk_reuseport set will be
+added into the reuseport group.
 
+It means SO_REUSEPORT sockopt must be set for every socket
+before calling listen().
 
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
+>
+> It seems there is only a single ebpf program possible per
+> reuseport group, so there has to be just a single one.
+Yes, a single ebpf program per reuseport group should work.
+see prepare_sk_fds() in kernel selftests for select_reuseport bfp.
 
-> Changelog
-> =====
-> v6->v7:
->   - A new wrapper struct pointer is used in struct net_device.
->   - Add IS_ENABLED(CONFIG_DIMLIB) to avoid compiler warnings.
->   - Profile fields changed from u16 to u32.
-> 
-> v5->v6:
->   - Place the profile in netdevice to bypass the driver.
->     The interaction code of ethtool <-> kernel has not changed at all,
->     only the interaction part of kernel <-> driver has changed.
-> 
-> v4->v5:
->   - Update some snippets from Kuba, Thanks.
-> 
-> v3->v4:
->   - Some tiny updates and patch 1 only add a new comment.
-> 
-> v2->v3:
->   - Break up the attributes to avoid the use of raw c structs.
->   - Use per-device profile instead of global profile in the driver.
-> 
-> v1->v2:
->   - Use ethtool tool instead of net-sysfs
-> 
-> Heng Qi (4):
->   linux/dim: move useful macros to .h file
->   ethtool: provide customized dim profile management
->   virtio-net: refactor dim initialization/destruction
->   virtio-net: support dim profile fine-tuning
-> 
-> Heng Qi (4):
->   linux/dim: move useful macros to .h file
->   ethtool: provide customized dim profile management
->   virtio-net: refactor dim initialization/destruction
->   virtio-net: support dim profile fine-tuning
-> 
->  Documentation/netlink/specs/ethtool.yaml     |  33 +++
->  Documentation/networking/ethtool-netlink.rst |   8 +
->  drivers/net/virtio_net.c                     |  46 +++--
->  include/linux/dim.h                          |  13 ++
->  include/linux/ethtool.h                      |  11 +-
->  include/linux/netdevice.h                    |  24 +++
->  include/uapi/linux/ethtool_netlink.h         |  24 +++
->  lib/dim/net_dim.c                            |  10 +-
->  net/core/dev.c                               |  83 ++++++++
->  net/ethtool/coalesce.c                       | 201 ++++++++++++++++++-
->  10 files changed, 430 insertions(+), 23 deletions(-)
-> 
-> -- 
-> 2.32.0.3.g01195cf9f
+>
+> But is it possible for in kernel servers to also register an epbf program=
+?
+Good question. TBH, I don't really know much about epbf programming.
+I guess the real problem is how you pass the .o file to kernel space?
 
+Another question is, in the selftests:
+tools/testing/selftests/bpf/prog_tests/select_reuseport.c
+tools/testing/selftests/bpf/progs/test_select_reuseport_kern.c
+
+it created a global reuseport_array, and then added these sockets
+into this array for the later lookup, but these sockets are all created
+in the same process.
+
+But your case is that the sockets are created in different processes.
+I'm not sure if it's possible to add sockets from different processes
+into the same reuseport_array?
+
+Added Martin who introduced BPF_PROG_TYPE_SK_REUSEPORT,
+I guess he may know the answers.
+
+Thanks.
 
