@@ -1,41 +1,41 @@
-Return-Path: <netdev+bounces-89988-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89989-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97F3F8AC754
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 10:46:40 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50A8E8AC755
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 10:46:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C9E0E1C20E22
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 08:46:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C833AB21112
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 08:46:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D156524D3;
-	Mon, 22 Apr 2024 08:46:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E3705103E;
+	Mon, 22 Apr 2024 08:46:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE86151C52
-	for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 08:46:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E1AC4CB55
+	for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 08:46:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713775590; cv=none; b=gIt8HeGbwvLRRmMtEOX3FQ3yxi5IRAxUBrMuL2dLj/NVsUkVmn6dGJ61e8Xg1K0y2OVjXGRUpqkXdz0FmSMAVEc20Vpc7BtKZMNrOCWzkLcHJjn9ezk9cNLmudYLuMiOXxfSRLejLumjqrapZVjskfTa3OOwwRO/Vm/W6dd+HTY=
+	t=1713775591; cv=none; b=pCcpcgvw2yy2hkBF/HQcYc7bVgDSegcpN4A7EcnICKNYlpHq2Kl+N56VCJY23fqIqnCyYdDCbycXpBHhfzxRRsj+NAgCp3EqS8V0HgKvahXIqpGI2RinjIzXgz4EuJqQ2mzJAfL2JXoFyHKTRfU3c810xPq5lqWhfxGln636pu8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713775590; c=relaxed/simple;
-	bh=IU6x0P+j4+jOHSGmx6FtiHna/5kD7S4rVr4bL7nsngg=;
+	s=arc-20240116; t=1713775591; c=relaxed/simple;
+	bh=hbWncv3O5p+eXPs67WyDuajeTIZwF1P/8g1gar0nJUo=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=NBBSwMIVH8C6wmPMwBK/DqYetVukXhr0BA+8w6tHDnFVGzRrL93FxbeZTBSHSmEuDq3UTh4TZcSoRBTZa6ktdsx6Dzh31dwvUJ22eKuMKulGtyZqScTfwZEuiNXB4Ah73i6wSExyx/00F6hpCAxqR/SQK2Y7B+lFXRdW3GZP27M=
+	 In-Reply-To:To:Cc; b=cbaOAxKSzFrhSgESf+B1tco/6lHScYsJmLY0KJ/HTYAQCc+bjTZQgb007tfX5T10Me38vGNdXglhiEhg3XKVsbS7JNJyMzn9tPCtRPkVUNokVTJFP0ZqP7EhRU+gutvAVe2qkfafr0ij2d0LJfNfzG8hVcctdltyWTUWCOV0UbI=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
 Received: from ptz.office.stw.pengutronix.de ([2a0a:edc0:0:900:1d::77] helo=ratatoskr.trumtrar.info)
 	by metis.whiteo.stw.pengutronix.de with esmtp (Exim 4.92)
 	(envelope-from <s.trumtrar@pengutronix.de>)
-	id 1rypJf-0000ML-Dr; Mon, 22 Apr 2024 10:46:23 +0200
+	id 1rypJg-0000ML-DO; Mon, 22 Apr 2024 10:46:24 +0200
 From: Steffen Trumtrar <s.trumtrar@pengutronix.de>
-Date: Mon, 22 Apr 2024 10:46:18 +0200
-Subject: [PATCH 2/3] arm64: dts: imx93: add enet_clk_sel
+Date: Mon, 22 Apr 2024 10:46:19 +0200
+Subject: [PATCH 3/3] net: stmicro: imx: set TX_CLK direction in RMII mode
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -44,7 +44,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240422-v6-9-topic-imx93-eqos-rmii-v1-2-30151fca43d2@pengutronix.de>
+Message-Id: <20240422-v6-9-topic-imx93-eqos-rmii-v1-3-30151fca43d2@pengutronix.de>
 References: <20240422-v6-9-topic-imx93-eqos-rmii-v1-0-30151fca43d2@pengutronix.de>
 In-Reply-To: <20240422-v6-9-topic-imx93-eqos-rmii-v1-0-30151fca43d2@pengutronix.de>
 To: "David S. Miller" <davem@davemloft.net>, 
@@ -68,26 +68,75 @@ X-SA-Exim-Mail-From: s.trumtrar@pengutronix.de
 X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
 X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-The ENET_CLK_SEL register is at offset 0x2c in the wakeupmix_gpr
-register and needed to set the TX_CLK direction in case of RMII mode.
+In case of RMII connection, the TX_CLK must be set to output direction.
+Parse the register and offset from the devicetree and set the direction
+of the TX_CLK when the property was provided.
 
 Signed-off-by: Steffen Trumtrar <s.trumtrar@pengutronix.de>
 ---
- arch/arm64/boot/dts/freescale/imx93.dtsi | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c | 27 +++++++++++++++++++++++++
+ 1 file changed, 27 insertions(+)
 
-diff --git a/arch/arm64/boot/dts/freescale/imx93.dtsi b/arch/arm64/boot/dts/freescale/imx93.dtsi
-index 601c94e1fac8e..116ff9c15709b 100644
---- a/arch/arm64/boot/dts/freescale/imx93.dtsi
-+++ b/arch/arm64/boot/dts/freescale/imx93.dtsi
-@@ -1051,6 +1051,7 @@ eqos: ethernet@428a0000 {
- 							 <&clk IMX93_CLK_SYS_PLL_PFD0_DIV2>;
- 				assigned-clock-rates = <100000000>, <250000000>;
- 				intf_mode = <&wakeupmix_gpr 0x28>;
-+				enet_clk_sel = <&wakeupmix_gpr 0x2c>;
- 				snps,clk-csr = <0>;
- 				status = "disabled";
- 			};
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c
+index 6b65420e11b5c..0fc81a626a664 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c
+@@ -37,6 +37,9 @@
+ #define MX93_GPR_ENET_QOS_INTF_SEL_RGMII	(0x1 << 1)
+ #define MX93_GPR_ENET_QOS_CLK_GEN_EN		(0x1 << 0)
+ 
++#define MX93_GPR_ENET_QOS_TX_CLK_SEL_MASK	GENMASK(1, 1)
++#define MX93_GPR_ENET_QOS_TX_CLK_SEL		(0x1 << 1)
++
+ #define DMA_BUS_MODE			0x00001000
+ #define DMA_BUS_MODE_SFT_RESET		(0x1 << 0)
+ #define RMII_RESET_SPEED		(0x3 << 14)
+@@ -57,7 +60,9 @@ struct imx_priv_data {
+ 	struct clk *clk_tx;
+ 	struct clk *clk_mem;
+ 	struct regmap *intf_regmap;
++	struct regmap *enet_clk_regmap;
+ 	u32 intf_reg_off;
++	u32 enet_clk_reg_off;
+ 	bool rmii_refclk_ext;
+ 	void __iomem *base_addr;
+ 
+@@ -116,6 +121,18 @@ static int imx93_set_intf_mode(struct plat_stmmacenet_data *plat_dat)
+ 		break;
+ 	case PHY_INTERFACE_MODE_RMII:
+ 		val = MX93_GPR_ENET_QOS_INTF_SEL_RMII;
++
++		/* According to NXP AN14149, the direction of the
++		 * TX_CLK must be set to output in RMII mode.
++		 */
++		if (dwmac->enet_clk_regmap)
++			regmap_update_bits(dwmac->enet_clk_regmap,
++					   dwmac->enet_clk_reg_off,
++					   MX93_GPR_ENET_QOS_TX_CLK_SEL_MASK,
++					   MX93_GPR_ENET_QOS_TX_CLK_SEL);
++		else
++			dev_warn(dwmac->dev, "TX_CLK can't be set to output mode.\n");
++
+ 		break;
+ 	case PHY_INTERFACE_MODE_RGMII:
+ 	case PHY_INTERFACE_MODE_RGMII_ID:
+@@ -310,6 +327,16 @@ imx_dwmac_parse_dt(struct imx_priv_data *dwmac, struct device *dev)
+ 			dev_err(dev, "Can't get intf mode reg offset (%d)\n", err);
+ 			return err;
+ 		}
++
++		dwmac->enet_clk_regmap = syscon_regmap_lookup_by_phandle(np, "enet_clk_sel");
++		if (IS_ERR(dwmac->enet_clk_regmap))
++			return PTR_ERR(dwmac->enet_clk_regmap);
++
++		err = of_property_read_u32_index(np, "enet_clk_sel", 1, &dwmac->enet_clk_reg_off);
++		if (err) {
++			dev_err(dev, "Can't get enet clk sel reg offset (%d)\n", err);
++			return err;
++		}
+ 	}
+ 
+ 	return err;
 
 -- 
 2.43.2
