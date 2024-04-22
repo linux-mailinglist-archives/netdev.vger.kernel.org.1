@@ -1,151 +1,184 @@
-Return-Path: <netdev+bounces-90172-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90173-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A2298ACF2C
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 16:19:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B5DB8ACF38
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 16:21:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9ECFF1F214FC
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 14:19:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 23638282E92
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 14:21:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9ACEA1509B5;
-	Mon, 22 Apr 2024 14:19:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="vYgUh1sN"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CC921514C4;
+	Mon, 22 Apr 2024 14:21:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 631E322625
-	for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 14:19:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C8661509B9
+	for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 14:21:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713795543; cv=none; b=X+elU1yvS2ESaJEbH9FglpUJsLNYqO2c/6IbNwBKs3IdVtMiyLmWFDj1A7hqCvEOnPM+Kf/CmJKi+A5XrBvWwldgWfPeHmHzWM17NP0NYNBR+BLvSWNfRd3zv7rBqviBbVcYjp6Ub/y63dmXFY80EQ4bngF3R/k5jOcyL/LogH4=
+	t=1713795685; cv=none; b=a/SiV7a1LuC2VRMkIj21NnZpo2r7QkC6ACszAc1E//7J4NUl949+IkK2s/ylbapCrq7i7ecri+kctXKKGORlyeNLRaCXjOuOwFAtlSdz7ofsZksjnDEiLGqPicSHar1H9TUmlffCeATEYIryiBKQhb2wYO4/BmyeWG6EOijYb1Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713795543; c=relaxed/simple;
-	bh=AiuxBPh2cWOttXetfkOvjTeTNBefriCBNsLwGKfRSOY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=e3m8KcQXhhtxNyGeIzd79yk3xCB/ArpyZYdlD3VrKuWZUqbYZS8PF8ndqNeNWpyyrhdQ0IPykhgfuMB1aHIrkvbpZUsK8vtrC0cJaxMA2+edB+JIihSpIuK2zrM6z1/PLyONyCyIk0i3ECm8X+Sk0ARoD/ZHNO3KUJ4HVHXsA6Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=vYgUh1sN; arc=none smtp.client-ip=209.85.218.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a524ecaf215so454886166b.2
-        for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 07:19:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1713795540; x=1714400340; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=T6x0t+W0EiSlEO0rKZIWSrQC6VoY+Vp+8NR6a2w/aIo=;
-        b=vYgUh1sNPLm8Fu+aWEYgm85WK+PhCik4VXUucxqinDlheCGZYV3uX0xK6HqkIGUqoK
-         5x2hqrhigSCSCaNsX/87Biy9RHfohMq0dygJpOTJUh0ZTae7G5HhJQ0YQtblIa/Qc5dG
-         OVYoTb5KmJkyO+ytyAd3PI3V2lnv9+8IFZloNu5GGHPo3dCdwzyHWvxMocgfDG2ruM3E
-         CNiXLVansQIiA6puQjRqCN0zis6xfiAmjnMh3FL8tFBfPs+18m/HF2p/hmx2Il/SfHeA
-         E2+bKMPpx/8r/M0TLyQsMPB4oB4BIS817hNfD2gMez3otCkvucpqODbT8ewiaOvhrzUe
-         C3Hw==
+	s=arc-20240116; t=1713795685; c=relaxed/simple;
+	bh=Qy//AdmxEgHP3psLoUo+TYNKkRALUtkqAmoJKbj8rrQ=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=cIXEjak9u7OofP8u9YJwRstUF9yvLVhbj4AoMvNOVaClrSfCQedwNWd9q04tmrkaq1EbEwPmeLRZDJ3bMxY2qic454xb4Aufv581A5YSmeKGmC/xB/js4QDA8lw07K6suvIzDIMr4zC3lb7EXW34IqErSWM06MagEIummZBo2bk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-7da42114485so494949339f.2
+        for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 07:21:23 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713795540; x=1714400340;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=T6x0t+W0EiSlEO0rKZIWSrQC6VoY+Vp+8NR6a2w/aIo=;
-        b=kztaXpJsV0qXpF1XHAB+aQZ7veP3C/LeeeSoPzqcJGxRw5qpXbjkfTa8JextE62Ngu
-         TNYi3T8RWtIUXqmtgZSlc8/kroE+B4RrHZZvkmo991w3SdVnnqP9KYn0wWz8nNyf9v41
-         sXckB1uS8NTtZnf9qJ+2bSXOwbs/1T/gZP+uERkM/Dhn8GPumRb0pqvhycJVL8aNywYd
-         DGEcNr9jWoMmK9nfIPkBa3b0YhZyDdECUkskIQGd577uAh8x3qTpswgXohRZEU8wGXt+
-         bxlKX/1HPSewJJybyQPCPZRQQJ3S6X5FZ5Ln8Z1vGZmdcsAGr/nzntyN86j8oij8xt6k
-         54Uw==
-X-Forwarded-Encrypted: i=1; AJvYcCX3K2LSdHukep3Rt1qmsTbFl04Isz45Pnsqx7U6J5E1jdaG8ADmyNk0aY2L9rzKbpj3LWPFlu5qsbuP4mUD7mDV5PnwVzYg
-X-Gm-Message-State: AOJu0Yzw+bv+X+vfNAjSqY9wluemIh3Y+T9dIHbkWNGbzt2HQDm7Dkye
-	K+abupwBrjWH1nhMQv6c/7zXLHFGM2un3O0yEliukCFXi63w+1j7fiA1qzcjJzY=
-X-Google-Smtp-Source: AGHT+IFb2r1Ao8A/J8LHWX/DDwptGf8gqwhSEuKkDRF+57W2nyzvfzT5B1bEOJm6YhGh1x6d/HEynw==
-X-Received: by 2002:a17:906:c242:b0:a55:61cf:f859 with SMTP id bl2-20020a170906c24200b00a5561cff859mr5683751ejb.1.1713795539487;
-        Mon, 22 Apr 2024 07:18:59 -0700 (PDT)
-Received: from localhost (78-80-105-131.customers.tmcz.cz. [78.80.105.131])
-        by smtp.gmail.com with ESMTPSA id rn2-20020a170906d92200b00a55a67a81c8sm2278910ejb.126.2024.04.22.07.18.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Apr 2024 07:18:58 -0700 (PDT)
-Date: Mon, 22 Apr 2024 16:18:56 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jijie Shao <shaojijie@huawei.com>
-Cc: yisen.zhuang@huawei.com, salil.mehta@huawei.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	shenjian15@huawei.com, wangjie125@huawei.com,
-	liuyonglong@huawei.com, chenhao418@huawei.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net 7/7] net: hns3: fix kernel crash when devlink reload
- during vf initialization
-Message-ID: <ZiZx0E5NlSL7nuLE@nanopsycho>
-References: <20240422134327.3160587-1-shaojijie@huawei.com>
- <20240422134327.3160587-8-shaojijie@huawei.com>
+        d=1e100.net; s=20230601; t=1713795683; x=1714400483;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=1yKoEUmreO/jxEhsqvfi/lpCnpHH8jnP+ZOdlyL7veY=;
+        b=Pj/nWVoHcCLt0Wsbz1kcpV2DkR1rcCRx8JT64/Ssi7EDYz9Tn+m4rBG+bMyceMKDZY
+         sttrvMv6F5rrDfdphu9lVBdc34xotRMCTn2syXfyVejVo+bD2CUnmSNZb8BpJshVmehL
+         4o3OKHlH3bw526GwskVRnhSdwkJSuFgMQ7yfdQxREjYoRnpLKdudsetX6aUW1FC7l9uE
+         WPlTy4rsv2lNDWOBwDs0Se9rfaBB9ykP3/ISMxE/j03mZPigyQOOy0OXtYjW4YB3wEw2
+         rZqSyf2j6W1PRIGBADixg1YncS8WSt7w3MqYByYEpYKvRV7ee8npv6uAncXEW3uKY3pn
+         GfSQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUwOnolUSvJPSrMGcvmBDwQkwpLhcO5hMsrruKBGnEWb+3HJm3Vcf3f2QUZ2u/qDje5hzr5d51bbU3NY6KiJP0sWoUfednC
+X-Gm-Message-State: AOJu0YzJiJ8056OduktZV5k8wsOeD6LJimXccjzNvoetT0ce51s/8AST
+	IuOjDUAJctjWPgDyBbY/1U7KvjDs9eC9KmKdZZZxiSdbAyMjPFJmaRxOmCwHxzMJKgd3Yb5Se9t
+	qg+56n1yIshXe1LrNRZOUc5nIwORHT7U6fMk6uZK5HJTll22jj7HtLZ8=
+X-Google-Smtp-Source: AGHT+IFx4XZUnDLRtz1C/Ng5arXiCpIa7t+/uscrSJudFp4Q7+OF/5yd8SHiEj/XxK3O44Hvn/K5fRyvioamZvbwXzLBhAdQqu5q
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240422134327.3160587-8-shaojijie@huawei.com>
+X-Received: by 2002:a05:6602:6c12:b0:7da:ce78:a1be with SMTP id
+ ik18-20020a0566026c1200b007dace78a1bemr55003iob.3.1713795683234; Mon, 22 Apr
+ 2024 07:21:23 -0700 (PDT)
+Date: Mon, 22 Apr 2024 07:21:23 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000eac28e0616b026d1@google.com>
+Subject: [syzbot] [bpf?] [net?] WARNING in skb_ensure_writable
+From: syzbot <syzbot+0c4150bff9fff3bf023c@syzkaller.appspotmail.com>
+To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
+	daniel@iogearbox.net, davem@davemloft.net, eddyz87@gmail.com, 
+	edumazet@google.com, fw@strlen.de, haoluo@google.com, horms@kernel.org, 
+	john.fastabend@gmail.com, jolsa@kernel.org, kpsingh@kernel.org, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, martin.lau@linux.dev, 
+	netdev@vger.kernel.org, pabeni@redhat.com, sdf@google.com, song@kernel.org, 
+	syzkaller-bugs@googlegroups.com, yonghong.song@linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-Mon, Apr 22, 2024 at 03:43:27PM CEST, shaojijie@huawei.com wrote:
->From: Yonglong Liu <liuyonglong@huawei.com>
->
->The devlink reload process will access the hardware resources,
->but the register operation is done before the hardware is initialized.
->So, processing the devlink reload during initialization may lead to kernel
->crash. This patch fixes this by taking devl_lock during initialization.
->
->Fixes: cd6242991d2e ("net: hns3: add support for registering devlink for VF")
->Signed-off-by: Yonglong Liu <liuyonglong@huawei.com>
->Signed-off-by: Jijie Shao <shaojijie@huawei.com>
->---
-> drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c | 4 ++++
-> 1 file changed, 4 insertions(+)
->
->diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c b/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c
->index 08db8e84be4e..3ee41943d15f 100644
->--- a/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c
->+++ b/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c
->@@ -2849,6 +2849,8 @@ static int hclgevf_init_hdev(struct hclgevf_dev *hdev)
-> 	if (ret)
-> 		goto err_devlink_init;
-> 
+Hello,
 
-Hmm, what if reload happens here? I think that you don't fix the issue,
-rather just narrowing the race window.
+syzbot found the following issue on:
 
-Why don't you rather calle devlink_register at the end of this function?
+HEAD commit:    4ac828960a60 Merge branch 'eee-linkmode-bitmaps'
+git tree:       net-next
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=14710a54180000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=57c41f64f37f51c5
+dashboard link: https://syzkaller.appspot.com/bug?extid=0c4150bff9fff3bf023c
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17cc49d8180000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12c88616180000
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/f1bd74942969/disk-4ac82896.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/c99cbac61b8b/vmlinux-4ac82896.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/fa3d589c2a1c/bzImage-4ac82896.xz
+
+The issue was bisected to:
+
+commit 219eee9c0d16f1b754a8b85275854ab17df0850a
+Author: Florian Westphal <fw@strlen.de>
+Date:   Fri Feb 16 11:36:57 2024 +0000
+
+    net: skbuff: add overflow debug check to pull/push helpers
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=166b3a4c180000
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=156b3a4c180000
+console output: https://syzkaller.appspot.com/x/log.txt?x=116b3a4c180000
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+0c4150bff9fff3bf023c@syzkaller.appspotmail.com
+Fixes: 219eee9c0d16 ("net: skbuff: add overflow debug check to pull/push helpers")
+
+------------[ cut here ]------------
+WARNING: CPU: 1 PID: 5074 at include/linux/skbuff.h:2723 pskb_may_pull_reason include/linux/skbuff.h:2723 [inline]
+WARNING: CPU: 1 PID: 5074 at include/linux/skbuff.h:2723 pskb_may_pull include/linux/skbuff.h:2739 [inline]
+WARNING: CPU: 1 PID: 5074 at include/linux/skbuff.h:2723 skb_ensure_writable+0x2ef/0x440 net/core/skbuff.c:6103
+Modules linked in:
+CPU: 1 PID: 5074 Comm: syz-executor365 Not tainted 6.8.0-rc5-syzkaller-01654-g4ac828960a60 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/25/2024
+RIP: 0010:pskb_may_pull_reason include/linux/skbuff.h:2723 [inline]
+RIP: 0010:pskb_may_pull include/linux/skbuff.h:2739 [inline]
+RIP: 0010:skb_ensure_writable+0x2ef/0x440 net/core/skbuff.c:6103
+Code: e8 b6 f7 57 f8 4c 89 ef 31 f6 31 d2 b9 20 08 00 00 48 83 c4 28 5b 41 5c 41 5d 41 5e 41 5f 5d e9 17 04 fe ff e8 92 f7 57 f8 90 <0f> 0b 90 e9 3e fd ff ff 44 89 f7 44 89 e6 e8 3e f9 57 f8 45 39 e6
+RSP: 0018:ffffc900039ef8f8 EFLAGS: 00010293
+RAX: ffffffff893b75de RBX: ffff88802c8a1000 RCX: ffff88802a155940
+RDX: 0000000000000000 RSI: 00000000fb6014e4 RDI: 0000000000000000
+RBP: 00000000fb6014e4 R08: ffffffff893b7317 R09: 1ffffffff1f0bcb5
+R10: dffffc0000000000 R11: ffffffffa0000954 R12: 00000000fb6014e4
+R13: ffff88802c8a1000 R14: ffffc90000b06030 R15: dffffc0000000000
+FS:  0000555556fa9380(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000001b7b398 CR3: 00000000241e8000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ __bpf_try_make_writable net/core/filter.c:1665 [inline]
+ bpf_try_make_writable net/core/filter.c:1671 [inline]
+ ____bpf_skb_pull_data net/core/filter.c:1862 [inline]
+ bpf_skb_pull_data+0x7c/0x230 net/core/filter.c:1851
+ bpf_prog_ca74b6b79e086095+0x1d/0x1f
+ bpf_dispatcher_nop_func include/linux/bpf.h:1235 [inline]
+ __bpf_prog_run include/linux/filter.h:651 [inline]
+ bpf_prog_run include/linux/filter.h:658 [inline]
+ bpf_test_run+0x408/0x900 net/bpf/test_run.c:423
+ bpf_prog_test_run_skb+0xaf9/0x13a0 net/bpf/test_run.c:1056
+ bpf_prog_test_run+0x33a/0x3b0 kernel/bpf/syscall.c:4188
+ __sys_bpf+0x48d/0x810 kernel/bpf/syscall.c:5591
+ __do_sys_bpf kernel/bpf/syscall.c:5680 [inline]
+ __se_sys_bpf kernel/bpf/syscall.c:5678 [inline]
+ __x64_sys_bpf+0x7c/0x90 kernel/bpf/syscall.c:5678
+ do_syscall_64+0xf9/0x240
+ entry_SYSCALL_64_after_hwframe+0x6f/0x77
+RIP: 0033:0x7f6a0471c4a9
+Code: 48 83 c4 28 c3 e8 37 17 00 00 0f 1f 80 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffcdcead7e8 EFLAGS: 00000246 ORIG_RAX: 0000000000000141
+RAX: ffffffffffffffda RBX: 00007ffcdcead9b8 RCX: 00007f6a0471c4a9
+RDX: 0000000000000050 RSI: 0000000020000080 RDI: 000000000000000a
+RBP: 00007f6a0478f610 R08: 0000000000000000 R09: 00007ffcdcead9b8
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000001
+R13: 00007ffcdcead9a8 R14: 0000000000000001 R15: 0000000000000001
+ </TASK>
 
 
-Also, parallel to this patch, why don't you register devlink port of
-flavour "virtual" for this VF?
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
->+	devl_lock(hdev->devlink);
->+
-> 	ret = hclge_comm_cmd_queue_init(hdev->pdev, &hdev->hw.hw);
-> 	if (ret)
-> 		goto err_cmd_queue_init;
->@@ -2950,6 +2952,7 @@ static int hclgevf_init_hdev(struct hclgevf_dev *hdev)
-> 	hclgevf_task_schedule(hdev, round_jiffies_relative(HZ));
-> 	timer_setup(&hdev->reset_timer, hclgevf_reset_timer, 0);
-> 
->+	devl_unlock(hdev->devlink);
-> 	return 0;
-> 
-> err_config:
->@@ -2960,6 +2963,7 @@ static int hclgevf_init_hdev(struct hclgevf_dev *hdev)
-> err_cmd_init:
-> 	hclge_comm_cmd_uninit(hdev->ae_dev, &hdev->hw.hw);
-> err_cmd_queue_init:
->+	devl_unlock(hdev->devlink);
-> 	hclgevf_devlink_uninit(hdev);
-> err_devlink_init:
-> 	hclgevf_pci_uninit(hdev);
->-- 
->2.30.0
->
->
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
