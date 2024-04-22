@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-90258-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90259-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD9648AD59D
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 22:07:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CBB18AD5A7
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 22:08:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D12721C20CD1
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 20:07:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 49468280D4C
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 20:08:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E171415539A;
-	Mon, 22 Apr 2024 20:07:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AC2715539D;
+	Mon, 22 Apr 2024 20:08:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="g+rxy39V"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="nxM0lyA0"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DF2C15534A;
-	Mon, 22 Apr 2024 20:07:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA14415532F;
+	Mon, 22 Apr 2024 20:08:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713816466; cv=none; b=E6+M0eulEB/nAKuJyH6tR/Z7i2sZ53FgmbohUWIUXMylMx7y3pKcZw51g3h3LTOXJiulWxPbn4E01bjPI743bi8wKQbkbQ3a4YCQPPPOamjrtjfq1F5AKd0IcjcjeRPnU0orJb4KS3ItXPxUEOXw9dwCpBNpdS2O1a94J3Xgi1Q=
+	t=1713816515; cv=none; b=JsEjK/m4twvwgVQbPQazcI3HDQNgN6F85KJHcahKykxxbuxGoPX9Hv+UIjMjEW4xf5Plbz7+9PrafiK/SFkGmnsDs3E7bNwG4LBvFMqwKzpORpgmc9TCGHbfrAZGV/kPWsrjhBvNX8m33PMFecfT9OzPx0j/mbLFv/hJoW6pH6k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713816466; c=relaxed/simple;
-	bh=YwB3B7Ax1N+hcIIIexsiYQywXNfrCXaxhG8ux0IuDWM=;
+	s=arc-20240116; t=1713816515; c=relaxed/simple;
+	bh=KaJ+NKYdo03BsBZ2eLdFmRwcG8JugyABNskGFpktxOE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=G5JNO4Uvs24IskpqyA0rgsPllDKgvZjkwy5wl3SkrcUhuxaslV3JCH1/O5nCnfcRbWESuLkfV9a8dObuT5HkEZRoI4sfEcDRowen66Za+e+mNde7FfLdMybCnZ6EBjOAzv4QUeICa660N0+3NVI59FWgelMnubOeJ9Q4rhHIi2Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=g+rxy39V; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=KBrIfcXhTtbaDIqFozJfhBqiZMgw2g3eUjz2MDIuU5tbakcCWO1DTJmr9Dc/Md5DuMMwDKD+wd224RKKImeZj5DbreftK840j9KQwaXhuBYH8pZhh3TtGYK3uMXsqCDOTp7MNYxW19R27DhB0WjrhAfoyfyEFd1BgbmmZBe1zEs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=nxM0lyA0; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,13 +36,13 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=TU14y8FTwcIUu8V8KvTbGpugfd4H2ENzIeZb0l05KiQ=; b=g+rxy39VeCVO17Y8nhBHPyk9IM
-	Uuf5Qn+YixYxykhUqVz+jSm+UIRt2T72KgWAWdRvI4AC2Co6TrGqzgnQoUjAC7mcanyJVxTgb+7Lc
-	vR8QymzRPUDqicNvDmhCa4W/kj1bjhIV+M5ESXly/OL2jq+848uE39gur8+HEgKLN8/g=;
+	bh=BtAYhAYP1vm83aI3IXJgYBpWB+UbrPUSs9pOyPbh51o=; b=nxM0lyA0bk8GWyydokRHEbJLL/
+	CV5g+r4sECy1DVu7PShcc62sqVUsD6VpTTLZy+Hz73Io2xN3YgTzFEg3rpVr0AE2GSn1fBCLx19gl
+	Jo5i6KOgr/ZtliulgwpA35L6BVZs8YXcmU6ZuDub+Stasm3uSdXLGK75Eh84gaH3cLNc=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1ryzwh-00DeFV-5e; Mon, 22 Apr 2024 22:07:23 +0200
-Date: Mon, 22 Apr 2024 22:07:23 +0200
+	id 1ryzxf-00DeGH-7N; Mon, 22 Apr 2024 22:08:23 +0200
+Date: Mon, 22 Apr 2024 22:08:23 +0200
 From: Andrew Lunn <andrew@lunn.ch>
 To: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
 Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
@@ -59,7 +59,7 @@ Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
 	benjamin.bigler@bernformulastudent.ch
 Subject: Re: [PATCH net-next v4 00/12] Add support for OPEN Alliance
  10BASE-T1x MACPHY Serial Interface
-Message-ID: <2526cd6a-2300-47f2-bf94-3c697dda87e0@lunn.ch>
+Message-ID: <5f73edc0-1a25-4d03-be21-5b1aa9e933b2@lunn.ch>
 References: <20240418125648.372526-1-Parthiban.Veerasooran@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -71,25 +71,24 @@ Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20240418125648.372526-1-Parthiban.Veerasooran@microchip.com>
 
-On Thu, Apr 18, 2024 at 06:26:36PM +0530, Parthiban Veerasooran wrote:
-> This patch series contain the below updates,
-> - Adds support for OPEN Alliance 10BASE-T1x MACPHY Serial Interface in the
->   net/ethernet/oa_tc6.c.
->   Link to the spec:
->   -----------------
->   https://opensig.org/download/document/OPEN_Alliance_10BASET1x_MAC-PHY_Serial_Interface_V1.1.pdf
+> Testing Details:
+> ----------------
+> The driver performance was tested using iperf3 in the below two setups
+> separately.
 > 
-> - Adds driver support for Microchip LAN8650/1 Rev.B1 10BASE-T1S MACPHY
->   Ethernet driver in the net/ethernet/microchip/lan865x/lan865x.c.
->   Link to the product:
->   --------------------
->   https://www.microchip.com/en-us/product/lan8650
+> Setup 1:
+> --------
+> Node 0 - Raspberry Pi 4 with LAN8650 MAC-PHY 
+> Node 1 - Raspberry Pi 4 with EVB-LAN8670-USB USB Stick
+> 
+> Setup 2:
+> --------
+> Node 0 - SAMA7G54-EK with LAN8650 MAC-PHY 
+> Node 1 - Raspberry Pi 4 with EVB-LAN8670-USB USB Stick
 
-I will get around to reviewing this soon, i promise.
-
-To the OnSemi people: Have you tried your driver/device using this
-framework? It would be good to have a second vendors device using it,
-just to show no vendor specific code has slipped into the framework.
+Would it be possible to chain these two setups together by adding two
+USB dongles to one of the Ri 4s? If i remember correctly, there were
+reports of issues when two devices were using the framework at once.
 
 Thanks
 	Andrew
