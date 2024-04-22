@@ -1,72 +1,163 @@
-Return-Path: <netdev+bounces-90076-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90072-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F49E8ACA7C
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 12:21:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F6DC8ACA2F
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 12:05:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C10571C21096
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 10:21:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 504DE1C20EA3
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 10:05:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1CF113E405;
-	Mon, 22 Apr 2024 10:21:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9C0413CFB7;
+	Mon, 22 Apr 2024 10:05:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=163.com header.i=@163.com header.b="EsfFe/Sn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dAniB5Js"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.2])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D445953814
-	for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 10:21:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.2
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 964CF13C677;
+	Mon, 22 Apr 2024 10:05:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713781293; cv=none; b=Y4iUDcpZBjmIOKXnj/oHF7Mfxn6aT53npk0hadw7VCyuUw9R4iMm7hemFtFQiby/bei9uvrgi4tJYP4Sp1DDKtplSqguZKapAssNMXoBxO92nSiDj+TACYFWSt76we3qSABiCiwDWWicjtBC5zezttJj79BuY5pfYBqzXc6RwDo=
+	t=1713780345; cv=none; b=pFu7AxKjDJeQQbJdjVX6y8MidH9WfxqQxGpasdRu/RvC/ATtI8e+7nyKPHB58uPfQ9TK1H8/tSdGdAr4uLxUCuEHxXG1RTzJXY6XQwPw48gPZbs+hq0fUbCBTSkS5/RqFWTpRRNC1bKKaCY7gKwBqbL8bjPaOYW67vvcCjvcGwg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713781293; c=relaxed/simple;
-	bh=pg8C8mTdpAyzP7IhwHlSNoBi3pGZ42LmMJtTWiQoNV8=;
-	h=Date:From:To:Cc:Subject:Content-Type:MIME-Version:Message-ID; b=kuPFhRqn7xZtWOBb9xy/hHTOzYn5rPKDQ7aMbt45mxq1mqEl8TTAxgirYcIyDzKra3hnIZYfT6FqS9OmKS3+AsJ5IOIpyJcrUj139kjWcphYXG0tqipaaBRITqNPJBEwfLWKo3KhtSW7iE4RtsRbe6skVSrLggDsTUnL1vAdTF0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=fail (1024-bit key) header.d=163.com header.i=@163.com header.b=EsfFe/Sn reason="signature verification failed"; arc=none smtp.client-ip=220.197.31.2
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=Date:From:Subject:Content-Type:MIME-Version:
-	Message-ID; bh=NoXqFYOZkWfDuv+eKJeXfbFFpbrGaUh/snnhSrRu+Yo=; b=E
-	sfFe/SnxWG+erY1/jHD7Ji6hbalOd1DyID6T6bJ8Ni76bnci/YVs/zwZtYz0mr9B
-	mAFtxs2N/0uWUAAxAgpYTlEre4RHBAhiF1mVUsQ3jpy26UflgFL2ZT6KkrsydYQL
-	5IFJgUv/jkI/5O7qvbRMPaCgAmhqGO94sUhLpx7xXs=
-Received: from zhulei_szu$163.com ( [116.128.244.171] ) by
- ajax-webmail-wmsvr-40-123 (Coremail) ; Mon, 22 Apr 2024 17:35:48 +0800
- (CST)
-Date: Mon, 22 Apr 2024 17:35:48 +0800 (CST)
-From: zhulei  <zhulei_szu@163.com>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net
-Subject: Kernel crash caused by vxlan testing
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version XT5.0.14 build 20230109(dcb5de15)
- Copyright (c) 2002-2024 www.mailtech.cn 163com
-X-NTES-SC: AL_Qu2aAfuct00v7iCdbekWkkYagew/X8u3uv4k1IVePZE0kSTo/Swyf1xOEGrI7MWlCBCXkzuOegNF89lATINlZpupEDdFFHeFpxFHuxGKKWdr
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=GBK
+	s=arc-20240116; t=1713780345; c=relaxed/simple;
+	bh=WPTWdTvATvp/Jc2ILqq8RbsICHapQ9gBhIDKHIKQg0g=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ZNR1Ey6d5Y2NIRL5WG0hg+0MLTlwY6OQbTIJu7yK/AFccJeLWbW1+GNqI4HljbXh7NLg1t/MfCSasGxEgwkMabXXVnyQgvZqsuhblwCbzpHd0jZbOFMoMQyEWViAaIboS/lTWE+cqhPbiLN02IjCFa/LftbWoTSDgGwV4KCIuxw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dAniB5Js; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1AA6CC113CC;
+	Mon, 22 Apr 2024 10:05:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713780345;
+	bh=WPTWdTvATvp/Jc2ILqq8RbsICHapQ9gBhIDKHIKQg0g=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=dAniB5Jsq/cAUYner1B86ic2vrrL731C8vhtTKZw0rc1uQ+S3NC/lrsp9sVE7Oj9l
+	 JRDSKNaB3Jh/ud4alrjEr32BST067vcCTQVK3dofx9+p+axKXAH+Rn4A4r1lM7fukd
+	 LUEsc4Qu0kgyagzUl9YXttTHgylXLOBIbBnGgrhFwz52ZFUSm8z9f0F5G9JNtLS70q
+	 HY6vn+f4GW1/AjosvWx5kFe/mZ6seAfwl/qZVbccuYVNkH+z9E/outNlR67+iB8/uJ
+	 IJ8rU/0cJRIKpoF1lczjhBvcEyUoxcCHfTZs6I6+VvfDmI8myZHvJ9nQYWnQ6hip/d
+	 ujdirnxpi+7sA==
+Message-ID: <70184416-344f-4e03-bfb7-0626ff845fe0@kernel.org>
+Date: Mon, 22 Apr 2024 12:05:39 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <610c7229.e38a.18f05295d5d.Coremail.zhulei_szu@163.com>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:_____wD3n1l1LyZmeaMTAA--.2860W
-X-CM-SenderInfo: x2kxzvxlbv63i6rwjhhfrp/1tbiRQ-ITWXAlxfr1AAJsc
-X-Coremail-Antispam: 1U5529EdanIXcx71UUUUU7vcSsGvfC2KfnxnUU==
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [PATCH net-next v7 1/7] net: introduce rstreason to detect why
+ the RST is sent
+Content-Language: en-GB
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: edumazet@google.com, dsahern@kernel.org, martineau@kernel.org,
+ geliang@kernel.org, kuba@kernel.org, pabeni@redhat.com, davem@davemloft.net,
+ rostedt@goodmis.org, mhiramat@kernel.org, mathieu.desnoyers@efficios.com,
+ atenart@kernel.org, mptcp@lists.linux.dev, netdev@vger.kernel.org,
+ linux-trace-kernel@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+References: <20240422030109.12891-1-kerneljasonxing@gmail.com>
+ <20240422030109.12891-2-kerneljasonxing@gmail.com>
+ <4f492445-1fe3-44af-bbaa-bb1fe281964e@kernel.org>
+ <CAL+tcoBRtE0ikv9xiUoWq66_WcysF7QwGggTMwiw793qXxKH8g@mail.gmail.com>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <CAL+tcoBRtE0ikv9xiUoWq66_WcysF7QwGggTMwiw793qXxKH8g@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-SGV5IGFsbCwKCkkgcmVjZW50bHkgdXNlZCBhIHRlc3RpbmcgcHJvZ3JhbSB0byB0ZXN0IHRoZSA0
-LjE5IHN0YWJsZSBicmFuY2gga2VybmVsIGFuZCBmb3VuZCB0aGF0IGEgY3Jhc2ggb2NjdXJyZWQg
-aW1tZWRpYXRlbHkuIFRoZSB0ZXN0IHNvdXJjZSBjb2RlIGxpbmsgaXM6Cmh0dHBzOi8vZ2l0aHVi
-LmNvbS9CYWNrbXloZWFydC9zcmMwMzU4L2Jsb2IvbWFzdGVyL3Z4bGFuX2ZkYl9kZXN0cm95LmMK
-ClRoZSB0ZXN0IGNvbW1hbmQgaXMgYXMgZm9sbG93czoKZ2NjIHZ4bGFuX2ZkYl9kZXN0cm95LmMg
-LW8gdnhsYW5fZmRiX2Rlc3Ryb3kgLWxwdGhyZWFkCgpBY2NvcmRpbmcgdG8gaXRzIHN0YWNrLCB1
-cHN0cmVhbSBoYXMgcmVsZXZhbnQgcmVwYWlyIHBhdGNoLCB0aGUgY29tbWl0IGlkIGlzIDdjMzFl
-NTRhZWVlNTE3ZDEzMThkZmMwYmRlOWZhN2RlNzU4OTNkYzYuCgpNYXkgaSBhc2sgaWYgdGhlIDQu
-MTkga2VybmVsIHdpbGwgcG9ydCB0aGlzIHBhdGNoID8K
+On 22/04/2024 11:17, Jason Xing wrote:> On Mon, Apr 22, 2024 at 4:47 PM
+Matthieu Baerts <matttbe@kernel.org> wrote:
+>> On 22/04/2024 05:01, Jason Xing wrote:
+>>> From: Jason Xing <kernelxing@tencent.com>
+
+(...)
+
+>>> diff --git a/include/net/rstreason.h b/include/net/rstreason.h
+>>> new file mode 100644
+>>> index 000000000000..c57bc5413c17
+>>> --- /dev/null
+>>> +++ b/include/net/rstreason.h
+>>> @@ -0,0 +1,144 @@
+>>> +/* SPDX-License-Identifier: GPL-2.0-or-later */
+>>> +
+>>> +#ifndef _LINUX_RSTREASON_H
+>>> +#define _LINUX_RSTREASON_H
+>>> +#include <net/dropreason-core.h>
+>>> +#include <uapi/linux/mptcp.h>
+>>> +
+>>> +#define DEFINE_RST_REASON(FN, FNe)   \
+>>> +     FN(MPTCP_RST_EUNSPEC)           \
+>>> +     FN(MPTCP_RST_EMPTCP)            \
+>>> +     FN(MPTCP_RST_ERESOURCE)         \
+>>> +     FN(MPTCP_RST_EPROHIBIT)         \
+>>> +     FN(MPTCP_RST_EWQ2BIG)           \
+>>> +     FN(MPTCP_RST_EBADPERF)          \
+>>> +     FN(MPTCP_RST_EMIDDLEBOX)        \
+>>
+>> Small detail: should it not make more sense to put the ones linked to
+>> MPTCP at the end? I mean I guess MPTCP should be treated in second
+>> priority: CONFIG_MPTCP could not be set, and the ones linked to TCP
+>> should be more frequent, etc.
+> 
+> Do you mean that I need to adjust the order: 1) tcp reasons first, 2)
+> independent reasons, 3) mptcp reasons ?
+
+Correct, it looks like it is a more "natural" order.
+
+> Reasonable. I will do it :)
+
+Thanks!
+
+Cheers,
+Matt
+-- 
+Sponsored by the NGI0 Core fund.
+
 
