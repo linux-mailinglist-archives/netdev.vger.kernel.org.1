@@ -1,86 +1,100 @@
-Return-Path: <netdev+bounces-90211-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90212-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F2018AD1BA
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 18:18:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D0C08AD1C2
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 18:20:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 143F41F2449A
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 16:18:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9EACD1C20E94
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 16:20:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D58C153588;
-	Mon, 22 Apr 2024 16:17:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31FBB15380B;
+	Mon, 22 Apr 2024 16:20:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="TuOMPPnH"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="apwd0xpN"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
+Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D90D7153BCE
-	for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 16:17:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97B321474D2;
+	Mon, 22 Apr 2024 16:20:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713802641; cv=none; b=paxW+dy3VjtmLfxlvvlZzybmzuQTBA6hUTG9DnVv5+Vh2s5eCJ89f8TevPJ3Ngjt1PxVQBOoc+2gj0ZiqAxGBTLlgFFnmpWcuqeA0/0HYyZ8Y8X4zpjGADLUlYDPTvM2/tGg0GT5fyo1xPaBWb2LlkAA6JIHbMOh0tGRwQEsf+0=
+	t=1713802844; cv=none; b=TNyg6yOiaE7jRLMoP1DzDx6IUyZMG+ky0ymu58i3PgbgTdH2IaS9tJBnNSxYAieykUOlewPiF2hK2LwYHfFPGzyjto4FF/XPOjrQXdtT6+pIGUHFU+HPfCX/PH9b3QJrhULn+OKxymbq6MWcWzEm1JyE9Q6Vj1CVdmV6vvxIOEM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713802641; c=relaxed/simple;
-	bh=kPtHa1h75L0L9bPKO9qdnWB5Z/ik7V/Q4elzb5V6T+M=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=al3qkKiqgz24VVFEeJReke1R7VVTCHaMJqJtUQaVOEI2LQTxsXYAYyZeSb5zfmCqpZwb1oIrf3NrPeVHRKU8G+PNN4c/v7LHT9RxGS9W/wFsOAcPi1i1I1j4s3Jpm6+iD2Wi6QLkKrUOCA2bu6pCBiAIyJ9jUuxumfXyC8gbauQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=TuOMPPnH; arc=none smtp.client-ip=99.78.197.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1713802639; x=1745338639;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=mrah453q2MFwXAq9wjp65lEluNdemNuwyBu10e18TxE=;
-  b=TuOMPPnHy9F49fdyHu2mNp0BeZGKZueBpuujYzT7jyp1s1wFA8CUQHCk
-   Xbxz20i/RQ0xLoCJOWyCzywulPDTtLkXDRhB3dGgmFMBIz5YrFzcUx7DV
-   Z/7ruhvXN+tMxrGIB/BwQ0hLEHF9kENCAHkttAD8PmpxVJtAQrdNVou5+
-   A=;
-X-IronPort-AV: E=Sophos;i="6.07,221,1708387200"; 
-   d="scan'208";a="290865115"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Apr 2024 16:17:17 +0000
-Received: from EX19MTAEUC002.ant.amazon.com [10.0.10.100:7206]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.8.194:2525] with esmtp (Farcaster)
- id 57717e08-bd6f-460b-b357-06035a32e564; Mon, 22 Apr 2024 16:17:15 +0000 (UTC)
-X-Farcaster-Flow-ID: 57717e08-bd6f-460b-b357-06035a32e564
-Received: from EX19D038EUA003.ant.amazon.com (10.252.50.199) by
- EX19MTAEUC002.ant.amazon.com (10.252.51.245) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Mon, 22 Apr 2024 16:17:15 +0000
-Received: from c889f3b7ef0b.amazon.com (10.119.243.178) by
- EX19D038EUA003.ant.amazon.com (10.252.50.199) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.28;
- Mon, 22 Apr 2024 16:17:13 +0000
-From: Salvatore Dipietro <dipiets@amazon.com>
-To: <edumazet@google.com>
-CC: <alisaidi@amazon.com>, <benh@amazon.com>, <blakgeof@amazon.com>,
-	<davem@davemloft.net>, <dipietro.salvatore@gmail.com>, <dipiets@amazon.com>,
-	<dsahern@kernel.org>, <kuba@kernel.org>, <netdev@vger.kernel.org>,
-	<pabeni@redhat.com>
-Subject: Re: [PATCH v3] tcp: Add memory barrier to tcp_push()
-Date: Mon, 22 Apr 2024 09:16:56 -0700
-Message-ID: <20240422161656.60331-1-dipiets@amazon.com>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <CANn89iK69pB9y5eZTNjV6rH-2y3B2iAT2dnu13WfUPyPTBkTkw@mail.gmail.com>
-References: <CANn89iK69pB9y5eZTNjV6rH-2y3B2iAT2dnu13WfUPyPTBkTkw@mail.gmail.com>
+	s=arc-20240116; t=1713802844; c=relaxed/simple;
+	bh=H+5ifd3rJFrn7La+R7Jq0qBUFBBAzUtH9vz5BUqJqno=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=cjzpa0GdJV2DpEd5BPq9v+k1Mzzz4uSs4mAeAnk+/P8Lu1tOfYDlyugL6uaoAapSUF1ON+Af7mnS4LJX2OypF1diuGtBmdnUsVsR/uZJk4CC3BS2tpEAHRHAa8VfCB5YRlLKTxZsJTf6i0PGfWKfSNFWrWlt2PRZV6ZPSQwMFkk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=apwd0xpN; arc=none smtp.client-ip=217.70.183.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 3DFE7FF80C;
+	Mon, 22 Apr 2024 16:20:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1713802833;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=H+5ifd3rJFrn7La+R7Jq0qBUFBBAzUtH9vz5BUqJqno=;
+	b=apwd0xpNA1Qt0vvFaHPmcY9lgnXnvJjbS8S60Oifr66DhJ5GQIzlPoZVTsSv10r2CkgjvU
+	bV4BN/WPut0OWOYNgDyWBQ1SFkLv/oEhA8otZhNV+OUrw6jJVDHrmYUQrDSPE5YnE2SUgf
+	uADijSy6PQ8Pdlt75Z/GcpvF91xCkGGH4ZUGl1M39K0s0iKzvMuqHWm2JCvbqX3lc6+uBi
+	npkz+4+IoCbMJb6sVjTwiGBSKF03hibwmFlC3sl+q8Hk/onvwFAjMszbIpBlZ5iXGgd3kE
+	uQ0pTONFlZt44T/sYdr0uemom7Jq0UTvc8XWrM3UD71MlpK0VIrE1QHQQWk5Yg==
+Date: Mon, 22 Apr 2024 18:20:30 +0200
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn
+ <andrew@lunn.ch>, Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Kyle Swenson
+ <kyle.swenson@est.tech>
+Subject: Re: [PATCH net-next v2 2/3] net: pse-pd: pse_core: Fix pse
+ regulator type
+Message-ID: <20240422182030.34524046@kmaincent-XPS-13-7390>
+In-Reply-To: <ZiZ7-n5q3COmPRx6@nanopsycho>
+References: <20240422-fix_poe-v2-0-e58325950f07@bootlin.com>
+	<20240422-fix_poe-v2-2-e58325950f07@bootlin.com>
+	<ZiZ7-n5q3COmPRx6@nanopsycho>
+Organization: bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D037UWB003.ant.amazon.com (10.13.138.115) To
- EX19D038EUA003.ant.amazon.com (10.252.50.199)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: kory.maincent@bootlin.com
 
-We have tested the proposed solution and it doesn't introduce any regression in our benchmark. 
-Moreover, looking to the assembly code, the `test_and_set_bit` generates an `ldsetal` and `dmb ish` instructions which are correct for the ARM architecture.
-We do not see any concern with the proposed patch.
+On Mon, 22 Apr 2024 17:02:18 +0200
+Jiri Pirko <jiri@resnulli.us> wrote:
+
+> Mon, Apr 22, 2024 at 03:35:47PM CEST, kory.maincent@bootlin.com wrote:
+> >From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
+> >
+> >Clarify PSE regulator as voltage regulator, not current.
+> >The PSE (Power Sourcing Equipment) regulator is defined as a voltage
+> >regulator, maintaining fixed voltage while accommodating varying current.
+> >
+> >Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> >Signed-off-by: Kory Maincent <kory.maincent@bootlin.com> =20
+>=20
+> This looks like a fix. Can you provide "Fixes" tag please and perhaps
+> send this to -net tree?
+
+Indeed I should have used the Fixes tag.
+The PoE patch series that introduce this issue is currently in net-next.
+
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
