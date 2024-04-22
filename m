@@ -1,142 +1,149 @@
-Return-Path: <netdev+bounces-90089-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90090-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E425F8ACC31
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 13:40:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D13D8ACC63
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 13:58:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 83DB81F22846
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 11:40:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 425E31F24A5E
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 11:58:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADFA7146D75;
-	Mon, 22 Apr 2024 11:40:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="KjoeidS3"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E80D2146A93;
+	Mon, 22 Apr 2024 11:58:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F28C214658F;
-	Mon, 22 Apr 2024 11:40:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.141
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FFD61448E5;
+	Mon, 22 Apr 2024 11:57:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713786017; cv=none; b=cSmyFxG+rwPrZkr8tHxwA1A+cE0mKv/VvTff74bFGP7vfWsJoBkmezkH9Fjoz9tmkBcdoM5/gIvdj0VcTuHoTQeLO3IQGEDtbnawWF2sGYBxZ26uEO9VFBA8NnhV19KFO5IcFXVaT/B9w0Xg3L+vrJuSDdQfti87/d/l3pvXCmA=
+	t=1713787081; cv=none; b=qpUeA1YGgEY67doqXFVV+B6DRC4pFCPyPJ9sV4QgiLcxs5zy5Yi+xHxGt6k6yfaQWigatvnoTP8XuLIXTQUfrKh6PpMRZJS4HLAEd2RbsojvwA/b0UJmveZMYPHoSf/cI9L7A550gf1QooVoZInOzGSBPRA0RdFyvNVDajkqa1o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713786017; c=relaxed/simple;
-	bh=OtIT4ZDrndIdEQ3XvZhnwUHtIrc/1Kjzl6egH19m7JY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=c5aPRnVhRg4pctFEphk10LLbRRFobZnaSVzlKjuWNdj9Gf9rTkzn0MyDJdQmn2Lx/sFTHChYUmvIZkQ+ow/9d9LGvN8YhMtzK/yCo2TxgTOlycGaBsyU4KwmSsm4ORHvMeu+qTqFbDldSHnomZDlC+VrZC8Gox/12PIoeUm0wbA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=KjoeidS3; arc=none smtp.client-ip=198.47.19.141
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from lelv0265.itg.ti.com ([10.180.67.224])
-	by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 43MBdkv3009267;
-	Mon, 22 Apr 2024 06:39:46 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1713785986;
-	bh=xzNR1J4JC8x2iDrAZi8hRXVcWNOe522OtdWGdtBjwCs=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=KjoeidS3shpylO3V1IFSVlFuhnbwUEKJbERpt3In65ouHUbT8sNPYeDmY0HjfJ7km
-	 eGvv5qhrqmZRLJh4GKUvIKCTLxgoEEjr/mREBkYSSMIAYDBmQyGgrR/+aHtC7/2FY2
-	 CrRppFKyWPyHH0arSHE92MSdbqPHy35mZyTDsAtY=
-Received: from DLEE102.ent.ti.com (dlee102.ent.ti.com [157.170.170.32])
-	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 43MBdkR7030973
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Mon, 22 Apr 2024 06:39:46 -0500
-Received: from DLEE107.ent.ti.com (157.170.170.37) by DLEE102.ent.ti.com
- (157.170.170.32) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Mon, 22
- Apr 2024 06:39:46 -0500
-Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DLEE107.ent.ti.com
- (157.170.170.37) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Mon, 22 Apr 2024 06:39:46 -0500
-Received: from [172.24.227.220] (chintan-thinkstation-p360-tower.dhcp.ti.com [172.24.227.220])
-	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 43MBdfeg004953;
-	Mon, 22 Apr 2024 06:39:42 -0500
-Message-ID: <67c7f423-18ce-4804-8be9-cc4521733cd2@ti.com>
-Date: Mon, 22 Apr 2024 17:09:41 +0530
+	s=arc-20240116; t=1713787081; c=relaxed/simple;
+	bh=Y2/31JXWx+TG+GTmKmgC1g8zUJkzx+PWi+Sj1Tk9zD8=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=XIekui/H/KBqcGJm0iF6mvygM0hQRUJxdWJsNLk9WKvilOOzIm+F6dnM42Q7ExDchoCBxxdfZwOrQHFrVm1Kfd7cpxKn4zL6WCiwZ0iFNMGXDuL4svyVpSr6UmGel7UP6ptqavUl9LJ7CbxqywyKwzIvCxkkmHCNlT/hA1/PkDI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.48])
+	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4VNNwK3ZBkz1R8WJ;
+	Mon, 22 Apr 2024 19:54:57 +0800 (CST)
+Received: from dggpemm500005.china.huawei.com (unknown [7.185.36.74])
+	by mail.maildlp.com (Postfix) with ESMTPS id 78F5318005D;
+	Mon, 22 Apr 2024 19:57:56 +0800 (CST)
+Received: from localhost.localdomain (10.69.192.56) by
+ dggpemm500005.china.huawei.com (7.185.36.74) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Mon, 22 Apr 2024 19:57:56 +0800
+From: Yunsheng Lin <linyunsheng@huawei.com>
+To: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Yunsheng Lin
+	<linyunsheng@huawei.com>, David Howells <dhowells@redhat.com>, Alexander
+ Duyck <alexander.duyck@gmail.com>, Marc Dionne <marc.dionne@auristor.com>,
+	Eric Dumazet <edumazet@google.com>, <linux-afs@lists.infradead.org>
+Subject: [PATCH net] rxrpc: Fix using alignmask being zero for __page_frag_alloc_align()
+Date: Mon, 22 Apr 2024 19:55:40 +0800
+Message-ID: <20240422115541.38548-1-linyunsheng@huawei.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v8 0/2] Enable RX HW timestamp for PTP packets
- using CPTS FIFO
-Content-Language: en-US
-To: Julien Panis <jpanis@baylibre.com>, Arnd Bergmann <arnd@arndb.de>,
-        Dan
- Carpenter <dan.carpenter@linaro.org>,
-        Heiner Kallweit <hkallweit1@gmail.com>,
-        Vladimir Oltean <vladimir.oltean@nxp.com>,
-        Andrew Lunn <andrew@lunn.ch>, Roger Quadros <rogerq@kernel.org>,
-        Richard Cochran
-	<richardcochran@gmail.com>,
-        Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski
-	<kuba@kernel.org>,
-        Eric Dumazet <edumazet@google.com>,
-        "David S. Miller"
-	<davem@davemloft.net>, <s-vadapalli@ti.com>
-CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>
-References: <20240419082626.57225-1-c-vankar@ti.com>
-From: Chintan Vankar <c-vankar@ti.com>
-In-Reply-To: <20240419082626.57225-1-c-vankar@ti.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ dggpemm500005.china.huawei.com (7.185.36.74)
 
+rxrpc_alloc_data_txbuf() may be called with data_align being
+zero in none_alloc_txbuf() and rxkad_alloc_txbuf(), data_align
+is supposed to be an order-based alignment value, but zero is
+not a valid order-based alignment value, and '~(data_align - 1)'
+doesn't result in a valid mask-based alignment value for
+__page_frag_alloc_align().
 
+Fix it by passing a valid order-based alignment value in
+none_alloc_txbuf() and rxkad_alloc_txbuf().
 
-On 19/04/24 13:56, Chintan Vankar wrote:
-> The CPSW offers two mechanisms for communicating packet ingress timestamp
-> information to the host.
-> 
-> The first mechanism is via the CPTS Event FIFO which records timestamp
-> when triggered by certain events. One such event is the reception of an
-> Ethernet packet with a specified EtherType field. This is used to capture
-> ingress timestamps for PTP packets. With this mechanism the host must
-> read the timestamp (from the CPTS FIFO) separately from the packet payload
-> which is delivered via DMA.
-> 
-> In the second mechanism of timestamping, CPSW driver enables hardware
-> timestamping for all received packets by setting the TSTAMP_EN bit in
-> CPTS_CONTROL register, which directs the CPTS module to timestamp all
-> received packets, followed by passing timestamp via DMA descriptors.
-> This mechanism is responsible for triggering errata i2401:
-> "CPSW: Host Timestamps Cause CPSW Port to Lock up."
-> 
-> The errata affects all K3 SoCs. Link to errata for AM64x:
-> https://www.ti.com/lit/er/sprz457h/sprz457h.pdf
-> 
-> As a workaround we can use first mechanism to timestamp received
-> packets.
-> 
-> Series is based on linux-next tagged next-20240419.
-> 
-> Link to v7:
-> https://lore.kernel.org/r/20240417120913.3811519-1-c-vankar@ti.com/
-> 
-> Changes from v7 to v8:
-> - Removed empty lines between trailers in [PATCH v7 2/2] as suggested
->    by Jakub.
-> 
+Also use page_frag_alloc_align() expecting an order-based
+alignment value in rxrpc_alloc_data_txbuf() to avoid doing the
+alignment converting operation and to catch possible invalid
+alignment value in the future. Remove the 'if (data_align)'
+checking too, as it is always true for a valid order-based
+alignment value.
 
-Is it possible to merge this series if no further comment ?
+Fixes: 6b2536462fd4 ("rxrpc: Fix use of changed alignment param to page_frag_alloc_align()")
+Fixes: 49489bb03a50 ("rxrpc: Do zerocopy using MSG_SPLICE_PAGES and page frags")
+CC: David Howells <dhowells@redhat.com>
+CC: Alexander Duyck <alexander.duyck@gmail.com>
+Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
+---
+ net/rxrpc/insecure.c |  2 +-
+ net/rxrpc/rxkad.c    |  2 +-
+ net/rxrpc/txbuf.c    | 10 +++++-----
+ 3 files changed, 7 insertions(+), 7 deletions(-)
 
-> Chintan Vankar (2):
->    net: ethernet: ti: am65-cpts: Enable RX HW timestamp for PTP packets
->      using CPTS FIFO
->    net: ethernet: ti: am65-cpsw/ethtool: Enable RX HW timestamp only for
->      PTP packets
-> 
->   drivers/net/ethernet/ti/am65-cpsw-ethtool.c |  13 ++-
->   drivers/net/ethernet/ti/am65-cpsw-nuss.c    |  51 +++++-----
->   drivers/net/ethernet/ti/am65-cpts.c         | 107 ++++++++++++++------
->   drivers/net/ethernet/ti/am65-cpts.h         |  11 +-
->   4 files changed, 118 insertions(+), 64 deletions(-)
-> 
+diff --git a/net/rxrpc/insecure.c b/net/rxrpc/insecure.c
+index f2701068ed9e..b52b75a0fdac 100644
+--- a/net/rxrpc/insecure.c
++++ b/net/rxrpc/insecure.c
+@@ -19,7 +19,7 @@ static int none_init_connection_security(struct rxrpc_connection *conn,
+  */
+ static struct rxrpc_txbuf *none_alloc_txbuf(struct rxrpc_call *call, size_t remain, gfp_t gfp)
+ {
+-	return rxrpc_alloc_data_txbuf(call, min_t(size_t, remain, RXRPC_JUMBO_DATALEN), 0, gfp);
++	return rxrpc_alloc_data_txbuf(call, min_t(size_t, remain, RXRPC_JUMBO_DATALEN), 1U, gfp);
+ }
+ 
+ static int none_secure_packet(struct rxrpc_call *call, struct rxrpc_txbuf *txb)
+diff --git a/net/rxrpc/rxkad.c b/net/rxrpc/rxkad.c
+index f1a68270862d..c48e93a26b2a 100644
+--- a/net/rxrpc/rxkad.c
++++ b/net/rxrpc/rxkad.c
+@@ -155,7 +155,7 @@ static struct rxrpc_txbuf *rxkad_alloc_txbuf(struct rxrpc_call *call, size_t rem
+ 	switch (call->conn->security_level) {
+ 	default:
+ 		space = min_t(size_t, remain, RXRPC_JUMBO_DATALEN);
+-		return rxrpc_alloc_data_txbuf(call, space, 0, gfp);
++		return rxrpc_alloc_data_txbuf(call, space, 1U, gfp);
+ 	case RXRPC_SECURITY_AUTH:
+ 		shdr = sizeof(struct rxkad_level1_hdr);
+ 		break;
+diff --git a/net/rxrpc/txbuf.c b/net/rxrpc/txbuf.c
+index e0679658d9de..994d6582d5e2 100644
+--- a/net/rxrpc/txbuf.c
++++ b/net/rxrpc/txbuf.c
+@@ -21,20 +21,20 @@ struct rxrpc_txbuf *rxrpc_alloc_data_txbuf(struct rxrpc_call *call, size_t data_
+ {
+ 	struct rxrpc_wire_header *whdr;
+ 	struct rxrpc_txbuf *txb;
+-	size_t total, hoff = 0;
++	size_t total, hoff;
+ 	void *buf;
+ 
+ 	txb = kmalloc(sizeof(*txb), gfp);
+ 	if (!txb)
+ 		return NULL;
+ 
+-	if (data_align)
+-		hoff = round_up(sizeof(*whdr), data_align) - sizeof(*whdr);
++	hoff = round_up(sizeof(*whdr), data_align) - sizeof(*whdr);
+ 	total = hoff + sizeof(*whdr) + data_size;
+ 
++	data_align = max_t(size_t, data_align, L1_CACHE_BYTES);
+ 	mutex_lock(&call->conn->tx_data_alloc_lock);
+-	buf = __page_frag_alloc_align(&call->conn->tx_data_alloc, total, gfp,
+-				      ~(data_align - 1) & ~(L1_CACHE_BYTES - 1));
++	buf = page_frag_alloc_align(&call->conn->tx_data_alloc, total, gfp,
++				    data_align);
+ 	mutex_unlock(&call->conn->tx_data_alloc_lock);
+ 	if (!buf) {
+ 		kfree(txb);
+-- 
+2.33.0
+
 
