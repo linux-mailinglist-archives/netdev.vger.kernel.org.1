@@ -1,155 +1,177 @@
-Return-Path: <netdev+bounces-90095-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90096-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9B748ACC90
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 14:11:49 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A1F778ACCDC
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 14:39:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 95BEC285B6B
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 12:11:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 997C1B20A63
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 12:39:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 155B01474A7;
-	Mon, 22 Apr 2024 12:11:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CFHTz0AC"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFC1A146D5F;
+	Mon, 22 Apr 2024 12:39:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C96DD146D63
-	for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 12:11:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01E30146A93;
+	Mon, 22 Apr 2024 12:39:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713787901; cv=none; b=NMkqx+y/4si/YRwNQh3icjrwJ99V+ZBXn4FOoM481rRpmSSPUgeUqjd6FLLiopWG/qq6zJAAV6T88ciS06MytijnyGwfn2kmjOlHNOrNRu297XAs03L7OYHlf1sYYZyT2SVcNn6mT1SHtQCkpj9HVpQBPfogdGo6H5YPxnwIY5I=
+	t=1713789579; cv=none; b=SOfGwSjTplOrgBBe/be17lMN39059U8J5KG3JK39VXFMGwcZeQ4U3nuvsrO2eaP2Reb5ggt/gngs3zXEb1Lm4JRyZBHRsYx8UlQjupetVIFNn07IfxPdh65WLQ2/zeEsWzmqWkPTbi6fjLdtJ9SWmJAtjIzlzwWA5Co+h0XwMvE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713787901; c=relaxed/simple;
-	bh=P+ngD7651DKaxK2xXQRIyCnuFIb7V6Y5I4v0Y+4liW4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cBFBqxnT4Gx0IOJ9xrvP+CyUiok5H3ieDtkpr+jmSnTzMAtEBFBP5sOOq/yGAscRbq/50irrppfpyAwSEedGYS2jVRd/GhcTFWGQje66x8Xo4dLCAaGhFe6ZTv8MLecR05OR5nVHiKNS4lAOAW4ySqhDsTcytAp9Szos2+VQSC4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=CFHTz0AC; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-41a1d88723bso8350415e9.0
-        for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 05:11:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1713787897; x=1714392697; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=bCRnuZK0O/QOXHu1Ldkstjl1doP0jCVLWLbPZKH0WnQ=;
-        b=CFHTz0ACeA5cePDuWJvlh0c8tKCX+vdZE51F+lymx2ic2Y7hs2eXx05OW4IBWO5NY7
-         enwTee91Ffu3VfDwyIkmea7VIvN1ABlqbVpYWHDO8qGLChX0hoAO+wasQMUtc896zpHB
-         QxjKoTPskxJNDiDIqOlKG4CIT6U73cuCt0Vs9fgQM0ezVMx0psIJB9CigTkRj5XWIUKW
-         xaeJd3fUGhkumQtrwTPbnfBgS5vg69UeFthGeF6sKzOfXwJNG5K2/VFS9jCmhxkfP77J
-         31QAA9xu9VEv3dBKe3932dOMZdSw5hMYLReIRTM78EV4NCYcxeN6zzWPjQTuz5Shh7PR
-         Wv3A==
+	s=arc-20240116; t=1713789579; c=relaxed/simple;
+	bh=yxR46rGU3Aqnq5NTBddw5GE+9vGxcjEQcLz0queXR3E=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FjUewH5PzV0fserXKHpiyjni8DLNrwXH4gTo/LwxofeZNcgln02ijpnBIoFlNWwImuQqCqVGpmDcp4W3gmdtosXiEIvhM9Weg7wjOnYuy+qfgW9viWiBl4OGGR4mwD9etKS9gEVeMVja7i5PjSP5HSysfZmaSfR+5/HRNUC8eE4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.167.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-518a56cdc03so5281683e87.1;
+        Mon, 22 Apr 2024 05:39:37 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713787897; x=1714392697;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=bCRnuZK0O/QOXHu1Ldkstjl1doP0jCVLWLbPZKH0WnQ=;
-        b=Is0tOYEJdPonrFZni1wXtd9Wda5qzsXbRtvXaLAiR8d0lq83eNLcZH1cq7tiGWNAxS
-         kzdqbhPSW02x2Q8leoksvgSYEF81kv08D/jg0cN7PzzYyDJWVFsONx4/IxvfgbDTDXNS
-         +OKcUgGJyA0VZnmnKaaN0PjQe7PURcXvODhk2BSWuwYZz1yRLsAHQApVZpWzfglibQOL
-         NQaiQ513+HzL5dCGB79aB/KpuREGlwu7BtyTBphwRKYXqBN7asDXTZz0OR4cHKCTJQCz
-         IYesW+QhS5kLoNwfkaIWk/FjubstPOsGq6wvzPoz4ne605Z3W3I3BS7x2gpPJ97SJF3K
-         x8MA==
-X-Forwarded-Encrypted: i=1; AJvYcCWvNqhsjQw0es7nEu5pEjRimXk1YDS5UsioHVV/I0sX/YJZvQ08y2f3rWX1yhqbnGRGN1xS/vgYHIf+BlDEpudTXnZkgiJH
-X-Gm-Message-State: AOJu0Yzy9AsirToqMT3GHHQ4wS40H4/LSAeQpi28UQ+GtBnXo5C6qHy1
-	KA8T3FP1C5de3HFTwGFh+xiVvtWhIoGhkIaJ/ZCmuyNh7JiZ3BZ8tu6fnTlMr5k=
-X-Google-Smtp-Source: AGHT+IHynTNWSPs7rYJt+CqENDAY0rj5tOUJ3mwkpUrvPfTTqXCsLGZ4LMBMh1xVXt1DdTNJhAB4yQ==
-X-Received: by 2002:a05:600c:3552:b0:419:7fd:2fbe with SMTP id i18-20020a05600c355200b0041907fd2fbemr5536580wmq.11.1713787897251;
-        Mon, 22 Apr 2024 05:11:37 -0700 (PDT)
-Received: from [192.168.1.28] (lfbn-bay-1-170-196.w83-193.abo.wanadoo.fr. [83.193.250.196])
-        by smtp.gmail.com with ESMTPSA id r14-20020a05600c458e00b00417e5b71188sm16503881wmo.34.2024.04.22.05.11.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 22 Apr 2024 05:11:36 -0700 (PDT)
-Message-ID: <fb942d49-1c72-40a6-8309-ef3331d8f8dc@linaro.org>
-Date: Mon, 22 Apr 2024 14:11:34 +0200
+        d=1e100.net; s=20230601; t=1713789576; x=1714394376;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=iz0ikdoTMPeoGlY7AzEyABEuqkNB0Gjgw6bWzoieFE4=;
+        b=FHH9Cz9NESk4CUdnzGBzUPoGF/71XXkUlZcSlqnw1ThuPdAVTkcg2LtUPZcZHkQrhG
+         qCcISFYRZRsEqHZQSvgHC/iZbj7AP3ZqMIVwn7ykXFGiLXOcijL9axonheGNQwcxX5VP
+         aPwYP+eL91QZpG7KhTNy7kO7LmEA3FC7icknlr8E8Y1Iuv17dS7odp6aw2u9t7Nwequ+
+         +TDXv6yRqacCZ0N/I3sIxOX+U3KtK7/9pvJczt7TRFvuTaBOguua4w/SQVrjEYSwrwFP
+         qBFdDzIbWr0HFmHg5wRTlJG22dYiJxnz6QZcqbtx4aobRqcD14jBKB3HfX4HkUeTbyii
+         KykQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV3fitlaIUpjwnoUUZ5I5RTi8ccjLVCqti3pDJZ0NorDV50X/d7BohPWGTFAzVVLva/eE9BKmVHjSu417DjWVS+Ep+pmStWBxWQdTN3j86Mrl1JQWKyTrjoNma44pNCLUQKgWEYuKWWdNpncHT0Ri4R4y5ncKaHnrm+3VTNKx5CkHbNXhhr4Ctq02qjLaSnC3UzyrmXzE/kOEc=
+X-Gm-Message-State: AOJu0YwEln7ff7cUg7LRTYedsHx8SkqV1qU2ihnHX771xd4hhfyRPo++
+	h+aFJwLP4cxfsMP9wUH+1jlBbMT98O2an5ygrVHl5H6HQcA+l+GR
+X-Google-Smtp-Source: AGHT+IF5YTCCg6KEsN0PmqluDOTi/5NrwJEUq5lvraAub+lxIQJqUtef+oDOn/RubcUZafX5KbdePw==
+X-Received: by 2002:a19:ca4f:0:b0:515:c195:d6b8 with SMTP id h15-20020a19ca4f000000b00515c195d6b8mr5518092lfj.60.1713789575968;
+        Mon, 22 Apr 2024 05:39:35 -0700 (PDT)
+Received: from localhost (fwdproxy-lla-117.fbsv.net. [2a03:2880:30ff:75::face:b00c])
+        by smtp.gmail.com with ESMTPSA id og14-20020a1709071dce00b00a55ac4c4550sm1906884ejc.211.2024.04.22.05.39.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Apr 2024 05:39:35 -0700 (PDT)
+From: Breno Leitao <leitao@debian.org>
+To: aleksander.lobakin@intel.com,
+	kuba@kernel.org,
+	davem@davemloft.net,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	elder@kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	nbd@nbd.name,
+	sean.wang@mediatek.com,
+	Mark-MC.Lee@mediatek.com,
+	lorenzo@kernel.org,
+	taras.chornyi@plvision.eu,
+	ath11k@lists.infradead.org,
+	ath10k@lists.infradead.org,
+	linux-wireless@vger.kernel.org,
+	geomatsi@gmail.com,
+	kvalo@kernel.org,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Cc: quic_jjohnson@quicinc.com,
+	leon@kernel.org,
+	dennis.dalessandro@cornelisnetworks.com,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	bpf@vger.kernel.org,
+	idosch@idosch.org,
+	leitao@debian.org
+Subject: [PATCH net-next v7 00/10] allocate dummy device dynamically
+Date: Mon, 22 Apr 2024 05:38:53 -0700
+Message-ID: <20240422123921.854943-1-leitao@debian.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 11/15] arch: make execmem setup available regardless of
- CONFIG_MODULES
-To: Mike Rapoport <rppt@kernel.org>, linux-kernel@vger.kernel.org
-Cc: Alexandre Ghiti <alexghiti@rivosinc.com>,
- Andrew Morton <akpm@linux-foundation.org>, =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?=
- <bjorn@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
- Christophe Leroy <christophe.leroy@csgroup.eu>,
- "David S. Miller" <davem@davemloft.net>, Dinh Nguyen <dinguyen@kernel.org>,
- Donald Dutile <ddutile@redhat.com>, Eric Chanudet <echanude@redhat.com>,
- Heiko Carstens <hca@linux.ibm.com>, Helge Deller <deller@gmx.de>,
- Huacai Chen <chenhuacai@kernel.org>,
- Kent Overstreet <kent.overstreet@linux.dev>,
- Luis Chamberlain <mcgrof@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
- Masami Hiramatsu <mhiramat@kernel.org>, Michael Ellerman
- <mpe@ellerman.id.au>, Nadav Amit <nadav.amit@gmail.com>,
- Palmer Dabbelt <palmer@dabbelt.com>, Peter Zijlstra <peterz@infradead.org>,
- Rick Edgecombe <rick.p.edgecombe@intel.com>,
- Russell King <linux@armlinux.org.uk>, Sam Ravnborg <sam@ravnborg.org>,
- Song Liu <song@kernel.org>, Steven Rostedt <rostedt@goodmis.org>,
- Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
- Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
- bpf@vger.kernel.org, linux-arch@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
- linux-mm@kvack.org, linux-modules@vger.kernel.org,
- linux-parisc@vger.kernel.org, linux-riscv@lists.infradead.org,
- linux-s390@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org, loongarch@lists.linux.dev,
- netdev@vger.kernel.org, sparclinux@vger.kernel.org, x86@kernel.org
-References: <20240422094436.3625171-1-rppt@kernel.org>
- <20240422094436.3625171-12-rppt@kernel.org>
-Content-Language: en-US
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-In-Reply-To: <20240422094436.3625171-12-rppt@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-On 22/4/24 11:44, Mike Rapoport wrote:
-> From: "Mike Rapoport (IBM)" <rppt@kernel.org>
-> 
-> execmem does not depend on modules, on the contrary modules use
-> execmem.
-> 
-> To make execmem available when CONFIG_MODULES=n, for instance for
-> kprobes, split execmem_params initialization out from
-> arch/*/kernel/module.c and compile it when CONFIG_EXECMEM=y
-> 
-> Signed-off-by: Mike Rapoport (IBM) <rppt@kernel.org>
-> ---
->   arch/arm/kernel/module.c       |  43 ----------
->   arch/arm/mm/init.c             |  45 +++++++++++
->   arch/arm64/kernel/module.c     | 140 ---------------------------------
->   arch/arm64/mm/init.c           | 140 +++++++++++++++++++++++++++++++++
->   arch/loongarch/kernel/module.c |  19 -----
->   arch/loongarch/mm/init.c       |  21 +++++
->   arch/mips/kernel/module.c      |  22 ------
->   arch/mips/mm/init.c            |  23 ++++++
->   arch/nios2/kernel/module.c     |  20 -----
->   arch/nios2/mm/init.c           |  21 +++++
->   arch/parisc/kernel/module.c    |  20 -----
->   arch/parisc/mm/init.c          |  23 +++++-
->   arch/powerpc/kernel/module.c   |  63 ---------------
->   arch/powerpc/mm/mem.c          |  64 +++++++++++++++
->   arch/riscv/kernel/module.c     |  44 -----------
->   arch/riscv/mm/init.c           |  45 +++++++++++
->   arch/s390/kernel/module.c      |  27 -------
->   arch/s390/mm/init.c            |  30 +++++++
->   arch/sparc/kernel/module.c     |  19 -----
->   arch/sparc/mm/Makefile         |   2 +
->   arch/sparc/mm/execmem.c        |  21 +++++
->   arch/x86/kernel/module.c       |  27 -------
->   arch/x86/mm/init.c             |  29 +++++++
->   23 files changed, 463 insertions(+), 445 deletions(-)
->   create mode 100644 arch/sparc/mm/execmem.c
+struct net_device shouldn't be embedded into any structure, instead,
+the owner should use the private space to embed their state into
+net_device.
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+But, in some cases the net_device is embedded inside the private
+structure, which blocks the usage of zero-length arrays inside
+net_device.
+
+Create a helper to allocate a dummy device at dynamically runtime, and
+move the Ethernet devices to use it, instead of embedding the dummy
+device inside the private structure.
+
+This fixes all the network cases plus some wireless drivers.
+
+PS: Due to lack of hardware, unfortunately most these patches are
+compiled tested only, except ath11k that was kindly tested by Kalle Valo.
+
+---
+Changelog:
+
+v7:
+	* Document the return value of alloc_netdev_dummy()
+v6:
+	* No code change. Just added Reviewed-by: and fix a commit message
+v5:
+	* Added a new patch to fix some typos in the previous code
+	* Rebased to net-net/main
+v4:
+	* Added a new patch to add dummy device at free_netdev(), as suggested
+	  by Jakub.
+	* Added support for some wireless driver.
+	* Added some Acked-by and Reviewed-by.
+v3:
+	* Use free_netdev() instead of kfree() as suggested by Jakub.
+	* Change the free_netdev() place in ipa driver, as suggested by
+	  Alex Elder.
+	* Set err in the error path in the Marvell driver, as suggested
+	  by Simon Horman.
+v2:
+	* Patch 1: Use a pre-defined name ("dummy#") for the dummy
+	  net_devices.
+	* Patch 2-5: Added users for the new helper.
+v1:
+	* https://lore.kernel.org/all/20240327200809.512867-1-leitao@debian.org/
+
+Breno Leitao (10):
+  net: core: Fix documentation
+  net: free_netdev: exit earlier if dummy
+  net: create a dummy net_device allocator
+  net: marvell: prestera: allocate dummy net_device dynamically
+  net: mediatek: mtk_eth_sock: allocate dummy net_device dynamically
+  net: ipa: allocate dummy net_device dynamically
+  net: ibm/emac: allocate dummy net_device dynamically
+  wifi: qtnfmac: Use netdev dummy allocator helper
+  wifi: ath10k: allocate dummy net_device dynamically
+  wifi: ath11k: allocate dummy net_device dynamically
+
+ drivers/net/ethernet/ibm/emac/mal.c           | 14 ++++-
+ drivers/net/ethernet/ibm/emac/mal.h           |  2 +-
+ .../ethernet/marvell/prestera/prestera_rxtx.c | 15 ++++-
+ drivers/net/ethernet/mediatek/mtk_eth_soc.c   | 17 ++++--
+ drivers/net/ethernet/mediatek/mtk_eth_soc.h   |  2 +-
+ drivers/net/ipa/gsi.c                         | 12 ++--
+ drivers/net/ipa/gsi.h                         |  2 +-
+ drivers/net/wireless/ath/ath10k/core.c        |  9 ++-
+ drivers/net/wireless/ath/ath10k/core.h        |  2 +-
+ drivers/net/wireless/ath/ath10k/pci.c         |  2 +-
+ drivers/net/wireless/ath/ath10k/sdio.c        |  2 +-
+ drivers/net/wireless/ath/ath10k/snoc.c        |  4 +-
+ drivers/net/wireless/ath/ath10k/usb.c         |  2 +-
+ drivers/net/wireless/ath/ath11k/ahb.c         |  9 ++-
+ drivers/net/wireless/ath/ath11k/core.h        |  2 +-
+ drivers/net/wireless/ath/ath11k/pcic.c        | 21 +++++--
+ .../wireless/quantenna/qtnfmac/pcie/pcie.c    |  3 +-
+ include/linux/netdevice.h                     |  3 +
+ net/core/dev.c                                | 59 +++++++++++++------
+ 19 files changed, 129 insertions(+), 53 deletions(-)
+
+-- 
+2.43.0
 
 
