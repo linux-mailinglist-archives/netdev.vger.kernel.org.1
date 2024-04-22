@@ -1,133 +1,72 @@
-Return-Path: <netdev+bounces-90071-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90076-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8511E8ACA07
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 11:57:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F49E8ACA7C
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 12:21:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 215A41F21B6B
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 09:57:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C10571C21096
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 10:21:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D6E313D521;
-	Mon, 22 Apr 2024 09:56:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1CF113E405;
+	Mon, 22 Apr 2024 10:21:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="BysXfxH/"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=163.com header.i=@163.com header.b="EsfFe/Sn"
 X-Original-To: netdev@vger.kernel.org
-Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9343912837C
-	for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 09:56:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.2])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D445953814
+	for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 10:21:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.2
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713779775; cv=none; b=gp166b5JOeuA0aM+q3lVd25mx8YdtdZcKFY8kBrfTVj0mS9pjOHolFve6USthR1Ytf7acwMdw1zjNo++B7YabwA4QH1FZuNoFPzA2Py+gPmN3QasaszLo3t8ndF3gsZJwVg+4N8IcR+ecu3bssRGaTkMSxz3GmDUnZdbaajEuOE=
+	t=1713781293; cv=none; b=Y4iUDcpZBjmIOKXnj/oHF7Mfxn6aT53npk0hadw7VCyuUw9R4iMm7hemFtFQiby/bei9uvrgi4tJYP4Sp1DDKtplSqguZKapAssNMXoBxO92nSiDj+TACYFWSt76we3qSABiCiwDWWicjtBC5zezttJj79BuY5pfYBqzXc6RwDo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713779775; c=relaxed/simple;
-	bh=VQe9xA3nwX29uqRHiGOigNX0yJdXeQJkMD3LQssSslM=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MV3wzb40VTMmEvg8anyB0DG0TDxY6uL2Kl7NS4HXgZrFJ/2cYc1mV1Tx9/4Ko5yAlGFqofklZiov08/TncKAubp8+1JHkM4f0U06aPhD7nB8i/xb2oKfYjMgLp6IcbCjtTl06ePPI4quvtRVVDW48IrykEtHQVjS6ai0tseuWP8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=BysXfxH/; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id B6B4F207B2;
-	Mon, 22 Apr 2024 11:56:10 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from a.mx.secunet.com ([127.0.0.1])
-	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id wUTmXmJV0HRS; Mon, 22 Apr 2024 11:56:10 +0200 (CEST)
-Received: from mailout2.secunet.com (mailout2.secunet.com [62.96.220.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id 27E1220754;
-	Mon, 22 Apr 2024 11:56:10 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 27E1220754
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1713779770;
-	bh=JhtV6i+sS33eLn83kJwJuDGPyzm5UHQNoa6LJkmC3oA=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
-	b=BysXfxH/z7PSyDeT+s8GDtKOrJArD7WdTbzf1Kcycgua4FtBiYVBJpFUpPnHYjeq9
-	 urLKbtaIqcVLAWNJ8rXRG+Eo06Rb6TEI0ndM8MIAKOzNiU4wiciyramSX8ZcqHzTEt
-	 b2FBnxQGeqJ80H0eDCS9P75v4V7VA8qFM537180MMK5NbWdG/tIZK1r1/XryTBVq16
-	 UViUXdN+jsJ1nUrkMonQQfDaI30R2q6j2HpOupSbyJ1F/HXt5ewSJ7dPkopQOspXRj
-	 Atu9Z1Tpq8EMag05MTFrPFLBv/K6gnzDXciO0c9JDkee0rJIXZQfu/heySbAuDr465
-	 r4w/gMuczm8fg==
-Received: from cas-essen-01.secunet.de (unknown [10.53.40.201])
-	by mailout2.secunet.com (Postfix) with ESMTP id 1918480004A;
-	Mon, 22 Apr 2024 11:56:10 +0200 (CEST)
-Received: from mbx-essen-02.secunet.de (10.53.40.198) by
- cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 22 Apr 2024 11:56:09 +0200
-Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
- (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.37; Mon, 22 Apr
- 2024 11:56:09 +0200
-Received: by gauss2.secunet.de (Postfix, from userid 1000)
-	id 51D9E3182573; Mon, 22 Apr 2024 11:56:09 +0200 (CEST)
-Date: Mon, 22 Apr 2024 11:56:09 +0200
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: Paul Davey <paul.davey@alliedtelesis.co.nz>
-CC: Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller"
-	<davem@davemloft.net>, <netdev@vger.kernel.org>
-Subject: Re: [PATCH net] xfrm: Preserve vlan tags for transport mode software
- GRO
-Message-ID: <ZiY0Of0QuDOCPXHg@gauss3.secunet.de>
-References: <20240422025711.145577-1-paul.davey@alliedtelesis.co.nz>
+	s=arc-20240116; t=1713781293; c=relaxed/simple;
+	bh=pg8C8mTdpAyzP7IhwHlSNoBi3pGZ42LmMJtTWiQoNV8=;
+	h=Date:From:To:Cc:Subject:Content-Type:MIME-Version:Message-ID; b=kuPFhRqn7xZtWOBb9xy/hHTOzYn5rPKDQ7aMbt45mxq1mqEl8TTAxgirYcIyDzKra3hnIZYfT6FqS9OmKS3+AsJ5IOIpyJcrUj139kjWcphYXG0tqipaaBRITqNPJBEwfLWKo3KhtSW7iE4RtsRbe6skVSrLggDsTUnL1vAdTF0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=fail (1024-bit key) header.d=163.com header.i=@163.com header.b=EsfFe/Sn reason="signature verification failed"; arc=none smtp.client-ip=220.197.31.2
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=Date:From:Subject:Content-Type:MIME-Version:
+	Message-ID; bh=NoXqFYOZkWfDuv+eKJeXfbFFpbrGaUh/snnhSrRu+Yo=; b=E
+	sfFe/SnxWG+erY1/jHD7Ji6hbalOd1DyID6T6bJ8Ni76bnci/YVs/zwZtYz0mr9B
+	mAFtxs2N/0uWUAAxAgpYTlEre4RHBAhiF1mVUsQ3jpy26UflgFL2ZT6KkrsydYQL
+	5IFJgUv/jkI/5O7qvbRMPaCgAmhqGO94sUhLpx7xXs=
+Received: from zhulei_szu$163.com ( [116.128.244.171] ) by
+ ajax-webmail-wmsvr-40-123 (Coremail) ; Mon, 22 Apr 2024 17:35:48 +0800
+ (CST)
+Date: Mon, 22 Apr 2024 17:35:48 +0800 (CST)
+From: zhulei  <zhulei_szu@163.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net
+Subject: Kernel crash caused by vxlan testing
+X-Priority: 3
+X-Mailer: Coremail Webmail Server Version XT5.0.14 build 20230109(dcb5de15)
+ Copyright (c) 2002-2024 www.mailtech.cn 163com
+X-NTES-SC: AL_Qu2aAfuct00v7iCdbekWkkYagew/X8u3uv4k1IVePZE0kSTo/Swyf1xOEGrI7MWlCBCXkzuOegNF89lATINlZpupEDdFFHeFpxFHuxGKKWdr
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=GBK
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20240422025711.145577-1-paul.davey@alliedtelesis.co.nz>
-X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
- mbx-essen-02.secunet.de (10.53.40.198)
+Message-ID: <610c7229.e38a.18f05295d5d.Coremail.zhulei_szu@163.com>
+X-Coremail-Locale: zh_CN
+X-CM-TRANSID:_____wD3n1l1LyZmeaMTAA--.2860W
+X-CM-SenderInfo: x2kxzvxlbv63i6rwjhhfrp/1tbiRQ-ITWXAlxfr1AAJsc
+X-Coremail-Antispam: 1U5529EdanIXcx71UUUUU7vcSsGvfC2KfnxnUU==
 
-On Mon, Apr 22, 2024 at 02:56:20PM +1200, Paul Davey wrote:
-> The software GRO path for esp transport mode uses skb_mac_header_rebuild
-> prior to re-injecting the packet via the xfrm_napi_dev.  This only
-> copies skb->mac_len bytes of header which may not be sufficient if the
-> packet contains 802.1Q tags or other VLAN tags.  Worse copying only the
-> initial header will leave a packet marked as being VLAN tagged but
-> without the corresponding tag leading to mangling when it is later
-> untagged.
-> 
-> The VLAN tags are important when receiving the decrypted esp transport
-> mode packet after GRO processing to ensure it is received on the correct
-> interface.
-> 
-> Therefore record the full mac header length in xfrm*_transport_input for
-> later use in correpsonding xfrm*_transport_finish to copy the entire mac
-> header when rebuilding the mac header for GRO.  The skb->data pointer is
-> left pointing skb->mac_header bytes after the start of the mac header as
-> is expected by the network stack and network and transport header
-> offsets reset to this location.
-> 
-> Signed-off-by: Paul Davey <paul.davey@alliedtelesis.co.nz>
-
-Please add a 'Fixes:' tag so it can be backported to stable.
-
-> diff --git a/include/net/xfrm.h b/include/net/xfrm.h
-> index 57c743b7e4fe..0331cfecb28b 100644
-> --- a/include/net/xfrm.h
-> +++ b/include/net/xfrm.h
-> @@ -675,6 +675,9 @@ struct xfrm_mode_skb_cb {
->  
->  	/* Used by IPv6 only, zero for IPv4. */
->  	u8 flow_lbl[3];
-> +
-> +	/* Used to keep whole l2 header for transport mode GRO */
-> +	u32 orig_mac_len;
-
-xfrm_mode_skb_cb has already reached the maximum size of 48 bytes.
-Adding more will overwrite data in the 'struct sk_buff'.
-
-Try to store this in 'struct xfrm_offload'.
-
-Thanks!
+SGV5IGFsbCwKCkkgcmVjZW50bHkgdXNlZCBhIHRlc3RpbmcgcHJvZ3JhbSB0byB0ZXN0IHRoZSA0
+LjE5IHN0YWJsZSBicmFuY2gga2VybmVsIGFuZCBmb3VuZCB0aGF0IGEgY3Jhc2ggb2NjdXJyZWQg
+aW1tZWRpYXRlbHkuIFRoZSB0ZXN0IHNvdXJjZSBjb2RlIGxpbmsgaXM6Cmh0dHBzOi8vZ2l0aHVi
+LmNvbS9CYWNrbXloZWFydC9zcmMwMzU4L2Jsb2IvbWFzdGVyL3Z4bGFuX2ZkYl9kZXN0cm95LmMK
+ClRoZSB0ZXN0IGNvbW1hbmQgaXMgYXMgZm9sbG93czoKZ2NjIHZ4bGFuX2ZkYl9kZXN0cm95LmMg
+LW8gdnhsYW5fZmRiX2Rlc3Ryb3kgLWxwdGhyZWFkCgpBY2NvcmRpbmcgdG8gaXRzIHN0YWNrLCB1
+cHN0cmVhbSBoYXMgcmVsZXZhbnQgcmVwYWlyIHBhdGNoLCB0aGUgY29tbWl0IGlkIGlzIDdjMzFl
+NTRhZWVlNTE3ZDEzMThkZmMwYmRlOWZhN2RlNzU4OTNkYzYuCgpNYXkgaSBhc2sgaWYgdGhlIDQu
+MTkga2VybmVsIHdpbGwgcG9ydCB0aGlzIHBhdGNoID8K
 
