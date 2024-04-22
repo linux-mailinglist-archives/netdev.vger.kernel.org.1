@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-90254-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90255-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3348D8AD527
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 21:49:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28D938AD528
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 21:50:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DCA5B281BC1
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 19:49:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5AB3D1C20EA7
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 19:49:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68BAD155335;
-	Mon, 22 Apr 2024 19:49:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D9ED155345;
+	Mon, 22 Apr 2024 19:49:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="Pn5kpeQr"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="ZlqiSMds"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-6001.amazon.com (smtp-fw-6001.amazon.com [52.95.48.154])
+Received: from smtp-fw-52005.amazon.com (smtp-fw-52005.amazon.com [52.119.213.156])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB1046A03F
-	for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 19:49:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.48.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D39C26A03F
+	for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 19:49:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.156
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713815371; cv=none; b=YYdNOjy9tjAgYeq1Si2vd1jPfzlkM9E3+wO2PqpFvcLN+kHv8zVF7PgXKQ6zRMMvrB0h90Rid1EKDunxyYxMzStFVL7nhlFXiU29zqS3Fam6X0cumHfE4fLsO1TLD9FE6wHD+a0Wa4I97ITxE56CJaHJ3clEW33YylA3Cd2ELgk=
+	t=1713815395; cv=none; b=Yoxvd5etZ/mV22oXHgGyXi5vwYmGs+WKOssOVPrLWvEtcKUVzJgCnxS0mDPoIJv7ony0fgr84xnwoWmExuKL0AjjIzZjxQduB6ojbNdy04GtEKYYP/UGsY2PHWuV/KlcvKMqrF4x7av1zF3OTBYY1Z9sbXdW4AkYrTSvgfKjXd0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713815371; c=relaxed/simple;
-	bh=HV3BPHqXPDmXYgQpQT1m2Ltigw1Fhh47Ep81QeL09/A=;
+	s=arc-20240116; t=1713815395; c=relaxed/simple;
+	bh=TaUSGeX4ooF8apZeC63KXkYPPDwPtljgEbAp1vQ0Hkw=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=nFPIrUYoGcaO4VVj4H0cW1PkWWEOGMVhYGtgAQqeDBio8iyO3Z5wL2HrVBT0xVZqrOmcgGf/6QyG3tjcUnPmSdMsJ9BycuqDj9ZUnMZ1mZt9CsoSpcB2bg8c3qu+Z+isGzk/8RtqdG4tUdWUOv5qFCZco6CFXhGWdB4fwShUKok=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=Pn5kpeQr; arc=none smtp.client-ip=52.95.48.154
+	 MIME-Version:Content-Type; b=kVkhf8g9dOZiUW86q80oYpd3ppXg7eFv5A6u9uweDN9o2eS1NBM3IyFk/2Q4OfEOBFYHyMQWyYZ5frWVAR7lGAXD/XUlOOLB1CGq5sNK313zUZ/BdwvFW6uKELXQC3kpmdE8WM1SNxVmxD9xndcno2BXgLeOxq+I3HKBuX9kzVI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=ZlqiSMds; arc=none smtp.client-ip=52.119.213.156
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1713815370; x=1745351370;
+  t=1713815394; x=1745351394;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=O8ijWAzy9Fufp4GKwbIfWSlcbybgK4zD9u8PFQfKdgQ=;
-  b=Pn5kpeQrUf8+wfdFdNjU/lqdj4dGI8GAhhDzmI9YidLWbm/PYNhsO19t
-   UBL5ki4RVCTwuYRMgMq7qSz5sWUzeNcAf6rbl19OOyQx6zX5qJRo+Mp//
-   ZmBVGxMZxQcsz8yIvXdwlcIPhQUujpnVSK+okIKPv5vWAm4QLR7IcYr+7
-   M=;
+  bh=RaF98YL7yXmFqXvONl7i4hefr/oT7ESfH7oYrt9h4FA=;
+  b=ZlqiSMdsF6LGJWZtF5DqFCJXMLrL/LLrtTa/rwTNguJbZEyHouB4DM9v
+   jKz+xnurndRAUV2yYfPr3EdufTVH9Vbo7pN5mm1qICXn6Id3dISWzpN+X
+   BR/GmvShr1FmY+jutUT+jSVnN97wiCgSDD8IyzJkG4N5UhTzKPvXiz4pL
+   s=;
 X-IronPort-AV: E=Sophos;i="6.07,221,1708387200"; 
-   d="scan'208";a="391676862"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
-  by smtp-border-fw-6001.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Apr 2024 19:49:27 +0000
-Received: from EX19MTAUWA001.ant.amazon.com [10.0.7.35:9998]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.26.77:2525] with esmtp (Farcaster)
- id 989cd98e-e566-4a87-a495-7728f0162a25; Mon, 22 Apr 2024 19:49:26 +0000 (UTC)
-X-Farcaster-Flow-ID: 989cd98e-e566-4a87-a495-7728f0162a25
+   d="scan'208";a="649559992"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52005.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Apr 2024 19:49:52 +0000
+Received: from EX19MTAUWC001.ant.amazon.com [10.0.38.20:60751]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.53.80:2525] with esmtp (Farcaster)
+ id f08ce987-264d-47e3-a17d-e9ae06aa23c0; Mon, 22 Apr 2024 19:49:51 +0000 (UTC)
+X-Farcaster-Flow-ID: f08ce987-264d-47e3-a17d-e9ae06aa23c0
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA001.ant.amazon.com (10.250.64.204) with Microsoft SMTP Server
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Mon, 22 Apr 2024 19:49:26 +0000
+ 15.2.1258.28; Mon, 22 Apr 2024 19:49:51 +0000
 Received: from 88665a182662.ant.amazon.com (10.106.101.48) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Mon, 22 Apr 2024 19:49:23 +0000
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.28;
+ Mon, 22 Apr 2024 19:49:48 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
 To: "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
 	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Paolo
  Abeni" <pabeni@redhat.com>
 CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
 	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v1 net-next 3/6] arp: Factorise ip_route_output() call in arp_req_set() and arp_req_delete().
-Date: Mon, 22 Apr 2024 12:47:52 -0700
-Message-ID: <20240422194755.4221-4-kuniyu@amazon.com>
+Subject: [PATCH v1 net-next 4/6] arp: Remove a nest in arp_req_get().
+Date: Mon, 22 Apr 2024 12:47:53 -0700
+Message-ID: <20240422194755.4221-5-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20240422194755.4221-1-kuniyu@amazon.com>
 References: <20240422194755.4221-1-kuniyu@amazon.com>
@@ -77,109 +77,64 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D031UWC003.ant.amazon.com (10.13.139.252) To
+X-ClientProxiedBy: EX19D037UWC004.ant.amazon.com (10.13.139.254) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-When ioctl(SIOCDARP/SIOCSARP) is issued for non-proxy entry (no ATF_COM)
-without arpreq.arp_dev[] set, arp_req_set() and arp_req_delete() looks up
-dev based on IPv4 address by ip_route_output().
+This is a prep patch to make the following changes tidy.
 
-Let's factorise the same code as arp_req_dev().
+No functional change intended.
 
 Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 ---
- net/ipv4/arp.c | 50 ++++++++++++++++++++++++++++++--------------------
- 1 file changed, 30 insertions(+), 20 deletions(-)
+ net/ipv4/arp.c | 31 ++++++++++++++++++-------------
+ 1 file changed, 18 insertions(+), 13 deletions(-)
 
 diff --git a/net/ipv4/arp.c b/net/ipv4/arp.c
-index b20a5771d069..ac3e15799c2f 100644
+index ac3e15799c2f..60f633b24ec8 100644
 --- a/net/ipv4/arp.c
 +++ b/net/ipv4/arp.c
-@@ -1003,6 +1003,27 @@ static int arp_rcv(struct sk_buff *skb, struct net_device *dev,
-  *	User level interface (ioctl)
-  */
- 
-+static struct net_device *arp_req_dev(struct net *net, struct arpreq *r)
-+{
-+	struct net_device *dev;
-+	struct rtable *rt;
-+	__be32 ip;
-+
-+	ip = ((struct sockaddr_in *)&r->arp_pa)->sin_addr.s_addr;
-+
-+	rt = ip_route_output(net, ip, 0, 0, 0, RT_SCOPE_LINK);
-+	if (IS_ERR(rt))
-+		return ERR_CAST(rt);
-+
-+	dev = rt->dst.dev;
-+	ip_rt_put(rt);
-+
-+	if (!dev)
-+		return ERR_PTR(-EINVAL);
-+
-+	return dev;
-+}
-+
- /*
-  *	Set (create) an ARP cache entry.
-  */
-@@ -1045,25 +1066,17 @@ static int arp_req_set_public(struct net *net, struct arpreq *r,
- static int arp_req_set(struct net *net, struct arpreq *r,
- 		       struct net_device *dev)
+@@ -1138,23 +1138,28 @@ static int arp_req_get(struct arpreq *r, struct net_device *dev)
  {
--	__be32 ip;
+ 	__be32 ip = ((struct sockaddr_in *) &r->arp_pa)->sin_addr.s_addr;
  	struct neighbour *neigh;
-+	__be32 ip;
- 	int err;
+-	int err = -ENXIO;
  
- 	if (r->arp_flags & ATF_PUBL)
- 		return arp_req_set_public(net, r, dev);
- 
--	ip = ((struct sockaddr_in *)&r->arp_pa)->sin_addr.s_addr;
--
- 	if (!dev) {
--		struct rtable *rt = ip_route_output(net, ip, 0, 0, 0,
--						    RT_SCOPE_LINK);
--
--		if (IS_ERR(rt))
--			return PTR_ERR(rt);
--		dev = rt->dst.dev;
--		ip_rt_put(rt);
--		if (!dev)
--			return -EINVAL;
-+		dev = arp_req_dev(net, r);
-+		if (IS_ERR(dev))
-+			return PTR_ERR(dev);
- 	}
- 	switch (dev->type) {
- #if IS_ENABLED(CONFIG_FDDI)
-@@ -1086,6 +1099,8 @@ static int arp_req_set(struct net *net, struct arpreq *r,
- 		break;
- 	}
- 
-+	ip = ((struct sockaddr_in *)&r->arp_pa)->sin_addr.s_addr;
+ 	neigh = neigh_lookup(&arp_tbl, &ip, dev);
+-	if (neigh) {
+-		if (!(READ_ONCE(neigh->nud_state) & NUD_NOARP)) {
+-			read_lock_bh(&neigh->lock);
+-			memcpy(r->arp_ha.sa_data, neigh->ha,
+-			       min(dev->addr_len, sizeof(r->arp_ha.sa_data_min)));
+-			r->arp_flags = arp_state_to_flags(neigh);
+-			read_unlock_bh(&neigh->lock);
+-			r->arp_ha.sa_family = dev->type;
+-			strscpy(r->arp_dev, dev->name, sizeof(r->arp_dev));
+-			err = 0;
+-		}
++	if (!neigh)
++		return -ENXIO;
 +
- 	neigh = __neigh_lookup_errno(&arp_tbl, &ip, dev);
- 	err = PTR_ERR(neigh);
- 	if (!IS_ERR(neigh)) {
-@@ -1191,14 +1206,9 @@ static int arp_req_delete(struct net *net, struct arpreq *r,
- 
- 	ip = ((struct sockaddr_in *)&r->arp_pa)->sin_addr.s_addr;
- 	if (!dev) {
--		struct rtable *rt = ip_route_output(net, ip, 0, 0, 0,
--						    RT_SCOPE_LINK);
--		if (IS_ERR(rt))
--			return PTR_ERR(rt);
--		dev = rt->dst.dev;
--		ip_rt_put(rt);
--		if (!dev)
--			return -EINVAL;
-+		dev = arp_req_dev(net, r);
-+		if (IS_ERR(dev))
-+			return PTR_ERR(dev);
++	if (READ_ONCE(neigh->nud_state) & NUD_NOARP) {
+ 		neigh_release(neigh);
++		return -ENXIO;
  	}
- 	return arp_invalidate(dev, ip, true);
+-	return err;
++
++	read_lock_bh(&neigh->lock);
++	memcpy(r->arp_ha.sa_data, neigh->ha,
++	       min(dev->addr_len, sizeof(r->arp_ha.sa_data_min)));
++	r->arp_flags = arp_state_to_flags(neigh);
++	read_unlock_bh(&neigh->lock);
++
++	neigh_release(neigh);
++
++	r->arp_ha.sa_family = dev->type;
++	strscpy(r->arp_dev, dev->name, sizeof(r->arp_dev));
++
++	return 0;
  }
+ 
+ int arp_invalidate(struct net_device *dev, __be32 ip, bool force)
 -- 
 2.30.2
 
