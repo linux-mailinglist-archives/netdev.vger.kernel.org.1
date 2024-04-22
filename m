@@ -1,187 +1,85 @@
-Return-Path: <netdev+bounces-90176-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90177-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5746B8ACF6F
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 16:31:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7FBC8ACFEE
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 16:53:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0E87F1F21852
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 14:31:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 78E6F1F21C5B
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 14:53:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DC243D0D5;
-	Mon, 22 Apr 2024 14:31:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZyMdN45R"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 680A8152184;
+	Mon, 22 Apr 2024 14:53:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF8581E4A1
-	for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 14:31:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 886491E49F;
+	Mon, 22 Apr 2024 14:53:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713796310; cv=none; b=Ov8R01Oka+yOiCubpIAH0pPrCEZJxcAABAsdwd47bFbXjLTRbG7uUN4Has7Fh7gYqUZeEk6ASgRYHOHxGaYEAOoyRS4NsKM6Izi41MYFHirfztIGoWHDn/1315XiOUnsio4oK0p3H9tMUXStEisML6YzxoHaPZuxbnrRyp5jrWw=
+	t=1713797585; cv=none; b=LDzRT8OnsCFS1IvohZqeZ0hAIsHQStezvagUUbCd05S7C5Za5yoUc18WZDO6dRj9QEQiPc1pDXb7SptOpqc/Dojm0HrdaBEZTnypEdOC58SeRfWa4EcIw1johEEaomXygeO7zU+5zskefbxIo92a75brZQ+TwVHuw7SIb0ssiXc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713796310; c=relaxed/simple;
-	bh=pzmC56HFWs/QTkhB91JQ7NJkOCAI0HM6A928WLI6WQg=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=kxiqsvmL2FuNn7qCzXmbo69NykDfsaEE7GQJkv6Ukv7LdL5xl1Jiz0erODGp5DGgWRJFeQztvMfCubX8jT+2Hta6RDqz9wI9/6RByjbSFKr9pSKm/zjNBCBywj+qLx4K/ZUFv5VdHzhmlRBySfdwSBmxJG9OW72/DzgYHDoEfZw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZyMdN45R; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1713796307;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mhkGPPHbdmj1oVdDbXBZ1Ge+SsAT/eWQ0YBbLSXrT28=;
-	b=ZyMdN45RT/soQ3fyy306vD6u0T4CNZrSXSFu8kbzC3ejl+i8B8gmMcBdzCqHe+g5VSFidj
-	1RJezsB2f1xC7PGxjLjms9LwyaLm7v+UR+PJNtqY1A7gFN7Emj5KNdGoDDZ/WJA1xx55XB
-	VxAtJmDFMDIOeqCkaxm+PfymGnBEv0U=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-658-u6xqa1moNI2JlZoKenD4NQ-1; Mon, 22 Apr 2024 10:31:46 -0400
-X-MC-Unique: u6xqa1moNI2JlZoKenD4NQ-1
-Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-6a049c7d190so62949186d6.0
-        for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 07:31:46 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713796306; x=1714401106;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mhkGPPHbdmj1oVdDbXBZ1Ge+SsAT/eWQ0YBbLSXrT28=;
-        b=eyJw23aORzQmAGRYq1jFdM3sYgPwP07EWYBpSi6o31iGxmmvbb+kwj2HhZF6XOx3V8
-         xxkODJnqj6W6Rj2s1fN6e6gG0PG+8mB9MHRWYN2smU52Gwo4H07qS3n7Fvmx6G1H/C0V
-         plndyXLbNvNpnJTha6hG2gjFqx0VXB2+NmMWmYGKVIibQ4SMh7uqZZKr6JG3fHvK0P0h
-         YSxzteAA/qhf78qmMDpJh+V8g0Pi9Y+ICJ2BxYhyj3Rp1bucpnu2p2PTr2T8iGN3xExZ
-         5Dd8EE2riNfoCh/6gwo2pc3f41F1Hch82ESeuOD45WI7epUAldm4/1G5GDxjdH5v3UN5
-         rtSQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVmmG5NwE/0tzUMsWsqeo7+/8Dt6uTIZAr9sOEwu0M7/z6Nb5BwPa7btEKfc4azg8VJf2gYQxG8HBhAmaCN9MsP76eg7393
-X-Gm-Message-State: AOJu0Yz0gLnvDiCaj/PMuvkFFrrRAdTxIyorGv65vysierMlfbaZRK+7
-	UpDJxtsPauEG5Pw29r3fYEggmESYoR5lLupN4bo58O6DXXDYAGszEtco5l9QwiBejTVfPiXhfCO
-	L9tqgNSEBy8bVVjfkJIpnV2SRrT1Bgd/DoglMRc3tr8K/OGsbpvZlaw==
-X-Received: by 2002:ad4:424f:0:b0:69b:1a43:27f5 with SMTP id l15-20020ad4424f000000b0069b1a4327f5mr10265939qvq.35.1713796305990;
-        Mon, 22 Apr 2024 07:31:45 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFgAG0VNYTVd95FVX0FTRiJkrXveidEN6CjszexmNNUFWwDrDgOvzjbXwvC9ZePvx8e1ZiGoQ==
-X-Received: by 2002:ad4:424f:0:b0:69b:1a43:27f5 with SMTP id l15-20020ad4424f000000b0069b1a4327f5mr10265921qvq.35.1713796305582;
-        Mon, 22 Apr 2024 07:31:45 -0700 (PDT)
-Received: from vschneid-thinkpadt14sgen2i.remote.csb (213-44-141-166.abo.bbox.fr. [213.44.141.166])
-        by smtp.gmail.com with ESMTPSA id g12-20020a0cf08c000000b006913aa64629sm4260487qvk.22.2024.04.22.07.31.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Apr 2024 07:31:45 -0700 (PDT)
-From: Valentin Schneider <vschneid@redhat.com>
+	s=arc-20240116; t=1713797585; c=relaxed/simple;
+	bh=/ZmiNT3Ti61s/9U83aeDaAzv7pg7v8kBefpWb9Hqwkw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MVn7m+iu8BBFCXwomTNEUzhZXATG87O2XmQVi1i0qWz009lS0gHAEb7e9eMFithGnBSuJGpozPYS7FjqGDirq2HFoUkQofSqOrlpbkVn0RRY6vmUgJq2KOyyeROB+nzHrt+gZFvZ/KNUPM/7ffaQvTA5qBopY5y7EfmR1lBHWXU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
+Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
+	(envelope-from <fw@strlen.de>)
+	id 1ryv2N-0000Rk-5J; Mon, 22 Apr 2024 16:52:55 +0200
+Date: Mon, 22 Apr 2024 16:52:55 +0200
+From: Florian Westphal <fw@strlen.de>
 To: Eric Dumazet <edumazet@google.com>
-Cc: dccp@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-rt-users@vger.kernel.org, "David S.
- Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, mleitner@redhat.com, David Ahern
- <dsahern@kernel.org>, Juri Lelli <juri.lelli@redhat.com>, Tomas Glozar
- <tglozar@redhat.com>, Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
- Thomas Gleixner <tglx@linutronix.de>
-Subject: Re: [PATCH v5 0/2] tcp/dcpp: Un-pin tw_timer
-In-Reply-To: <CANn89iJRev5Kn_jEgimDfyHosmiyYeaz2gHRGS2tcFC-yMbGaQ@mail.gmail.com>
-References: <20240415113436.3261042-1-vschneid@redhat.com>
- <CANn89iJYX8e_3Or9a5Q55NuQ8ZAHfYL+p_SpM0yz91sdj4HqtQ@mail.gmail.com>
- <xhsmhmspu8zlj.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
- <CANn89iJRev5Kn_jEgimDfyHosmiyYeaz2gHRGS2tcFC-yMbGaQ@mail.gmail.com>
-Date: Mon, 22 Apr 2024 16:31:41 +0200
-Message-ID: <xhsmhbk618o4y.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
+Cc: syzbot <syzbot+0c4150bff9fff3bf023c@syzkaller.appspotmail.com>,
+	andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org,
+	daniel@iogearbox.net, davem@davemloft.net, eddyz87@gmail.com,
+	fw@strlen.de, haoluo@google.com, horms@kernel.org,
+	john.fastabend@gmail.com, jolsa@kernel.org, kpsingh@kernel.org,
+	kuba@kernel.org, linux-kernel@vger.kernel.org, martin.lau@linux.dev,
+	netdev@vger.kernel.org, pabeni@redhat.com, sdf@google.com,
+	song@kernel.org, syzkaller-bugs@googlegroups.com,
+	yonghong.song@linux.dev
+Subject: Re: [syzbot] [bpf?] [net?] WARNING in skb_ensure_writable
+Message-ID: <20240422145255.GA13918@breakpoint.cc>
+References: <000000000000eac28e0616b026d1@google.com>
+ <CANn89iKr4pY3wcMb=ONr8f5DU1X300XG8RoX7HU4_FEWSAJ9_w@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CANn89iKr4pY3wcMb=ONr8f5DU1X300XG8RoX7HU4_FEWSAJ9_w@mail.gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
+Eric Dumazet <edumazet@google.com> wrote:
+> Hmm... Not sure how to deal with this one... this is a 'false positive'
+> 
+> diff --git a/net/core/filter.c b/net/core/filter.c
+> index 58e8e1a70aa752a2c045117e00d8797478da4738..a7cea6d717ef321215bc4cf9ab3b83535c4eec98
+> 100644
+> --- a/net/core/filter.c
+> +++ b/net/core/filter.c
+> @@ -1662,6 +1662,11 @@ static DEFINE_PER_CPU(struct bpf_scratchpad, bpf_sp);
+>  static inline int __bpf_try_make_writable(struct sk_buff *skb,
+>                                           unsigned int write_len)
+>  {
+> +#if defined(CONFIG_DEBUG_NET)
+> +       /* Avoid a splat in pskb_may_pull_reason() */
+> +       if (write_len > INT_MAX)
+> +               return -EINVAL;
+> +#endif
+>         return skb_ensure_writable(skb, write_len);
+>  }
+> 
 
-Apologies for the delayed reply, I was away for most of last week;
-
-On 16/04/24 17:01, Eric Dumazet wrote:
-> On Mon, Apr 15, 2024 at 4:33=E2=80=AFPM Valentin Schneider <vschneid@redh=
-at.com> wrote:
->>
->> On 15/04/24 14:35, Eric Dumazet wrote:
->> > On Mon, Apr 15, 2024 at 1:34=E2=80=AFPM Valentin Schneider <vschneid@r=
-edhat.com> wrote:
->> >> v4 -> v5
->> >> ++++++++
->> >>
->> >> o Rebased against latest Linus' tree
->> >> o Converted tw_timer into a delayed work following Jakub's bug report=
- on v4
->> >>   http://lore.kernel.org/r/20240411100536.224fa1e7@kernel.org
->> >
->> > What was the issue again ?
->> >
->> > Please explain precisely why it was fundamentally tied to the use of
->> > timers (and this was not possible to fix the issue without
->> > adding work queues and more dependencies to TCP stack)
->>
->> In v4 I added the use of the ehash lock to serialize arming the timewait
->> timer vs destroying it (inet_twsk_schedule() vs inet_twsk_deschedule_put=
-()).
->>
->> Unfortunately, holding a lock both in a timer callback and in the context
->> in which it is destroyed is invalid. AIUI the issue is as follows:
->>
->>   CPUx                        CPUy
->>   spin_lock(foo);
->>                               <timer fires>
->>                               call_timer_fn()
->>                                 spin_lock(foo) // blocks
->>   timer_shutdown_sync()
->>     __timer_delete_sync()
->>       __try_to_del_timer_sync() // looped as long as timer is running
->>                        <deadlock>
->>
->> In our case, we had in v4:
->>
->>   inet_twsk_deschedule_put()
->>     spin_lock(ehash_lock);
->>                                           tw_timer_handler()
->>                                             inet_twsk_kill()
->>                                               spin_lock(ehash_lock);
->>                                               __inet_twsk_kill();
->>     timer_shutdown_sync(&tw->tw_timer);
->>
->> The fix here is to move the timer deletion to a non-timer
->> context. Workqueues fit the bill, and as the tw_timer_handler() would ju=
-st queue
->> a work item, I converted it to a delayed_work.
->
-> I do not like this delayed work approach.
->
-> Adding more dependencies to the TCP stack is not very nice from a
-> maintainer point of view.
->
-> Why couldn't you call timer_shutdown_sync() before grabbing the lock ?
-
-We need the timer_shutdown_sync() and mod_timer() of tw->tw_timer to be
-serialized in some way. If they aren't, we have the following race:
-
-                             tcp_time_wait()
-                               inet_twsk_hashdance()
-  inet_twsk_deschedule_put()
-    // Returns 0 because not pending, but prevents future arming
-    timer_shutdown_sync()
-                               inet_twsk_schedule()
-                                 // Returns 0 as if timer had been succesfu=
-lly armed
-                                 mod_timer()
-
-This means inet_twsk_deschedule_put() doesn't end up calling
-inet_twsk_kill() (because the timer wasn't pending when it got shutdown),
-but inet_twsk_schedule() doesn't arm it either despite the hashdance()
-having updated the refcounts.
-
-If we leave the deschedule as a del_timer_sync(), the timer ends up armed
-in inet_twsk_schedule(), but that means waiting for the timer to fire to
-clean up the resources despite having called inet_twsk_deschedule_put().
-
+LGTM, thanks Eric.  I think the current 'warn on > INT_MAX' makes sense
+for normal (non-bpf) callers.
 
