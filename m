@@ -1,139 +1,146 @@
-Return-Path: <netdev+bounces-90016-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90014-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D70738AC862
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 11:06:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E18C8AC85F
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 11:06:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4E9AB1F2174B
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 09:06:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9778E1F21455
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 09:06:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A49B13FD7D;
-	Mon, 22 Apr 2024 09:04:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22DC713D2B9;
+	Mon, 22 Apr 2024 09:04:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=smtpcorp.com header.i=@smtpcorp.com header.b="KnOgOpJh";
-	dkim=pass (2048-bit key) header.d=asem.it header.i=@asem.it header.b="nW9WIJ1/"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="g1zr40s7"
 X-Original-To: netdev@vger.kernel.org
-Received: from e2i187.smtp2go.com (e2i187.smtp2go.com [103.2.140.187])
+Received: from out30-101.freemail.mail.aliyun.com (out30-101.freemail.mail.aliyun.com [115.124.30.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AB3213E03D
-	for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 09:04:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.2.140.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F62313DDB7;
+	Mon, 22 Apr 2024 09:04:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713776680; cv=none; b=mv+7N9gJxvhHnqxKNIMjXqhV5EalY2+BdsE9ZfI6CmXiFFk+RR1vu2DT6x+tKEfdwB833XAbhYCrGNJaaTznn1oURZ/t5sOS66ATqg93GnJ5guYy6FpnIET7NpjUd6fvnIUB002ee00jq2zhp9hqby/vmWiWPlXg5Swm1DG2LCQ=
+	t=1713776679; cv=none; b=SAvAf8d4LMUbkS1gSTRzvZFoEYmDhYSxmztTLd1+MQQN5yYZsDIM75btn9psS9fb8ePSP+4uPKXmKriF0GkredMbvVlmKxP9umZPkEsZYl2kxMXzo+iu+vmR3LKYGDIrRGCMvhNvAbhQ5DadQF06PRlS4lrLoBydqiilQSh4ldg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713776680; c=relaxed/simple;
-	bh=vr3mP70Ml+CTsiCqXFkvm+bmpkhuQn6pWYBnGDF4u1I=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=t/9KSxsBZ0E2rt+ixi0XI4Y0mHcnLVKfM2HyJSzfdb83la3y3opkyxx31Tmcnr1ULE21UZUAz7k80p2uXWqGmmlDHO4LpHK2Ff3OzbWR2QUILouO729JmsyK8zsjObScTONwxENjLlL3UnQzoTmgiVDkG1AxuMe2KgGUB7EGXSM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asem.it; spf=pass smtp.mailfrom=em1174574.asem.it; dkim=pass (2048-bit key) header.d=smtpcorp.com header.i=@smtpcorp.com header.b=KnOgOpJh; dkim=pass (2048-bit key) header.d=asem.it header.i=@asem.it header.b=nW9WIJ1/; arc=none smtp.client-ip=103.2.140.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asem.it
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=em1174574.asem.it
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=smtpcorp.com; s=a1-4; h=Feedback-ID:X-Smtpcorp-Track:Message-Id:Date:
-	Subject:To:From:Reply-To:Sender:List-Unsubscribe;
-	bh=QgmQ2Gqg/9Dc9h8gAthGPlmhLJ1iqOTv73ICctSoMIU=; b=KnOgOpJhBScr7wA54sbUjFmoh3
-	0cC4ls+jOZW0q5wjBX292u/MptbUHpDTyjpA/aBOPYqs7ymEFW0h3L6GXtP/L0VgN0Sg7qMRrFENV
-	/evBB1ccaN3NIuCMbRYMadRpwa30gP6g9Ubv3LVKV3/pgiC/1wAVgqDz5XfiVk/O2p/hj/W/LMjp+
-	5zN4Xp8vkXOVtgKmmkV4mXLbMEMmOFeHQuQw60/Bm38eEgawsF1bI44qgQu4aCWkoZ8RGAxhH+3W7
-	4c7g1DosTRb2ISRznLrYtG/dgCXgDVL5YR5D2Z9sQOHZ0XShMJ14cdvqmLCWdGMDdA9Cyakii22Il
-	5PqL8rEg==;
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=asem.it;
- i=@asem.it; q=dns/txt; s=s1174574; t=1713776655; h=from : subject : to
- : message-id : date; bh=QgmQ2Gqg/9Dc9h8gAthGPlmhLJ1iqOTv73ICctSoMIU=;
- b=nW9WIJ1/zEUa1nlhr6KtrCc65Wsqkp6cpIwFQEio26iB1LgBZ32DppHUsIwDnIoJgldip
- ZgBK9ZAhmFs6sOXWELBGH42Clsl1B8TQHNQn9xoC2/WZJ479yH8cGyBwMz3CwH8KVpVj224
- cC5omgd2yD1Qh1VAfjSFb+fNE8cQawyme+yjfvCTXXUMPOrKSEyCB8W1yPlH35reCr29oTa
- WemesYEUdQ8vMQALFPbsbyOK8BDSqpOvw8m1b0C3s6bixgvAg8CvyML3cD4QtOAZ8SikPxT
- ehV+WI0nkGfAFrZ6nnpgZxf3KXvgTZdGmlidXjEh8sW3nOj3V9GE8eN0MS2g==
-Received: from [10.143.42.182] (helo=SmtpCorp) by smtpcorp.com with esmtpsa
- (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
- (Exim 4.94.2-S2G) (envelope-from <f.suligoi@asem.it>)
- id 1rypav-Y8PE4i-Cc; Mon, 22 Apr 2024 09:04:13 +0000
-Received: from [10.86.249.198] (helo=asas054.asem.intra)
- by smtpcorp.com with esmtpa (Exim 4.97-S2G)
- (envelope-from <f.suligoi@asem.it>) id 1rypau-FnQW0hPpvx6-iJmZ;
- Mon, 22 Apr 2024 09:04:12 +0000
-Received: from flavio-x.asem.intra ([172.16.18.47]) by asas054.asem.intra with
- Microsoft SMTPSVC(10.0.14393.4169); Mon, 22 Apr 2024 11:04:08 +0200
-From: Flavio Suligoi <f.suligoi@asem.it>
-To: "David S . Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Giuseppe Cavallaro <peppe.cavallaro@st.com>,
- Jose Abreu <joabreu@synopsys.com>
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, Flavio Suligoi <f.suligoi@asem.it>
-Subject: [PATCH v3 5/5] arm64: dts: qcom: sa8775p-ride: remove tx-sched-sp
- property
-Date: Mon, 22 Apr 2024 11:04:02 +0200
-Message-Id: <20240422090402.33397-6-f.suligoi@asem.it>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240422090402.33397-1-f.suligoi@asem.it>
-References: <20240422090402.33397-1-f.suligoi@asem.it>
+	s=arc-20240116; t=1713776679; c=relaxed/simple;
+	bh=VCDi0b6H9++Q/mdIE6+PmeVSPcSFlEcG/DW7KI2h1Uc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=VWhhxSJiWweFqG4oiaLi4aNdBtq8rH1bN9RLh8W67mCboW7kQbhq7I1teRTM31XPzgzOysoMA1kV6+qSE3mXo7EjmDXtaz2GpISzt/4+s26X4YXZmi4FCV5Knnh8S0i8nmfpMT2WwCx4ebXav+SU42pWY2FL2vskMwcBHmh1GGU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=g1zr40s7; arc=none smtp.client-ip=115.124.30.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1713776650; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=YBdh3d4NG7zhEjgVLeaTSgMeUhDFAFZPUPg3nLFAOF8=;
+	b=g1zr40s7du7qcE1X3YS3A7kFpRjI1q/LkOzcz/hySxUSSuqDQ3OJwiUJUd601kZhJ0lSSFEB6P9NTqVojOUXmonYGPjm8T180KWYWeS2AAl3cSHVE6VCDoEracSPnLHkVpblADfP5KqmbfaARf3cqVy/FhLiO0YkuiMkSIj8cDI=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R911e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046059;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=23;SR=0;TI=SMTPD_---0W50qzB3_1713776646;
+Received: from 30.221.148.142(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0W50qzB3_1713776646)
+          by smtp.aliyun-inc.com;
+          Mon, 22 Apr 2024 17:04:08 +0800
+Message-ID: <6509d9f4-09b1-43ee-ab38-8949f51a806d@linux.alibaba.com>
+Date: Mon, 22 Apr 2024 17:04:06 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v9 2/4] ethtool: provide customized dim profile
+ management
+To: Brett Creeley <bcreeley@amd.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, "David S . Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ "Michael S . Tsirkin" <mst@redhat.com>,
+ Ratheesh Kannoth <rkannoth@marvell.com>,
+ Alexander Lobakin <aleksander.lobakin@intel.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Tal Gilboa <talgi@nvidia.com>,
+ Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
+ Maxime Chevallier <maxime.chevallier@bootlin.com>,
+ Jiri Pirko <jiri@resnulli.us>, Paul Greenwalt <paul.greenwalt@intel.com>,
+ Ahmed Zaki <ahmed.zaki@intel.com>, Vladimir Oltean
+ <vladimir.oltean@nxp.com>, Kory Maincent <kory.maincent@bootlin.com>,
+ Andrew Lunn <andrew@lunn.ch>, "justinstitt@google.com"
+ <justinstitt@google.com>,
+ "open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>,
+ "open list:VIRTIO CORE AND NET DRIVERS" <virtualization@lists.linux.dev>
+References: <20240417155546.25691-1-hengqi@linux.alibaba.com>
+ <20240417155546.25691-3-hengqi@linux.alibaba.com>
+ <c59ebd40-fe9c-477f-9ed5-958163470f03@amd.com>
+From: Heng Qi <hengqi@linux.alibaba.com>
+In-Reply-To: <c59ebd40-fe9c-477f-9ed5-958163470f03@amd.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-OriginalArrivalTime: 22 Apr 2024 09:04:08.0995 (UTC)
- FILETIME=[091F0730:01DA9494]
-X-Smtpcorp-Track: zUp79NGZ1B57.gYJZroMy5d0s.ss699wuhzRr
-Feedback-ID: 1174574m:1174574aXfMg4B:1174574sM5RhJVoQE
-X-Report-Abuse: Please forward a copy of this message, including all headers,
- to <abuse-report@smtp2go.com>
 
-Strict priority for the tx scheduler is by default in Linux driver, so the
-tx-sched-sp property was removed in commit aed6864035b1 ("net: stmmac:
-platform: Delete a redundant condition branch").
 
-So we can safely remove this property from this device-tree.
 
-Signed-off-by: Flavio Suligoi <f.suligoi@asem.it>
----
+在 2024/4/21 下午11:53, Brett Creeley 写道:
+> On 4/17/2024 8:55 AM, Heng Qi wrote:
+>> Caution: This message originated from an External Source. Use proper 
+>> caution when opening attachments, clicking links, or responding.
+>>
+>>
+>> The NetDIM library, currently leveraged by an array of NICs, delivers
+>> excellent acceleration benefits. Nevertheless, NICs vary significantly
+>> in their dim profile list prerequisites.
+>>
+>> Specifically, virtio-net backends may present diverse sw or hw device
+>> implementation, making a one-size-fits-all parameter list impractical.
+>> On Alibaba Cloud, the virtio DPU's performance under the default DIM
+>> profile falls short of expectations, partly due to a mismatch in
+>> parameter configuration.
+>>
+>> I also noticed that ice/idpf/ena and other NICs have customized
+>> profilelist or placed some restrictions on dim capabilities.
+>>
+>> Motivated by this, I tried adding new params for "ethtool -C" that 
+>> provides
+>> a per-device control to modify and access a device's interrupt 
+>> parameters.
+>>
+>> Usage
+>> ========
+>> The target NIC is named ethx.
+>>
+>> Assume that ethx only declares support for 
+>> ETHTOOL_COALESCE_RX_EQE_PROFILE
+>> in ethtool_ops->supported_coalesce_params.
+>>
+>> 1. Query the currently customized list of the device
+>>
+>> $ ethtool -c ethx
+>> ...
+>> rx-eqe-profile:
+>> {.usec =   1, .pkts = 256, .comps =   0,},
+>> {.usec =   8, .pkts = 256, .comps =   0,},
+>> {.usec =  64, .pkts = 256, .comps =   0,},
+>> {.usec = 128, .pkts = 256, .comps =   0,},
+>> {.usec = 256, .pkts = 256, .comps =   0,}
+>> rx-cqe-profile:   n/a
+>> tx-eqe-profile:   n/a
+>> tx-cqe-profile:   n/a
+>>
+>> 2. Tune
+>> $ ethtool -C ethx rx-eqe-profile 1,1,0_2,2,0_3,3,0_4,4,0_5,5,0
+>
+> With all of this work to support custom dim profiles (which I think is 
+> a great idea FWIW), I wonder if it would be worth supporting a dynamic 
+> number of profile entries instead of being hard-coded to 5?
+>
 
-v3 - Removed the tag "Reviewed-by: Krzysztof Kozlowski <krzk@kernel.org>"
-     (it was added by mistake).
-     Added history, as well as in the cover-letter.
-v2 - This patch is the 2nd version of a previous patch, where both the DTS
-     and the yaml files were included toghether. Then I split this 1st patch
-     series in two, as suggested by Krzysztof.
-v1 - Original version of the patch where, in addition to this DTS patch,
-     there was also the one related to the correspondent snps,dwmac.yaml
-     dt_binding file.
+In my practice, I have not found that fewer or more profile entries lead 
+to better performance.
 
- arch/arm64/boot/dts/qcom/sa8775p-ride.dts | 2 --
- 1 file changed, 2 deletions(-)
+Thanks.
 
-diff --git a/arch/arm64/boot/dts/qcom/sa8775p-ride.dts b/arch/arm64/boot/dts/qcom/sa8775p-ride.dts
-index 26ad05bd3b3f..2e1770e07f45 100644
---- a/arch/arm64/boot/dts/qcom/sa8775p-ride.dts
-+++ b/arch/arm64/boot/dts/qcom/sa8775p-ride.dts
-@@ -334,7 +334,6 @@ queue3 {
- 
- 	mtl_tx_setup: tx-queues-config {
- 		snps,tx-queues-to-use = <4>;
--		snps,tx-sched-sp;
- 
- 		queue0 {
- 			snps,dcb-algorithm;
-@@ -404,7 +403,6 @@ queue3 {
- 
- 	mtl_tx_setup1: tx-queues-config {
- 		snps,tx-queues-to-use = <4>;
--		snps,tx-sched-sp;
- 
- 		queue0 {
- 			snps,dcb-algorithm;
--- 
-2.34.1
+> Thanks,
+>
+> Brett
+>
+> <snip>
 
 
