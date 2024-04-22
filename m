@@ -1,115 +1,103 @@
-Return-Path: <netdev+bounces-90159-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90162-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 825908ACE68
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 15:37:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D1E88ACEAC
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 15:50:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B3C6C1C214E6
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 13:37:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D209E280DB9
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 13:49:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D374B152160;
-	Mon, 22 Apr 2024 13:36:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="jIH1GQXi"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91271150980;
+	Mon, 22 Apr 2024 13:49:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56FDF746E;
-	Mon, 22 Apr 2024 13:36:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B069614F9FA;
+	Mon, 22 Apr 2024 13:49:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713792971; cv=none; b=Msdt49HAGkvs0DSxtMCQ0hazTPxEBxGidv2EA0Wdh6mz3vTCY8LJx5jd4vvxe/6gnkW/CBZLqG+U9p3+at8XBUlujuYHoEO3E6HM/EZ74CvEIG5JE2hNxs/uhl0vYQDLA14VCMPAyYJ4Kht3G8ez91vMMAgDBfwgpEHPFLig070=
+	t=1713793796; cv=none; b=uLeZf2boeIA0l2iVhsnLtOGLh0pZys0rOlX3VxFD2MRhKSMmqjD+8inhSiz4HyAOuhuW46b3epRv8V2gOhneNYehqwAl/122aETB6ud0jXLkcihvcH3ZIbdkbKFlryi5DKXxq8NTadeAgSPd9MazEN/p5f1CfXXEg8g6G4/9OtI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713792971; c=relaxed/simple;
-	bh=MOieSkGFlLap9YqZh1kDWE4xoA3yyZ85BdHa4q/AEjY=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=sQyqbpvdTNNoG9z7gWqmeFWMymNCXFrFc1XdcjXkQ3JQau7IulN/N527wqqY7NhZgVcPaDKUr5yzTjbze0wsOMRNqKHSL463UmgIwgx+n2TNSHvpeyJ8cxa7+HZHLOCp2QhpTWMs8XkbnhCMOwnMAju+34FokZg8ppp8OUae/Is=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=jIH1GQXi; arc=none smtp.client-ip=217.70.183.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 0140E1C0012;
-	Mon, 22 Apr 2024 13:36:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1713792962;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=k2f64ANu3PLImfYGjhtzlKzsVrMAXXlyB8IVnzSIbzQ=;
-	b=jIH1GQXi2hnbWCvqH9FvnVxSgSQbO+u0U4T7PfJRF8cSZ/ciZ6Bt8ZEjh87MJ3UiP8Ohgi
-	xr3K3izrHsmttmBYS03DJigcLXh+KWJQKnTV1CN1qbsBx33ULXJ/WPGnjh6v3rTZsopnsB
-	CB3pYpI7nikrB3+/Ve42SocQGUNjTb1BoBgSTsnId/iWrjPjVoy2za593Q0goTXILNdSek
-	0SPcjzNZHNZ70LQ/qywQOlig1OBhQdVZpy+lyWivMuubPCngBBk5EMOdnG4VyyYOW2zOZ3
-	gdvPfh4PiRCkuNLjdscVYQ7iCU9On9m8SMEpuFdqg60zFyOhZzNms/zuadY8KA==
-From: "Kory Maincent (Dent Project)" <kory.maincent@bootlin.com>
-Date: Mon, 22 Apr 2024 15:35:48 +0200
-Subject: [PATCH net-next v2 3/3] net: pse-pd: Kconfig: Add missing
- Regulator API dependency
+	s=arc-20240116; t=1713793796; c=relaxed/simple;
+	bh=2fCUerJP7jfaJaj+usa/YK7IUw4+3HWZsB+B05Psgcs=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=PUrMPwUW0hUYRAqYlAN6DNR8RxiXMwpZq1RZEjfQ55ZRGsJSP1D8z+8fBUKsFbqPay+DwjZTv3xcfbwxirpoQ2gaXA6x1+iywLKpD+GP5BBotXKmVl1zsMSg9yFUKgi/aL+xi4954taBFa9Y8tNGyAdlKNmV5X+XnZuwvBXeEc0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.252])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4VNRPF5qYszcdcV;
+	Mon, 22 Apr 2024 21:46:41 +0800 (CST)
+Received: from kwepemm600007.china.huawei.com (unknown [7.193.23.208])
+	by mail.maildlp.com (Postfix) with ESMTPS id 84C7C18007D;
+	Mon, 22 Apr 2024 21:49:50 +0800 (CST)
+Received: from localhost.localdomain (10.67.165.2) by
+ kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Mon, 22 Apr 2024 21:49:49 +0800
+From: Jijie Shao <shaojijie@huawei.com>
+To: <yisen.zhuang@huawei.com>, <salil.mehta@huawei.com>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>
+CC: <shenjian15@huawei.com>, <wangjie125@huawei.com>,
+	<liuyonglong@huawei.com>, <shaojijie@huawei.com>, <chenhao418@huawei.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: [PATCH net 1/7] net: hns3: direct return when receive a unknown mailbox message
+Date: Mon, 22 Apr 2024 21:43:21 +0800
+Message-ID: <20240422134327.3160587-2-shaojijie@huawei.com>
+X-Mailer: git-send-email 2.30.0
+In-Reply-To: <20240422134327.3160587-1-shaojijie@huawei.com>
+References: <20240422134327.3160587-1-shaojijie@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240422-fix_poe-v2-3-e58325950f07@bootlin.com>
-References: <20240422-fix_poe-v2-0-e58325950f07@bootlin.com>
-In-Reply-To: <20240422-fix_poe-v2-0-e58325950f07@bootlin.com>
-To: Oleksij Rempel <o.rempel@pengutronix.de>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Andrew Lunn <andrew@lunn.ch>
-Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Kyle Swenson <kyle.swenson@est.tech>, 
- Kory Maincent <kory.maincent@bootlin.com>, 
- kernel test robot <lkp@intel.com>
-X-Mailer: b4 0.14-dev
-X-GND-Sasl: kory.maincent@bootlin.com
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ kwepemm600007.china.huawei.com (7.193.23.208)
 
-From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
+From: Jian Shen <shenjian15@huawei.com>
 
-The PSE (Power Sourcing Equipment) API now relies on the Regulator API.
-However, the Regulator dependency was missing from Kconfig. This patch
-adds the necessary dependency, resolving the issue of the missing
-dependency and ensuring proper functionality of the PSE API.
+Currently, the driver didn't return when receive a unknown
+mailbox message, and continue checking whether need to
+generate a response. It's unnecessary and may be incorrect.
 
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/oe-kbuild-all/202404201020.mqX2IOu7-lkp@intel.com/
-Closes: https://lore.kernel.org/oe-kbuild-all/202404200036.D8ap1Mf5-lkp@intel.com/
-Fixes: d83e13761d5b ("net: pse-pd: Use regulator framework within PSE framework")
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
+Fixes: bb5790b71bad ("net: hns3: refactor mailbox response scheme between PF and VF")
+Signed-off-by: Jian Shen <shenjian15@huawei.com>
+Signed-off-by: Jijie Shao <shaojijie@huawei.com>
 ---
- drivers/net/pse-pd/Kconfig | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_mbx.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/net/pse-pd/Kconfig b/drivers/net/pse-pd/Kconfig
-index 80cf373a5a0e..577ea904b3d9 100644
---- a/drivers/net/pse-pd/Kconfig
-+++ b/drivers/net/pse-pd/Kconfig
-@@ -5,6 +5,7 @@
+diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_mbx.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_mbx.c
+index d4a0e0be7a72..59c863306657 100644
+--- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_mbx.c
++++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_mbx.c
+@@ -1077,12 +1077,13 @@ static void hclge_mbx_request_handling(struct hclge_mbx_ops_param *param)
  
- menuconfig PSE_CONTROLLER
- 	bool "Ethernet Power Sourcing Equipment Support"
-+	depends on REGULATOR
- 	help
- 	  Generic Power Sourcing Equipment Controller support.
+ 	hdev = param->vport->back;
+ 	cmd_func = hclge_mbx_ops_list[param->req->msg.code];
+-	if (cmd_func)
+-		ret = cmd_func(param);
+-	else
++	if (!cmd_func) {
+ 		dev_err(&hdev->pdev->dev,
+ 			"un-supported mailbox message, code = %u\n",
+ 			param->req->msg.code);
++		return;
++	}
++	ret = cmd_func(param);
  
-@@ -14,7 +15,6 @@ if PSE_CONTROLLER
- 
- config PSE_REGULATOR
- 	tristate "Regulator based PSE controller"
--	depends on REGULATOR || COMPILE_TEST
- 	help
- 	  This module provides support for simple regulator based Ethernet Power
- 	  Sourcing Equipment without automatic classification support. For
-
+ 	/* PF driver should not reply IMP */
+ 	if (hnae3_get_bit(param->req->mbx_need_resp, HCLGE_MBX_NEED_RESP_B) &&
 -- 
-2.34.1
+2.30.0
 
 
