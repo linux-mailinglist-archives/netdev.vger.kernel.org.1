@@ -1,179 +1,228 @@
-Return-Path: <netdev+bounces-90023-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90024-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99DBC8AC8A9
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 11:16:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 51D5B8AC8AD
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 11:18:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CAE4F1C208C2
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 09:16:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7516A1C20AA6
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 09:18:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99E8B1BF33;
-	Mon, 22 Apr 2024 09:16:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B41F2537F5;
+	Mon, 22 Apr 2024 09:18:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VjUhWVop"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [207.211.30.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33866537F5
-	for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 09:16:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.211.30.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECE355644F;
+	Mon, 22 Apr 2024 09:18:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713777410; cv=none; b=YpUxg7TjQV0A5DxubX5XbI2w2mJBL2s9fCnOc+PibWUqDUrDj74+Dgcr2ARnT4fNZXBU/f8rbK6qPdVptwKFsPQlPoKrL8O2UPQrcN9xetzfP9bAb6hqbeV25yQEmgKm5X7CYAmdNIsRsV4M4KoyUgjcnd6MktreNOY6mVvea/k=
+	t=1713777498; cv=none; b=tGBXS6INWEZQ2H9//jtMWNB8LA61HDuVhy3Oe5N7UCm0GwoaGtmKsoP4/txRnJtrh6y2A2OkVAHrnTZbVYV1O6x7QZpvQlsYKL6jBq4n3YJ9Rx1NwkAFBPD+aoAcqjBWwv6yYIoKQ3m26I/E4BvKpnX87EwofbXyUG4RwrUwPrA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713777410; c=relaxed/simple;
-	bh=0Q7XZMdWBQ0oWBsSGnUV5fnIg6r94Lo2Iy3iTGZ7M9o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 In-Reply-To:Content-Type:Content-Disposition; b=k+nqbQDsAdh29S01P2R2aaxql6VvEPGQBy3kSKNGBkU8JnLxScLI5B2Zpx18zCUecmq88OyViICNWXDxFtHD1hyvfOaKE95fZKeOhJur8CiDDr91NH+Kba9qV835XMxGzoF7ggNpos7KP4QS/5MBXZbMbNCBubYXQmOxXoWd4Yc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=none smtp.mailfrom=queasysnail.net; arc=none smtp.client-ip=207.211.30.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=queasysnail.net
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-315-uNNZDHtMNeW27Wstzkbz6w-1; Mon,
- 22 Apr 2024 05:16:35 -0400
-X-MC-Unique: uNNZDHtMNeW27Wstzkbz6w-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 240821C3F0F0;
-	Mon, 22 Apr 2024 09:16:35 +0000 (UTC)
-Received: from hog (unknown [10.39.193.137])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 9D7A544048;
-	Mon, 22 Apr 2024 09:16:32 +0000 (UTC)
-Date: Mon, 22 Apr 2024 11:16:31 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Antony Antony <antony@phenome.org>
-Cc: Antony Antony <antony.antony@secunet.com>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>, netdev@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	devel@linux-ipsec.org, Leon Romanovsky <leon@kernel.org>,
-	Eyal Birger <eyal.birger@gmail.com>,
-	Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Subject: Re: [devel-ipsec] [PATCH ipsec-next v10 1/3] xfrm: Add Direction to
- the SA in or out
-Message-ID: <ZiYq729Q1AF2Xq8M@hog>
-References: <0e0d997e634261fcdf16cf9f07c97d97af7370b6.1712828282.git.antony.antony@secunet.com>
- <Zh0b3gfnr99ddaYM@hog>
- <Zh4kYUjvDtUq69-h@Antony2201.local>
- <Zh44gO885KtSjBHC@hog>
- <ZiWNh-Hz9TYWVofO@Antony2201.local>
+	s=arc-20240116; t=1713777498; c=relaxed/simple;
+	bh=lxEcktRM3o1u22clJI+gdENckYYwX0xCiMNHeF4WEiQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=tnwKpX87PHI8vthmQwoeghqh9j1n4gdaqyM9GLwqmp3LOP5ilA9E721PWPq7I894ueQbmCrUEnzK0DTWtCB84aXgE8t5+MCDlN/qzP1ForaGKj4K05Ol+kzZzKS+8qgWfHS1ULjkBUq9zEY0M+A/rZVi4nt5Jt2VFrB/Ewy0+xQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VjUhWVop; arc=none smtp.client-ip=209.85.218.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-a55b481cf0fso95922366b.3;
+        Mon, 22 Apr 2024 02:18:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1713777495; x=1714382295; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yVwqwhtjvlZszt9bRT54ZI824MgakHvK+s8hVXWfzLQ=;
+        b=VjUhWVopj4sdyFa6PZR5vjvsJ5e4v4RsA2owidq6q6qTLRtzmZji4Op9f2hWmG7agg
+         4ykeYVw1P8WsZKyXpypVTz4OyGGJnWn/h2/jm11QyI6L2lsZlP0nAGqGPZEaEm9w+mNl
+         s2/9kgA4sDDhe1zvPlhpxKfExTrMiNmkPxdm26Xp0eDaWIfuUfAUnaXsxyfbOH4RR+ad
+         LjwKQJbkpEruZfr275E/fLBzTXhvEOzY4xGw6uGOaMInITnUwNoiZGB/KAJ5julED9GR
+         TyUsiytazKujkMfABjuqV2+KS9rH42se3t/HhDE7QhkZFZ/a1le9dvWrx+sNyXRzVybb
+         MoDg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713777495; x=1714382295;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=yVwqwhtjvlZszt9bRT54ZI824MgakHvK+s8hVXWfzLQ=;
+        b=a7D/8S48vMkbBmTYWtrh3Vz3D33eS0YsHbnWunvF2LdW0aLEbiqxJrUKJDASj3Mvm1
+         yvzo2cxu84DhJ1a2x/Iu24Q4/eKUOgY2Q9KyPpNSpoBnHgeYx5V8355rYXPw1arCvi5u
+         IVDkLHBxE0F8jejJbZC/MvAJhRlC6Fo78srvQ2evxsV+gY5NVf4mTP3yIjQiG0lsW53R
+         j7svB05HiqNX0bjrSRv/fBfhpG8U6OaJP+GVW/9ob/tS7xmusWxBWjkcDnckKQ9L87rL
+         QnS8aHAGzIsToOLqxHLGIulE/9sjmHq7I7yvhVqHeGGHy/hLK8AFQXr6jyMBm63yM9Ja
+         bdvA==
+X-Forwarded-Encrypted: i=1; AJvYcCUYnl4OFo9wVAnQZsKnyhfR9lKv3jVyMk4FgezNDPlCef+E6cklmdJYId+cvy5neCn5iwbOw7lUH3ci/SSfMspv3Di0SyVVrUMi3FsZxUf7jtPtYOOaHnDcP1O1FDz5vtZYsO7S7QJV23ZH
+X-Gm-Message-State: AOJu0Yxf+DGddyz4P9BFPorAmJ8QgpnQZjPCdkfkbXaQnYIt4J/zI92Y
+	Ge6jUt+vOWtBnxkguMJ0f4mKPx+zjNUyNoIPDix1rCOx+nc4hBngzCIJ6oB1mGbrSJo4+BI23/C
+	d/9JJRjPaBvaVrK3hU9QxWA3xxa0=
+X-Google-Smtp-Source: AGHT+IHv6eCluYziBGpcYsO49wKQF/pXyNdctQ3vZj8mdPKj4PxQNwwBYVRfwy5VlGKSnU5FVg6/hvwrwSLU6IGhtY0=
+X-Received: by 2002:a17:906:649:b0:a46:cef3:4aba with SMTP id
+ t9-20020a170906064900b00a46cef34abamr7016502ejb.75.1713777495027; Mon, 22 Apr
+ 2024 02:18:15 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <ZiWNh-Hz9TYWVofO@Antony2201.local>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: queasysnail.net
-Content-Type: text/plain; charset=UTF-8
-Content-Disposition: inline
+References: <20240422030109.12891-1-kerneljasonxing@gmail.com>
+ <20240422030109.12891-2-kerneljasonxing@gmail.com> <4f492445-1fe3-44af-bbaa-bb1fe281964e@kernel.org>
+In-Reply-To: <4f492445-1fe3-44af-bbaa-bb1fe281964e@kernel.org>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Mon, 22 Apr 2024 17:17:37 +0800
+Message-ID: <CAL+tcoBRtE0ikv9xiUoWq66_WcysF7QwGggTMwiw793qXxKH8g@mail.gmail.com>
+Subject: Re: [PATCH net-next v7 1/7] net: introduce rstreason to detect why
+ the RST is sent
+To: Matthieu Baerts <matttbe@kernel.org>
+Cc: edumazet@google.com, dsahern@kernel.org, martineau@kernel.org, 
+	geliang@kernel.org, kuba@kernel.org, pabeni@redhat.com, davem@davemloft.net, 
+	rostedt@goodmis.org, mhiramat@kernel.org, mathieu.desnoyers@efficios.com, 
+	atenart@kernel.org, mptcp@lists.linux.dev, netdev@vger.kernel.org, 
+	linux-trace-kernel@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-2024-04-22, 00:04:55 +0200, Antony Antony wrote:
-> Hi Sabrina,
->=20
-> On Tue, Apr 16, 2024 at 10:36:16AM +0200, Sabrina Dubroca wrote:
-> > 2024-04-16, 09:10:25 +0200, Antony Antony wrote:
-> > > On Mon, Apr 15, 2024 at 02:21:50PM +0200, Sabrina Dubroca via Devel w=
-rote:
-> > > > 2024-04-11, 11:40:59 +0200, Antony Antony wrote:
-> > > > > diff --git a/net/xfrm/xfrm_device.c b/net/xfrm/xfrm_device.c
-> > > > > index 6346690d5c69..2455a76a1cff 100644
-> > > > > --- a/net/xfrm/xfrm_device.c
-> > > > > +++ b/net/xfrm/xfrm_device.c
-> > > > > @@ -253,6 +253,12 @@ int xfrm_dev_state_add(struct net *net, stru=
-ct xfrm_state *x,
-> > > > >  =09=09return -EINVAL;
-> > > > >  =09}
-> > > > >=20
-> > > > > +=09if ((xuo->flags & XFRM_OFFLOAD_INBOUND && x->dir =3D=3D XFRM_=
-SA_DIR_OUT) ||
-> > > > > +=09    (!(xuo->flags & XFRM_OFFLOAD_INBOUND) && x->dir =3D=3D XF=
-RM_SA_DIR_IN)) {
-> > > > > +=09=09NL_SET_ERR_MSG(extack, "Mismatched SA and offload directio=
-n");
-> > > > > +=09=09return -EINVAL;
-> > > > > +=09}
-> > > >=20
-> > > > It would be nice to set x->dir to match the flag, but then I guess =
-the
-> > > > validation in xfrm_state_update would fail if userspaces tries an
-> > > > update without providing XFRMA_SA_DIR. (or not because we already w=
-ent
-> > > > through this code by the time we get to xfrm_state_update?)
-> > >=20
-> > > this code already executed from xfrm_state_construct.
-> > > We could set the in flag in xuo when x->dir =3D=3D XFRM_SA_DIR_IN, le=
-t me think=20
-> > > again.  May be we can do that later:)
-> >=20
-> > I mean setting x->dir, not setting xuo, ie adding something like this
-> > to xfrm_dev_state_add:
-> >=20
-> >     x->dir =3D xuo->flags & XFRM_OFFLOAD_INBOUND ? XFRM_SA_DIR_IN : XFR=
-M_SA_DIR_OUT;
-> >=20
-> > xuo will already be set correctly when we're using offload, and won't
-> > be present if we're not.
->=20
-> Updating with older tools may fail validation. For instance, if a user cr=
-eates
-> an SA using an older iproute2 with offload and XFRM_OFFLOAD_INBOUND flag=
-=20
-> set, the kernel sets x->dir =3D XFRM_SA_DIR_IN. Then, if the user wants t=
-o=20
-> update this SA using the same older iproute2, which doesn't allow setting=
-=20
-> dir, the update will fail.
+Hello Matthieu,
 
-I'm not sure it would, since as you said xfrm_state_construct would
-have set x->dir based on XFRM_OFFLOAD_INBOUND. But if that's the case,
-then that can be added later, because it would not change any behavior.
+On Mon, Apr 22, 2024 at 4:47=E2=80=AFPM Matthieu Baerts <matttbe@kernel.org=
+> wrote:
+>
+> Hi Jason,
+>
+> On 22/04/2024 05:01, Jason Xing wrote:
+> > From: Jason Xing <kernelxing@tencent.com>
+> >
+> > Add a new standalone file for the easy future extension to support
+> > both active reset and passive reset in the TCP/DCCP/MPTCP protocols.
+>
+> Thank you for looking at that!
 
-> However, as I proposed, if SA dir "in" and offload is enabled, the kernel
-> could set xuo->flags &=3D XFRM_OFFLOAD_INBOUND to avoid double typing.
+Thanks for the review!
 
-Do you mean in iproute?
+>
+> (...)
+>
+> > diff --git a/include/net/rstreason.h b/include/net/rstreason.h
+> > new file mode 100644
+> > index 000000000000..c57bc5413c17
+> > --- /dev/null
+> > +++ b/include/net/rstreason.h
+> > @@ -0,0 +1,144 @@
+> > +/* SPDX-License-Identifier: GPL-2.0-or-later */
+> > +
+> > +#ifndef _LINUX_RSTREASON_H
+> > +#define _LINUX_RSTREASON_H
+> > +#include <net/dropreason-core.h>
+> > +#include <uapi/linux/mptcp.h>
+> > +
+> > +#define DEFINE_RST_REASON(FN, FNe)   \
+> > +     FN(MPTCP_RST_EUNSPEC)           \
+> > +     FN(MPTCP_RST_EMPTCP)            \
+> > +     FN(MPTCP_RST_ERESOURCE)         \
+> > +     FN(MPTCP_RST_EPROHIBIT)         \
+> > +     FN(MPTCP_RST_EWQ2BIG)           \
+> > +     FN(MPTCP_RST_EBADPERF)          \
+> > +     FN(MPTCP_RST_EMIDDLEBOX)        \
+>
+> Small detail: should it not make more sense to put the ones linked to
+> MPTCP at the end? I mean I guess MPTCP should be treated in second
+> priority: CONFIG_MPTCP could not be set, and the ones linked to TCP
+> should be more frequent, etc.
 
-On the kernel side, xuo has to be provided when offloading, and the
-meaning of (xuo->flags & XFRM_OFFLOAD_INBOUND) is well defined (0 =3D
-out, !0 =3D in). xuo->flags & XFRM_OFFLOAD_INBOUND =3D=3D 0 with SA_DIR =3D=
-=3D
-IN must remain an invalid config.
+Do you mean that I need to adjust the order: 1) tcp reasons first, 2)
+independent reasons, 3) mptcp reasons ?
 
+Reasonable. I will do it :)
 
-> > > And also this looks like a general cleanup up to me. I wonder how Ste=
-ffen=20
-> > > would add such a check for the upcoming PCPU attribute! Should that b=
-e=20
-> > > prohibited DELSA or XFRM_MSG_FLUSHSA or DELSA?
-> >=20
-> > IMO, new attributes should be rejected in any handler that doesn't use
-> > them. That's not a general cleanup because it's a new attribute, and
-> > the goal is to allow us to decide later if we want to use that
-> > attribute in DELSA etc. Maybe in one year, we want to make DELSA able
-> > to match on SA_DIR. If we don't reject SA_DIR from DELSA now, we won't
-> > be able to do that. That's why I'm insisting on this.
->=20
-> I have implemented a method to reject in v11, even though it is not my=20
-> preference:) My argument xfrm has no precedence of limiting unused=20
-> attributes in most types. We are not enforcing on all attributes such as=
-=20
-> upcoming PCPU.
+>
+> > +     FN(NOT_SPECIFIED)               \
+> > +     FN(NO_SOCKET)                   \
+> > +     FNe(MAX)
+>
+> (...)
+>
+> > +/* Convert reset reasons in MPTCP to our own enum type */
+> > +static inline enum sk_rst_reason convert_mptcpreason(u32 reason)
+> > +{
+> > +     switch (reason) {
+> > +     case MPTCP_RST_EUNSPEC:
+> > +             return SK_RST_REASON_MPTCP_RST_EUNSPEC;
+> > +     case MPTCP_RST_EMPTCP:
+> > +             return SK_RST_REASON_MPTCP_RST_EMPTCP;
+> > +     case MPTCP_RST_ERESOURCE:
+> > +             return SK_RST_REASON_MPTCP_RST_ERESOURCE;
+> > +     case MPTCP_RST_EPROHIBIT:
+> > +             return SK_RST_REASON_MPTCP_RST_EPROHIBIT;
+> > +     case MPTCP_RST_EWQ2BIG:
+> > +             return SK_RST_REASON_MPTCP_RST_EWQ2BIG;
+> > +     case MPTCP_RST_EBADPERF:
+> > +             return SK_RST_REASON_MPTCP_RST_EBADPERF;
+> > +     case MPTCP_RST_EMIDDLEBOX:
+> > +             return SK_RST_REASON_MPTCP_RST_EMIDDLEBOX;
+> > +     default:
+> > +             /**
+> > +              * It should not happen, or else errors may occur
+> > +              * in MPTCP layer
+> > +              */
+> > +             return SK_RST_REASON_ERROR;
+> > +     }
+> > +}
+>
+> If this helper is only used on MPTCP, maybe better to move it to
+> net/mptcp/protocol.h (and to patch 5/7?)? We tried to isolate MPTCP code.
 
-I'll ask Steffen to enforce it there as well :)
-I think it's a mistake that old netlink APIs were too friendly to invalid i=
-nput.
+Roger that. I will move the helper into protocol.h as well as the patch its=
+elf.
 
---=20
-Sabrina
+>
+> Also, maybe it is just me, but I'm not a big fan of the helper name:
+> convert_mptcpreason() (same for the "drop" one). I think it should at
+> least mention its "origin" (rst reason): e.g. something like
+> (sk_)rst_reason_convert_mptcp or (sk_)rst_convert_mptcp_reason() (or
+> mptcp_to_rst_reason())?
+>
+> And (sk_)rst_reason_convert_(skb_)drop() (or skb_drop_to_rst_reason())?
 
+I agree with you. Actually I had a local patch where I used
+sk_rst_reason_skbdrop() and sk_rst_reason_mptcpreason().
+Interestingly, I changed them in this patch series due to the function
+name being too long (which is my initial thought).
+
+I will use sk_rst_convert_xxx_reason() as you suggested.
+
+>
+> > +/* Convert reset reasons in MPTCP to our own enum type */
+>
+> I don't think this part is linked to MPTCP, right?
+
+Ah, copy-paste syndrome... Sorry, I will correct it.
+
+>
+> > +static inline enum sk_rst_reason convert_dropreason(enum skb_drop_reas=
+on reason)
+> > +{
+> > +     switch (reason) {
+> > +     case SKB_DROP_REASON_NOT_SPECIFIED:
+> > +             return SK_RST_REASON_NOT_SPECIFIED;
+> > +     case SKB_DROP_REASON_NO_SOCKET:
+> > +             return SK_RST_REASON_NO_SOCKET;
+> > +     default:
+> > +             /* If we don't have our own corresponding reason */
+> > +             return SK_RST_REASON_NOT_SPECIFIED;
+> > +     }
+> > +}
+>
+> (This helper could be introduced in patch 4/7 because it is not used
+> before, but I'm fine either ways.)
+
+Good. It makes more sense.
+
+Thanks,
+Jason
 
