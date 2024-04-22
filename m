@@ -1,148 +1,119 @@
-Return-Path: <netdev+bounces-90210-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90209-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 930CA8AD195
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 18:11:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6914B8AD194
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 18:11:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 49F541F2132A
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 16:11:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 05A701F2103F
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 16:11:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB40315358B;
-	Mon, 22 Apr 2024 16:11:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3CBE153581;
+	Mon, 22 Apr 2024 16:11:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="X70YJ8xX"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="gW/V60KB"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-33001.amazon.com (smtp-fw-33001.amazon.com [207.171.190.10])
+Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52F6615357B;
-	Mon, 22 Apr 2024 16:11:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.190.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9EE615357B
+	for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 16:11:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713802290; cv=none; b=Bm/fk85GGthtwlkL15mrKG9bbrdfUbJzlXN5XzNCPdsRSKrux9WG3POScgojUTSDF5Stp/oSxGhS8IjW+YOahRTHIsCVNI0k81kEIuYPQctRU7tp8dE+IZ5Sf+eAyyHdi2WnM4GPKBWcit4ZxReiDHkv636OKMSzSQpXKXfX7Io=
+	t=1713802279; cv=none; b=E9n4Og09W+nOsiCIqsTRArO78s0+/kZ/hXAjAOhUNKldc2R4P3cNIY7+qRnmzICvMobh+Bt3WA2zEeQVE0w8gfalZNraxQc/Fg7wBAroRIUs+wuTdyMcMBNI8KsHotD+E4H5EL6xmG4hUwFhCNokgaInkNpz8s4k3xzsgwrW9t4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713802290; c=relaxed/simple;
-	bh=3le542UJeSfYGDRoP90qKz4Zy3WYFGW+CJlvN5OAxOs=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HW6T4F9TONOm1JuiWOacM+82iYuiPal65NZh6Q7E6VLjtWhXisR3q9djQOjl2B6FO9dmFSzd6/dvntPkulZ4/e8LfTjBG4GhthwhQHtuMyzIUDZ5aqce8Uv8UK8NquoutCbHHMjD3N+eVYRThIo8AKxlKrfQ+RaDhFHxjZKtUQ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=X70YJ8xX; arc=none smtp.client-ip=207.171.190.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1713802290; x=1745338290;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=FUemsqeaBxTFXlHFc7wvr33AU2ZxcVwt25g4PMBCnzc=;
-  b=X70YJ8xXV4QYubRaYN1EHQwuqbjwFacIOCMtQ2K9EtsQjhbyiufYQO8P
-   jegQRKXlbkirrKkpt75duLH23D2xhrFbnnH3GEA3p88KLr4bZ8N0/QF8F
-   96hkXlZAbVIxZIm3FGcWy/7PvDW6GNsbju8lQm7CxzLz1Xr07Zur4YPkq
-   k=;
-X-IronPort-AV: E=Sophos;i="6.07,221,1708387200"; 
-   d="scan'208";a="340362836"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-33001.sea14.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Apr 2024 16:11:22 +0000
-Received: from EX19MTAUWC001.ant.amazon.com [10.0.21.151:54137]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.31.31:2525] with esmtp (Farcaster)
- id b5dd08d2-1c1d-4c47-bb35-ab706d63a8fa; Mon, 22 Apr 2024 16:11:20 +0000 (UTC)
-X-Farcaster-Flow-ID: b5dd08d2-1c1d-4c47-bb35-ab706d63a8fa
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Mon, 22 Apr 2024 16:11:20 +0000
-Received: from 88665a182662.ant.amazon.com (10.106.101.48) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.28;
- Mon, 22 Apr 2024 16:11:17 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <syzbot+c298c9f0e46a3c86332b@syzkaller.appspotmail.com>
-CC: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
-	<fw@strlen.de>, <horms@kernel.org>, <kuba@kernel.org>, <kuniyu@amazon.com>,
-	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<pabeni@redhat.com>, <syzkaller-bugs@googlegroups.com>
-Subject: Re: [syzbot] [net?] WARNING in gre_tap_xmit (2)
-Date: Mon, 22 Apr 2024 09:11:08 -0700
-Message-ID: <20240422161108.83595-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <0000000000007aa28106168b76c9@google.com>
-References: <0000000000007aa28106168b76c9@google.com>
+	s=arc-20240116; t=1713802279; c=relaxed/simple;
+	bh=iuEt06c15ZpSI5gooEbksAT53qbH2lNGBGZmCx+ozVA=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=l2xsjHAlik0UJB4a1VfXFNf0/CLgWcSHZhBFxCYXbozF3F1hbidzy8Fc3U6EpAhfVTe6aC/fZQ07oTwMjjj1+D8KsbdBuNEDhw2T13Vp/G4cOYuf9Duk7dKKtNZ98VxPdircaz5q92160vpR3HEei1ouQ4Uc2aGKVh+m0uEHASE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=gW/V60KB; arc=none smtp.client-ip=62.96.220.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
+Received: from localhost (localhost [127.0.0.1])
+	by a.mx.secunet.com (Postfix) with ESMTP id 919B3207E4;
+	Mon, 22 Apr 2024 18:11:13 +0200 (CEST)
+X-Virus-Scanned: by secunet
+Received: from a.mx.secunet.com ([127.0.0.1])
+	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id 1YAwzjmEClaO; Mon, 22 Apr 2024 18:11:12 +0200 (CEST)
+Received: from mailout2.secunet.com (mailout2.secunet.com [62.96.220.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by a.mx.secunet.com (Postfix) with ESMTPS id 6B59B205E3;
+	Mon, 22 Apr 2024 18:11:12 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 6B59B205E3
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
+	s=202301; t=1713802272;
+	bh=l+Jw/tsRdCVH1z8TPr6fjaovnODPh6TBoMbhMA7b/Ok=;
+	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
+	b=gW/V60KBbdvgvkYtK1SNoKCFcSdN44S9uV7goYZwPfHu+Vmt54lvBRWd0y2VjcjBz
+	 2yEmakzefPWCIxETvrRBu+W4eaQXoXkhJFL2KbnqVE+aNM+kqmHfkTjQVrraz4s0UR
+	 tpDKZ5hCcO11vDcQYJ/CmNi7kqCvckNSXl2bQDh9L5RBPoDyt7fcyuGlU3BKZFZUFV
+	 mlWsKsz3vEZAAn1QYmpjA3377idACXGNdqb5HtojpLICwJt0c5X+RLMnAQLAN3lU53
+	 LMjWWFvQftenj1goB5lpxKlzn8jk3OPK1HcPokTUf1d54NIopPWgChedy7yUN91Ag0
+	 QbThWFvHXU4rw==
+Received: from cas-essen-01.secunet.de (unknown [10.53.40.201])
+	by mailout2.secunet.com (Postfix) with ESMTP id 5E65F80004A;
+	Mon, 22 Apr 2024 18:11:12 +0200 (CEST)
+Received: from mbx-essen-02.secunet.de (10.53.40.198) by
+ cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Mon, 22 Apr 2024 18:11:12 +0200
+Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
+ (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.37; Mon, 22 Apr
+ 2024 18:11:11 +0200
+Received: by gauss2.secunet.de (Postfix, from userid 1000)
+	id 957E13182BCE; Mon, 22 Apr 2024 18:11:11 +0200 (CEST)
+Date: Mon, 22 Apr 2024 18:11:11 +0200
+From: Steffen Klassert <steffen.klassert@secunet.com>
+To: Sabrina Dubroca <sd@queasysnail.net>
+CC: Paul Davey <paul.davey@alliedtelesis.co.nz>, Herbert Xu
+	<herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>,
+	<netdev@vger.kernel.org>
+Subject: Re: [PATCH net] xfrm: Preserve vlan tags for transport mode software
+ GRO
+Message-ID: <ZiaMH0e0NL+/P0Fg@gauss3.secunet.de>
+References: <20240422025711.145577-1-paul.davey@alliedtelesis.co.nz>
+ <ZiY0Of0QuDOCPXHg@gauss3.secunet.de>
+ <ZiZc6ApkxivqaILg@hog>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D037UWC002.ant.amazon.com (10.13.139.250) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <ZiZc6ApkxivqaILg@hog>
+X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
+ mbx-essen-02.secunet.de (10.53.40.198)
 
-From: syzbot <syzbot+c298c9f0e46a3c86332b@syzkaller.appspotmail.com>
-Date: Sat, 20 Apr 2024 11:35:04 -0700
-> syzbot has bisected this issue to:
+On Mon, Apr 22, 2024 at 02:49:44PM +0200, Sabrina Dubroca wrote:
 > 
-> commit 219eee9c0d16f1b754a8b85275854ab17df0850a
-> Author: Florian Westphal <fw@strlen.de>
-> Date:   Fri Feb 16 11:36:57 2024 +0000
+> Actually it looks like we still have 4B in xfrm_mode_skb_cb:
 > 
->     net: skbuff: add overflow debug check to pull/push helpers
+> struct xfrm_mode_skb_cb {
+> 	struct xfrm_tunnel_skb_cb  header;               /*     0    32 */
+> 	__be16                     id;                   /*    32     2 */
+> 	__be16                     frag_off;             /*    34     2 */
+> 	u8                         ihl;                  /*    36     1 */
+> 	u8                         tos;                  /*    37     1 */
+> 	u8                         ttl;                  /*    38     1 */
+> 	u8                         protocol;             /*    39     1 */
+> 	u8                         optlen;               /*    40     1 */
+> 	u8                         flow_lbl[3];          /*    41     3 */
 > 
-> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=167a954f180000
-> start commit:   443574b03387 riscv, bpf: Fix kfunc parameters incompatibil..
-> git tree:       bpf
-> final oops:     https://syzkaller.appspot.com/x/report.txt?x=157a954f180000
-> console output: https://syzkaller.appspot.com/x/log.txt?x=117a954f180000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=6fb1be60a193d440
-> dashboard link: https://syzkaller.appspot.com/bug?extid=c298c9f0e46a3c86332b
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=14a94f00980000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15bce6ab180000
+> 	/* size: 48, cachelines: 1, members: 9 */
+> 	/* padding: 4 */
+> 	/* last cacheline: 48 bytes */
+> };
 > 
-> Reported-by: syzbot+c298c9f0e46a3c86332b@syzkaller.appspotmail.com
-> Fixes: 219eee9c0d16 ("net: skbuff: add overflow debug check to pull/push helpers")
+> flow_lbl ends at 44, so adding orig_mac_len should be fine. I don't
+> see any config options that would increase the size of
+> xfrm_mode_skb_cb compared to what I already have.
 
-Testing same patch for this
-
-#syz test: git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git 219eee9c0d16
-
-diff --git a/net/nsh/nsh.c b/net/nsh/nsh.c
-index f4a38bd6a7e0..1344653916c4 100644
---- a/net/nsh/nsh.c
-+++ b/net/nsh/nsh.c
-@@ -77,13 +77,15 @@ EXPORT_SYMBOL_GPL(nsh_pop);
- static struct sk_buff *nsh_gso_segment(struct sk_buff *skb,
- 				       netdev_features_t features)
- {
-+	unsigned int tnl_hlen, mac_len, nsh_len;
- 	struct sk_buff *segs = ERR_PTR(-EINVAL);
- 	u16 mac_offset = skb->mac_header;
--	unsigned int nsh_len, mac_len;
--	__be16 proto;
-+	__be16 tnl_proto, proto;
- 
- 	skb_reset_network_header(skb);
- 
-+	tnl_proto = skb->protocol;
-+	tnl_hlen = skb->network_header - skb->mac_header;
- 	mac_len = skb->mac_len;
- 
- 	if (unlikely(!pskb_may_pull(skb, NSH_BASE_HDR_LEN)))
-@@ -113,11 +115,11 @@ static struct sk_buff *nsh_gso_segment(struct sk_buff *skb,
- 	}
- 
- 	for (skb = segs; skb; skb = skb->next) {
--		skb->protocol = htons(ETH_P_NSH);
--		__skb_push(skb, nsh_len);
--		skb->mac_header = mac_offset;
--		skb->network_header = skb->mac_header + mac_len;
-+		__skb_push(skb, nsh_len + tnl_hlen);
-+		skb_reset_mac_header(skb);
-+		skb->network_header = skb->mac_header + tnl_hlen;
- 		skb->mac_len = mac_len;
-+		skb->protocol = tnl_proto;
- 	}
- 
- out:
+Right, I overlooked the 4 byte padding in the pahole output.
 
