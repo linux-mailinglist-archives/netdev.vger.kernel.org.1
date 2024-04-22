@@ -1,102 +1,77 @@
-Return-Path: <netdev+bounces-90141-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90142-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A7B98ACDD8
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 15:09:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8DDE18ACDDB
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 15:09:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8290D1C22176
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 13:09:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 45BC51F2152D
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 13:09:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72EF614F9DE;
-	Mon, 22 Apr 2024 13:08:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC7A414F123;
+	Mon, 22 Apr 2024 13:09:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tKj1Ev0s"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Y/Axa+nT"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4369614F9D4;
-	Mon, 22 Apr 2024 13:08:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9155314F121
+	for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 13:09:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713791332; cv=none; b=W0qgamwXqdH2d4JSE/PyvI8FgP1KVl5T34iG/GSxED0S3N29RLjhbdYsIzD2QhX4dI5dk9wv7UVDBToFZTRoys5Kgns6Qj5ITmye+wvj2wM9YczezleK4ZcW+4SXu1ALkvL7mSWOaqNzOUzegEddSDLfp8Yn0LC1HqTWJnt8ETU=
+	t=1713791345; cv=none; b=Jo4SaxNyVHjjdS2nd3HN1cjh1L6wJfeJOPkSxs6vj3JbxSkoCIhZAoQADS5xAr55NYaSHUd0dHwUv7rhCPxISrFvMlLQC7/JYgd1JwrFdV423amL40Hldrx0GR7IOh+OabVOCaMR2SqYTTgpWqEIXz9l1fyD8d0Etn+UeWo90n4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713791332; c=relaxed/simple;
-	bh=J+i9N1KjmFk35PLTmY7h40rPANVS4NetGv5XWCcgOzg=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=ti2U64yyM1TK1C7ZulpHO/BoSuDDCnWs941m21Milfm7hgR19V4V23jBRJbn5aG71hrK+TGED18uFRZcWvW2z78us8WmpKlyNYLNw+rpyrFp5Jgae6DefiUvhwIsabtVHzPfVZYIBJ9Iu5fNpzwGtQvmqT5v2KCySD560YnQMXQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tKj1Ev0s; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 19101C2BD11;
-	Mon, 22 Apr 2024 13:08:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713791331;
-	bh=J+i9N1KjmFk35PLTmY7h40rPANVS4NetGv5XWCcgOzg=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
-	b=tKj1Ev0sDkQi5+KEiB5LhY1YrapyhqPWj1xhNyldEFOrjYMdLC2NQNywPIpM2oCn9
-	 KKR+ldrGnJ0vgDJG4XgwKBgLI5FgxOu432nBCICrmXQSH+gCWW0UTDdlAhAQBILxdo
-	 xqF/R3vnu4jpugzmTn/hkZBf7SpnConYhE6huJdhyTx4EfL7nhXiFev8vfEpfZp+Lw
-	 L0pJcnsCn5VjnI/vxE0yT7hls74KwUcZ1ud9MZJyYKzX2kxFcFbVphu8ZJaYeFhTzP
-	 hCEBR8kB/Bdhv+iVxYObXPLD8tw+6rMlMYtLli9sAXUXAWh2sYW2PburZIAgpw4TBX
-	 ODeXWH+Ch2/IQ==
-From: Kalle Valo <kvalo@kernel.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: aleksander.lobakin@intel.com,  kuba@kernel.org,  davem@davemloft.net,
-  pabeni@redhat.com,  edumazet@google.com,  elder@kernel.org,
-  linux-arm-kernel@lists.infradead.org,
-  linux-mediatek@lists.infradead.org,  nbd@nbd.name,
-  sean.wang@mediatek.com,  Mark-MC.Lee@mediatek.com,  lorenzo@kernel.org,
-  taras.chornyi@plvision.eu,  ath11k@lists.infradead.org,
-  ath10k@lists.infradead.org,  linux-wireless@vger.kernel.org,
-  geomatsi@gmail.com,  Jeff Johnson <jjohnson@kernel.org>,
-  quic_jjohnson@quicinc.com,  leon@kernel.org,
-  dennis.dalessandro@cornelisnetworks.com,  linux-kernel@vger.kernel.org,
-  netdev@vger.kernel.org,  bpf@vger.kernel.org,  idosch@idosch.org,
-  angelogioacchino.delregno@collabora.com,  matthias.bgg@gmail.com
-Subject: Re: [PATCH net-next v7 10/10] wifi: ath11k: allocate dummy
- net_device dynamically
-References: <20240422123921.854943-1-leitao@debian.org>
-	<20240422123921.854943-11-leitao@debian.org>
-Date: Mon, 22 Apr 2024 16:08:44 +0300
-In-Reply-To: <20240422123921.854943-11-leitao@debian.org> (Breno Leitao's
-	message of "Mon, 22 Apr 2024 05:39:03 -0700")
-Message-ID: <87le55v92b.fsf@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
+	s=arc-20240116; t=1713791345; c=relaxed/simple;
+	bh=1IFyZIEF5CkhE87tcVH8Y+W3bdgf1GLQBPeC1eWFxnE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZFg3RtP84aqMgymrjmWaXtJJB4N/wLmimb33gD2wP1uMZLrqcKbzDHqkFJT7u88a702PBlqqFYIzFQNFKhq+47W792hl57JTAjtxiaE50VJEuKXcHPGEX2Zb/yG/Dy328qa9EAVGVi3ENnvVu8i43T0I1xDfP9lCOfUo96yOPqs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Y/Axa+nT; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=0tExVYQkgh/QamuMLTOQ4cMZPcA9+abAxScGFT1jSxo=; b=Y/
+	Axa+nTbrQvLvq+T8cbVslMYPX86wla3eZ8AKqHFrS6GH6lbU8mtUaJrgSqkbtMgN5yTA6xvEM5cGW
+	Iz/6CBZVKm3kff2Y0cwMK5XXhVlFPnUF+aBmbk4p3nOJvDN3Qb10QAa5VeDxp6O7uJfi97DYugw3A
+	MxH/ONbRO5gUcMk=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rytPp-00DcLS-AG; Mon, 22 Apr 2024 15:09:01 +0200
+Date: Mon, 22 Apr 2024 15:09:01 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>
+Cc: netdev@vger.kernel.org, Russell King <rmk+kernel@armlinux.org.uk>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Subject: Re: [PATCH net-next 1/2] net: sfp: update comment for FS SFP-10G-T
+ quirk
+Message-ID: <ac68c1fe-e3b8-4eb0-b3d6-a8b460af858f@lunn.ch>
+References: <20240422094435.25913-1-kabel@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240422094435.25913-1-kabel@kernel.org>
 
-Breno Leitao <leitao@debian.org> writes:
+On Mon, Apr 22, 2024 at 11:44:34AM +0200, Marek Behún wrote:
+> Update the comment for the Fibrestore SFP-10G-T module: since commit
+> e9301af385e7 ("net: sfp: fix PHY discovery for FS SFP-10G-T module")
+> we also do a 4 second wait before probing the PHY.
+> 
+> Fixes: e9301af385e7 ("net: sfp: fix PHY discovery for FS SFP-10G-T module")
+> Signed-off-by: Marek Behún <kabel@kernel.org>
 
-> Embedding net_device into structures prohibits the usage of flexible
-> arrays in the net_device structure. For more details, see the discussion
-> at [1].
->
-> Un-embed the net_device from struct ath11k_ext_irq_grp by converting it
-> into a pointer. Then use the leverage alloc_netdev() to allocate the
-> net_device object at ath11k_ahb_config_ext_irq() for ahb, and
-> ath11k_pcic_ext_irq_config() for pcic.
->
-> The free of the device occurs at ath11k_ahb_free_ext_irq() for the ahb
-> case, and ath11k_pcic_free_ext_irq() for the pcic case.
->
-> [1] https://lore.kernel.org/all/20240229225910.79e224cf@kernel.org/
->
-> Signed-off-by: Breno Leitao <leitao@debian.org>
-> Tested-by: Kalle Valo <kvalo@kernel.org>
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-I assume this goes via net-next:
-
-Acked-by: Kalle Valo <kvalo@kernel.org>
-
--- 
-https://patchwork.kernel.org/project/linux-wireless/list/
-
-https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
+    Andrew
 
