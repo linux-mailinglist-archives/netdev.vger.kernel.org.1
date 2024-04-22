@@ -1,153 +1,173 @@
-Return-Path: <netdev+bounces-89982-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89983-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B91CA8AC705
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 10:32:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 279FD8AC741
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 10:40:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6E48428300B
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 08:32:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D17FE1F214F2
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 08:40:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A96CE433B1;
-	Mon, 22 Apr 2024 08:32:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06564502BE;
+	Mon, 22 Apr 2024 08:40:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DvVmx2eg"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4kVrvdjr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
+Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 071B92A1D5;
-	Mon, 22 Apr 2024 08:32:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71AA14317E
+	for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 08:40:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713774751; cv=none; b=LQOWpUMyhjksSKPgOUse6zcR2vFsNJc7zG3EuL/8E1vgQ3Yxv+G6oLpueTEYK0Mbv05JonmR3Vr36RI8bEdVik5c141/DcS8B5n+wOvH5/J1Vk4eR1Z9F3a67E2/Ga529Bv1Xvlqe+sTYhaBodyjehmjEO+KAXYspclaT0eRl/4=
+	t=1713775213; cv=none; b=IWE41Adtei3Wo+Bn7C5oEmHlgyQTGdHGZOxQ5DUZe2l9649qn7bA3+GP8X8iBYfa5sCynABJvc34NRMZ6s2YV1eG5iUUGzUKrEqfjt5cc/pNuc8DmnW/2X59fv/zi5a4elQZQKaHsfsfEduOcR1qzg89qC4EVf/GjvDrBAfj0hE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713774751; c=relaxed/simple;
-	bh=ItqWrjV4KsXB1KfR4xf7yFZdMNV++bahmpR7BVnUJI0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=cAYulZEUrfyh99iWaoA3lTkEGeDR5hjCP42txcnIn0CbozuJbBsBILthwMXQbU68D2VE9o6q4Ik9XJesCaslGS6KsMS3oMPxJxl8f2wG4y+QM16VY7gtbYIWksu5iKSCCJjBx2pxjVkFPHcrxpZi5vz/Wwq+JgifmQC0NDlTWx8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DvVmx2eg; arc=none smtp.client-ip=209.85.208.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-2dd041acff1so22596071fa.1;
-        Mon, 22 Apr 2024 01:32:29 -0700 (PDT)
+	s=arc-20240116; t=1713775213; c=relaxed/simple;
+	bh=gBjd+Vu8U7gmMK1cuacoUqWYu4Mm34R+F75jPHl6MLw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=IgP0ubWP/27P6o/2bz9O30t+4G9fAr6r1uMY5kMNNdhpL24csZs2HnEeO2FFfZfH3kOKpwCn2l4obK9lFSzXP7JNxG9nbnfP+Q5BvL5+EPIT61AK07ka4LZvxzK1z8x4/tOPnZG4tgmRRpm7AcKu52h+7+3H6eIzynd5+XR8G9o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4kVrvdjr; arc=none smtp.client-ip=209.85.219.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-69b137d09e3so26403636d6.1
+        for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 01:40:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713774748; x=1714379548; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:to:subject
-         :mime-version:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=PxlY+v4R1WFPP2X8bTG9NbxEznhhcRgrGyfQ/AoxbwY=;
-        b=DvVmx2egz2M3qYxNEnJcS2ce1aGVBxdDDHwCrmq3WUnXr3Gs6dSibQCwbDkjciFu5U
-         2Km0xHikaWdmuvmb9ya9leM1JnL/QLlnU56Z8oOYQhAVvmdGX+JZwXWElsJY3XhiXqWt
-         3hux61hAUNbY+iuZ7ACwPzo+Ard/Hf8RrB2Dy3v1xtBQCl+enaJYWWtJfszaqsbDjhrZ
-         E/ZkyMA1C64yL3xFKG1LXI43tYTcbB2eJf4HV1Uw/LT4k8VLmUUFFvft5QkRyl5vsQzt
-         TSeH8qu2Zbw28FN046/go7VXpS4ySyYSBMVIQcKR+aR+AquEc1noiInYmUltM5URzp6L
-         hM7Q==
+        d=google.com; s=20230601; t=1713775211; x=1714380011; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fyV/lN5dlUHG9Gy3r8/spvLCW++B9nPT5UV3g/jx5Xs=;
+        b=4kVrvdjr2p9mjVLIDGrZWj387KqxTGUQaknDPGFWnpWaDNFJ3jOfDIohD1ym1dOGfl
+         bG7Lw9t5kpHqeu60Fw6sL66PNSNOwoZzNm1r97z1GdMD3GG+VcQQWgkUvudk/VIC8DIx
+         kmIFipbu4UwgjDT024Nm2/0r0FZpiKwCVXsVpunkPRTt2E0DsvQ0Ht08EGQF2riJKYAh
+         4eBNxt2Q/pjDi+9SKOQg7EOaaLYiAeRC/5eUOHQswjkx2jxJARuJ9jc93PbH4vbjLqqw
+         e9F13nl352QwbNi+80aZ19D5bZmjMbwSH7EcRBhI69Y6zLWqNl2VrtlqtUYEe4gZsGD+
+         ocuw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713774748; x=1714379548;
-        h=content-transfer-encoding:in-reply-to:from:references:to:subject
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=PxlY+v4R1WFPP2X8bTG9NbxEznhhcRgrGyfQ/AoxbwY=;
-        b=qSfQlh6nYbi3CY5WVIapIkpeCuQaFiNcFid6gBmk+GVylBfT1zy2fBKAz7Zs5FJK+f
-         ake2nogweOEXfhNo9wC5HEUwzijTp3/l1C8pWoDyzLtthjAg3cl6TtYk5S60PylE/jNK
-         nGZNJyqUttjMIApfaalQ+T1dm7Js6syWP0xR4kcxRG9a/k7QnQLMUVo2OugAC1s3XqWo
-         cqh7bWrQ6Xz2tZvBeoW2pZcVcDxinnqslJJ5BctKVQTzPS0rG9pQDHdCwhjdgWgwW2p7
-         kczBzkV8Yemh0EeeX5MWZOITYkvm76bURK40daA4Ee9FVgNQ+TdOC6jnDwlttoXrceKo
-         uGZg==
-X-Forwarded-Encrypted: i=1; AJvYcCUW1W885hww+/7MZWQhP6XsXqA2Rhtz3rg12KTTj5fxpzzJkF2JeMF03m5mefkPSu8GCQtPEnLKfPb91pjL8v25DSuHXrRX0NxCLNf244RdYse9sw/zQDM9Jq5snE/VRmSNpTzB
-X-Gm-Message-State: AOJu0Yxen4LRaNEbqSwZ9B0UGkqHEYR4yp2xiDOwDO/5+7FeUmutM+Sk
-	KftA3X6VapfsWGwIDcjL0+/jm+bIywB2vR15W2gF1dT7xA1+6VZ2
-X-Google-Smtp-Source: AGHT+IHsBgBAcdF5nwLDpbaXlFLwOSvezPhboZlien6ff2qIWna2LxlAFUMFr2UP4OKO/zBXVP0Qbw==
-X-Received: by 2002:a05:651c:10a3:b0:2dc:f305:f536 with SMTP id k3-20020a05651c10a300b002dcf305f536mr5145873ljn.1.1713774747840;
-        Mon, 22 Apr 2024 01:32:27 -0700 (PDT)
-Received: from debian ([146.70.204.204])
-        by smtp.gmail.com with ESMTPSA id e37-20020a5d5965000000b0034a44c615ddsm9357055wri.88.2024.04.22.01.32.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 22 Apr 2024 01:32:27 -0700 (PDT)
-Message-ID: <ae7af8b6-0952-434d-8178-8042a2db6bc9@gmail.com>
-Date: Mon, 22 Apr 2024 10:32:16 +0200
+        d=1e100.net; s=20230601; t=1713775211; x=1714380011;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=fyV/lN5dlUHG9Gy3r8/spvLCW++B9nPT5UV3g/jx5Xs=;
+        b=KeTd8ryoAPUSQWvk/80uFGNxBfI7XRljOsgTZgQyMi5PKjr9aMg4n9iAp+/GarqSMJ
+         Lvvh/bdANpo6I11cAmGtIQcBp9E/fQwRIqgkcs+/LB2kBrulVAZwlXc/1VJ0/Rh6b/uN
+         JHT+QfHOYyFao8yl5H/IZvLBNudDj4f7+YQb71coynZyI9c3I4DdzVOae7bCPtrQrFmU
+         itY5XLZxUlnZxJWqBzOrfFXCuBCebpdOtexyj/1Rwp6Ktb5lKhWDqjtvRTZWYOa4wqdU
+         1Sr3RC3Ir2G7es5Qjd1Gn8xLvCsgQqVu8MFFPXPknruwkGD2LxrOBQYuCdwdZVzcZylM
+         FUCQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVl3GmuQ6ZsavdlPboTV4GsdeI1l3Dr2WVRWGEsCseyGVIfMCb1d0DjI5CvsSn5f01kOqSk0OBRbNPfoJq8uv52vAtoRWtY
+X-Gm-Message-State: AOJu0Yy4l6pMjtGRZq7/y738FU4LXzwKni9Qh580CoKTRzHocON/xA7L
+	ktj9cVNGHyspylUV5IKxExdMo4TubGpBDgdruE8nWz8BX9lZ9YabyMkhiT28h7HOK0uEx3HUwV+
+	+r6HKyFHjjdxwrhfzFYIkrBY9UgLFK3EWliKZ
+X-Google-Smtp-Source: AGHT+IENPCbRIQ0LUueLwxddxA/XFr+u6ftoONVq0st9eSr/uSCaEUXWKVFNQ/qNjCmILccHeR7B/y8ZUUcVGBHPLk0=
+X-Received: by 2002:a05:6214:1772:b0:6a0:75fb:4587 with SMTP id
+ et18-20020a056214177200b006a075fb4587mr5828957qvb.41.1713775211256; Mon, 22
+ Apr 2024 01:40:11 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net v2 1/3] net: gro: add {inner_}network_offset to
- napi_gro_cb
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, dsahern@kernel.org,
- alexander.duyck@gmail.com, aleksander.lobakin@intel.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20240419153542.121087-1-richardbgobert@gmail.com>
- <20240419153542.121087-2-richardbgobert@gmail.com>
- <6622bd416e567_1241e229425@willemb.c.googlers.com.notmuch>
-From: Richard Gobert <richardbgobert@gmail.com>
-In-Reply-To: <6622bd416e567_1241e229425@willemb.c.googlers.com.notmuch>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <000000000000826ac1061675b0e3@google.com>
+In-Reply-To: <000000000000826ac1061675b0e3@google.com>
+From: Alexander Potapenko <glider@google.com>
+Date: Mon, 22 Apr 2024 10:39:31 +0200
+Message-ID: <CAG_fn=Xt=i_EqRbbceS-GSo5voAF-9GO0ZBMykX3LwyffaU9NA@mail.gmail.com>
+Subject: Re: [syzbot] [net?] KMSAN: uninit-value in unwind_dump
+To: syzbot <syzbot+355c5bb8c1445c871ee8@syzkaller.appspotmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Willem de Bruijn wrote:
-> Richard Gobert wrote:
->> This patch adds network_offset and inner_network_offset to napi_gro_cb, and
->> makes sure both are set correctly. In the common path there's only one
->> write (skb_gro_reset_offset, which replaces skb_set_network_header).
->>
->> Signed-off-by: Richard Gobert <richardbgobert@gmail.com>
->> ---
->>  drivers/net/geneve.c           |  1 +
->>  drivers/net/vxlan/vxlan_core.c |  1 +
->>  include/net/gro.h              | 18 ++++++++++++++++--
->>  net/8021q/vlan_core.c          |  2 ++
->>  net/core/gro.c                 |  1 +
->>  net/ethernet/eth.c             |  1 +
->>  net/ipv4/af_inet.c             |  5 +----
->>  net/ipv4/gre_offload.c         |  1 +
->>  net/ipv6/ip6_offload.c         |  8 ++++----
->>  9 files changed, 28 insertions(+), 10 deletions(-)
->>
-> 
->> +static inline int skb_gro_network_offset(const struct sk_buff *skb)
->> +{
->> +	return NAPI_GRO_CB(skb)->network_offsets[NAPI_GRO_CB(skb)->encap_mark];
->> +}
->> +
-> 
-> 
->> @@ -236,8 +236,6 @@ INDIRECT_CALLABLE_SCOPE struct sk_buff *ipv6_gro_receive(struct list_head *head,
->>  	if (unlikely(!iph))
->>  		goto out;
->>  
->> -	skb_set_network_header(skb, off);
->> -
-> 
-> Especially for net, this is still a large patch.
-> 
-> Can we avoid touching all those tunnel callbacks and just set the
-> offsets in inet_gro_receive and ipv6_gro_receive themselves, just
-> as skb_set_network_header now:
-> 
-> @@ -236,7 +236,7 @@ INDIRECT_CALLABLE_SCOPE struct sk_buff *ipv6_gro_receive(struct list_head *head,
->         if (unlikely(!iph))
->                 goto out;
->  
-> -       skb_set_network_header(skb, off);
-> +       NAPI_GRO_CB(skb)->network_offsets[NAPI_GRO_CB(skb)->encap_mark] = off;
-> 
+On Fri, Apr 19, 2024 at 6:36=E2=80=AFPM syzbot
+<syzbot+355c5bb8c1445c871ee8@syzkaller.appspotmail.com> wrote:
+>
+> Hello,
+>
+> syzbot found the following issue on:
+>
+> HEAD commit:    0bbac3facb5d Linux 6.9-rc4
+> git tree:       upstream
+> console output: https://syzkaller.appspot.com/x/log.txt?x=3D13403bcb18000=
+0
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=3D87a805e655619=
+c64
+> dashboard link: https://syzkaller.appspot.com/bug?extid=3D355c5bb8c1445c8=
+71ee8
+> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Deb=
+ian) 2.40
+>
+> Unfortunately, I don't have any reproducer for this issue yet.
+>
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/93eb2bab28b5/dis=
+k-0bbac3fa.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/47a883d2dfaa/vmlinu=
+x-0bbac3fa.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/6bc56900ec1d/b=
+zImage-0bbac3fa.xz
+>
+> IMPORTANT: if you fix the issue, please add the following tag to the comm=
+it:
+> Reported-by: syzbot+355c5bb8c1445c871ee8@syzkaller.appspotmail.com
+>
+> WARNING: kernel stack frame pointer at ffff88813fd05fe8 in kworker/1:1:42=
+ has bad value ffff888103513fe8
+> unwind stack type:0 next_sp:ffff888103513fd8 mask:0x4 graph_idx:0
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D
+> BUG: KMSAN: uninit-value in unwind_dump+0x5a0/0x730 arch/x86/kernel/unwin=
+d_frame.c:60
+>  unwind_dump+0x5a0/0x730 arch/x86/kernel/unwind_frame.c:60
+>  unwind_next_frame+0x2d6/0x470
+>  arch_stack_walk+0x1ec/0x2d0 arch/x86/kernel/stacktrace.c:25
+>  stack_trace_save+0xaa/0xe0 kernel/stacktrace.c:122
+>  ref_tracker_free+0x103/0xec0 lib/ref_tracker.c:239
+>  __netns_tracker_free include/net/net_namespace.h:348 [inline]
+>  put_net_track include/net/net_namespace.h:363 [inline]
+>  __sk_destruct+0x5aa/0xb70 net/core/sock.c:2204
+>  sk_destruct net/core/sock.c:2223 [inline]
+>  __sk_free+0x6de/0x760 net/core/sock.c:2234
+>  sk_free+0x70/0xc0 net/core/sock.c:2245
+>  deferred_put_nlk_sk+0x243/0x270 net/netlink/af_netlink.c:744
+>  rcu_do_batch kernel/rcu/tree.c:2196 [inline]
+>  rcu_core+0xa59/0x1e70 kernel/rcu/tree.c:2471
+>  rcu_core_si+0x12/0x20 kernel/rcu/tree.c:2488
+>  __do_softirq+0x1c0/0x7d7 kernel/softirq.c:554
+>  invoke_softirq kernel/softirq.c:428 [inline]
+>  __irq_exit_rcu kernel/softirq.c:633 [inline]
+>  irq_exit_rcu+0x6a/0x130 kernel/softirq.c:645
+>  instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1043 [inli=
+ne]
+>  sysvec_apic_timer_interrupt+0x83/0x90 arch/x86/kernel/apic/apic.c:1043
+>
+> Local variable tx created at:
+>  ieee80211_get_buffered_bc+0x44/0x970 net/mac80211/tx.c:5886
+>  mac80211_hwsim_beacon_tx+0x63b/0xb40 drivers/net/wireless/virtual/mac802=
+11_hwsim.c:2303
+>
+> CPU: 1 PID: 42 Comm: kworker/1:1 Not tainted 6.9.0-rc4-syzkaller #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS G=
+oogle 03/27/2024
+> Workqueue: usb_hub_wq hub_event
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D
 
-Thanks for the reply!
+This seems to be a false positive caused by KMSAN instrumenting
+READ_ONCE_NOCHECK(), although it is not supposed to.
+I was going to define it as follows under __SANITIZE_MEMORY__:
 
-Setting network_offset on dev_gro_receive and inner_network_offset only
-in the tunnel callbacks is the best option IMO. I agree that
-we want a small patch to net that solves the problem, although I 
-think always using ->encap_mark in the common path is not ideal. 
+  #define __no_sanitize_or_inline __no_kmsan_checks notrace __maybe_unused
 
-We can avoid changing all the tunnel callbacks by always setting
-inner_network_offset in {ipv6,inet}_gro_receive and initialize
-network_offset to 0 in dev_gro_receive. It will result in a small
-change, without using ->encap_mark.
-
-What are your thoughts?
+, but I find the name __no_sanitize_or_inline a bit unfortunate
+because it doesn't distinguish between "do not instrument this code"
+and "do not report bugs in this code", which have different meanings
+from KMSAN perspective.
 
