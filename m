@@ -1,80 +1,80 @@
-Return-Path: <netdev+bounces-90193-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90191-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4EA6E8AD0C0
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 17:30:29 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07A9E8AD0BD
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 17:30:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 71B821C21DBF
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 15:30:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 678A1B249DE
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 15:30:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F290E153596;
-	Mon, 22 Apr 2024 15:29:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2867715357E;
+	Mon, 22 Apr 2024 15:29:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="GM6WVdkF"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="T7nVr9mw"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2040.outbound.protection.outlook.com [40.107.244.40])
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2061.outbound.protection.outlook.com [40.107.220.61])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EAF7153579
-	for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 15:29:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.40
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C850153503
+	for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 15:29:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.61
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713799778; cv=fail; b=GGZLyKnzmheYwL03Levu0j+y2Lt3LSBfISR5kwaOid0JYCo2UQb9LE62QQYQ8RjJgsjo4jwHX+80JaxF6UVjntcAiZzFucQGWmnlMJSFxQQMQ6TXgfi7YHkHz1isdeKrR8GmY1KGl7WefdaYgfK61t+u59YDsdLy92z+Bv0ihY4=
+	t=1713799771; cv=fail; b=akrjwDp3zfYWoZbFPZKbhOZwY6G+dpZHBn+Q+hpz1Cj6l2ENy3ZnN8fVQ0rZ4qV5Amgag9r0BAqeLoiHUKXfOolYDB0ZoQgQMFyLkJ4UeJlnXctsGlkyYqR5qvvmzCiJmtxU2PJPVlW9GwCmfDcxoCCUII9SRYKUaFdCBrBtn6Q=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713799778; c=relaxed/simple;
-	bh=WPVMaZgf0c1BhE/LdBWGLOuVxLDiuow5XbgmFVSyBjw=;
+	s=arc-20240116; t=1713799771; c=relaxed/simple;
+	bh=Y7Z5EoeVZCqtlXj2ln+Jl8DvaG8afwfAVTOYdE+ep6U=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EZCO5YU9tP8rqZNxiHK9LbHljiLoee9bSCJxlAW1SiIueTywCjb4ELGbS2Gplx9E26MMN0f7ChHPdEWqoJZ8SwzYuf/oIT1iodeztK+np5m0Kl7aovHi6o7eLOzAaWwiRAuqTt5NFiYkD+YjC3mTH7pseLiG59qnXApGogflVRk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=GM6WVdkF; arc=fail smtp.client-ip=40.107.244.40
+	 MIME-Version:Content-Type; b=GLay0M2uPXL9E6tN9Tl7SMO6mXrqGuvich2hA6J9156YaXxRfzN4rvbWYouUYIKnHcsefyeu0wKNpm3fE8dD7R3722sj4TvnfeVKZPtrInJd8crR2cGYmCRHCcetsH4uusA7GydybpVu/FlBkC4Z8c4Vm9UVrwYDCTx8Y+5QcwQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=T7nVr9mw; arc=fail smtp.client-ip=40.107.220.61
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Gnml+WWAndGvdwMIZmvxISyXhPPGLLFFeBu5uG4IsuH0Olsvtp2oHQjKzh8AuCFFQd9ZDj6sdaj1sBygu9okIeTHoDgAa6KncjmNz9yY3xGZSlg+4zRoasDFyE9YvgeaLXTdNGWiWFMTLIhGtXL/YTxLLKNtKFV7hOA1EMLJLr/QaT4ShY3IZ0K6DeMgs9olXuwX1CQ42XdLaQq4Hx/iQL2L2va1NOb2o2KPgSJGrwcM+j38h5n+ZucvQPEP1JxenOvRjd7hCYJ47GHP2fqqjDXiZG2iiiO4wUalmm7KNlwOWWX1cJgXqTbwTLwNIb0Mj9NaUR+vsQApLdndULOZkA==
+ b=JKZX2S0ULGY/FVRLMxryFbq5JbqP3FiSCMAcyMONOdIKAneWM6wX7RCRNB9eaoFORX84ODQ2VKq+3HxsIQh+HWcQDIFOe+VMMH6X1rt7+XVQnaKV0cE2fC81dEkhN7jJlfxuzud2KUBVfIGvMIDc45IikLTo8D9QcGjF3WBXZIWoekNKIfkrcVQZwaUEfkRleIGx8AjHMylhhvjMUfGRb09aFsyOxY6Ptr2QUgb8tnnD7D7MZFmd+0wrWwmUEapVXPG9K+drgOQBbJKPhf58YKFwHlvuGqTIvLvmCBLHCB+iIu0Cz9/ogACiiU/sQ4XlALmvJW39UqA8YoSE2FgdFQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=wwGWOuZbaFXS1D54uDpK2b9x0Mhjqyng+VGkHzJV0sk=;
- b=AqGptBbux3jPG321M88RY+LeQaQJmiOwQHYhmQcsU6mUpGZfztusiji5+ADuLFSoafISPDPyoQTEQ7kNGMgdbChZTOELfgi83siKp1neIbdpv0D8EvxtGR0251mloftSSp69ss1mshFKlFfi42eRc63ca9W+uT+foaGTCWfePyKh83WUEYaQxrEQl/ShAU6hT+aJGDXB0cgs76t5TZGGcLGH9qwaiFxzUO6tB1smMTc6lQnapB1mk5mVMlgWMUZS1PVPbM0G/BugJqkMfRQgyG12wVfQBcuj4nLwNUcKY2t+WOMxUWctmnvW4YDK7l7ftEA1IJ+/Cb2vSFeC44N4dw==
+ bh=sctuDcEJLQnxwZdOoVs2WOmWvQwyvvEClGVRjiPf65g=;
+ b=aSkHswHsUPsfKAVC7MAyVjdjV90yPASw06frvf1oJ6yZuHtT24BuaYMs3+0d/OsB5v34P3FsSHYJtjI03g7hgoEpYhuTmTQTj/VHO0UG4cHRCuz2oqrc3Kv9vWmj892RTOtYRKFRYcrX2F1cV3YWSoQOG5/p7n1xshO5781Hrb8NgXG8uVByq23KYs7lPphBBdvfJmsrRNGf+mWKh3aCgNRGcV8DOo0pyOtjqTCSa754lExEGvvSnVEE1x21Ah7PYbVqdinXpBV2YPsyEh6/qLASOI2Z+r+oymd/n7lDBAIWU75AhgtJvkmMGXF7eBPqrtkv1AuGe/tTUdAKP7w9lw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
+ 216.228.117.161) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=wwGWOuZbaFXS1D54uDpK2b9x0Mhjqyng+VGkHzJV0sk=;
- b=GM6WVdkFC7pirLxT3gagy08p5oA9q2XubripDGgDs5wxlBGOeB9r2lmImhCLiR0jNtPy1cexySvkaPrHsa/YGHUj5ABE22yt1YDqWVc4b39Td6ruQc+2VkVgZe/ujmhVEDNDnFThFNKFD3eDqFk678bb/q7BMY1oNOnU2lL71+pTvNEYuK+ob0zpvUCIJmnpRFmERcYI79Rlnc3RRXAqZJ182NZNKMkSRJg/H/DOowCyFAATmlseLjtFfbo/dWz/OfaiQOacITsGJf+ZR+ILNgQ93bp5Bn8A65G2hfE5mwZbD/zy2GNQD9eJdoK2K1r4m6uuYB4fOotQJnBz1k63LA==
-Received: from BN0PR08CA0016.namprd08.prod.outlook.com (2603:10b6:408:142::35)
- by IA0PR12MB8207.namprd12.prod.outlook.com (2603:10b6:208:401::8) with
+ bh=sctuDcEJLQnxwZdOoVs2WOmWvQwyvvEClGVRjiPf65g=;
+ b=T7nVr9mwSckDihOXSKSBTE3S0Pp09xNgA6jURCQYKpvvmu7iPyC3OhAr9Clq5555I1eWQyZCSfxQkXT7q1imoRNHfANUyw1gyukar03uESLfQsmhPMtuod+ImE4/PFIOPvz/0frlMn2wf0+1duIL8qTC0kI/7V4vI/LrhLd5tICx73MH12+UcdMR5L05efiYIaEv6ehCu3D681WXTYUEc9qkORiBIvSf4T7hbUsP6RzH7FaVG1uCXN6fAgWL6h4tYiEns+/tZ8GSdYbMMSFRwNHeajsO7RRRt90j4iK9Ws4Ym/JZkl/wVxREVnCE3PK1KfAuL8v1gmvwLrYT0y5tzQ==
+Received: from CH0PR04CA0002.namprd04.prod.outlook.com (2603:10b6:610:76::7)
+ by DS0PR12MB8246.namprd12.prod.outlook.com (2603:10b6:8:de::19) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7472.44; Mon, 22 Apr
- 2024 15:29:30 +0000
-Received: from BN1PEPF00004689.namprd05.prod.outlook.com
- (2603:10b6:408:142:cafe::39) by BN0PR08CA0016.outlook.office365.com
- (2603:10b6:408:142::35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7495.33 via Frontend
- Transport; Mon, 22 Apr 2024 15:29:27 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ 2024 15:29:26 +0000
+Received: from CH2PEPF00000148.namprd02.prod.outlook.com
+ (2603:10b6:610:76:cafe::29) by CH0PR04CA0002.outlook.office365.com
+ (2603:10b6:610:76::7) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7495.34 via Frontend
+ Transport; Mon, 22 Apr 2024 15:29:26 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
 Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- BN1PEPF00004689.mail.protection.outlook.com (10.167.243.134) with Microsoft
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ CH2PEPF00000148.mail.protection.outlook.com (10.167.244.105) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7519.19 via Frontend Transport; Mon, 22 Apr 2024 15:29:27 +0000
+ 15.20.7519.19 via Frontend Transport; Mon, 22 Apr 2024 15:29:25 +0000
 Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Mon, 22 Apr
- 2024 08:29:04 -0700
+ 2024 08:29:09 -0700
 Received: from localhost.localdomain (10.126.231.35) by rnnvmail201.nvidia.com
  (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Mon, 22 Apr
- 2024 08:29:00 -0700
+ 2024 08:29:04 -0700
 From: Petr Machata <petrm@nvidia.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
@@ -82,9 +82,9 @@ To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 CC: Ido Schimmel <idosch@nvidia.com>, Jiri Pirko <jiri@resnulli.us>, "Petr
  Machata" <petrm@nvidia.com>, Alexander Zubkov <green@qrator.net>,
 	<mlxsw@nvidia.com>
-Subject: [PATCH net 4/9] mlxsw: spectrum_acl_tcam: Fix possible use-after-free during rehash
-Date: Mon, 22 Apr 2024 17:25:57 +0200
-Message-ID: <3e412b5659ec2310c5c615760dfe5eac18dd7ebd.1713797103.git.petrm@nvidia.com>
+Subject: [PATCH net 5/9] mlxsw: spectrum_acl_tcam: Rate limit error message
+Date: Mon, 22 Apr 2024 17:25:58 +0200
+Message-ID: <c510763b2ebd25e7990d80183feff91cde593145.1713797103.git.petrm@nvidia.com>
 X-Mailer: git-send-email 2.44.0
 In-Reply-To: <cover.1713797103.git.petrm@nvidia.com>
 References: <cover.1713797103.git.petrm@nvidia.com>
@@ -100,139 +100,81 @@ X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
  rnnvmail201.nvidia.com (10.129.68.8)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN1PEPF00004689:EE_|IA0PR12MB8207:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8f37392a-1868-43e4-ddb8-08dc62e0ff79
+X-MS-TrafficTypeDiagnostic: CH2PEPF00000148:EE_|DS0PR12MB8246:EE_
+X-MS-Office365-Filtering-Correlation-Id: b4e22d39-ac32-4a8b-968f-08dc62e0fe79
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?kJOMXnxSglffEQKOTD9BVko3iz19pwx/12Mb8WfPXnqRVzodxNLnZHUB4vSZ?=
- =?us-ascii?Q?eGqGCA6MRrvaRWDaJu2TSyoTX7z17QfmLjEa0MCPDucYcCQ6a4XtGIlBGt/+?=
- =?us-ascii?Q?q+xvT/9MTuBmpFKE/oZS6pT08AjDRzcjcrBJvZaml7xVAo0/c0xzb8/kNnl3?=
- =?us-ascii?Q?5I7gpwKCcbqq8vCjdh+iL/wMEdm/sGEn/QGzeGAcaY7NB1lX92iuZb0yVu4o?=
- =?us-ascii?Q?8LLrS/LqapMZnNCDz8oNRGQLV+Ci0kfPz4vBD/swFiN7ybCVZ96vgGS2vt4B?=
- =?us-ascii?Q?eE6lxGHtwFWOJ2asVr3Vo9M9ctFXlmFmYH0Gw0ZAP76ODQP4PfBoW20zh4yc?=
- =?us-ascii?Q?SfkUkNy/8n38V4DXk/RQibg+xGKJgKlwLWbE7RPLooNa309rSt6tmsjb6otv?=
- =?us-ascii?Q?jUDMTUS8buzsGlHqNLSy1bBCT80zog+C76ugg+A/nOi4ZGQag0fpBKHh8qCZ?=
- =?us-ascii?Q?esskxoP8LSUjgmgb/UbfSNeg0dTrid+5JydFmO4hTAEDYYUvOB8I6MVCCmlM?=
- =?us-ascii?Q?chfPHZnj4R2XnpXWdmfx4SbxszoRiTuS0XZczAFD3blNVWqtTt2JIzD6kF8b?=
- =?us-ascii?Q?ACGnDGltGd2ttYHWMqFTKkN7BI4LHKaVpPuakIlsDMEePnfEGZfm+LyR72Tl?=
- =?us-ascii?Q?UCGuMUC8YZgvpq05BYV6AIb8/fUt1fjQ8FF1pwAzkmlxy+xCGycN9W8YPjpn?=
- =?us-ascii?Q?ZWeGuiL3lb2t7pET3cLbUu/L+2im/5UcfHrdF2AkK/+ZVKj5y2DbFW9zIw8g?=
- =?us-ascii?Q?FCZcHn4aQJ+Ize2bowGHzq6EQ3LXWDCfu2dua3sp76cHRI+yDJDl5RwlgOek?=
- =?us-ascii?Q?hgPDCnNEpSR+raJm+yX053A6tDLvhEMKQPi9KdJ9heskD6WjCwthryujcWPI?=
- =?us-ascii?Q?xzsJuTkh7NXykwu7LasMDoZs71we2XLmhu8X3sKWXCI+d8aEU0sIl/pI1gtn?=
- =?us-ascii?Q?xWIhzZzOTvkM4vrFcE2aqI3+ZkVyjLqv6yvOjLt216i6c6W7h2RUwZflAida?=
- =?us-ascii?Q?sbNcixtdivsunrrgtuaJ3dQaPQ5FsIJevV7LiN86yYcaA+4g+rDvI8krMds2?=
- =?us-ascii?Q?GY+7t5qnamvo823abrycGyWxkHDmvGInOajgR+a8iSkqVvv2DJpUTGNSuvl9?=
- =?us-ascii?Q?HJ53choKZTFLET2mt82gZcnzJXW9f8xQscSgeP+XpuKBMzyaNXCzQb0fqvuB?=
- =?us-ascii?Q?Lwnpt9wAynOKUd3lZaLL+88rFoqJCCSyxU3WryPLXRTt7AdKWSaCkM0E0FeL?=
- =?us-ascii?Q?tyFU51m9Nuhw3xBCTRhqYhWyBOJ1ZDzyC/1zmsSrDgP9S+IBQbHiJItQkU47?=
- =?us-ascii?Q?XVB/pMtPBbXD8YC7MjvNoYWL6nSmqds0Cd2WwvlMQJic9dtghzoQDh7jzX37?=
- =?us-ascii?Q?2Dx4/E2sk46z8PknvJCJtFqNTwZy?=
+	=?us-ascii?Q?j6r0RluA3Gw91sdhMhJtr/a+jn3wE8R0N9BPILG+EunQLEhERa/uDItuL56M?=
+ =?us-ascii?Q?4INp4TvUrZdg1QpSMDsykP7J2xaVXnCBZwi2WFE65HIz1DJZH0qzjGfpHFig?=
+ =?us-ascii?Q?Oq5fNHWVHlNTZxb8jpks8VZm/e4zBbNHRAoMH2OWtCK3HyL+LHK6jj4ec9TO?=
+ =?us-ascii?Q?j7rGnE50LMoah/36ceO7sxKt4V//O16pEH16s7kyhB6YPq26g9GbFSHM9gRB?=
+ =?us-ascii?Q?83xNjjxGPntbTYYp2T1Sy4gsTbmgyAmCTgrmu0SsrSsaGUtcqmftZMs+iUaX?=
+ =?us-ascii?Q?Wnkp0VTJgiKfXlAOtf8tE2MPj713vKMjPc5iie5hCzcVVvZlec1bmWVjTXpN?=
+ =?us-ascii?Q?DUehdhRU40Zfj2AtjcLB46P8apyLMhd6DuHOvPYFDpep+7XVOOpVGXTdjLKH?=
+ =?us-ascii?Q?lbaILAZDb9FWmW0e/g83VAn6QoUCbk4OVw57igqxNnK+KB7LZGvceDOF+lWl?=
+ =?us-ascii?Q?gVo1mVqDGhuxQMiDX1CPttDttTr7zse9/nWMGyUG+Mj2/7WgOEuiewDoT/mm?=
+ =?us-ascii?Q?oj/kTMvoJjr59GBL8ASZ6jXU5Ka8KcXZHms0l5KWtZ9jMdsbOr+rjnIMfPat?=
+ =?us-ascii?Q?lijAdTcZR8i1CIxcXKdNhkFKMsONoU4eqzjwM1iOVSw7bUfrN2AGlMrsER0K?=
+ =?us-ascii?Q?dmC7qLTdXVQd6CLqm5gyWp8eCypKnwxT1B70M1hiamE6zao2jfnzlSSla6jB?=
+ =?us-ascii?Q?DJrSMXe3A1KGvuFu5AcvS0TgpF1EdMvx+tcpEN7wi3cQtFaKqo3dMUVOPKBG?=
+ =?us-ascii?Q?B8lnm55g0GK3xpVlGkSQb0Nr+H7kxDxp6U+z2kDQAuSvyGdk9MSUQrAbGB4+?=
+ =?us-ascii?Q?c5BrxOdUuN9LTtrIrh0wBoW+tQk1YtWPymJZmJqit2JDdkGbal6WcBj7kQ5A?=
+ =?us-ascii?Q?tTLePRFu4hTBxGlfzpRzZ0v9rEQW+YOGRWj9WcwKohoaWia3MwfwZs5bO2TH?=
+ =?us-ascii?Q?YpGCr7N0WCnWLQdhdgiCBTylmzmUKU4y4OfGcPLTVMNtVsNhlLTZiNQKImx6?=
+ =?us-ascii?Q?eRu6sjUCi/3bdKeXfQiONoIb7QBZg6kXuOx48jPjTDXdadqvaAqdyBGqUimQ?=
+ =?us-ascii?Q?Iv8aEFlCa8sEEtM+rFAaaEUeHZ5iQQPyblZlEMpBWoRBWezptDwjOLOjcd/i?=
+ =?us-ascii?Q?ufoXgoeawHveSyKVJkpDEOCnRQgFml2CQ1mxtkPglY35voqvxRMHe8K8nTg/?=
+ =?us-ascii?Q?tgcWOZalxq2h48bGPbGue20YQDmkRpqb6CtW9C8putQ/BfIYCCf3Up5F52DZ?=
+ =?us-ascii?Q?aC3v6iLZebc5Ai7y34ZZ1wH6ObST5qMiCXwixC8f+T11FaRB4Prieo6iVFc8?=
+ =?us-ascii?Q?mbQoqj1odEOp9d3E1nOwqLtgeKanmxVPE3psaoQxCo//XHOeGwD2L1rA52Ez?=
+ =?us-ascii?Q?3QhYfB6TesF0CdifYGScLEHE6wOk?=
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230031)(36860700004)(1800799015)(82310400014)(376005);DIR:OUT;SFP:1101;
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(82310400014)(1800799015)(36860700004)(376005);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Apr 2024 15:29:27.5953
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Apr 2024 15:29:25.9782
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8f37392a-1868-43e4-ddb8-08dc62e0ff79
+X-MS-Exchange-CrossTenant-Network-Message-Id: b4e22d39-ac32-4a8b-968f-08dc62e0fe79
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	BN1PEPF00004689.namprd05.prod.outlook.com
+	CH2PEPF00000148.namprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB8207
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB8246
 
 From: Ido Schimmel <idosch@nvidia.com>
 
-The rehash delayed work migrates filters from one region to another
-according to the number of available credits.
+In the rare cases when the device resources are exhausted it is likely
+that the rehash delayed work will fail. An error message will be printed
+whenever this happens which can be overwhelming considering the fact
+that the work is per-region and that there can be hundreds of regions.
 
-The migrated from region is destroyed at the end of the work if the
-number of credits is non-negative as the assumption is that this is
-indicative of migration being complete. This assumption is incorrect as
-a non-negative number of credits can also be the result of a failed
-migration.
+Fix by rate limiting the error message.
 
-The destruction of a region that still has filters referencing it can
-result in a use-after-free [1].
-
-Fix by not destroying the region if migration failed.
-
-[1]
-BUG: KASAN: slab-use-after-free in mlxsw_sp_acl_ctcam_region_entry_remove+0x21d/0x230
-Read of size 8 at addr ffff8881735319e8 by task kworker/0:31/3858
-
-CPU: 0 PID: 3858 Comm: kworker/0:31 Tainted: G        W          6.9.0-rc2-custom-00782-gf2275c2157d8 #5
-Hardware name: Mellanox Technologies Ltd. MSN3700/VMOD0005, BIOS 5.11 01/06/2019
-Workqueue: mlxsw_core mlxsw_sp_acl_tcam_vregion_rehash_work
-Call Trace:
- <TASK>
- dump_stack_lvl+0xc6/0x120
- print_report+0xce/0x670
- kasan_report+0xd7/0x110
- mlxsw_sp_acl_ctcam_region_entry_remove+0x21d/0x230
- mlxsw_sp_acl_ctcam_entry_del+0x2e/0x70
- mlxsw_sp_acl_atcam_entry_del+0x81/0x210
- mlxsw_sp_acl_tcam_vchunk_migrate_all+0x3cd/0xb50
- mlxsw_sp_acl_tcam_vregion_rehash_work+0x157/0x1300
- process_one_work+0x8eb/0x19b0
- worker_thread+0x6c9/0xf70
- kthread+0x2c9/0x3b0
- ret_from_fork+0x4d/0x80
- ret_from_fork_asm+0x1a/0x30
- </TASK>
-
-Allocated by task 174:
- kasan_save_stack+0x33/0x60
- kasan_save_track+0x14/0x30
- __kasan_kmalloc+0x8f/0xa0
- __kmalloc+0x19c/0x360
- mlxsw_sp_acl_tcam_region_create+0xdf/0x9c0
- mlxsw_sp_acl_tcam_vregion_rehash_work+0x954/0x1300
- process_one_work+0x8eb/0x19b0
- worker_thread+0x6c9/0xf70
- kthread+0x2c9/0x3b0
- ret_from_fork+0x4d/0x80
- ret_from_fork_asm+0x1a/0x30
-
-Freed by task 7:
- kasan_save_stack+0x33/0x60
- kasan_save_track+0x14/0x30
- kasan_save_free_info+0x3b/0x60
- poison_slab_object+0x102/0x170
- __kasan_slab_free+0x14/0x30
- kfree+0xc1/0x290
- mlxsw_sp_acl_tcam_region_destroy+0x272/0x310
- mlxsw_sp_acl_tcam_vregion_rehash_work+0x731/0x1300
- process_one_work+0x8eb/0x19b0
- worker_thread+0x6c9/0xf70
- kthread+0x2c9/0x3b0
- ret_from_fork+0x4d/0x80
- ret_from_fork_asm+0x1a/0x30
-
-Fixes: c9c9af91f1d9 ("mlxsw: spectrum_acl: Allow to interrupt/continue rehash work")
+Fixes: e5e7962ee5c2 ("mlxsw: spectrum_acl: Implement region migration according to hints")
 Signed-off-by: Ido Schimmel <idosch@nvidia.com>
 Tested-by: Alexander Zubkov <green@qrator.net>
 Reviewed-by: Petr Machata <petrm@nvidia.com>
 Signed-off-by: Petr Machata <petrm@nvidia.com>
 ---
- drivers/net/ethernet/mellanox/mlxsw/spectrum_acl_tcam.c | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/net/ethernet/mellanox/mlxsw/spectrum_acl_tcam.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/drivers/net/ethernet/mellanox/mlxsw/spectrum_acl_tcam.c b/drivers/net/ethernet/mellanox/mlxsw/spectrum_acl_tcam.c
-index 7e69225c057d..1ff0b2c7c11d 100644
+index 1ff0b2c7c11d..568ae7092fe0 100644
 --- a/drivers/net/ethernet/mellanox/mlxsw/spectrum_acl_tcam.c
 +++ b/drivers/net/ethernet/mellanox/mlxsw/spectrum_acl_tcam.c
-@@ -1451,6 +1451,7 @@ mlxsw_sp_acl_tcam_vregion_rehash(struct mlxsw_sp *mlxsw_sp,
+@@ -1450,7 +1450,7 @@ mlxsw_sp_acl_tcam_vregion_rehash(struct mlxsw_sp *mlxsw_sp,
+ 	err = mlxsw_sp_acl_tcam_vregion_migrate(mlxsw_sp, vregion,
  						ctx, credits);
  	if (err) {
- 		dev_err(mlxsw_sp->bus_info->dev, "Failed to migrate vregion\n");
-+		return;
+-		dev_err(mlxsw_sp->bus_info->dev, "Failed to migrate vregion\n");
++		dev_err_ratelimited(mlxsw_sp->bus_info->dev, "Failed to migrate vregion\n");
+ 		return;
  	}
  
- 	if (*credits >= 0)
 -- 
 2.43.0
 
