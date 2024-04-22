@@ -1,82 +1,99 @@
-Return-Path: <netdev+bounces-90147-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90148-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FC9E8ACDF1
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 15:14:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B97C8ACDF5
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 15:15:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EF0BC2821E2
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 13:14:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 78BD71C22125
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 13:15:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 427E914F126;
-	Mon, 22 Apr 2024 13:14:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E6B514F12F;
+	Mon, 22 Apr 2024 13:15:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="tjDw6cTo"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H7DzM5Ei"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4DFA14F123;
-	Mon, 22 Apr 2024 13:14:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAF0614EC67;
+	Mon, 22 Apr 2024 13:15:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713791660; cv=none; b=n6GQiohbIpOqptbOJphUzIJyAeWWoij7pK3GMrbD7Hde+Mfhb1+FVDIr9s2ioFJUSoKa9/ratUHeToQGwxnhLvfTKBOQGMwhySF0OKz2xuARFA48YdeQv2JBHnwQ4xW/BY3lD7CrMZlsDqik6iAhkQgToB/jxrs+wPxoCPAeEy0=
+	t=1713791716; cv=none; b=Jc7vUndLtg9cxmb7ymqsdcEHqjgkGQrr4Fkei7bulY406dpoCrqfGzXQ/+GA37GD2Z21/MX3jGpw+V1jOzNDZ2GBB+w9jfYFnTxTdwDpXvDt+kbZm6ItBi4HwmqGHkDaOVvcrVusKCvEciyxigN3ArrcDv7zx5xV1jBjNgriomk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713791660; c=relaxed/simple;
-	bh=hPRmFIFYiJN/6bf0YcOYo5UrScKhMIeu5BKYFrgEz+U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TfaEcutdfaqivknHM4CVEcGroOoy5L9YPVfNk92pUCUVP78Nv6OZUNFRQ9JGc9qqWE8skSCJf+586WkCx0QS6ISeCX7WbyE8yQ3dHH6wQkOOcQ5YSUZDyJ9tLrpwLm3wUV8qCl70Vd8UjePjTvpHqeepimXjdBuqpmMKjkiitYk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=tjDw6cTo; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=7m/NEnQbMSmAGNLxJ0CrFAMWF7x2McYRy+y8URj23QA=; b=tjDw6cToW6Slo/C3OouTVirmOX
-	f3rHzTyiQ8odCj8AuKV2tXlJVOUzYQ14Rkif6HZsXmjW36Br6iVYETbapEvL1rvBNMZEWwIQrK5yj
-	yJ4IRApUIkuazCVKeHZB28GIbtb7EV1mVGQfOnyC9+Fino+GzWv+RDCkeIP2GP593hpg=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rytUq-00DcQI-4z; Mon, 22 Apr 2024 15:14:12 +0200
-Date: Mon, 22 Apr 2024 15:14:12 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Kory Maincent (Dent Project)" <kory.maincent@bootlin.com>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+	s=arc-20240116; t=1713791716; c=relaxed/simple;
+	bh=Eio/1AEc7ubO0FasZh46qzObS9lQSnNE57hP8qhc5Ss=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=hgeui5wni9UgOwxjCC+LBq0FUOO/btUn3lKSL/tbMBz+FSta301EFY6hqWQkfSmlIb4hBJ4LOy9mBzBeUF09xWYbPr7qaqJkZ7akBziDDr2YRJeopO9H/SPLqSfzmk0v8s7wM50mu3IpGl0nhsq+oP8E4x/HCz1qz3X8GnzE42U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H7DzM5Ei; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7718EC113CC;
+	Mon, 22 Apr 2024 13:15:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713791715;
+	bh=Eio/1AEc7ubO0FasZh46qzObS9lQSnNE57hP8qhc5Ss=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=H7DzM5Eib4LTUdtI8EUX/6yzxsvNX3ccwNEngynGV/pqCi6g4O+IrzcTi5u3Q/5nQ
+	 wgmR/xx7BLiImCXH1RCOIttNXHQt2ZViIBDMqnn7VgGTn3mxDiiTD6yVuaLuVNJKz1
+	 r+59rFVB21rdOC87v5yC4KnSiplLLhFAacJaIedNz7v19D7yMyIDqcwRTTF01NAlYH
+	 pRQeGREO1CKoHDZqJT/MhFg2ZpGixj4D54c0TrnH25TVvr0l5ib7ijZYrFD2BM1hfb
+	 0D5LfRU0B0vzHsAOE9cvoHRN44CM+npJ14iC6PTiZK7X/WxJjAWw+Js1j3lzZ9v0lH
+	 80BV6ACi7rN5A==
+From: Bjorn Andersson <andersson@kernel.org>
+To: Kalle Valo <kvalo@kernel.org>,
+	Jeff Johnson <quic_jjohnson@quicinc.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Kyle Swenson <kyle.swenson@est.tech>
-Subject: Re: [PATCH net-next 2/3] net: pse-pd: pse_core: Fix pse regulator
- type
-Message-ID: <a5991b1a-a669-4c47-8918-60c4c12a1505@lunn.ch>
-References: <20240422-fix_poe-v1-0-811c8c0b9da7@bootlin.com>
- <20240422-fix_poe-v1-2-811c8c0b9da7@bootlin.com>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+Cc: ath10k@lists.infradead.org,
+	linux-wireless@vger.kernel.org,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org,
+	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Subject: Re: (subset) [PATCH RFC v2 0/4] wifi: ath10k: support board-specific firmware overrides
+Date: Mon, 22 Apr 2024 08:15:12 -0500
+Message-ID: <171379170888.1217989.8167751161214805581.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240306-wcn3990-firmware-path-v2-0-f89e98e71a57@linaro.org>
+References: <20240306-wcn3990-firmware-path-v2-0-f89e98e71a57@linaro.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240422-fix_poe-v1-2-811c8c0b9da7@bootlin.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
-On Mon, Apr 22, 2024 at 02:50:49PM +0200, Kory Maincent (Dent Project) wrote:
-> From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
+
+On Wed, 06 Mar 2024 10:16:44 +0200, Dmitry Baryshkov wrote:
+> On WCN3990 platforms actual firmware, wlanmdsp.mbn, is sideloaded to the
+> modem DSP via the TQFTPserv. These MBN files are signed by the device
+> vendor, can only be used with the particular SoC or device.
 > 
-> Clarify PSE regulator as voltage regulator, not current.
-> The PSE (Power Sourcing Equipment) regulator is defined as a voltage
-> regulator, maintaining fixed voltage while accommodating varying current.
+> Unfortunately different firmware versions come with different features.
+> For example firmware for SDM845 doesn't use single-chan-info-per-channel
+> feature, while firmware for QRB2210 / QRB4210 requires that feature.
 > 
-> Signed-off-by: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
+> [...]
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Applied, thanks!
 
-    Andrew
+[3/4] arm64: dts: qcom: qrb2210-rb1: add firmware-name qualifier to WiFi node
+      commit: 57ce4b27a12c827a24aaa18aa444bcb8733cb053
+[4/4] arm64: dts: qcom: qrb4210-rb1: add firmware-name qualifier to WiFi node
+      commit: 673b174b5b2ca2fb99fe52bf7bad3cc348432170
+
+Best regards,
+-- 
+Bjorn Andersson <andersson@kernel.org>
 
