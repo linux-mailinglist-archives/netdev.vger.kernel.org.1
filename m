@@ -1,173 +1,329 @@
-Return-Path: <netdev+bounces-90169-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90170-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BA378ACEFA
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 16:09:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F29638ACF0F
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 16:12:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 27AE81F2161F
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 14:09:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 220BD1C20DAA
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 14:12:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A38881509A4;
-	Mon, 22 Apr 2024 14:09:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 281CF1514C3;
+	Mon, 22 Apr 2024 14:12:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XZI2g4Uq"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C37C8150999;
-	Mon, 22 Apr 2024 14:09:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C338414F9E1;
+	Mon, 22 Apr 2024 14:12:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713794947; cv=none; b=VWMGisWlvuJuVwK9yR5J/G4tEfHR+nw4jQw2l3XJ56rXSMQpMZkP3Fj3vDuTdFU+kopsmeedN39mH1fGifVURau919cogYRxpk459gPL4f6B2OzVXJFOE+PczhCT3u910d0mqKBKCnJDFDPPwUtQyQcqyrr9hU5ms9sOhkJ6rAg=
+	t=1713795124; cv=none; b=I8NvMLwqdlQrL69bFqT3d0w6JhCFuJp58mH4j+iwVSK+pPnEAhObe1/JB9IdQQyFcr/XF9+6A/KxCZkqFpC/Qub5zmiLdQmgANRuFdUa2gbPa3HHAySNrMS1eQhezZttUupEirvnPm2HGG6ECYIr75FhebBS0rqX21fhTWzQRLY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713794947; c=relaxed/simple;
-	bh=EyNcns5pQgclKYHILemdW7rew+42rQDhCJV9u1hRB3Y=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=eRyJcO559R3vpvq1nnAnu1+llC42w5mm18guHkAAkcGUr5EZOjf/6pIzwJCrgQv/Bgc3mrP6LSrMUfY2sUUNxVOjSQl9UDSjIaj0x/dlhSOsYRAlshN3AIPUwqQUHO1/IAN43WY65IXbX6MfZ9tEgAgoIKuxxLm5oKsyd2QrC6A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.162.254])
-	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4VNRQ14g22zNspT;
-	Mon, 22 Apr 2024 21:47:21 +0800 (CST)
-Received: from kwepemm600007.china.huawei.com (unknown [7.193.23.208])
-	by mail.maildlp.com (Postfix) with ESMTPS id 0447218007C;
-	Mon, 22 Apr 2024 21:49:51 +0800 (CST)
-Received: from localhost.localdomain (10.67.165.2) by
- kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Mon, 22 Apr 2024 21:49:50 +0800
-From: Jijie Shao <shaojijie@huawei.com>
-To: <yisen.zhuang@huawei.com>, <salil.mehta@huawei.com>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>
-CC: <shenjian15@huawei.com>, <wangjie125@huawei.com>,
-	<liuyonglong@huawei.com>, <shaojijie@huawei.com>, <chenhao418@huawei.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH net 2/7] net: hns3: change type of numa_node_mask as nodemask_t
-Date: Mon, 22 Apr 2024 21:43:22 +0800
-Message-ID: <20240422134327.3160587-3-shaojijie@huawei.com>
-X-Mailer: git-send-email 2.30.0
-In-Reply-To: <20240422134327.3160587-1-shaojijie@huawei.com>
-References: <20240422134327.3160587-1-shaojijie@huawei.com>
+	s=arc-20240116; t=1713795124; c=relaxed/simple;
+	bh=63rvt2yz8r57hl8myRcuStiGVHTSpmv479F+BVPlgOk=;
+	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=EXwSD1gOrzC1UFPRGE5PVklfn2EoSRdpM7bDx5A8c6v9xGY92yUE7DYBMuHjcoWboURdTr2w4X7aiJpQwuRUlk6lCh0sCZljFPZTVx+fOjhme6Pl/doOqdc+R6TiLVs9/VPwgnkJtli8CrbQU9LQGi+34iQfac4+sgukfYDjUD4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XZI2g4Uq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CAAD5C32783;
+	Mon, 22 Apr 2024 14:11:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713795123;
+	bh=63rvt2yz8r57hl8myRcuStiGVHTSpmv479F+BVPlgOk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=XZI2g4UqcleGPHMCMSqV3/iC7oJP0tZWbpfXP00rfR9bLCRfpzFMwC9X4q54oxXMM
+	 DnhZrHtKfWP5KsKR0UwBwIDd4eHpEkLzxxX7LPi42cCObWXCldmkT2ETPDxFRfwhiK
+	 nyXLCvvf3mWcIJjGAf2BRpg+sGk/r9FACse9FCIZKTAIMRKChgqXwhJ7CqFLLV8oy/
+	 QLrmKiFkxPB4YBmwLg/Hf4QkKGO2SUvS8pCcc0bNoMWOtMRS3u0h3n+olJg1vGec5V
+	 55mbL/zgu8a6qrqHPaT4tJ+d8LCTGjRW/TTRHz6/VaV0UanNJA0VfQalKnV9xzPuaQ
+	 EUKZMBGXl8nFQ==
+Date: Mon, 22 Apr 2024 23:11:51 +0900
+From: Masami Hiramatsu (Google) <mhiramat@kernel.org>
+To: Mike Rapoport <rppt@kernel.org>
+Cc: linux-kernel@vger.kernel.org, Alexandre Ghiti <alexghiti@rivosinc.com>,
+ Andrew Morton <akpm@linux-foundation.org>, =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?=
+ <bjorn@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, Christophe
+ Leroy <christophe.leroy@csgroup.eu>, "David S. Miller"
+ <davem@davemloft.net>, Dinh Nguyen <dinguyen@kernel.org>, Donald Dutile
+ <ddutile@redhat.com>, Eric Chanudet <echanude@redhat.com>, Heiko Carstens
+ <hca@linux.ibm.com>, Helge Deller <deller@gmx.de>, Huacai Chen
+ <chenhuacai@kernel.org>, Kent Overstreet <kent.overstreet@linux.dev>, Luis
+ Chamberlain <mcgrof@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+ Masami Hiramatsu <mhiramat@kernel.org>, Michael Ellerman
+ <mpe@ellerman.id.au>, Nadav Amit <nadav.amit@gmail.com>, Palmer Dabbelt
+ <palmer@dabbelt.com>, Peter Zijlstra <peterz@infradead.org>, Rick Edgecombe
+ <rick.p.edgecombe@intel.com>, Russell King <linux@armlinux.org.uk>, Sam
+ Ravnborg <sam@ravnborg.org>, Song Liu <song@kernel.org>, Steven Rostedt
+ <rostedt@goodmis.org>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+ Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
+ bpf@vger.kernel.org, linux-arch@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
+ linux-mm@kvack.org, linux-modules@vger.kernel.org,
+ linux-parisc@vger.kernel.org, linux-riscv@lists.infradead.org,
+ linux-s390@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org, loongarch@lists.linux.dev,
+ netdev@vger.kernel.org, sparclinux@vger.kernel.org, x86@kernel.org
+Subject: Re: [PATCH v5 14/15] kprobes: remove dependency on CONFIG_MODULES
+Message-Id: <20240422231151.0d7c18ec1917887c7f323d4c@kernel.org>
+In-Reply-To: <20240422094436.3625171-15-rppt@kernel.org>
+References: <20240422094436.3625171-1-rppt@kernel.org>
+	<20240422094436.3625171-15-rppt@kernel.org>
+X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- kwepemm600007.china.huawei.com (7.193.23.208)
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-From: Peiyang Wang <wangpeiyang1@huawei.com>
+On Mon, 22 Apr 2024 12:44:35 +0300
+Mike Rapoport <rppt@kernel.org> wrote:
 
-It provides nodemask_t to describe the numa node mask in kernel. To
-improve transportability, change the type of numa_node_mask as nodemask_t.
+> From: "Mike Rapoport (IBM)" <rppt@kernel.org>
+> 
+> kprobes depended on CONFIG_MODULES because it has to allocate memory for
+> code.
+> 
+> Since code allocations are now implemented with execmem, kprobes can be
+> enabled in non-modular kernels.
+> 
+> Add #ifdef CONFIG_MODULE guards for the code dealing with kprobes inside
+> modules, make CONFIG_KPROBES select CONFIG_EXECMEM and drop the
+> dependency of CONFIG_KPROBES on CONFIG_MODULES.
 
-Fixes: 38caee9d3ee8 ("net: hns3: Add support of the HNAE3 framework")
-Signed-off-by: Peiyang Wang <wangpeiyang1@huawei.com>
-Signed-off-by: Jijie Shao <shaojijie@huawei.com>
----
- drivers/net/ethernet/hisilicon/hns3/hnae3.h               | 2 +-
- drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c   | 6 ++++--
- drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.h   | 2 +-
- drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c | 7 ++++---
- drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.h | 2 +-
- 5 files changed, 11 insertions(+), 8 deletions(-)
+Looks good to me.
 
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hnae3.h b/drivers/net/ethernet/hisilicon/hns3/hnae3.h
-index f19f1e1d1f9f..133c94646c21 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hnae3.h
-+++ b/drivers/net/ethernet/hisilicon/hns3/hnae3.h
-@@ -897,7 +897,7 @@ struct hnae3_handle {
- 		struct hnae3_roce_private_info rinfo;
- 	};
- 
--	u32 numa_node_mask;	/* for multi-chip support */
-+	nodemask_t numa_node_mask; /* for multi-chip support */
- 
- 	enum hnae3_port_base_vlan_state port_base_vlan_state;
- 
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-index ff6a2ed23ddb..62ddce05fa2b 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-@@ -1766,7 +1766,8 @@ static int hclge_vport_setup(struct hclge_vport *vport, u16 num_tqps)
- 
- 	nic->pdev = hdev->pdev;
- 	nic->ae_algo = &ae_algo;
--	nic->numa_node_mask = hdev->numa_node_mask;
-+	bitmap_copy(nic->numa_node_mask.bits, hdev->numa_node_mask.bits,
-+		    MAX_NUMNODES);
- 	nic->kinfo.io_base = hdev->hw.hw.io_base;
- 
- 	ret = hclge_knic_setup(vport, num_tqps,
-@@ -2458,7 +2459,8 @@ static int hclge_init_roce_base_info(struct hclge_vport *vport)
- 
- 	roce->pdev = nic->pdev;
- 	roce->ae_algo = nic->ae_algo;
--	roce->numa_node_mask = nic->numa_node_mask;
-+	bitmap_copy(roce->numa_node_mask.bits, nic->numa_node_mask.bits,
-+		    MAX_NUMNODES);
- 
- 	return 0;
- }
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.h b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.h
-index e821dd2f1528..37527b847f2f 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.h
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.h
-@@ -891,7 +891,7 @@ struct hclge_dev {
- 
- 	u16 fdir_pf_filter_count; /* Num of guaranteed filters for this PF */
- 	u16 num_alloc_vport;		/* Num vports this driver supports */
--	u32 numa_node_mask;
-+	nodemask_t numa_node_mask;
- 	u16 rx_buf_len;
- 	u16 num_tx_desc;		/* desc num of per tx queue */
- 	u16 num_rx_desc;		/* desc num of per rx queue */
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c b/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c
-index 0aa9beefd1c7..b57111252d07 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c
-@@ -412,7 +412,8 @@ static int hclgevf_set_handle_info(struct hclgevf_dev *hdev)
- 
- 	nic->ae_algo = &ae_algovf;
- 	nic->pdev = hdev->pdev;
--	nic->numa_node_mask = hdev->numa_node_mask;
-+	bitmap_copy(nic->numa_node_mask.bits, hdev->numa_node_mask.bits,
-+		    MAX_NUMNODES);
- 	nic->flags |= HNAE3_SUPPORT_VF;
- 	nic->kinfo.io_base = hdev->hw.hw.io_base;
- 
-@@ -2082,8 +2083,8 @@ static int hclgevf_init_roce_base_info(struct hclgevf_dev *hdev)
- 
- 	roce->pdev = nic->pdev;
- 	roce->ae_algo = nic->ae_algo;
--	roce->numa_node_mask = nic->numa_node_mask;
--
-+	bitmap_copy(roce->numa_node_mask.bits, nic->numa_node_mask.bits,
-+		    MAX_NUMNODES);
- 	return 0;
- }
- 
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.h b/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.h
-index a73f2bf3a56a..cccef3228461 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.h
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.h
-@@ -236,7 +236,7 @@ struct hclgevf_dev {
- 	u16 rss_size_max;	/* HW defined max RSS task queue */
- 
- 	u16 num_alloc_vport;	/* num vports this driver supports */
--	u32 numa_node_mask;
-+	nodemask_t numa_node_mask;
- 	u16 rx_buf_len;
- 	u16 num_tx_desc;	/* desc num of per tx queue */
- 	u16 num_rx_desc;	/* desc num of per rx queue */
+Acked-by: Masami Hiramatsu (Google) <mhiramat@kernel.org>
+
+Thank you!
+
+> 
+> Signed-off-by: Mike Rapoport (IBM) <rppt@kernel.org>
+> ---
+>  arch/Kconfig                |  2 +-
+>  include/linux/module.h      |  9 ++++++
+>  kernel/kprobes.c            | 55 +++++++++++++++++++++++--------------
+>  kernel/trace/trace_kprobe.c | 20 +++++++++++++-
+>  4 files changed, 63 insertions(+), 23 deletions(-)
+> 
+> diff --git a/arch/Kconfig b/arch/Kconfig
+> index 7006f71f0110..a48ce6a488b3 100644
+> --- a/arch/Kconfig
+> +++ b/arch/Kconfig
+> @@ -52,9 +52,9 @@ config GENERIC_ENTRY
+>  
+>  config KPROBES
+>  	bool "Kprobes"
+> -	depends on MODULES
+>  	depends on HAVE_KPROBES
+>  	select KALLSYMS
+> +	select EXECMEM
+>  	select TASKS_RCU if PREEMPTION
+>  	help
+>  	  Kprobes allows you to trap at almost any kernel address and
+> diff --git a/include/linux/module.h b/include/linux/module.h
+> index 1153b0d99a80..ffa1c603163c 100644
+> --- a/include/linux/module.h
+> +++ b/include/linux/module.h
+> @@ -605,6 +605,11 @@ static inline bool module_is_live(struct module *mod)
+>  	return mod->state != MODULE_STATE_GOING;
+>  }
+>  
+> +static inline bool module_is_coming(struct module *mod)
+> +{
+> +        return mod->state == MODULE_STATE_COMING;
+> +}
+> +
+>  struct module *__module_text_address(unsigned long addr);
+>  struct module *__module_address(unsigned long addr);
+>  bool is_module_address(unsigned long addr);
+> @@ -857,6 +862,10 @@ void *dereference_module_function_descriptor(struct module *mod, void *ptr)
+>  	return ptr;
+>  }
+>  
+> +static inline bool module_is_coming(struct module *mod)
+> +{
+> +	return false;
+> +}
+>  #endif /* CONFIG_MODULES */
+>  
+>  #ifdef CONFIG_SYSFS
+> diff --git a/kernel/kprobes.c b/kernel/kprobes.c
+> index ddd7cdc16edf..ca2c6cbd42d2 100644
+> --- a/kernel/kprobes.c
+> +++ b/kernel/kprobes.c
+> @@ -1588,7 +1588,7 @@ static int check_kprobe_address_safe(struct kprobe *p,
+>  	}
+>  
+>  	/* Get module refcount and reject __init functions for loaded modules. */
+> -	if (*probed_mod) {
+> +	if (IS_ENABLED(CONFIG_MODULES) && *probed_mod) {
+>  		/*
+>  		 * We must hold a refcount of the probed module while updating
+>  		 * its code to prohibit unexpected unloading.
+> @@ -1603,12 +1603,13 @@ static int check_kprobe_address_safe(struct kprobe *p,
+>  		 * kprobes in there.
+>  		 */
+>  		if (within_module_init((unsigned long)p->addr, *probed_mod) &&
+> -		    (*probed_mod)->state != MODULE_STATE_COMING) {
+> +		    !module_is_coming(*probed_mod)) {
+>  			module_put(*probed_mod);
+>  			*probed_mod = NULL;
+>  			ret = -ENOENT;
+>  		}
+>  	}
+> +
+>  out:
+>  	preempt_enable();
+>  	jump_label_unlock();
+> @@ -2488,24 +2489,6 @@ int kprobe_add_area_blacklist(unsigned long start, unsigned long end)
+>  	return 0;
+>  }
+>  
+> -/* Remove all symbols in given area from kprobe blacklist */
+> -static void kprobe_remove_area_blacklist(unsigned long start, unsigned long end)
+> -{
+> -	struct kprobe_blacklist_entry *ent, *n;
+> -
+> -	list_for_each_entry_safe(ent, n, &kprobe_blacklist, list) {
+> -		if (ent->start_addr < start || ent->start_addr >= end)
+> -			continue;
+> -		list_del(&ent->list);
+> -		kfree(ent);
+> -	}
+> -}
+> -
+> -static void kprobe_remove_ksym_blacklist(unsigned long entry)
+> -{
+> -	kprobe_remove_area_blacklist(entry, entry + 1);
+> -}
+> -
+>  int __weak arch_kprobe_get_kallsym(unsigned int *symnum, unsigned long *value,
+>  				   char *type, char *sym)
+>  {
+> @@ -2570,6 +2553,25 @@ static int __init populate_kprobe_blacklist(unsigned long *start,
+>  	return ret ? : arch_populate_kprobe_blacklist();
+>  }
+>  
+> +#ifdef CONFIG_MODULES
+> +/* Remove all symbols in given area from kprobe blacklist */
+> +static void kprobe_remove_area_blacklist(unsigned long start, unsigned long end)
+> +{
+> +	struct kprobe_blacklist_entry *ent, *n;
+> +
+> +	list_for_each_entry_safe(ent, n, &kprobe_blacklist, list) {
+> +		if (ent->start_addr < start || ent->start_addr >= end)
+> +			continue;
+> +		list_del(&ent->list);
+> +		kfree(ent);
+> +	}
+> +}
+> +
+> +static void kprobe_remove_ksym_blacklist(unsigned long entry)
+> +{
+> +	kprobe_remove_area_blacklist(entry, entry + 1);
+> +}
+> +
+>  static void add_module_kprobe_blacklist(struct module *mod)
+>  {
+>  	unsigned long start, end;
+> @@ -2672,6 +2674,17 @@ static struct notifier_block kprobe_module_nb = {
+>  	.priority = 0
+>  };
+>  
+> +static int kprobe_register_module_notifier(void)
+> +{
+> +	return register_module_notifier(&kprobe_module_nb);
+> +}
+> +#else
+> +static int kprobe_register_module_notifier(void)
+> +{
+> +	return 0;
+> +}
+> +#endif /* CONFIG_MODULES */
+> +
+>  void kprobe_free_init_mem(void)
+>  {
+>  	void *start = (void *)(&__init_begin);
+> @@ -2731,7 +2744,7 @@ static int __init init_kprobes(void)
+>  	if (!err)
+>  		err = register_die_notifier(&kprobe_exceptions_nb);
+>  	if (!err)
+> -		err = register_module_notifier(&kprobe_module_nb);
+> +		err = kprobe_register_module_notifier();
+>  
+>  	kprobes_initialized = (err == 0);
+>  	kprobe_sysctls_init();
+> diff --git a/kernel/trace/trace_kprobe.c b/kernel/trace/trace_kprobe.c
+> index 14099cc17fc9..2cb2a3951b4f 100644
+> --- a/kernel/trace/trace_kprobe.c
+> +++ b/kernel/trace/trace_kprobe.c
+> @@ -111,6 +111,7 @@ static nokprobe_inline bool trace_kprobe_within_module(struct trace_kprobe *tk,
+>  	return strncmp(module_name(mod), name, len) == 0 && name[len] == ':';
+>  }
+>  
+> +#ifdef CONFIG_MODULES
+>  static nokprobe_inline bool trace_kprobe_module_exist(struct trace_kprobe *tk)
+>  {
+>  	char *p;
+> @@ -129,6 +130,12 @@ static nokprobe_inline bool trace_kprobe_module_exist(struct trace_kprobe *tk)
+>  
+>  	return ret;
+>  }
+> +#else
+> +static inline bool trace_kprobe_module_exist(struct trace_kprobe *tk)
+> +{
+> +	return false;
+> +}
+> +#endif
+>  
+>  static bool trace_kprobe_is_busy(struct dyn_event *ev)
+>  {
+> @@ -670,6 +677,7 @@ static int register_trace_kprobe(struct trace_kprobe *tk)
+>  	return ret;
+>  }
+>  
+> +#ifdef CONFIG_MODULES
+>  /* Module notifier call back, checking event on the module */
+>  static int trace_kprobe_module_callback(struct notifier_block *nb,
+>  				       unsigned long val, void *data)
+> @@ -704,6 +712,16 @@ static struct notifier_block trace_kprobe_module_nb = {
+>  	.notifier_call = trace_kprobe_module_callback,
+>  	.priority = 1	/* Invoked after kprobe module callback */
+>  };
+> +static int trace_kprobe_register_module_notifier(void)
+> +{
+> +	return register_module_notifier(&trace_kprobe_module_nb);
+> +}
+> +#else
+> +static int trace_kprobe_register_module_notifier(void)
+> +{
+> +	return 0;
+> +}
+> +#endif /* CONFIG_MODULES */
+>  
+>  static int count_symbols(void *data, unsigned long unused)
+>  {
+> @@ -1933,7 +1951,7 @@ static __init int init_kprobe_trace_early(void)
+>  	if (ret)
+>  		return ret;
+>  
+> -	if (register_module_notifier(&trace_kprobe_module_nb))
+> +	if (trace_kprobe_register_module_notifier())
+>  		return -EINVAL;
+>  
+>  	return 0;
+> -- 
+> 2.43.0
+> 
+
+
 -- 
-2.30.0
-
+Masami Hiramatsu (Google) <mhiramat@kernel.org>
 
