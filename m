@@ -1,105 +1,127 @@
-Return-Path: <netdev+bounces-90307-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90310-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E4A78AD94B
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 01:48:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FA298ADA4C
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 02:09:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C069EB21F25
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 23:48:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3B3AA1C20433
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 00:09:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F40B245BE7;
-	Mon, 22 Apr 2024 23:48:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4C1B16F26C;
+	Mon, 22 Apr 2024 23:57:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="UHZDGDqB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KfI2qZAx"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 448C44594A;
-	Mon, 22 Apr 2024 23:48:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7606716F265;
+	Mon, 22 Apr 2024 23:57:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713829696; cv=none; b=u86qN63pYzm07tWN7TLeXva83Ql1d36XzdSbIek2aM/NNOtQ/jG4AvUtt16W/nXqccDIrJzz3oiBPznT8uYhhjTdOcceKXSiZIQEyAqgfWJm4BLGMPNqeCG7XWNBIed33/+0GxPGVWxjBFZeZJ05nB/CB1ku8AAJmGJfe04zAJI=
+	t=1713830226; cv=none; b=DjnwTkmzGxbdy/ZPpdUZYp9hADgMFyo1qm9TjC5xXnTdbP8W5zJGymKjgDAakjnyvD0SPzZGpzCBkGtNOACkjs2x4G5jHNMjc/n1K639ANInCyacLiAn2afrBQngee77UutZlM4f8gfTB7v7vScrqSsA9CrWjdd/B8ysuXtOVJc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713829696; c=relaxed/simple;
-	bh=Yc7YfWV2OqvmkQgm70k9rhjjb7dMSGGm3abJbjnnWc4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ghj9A/BVjpLOHggjWe4wncsYAehhdD5Vi8ZwD4brDl34VoUD70X5k7RxRFg6boBo1JP3WBSRQ9KZkrH1QhbExwSgSzXSt2hrOBMBNrv21weR8OOfu6yuXKFyV7qamaAsR7OCopcpeSipz3ndwy6PjCTS84wPaKNz07f0Z/pScL4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=UHZDGDqB; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=oV2rilDACRGG3Sdf0w7IaYABAzDPmTQsqLTOnBjeGwE=; b=UHZDGDqBNYq7P1mjDd30ejFhUc
-	it+/XVOFbwFOFYcEmqzHgU5B+bQvioDGkQ4IZZk1iWQqglQo2sTpWVQrA7mZWdsC4l3SRu2hwyJkj
-	lcht0YVXUDwGFNXyVsSlNuZjkr477iAxbt8wYUDY2gTQ+SDBZk8KCDDZaCsTXvbfmRic=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rz3OE-00DezN-Dt; Tue, 23 Apr 2024 01:48:02 +0200
-Date: Tue, 23 Apr 2024 01:48:02 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, horms@kernel.org, saeedm@nvidia.com,
-	anthony.l.nguyen@intel.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, corbet@lwn.net,
-	linux-doc@vger.kernel.org, robh+dt@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
-	devicetree@vger.kernel.org, horatiu.vultur@microchip.com,
-	ruanjinjie@huawei.com, steen.hegelund@microchip.com,
-	vladimir.oltean@nxp.com, UNGLinuxDriver@microchip.com,
-	Thorsten.Kummermehr@microchip.com, Pier.Beruto@onsemi.com,
-	Selvamani.Rajagopal@onsemi.com, Nicolas.Ferre@microchip.com,
-	benjamin.bigler@bernformulastudent.ch
-Subject: Re: [PATCH net-next v4 02/12] net: ethernet: oa_tc6: implement
- register write operation
-Message-ID: <358658e7-70b8-41c3-8999-0d6ebbc8c9b8@lunn.ch>
-References: <20240418125648.372526-1-Parthiban.Veerasooran@microchip.com>
- <20240418125648.372526-3-Parthiban.Veerasooran@microchip.com>
+	s=arc-20240116; t=1713830226; c=relaxed/simple;
+	bh=hbF//MQ3NjhgP0EtEYpKMD7hF56CxP2QRjffX7aq5Ws=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=tKmIigKfvNOzeyAw+zxMS6UcIBKbEFaGtnrfZjbgsT9rxW0mMnJw/0TBQDc14uUOSEdWrZHq2iIDnXVWTiTOkh8bawjhEte+FqHoOsVyH/vBsZjqDgXcxdapXSw5eHz6TonB8vqly9YyHnp417+n627kOWCqutsE4IG4GMBTbis=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KfI2qZAx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99408C32782;
+	Mon, 22 Apr 2024 23:57:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713830226;
+	bh=hbF//MQ3NjhgP0EtEYpKMD7hF56CxP2QRjffX7aq5Ws=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=KfI2qZAxay+GXMZNxPTHTDX0rCf68hl+FwKYv04csxdeha1MazNOKENAH5YLx38tG
+	 tUQ8gOCZIzN8RaCQhAy54/mQ+Gj8PmXz51q84UUJ1HatQhWHd5VYX2R40yoJEptNML
+	 3aSohMv9cEhJxsJGZshad/hLJPp+w8mezxZInB47aE0YuuDZQEYW6EaSVWji1OvlSn
+	 XSLUs5X5B5cdK6vsXVwz3IhwO3qPEW/LRtS4L9wHydrXZD8kra1QBK4Qbt0WDrZuRN
+	 JJXOorGvykRl/bVyjUk6+PXI5S3XLHPsiUNt0cA0yR7X72/o/21XSar6nfv6bQeYAR
+	 XacNDyYEd7UqQ==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: Rick Edgecombe <rick.p.edgecombe@intel.com>,
+	Michael Kelley <mhklinux@outlook.com>,
+	Kuppuswamy Sathyanarayanan <sathyanarayanan.kuppuswamy@linux.intel.com>,
+	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+	Wei Liu <wei.liu@kernel.org>,
+	Sasha Levin <sashal@kernel.org>,
+	kys@microsoft.com,
+	haiyangz@microsoft.com,
+	decui@microsoft.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.6 25/29] hv_netvsc: Don't free decrypted memory
+Date: Mon, 22 Apr 2024 19:17:06 -0400
+Message-ID: <20240422231730.1601976-25-sashal@kernel.org>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240422231730.1601976-1-sashal@kernel.org>
+References: <20240422231730.1601976-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240418125648.372526-3-Parthiban.Veerasooran@microchip.com>
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.6.28
+Content-Transfer-Encoding: 8bit
 
-> +/**
-> + * oa_tc6_write_registers - function for writing multiple consecutive registers.
-> + * @tc6: oa_tc6 struct.
-> + * @address: address of the first register to be written in the MAC-PHY.
-> + * @value: values to be written from the starting register address @address.
-> + * @length: number of consecutive registers to be written from @address.
-> + *
-> + * Maximum of 128 consecutive registers can be written starting at @address.
-> + *
-> + * Returns 0 on success otherwise failed.
-> + */
+From: Rick Edgecombe <rick.p.edgecombe@intel.com>
 
-I think the static analyser tools are getting more picky, and what
-'Return:' .
+[ Upstream commit bbf9ac34677b57506a13682b31a2a718934c0e31 ]
 
-https://elixir.bootlin.com/linux/latest/source/Documentation/doc-guide/kernel-doc.rst#L86
+In CoCo VMs it is possible for the untrusted host to cause
+set_memory_encrypted() or set_memory_decrypted() to fail such that an
+error is returned and the resulting memory is shared. Callers need to
+take care to handle these errors to avoid returning decrypted (shared)
+memory to the page allocator, which could lead to functional or security
+issues.
 
-All the examples use Return:
+The netvsc driver could free decrypted/shared pages if
+set_memory_decrypted() fails. Check the decrypted field in the gpadl
+to decide whether to free the memory.
 
-That document also says:
+Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
+Signed-off-by: Michael Kelley <mhklinux@outlook.com>
+Reviewed-by: Kuppuswamy Sathyanarayanan <sathyanarayanan.kuppuswamy@linux.intel.com>
+Acked-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+Link: https://lore.kernel.org/r/20240311161558.1310-4-mhklinux@outlook.com
+Signed-off-by: Wei Liu <wei.liu@kernel.org>
+Message-ID: <20240311161558.1310-4-mhklinux@outlook.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/net/hyperv/netvsc.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-The documentation format is verified by the kernel build when it is
-requested to perform extra gcc checks::
+diff --git a/drivers/net/hyperv/netvsc.c b/drivers/net/hyperv/netvsc.c
+index 4f9658a741024..b2f27e505f76c 100644
+--- a/drivers/net/hyperv/netvsc.c
++++ b/drivers/net/hyperv/netvsc.c
+@@ -154,8 +154,11 @@ static void free_netvsc_device(struct rcu_head *head)
+ 	int i;
+ 
+ 	kfree(nvdev->extension);
+-	vfree(nvdev->recv_buf);
+-	vfree(nvdev->send_buf);
++
++	if (!nvdev->recv_buf_gpadl_handle.decrypted)
++		vfree(nvdev->recv_buf);
++	if (!nvdev->send_buf_gpadl_handle.decrypted)
++		vfree(nvdev->send_buf);
+ 	bitmap_free(nvdev->send_section_map);
+ 
+ 	for (i = 0; i < VRSS_CHANNEL_MAX; i++) {
+-- 
+2.43.0
 
-	make W=n
-
-And if patchwork can apply your patches, it also checks for problems
-like this.
-
-    Andrew
 
