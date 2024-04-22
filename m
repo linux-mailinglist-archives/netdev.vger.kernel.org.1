@@ -1,118 +1,155 @@
-Return-Path: <netdev+bounces-90094-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90095-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id F264A8ACC7D
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 14:09:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9B748ACC90
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 14:11:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9A60CB23FDC
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 12:09:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 95BEC285B6B
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 12:11:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C695D146D7D;
-	Mon, 22 Apr 2024 12:09:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 155B01474A7;
+	Mon, 22 Apr 2024 12:11:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g8xo5x/v"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CFHTz0AC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36D171448E5
-	for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 12:09:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C96DD146D63
+	for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 12:11:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713787759; cv=none; b=qORTJDWT9ogHajDo2a7MuMO/AXzAchfmzU9VesycZairZgzq34OF1J0HiddxIONGdvWw/5y7VnbSlsvy/qDS+NGKjPWEMZ2GTiSWnSR+whoB+kI7cUeH7vvtpjVJ4LNRa01q15XBerb2jcu8SkSfbZKonrh3LNYYwddbZTmrDVo=
+	t=1713787901; cv=none; b=NMkqx+y/4si/YRwNQh3icjrwJ99V+ZBXn4FOoM481rRpmSSPUgeUqjd6FLLiopWG/qq6zJAAV6T88ciS06MytijnyGwfn2kmjOlHNOrNRu297XAs03L7OYHlf1sYYZyT2SVcNn6mT1SHtQCkpj9HVpQBPfogdGo6H5YPxnwIY5I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713787759; c=relaxed/simple;
-	bh=di9sBsaIZg/SBOPjkTePgnH3iNpf7xSHnUD9plckD9Y=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
-	 MIME-Version:Content-Type; b=QX6l+8fEuToLrZjVGTXQfi9/UImjuYKFKXX2gmkn94uXgdzxyHWe8Holtd8jCTiKyBnhxX+bLIACJH0ft3gvlVM2nYGnqESaiYj4J73raBY8nR+dbPTGR9+LSX134VApPLDaLktCrKnkg3gDnhEJw8AX/bIJ2F3BIaApGejNOgk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g8xo5x/v; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-418c2bf2f55so28875885e9.2
-        for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 05:09:18 -0700 (PDT)
+	s=arc-20240116; t=1713787901; c=relaxed/simple;
+	bh=P+ngD7651DKaxK2xXQRIyCnuFIb7V6Y5I4v0Y+4liW4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=cBFBqxnT4Gx0IOJ9xrvP+CyUiok5H3ieDtkpr+jmSnTzMAtEBFBP5sOOq/yGAscRbq/50irrppfpyAwSEedGYS2jVRd/GhcTFWGQje66x8Xo4dLCAaGhFe6ZTv8MLecR05OR5nVHiKNS4lAOAW4ySqhDsTcytAp9Szos2+VQSC4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=CFHTz0AC; arc=none smtp.client-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-41a1d88723bso8350415e9.0
+        for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 05:11:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713787756; x=1714392556; darn=vger.kernel.org;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Q85A1ZcmKJJIRH+TuaFh9yTmESgOk1vCrMNPOrJ0bCo=;
-        b=g8xo5x/vOm5eWd19ZZa/fxh9cKUFQSAY1xGnPMC6Z4o6vhwYIfbN8BAAOnDI8/Cv8Y
-         6ELCtu2gz5EhV7KMeAs+yVqSihfd9StqDDUitnaIPlmUjJj/RJOdNd0lwYfxeziJUbRO
-         ch1iJJgkSP1ogyQAGUEcTtOCmasroqc65ro6t5+gWS6noJL95gQt8wMTRLGh/yG64cia
-         EonhtMiT06Pe6XEMxNBOMyZGJC+eNUCNaS88mpz73JAmCXQBQBxrj5IvV+Tyr0zUg8KP
-         YvICYcR+KUDze/W6Vza2qVVg/UEdQi4wpfw1RGZeu+bFM/7PJMaw5MeeXJwDTbfq8FbN
-         xlZA==
+        d=linaro.org; s=google; t=1713787897; x=1714392697; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=bCRnuZK0O/QOXHu1Ldkstjl1doP0jCVLWLbPZKH0WnQ=;
+        b=CFHTz0ACeA5cePDuWJvlh0c8tKCX+vdZE51F+lymx2ic2Y7hs2eXx05OW4IBWO5NY7
+         enwTee91Ffu3VfDwyIkmea7VIvN1ABlqbVpYWHDO8qGLChX0hoAO+wasQMUtc896zpHB
+         QxjKoTPskxJNDiDIqOlKG4CIT6U73cuCt0Vs9fgQM0ezVMx0psIJB9CigTkRj5XWIUKW
+         xaeJd3fUGhkumQtrwTPbnfBgS5vg69UeFthGeF6sKzOfXwJNG5K2/VFS9jCmhxkfP77J
+         31QAA9xu9VEv3dBKe3932dOMZdSw5hMYLReIRTM78EV4NCYcxeN6zzWPjQTuz5Shh7PR
+         Wv3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713787756; x=1714392556;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Q85A1ZcmKJJIRH+TuaFh9yTmESgOk1vCrMNPOrJ0bCo=;
-        b=czYn7SPmghucA1pPImDMyBSYKKPxx9mLYnArN6VOGiP/xenvTEy17ffRnPR8dm8acS
-         j/DoFxgT3NGgOdbn6zlRPLquWjI4okX3GEj2E4SKBgopJIc2ofG/HWIEvOvy6sWrf4qA
-         9/HGfzje7FdVnJSz5+IsD4vQl5ceFTvrUOBZj3FvIbM1KBKu9r1B6NLxbKhRMN3xQmIL
-         gA5WlUT+JZtBZmzG/HYylXh5BQk16uCyvzIkyegPhs1RGrMz3vuhDEdlRdQz+N2YVSVt
-         aA3FCgkaZizcw2n/ZdPHWgjI60to/tIwRbTG1d4dvuBfZeIkT4HRU3vC/ztyJzRzJNFf
-         SAIA==
-X-Forwarded-Encrypted: i=1; AJvYcCWNowMszilMk34kJRwIMJZjuo3kpiuo1iEEID6ZecMFwqWpXRntI7bXf6D1E51x+Vzk3p5Et7bwyrniExLqzzzvMWtxlhsl
-X-Gm-Message-State: AOJu0Yy3aTmw/C8oBUTVBpekjz9xZgOEyfbf53FDCxW4057NwHLO8aCT
-	o9OX9ss156VSAjTU96vpyCDLyXUZ3R3tG+t/mID3ONGstroHlBWmaBs+1w==
-X-Google-Smtp-Source: AGHT+IE/e/Ok6/G1ebpGLGtjM3/GrFfPvc4KkpWSDzyMD0BUKVMKVjDI9wKgo6XB87dxkjWVGnDmeA==
-X-Received: by 2002:a05:600c:3d16:b0:41a:3407:78e5 with SMTP id bh22-20020a05600c3d1600b0041a340778e5mr2633258wmb.12.1713787756399;
-        Mon, 22 Apr 2024 05:09:16 -0700 (PDT)
-Received: from imac ([2a02:8010:60a0:0:1c85:90cc:480f:645b])
-        by smtp.gmail.com with ESMTPSA id c11-20020adffb0b000000b0034b1a91be72sm14820wrr.14.2024.04.22.05.09.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Apr 2024 05:09:15 -0700 (PDT)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net,  netdev@vger.kernel.org,  edumazet@google.com,
-  pabeni@redhat.com,  jiri@resnulli.us,  sdf@google.com
-Subject: Re: [PATCH net] tools: ynl: don't ignore errors in NLMSG_DONE messages
-In-Reply-To: <20240420020827.3288615-1-kuba@kernel.org> (Jakub Kicinski's
-	message of "Fri, 19 Apr 2024 19:08:26 -0700")
-Date: Mon, 22 Apr 2024 13:08:20 +0100
-Message-ID: <m21q6xha6j.fsf@gmail.com>
-References: <20240420020827.3288615-1-kuba@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+        d=1e100.net; s=20230601; t=1713787897; x=1714392697;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=bCRnuZK0O/QOXHu1Ldkstjl1doP0jCVLWLbPZKH0WnQ=;
+        b=Is0tOYEJdPonrFZni1wXtd9Wda5qzsXbRtvXaLAiR8d0lq83eNLcZH1cq7tiGWNAxS
+         kzdqbhPSW02x2Q8leoksvgSYEF81kv08D/jg0cN7PzzYyDJWVFsONx4/IxvfgbDTDXNS
+         +OKcUgGJyA0VZnmnKaaN0PjQe7PURcXvODhk2BSWuwYZz1yRLsAHQApVZpWzfglibQOL
+         NQaiQ513+HzL5dCGB79aB/KpuREGlwu7BtyTBphwRKYXqBN7asDXTZz0OR4cHKCTJQCz
+         IYesW+QhS5kLoNwfkaIWk/FjubstPOsGq6wvzPoz4ne605Z3W3I3BS7x2gpPJ97SJF3K
+         x8MA==
+X-Forwarded-Encrypted: i=1; AJvYcCWvNqhsjQw0es7nEu5pEjRimXk1YDS5UsioHVV/I0sX/YJZvQ08y2f3rWX1yhqbnGRGN1xS/vgYHIf+BlDEpudTXnZkgiJH
+X-Gm-Message-State: AOJu0Yzy9AsirToqMT3GHHQ4wS40H4/LSAeQpi28UQ+GtBnXo5C6qHy1
+	KA8T3FP1C5de3HFTwGFh+xiVvtWhIoGhkIaJ/ZCmuyNh7JiZ3BZ8tu6fnTlMr5k=
+X-Google-Smtp-Source: AGHT+IHynTNWSPs7rYJt+CqENDAY0rj5tOUJ3mwkpUrvPfTTqXCsLGZ4LMBMh1xVXt1DdTNJhAB4yQ==
+X-Received: by 2002:a05:600c:3552:b0:419:7fd:2fbe with SMTP id i18-20020a05600c355200b0041907fd2fbemr5536580wmq.11.1713787897251;
+        Mon, 22 Apr 2024 05:11:37 -0700 (PDT)
+Received: from [192.168.1.28] (lfbn-bay-1-170-196.w83-193.abo.wanadoo.fr. [83.193.250.196])
+        by smtp.gmail.com with ESMTPSA id r14-20020a05600c458e00b00417e5b71188sm16503881wmo.34.2024.04.22.05.11.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 22 Apr 2024 05:11:36 -0700 (PDT)
+Message-ID: <fb942d49-1c72-40a6-8309-ef3331d8f8dc@linaro.org>
+Date: Mon, 22 Apr 2024 14:11:34 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 11/15] arch: make execmem setup available regardless of
+ CONFIG_MODULES
+To: Mike Rapoport <rppt@kernel.org>, linux-kernel@vger.kernel.org
+Cc: Alexandre Ghiti <alexghiti@rivosinc.com>,
+ Andrew Morton <akpm@linux-foundation.org>, =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?=
+ <bjorn@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
+ Christophe Leroy <christophe.leroy@csgroup.eu>,
+ "David S. Miller" <davem@davemloft.net>, Dinh Nguyen <dinguyen@kernel.org>,
+ Donald Dutile <ddutile@redhat.com>, Eric Chanudet <echanude@redhat.com>,
+ Heiko Carstens <hca@linux.ibm.com>, Helge Deller <deller@gmx.de>,
+ Huacai Chen <chenhuacai@kernel.org>,
+ Kent Overstreet <kent.overstreet@linux.dev>,
+ Luis Chamberlain <mcgrof@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+ Masami Hiramatsu <mhiramat@kernel.org>, Michael Ellerman
+ <mpe@ellerman.id.au>, Nadav Amit <nadav.amit@gmail.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>, Peter Zijlstra <peterz@infradead.org>,
+ Rick Edgecombe <rick.p.edgecombe@intel.com>,
+ Russell King <linux@armlinux.org.uk>, Sam Ravnborg <sam@ravnborg.org>,
+ Song Liu <song@kernel.org>, Steven Rostedt <rostedt@goodmis.org>,
+ Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+ Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
+ bpf@vger.kernel.org, linux-arch@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
+ linux-mm@kvack.org, linux-modules@vger.kernel.org,
+ linux-parisc@vger.kernel.org, linux-riscv@lists.infradead.org,
+ linux-s390@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org, loongarch@lists.linux.dev,
+ netdev@vger.kernel.org, sparclinux@vger.kernel.org, x86@kernel.org
+References: <20240422094436.3625171-1-rppt@kernel.org>
+ <20240422094436.3625171-12-rppt@kernel.org>
+Content-Language: en-US
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+In-Reply-To: <20240422094436.3625171-12-rppt@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Jakub Kicinski <kuba@kernel.org> writes:
-
-> NLMSG_DONE contains an error code, it has to be extracted.
-> Prior to this change all dumps will end in success,
-> and in case of failure the result is silently truncated.
->
-> Fixes: e4b48ed460d3 ("tools: ynl: add a completely generic client")
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-
-Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
-
+On 22/4/24 11:44, Mike Rapoport wrote:
+> From: "Mike Rapoport (IBM)" <rppt@kernel.org>
+> 
+> execmem does not depend on modules, on the contrary modules use
+> execmem.
+> 
+> To make execmem available when CONFIG_MODULES=n, for instance for
+> kprobes, split execmem_params initialization out from
+> arch/*/kernel/module.c and compile it when CONFIG_EXECMEM=y
+> 
+> Signed-off-by: Mike Rapoport (IBM) <rppt@kernel.org>
 > ---
-> CC: donald.hunter@gmail.com
-> CC: jiri@resnulli.us
-> CC: sdf@google.com
-> ---
->  tools/net/ynl/lib/ynl.py | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/tools/net/ynl/lib/ynl.py b/tools/net/ynl/lib/ynl.py
-> index a67f7b6fef92..a9e4d588baf6 100644
-> --- a/tools/net/ynl/lib/ynl.py
-> +++ b/tools/net/ynl/lib/ynl.py
-> @@ -203,6 +203,7 @@ from .nlspec import SpecFamily
->              self.done = 1
->              extack_off = 20
->          elif self.nl_type == Netlink.NLMSG_DONE:
-> +            self.error = struct.unpack("i", self.raw[0:4])[0]
->              self.done = 1
->              extack_off = 4
+>   arch/arm/kernel/module.c       |  43 ----------
+>   arch/arm/mm/init.c             |  45 +++++++++++
+>   arch/arm64/kernel/module.c     | 140 ---------------------------------
+>   arch/arm64/mm/init.c           | 140 +++++++++++++++++++++++++++++++++
+>   arch/loongarch/kernel/module.c |  19 -----
+>   arch/loongarch/mm/init.c       |  21 +++++
+>   arch/mips/kernel/module.c      |  22 ------
+>   arch/mips/mm/init.c            |  23 ++++++
+>   arch/nios2/kernel/module.c     |  20 -----
+>   arch/nios2/mm/init.c           |  21 +++++
+>   arch/parisc/kernel/module.c    |  20 -----
+>   arch/parisc/mm/init.c          |  23 +++++-
+>   arch/powerpc/kernel/module.c   |  63 ---------------
+>   arch/powerpc/mm/mem.c          |  64 +++++++++++++++
+>   arch/riscv/kernel/module.c     |  44 -----------
+>   arch/riscv/mm/init.c           |  45 +++++++++++
+>   arch/s390/kernel/module.c      |  27 -------
+>   arch/s390/mm/init.c            |  30 +++++++
+>   arch/sparc/kernel/module.c     |  19 -----
+>   arch/sparc/mm/Makefile         |   2 +
+>   arch/sparc/mm/execmem.c        |  21 +++++
+>   arch/x86/kernel/module.c       |  27 -------
+>   arch/x86/mm/init.c             |  29 +++++++
+>   23 files changed, 463 insertions(+), 445 deletions(-)
+>   create mode 100644 arch/sparc/mm/execmem.c
+
+Reviewed-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+
 
