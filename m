@@ -1,112 +1,89 @@
-Return-Path: <netdev+bounces-90165-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90160-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A29588ACEB2
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 15:50:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3EAC88ACE8D
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 15:43:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D4ECD1C21291
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 13:50:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ECFF8281742
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 13:43:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A4FF152163;
-	Mon, 22 Apr 2024 13:50:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A766D14F9C5;
+	Mon, 22 Apr 2024 13:43:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YkxA/mBG"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E12B21514E2;
-	Mon, 22 Apr 2024 13:50:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 842BB5028B
+	for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 13:43:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713793802; cv=none; b=tCYjc/e1oDSIVwGEoU1msrXCWLb4x5p72aeeFkGmbTFuGRbAc7MeqR6aQ8xuU0dV3YZKAFzUjfOpnd6OIsUsY3E/QYrT1M9A2CHNl+k/H5gL5qeZi4EL9naYQjDKXI6pqw+UevFBSlDaTPfrbZRtWRXDVxv75JDZLv4Yep3IM4w=
+	t=1713793429; cv=none; b=E324D3r+gDC8xQBP3LMl+lMVydwXYHL+xmYsnwxPFddoYRQvcUoBGvskF1NYJpktEQf94DGdGTvd5/C5aHYe5LdgdpjZkW1c2XB+hDyVaRO5eiBHMFaR1a9HIwYLoWO1lj0nyh13y8eeG1T1g5ovts2spbNDUXt9O0J2hKRgvNI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713793802; c=relaxed/simple;
-	bh=5yvgi9mrQAF3qOurmIWeU5dX0slS7fJ6ldV2mGba9Lc=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JzU4BxWJr2Xsk/4KtjelO975nY3TXsDDD5hk82jQb39wwckjmIsbGqJiASlemakL/KbLfm40RL0Hw+rDQfg/UXbwcxHTMeK/cKCXVLimvDzVtET6rTMy8eCfuQgK+sjOmQkQl1pj94EK977IIcP8MrT01gbVrJatluJLjNns5NA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.252])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4VNRNy5vlqzXmCw;
-	Mon, 22 Apr 2024 21:46:26 +0800 (CST)
-Received: from kwepemm600007.china.huawei.com (unknown [7.193.23.208])
-	by mail.maildlp.com (Postfix) with ESMTPS id 6D5F318007D;
-	Mon, 22 Apr 2024 21:49:53 +0800 (CST)
-Received: from localhost.localdomain (10.67.165.2) by
- kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Mon, 22 Apr 2024 21:49:52 +0800
-From: Jijie Shao <shaojijie@huawei.com>
-To: <yisen.zhuang@huawei.com>, <salil.mehta@huawei.com>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>
-CC: <shenjian15@huawei.com>, <wangjie125@huawei.com>,
-	<liuyonglong@huawei.com>, <shaojijie@huawei.com>, <chenhao418@huawei.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH net 7/7] net: hns3: fix kernel crash when devlink reload during vf initialization
-Date: Mon, 22 Apr 2024 21:43:27 +0800
-Message-ID: <20240422134327.3160587-8-shaojijie@huawei.com>
-X-Mailer: git-send-email 2.30.0
-In-Reply-To: <20240422134327.3160587-1-shaojijie@huawei.com>
-References: <20240422134327.3160587-1-shaojijie@huawei.com>
+	s=arc-20240116; t=1713793429; c=relaxed/simple;
+	bh=VbX/CWak+f/znblvggqmEsaLUhXMK5f+MjExaZ91ujU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=iqcVnYmxZhBLXkLJcWx4wQ7HPL4nckOff9sPzDgqdasF9Sqlbeogw0nNSV1+iBt2r6dhP84uJKymzZi/4BWQ9k1e2ijB+Fgum4qPvpIAPeko6WHufsqTIVbh+mCkq0uNa2gvli1ZmHxVQhwfkwBpdiL//JsP/18boYvH5PKH4Uc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YkxA/mBG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7500BC113CC;
+	Mon, 22 Apr 2024 13:43:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713793429;
+	bh=VbX/CWak+f/znblvggqmEsaLUhXMK5f+MjExaZ91ujU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=YkxA/mBGXx/vhG98dSobWf3z27+mSoWgtD+2lTr4zjDI8PZleqPgnNhIsL5j4hkck
+	 he5Fw+p9Ce7wg5BfiqpyvZmOJfufYxYuFNapKlOAPqfsAKryVoIZePI/7zCVrz7nhd
+	 vDu5MO73Rb3ea0g1d4jmyqQtiViXjReEZxOWUCN17xJnYa+PTCALDzCpaJj5hbPjya
+	 f8SYJK0M4b6Bui5bHsFxYsZlDfw6hK9clRf1RG9YV8s9btX9A+317bXfb1Su9Rsy45
+	 GqqMqMZ63O4Hlg8mOzmxpPYul0PkouL+xALGwQ3l54zASaa9G65WhbDxGYsLy/+dxK
+	 ANoohquTcueOg==
+Date: Mon, 22 Apr 2024 15:43:44 +0200
+From: Marek =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: netdev@vger.kernel.org, Russell King <rmk+kernel@armlinux.org.uk>, Raju
+ Lakkaraju <Raju.Lakkaraju@microchip.com>, Frank Wunderlich
+ <frank-w@public-files.de>, Simon Horman <simon.horman@corigine.com>, Eric
+ Woudstra <ericwouds@gmail.com>, Heiner Kallweit <hkallweit1@gmail.com>
+Subject: Re: [PATCH net-next 2/2] net: sfp: enhance quirk for Fibrestore
+ 2.5G copper SFP module
+Message-ID: <20240422154344.434df4ed@dellmb>
+In-Reply-To: <4e07c66a-fd5d-4640-8a26-c64426aa3c7e@lunn.ch>
+References: <20240422094435.25913-1-kabel@kernel.org>
+	<20240422094435.25913-2-kabel@kernel.org>
+	<4e07c66a-fd5d-4640-8a26-c64426aa3c7e@lunn.ch>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.41; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- kwepemm600007.china.huawei.com (7.193.23.208)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-From: Yonglong Liu <liuyonglong@huawei.com>
+On Mon, 22 Apr 2024 15:12:55 +0200
+Andrew Lunn <andrew@lunn.ch> wrote:
 
-The devlink reload process will access the hardware resources,
-but the register operation is done before the hardware is initialized.
-So, processing the devlink reload during initialization may lead to kernel
-crash. This patch fixes this by taking devl_lock during initialization.
+> > The PHY inside the module is Realtek RTL8221B-VB-CG PHY, for which
+> > the realtek driver we only recently gained support to set it up via
+> > clause 45 accesses.  
+> 
+> This sentence does not parse very well.
+> 
+> The PHY inside the module is a Realtek RTL8221B-VB-CG. The realtek
+> driver recently gained support to set it up via clause 45 accesses.
+> 
+> ???
+> 
+> 
+>     Andrew
+> 
+> ---
+> pw-bot: cr
 
-Fixes: cd6242991d2e ("net: hns3: add support for registering devlink for VF")
-Signed-off-by: Yonglong Liu <liuyonglong@huawei.com>
-Signed-off-by: Jijie Shao <shaojijie@huawei.com>
----
- drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c b/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c
-index 08db8e84be4e..3ee41943d15f 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c
-@@ -2849,6 +2849,8 @@ static int hclgevf_init_hdev(struct hclgevf_dev *hdev)
- 	if (ret)
- 		goto err_devlink_init;
- 
-+	devl_lock(hdev->devlink);
-+
- 	ret = hclge_comm_cmd_queue_init(hdev->pdev, &hdev->hw.hw);
- 	if (ret)
- 		goto err_cmd_queue_init;
-@@ -2950,6 +2952,7 @@ static int hclgevf_init_hdev(struct hclgevf_dev *hdev)
- 	hclgevf_task_schedule(hdev, round_jiffies_relative(HZ));
- 	timer_setup(&hdev->reset_timer, hclgevf_reset_timer, 0);
- 
-+	devl_unlock(hdev->devlink);
- 	return 0;
- 
- err_config:
-@@ -2960,6 +2963,7 @@ static int hclgevf_init_hdev(struct hclgevf_dev *hdev)
- err_cmd_init:
- 	hclge_comm_cmd_uninit(hdev->ae_dev, &hdev->hw.hw);
- err_cmd_queue_init:
-+	devl_unlock(hdev->devlink);
- 	hclgevf_devlink_uninit(hdev);
- err_devlink_init:
- 	hclgevf_pci_uninit(hdev);
--- 
-2.30.0
-
+Sorry about this, will send v2 :)
 
