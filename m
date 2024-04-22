@@ -1,105 +1,113 @@
-Return-Path: <netdev+bounces-90185-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90197-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD0D68AD0A9
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 17:29:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 451BE8AD0DB
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 17:31:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 688D8287041
-	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 15:29:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 01EFB28C5FD
+	for <lists+netdev@lfdr.de>; Mon, 22 Apr 2024 15:31:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF3F6153BDC;
-	Mon, 22 Apr 2024 15:28:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="EmWtq4BC"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0879F1534F2;
+	Mon, 22 Apr 2024 15:31:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C73C153BD4;
-	Mon, 22 Apr 2024 15:28:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30B07152E1F;
+	Mon, 22 Apr 2024 15:31:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713799691; cv=none; b=S+jgDTsW86SlLfNezdXoCgqokOAImp+LMpBCeFFHMbhpvnuMRkmm9PG6RVH3Zr3Xro70GjIaapafti/y7J78ajQ4L5fR6oSu83gcPWMfIP3Sbnx78siu9TeL6NyKQJU8bk6E8sdD2R/PM1rww8ChQfvKOitj5TVErQILsCw6+ng=
+	t=1713799894; cv=none; b=slNnfrmxHCd5qD9J21b5XjPq+MtA69kv+6BZpgOwqeSNXkF5M3ddH5kY5jntxh2oxTNUoV5ZTS7iGiBpCnmQGf1bXyFd/8uwUkd/G0Eh9RxcpM1cuGAdOLFlPdJUz+Tp+/9YP4O+g0zeZZFO5xxk0/HV3EGw/TOd96VlvkpINx4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713799691; c=relaxed/simple;
-	bh=hQh9FuW56vkudkOGmDgSrmvY96HwoJBQhUhM8CETBGY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=G3n+0EoNorbRB3VUG3OPqwNd6q03SlkNPNC2uToufd1bk2UYlpg6xd/vE4mufGHEtcZRjkqj5DGwA25X/Th4foHjhwlVLxPY02gSzOSqNVyY8J+wgDDradrjlcPmx9+7H3yyQFa96q7E6fO2s+fkUWVcshxBii2KZiduuFI5LQc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=EmWtq4BC; arc=none smtp.client-ip=193.104.135.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
-Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
-	by mail1.fiberby.net (Postfix) with ESMTPSA id BF78C600C8;
-	Mon, 22 Apr 2024 15:27:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
-	s=202008; t=1713799688;
-	bh=hQh9FuW56vkudkOGmDgSrmvY96HwoJBQhUhM8CETBGY=;
-	h=From:To:Cc:Subject:Date:From;
-	b=EmWtq4BCL95M1z5XhDVo5QGLbrHWa8XJWZPrPmHIY7ioV0JekFUnCn5fAoZWb0Z2J
-	 FtTjlIipqnY7hA4qlK6QbmGH1Jf9YUqIBzPjtlQqrgBUTHBwCy65yhclxdgyuQUIon
-	 JmqXql7VZEhasPzeJ/s0LZBe8nKLPN7Sy1Imb/lfifgCXRGMLLvTbjNtCoYdZCq7Ur
-	 5BRiqFgJQjchggtTVHQ2Bwi/14jwi35HKZyh/qHFdaA1gXVg4tHGAKBj0eYSZm0vD5
-	 soh0oHlKeC7/KkXAP6tYhWOo9N0IjGcRiwzlk8ly/eh1UrI6Jsf9Jk4DcXKqhICVyw
-	 AzKmqK4i0Slqg==
-Received: by x201s (Postfix, from userid 1000)
-	id CA433207A4D; Mon, 22 Apr 2024 15:26:56 +0000 (UTC)
-From: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>
-To: netdev@vger.kernel.org
-Cc: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>,
-	linux-kernel@vger.kernel.org,
+	s=arc-20240116; t=1713799894; c=relaxed/simple;
+	bh=ZX7ezTTTUMTmVtmYsyG3PnhRs5cysy7HO5gbmBVheck=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KIeXivxn7sVe8pYse7iZ2gKqrcm04iShsH6m8K9GL5g3MnkMoRwL4V4uWEqcjvE8PPq5wYS27BQCNIu2rbfRLLXUCUfWRN2Zq88h0zIWqnFxg4a1sG3oGM6+iy16roQyySvugLBoyJ7Ls4RkzpFcyg/bF2FnNMmI2AUCRDx1VFQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=breakpoint.cc; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=breakpoint.cc
+Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
+	(envelope-from <fw@breakpoint.cc>)
+	id 1ryvdg-0000fj-7G; Mon, 22 Apr 2024 17:31:28 +0200
+From: Florian Westphal <fw@strlen.de>
+To: <netdev@vger.kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Siddharth Vadapalli <s-vadapalli@ti.com>,
-	Ravi Gunasekaran <r-gunasekaran@ti.com>,
-	Roger Quadros <rogerq@kernel.org>,
-	linux-omap@vger.kernel.org
-Subject: [PATCH net-next] net: ethernet: ti: cpsw: flower: validate control flags
-Date: Mon, 22 Apr 2024 15:26:55 +0000
-Message-ID: <20240422152656.175627-1-ast@fiberby.net>
-X-Mailer: git-send-email 2.43.0
+	<netfilter-devel@vger.kernel.org>,
+	pablo@netfilter.org
+Subject: [PATCH net-next] tools: testing: selftests: switch conntrack_dump_flush to TEST_PROGS
+Date: Mon, 22 Apr 2024 17:26:59 +0200
+Message-ID: <20240422152701.13518-1-fw@strlen.de>
+X-Mailer: git-send-email 2.43.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-This driver currently doesn't support any control flags.
+Currently conntrack_dump_flush test program always runs when passing
+TEST_PROGS argument:
 
-Use flow_rule_match_has_control_flags() to check for control flags,
-such as can be set through `tc flower ... ip_flags frag`.
+% make -C tools/testing/selftests TARGETS=net/netfilter TEST_PROGS=conntrack_ipip_mtu.sh run_tests
+make: Entering [..]
+TAP version 13
+1..2 [..]
+  selftests: net/netfilter: conntrack_dump_flush [..]
 
-In case any control flags are masked, flow_rule_match_has_control_flags()
-sets a NL extended error message, and we return -EOPNOTSUPP.
+Move away from TEST_CUSTOM_PROGS to avoid this.  After this,
+above command will only run the program specified in TEST_PROGS.
 
-Only compile-tested.
-
-Signed-off-by: Asbjørn Sloth Tønnesen <ast@fiberby.net>
+Signed-off-by: Florian Westphal <fw@strlen.de>
 ---
- drivers/net/ethernet/ti/cpsw_priv.c | 3 +++
- 1 file changed, 3 insertions(+)
+ I noticed that conntrack_dump_flush test case runs on each test
+ iteration in the netdev test infra, hence this patch.
 
-diff --git a/drivers/net/ethernet/ti/cpsw_priv.c b/drivers/net/ethernet/ti/cpsw_priv.c
-index 764ed298b570..6fe4edabba44 100644
---- a/drivers/net/ethernet/ti/cpsw_priv.c
-+++ b/drivers/net/ethernet/ti/cpsw_priv.c
-@@ -1404,6 +1404,9 @@ static int cpsw_qos_clsflower_add_policer(struct cpsw_priv *priv,
- 		return -EOPNOTSUPP;
- 	}
+ Alternative would be to also pass TEST_CUSTOM_PROGS="", but I guess
+ its better to stop using this feature, no other net subtests do this.
+
+ tools/testing/selftests/net/netfilter/Makefile                | 3 +--
+ tools/testing/selftests/net/netfilter/conntrack_dump_flush.sh | 4 ++++
+ 2 files changed, 5 insertions(+), 2 deletions(-)
+ create mode 100755 tools/testing/selftests/net/netfilter/conntrack_dump_flush.sh
+
+diff --git a/tools/testing/selftests/net/netfilter/Makefile b/tools/testing/selftests/net/netfilter/Makefile
+index 68e4780edfdc..15d2f2087aee 100644
+--- a/tools/testing/selftests/net/netfilter/Makefile
++++ b/tools/testing/selftests/net/netfilter/Makefile
+@@ -7,6 +7,7 @@ MNL_CFLAGS := $(shell $(HOSTPKG_CONFIG) --cflags libmnl 2>/dev/null)
+ MNL_LDLIBS := $(shell $(HOSTPKG_CONFIG) --libs libmnl 2>/dev/null || echo -lmnl)
  
-+	if (flow_rule_match_has_control_flags(rule, extack))
-+		return -EOPNOTSUPP;
+ TEST_PROGS := br_netfilter.sh bridge_brouter.sh
++TEST_PROGS += conntrack_dump_flush.sh
+ TEST_PROGS += conntrack_icmp_related.sh
+ TEST_PROGS += conntrack_ipip_mtu.sh
+ TEST_PROGS += conntrack_tcp_unreplied.sh
+@@ -28,8 +29,6 @@ TEST_PROGS += nft_zones_many.sh
+ TEST_PROGS += rpath.sh
+ TEST_PROGS += xt_string.sh
+ 
+-TEST_CUSTOM_PROGS += conntrack_dump_flush
+-
+ TEST_GEN_FILES = audit_logread
+ TEST_GEN_FILES += conntrack_dump_flush
+ TEST_GEN_FILES += connect_close nf_queue
+diff --git a/tools/testing/selftests/net/netfilter/conntrack_dump_flush.sh b/tools/testing/selftests/net/netfilter/conntrack_dump_flush.sh
+new file mode 100755
+index 000000000000..5e81c8284aa9
+--- /dev/null
++++ b/tools/testing/selftests/net/netfilter/conntrack_dump_flush.sh
+@@ -0,0 +1,4 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-2.0
 +
- 	if (!flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_ETH_ADDRS)) {
- 		NL_SET_ERR_MSG_MOD(extack, "Not matching on eth address");
- 		return -EOPNOTSUPP;
++exec ./conntrack_dump_flush
 -- 
-2.43.0
+2.43.2
 
 
