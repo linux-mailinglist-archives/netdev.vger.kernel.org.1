@@ -1,273 +1,241 @@
-Return-Path: <netdev+bounces-90698-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90699-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69CCA8AFBEE
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 00:40:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 643598AFC19
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 00:43:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EDC8A1F234B4
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 22:40:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 87AAD1C22832
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 22:43:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55D69286A6;
-	Tue, 23 Apr 2024 22:39:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C631641746;
+	Tue, 23 Apr 2024 22:42:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="vtBsl/ch"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.188.207])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BF2347772
-	for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 22:39:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.188.207
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7A912E644
+	for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 22:42:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713911983; cv=none; b=iShMyY/xQx7bMWQlhG9LRzTGH19vwQNU8/ZM7JQFhkpbxCk71IRFE0ZT1mw/pKTUAmoUtazm4uVW5WQiOdRz9cKGvDhFW8fMlOn2UGXlHhmSsIr5S0Frr6LDh2pWhKzAiYjdSNaNSOy9Y9s1QyK0p3lyPP8jE3NPHUqp8mTQiVw=
+	t=1713912141; cv=none; b=EMMvQrqKaMoh9CtTDS4cC5SPznRb1GvqTsUcdhanDrr27+SrQS4R3c1r6IV33CJ39Sj2IMZrqZAY5elKNZc3zeSzPMjvY5XiEjQqZXd6Fn+dIPiGWt4voIvr7hEe98fXgPdceN4/YAg90G7eBz9kOnx34Ea99mCYsE86s1dC4tQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713911983; c=relaxed/simple;
-	bh=AKHzQis+WqzbjK2LADWtbs3dPanqdGcxdPxiXYfe/nA=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=AtJSxeaCajZwCW18JqrwXc8H1wuwibh+Nw0/zK4cVrTdQlHgQmGCX9UVHxLpMCpT06cN/BQ7opGtHNf+S6XjrerrCtNeZpdAV8dtE6HSFCgLCrbzfmCBodgczeiFAdf5pEYUfiUMc0N/rMnVh61/h2a8gB3GpGmXBHipnSOyEOE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; arc=none smtp.client-ip=217.70.188.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	laforge@osmocom.org,
-	pespin@sysmocom.de,
-	osmith@sysmocom.de
-Subject: [PATCH net-next 12/12] gtp: identify tunnel via GTP device + GTP version + TEID + family
-Date: Wed, 24 Apr 2024 00:39:19 +0200
-Message-Id: <20240423223919.3385493-13-pablo@netfilter.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20240423223919.3385493-1-pablo@netfilter.org>
-References: <20240423223919.3385493-1-pablo@netfilter.org>
+	s=arc-20240116; t=1713912141; c=relaxed/simple;
+	bh=UvdwXWXG1PNScJhZS7lD4Ns3TVdO+4izlNOhEZdfd+Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QADpgRVSUtkyGO3vdeg27YzJ6k34b+BTmGYoRjcQu5JHcPN44/HtOrvOQGBPx5+6RL5HH0i91+eiywF6RuGgsBUxHFCSWb6aKc+u38DlERHq4urLJ1H/2rKIb+Td6UCCeX6vznXD0/EAJlBJsmpgdDIV+BGbf+gEeq9k+s073AQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=vtBsl/ch; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-1e5715a9ebdso51385505ad.2
+        for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 15:42:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1713912138; x=1714516938; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=f0NF/urch0L9yqqTw9KHmdE06xhVpDAjqz9wOu+b8KM=;
+        b=vtBsl/chbCNPMhQVjONdN2YmCc1uZUWknGQMpazoyXADdT+WydHffIMw+DTkt78IZw
+         ijqMQPUyIKu2FsFf9I1KoYDPBkJnPwZqzfiyzxxX20BOLcWd+N67OElTgzaQby2o+ltm
+         KOVhWmupPy/ytKol7rsGCLdPADW2jECV7JOnQ=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713912138; x=1714516938;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=f0NF/urch0L9yqqTw9KHmdE06xhVpDAjqz9wOu+b8KM=;
+        b=UeN/SPu6p0xUrviFOpSX64+F5dp+lFK9Mq0WVfR7Qi5Op9MIz3v7WKxOtE9nkTkOWw
+         5gzQDz3hMTM1fDq1YJwFPLnGkPLOjje5VhiM/J9zaUcO1ebS4aJpjzrGday9/ZijL4ab
+         Rk4Yn3IQysDM4VbDey4dyayGgV4wzccsPGoLWbF1f3XO1vfz0ymIQMfCGVzm4xZf6fT/
+         Px9w6kiNuU8ASQXU3/5E6ov26CZNnUCcjzeBb6sebjsF0IVVMc1xlowQfwSbLvpIlIkK
+         ETEE2BKyqbaLTTiO8R0H/BN0JcqhEfPIJ9q3nUDH1zSC0FmLBt0ON1km9KMLCn1/n64J
+         ZrDA==
+X-Forwarded-Encrypted: i=1; AJvYcCU8Tq3yjdd8D/9qzSqY6Rpt2hKuX0VagGYVodTRdWi9ITNuINIzYAj/xNv/pFRFH0/NGjEB8d+Kbbnr/p26WlxvHEn2S/5k
+X-Gm-Message-State: AOJu0YybL7HYPqAPBqgK4SbsPKcL6qD2aCGBMowyGr+huZc6wmOX3khi
+	l0rzoEsIa9iqsVtYziN0dBPy9PAedOluJBWdEMbclYDPjE67HI8PtCjHV/fSfZk=
+X-Google-Smtp-Source: AGHT+IEDbX6ouzL5Njlg4Ul6dWDxEJq6hgxpeeyfBQ3CJep+Y0+BVxqC0fInHm5nJWzeekHj+AC+og==
+X-Received: by 2002:a17:902:ce91:b0:1e4:4955:98d9 with SMTP id f17-20020a170902ce9100b001e4495598d9mr1048993plg.45.1713912138228;
+        Tue, 23 Apr 2024 15:42:18 -0700 (PDT)
+Received: from LQ3V64L9R2 ([74.87.211.242])
+        by smtp.gmail.com with ESMTPSA id p2-20020a1709027ec200b001e2ba8605dfsm10716451plb.150.2024.04.23.15.42.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 23 Apr 2024 15:42:17 -0700 (PDT)
+Date: Tue, 23 Apr 2024 12:42:13 -1000
+From: Joe Damato <jdamato@fastly.com>
+To: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, tariqt@nvidia.com,
+	saeedm@nvidia.com
+Cc: mkarsten@uwaterloo.ca, gal@nvidia.com, nalramli@fastly.com,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"open list:MELLANOX MLX4 core VPI driver" <linux-rdma@vger.kernel.org>
+Subject: Re: [PATCH net-next 3/3] net/mlx4: support per-queue statistics via
+ netlink
+Message-ID: <Zig5RZOkzhGITL7V@LQ3V64L9R2>
+References: <20240423194931.97013-1-jdamato@fastly.com>
+ <20240423194931.97013-4-jdamato@fastly.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240423194931.97013-4-jdamato@fastly.com>
 
-This allows to define a GTP tunnel for dual stack MS/UE with both IPv4
-and IPv6 addresses while using the same TEID via two PDP context
-objects.
+On Tue, Apr 23, 2024 at 07:49:30PM +0000, Joe Damato wrote:
+> Make mlx4 compatible with the newly added netlink queue stats API.
+> 
+> Signed-off-by: Joe Damato <jdamato@fastly.com>
+> Tested-by: Martin Karsten <mkarsten@uwaterloo.ca>
+> ---
+>  .../net/ethernet/mellanox/mlx4/en_netdev.c    | 91 +++++++++++++++++++
+>  1 file changed, 91 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/mellanox/mlx4/en_netdev.c b/drivers/net/ethernet/mellanox/mlx4/en_netdev.c
+> index 5d3fde63b273..c7f04d4820c6 100644
+> --- a/drivers/net/ethernet/mellanox/mlx4/en_netdev.c
+> +++ b/drivers/net/ethernet/mellanox/mlx4/en_netdev.c
+> @@ -43,6 +43,7 @@
+>  #include <net/vxlan.h>
+>  #include <net/devlink.h>
+>  #include <net/rps.h>
+> +#include <net/netdev_queues.h>
+>  
+>  #include <linux/mlx4/driver.h>
+>  #include <linux/mlx4/device.h>
+> @@ -3099,6 +3100,95 @@ void mlx4_en_set_stats_bitmap(struct mlx4_dev *dev,
+>  	last_i += NUM_PHY_STATS;
+>  }
+>  
+> +static void mlx4_get_queue_stats_rx(struct net_device *dev, int i,
+> +				    struct netdev_queue_stats_rx *stats)
+> +{
+> +	struct mlx4_en_priv *priv = netdev_priv(dev);
+> +	const struct mlx4_en_rx_ring *ring;
+> +
+> +	stats->packets = 0xff;
+> +	stats->bytes = 0xff;
+> +	stats->alloc_fail = 0xff;
+> +
+> +	spin_lock_bh(&priv->stats_lock);
+> +
+> +	if (!priv->port_up || mlx4_is_master(priv->mdev->dev))
+> +		goto out_unlock;
+> +
+> +	ring = priv->rx_ring[i];
+> +	stats->packets = READ_ONCE(ring->packets);
+> +	stats->bytes   = READ_ONCE(ring->bytes);
+> +	stats->alloc_fail = READ_ONCE(ring->dropped);
+> +
+> +out_unlock:
+> +	spin_unlock_bh(&priv->stats_lock);
+> +}
+> +
+> +static void mlx4_get_queue_stats_tx(struct net_device *dev, int i,
+> +				    struct netdev_queue_stats_tx *stats)
+> +{
+> +	struct mlx4_en_priv *priv = netdev_priv(dev);
+> +	const struct mlx4_en_tx_ring *ring;
+> +
+> +	stats->packets = 0xff;
+> +	stats->bytes = 0xff;
+> +
+> +	spin_lock_bh(&priv->stats_lock);
+> +
+> +	if (!priv->port_up || mlx4_is_master(priv->mdev->dev))
+> +		goto out_unlock;
+> +
+> +	ring = priv->tx_ring[TX][i];
+> +	stats->packets = READ_ONCE(ring->packets);
+> +	stats->bytes   = READ_ONCE(ring->bytes);
+> +
+> +out_unlock:
+> +	spin_unlock_bh(&priv->stats_lock);
+> +}
+> +
+> +static void mlx4_get_base_stats(struct net_device *dev,
+> +				struct netdev_queue_stats_rx *rx,
+> +				struct netdev_queue_stats_tx *tx)
+> +{
+> +	struct mlx4_en_priv *priv = netdev_priv(dev);
+> +	int i;
+> +
+> +	rx->packets = 0xff;
+> +	rx->bytes = 0xff;
+> +	rx->alloc_fail = 0xff;
+> +	tx->packets = 0xff;
+> +	tx->bytes = 0xff;
+> +
+> +	spin_lock_bh(&priv->stats_lock);
+> +
+> +	if (!priv->port_up || mlx4_is_master(priv->mdev->dev))
+> +		goto out_unlock;
 
-Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
----
- drivers/net/gtp.c | 85 +++++++++++++++++++++++++++++++++++------------
- 1 file changed, 63 insertions(+), 22 deletions(-)
+I realized in this case, I'll need to set the fields initialized to 0xff
+above to 0 before doing the increments below.
 
-diff --git a/drivers/net/gtp.c b/drivers/net/gtp.c
-index 0b39c4e31e67..3196f7bb20b3 100644
---- a/drivers/net/gtp.c
-+++ b/drivers/net/gtp.c
-@@ -140,7 +140,7 @@ static inline u32 ipv6_hashfn(const struct in6_addr *ip6)
- }
- 
- /* Resolve a PDP context structure based on the 64bit TID. */
--static struct pdp_ctx *gtp0_pdp_find(struct gtp_dev *gtp, u64 tid)
-+static struct pdp_ctx *gtp0_pdp_find(struct gtp_dev *gtp, u64 tid, u16 family)
- {
- 	struct hlist_head *head;
- 	struct pdp_ctx *pdp;
-@@ -148,7 +148,8 @@ static struct pdp_ctx *gtp0_pdp_find(struct gtp_dev *gtp, u64 tid)
- 	head = &gtp->tid_hash[gtp0_hashfn(tid) % gtp->hash_size];
- 
- 	hlist_for_each_entry_rcu(pdp, head, hlist_tid) {
--		if (pdp->gtp_version == GTP_V0 &&
-+		if (pdp->af == family &&
-+		    pdp->gtp_version == GTP_V0 &&
- 		    pdp->u.v0.tid == tid)
- 			return pdp;
- 	}
-@@ -156,7 +157,7 @@ static struct pdp_ctx *gtp0_pdp_find(struct gtp_dev *gtp, u64 tid)
- }
- 
- /* Resolve a PDP context structure based on the 32bit TEI. */
--static struct pdp_ctx *gtp1_pdp_find(struct gtp_dev *gtp, u32 tid)
-+static struct pdp_ctx *gtp1_pdp_find(struct gtp_dev *gtp, u32 tid, u16 family)
- {
- 	struct hlist_head *head;
- 	struct pdp_ctx *pdp;
-@@ -164,7 +165,8 @@ static struct pdp_ctx *gtp1_pdp_find(struct gtp_dev *gtp, u32 tid)
- 	head = &gtp->tid_hash[gtp1u_hashfn(tid) % gtp->hash_size];
- 
- 	hlist_for_each_entry_rcu(pdp, head, hlist_tid) {
--		if (pdp->gtp_version == GTP_V1 &&
-+		if (pdp->af == family &&
-+		    pdp->gtp_version == GTP_V1 &&
- 		    pdp->u.v1.i_tei == tid)
- 			return pdp;
- 	}
-@@ -304,15 +306,8 @@ static int gtp_inner_proto(struct sk_buff *skb, unsigned int hdrlen,
- }
- 
- static int gtp_rx(struct pdp_ctx *pctx, struct sk_buff *skb,
--		  unsigned int hdrlen, unsigned int role)
-+		  unsigned int hdrlen, unsigned int role, __u16 inner_proto)
- {
--	__u16 inner_proto;
--
--	if (gtp_inner_proto(skb, hdrlen, &inner_proto) < 0) {
--		netdev_dbg(pctx->dev, "GTP packet does not encapsulate an IP packet\n");
--		return -1;
--	}
--
- 	if (!gtp_check_ms(skb, pctx, hdrlen, role, inner_proto)) {
- 		netdev_dbg(pctx->dev, "No PDP ctx for this MS\n");
- 		return 1;
-@@ -561,6 +556,21 @@ static int gtp0_handle_echo_resp(struct gtp_dev *gtp, struct sk_buff *skb)
- 				       msg, 0, GTP_GENL_MCGRP, GFP_ATOMIC);
- }
- 
-+static int gtp_proto_to_family(__u16 proto)
-+{
-+	switch (proto) {
-+	case ETH_P_IP:
-+		return AF_INET;
-+	case ETH_P_IPV6:
-+		return AF_INET6;
-+	default:
-+		WARN_ON_ONCE(1);
-+		break;
-+	}
-+
-+	return AF_UNSPEC;
-+}
-+
- /* 1 means pass up to the stack, -1 means drop and 0 means decapsulated. */
- static int gtp0_udp_encap_recv(struct gtp_dev *gtp, struct sk_buff *skb)
- {
-@@ -568,6 +578,7 @@ static int gtp0_udp_encap_recv(struct gtp_dev *gtp, struct sk_buff *skb)
- 			      sizeof(struct gtp0_header);
- 	struct gtp0_header *gtp0;
- 	struct pdp_ctx *pctx;
-+	__u16 inner_proto;
- 
- 	if (!pskb_may_pull(skb, hdrlen))
- 		return -1;
-@@ -590,13 +601,19 @@ static int gtp0_udp_encap_recv(struct gtp_dev *gtp, struct sk_buff *skb)
- 	if (gtp0->type != GTP_TPDU)
- 		return 1;
- 
--	pctx = gtp0_pdp_find(gtp, be64_to_cpu(gtp0->tid));
-+	if (gtp_inner_proto(skb, hdrlen, &inner_proto) < 0) {
-+		netdev_dbg(pctx->dev, "GTP packet does not encapsulate an IP packet\n");
-+		return -1;
-+	}
-+
-+	pctx = gtp0_pdp_find(gtp, be64_to_cpu(gtp0->tid),
-+			     gtp_proto_to_family(inner_proto));
- 	if (!pctx) {
- 		netdev_dbg(gtp->dev, "No PDP ctx to decap skb=%p\n", skb);
- 		return 1;
- 	}
- 
--	return gtp_rx(pctx, skb, hdrlen, gtp->role);
-+	return gtp_rx(pctx, skb, hdrlen, gtp->role, inner_proto);
- }
- 
- /* msg_type has to be GTP_ECHO_REQ or GTP_ECHO_RSP */
-@@ -767,6 +784,7 @@ static int gtp1u_udp_encap_recv(struct gtp_dev *gtp, struct sk_buff *skb)
- 			      sizeof(struct gtp1_header);
- 	struct gtp1_header *gtp1;
- 	struct pdp_ctx *pctx;
-+	__u16 inner_proto;
- 
- 	if (!pskb_may_pull(skb, hdrlen))
- 		return -1;
-@@ -802,9 +820,15 @@ static int gtp1u_udp_encap_recv(struct gtp_dev *gtp, struct sk_buff *skb)
- 	if (!pskb_may_pull(skb, hdrlen))
- 		return -1;
- 
-+	if (gtp_inner_proto(skb, hdrlen, &inner_proto) < 0) {
-+		netdev_dbg(pctx->dev, "GTP packet does not encapsulate an IP packet\n");
-+		return -1;
-+	}
-+
- 	gtp1 = (struct gtp1_header *)(skb->data + sizeof(struct udphdr));
- 
--	pctx = gtp1_pdp_find(gtp, ntohl(gtp1->tid));
-+	pctx = gtp1_pdp_find(gtp, ntohl(gtp1->tid),
-+			     gtp_proto_to_family(inner_proto));
- 	if (!pctx) {
- 		netdev_dbg(gtp->dev, "No PDP ctx to decap skb=%p\n", skb);
- 		return 1;
-@@ -814,7 +838,7 @@ static int gtp1u_udp_encap_recv(struct gtp_dev *gtp, struct sk_buff *skb)
- 	    gtp_parse_exthdrs(skb, &hdrlen) < 0)
- 		return -1;
- 
--	return gtp_rx(pctx, skb, hdrlen, gtp->role);
-+	return gtp_rx(pctx, skb, hdrlen, gtp->role, inner_proto);
- }
- 
- static void __gtp_encap_destroy(struct sock *sk)
-@@ -1841,10 +1865,12 @@ static struct pdp_ctx *gtp_pdp_add(struct gtp_dev *gtp, struct sock *sk,
- 		found = true;
- 	if (version == GTP_V0)
- 		pctx_tid = gtp0_pdp_find(gtp,
--					 nla_get_u64(info->attrs[GTPA_TID]));
-+					 nla_get_u64(info->attrs[GTPA_TID]),
-+					 family);
- 	else if (version == GTP_V1)
- 		pctx_tid = gtp1_pdp_find(gtp,
--					 nla_get_u32(info->attrs[GTPA_I_TEI]));
-+					 nla_get_u32(info->attrs[GTPA_I_TEI]),
-+					 family);
- 	if (pctx_tid)
- 		found = true;
- 
-@@ -2023,6 +2049,12 @@ static struct pdp_ctx *gtp_find_pdp_by_link(struct net *net,
- 					    struct nlattr *nla[])
- {
- 	struct gtp_dev *gtp;
-+	int family;
-+
-+	if (nla[GTPA_FAMILY])
-+		family = nla_get_u8(nla[GTPA_FAMILY]);
-+	else
-+		family = AF_INET;
- 
- 	gtp = gtp_find_dev(net, nla);
- 	if (!gtp)
-@@ -2031,10 +2063,16 @@ static struct pdp_ctx *gtp_find_pdp_by_link(struct net *net,
- 	if (nla[GTPA_MS_ADDRESS]) {
- 		__be32 ip = nla_get_be32(nla[GTPA_MS_ADDRESS]);
- 
-+		if (family != AF_INET)
-+			return ERR_PTR(-EINVAL);
-+
- 		return ipv4_pdp_find(gtp, ip);
- 	} else if (nla[GTPA_MS_ADDR6]) {
- 		struct in6_addr addr = nla_get_in6_addr(nla[GTPA_MS_ADDR6]);
- 
-+		if (family != AF_INET6)
-+			return ERR_PTR(-EINVAL);
-+
- 		if (addr.s6_addr32[2] ||
- 		    addr.s6_addr32[3])
- 			return ERR_PTR(-EADDRNOTAVAIL);
-@@ -2043,10 +2081,13 @@ static struct pdp_ctx *gtp_find_pdp_by_link(struct net *net,
- 	} else if (nla[GTPA_VERSION]) {
- 		u32 gtp_version = nla_get_u32(nla[GTPA_VERSION]);
- 
--		if (gtp_version == GTP_V0 && nla[GTPA_TID])
--			return gtp0_pdp_find(gtp, nla_get_u64(nla[GTPA_TID]));
--		else if (gtp_version == GTP_V1 && nla[GTPA_I_TEI])
--			return gtp1_pdp_find(gtp, nla_get_u32(nla[GTPA_I_TEI]));
-+		if (gtp_version == GTP_V0 && nla[GTPA_TID]) {
-+			return gtp0_pdp_find(gtp, nla_get_u64(nla[GTPA_TID]),
-+					     family);
-+		} else if (gtp_version == GTP_V1 && nla[GTPA_I_TEI]) {
-+			return gtp1_pdp_find(gtp, nla_get_u32(nla[GTPA_I_TEI]),
-+					     family);
-+		}
- 	}
- 
- 	return ERR_PTR(-EINVAL);
--- 
-2.30.2
+Sorry about that; just realized that now and will fix that in the v2 (along
+with any other feedback I get), probably something:
 
+  if (priv->rx_ring_num) {
+          rx->packets = 0;
+          rx->bytes = 0;
+          rx->alloc_fail = 0;
+  }
+
+Here for the RX side and see below for the TX side.
+
+> +	for (i = 0; i < priv->rx_ring_num; i++) {
+> +		const struct mlx4_en_rx_ring *ring = priv->rx_ring[i];
+> +
+> +		rx->packets += READ_ONCE(ring->packets);
+> +		rx->bytes += READ_ONCE(ring->bytes);
+> +		rx->alloc_fail += READ_ONCE(ring->dropped);
+> +	}
+
+Similar to above, probably will fix with something like this here:
+
+  if (priv->tx_ring_num[TX]) {
+          tx->packets = 0;
+          tx->bytes = 0;
+  }
+
+Sorry for the noise, I should have noticed this before sending it out.
+
+> +	for (i = 0; i < priv->tx_ring_num[TX]; i++) {
+> +		const struct mlx4_en_tx_ring *ring = priv->tx_ring[TX][i];
+> +
+> +		tx->packets += READ_ONCE(ring->packets);
+> +		tx->bytes   += READ_ONCE(ring->bytes);
+> +	}
+> +
+> +out_unlock:
+> +	spin_unlock_bh(&priv->stats_lock);
+> +}
+> +
+> +static const struct netdev_stat_ops mlx4_stat_ops = {
+> +	.get_queue_stats_rx     = mlx4_get_queue_stats_rx,
+> +	.get_queue_stats_tx     = mlx4_get_queue_stats_tx,
+> +	.get_base_stats         = mlx4_get_base_stats,
+> +};
+> +
+>  int mlx4_en_init_netdev(struct mlx4_en_dev *mdev, int port,
+>  			struct mlx4_en_port_profile *prof)
+>  {
+> @@ -3262,6 +3352,7 @@ int mlx4_en_init_netdev(struct mlx4_en_dev *mdev, int port,
+>  	netif_set_real_num_tx_queues(dev, priv->tx_ring_num[TX]);
+>  	netif_set_real_num_rx_queues(dev, priv->rx_ring_num);
+>  
+> +	dev->stat_ops = &mlx4_stat_ops;
+>  	dev->ethtool_ops = &mlx4_en_ethtool_ops;
+>  
+>  	/*
+> -- 
+> 2.25.1
+> 
 
