@@ -1,167 +1,114 @@
-Return-Path: <netdev+bounces-90435-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90436-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2DF1E8AE1F6
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 12:18:16 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34CB18AE207
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 12:25:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 512BAB21639
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 10:18:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 81CC4B21D61
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 10:24:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81D7260B9C;
-	Tue, 23 Apr 2024 10:18:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1CA660EC3;
+	Tue, 23 Apr 2024 10:24:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="f5f9jauX"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PGv81DpS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F7B1605CE
-	for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 10:18:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79DF2381AD
+	for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 10:24:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713867488; cv=none; b=ie00rYBfzufGuSRFWojYeEv2ImAXkt5Sdk9aXhN72tk2m5SgBNQgp+K69Hi5nPbnmJekyc7r7pbLMxFwsd8qwO4u/VI2trGB+EgUOP4QsWjGPNd7TB9Pdrg/CEgh53LoC54A1Ta7kOFJ2SRy9Dbs8zTDBFjnPt6jiKSroPCZLwg=
+	t=1713867893; cv=none; b=eurMQZFbbeXKulEbXBYdVk9z5HT5pmlKXy5vMK9+plwXDg/QPa8445g1Sl+bs8Qk15cTWEtE683TKuINSU31AlIg77RilTNxNG8LJkewTn8GQH5o1sH0LPtfzIBYJGwqdhw/ly6AwRZHbQpve3SakSXE37/q1boR1yKD8aAmfw4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713867488; c=relaxed/simple;
-	bh=kkqIE0Y4DRPtCUs/sSOoUIPS1FebsbAyD8enDcphis0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gl4yOmUY7o/8ce2/uvueq39/EolRI4wmKCuKSSAXCnBwCPA+frQBlHJ4JXp1gHKca53VmMiTPUg5YR8IivMRWCLI+gaAUZhaT/qY09hvBeDt0P/rVjJUTmRe/7xuQeR9JKkNIVNuUof0ZHwuAfrkwG77FM5YJ5mgip7j34EH7B8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=f5f9jauX; arc=none smtp.client-ip=209.85.208.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-571be483ccaso6565885a12.2
-        for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 03:18:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1713867483; x=1714472283; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=qjAI/u9aTsfeTNEAGphzTSvRCRRtKSx3dGfB1X7fHEM=;
-        b=f5f9jauXNOz/gru2x9BtyCzc3xPSpxK0wdkHcIVjZS7tOhqwA7fngZGyCt7wVUhrQO
-         Tvpz0TO9i3FbqaCGBSUNZnZv+ekkE48aGQqdE8xXtbAiMmrGraeet88809kJj/lyofn1
-         rSEyuhN8bJ+dTLPgeksXpCCT9gzxzJd01MYouG3maUfeUC6DB/Zt9DG5IgaHYKSQLLgP
-         z9c3LbL04ScIo25DAL8kjA7qHVyeZuGBeozyq0ZflqkFh7a2+J/Lq3EF8IaMJb1RQ6ev
-         ssINnJQitcvmJCj/wkUCs+rKzhlXI72RSgfwl42KuVsrC5L4zrUEs2F1AvnaFFPvUDfI
-         4OtQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713867483; x=1714472283;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qjAI/u9aTsfeTNEAGphzTSvRCRRtKSx3dGfB1X7fHEM=;
-        b=YU+UDQbgXYkW9iDtFWH77KTYnuaEIbl+QILrUytNeIcJ3z1ZloWueL/PLAJhKoY1N2
-         zacAWUxODXoTJK2JrCZmhu+/HWxl1T9QIVNarPNfBGaH/OWBL9ha7PNHnV5kFUF0cPyH
-         DPpDz4EB40C+dHvEho42UGC0GSjxgMfWZGNlrtjW7dA+DOEZB0vtThGSW7jgTRJtgLvS
-         Lqui5neystATRDwVKVczKoAb4cbspgb+onLOrHwVv5rmtGIv+aw1MW5V/G04WFEuwRzs
-         lEURhlH+apO60LeN13NjNzKQy4113WItC2gLw0dSNKMkzam9DH5e/91TzSYJCkenEhWm
-         Vt9A==
-X-Gm-Message-State: AOJu0YyyWyKYqDrK5D3JivajjgT3ZQ8bEqf+KmLX+qzDIfpqOxyOkS45
-	o5yulV8MHMx1iL1RSTjDnYRpSLqpHfkhr+xhYyJe6PSDhKfmXjUSutvWas1YDpo=
-X-Google-Smtp-Source: AGHT+IFrpUA9BGDfzOFgMoFt6BOHOhg8GKgTOgeY0r+LlC7dYpKajZym1moY/r+ox+cVnvAc2GZjxA==
-X-Received: by 2002:a50:8ad1:0:b0:56e:428d:77c1 with SMTP id k17-20020a508ad1000000b0056e428d77c1mr8244269edk.36.1713867483066;
-        Tue, 23 Apr 2024 03:18:03 -0700 (PDT)
-Received: from localhost (78-80-105-131.customers.tmcz.cz. [78.80.105.131])
-        by smtp.gmail.com with ESMTPSA id h4-20020a0564020e0400b00571f140e6b6sm3548863edh.97.2024.04.23.03.18.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Apr 2024 03:18:01 -0700 (PDT)
-Date: Tue, 23 Apr 2024 12:17:58 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Heng Qi <hengqi@linux.alibaba.com>
-Cc: netdev@vger.kernel.org, virtualization@lists.linux.dev,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eric Dumazet <edumazet@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next 1/2] virtio_net: virtnet_send_command supports
- command-specific-result
-Message-ID: <ZieK1lmc0czcEXWk@nanopsycho>
-References: <20240423084226.25440-1-hengqi@linux.alibaba.com>
- <20240423084226.25440-2-hengqi@linux.alibaba.com>
+	s=arc-20240116; t=1713867893; c=relaxed/simple;
+	bh=wS3oClzzrDf+uJ+ItKJDbEVykFqq7JB3tyjSIMb9i4Y=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=I2b5nPqe7ZDRMia6NOx8e5g+SC5sxmifKL21q4o1EEiijdkIZs5ozjmwp52E8FGZgSq6Jcn12Xwi57KwItYONriO347WSPfsARLBi0ehRJ51Uygf+1Ge1OSYXkxpGNXp3uOaoQ3OYmwEC9iGJvuiKMPIFxNRwRabBTRMEXjFXn0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PGv81DpS; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1713867891;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=TlA1wYh3gUjJTOs9PplfnS/DRdE9om0csvqcDnlkLf8=;
+	b=PGv81DpSKNts38w6/Msrzef1Y1B9bNj0+N/PdAZqct4x1ErAjsT10+Jfr0FKdr95+zXFz7
+	+5pjn8m4x83m9JU6aWiZa+q0cMXYImxV3ja4/NB51EXza3X8nUAmoxZawiX0z92kcMEgjb
+	PxOIyk3ug8K3mJyVp0p2T1bcfF1Bvco=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-615-rsb7kCBkOvW8gIp_12clWw-1; Tue, 23 Apr 2024 06:24:48 -0400
+X-MC-Unique: rsb7kCBkOvW8gIp_12clWw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 78E4E802E4D;
+	Tue, 23 Apr 2024 10:24:48 +0000 (UTC)
+Received: from calimero.vinschen.de (unknown [10.39.194.197])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 57AA944048;
+	Tue, 23 Apr 2024 10:24:48 +0000 (UTC)
+Received: by calimero.vinschen.de (Postfix, from userid 500)
+	id 0A9ACA80BA0; Tue, 23 Apr 2024 12:24:47 +0200 (CEST)
+From: Corinna Vinschen <vinschen@redhat.com>
+To: netdev@vger.kernel.org,
+	intel-wired-lan@lists.osuosl.org
+Subject: [PATCH] igb: cope with large MAX_SKB_FRAGS.
+Date: Tue, 23 Apr 2024 12:24:46 +0200
+Message-ID: <20240423102446.901450-1-vinschen@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240423084226.25440-2-hengqi@linux.alibaba.com>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
 
-Tue, Apr 23, 2024 at 10:42:25AM CEST, hengqi@linux.alibaba.com wrote:
->From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
->
->As the spec https://github.com/oasis-tcs/virtio-spec/commit/42f389989823039724f95bbbd243291ab0064f82
->
->The virtnet cvq supports to get result from the device.
+From: Paolo Abeni <pabeni@redhat.com>
 
-Is this a statement about current status, cause it sounds so. Could you
-make it clear by changing the patch subject and description to use
-imperative mood please. Command the codebase what to do.
+Sabrina reports that the igb driver does not cope well with large
+MAX_SKB_FRAG values: setting MAX_SKB_FRAG to 45 causes payload
+corruption on TX.
 
-Thanks!
+The root cause of the issue is that the driver does not take into
+account properly the (possibly large) shared info size when selecting
+the ring layout, and will try to fit two packets inside the same 4K
+page even when the 1st fraglist will trump over the 2nd head.
 
->
->Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
->---
-> drivers/net/virtio_net.c | 24 +++++++++++++++++-------
-> 1 file changed, 17 insertions(+), 7 deletions(-)
->
->diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
->index 7176b956460b..3bc9b1e621db 100644
->--- a/drivers/net/virtio_net.c
->+++ b/drivers/net/virtio_net.c
->@@ -2527,11 +2527,12 @@ static int virtnet_tx_resize(struct virtnet_info *vi,
->  * supported by the hypervisor, as indicated by feature bits, should
->  * never fail unless improperly formatted.
->  */
->-static bool virtnet_send_command(struct virtnet_info *vi, u8 class, u8 cmd,
->-				 struct scatterlist *out)
->+static bool virtnet_send_command_reply(struct virtnet_info *vi, u8 class, u8 cmd,
->+				       struct scatterlist *out,
->+				       struct scatterlist *in)
-> {
->-	struct scatterlist *sgs[4], hdr, stat;
->-	unsigned out_num = 0, tmp;
->+	struct scatterlist *sgs[5], hdr, stat;
->+	u32 out_num = 0, tmp, in_num = 0;
-> 	int ret;
-> 
-> 	/* Caller should know better */
->@@ -2549,10 +2550,13 @@ static bool virtnet_send_command(struct virtnet_info *vi, u8 class, u8 cmd,
-> 
-> 	/* Add return status. */
-> 	sg_init_one(&stat, &vi->ctrl->status, sizeof(vi->ctrl->status));
->-	sgs[out_num] = &stat;
->+	sgs[out_num + in_num++] = &stat;
-> 
->-	BUG_ON(out_num + 1 > ARRAY_SIZE(sgs));
->-	ret = virtqueue_add_sgs(vi->cvq, sgs, out_num, 1, vi, GFP_ATOMIC);
->+	if (in)
->+		sgs[out_num + in_num++] = in;
->+
->+	BUG_ON(out_num + in_num > ARRAY_SIZE(sgs));
->+	ret = virtqueue_add_sgs(vi->cvq, sgs, out_num, in_num, vi, GFP_ATOMIC);
-> 	if (ret < 0) {
-> 		dev_warn(&vi->vdev->dev,
-> 			 "Failed to add sgs for command vq: %d\n.", ret);
->@@ -2574,6 +2578,12 @@ static bool virtnet_send_command(struct virtnet_info *vi, u8 class, u8 cmd,
-> 	return vi->ctrl->status == VIRTIO_NET_OK;
-> }
-> 
->+static bool virtnet_send_command(struct virtnet_info *vi, u8 class, u8 cmd,
->+				 struct scatterlist *out)
->+{
->+	return virtnet_send_command_reply(vi, class, cmd, out, NULL);
->+}
->+
-> static int virtnet_set_mac_address(struct net_device *dev, void *p)
-> {
-> 	struct virtnet_info *vi = netdev_priv(dev);
->-- 
->2.32.0.3.g01195cf9f
->
->
+Address the issue forcing the driver to fit a single packet per page,
+leaving there enough room to store the (currently) largest possible
+skb_shared_info.
+
+Fixes: 3948b05950fd ("net: introduce a config option to tweak MAX_SKB_FRAG")
+Reported-by: Jan Tluka <jtluka@redhat.com>
+Reported-by: Jirka Hladky <jhladky@redhat.com>
+Reported-by: Sabrina Dubroca <sd@queasysnail.net>
+Tested-by: Sabrina Dubroca <sd@queasysnail.net>
+Tested-by: Corinna Vinschen <vinschen@redhat.com>
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+---
+ drivers/net/ethernet/intel/igb/igb_main.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/ethernet/intel/igb/igb_main.c
+index a3f100769e39..22fb2c322bca 100644
+--- a/drivers/net/ethernet/intel/igb/igb_main.c
++++ b/drivers/net/ethernet/intel/igb/igb_main.c
+@@ -4833,6 +4833,7 @@ static void igb_set_rx_buffer_len(struct igb_adapter *adapter,
+ 
+ #if (PAGE_SIZE < 8192)
+ 	if (adapter->max_frame_size > IGB_MAX_FRAME_BUILD_SKB ||
++	    SKB_HEAD_ALIGN(adapter->max_frame_size) > (PAGE_SIZE / 2) ||
+ 	    rd32(E1000_RCTL) & E1000_RCTL_SBP)
+ 		set_ring_uses_large_buffer(rx_ring);
+ #endif
+-- 
+2.44.0
+
 
