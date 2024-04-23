@@ -1,58 +1,86 @@
-Return-Path: <netdev+bounces-90655-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90658-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E7678AF6BA
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 20:40:18 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 296B68AF6D4
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 20:44:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4E0471C222C0
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 18:40:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6FCF9B233CD
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 18:44:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C582F537E9;
-	Tue, 23 Apr 2024 18:40:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 007FF13E8AA;
+	Tue, 23 Apr 2024 18:44:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q71Nv3DW"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="sTdsLXFR"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CE731CD39;
-	Tue, 23 Apr 2024 18:40:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D6701E53F;
+	Tue, 23 Apr 2024 18:44:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713897613; cv=none; b=kDGYEIzo2yL2eP5JCmoieTN/CYh/W6pe/ZZFemowCKj/wEVZOCs6HBI7M9J8SbTZBmfrx2SgSHJekWXPfWiQ1xdMOajJxJEb0uczzwoEKnc2RLcP2ZMpUXqh5jzfmKfOwyEahM+6n8/q/rQmMtwBm3cqkFpHju2Eu0YS6S61Tcc=
+	t=1713897855; cv=none; b=eJJojNpP+YNG4y5RvlwFITjSZtddyNUeYxGe4j7Ipali/3MK1X1vjwuKdWj64M/U5RnyY8rzx3fn7LNvzEuQr5KOuu5cF7WCe4sBjsNIuGC2P1ukYF8aD1uzUqcLj9UqTZ+8701ApLORvmA8DMl3Si8XR2U8WdMi1ZHlQm0AMzE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713897613; c=relaxed/simple;
-	bh=ThM0dkHUHd9BFq7Itl11tNeAKPWyMMKwFqpa1Ol1kFk=;
+	s=arc-20240116; t=1713897855; c=relaxed/simple;
+	bh=Eh9zhjxxN1SsvPJ8tSCa0BbWuSgXZjcEkhJDt0+ZCWw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CkKG+Cm7PXD6Y0Mdkbc7eXz70cslSAwrfkSWZJECLBKAr5WEX0iQKSWom0TCWn6U3fMkvGFOLbD0kgoMZOIvEV2gx+Au+0+H1kb7Y5nrVEy9zeyeccrUwj3ZkYKTDq48XAMjjNh0iuEY82U64H+Ukx4CKblEz8AkSjz3d++CK+U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q71Nv3DW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F2F0C116B1;
-	Tue, 23 Apr 2024 18:40:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713897613;
-	bh=ThM0dkHUHd9BFq7Itl11tNeAKPWyMMKwFqpa1Ol1kFk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Q71Nv3DWdZB5OeZUeWla7WxgboDD/bWp3ZWM5sNlfUrPMJQCQ2DuaXsbNxRDn89+o
-	 TJbjlroBpTCOS7HqI8MlnrQY8GK//mc100ChzwnGL/hrOKa+3rikfVLBqpSC9AQZbC
-	 qje6Er1tztJ8N/D/JhjfD8EM6BgK9lgJJ4tnvWaIVnh9emuHQ113dfgdLCR9l/jzxS
-	 fyzTSjmIwYwFhSN5zOJNYsZxgr09Q+zZ4cxExYenCsGce9A+8u6XjGlcNK1gr7T0di
-	 VN939SBTagn1ZutMmOVY5c1TA27Gaj8lHtQ+fU4w38B1Nnto9pQ3OUBzjNi7tmdwj2
-	 l0VQJdVCO9Rdw==
-Date: Tue, 23 Apr 2024 19:40:08 +0100
-From: Simon Horman <horms@kernel.org>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, eric.dumazet@gmail.com,
-	shironeko <shironeko@tesaguri.club>,
-	Jose Alonso <joalonsof@gmail.com>, linux-usb@vger.kernel.org
-Subject: Re: [PATCH net] net: usb: ax88179_178a: stop lying about
- skb->truesize
-Message-ID: <20240423184008.GZ42092@kernel.org>
-References: <20240421193828.1966195-1-edumazet@google.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=AUZ00UZ42UCGzpoyUbY1XGugCFOzUC2zLogpeZJ10rHI29unvdOiaTbXhqbqr0kRWaaCQliUxfDhZRrt5EulyFg09YRArOh3r53M/ftmVKe6WJaBl8wIXOrsrduBnCqD2JkSXBnIhybDnZWmW3xyP1XNyIHJMPWgTqk+rCbrNcg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=sTdsLXFR; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=r34+nTm/8Jbk3qeyC42lEKxQEubfYHcW3Uknob791/g=; b=sTdsLXFRE+QcyX+0QJ8WCgaQYk
+	jiSZ6Kg9oD2pelNjtWjILcEQkP/tyHd4UJmsQbaA2Jitxjalcki5VI03zdGPwpwTxSoe3aIbli3qQ
+	dWH7sElHDAutoKt8KDm5nian7HuEUHVgySIzKpZXw53KNkQNHisfiYi9aT2zUjYwSYlqMi/pKFh4h
+	lR+8fzkY2is97ohNEfJiNYIyw5wG0OUC6MDW4MRyh7HEtQLG80vucUI1prRhC7ITcRjqm0SAho5j2
+	lxk7qbgnL2WHJoutm2s37b7MEjM+hCAz2PrtFU951qAi7PqrN+vxilNTvPssOcF0h7m744Qbr1drk
+	dX6rIqQw==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1rzL7i-00000001AcU-0fdH;
+	Tue, 23 Apr 2024 18:44:10 +0000
+Date: Tue, 23 Apr 2024 11:44:10 -0700
+From: Luis Chamberlain <mcgrof@kernel.org>
+To: Mike Rapoport <rppt@kernel.org>
+Cc: linux-kernel@vger.kernel.org, Alexandre Ghiti <alexghiti@rivosinc.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	=?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	"David S. Miller" <davem@davemloft.net>,
+	Dinh Nguyen <dinguyen@kernel.org>,
+	Donald Dutile <ddutile@redhat.com>,
+	Eric Chanudet <echanude@redhat.com>,
+	Heiko Carstens <hca@linux.ibm.com>, Helge Deller <deller@gmx.de>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	Kent Overstreet <kent.overstreet@linux.dev>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nadav Amit <nadav.amit@gmail.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Rick Edgecombe <rick.p.edgecombe@intel.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Sam Ravnborg <sam@ravnborg.org>, Song Liu <song@kernel.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+	Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
+	bpf@vger.kernel.org, linux-arch@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
+	linux-mm@kvack.org, linux-modules@vger.kernel.org,
+	linux-parisc@vger.kernel.org, linux-riscv@lists.infradead.org,
+	linux-s390@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org, loongarch@lists.linux.dev,
+	netdev@vger.kernel.org, sparclinux@vger.kernel.org, x86@kernel.org
+Subject: Re: [PATCH v5 00/15] mm: jit/text allocator
+Message-ID: <ZigBepQBSfqLsyL7@bombadil.infradead.org>
+References: <20240422094436.3625171-1-rppt@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,26 +89,30 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240421193828.1966195-1-edumazet@google.com>
+In-Reply-To: <20240422094436.3625171-1-rppt@kernel.org>
+Sender: Luis Chamberlain <mcgrof@infradead.org>
 
-On Sun, Apr 21, 2024 at 07:38:28PM +0000, Eric Dumazet wrote:
-> Some usb drivers try to set small skb->truesize and break
-> core networking stacks.
+On Mon, Apr 22, 2024 at 12:44:21PM +0300, Mike Rapoport wrote:
+> From: "Mike Rapoport (IBM)" <rppt@kernel.org>
 > 
-> In this patch, I removed one of the skb->truesize overide.
+> (something went wrong with the prevois posting, sorry for the noise)
 > 
-> I also replaced one skb_clone() by an allocation of a fresh
-> and small skb, to get minimally sized skbs, like we did
-> in commit 1e2c61172342 ("net: cdc_ncm: reduce skb truesize
-> in rx path")
+> Hi,
 > 
-> Fixes: f8ebb3ac881b ("net: usb: ax88179_178a: Fix packet receiving")
-> Reported-by: shironeko <shironeko@tesaguri.club>
-> Closes: https://lore.kernel.org/netdev/c110f41a0d2776b525930f213ca9715c@tesaguri.club/
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> Cc: Jose Alonso <joalonsof@gmail.com>
-> Cc: linux-usb@vger.kernel.org
+> Since v3 I looked into making execmem more of an utility toolbox, as we
+> discussed at LPC with Mark Rutland, but it was getting more hairier than
+> having a struct describing architecture constraints and a type identifying
+> the consumer of execmem.
+> 
+> And I do think that having the description of architecture constraints for
+> allocations of executable memory in a single place is better than having it
+> spread all over the place.
+> 
+> The patches available via git:
+> https://git.kernel.org/pub/scm/linux/kernel/git/rppt/linux.git/log/?h=execmem/v5
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Thanks! I've merged and pushed this onto modules-next in its entirety now for
+wider testing.
 
+  Luis
 
