@@ -1,102 +1,95 @@
-Return-Path: <netdev+bounces-90399-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90400-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB98B8AE046
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 10:50:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3B5E8AE049
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 10:50:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 983DC282F03
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 08:50:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 588D31F21AB8
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 08:50:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C797954FB5;
-	Tue, 23 Apr 2024 08:50:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89D1755C2A;
+	Tue, 23 Apr 2024 08:50:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GttxDiCi"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 316AF482FA
-	for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 08:50:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6319A55782
+	for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 08:50:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713862234; cv=none; b=gBeiFMU6p3ASysgfJFMsy59k3+TD4thrA7xQj6lbXlMQDNfNYGaWBewiGhL/wbQzn8hzQaROzmZ/8O4WhCZMGW066BXyXRHFwlnF/XSmcqfFLvViD+mqdA0+Yh1pOXg5L3edxgLelStudwBaIcFWW+3WaaTwoaN0/TXU9tjoeBw=
+	t=1713862247; cv=none; b=CxstfFLb6GZSPNTRXpqaTP9WnKeDxNKeZ2EBAhTOvGXmSi8WNt3j4hopQMh3nnORw23S3r/H2jsEL062jdq0CHubfPS51KRPu0NKOnC2FLQxhAh766Z67JKwUBI0s+3YMJ4MQO5UfL+DQPCPickZykQEBy9j5c064kqTYuyi37E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713862234; c=relaxed/simple;
-	bh=w7FyHw/39a9sjSjgy68+TMD8GicBYwCUzwy2rFX/2gg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Xj99ty9IHYlAGtjKN+CJWWimJjwRHJ39P3NIz/UYD+UCJVVjja/c8lvQJaiKvbcDKe6o55ZvywN9vg31u3pLE5CvLpwpcfnDtvKnpnyK+Wa0h74FrAW43GO5/+HtuBHuTzvvGSx4VDuvYU4i8spSRlF17z1G3tki7XWEbboA62s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1rzBr7-0007tc-Vk; Tue, 23 Apr 2024 10:50:25 +0200
-Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1rzBr7-00Dra3-2p; Tue, 23 Apr 2024 10:50:25 +0200
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1rzBr6-009ntL-38;
-	Tue, 23 Apr 2024 10:50:24 +0200
-Date: Tue, 23 Apr 2024 10:50:24 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: "Kory Maincent (Dent Project)" <kory.maincent@bootlin.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	s=arc-20240116; t=1713862247; c=relaxed/simple;
+	bh=ZriBtzS/8pdC+TZzWotyoCsb5KLor5nIotYwCDz1AfM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=MCS167bhU/7t+AmE4qcJ6uw+zb7Et6a/zq8+LJpwUHzhGs8hjPDBca2x4CrMZTvfFa7Gk1XHjmhz8HetYZF1W+sOUOSo8ce5QW/G5lZt4I2NQKOk6sMnAfPEtkESYmkX4YZ5e/VNz3oketcgr5qp3Rve3oeJm4qWq//iI3+GIZg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GttxDiCi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A7E67C116B1;
+	Tue, 23 Apr 2024 08:50:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713862246;
+	bh=ZriBtzS/8pdC+TZzWotyoCsb5KLor5nIotYwCDz1AfM=;
+	h=From:To:Cc:Subject:Date:From;
+	b=GttxDiCiHns8V3NGnVSTJAIfeX5Qz2AAoEveyo7rT/NhIrjNMQdOiIe8l6ROb31fk
+	 n0dhP7mtz3fq74KHYbCmBYnB1W66AAWUx/INzlsYYOOwibSCK/ubIpsNAudW7F1EnK
+	 kDp5Ug6qZgaoHOeZhXZ3Y74oX4yszZd51i0+J3wpzfjg9uVixLkBGxZ5GHdg79GDQy
+	 4+NwsvH1lp6iVx4TtGQyQ4wikdMvIV6/zVhny1rYTVwJJIxXdtdW+iFPcPF7dz9a7T
+	 +mRxvPD5Qa/hmwvFHZwF+Vs1OT2CGNaNs/ocVhmS/xNKWwDpeIFA0rZZUjgDWQZ0tl
+	 kWchIc915WrqA==
+From: =?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>
+To: netdev@vger.kernel.org,
+	Russell King <rmk+kernel@armlinux.org.uk>
+Cc: =?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>,
 	Andrew Lunn <andrew@lunn.ch>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Kyle Swenson <kyle.swenson@est.tech>,
-	kernel test robot <lkp@intel.com>
-Subject: Re: [PATCH net-next v2 3/3] net: pse-pd: Kconfig: Add missing
- Regulator API dependency
-Message-ID: <Zid2UJolNR0GSIeD@pengutronix.de>
-References: <20240422-fix_poe-v2-0-e58325950f07@bootlin.com>
- <20240422-fix_poe-v2-3-e58325950f07@bootlin.com>
+	Heiner Kallweit <hkallweit1@gmail.com>
+Subject: [PATCH net-next v2 1/2] net: sfp: update comment for FS SFP-10G-T quirk
+Date: Tue, 23 Apr 2024 10:50:38 +0200
+Message-ID: <20240423085039.26957-1-kabel@kernel.org>
+X-Mailer: git-send-email 2.43.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240422-fix_poe-v2-3-e58325950f07@bootlin.com>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Mon, Apr 22, 2024 at 03:35:48PM +0200, Kory Maincent (Dent Project) wrote:
-> From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
-> 
-> The PSE (Power Sourcing Equipment) API now relies on the Regulator API.
-> However, the Regulator dependency was missing from Kconfig. This patch
-> adds the necessary dependency, resolving the issue of the missing
-> dependency and ensuring proper functionality of the PSE API.
-> 
-> Reported-by: kernel test robot <lkp@intel.com>
-> Closes: https://lore.kernel.org/oe-kbuild-all/202404201020.mqX2IOu7-lkp@intel.com/
-> Closes: https://lore.kernel.org/oe-kbuild-all/202404200036.D8ap1Mf5-lkp@intel.com/
-> Fixes: d83e13761d5b ("net: pse-pd: Use regulator framework within PSE framework")
-> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
+Update the comment for the Fibrestore SFP-10G-T module: since commit
+e9301af385e7 ("net: sfp: fix PHY discovery for FS SFP-10G-T module")
+we also do a 4 second wait before probing the PHY.
 
-Acked-by: Oleksij Rempel <o.rempel@pengutronix.de>
+Fixes: e9301af385e7 ("net: sfp: fix PHY discovery for FS SFP-10G-T module")
+Signed-off-by: Marek Behún <kabel@kernel.org>
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+---
+Since this only fixes a comment and the next patch is based on this one,
+I am sending to net-next instead of net.
+---
+ drivers/net/phy/sfp.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
+diff --git a/drivers/net/phy/sfp.c b/drivers/net/phy/sfp.c
+index 6e7639fc64dd..1af15f2da8a6 100644
+--- a/drivers/net/phy/sfp.c
++++ b/drivers/net/phy/sfp.c
+@@ -468,8 +468,9 @@ static const struct sfp_quirk sfp_quirks[] = {
+ 	SFP_QUIRK("ALCATELLUCENT", "3FE46541AA", sfp_quirk_2500basex,
+ 		  sfp_fixup_nokia),
+ 
+-	// Fiberstore SFP-10G-T doesn't identify as copper, and uses the
+-	// Rollball protocol to talk to the PHY.
++	// Fiberstore SFP-10G-T doesn't identify as copper, uses the Rollball
++	// protocol to talk to the PHY and needs 4 sec wait before probing the
++	// PHY.
+ 	SFP_QUIRK_F("FS", "SFP-10G-T", sfp_fixup_fs_10gt),
+ 
+ 	// Fiberstore GPON-ONU-34-20BI can operate at 2500base-X, but report 1.2GBd
 -- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+2.43.2
+
 
