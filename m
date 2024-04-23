@@ -1,222 +1,216 @@
-Return-Path: <netdev+bounces-90613-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90614-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 262DE8AF382
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 18:09:38 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1BB8A8AF3AA
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 18:15:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D22212866ED
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 16:09:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 28B89B256B3
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 16:15:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D015013CAA2;
-	Tue, 23 Apr 2024 16:09:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B04713D50A;
+	Tue, 23 Apr 2024 16:14:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FIE8LRDu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B7B613C66C
-	for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 16:09:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.71
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D80413D503;
+	Tue, 23 Apr 2024 16:14:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713888564; cv=none; b=aWEsuL1/vtrIGKQWsJNlQ1qlpMW0QAoDvz9wr5vjXbX+xBXKYGk+DJ1QYM6g5jliIwyej6o860m9kDP+U+tTF3F7o8kLmC9bae0o4VPLLUsEuHh0qwp+FHLarI8jsFms0i56/OjKp3qt4/5OjiSt7d1b7JC6SMPJXW1Uy0dtwJE=
+	t=1713888882; cv=none; b=FGhqfbozAV0w3AFGiJhoK1aCZe+LugiqHmu+gRlKTtQybO50fCUQTA+hbRKqPfNMRwcEkC5jb+TubFBYBmHeWr/kw+2MgJO5+04/zPagvWcnA9Hx8EaFimPzhGH9jJKcxJuf1hgLuBakrNgNB8sFzo3iPA1jQBhjsVtbwycLafo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713888564; c=relaxed/simple;
-	bh=LL6Bn5JcSzwliiLuDQ78JZdeqM3pl5MZa4j3ubP5F80=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Rh0s+AXbyTqNNSjXTdDrs+NlbPHKCcp3D+ORYjaxeDWhaOsCAdG2lfUKm1zlWsKfcO1oM7lP+AqYXbwOCtZwOZj8BTCJ65a105wVfkQ0YzlgAKxObnZ4mfY+kdrulE9DbwtMAFJPNWGtQY66fxi9E9aSQaajb7UGCJ8ztKRQfNM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-7de2de148f9so88850139f.3
-        for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 09:09:22 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713888562; x=1714493362;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=/8J3OxauynARCzPhSLU5/ak2dxpVPJ+Bfj7eFyVyks4=;
-        b=Uynzw6bd6kaIII9DqHOgQrKlzOuo34eRqXefKXJi43ajL495cNt0UQrXGHyugl+bYS
-         RPcg05CdJCfeIlb/hA7nPXK1XmQGOeqDRy/mo8XcnrZUeyGtqpsJS0noKER/Yau4eMQa
-         iS3LOw0wDUwf151jevxLwnsjICgI2HAlAYDmz6V33zCjvbairX2uArbpxDvcoQx2APwN
-         35CjaLOKXLvXGKZrL4wMGWub+D54B59cuV1zZWqmwXRkV7y+hoV/HTAUUySuE8hdtYrM
-         txNOOeoeY74eWtzh7OFEHh7TZ1TXhYdB7x/7WSjB0tLrDt/zHr5GL3PC24gEikEFcz4m
-         b3JQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWX87fiByqMno1/scpFvaR010Isyvazvh1LzqF5G5j9ULJwTJYY1AwO9NRpec3f0Nv5TYcwFxcKxrvZuRz56m7aJGTMeQib
-X-Gm-Message-State: AOJu0Yw2IPECHJB/yhqaxsJXhCE/RCwWCxj4N7HiBqjhgA8tGdb3dsI4
-	Lqv0LNyoxE8CG84RhjinmUQDrEj0wVQ9pTbqCh91AosnG+aFIOcRYR0fb2YJHmwxRnt8L0lrPTV
-	1zU6HaYbSkPNmSZGzOYWzoF7SrPkUpKnDPGMhd1dSmfGrcB00hT+/x44=
-X-Google-Smtp-Source: AGHT+IHtCjhHDwurnWyMvfS1ZtFj8hEag/m7u5e1xnNDD5kvOqbF8jFgh+LwcUOGTMVmM3gPmK/9YVVNK3QO5xwqzCfBxD4snq2x
+	s=arc-20240116; t=1713888882; c=relaxed/simple;
+	bh=Vv3Pzh/tN2YWuj6VkDSluT/ePBD6u8OspryaSNQWcRw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Agbuo2DZ4ZXNacqRbhGYpv64cFA9j9YsTRXUmwI7Ge/n1NkxNyzJS6HgVaOHvZfxEJnu17qmu+NVopARp0S1VVDUcw2d0rDUx2M2T3A1hcEbYcp2xcvtQi1EjMXBi9Yw/uPGq3oSJANykODNhswNOFBVL+csCv0y2HZypzBYfe8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FIE8LRDu; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1713888879; x=1745424879;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Vv3Pzh/tN2YWuj6VkDSluT/ePBD6u8OspryaSNQWcRw=;
+  b=FIE8LRDusZT/64f6dle62V0br9FMckHgrXIHb7Ryhq2nlLPikDrJPTGZ
+   /m/aG6Ln7zyHvMMt25AOov2u9wzKdbWU+JXc5j0XDZNOZkcqL1u5r4i7P
+   xY/G0sXZkCfDozFlSclOwVRMKEy1Ne8yZaEG6ZEvWwfSu/pdiOj7hkvWS
+   GJ+wau+biIbTPJzKqkeZc4v+gcJFATi1xmToWxdC3JnKmhtSE0QyFsKvK
+   b8XpLURI0O22boBOauoVte4YDXCkEhi4Oc/x8KGRU+ygtF7ZMk42KkWLK
+   kfdO3WKmaoH/XsSd/bdkSAbRQ/p8CwtUN44dRZDUZaCtYCcBDOzUqKBSR
+   w==;
+X-CSE-ConnectionGUID: vARbTaijTZm9nbIwetNcRg==
+X-CSE-MsgGUID: d0fs90R3QP+hcLDknxElUA==
+X-IronPort-AV: E=McAfee;i="6600,9927,11053"; a="31978014"
+X-IronPort-AV: E=Sophos;i="6.07,222,1708416000"; 
+   d="scan'208";a="31978014"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2024 09:14:39 -0700
+X-CSE-ConnectionGUID: OyVmfELgT4+8rSOzi26oTg==
+X-CSE-MsgGUID: fz3MNTTYSMOIFOVkv5qZ6g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,222,1708416000"; 
+   d="scan'208";a="24414604"
+Received: from lkp-server01.sh.intel.com (HELO e434dd42e5a1) ([10.239.97.150])
+  by fmviesa009.fm.intel.com with ESMTP; 23 Apr 2024 09:14:35 -0700
+Received: from kbuild by e434dd42e5a1 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rzImv-0000JI-1k;
+	Tue, 23 Apr 2024 16:14:33 +0000
+Date: Wed, 24 Apr 2024 00:13:39 +0800
+From: kernel test robot <lkp@intel.com>
+To: Geetha sowjanya <gakula@marvell.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, kuba@kernel.org, davem@davemloft.net,
+	pabeni@redhat.com, edumazet@google.com, sgoutham@marvell.com,
+	gakula@marvell.com, sbhatta@marvell.com, hkelam@marvell.com
+Subject: Re: [net-next PATCH v2 5/9] octeontx2-af: Add packet path between
+ representor and VF
+Message-ID: <202404240058.p4HzPiSt-lkp@intel.com>
+References: <20240422095401.14245-6-gakula@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:4126:b0:485:7333:8c29 with SMTP id
- ay38-20020a056638412600b0048573338c29mr186877jab.1.1713888562340; Tue, 23 Apr
- 2024 09:09:22 -0700 (PDT)
-Date: Tue, 23 Apr 2024 09:09:22 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000f1761a0616c5c629@google.com>
-Subject: [syzbot] [net?] possible deadlock in __unix_gc
-From: syzbot <syzbot+fa379358c28cc87cc307@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240422095401.14245-6-gakula@marvell.com>
 
-Hello,
+Hi Geetha,
 
-syzbot found the following issue on:
+kernel test robot noticed the following build warnings:
 
-HEAD commit:    4d2008430ce8 Merge tag 'docs-6.9-fixes2' of git://git.lwn...
-git tree:       upstream
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=14a15280980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=98d5a8e00ed1044a
-dashboard link: https://syzkaller.appspot.com/bug?extid=fa379358c28cc87cc307
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16a8fb4f180000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=17ceeb73180000
+[auto build test WARNING on next-20240422]
+[also build test WARNING on v6.9-rc5]
+[cannot apply to net-next/main linus/master horms-ipvs/master v6.9-rc5 v6.9-rc4 v6.9-rc3]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/5670e5771b96/disk-4d200843.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/03314e6c8879/vmlinux-4d200843.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/41aca7a9505a/bzImage-4d200843.xz
+url:    https://github.com/intel-lab-lkp/linux/commits/Geetha-sowjanya/octeontx2-pf-Refactoring-RVU-driver/20240422-175819
+base:   next-20240422
+patch link:    https://lore.kernel.org/r/20240422095401.14245-6-gakula%40marvell.com
+patch subject: [net-next PATCH v2 5/9] octeontx2-af: Add packet path between representor and VF
+config: alpha-randconfig-r122-20240423 (https://download.01.org/0day-ci/archive/20240424/202404240058.p4HzPiSt-lkp@intel.com/config)
+compiler: alpha-linux-gcc (GCC) 13.2.0
+reproduce: (https://download.01.org/0day-ci/archive/20240424/202404240058.p4HzPiSt-lkp@intel.com/reproduce)
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+fa379358c28cc87cc307@syzkaller.appspotmail.com
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202404240058.p4HzPiSt-lkp@intel.com/
 
-======================================================
-WARNING: possible circular locking dependency detected
-6.9.0-rc5-syzkaller-00007-g4d2008430ce8 #0 Not tainted
-------------------------------------------------------
-kworker/u8:1/11 is trying to acquire lock:
-ffff88807cea4e70 (&u->lock){+.+.}-{2:2}, at: spin_lock include/linux/spinlock.h:351 [inline]
-ffff88807cea4e70 (&u->lock){+.+.}-{2:2}, at: __unix_gc+0x40e/0xf70 net/unix/garbage.c:302
+sparse warnings: (new ones prefixed by >>)
+>> drivers/net/ethernet/marvell/octeontx2/af/rvu_rep.c:39:38: sparse: sparse: cast to restricted __be16
+>> drivers/net/ethernet/marvell/octeontx2/af/rvu_rep.c:39:38: sparse: sparse: cast to restricted __be16
+>> drivers/net/ethernet/marvell/octeontx2/af/rvu_rep.c:39:38: sparse: sparse: cast to restricted __be16
+>> drivers/net/ethernet/marvell/octeontx2/af/rvu_rep.c:39:38: sparse: sparse: cast to restricted __be16
+>> drivers/net/ethernet/marvell/octeontx2/af/rvu_rep.c:95:31: sparse: sparse: incorrect type in assignment (different base types) @@     expected restricted __be16 [assigned] [usertype] vlan_etype @@     got int @@
+   drivers/net/ethernet/marvell/octeontx2/af/rvu_rep.c:95:31: sparse:     expected restricted __be16 [assigned] [usertype] vlan_etype
+   drivers/net/ethernet/marvell/octeontx2/af/rvu_rep.c:95:31: sparse:     got int
+   drivers/net/ethernet/marvell/octeontx2/af/rvu_rep.c:96:29: sparse: sparse: incorrect type in assignment (different base types) @@     expected restricted __be16 [assigned] [usertype] vlan_etype @@     got int @@
+   drivers/net/ethernet/marvell/octeontx2/af/rvu_rep.c:96:29: sparse:     expected restricted __be16 [assigned] [usertype] vlan_etype
+   drivers/net/ethernet/marvell/octeontx2/af/rvu_rep.c:96:29: sparse:     got int
+>> drivers/net/ethernet/marvell/octeontx2/af/rvu_rep.c:97:29: sparse: sparse: incorrect type in assignment (different base types) @@     expected restricted __be16 [assigned] [usertype] vlan_tci @@     got unsigned short [assigned] [usertype] vlan_tci @@
+   drivers/net/ethernet/marvell/octeontx2/af/rvu_rep.c:97:29: sparse:     expected restricted __be16 [assigned] [usertype] vlan_tci
+   drivers/net/ethernet/marvell/octeontx2/af/rvu_rep.c:97:29: sparse:     got unsigned short [assigned] [usertype] vlan_tci
+>> drivers/net/ethernet/marvell/octeontx2/af/rvu_rep.c:98:27: sparse: sparse: incorrect type in assignment (different base types) @@     expected restricted __be16 [assigned] [usertype] vlan_tci @@     got int @@
+   drivers/net/ethernet/marvell/octeontx2/af/rvu_rep.c:98:27: sparse:     expected restricted __be16 [assigned] [usertype] vlan_tci
+   drivers/net/ethernet/marvell/octeontx2/af/rvu_rep.c:98:27: sparse:     got int
 
-but task is already holding lock:
-ffffffff8f6ab638 (unix_gc_lock){+.+.}-{2:2}, at: spin_lock include/linux/spinlock.h:351 [inline]
-ffffffff8f6ab638 (unix_gc_lock){+.+.}-{2:2}, at: __unix_gc+0x117/0xf70 net/unix/garbage.c:261
+vim +39 drivers/net/ethernet/marvell/octeontx2/af/rvu_rep.c
 
-which lock already depends on the new lock.
+    25	
+    26	static int rvu_rep_tx_vlan_cfg(struct rvu *rvu,  u16 pcifunc,
+    27				       u16 vlan_tci, int *vidx)
+    28	{
+    29		struct nix_vtag_config_rsp rsp = {};
+    30		struct nix_vtag_config req = {};
+    31		u64 etype = ETH_P_8021Q;
+    32		int err;
+    33	
+    34		/* Insert vlan tag */
+    35		req.hdr.pcifunc = pcifunc;
+    36		req.vtag_size = VTAGSIZE_T4;
+    37		req.cfg_type = 0; /* tx vlan cfg */
+    38		req.tx.cfg_vtag0 = true;
+  > 39		req.tx.vtag0 = etype << 48 | ntohs(vlan_tci);
+    40	
+    41		err = rvu_mbox_handler_nix_vtag_cfg(rvu, &req, &rsp);
+    42		if (err) {
+    43			dev_err(rvu->dev, "Tx vlan config failed\n");
+    44			return err;
+    45		}
+    46		*vidx = rsp.vtag0_idx;
+    47		return 0;
+    48	}
+    49	
+    50	static int rvu_rep_rx_vlan_cfg(struct rvu *rvu, u16 pcifunc)
+    51	{
+    52		struct nix_vtag_config req = {};
+    53		struct nix_vtag_config_rsp rsp;
+    54	
+    55		/* config strip, capture and size */
+    56		req.hdr.pcifunc = pcifunc;
+    57		req.vtag_size = VTAGSIZE_T4;
+    58		req.cfg_type = 1; /* rx vlan cfg */
+    59		req.rx.vtag_type = NIX_AF_LFX_RX_VTAG_TYPE0;
+    60		req.rx.strip_vtag = true;
+    61		req.rx.capture_vtag = false;
+    62	
+    63		return rvu_mbox_handler_nix_vtag_cfg(rvu, &req, &rsp);
+    64	}
+    65	
+    66	static int rvu_rep_install_rx_rule(struct rvu *rvu, u16 pcifunc,
+    67					   u16 entry, bool rte)
+    68	{
+    69		struct npc_install_flow_req req = {};
+    70		struct npc_install_flow_rsp rsp = {};
+    71		struct rvu_pfvf *pfvf;
+    72		u16 vlan_tci, rep_id;
+    73	
+    74		pfvf = rvu_get_pfvf(rvu, pcifunc);
+    75	
+    76		/* To stree the traffic from Representee to Representor */
+    77		rep_id = (u16)rvu_rep_get_vlan_id(rvu, pcifunc);
+    78		if (rte) {
+    79			vlan_tci = rep_id | 0x1ull << 8;
+    80			req.vf = rvu->rep_pcifunc;
+    81			req.op = NIX_RX_ACTIONOP_UCAST;
+    82			req.index = rep_id;
+    83		} else {
+    84			vlan_tci = rep_id;
+    85			req.vf = pcifunc;
+    86			req.op = NIX_RX_ACTION_DEFAULT;
+    87		}
+    88	
+    89		rvu_rep_rx_vlan_cfg(rvu, req.vf);
+    90		req.entry = entry;
+    91		req.hdr.pcifunc = 0; /* AF is requester */
+    92		req.features = BIT_ULL(NPC_OUTER_VID) | BIT_ULL(NPC_VLAN_ETYPE_CTAG);
+    93		req.vtag0_valid = true;
+    94		req.vtag0_type = NIX_AF_LFX_RX_VTAG_TYPE0;
+  > 95		req.packet.vlan_etype = ETH_P_8021Q;
+    96		req.mask.vlan_etype = ETH_P_8021Q;
+  > 97		req.packet.vlan_tci = vlan_tci;
+  > 98		req.mask.vlan_tci = 0xffff;
+    99	
+   100		req.channel = RVU_SWITCH_LBK_CHAN;
+   101		req.chan_mask = 0xffff;
+   102		req.intf = pfvf->nix_rx_intf;
+   103	
+   104		return rvu_mbox_handler_npc_install_flow(rvu, &req, &rsp);
+   105	}
+   106	
 
-
-the existing dependency chain (in reverse order) is:
-
--> #1 (unix_gc_lock){+.+.}-{2:2}:
-       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5754
-       __raw_spin_lock include/linux/spinlock_api_smp.h:133 [inline]
-       _raw_spin_lock+0x2e/0x40 kernel/locking/spinlock.c:154
-       spin_lock include/linux/spinlock.h:351 [inline]
-       unix_notinflight+0x13d/0x390 net/unix/garbage.c:140
-       unix_detach_fds net/unix/af_unix.c:1819 [inline]
-       unix_destruct_scm+0x221/0x350 net/unix/af_unix.c:1876
-       skb_release_head_state+0x100/0x250 net/core/skbuff.c:1188
-       skb_release_all net/core/skbuff.c:1200 [inline]
-       __kfree_skb net/core/skbuff.c:1216 [inline]
-       kfree_skb_reason+0x16d/0x3b0 net/core/skbuff.c:1252
-       kfree_skb include/linux/skbuff.h:1262 [inline]
-       manage_oob net/unix/af_unix.c:2672 [inline]
-       unix_stream_read_generic+0x1125/0x2700 net/unix/af_unix.c:2749
-       unix_stream_splice_read+0x239/0x320 net/unix/af_unix.c:2981
-       do_splice_read fs/splice.c:985 [inline]
-       splice_file_to_pipe+0x299/0x500 fs/splice.c:1295
-       do_splice+0xf2d/0x1880 fs/splice.c:1379
-       __do_splice fs/splice.c:1436 [inline]
-       __do_sys_splice fs/splice.c:1652 [inline]
-       __se_sys_splice+0x331/0x4a0 fs/splice.c:1634
-       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-       do_syscall_64+0xf5/0x240 arch/x86/entry/common.c:83
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
--> #0 (&u->lock){+.+.}-{2:2}:
-       check_prev_add kernel/locking/lockdep.c:3134 [inline]
-       check_prevs_add kernel/locking/lockdep.c:3253 [inline]
-       validate_chain+0x18cb/0x58e0 kernel/locking/lockdep.c:3869
-       __lock_acquire+0x1346/0x1fd0 kernel/locking/lockdep.c:5137
-       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5754
-       __raw_spin_lock include/linux/spinlock_api_smp.h:133 [inline]
-       _raw_spin_lock+0x2e/0x40 kernel/locking/spinlock.c:154
-       spin_lock include/linux/spinlock.h:351 [inline]
-       __unix_gc+0x40e/0xf70 net/unix/garbage.c:302
-       process_one_work kernel/workqueue.c:3254 [inline]
-       process_scheduled_works+0xa10/0x17c0 kernel/workqueue.c:3335
-       worker_thread+0x86d/0xd70 kernel/workqueue.c:3416
-       kthread+0x2f0/0x390 kernel/kthread.c:388
-       ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
-       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
-
-other info that might help us debug this:
-
- Possible unsafe locking scenario:
-
-       CPU0                    CPU1
-       ----                    ----
-  lock(unix_gc_lock);
-                               lock(&u->lock);
-                               lock(unix_gc_lock);
-  lock(&u->lock);
-
- *** DEADLOCK ***
-
-3 locks held by kworker/u8:1/11:
- #0: ffff888015089148 ((wq_completion)events_unbound){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3229 [inline]
- #0: ffff888015089148 ((wq_completion)events_unbound){+.+.}-{0:0}, at: process_scheduled_works+0x8e0/0x17c0 kernel/workqueue.c:3335
- #1: ffffc90000107d00 (unix_gc_work){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3230 [inline]
- #1: ffffc90000107d00 (unix_gc_work){+.+.}-{0:0}, at: process_scheduled_works+0x91b/0x17c0 kernel/workqueue.c:3335
- #2: ffffffff8f6ab638 (unix_gc_lock){+.+.}-{2:2}, at: spin_lock include/linux/spinlock.h:351 [inline]
- #2: ffffffff8f6ab638 (unix_gc_lock){+.+.}-{2:2}, at: __unix_gc+0x117/0xf70 net/unix/garbage.c:261
-
-stack backtrace:
-CPU: 0 PID: 11 Comm: kworker/u8:1 Not tainted 6.9.0-rc5-syzkaller-00007-g4d2008430ce8 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
-Workqueue: events_unbound __unix_gc
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0x241/0x360 lib/dump_stack.c:114
- check_noncircular+0x36a/0x4a0 kernel/locking/lockdep.c:2187
- check_prev_add kernel/locking/lockdep.c:3134 [inline]
- check_prevs_add kernel/locking/lockdep.c:3253 [inline]
- validate_chain+0x18cb/0x58e0 kernel/locking/lockdep.c:3869
- __lock_acquire+0x1346/0x1fd0 kernel/locking/lockdep.c:5137
- lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5754
- __raw_spin_lock include/linux/spinlock_api_smp.h:133 [inline]
- _raw_spin_lock+0x2e/0x40 kernel/locking/spinlock.c:154
- spin_lock include/linux/spinlock.h:351 [inline]
- __unix_gc+0x40e/0xf70 net/unix/garbage.c:302
- process_one_work kernel/workqueue.c:3254 [inline]
- process_scheduled_works+0xa10/0x17c0 kernel/workqueue.c:3335
- worker_thread+0x86d/0xd70 kernel/workqueue.c:3416
- kthread+0x2f0/0x390 kernel/kthread.c:388
- ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
- </TASK>
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
