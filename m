@@ -1,111 +1,135 @@
-Return-Path: <netdev+bounces-90488-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90490-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93EC98AE3EE
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 13:30:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 546F88AE3F8
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 13:32:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C67191C22227
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 11:30:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 869A01C22968
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 11:32:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70E347E59F;
-	Tue, 23 Apr 2024 11:30:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52C33824AC;
+	Tue, 23 Apr 2024 11:31:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="exFm2Vrw"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="XtA9mcPP"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out30-100.freemail.mail.aliyun.com (out30-100.freemail.mail.aliyun.com [115.124.30.100])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F0607D3E6;
-	Tue, 23 Apr 2024 11:30:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26EB47FBCF;
+	Tue, 23 Apr 2024 11:31:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.100
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713871830; cv=none; b=sJYIoAvDkiDpRFUQ3et95IdQeiTjUrh4dCjTV5gK4eXfaXyocLIf/ja1VlQGrF+B/HlXIypE2/Lk7C+8L0/bXHqygret5A5wT3to2usiQWr9SdC5hUisi6LU3Wx8y67LVP/2n8F63bE5xruFhgX35kvrFF6XuU/EK4/PzdySGPo=
+	t=1713871913; cv=none; b=bYMhoas48sFh9n794LdMllfkfuHjmIzFdyIPeXOHLhlGAljf/GHvaMIvolQ29Qjjq586GolWEKtZPYtvr8tWyrDA5Athvzx3r5U0AeqTHVH2dXdOnD6LOqG6sr43z9kQuOzT/z2tKamMUf//X7Kt5X57uJfL4EF8JDpsf76bf3g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713871830; c=relaxed/simple;
-	bh=Nq9WyZ1f/AyPelh/YiIXTtOGifGc5Zz8SfWRvAnWDdg=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Zzh5ZpXjPRGYe2KkR5c/c8LpcMAxY6DfHREpfEymiZmo29OhNQGY2bkxz6bbwCluvpUixHCqWAt+r/ulZJMgrwScAWf6YLvi8gwEBGzbrp3cmCHW3j0vhiAY5iq+7ueSiDVfQXfod53fR8tTrmnda/ejfrmtKZDeymJHYwEw79s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=exFm2Vrw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id B9395C2BD11;
-	Tue, 23 Apr 2024 11:30:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713871829;
-	bh=Nq9WyZ1f/AyPelh/YiIXTtOGifGc5Zz8SfWRvAnWDdg=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=exFm2VrwQCGJUFP88430cybowGq0K29utUWcg7Pj1nxZuWIAy2v8YRsPHOj1hpwJQ
-	 LX8TpLx6yuHDTDLdU5yCeMH+P0dpJ97RdLkNmpYFKX6QUtP4oIakOBbTq//lXLCidC
-	 bBeu2F1MEdjWp1JJgSTuD1+YIPPLIzXZhXSaBeQjAuoO2//EdiRKHG+YiEq80KayHQ
-	 frnmzwXlF4D4OoIBRsqqD4xW+vJVSdHFN6WUrRDuuY6JKL1XJwDgeEErSSeMitEEfE
-	 UT8WlauNKo9kNANSPPkAFgR8x2DhEylnMlPwtatVuUt2njdIB+GT0sjsg6GtOM+8/8
-	 8KXng6PRcHgug==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 9C97DC00448;
-	Tue, 23 Apr 2024 11:30:29 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1713871913; c=relaxed/simple;
+	bh=1lPiGQ5shC4C7UOa4YIACl3pZn+ENy7c7yEhkeTIp38=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=akgm8K2MmzzmiZYZG+0g1GQ7k507GiZPyI8twEfs0pH1mW4YpzcyNSaHUv6z5gjLvnBysVwdfanlt7tY5CfsfrDU53SbwG6qSfYs5IAX/RHdQP9i9DsEtdkv+Dq5FN8Q0Hwl6h8kr9owV+Lw5r8ZQFp0EMGlt8yd1mXYHY6WHkU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=XtA9mcPP; arc=none smtp.client-ip=115.124.30.100
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1713871903; h=From:To:Subject:Date:Message-Id:MIME-Version;
+	bh=xoJ9YNLWXu7XQFYT7mcYJIil9lkfTlWRr3vGzICttBY=;
+	b=XtA9mcPPFen/FB3BSDqiXtnxMOeK2FuWs0jeHjOuqgkXtdG8jZ9GFmbg+zOwCHODLiOnEm9zRuwPm1u/F2VRccX9trcWByOAYwZFfbEk2xPlE1QPpgGUo6YGQSxqhJxp0062uhobGRKQBB6dvEdaWQ1CXJx2KAP0VA6TVncN93w=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R111e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037067110;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=19;SR=0;TI=SMTPD_---0W596LXQ_1713871901;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W596LXQ_1713871901)
+          by smtp.aliyun-inc.com;
+          Tue, 23 Apr 2024 19:31:42 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Stanislav Fomichev <sdf@google.com>,
+	Amritha Nambiar <amritha.nambiar@intel.com>,
+	Larysa Zaremba <larysa.zaremba@intel.com>,
+	Sridhar Samudrala <sridhar.samudrala@intel.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	virtualization@lists.linux.dev,
+	bpf@vger.kernel.org
+Subject: [PATCH net-next v6 0/8] virtio-net: support device stats
+Date: Tue, 23 Apr 2024 19:31:33 +0800
+Message-Id: <20240423113141.1752-1-xuanzhuo@linux.alibaba.com>
+X-Mailer: git-send-email 2.32.0.3.g01195cf9f
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-Git-Hash: 75c95ace5f2d
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 0/8] net: ipa: eight simple cleanups
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171387182963.10035.7202226202218402214.git-patchwork-notify@kernel.org>
-Date: Tue, 23 Apr 2024 11:30:29 +0000
-References: <20240419151800.2168903-1-elder@linaro.org>
-In-Reply-To: <20240419151800.2168903-1-elder@linaro.org>
-To: Alex Elder <elder@linaro.org>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, mka@chromium.org, andersson@kernel.org,
- quic_cpratapa@quicinc.com, quic_avuyyuru@quicinc.com,
- quic_jponduru@quicinc.com, quic_subashab@quicinc.com, elder@kernel.org,
- netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org,
- linux-kernel@vger.kernel.org
 
-Hello:
+As the spec:
 
-This series was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+https://github.com/oasis-tcs/virtio-spec/commit/42f389989823039724f95bbbd243291ab0064f82
 
-On Fri, 19 Apr 2024 10:17:52 -0500 you wrote:
-> This series contains a mix of cleanups, some dating back to
-> December, 2022.  Version 1 was based on an older version of
-> net-next/main; this version has simply been rebased.
-> 
-> The first two make it so the IPA SUSPEND interrupt only gets enabled
-> when necessary.  That make it possible in the third patch to call
-> device_init_wakeup() during an earlier phase of initialization, and
-> remove two functions.
-> 
-> [...]
+The virtio net supports to get device stats.
 
-Here is the summary with links:
-  - [net-next,v2,1/8] net: ipa: maintain bitmap of suspend-enabled endpoints
-    https://git.kernel.org/netdev/net-next/c/2eca73444036
-  - [net-next,v2,2/8] net: ipa: only enable the SUSPEND IPA interrupt when needed
-    https://git.kernel.org/netdev/net-next/c/6f3700266369
-  - [net-next,v2,3/8] net: ipa: call device_init_wakeup() earlier
-    https://git.kernel.org/netdev/net-next/c/19790951f031
-  - [net-next,v2,4/8] net: ipa: remove unneeded FILT_ROUT_HASH_EN definitions
-    https://git.kernel.org/netdev/net-next/c/5043d6b16211
-  - [net-next,v2,5/8] net: ipa: make ipa_table_hash_support() a real function
-    https://git.kernel.org/netdev/net-next/c/b81565b7fd02
-  - [net-next,v2,6/8] net: ipa: fix two bogus argument names
-    https://git.kernel.org/netdev/net-next/c/f2e4e9ea82f9
-  - [net-next,v2,7/8] net: ipa: fix two minor ipa_cmd problems
-    https://git.kernel.org/netdev/net-next/c/319b6d4ef087
-  - [net-next,v2,8/8] net: ipa: kill ipa_version_supported()
-    https://git.kernel.org/netdev/net-next/c/dfdd70e24e38
+Please review.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Thanks.
 
+v6:
+    1. remove 'maps'. check stats by if-else.
+
+v5:
+    1. Fix some small problems in last version
+    2. Not report stats that will be reported by netlink
+    3. remove "_queue" from  ethtool -S
+
+v4:
+    1. Support per-queue statistics API
+    2. Fix some small problems in last version
+
+v3:
+    1. rebase net-next
+
+v2:
+    1. fix the usage of the leXX_to_cpu()
+    2. add comment to the structure virtnet_stats_map
+
+v1:
+    1. fix some definitions of the marco and the struct
+
+
+
+
+
+
+
+Xuan Zhuo (8):
+  virtio_net: introduce device stats feature and structures
+  virtio_net: remove "_queue" from ethtool -S
+  virtio_net: support device stats
+  virtio_net: device stats helpers support driver stats
+  virtio_net: add the total stats field
+  virtio_net: rename stat tx_timeout to timeout
+  netdev: add queue stats
+  virtio-net: support queue stat
+
+ Documentation/netlink/specs/netdev.yaml | 104 +++
+ drivers/net/virtio_net.c                | 969 ++++++++++++++++++++++--
+ include/net/netdev_queues.h             |  27 +
+ include/uapi/linux/netdev.h             |  19 +
+ include/uapi/linux/virtio_net.h         | 143 ++++
+ net/core/netdev-genl.c                  |  23 +-
+ tools/include/uapi/linux/netdev.h       |  19 +
+ 7 files changed, 1247 insertions(+), 57 deletions(-)
+
+--
+2.32.0.3.g01195cf9f
 
 
