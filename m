@@ -1,121 +1,198 @@
-Return-Path: <netdev+bounces-90391-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90392-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 369548ADFF0
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 10:41:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EB0198ADFF1
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 10:41:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 677CE1C228F4
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 08:41:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1B2A71C22715
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 08:41:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D04954FA0;
-	Tue, 23 Apr 2024 08:40:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A0CB5579F;
+	Tue, 23 Apr 2024 08:40:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IAWWlpyO"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fP35xdLo"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17AC454913
-	for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 08:40:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A6D354913
+	for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 08:40:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713861647; cv=none; b=igze1H9A7hfgJwSKdl3H1+tpUbOSFztjs5j7hyI/1lojmphpIBUVBKNwXlamlk9UWic3B34Dx9dJe81496BWfZ6FgItsozXcIkkKeaEuTfwtDoC9ureexFXeP5I246QyhdOMwf67TQqD4QFiw/HguZz7i2100SoMT+nfwqfZOMA=
+	t=1713861657; cv=none; b=NCWwPdMG60EBQR9H9K8YFgcN6Gs7JIWEXxfiWXRyXfmhTdhRTC9RqXqcloPKDqtJiuM0/TlK+vsIjegnVF8YAlWoKpwV6+iz03CQCpBi6d5ZUCIWvVE+q0EjbypysVkDrJD7IAZQWJW4sOa3iMa8LSkP6jVtHkp9iFVKmHH8sFg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713861647; c=relaxed/simple;
-	bh=/3NNL8E9rqu/KD80ikV6+qb39GR/qDWlCsxfeJ5iKGU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=di0Eh4SqTUQmGRNmbGIOqppCM8x8DnI6GZhOqrL5bJLciy9tj2sLwc9rwKDt1wgcSLr9H+iJAeSRpKNZg4XyJCVpfc7jZ5pgyekkQ8hHnaQk5e5svi8Xao3oSWgSG1Qmkmk0jBtZbfnlGGERb5+mlO6EBKsGBW5bepq+Cw1ca+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IAWWlpyO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D71FAC116B1;
-	Tue, 23 Apr 2024 08:40:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713861646;
-	bh=/3NNL8E9rqu/KD80ikV6+qb39GR/qDWlCsxfeJ5iKGU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=IAWWlpyOKY4DHt7wpx20/u5OmEOwSQPG/YYJXP5XUqw07q2HmsfRrO9cGsEs1MXq4
-	 iEIV0Mumke0OEKBi4llmHf78L0WyK5I/ZXM8a/52cQBOWxJJ8rfWd6RNKpeaFvXl3T
-	 hRgXj8hT+SlYmbES+pv+G5guWM+3OoTk6URAHP3M8FXD84hFpA5gvI/Amw2e44i74i
-	 Hk0CcjEA0L+oW6xIJcj/+ZZbV0I/kMI+La1qtL1hXMyiao55kKx7jOQUbfImR1nwzd
-	 mRNXhd6aEtQwGMANOQOG2zNYMz4JfSEVtbbI5gU8n9Cqozrg6Z86x5fxEyM4O4UE/7
-	 gUoX8b1AOlUPQ==
-Date: Tue, 23 Apr 2024 10:40:41 +0200
-From: Marek =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>
-To: Eric Woudstra <ericwouds@gmail.com>
-Cc: netdev@vger.kernel.org, Russell King <rmk+kernel@armlinux.org.uk>, Raju
- Lakkaraju <Raju.Lakkaraju@microchip.com>, Frank Wunderlich
- <frank-w@public-files.de>, Simon Horman <simon.horman@corigine.com>, Andrew
- Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
-Subject: Re: [PATCH net-next 2/2] net: sfp: enhance quirk for Fibrestore
- 2.5G copper SFP module
-Message-ID: <20240423104041.080a9876@dellmb>
-In-Reply-To: <ea9924d3-639b-4332-b870-a9ab2caab11c@gmail.com>
-References: <20240422094435.25913-1-kabel@kernel.org>
-	<20240422094435.25913-2-kabel@kernel.org>
-	<ea9924d3-639b-4332-b870-a9ab2caab11c@gmail.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.41; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1713861657; c=relaxed/simple;
+	bh=a1StSV/DuHC2xEPRVESsMkc2H07ehAxDi0sWxQQg81g=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=YMWG1iXiqWmTmswbFnH2ms4vFeNgXB6047DAaA+KsVk0ofSpFuiOV341eIjKDvfkrMN6/sv+UHQsWckX3TpKcI3elC71nEOfVNK6H7FwPgwS0PmsfXXGY+m26IezJz+vDV8x25SnCnYAJkrhcisAdqPoS2rJwPrhYkBolNbWupg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fP35xdLo; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1713861654;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=WBhy2NIZyHBCakG2u3+dlgMj9SbpEWO/Yr2w1puTclg=;
+	b=fP35xdLoIRdjfoYhV/ED2rZs5DUXGMYr4uQ/jwu7cyb8sDeS5D5OqLJVnq4+ePruemM8CG
+	SA4eRJYoQtOSDgB16bf0iwfmwxkQzl8y0+TtZfQAJeKRW1NdeeSyByYEI5+N7nsxYX4mw2
+	MLb0hksgh0J1WrvTusvdWh4818po1A4=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-15-p54AxvzqPQqSf8MieNQUJA-1; Tue, 23 Apr 2024 04:40:52 -0400
+X-MC-Unique: p54AxvzqPQqSf8MieNQUJA-1
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3450bcc1482so735761f8f.1
+        for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 01:40:51 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713861651; x=1714466451;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=WBhy2NIZyHBCakG2u3+dlgMj9SbpEWO/Yr2w1puTclg=;
+        b=gnZ1dTd1P1vo4DmuRuIZlxSRgi9ESUZhdm4RZvjSH9FHl3cqIjr0QbJ7WWVGz/enBm
+         RFeXoBBeAQmu4COLKR4x2JQW1H3h+gKyUoW+DIs0PX79MyNR3fOqM+tQJZ7lEFjteOy1
+         zo3nxkzmTA5zU0pmrOpCfp3rEOiaB7n6otcpA+kR8JuWI40SrV3VgDODQiZ4o4yAVWOB
+         cjOkudxlC3XoorKOzoq/n3f3yPdYkuFwHkv8/OX4g/MHlAQmrZXtkF9v99DkZjFwJNie
+         gNyBkukL+SQ1AsTVwgYXMWXc/uh4iIJv671Yb4iV2oSEJKI2O6Pn/GgShYOrhRIswo93
+         +vpQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW+8NR8s+2z6I/yG41O2ilMFlVV0mPJacgQchZ90jajbuvi7l2JcpandRRgC0eTRXk+7hksJWhJ6TsXp/3QkMC0iZc/ugK6
+X-Gm-Message-State: AOJu0YxeB2RzAV2Ogor0jm1qhBRxY+XrS9k0L+icetX5/JU8LSFk8ICQ
+	bVOY6Mwo5DaVW4o8MUuHOlHvwa/COItePfbUVlb0L4n6q6qvgBWWT0rmGwpd/W8kGsHjsidsMPk
+	KhbC3xknhpvx4TQrUYLtMfXn44cbQnsW2fdLA65HBITvaSbT+epImRA==
+X-Received: by 2002:a05:600c:3ca4:b0:41a:bb50:92bb with SMTP id bg36-20020a05600c3ca400b0041abb5092bbmr696580wmb.0.1713861650920;
+        Tue, 23 Apr 2024 01:40:50 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGuYGM+Izwbr16myDEMQ3YHgPrdTyUYh8tJVaQzd3+LFEzph55+XImIQrAxk2Nx1xsGhnoCdQ==
+X-Received: by 2002:a05:600c:3ca4:b0:41a:bb50:92bb with SMTP id bg36-20020a05600c3ca400b0041abb5092bbmr696555wmb.0.1713861650500;
+        Tue, 23 Apr 2024 01:40:50 -0700 (PDT)
+Received: from gerbillo.redhat.com ([2a0d:3344:172c:4510::f71])
+        by smtp.gmail.com with ESMTPSA id n6-20020a05600c3b8600b0041892e839bcsm19505308wms.33.2024.04.23.01.40.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 23 Apr 2024 01:40:49 -0700 (PDT)
+Message-ID: <6123223eaf54ea6f492c896d81551315a1e38f66.camel@redhat.com>
+Subject: Re: [PATCH net-next v3 2/2] net: dsa: mt7530: simplify core
+ operations
+From: Paolo Abeni <pabeni@redhat.com>
+To: =?UTF-8?Q?Ar=C4=B1n=C3=A7_=C3=9CNAL?= <arinc.unal@arinc9.com>, Daniel
+ Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>, Sean Wang
+ <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>, Florian Fainelli
+ <f.fainelli@gmail.com>, Vladimir Oltean <olteanv@gmail.com>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>, 
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Cc: Bartel Eerdekens <bartel.eerdekens@constell8.be>,
+ mithat.guner@xeront.com,  erkin.bozoglu@xeront.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org,  linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org
+Date: Tue, 23 Apr 2024 10:40:47 +0200
+In-Reply-To: <20240418-b4-for-netnext-mt7530-phy-addr-from-dt-and-simplify-core-ops-v3-2-3b5fb249b004@arinc9.com>
+References: 
+	<20240418-b4-for-netnext-mt7530-phy-addr-from-dt-and-simplify-core-ops-v3-0-3b5fb249b004@arinc9.com>
+	 <20240418-b4-for-netnext-mt7530-phy-addr-from-dt-and-simplify-core-ops-v3-2-3b5fb249b004@arinc9.com>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
 
-On Tue, 23 Apr 2024 07:54:39 +0200
-Eric Woudstra <ericwouds@gmail.com> wrote:
+On Thu, 2024-04-18 at 08:35 +0300, Ar=C4=B1n=C3=A7 =C3=9CNAL wrote:
+> The core_rmw() function calls core_read_mmd_indirect() to read the
+> requested register, and then calls core_write_mmd_indirect() to write the
+> requested value to the register. Because Clause 22 is used to access Clau=
+se
+> 45 registers, some operations on core_write_mmd_indirect() are
+> unnecessarily run. Get rid of core_read_mmd_indirect() and
+> core_write_mmd_indirect(), and run only the necessary operations on
+> core_write() and core_rmw().
+>=20
+> Reviewed-by: Daniel Golle <daniel@makrotopia.org>
+> Tested-by: Daniel Golle <daniel@makrotopia.org>
+> Signed-off-by: Ar=C4=B1n=C3=A7 =C3=9CNAL <arinc.unal@arinc9.com>
+> ---
+>  drivers/net/dsa/mt7530.c | 108 +++++++++++++++++++----------------------=
+------
+>  1 file changed, 43 insertions(+), 65 deletions(-)
+>=20
+> diff --git a/drivers/net/dsa/mt7530.c b/drivers/net/dsa/mt7530.c
+> index 64b1f6320b9a..e0cb194019f8 100644
+> --- a/drivers/net/dsa/mt7530.c
+> +++ b/drivers/net/dsa/mt7530.c
+> @@ -74,116 +74,94 @@ static const struct mt7530_mib_desc mt7530_mib[] =3D=
+ {
+>  	MIB_DESC(1, 0xb8, "RxArlDrop"),
+>  };
+> =20
+> -/* Since phy_device has not yet been created and
+> - * phy_{read,write}_mmd_indirect is not available, we provide our own
+> - * core_{read,write}_mmd_indirect with core_{clear,write,set} wrappers
+> - * to complete this function.
+> - */
+> -static int
+> -core_read_mmd_indirect(struct mt7530_priv *priv, int prtad, int devad)
+> +static void
+> +mt7530_mutex_lock(struct mt7530_priv *priv)
+> +{
+> +	if (priv->bus)
+> +		mutex_lock_nested(&priv->bus->mdio_lock, MDIO_MUTEX_NESTED);
+> +}
+> +
+> +static void
+> +mt7530_mutex_unlock(struct mt7530_priv *priv)
+> +{
+> +	if (priv->bus)
+> +		mutex_unlock(&priv->bus->mdio_lock);
+> +}
+> +
+> +static void
+> +core_write(struct mt7530_priv *priv, u32 reg, u32 val)
+>  {
+>  	struct mii_bus *bus =3D priv->bus;
+> -	int value, ret;
+> +	int ret;
+> +
+> +	mt7530_mutex_lock(priv);
+> =20
+>  	/* Write the desired MMD Devad */
+>  	ret =3D bus->write(bus, MT753X_CTRL_PHY_ADDR(priv->mdiodev->addr),
+> -			 MII_MMD_CTRL, devad);
+> +			 MII_MMD_CTRL, MDIO_MMD_VEND2);
+>  	if (ret < 0)
+>  		goto err;
+> =20
+>  	/* Write the desired MMD register address */
+>  	ret =3D bus->write(bus, MT753X_CTRL_PHY_ADDR(priv->mdiodev->addr),
+> -			 MII_MMD_DATA, prtad);
+> +			 MII_MMD_DATA, reg);
+>  	if (ret < 0)
+>  		goto err;
+> =20
+>  	/* Select the Function : DATA with no post increment */
+>  	ret =3D bus->write(bus, MT753X_CTRL_PHY_ADDR(priv->mdiodev->addr),
+> -			 MII_MMD_CTRL, devad | MII_MMD_CTRL_NOINCR);
+> +			 MII_MMD_CTRL, MDIO_MMD_VEND2 | MII_MMD_CTRL_NOINCR);
+>  	if (ret < 0)
+>  		goto err;
 
-> On 4/22/24 11:44, Marek Beh=C3=BAn wrote:
->=20
-> > Frank, Russell, do you still have access to OEM SFP-2.5G-T module?
-> > It could make sense to try this quirk also for those modeuls, instead
-> > of the current sfp_quirk_oem_2_5 =20
->=20
-> It was part of the previous patch-set until and including v2:
-> "rtl8221b/8251b add C45 instances and SerDes switching"
->=20
-> Note that it does:
-> 	sfp->id.base.extended_cc =3D SFF8024_ECC_2_5GBASE_T;
-> As the OEM modules have not set this byte. We need it, so that we know
-> that the sfp_may_have_phy().
->=20
-> After v2 I have dropped it, as it would break functioning some sfp-module=
-s.
->=20
-> As OEM vendors know the eeprom password of the Rollball sfp modules,
-> they use it in any way they want, not taking in to account that mainline
-> kernel uses it for unique identification.
->=20
-> Vendor 1 sells "OEM", "SFP-2.5G-T" with a rtl8221b on it.
-> Vendor 2 sells "OEM", "SFP-2.5G-T" with a yt8821 on it.
->=20
-> So on the OEM modules, we cannot rely solely on the two strings anymore.
->=20
-> Introducing the patch, would break the modules with the yt8821 on it. It
-> does not have any support in mainline.
->=20
-> Also any code I found for the yt8821 is C22 only. And even more, even
-> though we are facing with an almost similar MCU, RollBall protocol does
-> not work. I think it is almost the same mcu, as it responds to the same
-> eeprom password, and also the rollball password does something, but not
-> give the expected result.
->=20
+What about a possible follow-up, moving the above writes in a separate
+helper (say, 'core_select_register' or the like) and reusing it here
+and in core_rmw() ?
 
-What about I2C address 0x56?
+Not blocking this series, I'm applying it.
 
-I noticed that the Fibrestore FS SFP-2.5G-T with the realtek chip
-also exposes clause 22 registers, but the current mdio-i2c driver wont
-work, because the module implements the access in an incompatible way
-(we would need to extend mdio-i2c).
+Thanks,
 
-Eric, can you check whether the motorcomm module exposes something on
-address 0x56? With i2cdump, i.e. on omnia:
-  i2cdump -y 5 0x56
-(you will need to change 5 to the i2c controller of the sfp cage).
-What does it print?
+Paolo
 
-Marek
 
