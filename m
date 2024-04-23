@@ -1,93 +1,81 @@
-Return-Path: <netdev+bounces-90621-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90622-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9DC938AF48B
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 18:46:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D3D78AF4A0
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 18:50:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 52CB41F26782
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 16:46:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BB4BD1F253E0
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 16:50:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86C3F13D50F;
-	Tue, 23 Apr 2024 16:46:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 197D913D522;
+	Tue, 23 Apr 2024 16:50:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VW//JClN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TlbQh0Yw"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 540DB13BAFE;
-	Tue, 23 Apr 2024 16:46:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5D2F1E898;
+	Tue, 23 Apr 2024 16:50:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713890783; cv=none; b=kkBhFmw9sPV7PhTB8wRCr8mtsOKSByE+qSy0b4jrHz8zB0EYFRO69wRztm0PgSm17oyOw0G2htudPCqwPuaf+q4wLdH7wgbcrjZJH31je/4IvSbQfVLJE46yJmYCWFrdLzTBv3b69/8cRd8k80HQ0qPZNM6FhmgzsJZ6BgMuelI=
+	t=1713891045; cv=none; b=IhMiawxBzt+5ou6v2xIDGJW6BM1vqjCUjstwBMlgxFzuChuJ4Ll2zYzy30PpMLwyVubEXQcgkyoMt1c5TjaVpj9PjNjOazoPHqvonNBMv6U+Qt2BJXDKMDrwsGWFgK4gXlUo+zo5nE4DWss9WMxPwd5x5bVIvdoRaEiVRBU1VHo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713890783; c=relaxed/simple;
-	bh=d6fUPT7FccaSpbhAaWt+3bXIMJB6KRIJ6QO0yTnP038=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=E1wdi2Q7BalRVecUMmUqZ0fkaVp1/OvjomuiH/g+dOYkcbI6WTPr+nWkdhzVbTfp2bjlTKiYxnQ9eXQr2XpcIsvcCJUaBRt949AyVZ4o0+xlID64kVfn+18Mn6Uh9vI2rqxcZAsU3Wsmxe79N9qEcWo5bH357BMDMzU8r1ci+38=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VW//JClN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 17428C116B1;
-	Tue, 23 Apr 2024 16:46:18 +0000 (UTC)
+	s=arc-20240116; t=1713891045; c=relaxed/simple;
+	bh=OoFN4ZOKy/U5nSpkW3eeRgNHP0I9KlzPXkLoR0ErUj8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=GoHfzZ5e9cbvpZWWfih2ixaFi/TtUUXXpzi2+r3xvrXUSMPjvFxL/ss8Sj3vcpNxG9UlneoXRA1vS+WTU9ez4BjdFnBxlgBDZCj6AVX5tL9/BAZesJzoHSDpExbp4Og92Xw/SKY0pGb7KIu/T45WOdOAncsPCjDgPXvFtzrnCig=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TlbQh0Yw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 41722C116B1;
+	Tue, 23 Apr 2024 16:50:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713890782;
-	bh=d6fUPT7FccaSpbhAaWt+3bXIMJB6KRIJ6QO0yTnP038=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=VW//JClNLBdywVje2WU6TgzA/sd6UIAiscV0HlVXGhCD19BwZG5atbmQRH/qm/nMf
-	 RwrIAGS3M9LGnI0rin3JJ9NWKsj6cnXpz1Pz6mCvIt1DfZWVCuV4g6M1TIEm9QS5UY
-	 Kp5tywStDs1+ph8qr4NtIaXuGZt4Qvunna7FwICtBvvawtEhce117pR7iPrGZEJDz/
-	 xQJ9brNKx+1Vwo3iL/HXTIqx4ZwvlxHevJ99ais6v96nvBgiE9C3kEgMc04ESDP1Gl
-	 3fuxPXMiS4FqJGZ1mBIwyG8yLUzHSfVVXhZDlQ0PC6HHb9TWpRUM1M6bFdqhdZpvRp
-	 KXWAIDcrJkWPw==
-Date: Tue, 23 Apr 2024 17:46:16 +0100
-From: Simon Horman <horms@kernel.org>
-To: Gregor Herburger <gregor.herburger@ew.tq-group.com>
-Cc: Marc Kleine-Budde <mkl@pengutronix.de>,
-	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
-	Thomas Kopp <thomas.kopp@microchip.com>,
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>, linux-can@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	devicetree@vger.kernel.org, linux@ew.tq-group.com,
-	alexander.stein@ew.tq-group.com
-Subject: Re: [PATCH 2/4] can: mcp251xfd: mcp251xfd_regmap_crc_write():
- workaround for errata 5
-Message-ID: <20240423164616.GX42092@kernel.org>
-References: <20240417-mcp251xfd-gpio-feature-v1-0-bc0c61fd0c80@ew.tq-group.com>
- <20240417-mcp251xfd-gpio-feature-v1-2-bc0c61fd0c80@ew.tq-group.com>
+	s=k20201202; t=1713891044;
+	bh=OoFN4ZOKy/U5nSpkW3eeRgNHP0I9KlzPXkLoR0ErUj8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=TlbQh0YwZ0ar/Pb74ud2VCkm5g0errfvUMWGJeUulDJekjZu8u70+uVgcLCOc9orx
+	 iSijrJxOuH335G2nnwAfCYl2k/ixUJ8OZsnkx67RS7tsE1Ax1Az3OR/y8x5ZN606Qr
+	 tEWwAFdHcFsDjomwcy0ePzwOyKrdgtrknck6U7K5hq/RQ39dtQlFMuCbKtkUQ6VJ7e
+	 8e5UbglZISKlx+MqJf4/LGI/DzhHLgj12KNVwZbgmX7hGdg6+tkrh11CEmfyLNjWgl
+	 SXBoSpvYlEf+AaOa1Br9fq0MXrycjIM2Og9rxQ7GCdK786e87Fpir4sQ1ByfLJAeL+
+	 Zbhc1f5a8oukA==
+Date: Tue, 23 Apr 2024 09:50:43 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Florian Westphal <fw@strlen.de>
+Cc: <netdev@vger.kernel.org>, Paolo Abeni <pabeni@redhat.com>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ <netfilter-devel@vger.kernel.org>, pablo@netfilter.org
+Subject: Re: [PATCH net-next 0/7] selftest: netfilter: additional cleanups
+Message-ID: <20240423095043.2f8d46fc@kernel.org>
+In-Reply-To: <20240423130604.7013-1-fw@strlen.de>
+References: <20240423130604.7013-1-fw@strlen.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240417-mcp251xfd-gpio-feature-v1-2-bc0c61fd0c80@ew.tq-group.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, Apr 17, 2024 at 03:43:55PM +0200, Gregor Herburger wrote:
-> According to Errata DS80000789E 5 writing IOCON register using one SPI
-> write command clears LAT0/LAT1.
+On Tue, 23 Apr 2024 15:05:43 +0200 Florian Westphal wrote:
+> This is the last planned series of the netfilter-selftest-move.
+> It contains cleanups (and speedups) and a few small updates to
+> scripts to improve error/skip reporting.
 > 
-> Errata Fix/Work Around suggests to write registers with single byte write
-> instructions. However, it seems that every write to the second byte
-> causes the overrite of LAT0/LAT1.
+> I intend to route future changes, if any, via nf(-next) trees
+> now that the 'massive code churn' phase is over.
 
-nit: overwrite
+Got it.
 
-Flagged by ./scripts/checkpatch.pl --codespell
+The main thing that seems to be popping up in the netdev runner is:
 
-> 
-> Never write byte 2 of IOCON register to avoid clearing of LAT0/LAT1.
-> 
-> Signed-off-by: Gregor Herburger <gregor.herburger@ew.tq-group.com>
+# TEST: performance
+#   net,port                                                      [SKIP]
+#   perf not supported
 
-...
+What is "perf" in this case? Some NFT module? the perf tool is
+installed, AFAICT..
 
