@@ -1,120 +1,143 @@
-Return-Path: <netdev+bounces-90437-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90438-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 834BB8AE209
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 12:25:06 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98C1E8AE215
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 12:25:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BBE491C2154A
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 10:25:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4D7121F25667
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 10:25:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 359FA60ED3;
-	Tue, 23 Apr 2024 10:25:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FC1561691;
+	Tue, 23 Apr 2024 10:25:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DOeRooee"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b="Sdkb0v8A"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from nbd.name (nbd.name [46.4.11.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B00C760EC3
-	for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 10:25:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE1B95CDF2;
+	Tue, 23 Apr 2024 10:25:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.4.11.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713867903; cv=none; b=Tb88sGxiJ1AIVo9LAOHPM/1Amjpr3iKOibHestfuU6hUMpYAIt5Agc1OW9ieH++rQr3eyqBVlgp7PxY81pnfWnzZ/eId3fvfVrBb+rb38u0P2pwwCdbnli+UaurCXRX/3pKbTUZa5e70r/CqSaosXBGMBSBwpMyPcpdi+y9XGaA=
+	t=1713867941; cv=none; b=SvZPreLDrTdZyc9AjON+dSJJbgIJoRwKyHFwl1fikir7lS/G7Ta/pYsYeWJbYE9yFXujkSWESOJQmwocdkhIPoh69ntueISkTanCEZyKkymPLzYmfcVDKFagxuorff7WhBaR/f8kpzTD5+Dm6QOv6VMcqe/XCcEOGnYdlmw2Aek=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713867903; c=relaxed/simple;
-	bh=UBDCME3HI3A/94oLpbDgzueXtBRi1gLLxVmdd4sm1vs=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=SGVhn0JeyJXvEuNMygYYliGfdV/WE2Agxow7hcAfQ98VF6HwBWmC1AA/OtDlOSwardbPHWLimaaxd4BnElOeurb1JRVDutxCimD3VXTrlMbB3bUIO2RH94Kv+BNCU5+0lutzgDNS7m7nKrhWvtodlGcoBktI886Sl0Cel57BWaM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DOeRooee; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1713867900;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=U2lce3/QNW+fiWXInJhryu4GzC+S2O+/i+htA/jwGrw=;
-	b=DOeRooee8ENS8sJoGc9ynxFwgkYnwnLsUOn94Sm8XIFeJuXWv1lvRWSKEPthyejN0+L3be
-	bkx4XIxziTKSZ9U9nQKWJAYwB4HHU+alXxVboB07aMQ75TlGXgS/D9pVNXlFLLJsaXSFK9
-	rJhpe9iIDWMjtpfihnA6YwAfs0t4ZbQ=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-361-GX6gB2GwN92ENdTWo_SQYg-1; Tue,
- 23 Apr 2024 06:24:56 -0400
-X-MC-Unique: GX6gB2GwN92ENdTWo_SQYg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2F76E3C02745;
-	Tue, 23 Apr 2024 10:24:56 +0000 (UTC)
-Received: from calimero.vinschen.de (unknown [10.39.194.197])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 0BB653543A;
-	Tue, 23 Apr 2024 10:24:56 +0000 (UTC)
-Received: by calimero.vinschen.de (Postfix, from userid 500)
-	id 0D45DA80BA0; Tue, 23 Apr 2024 12:24:55 +0200 (CEST)
-From: Corinna Vinschen <vinschen@redhat.com>
-To: netdev@vger.kernel.org,
-	intel-wired-lan@lists.osuosl.org
-Subject: [PATCH] igc: fix a log entry using uninitialized netdev
-Date: Tue, 23 Apr 2024 12:24:54 +0200
-Message-ID: <20240423102455.901469-1-vinschen@redhat.com>
+	s=arc-20240116; t=1713867941; c=relaxed/simple;
+	bh=Y8f5+YKLqjKKXsFmgIr/oOVxZIeWK6XAH8GXTpW6zo4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HLlRBL7soTniS5uYvronqlR1zBwOl3IOmuK8q5v7tcOWT/2JXh9w++sWOyo6MCkNnAOhlGcHCJbOx73yxbivUy4bR1X4AmIc1j9MWBnQdmFmjicwnpk694iiDWqdt/2KSI3ZFp6CS8SWVCACZZtCw7AVB4oMK1UoQg9ugiws9ro=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nbd.name; spf=none smtp.mailfrom=nbd.name; dkim=pass (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b=Sdkb0v8A; arc=none smtp.client-ip=46.4.11.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nbd.name
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=nbd.name
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=nbd.name;
+	s=20160729; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+	References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender:Reply-To:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=e6sfNgyyq3CP0DjLtTP2ZBLYSGUFE+AaTMTxRx7+2Mw=; b=Sdkb0v8ApZ8eALsQJahEXgrNj4
+	7EOx8+0/ILDg5MFyUY/fHFjMDPTuFRY1+r2zZJ+t7ZQDD4vFNuEQiImMbhMm489QKlTkkMl3UE10/
+	KQxnokWGZdgrO6TFW0SSATzzFXlYVFvcfgnt+DY5y0iggp65fnsH3HBnNiJ62OSzWITc=;
+Received: from p54ae9c93.dip0.t-ipconnect.de ([84.174.156.147] helo=nf.local)
+	by ds12 with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.96)
+	(envelope-from <nbd@nbd.name>)
+	id 1rzDLB-0061vs-11;
+	Tue, 23 Apr 2024 12:25:33 +0200
+Message-ID: <63abfa26-d990-46c3-8982-3eaf7b8f8ee5@nbd.name>
+Date: Tue, 23 Apr 2024 12:25:26 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC] net: add TCP fraglist GRO support
+To: Eric Dumazet <edumazet@google.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ David Ahern <dsahern@kernel.org>, linux-kernel@vger.kernel.org
+References: <20240423094117.93206-1-nbd@nbd.name>
+ <CANn89i+6xRe4V6aDmD-9EM0uD7A87f6rzg3S7Xq6-NaB_Mb4nw@mail.gmail.com>
+Content-Language: en-US
+From: Felix Fietkau <nbd@nbd.name>
+Autocrypt: addr=nbd@nbd.name; keydata=
+ xsDiBEah5CcRBADIY7pu4LIv3jBlyQ/2u87iIZGe6f0f8pyB4UjzfJNXhJb8JylYYRzIOSxh
+ ExKsdLCnJqsG1PY1mqTtoG8sONpwsHr2oJ4itjcGHfn5NJSUGTbtbbxLro13tHkGFCoCr4Z5
+ Pv+XRgiANSpYlIigiMbOkide6wbggQK32tC20QxUIwCg4k6dtV/4kwEeiOUfErq00TVqIiEE
+ AKcUi4taOuh/PQWx/Ujjl/P1LfJXqLKRPa8PwD4j2yjoc9l+7LptSxJThL9KSu6gtXQjcoR2
+ vCK0OeYJhgO4kYMI78h1TSaxmtImEAnjFPYJYVsxrhay92jisYc7z5R/76AaELfF6RCjjGeP
+ wdalulG+erWju710Bif7E1yjYVWeA/9Wd1lsOmx6uwwYgNqoFtcAunDaMKi9xVQW18FsUusM
+ TdRvTZLBpoUAy+MajAL+R73TwLq3LnKpIcCwftyQXK5pEDKq57OhxJVv1Q8XkA9Dn1SBOjNB
+ l25vJDFAT9ntp9THeDD2fv15yk4EKpWhu4H00/YX8KkhFsrtUs69+vZQwc0cRmVsaXggRmll
+ dGthdSA8bmJkQG5iZC5uYW1lPsJgBBMRAgAgBQJGoeQnAhsjBgsJCAcDAgQVAggDBBYCAwEC
+ HgECF4AACgkQ130UHQKnbvXsvgCgjsAIIOsY7xZ8VcSm7NABpi91yTMAniMMmH7FRenEAYMa
+ VrwYTIThkTlQzsFNBEah5FQQCACMIep/hTzgPZ9HbCTKm9xN4bZX0JjrqjFem1Nxf3MBM5vN
+ CYGBn8F4sGIzPmLhl4xFeq3k5irVg/YvxSDbQN6NJv8o+tP6zsMeWX2JjtV0P4aDIN1pK2/w
+ VxcicArw0VYdv2ZCarccFBgH2a6GjswqlCqVM3gNIMI8ikzenKcso8YErGGiKYeMEZLwHaxE
+ Y7mTPuOTrWL8uWWRL5mVjhZEVvDez6em/OYvzBwbkhImrryF29e3Po2cfY2n7EKjjr3/141K
+ DHBBdgXlPNfDwROnA5ugjjEBjwkwBQqPpDA7AYPvpHh5vLbZnVGu5CwG7NAsrb2isRmjYoqk
+ wu++3117AAMFB/9S0Sj7qFFQcD4laADVsabTpNNpaV4wAgVTRHKV/kC9luItzwDnUcsZUPdQ
+ f3MueRJ3jIHU0UmRBG3uQftqbZJj3ikhnfvyLmkCNe+/hXhPu9sGvXyi2D4vszICvc1KL4RD
+ aLSrOsROx22eZ26KqcW4ny7+va2FnvjsZgI8h4sDmaLzKczVRIiLITiMpLFEU/VoSv0m1F4B
+ FtRgoiyjFzigWG0MsTdAN6FJzGh4mWWGIlE7o5JraNhnTd+yTUIPtw3ym6l8P+gbvfoZida0
+ TspgwBWLnXQvP5EDvlZnNaKa/3oBes6z0QdaSOwZCRA3QSLHBwtgUsrT6RxRSweLrcabwkkE
+ GBECAAkFAkah5FQCGwwACgkQ130UHQKnbvW2GgCeMncXpbbWNT2AtoAYICrKyX5R3iMAoMhw
+ cL98efvrjdstUfTCP2pfetyN
+In-Reply-To: <CANn89i+6xRe4V6aDmD-9EM0uD7A87f6rzg3S7Xq6-NaB_Mb4nw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
 
-During successful probe, igc logs this:
+On 23.04.24 12:15, Eric Dumazet wrote:
+> On Tue, Apr 23, 2024 at 11:41 AM Felix Fietkau <nbd@nbd.name> wrote:
+>>
+>> When forwarding TCP after GRO, software segmentation is very expensive,
+>> especially when the checksum needs to be recalculated.
+>> One case where that's currently unavoidable is when routing packets over
+>> PPPoE. Performance improves significantly when using fraglist GRO
+>> implemented in the same way as for UDP.
+>>
+>> Here's a measurement of running 2 TCP streams through a MediaTek MT7622
+>> device (2-core Cortex-A53), which runs NAT with flow offload enabled from
+>> one ethernet port to PPPoE on another ethernet port + cake qdisc set to
+>> 1Gbps.
+>>
+>> rx-gro-list off: 630 Mbit/s, CPU 35% idle
+>> rx-gro-list on:  770 Mbit/s, CPU 40% idle
+> 
+> Hi Felix
+> 
+> changelog is a bit terse, and patch complex.
+> 
+> Could you elaborate why this issue
+> seems to be related to a specific driver ?
+> 
+> I think we should push hard to not use frag_list in drivers :/
+> 
+> And GRO itself could avoid building frag_list skbs
+> in hosts where forwarding is enabled.
+> 
+> (Note that we also can increase MAX_SKB_FRAGS to 45 these days)
 
-[    5.133667] igc 0000:01:00.0 (unnamed net_device) (uninitialized): PHC added
-                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-The reason is that igc_ptp_init() is called very early, even before
-register_netdev() has been called. So the netdev_info() call works
-on a partially uninitialized netdev.
+The issue is not related to a specific driver at all. Here's how traffic 
+flows: TCP packets are received on the SoC ethernet driver, the network 
+stack performs regular GRO. The packet gets forwarded by flow offloading 
+until it reaches the PPPoE device. PPPoE does not support GSO packets, 
+so the packets need to be segmented again.
+This is *very* expensive, since data needs to be copied and checksummed.
 
-Fix this by calling igc_ptp_init() after register_netdev(), right
-after the media autosense check, just as in igb.  Add a comment,
-just as in igb.
+So in my patch, I changed the code to build fraglist GRO instead of 
+regular GRO packets, whenever there is no local socket to receive the 
+packets. This makes segmenting very cheap, since the original skbs are 
+preserved on the trip through the stack. The only cost is an extra 
+socket lookup whenever NETIF_F_FRAGLIST_GRO is enabled.
 
-Now the log message is fine:
+PPPoE in this case is only an example. The same issue appears when 
+forwarding to any netdev which does not support TSO, which in my case 
+affects most wifi drivers as well.
 
-[    5.200987] igc 0000:01:00.0 eth0: PHC added
-
-Signed-off-by: Corinna Vinschen <vinschen@redhat.com>
----
- drivers/net/ethernet/intel/igc/igc_main.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
-index d9bd001af7ba..e5900d004071 100644
---- a/drivers/net/ethernet/intel/igc/igc_main.c
-+++ b/drivers/net/ethernet/intel/igc/igc_main.c
-@@ -6927,8 +6927,6 @@ static int igc_probe(struct pci_dev *pdev,
- 	device_set_wakeup_enable(&adapter->pdev->dev,
- 				 adapter->flags & IGC_FLAG_WOL_SUPPORTED);
- 
--	igc_ptp_init(adapter);
--
- 	igc_tsn_clear_schedule(adapter);
- 
- 	/* reset the hardware with the new settings */
-@@ -6950,6 +6948,9 @@ static int igc_probe(struct pci_dev *pdev,
- 	/* Check if Media Autosense is enabled */
- 	adapter->ei = *ei;
- 
-+	/* do hw tstamp init after resetting */
-+	igc_ptp_init(adapter);
-+
- 	/* print pcie link status and MAC address */
- 	pcie_print_link_status(pdev);
- 	netdev_info(netdev, "MAC: %pM\n", netdev->dev_addr);
--- 
-2.44.0
-
+- Felix
 
