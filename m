@@ -1,96 +1,115 @@
-Return-Path: <netdev+bounces-90510-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90511-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B684F8AE53A
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 14:00:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1812B8AE54E
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 14:03:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 53D6C1F24208
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 12:00:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C5F252863B3
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 12:03:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1F2685631;
-	Tue, 23 Apr 2024 11:46:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9502086278;
+	Tue, 23 Apr 2024 11:50:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="heuh6PxT"
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="sQyZJhxN"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out162-62-57-210.mail.qq.com (out162-62-57-210.mail.qq.com [162.62.57.210])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC28285274
-	for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 11:46:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6945D86267;
+	Tue, 23 Apr 2024 11:50:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.57.210
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713872763; cv=none; b=WashJoY56U8TUEHhmBvwraCmbdsUEEyc+J8KJlH1gKcnh6vO+oQi9w5fMhXsNOCAXcGizpsqToS3CUbsVlhvTC6jdWU530ipuxez0r9k4EmWOcr19jd3Im8yB5E/1kVLJs57Fdmm02b8tx+FLpxCtKkKdIPCmci4vdRB1whDccQ=
+	t=1713873045; cv=none; b=mIVwwA+YW/luTu9jN0JIF62/tLcMDdz84F3ouG7G98xRjpbFFPhkkIFtt4K3VMxGPGHZB5JzzTp+tvIceMdPYoOl0RO6LMS7YA2ONTuqHhfHIbsKUvnVgSCif6Zc70BvEHfatyr1XUL3R0lf/6cBgQf0t29JU7+aM2Qj7vchxfc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713872763; c=relaxed/simple;
-	bh=ItzHgWjEcVLsXdMc9k9hJYVYwWOJnIObQkoft59pIJU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DEH0t/nHx9ikXEz1afm40cG/TL+ejIQ6JgURkYAclpDIaZEHUi06jmgRaHNr2PcM0bttJVUX6UyxlcCC9YSyueN+wSptK7uQ3db1dbcMimZSBkEVZa6Fxz0hma0kY8guA8lBO/KU36dcbHaQ8OIH3fmzOxvNRzcwvvHRa1HGuzg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=heuh6PxT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E309C116B1;
-	Tue, 23 Apr 2024 11:46:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713872763;
-	bh=ItzHgWjEcVLsXdMc9k9hJYVYwWOJnIObQkoft59pIJU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=heuh6PxTP8hNheqOGcnCzZvpfPBucKxwWV3+Vr55wGNd739YqVV1hw6uWKifCkYPt
-	 m7/vWwp33YnjbXCV8v7hDhHXlOEMd5Fu8SbEvY/UwOrTVrQJTs4Dgqr0p3TangJL7N
-	 iyPrO4Ip3T8z3mcdmnhiEvp5sGqFyKBkYLpF5IK6cVXXXLGlTePNlJpPkMFnk4meh/
-	 G6tuTcBPXIqTT/D+f/sTQMwoAbcixHrfZV7ahvpNzZOV9vP098WxRsbGpdjrcYV1rZ
-	 /Wfhq3v1kIu9pZl8OsHFP2kXGH7M8LIcsdLD0fv+xXp3wWYSkYTgeEoJplwJKX1ZMI
-	 esCZLapVwHhKw==
-Date: Tue, 23 Apr 2024 13:45:57 +0200
-From: Marek =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: netdev@vger.kernel.org, Russell King <rmk+kernel@armlinux.org.uk>, Raju
- Lakkaraju <Raju.Lakkaraju@microchip.com>, Frank Wunderlich
- <frank-w@public-files.de>, Eric Woudstra <ericwouds@gmail.com>, Andrew Lunn
- <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
-Subject: Re: [PATCH net-next v2 2/2] net: sfp: enhance quirk for Fibrestore
- 2.5G copper SFP module
-Message-ID: <20240423134557.2a2f67c6@dellmb>
-In-Reply-To: <ZieebbTQ0FP0yiXx@nanopsycho>
-References: <20240423085039.26957-1-kabel@kernel.org>
-	<20240423085039.26957-2-kabel@kernel.org>
-	<ZieebbTQ0FP0yiXx@nanopsycho>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.41; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1713873045; c=relaxed/simple;
+	bh=pRCyizJBXLafcgiLZimJVFcWKch621Tv6coNnmXpEbw=;
+	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=HjjAQcMbnsljVj0Iurn/GBflssN0uvr1hb9/83v284V9veSHJZDOcjCivnRjkPPQS+hA1hZmlKgpG1/ncCUkXd3fbO3mm85aztF28LitWBeQkFHMK9Xv0NWRCrYmBW3j4SGRRdstIgaZwW6q2kJ6CerujVNtbQLDCZxw2Cn9LWg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=sQyZJhxN; arc=none smtp.client-ip=162.62.57.210
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1713873032; bh=9/w/tzBWmQ5MmArL4N+CgRcqjaPmk49mqMX02OJXD2A=;
+	h=From:To:Cc:Subject:Date;
+	b=sQyZJhxNAKv139UYsDafubp+qax6vg4HZyCfQt4389bsNekIU8wMvfqKFggUrZYXu
+	 mIzB0ECyNn/dWvxwjZiEuiP519pxCrRdd0M4f9Y/mn/C99IlXiaDqpajo+l+iaoIFu
+	 YdVSdKj04rxqeSvTZzJz+8ovTAaYIowirJuyg6Mg=
+Received: from localhost.localdomain ([58.213.8.145])
+	by newxmesmtplogicsvrszb9-1.qq.com (NewEsmtp) with SMTP
+	id C9C0D4D5; Tue, 23 Apr 2024 19:50:28 +0800
+X-QQ-mid: xmsmtpt1713873028tyc2wg7ji
+Message-ID: <tencent_284407955020261D1B2BD142194A87C9EB0A@qq.com>
+X-QQ-XMAILINFO: MhK4DKsBP06icZ6vUiZ0AyWKbL8hEAKksNAHNakfhxrPXC70cEjOCWZa/sxygp
+	 kuQj+OxO7txQuk/IXFlt9sXae4kml6zc8mgK5OeTDWGTVJ6uoYtpMloRcGuEZ9i3d+XbOahiP9kX
+	 vB5OxRyAenN3N852Nag3v2IgpseG3NE3wkXJDedAUqLGjATWpyexrPs3j4SUl6BXP+MmMB3yrG7K
+	 s1gNZoRxA7NXZ3cIheGISx5tNPFdvnNsyJQSdelHAsYbJoJQgAPR8V+WTG+GEeoY6Rbzrs5AQTOh
+	 bkFtMDlsl3MDVhoGmLzAwTifnt5WWWac7svMwAbVsazk/rYReWlJ0n8JEONRJrUYWmMLfJ/h9wNR
+	 xROLstzvwc+j/djLysaFbyUI0PeURjIy23bX/0+D0dUP/D8dh4mZJKtBPEk+StEJU2a6GyShYwV+
+	 0x3pg50ZaOBzKnY/tJOVPJCYHY9JRAh8wMjwP6L8wNSlEbgUlPbof9EJBSsGFyZjb9TsUhm+E8SP
+	 42GLah5/1l3CQAoUPhZLx5s5JR2ym0cWwP0pY9P0H+Rz9/+ptJw5yB3NrG1uWpTfiWM7gzfFQLk+
+	 m1M2/VPN/q2LR2BmMboe/KjRV3qe9cVx25pQcRHWcJFVhyj4oLQ7JSjevttVrN0uAP+9Wy8I2jtl
+	 tzPjn64Qg7A2lfFI5aoBqYB3rn6ca8xRT0uvdNIBhduMxM2KefQOXjpxgOYbXLytg0fqc3pap5Fd
+	 TQeOrS2r5CJUXmofpW6rc6v9bbzdWCoJBtyeEjZZtZ+V5cieZfH0C4uFXxXU2clSm2SojQQjd3WK
+	 qGbR1M8y7rqNpmBDKkywccv+e7zey9l20tvStFBCGlVyQtjoBBs1mF74RcTAV2LLSyoKhLL+vm9J
+	 VxY2IjC2GBuX8V/V9OPLpwO4FUr0LDSpPyscMwtpNK9mDk7pUtEsGOCJUgNkojWQCynlZAFQVywd
+	 TXOyPIsfiyUYL4SIDD3QK9EWcLkckmoRaOG+B9v3kc089saNLibeoRXTHwFi3/bCJT2NL9gkhShS
+	 r4aB4GOmtnz55qVyMyRnAnON8Lh1k=
+X-QQ-XMRINFO: NI4Ajvh11aEj8Xl/2s1/T8w=
+From: linke li <lilinke99@qq.com>
+To: 
+Cc: xujianhao01@gmail.com,
+	linke li <lilinke99@qq.com>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	Florian Westphal <fw@strlen.de>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] netfilter: mark racy access on ext->gen_id
+Date: Tue, 23 Apr 2024 19:50:22 +0800
+X-OQ-MSGID: <20240423115022.78748-1-lilinke99@qq.com>
+X-Mailer: git-send-email 2.39.3 (Apple Git-146)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Tue, 23 Apr 2024 13:41:33 +0200
-Jiri Pirko <jiri@resnulli.us> wrote:
+In __nf_ct_ext_find(), ext->gen_id can be changed by 
+nf_ct_ext_valid_post(), using WRITE_ONCE. Mark data races on ext->gen_id
+as benign using READ_ONCE. 
 
-> Tue, Apr 23, 2024 at 10:50:39AM CEST, kabel@kernel.org wrote:
-> >Enhance the quirk for Fibrestore 2.5G copper SFP module. The original
-> >commit e27aca3760c0 ("net: sfp: add quirk for FS's 2.5G copper SFP")
-> >introducing the quirk says that the PHY is inaccessible, but that is
-> >not true.
-> >
-> >The module uses Rollball protocol to talk to the PHY, and needs a 4
-> >second wait before probing it, same as FS 10G module.
-> >
-> >The PHY inside the module is Realtek RTL8221B-VB-CG PHY. The realtek
-> >driver recently gained support to set it up via clause 45 accesses.
-> >
-> >Signed-off-by: Marek Beh=C3=BAn <kabel@kernel.org>
-> >---
-> >This patch depends on realtek driver changes merged in
-> >  c31bd5b6ff6f ("Merge branch 'rtl8226b-serdes-switching'")
-> >which are currently only in net-next. =20
->=20
-> I don't follow. You are targetting net-next (by patch subject), what's
-> the point of this comment?
+This patch is aimed at reducing the number of benign races reported by
+KCSAN in order to focus future debugging effort on harmful races.
 
-I wrote that in case someone wanted me to send this to net, instead of
-net-next.
+Signed-off-by: linke li <lilinke99@qq.com>
+---
+ net/netfilter/nf_conntrack_extend.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Marek
+diff --git a/net/netfilter/nf_conntrack_extend.c b/net/netfilter/nf_conntrack_extend.c
+index dd62cc12e775..7f1a5e5f6646 100644
+--- a/net/netfilter/nf_conntrack_extend.c
++++ b/net/netfilter/nf_conntrack_extend.c
+@@ -141,7 +141,7 @@ void *__nf_ct_ext_find(const struct nf_ct_ext *ext, u8 id)
+ 	if (!__nf_ct_ext_exist(ext, id))
+ 		return NULL;
+ 
+-	if (this_id == 0 || ext->gen_id == gen_id)
++	if (this_id == 0 || READ_ONCE(ext->gen_id) == gen_id)
+ 		return (void *)ext + ext->offset[id];
+ 
+ 	return NULL;
+-- 
+2.39.3 (Apple Git-146)
+
 
