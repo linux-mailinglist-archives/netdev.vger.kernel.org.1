@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-90317-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90318-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D8A68ADB4B
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 02:53:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5CEC78ADB4E
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 02:53:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7D91E1C20F90
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 00:53:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E24E02820C2
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 00:53:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F31DBDDB8;
-	Tue, 23 Apr 2024 00:53:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9D7917545;
+	Tue, 23 Apr 2024 00:53:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QKeJML2k"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GcpVjxR8"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9E27322A;
-	Tue, 23 Apr 2024 00:53:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91C64168B8;
+	Tue, 23 Apr 2024 00:53:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713833591; cv=none; b=RV/gUoRB3m0wlo1cn8jCD/2Spf1jMR2m/KAZZKnqMLbYZqZlq4HFXED5Js+aLeOb6hLCF4EruLQKAIzbVbMuHw0XXdFpWlurpL4hP1rwVdDjeWd5wBmkjP/3kJJmXHs5Ry+IVRjUdYr7Lcc9/qVoeeM1dW+Fhe6Or2v5xX9Y88g=
+	t=1713833593; cv=none; b=n4FWjn/sMTI3MYJfULF0ZwGC29wp5FQQOjb4crEkUerBzSsboh+SsBqS6PW4A/1TyV/pnJMWZgfPuCgc8z04Ct/gL6ky2hLcqUM60SAmCQgfHJ2MAvKFUK6ULYizCX/UPSD6NQQWPGjtTGcE5ufpiQoTy3bfD8LAEcK3oSjeVX0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713833591; c=relaxed/simple;
-	bh=LRUpSH5+qSQEKPv+C6482zv9PMbA+2tteYA9bEobWsI=;
+	s=arc-20240116; t=1713833593; c=relaxed/simple;
+	bh=/b+EQeQgjOThGXQ91wTEx8RDS06LwJVQyIGHLf9kxxM=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=nzBBUXbd4DErFlHTwySDqF5C8stCkQqOMtIU5qp/ZfoeiHZK3A+VUSFABVy7tQBVyuJLuVPrl0LR8hJqNHHdD/NKvg0Chk0e3+ecbJW9II4xXwHxOanPuzQH+GWYYMQ0hCFqCxh/KgtR1dFta4RnsC6xadV+wwX96TRvKBrnApE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QKeJML2k; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 60CA3C32782;
-	Tue, 23 Apr 2024 00:53:11 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=emMBpjpqHrLPsTOLkn4QNfto1QeykLh69KEri1HXt47EhPrBGiHnzqgEmxXR1pjF5KaRQPaH012hHrQqVtQ9nV+aZBQvojZRAQ2ZLibeRSWO4Ojo0qjzBNJmKtP/5F8+QY/LuBdoFVh0z3VuWdrgc92AasfPRZiiw6Cpzsd29uE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GcpVjxR8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 67272C4AF0D;
+	Tue, 23 Apr 2024 00:53:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713833591;
-	bh=LRUpSH5+qSQEKPv+C6482zv9PMbA+2tteYA9bEobWsI=;
+	s=k20201202; t=1713833593;
+	bh=/b+EQeQgjOThGXQ91wTEx8RDS06LwJVQyIGHLf9kxxM=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=QKeJML2kLFdRwFbQyUT88vDF7urP0elHRbl5BKzOUaa7s3jnfqyf3sQg5fWVkbVDL
-	 IT6T33q6Tj16r8ei319KXGNDtNnlxSnCeYQfDIQffk0j5sFZk0yGBHwgmEoMQyqtMB
-	 aNv+a2idtLCZ/M4M83GmoOpHIDgpwBmn6wrj8a/mhelqj0BXLWR/wOE+IeVVyTpViP
-	 +VVFjG8UdwjIvVHwR4bD3+MhYNG0BC0WvpSYCzhi/6GyTyYYW3cKrIbYiO9SCzIH0p
-	 ULy7BmmaKTwn6aYXp+1zxgUiKLWHy6USxCNqKFijgncE+t/C35HsUZmcWthQMQa+AK
-	 4oMxRabDKmQNA==
+	b=GcpVjxR8PDqm/KbwbOEjuecwfeRHQ463cF75dIXMmj09c8bmxzt7O7KYTuiy2IIux
+	 j61hjWUpNQ0hTkOl68C1+XA/DICdrfcbTPl/JkfYJwbG+jqL+u5bRoW+IQ3qGQGR1U
+	 mtglrbGTQside7rGCJ6LqT8czQiwbEr/dB8D+f1cvirMgagELqHD3XqH9gu5+apFdx
+	 ugoOgshMNd+e+HlOySrLmPhx3+oXTVqyPLsRSga3xaMb/IWCWyt4/XT0lZlSVncl43
+	 wJsgC0hTHWZLD2Bclj5V6amZtONof3dn+l0g94PN/AVY6j19C8dsq6bLXSm+faFFS6
+	 ImKa36zcHfuDw==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 50F35C433A2;
-	Tue, 23 Apr 2024 00:53:11 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 57503C4339F;
+	Tue, 23 Apr 2024 00:53:13 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,37 +52,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2] NFC: trf7970a: disable all regulators on removal
+Subject: Re: [PATCH net-next] dpaa2-switch: flower: validate control flags
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171383359132.888.4974153862608179534.git-patchwork-notify@kernel.org>
-Date: Tue, 23 Apr 2024 00:53:11 +0000
-References: <DB7PR09MB26847A4EBF88D9EDFEB1DA0F950E2@DB7PR09MB2684.eurprd09.prod.outlook.com>
-In-Reply-To: <DB7PR09MB26847A4EBF88D9EDFEB1DA0F950E2@DB7PR09MB2684.eurprd09.prod.outlook.com>
-To: Paul Geurts <paul_geurts@live.nl>
-Cc: mgreer@animalcreek.com, krzk@kernel.org, linux-wireless@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+ <171383359333.888.17584728773628518508.git-patchwork-notify@kernel.org>
+Date: Tue, 23 Apr 2024 00:53:13 +0000
+References: <20240418161802.189247-1-ast@fiberby.net>
+In-Reply-To: <20240418161802.189247-1-ast@fiberby.net>
+To: =?utf-8?b?QXNiasO4cm4gU2xvdGggVMO4bm5lc2VuIDxhc3RAZmliZXJieS5uZXQ+?=@codeaurora.org
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ ioana.ciornei@nxp.com
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 18 Apr 2024 21:25:38 +0200 you wrote:
-> During module probe, regulator 'vin' and 'vdd-io' are used and enabled,
-> but the vdd-io regulator overwrites the 'vin' regulator pointer. During
-> remove, only the vdd-io is disabled, as the vin regulator pointer is not
-> available anymore. When regulator_put() is called during resource
-> cleanup a kernel warning is given, as the regulator is still enabled.
+On Thu, 18 Apr 2024 16:18:01 +0000 you wrote:
+> This driver currently doesn't support any control flags.
 > 
-> Store the two regulators in separate pointers and disable both the
-> regulators on module remove.
+> Use flow_rule_match_has_control_flags() to check for control flags,
+> such as can be set through `tc flower ... ip_flags frag`.
+> 
+> In case any control flags are masked, flow_rule_match_has_control_flags()
+> sets a NL extended error message, and we return -EOPNOTSUPP.
 > 
 > [...]
 
 Here is the summary with links:
-  - [v2] NFC: trf7970a: disable all regulators on removal
-    https://git.kernel.org/netdev/net/c/6bea4f03c6a4
+  - [net-next] dpaa2-switch: flower: validate control flags
+    https://git.kernel.org/netdev/net-next/c/af7dfa94c2f9
 
 You are awesome, thank you!
 -- 
