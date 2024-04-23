@@ -1,96 +1,102 @@
-Return-Path: <netdev+bounces-90404-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90403-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E52718AE078
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 11:01:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 811CE8AE075
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 11:01:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 04AD5B23A76
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 09:01:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 22BA21F22648
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 09:01:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C00A65A788;
-	Tue, 23 Apr 2024 09:00:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC0BB56444;
+	Tue, 23 Apr 2024 09:00:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K+GZQbw6"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ffDiCOhO"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B04156443
-	for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 09:00:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D6CA56B73;
+	Tue, 23 Apr 2024 09:00:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713862831; cv=none; b=StlU9TDb1v8OEXJ3rfMQNa1MBXUGRKnwfdlMeWRXmD/Ywzk/FLw0WFX35/Kkvyqmbp++p/RrGw9lpjhQ6r2FyN5j/n9tl8265/e/duRV2NPxDBzbHVyKE04pte41jidFaqhTORKxOoF/VKPpqMz+t41QNWzNdrRpkl/g6zOZVDs=
+	t=1713862829; cv=none; b=mfUytNjoPjtOwDqJSeZnucifGBuvGqZN8FqLzq/H2HWN+tU8mMi3yU9He7Oe/aZtacqKTZ1e6xyCmTxYeUjKF5Q5YKMXYJ6rnjjCCN6g5u9yWPmBf5Yw5DhJUfSd8CQvhFjZOVhkql2FKzd2b/BsjGJob5c20hXC+vzmpbDuW+g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713862831; c=relaxed/simple;
-	bh=PMXpt3oUBGf6RhbHU9YTyK2cMQRbrJwlqjA4ecWS2Is=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Eip4LV/5pyA33rCYMoMiCGrXaaQIUKi378hRyaLIOwWOKmVThVY6IcRRJpy8am66139065/L2Ap2+dtjwVJ4cPpsC++o0FIdB2R3KDHRLb0NmPeNpOoib8xvecK5DIf1BgP2X7pN9BCEuydQVXGiDSneGonoCQGlypx+x/WFlyU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K+GZQbw6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BDCEAC116B1;
+	s=arc-20240116; t=1713862829; c=relaxed/simple;
+	bh=nE8DnFAjlXYHaUIN1qirvqDi+c0X4LQGHB4IF21MuZU=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=hxwb+OQf4K/U5VONNSAOIr2kBGi+PhsRGJ2UUekblU8yaKR5zHDS4OiHUjINpYIz3SfkE7IH2gxNGgbJ+LH4oGDQiVg/tcD3RNuJwQssNvll8kIKFDSCIxOHVn+MTENq4Liy0ucvSEJSefr/zplUwlWfAHjxPbLd7LDsZwkn8Zw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ffDiCOhO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id F410FC2BD11;
 	Tue, 23 Apr 2024 09:00:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713862830;
-	bh=PMXpt3oUBGf6RhbHU9YTyK2cMQRbrJwlqjA4ecWS2Is=;
-	h=From:To:Cc:Subject:Date:From;
-	b=K+GZQbw6i8aVj7FNuJ1Brta19SHgPpl1Bk9CIP0SwM7OqPp56v25BmJl8HCcX2KtY
-	 8rpcxZTTVERNl1pHwPZz35WARRwL64+Sm0nio6xNymCDIQVR5yVcSf3fNr87tyHnzC
-	 l0F1H1K7SPA9tiymmPfjFruXQD+etNLN45CsHyek4xmjE9A9vfpEAW2joa5r6aQklO
-	 87VmYV07cPgOynFuMvBcid+oX06mfU0wawQYO7cQvprt/3U7W7uNuHt0IYgZcXga08
-	 N3utwh8b06OZoRie44nz9WbKCIjJAg7Ex0K5JcgIA7vwMVDnDpDV2sxb6VI9yIeBPB
-	 gzA30DIz2FQNA==
-From: =?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>
-To: netdev@vger.kernel.org,
-	Russell King <rmk+kernel@armlinux.org.uk>
-Cc: Daniel Golle <daniel@makrotopia.org>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Josef Schlehofer <pepe.schlehofer@gmail.com>,
-	=?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>
-Subject: [PATCH net-next] net: sfp: add quirk for ATS SFP-GE-T 1000Base-TX module
-Date: Tue, 23 Apr 2024 11:00:25 +0200
-Message-ID: <20240423090025.29231-1-kabel@kernel.org>
-X-Mailer: git-send-email 2.43.2
+	s=k20201202; t=1713862829;
+	bh=nE8DnFAjlXYHaUIN1qirvqDi+c0X4LQGHB4IF21MuZU=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=ffDiCOhOXgB1vtYuHtskFOzrmJPR48sXJuIs0EAloKkXE4BGyvLJzrJ21OWoetBSk
+	 IJOOFoN8WGP1Bo8Vaj0wW+vu4ckwjFOiJT+bheMARzCE42j2BaikPJirx3UtYtynFW
+	 PlaV4m9l+bDjqfZ9LjL9jbGN43KmCxbKF4opiiQ9/4Wpm4GWPBs4s7Lg+BVVvJ0FsU
+	 iWKdZSo2U/rvRday6FBau0M2kTLRN/qdOwX6AcwQDWNWfZOj3ECEB+WPMOmPlAktlP
+	 YyJaJ2+pgggh78adxIzT5UtKcMujMr2G+AyHxzzA7QVbYH1zp3Owv9sjRmiENsGuOD
+	 HH3cxEjbDHW2w==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D44B2C595D1;
+	Tue, 23 Apr 2024 09:00:28 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v3 0/2] Read PHY address of switch from device
+ tree on MT7530 DSA subdriver
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171386282885.3533.16186593968313244252.git-patchwork-notify@kernel.org>
+Date: Tue, 23 Apr 2024 09:00:28 +0000
+References: <20240418-b4-for-netnext-mt7530-phy-addr-from-dt-and-simplify-core-ops-v3-0-3b5fb249b004@arinc9.com>
+In-Reply-To: <20240418-b4-for-netnext-mt7530-phy-addr-from-dt-and-simplify-core-ops-v3-0-3b5fb249b004@arinc9.com>
+To: =?utf-8?b?QXLEsW7DpyDDnE5BTCB2aWEgQjQgUmVsYXkgPGRldm51bGwrYXJpbmMudW5hbC5h?=@codeaurora.org,
+	=?utf-8?b?cmluYzkuY29tQGtlcm5lbC5vcmc+?=@codeaurora.org
+Cc: daniel@makrotopia.org, dqfext@gmail.com, sean.wang@mediatek.com,
+ andrew@lunn.ch, f.fainelli@gmail.com, olteanv@gmail.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com,
+ bartel.eerdekens@constell8.be, mithat.guner@xeront.com,
+ erkin.bozoglu@xeront.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org, arinc.unal@arinc9.com,
+ florian.fainelli@broadcom.com
 
-From: Daniel Golle <daniel@makrotopia.org>
+Hello:
 
-Add quirk for ATS SFP-GE-T 1000Base-TX module.
+This series was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-This copper module comes with broken TX_FAULT indicator which must be
-ignored for it to work.
+On Thu, 18 Apr 2024 08:35:29 +0300 you wrote:
+> This patch series makes the driver read the PHY address the switch listens
+> on from the device tree which, in result, brings support for MT7530
+> switches listening on a different PHY address than 31. And the patch series
+> simplifies the core operations.
+> 
+> Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
+> 
+> [...]
 
-Co-authored-by: Josef Schlehofer <pepe.schlehofer@gmail.com>
-Signed-off-by: Daniel Golle <daniel@makrotopia.org>
-[ rebased on top of net-next ]
-Signed-off-by: Marek Behún <kabel@kernel.org>
----
- drivers/net/phy/sfp.c | 3 +++
- 1 file changed, 3 insertions(+)
+Here is the summary with links:
+  - [net-next,v3,1/2] net: dsa: mt7530-mdio: read PHY address of switch from device tree
+    https://git.kernel.org/netdev/net-next/c/868ff5f4944a
+  - [net-next,v3,2/2] net: dsa: mt7530: simplify core operations
+    https://git.kernel.org/netdev/net-next/c/7c5e37d7ee78
 
-diff --git a/drivers/net/phy/sfp.c b/drivers/net/phy/sfp.c
-index 7d063cd3c6af..3f9cbd797fd6 100644
---- a/drivers/net/phy/sfp.c
-+++ b/drivers/net/phy/sfp.c
-@@ -509,6 +509,9 @@ static const struct sfp_quirk sfp_quirks[] = {
- 	SFP_QUIRK_F("Walsun", "HXSX-ATRC-1", sfp_fixup_fs_10gt),
- 	SFP_QUIRK_F("Walsun", "HXSX-ATRI-1", sfp_fixup_fs_10gt),
- 
-+	// OEM SFP-GE-T is a 1000Base-T module with broken TX_FAULT indicator
-+	SFP_QUIRK_F("OEM", "SFP-GE-T", sfp_fixup_ignore_tx_fault),
-+
- 	SFP_QUIRK_F("OEM", "SFP-10G-T", sfp_fixup_rollball_cc),
- 	SFP_QUIRK_M("OEM", "SFP-2.5G-T", sfp_quirk_oem_2_5g),
- 	SFP_QUIRK_F("OEM", "RTSFP-10", sfp_fixup_rollball_cc),
+You are awesome, thank you!
 -- 
-2.43.2
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
