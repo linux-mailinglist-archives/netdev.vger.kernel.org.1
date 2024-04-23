@@ -1,59 +1,77 @@
-Return-Path: <netdev+bounces-90653-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90654-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70B238AF6B5
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 20:36:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5D748AF6B9
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 20:39:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DE5A51F287E5
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 18:36:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 78BFE285384
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 18:39:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4F341420BB;
-	Tue, 23 Apr 2024 18:35:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E9A46A03F;
+	Tue, 23 Apr 2024 18:39:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uI11Pq6M"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T06PXO27"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DC411420A8;
-	Tue, 23 Apr 2024 18:35:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF2CC1CD39
+	for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 18:39:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713897352; cv=none; b=AeK7GlUs80mTzlqP0UmopQLse0WdO+BBMzOgZWzVFRgyH+vkXSzROWOtpqT4g8AjVkDwNZVv6jNqOX1wCqT61O3+gepq6aEgXZ2kKAo9Nw4L4AK8N60/IdmxV1suwlI9KolpPVPOyjeoQzNSY8ETwGbCz1dqXEMt3Y4VHDJBvkk=
+	t=1713897547; cv=none; b=MgyUnVg9n64GVIGS2JxlKiAdU3gJeKBhW/SHzbgTBbCXo0yZ04OXEj8fLXK3RP65PHnLfPmk/XrsTVKtMHXQi9bld+uofAVsRcooR/LK+vcyjyVzJD1WxoH+2j9ZP2H+dsZTsjdmgbYpvvfMn4u8l1R/vDxk72fboTxJ6qlrNIs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713897352; c=relaxed/simple;
-	bh=VAWU1PNulVK6IrSoDcMmfCG+WwNrpOQsTXkWrjjLLxA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=k9hNjwHXZ6xgfDIyIXI3V6Eb5Qx1nzid9aSThtShBkQckATluIwntU6ikYjNSBm7UINjvN0vRQ8+XD7oN4UPKZgMAwtKkioT5blhCFta3jR6vRHPxWXffu1Z62HRstGG9jadBInfvolqZjfsF/i5NI2klLOgaHxrVzvlDptfhWQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uI11Pq6M; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0FFB1C32781;
-	Tue, 23 Apr 2024 18:35:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713897352;
-	bh=VAWU1PNulVK6IrSoDcMmfCG+WwNrpOQsTXkWrjjLLxA=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=uI11Pq6M8MCVirry+w9cSegnSm+JXY6YgEsjYNL0vW0Y0lv5lkhFcJniY+jz1LoSu
-	 Bh6gsPhZJjxXb9bmp6o0JxljPYVDveZvqU8CPTW37dqbaFPxiMB8Lnf8DN2CWjdeGs
-	 kQTprwuF8+U9T+nUJwjqAER0IC/0Bzc+NAxSSC7dN83tg4GbufYPZKc3gvFZnVDQ7Q
-	 HJhgYyLDud0rGjTmnvemvOu5TgscboIqF6XG05xfTQgdoRhxsvun7ulKfJJd7+zjOo
-	 1PTB+orU9//Vs9EWOdq7lZeRTgjwzTafX2A0L4527+pRg9Vh+kqHQW1PBCQwH3+lrE
-	 59YH4pDFGOCvg==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	bpf@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 2/2] selftests: net: extract BPF building logic from the Makefile
-Date: Tue, 23 Apr 2024 11:35:42 -0700
-Message-ID: <20240423183542.3807234-3-kuba@kernel.org>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20240423183542.3807234-1-kuba@kernel.org>
-References: <20240423183542.3807234-1-kuba@kernel.org>
+	s=arc-20240116; t=1713897547; c=relaxed/simple;
+	bh=HlSq4+53kpIvVV698i52HU1Q1lk4N9kxKXA5tq73oPU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=T8sxRZGbViogbLqvwRUcECZ368oqBLSBpKdgb5D1FeAt+V3aQtXLgslI5xMo9ZiSqtBoxaSP7Hf0A32HZG7r66+28eZwhj931q+qq9fShq8mp+bMQVmzsHNHSpq41sAowHi7x1Vm29WDt6plIluUe53jZnu5HUWu+S9sW4qnOgE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T06PXO27; arc=none smtp.client-ip=209.85.128.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-41a5b68eceeso18931725e9.3
+        for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 11:39:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1713897544; x=1714502344; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=11PbC9TVWukv/d0s3ZoI8BIqTTqQkSG5khgm1hVUYh4=;
+        b=T06PXO275XnhKTa9frOQ9A/Pw/8+Xsz/yaAccPICY83FsqAb21vYa1CgnisX6Pc/Zw
+         VjESmXuhRsL+UeT8frcO/JifSgExCLzGHhPCv8/Viq8rvdG9JT2LZRXftmGk1OqnIYcH
+         d2NLOzHzI7BCzbOgMZR7mGcRw/3Ngmw/yFzTQZRK5P3mE6BJCAWcBBvSaKvYSjTaVQ07
+         RT4ml6BeLIqKyv61wf0I2EgwZXe5B38z5sn9uufEE09xFpDSx7sLCrildYdiiP6Ijbdf
+         59S6ZtkzVhg3V+RKZDQi+T4YI7GIcEHsrFS/0J7Ij9vxu+WYfTKsAlJQnpDELIgTI8T3
+         n5tA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713897544; x=1714502344;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=11PbC9TVWukv/d0s3ZoI8BIqTTqQkSG5khgm1hVUYh4=;
+        b=hNZYIzIgQ5LuFiCzatuIu52ScAPf4zQ5hH6Y9wPC4+ynJeKC8RTuQ/IclW0xYNObt+
+         ydnldhl80SB5aq0dJ0ahlNZXTp0sNtKMjxmYNmETscO77fE3pyaHJwh5fv91SJEKBZBR
+         a6o7JaEpnlhhcij11pST7Dko93bjPDvgifA2Tbngmqhmk6DAnv+sULQBGLx+ExUUHHan
+         NxoxXbW7jDp2uvXaeoBdh76o7+0jVlykPQZ9O0Eo63KP8QpWzgmSiPvL/3EsYk9+Rj51
+         qgGXQJ4LIPN/U0TKrpr3zYgLN7FItmEl4eU2l1nKcWa9zPSNJrjnXaqqXa9asG6QQ6q+
+         xuyg==
+X-Gm-Message-State: AOJu0Ywgjn3DQTX8ZSO+YqBTOYCxcIJJKQuUR7r2ffKX4OpSEFut0D5r
+	UEMjwdwOSu/0xw1txnZ9zDACHF0ktKLPI/iHHKxCxsjeEUfmwQ5rXBBXrV8m
+X-Google-Smtp-Source: AGHT+IG9eDje5/ATavPrxORyaogMG+AF67wMytIT0mvQLdRNRMSAVByDbS52hinu/SHFF1DAIcKFWQ==
+X-Received: by 2002:a05:600c:310a:b0:418:5e80:a6fa with SMTP id g10-20020a05600c310a00b004185e80a6famr102068wmo.14.1713897543579;
+        Tue, 23 Apr 2024 11:39:03 -0700 (PDT)
+Received: from lenovo-lap.localdomain (93-172-164-233.bb.netvision.net.il. [93.172.164.233])
+        by smtp.googlemail.com with ESMTPSA id i4-20020a05600c354400b0041902ebc87esm17793971wmq.35.2024.04.23.11.39.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 23 Apr 2024 11:39:03 -0700 (PDT)
+From: Yedaya Katsman <yedaya.ka@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Stephen Hemminger <stephen@networkplumber.org>,
+	Yedaya Katsman <yedaya.ka@gmail.com>
+Subject: [PATCH] ip: Exit exec in child process if setup fails
+Date: Tue, 23 Apr 2024 21:38:20 +0300
+Message-Id: <20240423183819.22367-1-yedaya.ka@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,142 +80,54 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The BPF sample building code looks a little bit spaghetti-ish
-so move it out to its own Makefile snippet. Similar in the spirit
-to how we include lib.mk. libynl will soon get a similar snippet.
+If we forked, returning from the function will make the calling code to
+continue in both the child and parent process. Make cmd_exec exit if
+setup failed and it forked already.
 
-There is a small change hiding in the move, the relative
-paths (../../.., ../.. etc) are replaced with variables
-from lib.mk such as top_srcdir and selfdir.
+An example of issues this causes, where a failure in setup causes
+multiple unnecessary tries:
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+```
+$ ip netns
+ef
+ab
+$ ip -all netns exec ls
+
+netns: ef
+setting the network namespace "ef" failed: Operation not permitted
+
+netns: ab
+setting the network namespace "ab" failed: Operation not permitted
+
+netns: ab
+setting the network namespace "ab" failed: Operation not permitted
+```
+
+Signed-off-by: Yedaya Katsman <yedaya.ka@gmail.com>
 ---
- tools/testing/selftests/net/Makefile | 53 +---------------------------
- tools/testing/selftests/net/bpf.mk   | 53 ++++++++++++++++++++++++++++
- 2 files changed, 54 insertions(+), 52 deletions(-)
- create mode 100644 tools/testing/selftests/net/bpf.mk
+ lib/exec.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
-index c388308ff517..5befca249452 100644
---- a/tools/testing/selftests/net/Makefile
-+++ b/tools/testing/selftests/net/Makefile
-@@ -108,55 +108,4 @@ $(OUTPUT)/tcp_inq: LDLIBS += -lpthread
- $(OUTPUT)/bind_bhash: LDLIBS += -lpthread
- $(OUTPUT)/io_uring_zerocopy_tx: CFLAGS += -I../../../include/
+diff --git a/lib/exec.c b/lib/exec.c
+index 9b1c8f4a1396..893937550079 100644
+--- a/lib/exec.c
++++ b/lib/exec.c
+@@ -36,8 +36,13 @@ int cmd_exec(const char *cmd, char **argv, bool do_fork,
+ 		}
+ 	}
  
--# Rules to generate bpf objs
--CLANG ?= clang
--SCRATCH_DIR := $(OUTPUT)/tools
--BUILD_DIR := $(SCRATCH_DIR)/build
--BPFDIR := $(abspath ../../../lib/bpf)
--APIDIR := $(abspath ../../../include/uapi)
--
--CCINCLUDE += -I../bpf
--CCINCLUDE += -I../../../../usr/include/
--CCINCLUDE += -I$(SCRATCH_DIR)/include
--
--BPFOBJ := $(BUILD_DIR)/libbpf/libbpf.a
--
--MAKE_DIRS := $(BUILD_DIR)/libbpf
--$(MAKE_DIRS):
--	$(call msg,MKDIR,,$@)
--	$(Q)mkdir -p $@
--
--# Get Clang's default includes on this system, as opposed to those seen by
--# '--target=bpf'. This fixes "missing" files on some architectures/distros,
--# such as asm/byteorder.h, asm/socket.h, asm/sockios.h, sys/cdefs.h etc.
--#
--# Use '-idirafter': Don't interfere with include mechanics except where the
--# build would have failed anyways.
--define get_sys_includes
--$(shell $(1) $(2) -v -E - </dev/null 2>&1 \
--	| sed -n '/<...> search starts here:/,/End of search list./{ s| \(/.*\)|-idirafter \1|p }') \
--$(shell $(1) $(2) -dM -E - </dev/null | grep '__riscv_xlen ' | awk '{printf("-D__riscv_xlen=%d -D__BITS_PER_LONG=%d", $$3, $$3)}')
--endef
--
--ifneq ($(CROSS_COMPILE),)
--CLANG_TARGET_ARCH = --target=$(notdir $(CROSS_COMPILE:%-=%))
--endif
--
--CLANG_SYS_INCLUDES = $(call get_sys_includes,$(CLANG),$(CLANG_TARGET_ARCH))
--
--BPF_PROG_OBJS := $(patsubst %.c,$(OUTPUT)/%.o,$(wildcard *.bpf.c))
--
--$(BPF_PROG_OBJS): $(OUTPUT)/%.o : %.c $(BPFOBJ) | $(MAKE_DIRS)
--	$(call msg,BPF_PROG,,$@)
--	$(Q)$(CLANG) -O2 -g --target=bpf $(CCINCLUDE) $(CLANG_SYS_INCLUDES) \
--	-c $< -o $@
--
--$(BPFOBJ): $(wildcard $(BPFDIR)/*.[ch] $(BPFDIR)/Makefile)		       \
--	   $(APIDIR)/linux/bpf.h					       \
--	   | $(BUILD_DIR)/libbpf
--	$(call msg,MAKE,,$@)
--	$(Q)$(MAKE) $(submake_extras) -C $(BPFDIR) OUTPUT=$(BUILD_DIR)/libbpf/ \
--		    EXTRA_CFLAGS='-g -O0'				       \
--		    DESTDIR=$(SCRATCH_DIR) prefix= all install_headers
--
--EXTRA_CLEAN := $(SCRATCH_DIR)
-+include bpf.mk
-diff --git a/tools/testing/selftests/net/bpf.mk b/tools/testing/selftests/net/bpf.mk
-new file mode 100644
-index 000000000000..a4f6755dd894
---- /dev/null
-+++ b/tools/testing/selftests/net/bpf.mk
-@@ -0,0 +1,53 @@
-+# SPDX-License-Identifier: GPL-2.0
-+# Rules to generate bpf objs
-+CLANG ?= clang
-+SCRATCH_DIR := $(OUTPUT)/tools
-+BUILD_DIR := $(SCRATCH_DIR)/build
-+BPFDIR := $(top_srcdir)/tools/lib/bpf
-+APIDIR := $(top_srcdir)/tools/include/uapi
-+
-+CCINCLUDE += -I$(selfdir)/bpf
-+CCINCLUDE += -I$(top_srcdir)/usr/include/
-+CCINCLUDE += -I$(SCRATCH_DIR)/include
-+
-+BPFOBJ := $(BUILD_DIR)/libbpf/libbpf.a
-+
-+MAKE_DIRS := $(BUILD_DIR)/libbpf
-+$(MAKE_DIRS):
-+	$(call msg,MKDIR,,$@)
-+	$(Q)mkdir -p $@
-+
-+# Get Clang's default includes on this system, as opposed to those seen by
-+# '--target=bpf'. This fixes "missing" files on some architectures/distros,
-+# such as asm/byteorder.h, asm/socket.h, asm/sockios.h, sys/cdefs.h etc.
-+#
-+# Use '-idirafter': Don't interfere with include mechanics except where the
-+# build would have failed anyways.
-+define get_sys_includes
-+$(shell $(1) $(2) -v -E - </dev/null 2>&1 \
-+	| sed -n '/<...> search starts here:/,/End of search list./{ s| \(/.*\)|-idirafter \1|p }') \
-+$(shell $(1) $(2) -dM -E - </dev/null | grep '__riscv_xlen ' | awk '{printf("-D__riscv_xlen=%d -D__BITS_PER_LONG=%d", $$3, $$3)}')
-+endef
-+
-+ifneq ($(CROSS_COMPILE),)
-+CLANG_TARGET_ARCH = --target=$(notdir $(CROSS_COMPILE:%-=%))
-+endif
-+
-+CLANG_SYS_INCLUDES = $(call get_sys_includes,$(CLANG),$(CLANG_TARGET_ARCH))
-+
-+BPF_PROG_OBJS := $(patsubst %.c,$(OUTPUT)/%.o,$(wildcard *.bpf.c))
-+
-+$(BPF_PROG_OBJS): $(OUTPUT)/%.o : %.c $(BPFOBJ) | $(MAKE_DIRS)
-+	$(call msg,BPF_PROG,,$@)
-+	$(Q)$(CLANG) -O2 -g --target=bpf $(CCINCLUDE) $(CLANG_SYS_INCLUDES) \
-+	-c $< -o $@
-+
-+$(BPFOBJ): $(wildcard $(BPFDIR)/*.[ch] $(BPFDIR)/Makefile)		       \
-+	   $(APIDIR)/linux/bpf.h					       \
-+	   | $(BUILD_DIR)/libbpf
-+	$(call msg,MAKE,,$@)
-+	$(Q)$(MAKE) $(submake_extras) -C $(BPFDIR) OUTPUT=$(BUILD_DIR)/libbpf/ \
-+		    EXTRA_CFLAGS='-g -O0'				       \
-+		    DESTDIR=$(SCRATCH_DIR) prefix= all install_headers
-+
-+EXTRA_CLEAN += $(SCRATCH_DIR)
+-	if (setup && setup(arg))
++	if (setup && setup(arg)) {
++		if (do_fork) {
++			/* In child, nothing to do */
++			_exit(1);
++		}
+ 		return -1;
++	}
+ 
+ 	if (execvp(cmd, argv)  < 0)
+ 		fprintf(stderr, "exec of \"%s\" failed: %s\n",
 -- 
-2.44.0
+2.34.1
 
 
