@@ -1,142 +1,128 @@
-Return-Path: <netdev+bounces-90604-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90605-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C44D88AEB02
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 17:27:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 845168AEB1D
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 17:30:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 00E9B1C20E5C
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 15:27:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B60FD1C21F46
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 15:30:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CA6313BAF1;
-	Tue, 23 Apr 2024 15:27:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44E7C13C3E3;
+	Tue, 23 Apr 2024 15:30:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="TLs/MHmm"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="3XvHWjB+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B944413BC20
-	for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 15:27:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4167513C80C
+	for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 15:30:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713886062; cv=none; b=q5BXSfl7+xUXItMEvcqg8cAIF+hH99pkhqDaQWicnZsEVnzHYvLbV2KbcBQQi4DccOGY4X//0/pJsbDFiRdShjHk8vdUa3Qhp9EKMOI0xQNFP9w+hHAhaBXAohhtLvPRQyyqRXQUCeRCPnsHtj1eTJ/OoiQdAKKpE2GsHt7AXc4=
+	t=1713886222; cv=none; b=udKNOah4s6PDoZkjxe8hX5nibPOQVcuGUCQvUk5LbDFotTHzCyrb7YRbhtxEznvjOy6cThaTKifl1by3OHF1gLp8K8HOt1kOy4edMWiHs/+zAw3AFEN/0qUBvH52F/DGG3pw7++X//wb5EfAMNF3H7V4BaeX8JjdbICroLmvaFs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713886062; c=relaxed/simple;
-	bh=BFypqAv8U50w3WuJDsplwm0E71eqJxHq1OKvdwNETRU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dKfqQAEFPPZdMYjDPP8hy8zDol2CmnCwI5vdLeg3hEQ6IxwOpO7h3K+owErMZ11Yb+JX3pFgeAENYnphOZzu3nSJVyGLGwZXnG+KGZqp8AhZ0Efb5Uy0lrsyhgEgZn1lKePmCS7kvvkSUejOjlTqMVMl358zilv5edqxl6oo85U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=TLs/MHmm; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-41a5b68ed5cso24273225e9.2
-        for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 08:27:40 -0700 (PDT)
+	s=arc-20240116; t=1713886222; c=relaxed/simple;
+	bh=e8wuBSzLvfX5kN29uOikR0cOQbSak6iCsOgk+EzmlHw=;
+	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=C39ukT2U9HCqRl3qRqmmlgLobO+BitKglnT73T63vvWNrfZE2h+gDqZCxuxO3iF/J8viixrSEu7dNZdG6JWFQ1uVxI0D4iSyp7dArR06mZB7qNodL6BCd+1ygQZwVIuPLM/PnT/QYvA+skFO0HMWhlvdroqDzyW2gQv+eaLOf/Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=3XvHWjB+; arc=none smtp.client-ip=209.85.128.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-4187c47405aso39376675e9.3
+        for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 08:30:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=6wind.com; s=google; t=1713886059; x=1714490859; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=NP4Yxhhvx6O77mwXJVK7IB6oa4CjJexQ7edB4wS0ZM8=;
-        b=TLs/MHmmTfMCY+eSqh+DUX0PWlljbaayovjweLde5/f22eP/9e/9WJWiF3XenugLUu
-         9CYUJe6S9vT9IsuJ0yWdcnePWkNxJqImdBT0LBKVrFwA5qqZiiVLofD08CABw++8rApE
-         0LfBK8rU3+Bk/haQnWzZPFOOnLP37ykhy68rWDf4RPtAOE5k6x0S98vKxJdbf3N3vIKU
-         8PNjUMIGGUvnrzNG/U8EteXH77f6m5UMfajUO6Fuq9AmacQgR+Kg67Rg1rTdLtpUiquO
-         Ri+P6U9vXmzYRKu3rJxiPpPX0YndQ4tga+8oVEWE+U1dTUIGiZFkXKzbSxw+HCJNuuOX
-         qHpw==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1713886207; x=1714491007; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=2PasE5zHDUZQpfPlcoJSnFo4u5YpglCrOsGZQUACmWk=;
+        b=3XvHWjB+p1nZ+ARYiZ78mlfiCqD69ReM4nUeAQM7zzz5Z5QdtsssyIPvW4sV/tLQYD
+         vdlzxZfoP+4FO2Ky8lXylnWQ5BU/Di3IJQ///cDmIME8ERbHAAw/BXkhb54Kcl0ACS5s
+         airV5cngXPfcCdG5nx7lLewxHWGBqrda1xh6R39DIDi8a/wIw/1kBcBk7QeL2ZyvC2Hq
+         rGdCHqKovVfYE3O/cbYPL2MT+4DUOCDj+fqc3cI4ziGdtTa93skPz6YUzqBYKZLZkoP2
+         9YMqL4mAqqXRg+7ZHkI8rf7F8XzD/uoSpJtbCD0ZMTzE7Q7dc9j4Gol8x//u75H8RTm3
+         JLGg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713886059; x=1714490859;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=NP4Yxhhvx6O77mwXJVK7IB6oa4CjJexQ7edB4wS0ZM8=;
-        b=LrdqRJSgxVEQYFWCgu6JT1AKkXxLHNI9Fp+MXqaxRVJ28h+585AfzMjs2j5kVnJ4w6
-         tTfSnqM72dI7ZOryGxmeMSMxPNvDq+AEkX+B4TqtAR8lDJj8zh4SFF9cnNCwExwEmW8b
-         DZd5Qll4+LkqZ8ekYJ6eTXQ1n4daEj2Hadmo5RlC0Psbn9h+oyEF+jg30AvCN3gLI/0t
-         RgTT+cLg3m9PYlwIVKBrQYP5trG3yCDWECc9x3vLcjEFv+JfwpOeyMWsLFHoFCd32oqE
-         tLPrr/lOCr04BJsQj4dU0p5zz8q+0InGbuQQF1hH89duWMVCprY//cbTPUyBvBbrVRPD
-         GJwg==
-X-Forwarded-Encrypted: i=1; AJvYcCUqicQAklXk5Czkgts0iBoPoh6JagbbpDHP1nhGoA8+EEF/DM7ceun/GpGBXyx/jrQorni8TEHd8iO9Li1i4UpVDCxU08hW
-X-Gm-Message-State: AOJu0Yy4ouD7ufBhbhqm5R0PofDdUXeOrZts6L0b+VrMN2jgsN9gxfyC
-	g9I/08uuHH6aLoUmSsxY2uujibZvGAi6DMK4dpB8Nd95CnoDLb3mB8ribyVNCzA=
-X-Google-Smtp-Source: AGHT+IFWnWoy+tNdk03XlARg88AIgs8u1Kcmfps3PA7bC804qbYAoPXRgUfZR7wGWs+s28myeSjQRw==
-X-Received: by 2002:a05:600c:3d8b:b0:41a:bdaf:8c9c with SMTP id bi11-20020a05600c3d8b00b0041abdaf8c9cmr1816883wmb.35.1713886058802;
-        Tue, 23 Apr 2024 08:27:38 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:b41:c160:286e:b61a:3958:bd85? ([2a01:e0a:b41:c160:286e:b61a:3958:bd85])
-        by smtp.gmail.com with ESMTPSA id l23-20020a05600c1d1700b00418f99170f2sm18321795wms.32.2024.04.23.08.27.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 23 Apr 2024 08:27:38 -0700 (PDT)
-Message-ID: <8ac397dc-5498-493c-bcbc-926555ab60ab@6wind.com>
-Date: Tue, 23 Apr 2024 17:27:37 +0200
+        d=1e100.net; s=20230601; t=1713886207; x=1714491007;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2PasE5zHDUZQpfPlcoJSnFo4u5YpglCrOsGZQUACmWk=;
+        b=S7w0Ub8FWpxBzKPqBqp5Gd47N35xE8B1hHFuokHua2vMOl8BBaaaIUOA0x9VqZjHcK
+         rRWDqO4BfWdpxheYEH6Lweqi+ejNMMUy5GiImlj3ibWkkTIY3bGkK7nTv9QSF/jaiM9x
+         GldQS2Msk92BceDzIcdHFun2gD9IS/FhvDZHzlZtjb4QlNEDRHJSjGEsGkAdWWUfux83
+         lj2g1oiQ5mKGoKyi4EZbQvZVmPiSXSj6uPBGxey74hBemp5+7On8DW6O1GwuU9zkLWKO
+         PGq271TQyRWAgtkCOew51sKpfpcRZ4QsZt9Kj6P9MLSIYMTl5x5I+M8bxi6oEpc8tUU7
+         nQSQ==
+X-Gm-Message-State: AOJu0YwOLlsFShGEhTZDQ1ub3s+XpKoJbtHCAdopebz6h00VfoMSwvL9
+	UGAeqteyZBiWl64ZjSdpfOTU0dDRBrw3/r1KcPNraQcrUEEOdGkCTd3pWjYl4ut/LLLqhrFs1zd
+	F/lg=
+X-Google-Smtp-Source: AGHT+IGtEkEhcb5mQc3KY/J9uWfPMgymkhpoR4p6Es6H93bP2NJvAnRHhoqtAk124PPyocNsK1fuzQ==
+X-Received: by 2002:adf:ec4d:0:b0:34a:2852:f119 with SMTP id w13-20020adfec4d000000b0034a2852f119mr8476258wrn.36.1713886207063;
+        Tue, 23 Apr 2024 08:30:07 -0700 (PDT)
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id p5-20020a5d48c5000000b0034afaa9ca47sm6577931wrs.1.2024.04.23.08.30.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 23 Apr 2024 08:30:06 -0700 (PDT)
+Date: Tue, 23 Apr 2024 17:30:02 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org
+Subject: Re: [PATCH] igb: cope with large MAX_SKB_FRAGS.
+Message-ID: <ZifT-pli5-3KBd2i@nanopsycho>
+References: <20240423102446.901450-1-vinschen@redhat.com>
+ <Ziea2_SRYoGcy9Sw@nanopsycho>
+ <Zie9ffllQf8qxv2-@calimero.vinschen.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: nicolas.dichtel@6wind.com
-Subject: Re: [PATCH ipsec-next v12 3/4] xfrm: Add dir validation to "in" data
- path lookup
-To: antony.antony@secunet.com, Steffen Klassert
- <steffen.klassert@secunet.com>, Herbert Xu <herbert@gondor.apana.org.au>,
- netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, devel@linux-ipsec.org,
- Leon Romanovsky <leon@kernel.org>, Eyal Birger <eyal.birger@gmail.com>,
- Sabrina Dubroca <sd@queasysnail.net>
-References: <cover.1713874887.git.antony.antony@secunet.com>
- <f7492e95b2a838f78032424a18c3509e0faacba5.1713874887.git.antony.antony@secunet.com>
-From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Content-Language: en-US
-Organization: 6WIND
-In-Reply-To: <f7492e95b2a838f78032424a18c3509e0faacba5.1713874887.git.antony.antony@secunet.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Zie9ffllQf8qxv2-@calimero.vinschen.de>
 
-Le 23/04/2024 à 14:50, Antony Antony a écrit :
-> Introduces validation for the x->dir attribute within the XFRM input
-> data lookup path. If the configured direction does not match the
-> expected direction, input, increment the XfrmInStateDirError counter
-> and drop the packet to ensure data integrity and correct flow handling.
-> 
-> grep -vw 0 /proc/net/xfrm_stat
-> XfrmInStateDirError     	1
-> 
-> Signed-off-by: Antony Antony <antony.antony@secunet.com>
-> ---
-> v11 -> 12
->  - add documentation to xfrm_proc.rst
-> 
-> v10->v11
->  - rename error s/XfrmInDirError/XfrmInStateDirError/
-> ---
->  Documentation/networking/xfrm_proc.rst |  3 +++
->  include/uapi/linux/snmp.h              |  1 +
->  net/ipv6/xfrm6_input.c                 |  7 +++++++
->  net/xfrm/xfrm_input.c                  | 11 +++++++++++
->  net/xfrm/xfrm_proc.c                   |  1 +
->  5 files changed, 23 insertions(+)
-> 
-> diff --git a/Documentation/networking/xfrm_proc.rst b/Documentation/networking/xfrm_proc.rst
-> index c237bef03fb6..b4f4d9552dea 100644
-> --- a/Documentation/networking/xfrm_proc.rst
-> +++ b/Documentation/networking/xfrm_proc.rst
-> @@ -73,6 +73,9 @@ XfrmAcquireError:
->  XfrmFwdHdrError:
->  	Forward routing of a packet is not allowed
-> 
-> +XfrmInStateDirError:
-> +        State direction input mismatched with lookup path direction
-It's a bit confusing because when this error occurs, the state direction is not
-'input'.
-This statistic is under 'Inbound errors', so may something like this is enough:
-'State direction is output.'
+Tue, Apr 23, 2024 at 03:54:05PM CEST, vinschen@redhat.com wrote:
+>Hi Jiri,
+>
+>On Apr 23 13:26, Jiri Pirko wrote:
+>> Tue, Apr 23, 2024 at 12:24:46PM CEST, vinschen@redhat.com wrote:
+>> >From: Paolo Abeni <pabeni@redhat.com>
+>> >
+>> >Sabrina reports that the igb driver does not cope well with large
+>> >MAX_SKB_FRAG values: setting MAX_SKB_FRAG to 45 causes payload
+>> >corruption on TX.
+>> >
+>> >The root cause of the issue is that the driver does not take into
+>> >account properly the (possibly large) shared info size when selecting
+>> >the ring layout, and will try to fit two packets inside the same 4K
+>> >page even when the 1st fraglist will trump over the 2nd head.
+>> >
+>> >Address the issue forcing the driver to fit a single packet per page,
+>> >leaving there enough room to store the (currently) largest possible
+>> >skb_shared_info.
+>> >
+>> >Fixes: 3948b05950fd ("net: introduce a config option to tweak MAX_SKB_FRAG")
+>> >Reported-by: Jan Tluka <jtluka@redhat.com>
+>> >Reported-by: Jirka Hladky <jhladky@redhat.com>
+>> >Reported-by: Sabrina Dubroca <sd@queasysnail.net>
+>> >Tested-by: Sabrina Dubroca <sd@queasysnail.net>
+>> >Tested-by: Corinna Vinschen <vinschen@redhat.com>
+>> >Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+>> >---
+>> > drivers/net/ethernet/intel/igb/igb_main.c | 1 +
+>> 
+>> Also, please use get_maintainer.pl script to get cclist.
+>
+>done and done in v2 (for which I forgot the "in-reply-to" now, d'uh)
 
+In-reply-to is not needed. Send each V to separate thread.
 
-Regards,
-Nicolas
+>
+>Thanks,
+>Corinna
+>
+>
 
