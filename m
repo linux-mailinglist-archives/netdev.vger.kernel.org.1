@@ -1,143 +1,77 @@
-Return-Path: <netdev+bounces-90314-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90315-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7D548ADB1B
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 02:27:46 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73AC58ADB2F
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 02:39:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 58B651F25743
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 00:27:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 131DBB22466
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 00:39:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 035F81E898;
-	Tue, 23 Apr 2024 00:25:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64FE612B93;
+	Tue, 23 Apr 2024 00:38:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="pxqD9VHf";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="1/Kxh1AP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qcJWmRTK"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B03D23BE;
-	Tue, 23 Apr 2024 00:25:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D2B812B95;
+	Tue, 23 Apr 2024 00:38:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713831920; cv=none; b=q3tR88t1bNxKz/uhbSfZSTmWpJsd2uNQQ5VJsXrXpZFgnMN1w/Q4iKcaj6GNknybU3MSaKiU2TKEYEYNBDPV2UoQevDEMIdf220Ot83MEjQbGEHPbPjAauqTn29jqM/tbzaM04Vn6mmlLMaaXFevp6a561WshPD9GUlSK+WG0s4=
+	t=1713832732; cv=none; b=ts4V3BfmJMEU/eUMunB5oiUWeVX7efsBSzLlhf+y1o4GYZ8KYLqD6j5caY671j6KyCFHhTmigj4zRD6vqHBlrPLp4LJc4cq4leVDHaWcuC8DUYTWaIMj7WKZOLjGSyErWhM2lL0NCROFJbxtsR3b3/Vv4bUISQu88Jrlfv7nNwM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713831920; c=relaxed/simple;
-	bh=k6eRWwINhj0U1Xa3qi1OYa2d9LpF+aurYBLnHfRbNCU=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=fo4E4Mgz7tV8TIwloUN9gZfe0hEelCev3q7kWrqsKEx2YtUz1dnn7swc8UdR0501ruCy78d/eMvK/2HA7PXORDArM9TAYgH+L44CKvKIC2Bb49LJIqcH1ztX9tHHI0yfPjJTMKmnqBiqFwzVmtMvfDuGm09jkaTc4sFmxvQuZs4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=pxqD9VHf; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=1/Kxh1AP; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1713831917;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mjTLjvprvXko18egTeJSxFNpZDAMhMu8NQmFX6VjddQ=;
-	b=pxqD9VHfQzMHm12zw5pgnOUaWT0va38KJ1b35SniTjYbk6JEIY2B2EhKzO9Zke0zbWgXEx
-	JTjijvpgpBzA/erowJLczheT6y5tlxD1uDpLm6K9uJNgPIAt2qz7E7fbewoHaYXy4Mfqp+
-	HftA9P57UWc9I76fBxnjmJJLhDPsYvitPgUb+bdKRbkVTZTU877uM6FhjWnP0jRAGL5GEJ
-	RNsuOWZ2r9aEL0iaPHTtIN5U5L9QbZ66xrB+Lyjacyi6BmIymamxqLNQLpuFZMf/Zo8xTr
-	1AUgHRtRxEio2APQR2NVg2XIsdcPLAFMCe/ncuqwMZgvJOjXZq3xdve8txqyTQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1713831917;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mjTLjvprvXko18egTeJSxFNpZDAMhMu8NQmFX6VjddQ=;
-	b=1/Kxh1AP2LHbLo74FfgDon0/dMkzAGGnhYuXAl8+2i5y1NkQSjwVELm75F9hCdutR7wJ7k
-	ucRJYclIUzulmdAA==
-To: =?utf-8?B?TWFoZXNoIEJhbmRld2FyICjgpK7gpLngpYfgpLYg4KSs4KSC4KSh4KWH4KS1?=
- =?utf-8?B?4KS+4KSwKQ==?= <maheshb@google.com>, David Laight
- <David.Laight@aculab.com>
-Cc: Netdev <netdev@vger.kernel.org>, Linux <linux-kernel@vger.kernel.org>,
- David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Richard
- Cochran <richardcochran@gmail.com>, Arnd Bergmann <arnd@arndb.de>, Sagi
- Maimon <maimon.sagi@gmail.com>, Jonathan Corbet <corbet@lwn.net>, John
- Stultz <jstultz@google.com>, Mahesh Bandewar <mahesh@bandewar.net>
-Subject: Re: [PATCHv2 next] ptp: update gettimex64 to provide ts optionally
- in mono-raw base.
-In-Reply-To: <CAF2d9jj6H+jOfUbbw1ZEHmgqroXmn+oFV8NwTyKJ_P_T4G_5xg@mail.gmail.com>
-References: <20240418042706.1261473-1-maheshb@google.com>
- <163538a0495840eca34f6fbd09533ae1@AcuMS.aculab.com>
- <CAF2d9jj6H+jOfUbbw1ZEHmgqroXmn+oFV8NwTyKJ_P_T4G_5xg@mail.gmail.com>
-Date: Tue, 23 Apr 2024 02:24:59 +0200
-Message-ID: <87edaxudr8.ffs@tglx>
+	s=arc-20240116; t=1713832732; c=relaxed/simple;
+	bh=E9+RsWxIjC2HxdWYdJ7u8cdMUO7bM5Px2e7ZnnhAzGk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=HtcmatFmlm/DpnaLsdEIMuegGWWbbqpq0BUHo0fXox3ZII7pH+ZJ+K8kUYN8K3agtMr8gzwNYnRP2/zL9/KytxAAnqeJhiynD78tSFcsyfhNZ/uGaE9UVPFpIhZ8oPNQDboL9yZoDTts6I54vAQnon2M+81+PjVuYvkIi7ZePgE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qcJWmRTK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A2194C113CC;
+	Tue, 23 Apr 2024 00:38:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713832731;
+	bh=E9+RsWxIjC2HxdWYdJ7u8cdMUO7bM5Px2e7ZnnhAzGk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=qcJWmRTKEX7PM2lNDSUeg8aeMkeG3vVIZhIwcKMkEtkiMWAp+9hGW3I5UNxdCUFcg
+	 0TDmiqd0tzLXL13mRvvyTlkESLga2Fl5ZOyGNT8xD+U57atfczXgMbNTukv/FjJDqO
+	 EVoMLJtErqOsX2gLOPuJknTzMvSZBybgquwxSL/Sx5Ft+L+q2q9G4uMkuYN+lgMwZQ
+	 qNOCUXU6rWmnbEeJx1Aiju9IpYpwREavecfM6Urrw6+6aNWzjtxue1Pj6DF3Y96s3B
+	 KtdyH1zeJMRbFvr3woeZKbbQ3Z1XxD6Ujj7Y4er6wXGc57F0bcoXv237PZo2kLUwPB
+	 RfUBUB5LmKaJg==
+Date: Mon, 22 Apr 2024 17:38:50 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jun Gu <jun.gu@easystack.cn>
+Cc: dev@openvswitch.org, echaudro@redhat.com, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v4] net: openvswitch: Check vport netdev name
+Message-ID: <20240422173850.2222305f@kernel.org>
+In-Reply-To: <20240419061425.132723-1-jun.gu@easystack.cn>
+References: <20240419061425.132723-1-jun.gu@easystack.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Apr 22 2024 at 15:04, Mahesh Bandewar (=E0=A4=AE=E0=A4=B9=E0=A5=87=
-=E0=A4=B6 =E0=A4=AC=E0=A4=82=E0=A4=A1=E0=A5=87=E0=A4=B5=E0=A4=BE=E0=A4=B0) =
-wrote:
-> On Sun, Apr 21, 2024 at 11:27=E2=80=AFAM David Laight <David.Laight@acula=
-b.com> wrote:
->>
->> Isn't using CLOCK_REALTIME just a big bug?
->> As well as minor 'corrections' done by NTP it suffers from
->> major time-warps that can jump in either direction by arbitrary amounts.
->>
-> Yes, this arbitrary jump in either direction is a problem and hence
-> the proposed update. However, since it's a UAPI and there could be use
-> cases that are happy with the current implementation, we can't break
-> them. Of course the use case that I'm bringing in (and probably what
-> you have in mind) differs but backward compatibility needs to be
-> maintained.
+On Fri, 19 Apr 2024 14:14:25 +0800 Jun Gu wrote:
+>  	vport->dev = dev_get_by_name(ovs_dp_get_net(vport->dp), name);
+> -	if (!vport->dev) {
+> +	/* Ensure that the device exists and that the provided
+> +	 * name is not one of its aliases.
+> +	 */
+> +	if (!vport->dev || strcmp(name, ovs_vport_name(vport))) {
+>  		err = -ENODEV;
+>  		goto error_free_vport;
+>  	}
 
-It depends on what you are trying to do. You cannot adjust
-CLOCK_REALTIME/TAI without knowing the current time, right?
-
-So just declaring that this is a big bug and a problem is as wrong as it
-gets. It's obviously not the right thing for all use cases, but that
-makes the legitimate use cases not wrong.
-
->> This doesn't solve the problem of the NTP adjusted clock always
->> running slightly slow or fast.
->> The big NTP errors happen in the first (IIRC up to ~20 mins after boot)
->> when the system clock is being synchronised.
->
-> Yes, a big step is a high possibility at the beginning (at boot) but
-> smaller steps as well as ppm adjustments are real possibilities
-> throughout and hence CLOCK_REALTIME and CLOCK_MONOTONIC are affected.
-> By adding the timestamps in CLOCK_MONOTONIC_RAW (as proposed in this
-> patch) should address this issue.
->
->> It really would be nice if those big adjustments didn't affect
->> CLOCK_MONATONIC. (as an example try sending RTP audio every 20ms)
-
-They don't affect CLOCK_MONATONIC at all because there is no such clock :)
-
-> Hmm, probably this is out of context for this patch and probably a
-> question for the time maintainers / experts?
-
-The quantity of the initial frequency adjustments depends on the
-accuracy of the initial clock frequency calibration which is on most
-sane systems within +/- 500ppm.
-
-     500ppm of 20ms =3D=3D 10us
-
-If the clock calibration is off by a larger margin then that needs to be
-fixed.
-
-It's clearly documented that CLOCK_MONOTONIC and CLOCK_REALTIME (and
-therefore CLOCK_BOOTTIME and CLOCK_TAI) are strictly based on the same
-frequency and only differ by offsets. So there is nothing to fix and
-change.
-
-Thanks,
-
-        tglx
+Sorry I applied this before I realised that it's buggy.
+dev_get_by_name() will give you a reference on the device.
+You must free it, so the error handling is different.
+Please follow up ASAP to fix that.
 
