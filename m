@@ -1,115 +1,114 @@
-Return-Path: <netdev+bounces-90511-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90512-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1812B8AE54E
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 14:03:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48BD18AE558
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 14:04:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C5F252863B3
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 12:03:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 79EBA1C219E5
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 12:04:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9502086278;
-	Tue, 23 Apr 2024 11:50:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="sQyZJhxN"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 453B712B17B;
+	Tue, 23 Apr 2024 11:52:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out162-62-57-210.mail.qq.com (out162-62-57-210.mail.qq.com [162.62.57.210])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6945D86267;
-	Tue, 23 Apr 2024 11:50:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.57.210
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8B0583CAA
+	for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 11:52:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713873045; cv=none; b=mIVwwA+YW/luTu9jN0JIF62/tLcMDdz84F3ouG7G98xRjpbFFPhkkIFtt4K3VMxGPGHZB5JzzTp+tvIceMdPYoOl0RO6LMS7YA2ONTuqHhfHIbsKUvnVgSCif6Zc70BvEHfatyr1XUL3R0lf/6cBgQf0t29JU7+aM2Qj7vchxfc=
+	t=1713873172; cv=none; b=u3xXUcL8lI7dH6rS9EKRKJtfMmdKFeUC8M3gjqwKD8sA1SA7Z4zAFwjjoGGtdW3BeMlXmLMyIxG+wOpAjW+UBnpMg7JuaPUkJda9vxriV5/8/1QvS6b6ZJnxrX1bKWUmzbWEVLfovziG/PiK6EUm12/WWOSD5/sL4+NtRyMTbEE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713873045; c=relaxed/simple;
-	bh=pRCyizJBXLafcgiLZimJVFcWKch621Tv6coNnmXpEbw=;
-	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=HjjAQcMbnsljVj0Iurn/GBflssN0uvr1hb9/83v284V9veSHJZDOcjCivnRjkPPQS+hA1hZmlKgpG1/ncCUkXd3fbO3mm85aztF28LitWBeQkFHMK9Xv0NWRCrYmBW3j4SGRRdstIgaZwW6q2kJ6CerujVNtbQLDCZxw2Cn9LWg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=sQyZJhxN; arc=none smtp.client-ip=162.62.57.210
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1713873032; bh=9/w/tzBWmQ5MmArL4N+CgRcqjaPmk49mqMX02OJXD2A=;
-	h=From:To:Cc:Subject:Date;
-	b=sQyZJhxNAKv139UYsDafubp+qax6vg4HZyCfQt4389bsNekIU8wMvfqKFggUrZYXu
-	 mIzB0ECyNn/dWvxwjZiEuiP519pxCrRdd0M4f9Y/mn/C99IlXiaDqpajo+l+iaoIFu
-	 YdVSdKj04rxqeSvTZzJz+8ovTAaYIowirJuyg6Mg=
-Received: from localhost.localdomain ([58.213.8.145])
-	by newxmesmtplogicsvrszb9-1.qq.com (NewEsmtp) with SMTP
-	id C9C0D4D5; Tue, 23 Apr 2024 19:50:28 +0800
-X-QQ-mid: xmsmtpt1713873028tyc2wg7ji
-Message-ID: <tencent_284407955020261D1B2BD142194A87C9EB0A@qq.com>
-X-QQ-XMAILINFO: MhK4DKsBP06icZ6vUiZ0AyWKbL8hEAKksNAHNakfhxrPXC70cEjOCWZa/sxygp
-	 kuQj+OxO7txQuk/IXFlt9sXae4kml6zc8mgK5OeTDWGTVJ6uoYtpMloRcGuEZ9i3d+XbOahiP9kX
-	 vB5OxRyAenN3N852Nag3v2IgpseG3NE3wkXJDedAUqLGjATWpyexrPs3j4SUl6BXP+MmMB3yrG7K
-	 s1gNZoRxA7NXZ3cIheGISx5tNPFdvnNsyJQSdelHAsYbJoJQgAPR8V+WTG+GEeoY6Rbzrs5AQTOh
-	 bkFtMDlsl3MDVhoGmLzAwTifnt5WWWac7svMwAbVsazk/rYReWlJ0n8JEONRJrUYWmMLfJ/h9wNR
-	 xROLstzvwc+j/djLysaFbyUI0PeURjIy23bX/0+D0dUP/D8dh4mZJKtBPEk+StEJU2a6GyShYwV+
-	 0x3pg50ZaOBzKnY/tJOVPJCYHY9JRAh8wMjwP6L8wNSlEbgUlPbof9EJBSsGFyZjb9TsUhm+E8SP
-	 42GLah5/1l3CQAoUPhZLx5s5JR2ym0cWwP0pY9P0H+Rz9/+ptJw5yB3NrG1uWpTfiWM7gzfFQLk+
-	 m1M2/VPN/q2LR2BmMboe/KjRV3qe9cVx25pQcRHWcJFVhyj4oLQ7JSjevttVrN0uAP+9Wy8I2jtl
-	 tzPjn64Qg7A2lfFI5aoBqYB3rn6ca8xRT0uvdNIBhduMxM2KefQOXjpxgOYbXLytg0fqc3pap5Fd
-	 TQeOrS2r5CJUXmofpW6rc6v9bbzdWCoJBtyeEjZZtZ+V5cieZfH0C4uFXxXU2clSm2SojQQjd3WK
-	 qGbR1M8y7rqNpmBDKkywccv+e7zey9l20tvStFBCGlVyQtjoBBs1mF74RcTAV2LLSyoKhLL+vm9J
-	 VxY2IjC2GBuX8V/V9OPLpwO4FUr0LDSpPyscMwtpNK9mDk7pUtEsGOCJUgNkojWQCynlZAFQVywd
-	 TXOyPIsfiyUYL4SIDD3QK9EWcLkckmoRaOG+B9v3kc089saNLibeoRXTHwFi3/bCJT2NL9gkhShS
-	 r4aB4GOmtnz55qVyMyRnAnON8Lh1k=
-X-QQ-XMRINFO: NI4Ajvh11aEj8Xl/2s1/T8w=
-From: linke li <lilinke99@qq.com>
-To: 
-Cc: xujianhao01@gmail.com,
-	linke li <lilinke99@qq.com>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Florian Westphal <fw@strlen.de>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] netfilter: mark racy access on ext->gen_id
-Date: Tue, 23 Apr 2024 19:50:22 +0800
-X-OQ-MSGID: <20240423115022.78748-1-lilinke99@qq.com>
-X-Mailer: git-send-email 2.39.3 (Apple Git-146)
+	s=arc-20240116; t=1713873172; c=relaxed/simple;
+	bh=b04MyvKSekoRkZfbb2lCAurxalynMJ5tz/7M7CwrKOg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:Cc:
+	 In-Reply-To:Content-Type; b=XwkCVAP6qnLzKmky/aVhvzvFhBgdnmAE6hVGFbc/CqD+vZBJHC8b2oOI570XByLRqB7Fb1ZJMfiPzHJBW0iJvScETqSK9W94M0Q073Q6tX9AXht4V9PjwS3vHciwBTMaIL1wuy0MbWeLca5pW1vidRBR0slkaGM7/N32c2laylQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [141.14.220.34] (g34.guest.molgen.mpg.de [141.14.220.34])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id B75D061E5FE36;
+	Tue, 23 Apr 2024 13:52:26 +0200 (CEST)
+Message-ID: <5d30a9df-224e-4285-94d1-53f6995d648a@molgen.mpg.de>
+Date: Tue, 23 Apr 2024 13:52:26 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH] igb: cope with large MAX_SKB_FRAGS.
+To: Corinna Vinschen <vinschen@redhat.com>
+References: <20240423102446.901450-1-vinschen@redhat.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+Cc: netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org
+In-Reply-To: <20240423102446.901450-1-vinschen@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-In __nf_ct_ext_find(), ext->gen_id can be changed by 
-nf_ct_ext_valid_post(), using WRITE_ONCE. Mark data races on ext->gen_id
-as benign using READ_ONCE. 
+Dear Corinna,
 
-This patch is aimed at reducing the number of benign races reported by
-KCSAN in order to focus future debugging effort on harmful races.
 
-Signed-off-by: linke li <lilinke99@qq.com>
----
- net/netfilter/nf_conntrack_extend.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Thank you for the patch.
 
-diff --git a/net/netfilter/nf_conntrack_extend.c b/net/netfilter/nf_conntrack_extend.c
-index dd62cc12e775..7f1a5e5f6646 100644
---- a/net/netfilter/nf_conntrack_extend.c
-+++ b/net/netfilter/nf_conntrack_extend.c
-@@ -141,7 +141,7 @@ void *__nf_ct_ext_find(const struct nf_ct_ext *ext, u8 id)
- 	if (!__nf_ct_ext_exist(ext, id))
- 		return NULL;
- 
--	if (this_id == 0 || ext->gen_id == gen_id)
-+	if (this_id == 0 || READ_ONCE(ext->gen_id) == gen_id)
- 		return (void *)ext + ext->offset[id];
- 
- 	return NULL;
--- 
-2.39.3 (Apple Git-146)
 
+Am 23.04.24 um 12:24 schrieb Corinna Vinschen:
+> From: Paolo Abeni <pabeni@redhat.com>
+
+It’d be great if you removed the trailing dot/period in the commit 
+message summary.
+
+> Sabrina reports that the igb driver does not cope well with large
+> MAX_SKB_FRAG values: setting MAX_SKB_FRAG to 45 causes payload
+> corruption on TX.
+> 
+> The root cause of the issue is that the driver does not take into
+> account properly the (possibly large) shared info size when selecting
+> the ring layout, and will try to fit two packets inside the same 4K
+> page even when the 1st fraglist will trump over the 2nd head.
+> 
+> Address the issue forcing the driver to fit a single packet per page,
+> leaving there enough room to store the (currently) largest possible
+> skb_shared_info.
+
+If you have a reproducer for this, it’d be great if you could document 
+it in the commit message.
+
+> Fixes: 3948b05950fd ("net: introduce a config option to tweak MAX_SKB_FRAG")
+> Reported-by: Jan Tluka <jtluka@redhat.com>
+> Reported-by: Jirka Hladky <jhladky@redhat.com>
+> Reported-by: Sabrina Dubroca <sd@queasysnail.net>
+> Tested-by: Sabrina Dubroca <sd@queasysnail.net>
+> Tested-by: Corinna Vinschen <vinschen@redhat.com>
+> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+> ---
+>   drivers/net/ethernet/intel/igb/igb_main.c | 1 +
+>   1 file changed, 1 insertion(+)
+> 
+> diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/ethernet/intel/igb/igb_main.c
+> index a3f100769e39..22fb2c322bca 100644
+> --- a/drivers/net/ethernet/intel/igb/igb_main.c
+> +++ b/drivers/net/ethernet/intel/igb/igb_main.c
+> @@ -4833,6 +4833,7 @@ static void igb_set_rx_buffer_len(struct igb_adapter *adapter,
+>   
+>   #if (PAGE_SIZE < 8192)
+>   	if (adapter->max_frame_size > IGB_MAX_FRAME_BUILD_SKB ||
+> +	    SKB_HEAD_ALIGN(adapter->max_frame_size) > (PAGE_SIZE / 2) ||
+>   	    rd32(E1000_RCTL) & E1000_RCTL_SBP)
+>   		set_ring_uses_large_buffer(rx_ring);
+>   #endif
+
+
+Kind regards,
+
+Paul
 
