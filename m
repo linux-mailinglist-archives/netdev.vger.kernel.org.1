@@ -1,51 +1,46 @@
-Return-Path: <netdev+bounces-90472-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90526-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5D808AE390
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 13:12:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F06E8AE608
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 14:27:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 03D991C20EF4
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 11:12:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 46A5E282C8D
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 12:27:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C29385274;
-	Tue, 23 Apr 2024 11:11:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C9BA8405C;
+	Tue, 23 Apr 2024 12:27:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+Received: from mail-m1041.netease.com (mail-m1041.netease.com [154.81.10.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A2D7823DE;
-	Tue, 23 Apr 2024 11:11:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 526D478285;
+	Tue, 23 Apr 2024 12:27:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=154.81.10.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713870683; cv=none; b=M8eg6z8G9zBO+9Q18UdWukpteFDQwPXD/LQms+A/Ms0RzsPOEb1AgJek09vFL6NeZYt/auqaQpk95SXR4BwsnwDBgWFBwDEK1ktILIE4FmfaSjRV0U9qC6X8nBgotnVTRg4Ed/cFrMA187im+wrBSXPgueo4YpZI6/b2YNy6r00=
+	t=1713875267; cv=none; b=uKFpIrXQzrhD9+hDndjjCi0csH0S1N1O19NAO+3NXS9nxk8kb88Efdu6dhxLDsv5AxxvUgs14CgkF+L0OaNcY2T5td3KZpj/AB8GTKE3judowVzw2dc0AKkzPgEYpyH4nrEFtlZQ+nnD1Qu4+G8leOOx9gGo6NKeRjA9tUNmYQE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713870683; c=relaxed/simple;
-	bh=/5I5lwIPx9PUX8/fZPeDyG1iBAYxbA5KU6P3hlbkIKQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=TXi4nk3L58SfVr00h5J1D4TWf7AcBP5aiEf7YLYzTQDMx1MPtSxFbbt4igVm0xNgsspQmQDm16AbaUqNWnBIe10AfiHaoSN1U9ZoFYEvjm0EKf8vFdqb9HYjBEOZCRov93KqVpPWiJYmhwGyWreW6dP6dGggkcYijz14sRwkFWo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=breakpoint.cc; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=breakpoint.cc
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@breakpoint.cc>)
-	id 1rzE3S-0006xA-7c; Tue, 23 Apr 2024 13:11:18 +0200
-From: Florian Westphal <fw@strlen.de>
-To: <netdev@vger.kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	<netfilter-devel@vger.kernel.org>,
-	pablo@netfilter.org
-Subject: [PATCH net-next 7/7] selftests: netfilter: conntrack_vrf.sh: prefer socat, not iperf3
-Date: Tue, 23 Apr 2024 15:05:50 +0200
-Message-ID: <20240423130604.7013-8-fw@strlen.de>
-X-Mailer: git-send-email 2.43.2
-In-Reply-To: <20240423130604.7013-1-fw@strlen.de>
-References: <20240423130604.7013-1-fw@strlen.de>
+	s=arc-20240116; t=1713875267; c=relaxed/simple;
+	bh=u6/C1yJRd8MJjmVCXRoTO9Hy08s48e5CyIph8InaR2Q=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=U0/Eey4z97hvOOxZEiyWbRm/O+Nj48q6iGmeDpso9aZ9AGcXNzVKx+Gd6pRBRz/orgr8TyggxMl0szKZWIr7JP4cVgI9uabZVV5Gl1rb10PkY+NH40XzmZGIfngO9pntJw+/YG7I33g8S0Z6ztPe2nzJNng3I8naFwGrBL7eOiE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=easystack.cn; spf=pass smtp.mailfrom=easystack.cn; arc=none smtp.client-ip=154.81.10.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=easystack.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=easystack.cn
+Received: from localhost.localdomain (unknown [110.185.170.227])
+	by smtp.qiye.163.com (Hmail) with ESMTPA id B1CFD560145;
+	Tue, 23 Apr 2024 15:37:54 +0800 (CST)
+From: Jun Gu <jun.gu@easystack.cn>
+To: pshelar@ovn.org
+Cc: netdev@vger.kernel.org,
+	dev@openvswitch.org,
+	linux-kernel@vger.kernel.org,
+	Jun Gu <jun.gu@easystack.cn>
+Subject: [PATCH net-next] net: openvswitch: Release reference to netdev
+Date: Tue, 23 Apr 2024 15:37:51 +0800
+Message-Id: <20240423073751.52706-1-jun.gu@easystack.cn>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,101 +48,49 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
+	tZV1koWUFJQjdXWS1ZQUlXWQ8JGhUIEh9ZQVkaGkJOVh0eGUhMGENOGUhOS1UZERMWGhIXJBQOD1
+	lXWRgSC1lBWUpKS1VKQ05VSkxLVUlJTFlXWRYaDxIVHRRZQVlPS0hVSk1PSUxOVUpLS1VKQktLWQ
+	Y+
+X-HM-Tid: 0a8f09e3cb78023dkunmb1cfd560145
+X-HM-MType: 1
+X-HM-Sender-Digest: e1kMHhlZQR0aFwgeV1kSHx4VD1lBWUc6PzI6MAw4OTcrMxJNFhQ5Pxgj
+	GTAaC1FVSlVKTEpIQ05MQ0xOSkxOVTMWGhIXVREOFVUcDjseGggCCA8aGBBVGBVFWVdZEgtZQVlK
+	SktVSkNOVUpMS1VJSUxZV1kIAVlBSkJISjcG
 
-Use socat, like most of the other scripts already do.  This also makes
-the script complete slightly faster (3s -> 1s).
+dev_get_by_name will provide a reference on the netdev. So ensure that
+the reference of netdev is released after completed.
 
-iperf3 establishes two connections (1 control connection, and 1+x
-depending on test), so adjust expected counter values as well.
-
-Signed-off-by: Florian Westphal <fw@strlen.de>
+Fixes: 2540088b836f ("net: openvswitch: Check vport netdev name")
+Signed-off-by: Jun Gu <jun.gu@easystack.cn>
 ---
- .../selftests/net/netfilter/conntrack_vrf.sh  | 40 ++++++++++---------
- 1 file changed, 21 insertions(+), 19 deletions(-)
+ net/openvswitch/vport-netdev.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/tools/testing/selftests/net/netfilter/conntrack_vrf.sh b/tools/testing/selftests/net/netfilter/conntrack_vrf.sh
-index f7417004ec71..073e8e62d350 100755
---- a/tools/testing/selftests/net/netfilter/conntrack_vrf.sh
-+++ b/tools/testing/selftests/net/netfilter/conntrack_vrf.sh
-@@ -43,15 +43,9 @@ cleanup()
- 	cleanup_all_ns
- }
+diff --git a/net/openvswitch/vport-netdev.c b/net/openvswitch/vport-netdev.c
+index 618edc346c0f..91a11067e458 100644
+--- a/net/openvswitch/vport-netdev.c
++++ b/net/openvswitch/vport-netdev.c
+@@ -78,12 +78,16 @@ struct vport *ovs_netdev_link(struct vport *vport, const char *name)
+ 	int err;
  
--if ! nft --version > /dev/null 2>&1;then
--	echo "SKIP: Could not run test without nft tool"
--	exit $ksft_skip
--fi
--
--if ! conntrack --version > /dev/null 2>&1;then
--	echo "SKIP: Could not run test without conntrack tool"
--	exit $ksft_skip
--fi
-+checktool "nft --version" "run test without nft"
-+checktool "conntrack --version" "run test without conntrack"
-+checktool "socat -h" "run test without socat"
- 
- trap cleanup EXIT
- 
-@@ -79,7 +73,15 @@ ip -net "$ns1" li set veth0 up
- ip -net "$ns0" addr add $IP0/$PFXL dev veth0
- ip -net "$ns1" addr add $IP1/$PFXL dev veth0
- 
--ip netns exec "$ns1" iperf3 -s > /dev/null 2>&1 &
-+listener_ready()
-+{
-+        local ns="$1"
-+
-+        ss -N "$ns" -l -n -t -o "sport = :55555" | grep -q "55555"
-+}
-+
-+ip netns exec "$ns1" socat -u -4 TCP-LISTEN:55555,reuseaddr,fork STDOUT > /dev/null &
-+busywait $BUSYWAIT_TIMEOUT listener_ready "$ns1"
- 
- # test vrf ingress handling.
- # The incoming connection should be placed in conntrack zone 1,
-@@ -160,16 +162,16 @@ table ip nat {
+ 	vport->dev = dev_get_by_name(ovs_dp_get_net(vport->dp), name);
++	if (!vport->dev) {
++		err = -ENODEV;
++		goto error_free_vport;
++	}
+ 	/* Ensure that the device exists and that the provided
+ 	 * name is not one of its aliases.
+ 	 */
+-	if (!vport->dev || strcmp(name, ovs_vport_name(vport))) {
++	if (strcmp(name, ovs_vport_name(vport))) {
+ 		err = -ENODEV;
+-		goto error_free_vport;
++		goto error_put;
  	}
- }
- EOF
--	if ! ip netns exec "$ns0" ip vrf exec tvrf iperf3 -t 1 -c $IP1 >/dev/null; then
--		echo "FAIL: iperf3 connect failure with masquerade + sport rewrite on vrf device"
-+	if ! ip netns exec "$ns0" ip vrf exec tvrf socat -u -4 STDIN TCP:"$IP1":55555 < /dev/null > /dev/null;then
-+		echo "FAIL: connect failure with masquerade + sport rewrite on vrf device"
- 		ret=1
- 		return
- 	fi
- 
- 	# must also check that nat table was evaluated on second (lower device) iteration.
--	ip netns exec "$ns0" nft list table ip nat |grep -q 'counter packets 2' &&
--	if ip netns exec "$ns0" nft list table ip nat |grep -q 'untracked counter packets [1-9]'; then
--		echo "PASS: iperf3 connect with masquerade + sport rewrite on vrf device ($qdisc qdisc)"
-+	if ip netns exec "$ns0" nft list table ip nat |grep -q 'counter packets 1' &&
-+	   ip netns exec "$ns0" nft list table ip nat |grep -q 'untracked counter packets [1-9]'; then
-+		echo "PASS: connect with masquerade + sport rewrite on vrf device ($qdisc qdisc)"
- 	else
- 		echo "FAIL: vrf rules have unexpected counter value"
- 		ret=1
-@@ -195,15 +197,15 @@ table ip nat {
- 	}
- }
- EOF
--	if ! ip netns exec "$ns0" ip vrf exec tvrf iperf3 -t 1 -c $IP1 > /dev/null; then
--		echo "FAIL: iperf3 connect failure with masquerade + sport rewrite on veth device"
-+	if ! ip netns exec "$ns0" ip vrf exec tvrf socat -u -4 STDIN TCP:"$IP1":55555 < /dev/null > /dev/null;then
-+		echo "FAIL: connect failure with masquerade + sport rewrite on veth device"
- 		ret=1
- 		return
- 	fi
- 
- 	# must also check that nat table was evaluated on second (lower device) iteration.
--	if ip netns exec "$ns0" nft list table ip nat |grep -q 'counter packets 2'; then
--		echo "PASS: iperf3 connect with masquerade + sport rewrite on veth device"
-+	if ip netns exec "$ns0" nft list table ip nat |grep -q 'counter packets 1'; then
-+		echo "PASS: connect with masquerade + sport rewrite on veth device"
- 	else
- 		echo "FAIL: vrf masq rule has unexpected counter value"
- 		ret=1
+ 	netdev_tracker_alloc(vport->dev, &vport->dev_tracker, GFP_KERNEL);
+ 	if (vport->dev->flags & IFF_LOOPBACK ||
 -- 
-2.43.2
+2.25.1
 
 
