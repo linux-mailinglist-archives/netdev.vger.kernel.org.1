@@ -1,90 +1,121 @@
-Return-Path: <netdev+bounces-90323-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90324-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A03B38ADB8B
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 03:31:25 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A92688ADB91
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 03:36:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DB50C1C2127C
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 01:31:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 494331F22CBD
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 01:36:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6430317C66;
-	Tue, 23 Apr 2024 01:31:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1973A12E5B;
+	Tue, 23 Apr 2024 01:36:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="b502/hTr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
+Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6162B168DE
-	for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 01:31:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68AC5FC18
+	for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 01:36:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713835866; cv=none; b=Mj1L3I6k+CTXyvxqe7nfQmmPUEd/1Y1gfpQPjgBFz31Q96IOaL9i5CbuOlijTIhLAQqnGL1AE8/dR2n2HNPHwk381HRaWJvl9XKIbgGp22pt3zD4NgivS1ffi5boo40ibYn5dXODZwlfT7xkN9BOFwCfDyh8SvP5XI5JwAl12oc=
+	t=1713836167; cv=none; b=B7DfHXeF4E4vgpzj7ZdYLcJpJXJNMnp5mthBChzT692A7n95pGMYvFNd45DRc3oUAIBw/tWaaqRO77+fky5bVqe+k8Uj5Okgu+EIZXpbGvF0XY66+nSkLjj3I1749syNgKpHhA981KFRIt9/uboYJIBVQ4RP2IdD3fExykC34sk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713835866; c=relaxed/simple;
-	bh=22JucIr333S5hWoQojYq8sDzxWaVqwg8jNiaohfDBE8=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=DEwopCdwFc+/eYAYmrMN/jK2z05rD1b1DECNLpRCFVUgZX+IYHFKp84+BM7EcoAgKd7cow2SXZgN2V99GOwT0Lz0SHfHhvF+xyQvlC6jufJZyB/xaJqBn+tfsDUfNYwZFF+d22PJ+kWJOFSAz1MuI9J6V20/Fqo+sY5s07vhKiE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-7dc08afa8c2so104601939f.1
-        for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 18:31:04 -0700 (PDT)
+	s=arc-20240116; t=1713836167; c=relaxed/simple;
+	bh=FzHzlKOYZu3jrDJtojwBIp3jG1Z4L84R0ebQ+R2aHlQ=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=qvsUUv6hUwp0/NwMA7RK+i1vI49ej1drnTB6R6PFD+lPuAAsQ9qv5WGNw7ou1OgBE86elrF1akOAywOLE7LFadX+VggNGbofULZfQdapEVJ6avbuwBW+VF6GR2Vn1WmJWsNqu0hWjXnWZpKJCmrbN41LzNP47zcZxpYqMYTKcYk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=b502/hTr; arc=none smtp.client-ip=209.85.216.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-2ab48c14334so801237a91.3
+        for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 18:36:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1713836164; x=1714440964; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=s9oPaH/VV1Sgs6JhGxcg9NL/ZQE2v/wkBZW2pxzw1II=;
+        b=b502/hTrpauQropwUYfnOS4g+CLIvcCqk6glX1AEYsrKayuzoQjrT6Yxtm0WnsL09T
+         f6j6/mBlCAPfyoQDCID8x2r0CxGIjdvmTpYpDEcn5smlmGpcjfKYuxz01z3WDlOTej9V
+         EDOdDBBbRoNEWCHaoJZbhsfIDXDyYJ+GHcJoDs4P6MGMxcTrlXAEizEoRLTigGU58rK7
+         OZWiAGMy3lrZkpSmx989kaUGrZCYozxr6HWEDydMLBkc6IfJ+LiS9wYtauC59XC3YsAv
+         PkCTDj331Op6E0OM8Xt8ZNvPHm2te9gClx5f/oRz3LqAHDK3FXKhrOrlojyrzSXPwY4M
+         g/lA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713835863; x=1714440663;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Cz3oNrlg/tZ0pVKzc2WrDO3+pRPfzflWiDsR/M727fk=;
-        b=ZwQuNdKpjLx8fcV6DhkyQUf+Y9rhrRodzQFe7ka3mdLfi9wJ2RqQFWp9yTlDr5R+Dm
-         iP33XuFveMET9Z489a5DGBsxM74K2X2VA4yUzZDO7dGwXHFP2iffS4lMOi/5DeQ3IZ+X
-         7Nf9ZWQSxiVq6pGVQOukcZfZFDXEgqU8M87vTNm8XgK6pNlUHYEIrneZtcASPDbharZi
-         w7XOb187T0d0KdtmUUf0va0BosO02VLhfywReI1chTBgsQVhDnJwaNtEJM7hz02cMPDu
-         2A8ogPfwDjQsteesHa15ooowYguDlCk95wT5zOgEpa/cMKmqXT3BkGpBbYru2e0JcysZ
-         GApQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWW/jsA4xD1/gue65nXVUmi4UEY2asfXHLyrY7A2y3QY8qq+eMKhYBwifrrlCW+136fLoeHa0ieF5A3+aq+kPOce1WawGHy
-X-Gm-Message-State: AOJu0YwZ1Pyz9latLAi0Ug273JTRlOkmO1K4NeZAYbHEaH4WhoNk5BUr
-	aFZOdJT3sbKDse+5px8JGTq3cF/mQAzTf6ESvb4MyG3kPfoFfmiTMWmLhp8YGaX9WWeOP9ptORJ
-	8QlqBM/bLvZPSRl9iKsmKvCvBXlKS72JWuaF5bJ0KLXLiCDLysu44G4k=
-X-Google-Smtp-Source: AGHT+IHodPS3M1cJI0kzh6PKVQhHFuy5lI2gp/FKCQIK5MUvSHRJwKXkmGBl7t3+5hguQZybcRaW0A0Oqr+8oMCpedZQCN1uEESx
+        d=1e100.net; s=20230601; t=1713836164; x=1714440964;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=s9oPaH/VV1Sgs6JhGxcg9NL/ZQE2v/wkBZW2pxzw1II=;
+        b=FbBRayw6WOePxKQY2KAE/on9ptv/H26N+Tl0dGk6M1pv5XaOZ/YD71+0+FwQaHkc2G
+         d4mUHo2AuEgG9XtoLq2yd8Zdd7gSXK0QtMyquxPogmKhWgVetrnPWtQKpNnLfqn+vsL4
+         Q/XOOjRbx7Uas5DWt2X6GljuDsQ0rL7zJd7anoFg9cCFeZm8V3fH+ief7da1JGjJjfi8
+         Kwdg4UthlGOKQiO0ESB7vlPYbhihdEK3HT1nYKUo15rQah75UEuL/EvkjN2wf7Gr2vOV
+         AUGnr6HWaOZ0xVQZJ+OODTRoxlBlFjVdnYGgQeKrdDfF9BiUmpaCm9mDO8yX0Dli24Jq
+         7pLQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX9aL3zO5JroRwi2ebgQhkiZkqIn4J8n8w1uv58bOY+fw4B62tiZY1eydpyhV+29j9ZFJdYpw5Mha5LVMJfEbXelTobx+ya
+X-Gm-Message-State: AOJu0Yx4hq+xfvZyHf0G/lg29WzuA1B7FKtGH5ihYB9QdVxIv4O2+1Dg
+	hO+wzqaR753XNYhRYhww5JiSGnymb3O17zyoXVQ8inHjXEbV6qWh4PKO0enjO9g=
+X-Google-Smtp-Source: AGHT+IGzlYpawNDmZcr5CUIaLSVmPzj5i1QCymzAQ8rNfxRGM71jaLD4N1FTIjMDD+MiT7VbGVUzTQ==
+X-Received: by 2002:a17:902:ec84:b0:1e8:4063:6ded with SMTP id x4-20020a170902ec8400b001e840636dedmr14042378plg.1.1713836164318;
+        Mon, 22 Apr 2024 18:36:04 -0700 (PDT)
+Received: from [127.0.0.1] ([198.8.77.194])
+        by smtp.gmail.com with ESMTPSA id f21-20020a170902ab9500b001e5119c1923sm8777775plr.71.2024.04.22.18.36.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Apr 2024 18:36:03 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: io-uring@vger.kernel.org, netdev@vger.kernel.org, 
+ Pavel Begunkov <asml.silence@gmail.com>
+Cc: "David S . Miller" <davem@davemloft.net>, 
+ Jakub Kicinski <kuba@kernel.org>, David Ahern <dsahern@kernel.org>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ Jason Wang <jasowang@redhat.com>, Wei Liu <wei.liu@kernel.org>, 
+ Paul Durrant <paul@xen.org>, xen-devel@lists.xenproject.org, 
+ "Michael S . Tsirkin" <mst@redhat.com>, virtualization@lists.linux.dev, 
+ kvm@vger.kernel.org
+In-Reply-To: <cover.1713369317.git.asml.silence@gmail.com>
+References: <cover.1713369317.git.asml.silence@gmail.com>
+Subject: Re: (subset) [PATCH io_uring-next/net-next v2 0/4] implement
+ io_uring notification (ubuf_info) stacking
+Message-Id: <171383616279.27114.3831538607187347697.b4-ty@kernel.dk>
+Date: Mon, 22 Apr 2024 19:36:02 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:4126:b0:485:6cb9:9a79 with SMTP id
- ay38-20020a056638412600b004856cb99a79mr103537jab.0.1713835863671; Mon, 22 Apr
- 2024 18:31:03 -0700 (PDT)
-Date: Mon, 22 Apr 2024 18:31:03 -0700
-In-Reply-To: <20240422101622-mutt-send-email-mst@kernel.org>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000db97ee0616b981a2@google.com>
-Subject: Re: [syzbot] [virt?] [net?] KMSAN: uninit-value in
- vsock_assign_transport (2)
-From: syzbot <syzbot+6c21aeb59d0e82eb2782@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, mst@redhat.com, netdev@vger.kernel.org, 
-	pabeni@redhat.com, sgarzare@redhat.com, syzkaller-bugs@googlegroups.com, 
-	virtualization@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.12.5-dev-2aabd
 
-Hello,
 
-syzbot has tested the proposed patch and the reproducer did not trigger any issue:
+On Fri, 19 Apr 2024 12:08:38 +0100, Pavel Begunkov wrote:
+> Please, don't take directly, conflicts with io_uring.
+> 
+> To have per request buffer notifications each zerocopy io_uring send
+> request allocates a new ubuf_info. However, as an skb can carry only
+> one uarg, it may force the stack to create many small skbs hurting
+> performance in many ways.
+> 
+> [...]
 
-Reported-and-tested-by: syzbot+6c21aeb59d0e82eb2782@syzkaller.appspotmail.com
+Applied, thanks!
 
-Tested on:
+[3/4] io_uring/notif: simplify io_notif_flush()
+      commit: 5a569469b973cb7a6c58192a37dfb8418686e518
+[4/4] io_uring/notif: implement notification stacking
+      commit: 6fe4220912d19152a26ce19713ab232f4263018d
 
-commit:         bcc17a06 vhost/vsock: always initialize seqpacket_allow
-git tree:       https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git
-console output: https://syzkaller.appspot.com/x/log.txt?x=12b58abb180000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=87a805e655619c64
-dashboard link: https://syzkaller.appspot.com/bug?extid=6c21aeb59d0e82eb2782
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+Best regards,
+-- 
+Jens Axboe
 
-Note: no patches were applied.
-Note: testing is done by a robot and is best-effort only.
+
+
 
