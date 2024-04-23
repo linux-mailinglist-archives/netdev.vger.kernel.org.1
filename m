@@ -1,90 +1,109 @@
-Return-Path: <netdev+bounces-90703-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90707-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B47D18AFC90
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 01:28:30 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0D6D8AFCBE
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 01:37:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 78DF4285E23
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 23:28:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DA727B22DB6
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 23:37:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0343041746;
-	Tue, 23 Apr 2024 23:27:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D095548E4;
+	Tue, 23 Apr 2024 23:36:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="oG2uZ17X"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="i7ghu4dq"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from relay.smtp-ext.broadcom.com (relay.smtp-ext.broadcom.com [192.19.144.208])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D78F535A8;
-	Tue, 23 Apr 2024 23:27:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 936DC502B3;
+	Tue, 23 Apr 2024 23:36:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.19.144.208
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713914872; cv=none; b=sVsOEFIYp2kIpMpOt1Sc/b+Vc9LJI2cX+RzmsRKh3GzQawbc6lDMSerf+y0qFpNFpmlgoGfSbgYj/CGEy9gJNUlkb+EM767jq8lWJ+DTXk713nSaBLTE2+UjZkJWWdbHodSHSv22IxZ23Nhzh0cErHJQCoo3X0UUZD9vWEWma10=
+	t=1713915397; cv=none; b=hnVmMQG/mflTBZxFF9e68b27O7txPi8Srgn5ulpR/6I7nZUUfnU7HwCRZm5XouAi3RqXhKBeMb+nIRo4UTYQ6fv9khq7yO1j3aTS3u9zKcpoRZr+jLu/r4u3sU3tMO8OYkzkisf6+aidiafp3btHbpM/OxzsKyUW1l4sCspuWaY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713914872; c=relaxed/simple;
-	bh=Di0eUS6WREMzSyk4+6QnDiMIGNndSFqM4RTH15x9824=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=e8ppRcWSLv8UGMDqr//TUzy3J8r9ESpLrhfC9RnxWQm7x5MnOAAEvXOCXxMvFS7HRX/x1/pPFitkfl8P5il7XTbYM7ggGzR7qOWtcChki03lkBbNPToszrEMx/1/onLqI2b0trSZQ3l07PPdg45w7AfveAZUseCeD26tBTenL6c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=oG2uZ17X; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=2wkn34TJloC4Y8deA3NUhgvA8IvVsAZmbGxActHIjqA=; b=oG2uZ17Xn75kmR3SkL9E50tdIM
-	hr8ZqQQiFqK55NOlh7LuYZO0sOrabAHSbvBRevbhSFt9iKHyQQdxgayUhaQzzGg5Mqo7hgkNot8Z0
-	gCWEqrHOjKkWkhoV9W2QEsVq+V0BOUtC1Mp6KO5sRwvj8YHbzYXlupdG/q+xYJcamkSI=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rzPY6-00Dl56-Tz; Wed, 24 Apr 2024 01:27:42 +0200
-Date: Wed, 24 Apr 2024 01:27:42 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, horms@kernel.org, saeedm@nvidia.com,
-	anthony.l.nguyen@intel.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, corbet@lwn.net,
-	linux-doc@vger.kernel.org, robh+dt@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
-	devicetree@vger.kernel.org, horatiu.vultur@microchip.com,
-	ruanjinjie@huawei.com, steen.hegelund@microchip.com,
-	vladimir.oltean@nxp.com, UNGLinuxDriver@microchip.com,
-	Thorsten.Kummermehr@microchip.com, Pier.Beruto@onsemi.com,
-	Selvamani.Rajagopal@onsemi.com, Nicolas.Ferre@microchip.com,
-	benjamin.bigler@bernformulastudent.ch
-Subject: Re: [PATCH net-next v4 05/12] net: ethernet: oa_tc6: implement error
- interrupts unmasking
-Message-ID: <307990fc-a196-427a-ac29-0b295bd024f7@lunn.ch>
-References: <20240418125648.372526-1-Parthiban.Veerasooran@microchip.com>
- <20240418125648.372526-6-Parthiban.Veerasooran@microchip.com>
+	s=arc-20240116; t=1713915397; c=relaxed/simple;
+	bh=hznnnD58QA4JaaOj/qkrk9nSWrFuvXnrqyI2HHl4VyU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=tkYATi8a0RcmvipH3q7dpToEolJcSskHLdCB0yMpF7lFklRV4pJSfOkpVF5ZzDxo0Stt8OQjIt29SzC3J6Sf/sJc8+wHyzq1c1vu+Mz7cvVUAQCsM2WZAnSHa8X7VufLz4SaSKcHbARvDRMVtvm+2RETWiyk2y2uT0oNuKXYABI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=i7ghu4dq; arc=none smtp.client-ip=192.19.144.208
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: from mail-lvn-it-01.lvn.broadcom.net (mail-lvn-it-01.lvn.broadcom.net [10.36.132.253])
+	by relay.smtp-ext.broadcom.com (Postfix) with ESMTP id C1DACC001522;
+	Tue, 23 Apr 2024 16:36:28 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 relay.smtp-ext.broadcom.com C1DACC001522
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=broadcom.com;
+	s=dkimrelay; t=1713915388;
+	bh=hznnnD58QA4JaaOj/qkrk9nSWrFuvXnrqyI2HHl4VyU=;
+	h=From:To:Cc:Subject:Date:From;
+	b=i7ghu4dqP/uBircYXR9RrIasZUOawqRvhPZcqLlerah6kWynkZpFiQzFxrJ1XF8kb
+	 bXK6Pro3FOSiwtELXrIiAHzPY0QYaDFrQwIF5Bvag54cs8iGHryuEX043TeVSPkM0t
+	 ZJtKvXJeJuoReurjab7hbScHyTub7xE72+DwE3K8=
+Received: from fainelli-desktop.igp.broadcom.net (fainelli-desktop.dhcp.broadcom.net [10.67.48.245])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mail-lvn-it-01.lvn.broadcom.net (Postfix) with ESMTPSA id CB29A18041CAC4;
+	Tue, 23 Apr 2024 16:36:26 -0700 (PDT)
+From: Florian Fainelli <florian.fainelli@broadcom.com>
+To: linux-kernel@vger.kernel.org
+Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
+	Jarkko Nikula <jarkko.nikula@linux.intel.com>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Mika Westerberg <mika.westerberg@linux.intel.com>,
+	Jan Dabros <jsd@semihalf.com>,
+	Andi Shyti <andi.shyti@kernel.org>,
+	Lee Jones <lee@kernel.org>,
+	Jiawen Wu <jiawenwu@trustnetic.com>,
+	Mengyuan Lou <mengyuanlou@net-swift.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Duanqiang Wen <duanqiangwen@net-swift.com>,
+	linux-i2c@vger.kernel.org (open list:SYNOPSYS DESIGNWARE I2C DRIVER),
+	netdev@vger.kernel.org (open list:WANGXUN ETHERNET DRIVER)
+Subject: [PATCH 0/4] Define i2c_designware in a header file
+Date: Tue, 23 Apr 2024 16:36:18 -0700
+Message-Id: <20240423233622.1494708-1-florian.fainelli@broadcom.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240418125648.372526-6-Parthiban.Veerasooran@microchip.com>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Apr 18, 2024 at 06:26:41PM +0530, Parthiban Veerasooran wrote:
-> This will unmask the following error interrupts from the MAC-PHY.
->   tx protocol error
->   rx buffer overflow error
->   loss of framing error
->   header error
-> The MAC-PHY will signal an error by setting the EXST bit in the receive
-> data footer which will then allow the host to read the STATUS0 register
-> to find the source of the error.
-> 
-> Signed-off-by: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
+This patch series depends upon the following two patches being applied:
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+https://lore.kernel.org/all/20240422084109.3201-1-duanqiangwen@net-swift.com/
+https://lore.kernel.org/all/20240422084109.3201-2-duanqiangwen@net-swift.com/
 
-    Andrew
+There is no reason why each driver should have to repeat the
+"i2c_designware" string all over the place, because when that happens we
+see the reverts like the above being necessary.
+
+Florian Fainelli (4):
+  i2c: designware: Create shared header hosting driver name
+  mfd: intel-lpss: Utilize i2c-designware.h
+  mfd: intel_quark_i2c_gpio: Utilize i2c-designware.h
+  net: txgbe: Utilize i2c-designware.h
+
+ MAINTAINERS                                    | 1 +
+ drivers/i2c/busses/i2c-designware-pcidrv.c     | 5 +++--
+ drivers/i2c/busses/i2c-designware-platdrv.c    | 5 +++--
+ drivers/mfd/intel-lpss.c                       | 3 ++-
+ drivers/mfd/intel_quark_i2c_gpio.c             | 5 +++--
+ drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c | 7 ++++---
+ include/linux/i2c-designware.h                 | 7 +++++++
+ 7 files changed, 23 insertions(+), 10 deletions(-)
+ create mode 100644 include/linux/i2c-designware.h
+
+-- 
+2.34.1
+
 
