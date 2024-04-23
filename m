@@ -1,121 +1,88 @@
-Return-Path: <netdev+bounces-90324-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90325-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A92688ADB91
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 03:36:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2044A8ADBAC
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 03:46:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 494331F22CBD
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 01:36:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D05592810E2
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 01:46:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1973A12E5B;
-	Tue, 23 Apr 2024 01:36:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="b502/hTr"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5D1414292;
+	Tue, 23 Apr 2024 01:46:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68AC5FC18
-	for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 01:36:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A337C18032
+	for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 01:46:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713836167; cv=none; b=B7DfHXeF4E4vgpzj7ZdYLcJpJXJNMnp5mthBChzT692A7n95pGMYvFNd45DRc3oUAIBw/tWaaqRO77+fky5bVqe+k8Uj5Okgu+EIZXpbGvF0XY66+nSkLjj3I1749syNgKpHhA981KFRIt9/uboYJIBVQ4RP2IdD3fExykC34sk=
+	t=1713836768; cv=none; b=sQkvH/UDOr84oJN4vP3BIKZBYS0bmpHxY5+Oq/WblgsaRqVgcAJKoSEVYeclZjY4zIaqE9BBh8x9Q2aIXhEwn/QS7SXgVUYuiC//TwB7IJCEpt9NGz2P8bBvVPsnzCTJVsuDyqVhyk2GBfDPjTn2JVR/I58lbsiWYc+nPMFFzD0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713836167; c=relaxed/simple;
-	bh=FzHzlKOYZu3jrDJtojwBIp3jG1Z4L84R0ebQ+R2aHlQ=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=qvsUUv6hUwp0/NwMA7RK+i1vI49ej1drnTB6R6PFD+lPuAAsQ9qv5WGNw7ou1OgBE86elrF1akOAywOLE7LFadX+VggNGbofULZfQdapEVJ6avbuwBW+VF6GR2Vn1WmJWsNqu0hWjXnWZpKJCmrbN41LzNP47zcZxpYqMYTKcYk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=b502/hTr; arc=none smtp.client-ip=209.85.216.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-2ab48c14334so801237a91.3
-        for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 18:36:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1713836164; x=1714440964; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=s9oPaH/VV1Sgs6JhGxcg9NL/ZQE2v/wkBZW2pxzw1II=;
-        b=b502/hTrpauQropwUYfnOS4g+CLIvcCqk6glX1AEYsrKayuzoQjrT6Yxtm0WnsL09T
-         f6j6/mBlCAPfyoQDCID8x2r0CxGIjdvmTpYpDEcn5smlmGpcjfKYuxz01z3WDlOTej9V
-         EDOdDBBbRoNEWCHaoJZbhsfIDXDyYJ+GHcJoDs4P6MGMxcTrlXAEizEoRLTigGU58rK7
-         OZWiAGMy3lrZkpSmx989kaUGrZCYozxr6HWEDydMLBkc6IfJ+LiS9wYtauC59XC3YsAv
-         PkCTDj331Op6E0OM8Xt8ZNvPHm2te9gClx5f/oRz3LqAHDK3FXKhrOrlojyrzSXPwY4M
-         g/lA==
+	s=arc-20240116; t=1713836768; c=relaxed/simple;
+	bh=VGeBMKGq9/Hj05caC3kl8lkmEKoFdqUf7+vqK4SSf9U=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=Lizx4IMImUQ5zP4dTTYz97HRoK33XRgmGUSAMvKmiN8JcKMRwwA8WcCrWXqTT9iuVdP8x/Y+UH8yi4K6a/ky7J5rGaCmDr3QHDQU+D5B+gNVlUhKYuLrvoIrJ79AkEGDwnUDsrlVoxN8YFlUX2zkPVotTJg8Z5t+aj1XX44fkVE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-7ddf08e17e4so36149639f.0
+        for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 18:46:06 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713836164; x=1714440964;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=s9oPaH/VV1Sgs6JhGxcg9NL/ZQE2v/wkBZW2pxzw1II=;
-        b=FbBRayw6WOePxKQY2KAE/on9ptv/H26N+Tl0dGk6M1pv5XaOZ/YD71+0+FwQaHkc2G
-         d4mUHo2AuEgG9XtoLq2yd8Zdd7gSXK0QtMyquxPogmKhWgVetrnPWtQKpNnLfqn+vsL4
-         Q/XOOjRbx7Uas5DWt2X6GljuDsQ0rL7zJd7anoFg9cCFeZm8V3fH+ief7da1JGjJjfi8
-         Kwdg4UthlGOKQiO0ESB7vlPYbhihdEK3HT1nYKUo15rQah75UEuL/EvkjN2wf7Gr2vOV
-         AUGnr6HWaOZ0xVQZJ+OODTRoxlBlFjVdnYGgQeKrdDfF9BiUmpaCm9mDO8yX0Dli24Jq
-         7pLQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX9aL3zO5JroRwi2ebgQhkiZkqIn4J8n8w1uv58bOY+fw4B62tiZY1eydpyhV+29j9ZFJdYpw5Mha5LVMJfEbXelTobx+ya
-X-Gm-Message-State: AOJu0Yx4hq+xfvZyHf0G/lg29WzuA1B7FKtGH5ihYB9QdVxIv4O2+1Dg
-	hO+wzqaR753XNYhRYhww5JiSGnymb3O17zyoXVQ8inHjXEbV6qWh4PKO0enjO9g=
-X-Google-Smtp-Source: AGHT+IGzlYpawNDmZcr5CUIaLSVmPzj5i1QCymzAQ8rNfxRGM71jaLD4N1FTIjMDD+MiT7VbGVUzTQ==
-X-Received: by 2002:a17:902:ec84:b0:1e8:4063:6ded with SMTP id x4-20020a170902ec8400b001e840636dedmr14042378plg.1.1713836164318;
-        Mon, 22 Apr 2024 18:36:04 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.194])
-        by smtp.gmail.com with ESMTPSA id f21-20020a170902ab9500b001e5119c1923sm8777775plr.71.2024.04.22.18.36.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Apr 2024 18:36:03 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: io-uring@vger.kernel.org, netdev@vger.kernel.org, 
- Pavel Begunkov <asml.silence@gmail.com>
-Cc: "David S . Miller" <davem@davemloft.net>, 
- Jakub Kicinski <kuba@kernel.org>, David Ahern <dsahern@kernel.org>, 
- Eric Dumazet <edumazet@google.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- Jason Wang <jasowang@redhat.com>, Wei Liu <wei.liu@kernel.org>, 
- Paul Durrant <paul@xen.org>, xen-devel@lists.xenproject.org, 
- "Michael S . Tsirkin" <mst@redhat.com>, virtualization@lists.linux.dev, 
- kvm@vger.kernel.org
-In-Reply-To: <cover.1713369317.git.asml.silence@gmail.com>
-References: <cover.1713369317.git.asml.silence@gmail.com>
-Subject: Re: (subset) [PATCH io_uring-next/net-next v2 0/4] implement
- io_uring notification (ubuf_info) stacking
-Message-Id: <171383616279.27114.3831538607187347697.b4-ty@kernel.dk>
-Date: Mon, 22 Apr 2024 19:36:02 -0600
+        d=1e100.net; s=20230601; t=1713836766; x=1714441566;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=0WCupfQ1dCDU21cSKiBT3YMKDn110UjiBH0ZicqUxGk=;
+        b=qBGdA8sOXh9ydEadmU01dcGpXTb4nUl3dxMeY1D5JS+dwc9H5jJRkgdqlDAde2GgUh
+         9rh3kWEUwEnMpB7MFeopPmXchblnUtC6PY++zaLv8rpY78S4f/VomLfnZ754fcGtAxtt
+         RBYVn0Qp92iqf/7B9rVe4dpUowV/Rqn+A3hv9gOXK4CPGn4epazvdILaXXJWlSCFJzaA
+         jsYhv3lR2vUYto+JcMkogk+BByEiVKO8Ot2cgx/fUnq2Qav7dy9krXvhK6CKslP/LUBA
+         Wo0cckroW1/OairIVUHPBde9VwwVAv/v/rQox/yhLArjNPaW4LHaiQSXJsm259IiucMh
+         l4Bg==
+X-Forwarded-Encrypted: i=1; AJvYcCVH/+csD6C6dH6+bpZK362AzdnuhHNvPkvDBr6MuzqtKY7eMDyA5906bcvDsd65RTqO9be9zLrk7mnPk7/WGZESnwTYW/IB
+X-Gm-Message-State: AOJu0YwMj1MCz41rZ/44g+VyXBzHWklMJ13b0EHtX+B3AFWxurfnQ16q
+	Xq525b160wzjS4pscKsYc/4tZ3ZW/j8xz15J6XT71TREWja89yFAD60wIa9XUGFe0U5BG2v1Lul
+	v6epzrnP/EsPbkYyP7QGcUXCyPjuWle2vBcBgwXJEKhrIbot0JywOpl4=
+X-Google-Smtp-Source: AGHT+IH48UqFEkGt1Qqueqq3haIM+KLMvozMjEfBK3G/AergUVQ+XvZS8xlYf1kvWIScJiTdzSLWPApCVy3Ks0Ow5kGE+IM+n69M
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.12.5-dev-2aabd
+X-Received: by 2002:a05:6602:2c08:b0:7da:bb15:56fd with SMTP id
+ w8-20020a0566022c0800b007dabb1556fdmr40563iov.1.1713836765934; Mon, 22 Apr
+ 2024 18:46:05 -0700 (PDT)
+Date: Mon, 22 Apr 2024 18:46:05 -0700
+In-Reply-To: <20240422160728.82185-1-kuniyu@amazon.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000a30a9e0616b9b739@google.com>
+Subject: Re: [syzbot] [net?] KMSAN: uninit-value in ipvlan_queue_xmit (2)
+From: syzbot <syzbot+42a0dc856239de4de60e@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	kuniyu@amazon.com, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
+Hello,
 
-On Fri, 19 Apr 2024 12:08:38 +0100, Pavel Begunkov wrote:
-> Please, don't take directly, conflicts with io_uring.
-> 
-> To have per request buffer notifications each zerocopy io_uring send
-> request allocates a new ubuf_info. However, as an skb can carry only
-> one uarg, it may force the stack to create many small skbs hurting
-> performance in many ways.
-> 
-> [...]
+syzbot has tested the proposed patch and the reproducer did not trigger any issue:
 
-Applied, thanks!
+Reported-and-tested-by: syzbot+42a0dc856239de4de60e@syzkaller.appspotmail.com
 
-[3/4] io_uring/notif: simplify io_notif_flush()
-      commit: 5a569469b973cb7a6c58192a37dfb8418686e518
-[4/4] io_uring/notif: implement notification stacking
-      commit: 6fe4220912d19152a26ce19713ab232f4263018d
+Tested on:
 
-Best regards,
--- 
-Jens Axboe
+commit:         f2e367d6 Merge tag 'for-6.8/dm-fix-3' of git://git.ker..
+git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+console output: https://syzkaller.appspot.com/x/log.txt?x=1286b06b180000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=1b015d567058472
+dashboard link: https://syzkaller.appspot.com/bug?extid=42a0dc856239de4de60e
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+patch:          https://syzkaller.appspot.com/x/patch.diff?x=117ae96f180000
 
-
-
+Note: testing is done by a robot and is best-effort only.
 
