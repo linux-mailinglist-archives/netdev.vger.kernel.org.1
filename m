@@ -1,306 +1,156 @@
-Return-Path: <netdev+bounces-90684-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90685-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B952F8AFB8C
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 00:03:42 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 343198AFBD7
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 00:39:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DD1DA1C2275B
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 22:03:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DEDDA1F22BC0
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 22:39:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACF12143889;
-	Tue, 23 Apr 2024 22:03:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B89F18B04;
+	Tue, 23 Apr 2024 22:38:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KyjaxeHg"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="Z2EZZIQf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C5B714264F
-	for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 22:03:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.11
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713909819; cv=fail; b=GeNRLhOfcnipahE1hsqNnXOmf93zoDlQcNuE2p+0A5x3EVxQFkFWjwFxSINWSRiIts3OLWf6TV2sJ5N4qr07bzU5V5B3F5ijEDrZ3RbBx4VUIkP8znBAH7SpkJDvMXdwZ8vqtv1FoKB+nNtnyVBABnMxzMcZPlRcz9AFXW+LGPg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713909819; c=relaxed/simple;
-	bh=PkuX1nP6b/PNQh2SY9HJcUp4RYvvxbsCfJAlvxkWzAc=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=QWuGX4p2OAoLyK4rXbLGVPUh8uF3J/5qW9CzRbrUsmcmFUfKLMnaZecvfNyTxW5XGLfVM0VR2ElgpG3dv9q40ZBTbRPD7V0ETeYzoGA4tyl3qXRWLDqrntqjTGQFN9R3S34UHxoqZx/w5Syve6STS5IfmJBcCppcMtDfjG4tbSs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KyjaxeHg; arc=fail smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1713909817; x=1745445817;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=PkuX1nP6b/PNQh2SY9HJcUp4RYvvxbsCfJAlvxkWzAc=;
-  b=KyjaxeHgmUnqM2OWPOL8gaHlMERdnA6UMBK8fo855YVy56HJtskZCVQe
-   JnCLBVte+ORscx1Kv6g1fgtYPJ/Fkj2ZLzBn2Mpms64bXC8O6za1PU20c
-   /obIi1+G8g8MvR7i3XqUa6pVxRS4/NtHIC9WBP4TmrQi2+vkdJou9GJYc
-   U85fWaq+X9lUXmh0qv5NehKFGk+76lVdOPofJFFswW7gbevrNwW3j5kxt
-   5ie4UH8s6iAZUY6W265eGWRrL2voaSceaEBXNe8GPzhnmxUMaFZKMnjY0
-   Tu9WpFaSfGAXzoLvuF5TWz17PBEG3Pfp25IeUrBzW9v9UMFFa180JFiQ7
-   g==;
-X-CSE-ConnectionGUID: 9J5JQJMxQB+HNh0QPyOJ6Q==
-X-CSE-MsgGUID: nqJfT+t7QF+x8KV1rN5vHg==
-X-IronPort-AV: E=McAfee;i="6600,9927,11053"; a="20133095"
-X-IronPort-AV: E=Sophos;i="6.07,222,1708416000"; 
-   d="scan'208";a="20133095"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2024 15:03:32 -0700
-X-CSE-ConnectionGUID: 6cZ8PHEZSs2fFtL9f4Glxg==
-X-CSE-MsgGUID: vbLKNaZgQ0CUcOtB8/s05w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,222,1708416000"; 
-   d="scan'208";a="29155429"
-Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
-  by fmviesa004.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 23 Apr 2024 15:03:29 -0700
-Received: from fmsmsx601.amr.corp.intel.com (10.18.126.81) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 23 Apr 2024 15:03:28 -0700
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Tue, 23 Apr 2024 15:03:28 -0700
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.101)
- by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Tue, 23 Apr 2024 15:03:28 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=U1boPGLzfDUs999IEWUl62A2tNOKkMAskBKR2sNImSS0m+3h4MxK3XomVZZONnJF6YVAUnv7Gl9xs6QuDyTH3ZBG183hetT0W4Fqv0dmjydpllbbnvD4SuLqMEsrhhi8tlWvO/olXfhQeqnrmRuKVIrBnNv/o0b4P/I3v1t/fy+N8NBJ0QgpLeGlLs9N23wTX9HJAdZmcB9YpMtUdMKiQlphckAsd+Fy6AhSZPXsgMxxdseHTX3QbDUQm9HVCBb2xIpLjw8egYWwIADwZ0vnBdWBUR/SJUN34SFrJNV15hQNwYtATn/ViRvH6bnfTcaGmClA32txb02pC7yrbKFLbA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=uhbrnAV0adwuPr4V3KhcqqPK8lN5kFx9feHduQTWVWk=;
- b=h970TEULEDL1vWrtzjpLF3u8vHMoPPXrMK0PnwB0C4o6uLt/cNc0W5014dJo3wKmAT8WIklYFQVImzePAduDt3PnGHRJzHTMD72rfm1H2p1ac0bT9OjABuVHoFoNgVnTio7CSxrmW0ZHUQUlCy3WhGv0viQauRULKq2YpeJq0y87GrTxEyLPa+tbJdOeh3BDBdomeKU6Zx3z4+esXe3DEif8USM/KdPYsk5CbusnCj5X7Anv5BAhA+SJfoqvFpI1ZXwkyd/fec7TWmL7s3FIQ3gTqeD5cKQGKKT1no9DZ0RSHNmRgw783z4rdUN2JHC59pVIA/LQ1Lk2JVBn/U0n+Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
- by PH0PR11MB5077.namprd11.prod.outlook.com (2603:10b6:510:3b::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7519.21; Tue, 23 Apr
- 2024 22:03:26 +0000
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::b383:e86d:874:245a]) by CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::b383:e86d:874:245a%5]) with mapi id 15.20.7519.020; Tue, 23 Apr 2024
- 22:03:26 +0000
-Message-ID: <3a634778-9b72-4663-b305-3be18bd8f618@intel.com>
-Date: Tue, 23 Apr 2024 15:03:25 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next v2] ice: Extend auxbus device
- naming
-To: Jiri Pirko <jiri@resnulli.us>, "Temerkhanov, Sergey"
-	<sergey.temerkhanov@intel.com>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>
-References: <20240423091459.72216-1-sergey.temerkhanov@intel.com>
- <ZiedKc5wE2-3LlaM@nanopsycho>
- <MW3PR11MB468117FD76AC6D15970A6E1080112@MW3PR11MB4681.namprd11.prod.outlook.com>
- <Zie0NIztebf5Qq1J@nanopsycho>
-Content-Language: en-US
-From: Jacob Keller <jacob.e.keller@intel.com>
-In-Reply-To: <Zie0NIztebf5Qq1J@nanopsycho>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MW4P223CA0008.NAMP223.PROD.OUTLOOK.COM
- (2603:10b6:303:80::13) To CO1PR11MB5089.namprd11.prod.outlook.com
- (2603:10b6:303:9b::16)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 019EA28E2
+	for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 22:38:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1713911937; cv=none; b=eTttlSj5o7ARdJC28+rZE4CZzzh3MfwY7IRtRXqct6JXPAXisTssjMB/2jX8WZZEs4A+lkVeFjn6zg6o4qvYLKk+aA4wbT71V2F1eHyqNXPyXjsou6b9kmbSlRs+2auwPI1iAip3v2/LXnZ01AE7Gsag08s+5lWUjWPU5JDjezE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1713911937; c=relaxed/simple;
+	bh=1pROOLzvYgFAvQOqlCQuvejs2/LA2hfbPAZih2dmTp4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sVvaHqnmvPS/hgjf+m/ZZWzv3OzllP7G2mldPolA3C1dLHqT8q9q12LKOMa1PX1V80IeHzHiMWMfAhFYfIJq1yKS1KQcMoFOVa8EXhBTLQTQID2XRm847ZwOW5a9UXNp9PHHkNJ2eHHhk7Egx2cBeeDASSLRGK1li/gnXLKyE64=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=Z2EZZIQf; arc=none smtp.client-ip=209.85.210.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-6ee13f19e7eso5652818b3a.1
+        for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 15:38:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1713911935; x=1714516735; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=v116oTmF2G8tcjqnmi5BBeYNjLNRAfDLk4IJTFjyTNc=;
+        b=Z2EZZIQfKJl5veU9/FKQRNrsROGQAwHhfKOGdjl0uGmkEbVYHhn2Idk24Uyy92xKFF
+         5U9shcqNd5kU1zsC1oIJmCggdXDVSh5ADv1L+3IVt2M6rVjj5yC03qHvEDwmN5rI/rzt
+         gxo4pLdUpgBepTx87tEzZT53khZltihCDRRL8=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713911935; x=1714516735;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=v116oTmF2G8tcjqnmi5BBeYNjLNRAfDLk4IJTFjyTNc=;
+        b=CN0VeGO2ehbBrWAV7WtGsL+/DedkKUtEYRgZYIxSjohBS+ZH1JuRhcC7w7RKsxwthh
+         lLPtiTF4UxUgztYmDtG3Vyif0w7eNcgfYlUejeWikmty7T0t6D9v0uJUag7q7QIACT8F
+         idU5IFz4aOJp5QNsPPc4whinjXdLciqG+QVviNaSnv23qKUDrjPEY7YcLv/izg1++xmx
+         NieWX6P5bIcrSaunpcVX2YRjZWMg2BflILZ0/LG6XqBzGNW6dUvmWjAkHG6pcmZTNQ1j
+         DguDndvBnIAhAc04qu7jthJpMbrLiWcnkeuxMI0PspeYSzRgaCqcdUqFHWSRTwuDwFrY
+         RYpQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUUbRT+jZ3CkjTVrheNeeaOM6FO45XB+OkAmMCOGEHm4puTxo05TDmWU8cU3+nzVoXcl5TmfTW/v/uEm6rohns6BktqNx8h
+X-Gm-Message-State: AOJu0Yxlq18qNZXMRC8oZw9WgSAftnAhPhuVqq3WqYhcFxTDGhQDgC3L
+	5lJtnSnrWdsfABpxlebGqVRZRHHnFGv/kh1ouGZP8/esXJURYoQ/YwD2oniosWA=
+X-Google-Smtp-Source: AGHT+IGMn901wx8TYt9AQqDHfU3dkygWZi82tmpZMejTg3zDD+F0hjLw+9GT9DzvcwivByXEHkP6Iw==
+X-Received: by 2002:a05:6a00:1911:b0:6ec:fdfe:9bde with SMTP id y17-20020a056a00191100b006ecfdfe9bdemr1132482pfi.25.1713911935171;
+        Tue, 23 Apr 2024 15:38:55 -0700 (PDT)
+Received: from LQ3V64L9R2 ([74.87.211.242])
+        by smtp.gmail.com with ESMTPSA id kt19-20020a056a004bb300b006e6b989514bsm10175499pfb.60.2024.04.23.15.38.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 23 Apr 2024 15:38:54 -0700 (PDT)
+Date: Tue, 23 Apr 2024 12:38:50 -1000
+From: Joe Damato <jdamato@fastly.com>
+To: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, tariqt@nvidia.com,
+	saeedm@nvidia.com
+Cc: mkarsten@uwaterloo.ca, gal@nvidia.com, nalramli@fastly.com,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"open list:MELLANOX MLX4 core VPI driver" <linux-rdma@vger.kernel.org>
+Subject: Re: [PATCH net-next 1/3] net/mlx4: Track RX allocation failures in a
+ stat
+Message-ID: <Zig4etCiQ6AGlR4H@LQ3V64L9R2>
+References: <20240423194931.97013-1-jdamato@fastly.com>
+ <20240423194931.97013-2-jdamato@fastly.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|PH0PR11MB5077:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1f28d42e-79e7-404b-f176-08dc63e133a8
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230031|376005|366007|1800799015;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?eWdVL2FScGhoQ2p2QjdBeVRuWDRPcUF6QUpzeGJBUjF0WjhXQkhmMm5vQk5J?=
- =?utf-8?B?TnRyU1c4dmN1WlNwWmloMzV1d25MUFRBTFhRMGt1OXd6SVdhVm1KSHZIbCto?=
- =?utf-8?B?ZWgwd0hROTJDeFpVMEd5UUVFWWRldnM2ZllWbzRKcW1kUTJXT0pmbVBxeFZL?=
- =?utf-8?B?NStwNnRBSW4wcGN3cmZoMFRKM1VRZEh0VHN4dFNzKy80TXJtWGowM0d3a2p4?=
- =?utf-8?B?aThWeGNtVVh0SldJWHJFeGhnMUhubnB5ZXFPamZ2Q0NtTnAwOU9ST2hLMnM0?=
- =?utf-8?B?OWkvWFYxWFlVZTFkbkZ3eUJtMmpUZmJ1b3VVbGlvZStzYjFVa3BRWEovU1Z0?=
- =?utf-8?B?Ujhwc2IyaGd0QWJnL3NWNS9qUGc0NE5uK1ZyWFlySnhTT3Z0bkhWM1lneUJj?=
- =?utf-8?B?aW5KRjVMaUZnc3hiMmtFeHppcWVZU2FDN0FQdnRGVnZBZlFIT0N2RWZhcTV4?=
- =?utf-8?B?K2JvSFp5akQyaXFMbjlsbk1VNE1yY1ZrcUlxVnVxUmVVTmFPVFNKeFBIWW4r?=
- =?utf-8?B?SFpVUnorSkFCbXRxTlNJT1JnN1UzT1g2TVVQWUxpL2RaS3V1MWdtQnlTMUlx?=
- =?utf-8?B?Y0NJRy9BQjhCOWtjS3pqTXJXOU5TM0JTVGNkMUVVcEx1TU41eDBObWpvSUFR?=
- =?utf-8?B?ZGQ5eFNDcHpkaXozd0RuOXRSbDB3bmNKNnNUQWdmVUxUajl1bVRYdWhTcjZO?=
- =?utf-8?B?ODdRaGtYOEU4NUl0U2RqTkxpbXQwZ3E5aFNQeE5WOHpqei9uZ0NMdnc1dW9O?=
- =?utf-8?B?TWRDVnRhVHZOVnBnVDhrVkdEcnJDMG9TNE5xRGdVZnBXcUNqVnZVc2QvQ2JR?=
- =?utf-8?B?KzdEOU9HeDFKVjhwakx4T054blczZ2RHNWRFdTdkNUt2azlBdS9DUy9uZGpv?=
- =?utf-8?B?T3NLMWlDTy9tVGdPVUFKNUhVY2lJWEoxQlJwL1R1b2pyTTNLdTdmenhWQUVJ?=
- =?utf-8?B?WSs4YnFILzJKRVEvWWpFK2R3SmNYQ3pHTXJia1BpSlVhajRoRVlKM3kwQ2VY?=
- =?utf-8?B?SlcwMkFZWE1xREhSenZ3d3kzeHRZR2lwazdFb2UyS2JwRmhORW1sNE1JQUpq?=
- =?utf-8?B?UHdXbnk1ejBTU0ZpaTVhUjIwN1JJNldPQUhBbU5EdHdSc3pkeWlLdGtXeU02?=
- =?utf-8?B?TmNaZTIvaE5FNmdaYlBUd2JmcE1kWUx2MG0rUWZVL2o3MGlPWnVpZ3hZMXUw?=
- =?utf-8?B?QVVEWWh4bG96dW8zbXdXNE9hRGI3UHBJQllDaCtianZoMUNQK3VnTVA0RnZ1?=
- =?utf-8?B?cmZkNCtKa21wa0VlQ3RLRlFFV3NlbUlwdXBwRkluWUc1YWcrbWtpZS9RR2pD?=
- =?utf-8?B?ekl0eFprQStmSVZxS25PSWlobGZNQ1ovYWdWY2JyVHYxcXF6YTZXdUY4K2tx?=
- =?utf-8?B?WVBwUktVay9TUjhkcFExaVpldSt6RndZRmxVWG11RTlCMHdiZ1lNSWE4bmVi?=
- =?utf-8?B?aEdNd0drVDBhWjZaNU5ITTlGV0FneUduV0U0T1JTS3lodXFNV3NueXBaNXNn?=
- =?utf-8?B?Y0IyeWN5bjZlenN4RTJNMXBCay9nMEFKOGx2Y1hIZDM0Ti9JenN4ak93TkI1?=
- =?utf-8?B?RmZpZTJNSi9MckxoVFYycE0vU1RFem5yVDYzbVRtK296UitUVDBWeFE0UGdn?=
- =?utf-8?B?QkxvbEtmcXgyYmI5Y0FXVkZ5UG9XZkM5Z21Ldm5VS3NSMTVnRVkva0RhS3N1?=
- =?utf-8?B?RXk1Yng4KzdPeW9WSFo3OUw0cXNYMjdveCtNbmUvb0JRdThiWUNCRHdRPT0=?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(366007)(1800799015);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?a0dybWNpa0doQThmQlUzS0xlbUF4UkE0UlNHWEx0OUV6VG42cW4vdlRRM1NN?=
- =?utf-8?B?NnN2ZVBOdGVQbCtxS1dBRW1la2x3cnVGNFVlSnBjeERoNTVJam4xV21wQXMw?=
- =?utf-8?B?TCt0VmNndHg1ZEVNbEpra2NVaDEvd0lEOUE1a3Q0R1NQOWZFY1dFWVQrTWNp?=
- =?utf-8?B?SHNOSi9aNERaM3lzV2JaR2daQ1lCN2xaa3hMN0ZQbjFCSzkrVVY4UnlxbkZQ?=
- =?utf-8?B?bExCLzZuKzU4emc0TjQ2VUVxRmFKYVN2cUl0SmYySXVDdmNHaFJrWjM1Ukto?=
- =?utf-8?B?UHZRYUpyeXlXd0I4QmVKYzIwaG5RbGNDck5jZlBKYWZDVU9paFRITXRvTk1Z?=
- =?utf-8?B?R2E5R0h0bHZqYWxtcUdLT2pKMFVuaFBZU0NLTTZRS1lmQjBsbTZkMlB5aVEx?=
- =?utf-8?B?QTBEVCtXaTdrOWJGUmR1MDFiR0Y5RUpuK0pLT3JPSGhOS0htWlpZSWtuQndp?=
- =?utf-8?B?M2VxN1FqbWRrVVNQek43anMzdUJGa1N1NGNUMENRcDlRQ2pmUEl3VXJYREFC?=
- =?utf-8?B?c2dCbEZuNXlNTXJKb2JmUkFvVTZFeTd5T1d2MW5vZVRSSm9OOS93dnNsbEZK?=
- =?utf-8?B?NmROVFp0RnNuVWgxS2t4TlhtWkJLV3FwRjFyckFQb3V6eDRoQXFtZUpPOE1v?=
- =?utf-8?B?VVYwWmF3NUF1VG15MlQ1cDlwbER3ME0rSnR5U3I4YW5OTmQ3ck0zQlRxWnVz?=
- =?utf-8?B?d0ZscDk0VFZ4bFpuUFh0YXA4ZVRFT1NmeEhpN2NTTEhXQ0dCeGFSTGkyUXBF?=
- =?utf-8?B?SlNYbFpUY1NuZ2h1VTRxRXFQRURDME1NT0tTY0s2aEZzNUZKMExma1JMWW9H?=
- =?utf-8?B?OVFwWktKTzZDakdoeWhkOGZyYUplYkRUczQrNmd3K3hVeVpZZmdQUnB1U2Zv?=
- =?utf-8?B?MUErVGlSWHJ0NHk5bHFxemdlZm5mMlBMZjF4NjVyWWNHaTdQQkZ1YlZhRm8r?=
- =?utf-8?B?WlhOYmFCK1owcjlqNzJaMlYyNHhFVGFmTVlWcllId29yZ2JSS0J3VU9oY2hl?=
- =?utf-8?B?U1hXOXFDUWVvemxoY3psTDlpeWVxc3UwcnJLVlZJR0plVjArUkdONk1DVEti?=
- =?utf-8?B?N2x6L3ZJNEJLYk51TENVWmJQWVRnbElZZkRRTE9hZkJ5bXRtbmpXd29hZ0hJ?=
- =?utf-8?B?bC9TdHJrSlpaaEFYeURUeHRoSWszdWwwNE9seFFIc3NURWZSRVBzUGFhMUtH?=
- =?utf-8?B?c1U5T0taWVFkWm9mT0IvYzVKRm5iNlBKSUV2UVdRRTVyTU1UOVFYZ1EzY1pa?=
- =?utf-8?B?eVlUUU12NExpMzMvaEJoNW9IWDV5b1dYSUNCOStDYmJkOGpCR0krdmVQL2VR?=
- =?utf-8?B?M0VBbUxNL21YbjZIOW8yUjdSYWVMNUpFZ3J1MFE0UytQYWlZWS9Yekp3QkVx?=
- =?utf-8?B?aHg3SVYxem1YanlSYy9MSXBTbVFhMzlQeis1aEpMYTAwWUcvc1QwY3lSOHhR?=
- =?utf-8?B?V3czSDNZV2VOVGtnTkFTMnJJRHF3TW1qb2RHQms0WWlWL3RiUHhsbWJrUEtK?=
- =?utf-8?B?T0YrZzFBakpxdzFGQ0x0ZWkrY042RHk2Nzg5cG1FR01RaXkrZ2tOZnErVTc2?=
- =?utf-8?B?NHBLTCtvSHFJYzF5UlZJNHhvSGMvcXZlaVlrYVdENXVWZHc3MS93TkMzajVv?=
- =?utf-8?B?UlJoR0xFSkx4Mkl4TXlGbStGTEd1MkJSSTRONkhiVFptTFpPKzJuekREdkFK?=
- =?utf-8?B?emNJM21TcElzS3g0Q29hSGFMTWxGZjhEcFdnaUNFZHdKQTJUNTU5L3ZWdXFD?=
- =?utf-8?B?UGloTEt4U0R2cFVBOTBWS29EdHlGNnNXNkFEdU1haUZPYVR0cWVEUk9xODQr?=
- =?utf-8?B?SlhsZ1VLeG1Ea3lrenRSb2g0YXJhMC9HTVFhdXoyMVhhRmI4elEveGhIc0hs?=
- =?utf-8?B?Vk1yYnVCSHR2bGk1MVliVG14ajRBNTFqZC9NUTh0MmNvdWtDY1BXL2V4Mmt6?=
- =?utf-8?B?ajdDWDMvTzhRemRyVGRYd2RtMkxSZEhzWWZ2ek40ekpRQXhKcXo1NVlCWjc2?=
- =?utf-8?B?Q3NYU282WFdKL1NMZElRcCszQ3VIUnNWTlE5bHc3bXI0aDBjQVhFQndZdHhD?=
- =?utf-8?B?YnB3NWJPLzdUYkNoZCtDTEx5YVl3Mnd4QnlLM25XL3QxaW45VUxWOWJibXNI?=
- =?utf-8?B?MDExWDkzN0JOWXZtcW93QnhqK1hEYlcvS1B2VmllWnZmK0w1TEpuQ3RnV0t2?=
- =?utf-8?B?dVE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1f28d42e-79e7-404b-f176-08dc63e133a8
-X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Apr 2024 22:03:26.6236
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: R78XRMJHcTqKrYaVkbSCtHm02c18sozOUQEu5GYyGhaClBPRyJ/2VUhZ8OSU5Bj/MssuIbTBDZffsjvHNbEJuwSRuRO46vtaH18YYgMq1/4=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB5077
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240423194931.97013-2-jdamato@fastly.com>
 
-
-
-On 4/23/2024 6:14 AM, Jiri Pirko wrote:
-> Tue, Apr 23, 2024 at 01:56:55PM CEST, sergey.temerkhanov@intel.com wrote:
->>
->>
->>> -----Original Message-----
->>> From: Jiri Pirko <jiri@resnulli.us>
->>> Sent: Tuesday, April 23, 2024 1:36 PM
->>> To: Temerkhanov, Sergey <sergey.temerkhanov@intel.com>
->>> Cc: intel-wired-lan@lists.osuosl.org; netdev@vger.kernel.org; Kitszel,
->>> Przemyslaw <przemyslaw.kitszel@intel.com>
->>> Subject: Re: [PATCH iwl-next v2] ice: Extend auxbus device naming
->>>
->>> Tue, Apr 23, 2024 at 11:14:59AM CEST, sergey.temerkhanov@intel.com
->>> wrote:
->>>> Include segment/domain number in the device name to distinguish
->>> between
->>>> PCI devices located on different root complexes in multi-segment
->>>> configurations. Naming is changed from ptp_<bus>_<slot>_clk<clock>  to
->>>> ptp_<domain>_<bus>_<slot>_clk<clock>
->>>
->>> I don't understand why you need to encode pci properties of a parent device
->>> into the auxiliary bus name. Could you please explain the motivation? Why
->>> you need a bus instance per PF?
->>>
->>> The rest of the auxbus registrators don't do this. Could you please align? Just
->>> have one bus for ice driver and that's it.
->>
->> This patch adds support for multi-segment PCIe configurations.
->> An auxdev is created for each adapter, which has a clock, in the system. There can be
+On Tue, Apr 23, 2024 at 07:49:28PM +0000, Joe Damato wrote:
+> mlx4_en_alloc_frags currently returns -ENOMEM when mlx4_alloc_page
+> fails but does not increment a stat field when this occurs.
 > 
-> You are trying to change auxiliary bus name.
+> struct mlx4_en_rx_ring has a dropped field which is tabulated in
+> mlx4_en_DUMP_ETH_STATS, but never incremented by the driver.
 > 
+> This change modifies mlx4_en_alloc_frags to increment mlx4_en_rx_ring's
+> dropped field for the -ENOMEM case.
 > 
->> more than one adapter present, so there exists a possibility of device naming conflict.
->> To avoid it, auxdevs are named according to the PCI geographical addresses of the adapters.
+> Signed-off-by: Joe Damato <jdamato@fastly.com>
+> Tested-by: Martin Karsten <mkarsten@uwaterloo.ca>
+> ---
+>  drivers/net/ethernet/mellanox/mlx4/en_port.c | 4 +++-
+>  drivers/net/ethernet/mellanox/mlx4/en_rx.c   | 4 +++-
+>  2 files changed, 6 insertions(+), 2 deletions(-)
 > 
-> Why? It's the auxdev, the name should not contain anything related to
-> PCI, no reason for it. I asked for motivation, you didn't provide any.
+> diff --git a/drivers/net/ethernet/mellanox/mlx4/en_port.c b/drivers/net/ethernet/mellanox/mlx4/en_port.c
+> index 532997eba698..c4b1062158e1 100644
+> --- a/drivers/net/ethernet/mellanox/mlx4/en_port.c
+> +++ b/drivers/net/ethernet/mellanox/mlx4/en_port.c
+> @@ -151,7 +151,7 @@ void mlx4_en_fold_software_stats(struct net_device *dev)
+>  {
+>  	struct mlx4_en_priv *priv = netdev_priv(dev);
+>  	struct mlx4_en_dev *mdev = priv->mdev;
+> -	unsigned long packets, bytes;
+> +	unsigned long packets, bytes, dropped;
+
+Err, sorry forgot to initialize this to 0 below with the rest of the init.
+Will fix this in v2 (and whatever other feedback there is). Apologies on
+the error here on my part.
+
+>  	int i;
+>  
+>  	if (!priv->port_up || mlx4_is_master(mdev->dev))
+> @@ -164,9 +164,11 @@ void mlx4_en_fold_software_stats(struct net_device *dev)
+>  
+>  		packets += READ_ONCE(ring->packets);
+>  		bytes   += READ_ONCE(ring->bytes);
+> +		dropped += READ_ONCE(ring->dropped);
+>  	}
+>  	dev->stats.rx_packets = packets;
+>  	dev->stats.rx_bytes = bytes;
+> +	dev->stats.rx_missed_errors = dropped;
+>  
+>  	packets = 0;
+>  	bytes = 0;
+> diff --git a/drivers/net/ethernet/mellanox/mlx4/en_rx.c b/drivers/net/ethernet/mellanox/mlx4/en_rx.c
+> index 8328df8645d5..573ae10300c7 100644
+> --- a/drivers/net/ethernet/mellanox/mlx4/en_rx.c
+> +++ b/drivers/net/ethernet/mellanox/mlx4/en_rx.c
+> @@ -82,8 +82,10 @@ static int mlx4_en_alloc_frags(struct mlx4_en_priv *priv,
+>  
+>  	for (i = 0; i < priv->num_frags; i++, frags++) {
+>  		if (!frags->page) {
+> -			if (mlx4_alloc_page(priv, frags, gfp))
+> +			if (mlx4_alloc_page(priv, frags, gfp)) {
+> +				ring->dropped++;
+>  				return -ENOMEM;
+> +			}
+>  			ring->rx_alloc_pages++;
+>  		}
+>  		rx_desc->data[i].addr = cpu_to_be64(frags->dma +
+> -- 
+> 2.25.1
 > 
-
-We aren't creating one auxbus per PF. We're creating one auxbus per
-*clock*. The device has multiple clocks in some configurations.
-
-We need to connect each PF to the same clock controller, because there
-is only one clock owner for the device in a multi-port card.
-
-> Again, could you please avoid creating auxiliary bus per-PF and just
-> have one auxiliary but per-ice-driver?
-> 
-
-We can't have one per-ice driver, because we don't want to connect ports
-from a different device to the same clock. If you have two ice devices
-plugged in, the ports on each device are separate from each other.
-
-The goal here is to connect the clock ports to the clock owner.
-
-Worse, as described here, we do have some devices which combine multiple
-adapters together and tie their clocks together via HW signaling. In
-those cases the clocks *do* need to communicate across the device, but
-only to other ports on the same physical device, not to ports on a
-different device.
-
-Perhaps auxbus is the wrong approach here? but how else can we connect
-these ports without over-connecting to other ports? We could write
-bespoke code which finds these devices, but that felt like it was risky
-and convoluted.
-
-Perhaps it would be ideal if something in the PCI layer could connect
-these together? I don't know how that would be implemented though..
-
-The fundamental problem is that we have a multi-function device with
-some shared functionality which we need to manage across function. In
-this case it is the clock should only have one entity, while the ports
-connected to it are controlled independently by PF. We tried a variety
-of ways to solve this in the past, mostly with hacky solutions.
-
-We need an entity which can find all the ports connected to a single
-clock, and the port needs to be able to get back to its clock. If we
-used a single auxdriver for this, that driver would have to maintain
-some hash tables or connections in order to locate which ports belonged
-to the clock. It would also need to figure out which port was the
-"owner" so that it could send owner-based requests through that port,
-since it would not inherently have access to the clock hardware since
-its a global entity and not tied to a port.
-
-In the current model, the driver can go back to the PF that spawned it
-to manage the clock, and uses the aux devices as a mechanism to connect
-to each port for purposes such as initializing the PHYs, and caching the
-PTP hardware time for timestamp extension.
-
-Maybe you disagree with this use of auxbus? Do you have any suggestions
-for a separate model?
-
-We could make use of ice_adapter, though we'd need some logic to manage
-devices which have multiple clocks, as well as devices like the one
-Sergey is working on which tie multiple adapters together.
 
