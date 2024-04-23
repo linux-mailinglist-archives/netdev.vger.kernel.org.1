@@ -1,168 +1,127 @@
-Return-Path: <netdev+bounces-90327-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90328-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17B2E8ADBD3
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 04:18:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 497E28ADC18
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 05:12:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 69083B21E90
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 02:18:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A3890280D10
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 03:12:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACCC91757E;
-	Tue, 23 Apr 2024 02:18:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59E8F18659;
+	Tue, 23 Apr 2024 03:12:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iGpydhKK"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fYDPqqvv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1B4417BA8;
-	Tue, 23 Apr 2024 02:18:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D669718049
+	for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 03:12:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713838691; cv=none; b=TbR7o+HQNjiLcHk+sYrtctt6ELCkiPl2Et1rAC7+6cvpRpxc76jbjX3ZS0ncrVI8sNJy9aqMZx2u8BoCPAXjgU6NCLdfptFbI6j4gOvF546psrnsUsC48mfeem2wRhmCdPbUICMgDwgv8Sue+8xb5VNteBOww+RO6SRxLquEhJw=
+	t=1713841928; cv=none; b=Skv4IY2I9WiKWhgqqA2Zj95bxKh9h9T1SKvkgxFs/y5+NiM5TuaJIhz5fAB+v3zNq+CEf9+WycjzEwFVzbQn8+lzwr37hvC43hDelkaET21wvl/6ZxoVQYS83mARrEYsPeTW2JExw75/0VD88EIgAOe5kIyjLnoZ+7ce2JorO1Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713838691; c=relaxed/simple;
-	bh=IopP1bFkYoWAQOq+qAQGXZ+TGVLKYGRlyaC/38OvAac=;
+	s=arc-20240116; t=1713841928; c=relaxed/simple;
+	bh=T/ufC5uEstpX7JOyLrRfGUXFoGcTxcoqu+hG9uSdM3U=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PE2bDT4zPmRv3l27dq9AKxmU0JymhG+JLjGezRl61kjVIxLteM7xSAZTjgPqZDQajINb6+7QLYXlSWm4Q+OnWO7vTu+/VclOi+g4CbRQ8dIs4XB/dBn3KcvVYlSwCTNE5XUN1Lb2Sy9B1y0hAdZ5zPQ5elL9RPdw2gPXJ+PVaKM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iGpydhKK; arc=none smtp.client-ip=209.85.167.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-51bab51e963so28891e87.1;
-        Mon, 22 Apr 2024 19:18:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713838688; x=1714443488; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sNx3rKWvVj9v4h/EIoU/yDC78hRfQ0z6qddPdkKKM5o=;
-        b=iGpydhKKjSR6KUzMBc+e8dtpbYLxsBs24tMhnFU0tqa34KuFAKNBG5Z+thiQBjyGgA
-         Bb7INvX9uaAiyHubOQD4RiRlxnp+1CqKQqUMnAz2yZdpdOSwOo6S2yl9AkmKNJ4Ibur7
-         +CSa2wwCDb/FeR7QHd6l2bVbFTd79d5LkwwQl3TA42jWDeFNchblOx80lXwW9RIu+NWj
-         hoVGHrOUriuU8f2tGpt8+9VqkdO2Dqr7214788mtoLockKjQZjyZWpRe8Xr9pdB+UjoG
-         ikaAHh15UanwwJJPvIsN50LVkXDNC54EUPrrPpL3ZcPG0o4nLpWJzdSWZIdH+L0LQOOF
-         pxyw==
+	 To:Cc:Content-Type; b=jTP5uha/vv6wLik5BJVnzI+MZfjVbbWhdlbO1pj1k/eqtGOY2YDwM3SzIN83YgMy84xDRfvcCUnATTczOUrJOU9peUL4EBlsKQAaEtETqDlDJTuIWAgmu90Ua1HeIIK90ktLdabI4h1d3csDf3aN9/hmVX0yqQogDdgzlGVdqEU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fYDPqqvv; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1713841926;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=P6Hud8ZwYGV/pvpEAsvmgKYrOtwj2IKB6XpISxJlVG0=;
+	b=fYDPqqvvm0V2xsVRbCdjW5xgOaQw+FPqnOTPatW1MTerV57fPzLQ1FqOGG5jF3JkA7WqVO
+	jPiVQrgm3UlyT5XtRn71teLnZ1H3/SIl9Hzh4jAE1cwrXLZOCPJfzoKZDqR4tUh6KzsB64
+	L0bIVrEexcZ1DZjHGwvhVk52WnTHsns=
+Received: from mail-pg1-f200.google.com (mail-pg1-f200.google.com
+ [209.85.215.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-659-4UlKFTDfN62chLNPLgDv1g-1; Mon, 22 Apr 2024 23:12:04 -0400
+X-MC-Unique: 4UlKFTDfN62chLNPLgDv1g-1
+Received: by mail-pg1-f200.google.com with SMTP id 41be03b00d2f7-5d5a080baf1so5265561a12.1
+        for <netdev@vger.kernel.org>; Mon, 22 Apr 2024 20:12:04 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713838688; x=1714443488;
+        d=1e100.net; s=20230601; t=1713841923; x=1714446723;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=sNx3rKWvVj9v4h/EIoU/yDC78hRfQ0z6qddPdkKKM5o=;
-        b=AOtDuv+ggPT+Y6JwnHvHqbhBGe6y9k45x/TixboShj87+MWcXftL0Lo4O9PPWOmH0t
-         WRpUZ9vCLVPMDVn1+ICPXBo8MMk+56YJ/qV87Fku7uM48HKxSglykvTTzoXGRBZqV8B4
-         6TsoT+wNqP7z7dkzk7gKci+yLLb7MlCwt+IlYdrkWQP3Qd9cyVUN+SOSCvN3e4zdjMuX
-         moVTcewtBxTxkunC+WfESDE3dsJmiPRWRihiV3p4ZDcn1QNjZe4gm1agUiLrRdV5wxqt
-         nyXIgiqIpvHMxMnsYSmk7vM+eCFNkoL4gK9sG3cZqNHLhoKdRcpIjRu7V8zMCJOdXRTY
-         moxw==
-X-Forwarded-Encrypted: i=1; AJvYcCXDJtY/VnYhmPQ0KmeII5j21wGbQQ4FZ5YzXi/CwDLmqcV7VlPIFKJCUEtfsB6NHaYJmobVKZhYKFSKc8IAzdHKFqV9NmyxF9x8GFr1xylArr0nPrFys33kQKgVm8RKLdc0MzYQw+3uYJnZ
-X-Gm-Message-State: AOJu0YwdgeBHe+8okQ0DvEB4wS5qTDE9nBaIFghlf65ZovXBnTN8KpaM
-	GrXj/GO4Mu0KEbJ7HucgXFd/CK3iPZQHG0Y5sBHyIn0T/UVJLwsF0e3q7dtD0KCRn8RYXQgOyv2
-	GuevOfO3owi6MDhQuleACVDHzKQE=
-X-Google-Smtp-Source: AGHT+IEjFVfDZ1b7bRrb9RNiaXGSUz1z4d0R1LaPaGHytvUP/U/AtHU07YcBD9GKqtXQAIQBGHYMbRVr20cCPAIoj30=
-X-Received: by 2002:a19:a413:0:b0:513:d3cb:249f with SMTP id
- q19-20020a19a413000000b00513d3cb249fmr6700874lfc.52.1713838687950; Mon, 22
- Apr 2024 19:18:07 -0700 (PDT)
+        bh=P6Hud8ZwYGV/pvpEAsvmgKYrOtwj2IKB6XpISxJlVG0=;
+        b=P7sEucEixT+CkHSVbFi2GU3FEuBGe6aq8XWFmqFFJIQ+ZudjRTHLGRTDYpfUvKvQ6x
+         6G0h+JJR5P7wVg8qL08XgRTFwT/M3UB6fYHm9XlT6KywtzpqjcHs0sbWH8IfAwW3aQ1u
+         mwj41vKZ7YCwpsUqcPxfk+phMQRKdjhxmLmdHWm8nFfyfY2j2wns2Yb06UAwDJwgq459
+         cKH37o7IvOEdo4wvx/di8agXHl/4gp8ad31SPE1X52rUHMCvz6U8Ck4ZHuAPoFXgIfIJ
+         qJQfaDkFhijUxSvl+ZxehGjtL52D9Qrxqcm/iUjqC4+4AygNjHBGf5bJRoD654c9TS4K
+         yQVQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVlhCMmo+a/ZVXHEbocCA1wZXh3Yq5p35vX6eUsIabAbr+MeFkoHh2sX0FjvXPNjX0o7DYZ2dYY3yEt/60a4vsV9nVC1bss
+X-Gm-Message-State: AOJu0YxhS+SRcxLo6ZSx+JihllzxuD+idVwiSxySPACLdPm48NG5+/8J
+	tRqdklvpLs7/MP4kDaHpR3PIRt7wY88TEpsO3NkkR+RUeGDdqkL5RN+L7W+scFXGnZ4g8LOPrrW
+	Ol0Vt78kCUmQwv9xrAYYLRyMGUAzOUb/szr714pKBIEp48zKylJKHtwmiscVbM+myZ8k/xE+mHk
+	K5Pirv4uRsLsS/g7EAs8+zltYxBIBh
+X-Received: by 2002:a05:6a20:3256:b0:1a7:5721:7011 with SMTP id hm22-20020a056a20325600b001a757217011mr11311677pzc.41.1713841923309;
+        Mon, 22 Apr 2024 20:12:03 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFL/9rAZIQKEhE2sGik3GY4VP6E6ML0Uuq+/eQz4r9cyQjK8L0BsWvQoRqid/ZT5JNaJAJMTO7IM8KdyetjUHA=
+X-Received: by 2002:a05:6a20:3256:b0:1a7:5721:7011 with SMTP id
+ hm22-20020a056a20325600b001a757217011mr11311674pzc.41.1713841923041; Mon, 22
+ Apr 2024 20:12:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240422030109.12891-1-kerneljasonxing@gmail.com>
- <20240422030109.12891-2-kerneljasonxing@gmail.com> <20240422182755.GD42092@kernel.org>
- <CAL+tcoBKF0Koy37eakaYaafKgoJjeMMwkLBdJXTc_86EQnjOSw@mail.gmail.com>
-In-Reply-To: <CAL+tcoBKF0Koy37eakaYaafKgoJjeMMwkLBdJXTc_86EQnjOSw@mail.gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Tue, 23 Apr 2024 10:17:31 +0800
-Message-ID: <CAL+tcoDoZ5CYn-fdK5AWaMe36O10ihe2Rd89dDmjBxiBDQ37sA@mail.gmail.com>
-Subject: Re: [PATCH net-next v7 1/7] net: introduce rstreason to detect why
- the RST is sent
-To: Simon Horman <horms@kernel.org>
-Cc: edumazet@google.com, dsahern@kernel.org, matttbe@kernel.org, 
-	martineau@kernel.org, geliang@kernel.org, kuba@kernel.org, pabeni@redhat.com, 
-	davem@davemloft.net, rostedt@goodmis.org, mhiramat@kernel.org, 
-	mathieu.desnoyers@efficios.com, atenart@kernel.org, mptcp@lists.linux.dev, 
-	netdev@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
+References: <20240422072408.126821-1-xuanzhuo@linux.alibaba.com> <20240422072408.126821-8-xuanzhuo@linux.alibaba.com>
+In-Reply-To: <20240422072408.126821-8-xuanzhuo@linux.alibaba.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Tue, 23 Apr 2024 11:11:51 +0800
+Message-ID: <CACGkMEubWOFq8Bj1Kk02Om8DnbhFyNtAD_Lk8mXL4c2GSZgabA@mail.gmail.com>
+Subject: Re: [PATCH vhost v2 7/7] virtio_net: remove the misleading comment
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: virtualization@lists.linux.dev, "Michael S. Tsirkin" <mst@redhat.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Apr 23, 2024 at 10:14=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.=
-com> wrote:
+On Mon, Apr 22, 2024 at 3:24=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba.c=
+om> wrote:
 >
-> Hi Simon,
+> We call the build_skb() actually without copying data.
+> The comment is misleading. So remove it.
 >
-> On Tue, Apr 23, 2024 at 2:28=E2=80=AFAM Simon Horman <horms@kernel.org> w=
-rote:
-> >
-> > On Mon, Apr 22, 2024 at 11:01:03AM +0800, Jason Xing wrote:
-> >
-> > ...
-> >
-> > > diff --git a/include/net/rstreason.h b/include/net/rstreason.h
-> >
-> > ...
-> >
-> > > +/**
-> > > + * There are three parts in order:
-> > > + * 1) reset reason in MPTCP: only for MPTCP use
-> > > + * 2) skb drop reason: relying on drop reasons for such as passive r=
-eset
-> > > + * 3) independent reset reason: such as active reset reasons
-> > > + */
-> >
-> > Hi Jason,
-> >
-> > A minor nit from my side.
-> >
-> > '/**' denotes the beginning of a Kernel doc,
-> > but other than that, this comment is not a Kernel doc.
-> >
-> > FWIIW, I would suggest providing a proper Kernel doc for enum sk_rst_re=
-ason.
-> > But another option would be to simply make this a normal comment,
-> > starting with "/* There are"
->
-> Thanks Simon. I'm trying to use the kdoc way to make it right :)
->
-> How about this one:
-> /**
->  * enum sk_rst_reason - the reasons of socket reset
->  *
->  * The reason of skb drop, which is used in DCCP/TCP/MPTCP protocols.
+> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
 
-s/skb drop/sk reset/
+Acked-by: Jason Wang <jasowang@redhat.com>
 
-Sorry, I cannot withdraw my previous email in time.
+Thanks
 
->  *
->  * There are three parts in order:
->  * 1) skb drop reasons: relying on drop reasons for such as passive
-> reset
->  * 2) independent reset reasons: such as active reset reasons
->  * 3) reset reasons in MPTCP: only for MPTCP use
->  */
-> ?
+> ---
+>  drivers/net/virtio_net.c | 1 -
+>  1 file changed, 1 deletion(-)
 >
-> I chose to mimic what enum skb_drop_reason does in the
-> include/net/dropreason-core.h file.
+> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> index 848e93ccf2ef..ae15254a673b 100644
+> --- a/drivers/net/virtio_net.c
+> +++ b/drivers/net/virtio_net.c
+> @@ -690,7 +690,6 @@ static struct sk_buff *page_to_skb(struct virtnet_inf=
+o *vi,
 >
-> > +enum sk_rst_reason {
-> > +       /**
-> > +        * Copy from include/uapi/linux/mptcp.h.
-> > +        * These reset fields will not be changed since they adhere to
-> > +        * RFC 8684. So do not touch them. I'm going to list each defin=
-ition
-> > +        * of them respectively.
-> > +        */
+>         shinfo_size =3D SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
 >
-> Thanks to you, I found another similar point where I smell something
-> wrong as in the above code. I'm going to replace '/**' with '/*' since
-> it's only a comment, not a kdoc.
+> -       /* copy small packet so we can reuse these pages */
+>         if (!NET_IP_ALIGN && len > GOOD_COPY_LEN && tailroom >=3D shinfo_=
+size) {
+>                 skb =3D virtnet_build_skb(buf, truesize, p - buf, len);
+>                 if (unlikely(!skb))
+> --
+> 2.32.0.3.g01195cf9f
 >
-> Thanks,
-> Jason
+
 
