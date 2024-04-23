@@ -1,224 +1,380 @@
-Return-Path: <netdev+bounces-90628-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90629-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6A468AF57E
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 19:28:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id ACB808AF58A
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 19:33:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 33DC0B24C40
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 17:25:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CFCC01C2264C
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 17:33:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00AA813DB98;
-	Tue, 23 Apr 2024 17:25:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0EEA13DDA5;
+	Tue, 23 Apr 2024 17:33:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KLz8eO46"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="07DWhGIG"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0651213D8BE
-	for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 17:25:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCDC313CA85
+	for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 17:33:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713893145; cv=none; b=M8ohF3vh/s5Mrh/60TOyFl+hYG+93QWcqHFX+HSgvfOqBJXorqIjqk3UZ2fqWrVaNu2OlLu9T9NncUmNDmklU6p74kDCaHvXmAk8DofMzavdMxUgc7FEHxIfdfWoMtoQ5WuONNflVKSr6+Tc2yuGZszacAaGgImpl6Ko1Q+c6nk=
+	t=1713893619; cv=none; b=dgUcpyI6OqgRX67zkjd64tQBqxg5L/8HMMx4Z1WwU4SsN+jxcJ6Z6YnhO59E7g4TTqrq+ZvSii0/MzfFgikuT3zIDlZi+w0fxSMSHcut9C+5hV3tM7li4ulDp4oOxAf+EOl6P8V7q7kKFoyUjQ+FjFbTTqKnGE6bLwimvYKhpnQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713893145; c=relaxed/simple;
-	bh=bOEsH0iPOIpWP6TE3bIOCad7k//K2mp+hslR/5EQT2g=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=o5hAxyDVGpuZWwPpGZLHGzHVmvoJX/lc4gp/ofpW8rQRr/RbCSiG0sNOm/MctIAKIXNXL7QFSM6heYFO3/hPmMPxd6dlSsedYIr8WuH/BxJzPiOA/QOOy23XYS0tlqBFm24QuAub8zKW+0GcC9GXsxr6RY5To1sKxhuvGzJlTkc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KLz8eO46; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1713893142;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=OAyafxbBfPXNG4duQ8T05vTAmiPLJyM4tEtBIC2PDm0=;
-	b=KLz8eO46BaPNHZVNF9E1gGZSyWmoGZQXE9ZfwVyTBlNxUGc7QvgfcZtedKNqPBQdCHGltl
-	lqB+FzwD9nt3qmrNPzOVAHM/YdD2gc1Lxqn0MsSbrFEvAPEd853pYs2EzEN+77W6cTag7v
-	KVYJknrkZkCB4qMzmS9mOYyRz3PFjJE=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-386-qm3GFOHBNc6vU9U3YIsTIg-1; Tue, 23 Apr 2024 13:25:41 -0400
-X-MC-Unique: qm3GFOHBNc6vU9U3YIsTIg-1
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4188d1b90c8so336565e9.3
-        for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 10:25:40 -0700 (PDT)
+	s=arc-20240116; t=1713893619; c=relaxed/simple;
+	bh=tFD3sOvFiTjfPDSADfIbdWWan881qfO6V+ObufA+11s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=iObPNvRLUzl7Q5nW1o3Ru6MayeCb17o+3q2CHQidKT+jJMo9wFIKH/5fKjzwSbhoRUXlVLCWz3zLo9LH6aUA7PgDRCajAyfA5EhTBNohfhMY0saCE3aNdXoHhPl+oui1t/xejtFx1mK9bZKxIujKBobDSSH5GuJylVIF4wrMvj8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=07DWhGIG; arc=none smtp.client-ip=209.85.210.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-6ed691fb83eso4716187b3a.1
+        for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 10:33:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1713893617; x=1714498417; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=qWcNT8qfQKi7DbtbjC9KJesObFsaCo+0Yt+IIMin+3E=;
+        b=07DWhGIGF3ePjCfONPue9TputVci0Al5RIgnUT7SStLoDST0446r3VbA+X/8VEwSei
+         g6jh0XuO8aHWDozRAzbIVMOFItDRHWTkqe1R7vPeB8M+wukTs5qoZtRN2YltUZRuBucY
+         1FyGvXMpAmVTLKyFUvESASgH+Dj4WjCIf/OJirkXfG53yE5S7eTlMXqjF5bTXuGzxNy9
+         uWBBsW5KmrHlyxky4vTKrgPI4P9RxH2mXNpAsKZtkp5fM8tHeB0Z4oD4bpEZZlCti3cN
+         V5jUQPpF3JCggSUkxgDK+bqlr3CNkCwJx7XeaxwL24TzLQT4seQ7Vyh3Lbq8aWN49NcW
+         WMJQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713893140; x=1714497940;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
+        d=1e100.net; s=20230601; t=1713893617; x=1714498417;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OAyafxbBfPXNG4duQ8T05vTAmiPLJyM4tEtBIC2PDm0=;
-        b=ZlJJvSQOip8VsMu/2Re+cQ4KhVmSs+Yx+Bnl1tn3sg/jlbkDtyj1F6uorlxXUyoaXQ
-         pZhTX6viXDJgMqJX2Be3DU+J6d2ZBx189q0HHSh3IKukBUR/K9LEqisWn8VjjBZwiK9C
-         1zBt5Wy1Uu4bkiFlzDdFJMNxk3Urqqy8G+d52xYw0eDyRDMpEIWvZAll+6jE0/LxYalV
-         j4DyxyGgsWRIHAknQHm0Q1Tja6az4mpASDo/o4+WaLSQ2lPBDlQiTl6By0W76zAIaJmu
-         KldOw7GXkT0F539Oizve0QI5YPD/q6OnVIszKsmtileWf+ERMej1zqupFokfUmlFr14X
-         OisQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW8LBD3bmsUFVrhZsMlRHOjoxT9q8HzypEZnM4jBHbBfSqEuknG2JM3hhLzfrdzqgK49RsDdKacm1bz1YyKrJG8++1AEE+T
-X-Gm-Message-State: AOJu0YxeLbU+FRs+DAQY5ldkW1thCgqAxkyZVoR3gv5wXUXwLYeuV8ya
-	R3yFMpsflbe5ms2bm1vtozqzLSoth3uIcpaZLcnPTt9dzNZidrORBoJyjJ9xQorXanMzO0ZRHqt
-	1L+OtfPvmtHKC5C6MY23DGFS4kwgLaraPR7qQwtcu+RF1EGusFGDiRQ==
-X-Received: by 2002:a05:600c:4fc3:b0:418:f770:ba0 with SMTP id o3-20020a05600c4fc300b00418f7700ba0mr9811749wmq.0.1713893139833;
-        Tue, 23 Apr 2024 10:25:39 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGZTfcZCyN9ek9qph7rbZH1CiyORcwMqvi5SkqJOYCMbxg82eNj1uDy6hr0NrKmR0kKVFB7Dw==
-X-Received: by 2002:a05:600c:4fc3:b0:418:f770:ba0 with SMTP id o3-20020a05600c4fc300b00418f7700ba0mr9811736wmq.0.1713893139397;
-        Tue, 23 Apr 2024 10:25:39 -0700 (PDT)
-Received: from gerbillo.redhat.com ([2a0d:3344:172c:4510::f71])
-        by smtp.gmail.com with ESMTPSA id hg16-20020a05600c539000b0041aa8ad46d6sm3618315wmb.16.2024.04.23.10.25.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Apr 2024 10:25:38 -0700 (PDT)
-Message-ID: <1380ba9e71d500628994b0a1a7cbb108b4bf9492.camel@redhat.com>
-Subject: Re: [RFC] HW TX Rate Limiting Driver API
-From: Paolo Abeni <pabeni@redhat.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, Jiri Pirko
- <jiri@resnulli.us>, Madhu Chittim <madhu.chittim@intel.com>, Sridhar
- Samudrala <sridhar.samudrala@intel.com>
-Date: Tue, 23 Apr 2024 19:25:37 +0200
-In-Reply-To: <20240422110654.2f843133@kernel.org>
-References: <20240405102313.GA310894@kernel.org>
-	 <20240409153250.574369e4@kernel.org>
-	 <91451f2da3dcd70de3138975ad7d21f0548e19c9.camel@redhat.com>
-	 <20240410075745.4637c537@kernel.org>
-	 <de5bc3a7180fdc42a58df56fd5527c4955fd0978.camel@redhat.com>
-	 <20240411090325.185c8127@kernel.org>
-	 <0c1528838ebafdbe275ad69febb24b056895f94a.camel@redhat.com>
-	 <20240422110654.2f843133@kernel.org>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
+        bh=qWcNT8qfQKi7DbtbjC9KJesObFsaCo+0Yt+IIMin+3E=;
+        b=e9LWGBoWSY2J5pirYx1A+HsdS0K0/UUVeCiYN8q05h1XBw9VtCWF/rhq9E0JUJVT3b
+         WQyZyo9uoCcfWshfbUZ2g5yhz2Sy/jta09LjStQGZo+graRUU0KZLjWC5G5pz2Zh21Iq
+         l/Bstzx8z006l+wYqJsJG58yK5ysy+keVFh8nJqUMOKUL85T7xm+wsiVJpzbEn0Js1Yo
+         G+HgVK8puErgwFzB+fhUs2cuuHu5xXBMRzPqCKEmxsP7OS3Q0cbunLlW7KSI3WWXJjqH
+         Egg2EJjbFA9r01HAmrs8W56qBg8Y4T1QN7FBNACDgoU7hnI+YmtbQB1kwjAaRjMON7C0
+         1RJg==
+X-Forwarded-Encrypted: i=1; AJvYcCXpPTo1hegs4MPfKe+L5ZNwqTuIvkrLxW724ux7p0hoTMUAyEJ3LQzie3QZx0FLWrloJKvHBsjczBK34TjjWzUajM51pMuP
+X-Gm-Message-State: AOJu0YxbSMW+2QgjD7XyND2SGIHJWM4Sn3Vrp8vxGs8DJWp+DDUlmv6C
+	kYc6EcTXpLZ2JgoVdN5XdmkIpF1Ka6sSZsxpsWSoT7KpGAH1vG7o2v4uOR5gxmO5Yz0ZA+VzPpD
+	0
+X-Google-Smtp-Source: AGHT+IFUCXlwQWQb1xainngjFQx0FkIzU9OA5QknII/ltNS9pjNne6s/w7+NA3SldBu4zN1Rlx8iAw==
+X-Received: by 2002:a05:6a00:b49:b0:6ea:afdb:6d03 with SMTP id p9-20020a056a000b4900b006eaafdb6d03mr291325pfo.19.1713893617018;
+        Tue, 23 Apr 2024 10:33:37 -0700 (PDT)
+Received: from ?IPV6:2a03:83e0:1151:15:40a:5eb5:8916:33a4? ([2620:10d:c090:500::6:5c90])
+        by smtp.gmail.com with ESMTPSA id lw4-20020a056a00750400b006ea9108ec12sm9869241pfb.115.2024.04.23.10.33.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 23 Apr 2024 10:33:36 -0700 (PDT)
+Message-ID: <a9461863-d064-4014-a65a-7381ff8d1f7b@davidwei.uk>
+Date: Tue, 23 Apr 2024 10:33:35 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH net-next 9/9] gve: Implement queue api
+Content-Language: en-GB
+To: Shailend Chand <shailend@google.com>, netdev@vger.kernel.org
+Cc: almasrymina@google.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, willemb@google.com
+References: <20240418195159.3461151-1-shailend@google.com>
+ <20240418195159.3461151-10-shailend@google.com>
+From: David Wei <dw@davidwei.uk>
+In-Reply-To: <20240418195159.3461151-10-shailend@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, 2024-04-22 at 11:06 -0700, Jakub Kicinski wrote:
-> On Fri, 19 Apr 2024 13:53:53 +0200 Paolo Abeni wrote:
-> > > They don't have to be nodes. They can appear as parent or child of=
-=20
-> > > a real node, but they don't themselves carry any configuration.
-> > >=20
-> > > IOW you can represent them as a special encoding of the ID field,
-> > > rather than a real node. =20
-> >=20
-> > I'm sorry for the latency, I got distracted elsewhere.=C2=A0
-> >=20
-> > It's not clear the benefit of introducing this 'attach points' concept.
-> >=20
-> > With the current proposal, configuring a queue shaper would be:
-> >=20
-> > info.bw_min =3D ...
-> > dev->shaper_ops->set(dev, SHAPER_LOOKUP_BY_QUEUE, queue_id, &info, &ack=
-);
-> >=20
-> > and restoring the default could be either:
-> >=20
-> > info.bw_min =3D 0;
-> > dev->shaper_ops->set(dev, SHAPER_LOOKUP_BY_QUEUE, queue_id, &info, &ack=
-);
->=20
-> And presumably also bw_max =3D 0 also means "delete" or will it be bw_max
-> =3D ~0 ?
+On 2024-04-18 12:51 pm, Shailend Chand wrote:
+> An api enabling the net stack to reset driver queues is implemented for
+> gve.
+> 
+> Signed-off-by: Shailend Chand <shailend@google.com>
+> ---
+>  drivers/net/ethernet/google/gve/gve.h        |   6 +
+>  drivers/net/ethernet/google/gve/gve_dqo.h    |   6 +
+>  drivers/net/ethernet/google/gve/gve_main.c   | 143 +++++++++++++++++++
+>  drivers/net/ethernet/google/gve/gve_rx.c     |  12 +-
+>  drivers/net/ethernet/google/gve/gve_rx_dqo.c |  12 +-
+>  5 files changed, 167 insertions(+), 12 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/google/gve/gve.h b/drivers/net/ethernet/google/gve/gve.h
+> index 9f6a897c87cb..d752e525bde7 100644
+> --- a/drivers/net/ethernet/google/gve/gve.h
+> +++ b/drivers/net/ethernet/google/gve/gve.h
+> @@ -1147,6 +1147,12 @@ bool gve_tx_clean_pending(struct gve_priv *priv, struct gve_tx_ring *tx);
+>  void gve_rx_write_doorbell(struct gve_priv *priv, struct gve_rx_ring *rx);
+>  int gve_rx_poll(struct gve_notify_block *block, int budget);
+>  bool gve_rx_work_pending(struct gve_rx_ring *rx);
+> +int gve_rx_alloc_ring_gqi(struct gve_priv *priv,
+> +			  struct gve_rx_alloc_rings_cfg *cfg,
+> +			  struct gve_rx_ring *rx,
+> +			  int idx);
+> +void gve_rx_free_ring_gqi(struct gve_priv *priv, struct gve_rx_ring *rx,
+> +			  struct gve_rx_alloc_rings_cfg *cfg);
+>  int gve_rx_alloc_rings(struct gve_priv *priv);
+>  int gve_rx_alloc_rings_gqi(struct gve_priv *priv,
+>  			   struct gve_rx_alloc_rings_cfg *cfg);
+> diff --git a/drivers/net/ethernet/google/gve/gve_dqo.h b/drivers/net/ethernet/google/gve/gve_dqo.h
+> index b81584829c40..e83773fb891f 100644
+> --- a/drivers/net/ethernet/google/gve/gve_dqo.h
+> +++ b/drivers/net/ethernet/google/gve/gve_dqo.h
+> @@ -44,6 +44,12 @@ void gve_tx_free_rings_dqo(struct gve_priv *priv,
+>  			   struct gve_tx_alloc_rings_cfg *cfg);
+>  void gve_tx_start_ring_dqo(struct gve_priv *priv, int idx);
+>  void gve_tx_stop_ring_dqo(struct gve_priv *priv, int idx);
+> +int gve_rx_alloc_ring_dqo(struct gve_priv *priv,
+> +			  struct gve_rx_alloc_rings_cfg *cfg,
+> +			  struct gve_rx_ring *rx,
+> +			  int idx);
+> +void gve_rx_free_ring_dqo(struct gve_priv *priv, struct gve_rx_ring *rx,
+> +			  struct gve_rx_alloc_rings_cfg *cfg);
+>  int gve_rx_alloc_rings_dqo(struct gve_priv *priv,
+>  			   struct gve_rx_alloc_rings_cfg *cfg);
+>  void gve_rx_free_rings_dqo(struct gve_priv *priv,
+> diff --git a/drivers/net/ethernet/google/gve/gve_main.c b/drivers/net/ethernet/google/gve/gve_main.c
+> index c348dff7cca6..5e652958f10f 100644
+> --- a/drivers/net/ethernet/google/gve/gve_main.c
+> +++ b/drivers/net/ethernet/google/gve/gve_main.c
+> @@ -17,6 +17,7 @@
+>  #include <linux/workqueue.h>
+>  #include <linux/utsname.h>
+>  #include <linux/version.h>
+> +#include <net/netdev_queues.h>
+>  #include <net/sch_generic.h>
+>  #include <net/xdp_sock_drv.h>
+>  #include "gve.h"
+> @@ -2070,6 +2071,15 @@ static void gve_turnup(struct gve_priv *priv)
+>  	gve_set_napi_enabled(priv);
+>  }
+>  
+> +static void gve_turnup_and_check_status(struct gve_priv *priv)
+> +{
+> +	u32 status;
+> +
+> +	gve_turnup(priv);
+> +	status = ioread32be(&priv->reg_bar0->device_status);
+> +	gve_handle_link_status(priv, GVE_DEVICE_STATUS_LINK_STATUS_MASK & status);
+> +}
+> +
+>  static void gve_tx_timeout(struct net_device *dev, unsigned int txqueue)
+>  {
+>  	struct gve_notify_block *block;
+> @@ -2530,6 +2540,138 @@ static void gve_write_version(u8 __iomem *driver_version_register)
+>  	writeb('\n', driver_version_register);
+>  }
+>  
+> +static int gve_rx_queue_stop(struct net_device *dev, int idx,
+> +			     void **out_per_q_mem)
+> +{
+> +	struct gve_priv *priv = netdev_priv(dev);
+> +	struct gve_rx_ring *rx;
+> +	int err;
+> +
+> +	if (!priv->rx)
+> +		return -EAGAIN;
+> +	if (idx < 0 || idx >= priv->rx_cfg.max_queues)
+> +		return -ERANGE;
+> +
+> +	/* Destroying queue 0 while other queues exist is not supported in DQO */
+> +	if (!gve_is_gqi(priv) && idx == 0)
+> +		return -ERANGE;
+> +
+> +	rx = kvzalloc(sizeof(*rx), GFP_KERNEL);
+> +	if (!rx)
+> +		return -ENOMEM;
+> +	*rx = priv->rx[idx];
+> +
+> +	/* Single-queue destruction requires quiescence on all queues */
+> +	gve_turndown(priv);
+> +
+> +	/* This failure will trigger a reset - no need to clean up */
+> +	err = gve_adminq_destroy_single_rx_queue(priv, idx);
+> +	if (err) {
+> +		kvfree(rx);
+> +		return err;
+> +	}
+> +
+> +	if (gve_is_gqi(priv))
+> +		gve_rx_stop_ring_gqi(priv, idx);
+> +	else
+> +		gve_rx_stop_ring_dqo(priv, idx);
 
-I would say just bw_min =3D 0, all others fields are ignored in such
-case. But not very relevant since...
->=20
-> > or:
-> >=20
-> > dev->shaper_ops->delete(dev, SHAPER_LOOKUP_BY_QUEUE, queue_id, &info, &=
-ack);
->=20
-> Which confusingly will not actually delete the node, subsequent get()
-> will still return it.
->=20
-> > With the 'attach points' I guess it will be something alike the
-> > following (am not defining a different node type here just to keep the
-> > example short):
-> >=20
-> > # configure a queue shaper
-> > struct shaper_info attach_info;
-> > dev->shaper_ops->get(dev, SHAPER_LOOKUP_BY_QUEUE, queue_id, &attach_inf=
-o, &ack);
-> > info.parent_id =3D attach_info.id;
-> > info.bw_min =3D ...
-> > new_node_id =3D dev->shaper_ops->add(dev, &info, &ack);
-> >=20
-> > # restore defaults:
-> > dev->shaper_ops->delete(dev, SHAPER_LOOKUP_BY_TREE_ID, new_node_id, &in=
-fo, &ack);
-> >=20
-> > likely some additional operation would be needed to traverse/fetch
-> > directly the actual shaper present at the attach points???
->=20
-> Whether type + ID (here SHAPER_LOOKUP_BY_QUEUE, queue_id) identifies
-> the node sufficiently to avoid the get is orthogonal. Your ->set
-> example assumes you don't have to do a get first to find exact
-> (synthetic) node ID. The same can be true for an ->add, if you prefer.
+Could these be pulled out into a helper? I see it repeated a lot.
 
-... my understanding is that you have strong preference over the
-'attach points' variant.
+> +
+> +	/* Turn the unstopped queues back up */
+> +	gve_turnup_and_check_status(priv);
+> +
+> +	*out_per_q_mem = rx;
+> +	return 0;
+> +}
+> +
+> +static void gve_rx_queue_mem_free(struct net_device *dev, void *per_q_mem)
+> +{
+> +	struct gve_priv *priv = netdev_priv(dev);
+> +	struct gve_rx_alloc_rings_cfg cfg = {0};
+> +	struct gve_rx_ring *rx;
+> +
+> +	gve_rx_get_curr_alloc_cfg(priv, &cfg);
+> +	rx = (struct gve_rx_ring *)per_q_mem;
+> +	if (!rx)
+> +		return;
 
-I think in the end is mostly a matter of clearly define
-expectation/behavior and initial status.=20
+This can be checked earlier.
 
-Assuming the initial tree is empty, and the kernel tracks all changes
-vs the default (empty tree) configuration, I guess it's probably better
-change slightly the ->add():
-
-int (*add)(struct net_device *dev,=C2=A0
-	   enum shaper_lookup_mode lookup_mode, // for the parent
-	   u32 parent_id			// relative to lookup_mode
-	   const struct shaper_info *shaper,    // 'id' and 'parent_id' fields
-						// are unused
-	   struct netlink_ext_ack *extack);
-
-so we can easily add/configure a queue shapers with a single op:
-
-	struct shaper_info attach_info;
-	info.bw_min =3D ...
-	dev->shaper_ops->add(dev, SHAPER_LOOKUP_BY_QUEUE, queue_id, &info, &ack);
-
-And possibly even the ->move() op:
-
-	int (*move)(struct net_device *dev,
-		    u32 id, // shapers to be moved, id is SHAPER_LOOKUP_BY_TREE_ID
-		    enum shaper_lookup_mode lookup_mode,=C2=A0// for the new parent
-		    u32 new_parent_id,=C2=A0			 // relative to 'lookup_mode'
-		    struct netlink_ext_ack *extack);
-
-Since it does not make sense to move around the attach point, the
-kernel knows the id of the created/modified nodes, and it should be
-useful be able to move the shaper directly under an arbitrary attach
-point.
-
-Finally, what about renaming the whole SHAPER_LOOKUP_* values to
-SHAPER_LOOKUP_TX_* so we can later easily extends this to RX?=20
-
-> I do find it odd that we have objects in multiple places of=20
-> the hierarchy when there is no configuration intended. Especially
-> that
-> the HW may actually not support such configuration (say there is
-> always
-> a DRR before the egress, now we insert a shaping stage there).
-
-Regardless of the model we chose (with 'attach points' or without), if
-the H/W does not support a given configuration, the relative op must
-fail. No shapers will be created matching an unsupported configuration.
-
-Thanks,
-
-Paolo
-
+> +
+> +	if (gve_is_gqi(priv))
+> +		gve_rx_free_ring_gqi(priv, rx, &cfg);
+> +	else
+> +		gve_rx_free_ring_dqo(priv, rx, &cfg);
+> +
+> +	kvfree(per_q_mem);
+> +}
+> +
+> +static void *gve_rx_queue_mem_alloc(struct net_device *dev, int idx)
+> +{
+> +	struct gve_priv *priv = netdev_priv(dev);
+> +	struct gve_rx_alloc_rings_cfg cfg = {0};
+> +	struct gve_rx_ring *rx;
+> +	int err;
+> +
+> +	gve_rx_get_curr_alloc_cfg(priv, &cfg);
+> +	if (idx < 0 || idx >= cfg.qcfg->max_queues)
+> +		return NULL;
+> +
+> +	rx = kvzalloc(sizeof(*rx), GFP_KERNEL);
+> +	if (!rx)
+> +		return NULL;
+> +
+> +	if (gve_is_gqi(priv))
+> +		err = gve_rx_alloc_ring_gqi(priv, &cfg, rx, idx);
+> +	else
+> +		err = gve_rx_alloc_ring_dqo(priv, &cfg, rx, idx);
+> +
+> +	if (err) {
+> +		kvfree(rx);
+> +		return NULL;
+> +	}
+> +	return rx;
+> +}
+> +
+> +static int gve_rx_queue_start(struct net_device *dev, int idx, void *per_q_mem)
+> +{
+> +	struct gve_priv *priv = netdev_priv(dev);
+> +	struct gve_rx_ring *rx;
+> +	int err;
+> +
+> +	if (!priv->rx)
+> +		return -EAGAIN;
+> +	if (idx < 0 || idx >= priv->rx_cfg.max_queues)
+> +		return -ERANGE;
+> +	rx = (struct gve_rx_ring *)per_q_mem;
+> +	priv->rx[idx] = *rx;
+> +
+> +	/* Single-queue creation requires quiescence on all queues */
+> +	gve_turndown(priv);
+> +
+> +	if (gve_is_gqi(priv))
+> +		gve_rx_start_ring_gqi(priv, idx);
+> +	else
+> +		gve_rx_start_ring_dqo(priv, idx);
+> +
+> +	/* This failure will trigger a reset - no need to clean up */
+> +	err = gve_adminq_create_single_rx_queue(priv, idx);
+> +	if (err)
+> +		return err;
+> +
+> +	if (gve_is_gqi(priv))
+> +		gve_rx_write_doorbell(priv, &priv->rx[idx]);
+> +	else
+> +		gve_rx_post_buffers_dqo(&priv->rx[idx]);
+> +
+> +	/* Turn the unstopped queues back up */
+> +	gve_turnup_and_check_status(priv);
+> +	return 0;
+> +}
+> +
+> +static const struct netdev_queue_mgmt_ops gve_queue_mgmt_ops = {
+> +	.ndo_queue_mem_alloc	=	gve_rx_queue_mem_alloc,
+> +	.ndo_queue_mem_free	=	gve_rx_queue_mem_free,
+> +	.ndo_queue_start	=	gve_rx_queue_start,
+> +	.ndo_queue_stop		=	gve_rx_queue_stop,
+> +};
+> +
+>  static int gve_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+>  {
+>  	int max_tx_queues, max_rx_queues;
+> @@ -2584,6 +2726,7 @@ static int gve_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+>  	pci_set_drvdata(pdev, dev);
+>  	dev->ethtool_ops = &gve_ethtool_ops;
+>  	dev->netdev_ops = &gve_netdev_ops;
+> +	dev->queue_mgmt_ops = &gve_queue_mgmt_ops;
+>  
+>  	/* Set default and supported features.
+>  	 *
+> diff --git a/drivers/net/ethernet/google/gve/gve_rx.c b/drivers/net/ethernet/google/gve/gve_rx.c
+> index 1d235caab4c5..307bf97d4778 100644
+> --- a/drivers/net/ethernet/google/gve/gve_rx.c
+> +++ b/drivers/net/ethernet/google/gve/gve_rx.c
+> @@ -101,8 +101,8 @@ void gve_rx_stop_ring_gqi(struct gve_priv *priv, int idx)
+>  	gve_rx_reset_ring_gqi(priv, idx);
+>  }
+>  
+> -static void gve_rx_free_ring_gqi(struct gve_priv *priv, struct gve_rx_ring *rx,
+> -				 struct gve_rx_alloc_rings_cfg *cfg)
+> +void gve_rx_free_ring_gqi(struct gve_priv *priv, struct gve_rx_ring *rx,
+> +			  struct gve_rx_alloc_rings_cfg *cfg)
+>  {
+>  	struct device *dev = &priv->pdev->dev;
+>  	u32 slots = rx->mask + 1;
+> @@ -270,10 +270,10 @@ void gve_rx_start_ring_gqi(struct gve_priv *priv, int idx)
+>  	gve_add_napi(priv, ntfy_idx, gve_napi_poll);
+>  }
+>  
+> -static int gve_rx_alloc_ring_gqi(struct gve_priv *priv,
+> -				 struct gve_rx_alloc_rings_cfg *cfg,
+> -				 struct gve_rx_ring *rx,
+> -				 int idx)
+> +int gve_rx_alloc_ring_gqi(struct gve_priv *priv,
+> +			  struct gve_rx_alloc_rings_cfg *cfg,
+> +			  struct gve_rx_ring *rx,
+> +			  int idx)
+>  {
+>  	struct device *hdev = &priv->pdev->dev;
+>  	u32 slots = cfg->ring_size;
+> diff --git a/drivers/net/ethernet/google/gve/gve_rx_dqo.c b/drivers/net/ethernet/google/gve/gve_rx_dqo.c
+> index dc2c6bd92e82..dcbc37118870 100644
+> --- a/drivers/net/ethernet/google/gve/gve_rx_dqo.c
+> +++ b/drivers/net/ethernet/google/gve/gve_rx_dqo.c
+> @@ -299,8 +299,8 @@ void gve_rx_stop_ring_dqo(struct gve_priv *priv, int idx)
+>  	gve_rx_reset_ring_dqo(priv, idx);
+>  }
+>  
+> -static void gve_rx_free_ring_dqo(struct gve_priv *priv, struct gve_rx_ring *rx,
+> -				 struct gve_rx_alloc_rings_cfg *cfg)
+> +void gve_rx_free_ring_dqo(struct gve_priv *priv, struct gve_rx_ring *rx,
+> +			  struct gve_rx_alloc_rings_cfg *cfg)
+>  {
+>  	struct device *hdev = &priv->pdev->dev;
+>  	size_t completion_queue_slots;
+> @@ -373,10 +373,10 @@ void gve_rx_start_ring_dqo(struct gve_priv *priv, int idx)
+>  	gve_add_napi(priv, ntfy_idx, gve_napi_poll_dqo);
+>  }
+>  
+> -static int gve_rx_alloc_ring_dqo(struct gve_priv *priv,
+> -				 struct gve_rx_alloc_rings_cfg *cfg,
+> -				 struct gve_rx_ring *rx,
+> -				 int idx)
+> +int gve_rx_alloc_ring_dqo(struct gve_priv *priv,
+> +			  struct gve_rx_alloc_rings_cfg *cfg,
+> +			  struct gve_rx_ring *rx,
+> +			  int idx)
+>  {
+>  	struct device *hdev = &priv->pdev->dev;
+>  	size_t size;
 
