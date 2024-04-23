@@ -1,102 +1,137 @@
-Return-Path: <netdev+bounces-90661-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90662-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DDC08AF712
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 21:14:47 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6EB0A8AF716
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 21:15:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 499C81C223B3
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 19:14:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 107511F23EE5
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 19:15:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6119D13E3F8;
-	Tue, 23 Apr 2024 19:14:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9881813FD72;
+	Tue, 23 Apr 2024 19:15:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="VMxNgFE7"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="hzFa8ov+"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8A8E1E49E;
-	Tue, 23 Apr 2024 19:14:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D8C413F458;
+	Tue, 23 Apr 2024 19:15:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713899683; cv=none; b=kB28G/8eIkltAjesDokvynwkCBW+BYSo+sBdeTuZFUlO3fw5XO8TUghZZW9T5qxfZWCK6+lozbMnOQs9LzkuRJ3CotvYSX0PEMvK2Sk2eN5c+4xdAF+XodKyySYnPEjMqco8Vtg9PwEtZeoJ02wPQiCFYIkdfyjVsS1uYq0fOss=
+	t=1713899730; cv=none; b=Mz82otAydzd6Cp88CbMbFqSVep5/lfQqfXEabO6G7f8K32Xsd2nYZgOf/+I1Z/pJdv4z42WYToSgmW8IJF/h6/iFsx0eJfRUxbSNnoKu+FwTB490RorrViwdRiX+c5n77hAR2Jweyx9ibK1yLImDV5xyYoDUPireS1bbGzTy2p4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713899683; c=relaxed/simple;
-	bh=vHCfR07oU6jXib+D/KGYmjmEdexZMbpvXTHnBEU9KGo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fYS3QK+DUNGml2zV7f+UATgwGgx+Pv82ctthZ0No/NjgGi6iJCS0icQ2/D/O5OZbvcmFQWnayiW9Zxr4GFibxO+S+hrGq0k7s3y4x2y6p2ydmqTNMT1WhLE2ok4reYM4tf1mTi6f7rv9amCYwMQhs3mcuyKf9l5RGBqooJ3oCTg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=VMxNgFE7; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=m/j47UCoCVDN051XsJvZ/Szrqafk0ETS8lvIj7OcbyY=; b=VMxNgFE7yJtbn8XCv0oN4WtWH3
-	9Ay3zHGNLSUDat1mAimTbSPhdHD05TQAwG8VC91v1fktQzF0Ai5L2UdNWgZcjzq4QsrIshvn3l7Ib
-	usqRHqFwqc75QdegQlnGPXUQntzUBPqzHd7XOHMyI6rRr4oB/KT//TMSWyVYmSDcZcSKF7V/ez1yW
-	p0EYl1NDn+03AkfoSJKsI6BDurOuljFj+AA0KHC7yTLpJQ8hl3z9K1dQrNSkeGUs8mGMIKP5YdliM
-	efJz2bSXQyDGcuXEbyPhoElMMqUyteZoymGxOCVWJC367AeRg25sWmY2GUTPaQd+FPwygxdYA3929
-	n0mkUyHQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:49760)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1rzLb1-0004xi-0L;
-	Tue, 23 Apr 2024 20:14:27 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rzLb0-0003cf-4K; Tue, 23 Apr 2024 20:14:26 +0100
-Date: Tue, 23 Apr 2024 20:14:26 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Florian Fainelli <florian.fainelli@broadcom.com>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
+	s=arc-20240116; t=1713899730; c=relaxed/simple;
+	bh=NamVyGNhcAdeE0FhFAkCQho8WPc4LSkNyW3eImgeIWg=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=o2cUGzottuBXjSgTk0ebQNsnDB2BCpS2fM/hRxJuSKrw0uhRwg25Ja3GYDrv8PXnxv+mHDHFqZ4hDzg0MoKPp9xRdIParWijagDG5q1G/EE6cZJh33TE/T1XuE4SAinDBNM0sRRRZGVNOj2A88uLedhWSQcgQ26H5lnXMhLmD3k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=hzFa8ov+; arc=none smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1713899728; x=1745435728;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=NamVyGNhcAdeE0FhFAkCQho8WPc4LSkNyW3eImgeIWg=;
+  b=hzFa8ov+I39C5k+TN8xuPYAJgxKYhGTThO8EvPyZlaIeyeTQmsV3ALzd
+   l/xkfGbMAFyGSKwot86jYtQWnaOZ7ge01zWMVzlN49UUu31rJso1/G2wD
+   8P0KTgIkMP7fqINgL0NTnf3xjRI2QPimaKZzfLBi2Fk61L6ToA5YkjmEe
+   9i7M9OYLs2HXBjQtnIo+8i2eDmAcF0E9kL3oRVgAvaAWJNlGme8F/hu18
+   h3m9wGigXYgoqrWt6AdHs4LzF964AQ3bIO2Ox0453Tg+RPb2Z3apA8t5H
+   vXcBTfzTVkfQdaQlwkzrV/NRYV8dps62aSkGGlGmt6UFmNOKB4gS+NNgJ
+   A==;
+X-CSE-ConnectionGUID: Kl1sSzTvQmW3T0xKu8i8cQ==
+X-CSE-MsgGUID: kh67dMNmQUKYdaHvQwgKZQ==
+X-IronPort-AV: E=Sophos;i="6.07,222,1708412400"; 
+   d="scan'208";a="189648523"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 23 Apr 2024 12:15:27 -0700
+Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
+ chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Tue, 23 Apr 2024 12:15:19 -0700
+Received: from DEN-DL-M70577 (10.10.85.11) by chn-vm-ex04.mchp-main.com
+ (10.10.85.152) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
+ Transport; Tue, 23 Apr 2024 12:15:16 -0700
+Date: Tue, 23 Apr 2024 19:15:16 +0000
+From: Daniel Machon <daniel.machon@microchip.com>
+To: =?utf-8?Q?Asbj=C3=B8rn_Sloth_T=C3=B8nnesen?= <ast@fiberby.net>
+CC: <netdev@vger.kernel.org>, Steen Hegelund <Steen.Hegelund@microchip.com>,
+	Lars Povlsen <lars.povlsen@microchip.com>, <UNGLinuxDriver@microchip.com>,
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next 0/8] net: dsa: b53: Remove adjust_link
-Message-ID: <ZigIkdr/FEmBZRLP@shell.armlinux.org.uk>
-References: <20240423183339.1368511-1-florian.fainelli@broadcom.com>
+	<linux-kernel@vger.kernel.org>, Jacob Keller <jacob.e.keller@intel.com>
+Subject: Re: [PATCH net-next 1/2] net: sparx5: flower: cleanup
+ sparx5_tc_flower_handler_control_usage()
+Message-ID: <20240423191516.o6ssgqhrsk7hizdk@DEN-DL-M70577>
+References: <20240423102728.228765-1-ast@fiberby.net>
+ <20240423111515.wzvclnlxdwv77zy7@DEN-DL-M70577>
+ <8e112b31-0168-4e82-a378-87211ea99cfa@fiberby.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="iso-8859-1"
 Content-Disposition: inline
-In-Reply-To: <20240423183339.1368511-1-florian.fainelli@broadcom.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <8e112b31-0168-4e82-a378-87211ea99cfa@fiberby.net>
 
-On Tue, Apr 23, 2024 at 11:33:31AM -0700, Florian Fainelli wrote:
-> b53 is now the only remaining driver that uses both PHYLIB's adjust_link
-> and PHYLINK's mac_ops callbacks, convert entirely to PHYLINK.
+> > > -       if (mt.mask->flags) {
+> > > +       if (mt.mask->flags & (FLOW_DIS_IS_FRAGMENT | FLOW_DIS_FIRST_FRAG)) {
+> > 
+> > Since these flags are used here and in the next patch, maybe assign them
+> > to a variable:
+> > 
+> > u32 supp_flags = FLOW_DIS_IS_FRAGMENT | FLOW_DIS_FIRST_FRAG
+> > 
+> > And update the use throughout.
 > 
-> Florian Fainelli (8):
->   net: dsa: b53: Stop exporting b53_phylink_* routines
->   net: dsa: b53: Introduce b53_adjust_531x5_rgmii()
->   net: dsa: b53: Introduce b53_adjust_5325_mii()
->   net: dsa: b53: Force flow control for BCM5301X CPU port(s)
->   net: dsa: b53: Configure RGMII for 531x5 and MII for 5325
->   net: dsa: b53: Call b53_eee_init() from b53_mac_link_up()
->   net: dsa: b53: Remove b53_adjust_link()
->   net: dsa: b53: provide own phylink MAC operations
+> In an earlier state this patch had a #define SPARX5_FLOWER_SUPPORTED_CTLFLAGS,
+> in the same style as nfp in drivers/net/ethernet/netronome/nfp/flower/offload.c
+> 
+> Right now, this driver supports all currently defined flags (which are used with mask),
+> so the point of using flow_rule_is_supp_control_flags() to this dirver, is to
+> make it possible to introduce new flags in the future, without having to update
+> all drivers to explicitly not support a new flag.
+> 
+> My problem with using supp_flags in both places is: What happens when support
+> for a new flag is introduced?
+> 
+> u32 supp_flags = FLOW_DIS_IS_FRAGMENT | FLOW_DIS_FIRST_FRAG | FLOW_DIS_NEW_FLAG;
+> 
+> if (mt.mask->flags & (FLOW_DIS_IS_FRAGMENT | FLOW_DIS_FIRST_FRAG))
+>         /* handle fragment flags through lookup table */
+> 
+> if (mt.mask->flags & FLOW_DIS_NEW_FLAG)
+>         /* do something */
+> 
+> if (!flow_rule_is_supp_control_flags(supp_flags, mt.mask->flags, extack))
+>         return -EOPNOTSUPP;
+> 
+> The fragment lookup table code currently requires the above guarding,
+> as [0][0] in the lookup table is FRAG_INVAL, and not FRAG_SHRUG.
+> 
+> What do you think?
 
-Read through the series, nothing obvious stands out, thanks for doing
-this!
+Yes - lets only check for fragment flags when doing the lookup. I am
+fine with your original impl.
 
-For the series:
+If you can fix the remaining issue, I will take the patches for a test
+spin tomorrow.
 
-Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Thanks!
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+> 
+> --
+> Best regards
+> Asbjørn Sloth Tønnesen
+> Network Engineer
+> Fiberby - AS42541
 
