@@ -1,155 +1,229 @@
-Return-Path: <netdev+bounces-90384-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90388-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 535E28ADF05
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 10:00:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C88AD8ADF51
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 10:05:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BF5E21F242D7
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 08:00:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7E6E128761F
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 08:05:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E36315102F;
-	Tue, 23 Apr 2024 07:56:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F3F458AB8;
+	Tue, 23 Apr 2024 08:03:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DCpgKnms"
+	dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b="XZeV3YWG"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from todd.t-8ch.de (todd.t-8ch.de [159.69.126.157])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B9B150291
-	for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 07:56:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1BF34CDF9;
+	Tue, 23 Apr 2024 08:03:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.69.126.157
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713859001; cv=none; b=NdLvUFfFutNp7/zbocGHfZEOJ/g4wYZYyOslDsdeBI8hNMjzKx/8Zw0rKRTlWR0J0vzboJ+evrZm7E3esgcQhqKrVfjzHKA8uACmmj+P7l67SF9alT55fjw0QIX9Pvwute51lG59zXIXbOxT6HWDiszd6i7YAGWfUcqQ3fH4RI4=
+	t=1713859392; cv=none; b=Ya6viw0K7g6ysUOfZ3po53vCmIny7S2m1AkK0LNU477Oql7Y6/ZUNMRrQ4+xFXaelaACVXfzMSWhsBV56GYMFAfXh1X16j8X7cfVT9L9npKIyEZddFAIcLnTnTLDGvZy9Pa4PcfGGam6qd0bxUTcwUKAAlo5E3ezRgDhV2CqXMQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713859001; c=relaxed/simple;
-	bh=1TlwN3xC88ayoJNrLD/eruVrZt0lEHJ+l9v4qt0so9s=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=sYx7sBqt5I4OA5rDwjjd09FHqbt5AumS3M9yIHFXZ/b16jreHczSWGyzY95eZknW+d50rOf9LnETOuAjA/tNVpN/a1qJSjKld4gec40HKUeug9LegsSj+3OmSeWQ/ZGRULglzKlKM55yssbq2V8aGV9OfsVv7iiICSLaNjStEZ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DCpgKnms; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1713858999;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=1TlwN3xC88ayoJNrLD/eruVrZt0lEHJ+l9v4qt0so9s=;
-	b=DCpgKnmscXEMFrR5mN4sljd5/QhaBFfjDVqTHpobI7dRH9dHjR389PsqIXN7+krcxCurZj
-	8Z7smPvcwi4HSIQFLSlNt2hupwGG8NJlMQtQn4G5VaSPaaDI6dZ+8Kgx8LEhNOolH0qJSU
-	JlHVPKI4H0bZQWapSUjzHmbaBnAExSI=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-150-NAMgenYmMHeL6Oq9fd31sw-1; Tue, 23 Apr 2024 03:56:37 -0400
-X-MC-Unique: NAMgenYmMHeL6Oq9fd31sw-1
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4188cfbabe3so6566875e9.3
-        for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 00:56:37 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713858996; x=1714463796;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1TlwN3xC88ayoJNrLD/eruVrZt0lEHJ+l9v4qt0so9s=;
-        b=anVKetmJa30xkoKvXPeFvls3A0HOcHBWvJWBfg3B3aK+RWxVZovuNGilXkEnOyz0Yu
-         aD9cvurLcTnzv0A+enlnlvyfG8Myg1wenE5u4GDYMI8Kv9W7iiEITmyM8/CSmZAQBL4o
-         KpFULLa7DxfG+T5ca+g+y3Yw1Ah8Jv/hI1f8B3S5KCJW9if9WG0GYgPAfkjVqAUtopMe
-         gqIVWT0kGprJFVza2g+C5x2TswxD7ezBd9cYP4CNWxAaqVF99gj86r/8y+sx9oPjxqAX
-         rtT5MVjlrwthlgsfYN7RHpBY+9zYAGgUWbN4BzKplx6QYJKnLElzI1qxIAuEwGpAHV0d
-         q1xQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUjcXdrAXBwuyJGD6C6Is7iGacp6XclfMnLuFhuf1gahsmge/iRj1mQYFh2PnvytU1dLWAAcLxS3DYb0QLkyW/ixbAUvqyn
-X-Gm-Message-State: AOJu0YzbFMWGmtOD3RunnwUhENxKu0850hpn4efbTJ6EaDkfrPLTgYL7
-	fLx0j+OJmQtxUee9Ma/oV7+Zu73MwTDA7UycKJR7mxu+4Kv8fjCbW+cNtqn2qPIVPpf2KsHQa6l
-	hjlQya+fBK7JUnJ6uCO5cR2CtD0UhH3znC5vU9VQ4ApcoZxH/Ujkw0fHGtNCm4Q==
-X-Received: by 2002:a05:600c:1c9c:b0:418:ef65:4b5f with SMTP id k28-20020a05600c1c9c00b00418ef654b5fmr8515113wms.3.1713858995822;
-        Tue, 23 Apr 2024 00:56:35 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGtvdpUVvfIE8HC9Y+s3Tq+/zaxNSctKzEy8pHTqosbTtivobUYHvfaAeLs5EJT7EP/75KXhA==
-X-Received: by 2002:a05:600c:1c9c:b0:418:ef65:4b5f with SMTP id k28-20020a05600c1c9c00b00418ef654b5fmr8515102wms.3.1713858995416;
-        Tue, 23 Apr 2024 00:56:35 -0700 (PDT)
-Received: from gerbillo.redhat.com ([2a0d:3344:172c:4510::f71])
-        by smtp.gmail.com with ESMTPSA id o14-20020a05600c510e00b00419f572671dsm10859790wms.20.2024.04.23.00.56.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Apr 2024 00:56:34 -0700 (PDT)
-Message-ID: <e67ea4ee50b7a5e4774d3e91a1bfb4d14bfa308e.camel@redhat.com>
-Subject: Re: [RFC PATCH] net: skb: Increasing allocation in
- __napi_alloc_skb() to 2k when needed.
-From: Paolo Abeni <pabeni@redhat.com>
-To: David J Wilder <dwilder@us.ibm.com>, netdev@vger.kernel.org
-Date: Tue, 23 Apr 2024 09:56:33 +0200
-In-Reply-To: <20240419222328.3231075-1-dwilder@us.ibm.com>
-References: <20240419222328.3231075-1-dwilder@us.ibm.com>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
+	s=arc-20240116; t=1713859392; c=relaxed/simple;
+	bh=O54mll2lZcxHuSuV6IhzlmRJxXGkXc6uykp5lefHyQg=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=gaxnNLFRfa/rRu26DvoPCR2gJF6S5ZUu/9IgdTh7KdXGeiC3VFOFtfiXrB7uipyMy8TyuUUdaaC+RFczQ5hOcUaKzTz728DcUJFUzSVQROsI6t5ufNga4BE7zBC7H1MvXZiy2dKr1NF0gjhNvfOdAUjmPrRktT4jX7dKbgDnvUs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=weissschuh.net; spf=pass smtp.mailfrom=weissschuh.net; dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b=XZeV3YWG; arc=none smtp.client-ip=159.69.126.157
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=weissschuh.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=weissschuh.net
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=weissschuh.net;
+	s=mail; t=1713858962;
+	bh=O54mll2lZcxHuSuV6IhzlmRJxXGkXc6uykp5lefHyQg=;
+	h=From:Subject:Date:To:Cc:From;
+	b=XZeV3YWGKdzXDyt2gGdiSBu+tAR9ehmxCo0/cgGTgNF4l9KeVxXCrFY2tRLq1+ykl
+	 c6TDhFBKGpJkh/D8HY03220W94T6e0r+dDxGxBkrr0k1umozRGS6gkzuySz0B7Xa/g
+	 8yXILGrDVWsr+D5Q4C7df89uD11g1JxsYDcXWzP0=
+From: =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
+Subject: [PATCH v3 00/11] sysctl: treewide: constify ctl_table argument of
+ sysctl handlers
+Date: Tue, 23 Apr 2024 09:54:35 +0200
+Message-Id: <20240423-sysctl-const-handler-v3-0-e0beccb836e2@weissschuh.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-B4-Tracking: v=1; b=H4sIADtpJ2YC/3XOwQ7CIAwG4FdZOIuB4oR48j2Mh411QrIwQxFdl
+ r27bCcT9fg3/b92ZoTRI7FTNbOI2ZMfQwlqVzHrmnBD7ruSGQhQEuDIaSKbBm7HQImXjW7AyI1
+ RbY1to9EIVqr3iL1/bezlWrLzlMY4bVeyXKcreBBK1r/BLLngUgE0VttWqO78RE9E1j3cPmBiq
+ 5rhQwL1R4IilbdaqU0vNegvaVmWN33FrUoHAQAA
+To: Luis Chamberlain <mcgrof@kernel.org>, 
+ Joel Granados <j.granados@samsung.com>, Kees Cook <keescook@chromium.org>
+Cc: Eric Dumazet <edumazet@google.com>, Dave Chinner <david@fromorbit.com>, 
+ linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org, 
+ linux-arm-kernel@lists.infradead.org, linux-s390@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org, 
+ linux-mm@kvack.org, linux-security-module@vger.kernel.org, 
+ bpf@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+ linux-xfs@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
+ linux-perf-users@vger.kernel.org, netfilter-devel@vger.kernel.org, 
+ coreteam@netfilter.org, kexec@lists.infradead.org, 
+ linux-hardening@vger.kernel.org, bridge@lists.linux.dev, 
+ lvs-devel@vger.kernel.org, linux-rdma@vger.kernel.org, 
+ rds-devel@oss.oracle.com, linux-sctp@vger.kernel.org, 
+ linux-nfs@vger.kernel.org, apparmor@lists.ubuntu.com, 
+ =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
+X-Mailer: b4 0.13.0
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1713858961; l=7199;
+ i=linux@weissschuh.net; s=20221212; h=from:subject:message-id;
+ bh=O54mll2lZcxHuSuV6IhzlmRJxXGkXc6uykp5lefHyQg=;
+ b=SEVrV4QL0aRQf4sZAyD6Lh+KIYjBicAEwKhtJ0PUAXQvKQVj+Lo8XxYFfez7YZFSvNW40HQoh
+ r7IOwglEOGsCcMSO1z8xH6fte/UGc8Ay9QjWTKXdmQpGpMwPGKciBsV
+X-Developer-Key: i=linux@weissschuh.net; a=ed25519;
+ pk=KcycQgFPX2wGR5azS7RhpBqedglOZVgRPfdFSPB1LNw=
 
-On Fri, 2024-04-19 at 15:23 -0700, David J Wilder wrote:
-> When testing CONFIG_MAX_SKB_FRAGS=3D45 on ppc64le and x86_64 I ran into a
-> couple of issues.
->=20
-> __napi_alloc_skb() assumes its smallest fragment allocations will fit in
-> 1K. When CONFIG_MAX_SKB_FRAGS is increased this may no longer be true
-> resulting in __napi_alloc_skb() reverting to using page_frag_alloc().
-> This results in the return of the bug fixed in:
-> Commit 3226b158e67c ("net: avoid 32 x truesize under-estimation for
-> tiny skbs")
->=20
-> That commit insured that "small skb head fragments are kmalloc backed,
-> so that other objects in the slab page can be reused instead of being hel=
-d
-> as long as skbs are sitting in socket queues."
->=20
-> On ppc64le the warning from napi_get_frags_check() is displayed when
-> CONFIG_MAX_SKB_FRAGS is set to 45. The purpose of the warning is to detec=
-t
-> when an increase of MAX_SKB_FRAGS has reintroduced the aforementioned bug=
-.
-> Unfortunately on x86_64 this warning is not seen, even though it should b=
-e.
-> I found the warning was disabled by:
-> commit dbae2b062824 ("net: skb: introduce and use a single page frag
-> cache")
->=20
-> This RFC patch to __napi_alloc_skb() determines if an skbuff allocation
-> with a head fragment of size GRO_MAX_HEAD will fit in a 1k allocation,
-> increasing the allocation to 2k if needed.
->=20
-> I have functionally tested this patch, performance testing is still neede=
-d.
->=20
-> TBD: Remove the limitation on 4k page size from the single page frag cach=
-e
-> allowing ppc64le (64K page size) to benefit from this change.
->=20
-> TBD: I have not address the warning in napi_get_frags_check() on x86_64.
-> Will the warning still be needed once the other changes are completed?
+* Patch 1 is a bugfix for the stack_erasing sysctl handler
+* Patches 2-10 change various helper functions throughout the kernel to
+  be able to handle 'const ctl_table'.
+* Patch 11 changes the signatures of all proc handlers through the tree.
+  Some other signatures are also adapted, for details see the commit
+  message.
 
+Only patch 1 changes any code at all.
 
-Thanks for the detailed analysis.
+The series was compile-tested on top of next-20230423 for
+i386, x86_64, arm, arm64, riscv, loongarch, s390 and m68k.
 
-As mentioned by Eric in commit
-bf9f1baa279f0758dc2297080360c5a616843927, it should be now possible to
-revert dbae2b062824 without incurring in performance regressions for
-the relevant use-case. I had that on my todo list since a lot of time,
-but I was unable to allocate time for that.
+The series was split from my larger series sysctl-const series [0].
+It only focusses on the proc_handlers but is an important step to be
+able to move all static definitions of ctl_table into .rodata.
 
-I think such revert would be preferable. Would you be able to evaluate
-such option?
+[0] https://lore.kernel.org/lkml/20231204-const-sysctl-v2-0-7a5060b11447@weissschuh.net/
 
-Thanks!
+Signed-off-by: Thomas Weißschuh <linux@weissschuh.net>
+---
+Changes in v3:
+- Rebase on current -next
+- Cc affected mailing lists again to gather feedback
+- Link to v2: https://lore.kernel.org/r/20240323-sysctl-const-handler-v2-0-e80b178f1727@weissschuh.net
 
-Paolo
+Changes in v2:
+- Reduce recipient list
+- Fix source formatting
+- Rebase onto next-20240322
+- Link to v1: https://lore.kernel.org/r/20240315-sysctl-const-handler-v1-0-1322ac7cb03d@weissschuh.net
+
+---
+Thomas Weißschuh (11):
+      stackleak: don't modify ctl_table argument
+      cgroup: bpf: constify ctl_table arguments and fields
+      hugetlb: constify ctl_table arguments of utility functions
+      utsname: constify ctl_table arguments of utility function
+      neighbour: constify ctl_table arguments of utility function
+      ipv4/sysctl: constify ctl_table arguments of utility functions
+      ipv6/addrconf: constify ctl_table arguments of utility functions
+      ipv6/ndisc: constify ctl_table arguments of utility function
+      ipvs: constify ctl_table arguments of utility functions
+      sysctl: constify ctl_table arguments of utility function
+      sysctl: treewide: constify the ctl_table argument of handlers
+
+ arch/arm64/kernel/armv8_deprecated.c      |  2 +-
+ arch/arm64/kernel/fpsimd.c                |  2 +-
+ arch/s390/appldata/appldata_base.c        | 10 ++--
+ arch/s390/kernel/debug.c                  |  2 +-
+ arch/s390/kernel/topology.c               |  2 +-
+ arch/s390/mm/cmm.c                        |  6 +--
+ arch/x86/kernel/itmt.c                    |  2 +-
+ drivers/cdrom/cdrom.c                     |  4 +-
+ drivers/char/random.c                     |  6 +--
+ drivers/macintosh/mac_hid.c               |  2 +-
+ drivers/net/vrf.c                         |  2 +-
+ drivers/parport/procfs.c                  | 12 ++---
+ drivers/perf/arm_pmuv3.c                  |  4 +-
+ drivers/perf/riscv_pmu_sbi.c              |  2 +-
+ fs/coredump.c                             |  2 +-
+ fs/dcache.c                               |  4 +-
+ fs/drop_caches.c                          |  2 +-
+ fs/exec.c                                 |  4 +-
+ fs/file_table.c                           |  4 +-
+ fs/fs-writeback.c                         |  2 +-
+ fs/inode.c                                |  4 +-
+ fs/pipe.c                                 |  2 +-
+ fs/quota/dquot.c                          |  2 +-
+ fs/xfs/xfs_sysctl.c                       |  6 +--
+ include/linux/filter.h                    |  2 +-
+ include/linux/ftrace.h                    |  4 +-
+ include/linux/mm.h                        |  8 +--
+ include/linux/perf_event.h                |  6 +--
+ include/linux/security.h                  |  2 +-
+ include/linux/sysctl.h                    | 36 ++++++-------
+ include/linux/vmstat.h                    |  6 +--
+ include/linux/writeback.h                 |  2 +-
+ include/net/ndisc.h                       |  2 +-
+ include/net/neighbour.h                   |  6 +--
+ include/net/netfilter/nf_hooks_lwtunnel.h |  2 +-
+ ipc/ipc_sysctl.c                          |  8 +--
+ kernel/bpf/syscall.c                      |  4 +-
+ kernel/delayacct.c                        |  4 +-
+ kernel/events/callchain.c                 |  2 +-
+ kernel/events/core.c                      |  4 +-
+ kernel/fork.c                             |  2 +-
+ kernel/hung_task.c                        |  6 +--
+ kernel/kexec_core.c                       |  2 +-
+ kernel/kprobes.c                          |  2 +-
+ kernel/latencytop.c                       |  4 +-
+ kernel/pid_namespace.c                    |  2 +-
+ kernel/pid_sysctl.h                       |  2 +-
+ kernel/printk/internal.h                  |  2 +-
+ kernel/printk/printk.c                    |  2 +-
+ kernel/printk/sysctl.c                    |  5 +-
+ kernel/sched/core.c                       |  8 +--
+ kernel/sched/rt.c                         | 16 +++---
+ kernel/sched/topology.c                   |  2 +-
+ kernel/seccomp.c                          | 10 ++--
+ kernel/stackleak.c                        |  9 ++--
+ kernel/sysctl.c                           | 89 ++++++++++++++++---------------
+ kernel/time/timer.c                       |  2 +-
+ kernel/trace/ftrace.c                     |  2 +-
+ kernel/trace/trace.c                      |  2 +-
+ kernel/trace/trace_events_user.c          |  2 +-
+ kernel/trace/trace_stack.c                |  2 +-
+ kernel/umh.c                              |  2 +-
+ kernel/utsname_sysctl.c                   |  4 +-
+ kernel/watchdog.c                         | 12 ++---
+ mm/compaction.c                           |  6 +--
+ mm/hugetlb.c                              | 12 ++---
+ mm/page-writeback.c                       | 18 +++----
+ mm/page_alloc.c                           | 14 ++---
+ mm/util.c                                 | 12 ++---
+ mm/vmstat.c                               |  4 +-
+ net/bridge/br_netfilter_hooks.c           |  2 +-
+ net/core/neighbour.c                      | 20 +++----
+ net/core/sysctl_net_core.c                | 20 +++----
+ net/ipv4/devinet.c                        |  6 +--
+ net/ipv4/route.c                          |  2 +-
+ net/ipv4/sysctl_net_ipv4.c                | 38 ++++++-------
+ net/ipv6/addrconf.c                       | 27 +++++-----
+ net/ipv6/ndisc.c                          |  4 +-
+ net/ipv6/route.c                          |  2 +-
+ net/ipv6/sysctl_net_ipv6.c                |  4 +-
+ net/mpls/af_mpls.c                        |  4 +-
+ net/netfilter/ipvs/ip_vs_ctl.c            | 19 +++----
+ net/netfilter/nf_conntrack_standalone.c   |  2 +-
+ net/netfilter/nf_hooks_lwtunnel.c         |  2 +-
+ net/netfilter/nf_log.c                    |  2 +-
+ net/phonet/sysctl.c                       |  2 +-
+ net/rds/tcp.c                             |  4 +-
+ net/sctp/sysctl.c                         | 32 +++++------
+ net/sunrpc/sysctl.c                       |  6 +--
+ net/sunrpc/xprtrdma/svc_rdma.c            |  2 +-
+ security/apparmor/lsm.c                   |  2 +-
+ security/min_addr.c                       |  2 +-
+ security/yama/yama_lsm.c                  |  2 +-
+ 93 files changed, 329 insertions(+), 322 deletions(-)
+---
+base-commit: a59668a9397e7245b26e9be85d23f242ff757ae8
+change-id: 20231226-sysctl-const-handler-883b5eba7e80
+
+Best regards,
+-- 
+Thomas Weißschuh <linux@weissschuh.net>
 
 
