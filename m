@@ -1,118 +1,79 @@
-Return-Path: <netdev+bounces-90616-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90617-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 835EC8AF3C3
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 18:18:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B86398AF3E4
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 18:25:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 232441F23643
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 16:18:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7254328AAAF
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 16:25:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCA2113CAB5;
-	Tue, 23 Apr 2024 16:18:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42F0213E057;
+	Tue, 23 Apr 2024 16:23:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o2tcZPud"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="nThVN82K"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 982B913C9DF
-	for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 16:18:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01C7113E03B;
+	Tue, 23 Apr 2024 16:23:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713889134; cv=none; b=uTP5vp2GiTvCF+WYyFmcv7csgPC2UtV3F2gPhUsIILkkWtocj8QmI1HLYnYqnXCCvGHRwvbuBl9kuqyzbuaTyvAjYHPrM4lF66Ga8a/ynQofaHeifeG5To7kYFFHwqlgUADa87ryXspjncc4im9QwgVpyifyjuRowyQf53Vgus4=
+	t=1713889436; cv=none; b=BqmXzBuyTuzJ7BxV6Bl49D0Xvg0s+Zvs7RUqrYP7pJp/g/jWH7TStlSlJZWe9MkXi86yVzujU94PPC/jx8z700OXsAFGp4T7tp3A1Cv4pWU+Shgc39tVnAzgN5TS1F5sG6rbkV8QTs4Rd5sWhP+BxzzP6cvFlFDYtP9mh6IDCUg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713889134; c=relaxed/simple;
-	bh=JJPdZeRSB0G7BWjAMGmMubvKNrJMsm7LhBJ9zzq/Hfg=;
+	s=arc-20240116; t=1713889436; c=relaxed/simple;
+	bh=3rE8iCzACJ3xQrQo2n7+k+pI9IyJWXmBfSTaEbZ8Wjc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XDEhTtyfwdONOtM5vFpx2fzJC6qePJfylwZ91DLzrOpvWzBalJy8RsvVIhyTde9Xi+QYInK/L1zigar9GKR4B/xJvK2TG0cEIyC+EImQB5cUxW/+nxt4gg6UHnvOHVTO3kxTsmD4kEc7nZM2Dl2lrYVJB24OchhAfUmLaFT28bY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o2tcZPud; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52C6AC116B1;
-	Tue, 23 Apr 2024 16:18:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713889134;
-	bh=JJPdZeRSB0G7BWjAMGmMubvKNrJMsm7LhBJ9zzq/Hfg=;
+	 Content-Type:Content-Disposition:In-Reply-To; b=f5Q9jE2yRf4WcgE96Yp+pbnlQVj2erMo7imzg1QlcbZqAdt533LxNleT+2MfqeDsvKFXXL1UFfz9VCZKhyMf7HJhtg8xQ3OPRo0CUaLFjMEuRvssQrnqyCKwKvDyiYzaJ2uYeiFVEcp7isn9hzxOZNzQbMmCC+7Id10awOy+VqI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=nThVN82K; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 801D2C116B1;
+	Tue, 23 Apr 2024 16:23:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1713889435;
+	bh=3rE8iCzACJ3xQrQo2n7+k+pI9IyJWXmBfSTaEbZ8Wjc=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=o2tcZPudzWK7CpfFi7IxJqaL2SdA5471xtcrRRGugct4rGMzS5cF+aeKHpVJ0iDXn
-	 q+6PJ/A/EcngAsVrGDHgB06ISRRQPW3NsdYAZ7svncj4pQJx2X+TCDg0fb6LlcsyM/
-	 LRnwEwZsNT7a2cDwfUy9yki5a5z+1xC62X88lObdYYJAtC1NS/iEphC4xiSEWlDqWu
-	 eoIDAumbBMqm8bFsgRqVEVg+Ab0QfNVU6TUTqi3ikyMWfKvh6aUZ67vhvYq124DzDZ
-	 2ZUbg26tonhU8ey7z4K13XJv4LRCvkx7+tidNV8jrdiTDzH/R/bD/8xpUYFqfbNLkf
-	 ELVz7lg6uHriQ==
-Date: Tue, 23 Apr 2024 17:18:49 +0100
-From: Simon Horman <horms@kernel.org>
-To: Daniel Machon <daniel.machon@microchip.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Bryan Whitehead <bryan.whitehead@microchip.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Horatiu Vultur <horatiu.vultur@microchip.com>,
-	Lars Povlsen <lars.povlsen@microchip.com>,
-	Steen Hegelund <Steen.Hegelund@microchip.com>,
-	UNGLinuxDriver@microchip.com, netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH net-next 4/4] net: sparx5: Correct spelling in comments
-Message-ID: <20240423161849.GW42092@kernel.org>
-References: <20240419-lan743x-confirm-v1-0-2a087617a3e5@kernel.org>
- <20240419-lan743x-confirm-v1-4-2a087617a3e5@kernel.org>
- <20240420192424.42z2aztt73grdvsj@DEN-DL-M70577>
- <20240422105756.GC42092@kernel.org>
- <20240423112915.5cmqvmvwfwutahky@DEN-DL-M70577>
- <20240423135417.GT42092@kernel.org>
+	b=nThVN82Kxi0XgxvS273sJ4SetvM8MeSKZouTlFVsenVzlc1/VrdZZgIJrVhWcdZmX
+	 5WhQ51oV4EBJq/gZUbuesH0JENAYYo+IuK0cCGG8r+whTh4eAIrs7PlS9jlzZrUB8c
+	 nq3oGE4gtw/xO/KFmMH7+7ybYSTvHxN6zEKd8Bqo=
+Date: Tue, 23 Apr 2024 09:23:46 -0700
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: =?iso-8859-1?B?Suly9G1l?= Carretero <cJ-ko@zougloub.eu>
+Cc: Sasha Neftin <sasha.neftin@intel.com>, netdev@vger.kernel.org,
+	intel-wired-lan@lists.osuosl.org, linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [Intel-wired-lan] [BUG] e1000e, scheduling while atomic (stable)
+Message-ID: <2024042328-footprint-enrage-2db3@gregkh>
+References: <a7eb665c74b5efb5140e6979759ed243072cb24a.camel@zougloub.eu>
+ <dff8729b-3ab6-4b54-a3b0-60fabf031d62@intel.com>
+ <2259bbeb9a012548779e3bf09a393fdb7d62dd0c.camel@zougloub.eu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20240423135417.GT42092@kernel.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <2259bbeb9a012548779e3bf09a393fdb7d62dd0c.camel@zougloub.eu>
 
-On Tue, Apr 23, 2024 at 02:54:17PM +0100, Simon Horman wrote:
-> On Tue, Apr 23, 2024 at 11:29:15AM +0000, Daniel Machon wrote:
-> > > > Hi Simon,
-> > > >
-> > > > > -/* Convert validation error code into tc extact error message */
-> > > > > +/* Convert validation error code into tc exact error message */
-> > > >
-> > > > This seems wrong. I bet it refers to the 'netlink_ext_ack' struct. So
-> > > > the fix should be 'extack' instead.
-> > > >
-> > > > >  void vcap_set_tc_exterr(struct flow_cls_offload *fco, struct vcap_rule *vrule)
-> > > > >  {
-> > > > >         switch (vrule->exterr) {
-> > > > > diff --git a/drivers/net/ethernet/microchip/vcap/vcap_api_client.h b/drivers/net/ethernet/microchip/vcap/vcap_api_client.h
-> > > > > index 56874f2adbba..d6c3e90745a7 100644
-> > > > > --- a/drivers/net/ethernet/microchip/vcap/vcap_api_client.h
-> > > > > +++ b/drivers/net/ethernet/microchip/vcap/vcap_api_client.h
-> > > > > @@ -238,7 +238,7 @@ const struct vcap_set *vcap_keyfieldset(struct vcap_control *vctrl,
-> > > > >  /* Copy to host byte order */
-> > > > >  void vcap_netbytes_copy(u8 *dst, u8 *src, int count);
-> > > > >
-> > > > > -/* Convert validation error code into tc extact error message */
-> > > > > +/* Convert validation error code into tc exact error message */
-> > > >
-> > > > Same here.
-> > > 
-> > > Thanks Daniel,
-> > > 
-> > > Silly me. I'll drop these changes in v2.
-> > 
-> > No reason to drop them just change it to 'extack' :-)
+On Fri, Apr 19, 2024 at 12:20:05PM -0400, Jérôme Carretero wrote:
+> Hi Sasha,
 > 
-> Thanks, will do.
+> 
+> Thank you, sorry for the delay but I coudln't reboot.
+> 
+> Adding Greg KH because I don't know if stable will receive my e-mail
+> (not subscribed) but the regression was integrated in stable:
+>  commit 0a4e3c2d976aa4dd38951afd6267f74ef3fade0e
+> so they should get the fix ASAP too.
 
-Sorry, I am somehow confused.
+The fix needs to show up in Linus's tree, is it on its way there?
 
-Do you mean like this?
+thanks,
 
-/* Convert validation error code into extact error message */
-
-Or just leave things unchanged?
-
-/* Convert validation error code into tc extact error message */
+greg k-h
 
