@@ -1,224 +1,229 @@
-Return-Path: <netdev+bounces-90611-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90612-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF7118AF37D
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 18:07:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32C438AF380
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 18:09:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0FDD31C236A0
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 16:07:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DAEC32842FA
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 16:09:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A56D713CAA2;
-	Tue, 23 Apr 2024 16:07:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BB5A13CA98;
+	Tue, 23 Apr 2024 16:09:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="vQprFO8m"
+	dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b="Vq9EsyMx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92E5313CA85
-	for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 16:07:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713888425; cv=none; b=WqNtoPW4zSFfG3D7BMqKQs523ZJwNz8M5DVaxjEZjFjVjPuDoRqOwcf/y0oZKwLijcFjhrYNjD3EEPifypM+bYwhAP/WD298i6ZUmv27PMllA2Nf0uPqvdgZzOoOBFCL8OZS51CmcxzmSEbLVGdk2+bCKOrB22upY5s/X5e4w6Y=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713888425; c=relaxed/simple;
-	bh=15ljKbv4cbUEjCZg64vWyrYTBVv3afRPyXXfsAG0AVE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=iqGvqeamcWFarvLyDxjr9y7OLX9zjrtqUGUheaRGnPfgKz5bOK2sJN5711lUZERCgj7wrcbLxEDcO3lmYJ1XgjZMA/9lF6jRgJ0mB4tUzrWqqgjE9Xd4u+VZTHHUB5B8QUE1C4uh1RdU2e0w6HvU4BGHnGSG488MPhYJoF0pFEE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=vQprFO8m; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-1e3ff14f249so41933305ad.1
-        for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 09:07:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1713888423; x=1714493223; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ccAK0tLMg2IaHIQtL66bvw8V/SrcoGcoIlZN6/xzeoI=;
-        b=vQprFO8mqx6alxh9cHC+5L/c1avPwhl7Z/s6XbgOFhfo13P7o+DsWd2pcrr/3J6upY
-         iuRwNgExdYdRMU+AmF1z9BFr4+jcrZGhrFaTumDNR7YVZsNx3NTp4zglJ1fBby++lzAJ
-         Ns2wsB4TSXNBOQEWH2Z3J63VYSNosMMdtNRI2y4ERnxTFSb4qFgbwfTtJrKuwC1oSCuB
-         QYwCWNaBzHuX68xDP95ck9Wx1ZHTBFKUMbwS4s7ii+tAlBy6p+XjiPloKvP2CGZyeqBd
-         qC+9Ps0a6/OqLl+gKwABC3ziG7JatOmATMcM+oOGXKVcWXxre+fVhQ7eNmuXLJgeaJyt
-         iAjg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713888423; x=1714493223;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ccAK0tLMg2IaHIQtL66bvw8V/SrcoGcoIlZN6/xzeoI=;
-        b=pj77AXXnoBaHwrlXgJbugesrb0TUv1JFamRyDIZR6AaFsJLbI63ydShe0X5Ohc2+V+
-         /3MZ8tzpSjMnt1GwlB2YYrONXjvhQwYWBKNGWzfB18M2t8Ao1ois2/UaxHqUefjP+U9B
-         r/nDZiZ9548izvbO/uKNpSbh78Urlzv9uBmUxhUebXk0fySGZ2jAyzhmo3SaeI90XMam
-         SZnQzotRH38RNjibOUt3iQbwO8SdC5uhz893o7kbK8KXCfvGjKbEpaxg9kyO6iU3iQQX
-         ZDIedsVG5PoOg4OD2ah1UzNt0OwNfRXteaOxfSwyufAEcJ9hIxI5+DI6MdUZWwsoSp6E
-         qrcw==
-X-Gm-Message-State: AOJu0YyOKxLRxddk3B4magbJOIF8K/kx9Mb4vwEhT1VotcKdfmMM8N04
-	eB3l/gToSpTmtklL/WtnT6vt5ycuf3h6ckql6Cq/szQCCHSPQLx4QO3BzSmt5PSPA84cGReo5a2
-	+xrM=
-X-Google-Smtp-Source: AGHT+IG6X6zcceYN5OUIENQojIwiVMue9NqejySPiPYCPwww1Z8xYboR7nw/XMUeoVErsdpVgNNG0A==
-X-Received: by 2002:a17:903:2310:b0:1e2:bdef:3973 with SMTP id d16-20020a170903231000b001e2bdef3973mr3713376plh.33.1713888422655;
-        Tue, 23 Apr 2024 09:07:02 -0700 (PDT)
-Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id n3-20020a170902e54300b001e41e968a61sm10190379plf.223.2024.04.23.09.07.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Apr 2024 09:07:02 -0700 (PDT)
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: netdev@vger.kernel.org
-Cc: Stephen Hemminger <stephen@networkplumber.org>
-Subject: [PATCH iproute2] use missing argument helper
-Date: Tue, 23 Apr 2024 09:05:43 -0700
-Message-ID: <20240423160652.68304-1-stephen@networkplumber.org>
-X-Mailer: git-send-email 2.43.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B96D13C66C;
+	Tue, 23 Apr 2024 16:09:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=67.231.156.173
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1713888555; cv=fail; b=n+buDhbNAryFKGD2+rN60YfiU7+tZGjTPsaDzPL49TNgXETaXGe5Nmh74aKr16fiLTb06CeiFfvCrwglpwzrqSo8E3iX3rzh2VZFAMkSjC34RamEDZLmxKy4OABHsptFURO9TIKp1qgYGfewAdfguY3vtucxknuyUTf2iVDAIrY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1713888555; c=relaxed/simple;
+	bh=1f6Hw/+RkH9QRRKicjtROKEcU/H3c5/zqsvW9Zntf+U=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=bd/Fxjr6rL8g7qZmh752Rs1xOFn5gCBPkW/pifhEMbMI0VWjG0SJEVj5PCygc1E8UxMXIC7b6NWfWaQXTo9lApy/H1GVOz7sTofjS8F8rh+bDZRLFtfcVDnr2HeEdZBodvsI3R4mLpT27jHm2vqv7ChtpFuudFPldQP7F4XCmhw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b=Vq9EsyMx; arc=fail smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 43N5buqL016956;
+	Tue, 23 Apr 2024 09:09:05 -0700
+Received: from nam02-sn1-obe.outbound.protection.outlook.com (mail-sn1nam02lp2041.outbound.protection.outlook.com [104.47.57.41])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3xmd7ghspp-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 23 Apr 2024 09:09:05 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=TF0JQgdw/1okolosuatc8qOv2izvdOKCYB3NpnyKi2pJOHEItEKnw8epfoQr82vJy20LTkZPhDqi8Z8BbiAoztJ9MBtR+uU/76nPoI31HQHJRhzsGTewjWUBCsM7fK4zq8k6BgEQ6sbdk+P5YzvlQkwHtldJcT2SJRtDaXgJzHHsf8Si4/3V/XM6Y+AcSSAJTjlTQCKd/jsozr7pRHlH0/vtuJeRqRuJhf7bKDg1YsKFFn9+yCO+xqrarky6qcZfpkLDU0b0iV4JCjcQoQQVO2NR/h2ozHBYY3ZYbCZE50g4ONj2rfw09fVDhfIS16YhD03mPACIr0ML/eSlMbpyng==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=s9UEMsrCCKBIOs9bfmsswbTa3Ijf/uu7wy9CH+8hmVk=;
+ b=YW396x4ej4ajfQOcLWuZDkhvTCPuL7vf7gTcGBsnGcwzGqAMThtQ5x9UIRWmie31V/9yYTL0Lx32awN5NLI5zi9zWYgYTmQK/AidAmoiXidZbKjeF80/RXZnX2ViBqbmbCp8U1UJKpanq0SLl7o/5ZuE0NB5HF9W/mlL7xSNzfcQ6BhmyFPmIYxrlfB6C1zR7TvLquc3nx3BfugJb+pLE1+T5lR5i5Se85bHC5L2nX1K79IL/uY+/sEaHiu3dvx7X7h3y1a63t427wgFkQmxHMFis9FdHq5hZZQdzKnhQFT2u2zs9jC3zXXc0CcUnLYLl9DuuAz1mt+yFEvbAL/3Xg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
+ dkim=pass header.d=marvell.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=s9UEMsrCCKBIOs9bfmsswbTa3Ijf/uu7wy9CH+8hmVk=;
+ b=Vq9EsyMxPCxClLhDieRRsWLp21kMKaXg7UMbfZgyIxMQ7sEiDcn3FPwl8F0CRiDpoG8OT4yfcc1lDanTQkgSgWfe0/nngfCvK4ImrEqkdes3JO7WcXguHkd7rJbqD5TGR+9L/Zy/J6ARcaoUqWCMuzQJUcN14zSbp/xiQHMq9l0=
+Received: from BL1PR18MB4342.namprd18.prod.outlook.com (2603:10b6:208:31e::16)
+ by SJ0PR18MB4479.namprd18.prod.outlook.com (2603:10b6:a03:37f::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7472.44; Tue, 23 Apr
+ 2024 16:09:03 +0000
+Received: from BL1PR18MB4342.namprd18.prod.outlook.com
+ ([fe80::9e3c:b30b:67cf:1d16]) by BL1PR18MB4342.namprd18.prod.outlook.com
+ ([fe80::9e3c:b30b:67cf:1d16%5]) with mapi id 15.20.7472.044; Tue, 23 Apr 2024
+ 16:09:02 +0000
+From: Geethasowjanya Akula <gakula@marvell.com>
+To: Jiri Pirko <jiri@resnulli.us>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kuba@kernel.org" <kuba@kernel.org>,
+        "davem@davemloft.net"
+	<davem@davemloft.net>,
+        "pabeni@redhat.com" <pabeni@redhat.com>,
+        "edumazet@google.com" <edumazet@google.com>,
+        Sunil Kovvuri Goutham
+	<sgoutham@marvell.com>,
+        Subbaraya Sundeep Bhatta <sbhatta@marvell.com>,
+        Hariprasad Kelam <hkelam@marvell.com>
+Subject: RE: [EXTERNAL] Re: [net-next PATCH v2 7/9] octeontx2-pf: Add support
+ to sync link state between representor and VFs
+Thread-Topic: [EXTERNAL] Re: [net-next PATCH v2 7/9] octeontx2-pf: Add support
+ to sync link state between representor and VFs
+Thread-Index: AQHalJsVB1fMpBcrLE6y6oPYaOQD67F11OkAgAAswtA=
+Date: Tue, 23 Apr 2024 16:09:02 +0000
+Message-ID: 
+ <BL1PR18MB43427F05CB1F5D153DD54907CD112@BL1PR18MB4342.namprd18.prod.outlook.com>
+References: <20240422095401.14245-1-gakula@marvell.com>
+ <20240422095401.14245-8-gakula@marvell.com> <ZieyWKC7ReztKRWF@nanopsycho>
+In-Reply-To: <ZieyWKC7ReztKRWF@nanopsycho>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BL1PR18MB4342:EE_|SJ0PR18MB4479:EE_
+x-ms-office365-filtering-correlation-id: 178d2027-7259-4e95-ac1b-08dc63afb18a
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 
+ =?us-ascii?Q?8lPMnMn7mtzq2tvRuIBNopaJ74qW+uzjOmoZgF1OdGVD/L9Sq76mLqfj3NBF?=
+ =?us-ascii?Q?NT60l8PueklfnxERx9gsN8kp3V+SLObzBatfGj1VFv4LmPNBKJiN48PtokGD?=
+ =?us-ascii?Q?YMGFar0HSb3VVa121MoPpFH5gVFI14SNK0QgTcjgRAn845DGctADz9grgkzj?=
+ =?us-ascii?Q?zzDLbvu4S8ggaoDeKoemvH2zCDmKhgFT/LfeihHQlk9WNKLnFB974fGAbJKx?=
+ =?us-ascii?Q?UlOSx0OISrIVkr1EMYBHq/hBIyVtdz1oBkXBGo5Urws2A80PhcFmExk353jP?=
+ =?us-ascii?Q?Zr2FwUGQmUrfx08o4WnL2rBwZnlJd+VRHrGl0tZQv+IkVVl0Q6/sKXxTGbf1?=
+ =?us-ascii?Q?Zo1k1kKdCn3asx2s6CBVXYkmhK/vu2oOupH3k4azmnKv/lUsKlg1yBrH0U9e?=
+ =?us-ascii?Q?LsKJu7zFMv6/wPqRIB+mxEKD04+499ytFrP/UjMvAcOmnmG+zC6mVZjCS7Yt?=
+ =?us-ascii?Q?mC1j3B31VYCAwlmdcoEgGGLBf6tqDXHIrRlgYJVNRvtlkdSP6iV+e6L61xhm?=
+ =?us-ascii?Q?MRexqOvMe5E5cSXjN0S+ej0o7I4lSkqgaz6OGNivaSmSycQZxMmKhGCtOcIi?=
+ =?us-ascii?Q?ohn1HI4zh0W85iTFjxeh2qeKX+h4WUybK1Aku4tChVq57BpYmoPdAl5JxbWi?=
+ =?us-ascii?Q?joYCTMvMMrQ85Qo3tP0CGaCoYoLYiaa9YYUGNqIgpbPl4POt68YFsic1jKRx?=
+ =?us-ascii?Q?5zdN8eV3pKhnzs8ggSGIk87xgC0qSMftYQXypnpoAwlXLnTmuQBovf+Shrs0?=
+ =?us-ascii?Q?IxhXfaRVlbIZiTmnWQ84W1y4fY8HNUJqARufrDQlsGD9hOOezSpwUpHtlRoz?=
+ =?us-ascii?Q?KgFJMhARHAnOCC60Q2iFSQ1209aQcsM5BhxLV1Dsr8UIdvrFqywllIEd3tWA?=
+ =?us-ascii?Q?12HaS9kTvr0WxKyTyxMcjUFX26zYFYfTgkQG8V2sn24l6E5V234HP1LAFxJH?=
+ =?us-ascii?Q?QDhJbRe/wbuNPViUMJz1r8qfgrITwnd7o0nbZtJ6e0om7C5Pgvj9gdTx/1Cf?=
+ =?us-ascii?Q?2JqwAjixKckMVsvvrQRwOB3oTzT3MspfyfTGJ0EQMg5BU//ezOnUMwAklTo/?=
+ =?us-ascii?Q?875DGNGFSpeQ5gd9xP3Th0keRR9cRh8a/o+vxos359uLEWwC8ppBcOGPw0JZ?=
+ =?us-ascii?Q?YCDa835Tu6f85pQJA4Rq+azh+T9Bc33gTkkLw5VcHCh5ZgVL4se2Kf+7jWh6?=
+ =?us-ascii?Q?iaBPbzFMG3DBWty979D8y/kiDfgMATKf0wktnsNc3540X3NYDvTQYiae1z10?=
+ =?us-ascii?Q?bLEtsbZc0qroW+7GLCmIVFAlD3KiJcazGp9duCro4nVQFBhiIdIis5oHxe3B?=
+ =?us-ascii?Q?onE3CNxYWfiW9H5ymupNPVwHzvsRDDEhlAtAhkfH03zThg=3D=3D?=
+x-forefront-antispam-report: 
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR18MB4342.namprd18.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(1800799015)(376005)(38070700009);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: 
+ =?us-ascii?Q?18cRytvj9oLQslyFKLgXC+ZIDvJ/47QGOjwPGi+BtJc17MDNRWXPyUl2alys?=
+ =?us-ascii?Q?I/toP83rLumGOzR5LRSKmq5tABZOXQw4S7HFaz2BtYBPnKqi1+/qPy27hVBJ?=
+ =?us-ascii?Q?TwuoW5Ly0VHpIEVZguj+ANQUyxVzcL1Mno4jvFwDg6GTV2/MXaFmXoWSJ9HH?=
+ =?us-ascii?Q?59G7tGxR1QLBsAMkry0X/0vLHxjt4MyqUvfZb9doLs5zriZeEeCXLU2GkKR9?=
+ =?us-ascii?Q?yNb24xld+qZpNxvD+tzR1CuFvI4DmZDNqLSzw0kiiMIk1VONUTxssi05RR5U?=
+ =?us-ascii?Q?HSUjYU8sCSc5EV/xLDu8Hl9AkY8Erv0Jqgu6gSAOod5LaRVT3JMYRDYUeNBM?=
+ =?us-ascii?Q?xbd88VBeRUYQh4HPO+MgymRFzr34G8gp0ghO1NFGI2NpIsa5oHYc7UerFuni?=
+ =?us-ascii?Q?u24DYXL/P63zJA72ewDDYcV9VRN3QttBURapLqcKfruRlvSTvA8jIb/xmh8L?=
+ =?us-ascii?Q?bXkX3ORT9Q6dluaznzCw2vf8ntc7LLVWxYsQv8Bl3kFKZHQAkh/BLwK7WRJ6?=
+ =?us-ascii?Q?AfJlUKPeI6OZ7BbuEepjailalGQqzQhrgNA4N6EXAH7Vd/tvDyXRnf7S3ACD?=
+ =?us-ascii?Q?gXYxLfpmLhJlKKZWU7LgVQaoKl+n58uGx8zVADkkcQHvNYghnTpAVEWV/r5M?=
+ =?us-ascii?Q?mBA0FXXYaviGca41Fe8dsPx3YP1WcjgXtH6xeCMsCogeWOewOHhw3EN6XVlg?=
+ =?us-ascii?Q?NaYdaInpMGtfHToaTryA0fe7nPtz/gBCfUy6QoTwQvSCPukdaYdoYg1yBAel?=
+ =?us-ascii?Q?mMGSUt7tZ1lyh4C2csNCtn5U7JNlli5Njyf5M2FkxCSY5kP3eo2QBrTozn5N?=
+ =?us-ascii?Q?5CzPUffaepR7DEJXCwcnjRYw22xoXuwln6GqXYz1FwQwqel/tDywKI50eBfT?=
+ =?us-ascii?Q?faY/AE7TAXcAS6Z4SqKYSEa8fXYz20sp0QcqO8UBSqCVGIsGLxSF4KX/+E1V?=
+ =?us-ascii?Q?dcGUeXgj5u1x4TVm7uAWIyVodjnXpbFHDv2bWrc3o0ySZgYzaZDLlp1hUFOt?=
+ =?us-ascii?Q?a6gFklY8sLqOeASK9uJaQSg7QaDdkaiqqPTaNJWCn5z0v6KLHCkwbzNvVeaG?=
+ =?us-ascii?Q?SzowUEl+Va/fzYNQ8hvfE/m5ddvXY8PQtdi+WBekGGaKJ9fHdi8KNQyGXJj8?=
+ =?us-ascii?Q?dkSBIZViot8XBLibE9bnWf7ll4QWYHZXLqexZtAYM/lYs8BGD+4ldqjTFkGF?=
+ =?us-ascii?Q?UOor3O0NP74ArqZqSodUkipwkPDb9ALqqhDmQhwKWvXr1UGs7kvktLkdB/6u?=
+ =?us-ascii?Q?mKM96SDCftjRyuaeFW08eBe1jsa/PXsxJ1uABgECsZCSrqvjTNOR37yPkalw?=
+ =?us-ascii?Q?7I4E83n2pqLPiJWPaxE2DpoOPBZ+KgAxvbacBc+MuKApVPpfPWOmkDfYbOOr?=
+ =?us-ascii?Q?NUgAuksPO0B9lBjqG7PINWXg/I92Ab1BsdKfqlEreG6HwAkIBlZEefPvJmac?=
+ =?us-ascii?Q?0bPr1t7/UMgHnWczzL9i8RdM9+NWitdNRhhgURwyKuIDC3WI64AJEzb56N73?=
+ =?us-ascii?Q?uDSot9HqOr4j7fGZTRtNHvD8P6LgUkxoGc8MHm+uxfNgMh8iOLvoZWnWGPaL?=
+ =?us-ascii?Q?9rg1E0UVHsNr7Wj618s=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: marvell.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BL1PR18MB4342.namprd18.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 178d2027-7259-4e95-ac1b-08dc63afb18a
+X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Apr 2024 16:09:02.8346
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: g5wo8GbsiglhUfPCXAOybRGGBGrUVxakQF7LavbrXIBxH81FBlHvzH0Tc9YSymYfBn69NaAK5dof6QRb+Ss5RQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR18MB4479
+X-Proofpoint-ORIG-GUID: cdWd-Eq4HqPb5ZuOrX6RcHjOA7m4O2Xb
+X-Proofpoint-GUID: cdWd-Eq4HqPb5ZuOrX6RcHjOA7m4O2Xb
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1011,Hydra:6.0.650,FMLib:17.11.176.26
+ definitions=2024-04-23_13,2024-04-23_02,2023-05-22_02
 
-There is a helper in utilities to handle missing argument,
-but it was not being used consistently.
 
-Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
----
- ip/ip.c               | 10 +++++-----
- ip/iproute_lwtunnel.c |  7 ++-----
- ip/rtmon.c            |  4 ++--
- tc/f_u32.c            |  2 +-
- tc/m_sample.c         |  7 ++-----
- tc/tc.c               |  2 +-
- 6 files changed, 13 insertions(+), 19 deletions(-)
 
-diff --git a/ip/ip.c b/ip/ip.c
-index e51fa206..eb492139 100644
---- a/ip/ip.c
-+++ b/ip/ip.c
-@@ -203,15 +203,15 @@ int main(int argc, char **argv)
- 			argc--;
- 			argv++;
- 			if (argc <= 1)
--				usage();
-+				missarg("loop count");
- 			max_flush_loops = atoi(argv[1]);
- 		} else if (matches(opt, "-family") == 0) {
- 			argc--;
- 			argv++;
- 			if (argc <= 1)
--				usage();
-+				missarg("family type");
- 			if (strcmp(argv[1], "help") == 0)
--				usage();
-+				do_help(argc, argv);
- 			else
- 				preferred_family = read_family(argv[1]);
- 			if (preferred_family == AF_UNSPEC)
-@@ -258,7 +258,7 @@ int main(int argc, char **argv)
- 			argc--;
- 			argv++;
- 			if (argc <= 1)
--				usage();
-+				missarg("batch file");
- 			batch_file = argv[1];
- 		} else if (matches(opt, "-brief") == 0) {
- 			++brief;
-@@ -272,7 +272,7 @@ int main(int argc, char **argv)
- 			argc--;
- 			argv++;
- 			if (argc <= 1)
--				usage();
-+				missarg("rcvbuf size");
- 			if (get_unsigned(&size, argv[1], 0)) {
- 				fprintf(stderr, "Invalid rcvbuf size '%s'\n",
- 					argv[1]);
-diff --git a/ip/iproute_lwtunnel.c b/ip/iproute_lwtunnel.c
-index 94985972..b4df4348 100644
---- a/ip/iproute_lwtunnel.c
-+++ b/ip/iproute_lwtunnel.c
-@@ -2228,11 +2228,8 @@ int lwt_parse_encap(struct rtattr *rta, size_t len, int *argcp, char ***argvp,
- 		invarg("\"encap type\" value is invalid\n", *argv);
- 
- 	NEXT_ARG();
--	if (argc <= 1) {
--		fprintf(stderr,
--			"Error: unexpected end of line after \"encap\"\n");
--		exit(-1);
--	}
-+	if (argc <= 1)
-+		missarg("encap type");
- 
- 	nest = rta_nest(rta, len, encap_attr);
- 	switch (type) {
-diff --git a/ip/rtmon.c b/ip/rtmon.c
-index aad9968f..08105d68 100644
---- a/ip/rtmon.c
-+++ b/ip/rtmon.c
-@@ -82,7 +82,7 @@ main(int argc, char **argv)
- 			argc--;
- 			argv++;
- 			if (argc <= 1)
--				usage();
-+				missarg("family type");
- 			if (strcmp(argv[1], "inet") == 0)
- 				family = AF_INET;
- 			else if (strcmp(argv[1], "inet6") == 0)
-@@ -108,7 +108,7 @@ main(int argc, char **argv)
- 			argc--;
- 			argv++;
- 			if (argc <= 1)
--				usage();
-+				missarg("file");
- 			file = argv[1];
- 		} else if (matches(argv[1], "link") == 0) {
- 			llink = 1;
-diff --git a/tc/f_u32.c b/tc/f_u32.c
-index a0699636..d7679e7a 100644
---- a/tc/f_u32.c
-+++ b/tc/f_u32.c
-@@ -663,7 +663,7 @@ static int parse_mark(int *argc_p, char ***argv_p, struct nlmsghdr *n)
- 	struct tc_u32_mark mark;
- 
- 	if (argc <= 1)
--		return -1;
-+		missarg("mark");
- 
- 	if (get_u32(&mark.val, *argv, 0)) {
- 		fprintf(stderr, "Illegal \"mark\" value\n");
-diff --git a/tc/m_sample.c b/tc/m_sample.c
-index 642ec3a6..3baf1d55 100644
---- a/tc/m_sample.c
-+++ b/tc/m_sample.c
-@@ -45,11 +45,8 @@ static int parse_sample(const struct action_util *a, int *argc_p, char ***argv_p
- 	__u32 group;
- 	__u32 rate;
- 
--	if (argc <= 1) {
--		fprintf(stderr, "sample bad argument count %d\n", argc);
--		usage();
--		return -1;
--	}
-+	if (argc <= 1)
-+		missarg("sample count");
- 
- 	if (matches(*argv, "sample") == 0) {
- 		NEXT_ARG();
-diff --git a/tc/tc.c b/tc/tc.c
-index 7edff7e3..26e6f69c 100644
---- a/tc/tc.c
-+++ b/tc/tc.c
-@@ -289,7 +289,7 @@ int main(int argc, char **argv)
- 		} else if (matches(argv[1], "-batch") == 0) {
- 			argc--;	argv++;
- 			if (argc <= 1)
--				usage();
-+				missarg("batch file");
- 			batch_file = argv[1];
- 		} else if (matches(argv[1], "-netns") == 0) {
- 			NEXT_ARG();
--- 
-2.43.0
+> -----Original Message-----
+> From: Jiri Pirko <jiri@resnulli.us>
+> Sent: Tuesday, April 23, 2024 6:37 PM
+> To: Geethasowjanya Akula <gakula@marvell.com>
+> Cc: netdev@vger.kernel.org; linux-kernel@vger.kernel.org; kuba@kernel.org=
+;
+> davem@davemloft.net; pabeni@redhat.com; edumazet@google.com; Sunil
+> Kovvuri Goutham <sgoutham@marvell.com>; Subbaraya Sundeep Bhatta
+> <sbhatta@marvell.com>; Hariprasad Kelam <hkelam@marvell.com>
+> Subject: [EXTERNAL] Re: [net-next PATCH v2 7/9] octeontx2-pf: Add support=
+ to
+> sync link state between representor and VFs
+>=20
+> Prioritize security for external emails: Confirm sender and content safet=
+y
+> before clicking links or opening attachments
+>=20
+> ----------------------------------------------------------------------
+> Mon, Apr 22, 2024 at 11:53:59AM CEST, gakula@marvell.com wrote:
+> >Implements mbox function to sync the link state between VFs and its
+> >representors. Same mbox is use to notify other updates like mtu etc.
+> >
+> >This patch enables
+> >- Reflecting the link state of representor based on the VF state and
+> >link state of VF based on representor.
+>=20
+> Could you please elaborate a bit more how exactly this behaves? Examples
+> would help.
+>=20
+We patch implement the below requirement mentioned the representors documen=
+tation.
+Eg: ip link set r0p1 up/down  will disable carrier on/off of the correspond=
+ing representee(eth0) interface.
 
+
+"
+The representee's link state is controlled through the representor. Setting=
+ the representor administratively UP or DOWN should cause carrier ON or OFF=
+ at the representee.
+"
+
+>=20
+> >- On VF interface up/down a notification is sent via mbox to
+> >representor
+> >  to update the link state.
+> >- On representor interafce up/down will cause the link state update of V=
+F.
+> >
 
