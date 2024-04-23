@@ -1,75 +1,50 @@
-Return-Path: <netdev+bounces-90570-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90571-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1AD558AE890
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 15:48:42 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A8F38AE8A2
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 15:50:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C1C1F1F235DF
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 13:48:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A2666B25823
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 13:50:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EA62136E22;
-	Tue, 23 Apr 2024 13:47:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CB9313698B;
+	Tue, 23 Apr 2024 13:50:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TxpO4Pw/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W2CYdMDd"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73230136E05
-	for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 13:47:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19524136989
+	for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 13:50:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713880060; cv=none; b=rTq3Sx56eeeDpYy6/N+DPCwYLQlVSVhm3pdAYXI33sDyBD1BnuTEugQqxONCngQzFteGhvYPLssQzb18i4M5V+ivb1roWylDJ2wXEnqRsOOqOGVR3MjuZhlJG31jfn1jjnJLkAwueCfcDQZ2Zu5Ww4KBxQdMc0J3/QsT5r4QOlI=
+	t=1713880229; cv=none; b=VyRyzlwQXdl4+IVTCQjXEMv/et8HYmaWKGQ44DqlJb16jMCqSzud0eznh3QvkWBJNZ9H5wQLMz52sLaWjJXsN8rLxzLBOd4jUL9NMPYXPEIDgp+wda7ndnb2vkuMldc0AXlEdj++CyCJuvGKp/3eyYCQkChTlMTJvF6P4YHgNMw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713880060; c=relaxed/simple;
-	bh=SLVehTKF+44M8nOQRcYo9sNLtTeGWb/0pP2ZXk9JzXU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GR6EIT4xMkOiw1LGY8vhguU07fhauQmGCcTvyUMrcr8KWdTsnAMH8rBkdU7ubVU86DmkpmnfnSUYahhNTlzql3a89Im5Mtt1mFYerRJkjUHUmbTqHM8I827jZK6GbFLLdQoAita2bnD4HmDMG8PRBaGazfU5H8CzjtFXCC44By0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TxpO4Pw/; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1713880057;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=hMZp7vYlgNuZhS/jUXjj83MHWi0SFemcDgb6WZEyykI=;
-	b=TxpO4Pw/6d8A+ibfJXVCGMOFudJtwKMVo1U+Z2t5MPq0tZWwHVajvPRAe1MIMB9Ge42lgs
-	e+NZ3MrNYbF1IK2THU+pGmAhNQu6gKQVogdwgl8Dm9Qbp7foI/wpebqT5rG0cCQxQxHjNL
-	re0dlKmmep48IOQKeMSK51cgTXJ28G0=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-473-Rxv05-80N6mL9QIoHLVtCw-1; Tue,
- 23 Apr 2024 09:47:34 -0400
-X-MC-Unique: Rxv05-80N6mL9QIoHLVtCw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4BAC13C3D0C5;
-	Tue, 23 Apr 2024 13:47:33 +0000 (UTC)
-Received: from calimero.vinschen.de (unknown [10.39.194.197])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id DF92D200A5C5;
-	Tue, 23 Apr 2024 13:47:32 +0000 (UTC)
-Received: by calimero.vinschen.de (Postfix, from userid 500)
-	id 88233A80CED; Tue, 23 Apr 2024 15:47:31 +0200 (CEST)
-From: Corinna Vinschen <vinschen@redhat.com>
-To: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	intel-wired-lan@lists.osuosl.org
-Cc: Nikolay Aleksandrov <razor@blackwall.org>,
-	Jason Xing <kerneljasonxing@gmail.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>
-Subject: [PATCH net v2] igb: cope with large MAX_SKB_FRAGS
-Date: Tue, 23 Apr 2024 15:47:31 +0200
-Message-ID: <20240423134731.918157-1-vinschen@redhat.com>
+	s=arc-20240116; t=1713880229; c=relaxed/simple;
+	bh=1GvNI/DgpgoE3hvfJNSzqsrzgjENREL6iWBCPy/Qo3o=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=ce/f6Wc7XBBu8v5rNhSONPSclwfis32YI0R2e08UFvLoRWU+miUMRczystxu5jtmzc25UQwErrXlXRFNauZzhR5MKUGZryxM6te+LBjm+ENLg3xFXHadwDneukjEZMiAMs5Xw5rB1//65U/9hElK84yL63M9HWMEVLn72N7/YJM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W2CYdMDd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id E62AAC3277B;
+	Tue, 23 Apr 2024 13:50:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713880229;
+	bh=1GvNI/DgpgoE3hvfJNSzqsrzgjENREL6iWBCPy/Qo3o=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=W2CYdMDdeBnGZWDX4kSwWwBQzZ9eeI3GXYKdF/U4muiULuqtmL4FKyFrxETbFHLqx
+	 k5dMJ51buxpkOp3v8a1Y+uheB7+jx/nkjHw6IQ0CUcNQfHn9lQGNYfxb/kklETSFCn
+	 QSAwu60ISiHNdtWZzsU05sL1Qiej1m3jQdBmZn+prZVPy89NBQBSFD73UjMdVxPZhq
+	 o/WDlHYftojnZGrDafBkA0JOvCngL6oldZ5irSSCNfAGKrnZ4rQtZv23S2FBTYulAg
+	 0947jqERhtXqY/bJKypPdTd1h2DQb6GvjW5zDJG0NWskxgmp4uec67L2OYZ8mbX3QJ
+	 bBCX+AXrB/Itg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D416CDEC7DE;
+	Tue, 23 Apr 2024 13:50:28 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,52 +52,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.4
+Subject: Re: [PATCH net] tools: ynl: don't ignore errors in NLMSG_DONE messages
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171388022886.4537.17723678422996074724.git-patchwork-notify@kernel.org>
+Date: Tue, 23 Apr 2024 13:50:28 +0000
+References: <20240420020827.3288615-1-kuba@kernel.org>
+In-Reply-To: <20240420020827.3288615-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, donald.hunter@gmail.com, jiri@resnulli.us, sdf@google.com
 
-From: Paolo Abeni <pabeni@redhat.com>
+Hello:
 
-Sabrina reports that the igb driver does not cope well with large
-MAX_SKB_FRAG values: setting MAX_SKB_FRAG to 45 causes payload
-corruption on TX.
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-An easy reproducer is to run ssh to connect to the machine.  With
-MAX_SKB_FRAGS=17 it works, with MAX_SKB_FRAGS=45 it fails.
+On Fri, 19 Apr 2024 19:08:26 -0700 you wrote:
+> NLMSG_DONE contains an error code, it has to be extracted.
+> Prior to this change all dumps will end in success,
+> and in case of failure the result is silently truncated.
+> 
+> Fixes: e4b48ed460d3 ("tools: ynl: add a completely generic client")
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> 
+> [...]
 
-The root cause of the issue is that the driver does not take into
-account properly the (possibly large) shared info size when selecting
-the ring layout, and will try to fit two packets inside the same 4K
-page even when the 1st fraglist will trump over the 2nd head.
+Here is the summary with links:
+  - [net] tools: ynl: don't ignore errors in NLMSG_DONE messages
+    https://git.kernel.org/netdev/net/c/a44f2eb106a4
 
-Address the issue forcing the driver to fit a single packet per page,
-leaving there enough room to store the (currently) largest possible
-skb_shared_info.
-
-Fixes: 3948b05950fd ("net: introduce a config option to tweak MAX_SKB_FRAG")
-Reported-by: Jan Tluka <jtluka@redhat.com>
-Reported-by: Jirka Hladky <jhladky@redhat.com>
-Reported-by: Sabrina Dubroca <sd@queasysnail.net>
-Tested-by: Sabrina Dubroca <sd@queasysnail.net>
-Tested-by: Corinna Vinschen <vinschen@redhat.com>
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
----
-v2: fix subject, add a simple reproducer
-
- drivers/net/ethernet/intel/igb/igb_main.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/ethernet/intel/igb/igb_main.c
-index a3f100769e39..22fb2c322bca 100644
---- a/drivers/net/ethernet/intel/igb/igb_main.c
-+++ b/drivers/net/ethernet/intel/igb/igb_main.c
-@@ -4833,6 +4833,7 @@ static void igb_set_rx_buffer_len(struct igb_adapter *adapter,
- 
- #if (PAGE_SIZE < 8192)
- 	if (adapter->max_frame_size > IGB_MAX_FRAME_BUILD_SKB ||
-+	    SKB_HEAD_ALIGN(adapter->max_frame_size) > (PAGE_SIZE / 2) ||
- 	    rd32(E1000_RCTL) & E1000_RCTL_SBP)
- 		set_ring_uses_large_buffer(rx_ring);
- #endif
+You are awesome, thank you!
 -- 
-2.44.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
