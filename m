@@ -1,91 +1,117 @@
-Return-Path: <netdev+bounces-90571-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90572-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A8F38AE8A2
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 15:50:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 361C28AE8AB
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 15:51:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A2666B25823
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 13:50:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5A6111C222B7
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 13:51:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CB9313698B;
-	Tue, 23 Apr 2024 13:50:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W2CYdMDd"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 827CC13774E;
+	Tue, 23 Apr 2024 13:51:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [207.211.30.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19524136989
-	for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 13:50:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 382B41369AC
+	for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 13:51:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.211.30.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713880229; cv=none; b=VyRyzlwQXdl4+IVTCQjXEMv/et8HYmaWKGQ44DqlJb16jMCqSzud0eznh3QvkWBJNZ9H5wQLMz52sLaWjJXsN8rLxzLBOd4jUL9NMPYXPEIDgp+wda7ndnb2vkuMldc0AXlEdj++CyCJuvGKp/3eyYCQkChTlMTJvF6P4YHgNMw=
+	t=1713880305; cv=none; b=KJZGXkdQSA/ZcUOkapJKaFDuDKY91vhBd36Vn5dEqPWZEME5tDayBYGRzVuvPJU7uP5VtFBiUQXw0lnR2PP3Z3Em+Fuz0TE+Vu1NvRt3ZHfqfe23lmyjLdFkQaci05CWtWUeznnJxWTAgdLSUej/C5i9VbUItThyM2sq7dpAKwM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713880229; c=relaxed/simple;
-	bh=1GvNI/DgpgoE3hvfJNSzqsrzgjENREL6iWBCPy/Qo3o=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ce/f6Wc7XBBu8v5rNhSONPSclwfis32YI0R2e08UFvLoRWU+miUMRczystxu5jtmzc25UQwErrXlXRFNauZzhR5MKUGZryxM6te+LBjm+ENLg3xFXHadwDneukjEZMiAMs5Xw5rB1//65U/9hElK84yL63M9HWMEVLn72N7/YJM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W2CYdMDd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id E62AAC3277B;
-	Tue, 23 Apr 2024 13:50:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713880229;
-	bh=1GvNI/DgpgoE3hvfJNSzqsrzgjENREL6iWBCPy/Qo3o=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=W2CYdMDdeBnGZWDX4kSwWwBQzZ9eeI3GXYKdF/U4muiULuqtmL4FKyFrxETbFHLqx
-	 k5dMJ51buxpkOp3v8a1Y+uheB7+jx/nkjHw6IQ0CUcNQfHn9lQGNYfxb/kklETSFCn
-	 QSAwu60ISiHNdtWZzsU05sL1Qiej1m3jQdBmZn+prZVPy89NBQBSFD73UjMdVxPZhq
-	 o/WDlHYftojnZGrDafBkA0JOvCngL6oldZ5irSSCNfAGKrnZ4rQtZv23S2FBTYulAg
-	 0947jqERhtXqY/bJKypPdTd1h2DQb6GvjW5zDJG0NWskxgmp4uec67L2OYZ8mbX3QJ
-	 bBCX+AXrB/Itg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D416CDEC7DE;
-	Tue, 23 Apr 2024 13:50:28 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1713880305; c=relaxed/simple;
+	bh=HqWlP2B43ITaNAmdX2M76lS5NeYbBVl1sCNqC1NeAuQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 In-Reply-To:Content-Type:Content-Disposition; b=FUbUDWwYKK4Oc6QwmAtBnbl/rnev4GdsJNBblTuHwtWvwx57F/iv125g1k3cfn7wW0PlChb2fa5PPmw43pRVv7soJV6PF5wknM1JL2M/bLB+PwpjWs1CwbYGiqYUqsOMuvOHQZNv1wppRZGMQUWoGOcOWD+3MNlL88MVmiKGgeg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=none smtp.mailfrom=queasysnail.net; arc=none smtp.client-ip=207.211.30.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=queasysnail.net
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-619-_0ByQh2pOYmmNHXQusQQfA-1; Tue,
+ 23 Apr 2024 09:51:32 -0400
+X-MC-Unique: _0ByQh2pOYmmNHXQusQQfA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8EE2D3C3D0C5;
+	Tue, 23 Apr 2024 13:51:31 +0000 (UTC)
+Received: from hog (unknown [10.39.193.137])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 13B9940C6CC0;
+	Tue, 23 Apr 2024 13:51:29 +0000 (UTC)
+Date: Tue, 23 Apr 2024 15:51:28 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Rahul Rameshbabu <rrameshbabu@nvidia.com>
+Cc: netdev@vger.kernel.org, stable@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Paolo Abeni <pabeni@redhat.com>, Gal Pressman <gal@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Yossi Kuperman <yossiku@nvidia.com>,
+	Benjamin Poirier <bpoirier@nvidia.com>,
+	Cosmin Ratiu <cratiu@nvidia.com>
+Subject: Re: [PATCH net v2 2/4] ethernet: Add helper for assigning packet
+ type when dest address does not match device address
+Message-ID: <Zie84KZ--UBnBydc@hog>
+References: <20240419213033.400467-1-rrameshbabu@nvidia.com>
+ <20240419213033.400467-3-rrameshbabu@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] tools: ynl: don't ignore errors in NLMSG_DONE messages
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171388022886.4537.17723678422996074724.git-patchwork-notify@kernel.org>
-Date: Tue, 23 Apr 2024 13:50:28 +0000
-References: <20240420020827.3288615-1-kuba@kernel.org>
-In-Reply-To: <20240420020827.3288615-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, donald.hunter@gmail.com, jiri@resnulli.us, sdf@google.com
+In-Reply-To: <20240419213033.400467-3-rrameshbabu@nvidia.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.2
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: queasysnail.net
+Content-Type: text/plain; charset=UTF-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Hello:
+2024-04-19, 14:30:17 -0700, Rahul Rameshbabu wrote:
+> Enable reuse of logic in eth_type_trans for determining packet type.
+>=20
+> Suggested-by: Sabrina Dubroca <sd@queasysnail.net>
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Rahul Rameshbabu <rrameshbabu@nvidia.com>
+> ---
+>  include/linux/etherdevice.h | 24 ++++++++++++++++++++++++
+>  net/ethernet/eth.c          | 12 +-----------
+>  2 files changed, 25 insertions(+), 11 deletions(-)
+>=20
+> diff --git a/include/linux/etherdevice.h b/include/linux/etherdevice.h
+> index 224645f17c33..f5868ac69dec 100644
+> --- a/include/linux/etherdevice.h
+> +++ b/include/linux/etherdevice.h
+> @@ -607,6 +607,30 @@ static inline void eth_hw_addr_gen(struct net_device=
+ *dev, const u8 *base_addr,
+>  =09eth_hw_addr_set(dev, addr);
+>  }
+> =20
+> +/**
+> + * eth_skb_pkt_type - Assign packet type if destination address does not=
+ match
+> + * @skb: Assigned a packet type if address does not match @dev address
+> + * @dev: Network device used to compare packet address against
+> + *
+> + * If the destination MAC address of the packet does not match the netwo=
+rk
+> + * device address, assign an appropriate packet type.
+> + */
+> +static inline void eth_skb_pkt_type(struct sk_buff *skb, struct net_devi=
+ce *dev)
 
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+Could you make dev const? Otherwise the series looks good to me.
 
-On Fri, 19 Apr 2024 19:08:26 -0700 you wrote:
-> NLMSG_DONE contains an error code, it has to be extracted.
-> Prior to this change all dumps will end in success,
-> and in case of failure the result is silently truncated.
-> 
-> Fixes: e4b48ed460d3 ("tools: ynl: add a completely generic client")
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> 
-> [...]
+Thanks.
 
-Here is the summary with links:
-  - [net] tools: ynl: don't ignore errors in NLMSG_DONE messages
-    https://git.kernel.org/netdev/net/c/a44f2eb106a4
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+--=20
+Sabrina
 
 
