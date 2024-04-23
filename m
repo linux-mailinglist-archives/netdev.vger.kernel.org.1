@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-90701-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90702-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DDEDC8AFC7C
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 01:17:26 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26EF88AFC8A
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 01:26:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 996BC2831D2
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 23:17:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 57404B22259
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 23:26:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60389381DA;
-	Tue, 23 Apr 2024 23:17:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8065A3D3BD;
+	Tue, 23 Apr 2024 23:26:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="wR2tz+Z6"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="2BuQeT8N"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB10B44366;
-	Tue, 23 Apr 2024 23:17:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC38638DDD;
+	Tue, 23 Apr 2024 23:26:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713914237; cv=none; b=dNAN+bS2WN/l+KGxIYMW7UgNV46xZUEpDKXXVq+6pEuvAGC6kMX70CnIjhutHAQ4oIB+Cw64ryNZmSJs4NiheyIGk6h2L2oOURVlq/dyApwY53ttq1SVwwSDuMTHg6NmBW6vkVpjYdgO85JY2WZrjgmG/vXJqZ7yj2xK9vOrkog=
+	t=1713914791; cv=none; b=khCMgQbiosIWpT3YKVHYSmH9bdaKxL0kYb0+82k2Q/O/yBK2f+cT0SPI6iWYQRRZYVeiDZA/80wTaPXhOsSc/2MEAlfA66WkWwasGqgSCwl3q4LLL/NAqW78fWYx7AhjPSzwHmxk0XYSzLrXsOdTAUbClqEOdm0IsccFoJLiT1c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713914237; c=relaxed/simple;
-	bh=6tt29QpRIkzCTP0vI3/A7kHdomrFExRog0V0dqNWXIo=;
+	s=arc-20240116; t=1713914791; c=relaxed/simple;
+	bh=vgtPT8kZmuUIwEgKnTpoONPjgJw4cySOe+Vlw9DBD7w=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=O5ajIP4kiHhCZPxX/AuxlTfJyfDv5vlxaA/G2U3XC0fkmbsLoQcPWKP5+QnMF73KGkLEon3StN5tX3Gip23OOP9cNLudsX0qTCJMUF93T/BIdeLBnGl+cBdXCn1jUbeIpQMRklSSikGHHpKwig/H3QYgXuBCFEO7ngPVwZz/8lc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=wR2tz+Z6; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=dUSLvUhlnUiIdTyLfpEO9fe+boIqInzwujl3SaUxGUSVNLFWaAZYlnDKrNF6V6PfxYFBmdJrl2kCFiVBPbDDl+ZxW0pJEyIkVRv8T4AGN+HEMP7YTF4i0cujbnsqWb/f8mxoy/jpMfHpZJbhJmR6aMTbuR/VXT4IrITdh5VBjwE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=2BuQeT8N; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,13 +36,13 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=yo/azk6enc6QmwwKUibOlX+VM7LeQmslPJZahnN5aqM=; b=wR2tz+Z6rOsIhlAh2C8zyt4AyE
-	B5C/Ihh2Dk3qdhGcp2LNYv4c5DCJ6UGk42dmHyITb+mIY37uIwSKDLjDzd4qegOHxWK+QKQuJel5F
-	z2E26InckLGbSQQDThYfVjIwiaxzpHrQOG/hOFu5bNfcL6ZAaSfKIMZSJUjaUSe3SRXo=;
+	bh=EIgP/ChupM/MVY7fcGEjq87hzDUCAn6wjlf+IrXBvOM=; b=2BuQeT8NKR3EHOI/umX9Wk6VgE
+	vp30CDPxrZuaUQ6074Vj/KAzuVH9/UyKaiO6290uj0JpJ+NFUnxIVDecZwPU/cgmo9UgsAaWpeT9E
+	Rzm+KMub61vMGVooVrxoFIuFYOJbM5Un7Fb6rsd1vS1WfGDeDCX3U4EtFfA10JoN0L64=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1rzPNo-00Dl1S-Ul; Wed, 24 Apr 2024 01:17:04 +0200
-Date: Wed, 24 Apr 2024 01:17:04 +0200
+	id 1rzPWj-00Dl3u-Ne; Wed, 24 Apr 2024 01:26:17 +0200
+Date: Wed, 24 Apr 2024 01:26:17 +0200
 From: Andrew Lunn <andrew@lunn.ch>
 To: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
 Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
@@ -57,11 +57,11 @@ Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
 	Thorsten.Kummermehr@microchip.com, Pier.Beruto@onsemi.com,
 	Selvamani.Rajagopal@onsemi.com, Nicolas.Ferre@microchip.com,
 	benjamin.bigler@bernformulastudent.ch
-Subject: Re: [PATCH net-next v4 03/12] net: ethernet: oa_tc6: implement
- register read operation
-Message-ID: <cfe4a1f4-df6e-4ac7-bd2d-1f8429af29e2@lunn.ch>
+Subject: Re: [PATCH net-next v4 04/12] net: ethernet: oa_tc6: implement
+ software reset
+Message-ID: <1083000b-55db-4fea-843a-6d1db802242d@lunn.ch>
 References: <20240418125648.372526-1-Parthiban.Veerasooran@microchip.com>
- <20240418125648.372526-4-Parthiban.Veerasooran@microchip.com>
+ <20240418125648.372526-5-Parthiban.Veerasooran@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,14 +70,25 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240418125648.372526-4-Parthiban.Veerasooran@microchip.com>
+In-Reply-To: <20240418125648.372526-5-Parthiban.Veerasooran@microchip.com>
 
-> +static int oa_tc6_check_ctrl_read_reply(struct oa_tc6 *tc6, u8 size)
+> +static int oa_tc6_read_status0(struct oa_tc6 *tc6)
 > +{
-> +	u32 *tx_buf = tc6->spi_ctrl_tx_buf;
-> +	u32 *rx_buf = tc6->spi_ctrl_rx_buf + OA_TC6_CTRL_IGNORED_SIZE;
+> +	u32 regval;
+> +	int ret;
+> +
+> +	ret = oa_tc6_read_register(tc6, OA_TC6_REG_STATUS0, &regval);
+> +	if (ret)
+> +		return 0;
 
-Reverse christmas tree. Those two need swapping around.
+If there is an error, your throw the error code away?
+
+It is a bit messy, since you are using this inside
+readx_poll_timeout(). I would probably do a netdev_warn() or similar,
+since it should not happen, and then return 0? I _think_ this is
+probably the first bus transaction we do, so if it fails, knowing the
+error code will help figuring out what is wrong with the SPI bus
+configuration.
 
 	Andrew
 
