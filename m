@@ -1,352 +1,228 @@
-Return-Path: <netdev+bounces-90677-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90678-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A4AB8AF7AD
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 21:58:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 958B98AF7C4
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 22:04:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D432528B177
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 19:58:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4C42E28C4EE
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 20:04:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B1921422A3;
-	Tue, 23 Apr 2024 19:58:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FCA41422DF;
+	Tue, 23 Apr 2024 20:04:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="GBNGlUMO"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="oDmNhOQu"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A05C1411F4;
-	Tue, 23 Apr 2024 19:58:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D36013D522
+	for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 20:04:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713902296; cv=none; b=qT4rQskq7ZcM3jo41KeIqOEc/16Z9RWWc161Cwf3tPxv5w0wDhjlkcb62MtgAGZrea2OdlEzKwbEe0aObm/GsL28eh5HjrNhk88zF/lL21BKqe95ZJoNNvwGCdrm+GAt8RIlP7pZfHpLBBIxQAdsjUVzCV6v6olQuzcq86OONwg=
+	t=1713902663; cv=none; b=IxucxNuVpfnXLQ+8ahPe71IaxjmfjDuw++kScnt4lULUIMtTTb2+8Do1kZg+wfpNocKdAjZ6YmxHTfG09ybI8Q6a07lIpda/PZvFXFrOZXfToNGGYyQa/1mAcpnwhqfAy+SN3fTdl61AIj+miZowhnNCytXs+ixTe3v9yVZNjx4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713902296; c=relaxed/simple;
-	bh=jzSbqsy+gSaNWK/h2jOXWvQnb4ux/bndnUaOM908xqU=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=kidkDSnk9uxTTISzSgWiau/ukuNcfL++HgIriMRs/iH2ukiQmKavv6Zvc3j2WWqgmJTxdnYPPxrmbzDl2T73I+B4T1+hn2DaTnnvFJCnOV0mEbcONbkSGxWlypQ0XfCz8BpmFHPO3BIHae+V0Ik1j8ZyXZHpKCoVd1pq5rWxWmQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=GBNGlUMO; arc=none smtp.client-ip=68.232.154.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1713902294; x=1745438294;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=jzSbqsy+gSaNWK/h2jOXWvQnb4ux/bndnUaOM908xqU=;
-  b=GBNGlUMOKOW2av6WrZq9LtXId5mlWCkttHSgjFXUTDV734rMldyo228R
-   cElYXYKeym7VGjDYMn/mT0w0w+ARSV5RWmY6ibdRl2Da7fHhpAbeUxHQK
-   A39NFz7rhiFZOj+nKFVxwRBATE8IJf4UUKM59OIYnxpHSWLiJG6wEpmN6
-   PX1dehFUVEvraBvd0khbpKUodbhr287OpSM/1sIHISNmDnuRWsPjif+vH
-   xWR6bJesPQXb8jBmkhw7tiqhVSxQwKRiaEeqV+Ky1SAk/B/qjRCWwRstr
-   lZCHyzQEYg2Ziv8IyYyn0zyR+HvrAWys7xzW+/JOuxp2KyjbMdQjuV6W6
-   Q==;
-X-CSE-ConnectionGUID: 5xSWtGnMQTuHpwnp037lyA==
-X-CSE-MsgGUID: 6XUchRz+RfWYJfofscGSPQ==
-X-IronPort-AV: E=Sophos;i="6.07,222,1708412400"; 
-   d="scan'208";a="22310508"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 23 Apr 2024 12:58:13 -0700
-Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
- chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 23 Apr 2024 12:57:43 -0700
-Received: from DEN-DL-M31836.microsemi.net (10.10.85.11) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server id
- 15.1.2507.35 via Frontend Transport; Tue, 23 Apr 2024 12:57:41 -0700
-From: Horatiu Vultur <horatiu.vultur@microchip.com>
-To: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <richardcochran@gmail.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Horatiu Vultur
-	<horatiu.vultur@microchip.com>
-Subject: [PATCH net-next] net: phy: micrel: Add support for PTP_PF_EXTTS for lan8814
-Date: Tue, 23 Apr 2024 21:57:32 +0200
-Message-ID: <20240423195732.3353522-1-horatiu.vultur@microchip.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1713902663; c=relaxed/simple;
+	bh=+JolNU2YTee8jjksoeFgy8MgLuarS4MGW9ZvQFQLFrE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qhov02nI+F3l4r9mDWTSt8q2awBK9jZaFrGu++XcG/PpufXCnQ+P0lvzHL9tSCOIJd+Ap41qV+at5obODd8cdNhgeKJQMcS0bsem9rmNNVffyml2iGFZjedyF4VmuJ4WVb5VRZmsir/WsIW11t76x9fHHd9zKvNFeUUhJlf1WSg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=oDmNhOQu; arc=none smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-1e36b7e7dd2so54138605ad.1
+        for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 13:04:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1713902662; x=1714507462; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=WsTJrC/TYb7FK0Q2lIiKRgdIYme7w6OgmiHGtnaunaU=;
+        b=oDmNhOQukzy/lDahq28UIQU3Png+Rm7FT11SrBQqNZHZGok0RE+4BrTsile7A07CjG
+         8KQ5KozB/UvSp1BxBWD+uIHzXNjWPF/DDsTnSUpsB8nthr4SZK020eaUMPRrm/RnX/Yk
+         TeqILjVO09x3oVw7eU7MfHDCGMslx9oSv7pJoi3lFECTEXOaYoOt7pfqD/qMR++kGMbv
+         pNdqAwVitdoNxVrXB6x8cwWuCcD9+H77S/iuIzlc0s4pGIxbZQyHLcyZOTP64x2bV10L
+         KeDDAbXan3q6dp+mNVL45SMcqdGznNitKdmGXimSBZFVdmuZRFEv4hacsp2z2GXMmtdP
+         ylsg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713902662; x=1714507462;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=WsTJrC/TYb7FK0Q2lIiKRgdIYme7w6OgmiHGtnaunaU=;
+        b=IYJ+2nZ0IVp/bZ4sexUPkXC8VYS24kYZI5Uy+iXMKR+r3G6sS/kyhEEo4BChXoY7zY
+         mrkbc6I5OaPaKeTNGczFvx2Pk0e5qUXnxFuX8DNO6A6HmKc5G20SWvWY8cCFJyQA1ae2
+         dZuSbS5XNZcUQKsTeFL2Mj/mAxnPt35Flp/+aUaaIZpgVpvc2ogbxOGGpC1pl/PyHKyJ
+         zuPeVtuvyvnsShKCVRxQH93oJFgKm5uY0hBniTjEJKHnJ37meGgRRUGi+YuaT8r9OLP2
+         K0hgImKPlAmeEPhhI0cGORFxdJTDdYVAY8V0bBGvj24WnAziYKC8xHsZBJ++1aP47dr7
+         BsSA==
+X-Forwarded-Encrypted: i=1; AJvYcCVi6EcWi6/3zSrNBo5gG0n6puvZECkStK4UQUIkL73IFuWRTfoHnp3Ibh2p1bUsu1jigXtYREi1OifjTBZ7BcMHkRLfXN5N
+X-Gm-Message-State: AOJu0YzdwC71YNJb1M0oZhGEF8sHqMDD8QqUE4r/MzNoZ5s/0s7spYtQ
+	1BeJe+LXAoHqyWn9ZmW2E2BJz2ZPVB87Rtu6xtf62ha+k4E5xLTx5YQtNyGZP9w=
+X-Google-Smtp-Source: AGHT+IGzPeEKROaW1uTtKzgd2zZxcbStSQXrb0rXRLSHxSmFyHmaGtrrOBx+IjPs7kgbIr0zjopCYQ==
+X-Received: by 2002:a17:902:e809:b0:1e2:194a:3d22 with SMTP id u9-20020a170902e80900b001e2194a3d22mr626266plg.32.1713902661709;
+        Tue, 23 Apr 2024 13:04:21 -0700 (PDT)
+Received: from ?IPV6:2a03:83e0:1151:15:40a:5eb5:8916:33a4? ([2620:10d:c090:500::6:5c90])
+        by smtp.gmail.com with ESMTPSA id y2-20020a1709027c8200b001e22e8a859asm10443526pll.108.2024.04.23.13.04.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 23 Apr 2024 13:04:21 -0700 (PDT)
+Message-ID: <5d1acb78-afd9-4a41-8306-347cb5bbeae7@davidwei.uk>
+Date: Tue, 23 Apr 2024 13:04:19 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 2/2] net: selftest: add test for netdev
+ netlink queue-get API
+Content-Language: en-GB
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, netdev@vger.kernel.org
+Cc: Jakub Kicinski <kuba@kernel.org>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>
+References: <20240419220857.2065615-1-dw@davidwei.uk>
+ <20240419220857.2065615-3-dw@davidwei.uk>
+ <66252926969a4_1dff99294ad@willemb.c.googlers.com.notmuch>
+From: David Wei <dw@davidwei.uk>
+In-Reply-To: <66252926969a4_1dff99294ad@willemb.c.googlers.com.notmuch>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Extend the PTP programmable gpios to implement also PTP_PF_EXTTS
-function. The pins can be configured to capture both of rising
-and falling edge. Once the event is seen, then an interrupt is
-generated and the LTC is saved in the registers.
-On lan8814 only GPIO 3 can be configured for this.
+On 2024-04-21 7:56 am, Willem de Bruijn wrote:
+> David Wei wrote:
+>> Add a selftest for netdev generic netlink. For now there is only a
+>> single test that exercises the `queue-get` API.
+>>
+>> The test works with netdevsim by default or with a real device by
+>> setting NETIF.
+>>
+>> Signed-off-by: David Wei <dw@davidwei.uk>
+>> ---
+>>  tools/testing/selftests/drivers/net/Makefile  |  1 +
+>>  .../selftests/drivers/net/lib/py/env.py       |  6 +-
+>>  tools/testing/selftests/drivers/net/queues.py | 59 +++++++++++++++++++
+>>  tools/testing/selftests/net/lib/py/nsim.py    |  4 +-
+>>  4 files changed, 66 insertions(+), 4 deletions(-)
+>>  create mode 100755 tools/testing/selftests/drivers/net/queues.py
+>>
+>> diff --git a/tools/testing/selftests/drivers/net/Makefile b/tools/testing/selftests/drivers/net/Makefile
+>> index 379cdb1960a7..118a73650dbc 100644
+>> --- a/tools/testing/selftests/drivers/net/Makefile
+>> +++ b/tools/testing/selftests/drivers/net/Makefile
+>> @@ -3,5 +3,6 @@
+>>  TEST_INCLUDES := $(wildcard lib/py/*.py)
+>>  
+>>  TEST_PROGS := stats.py
+>> +TEST_PROGS += queues.py
+>>  
+>>  include ../../lib.mk
+>> diff --git a/tools/testing/selftests/drivers/net/lib/py/env.py b/tools/testing/selftests/drivers/net/lib/py/env.py
+>> index e1abe9491daf..0ac4e9e6cd84 100644
+>> --- a/tools/testing/selftests/drivers/net/lib/py/env.py
+>> +++ b/tools/testing/selftests/drivers/net/lib/py/env.py
+>> @@ -7,7 +7,7 @@ from lib.py import ip
+>>  from lib.py import NetdevSimDev
+>>  
+>>  class NetDrvEnv:
+>> -    def __init__(self, src_path):
+>> +    def __init__(self, src_path, **kwargs):
+>>          self._ns = None
+>>  
+>>          self.env = os.environ.copy()
+>> @@ -16,11 +16,13 @@ class NetDrvEnv:
+>>          if 'NETIF' in self.env:
+>>              self.dev = ip("link show dev " + self.env['NETIF'], json=True)[0]
+>>          else:
+>> -            self._ns = NetdevSimDev()
+>> +            self._ns = NetdevSimDev(**kwargs)
+>>              self.dev = self._ns.nsims[0].dev
+>>          self.ifindex = self.dev['ifindex']
+>>  
+>>      def __enter__(self):
+>> +        ip(f"link set dev {self.dev['ifname']} up")
+>> +
+>>          return self
+>>  
+>>      def __exit__(self, ex_type, ex_value, ex_tb):
+>> diff --git a/tools/testing/selftests/drivers/net/queues.py b/tools/testing/selftests/drivers/net/queues.py
+>> new file mode 100755
+>> index 000000000000..c23cd5a932cb
+>> --- /dev/null
+>> +++ b/tools/testing/selftests/drivers/net/queues.py
+>> @@ -0,0 +1,59 @@
+>> +#!/usr/bin/env python3
+>> +# SPDX-License-Identifier: GPL-2.0
+>> +
+>> +from lib.py import ksft_run, ksft_eq, KsftSkipEx
+>> +from lib.py import NetdevFamily
+>> +from lib.py import NetDrvEnv
+>> +from lib.py import cmd
+>> +import glob
+>> +
+>> +
+>> +def sys_get_queues(ifname) -> int:
+>> +    folders = glob.glob(f'/sys/class/net/{ifname}/queues/rx-*')
+>> +    return len(folders)
+>> +
+>> +
+>> +def nl_get_queues(cfg, nl):
+>> +    queues = nl.queue_get({'ifindex': cfg.ifindex}, dump=True)
+>> +    if queues:
+>> +        return len([q for q in queues if q['type'] == 'rx'])
+>> +    return None
+>> +
+>> +
+>> +def get_queues(cfg, nl) -> None:
+>> +    queues = nl_get_queues(cfg, nl)
+>> +    if not queues:
+>> +        raise KsftSkipEx("queue-get not supported by device")
+>> +
+>> +    expected = sys_get_queues(cfg.dev['ifname'])
+>> +    ksft_eq(queues, expected)
+>> +
+>> +
+>> +def addremove_queues(cfg, nl) -> None:
+>> +    queues = nl_get_queues(cfg, nl)
+>> +    if not queues:
+>> +        raise KsftSkipEx("queue-get not supported by device")
+>> +
+>> +    expected = sys_get_queues(cfg.dev['ifname'])
+>> +    ksft_eq(queues, expected)
+>> +
+> 
+> This is a copy of get_queues() above
 
-This was tested using:
-ts2phc -m -l 7 -s generic -f ts2phc.cfg
+I'll remove this part of the test case.
 
-Where the configuration was the following:
----
-[global]
-ts2phc.pin_index  3
+> 
+>> +    # reduce queue count by 1
+>> +    expected = expected - 1
+> 
+> Verify first that queue count > 1. Which it isn't in the test setup.
 
-[eth0]
----
+Thanks, I'll make sure changing the queues for a real device doesn't go
+out of bounds.
 
-Signed-off-by: Horatiu Vultur <horatiu.vultur@microchip.com>
----
- drivers/net/phy/micrel.c | 182 ++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 181 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
-index 0e310a5e2bff0..2d11f38cbc243 100644
---- a/drivers/net/phy/micrel.c
-+++ b/drivers/net/phy/micrel.c
-@@ -167,6 +167,9 @@
- #define PTP_CMD_CTL_PTP_LTC_STEP_SEC_		BIT(5)
- #define PTP_CMD_CTL_PTP_LTC_STEP_NSEC_		BIT(6)
- 
-+#define PTP_COMMON_INT_ENA			0x0204
-+#define PTP_COMMON_INT_ENA_GPIO_CAP_EN		BIT(2)
-+
- #define PTP_CLOCK_SET_SEC_HI			0x0205
- #define PTP_CLOCK_SET_SEC_MID			0x0206
- #define PTP_CLOCK_SET_SEC_LO			0x0207
-@@ -179,6 +182,27 @@
- #define PTP_CLOCK_READ_NS_HI			0x022C
- #define PTP_CLOCK_READ_NS_LO			0x022D
- 
-+#define PTP_GPIO_SEL				0x0230
-+#define PTP_GPIO_SEL_GPIO_SEL(pin)		((pin) << 8)
-+#define PTP_GPIO_CAP_MAP_LO			0x0232
-+
-+#define PTP_GPIO_CAP_EN				0x0233
-+#define PTP_GPIO_CAP_EN_GPIO_RE_CAPTURE_ENABLE(gpio)	BIT(gpio)
-+#define PTP_GPIO_CAP_EN_GPIO_FE_CAPTURE_ENABLE(gpio)	(BIT(gpio) << 8)
-+
-+#define PTP_GPIO_RE_LTC_SEC_HI_CAP		0x0235
-+#define PTP_GPIO_RE_LTC_SEC_LO_CAP		0x0236
-+#define PTP_GPIO_RE_LTC_NS_HI_CAP		0x0237
-+#define PTP_GPIO_RE_LTC_NS_LO_CAP		0x0238
-+#define PTP_GPIO_FE_LTC_SEC_HI_CAP		0x0239
-+#define PTP_GPIO_FE_LTC_SEC_LO_CAP		0x023A
-+#define PTP_GPIO_FE_LTC_NS_HI_CAP		0x023B
-+#define PTP_GPIO_FE_LTC_NS_LO_CAP		0x023C
-+
-+#define PTP_GPIO_CAP_STS			0x023D
-+#define PTP_GPIO_CAP_STS_PTP_GPIO_RE_STS(gpio)	BIT(gpio)
-+#define PTP_GPIO_CAP_STS_PTP_GPIO_FE_STS(gpio)	(BIT(gpio) << 8)
-+
- #define PTP_OPERATING_MODE			0x0241
- #define PTP_OPERATING_MODE_STANDALONE_		BIT(0)
- 
-@@ -274,6 +298,7 @@
- 
- #define LAN8814_PTP_GPIO_NUM			24
- #define LAN8814_PTP_PEROUT_NUM			2
-+#define LAN8814_PTP_EXTTS_NUM			3
- 
- #define LAN8814_BUFFER_TIME			2
- 
-@@ -3124,12 +3149,102 @@ static int lan8814_ptp_perout(struct ptp_clock_info *ptpci,
- 	return 0;
- }
- 
-+static void lan8814_ptp_extts_on(struct phy_device *phydev, int pin, u32 flags)
-+{
-+	u16 tmp;
-+
-+	/* Set as gpio input */
-+	tmp = lanphy_read_page_reg(phydev, 4, LAN8814_GPIO_DIR_ADDR(pin));
-+	tmp &= ~LAN8814_GPIO_DIR_BIT(pin);
-+	lanphy_write_page_reg(phydev, 4, LAN8814_GPIO_DIR_ADDR(pin), tmp);
-+
-+	/* Map the pin to ltc pin 0 of the capture map registers */
-+	tmp = lanphy_read_page_reg(phydev, 4, PTP_GPIO_CAP_MAP_LO);
-+	tmp |= pin;
-+	lanphy_write_page_reg(phydev, 4, PTP_GPIO_CAP_MAP_LO, tmp);
-+
-+	/* Enable capture on the edges of the ltc pin */
-+	tmp = lanphy_read_page_reg(phydev, 4, PTP_GPIO_CAP_EN);
-+	if (flags & PTP_RISING_EDGE)
-+		tmp |= PTP_GPIO_CAP_EN_GPIO_RE_CAPTURE_ENABLE(0);
-+	if (flags & PTP_FALLING_EDGE)
-+		tmp |= PTP_GPIO_CAP_EN_GPIO_FE_CAPTURE_ENABLE(0);
-+	lanphy_write_page_reg(phydev, 4, PTP_GPIO_CAP_EN, tmp);
-+
-+	/* Enable interrupt top interrupt */
-+	tmp = lanphy_read_page_reg(phydev, 4, PTP_COMMON_INT_ENA);
-+	tmp |= PTP_COMMON_INT_ENA_GPIO_CAP_EN;
-+	lanphy_write_page_reg(phydev, 4, PTP_COMMON_INT_ENA, tmp);
-+}
-+
-+static void lan8814_ptp_extts_off(struct phy_device *phydev, int pin)
-+{
-+	u16 tmp;
-+
-+	/* Set as gpio out */
-+	tmp = lanphy_read_page_reg(phydev, 4, LAN8814_GPIO_DIR_ADDR(pin));
-+	tmp |= LAN8814_GPIO_DIR_BIT(pin);
-+	lanphy_write_page_reg(phydev, 4, LAN8814_GPIO_DIR_ADDR(pin), tmp);
-+
-+	/* Enable alternate, 0:for alternate function, 1:gpio */
-+	tmp = lanphy_read_page_reg(phydev, 4, LAN8814_GPIO_EN_ADDR(pin));
-+	tmp &= ~LAN8814_GPIO_EN_BIT(pin);
-+	lanphy_write_page_reg(phydev, 4, LAN8814_GPIO_EN_ADDR(pin), tmp);
-+
-+	/* Clear the mapping of pin to registers 0 of the capture registers */
-+	tmp = lanphy_read_page_reg(phydev, 4, PTP_GPIO_CAP_MAP_LO);
-+	tmp &= ~GENMASK(3, 0);
-+	lanphy_write_page_reg(phydev, 4, PTP_GPIO_CAP_MAP_LO, tmp);
-+
-+	/* Disable capture on both of the edges */
-+	tmp = lanphy_read_page_reg(phydev, 4, PTP_GPIO_CAP_EN);
-+	tmp &= ~PTP_GPIO_CAP_EN_GPIO_RE_CAPTURE_ENABLE(pin);
-+	tmp &= ~PTP_GPIO_CAP_EN_GPIO_FE_CAPTURE_ENABLE(pin);
-+	lanphy_write_page_reg(phydev, 4, PTP_GPIO_CAP_EN, tmp);
-+
-+	/* Disable interrupt top interrupt */
-+	tmp = lanphy_read_page_reg(phydev, 4, PTP_COMMON_INT_ENA);
-+	tmp &= ~PTP_COMMON_INT_ENA_GPIO_CAP_EN;
-+	lanphy_write_page_reg(phydev, 4, PTP_COMMON_INT_ENA, tmp);
-+}
-+
-+static int lan8814_ptp_extts(struct ptp_clock_info *ptpci,
-+			     struct ptp_clock_request *rq, int on)
-+{
-+	struct lan8814_shared_priv *shared = container_of(ptpci, struct lan8814_shared_priv,
-+							  ptp_clock_info);
-+	struct phy_device *phydev = shared->phydev;
-+	int pin;
-+
-+	if (rq->extts.flags & ~(PTP_ENABLE_FEATURE |
-+				PTP_EXTTS_EDGES |
-+				PTP_STRICT_FLAGS))
-+		return -EOPNOTSUPP;
-+
-+	pin = ptp_find_pin(shared->ptp_clock, PTP_PF_EXTTS,
-+			   rq->extts.index);
-+	if (pin == -1 || pin != LAN8814_PTP_EXTTS_NUM)
-+		return -EINVAL;
-+
-+	mutex_lock(&shared->shared_lock);
-+	if (on)
-+		lan8814_ptp_extts_on(phydev, pin, rq->extts.flags);
-+	else
-+		lan8814_ptp_extts_off(phydev, pin);
-+
-+	mutex_unlock(&shared->shared_lock);
-+
-+	return 0;
-+}
-+
- static int lan8814_ptpci_enable(struct ptp_clock_info *ptpci,
- 				struct ptp_clock_request *rq, int on)
- {
- 	switch (rq->type) {
- 	case PTP_CLK_REQ_PEROUT:
- 		return lan8814_ptp_perout(ptpci, rq, on);
-+	case PTP_CLK_REQ_EXTTS:
-+		return lan8814_ptp_extts(ptpci, rq, on);
- 	default:
- 		return -EINVAL;
- 	}
-@@ -3148,6 +3263,10 @@ static int lan8814_ptpci_verify(struct ptp_clock_info *ptp, unsigned int pin,
- 		if (pin >= LAN8814_PTP_PEROUT_NUM || pin != chan)
- 			return -1;
- 		break;
-+	case PTP_PF_EXTTS:
-+		if (pin != LAN8814_PTP_EXTTS_NUM)
-+			return -1;
-+		break;
- 	default:
- 		return -1;
- 	}
-@@ -3320,6 +3439,64 @@ static void lan8814_handle_ptp_interrupt(struct phy_device *phydev, u16 status)
- 	}
- }
- 
-+static int lan8814_gpio_process_cap(struct lan8814_shared_priv *shared)
-+{
-+	struct phy_device *phydev = shared->phydev;
-+	struct ptp_clock_event ptp_event = {0};
-+	unsigned long nsec;
-+	s64 sec;
-+	u16 tmp;
-+
-+	/* This is 0 because whatever was the input pin it was mapped it to
-+	 * ltc gpio pin 0
-+	 */
-+	tmp = lanphy_read_page_reg(phydev, 4, PTP_GPIO_SEL);
-+	tmp |= PTP_GPIO_SEL_GPIO_SEL(0);
-+	lanphy_write_page_reg(phydev, 4, PTP_GPIO_SEL, tmp);
-+
-+	tmp = lanphy_read_page_reg(phydev, 4, PTP_GPIO_CAP_STS);
-+	if (!(tmp & PTP_GPIO_CAP_STS_PTP_GPIO_RE_STS(0)) &&
-+	    !(tmp & PTP_GPIO_CAP_STS_PTP_GPIO_FE_STS(0)))
-+		return -1;
-+
-+	if (tmp & BIT(0)) {
-+		sec = lanphy_read_page_reg(phydev, 4, PTP_GPIO_RE_LTC_SEC_HI_CAP);
-+		sec <<= 16;
-+		sec |= lanphy_read_page_reg(phydev, 4, PTP_GPIO_RE_LTC_SEC_LO_CAP);
-+
-+		nsec = lanphy_read_page_reg(phydev, 4, PTP_GPIO_RE_LTC_NS_HI_CAP) & 0x3fff;
-+		nsec <<= 16;
-+		nsec |= lanphy_read_page_reg(phydev, 4, PTP_GPIO_RE_LTC_NS_LO_CAP);
-+	} else {
-+		sec = lanphy_read_page_reg(phydev, 4, PTP_GPIO_FE_LTC_SEC_HI_CAP);
-+		sec <<= 16;
-+		sec |= lanphy_read_page_reg(phydev, 4, PTP_GPIO_FE_LTC_SEC_LO_CAP);
-+
-+		nsec = lanphy_read_page_reg(phydev, 4, PTP_GPIO_FE_LTC_NS_HI_CAP) & 0x3fff;
-+		nsec <<= 16;
-+		nsec |= lanphy_read_page_reg(phydev, 4, PTP_GPIO_RE_LTC_NS_LO_CAP);
-+	}
-+
-+	ptp_event.index = 0;
-+	ptp_event.timestamp = ktime_set(sec, nsec);
-+	ptp_event.type = PTP_CLOCK_EXTTS;
-+	ptp_clock_event(shared->ptp_clock, &ptp_event);
-+
-+	return 0;
-+}
-+
-+static int lan8814_handle_gpio_interrupt(struct phy_device *phydev, u16 status)
-+{
-+	struct lan8814_shared_priv *shared = phydev->shared->priv;
-+	int ret;
-+
-+	mutex_lock(&shared->shared_lock);
-+	ret = lan8814_gpio_process_cap(shared);
-+	mutex_unlock(&shared->shared_lock);
-+
-+	return ret;
-+}
-+
- static int lan8804_config_init(struct phy_device *phydev)
- {
- 	int val;
-@@ -3424,6 +3601,9 @@ static irqreturn_t lan8814_handle_interrupt(struct phy_device *phydev)
- 		ret = IRQ_HANDLED;
- 	}
- 
-+	if (!lan8814_handle_gpio_interrupt(phydev, irq_status))
-+		ret = IRQ_HANDLED;
-+
- 	return ret;
- }
- 
-@@ -3541,7 +3721,7 @@ static int lan8814_ptp_probe_once(struct phy_device *phydev)
- 	snprintf(shared->ptp_clock_info.name, 30, "%s", phydev->drv->name);
- 	shared->ptp_clock_info.max_adj = 31249999;
- 	shared->ptp_clock_info.n_alarm = 0;
--	shared->ptp_clock_info.n_ext_ts = 0;
-+	shared->ptp_clock_info.n_ext_ts = LAN8814_PTP_EXTTS_NUM;
- 	shared->ptp_clock_info.n_pins = LAN8814_PTP_GPIO_NUM;
- 	shared->ptp_clock_info.pps = 0;
- 	shared->ptp_clock_info.pin_config = shared->pin_config;
--- 
-2.34.1
-
+> 
+>> +    cmd(f"ethtool -L {cfg.dev['ifname']} combined {expected}")
+>> +    queues = nl_get_queues(cfg, nl)
+>> +    ksft_eq(queues, expected)
+>> +
+>> +    # increase queue count by 1
+>> +    expected = expected + 1
+>> +    cmd(f"ethtool -L {cfg.dev['ifname']} combined {expected}")
+>> +    queues = nl_get_queues(cfg, nl)
+>> +    ksft_eq(queues, expected)
+>> +
+>> +
+>> +def main() -> None:
+>> +    with NetDrvEnv(__file__, queue_count=3) as cfg:
+>> +        ksft_run([get_queues, addremove_queues], args=(cfg, NetdevFamily()))
+>> +
+>> +
+> 
+> 
 
