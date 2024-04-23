@@ -1,142 +1,105 @@
-Return-Path: <netdev+bounces-90666-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90667-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7E6A8AF757
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 21:29:57 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3ED168AF758
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 21:30:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 050FD1C21EC6
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 19:29:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CE2121F2308D
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 19:30:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 946471411DE;
-	Tue, 23 Apr 2024 19:29:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B3201419AA;
+	Tue, 23 Apr 2024 19:29:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="E2LxU41e"
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="b9aEDmEy"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDEC013E418
-	for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 19:29:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82A0513E418
+	for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 19:29:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713900588; cv=none; b=GaiMX6HrpzwQ1gbTn4K5wX56elP3sLf6RUhyJ+1Fs/Fk110f5c5MEwghy9KDYLzKj1V06jmAwfsLB7y0b4MXNy3YVsFr5APEQi1GrctkTffUegQ4186GuNyzXQ/sm6UCuzfY87Z2fTghetLaqOu1rLCiMDgI22nDrBR7fN/z1fo=
+	t=1713900594; cv=none; b=jkh29YzrwOSI/w55uEmSKDJ61ITCn0+w0Bjth4euwYiFFJR6LxEILHr8Qjz8bdlpd49x/e/RSeZzcszqTnxZDM7UAfzHAioY4eGv0tX0eA5ZbPJSkeQIS0mnFkhTGNUwhxOvOyNTvsKAq3XM/GJF6FCtMHIBZN9Tg+HUbqdtLvw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713900588; c=relaxed/simple;
-	bh=odvs53J89vHkxamj8JtAAYYYthFoYRIwiYqr53H9o4A=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=j50WvlEDf4IpVhATxTuvbadf4vFGs6bzr6DrDdYzR1pB9RMF6c/bQ6UHhWVBOoQqBswxYgI1DGsdgrGLFcrGyTx/N5c+aEIQRJvFAJpd16P1qXJDT7OBpD+niowhNvmeFJF2TRQA6A7CMneeNewgl/zJXcRFvUemikD4ZTf3mAY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=E2LxU41e; arc=none smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1713900588; x=1745436588;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=odvs53J89vHkxamj8JtAAYYYthFoYRIwiYqr53H9o4A=;
-  b=E2LxU41e9LEkSExyipihkdz82ZdTaiTiORZ1ylEo0xDYDooGcla7JCAT
-   rsH57LmTqyXDTPnn08Zav9otKIjaQ2x7KELoP16LDwD0AwLKBMmLDlODj
-   PG+4V4qPdReEaFO1Ywjr8t0N0caJlbigaRzdzpMYR5dN1r2RXlQiUczmu
-   Qn19K3QZho8ya27nu+L+NA/xXhcwAyHGAnBF/3ZjSARw/lKf0JuBHDNjw
-   uVw2k2c+8CIEX6HWs78ekvUPFfuUY7iYmTzsMrcP0FJrgRSY1FKWkEl4m
-   D3w+KkyeL7duEGspHvBCEP8/m9MM/0xO4ipAX1YI//YqMUihVIpOAFrJm
-   A==;
-X-CSE-ConnectionGUID: SD2mN5/IQM20Rk6USUIJug==
-X-CSE-MsgGUID: gCTb8hoCSFCt/0pTMDJExA==
-X-IronPort-AV: E=Sophos;i="6.07,222,1708412400"; 
-   d="scan'208";a="22340301"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 23 Apr 2024 12:29:46 -0700
-Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 23 Apr 2024 12:29:33 -0700
-Received: from DEN-DL-M70577 (10.10.85.11) by chn-vm-ex01.mchp-main.com
- (10.10.85.143) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
- Transport; Tue, 23 Apr 2024 12:29:31 -0700
-Date: Tue, 23 Apr 2024 19:29:30 +0000
-From: Daniel Machon <daniel.machon@microchip.com>
-To: Simon Horman <horms@kernel.org>
-CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Bryan Whitehead <bryan.whitehead@microchip.com>,
-	"Richard Cochran" <richardcochran@gmail.com>, Horatiu Vultur
-	<horatiu.vultur@microchip.com>, Lars Povlsen <lars.povlsen@microchip.com>,
-	Steen Hegelund <Steen.Hegelund@microchip.com>,
-	<UNGLinuxDriver@microchip.com>, <netdev@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>
-Subject: Re: [PATCH net-next 4/4] net: sparx5: Correct spelling in comments
-Message-ID: <20240423192930.okhvbvlao6ke3pkl@DEN-DL-M70577>
-References: <20240419-lan743x-confirm-v1-0-2a087617a3e5@kernel.org>
- <20240419-lan743x-confirm-v1-4-2a087617a3e5@kernel.org>
- <20240420192424.42z2aztt73grdvsj@DEN-DL-M70577>
- <20240422105756.GC42092@kernel.org>
- <20240423112915.5cmqvmvwfwutahky@DEN-DL-M70577>
- <20240423135417.GT42092@kernel.org>
- <20240423161849.GW42092@kernel.org>
+	s=arc-20240116; t=1713900594; c=relaxed/simple;
+	bh=UkjqzAEY+xUmI8ibNgSjLH18pwa4XJKVzG1+CmZUhos=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=TKwGgR4b0jB5X4ncvgSRwmKbszeDr13N56ILGH0kpNBsaMuCLPADd1TeGKZKAz7CF9oPu7fAMKZm29PiHjQA+BDWR4lk3+x3/91QL8IDuRfbhr5d/xYIj6maWRKYBnh9VOjY3GoCtV7Fzz+Ed3C3sfTzlkWCITgfmnokNyTW+8g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=b9aEDmEy; arc=none smtp.client-ip=209.85.128.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
+Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-617e42a3f94so67098757b3.2
+        for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 12:29:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1713900591; x=1714505391; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=AdYVTxq72Ghh0+nryy4S2GXt7RvzUpURnWrK7wREYZs=;
+        b=b9aEDmEydrz/Bv03fn7/cKnQLMyRN/pQFTWvDLlT1gSB3AVTusdbLEpCFBDBo3ZS8n
+         NRXqByTtRgzd5VF4xnV7N8F9W+lhElsY4jZ0O+a6hdbiTfAbbBqz51L9FTPkjQcl9gu3
+         Su+5BrGG/VfFy6tRtD6l1sPOaLyHtUINrALTO2/gBpK2VlO5GprZngQg275sdfmIEOWF
+         Xz0b6GJGvEHHpHtAGrP2hlNS6+P0BYRWDNlRD7i8v0Cqlw6Odxzze9BN5y/JrsNUcE0C
+         IOv3hao7mugMds09LAKi5E0S2NmSD+gF+NrSkeBHighWGN8cZFJZUHWiUbd1CBcBcKnD
+         4d6A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713900591; x=1714505391;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=AdYVTxq72Ghh0+nryy4S2GXt7RvzUpURnWrK7wREYZs=;
+        b=TTPm99deKzywB7qD4ontoSFfz4i9nxbmxPG0HKCVdbIVLVF9Iz7vKgbmh+et2papBJ
+         vQReEB8VFloBj+fsZ2JZP9ZXCHWHwZ4uGK1RYbFdRaA9AWKIkJA6b2L3zyTO3yqt4WUp
+         AMCfkPbvSJnOm285K7m5fGefkcm0YxStWDFBL7ax+Gw/hO78JuFV4SgXAMn0pfNgTZUR
+         qU7yViHRJ+nmlYsStXq2r9CA2soJeTlnaedFShLmU1JE68XypmyvCvENw6gUGTgTD1QA
+         D5pKXGrSlhzPR6Km5YubFi935MqqP79/z8jILkv4lkw3vO+sN/9lNv0wSweVKFkIVGEP
+         kovw==
+X-Gm-Message-State: AOJu0Yyim91mn/TMdfHihzTH8IZk9TjMqylufZeT/ljCJj6L1i6sHgQ0
+	luBDyXJnWyASN9cgxJBBFIbG1o4IavYTDeYx3qTFg30EU/9FPDfNRUKtNAzYkpE=
+X-Google-Smtp-Source: AGHT+IEnnvuwBABQJt3unA0O+RDYv60NQgWnLneWCgqrxcnIEsIM6phki1YZACvHdPbW1qeS25vuLw==
+X-Received: by 2002:a05:690c:a98:b0:615:2d5a:e398 with SMTP id ci24-20020a05690c0a9800b006152d5ae398mr542644ywb.21.1713900591171;
+        Tue, 23 Apr 2024 12:29:51 -0700 (PDT)
+Received: from [10.73.215.90] ([72.29.204.230])
+        by smtp.gmail.com with ESMTPSA id i84-20020a0ddf57000000b00617cd7bd3a9sm2558766ywe.109.2024.04.23.12.29.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 23 Apr 2024 12:29:50 -0700 (PDT)
+Message-ID: <795d794c-35b8-4ae7-9a97-296523c5bf3a@bytedance.com>
+Date: Tue, 23 Apr 2024 12:29:48 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20240423161849.GW42092@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [External] Re: [PATCH net-next v2 0/3] net: A lightweight
+ zero-copy notification
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, edumazet@google.com,
+ willemdebruijn.kernel@gmail.com, davem@davemloft.net,
+ cong.wang@bytedance.com, xiaochun.lu@bytedance.com
+References: <20240419214819.671536-1-zijianzhang@bytedance.com>
+ <20240419204754.3f3b7347@kernel.org>
+Content-Language: en-US
+From: Zijian Zhang <zijianzhang@bytedance.com>
+In-Reply-To: <20240419204754.3f3b7347@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-> On Tue, Apr 23, 2024 at 02:54:17PM +0100, Simon Horman wrote:
-> > On Tue, Apr 23, 2024 at 11:29:15AM +0000, Daniel Machon wrote:
-> > > > > Hi Simon,
-> > > > >
-> > > > > > -/* Convert validation error code into tc extact error message */
-> > > > > > +/* Convert validation error code into tc exact error message */
-> > > > >
-> > > > > This seems wrong. I bet it refers to the 'netlink_ext_ack' struct. So
-> > > > > the fix should be 'extack' instead.
-> > > > >
-> > > > > >  void vcap_set_tc_exterr(struct flow_cls_offload *fco, struct vcap_rule *vrule)
-> > > > > >  {
-> > > > > >         switch (vrule->exterr) {
-> > > > > > diff --git a/drivers/net/ethernet/microchip/vcap/vcap_api_client.h b/drivers/net/ethernet/microchip/vcap/vcap_api_client.h
-> > > > > > index 56874f2adbba..d6c3e90745a7 100644
-> > > > > > --- a/drivers/net/ethernet/microchip/vcap/vcap_api_client.h
-> > > > > > +++ b/drivers/net/ethernet/microchip/vcap/vcap_api_client.h
-> > > > > > @@ -238,7 +238,7 @@ const struct vcap_set *vcap_keyfieldset(struct vcap_control *vctrl,
-> > > > > >  /* Copy to host byte order */
-> > > > > >  void vcap_netbytes_copy(u8 *dst, u8 *src, int count);
-> > > > > >
-> > > > > > -/* Convert validation error code into tc extact error message */
-> > > > > > +/* Convert validation error code into tc exact error message */
-> > > > >
-> > > > > Same here.
-> > > >
-> > > > Thanks Daniel,
-> > > >
-> > > > Silly me. I'll drop these changes in v2.
-> > >
-> > > No reason to drop them just change it to 'extack' :-)
-> >
-> > Thanks, will do.
-> 
-> Sorry, I am somehow confused.
-> 
-> Do you mean like this?
-> 
-> /* Convert validation error code into extact error message */
-> 
-> Or just leave things unchanged?
-> 
-> /* Convert validation error code into tc extact error message */
+Thanks, will update in the next version.
 
-Should be:
-
-  /* Convert validation error code into tc extack error message */
-
-So the misspelling was real, just the fix was extack and not exact.
-
-/Daniel
+On 4/19/24 8:47 PM, Jakub Kicinski wrote:
+> On Fri, 19 Apr 2024 21:48:16 +0000 zijianzhang@bytedance.com wrote:
+>> Original title is "net: socket sendmsg MSG_ZEROCOPY_UARG"
+>> https://lore.kernel.org/all/
+>> 20240409205300.1346681-2-zijianzhang@bytedance.com/
+> 
+> AFAICT sparse reports this new warning:
+> 
+> net/core/sock.c:2864:26: warning: incorrect type in assignment (different address spaces)
+> net/core/sock.c:2864:26:    expected void [noderef] __user *usr_addr
+> net/core/sock.c:2864:26:    got void *
 
