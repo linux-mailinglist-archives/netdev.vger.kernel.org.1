@@ -1,131 +1,156 @@
-Return-Path: <netdev+bounces-90462-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90464-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14B738AE363
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 13:06:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BB0688AE380
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 13:11:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 33263B222A4
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 11:06:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E7DFDB21031
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 11:11:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2274C6EB70;
-	Tue, 23 Apr 2024 11:06:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0D168004B;
+	Tue, 23 Apr 2024 11:10:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="qDRsJJb0"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ERnBvNby"
 X-Original-To: netdev@vger.kernel.org
-Received: from fllv0016.ext.ti.com (fllv0016.ext.ti.com [198.47.19.142])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 424ED757EE;
-	Tue, 23 Apr 2024 11:06:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.142
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20EDF80028;
+	Tue, 23 Apr 2024 11:10:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713870408; cv=none; b=ZWTfVGW17S+zQtzcwCHZOpBmhL8PR2Ap0F4DOA7mZJKWFpo3dEaXcR0mWNcqnZ4KqUYec9esuCjR1XCylH0ln/G8bIUMI8ecurXjzIb/CxOZGWX59h1zAVtBbUwK/xKjF6FSkKkbZ+FkiPmKNcYJk6IF9B3797GfZYS1S8ntirY=
+	t=1713870646; cv=none; b=McIFTCSSLlautCAxL3r8ISgCDKGc0PtRggL2S+KbrCwPhsDhWwLCBbosgekjZIIvy53Cts8GbLC0eRZ+g9W2cW3iUqoKCov7id1Eg8rx9UPnBMbwoZFMycvmfpWT55qBwsv5EvBIyxSuGjvxvM5te/7GlzVSyAJiffqZgNU4+98=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713870408; c=relaxed/simple;
-	bh=xi+p9Aq+rLkwX64YbZih1zn1N7OINid8fRd3s6RwH6E=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=dCpeliCI7riIWRHhVBbLvOnaa7T760NhV8gGnEWpD8szVZBUP62pD7XwSc/lvpfFkYhQw0bSzgGdDbNLyRytsGT0G5XR8A8R8ceMimZGdPu2+cF40/B5vz61wb0We1l0AjnWFyYAZhyGcM2wTLtzitF3Gx0JdRbDm1jROKCIRzk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=qDRsJJb0; arc=none smtp.client-ip=198.47.19.142
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from lelv0266.itg.ti.com ([10.180.67.225])
-	by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id 43NB6UnV073180;
-	Tue, 23 Apr 2024 06:06:30 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1713870390;
-	bh=XSNBGgTi8rj9WzeNTLXIKZPG5fboAicbyYRXMZYYjpw=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=qDRsJJb0E789F2YGFYK3VCtIe3E3IbWm/Lxji3FQ7DI0FUAK+YDgRFSuYgdO3Dw0J
-	 FNR/j+0uNUlZjjGMor/DeJxPJ+m3u7QadWfHUKQ7jWX4PKvepENSv2RzI6uuQ1Rbgm
-	 GvU0dZCA69+WZVokTG8Nnhvv+/oXp5RPYWz7LteQ=
-Received: from DLEE109.ent.ti.com (dlee109.ent.ti.com [157.170.170.41])
-	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 43NB6UJa025529
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Tue, 23 Apr 2024 06:06:30 -0500
-Received: from DLEE110.ent.ti.com (157.170.170.21) by DLEE109.ent.ti.com
- (157.170.170.41) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Tue, 23
- Apr 2024 06:06:29 -0500
-Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DLEE110.ent.ti.com
- (157.170.170.21) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Tue, 23 Apr 2024 06:06:29 -0500
-Received: from [172.24.227.88] (uda0500640.dhcp.ti.com [172.24.227.88])
-	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 43NB6PEK039021;
-	Tue, 23 Apr 2024 06:06:25 -0500
-Message-ID: <52c7352f-a91b-3604-5ae0-88d7bb814e51@ti.com>
-Date: Tue, 23 Apr 2024 16:36:24 +0530
+	s=arc-20240116; t=1713870646; c=relaxed/simple;
+	bh=FhMYwpD0Jy+0t5UX4wrDuIaENfV+qwJP/+xWhZFZCdQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GHkX7VD6nLSh6upVA9fIJm9w2KmOdWzm9TWX+uBPXXpxGUDUmefcuoqmVEyjgqCW2K94IDiuVvYT+wyKl7LXiF3vssX8M54uUlDsi7aLOrxTg8hhBpXwQ+zhnUyR4tskoNOC50PDjo4jJs1A5YICrpNEAV9CY/jUZVYBhBidrD8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ERnBvNby; arc=none smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1713870645; x=1745406645;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=FhMYwpD0Jy+0t5UX4wrDuIaENfV+qwJP/+xWhZFZCdQ=;
+  b=ERnBvNbyFK6VwTLE/1IyNhrnjvj0TxFuN2XL4Gq4yAOJ7yN7lSkTHEOX
+   CDlc2aCKPJPboY8CRQ9p25ZrTi0xPKZuDho4/fJGNiDcoXAExx5WCcUT7
+   k1Ot3Y0us4F2uybfjrr42Qo85nTF/Jmcg9zLevTfktr3qGwmdSW6fDX4u
+   oTSHr0zY+q3Of+/1/hBTnL1uVqM88Npsrax+/yF5sxl/b18eE4LkXFwEC
+   8rX2uGqbODoQIr+zy0zp+Xw2b4xHI78iHrjfyCgGijDyqdO1VYQBh/OOC
+   Igdk54FoXmzzQn2j3gpp4kz7UQAw2sFDxEGa/Tc3pVTe6HmSSwbPnLjKU
+   A==;
+X-CSE-ConnectionGUID: yTIwQevkT9CXDZpZ5SC9lQ==
+X-CSE-MsgGUID: 8EmlvmEuT8+Ut7spIoLwrQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11052"; a="26905757"
+X-IronPort-AV: E=Sophos;i="6.07,222,1708416000"; 
+   d="scan'208";a="26905757"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2024 04:10:45 -0700
+X-CSE-ConnectionGUID: GHANmPF1QaSu/tzRusNdUw==
+X-CSE-MsgGUID: zm+oKK03QECvY3VX9hfdGA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,222,1708416000"; 
+   d="scan'208";a="24342606"
+Received: from mszycik-mobl1.ger.corp.intel.com (HELO [10.246.35.198]) ([10.246.35.198])
+  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2024 04:10:37 -0700
+Message-ID: <eb54c7bb-db63-4361-b42f-dc02e2c37fbf@linux.intel.com>
+Date: Tue, 23 Apr 2024 13:10:16 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH net] net: ethernet: ti: am65-cpts: Fix PTPv1 message type
- on TX packets
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH 0/5] Ensure the copied buf is NULL
+ terminated
+To: Bui Quang Minh <minhquangbui99@gmail.com>,
+ Jesse Brandeburg <jesse.brandeburg@intel.com>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Paul M Stillwell Jr <paul.m.stillwell.jr@intel.com>,
+ Rasesh Mody <rmody@marvell.com>, Sudarsana Kalluru <skalluru@marvell.com>,
+ GR-Linux-NIC-Dev@marvell.com, Krishna Gudipati <kgudipat@brocade.com>,
+ Anil Gurumurthy <anil.gurumurthy@qlogic.com>,
+ Sudarsana Kalluru <sudarsana.kalluru@qlogic.com>,
+ "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ Fabian Frederick <fabf@skynet.be>, Saurav Kashyap <skashyap@marvell.com>,
+ Javed Hasan <jhasan@marvell.com>, GR-QLogic-Storage-Upstream@marvell.com,
+ Nilesh Javali <nilesh.javali@cavium.com>, Arun Easi <arun.easi@cavium.com>,
+ Manish Rangankar <manish.rangankar@cavium.com>,
+ Vineeth Vijayan <vneethv@linux.ibm.com>,
+ Peter Oberparleiter <oberpar@linux.ibm.com>,
+ Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+ Alexander Gordeev <agordeev@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Sven Schnelle <svens@linux.ibm.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-s390@vger.kernel.org,
+ linux-scsi@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
+ Saurav Kashyap <saurav.kashyap@cavium.com>
+References: <20240422-fix-oob-read-v1-0-e02854c30174@gmail.com>
 Content-Language: en-US
-To: Paolo Abeni <pabeni@redhat.com>, <s-vadapalli@ti.com>, <rogerq@kernel.org>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <richardcochran@gmail.com>, <jreeder@ti.com>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <srk@ti.com>,
-        Ravi Gunasekaran
-	<r-gunasekaran@ti.com>
-References: <20240419080547.10682-1-r-gunasekaran@ti.com>
- <4a92f794480b12c21eaeeeb66521dbe978f08414.camel@redhat.com>
-From: Ravi Gunasekaran <r-gunasekaran@ti.com>
-In-Reply-To: <4a92f794480b12c21eaeeeb66521dbe978f08414.camel@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+From: Marcin Szycik <marcin.szycik@linux.intel.com>
+In-Reply-To: <20240422-fix-oob-read-v1-0-e02854c30174@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 
-Paolo,
 
-On 4/23/24 3:31 PM, Paolo Abeni wrote:
-> On Fri, 2024-04-19 at 13:35 +0530, Ravi Gunasekaran wrote:
->> From: Jason Reeder <jreeder@ti.com>
->>
->> The CPTS, by design, captures the messageType (Sync, Delay_Req, etc.)
->> field from the second nibble of the PTP header which is defined in the
->> PTPv2 (1588-2008) specification. In the PTPv1 (1588-2002) specification
->> the first two bytes of the PTP header are defined as the versionType
->> which is always 0x0001. This means that any PTPv1 packets that are
->> tagged for TX timestamping by the CPTS will have their messageType set
->> to 0x0 which corresponds to a Sync message type. This causes issues
->> when a PTPv1 stack is expecting a Delay_Req (messageType: 0x1)
->> timestamp that never appears.
->>
->> Fix this by checking if the ptp_class of the timestamped TX packet is
->> PTP_CLASS_V1 and then matching the PTP sequence ID to the stored
->> sequence ID in the skb->cb data structure. If the sequence IDs match
->> and the packet is of type PTPv1 then there is a chance that the
->> messageType has been incorrectly stored by the CPTS so overwrite the
->> messageType stored by the CPTS with the messageType from the skb->cb
->> data structure. This allows the PTPv1 stack to receive TX timestamps
->> for Delay_Req packets which are necessary to lock onto a PTP Leader.
->>
->> Signed-off-by: Jason Reeder <jreeder@ti.com>
->> Signed-off-by: Ravi Gunasekaran <r-gunasekaran@ti.com>
+
+On 22.04.2024 18:41, Bui Quang Minh wrote:
+> Hi everyone,
 > 
-> Please provide a suitable fixes tag, thanks!
+> I found that some drivers contains an out-of-bound read pattern like this
+> 
+> 	kern_buf = memdup_user(user_buf, count);
+> 	...
+> 	sscanf(kern_buf, ...);
+> 
+> The sscanf can be replaced by some other string-related functions. This
+> pattern can lead to out-of-bound read of kern_buf in string-related
+> functions.
+> 
+> This series fix the above issue by replacing memdup_user with
+> memdup_user_nul or allocating count + 1 buffer then writing the NULL
+> terminator to end of buffer after userspace copying.
+> 
+> Thanks,
+> Quang Minh.
+> 
+> Signed-off-by: Bui Quang Minh <minhquangbui99@gmail.com>
+> ---
+> Bui Quang Minh (5):
+>       drivers/net/ethernet/intel-ice: ensure the copied buf is NULL terminated
+>       drivers/net/brocade-bnad: ensure the copied buf is NULL terminated
+>       drivers/scsi/bfa/bfad: ensure the copied buf is NULL terminated
+>       drivers/scsi/qedf: ensure the copied buf is NULL terminated
+>       drivers/s390/cio: ensure the copied buf is NULL terminated
 
-am65_cpts_match_tx_ts() was added in the very first commit of the file.
-Would that be a suitable fixes tag? I understand that the purpose of
-the fixes tag is to know to which all previous kernels, the fix needs to
-be applied. 
-
-Please let me know, if it is ok to provide first commit as fixes tag, so that
-I can send a v2.
+Typically you don't include path to module in title, instead:
+ice: ensure the copied buf is NULL terminated
+bna: ensure the copied buf is NULL terminated
+etc.
 
 > 
-> Paolo
+>  drivers/net/ethernet/brocade/bna/bnad_debugfs.c | 4 ++--
+>  drivers/net/ethernet/intel/ice/ice_debugfs.c    | 8 ++++----
+>  drivers/s390/cio/cio_inject.c                   | 3 ++-
+>  drivers/scsi/bfa/bfad_debugfs.c                 | 4 ++--
+>  drivers/scsi/qedf/qedf_debugfs.c                | 2 +-
+>  5 files changed, 11 insertions(+), 10 deletions(-)
+> ---
+> base-commit: ed30a4a51bb196781c8058073ea720133a65596f
+> change-id: 20240422-fix-oob-read-19ae7f8f3711
 > 
+> Best regards,
 
--- 
-Regards,
-Ravi
+Thanks,
+Marcin
 
