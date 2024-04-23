@@ -1,232 +1,132 @@
-Return-Path: <netdev+bounces-90370-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90373-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 957378ADE2A
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 09:23:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 393AD8ADE61
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 09:38:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F1A55B2164A
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 07:23:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 66F981C211B6
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 07:38:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DB3E47A52;
-	Tue, 23 Apr 2024 07:22:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89C6A47A7C;
+	Tue, 23 Apr 2024 07:38:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TB7m8R8m"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="g2nCNumm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A27894776E;
-	Tue, 23 Apr 2024 07:22:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88F5F46441;
+	Tue, 23 Apr 2024 07:38:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713856939; cv=none; b=JDMSbIrqPXtfNMHQSL37FtLFY7+syWqfkos41iAu7PR2/fbhTevPh71cnoZZHEbhzHPb7d1ckb8ZBazryQYGCVkrL6FTk/beOyqq2VYVmvFwYnhozbw4ZYVkNc4S8Z+qmufHLU9BTTzUO0sZ54y1eplIRJvUntb2NeGhj0ljZaI=
+	t=1713857931; cv=none; b=auiBXftCscdy1v3JteyE6UXnPdDO023fsUB1RZrT0eJj5lV2XXQ6QbP+zXeaEOZ44AVWBEL0iCz7uz7rGedi0/ZODbdZJshyic8cKxewU4/L8JUzFqmk8ATaksWz1PQj5vNIH3QvGU7gWCamQaXqaBq0JwIx8wPT6V+MQ2AEBNc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713856939; c=relaxed/simple;
-	bh=EKYMhUZclgItu8bZojekegGV/0jiYlqGYAss6oG3DpE=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=hw9GIp4O/zHDf3Y/XrZIccG9uj9eJzaN1hJe6ojrwCoXNXTjRuByYIp0SMys3+qKOXKssKLa/wCQ8I1M5iczGcoL/4V94m0aL9bNqVwxUuumC8b18oyFzRpjMFE9hMoBNl+45iLo5HvurV4JEQlyeKLFEialInto14O+VApRtVc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TB7m8R8m; arc=none smtp.client-ip=209.85.210.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-6eddff25e4eso4498721b3a.3;
-        Tue, 23 Apr 2024 00:22:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713856937; x=1714461737; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dSmjtgVuckfMZ8VC+OmMH5H1dLjbofpKgPRr0iJJo38=;
-        b=TB7m8R8mtx2Kdwhd6CqAnoEjaboXOw7Pu4+t1YG8YPdX2a2CgS0BqlVJ40Wa6Rarqu
-         MNw2QpuiTQZ6k9WXnPGe0Ea6DYxgxHyqrszI0REtUl8Q9TbEjG6qen3TZ49KQ/I82okf
-         UHqhMVUqK3VeOHw7ssHFjoUa5BhWqWQVk6Nyor2KZXSB+vbk51sZ8aIDGJ0S3A/iNP2q
-         m9yVRmW/MSliPSMniEAY5hL9ZgbMAlQOQ34iLmn16R6o0ancBJO74iWlgUNlGWtj6oX+
-         oFVOr8zDo/8yC5ZKSgFvQgPNsxppjTN6L0oo2HxuL2pJ1ypvKbF2Kb9vrBHv7MhE4WOO
-         dmFQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713856937; x=1714461737;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=dSmjtgVuckfMZ8VC+OmMH5H1dLjbofpKgPRr0iJJo38=;
-        b=DaLJ/Q6Tx8WV+JMqPtmX3uyGIJO5X6GC8bYR0Po1t4o8OB2Q26f8pffeBbJdC2g4mg
-         oLnvP/i4kzaTK6aXmbpp/TJvuOipJJf8ynqkQmrrVP5CP7VHoxJq8xVw+vscU8VHf/EA
-         Sf52K3toSdffbrjmAjlcw0AaKmZTNszQxz+sdByRA1e7rYWLUsT5WOxSWF81Q9ugyIQz
-         p93Ks8quExqXyazVUydqSAXmsBJ0GrgrCNgck1lh+4DDA17jjFKI3X6t+GxMdk9rfRS9
-         FSGeOy+TiOamh2jo8PuyX3xARwhrWkmOIxdWNaPC1rdFgnxUuFe/A+2IELxgmG9P2Fjp
-         uW/A==
-X-Forwarded-Encrypted: i=1; AJvYcCW7uTgR74H50+If72VNRgw/3UOKlikpaqzrR9/Mx7gl/5IK4SkVRYyXv2aNiDAEw7v5GxZ1SX2NM+MU1yOlFjUADaU0WY+gGW/c12GS7xOjgd37ep0dyP9nQDi6HnF6hlEM/nIR6g16JKCY
-X-Gm-Message-State: AOJu0YycT4p4JiXoKxAo4xzHvezbkGI6f3qBV9czoug2BlHM3RGfbQvf
-	4uzkup3HwJeYwczS+n70HM9krVsvI3BWVF5fMLnFRUOaPR6te9iG
-X-Google-Smtp-Source: AGHT+IGECVYwawMBLuHgOSRImd/V0atYzUdeUTVW1k4VHS5NdHvP5jhMq/LACb9K2IoLT372LftMsQ==
-X-Received: by 2002:a05:6a21:3945:b0:1aa:9310:e83a with SMTP id ac5-20020a056a21394500b001aa9310e83amr14194404pzc.6.1713856937019;
-        Tue, 23 Apr 2024 00:22:17 -0700 (PDT)
-Received: from KERNELXING-MB0.tencent.com ([43.132.141.25])
-        by smtp.gmail.com with ESMTPSA id w19-20020a170902c79300b001e0c956f0dcsm9330114pla.213.2024.04.23.00.22.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Apr 2024 00:22:16 -0700 (PDT)
-From: Jason Xing <kerneljasonxing@gmail.com>
-To: edumazet@google.com,
-	dsahern@kernel.org,
-	matttbe@kernel.org,
-	martineau@kernel.org,
-	geliang@kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	davem@davemloft.net,
-	rostedt@goodmis.org,
-	mhiramat@kernel.org,
-	mathieu.desnoyers@efficios.com,
-	atenart@kernel.org,
-	horms@kernel.org
-Cc: mptcp@lists.linux.dev,
-	netdev@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org,
-	kerneljasonxing@gmail.com,
-	Jason Xing <kernelxing@tencent.com>
-Subject: [PATCH net-next v8 7/7] rstreason: make it work in trace world
-Date: Tue, 23 Apr 2024 15:21:37 +0800
-Message-Id: <20240423072137.65168-8-kerneljasonxing@gmail.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20240423072137.65168-1-kerneljasonxing@gmail.com>
-References: <20240423072137.65168-1-kerneljasonxing@gmail.com>
+	s=arc-20240116; t=1713857931; c=relaxed/simple;
+	bh=mjRkFfdBtZbVYBPrvsjPmWl58HkXWr16xgIBP3dQroM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=COuefhTOhK8DI4ss2fOuEjv8uAb0+mEcyP6subvAxUnwnFt4Xv/wA0S6q1dYcudFqWQs7E9pwGod0fmudnC0pU8PEWo9bLHx8OoSA/4XIUvV472TggvfkSVDmve/iE2brcMDUfSLkJuKQLMmq4XpcX09NUmVeRKEwaNGqwajEbQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=g2nCNumm; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1713857929; x=1745393929;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=mjRkFfdBtZbVYBPrvsjPmWl58HkXWr16xgIBP3dQroM=;
+  b=g2nCNummvlRj+JVkPdJL1qOV+3rWgeywty2ipzANBbnJsXrpqJJhNC7x
+   dGhRdKrMZSNTTUv7zqboihF8yRIa41pCGR5wGmoqMRkgLsiM8PALfGbR1
+   QdhdVn+mJmY7z6GSblg/InVuNT9Rjr5AtxSwnZ3T6ufoZTK95L2gBnmWx
+   axZ/DlclZSuohycmHPNp5Se6llS/di/BlqDwFb3xVT7eUAq0rvYY2Du5K
+   lXp5pwMepesZQcGKV6qnCKNpwAwNpF8ae4EQ3zNICZrq10y2XAS9Y9ttD
+   omYiHR2SC0iie8sQ17O7EN5NbilH9cgNWuen1tOzmGrUrFS0yOTUm+Cb1
+   A==;
+X-CSE-ConnectionGUID: GvO6N5AUR2yId7/OmN5Dmw==
+X-CSE-MsgGUID: SWnKJNYuTzqKvj7J1LwpQg==
+X-IronPort-AV: E=McAfee;i="6600,9927,11052"; a="31918033"
+X-IronPort-AV: E=Sophos;i="6.07,222,1708416000"; 
+   d="scan'208";a="31918033"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2024 00:38:48 -0700
+X-CSE-ConnectionGUID: s/KDoHdVTiSM0XnX3bJmkw==
+X-CSE-MsgGUID: mzxAigJiRoSRJZwbwrOibA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,222,1708416000"; 
+   d="scan'208";a="24332315"
+Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
+  by fmviesa006.fm.intel.com with ESMTP; 23 Apr 2024 00:38:37 -0700
+Date: Tue, 23 Apr 2024 15:33:16 +0800
+From: Xu Yilun <yilun.xu@linux.intel.com>
+To: Arnd Bergmann <arnd@kernel.org>
+Cc: linux-kernel@vger.kernel.org, Corey Minyard <minyard@acm.org>,
+	Peter Huewe <peterhuewe@gmx.de>,
+	Jarkko Sakkinen <jarkko@kernel.org>, Vinod Koul <vkoul@kernel.org>,
+	Moritz Fischer <mdf@kernel.org>, Wu Hao <hao.wu@intel.com>,
+	Xu Yilun <yilun.xu@intel.com>, Jiri Kosina <jikos@kernel.org>,
+	Benjamin Tissoires <benjamin.tissoires@redhat.com>,
+	Michael Hennerich <michael.hennerich@analog.com>,
+	Peter Rosin <peda@axentia.se>,
+	Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+	Iyappan Subramanian <iyappan@os.amperecomputing.com>,
+	Keyur Chudgar <keyur@os.amperecomputing.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Yisen Zhuang <yisen.zhuang@huawei.com>,
+	Salil Mehta <salil.mehta@huawei.com>,
+	Tony Lindgren <tony@atomide.com>,
+	Liam Girdwood <lgirdwood@gmail.com>,
+	Mark Brown <broonie@kernel.org>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	Xiang Chen <chenxiang66@hisilicon.com>,
+	"James E.J. Bottomley" <jejb@linux.ibm.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Russell King <linux@armlinux.org.uk>,
+	Jiri Slaby <jirislaby@kernel.org>,
+	Jacky Huang <ychuang3@nuvoton.com>,
+	Shan-Chun Hung <schung@nuvoton.com>, Arnd Bergmann <arnd@arndb.de>,
+	Jason Gunthorpe <jgg@ziepe.ca>, Tom Rix <trix@redhat.com>,
+	Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
+	Randy Dunlap <rdunlap@infradead.org>, Rob Herring <robh@kernel.org>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	openipmi-developer@lists.sourceforge.net,
+	linux-integrity@vger.kernel.org, dmaengine@vger.kernel.org,
+	linux-fpga@vger.kernel.org, linux-input@vger.kernel.org,
+	linux-i2c@vger.kernel.org, netdev@vger.kernel.org,
+	linux-omap@vger.kernel.org, linux-rtc@vger.kernel.org,
+	linux-scsi@vger.kernel.org, linux-staging@lists.linux.dev,
+	linux-serial@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH 33/34] drivers: remove incorrect of_match_ptr/ACPI_PTR
+ annotations
+Message-ID: <ZidkPHp27jz0t6t3@yilunxu-OptiPlex-7050>
+References: <20240403080702.3509288-1-arnd@kernel.org>
+ <20240403080702.3509288-34-arnd@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240403080702.3509288-34-arnd@kernel.org>
 
-From: Jason Xing <kernelxing@tencent.com>
+> diff --git a/drivers/fpga/versal-fpga.c b/drivers/fpga/versal-fpga.c
+> index 3710e8f01be2..e6189106c468 100644
+> --- a/drivers/fpga/versal-fpga.c
+> +++ b/drivers/fpga/versal-fpga.c
+> @@ -69,7 +69,7 @@ static struct platform_driver versal_fpga_driver = {
+>  	.probe = versal_fpga_probe,
+>  	.driver = {
+>  		.name = "versal_fpga_manager",
+> -		.of_match_table = of_match_ptr(versal_fpga_of_match),
+> +		.of_match_table = versal_fpga_of_match,
 
-At last, we should let it work by introducing this reset reason in
-trace world.
+For this part
 
-One of the possible expected outputs is:
-... tcp_send_reset: skbaddr=xxx skaddr=xxx src=xxx dest=xxx
-state=TCP_ESTABLISHED reason=NOT_SPECIFIED
-
-Signed-off-by: Jason Xing <kernelxing@tencent.com>
-Reviewed-by: Steven Rostedt (Google) <rostedt@goodmis.org>
----
- include/trace/events/tcp.h | 26 ++++++++++++++++++++++----
- net/ipv4/tcp_ipv4.c        |  2 +-
- net/ipv4/tcp_output.c      |  2 +-
- net/ipv6/tcp_ipv6.c        |  2 +-
- 4 files changed, 25 insertions(+), 7 deletions(-)
-
-diff --git a/include/trace/events/tcp.h b/include/trace/events/tcp.h
-index 5c04a61a11c2..49b5ee091cf6 100644
---- a/include/trace/events/tcp.h
-+++ b/include/trace/events/tcp.h
-@@ -11,6 +11,7 @@
- #include <net/ipv6.h>
- #include <net/tcp.h>
- #include <linux/sock_diag.h>
-+#include <net/rstreason.h>
- 
- /*
-  * tcp event with arguments sk and skb
-@@ -74,20 +75,32 @@ DEFINE_EVENT(tcp_event_sk_skb, tcp_retransmit_skb,
- 	TP_ARGS(sk, skb)
- );
- 
-+#undef FN
-+#define FN(reason)	TRACE_DEFINE_ENUM(SK_RST_REASON_##reason);
-+DEFINE_RST_REASON(FN, FN)
-+
-+#undef FN
-+#undef FNe
-+#define FN(reason)	{ SK_RST_REASON_##reason, #reason },
-+#define FNe(reason)	{ SK_RST_REASON_##reason, #reason }
-+
- /*
-  * skb of trace_tcp_send_reset is the skb that caused RST. In case of
-  * active reset, skb should be NULL
-  */
- TRACE_EVENT(tcp_send_reset,
- 
--	TP_PROTO(const struct sock *sk, const struct sk_buff *skb),
-+	TP_PROTO(const struct sock *sk,
-+		 const struct sk_buff *skb,
-+		 const enum sk_rst_reason reason),
- 
--	TP_ARGS(sk, skb),
-+	TP_ARGS(sk, skb, reason),
- 
- 	TP_STRUCT__entry(
- 		__field(const void *, skbaddr)
- 		__field(const void *, skaddr)
- 		__field(int, state)
-+		__field(enum sk_rst_reason, reason)
- 		__array(__u8, saddr, sizeof(struct sockaddr_in6))
- 		__array(__u8, daddr, sizeof(struct sockaddr_in6))
- 	),
-@@ -113,14 +126,19 @@ TRACE_EVENT(tcp_send_reset,
- 			 */
- 			TP_STORE_ADDR_PORTS_SKB(skb, th, entry->daddr, entry->saddr);
- 		}
-+		__entry->reason = reason;
- 	),
- 
--	TP_printk("skbaddr=%p skaddr=%p src=%pISpc dest=%pISpc state=%s",
-+	TP_printk("skbaddr=%p skaddr=%p src=%pISpc dest=%pISpc state=%s reason=%s",
- 		  __entry->skbaddr, __entry->skaddr,
- 		  __entry->saddr, __entry->daddr,
--		  __entry->state ? show_tcp_state_name(__entry->state) : "UNKNOWN")
-+		  __entry->state ? show_tcp_state_name(__entry->state) : "UNKNOWN",
-+		  __print_symbolic(__entry->reason, DEFINE_RST_REASON(FN, FNe)))
- );
- 
-+#undef FN
-+#undef FNe
-+
- /*
-  * tcp event with arguments sk
-  *
-diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-index 6bd3a0fb9439..6096ac7a3a02 100644
---- a/net/ipv4/tcp_ipv4.c
-+++ b/net/ipv4/tcp_ipv4.c
-@@ -871,7 +871,7 @@ static void tcp_v4_send_reset(const struct sock *sk, struct sk_buff *skb,
- 	if (sk)
- 		arg.bound_dev_if = sk->sk_bound_dev_if;
- 
--	trace_tcp_send_reset(sk, skb);
-+	trace_tcp_send_reset(sk, skb, reason);
- 
- 	BUILD_BUG_ON(offsetof(struct sock, sk_bound_dev_if) !=
- 		     offsetof(struct inet_timewait_sock, tw_bound_dev_if));
-diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
-index 276d9d541b01..b08ffb17d5a0 100644
---- a/net/ipv4/tcp_output.c
-+++ b/net/ipv4/tcp_output.c
-@@ -3612,7 +3612,7 @@ void tcp_send_active_reset(struct sock *sk, gfp_t priority,
- 	/* skb of trace_tcp_send_reset() keeps the skb that caused RST,
- 	 * skb here is different to the troublesome skb, so use NULL
- 	 */
--	trace_tcp_send_reset(sk, NULL);
-+	trace_tcp_send_reset(sk, NULL, SK_RST_REASON_NOT_SPECIFIED);
- }
- 
- /* Send a crossed SYN-ACK during socket establishment.
-diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
-index 317d7a6e6b01..77958adf2e16 100644
---- a/net/ipv6/tcp_ipv6.c
-+++ b/net/ipv6/tcp_ipv6.c
-@@ -1133,7 +1133,7 @@ static void tcp_v6_send_reset(const struct sock *sk, struct sk_buff *skb,
- 			label = ip6_flowlabel(ipv6h);
- 	}
- 
--	trace_tcp_send_reset(sk, skb);
-+	trace_tcp_send_reset(sk, skb, reason);
- 
- 	tcp_v6_send_response(sk, skb, seq, ack_seq, 0, 0, 0, oif, 1,
- 			     ipv6_get_dsfield(ipv6h), label, priority, txhash,
--- 
-2.37.3
-
+Acked-by: Xu Yilun <yilun.xu@intel.com>
 
