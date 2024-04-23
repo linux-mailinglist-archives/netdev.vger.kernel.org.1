@@ -1,29 +1,29 @@
-Return-Path: <netdev+bounces-90687-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90689-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41C6C8AFBDF
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 00:39:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8B1E8AFBE3
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 00:39:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E5C131F22D7E
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 22:39:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ECC151C225FE
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 22:39:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16CDC29429;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62B0F2E62F;
 	Tue, 23 Apr 2024 22:39:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from mail.netfilter.org (mail.netfilter.org [217.70.188.207])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D74831C696
-	for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 22:39:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A5871DDC5
+	for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 22:39:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.188.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713911977; cv=none; b=SgFuuLRRsS+VUoCuD0b5ZoYygANNVQoLQKrGZgIWhdD+eLw/qsNQoeF3ZmqlgHya7yLpGRBPE00KUQFKmOnCX85QV0IWGnxRdM2RmhxyIHsboHsERSoy4ednyBgDgvQvXKFHkWXYi9cTxmZpcaYl3SlznnqSf2e61VzVWwdHXN8=
+	t=1713911977; cv=none; b=Q9W1AlC5t1uqGpJvfzE6F+ScPBF6h59fwfPo+Hn73J0la+h0SGcusjZZI/Dnk5Q/vUMRbB4hHchh7ddKbA0c04sgZy1gkXB0bKF1hmPFDMqtL5lcYXd/G5wUG1WFSQjQRB7JohsRLQvDjqcfU1yYhdxtfXVJXPesbL1knf5rRBI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1713911977; c=relaxed/simple;
-	bh=rLIg6JOz6gDMxBpfcjJhmMEqYka+BuPc3gtrZMgQMH4=;
+	bh=WB6qxQJUMew7EuzSr1VslbdU0afdq7hFwg/fxZrL6Qg=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=UZNsQGpGmsCrzhulmcDfDPHwtwPaXC0lKVOLyWoD99zC0IF9VUbxnPQpRiJntrczmw3ydkMa2+ppXwagVfPoFznennUt5O8avwG5e6EPWote+WT9kzWF91RMY0lFLcmLGbQhYJuQ2fBbyrKHcDsXjXzhyYU5irPzizw2QeHGyMM=
+	 MIME-Version; b=Aw6SZcqJeVuo0uLzanHkVyW0dOOmsBSo8Oo4bHnYo+Z5IrAYobIo+2FxtmcC/Is5VvF8uuuZOH5yZ6jgOAZRlshUaEE6aXWTbLWaxB+2opS0aaCq6IoNQQBJSzI2e3PMY5jyYnCWOViVm6U4BVbeNyX+6JOzBWY9UnfHfDN/WtI=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; arc=none smtp.client-ip=217.70.188.207
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
@@ -36,9 +36,9 @@ Cc: davem@davemloft.net,
 	laforge@osmocom.org,
 	pespin@sysmocom.de,
 	osmith@sysmocom.de
-Subject: [PATCH net-next 02/12] gtp: properly parse extension headers
-Date: Wed, 24 Apr 2024 00:39:09 +0200
-Message-Id: <20240423223919.3385493-3-pablo@netfilter.org>
+Subject: [PATCH net-next 03/12] gtp: prepare for IPv6 support
+Date: Wed, 24 Apr 2024 00:39:10 +0200
+Message-Id: <20240423223919.3385493-4-pablo@netfilter.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20240423223919.3385493-1-pablo@netfilter.org>
 References: <20240423223919.3385493-1-pablo@netfilter.org>
@@ -50,106 +50,325 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Currently GTP packets are dropped if the next extension field is set to
-non-zero value, but this are valid GTP packets.
-
-TS 29.281 provides a longer header format, which is defined as struct
-gtp1_header_long. Such long header format is used if any of the S, PN, E
-flags is set.
-
-This long header is 4 bytes longer than struct gtp1_header, plus
-variable length (optional) extension headers. The next extension header
-field is zero is no extension header is provided.
-
-The extension header is composed of a length field which includes total
-number of 4 byte words including the extension header itself (1 byte),
-payload (variable length) and next type (1 byte). The extension header
-size and its payload is aligned to 4 bytes.
-
-A GTP packet might come with a chain extensions headers, which makes it
-slightly cumbersome to parse because the extension next header field
-comes at the end of the extension header, and there is a need to check
-if this field becomes zero to stop the extension header parser.
+Use union artifact to prepare for IPv6 support.
+Add and use GTP_{IPV4,TH}_MAXLEN.
 
 Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
 ---
- drivers/net/gtp.c | 41 +++++++++++++++++++++++++++++++++++++++++
- include/net/gtp.h |  5 +++++
- 2 files changed, 46 insertions(+)
+ drivers/net/gtp.c | 151 +++++++++++++++++++++++++++++-----------------
+ 1 file changed, 96 insertions(+), 55 deletions(-)
 
 diff --git a/drivers/net/gtp.c b/drivers/net/gtp.c
-index 4680cdf4fa70..9451c74c1a7d 100644
+index 9451c74c1a7d..1c4429d24cfc 100644
 --- a/drivers/net/gtp.c
 +++ b/drivers/net/gtp.c
-@@ -567,6 +567,43 @@ static int gtp1u_handle_echo_resp(struct gtp_dev *gtp, struct sk_buff *skb)
- 				       msg, 0, GTP_GENL_MCGRP, GFP_ATOMIC);
+@@ -50,8 +50,12 @@ struct pdp_ctx {
+ 	u8			gtp_version;
+ 	u16			af;
+ 
+-	struct in_addr		ms_addr_ip4;
+-	struct in_addr		peer_addr_ip4;
++	union {
++		struct in_addr	addr;
++	} ms;
++	union {
++		struct in_addr	addr;
++	} peer;
+ 
+ 	struct sock		*sk;
+ 	struct net_device       *dev;
+@@ -80,9 +84,15 @@ struct gtp_dev {
+ };
+ 
+ struct echo_info {
+-	struct in_addr		ms_addr_ip4;
+-	struct in_addr		peer_addr_ip4;
++	u16			af;
+ 	u8			gtp_version;
++
++	union {
++		struct in_addr	addr;
++	} ms;
++	union {
++		struct in_addr	addr;
++	} peer;
+ };
+ 
+ static unsigned int gtp_net_id __read_mostly;
+@@ -163,7 +173,7 @@ static struct pdp_ctx *ipv4_pdp_find(struct gtp_dev *gtp, __be32 ms_addr)
+ 
+ 	hlist_for_each_entry_rcu(pdp, head, hlist_addr) {
+ 		if (pdp->af == AF_INET &&
+-		    pdp->ms_addr_ip4.s_addr == ms_addr)
++		    pdp->ms.addr.s_addr == ms_addr)
+ 			return pdp;
+ 	}
+ 
+@@ -181,9 +191,9 @@ static bool gtp_check_ms_ipv4(struct sk_buff *skb, struct pdp_ctx *pctx,
+ 	iph = (struct iphdr *)(skb->data + hdrlen);
+ 
+ 	if (role == GTP_ROLE_SGSN)
+-		return iph->daddr == pctx->ms_addr_ip4.s_addr;
++		return iph->daddr == pctx->ms.addr.s_addr;
+ 	else
+-		return iph->saddr == pctx->ms_addr_ip4.s_addr;
++		return iph->saddr == pctx->ms.addr.s_addr;
  }
  
-+static int gtp_parse_exthdrs(struct sk_buff *skb, unsigned int *hdrlen)
+ /* Check if the inner IP address in this packet is assigned to any
+@@ -292,13 +302,39 @@ static void gtp0_build_echo_msg(struct gtp0_header *hdr, __u8 msg_type)
+ 		hdr->length = 0;
+ }
+ 
++static int gtp0_send_echo_resp_ip(struct gtp_dev *gtp, struct sk_buff *skb)
 +{
-+	struct gtp_ext_hdr *gtp_exthdr, _gtp_exthdr;
-+	unsigned int offset = *hdrlen;
-+	__u8 *next_type, _next_type;
++	struct iphdr *iph = ip_hdr(skb);
++	struct flowi4 fl4;
++	struct rtable *rt;
 +
-+	/* From 29.060: "The Extension Header Length field specifies the length
-+	 * of the particular Extension header in 4 octets units."
-+	 *
-+	 * This length field includes length field size itself (1 byte),
-+	 * payload (variable length) and next type (1 byte). The extension
-+	 * header is aligned to to 4 bytes.
++	/* find route to the sender,
++	 * src address becomes dst address and vice versa.
 +	 */
++	rt = ip4_route_output_gtp(&fl4, gtp->sk0, iph->saddr, iph->daddr);
++	if (IS_ERR(rt)) {
++		netdev_dbg(gtp->dev, "no route for echo response from %pI4\n",
++			   &iph->saddr);
++		return -1;
++	}
 +
-+	do {
-+		gtp_exthdr = skb_header_pointer(skb, offset, sizeof(gtp_exthdr),
-+						&_gtp_exthdr);
-+		if (!gtp_exthdr || !gtp_exthdr->len)
-+			return -1;
-+
-+		offset += gtp_exthdr->len * 4;
-+
-+		/* From 29.060: "If no such Header follows, then the value of
-+		 * the Next Extension Header Type shall be 0."
-+		 */
-+		next_type = skb_header_pointer(skb, offset - 1,
-+					       sizeof(_next_type), &_next_type);
-+		if (!next_type)
-+			return -1;
-+
-+	} while (*next_type != 0);
-+
-+	*hdrlen = offset;
++	udp_tunnel_xmit_skb(rt, gtp->sk0, skb,
++			    fl4.saddr, fl4.daddr,
++			    iph->tos,
++			    ip4_dst_hoplimit(&rt->dst),
++			    0,
++			    htons(GTP0_PORT), htons(GTP0_PORT),
++			    !net_eq(sock_net(gtp->sk1u),
++				    dev_net(gtp->dev)),
++			    false);
 +
 +	return 0;
 +}
 +
- static int gtp1u_udp_encap_recv(struct gtp_dev *gtp, struct sk_buff *skb)
+ static int gtp0_send_echo_resp(struct gtp_dev *gtp, struct sk_buff *skb)
  {
- 	unsigned int hdrlen = sizeof(struct udphdr) +
-@@ -616,6 +653,10 @@ static int gtp1u_udp_encap_recv(struct gtp_dev *gtp, struct sk_buff *skb)
- 		return 1;
+ 	struct gtp0_packet *gtp_pkt;
+ 	struct gtp0_header *gtp0;
+-	struct rtable *rt;
+-	struct flowi4 fl4;
+-	struct iphdr *iph;
+ 	__be16 seq;
+ 
+ 	gtp0 = (struct gtp0_header *)(skb->data + sizeof(struct udphdr));
+@@ -325,27 +361,15 @@ static int gtp0_send_echo_resp(struct gtp_dev *gtp, struct sk_buff *skb)
+ 	gtp_pkt->ie.tag = GTPIE_RECOVERY;
+ 	gtp_pkt->ie.val = gtp->restart_count;
+ 
+-	iph = ip_hdr(skb);
+-
+-	/* find route to the sender,
+-	 * src address becomes dst address and vice versa.
+-	 */
+-	rt = ip4_route_output_gtp(&fl4, gtp->sk0, iph->saddr, iph->daddr);
+-	if (IS_ERR(rt)) {
+-		netdev_dbg(gtp->dev, "no route for echo response from %pI4\n",
+-			   &iph->saddr);
++	switch (gtp->sk0->sk_family) {
++	case AF_INET:
++		if (gtp0_send_echo_resp_ip(gtp, skb) < 0)
++			return -1;
++		break;
++	case AF_INET6:
+ 		return -1;
  	}
  
-+	if (gtp1->flags & GTP1_F_EXTHDR &&
-+	    gtp_parse_exthdrs(skb, &hdrlen) < 0)
-+		return -1;
-+
- 	return gtp_rx(pctx, skb, hdrlen, gtp->role);
+-	udp_tunnel_xmit_skb(rt, gtp->sk0, skb,
+-			    fl4.saddr, fl4.daddr,
+-			    iph->tos,
+-			    ip4_dst_hoplimit(&rt->dst),
+-			    0,
+-			    htons(GTP0_PORT), htons(GTP0_PORT),
+-			    !net_eq(sock_net(gtp->sk1u),
+-				    dev_net(gtp->dev)),
+-			    false);
+ 	return 0;
  }
  
-diff --git a/include/net/gtp.h b/include/net/gtp.h
-index 2a503f035d18..c0253c8702d0 100644
---- a/include/net/gtp.h
-+++ b/include/net/gtp.h
-@@ -78,4 +78,9 @@ static inline bool netif_is_gtp(const struct net_device *dev)
- #define GTP1_F_EXTHDR	0x04
- #define GTP1_F_MASK	0x07
+@@ -360,8 +384,8 @@ static int gtp_genl_fill_echo(struct sk_buff *skb, u32 snd_portid, u32 snd_seq,
+ 		goto failure;
  
-+struct gtp_ext_hdr {
-+	__u8	len;
-+	__u8	data[];
-+};
+ 	if (nla_put_u32(skb, GTPA_VERSION, echo.gtp_version) ||
+-	    nla_put_be32(skb, GTPA_PEER_ADDRESS, echo.peer_addr_ip4.s_addr) ||
+-	    nla_put_be32(skb, GTPA_MS_ADDRESS, echo.ms_addr_ip4.s_addr))
++	    nla_put_be32(skb, GTPA_PEER_ADDRESS, echo.peer.addr.s_addr) ||
++	    nla_put_be32(skb, GTPA_MS_ADDRESS, echo.ms.addr.s_addr))
+ 		goto failure;
+ 
+ 	genlmsg_end(skb, genlh);
+@@ -372,12 +396,20 @@ static int gtp_genl_fill_echo(struct sk_buff *skb, u32 snd_portid, u32 snd_seq,
+ 	return -EMSGSIZE;
+ }
+ 
++static void gtp0_handle_echo_resp_ip(struct sk_buff *skb, struct echo_info *echo)
++{
++	struct iphdr *iph = ip_hdr(skb);
 +
- #endif
++	echo->ms.addr.s_addr = iph->daddr;
++	echo->peer.addr.s_addr = iph->saddr;
++	echo->gtp_version = GTP_V0;
++}
++
+ static int gtp0_handle_echo_resp(struct gtp_dev *gtp, struct sk_buff *skb)
+ {
+ 	struct gtp0_header *gtp0;
+ 	struct echo_info echo;
+ 	struct sk_buff *msg;
+-	struct iphdr *iph;
+ 	int ret;
+ 
+ 	gtp0 = (struct gtp0_header *)(skb->data + sizeof(struct udphdr));
+@@ -385,10 +417,13 @@ static int gtp0_handle_echo_resp(struct gtp_dev *gtp, struct sk_buff *skb)
+ 	if (!gtp0_validate_echo_hdr(gtp0))
+ 		return -1;
+ 
+-	iph = ip_hdr(skb);
+-	echo.ms_addr_ip4.s_addr = iph->daddr;
+-	echo.peer_addr_ip4.s_addr = iph->saddr;
+-	echo.gtp_version = GTP_V0;
++	switch (gtp->sk0->sk_family) {
++	case AF_INET:
++		gtp0_handle_echo_resp_ip(skb, &echo);
++		break;
++	case AF_INET6:
++		return -1;
++	}
+ 
+ 	msg = nlmsg_new(NLMSG_DEFAULT_SIZE, GFP_ATOMIC);
+ 	if (!msg)
+@@ -549,8 +584,8 @@ static int gtp1u_handle_echo_resp(struct gtp_dev *gtp, struct sk_buff *skb)
+ 		return -1;
+ 
+ 	iph = ip_hdr(skb);
+-	echo.ms_addr_ip4.s_addr = iph->daddr;
+-	echo.peer_addr_ip4.s_addr = iph->saddr;
++	echo.ms.addr.s_addr = iph->daddr;
++	echo.peer.addr.s_addr = iph->saddr;
+ 	echo.gtp_version = GTP_V1;
+ 
+ 	msg = nlmsg_new(NLMSG_DEFAULT_SIZE, GFP_ATOMIC);
+@@ -801,9 +836,15 @@ static inline void gtp1_push_header(struct sk_buff *skb, struct pdp_ctx *pctx)
+ 
+ struct gtp_pktinfo {
+ 	struct sock		*sk;
+-	struct iphdr		*iph;
+-	struct flowi4		fl4;
+-	struct rtable		*rt;
++	union {
++		struct iphdr	*iph;
++	};
++	union {
++		struct flowi4	fl4;
++	};
++	union {
++		struct rtable	*rt;
++	};
+ 	struct pdp_ctx		*pctx;
+ 	struct net_device	*dev;
+ 	__be16			gtph_port;
+@@ -864,18 +905,18 @@ static int gtp_build_skb_ip4(struct sk_buff *skb, struct net_device *dev,
+ 	}
+ 	netdev_dbg(dev, "found PDP context %p\n", pctx);
+ 
+-	rt = ip4_route_output_gtp(&fl4, pctx->sk, pctx->peer_addr_ip4.s_addr,
++	rt = ip4_route_output_gtp(&fl4, pctx->sk, pctx->peer.addr.s_addr,
+ 				  inet_sk(pctx->sk)->inet_saddr);
+ 	if (IS_ERR(rt)) {
+ 		netdev_dbg(dev, "no route to SSGN %pI4\n",
+-			   &pctx->peer_addr_ip4.s_addr);
++			   &pctx->peer.addr.s_addr);
+ 		dev->stats.tx_carrier_errors++;
+ 		goto err;
+ 	}
+ 
+ 	if (rt->dst.dev == dev) {
+ 		netdev_dbg(dev, "circular route to SSGN %pI4\n",
+-			   &pctx->peer_addr_ip4.s_addr);
++			   &pctx->peer.addr.s_addr);
+ 		dev->stats.collisions++;
+ 		goto err_rt;
+ 	}
+@@ -977,11 +1018,11 @@ static const struct device_type gtp_type = {
+ 	.name = "gtp",
+ };
+ 
++#define GTP_TH_MAXLEN	(sizeof(struct udphdr) + sizeof(struct gtp0_header))
++#define GTP_IPV4_MAXLEN	(sizeof(struct iphdr) + GTP_TH_MAXLEN)
++
+ static void gtp_link_setup(struct net_device *dev)
+ {
+-	unsigned int max_gtp_header_len = sizeof(struct iphdr) +
+-					  sizeof(struct udphdr) +
+-					  sizeof(struct gtp0_header);
+ 	struct gtp_dev *gtp = netdev_priv(dev);
+ 
+ 	dev->netdev_ops		= &gtp_netdev_ops;
+@@ -990,7 +1031,7 @@ static void gtp_link_setup(struct net_device *dev)
+ 
+ 	dev->hard_header_len = 0;
+ 	dev->addr_len = 0;
+-	dev->mtu = ETH_DATA_LEN - max_gtp_header_len;
++	dev->mtu = ETH_DATA_LEN - GTP_IPV4_MAXLEN;
+ 
+ 	/* Zero header length. */
+ 	dev->type = ARPHRD_NONE;
+@@ -1001,7 +1042,7 @@ static void gtp_link_setup(struct net_device *dev)
+ 	dev->features	|= NETIF_F_LLTX;
+ 	netif_keep_dst(dev);
+ 
+-	dev->needed_headroom	= LL_MAX_HEADER + max_gtp_header_len;
++	dev->needed_headroom	= LL_MAX_HEADER + GTP_IPV4_MAXLEN;
+ 	gtp->dev = dev;
+ }
+ 
+@@ -1340,9 +1381,9 @@ static void ipv4_pdp_fill(struct pdp_ctx *pctx, struct genl_info *info)
+ {
+ 	pctx->gtp_version = nla_get_u32(info->attrs[GTPA_VERSION]);
+ 	pctx->af = AF_INET;
+-	pctx->peer_addr_ip4.s_addr =
++	pctx->peer.addr.s_addr =
+ 		nla_get_be32(info->attrs[GTPA_PEER_ADDRESS]);
+-	pctx->ms_addr_ip4.s_addr =
++	pctx->ms.addr.s_addr =
+ 		nla_get_be32(info->attrs[GTPA_MS_ADDRESS]);
+ 
+ 	switch (pctx->gtp_version) {
+@@ -1443,13 +1484,13 @@ static struct pdp_ctx *gtp_pdp_add(struct gtp_dev *gtp, struct sock *sk,
+ 	switch (pctx->gtp_version) {
+ 	case GTP_V0:
+ 		netdev_dbg(dev, "GTPv0-U: new PDP ctx id=%llx ssgn=%pI4 ms=%pI4 (pdp=%p)\n",
+-			   pctx->u.v0.tid, &pctx->peer_addr_ip4,
+-			   &pctx->ms_addr_ip4, pctx);
++			   pctx->u.v0.tid, &pctx->peer.addr,
++			   &pctx->ms.addr, pctx);
+ 		break;
+ 	case GTP_V1:
+ 		netdev_dbg(dev, "GTPv1-U: new PDP ctx id=%x/%x ssgn=%pI4 ms=%pI4 (pdp=%p)\n",
+ 			   pctx->u.v1.i_tei, pctx->u.v1.o_tei,
+-			   &pctx->peer_addr_ip4, &pctx->ms_addr_ip4, pctx);
++			   &pctx->peer.addr, &pctx->ms.addr, pctx);
+ 		break;
+ 	}
+ 
+@@ -1621,8 +1662,8 @@ static int gtp_genl_fill_info(struct sk_buff *skb, u32 snd_portid, u32 snd_seq,
+ 
+ 	if (nla_put_u32(skb, GTPA_VERSION, pctx->gtp_version) ||
+ 	    nla_put_u32(skb, GTPA_LINK, pctx->dev->ifindex) ||
+-	    nla_put_be32(skb, GTPA_PEER_ADDRESS, pctx->peer_addr_ip4.s_addr) ||
+-	    nla_put_be32(skb, GTPA_MS_ADDRESS, pctx->ms_addr_ip4.s_addr))
++	    nla_put_be32(skb, GTPA_PEER_ADDRESS, pctx->peer.addr.s_addr) ||
++	    nla_put_be32(skb, GTPA_MS_ADDRESS, pctx->ms.addr.s_addr))
+ 		goto nla_put_failure;
+ 
+ 	switch (pctx->gtp_version) {
 -- 
 2.30.2
 
