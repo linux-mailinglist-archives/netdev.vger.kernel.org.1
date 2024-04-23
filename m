@@ -1,472 +1,151 @@
-Return-Path: <netdev+bounces-90419-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90420-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECAD28AE119
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 11:34:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E1618AE128
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 11:40:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5CCF21F224C3
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 09:34:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 402381C218A2
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 09:40:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5F925FDB5;
-	Tue, 23 Apr 2024 09:34:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A72E58ADD;
+	Tue, 23 Apr 2024 09:40:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=fritzc.com header.i=@fritzc.com header.b="IbQo6Yo9"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qsg67ZD5"
 X-Original-To: netdev@vger.kernel.org
-Received: from fritzc.com (mail.fritzc.com [213.160.72.247])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EB7759148;
-	Tue, 23 Apr 2024 09:34:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.160.72.247
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE1011E863
+	for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 09:40:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713864845; cv=none; b=m73EtnQEgduLpkURVk9xiO7CiD+Mdpky+jYJ3OjTDAQFSphkD44kM7XCSKOxHJ14Jh3erJub5v6c7gggGsuYnLkZXfdo33Kls6ostCjwFBzzamQ4QDGVxcCIlIXUUtkf6RFk0YsLUBH4QrTEn50Y83Q4PnbYkU7yfO4Hjl+EUCs=
+	t=1713865226; cv=none; b=iODmHMX/HfDLlvevlNvoHqScqzmdnet5l07AcfRWbxIPvQnvIAiirg20Y82fUmPDVLVwBKAcKFg2qLppsQ/3nDqcXLnFhD6ELySLFGlFixZGmP9BfZ4O/i8s1AAC9LqW4T1Ls8r8YBBs9j10511l/wbddc1a/sAM7C3o/Gb8rjg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713864845; c=relaxed/simple;
-	bh=hW/MSIqixDoWTQPsb1jY1aJlgqcGAnzc07luQQKSUJY=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=sbanmUbkzHCt5TjoBn/3DNYXDc9lbaiEFejVq6O0pRekhXj4U83KqBSGmMUVgah6ljzVv6oJmpbVO2KbI0k43N9YGGdzhwbq8yy72O3GpsoEOfXdyOXpr5gKNxza00b0L+X+zmnjJ1doRyzy2UM2ID0fTZRSCsnFe/uGQZUUZCc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hexdev.de; spf=pass smtp.mailfrom=hexdev.de; dkim=pass (1024-bit key) header.d=fritzc.com header.i=@fritzc.com header.b=IbQo6Yo9; arc=none smtp.client-ip=213.160.72.247
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hexdev.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hexdev.de
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=fritzc.com;
-	s=dkim; h=Content-Transfer-Encoding:MIME-Version:Content-Type:References:
-	In-Reply-To:Date:Cc:To:Reply-To:From:Subject:Message-ID:Sender:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=O7Ga/+MQslFYLFemzYWK7NMgPsWPI6GzChQN73PPCu8=; b=IbQo6Yo9ix8PPIhPR78eQvZZ5c
-	QzaJxedwlfH4Vfh3gJH+5ioI7g+9nB/8r/W8HruwIS6W6uAE2nM5//VU35RPBJD6eOhMub7YGP2Jy
-	EgwF6V+4o/48ML6pQBAY39H/ORMERYKouKnLdd59pbdQqRn4Z/VNgNrY311PeLMs9srA=;
-Received: from 127.0.0.1
-	by fritzc.com with esmtpsa (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim latest)
-	(envelope-from <christoph.fritz@hexdev.de>)
-	id 1rzCWy-001LNj-0F;
-	Tue, 23 Apr 2024 11:33:40 +0200
-Message-ID: <43a8b0484e5b4e7d550a665aa4f7b37186d030f7.camel@hexdev.de>
-Subject: Re: [PATCH 01/11] can: Add LIN bus as CAN abstraction
-From: Christoph Fritz <christoph.fritz@hexdev.de>
-Reply-To: christoph.fritz@hexdev.de
-To: Jiri Slaby <jirislaby@kernel.org>
-Cc: Oliver Hartkopp <socketcan@hartkopp.net>, Marc Kleine-Budde
- <mkl@pengutronix.de>, Vincent Mailhol <mailhol.vincent@wanadoo.fr>, "David
- S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>, Rob
- Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,  Conor
- Dooley <conor+dt@kernel.org>, Jiri Kosina <jikos@kernel.org>, Benjamin
- Tissoires <bentiss@kernel.org>,  Greg Kroah-Hartman
- <gregkh@linuxfoundation.org>, Andreas Lauser
- <andreas.lauser@mercedes-benz.com>, Jonathan Corbet <corbet@lwn.net>,
- linux-can@vger.kernel.org, netdev@vger.kernel.org, 
- devicetree@vger.kernel.org, linux-input@vger.kernel.org, 
- linux-serial@vger.kernel.org
-Date: Tue, 23 Apr 2024 11:33:35 +0200
-In-Reply-To: <cf9109ac-f17b-4812-aa50-449b8fb9504e@kernel.org>
-References: <20240422065114.3185505-1-christoph.fritz@hexdev.de>
-	 <20240422065114.3185505-2-christoph.fritz@hexdev.de>
-	 <cf9109ac-f17b-4812-aa50-449b8fb9504e@kernel.org>
-Organization: hexDEV GmbH
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.46.4-2 
+	s=arc-20240116; t=1713865226; c=relaxed/simple;
+	bh=Kw0NtqcrbAlk17kqAfzgFuxOxsbSsqlNFxBhqzrwRf4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=MxoEU+yqLpmnSywQxjvPY4tvTAaii9IXubHWdFfy53K0hGMTcoMV4czUJBZwlAjCPxOyKx/2HtLrVhyz5o4VlTVpLte8Aac4Hf7+HWXjp2yuxD3eGayPIrlCLPDjp3xefj9J5LHVoBIp28a8ahAQPsmiemuQPbh83PIg46xdneY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qsg67ZD5; arc=none smtp.client-ip=209.85.208.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-56e5174ffc2so6198a12.1
+        for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 02:40:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1713865223; x=1714470023; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Kw0NtqcrbAlk17kqAfzgFuxOxsbSsqlNFxBhqzrwRf4=;
+        b=qsg67ZD5y4aOZBTeh4d4ES4LBazAhuYCNeBtCjHbx6j+ZfN0LuwamN44b1+33Soumc
+         H4f59PtYnfMinueHEMku5LLj/KqAEKFZYizfPxA+aPRtubalTcgOvp5pa5AggxbHkAVC
+         2MEKucqnygFshYwQ8vCdXmLF/3BdP0ih6WLALdK77xr3QL6lvMlD765ujCcnQugGwgqh
+         8RZgapWT5ezNO5M/PPHUUjZR3dpFA+yheVOKT5OBihUAdH7T10RcFl+gBewp0uaWrpRf
+         CUGHvbmMxDDcl6JvYfNzI/jGK8aBhbAYdZyVqjbTAQji4CKd16E+vAdsnaIN9WjlE951
+         Kcmw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713865223; x=1714470023;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Kw0NtqcrbAlk17kqAfzgFuxOxsbSsqlNFxBhqzrwRf4=;
+        b=TmaZb0xBl7e2X97CICBQk6K/OkTyva+mK7CvYBmIxJhrSjrBZ9cTkCOUmsOq/A+Tad
+         DpEFAg+9ceT0GPZljr+aned0roMB2L93vwSesKFZdsZ9mkw20uLuUIauM/0TTImMvG8a
+         gXiLVQDswkpuHLKrWP4i1BGj/gIZ0rzieSoj1KwzNYDfK5skemCbK+JZ7WoLQ8EyFQ0p
+         MtJD/75AmCpGuc6hZs1SyJVj4FbvoxYQqM1/V+NSEBo0MlcyAK2EDh2UD/4OkAA4/3Ta
+         FRnTyntZHax4aJObMru6NwbU5O74rrVAuVlZP4ji7dZEtjPRtFM36empQdj0x0HuKu9t
+         jINg==
+X-Forwarded-Encrypted: i=1; AJvYcCXONK5+722vKcpy3vWDsf8YsyAyqUfBZiD4Uw5QdcVKTJsQtDj8Oh0f4WUESBvsoqGPQEGS67UCnzspbODq294aU+giuuZe
+X-Gm-Message-State: AOJu0YzJWPzS670r8n3FOeGqg8+/lRAWhBVPzdt0AzQQhZZsTwww7wC5
+	Pim6tuaQbc6CEQhyeQZH1OLZMYFm/2p5r6Xq5Ql5n5UQb4bLaPFqBytC4nrvl/DQqXXtaE5PhYa
+	28DNFMMdeaPynLI0p9AIBDLNW4YtsKQhbYVOd
+X-Google-Smtp-Source: AGHT+IGODgn6RLijI4qvb/sVffIu/ww3JNUGMU8tjUcin5spxNo5FBRTHsCIAQWOsHr8Jzzwy/AfgAdZ8d1QCzKK8cM=
+X-Received: by 2002:aa7:d947:0:b0:572:20fb:190f with SMTP id
+ l7-20020aa7d947000000b0057220fb190fmr85622eds.3.1713865222687; Tue, 23 Apr
+ 2024 02:40:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+References: <7dc06d6158f72053cf877a82e2a7a5bd23692faa.1713448007.git.dcaratti@redhat.com>
+ <CAKa-r6tZkLX8rVRWjN6857PLiLQtp92O114FYEkXn6pu9Mb27A@mail.gmail.com> <7ce1a0dba3cc100e6f73a7499b407176a99c0aa9.camel@redhat.com>
+In-Reply-To: <7ce1a0dba3cc100e6f73a7499b407176a99c0aa9.camel@redhat.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 23 Apr 2024 11:40:08 +0200
+Message-ID: <CANn89iKH9FQFjnkmSCX2qcjcvG2GZigT+hFgKEd6P4L5fvGmTA@mail.gmail.com>
+Subject: Re: [PATCH net-next v2] net/sched: fix false lockdep warning on qdisc
+ root lock
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Davide Caratti <dcaratti@redhat.com>, Saeed Mahameed <saeedm@nvidia.com>, 
+	Tariq Toukan <tariqt@nvidia.com>, netdev@vger.kernel.org, renmingshuai@huawei.com, 
+	jiri@resnulli.us, xiyou.wangcong@gmail.com, xmu@redhat.com, 
+	Christoph Paasch <cpaasch@apple.com>, Jamal Hadi Salim <jhs@mojatatu.com>, 
+	Maxim Mikityanskiy <maxim@isovalent.com>, Victor Nogueira <victor@mojatatu.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-...
-> > --- /dev/null
-> > +++ b/drivers/net/can/lin.c
-> ...> +static int lin_create_sysfs_id_files(struct net_device *ndev)
-> > +{
-> > +	struct lin_device *ldev = netdev_priv(ndev);
-> > +	struct kobj_attribute *attr;
-> > +	int ret;
-> > +
-> > +	for (int id = 0; id < LIN_NUM_IDS; id++) {
-> > +		ldev->sysfs_entries[id].ldev = ldev;
-> > +		attr = &ldev->sysfs_entries[id].attr;
-> > +		attr->attr.name = kasprintf(GFP_KERNEL, "%02x", id);
-> > +		if (!attr->attr.name)
-> > +			return -ENOMEM;
-> > +		attr->attr.mode = 0644;
-> > +		attr->show = lin_identifier_show;
-> > +		attr->store = lin_identifier_store;
-> > +
-> > +		sysfs_attr_init(&attr->attr);
-> > +		ret = sysfs_create_file(ldev->lin_ids_kobj, &attr->attr);
-> > +		if (ret) {
-> > +			kfree(attr->attr.name);
-> > +			kfree(attr);
-> 
-> Is the latter kfree() right? It appears not.
+On Tue, Apr 23, 2024 at 11:21=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wr=
+ote:
+>
+> On Thu, 2024-04-18 at 16:01 +0200, Davide Caratti wrote:
+> > hello,
+> >
+> > On Thu, Apr 18, 2024 at 3:50=E2=80=AFPM Davide Caratti <dcaratti@redhat=
+.com> wrote:
+> > >
+> >
+> > [...]
+> >
+> > > This happens when TC does a mirred egress redirect from the root qdis=
+c of
+> > > device A to the root qdisc of device B. As long as these two locks ar=
+en't
+> > > protecting the same qdisc, they can be acquired in chain: add a per-q=
+disc
+> > > lockdep key to silence false warnings.
+> > > This dynamic key should safely replace the static key we have in sch_=
+htb:
+> > > it was added to allow enqueueing to the device "direct qdisc" while s=
+till
+> > > holding the qdisc root lock.
+> > >
+> > > v2: don't use static keys anymore in HTB direct qdiscs (thanks Eric D=
+umazet)
+> >
+> > I didn't have the correct setup to test HTB offload, so any feedback
+> > for the HTB part is appreciated. On a debug kernel the extra time
+> > taken to register / de-register dynamic lockdep keys is very evident
+> > (more when qdisc are created: the time needed for "tc qdisc add ..."
+> > becomes an order of magnitude bigger, while the time for "tc qdisc del
+> > ..." doubles).
+>
+> @Eric: why do you think the lockdep slowdown would be critical? We
+> don't expect to see lockdep in production, right?
 
-Thanks for the catch, it's wrong and will be removed in v2.
+I think you missed one of my update, where I said this was absolutely ok.
 
-> 
-> > +			return -ENOMEM;
-> > +		}
-> > +	}
-> > +
-> > +	return 0;
-> > +}
-> ...
-> > +static void lin_tx_work_handler(struct work_struct *ws)
-> > +{
-> > +	struct lin_device *ldev = container_of(ws, struct lin_device,
-> > +					       tx_work);
-> > +	struct net_device *ndev = ldev->ndev;
-> > +	struct canfd_frame *cfd;
-> > +	struct lin_frame lf;
-> > +
-> > +	ldev->tx_busy = true;
-> 
-> How is this store protected against reordering/race conditions?
+https://lore.kernel.org/netdev/CANn89iJQZ5R=3DCct494W0DbNXR3pxOj54zDY7bgtFF=
+CiiC1abDg@mail.gmail.com/
 
-Falsely it is not, like in mcp251x.c I'll add a mutex.
 
-> 
-> > +
-> > +	cfd = (struct canfd_frame *)ldev->tx_skb->data;
-> > +	lf.checksum_mode = (cfd->can_id & LIN_ENHANCED_CKSUM_FLAG) ?
-> > +			   LINBUS_ENHANCED : LINBUS_CLASSIC;
-> > +	lf.lin_id = (u8)(cfd->can_id & LIN_ID_MASK);
-> 
-> Why is that cast necessary?
 
-It's not.
-
-> 
-> > +	lf.len = min(cfd->len, LIN_MAX_DLEN);
-> > +	memcpy(lf.data, cfd->data, lf.len);
-> > +
-> > +	ret = ldev->ldev_ops->ldo_tx(ldev, &lf);
-> > +	if (ret) {
-> > +		DEV_STATS_INC(ndev, tx_dropped);
-> > +		netdev_err_once(ndev, "transmission failure %d\n", ret);
-> > +		goto lin_tx_out;
-> 
-> Where is this label?
-
-In a later patch, let me fix the patchset accordingly.
-
-> 
-> > +	}
-> > +
-> > +	DEV_STATS_INC(ndev, tx_packets);
-> > +	DEV_STATS_ADD(ndev, tx_bytes, lf.len);
-> > +	ldev->tx_busy = false;
-> 
-> The same as above.
-
-OK
-
-> 
-> > +	netif_wake_queue(ndev);
-> > +}
-> > +
-> > +static netdev_tx_t lin_start_xmit(struct sk_buff *skb,
-> > +				  struct net_device *ndev)
-> > +{
-> > +	struct lin_device *ldev = netdev_priv(ndev);
-> > +
-> > +	if (ldev->tx_busy)
-> > +		return NETDEV_TX_BUSY;
-> 
-> And here too.
-
-OK
-
-> 
-> > +
-> > +	netif_stop_queue(ndev);
-> > +	ldev->tx_skb = skb;
-> > +	queue_work(ldev->wq, &ldev->tx_work);
-> > +
-> > +	return NETDEV_TX_OK;
-> > +}
-> ...
-> > +u8 lin_get_checksum(u8 pid, u8 n_of_bytes, const u8 *bytes,
-> > +		    enum lin_checksum_mode cm)
-> > +{
-> > +	uint csum = 0;
-> 
-> Is "uint" of the preffered types in the kernel?
-
-OK, no sysv 'uint', will be changed in another patch too
-
-> 
-> > +	int i;
-> > +
-> > +	if (cm == LINBUS_ENHANCED)
-> > +		csum += pid;
-> > +
-> > +	for (i = 0; i < n_of_bytes; i++) {
-> > +		csum += bytes[i];
-> > +		if (csum > 255)
-> > +			csum -= 255;
-> > +	}
-> > +
-> > +	return (u8)(~csum & 0xff);
-> 
-> Unnecessary cast?
-
-Yes
-
-> 
-> > +}
-> 
-> 
-> > +int lin_rx(struct lin_device *ldev, const struct lin_frame *lf)
-> > +{
-> > +	struct net_device *ndev = ldev->ndev;
-> > +	struct can_frame *cf;
-> > +	struct sk_buff *skb;
-> > +	int ret;
-> > +
-> > +	if (!ndev)
-> > +		return -ENODEV;
-> 
-> Is this racy or is this only a sanity check?
-
-Just beeing cautious, I guess it can be removed
-
-> 
-> > +	netdev_dbg(ndev, "id:%02x, len:%u, data:%*ph, checksum:%02x (%s)\n",
-> > +		   lf->lin_id, lf->len, lf->len, lf->data, lf->checksum,
-> > +		   lf->checksum_mode ? "enhanced" : "classic");
-> > +
-> > +	ret = lin_bump_rx_err(ldev, lf);
-> > +	if (ret) {
-> > +		DEV_STATS_INC(ndev, rx_dropped);
-> > +		return ret;
-> > +	}
-> > +
-> > +	skb = alloc_can_skb(ndev, &cf);
-> > +	if (unlikely(!skb)) {
-> > +		DEV_STATS_INC(ndev, rx_dropped);
-> > +		return -ENOMEM;
-> > +	}
-> > +
-> > +	cf->can_id = lf->lin_id;
-> > +	cf->len = min(lf->len, LIN_MAX_DLEN);
-> > +	memcpy(cf->data, lf->data, cf->len);
-> > +
-> > +	DEV_STATS_INC(ndev, rx_packets);
-> > +	DEV_STATS_ADD(ndev, rx_bytes, cf->len);
-> > +
-> > +	netif_receive_skb(skb);
-> > +
-> > +	return 0;
-> > +}
-> > +EXPORT_SYMBOL_GPL(lin_rx);
-> > +
-> > +static int lin_set_bittiming(struct net_device *ndev)
-> > +{
-> > +	struct lin_device *ldev = netdev_priv(ndev);
-> > +	unsigned int bitrate;
-> > +	int ret;
-> > +
-> > +	bitrate = ldev->can.bittiming.bitrate;
-> > +	ret = ldev->ldev_ops->update_bitrate(ldev, bitrate);
-> > +
-> > +	return ret;
-> 
-> No need for ret then.
-
-Compact code, sure, will get adapted
-
-> 
-> > +}
-> > +
-> > +static const u32 lin_bitrate[] = { 1200, 2400, 4800, 9600, 19200 };
-> > +
-> > +struct lin_device *register_lin(struct device *dev,
-> > +				const struct lin_device_ops *ldops)
-> > +{
-> > +	struct net_device *ndev;
-> > +	struct lin_device *ldev;
-> > +	int ret;
-> > +
-> > +	if (!ldops || !ldops->ldo_tx || !ldops->update_bitrate) {
-> > +		netdev_err(ndev, "missing mandatory lin_device_ops\n");
-> > +		return ERR_PTR(-EOPNOTSUPP);
-> 
-> Would EINVAL fit better?
-
-no preference over the other, will use EINVAL
-
-> 
-> > +	}
-> > +
-> > +	ndev = alloc_candev(sizeof(struct lin_device), 1);
-> > +	if (!ndev)
-> > +		return ERR_PTR(-ENOMEM);
-> > +
-> > +	ldev = netdev_priv(ndev);
-> > +
-> > +	ldev->ldev_ops = ldops;
-> > +	ndev->netdev_ops = &lin_netdev_ops;
-> > +	ndev->flags |= IFF_ECHO;
-> > +	ndev->mtu = CANFD_MTU;
-> > +	ldev->can.bittiming.bitrate = LIN_DEFAULT_BAUDRATE;
-> > +	ldev->can.ctrlmode = CAN_CTRLMODE_LIN;
-> > +	ldev->can.ctrlmode_supported = 0;
-> > +	ldev->can.bitrate_const = lin_bitrate;
-> > +	ldev->can.bitrate_const_cnt = ARRAY_SIZE(lin_bitrate);
-> > +	ldev->can.do_set_bittiming = lin_set_bittiming;
-> > +	ldev->ndev = ndev;
-> > +	ldev->dev = dev;
-> > +
-> > +	SET_NETDEV_DEV(ndev, dev);
-> > +
-> > +	ret = lin_set_bittiming(ndev);
-> > +	if (ret) {
-> > +		netdev_err(ndev, "set bittiming failed\n");
-> > +		goto exit_candev;
-> > +	}
-> > +
-> > +	ret = register_candev(ndev);
-> > +	if (ret)
-> > +		goto exit_candev;
-> > +
-> > +	ldev->lin_ids_kobj = kobject_create_and_add("lin_ids", &ndev->dev.kobj);
-> > +	if (!ldev->lin_ids_kobj) {
-> > +		netdev_err(ndev, "Failed to create sysfs directory\n");
-> > +		ret = -ENOMEM;
-> > +		goto exit_unreg;
-> > +	}
-> > +
-> > +	ret = lin_create_sysfs_id_files(ndev);
-> > +	if (ret) {
-> > +		netdev_err(ndev, "Failed to create sysfs entry: %d\n", ret);
-> > +		goto exit_kobj_put;
-> > +	}
-> > +
-> > +	ldev->wq = alloc_workqueue(dev_name(dev), WQ_FREEZABLE | WQ_MEM_RECLAIM,
-> > +				   0);
-> 
-> It would be worth noting why you need your own WQ.
-
-I'll add a comment stating:
-
-/* Use workqueue as tx over USB/SPI/... may sleep */
-
-> 
-> > +	if (!ldev->wq)
-> > +		goto exit_rm_files;
-> > +
-> > +	INIT_WORK(&ldev->tx_work, lin_tx_work_handler);
-> > +
-> > +	netdev_info(ndev, "LIN initialized.\n");
-> > +
-> > +	return ldev;
-> > +
-> > +exit_rm_files:
-> > +	lin_remove_sysfs_id_files(ndev);
-> > +exit_kobj_put:
-> > +	kobject_put(ldev->lin_ids_kobj);
-> > +exit_unreg:
-> > +	unregister_candev(ndev);
-> > +exit_candev:
-> > +	free_candev(ndev);
-> > +	return ERR_PTR(ret);
-> > +}
-> > +EXPORT_SYMBOL_GPL(register_lin);
-> > +
-> > +void unregister_lin(struct lin_device *ldev)
-> > +{
-> > +	struct net_device *ndev = ldev->ndev;
-> > +
-> > +	lin_remove_sysfs_id_files(ndev);
-> > +	kobject_put(ldev->lin_ids_kobj);
-> > +	unregister_candev(ndev);
-> > +	destroy_workqueue(ldev->wq);
-> > +	free_candev(ndev);
-> > +}
-> > +EXPORT_SYMBOL_GPL(unregister_lin);
-> > +
-> > +MODULE_LICENSE("GPL");
-> > +MODULE_AUTHOR("Christoph Fritz <christoph.fritz@hexdev.de>");
-> > +MODULE_DESCRIPTION("LIN bus to CAN glue driver");
-> > diff --git a/include/net/lin.h b/include/net/lin.h
-> > new file mode 100644
-> > index 0000000000000..2fe16e142db96
-> > --- /dev/null
-> > +++ b/include/net/lin.h
-> > @@ -0,0 +1,97 @@
-> > +/* SPDX-License-Identifier: GPL-2.0+ */
-> > +/* Copyright (C) 2024 hexDEV GmbH - https://hexdev.de */
-> > +
-> > +#ifndef _NET_LIN_H_
-> > +#define _NET_LIN_H_
-> > +
-> > +#include <linux/can/dev.h>
-> > +#include <linux/device.h>
-> > +
-> > +#define LIN_NUM_IDS		64
-> > +#define LIN_HEADER_SIZE		3
-> > +#define LIN_MAX_DLEN		8
-> > +
-> > +#define LIN_MAX_BAUDRATE	20000
-> > +#define LIN_MIN_BAUDRATE	1000
-> > +#define LIN_DEFAULT_BAUDRATE	9600
-> > +#define LIN_SYNC_BYTE		0x55
-> > +
-> > +#define LIN_ID_MASK		0x0000003FU
-> 
-> GEN_MASK() ?
-
-In the upcoming v2 I'll use:
-
-#define LIN_ID_MASK   GENMASK(5, 0)
-
-> 
-> > +/* special ID descriptions for LIN */
-> > +#define LIN_ENHANCED_CKSUM_FLAG	0x00000100U
-> > +
-> > +static const unsigned char lin_id_parity_tbl[] = {
-> 
-> This ends up in every translation unit you include lin.h into. Bad.
-
-This is also being used by a serial lin driver. But I guess most of the drivers have no need for this. Mhm, ... any ideas?
-
-> And perhaps u8?
-
-OK
-
-> 
-> > +	0x80, 0xc0, 0x40, 0x00, 0xc0, 0x80, 0x00, 0x40,
-> > +	0x00, 0x40, 0xc0, 0x80, 0x40, 0x00, 0x80, 0xc0,
-> > +	0x40, 0x00, 0x80, 0xc0, 0x00, 0x40, 0xc0, 0x80,
-> > +	0xc0, 0x80, 0x00, 0x40, 0x80, 0xc0, 0x40, 0x00,
-> > +	0x00, 0x40, 0xc0, 0x80, 0x40, 0x00, 0x80, 0xc0,
-> > +	0x80, 0xc0, 0x40, 0x00, 0xc0, 0x80, 0x00, 0x40,
-> > +	0xc0, 0x80, 0x00, 0x40, 0x80, 0xc0, 0x40, 0x00,
-> > +	0x40, 0x00, 0x80, 0xc0, 0x00, 0x40, 0xc0, 0x80,
-> > +};
-> > +
-> > +#define LIN_GET_ID(PID)		((PID) & LIN_ID_MASK)
-> 
-> FIELD_GET() ?
-
-In the upcoming v2 I'll use:
-
-#define LIN_GET_ID(PID)		FIELD_GET(LIN_ID_MASK, PID)
-
-> 
-> > +#define LIN_FORM_PID(ID)	(LIN_GET_ID(ID) | \
-> > +					lin_id_parity_tbl[LIN_GET_ID(ID)])
-> > +#define LIN_GET_PARITY(PID)	((PID) & ~LIN_ID_MASK)
-> > +#define LIN_CHECK_PID(PID)	(LIN_GET_PARITY(PID) == \
-> > +					LIN_GET_PARITY(LIN_FORM_PID(PID)))
-> 
-
-Thanks for the feedback
-  -- Christoph
+>
+> Enabling lockdep will defeat most/all cacheline optimization moving
+> around all fields after a lock, performances should be significantly
+> impacted anyway.
+>
+> WDYT?
+>
+> The HTB bits looks safe to me, but it would be great if someone @nvidia
+> could actually test it (AFAICS mlx5 is the only user of such
+> annotation).
+>
+> Thanks!
+>
+> Paolo
+>
 
