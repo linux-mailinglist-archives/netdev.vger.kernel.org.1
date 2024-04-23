@@ -1,194 +1,239 @@
-Return-Path: <netdev+bounces-90648-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90650-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96C938AF6AA
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 20:34:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E329C8AF6AF
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 20:36:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BAD801C22EA9
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 18:34:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 128E11C24F76
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 18:36:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CC621420D3;
-	Tue, 23 Apr 2024 18:33:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCB3513EFE3;
+	Tue, 23 Apr 2024 18:35:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Df0U+Pwq"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mLvgix0o"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay.smtp-ext.broadcom.com (relay.smtp-ext.broadcom.com [192.19.144.209])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2F572AD2C;
-	Tue, 23 Apr 2024 18:33:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.19.144.209
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3537E13EFE4;
+	Tue, 23 Apr 2024 18:35:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713897229; cv=none; b=YmDijZE75fdSpQVZcOTO/pQzD5gM05ZRYrT5HqxQw8lDHgxeR6h9kFPRXeKS0/7n22UTKlNdyYZ/RhdHWne4QquIbyAS7pR/3dGc8kvZr3kJh5K5LBN3dQVz3WvW1kArS/Bpb2TVHgOC0kdisV+VfGlOObxlH9JLUWaAKp5uSk0=
+	t=1713897304; cv=none; b=oRPBOSkYHLULBikqNIf2mIxPjiAIkSayr4zqm0FV5ZlkDAn2mYwzxtT93nXt8xUB4iQMMk4wRvulbGjqPzrOwLbazNm06A7fOhhFxDhK8S1fGmYqA3x9YkMKWtzVBzSEesYOMQveNoZdCWh7U/MD0MwXHoafNIK7nTsx5I49VPM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713897229; c=relaxed/simple;
-	bh=c/Ah+ocoUmfGe7UtUQ0MIQIvcS0fCgxsUc5y7Y2Hzns=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=nVvr60mDpmvvRKy3Z6AZk8Loq+0FNhmvBY8+gOqHJo/5o3KK7zFUkCZRT2Q9COnaVI1VRT8p+lgYpxeUHn6n3iWxZgKbd18lFeRWXeAKVSvLb9qRX1qChvtWub9mLApkeWkXNJuKNK72zrU/CT7Gx8WhKKo0+mxlF6jZ1IELxC0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Df0U+Pwq; arc=none smtp.client-ip=192.19.144.209
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: from mail-lvn-it-01.lvn.broadcom.net (mail-lvn-it-01.lvn.broadcom.net [10.36.132.253])
-	by relay.smtp-ext.broadcom.com (Postfix) with ESMTP id 05FC0C002821;
-	Tue, 23 Apr 2024 11:33:42 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 relay.smtp-ext.broadcom.com 05FC0C002821
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=broadcom.com;
-	s=dkimrelay; t=1713897222;
-	bh=c/Ah+ocoUmfGe7UtUQ0MIQIvcS0fCgxsUc5y7Y2Hzns=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Df0U+PwqGWnGL6cz/LQi8FCGT4wMjX+C5bztz1J7ErXLmQiZEXlE967SpLHWGGKD5
-	 7fF5HkIpDEt5gP5eUmPbyIJZC1Hnx640btl9YpitkpoOe1BZ/jz50QjO1kGdX5Dp34
-	 MIJsgBh25ttg2sTd3FNoS1Vlh3DSKOzHGKM3be2Q=
-Received: from fainelli-desktop.igp.broadcom.net (fainelli-desktop.dhcp.broadcom.net [10.67.48.245])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mail-lvn-it-01.lvn.broadcom.net (Postfix) with ESMTPSA id 29CE318041CAC4;
-	Tue, 23 Apr 2024 11:33:40 -0700 (PDT)
-From: Florian Fainelli <florian.fainelli@broadcom.com>
-To: netdev@vger.kernel.org
-Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>,
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net-next 8/8] net: dsa: b53: provide own phylink MAC operations
-Date: Tue, 23 Apr 2024 11:33:39 -0700
-Message-Id: <20240423183339.1368511-9-florian.fainelli@broadcom.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240423183339.1368511-1-florian.fainelli@broadcom.com>
-References: <20240423183339.1368511-1-florian.fainelli@broadcom.com>
+	s=arc-20240116; t=1713897304; c=relaxed/simple;
+	bh=WYvbuboNOGHAGTYL5eAezP0LLrKAAhKuVSJiY613RAw=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=EEputlIAUfDgbTo8PNL5TFJMvNF52VU+XnfvEstw8gU/mixGzXLODxOszLWAHxRVF+cIrwh6cCBzGo7zdfQrByfMEQ09dkOKSWH3hdUn5ckPdvhESz4qwliI4ZfKd8EApbK/hKv+v3aql7TGFISoGSMltsuLZepgLATV0N7TXP8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mLvgix0o; arc=none smtp.client-ip=209.85.219.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-6a06b12027cso1567176d6.0;
+        Tue, 23 Apr 2024 11:35:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1713897301; x=1714502101; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/HiLWdjQaV8hb1O52W4MiOT+NWSrI3hsRhd3S7MooKM=;
+        b=mLvgix0oFK/Y4jcA2Vz5ZFEswodnVB1nVzf1NCxJw3pv1QRPryaEPGsmRmThBhv4Z8
+         24dmD0RkdX4bjC63Mg6vc0dTQZbhXfGdyH8QbgpdGPvbhuW6FpVZhGA48Tygb/CPBGfz
+         fzZbR2rPoENLwSV3EGGjAoqdR2Uerzbcxli5ZfPAE1Q16SLHo200HVR3F4qgDkiVTBPP
+         EZS7M0ooLb+RjwzP5UoIB2umI/ivp825o3soddPzJyBG9c5vrFrE5+slwm9vbedYvJeX
+         MZL9U0zaPbdTlHWHK9p9HnEsLO4FC9KSN72+K/MOQfadIuorq6zzCcQfyfct766iJ15Z
+         3Lug==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713897301; x=1714502101;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=/HiLWdjQaV8hb1O52W4MiOT+NWSrI3hsRhd3S7MooKM=;
+        b=klifJUKnOksIdMAMl628US+1vyzSRFD3EPx1gAXGaJrg0Vexx6Z0ZrCfs21CQeO8+M
+         kBn5Ujjg2TbiAh1T2cr4p83n3OFMGQrqgZXS0g5e4HP4Glth8uN9xjiK6J+F0hoKgSq1
+         lXyUnd8iOJFbj2vp2a16m3SvLk1FehZwEeFraluzPMpvtZcBBtQTcjv9SOATQwORj7kV
+         c/tB2rTflUkDBwGSWu+qdanYuYaIRGn1H8EHYnt65K8S5I52KGGCY9aScw1U4V5Wd1Eu
+         KPfB5CBHdpMN6ki10ALh8Juot04TuSpsw8QVZ1pylJtG/oaLK3oCjDMRRlsF2qWdfQ44
+         FuSw==
+X-Forwarded-Encrypted: i=1; AJvYcCXtVWH6/8JO3zCRW7ZfRZN2nybUL8J/Sc37JUpn+yxn//QpJDaZb5MVxKJ2jmCPovOwwh3RKGpeQXl+GQwV2ojkFYBAn2Vo+ziW4IFTp6nL7qUU7w37B6SkWH9W
+X-Gm-Message-State: AOJu0Yz4f0BhYT56+IKHb3JfPshzWz9mGk40Bsb9/w+LQaMOQxSoJpHe
+	qwVriLZDduCF6a+0xh4m06rHoBA5HC33iMLYwGsw8Jfb6rfR+Ipx
+X-Google-Smtp-Source: AGHT+IF62Qwt6JGagRCz6T9wK89ruUN39TtsigSJte1Aii5NS2nBJ3TAqKMQGIi2Zy6y47RheF7jmw==
+X-Received: by 2002:a05:6214:e69:b0:6a0:4756:ce99 with SMTP id jz9-20020a0562140e6900b006a04756ce99mr6817134qvb.21.1713897300995;
+        Tue, 23 Apr 2024 11:35:00 -0700 (PDT)
+Received: from localhost (164.146.150.34.bc.googleusercontent.com. [34.150.146.164])
+        by smtp.gmail.com with ESMTPSA id o6-20020a0ce406000000b0069b20891f0dsm5377155qvl.30.2024.04.23.11.35.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 23 Apr 2024 11:35:00 -0700 (PDT)
+Date: Tue, 23 Apr 2024 14:35:00 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: =?UTF-8?B?TGVuYSBXYW5nICjnjovlqJwp?= <Lena.Wang@mediatek.com>, 
+ "maze@google.com" <maze@google.com>, 
+ "willemdebruijn.kernel@gmail.com" <willemdebruijn.kernel@gmail.com>
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+ "bpf@vger.kernel.org" <bpf@vger.kernel.org>, 
+ "steffen.klassert@secunet.com" <steffen.klassert@secunet.com>, 
+ "kuba@kernel.org" <kuba@kernel.org>, 
+ =?UTF-8?B?U2hpbWluZyBDaGVuZyAo5oiQ6K+X5piOKQ==?= <Shiming.Cheng@mediatek.com>, 
+ "pabeni@redhat.com" <pabeni@redhat.com>, 
+ "edumazet@google.com" <edumazet@google.com>, 
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+ "matthias.bgg@gmail.com" <matthias.bgg@gmail.com>, 
+ "davem@davemloft.net" <davem@davemloft.net>, 
+ "yan@cloudflare.com" <yan@cloudflare.com>
+Message-ID: <6627ff5432c3a_1759e929467@willemb.c.googlers.com.notmuch>
+In-Reply-To: <9f097bcafc5bacead23c769df4c3f63a80dcbad5.camel@mediatek.com>
+References: <20240415150103.23316-1-shiming.cheng@mediatek.com>
+ <661d93b4e3ec3_3010129482@willemb.c.googlers.com.notmuch>
+ <65e3e88a53d466cf5bad04e5c7bc3f1648b82fd7.camel@mediatek.com>
+ <CANP3RGdkxT4TjeSvv1ftXOdFQd5Z4qLK1DbzwATq_t_Dk+V8ig@mail.gmail.com>
+ <661eb25eeb09e_6672129490@willemb.c.googlers.com.notmuch>
+ <CANP3RGdrRDERiPFVQ1nZYVtopErjqOQ72qQ_+ijGQiL7bTtcLQ@mail.gmail.com>
+ <CANP3RGd+Zd-bx6S-NzeGch_crRK2w0-u6xwSVn71M581uCp9cQ@mail.gmail.com>
+ <661f066060ab4_7a39f2945d@willemb.c.googlers.com.notmuch>
+ <77068ef60212e71b270281b2ccd86c8c28ee6be3.camel@mediatek.com>
+ <662027965bdb1_c8647294b3@willemb.c.googlers.com.notmuch>
+ <11395231f8be21718f89981ffe3703da3f829742.camel@mediatek.com>
+ <CANP3RGdh24xyH2V7Sa2fs9Ca=tiZNBdKu1qQ8LFHS3sY41CxmA@mail.gmail.com>
+ <b24bc70ae2c50dc50089c45afbed34904f3ee189.camel@mediatek.com>
+ <66227ce6c1898_116a9b294be@willemb.c.googlers.com.notmuch>
+ <CANP3RGfxeKDUmGwSsZrAs88Fmzk50XxN+-MtaJZTp641aOhotA@mail.gmail.com>
+ <6622acdd22168_122c5b2945@willemb.c.googlers.com.notmuch>
+ <9f097bcafc5bacead23c769df4c3f63a80dcbad5.camel@mediatek.com>
+Subject: Re: [PATCH net] udp: fix segmentation crash for GRO packet without
+ fraglist
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-Convert b53 to provide its own phylink MAC operations, thus avoiding the
-shim layer in DSA's port.c
+> Hi Willem,
+> As the discussion, is it OK for the patch below?
 
-Signed-off-by: Florian Fainelli <florian.fainelli@broadcom.com>
----
- drivers/net/dsa/b53/b53_common.c | 40 +++++++++++++++++++++-----------
- 1 file changed, 26 insertions(+), 14 deletions(-)
+Thanks for iterating on this.
 
-diff --git a/drivers/net/dsa/b53/b53_common.c b/drivers/net/dsa/b53/b53_common.c
-index e490ef0fd3f1..8f50abe739b7 100644
---- a/drivers/net/dsa/b53/b53_common.c
-+++ b/drivers/net/dsa/b53/b53_common.c
-@@ -1383,24 +1383,27 @@ static void b53_phylink_get_caps(struct dsa_switch *ds, int port,
- 		dev->ops->phylink_get_caps(dev, port, config);
- }
+I would like the opinion also of the fraglist and UDP GRO experts.
  
--static struct phylink_pcs *b53_phylink_mac_select_pcs(struct dsa_switch *ds,
--						      int port,
-+static struct phylink_pcs *b53_phylink_mac_select_pcs(struct phylink_config *config,
- 						      phy_interface_t interface)
- {
--	struct b53_device *dev = ds->priv;
-+	struct dsa_port *dp = dsa_phylink_to_port(config);
-+	struct b53_device *dev = dp->ds->priv;
- 
- 	if (!dev->ops->phylink_mac_select_pcs)
- 		return NULL;
- 
--	return dev->ops->phylink_mac_select_pcs(dev, port, interface);
-+	return dev->ops->phylink_mac_select_pcs(dev, dp->index, interface);
- }
- 
--static void b53_phylink_mac_config(struct dsa_switch *ds, int port,
-+static void b53_phylink_mac_config(struct phylink_config *config,
- 				   unsigned int mode,
- 				   const struct phylink_link_state *state)
- {
-+	struct dsa_port *dp = dsa_phylink_to_port(config);
- 	phy_interface_t interface = state->interface;
-+	struct dsa_switch *ds = dp->ds;
- 	struct b53_device *dev = ds->priv;
-+	int port = dp->index;
- 
- 	if (is63xx(dev) && port >= B53_63XX_RGMII0)
- 		b53_adjust_63xx_rgmii(ds, port, interface);
-@@ -1415,11 +1418,13 @@ static void b53_phylink_mac_config(struct dsa_switch *ds, int port,
- 	}
- }
- 
--static void b53_phylink_mac_link_down(struct dsa_switch *ds, int port,
-+static void b53_phylink_mac_link_down(struct phylink_config *config,
- 				      unsigned int mode,
- 				      phy_interface_t interface)
- {
--	struct b53_device *dev = ds->priv;
-+	struct dsa_port *dp = dsa_phylink_to_port(config);
-+	struct b53_device *dev = dp->ds->priv;
-+	int port = dp->index;
- 
- 	if (mode == MLO_AN_PHY)
- 		return;
-@@ -1434,15 +1439,18 @@ static void b53_phylink_mac_link_down(struct dsa_switch *ds, int port,
- 		dev->ops->serdes_link_set(dev, port, mode, interface, false);
- }
- 
--static void b53_phylink_mac_link_up(struct dsa_switch *ds, int port,
-+static void b53_phylink_mac_link_up(struct phylink_config *config,
-+				    struct phy_device *phydev,
- 				    unsigned int mode,
- 				    phy_interface_t interface,
--				    struct phy_device *phydev,
- 				    int speed, int duplex,
- 				    bool tx_pause, bool rx_pause)
- {
-+	struct dsa_port *dp = dsa_phylink_to_port(config);
-+	struct dsa_switch *ds = dp->ds;
- 	struct b53_device *dev = ds->priv;
--	struct ethtool_keee *p = &dev->ports[port].eee;
-+	struct ethtool_keee *p = &dev->ports[dp->index].eee;
-+	int port = dp->index;
- 
- 	if (mode == MLO_AN_PHY) {
- 		/* Re-negotiate EEE if it was enabled already */
-@@ -2259,6 +2267,13 @@ static int b53_get_max_mtu(struct dsa_switch *ds, int port)
- 	return JMS_MAX_SIZE;
- }
- 
-+static const struct phylink_mac_ops b53_phylink_mac_ops = {
-+	.mac_select_pcs	= b53_phylink_mac_select_pcs,
-+	.mac_config	= b53_phylink_mac_config,
-+	.mac_link_down	= b53_phylink_mac_link_down,
-+	.mac_link_up	= b53_phylink_mac_link_up,
-+};
-+
- static const struct dsa_switch_ops b53_switch_ops = {
- 	.get_tag_protocol	= b53_get_tag_protocol,
- 	.setup			= b53_setup,
-@@ -2270,10 +2285,6 @@ static const struct dsa_switch_ops b53_switch_ops = {
- 	.phy_read		= b53_phy_read16,
- 	.phy_write		= b53_phy_write16,
- 	.phylink_get_caps	= b53_phylink_get_caps,
--	.phylink_mac_select_pcs	= b53_phylink_mac_select_pcs,
--	.phylink_mac_config	= b53_phylink_mac_config,
--	.phylink_mac_link_down	= b53_phylink_mac_link_down,
--	.phylink_mac_link_up	= b53_phylink_mac_link_up,
- 	.port_enable		= b53_enable_port,
- 	.port_disable		= b53_disable_port,
- 	.get_mac_eee		= b53_get_mac_eee,
-@@ -2716,6 +2727,7 @@ struct b53_device *b53_switch_alloc(struct device *base,
- 	dev->priv = priv;
- 	dev->ops = ops;
- 	ds->ops = &b53_switch_ops;
-+	ds->phylink_mac_ops = &b53_phylink_mac_ops;
- 	dev->vlan_enabled = true;
- 	/* Let DSA handle the case were multiple bridges span the same switch
- 	 * device and different VLAN awareness settings are requested, which
--- 
-2.34.1
+Yes, I think both
+
+- protecting skb_segment_list against clearly illegal fraglist packets, and
+- blocking BPF from constructing such packets
+
+are worthwhile stable fixes. I believe they should be two separate
+patches. Both probably with the same Fixes tag: 3a1296a38d0c
+("net: Support GRO/GSO fraglist chaining").
+
+> diff --git a/net/core/filter.c b/net/core/filter.c
+> index 3a6110ea4009..abc6029c8eef 100644
+> --- a/net/core/filter.c
+> +++ b/net/core/filter.c
+> @@ -1655,6 +1655,11 @@ static DEFINE_PER_CPU(struct bpf_scratchpad,
+> bpf_sp);
+>  static inline int __bpf_try_make_writable(struct sk_buff *skb,
+>                                           unsigned int write_len)
+>  {
+> +       if (skb_is_gso(skb) && (skb_shinfo(skb)->gso_type &
+> +                       SKB_GSO_FRAGLIST) && (write_len >
+> skb_headlen(skb))) {
+> +               return -ENOMEM;
+> +       }
+> +
+
+Indentation looks off, but I agree with the logic.
+
+    if (skb_is_gso(skb) &&
+        (skb_shinfo(skb)->gso_type & SKB_GSO_FRAGLIST) &&
+         (write_len > skb_headlen(skb)))
+
+>         return skb_ensure_writable(skb, write_len);
+>  }
+> 
+> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+> index 73b1e0e53534..2e90534c1a1e 100644
+> --- a/net/core/skbuff.c
+> +++ b/net/core/skbuff.c
+> @@ -4036,9 +4036,11 @@ struct sk_buff *skb_segment_list(struct sk_buff
+> *skb,
+>         unsigned int tnl_hlen = skb_tnl_header_len(skb);
+>         unsigned int delta_truesize = 0;
+>         unsigned int delta_len = 0;
+> +       unsigned int mss = skb_shinfo(skb)->gso_size;
+>         struct sk_buff *tail = NULL;
+>         struct sk_buff *nskb, *tmp;
+>         int len_diff, err;
+> +       bool err_len = false;
+> 
+>         skb_push(skb, -skb_network_offset(skb) + offset);
+> 
+> @@ -4047,6 +4049,14 @@ struct sk_buff *skb_segment_list(struct sk_buff
+> *skb,
+>         if (err)
+>                 goto err_linearize;
+> 
+> +       if (mss != GSO_BY_FRAGS && mss != skb_headlen(skb)) {
+> +               if (!list_skb) {
+> +                       goto err_linearize;
+
+The label no longer truly covers the meaning.
+
+But that is already true since the above (second) jump was added in
+commit c329b261afe7 ("net: prevent skb corruption on frag list
+segmentation").
+
+Neither needs the kfree_skb_list, as skb->next is not assigned to
+until the loop. Can just return ERR_PTR(-EFAULT)?
+
+> +               } else {
+> +                       err_len = true;
+> +               }
+> +       }
+> +
+
+Why the branch? Might as well always fail immediately?
+
+>         skb_shinfo(skb)->frag_list = NULL;
+> 
+>         while (list_skb) {
+> @@ -4109,6 +4119,9 @@ struct sk_buff *skb_segment_list(struct sk_buff
+> *skb,
+>             __skb_linearize(skb))
+>                 goto err_linearize;
+> 
+> +       if (err_len)
+> +               goto err_linearize;
+> +
+>         skb_get(skb);
+> 
+>         return skb;
+> 
+> > > 
+> > > > Back to the original report: the issue should already have been
+> > fixed
+> > > > by commit 876e8ca83667 ("net: fix NULL pointer in
+> > skb_segment_list").
+> > > > But that commit is in the kernel for which you report the error.
+> > > >
+> > > > Turns out that the crash is not in skb_segment_list, but later in
+> > > > __udpv4_gso_segment_list_csum. Which unconditionally dereferences
+> > > > udp_hdr(seg).
+> > > >
+> > > > The above fix also mentions skb pull as the culprit, but does not
+> > > > include a BPF program. If this can be reached in other ways, then
+> > we
+> > > > do need a stronger test in skb_segment_list, as you propose.
+> > > >
+> > > > I don't want to narrowly check whether udp_hdr is safe.
+> > Essentially,
+> > > > an SKB_GSO_FRAGLIST skb layout cannot be trusted at all if even
+> > one
+> > > > byte would get pulled.
+
 
 
