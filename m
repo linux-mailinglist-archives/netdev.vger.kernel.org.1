@@ -1,65 +1,74 @@
-Return-Path: <netdev+bounces-90464-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90473-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB0688AE380
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 13:11:17 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D12168AE39A
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 13:13:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E7DFDB21031
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 11:11:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 18272B231E3
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 11:13:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0D168004B;
-	Tue, 23 Apr 2024 11:10:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BD487E578;
+	Tue, 23 Apr 2024 11:12:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ERnBvNby"
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="gkBB9/09"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20EDF80028;
-	Tue, 23 Apr 2024 11:10:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74AEF7C09F
+	for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 11:12:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713870646; cv=none; b=McIFTCSSLlautCAxL3r8ISgCDKGc0PtRggL2S+KbrCwPhsDhWwLCBbosgekjZIIvy53Cts8GbLC0eRZ+g9W2cW3iUqoKCov7id1Eg8rx9UPnBMbwoZFMycvmfpWT55qBwsv5EvBIyxSuGjvxvM5te/7GlzVSyAJiffqZgNU4+98=
+	t=1713870772; cv=none; b=ZDcPH9rJtD89FocVaJMb6+RNlKeoLW4xh6h6rxpJ5Rj3ty3204rwWDUpUhGVVDd7a232Jz7VZK6I5NWpfVv8grKGYcb4SKZeokIuWHj/7PaPghGmJDSDbD0M72w5mmVv+uY601kuviMbR7qEcy0aZZ6isHs1tNi43QZxSKtAYxM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713870646; c=relaxed/simple;
-	bh=FhMYwpD0Jy+0t5UX4wrDuIaENfV+qwJP/+xWhZFZCdQ=;
+	s=arc-20240116; t=1713870772; c=relaxed/simple;
+	bh=WK4EztFBVAHg7eYRzkCerijhdminORv97CA/HPtekR0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GHkX7VD6nLSh6upVA9fIJm9w2KmOdWzm9TWX+uBPXXpxGUDUmefcuoqmVEyjgqCW2K94IDiuVvYT+wyKl7LXiF3vssX8M54uUlDsi7aLOrxTg8hhBpXwQ+zhnUyR4tskoNOC50PDjo4jJs1A5YICrpNEAV9CY/jUZVYBhBidrD8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ERnBvNby; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1713870645; x=1745406645;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=FhMYwpD0Jy+0t5UX4wrDuIaENfV+qwJP/+xWhZFZCdQ=;
-  b=ERnBvNbyFK6VwTLE/1IyNhrnjvj0TxFuN2XL4Gq4yAOJ7yN7lSkTHEOX
-   CDlc2aCKPJPboY8CRQ9p25ZrTi0xPKZuDho4/fJGNiDcoXAExx5WCcUT7
-   k1Ot3Y0us4F2uybfjrr42Qo85nTF/Jmcg9zLevTfktr3qGwmdSW6fDX4u
-   oTSHr0zY+q3Of+/1/hBTnL1uVqM88Npsrax+/yF5sxl/b18eE4LkXFwEC
-   8rX2uGqbODoQIr+zy0zp+Xw2b4xHI78iHrjfyCgGijDyqdO1VYQBh/OOC
-   Igdk54FoXmzzQn2j3gpp4kz7UQAw2sFDxEGa/Tc3pVTe6HmSSwbPnLjKU
-   A==;
-X-CSE-ConnectionGUID: yTIwQevkT9CXDZpZ5SC9lQ==
-X-CSE-MsgGUID: 8EmlvmEuT8+Ut7spIoLwrQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11052"; a="26905757"
-X-IronPort-AV: E=Sophos;i="6.07,222,1708416000"; 
-   d="scan'208";a="26905757"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2024 04:10:45 -0700
-X-CSE-ConnectionGUID: GHANmPF1QaSu/tzRusNdUw==
-X-CSE-MsgGUID: zm+oKK03QECvY3VX9hfdGA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,222,1708416000"; 
-   d="scan'208";a="24342606"
-Received: from mszycik-mobl1.ger.corp.intel.com (HELO [10.246.35.198]) ([10.246.35.198])
-  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2024 04:10:37 -0700
-Message-ID: <eb54c7bb-db63-4361-b42f-dc02e2c37fbf@linux.intel.com>
-Date: Tue, 23 Apr 2024 13:10:16 +0200
+	 In-Reply-To:Content-Type; b=Svph/Fc9w0jO3O3e5bL1xvLtIbeSJh6IVM68JKXXMH1xcOYzOUTTv8kTsOF7atjkxinZ3N/CQPMaKm6aiqMDM35oQZsjp/uYmrkD+hfypCkn/W+fi0zHiK83cue4vajWMFfR2ulkkTcDXhF3PLSnyDUfrNkQXF9Ess7Ob8KIYZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=gkBB9/09; arc=none smtp.client-ip=209.85.218.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-a5224dfa9adso936470966b.0
+        for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 04:12:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1713870768; x=1714475568; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=1GbwA9AtFu4Yu/r6+eMwCiUFKh6Xn8xW9wVevaAyhDE=;
+        b=gkBB9/09VmOcjQeiyZJnWiz8KUF59wHyDdJVu8uIHybYWzikm3us1PYKBlsR62sT6f
+         TyuLhEWVd/ZM01OhqIpymd58GiWuC9QSINMaQGqKNaZ0PDtebqP032xWH/gC5bR/bdP8
+         mMtW/wxOGnUHvfMot9tqY9q0OY3hX1RKbvnfKw2LLKDnLfUaN0ZYEAmYSkm6TWFC3KjB
+         yZRjNqiOWSqBCsK3At3aJMmKPbGSazOBwdbSK+ygybKkseecdDKCZQ8z8wT2kiSIZJjz
+         rE7XxukzxxXgu16rdLRdzaknu3pzDtrAcbFmXnM8t4L7laEGN9TX88hzenifQf67fbqw
+         hH7Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713870768; x=1714475568;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=1GbwA9AtFu4Yu/r6+eMwCiUFKh6Xn8xW9wVevaAyhDE=;
+        b=Dpnej4/ul1STz368lpJpTvsoDdoTkyrg4NyIpdEWWDZ5mSg/RE2s+fsA+DFNlUcj1F
+         to9kNeeyZX0iTzcUNrg5bCPwLKjTzaeyHa/GDCtB7m+6z0mXgM3jMW50Mi/h6X9oHkbN
+         PW5x9dcw+h8LdtFo46EnFTR0/aqG2dKPaRCEf49fKWy1ZgvFs+gXS/Lu5yFMvv9GMwXX
+         yhD0KD0Q0qmk7v5SDVTHacLjRgtWYVbLbEdUT+o0hfNtzgwVgEzm6IRVyAK2ZLGSuLNF
+         T3yJnS4eC3w8gLrFcMgzlmmsyhN8USrIeu5MHvsqq2/gY6o1G+ouIj35LpcSq4Az1TWE
+         5lIg==
+X-Forwarded-Encrypted: i=1; AJvYcCVzL/cpXw34ejRxWZc4hRiApZ/1GRaOG0BmDqOadDb8qWugAwvu+9b3n5prm88JvNKuniHlVB66xUx9RH2lcvoaO3ARGACJ
+X-Gm-Message-State: AOJu0YzY3sLu3+WDl3hSboc8wZrb02tETyWCYX0W15aPXSxtKWGqWly+
+	F34NG/n5WZofo3nJsPQBuhXmzc5Y3UxBNT87SNfruJ/gRlI2ZA/hLuT5Ngxhpas=
+X-Google-Smtp-Source: AGHT+IG+TtGWysDfdlawCem0S3HMY9EM/WsGwW7MbhgDMk8j9ZqeCViVLQ5g4hfRsmjhInG+O7du1A==
+X-Received: by 2002:a17:906:af79:b0:a58:8602:ffa1 with SMTP id os25-20020a170906af7900b00a588602ffa1mr351273ejb.19.1713870767677;
+        Tue, 23 Apr 2024 04:12:47 -0700 (PDT)
+Received: from [10.100.1.125] (ip.82.144.213.21.stat.volia.net. [82.144.213.21])
+        by smtp.gmail.com with ESMTPSA id t22-20020a1709063e5600b00a5209dc79c1sm7006898eji.146.2024.04.23.04.12.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 23 Apr 2024 04:12:47 -0700 (PDT)
+Message-ID: <b1fccc7c-3c9f-45e0-979f-f83dfc788613@blackwall.org>
+Date: Tue, 23 Apr 2024 14:12:44 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,90 +76,46 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH 0/5] Ensure the copied buf is NULL
- terminated
-To: Bui Quang Minh <minhquangbui99@gmail.com>,
- Jesse Brandeburg <jesse.brandeburg@intel.com>,
- Tony Nguyen <anthony.l.nguyen@intel.com>,
+Subject: Re: [PATCH] net: bridge: remove redundant check of f->dst
+Content-Language: en-US
+To: linke li <lilinke99@qq.com>
+Cc: xujianhao01@gmail.com, Roopa Prabhu <roopa@nvidia.com>,
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Paul M Stillwell Jr <paul.m.stillwell.jr@intel.com>,
- Rasesh Mody <rmody@marvell.com>, Sudarsana Kalluru <skalluru@marvell.com>,
- GR-Linux-NIC-Dev@marvell.com, Krishna Gudipati <kgudipat@brocade.com>,
- Anil Gurumurthy <anil.gurumurthy@qlogic.com>,
- Sudarsana Kalluru <sudarsana.kalluru@qlogic.com>,
- "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
- "Martin K. Petersen" <martin.petersen@oracle.com>,
- Fabian Frederick <fabf@skynet.be>, Saurav Kashyap <skashyap@marvell.com>,
- Javed Hasan <jhasan@marvell.com>, GR-QLogic-Storage-Upstream@marvell.com,
- Nilesh Javali <nilesh.javali@cavium.com>, Arun Easi <arun.easi@cavium.com>,
- Manish Rangankar <manish.rangankar@cavium.com>,
- Vineeth Vijayan <vneethv@linux.ibm.com>,
- Peter Oberparleiter <oberpar@linux.ibm.com>,
- Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
- Alexander Gordeev <agordeev@linux.ibm.com>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Sven Schnelle <svens@linux.ibm.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-s390@vger.kernel.org,
- linux-scsi@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
- Saurav Kashyap <saurav.kashyap@cavium.com>
-References: <20240422-fix-oob-read-v1-0-e02854c30174@gmail.com>
-Content-Language: en-US
-From: Marcin Szycik <marcin.szycik@linux.intel.com>
-In-Reply-To: <20240422-fix-oob-read-v1-0-e02854c30174@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+ bridge@lists.linux.dev, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <tencent_616D84217798828E5D1021857C528B713406@qq.com>
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <tencent_616D84217798828E5D1021857C528B713406@qq.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-
-
-On 22.04.2024 18:41, Bui Quang Minh wrote:
-> Hi everyone,
+On 4/23/24 13:53, linke li wrote:
+> In br_fill_forward_path(), f->dst is checked not to be NULL, then
+> immediately read using READ_ONCE and checked again. The first check is
+> useless, so this patch aims to remove the redundant check of f->dst.
 > 
-> I found that some drivers contains an out-of-bound read pattern like this
-> 
-> 	kern_buf = memdup_user(user_buf, count);
-> 	...
-> 	sscanf(kern_buf, ...);
-> 
-> The sscanf can be replaced by some other string-related functions. This
-> pattern can lead to out-of-bound read of kern_buf in string-related
-> functions.
-> 
-> This series fix the above issue by replacing memdup_user with
-> memdup_user_nul or allocating count + 1 buffer then writing the NULL
-> terminator to end of buffer after userspace copying.
-> 
-> Thanks,
-> Quang Minh.
-> 
-> Signed-off-by: Bui Quang Minh <minhquangbui99@gmail.com>
+> Signed-off-by: linke li <lilinke99@qq.com>
 > ---
-> Bui Quang Minh (5):
->       drivers/net/ethernet/intel-ice: ensure the copied buf is NULL terminated
->       drivers/net/brocade-bnad: ensure the copied buf is NULL terminated
->       drivers/scsi/bfa/bfad: ensure the copied buf is NULL terminated
->       drivers/scsi/qedf: ensure the copied buf is NULL terminated
->       drivers/s390/cio: ensure the copied buf is NULL terminated
-
-Typically you don't include path to module in title, instead:
-ice: ensure the copied buf is NULL terminated
-bna: ensure the copied buf is NULL terminated
-etc.
-
+>   net/bridge/br_device.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
 > 
->  drivers/net/ethernet/brocade/bna/bnad_debugfs.c | 4 ++--
->  drivers/net/ethernet/intel/ice/ice_debugfs.c    | 8 ++++----
->  drivers/s390/cio/cio_inject.c                   | 3 ++-
->  drivers/scsi/bfa/bfad_debugfs.c                 | 4 ++--
->  drivers/scsi/qedf/qedf_debugfs.c                | 2 +-
->  5 files changed, 11 insertions(+), 10 deletions(-)
-> ---
-> base-commit: ed30a4a51bb196781c8058073ea720133a65596f
-> change-id: 20240422-fix-oob-read-19ae7f8f3711
-> 
-> Best regards,
+> diff --git a/net/bridge/br_device.c b/net/bridge/br_device.c
+> index 65cee0ad3c1b..ae33b30ff87c 100644
+> --- a/net/bridge/br_device.c
+> +++ b/net/bridge/br_device.c
+> @@ -405,7 +405,7 @@ static int br_fill_forward_path(struct net_device_path_ctx *ctx,
+>   	br_vlan_fill_forward_path_pvid(br, ctx, path);
+>   
+>   	f = br_fdb_find_rcu(br, ctx->daddr, path->bridge.vlan_id);
+> -	if (!f || !f->dst)
+> +	if (!f)
+>   		return -1;
+>   
+>   	dst = READ_ONCE(f->dst);
 
-Thanks,
-Marcin
+This patch should target net-next (PATCH net-next in subject).
+Other than that the patch seems fine.
+
+Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
+
 
