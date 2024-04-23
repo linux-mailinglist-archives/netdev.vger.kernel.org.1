@@ -1,119 +1,111 @@
-Return-Path: <netdev+bounces-90487-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90488-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA31B8AE3E7
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 13:29:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 93EC98AE3EE
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 13:30:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A6831282495
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 11:29:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C67191C22227
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 11:30:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 315657C6DF;
-	Tue, 23 Apr 2024 11:29:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70E347E59F;
+	Tue, 23 Apr 2024 11:30:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="2rIPabPh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="exFm2Vrw"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AAF281AAA
-	for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 11:29:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F0607D3E6;
+	Tue, 23 Apr 2024 11:30:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713871775; cv=none; b=vDqBekXZT8DPvNre1YdGM+Wm570RCFzTPH7mRls+1zFgiaFNHHMh/W29SMlsP21ShfedBEUVVKw5Cm6KLHWHtH3NJmlVz3jiqq09py5jal0crM/wYEYG39Ak0EoLWj/whoYdR6T4fkFeO8RJ2+vsuTBOBzI7i6gBSiOki0e+NCg=
+	t=1713871830; cv=none; b=sJYIoAvDkiDpRFUQ3et95IdQeiTjUrh4dCjTV5gK4eXfaXyocLIf/ja1VlQGrF+B/HlXIypE2/Lk7C+8L0/bXHqygret5A5wT3to2usiQWr9SdC5hUisi6LU3Wx8y67LVP/2n8F63bE5xruFhgX35kvrFF6XuU/EK4/PzdySGPo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713871775; c=relaxed/simple;
-	bh=mFXN2edjnM2qe5cHXA0AHOBUc0ToWeeiy+s7Bn/TCvA=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Y9QVDZnJojOiN2RTKEYb8jVXjPeyFziMnre5z+NvBRkFNS4ZhJaiX9tR7FERSwUQ/LQkWMczGVQIQik3Q/DBPK8SuQ9j2VV9xP0OL3Vtrt7CQKIWKwkWsBOSP6x1+rvLRw8STCY3d5juccQwYup2AUgP7qkqSJkvYlU6edIigKk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=2rIPabPh; arc=none smtp.client-ip=68.232.154.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1713871773; x=1745407773;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=mFXN2edjnM2qe5cHXA0AHOBUc0ToWeeiy+s7Bn/TCvA=;
-  b=2rIPabPhZuQpGSpNTSdNeZN2UwrOn7BUFQU9VopHtGVpiKgsiOP4aKf3
-   eB13vC8/69I2UVfrqEIvLDXhkfDKTL66qe+Mwo0FBTwwL0sWc8Ylu/+BK
-   iw5CK8j0LiYWI02lBGJiDhpIgtOensfy2QO0QsLmXbrU7r+w54rk4+msE
-   0Ag1/yLwYzgYVtJe4EZmRWkecD15Lg6/PgZ58OofuVuavBcSwk49YSoLm
-   TDvwxYTSWmvw2fzyrA7Ewp+sZLM7NFdH5R1J3qZ4RJiq1SE2rojmslWcd
-   WgUKnGriBUb8L2uNxW8NyzmPJFhwIL3zLsDSz7QxTFU5AOzNzUuzTdXtg
-   g==;
-X-CSE-ConnectionGUID: 27LrOb8JR+S9XmqCg/RY/Q==
-X-CSE-MsgGUID: BW5xDyjURI+/KYfiMSO/Hg==
-X-IronPort-AV: E=Sophos;i="6.07,222,1708412400"; 
-   d="scan'208";a="189585239"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 23 Apr 2024 04:29:32 -0700
-Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
- chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 23 Apr 2024 04:29:18 -0700
-Received: from DEN-DL-M70577 (10.10.85.11) by chn-vm-ex02.mchp-main.com
- (10.10.85.144) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
- Transport; Tue, 23 Apr 2024 04:29:15 -0700
-Date: Tue, 23 Apr 2024 11:29:15 +0000
-From: Daniel Machon <daniel.machon@microchip.com>
-To: Simon Horman <horms@kernel.org>
-CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Bryan Whitehead <bryan.whitehead@microchip.com>,
-	"Richard Cochran" <richardcochran@gmail.com>, Horatiu Vultur
-	<horatiu.vultur@microchip.com>, Lars Povlsen <lars.povlsen@microchip.com>,
-	Steen Hegelund <Steen.Hegelund@microchip.com>,
-	<UNGLinuxDriver@microchip.com>, <netdev@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>
-Subject: Re: [PATCH net-next 4/4] net: sparx5: Correct spelling in comments
-Message-ID: <20240423112915.5cmqvmvwfwutahky@DEN-DL-M70577>
-References: <20240419-lan743x-confirm-v1-0-2a087617a3e5@kernel.org>
- <20240419-lan743x-confirm-v1-4-2a087617a3e5@kernel.org>
- <20240420192424.42z2aztt73grdvsj@DEN-DL-M70577>
- <20240422105756.GC42092@kernel.org>
+	s=arc-20240116; t=1713871830; c=relaxed/simple;
+	bh=Nq9WyZ1f/AyPelh/YiIXTtOGifGc5Zz8SfWRvAnWDdg=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Zzh5ZpXjPRGYe2KkR5c/c8LpcMAxY6DfHREpfEymiZmo29OhNQGY2bkxz6bbwCluvpUixHCqWAt+r/ulZJMgrwScAWf6YLvi8gwEBGzbrp3cmCHW3j0vhiAY5iq+7ueSiDVfQXfod53fR8tTrmnda/ejfrmtKZDeymJHYwEw79s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=exFm2Vrw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id B9395C2BD11;
+	Tue, 23 Apr 2024 11:30:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713871829;
+	bh=Nq9WyZ1f/AyPelh/YiIXTtOGifGc5Zz8SfWRvAnWDdg=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=exFm2VrwQCGJUFP88430cybowGq0K29utUWcg7Pj1nxZuWIAy2v8YRsPHOj1hpwJQ
+	 LX8TpLx6yuHDTDLdU5yCeMH+P0dpJ97RdLkNmpYFKX6QUtP4oIakOBbTq//lXLCidC
+	 bBeu2F1MEdjWp1JJgSTuD1+YIPPLIzXZhXSaBeQjAuoO2//EdiRKHG+YiEq80KayHQ
+	 frnmzwXlF4D4OoIBRsqqD4xW+vJVSdHFN6WUrRDuuY6JKL1XJwDgeEErSSeMitEEfE
+	 UT8WlauNKo9kNANSPPkAFgR8x2DhEylnMlPwtatVuUt2njdIB+GT0sjsg6GtOM+8/8
+	 8KXng6PRcHgug==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 9C97DC00448;
+	Tue, 23 Apr 2024 11:30:29 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20240422105756.GC42092@kernel.org>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v2 0/8] net: ipa: eight simple cleanups
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171387182963.10035.7202226202218402214.git-patchwork-notify@kernel.org>
+Date: Tue, 23 Apr 2024 11:30:29 +0000
+References: <20240419151800.2168903-1-elder@linaro.org>
+In-Reply-To: <20240419151800.2168903-1-elder@linaro.org>
+To: Alex Elder <elder@linaro.org>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, mka@chromium.org, andersson@kernel.org,
+ quic_cpratapa@quicinc.com, quic_avuyyuru@quicinc.com,
+ quic_jponduru@quicinc.com, quic_subashab@quicinc.com, elder@kernel.org,
+ netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
-> > Hi Simon,
-> >
-> > > -/* Convert validation error code into tc extact error message */
-> > > +/* Convert validation error code into tc exact error message */
-> >
-> > This seems wrong. I bet it refers to the 'netlink_ext_ack' struct. So
-> > the fix should be 'extack' instead.
-> >
-> > >  void vcap_set_tc_exterr(struct flow_cls_offload *fco, struct vcap_rule *vrule)
-> > >  {
-> > >         switch (vrule->exterr) {
-> > > diff --git a/drivers/net/ethernet/microchip/vcap/vcap_api_client.h b/drivers/net/ethernet/microchip/vcap/vcap_api_client.h
-> > > index 56874f2adbba..d6c3e90745a7 100644
-> > > --- a/drivers/net/ethernet/microchip/vcap/vcap_api_client.h
-> > > +++ b/drivers/net/ethernet/microchip/vcap/vcap_api_client.h
-> > > @@ -238,7 +238,7 @@ const struct vcap_set *vcap_keyfieldset(struct vcap_control *vctrl,
-> > >  /* Copy to host byte order */
-> > >  void vcap_netbytes_copy(u8 *dst, u8 *src, int count);
-> > >
-> > > -/* Convert validation error code into tc extact error message */
-> > > +/* Convert validation error code into tc exact error message */
-> >
-> > Same here.
+Hello:
+
+This series was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Fri, 19 Apr 2024 10:17:52 -0500 you wrote:
+> This series contains a mix of cleanups, some dating back to
+> December, 2022.  Version 1 was based on an older version of
+> net-next/main; this version has simply been rebased.
 > 
-> Thanks Daniel,
+> The first two make it so the IPA SUSPEND interrupt only gets enabled
+> when necessary.  That make it possible in the third patch to call
+> device_init_wakeup() during an earlier phase of initialization, and
+> remove two functions.
 > 
-> Silly me. I'll drop these changes in v2.
+> [...]
 
-No reason to drop them just change it to 'extack' :-)
+Here is the summary with links:
+  - [net-next,v2,1/8] net: ipa: maintain bitmap of suspend-enabled endpoints
+    https://git.kernel.org/netdev/net-next/c/2eca73444036
+  - [net-next,v2,2/8] net: ipa: only enable the SUSPEND IPA interrupt when needed
+    https://git.kernel.org/netdev/net-next/c/6f3700266369
+  - [net-next,v2,3/8] net: ipa: call device_init_wakeup() earlier
+    https://git.kernel.org/netdev/net-next/c/19790951f031
+  - [net-next,v2,4/8] net: ipa: remove unneeded FILT_ROUT_HASH_EN definitions
+    https://git.kernel.org/netdev/net-next/c/5043d6b16211
+  - [net-next,v2,5/8] net: ipa: make ipa_table_hash_support() a real function
+    https://git.kernel.org/netdev/net-next/c/b81565b7fd02
+  - [net-next,v2,6/8] net: ipa: fix two bogus argument names
+    https://git.kernel.org/netdev/net-next/c/f2e4e9ea82f9
+  - [net-next,v2,7/8] net: ipa: fix two minor ipa_cmd problems
+    https://git.kernel.org/netdev/net-next/c/319b6d4ef087
+  - [net-next,v2,8/8] net: ipa: kill ipa_version_supported()
+    https://git.kernel.org/netdev/net-next/c/dfdd70e24e38
 
-/Daniel
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
