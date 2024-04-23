@@ -1,93 +1,124 @@
-Return-Path: <netdev+bounces-90619-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90620-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 115538AF470
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 18:40:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3317A8AF475
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 18:41:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AE5B41F25DA5
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 16:40:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 573E61F21AF4
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 16:41:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 248DE13D254;
-	Tue, 23 Apr 2024 16:40:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB68B13D522;
+	Tue, 23 Apr 2024 16:41:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XnKJEgvr"
+	dkim=pass (2048-bit key) header.d=ravnborg.org header.i=@ravnborg.org header.b="Tw8FQkWz";
+	dkim=permerror (0-bit key) header.d=ravnborg.org header.i=@ravnborg.org header.b="MCt7cKSc"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mailrelay5-1.pub.mailoutpod2-cph3.one.com (mailrelay5-1.pub.mailoutpod2-cph3.one.com [46.30.211.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F401413C67E
-	for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 16:40:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90C0013D512
+	for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 16:41:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.30.211.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713890429; cv=none; b=gJ453jmIyZXh+VNZNKYyl7IHVYMdqZLWn2J/IXbOR3E5uOA55w6+hNJwxtjTfwpC3XGkSxOkDGzH/vBFCHBnQMtczIAvcK6y/i8qmRZoq4RHJfp1/2u8tboG15rXYpCLjBk9QYG3J7/hW0y1oN6l4nJk7VmopdRvMRywAneSvnQ=
+	t=1713890497; cv=none; b=Qt27QqD98Vk5uj/HiW7zg136YvdFonsWAlaAzC6C1sOT5tAf/lxBE7Sq6mXEg0gu9MRGjMLDVwRzfAv+lNkRZnV/I/sJ8Fxrzu1WVlDJ2ZFH4qNWqZKrnj4r8x/hEZoue9tXGr+DJl9BmXgLHF4NJ2bpAKbTzi3buIqrVAphLfU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713890429; c=relaxed/simple;
-	bh=LwP+4om0NnyGjYJrLCCIWkevDzv+V3DQ9PgzZJzMykA=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=SkiHEDHW7jTxaiNr5ErQTftPNzHPZv1y4EDAqzqXHMaVk/3qT2biYzY8Bn9NRyLka6Lyvp3iL5p4sLGfAUOYBW2qKPmSpo9G6Gd/28kIhhDoXRnOYrb8uI44WlBQwkSZYM/CVrKbpr07+oRabmvLNj50n5+cyJfzKMySJ6QvfKA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XnKJEgvr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C9C03C2BD10;
-	Tue, 23 Apr 2024 16:40:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713890428;
-	bh=LwP+4om0NnyGjYJrLCCIWkevDzv+V3DQ9PgzZJzMykA=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=XnKJEgvrvojt+KbsVMUhLtC12+NEZIVDtckiCJsVh23TQISAAZ0rTJtJMfOT1tO0E
-	 VJQ5tHOWsoO6N3higk0Mt4LUI+e3eUsFIRMhGPaHYlWJiBeq9rDQAWuieFvPwmXiXU
-	 OP5dNmTHvihKt4WMSfZRRdHReLGq3okGJwpuxu1YsXP40Lh0zkUpJwir+/BNyuTLA8
-	 pe55ytxYlteKTPsNlZN9Nt87rJhWeA2MY3oF2t84BcEzJYpliaaNcwC5iE112vg7cY
-	 kLY+QUq7KKSW4tyyxOmfEfsBKb9ePx2V7b1dzOXYYfgZoTKK3t7o2E1Hyh4SH5fyBc
-	 EuMmCkf7vXjSQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B51ECC433E9;
-	Tue, 23 Apr 2024 16:40:28 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1713890497; c=relaxed/simple;
+	bh=Ew4ZwP340aTNrveQuDNc86ipPLYtcqn5HIz7uAO7cFI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QlyueLuDvanTUigAVUMIYE4aqK9zfKv/0p66YhXZIilTEDgiTlMz/ukMpnO8GMTuacrytoxXLK/53speBj7uw2i6hY0bFLcm5woe+YLzkjuKnog5uDcJm2A/RuHq+VMPwWo4D6DcT6BMaQVYske4BhuKvHGlIhZDG41OH8K0GD0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ravnborg.org; spf=none smtp.mailfrom=ravnborg.org; dkim=pass (2048-bit key) header.d=ravnborg.org header.i=@ravnborg.org header.b=Tw8FQkWz; dkim=permerror (0-bit key) header.d=ravnborg.org header.i=@ravnborg.org header.b=MCt7cKSc; arc=none smtp.client-ip=46.30.211.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ravnborg.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ravnborg.org
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=ravnborg.org; s=rsa1;
+	h=in-reply-to:content-type:mime-version:references:message-id:subject:cc:to:
+	 from:date:from;
+	bh=ce+ZqFlarA8IAt5zfwbr2hxRLFQAtI7f0O/GFL7QRfQ=;
+	b=Tw8FQkWzueJByde49pf2Etw1JNd+9Cs/a8VSdP4sAjZamDT998lpGJ8OUSXZPgdnq9YK80Ld79By0
+	 E1ZePxzkIVPPM3w68Ti2ki86ZQSTo/Qengh+ox/5EsZdMfGxT/LtyRbZzNkl+eBPCbtoD00qByBVfh
+	 QlogVQorbOUCuNhfuDWjsPIOEK757mimusKghDsKCrDlzJS1s6Psw/PaVE8r407gkh53FMLrF7D1dO
+	 uDYiPtxot3rmREDV43Zw4JTzOwK/+pqOJcBE6+tKyTzcGurjSzSuf0Roh28MmUDSp64HXkjpWwAEu0
+	 fCub6cvUfUdVz3Rx5TFyQR6t2+r0Tlw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed;
+	d=ravnborg.org; s=ed1;
+	h=in-reply-to:content-type:mime-version:references:message-id:subject:cc:to:
+	 from:date:from;
+	bh=ce+ZqFlarA8IAt5zfwbr2hxRLFQAtI7f0O/GFL7QRfQ=;
+	b=MCt7cKScu1j54dhTCuf6RoKzDR6Pxv4AhcExl3aouinnY7Cygl2lgVcGjoVORGMB/icOvVzGnLV0S
+	 zdG43KuBQ==
+X-HalOne-ID: 4e317c2c-0190-11ef-8c96-edf132814434
+Received: from ravnborg.org (2-105-2-98-cable.dk.customer.tdc.net [2.105.2.98])
+	by mailrelay5.pub.mailoutpod2-cph3.one.com (Halon) with ESMTPSA
+	id 4e317c2c-0190-11ef-8c96-edf132814434;
+	Tue, 23 Apr 2024 16:41:22 +0000 (UTC)
+Date: Tue, 23 Apr 2024 18:41:17 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+To: Mike Rapoport <rppt@kernel.org>
+Cc: linux-kernel@vger.kernel.org, Alexandre Ghiti <alexghiti@rivosinc.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	=?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	"David S. Miller" <davem@davemloft.net>,
+	Dinh Nguyen <dinguyen@kernel.org>,
+	Donald Dutile <ddutile@redhat.com>,
+	Eric Chanudet <echanude@redhat.com>,
+	Heiko Carstens <hca@linux.ibm.com>, Helge Deller <deller@gmx.de>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	Kent Overstreet <kent.overstreet@linux.dev>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nadav Amit <nadav.amit@gmail.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Rick Edgecombe <rick.p.edgecombe@intel.com>,
+	Russell King <linux@armlinux.org.uk>, Song Liu <song@kernel.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+	Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
+	bpf@vger.kernel.org, linux-arch@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
+	linux-mm@kvack.org, linux-modules@vger.kernel.org,
+	linux-parisc@vger.kernel.org, linux-riscv@lists.infradead.org,
+	linux-s390@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org, loongarch@lists.linux.dev,
+	netdev@vger.kernel.org, sparclinux@vger.kernel.org, x86@kernel.org
+Subject: Re: [PATCH v5 04/15] sparc: simplify module_alloc()
+Message-ID: <20240423164117.GA897977@ravnborg.org>
+References: <20240422094436.3625171-1-rppt@kernel.org>
+ <20240422094436.3625171-5-rppt@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH iproute2-next v3 0/2] PFCP support
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171389042872.6422.8127722613150421621.git-patchwork-notify@kernel.org>
-Date: Tue, 23 Apr 2024 16:40:28 +0000
-References: <20240422120551.4616-1-wojciech.drewek@intel.com>
-In-Reply-To: <20240422120551.4616-1-wojciech.drewek@intel.com>
-To: Wojciech Drewek <wojciech.drewek@intel.com>
-Cc: netdev@vger.kernel.org, dsahern@gmail.com, stephen@networkplumber.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240422094436.3625171-5-rppt@kernel.org>
 
-Hello:
-
-This series was applied to iproute2/iproute2-next.git (main)
-by David Ahern <dsahern@kernel.org>:
-
-On Mon, 22 Apr 2024 14:05:49 +0200 you wrote:
-> New PFCP module was accepted in the kernel together with cls_flower
-> changes which allow to filter the packets using PFCP specific fields [1].
-> Packet Forwarding Control Protocol is a 3GPP Protocol defined in
-> TS 29.244 [2].
+Hi Mike,
+On Mon, Apr 22, 2024 at 12:44:25PM +0300, Mike Rapoport wrote:
+> From: "Mike Rapoport (IBM)" <rppt@kernel.org>
 > 
-> Extended ip link with the support for the new PFCP device.
-> Add pfcp_opts support in tc-flower.
+> Define MODULES_VADDR and MODULES_END as VMALLOC_START and VMALLOC_END
+> for 32-bit and reduce module_alloc() to
 > 
-> [...]
+> 	__vmalloc_node_range(size, 1, MODULES_VADDR, MODULES_END, ...)
+> 
+> as with the new defines the allocations becames identical for both 32
+> and 64 bits.
+> 
+> While on it, drop unsed include of <linux/jump_label.h>
+> 
+> Suggested-by: Sam Ravnborg <sam@ravnborg.org>
+> Signed-off-by: Mike Rapoport (IBM) <rppt@kernel.org>
 
-Here is the summary with links:
-  - [iproute2-next,v3,1/2] ip: PFCP device support
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=a25f6771bef3
-  - [iproute2-next,v3,2/2] f_flower: implement pfcp opts
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=976dca372e4c
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Looks good.
+Reviewed-by: Sam Ravnborg <sam@ravnborg.org>
 
