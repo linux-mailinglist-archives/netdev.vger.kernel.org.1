@@ -1,198 +1,102 @@
-Return-Path: <netdev+bounces-90407-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90408-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1E6D8AE090
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 11:06:35 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 105EB8AE0C5
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 11:13:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 40391B22805
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 09:06:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8B05EB23AE7
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 09:13:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 978A558236;
-	Tue, 23 Apr 2024 09:06:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 363F55644F;
+	Tue, 23 Apr 2024 09:12:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="lw3ZPOpI"
+	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="RisI7Xup"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40AE056768;
-	Tue, 23 Apr 2024 09:06:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1808C3399A;
+	Tue, 23 Apr 2024 09:12:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713863177; cv=none; b=ttgA89+xrVc4MEKvQhSC8Fx5xsI7Tu6s06QrRflujCwXQO7Py0+tt/dEzrrc6X+2Ojqp880/OFNifp2opPMy7SV15obdqdsx8PUIaQ0DDBmzwRjq2oeyw5QCZOOdR4mU/7hPFbmCLSuFdx5S+KlvZb64kVd5LqlXa9Ynpw9o2m8=
+	t=1713863579; cv=none; b=KzdPlHftg7iKQAEOfj31Z5+SRKet+ZrIjy+HTBtWCtUtZf/PXu8xEeS7H08KwmONs+p9aJnCBva2zGnoYhCLo/IrIRQtjCHA08f79qK6oEuinFaQgIuYXAUJnpEcZS2M9//zECBHepcip0tuLcg7+uqeWWlL+viRlgYOJ/pRbEw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713863177; c=relaxed/simple;
-	bh=30B4AtuolDboQHql5UUskhU5+dDy3nL0iec2d0X9dt8=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=iQYQIfeLsqthI2MHRHq2Uno4mplE1GdgjnAENcsS5St3Aw143VBpu8E1Tasc/OZJWie4P3kzPwPkXDuaOXEsukqV+27fGrxzIHD/62rc9cWrn/WWFtHGZ2D73Ug0Zxyvh23GCEdKh7fOvyH/pQSeXKfbye26uoV8z8XFIRH6clA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=lw3ZPOpI; arc=none smtp.client-ip=217.70.183.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id EC8E1E000C;
-	Tue, 23 Apr 2024 09:06:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1713863173;
+	s=arc-20240116; t=1713863579; c=relaxed/simple;
+	bh=KWOkFmG3aHAc/JdDHQ/HaYbgNUgxXSXQ/L5N+b2f3SQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Y9bErGtbyrzDRwAQyFv0mzkRpLnLwDy72S4ExeUDTp+IT4dU0sfKwauoM5a4N7LLP+cWvO2K7mC951dW/XAjd1QrFaehhPGVJbjbGfQo04h0IRmTIwVXTTzgUo+Xhv9io9ahCgOCEP0VJLzJKHpDsujZ2mkVaC4aWWpDgi5jeBE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com; spf=pass smtp.mailfrom=arinc9.com; dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b=RisI7Xup; arc=none smtp.client-ip=217.70.183.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arinc9.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id AA66BC000A;
+	Tue, 23 Apr 2024 09:12:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
+	t=1713863575;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=cv8IAJl5ZT2KI5eGTFuxjLT4/JyU5BmA9vKpIsy+9T4=;
-	b=lw3ZPOpIlG9Fdutzqsus7l0rnv1YaZPTZG6ilDrD10+Y+ehMjx1ZfFsUz9HorVTwjrs1FS
-	ySKZnf/lzXcoZFhBY4PEkQ4ShTs46TZ+i/NpG7XhoSOxfvkHsCrO2HcB5G6IHGOf9SbybB
-	cgLM6Y5pMP2kxphxQp9kwGYBcVqZFwawNgwUuJzBspjnD8uBzW5hhf/RmRSMgsordwMaz8
-	kEEnqgsf12ep5U+DkiYEU8GFMJmys/Y9fKpYBvRkrKQPxDEd58q5T+ikCwjtOrGZzKmXZd
-	O/K+ykd67xIBRpMZd4TE57pmgey46rW7GJGRQ1oIphD6iHLjSkhNpHIXQuTM4Q==
-From: Kory Maincent <kory.maincent@bootlin.com>
-Date: Tue, 23 Apr 2024 11:05:42 +0200
-Subject: [PATCH ethtool-next 2/2] ethtool: pse-pd: Add support for Power
- over Ethernet (clause 33)
+	bh=4RSaeKenSkqzfI7p9YhBSwGcR+DegY61d7J8nJauZO8=;
+	b=RisI7XupKRo6wJU3TRc7hhtxbnJr4vk3B/nwdTxtLfYbZbIpTA41dYeHgv83jFwkUkchaJ
+	GRxF3LN4ttz6IQL4BgaxfR4QzSd+9e4jgnYPzGQC13E9EBcLVF3dmhG/CwAz9sS2RtKkKZ
+	bXK6XI8RCIknkgSlHwDSBjP0btSBBwVQE7Pl6glaHHIO+HGLKiCJSKhqjA9AqgF15kYO3u
+	A3C2vLY8YaUQam9W8pRs8kGne7fQ2IF7l/lRO8CtpDJUdNKeyjpubXqIX0TnNQK0XEqAc8
+	SFwhodPli7/jQpUUBvMhLN2quJb3d3GujMPKB+UvyTdnWXHmdSsxZov3BHqJEw==
+Message-ID: <6e67c66b-1d05-40d4-930f-625acc317ff1@arinc9.com>
+Date: Tue, 23 Apr 2024 12:12:45 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240423-feature_poe-v1-2-9e12136a8674@bootlin.com>
-References: <20240423-feature_poe-v1-0-9e12136a8674@bootlin.com>
-In-Reply-To: <20240423-feature_poe-v1-0-9e12136a8674@bootlin.com>
-To: Oleksij Rempel <o.rempel@pengutronix.de>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Andrew Lunn <andrew@lunn.ch>, Michal Kubecek <mkubecek@suse.cz>
-Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Kyle Swenson <kyle.swenson@est.tech>, 
- Kory Maincent <kory.maincent@bootlin.com>
-X-Mailer: b4 0.14-dev
-X-GND-Sasl: kory.maincent@bootlin.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 2/2] net: dsa: mt7530: simplify core
+ operations
+To: Paolo Abeni <pabeni@redhat.com>, Daniel Golle <daniel@makrotopia.org>,
+ DENG Qingfang <dqfext@gmail.com>, Sean Wang <sean.wang@mediatek.com>,
+ Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
+ Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Cc: Bartel Eerdekens <bartel.eerdekens@constell8.be>,
+ mithat.guner@xeront.com, erkin.bozoglu@xeront.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org
+References: <20240418-b4-for-netnext-mt7530-phy-addr-from-dt-and-simplify-core-ops-v3-0-3b5fb249b004@arinc9.com>
+ <20240418-b4-for-netnext-mt7530-phy-addr-from-dt-and-simplify-core-ops-v3-2-3b5fb249b004@arinc9.com>
+ <6123223eaf54ea6f492c896d81551315a1e38f66.camel@redhat.com>
+Content-Language: en-US
+From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+In-Reply-To: <6123223eaf54ea6f492c896d81551315a1e38f66.camel@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: arinc.unal@arinc9.com
 
-From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
+On 23/04/2024 11:40, Paolo Abeni wrote:
+> On Thu, 2024-04-18 at 08:35 +0300, Arınç ÜNAL wrote:
+>>   	/* Select the Function : DATA with no post increment */
+>>   	ret = bus->write(bus, MT753X_CTRL_PHY_ADDR(priv->mdiodev->addr),
+>> -			 MII_MMD_CTRL, devad | MII_MMD_CTRL_NOINCR);
+>> +			 MII_MMD_CTRL, MDIO_MMD_VEND2 | MII_MMD_CTRL_NOINCR);
+>>   	if (ret < 0)
+>>   		goto err;
+> 
+> What about a possible follow-up, moving the above writes in a separate
+> helper (say, 'core_select_register' or the like) and reusing it here
+> and in core_rmw() ?
 
-This update extends PSE support to include Power over Ethernet (clause 33),
-encompassing standards 802.3af, 802.3at, and 802.3bt infrastructure.
+There's a possibility where the Clause 45 access method could be used here
+which would make this redundant. I will do your suggestion if that won't
+work out.
 
-Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
----
- ethtool.c        |  1 +
- netlink/pse-pd.c | 66 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 67 insertions(+)
+> 
+> Not blocking this series, I'm applying it.
 
-diff --git a/ethtool.c b/ethtool.c
-index e587597..d85a57a 100644
---- a/ethtool.c
-+++ b/ethtool.c
-@@ -6216,6 +6216,7 @@ static const struct option args[] = {
- 		.nlfunc	= nl_spse,
- 		.help	= "Set Power Sourcing Equipment settings",
- 		.xhelp	= "		[ podl-pse-admin-control enable|disable ]\n"
-+			  "		[ c33-pse-admin-control enable|disable ]\n"
- 	},
- 	{
- 		.opts	= "-h|--help",
-diff --git a/netlink/pse-pd.c b/netlink/pse-pd.c
-index d6faff8..2c8dd89 100644
---- a/netlink/pse-pd.c
-+++ b/netlink/pse-pd.c
-@@ -54,6 +54,41 @@ static const char *podl_pse_pw_d_status_name(u32 val)
- 	}
- }
- 
-+static const char *c33_pse_admin_state_name(u32 val)
-+{
-+	switch (val) {
-+	case ETHTOOL_C33_PSE_ADMIN_STATE_UNKNOWN:
-+		return "unknown";
-+	case ETHTOOL_C33_PSE_ADMIN_STATE_DISABLED:
-+		return "disabled";
-+	case ETHTOOL_C33_PSE_ADMIN_STATE_ENABLED:
-+		return "enabled";
-+	default:
-+		return "unsupported";
-+	}
-+}
-+
-+static const char *c33_pse_pw_d_status_name(u32 val)
-+{
-+	switch (val) {
-+	case ETHTOOL_C33_PSE_PW_D_STATUS_UNKNOWN:
-+		return "unknown";
-+	case ETHTOOL_C33_PSE_PW_D_STATUS_DISABLED:
-+		return "disabled";
-+	case ETHTOOL_C33_PSE_PW_D_STATUS_SEARCHING:
-+		return "searching";
-+	case ETHTOOL_C33_PSE_PW_D_STATUS_DELIVERING:
-+		return "delivering power";
-+	case ETHTOOL_C33_PSE_PW_D_STATUS_TEST:
-+		return "test";
-+	case ETHTOOL_C33_PSE_PW_D_STATUS_FAULT:
-+		return "fault";
-+	case ETHTOOL_C33_PSE_PW_D_STATUS_OTHERFAULT:
-+		return "otherfault";
-+	default:
-+		return "unsupported";
-+	}
-+}
- int pse_reply_cb(const struct nlmsghdr *nlhdr, void *data)
- {
- 	const struct nlattr *tb[ETHTOOL_A_PSE_MAX + 1] = {};
-@@ -98,6 +133,24 @@ int pse_reply_cb(const struct nlmsghdr *nlhdr, void *data)
- 			     podl_pse_pw_d_status_name(val));
- 	}
- 
-+	if (tb[ETHTOOL_A_C33_PSE_ADMIN_STATE]) {
-+		u32 val;
-+
-+		val = mnl_attr_get_u32(tb[ETHTOOL_A_C33_PSE_ADMIN_STATE]);
-+		print_string(PRINT_ANY, "c33-pse-admin-state",
-+			     "Clause 33 PSE Admin State: %s\n",
-+			     c33_pse_admin_state_name(val));
-+	}
-+
-+	if (tb[ETHTOOL_A_C33_PSE_PW_D_STATUS]) {
-+		u32 val;
-+
-+		val = mnl_attr_get_u32(tb[ETHTOOL_A_C33_PSE_PW_D_STATUS]);
-+		print_string(PRINT_ANY, "c33-pse-power-detection-status",
-+			     "Clause 33 PSE Power Detection Status: %s\n",
-+			     c33_pse_pw_d_status_name(val));
-+	}
-+
- 	close_json_object();
- 
- 	return MNL_CB_OK;
-@@ -138,6 +191,12 @@ static const struct lookup_entry_u32 podl_pse_admin_control_values[] = {
- 	{}
- };
- 
-+static const struct lookup_entry_u32 c33_pse_admin_control_values[] = {
-+	{ .arg = "enable",	.val = ETHTOOL_C33_PSE_ADMIN_STATE_ENABLED },
-+	{ .arg = "disable",	.val = ETHTOOL_C33_PSE_ADMIN_STATE_DISABLED },
-+	{}
-+};
-+
- static const struct param_parser spse_params[] = {
- 	{
- 		.arg		= "podl-pse-admin-control",
-@@ -146,6 +205,13 @@ static const struct param_parser spse_params[] = {
- 		.handler_data	= podl_pse_admin_control_values,
- 		.min_argc	= 1,
- 	},
-+	{
-+		.arg		= "c33-pse-admin-control",
-+		.type		= ETHTOOL_A_C33_PSE_ADMIN_CONTROL,
-+		.handler	= nl_parse_lookup_u32,
-+		.handler_data	= c33_pse_admin_control_values,
-+		.min_argc	= 1,
-+	},
- 	{}
- };
- 
-
--- 
-2.34.1
-
+Cheers.
+Arınç
 
