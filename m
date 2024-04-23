@@ -1,97 +1,67 @@
-Return-Path: <netdev+bounces-90620-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90621-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3317A8AF475
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 18:41:45 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DC938AF48B
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 18:46:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 573E61F21AF4
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 16:41:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 52CB41F26782
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 16:46:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB68B13D522;
-	Tue, 23 Apr 2024 16:41:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86C3F13D50F;
+	Tue, 23 Apr 2024 16:46:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ravnborg.org header.i=@ravnborg.org header.b="Tw8FQkWz";
-	dkim=permerror (0-bit key) header.d=ravnborg.org header.i=@ravnborg.org header.b="MCt7cKSc"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VW//JClN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailrelay5-1.pub.mailoutpod2-cph3.one.com (mailrelay5-1.pub.mailoutpod2-cph3.one.com [46.30.211.180])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90C0013D512
-	for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 16:41:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.30.211.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 540DB13BAFE;
+	Tue, 23 Apr 2024 16:46:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713890497; cv=none; b=Qt27QqD98Vk5uj/HiW7zg136YvdFonsWAlaAzC6C1sOT5tAf/lxBE7Sq6mXEg0gu9MRGjMLDVwRzfAv+lNkRZnV/I/sJ8Fxrzu1WVlDJ2ZFH4qNWqZKrnj4r8x/hEZoue9tXGr+DJl9BmXgLHF4NJ2bpAKbTzi3buIqrVAphLfU=
+	t=1713890783; cv=none; b=kkBhFmw9sPV7PhTB8wRCr8mtsOKSByE+qSy0b4jrHz8zB0EYFRO69wRztm0PgSm17oyOw0G2htudPCqwPuaf+q4wLdH7wgbcrjZJH31je/4IvSbQfVLJE46yJmYCWFrdLzTBv3b69/8cRd8k80HQ0qPZNM6FhmgzsJZ6BgMuelI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713890497; c=relaxed/simple;
-	bh=Ew4ZwP340aTNrveQuDNc86ipPLYtcqn5HIz7uAO7cFI=;
+	s=arc-20240116; t=1713890783; c=relaxed/simple;
+	bh=d6fUPT7FccaSpbhAaWt+3bXIMJB6KRIJ6QO0yTnP038=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QlyueLuDvanTUigAVUMIYE4aqK9zfKv/0p66YhXZIilTEDgiTlMz/ukMpnO8GMTuacrytoxXLK/53speBj7uw2i6hY0bFLcm5woe+YLzkjuKnog5uDcJm2A/RuHq+VMPwWo4D6DcT6BMaQVYske4BhuKvHGlIhZDG41OH8K0GD0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ravnborg.org; spf=none smtp.mailfrom=ravnborg.org; dkim=pass (2048-bit key) header.d=ravnborg.org header.i=@ravnborg.org header.b=Tw8FQkWz; dkim=permerror (0-bit key) header.d=ravnborg.org header.i=@ravnborg.org header.b=MCt7cKSc; arc=none smtp.client-ip=46.30.211.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ravnborg.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ravnborg.org
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=ravnborg.org; s=rsa1;
-	h=in-reply-to:content-type:mime-version:references:message-id:subject:cc:to:
-	 from:date:from;
-	bh=ce+ZqFlarA8IAt5zfwbr2hxRLFQAtI7f0O/GFL7QRfQ=;
-	b=Tw8FQkWzueJByde49pf2Etw1JNd+9Cs/a8VSdP4sAjZamDT998lpGJ8OUSXZPgdnq9YK80Ld79By0
-	 E1ZePxzkIVPPM3w68Ti2ki86ZQSTo/Qengh+ox/5EsZdMfGxT/LtyRbZzNkl+eBPCbtoD00qByBVfh
-	 QlogVQorbOUCuNhfuDWjsPIOEK757mimusKghDsKCrDlzJS1s6Psw/PaVE8r407gkh53FMLrF7D1dO
-	 uDYiPtxot3rmREDV43Zw4JTzOwK/+pqOJcBE6+tKyTzcGurjSzSuf0Roh28MmUDSp64HXkjpWwAEu0
-	 fCub6cvUfUdVz3Rx5TFyQR6t2+r0Tlw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed;
-	d=ravnborg.org; s=ed1;
-	h=in-reply-to:content-type:mime-version:references:message-id:subject:cc:to:
-	 from:date:from;
-	bh=ce+ZqFlarA8IAt5zfwbr2hxRLFQAtI7f0O/GFL7QRfQ=;
-	b=MCt7cKScu1j54dhTCuf6RoKzDR6Pxv4AhcExl3aouinnY7Cygl2lgVcGjoVORGMB/icOvVzGnLV0S
-	 zdG43KuBQ==
-X-HalOne-ID: 4e317c2c-0190-11ef-8c96-edf132814434
-Received: from ravnborg.org (2-105-2-98-cable.dk.customer.tdc.net [2.105.2.98])
-	by mailrelay5.pub.mailoutpod2-cph3.one.com (Halon) with ESMTPSA
-	id 4e317c2c-0190-11ef-8c96-edf132814434;
-	Tue, 23 Apr 2024 16:41:22 +0000 (UTC)
-Date: Tue, 23 Apr 2024 18:41:17 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-To: Mike Rapoport <rppt@kernel.org>
-Cc: linux-kernel@vger.kernel.org, Alexandre Ghiti <alexghiti@rivosinc.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	=?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=E1wdi2Q7BalRVecUMmUqZ0fkaVp1/OvjomuiH/g+dOYkcbI6WTPr+nWkdhzVbTfp2bjlTKiYxnQ9eXQr2XpcIsvcCJUaBRt949AyVZ4o0+xlID64kVfn+18Mn6Uh9vI2rqxcZAsU3Wsmxe79N9qEcWo5bH357BMDMzU8r1ci+38=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VW//JClN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 17428C116B1;
+	Tue, 23 Apr 2024 16:46:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713890782;
+	bh=d6fUPT7FccaSpbhAaWt+3bXIMJB6KRIJ6QO0yTnP038=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=VW//JClNLBdywVje2WU6TgzA/sd6UIAiscV0HlVXGhCD19BwZG5atbmQRH/qm/nMf
+	 RwrIAGS3M9LGnI0rin3JJ9NWKsj6cnXpz1Pz6mCvIt1DfZWVCuV4g6M1TIEm9QS5UY
+	 Kp5tywStDs1+ph8qr4NtIaXuGZt4Qvunna7FwICtBvvawtEhce117pR7iPrGZEJDz/
+	 xQJ9brNKx+1Vwo3iL/HXTIqx4ZwvlxHevJ99ais6v96nvBgiE9C3kEgMc04ESDP1Gl
+	 3fuxPXMiS4FqJGZ1mBIwyG8yLUzHSfVVXhZDlQ0PC6HHb9TWpRUM1M6bFdqhdZpvRp
+	 KXWAIDcrJkWPw==
+Date: Tue, 23 Apr 2024 17:46:16 +0100
+From: Simon Horman <horms@kernel.org>
+To: Gregor Herburger <gregor.herburger@ew.tq-group.com>
+Cc: Marc Kleine-Budde <mkl@pengutronix.de>,
+	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
+	Thomas Kopp <thomas.kopp@microchip.com>,
+	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
 	"David S. Miller" <davem@davemloft.net>,
-	Dinh Nguyen <dinguyen@kernel.org>,
-	Donald Dutile <ddutile@redhat.com>,
-	Eric Chanudet <echanude@redhat.com>,
-	Heiko Carstens <hca@linux.ibm.com>, Helge Deller <deller@gmx.de>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	Kent Overstreet <kent.overstreet@linux.dev>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nadav Amit <nadav.amit@gmail.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Rick Edgecombe <rick.p.edgecombe@intel.com>,
-	Russell King <linux@armlinux.org.uk>, Song Liu <song@kernel.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-	Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
-	bpf@vger.kernel.org, linux-arch@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
-	linux-mm@kvack.org, linux-modules@vger.kernel.org,
-	linux-parisc@vger.kernel.org, linux-riscv@lists.infradead.org,
-	linux-s390@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, loongarch@lists.linux.dev,
-	netdev@vger.kernel.org, sparclinux@vger.kernel.org, x86@kernel.org
-Subject: Re: [PATCH v5 04/15] sparc: simplify module_alloc()
-Message-ID: <20240423164117.GA897977@ravnborg.org>
-References: <20240422094436.3625171-1-rppt@kernel.org>
- <20240422094436.3625171-5-rppt@kernel.org>
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>, linux-can@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	devicetree@vger.kernel.org, linux@ew.tq-group.com,
+	alexander.stein@ew.tq-group.com
+Subject: Re: [PATCH 2/4] can: mcp251xfd: mcp251xfd_regmap_crc_write():
+ workaround for errata 5
+Message-ID: <20240423164616.GX42092@kernel.org>
+References: <20240417-mcp251xfd-gpio-feature-v1-0-bc0c61fd0c80@ew.tq-group.com>
+ <20240417-mcp251xfd-gpio-feature-v1-2-bc0c61fd0c80@ew.tq-group.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -100,25 +70,24 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240422094436.3625171-5-rppt@kernel.org>
+In-Reply-To: <20240417-mcp251xfd-gpio-feature-v1-2-bc0c61fd0c80@ew.tq-group.com>
 
-Hi Mike,
-On Mon, Apr 22, 2024 at 12:44:25PM +0300, Mike Rapoport wrote:
-> From: "Mike Rapoport (IBM)" <rppt@kernel.org>
+On Wed, Apr 17, 2024 at 03:43:55PM +0200, Gregor Herburger wrote:
+> According to Errata DS80000789E 5 writing IOCON register using one SPI
+> write command clears LAT0/LAT1.
 > 
-> Define MODULES_VADDR and MODULES_END as VMALLOC_START and VMALLOC_END
-> for 32-bit and reduce module_alloc() to
-> 
-> 	__vmalloc_node_range(size, 1, MODULES_VADDR, MODULES_END, ...)
-> 
-> as with the new defines the allocations becames identical for both 32
-> and 64 bits.
-> 
-> While on it, drop unsed include of <linux/jump_label.h>
-> 
-> Suggested-by: Sam Ravnborg <sam@ravnborg.org>
-> Signed-off-by: Mike Rapoport (IBM) <rppt@kernel.org>
+> Errata Fix/Work Around suggests to write registers with single byte write
+> instructions. However, it seems that every write to the second byte
+> causes the overrite of LAT0/LAT1.
 
-Looks good.
-Reviewed-by: Sam Ravnborg <sam@ravnborg.org>
+nit: overwrite
+
+Flagged by ./scripts/checkpatch.pl --codespell
+
+> 
+> Never write byte 2 of IOCON register to avoid clearing of LAT0/LAT1.
+> 
+> Signed-off-by: Gregor Herburger <gregor.herburger@ew.tq-group.com>
+
+...
 
