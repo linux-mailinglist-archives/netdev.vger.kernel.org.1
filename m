@@ -1,117 +1,134 @@
-Return-Path: <netdev+bounces-90361-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90362-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5FE478ADDF8
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 09:05:15 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 138018ADDFF
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 09:08:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 020D91F22B12
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 07:05:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A1576B21E98
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 07:08:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE0762C190;
-	Tue, 23 Apr 2024 07:05:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M3hYdkH7"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4CAD2E85E;
+	Tue, 23 Apr 2024 07:08:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52B7528DBC
-	for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 07:05:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5794131A8F
+	for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 07:08:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713855909; cv=none; b=R7mCYz0MauPGOWTrrN3SLVa71IKmvQNthWJNv4zpjH1p76JV4KZolxNccrzk/KtqetGW6TZ/riEcnmkGooyEU5vUqq8BBxid4TSivFBe6AgVKsYi7M3N3oDP6uhurZFMPUzm4kXL6ubPBnELxJPWM2ioa/AEiIVOhy4/vMpBcHE=
+	t=1713856095; cv=none; b=gC4VvAtNwVd4dwJp8V5wFHD7lAF5/1840iuP29UpxTrDx6/56HPATiDHsRmS+/tsZ2u6dNdW+HsDOL63ZNy3AxOGaozIGDMOE37gA3VD2OGpjmTcQ5B6YzALKrUAMAmDCF+X0W8FJawusfLvBrA8dh3AZLPJYh10WVWq9Fkuwzw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713855909; c=relaxed/simple;
-	bh=milJy/hChBIXc/04Da5S/85tCIwYKn0BJEaS1othb0A=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=aaxocbKELM1swLkA+2gXOeuAKj5tK6h1tUVYCm5sz6xs9LOAnr0oBJOUMQ4D4rXwL+h+NPuSaE4RpX4wm3qGovcv2RjqjyU3ipK6yRGqVb4xoYHohzmwCvQz6nzPEHJoZorMTIuQcNaKHwzIS8Omvq3vf9o/awVS5LjoFFzqwHE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=M3hYdkH7; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-1e40042c13eso38618895ad.2
-        for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 00:05:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713855907; x=1714460707; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=W24cBgwZJ5NJChHJxn5xxRRYL+4YKeuKelHoBEGNKJM=;
-        b=M3hYdkH7YH2D2TCdOdaZbhyLIU6jDwbX6v7ES9g/AETvHMlsfc9kfeD7KOt9KhoAcd
-         MNaRJEK2mhPvVQNR7Qs1VhXQurqmKrXwYkaQ0awVgJ77itlcEV+ogfO/rgz+B5VO92kT
-         80DRnqIwSd3Hy9jCYGSEhQ1KV1m23btfbmkrxclwq2K2Y+1vKbGJKPZPmLoeI8W04FaO
-         tmAkL9oBe5I8PrZvIhIhfQgEh7iZLwRtn2bk0p6fGEbTTXQJuPwMgwsN7W8+pE0utVI3
-         cQLpKVdptHhHdyP2fvbnqCLVkHYRfSV65MkttbP/gg63cuIbueg3dtXPZY1Ot7GbBI9o
-         IVEQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713855907; x=1714460707;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=W24cBgwZJ5NJChHJxn5xxRRYL+4YKeuKelHoBEGNKJM=;
-        b=RynU65e+p9NZNLoXV6SNNVNat+QVsP42bJ9F9jS2x5P7Kf9ay3cvKDmDmV2R67Vf2N
-         wE0/BWdCI6+4ip91mvFXGCXi/i8P9D+csPzuVhvElKBd1xbsXgERJ5u4belZ+SFfbCSX
-         KGijPugLM+LIlHyO3IbCutlbYOFfTgcsuig2nr3XUpSJTaIMKnnL0qeZ2D4YHjF5GOfp
-         iz8v3TgmTKpfFwp5nnUet6kNmC1qjF61ZGQAeqEvl0DKpU9sXQJDDSSq/6E402nNHhB1
-         P20gMztyg8H886rNRJqnw2iLoxldvoyi7Zg+Zf3B5iRvD1vMzMjORNwZafxS/tVoAxcO
-         IWTA==
-X-Gm-Message-State: AOJu0YyyJ1FrfEh8VqhSzOpd4HPhZC6DHG3UaEEfqygN+vcoaAKKbQUT
-	zJFjc/K0UVvJejnz+rCfZeL4U5IcOKhtMBwjiZi+TOF2mK4X6QyG7ofwNKNJJg0=
-X-Google-Smtp-Source: AGHT+IFDwYVwXq17MTcOel3inMmKC+91lU8s4TfsXsrWASNbwODfHmOOdDedeLeQePb479Rj3hUHlA==
-X-Received: by 2002:a17:902:e54d:b0:1e4:9ac6:1f3f with SMTP id n13-20020a170902e54d00b001e49ac61f3fmr14753677plf.5.1713855906581;
-        Tue, 23 Apr 2024 00:05:06 -0700 (PDT)
-Received: from VM-4-8-ubuntu.. ([124.222.65.152])
-        by smtp.gmail.com with ESMTPSA id j12-20020a170903024c00b001db66f3748fsm9284497plh.182.2024.04.23.00.05.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Apr 2024 00:05:06 -0700 (PDT)
-From: Jiayun Chen <chenjiayunju@gmail.com>
-To: netdev@vger.kernel.org
-Cc: shemminger@osdl.org,
-	Jiayun Chen <chenjiayunju@gmail.com>
-Subject: [PATCH] man: fix doc ip will exit with -1
-Date: Tue, 23 Apr 2024 15:03:46 +0800
-Message-Id: <20240423070345.508758-1-chenjiayunju@gmail.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1713856095; c=relaxed/simple;
+	bh=LbZv+IFW0ABDVGbIyrN2XXjy2qr1emVrakdBmUuQ5Q4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bOS7NLGSP6B50c09JYY6oNbqlXAq6HiuDHVTBsT9A6SqIK759FBmFKxaxAP/LchofkYXCB2TPwFaFahgz3d7BjJXEhLVarzEHX3VxZqDJF2CeU0D3zQr1zVYRx7oRRPOoUz+dIDLUlf0/50R0X046Nv240FJo/31v8qs/OYQjy0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rzAG2-0004PC-Fe; Tue, 23 Apr 2024 09:08:02 +0200
+Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rzAG0-00Dppn-33; Tue, 23 Apr 2024 09:08:00 +0200
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rzAFz-009lmk-3C;
+	Tue, 23 Apr 2024 09:08:00 +0200
+Date: Tue, 23 Apr 2024 09:07:59 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Richard Cochran <richardcochran@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	Arun Ramadoss <arun.ramadoss@microchip.com>,
+	Russell King <linux@armlinux.org.uk>, kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	UNGLinuxDriver@microchip.com,
+	linux-stm32@st-md-mailman.stormreply.com
+Subject: Re: [PATCH net-next v1 2/4] net: phy: micrel: lan8841: set default
+ PTP latency values
+Message-ID: <ZideTxpOcPTbR9yt@pengutronix.de>
+References: <20240417164316.1755299-1-o.rempel@pengutronix.de>
+ <20240417164316.1755299-3-o.rempel@pengutronix.de>
+ <c8e3f5d0-832b-4ab1-a65f-52f983ff110a@lunn.ch>
+ <ZiAtREiqPuvXkB4S@pengutronix.de>
+ <b44a4aee-f76f-4472-9b5c-343a09ed0d33@lunn.ch>
+ <ZiITWEZgTx9aPqIy@hoboy.vegasvil.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <ZiITWEZgTx9aPqIy@hoboy.vegasvil.org>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-The exit code of -1 (255) is not documented:
+Hi Richard,
 
-$ ip link set dev; echo $?
-255
+On Thu, Apr 18, 2024 at 11:46:48PM -0700, Richard Cochran wrote:
+> On Wed, Apr 17, 2024 at 10:23:07PM +0200, Andrew Lunn wrote:
+> > I suggest you go read older messages from Richard. It was a discussion
+> > with Microchip about one of their PHYs.
+> 
+> My 2 cents:
+> 
+> User space has all of the hooks needed to configure corrections for a
+> given setup.
+> 
+> Hard coding corrections in device drivers is bound to fail, based on
+> prior experience with Vendors not knowing or caring how their products
+> actually work.  Vendors will publish value X one year, then delete the
+> info (to avoid embarrassment), then publish the new value Y, once
+> customers have forgotten about X.
+> 
+> So, prudent users will always calibrate their beloved systems, not
+> trusting the Vendors to provide anything close to reasonable.
+> 
+> Ergo, adding new magical correction in a kernel release causes
+> regressions for prudent users.
+> 
+> But, in the end, that doesn't matter, because prudent users are used
+> to being abused by well-meaning yet misguided device driver authors.
+> 
+> Prudent users are wise, and they will re-calibrate their systems
+> before rolling out an updated kernel.
 
-$ ip route help; echo $?
-255
+Ok, i see. Thank you for your feedback.
 
-It appears that ip returns -1 on syntax error, e.g., invalid device, buffer
-size. Here is a patch for documenting this behavior.
+Are the recommended FOSS projects managing calibration values per-
+linkmode/port/device in user space?
 
-Signed-off-by: Jiayun Chen <chenjiayunju@gmail.com>
----
- man/man8/ip.8 | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+What is recommended way for calibration? Using some recommended device?
 
-diff --git a/man/man8/ip.8 b/man/man8/ip.8
-index fdae57c5..e7bd9eb4 100644
---- a/man/man8/ip.8
-+++ b/man/man8/ip.8
-@@ -405,8 +405,8 @@ If this value is 0-6 or 8, chose colors suitable for dark background:
- COLORFGBG=";0" ip -c a
- 
- .SH EXIT STATUS
--Exit status is 0 if command was successful, and 1 if there is a syntax error.
--If an error was reported by the kernel exit status is 2.
-+Exit status is 0 if command was successful, and -1 or 1 if there is a 
-+syntax error. If an error was reported by the kernel exit status is 2.
- 
- .SH "EXAMPLES"
- .PP
+Regards,
+Oleksij
 -- 
-2.34.1
-
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
