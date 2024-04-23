@@ -1,154 +1,158 @@
-Return-Path: <netdev+bounces-90544-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90545-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 516668AE708
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 14:53:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E5F88AE712
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 14:56:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 08A9C1F25AE6
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 12:53:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AE3731F25DE8
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 12:56:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F212B12F391;
-	Tue, 23 Apr 2024 12:51:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBA8686AC2;
+	Tue, 23 Apr 2024 12:56:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="j1qNN91P"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NxlOzrkB"
 X-Original-To: netdev@vger.kernel.org
-Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6541C12DDAC
-	for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 12:51:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BAFB85C4E
+	for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 12:56:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713876692; cv=none; b=nosWq2utIC07g7JGemDd8wYymBEihZ1QwdEs+O5y0EO6G+5xBHONcP/DfnAOQENG5+ys1F/N1qE3BTQe0snclIt8eUnX50NIy+5Yg/DzSPxFGbhHF+WFkKj+YFbtbfHYiBrcjTQdnG45dPFVl/+hnZkZDNY4eIjSxys7axR8KvQ=
+	t=1713876984; cv=none; b=JvgUrMM31ELejk6RLr5NOYApdlwos0V1jSaw87mbDwpL2b1MLgvmMqxAmQOYO61dkA4URKLyDQbVDO/TeI3uIlJoLuI2eROv554Gn4DmJuFUyPfw8O+ASMqwnBE4is9Q28i4jj0TdPXnCGGGwSU7dutLwRNrVYLy5YvoYmGmJXM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713876692; c=relaxed/simple;
-	bh=+qHZ8hKMsG2TCvpVNq3b3f5G4B+/z6iOLRClJQQxTkE=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bMK+/NmcaY+J2DIUY0pF3RCDvwlCZxdFzIrGS/MsXZucitf4r74PAh6iVTmRV8KlXV7lfGA3ws/+cD0h8y6vPzUOfg8R27EWDHljHaAY2DxRTH5Xq9q5Fp1RWkKi4xFHuWj4kAIDEvSpSzwNliyO2uW/uh+lg1s/DKsL9Hz2oTU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=j1qNN91P; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id 204B32074F;
-	Tue, 23 Apr 2024 14:51:29 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from a.mx.secunet.com ([127.0.0.1])
-	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ZnOhb3zi-sfZ; Tue, 23 Apr 2024 14:51:28 +0200 (CEST)
-Received: from mailout2.secunet.com (mailout2.secunet.com [62.96.220.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id 8BABF20518;
-	Tue, 23 Apr 2024 14:51:28 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 8BABF20518
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1713876688;
-	bh=PkOVy0Xg18j+qbliAAaPHXWfm6l1g+br2N1BH1POPZU=;
-	h=Date:From:To:CC:Subject:Reply-To:References:In-Reply-To:From;
-	b=j1qNN91P9THgsjS+G5v542R13m6kDCp9HNyX0yAbS2EYAoxhY5eaFCrV+UFMymwbD
-	 BaCdnrT18FoLL8eKHaKjKs3v/jWCzllknbs3Pun0FYlmmeImku/b71+fFzuoJksN0l
-	 WH/Jhv68lOyuC86IKywU9nbImXY7S3SPixy84IV00zvhijl25vkksLXvkuSVZPFbEC
-	 MlnfasX9Af2sT11cqq58Hpfz3U2VoKJc+uuxiDaGjjR9q7I1sgDX+Na7DRgVxZKJl8
-	 mohHEX9Mcv3UJ4W3/G/SiySnWoUF7cI0qYAbkwzu7vQobT8y0pCt+Qzy1YCld/zPjn
-	 gzOZF7xdrx8AQ==
-Received: from cas-essen-01.secunet.de (unknown [10.53.40.201])
-	by mailout2.secunet.com (Postfix) with ESMTP id 7F26380004A;
-	Tue, 23 Apr 2024 14:51:28 +0200 (CEST)
-Received: from mbx-essen-01.secunet.de (10.53.40.197) by
- cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.37; Tue, 23 Apr 2024 14:51:28 +0200
-Received: from moon.secunet.de (172.18.149.1) by mbx-essen-01.secunet.de
- (10.53.40.197) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.37; Tue, 23 Apr
- 2024 14:51:27 +0200
-Date: Tue, 23 Apr 2024 14:51:21 +0200
-From: Antony Antony <antony.antony@secunet.com>
-To: Steffen Klassert <steffen.klassert@secunet.com>, Herbert Xu
-	<herbert@gondor.apana.org.au>, <netdev@vger.kernel.org>
-CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, <devel@linux-ipsec.org>, Leon Romanovsky
-	<leon@kernel.org>, Eyal Birger <eyal.birger@gmail.com>, Nicolas Dichtel
-	<nicolas.dichtel@6wind.com>, Sabrina Dubroca <sd@queasysnail.net>
-Subject: [PATCH ipsec-next v12 4/4] xfrm: Restrict SA direction attribute to
- specific netlink message types
-Message-ID: <718d3da5f5cd56c2444fb350516c7e5e022893c4.1713874887.git.antony.antony@secunet.com>
-Reply-To: <antony.antony@secunet.com>
-References: <cover.1713874887.git.antony.antony@secunet.com>
+	s=arc-20240116; t=1713876984; c=relaxed/simple;
+	bh=QFxslPSEo74p62WKNfUcMHjN0BnOuD+s+Y9P2f7Epo4=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=EVRo6iIqucbYJFMXJSmi0xYsuVmcbKF17WwpIqiCg2jER+dHxwmm4mjHk+zsddVm/t+6+kyiyMhGp24BPSzBZpuSzDx+fGBO5QSPUp8IrlTj6HlapgqpMap1VtBiViVL4YgiHIW8gDa5WcAFOpuq9qoyE0BC+fYn4Ulige3rHS0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NxlOzrkB; arc=none smtp.client-ip=209.85.128.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6150e36ca0dso93073707b3.1
+        for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 05:56:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1713876982; x=1714481782; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=4DmhxbQZvPAwteWSi09i5UotY7tqM6eGArkTWrF1j9c=;
+        b=NxlOzrkBSjRuqfuA8qipfZagsjtUZz0LX79e6qNeTqno+8TS9MgzMEtKpCMk9ChRjb
+         Ioc6VLYsQG7/LRd+an6//UAoqjOD0FnGuoVyhGLMSpmikLLDUwtO70/Me9zq8pVEX/q4
+         mzsgLfSZWNRod+DGEeomHVmLNrC6TzXOEaCW4okZyLmNc7cCd+oUcsjF0Ovd6WA5zlLv
+         BcMS6VI9f/0Bo+b9HK2KqpIQ1/jZxG5knsRlLdYowm+lrDX/aLw04FenkWh20nmDJTxi
+         XgBylU2PlW+oGIobOypsKvkUabMOvKj/sRS3wWsu9DfcEKUdOIS3N2aPo8T1T0Bx+F3O
+         OigA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713876982; x=1714481782;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=4DmhxbQZvPAwteWSi09i5UotY7tqM6eGArkTWrF1j9c=;
+        b=SkyTDhkD9u8s8LsZN1fU9IQot3M9e+tpXczlNxOF/YxYAOIjv6mcXS1JeXrRPloSm7
+         I1Kp6YXH79/qZvCILz8zyJIp0fbHhMMw7CfNUrZtmXPfnn1Tzj9d+1h2QoTz6Dxz69qI
+         dqGCFIl2IFOIDaHR3D/plWKj7gfIRX48owhPcJiL15tedZfLDepxhi3b9i7MxaPqiJYN
+         4IyFLOLqoKK6CDP9BAUXjht4zdalBHLfWuygjmhV9GW4Irox80yNOeeSh/LC5Eoylt+K
+         4l98BWSJtOR5CRa+Olh62/niZ0K9n8bcTQR2wYLMpqh0xPrTL3tnxTW3zF6Lbqa91oab
+         W2yQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV/+sw7uOixT1sRYaTjTfhKFB/io9IWD1wqLu2MAWpkya0Vyhp6xOipCvyneOGz7TPC5tj8e6dG8cgduY0vOzTFZsfKNpoe
+X-Gm-Message-State: AOJu0YxsT95cTcxmqYQZGC1LGr87+AUl/VwOpuPMgzuK6/Ja+3xY1QKy
+	5czDUXWk8Jm5DQArdcQroOHd3V9FhAd23dhsq4zM8/5ozZJxc4ceEBMqadSWQDPkaf/V+NJDGY1
+	B21nulL2CJw==
+X-Google-Smtp-Source: AGHT+IGYsKSO1mFYMW+A3wU7XRUhY6Ayeg9Yu7FR/Quraup3OMhPLcs849NpgePEa6Xf5I0ij/unwGeVczXojg==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a05:6902:725:b0:dbe:30cd:8fcb with SMTP
+ id l5-20020a056902072500b00dbe30cd8fcbmr1015050ybt.0.1713876982320; Tue, 23
+ Apr 2024 05:56:22 -0700 (PDT)
+Date: Tue, 23 Apr 2024 12:56:20 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <cover.1713874887.git.antony.antony@secunet.com>
-Precedence: first-class
-Priority: normal
-Organization: secunet
-X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
- mbx-essen-01.secunet.de (10.53.40.197)
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.44.0.769.g3c40516874-goog
+Message-ID: <20240423125620.3309458-1-edumazet@google.com>
+Subject: [PATCH net-next] tcp: avoid premature drops in tcp_add_backlog()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Soheil Hassas Yeganeh <soheil@google.com>, Neal Cardwell <ncardwell@google.com>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Reject the usage of the SA_DIR attribute in xfrm netlink messages when
-it's not applicable. This ensures that SA_DIR is only accepted for
-certain message types (NEWSA, UPDSA, and ALLOCSPI)
+While testing TCP performance with latest trees,
+I saw suspect SOCKET_BACKLOG drops.
 
-Signed-off-by: Antony Antony <antony.antony@secunet.com>
+tcp_add_backlog() computes its limit with :
+
+    limit = (u32)READ_ONCE(sk->sk_rcvbuf) +
+            (u32)(READ_ONCE(sk->sk_sndbuf) >> 1);
+    limit += 64 * 1024;
+
+This does not take into account that sk->sk_backlog.len
+is reset only at the very end of __release_sock().
+
+Both sk->sk_backlog.len and sk->sk_rmem_alloc could reach
+sk_rcvbuf in normal conditions.
+
+We should double sk->sk_rcvbuf contribution in the formula
+to absorb bubbles in the backlog, which happen more often
+for very fast flows.
+
+This change maintains decent protection against abuses.
+
+Fixes: c377411f2494 ("net: sk_add_backlog() take rmem_alloc into account")
+Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
-v11 -> 12
-     - fix spd look up. This broke xfrm_policy.sh tests
----
- net/xfrm/xfrm_user.c | 24 ++++++++++++++++++++++++
- 1 file changed, 24 insertions(+)
+ net/ipv4/tcp_ipv4.c | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
 
-diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
-index d34ac467a219..5d8aac0e8a6f 100644
---- a/net/xfrm/xfrm_user.c
-+++ b/net/xfrm/xfrm_user.c
-@@ -3200,6 +3200,24 @@ static const struct xfrm_link {
- 	[XFRM_MSG_GETDEFAULT  - XFRM_MSG_BASE] = { .doit = xfrm_get_default   },
- };
-
-+static int xfrm_reject_unused(int type, struct nlattr **attrs,
-+			      struct netlink_ext_ack *extack)
-+{
-+	if (attrs[XFRMA_SA_DIR]) {
-+		switch (type) {
-+		case XFRM_MSG_NEWSA:
-+		case XFRM_MSG_UPDSA:
-+		case XFRM_MSG_ALLOCSPI:
-+			break;
-+		default:
-+			NL_SET_ERR_MSG(extack, "Invalid attribute SA_DIR");
-+			return -EINVAL;
-+		}
-+	}
-+
-+	return 0;
-+}
-+
- static int xfrm_user_rcv_msg(struct sk_buff *skb, struct nlmsghdr *nlh,
- 			     struct netlink_ext_ack *extack)
+diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
+index 88c83ac4212957f19efad0f967952d2502bdbc7f..e06f0cd04f7eee2b00fcaebe17cbd23c26f1d28f 100644
+--- a/net/ipv4/tcp_ipv4.c
++++ b/net/ipv4/tcp_ipv4.c
+@@ -1995,7 +1995,7 @@ int tcp_v4_early_demux(struct sk_buff *skb)
+ bool tcp_add_backlog(struct sock *sk, struct sk_buff *skb,
+ 		     enum skb_drop_reason *reason)
  {
-@@ -3259,6 +3277,12 @@ static int xfrm_user_rcv_msg(struct sk_buff *skb, struct nlmsghdr *nlh,
- 	if (err < 0)
- 		goto err;
-
-+	if (!link->nla_pol || link->nla_pol == xfrma_policy) {
-+		err = xfrm_reject_unused((type + XFRM_MSG_BASE), attrs, extack);
-+		if (err < 0)
-+			goto err;
-+	}
+-	u32 limit, tail_gso_size, tail_gso_segs;
++	u32 tail_gso_size, tail_gso_segs;
+ 	struct skb_shared_info *shinfo;
+ 	const struct tcphdr *th;
+ 	struct tcphdr *thtail;
+@@ -2004,6 +2004,7 @@ bool tcp_add_backlog(struct sock *sk, struct sk_buff *skb,
+ 	bool fragstolen;
+ 	u32 gso_segs;
+ 	u32 gso_size;
++	u64 limit;
+ 	int delta;
+ 
+ 	/* In case all data was pulled from skb frags (in __pskb_pull_tail()),
+@@ -2099,7 +2100,13 @@ bool tcp_add_backlog(struct sock *sk, struct sk_buff *skb,
+ 	__skb_push(skb, hdrlen);
+ 
+ no_coalesce:
+-	limit = (u32)READ_ONCE(sk->sk_rcvbuf) + (u32)(READ_ONCE(sk->sk_sndbuf) >> 1);
++	/* sk->sk_backlog.len is reset only at the end of __release_sock().
++	 * Both sk->sk_backlog.len and sk->sk_rmem_alloc could reach
++	 * sk_rcvbuf in normal conditions.
++	 */
++	limit = ((u64)READ_ONCE(sk->sk_rcvbuf)) << 1;
 +
- 	if (link->doit == NULL) {
- 		err = -EINVAL;
- 		goto err;
---
-2.30.2
++	limit += ((u32)READ_ONCE(sk->sk_sndbuf)) >> 1;
+ 
+ 	/* Only socket owner can try to collapse/prune rx queues
+ 	 * to reduce memory overhead, so add a little headroom here.
+@@ -2107,6 +2114,8 @@ bool tcp_add_backlog(struct sock *sk, struct sk_buff *skb,
+ 	 */
+ 	limit += 64 * 1024;
+ 
++	limit = min_t(u64, limit, UINT_MAX);
++
+ 	if (unlikely(sk_add_backlog(sk, skb, limit))) {
+ 		bh_unlock_sock(sk);
+ 		*reason = SKB_DROP_REASON_SOCKET_BACKLOG;
+-- 
+2.44.0.769.g3c40516874-goog
 
 
