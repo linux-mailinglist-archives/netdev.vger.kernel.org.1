@@ -1,131 +1,181 @@
-Return-Path: <netdev+bounces-90430-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90431-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2DABB8AE190
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 12:01:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96A6B8AE1AF
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 12:03:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D921428138E
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 10:01:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 21198283DA7
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 10:03:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C6746024A;
-	Tue, 23 Apr 2024 10:01:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D150360DFB;
+	Tue, 23 Apr 2024 10:02:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ApyRiA+D"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OfEfuua9"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED7525FB9B
-	for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 10:01:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A54875FBAA;
+	Tue, 23 Apr 2024 10:02:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713866471; cv=none; b=HPr8z+rH8jMe6EEfEZJFXGuGK39yyxOCuG0gL7TuyjkacBHJTTEt0ZnPXl48tDePx7mUjb8Qy/mY8/M+fOrDwx2Xm5//tSg9FUXOkLZOsk9pYKI0mdvd3+rswnQRzWBv5Xzo6dDQyj3BuzDHbK77wfcs8B4WptS0EVcLyAQAJQ8=
+	t=1713866540; cv=none; b=aeNk4duMuSPX8qI3dBrWE4qQm2ZHJdRuNWWr+Mx/OfvxdqPbOheq2F+sSDjUUg8l0acE+yJnM89sq7+PpBYN4gfbp1iL2zdiW0Q5ua1pwrhEnz1u01l+mq5quLanSjAmJ+QOgQaKaOtLWFztMdyg8SKDZk+COpw92WjYa1W3f8I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713866471; c=relaxed/simple;
-	bh=YwIkjif5BreNxnLNOWf6abaVgTHOQBKAwUvTq0Bl3Ug=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=KOxOuM2Ao2u3dDMq9VWNQ2tEjCwJVj6agBFVVUFS8m1YT2c7nTIV4ErYweWfb84nni02SkHSfJZiCaK10Dk2jl3ocuzAxJlW6wBN88J+0tNIewJLSgzbykkYaI/Sf94wKGfQm4EiFj9vhE3PfSuIvsOWnQpBFjUo5jBIMjEVYLc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ApyRiA+D; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1713866467;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=YwIkjif5BreNxnLNOWf6abaVgTHOQBKAwUvTq0Bl3Ug=;
-	b=ApyRiA+D7vmnGqc3RO+HympC3WHHgg4H1c3JtR8iS0+H60cejlmQoBqdSTA/r/zHeM6wTE
-	YwZNb7qpebulhC+UD38G741bjtf+VnOkzRgzo2kDgeGtyPYISiorlX6s/HPIjyfdtzof+w
-	YMKhU5RzTH4fwApnCi9hsoeKKadL4cw=
-Received: from mail-oi1-f200.google.com (mail-oi1-f200.google.com
- [209.85.167.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-590-_Da4ZmwzOWuq0IuyzouhAg-1; Tue, 23 Apr 2024 06:01:05 -0400
-X-MC-Unique: _Da4ZmwzOWuq0IuyzouhAg-1
-Received: by mail-oi1-f200.google.com with SMTP id 5614622812f47-3c7533a4a7cso1184613b6e.0
-        for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 03:01:05 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713866465; x=1714471265;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=YwIkjif5BreNxnLNOWf6abaVgTHOQBKAwUvTq0Bl3Ug=;
-        b=DdXeNEhEiOM0dmgQUS78RNmcO4jNpIeNzpM2IsLBoCpwoe/QUjvFnye6PqKYd5gJJs
-         noR2Ltp61fXp7mCczWgXUcKVNaeIK+tNlXeg9vxGcavOG98CeQTVVs7L3joBRRvbq7kg
-         22tUrzKPEvp8VlBfLqSwUXr3yB1iw6BNp760b2oZ+YECegWTGPvGZfGNA6h0gM6CCOsI
-         rd8R5FSmRqStfqq2IJu89qjAaK04aSFSda3nX9bqg84WDzjZtb2xBViO+97BpRu6Mzva
-         eH62l2sA7IqOTYHtCjhiu0D+0uPPEPxgzY2InTNMara303qXZZuymmwg7pUeUbryrwZ/
-         z4hw==
-X-Forwarded-Encrypted: i=1; AJvYcCW59BFOdhIj1O0e/t2SFh4S0T/Ann8QXX2RpKGuhheNQ/pQLC8obBq1yhYOLl2pKsFTGHaaoBQ6xZ5uXWhCRTkk3vofJm+I
-X-Gm-Message-State: AOJu0YzoUj/rmZ1j7JnAHXw7Y7+RveOe55DDmrXpWJA83az4RKDqLNXT
-	SFdirOAqXFbuimUgNSkRh8hAtQRjB9j/5WY5STk0tPKbu2u6wBwZGxyFkBShvVXj2n4lfgH7JFv
-	ZHLGQ+dNUvS50kbYllkm7SqEFlfbyA04cYBbd8J2lFTeblQwaNgLE5g==
-X-Received: by 2002:a05:6870:8891:b0:22e:dfbc:4aae with SMTP id m17-20020a056870889100b0022edfbc4aaemr14682570oam.2.1713866464841;
-        Tue, 23 Apr 2024 03:01:04 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE2cGPqTX80VpHqtIO0GuVwmn2dBJMhu25/rZtGRTV0uf+aWtNYNNJgU7vEjgHSo783VHDnMA==
-X-Received: by 2002:a05:6870:8891:b0:22e:dfbc:4aae with SMTP id m17-20020a056870889100b0022edfbc4aaemr14682536oam.2.1713866464448;
-        Tue, 23 Apr 2024 03:01:04 -0700 (PDT)
-Received: from gerbillo.redhat.com ([2a0d:3344:172c:4510::f71])
-        by smtp.gmail.com with ESMTPSA id x4-20020ac87304000000b00434c31fa60csm5023855qto.92.2024.04.23.03.01.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Apr 2024 03:01:04 -0700 (PDT)
-Message-ID: <4a92f794480b12c21eaeeeb66521dbe978f08414.camel@redhat.com>
-Subject: Re: [PATCH net] net: ethernet: ti: am65-cpts: Fix PTPv1 message
- type on TX packets
-From: Paolo Abeni <pabeni@redhat.com>
-To: Ravi Gunasekaran <r-gunasekaran@ti.com>, s-vadapalli@ti.com, 
-	rogerq@kernel.org
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	richardcochran@gmail.com, jreeder@ti.com, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, srk@ti.com
-Date: Tue, 23 Apr 2024 12:01:01 +0200
-In-Reply-To: <20240419080547.10682-1-r-gunasekaran@ti.com>
-References: <20240419080547.10682-1-r-gunasekaran@ti.com>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
+	s=arc-20240116; t=1713866540; c=relaxed/simple;
+	bh=roHevk8etALCBrRz2KDXK9F53loOjFxJP/aOxjGpleo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Vp0omaqhkqUNOu1/EZLTNOFyWp+0G+bMFPCmymFC8iNtz4PRSPRWtHakxtDtgP/iSg6j80Rw7eaKwPpWYH/hn16uM5y09BppVm4aNls7hO6MetyIZBlB3xHyXvBkKXRHlKSB3bqQarVYv+4zZ7nh+fsoVMz5/eIU25jytUWYufU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OfEfuua9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D734CC2BD11;
+	Tue, 23 Apr 2024 10:02:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713866540;
+	bh=roHevk8etALCBrRz2KDXK9F53loOjFxJP/aOxjGpleo=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=OfEfuua93euOvHR3DhnMSLa5ipxTDgnCLldGfzhSSOs0T1GrUJT/UYal87/tcntY5
+	 kIzH2cbPg2/eJ+bxYPHlcooeybIvKBjl2yu/DCaSrxdJ3GwfTd35kUYwFCzSubHT2D
+	 A0CoTJDB+AEU/Z6rrygJcz33BKn9TUfzG23IE+RMs1rsS9AZ36KqCkFgSDjIwHzolV
+	 /Ofi+o2qK/Z8FUt8GDQVeGzII5UUBibjOiWC1pvNq23dwAOEcXREm3ZyKkGIqreMs/
+	 WcY/WV52n1etlfqF57mTzPiG5VtR/Or14+/uEbuL4fR4cpd5x47hvGrNAWVHa8AX1f
+	 NsDwRw3N9bV+Q==
+Message-ID: <4ce919ea-6110-4a84-8992-a72a9785c48b@kernel.org>
+Date: Tue, 23 Apr 2024 12:02:12 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [PATCH net-next v8 5/7] mptcp: support rstreason for passive
+ reset
+Content-Language: en-GB
+To: Jason Xing <kerneljasonxing@gmail.com>, edumazet@google.com,
+ dsahern@kernel.org, martineau@kernel.org, geliang@kernel.org,
+ kuba@kernel.org, pabeni@redhat.com, davem@davemloft.net,
+ rostedt@goodmis.org, mhiramat@kernel.org, mathieu.desnoyers@efficios.com,
+ atenart@kernel.org, horms@kernel.org
+Cc: mptcp@lists.linux.dev, netdev@vger.kernel.org,
+ linux-trace-kernel@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+References: <20240423072137.65168-1-kerneljasonxing@gmail.com>
+ <20240423072137.65168-6-kerneljasonxing@gmail.com>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <20240423072137.65168-6-kerneljasonxing@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, 2024-04-19 at 13:35 +0530, Ravi Gunasekaran wrote:
-> From: Jason Reeder <jreeder@ti.com>
->=20
-> The CPTS, by design, captures the messageType (Sync, Delay_Req, etc.)
-> field from the second nibble of the PTP header which is defined in the
-> PTPv2 (1588-2008) specification. In the PTPv1 (1588-2002) specification
-> the first two bytes of the PTP header are defined as the versionType
-> which is always 0x0001. This means that any PTPv1 packets that are
-> tagged for TX timestamping by the CPTS will have their messageType set
-> to 0x0 which corresponds to a Sync message type. This causes issues
-> when a PTPv1 stack is expecting a Delay_Req (messageType: 0x1)
-> timestamp that never appears.
->=20
-> Fix this by checking if the ptp_class of the timestamped TX packet is
-> PTP_CLASS_V1 and then matching the PTP sequence ID to the stored
-> sequence ID in the skb->cb data structure. If the sequence IDs match
-> and the packet is of type PTPv1 then there is a chance that the
-> messageType has been incorrectly stored by the CPTS so overwrite the
-> messageType stored by the CPTS with the messageType from the skb->cb
-> data structure. This allows the PTPv1 stack to receive TX timestamps
-> for Delay_Req packets which are necessary to lock onto a PTP Leader.
->=20
-> Signed-off-by: Jason Reeder <jreeder@ti.com>
-> Signed-off-by: Ravi Gunasekaran <r-gunasekaran@ti.com>
+Hi Jason,
 
-Please provide a suitable fixes tag, thanks!
+On 23/04/2024 09:21, Jason Xing wrote:
+> From: Jason Xing <kernelxing@tencent.com>
+> 
+> It relys on what reset options in the skb are as rfc8684 says. Reusing
 
-Paolo
+(if you have something else to fix, 'checkpatch.pl --codespell' reported
+a warning here: s/relys/relies/)
+
+> this logic can save us much energy. This patch replaces most of the prior
+> NOT_SPECIFIED reasons.
+> 
+> Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> ---
+>  net/mptcp/protocol.h | 28 ++++++++++++++++++++++++++++
+>  net/mptcp/subflow.c  | 22 +++++++++++++++++-----
+>  2 files changed, 45 insertions(+), 5 deletions(-)
+> 
+> diff --git a/net/mptcp/protocol.h b/net/mptcp/protocol.h
+> index fdfa843e2d88..bbcb8c068aae 100644
+> --- a/net/mptcp/protocol.h
+> +++ b/net/mptcp/protocol.h
+> @@ -581,6 +581,34 @@ mptcp_subflow_ctx_reset(struct mptcp_subflow_context *subflow)
+>  	WRITE_ONCE(subflow->local_id, -1);
+>  }
+>  
+> +/* Convert reset reasons in MPTCP to enum sk_rst_reason type */
+> +static inline enum sk_rst_reason
+> +sk_rst_convert_mptcp_reason(u32 reason)
+> +{
+> +	switch (reason) {
+> +	case MPTCP_RST_EUNSPEC:
+> +		return SK_RST_REASON_MPTCP_RST_EUNSPEC;
+> +	case MPTCP_RST_EMPTCP:
+> +		return SK_RST_REASON_MPTCP_RST_EMPTCP;
+> +	case MPTCP_RST_ERESOURCE:
+> +		return SK_RST_REASON_MPTCP_RST_ERESOURCE;
+> +	case MPTCP_RST_EPROHIBIT:
+> +		return SK_RST_REASON_MPTCP_RST_EPROHIBIT;
+> +	case MPTCP_RST_EWQ2BIG:
+> +		return SK_RST_REASON_MPTCP_RST_EWQ2BIG;
+> +	case MPTCP_RST_EBADPERF:
+> +		return SK_RST_REASON_MPTCP_RST_EBADPERF;
+> +	case MPTCP_RST_EMIDDLEBOX:
+> +		return SK_RST_REASON_MPTCP_RST_EMIDDLEBOX;
+> +	default:
+> +		/**
+
+I guess here as well, it should be '/*' instead of '/**'. But I guess
+that's fine, this file is probably not scanned. Anyway, if you have to
+send a new version, please fix this as well.
+
+(Also, this helper might require '#include <net/rstreason.h>', but our
+CI is fine with it, it is also added in the next commit, and probably
+already included via include/net/request_sock.h. So I guess that's fine.)
+
+
+Other than that, it looks good to me:
+
+Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+
+Cheers,
+Matt
+-- 
+Sponsored by the NGI0 Core fund.
 
 
