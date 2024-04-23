@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-90551-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90552-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC0138AE74D
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 15:04:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41F7E8AE764
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 15:06:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E6656B26937
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 13:04:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 74AD11C233C6
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 13:06:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DBD3134427;
-	Tue, 23 Apr 2024 13:04:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A39DC134733;
+	Tue, 23 Apr 2024 13:06:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="I3r8Gp3j"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="gPCm6X/m"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CB5E85938
-	for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 13:04:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B0451332B0
+	for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 13:06:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713877484; cv=none; b=geTgoql0PDtLjX9JEq4E1SMTT4JFjEI+f4sYcGW4co0DWcOrpq7TPMZBXTJHzsypmwFzqToAyj1Bnd4+ToNcJC0JjKwQSmWGsV3Q7eiwfQiFuVC2z0M1DElYmKEcVg86SCftNpTv8KwaL17+XdQc+fQOP+v9mU897dQUqNR1LxI=
+	t=1713877597; cv=none; b=J8LXPu0eu7t+plsIx8TsfrAbLzzaiaL0sM7dilB0nszfgh9p0xuXvbckXcC3aW7TXDEHyFu4WpBN13Bqc96MTi/iVeAvrcLOFQJZ1EKCKa9Al5R+7LWRaqDA2/QnBf02ALgEep3TkIpMFlMWSilsCAGTbTjCdr3D+CEfo5UBTM4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713877484; c=relaxed/simple;
-	bh=4PayvcCQahx+h/YDh/dNOsNcPVTkJJLHrFkqYUc4Rwo=;
+	s=arc-20240116; t=1713877597; c=relaxed/simple;
+	bh=grwm9HXpZ8bNgqFZwTamq6hPZswUJZHRWpQR6jPcCgQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eNdk16rHjPrmOFGSi1kBs2BOYy6vtwMT1hgiA9+Zzo4GBgEPWwMLQDe+e6Erg1wJWaFMZDk3v3YSJ4DT1fLJMfv2MBVkRs2xmEXxBWZN4LpxXWh9tg5KhpaHZizAV4HLQFvINDOK3iYp/k8I0Rr+HyYJRqDnS2rLc7ovQR2q0kI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=I3r8Gp3j; arc=none smtp.client-ip=209.85.218.54
+	 Content-Type:Content-Disposition:In-Reply-To; b=JGf60IsSDadZtXumK2aKbeQKAw3LnJRMAFLYD5ZFx/8i3ZM4QsfouYrIlNMJnTTbOVm9e85zWdvqbapxHS9zQQkeSkr+aFpN0/obMiJWoFwq/NTf1hC3I+aFRAZ0U5mPuJySCdXR3KsKEBQaTgRM2D3JQbQLGm3bXvI3UnFzRSQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=gPCm6X/m; arc=none smtp.client-ip=209.85.208.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-a51a7d4466bso601973066b.2
-        for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 06:04:43 -0700 (PDT)
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5708d8beec6so6804839a12.0
+        for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 06:06:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1713877482; x=1714482282; darn=vger.kernel.org;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1713877594; x=1714482394; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=aKO5eiafgqhKAWmwCBGeybrOv3ldefy8ZOECZrE5TO0=;
-        b=I3r8Gp3j7fuVzAInrRyB2RGTkxIlt/5Z4F7zra6/50Y4O3n6qWLIsFXNwzaNNLFYVS
-         4VZjXqrZl0mhwlWvBTK61OXGlS2FF0GRTj7f2IwN/GHHspNJacJsgM1qWxOWf7YEABu7
-         mLdhzaou0Yo4OOGiyMC8LO9PxPyLeOGdzE/aH6AFqZM5rSQepllgMNXli1VN3tLkPluy
-         XuQhJ3R4hjiJ+0AqtNf+csagjvmLIpMMJV0VoBvh/LeYk3Th4xxMmEXd/NRAN+C4qg3s
-         c8ErtXBbI03yczaAnsx4KiyVsqVU0JmBTFQYCpC0o614F7nEg9WRugmkqduJSttYKZII
-         4x1g==
+        bh=YtNKrVkvv3wQwUeLZfXmzb5Q0GHzil5K1gY3ZsSm6Z8=;
+        b=gPCm6X/mQOKQYH5eQn8hp4KffHO79Mpu49w8aIjcNL7hp9ZXFXkxU0tTN7UnMrSGiS
+         pnCRTncVMeCIZ5VnP+zOerYj5nTg2ioZX/b20+QWODPsOJjfSZKcKv0gz3TQjD5EW3w9
+         lpCPUgzKXD27In/qdiOmhpawtv3YcGLOVtzolsTgsMBKP206fhbU9fFCCtzt6nzkoi5c
+         kLtCRbhXmV45OCxfMOGyjuKlAdnUX5Ykl7FvRx4N3Kv71O2VGO5Hb/k6Lb5MdjzhuWf1
+         GCcj8s3aAPSksAdSZ7iA4u1x1o+6Nw7+edj3bVVqhBYynmZGiKGWuIEzORAAYffz2R+P
+         INLg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713877482; x=1714482282;
+        d=1e100.net; s=20230601; t=1713877594; x=1714482394;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=aKO5eiafgqhKAWmwCBGeybrOv3ldefy8ZOECZrE5TO0=;
-        b=jFgt8sEJTzD6SdbEBgcOImWywRJW2xyBgnDOAiK4B/wH0mTpvSWZiIsxxT0rtYYiPB
-         rNzSKLtXyn7Cet2Z4CnGcgXV2uJ9N+bNGxi0SkyihXrXk9Ks1PZSDFGLHgLSVL7f7m5n
-         YiSuzncpbxGI9qnq7dfR/8jTECWC4TZbI1jcLCNkxclxweXg2hS1AqS1BW1Uwdby4E9B
-         3ucc+3SX5cT+3EQHG3UHyHTN9H9dF0O+yFn0apq7yRSUs3nMDhyeGSSVKt38ZQWcUKzA
-         OEQIQJb1IxV4DgTmSn+OEqd2GRTPQp8ABokPQ1dupO0odUrVfsu0xiJsl+Juekbv13p8
-         SFLg==
-X-Gm-Message-State: AOJu0Yy05mvZ9HEB8fWsWBrd9AvX0Od4cmQ8og0PAkTUsrX5BazpKZGo
-	DAtIzOPNTFdlNH4E9YTQ+HG6P0FlKRefNgMmyV841tJs2h1EdKk0icwJcqfmWNg=
-X-Google-Smtp-Source: AGHT+IF6LtpiKpdCpU719YcKxu9nj8OoIklDYjPATVZCNPyyvGmEyrYn1Z1ks9R9E0zgmHl1ekjL7w==
-X-Received: by 2002:a17:906:d20d:b0:a55:914a:8b4 with SMTP id w13-20020a170906d20d00b00a55914a08b4mr6639402ejz.37.1713877481719;
-        Tue, 23 Apr 2024 06:04:41 -0700 (PDT)
+        bh=YtNKrVkvv3wQwUeLZfXmzb5Q0GHzil5K1gY3ZsSm6Z8=;
+        b=GpZjFrdug+bgYHx+g6/3oP3yOMGbga5iArJaSJKFsZC3rR3CZBPW4mAeEfG4LoCP9l
+         TXSGJDA4Cd/4xtfcdIdt4qrWVvn3pGdcwS3HzW43CGYzI/CSDafw2jYcEbWsIkP+Smef
+         8fGRG1DIbCm+AxYHHhufnVBnHfkYgNvdeOeTBsJxmtBgUOBBooHk5xFdGG+1g7TZhDYJ
+         ++c9lOUB92YF9r8elHcqNlvUcFGyL3tCVTPc6wT2SPOGplb9/aR6wSA2lvNvzXv5ASYD
+         NWi4Y86y/51iZX2M2P8uWwA4O7adGLgo39vi/dGCgZnuD6jn7ifyY71lMIRJteWkXsun
+         VrRA==
+X-Gm-Message-State: AOJu0Yyy56l7FveOYseSyqqVg36Uy458LVA8Hwwd7lrIXPSbZr0CbM6s
+	NQzRRr19WT1j3arQ8h4Bieia04XTS9+dTDa7UnX9RCeIHXzHRkJSI3zn/ac0tqI=
+X-Google-Smtp-Source: AGHT+IEfj15fF7r+4JoIHYXpZkv3IMh0LCnfIlqWJ1hT3PKS6rWFiI+6gS+uY4CKIniCYg2L0Kg/iA==
+X-Received: by 2002:a50:d542:0:b0:568:cdd8:cf60 with SMTP id f2-20020a50d542000000b00568cdd8cf60mr12887790edj.8.1713877594441;
+        Tue, 23 Apr 2024 06:06:34 -0700 (PDT)
 Received: from localhost (78-80-105-131.customers.tmcz.cz. [78.80.105.131])
-        by smtp.gmail.com with ESMTPSA id i7-20020a1709061e4700b00a52244ab819sm7154788ejj.170.2024.04.23.06.04.40
+        by smtp.gmail.com with ESMTPSA id et3-20020a056402378300b00571d8da8d09sm4806843edb.68.2024.04.23.06.06.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Apr 2024 06:04:40 -0700 (PDT)
-Date: Tue, 23 Apr 2024 15:04:38 +0200
+        Tue, 23 Apr 2024 06:06:33 -0700 (PDT)
+Date: Tue, 23 Apr 2024 15:06:32 +0200
 From: Jiri Pirko <jiri@resnulli.us>
 To: Geetha sowjanya <gakula@marvell.com>
 Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kuba@kernel.org,
 	davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
 	sgoutham@marvell.com, sbhatta@marvell.com, hkelam@marvell.com
-Subject: Re: [net-next PATCH v2 9/9] octeontx2-pf: Add representors for sdp
- MAC
-Message-ID: <Ziex5kCf3XwNQzjK@nanopsycho>
+Subject: Re: [net-next PATCH v2 7/9] octeontx2-pf: Add support to sync link
+ state between representor and VFs
+Message-ID: <ZieyWKC7ReztKRWF@nanopsycho>
 References: <20240422095401.14245-1-gakula@marvell.com>
- <20240422095401.14245-10-gakula@marvell.com>
+ <20240422095401.14245-8-gakula@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,15 +84,22 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240422095401.14245-10-gakula@marvell.com>
+In-Reply-To: <20240422095401.14245-8-gakula@marvell.com>
 
-Mon, Apr 22, 2024 at 11:54:01AM CEST, gakula@marvell.com wrote:
->Current silicons support 2 types of MACs, SDP and
+Mon, Apr 22, 2024 at 11:53:59AM CEST, gakula@marvell.com wrote:
+>Implements mbox function to sync the link state between VFs and
+>its representors. Same mbox is use to notify other updates like mtu etc.
+>
+>This patch enables
+>- Reflecting the link state of representor based on the VF state and
+> link state of VF based on representor.
 
-What's SDP? Care to elaborate a bit here?
+Could you please elaborate a bit more how exactly this behaves? Examples
+would help.
 
 
->RPM MAC.  This patch adds representors for SDP MAC
->interfaces.
+>- On VF interface up/down a notification is sent via mbox to representor
+>  to update the link state.
+>- On representor interafce up/down will cause the link state update of VF.
 >
 
