@@ -1,153 +1,107 @@
-Return-Path: <netdev+bounces-90478-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90479-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DCD08AE3B0
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 13:18:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D95198AE3B2
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 13:19:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 24F361F24B4F
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 11:18:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 687141F24DC1
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 11:19:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0FF27CF25;
-	Tue, 23 Apr 2024 11:17:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C91647E573;
+	Tue, 23 Apr 2024 11:19:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AYdUuJSH"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BsKNioUf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36FAA5D903
-	for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 11:17:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44EC25D903
+	for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 11:19:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713871077; cv=none; b=BcO3EGxFmNMjV79lSElyg2PTcdnmsKMu0RNJcYd/fVxf4PTDHL1TgxVhkqsgkvDDqYRcTXnyeElT9Kc5eXt/EeSIYxHbYp71ip4UCrH80bdbd3e8wtftEkyEZduy0GSdLwuukiRoDNJMGR4oEssw80z89Hpts10BKAxHl0EjvRQ=
+	t=1713871148; cv=none; b=LTdS146rmgDaD2pRQLF56N12pawjOFk19jbrcNLTb3AVXiS1QyC+BEdJtetviZSUmvnnk+kWOR2LGe1rd5bM+8Pv3EL1GjMPIIrkBgp33FCi63lhLLcrGscrzdN1LbuqNvfIkGZl9MnA5HUyJ6iNjM3bmgC7lKQhb2vRWJmHL7o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713871077; c=relaxed/simple;
-	bh=WBlYJbDM420376pxHCSgY3J8I6hmPvxhxfia3JcpKqQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=BaPyjIAO4W/cDiEWGcX6Yjm86FBJz1+d6iSTtN0AJ2gcdfN37+4AuuoFMVG2dqpBC2UX1ic3zdMhSMoAHBkfXZZDoOkIcRwTSos79bEadAbswbdkYQNbAKQQ5S5cgz5890iXkLwfsg5oXTq5q/J4tu7+f6ouk7mn3ZmlB1mK5Eo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AYdUuJSH; arc=none smtp.client-ip=209.85.208.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-571e13cd856so16572a12.0
-        for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 04:17:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713871074; x=1714475874; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yFS7RXq9qBhiwLT5zm2qX4wTBz1ICyONtrvH1XkqVug=;
-        b=AYdUuJSHTNIL9PeNTroij4pmIoLgbEgRuIvGJr3s8qEjgTA7AYNbl66Q14cnVnnruN
-         GSRz3o+bEB1rtFjJwSMmu9kUybfhn1QWdk0TBkMCuvwUAlp1zAWyzUkDNfry/lMHWrYi
-         nrpy5rcBF0U48dg8Ugao871kSwgGJxHdhFa92rqVN/uHswpqXZn894BYVdO9yzhGRDb3
-         w9vnN543QQlyQpxL7cFCO2LIvrYtbc0AGjTXNyz2LBlvLY4UfPJFiU9FLTI6g3zbC3SZ
-         MxmGe0ibll69EM/KJF9c6fE0k9iEWb2i75ZUd6DmrF0vTYuso5N3oxzIEncQr/RkSKGr
-         rPxQ==
+	s=arc-20240116; t=1713871148; c=relaxed/simple;
+	bh=KZP9VCw1/Uo3VBFKKbE8e0yd9jVZbtVuTAHNJpHQ5Jc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Nup0RnXh/VvR8QiMMVsAYS+5wPuMhQ9+Osf6gfGgfkiagRUrVkoA9D091FJRXw+T+ElQTo2lMU2r3dM1LnXK3AhaOtt/jckQeFhJ1D5DxHszOI7EsYApCLQx7XqtAWdCMod4pbGdlmR09ak4uy8Flo1YSQYJtAL/jwxUrqBQ5n0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BsKNioUf; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1713871146;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=KZP9VCw1/Uo3VBFKKbE8e0yd9jVZbtVuTAHNJpHQ5Jc=;
+	b=BsKNioUfbDVheG1ifg+yp4O8H2F4QsPEFXc0kbwromeFo/sgx571BaD+KwYfV0JlCWSIbP
+	zcQRA3PN4WoBLyuCx7G3G9xB7WlBGzXRuxVNgfHCNF5IZHlubaWhThRLD+1986+Mbz6YFI
+	PZ3gT/s725QNkOweJsno5UzqLKhIS4Q=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-633-idvCz6lBNniVrWeDjEyEOg-1; Tue, 23 Apr 2024 07:19:04 -0400
+X-MC-Unique: idvCz6lBNniVrWeDjEyEOg-1
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-a5874093a21so77557566b.0
+        for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 04:19:04 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713871074; x=1714475874;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yFS7RXq9qBhiwLT5zm2qX4wTBz1ICyONtrvH1XkqVug=;
-        b=XsVaUuVLGdDKAjZZfKDAAxHyooWjqHPzN4pUhzCZaTFFRJK3nqP2bcS1zsZheMEIm+
-         Wl0vOJuzz0iFvmgQpMcSndJAu7tcl9mk1cSFUjpR1Dj4SWhsEIBAqrUBqPSC6aHQhUML
-         jKZSFn/F6Nfdc9QiX8VGfiv7XtmNrH7KwCvj+1rGYIIghzpE2p8H/ukIPpPaTRi2Uj1I
-         s6N4zeDKtW33Kx14aW886eESXR9DyM+y/WG2UXeHXvSry38g5v0V1V8JSteSHW3wKfND
-         u46iQAUZZz4eV8CUcLyBWVkjQy28W+bjb89Tj4GoyUymDsQgoeb+VnJ/tl/T8OmBd7iZ
-         +Ecg==
-X-Gm-Message-State: AOJu0YwQ1j3RNtwdEFbPLIF3NvQVqRJ01mNX39PVcFXh+knzTorZhWf8
-	RBKwY0lggaMza6s9wl3F6C0WNHc2VyYsA8ebSKdlLQzFD21fiq1//dFj896NVkhLIMCwxC9zYOS
-	uBAU33NeZEUwDiCZ2S5DeNwOwkDdTICnArTxb
-X-Google-Smtp-Source: AGHT+IElhRef4erNceR0B1a4VbiksSXys1972fOis+BIviNNsr++R2H7gn6Pfe0eqSlTR0M5DlODJyasKv8DYku/sVc=
-X-Received: by 2002:aa7:d290:0:b0:571:fee3:594c with SMTP id
- w16-20020aa7d290000000b00571fee3594cmr149127edq.4.1713871074171; Tue, 23 Apr
- 2024 04:17:54 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1713871144; x=1714475944;
+        h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=KZP9VCw1/Uo3VBFKKbE8e0yd9jVZbtVuTAHNJpHQ5Jc=;
+        b=azC7i+q9dUoQdOqSwy2up0XB6LempeB5yQFU/2/s6Wu0jjohtxNAQKlDZDsNyaouMv
+         wH4LGTlhz909kWJog3aeLs/nOH7SobcM2Zwj+tGCqn+GeUabrcWsYbklTy1XjyzhFMch
+         go8OOuJ/yRXKPAy6m7YxLUr/cjnoDqSXn/uKoKGeFDGr1yicfJZp5CvjtUlV/qTelrQW
+         YjtJYn8FsfMilZQfHWWIcI1YJAzp93s9wzx5arrEB37QoMFx87Jx3d9keDK+LXzFjEt8
+         UQKlEiMHP5vmD84pUbH3qBLUwG+pFvQkfWbfHEZ4Ot85ymO0bgShbvrl47gjOgO+P//8
+         kh/A==
+X-Forwarded-Encrypted: i=1; AJvYcCXse1tAUXYfg6gDBtHeDxTE1xaC4o3hGIrBwM0KzJqz63czhjxH4Ar54R9uonILIavrt08h/RPHE5jggqF9u0e9YOd7QDjE
+X-Gm-Message-State: AOJu0YyAogQa98Fonrkuuh6FaRL1D3UcTAhfT74HYkqHK3MCGeAKXOXz
+	Ly40DWaGcydp/G3fbCrmHqakzCciyTxJh8jwZjsIJFqTVBoJEfNShfTv/ObciCig35/BU+oOhGa
+	B/blF6OVTWHjlTUvRqyhA6a6j7nrUv0/V4A6n5M+2rTFpNIsb8wB6cQ==
+X-Received: by 2002:a17:906:3b59:b0:a56:4c83:fcb9 with SMTP id h25-20020a1709063b5900b00a564c83fcb9mr3406821ejf.55.1713871143836;
+        Tue, 23 Apr 2024 04:19:03 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFaCMQYjFIyeyYbxA/+uCn7lL6cZiX8H3MkJhY2sRHk6IUsyj3HEaxdCPeuK8Ec7M09N3WXDw==
+X-Received: by 2002:a17:906:3b59:b0:a56:4c83:fcb9 with SMTP id h25-20020a1709063b5900b00a564c83fcb9mr3406799ejf.55.1713871143460;
+        Tue, 23 Apr 2024 04:19:03 -0700 (PDT)
+Received: from [169.254.21.156] (5920ab7b.static.cust.trined.nl. [89.32.171.123])
+        by smtp.gmail.com with ESMTPSA id ot15-20020a170906cccf00b00a5239720044sm6912925ejb.8.2024.04.23.04.19.02
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 23 Apr 2024 04:19:02 -0700 (PDT)
+From: Eelco Chaudron <echaudro@redhat.com>
+To: Jun Gu <jun.gu@easystack.cn>
+Cc: pshelar@ovn.org, dev@openvswitch.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [ovs-dev] [PATCH net-next] net: openvswitch: Release reference to
+ netdev
+Date: Tue, 23 Apr 2024 13:19:01 +0200
+X-Mailer: MailMate (1.14r6029)
+Message-ID: <77015793-E8E4-4AD0-A032-9E0A7F7F0865@redhat.com>
+In-Reply-To: <20240423073751.52706-1-jun.gu@easystack.cn>
+References: <20240423073751.52706-1-jun.gu@easystack.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240423094117.93206-1-nbd@nbd.name> <CANn89i+6xRe4V6aDmD-9EM0uD7A87f6rzg3S7Xq6-NaB_Mb4nw@mail.gmail.com>
- <63abfa26-d990-46c3-8982-3eaf7b8f8ee5@nbd.name>
-In-Reply-To: <63abfa26-d990-46c3-8982-3eaf7b8f8ee5@nbd.name>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 23 Apr 2024 13:17:40 +0200
-Message-ID: <CANn89iJZvoKVB+AK1_44gki2pHyigyMLXFkyevSQpH3iDbnCvw@mail.gmail.com>
-Subject: Re: [RFC] net: add TCP fraglist GRO support
-To: Felix Fietkau <nbd@nbd.name>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
 
-On Tue, Apr 23, 2024 at 12:25=E2=80=AFPM Felix Fietkau <nbd@nbd.name> wrote=
-:
+
+
+On 23 Apr 2024, at 9:37, Jun Gu wrote:
+
+> dev_get_by_name will provide a reference on the netdev. So ensure that
+> the reference of netdev is released after completed.
 >
-> On 23.04.24 12:15, Eric Dumazet wrote:
-> > On Tue, Apr 23, 2024 at 11:41=E2=80=AFAM Felix Fietkau <nbd@nbd.name> w=
-rote:
-> >>
-> >> When forwarding TCP after GRO, software segmentation is very expensive=
-,
-> >> especially when the checksum needs to be recalculated.
-> >> One case where that's currently unavoidable is when routing packets ov=
-er
-> >> PPPoE. Performance improves significantly when using fraglist GRO
-> >> implemented in the same way as for UDP.
-> >>
-> >> Here's a measurement of running 2 TCP streams through a MediaTek MT762=
-2
-> >> device (2-core Cortex-A53), which runs NAT with flow offload enabled f=
-rom
-> >> one ethernet port to PPPoE on another ethernet port + cake qdisc set t=
-o
-> >> 1Gbps.
-> >>
-> >> rx-gro-list off: 630 Mbit/s, CPU 35% idle
-> >> rx-gro-list on:  770 Mbit/s, CPU 40% idle
-> >
-> > Hi Felix
-> >
-> > changelog is a bit terse, and patch complex.
-> >
-> > Could you elaborate why this issue
-> > seems to be related to a specific driver ?
-> >
-> > I think we should push hard to not use frag_list in drivers :/
-> >
-> > And GRO itself could avoid building frag_list skbs
-> > in hosts where forwarding is enabled.
-> >
-> > (Note that we also can increase MAX_SKB_FRAGS to 45 these days)
->
-> The issue is not related to a specific driver at all. Here's how traffic
-> flows: TCP packets are received on the SoC ethernet driver, the network
-> stack performs regular GRO. The packet gets forwarded by flow offloading
-> until it reaches the PPPoE device. PPPoE does not support GSO packets,
-> so the packets need to be segmented again.
-> This is *very* expensive, since data needs to be copied and checksummed.
+> Fixes: 2540088b836f ("net: openvswitch: Check vport netdev name")
+> Signed-off-by: Jun Gu <jun.gu@easystack.cn>
 
-gso segmentation does not copy the payload, unless the device has no
-SG capability.
+Thanks Jun for the follow-up! The change looks good to me!
 
-I guess something should be done about that, regardless of your GRO work,
-since most ethernet devices support SG these days.
+Acked-by: Eelco Chaudron <echaudro@redhat.com>
 
-Some drivers use header split for RX, so forwarding to  PPPoE
-would require a linearization anyway, if SG is not properly handled.
-
->
-> So in my patch, I changed the code to build fraglist GRO instead of
-> regular GRO packets, whenever there is no local socket to receive the
-> packets. This makes segmenting very cheap, since the original skbs are
-> preserved on the trip through the stack. The only cost is an extra
-> socket lookup whenever NETIF_F_FRAGLIST_GRO is enabled.
-
-A socket lookup in multi-net-namespace world is not going to work generical=
-ly,
-but I get the idea now.
 
