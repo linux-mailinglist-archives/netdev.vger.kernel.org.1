@@ -1,79 +1,163 @@
-Return-Path: <netdev+bounces-90617-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90618-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B86398AF3E4
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 18:25:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D3778AF40D
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 18:29:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7254328AAAF
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 16:25:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BEC5C1C23A32
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 16:29:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42F0213E057;
-	Tue, 23 Apr 2024 16:23:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B43C13FD64;
+	Tue, 23 Apr 2024 16:26:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="nThVN82K"
+	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="Wy1Y85zC"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01C7113E03B;
-	Tue, 23 Apr 2024 16:23:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 765DE142916;
+	Tue, 23 Apr 2024 16:26:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713889436; cv=none; b=BqmXzBuyTuzJ7BxV6Bl49D0Xvg0s+Zvs7RUqrYP7pJp/g/jWH7TStlSlJZWe9MkXi86yVzujU94PPC/jx8z700OXsAFGp4T7tp3A1Cv4pWU+Shgc39tVnAzgN5TS1F5sG6rbkV8QTs4Rd5sWhP+BxzzP6cvFlFDYtP9mh6IDCUg=
+	t=1713889567; cv=none; b=bKWiX5yQ7Ow+2cr9O2vBE2TwLTHopIWgxxpHuouKOoKJjzDrlcVjRytOYmGuBcDAe7P8em3moHAlmEZUJgf4UE4u1J0C4IyT38NkOrSqR+HQ548uaxyFr5xT5ar/5uQrFoOyko55TLd2DuyaMw1qBmv/SXoOJ1C3z5G1Yph589Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713889436; c=relaxed/simple;
-	bh=3rE8iCzACJ3xQrQo2n7+k+pI9IyJWXmBfSTaEbZ8Wjc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=f5Q9jE2yRf4WcgE96Yp+pbnlQVj2erMo7imzg1QlcbZqAdt533LxNleT+2MfqeDsvKFXXL1UFfz9VCZKhyMf7HJhtg8xQ3OPRo0CUaLFjMEuRvssQrnqyCKwKvDyiYzaJ2uYeiFVEcp7isn9hzxOZNzQbMmCC+7Id10awOy+VqI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=nThVN82K; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 801D2C116B1;
-	Tue, 23 Apr 2024 16:23:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1713889435;
-	bh=3rE8iCzACJ3xQrQo2n7+k+pI9IyJWXmBfSTaEbZ8Wjc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=nThVN82Kxi0XgxvS273sJ4SetvM8MeSKZouTlFVsenVzlc1/VrdZZgIJrVhWcdZmX
-	 5WhQ51oV4EBJq/gZUbuesH0JENAYYo+IuK0cCGG8r+whTh4eAIrs7PlS9jlzZrUB8c
-	 nq3oGE4gtw/xO/KFmMH7+7ybYSTvHxN6zEKd8Bqo=
-Date: Tue, 23 Apr 2024 09:23:46 -0700
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: =?iso-8859-1?B?Suly9G1l?= Carretero <cJ-ko@zougloub.eu>
-Cc: Sasha Neftin <sasha.neftin@intel.com>, netdev@vger.kernel.org,
-	intel-wired-lan@lists.osuosl.org, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [Intel-wired-lan] [BUG] e1000e, scheduling while atomic (stable)
-Message-ID: <2024042328-footprint-enrage-2db3@gregkh>
-References: <a7eb665c74b5efb5140e6979759ed243072cb24a.camel@zougloub.eu>
- <dff8729b-3ab6-4b54-a3b0-60fabf031d62@intel.com>
- <2259bbeb9a012548779e3bf09a393fdb7d62dd0c.camel@zougloub.eu>
+	s=arc-20240116; t=1713889567; c=relaxed/simple;
+	bh=nx7ksgUQaGN0EY1GfAjq1Qx4E1C02KxqvhGIJ2PtKp0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=N9MlS1R1QaoM4PV9vyF65esWCvUQPbET1FX/Zco1rtjyiXF3RegeCJGNFI4VltbUnsU2nrI2Y25J4bgGIPZy6pdlONRpg1Ckqb+oBaL7ojz2pxQoW+kh0KKzQwPxLVPfwjX/LPQ3IpXplUqFyugbr7Pljdtvivmwz1hXoR+qabA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=Wy1Y85zC; arc=none smtp.client-ip=193.104.135.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
+Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
+	by mail1.fiberby.net (Postfix) with ESMTPSA id 78369600A7;
+	Tue, 23 Apr 2024 16:25:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
+	s=202008; t=1713889560;
+	bh=nx7ksgUQaGN0EY1GfAjq1Qx4E1C02KxqvhGIJ2PtKp0=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=Wy1Y85zCl8qjZwviFxUVjPwGHAzszgP07LuhfP0ILoq2zTbtXwMY8pUCeak4rheIZ
+	 5SOWaA3EWeRE12awTASNBViXK2v201N83EGXFsjakP4SLpYdBJX0gdqedCpF91ycqt
+	 ZfpZ91W1zB5mTVCDd4aEGqtnrB1NL/eSbi3PoJG5IO+IfsiO1vAAGJ2KTS0it6X4ZV
+	 aBjeWoxzhl3vHnwFPhdjxRV7oVIzw7vs+bb8OBdoMkO6dg6Bc/0KDXFlxLt3lHuWMk
+	 Cux21icq9SurCdgOjNlii+NFq2W24fIKkNzJZspIYTlXXYb3JygX4Kt/3XDsZKew9j
+	 XABlU82rJUjQw==
+Received: from [127.0.0.1] (localhost [127.0.0.1])
+	by x201s (Postfix) with ESMTP id 9C6CD202787;
+	Tue, 23 Apr 2024 16:25:53 +0000 (UTC)
+Message-ID: <8e112b31-0168-4e82-a378-87211ea99cfa@fiberby.net>
+Date: Tue, 23 Apr 2024 16:25:53 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 1/2] net: sparx5: flower: cleanup
+ sparx5_tc_flower_handler_control_usage()
+To: Daniel Machon <daniel.machon@microchip.com>
+Cc: netdev@vger.kernel.org, Steen Hegelund <Steen.Hegelund@microchip.com>,
+ Lars Povlsen <lars.povlsen@microchip.com>, UNGLinuxDriver@microchip.com,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ linux-kernel@vger.kernel.org, Jacob Keller <jacob.e.keller@intel.com>
+References: <20240423102728.228765-1-ast@fiberby.net>
+ <20240423111515.wzvclnlxdwv77zy7@DEN-DL-M70577>
+Content-Language: en-US
+From: =?UTF-8?Q?Asbj=C3=B8rn_Sloth_T=C3=B8nnesen?= <ast@fiberby.net>
+In-Reply-To: <20240423111515.wzvclnlxdwv77zy7@DEN-DL-M70577>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <2259bbeb9a012548779e3bf09a393fdb7d62dd0c.camel@zougloub.eu>
 
-On Fri, Apr 19, 2024 at 12:20:05PM -0400, J�r�me Carretero wrote:
-> Hi Sasha,
+Hi Daniel,
+
+Thank you for the review.
+
+On 4/23/24 11:15 AM, Daniel Machon wrote:
+> Hi Asbjørn,
 > 
+> Thank you for your patch!
 > 
-> Thank you, sorry for the delay but I coudln't reboot.
+>> Define extack locally, to reduce line lengths and future users.
+>>
+>> Only perform fragment handling, when at least one fragment flag is set.
+>>
+>> Remove goto, as it's only used once, and the error message is specific
+>> to that context.
+>>
+>> Only compile tested.
+>>
+>> Signed-off-by: Asbjørn Sloth Tønnesen <ast@fiberby.net>
+>> ---
+>>   .../ethernet/microchip/sparx5/sparx5_tc_flower.c    | 13 ++++++-------
+>>   1 file changed, 6 insertions(+), 7 deletions(-)
+>>
+>> diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_tc_flower.c b/drivers/net/ethernet/microchip/sparx5/sparx5_tc_flower.c
+>> index 663571fe7b2d..d846edd77a01 100644
+>> --- a/drivers/net/ethernet/microchip/sparx5/sparx5_tc_flower.c
+>> +++ b/drivers/net/ethernet/microchip/sparx5/sparx5_tc_flower.c
+>> @@ -159,13 +159,14 @@ sparx5_tc_flower_handler_basic_usage(struct vcap_tc_flower_parse_usage *st)
+>>   static int
+>>   sparx5_tc_flower_handler_control_usage(struct vcap_tc_flower_parse_usage *st)
+>>   {
+>> +       struct netlink_ext_ack *extack = st->fco->common.extack;
 > 
-> Adding Greg KH because I don't know if stable will receive my e-mail
-> (not subscribed) but the regression was integrated in stable:
->  commit 0a4e3c2d976aa4dd38951afd6267f74ef3fade0e
-> so they should get the fix ASAP too.
+> Could you please update the use of extack in all places inside this
+> function. You are missing one place.
 
-The fix needs to show up in Linus's tree, is it on its way there?
+Good catch, sure. It must have got lost somewhere along the way. I deliberately kept it out
+of the net patch, since it could wait for net-next.
 
-thanks,
 
-greg k-h
+>>          struct flow_match_control mt;
+>>          u32 value, mask;
+>>          int err = 0;
+>>
+>>          flow_rule_match_control(st->frule, &mt);
+>>
+>> -       if (mt.mask->flags) {
+>> +       if (mt.mask->flags & (FLOW_DIS_IS_FRAGMENT | FLOW_DIS_FIRST_FRAG)) {
+> 
+> Since these flags are used here and in the next patch, maybe assign them
+> to a variable:
+> 
+> u32 supp_flags = FLOW_DIS_IS_FRAGMENT | FLOW_DIS_FIRST_FRAG
+> 
+> And update the use throughout.
+
+In an earlier state this patch had a #define SPARX5_FLOWER_SUPPORTED_CTLFLAGS,
+in the same style as nfp in drivers/net/ethernet/netronome/nfp/flower/offload.c
+
+Right now, this driver supports all currently defined flags (which are used with mask),
+so the point of using flow_rule_is_supp_control_flags() to this dirver, is to
+make it possible to introduce new flags in the future, without having to update
+all drivers to explicitly not support a new flag.
+
+My problem with using supp_flags in both places is: What happens when support
+for a new flag is introduced?
+
+u32 supp_flags = FLOW_DIS_IS_FRAGMENT | FLOW_DIS_FIRST_FRAG | FLOW_DIS_NEW_FLAG;
+
+if (mt.mask->flags & (FLOW_DIS_IS_FRAGMENT | FLOW_DIS_FIRST_FRAG))
+         /* handle fragment flags through lookup table */
+
+if (mt.mask->flags & FLOW_DIS_NEW_FLAG)
+         /* do something */
+
+if (!flow_rule_is_supp_control_flags(supp_flags, mt.mask->flags, extack))
+         return -EOPNOTSUPP;
+
+The fragment lookup table code currently requires the above guarding,
+as [0][0] in the lookup table is FRAG_INVAL, and not FRAG_SHRUG.
+
+What do you think?
+
+-- 
+Best regards
+Asbjørn Sloth Tønnesen
+Network Engineer
+Fiberby - AS42541
 
