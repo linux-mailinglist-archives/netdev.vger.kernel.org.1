@@ -1,134 +1,124 @@
-Return-Path: <netdev+bounces-90534-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90535-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4FE998AE6E6
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 14:50:27 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 842948AE6EE
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 14:50:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9F69FB23188
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 12:50:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2563E1F231D3
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 12:50:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B17A5127E12;
-	Tue, 23 Apr 2024 12:49:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D63AC1332AC;
+	Tue, 23 Apr 2024 12:49:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="gMqIsohm"
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="f3qLH8hl"
 X-Original-To: netdev@vger.kernel.org
-Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E46427E765
-	for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 12:49:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C0FD130E5B;
+	Tue, 23 Apr 2024 12:49:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713876546; cv=none; b=CzRu9DCu3h/95majB8C+5CnYHlWkq3PuJaBUBqNAVq0PtLESfzCjkvGGCXHi9JUd+GjO4w6Jenzz9glnK+JxkLIVu7RdLqIUuKFcsP1EgiIRX6mUv1AUJ/CN/LwfDD8PX8+agG2zjvMmTeSD1Vb/sdFxFtc2pYmgY1yfVUJu3j0=
+	t=1713876567; cv=none; b=qoCHst8zlRGNu8MRjPsdQ9roIeLfcSGHoANQm3kaPjZeNWAggHBG0QRnauzg6LmISzg6BISbLUkWhj5kGuXjmN6sEcQVmMCIQQ4ISkp6Cmzm4REekbYH7FVd/Pc3aaSwvtwAHeHRLu5ZmoZxb9wDSKfeq6mIb5J6QAF6MbBtZjM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713876546; c=relaxed/simple;
-	bh=PEaHPyRWdC2vlCZldOD6tTtUMOeM14ID4vQm6qq6+Ao=;
-	h=Date:From:To:CC:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=ULpkce0UgP0N4O9vJA1fMehWh47if+ZETcuXF5gkkXdNVO/c/guo5Mq85sbh/5xlCEm8Ne61H3vQGOjfVNi6+ao6Ys+FdhTB0C+Lxg4YC4kviEzgYEoEfuNPo6DRQN2ir3y/b4NG5TQhFyiIMEGBM/WEVZYXs4jRpvyTcyE8sks=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=gMqIsohm; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id 3A752207D8;
-	Tue, 23 Apr 2024 14:48:56 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from a.mx.secunet.com ([127.0.0.1])
-	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id HJmZ5eFXd-Y6; Tue, 23 Apr 2024 14:48:55 +0200 (CEST)
-Received: from mailout2.secunet.com (mailout2.secunet.com [62.96.220.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	s=arc-20240116; t=1713876567; c=relaxed/simple;
+	bh=oM/QClw0lexR1wRtj45iY1WsJDpcigmQopGhpEoonR8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=TYpbPsN2Tbwa03jZxqjiKNMqFleC7EPeAMgFCx+0kzUmYTlPcL9iqBh2ruH140aoXDVmecPU06sQbvTUGUWAYRd0DEz9Yvzf6vhQLdclOzTh8gBL9IDkuK5rXViY9awD1CGbVdB0TmWRww+5btIRYOW6AzGh2NkzdWuJxKeCR3Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=f3qLH8hl; arc=none smtp.client-ip=85.214.62.61
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Received: from localhost.localdomain (85-222-111-42.dynamic.chello.pl [85.222.111.42])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
 	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id AB055207D5;
-	Tue, 23 Apr 2024 14:48:55 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com AB055207D5
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1713876535;
-	bh=sJpAz3ZL12uPhh2YJMujiNka98ma11ETIjxh5z0cHn4=;
-	h=Date:From:To:CC:Subject:Reply-To:From;
-	b=gMqIsohm1IyaupZHwp6K2LHJjoZtWLVqBugBwnFrPgZq9YeHH5X9zOwUs5pX/j/C+
-	 TfBb1lxEEVxovbqL93S+M/defNLvarCL9XpRdSdJLrYQHoVeK8Jl8tvESwIvozkm9v
-	 FXFqlY/gL7yG1T1oypfMAydM94IyGmF/UTt31iZWxtJSIYlf9FCXW6LYr03jXqZ1a7
-	 CXm9qmZnSfpXHGd3kxRj+GvVz3xl0+PJbLvOeEUcyrdSWO+GXOS/VW3RQd7yVUcqwM
-	 1h11ljwnuzQrmJdBO7TRI1+NQCfibLU5TWFUq/95DBeRxv3skiQV1IE9zpMLt7tGxU
-	 gFD0B5oRKYIwQ==
-Received: from cas-essen-02.secunet.de (unknown [10.53.40.202])
-	by mailout2.secunet.com (Postfix) with ESMTP id 9D9AA80004A;
-	Tue, 23 Apr 2024 14:48:55 +0200 (CEST)
-Received: from mbx-essen-01.secunet.de (10.53.40.197) by
- cas-essen-02.secunet.de (10.53.40.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 23 Apr 2024 14:48:55 +0200
-Received: from moon.secunet.de (172.18.149.1) by mbx-essen-01.secunet.de
- (10.53.40.197) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.37; Tue, 23 Apr
- 2024 14:48:55 +0200
-Date: Tue, 23 Apr 2024 14:48:48 +0200
-From: Antony Antony <antony.antony@secunet.com>
-To: Steffen Klassert <steffen.klassert@secunet.com>, Herbert Xu
-	<herbert@gondor.apana.org.au>, <netdev@vger.kernel.org>
-CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, <devel@linux-ipsec.org>, Leon Romanovsky
-	<leon@kernel.org>, Eyal Birger <eyal.birger@gmail.com>, Nicolas Dichtel
-	<nicolas.dichtel@6wind.com>, Sabrina Dubroca <sd@queasysnail.net>
-Subject: [PATCH ipsec-next v12 0/4] xfrm: Introduce direction attribute for SA
-Message-ID: <cover.1713874887.git.antony.antony@secunet.com>
-Reply-To: <antony.antony@secunet.com>
+	(Authenticated sender: lukma@denx.de)
+	by phobos.denx.de (Postfix) with ESMTPSA id 90B1C88371;
+	Tue, 23 Apr 2024 14:49:21 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+	s=phobos-20191101; t=1713876563;
+	bh=uMJafPMhykroFDvF8uV6g/GGANywMwLnnHnVCVXHuiI=;
+	h=From:To:Cc:Subject:Date:From;
+	b=f3qLH8hldPTSc+kj/7KNmqs0Yk8q7qRO3mJ0Z13M+axQuNBLNxAxPFLO16L6ffA2m
+	 WJobjHCIka3nMbzvnVmRSUsfVTUbqJEdkNv5ed4MVkCttqQnbRY7H2Opsi8aFWdo3b
+	 kj2HxUIODJQS4iWaS+5LSybssGHdqn68vb22CcV7Vp5rtqdDPU6+tjGi8Ro3zWp7XG
+	 MzIVzR/cDEcDe6HpdBOuFSb7DD+uFCSyaf61EABbWoUyNqEIQIgMy/pyh4OTV/kno4
+	 nEdXqABKnTUzoAeg37DgvZIvFP4BbvDYfjndlO416udtii/kV9xGvDb1EYDweeGwlX
+	 ZmZ6u+Bo26+fQ==
+From: Lukasz Majewski <lukma@denx.de>
+To: netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	Casper Andersson <casper.casan@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	Tristram.Ha@microchip.com,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Ravi Gunasekaran <r-gunasekaran@ti.com>,
+	Simon Horman <horms@kernel.org>,
+	Nikita Zhandarovich <n.zhandarovich@fintech.ru>,
+	Murali Karicheri <m-karicheri2@ti.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Dan Carpenter <dan.carpenter@linaro.org>,
+	Ziyang Xuan <william.xuanziyang@huawei.com>,
+	Shigeru Yoshida <syoshida@redhat.com>,
+	"Ricardo B. Marliere" <ricardo@marliere.net>,
+	linux-kernel@vger.kernel.org,
+	Lukasz Majewski <lukma@denx.de>
+Subject: [net-next PATCH v6 0/5] net: hsr: Add support for HSR-SAN (RedBOX)
+Date: Tue, 23 Apr 2024 14:49:03 +0200
+Message-Id: <20240423124908.2073400-1-lukma@denx.de>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-Precedence: first-class
-Priority: normal
-Organization: secunet
-X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
- mbx-essen-01.secunet.de (10.53.40.197)
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
 
-Hi,
+This patch set provides v6 of HSR-SAN (RedBOX) as well as hsr_redbox.sh
+test script.
 
-Inspired by the upcoming IP-TFS patch set, and confusions experienced in
-the past due to lack of direction attribute on SAs, add a new direction
-"dir" attribute. It aims to streamline the SA configuration process and
-enhance the clarity of existing SA attributes.
+The most straightforward way to test those patches is to use buildroot
+(2024.02.01) to create rootfs and QEMU based environment to run x86_64
+Linux.
 
-This patch set introduces the 'dir' attribute to SA, aka xfrm_state,
-('in' for input or 'out' for output). Alsp add validations of existing
-direction-specific SA attributes during configuration and in the data
-path lookup.
+Then one shall run hsr_redbox.sh and hsr_ping.sh from
+tools/testing/selftests/net/hsr.
 
-This change would not affect any existing use case or way of configuring
-SA. You will notice improvements when the new 'dir' attribute is set.
+Lukasz Majewski (5):
+  net: hsr: Provide RedBox support (HSR-SAN)
+  test: hsr: Remove script code already implemented in lib.sh
+  test: hsr: Move common code to hsr_common.sh file
+  test: hsr: Extract version agnostic information from ping command
+    output
+  test: hsr: Add test for HSR RedBOX (HSR-SAN) mode of operation
 
-Antony Antony (4):
-  xfrm: Add Direction to the SA in or out
-  xfrm: Add dir validation to "out" data path lookup
-  xfrm: Add dir validation to "in" data path lookup
-  xfrm: Restrict SA direction attribute to specific netlink message
-    types
+ include/uapi/linux/if_link.h                  |   1 +
+ net/hsr/hsr_device.c                          |  36 +++++-
+ net/hsr/hsr_device.h                          |   4 +-
+ net/hsr/hsr_forward.c                         |  85 ++++++++++++--
+ net/hsr/hsr_framereg.c                        |  52 +++++++++
+ net/hsr/hsr_framereg.h                        |   4 +
+ net/hsr/hsr_main.h                            |   7 ++
+ net/hsr/hsr_netlink.c                         |  30 ++++-
+ net/hsr/hsr_slave.c                           |   1 +
+ tools/testing/selftests/net/hsr/Makefile      |   3 +-
+ tools/testing/selftests/net/hsr/hsr_common.sh |  84 ++++++++++++++
+ tools/testing/selftests/net/hsr/hsr_ping.sh   | 106 +-----------------
+ tools/testing/selftests/net/hsr/hsr_redbox.sh |  92 +++++++++++++++
+ 13 files changed, 387 insertions(+), 118 deletions(-)
+ create mode 100644 tools/testing/selftests/net/hsr/hsr_common.sh
+ create mode 100755 tools/testing/selftests/net/hsr/hsr_redbox.sh
 
- Documentation/networking/xfrm_proc.rst |   6 +
- include/net/xfrm.h                     |   1 +
- include/uapi/linux/snmp.h              |   2 +
- include/uapi/linux/xfrm.h              |   6 +
- net/ipv6/xfrm6_input.c                 |   7 ++
- net/xfrm/xfrm_compat.c                 |   7 +-
- net/xfrm/xfrm_device.c                 |   6 +
- net/xfrm/xfrm_input.c                  |  11 ++
- net/xfrm/xfrm_policy.c                 |   6 +
- net/xfrm/xfrm_proc.c                   |   2 +
- net/xfrm/xfrm_replay.c                 |   3 +-
- net/xfrm/xfrm_state.c                  |   5 +
- net/xfrm/xfrm_user.c                   | 149 ++++++++++++++++++++++++-
- 13 files changed, 202 insertions(+), 9 deletions(-)
-
---
-2.30.2
+-- 
+2.20.1
 
 
