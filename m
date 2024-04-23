@@ -1,121 +1,122 @@
-Return-Path: <netdev+bounces-90593-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90594-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39AA48AE9A0
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 16:35:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B70C8AE9B0
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 16:41:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E9CA6281E0F
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 14:35:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4CD241C235E6
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 14:41:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70BE21F959;
-	Tue, 23 Apr 2024 14:35:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1815B13B2AC;
+	Tue, 23 Apr 2024 14:41:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Sob+d08f"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RgF08P3u"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E153719470
-	for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 14:35:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A104E651AB;
+	Tue, 23 Apr 2024 14:41:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713882907; cv=none; b=VQGmTIoA7SdLu1iPD3bOHgf+JAnlwQPh/0jCTX9ioyL4kHHjomdhLAIDzud4Dgmy3VKoG/PVmBzivMu0qeiFOfIuhHhL6rR3RePEOXdCXPCvETYU4nOL/zYIman2WK6WG3dytU3/hsMwcQQuTfyGZqP5AkJSGGmJzzVaGbix2qo=
+	t=1713883277; cv=none; b=osuCcYKPmukLSEyS7OOyCI3rGXv1UwE+16MnOZDhTrlkRtad5Z2sYWxY8vy7c5OjKwBYuIsWihL3w7pLfBjcGs5nzebJlsgU+iZR+Pg+iXtMQLjJhjZ8W9LOXqgrWLeMST4DVq46Mw24YYoc0Dj1dDhPnqlvwjE+FCliXSYT+yw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713882907; c=relaxed/simple;
-	bh=JJeDsjTN75HCqhlyAhfBJzYPhMpKfc9FiSlj9/utqQ8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=G8pD8yTZHUmD/+EUA5P0AkrdRI5PiVXie9zOzJRvcP8nJd2Yq3Ys1X7S0AZ1sBtY5EAtBm5CsJ6uNyfbdzwbsuMUIvAZTwdrnFApmrR+vS1gTWxvRFO0MIElajCxI2gaLBeXzIbHSbvIIKcWo7/+lI9Z/vJXeBEZFCKUQGNAi2Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Sob+d08f; arc=none smtp.client-ip=192.198.163.10
+	s=arc-20240116; t=1713883277; c=relaxed/simple;
+	bh=JmDbnp7jB3iYKQ7kmrwc2e3Fj/aFyXr9ucUALcAe+xo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=EyfflGBz2sJdOdYLuXTJtFTckpKOnbiN7FoUtVTtxiSW+ZVUPiUz+R12y7zegJ6y/sCA2TMs31U9pQDTwCJuZd6R7JMMCkuEPkJ7obG46jcVhTWmljn1uo47+J77Zp44nrXSJ9gbZFS3eGCzMoBIXyEfg1N9+7sxUO8MJ3D3k9k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RgF08P3u; arc=none smtp.client-ip=192.198.163.13
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1713882906; x=1745418906;
+  t=1713883275; x=1745419275;
   h=from:to:cc:subject:date:message-id:mime-version:
    content-transfer-encoding;
-  bh=JJeDsjTN75HCqhlyAhfBJzYPhMpKfc9FiSlj9/utqQ8=;
-  b=Sob+d08fETF2+kpWsTIjvm9TV5TQEIk9H8qkgvB8AXiRCBpCUP+0+340
-   U5koAe75Erx2WFer424gk86gQqfwzoo6fiCg1oA2HJyTslTVv41PLYkKS
-   nS1OoXElDR0rTAswNFL9UDh8YndupqAUQXyBcX6UY/p5XojdiJpXWJiGU
-   Re7ZOOXYXIXlivk62tHyTc7wK+SazykSmluykb0G+J5VRbPqyPFO7yFYr
-   IPgzhgSkHIyAgF77RXR60cIGDQLbH4ANZWYvPdcgqXR/oLhrcbzXqNbxa
-   bitmQkoK8RS+XDpAut7a/AhA0V6o+XUXynm3dEpfjfyoE90lGX08m70S1
-   w==;
-X-CSE-ConnectionGUID: IbP5VR/ZTNa9DUBPRW8u7Q==
-X-CSE-MsgGUID: UUruH0pRRYGRyhi+3rkiyA==
-X-IronPort-AV: E=McAfee;i="6600,9927,11053"; a="20870920"
+  bh=JmDbnp7jB3iYKQ7kmrwc2e3Fj/aFyXr9ucUALcAe+xo=;
+  b=RgF08P3uVipErfhiQtXZCzHb3bcjMx0GBAqaOF/AQjBKlB9SB6uH4heI
+   ngpkEds90JLkNBTvQXPUtjrZxn7Lg17qD4eO+Q/l1Zt6+RIqLcSyh9z96
+   L5us0bqSjqnUIs0wCnihjeTE/4K5vzTBuBK4bAN6Ji0gEvQOSAC2JD64l
+   MgRqZlNbuwIvfraqtA9JGOT38TnCjBm19pxMKEvsqBVSNREjgJbLMYCka
+   sGVUe1zcN9NALd6OjyNC64QA6pUn5j1beOGGVJUWlWJWGyotF8m+Y6Z21
+   bP6qZuK9x4o0pPHhXCQejamx35mnGHHcleBEOo+B7TXbMZHH+QJLD2H2K
+   Q==;
+X-CSE-ConnectionGUID: 6BxdYX0SRjehPg0LDYhfaw==
+X-CSE-MsgGUID: UKLdfLL/TJOJucVC5DHaWw==
+X-IronPort-AV: E=McAfee;i="6600,9927,11053"; a="12402889"
 X-IronPort-AV: E=Sophos;i="6.07,222,1708416000"; 
-   d="scan'208";a="20870920"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2024 07:35:01 -0700
-X-CSE-ConnectionGUID: dqkM8oChRHmUNfCdjg8Ofg==
-X-CSE-MsgGUID: 1a3IM4mjQA6lAwjOa+VG+A==
+   d="scan'208";a="12402889"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2024 07:41:14 -0700
+X-CSE-ConnectionGUID: 7l8+2zYiQMSa5rnSI9HzpQ==
+X-CSE-MsgGUID: e57XYyf+SfOQ1IIN3xF25w==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,222,1708416000"; 
-   d="scan'208";a="24843324"
-Received: from irvmail002.ir.intel.com ([10.43.11.120])
-  by orviesa006.jf.intel.com with ESMTP; 23 Apr 2024 07:34:59 -0700
-Received: from mystra-4.igk.intel.com (mystra-4.igk.intel.com [10.123.220.40])
-	by irvmail002.ir.intel.com (Postfix) with ESMTP id C2DE3332BD;
-	Tue, 23 Apr 2024 15:34:51 +0100 (IST)
-From: Marcin Szycik <marcin.szycik@linux.intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
-	Wojciech Drewek <wojciech.drewek@intel.com>,
-	Marcin Szycik <marcin.szycik@linux.intel.com>
-Subject: [PATCH iwl-next] ice: remove correct filters during eswitch release
-Date: Tue, 23 Apr 2024 16:36:32 +0200
-Message-ID: <20240423143632.45086-1-marcin.szycik@linux.intel.com>
-X-Mailer: git-send-email 2.41.0
+   d="scan'208";a="24260682"
+Received: from ijarvine-desk1.ger.corp.intel.com (HELO localhost) ([10.245.247.40])
+  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2024 07:41:11 -0700
+From: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
+To: Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
+Subject: [PATCH 1/1] net: e1000e & ixgbe: Remove PCI_HEADER_TYPE_MFD duplicates
+Date: Tue, 23 Apr 2024 17:40:59 +0300
+Message-Id: <20240423144100.76522-1-ilpo.jarvinen@linux.intel.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+PCI_HEADER_TYPE_MULTIFUNC is define by e1000e and ixgbe and both are
+unused. There is already PCI_HEADER_TYPE_MFD in pci_regs.h anyway which
+should be used instead so remove the duplicated defines of it.
 
-ice_clear_dflt_vsi() is only removing default rule. Both default RX and
-TX rule should be removed during release.
-
-If it isn't switching to switchdev, second time results in error, because
-TX filter is already there.
-
-Fix it by removing the correct set of rules.
-
-Fixes: 50d62022f455 ("ice: default Tx rule instead of to queue")
-Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
-Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Signed-off-by: Marcin Szycik <marcin.szycik@linux.intel.com>
+Signed-off-by: Ilpo Järvinen <ilpo.jarvinen@linux.intel.com>
 ---
-It is targetting iwl-next with fix, because the broken patch isn't yet
-in net repo.
----
- drivers/net/ethernet/intel/ice/ice_eswitch.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ drivers/net/ethernet/intel/e1000e/defines.h   | 2 --
+ drivers/net/ethernet/intel/ixgbe/ixgbe_type.h | 1 -
+ 2 files changed, 3 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_eswitch.c b/drivers/net/ethernet/intel/ice/ice_eswitch.c
-index c902848cf88e..b102db8b829a 100644
---- a/drivers/net/ethernet/intel/ice/ice_eswitch.c
-+++ b/drivers/net/ethernet/intel/ice/ice_eswitch.c
-@@ -246,7 +246,10 @@ static void ice_eswitch_release_env(struct ice_pf *pf)
- 	ice_vsi_update_local_lb(uplink_vsi, false);
- 	ice_vsi_update_security(uplink_vsi, ice_vsi_ctx_clear_allow_override);
- 	vlan_ops->ena_rx_filtering(uplink_vsi);
--	ice_clear_dflt_vsi(uplink_vsi);
-+	ice_cfg_dflt_vsi(uplink_vsi->port_info, uplink_vsi->idx, false,
-+			 ICE_FLTR_TX);
-+	ice_cfg_dflt_vsi(uplink_vsi->port_info, uplink_vsi->idx, false,
-+			 ICE_FLTR_RX);
- 	ice_fltr_add_mac_and_broadcast(uplink_vsi,
- 				       uplink_vsi->port_info->mac.perm_addr,
- 				       ICE_FWD_TO_VSI);
+diff --git a/drivers/net/ethernet/intel/e1000e/defines.h b/drivers/net/ethernet/intel/e1000e/defines.h
+index 23a58cada43a..5e2cfa73f889 100644
+--- a/drivers/net/ethernet/intel/e1000e/defines.h
++++ b/drivers/net/ethernet/intel/e1000e/defines.h
+@@ -679,8 +679,6 @@
+ /* PCI/PCI-X/PCI-EX Config space */
+ #define PCI_HEADER_TYPE_REGISTER     0x0E
+ 
+-#define PCI_HEADER_TYPE_MULTIFUNC    0x80
+-
+ #define PHY_REVISION_MASK      0xFFFFFFF0
+ #define MAX_PHY_REG_ADDRESS    0x1F  /* 5 bit address bus (0-0x1F) */
+ #define MAX_PHY_MULTI_PAGE_REG 0xF
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h b/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h
+index ed440dd0c4f9..897fe357b65b 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h
+@@ -2179,7 +2179,6 @@ enum {
+ #define IXGBE_PCI_LINK_SPEED_5000 0x2
+ #define IXGBE_PCI_LINK_SPEED_8000 0x3
+ #define IXGBE_PCI_HEADER_TYPE_REGISTER  0x0E
+-#define IXGBE_PCI_HEADER_TYPE_MULTIFUNC 0x80
+ #define IXGBE_PCI_DEVICE_CONTROL2_16ms  0x0005
+ 
+ #define IXGBE_PCIDEVCTRL2_TIMEO_MASK	0xf
 -- 
-2.41.0
+2.39.2
 
 
