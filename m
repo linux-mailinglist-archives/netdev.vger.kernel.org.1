@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-90505-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90506-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF3C28AE4FA
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 13:54:41 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1ECD68AE511
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 13:56:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AAF7E287B45
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 11:54:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5DED4B25891
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 11:56:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 288CC14883E;
-	Tue, 23 Apr 2024 11:41:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F33E14A081;
+	Tue, 23 Apr 2024 11:41:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="diWhzlFy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qZ2LD6bc"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F27D414883C;
-	Tue, 23 Apr 2024 11:41:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55655149E17;
+	Tue, 23 Apr 2024 11:41:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713872504; cv=none; b=MG7rDEQ7E/UVZyRfWuRQVgJ7elo2BUkrs0fJOe8JgL7nGIPXGeFKH5sOoUwrZ5NzAs0SPOGJ7o5gPqOSKg+633zBnRFAXAVKnVlMtXJL+XyFWQI61e4+ddb/796Tns9/Foicg2PzaPIdzYV3Wo6I/0vVfMK0OaiHJvPhKuIcSFY=
+	t=1713872518; cv=none; b=o8R63/ltsZOrDOS2AgetSg1YjPHzp3Q6tiRR3ITBnz0jjXY+Jd3Wzre/b4vYuJUVs/Ik6NsRVG/016aICDPRjW2q+uOd1rxMjuEyMDAqGLztw0C9cKJIvtwxpelKsRUcgDu8ltWrA54Zmz5ukV1P1I99DxLWJRHI4G47+c6xqnI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713872504; c=relaxed/simple;
-	bh=2CXFvEBh+79qRy6bDr6kpfO2wkmH7cn0aOJtpV1LBEk=;
+	s=arc-20240116; t=1713872518; c=relaxed/simple;
+	bh=fr6j1s7ufqHS9KsK1ajTTv+Ql6ozOEUFzJ1s7NqUe6U=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=TLWWmrVZuWHxgJHTpT8o8MCST89slFncvZdmhQk226e0KnIj7BtnRfUbpGMZMjkMB8zkzS2mvHQAxO4JYJ7Ji0Yo1ijrYJyJ9ibcqBRfuLvM0/BV4Xa4bKj+u8xJerVe5af1LW9EMqusajOAYRgqGxqPLlfnBrrqqkLLNWFO2c4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=diWhzlFy; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A7FA5C116B1;
-	Tue, 23 Apr 2024 11:41:42 +0000 (UTC)
+	 MIME-Version; b=TPiy7LCU9ID7HNx3RLj/DMpCiIEwt56zZx+Yp3MeNceyg0XwiG6kzCyL0K2kFq9pNPo3L1V5L21VfqbM00xS014fN+XNdMOkY0LwW5recJuroVebO0QpqTx5kFNjT9vAFpzVBlHwNOpULmoK1klgQZvggfVo3ZenMZk3QSgIyFY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qZ2LD6bc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A20D6C32783;
+	Tue, 23 Apr 2024 11:41:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713872503;
-	bh=2CXFvEBh+79qRy6bDr6kpfO2wkmH7cn0aOJtpV1LBEk=;
+	s=k20201202; t=1713872517;
+	bh=fr6j1s7ufqHS9KsK1ajTTv+Ql6ozOEUFzJ1s7NqUe6U=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=diWhzlFy5/ix5P/pfmWoU4jGRP50AWDn0+vIMObmYQGbgRym0C8PuErK+tTzBfR/C
-	 0RzMttUDMll9dUQOyGtgSGpvr8wGZ3lzOt61TR5EjLtOJ8L3ubFMQXvQW6HOks1uv1
-	 cYYxBMAnkgX0WsXBxGMsTLZKNqY/y57JWia4ZArOXOkmkjnvSbSyDAzm0Gbwkt7HYk
-	 7b0fJsrikhz31DB0GwNMmmkrbxl3VCO/faTkAI6JIqzWaiBZJi4sX7Xxhl1kvZTHRV
-	 k8GK636iPQkKI75EdFcqX1oXjFz0+qV0W4Yn4lcoDGU1EdUBXQ5umwHXVRZWd38Jgj
-	 TEnMD4QlHrGZA==
+	b=qZ2LD6bcItfOZWHG00jXQMFDAp03jaL0C0e1pB5iergMj49E/cf1QbxKLXU3MFV0y
+	 94EdIbS19da4XGx6oNpIQzFThutdY6+cJJvrZx+jgvB1J7ujArO5kJ7TOvTOFoW+Qb
+	 EK76WdjudIY8ohhyuYP55emBkfB27Bm0tnLSIJmU5mxDmuepn6oy5PS4hW2FRTwIhx
+	 Iox9Ru5SlZmbJmTRbIaehtrGoooLUrFHEq9eL1TOQVE9H6g9jda4cD1x9ZROQC6bBs
+	 MMuCaTgQ/hso6BsJmAFxc7KB7i6bA3Yu/VZBpSwzosdika+eoJcfiKuM1RASmHQ7Zk
+	 wUh8UqA35mTOg==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -53,12 +53,12 @@ Cc: Vanillan Wang <vanillanwang@163.com>,
 	pabeni@redhat.com,
 	netdev@vger.kernel.org,
 	linux-usb@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.10 9/9] net:usb:qmi_wwan: support Rolling modules
-Date: Tue, 23 Apr 2024 07:02:47 -0400
-Message-ID: <20240423110249.1659263-9-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.4 8/8] net:usb:qmi_wwan: support Rolling modules
+Date: Tue, 23 Apr 2024 07:03:03 -0400
+Message-ID: <20240423110304.1659456-8-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240423110249.1659263-1-sashal@kernel.org>
-References: <20240423110249.1659263-1-sashal@kernel.org>
+In-Reply-To: <20240423110304.1659456-1-sashal@kernel.org>
+References: <20240423110304.1659456-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,7 +67,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 5.10.215
+X-stable-base: Linux 5.4.274
 Content-Transfer-Encoding: 8bit
 
 From: Vanillan Wang <vanillanwang@163.com>
@@ -121,10 +121,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 1 insertion(+)
 
 diff --git a/drivers/net/usb/qmi_wwan.c b/drivers/net/usb/qmi_wwan.c
-index 3d342908f57a0..be2761d0bcd91 100644
+index c2bd4abce6de5..1c48d3d9522ba 100644
 --- a/drivers/net/usb/qmi_wwan.c
 +++ b/drivers/net/usb/qmi_wwan.c
-@@ -1358,6 +1358,7 @@ static const struct usb_device_id products[] = {
+@@ -1380,6 +1380,7 @@ static const struct usb_device_id products[] = {
  	{QMI_FIXED_INTF(0x0489, 0xe0b5, 0)},	/* Foxconn T77W968 LTE with eSIM support*/
  	{QMI_FIXED_INTF(0x2692, 0x9025, 4)},    /* Cellient MPL200 (rebranded Qualcomm 05c6:9025) */
  	{QMI_QUIRK_SET_DTR(0x1546, 0x1342, 4)},	/* u-blox LARA-L6 */
