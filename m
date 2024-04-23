@@ -1,175 +1,109 @@
-Return-Path: <netdev+bounces-90393-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90396-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14B4C8AE004
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 10:43:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 80C698AE035
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 10:48:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C47CB283DFC
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 08:43:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B29391C2105C
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 08:48:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12B5C56443;
-	Tue, 23 Apr 2024 08:42:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="TqMEdO+K"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59E7E482FA;
+	Tue, 23 Apr 2024 08:48:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-101.freemail.mail.aliyun.com (out30-101.freemail.mail.aliyun.com [115.124.30.101])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A980456B65
-	for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 08:42:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E39C1E526
+	for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 08:48:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713861757; cv=none; b=vDHKOeCezAaqtcBsk8IVrEuRWOGI5YnkvDEems+1pYiXrCN0NL7qOBRFrAIS2aJGNBIXi2IOI2Q35MiKgiDC0zZbpJOkZe0Z3vRmMWkPaEt7KYjzmnYBVzj7DnqhF1AEq6jhpqtANzf4xNC8yu8RrC3H9szzyl+mvmCRkLLyzwg=
+	t=1713862119; cv=none; b=f+XpkUcrIuVPYXuiA0I3F6lgSVrzNo9ZL1qLfkmjy2kmH7NeqbP3DitLxxbiwWVM4whoOJzSyVP8W2MgWZksK+sEb/zJkZXXFI+YMB0fhbFS49v5zaUQ/JFurHXwftNmdWpud+DwWxTGLf0DFFjc8JcWOcED9nwl4cbOKejnSNo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713861757; c=relaxed/simple;
-	bh=TGYFaIai2Z0dam9L8nAVwO8TpywOklb2AgAye2mg+Xc=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Ao3V66mBFENeU9++IqUXmu961yDlleErjiCCTcbthSjSlewUQq3f9A3u3S9H2sbLrC66EAKp2hhtU2VrGtJxsa/77n3SHXtQNSGBv2jG3JKZaWNTsNDH0EFMf82eQ/90B3y40i5OrwbAPlE96I4vSbKuPUWQQbst6sPcMHOCJJ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=TqMEdO+K; arc=none smtp.client-ip=115.124.30.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1713861752; h=From:To:Subject:Date:Message-Id:MIME-Version;
-	bh=CZkfS1T+3iklRYyYG/M6nVAjZnl0ZNjEuysnrUnFU68=;
-	b=TqMEdO+Kf4fvYJyM7ucwimd2OHWBBmJ0RENV/Ijx0d0YaE7lvSSNIgyRffUkEKvVQvyqKTvWIS7TJ86wPthLl6/JvTn13nirgpdcjaRoTv+JO8UNhUH3tDyHmZ7xYcK4XgXbAobHhmdRjaeu2plFw/mZn8kOxyjNQXkEY0CXE9E=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R121e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045168;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=9;SR=0;TI=SMTPD_---0W58UuWL_1713861750;
-Received: from localhost(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0W58UuWL_1713861750)
-          by smtp.aliyun-inc.com;
-          Tue, 23 Apr 2024 16:42:31 +0800
-From: Heng Qi <hengqi@linux.alibaba.com>
-To: netdev@vger.kernel.org,
-	virtualization@lists.linux.dev
-Cc: "Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	s=arc-20240116; t=1713862119; c=relaxed/simple;
+	bh=g8zd7G7ZNAHafF2FAzyu3q4vLjerp9wEdhoccM4gm0A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LkZykBv44b2IMM8dz5LcWvJRnU70jDZdBWpNLA8xqTuBTSXmmzPsWr0lTFvcv5zqf3sWuc5HgM6kRGeO9LWKS5Phbuu0LwVaANWQW6K8STgtB0mGWC6WkppW1XIG47naphKLMDvAWPLFRqkB/0NMX9l8KMiokOcIphD1+aHhnOg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rzBpD-0007F0-V4; Tue, 23 Apr 2024 10:48:27 +0200
+Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rzBpB-00DrZr-S1; Tue, 23 Apr 2024 10:48:25 +0200
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rzBpB-009nsc-2V;
+	Tue, 23 Apr 2024 10:48:25 +0200
+Date: Tue, 23 Apr 2024 10:48:25 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: Jiri Pirko <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next 2/2] virtio_net: get init coalesce value when probe
-Date: Tue, 23 Apr 2024 16:42:26 +0800
-Message-Id: <20240423084226.25440-3-hengqi@linux.alibaba.com>
-X-Mailer: git-send-email 2.32.0.3.g01195cf9f
-In-Reply-To: <20240423084226.25440-1-hengqi@linux.alibaba.com>
-References: <20240423084226.25440-1-hengqi@linux.alibaba.com>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Kyle Swenson <kyle.swenson@est.tech>
+Subject: Re: [PATCH net-next v2 2/3] net: pse-pd: pse_core: Fix pse regulator
+ type
+Message-ID: <Zid12Z4hVQ7sThhT@pengutronix.de>
+References: <20240422-fix_poe-v2-0-e58325950f07@bootlin.com>
+ <20240422-fix_poe-v2-2-e58325950f07@bootlin.com>
+ <ZiZ7-n5q3COmPRx6@nanopsycho>
+ <20240422182030.34524046@kmaincent-XPS-13-7390>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240422182030.34524046@kmaincent-XPS-13-7390>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Currently, virtio-net lacks a way to obtain the default coalesce
-values of the device during the probe phase. That is, the device
-may have default experience values, but the user uses "ethtool -c"
-to query that the values are still 0.
+On Mon, Apr 22, 2024 at 06:20:30PM +0200, Kory Maincent wrote:
+> On Mon, 22 Apr 2024 17:02:18 +0200
+> Jiri Pirko <jiri@resnulli.us> wrote:
+> 
+> > Mon, Apr 22, 2024 at 03:35:47PM CEST, kory.maincent@bootlin.com wrote:
+> > >From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
+> > >
+> > >Clarify PSE regulator as voltage regulator, not current.
+> > >The PSE (Power Sourcing Equipment) regulator is defined as a voltage
+> > >regulator, maintaining fixed voltage while accommodating varying current.
+> > >
+> > >Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> > >Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>  
+> > 
+> > This looks like a fix. Can you provide "Fixes" tag please and perhaps
+> > send this to -net tree?
+> 
+> Indeed I should have used the Fixes tag.
+> The PoE patch series that introduce this issue is currently in net-next.
 
-Therefore, we reuse VIRTIO_NET_CTRL_NOTF_COAL_VQ_GET to complete the goal.
+With Fixes tag:
+Acked-by: Oleksij Rempel <o.rempel@pengutronix.de>
 
-Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
----
- drivers/net/virtio_net.c | 68 +++++++++++++++++++++++++++++++++++-----
- 1 file changed, 61 insertions(+), 7 deletions(-)
-
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index 3bc9b1e621db..fe0c15819dd3 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -4623,6 +4623,46 @@ static int virtnet_validate(struct virtio_device *vdev)
- 	return 0;
- }
- 
-+static int virtnet_get_coal_init_value(struct virtnet_info *vi,
-+				       u16 _vqn, bool is_tx)
-+{
-+	struct virtio_net_ctrl_coal *coal = &vi->ctrl->coal_vq.coal;
-+	__le16 *vqn = &vi->ctrl->coal_vq.vqn;
-+	struct scatterlist sgs_in, sgs_out;
-+	u32 usecs, pkts, i;
-+	bool ret;
-+
-+	*vqn = cpu_to_le16(_vqn);
-+
-+	sg_init_one(&sgs_out, vqn, sizeof(*vqn));
-+	sg_init_one(&sgs_in, coal, sizeof(*coal));
-+	ret = virtnet_send_command_reply(vi, VIRTIO_NET_CTRL_NOTF_COAL,
-+					 VIRTIO_NET_CTRL_NOTF_COAL_VQ_GET,
-+					 &sgs_out, &sgs_in);
-+	if (!ret)
-+		return ret;
-+
-+	usecs = le32_to_cpu(coal->max_usecs);
-+	pkts = le32_to_cpu(coal->max_packets);
-+	if (is_tx) {
-+		vi->intr_coal_tx.max_usecs = usecs;
-+		vi->intr_coal_tx.max_packets = pkts;
-+		for (i = 0; i < vi->max_queue_pairs; i++) {
-+			vi->sq[i].intr_coal.max_usecs = usecs;
-+			vi->sq[i].intr_coal.max_packets = pkts;
-+		}
-+	} else {
-+		vi->intr_coal_rx.max_usecs = usecs;
-+		vi->intr_coal_rx.max_packets = pkts;
-+		for (i = 0; i < vi->max_queue_pairs; i++) {
-+			vi->rq[i].intr_coal.max_usecs = usecs;
-+			vi->rq[i].intr_coal.max_packets = pkts;
-+		}
-+	}
-+
-+	return 0;
-+}
-+
- static bool virtnet_check_guest_gso(const struct virtnet_info *vi)
- {
- 	return virtio_has_feature(vi->vdev, VIRTIO_NET_F_GUEST_TSO4) ||
-@@ -4885,13 +4925,6 @@ static int virtnet_probe(struct virtio_device *vdev)
- 			vi->intr_coal_tx.max_packets = 0;
- 	}
- 
--	if (virtio_has_feature(vi->vdev, VIRTIO_NET_F_VQ_NOTF_COAL)) {
--		/* The reason is the same as VIRTIO_NET_F_NOTF_COAL. */
--		for (i = 0; i < vi->max_queue_pairs; i++)
--			if (vi->sq[i].napi.weight)
--				vi->sq[i].intr_coal.max_packets = 1;
--	}
--
- #ifdef CONFIG_SYSFS
- 	if (vi->mergeable_rx_bufs)
- 		dev->sysfs_rx_queue_group = &virtio_net_mrg_rx_group;
-@@ -4926,6 +4959,27 @@ static int virtnet_probe(struct virtio_device *vdev)
- 
- 	virtio_device_ready(vdev);
- 
-+	if (virtio_has_feature(vi->vdev, VIRTIO_NET_F_VQ_NOTF_COAL)) {
-+		/* The reason is the same as VIRTIO_NET_F_NOTF_COAL. */
-+		for (i = 0; i < vi->max_queue_pairs; i++)
-+			if (vi->sq[i].napi.weight)
-+				vi->sq[i].intr_coal.max_packets = 1;
-+
-+		/* The loop exits if the default value from any
-+		 * queue is successfully read.
-+		 */
-+		for (i = 0; i < vi->max_queue_pairs; i++) {
-+			err = virtnet_get_coal_init_value(vi, rxq2vq(i), false);
-+			if (!err)
-+				break;
-+		}
-+		for (i = 0; i < vi->max_queue_pairs; i++) {
-+			err = virtnet_get_coal_init_value(vi, txq2vq(i), true);
-+			if (!err)
-+				break;
-+		}
-+	}
-+
- 	_virtnet_set_queues(vi, vi->curr_queue_pairs);
- 
- 	/* a random MAC address has been assigned, notify the device.
 -- 
-2.32.0.3.g01195cf9f
-
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
