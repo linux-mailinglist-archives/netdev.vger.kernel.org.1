@@ -1,121 +1,165 @@
-Return-Path: <netdev+bounces-90473-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90475-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D12168AE39A
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 13:13:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AEDA18AE3A7
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 13:15:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 18272B231E3
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 11:13:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6AAC92829B8
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 11:15:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BD487E578;
-	Tue, 23 Apr 2024 11:12:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4C1B7CF25;
+	Tue, 23 Apr 2024 11:15:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="gkBB9/09"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="mlSiZK39"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74AEF7C09F
-	for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 11:12:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B95F76C61;
+	Tue, 23 Apr 2024 11:15:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713870772; cv=none; b=ZDcPH9rJtD89FocVaJMb6+RNlKeoLW4xh6h6rxpJ5Rj3ty3204rwWDUpUhGVVDd7a232Jz7VZK6I5NWpfVv8grKGYcb4SKZeokIuWHj/7PaPghGmJDSDbD0M72w5mmVv+uY601kuviMbR7qEcy0aZZ6isHs1tNi43QZxSKtAYxM=
+	t=1713870943; cv=none; b=fFHXbUlYOI70oc8iM4etmDxe9QQDUkGQuh6vujOMzaAuHkt/8T6iSBExi+gHsDraZ4GyR3tjhO/kqnoJSa51mFJkpo5CsEYNm1QO5BkinhXRaPrj8KbuAHYYJe+nYXp/Hsrvv3jBCf+FQn+Uu/ttkTBY8OwWOcjxRuHv7KJZLew=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713870772; c=relaxed/simple;
-	bh=WK4EztFBVAHg7eYRzkCerijhdminORv97CA/HPtekR0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Svph/Fc9w0jO3O3e5bL1xvLtIbeSJh6IVM68JKXXMH1xcOYzOUTTv8kTsOF7atjkxinZ3N/CQPMaKm6aiqMDM35oQZsjp/uYmrkD+hfypCkn/W+fi0zHiK83cue4vajWMFfR2ulkkTcDXhF3PLSnyDUfrNkQXF9Ess7Ob8KIYZE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=gkBB9/09; arc=none smtp.client-ip=209.85.218.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-a5224dfa9adso936470966b.0
-        for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 04:12:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1713870768; x=1714475568; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=1GbwA9AtFu4Yu/r6+eMwCiUFKh6Xn8xW9wVevaAyhDE=;
-        b=gkBB9/09VmOcjQeiyZJnWiz8KUF59wHyDdJVu8uIHybYWzikm3us1PYKBlsR62sT6f
-         TyuLhEWVd/ZM01OhqIpymd58GiWuC9QSINMaQGqKNaZ0PDtebqP032xWH/gC5bR/bdP8
-         mMtW/wxOGnUHvfMot9tqY9q0OY3hX1RKbvnfKw2LLKDnLfUaN0ZYEAmYSkm6TWFC3KjB
-         yZRjNqiOWSqBCsK3At3aJMmKPbGSazOBwdbSK+ygybKkseecdDKCZQ8z8wT2kiSIZJjz
-         rE7XxukzxxXgu16rdLRdzaknu3pzDtrAcbFmXnM8t4L7laEGN9TX88hzenifQf67fbqw
-         hH7Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713870768; x=1714475568;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1GbwA9AtFu4Yu/r6+eMwCiUFKh6Xn8xW9wVevaAyhDE=;
-        b=Dpnej4/ul1STz368lpJpTvsoDdoTkyrg4NyIpdEWWDZ5mSg/RE2s+fsA+DFNlUcj1F
-         to9kNeeyZX0iTzcUNrg5bCPwLKjTzaeyHa/GDCtB7m+6z0mXgM3jMW50Mi/h6X9oHkbN
-         PW5x9dcw+h8LdtFo46EnFTR0/aqG2dKPaRCEf49fKWy1ZgvFs+gXS/Lu5yFMvv9GMwXX
-         yhD0KD0Q0qmk7v5SDVTHacLjRgtWYVbLbEdUT+o0hfNtzgwVgEzm6IRVyAK2ZLGSuLNF
-         T3yJnS4eC3w8gLrFcMgzlmmsyhN8USrIeu5MHvsqq2/gY6o1G+ouIj35LpcSq4Az1TWE
-         5lIg==
-X-Forwarded-Encrypted: i=1; AJvYcCVzL/cpXw34ejRxWZc4hRiApZ/1GRaOG0BmDqOadDb8qWugAwvu+9b3n5prm88JvNKuniHlVB66xUx9RH2lcvoaO3ARGACJ
-X-Gm-Message-State: AOJu0YzY3sLu3+WDl3hSboc8wZrb02tETyWCYX0W15aPXSxtKWGqWly+
-	F34NG/n5WZofo3nJsPQBuhXmzc5Y3UxBNT87SNfruJ/gRlI2ZA/hLuT5Ngxhpas=
-X-Google-Smtp-Source: AGHT+IG+TtGWysDfdlawCem0S3HMY9EM/WsGwW7MbhgDMk8j9ZqeCViVLQ5g4hfRsmjhInG+O7du1A==
-X-Received: by 2002:a17:906:af79:b0:a58:8602:ffa1 with SMTP id os25-20020a170906af7900b00a588602ffa1mr351273ejb.19.1713870767677;
-        Tue, 23 Apr 2024 04:12:47 -0700 (PDT)
-Received: from [10.100.1.125] (ip.82.144.213.21.stat.volia.net. [82.144.213.21])
-        by smtp.gmail.com with ESMTPSA id t22-20020a1709063e5600b00a5209dc79c1sm7006898eji.146.2024.04.23.04.12.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 23 Apr 2024 04:12:47 -0700 (PDT)
-Message-ID: <b1fccc7c-3c9f-45e0-979f-f83dfc788613@blackwall.org>
-Date: Tue, 23 Apr 2024 14:12:44 +0300
+	s=arc-20240116; t=1713870943; c=relaxed/simple;
+	bh=baFMNWGyou+cGTsc/4yhjdBlXemDBb5oXUXZS+PgXNk=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KdrpN2ar1gdgg/ah63OJMj3rScPbaSwn4FdNdf+HDpEqke871U3ovH6CnxCBbSawyO3F2rL8pOl/GAzxnS/kUyr8jPE/ttNMtrqe92BmBSK2QR5MWhboIY/tqUsbY8Q3T1IoPX0cxEoNl1eK0pMyN3N/ZKyOyi6MOwDii7gP+Hs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=mlSiZK39; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1713870942; x=1745406942;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=baFMNWGyou+cGTsc/4yhjdBlXemDBb5oXUXZS+PgXNk=;
+  b=mlSiZK399cW+CJs9r9ED2niWPqJjSH3H1Ot/zvrcR4YvSa3Mo8E2tnZ6
+   Ab8lLwEHvH6K1vfRN/QHRY72oinrHQH/gEdt2GP6pWb5+/9UgcOaVfPfH
+   laU9IHUJXfZs7jijfmGP3EiraC3oE5aeovuzvu85i6KXgppedKYzLnY9S
+   KNXzIZY8OvNvL8UASPtsNhO9ULY7zYX73UjkRAJLKQyxvUG/C3gDpJKrJ
+   Aeza/aglYU2b1dFIWhDkpzMG6E0m/CUAxrUu+XNmG+Yi0JZGi5bQmYRyN
+   h5LXzuVlrgEiBJmuCtmOKrjE0LBpRAwPSNDIIW1S4SGGVjNYsI0kiOOQq
+   g==;
+X-CSE-ConnectionGUID: DdasAwANSf+S3v9cTxLjwg==
+X-CSE-MsgGUID: xhX+9NR7Q3Stoz0pADNDug==
+X-IronPort-AV: E=Sophos;i="6.07,222,1708412400"; 
+   d="scan'208";a="253077175"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 23 Apr 2024 04:15:41 -0700
+Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
+ chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Tue, 23 Apr 2024 04:15:17 -0700
+Received: from DEN-DL-M70577 (10.10.85.11) by chn-vm-ex03.mchp-main.com
+ (10.10.85.151) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
+ Transport; Tue, 23 Apr 2024 04:15:15 -0700
+Date: Tue, 23 Apr 2024 11:15:15 +0000
+From: Daniel Machon <daniel.machon@microchip.com>
+To: =?utf-8?Q?Asbj=C3=B8rn_Sloth_T=C3=B8nnesen?= <ast@fiberby.net>
+CC: <netdev@vger.kernel.org>, Steen Hegelund <Steen.Hegelund@microchip.com>,
+	Lars Povlsen <lars.povlsen@microchip.com>, <UNGLinuxDriver@microchip.com>,
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	<linux-kernel@vger.kernel.org>, Jacob Keller <jacob.e.keller@intel.com>
+Subject: Re: [PATCH net-next 1/2] net: sparx5: flower: cleanup
+ sparx5_tc_flower_handler_control_usage()
+Message-ID: <20240423111515.wzvclnlxdwv77zy7@DEN-DL-M70577>
+References: <20240423102728.228765-1-ast@fiberby.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: bridge: remove redundant check of f->dst
-Content-Language: en-US
-To: linke li <lilinke99@qq.com>
-Cc: xujianhao01@gmail.com, Roopa Prabhu <roopa@nvidia.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- bridge@lists.linux.dev, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <tencent_616D84217798828E5D1021857C528B713406@qq.com>
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <tencent_616D84217798828E5D1021857C528B713406@qq.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240423102728.228765-1-ast@fiberby.net>
 
-On 4/23/24 13:53, linke li wrote:
-> In br_fill_forward_path(), f->dst is checked not to be NULL, then
-> immediately read using READ_ONCE and checked again. The first check is
-> useless, so this patch aims to remove the redundant check of f->dst.
+Hi Asbjørn,
+
+Thank you for your patch!
+
+> Define extack locally, to reduce line lengths and future users.
 > 
-> Signed-off-by: linke li <lilinke99@qq.com>
+> Only perform fragment handling, when at least one fragment flag is set.
+> 
+> Remove goto, as it's only used once, and the error message is specific
+> to that context.
+> 
+> Only compile tested.
+> 
+> Signed-off-by: Asbjørn Sloth Tønnesen <ast@fiberby.net>
 > ---
->   net/bridge/br_device.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
+>  .../ethernet/microchip/sparx5/sparx5_tc_flower.c    | 13 ++++++-------
+>  1 file changed, 6 insertions(+), 7 deletions(-)
 > 
-> diff --git a/net/bridge/br_device.c b/net/bridge/br_device.c
-> index 65cee0ad3c1b..ae33b30ff87c 100644
-> --- a/net/bridge/br_device.c
-> +++ b/net/bridge/br_device.c
-> @@ -405,7 +405,7 @@ static int br_fill_forward_path(struct net_device_path_ctx *ctx,
->   	br_vlan_fill_forward_path_pvid(br, ctx, path);
->   
->   	f = br_fdb_find_rcu(br, ctx->daddr, path->bridge.vlan_id);
-> -	if (!f || !f->dst)
-> +	if (!f)
->   		return -1;
->   
->   	dst = READ_ONCE(f->dst);
+> diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_tc_flower.c b/drivers/net/ethernet/microchip/sparx5/sparx5_tc_flower.c
+> index 663571fe7b2d..d846edd77a01 100644
+> --- a/drivers/net/ethernet/microchip/sparx5/sparx5_tc_flower.c
+> +++ b/drivers/net/ethernet/microchip/sparx5/sparx5_tc_flower.c
+> @@ -159,13 +159,14 @@ sparx5_tc_flower_handler_basic_usage(struct vcap_tc_flower_parse_usage *st)
+>  static int
+>  sparx5_tc_flower_handler_control_usage(struct vcap_tc_flower_parse_usage *st)
+>  {
+> +       struct netlink_ext_ack *extack = st->fco->common.extack;
 
-This patch should target net-next (PATCH net-next in subject).
-Other than that the patch seems fine.
+Could you please update the use of extack in all places inside this
+function. You are missing one place.
 
-Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
+>         struct flow_match_control mt;
+>         u32 value, mask;
+>         int err = 0;
+> 
+>         flow_rule_match_control(st->frule, &mt);
+> 
+> -       if (mt.mask->flags) {
+> +       if (mt.mask->flags & (FLOW_DIS_IS_FRAGMENT | FLOW_DIS_FIRST_FRAG)) {
+
+Since these flags are used here and in the next patch, maybe assign them
+to a variable:
+
+u32 supp_flags = FLOW_DIS_IS_FRAGMENT | FLOW_DIS_FIRST_FRAG
+
+And update the use throughout.
+
+>                 u8 is_frag_key = !!(mt.key->flags & FLOW_DIS_IS_FRAGMENT);
+>                 u8 is_frag_mask = !!(mt.mask->flags & FLOW_DIS_IS_FRAGMENT);
+>                 u8 is_frag_idx = (is_frag_key << 1) | is_frag_mask;
+> @@ -190,17 +191,15 @@ sparx5_tc_flower_handler_control_usage(struct vcap_tc_flower_parse_usage *st)
+>                 err = vcap_rule_add_key_u32(st->vrule,
+>                                             VCAP_KF_L3_FRAGMENT_TYPE,
+>                                             value, mask);
+> -               if (err)
+> -                       goto out;
+> +               if (err) {
+> +                       NL_SET_ERR_MSG_MOD(extack, "ip_frag parse error");
+> +                       return err;
+> +               }
+>         }
+> 
+>         st->used_keys |= BIT_ULL(FLOW_DISSECTOR_KEY_CONTROL);
+> 
+>         return err;
+> -
+> -out:
+> -       NL_SET_ERR_MSG_MOD(st->fco->common.extack, "ip_frag parse error");
+> -       return err;
+>  }
+> 
+>  static int
+> --
+> 2.43.0
+
+Also I think you missing a cover letter for this series.
+
+I will run the patches through our tests once the issues are addressed.
+
+/Daniel
 
 
