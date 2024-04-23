@@ -1,109 +1,87 @@
-Return-Path: <netdev+bounces-90356-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90357-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC3638ADD9B
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 08:44:35 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD22B8ADDB0
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 08:47:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1A1D61C21417
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 06:44:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 64139B211D1
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 06:47:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06F8222619;
-	Tue, 23 Apr 2024 06:44:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5404F2C190;
+	Tue, 23 Apr 2024 06:45:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="rhPQ2CV+"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from out30-101.freemail.mail.aliyun.com (out30-101.freemail.mail.aliyun.com [115.124.30.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24DBC2A1D4
-	for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 06:44:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22FCC4779D;
+	Tue, 23 Apr 2024 06:45:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713854661; cv=none; b=Lq5XJN3cfuaXsSiBC3ofE7dHt0rUaT9Xij6aG8isC5gLahQs6j22WM7xC9hos38aTBDOZhkTV8jYB+MwuKXtXKgvX+t3ovCCBhULuYM4+zzva03KfzWW2sqR/Pj3wrJnKEjwpFo6hDwr4jKZy0NSh8CV5U+2EYZbk+mRar39i78=
+	t=1713854724; cv=none; b=Lja9G0JpMYyXgpDGjSMO/yq4kFMdD83CQMFjwE5EfyXar+Q8v7xOIXbIqNl0YY1iDuVvKBht64P4coC2fT0YMapG5qHmydBE0ur3Gz1ZIKcJZxLk6QVG0YAQZbJasFbkraxFR0rlu88nmOe2CYvdaw/5ROXLhWOeoO6SpEHQMEE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713854661; c=relaxed/simple;
-	bh=3yvG2JR0FVm384FMkHjhLQhJrk9XdHHltko3LnCBBic=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=BNy4UWe0Up2Ys0dY6RQ8ekgUgADHt7Puc+hdwiTyOfpJR+Ir1s+7hiQP6QBI1PNbExKYaKkm8Y5haauSnDSBG2L/yVynsB24PAMp5/ygN4XncSCAxvE1q+ZR2cptiI8k7VYmVaV9ftG27Y2ChT8AJefiC5s972k/ckT+yxTwM4s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from ptz.office.stw.pengutronix.de ([2a0a:edc0:0:900:1d::77] helo=ratatoskr.pengutronix.de)
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <s.trumtrar@pengutronix.de>)
-	id 1rz9sp-0007P6-Hm; Tue, 23 Apr 2024 08:44:03 +0200
-From: Steffen Trumtrar <s.trumtrar@pengutronix.de>
-To: =?utf-8?Q?S=C3=A9bastien?= Szymanski <sebastien.szymanski@armadeus.com>
-Cc: "David S. Miller" <davem@davemloft.net>,  Eric Dumazet
- <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,  Paolo Abeni
- <pabeni@redhat.com>,  Rob Herring <robh@kernel.org>,  Krzysztof Kozlowski
- <krzysztof.kozlowski+dt@linaro.org>,  Conor Dooley <conor+dt@kernel.org>,
-  Shawn Guo <shawnguo@kernel.org>,  Sascha Hauer <s.hauer@pengutronix.de>,
-  Pengutronix Kernel Team <kernel@pengutronix.de>,  Fabio Estevam
- <festevam@gmail.com>,  Clark Wang <xiaoning.wang@nxp.com>,  Linux Team
- <linux-imx@nxp.com>,  Alexandre Torgue <alexandre.torgue@foss.st.com>,
-  Jose Abreu <joabreu@synopsys.com>,  Maxime Coquelin
- <mcoquelin.stm32@gmail.com>,  netdev@vger.kernel.org,
-  devicetree@vger.kernel.org,  imx@lists.linux.dev,
-  linux-arm-kernel@lists.infradead.org,  linux-kernel@vger.kernel.org,
-  linux-stm32@st-md-mailman.stormreply.com
-Subject: Re: [PATCH 0/3] arm64: mx93: etherrnet: set TX_CLK in RMII mode
-In-Reply-To: <f01d49cf-5955-405c-9c2b-05b0c7bb982c@armadeus.com>
- (=?utf-8?Q?=22S=C3=A9bastien?=
-	Szymanski"'s message of "Mon, 22 Apr 2024 11:28:08 +0200")
-References: <20240422-v6-9-topic-imx93-eqos-rmii-v1-0-30151fca43d2@pengutronix.de>
-	<f01d49cf-5955-405c-9c2b-05b0c7bb982c@armadeus.com>
-User-Agent: mu4e 1.12.4; emacs 29.3
-Date: Tue, 23 Apr 2024 08:43:58 +0200
-Message-ID: <87mspkk28h.fsf@pengutronix.de>
+	s=arc-20240116; t=1713854724; c=relaxed/simple;
+	bh=/8UG4gXHPEjzqQauQjn7i+cz8eMeT4m/eMNC5CnSkI4=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=IVERTG1cIR0LlWP8Xm4k2OHFXRiOMbu0MkI0Cp03tU4sQnfgCjhwUuf20CfOAhFNrwR4LVbqzb0z36mgk3TkohiWPN9JlyPExO3DiMVr8Flq1oup6MYlRu59WONTc+wOJHBp/REbrteJVpxayX3VxUrWSI9qKlA+YT+c2t1PMXU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=rhPQ2CV+; arc=none smtp.client-ip=115.124.30.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1713854712; h=Message-ID:Date:MIME-Version:From:Subject:To:Content-Type;
+	bh=2Bh4K1u+LZbAykGU6w9RgWH0PLEDjVXql/jyM2G15cE=;
+	b=rhPQ2CV+JZYFooyDt2EV76dDmv6+oLP86ViNlpwSeKlQ5xZq/4YeaC/2xN/WsZhpZkG1SeD65+5Jh2MgqCJJungfJ2be1hcqiLLVZdXgEztiIhncWh2jE0T/2SKulbzkSSigISJPJDx1ngQCHdw3vLS+zW4R8aFMgq1SaztvZNU=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R991e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046051;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=18;SR=0;TI=SMTPD_---0W580vZc_1713854701;
+Received: from 30.221.129.150(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0W580vZc_1713854701)
+          by smtp.aliyun-inc.com;
+          Tue, 23 Apr 2024 14:45:11 +0800
+Message-ID: <6907c23c-a9b4-4366-99e5-b175319f9061@linux.alibaba.com>
+Date: Tue, 23 Apr 2024 14:45:00 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:900:1d::77
-X-SA-Exim-Mail-From: s.trumtrar@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+From: Wen Gu <guwen@linux.alibaba.com>
+Subject: Re: [PATCH net-next v6 00/11] net/smc: SMC intra-OS shortcut with
+ loopback-ism
+To: Wenjia Zhang <wenjia@linux.ibm.com>, wintera@linux.ibm.com,
+ twinkler@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
+ agordeev@linux.ibm.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, jaka@linux.ibm.com
+Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com,
+ alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
+ linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20240414040304.54255-1-guwen@linux.alibaba.com>
+ <3bc12c1e-c36c-4b34-8bc4-57ebb07038c2@linux.ibm.com>
+In-Reply-To: <3bc12c1e-c36c-4b34-8bc4-57ebb07038c2@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
 
-Hi,
 
-On 2024-04-22 at 11:28 +02, S=C3=A9bastien Szymanski <sebastien.szymanski@a=
-rmadeus.com> wrote:=20
-=20
-> Hello,  On 4/22/24 10:46, Steffen Trumtrar wrote:=20
-> > This series adds support for setting the TX_CLK direction in the eQOS e=
-thernet core on the i.MX93 when RMII mode is used.  According to AN14149, w=
-hen the i.MX93 ethernet controller is used in RMII mode, the TX_CLK *must* =
-be set to output mode.=20
->  Must ? I don't think that is true. Downstream NXP kernel has an option t=
-o set TX_CLK as an input:=20
->
+On 2024/4/17 23:36, Wenjia Zhang wrote:
+> 
+> 
+> On 14.04.24 06:02, Wen Gu wrote:
+>> This patch set acts as the second part of the new version of [1] (The first
+>> part can be referred from [2]), the updated things of this version are listed
+>> at the end.
+>>
+>>
+> Still need some time to review the patches.
+> 
+> Thanks for your patience!
 
-re-reading that passage again, it only says "other registers that must be c=
-onfigured" and that the ENET_QOS_CLK_TX_CLK_SEL bit "is 0b1" for RMII. So, =
-maybe you are right.=20
+Hi Wenjia, is there any update on the review?
 
-
-Thanks,
-Steffen
-
-> https://github.com/nxp-imx/linux-imx/blob/lf-6.6.y/Documentation/devicetr=
-ee/bindings/net/nxp%2Cdwmac-imx.yaml#L69
->=20
-> https://github.com/nxp-imx/linux-imx/commit/fbc17f6f7919d03c275fc48b0400c=
-212475b60ec
->=20
-
---=20
-Pengutronix e.K.                | Dipl.-Inform. Steffen Trumtrar |
-Steuerwalder Str. 21            | https://www.pengutronix.de/    |
-31137 Hildesheim, Germany       | Phone: +49-5121-206917-0       |
-Amtsgericht Hildesheim, HRA 2686| Fax:   +49-5121-206917-5555    |
+Thanks!
 
