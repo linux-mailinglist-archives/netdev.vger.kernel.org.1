@@ -1,120 +1,103 @@
-Return-Path: <netdev+bounces-90558-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90559-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D0308AE7F7
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 15:22:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F8438AE800
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 15:23:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F18421F242C9
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 13:22:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C7DD0287F79
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 13:23:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F4A6135A4A;
-	Tue, 23 Apr 2024 13:22:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4745813541A;
+	Tue, 23 Apr 2024 13:23:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="m4XzY5FC";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="fEUVoteP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KED5v42A"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F099713540B;
-	Tue, 23 Apr 2024 13:22:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 186FA745E2;
+	Tue, 23 Apr 2024 13:23:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713878527; cv=none; b=mAC2wKdyYX37LQ9ygKfIGDrt7YMXSjQ6aD+RJixSsb4XoJciQbCfDoS48aY53HjAYX1MZZBLjlRwcr2bNtHk3jvll/YWup3eIUtHPpCmzPI1kT3ttZxM188H021uKSc0kwPKSTsis4suguHJIy4vo1HsCqKI75Q8puesItx4Qkc=
+	t=1713878590; cv=none; b=rRDtUZTxggv25GvDNQs/MGNCCt5llfDNvc9r4Nr9s6jJP3jvr1ej/P1liWN/QOkH8XSIcKrKquykmvxBwOHbQJ+SX3JovPZxFYQYGuXfjERKwV10dMY0g4mGM9DVj3yShNTatdcFH5QA05jHjPBywYn/5q3/Yfy1FJTaTCi4mhQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713878527; c=relaxed/simple;
-	bh=V3gsGptT/p6G36o7U4/7jd6cpZS627ebrpI08k2sDs8=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=JNXgKjeJNUE4DZxZHIJF146JwSO8viYcQ+zjfa1xkFYtDEncIPg89J236TFnm891BHaIHfht61JMIN5tq/v4VwRc47pVYlwsWKYGE9tefq+X6EIKchWCVcp+IKsY7r7CQpE25f9IMbPj1HYzYjvTCBS1yoOyLPVtiFDpNJYW3go=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=m4XzY5FC; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=fEUVoteP; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1713878523;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=1F8WScoobWXTtBRZtrYdICKNugHPF5SmK3XsH1n+Ymc=;
-	b=m4XzY5FCfbd9YzD0QWq6thD2I29dU5dUZUijd8hKfBmzwlypeVYo119Owo+ltIBvTJky3l
-	y3XVXXzgGyS9JcFvV5zoG5Ib5X+x30HMBwRtPKJ4mUFvhQ6gIuU426hZi8ONZwP+xRlI7+
-	YfNIRJe+hqpwj57IkiA5Q3++NgX3S7byZvCG5F1ajVPIjZAs5A4RbZkAvTZw6Nd+T1QbT8
-	N3stnuWQuVe8owjbFhv9t0zUx797SABWbNcJoOTWk+zyXipl3MHXB1EdtACYDDy6H40Vsk
-	epI4YE3PBz9Co4k3U767mEbqF92rXMIYfC+S3ddgvfFFqSbwQdonxpFyimvYtw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1713878523;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=1F8WScoobWXTtBRZtrYdICKNugHPF5SmK3XsH1n+Ymc=;
-	b=fEUVotePRbJwjMxyVae5qz3FjkZBFRprreKVWLuHEJ4AVVFLnejBKkQJvTQUzeDAsOEK6Y
-	K7fwToOh0tUPzTDA==
-To: David Laight <David.Laight@ACULAB.COM>, =?utf-8?B?TWFoZXNoIEJhbmRld2Fy?=
- =?utf-8?B?ICjgpK7gpLngpYfgpLYg4KSs4KSC4KSh4KWH4KS14KS+4KSwKQ==?=
- <maheshb@google.com>
-Cc: Netdev <netdev@vger.kernel.org>, Linux <linux-kernel@vger.kernel.org>,
- David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Richard
- Cochran <richardcochran@gmail.com>, Arnd Bergmann <arnd@arndb.de>, Sagi
- Maimon <maimon.sagi@gmail.com>, Jonathan Corbet <corbet@lwn.net>, John
- Stultz <jstultz@google.com>, Mahesh Bandewar <mahesh@bandewar.net>
-Subject: RE: [PATCHv2 next] ptp: update gettimex64 to provide ts optionally
- in mono-raw base.
-In-Reply-To: <f2ac461445f44addb521ef79ecedc584@AcuMS.aculab.com>
-References: <20240418042706.1261473-1-maheshb@google.com>
- <163538a0495840eca34f6fbd09533ae1@AcuMS.aculab.com>
- <CAF2d9jj6H+jOfUbbw1ZEHmgqroXmn+oFV8NwTyKJ_P_T4G_5xg@mail.gmail.com>
- <87edaxudr8.ffs@tglx> <f2ac461445f44addb521ef79ecedc584@AcuMS.aculab.com>
-Date: Tue, 23 Apr 2024 15:22:00 +0200
-Message-ID: <875xw8uscn.ffs@tglx>
+	s=arc-20240116; t=1713878590; c=relaxed/simple;
+	bh=Y3e+kyYzGZmeqX9U2y8Sf5GaMC6t/3cbauRRDhpXMhE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DxnE/6XIP8bu/Phj7qrqQmLKKbuwGBv3UQUW50Kh/tbJCOhB025Ly4X29E7JAkszPFd6zn4q8mmNcWdxwYF8ku7+vofBHOyS5YR1HvOwXL4UWlt2HdD1oXzb3CGbfjBwy7T1vRpmRWfbfbqGdJ2nrzdi0dyHu8h2RZDuIJHCkhM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KED5v42A; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D2E8C116B1;
+	Tue, 23 Apr 2024 13:23:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713878589;
+	bh=Y3e+kyYzGZmeqX9U2y8Sf5GaMC6t/3cbauRRDhpXMhE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=KED5v42A/DIYWTinaT6HqZ0EzXjUr/GomwKAiORVTHqV3Qh9fIy66439eRBhYoqwv
+	 EOvMe9pDnPvmkhEXh6PL9LftXU9Mm0nYAvr45JyMrwFuqCjWZCFqQkjaFxXuNVHEAc
+	 BZ5Ns8FatnJO7xpQ33PIzjx8BbzxQCM7SJpXPCCMoR4kNj1V+KLUMIaMCvUfLHFCb2
+	 84cs3gH35Qbnp/Cm5Rz6VJkaAO8bx7IO752OdXImQvv+1jg2vOsoUWDte9/imL10cl
+	 SUYBichI0SnZxDT5+Ayzxur9FAw3WU7lNP6a8XDHtcld32dGJa98fiGJEh8DcP1pE+
+	 ncXSNdg3AEguA==
+Date: Tue, 23 Apr 2024 14:23:04 +0100
+From: Simon Horman <horms@kernel.org>
+To: Stefan Eichenberger <eichest@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, robh@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+	lxu@maxlinear.com, andrew@lunn.ch, hkallweit1@gmail.com,
+	linux@armlinux.org.uk, michael@walle.cc, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 2/2] net: phy: mxl-gpy: add new device tree property
+ to disable SGMII autoneg
+Message-ID: <20240423132304.GS42092@kernel.org>
+References: <20240416121032.52108-1-eichest@gmail.com>
+ <20240416121032.52108-3-eichest@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240416121032.52108-3-eichest@gmail.com>
 
-On Tue, Apr 23 2024 at 09:22, David Laight wrote:
-> From: Thomas Gleixner
->> The quantity of the initial frequency adjustments depends on the
->> accuracy of the initial clock frequency calibration which is on most
->> sane systems within +/- 500ppm.
->> 
->>      500ppm of 20ms == 10us
->> 
->> If the clock calibration is off by a larger margin then that needs to be
->> fixed.
->
-> The initial adjustment depends on the accuracy of the initial RTC
-> value read from the local hardware.
+On Tue, Apr 16, 2024 at 02:10:32PM +0200, Stefan Eichenberger wrote:
+> Add a new device tree property to disable SGMII autonegotiation and
+> instead use the option to match the SGMII speed to what was negotiated
+> on the twisted pair interface (tpi). This allows us to disable SGMII
+> autonegotiation on Ethernet controllers that are not compatible with
+> this mode.
+> 
+> Signed-off-by: Stefan Eichenberger <eichest@gmail.com>
+> ---
+>  drivers/net/phy/mxl-gpy.c | 18 +++++++++++++++++-
+>  1 file changed, 17 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/phy/mxl-gpy.c b/drivers/net/phy/mxl-gpy.c
+> index b2d36a3a96f1..4147b4c29eaf 100644
+> --- a/drivers/net/phy/mxl-gpy.c
+> +++ b/drivers/net/phy/mxl-gpy.c
+> @@ -114,6 +114,7 @@ struct gpy_priv {
+>  	 * is enabled.
+>  	 */
+>  	u64 lb_dis_to;
+> +	bool sgmii_match_tpi_speed;
+>  };
+>  
+>  static const struct {
+> @@ -262,8 +263,17 @@ static int gpy_mbox_read(struct phy_device *phydev, u32 addr)
+>  
+>  static int gpy_config_init(struct phy_device *phydev)
+>  {
+> +	struct gpy_priv *priv = phydev->priv;
+>  	int ret;
+>  
+> +	/* Disalbe SGMII Autoneg if we want to match SGMII to TPI speed */
 
-The initial value of CLOCK_REALTIME depends on the RTC value, but not
-the initial frequency and the frequency is the only thing which matters
-for CLOCK_MONOTONIC.
-
-> This is unlikely to be more accurate than 1 second and can easily
-> be a few seconds out.
-
-Halfways sane RTCs drift in the range of +/- 5 seconds per day. But
-that's not a problem if your NTP daemon is configured correctly because
-it will step CLOCK_REALTIME right away when it's off more than 1 second.
-
-Also correctly configured NTP daemons keep track of the drift and reuse
-the last observed drift value which makes them stabilize quickly if the
-initial frequency value which has been calibrated / determined by the
-kernel is halfways accurate. It takes 5 seconds on my laptop from
-starting chrony until it's stable.
-
-Sure you can configure NTP in weird ways, but that's not a kernel
-problem.
-
-Thanks,
-
-        tglx
-
+nit: Disable
 
 
