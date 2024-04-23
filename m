@@ -1,110 +1,100 @@
-Return-Path: <netdev+bounces-90439-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90443-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C02CD8AE223
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 12:28:22 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A16B8AE236
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 12:30:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0F071B20FB5
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 10:28:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9D6361F25C96
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 10:30:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEF9A626DD;
-	Tue, 23 Apr 2024 10:28:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C181E22EF2;
+	Tue, 23 Apr 2024 10:30:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="DRopk1Cb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rwluyx6i"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04E9560267;
-	Tue, 23 Apr 2024 10:28:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A7951EB56;
+	Tue, 23 Apr 2024 10:30:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713868095; cv=none; b=tf+YotlAzGDpjTxS5Z8RxtbUzjBhs6aNKLxiWoqYNGF1STiUh5Gg/+yJIWLdIWu1bOxPiDdgGUSxcYOByClvMDyZ08l6uandIFs2ZT5w9+3YZnKqF9Ck6D6b9FSYdelj//Qn6sv9mv+OycJYBNdXIcT7nHsdQcOOhk+uqolzbzI=
+	t=1713868231; cv=none; b=gHrn5BDpBDvoL6x6io4hxOjOz78nVSRAG2JRpy4lWFWBB9LsXd+r1vbqffF/oOpA4o22Fq5Ynt0BKz42yvgaioFKo6c6HQhDk0c2t6e96Nvh1pnWywmzPixyne5kx4G27gjL9gHW0kuburPBU5BnvpgRN2YfD4RoofTrp4LBLWM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713868095; c=relaxed/simple;
-	bh=39WhF6eCSOF/ZCUdao6fmDVARxWuHqpggCtYOqxbRdc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=f3IAcp5c6a7S4XHfMWDuILc32rM+IKvqoPnaT0DGm6GmSd0zOkv7/U1NMhlaG5o7xdgdHlkVYOipMFZAMw8U0lDDcI9kV35+Cw+5g7KJtuNemAYbgaOlFCXKtlBU9g59c7FwgrvZUzO4lreRdbV0mSouLmu1O1D95cT1URfaxk8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=DRopk1Cb; arc=none smtp.client-ip=193.104.135.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
-Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
-	by mail1.fiberby.net (Postfix) with ESMTPSA id 29706600A7;
-	Tue, 23 Apr 2024 10:28:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
-	s=202008; t=1713868084;
-	bh=39WhF6eCSOF/ZCUdao6fmDVARxWuHqpggCtYOqxbRdc=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=DRopk1CbxQFpR7TwvdM4LduXW51OoycFf176Xzt0GSHWRVRlo9Sa+0GfjFY3CopnG
-	 tLAyQFME3G2F3goHqEyYYyjrxDVNSURLwnTsRa678RL1cgZMh+eMTtPLlZlgZO5IHw
-	 R9epoP7Li6mTiNjf1ns9eO8YfP/6J5dLkdRiuURfFFpwUv1FxJCV5mzpN1OHt2UMyz
-	 HsmMyu2SLZ12JRIpB+4R+tJ0qrDwz5gXFU2EZBro5v7TiKYKem3y3ndNGi3Uyvb2FL
-	 av/uwjNBrdv4GXtyAlY1FHLoE087RSPnHgFT9pXq6teEA4leaqRQYNPafcGHCpo0MD
-	 I2KEwvAYaSHTQ==
-Received: by x201s (Postfix, from userid 1000)
-	id 61B34216B93; Tue, 23 Apr 2024 10:27:29 +0000 (UTC)
-From: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>
-To: netdev@vger.kernel.org
-Cc: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>,
-	Steen Hegelund <Steen.Hegelund@microchip.com>,
-	Lars Povlsen <lars.povlsen@microchip.com>,
-	Daniel Machon <daniel.machon@microchip.com>,
-	UNGLinuxDriver@microchip.com,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org,
-	Jacob Keller <jacob.e.keller@intel.com>
-Subject: [PATCH net-next 2/2] net: sparx5: flower: check for unsupported control flags
-Date: Tue, 23 Apr 2024 10:27:27 +0000
-Message-ID: <20240423102728.228765-2-ast@fiberby.net>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240423102728.228765-1-ast@fiberby.net>
-References: <20240423102728.228765-1-ast@fiberby.net>
+	s=arc-20240116; t=1713868231; c=relaxed/simple;
+	bh=SLELhq9s8Pwo4jEjjEa21DTEsxCcaygTfm0oUvjTWdI=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=JbaZsO3amaDAhsBSdlUHaDi11lrbcIkaJvNtdAc9ZS3Z3X/q5tMU3lMOr1vifCkcyqpX2/v7lMK5lQSVfWzMwvZIgq024oGxOUH3SO3ZODr/33ii6o6WcuGPZQ9AfjMXOleWOoENm4sRB47bU05uPbDtZk2D1n9DpcgVlDij2dg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rwluyx6i; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 4055FC32782;
+	Tue, 23 Apr 2024 10:30:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713868231;
+	bh=SLELhq9s8Pwo4jEjjEa21DTEsxCcaygTfm0oUvjTWdI=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Rwluyx6i8nuipA7/zGA/szpoMpE3B944XnuEm1c7SYZauWVvKE8cQfKLxUxv22gKq
+	 SUv8OtnFiGhCBHtM+788RZSQxOFYQ6MtMbFXVxzd6MZTYtdVZH20/FxPcldyxDOst9
+	 9GcFheT89OExr9CfeKAiZ1bRgSqADPXoFCw3qd6IbCZFmo1OVFnWiwv2bpvQv+IiTE
+	 yTQH/adUBSkVOXtICQDE4lDQ3bxMylwnLz34PVyBY3E3KJYRXWM0+bbc3+8YctoNPZ
+	 glKBbxVVjfUtBOYYoBJvmsUFfLHD28+GKrkSE4Twh9xu/2thj136x3QIwRLc+nY5qq
+	 sqXy7JvJ8Yj4Q==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 2D495C595D2;
+	Tue, 23 Apr 2024 10:30:31 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v8 0/2] Enable RX HW timestamp for PTP packets using
+ CPTS FIFO
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171386823117.5282.12691029337739979479.git-patchwork-notify@kernel.org>
+Date: Tue, 23 Apr 2024 10:30:31 +0000
+References: <20240419082626.57225-1-c-vankar@ti.com>
+In-Reply-To: <20240419082626.57225-1-c-vankar@ti.com>
+To: Chintan Vankar <c-vankar@ti.com>
+Cc: jpanis@baylibre.com, arnd@arndb.de, dan.carpenter@linaro.org,
+ hkallweit1@gmail.com, vladimir.oltean@nxp.com, andrew@lunn.ch,
+ rogerq@kernel.org, richardcochran@gmail.com, pabeni@redhat.com,
+ kuba@kernel.org, edumazet@google.com, davem@davemloft.net,
+ s-vadapalli@ti.com, linux-kernel@vger.kernel.org, netdev@vger.kernel.org
 
-Use flow_rule_is_supp_control_flags() to reject filters with
-unsupported control flags.
+Hello:
 
-In case any unsupported control flags are masked,
-flow_rule_is_supp_control_flags() sets a NL extended
-error message, and we return -EOPNOTSUPP.
+This series was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-Only compile-tested.
+On Fri, 19 Apr 2024 13:56:24 +0530 you wrote:
+> The CPSW offers two mechanisms for communicating packet ingress timestamp
+> information to the host.
+> 
+> The first mechanism is via the CPTS Event FIFO which records timestamp
+> when triggered by certain events. One such event is the reception of an
+> Ethernet packet with a specified EtherType field. This is used to capture
+> ingress timestamps for PTP packets. With this mechanism the host must
+> read the timestamp (from the CPTS FIFO) separately from the packet payload
+> which is delivered via DMA.
+> 
+> [...]
 
-Signed-off-by: Asbjørn Sloth Tønnesen <ast@fiberby.net>
----
- drivers/net/ethernet/microchip/sparx5/sparx5_tc_flower.c | 5 +++++
- 1 file changed, 5 insertions(+)
+Here is the summary with links:
+  - [net-next,v8,1/2] net: ethernet: ti: am65-cpts: Enable RX HW timestamp for PTP packets using CPTS FIFO
+    https://git.kernel.org/netdev/net-next/c/c459f606f66d
+  - [net-next,v8,2/2] net: ethernet: ti: am65-cpsw/ethtool: Enable RX HW timestamp only for PTP packets
+    https://git.kernel.org/netdev/net-next/c/c03a6fd39826
 
-diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_tc_flower.c b/drivers/net/ethernet/microchip/sparx5/sparx5_tc_flower.c
-index d846edd77a01..f81d89f8f620 100644
---- a/drivers/net/ethernet/microchip/sparx5/sparx5_tc_flower.c
-+++ b/drivers/net/ethernet/microchip/sparx5/sparx5_tc_flower.c
-@@ -197,6 +197,11 @@ sparx5_tc_flower_handler_control_usage(struct vcap_tc_flower_parse_usage *st)
- 		}
- 	}
- 
-+	if (!flow_rule_is_supp_control_flags(FLOW_DIS_IS_FRAGMENT |
-+					     FLOW_DIS_FIRST_FRAG,
-+					     mt.mask->flags, extack))
-+		return -EOPNOTSUPP;
-+
- 	st->used_keys |= BIT_ULL(FLOW_DISSECTOR_KEY_CONTROL);
- 
- 	return err;
+You are awesome, thank you!
 -- 
-2.43.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
