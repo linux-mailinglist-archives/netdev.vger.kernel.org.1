@@ -1,122 +1,174 @@
-Return-Path: <netdev+bounces-90594-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90595-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B70C8AE9B0
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 16:41:27 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 06AD78AE9CF
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 16:46:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4CD241C235E6
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 14:41:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2C55CB20F8B
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 14:46:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1815B13B2AC;
-	Tue, 23 Apr 2024 14:41:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3996284FC5;
+	Tue, 23 Apr 2024 14:46:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RgF08P3u"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DWbbKtvH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A104E651AB;
-	Tue, 23 Apr 2024 14:41:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBC108F5E;
+	Tue, 23 Apr 2024 14:46:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713883277; cv=none; b=osuCcYKPmukLSEyS7OOyCI3rGXv1UwE+16MnOZDhTrlkRtad5Z2sYWxY8vy7c5OjKwBYuIsWihL3w7pLfBjcGs5nzebJlsgU+iZR+Pg+iXtMQLjJhjZ8W9LOXqgrWLeMST4DVq46Mw24YYoc0Dj1dDhPnqlvwjE+FCliXSYT+yw=
+	t=1713883610; cv=none; b=dEZeWkMq2nsCZJ/nUKUbv3x65aeXG+GofpfnWtw8iOckCpcsX9D9xe3M3nYaEFIMPZhjAaEAOkfz7bD9B8ran+DV4+c8BdIn06vFAH36yOGzklmVLyH+2CFQgoqqPZTXXYv4Q/hybucWEPJ6WRYWhZegIrtsZE8hzn/ws+lW+pk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713883277; c=relaxed/simple;
-	bh=JmDbnp7jB3iYKQ7kmrwc2e3Fj/aFyXr9ucUALcAe+xo=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=EyfflGBz2sJdOdYLuXTJtFTckpKOnbiN7FoUtVTtxiSW+ZVUPiUz+R12y7zegJ6y/sCA2TMs31U9pQDTwCJuZd6R7JMMCkuEPkJ7obG46jcVhTWmljn1uo47+J77Zp44nrXSJ9gbZFS3eGCzMoBIXyEfg1N9+7sxUO8MJ3D3k9k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RgF08P3u; arc=none smtp.client-ip=192.198.163.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1713883275; x=1745419275;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=JmDbnp7jB3iYKQ7kmrwc2e3Fj/aFyXr9ucUALcAe+xo=;
-  b=RgF08P3uVipErfhiQtXZCzHb3bcjMx0GBAqaOF/AQjBKlB9SB6uH4heI
-   ngpkEds90JLkNBTvQXPUtjrZxn7Lg17qD4eO+Q/l1Zt6+RIqLcSyh9z96
-   L5us0bqSjqnUIs0wCnihjeTE/4K5vzTBuBK4bAN6Ji0gEvQOSAC2JD64l
-   MgRqZlNbuwIvfraqtA9JGOT38TnCjBm19pxMKEvsqBVSNREjgJbLMYCka
-   sGVUe1zcN9NALd6OjyNC64QA6pUn5j1beOGGVJUWlWJWGyotF8m+Y6Z21
-   bP6qZuK9x4o0pPHhXCQejamx35mnGHHcleBEOo+B7TXbMZHH+QJLD2H2K
-   Q==;
-X-CSE-ConnectionGUID: 6BxdYX0SRjehPg0LDYhfaw==
-X-CSE-MsgGUID: UKLdfLL/TJOJucVC5DHaWw==
-X-IronPort-AV: E=McAfee;i="6600,9927,11053"; a="12402889"
-X-IronPort-AV: E=Sophos;i="6.07,222,1708416000"; 
-   d="scan'208";a="12402889"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2024 07:41:14 -0700
-X-CSE-ConnectionGUID: 7l8+2zYiQMSa5rnSI9HzpQ==
-X-CSE-MsgGUID: e57XYyf+SfOQ1IIN3xF25w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,222,1708416000"; 
-   d="scan'208";a="24260682"
-Received: from ijarvine-desk1.ger.corp.intel.com (HELO localhost) ([10.245.247.40])
-  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2024 07:41:11 -0700
-From: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
-To: Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
-Subject: [PATCH 1/1] net: e1000e & ixgbe: Remove PCI_HEADER_TYPE_MFD duplicates
-Date: Tue, 23 Apr 2024 17:40:59 +0300
-Message-Id: <20240423144100.76522-1-ilpo.jarvinen@linux.intel.com>
-X-Mailer: git-send-email 2.39.2
+	s=arc-20240116; t=1713883610; c=relaxed/simple;
+	bh=ToGncwj89AClxloq2GR3iiMSNF1CUJnuDODivUGYRAo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mA7QD4hK2Hj1Ng+BY3LoPVFeWioVIPD3uMOZnuaiUtFD/uSJ2HFAiHrLN0/cMtqb55HTYtvUgeqTaVHC6yatAK7hZB59zc6RYUWseWHM+TpNd9vwrUoE9j0p2/KGyB/KD0OUrD3obY1zMvdEt800b7lDqvenBt5cI1XjClW0vRI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DWbbKtvH; arc=none smtp.client-ip=209.85.210.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-6f103b541aeso2862068b3a.3;
+        Tue, 23 Apr 2024 07:46:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1713883608; x=1714488408; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Vb/jtEQiqMYQ/ISAQh9mg0MTb6zQnFx3hOrCArI3w1E=;
+        b=DWbbKtvHDAMwRw51MQT/rsxrsRjCAkZaOczYUrHsiLHWSnc+6qxwEdTC0m1THnAbcs
+         3vrCdNWRkhImjZz2HbxRg0+2ddHQNoQUCLbExcy0baU4PpTZvnZ8Q/WeSY9TeQjkFyRg
+         xebZuErcwDN8h2O4GcIQHHUYPBgzapZJ+yTHTx5BPc7hsB5H5ZeXxv1OgwFNBuSRqdDD
+         vYKHfE7rTz0trpu+m49fUQXPAddmOsK01hnT+UEbygM3KMG/Ini1bmApMbBdnoRX3Ucs
+         YQnvw7frWjb2uaPFQq7jGTmOnDhuRdriHYNEnadW60flv3rJkxaNdekV9JK6Kj7kx7UU
+         889A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713883608; x=1714488408;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Vb/jtEQiqMYQ/ISAQh9mg0MTb6zQnFx3hOrCArI3w1E=;
+        b=Yj22KoMIMbgR3Qt4ons/OSTtL79sRiKf30ppw4o+hxnJ3LzI37aZdhgZFJKaoPGNCz
+         HaRoN7h/noRo3Bf3bfaJWIHAcY6GZZSTK5aSMBeHnyZ6TzfEDxRGdELqikZ01xFZQfy6
+         Ip2l2BBmg/gLzYHdRI9CSbyaF8AmUXE9fSjRodiSgdVjOojiOHY7OaYitABq2k86giUE
+         mVDGoBiS+5GdRU9cH0dVW34srmS90fpo3LOQZTo1MG/lcVh8n6Cu//PMydchTmTAdVlH
+         P2wExGYCvu7wLm57t4qLpC14dk56syTsSEgy9XmuYnNi6/nDjnv9bkMIVS2NWBnFFHUK
+         zOUw==
+X-Forwarded-Encrypted: i=1; AJvYcCVRzvOIiYB6u8nwICMC6ZzZUji5PAbn+LrzPcm6x8WGnD6VwXCWLto2OIZQ85c5SSv4Y6WkZBnNA2a2vz8tUC4aq7PfKBbO9olXFmMTJ/4fCQsaebRYowM7S54AAi4GrZEqf0Cm4KMHzIMmqwqwGO29rETmmSoyQlimwz636I7LHJQ4okMpfhfQy0d9D9xQqnbv122rcC3Fq7fCIUI=
+X-Gm-Message-State: AOJu0YwsAvAFBdyeplJDKZfEUMnuEjpWKO7d94MQDWZXpcqQioLBROef
+	uBdvNym3121+/kUAnQYqdid2a1rB/H6C+I1wMMeeSa3ed0yYK/Of
+X-Google-Smtp-Source: AGHT+IE1b3OGo1AOOyHI2O/gtQLNNZdbLcFXucTipISHaNiAukcRoQ6PFKyPGYCIilU3YAqWXr+loQ==
+X-Received: by 2002:a05:6a21:2792:b0:1aa:6a28:cf6e with SMTP id rn18-20020a056a21279200b001aa6a28cf6emr12043604pzb.48.1713883607972;
+        Tue, 23 Apr 2024 07:46:47 -0700 (PDT)
+Received: from ?IPV6:2001:ee0:50f5:5d0:b2f6:b23d:3030:9638? ([2001:ee0:50f5:5d0:b2f6:b23d:3030:9638])
+        by smtp.gmail.com with ESMTPSA id l185-20020a6391c2000000b005ffd8019f01sm3689182pge.20.2024.04.23.07.46.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 23 Apr 2024 07:46:47 -0700 (PDT)
+Message-ID: <e4f5cbd0-c803-4c3c-9703-f52e56864106@gmail.com>
+Date: Tue, 23 Apr 2024 21:46:35 +0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 5/5] drivers/s390/cio: ensure the copied buf is NULL
+ terminated
+To: Heiko Carstens <hca@linux.ibm.com>
+Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Paul M Stillwell Jr <paul.m.stillwell.jr@intel.com>,
+ Rasesh Mody <rmody@marvell.com>, Sudarsana Kalluru <skalluru@marvell.com>,
+ GR-Linux-NIC-Dev@marvell.com, Krishna Gudipati <kgudipat@brocade.com>,
+ Anil Gurumurthy <anil.gurumurthy@qlogic.com>,
+ Sudarsana Kalluru <sudarsana.kalluru@qlogic.com>,
+ "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ Fabian Frederick <fabf@skynet.be>, Saurav Kashyap <skashyap@marvell.com>,
+ Javed Hasan <jhasan@marvell.com>, GR-QLogic-Storage-Upstream@marvell.com,
+ Nilesh Javali <nilesh.javali@cavium.com>, Arun Easi <arun.easi@cavium.com>,
+ Manish Rangankar <manish.rangankar@cavium.com>,
+ Vineeth Vijayan <vneethv@linux.ibm.com>,
+ Peter Oberparleiter <oberpar@linux.ibm.com>,
+ Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev
+ <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Sven Schnelle <svens@linux.ibm.com>, intel-wired-lan@lists.osuosl.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-scsi@vger.kernel.org, Saurav Kashyap <saurav.kashyap@cavium.com>,
+ linux-s390@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+References: <20240422-fix-oob-read-v1-0-e02854c30174@gmail.com>
+ <20240422-fix-oob-read-v1-5-e02854c30174@gmail.com>
+ <20240423065052.10211-C-hca@linux.ibm.com>
+Content-Language: en-US
+From: Bui Quang Minh <minhquangbui99@gmail.com>
+In-Reply-To: <20240423065052.10211-C-hca@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-PCI_HEADER_TYPE_MULTIFUNC is define by e1000e and ixgbe and both are
-unused. There is already PCI_HEADER_TYPE_MFD in pci_regs.h anyway which
-should be used instead so remove the duplicated defines of it.
+On 4/23/24 13:50, Heiko Carstens wrote:
+> On Mon, Apr 22, 2024 at 11:41:40PM +0700, Bui Quang Minh wrote:
+>> Currently, we allocate a lbuf-sized kernel buffer and copy lbuf from
+>> userspace to that buffer. Later, we use scanf on this buffer but we don't
+>> ensure that the string is terminated inside the buffer, this can lead to
+>> OOB read when using scanf. Fix this issue by allocating 1 more byte to at
+>> the end of buffer and write NULL terminator to the end of buffer after
+>> userspace copying.
+>>
+>> Fixes: a4f17cc72671 ("s390/cio: add CRW inject functionality")
+>> Signed-off-by: Bui Quang Minh <minhquangbui99@gmail.com>
+>> ---
+>>   drivers/s390/cio/cio_inject.c | 3 ++-
+>>   1 file changed, 2 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/s390/cio/cio_inject.c b/drivers/s390/cio/cio_inject.c
+>> index 8613fa937237..9b69fbf49f60 100644
+>> --- a/drivers/s390/cio/cio_inject.c
+>> +++ b/drivers/s390/cio/cio_inject.c
+>> @@ -95,10 +95,11 @@ static ssize_t crw_inject_write(struct file *file, const char __user *buf,
+>>   		return -EINVAL;
+>>   	}
+>>   
+>> -	buffer = vmemdup_user(buf, lbuf);
+>> +	buffer = vmemdup_user(buf, lbuf + 1);
+>>   	if (IS_ERR(buffer))
+>>   		return -ENOMEM;
+>>   
+>> +	buffer[lbuf] = '\0';
+> 
+> This would read one byte too much from user space, and could potentially
+> fault.
+> 
+> Why isn't this simply memdup_user_nul() like all others, which would do the
+> right thing?
 
-Signed-off-by: Ilpo Järvinen <ilpo.jarvinen@linux.intel.com>
----
- drivers/net/ethernet/intel/e1000e/defines.h   | 2 --
- drivers/net/ethernet/intel/ixgbe/ixgbe_type.h | 1 -
- 2 files changed, 3 deletions(-)
+Thanks for your review. It's my mistake, I blindly follow the pattern in 
+rvu_debugfs
 
-diff --git a/drivers/net/ethernet/intel/e1000e/defines.h b/drivers/net/ethernet/intel/e1000e/defines.h
-index 23a58cada43a..5e2cfa73f889 100644
---- a/drivers/net/ethernet/intel/e1000e/defines.h
-+++ b/drivers/net/ethernet/intel/e1000e/defines.h
-@@ -679,8 +679,6 @@
- /* PCI/PCI-X/PCI-EX Config space */
- #define PCI_HEADER_TYPE_REGISTER     0x0E
- 
--#define PCI_HEADER_TYPE_MULTIFUNC    0x80
--
- #define PHY_REVISION_MASK      0xFFFFFFF0
- #define MAX_PHY_REG_ADDRESS    0x1F  /* 5 bit address bus (0-0x1F) */
- #define MAX_PHY_MULTI_PAGE_REG 0xF
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h b/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h
-index ed440dd0c4f9..897fe357b65b 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h
-@@ -2179,7 +2179,6 @@ enum {
- #define IXGBE_PCI_LINK_SPEED_5000 0x2
- #define IXGBE_PCI_LINK_SPEED_8000 0x3
- #define IXGBE_PCI_HEADER_TYPE_REGISTER  0x0E
--#define IXGBE_PCI_HEADER_TYPE_MULTIFUNC 0x80
- #define IXGBE_PCI_DEVICE_CONTROL2_16ms  0x0005
- 
- #define IXGBE_PCIDEVCTRL2_TIMEO_MASK	0xf
--- 
-2.39.2
+static ssize_t rvu_dbg_qsize_write(struct file *filp,
+				   const char __user *buffer, size_t count,
+				   loff_t *ppos, int blktype)
+{
+	cmd_buf = memdup_user(buffer, count + 1);
+	if (IS_ERR(cmd_buf))
+		return -ENOMEM;
 
+	cmd_buf[count] = '\0';
+}
+
+I will send a patch to fix this too.
+
+For this case, as the original code uses vmemdup_user, which internally 
+uses kvmalloc not kmalloc, so I try to keep the original behavior. And 
+vmemdup_user does not have the counterpart vmemdup_user_nul. I can 
+kvmalloc(lbuf + 1), then copy_to_user(lbuf) and set buffer[lbuf] = '\0' 
+or do you think I should create vmemdup_user_nul?
+
+Thanks,
+Quang Minh.
 
