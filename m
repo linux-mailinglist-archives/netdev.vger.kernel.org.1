@@ -1,29 +1,29 @@
-Return-Path: <netdev+bounces-90697-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90698-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B5058AFBED
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 00:40:27 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69CCA8AFBEE
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 00:40:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7F82D1C229C7
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 22:40:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EDC8A1F234B4
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 22:40:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F9B4249F7;
-	Tue, 23 Apr 2024 22:39:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55D69286A6;
+	Tue, 23 Apr 2024 22:39:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from mail.netfilter.org (mail.netfilter.org [217.70.188.207])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62C3543AB4
-	for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 22:39:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BF2347772
+	for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 22:39:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.188.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713911982; cv=none; b=oWgpwtm5+e1u2yh+5XPBPMXksqaIN4mCNFQmtsMHy3wdQyjtT8nvatoNRty0Ko6vxshUYjTM1Dh423J6FoYeV0k2F0bVXHsr1umk4/h++rpWurBEhf7aZczO4fMO+qx7JPv9F2zXLrr+CmmBGoeuH9XIUTaXFD0Y56RLxjYTMu8=
+	t=1713911983; cv=none; b=iShMyY/xQx7bMWQlhG9LRzTGH19vwQNU8/ZM7JQFhkpbxCk71IRFE0ZT1mw/pKTUAmoUtazm4uVW5WQiOdRz9cKGvDhFW8fMlOn2UGXlHhmSsIr5S0Frr6LDh2pWhKzAiYjdSNaNSOy9Y9s1QyK0p3lyPP8jE3NPHUqp8mTQiVw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713911982; c=relaxed/simple;
-	bh=wLV5fPriP+JXD+Q4b/35ofyaGTs01kj3TrayQZuUgg8=;
+	s=arc-20240116; t=1713911983; c=relaxed/simple;
+	bh=AKHzQis+WqzbjK2LADWtbs3dPanqdGcxdPxiXYfe/nA=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=lx1ZMU/jz2zmhYuZ/FIXXWy3kG5osmjNvhvfJdGW43u35lmJuIFVNvlEJI2tF/liDmFfKb8gG2kUbkMz0wETHO6+RbT0CGaHLUcvFkLRbzaVRJBaEfkpTLUsjaiGsOixVO/tylsL7ulU1Sfpd7JtncNmaN+77DkiRoRbzzoa+oQ=
+	 MIME-Version; b=AtJSxeaCajZwCW18JqrwXc8H1wuwibh+Nw0/zK4cVrTdQlHgQmGCX9UVHxLpMCpT06cN/BQ7opGtHNf+S6XjrerrCtNeZpdAV8dtE6HSFCgLCrbzfmCBodgczeiFAdf5pEYUfiUMc0N/rMnVh61/h2a8gB3GpGmXBHipnSOyEOE=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; arc=none smtp.client-ip=217.70.188.207
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
@@ -36,9 +36,9 @@ Cc: davem@davemloft.net,
 	laforge@osmocom.org,
 	pespin@sysmocom.de,
 	osmith@sysmocom.de
-Subject: [PATCH net-next 11/12] gtp: support for IPv4-in-IPv6-GTP and IPv6-in-IPv4-GTP
-Date: Wed, 24 Apr 2024 00:39:18 +0200
-Message-Id: <20240423223919.3385493-12-pablo@netfilter.org>
+Subject: [PATCH net-next 12/12] gtp: identify tunnel via GTP device + GTP version + TEID + family
+Date: Wed, 24 Apr 2024 00:39:19 +0200
+Message-Id: <20240423223919.3385493-13-pablo@netfilter.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20240423223919.3385493-1-pablo@netfilter.org>
 References: <20240423223919.3385493-1-pablo@netfilter.org>
@@ -50,273 +50,223 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add new protocol field to PDP context that determines the transmit path
-IP protocol to encapsulate the original packets, either IPv4 or IPv6.
-
-Relax existing netlink attribute checks to allow to specify different
-family in MS and peer attributes from the control plane.
-
-Use build helpers to tx path to encapsulate IPv4-in-IPv6-GTP and
-IPv6-in-IPv4-GTP according to the user-specified configuration.
-
-From rx path, snoop for the inner protocol header since outer
-skb->protocol might differ and use this to validate for valid PDP
-context and to restore skb->protocol after decapsulation.
+This allows to define a GTP tunnel for dual stack MS/UE with both IPv4
+and IPv6 addresses while using the same TEID via two PDP context
+objects.
 
 Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
 ---
- drivers/net/gtp.c | 129 ++++++++++++++++++++++++++++++++++++----------
- 1 file changed, 101 insertions(+), 28 deletions(-)
+ drivers/net/gtp.c | 85 +++++++++++++++++++++++++++++++++++------------
+ 1 file changed, 63 insertions(+), 22 deletions(-)
 
 diff --git a/drivers/net/gtp.c b/drivers/net/gtp.c
-index c38dfe6a0673..0b39c4e31e67 100644
+index 0b39c4e31e67..3196f7bb20b3 100644
 --- a/drivers/net/gtp.c
 +++ b/drivers/net/gtp.c
-@@ -267,9 +267,10 @@ static bool gtp_check_ms_ipv6(struct sk_buff *skb, struct pdp_ctx *pctx,
-  * existing mobile subscriber.
-  */
- static bool gtp_check_ms(struct sk_buff *skb, struct pdp_ctx *pctx,
--			     unsigned int hdrlen, unsigned int role)
-+			 unsigned int hdrlen, unsigned int role,
-+			 __u16 inner_proto)
- {
--	switch (ntohs(skb->protocol)) {
-+	switch (inner_proto) {
- 	case ETH_P_IP:
- 		return gtp_check_ms_ipv4(skb, pctx, hdrlen, role);
- 	case ETH_P_IPV6:
-@@ -278,16 +279,47 @@ static bool gtp_check_ms(struct sk_buff *skb, struct pdp_ctx *pctx,
- 	return false;
+@@ -140,7 +140,7 @@ static inline u32 ipv6_hashfn(const struct in6_addr *ip6)
  }
  
-+static int gtp_inner_proto(struct sk_buff *skb, unsigned int hdrlen,
-+			   __u16 *inner_proto)
+ /* Resolve a PDP context structure based on the 64bit TID. */
+-static struct pdp_ctx *gtp0_pdp_find(struct gtp_dev *gtp, u64 tid)
++static struct pdp_ctx *gtp0_pdp_find(struct gtp_dev *gtp, u64 tid, u16 family)
+ {
+ 	struct hlist_head *head;
+ 	struct pdp_ctx *pdp;
+@@ -148,7 +148,8 @@ static struct pdp_ctx *gtp0_pdp_find(struct gtp_dev *gtp, u64 tid)
+ 	head = &gtp->tid_hash[gtp0_hashfn(tid) % gtp->hash_size];
+ 
+ 	hlist_for_each_entry_rcu(pdp, head, hlist_tid) {
+-		if (pdp->gtp_version == GTP_V0 &&
++		if (pdp->af == family &&
++		    pdp->gtp_version == GTP_V0 &&
+ 		    pdp->u.v0.tid == tid)
+ 			return pdp;
+ 	}
+@@ -156,7 +157,7 @@ static struct pdp_ctx *gtp0_pdp_find(struct gtp_dev *gtp, u64 tid)
+ }
+ 
+ /* Resolve a PDP context structure based on the 32bit TEI. */
+-static struct pdp_ctx *gtp1_pdp_find(struct gtp_dev *gtp, u32 tid)
++static struct pdp_ctx *gtp1_pdp_find(struct gtp_dev *gtp, u32 tid, u16 family)
+ {
+ 	struct hlist_head *head;
+ 	struct pdp_ctx *pdp;
+@@ -164,7 +165,8 @@ static struct pdp_ctx *gtp1_pdp_find(struct gtp_dev *gtp, u32 tid)
+ 	head = &gtp->tid_hash[gtp1u_hashfn(tid) % gtp->hash_size];
+ 
+ 	hlist_for_each_entry_rcu(pdp, head, hlist_tid) {
+-		if (pdp->gtp_version == GTP_V1 &&
++		if (pdp->af == family &&
++		    pdp->gtp_version == GTP_V1 &&
+ 		    pdp->u.v1.i_tei == tid)
+ 			return pdp;
+ 	}
+@@ -304,15 +306,8 @@ static int gtp_inner_proto(struct sk_buff *skb, unsigned int hdrlen,
+ }
+ 
+ static int gtp_rx(struct pdp_ctx *pctx, struct sk_buff *skb,
+-		  unsigned int hdrlen, unsigned int role)
++		  unsigned int hdrlen, unsigned int role, __u16 inner_proto)
+ {
+-	__u16 inner_proto;
+-
+-	if (gtp_inner_proto(skb, hdrlen, &inner_proto) < 0) {
+-		netdev_dbg(pctx->dev, "GTP packet does not encapsulate an IP packet\n");
+-		return -1;
+-	}
+-
+ 	if (!gtp_check_ms(skb, pctx, hdrlen, role, inner_proto)) {
+ 		netdev_dbg(pctx->dev, "No PDP ctx for this MS\n");
+ 		return 1;
+@@ -561,6 +556,21 @@ static int gtp0_handle_echo_resp(struct gtp_dev *gtp, struct sk_buff *skb)
+ 				       msg, 0, GTP_GENL_MCGRP, GFP_ATOMIC);
+ }
+ 
++static int gtp_proto_to_family(__u16 proto)
 +{
-+	__u8 *ip_version, _ip_version;
-+
-+	ip_version = skb_header_pointer(skb, hdrlen, sizeof(ip_version),
-+					&_ip_version);
-+	if (!ip_version)
-+		return -1;
-+
-+	switch (*ip_version & 0xf0) {
-+	case 0x40:
-+		*inner_proto = ETH_P_IP;
-+		break;
-+	case 0x60:
-+		*inner_proto = ETH_P_IPV6;
-+		break;
++	switch (proto) {
++	case ETH_P_IP:
++		return AF_INET;
++	case ETH_P_IPV6:
++		return AF_INET6;
 +	default:
-+		return -1;
++		WARN_ON_ONCE(1);
++		break;
 +	}
 +
-+	return 0;
++	return AF_UNSPEC;
 +}
 +
- static int gtp_rx(struct pdp_ctx *pctx, struct sk_buff *skb,
--			unsigned int hdrlen, unsigned int role)
-+		  unsigned int hdrlen, unsigned int role)
+ /* 1 means pass up to the stack, -1 means drop and 0 means decapsulated. */
+ static int gtp0_udp_encap_recv(struct gtp_dev *gtp, struct sk_buff *skb)
  {
--	if (!gtp_check_ms(skb, pctx, hdrlen, role)) {
+@@ -568,6 +578,7 @@ static int gtp0_udp_encap_recv(struct gtp_dev *gtp, struct sk_buff *skb)
+ 			      sizeof(struct gtp0_header);
+ 	struct gtp0_header *gtp0;
+ 	struct pdp_ctx *pctx;
 +	__u16 inner_proto;
-+
+ 
+ 	if (!pskb_may_pull(skb, hdrlen))
+ 		return -1;
+@@ -590,13 +601,19 @@ static int gtp0_udp_encap_recv(struct gtp_dev *gtp, struct sk_buff *skb)
+ 	if (gtp0->type != GTP_TPDU)
+ 		return 1;
+ 
+-	pctx = gtp0_pdp_find(gtp, be64_to_cpu(gtp0->tid));
 +	if (gtp_inner_proto(skb, hdrlen, &inner_proto) < 0) {
 +		netdev_dbg(pctx->dev, "GTP packet does not encapsulate an IP packet\n");
 +		return -1;
 +	}
 +
-+	if (!gtp_check_ms(skb, pctx, hdrlen, role, inner_proto)) {
- 		netdev_dbg(pctx->dev, "No PDP ctx for this MS\n");
++	pctx = gtp0_pdp_find(gtp, be64_to_cpu(gtp0->tid),
++			     gtp_proto_to_family(inner_proto));
+ 	if (!pctx) {
+ 		netdev_dbg(gtp->dev, "No PDP ctx to decap skb=%p\n", skb);
  		return 1;
  	}
  
- 	/* Get rid of the GTP + UDP headers. */
--	if (iptunnel_pull_header(skb, hdrlen, skb->protocol,
-+	if (iptunnel_pull_header(skb, hdrlen, htons(inner_proto),
- 			 !net_eq(sock_net(pctx->sk), dev_net(pctx->dev)))) {
- 		pctx->dev->stats.rx_length_errors++;
- 		goto err;
-@@ -1107,6 +1139,7 @@ static int gtp_build_skb_ip4(struct sk_buff *skb, struct net_device *dev,
- 			     struct gtp_pktinfo *pktinfo)
- {
- 	struct gtp_dev *gtp = netdev_priv(dev);
-+	struct net *net = gtp->net;
- 	struct pdp_ctx *pctx;
- 	struct iphdr *iph;
- 	int ret;
-@@ -1127,8 +1160,21 @@ static int gtp_build_skb_ip4(struct sk_buff *skb, struct net_device *dev,
- 	}
- 	netdev_dbg(dev, "found PDP context %p\n", pctx);
- 
--	ret = gtp_build_skb_outer_ip4(skb, dev, pktinfo, pctx,
--				      iph->tos, iph->frag_off);
-+	switch (pctx->sk->sk_family) {
-+	case AF_INET:
-+		ret = gtp_build_skb_outer_ip4(skb, dev, pktinfo, pctx,
-+					      iph->tos, iph->frag_off);
-+		break;
-+	case AF_INET6:
-+		ret = gtp_build_skb_outer_ip6(net, skb, dev, pktinfo, pctx,
-+					      iph->tos);
-+		break;
-+	default:
-+		ret = -1;
-+		WARN_ON_ONCE(1);
-+		break;
-+	}
-+
- 	if (ret < 0)
- 		return ret;
- 
-@@ -1166,7 +1212,19 @@ static int gtp_build_skb_ip6(struct sk_buff *skb, struct net_device *dev,
- 
- 	tos = ipv6_get_dsfield(ip6h);
- 
--	ret = gtp_build_skb_outer_ip6(net, skb, dev, pktinfo, pctx, tos);
-+	switch (pctx->sk->sk_family) {
-+	case AF_INET:
-+		ret = gtp_build_skb_outer_ip4(skb, dev, pktinfo, pctx, tos, 0);
-+		break;
-+	case AF_INET6:
-+		ret = gtp_build_skb_outer_ip6(net, skb, dev, pktinfo, pctx, tos);
-+		break;
-+	default:
-+		ret = -1;
-+		WARN_ON_ONCE(1);
-+		break;
-+	}
-+
- 	if (ret < 0)
- 		return ret;
- 
-@@ -1206,8 +1264,8 @@ static netdev_tx_t gtp_dev_xmit(struct sk_buff *skb, struct net_device *dev)
- 	if (err < 0)
- 		goto tx_err;
- 
--	switch (proto) {
--	case ETH_P_IP:
-+	switch (pktinfo.pctx->sk->sk_family) {
-+	case AF_INET:
- 		udp_tunnel_xmit_skb(pktinfo.rt, pktinfo.sk, skb,
- 				    pktinfo.fl4.saddr, pktinfo.fl4.daddr,
- 				    pktinfo.tos,
-@@ -1218,7 +1276,7 @@ static netdev_tx_t gtp_dev_xmit(struct sk_buff *skb, struct net_device *dev)
- 					    dev_net(dev)),
- 				    false);
- 		break;
--	case ETH_P_IPV6:
-+	case AF_INET6:
- #if IS_ENABLED(CONFIG_IPV6)
- 		udp_tunnel6_xmit_skb(&pktinfo.rt6->dst, pktinfo.sk, skb, dev,
- 				     &pktinfo.fl6.saddr, &pktinfo.fl6.daddr,
-@@ -1693,10 +1751,19 @@ static void gtp_pdp_fill(struct pdp_ctx *pctx, struct genl_info *info)
- 	}
+-	return gtp_rx(pctx, skb, hdrlen, gtp->role);
++	return gtp_rx(pctx, skb, hdrlen, gtp->role, inner_proto);
  }
  
-+static void ip_pdp_peer_fill(struct pdp_ctx *pctx, struct genl_info *info)
-+{
-+	if (info->attrs[GTPA_PEER_ADDRESS]) {
-+		pctx->peer.addr.s_addr =
-+			nla_get_be32(info->attrs[GTPA_PEER_ADDRESS]);
-+	} else if (info->attrs[GTPA_PEER_ADDR6]) {
-+		pctx->peer.addr6 = nla_get_in6_addr(info->attrs[GTPA_PEER_ADDR6]);
-+	}
-+}
-+
- static void ipv4_pdp_fill(struct pdp_ctx *pctx, struct genl_info *info)
- {
--	pctx->peer.addr.s_addr =
--		nla_get_be32(info->attrs[GTPA_PEER_ADDRESS]);
-+	ip_pdp_peer_fill(pctx, info);
- 	pctx->ms.addr.s_addr =
- 		nla_get_be32(info->attrs[GTPA_MS_ADDRESS]);
- 	gtp_pdp_fill(pctx, info);
-@@ -1704,7 +1771,7 @@ static void ipv4_pdp_fill(struct pdp_ctx *pctx, struct genl_info *info)
+ /* msg_type has to be GTP_ECHO_REQ or GTP_ECHO_RSP */
+@@ -767,6 +784,7 @@ static int gtp1u_udp_encap_recv(struct gtp_dev *gtp, struct sk_buff *skb)
+ 			      sizeof(struct gtp1_header);
+ 	struct gtp1_header *gtp1;
+ 	struct pdp_ctx *pctx;
++	__u16 inner_proto;
  
- static bool ipv6_pdp_fill(struct pdp_ctx *pctx, struct genl_info *info)
- {
--	pctx->peer.addr6 = nla_get_in6_addr(info->attrs[GTPA_PEER_ADDR6]);
-+	ip_pdp_peer_fill(pctx, info);
- 	pctx->ms.addr6 = nla_get_in6_addr(info->attrs[GTPA_MS_ADDR6]);
- 	if (pctx->ms.addr6.s6_addr32[2] ||
- 	    pctx->ms.addr6.s6_addr32[3])
-@@ -1738,6 +1805,9 @@ static struct pdp_ctx *gtp_pdp_add(struct gtp_dev *gtp, struct sock *sk,
- 	if (family == AF_INET6)
- 		return ERR_PTR(-EAFNOSUPPORT);
- #endif
-+	if (!info->attrs[GTPA_PEER_ADDRESS] &&
-+	    !info->attrs[GTPA_PEER_ADDR6])
-+		return ERR_PTR(-EINVAL);
+ 	if (!pskb_may_pull(skb, hdrlen))
+ 		return -1;
+@@ -802,9 +820,15 @@ static int gtp1u_udp_encap_recv(struct gtp_dev *gtp, struct sk_buff *skb)
+ 	if (!pskb_may_pull(skb, hdrlen))
+ 		return -1;
  
- 	if ((info->attrs[GTPA_PEER_ADDRESS] &&
- 	     sk->sk_family == AF_INET6) ||
-@@ -1748,9 +1818,7 @@ static struct pdp_ctx *gtp_pdp_add(struct gtp_dev *gtp, struct sock *sk,
- 	switch (family) {
- 	case AF_INET:
- 		if (!info->attrs[GTPA_MS_ADDRESS] ||
--		    !info->attrs[GTPA_PEER_ADDRESS] ||
--		    info->attrs[GTPA_MS_ADDR6] ||
--		    info->attrs[GTPA_PEER_ADDR6])
-+		    info->attrs[GTPA_MS_ADDR6])
- 			return ERR_PTR(-EINVAL);
- 
- 		ms_addr = nla_get_be32(info->attrs[GTPA_MS_ADDRESS]);
-@@ -1759,9 +1827,7 @@ static struct pdp_ctx *gtp_pdp_add(struct gtp_dev *gtp, struct sock *sk,
- 		break;
- 	case AF_INET6:
- 		if (!info->attrs[GTPA_MS_ADDR6] ||
--		    !info->attrs[GTPA_PEER_ADDR6] ||
--		    info->attrs[GTPA_MS_ADDRESS] ||
--		    info->attrs[GTPA_PEER_ADDRESS])
-+		    info->attrs[GTPA_MS_ADDRESS])
- 			return ERR_PTR(-EINVAL);
- 
- 		ms_addr6 = nla_get_in6_addr(info->attrs[GTPA_MS_ADDR6]);
-@@ -1825,15 +1891,13 @@ static struct pdp_ctx *gtp_pdp_add(struct gtp_dev *gtp, struct sock *sk,
- 
- 	switch (pctx->af) {
- 	case AF_INET:
--		if (!info->attrs[GTPA_MS_ADDRESS] ||
--		    !info->attrs[GTPA_PEER_ADDRESS])
-+		if (!info->attrs[GTPA_MS_ADDRESS])
- 			return ERR_PTR(-EINVAL);
- 
- 		ipv4_pdp_fill(pctx, info);
- 		break;
- 	case AF_INET6:
--		if (!info->attrs[GTPA_MS_ADDR6] ||
--		    !info->attrs[GTPA_PEER_ADDR6])
-+		if (!info->attrs[GTPA_MS_ADDR6])
- 			return ERR_PTR(-EINVAL);
- 
- 		if (!ipv6_pdp_fill(pctx, info))
-@@ -2051,13 +2115,22 @@ static int gtp_genl_fill_info(struct sk_buff *skb, u32 snd_portid, u32 snd_seq,
- 
- 	switch (pctx->af) {
- 	case AF_INET:
--		if (nla_put_be32(skb, GTPA_PEER_ADDRESS, pctx->peer.addr.s_addr) ||
--		    nla_put_be32(skb, GTPA_MS_ADDRESS, pctx->ms.addr.s_addr))
-+		if (nla_put_be32(skb, GTPA_MS_ADDRESS, pctx->ms.addr.s_addr))
-+			goto nla_put_failure;
-+		break;
-+	case AF_INET6:
-+		if (nla_put_in6_addr(skb, GTPA_MS_ADDR6, &pctx->ms.addr6))
-+			goto nla_put_failure;
-+		break;
++	if (gtp_inner_proto(skb, hdrlen, &inner_proto) < 0) {
++		netdev_dbg(pctx->dev, "GTP packet does not encapsulate an IP packet\n");
++		return -1;
 +	}
 +
-+	switch (pctx->sk->sk_family) {
-+	case AF_INET:
-+		if (nla_put_be32(skb, GTPA_PEER_ADDRESS, pctx->peer.addr.s_addr))
- 			goto nla_put_failure;
- 		break;
- 	case AF_INET6:
--		if (nla_put_in6_addr(skb, GTPA_PEER_ADDR6, &pctx->peer.addr6) ||
--		    nla_put_in6_addr(skb, GTPA_MS_ADDR6, &pctx->ms.addr6))
-+		if (nla_put_in6_addr(skb, GTPA_PEER_ADDR6, &pctx->peer.addr6))
- 			goto nla_put_failure;
- 		break;
+ 	gtp1 = (struct gtp1_header *)(skb->data + sizeof(struct udphdr));
+ 
+-	pctx = gtp1_pdp_find(gtp, ntohl(gtp1->tid));
++	pctx = gtp1_pdp_find(gtp, ntohl(gtp1->tid),
++			     gtp_proto_to_family(inner_proto));
+ 	if (!pctx) {
+ 		netdev_dbg(gtp->dev, "No PDP ctx to decap skb=%p\n", skb);
+ 		return 1;
+@@ -814,7 +838,7 @@ static int gtp1u_udp_encap_recv(struct gtp_dev *gtp, struct sk_buff *skb)
+ 	    gtp_parse_exthdrs(skb, &hdrlen) < 0)
+ 		return -1;
+ 
+-	return gtp_rx(pctx, skb, hdrlen, gtp->role);
++	return gtp_rx(pctx, skb, hdrlen, gtp->role, inner_proto);
+ }
+ 
+ static void __gtp_encap_destroy(struct sock *sk)
+@@ -1841,10 +1865,12 @@ static struct pdp_ctx *gtp_pdp_add(struct gtp_dev *gtp, struct sock *sk,
+ 		found = true;
+ 	if (version == GTP_V0)
+ 		pctx_tid = gtp0_pdp_find(gtp,
+-					 nla_get_u64(info->attrs[GTPA_TID]));
++					 nla_get_u64(info->attrs[GTPA_TID]),
++					 family);
+ 	else if (version == GTP_V1)
+ 		pctx_tid = gtp1_pdp_find(gtp,
+-					 nla_get_u32(info->attrs[GTPA_I_TEI]));
++					 nla_get_u32(info->attrs[GTPA_I_TEI]),
++					 family);
+ 	if (pctx_tid)
+ 		found = true;
+ 
+@@ -2023,6 +2049,12 @@ static struct pdp_ctx *gtp_find_pdp_by_link(struct net *net,
+ 					    struct nlattr *nla[])
+ {
+ 	struct gtp_dev *gtp;
++	int family;
++
++	if (nla[GTPA_FAMILY])
++		family = nla_get_u8(nla[GTPA_FAMILY]);
++	else
++		family = AF_INET;
+ 
+ 	gtp = gtp_find_dev(net, nla);
+ 	if (!gtp)
+@@ -2031,10 +2063,16 @@ static struct pdp_ctx *gtp_find_pdp_by_link(struct net *net,
+ 	if (nla[GTPA_MS_ADDRESS]) {
+ 		__be32 ip = nla_get_be32(nla[GTPA_MS_ADDRESS]);
+ 
++		if (family != AF_INET)
++			return ERR_PTR(-EINVAL);
++
+ 		return ipv4_pdp_find(gtp, ip);
+ 	} else if (nla[GTPA_MS_ADDR6]) {
+ 		struct in6_addr addr = nla_get_in6_addr(nla[GTPA_MS_ADDR6]);
+ 
++		if (family != AF_INET6)
++			return ERR_PTR(-EINVAL);
++
+ 		if (addr.s6_addr32[2] ||
+ 		    addr.s6_addr32[3])
+ 			return ERR_PTR(-EADDRNOTAVAIL);
+@@ -2043,10 +2081,13 @@ static struct pdp_ctx *gtp_find_pdp_by_link(struct net *net,
+ 	} else if (nla[GTPA_VERSION]) {
+ 		u32 gtp_version = nla_get_u32(nla[GTPA_VERSION]);
+ 
+-		if (gtp_version == GTP_V0 && nla[GTPA_TID])
+-			return gtp0_pdp_find(gtp, nla_get_u64(nla[GTPA_TID]));
+-		else if (gtp_version == GTP_V1 && nla[GTPA_I_TEI])
+-			return gtp1_pdp_find(gtp, nla_get_u32(nla[GTPA_I_TEI]));
++		if (gtp_version == GTP_V0 && nla[GTPA_TID]) {
++			return gtp0_pdp_find(gtp, nla_get_u64(nla[GTPA_TID]),
++					     family);
++		} else if (gtp_version == GTP_V1 && nla[GTPA_I_TEI]) {
++			return gtp1_pdp_find(gtp, nla_get_u32(nla[GTPA_I_TEI]),
++					     family);
++		}
  	}
+ 
+ 	return ERR_PTR(-EINVAL);
 -- 
 2.30.2
 
