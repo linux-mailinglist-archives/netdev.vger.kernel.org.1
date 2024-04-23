@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-90431-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90432-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96A6B8AE1AF
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 12:03:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 911348AE1B0
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 12:03:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 21198283DA7
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 10:03:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C1C9D1C21D67
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 10:03:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D150360DFB;
-	Tue, 23 Apr 2024 10:02:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97CE8626DF;
+	Tue, 23 Apr 2024 10:02:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OfEfuua9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SRkFOyjm"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A54875FBAA;
-	Tue, 23 Apr 2024 10:02:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C5C860EC4;
+	Tue, 23 Apr 2024 10:02:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713866540; cv=none; b=aeNk4duMuSPX8qI3dBrWE4qQm2ZHJdRuNWWr+Mx/OfvxdqPbOheq2F+sSDjUUg8l0acE+yJnM89sq7+PpBYN4gfbp1iL2zdiW0Q5ua1pwrhEnz1u01l+mq5quLanSjAmJ+QOgQaKaOtLWFztMdyg8SKDZk+COpw92WjYa1W3f8I=
+	t=1713866547; cv=none; b=YzMXAa29VOw4o3+CQpUn6FU3thBIVgH/U0tgYKf+h3l/SNfzyUXtvkrsiQIHE1DmuuOOfeGG4Em2Fxt6eZ+H6Z2CJ6Y7FOoaNs3gkVdlfHxqqJwL8Q8pV5vXecSTjDZOOJnzpjoI7nDq7dCBOzdEYVUMF91fc2D4bJBjexENS0o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713866540; c=relaxed/simple;
-	bh=roHevk8etALCBrRz2KDXK9F53loOjFxJP/aOxjGpleo=;
+	s=arc-20240116; t=1713866547; c=relaxed/simple;
+	bh=DcWxtiZEfSNNcislng1wlBVMvGVhuxg+MUeDqlbuEv4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Vp0omaqhkqUNOu1/EZLTNOFyWp+0G+bMFPCmymFC8iNtz4PRSPRWtHakxtDtgP/iSg6j80Rw7eaKwPpWYH/hn16uM5y09BppVm4aNls7hO6MetyIZBlB3xHyXvBkKXRHlKSB3bqQarVYv+4zZ7nh+fsoVMz5/eIU25jytUWYufU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OfEfuua9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D734CC2BD11;
-	Tue, 23 Apr 2024 10:02:14 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=CxvNL4amE1bMUDjavVl0E11pZhvmIIwz56LTDvO6nBdwsySzrACLDd+cKinOorZtdIzLT6CSrgSjb91v47O2UZtaJpSlQfGUo/1kauuaimU6+UMy5Rx3tojpmxFjClhGMIBq4J5O13p/XiWPKle/PZYZy7mU6MTbAqV5d/uBNh8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SRkFOyjm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14565C3277B;
+	Tue, 23 Apr 2024 10:02:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713866540;
-	bh=roHevk8etALCBrRz2KDXK9F53loOjFxJP/aOxjGpleo=;
+	s=k20201202; t=1713866547;
+	bh=DcWxtiZEfSNNcislng1wlBVMvGVhuxg+MUeDqlbuEv4=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=OfEfuua93euOvHR3DhnMSLa5ipxTDgnCLldGfzhSSOs0T1GrUJT/UYal87/tcntY5
-	 kIzH2cbPg2/eJ+bxYPHlcooeybIvKBjl2yu/DCaSrxdJ3GwfTd35kUYwFCzSubHT2D
-	 A0CoTJDB+AEU/Z6rrygJcz33BKn9TUfzG23IE+RMs1rsS9AZ36KqCkFgSDjIwHzolV
-	 /Ofi+o2qK/Z8FUt8GDQVeGzII5UUBibjOiWC1pvNq23dwAOEcXREm3ZyKkGIqreMs/
-	 WcY/WV52n1etlfqF57mTzPiG5VtR/Or14+/uEbuL4fR4cpd5x47hvGrNAWVHa8AX1f
-	 NsDwRw3N9bV+Q==
-Message-ID: <4ce919ea-6110-4a84-8992-a72a9785c48b@kernel.org>
-Date: Tue, 23 Apr 2024 12:02:12 +0200
+	b=SRkFOyjmvzSNFrB/A9QLVaNkNjjYwK14jYzQlzLAvjdXfyqEseuHNSBpPviCbWRY0
+	 aVKmk2EuzTHQnVoIowK/hYqGL71F3cSPnxbeCrTnEEaFOqA9k9+2dvHI5JgHKhr9uV
+	 vLvhS43LXjHjPlGyaqXiHmuPXdP63RZcUbL7uLB2UnYJQohJnn5DnDb2iG3rCMXSM6
+	 SJarBvpIkQPuSHQzAtl8hICEz4YGALEPtgX7TfZfKJgLGrU6JJca+MsLtnNw6R+YFA
+	 u89DFBZPgYEIumhN2eC2XUwDH2kTsjzOBeScctAdySsoftgzHT1WeUbsHF64zjew48
+	 lGqJ1Zb3Ys0rw==
+Message-ID: <aabaa38e-3201-4f5b-8328-5b4348685f71@kernel.org>
+Date: Tue, 23 Apr 2024 12:02:18 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,8 +50,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH net-next v8 5/7] mptcp: support rstreason for passive
- reset
+Subject: Re: [PATCH net-next v8 6/7] mptcp: introducing a helper into active
+ reset logic
 Content-Language: en-GB
 To: Jason Xing <kerneljasonxing@gmail.com>, edumazet@google.com,
  dsahern@kernel.org, martineau@kernel.org, geliang@kernel.org,
@@ -61,7 +61,7 @@ To: Jason Xing <kerneljasonxing@gmail.com>, edumazet@google.com,
 Cc: mptcp@lists.linux.dev, netdev@vger.kernel.org,
  linux-trace-kernel@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
 References: <20240423072137.65168-1-kerneljasonxing@gmail.com>
- <20240423072137.65168-6-kerneljasonxing@gmail.com>
+ <20240423072137.65168-7-kerneljasonxing@gmail.com>
 From: Matthieu Baerts <matttbe@kernel.org>
 Autocrypt: addr=matttbe@kernel.org; keydata=
  xsFNBFXj+ekBEADxVr99p2guPcqHFeI/JcFxls6KibzyZD5TQTyfuYlzEp7C7A9swoK5iCvf
@@ -107,7 +107,7 @@ Autocrypt: addr=matttbe@kernel.org; keydata=
  JY6dglzGKnCi/zsmp2+1w559frz4+IC7j/igvJGX4KDDKUs0mlld8J2u2sBXv7CGxdzQoHaz
  lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
 Organization: NGI0 Core
-In-Reply-To: <20240423072137.65168-6-kerneljasonxing@gmail.com>
+In-Reply-To: <20240423072137.65168-7-kerneljasonxing@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
@@ -116,60 +116,14 @@ Hi Jason,
 On 23/04/2024 09:21, Jason Xing wrote:
 > From: Jason Xing <kernelxing@tencent.com>
 > 
-> It relys on what reset options in the skb are as rfc8684 says. Reusing
-
-(if you have something else to fix, 'checkpatch.pl --codespell' reported
-a warning here: s/relys/relies/)
-
-> this logic can save us much energy. This patch replaces most of the prior
-> NOT_SPECIFIED reasons.
+> Since we have mapped every mptcp reset reason definition in enum
+> sk_rst_reason, introducing a new helper can cover some missing places
+> where we have already set the subflow->reset_reason.
 > 
-> Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> ---
->  net/mptcp/protocol.h | 28 ++++++++++++++++++++++++++++
->  net/mptcp/subflow.c  | 22 +++++++++++++++++-----
->  2 files changed, 45 insertions(+), 5 deletions(-)
-> 
-> diff --git a/net/mptcp/protocol.h b/net/mptcp/protocol.h
-> index fdfa843e2d88..bbcb8c068aae 100644
-> --- a/net/mptcp/protocol.h
-> +++ b/net/mptcp/protocol.h
-> @@ -581,6 +581,34 @@ mptcp_subflow_ctx_reset(struct mptcp_subflow_context *subflow)
->  	WRITE_ONCE(subflow->local_id, -1);
->  }
->  
-> +/* Convert reset reasons in MPTCP to enum sk_rst_reason type */
-> +static inline enum sk_rst_reason
-> +sk_rst_convert_mptcp_reason(u32 reason)
-> +{
-> +	switch (reason) {
-> +	case MPTCP_RST_EUNSPEC:
-> +		return SK_RST_REASON_MPTCP_RST_EUNSPEC;
-> +	case MPTCP_RST_EMPTCP:
-> +		return SK_RST_REASON_MPTCP_RST_EMPTCP;
-> +	case MPTCP_RST_ERESOURCE:
-> +		return SK_RST_REASON_MPTCP_RST_ERESOURCE;
-> +	case MPTCP_RST_EPROHIBIT:
-> +		return SK_RST_REASON_MPTCP_RST_EPROHIBIT;
-> +	case MPTCP_RST_EWQ2BIG:
-> +		return SK_RST_REASON_MPTCP_RST_EWQ2BIG;
-> +	case MPTCP_RST_EBADPERF:
-> +		return SK_RST_REASON_MPTCP_RST_EBADPERF;
-> +	case MPTCP_RST_EMIDDLEBOX:
-> +		return SK_RST_REASON_MPTCP_RST_EMIDDLEBOX;
-> +	default:
-> +		/**
-
-I guess here as well, it should be '/*' instead of '/**'. But I guess
-that's fine, this file is probably not scanned. Anyway, if you have to
-send a new version, please fix this as well.
-
-(Also, this helper might require '#include <net/rstreason.h>', but our
-CI is fine with it, it is also added in the next commit, and probably
-already included via include/net/request_sock.h. So I guess that's fine.)
-
-
-Other than that, it looks good to me:
+> Note: using SK_RST_REASON_NOT_SPECIFIED is the same as
+> SK_RST_REASON_MPTCP_RST_EUNSPEC. They are both unknown. So we can convert
+> it directly.
+It looks good to me, thanks:
 
 Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
 
