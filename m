@@ -1,102 +1,147 @@
-Return-Path: <netdev+bounces-90408-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90409-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 105EB8AE0C5
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 11:13:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0D0B8AE0D0
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 11:15:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8B05EB23AE7
-	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 09:13:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D2D2C1C217E5
+	for <lists+netdev@lfdr.de>; Tue, 23 Apr 2024 09:15:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 363F55644F;
-	Tue, 23 Apr 2024 09:12:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C89945730D;
+	Tue, 23 Apr 2024 09:15:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="RisI7Xup"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GRuU7baC"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1808C3399A;
-	Tue, 23 Apr 2024 09:12:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40B9221345
+	for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 09:15:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713863579; cv=none; b=KzdPlHftg7iKQAEOfj31Z5+SRKet+ZrIjy+HTBtWCtUtZf/PXu8xEeS7H08KwmONs+p9aJnCBva2zGnoYhCLo/IrIRQtjCHA08f79qK6oEuinFaQgIuYXAUJnpEcZS2M9//zECBHepcip0tuLcg7+uqeWWlL+viRlgYOJ/pRbEw=
+	t=1713863734; cv=none; b=d0FCzsDYj5MhXgTiIZ1a6Mf3c6XFDI70BMA7JGz9ClAhiUkyQEm741MFKrIWSY14k8PbmrV0WbjfTvzV9osxod+4dsPZs16s9pLLJc7eln/gvqNHsPOsTRZOtcR3TDh4QUz4Is7xOG03tGQIyKed/EBDsep/Qn3kOYEXG02hQR0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713863579; c=relaxed/simple;
-	bh=KWOkFmG3aHAc/JdDHQ/HaYbgNUgxXSXQ/L5N+b2f3SQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Y9bErGtbyrzDRwAQyFv0mzkRpLnLwDy72S4ExeUDTp+IT4dU0sfKwauoM5a4N7LLP+cWvO2K7mC951dW/XAjd1QrFaehhPGVJbjbGfQo04h0IRmTIwVXTTzgUo+Xhv9io9ahCgOCEP0VJLzJKHpDsujZ2mkVaC4aWWpDgi5jeBE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com; spf=pass smtp.mailfrom=arinc9.com; dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b=RisI7Xup; arc=none smtp.client-ip=217.70.183.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arinc9.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id AA66BC000A;
-	Tue, 23 Apr 2024 09:12:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
-	t=1713863575;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4RSaeKenSkqzfI7p9YhBSwGcR+DegY61d7J8nJauZO8=;
-	b=RisI7XupKRo6wJU3TRc7hhtxbnJr4vk3B/nwdTxtLfYbZbIpTA41dYeHgv83jFwkUkchaJ
-	GRxF3LN4ttz6IQL4BgaxfR4QzSd+9e4jgnYPzGQC13E9EBcLVF3dmhG/CwAz9sS2RtKkKZ
-	bXK6XI8RCIknkgSlHwDSBjP0btSBBwVQE7Pl6glaHHIO+HGLKiCJSKhqjA9AqgF15kYO3u
-	A3C2vLY8YaUQam9W8pRs8kGne7fQ2IF7l/lRO8CtpDJUdNKeyjpubXqIX0TnNQK0XEqAc8
-	SFwhodPli7/jQpUUBvMhLN2quJb3d3GujMPKB+UvyTdnWXHmdSsxZov3BHqJEw==
-Message-ID: <6e67c66b-1d05-40d4-930f-625acc317ff1@arinc9.com>
-Date: Tue, 23 Apr 2024 12:12:45 +0300
+	s=arc-20240116; t=1713863734; c=relaxed/simple;
+	bh=zENXedFIh6Tmz/JHiVkv82LEMexdoV9DEhKBzO9s4ec=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=HqguUzHxf/wBkTMBQS+9EEtO0B28/Nh7P5pLKBC0szC2lYY8MUaA42Zsseyrx6BAEXeaGrFNFfwVuxsW4Km8I1oW5TSZvEBeQlmUE9KLZnO0RNckFV+Sn/baZ9qfjonA9lO13Gjofn0VmLQgGZArjuvjVURklLOWiNpL1GhD4Ng=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GRuU7baC; arc=none smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1713863733; x=1745399733;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=zENXedFIh6Tmz/JHiVkv82LEMexdoV9DEhKBzO9s4ec=;
+  b=GRuU7baCWX2IQK7XXXU5ynx7oQTIjmnKF8cOY/fWESS0FdyOrJmWwKzh
+   IALpwbzOeOPmfW7BdTk3K2oN19higotSR//alAxskjY3rusgnEfsQYi+E
+   5FGA1HmDV4yFHpw3kpHS/2t+eO5yCx4DZmzZVYb9wC+nsJm5h5LouIC5O
+   p2CN57ll+7WkzWs80jPvrz4z2P/tRXhm619C/tI0fWIrEFL+NDdphvK35
+   RJVcI/VLy65gKoAg8R0+Eep6GbuVjkJq1X4WmI7bLnzSGsM5eG/3XOrcq
+   aFpQwnfdnxA6Aax8T0sOh8dpp6XZimHo3GUndbYRpipZd4bFETNVYmeCk
+   A==;
+X-CSE-ConnectionGUID: Sr1OSpeFSnGc2Q+2N81G1A==
+X-CSE-MsgGUID: VEh8ydFcRoKjmFXgvVruXg==
+X-IronPort-AV: E=McAfee;i="6600,9927,11052"; a="34835649"
+X-IronPort-AV: E=Sophos;i="6.07,222,1708416000"; 
+   d="scan'208";a="34835649"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2024 02:15:32 -0700
+X-CSE-ConnectionGUID: Zm4+HrTHTLuxjd73darihQ==
+X-CSE-MsgGUID: jWLiRbgcSTWRGEWq3jT6kw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,222,1708416000"; 
+   d="scan'208";a="28811170"
+Received: from unknown (HELO localhost.igk.intel.com) ([10.211.13.141])
+  by fmviesa003.fm.intel.com with ESMTP; 23 Apr 2024 02:15:31 -0700
+From: Sergey Temerkhanov <sergey.temerkhanov@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	Sergey Temerkhanov <sergey.temerkhanov@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Subject: [PATCH iwl-next v2] ice: Extend auxbus device naming
+Date: Tue, 23 Apr 2024 11:14:59 +0200
+Message-Id: <20240423091459.72216-1-sergey.temerkhanov@intel.com>
+X-Mailer: git-send-email 2.35.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 2/2] net: dsa: mt7530: simplify core
- operations
-To: Paolo Abeni <pabeni@redhat.com>, Daniel Golle <daniel@makrotopia.org>,
- DENG Qingfang <dqfext@gmail.com>, Sean Wang <sean.wang@mediatek.com>,
- Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
- Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-Cc: Bartel Eerdekens <bartel.eerdekens@constell8.be>,
- mithat.guner@xeront.com, erkin.bozoglu@xeront.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org
-References: <20240418-b4-for-netnext-mt7530-phy-addr-from-dt-and-simplify-core-ops-v3-0-3b5fb249b004@arinc9.com>
- <20240418-b4-for-netnext-mt7530-phy-addr-from-dt-and-simplify-core-ops-v3-2-3b5fb249b004@arinc9.com>
- <6123223eaf54ea6f492c896d81551315a1e38f66.camel@redhat.com>
-Content-Language: en-US
-From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-In-Reply-To: <6123223eaf54ea6f492c896d81551315a1e38f66.camel@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Organization: Intel Technology Poland sp. z o.o. - ul. Slowackiego 173, 80-298 Gdansk - KRS 101882 - NIP 957-07-52-316
 Content-Transfer-Encoding: 8bit
-X-GND-Sasl: arinc.unal@arinc9.com
 
-On 23/04/2024 11:40, Paolo Abeni wrote:
-> On Thu, 2024-04-18 at 08:35 +0300, Arınç ÜNAL wrote:
->>   	/* Select the Function : DATA with no post increment */
->>   	ret = bus->write(bus, MT753X_CTRL_PHY_ADDR(priv->mdiodev->addr),
->> -			 MII_MMD_CTRL, devad | MII_MMD_CTRL_NOINCR);
->> +			 MII_MMD_CTRL, MDIO_MMD_VEND2 | MII_MMD_CTRL_NOINCR);
->>   	if (ret < 0)
->>   		goto err;
-> 
-> What about a possible follow-up, moving the above writes in a separate
-> helper (say, 'core_select_register' or the like) and reusing it here
-> and in core_rmw() ?
+Include segment/domain number in the device name to distinguish
+between PCI devices located on different root complexes in
+multi-segment configurations. Naming is changed from
+ptp_<bus>_<slot>_clk<clock>  to ptp_<domain>_<bus>_<slot>_clk<clock>
 
-There's a possibility where the Clause 45 access method could be used here
-which would make this redundant. I will do your suggestion if that won't
-work out.
+v1->v2
+Rebase on top of the latest changes
 
-> 
-> Not blocking this series, I'm applying it.
+Signed-off-by: Sergey Temerkhanov <sergey.temerkhanov@intel.com>
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_ptp.c | 18 ++++++++++++------
+ 1 file changed, 12 insertions(+), 6 deletions(-)
 
-Cheers.
-Arınç
+diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
+index 402436b72322..744b102f7636 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ptp.c
++++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
+@@ -2993,8 +2993,9 @@ ice_ptp_auxbus_create_id_table(struct ice_pf *pf, const char *name)
+ static int ice_ptp_register_auxbus_driver(struct ice_pf *pf)
+ {
+ 	struct auxiliary_driver *aux_driver;
++	struct pci_dev *pdev = pf->pdev;
+ 	struct ice_ptp *ptp;
+-	char busdev[8] = {};
++	char busdev[16] = {};
+ 	struct device *dev;
+ 	char *name;
+ 	int err;
+@@ -3005,8 +3006,10 @@ static int ice_ptp_register_auxbus_driver(struct ice_pf *pf)
+ 	INIT_LIST_HEAD(&ptp->ports_owner.ports);
+ 	mutex_init(&ptp->ports_owner.lock);
+ 	if (ice_is_e810(&pf->hw))
+-		sprintf(busdev, "%u_%u_", pf->pdev->bus->number,
+-			PCI_SLOT(pf->pdev->devfn));
++		snprintf(busdev, sizeof(busdev), "%u_%u_%u_",
++			 pci_domain_nr(pdev->bus),
++			 pdev->bus->number,
++			 PCI_SLOT(pdev->devfn));
+ 	name = devm_kasprintf(dev, GFP_KERNEL, "ptp_%sclk%u", busdev,
+ 			      ice_get_ptp_src_clock_index(&pf->hw));
+ 	if (!name)
+@@ -3210,8 +3213,9 @@ static void ice_ptp_release_auxbus_device(struct device *dev)
+ static int ice_ptp_create_auxbus_device(struct ice_pf *pf)
+ {
+ 	struct auxiliary_device *aux_dev;
++	struct pci_dev *pdev = pf->pdev;
+ 	struct ice_ptp *ptp;
+-	char busdev[8] = {};
++	char busdev[16] = {};
+ 	struct device *dev;
+ 	char *name;
+ 	int err;
+@@ -3224,8 +3228,10 @@ static int ice_ptp_create_auxbus_device(struct ice_pf *pf)
+ 	aux_dev = &ptp->port.aux_dev;
+ 
+ 	if (ice_is_e810(&pf->hw))
+-		sprintf(busdev, "%u_%u_", pf->pdev->bus->number,
+-			PCI_SLOT(pf->pdev->devfn));
++		snprintf(busdev, sizeof(busdev), "%u_%u_%u_",
++			 pci_domain_nr(pdev->bus),
++			 pdev->bus->number,
++			 PCI_SLOT(pdev->devfn));
+ 
+ 	name = devm_kasprintf(dev, GFP_KERNEL, "ptp_%sclk%u", busdev,
+ 			      ice_get_ptp_src_clock_index(&pf->hw));
+-- 
+2.35.3
+
 
