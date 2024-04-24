@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-91102-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91103-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 727E08B1628
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 00:27:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C0CFB8B163D
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 00:34:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 12F5A1F21B1D
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 22:27:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6164C1F23DF2
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 22:34:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B13616C856;
-	Wed, 24 Apr 2024 22:27:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED71515ECEE;
+	Wed, 24 Apr 2024 22:34:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="bMRhgFRe"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="JyNFpLEM"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6044019BDC;
-	Wed, 24 Apr 2024 22:27:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10567142E6F
+	for <netdev@vger.kernel.org>; Wed, 24 Apr 2024 22:34:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713997632; cv=none; b=d/wvx9nwIGdxbuJLJEB5aNb2BL4IkWyv6fnjm7JVl9tHD8zIk+VAl9N+665VYFMz68b6H7eOpwM4KMrZqa4iMZbvTF5lO1JJV3zlTf/Y1iPLC/gJNAJuFCLQDLy/as55g39vae0IvWYC965r7Uf11ZU36sMf+iSM2HXiVo+tOTk=
+	t=1713998076; cv=none; b=cq4iRTet35gzBGp9qEZ7izJPH8jHNWP62PyWquxZbPOAX7Rn+py1I46h/3qDT1wXCNQaatuDVVFBvzvma0aIn7LEfcxkrX1SElJj/0dm5Yptvoxn5Kzy6HZxKkXyhtp3TyWoqwkJLJYBdvYFUqXh4wfd40jqo9S1cDojAgvo6jM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713997632; c=relaxed/simple;
-	bh=mr6dI/QUD1Ch9WACeqoktdbI/KcKANVRLuvCXSELSPQ=;
+	s=arc-20240116; t=1713998076; c=relaxed/simple;
+	bh=CaIy8WZtU9QhE4sjbsPQqXiuTfactejDtbUoAhUJqIU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dFA5bkVhsVKvU5lA4wliFfAcpx3xIWniyipsr/rdwIHwSDCqZr470rOJqBGnC24IHsYhQj1nftnHvKVsvF2oPse65u1M3ns0yZ4nFajZQcNgXdTjZEXqLSYYMl1NxPxrJwkU2wG8iVTxoAQGKndWC/FsFMmmbKNjBUEZKs+nbw0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=bMRhgFRe; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=HwidMYSI4pm6c7LQrAGhcLp5rFsLc1kgsqs2hwPY6ymkXebmPwIjvwrQ6ZPvYjVQmBbnx5CA74kD1Ztz/pZ76d0OsIYSTkkJvv7juM0VNgdxP+jQX7B1xaNUqDaZuh0IPexsWQxu3uzfA3w3bVGDHoBQBTAsXW2SwtFOHQQchp4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=JyNFpLEM; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,26 +36,19 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=/U67hF5HIifhfl+FZSrLc2zlLCGyQGz76KtbopmNEG0=; b=bMRhgFRemnmXu6ECTBiBWM1yL6
-	3JiWbbvywJYzIAbK7mZT8RtiLyxgt3Mlb18/I2KoZzvcsdYoifF6gbmyU5VfY/zoGi6eYpZ6UXemb
-	y0wpqGt0Rm0kSxuwQcdu6TsgtWdkY+Izlz3OfPGQ+vB9GVh35Ao25dqJ9B25ETCpliQs=;
+	bh=vZ3B6dq2zPnL83S+QfF4z13TMNF7T6rBVnaRE/Ud6yc=; b=JyNFpLEMtqDJctphOR6y3yPRMl
+	7bqs7eJ6ihFsW2Piu5j/4nFer0bvYUlZwfri6guvSjZWTbGi9vXKzirUokby+sMNCxkMh/ZVxCtCK
+	KOUns3XzfYnIO07NHDbaQnxUOTxjy/gvxcLxBmfdklaCO7q4h/dbZee9C2WT1KYxDhxg=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1rzl4o-00DtQK-Mk; Thu, 25 Apr 2024 00:26:54 +0200
-Date: Thu, 25 Apr 2024 00:26:54 +0200
+	id 1rzlCB-00DtSt-Vq; Thu, 25 Apr 2024 00:34:31 +0200
+Date: Thu, 25 Apr 2024 00:34:31 +0200
 From: Andrew Lunn <andrew@lunn.ch>
-To: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
-Cc: Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Fabio Estevam <festevam@denx.de>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux@ew.tq-group.com
-Subject: Re: [PATCH net v2 1/2] net: dsa: mv88e6xxx: Add support for
- model-specific pre- and post-reset handlers
-Message-ID: <6a6959dd-3ab1-4a5c-963b-2146bcbf0b47@lunn.ch>
-References: <addee2a493823b4a7e0ea966b1713f4ed6c04a2e.1713858017.git.matthias.schiffer@ew.tq-group.com>
+To: Corinna Vinschen <vinschen@redhat.com>
+Cc: netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org
+Subject: Re: [PATCH] igc: fix a log entry using uninitialized netdev
+Message-ID: <033cce07-fe8f-42e6-8c27-7afee87fe13c@lunn.ch>
+References: <20240423102455.901469-1-vinschen@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,20 +57,28 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <addee2a493823b4a7e0ea966b1713f4ed6c04a2e.1713858017.git.matthias.schiffer@ew.tq-group.com>
+In-Reply-To: <20240423102455.901469-1-vinschen@redhat.com>
 
-On Tue, Apr 23, 2024 at 09:47:48AM +0200, Matthias Schiffer wrote:
-> Instead of calling mv88e6xxx_g2_eeprom_wait() directly from
-> mv88e6xxx_hardware_reset(), add configurable pre- and post-reset hard
-> reset handlers. Initially, the handlers are set to
-> mv88e6xxx_g2_eeprom_wait() for all families that have get/set_eeprom()
-> to match the existing behavior. No functional change intended (except
-> for additional error messages on failure).
+On Tue, Apr 23, 2024 at 12:24:54PM +0200, Corinna Vinschen wrote:
+> During successful probe, igc logs this:
 > 
-> Fixes: 6ccf50d4d474 ("net: dsa: mv88e6xxx: Avoid EEPROM timeout when EEPROM is absent")
-> Signed-off-by: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+> [    5.133667] igc 0000:01:00.0 (unnamed net_device) (uninitialized): PHC added
+>                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> The reason is that igc_ptp_init() is called very early, even before
+> register_netdev() has been called. So the netdev_info() call works
+> on a partially uninitialized netdev.
+> 
+> Fix this by calling igc_ptp_init() after register_netdev(), right
+> after the media autosense check, just as in igb.  Add a comment,
+> just as in igb.
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+The network stack can start sending and receiving packet before
+register_netdev() returns. This is typical of NFS root for example. Is
+there anything in igc_ptp_init() which could cause such packet
+transfers to explode?
 
-    Andrew
+A better fix is to allocate the device name earlier. A few drivers
+call dev_alloc_name().
+
+     Andrew
 
