@@ -1,246 +1,148 @@
-Return-Path: <netdev+bounces-90761-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90763-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BAEA8AFF67
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 05:20:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 39C9D8AFFDE
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 05:40:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D75851F23460
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 03:20:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CFA241F235B7
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 03:40:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81D77126F09;
-	Wed, 24 Apr 2024 03:20:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A93D13A897;
+	Wed, 24 Apr 2024 03:40:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="exBbni7G"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="hv2umyKP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9211585C59
-	for <netdev@vger.kernel.org>; Wed, 24 Apr 2024 03:20:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCADC2E62F;
+	Wed, 24 Apr 2024 03:40:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713928809; cv=none; b=Gz3gjYEmcb7GOuYka0VShPOmsuQ8sd6jCdiiTBJLRWII9s1LAMtsSNHPSEeKAAF4JO5qBLmhHbNZasFoLJ9EyTBTvGBid30hzrkvxJQ6pNHutpxCV8XEkwrNfiG8VVaYsANRlJNMn2xxMxZWLBI5uf6bTrfbGuWPHDg9JhkZuW8=
+	t=1713930047; cv=none; b=QUYmqm9dnstBJUDXI8wLK7iXHTfeh2dtFZ+z0EtoxAwtheNeXz1Ma91GCbgYpqLxfpRufiu2CRLuk/AhsrfCt8BJ5Emqdw340PU4qeBjFoBEnHPYykDIU4OpjPWc206quPX+wbWZzL7+DoVVP8J/CPqUeGip8+zzymMD53TI/cI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713928809; c=relaxed/simple;
-	bh=H+p+cA61CzYduY8sRfPYttKsWJhYYkxxYGrlMK8KNi8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TUIltL4JlzPTzFnGFSaRHUj4nF65ou9TiY7/Ygm3pT7KLcHb5LWWhCQelqpIlw2FwO/vJjj21+HlW3OV7VNQgY99YNN3qJCnxF8/SAofmJ/gNeevf0YdWM2U3TxlGQdNM0iwhCaFZYd5bbqubg2qs0U2zzwcTSmjhxosf91zTig=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=exBbni7G; arc=none smtp.client-ip=209.85.210.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-6e46dcd8feaso3047175b3a.2
-        for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 20:20:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1713928807; x=1714533607; darn=vger.kernel.org;
-        h=in-reply-to:autocrypt:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=pw2OEOLVknYVzeHBwNsmqaLDxu9yKtmRaQCI5E8Mjrs=;
-        b=exBbni7GiN3bF0m/FW0yNSm4m407RfBxLNEMgQw0+56sVgRwxVyMSjlKPJ/z+ozl1a
-         uBZrq/tnnXrPIjctXuosK3Z9R5oMXW+PoSXC7qAmV8+R5+FL6JRJN6KqpRc6AZmxxUTv
-         Kapfk4Ej/iyNwDuEws2D47HbpJko/GKIcHOuQ=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713928807; x=1714533607;
-        h=in-reply-to:autocrypt:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=pw2OEOLVknYVzeHBwNsmqaLDxu9yKtmRaQCI5E8Mjrs=;
-        b=dZ42wZt2EOvVqOEghOLDYQXEUnYRB6bY0/kthAH1wlhv1e+VRDpXkOh2NmVDD8BxAa
-         cXNly1zoeXpaCfdBntaw8qZ4ISa0mA0HuTLKR20tW6cEJ68/JvsPH1jOZu+i8+DXCb3/
-         HhxzDBgr8jN4PspN98SLSe1ZsMhMT9J0ncpllxDXPqLTjGtOWt+CMdqDgR1/jxjQlrI5
-         gd6u5N21vt4nDYGo0soMxwSALyWpzN8YLtxLF/kXbX+ks2QmCphXSR2pTg3zOlxzjIAn
-         7dNBPvgtuXh+HzT+Lz8NM5MyfBJJn4UVImx502xxcjBAxH6mh7aYbm8QtE5hO2ZahMet
-         TAWg==
-X-Forwarded-Encrypted: i=1; AJvYcCWefq8iB+HCpflKGACokbu3vZyFKkbwZu2fGshLCAdtfxKM7IsUpdgaXN0n/t/efAR4vXdOVuJ9rpwrADwVfqUuwkZxgPQZ
-X-Gm-Message-State: AOJu0YyRqQK9xSU7K6BiO8s5DhdIUzcW9hGIEhXutHJD6uhvgTfTdKqt
-	UFry7ASgknjM47hCbjKUGu2er9pVQtdXvnwp3BYtZKEb/RqPKe0gx7GrTw5KjA==
-X-Google-Smtp-Source: AGHT+IGOqTDWHZwB92KOICduJe0v24E3NfVNBSjALHQ5jkohouPor5aVbcHtPB0BPhwZ4bmp4P5d0w==
-X-Received: by 2002:a05:6a20:244f:b0:1a7:91b0:4f2a with SMTP id t15-20020a056a20244f00b001a791b04f2amr1365655pzc.41.1713928806691;
-        Tue, 23 Apr 2024 20:20:06 -0700 (PDT)
-Received: from [192.168.1.3] (ip68-4-215-93.oc.oc.cox.net. [68.4.215.93])
-        by smtp.gmail.com with ESMTPSA id x6-20020a170902ec8600b001e446490072sm5151047plg.25.2024.04.23.20.20.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 23 Apr 2024 20:20:04 -0700 (PDT)
-Message-ID: <1d1467d1-b57b-4cc6-a995-4068d6741a73@broadcom.com>
-Date: Tue, 23 Apr 2024 20:20:01 -0700
+	s=arc-20240116; t=1713930047; c=relaxed/simple;
+	bh=TSoe9AjLh2xT47kF4u9KjUP/QLLrWb9YhK9iLQNESSQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=cjeXAxel3YXBXx8AfOBDq9jT3ZHw5HFWhGPOQdlJO44Rl1OuaY6TG4BpbkDz7endKg7D2wCP4ep/gBjUJaNXCX7f0u+OnHaQDnqfk6V0cNw02Jz0Re9vtfu034azs/IT5rS6L8wmtNjludNn+uV5FgObSA0QKkp17ZTFv9XzMyQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=hv2umyKP; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1713930041;
+	bh=bG/fMaEnCOyIuDV9RDHJi6dZU9qMJoxcxKKp0+w5cuA=;
+	h=Date:From:To:Cc:Subject:From;
+	b=hv2umyKPKmGBQ2UiODimtoNErCcQVXFeas716MXEMiWmY0OPH9+CDXatq7my4A2pF
+	 NLX1F8bzLJcV6kPFQE0iY7F3CwZ0xILlQ83nqFNCHcwhnGtcTx08728QXlCnrgiKEU
+	 VdAtU2v4yVNbH8jdRo8oNxE7za9BU58MZxzWoPGgXAEYZVLkxXHrcj++W9YQY/a4dR
+	 95I1xDj09o37lBrhy81cB1x83s0LB7yAQ4u8HKPizcpirJe06j4RHZaDepU1OaLvbl
+	 d/gX6A6Pa1m6gBij5avlo/RUxMVVJpfmvig79/kHpJCD9Z8TLXB0yQH615fL/VPnTQ
+	 oKlhKneppUx4Q==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4VPPs34PySz4wcp;
+	Wed, 24 Apr 2024 13:40:39 +1000 (AEST)
+Date: Wed, 24 Apr 2024 13:40:38 +1000
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Rob Herring <robh@kernel.org>, David Miller <davem@davemloft.net>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Alexandre
+ Torgue <alexandre.torgue@st.com>
+Cc: Networking <netdev@vger.kernel.org>, Alexandre Torgue
+ <alexandre.torgue@foss.st.com>, Gatien Chevallier
+ <gatien.chevallier@foss.st.com>, "Kory Maincent (Dent Project)"
+ <kory.maincent@bootlin.com>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>, Saravana Kannan <saravanak@google.com>
+Subject: linux-next: manual merge of the devicetree tree with the net-next,
+ stm32 trees
+Message-ID: <20240424134038.28532f2f@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/4] mfd: intel-lpss: Utilize i2c-designware.h
-To: Andy Shevchenko <andy.shevchenko@gmail.com>
-Cc: linux-kernel@vger.kernel.org,
- Jarkko Nikula <jarkko.nikula@linux.intel.com>,
- Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
- Mika Westerberg <mika.westerberg@linux.intel.com>,
- Jan Dabros <jsd@semihalf.com>, Andi Shyti <andi.shyti@kernel.org>,
- Lee Jones <lee@kernel.org>, Jiawen Wu <jiawenwu@trustnetic.com>,
- Mengyuan Lou <mengyuanlou@net-swift.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
- Andrew Lunn <andrew@lunn.ch>, Duanqiang Wen <duanqiangwen@net-swift.com>,
- "open list:SYNOPSYS DESIGNWARE I2C DRIVER" <linux-i2c@vger.kernel.org>,
- "open list:WANGXUN ETHERNET DRIVER" <netdev@vger.kernel.org>
-References: <20240423233622.1494708-1-florian.fainelli@broadcom.com>
- <20240423233622.1494708-3-florian.fainelli@broadcom.com>
- <ZihLhl8eLC1ntJZK@surfacebook.localdomain>
-From: Florian Fainelli <florian.fainelli@broadcom.com>
-Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
- xsBNBFPAG8ABCAC3EO02urEwipgbUNJ1r6oI2Vr/+uE389lSEShN2PmL3MVnzhViSAtrYxeT
- M0Txqn1tOWoIc4QUl6Ggqf5KP6FoRkCrgMMTnUAINsINYXK+3OLe7HjP10h2jDRX4Ajs4Ghs
- JrZOBru6rH0YrgAhr6O5gG7NE1jhly+EsOa2MpwOiXO4DE/YKZGuVe6Bh87WqmILs9KvnNrQ
- PcycQnYKTVpqE95d4M824M5cuRB6D1GrYovCsjA9uxo22kPdOoQRAu5gBBn3AdtALFyQj9DQ
- KQuc39/i/Kt6XLZ/RsBc6qLs+p+JnEuPJngTSfWvzGjpx0nkwCMi4yBb+xk7Hki4kEslABEB
- AAHNMEZsb3JpYW4gRmFpbmVsbGkgPGZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tPsLB
- IQQQAQgAywUCZWl41AUJI+Jo+hcKAAG/SMv+fS3xUQWa0NryPuoRGjsA3SAUAAAAAAAWAAFr
- ZXktdXNhZ2UtbWFza0BwZ3AuY29tjDAUgAAAAAAgAAdwcmVmZXJyZWQtZW1haWwtZW5jb2Rp
- bmdAcGdwLmNvbXBncG1pbWUICwkIBwMCAQoFF4AAAAAZGGxkYXA6Ly9rZXlzLmJyb2FkY29t
- Lm5ldAUbAwAAAAMWAgEFHgEAAAAEFQgJChYhBNXZKpfnkVze1+R8aIExtcQpvGagAAoJEIEx
- tcQpvGagWPEH/2l0DNr9QkTwJUxOoP9wgHfmVhqc0ZlDsBFv91I3BbhGKI5UATbipKNqG13Z
- TsBrJHcrnCqnTRS+8n9/myOF0ng2A4YT0EJnayzHugXm+hrkO5O9UEPJ8a+0553VqyoFhHqA
- zjxj8fUu1px5cbb4R9G4UAySqyeLLeqnYLCKb4+GklGSBGsLMYvLmIDNYlkhMdnnzsSUAS61
- WJYW6jjnzMwuKJ0ZHv7xZvSHyhIsFRiYiEs44kiYjbUUMcXor/uLEuTIazGrE3MahuGdjpT2
- IOjoMiTsbMc0yfhHp6G/2E769oDXMVxCCbMVpA+LUtVIQEA+8Zr6mX0Yk4nDS7OiBlvOwE0E
- U8AbwQEIAKxr71oqe+0+MYCc7WafWEcpQHFUwvYLcdBoOnmJPxDwDRpvU5LhqSPvk/yJdh9k
- 4xUDQu3rm1qIW2I9Puk5n/Jz/lZsqGw8T13DKyu8eMcvaA/irm9lX9El27DPHy/0qsxmxVmU
- pu9y9S+BmaMb2CM9IuyxMWEl9ruWFS2jAWh/R8CrdnL6+zLk60R7XGzmSJqF09vYNlJ6Bdbs
- MWDXkYWWP5Ub1ZJGNJQ4qT7g8IN0qXxzLQsmz6tbgLMEHYBGx80bBF8AkdThd6SLhreCN7Uh
- IR/5NXGqotAZao2xlDpJLuOMQtoH9WVNuuxQQZHVd8if+yp6yRJ5DAmIUt5CCPcAEQEAAcLB
- gQQYAQIBKwUCU8AbwgUbDAAAAMBdIAQZAQgABgUCU8AbwQAKCRCTYAaomC8PVQ0VCACWk3n+
- obFABEp5Rg6Qvspi9kWXcwCcfZV41OIYWhXMoc57ssjCand5noZi8bKg0bxw4qsg+9cNgZ3P
- N/DFWcNKcAT3Z2/4fTnJqdJS//YcEhlr8uGs+ZWFcqAPbteFCM4dGDRruo69IrHfyyQGx16s
- CcFlrN8vD066RKevFepb/ml7eYEdN5SRALyEdQMKeCSf3mectdoECEqdF/MWpfWIYQ1hEfdm
- C2Kztm+h3Nkt9ZQLqc3wsPJZmbD9T0c9Rphfypgw/SfTf2/CHoYVkKqwUIzI59itl5Lze+R5
- wDByhWHx2Ud2R7SudmT9XK1e0x7W7a5z11Q6vrzuED5nQvkhAAoJEIExtcQpvGagugcIAJd5
- EYe6KM6Y6RvI6TvHp+QgbU5dxvjqSiSvam0Ms3QrLidCtantcGT2Wz/2PlbZqkoJxMQc40rb
- fXa4xQSvJYj0GWpadrDJUvUu3LEsunDCxdWrmbmwGRKqZraV2oG7YEddmDqOe0Xm/NxeSobc
- MIlnaE6V0U8f5zNHB7Y46yJjjYT/Ds1TJo3pvwevDWPvv6rdBeV07D9s43frUS6xYd1uFxHC
- 7dZYWJjZmyUf5evr1W1gCgwLXG0PEi9n3qmz1lelQ8lSocmvxBKtMbX/OKhAfuP/iIwnTsww
- 95A2SaPiQZA51NywV8OFgsN0ITl2PlZ4Tp9hHERDe6nQCsNI/Us=
-In-Reply-To: <ZihLhl8eLC1ntJZK@surfacebook.localdomain>
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000b97ca40616cf254e"
+Content-Type: multipart/signed; boundary="Sig_/6VHmicBbB41m5RkaUQo4PEu";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
---000000000000b97ca40616cf254e
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+--Sig_/6VHmicBbB41m5RkaUQo4PEu
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
+Hi all,
 
+Today's linux-next merge of the devicetree tree got a conflict in:
 
-On 4/23/2024 5:00 PM, Andy Shevchenko wrote:
-> Tue, Apr 23, 2024 at 04:36:20PM -0700, Florian Fainelli kirjoitti:
->> Rather than open code the i2c_designware string, utilize the newly
->> defined constant in i2c-designware.h.
-> 
-> ...
-> 
->>   static const struct mfd_cell intel_lpss_i2c_cell = {
->> -	.name = "i2c_designware",
->> +	.name = I2C_DESIGNWARE_NAME,
->>   	.num_resources = ARRAY_SIZE(intel_lpss_dev_resources),
->>   	.resources = intel_lpss_dev_resources,
->>   };
-> 
-> We have tons of drivers that are using explicit naming, why is this case
-> special?
-> 
+  drivers/of/property.c
 
-It is not special, just one of the 3 cases outside of drivers/i2c/busses 
-that reference a driver living under drivers/i2c/busses, as I replied in 
-the cover letter, this is a contract between the various device drivers 
-and their users, so we should have a central place where it is defined, 
-not repeated.
--- 
-Florian
+between commits:
 
---000000000000b97ca40616cf254e
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+  6a15368c1c6d ("of: property: fw_devlink: Add support for "access-controll=
+er"")
+  93c0d8c0ac30 ("of: property: Add fw_devlink support for pse parent")
 
-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
-riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
-QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
-UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
-M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
-Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
-14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
-a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
-XzCCBVgwggRAoAMCAQICDBP8P9hKRVySg3Qv5DANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
-RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
-UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAxMjE4MTFaFw0yNTA5MTAxMjE4MTFaMIGW
-MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
-BgNVBAoTDUJyb2FkY29tIEluYy4xGTAXBgNVBAMTEEZsb3JpYW4gRmFpbmVsbGkxLDAqBgkqhkiG
-9w0BCQEWHWZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tMIIBIjANBgkqhkiG9w0BAQEFAAOC
-AQ8AMIIBCgKCAQEA+oi3jMmHltY4LMUy8Up5+1zjd1iSgUBXhwCJLj1GJQF+GwP8InemBbk5rjlC
-UwbQDeIlOfb8xGqHoQFGSW8p9V1XUw+cthISLkycex0AJ09ufePshLZygRLREU0H4ecNPMejxCte
-KdtB4COST4uhBkUCo9BSy1gkl8DJ8j/BQ1KNUx6oYe0CntRag+EnHv9TM9BeXBBLfmMRnWNhvOSk
-nSmRX0J3d9/G2A3FIC6WY2XnLW7eAZCQPa1Tz3n2B5BGOxwqhwKLGLNu2SRCPHwOdD6e0drURF7/
-Vax85/EqkVnFNlfxtZhS0ugx5gn2pta7bTdBm1IG4TX+A3B1G57rVwIDAQABo4IB3jCCAdowDgYD
-VR0PAQH/BAQDAgWgMIGjBggrBgEFBQcBAQSBljCBkzBOBggrBgEFBQcwAoZCaHR0cDovL3NlY3Vy
-ZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAuY3J0MEEG
-CCsGAQUFBzABhjVodHRwOi8vb2NzcC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWdu
-MmNhMjAyMDBNBgNVHSAERjBEMEIGCisGAQQBoDIBKAowNDAyBggrBgEFBQcCARYmaHR0cHM6Ly93
-d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIwADBJBgNVHR8EQjBAMD6gPKA6
-hjhodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNy
-bDAoBgNVHREEITAfgR1mbG9yaWFuLmZhaW5lbGxpQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggr
-BgEFBQcDBDAfBgNVHSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQUUwwfJ6/F
-KL0fRdVROal/Lp4lAF0wDQYJKoZIhvcNAQELBQADggEBAKBgfteDc1mChZjKBY4xAplC6uXGyBrZ
-kNGap1mHJ+JngGzZCz+dDiHRQKGpXLxkHX0BvEDZLW6LGOJ83ImrW38YMOo3ZYnCYNHA9qDOakiw
-2s1RH00JOkO5SkYdwCHj4DB9B7KEnLatJtD8MBorvt+QxTuSh4ze96Jz3kEIoHMvwGFkgObWblsc
-3/YcLBmCgaWpZ3Ksev1vJPr5n8riG3/N4on8gO5qinmmr9Y7vGeuf5dmZrYMbnb+yCBalkUmZQwY
-NxADYvcRBA0ySL6sZpj8BIIhWiXiuusuBmt2Mak2eEv0xDbovE6Z6hYyl/ZnRadbgK/ClgbY3w+O
-AfUXEZ0xggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52
-LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwT
-/D/YSkVckoN0L+QwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIGZpLtJyEaQyahzN
-zaRBDKg6nBNAiDGQBsF8v4ObHQGxMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcN
-AQkFMQ8XDTI0MDQyNDAzMjAwN1owaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZI
-AWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEH
-MAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQCUeqm6sFJ4w6h5qAMwkrNkccfQnVfYet4c
-+drl+ZVgyDv5i6ySA/vC1CmTMA9bg6vGwu0y4B1zzLd98UflcN9jKKgOEfaudE9Z8Mj+yHb/vPl0
-RNl6MJSL23k5dJqf8QPOVXfEwpLoLiFMMWCc1UVu4xA7gbuFF696LRAc+tVatLXqwfq0ygtAThMS
-Jdw5KORdC4KyuYvftXvdTBWJiOxazU92dETWYgy0sS6C/fYcr5mcjfa/VGJalmMTyncBbsTJL7ld
-PJ/+DSmJ8QFaej8Jbf40sOhOSDvLU3ybxHRgo7cA09Bwe8f7eNsNm/BioL2f5Y+sdWNBErk8S9YE
-J0Ai
---000000000000b97ca40616cf254e--
+from the net-next, stm32 trees and commit:
+
+  669430b183fc ("of: property: fw_devlink: Add support for "power-supplies"=
+ binding")
+
+from the devicetree tree.
+
+I fixed it up (see below) and can carry the fix as necessary. This
+is now fixed as far as linux-next is concerned, but any non trivial
+conflicts should be mentioned to your upstream maintainer when your tree
+is submitted for merging.  You may also want to consider cooperating
+with the maintainer of the conflicting tree to minimise any particularly
+complex conflicts.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+diff --cc drivers/of/property.c
+index aaf3ce74f85c,4ede45001025..000000000000
+--- a/drivers/of/property.c
++++ b/drivers/of/property.c
+@@@ -1252,8 -1242,7 +1242,9 @@@ DEFINE_SIMPLE_PROP(backlight, "backligh
+  DEFINE_SIMPLE_PROP(panel, "panel", NULL)
+  DEFINE_SIMPLE_PROP(msi_parent, "msi-parent", "#msi-cells")
+  DEFINE_SIMPLE_PROP(post_init_providers, "post-init-providers", NULL)
+ +DEFINE_SIMPLE_PROP(access_controllers, "access-controllers", "#access-con=
+troller-cells")
+ +DEFINE_SIMPLE_PROP(pses, "pses", "#pse-cells")
++ DEFINE_SIMPLE_PROP(power_supplies, "power-supplies", NULL)
+  DEFINE_SUFFIX_PROP(regulators, "-supply", NULL)
+  DEFINE_SUFFIX_PROP(gpio, "-gpio", "#gpio-cells")
+ =20
+@@@ -1359,7 -1348,7 +1350,8 @@@ static const struct supplier_bindings o
+  	{ .parse_prop =3D parse_backlight, },
+  	{ .parse_prop =3D parse_panel, },
+  	{ .parse_prop =3D parse_msi_parent, },
+ +	{ .parse_prop =3D parse_pses, },
++ 	{ .parse_prop =3D parse_power_supplies, },
+  	{ .parse_prop =3D parse_gpio_compat, },
+  	{ .parse_prop =3D parse_interrupts, },
+  	{ .parse_prop =3D parse_regulators, },
+
+--Sig_/6VHmicBbB41m5RkaUQo4PEu
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmYofzYACgkQAVBC80lX
+0Gw/oAf/fKyulU2sd1RYcf+U2zsRb/N+YJjBdkPTI3QXWtAlU1N3guosEac4kGLV
+uFipdLF85Ou+WQytSq03sVea+yhBCNfAv52kmvsn2NFYvgBwOnxqAonxAqyh6yWP
+KaTfKZlnpUHJ8BuO1c/dJ8VimdJF+6PrEr3DWrGpleTeN1HXxIK1j9rA2WcBdpx8
+rTSsaEZcivP+i98PfzhplBgMCbPdM7Bk4606cEv7beQ3f/3p0l+NKP6iZ4MQqYzZ
+DhQFf/x+S2DBIrAIK6D2TZXzSg5qC91jjwcnEfbrdZrfbWZA7vNSyW3XpknuzE4R
+RQ4hWgeLy8j1OrJSiJw7mDPTAgpp1g==
+=TABj
+-----END PGP SIGNATURE-----
+
+--Sig_/6VHmicBbB41m5RkaUQo4PEu--
 
