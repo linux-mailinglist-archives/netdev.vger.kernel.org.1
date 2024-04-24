@@ -1,258 +1,241 @@
-Return-Path: <netdev+bounces-91012-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91013-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 297678B0F8A
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 18:18:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DFC798B0F96
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 18:23:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 96C181F22DFD
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 16:18:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5689A1F24B40
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 16:23:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E2C3161311;
-	Wed, 24 Apr 2024 16:18:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FDF4161321;
+	Wed, 24 Apr 2024 16:22:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eeyyFl7i"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="PPlgo+g2"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f44.google.com (mail-ot1-f44.google.com [209.85.210.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2169D16130D;
-	Wed, 24 Apr 2024 16:18:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A28C15EFD6
+	for <netdev@vger.kernel.org>; Wed, 24 Apr 2024 16:22:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713975505; cv=none; b=uJi9WUdD6e/IPOEyJDGUu3pGLfleDnSCoOONSZqdLe/w3tYZYWXe1AMv1Sl4VnEKvH0dLB9eYb2SxaUHq1Fpr+bsa8K2zYSOBmTQygRYyvhY3iwvRM88NKDtykUCKskdV4Scjm0jjR78/umNOrlAXVOaOyaHcCtPZWUmkv7WGcs=
+	t=1713975777; cv=none; b=Q2ei3y8ARkF6JxMe5UjZf7mPm4Oc6GiPmA6o1CLxl3/7E5GrmdjOXDfXN0d5hRCPhFfIlVVYCtW9hYpQQrDDt+IMBtmmMtleA32ELS8Uf/FKXRTeNYuemz1FaEqL/khxUrbDGXC678I6nQlTCHUTWSR6Td+H7eQ0FKHfvJxWPEc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713975505; c=relaxed/simple;
-	bh=WOCA64wLURkzbX3ikbDOkLsxKLSUsfx9997T2RUaXbM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bPzUeDW8P0S3QoXv5pnjsMlIkGI992h93iSO2L6CTYQWeV4xo201Euq/yTCGMCpKjjNnDYMJBHrln8BSiLpRnhxv/T9l5/NVWwPsXaWSoM2f0pYXGcw/TW4wCd6a4z56vGoPAu+2kVGJyKYZTw+Eg/lZUGEVG8AHNWcAaQbSGto=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eeyyFl7i; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE9F2C113CD;
-	Wed, 24 Apr 2024 16:18:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713975504;
-	bh=WOCA64wLURkzbX3ikbDOkLsxKLSUsfx9997T2RUaXbM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=eeyyFl7imnDTYm5iLmD+lfkzycscZRdTB3YQ5BjHvvnx/JTn2+ih4dK2Y0nBgNHNk
-	 jXYoIAm0t0G7YJJXE5GeCZrcAuXmW5B4nQsZ8pgxDJwkPceZyEDKhsRL5E6XTsBzsF
-	 xlZ3NlDVSDHJgARljvXjFbfWRv9NWfVwemQ35UbsF2bnnYRNEj4LL3D5cHRKI9TdVO
-	 /SuR/vWxiX+oltGFkUv2KKKaSBJOPHn3auoY2dJzbWwUcaTowfYBac55W07hboInSe
-	 7SVLiIEB/BTW3gh602Uy6/H2YDR4P2bc9MVmNCnq33mQZSp52fnHO9GgsCQLCnSyts
-	 lW0NbiE0kKJ3A==
-Date: Wed, 24 Apr 2024 09:18:23 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Heng Qi <hengqi@linux.alibaba.com>
-Cc: netdev@vger.kernel.org, virtualization@lists.linux.dev, "David S .
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Jason Wang <jasowang@redhat.com>, "Michael S .
- Tsirkin" <mst@redhat.com>, Brett Creeley <bcreeley@amd.com>, Ratheesh
- Kannoth <rkannoth@marvell.com>, Alexander Lobakin
- <aleksander.lobakin@intel.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Tal
- Gilboa <talgi@nvidia.com>, Jonathan Corbet <corbet@lwn.net>,
- linux-doc@vger.kernel.org, Maxime Chevallier
- <maxime.chevallier@bootlin.com>, Jiri Pirko <jiri@resnulli.us>, Paul
- Greenwalt <paul.greenwalt@intel.com>, Ahmed Zaki <ahmed.zaki@intel.com>,
- Vladimir Oltean <vladimir.oltean@nxp.com>, Kory Maincent
- <kory.maincent@bootlin.com>, Andrew Lunn <andrew@lunn.ch>,
- "justinstitt@google.com" <justinstitt@google.com>
-Subject: Re: [PATCH net-next v9 2/4] ethtool: provide customized dim profile
- management
-Message-ID: <20240424091823.4e9b008b@kernel.org>
-In-Reply-To: <640292b7-5fcd-44c2-bdd1-03702b7e60a1@linux.alibaba.com>
-References: <20240417155546.25691-1-hengqi@linux.alibaba.com>
-	<20240417155546.25691-3-hengqi@linux.alibaba.com>
-	<20240418174843.492078d5@kernel.org>
-	<96b59800-85e6-4a9e-ad9b-7ad3fa56fff4@linux.alibaba.com>
-	<640292b7-5fcd-44c2-bdd1-03702b7e60a1@linux.alibaba.com>
+	s=arc-20240116; t=1713975777; c=relaxed/simple;
+	bh=+XLY4CNUBjeKP91WmacUE1koVlkO+qbbBUS9jB38OVU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=vAwUbgaInZOnmHI0XW07HCsFYhWuUEn7/CJo6KhRQ5syO0dINVirAHEEIsK4j52SHBiMFJd7WbBUnWuXKY6oftSi45bzqoXUcMEgQdj5j20lfaIxM2b0uERs2QFHQcRvSG5wMQk4zkL6P1qW56zbYm+Zm6Wo6sUhS8QpFgdCg3M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=PPlgo+g2; arc=none smtp.client-ip=209.85.210.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-ot1-f44.google.com with SMTP id 46e09a7af769-6ea1a55b0c0so27553a34.3
+        for <netdev@vger.kernel.org>; Wed, 24 Apr 2024 09:22:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1713975774; x=1714580574; darn=vger.kernel.org;
+        h=in-reply-to:autocrypt:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=U1Br/mi7hyOv3mMiFiwIIAN+aQExDAdOeKuCwDQw4c8=;
+        b=PPlgo+g2Gmj/ojMyS7t4bJkjO2G7s1ztoz0GyAHJ8bEGU+3OwVYNXXrWtiiGoQD+D5
+         sSrJIHOp6Y0JExnVpkxzPwpBlguoEX0zAOeYl0P424WbMtTYqzy1rDFCrsS6h4U3tMoh
+         3BimedoGuzC+3Cpi4wA61qotdLI7X36qTeWaY=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713975774; x=1714580574;
+        h=in-reply-to:autocrypt:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=U1Br/mi7hyOv3mMiFiwIIAN+aQExDAdOeKuCwDQw4c8=;
+        b=r/B5qj2yFN1r8z31X8JQXtF3BAkiK5jGRHlK0U2sclfS5bIth6z9IWffWZQsr1vQRG
+         7RqLiNDyPsxuGQxUp0F7y18G+aHAC56yUFoFb1Hj5miaosTngIKZP6uxTg+u58/7it+d
+         3sFtovt2lNZwQQo0KLLjdxzDmDG52UFqhQdT+I8MoL4n7SYMQ2ZeKseAkOypnJY79vuP
+         oFs2vFhcWPCmJXwEayKP2qrurD43WibEy97TzGmnJk7GVyKROM953R2ehG55sX5EQ8rF
+         D25ipazZEWKeK9cl978i8eD1X2pDiwnFDBG8p1KfeogytbifW/1R/MPlGzSkQCKuIym8
+         lmdw==
+X-Forwarded-Encrypted: i=1; AJvYcCWTY+KOLJvYiI/6nYhdQmIk7+6Hz5LxCJ7/ArzXVRcUlkWpF6QBPXrFNy5Op/NtLWBBy3b9SpsNQ2gd/Nj70pWwkzDX73/3
+X-Gm-Message-State: AOJu0Yzm+0j9yJrbZ9sb07rFbYLAHqPuZDDSDAerl8xT7apAMLacXjUD
+	FN9BJh1wMM2qr+giujKUlzRGKtavjDHkgKD+svIqfIQdOI4IVA/PgywrS+TSww==
+X-Google-Smtp-Source: AGHT+IH0P+RGG+9Ehsma/Pd+Yu/hE8bqKpM/hW+9y9OgMq3L2letYjJhwxF0oja+H6zfDj0+OBJlSA==
+X-Received: by 2002:a9d:654f:0:b0:6eb:ddb8:3ddd with SMTP id q15-20020a9d654f000000b006ebddb83dddmr3350143otl.30.1713975774597;
+        Wed, 24 Apr 2024 09:22:54 -0700 (PDT)
+Received: from [10.67.48.245] ([192.19.223.252])
+        by smtp.gmail.com with ESMTPSA id y12-20020a05620a09cc00b0078d4732d92fsm6210201qky.115.2024.04.24.09.22.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 24 Apr 2024 09:22:53 -0700 (PDT)
+Message-ID: <59cbfcf1-d5c4-470b-8c81-67432d6ffc11@broadcom.com>
+Date: Wed, 24 Apr 2024 09:22:49 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 4/4] net: txgbe: Utilize i2c-designware.h
+To: Simon Horman <horms@kernel.org>
+Cc: linux-kernel@vger.kernel.org,
+ Jarkko Nikula <jarkko.nikula@linux.intel.com>,
+ Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+ Mika Westerberg <mika.westerberg@linux.intel.com>,
+ Jan Dabros <jsd@semihalf.com>, Andi Shyti <andi.shyti@kernel.org>,
+ Lee Jones <lee@kernel.org>, Jiawen Wu <jiawenwu@trustnetic.com>,
+ Mengyuan Lou <mengyuanlou@net-swift.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+ Andrew Lunn <andrew@lunn.ch>, Duanqiang Wen <duanqiangwen@net-swift.com>,
+ "open list:SYNOPSYS DESIGNWARE I2C DRIVER" <linux-i2c@vger.kernel.org>,
+ "open list:WANGXUN ETHERNET DRIVER" <netdev@vger.kernel.org>
+References: <20240423233622.1494708-1-florian.fainelli@broadcom.com>
+ <20240423233622.1494708-5-florian.fainelli@broadcom.com>
+ <20240424161406.GM42092@kernel.org>
+From: Florian Fainelli <florian.fainelli@broadcom.com>
+Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
+ xsBNBFPAG8ABCAC3EO02urEwipgbUNJ1r6oI2Vr/+uE389lSEShN2PmL3MVnzhViSAtrYxeT
+ M0Txqn1tOWoIc4QUl6Ggqf5KP6FoRkCrgMMTnUAINsINYXK+3OLe7HjP10h2jDRX4Ajs4Ghs
+ JrZOBru6rH0YrgAhr6O5gG7NE1jhly+EsOa2MpwOiXO4DE/YKZGuVe6Bh87WqmILs9KvnNrQ
+ PcycQnYKTVpqE95d4M824M5cuRB6D1GrYovCsjA9uxo22kPdOoQRAu5gBBn3AdtALFyQj9DQ
+ KQuc39/i/Kt6XLZ/RsBc6qLs+p+JnEuPJngTSfWvzGjpx0nkwCMi4yBb+xk7Hki4kEslABEB
+ AAHNMEZsb3JpYW4gRmFpbmVsbGkgPGZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tPsLB
+ IQQQAQgAywUCZWl41AUJI+Jo+hcKAAG/SMv+fS3xUQWa0NryPuoRGjsA3SAUAAAAAAAWAAFr
+ ZXktdXNhZ2UtbWFza0BwZ3AuY29tjDAUgAAAAAAgAAdwcmVmZXJyZWQtZW1haWwtZW5jb2Rp
+ bmdAcGdwLmNvbXBncG1pbWUICwkIBwMCAQoFF4AAAAAZGGxkYXA6Ly9rZXlzLmJyb2FkY29t
+ Lm5ldAUbAwAAAAMWAgEFHgEAAAAEFQgJChYhBNXZKpfnkVze1+R8aIExtcQpvGagAAoJEIEx
+ tcQpvGagWPEH/2l0DNr9QkTwJUxOoP9wgHfmVhqc0ZlDsBFv91I3BbhGKI5UATbipKNqG13Z
+ TsBrJHcrnCqnTRS+8n9/myOF0ng2A4YT0EJnayzHugXm+hrkO5O9UEPJ8a+0553VqyoFhHqA
+ zjxj8fUu1px5cbb4R9G4UAySqyeLLeqnYLCKb4+GklGSBGsLMYvLmIDNYlkhMdnnzsSUAS61
+ WJYW6jjnzMwuKJ0ZHv7xZvSHyhIsFRiYiEs44kiYjbUUMcXor/uLEuTIazGrE3MahuGdjpT2
+ IOjoMiTsbMc0yfhHp6G/2E769oDXMVxCCbMVpA+LUtVIQEA+8Zr6mX0Yk4nDS7OiBlvOwE0E
+ U8AbwQEIAKxr71oqe+0+MYCc7WafWEcpQHFUwvYLcdBoOnmJPxDwDRpvU5LhqSPvk/yJdh9k
+ 4xUDQu3rm1qIW2I9Puk5n/Jz/lZsqGw8T13DKyu8eMcvaA/irm9lX9El27DPHy/0qsxmxVmU
+ pu9y9S+BmaMb2CM9IuyxMWEl9ruWFS2jAWh/R8CrdnL6+zLk60R7XGzmSJqF09vYNlJ6Bdbs
+ MWDXkYWWP5Ub1ZJGNJQ4qT7g8IN0qXxzLQsmz6tbgLMEHYBGx80bBF8AkdThd6SLhreCN7Uh
+ IR/5NXGqotAZao2xlDpJLuOMQtoH9WVNuuxQQZHVd8if+yp6yRJ5DAmIUt5CCPcAEQEAAcLB
+ gQQYAQIBKwUCU8AbwgUbDAAAAMBdIAQZAQgABgUCU8AbwQAKCRCTYAaomC8PVQ0VCACWk3n+
+ obFABEp5Rg6Qvspi9kWXcwCcfZV41OIYWhXMoc57ssjCand5noZi8bKg0bxw4qsg+9cNgZ3P
+ N/DFWcNKcAT3Z2/4fTnJqdJS//YcEhlr8uGs+ZWFcqAPbteFCM4dGDRruo69IrHfyyQGx16s
+ CcFlrN8vD066RKevFepb/ml7eYEdN5SRALyEdQMKeCSf3mectdoECEqdF/MWpfWIYQ1hEfdm
+ C2Kztm+h3Nkt9ZQLqc3wsPJZmbD9T0c9Rphfypgw/SfTf2/CHoYVkKqwUIzI59itl5Lze+R5
+ wDByhWHx2Ud2R7SudmT9XK1e0x7W7a5z11Q6vrzuED5nQvkhAAoJEIExtcQpvGagugcIAJd5
+ EYe6KM6Y6RvI6TvHp+QgbU5dxvjqSiSvam0Ms3QrLidCtantcGT2Wz/2PlbZqkoJxMQc40rb
+ fXa4xQSvJYj0GWpadrDJUvUu3LEsunDCxdWrmbmwGRKqZraV2oG7YEddmDqOe0Xm/NxeSobc
+ MIlnaE6V0U8f5zNHB7Y46yJjjYT/Ds1TJo3pvwevDWPvv6rdBeV07D9s43frUS6xYd1uFxHC
+ 7dZYWJjZmyUf5evr1W1gCgwLXG0PEi9n3qmz1lelQ8lSocmvxBKtMbX/OKhAfuP/iIwnTsww
+ 95A2SaPiQZA51NywV8OFgsN0ITl2PlZ4Tp9hHERDe6nQCsNI/Us=
+In-Reply-To: <20240424161406.GM42092@kernel.org>
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="000000000000375d580616da15d9"
 
-On Wed, 24 Apr 2024 21:41:55 +0800 Heng Qi wrote:
-> +struct dim_irq_moder {
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* See DIM_PROFILE_* */
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 u8 profile_flags;
-> +
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* See DIM_COALESCE_* for Rx and Tx=
- */
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 u8 coal_flags;
-> +
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* Rx DIM period count mode: CQE or=
- EQE */
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 u8 dim_rx_mode;
-> +
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* Tx DIM period count mode: CQE or=
- EQE */
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 u8 dim_tx_mode;
-> +
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* DIM profile list for Rx */
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct dim_cq_moder *rx_profile;
-> +
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* DIM profile list for Tx */
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct dim_cq_moder *tx_profile;
-> +
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* Rx DIM worker function scheduled=
- by net_dim() */
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 void (*rx_dim_work)(struct work_str=
-uct *work);
-> +
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* Tx DIM worker function scheduled=
- by net_dim() */
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 void (*tx_dim_work)(struct work_str=
-uct *work);
-> +};
-> +
->=20
-> .....
->=20
->=20
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .ndo_init_irq_moder=C2=A0=C2=A0=C2=
-=A0=C2=A0 =3D virtnet_init_irq_moder,
+--000000000000375d580616da15d9
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-The init callback mostly fills in static data, can we not
-declare the driver information statically and move the init
-code into the core?
+On 4/24/24 09:14, Simon Horman wrote:
+> On Tue, Apr 23, 2024 at 04:36:22PM -0700, Florian Fainelli wrote:
+>> Rather than open code the i2c_designware string, utilize the newly
+>> defined constant in i2c-designware.h.
+>>
+>> Signed-off-by: Florian Fainelli <florian.fainelli@broadcom.com>
+> 
+> Hi Florian,
+> 
+> FYI, this conflicts with:
+> 
+> c644920ce922 ("net: txgbe: fix i2c dev name cannot match clkdev")
+> 
+> But a patch-set has been submitted which reverts that commit:
+> 
+> https://lore.kernel.org/all/20240422084109.3201-1-duanqiangwen@net-swift.com/
 
-> ....
->=20
->=20
-> +static int virtnet_init_irq_moder(struct net_device *dev)
-> +{
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct virtnet_info *vi =3D n=
-etdev_priv(dev);
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct dim_irq_moder *moder;
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int len;
-> +
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!virtio_has_feature(vi->v=
-dev, VIRTIO_NET_F_VQ_NOTF_COAL))
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 return 0;
-> +
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 dev->irq_moder =3D kzalloc(si=
-zeof(*dev->irq_moder), GFP_KERNEL);
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!dev->irq_moder)
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 goto err_moder;
-> +
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 moder =3D dev->irq_moder;
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 len =3D NET_DIM_PARAMS_NUM_PR=
-OFILES * sizeof(*moder->rx_profile);
-> +
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 moder->profile_flags |=3D DIM=
-_PROFILE_RX;
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 moder->coal_flags |=3D DIM_CO=
-ALESCE_USEC | DIM_COALESCE_PKTS;
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 moder->dim_rx_mode =3D DIM_CQ=
-_PERIOD_MODE_START_FROM_EQE;
-> +
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 moder->rx_dim_work =3D virtne=
-t_rx_dim_work;
-> +
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 moder->rx_profile =3D kmemdup=
-(dim_rx_profile[moder->dim_rx_mode],
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 len, GFP_KERNEL);
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!moder->rx_profile)
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 goto err_profile;
-> +
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return 0;
-> +
-> +err_profile:
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 kfree(moder);
-> +err_moder:
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return -ENOMEM;
-> +}
-> +
->=20
-> ......
->=20
-> +void net_dim_setting(struct net_device *dev, struct dim *dim, bool is_tx)
-> +{
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct dim_irq_moder *irq_moder =3D=
- dev->irq_moder;
-> +
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!irq_moder)
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 return;
-> +
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (is_tx) {
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 INIT_WORK(&dim->work, irq_moder->tx_dim_work);
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 dim->mode =3D irq_moder->dim_tx_mode;
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 return;
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
-> +
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 INIT_WORK(&dim->work, irq_moder->rx=
-_dim_work);
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 dim->mode =3D irq_moder->dim_rx_mod=
-e;
-> +}
->=20
-> .....
->=20
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 for (i =3D 0; i < vi->max_queue_pai=
-rs; i++)
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 net_dim_setting(vi->dev, &vi->rq[i].dim, false);
->=20
-> .....
->=20
->  =C2=A0=C2=A0=C2=A0 ETHTOOL_A_COALESCE_TX_AGGR_MAX_FRAMES,=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* u32 */
->=20
->  =C2=A0=C2=A0=C2=A0 ETHTOOL_A_COALESCE_TX_AGGR_TIME_USECS,=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* u32 */
->=20
-> + /* nest - _A_PROFILE_IRQ_MODERATION */
->=20
-> +=C2=A0 ETHTOOL_A_COALESCE_RX_PROFILE,
->=20
-> +=C2=A0=C2=A0 /* nest - _A_PROFILE_IRQ_MODERATION */
-> +=C2=A0 ETHTOOL_A_COALESCE_TX_PROFILE,
->=20
-> ......
->=20
->=20
-> Almost clear implementation, but the only problem is when I want to
-> reuse "ethtool -C" and append ETHTOOL_A_COALESCE_RX_PROFILE
-> and ETHTOOL_A_COALESCE_TX_PROFILE, *ethnl_set_coalesce_validate()
-> will report an error because there are no ETHTOOL_COALESCE_RX_PROFILE
-> and ETHTOOL_COALESCE_TX_PROFILE, because they are replaced by
-> DIM_PROFILE_RX and DIM_PROFILE_TX in the field profile_flags.*
+That's right, I mentioned in the cover letter this was based on top of 
+Duanqiang's couple patches. Thanks Simon!
+-- 
+Florian
 
-I see.
 
-> Should I reuse ETHTOOL_COALESCE_RX_PROFILE and
-> ETHTOOL_A_COALESCE_TX_PROFILE in ethtool_ops->.supported_coalesce_params
-> and remove the field profile_flags from struct dim_irq_moder?
-> Or let ethnl_set_coalesce_validate not verify these two flags?
-> Is there a better solution?
+--000000000000375d580616da15d9
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
 
-Maybe create the bits but automatically add them for the driver?
-
-diff --git a/net/ethtool/coalesce.c b/net/ethtool/coalesce.c
-index 83112c1a71ae..56777d36f7f1 100644
---- a/net/ethtool/coalesce.c
-+++ b/net/ethtool/coalesce.c
-@@ -243,6 +243,8 @@ ethnl_set_coalesce_validate(struct ethnl_req_info *req_=
-info,
-=20
- 	/* make sure that only supported parameters are present */
- 	supported_params =3D ops->supported_coalesce_params;
-+	if (dev->moder->coal_flags ...)
-+		supported_params |=3D ETHTOOL_COALESCE_...;
- 	for (a =3D ETHTOOL_A_COALESCE_RX_USECS; a < __ETHTOOL_A_COALESCE_CNT; a++)
- 		if (tb[a] && !(supported_params & attr_to_mask(a))) {
- 			NL_SET_ERR_MSG_ATTR(info->extack, tb[a],
+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
+riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
+QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
+UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
+M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
+Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
+14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
+a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
+XzCCBVgwggRAoAMCAQICDBP8P9hKRVySg3Qv5DANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
+RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
+UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAxMjE4MTFaFw0yNTA5MTAxMjE4MTFaMIGW
+MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
+BgNVBAoTDUJyb2FkY29tIEluYy4xGTAXBgNVBAMTEEZsb3JpYW4gRmFpbmVsbGkxLDAqBgkqhkiG
+9w0BCQEWHWZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tMIIBIjANBgkqhkiG9w0BAQEFAAOC
+AQ8AMIIBCgKCAQEA+oi3jMmHltY4LMUy8Up5+1zjd1iSgUBXhwCJLj1GJQF+GwP8InemBbk5rjlC
+UwbQDeIlOfb8xGqHoQFGSW8p9V1XUw+cthISLkycex0AJ09ufePshLZygRLREU0H4ecNPMejxCte
+KdtB4COST4uhBkUCo9BSy1gkl8DJ8j/BQ1KNUx6oYe0CntRag+EnHv9TM9BeXBBLfmMRnWNhvOSk
+nSmRX0J3d9/G2A3FIC6WY2XnLW7eAZCQPa1Tz3n2B5BGOxwqhwKLGLNu2SRCPHwOdD6e0drURF7/
+Vax85/EqkVnFNlfxtZhS0ugx5gn2pta7bTdBm1IG4TX+A3B1G57rVwIDAQABo4IB3jCCAdowDgYD
+VR0PAQH/BAQDAgWgMIGjBggrBgEFBQcBAQSBljCBkzBOBggrBgEFBQcwAoZCaHR0cDovL3NlY3Vy
+ZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAuY3J0MEEG
+CCsGAQUFBzABhjVodHRwOi8vb2NzcC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWdu
+MmNhMjAyMDBNBgNVHSAERjBEMEIGCisGAQQBoDIBKAowNDAyBggrBgEFBQcCARYmaHR0cHM6Ly93
+d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIwADBJBgNVHR8EQjBAMD6gPKA6
+hjhodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNy
+bDAoBgNVHREEITAfgR1mbG9yaWFuLmZhaW5lbGxpQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggr
+BgEFBQcDBDAfBgNVHSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQUUwwfJ6/F
+KL0fRdVROal/Lp4lAF0wDQYJKoZIhvcNAQELBQADggEBAKBgfteDc1mChZjKBY4xAplC6uXGyBrZ
+kNGap1mHJ+JngGzZCz+dDiHRQKGpXLxkHX0BvEDZLW6LGOJ83ImrW38YMOo3ZYnCYNHA9qDOakiw
+2s1RH00JOkO5SkYdwCHj4DB9B7KEnLatJtD8MBorvt+QxTuSh4ze96Jz3kEIoHMvwGFkgObWblsc
+3/YcLBmCgaWpZ3Ksev1vJPr5n8riG3/N4on8gO5qinmmr9Y7vGeuf5dmZrYMbnb+yCBalkUmZQwY
+NxADYvcRBA0ySL6sZpj8BIIhWiXiuusuBmt2Mak2eEv0xDbovE6Z6hYyl/ZnRadbgK/ClgbY3w+O
+AfUXEZ0xggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52
+LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwT
+/D/YSkVckoN0L+QwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIK7BngUomNbMckVN
+Yy/NdIkqvMblhCXK4MEw9v/X85NQMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcN
+AQkFMQ8XDTI0MDQyNDE2MjI1NFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZI
+AWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEH
+MAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQCGPsHgAmUuaHkIDy/hRM2pw4QrsHOBi8NF
+B49iLXyOBLBO0lOxxhxXqp/l9aDHRt/I1Cm+VOrlHYsY2kBwn0ia79U6V9+ur866r0/oDpbZmume
+tXvZmDsI75BhqN+qRs4Q/Bx0uDuRsATQRcaSmyvJXYHY5BFfLYaFiZF4fAkxiRwBYodnkU20XZpe
+2+QySIS8uZrSXzM+/U56tOwWA+6BVhYfaszLVfRZNNlTyu42p6cDyZtaG2o2sBXKzcDX43GO39fy
+3XrG7HKGAdtbJQhk2y2W65nXidH+z81dTTjUF0CsOU17w/gh9e+lXoA4wm+ezrhjjVKCuvv2qNEr
+C7DK
+--000000000000375d580616da15d9--
 
