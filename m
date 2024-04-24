@@ -1,273 +1,379 @@
-Return-Path: <netdev+bounces-91026-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91027-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6B398B1039
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 18:49:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF3288B1060
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 18:56:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C98391C24745
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 16:49:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 65C982811DA
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 16:56:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E604D16ABE8;
-	Wed, 24 Apr 2024 16:49:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D19A416C87B;
+	Wed, 24 Apr 2024 16:56:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="pfJA4PKm"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="W5dLbILZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D53861FDA;
-	Wed, 24 Apr 2024 16:49:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.132
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713977375; cv=none; b=Zr/2MQEpSAIpkUPDjbVvcMjIFF49AGZH0Z2cPhVTn/cEJDRVYF2UNE1GFOXnfhJ27E8a1hhXaFlGNItu+WkRW1KEAekTj5s7lYxoWdljl4T3BSBSAo3UaBI6nscyEjLNLsQUClw6FiUOWa0qgQUFTSBIIvP8uIUaRBg/FUq4RNo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713977375; c=relaxed/simple;
-	bh=BeuHAPFHOzgLj7bcwamrKQ0nWHsiW0duK0tmhO0g0NU=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=KOHpQ6UcXyXMNxDAs7pIuvQUKzYdn7kwtAtFQQoEf9G4S7sjnZ7Zw/erVPAbUM2teVe/ihw3N//JeBoL2CFG25d0PQWQEdJibWMMiOpcp3NX6/e47AKBvtnqADGPygN8p2+qMdUv2IwfFmFXTmMyyPyzYbHpMjerHgr/O37ztzQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=pfJA4PKm; arc=none smtp.client-ip=115.124.30.132
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1713977370; h=Message-ID:Date:MIME-Version:From:Subject:To:Content-Type;
-	bh=8KMQJzU1aMbtALFenO9YraP0j/CgdS9fdFoFzB32RZY=;
-	b=pfJA4PKmrv+Vn+ktQaz173jN7ZpLTxqAYOtxy7CReC3WiTfUFpSASdVhnI5IyqXHxzVt1Z1FV0zwoQUh0WtyflMbaB8TAEjMEh4NX+Uz55QJhAqB6bDcoNJSX973frajERSl39EONm9ZG8r0kgiEipnMQAnKT8HfaQnXVYr0ujA=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R591e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033032014016;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=23;SR=0;TI=SMTPD_---0W5Ck5Xj_1713977366;
-Received: from 30.39.150.89(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0W5Ck5Xj_1713977366)
-          by smtp.aliyun-inc.com;
-          Thu, 25 Apr 2024 00:49:28 +0800
-Message-ID: <df6163de-d82c-458d-b298-1eaf406e6b3d@linux.alibaba.com>
-Date: Thu, 25 Apr 2024 00:49:26 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55E2816C872
+	for <netdev@vger.kernel.org>; Wed, 24 Apr 2024 16:56:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.21
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1713977806; cv=fail; b=PodbaFlpKj18aGmFUqas/9IV+lLSMRufq4+cHnecEawvLSxtnhj4bNflknVrzKAPjfWe4O5BhJw6GHqK28DkntudmOadKqoDWkVcXWOPoSm89jbEN0GpmyqGethKKjWJpcCX02PpaN/2TrTE0wNnyKZ3mescoaiLllZkONQMaeA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1713977806; c=relaxed/simple;
+	bh=ua9bHnRtSx+f7q/1sJeCigfkHHgkvZfBP4lTHQ1IeAU=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=kquh04vgTqbayNehHCiVtxtN2OZkccvHn497rj0Kojqve+M0ek5czgJeO9l1vKwthK/V2k116+sml+rp1C2ErqoHcGoMM5iRxIWFIH3NVDsl/Dnt0Y0Svq6JDdOyaCMNt9jmvaR/Jq/OHzk2aKZEnsZD5msmSjSCWGCnSOHkKh0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=W5dLbILZ; arc=fail smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1713977805; x=1745513805;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=ua9bHnRtSx+f7q/1sJeCigfkHHgkvZfBP4lTHQ1IeAU=;
+  b=W5dLbILZOWxwZeM9IV4Ej6CgnE/qffv8BrmGuDLvDBI38Dks1ShZbW3J
+   yVUhUEfQRk57PtrRrjkQK3DyUyaIgeSCg+ehzmEiUOjWMDl2eM0WtNa11
+   5dIvqPfvJz4pYFdbt9bECLyi/78yIEKHUCxLllyDV4THtx9FlhsT+9Yue
+   zBkHYyXuEnSqI88bdRcMfc5L1rkKQrNGa4YsXbreyxYdCMkQ2FgG0BDIe
+   pH+525nO+UTz3wkwM7zIUIfYfejW3I6RmZFGfKdksFJbvAdFrrvW2uoIa
+   ANWXfAkYTrSkJLiYHHt9MMVpeiTrZe7WuPkBe/ppJ7ZY8HOTMVfuNE2xi
+   g==;
+X-CSE-ConnectionGUID: fSt30zGmT12TrMByGF8RpA==
+X-CSE-MsgGUID: N9eCOp+0SlSd64YFTy2O0w==
+X-IronPort-AV: E=McAfee;i="6600,9927,11054"; a="9551445"
+X-IronPort-AV: E=Sophos;i="6.07,226,1708416000"; 
+   d="scan'208";a="9551445"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2024 09:56:43 -0700
+X-CSE-ConnectionGUID: ScJomuPaSu+21L3jpi+CgQ==
+X-CSE-MsgGUID: wbtKdsvNQUKZuWI24ED2LA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,226,1708416000"; 
+   d="scan'208";a="25290542"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by orviesa007.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 24 Apr 2024 09:56:43 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 24 Apr 2024 09:56:41 -0700
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Wed, 24 Apr 2024 09:56:41 -0700
+Received: from NAM04-MW2-obe.outbound.protection.outlook.com (104.47.73.168)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Wed, 24 Apr 2024 09:56:41 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=hNKr9Xz2mygLB3LF1FORyTaFACm7/unvHFZVdyK7MnAzZbttVCXC8Ad1lRfvTAuwyLjne4wVH4R0PpN8ef/RDT7i5CmFuC/74S7gdPW8sgCxBdNCxsfNahNOhjw3LlTiACPh+xM1Q7BUZ4nFdamC5P/0DtaPnupvJV2JOqB1O/6bmQsNX9e4dPLLxwefBE6f5PD5l3zep1JirfHQWiZRqQTZ2y0dGy20u7Rqfit+kYAdMg5xiLMXbBE3uc0Wflb5Oeq7klv1GS3YK9PRuatDsB4AyDx0AMEj5R6F7KwcMe5J9NIbOrKBRxk8F4+PE7wAAk9m4gnC5RA0S2aCtfq7ZQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=1u6kWl2Hj/gyTwCZIf5oukp0OaDvdNRfBCmq8l3XgSE=;
+ b=GTEcK/WmGRQLEKRYcQILzxHN+1YVzJc4qQ0HDXeLtXZTE5wy4j4T+iLYbkjlEYDUN1zeL8jh1RAM+lTH1w/pKxs+6i7b72EPIkLzv5gqt5SwRYeK8/r76lchWUVmWo+98BTLU0DlBBNsqFEw9fI/Rfca9AM2L6Ci8MTQf7Ebl9yh6jRzaGLhtFUfoHvl3XFRd25RVoSt8uD12DVuOaoB1IVMU4hGod1dagP5oY8mCaNABk5bRsq1TpOpeOSJ9AxrqVqFaKVxLSKoyKR8rTXG68qkHJNrv88PywmVUlmYzzHgXYRnpZcRxJX4ASbe6du04uHMFyIED3QTTq5w+RgWfQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
+ by DM6PR11MB4562.namprd11.prod.outlook.com (2603:10b6:5:2a8::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7519.22; Wed, 24 Apr
+ 2024 16:56:40 +0000
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::b383:e86d:874:245a]) by CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::b383:e86d:874:245a%5]) with mapi id 15.20.7519.021; Wed, 24 Apr 2024
+ 16:56:40 +0000
+Message-ID: <3877b086-142d-4897-866e-e667ca7091d7@intel.com>
+Date: Wed, 24 Apr 2024 09:56:37 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next v2] ice: Extend auxbus device
+ naming
+To: Jiri Pirko <jiri@resnulli.us>
+CC: "Temerkhanov, Sergey" <sergey.temerkhanov@intel.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>
+References: <20240423091459.72216-1-sergey.temerkhanov@intel.com>
+ <ZiedKc5wE2-3LlaM@nanopsycho>
+ <MW3PR11MB468117FD76AC6D15970A6E1080112@MW3PR11MB4681.namprd11.prod.outlook.com>
+ <Zie0NIztebf5Qq1J@nanopsycho>
+ <3a634778-9b72-4663-b305-3be18bd8f618@intel.com>
+ <ZikgQhVpphnaAOpG@nanopsycho>
+Content-Language: en-US
+From: Jacob Keller <jacob.e.keller@intel.com>
+In-Reply-To: <ZikgQhVpphnaAOpG@nanopsycho>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW3PR05CA0026.namprd05.prod.outlook.com
+ (2603:10b6:303:2b::31) To CO1PR11MB5089.namprd11.prod.outlook.com
+ (2603:10b6:303:9b::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Heng Qi <hengqi@linux.alibaba.com>
-Subject: Re: [PATCH net-next v9 2/4] ethtool: provide customized dim profile
- management
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, virtualization@lists.linux.dev,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Jason Wang <jasowang@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>,
- Brett Creeley <bcreeley@amd.com>, Ratheesh Kannoth <rkannoth@marvell.com>,
- Alexander Lobakin <aleksander.lobakin@intel.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Tal Gilboa <talgi@nvidia.com>,
- Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
- Maxime Chevallier <maxime.chevallier@bootlin.com>,
- Jiri Pirko <jiri@resnulli.us>, Paul Greenwalt <paul.greenwalt@intel.com>,
- Ahmed Zaki <ahmed.zaki@intel.com>, Vladimir Oltean
- <vladimir.oltean@nxp.com>, Kory Maincent <kory.maincent@bootlin.com>,
- Andrew Lunn <andrew@lunn.ch>, "justinstitt@google.com"
- <justinstitt@google.com>
-References: <20240417155546.25691-1-hengqi@linux.alibaba.com>
- <20240417155546.25691-3-hengqi@linux.alibaba.com>
- <20240418174843.492078d5@kernel.org>
- <96b59800-85e6-4a9e-ad9b-7ad3fa56fff4@linux.alibaba.com>
- <640292b7-5fcd-44c2-bdd1-03702b7e60a1@linux.alibaba.com>
- <20240424091823.4e9b008b@kernel.org>
-In-Reply-To: <20240424091823.4e9b008b@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|DM6PR11MB4562:EE_
+X-MS-Office365-Filtering-Correlation-Id: fc998116-c7b9-470e-ac1f-08dc647f82d7
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230031|366007|376005|1800799015;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?S3k1SHJ0bzZ2bk5yRlJ0dlYveEtzVnRBZ2FRYVhNTjVXS1ltZlhOV05kWDFU?=
+ =?utf-8?B?ckxLVXVwQkg3QjFHNTNIRDN1ZFFMTVo1R1NYYVZNdUsyV0VYajB4d0tPSDds?=
+ =?utf-8?B?RVhLcDZiZXEwaHVRTTJZNWszVHlDTk8zNUNXVkp2SUVmU3IyOGNSanRxWFVF?=
+ =?utf-8?B?N2pManJmRHYzZG84UmlwRVlCRllFamduWk5VQXVKK0x3RVZjeUJXc2dRK2hv?=
+ =?utf-8?B?TjJrcGdXUW9EdTl0MHVjSnM1ek90eWNYRzdrOWxaTmhrczJXOEJZTFlUNnVn?=
+ =?utf-8?B?YlE1OCszRURXc2dmM0ZFNlZzL2JFUXJuN2tJK3VQYjNNM2lUMXFLREVCTnBz?=
+ =?utf-8?B?UGtkK0xvYWM1VlNZNTRnZ1Q3TUZxSmYwOCtQeUtlOHBKbWxIT0hrRXcrU082?=
+ =?utf-8?B?Ri91VEd6VlJ2QmJzN3NNZnFQQ0tEVk1Wa0Q1NHRzd0JqdnIvTk8xdThIb3pv?=
+ =?utf-8?B?QWxWQlBCT2EwVGE2N0pnTjZ2aEJUVVdaTDZPcG9DWW1udHB2V2wvakEwTUZ3?=
+ =?utf-8?B?ejF1RHowaVQ0MmxNTlhsNHVxS0NRdWdxeUpRWnhjaWVzRzZneHdBY3pXVVRH?=
+ =?utf-8?B?ZkF4VFFBMGRIcjAwNDBGOHNYNllzRXJ6M1Y5WHBhWk94VWl3UWx6d0c4YmpB?=
+ =?utf-8?B?M1FoOVExYnFKZVdaaEc2VWxRUk1PcDZ0ckRYNVV1aUEvaXkrY3A5Y244VzJw?=
+ =?utf-8?B?alJ2RFQvd1RpaFY5MTl3cFJrTEVTNVU3M29iR2YyYTFVMWVtNXl0UFpLTGk4?=
+ =?utf-8?B?RzI1R3NSc1dQQXhMbkxONm9ZbnJVY3cyNGlJMm1IMkdTeTR3UzkzWGh4ZFlj?=
+ =?utf-8?B?TDhWSmlMMmx3RjJJVDFmZzBXZ1JzTzZDWVIvUWtIN05KanlXeS9RSTNEak0z?=
+ =?utf-8?B?dXA5Z1FqVE5YVXdrYU5US28yK1huRU9POVc1Mi9hUldETWg4ckNPZFpDNzMz?=
+ =?utf-8?B?ejRwMllaRHBSMzN0V0U4VmtpYVRXOU5Xckd1alVraS9FQ25QVTRmQmlKNTZD?=
+ =?utf-8?B?ODB2UWJMaXFlSGZKd0poWXJJK1R6bGpOS0lsdVVoU1k5OXR4cmFHd0Y2UmRu?=
+ =?utf-8?B?VWpCU2Njb01xSzRlSE5pQ3RZZjBaUDRNNXR0YUpKazlEYStwcW5GempSMjBz?=
+ =?utf-8?B?a0pRSkRKd2xSemx0YVM3OGtLUmRZRVovK2krNHVkVEh4QWZsOEx1Q0pxTWls?=
+ =?utf-8?B?Y1o3QWtaWW9nb0RLRVo0ajdSUmN2Sm5yZXVtSjF6T1NjbDZmdUg3bGJjOFFv?=
+ =?utf-8?B?MnRpTUxlSFRhZStFK2VJRDZDbGNBSlY0OVNIaVBmMG9RTWVDaXd4SEVSVmNl?=
+ =?utf-8?B?TXRyWWFyL1liV2N2RDlMblpDWjFGbUU0cVhET0hHRUdiWlRkOHJjYlJoRkJ1?=
+ =?utf-8?B?U3hBREh1b2V4SzFtSDN5TWt2RjJzREREaXVxNTZOSVZlTEdYb2Z5RmZkYW9u?=
+ =?utf-8?B?cFNtSDlNczdoV21IUjJScFMyUzgwdVRFRjYzdnJlVVVFWWNxc2tHQVdMRVR2?=
+ =?utf-8?B?Ykd6QjAvVjBPRjVVQkZITUdNT0s2eGxWbWZGUjRSTmQ1Vkc3ZnptOFJmSUIx?=
+ =?utf-8?B?dmZ0Zkk2REs1a3lQYjFQdi9uSHhEWWFmS2hsUWt5dGttRlN3bC9VYmtBdk5X?=
+ =?utf-8?B?M0QrSzdaVnB3UkRJQ2pQN3dtVkNiOHBlQUp5c0Y4YU9EdE5LNVZncXJJNUF6?=
+ =?utf-8?B?NEg1NUJNYi85RE9LOGwrUkxvaVVDcHAyV2dzelFIemg1K3EyU1RKTzZ3PT0=?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(376005)(1800799015);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?TG51MjdQMS9rRGtWMHJDWWQvNmt2QkdCeUJOSVlLaUNuajIvOFBwcmpDbXYw?=
+ =?utf-8?B?Z29wOFJkWE9XeS9uQi9kMjljb2hNZnRieW4xdkdscHlsWiswUWsydG5QNmJC?=
+ =?utf-8?B?UGV4aHpmenE2cjFZeGM3eEllenpNSVFCRjZxQ2lCc3I5T2J6QVMwb1BHYUY5?=
+ =?utf-8?B?cEhsOEc5cDEzVWhrMnJQdWthRGRkeTdhSUFsWitmekpSZk1PYzBLT1BCQWNV?=
+ =?utf-8?B?c21hakdsVFp0Rzl5RlQyRDlXNDRmSTFjeHpteHRKQWRwdmhCZFJNRXdHSUF5?=
+ =?utf-8?B?bE9JbFVwWUw1a0YwRDlSVG9QS0JSVlEyQWpIV09wU3RVcnV0NUYzRStvVzVT?=
+ =?utf-8?B?YzVhQTcyVDdWUW5iT2JqRDdPZTdieWQvNlQ4MGd3dm1IbnVCYytDeWRGVnls?=
+ =?utf-8?B?NXpVS0JIWWI1bjJrOVljTXdDWG9NcGY0WGJtRXVGY3RYSk1SKy9qVEpyMUVC?=
+ =?utf-8?B?NENFeWNQeGVEYy94ZDlRR25qVjNYYmxHRXZnaEhMNnowV0lBZzZ5d2Z1b09R?=
+ =?utf-8?B?eHIxSEs3aGJOOXU5Y2s0anVvNHlJOFF1bUc4QmJyWUVxQnlsM1RuVlRZSlZz?=
+ =?utf-8?B?N2pLRmRORVU4dTA1V3lFbE5BTkdEYkxxenVLT1BDMHdyaStYUmYrOFVYd1JD?=
+ =?utf-8?B?NVhqWGcyK1ZEeG9sM3E2NGRBejBKTVljNlJQZUNvVVNmWUc2bzIvd3VZdFlP?=
+ =?utf-8?B?Mm16OVdlY0FvUnlsU2lXWDc5OC81NDhFRko4TSt3TlZVbjhVY1hqc3V1ZlZN?=
+ =?utf-8?B?LzB4VGF1MDczd2ZMdzRSV3NUdnRVcHR3UkpxN25KbVJyOVpxZWFwandHRVpC?=
+ =?utf-8?B?eXNLQ2p6VXhjWG5JbjhCODRtMmlMSGhKWHlzTTdoKytmMStPSFdIRTAvRW5U?=
+ =?utf-8?B?OGhZTmp6eHphaTNlQ0QwYUdOMHBMS3M5V3ZIVHp4SklGdVdRYUYxMzllaXNn?=
+ =?utf-8?B?NkowSVZDeEZ4b0tGMjNXRTNYWDc0dlhlWVNsMC9GVUl2T3h1NUQyNWZwRWlQ?=
+ =?utf-8?B?SUdnUVErK1JKbG9CYU9KalB2dDMrNmh6WUZYK1JPa1NkaXdiQXVrb21wb1pD?=
+ =?utf-8?B?V3Vub0VGZHlEbU9LOTZpNGtZbmhvajdSZU5ienRrSjZlMVFrM3NWeEVRVjF3?=
+ =?utf-8?B?M2hQc0NxVFdkZnl1UjN1ZEFxbDBIWHlnbkFnc1ZrT1RsZGF4cFYzYnJWcC82?=
+ =?utf-8?B?VW5UbUMyQ1JJRGNHYnp3MFNrSzY0cGRWMHBWOGIybVIwWGxqQnVzZUJsdTU4?=
+ =?utf-8?B?SW5vRndOVzIrdkV3NzF5dWNkUXlUS1l5RDBFckVqRTV2T200cWg0Zy9iazdW?=
+ =?utf-8?B?dGtGQzMwQ0xJanhsdm5CSlNWSWNSWG81c3BRUHMvTS96d1htbEtRSW9hNnZr?=
+ =?utf-8?B?SEVWdE84QUZ3aGVpaUx2SnJiT3hLbWJBZkFtRmJoS1FZV0I4L0Faa3Qya2xk?=
+ =?utf-8?B?cEFWSUVTc1ZIaDVXRFRmSGN5emcrYzVqY3ozazlQa1NoOXl3NHlacUp4NjZQ?=
+ =?utf-8?B?dWM5ZXl1Y25TWXRSUzAyZ0xZVTBBbjJIbGg0UjBXLzRLQkZyb0d6UG51SU04?=
+ =?utf-8?B?OU5YTFppQ0xoTFhoK3R4RmxVcGdNdmd5ZCtxSXYrcFZVYy82d3Q1U2dQUkJt?=
+ =?utf-8?B?bTdhUGdieiswSm1xaGJpU2t1aUxlcnlhWVgwSkdRRml2TGxKdEExRkhBTy91?=
+ =?utf-8?B?bG9NOW9EV3dNUmpMV2NEY2FrVnFTUWdzbU1UdmdTbmJrdWZna0FCbU1NQVFY?=
+ =?utf-8?B?RjJtc284M29zS3lXcjJCNGpPSlArZGVoYVN3aVJ1TWhMS0pSTmlUUElvT2dF?=
+ =?utf-8?B?bFB4bVNFUDJKclpWQWdLdUxCTTNySG9qS3JsREdGYXhRMGVNUzQvUE5Qam9a?=
+ =?utf-8?B?dmJRY1p2M3BUMWNQSDJ1cTlhc2g0ejRPTHlXZVNtRWM1Rm9ETjRNVFZaVEVo?=
+ =?utf-8?B?bmZtRS9Bem1Oc0w0clpidFFzdlZ5Y3gyNFBCSU5qYmE0VE9sNXZFYjBuV3RO?=
+ =?utf-8?B?N05NY0hhTmRUcVRYWXRkK3dTQXc4YTlyNzh1a2FXZVBuQmphVHN0bGZHTFJn?=
+ =?utf-8?B?TnRsT2pYZll2RlhodFAvSFM4SjdGUjJzMGIrcnd6b0hUNFNFR2xpUG1aNUpu?=
+ =?utf-8?B?bjZxZGQwb1NrcE5ua1pzZkEvR25jRElBYk5GdS9NTDgxZ3lEMlBIdC8yMU5Z?=
+ =?utf-8?B?NkE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: fc998116-c7b9-470e-ac1f-08dc647f82d7
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Apr 2024 16:56:39.9654
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Lp6s0T0MzyHOkGzYIQgSZBtSUErSjl8pylkZfuaBUHePxE7zzK/ibfuq38vVCdOGmkQIaZbrBKaZs7UObnw2FORX8Oi76DA95KIWTWs/58M=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR11MB4562
+X-OriginatorOrg: intel.com
 
 
-在 2024/4/25 上午12:18, Jakub Kicinski 写道:
-> On Wed, 24 Apr 2024 21:41:55 +0800 Heng Qi wrote:
->> +struct dim_irq_moder {
->> +       /* See DIM_PROFILE_* */
->> +       u8 profile_flags;
->> +
->> +       /* See DIM_COALESCE_* for Rx and Tx */
->> +       u8 coal_flags;
->> +
->> +       /* Rx DIM period count mode: CQE or EQE */
->> +       u8 dim_rx_mode;
->> +
->> +       /* Tx DIM period count mode: CQE or EQE */
->> +       u8 dim_tx_mode;
->> +
->> +       /* DIM profile list for Rx */
->> +       struct dim_cq_moder *rx_profile;
->> +
->> +       /* DIM profile list for Tx */
->> +       struct dim_cq_moder *tx_profile;
->> +
->> +       /* Rx DIM worker function scheduled by net_dim() */
->> +       void (*rx_dim_work)(struct work_struct *work);
->> +
->> +       /* Tx DIM worker function scheduled by net_dim() */
->> +       void (*tx_dim_work)(struct work_struct *work);
->> +};
->> +
->>
->> .....
->>
->>
->> +       .ndo_init_irq_moder     = virtnet_init_irq_moder,
-> The init callback mostly fills in static data, can we not
-> declare the driver information statically and move the init
-> code into the core?
 
-Now the init callback is used as following
-
-In dim.c:
-
-+int net_dim_init_irq_moder(struct net_device *dev)
-+{
-+       if (dev->netdev_ops && dev->netdev_ops->ndo_init_irq_moder)
-+               return dev->netdev_ops->ndo_init_irq_moder(dev);
-+
-+       return 0;
-+}
-+EXPORT_SYMBOL(net_dim_init_irq_moder);
-
-
-In dev.c
-
-@@ -10258,6 +10259,10 @@ int register_netdevice(struct net_device *dev)
-         if (ret)
-                 return ret;
-
-+       ret = net_dim_init_irq_moder(dev);
-+       if (ret)
-+               return ret;
-+
-         spin_lock_init(&dev->addr_list_lock);
-         netdev_set_addr_lockdep_class(dev);
-
-
-The collected flags, mode, and work must obtain driver-specific
-
-values from the driver. If I'm not wrong, you don't want an interface
-
-like .ndo_init_irq_moder, but instead provide a generic interface in
-
-dim.c (e.g. net_dim_init_irq_moder() with parameters dev and struct
-
-dim_irq_moder or separate flags,mode,work). Then this func is called
-
-by the driver in the probe phase?
-
-
->> ....
+On 4/24/2024 8:07 AM, Jiri Pirko wrote:
+> Wed, Apr 24, 2024 at 12:03:25AM CEST, jacob.e.keller@intel.com wrote:
 >>
 >>
->> +static int virtnet_init_irq_moder(struct net_device *dev)
->> +{
->> +        struct virtnet_info *vi = netdev_priv(dev);
->> +        struct dim_irq_moder *moder;
->> +        int len;
->> +
->> +        if (!virtio_has_feature(vi->vdev, VIRTIO_NET_F_VQ_NOTF_COAL))
->> +                return 0;
->> +
->> +        dev->irq_moder = kzalloc(sizeof(*dev->irq_moder), GFP_KERNEL);
->> +        if (!dev->irq_moder)
->> +                goto err_moder;
->> +
->> +        moder = dev->irq_moder;
->> +        len = NET_DIM_PARAMS_NUM_PROFILES * sizeof(*moder->rx_profile);
->> +
->> +        moder->profile_flags |= DIM_PROFILE_RX;
->> +        moder->coal_flags |= DIM_COALESCE_USEC | DIM_COALESCE_PKTS;
->> +        moder->dim_rx_mode = DIM_CQ_PERIOD_MODE_START_FROM_EQE;
->> +
->> +        moder->rx_dim_work = virtnet_rx_dim_work;
->> +
->> +        moder->rx_profile = kmemdup(dim_rx_profile[moder->dim_rx_mode],
->> +                                   len, GFP_KERNEL);
->> +        if (!moder->rx_profile)
->> +                goto err_profile;
->> +
->> +        return 0;
->> +
->> +err_profile:
->> +        kfree(moder);
->> +err_moder:
->> +        return -ENOMEM;
->> +}
->> +
+>> On 4/23/2024 6:14 AM, Jiri Pirko wrote:
+>>> Tue, Apr 23, 2024 at 01:56:55PM CEST, sergey.temerkhanov@intel.com wrote:
+>>>>
+>>>>
+>>>>> -----Original Message-----
+>>>>> From: Jiri Pirko <jiri@resnulli.us>
+>>>>> Sent: Tuesday, April 23, 2024 1:36 PM
+>>>>> To: Temerkhanov, Sergey <sergey.temerkhanov@intel.com>
+>>>>> Cc: intel-wired-lan@lists.osuosl.org; netdev@vger.kernel.org; Kitszel,
+>>>>> Przemyslaw <przemyslaw.kitszel@intel.com>
+>>>>> Subject: Re: [PATCH iwl-next v2] ice: Extend auxbus device naming
+>>>>>
+>>>>> Tue, Apr 23, 2024 at 11:14:59AM CEST, sergey.temerkhanov@intel.com
+>>>>> wrote:
+>>>>>> Include segment/domain number in the device name to distinguish
+>>>>> between
+>>>>>> PCI devices located on different root complexes in multi-segment
+>>>>>> configurations. Naming is changed from ptp_<bus>_<slot>_clk<clock>  to
+>>>>>> ptp_<domain>_<bus>_<slot>_clk<clock>
+>>>>>
+>>>>> I don't understand why you need to encode pci properties of a parent device
+>>>>> into the auxiliary bus name. Could you please explain the motivation? Why
+>>>>> you need a bus instance per PF?
+>>>>>
+>>>>> The rest of the auxbus registrators don't do this. Could you please align? Just
+>>>>> have one bus for ice driver and that's it.
+>>>>
+>>>> This patch adds support for multi-segment PCIe configurations.
+>>>> An auxdev is created for each adapter, which has a clock, in the system. There can be
+>>>
+>>> You are trying to change auxiliary bus name.
+>>>
+>>>
+>>>> more than one adapter present, so there exists a possibility of device naming conflict.
+>>>> To avoid it, auxdevs are named according to the PCI geographical addresses of the adapters.
+>>>
+>>> Why? It's the auxdev, the name should not contain anything related to
+>>> PCI, no reason for it. I asked for motivation, you didn't provide any.
+>>>
 >>
->> ......
+>> We aren't creating one auxbus per PF. We're creating one auxbus per
+>> *clock*. The device has multiple clocks in some configurations.
+> 
+> Does not matter. Why you need separate bus for whatever-instance? Why
+> can't you just have one ice-ptp bus and put devices on it?
+> 
+> 
+
+Because we only want ports on card A to be connected to the card owner
+on card A. We were using auxiliary bus to manage this. If we use a
+single bus for ice-ptp, then we still have to implement separation
+between each set of devices on a single card, which doesn't solve the
+problems we had, and at least with the current code using auxiliary bus
+doesn't buy us much if it doesn't solve that problem.
+
 >>
->> +void net_dim_setting(struct net_device *dev, struct dim *dim, bool is_tx)
->> +{
->> +       struct dim_irq_moder *irq_moder = dev->irq_moder;
->> +
->> +       if (!irq_moder)
->> +               return;
->> +
->> +       if (is_tx) {
->> +               INIT_WORK(&dim->work, irq_moder->tx_dim_work);
->> +               dim->mode = irq_moder->dim_tx_mode;
->> +               return;
->> +       }
->> +
->> +       INIT_WORK(&dim->work, irq_moder->rx_dim_work);
->> +       dim->mode = irq_moder->dim_rx_mode;
->> +}
+>> We need to connect each PF to the same clock controller, because there
+>> is only one clock owner for the device in a multi-port card.
+> 
+> Connect how? But putting a PF-device on a per-clock bus? That sounds
+> quite odd. How did you figure out this usage of auxiliary bus?
+> 
+> 
+
+Yea, its a multi-function board but the functions aren't fully
+independent. Each port has its own PF, but multiple ports can be tied to
+the same clock. We have similar problems with a variety of HW aspects.
+I've been told that the design is simpler for other operating systems,
+(something about the way the subsystems work so that they expect ports
+to be tied to functions). But its definitely frustrating from Linux
+perspective where a single driver instance for the device would be a lot
+easier to manage.
+
 >>
->> .....
+>>> Again, could you please avoid creating auxiliary bus per-PF and just
+>>> have one auxiliary but per-ice-driver?
+>>>
 >>
->> +       for (i = 0; i < vi->max_queue_pairs; i++)
->> +               net_dim_setting(vi->dev, &vi->rq[i].dim, false);
+>> We can't have one per-ice driver, because we don't want to connect ports
+>>from a different device to the same clock. If you have two ice devices
+>> plugged in, the ports on each device are separate from each other.
 >>
->> .....
+>> The goal here is to connect the clock ports to the clock owner.
 >>
->>       ETHTOOL_A_COALESCE_TX_AGGR_MAX_FRAMES,          /* u32 */
+>> Worse, as described here, we do have some devices which combine multiple
+>> adapters together and tie their clocks together via HW signaling. In
+>> those cases the clocks *do* need to communicate across the device, but
+>> only to other ports on the same physical device, not to ports on a
+>> different device.
 >>
->>       ETHTOOL_A_COALESCE_TX_AGGR_TIME_USECS,           /* u32 */
->>
->> + /* nest - _A_PROFILE_IRQ_MODERATION */
->>
->> +  ETHTOOL_A_COALESCE_RX_PROFILE,
->>
->> +   /* nest - _A_PROFILE_IRQ_MODERATION */
->> +  ETHTOOL_A_COALESCE_TX_PROFILE,
->>
->> ......
->>
->>
->> Almost clear implementation, but the only problem is when I want to
->> reuse "ethtool -C" and append ETHTOOL_A_COALESCE_RX_PROFILE
->> and ETHTOOL_A_COALESCE_TX_PROFILE, *ethnl_set_coalesce_validate()
->> will report an error because there are no ETHTOOL_COALESCE_RX_PROFILE
->> and ETHTOOL_COALESCE_TX_PROFILE, because they are replaced by
->> DIM_PROFILE_RX and DIM_PROFILE_TX in the field profile_flags.*
-> I see.
->
->> Should I reuse ETHTOOL_COALESCE_RX_PROFILE and
->> ETHTOOL_A_COALESCE_TX_PROFILE in ethtool_ops->.supported_coalesce_params
->> and remove the field profile_flags from struct dim_irq_moder?
->> Or let ethnl_set_coalesce_validate not verify these two flags?
->> Is there a better solution?
-> Maybe create the bits but automatically add them for the driver?
+>> Perhaps auxbus is the wrong approach here? but how else can we connect
+> 
+> Yeah, feels quite wrong.
+> 
+> 
+>> these ports without over-connecting to other ports? We could write
+>> bespoke code which finds these devices, but that felt like it was risky
+>> and convoluted.
+> 
+> Sounds you need something you have for DPLL subsystem. Feels to me that
+> your hw design is quite disconnected from the Linux device model :/
+> 
+
+I'm not 100% sure how DPLL handles this. I'll have to investigate.
+
+One thing I've considered a lot in the past (such as back when I was
+working on devlink flash update) was to somehow have a sort of extra
+layer where we could register with PCI subsystem some sort of "whole
+device" driver, that would get registered first and could connect to the
+rest of the function driver instances as they load. But this seems like
+it would need a lot of work in the PCI layer, and apparently hasn't been
+an issue for other devices? though ice is far from unique at least for
+Intel NICs. Its just that the devices got significantly more complex and
+functions more interdependent with this generation, and the issues with
+global bits were solved in other ways: often via hiding them with
+firmware >:(
 
 
-Ok. I think it works.
+I've tried explaining the issues with this to HW designers here, but so
+far haven't gotten a lot of traction.
 
+>> We could make use of ice_adapter, though we'd need some logic to manage
+>> devices which have multiple clocks, as well as devices like the one
+>> Sergey is working on which tie multiple adapters together.
+> 
+> Perhaps that is an answer. Maybe we can make DPLL much more simple after
+> that :)
 
-Thanks!
+The only major issue with ice_adapter is the case where we have one
+clock connected to multiple adapters, but hopefully Sergey has some
+ideas for how to solve that.
 
+I think we can mostly make the rest of the logic for the usual case work
+via ice_adapter:
 
-> diff --git a/net/ethtool/coalesce.c b/net/ethtool/coalesce.c
-> index 83112c1a71ae..56777d36f7f1 100644
-> --- a/net/ethtool/coalesce.c
-> +++ b/net/ethtool/coalesce.c
-> @@ -243,6 +243,8 @@ ethnl_set_coalesce_validate(struct ethnl_req_info *req_info,
->   
->   	/* make sure that only supported parameters are present */
->   	supported_params = ops->supported_coalesce_params;
-> +	if (dev->moder->coal_flags ...)
-> +		supported_params |= ETHTOOL_COALESCE_...;
->   	for (a = ETHTOOL_A_COALESCE_RX_USECS; a < __ETHTOOL_A_COALESCE_CNT; a++)
->   		if (tb[a] && !(supported_params & attr_to_mask(a))) {
->   			NL_SET_ERR_MSG_ATTR(info->extack, tb[a],
+1) we already get an ice_adapter reference during early probe
+2) each PF knows whether its an owner or not from the NVM/firmware interface
+3) we can move the list of ports from the auxbus thing into ice_adapter,
+possibly keeping one list per clock number, so that NVMs with multiple
+clocks enabled don't have conflicts or put all ports onto the same clock.
+
+I'm not sure how best to solve the weird case when we have multiple
+adapters tied together, but perhaps something with extending how the
+ice_adapter lookup is done could work? Sergey, I think we can continue
+this design discussion off list and come up with a proposal.
+
+We also have to be careful that whatever new solution also handles
+things which we got with auxiliary bus:
+
+1) prevent issues with ordering if a clock port loads before the clock
+owner PF. If the clock owner loads first, then we need to ensure the
+port still gets initialized. If the clock owner loads second, we need to
+avoid issues with things not being setup yet, i.e. ensure all the
+structures were already initialized (for example by initializing lists
+and such when we create the ice_adapter, not when the clock owner loads).
+
+2) prevent issues with teardown ordering that were previously serialized
+by the auxiliary bus unregister bits, where the driver unregister
+function would wait for all ports to shutdown.
+
+I think this can be done correctly with ice_adapter, but I wanted to
+point them out because we get them implicitly with the current design
+with auxiliary bus.
 
