@@ -1,94 +1,79 @@
-Return-Path: <netdev+bounces-90740-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90741-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4817E8AFE1A
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 04:01:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BCD208AFE3D
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 04:16:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F2AFF1F23A82
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 02:01:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CDE7C1C22004
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 02:16:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74F7CD29E;
-	Wed, 24 Apr 2024 02:01:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2969010A1A;
+	Wed, 24 Apr 2024 02:16:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Gvj9VckZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7526BE6C
-	for <netdev@vger.kernel.org>; Wed, 24 Apr 2024 02:01:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00604C13D;
+	Wed, 24 Apr 2024 02:16:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713924065; cv=none; b=DsCt0ExQ8uSZzuW8dWqQ9q/gInVaPQEU9eAH3uUWQrQSsReeXg9DNVSaqaq+3ZHNWFHI6ra5uJeuTZCFAUL9+qUw3z0upFN0m76uPvtcRuGw3wHBSfXSx41QEQH42Vj+AXlGf1Eof+A2feeE056LigbvEIjYItv0VLB+1yQmNgs=
+	t=1713924971; cv=none; b=sVSCLyN7JvWOeUsoReBqlP3tAkRboBIYpGZ29FzA16QAJ7lA8FoMeqPLaCyZzATIC3dRoIWTw2l+d63aFZvfDgKhFRFISB1aYCN527a7u1/4YQBVHXRfUzID7oNL4lsN9tGZP2+LssrEVkGPEjsLrP28KxeYr5NIQ995GtVoRAQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713924065; c=relaxed/simple;
-	bh=TUP9FkX2lJl7zbsImkQch4ciYMMyBDiJtF6VqMtpXM0=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=e31HwqgaVb6UhZATRDFBERXZMEOJjgMJs3KUerAQGcnS+VLzJZ6T+yoUynSewkKiu4JdyU2/+ESYV0/qyBPiaQyGu75JkXyGd+LVvmDRy3RCbhj/D3PQXag+LRR7wyRhoVMlDaqxxCl/2wG/PzlPD6OdSI1z16pwsdbDSv4lbYc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-7d5f08fdba8so33990039f.0
-        for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 19:01:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713924063; x=1714528863;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ifim8rK+5Cn5AylRfbIwtbU4eq2GAjVjQaY82cuTstU=;
-        b=UpuCdnBeD099i95/tT2uSONGTYse+IYbEaSwMpaJAXX2gbuI6FediMD0nyrmmKzVy4
-         j5HFwagDXFT7hWoxZqfGKvq0wWnCT10tRzncUABWF6z6Zlvi21HlT3swHxbVu4S6dhlA
-         RJAvHm37uCCedfWKnlVNtq99Yl8Yjsvh25dBHGwh6RMkQooAZ30Xsw9oewUGOfpoV+tL
-         yyAAa6MHq/MrP//TQlP1g8lz1goWMKVrGTrE1TP4nAICeK3MbJUlGCsqd43awbEX/8mh
-         KeSQWkiPYhDrkNmVmdA8nLDuvkH6piN35a9vou/xsyAvqGA9HyjICwL4q/Lwd7JI4AHZ
-         JwFQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUgZDvAVbIFdH7Vs+QbLKwFdBXsZ3klqmlqz2cKkFSyKqGUEoIm44tVnMKHtdbUwo1k0mMwLwcB5qjI9Rr3r7vn7cc2pEPd
-X-Gm-Message-State: AOJu0Yw33njt8iHah9YTaAaFnxFGbWfH75ea943ZN//YKTYJjBoXPJWu
-	/SOiblqO5SUVjU75L7pPqS7mzsn3bD0iBatv20yGRAeK5xMo2D5g3jS85ypJdv41Is/hr8zZUbf
-	VDuQg89dugM7XX83od8XiUjgfSL55G1l/n/76VM9Z8EeV1y8wkZ3dTbQ=
-X-Google-Smtp-Source: AGHT+IFb2GitKyqtyomAW5D/rDPBgckqBsgxNNOhYgMZPpoxfwrLMRBdrlj7GvDWAclxs7KfwPhmIkStqRgo4TlEKYioi51ypkQv
+	s=arc-20240116; t=1713924971; c=relaxed/simple;
+	bh=0vw9tPgrcUPrC3NfHnBNGyHFrlvNxn8ExXOVsKP7kK8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=rWrhAQH7S0GTawVWWdYU+Gh5HxSSMDk1NYPteFR9b4AeT8RNubHbuwbTUx5PQhyeVrnjI5jEZ6ilp0JUURxtAgw68sbYP2S9YTAB50mNf9lVn5ncnORLe9bETvMMIdXT+jIqHAMc2g10rvKaQSTIfV9/IZnF2vi6qNceJJ9yFno=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Gvj9VckZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B2C6C116B1;
+	Wed, 24 Apr 2024 02:16:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713924970;
+	bh=0vw9tPgrcUPrC3NfHnBNGyHFrlvNxn8ExXOVsKP7kK8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Gvj9VckZTAHuse4EnKfxJcq3+Zoo+Z8P0JPwej2HEZH4vTKa+LZ+V1w1ppHNDdMxy
+	 8daL6e3CMWiK/1vxuVF8A0ATK6bGXBoPKXNlUnlvTUWG/OXV3LSHUiEvXnmZAPMlcp
+	 0A69AqjkffLwkRwyM/Mskt1Qy1QQiI5rXW+oLnVJ+GrjAjIKqBpPuwDQ27MoqzbOt6
+	 XriwwEQTZozcsUeuZVfrnOlMWsRQNUkpgmqLqeRw8kh1JM43DuV1ltiILOHhwmNBG9
+	 uyM2ADZVO6Fv8PrreHQYQXLTtb4nj14MdzhTHFYtZY8Lq2WONGCEE+JQ79trIh8g0d
+	 Hfp66BGLJfM4g==
+Date: Tue, 23 Apr 2024 19:16:09 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Florian Westphal <fw@strlen.de>
+Cc: <netdev@vger.kernel.org>, Paolo Abeni <pabeni@redhat.com>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ <netfilter-devel@vger.kernel.org>, pablo@netfilter.org
+Subject: Re: [PATCH net-next] tools: testing: selftests: switch
+ conntrack_dump_flush to TEST_PROGS
+Message-ID: <20240423191609.70c14c42@kernel.org>
+In-Reply-To: <20240422152701.13518-1-fw@strlen.de>
+References: <20240422152701.13518-1-fw@strlen.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1cac:b0:36b:1b8b:75f4 with SMTP id
- x12-20020a056e021cac00b0036b1b8b75f4mr165809ill.2.1713924063116; Tue, 23 Apr
- 2024 19:01:03 -0700 (PDT)
-Date: Tue, 23 Apr 2024 19:01:03 -0700
-In-Reply-To: <000000000000f1761a0616c5c629@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000f450900616ce0aa5@google.com>
-Subject: Re: [syzbot] [net?] possible deadlock in __unix_gc
-From: syzbot <syzbot+fa379358c28cc87cc307@syzkaller.appspotmail.com>
-To: axboe@kernel.dk, davem@davemloft.net, edumazet@google.com, 
-	hdanton@sina.com, horms@kernel.org, kuba@kernel.org, kuni1840@gmail.com, 
-	kuniyu@amazon.com, linux-kernel@vger.kernel.org, mhal@rbox.co, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-syzbot has bisected this issue to:
+On Mon, 22 Apr 2024 17:26:59 +0200 Florian Westphal wrote:
+> Currently conntrack_dump_flush test program always runs when passing
+> TEST_PROGS argument:
+> 
+> % make -C tools/testing/selftests TARGETS=net/netfilter TEST_PROGS=conntrack_ipip_mtu.sh run_tests
+> make: Entering [..]
+> TAP version 13
+> 1..2 [..]
+>   selftests: net/netfilter: conntrack_dump_flush [..]
+> 
+> Move away from TEST_CUSTOM_PROGS to avoid this.  After this,
+> above command will only run the program specified in TEST_PROGS.
 
-commit 47d8ac011fe1c9251070e1bd64cb10b48193ec51
-Author: Michal Luczaj <mhal@rbox.co>
-Date:   Tue Apr 9 20:09:39 2024 +0000
-
-    af_unix: Fix garbage collector racing against connect()
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=13f440d3180000
-start commit:   4d2008430ce8 Merge tag 'docs-6.9-fixes2' of git://git.lwn...
-git tree:       upstream
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=100c40d3180000
-console output: https://syzkaller.appspot.com/x/log.txt?x=17f440d3180000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=98d5a8e00ed1044a
-dashboard link: https://syzkaller.appspot.com/bug?extid=fa379358c28cc87cc307
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16a8fb4f180000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=17ceeb73180000
-
-Reported-by: syzbot+fa379358c28cc87cc307@syzkaller.appspotmail.com
-Fixes: 47d8ac011fe1 ("af_unix: Fix garbage collector racing against connect()")
-
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+Hm, but why TEST_CUSTOM_PROGS in the first place?
+What's special about it? I think TEST_GEN_PROGS would work
 
