@@ -1,99 +1,133 @@
-Return-Path: <netdev+bounces-90789-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90790-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA7C38B02BF
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 09:00:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 672138B02F0
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 09:16:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 77A01282DF3
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 07:00:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 21E9D28459D
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 07:16:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A7321586C6;
-	Wed, 24 Apr 2024 06:57:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A2B3157A58;
+	Wed, 24 Apr 2024 07:16:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="AukXqEkZ"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="PY9Mw9ZZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.4])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA497157499;
-	Wed, 24 Apr 2024 06:57:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.4
+Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D59D360;
+	Wed, 24 Apr 2024 07:16:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.141
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713941858; cv=none; b=Lj2PhLk25r9kDzYzNm/Jo0AJC2RaMtLfLy2UpTR9VwBDwmaIILa5UeQFdojZcPkttXL3aRcRv0MUYUQFQh6/icntoNjw5UCWErKPuW8JYrsMedwpD9Jx0MGTVxTXApQmu4SC1JvtLRFeTkH4K+1XDhbQCqUlXm03cHli3HCOAsM=
+	t=1713943005; cv=none; b=mnHulsOCR6t/OiEnfwTXU/W8oklH1hbcmXQ4FN9sp1VBf+WaffTdYROPjTKcnbqzljjkPVMD3uFmEiVg9JlJ5wablx6Au+EA3f1AI902U5UFmJSU6RokuvAeLhIrkl2xdWmC/LQ2wVDjZ6TjOWkztQ+X+FMus10yvDFD1SP7ZRg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713941858; c=relaxed/simple;
-	bh=4M75hS8XdGgB27pG91ABOzG8oYFy2pFxUFNJPq7UJVI=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=noAeInJdrzC4ddKq8kdUR20xke6Sp5w/XnJtuB+n49YzXXPL5eCQ0Vsrr84peajgJk36CtyYiLK013I+UpXlnd/UeDBUALnppr+rEMVlHlgV1fzz/ZtcoACcWDr///Skdt5q+uA1rUaX0J7SXYadwWALcjaW1gHgE5cjJN1D8y4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=AukXqEkZ; arc=none smtp.client-ip=117.135.210.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=DjKTL
-	b/Hzmerf/tiPBtGXwro+rqebqKp1eua6xwlMow=; b=AukXqEkZJzqCCQMAJju49
-	Ub8DdX3+R54S7e66piVwKAJXSVYYcblIlUMhfHVKozDGL2PQJFm+N2g2B/EaR0Pm
-	Iv0vZciMqIPLRFakNzhSvBeJ1ij8kSSgLyX6hkTM1+/TErpxjwvDdrZvTG5ZQNkX
-	eeRQ19PZw7izp9vnLN9HaI=
-Received: from icess-ProLiant-DL380-Gen10.. (unknown [183.174.60.14])
-	by gzga-smtp-mta-g2-3 (Coremail) with SMTP id _____wDnFz0krShmD3q+CA--.62207S4;
-	Wed, 24 Apr 2024 14:56:56 +0800 (CST)
-From: Ma Ke <make_ruc2021@163.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	jtornosm@redhat.com,
-	andrew@lunn.ch,
-	horms@kernel.org,
-	hkallweit1@gmail.com,
-	make_ruc2021@163.com
-Cc: linux-usb@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2] net: usb: ax88179_178a: Add check for usbnet_get_endpoints()
-Date: Wed, 24 Apr 2024 14:56:34 +0800
-Message-Id: <20240424065634.1870027-1-make_ruc2021@163.com>
-X-Mailer: git-send-email 2.37.2
+	s=arc-20240116; t=1713943005; c=relaxed/simple;
+	bh=E1fwd1W0aXVPo9e17+huq/xHPYPSatpsHlCko4mo2wM=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=BKxBtdPO/M2louBcvKP8xgLpNqJVHSJ1hYcRLEO9oi74NWWeSBcngXA6tFkGd6l1e8QQ1a1Evl2cAlQ7vyHPzEyvtk4GNZquj+A0aYyJt6wUFpA9jnTSJrSp23VcFfaFggm+yLpiijkjS7v10ZFDFvjTIHXUiVaAVXLSmEfRvtc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=PY9Mw9ZZ; arc=none smtp.client-ip=198.47.19.141
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from lelv0265.itg.ti.com ([10.180.67.224])
+	by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 43O7GVdB061921;
+	Wed, 24 Apr 2024 02:16:31 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1713942991;
+	bh=0W2mD8fr9mkHJZVb38GrfhFcqGHaTgNh0tcswSRAXA8=;
+	h=From:To:CC:Subject:Date;
+	b=PY9Mw9ZZFu/IcIQv5tAVJOkJ83LP0jZFGuaqajzWdyaWanZ3TFMB23nu+sAhguFsz
+	 d8d04JJtQdiBPiCQfMq4Y6YOqG6glORbUsqJ0tSNWm85oVob7kYXQBZ7Yl/3eBN0CW
+	 gTLlh1NvrYcPlfPlcYuDIiVaUS/deoPLtWzhQJxY=
+Received: from DLEE102.ent.ti.com (dlee102.ent.ti.com [157.170.170.32])
+	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 43O7GV03026334
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Wed, 24 Apr 2024 02:16:31 -0500
+Received: from DLEE100.ent.ti.com (157.170.170.30) by DLEE102.ent.ti.com
+ (157.170.170.32) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Wed, 24
+ Apr 2024 02:16:31 -0500
+Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DLEE100.ent.ti.com
+ (157.170.170.30) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Wed, 24 Apr 2024 02:16:30 -0500
+Received: from uda0500640.dal.design.ti.com (uda0500640.dhcp.ti.com [172.24.227.88])
+	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 43O7GQTH085742;
+	Wed, 24 Apr 2024 02:16:27 -0500
+From: Ravi Gunasekaran <r-gunasekaran@ti.com>
+To: <s-vadapalli@ti.com>, <rogerq@kernel.org>, <r-gunasekaran@ti.com>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <richardcochran@gmail.com>, <jreeder@ti.com>,
+        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, <srk@ti.com>,
+        <ed.trexel@hp.com>
+Subject: [PATCH net v2] net: ethernet: ti: am65-cpts: Fix PTPv1 message type on TX packets
+Date: Wed, 24 Apr 2024 12:46:26 +0530
+Message-ID: <20240424071626.32558-1-r-gunasekaran@ti.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wDnFz0krShmD3q+CA--.62207S4
-X-Coremail-Antispam: 1Uf129KBjvdXoWruw4rZw4UAFy7GrWDury8Xwb_yoWfWrb_u3
-	Z7Gwn7Wr4jgF48Wr4DGw4avrWfKa1kXwn7uF4kK3sIq3WYq3WDJrn2vrnxC3Z7WF40vFnr
-	Cw1qyFy3JryDtjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7sRNvtCUUUUUU==
-X-CM-SenderInfo: 5pdnvshuxfjiisr6il2tof0z/xtbBFRTKC2XAlI2PswABsB
+Content-Type: text/plain
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 
-To avoid the failure of usbnet_get_endpoints(), we should check the
-return value of the usbnet_get_endpoints().
+From: Jason Reeder <jreeder@ti.com>
 
-Signed-off-by: Ma Ke <make_ruc2021@163.com>
+The CPTS, by design, captures the messageType (Sync, Delay_Req, etc.)
+field from the second nibble of the PTP header which is defined in the
+PTPv2 (1588-2008) specification. In the PTPv1 (1588-2002) specification
+the first two bytes of the PTP header are defined as the versionType
+which is always 0x0001. This means that any PTPv1 packets that are
+tagged for TX timestamping by the CPTS will have their messageType set
+to 0x0 which corresponds to a Sync message type. This causes issues
+when a PTPv1 stack is expecting a Delay_Req (messageType: 0x1)
+timestamp that never appears.
+
+Fix this by checking if the ptp_class of the timestamped TX packet is
+PTP_CLASS_V1 and then matching the PTP sequence ID to the stored
+sequence ID in the skb->cb data structure. If the sequence IDs match
+and the packet is of type PTPv1 then there is a chance that the
+messageType has been incorrectly stored by the CPTS so overwrite the
+messageType stored by the CPTS with the messageType from the skb->cb
+data structure. This allows the PTPv1 stack to receive TX timestamps
+for Delay_Req packets which are necessary to lock onto a PTP Leader.
+
+Fixes: f6bd59526ca5 ("net: ethernet: ti: introduce am654 common platform time sync driver")
+Signed-off-by: Jason Reeder <jreeder@ti.com>
+Signed-off-by: Ravi Gunasekaran <r-gunasekaran@ti.com>
 ---
- drivers/net/usb/ax88179_178a.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+Changes since v1:
+-----------------
+* Added Fixes tag as per Paolo's suggestion
+* Rebased to latest tip
 
-diff --git a/drivers/net/usb/ax88179_178a.c b/drivers/net/usb/ax88179_178a.c
-index 752f821a1990..388ea178c91d 100644
---- a/drivers/net/usb/ax88179_178a.c
-+++ b/drivers/net/usb/ax88179_178a.c
-@@ -1287,8 +1287,11 @@ static void ax88179_get_mac_addr(struct usbnet *dev)
- static int ax88179_bind(struct usbnet *dev, struct usb_interface *intf)
- {
- 	struct ax88179_data *ax179_data;
-+	int ret;
+v1: https://lore.kernel.org/all/20240419080547.10682-1-r-gunasekaran@ti.com/
+
+ drivers/net/ethernet/ti/am65-cpts.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/drivers/net/ethernet/ti/am65-cpts.c b/drivers/net/ethernet/ti/am65-cpts.c
+index c66618d91c28..f89716b1cfb6 100644
+--- a/drivers/net/ethernet/ti/am65-cpts.c
++++ b/drivers/net/ethernet/ti/am65-cpts.c
+@@ -784,6 +784,11 @@ static bool am65_cpts_match_tx_ts(struct am65_cpts *cpts,
+ 		struct am65_cpts_skb_cb_data *skb_cb =
+ 					(struct am65_cpts_skb_cb_data *)skb->cb;
  
--	usbnet_get_endpoints(dev, intf);
-+	ret = usbnet_get_endpoints(dev, intf);
-+	if (ret < 0)
-+		return ret;
++		if ((ptp_classify_raw(skb) & PTP_CLASS_V1) &&
++		    ((mtype_seqid & AM65_CPTS_EVENT_1_SEQUENCE_ID_MASK) ==
++		     (skb_cb->skb_mtype_seqid & AM65_CPTS_EVENT_1_SEQUENCE_ID_MASK)))
++			mtype_seqid = skb_cb->skb_mtype_seqid;
++
+ 		if (mtype_seqid == skb_cb->skb_mtype_seqid) {
+ 			u64 ns = event->timestamp;
  
- 	ax179_data = kzalloc(sizeof(*ax179_data), GFP_KERNEL);
- 	if (!ax179_data)
+
+base-commit: a59668a9397e7245b26e9be85d23f242ff757ae8
 -- 
-2.37.2
+2.17.1
 
 
