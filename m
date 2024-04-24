@@ -1,167 +1,191 @@
-Return-Path: <netdev+bounces-90737-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90738-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BE9B8AFDE4
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 03:38:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D52BA8AFDF7
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 03:41:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B710C285BD5
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 01:38:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 715541F23CC2
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 01:41:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33F76748A;
-	Wed, 24 Apr 2024 01:38:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74A1D6139;
+	Wed, 24 Apr 2024 01:39:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b="0TqBFOqR"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="LO1Y7OKI"
 X-Original-To: netdev@vger.kernel.org
-Received: from gate2.alliedtelesis.co.nz (gate2.alliedtelesis.co.nz [202.36.163.20])
+Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C0066AB6
-	for <netdev@vger.kernel.org>; Wed, 24 Apr 2024 01:38:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.36.163.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE76B200BF
+	for <netdev@vger.kernel.org>; Wed, 24 Apr 2024 01:39:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.184.29
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713922703; cv=none; b=Yqw2249wd7bXqadgquWw+DQoSWUk+t5KCP01kB/uOh9xSW/R7tTrbDBn172nMdoyJ2bfDJ6H0LIq2e+Dexu8ykLplyOx/vohDnWWylMlgaoIltx2FTYD7dkOtuFCc19GGtZNhdEPFxwSOimZ1DXW6k3aOXxs2GQhOEjsDxOEo0Q=
+	t=1713922783; cv=none; b=FHukxbR1ZiEsudn/84m/f1d9Frg0EJLllxzaPPMeovtHbW0nCZ1ISb9fALmvLm2eQazmMIo4tuEu9C7hR7MRYMopkZC0KbQ+goWjX0yuxtYhfz0ivayHsdGFVOyfi7HiWXz7lrQW882VHmUBcRtD7pRVZAli5hqSwvFPO9b6Af0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713922703; c=relaxed/simple;
-	bh=iopcgr3rm1GlCkZxTneL83WpCXee/HP4dS8CuULl/go=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=UzVQJRL3UcPhLqQpyuurjCxz963DA4Q30mCK8s/Hheh0eE2gn3FDdRvZC6caHOA6CN7OjV4luX3xidOTFeSvqdYXWO/Mz9XRIyND3who4aHNx33oUtcPj/vcVgxH+H/AsUgSb+9AGG/xONqSVdxsQyQF8WsKeeginSfuYITYC40=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz; spf=pass smtp.mailfrom=alliedtelesis.co.nz; dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b=0TqBFOqR; arc=none smtp.client-ip=202.36.163.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alliedtelesis.co.nz
-Received: from svr-chch-seg1.atlnz.lc (mmarshal3.atlnz.lc [10.32.18.43])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by gate2.alliedtelesis.co.nz (Postfix) with ESMTPS id CEAF82C02AE;
-	Wed, 24 Apr 2024 13:38:17 +1200 (NZST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alliedtelesis.co.nz;
-	s=mail181024; t=1713922697;
-	bh=iopcgr3rm1GlCkZxTneL83WpCXee/HP4dS8CuULl/go=;
-	h=From:To:CC:Subject:Date:References:In-Reply-To:From;
-	b=0TqBFOqRHxDY6YM38FvQdFMDHVEItdwJHTXZeNpGT55AoDMM3TP5w4Iz3N+X+nwe/
-	 J6jv/XxwlIdtKDN2c19NU/pFwER0CUAkdCkVJbYpFJOddU08AwA0NG60fU3ldWTNn6
-	 IZW7xWHuEN18BTTRyk2Qp/hM27ttLLTRfGNzwDhpCS0NJ0Kj4HLvjCLRGnKwishbWE
-	 fuvOmEXQIl02GXb5wl3MF1RnHO+AifambdikNS6kYqwS1Ve1Sd6LjwKRrAPQY+7npM
-	 HBY/L49+5XSKv+mbnDqTG4ontQH8Qk2WTXUMyflf/YOdaFfLIB57s3eKwgf3va6QMM
-	 w6Rg1o26Y8duA==
-Received: from svr-chch-ex2.atlnz.lc (Not Verified[2001:df5:b000:bc8::76]) by svr-chch-seg1.atlnz.lc with Trustwave SEG (v8,2,6,11305)
-	id <B662862890001>; Wed, 24 Apr 2024 13:38:17 +1200
-Received: from svr-chch-ex1.atlnz.lc (2001:df5:b000:bc8::77) by
- svr-chch-ex2.atlnz.lc (2001:df5:b000:bc8:f753:6de:11c0:a008) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.2.1544.9; Wed, 24 Apr 2024 13:38:17 +1200
-Received: from svr-chch-ex2.atlnz.lc (2001:df5:b000:bc8::76) by
- svr-chch-ex1.atlnz.lc (2001:df5:b000:bc8::77) with Microsoft SMTP Server
- (TLS) id 15.0.1497.48; Wed, 24 Apr 2024 13:38:17 +1200
-Received: from svr-chch-ex2.atlnz.lc ([fe80::a9eb:c9b7:8b52:9567]) by
- svr-chch-ex2.atlnz.lc ([fe80::a9eb:c9b7:8b52:9567%15]) with mapi id
- 15.02.1544.009; Wed, 24 Apr 2024 13:38:17 +1200
-From: Chris Packham <Chris.Packham@alliedtelesis.co.nz>
-To: Jeff Layton <jlayton@kernel.org>, Chuck Lever <chuck.lever@oracle.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-CC: "linux-nfs@vger.kernel.org" <linux-nfs@vger.kernel.org>, netdev
-	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "stable@vger.kernel.org"
-	<stable@vger.kernel.org>
-Subject: Re: kernel BUG at net/sunrpc/svc.c:570 after updating from v5.15.153
- to v5.15.155
-Thread-Topic: kernel BUG at net/sunrpc/svc.c:570 after updating from v5.15.153
- to v5.15.155
-Thread-Index: AQHaleHzc3oveYbGkkq3WWVD/cih7bF12zkA
-Date: Wed, 24 Apr 2024 01:38:17 +0000
-Message-ID: <0d2c2123-e782-4712-8876-c9b65d2c9a65@alliedtelesis.co.nz>
-References: <b363e394-7549-4b9e-b71b-d97cd13f9607@alliedtelesis.co.nz>
-In-Reply-To: <b363e394-7549-4b9e-b71b-d97cd13f9607@alliedtelesis.co.nz>
-Accept-Language: en-NZ, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <36B91780D8124341AE1E686FAD1428B8@atlnz.lc>
-Content-Transfer-Encoding: base64
+	s=arc-20240116; t=1713922783; c=relaxed/simple;
+	bh=MYkH/CFfcy5QwaDUQ7q0RYMcPcb17Bl5DJRAIeYM6zY=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=hOcJOjNX+yeCSD9mXyFie2eNsyLvAIBTAaHr9GrhIEsDL7+LLcgfT6jUuJCHwm23RqvZ+SdLXANlSA/lrEOhZfvmseYz8JFYr0eHklCDQWLPdwnh5knkKDMi6HK7x1aI0l0x8080N8armBXjvIXCcmKvwEiBRuMXQ8v9gk3nz+Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=LO1Y7OKI; arc=none smtp.client-ip=207.171.184.29
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1713922782; x=1745458782;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=ehAcdT1HxEs7NOlZ7U/XAwwhZn8XbLrfbeVSobntrPA=;
+  b=LO1Y7OKIaDQLr1pz2ouierLDWRUIN1Uj2ZQYZpa2MMOGfnzEVnLsHl/s
+   WT5uRoEViYt2y/FoN6mLgOZx2chD4FlWDWqp5WLghuUVKz2xEiTGhzKSP
+   RUg8NhRCn7J9k9PMk6tTDmwHcUUZZUiso8ICMoH7eELWrJip2kPd+qsis
+   U=;
+X-IronPort-AV: E=Sophos;i="6.07,222,1708387200"; 
+   d="scan'208";a="414215744"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
+  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2024 01:39:36 +0000
+Received: from EX19MTAUWA002.ant.amazon.com [10.0.38.20:12874]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.52.56:2525] with esmtp (Farcaster)
+ id 96922871-7aec-4779-90f0-2002d2c89d79; Wed, 24 Apr 2024 01:39:35 +0000 (UTC)
+X-Farcaster-Flow-ID: 96922871-7aec-4779-90f0-2002d2c89d79
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Wed, 24 Apr 2024 01:39:31 +0000
+Received: from 88665a182662.ant.amazon.com (10.187.170.62) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Wed, 24 Apr 2024 01:39:29 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <rao.shoaib@oracle.com>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<kuniyu@amazon.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>
+Subject: Re: [PATCH net v3] af_unix: Read with MSG_PEEK loops if the first unread byte is OOB
+Date: Tue, 23 Apr 2024 18:39:21 -0700
+Message-ID: <20240424013921.16819-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <5a2dc473-5b99-4798-8f23-c5316610af8e@oracle.com>
+References: <5a2dc473-5b99-4798-8f23-c5316610af8e@oracle.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-SEG-SpamProfiler-Analysis: v=2.4 cv=dY4j3mXe c=1 sm=1 tr=0 ts=66286289 a=Xf/6aR1Nyvzi7BryhOrcLQ==:117 a=xqWC_Br6kY4A:10 a=75chYTbOgJ0A:10 a=IkcTkHD0fZMA:10 a=raytVjVEu-sA:10 a=VaKPTF99bPf2uOp7nPkA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
-X-SEG-SpamProfiler-Score: 0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D040UWA001.ant.amazon.com (10.13.139.22) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-DQpPbiAyNC8wNC8yNCAxMjo1NCwgQ2hyaXMgUGFja2hhbSB3cm90ZToNCj4gSGkgSmVmZiwgQ2h1
-Y2ssIEdyZWcsDQo+DQo+IEFmdGVyIHVwZGF0aW5nIG9uZSBvZiBvdXIgYnVpbGRzIGFsb25nIHRo
-ZSA1LjE1LnkgTFRTIGJyYW5jaCBvdXIgDQo+IHRlc3RpbmcgY2F1Z2h0IGEgbmV3IGtlcm5lbCBi
-dWcuIE91dHB1dCBiZWxvdy4NCj4NCj4gSSBoYXZlbid0IGR1ZyBpbnRvIGl0IHlldCBidXQgd29u
-ZGVyZWQgaWYgaXQgcmFuZyBhbnkgYmVsbHMuDQoNCkEgYml0IG1vcmUgaW5mby4gVGhpcyBpcyBo
-YXBwZW5pbmcgYXQgInJlYm9vdCIgZm9yIHVzLiBPdXIgZW1iZWRkZWQgDQpkZXZpY2VzIHVzZSBh
-IGJpdCBvZiBhIGhhY2tlZCB1cCByZWJvb3QgcHJvY2VzcyBzbyB0aGF0IHRoZXkgY29tZSBiYWNr
-IA0KZmFzdGVyIGluIHRoZSBjYXNlIG9mIGEgZmFpbHVyZS4NCg0KSXQgZG9lc24ndCBoYXBwZW4g
-d2l0aCBhIHByb3BlciBgc3lzdGVtY3RsIHJlYm9vdGAgb3Igd2l0aCBhIFNZU1JRK0INCg0KSSBj
-YW4gdHJpZ2dlciBpdCB3aXRoIGBraWxsYWxsIC05IG5mc2RgIHdoaWNoIEknbSBub3Qgc3VyZSBp
-cyBhIA0KY29tcGxldGVseSBsZWdpdCB0aGluZyB0byBkbyB0byBrZXJuZWwgdGhyZWFkcyBidXQg
-aXQncyBwcm9iYWJseSBjbG9zZSANCnRvIHdoYXQgb3VyIGN1c3RvbWl6ZWQgcmVib290IGRvZXMu
-DQoNCj4NCj4gVGhhbmtzLA0KPiBDaHJpcw0KPg0KPiBbwqDCoCA5MS42MDUxMDldIC0tLS0tLS0t
-LS0tLVsgY3V0IGhlcmUgXS0tLS0tLS0tLS0tLQ0KPiBbwqDCoCA5MS42MDUxMjJdIGtlcm5lbCBC
-VUcgYXQgbmV0L3N1bnJwYy9zdmMuYzo1NzAhDQo+IFvCoMKgIDkxLjYwNTEyOV0gSW50ZXJuYWwg
-ZXJyb3I6IE9vcHMgLSBCVUc6IDAwMDAwMDAwZjIwMDA4MDAgWyMxXSANCj4gUFJFRU1QVCBTTVAN
-Cj4gW8KgwqAgOTEuNjEwNjQzXSBNb2R1bGVzIGxpbmtlZCBpbjogbXZjcHNzKE8pIHBsYXRmb3Jt
-X2RyaXZlcihPKSANCj4gaXBpZndkKE8pIHh0X2wydHAgeHRfaGFzaGxpbWl0IHh0X2Nvbm50cmFj
-ayB4dF9hZGRydHlwZSB4dF9MT0cgDQo+IHh0X0NIRUNLU1VNIHdwNTEyIHZ4bGFuIHZldGggdHdv
-ZmlzaF9nZW5lcmljIHR3b2Zpc2hfY29tbW9uIHNyOTgwMCANCj4gc21zYzk1eHggc21zYzc1eHgg
-c21zYyBzbTNfZ2VuZXJpYyBzaGE1MTJfYXJtNjQgc2hhM19nZW5lcmljIA0KPiBzZXJwZW50X2dl
-bmVyaWMgcnRsODE1MCBycGNzZWNfZ3NzX2tyYjUgcm1kMTYwIHBvbHkxMzA1X2dlbmVyaWMgcGx1
-c2IgDQo+IHBlZ2FzdXMgb3B0ZWVfcm5nIG5iZCBtaWNyb2NoaXAgbWQ0IG1kX21vZCBtY3M3ODMw
-IGxydyBsaWJwb2x5MTMwNSANCj4gbGFuNzh4eCBsMnRwX2lwNiBsMnRwX2lwIGwydHBfZXRoIGwy
-dHBfbmV0bGluayBsMnRwX2NvcmUgdWRwX3R1bm5lbCANCj4gaXB0X1JFSkVDVCBuZl9yZWplY3Rf
-aXB2NCBpcDZ0YWJsZV9uYXQgaXA2dGFibGVfbWFuZ2xlIGlwNnRhYmxlX2ZpbHRlciANCj4gaXA2
-dF9pcHY2aGVhZGVyIGlwNnRfUkVKRUNUIGlwNl91ZHBfdHVubmVsIGlwNl90YWJsZXMgZG05NjAx
-IGRtX3plcm8gDQo+IGRtX21pcnJvciBkbV9yZWdpb25faGFzaCBkbV9sb2cgZG1fbW9kIGRpYWcg
-dGlwYyBjdXNlIGN0cyANCj4gY3B1ZnJlcV9wb3dlcnNhdmUgY3B1ZnJlcV9jb25zZXJ2YXRpdmUg
-Y2hhY2hhX2dlbmVyaWMgY2hhY2hhMjBwb2x5MTMwNSANCj4gY2hhY2hhX25lb24gbGliY2hhY2hh
-IGNhc3Q2X2dlbmVyaWMgY2FzdDVfZ2VuZXJpYyBjYXN0X2NvbW1vbiANCj4gY2FtZWxsaWFfZ2Vu
-ZXJpYyBibG93ZmlzaF9nZW5lcmljIGJsb3dmaXNoX2NvbW1vbiBhdXRoX3JwY2dzcyANCj4gb2lk
-X3JlZ2lzdHJ5IGF0MjUgYXJtX3NtY2NjX3RybmcgYWVzX25lb25fYmxrIGlkcHJvbV9tdGQoTykg
-DQo+IGlkcHJvbV9pMmMoTykgZXBpM19ib2FyZGluZm9faTJjKE8pIHgyNTAoTykgcHN1c2xvdF9l
-cGkzX3JlZ2lzdGVyKE8pIA0KPiBwc3VzbG90X2dwaW9fZ3JvdXAoTykNCj4gW8KgwqAgOTEuNjEw
-ODA5XcKgIHBzdXNsb3QoTykNCj4gW8KgwqAgOTEuNjExODIyXSB3YXRjaGRvZzogd2F0Y2hkb2cx
-OiB3YXRjaGRvZyBkaWQgbm90IHN0b3AhDQo+IFvCoMKgIDkxLjY5NzA2NV3CoCBncGlvcGluc19i
-b2FyZGluZm8oTykgaWRwcm9tKE8pIGVwaTNfYm9hcmRpbmZvKE8pIA0KPiBib2FyZGluZm8oTykg
-aTJjX2dwaW8gaTJjX2FsZ29fYml0IGkyY19tdjY0eHh4IHBsdWdnYWJsZShPKSANCj4gbGVkX2Vu
-YWJsZShPKSBvbWFwX3JuZyBybmdfY29yZSBhdGxfcmVzZXQoTykgc2JzYV9nd2R0IHVpb19wZHJ2
-X2dlbmlycQ0KPiBbwqDCoCA5MS42OTcwOTZdIENQVTogMiBQSUQ6IDE3NzAgQ29tbTogbmZzZCBL
-ZHVtcDogbG9hZGVkIFRhaW50ZWQ6IA0KPiBHwqDCoMKgwqDCoMKgwqDCoMKgwqAgT8KgwqDCoMKg
-wqAgNS4xNS4xNTUgIzENCj4gW8KgwqAgOTEuNjk3MTAzXSBIYXJkd2FyZSBuYW1lOiBBbGxpZWQg
-VGVsZXNpcyB4MjUwLTI4WFRtIChEVCkNCj4gW8KgwqAgOTEuNjk3MTA3XSBwc3RhdGU6IDgwMDAw
-MDA1IChOemN2IGRhaWYgLVBBTiAtVUFPIC1UQ08gLURJVCAtU1NCUyANCj4gQlRZUEU9LS0pDQo+
-IFvCoMKgIDkxLjY5NzExMl0gcGMgOiBzdmNfZGVzdHJveSsweDg0LzB4YWMNCj4gW8KgwqAgOTEu
-NzAxMjAyXSB3YXRjaGRvZzogd2F0Y2hkb2cwOiB3YXRjaGRvZyBkaWQgbm90IHN0b3AhDQo+IFvC
-oMKgIDkxLjcwMjIxNV0gbHIgOiBzdmNfZGVzdHJveSsweDJjLzB4YWMNCj4gW8KgwqAgOTEuNzAy
-MjIwXSBzcCA6IGZmZmY4MDAwMGJiM2JkZTANCj4gW8KgwqAgOTEuNzAyMjIzXSB4Mjk6IGZmZmY4
-MDAwMGJiM2JkZTAgeDI4OiAwMDAwMDAwMDAwMDAwMDAwIHgyNzogDQo+IDAwMDAwMDAwMDAwMDAw
-MDANCj4gW8KgwqAgOTEuNzQ2MDk1XSB4MjY6IDAwMDAwMDAwMDAwMDAwMDAgeDI1OiBmZmZmMDAw
-MDBkYmZhYTQwIHgyNDogDQo+IGZmZmYwMDAwMTZjMTQwMDANCj4gW8KgwqAgOTEuNzQ2MTAxXSB4
-MjM6IGZmZmY4MDAwMDgzOTVjMDAgeDIyOiBmZmZmMDAwMDBlZTlmMjg0IHgyMTogDQo+IGZmZmYw
-MDAwMGVlYTllMTANCj4gW8KgwqAgOTEuNzQ2MTA4XSB4MjA6IGZmZmYwMDAwMGVlYTllMDAgeDE5
-OiBmZmZmMDAwMDBlZWE5ZTE0IHgxODogDQo+IGZmZmY4MDAwMDhlOTkwMDANCj4gW8KgwqAgOTEu
-NzY5NTI2XSB4MTc6IDAwMDAwMDAwMDAwMDAwMDYgeDE2OiAwMDAwMDAwMDAwMDAwMDAwIHgxNTog
-DQo+IDAwMDAwMDAwMDAwMDAwMDENCj4gW8KgwqAgOTEuNzc2NzgyXSB4MTQ6IDAwMDAwMDAwZmZm
-ZmZmZmQgeDEzOiBmZmZmZmMwMDAwMDAwMDAwIHgxMjogDQo+IGZmZmY4MDAwNzZiYzIwMDANCj4g
-W8KgwqAgOTEuNzg0MDMxXSB4MTE6IGZmZmYwMDAwN2ZiYTVjMTAgeDEwOiBmZmZmODAwMDc2YmMy
-MDAwIHg5IDogDQo+IGZmZmY4MDAwMDkyMjA3YzANCj4gW8KgwqAgOTEuNzg0MDM4XSB4OCA6IGZm
-ZmZmYzAwMDA1NWViMDggeDcgOiBmZmZmMDAwMDBlZjZjNGMwIHg2IDogDQo+IGZmZmZmYzAwMDFm
-ODcyYzgNCj4gW8KgwqAgOTEuNzk1ODIzXSB4NSA6IDAwMDAwMDAwMDAwMDAxMDAgeDQgOiBmZmZm
-MDAwMDdmYmFlZGE4IHgzIDogDQo+IDAwMDAwMDAwMDAwMDAwMDANCj4gW8KgwqAgOTEuODAxNjg0
-XSB4MiA6IDAwMDAwMDAwMDAwMDAwMDAgeDEgOiBmZmZmMDAwMDBkOGY4MDE4IHgwIDogDQo+IGZm
-ZmYwMDAwMGVlYTllMzANCj4gW8KgwqAgOTEuODA3NTQ1XSBDYWxsIHRyYWNlOg0KPiBbwqDCoCA5
-MS44MTAwODhdwqAgc3ZjX2Rlc3Ryb3krMHg4NC8weGFjDQo+IFvCoMKgIDkxLjgxMzU4Nl3CoCBz
-dmNfZXhpdF90aHJlYWQrMHgxMDgvMHgxNWMNCj4gW8KgwqAgOTEuODE2OTk4XcKgIG5mc2QrMHgx
-NzgvMHgxYTANCj4gW8KgwqAgOTEuODE4NjczXcKgIGt0aHJlYWQrMHgxNTAvMHgxNjANCj4gW8Kg
-wqAgOTEuODIwNjEwXcKgIHJldF9mcm9tX2ZvcmsrMHgxMC8weDIwDQo+IFvCoMKgIDkxLjgyMDYy
-MF0gQ29kZTogYTk0MTUzZjMgYThjMjdiZmQgZDUwMzIzYmYgZDY1ZjAzYzAgKGQ0MjEwMDAwKQ0K
-PiBbwqDCoCA5MS44MjA2MjldIFNNUDogc3RvcHBpbmcgc2Vjb25kYXJ5IENQVXMNCj4gW8KgwqAg
-OTEuODMwNDMzXSBTdGFydGluZyBjcmFzaGR1bXAga2VybmVsLi4uDQo+IFvCoMKgIDkxLjgzMzA2
-NF0gQnllIQ==
+From: Rao Shoaib <rao.shoaib@oracle.com>
+Date: Tue, 23 Apr 2024 18:18:24 -0700
+> On 4/23/24 17:15, Kuniyuki Iwashima wrote:
+> > From: Rao Shoaib <Rao.Shoaib@oracle.com>
+> > Date: Mon, 22 Apr 2024 02:25:03 -0700
+> >> Read with MSG_PEEK flag loops if the first byte to read is an OOB byte.
+> >> commit 22dd70eb2c3d ("af_unix: Don't peek OOB data without MSG_OOB.")
+> >> addresses the loop issue but does not address the issue that no data
+> >> beyond OOB byte can be read.
+> >>
+> >>>>> from socket import *
+> >>>>> c1, c2 = socketpair(AF_UNIX, SOCK_STREAM)
+> >>>>> c1.send(b'a', MSG_OOB)
+> >> 1
+> >>>>> c1.send(b'b')
+> >> 1
+> >>>>> c2.recv(1, MSG_PEEK | MSG_DONTWAIT)
+> >> b'b'
+> >>
+> >> Fixes: 314001f0bf92 ("af_unix: Add OOB support")
+> >> Signed-off-by: Rao Shoaib <Rao.Shoaib@oracle.com>
+> >> ---
+> >>  net/unix/af_unix.c | 26 ++++++++++++++------------
+> >>  1 file changed, 14 insertions(+), 12 deletions(-)
+> >>
+> >> diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+> >> index 9a6ad5974dff..ed5f70735435 100644
+> >> --- a/net/unix/af_unix.c
+> >> +++ b/net/unix/af_unix.c
+> >> @@ -2658,19 +2658,19 @@ static struct sk_buff *manage_oob(struct sk_buff *skb, struct sock *sk,
+> >>  		if (skb == u->oob_skb) {
+> >>  			if (copied) {
+> >>  				skb = NULL;
+> >> -			} else if (sock_flag(sk, SOCK_URGINLINE)) {
+> >> -				if (!(flags & MSG_PEEK)) {
+> >> +			} else if (!(flags & MSG_PEEK)) {
+> >> +				if (sock_flag(sk, SOCK_URGINLINE)) {
+> >>  					WRITE_ONCE(u->oob_skb, NULL);
+> >>  					consume_skb(skb);
+> >> +				} else {
+> >> +					skb_unlink(skb, &sk->sk_receive_queue);
+> >> +					WRITE_ONCE(u->oob_skb, NULL);
+> >> +					if (!WARN_ON_ONCE(skb_unref(skb)))
+> >> +						kfree_skb(skb);
+> >> +					skb = skb_peek(&sk->sk_receive_queue);
+> > 
+> > I added a comment about this case.
+> 
+> OK. I will sync up.
+> > 
+> > 
+> >>  				}
+> >> -			} else if (flags & MSG_PEEK) {
+> >> -				skb = NULL;
+> >> -			} else {
+> >> -				skb_unlink(skb, &sk->sk_receive_queue);
+> >> -				WRITE_ONCE(u->oob_skb, NULL);
+> >> -				if (!WARN_ON_ONCE(skb_unref(skb)))
+> >> -					kfree_skb(skb);
+> >> -				skb = skb_peek(&sk->sk_receive_queue);
+> >> +			} else if (!sock_flag(sk, SOCK_URGINLINE)) {
+> >> +				skb = skb_peek_next(skb, &sk->sk_receive_queue);
+> >>  			}
+> >>  		}
+> >>  	}
+> >> @@ -2747,9 +2747,11 @@ static int unix_stream_read_generic(struct unix_stream_read_state *state,
+> >>  #if IS_ENABLED(CONFIG_AF_UNIX_OOB)
+> >>  		if (skb) {
+> >>  			skb = manage_oob(skb, sk, flags, copied);
+> >> -			if (!skb && copied) {
+> >> +			if (!skb) {
+> >>  				unix_state_unlock(sk);
+> >> -				break;
+> >> +				if (copied || (flags & MSG_PEEK))
+> >> +					break;
+> >> +				goto redo;
+> > 
+> > Here, copied == 0 && !(flags & MSG_PEEK) && skb == NULL, so it means
+> > skb_peek(&sk->sk_receive_queue) above returned NULL.  Then, we need
+> > not jump to the redo label, where we call the same skb_peek().
+> > 
+> > Instead, we can just fall through the if (!skb) clause below.
+> > 
+> > Thanks!
+> 
+> Yes that makes sense. I will submit a new version with the jump to redo
+> removed.
+
+If skb_peek_next() returns NULL, should it also fall down to the
+!skb case ?
+
+TCP is blocked in the situation.
+
+So, I think this hunk in unix_stream_read_generic() is not needed.
+
+---8<---
+>>> from socket import *
+>>> 
+>>> s = socket()
+>>> s.listen()
+>>> 
+>>> c1 = socket()
+>>> c1.connect(s.getsockname())
+>>> c2, _ = s.accept()
+>>> 
+>>> c1.send(b'h', MSG_OOB)
+1
+>>> c2.recv(5, MSG_PEEK)
+^C
+---8<---
 
