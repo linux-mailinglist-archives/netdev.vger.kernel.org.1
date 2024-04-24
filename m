@@ -1,61 +1,77 @@
-Return-Path: <netdev+bounces-91107-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91108-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2E338B1669
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 00:45:54 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 909C08B167A
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 00:52:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6FC77286B21
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 22:45:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DFC33B251F8
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 22:51:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD07C16E87C;
-	Wed, 24 Apr 2024 22:45:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 234CA16E89C;
+	Wed, 24 Apr 2024 22:51:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Z9ia8oKm"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="IILmx88m"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E999416E879;
-	Wed, 24 Apr 2024 22:45:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A30D716E885;
+	Wed, 24 Apr 2024 22:51:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713998750; cv=none; b=Cy8O2NLb76vIqkwG8dCMi35rf3fjQQfvpDkNMve3JKNBa1xDHNNXeEYu0nszkdiCAvip3LEhLxMRl/5KKKB9B7EXbya/K3CK0HU7Hl7y05qtLA7SbiZCykZwQSpftToHd0npW/JG+iv8/+lihF2bGpiV+N2a8GR1ZXOXhtGodC8=
+	t=1713999096; cv=none; b=eWKc2W+gcoStE0SRov9o29++CFxnCfo8reTOvT4BVb9xm7oQ7pBKxUrnevwrAjLKEe7DZ8KRt/DLbdsbVZIxjTE/qwf5jEjuBZ3hdcmy2pBXfesmRdfl7wjStOEIc/yxDZqG2m0u1yyO2FPasZUj5TLJCL3i8DHvycfzyCwO6Po=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713998750; c=relaxed/simple;
-	bh=2bVYRRQaaSANIAiBxPXSRAarBno2eLafIZwTUiWnNpY=;
+	s=arc-20240116; t=1713999096; c=relaxed/simple;
+	bh=0RsNjdeYSfUc0k8oq/Nv37S+nYzUNW+CoiEKuah2oCQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GBslqUXc5rl8vfbf/P2agAilY+Lu+smENAvDO9BdNGMZa1B24Ue2GYyax2/gEQIXTgQVXfJraeR0iixPuiWYXdnwooxn+e23vVFFmpAmSpoxwujKMDAKk3x3+nRZR1fgzk+4xD/2Uf4DzQxCmhrsv+AeU/cHaZPTWPl57F8GTSE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Z9ia8oKm; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=Q6vQC85ZngIOR8bR4u952PNrCjyiBnCelYS1okjQp/g=; b=Z9ia8oKmH7gQiA1k3XDKCHwSDc
-	IvT6Hp3eOFiuhkkzrx09/bp5NSIFCTavHmVn3u9uewpT4/L3dDCePJjmpTshvZ9fI7nRZatxgXMu1
-	J4Vl+j1pQrMUwiqaHP4ddxAHIviSrOnfVOWfoyXJU7kWQb/GGtTUNMZLG4+pnuLfM8+E=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rzlMt-00DtX7-Cy; Thu, 25 Apr 2024 00:45:35 +0200
-Date: Thu, 25 Apr 2024 00:45:35 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Geert Uytterhoeven <geert+renesas@glider.be>
-Cc: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>,
-	Sergey Shtylyov <s.shtylyov@omp.ru>,
-	Paul Barker <paul.barker.ct@bp.renesas.com>,
-	Niklas =?iso-8859-1?Q?S=F6derlund?= <niklas.soderlund+renesas@ragnatech.se>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org
-Subject: Re: [PATCH] net: ravb: Fix registered interrupt names
-Message-ID: <1f131230-56a5-4547-bc77-c508e61e8a55@lunn.ch>
-References: <cde67b68adf115b3cf0b44c32334ae00b2fbb321.1713944647.git.geert+renesas@glider.be>
+	 Content-Type:Content-Disposition:In-Reply-To; b=P8ki4G3h1GwgLTAphsfSuIdQ303yBzkk9Ft0LvZaKEF3KaJP9qss4tVU0B9OI8+XefzoTfE85KzKRi8Jm7Ug8AQqVihhtfZONDRKpvv+oTVleylnVNpG1UStiulg6a7/JErYViwyMoxODFE3LLr/dAyzM4IjcMNu0svMdOmwmNw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=IILmx88m; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=uDrKK9MVu5GzHed4YiXOORHenuiRjCroUzkRtpq7Xr8=; b=IILmx88mD8vjiMwqrMmrre+9AR
+	zlcY2kqPjYZncZiBJFj6pnDAU0ZhhuV4rlxSZ7HcxKqBCjBa6OOs5ocvCCax/S8NxxWj84EAxqbEL
+	MFaNqZ2luw6imVBZuIGe/aG75GB7MYXZ5lbY0rcrAoNUxUNRBMpXuO1Am0ZJdsHYjENsjxw6Ycf9d
+	99F8TBD+1jTtbHGf1q71XtM4hbBSu5Sgx4e9bcidXHlwPBNvG5kZMloqH84s7AtrC9VybE9Mi1Ref
+	bJ1tegqi+pDWrgGvKx5eWVrDjQV3HCkjx2HtVZHUWlmRO6p1QgZOtIk+xYyIuM3ifm9ITathoorRw
+	g3AhKNoQ==;
+Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
+	by casper.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1rzlSU-00000001qPk-444P;
+	Wed, 24 Apr 2024 22:51:23 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+	id 8F02930040C; Thu, 25 Apr 2024 00:51:22 +0200 (CEST)
+Date: Thu, 25 Apr 2024 00:51:22 +0200
+From: Peter Zijlstra <peterz@infradead.org>
+To: Kees Cook <keescook@chromium.org>
+Cc: Mark Rutland <mark.rutland@arm.com>, Will Deacon <will@kernel.org>,
+	Boqun Feng <boqun.feng@gmail.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>, Jakub Kicinski <kuba@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	"Paul E. McKenney" <paulmck@kernel.org>,
+	Uros Bizjak <ubizjak@gmail.com>, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-arch@vger.kernel.org,
+	netdev@vger.kernel.org, linux-hardening@vger.kernel.org
+Subject: Re: [PATCH 1/4] locking/atomic/x86: Silence intentional wrapping
+ addition
+Message-ID: <20240424225122.GF12673@noisy.programming.kicks-ass.net>
+References: <20240424191225.work.780-kees@kernel.org>
+ <20240424191740.3088894-1-keescook@chromium.org>
+ <20240424224141.GX40213@noisy.programming.kicks-ass.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,38 +80,34 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <cde67b68adf115b3cf0b44c32334ae00b2fbb321.1713944647.git.geert+renesas@glider.be>
+In-Reply-To: <20240424224141.GX40213@noisy.programming.kicks-ass.net>
 
-On Wed, Apr 24, 2024 at 09:45:21AM +0200, Geert Uytterhoeven wrote:
-> As interrupts are now requested from ravb_probe(), before calling
-> register_netdev(), ndev->name still contains the template "eth%d",
-> leading to funny names in /proc/interrupts.  E.g. on R-Car E3:
+On Thu, Apr 25, 2024 at 12:41:41AM +0200, Peter Zijlstra wrote:
+> On Wed, Apr 24, 2024 at 12:17:34PM -0700, Kees Cook wrote:
 > 
-> 	89:  0      0  GICv2  93 Level  eth%d:ch22:multi
-> 	90:  0      3  GICv2  95 Level  eth%d:ch24:emac
-> 	91:  0  23484  GICv2  71 Level  eth%d:ch0:rx_be
-> 	92:  0      0  GICv2  72 Level  eth%d:ch1:rx_nc
-> 	93:  0  13735  GICv2  89 Level  eth%d:ch18:tx_be
-> 	94:  0      0  GICv2  90 Level  eth%d:ch19:tx_nc
+> > @@ -82,7 +83,7 @@ static __always_inline bool arch_atomic_add_negative(int i, atomic_t *v)
+> >  
+> >  static __always_inline int arch_atomic_add_return(int i, atomic_t *v)
+> >  {
+> > -	return i + xadd(&v->counter, i);
+> > +	return wrapping_add(int, i, xadd(&v->counter, i));
+> >  }
+> >  #define arch_atomic_add_return arch_atomic_add_return
 > 
-> Worse, on platforms with multiple RAVB instances (e.g. R-Car V4H), all
-> interrupts have similar names.
+> this is going to get old *real* quick :-/
 > 
-> Fix this by using the device name instead, like is done in several other
-> drivers:
-> 
-> 	89:  0      0  GICv2  93 Level  e6800000.ethernet:ch22:multi
-> 	90:  0      1  GICv2  95 Level  e6800000.ethernet:ch24:emac
-> 	91:  0  28578  GICv2  71 Level  e6800000.ethernet:ch0:rx_be
-> 	92:  0      0  GICv2  72 Level  e6800000.ethernet:ch1:rx_nc
-> 	93:  0  14044  GICv2  89 Level  e6800000.ethernet:ch18:tx_be
-> 	94:  0      0  GICv2  90 Level  e6800000.ethernet:ch19:tx_nc
-> 
-> Rename the local variable dev_name, as it shadows the dev_name()
-> function, and pre-initialize it, to simplify the code.
+> This must be the ugliest possible way to annotate all this, and then
+> litter the kernel with all this... urgh.
 
-Another option is to call dev_alloc_name() soon after alloc_netdev(),
-to give the device its name earlier than register_netdev().
+Also, what drugs is involved with __builtin_add_overflow() ? Per
+-fno-strict-overflow everything is 2s complement and you can just do the
+unsigned add.
 
-	Andrew
+Over the years we've been writing code with the express knowledge that
+everything wraps properly, this annotation is going to be utter pain.
+
+As I've said before, add an explicit non-wrapping type and use that for
+the cases you care about actually not wrapping.
+
+NAK
 
