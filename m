@@ -1,118 +1,86 @@
-Return-Path: <netdev+bounces-90988-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90987-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BB718B0D53
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 16:55:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F48B8B0D4F
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 16:54:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B7B4028D228
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 14:55:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1748E1F27A7E
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 14:54:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDF0515F3FA;
-	Wed, 24 Apr 2024 14:54:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04D1815EFCC;
+	Wed, 24 Apr 2024 14:54:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="YcDLjFHr"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="WJk2+Uh9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BD8D15F3F8;
-	Wed, 24 Apr 2024 14:54:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99F0015ECC1
+	for <netdev@vger.kernel.org>; Wed, 24 Apr 2024 14:54:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713970474; cv=none; b=VS3IvO32DEjGmhkP9+dk7AXsQrMG/KjwSv8e4svXh969eI7rUC4CXY/qqUoGbhBuq0JEX0HRn3iP1OfxFlU1aVXiiGjyotTyB5HgQ+z7FFpM1YKcW++rOtGKusz8AVUg8BZoyx4+WjsWa9Msrt4AfG8yeOnljb542BjG+43vAdo=
+	t=1713970461; cv=none; b=Cwbki2leelR8hNn4YikW8pfD5lZK2JJJ3b0PXCNBNM/gGKg+3s2qYAQKKEXDYBn+QQ7YRUad7hP3Q0C+J7nSNKRVXWElchWE502Vh6+fjXgfvTQppGdbS5w017qBodmH+5pVcUt54Gu8Qr6y7rQ/4/FYmJ319ozTATY6MrNL35Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713970474; c=relaxed/simple;
-	bh=Vke2PRjMOaaDnifLzd+g5rbY2VteuyFJwC55RRx62rU=;
+	s=arc-20240116; t=1713970461; c=relaxed/simple;
+	bh=lL6HMoPGq9Z8cnulXZqadp1IF3BotmV6W7JozM/cgLs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kxm8vi40fIsu7o4RWnF2AJDSl4IS5TEVNHm/pmf7QkFFBxLRkph+mCWZtUOmW2gp6Nza16ALwc3n38z4XgE3rjTtwJYkKcHv7f27ZS68snL3hdf+9JJ1P8S3g9SQz4wkwk3YPRaITJh9ibPT/Gdt8eBpEebJGsy4Qvw8w4aN0hc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=YcDLjFHr; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 43OEphXU021642;
-	Wed, 24 Apr 2024 14:54:18 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : references : mime-version : content-type :
- in-reply-to; s=pp1; bh=faPLB+kw4kVxRvk/awmxuWyqP9LFnkCQP2eMceG1XuI=;
- b=YcDLjFHr2K+Ys/y15mRL/i5XlzBdFtq5rcBbzgelkmuX+/sL3KIqMraFZybJfrfhTwPF
- 7u7AHXycbmDG4D34xnfCR2DgOJGnNXA6qXu/y49qQVifXoEmuLv+cB606ogd5otL2rJ9
- CTlExfmUkla6534BoaeqwMQQDsnlvT/bOAD7WgZx+KBlUmYtxke/Fcj80Tr0c2pYkQbG
- 0n18GAE8iMvexUAP3WiRGGe+SFc37h3Z8yQYk/jURhsf8SEK9VznS3OvZ6/jfObjQcJL
- sLBr5o0nJ8SLB7BDMIKoDPPsbH33nCyutt1MZIgWr5TXXskwRS7DOVKmLMvhLe1x+8vY nA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xq1mjrcgs-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 24 Apr 2024 14:54:17 +0000
-Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 43OEsGYx027087;
-	Wed, 24 Apr 2024 14:54:16 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xq1mjrcgj-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 24 Apr 2024 14:54:16 +0000
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 43OC0rH5015277;
-	Wed, 24 Apr 2024 14:54:15 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3xmshmc1tt-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 24 Apr 2024 14:54:15 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 43OEs9Kw44761424
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 24 Apr 2024 14:54:11 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 4449D2004B;
-	Wed, 24 Apr 2024 14:54:09 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 23A4B20040;
-	Wed, 24 Apr 2024 14:54:07 +0000 (GMT)
-Received: from osiris (unknown [9.171.4.217])
-	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Wed, 24 Apr 2024 14:54:07 +0000 (GMT)
-Date: Wed, 24 Apr 2024 16:54:05 +0200
-From: Heiko Carstens <hca@linux.ibm.com>
-To: Bui Quang Minh <minhquangbui99@gmail.com>
-Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>,
-        Tony Nguyen <anthony.l.nguyen@intel.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Paul M Stillwell Jr <paul.m.stillwell.jr@intel.com>,
-        Rasesh Mody <rmody@marvell.com>,
-        Sudarsana Kalluru <skalluru@marvell.com>, GR-Linux-NIC-Dev@marvell.com,
-        Anil Gurumurthy <anil.gurumurthy@qlogic.com>,
-        Sudarsana Kalluru <sudarsana.kalluru@qlogic.com>,
-        "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Fabian Frederick <fabf@skynet.be>,
-        Saurav Kashyap <skashyap@marvell.com>,
-        GR-QLogic-Storage-Upstream@marvell.com,
-        Nilesh Javali <nilesh.javali@cavium.com>,
-        Arun Easi <arun.easi@cavium.com>,
-        Manish Rangankar <manish.rangankar@cavium.com>,
-        Vineeth Vijayan <vneethv@linux.ibm.com>,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Sunil Goutham <sgoutham@marvell.com>,
-        Linu Cherian <lcherian@marvell.com>,
-        Geetha sowjanya <gakula@marvell.com>, Jerin Jacob <jerinj@marvell.com>,
-        hariprasad <hkelam@marvell.com>,
-        Subbaraya Sundeep <sbhatta@marvell.com>,
-        intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
-        Saurav Kashyap <saurav.kashyap@cavium.com>, linux-s390@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>
-Subject: Re: [PATCH v2 5/6] cio: ensure the copied buf is NUL terminated
-Message-ID: <20240424145405.26193-C-hca@linux.ibm.com>
-References: <20240424-fix-oob-read-v2-0-f1f1b53a10f4@gmail.com>
- <20240424-fix-oob-read-v2-5-f1f1b53a10f4@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=sGhhcm9hrh1YSENGws8ERc2UOJTho6L1WxeQSwwh+4Ldy2duNifC4emvQKWShv1w9C7QI5on6anV3dZ1C7Z9SUENgB/QpIRCBTUrSn5sQND04GEFCkZx0byNrHB+3JaOeqzTiXt4XLFuREkLJ0k5Fp4kKd49J/+FTVTF+p6fP90=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=WJk2+Uh9; arc=none smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-56e1baf0380so8279826a12.3
+        for <netdev@vger.kernel.org>; Wed, 24 Apr 2024 07:54:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1713970458; x=1714575258; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=v8o5wk9BVe4zRZIS+SUZnTsxDgL6wret0YGcxGXqZpA=;
+        b=WJk2+Uh9w0P1dcnclFjxa85fpBcCoWs0cVsSawTTyzynnEDhp+ynEWLxRvl6vv1bjo
+         k0NIabGBsZ1xoRrpkMEEXz4xPBr3WeNAtYjvHu0wftKHaf0TSB8I6viiYTJ6reB543Ds
+         QjltKfa0ASoODPnx1OwV4eMWfN/dx7y4MS5SE1mNmGheoTfrz0kuAglBZW5O9TH42hm7
+         Zst/VOAuDUnmAMcd1xnRTpgwt3yCb3Q+oIVRhnwhzyu23J2yJj2ogslKZ7EnOyHkPXqz
+         YsMYA6zDoRer4l26fq2dt1Kxi3UZqO8S9S81Z/a5Wm5ZNy5eS9nSwla6BCRAwx5aMBat
+         S4Yg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713970458; x=1714575258;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=v8o5wk9BVe4zRZIS+SUZnTsxDgL6wret0YGcxGXqZpA=;
+        b=qHMpG08Z2vIDXHUoyz1bdR2G6GXVWYTUoiikPGbbaBmjvXFQAsgYAlI+8fR8xM4If+
+         3+vZ25IPdFyJw4MKkwmGIOL1JHHy2AC02e/DEA7lIeZtapaPx+K2NIKFsRnECKbw4U9Q
+         7I5JaCw7dJGxByui5+3YWg49zcMBNHSw8DTOCN/XXwPbJBI5mDM4d+2m6CO3xEo9hF3D
+         YdyRCGFwkT6SWNOD/8cy2dggiZy8owOzuuSSxjZGGI33NS1blTYPJu+yX4pwogTUT6gr
+         0G/Y2462myISvHfT2jSSdB1oDLRdEIRvk4ktItm63s889R7CAnTpVkR+gsxAOw02/Tpw
+         ifFg==
+X-Gm-Message-State: AOJu0Yw0+KndNzhFFS5ix0/30/gkUKeXc4JB8E2BtbAzYwlazfED3Qku
+	fHxfiBjpIejRU3zBvPt1CnuffvXlgUH3Mu+vmKV1JMiCd2mgQo+NJuRYTHFNdEQATJEePCHcyVw
+	l
+X-Google-Smtp-Source: AGHT+IH9DPWrD5PoK9Rg6II3v+jSLz5i0i9V0Lqwz9MmeqPCadI969CTIW+TCgeCuAZIFlg3XC+MIA==
+X-Received: by 2002:a50:8ac7:0:b0:56e:2a7a:27e4 with SMTP id k7-20020a508ac7000000b0056e2a7a27e4mr1819177edk.39.1713970457829;
+        Wed, 24 Apr 2024 07:54:17 -0700 (PDT)
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id h2-20020a056402094200b0056e44b681a6sm7922436edz.57.2024.04.24.07.54.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 24 Apr 2024 07:54:17 -0700 (PDT)
+Date: Wed, 24 Apr 2024 16:54:13 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Adrian Moreno <amorenoz@redhat.com>
+Cc: netdev@vger.kernel.org, aconole@redhat.com, echaudro@redhat.com,
+	horms@kernel.org, i.maximets@ovn.org,
+	Yotam Gigi <yotam.gi@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 2/8] net: psample: add multicast filtering on
+ group_id
+Message-ID: <ZikdFbmAbT5bWNxa@nanopsycho>
+References: <20240424135109.3524355-1-amorenoz@redhat.com>
+ <20240424135109.3524355-3-amorenoz@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -121,30 +89,205 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240424-fix-oob-read-v2-5-f1f1b53a10f4@gmail.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: P3jauZ9wnPsNqb9Y8f9APW5dRRKdbn4d
-X-Proofpoint-GUID: bdcVi_JhzGQ_L9LlgnK3IM-pAQHck6Ez
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1011,Hydra:6.0.650,FMLib:17.11.176.26
- definitions=2024-04-24_12,2024-04-24_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- mlxlogscore=863 suspectscore=0 phishscore=0 mlxscore=0 lowpriorityscore=0
- malwarescore=0 impostorscore=0 spamscore=0 bulkscore=0 clxscore=1011
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2404010000 definitions=main-2404240056
+In-Reply-To: <20240424135109.3524355-3-amorenoz@redhat.com>
 
-On Wed, Apr 24, 2024 at 09:44:22PM +0700, Bui Quang Minh wrote:
-> Currently, we allocate a lbuf-sized kernel buffer and copy lbuf from
-> userspace to that buffer. Later, we use scanf on this buffer but we don't
-> ensure that the string is terminated inside the buffer, this can lead to
-> OOB read when using scanf. Fix this issue by using memdup_user_nul instead.
+Wed, Apr 24, 2024 at 03:50:49PM CEST, amorenoz@redhat.com wrote:
+>Packet samples can come from several places (e.g: different tc sample
+>actions), typically using the sample group (PSAMPLE_ATTR_SAMPLE_GROUP)
+>to differentiate them.
+>
+>Likewise, sample consumers that listen on the multicast group may only
+>be interested on a single group. However, they are currently forced to
+>receive all samples and discard the ones that are not relevant, causing
+>unnecessary overhead.
+>
+>Allow users to filter on the desired group_id by adding a new command
+>PSAMPLE_SET_FILTER that can be used to pass the desired group id.
+>Store this filter on the per-socket private pointer and use it for
+>filtering multicasted samples.
+>
+>Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
+>---
+> include/uapi/linux/psample.h |   1 +
+> net/psample/psample.c        | 110 +++++++++++++++++++++++++++++++++--
+> 2 files changed, 105 insertions(+), 6 deletions(-)
+>
+>diff --git a/include/uapi/linux/psample.h b/include/uapi/linux/psample.h
+>index e585db5bf2d2..9d62983af0a4 100644
+>--- a/include/uapi/linux/psample.h
+>+++ b/include/uapi/linux/psample.h
+>@@ -28,6 +28,7 @@ enum psample_command {
+> 	PSAMPLE_CMD_GET_GROUP,
+> 	PSAMPLE_CMD_NEW_GROUP,
+> 	PSAMPLE_CMD_DEL_GROUP,
+>+	PSAMPLE_CMD_SET_FILTER,
+> };
 > 
-> Fixes: a4f17cc72671 ("s390/cio: add CRW inject functionality")
-> Signed-off-by: Bui Quang Minh <minhquangbui99@gmail.com>
-> ---
->  drivers/s390/cio/cio_inject.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> enum psample_tunnel_key_attr {
+>diff --git a/net/psample/psample.c b/net/psample/psample.c
+>index a5d9b8446f77..f5f77515b969 100644
+>--- a/net/psample/psample.c
+>+++ b/net/psample/psample.c
+>@@ -98,13 +98,77 @@ static int psample_nl_cmd_get_group_dumpit(struct sk_buff *msg,
+> 	return msg->len;
+> }
+> 
+>-static const struct genl_small_ops psample_nl_ops[] = {
+>+struct psample_obj_desc {
+>+	struct rcu_head rcu;
+>+	u32 group_num;
+>+};
+>+
+>+struct psample_nl_sock_priv {
+>+	struct psample_obj_desc __rcu *filter;
+>+	spinlock_t filter_lock; /* Protects filter. */
+>+};
+>+
+>+static void psample_nl_sock_priv_init(void *priv)
+>+{
+>+	struct psample_nl_sock_priv *sk_priv = priv;
+>+
+>+	spin_lock_init(&sk_priv->filter_lock);
+>+}
+>+
+>+static void psample_nl_sock_priv_destroy(void *priv)
+>+{
+>+	struct psample_nl_sock_priv *sk_priv = priv;
+>+	struct psample_obj_desc *filter;
+>+
+>+	filter = rcu_dereference_protected(sk_priv->filter, true);
+>+	kfree_rcu(filter, rcu);
+>+}
+>+
+>+static int psample_nl_set_filter_doit(struct sk_buff *skb,
+>+				      struct genl_info *info)
+>+{
+>+	struct psample_obj_desc *filter = NULL;
+>+	struct psample_nl_sock_priv *sk_priv;
+>+	struct nlattr **attrs = info->attrs;
+>+
+>+	if (attrs[PSAMPLE_ATTR_SAMPLE_GROUP]) {
+>+		filter = kzalloc(sizeof(*filter), GFP_KERNEL);
+>+		filter->group_num =
+>+			nla_get_u32(attrs[PSAMPLE_ATTR_SAMPLE_GROUP]);
+>+	}
+>+
+>+	sk_priv = genl_sk_priv_get(&psample_nl_family, NETLINK_CB(skb).sk);
+>+	if (IS_ERR(sk_priv)) {
+>+		kfree(filter);
+>+		return PTR_ERR(sk_priv);
+>+	}
+>+
+>+	spin_lock(&sk_priv->filter_lock);
+>+	filter = rcu_replace_pointer(sk_priv->filter, filter,
+>+				     lockdep_is_held(&sk_priv->filter_lock));
+>+	spin_unlock(&sk_priv->filter_lock);
+>+	kfree_rcu(filter, rcu);
+>+	return 0;
+>+}
+>+
+>+static const struct nla_policy
+>+psample_set_filter_policy[PSAMPLE_ATTR_SAMPLE_GROUP + 1] = {
+>+	[PSAMPLE_ATTR_SAMPLE_GROUP] = { .type = NLA_U32, },
+>+};
+>+
+>+static const struct genl_ops psample_nl_ops[] = {
+> 	{
+> 		.cmd = PSAMPLE_CMD_GET_GROUP,
+> 		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
+> 		.dumpit = psample_nl_cmd_get_group_dumpit,
+> 		/* can be retrieved by unprivileged users */
+>-	}
+>+	},
+>+	{
+>+		.cmd		= PSAMPLE_CMD_SET_FILTER,
+>+		.doit		= psample_nl_set_filter_doit,
+>+		.policy		= psample_set_filter_policy,
+>+		.flags		= 0,
+>+	},
 
-Reviewed-by: Heiko Carstens <hca@linux.ibm.com>
+Sidenote:
+Did you think about converting psample to split ops and to introcude
+ynl spec file for it?
+
+
+> };
+> 
+> static struct genl_family psample_nl_family __ro_after_init = {
+>@@ -114,10 +178,13 @@ static struct genl_family psample_nl_family __ro_after_init = {
+> 	.netnsok	= true,
+> 	.module		= THIS_MODULE,
+> 	.mcgrps		= psample_nl_mcgrps,
+>-	.small_ops	= psample_nl_ops,
+>-	.n_small_ops	= ARRAY_SIZE(psample_nl_ops),
+>+	.ops		= psample_nl_ops,
+>+	.n_ops		= ARRAY_SIZE(psample_nl_ops),
+> 	.resv_start_op	= PSAMPLE_CMD_GET_GROUP + 1,
+> 	.n_mcgrps	= ARRAY_SIZE(psample_nl_mcgrps),
+>+	.sock_priv_size		= sizeof(struct psample_nl_sock_priv),
+>+	.sock_priv_init		= psample_nl_sock_priv_init,
+>+	.sock_priv_destroy	= psample_nl_sock_priv_destroy,
+> };
+> 
+> static void psample_group_notify(struct psample_group *group,
+>@@ -360,6 +427,32 @@ static int psample_tunnel_meta_len(struct ip_tunnel_info *tun_info)
+> }
+> #endif
+> 
+>+static inline void psample_nl_obj_desc_init(struct psample_obj_desc *desc,
+>+					    u32 group_num)
+>+{
+>+	memset(desc, 0, sizeof(*desc));
+>+	desc->group_num = group_num;
+>+}
+>+
+>+static int psample_nl_sample_filter(struct sock *dsk, struct sk_buff *skb,
+>+				    void *data)
+>+{
+>+	struct psample_obj_desc *desc = data;
+>+	struct psample_nl_sock_priv *sk_priv;
+>+	struct psample_obj_desc *filter;
+>+	int ret = 0;
+>+
+>+	rcu_read_lock();
+>+	sk_priv = __genl_sk_priv_get(&psample_nl_family, dsk);
+>+	if (!IS_ERR_OR_NULL(sk_priv)) {
+>+		filter = rcu_dereference(sk_priv->filter);
+>+		if (filter && desc)
+>+			ret = (filter->group_num != desc->group_num);
+>+	}
+>+	rcu_read_unlock();
+>+	return ret;
+>+}
+>+
+> void psample_sample_packet(struct psample_group *group, struct sk_buff *skb,
+> 			   u32 sample_rate, const struct psample_metadata *md)
+> {
+>@@ -370,6 +463,7 @@ void psample_sample_packet(struct psample_group *group, struct sk_buff *skb,
+> #ifdef CONFIG_INET
+> 	struct ip_tunnel_info *tun_info;
+> #endif
+>+	struct psample_obj_desc desc;
+> 	struct sk_buff *nl_skb;
+> 	int data_len;
+> 	int meta_len;
+>@@ -487,8 +581,12 @@ void psample_sample_packet(struct psample_group *group, struct sk_buff *skb,
+> #endif
+> 
+> 	genlmsg_end(nl_skb, data);
+>-	genlmsg_multicast_netns(&psample_nl_family, group->net, nl_skb, 0,
+>-				PSAMPLE_NL_MCGRP_SAMPLE, GFP_ATOMIC);
+>+	psample_nl_obj_desc_init(&desc, group->group_num);
+>+	genlmsg_multicast_netns_filtered(&psample_nl_family,
+>+					 group->net, nl_skb, 0,
+>+					 PSAMPLE_NL_MCGRP_SAMPLE,
+>+					 GFP_ATOMIC, psample_nl_sample_filter,
+>+					 &desc);
+> 
+> 	return;
+> error:
+>-- 
+>2.44.0
+>
+>
 
