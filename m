@@ -1,133 +1,83 @@
-Return-Path: <netdev+bounces-90790-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90791-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 672138B02F0
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 09:16:50 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2D8F8B0330
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 09:28:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 21E9D28459D
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 07:16:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EBBF0B241B0
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 07:28:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A2B3157A58;
-	Wed, 24 Apr 2024 07:16:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C12C9157A72;
+	Wed, 24 Apr 2024 07:28:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="PY9Mw9ZZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KxUUqjRh"
 X-Original-To: netdev@vger.kernel.org
-Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D59D360;
-	Wed, 24 Apr 2024 07:16:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.141
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 903F2D29E;
+	Wed, 24 Apr 2024 07:28:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713943005; cv=none; b=mnHulsOCR6t/OiEnfwTXU/W8oklH1hbcmXQ4FN9sp1VBf+WaffTdYROPjTKcnbqzljjkPVMD3uFmEiVg9JlJ5wablx6Au+EA3f1AI902U5UFmJSU6RokuvAeLhIrkl2xdWmC/LQ2wVDjZ6TjOWkztQ+X+FMus10yvDFD1SP7ZRg=
+	t=1713943681; cv=none; b=QYAmfEtxoBBsoOgS65xOGqoRof0lSmQ1fMUd88MXaf2ZXt+nYK2TB1VcvR8Wdg9rtK0kmxDa8NGyMUcrThwbS4+oW1QhzYgknXrzVFIFNjwrPHW/70CdALIqef0yV/mBuV0iCbEQ/JiqtvLVxoNU6z+d3vTgLG/jYOiNGsV21C0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713943005; c=relaxed/simple;
-	bh=E1fwd1W0aXVPo9e17+huq/xHPYPSatpsHlCko4mo2wM=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=BKxBtdPO/M2louBcvKP8xgLpNqJVHSJ1hYcRLEO9oi74NWWeSBcngXA6tFkGd6l1e8QQ1a1Evl2cAlQ7vyHPzEyvtk4GNZquj+A0aYyJt6wUFpA9jnTSJrSp23VcFfaFggm+yLpiijkjS7v10ZFDFvjTIHXUiVaAVXLSmEfRvtc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=PY9Mw9ZZ; arc=none smtp.client-ip=198.47.19.141
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from lelv0265.itg.ti.com ([10.180.67.224])
-	by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 43O7GVdB061921;
-	Wed, 24 Apr 2024 02:16:31 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1713942991;
-	bh=0W2mD8fr9mkHJZVb38GrfhFcqGHaTgNh0tcswSRAXA8=;
-	h=From:To:CC:Subject:Date;
-	b=PY9Mw9ZZFu/IcIQv5tAVJOkJ83LP0jZFGuaqajzWdyaWanZ3TFMB23nu+sAhguFsz
-	 d8d04JJtQdiBPiCQfMq4Y6YOqG6glORbUsqJ0tSNWm85oVob7kYXQBZ7Yl/3eBN0CW
-	 gTLlh1NvrYcPlfPlcYuDIiVaUS/deoPLtWzhQJxY=
-Received: from DLEE102.ent.ti.com (dlee102.ent.ti.com [157.170.170.32])
-	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 43O7GV03026334
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Wed, 24 Apr 2024 02:16:31 -0500
-Received: from DLEE100.ent.ti.com (157.170.170.30) by DLEE102.ent.ti.com
- (157.170.170.32) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Wed, 24
- Apr 2024 02:16:31 -0500
-Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DLEE100.ent.ti.com
- (157.170.170.30) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Wed, 24 Apr 2024 02:16:30 -0500
-Received: from uda0500640.dal.design.ti.com (uda0500640.dhcp.ti.com [172.24.227.88])
-	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 43O7GQTH085742;
-	Wed, 24 Apr 2024 02:16:27 -0500
-From: Ravi Gunasekaran <r-gunasekaran@ti.com>
-To: <s-vadapalli@ti.com>, <rogerq@kernel.org>, <r-gunasekaran@ti.com>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <richardcochran@gmail.com>, <jreeder@ti.com>,
-        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, <srk@ti.com>,
-        <ed.trexel@hp.com>
-Subject: [PATCH net v2] net: ethernet: ti: am65-cpts: Fix PTPv1 message type on TX packets
-Date: Wed, 24 Apr 2024 12:46:26 +0530
-Message-ID: <20240424071626.32558-1-r-gunasekaran@ti.com>
-X-Mailer: git-send-email 2.17.1
+	s=arc-20240116; t=1713943681; c=relaxed/simple;
+	bh=U+9Jy2HriAOq6JXv5BGv9/GxjLWl2uRiHVloYWp9ZZU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=tomxKFOgrTlWuRoDjBXBkbtwN9vPaxXbs5H8TC+A6X0CxWeRtXF6Pa2H5s9q5GtIzv49HZUnCQxPR8D7mbFQ43cmvkJft+RyFS7geTPL/rLiAMsyWw/n7MDsFhdx88LVmBP4JuUHU7hm9PfXA1yQcF0AsZ2Qx0D3lFS+l5JB3o8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KxUUqjRh; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 100A7C113CE;
+	Wed, 24 Apr 2024 07:27:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713943681;
+	bh=U+9Jy2HriAOq6JXv5BGv9/GxjLWl2uRiHVloYWp9ZZU=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=KxUUqjRhBW+OETFzFCjR+bkMsSiWfWuuPcQk3Up9p9/DJtc2Vu/LcHY5lQxenI9E+
+	 ScjKkspowKMEIm0JGDIDY+kc7SpyC4GRwrveXMd3V4VSvz9upW/TcEoeg8fpSj0D0S
+	 UEcKiRv9J4Y3d5X6J88+Ia6wBt9+okihtgae9NAb6aSySo1lttI9IOhJ7KrAPvVTuX
+	 thKOG3RP39eUAAygVORjrSHj3l+twr+shTdb8Q9OVL7Mbl+S7lBW86+JsTAOpvgG+P
+	 h8orAMZAS49pfbfBBl+c5xTo+Pz+q7ZfFUr1B99BWUt+Tmrwwi6YDFQwhQga1sccMn
+	 oKi5+/K9+eQPA==
+Message-ID: <8d69e3dc-97e9-4672-a741-d31daeaf8388@kernel.org>
+Date: Wed, 24 Apr 2024 10:27:53 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: ti: icssg-prueth: Fix signedness bug in
+ prueth_init_rx_chns()
+To: Dan Carpenter <dan.carpenter@linaro.org>, Roger Quadros <rogerq@ti.com>
+Cc: MD Danish Anwar <danishanwar@ti.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Andrew Lunn <andrew@lunn.ch>, Jan Kiszka <jan.kiszka@siemens.com>,
+ Diogo Ivo <diogo.ivo@siemens.com>, Rob Herring <robh@kernel.org>,
+ Grygorii Strashko <grygorii.strashko@ti.com>,
+ Vignesh Raghavendra <vigneshr@ti.com>, linux-arm-kernel@lists.infradead.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ kernel-janitors@vger.kernel.org
+References: <05282415-e7f4-42f3-99f8-32fde8f30936@moroto.mountain>
+Content-Language: en-US
+From: Roger Quadros <rogerq@kernel.org>
+In-Reply-To: <05282415-e7f4-42f3-99f8-32fde8f30936@moroto.mountain>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-From: Jason Reeder <jreeder@ti.com>
 
-The CPTS, by design, captures the messageType (Sync, Delay_Req, etc.)
-field from the second nibble of the PTP header which is defined in the
-PTPv2 (1588-2008) specification. In the PTPv1 (1588-2002) specification
-the first two bytes of the PTP header are defined as the versionType
-which is always 0x0001. This means that any PTPv1 packets that are
-tagged for TX timestamping by the CPTS will have their messageType set
-to 0x0 which corresponds to a Sync message type. This causes issues
-when a PTPv1 stack is expecting a Delay_Req (messageType: 0x1)
-timestamp that never appears.
 
-Fix this by checking if the ptp_class of the timestamped TX packet is
-PTP_CLASS_V1 and then matching the PTP sequence ID to the stored
-sequence ID in the skb->cb data structure. If the sequence IDs match
-and the packet is of type PTPv1 then there is a chance that the
-messageType has been incorrectly stored by the CPTS so overwrite the
-messageType stored by the CPTS with the messageType from the skb->cb
-data structure. This allows the PTPv1 stack to receive TX timestamps
-for Delay_Req packets which are necessary to lock onto a PTP Leader.
+On 23/04/2024 19:15, Dan Carpenter wrote:
+> The rx_chn->irq[] array is unsigned int but it should be signed for the
+> error handling to work.  Also if k3_udma_glue_rx_get_irq() returns zero
+> then we should return -ENXIO instead of success.
+> 
+> Fixes: 128d5874c082 ("net: ti: icssg-prueth: Add ICSSG ethernet driver")
+> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
 
-Fixes: f6bd59526ca5 ("net: ethernet: ti: introduce am654 common platform time sync driver")
-Signed-off-by: Jason Reeder <jreeder@ti.com>
-Signed-off-by: Ravi Gunasekaran <r-gunasekaran@ti.com>
----
-Changes since v1:
------------------
-* Added Fixes tag as per Paolo's suggestion
-* Rebased to latest tip
-
-v1: https://lore.kernel.org/all/20240419080547.10682-1-r-gunasekaran@ti.com/
-
- drivers/net/ethernet/ti/am65-cpts.c | 5 +++++
- 1 file changed, 5 insertions(+)
-
-diff --git a/drivers/net/ethernet/ti/am65-cpts.c b/drivers/net/ethernet/ti/am65-cpts.c
-index c66618d91c28..f89716b1cfb6 100644
---- a/drivers/net/ethernet/ti/am65-cpts.c
-+++ b/drivers/net/ethernet/ti/am65-cpts.c
-@@ -784,6 +784,11 @@ static bool am65_cpts_match_tx_ts(struct am65_cpts *cpts,
- 		struct am65_cpts_skb_cb_data *skb_cb =
- 					(struct am65_cpts_skb_cb_data *)skb->cb;
- 
-+		if ((ptp_classify_raw(skb) & PTP_CLASS_V1) &&
-+		    ((mtype_seqid & AM65_CPTS_EVENT_1_SEQUENCE_ID_MASK) ==
-+		     (skb_cb->skb_mtype_seqid & AM65_CPTS_EVENT_1_SEQUENCE_ID_MASK)))
-+			mtype_seqid = skb_cb->skb_mtype_seqid;
-+
- 		if (mtype_seqid == skb_cb->skb_mtype_seqid) {
- 			u64 ns = event->timestamp;
- 
-
-base-commit: a59668a9397e7245b26e9be85d23f242ff757ae8
--- 
-2.17.1
-
+Reviewed-by: Roger Quadros <rogerq@kernel.org>
 
