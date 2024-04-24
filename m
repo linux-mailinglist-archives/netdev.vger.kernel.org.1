@@ -1,343 +1,151 @@
-Return-Path: <netdev+bounces-91078-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91080-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C860E8B14C1
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 22:39:56 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E1C98B14C7
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 22:41:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7F19528697B
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 20:39:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 69167B21691
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 20:41:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F7D0156878;
-	Wed, 24 Apr 2024 20:37:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 969AB156888;
+	Wed, 24 Apr 2024 20:41:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="araiJMUD"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MiI+E99y"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ua1-f46.google.com (mail-ua1-f46.google.com [209.85.222.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91935156674
-	for <netdev@vger.kernel.org>; Wed, 24 Apr 2024 20:37:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 143221772F;
+	Wed, 24 Apr 2024 20:41:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713991055; cv=none; b=ogOVnWL+xqXa6vZzF/nVT72x0lwfMWIaiPt2IKnMXxgqADe64mxEj3HNiGZjhFceBCrQlwivtOJcNBLz4ImuxTN3/yhODMO5ybi+sxUwVOQuGLWY6sWfpDiJoWoOi9H7pkPi0DoItC/8TRqHf/15/l+fDwLD3LEdmr9E+W/oLu4=
+	t=1713991267; cv=none; b=TVKoM2uucxVFkrzvRUPIN0qWx/JLuEBlwyJY7sW/pBrAKdmL87fCyy2jNf7v5DqJOkjVuCEeo32IWXGetYbYVc8FEZDJk7JybfkqlgnjBOjDm06L6DookHYD8tAQP8CHjFTMovLZ4Gi7JqKMtb5fWemsj5hBqtgpwgISFqiDMr8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713991055; c=relaxed/simple;
-	bh=QK9UMzy7FXM4EZC+6fiHDSSyZd8qS90Y/4wgyQOoQVA=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cyf9WJMVpuO3HP/jcSgL4sWSISRHothviHv4fMaHYvStkXJP0ABdNffq9NlF4xIs4YCLP9vrZPd4Ix0bwlLCwi5aCUt8qHbLl5WyLY9mkR5SPnqdMZX9onAdS3Sq3XA1rqB+s+y/5gtIrV0BKBJaMeYNOXptGCuVQCojihMdOPM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=araiJMUD; arc=none smtp.client-ip=67.231.145.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
-Received: from pps.filterd (m0109334.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 43OJp14T025422
-	for <netdev@vger.kernel.org>; Wed, 24 Apr 2024 13:37:32 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding : content-type; s=s2048-2021-q4;
- bh=scIAbCP5Mt2EUNw5+qRbppIK8+St5c+UsSHjwQlHwzs=;
- b=araiJMUDyT2Ixo1mXflA01eKWVebmla5JZglYa78Usfj3wKoQ4ykXsG/KhqWO3e2Mr7V
- MQRoaoI5jVb8o89opAGmQaTiTZ2T+E2G/bR6JtO98iOQsfyqkUQVtr06lfqQYOulLFZI
- fmT+GUdmfzPtRS0Ye9csfY1LqRrsEj5Z5eit9XWr9ahXAvgoB8zl2XgH31QX4GTdq2lt
- fJhdA8wn3SMdvMVFtNiego6aHv35xt6a+QZcTXa1g8+p8Ha48sA9jJu5h3CNwqhMKVbp
- fxRodHAN3Eh3AhrpQ4snGGT5sgcXB5pCbeLbcyBoA6EvajrixKmPgTm4DFMSfGT8yiHD FQ== 
-Received: from maileast.thefacebook.com ([163.114.130.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3xq39uankm-2
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Wed, 24 Apr 2024 13:37:32 -0700
-Received: from twshared19781.38.frc1.facebook.com (2620:10d:c0a8:1b::8e35) by
- mail.thefacebook.com (2620:10d:c0a8:82::b) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Wed, 24 Apr 2024 20:37:30 +0000
-Received: by devvm15954.vll0.facebook.com (Postfix, from userid 420730)
-	id 98C4AC26A602; Wed, 24 Apr 2024 13:37:27 -0700 (PDT)
-From: Miao Xu <miaxu@meta.com>
-To: Eric Dumazet <edumazet@google.com>,
-        "David S . Miller"
-	<davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>,
-        David Ahern <dsahern@kernel.org>, Martin Lau
-	<kafai@meta.com>
-CC: <netdev@vger.kernel.org>, <bpf@vger.kernel.org>, Miao Xu <miaxu@meta.com>
-Subject: [PATCH 2/2] [PATCH net-next,2/2] Add test for the use of new args in cong_control
-Date: Wed, 24 Apr 2024 13:37:13 -0700
-Message-ID: <20240424203713.4003974-2-miaxu@meta.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240424203713.4003974-1-miaxu@meta.com>
-References: <20240424203713.4003974-1-miaxu@meta.com>
+	s=arc-20240116; t=1713991267; c=relaxed/simple;
+	bh=NtV27r+tglMYXDfoB0bXY0+cmZKJrF7Wz1+fqpO+/ds=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=thJ7NMkqPfwznjqt0zulldobFDw0Ziv4O5jYHwHcLoEyebtwDexTgbcRa/J+X/sa6ZpfUkSWYTm4SZKTzPlAs+HFPvOiiRCyflK+NGvLa8l6ENzQgK6F+G92z7NLNXzHLd0Kf8gMtiN+TwOqT/LVhTOvhs8VJGPIbUn79nlGLP0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MiI+E99y; arc=none smtp.client-ip=209.85.222.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ua1-f46.google.com with SMTP id a1e0cc1a2514c-7ed6cf3e7f8so118500241.2;
+        Wed, 24 Apr 2024 13:41:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1713991265; x=1714596065; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=owK6av2ybpUyGlbtXxFC1PnJrHab010U6ePsbqIH3Hc=;
+        b=MiI+E99y0WOtFm45EJZXDNZCsMOgXgrEe4tO/MeP/JCdxxhE43L5/8vE3BbyYIcltk
+         pYepo7Pvj19oFtgugnO2uBvNHdeYu8Wm27kvUQGw/F2JbCoTUHYewEYBatNXaegiIA8l
+         fx6rZXBrAJRKkdajlBJ6FgLasG7VkT2/n08L7AYqtECtH+j4nWVMAaLOomEkXmc0ZULq
+         X5zT2YS46pL2jiwUz69iJgEngpNE/pl/RbjHiQ6ghVI0XoBz7STKrsaT7BehiVeAJvY/
+         ZZdK8HRgC22uv8h6dvS5j8xFkENykarkAG9VJL8RDQBw5IH4Y6jEpJjqkXxrH5YMQu80
+         y39g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713991265; x=1714596065;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=owK6av2ybpUyGlbtXxFC1PnJrHab010U6ePsbqIH3Hc=;
+        b=vTVbQqrv9Lo05rJSEWhludBJZ+wmlkDN4gvxxkOyIeMkanRX/cKXBTOrntiZaJjyON
+         Y9dfGBjXE5xUrfRlLy7vT4y+RcmeOvavT4ec5R61kS/RYDkAwudLwveLlIb002yZN/ps
+         NRyTkXHyNjIcwQ29H/+MGtHsSskoMht5N4zB6Kb05Ko+uE8JnTlB8r8uRBYLkYqHLemi
+         txzYDXpAg1nwXqL656zP3eKXyK3/r16adetIOVqHHYwqz9SJyBCdn8plZIQgF4ILKxQC
+         WN8roMkzk5DLh8nJvb5pTrFGMhe2ZeQkYUW68MZF5scG388P6b70h8rLtM+FLTwf0SNf
+         Ow+A==
+X-Forwarded-Encrypted: i=1; AJvYcCV8I6Fg0vvDM+PtKuw927sADjujiyptw1eTX6WsRSZkHPSGl/7cRNeRcL9LbZXw2+qnkB86od/Ry64Z8Tit+V0TYc4SqmSC
+X-Gm-Message-State: AOJu0YypPgXZPsdgjf6kJVGSaGAvgN1Smk8oBUZtg48KKMFkmbiBH6+k
+	M4I6iabFcn8U1JB+MN2cq6uLF64sc5dO7hFR07iMGy4FvODIuikD
+X-Google-Smtp-Source: AGHT+IGemhFZd0k0RTh2j694j9hD8nZg15z5AJ0zhmaklLYFyXTGgQh8eOQ/ht1FaoWVk6Dz7VtDVw==
+X-Received: by 2002:a05:6102:a46:b0:47b:ef66:6720 with SMTP id i6-20020a0561020a4600b0047bef666720mr4424914vss.25.1713991264538;
+        Wed, 24 Apr 2024 13:41:04 -0700 (PDT)
+Received: from lvondent-mobl4.. ([107.146.107.67])
+        by smtp.gmail.com with ESMTPSA id g13-20020a056102158d00b0047bc0840999sm2553472vsv.7.2024.04.24.13.41.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 24 Apr 2024 13:41:03 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: davem@davemloft.net,
+	kuba@kernel.org
+Cc: linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: pull request: bluetooth 2024-04-24
+Date: Wed, 24 Apr 2024 16:41:02 -0400
+Message-ID: <20240424204102.2319483-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-FB-Internal: Safe
-Content-Type: text/plain
-X-Proofpoint-GUID: p-FiQZYKqz3XHknHHIdzTW1fJf8wjH_k
-X-Proofpoint-ORIG-GUID: p-FiQZYKqz3XHknHHIdzTW1fJf8wjH_k
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1011,Hydra:6.0.650,FMLib:17.11.176.26
- definitions=2024-04-24_17,2024-04-24_01,2023-05-22_02
+Content-Transfer-Encoding: 8bit
 
-This patch adds a selftest to show the usage of the new arguments in
-cong_control. For simplicity's sake, the testing example reuses cubic's
-kernel functions.
+The following changes since commit 5b5f724b05c550e10693a53a81cadca901aefd16:
 
-Signed-off-by: Miao Xu <miaxu@meta.com>
----
- tools/testing/selftests/bpf/bpf_tcp_helpers.h |  23 +++
- .../bpf/progs/bpf_cubic_cong_control.c        | 176 ++++++++++++++++++
- 2 files changed, 199 insertions(+)
- create mode 100644 tools/testing/selftests/bpf/progs/bpf_cubic_cong_cont=
-rol.c
+  net: phy: mediatek-ge-soc: follow netdev LED trigger semantics (2024-04-24 11:50:49 +0100)
 
-diff --git a/tools/testing/selftests/bpf/bpf_tcp_helpers.h b/tools/testin=
-g/selftests/bpf/bpf_tcp_helpers.h
-index 82a7c9de95f9..3115bc80280e 100644
---- a/tools/testing/selftests/bpf/bpf_tcp_helpers.h
-+++ b/tools/testing/selftests/bpf/bpf_tcp_helpers.h
-@@ -21,6 +21,15 @@ BPF_PROG(name, args)
- #endif
-=20
- #define tcp_jiffies32 ((__u32)bpf_jiffies64())
-+#define TCP_INFINITE_SSTHRESH 0x7fffffff
-+
-+#define FLAG_DATA_ACKED 0x04 /* This ACK acknowledged new data.		*/
-+#define FLAG_SYN_ACKED 0x10 /* This ACK acknowledged SYN.		*/
-+#define FLAG_DATA_SACKED 0x20 /* New SACK.				*/
-+#define FLAG_SND_UNA_ADVANCED \
-+	0x400 /* Snd_una was changed (!=3D FLAG_DATA_ACKED) */
-+#define FLAG_ACKED (FLAG_DATA_ACKED | FLAG_SYN_ACKED)
-+#define FLAG_FORWARD_PROGRESS (FLAG_ACKED | FLAG_DATA_SACKED)
-=20
- struct sock_common {
- 	unsigned char	skc_state;
-@@ -37,6 +46,7 @@ struct sock {
- 	struct sock_common	__sk_common;
- #define sk_state		__sk_common.skc_state
- 	unsigned long		sk_pacing_rate;
-+	unsigned long		sk_max_pacing_rate;
- 	__u32			sk_pacing_status; /* see enum sk_pacing */
- } __attribute__((preserve_access_index));
-=20
-@@ -86,6 +96,19 @@ struct tcp_sock {
- 	__u32	prior_cwnd;
- 	__u64	tcp_mstamp;	/* most recent packet received/sent */
- 	bool	is_mptcp;
-+	__u32	snd_cwnd_stamp;
-+	__u32	mss_cache;	/* Cached effective mss, not including SACKS */
-+	__u32	high_seq;	/* snd_nxt at onset of congestion	*/
-+	__u32	packets_out;	/* Packets which are "in flight"	*/
-+	__u32	srtt_us;	/* smoothed round trip time << 3 in usecs */
-+	__u32	retrans_out;	/* Retransmitted packets out */
-+	__u32	lost_out;	/* Lost packets */
-+	__u32	sacked_out;	/* SACK'd packets */
-+	__u32	prr_delivered;	/* Number of newly delivered packets to
-+				 * receiver in Recovery.
-+				 */
-+	__u32	prr_out;	/* Total number of pkts sent during Recovery. */
-+	__u32	reordering;	/* Packet reordering metric. */
- } __attribute__((preserve_access_index));
-=20
- static __always_inline struct inet_connection_sock *inet_csk(const struc=
-t sock *sk)
-diff --git a/tools/testing/selftests/bpf/progs/bpf_cubic_cong_control.c b=
-/tools/testing/selftests/bpf/progs/bpf_cubic_cong_control.c
-new file mode 100644
-index 000000000000..698964df1f33
---- /dev/null
-+++ b/tools/testing/selftests/bpf/progs/bpf_cubic_cong_control.c
-@@ -0,0 +1,176 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+
-+/* WARNING: This implementation is NOT the same as the tcp_cubic.c.
-+ * The purpose is mainly to show use cases of the new arguments in
-+ * cong_control.
-+ */
-+
-+#include <linux/bpf.h>
-+#include <linux/stddef.h>
-+#include <linux/tcp.h>
-+#include "bpf_tcp_helpers.h"
-+
-+char _license[] SEC("license") =3D "GPL";
-+
-+extern void cubictcp_init(struct sock *sk) __ksym;
-+extern void cubictcp_cwnd_event(struct sock *sk, enum tcp_ca_event event=
-)
-+	__ksym;
-+	extern __u32 cubictcp_recalc_ssthresh(struct sock *sk) __ksym;
-+	extern void cubictcp_state(struct sock *sk, __u8 new_state) __ksym;
-+	extern __u32 tcp_reno_undo_cwnd(struct sock *sk) __ksym;
-+extern void cubictcp_acked(struct sock *sk, const struct ack_sample *sam=
-ple)
-+	__ksym;
-+	extern void cubictcp_cong_avoid(struct sock *sk, __u32 ack, __u32 acked=
-) __ksym;
-+
-+
-+void BPF_STRUCT_OPS(bpf_cubic_init, struct sock *sk)
-+{
-+	cubictcp_init(sk);
-+}
-+
-+void BPF_STRUCT_OPS(bpf_cubic_cwnd_event, struct sock *sk, enum tcp_ca_e=
-vent event)
-+{
-+	cubictcp_cwnd_event(sk, event);
-+}
-+
-+#define USEC_PER_SEC 1000000UL
-+#define TCP_PACING_SS_RATIO (200)
-+#define TCP_PACING_CA_RATIO (120)
-+#define TCP_REORDERING (12)
-+#define likely(x) (__builtin_expect(!!(x), 1))
-+
-+static __always_inline __u64 div64_u64(__u64 dividend, __u64 divisor)
-+{
-+	return dividend / divisor;
-+}
-+
-+static void tcp_update_pacing_rate(struct sock *sk)
-+{
-+	const struct tcp_sock *tp =3D tcp_sk(sk);
-+	__u64 rate;
-+
-+	/* set sk_pacing_rate to 200 % of current rate (mss * cwnd / srtt) */
-+	rate =3D (__u64)tp->mss_cache * ((USEC_PER_SEC / 100) << 3);
-+
-+	/* current rate is (cwnd * mss) / srtt
-+	 * In Slow Start [1], set sk_pacing_rate to 200 % the current rate.
-+	 * In Congestion Avoidance phase, set it to 120 % the current rate.
-+	 *
-+	 * [1] : Normal Slow Start condition is (tp->snd_cwnd < tp->snd_ssthres=
-h)
-+	 *	 If snd_cwnd >=3D (tp->snd_ssthresh / 2), we are approaching
-+	 *	 end of slow start and should slow down.
-+	 */
-+	if (tp->snd_cwnd < tp->snd_ssthresh / 2)
-+		rate *=3D TCP_PACING_SS_RATIO;
-+	else
-+		rate *=3D TCP_PACING_CA_RATIO;
-+
-+	rate *=3D max(tp->snd_cwnd, tp->packets_out);
-+
-+	if (likely(tp->srtt_us))
-+		rate =3D div64_u64(rate, (__u64)tp->srtt_us);
-+
-+	sk->sk_pacing_rate =3D min(rate, (__u64)sk->sk_max_pacing_rate);
-+}
-+
-+static __always_inline void tcp_cwnd_reduction(
-+		struct sock *sk,
-+		int newly_acked_sacked,
-+		int newly_lost,
-+		int flag) {
-+	struct tcp_sock *tp =3D tcp_sk(sk);
-+	int sndcnt =3D 0;
-+	__u32 pkts_in_flight =3D tp->packets_out - (tp->sacked_out + tp->lost_o=
-ut) + tp->retrans_out;
-+	int delta =3D tp->snd_ssthresh - pkts_in_flight;
-+
-+	if (newly_acked_sacked <=3D 0 || !tp->prior_cwnd)
-+		return;
-+
-+	__u32 prr_delivered =3D tp->prr_delivered + newly_acked_sacked;
-+
-+	if (delta < 0) {
-+		__u64 dividend =3D
-+			(__u64)tp->snd_ssthresh * prr_delivered + tp->prior_cwnd - 1;
-+		sndcnt =3D (__u32)div64_u64(dividend, (__u64)tp->prior_cwnd) - tp->prr=
-_out;
-+	} else {
-+		sndcnt =3D max(prr_delivered - tp->prr_out, newly_acked_sacked);
-+		if (flag & FLAG_SND_UNA_ADVANCED && !newly_lost)
-+			sndcnt++;
-+		sndcnt =3D min(delta, sndcnt);
-+	}
-+	/* Force a fast retransmit upon entering fast recovery */
-+	sndcnt =3D max(sndcnt, (tp->prr_out ? 0 : 1));
-+	tp->snd_cwnd =3D pkts_in_flight + sndcnt;
-+}
-+
-+/* Decide wheather to run the increase function of congestion control. *=
-/
-+static __always_inline bool tcp_may_raise_cwnd(
-+		const struct sock *sk,
-+		const int flag) {
-+	if (tcp_sk(sk)->reordering > TCP_REORDERING)
-+		return flag & FLAG_FORWARD_PROGRESS;
-+
-+	return flag & FLAG_DATA_ACKED;
-+}
-+
-+void BPF_STRUCT_OPS(bpf_cubic_cong_control, struct sock *sk, __u32 ack, =
-int flag,
-+		const struct rate_sample *rs)
-+{
-+	struct tcp_sock *tp =3D tcp_sk(sk);
-+
-+	if (((1<<TCP_CA_CWR) | (1<<TCP_CA_Recovery)) &
-+			(1 << inet_csk(sk)->icsk_ca_state)) {
-+		/* Reduce cwnd if state mandates */
-+		tcp_cwnd_reduction(sk, rs->acked_sacked, rs->losses, flag);
-+
-+		if (!before(tp->snd_una, tp->high_seq)) {
-+			/* Reset cwnd to ssthresh in CWR or Recovery (unless it's undone) */
-+			if (tp->snd_ssthresh < TCP_INFINITE_SSTHRESH &&
-+					inet_csk(sk)->icsk_ca_state =3D=3D TCP_CA_CWR) {
-+				tp->snd_cwnd =3D tp->snd_ssthresh;
-+				tp->snd_cwnd_stamp =3D tcp_jiffies32;
-+			}
-+			// __cwnd_event(sk, CA_EVENT_COMPLETE_CWR);
-+		}
-+	} else if (tcp_may_raise_cwnd(sk, flag)) {
-+		/* Advance cwnd if state allows */
-+		cubictcp_cong_avoid(sk, ack, rs->acked_sacked);
-+		tp->snd_cwnd_stamp =3D tcp_jiffies32;
-+	}
-+
-+	tcp_update_pacing_rate(sk);
-+}
-+
-+__u32 BPF_STRUCT_OPS(bpf_cubic_recalc_ssthresh, struct sock *sk)
-+{
-+	return cubictcp_recalc_ssthresh(sk);
-+}
-+
-+void BPF_STRUCT_OPS(bpf_cubic_state, struct sock *sk, __u8 new_state)
-+{
-+	cubictcp_state(sk, new_state);
-+}
-+
-+void BPF_STRUCT_OPS(bpf_cubic_acked, struct sock *sk,
-+		const struct ack_sample *sample)
-+{
-+	cubictcp_acked(sk, sample);
-+}
-+
-+__u32 BPF_STRUCT_OPS(bpf_cubic_undo_cwnd, struct sock *sk)
-+{
-+	return tcp_reno_undo_cwnd(sk);
-+}
-+
-+
-+SEC(".struct_ops")
-+struct tcp_congestion_ops cubic =3D {
-+	.init		=3D (void *)bpf_cubic_init,
-+	.ssthresh	=3D (void *)bpf_cubic_recalc_ssthresh,
-+	.cong_control	=3D (void *)bpf_cubic_cong_control,
-+	.set_state	=3D (void *)bpf_cubic_state,
-+	.undo_cwnd	=3D (void *)bpf_cubic_undo_cwnd,
-+	.cwnd_event	=3D (void *)bpf_cubic_cwnd_event,
-+	.pkts_acked     =3D (void *)bpf_cubic_acked,
-+	.name		=3D "bpf_cubic",
-+};
---=20
-2.43.0
+are available in the Git repository at:
 
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2024-04-24
+
+for you to fetch changes up to 3d05fc82237aa97162d0d7dc300b55bb34e91d02:
+
+  Bluetooth: qca: set power_ctrl_enabled on NULL returned by gpiod_get_optional() (2024-04-24 16:26:22 -0400)
+
+----------------------------------------------------------------
+bluetooth pull request for net:
+
+ - qca: set power_ctrl_enabled on NULL returned by gpiod_get_optional()
+ - hci_sync: Using hci_cmd_sync_submit when removing Adv Monitor
+ - qca: fix invalid device address check
+ - hci_sync: Use advertised PHYs on hci_le_ext_create_conn_sync
+ - Fix type of len in {l2cap,sco}_sock_getsockopt_old()
+ - btusb: mediatek: Fix double free of skb in coredump
+ - btusb: Add Realtek RTL8852BE support ID 0x0bda:0x4853
+ - btusb: Fix triggering coredump implementation for QCA
+
+----------------------------------------------------------------
+Bartosz Golaszewski (1):
+      Bluetooth: qca: set power_ctrl_enabled on NULL returned by gpiod_get_optional()
+
+Chun-Yi Lee (1):
+      Bluetooth: hci_sync: Using hci_cmd_sync_submit when removing Adv Monitor
+
+Johan Hovold (3):
+      Bluetooth: qca: fix invalid device address check
+      Bluetooth: qca: fix NULL-deref on non-serdev suspend
+      Bluetooth: qca: fix NULL-deref on non-serdev setup
+
+Luiz Augusto von Dentz (3):
+      Bluetooth: hci_sync: Use advertised PHYs on hci_le_ext_create_conn_sync
+      Bluetooth: hci_event: Fix sending HCI_OP_READ_ENC_KEY_SIZE
+      Bluetooth: MGMT: Fix failing to MGMT_OP_ADD_UUID/MGMT_OP_REMOVE_UUID
+
+Nathan Chancellor (1):
+      Bluetooth: Fix type of len in {l2cap,sco}_sock_getsockopt_old()
+
+Sean Wang (1):
+      Bluetooth: btusb: mediatek: Fix double free of skb in coredump
+
+WangYuli (1):
+      Bluetooth: btusb: Add Realtek RTL8852BE support ID 0x0bda:0x4853
+
+Zijun Hu (1):
+      Bluetooth: btusb: Fix triggering coredump implementation for QCA
+
+ drivers/bluetooth/btmtk.c        |  7 +++----
+ drivers/bluetooth/btqca.c        | 38 ++++++++++++++++++++++++++++++++++++++
+ drivers/bluetooth/btusb.c        | 11 ++++++-----
+ drivers/bluetooth/hci_qca.c      | 29 ++++++++++++++++++++---------
+ include/net/bluetooth/hci_core.h |  8 +++++++-
+ net/bluetooth/hci_conn.c         |  6 ++++--
+ net/bluetooth/hci_event.c        | 25 ++++++++++++++-----------
+ net/bluetooth/hci_sync.c         |  9 ++++++---
+ net/bluetooth/l2cap_core.c       |  2 +-
+ net/bluetooth/l2cap_sock.c       |  7 ++++---
+ net/bluetooth/mgmt.c             | 24 +++++++++++++++++-------
+ net/bluetooth/sco.c              |  7 ++++---
+ 12 files changed, 124 insertions(+), 49 deletions(-)
 
