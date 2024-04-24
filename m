@@ -1,142 +1,82 @@
-Return-Path: <netdev+bounces-90793-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90795-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89B948B036E
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 09:45:42 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E56C8B0389
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 09:55:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B40F2281E61
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 07:45:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4FA73B2742F
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 07:55:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43425157E82;
-	Wed, 24 Apr 2024 07:45:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9D11158210;
+	Wed, 24 Apr 2024 07:55:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from laurent.telenet-ops.be (laurent.telenet-ops.be [195.130.137.89])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpbgjp3.qq.com (smtpbgjp3.qq.com [54.92.39.34])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2ED06153504
-	for <netdev@vger.kernel.org>; Wed, 24 Apr 2024 07:45:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.130.137.89
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB4E5158204
+	for <netdev@vger.kernel.org>; Wed, 24 Apr 2024 07:55:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.92.39.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713944735; cv=none; b=h77Sj9mZZme6z9Ob/qDckiMpP3BFQjdaoXV2GxD0LUZZpCaBPpwRtPSfI0aYK2hjhywJmE3oZEVyLPHlCZNS6eVU37Gvn6ESo9F5pNyJzP8R8D3u+xxEGXuw0btQtb5KR4kb6r9OVvH9dbNaA9HWD+fVe1yb7Oa3lBtBdTrms9Q=
+	t=1713945334; cv=none; b=D4dZsg9pKJbVD3w2Bw295BptzjjSaUGI8nArfu0d5w7u4orVRh549Cyi0RZFAE0paTKk1Q7jl9+1/l9lf3Wj4UTqZ4hp1+T7/U2BpDo5KC0N06g+AzX7JQuuYVE57IbyUYmHb1+vlCFFZHvRtvOltKJXUszgDjmtGu+2NxkjA5g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713944735; c=relaxed/simple;
-	bh=ssEEaHJeH/+FXd54tyEFn55ATdJwDE9WT446KlnZ0QA=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=U+oG3A6Ircu0NGFTe56aH3VFEPDRcjC3yt+WDoN+k5gNDkFAZC/hJygWlR6YCACJ1qTjsKnmctRNhjY2npqoud0vsfMB9IB+M9nUUzPsxlbJvrE2ZUPgOsgthXRzBe70/ixIyDDAS04sPdmxoKLO6obPhbYh+oEqZ4TckAGSVJM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=glider.be; spf=none smtp.mailfrom=linux-m68k.org; arc=none smtp.client-ip=195.130.137.89
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=glider.be
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux-m68k.org
-Received: from ramsan.of.borg ([IPv6:2a02:1810:ac12:ed80:76d0:2bff:fec8:549])
-	by laurent.telenet-ops.be with bizsmtp
-	id EvlN2C0080SSLxL01vlNdh; Wed, 24 Apr 2024 09:45:24 +0200
-Received: from rox.of.borg ([192.168.97.57])
-	by ramsan.of.borg with esmtp (Exim 4.95)
-	(envelope-from <geert@linux-m68k.org>)
-	id 1rzXJ4-005m6Q-3E;
-	Wed, 24 Apr 2024 09:45:22 +0200
-Received: from geert by rox.of.borg with local (Exim 4.95)
-	(envelope-from <geert@linux-m68k.org>)
-	id 1rzXJi-00ACdE-4y;
-	Wed, 24 Apr 2024 09:45:22 +0200
-From: Geert Uytterhoeven <geert+renesas@glider.be>
-To: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>,
-	Sergey Shtylyov <s.shtylyov@omp.ru>,
-	Paul Barker <paul.barker.ct@bp.renesas.com>,
-	=?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org,
-	Geert Uytterhoeven <geert+renesas@glider.be>
-Subject: [PATCH] net: ravb: Fix registered interrupt names
-Date: Wed, 24 Apr 2024 09:45:21 +0200
-Message-Id: <cde67b68adf115b3cf0b44c32334ae00b2fbb321.1713944647.git.geert+renesas@glider.be>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1713945334; c=relaxed/simple;
+	bh=Lqe/X+i3I0nshARv4DTkcZBAaOro2292vWvRjQOveRA=;
+	h=From:To:Cc:References:In-Reply-To:Subject:Date:Message-ID:
+	 MIME-Version:Content-Type; b=rJHrBMKOkBqayouhh8wpTIEyrst5zRh9EjBpHr1jkdfmN4EfXFgMATX7labsNgIUnGtrH4tCh5VnDMmhxq/6KcYrG3Hd28L1BQ+4gGjbq1Dt+06ACBqbKJSZIRrw7GkBO2RRlzfRfofMQMjuiVWHLhwfwZXtpQXL/9Ww0jqCm7Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.92.39.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
+X-QQ-mid:Yeas5t1713945198t467t18212
+Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [115.195.151.153])
+X-QQ-SSF:00400000000000F0FUF000000000000
+From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
+X-BIZMAIL-ID: 18304150619850852544
+To: "'Andrew Lunn'" <andrew@lunn.ch>
+Cc: <davem@davemloft.net>,
+	<edumazet@google.com>,
+	<kuba@kernel.org>,
+	<pabeni@redhat.com>,
+	<rmk+kernel@armlinux.org.uk>,
+	<netdev@vger.kernel.org>,
+	<mengyuanlou@net-swift.com>,
+	<duanqiangwen@net-swift.com>
+References: <20240416062952.14196-1-jiawenwu@trustnetic.com> <20240416062952.14196-3-jiawenwu@trustnetic.com> <ff606ace-1128-4d16-8192-7ff1a40301af@lunn.ch>
+In-Reply-To: <ff606ace-1128-4d16-8192-7ff1a40301af@lunn.ch>
+Subject: RE: [PATCH net 2/5] net: wangxun: fix error statistics when the device is reset
+Date: Wed, 24 Apr 2024 15:53:17 +0800
+Message-ID: <046501da961c$77f3fba0$67dbf2e0$@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+X-Mailer: Microsoft Outlook 16.0
+Thread-Index: AQMFotcmuiiFX27azvFEImaFqcAi9wJDtu9ZAWg8bGWvA5AtAA==
+Content-Language: zh-cn
+X-QQ-SENDSIZE: 520
+Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz8a-1
 
-As interrupts are now requested from ravb_probe(), before calling
-register_netdev(), ndev->name still contains the template "eth%d",
-leading to funny names in /proc/interrupts.  E.g. on R-Car E3:
+On Tue, April 16, 2024 10:56 PM, Andrew Lunn wrote:
+> On Tue, Apr 16, 2024 at 02:29:49PM +0800, Jiawen Wu wrote:
+> > Add flag for reset state to avoid reading statistics when hardware
+> > is reset.
+> 
+> This explains the what, which you can also get by reading the code
+> change. The commit message should also explain the why? What goes
+> wrong if you read the statistics when the hardware is in reset? Do you
+> get 42 for every statistic? Does the hardware lockup and the reset
+> never completes?
 
-	89:  0      0  GICv2  93 Level  eth%d:ch22:multi
-	90:  0      3  GICv2  95 Level  eth%d:ch24:emac
-	91:  0  23484  GICv2  71 Level  eth%d:ch0:rx_be
-	92:  0      0  GICv2  72 Level  eth%d:ch1:rx_nc
-	93:  0  13735  GICv2  89 Level  eth%d:ch18:tx_be
-	94:  0      0  GICv2  90 Level  eth%d:ch19:tx_nc
+I think I should discard this patch, and add the resetting flag to the patch 5/5 to avoid
+device reset collision. Since wx_update_stats() is called in txgbe_disable_device() while
+device is resetting. And I haven't found a situation that causes statistics confusion.
 
-Worse, on platforms with multiple RAVB instances (e.g. R-Car V4H), all
-interrupts have similar names.
-
-Fix this by using the device name instead, like is done in several other
-drivers:
-
-	89:  0      0  GICv2  93 Level  e6800000.ethernet:ch22:multi
-	90:  0      1  GICv2  95 Level  e6800000.ethernet:ch24:emac
-	91:  0  28578  GICv2  71 Level  e6800000.ethernet:ch0:rx_be
-	92:  0      0  GICv2  72 Level  e6800000.ethernet:ch1:rx_nc
-	93:  0  14044  GICv2  89 Level  e6800000.ethernet:ch18:tx_be
-	94:  0      0  GICv2  90 Level  e6800000.ethernet:ch19:tx_nc
-
-Rename the local variable dev_name, as it shadows the dev_name()
-function, and pre-initialize it, to simplify the code.
-
-Fixes: 32f012b8c01ca9fd ("net: ravb: Move getting/requesting IRQs in the probe() method")
-Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
----
- drivers/net/ethernet/renesas/ravb_main.c | 11 +++++------
- 1 file changed, 5 insertions(+), 6 deletions(-)
-
-diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
-index b621ddd4539cf517..384ddad65aaf641a 100644
---- a/drivers/net/ethernet/renesas/ravb_main.c
-+++ b/drivers/net/ethernet/renesas/ravb_main.c
-@@ -2729,19 +2729,18 @@ static int ravb_setup_irq(struct ravb_private *priv, const char *irq_name,
- 	struct platform_device *pdev = priv->pdev;
- 	struct net_device *ndev = priv->ndev;
- 	struct device *dev = &pdev->dev;
--	const char *dev_name;
-+	const char *devname = dev_name(dev);
- 	unsigned long flags;
- 	int error, irq_num;
- 
- 	if (irq_name) {
--		dev_name = devm_kasprintf(dev, GFP_KERNEL, "%s:%s", ndev->name, ch);
--		if (!dev_name)
-+		devname = devm_kasprintf(dev, GFP_KERNEL, "%s:%s", devname, ch);
-+		if (!devname)
- 			return -ENOMEM;
- 
- 		irq_num = platform_get_irq_byname(pdev, irq_name);
- 		flags = 0;
- 	} else {
--		dev_name = ndev->name;
- 		irq_num = platform_get_irq(pdev, 0);
- 		flags = IRQF_SHARED;
- 	}
-@@ -2751,9 +2750,9 @@ static int ravb_setup_irq(struct ravb_private *priv, const char *irq_name,
- 	if (irq)
- 		*irq = irq_num;
- 
--	error = devm_request_irq(dev, irq_num, handler, flags, dev_name, ndev);
-+	error = devm_request_irq(dev, irq_num, handler, flags, devname, ndev);
- 	if (error)
--		netdev_err(ndev, "cannot request IRQ %s\n", dev_name);
-+		netdev_err(ndev, "cannot request IRQ %s\n", devname);
- 
- 	return error;
- }
--- 
-2.34.1
 
 
