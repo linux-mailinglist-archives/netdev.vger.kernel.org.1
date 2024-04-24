@@ -1,126 +1,117 @@
-Return-Path: <netdev+bounces-90929-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90930-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A97588B0B60
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 15:43:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DE3058B0B63
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 15:44:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DB3CD1C203F7
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 13:43:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1B9C51C232A4
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 13:44:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29B8115CD4A;
-	Wed, 24 Apr 2024 13:43:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C13E15D5C3;
+	Wed, 24 Apr 2024 13:43:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="X1O+trFs"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UhHfN6FW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF53A15B986;
-	Wed, 24 Apr 2024 13:43:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E368915CD6F
+	for <netdev@vger.kernel.org>; Wed, 24 Apr 2024 13:43:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713966191; cv=none; b=bFNmZE+wIeSV2K28GadXTkZtzKeriEz4O5lnKuBoB/9BzOq5jcXN9TRb4h12KxHbRBFMvGuNyZEJvT9XJ+//osEPUwfi0XCxn27DiNEF5+Cc3ioZipijM+ZBR3a5KpsPbsLNN70T8PzXcrqzGdXtT+5wMVdjzWxD9pSfd+IH0F8=
+	t=1713966211; cv=none; b=L526s8KhAI3j1UpcV9dIervlb3A5XrvjKL/upgK/4fhZTLn2nYKixmclQFMJcknF8TJAcK6kOn5fDmu1mRrj8HvJSXaY0X32oeQqqoTzoK+oO2JTw1Eq8uQAtXAmcS4Wiqn5upQuZmtzPVRMNjv2fdMKgmvVE6ECH2vwnlA8Rns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713966191; c=relaxed/simple;
-	bh=EWAIznzUX0DHOlahRpLSJ/x5hLx2THJ0Nhx/H7hZWYw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=o3uKQdhDSEC51X9IW4heoiXLc/Y75S1du3CKWcNBrr8rXq5zF0oYgjngBvYQv1qOdUBzwYaDfFAC2eryRzzwBpWAkv6RtCw4nxXd7dZxnF0a4HyEfWil6NLQfLNA7DqbkkcmdmU6GzBLzU5sIb5X6KR1kre+kz/mfLGRFjg1rhY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=X1O+trFs; arc=none smtp.client-ip=193.104.135.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
-Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
-	by mail1.fiberby.net (Postfix) with ESMTPSA id E9574600A7;
-	Wed, 24 Apr 2024 13:42:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
-	s=202008; t=1713966185;
-	bh=EWAIznzUX0DHOlahRpLSJ/x5hLx2THJ0Nhx/H7hZWYw=;
-	h=From:To:Cc:Subject:Date:From;
-	b=X1O+trFsOgKa62JcfLSbuM0jHkDfDyHFfKNmEg+YxkjXEz3RJC9jULsnBaTlg11MX
-	 GOxef++oKDXDEJeHDHckE235YLIYyAF+CfgiYfauHu6M+LjZ+oLGoFv6p/2OT69ksn
-	 4fdYVhForzGduvlLAi4fvxvzXwDWdfJxQLQYozEHoeoYB+JfKIMsDBnt2sP2GVlIXh
-	 YyKflYYtgDtBrAhBQg9FC081zDTnH0wBKQHVpR1moDOf1hvfOXh7djXpiOpn/1NfuZ
-	 vzTTYn1uVT6dRBSJpam84mELLNd4/YVmaq+DAL98TpLwixT8gG71z8mKzWzwnv/Qqh
-	 ZrI0/mSonGWYg==
-Received: by x201s (Postfix, from userid 1000)
-	id 967542044F0; Wed, 24 Apr 2024 13:42:52 +0000 (UTC)
-From: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>
-To: netdev@vger.kernel.org
-Cc: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>,
-	linux-kernel@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Ariel Elior <aelior@marvell.com>,
-	Manish Chopra <manishc@marvell.com>
-Subject: [PATCH net-next] net: qede: flower: validate control flags
-Date: Wed, 24 Apr 2024 13:42:48 +0000
-Message-ID: <20240424134250.465904-1-ast@fiberby.net>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1713966211; c=relaxed/simple;
+	bh=enIq3rOjo69RcPcCmgdBwJJK6m49S2ThPAK1bf/uijI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=LuFLMff32zdVO3Gn4vyotY1oJuTq1amWhdTS3WuvXum8JHA4+kqBo4m5iPWIHzm9kCV90UhwtUziQfT1irnG/GXbSzRvElmX+jOryu/zSReMjxs63wkrl24lOqmTCh5W2jxFOby5xPUDIW7HeZS/TBNsVVpPlXhbp0Jsr+OSWhg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UhHfN6FW; arc=none smtp.client-ip=209.85.208.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-56e47843cc7so6150232a12.0
+        for <netdev@vger.kernel.org>; Wed, 24 Apr 2024 06:43:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1713966208; x=1714571008; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OmTGyMHN1tsiyGbtMZWbmbt5FVtHtQX9ZSQWdDaUOjw=;
+        b=UhHfN6FWroxg2VWYKfa4hbgaqJtuq+hau40RUQtVh6Svoos9aVthwsvWu9tl1yp3F+
+         OqTJPYHKSFqejzJrd6e4mLZh7/pelUuv/M3SD8zb0Ri3BnZfDWbn8GZV4gbtsg5Dsc5B
+         nXN1H7QEBC0v9p9E1NutWizFVilcvaredgmXhuplBGUNYe64C1Ke2u43H8i6nVci7pbP
+         5/87uWLSyFawle2VS8NP/XEOCw473T9EgUOaeopu7+AvEZpV8GyjQiQrlcLlSjvE+hdr
+         qj+i7pwUdc1LX8B5uek9+nlqMidZAWaKZrOBO86WPIqSeVzKlbs2BDWyUdaZPL7qp2lg
+         T3Iw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713966208; x=1714571008;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=OmTGyMHN1tsiyGbtMZWbmbt5FVtHtQX9ZSQWdDaUOjw=;
+        b=iD0UcydHRqjb80xakdNOgJyKgoNwPCQTTxCMwWgUQpL8EbD9szVM/miU9X0/Ovwrpw
+         kN6Lym0qHZW1lJSYolwf+8v68uRcSJ9cMog3GfraaRoUOF9hERtG0jBWlcKo1E5k+nD4
+         g+j9A8vFKW1pwVE8C2vFmuH08jctlxBwUUJm6lv1ZXHFgQ3425TgeP5Zm2CGU4nG8odx
+         bphtItOnWQ2f0PkxixOeaxaBmbxoMWrGIB6fAz7wg3QDMy5B/3RN7lIfPUfRwA3lX9pz
+         XSywGDQdLFVYHWgJGoyNXYfBSkseWYonqejocyKHFqVLNtrkSbUmionC0T3ugdJJi7O9
+         UxAg==
+X-Gm-Message-State: AOJu0YzoTkoUqL16OypX/TaJzIKp2QOEH5tQ8AjRbCCF0h7Ps+NmxoiN
+	FkgVV8glhSuhxglQb0j3qcJZnO67AmxkqzTRWFMrC3GbOk1n5yujOy0BJ0i/FuAg1jS+scdevNw
+	QajVmf124InRlz8nwNbU945EintFLWMqH
+X-Google-Smtp-Source: AGHT+IEmoudr4hI3kxdjZoOen/odr7sl2qkO8/oEVbP8FcnU2lVWk4XSNhyVX1mKkvGtxRqTQJJ8rnjKXhGrPNCZtMQ=
+X-Received: by 2002:a50:c050:0:b0:56e:2464:7c4b with SMTP id
+ u16-20020a50c050000000b0056e24647c4bmr2000018edd.10.1713966208042; Wed, 24
+ Apr 2024 06:43:28 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20240423070345.508758-1-chenjiayunju@gmail.com> <20240423083548.49573c93@hermes.local>
+In-Reply-To: <20240423083548.49573c93@hermes.local>
+From: jiayun chen <chenjiayunju@gmail.com>
+Date: Wed, 24 Apr 2024 21:43:15 +0800
+Message-ID: <CABiRo3kmBkUOLNRoQ3_U2stZuD8QgPHvJX662T9CGwLMXAf-UA@mail.gmail.com>
+Subject: Re: [PATCH] man: fix doc ip will exit with -1
+To: Stephen Hemminger <stephen@networkplumber.org>
+Cc: netdev@vger.kernel.org, shemminger@osdl.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-This driver currently doesn't support any flower control flags.
+But a checker based on the manual doesn't know
+what such an undefined value means and how to
+handle it.
 
-Implement check for control flags, such as can be set through
-`tc flower ... ip_flags frag`.
+So I suggest fixing the manual only, not the code.
 
-Since qede_parse_flow_attr() are called by both qede_add_tc_flower_fltr()
-and qede_flow_spec_to_rule(), as the latter doesn't having access to
-extack, then flow_rule_*_control_flags() can't be used in this driver.
 
-This patch therefore re-implements flow_rule_match_has_control_flags(),
-but with error messaging via DP_NOTICE, instead of NL_SET_ERR_MSG_FMT_MOD.
-
-So in case any control flags are masked, we call DP_NOTICE() and
-return -EOPNOTSUPP.
-
-Only compile-tested.
-
-Signed-off-by: Asbjørn Sloth Tønnesen <ast@fiberby.net>
----
-
-This is AFAICT the last driver which didn't validate these flags.
-
-$ git grep FLOW_DISSECTOR_KEY_CONTROL drivers/
-$ git grep 'flow_rule_.*_control_flags' drivers/
-
- drivers/net/ethernet/qlogic/qede/qede_filter.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
-
-diff --git a/drivers/net/ethernet/qlogic/qede/qede_filter.c b/drivers/net/ethernet/qlogic/qede/qede_filter.c
-index a5ac21a0ee33..40f72e700d8e 100644
---- a/drivers/net/ethernet/qlogic/qede/qede_filter.c
-+++ b/drivers/net/ethernet/qlogic/qede/qede_filter.c
-@@ -1843,6 +1843,19 @@ qede_parse_flow_attr(struct qede_dev *edev, __be16 proto,
- 		return -EPROTONOSUPPORT;
- 	}
- 
-+	if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_CONTROL)) {
-+		struct flow_match_control match;
-+
-+		flow_rule_match_control(rule, &match);
-+
-+		if (match.mask->flags) {
-+			DP_NOTICE(edev,
-+				  "Unsupported match on control.flags %#x",
-+				  match.mask->flags);
-+			return -EOPNOTSUPP;
-+		}
-+	}
-+
- 	if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_BASIC)) {
- 		struct flow_match_basic match;
- 
--- 
-2.43.0
-
+On Tue, Apr 23, 2024 at 11:35=E2=80=AFPM Stephen Hemminger
+<stephen@networkplumber.org> wrote:
+>
+> On Tue, 23 Apr 2024 15:03:46 +0800
+> Jiayun Chen <chenjiayunju@gmail.com> wrote:
+>
+> > The exit code of -1 (255) is not documented:
+> >
+> > $ ip link set dev; echo $?
+> > 255
+> >
+> > $ ip route help; echo $?
+> > 255
+> >
+> > It appears that ip returns -1 on syntax error, e.g., invalid device, bu=
+ffer
+> > size. Here is a patch for documenting this behavior.
+> >
+> > Signed-off-by: Jiayun Chen <chenjiayunju@gmail.com>
+> > ---
+> >  man/man8/ip.8 | 4 ++--
+> >  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> I wish Alexey had used the semi-standard exit codes from bash.
+> The convention is to use 2 for incorrect usage.
+> Probably too late to fix now?
 
