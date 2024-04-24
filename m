@@ -1,129 +1,180 @@
-Return-Path: <netdev+bounces-90863-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90865-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A25438B080E
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 13:11:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 654548B0823
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 13:13:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 432191F21EAF
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 11:11:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1EEBD281DDA
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 11:13:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66F6315B0E2;
-	Wed, 24 Apr 2024 11:10:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7BED15A482;
+	Wed, 24 Apr 2024 11:13:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OrEmQpCl"
+	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="U4bC0ILa"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DD5D15A482;
-	Wed, 24 Apr 2024 11:10:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED5E81598F1
+	for <netdev@vger.kernel.org>; Wed, 24 Apr 2024 11:13:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713957032; cv=none; b=o24btjS9IEFL8kZ0DWlEFvoRg/ud9cOPB87bdzgqsd4KllPAz3TqSB1Rme9NiS3NJeM1hCxubgLWn+D/tjMnZKudOxqYOpF43SB9IS2wt8AhcJCrIjb0e/DtIBOLpsWZSizn2j2TPKqWI1uyNkna/sAThMOR8c408RLVAfYv/Nw=
+	t=1713957194; cv=none; b=tCuBODrxfaAP4nYA3JXzxE/lODYJH27WA6WoJLImXtmxKmoqRQoOB2JyJdYZXb/ia91dLGHVOjhRELoMKw6BLtPcy4DRUqSIv8M53kypxfheqpG88+gW8yGengHIOLknqvUMafXiL6uX+qtXn4PEO1GE7vgWnacSNy45cWUu7+M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713957032; c=relaxed/simple;
-	bh=gqUwRpVOBrOCupCEmjKVghs27hLbcO22cVVu9ReSJc0=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=EmgYDi1wHmxjMYIv0pmMPh1Mtc2tlZEJegdOyiclnSW1FL8Dcq3gOdKsxbtclSI5VfZk0NPVyfdJF+PNJ9kqntbumORBzdT/8uQDuB+OEbg7AjUJo06uJi42Caw9iczHrwHOkwEr8ewj8t/OLmx/A6FBqI/dRia2yCZcMfNi33U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OrEmQpCl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C3ECBC4AF17;
-	Wed, 24 Apr 2024 11:10:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713957031;
-	bh=gqUwRpVOBrOCupCEmjKVghs27hLbcO22cVVu9ReSJc0=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=OrEmQpClgB7ghPcBbQXnD0fGvo60vZnrVDAEp4BtjvFtzItqvi+LVBmsH67JCOUPE
-	 GcridA1t/7Hr8qzIcOg7/MrG6N9QLoS/5fjUoCQ30oszdlmEAVYwIDTBi0g9Wpxeq5
-	 EQPjYNw4iX1MXlWedXINvXbBpwGjZm1Khe+D+m6qzVdXSJ2Z9dVrv7NDiyjtVW50G6
-	 C/5rwbc1ph2lPAIYcglKzP+MdBpinTffVZsQjwvpq1PxEILltD9rxjx+0FeXREFvUz
-	 SXhow9rP2IznyTIdxWhn0/Y8fkeKPdL/2FbFPl8Qtlhh8x3XPOr3VM1klNyPLjP1gC
-	 dpcd7y8ZzjA/Q==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B188EDEC7E3;
-	Wed, 24 Apr 2024 11:10:31 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1713957194; c=relaxed/simple;
+	bh=WMNSKI3RtoRqbQieeq7QOrGvMyFJTgjOPtgzlmdiq2U=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=m6M1yrd7t6xXlJHfQN2xzE2TLIZX6Wip+TseO0cDs3BHuYObs26tS+GV3zR9sMMBfQi62MhaD3yK+mTpao6CEMFy1+7/n+eqReplmZ3I636QzAd+bRgOSQGMQw4qyUjX/FR/8C8eHOGkQO8Z3VQkGDtFUC/VATSVaVzibP1UfeA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev; spf=pass smtp.mailfrom=tuxon.dev; dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b=U4bC0ILa; arc=none smtp.client-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tuxon.dev
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-41b21ed19f6so515025e9.1
+        for <netdev@vger.kernel.org>; Wed, 24 Apr 2024 04:13:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=tuxon.dev; s=google; t=1713957189; x=1714561989; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=tuS/MeSVaQGd2vfiEhoiZ2JN9TmDlUJ9YDiQAbZPceA=;
+        b=U4bC0ILaFmJVdvpndPiJW3U8Sdg4mc8qmsgR9PcDJbbxXgfYhRdPLfwshaMkCpn3OX
+         s5t6nZCh04hIhOePyXrvPrQinuBElzpyj9ltXAEBbo0kA7qF1bjm2Wrimo7vboKzT9W1
+         rr382YvCm9Fdv/UGBEgFHvr7Q8u+oBXVhUOPFGxprKTJp34yDMK586p9qSH89WghgPK9
+         XCUUFc4r3rfnsdpb3QIlHZBWcHBi2luVsjijKMD/wEp4mNmY9IYrNG778fkkb+o4a2Hn
+         x9/084IGRitRkNtnSrwbpL9eCBWudOUDhFPvKgQWDbWx1OYSWdq0TguTGH3M0E1L+Gbd
+         Pfgg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713957189; x=1714561989;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=tuS/MeSVaQGd2vfiEhoiZ2JN9TmDlUJ9YDiQAbZPceA=;
+        b=w8+XxnTGCq3IfkwiiGmIiXCCgJV/gENQInmHKjolQFJsietFhwhQrxbiOD+vm6BBQS
+         jrpcUoCk8EEUEy2yy1zYZ/C9gQsNt9gE3pkpUno/dI3+A4w6RfR21jKqHXhYvxCx0CGO
+         q8FM+BwhUpNgb4OpIyrHXmjNQ866IL2fPW0esNxJmcXQIKe42gAMPfpWi7F9q1Gn0A8A
+         7nNp6y7vwLFqmTFo+LBn/9kKzVI37sNy57dDlH3JG7+UFGkjhK2mjrPl81mOScQBTQ7v
+         LyWBAvAS5l12ot8kaNbZP8FpHw9owx2EDmQuKGgL5qrwSsY8s3mATNkv1gMG2bEMbfJ3
+         IOMw==
+X-Gm-Message-State: AOJu0YxvTqnpLT1khD9Rd8qADjumB+bwuZsPRtdEk2KavZoAR11GMalA
+	+f5JtgKBZQIins4MlUTkJzDYsWtAevdO2SxUmz7xAKMhGJcSic70PErDS9TQfhU=
+X-Google-Smtp-Source: AGHT+IEsmRMTrmnRs0/q7vNtTTmh6ZDQCCPSXskQm7UUfKPKy/cw9giZEGu9KlhLOwDJB4WZDflq1g==
+X-Received: by 2002:a05:600c:1d0e:b0:41a:c592:64ff with SMTP id l14-20020a05600c1d0e00b0041ac59264ffmr1508645wms.35.1713957188961;
+        Wed, 24 Apr 2024 04:13:08 -0700 (PDT)
+Received: from [192.168.50.4] ([82.78.167.53])
+        by smtp.gmail.com with ESMTPSA id o12-20020a05600c4fcc00b00418a6d62ad0sm27290070wmq.34.2024.04.24.04.13.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 24 Apr 2024 04:13:08 -0700 (PDT)
+Message-ID: <ea74f0f9-2081-4ca5-af11-4974625f22ed@tuxon.dev>
+Date: Wed, 24 Apr 2024 14:13:06 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 00/15] MT7530 DSA Subdriver Improvements Act IV
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171395703172.12181.6567333903825850575.git-patchwork-notify@kernel.org>
-Date: Wed, 24 Apr 2024 11:10:31 +0000
-References: <20240422-for-netnext-mt7530-improvements-4-v2-0-a75157ba76ad@arinc9.com>
-In-Reply-To: <20240422-for-netnext-mt7530-improvements-4-v2-0-a75157ba76ad@arinc9.com>
-To: =?utf-8?b?QXLEsW7DpyDDnE5BTCB2aWEgQjQgUmVsYXkgPGRldm51bGwrYXJpbmMudW5hbC5h?=@codeaurora.org,
-	=?utf-8?b?cmluYzkuY29tQGtlcm5lbC5vcmc+?=@codeaurora.org
-Cc: daniel@makrotopia.org, dqfext@gmail.com, sean.wang@mediatek.com,
- andrew@lunn.ch, f.fainelli@gmail.com, olteanv@gmail.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com,
- linux@armlinux.org.uk, bartel.eerdekens@constell8.be,
- mithat.guner@xeront.com, erkin.bozoglu@xeront.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org, arinc.unal@arinc9.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net: ravb: Fix registered interrupt names
+Content-Language: en-US
+To: Geert Uytterhoeven <geert+renesas@glider.be>,
+ Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>,
+ Sergey Shtylyov <s.shtylyov@omp.ru>,
+ Paul Barker <paul.barker.ct@bp.renesas.com>,
+ =?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org
+References: <cde67b68adf115b3cf0b44c32334ae00b2fbb321.1713944647.git.geert+renesas@glider.be>
+From: claudiu beznea <claudiu.beznea@tuxon.dev>
+In-Reply-To: <cde67b68adf115b3cf0b44c32334ae00b2fbb321.1713944647.git.geert+renesas@glider.be>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hello:
+Hi, Geert,
 
-This series was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
-
-On Mon, 22 Apr 2024 10:15:07 +0300 you wrote:
-> Hello!
+On 24.04.2024 10:45, Geert Uytterhoeven wrote:
+> As interrupts are now requested from ravb_probe(), before calling
+> register_netdev(), ndev->name still contains the template "eth%d",
+> leading to funny names in /proc/interrupts.  E.g. on R-Car E3:
 > 
-> This is the forth patch series with the goal of simplifying the MT7530 DSA
-> subdriver and improving support for MT7530, MT7531, and the switch on the
-> MT7988 SoC.
+> 	89:  0      0  GICv2  93 Level  eth%d:ch22:multi
+> 	90:  0      3  GICv2  95 Level  eth%d:ch24:emac
+> 	91:  0  23484  GICv2  71 Level  eth%d:ch0:rx_be
+> 	92:  0      0  GICv2  72 Level  eth%d:ch1:rx_nc
+> 	93:  0  13735  GICv2  89 Level  eth%d:ch18:tx_be
+> 	94:  0      0  GICv2  90 Level  eth%d:ch19:tx_nc
+
+I failed to notice it, sorry about that.
+
 > 
-> I have done a simple ping test to confirm basic communication on all switch
-> ports on MCM and standalone MT7530, and MT7531 switch with this patch
-> series applied.
+> Worse, on platforms with multiple RAVB instances (e.g. R-Car V4H), all
+> interrupts have similar names.
 > 
-> [...]
+> Fix this by using the device name instead, like is done in several other
+> drivers:
+> 
+> 	89:  0      0  GICv2  93 Level  e6800000.ethernet:ch22:multi
+> 	90:  0      1  GICv2  95 Level  e6800000.ethernet:ch24:emac
+> 	91:  0  28578  GICv2  71 Level  e6800000.ethernet:ch0:rx_be
+> 	92:  0      0  GICv2  72 Level  e6800000.ethernet:ch1:rx_nc
+> 	93:  0  14044  GICv2  89 Level  e6800000.ethernet:ch18:tx_be
+> 	94:  0      0  GICv2  90 Level  e6800000.ethernet:ch19:tx_nc
+> 
+> Rename the local variable dev_name, as it shadows the dev_name()
+> function, and pre-initialize it, to simplify the code.
+> 
+> Fixes: 32f012b8c01ca9fd ("net: ravb: Move getting/requesting IRQs in the probe() method")
+> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
 
-Here is the summary with links:
-  - [net-next,v2,01/15] net: dsa: mt7530: disable EEE abilities on failure on MT7531 and MT7988
-    https://git.kernel.org/netdev/net-next/c/385c22ee4ba4
-  - [net-next,v2,02/15] net: dsa: mt7530: refactor MT7530_PMCR_P()
-    https://git.kernel.org/netdev/net-next/c/883ea1c0ed48
-  - [net-next,v2,03/15] net: dsa: mt7530: rename p5_intf_sel and use only for MT7530 switch
-    https://git.kernel.org/netdev/net-next/c/eeaf9acbfc50
-  - [net-next,v2,04/15] net: dsa: mt7530: rename mt753x_bpdu_port_fw enum to mt753x_to_cpu_fw
-    https://git.kernel.org/netdev/net-next/c/7603a0c7d221
-  - [net-next,v2,05/15] net: dsa: mt7530: refactor MT7530_MFC and MT7531_CFC, add MT7531_QRY_FFP
-    https://git.kernel.org/netdev/net-next/c/9c7401dc1b13
-  - [net-next,v2,06/15] net: dsa: mt7530: refactor MT7530_HWTRAP and MT7530_MHWTRAP
-    https://git.kernel.org/netdev/net-next/c/7c8d14029dff
-  - [net-next,v2,07/15] net: dsa: mt7530: move MT753X_MTRAP operations for MT7530
-    https://git.kernel.org/netdev/net-next/c/377174c5760c
-  - [net-next,v2,08/15] net: dsa: mt7530: return mt7530_setup_mdio & mt7531_setup_common on error
-    https://git.kernel.org/netdev/net-next/c/7bf06bcd946e
-  - [net-next,v2,09/15] net: dsa: mt7530: define MAC speed capabilities per switch model
-    https://git.kernel.org/netdev/net-next/c/6512204b4d5b
-  - [net-next,v2,10/15] net: dsa: mt7530: get rid of function sanity check
-    https://git.kernel.org/netdev/net-next/c/379f7bf864f6
-  - [net-next,v2,11/15] net: dsa: mt7530: refactor MT7530_PMEEECR_P()
-    https://git.kernel.org/netdev/net-next/c/99acfa82ddb1
-  - [net-next,v2,12/15] net: dsa: mt7530: get rid of mac_port_validate member of mt753x_info
-    https://git.kernel.org/netdev/net-next/c/aa16e1fc9ea8
-  - [net-next,v2,13/15] net: dsa: mt7530: use priv->ds->num_ports instead of MT7530_NUM_PORTS
-    https://git.kernel.org/netdev/net-next/c/318c1944710a
-  - [net-next,v2,14/15] net: dsa: mt7530: do not pass port variable to mt7531_rgmii_setup()
-    https://git.kernel.org/netdev/net-next/c/9df9aec174f5
-  - [net-next,v2,15/15] net: dsa: mt7530: explain exposing MDIO bus of MT7531AE better
-    https://git.kernel.org/netdev/net-next/c/bf1774491eea
+Thank you for taking care of it.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Reviewed-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+Tested-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com> # on RZ/G3S
 
 
+> ---
+>  drivers/net/ethernet/renesas/ravb_main.c | 11 +++++------
+>  1 file changed, 5 insertions(+), 6 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
+> index b621ddd4539cf517..384ddad65aaf641a 100644
+> --- a/drivers/net/ethernet/renesas/ravb_main.c
+> +++ b/drivers/net/ethernet/renesas/ravb_main.c
+> @@ -2729,19 +2729,18 @@ static int ravb_setup_irq(struct ravb_private *priv, const char *irq_name,
+>  	struct platform_device *pdev = priv->pdev;
+>  	struct net_device *ndev = priv->ndev;
+>  	struct device *dev = &pdev->dev;
+> -	const char *dev_name;
+> +	const char *devname = dev_name(dev);
+>  	unsigned long flags;
+>  	int error, irq_num;
+>  
+>  	if (irq_name) {
+> -		dev_name = devm_kasprintf(dev, GFP_KERNEL, "%s:%s", ndev->name, ch);
+> -		if (!dev_name)
+> +		devname = devm_kasprintf(dev, GFP_KERNEL, "%s:%s", devname, ch);
+> +		if (!devname)
+>  			return -ENOMEM;
+>  
+>  		irq_num = platform_get_irq_byname(pdev, irq_name);
+>  		flags = 0;
+>  	} else {
+> -		dev_name = ndev->name;
+>  		irq_num = platform_get_irq(pdev, 0);
+>  		flags = IRQF_SHARED;
+>  	}
+> @@ -2751,9 +2750,9 @@ static int ravb_setup_irq(struct ravb_private *priv, const char *irq_name,
+>  	if (irq)
+>  		*irq = irq_num;
+>  
+> -	error = devm_request_irq(dev, irq_num, handler, flags, dev_name, ndev);
+> +	error = devm_request_irq(dev, irq_num, handler, flags, devname, ndev);
+>  	if (error)
+> -		netdev_err(ndev, "cannot request IRQ %s\n", dev_name);
+> +		netdev_err(ndev, "cannot request IRQ %s\n", devname);
+>  
+>  	return error;
+>  }
 
