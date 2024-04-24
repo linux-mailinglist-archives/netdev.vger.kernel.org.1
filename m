@@ -1,73 +1,72 @@
-Return-Path: <netdev+bounces-90747-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90748-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1CD88AFE50
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 04:21:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CADA08AFE53
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 04:23:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A50F41F23576
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 02:21:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 80AA3284B37
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 02:23:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19509C13D;
-	Wed, 24 Apr 2024 02:21:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67C5B125D5;
+	Wed, 24 Apr 2024 02:23:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="NcZsiPc3"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="PSsZxoxe"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
+Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A103BBE4F
-	for <netdev@vger.kernel.org>; Wed, 24 Apr 2024 02:21:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B154C13D
+	for <netdev@vger.kernel.org>; Wed, 24 Apr 2024 02:23:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=72.21.196.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713925311; cv=none; b=alpuJ/8RGkrQar80Bq0fjqJHZI597O5tWMMQmoH041APEC+YprcjnPOhe72Ln0Z/J6fPjGXzgFq8XXReM2xYj2EYyVJxLwTAMYXZDMO6MxcO92399foSfhkIcm23fwC7NEVaXtm1F42TjXCkDd54gGs25s/5ByDCGZu8EvQBkzI=
+	t=1713925422; cv=none; b=D54y0GDdCVthVCN6vquLq6ger9b8oCjIf5lrPfiDt2OsoBZLZTsODpdZwthXwrz4i8Ehd5W1IR27y538n5r+/K8/yQvzTtipCeQThbFutfsZG91nP/TZ2mPj7aigxmBt+4WQa1xQBM7kvFwyVXLtXD++sN1x9ZToVvLN4jQzf/4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713925311; c=relaxed/simple;
-	bh=y9XjZwK78IAYlNgNxrJv6/YNw9YQFDwZdXgrLxxJf2I=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qsSrgLogC4npD+TwDPl6WcnMu9hjWg8zIl5LvvvBlNHH7CaPWT5AnGuz9h9hPXxzbC6t+JdsFpEs++cWNEmmis2K8byfjqsGkYiGum+3dUCrftgOHQyWO3EjcWF0Wdpz29aA6N6ksuAuSr8pLYWhrOWKub+RwSEJHVdZ0MjolUs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=NcZsiPc3; arc=none smtp.client-ip=99.78.197.218
+	s=arc-20240116; t=1713925422; c=relaxed/simple;
+	bh=jrmH7ajdxZ7Q2wiqxFjY9Tj/yKzJZakkbbjUAo5vkOk=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=DTuXN3I1AlRtrXq97dKChdf6zRYuCNKye/sEreGzjjH07LtSj1mGYGxsvCbfv7n4WYMwEDwySD1SB+q9xisFEIAltv50hOM5INQ8sfQj4iTNEqhhWfbp7lIWLAOwCgPITel+Uk72gqpR9YmKXpjwNVzciTeQ2oC3obfgWt9qn7k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=PSsZxoxe; arc=none smtp.client-ip=72.21.196.25
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1713925310; x=1745461310;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=t13F33zq7BP3xMD0eOHg9cV1QMB9y1VusQpUD4KEweQ=;
-  b=NcZsiPc3k9wapYdu4LQJKYqA7Lz/k/C+r3qgS+BmolnQSP86868UsNvy
-   YyWIpqd4EBdRdtdRJyYiGmAr2o+8DeGqCP06kPAfCyfYctbkEf08lMsbE
-   Ejv9uF7zzw6H+8noW/OxJFboCYZczE1g2KhDmFvsWj4K72DAdejWoiZnz
-   o=;
+  t=1713925421; x=1745461421;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=KTPBHs47G4Fp/38NBIdkwsWKHLYagvcARF9irqGfNfo=;
+  b=PSsZxoxef+24sBzgfsefcE06wR4Q0x5xqMbcIShNjugcCCSo2N2HMCNb
+   n+BYx8k3gsx5gOIsMVkdkBn6xQ1bjs2gZJ1gSWvhpHzrxHPqRWDZKinRA
+   BY9UzptIMNqU8bub9f7ZJZW2VlRqJkVnx/EZdUVIXe0JZtBTM30Fk0Q2l
+   4=;
 X-IronPort-AV: E=Sophos;i="6.07,222,1708387200"; 
-   d="scan'208";a="291338877"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2024 02:21:48 +0000
-Received: from EX19MTAUWB001.ant.amazon.com [10.0.38.20:11084]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.23.104:2525] with esmtp (Farcaster)
- id d9e822c2-83cc-4cbf-afd7-f842f863edbd; Wed, 24 Apr 2024 02:21:47 +0000 (UTC)
-X-Farcaster-Flow-ID: d9e822c2-83cc-4cbf-afd7-f842f863edbd
+   d="scan'208";a="396910104"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2024 02:23:37 +0000
+Received: from EX19MTAUWC001.ant.amazon.com [10.0.7.35:64694]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.47.8:2525] with esmtp (Farcaster)
+ id 00e98a88-fa6d-43a4-80a5-ecc51428c1c9; Wed, 24 Apr 2024 02:23:36 +0000 (UTC)
+X-Farcaster-Flow-ID: 00e98a88-fa6d-43a4-80a5-ecc51428c1c9
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Wed, 24 Apr 2024 02:21:46 +0000
+ 15.2.1258.28; Wed, 24 Apr 2024 02:23:33 +0000
 Received: from 88665a182662.ant.amazon.com (10.187.170.62) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Wed, 24 Apr 2024 02:21:44 +0000
+ 15.2.1258.28; Wed, 24 Apr 2024 02:23:31 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <kuniyu@amazon.com>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<kuni1840@gmail.com>, <mhal@rbox.co>, <netdev@vger.kernel.org>,
-	<pabeni@redhat.com>, <syzbot+fa379358c28cc87cc307@syzkaller.appspotmail.com>
-Subject: Re: [PATCH v1 net-next] af_unix: Suppress false-positive lockdep splat for spin_lock() in __unix_gc().
-Date: Tue, 23 Apr 2024 19:21:36 -0700
-Message-ID: <20240424022136.20484-1-kuniyu@amazon.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>
+CC: Michal Luczaj <mhal@rbox.co>, Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Kuniyuki Iwashima <kuni1840@gmail.com>, <netdev@vger.kernel.org>,
+	<syzbot+fa379358c28cc87cc307@syzkaller.appspotmail.com>
+Subject: [PATCH v2 net] af_unix: Suppress false-positive lockdep splat for spin_lock() in __unix_gc().
+Date: Tue, 23 Apr 2024 19:23:19 -0700
+Message-ID: <20240424022319.20574-1-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20240424012648.15553-1-kuniyu@amazon.com>
-References: <20240424012648.15553-1-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,28 +75,165 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D031UWA004.ant.amazon.com (10.13.139.19) To
+X-ClientProxiedBy: EX19D038UWB003.ant.amazon.com (10.13.139.157) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-Date: Tue, 23 Apr 2024 18:26:48 -0700
-> syzbot reported a lockdep splat regarding unix_gc_lock() and
-> unix_state_lock().
-> 
-> One is called from recvmsg() for a connected socket, and another
-> is called from GC for TCP_LISTEN socket.
-> 
-> So, the splat is false-positive.
-> 
-> Let's add a dedicated lock class for the latter to suppress the splat.
-> 
-> Note that this change is not necessary for net-next.git as the issue
-> is only applied to the old GC impl.
-> 
+syzbot reported a lockdep splat regarding unix_gc_lock() and
+unix_state_lock().
 
-Sorry, I wrongly tagged net-next..
+One is called from recvmsg() for a connected socket, and another
+is called from GC for TCP_LISTEN socket.
 
-will resend v2.
+So, the splat is false-positive.
 
-pw-bot: cr
+Let's add a dedicated lock class for the latter to suppress the splat.
+
+Note that this change is not necessary for net-next.git as the issue
+is only applied to the old GC impl.
+
+[0]:
+WARNING: possible circular locking dependency detected
+6.9.0-rc5-syzkaller-00007-g4d2008430ce8 #0 Not tainted
+ -----------------------------------------------------
+kworker/u8:1/11 is trying to acquire lock:
+ffff88807cea4e70 (&u->lock){+.+.}-{2:2}, at: spin_lock include/linux/spinlock.h:351 [inline]
+ffff88807cea4e70 (&u->lock){+.+.}-{2:2}, at: __unix_gc+0x40e/0xf70 net/unix/garbage.c:302
+
+but task is already holding lock:
+ffffffff8f6ab638 (unix_gc_lock){+.+.}-{2:2}, at: spin_lock include/linux/spinlock.h:351 [inline]
+ffffffff8f6ab638 (unix_gc_lock){+.+.}-{2:2}, at: __unix_gc+0x117/0xf70 net/unix/garbage.c:261
+
+which lock already depends on the new lock.
+
+the existing dependency chain (in reverse order) is:
+
+ -> #1 (unix_gc_lock){+.+.}-{2:2}:
+       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5754
+       __raw_spin_lock include/linux/spinlock_api_smp.h:133 [inline]
+       _raw_spin_lock+0x2e/0x40 kernel/locking/spinlock.c:154
+       spin_lock include/linux/spinlock.h:351 [inline]
+       unix_notinflight+0x13d/0x390 net/unix/garbage.c:140
+       unix_detach_fds net/unix/af_unix.c:1819 [inline]
+       unix_destruct_scm+0x221/0x350 net/unix/af_unix.c:1876
+       skb_release_head_state+0x100/0x250 net/core/skbuff.c:1188
+       skb_release_all net/core/skbuff.c:1200 [inline]
+       __kfree_skb net/core/skbuff.c:1216 [inline]
+       kfree_skb_reason+0x16d/0x3b0 net/core/skbuff.c:1252
+       kfree_skb include/linux/skbuff.h:1262 [inline]
+       manage_oob net/unix/af_unix.c:2672 [inline]
+       unix_stream_read_generic+0x1125/0x2700 net/unix/af_unix.c:2749
+       unix_stream_splice_read+0x239/0x320 net/unix/af_unix.c:2981
+       do_splice_read fs/splice.c:985 [inline]
+       splice_file_to_pipe+0x299/0x500 fs/splice.c:1295
+       do_splice+0xf2d/0x1880 fs/splice.c:1379
+       __do_splice fs/splice.c:1436 [inline]
+       __do_sys_splice fs/splice.c:1652 [inline]
+       __se_sys_splice+0x331/0x4a0 fs/splice.c:1634
+       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+       do_syscall_64+0xf5/0x240 arch/x86/entry/common.c:83
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+ -> #0 (&u->lock){+.+.}-{2:2}:
+       check_prev_add kernel/locking/lockdep.c:3134 [inline]
+       check_prevs_add kernel/locking/lockdep.c:3253 [inline]
+       validate_chain+0x18cb/0x58e0 kernel/locking/lockdep.c:3869
+       __lock_acquire+0x1346/0x1fd0 kernel/locking/lockdep.c:5137
+       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5754
+       __raw_spin_lock include/linux/spinlock_api_smp.h:133 [inline]
+       _raw_spin_lock+0x2e/0x40 kernel/locking/spinlock.c:154
+       spin_lock include/linux/spinlock.h:351 [inline]
+       __unix_gc+0x40e/0xf70 net/unix/garbage.c:302
+       process_one_work kernel/workqueue.c:3254 [inline]
+       process_scheduled_works+0xa10/0x17c0 kernel/workqueue.c:3335
+       worker_thread+0x86d/0xd70 kernel/workqueue.c:3416
+       kthread+0x2f0/0x390 kernel/kthread.c:388
+       ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+
+other info that might help us debug this:
+
+ Possible unsafe locking scenario:
+
+       CPU0                    CPU1
+       ----                    ----
+  lock(unix_gc_lock);
+                               lock(&u->lock);
+                               lock(unix_gc_lock);
+  lock(&u->lock);
+
+ *** DEADLOCK ***
+
+3 locks held by kworker/u8:1/11:
+ #0: ffff888015089148 ((wq_completion)events_unbound){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3229 [inline]
+ #0: ffff888015089148 ((wq_completion)events_unbound){+.+.}-{0:0}, at: process_scheduled_works+0x8e0/0x17c0 kernel/workqueue.c:3335
+ #1: ffffc90000107d00 (unix_gc_work){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3230 [inline]
+ #1: ffffc90000107d00 (unix_gc_work){+.+.}-{0:0}, at: process_scheduled_works+0x91b/0x17c0 kernel/workqueue.c:3335
+ #2: ffffffff8f6ab638 (unix_gc_lock){+.+.}-{2:2}, at: spin_lock include/linux/spinlock.h:351 [inline]
+ #2: ffffffff8f6ab638 (unix_gc_lock){+.+.}-{2:2}, at: __unix_gc+0x117/0xf70 net/unix/garbage.c:261
+
+stack backtrace:
+CPU: 0 PID: 11 Comm: kworker/u8:1 Not tainted 6.9.0-rc5-syzkaller-00007-g4d2008430ce8 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
+Workqueue: events_unbound __unix_gc
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0x241/0x360 lib/dump_stack.c:114
+ check_noncircular+0x36a/0x4a0 kernel/locking/lockdep.c:2187
+ check_prev_add kernel/locking/lockdep.c:3134 [inline]
+ check_prevs_add kernel/locking/lockdep.c:3253 [inline]
+ validate_chain+0x18cb/0x58e0 kernel/locking/lockdep.c:3869
+ __lock_acquire+0x1346/0x1fd0 kernel/locking/lockdep.c:5137
+ lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5754
+ __raw_spin_lock include/linux/spinlock_api_smp.h:133 [inline]
+ _raw_spin_lock+0x2e/0x40 kernel/locking/spinlock.c:154
+ spin_lock include/linux/spinlock.h:351 [inline]
+ __unix_gc+0x40e/0xf70 net/unix/garbage.c:302
+ process_one_work kernel/workqueue.c:3254 [inline]
+ process_scheduled_works+0xa10/0x17c0 kernel/workqueue.c:3335
+ worker_thread+0x86d/0xd70 kernel/workqueue.c:3416
+ kthread+0x2f0/0x390 kernel/kthread.c:388
+ ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+ </TASK>
+
+Fixes: 47d8ac011fe1 ("af_unix: Fix garbage collector racing against connect()")
+Reported-and-tested-by: syzbot+fa379358c28cc87cc307@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=fa379358c28cc87cc307
+Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+---
+ include/net/af_unix.h | 3 +++
+ net/unix/garbage.c    | 2 +-
+ 2 files changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/include/net/af_unix.h b/include/net/af_unix.h
+index 627ea8e2d915..3dee0b2721aa 100644
+--- a/include/net/af_unix.h
++++ b/include/net/af_unix.h
+@@ -85,6 +85,9 @@ enum unix_socket_lock_class {
+ 	U_LOCK_NORMAL,
+ 	U_LOCK_SECOND,	/* for double locking, see unix_state_double_lock(). */
+ 	U_LOCK_DIAG, /* used while dumping icons, see sk_diag_dump_icons(). */
++	U_LOCK_GC_LISTENER, /* used for listening socket while determining gc
++			     * candidates to close a small race window.
++			     */
+ };
+ 
+ static inline void unix_state_lock_nested(struct sock *sk,
+diff --git a/net/unix/garbage.c b/net/unix/garbage.c
+index 6433a414acf8..0104be9d4704 100644
+--- a/net/unix/garbage.c
++++ b/net/unix/garbage.c
+@@ -299,7 +299,7 @@ static void __unix_gc(struct work_struct *work)
+ 			__set_bit(UNIX_GC_MAYBE_CYCLE, &u->gc_flags);
+ 
+ 			if (sk->sk_state == TCP_LISTEN) {
+-				unix_state_lock(sk);
++				unix_state_lock_nested(sk, U_LOCK_GC_LISTENER);
+ 				unix_state_unlock(sk);
+ 			}
+ 		}
+-- 
+2.30.2
+
 
