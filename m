@@ -1,129 +1,182 @@
-Return-Path: <netdev+bounces-91009-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91010-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BAC858B0F66
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 18:09:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27B048B0F6E
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 18:12:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 01FF4B27FA5
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 16:06:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D1AF1294BFD
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 16:11:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7092F1607B8;
-	Wed, 24 Apr 2024 16:06:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="QWF3TD5D"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F50416078B;
+	Wed, 24 Apr 2024 16:11:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC3CA15E1EA;
-	Wed, 24 Apr 2024 16:06:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C5B513D893;
+	Wed, 24 Apr 2024 16:11:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713974811; cv=none; b=NOI0qQ83BBhGNZpzjQx0ypvnXsoSLoUNeLp5xhxgK96l7wCAkWvL7Qf/u+P41JeGBZ67XSiAf2+OpPgAjaPRkOBrqDBKOEBIE+T1hp7VaMOsFIERPWr18uw2790wTc7aXvKBheE85JQ4UUaPsLFZtO5pt+iRgc8lobXK1z2G/VA=
+	t=1713975117; cv=none; b=FojNT8BKOfia4ENK6Ml6L9l5ijDovb9A1SVlkWWJJ3bLfWZZSSm+BKQPyWkxvwPuE2rFNq2Y5C/WPSu2bCGREqwv0TN/AYuUFIOTUc+NoVKGUqoNEq0PEzfEDqEJfvGXmxNCtOLQsgSVFAM1s8RUm2IzF+hm7f5SWk8FqIz8EEE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713974811; c=relaxed/simple;
-	bh=pV+VrxGvpBc3cztS2k/grcbxt+d6cI6f1QkR7t0g/z8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qVPvVP8uAV1MgfmWujzQTQ/8O1TucS9Sjra3NCIhs95qJChoh0Hg4YDkc4hmlRm6s/3tb/CpmypVMJiFQtsPZwBFNCVObF9iabNVa10P0m8+sCcSR/4ZQvkjeKEu8z63pAFId8qod+YiKVo3rEgGJi7Ohlp+RI7DWI7H8tnkeiQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=QWF3TD5D; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 3C07440E0177;
-	Wed, 24 Apr 2024 16:06:44 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id a1whXnU_urG2; Wed, 24 Apr 2024 16:06:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1713974800; bh=eT/sJrq6XNpXYldhLxOFeSR6n1DYq3NDJUftCdjBaNE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=QWF3TD5DfjsDxjpmOqQmkDBvJqmy2ArfExGwOQxTl1ZUOlBsHM9dtYnlQhG69Fb/7
-	 iE8KAkqTm0OoHa0sqEnqNWcuhISoAq6YJGJLh2CTI2HJoTz0gwL3sxig0eL2t+XY2M
-	 7wcaIOfeHdUmZE9oVDfrIbgjpsMl6j0NStBevpmYsILuDiK2NinFpnprFt/Kj8uVA+
-	 CgGjjZ6BKlhY91FWBu4lXYHoICXTM/XrlbZghwGMPwi39FaWBenySPfMaq7snqnjLK
-	 DHGyOx9XcOjdHxhTvqrGTHO6iAOOp87i4FR5e4l8X/niXuR8947AHiBMYDsv+0p+ie
-	 t5by9FFOxn4v6FEVb6CCDgwFRUmOGmr9k5AGdoH/POcu1MD+4/6NYOsUNYV5EDjOg5
-	 PPfjXhZSgcHT6hAu1FyqGHmnFr86tOFQDX/vQ0hzX5nqQ/zkc40g+B1+8fLb8NhoeS
-	 sgaTO3Iq/7BGdS5CLYN1eCV/iCM3MzN8rlDKiRcnn3IIlulziuBtI2Sv48bI4kC/Xl
-	 AOXtU65xrJi/MHNBROsVykmeh3rLJlX0/ypKzomYRUxao3j+puNaybZVeElC4NGJWW
-	 ciPuepgMBQQkbIYhb89WOO2YsKOgl5TanEh8YSI9J8FxddQFkWw/8nsJP1lF9kclVP
-	 nGSR16o2/oCj2/GI5CzL2t9k=
-Received: from zn.tnic (pd953020b.dip0.t-ipconnect.de [217.83.2.11])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id C440840E0192;
-	Wed, 24 Apr 2024 16:06:13 +0000 (UTC)
-Date: Wed, 24 Apr 2024 18:06:08 +0200
-From: Borislav Petkov <bp@alien8.de>
-To: Alexey Makhalov <alexey.makhalov@broadcom.com>
-Cc: linux-kernel@vger.kernel.org, virtualization@lists.linux.dev,
-	hpa@zytor.com, dave.hansen@linux.intel.com, mingo@redhat.com,
-	tglx@linutronix.de, x86@kernel.org, netdev@vger.kernel.org,
-	richardcochran@gmail.com, linux-input@vger.kernel.org,
-	dmitry.torokhov@gmail.com, zackr@vmware.com,
-	linux-graphics-maintainer@vmware.com, pv-drivers@vmware.com,
-	timothym@vmware.com, akaher@vmware.com,
-	dri-devel@lists.freedesktop.org, daniel@ffwll.ch, airlied@gmail.com,
-	tzimmermann@suse.de, mripard@kernel.org,
-	maarten.lankhorst@linux.intel.com, horms@kernel.org,
-	kirill.shutemov@linux.intel.com, Nadav Amit <nadav.amit@gmail.com>
-Subject: Re: [PATCH v8 1/7] x86/vmware: Move common macros to vmware.h
-Message-ID: <20240424160608.GFZikt8JLrTN4M5PG2@fat_crate.local>
-References: <20240422225656.10309-1-alexey.makhalov@broadcom.com>
- <20240422225656.10309-2-alexey.makhalov@broadcom.com>
+	s=arc-20240116; t=1713975117; c=relaxed/simple;
+	bh=GOoBxOlaIpmwICZK4WCVIt4VRYe8AudVtzbqmGtnuwo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=u1SoQF2cofIqJU24hAIp5cl6G9as/MzQn9h2GFXG2JMM5hn1GEWlHRd6UC63kdEe7SUElYEmsSXiSKXUNIdJQwyIIHdA0exG7dYMNK7n2/7ZRV9JCSkTPDqK62fP1GZxZIJ+jzyhu0m2oSb/R84OxNMFTyNPeGKPISVKobiGT+k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-57222fc625aso1969334a12.3;
+        Wed, 24 Apr 2024 09:11:54 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713975113; x=1714579913;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=N9Ytp1zYNtgWI9LiOFGXnBvOw75e8b/kBgDs3orvXtc=;
+        b=qk34nm37Msi386mL3VHEXAM4vwraOAt7iB2UOt2z4cEHbA9n2jjoLFTFKD9vt0TF+4
+         VubzmI/40jIlocpN0NTQPSI7tG5GLKV39Xz6m1/gPqulMHGhES61IVDWWSt4MEfubaNE
+         ri2w9n7UoX2xoSREM/Ff5fT6MczlJzSt6HDMvy/s0Qxg6qcBow8BVygfO3yL1DwMm5yn
+         N9JFJB076y/oAwYGEDke2kHO9UU215iBxqsPOwk3EtjjOthxlWuppIXae9gNynBYKhz1
+         e5AnZRFN+pHkBqeU96LD4jMDd9ke71nFJVWcigf5xxgP+Wruf6VlKB1a7onNCZ4PmZ6+
+         KXaQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUki35BpZHdWSsjg8BA8ssSO2mzhYyw+/Jxef0xQ6JEZdVZEXypDFjFvM2qssq2/DhIEwlzj5XArRkZlNMw4Yj3K5VVI9srKC0xfZL7JiZz5hFESBFtDr6tNPmSwD9i6oMhIuxO
+X-Gm-Message-State: AOJu0YxfRcDlSlHgBhYPkM9cvKCJB4F8z8Om8nLK+Yjd1MFRmai84VMC
+	bAniZaohtlR+18pq2af+NKj1qldNUhgJfT7zNFmE3XT69ILIdR8d
+X-Google-Smtp-Source: AGHT+IExvaCXYmWGV1a44vGm02+XchJsxnbF0StXY1lQmClYXTH6GQ+7+l/4M6FWk+LO0PHH5HLuOw==
+X-Received: by 2002:a17:906:a114:b0:a55:b810:8678 with SMTP id t20-20020a170906a11400b00a55b8108678mr2700110ejy.23.1713975113289;
+        Wed, 24 Apr 2024 09:11:53 -0700 (PDT)
+Received: from localhost (fwdproxy-lla-000.fbsv.net. [2a03:2880:30ff::face:b00c])
+        by smtp.gmail.com with ESMTPSA id ww4-20020a170907084400b00a51d88e6164sm8497371ejb.203.2024.04.24.09.11.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 24 Apr 2024 09:11:52 -0700 (PDT)
+From: Breno Leitao <leitao@debian.org>
+To: Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>,
+	Chiranjeevi Rapolu <chiranjeevi.rapolu@linux.intel.com>,
+	Liu Haijun <haijun.liu@mediatek.com>,
+	M Chetan Kumar <m.chetan.kumar@linux.intel.com>,
+	Ricardo Martinez <ricardo.martinez@linux.intel.com>,
+	Loic Poulain <loic.poulain@linaro.org>,
+	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: leit@meta.com,
+	netdev@vger.kernel.org (open list:MEDIATEK T7XX 5G WWAN MODEM DRIVER),
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH net-next] net: wwan: t7xx: Un-embed dummy device
+Date: Wed, 24 Apr 2024 09:11:07 -0700
+Message-ID: <20240424161108.3397057-1-leitao@debian.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240422225656.10309-2-alexey.makhalov@broadcom.com>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Apr 22, 2024 at 03:56:50PM -0700, Alexey Makhalov wrote:
-> Move VMware hypercall macros to vmware.h. This is a prerequisite for
-> the introduction of vmware_hypercall API. No functional changes besides
-> exporting vmware_hypercall_mode symbol.
+Embedding net_device into structures prohibits the usage of flexible
+arrays in the net_device structure. For more details, see the discussion
+at [1].
 
-Well, I see more.
+Un-embed the net_device from the private struct by converting it
+into a pointer. Then use the leverage the new alloc_netdev_dummy()
+helper to allocate and initialize dummy devices.
 
-So code movement patches should be done this way:
+[1] https://lore.kernel.org/all/20240229225910.79e224cf@kernel.org/
 
-* first patch: sole code movement, no changes whatsoever
+Signed-off-by: Breno Leitao <leitao@debian.org>
+--
+PS: This was compile-tested only due to lack of hardware.
+---
+ drivers/net/wwan/t7xx/t7xx_netdev.c | 20 ++++++++++++++++----
+ drivers/net/wwan/t7xx/t7xx_netdev.h |  2 +-
+ 2 files changed, 17 insertions(+), 5 deletions(-)
 
-* follow-on patches: add changes and explain them
-
-Because... (follow me down)...
-
-> @@ -476,8 +431,8 @@ static bool __init vmware_legacy_x2apic_available(void)
->  {
->  	uint32_t eax, ebx, ecx, edx;
->  	VMWARE_CMD(GETVCPU_INFO, eax, ebx, ecx, edx);
-> -	return !(eax & BIT(VMWARE_CMD_VCPU_RESERVED)) &&
-> -		(eax & BIT(VMWARE_CMD_LEGACY_X2APIC));
-> +	return !(eax & BIT(VCPU_RESERVED)) &&
-> +		(eax & BIT(VCPU_LEGACY_X2APIC));
-
-... what is that change for?
-
-Those bit definitions are clearly vmware-specific. So why are you
-changing them to something generic-ish?
-
-In any case, this patch needs to be split as outlined above.
-
-Thx.
-
+diff --git a/drivers/net/wwan/t7xx/t7xx_netdev.c b/drivers/net/wwan/t7xx/t7xx_netdev.c
+index 3ef4a8a4f8fd..91fa082e9cab 100644
+--- a/drivers/net/wwan/t7xx/t7xx_netdev.c
++++ b/drivers/net/wwan/t7xx/t7xx_netdev.c
+@@ -253,22 +253,27 @@ static void t7xx_ccmni_wwan_setup(struct net_device *dev)
+ 	dev->netdev_ops = &ccmni_netdev_ops;
+ }
+ 
+-static void t7xx_init_netdev_napi(struct t7xx_ccmni_ctrl *ctlb)
++static int t7xx_init_netdev_napi(struct t7xx_ccmni_ctrl *ctlb)
+ {
+ 	int i;
+ 
+ 	/* one HW, but shared with multiple net devices,
+ 	 * so add a dummy device for NAPI.
+ 	 */
+-	init_dummy_netdev(&ctlb->dummy_dev);
++	ctlb->dummy_dev = alloc_netdev_dummy(0);
++	if (!ctlb->dummy_dev)
++		return -ENOMEM;
++
+ 	atomic_set(&ctlb->napi_usr_refcnt, 0);
+ 	ctlb->is_napi_en = false;
+ 
+ 	for (i = 0; i < RXQ_NUM; i++) {
+ 		ctlb->napi[i] = &ctlb->hif_ctrl->rxq[i].napi;
+-		netif_napi_add_weight(&ctlb->dummy_dev, ctlb->napi[i], t7xx_dpmaif_napi_rx_poll,
++		netif_napi_add_weight(ctlb->dummy_dev, ctlb->napi[i], t7xx_dpmaif_napi_rx_poll,
+ 				      NIC_NAPI_POLL_BUDGET);
+ 	}
++
++	return 0;
+ }
+ 
+ static void t7xx_uninit_netdev_napi(struct t7xx_ccmni_ctrl *ctlb)
+@@ -279,6 +284,7 @@ static void t7xx_uninit_netdev_napi(struct t7xx_ccmni_ctrl *ctlb)
+ 		netif_napi_del(ctlb->napi[i]);
+ 		ctlb->napi[i] = NULL;
+ 	}
++	free_netdev(ctlb->dummy_dev);
+ }
+ 
+ static int t7xx_ccmni_wwan_newlink(void *ctxt, struct net_device *dev, u32 if_id,
+@@ -480,6 +486,7 @@ int t7xx_ccmni_init(struct t7xx_pci_dev *t7xx_dev)
+ {
+ 	struct device *dev = &t7xx_dev->pdev->dev;
+ 	struct t7xx_ccmni_ctrl *ctlb;
++	int ret;
+ 
+ 	ctlb = devm_kzalloc(dev, sizeof(*ctlb), GFP_KERNEL);
+ 	if (!ctlb)
+@@ -495,7 +502,12 @@ int t7xx_ccmni_init(struct t7xx_pci_dev *t7xx_dev)
+ 	if (!ctlb->hif_ctrl)
+ 		return -ENOMEM;
+ 
+-	t7xx_init_netdev_napi(ctlb);
++	ret = t7xx_init_netdev_napi(ctlb);
++	if (ret) {
++		t7xx_dpmaif_hif_exit(ctlb->hif_ctrl);
++		return ret;
++	}
++
+ 	init_md_status_notifier(t7xx_dev);
+ 	return 0;
+ }
+diff --git a/drivers/net/wwan/t7xx/t7xx_netdev.h b/drivers/net/wwan/t7xx/t7xx_netdev.h
+index f5ed6f99a145..b18312f49844 100644
+--- a/drivers/net/wwan/t7xx/t7xx_netdev.h
++++ b/drivers/net/wwan/t7xx/t7xx_netdev.h
+@@ -48,7 +48,7 @@ struct t7xx_ccmni_ctrl {
+ 	unsigned int			md_sta;
+ 	struct t7xx_fsm_notifier	md_status_notify;
+ 	bool				wwan_is_registered;
+-	struct net_device		dummy_dev;
++	struct net_device		*dummy_dev;
+ 	struct napi_struct		*napi[RXQ_NUM];
+ 	atomic_t			napi_usr_refcnt;
+ 	bool				is_napi_en;
 -- 
-Regards/Gruss,
-    Boris.
+2.43.0
 
-https://people.kernel.org/tglx/notes-about-netiquette
 
