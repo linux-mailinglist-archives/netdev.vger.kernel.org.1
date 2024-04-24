@@ -1,194 +1,239 @@
-Return-Path: <netdev+bounces-90734-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90735-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7976A8AFDC6
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 03:25:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94E998AFDD0
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 03:27:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 970CEB242C1
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 01:25:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DC96C1F213B0
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 01:27:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A89BC6139;
-	Wed, 24 Apr 2024 01:24:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 326D56112;
+	Wed, 24 Apr 2024 01:27:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R18UYbfH"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="kyrqHui2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f174.google.com (mail-yw1-f174.google.com [209.85.128.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-9106.amazon.com (smtp-fw-9106.amazon.com [207.171.188.206])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F8E75695;
-	Wed, 24 Apr 2024 01:24:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74D9D1BF2B
+	for <netdev@vger.kernel.org>; Wed, 24 Apr 2024 01:27:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713921894; cv=none; b=NJpjG2sOFXznpg/RkhslPKC8J1P0Lnhw/Zqen9PxEHiv/C/30M/Ah5IZWpfn1cSw1wARx1peahjpgAaFxuOzTp61onH2CMfW6hyEAtaLZQwvl+KAG4hVAHFtDhPIPmbHUJgk53BbhUZuNuwonOrLcGapOznSL7lSJT4650gdJ4c=
+	t=1713922029; cv=none; b=SoJhGu5Rj1G3ZSPtas6AsOXa+MPj5Ws+2VdRl996TPGswhcXziDJw3DESWoplOV+5g/jc8agjfyaC9KMiAEy50u6jHB9/uD7u7hty20J3HR8iH1ZCDhMpR+kpdRnwfKqFpDOHELgP6g+nn77yHqkWY3aH2OLt3sZRuKvRbXZWL8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713921894; c=relaxed/simple;
-	bh=g2euHgv+u1HrhsRlYkjqccKAEn+4TDFzMWh6/w2TmZ0=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=AMxeE+OKO2JxFjAE0QT5Uixa1p4GheMfeURL73jk7J7/MdHLPP52YVezveCBcEWB9rA+Rh3cEL/oA4NEI8XQvgZOxEXnWYSP0bD3w6k2Vkwbq1EuAwfXMc+9MYEhxru211uo8RmA30I9924UroXjbJUemfksUdwLebUQFB9ZasQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R18UYbfH; arc=none smtp.client-ip=209.85.128.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-615019cd427so50865907b3.3;
-        Tue, 23 Apr 2024 18:24:52 -0700 (PDT)
+	s=arc-20240116; t=1713922029; c=relaxed/simple;
+	bh=jrmH7ajdxZ7Q2wiqxFjY9Tj/yKzJZakkbbjUAo5vkOk=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=H0xldN48yEE4uT37orSpsMOW9VS3XSvZ9dJVIbrI1lwWScakrsWB9skfp3mpluqIxN2sjnLqj6geU/Ba8cIXEI8KLFNr5U++Yr3iVhPSpy+n5fYQJmrTHVkCameYMHmvB1GwsmeZee7SYqS/H70DtFRKHEpKgYuW+5XsBWKQs0M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=kyrqHui2; arc=none smtp.client-ip=207.171.188.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713921892; x=1714526692; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=g2euHgv+u1HrhsRlYkjqccKAEn+4TDFzMWh6/w2TmZ0=;
-        b=R18UYbfHTNPvvZ6dVkuMofYdzTljjrrcP3O+todHqthzNhvKmgZnhz90NRDKW0mL0x
-         h3d77joaYfr7ie4ZBpynvp+4VM2ZM/ugboOfEkc9BoCYGP4SFAWKMdWh1yUdp1wDBku+
-         vkNJuZrBe0TgAMb87GIjvuILhw6aLEyPHrIyT1AxeDja5H6/OjnxflsgpeBBHYo+4h8T
-         SOFCKYZYy95uKmvEnKR4rlEC3bMtYpD0gkZ7H0iH/XLga8Z0Olb18sWq2Gfh9qLMnfhl
-         CkmpXymmLPzJF5z5FccKg+WluI41qikNca2xdjKz77Vg4r49TQvrgC1q+iex8F57VBUN
-         Liog==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713921892; x=1714526692;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=g2euHgv+u1HrhsRlYkjqccKAEn+4TDFzMWh6/w2TmZ0=;
-        b=oV9k4LXQnLcj9+DCOXtO1SyDIyjVupyknlk+tULCvRr+fUida5Lb9JThCdqQuSbBkd
-         WL5GaNcbqdczCCiFrk6m6yvlvowICSzlH0Dw09Wb7ESRaLBDA9Nl8suIBQCw8Ky67fF3
-         Pv+qc67KOWWo1AjBHr/DATNDn1pfiimiQJ/qAgvec1t3aH0mBvwpEP+armsxYdScTKke
-         NbkVkcBh30pQYu5WMgErcw9eaMiziEBpy4YjDBW9vWlk7+jwWm7BXI0gfQiE4wXEeFf0
-         amAyGMyNgaOhx1bIO11U8ft+MhA7MCESADaVD+1tNHjZOKd0TZyWqOWCucfnt9HPQL2a
-         Ba4g==
-X-Forwarded-Encrypted: i=1; AJvYcCW7Z14Ebe2sfWBwJ2di/iudug6lKXcJmNqeF9NJuWxh9jBjyBWcEMB4ZY7B4Qyd/O7ZD5K8nSlgHL8CgMP+LcqHMVuh6Am5ytQVgIlS
-X-Gm-Message-State: AOJu0YzpRoINHHgRqBGy1eDXdDgobGHzw0dLdlwCjI40a9YN2Xy9EEx6
-	OzjO9GlYJaoYrDcM9I208j1R7C8JGZ5Yvg7J2CHY/wYFJxO7+FiU
-X-Google-Smtp-Source: AGHT+IFlOTIokBwIIGQQn7gMAI89XHKSgpOr9CpuGazblPnQR5r3xgr40lSSWK3gZaSorqqSdupmmw==
-X-Received: by 2002:a05:690c:6f0f:b0:61b:12:a587 with SMTP id jd15-20020a05690c6f0f00b0061b0012a587mr1294230ywb.3.1713921892021;
-        Tue, 23 Apr 2024 18:24:52 -0700 (PDT)
-Received: from localhost (164.146.150.34.bc.googleusercontent.com. [34.150.146.164])
-        by smtp.gmail.com with ESMTPSA id f12-20020ac8498c000000b0043496744c5dsm5662122qtq.52.2024.04.23.18.24.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Apr 2024 18:24:51 -0700 (PDT)
-Date: Tue, 23 Apr 2024 21:24:51 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Felix Fietkau <nbd@nbd.name>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Eric Dumazet <edumazet@google.com>
-Cc: netdev@vger.kernel.org, 
- "David S. Miller" <davem@davemloft.net>, 
- Jakub Kicinski <kuba@kernel.org>, 
- David Ahern <dsahern@kernel.org>, 
- linux-kernel@vger.kernel.org
-Message-ID: <66285f637bdec_1924cc2941b@willemb.c.googlers.com.notmuch>
-In-Reply-To: <328ab7b3-4890-4e0d-8b9a-fed7700f1a6a@nbd.name>
-References: <20240423094117.93206-1-nbd@nbd.name>
- <CANn89i+6xRe4V6aDmD-9EM0uD7A87f6rzg3S7Xq6-NaB_Mb4nw@mail.gmail.com>
- <63abfa26-d990-46c3-8982-3eaf7b8f8ee5@nbd.name>
- <CANn89iJZvoKVB+AK1_44gki2pHyigyMLXFkyevSQpH3iDbnCvw@mail.gmail.com>
- <7476374f-cf0c-45d0-8100-1b2cd2f290d5@nbd.name>
- <CANn89iLddm704LHPDnnoF2RbCfvrivAz0e6HTeiBARmvzoUBjA@mail.gmail.com>
- <ebe85dca-e0e9-4c55-a15d-20d340f66848@nbd.name>
- <97f10c8b5b615eac8f65d67ef10928d97b6b760d.camel@redhat.com>
- <328ab7b3-4890-4e0d-8b9a-fed7700f1a6a@nbd.name>
-Subject: Re: [RFC] net: add TCP fraglist GRO support
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1713922028; x=1745458028;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=KTPBHs47G4Fp/38NBIdkwsWKHLYagvcARF9irqGfNfo=;
+  b=kyrqHui2ntHwdaqm++K4b20uVMHHQE2HywUdSZp9Qg8X4QUsDOZhmSns
+   cJ8dab3uS708ab0MoTNujhpK69d1NXR62I+zInoKyO4qQ944k0ykc44U/
+   8/NvVGg6KndFPrihmWGMRNPmrKSpSyPbzUs9i8zyiZ2m0p6A3bifibFst
+   c=;
+X-IronPort-AV: E=Sophos;i="6.07,222,1708387200"; 
+   d="scan'208";a="721065259"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-9106.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2024 01:27:02 +0000
+Received: from EX19MTAUWB001.ant.amazon.com [10.0.38.20:43792]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.52.56:2525] with esmtp (Farcaster)
+ id e71157f1-4211-4f76-9f99-fcee1bf6af40; Wed, 24 Apr 2024 01:27:01 +0000 (UTC)
+X-Farcaster-Flow-ID: e71157f1-4211-4f76-9f99-fcee1bf6af40
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Wed, 24 Apr 2024 01:27:00 +0000
+Received: from 88665a182662.ant.amazon.com (10.187.170.62) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Wed, 24 Apr 2024 01:26:58 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>
+CC: Michal Luczaj <mhal@rbox.co>, Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Kuniyuki Iwashima <kuni1840@gmail.com>, <netdev@vger.kernel.org>,
+	<syzbot+fa379358c28cc87cc307@syzkaller.appspotmail.com>
+Subject: [PATCH v1 net-next] af_unix: Suppress false-positive lockdep splat for spin_lock() in __unix_gc().
+Date: Tue, 23 Apr 2024 18:26:48 -0700
+Message-ID: <20240424012648.15553-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D040UWA002.ant.amazon.com (10.13.139.113) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-Felix Fietkau wrote:
-> On 23.04.24 16:34, Paolo Abeni wrote:
-> > On Tue, 2024-04-23 at 14:23 +0200, Felix Fietkau wrote:
-> >> On 23.04.24 14:11, Eric Dumazet wrote:
-> >> > On Tue, Apr 23, 2024 at 1:55=E2=80=AFPM Felix Fietkau <nbd@nbd.nam=
-e> wrote:
-> >> > > =
+syzbot reported a lockdep splat regarding unix_gc_lock() and
+unix_state_lock().
 
-> >> > > In the world of consumer-grade WiFi devices, there are a lot of =
-chipsets
-> >> > > with limited or nonexistent SG support, and very limited checksu=
-m
-> >> > > offload capabilities on Ethernet. The WiFi side of these devices=
- is
-> >> > > often even worse. I think fraglist GRO is a decent fallback for =
-the
-> >> > > inevitable corner cases.
-> >> > =
+One is called from recvmsg() for a connected socket, and another
+is called from GC for TCP_LISTEN socket.
 
-> >> > What about netfilter and NAT ? Are they okay with NETIF_F_FRAGLIST=
-_GRO already ?
-> >> > =
+So, the splat is false-positive.
 
-> >> > Many of these devices are probably using NAT.
-> >> =
+Let's add a dedicated lock class for the latter to suppress the splat.
 
-> >> In my tests, nftables NAT works just fine, both with and without =
+Note that this change is not necessary for net-next.git as the issue
+is only applied to the old GC impl.
 
-> >> flowtable offloading. I didn't see anything in netfilter that would =
-have =
+[0]:
+WARNING: possible circular locking dependency detected
+6.9.0-rc5-syzkaller-00007-g4d2008430ce8 #0 Not tainted
+ -----------------------------------------------------
+kworker/u8:1/11 is trying to acquire lock:
+ffff88807cea4e70 (&u->lock){+.+.}-{2:2}, at: spin_lock include/linux/spinlock.h:351 [inline]
+ffff88807cea4e70 (&u->lock){+.+.}-{2:2}, at: __unix_gc+0x40e/0xf70 net/unix/garbage.c:302
 
-> >> a problem with this.
-> > =
+but task is already holding lock:
+ffffffff8f6ab638 (unix_gc_lock){+.+.}-{2:2}, at: spin_lock include/linux/spinlock.h:351 [inline]
+ffffffff8f6ab638 (unix_gc_lock){+.+.}-{2:2}, at: __unix_gc+0x117/0xf70 net/unix/garbage.c:261
 
-> > I see you handle explicitly NAT changes in __tcpv4_gso_segment_csum()=
-,
-> > like the current UDP code.
-> > =
+which lock already depends on the new lock.
 
-> > The TCP header has many other fields that could be updated affecting
-> > the TCP csum.
-> > Handling every possible mutation looks cumbersome and will likely
-> > reduce the performance benefits.
-> > =
+the existing dependency chain (in reverse order) is:
 
-> > What is your plan WRT other TCP header fields update?
-> =
+ -> #1 (unix_gc_lock){+.+.}-{2:2}:
+       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5754
+       __raw_spin_lock include/linux/spinlock_api_smp.h:133 [inline]
+       _raw_spin_lock+0x2e/0x40 kernel/locking/spinlock.c:154
+       spin_lock include/linux/spinlock.h:351 [inline]
+       unix_notinflight+0x13d/0x390 net/unix/garbage.c:140
+       unix_detach_fds net/unix/af_unix.c:1819 [inline]
+       unix_destruct_scm+0x221/0x350 net/unix/af_unix.c:1876
+       skb_release_head_state+0x100/0x250 net/core/skbuff.c:1188
+       skb_release_all net/core/skbuff.c:1200 [inline]
+       __kfree_skb net/core/skbuff.c:1216 [inline]
+       kfree_skb_reason+0x16d/0x3b0 net/core/skbuff.c:1252
+       kfree_skb include/linux/skbuff.h:1262 [inline]
+       manage_oob net/unix/af_unix.c:2672 [inline]
+       unix_stream_read_generic+0x1125/0x2700 net/unix/af_unix.c:2749
+       unix_stream_splice_read+0x239/0x320 net/unix/af_unix.c:2981
+       do_splice_read fs/splice.c:985 [inline]
+       splice_file_to_pipe+0x299/0x500 fs/splice.c:1295
+       do_splice+0xf2d/0x1880 fs/splice.c:1379
+       __do_splice fs/splice.c:1436 [inline]
+       __do_sys_splice fs/splice.c:1652 [inline]
+       __se_sys_splice+0x331/0x4a0 fs/splice.c:1634
+       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+       do_syscall_64+0xf5/0x240 arch/x86/entry/common.c:83
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
-> I think that should be easy enough to handle. My patch already only =
+ -> #0 (&u->lock){+.+.}-{2:2}:
+       check_prev_add kernel/locking/lockdep.c:3134 [inline]
+       check_prevs_add kernel/locking/lockdep.c:3253 [inline]
+       validate_chain+0x18cb/0x58e0 kernel/locking/lockdep.c:3869
+       __lock_acquire+0x1346/0x1fd0 kernel/locking/lockdep.c:5137
+       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5754
+       __raw_spin_lock include/linux/spinlock_api_smp.h:133 [inline]
+       _raw_spin_lock+0x2e/0x40 kernel/locking/spinlock.c:154
+       spin_lock include/linux/spinlock.h:351 [inline]
+       __unix_gc+0x40e/0xf70 net/unix/garbage.c:302
+       process_one_work kernel/workqueue.c:3254 [inline]
+       process_scheduled_works+0xa10/0x17c0 kernel/workqueue.c:3335
+       worker_thread+0x86d/0xd70 kernel/workqueue.c:3416
+       kthread+0x2f0/0x390 kernel/kthread.c:388
+       ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
 
-> combines packets where tcp_flag_word(th) is identical. So when =
+other info that might help us debug this:
 
-> segmenting, I could handle all flags changes with a single =
+ Possible unsafe locking scenario:
 
-> inet_proto_csum_replace4 call.
-> =
+       CPU0                    CPU1
+       ----                    ----
+  lock(unix_gc_lock);
+                               lock(&u->lock);
+                               lock(unix_gc_lock);
+  lock(&u->lock);
 
-> > Strictly WRT the patch, I guess it deserves to be split in series,
-> > moving UDP helpers in common code and possibly factoring out more
-> > helpers with separate patches.
-> Will do.
+ *** DEADLOCK ***
 
-A significant chunk of the complexity is in the
-tcp[46]_check_fraglist_gro sk match. Is this heuristic worth the
-complexity?
+3 locks held by kworker/u8:1/11:
+ #0: ffff888015089148 ((wq_completion)events_unbound){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3229 [inline]
+ #0: ffff888015089148 ((wq_completion)events_unbound){+.+.}-{0:0}, at: process_scheduled_works+0x8e0/0x17c0 kernel/workqueue.c:3335
+ #1: ffffc90000107d00 (unix_gc_work){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3230 [inline]
+ #1: ffffc90000107d00 (unix_gc_work){+.+.}-{0:0}, at: process_scheduled_works+0x91b/0x17c0 kernel/workqueue.c:3335
+ #2: ffffffff8f6ab638 (unix_gc_lock){+.+.}-{2:2}, at: spin_lock include/linux/spinlock.h:351 [inline]
+ #2: ffffffff8f6ab638 (unix_gc_lock){+.+.}-{2:2}, at: __unix_gc+0x117/0xf70 net/unix/garbage.c:261
 
-It seems that the platforms that will enable NETIF_F_FRAGLIST will
-be mainly forwarding planes.
+stack backtrace:
+CPU: 0 PID: 11 Comm: kworker/u8:1 Not tainted 6.9.0-rc5-syzkaller-00007-g4d2008430ce8 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
+Workqueue: events_unbound __unix_gc
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0x241/0x360 lib/dump_stack.c:114
+ check_noncircular+0x36a/0x4a0 kernel/locking/lockdep.c:2187
+ check_prev_add kernel/locking/lockdep.c:3134 [inline]
+ check_prevs_add kernel/locking/lockdep.c:3253 [inline]
+ validate_chain+0x18cb/0x58e0 kernel/locking/lockdep.c:3869
+ __lock_acquire+0x1346/0x1fd0 kernel/locking/lockdep.c:5137
+ lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5754
+ __raw_spin_lock include/linux/spinlock_api_smp.h:133 [inline]
+ _raw_spin_lock+0x2e/0x40 kernel/locking/spinlock.c:154
+ spin_lock include/linux/spinlock.h:351 [inline]
+ __unix_gc+0x40e/0xf70 net/unix/garbage.c:302
+ process_one_work kernel/workqueue.c:3254 [inline]
+ process_scheduled_works+0xa10/0x17c0 kernel/workqueue.c:3335
+ worker_thread+0x86d/0xd70 kernel/workqueue.c:3416
+ kthread+0x2f0/0x390 kernel/kthread.c:388
+ ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+ </TASK>
 
-If keeping, this refinement can probably a separate follow-on patch in
-the series too:
+Fixes: 47d8ac011fe1 ("af_unix: Fix garbage collector racing against connect()")
+Reported-and-tested-by: syzbot+fa379358c28cc87cc307@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=fa379358c28cc87cc307
+Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+---
+ include/net/af_unix.h | 3 +++
+ net/unix/garbage.c    | 2 +-
+ 2 files changed, 4 insertions(+), 1 deletion(-)
 
-- refactor existing udp code
-- add segmentation support to handle such packets on tx
-- add coalescing support that starts building such packets on rx
-- refine coalescing choice
-
-> > e.g. in __tcpv4_gso_segment_csum() is quite similar
-> > __udpv4_gso_segment_csum() - even too much, as the tcp csum should be=
-
-> > always be updated when the ports or addresses change ;)
-> =
-
-> Will fix that.
-> =
-
-> Thanks,
-> =
-
-> - Felix
-
+diff --git a/include/net/af_unix.h b/include/net/af_unix.h
+index 627ea8e2d915..3dee0b2721aa 100644
+--- a/include/net/af_unix.h
++++ b/include/net/af_unix.h
+@@ -85,6 +85,9 @@ enum unix_socket_lock_class {
+ 	U_LOCK_NORMAL,
+ 	U_LOCK_SECOND,	/* for double locking, see unix_state_double_lock(). */
+ 	U_LOCK_DIAG, /* used while dumping icons, see sk_diag_dump_icons(). */
++	U_LOCK_GC_LISTENER, /* used for listening socket while determining gc
++			     * candidates to close a small race window.
++			     */
+ };
+ 
+ static inline void unix_state_lock_nested(struct sock *sk,
+diff --git a/net/unix/garbage.c b/net/unix/garbage.c
+index 6433a414acf8..0104be9d4704 100644
+--- a/net/unix/garbage.c
++++ b/net/unix/garbage.c
+@@ -299,7 +299,7 @@ static void __unix_gc(struct work_struct *work)
+ 			__set_bit(UNIX_GC_MAYBE_CYCLE, &u->gc_flags);
+ 
+ 			if (sk->sk_state == TCP_LISTEN) {
+-				unix_state_lock(sk);
++				unix_state_lock_nested(sk, U_LOCK_GC_LISTENER);
+ 				unix_state_unlock(sk);
+ 			}
+ 		}
+-- 
+2.30.2
 
 
