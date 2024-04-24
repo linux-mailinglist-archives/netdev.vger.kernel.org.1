@@ -1,112 +1,106 @@
-Return-Path: <netdev+bounces-90726-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90727-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 047BC8AFD7A
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 02:57:25 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32FCA8AFD80
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 02:58:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1B5CF1C21F1A
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 00:57:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C14441F23AD8
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 00:58:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B3304A24;
-	Wed, 24 Apr 2024 00:57:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66FA74A35;
+	Wed, 24 Apr 2024 00:58:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f3wRJQCj"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="DcXAARSg"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57BF363D0;
-	Wed, 24 Apr 2024 00:57:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A9B64C9B
+	for <netdev@vger.kernel.org>; Wed, 24 Apr 2024 00:58:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713920240; cv=none; b=uR/Vw/i1dUUBO1nRukaOcCBGxFjQVX4Hpkd1Bttb0iuz00cXf3ySQ+Kx916/Z18iOXuUIwhHep4zQXM4lDYlBrLIRxE3q6+Fc5WNatIcRmwZkiXsyLVNRtB8ENvGXktFycFaa93uPc+DanP4T4MjNc9CXkzn18vrYqfz8HDoKvk=
+	t=1713920304; cv=none; b=IkmIxX+Yxn/CeyaNrRq4sMYFTuVHKDUpx3KhENGriReRMy/k07IKESfLtGSAsDIybElmeh4JpM6yJPXBnFnjHxxdj9Mb/T482VteB1eW0Cq/MhwKFbT/xMWB6qc+7HDqyUc3oXz5/G5AJiDA/geB5AtKmgCQODKxomiGdikLnf4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713920240; c=relaxed/simple;
-	bh=dU/mSRR2DatpobRTvXfLbp4WxXu8S7T6ZNvWUPBTg5M=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=oYZv6BrySxepzzUSlxwLaF3OCxKD4PTT+cNHuF8UztfWJKJK4icKyXp7UnFxVsr/bb/IhR/7o7Oos8G4nrT7f0zgXE5OwP10aPZc9EtfCdyyyp7vFk18HTS9q1dd5MY0T5tf6sodcIu02LwPQfTXUSg/031cfhU9hcC82JBJrkU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f3wRJQCj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 89F2CC116B1;
-	Wed, 24 Apr 2024 00:57:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713920239;
-	bh=dU/mSRR2DatpobRTvXfLbp4WxXu8S7T6ZNvWUPBTg5M=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=f3wRJQCjsRcBM8RFohLzlN9w61SLc4vWIOw0/yk7WdOAeo720eTDQXlMTyAnVX1b5
-	 wUDbNfJ2Z8ezexX7Id6xCXQa4ymc9yiOzlvZBJerdUk7HooTxgIq7TMvZtI78Ppvxl
-	 EN/mhrVeSqu1xahRWiMcMVIKC/WtONrkXEFOiLhvsljLCZ49t4fNIcSaqpDw4DMvup
-	 8T9mN9bo+MbWwcm7lqsVtq1FzRsq+MZzdnyEzzrBFujSFBzIFbcs7IwiiNN1dBsryl
-	 QgjhvJRJx7GMSi6jGJQd3lvQREE8vsskCvLfCmgqjTHUMILXY98IYfxz4IB4W/5Y8B
-	 ValZweNVWasrw==
-Date: Tue, 23 Apr 2024 17:57:18 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Joe Damato <jdamato@fastly.com>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, tariqt@nvidia.com,
- saeedm@nvidia.com, mkarsten@uwaterloo.ca, gal@nvidia.com,
- nalramli@fastly.com, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, "open list:MELLANOX
- MLX4 core VPI driver" <linux-rdma@vger.kernel.org>
-Subject: Re: [PATCH net-next 3/3] net/mlx4: support per-queue statistics via
- netlink
-Message-ID: <20240423175718.4ad4dc5a@kernel.org>
-In-Reply-To: <Zig5RZOkzhGITL7V@LQ3V64L9R2>
-References: <20240423194931.97013-1-jdamato@fastly.com>
-	<20240423194931.97013-4-jdamato@fastly.com>
-	<Zig5RZOkzhGITL7V@LQ3V64L9R2>
+	s=arc-20240116; t=1713920304; c=relaxed/simple;
+	bh=ly2OjP3OqU6gk7EJTGJpkZfiMl+XfIperBGEh5aHP10=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=puOpDHPkCZz9feausJ2YZMtYYw4pYIeg4MmIn8dsPGiyxKQZ2t773uOhZ0RecT9fQj5jOriZ3Uc6iWwwXyzurpgnwBuqhuGbxpmAn3k3Ui6kLmVYYpt/nkbqSZYwcCo5dIP3ceYfbSQbHS5Krf9nHazGl3CGPzqWiTqOb0IvqMo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=DcXAARSg; arc=none smtp.client-ip=209.85.218.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a5200202c1bso745152266b.0
+        for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 17:58:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1713920301; x=1714525101; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Agi+zB5Y5EOX29+eaFx0fm4Gxy05VBWM+Q41mvlClcY=;
+        b=DcXAARSg1koFsGYYZdomuK/vxiwFtjTpnrHxqxYmGhgmd6fil+y/orDzZL0BEN4t6t
+         FiWtHOyK8tNM5asmWTjxdkZyyanVfow1iCsLojYyfRfHEA4ASltacJqcbFMltONtsPej
+         bBbMb0FE14kgWevxNX2dSH/VZo7jKXznwTUoE=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713920301; x=1714525101;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Agi+zB5Y5EOX29+eaFx0fm4Gxy05VBWM+Q41mvlClcY=;
+        b=L7cYS15HaiZoWc1mQk8SnJmXV8LRw4dflvmMXveebkuEn4MXOxay3F9lVc5L4MTwLj
+         D6ox8ue8bzwQglb3WsrCf9cUdVNYASxNQWCqkv3h+h2iXtIG1mxFNImCb/OY4NSIO3tw
+         Jw53A9cp9xxPB63RoZHCkn9XSJxXFEELxeFXIkiCZyg2rDUoxCVlqO8jeA7k2Fm6Yc6T
+         6cY6AIU8ISZIXfXRmqJzhITSVADCaHt8zkLHRkXhMpjdmBAUfw8CvPDt2ksYACCHeU5N
+         cfMvayZW5CRubYkkWdIutCmq1Xsxy18NKGXlvfqtcYCEBVzrtK1LIq/SjxULhmsdHlMK
+         PUJQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUq2Oh2FLCW8Vt8+p/djmm58KPKsJfR7Z1ibRi1OiaLgQ5W1eMewZBFM3cmPI0uRJd+RRJf7a9HOnn6pLO5tBUOxthqhNgd
+X-Gm-Message-State: AOJu0YwGxHcAkS3mOJqck8XbLxtZ9bLfibVwGPcAMCrq0wM3jx2RkYvR
+	B89ulTp0wfcE+BKrvqEXuPNoBVKvXMlSZdl6axfe6Q7T26Hy2y3cayMCoWtKl82gAxQI/J3ZkcH
+	t5rK+egYSxYQLt1vPNGG0kN7ZamgDAMStNi/N
+X-Google-Smtp-Source: AGHT+IEr/n+RidcwYYa1O8bUShojVnvd0AdTOnz2UvXoU1pPttFAcg/DZNblCIQjh3OLmIIJ+2Sg7W0GySY7VWJ+psg=
+X-Received: by 2002:a17:906:b841:b0:a52:2c4f:7957 with SMTP id
+ ga1-20020a170906b84100b00a522c4f7957mr640115ejb.66.1713920300138; Tue, 23 Apr
+ 2024 17:58:20 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+References: <20240424002148.3937059-1-kuba@kernel.org>
+In-Reply-To: <20240424002148.3937059-1-kuba@kernel.org>
+From: Michael Chan <michael.chan@broadcom.com>
+Date: Tue, 23 Apr 2024 17:58:08 -0700
+Message-ID: <CACKFLikEhVAJA+osD7UjQNotdGte+fth7zOy7yDdLkTyFk9Pyw@mail.gmail.com>
+Subject: Re: [PATCH net] eth: bnxt: fix counting packets discarded due to OOM
+ and netpoll
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
+	pabeni@redhat.com, edwin.peer@broadcom.com
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, 23 Apr 2024 12:42:13 -1000 Joe Damato wrote:
-> I realized in this case, I'll need to set the fields initialized to 0xff
-> above to 0 before doing the increments below.
+On Tue, Apr 23, 2024 at 5:21=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> I added OOM and netpoll discard counters, naively assuming that
+> the cpr pointer is pointing to a common completion ring.
+> Turns out that is usually *a* completion ring but not *the*
+> completion ring which bnapi->cp_ring points to. bnapi->cp_ring
+> is where the stats are read from, so we end up reporting 0
+> thru ethtool -S and qstat even though the drop events have happened.
+> Make 100% sure we're recording statistics in the correct structure.
+>
+> Fixes: 907fd4a294db ("bnxt: count discards due to memory allocation error=
+s")
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-I don't know mlx4 very well, but glancing at the code - are you sure we
-need to loop over the queues is the "base" callbacks?
+Yes, on the newer chips, we have 2 cpr pointers and the correct one
+must be used for the sw_stats.  We actually have a patch that changes
+cpr->sw_stats to a pointer so that both cpr can share the same
+sw_stats structure.  This reminds me to post that patch soon to avoid
+this type of confusion in the future.  Thanks.
 
-The base callbacks are for getting "historical" data, i.e. info which
-was associated with queues which are no longer present. You seem to
-sweep all queues, so I'd have expected "base" to just set the values=20
-to 0. And the real values to come from the per-queue callbacks.
-
-The init to 0xff looks quite sus.
-
-Also what does this:
-
->	if (!priv->port_up || mlx4_is_master(priv->mdev->dev))
-
-do? =F0=9F=A4=94=EF=B8=8F what's a "master" in this context?
-
-> Sorry about that; just realized that now and will fix that in the v2 (alo=
-ng
-> with any other feedback I get), probably something:
->=20
->   if (priv->rx_ring_num) {
->           rx->packets =3D 0;
->           rx->bytes =3D 0;
->           rx->alloc_fail =3D 0;
->   }
->=20
-> Here for the RX side and see below for the TX side.
-
-FWIW I added a simple test for making sure queue stats match interface
-stats, it's tools/testing/selftests/drivers/net/stats.py
-
-You have to export NETIF=3D$name to make it run on a real interface.
-
-To copy the tests to a remote machine I do:
-
-make -C tools/testing/selftests/ TARGETS=3D"net drivers/net drivers/net/hw"=
- install INSTALL_PATH=3D/tmp/ksft-net-drv
-rsync -ra --delete /tmp/ksft-net-drv root@${machine}:/root/
-
-HTH
+Reviewed-by: Michael Chan <michael.chan@broadcom.com>
 
