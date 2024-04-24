@@ -1,125 +1,140 @@
-Return-Path: <netdev+bounces-90827-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90828-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 062A08B0586
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 11:10:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F1B38B0588
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 11:10:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B673B28CF5E
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 09:10:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1670B1F2587E
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 09:10:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA465158D82;
-	Wed, 24 Apr 2024 09:10:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60014158A37;
+	Wed, 24 Apr 2024 09:10:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30615158A39
-	for <netdev@vger.kernel.org>; Wed, 24 Apr 2024 09:10:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6BE1158867;
+	Wed, 24 Apr 2024 09:10:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713949824; cv=none; b=GuQzVxdjAUks4poaPM4cubWVqLboQF+sdW/wiNBjS/IxwctccXvUyKLYsDrFnEunITT5v8z4C1CwYzmop2ThVrooYDNK4g63ZuVfaG9/HI57WWT68XF8nXdNKe9hvhREllHFRv9xaZUSQmA82B2eKoEz95Xz/U6ExCAYCE4tg0M=
+	t=1713949844; cv=none; b=dqBNXQyHoQLwhzmfVQ+iV1jmi4eGgCepMjjTwE8Vi42kAxT6GnTUnN/qE3IxCwTl/uI4SjioYcS6M4VJ35ZLOpDZr+2mDSz3qg2fi8aDHA7vHWrTGxzKJ7+HPK1XzDFRUtQwn/4YbzTRFaS6cRD1JI8MtODJAJn3N8paeBz0UDs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713949824; c=relaxed/simple;
-	bh=8vA4orOaKDY+zHUQW1/tzx26tBDxJUvA8wUGfkL9DPc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NKdiZjRIElrJ8c6JYHe99afMHgi4BZz4lbjrejTRYKnRwlUkAyU71+5AW/oMPOWwh7jZR8IfrkGeX+0ly99VEpheOIWsL4tfNJY0txZyHXVhqzvDTjTFeZbN7/vCxDuLO1E1bjZfHMXtMOdMJAL9IPbMeUhDatKKEYe2i3NLETI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1rzYdj-0006Hi-91; Wed, 24 Apr 2024 11:10:07 +0200
-Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1rzYdh-00E3JN-HA; Wed, 24 Apr 2024 11:10:05 +0200
-Received: from pengutronix.de (unknown [172.20.34.65])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 186472BECA6;
-	Wed, 24 Apr 2024 09:10:05 +0000 (UTC)
-Date: Wed, 24 Apr 2024 11:10:04 +0200
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Gregor Herburger <gregor.herburger@ew.tq-group.com>
-Cc: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>, 
-	Thomas Kopp <thomas.kopp@microchip.com>, Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, linux-can@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux@ew.tq-group.com, alexander.stein@ew.tq-group.com
-Subject: Re: [PATCH 3/4] can: mcp251xfd: add gpio functionality
-Message-ID: <20240424-witty-vicugna-of-purring-7bffcc-mkl@pengutronix.de>
-References: <20240417-mcp251xfd-gpio-feature-v1-0-bc0c61fd0c80@ew.tq-group.com>
- <20240417-mcp251xfd-gpio-feature-v1-3-bc0c61fd0c80@ew.tq-group.com>
+	s=arc-20240116; t=1713949844; c=relaxed/simple;
+	bh=TEF0qjz9ZofKGHwyDHgAwC9obwz1u3kw3L6ZMSub7H4=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=GAhGjCUomq12e9X2uJUoRMP7oO7naPpGY4Fb3iDWEHiMDQY9Jpdyjgd3OLucig4iZuS4nLIYm+iJgmDrj7IxhP7i+xk2NKbNNyoW899m+wOZlr7OV7HfZ+P0AVJhX6TwTPg7v6xa6BinMKqMckt7rwJOik+3OtUYQ8rFtBwvkDA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from [192.168.1.105] (178.176.73.108) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Wed, 24 Apr
+ 2024 12:10:24 +0300
+Subject: Re: [PATCH] net: ravb: Fix registered interrupt names
+To: Geert Uytterhoeven <geert+renesas@glider.be>, Claudiu Beznea
+	<claudiu.beznea.uj@bp.renesas.com>, Paul Barker
+	<paul.barker.ct@bp.renesas.com>, =?UTF-8?Q?Niklas_S=c3=b6derlund?=
+	<niklas.soderlund+renesas@ragnatech.se>, "David S . Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+CC: <netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>
+References: <cde67b68adf115b3cf0b44c32334ae00b2fbb321.1713944647.git.geert+renesas@glider.be>
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+Message-ID: <81d556da-8aa4-cf92-d8a6-5d8b147ab9a2@omp.ru>
+Date: Wed, 24 Apr 2024 12:10:23 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="farp7erk7y3aax3q"
-Content-Disposition: inline
-In-Reply-To: <20240417-mcp251xfd-gpio-feature-v1-3-bc0c61fd0c80@ew.tq-group.com>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+In-Reply-To: <cde67b68adf115b3cf0b44c32334ae00b2fbb321.1713944647.git.geert+renesas@glider.be>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 04/24/2024 08:48:14
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 59
+X-KSE-AntiSpam-Info: Lua profiles 184894 [Apr 24 2024]
+X-KSE-AntiSpam-Info: Version: 6.1.0.4
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 18 0.3.18
+ b9d6ada76958f07c6a68617a7ac8df800bc4166c
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {relay has no DNS name}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.73.108 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info:
+	127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;omp.ru:7.1.1;178.176.73.108:7.1.2
+X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.73.108
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 59
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 04/24/2024 08:52:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 4/24/2024 7:13:00 AM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
+On 4/24/24 10:45 AM, Geert Uytterhoeven wrote:
 
---farp7erk7y3aax3q
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> As interrupts are now requested from ravb_probe(), before calling
+> register_netdev(), ndev->name still contains the template "eth%d",
+> leading to funny names in /proc/interrupts.  E.g. on R-Car E3:
+> 
+> 	89:  0      0  GICv2  93 Level  eth%d:ch22:multi
+> 	90:  0      3  GICv2  95 Level  eth%d:ch24:emac
+> 	91:  0  23484  GICv2  71 Level  eth%d:ch0:rx_be
+> 	92:  0      0  GICv2  72 Level  eth%d:ch1:rx_nc
+> 	93:  0  13735  GICv2  89 Level  eth%d:ch18:tx_be
+> 	94:  0      0  GICv2  90 Level  eth%d:ch19:tx_nc
+> 
+> Worse, on platforms with multiple RAVB instances (e.g. R-Car V4H), all
+> interrupts have similar names.
+> 
+> Fix this by using the device name instead, like is done in several other
+> drivers:
+> 
+> 	89:  0      0  GICv2  93 Level  e6800000.ethernet:ch22:multi
+> 	90:  0      1  GICv2  95 Level  e6800000.ethernet:ch24:emac
+> 	91:  0  28578  GICv2  71 Level  e6800000.ethernet:ch0:rx_be
+> 	92:  0      0  GICv2  72 Level  e6800000.ethernet:ch1:rx_nc
+> 	93:  0  14044  GICv2  89 Level  e6800000.ethernet:ch18:tx_be
+> 	94:  0      0  GICv2  90 Level  e6800000.ethernet:ch19:tx_nc
 
-On 17.04.2024 15:43:56, Gregor Herburger wrote:
-> The mcp251xfd devices allow two pins to be configured as gpio. Add this
-> functionality to driver.
+   Ugh! Sorry about missing this one...
 
-Fails to build if CONFIG_GPIOLIB is not enabled.
+> Rename the local variable dev_name, as it shadows the dev_name()
+> function, and pre-initialize it, to simplify the code.
 
-|   CC [M]  drivers/net/can/spi/mcp251xfd/mcp251xfd-core.o
-| drivers/net/can/spi/mcp251xfd/mcp251xfd-core.c: In function =E2=80=98mcp2=
-51fdx_gpio_setup=E2=80=99:
-| drivers/net/can/spi/mcp251xfd/mcp251xfd-core.c:1877:39: error: =E2=80=98s=
-truct mcp251xfd_priv=E2=80=99 has no member named =E2=80=98gc=E2=80=99; did=
- you mean =E2=80=98cc=E2=80=99?
-|  1877 |         struct gpio_chip *gc =3D &priv->gc;
-|       |                                       ^~
-|       |                                       cc
+   Why not call it just name instead?
 
-regards,
-Marc
+> Fixes: 32f012b8c01ca9fd ("net: ravb: Move getting/requesting IRQs in the probe() method")
+> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
 
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
 
---farp7erk7y3aax3q
-Content-Type: application/pgp-signature; name="signature.asc"
+[...]
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmYozGkACgkQKDiiPnot
-vG9J1wf/do8Juj8Orh5bVD09ULKiTACR0iSR2akIljO+FR51Sj5s88bF3DJUn3xV
-ipozlNXXytRTXvW6K535zzoaX9Qs6slTyDKZjubYt/foqQ3KssuOZudP45iaIuWG
-47N6tvdqDN8pEvBdhKwOWl1FJygZ4CskxX3hDMgF/jgc8JqL+5Y6z8vGqf6DssEV
-3Mr1R9jpbVdQn8FUmp3262pK2p352LicKK3MUIKVMxmEfZ1LYaZXqvJwme2lFL6d
-jXglkz5U3mLhY0rxlh8++tbwv+a1VNt4kDZGwLt7PaTm2rd/qC0ku/KC/yZHr/fe
-VGuS8MVt9UCBMQiFyAu85AVHRVAEww==
-=jzV9
------END PGP SIGNATURE-----
-
---farp7erk7y3aax3q--
+MBR, Sergey
 
