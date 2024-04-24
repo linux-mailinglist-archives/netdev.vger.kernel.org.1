@@ -1,287 +1,165 @@
-Return-Path: <netdev+bounces-91117-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91118-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B7B58B16EF
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 01:14:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FB6D8B16FF
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 01:20:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5342B2897F4
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 23:14:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EC0CD1F2650D
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 23:20:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F9D316F270;
-	Wed, 24 Apr 2024 23:14:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7A3A16F0DD;
+	Wed, 24 Apr 2024 23:20:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="V6WKQAwp"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="YjOkppfY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00B6016F0DF
-	for <netdev@vger.kernel.org>; Wed, 24 Apr 2024 23:14:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 450AF16F0CB
+	for <netdev@vger.kernel.org>; Wed, 24 Apr 2024 23:20:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714000472; cv=none; b=jJL6n2UL18H2Dd+rHQD1eMrPAK96lyFCnkY2mjW/1Hes2udPKv1KgT4n6dt7+OCHNuxsztuoezsaAb2aRR4GU0trSPi9Bv5gWsfTfCbBP0b4Cvnv48U8TNijLyWYmBWZLcWbGv7Bfe1wTye7Fdl3esdvjc2J6NxOpiEc+AIkvsc=
+	t=1714000823; cv=none; b=Wdaw65xVk5TQTNwfqZn++awSqxqakdaKAPuIgfJr4RYpuKWB7ZIfzhiMNXzQCt4zQciM8fi19yxwH+qq2DnQr3YB9sOBGT4R/wOLn4kxZVT28mQPKtxiBP+pLzbKksZuWu0bx4kMcQ8kFyYRdbcp2AMJELzEf/k8tOyNDsEkhFQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714000472; c=relaxed/simple;
-	bh=RjqHHh8+OvvgHWX6skeosEzS4N2AwclxB9HYRka+bGI=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=gpgDIAzYCYLgJjNm6XpDHkjon4c9uj18YrxVqN4brhLn6Vg8WzsxiQGhDG4kJK7qWPH9bigS/HzFv6Gr0D0sEXXn4mxDPRAiuIIo5c+Vdc6RPVebkDkgEoLwkeAK71VWxdkBuHqm1kLOIMPMn+LKB5q0LS2p84/zx6qeJDpq6+4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=V6WKQAwp; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-1e8bbcbc2b7so3728715ad.0
-        for <netdev@vger.kernel.org>; Wed, 24 Apr 2024 16:14:30 -0700 (PDT)
+	s=arc-20240116; t=1714000823; c=relaxed/simple;
+	bh=xMdC6gPfhPx0eqt9pE8Cf6dx1C6F38ZaVJBhnbPRa2E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HWvKYD6ADgCg7mCbbWZav7g8rHPdcITM52L3I9W1vjHS1YJwjx7AICUDY5cynaP1bu70UiIMqdX9EU5zfVdgLzRUBDv+UJKDjQVNCDVAyAgAo77lzc7xjRMzFd8+22jCf8aWJkNLloacr6OJHJwxJygFL84+aUSAHozg2OUbAAc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=YjOkppfY; arc=none smtp.client-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-1e36b7e7dd2so3279205ad.1
+        for <netdev@vger.kernel.org>; Wed, 24 Apr 2024 16:20:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1714000470; x=1714605270; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yW3rWzRu2U3mMza79f2YiFDKKLiYjn35V/dUh+fOfas=;
-        b=V6WKQAwp44pm6l8lFwzXWMuvXTnpqtJVjYEmNEK4PgbJxXevetq0K6Z7r1xYaLSbO+
-         Lgi06LH3J3wUxwQu9VoFQtcfcmAElwWQSRvESKc6uo9AxKDaY2lxP2i/W3xosn8GIK2K
-         Susknq3PgCubXRfj6MnYmTZRWuUHJ8A6HDVtU=
+        d=chromium.org; s=google; t=1714000821; x=1714605621; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=53galFO5b9NlY6rYFvZBx1xxKB41abzyybNlJJlu7mM=;
+        b=YjOkppfYENLsgSowL4ZSX3/HwEPO/rWaGdecpkQt5gyw/H5ZATAG+gW+W2tC+ojKok
+         MDqG3tof6H/HtrbSwsMYkIbwjtGjzCmmqvw2O5Sw6eFYjDC33lZoOHsxxzCcHM0elPT6
+         YEf1+Ieh2UUWDqca+ScK4hNpsq1jjUD6IVZak=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714000470; x=1714605270;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yW3rWzRu2U3mMza79f2YiFDKKLiYjn35V/dUh+fOfas=;
-        b=rSmOg1KftZmFZAetTwa/izi70a13oQlyrrZMcRT8r2cQemI1VGoQUJUNT3INQi4Pt6
-         GKGSO+miWMeIBVciHxiaxTK+Vw0J+nzKURXg8dFMSa/rkAoodJ3dclnIsVj9qtcRlGwK
-         IGrYB48RF3eCwlo8vSLm0TBwAK2vnBn4g+/ANzZVOXAbkjR06/Lrug3VQ7IUbYlKaXmV
-         oZbcs98l8rfWvLJDLRr3xS6pDTDNNsmfU51WNWmyAhsRw0BI5CpgGzJpZy0x2HaAi4qn
-         oeV1xnVD4qoU5hjIs25cVaLQRW+GErfbI4MEhzJ40LIGNFh/F2+A/xMDplgr9shCQT/W
-         QbVg==
-X-Forwarded-Encrypted: i=1; AJvYcCWFBxgVSCmMQ70XW+Z8bAzpqzj8OAEAxIoOY7rMAhNzgjz4G6m8zYU/ocBvR4idGJcSxqRq+r9tfdKFAhfFd2i0JILyJJSk
-X-Gm-Message-State: AOJu0YwU+aDxmVgLZCaK7TDIGTzN0Duq3VsCymu+uHvD14/XIih0Vjwu
-	W/D26viCLCnni3/9xZ+NdiKMHTDo51GFGRJpdKQR5NX+15vCWHHnJi9DbDqqxw==
-X-Google-Smtp-Source: AGHT+IEr4i3DB4r3Qkm4dkUw7/0uwv+gx9Lch3vZC0mX7eYJ4jMuT6PuvlXOirfn5+jM9r3f/0CttQ==
-X-Received: by 2002:a17:903:18d:b0:1e0:b689:950b with SMTP id z13-20020a170903018d00b001e0b689950bmr5683142plg.16.1714000470208;
-        Wed, 24 Apr 2024 16:14:30 -0700 (PDT)
-Received: from amakhalov-build-vm.eng.vmware.com ([64.186.27.43])
-        by smtp.gmail.com with ESMTPSA id n17-20020a170903111100b001e520495f51sm12383936plh.124.2024.04.24.16.14.27
+        d=1e100.net; s=20230601; t=1714000821; x=1714605621;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=53galFO5b9NlY6rYFvZBx1xxKB41abzyybNlJJlu7mM=;
+        b=OSuliwIFg2pHtHmKIlJTAXYoZfqiqxkwU/D74OjIJ1HJMCG2Ike8HVXJ5Z6a8AoZV7
+         vEZrmHj7H8Keb0Cym86Pf2TdjBMNn5PrfK7PIflGShhn1AfU49Y5k6QL56GjYYXVXyIq
+         8IoayJkFwLW8pqtpsQecvFHNuvaVsHN9FXmhAOKKEDTb83guTLPGXvasPXGGpkUu3wC7
+         RHwQvsL5rQ8tF6Cs18xfHGAdIPrq/Mmf1EA3u4cFVP/J+3vw7MOfgObE26WeG8ynmscr
+         LiLzecDu7RlII++kpyxpLjyBC90BTy9B+pcFaFFF0wjD2HL7SqoM4YCpgrOmSeUTETrG
+         x+RA==
+X-Forwarded-Encrypted: i=1; AJvYcCVqWUH7XLCvt7HupHc2e1vHZi3nYPyDyEleBCT3waVNF6/IHemS1J5qD96O0cLXcf3GvTA41+Y8qhtqFjetvPsuspIsVOwG
+X-Gm-Message-State: AOJu0YzArU2xFvUG4eGb2dq6Hh7CkmJiPRNl9WGwF7D+ApoOJ1Cz1zps
+	yY+g7b4Taa9xUEFKmdEi0/czqZhe9foPp9ffo182UU+KTeQAEJaoTLc+ZUPmoQ==
+X-Google-Smtp-Source: AGHT+IFMkYJNAfNLSmk4oPnPeYVule+RDiUbFbapsmqTHjfPM7QXarEC91Pvng6lRM//0u2jQSClHg==
+X-Received: by 2002:a17:902:868f:b0:1dd:2eed:52a5 with SMTP id g15-20020a170902868f00b001dd2eed52a5mr3803324plo.37.1714000821414;
+        Wed, 24 Apr 2024 16:20:21 -0700 (PDT)
+Received: from www.outflux.net ([198.0.35.241])
+        by smtp.gmail.com with ESMTPSA id c10-20020a170902d48a00b001dd0c5d5227sm12448914plg.193.2024.04.24.16.20.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Apr 2024 16:14:29 -0700 (PDT)
-From: Alexey Makhalov <alexey.makhalov@broadcom.com>
-To: linux-kernel@vger.kernel.org,
-	virtualization@lists.linux.dev,
-	bp@alien8.de,
-	hpa@zytor.com,
-	dave.hansen@linux.intel.com,
-	mingo@redhat.com,
-	tglx@linutronix.de
-Cc: x86@kernel.org,
-	netdev@vger.kernel.org,
-	richardcochran@gmail.com,
-	linux-input@vger.kernel.org,
-	dmitry.torokhov@gmail.com,
-	zackr@vmware.com,
-	linux-graphics-maintainer@vmware.com,
-	pv-drivers@vmware.com,
-	timothym@vmware.com,
-	akaher@vmware.com,
-	dri-devel@lists.freedesktop.org,
-	daniel@ffwll.ch,
-	airlied@gmail.com,
-	tzimmermann@suse.de,
-	mripard@kernel.org,
-	maarten.lankhorst@linux.intel.com,
-	horms@kernel.org,
-	kirill.shutemov@linux.intel.com,
-	Alexey Makhalov <alexey.makhalov@broadcom.com>,
-	Nadav Amit <nadav.amit@gmail.com>
-Subject: [PATCH v9 2/8] x86/vmware: Move common macros to vmware.h
-Date: Wed, 24 Apr 2024 16:14:07 -0700
-Message-Id: <20240424231407.14098-2-alexey.makhalov@broadcom.com>
-X-Mailer: git-send-email 2.39.0
-In-Reply-To: <20240424231407.14098-1-alexey.makhalov@broadcom.com>
-References: <adcbfb9a-a4e1-4a32-b786-6c204d941e9f@broadcom.com>
- <20240424231407.14098-1-alexey.makhalov@broadcom.com>
+        Wed, 24 Apr 2024 16:20:20 -0700 (PDT)
+Date: Wed, 24 Apr 2024 16:20:20 -0700
+From: Kees Cook <keescook@chromium.org>
+To: Peter Zijlstra <peterz@infradead.org>
+Cc: Mark Rutland <mark.rutland@arm.com>, Will Deacon <will@kernel.org>,
+	Boqun Feng <boqun.feng@gmail.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>, Jakub Kicinski <kuba@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	"Paul E. McKenney" <paulmck@kernel.org>,
+	Uros Bizjak <ubizjak@gmail.com>, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-arch@vger.kernel.org,
+	netdev@vger.kernel.org, linux-hardening@vger.kernel.org
+Subject: Re: [PATCH 1/4] locking/atomic/x86: Silence intentional wrapping
+ addition
+Message-ID: <202404241602.276D4ADA@keescook>
+References: <20240424191225.work.780-kees@kernel.org>
+ <20240424191740.3088894-1-keescook@chromium.org>
+ <20240424224141.GX40213@noisy.programming.kicks-ass.net>
+ <202404241542.6AFC3042C1@keescook>
+ <20240424225436.GY40213@noisy.programming.kicks-ass.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240424225436.GY40213@noisy.programming.kicks-ass.net>
 
-Move VMware hypercall macros to vmware.h. This is a prerequisite for
-the introduction of vmware_hypercall API. No functional changes besides
-exporting vmware_hypercall_mode symbol.
+On Thu, Apr 25, 2024 at 12:54:36AM +0200, Peter Zijlstra wrote:
+> On Wed, Apr 24, 2024 at 03:45:07PM -0700, Kees Cook wrote:
+> > On Thu, Apr 25, 2024 at 12:41:41AM +0200, Peter Zijlstra wrote:
+> > > On Wed, Apr 24, 2024 at 12:17:34PM -0700, Kees Cook wrote:
+> > > 
+> > > > @@ -82,7 +83,7 @@ static __always_inline bool arch_atomic_add_negative(int i, atomic_t *v)
+> > > >  
+> > > >  static __always_inline int arch_atomic_add_return(int i, atomic_t *v)
+> > > >  {
+> > > > -	return i + xadd(&v->counter, i);
+> > > > +	return wrapping_add(int, i, xadd(&v->counter, i));
+> > > >  }
+> > > >  #define arch_atomic_add_return arch_atomic_add_return
+> > > 
+> > > this is going to get old *real* quick :-/
+> > > 
+> > > This must be the ugliest possible way to annotate all this, and then
+> > > litter the kernel with all this... urgh.
+> > 
+> > I'm expecting to have explicit wrapping type annotations soon[1], but for
+> > the atomics, it's kind of a wash on how intrusive the annotations get. I
+> > had originally wanted to mark the function (as I did in other cases)
+> > rather than using the helper, but Mark preferred it this way. I'm happy
+> > to do whatever! :)
+> > 
+> > -Kees
+> > 
+> > [1] https://github.com/llvm/llvm-project/pull/86618
+> 
+> This is arse-about-face. Signed stuff wraps per -fno-strict-overflow.
+> We've been writing code for years under that assumption.
 
-Signed-off-by: Alexey Makhalov <alexey.makhalov@broadcom.com>
-Reviewed-by: Nadav Amit <nadav.amit@gmail.com>
----
- arch/x86/include/asm/vmware.h | 72 +++++++++++++++++++++++++++++------
- arch/x86/kernel/cpu/vmware.c  | 43 +--------------------
- 2 files changed, 62 insertions(+), 53 deletions(-)
+Right, which is why this is going to take time to roll out. :) What we
+were really doing with -fno-strict-overflow was getting rid of undefined
+behavior. That was really really horrible; we don't need the compiler
+hallucinating.
 
-diff --git a/arch/x86/include/asm/vmware.h b/arch/x86/include/asm/vmware.h
-index ac9fc51e2b18..de2533337611 100644
---- a/arch/x86/include/asm/vmware.h
-+++ b/arch/x86/include/asm/vmware.h
-@@ -8,25 +8,34 @@
- 
- /*
-  * The hypercall definitions differ in the low word of the %edx argument
-- * in the following way: the old port base interface uses the port
-- * number to distinguish between high- and low bandwidth versions.
-+ * in the following way: the old I/O port based interface uses the port
-+ * number to distinguish between high- and low bandwidth versions, and
-+ * uses IN/OUT instructions to define transfer direction.
-  *
-  * The new vmcall interface instead uses a set of flags to select
-  * bandwidth mode and transfer direction. The flags should be loaded
-  * into %dx by any user and are automatically replaced by the port
-- * number if the VMWARE_HYPERVISOR_PORT method is used.
-- *
-- * In short, new driver code should strictly use the new definition of
-- * %dx content.
-+ * number if the I/O port method is used.
-  */
- 
--/* Old port-based version */
--#define VMWARE_HYPERVISOR_PORT    0x5658
--#define VMWARE_HYPERVISOR_PORT_HB 0x5659
-+#define VMWARE_HYPERVISOR_HB		BIT(0)
-+#define VMWARE_HYPERVISOR_OUT		BIT(1)
-+
-+#define VMWARE_HYPERVISOR_PORT		0x5658
-+#define VMWARE_HYPERVISOR_PORT_HB	(VMWARE_HYPERVISOR_PORT | \
-+					 VMWARE_HYPERVISOR_HB)
-+
-+#define VMWARE_HYPERVISOR_MAGIC		0x564d5868U
-+
-+#define VMWARE_CMD_GETVERSION		10
-+#define VMWARE_CMD_GETHZ		45
-+#define VMWARE_CMD_GETVCPU_INFO		68
-+#define VMWARE_CMD_STEALCLOCK		91
-+
-+#define CPUID_VMWARE_FEATURES_ECX_VMMCALL	BIT(0)
-+#define CPUID_VMWARE_FEATURES_ECX_VMCALL	BIT(1)
- 
--/* Current vmcall / vmmcall version */
--#define VMWARE_HYPERVISOR_HB   BIT(0)
--#define VMWARE_HYPERVISOR_OUT  BIT(1)
-+extern u8 vmware_hypercall_mode;
- 
- /* The low bandwidth call. The low word of edx is presumed clear. */
- #define VMWARE_HYPERCALL						\
-@@ -54,4 +63,43 @@
- 		      "rep insb",					\
- 		      "vmcall", X86_FEATURE_VMCALL,			\
- 		      "vmmcall", X86_FEATURE_VMW_VMMCALL)
-+
-+#define VMWARE_PORT(cmd, eax, ebx, ecx, edx)				\
-+	__asm__("inl (%%dx), %%eax" :					\
-+		"=a"(eax), "=c"(ecx), "=d"(edx), "=b"(ebx) :		\
-+		"a"(VMWARE_HYPERVISOR_MAGIC),				\
-+		"c"(VMWARE_CMD_##cmd),					\
-+		"d"(VMWARE_HYPERVISOR_PORT), "b"(UINT_MAX) :		\
-+		"memory")
-+
-+#define VMWARE_VMCALL(cmd, eax, ebx, ecx, edx)				\
-+	__asm__("vmcall" :						\
-+		"=a"(eax), "=c"(ecx), "=d"(edx), "=b"(ebx) :		\
-+		"a"(VMWARE_HYPERVISOR_MAGIC),				\
-+		"c"(VMWARE_CMD_##cmd),					\
-+		"d"(0), "b"(UINT_MAX) :					\
-+		"memory")
-+
-+#define VMWARE_VMMCALL(cmd, eax, ebx, ecx, edx)				\
-+	__asm__("vmmcall" :						\
-+		"=a"(eax), "=c"(ecx), "=d"(edx), "=b"(ebx) :		\
-+		"a"(VMWARE_HYPERVISOR_MAGIC),				\
-+		"c"(VMWARE_CMD_##cmd),					\
-+		"d"(0), "b"(UINT_MAX) :					\
-+		"memory")
-+
-+#define VMWARE_CMD(cmd, eax, ebx, ecx, edx) do {		\
-+	switch (vmware_hypercall_mode) {			\
-+	case CPUID_VMWARE_FEATURES_ECX_VMCALL:			\
-+		VMWARE_VMCALL(cmd, eax, ebx, ecx, edx);		\
-+		break;						\
-+	case CPUID_VMWARE_FEATURES_ECX_VMMCALL:			\
-+		VMWARE_VMMCALL(cmd, eax, ebx, ecx, edx);	\
-+		break;						\
-+	default:						\
-+		VMWARE_PORT(cmd, eax, ebx, ecx, edx);		\
-+		break;						\
-+	}							\
-+	} while (0)
-+
- #endif
-diff --git a/arch/x86/kernel/cpu/vmware.c b/arch/x86/kernel/cpu/vmware.c
-index f58c8d669bd3..acd9658f7c4b 100644
---- a/arch/x86/kernel/cpu/vmware.c
-+++ b/arch/x86/kernel/cpu/vmware.c
-@@ -41,8 +41,6 @@
- 
- #define CPUID_VMWARE_INFO_LEAF               0x40000000
- #define CPUID_VMWARE_FEATURES_LEAF           0x40000010
--#define CPUID_VMWARE_FEATURES_ECX_VMMCALL    BIT(0)
--#define CPUID_VMWARE_FEATURES_ECX_VMCALL     BIT(1)
- 
- #define VMWARE_HYPERVISOR_MAGIC	0x564D5868
- 
-@@ -58,44 +56,6 @@
- #define STEALCLOCK_DISABLED        0
- #define STEALCLOCK_ENABLED         1
- 
--#define VMWARE_PORT(cmd, eax, ebx, ecx, edx)				\
--	__asm__("inl (%%dx), %%eax" :					\
--		"=a"(eax), "=c"(ecx), "=d"(edx), "=b"(ebx) :		\
--		"a"(VMWARE_HYPERVISOR_MAGIC),				\
--		"c"(VMWARE_CMD_##cmd),					\
--		"d"(VMWARE_HYPERVISOR_PORT), "b"(UINT_MAX) :		\
--		"memory")
--
--#define VMWARE_VMCALL(cmd, eax, ebx, ecx, edx)				\
--	__asm__("vmcall" :						\
--		"=a"(eax), "=c"(ecx), "=d"(edx), "=b"(ebx) :		\
--		"a"(VMWARE_HYPERVISOR_MAGIC),				\
--		"c"(VMWARE_CMD_##cmd),					\
--		"d"(0), "b"(UINT_MAX) :					\
--		"memory")
--
--#define VMWARE_VMMCALL(cmd, eax, ebx, ecx, edx)                         \
--	__asm__("vmmcall" :						\
--		"=a"(eax), "=c"(ecx), "=d"(edx), "=b"(ebx) :		\
--		"a"(VMWARE_HYPERVISOR_MAGIC),				\
--		"c"(VMWARE_CMD_##cmd),					\
--		"d"(0), "b"(UINT_MAX) :					\
--		"memory")
--
--#define VMWARE_CMD(cmd, eax, ebx, ecx, edx) do {		\
--	switch (vmware_hypercall_mode) {			\
--	case CPUID_VMWARE_FEATURES_ECX_VMCALL:			\
--		VMWARE_VMCALL(cmd, eax, ebx, ecx, edx);		\
--		break;						\
--	case CPUID_VMWARE_FEATURES_ECX_VMMCALL:			\
--		VMWARE_VMMCALL(cmd, eax, ebx, ecx, edx);	\
--		break;						\
--	default:						\
--		VMWARE_PORT(cmd, eax, ebx, ecx, edx);		\
--		break;						\
--	}							\
--	} while (0)
--
- struct vmware_steal_time {
- 	union {
- 		uint64_t clock;	/* stolen time counter in units of vtsc */
-@@ -109,7 +69,8 @@ struct vmware_steal_time {
- };
- 
- static unsigned long vmware_tsc_khz __ro_after_init;
--static u8 vmware_hypercall_mode     __ro_after_init;
-+u8 vmware_hypercall_mode __ro_after_init;
-+EXPORT_SYMBOL_GPL(vmware_hypercall_mode);
- 
- static inline int __vmware_platform(void)
- {
+> You want to mark the non-wrapping case.
+
+What we want is lack of ambiguity. Having done these kinds of things in
+the kernel for a while now, I have strong evidence that we get much better
+results with the "fail safe" approach, but start by making it non-fatal.
+That way we get full coverage, but we don't melt the world for anyone
+that doesn't want it, and we can shake things out over a few years. For
+example, it has worked well for CONFIG_FORTIFY, CONFIG_UBSAN_BOUNDS,
+KCFI, etc.
+
+The riskier condition is having something wrap when it wasn't expected
+(e.g. allocations, pointer offsets, etc), so we start by defining our
+regular types as non-wrapping, and annotate the wrapping types (or
+specific calculations or functions).
+
+For signed types in particular, wrapping is overwhelmingly the
+uncommon case, so from a purely "how much annotations is needed"
+perspective, marking wrapping is also easiest. Yes, there are cases of
+expected wrapping, but we'll track them all down and get them marked
+unambiguously. One thing on the short list is atomics, so here we are. :)
+
+-Kees
+
 -- 
-2.39.0
-
+Kees Cook
 
