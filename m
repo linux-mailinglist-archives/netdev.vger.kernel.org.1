@@ -1,93 +1,61 @@
-Return-Path: <netdev+bounces-91106-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91107-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E99138B1661
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 00:45:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B2E338B1669
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 00:45:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A02222843EE
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 22:45:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6FC77286B21
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 22:45:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5729416E88D;
-	Wed, 24 Apr 2024 22:45:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD07C16E87C;
+	Wed, 24 Apr 2024 22:45:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Ip2IuUZ5"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Z9ia8oKm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 876A616E874
-	for <netdev@vger.kernel.org>; Wed, 24 Apr 2024 22:45:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E999416E879;
+	Wed, 24 Apr 2024 22:45:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713998711; cv=none; b=k5GdRAfaC53fdyo1bq3sXfEOLeMFp/sFyRTyirycnRGNMbuBoP5IZJBmmCl05uBd+rsfnaXpw2itieXWmI92HJbKPx5/B0UJJAokf3jjDWYFXS7qe80IGri0VPV/JIfgzvKpwAdUlg7JtXQOlQtWwJ6YoNDlk3t6vcELb86cRp4=
+	t=1713998750; cv=none; b=Cy8O2NLb76vIqkwG8dCMi35rf3fjQQfvpDkNMve3JKNBa1xDHNNXeEYu0nszkdiCAvip3LEhLxMRl/5KKKB9B7EXbya/K3CK0HU7Hl7y05qtLA7SbiZCykZwQSpftToHd0npW/JG+iv8/+lihF2bGpiV+N2a8GR1ZXOXhtGodC8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713998711; c=relaxed/simple;
-	bh=PesUfngxJz9TzB+RXrKPi6gidufT5NJWBpNfqP6UeSg=;
+	s=arc-20240116; t=1713998750; c=relaxed/simple;
+	bh=2bVYRRQaaSANIAiBxPXSRAarBno2eLafIZwTUiWnNpY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=F6n1MZlRS9XdoFSV5sesHKvlHsmJ9l8A1kQuvFB7IAoDXsz7ImFtPTvbNfhQMBZ4fwy1Fr9ID190/2fbheqS2e1S3t4ZFG2OfXvv2D/cZbVhDB0whDR6ozCB+dEVdyX1HeziE9Lzo+2TXnoadkzU3hKPuKmA5t/2Ar+eMab3y9s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=Ip2IuUZ5; arc=none smtp.client-ip=209.85.210.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
-Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-6eddff25e4eso373788b3a.3
-        for <netdev@vger.kernel.org>; Wed, 24 Apr 2024 15:45:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1713998709; x=1714603509; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=bQ7aAoW8uYuZUJ8c+fQ05Y2fxYHEV3uQB6MRkhy36Ug=;
-        b=Ip2IuUZ5LfeaeG8LgTT7FPRSNVprS1WtQ8j+0rOBMsdFH8RkkiUSJdxlYmcWm0keco
-         D0VyxtpaYBK3q8eO/87uN8z81J/XdcHp44mFnYRtTQyLFhhWKfvbInbP/sym7rPhnNN8
-         73IKrRKCZtycqCXOrZtxQ2k6kD6uCr8YzTm4E=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713998709; x=1714603509;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bQ7aAoW8uYuZUJ8c+fQ05Y2fxYHEV3uQB6MRkhy36Ug=;
-        b=oteRLuhPISLPAezM/inU9OBvZQIndjkBhfTWGOnQY39TirnV4Kl/OXaCp2Xh/m0KIU
-         zd54XGeY6a3r3nfksWA3yhW++hSG6hfVET7jew04GxmuqHN1bdzOFAUWMgZxyopYgOA8
-         oYkiGu6w8HqoWQY+pquaXkFA5WJWVdUJ7ptY/VWf/SJuqGcaonkJFBt0P73NOPWROG2Z
-         iHEAwobiIh16bZvHcQxGJALaP8MbU2imob1/AAtXvrDTphJDa7g0/i07WSHv+wFjgSoz
-         xQWmPkuPAM1R0tNXXiEWyE7+SA+CSo0Bq4AnA2zw43kloRVdoqNxCKE5IjB5/SAlIJwI
-         DW+w==
-X-Forwarded-Encrypted: i=1; AJvYcCVxAcsHu9b9j3b29DbGN+9VUelZmbdp8W8lSOCLjqYbc4pmRm9hgrBVvXAVcZCEL9uPtneaYE0R2PPk9VNMVcBDbukxD8+3
-X-Gm-Message-State: AOJu0YyTUzc/In1Vhd6b8v3JIqZd1GWVpHEmmgbhXpg+kK7hSGE9SUM+
-	KP3IFvKa6qoa9vLle5KvApgTWOHedJrNJCL0yVBQxAUfcmlZhBJYGBDDlQSTiQ==
-X-Google-Smtp-Source: AGHT+IEAjXKcOqWbmJBmZ5dMg2rtYhG1LF2zwzQbtnGchw8LS/JZuvVMQDMhTtYVw79O2YlLzJPAxg==
-X-Received: by 2002:a05:6a00:4fcb:b0:6eb:2b:43b4 with SMTP id le11-20020a056a004fcb00b006eb002b43b4mr5470380pfb.27.1713998708861;
-        Wed, 24 Apr 2024 15:45:08 -0700 (PDT)
-Received: from www.outflux.net ([198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id ln2-20020a056a003cc200b006eff6f669a1sm11902767pfb.30.2024.04.24.15.45.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Apr 2024 15:45:08 -0700 (PDT)
-Date: Wed, 24 Apr 2024 15:45:07 -0700
-From: Kees Cook <keescook@chromium.org>
-To: Peter Zijlstra <peterz@infradead.org>
-Cc: Mark Rutland <mark.rutland@arm.com>, Will Deacon <will@kernel.org>,
-	Boqun Feng <boqun.feng@gmail.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>, Jakub Kicinski <kuba@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	"Paul E. McKenney" <paulmck@kernel.org>,
-	Uros Bizjak <ubizjak@gmail.com>, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-arch@vger.kernel.org,
-	netdev@vger.kernel.org, linux-hardening@vger.kernel.org
-Subject: Re: [PATCH 1/4] locking/atomic/x86: Silence intentional wrapping
- addition
-Message-ID: <202404241542.6AFC3042C1@keescook>
-References: <20240424191225.work.780-kees@kernel.org>
- <20240424191740.3088894-1-keescook@chromium.org>
- <20240424224141.GX40213@noisy.programming.kicks-ass.net>
+	 Content-Type:Content-Disposition:In-Reply-To; b=GBslqUXc5rl8vfbf/P2agAilY+Lu+smENAvDO9BdNGMZa1B24Ue2GYyax2/gEQIXTgQVXfJraeR0iixPuiWYXdnwooxn+e23vVFFmpAmSpoxwujKMDAKk3x3+nRZR1fgzk+4xD/2Uf4DzQxCmhrsv+AeU/cHaZPTWPl57F8GTSE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Z9ia8oKm; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=Q6vQC85ZngIOR8bR4u952PNrCjyiBnCelYS1okjQp/g=; b=Z9ia8oKmH7gQiA1k3XDKCHwSDc
+	IvT6Hp3eOFiuhkkzrx09/bp5NSIFCTavHmVn3u9uewpT4/L3dDCePJjmpTshvZ9fI7nRZatxgXMu1
+	J4Vl+j1pQrMUwiqaHP4ddxAHIviSrOnfVOWfoyXJU7kWQb/GGtTUNMZLG4+pnuLfM8+E=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rzlMt-00DtX7-Cy; Thu, 25 Apr 2024 00:45:35 +0200
+Date: Thu, 25 Apr 2024 00:45:35 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Geert Uytterhoeven <geert+renesas@glider.be>
+Cc: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>,
+	Sergey Shtylyov <s.shtylyov@omp.ru>,
+	Paul Barker <paul.barker.ct@bp.renesas.com>,
+	Niklas =?iso-8859-1?Q?S=F6derlund?= <niklas.soderlund+renesas@ragnatech.se>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org
+Subject: Re: [PATCH] net: ravb: Fix registered interrupt names
+Message-ID: <1f131230-56a5-4547-bc77-c508e61e8a55@lunn.ch>
+References: <cde67b68adf115b3cf0b44c32334ae00b2fbb321.1713944647.git.geert+renesas@glider.be>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -96,35 +64,38 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240424224141.GX40213@noisy.programming.kicks-ass.net>
+In-Reply-To: <cde67b68adf115b3cf0b44c32334ae00b2fbb321.1713944647.git.geert+renesas@glider.be>
 
-On Thu, Apr 25, 2024 at 12:41:41AM +0200, Peter Zijlstra wrote:
-> On Wed, Apr 24, 2024 at 12:17:34PM -0700, Kees Cook wrote:
+On Wed, Apr 24, 2024 at 09:45:21AM +0200, Geert Uytterhoeven wrote:
+> As interrupts are now requested from ravb_probe(), before calling
+> register_netdev(), ndev->name still contains the template "eth%d",
+> leading to funny names in /proc/interrupts.  E.g. on R-Car E3:
 > 
-> > @@ -82,7 +83,7 @@ static __always_inline bool arch_atomic_add_negative(int i, atomic_t *v)
-> >  
-> >  static __always_inline int arch_atomic_add_return(int i, atomic_t *v)
-> >  {
-> > -	return i + xadd(&v->counter, i);
-> > +	return wrapping_add(int, i, xadd(&v->counter, i));
-> >  }
-> >  #define arch_atomic_add_return arch_atomic_add_return
+> 	89:  0      0  GICv2  93 Level  eth%d:ch22:multi
+> 	90:  0      3  GICv2  95 Level  eth%d:ch24:emac
+> 	91:  0  23484  GICv2  71 Level  eth%d:ch0:rx_be
+> 	92:  0      0  GICv2  72 Level  eth%d:ch1:rx_nc
+> 	93:  0  13735  GICv2  89 Level  eth%d:ch18:tx_be
+> 	94:  0      0  GICv2  90 Level  eth%d:ch19:tx_nc
 > 
-> this is going to get old *real* quick :-/
+> Worse, on platforms with multiple RAVB instances (e.g. R-Car V4H), all
+> interrupts have similar names.
 > 
-> This must be the ugliest possible way to annotate all this, and then
-> litter the kernel with all this... urgh.
+> Fix this by using the device name instead, like is done in several other
+> drivers:
+> 
+> 	89:  0      0  GICv2  93 Level  e6800000.ethernet:ch22:multi
+> 	90:  0      1  GICv2  95 Level  e6800000.ethernet:ch24:emac
+> 	91:  0  28578  GICv2  71 Level  e6800000.ethernet:ch0:rx_be
+> 	92:  0      0  GICv2  72 Level  e6800000.ethernet:ch1:rx_nc
+> 	93:  0  14044  GICv2  89 Level  e6800000.ethernet:ch18:tx_be
+> 	94:  0      0  GICv2  90 Level  e6800000.ethernet:ch19:tx_nc
+> 
+> Rename the local variable dev_name, as it shadows the dev_name()
+> function, and pre-initialize it, to simplify the code.
 
-I'm expecting to have explicit wrapping type annotations soon[1], but for
-the atomics, it's kind of a wash on how intrusive the annotations get. I
-had originally wanted to mark the function (as I did in other cases)
-rather than using the helper, but Mark preferred it this way. I'm happy
-to do whatever! :)
+Another option is to call dev_alloc_name() soon after alloc_netdev(),
+to give the device its name earlier than register_netdev().
 
--Kees
-
-[1] https://github.com/llvm/llvm-project/pull/86618
-
--- 
-Kees Cook
+	Andrew
 
