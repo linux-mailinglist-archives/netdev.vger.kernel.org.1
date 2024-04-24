@@ -1,116 +1,143 @@
-Return-Path: <netdev+bounces-90885-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90886-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0268C8B09F4
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 14:46:27 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0853D8B0A01
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 14:49:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 34C021C2454E
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 12:46:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B1A321F23D99
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 12:49:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB95D15686E;
-	Wed, 24 Apr 2024 12:46:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12A0215B153;
+	Wed, 24 Apr 2024 12:49:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c8csSnqW"
+	dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b="R5kbLw91";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b="XMR3ziPw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx1.tq-group.com (mx1.tq-group.com [93.104.207.81])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BA9541A87;
-	Wed, 24 Apr 2024 12:46:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3A41219EA;
+	Wed, 24 Apr 2024 12:49:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.104.207.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713962781; cv=none; b=bXbte9fzTXICACUwT+4CJFN56roWeebvaLJjrNFR6ep0GoE0ftU5GtMmYy1Xv1R+sDLYKGM10KZWpYNiiuLNjEcfXyqEVrwSUQLzn5SnO/5jkjoexyInodyvb5PysW/R1U71UQCXqE3eyqA6qDG7Lq6aXh8a5ce+lWrHyzM1DBA=
+	t=1713962960; cv=none; b=fDTfeoc4D6aP49gpwuv9Gkep6c0LwukFdGoayzXLkTLtWhQ+2OIsi9rnGKO4yyhT5rDfp101fGAED6xL791P+zrDIGwb7VZIWmWwckVQ7jeYnoQXCmeyPsghPfCHzPeFgbErTm2nERnVONgkIEWSBarFRDt4TaQlB7ZqYHRVs4o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713962781; c=relaxed/simple;
-	bh=93+T8xJd3cXLT+8AE8EB6mYgzWWVXtgtKLQaSc/xBMI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=o5EJKByz1S+wq7ri5+d6X0EYh0gKe+sRWE+/7xaxB7KtYBj1Nei/I+AQcdBzeQW8LDWnMfW1vCx3tmFUMXg6wo1VSb6UqSMCkMGiUetvPl1Xfk7bdZDTsO6flB0mDwYfY1QXTBlIf2VKA/4q0mMPn4wnxX/2cwmh49fl82ezYyY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=c8csSnqW; arc=none smtp.client-ip=209.85.167.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-516ef30b16eso8381007e87.3;
-        Wed, 24 Apr 2024 05:46:20 -0700 (PDT)
+	s=arc-20240116; t=1713962960; c=relaxed/simple;
+	bh=VdU+Xq3t2ScH+5gw2z0PqnIEUjrWzU/wrEXQ4Siljos=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=jcao2beiki9w1+RgUP14QKoNjmgch8nwBbTFtUgWSMkfzZ5lQK+t/kIE6yFiF40b0QKCjuUe5jIjl2eD+j1qmHa1SFnTwASqEAxAYqlkT95Bb9Mei2F3CN9pHuaSpDzJ7hQ7Fgvnm+mV2js6kFE+KHk9GDTzlRDTQdRq9zXYxDw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com; spf=pass smtp.mailfrom=ew.tq-group.com; dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b=R5kbLw91; dkim=fail (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b=XMR3ziPw reason="key not found in DNS"; arc=none smtp.client-ip=93.104.207.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ew.tq-group.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713962778; x=1714567578; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+6TyatYgquEoqN9hGCWnWbVOlkZrg/qYutSLoXl0UTk=;
-        b=c8csSnqWkuOKSm2ryHvHEdB16KGx7xMB033UyC6ykMIecZMZVtWmDsXsrAqQi2DVnl
-         4SIofNU79+qsZqlBh4R1Fw+6peesyBNNxTfzL9WMnRZKzPPdrCRFQ0z9Cn/DrbZrLruD
-         PCLfCxIZpk6I7BsZ3LNrhP+KTT6zZf4vfdFkOMkiuwOwU6ccdsKCAmMIe/CsZLUWV0eB
-         EZOWMJPbzG7hpLoY/irQFuLfXjrjOD1F2NByp60eDy4JrZhZ9FwGjSSQhDfHFjV2L8NJ
-         TvmS9yNQBXD6B+6Defm/cEEBP3NvDp0EfE/KeyOZ+QUe2/PcqWp+dmbbEnPmfGjSqSnZ
-         Ht8g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713962778; x=1714567578;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=+6TyatYgquEoqN9hGCWnWbVOlkZrg/qYutSLoXl0UTk=;
-        b=khvlS8JsnPudBJvSFPW/aOZPuoI7s9/6rVeMT/jYf5erZIjPCHf+/umKmwRaNCGcpL
-         oLIroao+mJO4ltssKDJdR3nRn9V49FQZk3SCP7eeH54itzV9viGUKim8OZnJMEn8A/fS
-         Gz7SwhB1CxoLOYOe58cDvsn6nqqr/PPvMeQfEBLArVCluuAMFneg8FD5Vk/YLs3ubY4H
-         EA0fOuby4+nnrk8iUphqqQsxX80WzPKlTa6BNqQk1KBAvFrb80mY1XnVtLabSjwLI8lO
-         UW3VFX0tsD1Q+JsPDr3e97xUbhcejLn/XJDQ6bXYuLoNbPqIEeeXKQMPipD5IqJ4bLvi
-         KcPA==
-X-Forwarded-Encrypted: i=1; AJvYcCXaIKwMfvg3scMWreuFWUHyB6i/XPv5sm7ai1tVCj7q7CJXiCZ9CuStoeFCAmt1Ix/mGfdHLtRj0qJKhZcjqtxF5zwYUEowAu09yX/s30+2XV39EjMBvVrf0n4d8T04vPHX0fMVEqmhYkzXO1F835VXC7mRYe36cK4iwSQWZaTy
-X-Gm-Message-State: AOJu0YxwhLcViy746m0tEL5ip6htgu9mrY9RH9L8dUyPXobykhtgjeBr
-	y+5RydgHm3Yz4nBmocF4KiB3pkqu38H1LqKKcUVEr/H3Qbx9iduzowCy9Kraek+dMul3A9cuGS4
-	tUqiqmvK+goSfjmRNp4eqCmdjgJc=
-X-Google-Smtp-Source: AGHT+IEjbCu8zM2o9faAOyVL2dwkhogAJAXqFNtV2Wm2BJdBui8upObgqrxp6TVRNEGGaQGBWfOudgvaGBNm310z0n0=
-X-Received: by 2002:a05:6512:b12:b0:51b:de39:3826 with SMTP id
- w18-20020a0565120b1200b0051bde393826mr1910497lfu.65.1713962778231; Wed, 24
- Apr 2024 05:46:18 -0700 (PDT)
+  d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
+  t=1713962956; x=1745498956;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:content-transfer-encoding:mime-version;
+  bh=Nfzou4bPZHEFbM1qrzBnY6X7a0PW/6vDaAjCrguNNwM=;
+  b=R5kbLw91zBmviiN8nUoTkpgGujjU74+EStk29BSOZrgzlyoGfINGD03N
+   YqmM0w2GCGPAxB7+SUm2MMSfiF2JdsKmjKCm8umJFvgWE8ipgIUyXz4s+
+   8azxOo3Ilsw8wpn9NDPwE68B6fswIjnAU2BWEFVwZ2yAMFM493erUuOwE
+   HM8OHR1pMv3D1zjgTPy3Zqrx9RjmN7hAG4tF08Np8HaifGyJJfsll36S6
+   0j+o+ZWt2Bcngt8zehra5p0goIwKgfiVguqSJKONLjhcP0ABcoMj6W5rt
+   zy69AmB/Eirk0oBR8TKYbHO1FbWUDM8a2ajVC6G4wPxdzecivhCzhe6Ra
+   Q==;
+X-IronPort-AV: E=Sophos;i="6.07,226,1708383600"; 
+   d="scan'208";a="36591428"
+Received: from vmailcow01.tq-net.de ([10.150.86.48])
+  by mx1.tq-group.com with ESMTP; 24 Apr 2024 14:49:13 +0200
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 769131704ED;
+	Wed, 24 Apr 2024 14:49:07 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ew.tq-group.com;
+	s=dkim; t=1713962949;
+	h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=Nfzou4bPZHEFbM1qrzBnY6X7a0PW/6vDaAjCrguNNwM=;
+	b=XMR3ziPw0K9k6la6ctKkef70lQo/JHakhQOLNUZId4/jeeRZHaubqInVH4APWt5GUR8uPr
+	HdvlKpVgOGRDWMIpUIvyKgMd2v2adlzkR97fdaTQU9bZcEM+Yaq8hc/uQptXjvdN5TUnwV
+	uNqDcAhTIYOIkNaO/nmFq92AVQBr1e5/utic4Uk69XOl0L292tWyHzyNm52/YPXMxhCEmi
+	T7cOrnQ8RGa0irdw+8Z3y0EYrV3c1YRRgiBF/YZDLkh38nelFCMLf8U5jXIa4DKU/oH9L8
+	EiinX9yyKDKLM5HMdFHfmweqxvKucwTojcQcse5MDDW8UC4G4AP8mopISLRLZA==
+Message-ID: <1cb8bafb44075858221b31c056d75a40d7ba2ee1.camel@ew.tq-group.com>
+Subject: Re: [PATCH net-next] net: phy: marvell: add support for MV88E6020
+ internal PHYs
+From: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>,  "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org,  linux@ew.tq-group.com
+Date: Wed, 24 Apr 2024 14:49:07 +0200
+In-Reply-To: <19c4b8da-203e-4a81-9531-9ba4a4f750fd@lunn.ch>
+References: <20240424121022.160920-1-matthias.schiffer@ew.tq-group.com>
+	 <19c4b8da-203e-4a81-9531-9ba4a4f750fd@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.44.4-0ubuntu2 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240423233622.1494708-1-florian.fainelli@broadcom.com>
- <20240423233622.1494708-2-florian.fainelli@broadcom.com> <ZihLSKe_BHxasBql@surfacebook.localdomain>
- <0aac2975-42d0-4abe-9405-bf8a38a94104@broadcom.com> <b3cdfeb7-6eb0-4522-96ae-d3155d677002@lunn.ch>
-In-Reply-To: <b3cdfeb7-6eb0-4522-96ae-d3155d677002@lunn.ch>
-From: Andy Shevchenko <andy.shevchenko@gmail.com>
-Date: Wed, 24 Apr 2024 15:45:42 +0300
-Message-ID: <CAHp75VfBnYdzs+rD2QLq=tavr=Aw2PsKbxXOseUJNWWwXsAwPw@mail.gmail.com>
-Subject: Re: [PATCH 1/4] i2c: designware: Create shared header hosting driver name
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Florian Fainelli <florian.fainelli@broadcom.com>, linux-kernel@vger.kernel.org, 
-	Jarkko Nikula <jarkko.nikula@linux.intel.com>, 
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>, 
-	Mika Westerberg <mika.westerberg@linux.intel.com>, Jan Dabros <jsd@semihalf.com>, 
-	Andi Shyti <andi.shyti@kernel.org>, Lee Jones <lee@kernel.org>, 
-	Jiawen Wu <jiawenwu@trustnetic.com>, Mengyuan Lou <mengyuanlou@net-swift.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>, Duanqiang Wen <duanqiangwen@net-swift.com>, 
-	"open list:SYNOPSYS DESIGNWARE I2C DRIVER" <linux-i2c@vger.kernel.org>, 
-	"open list:WANGXUN ETHERNET DRIVER" <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-Last-TLS-Session-Version: TLSv1.3
 
-On Wed, Apr 24, 2024 at 3:18=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
-> > > >   #include <linux/i2c.h>
-> > > > +#include <linux/i2c-designware.h>
-> > >
-> > > Can it be hidden in the subfolder?
-> >
-> > That would require the MFD and ethernet drivers to include relative to =
-where
-> > they are in the source tree, do we really want that?
->
-> Maybe linux/platform_data/i2c-designware.h ? There are a few NAME
-> macros in there.
+On Wed, 2024-04-24 at 14:42 +0200, Andrew Lunn wrote:
+> On Wed, Apr 24, 2024 at 02:10:22PM +0200, Matthias Schiffer wrote:
+> > The embedded PHYs of the MV88E6020 (88E6250 family) switch are very
+> > basic - they do not even have an Extended Address / Page register.
+> >=20
+> > This adds support for the PHYs to the driver to set up PHY interrupts
+> > and retrieve error stats. The ethtool stat functions are slightly
+> > refactored to allow dealing with different marvell_hw_stat definitions.
+> >=20
+> > The same code should also work with other 88E6250 family switches
+> > (6250/6220/6071/6070), but it is unclear whether these use the same PHY
+> > ID - the spec only lists the prefix 0x01410c00 and describes the lower
+> > 10 bits as reserved, but that seems too unspecific to be useful, as it
+> > would cover several existing PHY IDs already supported by the driver.
+>=20
+> This sounds like:
+>=20
+> https://elixir.bootlin.com/linux/latest/source/drivers/net/dsa/mv88e6xxx/=
+chip.c#L3642
+>=20
+> So the DSA driver will fill in the lower bits, and it should work for
+> all devices in the family.
+>=20
+> > @@ -4072,6 +4134,7 @@ static struct mdio_device_id __maybe_unused marve=
+ll_tbl[] =3D {
+> >  	{ MARVELL_PHY_ID_88E1540, MARVELL_PHY_ID_MASK },
+> >  	{ MARVELL_PHY_ID_88E1545, MARVELL_PHY_ID_MASK },
+> >  	{ MARVELL_PHY_ID_88E3016, MARVELL_PHY_ID_MASK },
+> > +	{ MARVELL_PHY_ID_88E6020, MARVELL_PHY_ID_MASK },
+> >  	{ MARVELL_PHY_ID_88E6341_FAMILY, MARVELL_PHY_ID_MASK },
+>=20
+> Please follow the naming convention. MARVELL_PHY_ID_88E6250_FAMILY.
+>=20
+>        Andrew
 
-Yes, under subfolder I meant something like
-include/linux/$SOMETHING/_this_header_.h or even deeper.
+We currently do not override the PHY ID for this family in the DSA driver -=
+ my understanding was
+that this is only necessary for switches that don't provide a usable PHY ID=
+ at all. As I have no
+idea if this PHY ID works for the whole family or just the single switch, I=
+ went with the more
+specific naming here.
+
+Matthias
+
+
 
 --=20
-With Best Regards,
-Andy Shevchenko
+TQ-Systems GmbH | M=C3=BChlstra=C3=9Fe 2, Gut Delling | 82229 Seefeld, Germ=
+any
+Amtsgericht M=C3=BCnchen, HRB 105018
+Gesch=C3=A4ftsf=C3=BChrer: Detlef Schneider, R=C3=BCdiger Stahl, Stefan Sch=
+neider
+https://www.tq-group.com/
 
