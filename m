@@ -1,121 +1,91 @@
-Return-Path: <netdev+bounces-91109-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91110-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37D8B8B1694
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 00:55:48 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6315F8B169D
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 00:56:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4869A1C247A8
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 22:55:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8CB53B261FE
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 22:56:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 866F716E893;
-	Wed, 24 Apr 2024 22:55:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92D7616DEDE;
+	Wed, 24 Apr 2024 22:56:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="V23yVE2f"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rf9+O0Am"
 X-Original-To: netdev@vger.kernel.org
-Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 981D316192C;
-	Wed, 24 Apr 2024 22:54:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B5EB1E86F;
+	Wed, 24 Apr 2024 22:56:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713999301; cv=none; b=Woh9lmbPQ78BZw6FEFfKiUKRNKnItZZ1PmyQfsS1OZ6g7SBLHzTsNtzJfTS5u8SPRp89ptiSq/mhpoVm2yhZv1ZzwuEkxksGbHQzKdWhWMcSrpOiCuDH/oJlWDdUsmZAdW27Wxg86ece9TzveMwuT9HkzZliDRQCKFhIHd0ISzU=
+	t=1713999411; cv=none; b=NmhsAzuCsc9zIcERgEpFMjx5k8PH5Zw9i/SwvHVyHFFWWxRHhWB38YV6vkqb39glZ86qu2vuPuB752G1Aombfd1IvMOK0a7aKnhcJX2LboLi3E4UyRx6WSYuyht8/k0kZ+AlKEa5rLh9Rbnfc/QyNWtRF6gfzFrB4F9FbzYdkKE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713999301; c=relaxed/simple;
-	bh=z9pMGRLrLzKVrELAWdWdsuiieAGr6M7d01DM3NJ5UWM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ClzlV5GM1w+vhVT2jQFHE6jsr/HPxEL8GO/28yCDBay//sZ45Td0LrIBj0Fpt5Khp9uSe1XwN3HPBRbEA7NJF2cyjtpxt/ndD8CuOoEc2NsAlexziQ9V8JlyxUAJBMRX+O1pPWlxj/Bi0SeTDb28uQGsN24a22VePiL5QK059JQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=V23yVE2f; arc=none smtp.client-ip=90.155.92.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=0/eQjSTv8D6eZQAQWbqT2LJmg+Blfc0mgxAHCYd1hAM=; b=V23yVE2fnmFqMNMneHrFe2nxSM
-	zIWX162MuXqByjLfKBbVwbcp0AzY6fOr+0zfvw3ceFos1ccHbkuaHaEJFbPDycFIj7r7MKcF3AoF9
-	Ud6OrWWxfWsmc/D/+WPeVi1hgsxDm+xxuEvPjvu6V9rqYd4gytTsn/nUr0lGOIgRmdOThR/yErVzY
-	Mp0SW0j3wOVIs5oVCS2IWT6ty3aWNKwgTx+o7gyzjjIXeUcvMSvHWtx/LYxCM2uEFyk5JbJnKhQqI
-	ksWgC3vKtJidBTEq1tb37xRzuRV/Cv8knq5a8vixM6EfUhAnYGC4lr+jvFKN79uqdv+0symsrN1UX
-	sZ19Qvcw==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-	by desiato.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rzlVc-0000000EdKy-3Czb;
-	Wed, 24 Apr 2024 22:54:37 +0000
-Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
-	id 6ACAD30043E; Thu, 25 Apr 2024 00:54:36 +0200 (CEST)
-Date: Thu, 25 Apr 2024 00:54:36 +0200
-From: Peter Zijlstra <peterz@infradead.org>
-To: Kees Cook <keescook@chromium.org>
-Cc: Mark Rutland <mark.rutland@arm.com>, Will Deacon <will@kernel.org>,
-	Boqun Feng <boqun.feng@gmail.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>, Jakub Kicinski <kuba@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	"Paul E. McKenney" <paulmck@kernel.org>,
-	Uros Bizjak <ubizjak@gmail.com>, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-arch@vger.kernel.org,
-	netdev@vger.kernel.org, linux-hardening@vger.kernel.org
-Subject: Re: [PATCH 1/4] locking/atomic/x86: Silence intentional wrapping
- addition
-Message-ID: <20240424225436.GY40213@noisy.programming.kicks-ass.net>
-References: <20240424191225.work.780-kees@kernel.org>
- <20240424191740.3088894-1-keescook@chromium.org>
- <20240424224141.GX40213@noisy.programming.kicks-ass.net>
- <202404241542.6AFC3042C1@keescook>
+	s=arc-20240116; t=1713999411; c=relaxed/simple;
+	bh=L8SWJW40YNg+bBM8Lg4lMQv0LTgccJJD5LAiYkskBCY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=cYeGHAgatQGgmfZYTaOkKD2Sj3g4RDlKlx26ttPaqJCsbuTIgrmKKknKyzuEZ9KH66CyJ39BHq5fSkBP5g70fmjdwXDUdow/a34jD/ole9RwegW8pPLyoJzOIerirgw7OX1NEomK5Wo2+cWcPEu52IW7Fgp7u57y+oIz08Vf6UA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rf9+O0Am; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9C90C113CD;
+	Wed, 24 Apr 2024 22:56:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713999410;
+	bh=L8SWJW40YNg+bBM8Lg4lMQv0LTgccJJD5LAiYkskBCY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Rf9+O0Amp6VZAFJSD9SbhoQ1oNFE16Ob5x7SziiiVjyL0RTvzglyxI+z96JhauSaJ
+	 sLRPik94PxE6n8AHVOBRRx2XKzAlMUXfNy98/FzleXdF67rWikgxbLvgqdY3+6Mkn9
+	 U5JtZCstn+eytBymgmVo2Etp6MuCLhY/WxQQTZ8whC39xCr24ToDJxYFyBmB5VrYP1
+	 jgHxug7KnvhqyjJvvPy8bEu2h47mwNPbidWucFNklPAef8ApG6FL4LMsHqTQN9jIdQ
+	 tZivneNVAJio5w67xs06qAVmsvmF84qD/WemyFFtS3Bqc18ESV5eCqyJt3EA3Kg4l1
+	 fLXDYifl3TtLA==
+Date: Wed, 24 Apr 2024 15:56:49 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+ linux-kselftest@vger.kernel.org, willemdebruijn.kernel@gmail.com
+Subject: Re: [PATCH net-next 1/4] selftests: drv-net: force pseudo-terminal
+ allocation in ssh
+Message-ID: <20240424155649.5f43b426@kernel.org>
+In-Reply-To: <20240424221444.4194069-2-kuba@kernel.org>
+References: <20240424221444.4194069-1-kuba@kernel.org>
+	<20240424221444.4194069-2-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <202404241542.6AFC3042C1@keescook>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, Apr 24, 2024 at 03:45:07PM -0700, Kees Cook wrote:
-> On Thu, Apr 25, 2024 at 12:41:41AM +0200, Peter Zijlstra wrote:
-> > On Wed, Apr 24, 2024 at 12:17:34PM -0700, Kees Cook wrote:
-> > 
-> > > @@ -82,7 +83,7 @@ static __always_inline bool arch_atomic_add_negative(int i, atomic_t *v)
-> > >  
-> > >  static __always_inline int arch_atomic_add_return(int i, atomic_t *v)
-> > >  {
-> > > -	return i + xadd(&v->counter, i);
-> > > +	return wrapping_add(int, i, xadd(&v->counter, i));
-> > >  }
-> > >  #define arch_atomic_add_return arch_atomic_add_return
-> > 
-> > this is going to get old *real* quick :-/
-> > 
-> > This must be the ugliest possible way to annotate all this, and then
-> > litter the kernel with all this... urgh.
+On Wed, 24 Apr 2024 15:14:41 -0700 Jakub Kicinski wrote:
+> This is not yet needed, because we don't terminate remote background
+> commands. But once we do, if we run ssh without -t the ssh session
+> may close and the program may carry on happily running.
 > 
-> I'm expecting to have explicit wrapping type annotations soon[1], but for
-> the atomics, it's kind of a wash on how intrusive the annotations get. I
-> had originally wanted to mark the function (as I did in other cases)
-> rather than using the helper, but Mark preferred it this way. I'm happy
-> to do whatever! :)
+> I have hit this problem experimenting with mausezahn, let's fix
+> it already to avoid someone else wasting time debugging it.
 > 
-> -Kees
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+>  tools/testing/selftests/drivers/net/lib/py/remote_ssh.py | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> [1] https://github.com/llvm/llvm-project/pull/86618
+> diff --git a/tools/testing/selftests/drivers/net/lib/py/remote_ssh.py b/tools/testing/selftests/drivers/net/lib/py/remote_ssh.py
+> index 924addde19a3..294a4ed8284e 100644
+> --- a/tools/testing/selftests/drivers/net/lib/py/remote_ssh.py
+> +++ b/tools/testing/selftests/drivers/net/lib/py/remote_ssh.py
+> @@ -20,7 +20,7 @@ from lib.py import cmd
+>              self._tmpdir = None
+>  
+>      def cmd(self, comm):
+> -        return subprocess.Popen(["ssh", "-q", self.name, comm],
+> +        return subprocess.Popen(["ssh", "-t", "-q", self.name, comm],
+>                                  stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-This is arse-about-face. Signed stuff wraps per -fno-strict-overflow.
-We've been writing code for years under that assumption.
-
-You want to mark the non-wrapping case.
-
-
-
+This seems to mess up the local terminal. I guess we'll cross that
+bridge when we get there... I'll drop this patch when applying.
 
