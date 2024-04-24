@@ -1,178 +1,176 @@
-Return-Path: <netdev+bounces-90858-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90859-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 657C28B079E
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 12:47:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CB928B07BC
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 12:54:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EB9B92833AC
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 10:47:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C774E2863C2
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 10:54:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01F76159566;
-	Wed, 24 Apr 2024 10:47:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HfveqtrY"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A855F1598EC;
+	Wed, 24 Apr 2024 10:54:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A8E813D530;
-	Wed, 24 Apr 2024 10:47:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBB99152E0B;
+	Wed, 24 Apr 2024 10:54:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713955642; cv=none; b=PG8LrD/M2tzuji7dGDuN8VorsjcilUzhav7qNqbATYRzNuLAUpko1M/zqOBcWAtnllRBW+/lcePkdBHvPPH0o+G5m3Kssq/kldM8GD8g/XuOwJ6ks52XKFHNWD76CfTK72Qchjio1XCX3GiuOJvukrQs2dyH7X3doZMhgXh+8xg=
+	t=1713956066; cv=none; b=miQXiQlZ5RHCr3MPbbiBplOhXD/C4YiZ6O//q+GERsJ8prV3CmZws1IKJ0HNHwgN5c3ql7zM//DJlSyxUStxDv5oTaYNZz5tLg2T2FdPnODS0w5afZjiP/QzRB7vdeZvCr/BWxvtl6krp3m0jgwN+zQzHdOkow/l9nMg2yLjfUQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713955642; c=relaxed/simple;
-	bh=ndNtKsEJHrisTXsm+DPwzCduTCWbdENCeJabFAAgmzU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=M9Ikcv+mgpshkVr+Y3xwd4VKXOziyZrnOF64TZ7Ave51RiH+PHn6pRSolqB/VlDdD0rOlkqSU9E0QLPC5BBfx31FCIKo1uryniGjhhsilYDhGiUfCb5DNdiK57zycz4V2YJo10BZgvZRQ913P4xmgLiky0IWTDFwxAadYkhx1o8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HfveqtrY; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	s=arc-20240116; t=1713956066; c=relaxed/simple;
+	bh=dTdKB9+IkBBoLgEPCcacEl7xptPU+1wETHC5RBLak14=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=XBUcST1H/NrhCgKaMio34dBQ5E0+5v3/cb2Flwg8MsuF3Kx4FnzCqRLePzs85W2ImyIiXWw4RKL/ncZowvLQD78XbgLDGecTVDKZfhQY8sZ9MuZGrq/G9ymB/nJh4mo73o3OtwghmSyU7lI69OBbvaBWb82ONIJnNgjaQgeBYko=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=wanadoo.fr
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-1e8bbcbc2b7so51454355ad.0;
-        Wed, 24 Apr 2024 03:47:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713955641; x=1714560441; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=6bdsQTir/3MhHCM4A7qlVF2Qj2jipD2HiwXE+6sUe60=;
-        b=HfveqtrYAc0a5HHWECX+Si9xh3Y4JTCwUy5mnzs4zjH3MjpB53D0BnY0yWouORezTX
-         5crbbW0YiJCP6COBJ8t4xtB9k63QIQc93XCZApuFXOXqa3O3Wgb8qSWdHRKMSvYyyAOf
-         7gmQVEnAPdCvItLyNclFMG1F50KCstoQ66nV33B5hNW5hR9DQco7FATW6arkZkBunffS
-         0lAaYFJbr+b0wmn0LtMwQyc9h0OZSdQrWT1VrZDMs1hF9pS0PqCbNEu1TCuiDc5fbuW9
-         2H1DsQ2n4a3BbcbRDKd4dYpWpKPjztZXuvFcBgLh4I4WVg9BA+vNNOw+CffS3M7WWFGm
-         x+0g==
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-6ed112c64beso5853031b3a.1;
+        Wed, 24 Apr 2024 03:54:24 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713955641; x=1714560441;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6bdsQTir/3MhHCM4A7qlVF2Qj2jipD2HiwXE+6sUe60=;
-        b=R4+G2WDZH9ciXOExb6N2hweO+Yw3eFEpqP0SGwJFzrEGe7lE8kt/xIBSJ9w3zc8geg
-         LPJdBDe5bkDncqaseZvibtuL548VXWVm0XO29PJlmEJ4Iuq+uMzJFx/duNXTDmdDPZe0
-         y44CUzviI9R5ycATUSK/hozsNLMl/NPRcPrrWmjOTZl+7As4RDJrC39cOGt7G5pPXXBq
-         mObnui3DBwR2jbE3UjNb809nQbv6LhzNL6P1xkLC/R0paNBUvlNuwWvkTKr8riJLERYa
-         FMbHOAX8Zym1n+PDUNg5l283Fe/O3QpIX1XFz5wCyyiunpNEn2U6IO5kTmeZbvs0uQhw
-         r05Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXUusLQVkmkvJWSSsV6nCVCay+8tuSRuD+8+50u/jvLFykrDKSBzdFlF9MgdZZeBXgyLTFmzdj9Ns8DQB0ddUog2LpxsmZAhsd+Kdro7w30wJ8oENu+ubT1kMahwndG0W96
-X-Gm-Message-State: AOJu0Yy/S1GrhuD9tdQkRljbF0ocu1sRKwCc1S+SFElNIUzIjlaNvLM2
-	0WxnLB72GKJYY3hztiTb4woQGYY3eV/csVFEKP+/GTRm2Nk886wp
-X-Google-Smtp-Source: AGHT+IHLHh1TLtVl6/+bXuUaYJEj8Pm/FGfne9gHG3Xf03d902lyDFu59iUFDx1ucdKsT/dldtFtkg==
-X-Received: by 2002:a17:903:44d:b0:1e5:a025:12f9 with SMTP id iw13-20020a170903044d00b001e5a02512f9mr2302997plb.28.1713955640728;
-        Wed, 24 Apr 2024 03:47:20 -0700 (PDT)
-Received: from [192.168.0.107] ([103.124.138.155])
-        by smtp.gmail.com with ESMTPSA id im15-20020a170902bb0f00b001e45572a253sm11845146plb.14.2024.04.24.03.47.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 24 Apr 2024 03:47:20 -0700 (PDT)
-Message-ID: <f759d33f-860c-454b-8553-3b840ed6da8d@gmail.com>
-Date: Wed, 24 Apr 2024 17:47:15 +0700
+        d=1e100.net; s=20230601; t=1713956064; x=1714560864;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=sbRk+8O9BzuC/xDyoYPxAM90+rfheN7dqlzCKkmo9fI=;
+        b=fKmq+FGj9fRPPgTYSaw1imRarnZJN+CUe6bHGD/N7Var7038bDN4DX+jRY6y/e7OOA
+         Jtv8r0LkZmNmn0+K0EssPxFs7hJndLr4QM3aHWwLmhyev0b6IOTi2+QPMCuhBawBNUrR
+         O4yGvBiuKTh9U2VC3RczlfOSUH4aSe09ijpPjLKp4PAAm1LczrIM+shBERbIX8DKk4zF
+         57xQTNOOiM32oMpO/L0D8HkP1cdk1j64dpAL/beasZ49dCcIIv8FQDuvaa5wDfYVFoVs
+         pFs8DJ+b1LTr09SyyPdpufcNLKNmm5ni1fc4wygVF0Kew5PKk4/89pDAWAAC1yf35mJ9
+         fFMw==
+X-Forwarded-Encrypted: i=1; AJvYcCUIOV4soHI/Wc6YOz3P8PrBJHehC0UxRSd8UITAhbwk9FkFRW7WYdN+QWykKFVQXhVk5mlco3LJbNx3+yD+jVXYR3ykddyKCkW1F0NM7w3RXQqw5Yr3WW7oM23DmchD3n+x1/H6cKep8fevtgPJQNrfcZ2lmTCRyckuxZicYdhtMB9a6wFKcnKJw61ob45e7WW1gaIHpWMq4MGUCQ==
+X-Gm-Message-State: AOJu0Yz8ijjXmH9LoE4sm/QbbfD21N8RAOWfbyjDe+G1czAutgBID3s1
+	3luRL+WpaJ5EtYDSjmUFQcy3fc7HO5bBxtmgXGi/cGqlR9KVtu9cVM2PXutZj3oZQUUmD+NcEMx
+	TxieY/ECxk4GEnizRcO9jMbtclKY=
+X-Google-Smtp-Source: AGHT+IEPBBrIzHYPuawwbCDK5O95umbDiYxjntGXJscMNGrfD44AaArcqQZ2F8S4CSUjX7zpwGx4/+8Es4RQwo03Gzc=
+X-Received: by 2002:a05:6a00:ccd:b0:6eb:3d37:ce7a with SMTP id
+ b13-20020a056a000ccd00b006eb3d37ce7amr2675985pfv.21.1713956064157; Wed, 24
+ Apr 2024 03:54:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 6/6] ice: Document tx_scheduling_layers parameter
-To: Mateusz Polchlopek <mateusz.polchlopek@intel.com>,
- Tony Nguyen <anthony.l.nguyen@intel.com>, davem@davemloft.net,
- kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
- netdev@vger.kernel.org
-Cc: Michal Wilczynski <michal.wilczynski@intel.com>, corbet@lwn.net,
- linux-doc@vger.kernel.org, Jiri Pirko <jiri@nvidia.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>
-References: <20240422203913.225151-1-anthony.l.nguyen@intel.com>
- <20240422203913.225151-7-anthony.l.nguyen@intel.com>
- <ZierbWCemdgRNIuc@archie.me> <263b96d6-692e-4e2b-87dd-cf70a8818cbb@intel.com>
-Content-Language: en-US
-From: Bagas Sanjaya <bagasdotme@gmail.com>
-In-Reply-To: <263b96d6-692e-4e2b-87dd-cf70a8818cbb@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20240417-mcp251xfd-gpio-feature-v1-0-bc0c61fd0c80@ew.tq-group.com>
+ <20240417-mcp251xfd-gpio-feature-v1-2-bc0c61fd0c80@ew.tq-group.com>
+In-Reply-To: <20240417-mcp251xfd-gpio-feature-v1-2-bc0c61fd0c80@ew.tq-group.com>
+From: Vincent MAILHOL <mailhol.vincent@wanadoo.fr>
+Date: Wed, 24 Apr 2024 19:54:12 +0900
+Message-ID: <CAMZ6RqKYfFNGpKdwvu2ekuE5FDwiXgmH=Q3bA=QmDMKPLEzYsQ@mail.gmail.com>
+Subject: Re: [PATCH 2/4] can: mcp251xfd: mcp251xfd_regmap_crc_write():
+ workaround for errata 5
+To: Gregor Herburger <gregor.herburger@ew.tq-group.com>
+Cc: Marc Kleine-Budde <mkl@pengutronix.de>, 
+	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>, Thomas Kopp <thomas.kopp@microchip.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	linux-can@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux@ew.tq-group.com, alexander.stein@ew.tq-group.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 4/24/24 16:54, Mateusz Polchlopek wrote:
-> 
-> 
-> On 4/23/2024 2:37 PM, Bagas Sanjaya wrote:
->> On Mon, Apr 22, 2024 at 01:39:11PM -0700, Tony Nguyen wrote:
->>> +       The default 9-layer tree topology was deemed best for most workloads,
->>> +       as it gives an optimal ratio of performance to configurability. However,
->>> +       for some specific cases, this 9-layer topology might not be desired.
->>> +       One example would be sending traffic to queues that are not a multiple
->>> +       of 8. Because the maximum radix is limited to 8 in 9-layer topology,
->>> +       the 9th queue has a different parent than the rest, and it's given
->>> +       more bandwidth credits. This causes a problem when the system is
->>> +       sending traffic to 9 queues:
->>> +
->>> +       | tx_queue_0_packets: 24163396
->>> +       | tx_queue_1_packets: 24164623
->>> +       | tx_queue_2_packets: 24163188
->>> +       | tx_queue_3_packets: 24163701
->>> +       | tx_queue_4_packets: 24163683
->>> +       | tx_queue_5_packets: 24164668
->>> +       | tx_queue_6_packets: 23327200
->>> +       | tx_queue_7_packets: 24163853
->>> +       | tx_queue_8_packets: 91101417 < Too much traffic is sent from 9th
->>> +
->>> <snipped>...
->>> +       To verify that value has been set:
->>> +       $ devlink dev param show pci/0000:16:00.0 name tx_scheduling_layers
->>>   
->>
->> For consistency with other code blocks, format above as such:
->>
->> ---- >8 ----
->> diff --git a/Documentation/networking/devlink/ice.rst b/Documentation/networking/devlink/ice.rst
->> index 830c04354222f8..0039ca45782400 100644
->> --- a/Documentation/networking/devlink/ice.rst
->> +++ b/Documentation/networking/devlink/ice.rst
->> @@ -41,15 +41,17 @@ Parameters
->>          more bandwidth credits. This causes a problem when the system is
->>          sending traffic to 9 queues:
->>   -       | tx_queue_0_packets: 24163396
->> -       | tx_queue_1_packets: 24164623
->> -       | tx_queue_2_packets: 24163188
->> -       | tx_queue_3_packets: 24163701
->> -       | tx_queue_4_packets: 24163683
->> -       | tx_queue_5_packets: 24164668
->> -       | tx_queue_6_packets: 23327200
->> -       | tx_queue_7_packets: 24163853
->> -       | tx_queue_8_packets: 91101417 < Too much traffic is sent from 9th
->> +       .. code-block:: shell
->> +
->> +         tx_queue_0_packets: 24163396
->> +         tx_queue_1_packets: 24164623
->> +         tx_queue_2_packets: 24163188
->> +         tx_queue_3_packets: 24163701
->> +         tx_queue_4_packets: 24163683
->> +         tx_queue_5_packets: 24164668
->> +         tx_queue_6_packets: 23327200
->> +         tx_queue_7_packets: 24163853
->> +         tx_queue_8_packets: 91101417 < Too much traffic is sent from 9th
->>            To address this need, you can switch to a 5-layer topology, which
->>          changes the maximum topology radix to 512. With this enhancement,
->> @@ -67,7 +69,10 @@ Parameters
->>          You must do PCI slot powercycle for the selected topology to take effect.
->>            To verify that value has been set:
->> -       $ devlink dev param show pci/0000:16:00.0 name tx_scheduling_layers
->> +
->> +       .. code-block:: shell
->> +
->> +         $ devlink dev param show pci/0000:16:00.0 name tx_scheduling_layers
->>     Info versions
->>   =============
->>
->> Thanks.
->>
-> 
-> Thank You for reporting that. I will verify this issue soon.
+On Wed. 17 Apr. 2024 at 22:45, Gregor Herburger
+<gregor.herburger@ew.tq-group.com> wrote:
+> According to Errata DS80000789E 5 writing IOCON register using one SPI
+> write command clears LAT0/LAT1.
+>
+> Errata Fix/Work Around suggests to write registers with single byte write
+> instructions. However, it seems that every write to the second byte
+> causes the overrite of LAT0/LAT1.
+>
+> Never write byte 2 of IOCON register to avoid clearing of LAT0/LAT1.
+>
+> Signed-off-by: Gregor Herburger <gregor.herburger@ew.tq-group.com>
+> ---
+>  drivers/net/can/spi/mcp251xfd/mcp251xfd-regmap.c | 35 +++++++++++++++++++++++-
+>  1 file changed, 34 insertions(+), 1 deletion(-)
+>
+> diff --git a/drivers/net/can/spi/mcp251xfd/mcp251xfd-regmap.c b/drivers/net/can/spi/mcp251xfd/mcp251xfd-regmap.c
+> index 92b7bc7f14b9..ab4e372baffb 100644
+> --- a/drivers/net/can/spi/mcp251xfd/mcp251xfd-regmap.c
+> +++ b/drivers/net/can/spi/mcp251xfd/mcp251xfd-regmap.c
+> @@ -229,14 +229,47 @@ mcp251xfd_regmap_crc_gather_write(void *context,
+>         return spi_sync_transfer(spi, xfer, ARRAY_SIZE(xfer));
+>  }
+>
+> +static int
+> +mcp251xfd_regmap_crc_write_iocon(void *context, const void *data, size_t count)
+                                                                            ^^^^
+count is never used.
 
-OK, thanks!
+> +{
+> +       const size_t data_offset = sizeof(__be16) +
+> +               mcp251xfd_regmap_crc.pad_bits / BITS_PER_BYTE;
+> +       u16 reg = *(u16 *)data;
 
--- 
-An old man doll... just what I always wanted! - Clara
+This line made me scratch my head a lot.
 
+When I see a void * parameter named data, I expect this to be a memory
+region. Here, if I got this correctly, data is just a pointer to a u16
+which represents the low bit of a register.
+
+So, if you are not passing an address to a memory region but just a
+single scalar, why the void *? Wouldn't it be better to just do:
+
+  mcp251xfd_regmap_crc_write_iocon(void *context, u16 reg)
+
+> +       /* Never write to bits 16..23 of IOCON register to avoid clearing of LAT0/LAT1
+> +        *
+> +        * According to Errata DS80000789E 5 writing IOCON register using one
+> +        * SPI write command clears LAT0/LAT1.
+> +        *
+> +        * Errata Fix/Work Around suggests to write registers with single byte
+> +        * write instructions. However, it seems that the byte at 0xe06(IOCON[23:16])
+> +        * is for read-only access and writing to it causes the cleraing of LAT0/LAT1.
+                                                                  ^^^^^^^^
+clearing
+
+> +        */
+> +
+> +       /* Write IOCON[15:0] */
+> +       mcp251xfd_regmap_crc_gather_write(context, &reg, 1,
+> +                                         data + data_offset, 2);
+> +       reg += 3;
+> +       /* Write IOCON[31:24] */
+> +       mcp251xfd_regmap_crc_gather_write(context, &reg, 1,
+> +                                         data + data_offset + 3, 1);
+> +
+> +       return 0;
+> +}
+> +
+>  static int
+>  mcp251xfd_regmap_crc_write(void *context,
+>                            const void *data, size_t count)
+
+This also uses the const void* data, except that here, this is kind of
+forced by the prototype of the write() callback function from struct
+regmap_bus. Also, count is properly used.
+
+>  {
+>         const size_t data_offset = sizeof(__be16) +
+>                 mcp251xfd_regmap_crc.pad_bits / BITS_PER_BYTE;
+> +       u16 reg = *(u16 *)data;
+>
+> -       return mcp251xfd_regmap_crc_gather_write(context,
+> +       if (reg == MCP251XFD_REG_IOCON)
+> +               return mcp251xfd_regmap_crc_write_iocon(context,
+> +                                                data, count);
+
+After changing the prototype of mcp251xfd_regmap_crc_write_iocon(),
+this would then become:
+
+                return mcp251xfd_regmap_crc_write_iocon(context, reg);
+
+> +       else
+> +               return mcp251xfd_regmap_crc_gather_write(context,
+>                                                  data, data_offset,
+>                                                  data + data_offset,
+>                                                  count - data_offset);
 
