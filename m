@@ -1,250 +1,176 @@
-Return-Path: <netdev+bounces-90792-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90794-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E14648B035A
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 09:42:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DAE98B0373
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 09:48:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4D97A1F218E7
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 07:42:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id ED31F1F22742
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 07:47:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12C231581E2;
-	Wed, 24 Apr 2024 07:42:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AFF31581ED;
+	Wed, 24 Apr 2024 07:47:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Y+ojOGtE"
+	dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b="2sa9ksyO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+Received: from gate2.alliedtelesis.co.nz (gate2.alliedtelesis.co.nz [202.36.163.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25F95157E82;
-	Wed, 24 Apr 2024 07:42:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 557111581EE
+	for <netdev@vger.kernel.org>; Wed, 24 Apr 2024 07:47:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.36.163.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713944529; cv=none; b=SGCVwwjgbJo/aFY9ADBW8e1kzNICNRoYXqcDzFmaQmt7bfZt/hmHR1z5PRXrrFensj+j9DkSZJQFDJ7fVTRudHFab6wMr2ZWI7gNzQ3Do3At6k6/oMBWiubOMF4kXcqWyM6Ki1/fmT7RlmkbWqE0NrZ4iq8Vz+4LfWJShSz/OZ0=
+	t=1713944873; cv=none; b=XED6DO+Zafx0rEHJf//5aqf/g8QoA1Kz71vqJsUhzk52C0NMaIAGfKY/eYTKoeaekKikJxURKc0R4Lhsd5ymB+czFuoPTkYqfAlbhhqimNvvWKJmA3XGaPx0DalqD9peOiqOR/Pme7CqA75shhwJgTroTKMowmizJCZGV2glqI4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713944529; c=relaxed/simple;
-	bh=3jSAEAP6h7kLKxNdHKe1wEKkmll4W+mLBzqwPyPus3s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lx4O5wMw5GrnbkhiGXwHHIlsbpyaTDtLLR/8melng5o5XHTLPw6Fvm4kuOhQfOzfwoJpMMGQSTxaEuvBeUYFHkhRzxrJp4JC6asiQlOO1de0CJt1GAaNwwELd/wZ02L0uYx6TWV82Uvx9k9SMs3Yo3Ga//19WASc5roWT7yXBf4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Y+ojOGtE; arc=none smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1713944527; x=1745480527;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=3jSAEAP6h7kLKxNdHKe1wEKkmll4W+mLBzqwPyPus3s=;
-  b=Y+ojOGtEXHcSmgFeELayjUZZqxDpIdzNCrol4GXXh8gVQmXJV0iqDjgt
-   XaWaBtu4LWkUUO0ER1eg18EAnXRYUrq3OImyhCJnxMaaRS2IaPnguVsMA
-   l6FwZ09yBOC7bbBG+hs2ZVq5xVvtgANa72moXCNGJAuF/+heJ/Fl/5qOO
-   WooVVOjfM9UX9IXL82AfE1MH4lszu3w40IK1B5XTXNeKdDIoiedOE5vC2
-   qIL74HfHxm+6rd+aefK9fdDErZ9hrnsyhAlMixpqPRz8E6/ZcW48ele8x
-   ygZmoKDTfXfk4Lmzyq0SEDYzcdC+EdmZq+1BmElB1ATtRbd6R8BY/aSmh
-   A==;
-X-CSE-ConnectionGUID: K5hhc8rHQjSnkU7RAS+gcw==
-X-CSE-MsgGUID: XsW3pNtyTDKh9//ABbyEAg==
-X-IronPort-AV: E=McAfee;i="6600,9927,11053"; a="9390847"
-X-IronPort-AV: E=Sophos;i="6.07,225,1708416000"; 
-   d="scan'208";a="9390847"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2024 00:42:06 -0700
-X-CSE-ConnectionGUID: FALzAmajQ0uuFCSL2eFNuw==
-X-CSE-MsgGUID: ayiWfY4oQPi7bjsQn2obMg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,225,1708416000"; 
-   d="scan'208";a="24692454"
-Received: from lkp-server01.sh.intel.com (HELO e434dd42e5a1) ([10.239.97.150])
-  by fmviesa008.fm.intel.com with ESMTP; 24 Apr 2024 00:42:02 -0700
-Received: from kbuild by e434dd42e5a1 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1rzXGR-000106-2j;
-	Wed, 24 Apr 2024 07:41:59 +0000
-Date: Wed, 24 Apr 2024 15:41:59 +0800
-From: kernel test robot <lkp@intel.com>
-To: Joe Damato <jdamato@fastly.com>, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, tariqt@nvidia.com, saeedm@nvidia.com
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	mkarsten@uwaterloo.ca, gal@nvidia.com, nalramli@fastly.com,
-	Joe Damato <jdamato@fastly.com>, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-rdma@vger.kernel.org
-Subject: Re: [PATCH net-next 2/3] net/mlx4: link NAPI instances to queues and
- IRQs
-Message-ID: <202404241518.4TvjoN07-lkp@intel.com>
-References: <20240423194931.97013-3-jdamato@fastly.com>
+	s=arc-20240116; t=1713944873; c=relaxed/simple;
+	bh=aUlotTrNxrU0Ywmg7hPsLhO9C9H01/l5aIJwvotLHtg=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=jvZyMxGYU3glVxhlIQoc2y387QWBMWmImKX05tPK/k3ceWOUbbFsop417R8jJmzdJYnu950ug/4G1oOc7N0KsJGLDpOyShuS+RvE4TJubevoc/nXBDu8GTeosqIL+36nW4YGl+fhlUq1JKLg4MfJ5LjfEiRohqZUnmsRPXtjle4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz; spf=pass smtp.mailfrom=alliedtelesis.co.nz; dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b=2sa9ksyO; arc=none smtp.client-ip=202.36.163.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alliedtelesis.co.nz
+Received: from svr-chch-seg1.atlnz.lc (mmarshal3.atlnz.lc [10.32.18.43])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by gate2.alliedtelesis.co.nz (Postfix) with ESMTPS id CA43A2C02A8;
+	Wed, 24 Apr 2024 19:42:17 +1200 (NZST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alliedtelesis.co.nz;
+	s=mail181024; t=1713944537;
+	bh=aUlotTrNxrU0Ywmg7hPsLhO9C9H01/l5aIJwvotLHtg=;
+	h=From:To:CC:Subject:Date:References:In-Reply-To:From;
+	b=2sa9ksyOrBHVmvPI5YsJqxP+dPEBhWFw60RnOS1Z1D4GaK+fgq06JC9fUwUt5Hjd3
+	 lZo1rbavIp8BbauJ5Rv4DBoif3uVjfezR9M0YnkiD2dZu+Gs19Z9eSZ3YyLTbVjG0G
+	 Qu/l/Iqr9lBESgbMfNMdFUGdcpwuUEhB9qprEfOiQJ6m3YGBk4k/iTKavWd07uS2xJ
+	 QQ1ZqHGaxsKcubouvlSK0kmGjBwxSYhS17Yqrci8P9T7BSwuEP/y/uebmoWUY4mBbx
+	 Fbr1H72uO8jPnf5WUzfziLBbnsTZc15nM2hIFE6e73cNxEkwG/a28429NfT1zOOWq0
+	 z5TxbJXw5fcBA==
+Received: from svr-chch-ex2.atlnz.lc (Not Verified[2001:df5:b000:bc8::76]) by svr-chch-seg1.atlnz.lc with Trustwave SEG (v8,2,6,11305)
+	id <B6628b7d90001>; Wed, 24 Apr 2024 19:42:17 +1200
+Received: from svr-chch-ex2.atlnz.lc (2001:df5:b000:bc8::76) by
+ svr-chch-ex2.atlnz.lc (2001:df5:b000:bc8::76) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.9; Wed, 24 Apr 2024 19:42:17 +1200
+Received: from svr-chch-ex2.atlnz.lc ([fe80::a9eb:c9b7:8b52:9567]) by
+ svr-chch-ex2.atlnz.lc ([fe80::a9eb:c9b7:8b52:9567%15]) with mapi id
+ 15.02.1544.009; Wed, 24 Apr 2024 19:42:17 +1200
+From: Chris Packham <Chris.Packham@alliedtelesis.co.nz>
+To: Jeff Layton <jlayton@kernel.org>, Chuck Lever <chuck.lever@oracle.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "neilb@suse.de"
+	<neilb@suse.de>
+CC: "linux-nfs@vger.kernel.org" <linux-nfs@vger.kernel.org>, netdev
+	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "stable@vger.kernel.org"
+	<stable@vger.kernel.org>
+Subject: Re: kernel BUG at net/sunrpc/svc.c:570 after updating from v5.15.153
+ to v5.15.155
+Thread-Topic: kernel BUG at net/sunrpc/svc.c:570 after updating from v5.15.153
+ to v5.15.155
+Thread-Index: AQHaleHzc3oveYbGkkq3WWVD/cih7bF12zkAgABlswA=
+Date: Wed, 24 Apr 2024 07:42:17 +0000
+Message-ID: <06de0002-c3c6-4f13-9618-066cb9658240@alliedtelesis.co.nz>
+References: <b363e394-7549-4b9e-b71b-d97cd13f9607@alliedtelesis.co.nz>
+ <0d2c2123-e782-4712-8876-c9b65d2c9a65@alliedtelesis.co.nz>
+In-Reply-To: <0d2c2123-e782-4712-8876-c9b65d2c9a65@alliedtelesis.co.nz>
+Accept-Language: en-NZ, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <AFA88EA46A28404EBD871B9D3DFC4262@atlnz.lc>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240423194931.97013-3-jdamato@fastly.com>
+X-SEG-SpamProfiler-Analysis: v=2.4 cv=dY4j3mXe c=1 sm=1 tr=0 ts=6628b7d9 a=Xf/6aR1Nyvzi7BryhOrcLQ==:117 a=xqWC_Br6kY4A:10 a=oKJsc7D3gJEA:10 a=IkcTkHD0fZMA:10 a=raytVjVEu-sA:10 a=Oxyqa-lKnlMAWl67uNQA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+X-SEG-SpamProfiler-Score: 0
 
-Hi Joe,
-
-kernel test robot noticed the following build warnings:
-
-[auto build test WARNING on net-next/main]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Joe-Damato/net-mlx4-Track-RX-allocation-failures-in-a-stat/20240424-035224
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20240423194931.97013-3-jdamato%40fastly.com
-patch subject: [PATCH net-next 2/3] net/mlx4: link NAPI instances to queues and IRQs
-config: s390-defconfig (https://download.01.org/0day-ci/archive/20240424/202404241518.4TvjoN07-lkp@intel.com/config)
-compiler: clang version 19.0.0git (https://github.com/llvm/llvm-project 5ef5eb66fb428aaf61fb51b709f065c069c11242)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240424/202404241518.4TvjoN07-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202404241518.4TvjoN07-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
-   In file included from include/linux/elf.h:6:
-   In file included from arch/s390/include/asm/elf.h:173:
-   In file included from arch/s390/include/asm/mmu_context.h:11:
-   In file included from arch/s390/include/asm/pgalloc.h:18:
-   In file included from include/linux/mm.h:2208:
-   include/linux/vmstat.h:508:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
-     508 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
-     509 |                            item];
-         |                            ~~~~
-   include/linux/vmstat.h:515:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
-     515 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
-     516 |                            NR_VM_NUMA_EVENT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/vmstat.h:522:36: warning: arithmetic between different enumeration types ('enum node_stat_item' and 'enum lru_list') [-Wenum-enum-conversion]
-     522 |         return node_stat_name(NR_LRU_BASE + lru) + 3; // skip "nr_"
-         |                               ~~~~~~~~~~~ ^ ~~~
-   include/linux/vmstat.h:527:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
-     527 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
-     528 |                            NR_VM_NUMA_EVENT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/vmstat.h:536:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
-     536 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
-     537 |                            NR_VM_NUMA_EVENT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~~
-   In file included from drivers/net/ethernet/mellanox/mlx4/en_cq.c:34:
-   In file included from include/linux/mlx4/cq.h:39:
-   In file included from include/linux/mlx4/device.h:37:
-   In file included from include/linux/if_ether.h:19:
-   In file included from include/linux/skbuff.h:28:
-   In file included from include/linux/dma-mapping.h:11:
-   In file included from include/linux/scatterlist.h:9:
-   In file included from arch/s390/include/asm/io.h:78:
-   include/asm-generic/io.h:547:31: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     547 |         val = __raw_readb(PCI_IOBASE + addr);
-         |                           ~~~~~~~~~~ ^
-   include/asm-generic/io.h:560:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     560 |         val = __le16_to_cpu((__le16 __force)__raw_readw(PCI_IOBASE + addr));
-         |                                                         ~~~~~~~~~~ ^
-   include/uapi/linux/byteorder/big_endian.h:37:59: note: expanded from macro '__le16_to_cpu'
-      37 | #define __le16_to_cpu(x) __swab16((__force __u16)(__le16)(x))
-         |                                                           ^
-   include/uapi/linux/swab.h:102:54: note: expanded from macro '__swab16'
-     102 | #define __swab16(x) (__u16)__builtin_bswap16((__u16)(x))
-         |                                                      ^
-   In file included from drivers/net/ethernet/mellanox/mlx4/en_cq.c:34:
-   In file included from include/linux/mlx4/cq.h:39:
-   In file included from include/linux/mlx4/device.h:37:
-   In file included from include/linux/if_ether.h:19:
-   In file included from include/linux/skbuff.h:28:
-   In file included from include/linux/dma-mapping.h:11:
-   In file included from include/linux/scatterlist.h:9:
-   In file included from arch/s390/include/asm/io.h:78:
-   include/asm-generic/io.h:573:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     573 |         val = __le32_to_cpu((__le32 __force)__raw_readl(PCI_IOBASE + addr));
-         |                                                         ~~~~~~~~~~ ^
-   include/uapi/linux/byteorder/big_endian.h:35:59: note: expanded from macro '__le32_to_cpu'
-      35 | #define __le32_to_cpu(x) __swab32((__force __u32)(__le32)(x))
-         |                                                           ^
-   include/uapi/linux/swab.h:115:54: note: expanded from macro '__swab32'
-     115 | #define __swab32(x) (__u32)__builtin_bswap32((__u32)(x))
-         |                                                      ^
-   In file included from drivers/net/ethernet/mellanox/mlx4/en_cq.c:34:
-   In file included from include/linux/mlx4/cq.h:39:
-   In file included from include/linux/mlx4/device.h:37:
-   In file included from include/linux/if_ether.h:19:
-   In file included from include/linux/skbuff.h:28:
-   In file included from include/linux/dma-mapping.h:11:
-   In file included from include/linux/scatterlist.h:9:
-   In file included from arch/s390/include/asm/io.h:78:
-   include/asm-generic/io.h:584:33: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     584 |         __raw_writeb(value, PCI_IOBASE + addr);
-         |                             ~~~~~~~~~~ ^
-   include/asm-generic/io.h:594:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     594 |         __raw_writew((u16 __force)cpu_to_le16(value), PCI_IOBASE + addr);
-         |                                                       ~~~~~~~~~~ ^
-   include/asm-generic/io.h:604:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     604 |         __raw_writel((u32 __force)cpu_to_le32(value), PCI_IOBASE + addr);
-         |                                                       ~~~~~~~~~~ ^
-   include/asm-generic/io.h:692:20: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     692 |         readsb(PCI_IOBASE + addr, buffer, count);
-         |                ~~~~~~~~~~ ^
-   include/asm-generic/io.h:700:20: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     700 |         readsw(PCI_IOBASE + addr, buffer, count);
-         |                ~~~~~~~~~~ ^
-   include/asm-generic/io.h:708:20: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     708 |         readsl(PCI_IOBASE + addr, buffer, count);
-         |                ~~~~~~~~~~ ^
-   include/asm-generic/io.h:717:21: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     717 |         writesb(PCI_IOBASE + addr, buffer, count);
-         |                 ~~~~~~~~~~ ^
-   include/asm-generic/io.h:726:21: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     726 |         writesw(PCI_IOBASE + addr, buffer, count);
-         |                 ~~~~~~~~~~ ^
-   include/asm-generic/io.h:735:21: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     735 |         writesl(PCI_IOBASE + addr, buffer, count);
-         |                 ~~~~~~~~~~ ^
->> drivers/net/ethernet/mellanox/mlx4/en_cq.c:202:12: warning: variable 'qtype' is used uninitialized whenever 'if' condition is false [-Wsometimes-uninitialized]
-     202 |                 else if (cq->type == TX)
-         |                          ^~~~~~~~~~~~~~
-   drivers/net/ethernet/mellanox/mlx4/en_cq.c:205:45: note: uninitialized use occurs here
-     205 |                 netif_queue_set_napi(cq->dev, cq->cq_idx, qtype, NULL);
-         |                                                           ^~~~~
-   drivers/net/ethernet/mellanox/mlx4/en_cq.c:202:8: note: remove the 'if' if its condition is always true
-     202 |                 else if (cq->type == TX)
-         |                      ^~~~~~~~~~~~~~~~~~~
-     203 |                         qtype = NETDEV_QUEUE_TYPE_TX;
-   drivers/net/ethernet/mellanox/mlx4/en_cq.c:197:2: note: variable 'qtype' is declared here
-     197 |         enum netdev_queue_type qtype;
-         |         ^
-   18 warnings generated.
-
-
-vim +202 drivers/net/ethernet/mellanox/mlx4/en_cq.c
-
-   194	
-   195	void mlx4_en_deactivate_cq(struct mlx4_en_priv *priv, struct mlx4_en_cq *cq)
-   196	{
-   197		enum netdev_queue_type qtype;
-   198	
-   199		if (cq->type != TX_XDP) {
-   200			if (cq->type == RX)
-   201				qtype = NETDEV_QUEUE_TYPE_RX;
- > 202			else if (cq->type == TX)
-   203				qtype = NETDEV_QUEUE_TYPE_TX;
-   204	
-   205			netif_queue_set_napi(cq->dev, cq->cq_idx, qtype, NULL);
-   206			napi_disable(&cq->napi);
-   207			netif_napi_del(&cq->napi);
-   208		}
-   209	
-   210		mlx4_cq_free(priv->mdev->dev, &cq->mcq);
-   211	}
-   212	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+DQpPbiAyNC8wNC8yNCAxMzozOCwgQ2hyaXMgUGFja2hhbSB3cm90ZToNCj4NCj4gT24gMjQvMDQv
+MjQgMTI6NTQsIENocmlzIFBhY2toYW0gd3JvdGU6DQo+PiBIaSBKZWZmLCBDaHVjaywgR3JlZywN
+Cj4+DQo+PiBBZnRlciB1cGRhdGluZyBvbmUgb2Ygb3VyIGJ1aWxkcyBhbG9uZyB0aGUgNS4xNS55
+IExUUyBicmFuY2ggb3VyIA0KPj4gdGVzdGluZyBjYXVnaHQgYSBuZXcga2VybmVsIGJ1Zy4gT3V0
+cHV0IGJlbG93Lg0KPj4NCj4+IEkgaGF2ZW4ndCBkdWcgaW50byBpdCB5ZXQgYnV0IHdvbmRlcmVk
+IGlmIGl0IHJhbmcgYW55IGJlbGxzLg0KPg0KPiBBIGJpdCBtb3JlIGluZm8uIFRoaXMgaXMgaGFw
+cGVuaW5nIGF0ICJyZWJvb3QiIGZvciB1cy4gT3VyIGVtYmVkZGVkIA0KPiBkZXZpY2VzIHVzZSBh
+IGJpdCBvZiBhIGhhY2tlZCB1cCByZWJvb3QgcHJvY2VzcyBzbyB0aGF0IHRoZXkgY29tZSBiYWNr
+IA0KPiBmYXN0ZXIgaW4gdGhlIGNhc2Ugb2YgYSBmYWlsdXJlLg0KPg0KPiBJdCBkb2Vzbid0IGhh
+cHBlbiB3aXRoIGEgcHJvcGVyIGBzeXN0ZW1jdGwgcmVib290YCBvciB3aXRoIGEgU1lTUlErQg0K
+Pg0KPiBJIGNhbiB0cmlnZ2VyIGl0IHdpdGggYGtpbGxhbGwgLTkgbmZzZGAgd2hpY2ggSSdtIG5v
+dCBzdXJlIGlzIGEgDQo+IGNvbXBsZXRlbHkgbGVnaXQgdGhpbmcgdG8gZG8gdG8ga2VybmVsIHRo
+cmVhZHMgYnV0IGl0J3MgcHJvYmFibHkgY2xvc2UgDQo+IHRvIHdoYXQgb3VyIGN1c3RvbWl6ZWQg
+cmVib290IGRvZXMuDQoNCkkndmUgYmlzZWN0ZWQgYmV0d2VlbiB2NS4xNS4xNTMgYW5kIHY1LjE1
+LjE1NSBhbmQgaWRlbnRpZmllZCBjb21taXQgDQpkZWM2YjhiY2FjNzMgKCJuZnNkOiBTaW1wbGlm
+eSBjb2RlIGFyb3VuZCBzdmNfZXhpdF90aHJlYWQoKSBjYWxsIGluIA0KbmZzZCgpIikgYXMgdGhl
+IGZpcnN0IGJhZCBjb21taXQuIEJhc2VkIG9uIHRoZSBjb250ZXh0IHRoYXQgc2VlbXMgdG8gDQps
+aW5lIHVwIHdpdGggbXkgcmVwcm9kdWN0aW9uLiBJJ20gd29uZGVyaW5nIGlmIHBlcmhhcHMgc29t
+ZXRoaW5nIGdvdCANCm1pc3NlZCBvdXQgb2YgdGhlIHN0YWJsZSB0cmFjaz8gVW5mb3J0dW5hdGVs
+eSBJJ20gbm90IGFibGUgdG8gcnVuIGEgbW9yZSANCnJlY2VudCBrZXJuZWwgd2l0aCBhbGwgb2Yg
+dGhlIG5mcyByZWxhdGVkIHNldHVwIHRoYXQgaXMgYmVpbmcgdXNlZCBvbsKgIA0KdGhlIHN5c3Rl
+bSBpbiBxdWVzdGlvbi4NCg0KPg0KPj4NCj4+IFRoYW5rcywNCj4+IENocmlzDQo+Pg0KPj4gW8Kg
+wqAgOTEuNjA1MTA5XSAtLS0tLS0tLS0tLS1bIGN1dCBoZXJlIF0tLS0tLS0tLS0tLS0NCj4+IFvC
+oMKgIDkxLjYwNTEyMl0ga2VybmVsIEJVRyBhdCBuZXQvc3VucnBjL3N2Yy5jOjU3MCENCj4+IFvC
+oMKgIDkxLjYwNTEyOV0gSW50ZXJuYWwgZXJyb3I6IE9vcHMgLSBCVUc6IDAwMDAwMDAwZjIwMDA4
+MDAgWyMxXSANCj4+IFBSRUVNUFQgU01QDQo+PiBbwqDCoCA5MS42MTA2NDNdIE1vZHVsZXMgbGlu
+a2VkIGluOiBtdmNwc3MoTykgcGxhdGZvcm1fZHJpdmVyKE8pIA0KPj4gaXBpZndkKE8pIHh0X2wy
+dHAgeHRfaGFzaGxpbWl0IHh0X2Nvbm50cmFjayB4dF9hZGRydHlwZSB4dF9MT0cgDQo+PiB4dF9D
+SEVDS1NVTSB3cDUxMiB2eGxhbiB2ZXRoIHR3b2Zpc2hfZ2VuZXJpYyB0d29maXNoX2NvbW1vbiBz
+cjk4MDAgDQo+PiBzbXNjOTV4eCBzbXNjNzV4eCBzbXNjIHNtM19nZW5lcmljIHNoYTUxMl9hcm02
+NCBzaGEzX2dlbmVyaWMgDQo+PiBzZXJwZW50X2dlbmVyaWMgcnRsODE1MCBycGNzZWNfZ3NzX2ty
+YjUgcm1kMTYwIHBvbHkxMzA1X2dlbmVyaWMgcGx1c2IgDQo+PiBwZWdhc3VzIG9wdGVlX3JuZyBu
+YmQgbWljcm9jaGlwIG1kNCBtZF9tb2QgbWNzNzgzMCBscncgbGlicG9seTEzMDUgDQo+PiBsYW43
+OHh4IGwydHBfaXA2IGwydHBfaXAgbDJ0cF9ldGggbDJ0cF9uZXRsaW5rIGwydHBfY29yZSB1ZHBf
+dHVubmVsIA0KPj4gaXB0X1JFSkVDVCBuZl9yZWplY3RfaXB2NCBpcDZ0YWJsZV9uYXQgaXA2dGFi
+bGVfbWFuZ2xlIA0KPj4gaXA2dGFibGVfZmlsdGVyIGlwNnRfaXB2NmhlYWRlciBpcDZ0X1JFSkVD
+VCBpcDZfdWRwX3R1bm5lbCBpcDZfdGFibGVzIA0KPj4gZG05NjAxIGRtX3plcm8gZG1fbWlycm9y
+IGRtX3JlZ2lvbl9oYXNoIGRtX2xvZyBkbV9tb2QgZGlhZyB0aXBjIGN1c2UgDQo+PiBjdHMgY3B1
+ZnJlcV9wb3dlcnNhdmUgY3B1ZnJlcV9jb25zZXJ2YXRpdmUgY2hhY2hhX2dlbmVyaWMgDQo+PiBj
+aGFjaGEyMHBvbHkxMzA1IGNoYWNoYV9uZW9uIGxpYmNoYWNoYSBjYXN0Nl9nZW5lcmljIGNhc3Q1
+X2dlbmVyaWMgDQo+PiBjYXN0X2NvbW1vbiBjYW1lbGxpYV9nZW5lcmljIGJsb3dmaXNoX2dlbmVy
+aWMgYmxvd2Zpc2hfY29tbW9uIA0KPj4gYXV0aF9ycGNnc3Mgb2lkX3JlZ2lzdHJ5IGF0MjUgYXJt
+X3NtY2NjX3RybmcgYWVzX25lb25fYmxrIA0KPj4gaWRwcm9tX210ZChPKSBpZHByb21faTJjKE8p
+IGVwaTNfYm9hcmRpbmZvX2kyYyhPKSB4MjUwKE8pIA0KPj4gcHN1c2xvdF9lcGkzX3JlZ2lzdGVy
+KE8pIHBzdXNsb3RfZ3Bpb19ncm91cChPKQ0KPj4gW8KgwqAgOTEuNjEwODA5XcKgIHBzdXNsb3Qo
+TykNCj4+IFvCoMKgIDkxLjYxMTgyMl0gd2F0Y2hkb2c6IHdhdGNoZG9nMTogd2F0Y2hkb2cgZGlk
+IG5vdCBzdG9wIQ0KPj4gW8KgwqAgOTEuNjk3MDY1XcKgIGdwaW9waW5zX2JvYXJkaW5mbyhPKSBp
+ZHByb20oTykgZXBpM19ib2FyZGluZm8oTykgDQo+PiBib2FyZGluZm8oTykgaTJjX2dwaW8gaTJj
+X2FsZ29fYml0IGkyY19tdjY0eHh4IHBsdWdnYWJsZShPKSANCj4+IGxlZF9lbmFibGUoTykgb21h
+cF9ybmcgcm5nX2NvcmUgYXRsX3Jlc2V0KE8pIHNic2FfZ3dkdCB1aW9fcGRydl9nZW5pcnENCj4+
+IFvCoMKgIDkxLjY5NzA5Nl0gQ1BVOiAyIFBJRDogMTc3MCBDb21tOiBuZnNkIEtkdW1wOiBsb2Fk
+ZWQgVGFpbnRlZDogDQo+PiBHwqDCoMKgwqDCoMKgwqDCoMKgwqAgT8KgwqDCoMKgwqAgNS4xNS4x
+NTUgIzENCj4+IFvCoMKgIDkxLjY5NzEwM10gSGFyZHdhcmUgbmFtZTogQWxsaWVkIFRlbGVzaXMg
+eDI1MC0yOFhUbSAoRFQpDQo+PiBbwqDCoCA5MS42OTcxMDddIHBzdGF0ZTogODAwMDAwMDUgKE56
+Y3YgZGFpZiAtUEFOIC1VQU8gLVRDTyAtRElUIC1TU0JTIA0KPj4gQlRZUEU9LS0pDQo+PiBbwqDC
+oCA5MS42OTcxMTJdIHBjIDogc3ZjX2Rlc3Ryb3krMHg4NC8weGFjDQo+PiBbwqDCoCA5MS43MDEy
+MDJdIHdhdGNoZG9nOiB3YXRjaGRvZzA6IHdhdGNoZG9nIGRpZCBub3Qgc3RvcCENCj4+IFvCoMKg
+IDkxLjcwMjIxNV0gbHIgOiBzdmNfZGVzdHJveSsweDJjLzB4YWMNCj4+IFvCoMKgIDkxLjcwMjIy
+MF0gc3AgOiBmZmZmODAwMDBiYjNiZGUwDQo+PiBbwqDCoCA5MS43MDIyMjNdIHgyOTogZmZmZjgw
+MDAwYmIzYmRlMCB4Mjg6IDAwMDAwMDAwMDAwMDAwMDAgeDI3OiANCj4+IDAwMDAwMDAwMDAwMDAw
+MDANCj4+IFvCoMKgIDkxLjc0NjA5NV0geDI2OiAwMDAwMDAwMDAwMDAwMDAwIHgyNTogZmZmZjAw
+MDAwZGJmYWE0MCB4MjQ6IA0KPj4gZmZmZjAwMDAxNmMxNDAwMA0KPj4gW8KgwqAgOTEuNzQ2MTAx
+XSB4MjM6IGZmZmY4MDAwMDgzOTVjMDAgeDIyOiBmZmZmMDAwMDBlZTlmMjg0IHgyMTogDQo+PiBm
+ZmZmMDAwMDBlZWE5ZTEwDQo+PiBbwqDCoCA5MS43NDYxMDhdIHgyMDogZmZmZjAwMDAwZWVhOWUw
+MCB4MTk6IGZmZmYwMDAwMGVlYTllMTQgeDE4OiANCj4+IGZmZmY4MDAwMDhlOTkwMDANCj4+IFvC
+oMKgIDkxLjc2OTUyNl0geDE3OiAwMDAwMDAwMDAwMDAwMDA2IHgxNjogMDAwMDAwMDAwMDAwMDAw
+MCB4MTU6IA0KPj4gMDAwMDAwMDAwMDAwMDAwMQ0KPj4gW8KgwqAgOTEuNzc2NzgyXSB4MTQ6IDAw
+MDAwMDAwZmZmZmZmZmQgeDEzOiBmZmZmZmMwMDAwMDAwMDAwIHgxMjogDQo+PiBmZmZmODAwMDc2
+YmMyMDAwDQo+PiBbwqDCoCA5MS43ODQwMzFdIHgxMTogZmZmZjAwMDA3ZmJhNWMxMCB4MTA6IGZm
+ZmY4MDAwNzZiYzIwMDAgeDkgOiANCj4+IGZmZmY4MDAwMDkyMjA3YzANCj4+IFvCoMKgIDkxLjc4
+NDAzOF0geDggOiBmZmZmZmMwMDAwNTVlYjA4IHg3IDogZmZmZjAwMDAwZWY2YzRjMCB4NiA6IA0K
+Pj4gZmZmZmZjMDAwMWY4NzJjOA0KPj4gW8KgwqAgOTEuNzk1ODIzXSB4NSA6IDAwMDAwMDAwMDAw
+MDAxMDAgeDQgOiBmZmZmMDAwMDdmYmFlZGE4IHgzIDogDQo+PiAwMDAwMDAwMDAwMDAwMDAwDQo+
+PiBbwqDCoCA5MS44MDE2ODRdIHgyIDogMDAwMDAwMDAwMDAwMDAwMCB4MSA6IGZmZmYwMDAwMGQ4
+ZjgwMTggeDAgOiANCj4+IGZmZmYwMDAwMGVlYTllMzANCj4+IFvCoMKgIDkxLjgwNzU0NV0gQ2Fs
+bCB0cmFjZToNCj4+IFvCoMKgIDkxLjgxMDA4OF3CoCBzdmNfZGVzdHJveSsweDg0LzB4YWMNCj4+
+IFvCoMKgIDkxLjgxMzU4Nl3CoCBzdmNfZXhpdF90aHJlYWQrMHgxMDgvMHgxNWMNCj4+IFvCoMKg
+IDkxLjgxNjk5OF3CoCBuZnNkKzB4MTc4LzB4MWEwDQo+PiBbwqDCoCA5MS44MTg2NzNdwqAga3Ro
+cmVhZCsweDE1MC8weDE2MA0KPj4gW8KgwqAgOTEuODIwNjEwXcKgIHJldF9mcm9tX2ZvcmsrMHgx
+MC8weDIwDQo+PiBbwqDCoCA5MS44MjA2MjBdIENvZGU6IGE5NDE1M2YzIGE4YzI3YmZkIGQ1MDMy
+M2JmIGQ2NWYwM2MwIChkNDIxMDAwMCkNCj4+IFvCoMKgIDkxLjgyMDYyOV0gU01QOiBzdG9wcGlu
+ZyBzZWNvbmRhcnkgQ1BVcw0KPj4gW8KgwqAgOTEuODMwNDMzXSBTdGFydGluZyBjcmFzaGR1bXAg
+a2VybmVsLi4uDQo+PiBbwqDCoCA5MS44MzMwNjRdIEJ5ZSE=
 
