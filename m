@@ -1,176 +1,360 @@
-Return-Path: <netdev+bounces-90859-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90860-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CB928B07BC
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 12:54:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B0CE88B07CF
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 12:57:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C774E2863C2
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 10:54:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5F7DC282BB6
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 10:57:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A855F1598EC;
-	Wed, 24 Apr 2024 10:54:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E9E215990D;
+	Wed, 24 Apr 2024 10:57:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="mw3bahsQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBB99152E0B;
-	Wed, 24 Apr 2024 10:54:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 359781598EC
+	for <netdev@vger.kernel.org>; Wed, 24 Apr 2024 10:57:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713956066; cv=none; b=miQXiQlZ5RHCr3MPbbiBplOhXD/C4YiZ6O//q+GERsJ8prV3CmZws1IKJ0HNHwgN5c3ql7zM//DJlSyxUStxDv5oTaYNZz5tLg2T2FdPnODS0w5afZjiP/QzRB7vdeZvCr/BWxvtl6krp3m0jgwN+zQzHdOkow/l9nMg2yLjfUQ=
+	t=1713956241; cv=none; b=slUx99w8y3Mm5UPFZZB9HTHLo7zn6u/ItKeQrFwuuG+nyMTxvksXi77+iiSxI5mZiTvbh3pPAw85sxskRnXN563q7UH9Dt7wzC3UnFpsh2zIzB9rIFf9W8UV9EJhStSLzewzge9DjVC+DTLfks/iSAaHP/QOfbI4a/Cla8vOXD8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713956066; c=relaxed/simple;
-	bh=dTdKB9+IkBBoLgEPCcacEl7xptPU+1wETHC5RBLak14=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XBUcST1H/NrhCgKaMio34dBQ5E0+5v3/cb2Flwg8MsuF3Kx4FnzCqRLePzs85W2ImyIiXWw4RKL/ncZowvLQD78XbgLDGecTVDKZfhQY8sZ9MuZGrq/G9ymB/nJh4mo73o3OtwghmSyU7lI69OBbvaBWb82ONIJnNgjaQgeBYko=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-6ed112c64beso5853031b3a.1;
-        Wed, 24 Apr 2024 03:54:24 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713956064; x=1714560864;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=sbRk+8O9BzuC/xDyoYPxAM90+rfheN7dqlzCKkmo9fI=;
-        b=fKmq+FGj9fRPPgTYSaw1imRarnZJN+CUe6bHGD/N7Var7038bDN4DX+jRY6y/e7OOA
-         Jtv8r0LkZmNmn0+K0EssPxFs7hJndLr4QM3aHWwLmhyev0b6IOTi2+QPMCuhBawBNUrR
-         O4yGvBiuKTh9U2VC3RczlfOSUH4aSe09ijpPjLKp4PAAm1LczrIM+shBERbIX8DKk4zF
-         57xQTNOOiM32oMpO/L0D8HkP1cdk1j64dpAL/beasZ49dCcIIv8FQDuvaa5wDfYVFoVs
-         pFs8DJ+b1LTr09SyyPdpufcNLKNmm5ni1fc4wygVF0Kew5PKk4/89pDAWAAC1yf35mJ9
-         fFMw==
-X-Forwarded-Encrypted: i=1; AJvYcCUIOV4soHI/Wc6YOz3P8PrBJHehC0UxRSd8UITAhbwk9FkFRW7WYdN+QWykKFVQXhVk5mlco3LJbNx3+yD+jVXYR3ykddyKCkW1F0NM7w3RXQqw5Yr3WW7oM23DmchD3n+x1/H6cKep8fevtgPJQNrfcZ2lmTCRyckuxZicYdhtMB9a6wFKcnKJw61ob45e7WW1gaIHpWMq4MGUCQ==
-X-Gm-Message-State: AOJu0Yz8ijjXmH9LoE4sm/QbbfD21N8RAOWfbyjDe+G1czAutgBID3s1
-	3luRL+WpaJ5EtYDSjmUFQcy3fc7HO5bBxtmgXGi/cGqlR9KVtu9cVM2PXutZj3oZQUUmD+NcEMx
-	TxieY/ECxk4GEnizRcO9jMbtclKY=
-X-Google-Smtp-Source: AGHT+IEPBBrIzHYPuawwbCDK5O95umbDiYxjntGXJscMNGrfD44AaArcqQZ2F8S4CSUjX7zpwGx4/+8Es4RQwo03Gzc=
-X-Received: by 2002:a05:6a00:ccd:b0:6eb:3d37:ce7a with SMTP id
- b13-20020a056a000ccd00b006eb3d37ce7amr2675985pfv.21.1713956064157; Wed, 24
- Apr 2024 03:54:24 -0700 (PDT)
+	s=arc-20240116; t=1713956241; c=relaxed/simple;
+	bh=PeM+NrtL9hoMBw7MMty0ssnWnFf1zpWwc1ZkuqMUVLo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mharkZEvAeeBjEqgvcMRpySkHXTSDX0L/jYOE746KUuWZ2Jsq601/bnVpglQKMeZ5/jIkPEntQpD0g7kDakaqbHEvQ5S8S4ZxrIy1FPL9mDw/cd3nQDYCnq0FMNqEQCsyjY94S80HT8sFRkbDH3YhPfgquggXbMWQhVJXqVeUQY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=mw3bahsQ; arc=none smtp.client-ip=95.215.58.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <adf60fa5-052f-4135-acab-91a02a9aff61@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1713956237;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=lW0Os3WrE3ffFTtyiffhIaV15FkSN8s1heo57Xhe2Ww=;
+	b=mw3bahsQ11BdRUw0ZcWCIDI/XL708t2hHLsM1rMk0scMJfvfHTPwvZg8DYuPm+wp1ucUkD
+	xKspl8b6pwJjnXaHAOCkmrr8ivoY6hZstrc2qIpgHUKERrLPYUaQc28X5yeoie3mCTkgTz
+	5UGUmNLD1sfeyazzWwdA3Q6v9fZ/jxo=
+Date: Wed, 24 Apr 2024 11:57:10 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240417-mcp251xfd-gpio-feature-v1-0-bc0c61fd0c80@ew.tq-group.com>
- <20240417-mcp251xfd-gpio-feature-v1-2-bc0c61fd0c80@ew.tq-group.com>
-In-Reply-To: <20240417-mcp251xfd-gpio-feature-v1-2-bc0c61fd0c80@ew.tq-group.com>
-From: Vincent MAILHOL <mailhol.vincent@wanadoo.fr>
-Date: Wed, 24 Apr 2024 19:54:12 +0900
-Message-ID: <CAMZ6RqKYfFNGpKdwvu2ekuE5FDwiXgmH=Q3bA=QmDMKPLEzYsQ@mail.gmail.com>
-Subject: Re: [PATCH 2/4] can: mcp251xfd: mcp251xfd_regmap_crc_write():
- workaround for errata 5
-To: Gregor Herburger <gregor.herburger@ew.tq-group.com>
-Cc: Marc Kleine-Budde <mkl@pengutronix.de>, 
-	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>, Thomas Kopp <thomas.kopp@microchip.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
-	linux-can@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux@ew.tq-group.com, alexander.stein@ew.tq-group.com
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH net-next] net: phy: micrel: Add support for PTP_PF_EXTTS
+ for lan8814
+To: Horatiu Vultur <horatiu.vultur@microchip.com>, andrew@lunn.ch,
+ hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ richardcochran@gmail.com
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20240423195732.3353522-1-horatiu.vultur@microchip.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20240423195732.3353522-1-horatiu.vultur@microchip.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Wed. 17 Apr. 2024 at 22:45, Gregor Herburger
-<gregor.herburger@ew.tq-group.com> wrote:
-> According to Errata DS80000789E 5 writing IOCON register using one SPI
-> write command clears LAT0/LAT1.
->
-> Errata Fix/Work Around suggests to write registers with single byte write
-> instructions. However, it seems that every write to the second byte
-> causes the overrite of LAT0/LAT1.
->
-> Never write byte 2 of IOCON register to avoid clearing of LAT0/LAT1.
->
-> Signed-off-by: Gregor Herburger <gregor.herburger@ew.tq-group.com>
+On 23/04/2024 20:57, Horatiu Vultur wrote:
+> Extend the PTP programmable gpios to implement also PTP_PF_EXTTS
+> function. The pins can be configured to capture both of rising
+> and falling edge. Once the event is seen, then an interrupt is
+> generated and the LTC is saved in the registers.
+> On lan8814 only GPIO 3 can be configured for this.
+> 
+> This was tested using:
+> ts2phc -m -l 7 -s generic -f ts2phc.cfg
+> 
+> Where the configuration was the following:
 > ---
->  drivers/net/can/spi/mcp251xfd/mcp251xfd-regmap.c | 35 +++++++++++++++++++++++-
->  1 file changed, 34 insertions(+), 1 deletion(-)
->
-> diff --git a/drivers/net/can/spi/mcp251xfd/mcp251xfd-regmap.c b/drivers/net/can/spi/mcp251xfd/mcp251xfd-regmap.c
-> index 92b7bc7f14b9..ab4e372baffb 100644
-> --- a/drivers/net/can/spi/mcp251xfd/mcp251xfd-regmap.c
-> +++ b/drivers/net/can/spi/mcp251xfd/mcp251xfd-regmap.c
-> @@ -229,14 +229,47 @@ mcp251xfd_regmap_crc_gather_write(void *context,
->         return spi_sync_transfer(spi, xfer, ARRAY_SIZE(xfer));
->  }
->
-> +static int
-> +mcp251xfd_regmap_crc_write_iocon(void *context, const void *data, size_t count)
-                                                                            ^^^^
-count is never used.
+> [global]
+> ts2phc.pin_index  3
+> 
+> [eth0]
+> ---
+> 
+> Signed-off-by: Horatiu Vultur <horatiu.vultur@microchip.com>
 
+I'm not sure what happened to (fac63186f116 net: phy: micrel: Add
+support for PTP_PF_EXTTS for lan8841), looks like this patch is the
+rework previous with the limit to GPIO 3 only. In this case comments
+below are applicable.
+
+> ---
+>   drivers/net/phy/micrel.c | 182 ++++++++++++++++++++++++++++++++++++++-
+>   1 file changed, 181 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
+> index 0e310a5e2bff0..2d11f38cbc243 100644
+> --- a/drivers/net/phy/micrel.c
+> +++ b/drivers/net/phy/micrel.c
+> @@ -167,6 +167,9 @@
+>   #define PTP_CMD_CTL_PTP_LTC_STEP_SEC_		BIT(5)
+>   #define PTP_CMD_CTL_PTP_LTC_STEP_NSEC_		BIT(6)
+>   
+> +#define PTP_COMMON_INT_ENA			0x0204
+> +#define PTP_COMMON_INT_ENA_GPIO_CAP_EN		BIT(2)
+> +
+>   #define PTP_CLOCK_SET_SEC_HI			0x0205
+>   #define PTP_CLOCK_SET_SEC_MID			0x0206
+>   #define PTP_CLOCK_SET_SEC_LO			0x0207
+> @@ -179,6 +182,27 @@
+>   #define PTP_CLOCK_READ_NS_HI			0x022C
+>   #define PTP_CLOCK_READ_NS_LO			0x022D
+>   
+> +#define PTP_GPIO_SEL				0x0230
+> +#define PTP_GPIO_SEL_GPIO_SEL(pin)		((pin) << 8)
+> +#define PTP_GPIO_CAP_MAP_LO			0x0232
+> +
+> +#define PTP_GPIO_CAP_EN				0x0233
+> +#define PTP_GPIO_CAP_EN_GPIO_RE_CAPTURE_ENABLE(gpio)	BIT(gpio)
+> +#define PTP_GPIO_CAP_EN_GPIO_FE_CAPTURE_ENABLE(gpio)	(BIT(gpio) << 8)
+> +
+> +#define PTP_GPIO_RE_LTC_SEC_HI_CAP		0x0235
+> +#define PTP_GPIO_RE_LTC_SEC_LO_CAP		0x0236
+> +#define PTP_GPIO_RE_LTC_NS_HI_CAP		0x0237
+> +#define PTP_GPIO_RE_LTC_NS_LO_CAP		0x0238
+> +#define PTP_GPIO_FE_LTC_SEC_HI_CAP		0x0239
+> +#define PTP_GPIO_FE_LTC_SEC_LO_CAP		0x023A
+> +#define PTP_GPIO_FE_LTC_NS_HI_CAP		0x023B
+> +#define PTP_GPIO_FE_LTC_NS_LO_CAP		0x023C
+> +
+> +#define PTP_GPIO_CAP_STS			0x023D
+> +#define PTP_GPIO_CAP_STS_PTP_GPIO_RE_STS(gpio)	BIT(gpio)
+> +#define PTP_GPIO_CAP_STS_PTP_GPIO_FE_STS(gpio)	(BIT(gpio) << 8)
+> +
+>   #define PTP_OPERATING_MODE			0x0241
+>   #define PTP_OPERATING_MODE_STANDALONE_		BIT(0)
+>   
+> @@ -274,6 +298,7 @@
+>   
+>   #define LAN8814_PTP_GPIO_NUM			24
+>   #define LAN8814_PTP_PEROUT_NUM			2
+> +#define LAN8814_PTP_EXTTS_NUM			3
+>   
+>   #define LAN8814_BUFFER_TIME			2
+>   
+> @@ -3124,12 +3149,102 @@ static int lan8814_ptp_perout(struct ptp_clock_info *ptpci,
+>   	return 0;
+>   }
+>   
+> +static void lan8814_ptp_extts_on(struct phy_device *phydev, int pin, u32 flags)
 > +{
-> +       const size_t data_offset = sizeof(__be16) +
-> +               mcp251xfd_regmap_crc.pad_bits / BITS_PER_BYTE;
-> +       u16 reg = *(u16 *)data;
-
-This line made me scratch my head a lot.
-
-When I see a void * parameter named data, I expect this to be a memory
-region. Here, if I got this correctly, data is just a pointer to a u16
-which represents the low bit of a register.
-
-So, if you are not passing an address to a memory region but just a
-single scalar, why the void *? Wouldn't it be better to just do:
-
-  mcp251xfd_regmap_crc_write_iocon(void *context, u16 reg)
-
-> +       /* Never write to bits 16..23 of IOCON register to avoid clearing of LAT0/LAT1
-> +        *
-> +        * According to Errata DS80000789E 5 writing IOCON register using one
-> +        * SPI write command clears LAT0/LAT1.
-> +        *
-> +        * Errata Fix/Work Around suggests to write registers with single byte
-> +        * write instructions. However, it seems that the byte at 0xe06(IOCON[23:16])
-> +        * is for read-only access and writing to it causes the cleraing of LAT0/LAT1.
-                                                                  ^^^^^^^^
-clearing
-
-> +        */
+> +	u16 tmp;
 > +
-> +       /* Write IOCON[15:0] */
-> +       mcp251xfd_regmap_crc_gather_write(context, &reg, 1,
-> +                                         data + data_offset, 2);
-> +       reg += 3;
-> +       /* Write IOCON[31:24] */
-> +       mcp251xfd_regmap_crc_gather_write(context, &reg, 1,
-> +                                         data + data_offset + 3, 1);
+> +	/* Set as gpio input */
+> +	tmp = lanphy_read_page_reg(phydev, 4, LAN8814_GPIO_DIR_ADDR(pin));
+> +	tmp &= ~LAN8814_GPIO_DIR_BIT(pin);
+> +	lanphy_write_page_reg(phydev, 4, LAN8814_GPIO_DIR_ADDR(pin), tmp);
 > +
-> +       return 0;
+> +	/* Map the pin to ltc pin 0 of the capture map registers */
+> +	tmp = lanphy_read_page_reg(phydev, 4, PTP_GPIO_CAP_MAP_LO);
+> +	tmp |= pin;
+> +	lanphy_write_page_reg(phydev, 4, PTP_GPIO_CAP_MAP_LO, tmp);
+> +
+> +	/* Enable capture on the edges of the ltc pin */
+> +	tmp = lanphy_read_page_reg(phydev, 4, PTP_GPIO_CAP_EN);
+> +	if (flags & PTP_RISING_EDGE)
+> +		tmp |= PTP_GPIO_CAP_EN_GPIO_RE_CAPTURE_ENABLE(0);
+> +	if (flags & PTP_FALLING_EDGE)
+> +		tmp |= PTP_GPIO_CAP_EN_GPIO_FE_CAPTURE_ENABLE(0);
+> +	lanphy_write_page_reg(phydev, 4, PTP_GPIO_CAP_EN, tmp);
+> +
+> +	/* Enable interrupt top interrupt */
+> +	tmp = lanphy_read_page_reg(phydev, 4, PTP_COMMON_INT_ENA);
+> +	tmp |= PTP_COMMON_INT_ENA_GPIO_CAP_EN;
+> +	lanphy_write_page_reg(phydev, 4, PTP_COMMON_INT_ENA, tmp);
 > +}
 > +
->  static int
->  mcp251xfd_regmap_crc_write(void *context,
->                            const void *data, size_t count)
+> +static void lan8814_ptp_extts_off(struct phy_device *phydev, int pin)
+> +{
+> +	u16 tmp;
+> +
+> +	/* Set as gpio out */
+> +	tmp = lanphy_read_page_reg(phydev, 4, LAN8814_GPIO_DIR_ADDR(pin));
+> +	tmp |= LAN8814_GPIO_DIR_BIT(pin);
+> +	lanphy_write_page_reg(phydev, 4, LAN8814_GPIO_DIR_ADDR(pin), tmp);
+> +
+> +	/* Enable alternate, 0:for alternate function, 1:gpio */
+> +	tmp = lanphy_read_page_reg(phydev, 4, LAN8814_GPIO_EN_ADDR(pin));
+> +	tmp &= ~LAN8814_GPIO_EN_BIT(pin);
+> +	lanphy_write_page_reg(phydev, 4, LAN8814_GPIO_EN_ADDR(pin), tmp);
+> +
+> +	/* Clear the mapping of pin to registers 0 of the capture registers */
+> +	tmp = lanphy_read_page_reg(phydev, 4, PTP_GPIO_CAP_MAP_LO);
+> +	tmp &= ~GENMASK(3, 0);
+> +	lanphy_write_page_reg(phydev, 4, PTP_GPIO_CAP_MAP_LO, tmp);
+> +
+> +	/* Disable capture on both of the edges */
+> +	tmp = lanphy_read_page_reg(phydev, 4, PTP_GPIO_CAP_EN);
+> +	tmp &= ~PTP_GPIO_CAP_EN_GPIO_RE_CAPTURE_ENABLE(pin);
+> +	tmp &= ~PTP_GPIO_CAP_EN_GPIO_FE_CAPTURE_ENABLE(pin);
+> +	lanphy_write_page_reg(phydev, 4, PTP_GPIO_CAP_EN, tmp);
+> +
+> +	/* Disable interrupt top interrupt */
+> +	tmp = lanphy_read_page_reg(phydev, 4, PTP_COMMON_INT_ENA);
+> +	tmp &= ~PTP_COMMON_INT_ENA_GPIO_CAP_EN;
+> +	lanphy_write_page_reg(phydev, 4, PTP_COMMON_INT_ENA, tmp);
+> +}
+> +
+> +static int lan8814_ptp_extts(struct ptp_clock_info *ptpci,
+> +			     struct ptp_clock_request *rq, int on)
+> +{
+> +	struct lan8814_shared_priv *shared = container_of(ptpci, struct lan8814_shared_priv,
+> +							  ptp_clock_info);
+> +	struct phy_device *phydev = shared->phydev;
+> +	int pin;
+> +
+> +	if (rq->extts.flags & ~(PTP_ENABLE_FEATURE |
+> +				PTP_EXTTS_EDGES |
+> +				PTP_STRICT_FLAGS))
+> +		return -EOPNOTSUPP;
+> +
+> +	pin = ptp_find_pin(shared->ptp_clock, PTP_PF_EXTTS,
+> +			   rq->extts.index);
+> +	if (pin == -1 || pin != LAN8814_PTP_EXTTS_NUM)
+> +		return -EINVAL;
 
-This also uses the const void* data, except that here, this is kind of
-forced by the prototype of the write() callback function from struct
-regmap_bus. Also, count is properly used.
+I'm not sure how will enable request pass this check?
+In lan8814_ptp_probe_once pins are initialized with PTP_PF_NONE,
+and ptp_find_pin will always return -1, which will end up with
+-EINVAL here and never hit lan8814_ptp_extts_on/lan8814_ptp_extts_off
 
->  {
->         const size_t data_offset = sizeof(__be16) +
->                 mcp251xfd_regmap_crc.pad_bits / BITS_PER_BYTE;
-> +       u16 reg = *(u16 *)data;
->
-> -       return mcp251xfd_regmap_crc_gather_write(context,
-> +       if (reg == MCP251XFD_REG_IOCON)
-> +               return mcp251xfd_regmap_crc_write_iocon(context,
-> +                                                data, count);
+> +
+> +	mutex_lock(&shared->shared_lock);
+> +	if (on)
+> +		lan8814_ptp_extts_on(phydev, pin, rq->extts.flags);
+> +	else
+> +		lan8814_ptp_extts_off(phydev, pin);
+> +
+> +	mutex_unlock(&shared->shared_lock);
+> +
+> +	return 0;
+> +}
+> +
+>   static int lan8814_ptpci_enable(struct ptp_clock_info *ptpci,
+>   				struct ptp_clock_request *rq, int on)
+>   {
+>   	switch (rq->type) {
+>   	case PTP_CLK_REQ_PEROUT:
+>   		return lan8814_ptp_perout(ptpci, rq, on);
+> +	case PTP_CLK_REQ_EXTTS:
+> +		return lan8814_ptp_extts(ptpci, rq, on);
+>   	default:
+>   		return -EINVAL;
+>   	}
+> @@ -3148,6 +3263,10 @@ static int lan8814_ptpci_verify(struct ptp_clock_info *ptp, unsigned int pin,
+>   		if (pin >= LAN8814_PTP_PEROUT_NUM || pin != chan)
+>   			return -1;
+>   		break;
+> +	case PTP_PF_EXTTS:
+> +		if (pin != LAN8814_PTP_EXTTS_NUM)
 
-After changing the prototype of mcp251xfd_regmap_crc_write_iocon(),
-this would then become:
+Here the check states that exactly GPIO 3 can have EXTTS function, but
+later in the config...
 
-                return mcp251xfd_regmap_crc_write_iocon(context, reg);
+> +			return -1;
+> +		break;
+>   	default:
+>   		return -1;
+>   	}
+> @@ -3320,6 +3439,64 @@ static void lan8814_handle_ptp_interrupt(struct phy_device *phydev, u16 status)
+>   	}
+>   }
+>   
+> +static int lan8814_gpio_process_cap(struct lan8814_shared_priv *shared)
+> +{
+> +	struct phy_device *phydev = shared->phydev;
+> +	struct ptp_clock_event ptp_event = {0};
+> +	unsigned long nsec;
+> +	s64 sec;
+> +	u16 tmp;
+> +
+> +	/* This is 0 because whatever was the input pin it was mapped it to
+> +	 * ltc gpio pin 0
+> +	 */
+> +	tmp = lanphy_read_page_reg(phydev, 4, PTP_GPIO_SEL);
+> +	tmp |= PTP_GPIO_SEL_GPIO_SEL(0);
+> +	lanphy_write_page_reg(phydev, 4, PTP_GPIO_SEL, tmp);
+> +
+> +	tmp = lanphy_read_page_reg(phydev, 4, PTP_GPIO_CAP_STS);
+> +	if (!(tmp & PTP_GPIO_CAP_STS_PTP_GPIO_RE_STS(0)) &&
+> +	    !(tmp & PTP_GPIO_CAP_STS_PTP_GPIO_FE_STS(0)))
+> +		return -1;
+> +
+> +	if (tmp & BIT(0)) {
+> +		sec = lanphy_read_page_reg(phydev, 4, PTP_GPIO_RE_LTC_SEC_HI_CAP);
+> +		sec <<= 16;
+> +		sec |= lanphy_read_page_reg(phydev, 4, PTP_GPIO_RE_LTC_SEC_LO_CAP);
+> +
+> +		nsec = lanphy_read_page_reg(phydev, 4, PTP_GPIO_RE_LTC_NS_HI_CAP) & 0x3fff;
+> +		nsec <<= 16;
+> +		nsec |= lanphy_read_page_reg(phydev, 4, PTP_GPIO_RE_LTC_NS_LO_CAP);
+> +	} else {
+> +		sec = lanphy_read_page_reg(phydev, 4, PTP_GPIO_FE_LTC_SEC_HI_CAP);
+> +		sec <<= 16;
+> +		sec |= lanphy_read_page_reg(phydev, 4, PTP_GPIO_FE_LTC_SEC_LO_CAP);
+> +
+> +		nsec = lanphy_read_page_reg(phydev, 4, PTP_GPIO_FE_LTC_NS_HI_CAP) & 0x3fff;
+> +		nsec <<= 16;
+> +		nsec |= lanphy_read_page_reg(phydev, 4, PTP_GPIO_RE_LTC_NS_LO_CAP);
+> +	}
+> +
+> +	ptp_event.index = 0;
+> +	ptp_event.timestamp = ktime_set(sec, nsec);
+> +	ptp_event.type = PTP_CLOCK_EXTTS;
+> +	ptp_clock_event(shared->ptp_clock, &ptp_event);
+> +
+> +	return 0;
+> +}
+> +
+> +static int lan8814_handle_gpio_interrupt(struct phy_device *phydev, u16 status)
+> +{
+> +	struct lan8814_shared_priv *shared = phydev->shared->priv;
+> +	int ret;
+> +
+> +	mutex_lock(&shared->shared_lock);
+> +	ret = lan8814_gpio_process_cap(shared);
+> +	mutex_unlock(&shared->shared_lock);
+> +
+> +	return ret;
+> +}
+> +
+>   static int lan8804_config_init(struct phy_device *phydev)
+>   {
+>   	int val;
+> @@ -3424,6 +3601,9 @@ static irqreturn_t lan8814_handle_interrupt(struct phy_device *phydev)
+>   		ret = IRQ_HANDLED;
+>   	}
+>   
+> +	if (!lan8814_handle_gpio_interrupt(phydev, irq_status))
+> +		ret = IRQ_HANDLED;
+> +
+>   	return ret;
+>   }
+>   
+> @@ -3541,7 +3721,7 @@ static int lan8814_ptp_probe_once(struct phy_device *phydev)
+>   	snprintf(shared->ptp_clock_info.name, 30, "%s", phydev->drv->name);
+>   	shared->ptp_clock_info.max_adj = 31249999;
+>   	shared->ptp_clock_info.n_alarm = 0;
+> -	shared->ptp_clock_info.n_ext_ts = 0;
+> +	shared->ptp_clock_info.n_ext_ts = LAN8814_PTP_EXTTS_NUM;
 
-> +       else
-> +               return mcp251xfd_regmap_crc_gather_write(context,
->                                                  data, data_offset,
->                                                  data + data_offset,
->                                                  count - data_offset);
+Here ptp_clock is configured to have 3 pins supporting EXTTS.
+Looks like it should be n_ext_ts = 1;
+
+>   	shared->ptp_clock_info.n_pins = LAN8814_PTP_GPIO_NUM;
+>   	shared->ptp_clock_info.pps = 0;
+>   	shared->ptp_clock_info.pin_config = shared->pin_config;
+
 
