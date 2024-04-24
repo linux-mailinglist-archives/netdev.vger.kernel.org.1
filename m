@@ -1,142 +1,133 @@
-Return-Path: <netdev+bounces-90836-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90837-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67E468B0623
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 11:36:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E7798B062A
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 11:38:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1C8C81F2533F
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 09:36:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CFF352858AC
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 09:38:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA8E4158DC8;
-	Wed, 24 Apr 2024 09:36:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95928158D79;
+	Wed, 24 Apr 2024 09:38:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [207.211.30.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46B8D158DA0
-	for <netdev@vger.kernel.org>; Wed, 24 Apr 2024 09:36:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53025158A39
+	for <netdev@vger.kernel.org>; Wed, 24 Apr 2024 09:38:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.211.30.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713951389; cv=none; b=r/2A/DCO7CPIg5mhszWkVk1l7egripbOBIBlHXDIisX8q14VdT5zaaaaYUm/SPPZMsn7X89QmctBUdqMSwUhk5oiVhsFQbj/vLGgNIwRDvI9peiO5KfBltrFo/B3Ss68VDK+ajqXBeefHpZen1tH9/UBMEvJ3u1+/0m6N6KUOQ4=
+	t=1713951501; cv=none; b=hZNtR68vuSnbixX21FCKdNog5KUZIfcOX90ss4ocFLeBCmbzoQ39sy5+MCL7TBEWryCCoF7nFm2p7tr+xd5GXNBeSxkemcADJZHwD5zSoIME5CLc61L2S0HN7c1eZrliDNl14kcHyILt2a/ricvV2+rw70idCty0dU+y/PQs3ow=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713951389; c=relaxed/simple;
-	bh=XYUSje7s+vIF31JkBL5OE6mbhV5TbJ4IkrpChsZMHWQ=;
+	s=arc-20240116; t=1713951501; c=relaxed/simple;
+	bh=P8ldp0KdTR/3/C0aQaZ3OMNmoWsnxtTBgeZjDpVAxA0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aEWWyIQU4mymz+5Ht6euw3uCykSEjugLXiMQwRspc0isYVnYDA+1VJEmpZgPh8n0yO9eH4wgs9CRlM4ybrmcGBP826XNmjgkEmTLf8vPp0cONKFGcYqPchaCFNZ3AOjZUfPZZPT2PiY3U3ZaRFl49Vbp+O5SgvZhUvYvIcRFFQk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1rzZ2o-0004t5-F1; Wed, 24 Apr 2024 11:36:02 +0200
-Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1rzZ2m-00E3Pa-Ji; Wed, 24 Apr 2024 11:36:00 +0200
-Received: from pengutronix.de (unknown [172.20.34.65])
+	 In-Reply-To:Content-Type:Content-Disposition; b=UTCEz5nnBGX5S3pgwcSoAHLFqWtBngAJr8inRmiRfHjlCrgpJJvKdDUZppZxE/TZix5CNi4aJHRPCAwLnLvC3UQSUPV0Mqr2sN/GeQzp/el2wbyLj89i2S5P8ma/tAqmA9gLD5O4hboCKScoYUewp+2U0b9lNkx6nH3GcW5eJtE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=none smtp.mailfrom=queasysnail.net; arc=none smtp.client-ip=207.211.30.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=queasysnail.net
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-501-RXs0JHMCMv-ioyFKDv1Opg-1; Wed, 24 Apr 2024 05:38:12 -0400
+X-MC-Unique: RXs0JHMCMv-ioyFKDv1Opg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 27E402BECD3;
-	Wed, 24 Apr 2024 09:36:00 +0000 (UTC)
-Date: Wed, 24 Apr 2024 11:35:59 +0200
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Gregor Herburger <gregor.herburger@ew.tq-group.com>
-Cc: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>, 
-	Thomas Kopp <thomas.kopp@microchip.com>, Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, linux-can@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux@ew.tq-group.com, alexander.stein@ew.tq-group.com
-Subject: Re: [PATCH 3/4] can: mcp251xfd: add gpio functionality
-Message-ID: <20240424-notorious-roadrunner-of-will-0c55ce-mkl@pengutronix.de>
-References: <20240417-mcp251xfd-gpio-feature-v1-0-bc0c61fd0c80@ew.tq-group.com>
- <20240417-mcp251xfd-gpio-feature-v1-3-bc0c61fd0c80@ew.tq-group.com>
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 68B6A830E85;
+	Wed, 24 Apr 2024 09:38:11 +0000 (UTC)
+Received: from hog (unknown [10.39.193.137])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id BC7511C0654B;
+	Wed, 24 Apr 2024 09:38:09 +0000 (UTC)
+Date: Wed, 24 Apr 2024 11:38:08 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Antony Antony <antony.antony@secunet.com>
+Cc: Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>, netdev@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	devel@linux-ipsec.org, Leon Romanovsky <leon@kernel.org>,
+	Eyal Birger <eyal.birger@gmail.com>,
+	Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Subject: Re: [PATCH ipsec-next v12 1/4] xfrm: Add Direction to the SA in or
+ out
+Message-ID: <ZijTAN_ns1gRU9hz@hog>
+References: <cover.1713874887.git.antony.antony@secunet.com>
+ <91580d32b47bc78d0e09fccab936effc23ec8155.1713874887.git.antony.antony@secunet.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="7mrp4odhvvzy4nqr"
-Content-Disposition: inline
-In-Reply-To: <20240417-mcp251xfd-gpio-feature-v1-3-bc0c61fd0c80@ew.tq-group.com>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
-
-
---7mrp4odhvvzy4nqr
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <91580d32b47bc78d0e09fccab936effc23ec8155.1713874887.git.antony.antony@secunet.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.7
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: queasysnail.net
+Content-Type: text/plain; charset=UTF-8
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On 17.04.2024 15:43:56, Gregor Herburger wrote:
-> The mcp251xfd devices allow two pins to be configured as gpio. Add this
-> functionality to driver.
->=20
-> Signed-off-by: Gregor Herburger <gregor.herburger@ew.tq-group.com>
-> ---
->  drivers/net/can/spi/mcp251xfd/mcp251xfd-core.c   | 138 +++++++++++++++++=
-+++++-
->  drivers/net/can/spi/mcp251xfd/mcp251xfd-regmap.c |  21 +++-
->  drivers/net/can/spi/mcp251xfd/mcp251xfd.h        |   4 +
->  3 files changed, 159 insertions(+), 4 deletions(-)
->=20
-> diff --git a/drivers/net/can/spi/mcp251xfd/mcp251xfd-core.c b/drivers/net=
-/can/spi/mcp251xfd/mcp251xfd-core.c
-> index eb699288c076..5ba9fd0af4b6 100644
-> --- a/drivers/net/can/spi/mcp251xfd/mcp251xfd-core.c
-> +++ b/drivers/net/can/spi/mcp251xfd/mcp251xfd-core.c
+2024-04-23, 14:49:17 +0200, Antony Antony wrote:
+> diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
+> index 0c306473a79d..c8c5fc47c431 100644
+> --- a/net/xfrm/xfrm_state.c
+> +++ b/net/xfrm/xfrm_state.c
+> @@ -1292,6 +1292,7 @@ xfrm_state_find(const xfrm_address_t *daddr, const =
+xfrm_address_t *saddr,
+>  =09=09if (km_query(x, tmpl, pol) =3D=3D 0) {
+>  =09=09=09spin_lock_bh(&net->xfrm.xfrm_state_lock);
+>  =09=09=09x->km.state =3D XFRM_STATE_ACQ;
+> +=09=09=09x->dir =3D XFRM_SA_DIR_OUT;
 
+Would that make updates fail if userspace isn't setting SA_DIR
+afterwards?
+
+
+> diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
+> index 810b520493f3..d34ac467a219 100644
+> --- a/net/xfrm/xfrm_user.c
+> +++ b/net/xfrm/xfrm_user.c
 [...]
+> @@ -176,6 +200,7 @@ static int verify_newsa_info(struct xfrm_usersa_info =
+*p,
+>  =09=09=09     struct netlink_ext_ack *extack)
+>  {
+>  =09int err;
+> +=09u8 sa_dir =3D attrs[XFRMA_SA_DIR] ?  nla_get_u8(attrs[XFRMA_SA_DIR]) =
+: 0;
 
-> +static int mcp251fdx_gpio_setup(struct mcp251xfd_priv *priv)
-> +{
-> +	struct gpio_chip *gc =3D &priv->gc;
+nit: extra ' ' after '?', only one is needed.
+
+
+> @@ -358,6 +383,64 @@ static int verify_newsa_info(struct xfrm_usersa_info=
+ *p,
+>  =09=09=09err =3D -EINVAL;
+>  =09=09=09goto out;
+>  =09=09}
 > +
-> +	if (!device_property_present(&priv->spi->dev, "gpio-controller"))
-> +		return 0;
+> +=09=09if (sa_dir =3D=3D XFRM_SA_DIR_OUT) {
+> +=09=09=09NL_SET_ERR_MSG(extack,
+> +=09=09=09=09       "MTIMER_THRESH attribute should not be set on output =
+SA");
+> +=09=09=09err =3D -EINVAL;
+> +=09=09=09goto out;
+> +=09=09}
+> +=09}
 > +
-> +	if (priv->rx_int)
-> +		return dev_err_probe(&priv->spi->dev, -EINVAL,
-> +				     "Can't configure gpio-controller with RX-INT!\n");
+> +=09if (sa_dir =3D=3D XFRM_SA_DIR_OUT) {
+> +=09=09if (p->flags & XFRM_STATE_DECAP_DSCP) {
+> +=09=09=09NL_SET_ERR_MSG(extack, "Flag NDECAP_DSCP should not be set for =
+output SA");
 
-Can you enhance the DT binding to reflect this?
-
-regards,
-Marc
+That typo in the error string is still here (extra N in flag name).
 
 --=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+Sabrina
 
---7mrp4odhvvzy4nqr
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmYo0nwACgkQKDiiPnot
-vG8jwwf8C78MKwbC/RCbrV/cNcA+Z+3H66miJLcSjDg7A0mLZEjmJGCd6sDt9swW
-9ZusbKULy3vRQh8aOIf7zLkU3CuJbigbqfJO8e33B9nhN5SOJ0huOFssog5M24LI
-8k+L6Q6/bAkcC0SPuvCP1F/2+o3gYyjciEzfENA1yTBtvHvXHiJfc8JVTUkxrjan
-pfeZmgA2+hPXQUEuoxO3FMIzeiTe8l80Dxmrn6CdJSIfJsfm+rPnSaKY+bNdU4o+
-GP2VPfEds8yew+72uP7XgXmeZNVlnbAngGp82f8NxmCtvjBlTHkrjFE6/6+ZiuYw
-T5U6eqYVSFiHHWztQV81KACO+XZOsA==
-=Gi+/
------END PGP SIGNATURE-----
-
---7mrp4odhvvzy4nqr--
 
