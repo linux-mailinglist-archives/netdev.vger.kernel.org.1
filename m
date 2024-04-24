@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-91093-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91094-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F35DB8B15F1
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 00:14:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B23B8B15F3
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 00:15:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 926801F2247A
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 22:14:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 37F13283B9E
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 22:15:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4A3B161913;
-	Wed, 24 Apr 2024 22:14:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33C8516ABCD;
+	Wed, 24 Apr 2024 22:14:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XStIbT7A"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GUK/rBrT"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB42D1607A2;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06912165FB3;
 	Wed, 24 Apr 2024 22:14:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713996891; cv=none; b=BVrd4whN7efM+3p5rxLtqFQkcHv98G2G14/JqS+t9pXeAILf6dgJ9iFaYQz979sToquzJu0xPNE1ChjU8uz+znamntiE2L/iXwaSeGktsORuJvYv7PlUSAu1+dTTgWZgDZHUCXSkyC6TtesR3Nw4wtBSWtGbMWdnaX1HTiKAssg=
+	t=1713996892; cv=none; b=McAPZwFVHlTbkj9NuA5m8I8ey7z0tER8DEzvRm123Yjr++bXzywtz9emVh/sCUPizbk2FIbIlAziW2lGvEZn86vSAJ0kNoJ2N4cUxIUNbv6MFuNfCbIVuFXTlAq4f6JI+140ndolz7Swcn4tMCPjJ1IjUysSf1qHQSBwc0My2AI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713996891; c=relaxed/simple;
-	bh=d133gvW+7UN3UO7wVGaiUVGARPF1yuYlLI+me49dJRw=;
+	s=arc-20240116; t=1713996892; c=relaxed/simple;
+	bh=mLF7JiYV3aL5gRVzXWPg4mgGT5YCnXvtblk/EeSsU2U=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Yrc7rMTO4YLLmCluOUI2jvf9SP88jvcqc+xE3IOkecCH4gho9ciNN7V7z2j7ied8YAwWAOvxydoChwduXkPslRBZyWHKrOh6gaMfkd/HOZhBVVnnc4Ck59ZxhsXg4Y1/YaLJkPgoVIqhN0lFor01mbZ6p31TSukElUzAfVtgfM4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XStIbT7A; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 13380C2BD11;
+	 MIME-Version; b=h/ctaDyWUrjxhVAqPdniXryDMBtqczAQXSKnOGZxMAXp5Xrq6yLH/tshFboT8cZQLFrHfK85FECo2uRe6WFCvJi4q9wDHJbNyvodaXz2HVPWgQYSciDC4ZCQKFU4ZwtibH1kvmWkBk5Kr7pJXlIWYxDkkLPiRSx7YwyNcPh9ZSQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GUK/rBrT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6ED7BC113CE;
 	Wed, 24 Apr 2024 22:14:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1713996891;
-	bh=d133gvW+7UN3UO7wVGaiUVGARPF1yuYlLI+me49dJRw=;
+	bh=mLF7JiYV3aL5gRVzXWPg4mgGT5YCnXvtblk/EeSsU2U=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=XStIbT7AVplOlW2HjbSHqNweFrj1bwHaXq6MFdQZzpbPlV0nRw7iWPdo9c+S9DOXe
-	 AhTroAT6J8Ne6IOTvADR0zGzKBCX0cu1l8XXywMRw6eWooiXaya88UW8TD3swpRSML
-	 dTtXuSOtYyCCpKcOB1BcXnQbszZR4sFP9KK9TRfj2yckHVgm8ToVZW95T2KNvmMU3l
-	 n0/JHXkm5WeAyHR43/olCP2oOQPXnyYdAKHR+wiaTBT8KGODB6Y6T7+qVFCgG+9177
-	 srXh633I/XZbnElc7LwXyvNQ7xmSOdZqi17OukreEaeR/3gECHqC2GQIFNSI/+NIk9
-	 mX+urfg+zERqA==
+	b=GUK/rBrTA0SlRvjCJLNmlKSsxjI5Al8WXWOjCgQndqY0ICe6+QpbO0nmxKC38h3O8
+	 inesWIm5+i+xR+/TfaGC9xjLYaSUgPFCF/p0IH8xAaQ8XkoMTP4G5NFMyav2DY2wXW
+	 84BnufNmI4sFpIq8cSdCbPlAjcoqiNSrQvvD0ai7YQVbd8OHmsOIeemvEXKVKjSNdE
+	 Q0YjN3/HfBUmQCgAEJb/5QGD0WiN/qUHfx6E+pSD5+vN13EqOZT8pb6GMjCF1iv5yN
+	 AQucUBrkmE5izdmAPTOQUemoaMch6rKnLfLUy9Q/5X2SFA8gXkruyIPNp2syOdeOtT
+	 8dkweKLc54bJA==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -49,9 +49,9 @@ Cc: netdev@vger.kernel.org,
 	linux-kselftest@vger.kernel.org,
 	willemdebruijn.kernel@gmail.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 1/4] selftests: drv-net: force pseudo-terminal allocation in ssh
-Date: Wed, 24 Apr 2024 15:14:41 -0700
-Message-ID: <20240424221444.4194069-2-kuba@kernel.org>
+Subject: [PATCH net-next 2/4] selftests: drv-net: extend the README with more info and example
+Date: Wed, 24 Apr 2024 15:14:42 -0700
+Message-ID: <20240424221444.4194069-3-kuba@kernel.org>
 X-Mailer: git-send-email 2.44.0
 In-Reply-To: <20240424221444.4194069-1-kuba@kernel.org>
 References: <20240424221444.4194069-1-kuba@kernel.org>
@@ -63,31 +63,138 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This is not yet needed, because we don't terminate remote background
-commands. But once we do, if we run ssh without -t the ssh session
-may close and the program may carry on happily running.
+Add more info to the README. It's also now copied to GitHub for
+increased visibility:
 
-I have hit this problem experimenting with mausezahn, let's fix
-it already to avoid someone else wasting time debugging it.
+ https://github.com/linux-netdev/nipa/wiki/Running-driver-tests
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- tools/testing/selftests/drivers/net/lib/py/remote_ssh.py | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ .../testing/selftests/drivers/net/README.rst  | 97 ++++++++++++++++---
+ 1 file changed, 85 insertions(+), 12 deletions(-)
 
-diff --git a/tools/testing/selftests/drivers/net/lib/py/remote_ssh.py b/tools/testing/selftests/drivers/net/lib/py/remote_ssh.py
-index 924addde19a3..294a4ed8284e 100644
---- a/tools/testing/selftests/drivers/net/lib/py/remote_ssh.py
-+++ b/tools/testing/selftests/drivers/net/lib/py/remote_ssh.py
-@@ -20,7 +20,7 @@ from lib.py import cmd
-             self._tmpdir = None
+diff --git a/tools/testing/selftests/drivers/net/README.rst b/tools/testing/selftests/drivers/net/README.rst
+index 0cbab33dad1f..3b6a29e6564b 100644
+--- a/tools/testing/selftests/drivers/net/README.rst
++++ b/tools/testing/selftests/drivers/net/README.rst
+@@ -1,18 +1,42 @@
+-Running tests
+-=============
++.. SPDX-License-Identifier: GPL-2.0
  
-     def cmd(self, comm):
--        return subprocess.Popen(["ssh", "-q", self.name, comm],
-+        return subprocess.Popen(["ssh", "-t", "-q", self.name, comm],
-                                 stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+-Tests are executed within kselftest framework like any other tests.
+-By default tests execute against software drivers such as netdevsim.
+-All tests must support running against a real device (SW-only tests
+-should instead be placed in net/ or drivers/net/netdevsim, HW-only
+-tests in drivers/net/hw).
++Running driver tests
++====================
  
-     def _mktmp(self):
+-Set appropriate variables to point the tests at a real device.
++Networking driver tests are executed within kselftest framework like any
++other tests. They support testing both real device drivers and emulated /
++software drivers (latter mostly to test the core parts of the stack).
++
++SW mode
++~~~~~~~
++
++By default, when no extra parameters are set or exported, tests execute
++against software drivers such as netdevsim. No extra preparation is required
++the software devices are created and destroyed as part of the test.
++In this mode the tests are indistinguishable from other selftests and
++(for example) can be run under ``virtme-ng`` like the core networking selftests.
++
++HW mode
++~~~~~~~
++
++Executing tests against a real device requires external preparation.
++The netdevice against which tests will be run must exist, be running
++(in UP state) and be configured with an IP address.
++
++Refer to list of :ref:`Variables` later in this file to set up running
++the tests against a real device.
++
++Both modes required
++~~~~~~~~~~~~~~~~~~~
++
++All tests in drivers/net must support running both against a software device
++and a real device. SW-only tests should instead be placed in net/ or
++drivers/net/netdevsim, HW-only tests in drivers/net/hw.
+ 
+ Variables
+ =========
+ 
+-Variables can be set in the environment or by creating a net.config
++The variables can be set in the environment or by creating a net.config
+ file in the same directory as this README file. Example::
+ 
+   $ NETIF=eth0 ./some_test.sh
+@@ -23,9 +47,9 @@ Variables can be set in the environment or by creating a net.config
+   # Variable set in a file
+   NETIF=eth0
+ 
+-Please note that the config parser is very simple, if there are
+-any non-alphanumeric characters in the value it needs to be in
+-double quotes.
++Local test (which don't require endpoint for sending / receiving traffic)
++need only the ``NETIF`` variable. Remaining variables define the endpoint
++and communication method.
+ 
+ NETIF
+ ~~~~~
+@@ -61,3 +85,52 @@ Arguments used to construct the communication channel.
+ 
+   for netns - name of the "remote" namespace
+   for ssh - name/address of the remote host
++
++Example
++=======
++
++Build the selftests::
++
++  # make -C tools/testing/selftests/ TARGETS="drivers/net drivers/net/hw"
++
++"Install" the tests and copy them over to the target machine::
++
++  # make -C tools/testing/selftests/ TARGETS="drivers/net drivers/net/hw" \
++     install INSTALL_PATH=/tmp/ksft-net-drv
++
++  # rsync -ra --delete /tmp/ksft-net-drv root@192.168.1.1:/root/
++
++On the target machine, running the tests will use netdevsim by default::
++
++  [/root] # ./ksft-net-drv/run_kselftest.sh -t drivers/net:ping.py
++  TAP version 13
++  1..1
++  # timeout set to 45
++  # selftests: drivers/net: ping.py
++  # KTAP version 1
++  # 1..3
++  # ok 1 ping.test_v4
++  # ok 2 ping.test_v6
++  # ok 3 ping.test_tcp
++  # # Totals: pass:3 fail:0 xfail:0 xpass:0 skip:0 error:0
++  ok 1 selftests: drivers/net: ping.py
++
++Create a config with remote info::
++
++  [/root] # cat > ./ksft-net-drv/drivers/net/net.config <<EOF
++  NETIF=eth0
++  LOCAL_V4=192.168.1.1
++  REMOTE_V4=192.168.1.2
++  REMOTE_TYPE=ssh
++  REMOTE_ARGS=root@192.168.1.2
++  EOF
++
++Run the test::
++
++  [/root] # ./ksft-net-drv/drivers/net/ping.py
++  KTAP version 1
++  1..3
++  ok 1 ping.test_v4
++  ok 2 ping.test_v6 # SKIP Test requires IPv6 connectivity
++  ok 3 ping.test_tcp
++  # Totals: pass:2 fail:0 xfail:0 xpass:0 skip:1 error:0
 -- 
 2.44.0
 
