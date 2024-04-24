@@ -1,135 +1,164 @@
-Return-Path: <netdev+bounces-91052-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91053-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D269B8B11D0
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 20:15:01 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA7918B1263
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 20:32:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 878301F227F7
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 18:15:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9D19CB2FF71
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 18:31:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60F0616DEB4;
-	Wed, 24 Apr 2024 18:14:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7213172BB2;
+	Wed, 24 Apr 2024 18:23:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XGG1QpJd"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qa/fXVu5"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA1E116D9CA
-	for <netdev@vger.kernel.org>; Wed, 24 Apr 2024 18:14:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8CD916EC0B
+	for <netdev@vger.kernel.org>; Wed, 24 Apr 2024 18:23:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713982489; cv=none; b=uiXRVz06zYoDPgNEyM37Xi1qv3ICOOgVMVGzXUc6XvcVSbj/P8kBahk59p3qc4I7/mM6eKDYT/ZTDuufhpTNi4uYhDIWXJTS7rDrHTp0zPqsgkmYzfeQeH/6L5cgrP7tJS3jEk0jQkJhL3X64QVSUT3T4tvZRKDKgB9zT3jFrmU=
+	t=1713983013; cv=none; b=NrqbeUDMUeaqSLjtTLxDQAdQf5Ez9+Z/JXl3yccA5XN8At/scN2UHC7oEphcLlYDFTzaoK3YioPa9bgEbezJbBqpwDTA+r361rrLcKVUHJmpWBwMm02XyvgmZMtTRgu9MGR1koXTGZOpup+avuUJjzcchjgwnCNH5O1J3Psgx9o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713982489; c=relaxed/simple;
-	bh=+4r7iLFXraZgcoLPWgj6PnzEMXZRq0mxHwRIq9rZegk=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=QLaUuy83YFPAezUld3QpRSSWq4zO5g0hI5hQ4NKztk3XN55TZs7FLqoR7bD5HdxFYJo7rcp5m8N+O0CClEEl/WGyuVosIsv+/AK8pVLelOvLAEOMIclN9Z117LlgR9TWcVyMFv5L5qUwg8ghvG8cAfCG2RlWZqS23ds1D8lesEI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XGG1QpJd; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1713982486;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ll6LtsSB3IShWEfWe8TsPKTtwPqmZYYtwit4iQKiJxY=;
-	b=XGG1QpJdu00Z9+dDb/JKjt/UXVfQtwXmvSZoNIikPnsS071d3OZbmstfYtrH08th7eHsOS
-	8yUYaPPlI4pgE/OKzdcLJD+MVphwJtkimsa9kY/tJlFrd98KCRTd/HPd+PajQtTBxGhvs0
-	pMERDKbftdmUJrc9w8P1QtmVV+fya7Y=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-403-5G_tJbtIN1SpBo_XTRU4Zg-1; Wed,
- 24 Apr 2024 14:14:43 -0400
-X-MC-Unique: 5G_tJbtIN1SpBo_XTRU4Zg-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2DCF929AA3B0;
-	Wed, 24 Apr 2024 18:14:43 +0000 (UTC)
-Received: from RHTRH0061144 (dhcp-17-72.bos.redhat.com [10.18.17.72])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id EC6EF492BC6;
-	Wed, 24 Apr 2024 18:14:42 +0000 (UTC)
-From: Aaron Conole <aconole@redhat.com>
-To: Benjamin Poirier <benjamin.poirier@gmail.com>
-Cc: Simon Horman <horms@kernel.org>,  Jakub Kicinski <kuba@kernel.org>,
-  dev@openvswitch.org,  netdev@vger.kernel.org,
-  linux-kselftest@vger.kernel.org,  Jiri Pirko <jiri@resnulli.us>
-Subject: Re: [ovs-dev] selftests: openvswitch: Questions about possible
- enhancements
-In-Reply-To: <ZilIgbIvB04iUal2@f4> (Benjamin Poirier's message of "Wed, 24 Apr
-	2024 13:59:29 -0400")
-References: <20240424164405.GN42092@kernel.org>
-	<20240424173715.GP42092@kernel.org> <ZilIgbIvB04iUal2@f4>
-Date: Wed, 24 Apr 2024 14:14:42 -0400
-Message-ID: <f7th6fqaar1.fsf@redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1713983013; c=relaxed/simple;
+	bh=OW6K79LTwyn9Oh4Z2zu66keXdk6bie9FWxJ2hFH7idk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=AhtcE1MllyiwIuhlBlUP2aabzXcM+pBzjUQjQl1+4IRvgvziELC2RWmtrFFDhb5I5sF4ZE9rSUThTB7tDIZ+gyEJghoY2lfEcJb8A6leZDDGUO4mprViJ5Tkt66kczc5HFTjD0JxajfRfXtkuzlSImlJOEPBz6D5bOWDA1ewyMU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qa/fXVu5; arc=none smtp.client-ip=209.85.208.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-571b5fba660so2065a12.1
+        for <netdev@vger.kernel.org>; Wed, 24 Apr 2024 11:23:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1713983009; x=1714587809; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cUR7q0/1SIHPCudA3r8n/GS4qjmEqShPz422ck3ZFsQ=;
+        b=qa/fXVu5gXt4wNkFPfl2QZ5QBmlQkuTB/+wpraskj1QZ9Yj5yTt2oz3nxbvMPiknJa
+         ttoOZmWF7y32hJAt0K9ul7WC9cwwnZxL0zXiqz9S7+G1jzMqXad8J2vZeufMcOEEhA0S
+         s2v6MPsY/fnVZL7dQimbLD+lCRhSY6g106v8ZYu6CMeIxi/9V37dG9IDrUoIYS2IoO14
+         UXLH8iHO1gtDmLmAm+ETBVnhwzbAVJmVf09I1WtP/YE9YZLDxOo4OCb1MeSyM1kPd9bF
+         WwEA9Wl4+RuFMQ9d8LLfwPKxaTh+ACMRptQ2UapiPnvmbfTXeeWCGBVowrV0qRNGqHRy
+         0Xkg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713983009; x=1714587809;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=cUR7q0/1SIHPCudA3r8n/GS4qjmEqShPz422ck3ZFsQ=;
+        b=N0uz/A/rQb02EPxBZcg1o/jl3FLXgnnCoKAZ5VyEErmRd1kV9sBS0p5uRuvzHVQlJ2
+         R1Bdo7br915c0APxlQrQYFBdSVhyIfhbQZprtcAsPIv4FsPYW8+cyr89G1Hc9noWe0Fm
+         fRjvDsIMvNw1SmPiF+tHjL/oLz5HnlkrQRx1PNu0IXb68wUVDqMqlpyTQrjhpjI6lGI/
+         ++Za65sqJ3osQFg0KPDBX1GLyephYIH9YbsOQsf89IANkqK2h5rfZ0qEDF8UVFiI+y4k
+         129Gn5afss2Eaco+r6s/h8kgcKl1irZytPzmQCb6e630OdeYqdFYOdsb4UISCM+ja+W2
+         eorg==
+X-Gm-Message-State: AOJu0YweYoHPBu5DXapQA/MsKwieksLgNV4FsGFx9MstmBPQmb3Yk0fq
+	0r1H8lgt3swfSRUHz4F6oWp/zmFSLQUG9PX1vqPRhqLZqF3+FmM5ln8t+VS0WNFJPJu6D/a/iWQ
+	WQYj7At0opbywJ8wdo4Vowuzlstu+jlWZ8qpIrKD74kZCF0GEDA==
+X-Google-Smtp-Source: AGHT+IEjqJGW4k3GY74vFUxHtSdyRkdPWxbHnE82tGNfR/UBj+oUw2la1kTSF97etRl9JLWRdY4muBrMIspw9d3xkbc=
+X-Received: by 2002:a50:ff07:0:b0:571:b2c2:5c3e with SMTP id
+ a7-20020a50ff07000000b00571b2c25c3emr12634edu.1.1713983008810; Wed, 24 Apr
+ 2024 11:23:28 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.9
+References: <20240424180458.56211-1-nbd@nbd.name> <20240424180458.56211-5-nbd@nbd.name>
+In-Reply-To: <20240424180458.56211-5-nbd@nbd.name>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 24 Apr 2024 20:23:17 +0200
+Message-ID: <CANn89iL39fo99P-mfiwR6jnMdw4do-tkyb=qxOQJLPtnB8cZvA@mail.gmail.com>
+Subject: Re: [PATCH net-next 4/4] net: add heuristic for enabling TCP fraglist GRO
+To: Felix Fietkau <nbd@nbd.name>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
+	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	willemdebruijn.kernel@gmail.com, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Benjamin Poirier <benjamin.poirier@gmail.com> writes:
+On Wed, Apr 24, 2024 at 8:05=E2=80=AFPM Felix Fietkau <nbd@nbd.name> wrote:
+>
+> When forwarding TCP after GRO, software segmentation is very expensive,
+> especially when the checksum needs to be recalculated.
+> One case where that's currently unavoidable is when routing packets over
+> PPPoE. Performance improves significantly when using fraglist GRO
+> implemented in the same way as for UDP.
+>
+> When NETIF_F_GRO_FRAGLIST is enabled, perform a lookup for an established
+> socket in the same netns as the receiving device. While this may not
+> cover all relevant use cases in multi-netns configurations, it should be
+> good enough for most configurations that need this.
+>
+> Here's a measurement of running 2 TCP streams through a MediaTek MT7622
+> device (2-core Cortex-A53), which runs NAT with flow offload enabled from
+> one ethernet port to PPPoE on another ethernet port + cake qdisc set to
+> 1Gbps.
+>
+> rx-gro-list off: 630 Mbit/s, CPU 35% idle
+> rx-gro-list on:  770 Mbit/s, CPU 40% idle
+>
+> Signe-off-by: Felix Fietkau <nbd@nbd.name>
+> ---
+>  net/ipv4/tcp_offload.c   | 45 ++++++++++++++++++++++++++++++++++++++-
+>  net/ipv6/tcpv6_offload.c | 46 +++++++++++++++++++++++++++++++++++++++-
+>  2 files changed, 89 insertions(+), 2 deletions(-)
+>
+> diff --git a/net/ipv4/tcp_offload.c b/net/ipv4/tcp_offload.c
+> index 6294e7a5c099..f987e2d8423a 100644
+> --- a/net/ipv4/tcp_offload.c
+> +++ b/net/ipv4/tcp_offload.c
+> @@ -404,6 +404,49 @@ void tcp_gro_complete(struct sk_buff *skb)
+>  }
+>  EXPORT_SYMBOL(tcp_gro_complete);
+>
+> +static bool tcp4_check_fraglist_gro(struct sk_buff *skb)
+> +{
+> +       const struct iphdr *iph =3D skb_gro_network_header(skb);
+> +       struct net *net =3D dev_net(skb->dev);
+> +       unsigned int off, hlen, thlen;
+> +       struct tcphdr *th;
+> +       struct sock *sk;
+> +       int iif, sdif;
+> +
+> +       if (!(skb->dev->features & NETIF_F_GRO_FRAGLIST))
+> +               return false;
+> +
+> +       inet_get_iif_sdif(skb, &iif, &sdif);
+> +
+> +       off =3D skb_gro_offset(skb);
+> +       hlen =3D off + sizeof(*th);
+> +       th =3D skb_gro_header(skb, hlen, off);
+> +       if (unlikely(!th))
+> +               return false;
+> +
+> +       thlen =3D th->doff * 4;
+> +       if (thlen < sizeof(*th))
+> +               return false;
+> +
+> +       hlen =3D off + thlen;
+> +       if (!skb_gro_may_pull(skb, hlen)) {
+> +               th =3D skb_gro_header_slow(skb, hlen, off);
+> +               if (unlikely(!th))
+> +                       return false;
+> +       }
+> +
+> +       sk =3D __inet_lookup_established(net, net->ipv4.tcp_death_row.has=
+hinfo,
+> +                                      iph->saddr, th->source,
+> +                                      iph->daddr, ntohs(th->dest),
+> +                                      iif, sdif);
 
-> On 2024-04-24 18:37 +0100, Simon Horman wrote:
->> On Wed, Apr 24, 2024 at 05:44:05PM +0100, Simon Horman wrote:
->> > Hi Aaron, Jakub, all,
->> > 
->> > I have recently been exercising the Open vSwitch kernel selftests,
->> > using vng, something like this:
->> > 
->> > 	TESTDIR="tools/testing/selftests/net/openvswitch"
->> > 
->> >         vng -v --run . --user root --cpus 2 \
->> >                 --overlay-rwdir "$PWD" -- \
->> >                 "modprobe openvswitch && \
->> > 		 echo \"timeout=90\" >> \"${TESTDIR}/settings\" && \
->> >                  make -C \"$TESTDIR\" run_tests"
->> > 
->> > And I have some observations that I'd like to ask about.
->> > 
->> > 1. Building the kernel using the following command does not
->> >    build the openvswitch kernel module.
->> > 
->> > 	vng -v --build \
->> > 		--config tools/testing/selftests/net/config
->> > 
->> >    All that seems to be missing is CONFIG_OPENVSWITCH=m
->> >    and I am wondering what the best way of resolving this is.
->> > 
->> >    Perhaps I am doing something wrong.
->> >    Or perhaps tools/testing/selftests/net/openvswitch/config
->> >    should be created? If so, should it include (most of?) what is in
->> >    tools/testing/selftests/net/config, or just CONFIG_OPENVSWITCH=m?
->
-> I noticed something similar when testing Jiri's virtio_net selftests
-> patchset [1].
->
-> drivers/net/virtio_net/config includes virtio options but the
-> test also needs at least CONFIG_NET_VRF=y which is part of net/config.
->
-> Whatever the answer to your question, all config files should be
-> coherent on this matter.
->
-> [1] https://lore.kernel.org/netdev/20240424104049.3935572-1-jiri@resnulli.us/
->
-> [...]
->> 
->>   5. openvswitch.sh starts with "#!/bin/sh".
->>      But substitutions such as "${ns:0:1}0"  fail if /bin/sh is dash.
->>      Perhaps we should change openvswitch.sh to use bash?
->
-> I think so. A similar change was done in
-> c2518da8e6b0 selftests: bonding: Change script interpreter (v6.8-rc1)
+Presumably all this could be done only for the first skb/segment of a GRO t=
+rain.
 
-+1 - I'm okay with it.
+We could store the fraglist in a single bit in NAPI_GRO_CB(skb) ?
 
+GRO does a full tuple evaluation, we can trust it.
 
