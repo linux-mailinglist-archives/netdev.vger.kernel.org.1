@@ -1,64 +1,73 @@
-Return-Path: <netdev+bounces-91123-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91124-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ACE838B1783
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 01:58:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E5B18B1793
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 01:59:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 529342858BA
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 23:58:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3EB211F24E51
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 23:59:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D21B016F289;
-	Wed, 24 Apr 2024 23:57:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 845AB16F287;
+	Wed, 24 Apr 2024 23:59:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SxMCCDar"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g8GZJvMM"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACCBD41C68
-	for <netdev@vger.kernel.org>; Wed, 24 Apr 2024 23:57:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56C6A16F27F;
+	Wed, 24 Apr 2024 23:59:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714003075; cv=none; b=s7HuVc//gHiDwIWXVOP1Nnv7EiQZQf+8qVIKLelyd7bm4OluH0buYkbzBCZ8zGRn0UgDwCqfw7NItQ+d2/uPE927tu1Xu5QjYcvxB944etwaIqHCdk0e/hSbg1l7zJcUsD/vTr4meD2f/cNhXTjLhJ2WrManhZCZQQnil0nQkpE=
+	t=1714003148; cv=none; b=TNgbEy9mmg9r3CYZRB1BSYQI8If2E+irNARQfyrJ9mqV4azVvpN/p08DUM5a11HahFBnp9kp4pjubZK0ZqZ3Za1mzZCT4imlvKEbb6EC0LBlu/asI8n2XPQDfEl+4/zP5kfBFFnzXVnNfhn9pnaotLU++MStWKxUwxlBNPFGp64=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714003075; c=relaxed/simple;
-	bh=0ZKK7XAy1miGUYwPd+P9lggffp1jKkLor5eLUf+by+I=;
+	s=arc-20240116; t=1714003148; c=relaxed/simple;
+	bh=S1yZOjnuDdnjLcmEUPEYxqb4c/uKF1LFTpIO9ko8tUE=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LAWpVBw6beLXjCmvQuV0VhDC+faF1dfYJv43YN1cE7TU2D9FUgyBcKUhSckI7ptVn1EJfRoD49DJ/IJpNGoapGwt5Y+veZQN2jjEDqqeTVq1pbtGYucxPr7oFGauB9+jODje7GJsbo6qkOSHYJYFNSiGoZHtYp4dV6u1zIjtj0E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SxMCCDar; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 00756C113CE;
-	Wed, 24 Apr 2024 23:57:54 +0000 (UTC)
+	 MIME-Version:Content-Type; b=rIgpTt/dGA0YKoW3ihZo+3c0R09AP6q4geJo/TSu+0DMjgiTZmy9gM3JBt0vkpjYy/Y/pBfkDBcUkE1JNUGkyFfaHJyJQvaYuGKUr8lvH9ai2o83wgZybrZFLw2M+kLjeMoPImpSr7C/wPQ4YHmJrjTbBRyzq+7fgpOHVf+++zU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g8GZJvMM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 233C0C113CD;
+	Wed, 24 Apr 2024 23:59:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714003075;
-	bh=0ZKK7XAy1miGUYwPd+P9lggffp1jKkLor5eLUf+by+I=;
+	s=k20201202; t=1714003147;
+	bh=S1yZOjnuDdnjLcmEUPEYxqb4c/uKF1LFTpIO9ko8tUE=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=SxMCCDar01bnIJK8/Y+7vrCkaYMbQrnsNOy1AHM2Z0GnzyX3/YREAPH9GvIHJluN3
-	 abmcd/s5wZwU+o2jzZQ9+8Zfw4ba5jPrQWlX5n1XAryk+vsGfcokH91Qbd/bfakGbU
-	 +p95c3XWZ8OkgHrwwJIbktgGOZhgF61qAdvYuZ6XmTvHL/IggSjxsG4amMgeLFwxwp
-	 K7tUBTSm3Dw+AZbT5WYjNsvUkfSjNmChsn1qdi9Adb4UDX8UOL4J1+f/zs/V7CKchV
-	 /sFQCHMSa3G8TTw1/7BVGexXleb4yhv1jN4LxGVmHyT1w0OTpSbFhhvK5bzgRKN0of
-	 EAkxGbP9gUojA==
-Date: Wed, 24 Apr 2024 16:57:54 -0700
+	b=g8GZJvMMt16It97bIa7O97lBJMpPlA+g2xXmBN4u/PT5uPZ1J9mkEN1D4egAm8eXE
+	 W4ZBfndTc78tL7bKMd3ojHrPu3txt6R99WclcH38XZl/ckyBBZ9WIi27PjeuLa/wsh
+	 5hVR8KXwEPLfGMABqTGUgln3bxSbAevYE+fm3XuyQEvCAaMgB406RlSDCnC6E2z/0h
+	 /+t3neTJY0IXb0VpjRv0IOiQfVD/EYAqqesOwW1dusE5q0vubIuMb/mr/14Oy/IaEJ
+	 RqH1GyY7NlHGfOlL81+mDalZ5+X5eYrqzk+Z298ensznBVrjbW7NcpOEtshiaN2b0E
+	 ogyLlZGbffXYg==
+Date: Wed, 24 Apr 2024 16:59:06 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, Jiri Pirko
- <jiri@resnulli.us>, Madhu Chittim <madhu.chittim@intel.com>, Sridhar
- Samudrala <sridhar.samudrala@intel.com>
-Subject: Re: [RFC] HW TX Rate Limiting Driver API
-Message-ID: <20240424165754.1ba023ba@kernel.org>
-In-Reply-To: <1380ba9e71d500628994b0a1a7cbb108b4bf9492.camel@redhat.com>
-References: <20240405102313.GA310894@kernel.org>
-	<20240409153250.574369e4@kernel.org>
-	<91451f2da3dcd70de3138975ad7d21f0548e19c9.camel@redhat.com>
-	<20240410075745.4637c537@kernel.org>
-	<de5bc3a7180fdc42a58df56fd5527c4955fd0978.camel@redhat.com>
-	<20240411090325.185c8127@kernel.org>
-	<0c1528838ebafdbe275ad69febb24b056895f94a.camel@redhat.com>
-	<20240422110654.2f843133@kernel.org>
-	<1380ba9e71d500628994b0a1a7cbb108b4bf9492.camel@redhat.com>
+To: Heng Qi <hengqi@linux.alibaba.com>
+Cc: netdev@vger.kernel.org, virtualization@lists.linux.dev, "David S .
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, Jason Wang <jasowang@redhat.com>, "Michael S .
+ Tsirkin" <mst@redhat.com>, Brett Creeley <bcreeley@amd.com>, Ratheesh
+ Kannoth <rkannoth@marvell.com>, Alexander Lobakin
+ <aleksander.lobakin@intel.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Tal
+ Gilboa <talgi@nvidia.com>, Jonathan Corbet <corbet@lwn.net>,
+ linux-doc@vger.kernel.org, Maxime Chevallier
+ <maxime.chevallier@bootlin.com>, Jiri Pirko <jiri@resnulli.us>, Paul
+ Greenwalt <paul.greenwalt@intel.com>, Ahmed Zaki <ahmed.zaki@intel.com>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>, Kory Maincent
+ <kory.maincent@bootlin.com>, Andrew Lunn <andrew@lunn.ch>,
+ "justinstitt@google.com" <justinstitt@google.com>
+Subject: Re: [PATCH net-next v9 2/4] ethtool: provide customized dim profile
+ management
+Message-ID: <20240424165906.37c83c04@kernel.org>
+In-Reply-To: <df6163de-d82c-458d-b298-1eaf406e6b3d@linux.alibaba.com>
+References: <20240417155546.25691-1-hengqi@linux.alibaba.com>
+	<20240417155546.25691-3-hengqi@linux.alibaba.com>
+	<20240418174843.492078d5@kernel.org>
+	<96b59800-85e6-4a9e-ad9b-7ad3fa56fff4@linux.alibaba.com>
+	<640292b7-5fcd-44c2-bdd1-03702b7e60a1@linux.alibaba.com>
+	<20240424091823.4e9b008b@kernel.org>
+	<df6163de-d82c-458d-b298-1eaf406e6b3d@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,22 +77,12 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 23 Apr 2024 19:25:37 +0200 Paolo Abeni wrote:
-> I would say just bw_min = 0, all others fields are ignored in such
-> case. But not very relevant since...
+On Thu, 25 Apr 2024 00:49:26 +0800 Heng Qi wrote:
+> If I'm not wrong, you don't want an interface
+> like .ndo_init_irq_moder, but instead provide a generic interface in
+> dim.c (e.g. net_dim_init_irq_moder() with parameters dev and struct
+> dim_irq_moder or separate flags,mode,work). Then this func is called
+> by the driver in the probe phase?
 
-> ... my understanding is that you have strong preference over the
-> 'attach points' variant.
-> 
-> I think in the end is mostly a matter of clearly define
-> expectation/behavior and initial status. 
-
-Agreed, no strong preference but also no strong argument either way?
-
-Maybe my main worry was that we have 4 "lookup modes" if every one
-of them have fake nodes that's a bit messy. With fewer modes it's more
-palatable.
-
-And IIUC TC uses the magic encoding method, so that's a precedent.
-
+That's right.
 
