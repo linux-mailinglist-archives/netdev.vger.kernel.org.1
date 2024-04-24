@@ -1,293 +1,120 @@
-Return-Path: <netdev+bounces-90987-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90989-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F48B8B0D4F
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 16:54:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9F8B8B0D5B
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 16:57:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1748E1F27A7E
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 14:54:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 278291C23877
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 14:57:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04D1815EFCC;
-	Wed, 24 Apr 2024 14:54:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B8B415ECFE;
+	Wed, 24 Apr 2024 14:57:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="WJk2+Uh9"
+	dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b="D5lHqkVs";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b="qMC62mhU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx1.tq-group.com (mx1.tq-group.com [93.104.207.81])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99F0015ECC1
-	for <netdev@vger.kernel.org>; Wed, 24 Apr 2024 14:54:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2EA415B15C;
+	Wed, 24 Apr 2024 14:57:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.104.207.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713970461; cv=none; b=Cwbki2leelR8hNn4YikW8pfD5lZK2JJJ3b0PXCNBNM/gGKg+3s2qYAQKKEXDYBn+QQ7YRUad7hP3Q0C+J7nSNKRVXWElchWE502Vh6+fjXgfvTQppGdbS5w017qBodmH+5pVcUt54Gu8Qr6y7rQ/4/FYmJ319ozTATY6MrNL35Q=
+	t=1713970665; cv=none; b=u78pg77VeAL0xFw3DakpiNOxWbreLm/DUxF2w1EIy2jvsjbfwpGxlPjVeTiHp56j3GkqJ6/9kB+IT79ogKn2c+gz1eYbSdExJn45KLTNNLPp6sA816OtcqngP9ngOLDIRIW64l9lySmwvS/wufvy/U04rea2HGuKYhGmmIqgmbo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713970461; c=relaxed/simple;
-	bh=lL6HMoPGq9Z8cnulXZqadp1IF3BotmV6W7JozM/cgLs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sGhhcm9hrh1YSENGws8ERc2UOJTho6L1WxeQSwwh+4Ldy2duNifC4emvQKWShv1w9C7QI5on6anV3dZ1C7Z9SUENgB/QpIRCBTUrSn5sQND04GEFCkZx0byNrHB+3JaOeqzTiXt4XLFuREkLJ0k5Fp4kKd49J/+FTVTF+p6fP90=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=WJk2+Uh9; arc=none smtp.client-ip=209.85.208.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-56e1baf0380so8279826a12.3
-        for <netdev@vger.kernel.org>; Wed, 24 Apr 2024 07:54:19 -0700 (PDT)
+	s=arc-20240116; t=1713970665; c=relaxed/simple;
+	bh=yHNt98WidbxCEeSX3RQ9DOoGRKU6MVAVqIFcGJI8Vog=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=XlwhIJw4i8L5nyX1WO55+CwNsKA27XdSj3u0whw/Zk+Ao4zriFawh/5XQjTkqeJ0lBRKsVaNWzaU6JLI/V2C+k9A81uX9JZ3zxtECpJlobrgtzbx0BcTpfdYUAFXac5JbCqz+Hnwj0D8SlC8AG6IqCdUH3R4tg3QI7yrS0UHjuM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com; spf=pass smtp.mailfrom=ew.tq-group.com; dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b=D5lHqkVs; dkim=fail (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b=qMC62mhU reason="key not found in DNS"; arc=none smtp.client-ip=93.104.207.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ew.tq-group.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1713970458; x=1714575258; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=v8o5wk9BVe4zRZIS+SUZnTsxDgL6wret0YGcxGXqZpA=;
-        b=WJk2+Uh9w0P1dcnclFjxa85fpBcCoWs0cVsSawTTyzynnEDhp+ynEWLxRvl6vv1bjo
-         k0NIabGBsZ1xoRrpkMEEXz4xPBr3WeNAtYjvHu0wftKHaf0TSB8I6viiYTJ6reB543Ds
-         QjltKfa0ASoODPnx1OwV4eMWfN/dx7y4MS5SE1mNmGheoTfrz0kuAglBZW5O9TH42hm7
-         Zst/VOAuDUnmAMcd1xnRTpgwt3yCb3Q+oIVRhnwhzyu23J2yJj2ogslKZ7EnOyHkPXqz
-         YsMYA6zDoRer4l26fq2dt1Kxi3UZqO8S9S81Z/a5Wm5ZNy5eS9nSwla6BCRAwx5aMBat
-         S4Yg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713970458; x=1714575258;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=v8o5wk9BVe4zRZIS+SUZnTsxDgL6wret0YGcxGXqZpA=;
-        b=qHMpG08Z2vIDXHUoyz1bdR2G6GXVWYTUoiikPGbbaBmjvXFQAsgYAlI+8fR8xM4If+
-         3+vZ25IPdFyJw4MKkwmGIOL1JHHy2AC02e/DEA7lIeZtapaPx+K2NIKFsRnECKbw4U9Q
-         7I5JaCw7dJGxByui5+3YWg49zcMBNHSw8DTOCN/XXwPbJBI5mDM4d+2m6CO3xEo9hF3D
-         YdyRCGFwkT6SWNOD/8cy2dggiZy8owOzuuSSxjZGGI33NS1blTYPJu+yX4pwogTUT6gr
-         0G/Y2462myISvHfT2jSSdB1oDLRdEIRvk4ktItm63s889R7CAnTpVkR+gsxAOw02/Tpw
-         ifFg==
-X-Gm-Message-State: AOJu0Yw0+KndNzhFFS5ix0/30/gkUKeXc4JB8E2BtbAzYwlazfED3Qku
-	fHxfiBjpIejRU3zBvPt1CnuffvXlgUH3Mu+vmKV1JMiCd2mgQo+NJuRYTHFNdEQATJEePCHcyVw
-	l
-X-Google-Smtp-Source: AGHT+IH9DPWrD5PoK9Rg6II3v+jSLz5i0i9V0Lqwz9MmeqPCadI969CTIW+TCgeCuAZIFlg3XC+MIA==
-X-Received: by 2002:a50:8ac7:0:b0:56e:2a7a:27e4 with SMTP id k7-20020a508ac7000000b0056e2a7a27e4mr1819177edk.39.1713970457829;
-        Wed, 24 Apr 2024 07:54:17 -0700 (PDT)
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id h2-20020a056402094200b0056e44b681a6sm7922436edz.57.2024.04.24.07.54.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Apr 2024 07:54:17 -0700 (PDT)
-Date: Wed, 24 Apr 2024 16:54:13 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Adrian Moreno <amorenoz@redhat.com>
-Cc: netdev@vger.kernel.org, aconole@redhat.com, echaudro@redhat.com,
-	horms@kernel.org, i.maximets@ovn.org,
-	Yotam Gigi <yotam.gi@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 2/8] net: psample: add multicast filtering on
- group_id
-Message-ID: <ZikdFbmAbT5bWNxa@nanopsycho>
-References: <20240424135109.3524355-1-amorenoz@redhat.com>
- <20240424135109.3524355-3-amorenoz@redhat.com>
+  d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
+  t=1713970661; x=1745506661;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:content-transfer-encoding:mime-version;
+  bh=yHNt98WidbxCEeSX3RQ9DOoGRKU6MVAVqIFcGJI8Vog=;
+  b=D5lHqkVscU5glOSgQUUHcuOKmFw5kaE+heJuAfGODyVpxz1DUCjfFOKu
+   ywCxqh+uL77ovg3SMm2cXaasFNR2ouZxjnArgSHd8Jjc23iyUKByAtsYN
+   Ze030UcsPC7SnBo28WgWmo7PAu1TSXldzsBHYFFKBz12heTMkccoJiCEa
+   ogRcpy3jTOl5/T1bDyas910B77Pdx0IAKHok+7W7Sjx4mYnBfhX6i4u5Q
+   ewE6suTUoRuN8dI00DexmlhozlWTXDntwiXZW0ZT9K6JJTCtxcCGkNfXH
+   HnmQBPElYCR3fn8f60Qmubu7UeSbFPprfUSuKNepl28NgJtYIyE8DL7vM
+   Q==;
+X-IronPort-AV: E=Sophos;i="6.07,226,1708383600"; 
+   d="scan'208";a="36595123"
+Received: from vmailcow01.tq-net.de ([10.150.86.48])
+  by mx1.tq-group.com with ESMTP; 24 Apr 2024 16:57:38 +0200
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 77C14170C3E;
+	Wed, 24 Apr 2024 16:57:24 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ew.tq-group.com;
+	s=dkim; t=1713970654;
+	h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=yHNt98WidbxCEeSX3RQ9DOoGRKU6MVAVqIFcGJI8Vog=;
+	b=qMC62mhU5FeXGOga50JZBVDVdw4aoIP3fFcOoOI1P+nbGx/KsJZrVoFMSg9Xoj0K8gmb+S
+	ZQlyrxaQ9ze5OeNfEVZ6by2w7qW2ffBuVQ4nJ6/ecPKbsbz1Ql1w7mYSMoubOLfcz/nbni
+	Fv/wsQR0WEQn+Q8UfI2i0fEkvouaCRRpE3+VswggJyXIczSv2zhR1Jy/rLcJzEvrU7UJst
+	cyiqE/2LRyFG6xVULxjlh4NYDcySSE67VdtIyG+n1x64fYk4JKXoxt+SHnbyofDOozPqtP
+	QvjY9xDoJnKEmrdcIF2e3ilXSHtw3OkbiOgO0EWR1P2SrU3W33/4+p9gpFHb3g==
+Message-ID: <5426c24a215b363e7b9b03a97d023d2e29b6a0a7.camel@ew.tq-group.com>
+Subject: Re: [PATCH net-next] net: phy: marvell: add support for MV88E6020
+ internal PHYs
+From: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>,  "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org,  linux@ew.tq-group.com
+Date: Wed, 24 Apr 2024 16:57:24 +0200
+In-Reply-To: <64dbfe14-e777-49e2-ab7d-ec6fa517a8f1@lunn.ch>
+References: <20240424121022.160920-1-matthias.schiffer@ew.tq-group.com>
+	 <19c4b8da-203e-4a81-9531-9ba4a4f750fd@lunn.ch>
+	 <1cb8bafb44075858221b31c056d75a40d7ba2ee1.camel@ew.tq-group.com>
+	 <64dbfe14-e777-49e2-ab7d-ec6fa517a8f1@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.44.4-0ubuntu2 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240424135109.3524355-3-amorenoz@redhat.com>
+X-Last-TLS-Session-Version: TLSv1.3
 
-Wed, Apr 24, 2024 at 03:50:49PM CEST, amorenoz@redhat.com wrote:
->Packet samples can come from several places (e.g: different tc sample
->actions), typically using the sample group (PSAMPLE_ATTR_SAMPLE_GROUP)
->to differentiate them.
->
->Likewise, sample consumers that listen on the multicast group may only
->be interested on a single group. However, they are currently forced to
->receive all samples and discard the ones that are not relevant, causing
->unnecessary overhead.
->
->Allow users to filter on the desired group_id by adding a new command
->PSAMPLE_SET_FILTER that can be used to pass the desired group id.
->Store this filter on the per-socket private pointer and use it for
->filtering multicasted samples.
->
->Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
->---
-> include/uapi/linux/psample.h |   1 +
-> net/psample/psample.c        | 110 +++++++++++++++++++++++++++++++++--
-> 2 files changed, 105 insertions(+), 6 deletions(-)
->
->diff --git a/include/uapi/linux/psample.h b/include/uapi/linux/psample.h
->index e585db5bf2d2..9d62983af0a4 100644
->--- a/include/uapi/linux/psample.h
->+++ b/include/uapi/linux/psample.h
->@@ -28,6 +28,7 @@ enum psample_command {
-> 	PSAMPLE_CMD_GET_GROUP,
-> 	PSAMPLE_CMD_NEW_GROUP,
-> 	PSAMPLE_CMD_DEL_GROUP,
->+	PSAMPLE_CMD_SET_FILTER,
-> };
-> 
-> enum psample_tunnel_key_attr {
->diff --git a/net/psample/psample.c b/net/psample/psample.c
->index a5d9b8446f77..f5f77515b969 100644
->--- a/net/psample/psample.c
->+++ b/net/psample/psample.c
->@@ -98,13 +98,77 @@ static int psample_nl_cmd_get_group_dumpit(struct sk_buff *msg,
-> 	return msg->len;
-> }
-> 
->-static const struct genl_small_ops psample_nl_ops[] = {
->+struct psample_obj_desc {
->+	struct rcu_head rcu;
->+	u32 group_num;
->+};
->+
->+struct psample_nl_sock_priv {
->+	struct psample_obj_desc __rcu *filter;
->+	spinlock_t filter_lock; /* Protects filter. */
->+};
->+
->+static void psample_nl_sock_priv_init(void *priv)
->+{
->+	struct psample_nl_sock_priv *sk_priv = priv;
->+
->+	spin_lock_init(&sk_priv->filter_lock);
->+}
->+
->+static void psample_nl_sock_priv_destroy(void *priv)
->+{
->+	struct psample_nl_sock_priv *sk_priv = priv;
->+	struct psample_obj_desc *filter;
->+
->+	filter = rcu_dereference_protected(sk_priv->filter, true);
->+	kfree_rcu(filter, rcu);
->+}
->+
->+static int psample_nl_set_filter_doit(struct sk_buff *skb,
->+				      struct genl_info *info)
->+{
->+	struct psample_obj_desc *filter = NULL;
->+	struct psample_nl_sock_priv *sk_priv;
->+	struct nlattr **attrs = info->attrs;
->+
->+	if (attrs[PSAMPLE_ATTR_SAMPLE_GROUP]) {
->+		filter = kzalloc(sizeof(*filter), GFP_KERNEL);
->+		filter->group_num =
->+			nla_get_u32(attrs[PSAMPLE_ATTR_SAMPLE_GROUP]);
->+	}
->+
->+	sk_priv = genl_sk_priv_get(&psample_nl_family, NETLINK_CB(skb).sk);
->+	if (IS_ERR(sk_priv)) {
->+		kfree(filter);
->+		return PTR_ERR(sk_priv);
->+	}
->+
->+	spin_lock(&sk_priv->filter_lock);
->+	filter = rcu_replace_pointer(sk_priv->filter, filter,
->+				     lockdep_is_held(&sk_priv->filter_lock));
->+	spin_unlock(&sk_priv->filter_lock);
->+	kfree_rcu(filter, rcu);
->+	return 0;
->+}
->+
->+static const struct nla_policy
->+psample_set_filter_policy[PSAMPLE_ATTR_SAMPLE_GROUP + 1] = {
->+	[PSAMPLE_ATTR_SAMPLE_GROUP] = { .type = NLA_U32, },
->+};
->+
->+static const struct genl_ops psample_nl_ops[] = {
-> 	{
-> 		.cmd = PSAMPLE_CMD_GET_GROUP,
-> 		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
-> 		.dumpit = psample_nl_cmd_get_group_dumpit,
-> 		/* can be retrieved by unprivileged users */
->-	}
->+	},
->+	{
->+		.cmd		= PSAMPLE_CMD_SET_FILTER,
->+		.doit		= psample_nl_set_filter_doit,
->+		.policy		= psample_set_filter_policy,
->+		.flags		= 0,
->+	},
+On Wed, 2024-04-24 at 16:52 +0200, Andrew Lunn wrote:
+> > We currently do not override the PHY ID for this family in the DSA
+> > driver - my understanding was that this is only necessary for
+> > switches that don't provide a usable PHY ID at all. As I have no
+> > idea if this PHY ID works for the whole family or just the single
+> > switch, I went with the more specific naming here.
+>=20
+> The 'broken' switches have the Marvell OUI, but no module number. From
+> your description it sounds like the 6250 is the same?
+>=20
 
-Sidenote:
-Did you think about converting psample to split ops and to introcude
-ynl spec file for it?
+No, the PHYs have a proper ID, 0x01410db0. The "Functional Spec" for the 88=
+E6020 switch family gives
+us the 0x01410c00 part, but the lower 10 bits are undocumented ("reserved")=
+, and I don't know if
+they differ for each individual switch of the family, as I only have a 88E6=
+020 here.
+
+Matthias
 
 
-> };
-> 
-> static struct genl_family psample_nl_family __ro_after_init = {
->@@ -114,10 +178,13 @@ static struct genl_family psample_nl_family __ro_after_init = {
-> 	.netnsok	= true,
-> 	.module		= THIS_MODULE,
-> 	.mcgrps		= psample_nl_mcgrps,
->-	.small_ops	= psample_nl_ops,
->-	.n_small_ops	= ARRAY_SIZE(psample_nl_ops),
->+	.ops		= psample_nl_ops,
->+	.n_ops		= ARRAY_SIZE(psample_nl_ops),
-> 	.resv_start_op	= PSAMPLE_CMD_GET_GROUP + 1,
-> 	.n_mcgrps	= ARRAY_SIZE(psample_nl_mcgrps),
->+	.sock_priv_size		= sizeof(struct psample_nl_sock_priv),
->+	.sock_priv_init		= psample_nl_sock_priv_init,
->+	.sock_priv_destroy	= psample_nl_sock_priv_destroy,
-> };
-> 
-> static void psample_group_notify(struct psample_group *group,
->@@ -360,6 +427,32 @@ static int psample_tunnel_meta_len(struct ip_tunnel_info *tun_info)
-> }
-> #endif
-> 
->+static inline void psample_nl_obj_desc_init(struct psample_obj_desc *desc,
->+					    u32 group_num)
->+{
->+	memset(desc, 0, sizeof(*desc));
->+	desc->group_num = group_num;
->+}
->+
->+static int psample_nl_sample_filter(struct sock *dsk, struct sk_buff *skb,
->+				    void *data)
->+{
->+	struct psample_obj_desc *desc = data;
->+	struct psample_nl_sock_priv *sk_priv;
->+	struct psample_obj_desc *filter;
->+	int ret = 0;
->+
->+	rcu_read_lock();
->+	sk_priv = __genl_sk_priv_get(&psample_nl_family, dsk);
->+	if (!IS_ERR_OR_NULL(sk_priv)) {
->+		filter = rcu_dereference(sk_priv->filter);
->+		if (filter && desc)
->+			ret = (filter->group_num != desc->group_num);
->+	}
->+	rcu_read_unlock();
->+	return ret;
->+}
->+
-> void psample_sample_packet(struct psample_group *group, struct sk_buff *skb,
-> 			   u32 sample_rate, const struct psample_metadata *md)
-> {
->@@ -370,6 +463,7 @@ void psample_sample_packet(struct psample_group *group, struct sk_buff *skb,
-> #ifdef CONFIG_INET
-> 	struct ip_tunnel_info *tun_info;
-> #endif
->+	struct psample_obj_desc desc;
-> 	struct sk_buff *nl_skb;
-> 	int data_len;
-> 	int meta_len;
->@@ -487,8 +581,12 @@ void psample_sample_packet(struct psample_group *group, struct sk_buff *skb,
-> #endif
-> 
-> 	genlmsg_end(nl_skb, data);
->-	genlmsg_multicast_netns(&psample_nl_family, group->net, nl_skb, 0,
->-				PSAMPLE_NL_MCGRP_SAMPLE, GFP_ATOMIC);
->+	psample_nl_obj_desc_init(&desc, group->group_num);
->+	genlmsg_multicast_netns_filtered(&psample_nl_family,
->+					 group->net, nl_skb, 0,
->+					 PSAMPLE_NL_MCGRP_SAMPLE,
->+					 GFP_ATOMIC, psample_nl_sample_filter,
->+					 &desc);
-> 
-> 	return;
-> error:
->-- 
->2.44.0
->
->
+
+--=20
+TQ-Systems GmbH | M=C3=BChlstra=C3=9Fe 2, Gut Delling | 82229 Seefeld, Germ=
+any
+Amtsgericht M=C3=BCnchen, HRB 105018
+Gesch=C3=A4ftsf=C3=BChrer: Detlef Schneider, R=C3=BCdiger Stahl, Stefan Sch=
+neider
+https://www.tq-group.com/
 
