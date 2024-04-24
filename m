@@ -1,120 +1,140 @@
-Return-Path: <netdev+bounces-90989-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90990-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9F8B8B0D5B
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 16:57:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E7088B0D64
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 16:58:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 278291C23877
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 14:57:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 468E128B0B4
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 14:58:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B8B415ECFE;
-	Wed, 24 Apr 2024 14:57:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 209A715EFCC;
+	Wed, 24 Apr 2024 14:58:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b="D5lHqkVs";
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b="qMC62mhU"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="huFgtjX/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.tq-group.com (mx1.tq-group.com [93.104.207.81])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2EA415B15C;
-	Wed, 24 Apr 2024 14:57:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.104.207.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64B0415EFC7;
+	Wed, 24 Apr 2024 14:58:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713970665; cv=none; b=u78pg77VeAL0xFw3DakpiNOxWbreLm/DUxF2w1EIy2jvsjbfwpGxlPjVeTiHp56j3GkqJ6/9kB+IT79ogKn2c+gz1eYbSdExJn45KLTNNLPp6sA816OtcqngP9ngOLDIRIW64l9lySmwvS/wufvy/U04rea2HGuKYhGmmIqgmbo=
+	t=1713970704; cv=none; b=QzRVDq1D2BEiwDN1U2JNKpOhC+5JfAIna+fuQgQl6TTSpXXumnMw2rvuzGJW91+c8ZmmFg/3VjNF8m1mcfqYBo9CcIO7BHMXnxpDgkBqT/wtzEeOm7ojaV6iEkiOdPTwBZGYHcpHDWPGohF0nHArwPQ4dgSpVyRIbNqnFF/09xo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713970665; c=relaxed/simple;
-	bh=yHNt98WidbxCEeSX3RQ9DOoGRKU6MVAVqIFcGJI8Vog=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=XlwhIJw4i8L5nyX1WO55+CwNsKA27XdSj3u0whw/Zk+Ao4zriFawh/5XQjTkqeJ0lBRKsVaNWzaU6JLI/V2C+k9A81uX9JZ3zxtECpJlobrgtzbx0BcTpfdYUAFXac5JbCqz+Hnwj0D8SlC8AG6IqCdUH3R4tg3QI7yrS0UHjuM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com; spf=pass smtp.mailfrom=ew.tq-group.com; dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b=D5lHqkVs; dkim=fail (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b=qMC62mhU reason="key not found in DNS"; arc=none smtp.client-ip=93.104.207.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ew.tq-group.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
-  t=1713970661; x=1745506661;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:content-transfer-encoding:mime-version;
-  bh=yHNt98WidbxCEeSX3RQ9DOoGRKU6MVAVqIFcGJI8Vog=;
-  b=D5lHqkVscU5glOSgQUUHcuOKmFw5kaE+heJuAfGODyVpxz1DUCjfFOKu
-   ywCxqh+uL77ovg3SMm2cXaasFNR2ouZxjnArgSHd8Jjc23iyUKByAtsYN
-   Ze030UcsPC7SnBo28WgWmo7PAu1TSXldzsBHYFFKBz12heTMkccoJiCEa
-   ogRcpy3jTOl5/T1bDyas910B77Pdx0IAKHok+7W7Sjx4mYnBfhX6i4u5Q
-   ewE6suTUoRuN8dI00DexmlhozlWTXDntwiXZW0ZT9K6JJTCtxcCGkNfXH
-   HnmQBPElYCR3fn8f60Qmubu7UeSbFPprfUSuKNepl28NgJtYIyE8DL7vM
-   Q==;
-X-IronPort-AV: E=Sophos;i="6.07,226,1708383600"; 
-   d="scan'208";a="36595123"
-Received: from vmailcow01.tq-net.de ([10.150.86.48])
-  by mx1.tq-group.com with ESMTP; 24 Apr 2024 16:57:38 +0200
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 77C14170C3E;
-	Wed, 24 Apr 2024 16:57:24 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ew.tq-group.com;
-	s=dkim; t=1713970654;
-	h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=yHNt98WidbxCEeSX3RQ9DOoGRKU6MVAVqIFcGJI8Vog=;
-	b=qMC62mhU5FeXGOga50JZBVDVdw4aoIP3fFcOoOI1P+nbGx/KsJZrVoFMSg9Xoj0K8gmb+S
-	ZQlyrxaQ9ze5OeNfEVZ6by2w7qW2ffBuVQ4nJ6/ecPKbsbz1Ql1w7mYSMoubOLfcz/nbni
-	Fv/wsQR0WEQn+Q8UfI2i0fEkvouaCRRpE3+VswggJyXIczSv2zhR1Jy/rLcJzEvrU7UJst
-	cyiqE/2LRyFG6xVULxjlh4NYDcySSE67VdtIyG+n1x64fYk4JKXoxt+SHnbyofDOozPqtP
-	QvjY9xDoJnKEmrdcIF2e3ilXSHtw3OkbiOgO0EWR1P2SrU3W33/4+p9gpFHb3g==
-Message-ID: <5426c24a215b363e7b9b03a97d023d2e29b6a0a7.camel@ew.tq-group.com>
-Subject: Re: [PATCH net-next] net: phy: marvell: add support for MV88E6020
- internal PHYs
-From: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>,  "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org,  linux@ew.tq-group.com
-Date: Wed, 24 Apr 2024 16:57:24 +0200
-In-Reply-To: <64dbfe14-e777-49e2-ab7d-ec6fa517a8f1@lunn.ch>
-References: <20240424121022.160920-1-matthias.schiffer@ew.tq-group.com>
-	 <19c4b8da-203e-4a81-9531-9ba4a4f750fd@lunn.ch>
-	 <1cb8bafb44075858221b31c056d75a40d7ba2ee1.camel@ew.tq-group.com>
-	 <64dbfe14-e777-49e2-ab7d-ec6fa517a8f1@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.4-0ubuntu2 
+	s=arc-20240116; t=1713970704; c=relaxed/simple;
+	bh=x/ABSCkim9S0MeG/AzqNKvpbk54vNpeK5u4b7bC3YfY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=H5sauUGNErg8WqTyVHMu1STqnVfTr3k37rwbCCo7qEmQ43RLHgDlt2//lzKON3QTj0rYXI4JOjcYKdon1++P8+byliCje0ty87ydOYr0oIN1QIgYBinx9mxMrifX6iqiPOt4BUXKh/syHAnM3wvy92h0lEZ9270Ol+dBGK8L7Lw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=huFgtjX/; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=fzak5i6UEXrfZCHyTuoSWrRTPCwyT9tYF6PbbPFvEFg=; b=huFgtjX/EgWtocZIwmbY5+DXoU
+	MjVxuqn3Sx2ZoV8nfypF8Sge2jSlpPWvPyfgDoarUG1du5Usx2gfJetiyI9MUu6hv7bVQYZWvJ6NO
+	aaMwE5zawd5AaRVy30YOXW98BZaFHoqqeyqP3PRFi4R/s0LH+HruLIt7QVgeZTpn83MZpokIjf5bK
+	hWS4vVSZH9NwvyZMjbZHtNKj6Xrv6/NMm3MjK+k+ROwjHElpkRnv78N6lBtAIcra89usohYpQLJOV
+	GYZakpanBFv4g3ldCw9jhHsCWvjKC66T79c811qBX8gaZsx5b3UlB+VHwuLUEbc58lTSvo6vG3c7U
+	Dfg9ZwXg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:54942)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rze4S-00068O-1H;
+	Wed, 24 Apr 2024 15:58:04 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rze4O-0004k6-MP; Wed, 24 Apr 2024 15:58:00 +0100
+Date: Wed, 24 Apr 2024 15:58:00 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Stefan Eichenberger <eichest@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+	lxu@maxlinear.com, hkallweit1@gmail.com, michael@walle.cc,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 2/2] net: phy: mxl-gpy: add new device tree property
+ to disable SGMII autoneg
+Message-ID: <Zikd+GxuwMRC+5Ae@shell.armlinux.org.uk>
+References: <20240416121032.52108-1-eichest@gmail.com>
+ <20240416121032.52108-3-eichest@gmail.com>
+ <3f7f278f-e490-47f1-971c-ecf44a70cee4@lunn.ch>
+ <Zh6clAtI3NO+nMEi@eichest-laptop>
+ <5ed39628-4ac0-4c4e-9a16-fd4bf9a6db29@lunn.ch>
+ <Zh6mIv1Ee+1h21Xo@shell.armlinux.org.uk>
+ <Zh6z90iCpLqF4fla@eichest-laptop>
+ <Zh6/oVHUvnOVtHaC@shell.armlinux.org.uk>
+ <Zh94yqo2EHRq8eEq@eichest-laptop>
+ <ZiE156+BPpx/ciL6@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZiE156+BPpx/ciL6@shell.armlinux.org.uk>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Wed, 2024-04-24 at 16:52 +0200, Andrew Lunn wrote:
-> > We currently do not override the PHY ID for this family in the DSA
-> > driver - my understanding was that this is only necessary for
-> > switches that don't provide a usable PHY ID at all. As I have no
-> > idea if this PHY ID works for the whole family or just the single
-> > switch, I went with the more specific naming here.
->=20
-> The 'broken' switches have the Marvell OUI, but no module number. From
-> your description it sounds like the 6250 is the same?
->=20
+On Thu, Apr 18, 2024 at 04:01:59PM +0100, Russell King (Oracle) wrote:
+> On Wed, Apr 17, 2024 at 09:22:50AM +0200, Stefan Eichenberger wrote:
+> > I also checked the datasheet and you are right about the 1000base-X mode
+> > and in-band AN. What worked for us so far was to use SGMII mode even for
+> > 2.5Gbps and disable in-band AN (which is possible for SGMII). I think
+> > this works because as you wrote, the genphy just multiplies the clock by
+> > 2.5 and doesn't care if it's 1000base-X or SGMII. With your patches we
+> > might even be able to use in-band autonegoation for 10,100 and 1000Mbps
+> > and then just disable it for 2.5Gbps. I need to test it, but I have hope
+> > that this should work.
+> 
+> There is another way we could address this. If the querying support
+> had a means to identify that the endpoint supports bypass mode, we
+> could then have phylink identify that, and arrange to program the
+> mvpp2 end to be in 1000base-X + x2.5 clock + AN bypass, which would
+> mean it wouldn't require the inband 16-bit word to be present.
+> 
+> I haven't fully thought it through yet - for example, I haven't
+> considered how we should indicate to the PCS that AN bypass mode
+> should be enabled or disabled via the pcs_config() method.
 
-No, the PHYs have a proper ID, 0x01410db0. The "Functional Spec" for the 88=
-E6020 switch family gives
-us the 0x01410c00 part, but the lower 10 bits are undocumented ("reserved")=
-, and I don't know if
-they differ for each individual switch of the family, as I only have a 88E6=
-020 here.
+Okay, I've been trying to put more effort into this, but it's been slow
+progress (sorry).
 
-Matthias
+My thoughts from a design point of view were that we could just switch
+to PHYLINK_PCS_NEG_OUTBAND instead of PHYLINK_PCS_NEG_INBAND_* and
+everything at the PCS layer should be able to cope, but this is not the
+case, especially with mvneta/mvpp2.
 
+The problem is that mvneta/mvpp2 (and probably more) expect that
 
+1) MLO_AN_INBAND means that the PCS will be using inband, and that
+   means the link up/down state won't be forced. This basically implies
+   that only PHYLINK_PCS_NEG_INBAND_* can be used can be used for the
+   PCS.
 
---=20
-TQ-Systems GmbH | M=C3=BChlstra=C3=9Fe 2, Gut Delling | 82229 Seefeld, Germ=
-any
-Amtsgericht M=C3=BCnchen, HRB 105018
-Gesch=C3=A4ftsf=C3=BChrer: Detlef Schneider, R=C3=BCdiger Stahl, Stefan Sch=
-neider
-https://www.tq-group.com/
+2) !MLO_AN_INBAND means that an out-of-band mechanism will be used and
+   that means that the link needs to be forced (since there's no way
+   for the hardware to know whether the link should be up or down.)
+   It's therefore expected that only PHYLINK_PCS_NEG_OUTBAND will be
+   used for the PCS.
+
+So, attempting to put a resolution of the PHY and PCS abilities into
+phylink_pcs_neg_mode() and select the appropriate PHYLINK_PCS_NEG_*
+mode alone just doesn't work. Yet... we need to do that in there when
+considering whether inband can be enabled or not for non-PHY links.
+
+Basically, it needs a re-think how to solve this...
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
