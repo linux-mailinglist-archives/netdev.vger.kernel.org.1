@@ -1,498 +1,280 @@
-Return-Path: <netdev+bounces-91089-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91090-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13E4E8B15C9
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 00:07:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9964F8B15D3
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 00:09:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 250F2B21D8D
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 22:06:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BF3D8B21BD5
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 22:09:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70FCC15ECC7;
-	Wed, 24 Apr 2024 22:06:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53B3D15ECF0;
+	Wed, 24 Apr 2024 22:09:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="shMLebHJ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vxnanQmA"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5347415957C
-	for <netdev@vger.kernel.org>; Wed, 24 Apr 2024 22:06:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7145E143878
+	for <netdev@vger.kernel.org>; Wed, 24 Apr 2024 22:08:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713996410; cv=none; b=EFlUSfckyuADeJjdgb1o7XtxdPytM5imajY26JkcpOQr1Q5oBsG01W61cvUEqKJoOr2yeps7ALdgge0FpExj+82FzU9CM9IvjU8Moe5kQ0z/o7ZwrY7rg4b1OH5gKRWaKyVBJIECliLQw6vUwR0wUKpr6DAKKgouQT4KMGVktVE=
+	t=1713996540; cv=none; b=OkOut5yZw3DRNczjFNADvuJUESZi43oQIBrg0wPX8Rxwe9xurzZoL10cZuiYTepa1s5OJV4XxWtvYYF/laRppwK4VXNuntfk5lRee23mjDd5kSAdSU0AB5c+nVCMjp0UgatiPsOV//9kDFnlQBhHBxcqHLH/BZResmSYr9O+pKw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713996410; c=relaxed/simple;
-	bh=+lMA3nRYl8HtZgshgoxHRmWRGBxpHSw0ZFh6HgVMfUA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YVckyC5PzNRKI/r1mk9xmIh2EtqRPcYB2IeVI7WHV2xPtXhGVJ2T66zpiEYTvQ7hJJcc1dOZ+3pnbmHn7hDRwcnVqhDLT2Im7w9Qo9Uw5Dj19Ofz6NyrDpujEQr/g2oma8uD2Xf5ZW8dD6roIec/YSJBugn4HNfliJxm7sIv+ro=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=shMLebHJ; arc=none smtp.client-ip=95.215.58.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <3ed8b579-8342-4d74-9050-b0bf6afe5ab3@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1713996405;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=raMMmsSNlN5PsTX9ADSUcOeeX601+UxlcHGclyszo7I=;
-	b=shMLebHJmKnVqVuvBj+jQjZOW3o79p+93DRyPYBxjgID9ZgmnmL+ERAtOP/CkJv8jTvtbJ
-	O58Q4eJZS2J40nucqCBDKmUgcyjwUxgJzW2StwkVpqy05fY0By733K60CmsLb6D3qLTPyP
-	yhgx6e3l+PcDhE/PA16gbjoDnQy4eHQ=
-Date: Wed, 24 Apr 2024 15:06:35 -0700
+	s=arc-20240116; t=1713996540; c=relaxed/simple;
+	bh=ZZuHd5yizCSiPSTe1KnvRCDEhoAc14yofZTdbze6DW8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=VbetdtkO6jtmb4u1T0bcOc1gOCsj0a/8m90wiBY7ldsTlerQY+4BGEJzI6d0YSfdH9NaLKFokXbEUhI2IHnkHvZldaQsyVzDZxeB3feXD1BEp83FQ+aD5kZsjcdNZwcfJ1lEomSW/qJCs0NoqJzKEQQHOLeXdZSt+uIb2YxGjT4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vxnanQmA; arc=none smtp.client-ip=209.85.128.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-41aa2f6ff01so2461975e9.1
+        for <netdev@vger.kernel.org>; Wed, 24 Apr 2024 15:08:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1713996537; x=1714601337; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=r32Cg3+w7m+3nAP4ILki9Fc9/v3OtIVWGhJE/25h+/k=;
+        b=vxnanQmAp7j/9taEvyPDYSz1TkDBmB9dMwIDYabH4NkXnYOQuf2nX7FJ2yeJUdj7L+
+         NYmlnhv1yjWcJmTL4+lxaQOA9r/YKJ7LI8c6TTnzFl917CH7CIH+5ZBdJ0msRXV7F2/M
+         vRj55G8WcRdxvNxCMyLuHrDEacf9iYWQC1tDfltfd1SrrU01+S51IHNnW0GX3cLa/otX
+         XbGcsbDE1HWFSctpvbVt8YpgNwvfVUBEGzo7yz2dGseGAkNFHkWzVtq6tbAlPAkRwi37
+         8m5ewLxUe1xTlknwc07yvJKbjL2tJkIPcftYg61tJXi6sNrkYZ3s7LulBsBufT5/8Ccp
+         CzIw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713996537; x=1714601337;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=r32Cg3+w7m+3nAP4ILki9Fc9/v3OtIVWGhJE/25h+/k=;
+        b=XJ5RGtrbEuQso5CNl1xdL7A966zQbthflDWIA6Z+tvb7TX4PAip3PL4Xt8jVoJXlOB
+         jZg9dpASsYn8TZ3cbwyxHYIVoVSl79X3EZn+qPsv6ET7x4eobipaI1HikjPuFzsie+pV
+         /a3PyjR4VWMFOk4CrDAX/SRyDQl5RwarZwai8oD/FsTQ3JiU2FVICYoXnHSYO+1u37qW
+         dtql27fscX8bJwzNR+qvL84NZjgSirT3YrUidhbgjReSHPhL3EeGJfz+ZDbPfnlbZvI8
+         ShUpEt1xNODYTFNDQuR9pIfiHEy7AAvzQ8r0Qn4dR9jIIDCOBbI0U+STvAFsyrFcieQV
+         oOtw==
+X-Forwarded-Encrypted: i=1; AJvYcCVXTQDI2VuIXyPmBf1RSlGEslRc/r5Scr1RSGeO+0WNKlKjbzhTGhaeih5oCFNVJQD8vgMkrtf8xCGGihgIo4qYKBe1PHxp
+X-Gm-Message-State: AOJu0YzTT0tLt410aXvoBZ/070r8bs4iAmJeJnS5F3SYHDmOGECAGyBc
+	NFstSTPvUVps/gF1IISNflhiX9knt1gj+4OJhwfcpw5dZRkf/dSlrq0CY0xVYL7Mjc90e1O0Ytc
+	C7CH1AA5o+SjvT212AUQRuujNrA5hqsAKk3OI
+X-Google-Smtp-Source: AGHT+IG5/hEP7lNK14trqIFoR96oQzipOlhqUhIQJ2gnsizakJy44D4hzFt1huchs79ayYsNL9X/7vDCcTnnhzCo/CM=
+X-Received: by 2002:a5d:5f4b:0:b0:34b:e97e:20f7 with SMTP id
+ cm11-20020a5d5f4b000000b0034be97e20f7mr1470456wrb.59.1713996536422; Wed, 24
+ Apr 2024 15:08:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next v3 07/11] bpf: Fix a false rejection caused by
- AND operation
-Content-Language: en-GB
-To: Xu Kuohai <xukuohai@huaweicloud.com>, Eduard Zingerman
- <eddyz87@gmail.com>, bpf@vger.kernel.org, netdev@vger.kernel.org,
- linux-security-module@vger.kernel.org, linux-kselftest@vger.kernel.org
-Cc: Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Matt Bobrowski <mattbobrowski@google.com>,
- Brendan Jackman <jackmanb@chromium.org>, Paul Moore <paul@paul-moore.com>,
- James Morris <jmorris@namei.org>, "Serge E . Hallyn" <serge@hallyn.com>,
- Khadija Kamran <kamrankhadijadj@gmail.com>,
- Casey Schaufler <casey@schaufler-ca.com>,
- Ondrej Mosnacek <omosnace@redhat.com>, Kees Cook <keescook@chromium.org>,
- John Johansen <john.johansen@canonical.com>,
- Lukas Bulwahn <lukas.bulwahn@gmail.com>,
- Roberto Sassu <roberto.sassu@huawei.com>,
- Shung-Hsi Yu <shung-hsi.yu@suse.com>
-References: <20240411122752.2873562-1-xukuohai@huaweicloud.com>
- <20240411122752.2873562-8-xukuohai@huaweicloud.com>
- <e62e2971301ca7f2e9eb74fc500c520285cad8f5.camel@gmail.com>
- <f80991aa-3a49-451a-9a82-ac57982dcb28@huaweicloud.com>
- <bdc84c6c-7415-4b84-a883-1988cb5f77d1@linux.dev>
- <576c7c44-d1b4-42c8-8b6e-2e6b93d7547a@huaweicloud.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yonghong Song <yonghong.song@linux.dev>
-In-Reply-To: <576c7c44-d1b4-42c8-8b6e-2e6b93d7547a@huaweicloud.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+References: <20240424165646.1625690-2-dtatulea@nvidia.com> <4ba023709249e11d97c78a98ac7db3b37f419960.camel@nvidia.com>
+In-Reply-To: <4ba023709249e11d97c78a98ac7db3b37f419960.camel@nvidia.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Wed, 24 Apr 2024 15:08:42 -0700
+Message-ID: <CAHS8izMbAJHatnM6SvsZVLPY+N7LgGJg03pSdNfSRFCufGh9Zg@mail.gmail.com>
+Subject: Re: [RFC PATCH] net: Fix one page_pool page leak from skb_frag_unref
+To: Dragos Tatulea <dtatulea@nvidia.com>
+Cc: "jacob.e.keller@intel.com" <jacob.e.keller@intel.com>, "edumazet@google.com" <edumazet@google.com>, 
+	"davem@davemloft.net" <davem@davemloft.net>, "kuba@kernel.org" <kuba@kernel.org>, 
+	"pabeni@redhat.com" <pabeni@redhat.com>, 
+	"ilias.apalodimas@linaro.org" <ilias.apalodimas@linaro.org>, Jianbo Liu <jianbol@nvidia.com>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+On Wed, Apr 24, 2024 at 10:25=E2=80=AFAM Dragos Tatulea <dtatulea@nvidia.co=
+m> wrote:
+>
+> On Wed, 2024-04-24 at 19:56 +0300, Dragos Tatulea wrote:
+> > The patch referenced in the fixes tag introduced the skb_frag_unref API=
+.
+> This is wrong actually. Only skb_frag_ref was introduced. Sorry for the
+> confusion.
+>
+> > This API still has a dark corner: when skb->pp_recycled is false and a
+> > fragment being referenced is backed by a page_pool page, skb_frag_unref
+> > can leak the page out of the page_pool, like in the following example:
+> >
+> >  BUG: Bad page state in process swapper/4  pfn:103423
+> >  page: refcount:0 mapcount:0 mapping:0000000000000000 index:0x103423000=
+ pfn:0x103423
+> >  flags: 0x200000000000000(node=3D0|zone=3D2)
+> >  page_type: 0xffffffff()
+> >  raw: 0200000000000000 dead000000000040 ffff888106f38000 00000000000000=
+00
+> >  raw: 0000000103423000 0000000000000041 00000000ffffffff 00000000000000=
+00
+> >  page dumped because: page_pool leak
+> >  Modules linked in: act_mirred act_csum act_pedit act_gact cls_flower
+> >  act_ct nf_flow_table sch_ingress xt_conntrack xt_MASQUERADE
+> >  nf_conntrack_netlink nfnetlink xt_addrtype iptable_nat nf_nat
+> >  br_netfilter overlay rpcrdma rdma_ucm ib_iser libiscsi
+> >  scsi_transport_iscsi ib_umad rdma_cm ib_ipoib iw_cm ib_cm mlx5_ib
+> >  ib_uverbs ib_core zram zsmalloc mlx5_core fuse CPU: 4 PID: 0 Comm:
+> >  swapper/4 Not tainted 6.9.0-rc4+ #2
+> >  Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS rel-1.13.0-0-=
+gf21b5a4aeb02-prebuilt.qemu.org 04/01/2014
+> >  Call Trace:
+> >   <IRQ>
+> >   dump_stack_lvl+0x53/0x70
+> >   bad_page+0x6f/0xf0
+> >   free_unref_page_prepare+0x271/0x420
+> >   free_unref_page+0x38/0x120
+> >   ___pskb_trim+0x261/0x390
+> >   skb_segment+0xf60/0x1040
+> >   tcp_gso_segment+0xe8/0x4e0
+> >   inet_gso_segment+0x155/0x3d0
+> >   skb_mac_gso_segment+0x99/0x100
+> >   __skb_gso_segment+0xb4/0x160
+> >   ? netif_skb_features+0x95/0x2f0
+> >   validate_xmit_skb+0x16c/0x330
+> >   validate_xmit_skb_list+0x4c/0x70
+> >   sch_direct_xmit+0x23e/0x350
+> >   __dev_queue_xmit+0x334/0xbc0
+> >   tcf_mirred_to_dev+0x2a5/0x3e0 [act_mirred]
+> >   tcf_mirred_act+0xd7/0x4b0 [act_mirred]
+> >   ? tcf_pedit_act+0x6f/0x540 [act_pedit]
+> >   tcf_action_exec+0x82/0x170
+> >   fl_classify+0x1ee/0x200 [cls_flower]
+> >   ? tcf_mirred_to_dev+0x2a5/0x3e0 [act_mirred]
+> >   ? mlx5e_completion_event+0x39/0x40 [mlx5_core]
+> >   ? mlx5_eq_comp_int+0x1d7/0x1f0 [mlx5_core]
+> >   tcf_classify+0x26a/0x470
+> >   tc_run+0xa2/0x120
+> >   ? handle_irq_event+0x53/0x80
+> >   ? kvm_clock_get_cycles+0x11/0x20
+> >   __netif_receive_skb_core.constprop.0+0x932/0xee0
+> >   __netif_receive_skb_list_core+0xfe/0x1f0
+> >   netif_receive_skb_list_internal+0x1b5/0x2b0
+> >   napi_gro_complete.constprop.0+0xee/0x120
+> >   dev_gro_receive+0x3f4/0x710
+> >   napi_gro_receive+0x7d/0x220
+> >   mlx5e_handle_rx_cqe_mpwrq+0x10d/0x1d0 [mlx5_core]
+> >   mlx5e_poll_rx_cq+0x8b/0x6f0 [mlx5_core]
+> >   mlx5e_napi_poll+0xdc/0x6c0 [mlx5_core]
+> >   __napi_poll+0x25/0x1b0
+> >   net_rx_action+0x2c1/0x330
+> >   __do_softirq+0xcb/0x28c
+> >   irq_exit_rcu+0x69/0x90
+> >   common_interrupt+0x85/0xa0
+> >   </IRQ>
+> >   <TASK>
+> >   asm_common_interrupt+0x26/0x40
+> >  RIP: 0010:default_idle+0x17/0x20
+> >  Code: 00 4d 29 c8 4c 01 c7 4c 29 c2 e9 76 ff ff ff cc cc cc cc f3 0f 1=
+e
+> >  fa 8b 05 76 3f 0a 01 85 c0 7e 07 0f 00 2d 1d 74 41 00 fb f4 <fa> c3 0f
+> >  1f 80 00 00 00 00 f3 0f 1e fa 65 48 8b 35 04 b3 42 7e f0
+> >  RSP: 0018:ffff88810087bed8 EFLAGS: 00000246
+> >  RAX: 0000000000000000 RBX: ffff8881008415c0 RCX: 000000e116d359fb
+> >  RDX: 0000000000000000 RSI: ffffffff8223e1d1 RDI: 000000000003f214
+> >  RBP: 0000000000000004 R08: 000000000003f214 R09: 000000e116d359fb
+> >  R10: 000000e116d359fb R11: 000000000005dfee R12: 0000000000000004
+> >  R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
+> >   default_idle_call+0x3d/0xf0
+> >   do_idle+0x1ce/0x1e0
+> >   cpu_startup_entry+0x29/0x30
+> >   start_secondary+0x109/0x130
+> >   common_startup_64+0x129/0x138
+> >   </TASK>
+> >
+> > How it happens:
+> > -> skb_segment
+> >   -> clone skb into nskb
+> >   -> call __pskb_trim(nskb)
+> >     -> call pskb_expand_head(nskb) because nskb is cloned
+> >       -> call skb_release_data(nskb) because nskb is cloned
+> >         -> nskb->pp_recycle =3D 0
+> >     -> skb_unref(nskb->frag[i], nskb)
+> >       -> nskb->pp_recycle is false, frag is page_pool page
+> >       -> Fragment is released via put_page(frag page), hence leaking
+> >          from the page_pool.
+> >
+> > Something tells me that this is not be the only issue of this kind...
+> >
+> > The patch itself contains a suggested fix for this specific bug: it
+> > forces the unref in ___pskb_trim to recycle to the page_pool. If the
+> > page is not a page_pool page, it will be dereferenced as a regular page=
+.
+> >
+> > The alternative would be to save the skb->pp_recycled flag before
+> > pskb_expand_head and use it later during the unref.
+> >
+>
+> One more interesting point is the comment in skb_release_data [1] and it'=
+s
+> commit message [2] from Ilias. Looking at the commit message
+>
+
+Sorry for the bug. I don't think this is the right fix to be honest
+though. As you mention this is only 1 such instance of a general
+underlying issue.
+
+The underlying issue is that before the fixes commit, skb_frag_ref()
+grabbed a regular page ref. After the fixes commit, skb_frag_ref()
+grabs a page-pool ref. The unref path always dropped a regular page
+ref, thanks to this commit as you point out:
+
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?=
+id=3D2cc3aeb5ecccec0d266813172fcd82b4b5fa5803
+
+AFAICT the correct fix is to actually revert commit 2cc3aeb5eccc
+("skbuff: Fix a potential race while recycling page_pool packets").
+The reason is that now that skb_frag_ref() can grab page-pool refs, we
+don't need to make sure there is only 1 SKB that triggers the recycle
+path anymore. All the skb and its clones can obtain page-pool refs,
+and in the unref path we drop the page-pool refs. page_pool_put_page()
+detects correctly that the last page-pool ref is put and recycles the
+page only then.
+
+I'm unable to repro this issue. Do you need to do anything special? Or
+is 1 flow that hits skb_segment() good enough?
+
+Reverting commit 2cc3aeb5eccc ("skbuff: Fix a potential race while
+recycling page_pool packets") shows no regressions for me. Is it
+possible to try that out? If that doesn't work, I think I prefer
+reverting a580ea994fd3 ("net: mirror skb frag ref/unref helpers")
+rather than merging this fix to make sure we removed the underlying
+cause of the issue.
+
+> [1] https://elixir.bootlin.com/linux/v6.9-rc5/source/net/core/skbuff.c#L1=
+137
+> [2]
+> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit=
+/?id=3D2cc3aeb5ecccec0d266813172fcd82b4b5fa5803
+>
+> > Signed-off-by: Dragos Tatulea <dtatulea@nvidia.com>
+> > Co-developed-by: Jianbo Liu <jianbol@nvidia.com>
+> > Fixes: a580ea994fd3 ("net: mirror skb frag ref/unref helpers")
+> > Cc: Mina Almasry <almasrymina@google.com>
+> > ---
+> >  net/core/skbuff.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+> > index 37c858dc11a6..ab75b4f876ce 100644
+> > --- a/net/core/skbuff.c
+> > +++ b/net/core/skbuff.c
+> > @@ -2634,7 +2634,7 @@ int ___pskb_trim(struct sk_buff *skb, unsigned in=
+t len)
+> >               skb_shinfo(skb)->nr_frags =3D i;
+> >
+> >               for (; i < nfrags; i++)
+> > -                     skb_frag_unref(skb, i);
+> > +                     __skb_frag_unref(&skb_shinfo(skb)->frags[i], true=
+);
+> >
+> >               if (skb_has_frag_list(skb))
+> >                       skb_drop_fraglist(skb);
+>
 
 
-On 4/23/24 7:25 PM, Xu Kuohai wrote:
-> On 4/24/2024 5:55 AM, Yonghong Song wrote:
->>
->> On 4/20/24 1:33 AM, Xu Kuohai wrote:
->>> On 4/20/2024 7:00 AM, Eduard Zingerman wrote:
->>>> On Thu, 2024-04-11 at 20:27 +0800, Xu Kuohai wrote:
->>>>> From: Xu Kuohai <xukuohai@huawei.com>
->>>>>
->>>>> With lsm return value check, the no-alu32 version 
->>>>> test_libbpf_get_fd_by_id_opts
->>>>> is rejected by the verifier, and the log says:
->>>>>
->>>>>    0: R1=ctx() R10=fp0
->>>>>    ; int BPF_PROG(check_access, struct bpf_map *map, fmode_t 
->>>>> fmode) @ test_libbpf_get_fd_by_id_opts.c:27
->>>>>    0: (b7) r0 = 0                        ; R0_w=0
->>>>>    1: (79) r2 = *(u64 *)(r1 +0)
->>>>>    func 'bpf_lsm_bpf_map' arg0 has btf_id 916 type STRUCT 'bpf_map'
->>>>>    2: R1=ctx() R2_w=trusted_ptr_bpf_map()
->>>>>    ; if (map != (struct bpf_map *)&data_input) @ 
->>>>> test_libbpf_get_fd_by_id_opts.c:29
->>>>>    2: (18) r3 = 0xffff9742c0951a00       ; 
->>>>> R3_w=map_ptr(map=data_input,ks=4,vs=4)
->>>>>    4: (5d) if r2 != r3 goto pc+4         ; 
->>>>> R2_w=trusted_ptr_bpf_map() R3_w=map_ptr(map=data_input,ks=4,vs=4)
->>>>>    ; int BPF_PROG(check_access, struct bpf_map *map, fmode_t 
->>>>> fmode) @ test_libbpf_get_fd_by_id_opts.c:27
->>>>>    5: (79) r0 = *(u64 *)(r1 +8)          ; R0_w=scalar() R1=ctx()
->>>>>    ; if (fmode & FMODE_WRITE) @ test_libbpf_get_fd_by_id_opts.c:32
->>>>>    6: (67) r0 <<= 62                     ; 
->>>>> R0_w=scalar(smax=0x4000000000000000,umax=0xc000000000000000,smin32=0,smax32=umax32=0,var_off=(0x0; 
->>>>> 0xc000000000000000))
->>>>>    7: (c7) r0 s>>= 63                    ; 
->>>>> R0_w=scalar(smin=smin32=-1,smax=smax32=0)
->>>>>    ;  @ test_libbpf_get_fd_by_id_opts.c:0
->>>>>    8: (57) r0 &= -13                     ; 
->>>>> R0_w=scalar(smax=0x7ffffffffffffff3,umax=0xfffffffffffffff3,smax32=0x7ffffff3,umax32=0xfffffff3,var_off=(0x0; 
->>>>> 0xfffffffffffffff3))
->>>>>    ; int BPF_PROG(check_access, struct bpf_map *map, fmode_t 
->>>>> fmode) @ test_libbpf_get_fd_by_id_opts.c:27
->>>>>    9: (95) exit
->>>>>
->>>>> And here is the C code of the prog.
->>>>>
->>>>> SEC("lsm/bpf_map")
->>>>> int BPF_PROG(check_access, struct bpf_map *map, fmode_t fmode)
->>>>> {
->>>>>     if (map != (struct bpf_map *)&data_input)
->>>>>         return 0;
->>>>>
->>>>>     if (fmode & FMODE_WRITE)
->>>>>         return -EACCES;
->>>>>
->>>>>     return 0;
->>>>> }
->>>>>
->>>>> It is clear that the prog can only return either 0 or -EACCESS, 
->>>>> and both
->>>>> values are legal.
->>>>>
->>>>> So why is it rejected by the verifier?
->>>>>
->>>>> The verifier log shows that the second if and return value setting
->>>>> statements in the prog is optimized to bitwise operations "r0 s>>= 
->>>>> 63"
->>>>> and "r0 &= -13". The verifier correctly deduces that the the value of
->>>>> r0 is in the range [-1, 0] after verifing instruction "r0 s>>= 63".
->>>>> But when the verifier proceeds to verify instruction "r0 &= -13", it
->>>>> fails to deduce the correct value range of r0.
->>>>>
->>>>> 7: (c7) r0 s>>= 63                    ; 
->>>>> R0_w=scalar(smin=smin32=-1,smax=smax32=0)
->>>>> 8: (57) r0 &= -13                     ; 
->>>>> R0_w=scalar(smax=0x7ffffffffffffff3,umax=0xfffffffffffffff3,smax32=0x7ffffff3,umax32=0xfffffff3,var_off=(0x0; 
->>>>> 0xfffffffffffffff3))
->>>>>
->>>>> So why the verifier fails to deduce the result of 'r0 &= -13'?
->>>>>
->>>>> The verifier uses tnum to track values, and the two ranges "[-1, 
->>>>> 0]" and
->>>>> "[0, -1ULL]" are encoded to the same tnum. When verifing instruction
->>>>> "r0 &= -13", the verifier erroneously deduces the result from
->>>>> "[0, -1ULL] AND -13", which is out of the expected return range
->>>>> [-4095, 0].
->>>>>
->>>>> To fix it, this patch simply adds a special SCALAR32 case for the
->>>>> verifier. That is, when the source operand of the AND instruction is
->>>>> a constant and the destination operand changes from negative to
->>>>> non-negative and falls in range [-256, 256], deduce the result range
->>>>> by enumerating all possible AND results.
->>>>>
->>>>> Signed-off-by: Xu Kuohai <xukuohai@huawei.com>
->>>>> ---
->>>>
->>>> Hello,
->>>>
->>>> Sorry for the delay, I had to think about this issue a bit.
->>>> I found the clang transformation that generates the pattern this patch
->>>> tries to handle.
->>>> It is located in DAGCombiner::SimplifySelectCC() method (see [1]).
->>>> The transformation happens as a part of DAG to DAG rewrites
->>>> (LLVM uses several internal representations:
->>>>   - generic optimizer uses LLVM IR, most of the work is done
->>>>     using this representation;
->>>>   - before instruction selection IR is converted to Selection DAG,
->>>>     some optimizations are applied at this stage,
->>>>     all such optimizations are a set of pattern replacements;
->>>>   - Selection DAG is converted to machine code, some optimizations
->>>>     are applied at the machine code level).
->>>>
->>>> Full pattern is described as follows:
->>>>
->>>>    // fold (select_cc seteq (and x, y), 0, 0, A) -> (and (sra (shl 
->>>> x)) A)
->>>>    // where y is has a single bit set.
->>>>    // A plaintext description would be, we can turn the SELECT_CC 
->>>> into an AND
->>>>    // when the condition can be materialized as an all-ones 
->>>> register.  Any
->>>>    // single bit-test can be materialized as an all-ones register with
->>>>    // shift-left and shift-right-arith.
->>>>
->>>> For this particular test case the DAG is converted as follows:
->>>>
->>>>                      .---------------- lhs         The meaning of 
->>>> this select_cc is:
->>>>                      |        .------- rhs         `lhs == rhs ? 
->>>> true value : false value`
->>>>                      |        | .----- true value
->>>>                      |        | |  .-- false value
->>>>                      v        v v  v
->>>>    (select_cc seteq (and X 2) 0 0 -13)
->>>>                            ^
->>>> ->                        '---------------.
->>>>    (and (sra (sll X 62) 63)                |
->>>>         -13)                               |
->>>>                                            |
->>>> Before pattern is applied, it checks that second 'and' operand has
->>>> only one bit set, (which is true for '2').
->>>>
->>>> The pattern itself generates logical shift left / arithmetic shift
->>>> right pair, that ensures that result is either all ones (-1) or all
->>>> zeros (0). Hence, applying 'and' to shifts result and false value
->>>> generates a correct result.
->>>>
->>>
->>> Thanks for your detailed and invaluable explanation!
->>
->> Thanks Eduard for detailed explanation. It looks like we could
->> resolve this issue without adding too much complexity to verifier.
->> Also, this code pattern above seems generic enough to be worthwhile
->> with verifier change.
->>
->> Kuohai, please added detailed explanation (as described by Eduard)
->> in the commit message.
->>
->
-> Sure, already added, the commit message and the change now is like this:
->
-> ---
->
->     bpf: Fix a false rejection caused by AND operation
->
->     With lsm return value check, the no-alu32 version 
-> test_libbpf_get_fd_by_id_opts
->     is rejected by the verifier, and the log says:
->
->     0: R1=ctx() R10=fp0
->     ; int BPF_PROG(check_access, struct bpf_map *map, fmode_t fmode) @ 
-> test_libbpf_get_fd_by_id_opts.c:27
->     0: (b7) r0 = 0                        ; R0_w=0
->     1: (79) r2 = *(u64 *)(r1 +0)
->     func 'bpf_lsm_bpf_map' arg0 has btf_id 916 type STRUCT 'bpf_map'
->     2: R1=ctx() R2_w=trusted_ptr_bpf_map()
->     ; if (map != (struct bpf_map *)&data_input) @ 
-> test_libbpf_get_fd_by_id_opts.c:29
->     2: (18) r3 = 0xffff9742c0951a00       ; 
-> R3_w=map_ptr(map=data_input,ks=4,vs=4)
->     4: (5d) if r2 != r3 goto pc+4         ; R2_w=trusted_ptr_bpf_map() 
-> R3_w=map_ptr(map=data_input,ks=4,vs=4)
->     ; int BPF_PROG(check_access, struct bpf_map *map, fmode_t fmode) @ 
-> test_libbpf_get_fd_by_id_opts.c:27
->     5: (79) r0 = *(u64 *)(r1 +8)          ; R0_w=scalar() R1=ctx()
->     ; if (fmode & FMODE_WRITE) @ test_libbpf_get_fd_by_id_opts.c:32
->     6: (67) r0 <<= 62                     ; 
-> R0_w=scalar(smax=0x4000000000000000,umax=0xc000000000000000,smin32=0,smax32=umax32=0,var_off=(0x0; 
-> 0xc000000000000000))
->     7: (c7) r0 s>>= 63                    ; 
-> R0_w=scalar(smin=smin32=-1,smax=smax32=0)
->     ;  @ test_libbpf_get_fd_by_id_opts.c:0
->     8: (57) r0 &= -13                     ; 
-> R0_w=scalar(smax=0x7ffffffffffffff3,umax=0xfffffffffffffff3,smax32=0x7ffffff3,umax32=0xfffffff3,var_off=(0x0; 
-> 0xfffffffffffffff3))
->     ; int BPF_PROG(check_access, struct bpf_map *map, fmode_t fmode) @ 
-> test_libbpf_get_fd_by_id_opts.c:27
->     9: (95) exit
->
->     And here is the C code of the prog.
->
->     SEC("lsm/bpf_map")
->     int BPF_PROG(check_access, struct bpf_map *map, fmode_t fmode)
->     {
->         if (map != (struct bpf_map *)&data_input)
->                 return 0;
->
->         if (fmode & FMODE_WRITE)
->                 return -EACCES;
->
->         return 0;
->     }
->
->     It is clear that the prog can only return either 0 or -EACCESS, 
-> and both
->     values are legal.
->
->     So why is it rejected by the verifier?
->
->     The verifier log shows that the second if and return value setting
->     statements in the prog is optimized to bitwise operations "r0 s>>= 
-> 63"
->     and "r0 &= -13". The verifier correctly deduces that the the value of
->     r0 is in the range [-1, 0] after verifing instruction "r0 s>>= 63".
->     But when the verifier proceeds to verify instruction "r0 &= -13", it
->     fails to deduce the correct value range of r0.
->
->     7: (c7) r0 s>>= 63                    ; 
-> R0_w=scalar(smin=smin32=-1,smax=smax32=0)
->     8: (57) r0 &= -13                     ; 
-> R0_w=scalar(smax=0x7ffffffffffffff3,umax=0xfffffffffffffff3,smax32=0x7ffffff3,umax32=0xfffffff3,var_off=(0x0; 
-> 0xfffffffffffffff3))
->
->     So why the verifier fails to deduce the result of 'r0 &= -13'?
->
->     The verifier uses tnum to track values, and the two ranges "[-1, 
-> 0]" and
->     "[0, -1ULL]" are encoded to the same tnum. When verifing instruction
->     "r0 &= -13", the verifier erroneously deduces the result from
->     "[0, -1ULL] AND -13", which is out of the expected return range
->     [-4095, 0].
->
->     As explained by Eduard in [0], the clang transformation that 
-> generates this
->     pattern is located in DAGCombiner::SimplifySelectCC() method (see 
-> [1]).
->
->     The transformation happens as a part of DAG to DAG rewrites
->     (LLVM uses several internal representations:
->      - generic optimizer uses LLVM IR, most of the work is done
->        using this representation;
->      - before instruction selection IR is converted to Selection DAG,
->        some optimizations are applied at this stage,
->        all such optimizations are a set of pattern replacements;
->      - Selection DAG is converted to machine code, some optimizations
->        are applied at the machine code level).
->
->     Full pattern is described as follows:
->
->       // fold (select_cc seteq (and x, y), 0, 0, A) -> (and (sra (shl 
-> x)) A)
->       // where y is has a single bit set.
->       // A plaintext description would be, we can turn the SELECT_CC 
-> into an AND
->       // when the condition can be materialized as an all-ones 
-> register.  Any
->       // single bit-test can be materialized as an all-ones register with
->       // shift-left and shift-right-arith.
->
->     For this particular test case the DAG is converted as follows:
->
->                         .---------------- lhs         The meaning of 
-> this select_cc is:
->                         |        .------- rhs         `lhs == rhs ? 
-> true value : false value`
->                         |        | .----- true value
->                         |        | |  .-- false value
->                         v        v v  v
->       (select_cc seteq (and X 2) 0 0 -13)
->                               ^
->     ->                        '---------------.
->       (and (sra (sll X 62) 63)                |
->            -13)                               |
->                                               |
->     Before pattern is applied, it checks that second 'and' operand has
->     only one bit set, (which is true for '2').
->
->     The pattern itself generates logical shift left / arithmetic shift
->     right pair, that ensures that result is either all ones (-1) or all
->     zeros (0). Hence, applying 'and' to shifts result and false value
->     generates a correct result.
->
->     As suggested by Eduard, this patch makes a special case for source
->     or destination register of '&=' operation being in range [-1, 0].
->
->     Meaning that one of the '&=' operands is either:
->     - all ones, in which case the counterpart is the result of the 
-> operation;
->     - all zeros, in which case zero is the result of the operation.
->
->     And MIN and MAX values could be derived based on above two 
-> observations.
->
->     [0] 
-> https://lore.kernel.org/bpf/e62e2971301ca7f2e9eb74fc500c520285cad8f5.camel@gmail.com/
->     [1] 
-> https://github.com/llvm/llvm-project/blob/4523a267829c807f3fc8fab8e5e9613985a51565/llvm/lib/CodeGen/SelectionDAG/DAGCombiner.cpp
->
->     Suggested-by: Eduard Zingerman <eddyz87@gmail.com>
->     Signed-off-by: Xu Kuohai <xukuohai@huawei.com>
->
-> diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
-> index 640747b53745..30c551d39329 100644
-> --- a/kernel/bpf/verifier.c
-> +++ b/kernel/bpf/verifier.c
-> @@ -13374,6 +13374,24 @@ static void scalar32_min_max_and(struct 
-> bpf_reg_state *dst_reg,
->         dst_reg->u32_min_value = var32_off.value;
->         dst_reg->u32_max_value = min(dst_reg->u32_max_value, umax_val);
->
-> +       /* Special case: src_reg is known and dst_reg is in range [-1, 
-> 0] */
-> +       if (src_known &&
-> +               dst_reg->s32_min_value == -1 && dst_reg->s32_max_value 
-> == 0 &&
-> +               dst_reg->smin_value == -1 && dst_reg->smax_value == 0) {
-
-do we need to check dst_reg->smin_value/smax_value here? They should not impact
-final dst_reg->s32_{min,max}_value computation, right?
-Similarly, for later 64bit min/max and, 32bit value does not really matter.
-
-> + dst_reg->s32_min_value = min_t(s32, src_reg->s32_min_value, 0);
-> +               dst_reg->s32_max_value = max_t(s32, 
-> src_reg->s32_min_value, 0);
-> +               return;
-> +       }
-> +
-> +       /* Special case: dst_reg is known and src_reg is in range [-1, 
-> 0] */
-> +       if (dst_known &&
-> +               src_reg->s32_min_value == -1 && src_reg->s32_max_value 
-> == 0 &&
-> +               src_reg->smin_value == -1 && src_reg->smax_value == 0) {
-> +               dst_reg->s32_min_value = min_t(s32, 
-> dst_reg->s32_min_value, 0);
-> +               dst_reg->s32_max_value = max_t(s32, 
-> dst_reg->s32_min_value, 0);
-> +               return;
-> +       }
-> +
->         /* Safe to set s32 bounds by casting u32 result into s32 when u32
->          * doesn't cross sign boundary. Otherwise set s32 bounds to 
-> unbounded.
->          */
-> @@ -13404,6 +13422,24 @@ static void scalar_min_max_and(struct 
-> bpf_reg_state *dst_reg,
->         dst_reg->umin_value = dst_reg->var_off.value;
->         dst_reg->umax_value = min(dst_reg->umax_value, umax_val);
->
-> +       /* Special case: src_reg is known and dst_reg is in range [-1, 
-> 0] */
-> +       if (src_known &&
-> +               dst_reg->smin_value == -1 && dst_reg->smax_value == 0 &&
-> +               dst_reg->s32_min_value == -1 && dst_reg->s32_max_value 
-> == 0) {
-> +               dst_reg->smin_value = min_t(s64, src_reg->smin_value, 0);
-> +               dst_reg->smax_value = max_t(s64, src_reg->smin_value, 0);
-> +               return;
-> +       }
-> +
-> +       /* Special case: dst_reg is known and src_reg is in range [-1, 
-> 0] */
-> +       if (dst_known &&
-> +               src_reg->smin_value == -1 && src_reg->smax_value == 0 &&
-> +               src_reg->s32_min_value == -1 && src_reg->s32_max_value 
-> == 0) {
-> +               dst_reg->smin_value = min_t(s64, dst_reg->smin_value, 0);
-> +               dst_reg->smax_value = max_t(s64, dst_reg->smin_value, 0);
-> +               return;
-> +       }
-> +
->         /* Safe to set s64 bounds by casting u64 result into s64 when u64
->          * doesn't cross sign boundary. Otherwise set s64 bounds to 
-> unbounded.
->          */
->
->>>
->>>> In my opinion the approach taken by this patch is sub-optimal:
->>>> - 512 iterations is too much;
->>>> - this does not cover all code that could be generated by the above
->>>>    mentioned LLVM transformation
->>>>    (e.g. second 'and' operand could be 1 << 16).
->>>>
->>>> Instead, I suggest to make a special case for source or dst register
->>>> of '&=' operation being in range [-1,0].
->>>> Meaning that one of the '&=' operands is either:
->>>> - all ones, in which case the counterpart is the result of the 
->>>> operation;
->>>> - all zeros, in which case zero is the result of the operation;
->>>> - derive MIN and MAX values based on above two observations.
->>>>
->>>
->>> Totally agree, I'll cook a new patch as you suggested.
->>>
->>>> [1] 
->>>> https://github.com/llvm/llvm-project/blob/4523a267829c807f3fc8fab8e5e9613985a51565/llvm/lib/CodeGen/SelectionDAG/DAGCombiner.cpp#L5391
->>>>
->>>> Best regards,
->>>> Eduard
->>>
->>>
->>
->
+--=20
+Thanks,
+Mina
 
