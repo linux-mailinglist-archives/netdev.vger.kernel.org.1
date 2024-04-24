@@ -1,106 +1,125 @@
-Return-Path: <netdev+bounces-91023-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91024-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 097488B1019
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 18:43:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08A5E8B101C
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 18:44:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 97E371F230BC
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 16:43:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 396B41C2484E
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 16:44:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E79DC16ABC7;
-	Wed, 24 Apr 2024 16:43:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AA1D16ABE8;
+	Wed, 24 Apr 2024 16:44:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="otKxIOsd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t8N+WTXi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CE3B15ECC7;
-	Wed, 24 Apr 2024 16:43:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12C1613C672;
+	Wed, 24 Apr 2024 16:44:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713977010; cv=none; b=WwyPY3NsVYQKQH67G1ceR3A1+8YKKAJvlzGhVw/D/m9twPC+53AAgXzNUet4Zp/6kQCLTlvKvrRjzuYJmlNIVLeEIE2gAclU6Mhg42il8rb8dCIr4+vMtcd67ji3hVBPOBl956jj0/rEBw5czK7xMEQ5us6ZMG2szjo+zrvJhC8=
+	t=1713977049; cv=none; b=Qo9j6lEbfp/xwexh6RLIFZgbUprcdLbA0ij00x2BCAIEDBSB9rvBXVXgEDCJc3YBisaRNzQtuHQvzbi1MZHR+0ax5tWZ2svXO1xEdsMbad4zTr+K/oMeOy3y3KFeFkyMqmVIvmL2yGLu+YakIckOXtWfYHQI5riBZo1lIwZ3Wtg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713977010; c=relaxed/simple;
-	bh=4lFQdEjkvGXYmHpN1Zb/f8Uu/Vk5mUCIUFY3zg5YBxs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=OSB83YqQJ4QzaOvrNj7aPj4B2MhxgORw6AAqMn/Xhqf9OeyG6UJeuXeayvc3MDDFTfzXPMI7lbYDpe4EdQEncR3iS9RhIhGDMPDZason2maitVtKWFN2QmlFtE7Bb9AajebwEJeDPkmC5eisjiTgE1CHaeKHKbLAvSjHlXJyYkA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=otKxIOsd; arc=none smtp.client-ip=193.104.135.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
-Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
-	by mail1.fiberby.net (Postfix) with ESMTPSA id EF0D5600A2;
-	Wed, 24 Apr 2024 16:43:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
-	s=202008; t=1713977005;
-	bh=4lFQdEjkvGXYmHpN1Zb/f8Uu/Vk5mUCIUFY3zg5YBxs=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=otKxIOsdTbl7M4gl1ogesMJKcWgj05WkzcyBiUiwKASacEuskc6qJ0v9ntQTEfA0D
-	 VfGvBIZ+5jGsV0BvNGaq+7WKMVBkh6/gGWpY7723scd5r6GaXKJvdQy4cbXJOcFgHc
-	 Vtoi84nkWobSZp3Y28O0uwfd1tCt3tbW8TAZyTBmia7kXNwluJL2D+t6R791lgm044
-	 qMMPHiaTg7QkChsNldJDbjedcsXWRdcgh6XcoAiPaZ4BX0mYcZ6yqormgwKlL8SV9d
-	 xdHlo32UtXKbsPWPJXDUMdZ0HQLRxbo4jNml4POyMmt7gRYGHkg5zVZ8/ZRHGOc4OH
-	 DoX9XpFTN9fzQ==
-Received: from [127.0.0.1] (localhost [127.0.0.1])
-	by x201s (Postfix) with ESMTP id E39D9201C3F;
-	Wed, 24 Apr 2024 16:43:14 +0000 (UTC)
-Message-ID: <923135c6-1bd1-414d-b574-c201644d35ab@fiberby.net>
-Date: Wed, 24 Apr 2024 16:43:14 +0000
+	s=arc-20240116; t=1713977049; c=relaxed/simple;
+	bh=ou56p/+S5AFd1uQF8WgiDdiw3v5Mf5dIv88lwkk1SJs=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=Ufomg2a4udtyLU7OLaP42chAow9PIBjJ5nUYXoXvd85Y7FXFsT2FTfoHS1rzuX2X3cfxQru9nJNl8YuDl1roKy5vVpB/wwwfklGM1gyl4qnHkaXu0rZlbPBTzyQuG5FC2Gkm4ZCRUhi4gCmkjsAQkCEDi+Uj9iYdB5t+im2i7to=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t8N+WTXi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5E04AC113CD;
+	Wed, 24 Apr 2024 16:44:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713977048;
+	bh=ou56p/+S5AFd1uQF8WgiDdiw3v5Mf5dIv88lwkk1SJs=;
+	h=Date:From:To:Cc:Subject:From;
+	b=t8N+WTXiWdG1MkCFhoCWPovS7BBzao6f0BGXSyS1W4I2xqA7lbzJ+FJFz/R8UGh2V
+	 PTr7g94G3PKBbB6HVbraE791vq+w3/eySRvj8KwXsCFvpJV1GdnmKrtxNwxgyScMrQ
+	 kGFY1Tt5tDj00E5PwXHGXXRbVqe3wEr06okKZJkiryK7gbuifjpok9FIhQ36aJz6E9
+	 Lua2yRUfjRp8yDjgOI2jSYC3LYPpQnkljgPTtJxXAgBzhiihKf8MhbziTUNAXd1isn
+	 16c7XYsgGzuCH5/Lrw7arRk5skKX7W9v+glyGSsdIKswjdNcRFgnIucUvy8zazw/2u
+	 xhgXK9O9ZDOhg==
+Date: Wed, 24 Apr 2024 17:44:05 +0100
+From: Simon Horman <horms@kernel.org>
+To: Aaron Conole <aconole@redhat.com>, Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, dev@openvswitch.org,
+	linux-kselftest@vger.kernel.org
+Subject: selftests: openvswitch: Questions about possible enhancements
+Message-ID: <20240424164405.GN42092@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net: qede: flower: validate control flags
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Ariel Elior <aelior@marvell.com>, Manish Chopra <manishc@marvell.com>
-References: <20240424134250.465904-1-ast@fiberby.net>
- <Zikcq2S90S97h7Z0@nanopsycho>
-Content-Language: en-US
-From: =?UTF-8?Q?Asbj=C3=B8rn_Sloth_T=C3=B8nnesen?= <ast@fiberby.net>
-In-Reply-To: <Zikcq2S90S97h7Z0@nanopsycho>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Hi Jiri,
+Hi Aaron, Jakub, all,
 
-On 4/24/24 2:52 PM, Jiri Pirko wrote:
-> Wed, Apr 24, 2024 at 03:42:48PM CEST, ast@fiberby.net wrote:
->> This driver currently doesn't support any flower control flags.
->>
->> Implement check for control flags, such as can be set through
->> `tc flower ... ip_flags frag`.
->>
->> Since qede_parse_flow_attr() are called by both qede_add_tc_flower_fltr()
->> and qede_flow_spec_to_rule(), as the latter doesn't having access to
->> extack, then flow_rule_*_control_flags() can't be used in this driver.
-> 
-> Why? You can pass null.
+I have recently been exercising the Open vSwitch kernel selftests,
+using vng, something like this:
 
-Ah, I see. I hadn't traced that option down through the defines,
-I incorrectly assumed that NL_SET_ERR_MSG* didn't allow NULL.
+	TESTDIR="tools/testing/selftests/net/openvswitch"
 
-Currently thinking about doing v2 in this style:
+        vng -v --run . --user root --cpus 2 \
+                --overlay-rwdir "$PWD" -- \
+                "modprobe openvswitch && \
+		 echo \"timeout=90\" >> \"${TESTDIR}/settings\" && \
+                 make -C \"$TESTDIR\" run_tests"
 
-if (flow_rule_match_has_control_flags(rule, extack)) {
-         if (!extack)
-                 DP_NOTICE(edev, "Unsupported match on control.flags");
-         return -EOPNOTSUPP;
-}
+And I have some observations that I'd like to ask about.
 
-pw-bot: changes-requested
+1. Building the kernel using the following command does not
+   build the openvswitch kernel module.
 
--- 
-Best regards
-Asbjørn Sloth Tønnesen
-Network Engineer
-Fiberby - AS42541
+	vng -v --build \
+		--config tools/testing/selftests/net/config
+
+   All that seems to be missing is CONFIG_OPENVSWITCH=m
+   and I am wondering what the best way of resolving this is.
+
+   Perhaps I am doing something wrong.
+   Or perhaps tools/testing/selftests/net/openvswitch/config
+   should be created? If so, should it include (most of?) what is in
+   tools/testing/selftests/net/config, or just CONFIG_OPENVSWITCH=m?
+
+2. As per my example above, it seems that a modprobe openvswitch is
+   required (if openvswitch is a module).
+
+   Again, perhaps I am doing something wrong. But if not, should this be
+   incorporated into tools/testing/selftests/net/openvswitch/openvswitch.sh
+   or otherwise automated?
+
+3. I have observed that the last test fails (yesterday, but not today!),
+   because the namespace it tries to create already exists. I believe this
+   is because it is pending deletion.
+
+   My work-around is as follows:
+
+ ovs_add_netns_and_veths () {
+ 	info "Adding netns attached: sbx:$1 dp:$2 {$3, $4, $5}"
++	for i in $(seq 10); do
++		ovs_sbx "$1" test -e "/var/run/netns/$3" || break
++		info "Namespace $3 still exists (attempt $i)"
++		ovs_sbx "$1" ip netns del "$3"
++		sleep "$i"
++	done
+ 	ovs_sbx "$1" ip netns add "$3" || return 1
+ 	on_exit "ovs_sbx $1 ip netns del $3"
+ 	ovs_sbx "$1" ip link add "$4" type veth peer name "$5" || return 1
+
+   N.B.: the "netns del" part is probably not needed,
+   but I'm not able to exercise it effectively right now.
+
+   I am wondering if a loop like this is appropriate to add, perhaps also
+   to namespace deletion. Or if it would be appropriate to port
+   openvswitch.sh to use ./tools/testing/selftests/net/lib.sh, which I
+   believe handles this.
+
+4. I am observing timeouts whith the default value of 45s.
+   Bumping this to 90s seems to help.
+   Are there any objections to a patch to bump the timeout?
 
