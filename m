@@ -1,351 +1,151 @@
-Return-Path: <netdev+bounces-90846-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90845-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 081028B0723
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 12:20:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CFAF8B071A
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 12:18:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B29D4281E45
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 10:20:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4EAEB1C21BDE
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 10:18:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0184615921D;
-	Wed, 24 Apr 2024 10:20:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="I2tx6/JC"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37896159216;
+	Wed, 24 Apr 2024 10:18:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [205.139.111.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 970DC158D9A;
-	Wed, 24 Apr 2024 10:20:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03F271591F0
+	for <netdev@vger.kernel.org>; Wed, 24 Apr 2024 10:18:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.139.111.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713954039; cv=none; b=CES1IKWQW4Zk6OiWQwCywC2I2DoMeZEkDmhR+lyzsGZAQ5WxUu3c/Y4NrCYcww3ZMhYfPKMEBbR855tWaliRIs+QmpqVj/ZwZZ69VXN+IVfVfePFXd9tTOUqL2IpbYy+39xBX+kcCFALq+zDg252vgDtopU4evnLrUfI0aOqTvk=
+	t=1713953902; cv=none; b=fZSSJCWY2roJf2va9Z60ioJ1q7munVaLQoeWb0eZD5ijVwKZe2/qA4ASqnfHhcqKoLcqjX07q7unGmBvuhY/8qXSI2b0fZVdy3TaZq0TxerIwvXPpyegoSmMyJSBHkKq32yx/4xK/CUTTn60Nh2zNjkJB004/78G4otgHYYDsvo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713954039; c=relaxed/simple;
-	bh=+gjaI2nhObJ3ycyL3NwAVTxlbdJeHWtPqfvu+nCi9W4=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Tmv+X1ohJzRqm6muIde9/fyo+TMWfh6SJkmRLwUBI8ogFePCElxlhkNy0GehwsSXCdFPb5pEZJjF8TdLkfIjoW/dlbzsVwlsGU5+4oUun/ZYbmz1esQZbyVRX1vjhcF5Gn00C54NZWUzEYWA76fXAmEN2XwW2ovRxwuROJe+O+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=I2tx6/JC; arc=none smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1713954038; x=1745490038;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=+gjaI2nhObJ3ycyL3NwAVTxlbdJeHWtPqfvu+nCi9W4=;
-  b=I2tx6/JCd7fy2nNFiBDSzpV7fzc7HETauUW8zL8DIvDAuRmhZ7Ce0eRi
-   wYctNZccDhim00xsmDmbGDw/6MLc5NIJMXKpEuF1MPXQWrDK86XmLTa5o
-   ZMQ7QI0vpINkipdNyDB5pY7zLpxPshwK/KXUTTnphVUTh0XsW/29gJLsq
-   LDJINwnWsM5mFyRsNd3Wsz28+FTTKV3wnEvEW63QIbF34DgaQdg2UxFCF
-   5T3Zhu0pIYZAEgcV+XvhpQ4JtX7V61adty07JJi7YHFQiNyxdrbX6BBMh
-   qBA+5pKMkm+J+JgFrIIXfA/ftzyOHR7WCRlCodg9xeVwUxFo66y/uJxsN
-   w==;
-X-CSE-ConnectionGUID: nR2Vt7fJRiuDiSwuCX8NPw==
-X-CSE-MsgGUID: Rk8giScxRxSkgsz6jS2Dyg==
-X-IronPort-AV: E=McAfee;i="6600,9927,11053"; a="20126491"
-X-IronPort-AV: E=Sophos;i="6.07,225,1708416000"; 
-   d="scan'208";a="20126491"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2024 03:20:37 -0700
-X-CSE-ConnectionGUID: N8xhZuA3RvaEgwISMLNBEw==
-X-CSE-MsgGUID: +yrkNKYIT6y34aYJnQ5q+Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,225,1708416000"; 
-   d="scan'208";a="24633306"
-Received: from amlin-018-114.igk.intel.com ([10.102.18.114])
-  by orviesa009.jf.intel.com with ESMTP; 24 Apr 2024 03:20:35 -0700
-From: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-To: netdev@vger.kernel.org
-Cc: vadim.fedorenko@linux.dev,
-	jiri@resnulli.us,
-	davem@davemloft.net,
-	rrameshbabu@nvidia.com,
-	linux-kernel@vger.kernel.org,
-	pabeni@redhat.com,
-	kuba@kernel.org,
-	mschmidt@redhat.com,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-Subject: [PATCH net v2] dpll: fix dpll_pin_on_pin_register() for multiple parent pins
-Date: Wed, 24 Apr 2024 12:16:36 +0200
-Message-Id: <20240424101636.1491424-1-arkadiusz.kubalewski@intel.com>
-X-Mailer: git-send-email 2.38.1
+	s=arc-20240116; t=1713953902; c=relaxed/simple;
+	bh=Ms/kL5uYZ8RGAy+Ewand3vQOkDQURuccLAcO7HmSPd4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 In-Reply-To:Content-Type:Content-Disposition; b=s8s+VPKa0d3gr6gIPiP3IWX5F587NJAS401321qJecw7dhUjqWQNF25nl22koNQOEXJ72thfpHMXjo4nbPl1YsrMhpzQirKU80LpGtV5g4l4P42VNsKuwJb6CQImPl2Kbvv2kFBfmjuESrOr7h8ZBJwM9CV8WHt5Mo33e0hTQec=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=none smtp.mailfrom=queasysnail.net; arc=none smtp.client-ip=205.139.111.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=queasysnail.net
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-160-an_liTfIMIWa-05WnuWjYg-1; Wed,
+ 24 Apr 2024 06:18:14 -0400
+X-MC-Unique: an_liTfIMIWa-05WnuWjYg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 187CF38049FC;
+	Wed, 24 Apr 2024 10:18:14 +0000 (UTC)
+Received: from hog (unknown [10.39.193.137])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 63AFF1C060D0;
+	Wed, 24 Apr 2024 10:18:12 +0000 (UTC)
+Date: Wed, 24 Apr 2024 12:18:11 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Rahul Rameshbabu <rrameshbabu@nvidia.com>
+Cc: netdev@vger.kernel.org, stable@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Paolo Abeni <pabeni@redhat.com>, Gal Pressman <gal@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Yossi Kuperman <yossiku@nvidia.com>,
+	Benjamin Poirier <bpoirier@nvidia.com>,
+	Cosmin Ratiu <cratiu@nvidia.com>
+Subject: Re: [PATCH net-next 2/3] macsec: Detect if Rx skb is macsec-related
+ for offloading devices that update md_dst
+Message-ID: <ZijcY_DHlmP84U4S@hog>
+References: <20240419011740.333714-1-rrameshbabu@nvidia.com>
+ <20240419011740.333714-3-rrameshbabu@nvidia.com>
+ <ZiKIUC6bTCDhlnRw@hog>
+ <87mspp6xh7.fsf@nvidia.com>
+ <ZiYseYT62ZI0-_V9@hog>
+ <87plugpqrk.fsf@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <87plugpqrk.fsf@nvidia.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.7
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: queasysnail.net
+Content-Type: text/plain; charset=UTF-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-In scenario where pin is registered with multiple parent pins via
-dpll_pin_on_pin_register(..), all belonging to the same dpll device.
-A second call to dpll_pin_on_pin_unregister(..) would cause a call trace,
-as it tries to use already released registration resources (due to fix
-introduced in b446631f355e). In this scenario pin was registered twice,
-so resources are not yet expected to be release until each registered
-pin/pin pair is unregistered.
+2024-04-22, 22:55:02 -0700, Rahul Rameshbabu wrote:
+> On Mon, 22 Apr, 2024 11:23:05 +0200 Sabrina Dubroca <sd@queasysnail.net> =
+wrote:
+> > 2024-04-19, 11:01:20 -0700, Rahul Rameshbabu wrote:
+> >> On Fri, 19 Apr, 2024 17:05:52 +0200 Sabrina Dubroca <sd@queasysnail.ne=
+t> wrote:
+> >> > 2024-04-18, 18:17:16 -0700, Rahul Rameshbabu wrote:
+> >> <snip>
+> >> >> +=09=09=09/* This datapath is insecure because it is unable to
+> >> >> +=09=09=09 * enforce isolation of broadcast/multicast traffic and
+> >> >> +=09=09=09 * unicast traffic with promiscuous mode on the macsec
+> >> >> +=09=09=09 * netdev. Since the core stack has no mechanism to
+> >> >> +=09=09=09 * check that the hardware did indeed receive MACsec
+> >> >> +=09=09=09 * traffic, it is possible that the response handling
+> >> >> +=09=09=09 * done by the MACsec port was to a plaintext packet.
+> >> >> +=09=09=09 * This violates the MACsec protocol standard.
+> >> >> +=09=09=09 */
+> >> >> +=09=09=09DEBUG_NET_WARN_ON_ONCE(true);
+> >> >
+> >> > If you insist on this warning (and I'm not convinced it's useful,
+> >> > since if the HW is already built and cannot inform the driver, there=
+'s
+> >> > nothing the driver implementer can do), I would move it somewhere in=
+to
+> >> > the config path. macsec_update_offload would be a better location fo=
+r
+> >> > this kind of warning (maybe with a pr_warn (not limited to debug
+> >> > configs) saying something like "MACsec offload on devices that don't
+> >> > support md_dst are insecure: they do not provide proper isolation of
+> >> > traffic"). The comment can stay here.
+> >> >
+> >>=20
+> >> I do not like the warning either. I left it mainly if it needed furthe=
+r
+> >> discussion on the mailing list. Will remove it in my next revision. Th=
+at
+> >> said, it may make sense to advertise rx_uses_md_dst over netlink to
+> >> annotate what macsec offload path a device uses? Just throwing out an
+> >> idea here.
+> >
+> > Maybe. I was also thinking about adding a way to restrict offloading
+> > only to devices with rx_uses_md_dst.
+>=20
+> That's an option. Basically, devices that do not support rx_uses_md_dst
+> really only just do SW MACsec but do not return an error if the offload
+> parameter is passed over netlink so user scripts do not break?
 
-Currently, the following crash/call trace is produced when ice driver is
-removed on the system with installed E810T NIC which includes dpll device:
+Forcing a fallback to SW could be considered a breakage because of the
+performance regression, so I don't think we can turn this on by
+default. Then I would simply reject offload on those devices. We could
+have a compat mode that does the SW fallback you suggest. I don't know
+if it would be used.
 
-WARNING: CPU: 51 PID: 9155 at drivers/dpll/dpll_core.c:809 dpll_pin_ops+0x20/0x30
-RIP: 0010:dpll_pin_ops+0x20/0x30
-Call Trace:
- ? __warn+0x7f/0x130
- ? dpll_pin_ops+0x20/0x30
- dpll_msg_add_pin_freq+0x37/0x1d0
- dpll_cmd_pin_get_one+0x1c0/0x400
- ? __nlmsg_put+0x63/0x80
- dpll_pin_event_send+0x93/0x140
- dpll_pin_on_pin_unregister+0x3f/0x100
- ice_dpll_deinit_pins+0xa1/0x230 [ice]
- ice_remove+0xf1/0x210 [ice]
 
-Fix by adding a parent pointer as a cookie when creating a registration,
-also when searching for it. For the regular pins pass NULL, this allows to
-create separated registration for each parent the pin is registered with.
+> > (Slightly related) I also find it annoying that users have to tell the
+> > kernel whether to use PHY or MAC offload, but have no way to know
+> > which one their HW supports. That should probably have been an
+> > implementation detail that didn't need to be part of uapi :/
+>=20
+> We could leave the phy / mac netlink keywords and introduce an "on"
+> option. We deduce whether the device is a phydev or not when on is
+> passed and set the macsec->offload flag based on that. The phy and mac
+> options for offload in ip-macsec can then be deprecated.
 
-Fixes: b446631f355e ("dpll: fix dpll_xa_ref_*_del() for multiple registrations")
-Signed-off-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
----
-v2:
-- change the v1 approach, instead of refcounting create new registration
-  for each parent pointer cookie
-- change commit title: "fix dpll_pin_registration missing refcount" ->
-  "fix dpll_pin_on_pin_register() for multiple parent pins"
-- update commit description, simplify and align with new approach
----
-drivers/dpll/dpll_core.c | 58 +++++++++++++++++++++++-----------------
- 1 file changed, 33 insertions(+), 25 deletions(-)
+I thought about doing exactly that, and then dropped the idea because
+it would only help with newer kernels.
 
-diff --git a/drivers/dpll/dpll_core.c b/drivers/dpll/dpll_core.c
-index 64eaca80d736..d0f6693ca142 100644
---- a/drivers/dpll/dpll_core.c
-+++ b/drivers/dpll/dpll_core.c
-@@ -42,6 +42,7 @@ struct dpll_pin_registration {
- 	struct list_head list;
- 	const struct dpll_pin_ops *ops;
- 	void *priv;
-+	void *cookie;
- };
- 
- struct dpll_device *dpll_device_get_by_id(int id)
-@@ -54,12 +55,14 @@ struct dpll_device *dpll_device_get_by_id(int id)
- 
- static struct dpll_pin_registration *
- dpll_pin_registration_find(struct dpll_pin_ref *ref,
--			   const struct dpll_pin_ops *ops, void *priv)
-+			   const struct dpll_pin_ops *ops, void *priv,
-+			   void *cookie)
- {
- 	struct dpll_pin_registration *reg;
- 
- 	list_for_each_entry(reg, &ref->registration_list, list) {
--		if (reg->ops == ops && reg->priv == priv)
-+		if (reg->ops == ops && reg->priv == priv &&
-+		    reg->cookie == cookie)
- 			return reg;
- 	}
- 	return NULL;
-@@ -67,7 +70,8 @@ dpll_pin_registration_find(struct dpll_pin_ref *ref,
- 
- static int
- dpll_xa_ref_pin_add(struct xarray *xa_pins, struct dpll_pin *pin,
--		    const struct dpll_pin_ops *ops, void *priv)
-+		    const struct dpll_pin_ops *ops, void *priv,
-+		    void *cookie)
- {
- 	struct dpll_pin_registration *reg;
- 	struct dpll_pin_ref *ref;
-@@ -78,7 +82,7 @@ dpll_xa_ref_pin_add(struct xarray *xa_pins, struct dpll_pin *pin,
- 	xa_for_each(xa_pins, i, ref) {
- 		if (ref->pin != pin)
- 			continue;
--		reg = dpll_pin_registration_find(ref, ops, priv);
-+		reg = dpll_pin_registration_find(ref, ops, priv, cookie);
- 		if (reg) {
- 			refcount_inc(&ref->refcount);
- 			return 0;
-@@ -111,6 +115,7 @@ dpll_xa_ref_pin_add(struct xarray *xa_pins, struct dpll_pin *pin,
- 	}
- 	reg->ops = ops;
- 	reg->priv = priv;
-+	reg->cookie = cookie;
- 	if (ref_exists)
- 		refcount_inc(&ref->refcount);
- 	list_add_tail(&reg->list, &ref->registration_list);
-@@ -119,7 +124,8 @@ dpll_xa_ref_pin_add(struct xarray *xa_pins, struct dpll_pin *pin,
- }
- 
- static int dpll_xa_ref_pin_del(struct xarray *xa_pins, struct dpll_pin *pin,
--			       const struct dpll_pin_ops *ops, void *priv)
-+			       const struct dpll_pin_ops *ops, void *priv,
-+			       void *cookie)
- {
- 	struct dpll_pin_registration *reg;
- 	struct dpll_pin_ref *ref;
-@@ -128,7 +134,7 @@ static int dpll_xa_ref_pin_del(struct xarray *xa_pins, struct dpll_pin *pin,
- 	xa_for_each(xa_pins, i, ref) {
- 		if (ref->pin != pin)
- 			continue;
--		reg = dpll_pin_registration_find(ref, ops, priv);
-+		reg = dpll_pin_registration_find(ref, ops, priv, cookie);
- 		if (WARN_ON(!reg))
- 			return -EINVAL;
- 		list_del(&reg->list);
-@@ -146,7 +152,7 @@ static int dpll_xa_ref_pin_del(struct xarray *xa_pins, struct dpll_pin *pin,
- 
- static int
- dpll_xa_ref_dpll_add(struct xarray *xa_dplls, struct dpll_device *dpll,
--		     const struct dpll_pin_ops *ops, void *priv)
-+		     const struct dpll_pin_ops *ops, void *priv, void *cookie)
- {
- 	struct dpll_pin_registration *reg;
- 	struct dpll_pin_ref *ref;
-@@ -157,7 +163,7 @@ dpll_xa_ref_dpll_add(struct xarray *xa_dplls, struct dpll_device *dpll,
- 	xa_for_each(xa_dplls, i, ref) {
- 		if (ref->dpll != dpll)
- 			continue;
--		reg = dpll_pin_registration_find(ref, ops, priv);
-+		reg = dpll_pin_registration_find(ref, ops, priv, cookie);
- 		if (reg) {
- 			refcount_inc(&ref->refcount);
- 			return 0;
-@@ -190,6 +196,7 @@ dpll_xa_ref_dpll_add(struct xarray *xa_dplls, struct dpll_device *dpll,
- 	}
- 	reg->ops = ops;
- 	reg->priv = priv;
-+	reg->cookie = cookie;
- 	if (ref_exists)
- 		refcount_inc(&ref->refcount);
- 	list_add_tail(&reg->list, &ref->registration_list);
-@@ -199,7 +206,7 @@ dpll_xa_ref_dpll_add(struct xarray *xa_dplls, struct dpll_device *dpll,
- 
- static void
- dpll_xa_ref_dpll_del(struct xarray *xa_dplls, struct dpll_device *dpll,
--		     const struct dpll_pin_ops *ops, void *priv)
-+		     const struct dpll_pin_ops *ops, void *priv, void *cookie)
- {
- 	struct dpll_pin_registration *reg;
- 	struct dpll_pin_ref *ref;
-@@ -208,7 +215,7 @@ dpll_xa_ref_dpll_del(struct xarray *xa_dplls, struct dpll_device *dpll,
- 	xa_for_each(xa_dplls, i, ref) {
- 		if (ref->dpll != dpll)
- 			continue;
--		reg = dpll_pin_registration_find(ref, ops, priv);
-+		reg = dpll_pin_registration_find(ref, ops, priv, cookie);
- 		if (WARN_ON(!reg))
- 			return;
- 		list_del(&reg->list);
-@@ -594,14 +601,14 @@ EXPORT_SYMBOL_GPL(dpll_pin_put);
- 
- static int
- __dpll_pin_register(struct dpll_device *dpll, struct dpll_pin *pin,
--		    const struct dpll_pin_ops *ops, void *priv)
-+		    const struct dpll_pin_ops *ops, void *priv, void *cookie)
- {
- 	int ret;
- 
--	ret = dpll_xa_ref_pin_add(&dpll->pin_refs, pin, ops, priv);
-+	ret = dpll_xa_ref_pin_add(&dpll->pin_refs, pin, ops, priv, cookie);
- 	if (ret)
- 		return ret;
--	ret = dpll_xa_ref_dpll_add(&pin->dpll_refs, dpll, ops, priv);
-+	ret = dpll_xa_ref_dpll_add(&pin->dpll_refs, dpll, ops, priv, cookie);
- 	if (ret)
- 		goto ref_pin_del;
- 	xa_set_mark(&dpll_pin_xa, pin->id, DPLL_REGISTERED);
-@@ -610,7 +617,7 @@ __dpll_pin_register(struct dpll_device *dpll, struct dpll_pin *pin,
- 	return ret;
- 
- ref_pin_del:
--	dpll_xa_ref_pin_del(&dpll->pin_refs, pin, ops, priv);
-+	dpll_xa_ref_pin_del(&dpll->pin_refs, pin, ops, priv, cookie);
- 	return ret;
- }
- 
-@@ -642,7 +649,7 @@ dpll_pin_register(struct dpll_device *dpll, struct dpll_pin *pin,
- 		      dpll->clock_id == pin->clock_id)))
- 		ret = -EINVAL;
- 	else
--		ret = __dpll_pin_register(dpll, pin, ops, priv);
-+		ret = __dpll_pin_register(dpll, pin, ops, priv, NULL);
- 	mutex_unlock(&dpll_lock);
- 
- 	return ret;
-@@ -651,11 +658,11 @@ EXPORT_SYMBOL_GPL(dpll_pin_register);
- 
- static void
- __dpll_pin_unregister(struct dpll_device *dpll, struct dpll_pin *pin,
--		      const struct dpll_pin_ops *ops, void *priv)
-+		      const struct dpll_pin_ops *ops, void *priv, void *cookie)
- {
- 	ASSERT_DPLL_PIN_REGISTERED(pin);
--	dpll_xa_ref_pin_del(&dpll->pin_refs, pin, ops, priv);
--	dpll_xa_ref_dpll_del(&pin->dpll_refs, dpll, ops, priv);
-+	dpll_xa_ref_pin_del(&dpll->pin_refs, pin, ops, priv, cookie);
-+	dpll_xa_ref_dpll_del(&pin->dpll_refs, dpll, ops, priv, cookie);
- 	if (xa_empty(&pin->dpll_refs))
- 		xa_clear_mark(&dpll_pin_xa, pin->id, DPLL_REGISTERED);
- }
-@@ -680,7 +687,7 @@ void dpll_pin_unregister(struct dpll_device *dpll, struct dpll_pin *pin,
- 
- 	mutex_lock(&dpll_lock);
- 	dpll_pin_delete_ntf(pin);
--	__dpll_pin_unregister(dpll, pin, ops, priv);
-+	__dpll_pin_unregister(dpll, pin, ops, priv, NULL);
- 	mutex_unlock(&dpll_lock);
- }
- EXPORT_SYMBOL_GPL(dpll_pin_unregister);
-@@ -716,12 +723,12 @@ int dpll_pin_on_pin_register(struct dpll_pin *parent, struct dpll_pin *pin,
- 		return -EINVAL;
- 
- 	mutex_lock(&dpll_lock);
--	ret = dpll_xa_ref_pin_add(&pin->parent_refs, parent, ops, priv);
-+	ret = dpll_xa_ref_pin_add(&pin->parent_refs, parent, ops, priv, pin);
- 	if (ret)
- 		goto unlock;
- 	refcount_inc(&pin->refcount);
- 	xa_for_each(&parent->dpll_refs, i, ref) {
--		ret = __dpll_pin_register(ref->dpll, pin, ops, priv);
-+		ret = __dpll_pin_register(ref->dpll, pin, ops, priv, parent);
- 		if (ret) {
- 			stop = i;
- 			goto dpll_unregister;
-@@ -735,11 +742,12 @@ int dpll_pin_on_pin_register(struct dpll_pin *parent, struct dpll_pin *pin,
- dpll_unregister:
- 	xa_for_each(&parent->dpll_refs, i, ref)
- 		if (i < stop) {
--			__dpll_pin_unregister(ref->dpll, pin, ops, priv);
-+			__dpll_pin_unregister(ref->dpll, pin, ops, priv,
-+					      parent);
- 			dpll_pin_delete_ntf(pin);
- 		}
- 	refcount_dec(&pin->refcount);
--	dpll_xa_ref_pin_del(&pin->parent_refs, parent, ops, priv);
-+	dpll_xa_ref_pin_del(&pin->parent_refs, parent, ops, priv, pin);
- unlock:
- 	mutex_unlock(&dpll_lock);
- 	return ret;
-@@ -764,10 +772,10 @@ void dpll_pin_on_pin_unregister(struct dpll_pin *parent, struct dpll_pin *pin,
- 
- 	mutex_lock(&dpll_lock);
- 	dpll_pin_delete_ntf(pin);
--	dpll_xa_ref_pin_del(&pin->parent_refs, parent, ops, priv);
-+	dpll_xa_ref_pin_del(&pin->parent_refs, parent, ops, priv, pin);
- 	refcount_dec(&pin->refcount);
- 	xa_for_each(&pin->dpll_refs, i, ref)
--		__dpll_pin_unregister(ref->dpll, pin, ops, priv);
-+		__dpll_pin_unregister(ref->dpll, pin, ops, priv, parent);
- 	mutex_unlock(&dpll_lock);
- }
- EXPORT_SYMBOL_GPL(dpll_pin_on_pin_unregister);
-
-base-commit: 80e679b352c3ce5158f3f778cfb77eb767e586fb
--- 
-2.38.1
+--=20
+Sabrina
 
 
