@@ -1,164 +1,228 @@
-Return-Path: <netdev+bounces-91119-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91120-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5439B8B1711
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 01:31:00 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38DD88B1744
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 01:38:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C02471F2243C
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 23:30:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5499BB273A6
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 23:38:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46CE716F0E2;
-	Wed, 24 Apr 2024 23:30:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 870E516EBEF;
+	Wed, 24 Apr 2024 23:37:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="PuaOvteq"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="A/Y3/0rF";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="6zWxk48u";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="A/Y3/0rF";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="6zWxk48u"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f182.google.com (mail-oi1-f182.google.com [209.85.167.182])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3A4316F0C6
-	for <netdev@vger.kernel.org>; Wed, 24 Apr 2024 23:30:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DB092901;
+	Wed, 24 Apr 2024 23:37:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714001454; cv=none; b=SHes+QhZn4uNtyrCDVBEliCDDKL1waU1bfuqAslZLw3gr8fusGmJG5VOHEw7M2QEgJw/SKNopidiru4LC3OdiCCckIiD8aqQgN/P//BNFeO6kAms0bjP8AEAS6bOVTWVNwRoN07i4HQIFUgNbRL9KdJ1knI3r6UPbeabZpxP13Q=
+	t=1714001877; cv=none; b=RGar4a6mby8wZKYHTUoPMKSjzF3/n2uate0rUy3BhJDwBP2ZX0tBgOl3Yehsy68Fo1JAfWrMKmVcBo7ZgzVBpBKPQ5Hw+m7bBRW8+73yKLn21UON503EGO6Is9eZGyHmcvfyaoNFpcziJjgzZFumWBSwIvNxS/K2mwXQXlX+9jE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714001454; c=relaxed/simple;
-	bh=oH09D5zkFXRFNfU7QJiNFf+gIh+lrRtBdFHPc4eg0Ho=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=q+rvZWCwCacAIqgZhT96gaWWmWvxxxlPptWkvCHiKCglTuUCtts2rNavcdVc0hZ/h55CY3g+KtKbAAAu2rRRDZqC/nDUIAkQTIwNscTEDKgaG3CJLYMkylPzrTlmM4fSY9SH8rnOwUz42+Qe15HxhB11aIiPVTiSi8SI2NjCdt8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=PuaOvteq; arc=none smtp.client-ip=209.85.167.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
-Received: by mail-oi1-f182.google.com with SMTP id 5614622812f47-3c751bf249cso296537b6e.2
-        for <netdev@vger.kernel.org>; Wed, 24 Apr 2024 16:30:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1714001452; x=1714606252; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=pwtnqARf0+6Z9GG1dv72c6Df9XT02q1HeJoWwzmw6v8=;
-        b=PuaOvteq0mMRgO3Jlb2dgmiCdAPFB3Btc8zIHX74LLL3fcOxKUNDdejxB4uqBY5JPG
-         gzeSqc5Q6og7ag+mA85KLwOLD2cgygAFMqFSk4UJczXMpWloJJYfcMV9Dq0DpY7UpbE3
-         IpKBWIDyFj1vZDAhupVMhZaYLMQxGDePYUc5Y=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714001452; x=1714606252;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pwtnqARf0+6Z9GG1dv72c6Df9XT02q1HeJoWwzmw6v8=;
-        b=Z1kj9u1sv0VbHmIWiYptywgRHua5dM1iESMml2a/2H+T9rPI9TWWLzkSTpLWLxE6LM
-         +ZAZu8ZdZglFU3af+DSdWbecCndjvGoZaDjJ+L8iC1KQxG3TvmKnb47BNwX3R6N1hmoS
-         kzTumxUrFcJ+KA02HLFedkwjUhBsoh91FFwO1qRRU09/h4IyYjri8MXVRscw3VXIxyt7
-         yOSe1x3x/aC7oS9d/NEROwmWzPPjntukwGdYEvXlj212JU2et11B9SeorhCbOfPqMU8f
-         yWtbi9buK19/akQa5F15KTLpdSZbycU3uaU1UYj27GyvQ7qWPmIZ73QxG6zlWO2+0LhK
-         i0ww==
-X-Forwarded-Encrypted: i=1; AJvYcCVzFyV+GVF2LUGn5UX8iEy/tHnORt7XKLBmCpnUC+/s1va2NqDkD5qsTbXz6MMQdWEFuGZUHE1baE7s9RaKuytN8LIwZB47
-X-Gm-Message-State: AOJu0YzQYDzImWHhmpWQxYJNDPG7btq5A/o7187KcMTTA0pv+7ecUi95
-	GDAXYnCm4S+MeuLRExYqadZkN0/Y3n4lHp9y7vqtS7vSt4pexCBrE3PIKuBx7Q==
-X-Google-Smtp-Source: AGHT+IG1ie+7N7gLAuYGp0jXBUvNN0VNl/qnLnqCCnwse0PJuc/S/QdeclEgnM1MgF3ysfsWuiww9g==
-X-Received: by 2002:a05:6871:7410:b0:233:56e5:ff99 with SMTP id nw16-20020a056871741000b0023356e5ff99mr4180313oac.23.1714001451762;
-        Wed, 24 Apr 2024 16:30:51 -0700 (PDT)
-Received: from www.outflux.net ([198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id k73-20020a636f4c000000b005df41b00ee9sm600140pgc.68.2024.04.24.16.30.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Apr 2024 16:30:51 -0700 (PDT)
-Date: Wed, 24 Apr 2024 16:30:50 -0700
-From: Kees Cook <keescook@chromium.org>
-To: Peter Zijlstra <peterz@infradead.org>
-Cc: Mark Rutland <mark.rutland@arm.com>, Will Deacon <will@kernel.org>,
-	Boqun Feng <boqun.feng@gmail.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>, Jakub Kicinski <kuba@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	"Paul E. McKenney" <paulmck@kernel.org>,
-	Uros Bizjak <ubizjak@gmail.com>, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-arch@vger.kernel.org,
-	netdev@vger.kernel.org, linux-hardening@vger.kernel.org
-Subject: Re: [PATCH 1/4] locking/atomic/x86: Silence intentional wrapping
- addition
-Message-ID: <202404241621.8286B8A@keescook>
-References: <20240424191225.work.780-kees@kernel.org>
- <20240424191740.3088894-1-keescook@chromium.org>
- <20240424224141.GX40213@noisy.programming.kicks-ass.net>
- <202404241542.6AFC3042C1@keescook>
- <20240424225436.GY40213@noisy.programming.kicks-ass.net>
- <20240424230500.GG12673@noisy.programming.kicks-ass.net>
+	s=arc-20240116; t=1714001877; c=relaxed/simple;
+	bh=dlGWxTgg3NZ6ORKele2Vtua+TT2hu++V257pnckENVI=;
+	h=Content-Type:MIME-Version:From:To:Cc:Subject:In-reply-to:
+	 References:Date:Message-id; b=AfFbo1Ri4JpjYnWAbMbRtsol6RWrvfe/A1asSiEJxnXNBfSLLwbLk3BvX2h46EludYiXL1AVN5Dz358tdEAo8lkPXbrh1teIcrGR2KTQ7pLL1T3ISwijUNcEuYW6+A9lO3BPz5pkec5HjhtmbArR1R1pfJRVxo9SKJQSjY620L0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=A/Y3/0rF; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=6zWxk48u; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=A/Y3/0rF; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=6zWxk48u; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 2F389200FE;
+	Wed, 24 Apr 2024 23:37:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1714001868; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JBJMhiXBluHuYzKWwAs9eb5ZP9BHoBEtmUFZU7lGuvI=;
+	b=A/Y3/0rFMyU5p9LO0TfilvELBkb/cPg+gYCGk0iULy/BsEXVW+bNcUYaSJqEhcyR4z0JKG
+	d3ij0fYxTXH7OW6hryypdsPa7FOVDqHh10RQut++rzEf2ahvZTuYoSCbwP/xfc7HPfi8t+
+	smRVD9A8IWECBx00l6ONuvPf+Jz+EKQ=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1714001868;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JBJMhiXBluHuYzKWwAs9eb5ZP9BHoBEtmUFZU7lGuvI=;
+	b=6zWxk48uVQvfuC++8dufRjBi7ZYKFibKegxDwRHCB4Q0tgHxiM4nV6QlZSx3cGX4t+4sjC
+	RRvVbu4feWt7aFBQ==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b="A/Y3/0rF";
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=6zWxk48u
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1714001868; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JBJMhiXBluHuYzKWwAs9eb5ZP9BHoBEtmUFZU7lGuvI=;
+	b=A/Y3/0rFMyU5p9LO0TfilvELBkb/cPg+gYCGk0iULy/BsEXVW+bNcUYaSJqEhcyR4z0JKG
+	d3ij0fYxTXH7OW6hryypdsPa7FOVDqHh10RQut++rzEf2ahvZTuYoSCbwP/xfc7HPfi8t+
+	smRVD9A8IWECBx00l6ONuvPf+Jz+EKQ=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1714001868;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JBJMhiXBluHuYzKWwAs9eb5ZP9BHoBEtmUFZU7lGuvI=;
+	b=6zWxk48uVQvfuC++8dufRjBi7ZYKFibKegxDwRHCB4Q0tgHxiM4nV6QlZSx3cGX4t+4sjC
+	RRvVbu4feWt7aFBQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id C384D13690;
+	Wed, 24 Apr 2024 23:37:44 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([10.150.64.162])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id aiaRGciXKWawKQAAD6G6ig
+	(envelope-from <neilb@suse.de>); Wed, 24 Apr 2024 23:37:44 +0000
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240424230500.GG12673@noisy.programming.kicks-ass.net>
+From: "NeilBrown" <neilb@suse.de>
+To: "Chuck Lever III" <chuck.lever@oracle.com>
+Cc: "Chris Packham" <Chris.Packham@alliedtelesis.co.nz>,
+ "Jeff Layton" <jlayton@kernel.org>,
+ "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
+ "Linux NFS Mailing List" <linux-nfs@vger.kernel.org>,
+ "netdev" <netdev@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "stable@vger.kernel.org" <stable@vger.kernel.org>
+Subject: Re: kernel BUG at net/sunrpc/svc.c:570 after updating from v5.15.153
+ to v5.15.155
+In-reply-to: <5D19EAF8-0F65-4CD6-9378-67234D407B96@oracle.com>
+References: <>, <5D19EAF8-0F65-4CD6-9378-67234D407B96@oracle.com>
+Date: Thu, 25 Apr 2024 09:37:31 +1000
+Message-id: <171400185158.7600.16163546434537681088@noble.neil.brown.name>
+X-Spam-Flag: NO
+X-Spam-Score: -4.51
+X-Rspamd-Action: no action
+X-Rspamd-Queue-Id: 2F389200FE
+X-Spam-Level: 
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Spamd-Result: default: False [-4.51 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ARC_NA(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim];
+	DKIM_TRACE(0.00)[suse.de:+]
 
-On Thu, Apr 25, 2024 at 01:05:00AM +0200, Peter Zijlstra wrote:
-> On Thu, Apr 25, 2024 at 12:54:36AM +0200, Peter Zijlstra wrote:
-> > On Wed, Apr 24, 2024 at 03:45:07PM -0700, Kees Cook wrote:
-> > > On Thu, Apr 25, 2024 at 12:41:41AM +0200, Peter Zijlstra wrote:
-> > > > On Wed, Apr 24, 2024 at 12:17:34PM -0700, Kees Cook wrote:
-> > > > 
-> > > > > @@ -82,7 +83,7 @@ static __always_inline bool arch_atomic_add_negative(int i, atomic_t *v)
-> > > > >  
-> > > > >  static __always_inline int arch_atomic_add_return(int i, atomic_t *v)
-> > > > >  {
-> > > > > -	return i + xadd(&v->counter, i);
-> > > > > +	return wrapping_add(int, i, xadd(&v->counter, i));
-> > > > >  }
-> > > > >  #define arch_atomic_add_return arch_atomic_add_return
-> > > > 
-> > > > this is going to get old *real* quick :-/
-> > > > 
-> > > > This must be the ugliest possible way to annotate all this, and then
-> > > > litter the kernel with all this... urgh.
-> > > 
-> > > I'm expecting to have explicit wrapping type annotations soon[1], but for
-> > > the atomics, it's kind of a wash on how intrusive the annotations get. I
-> > > had originally wanted to mark the function (as I did in other cases)
-> > > rather than using the helper, but Mark preferred it this way. I'm happy
-> > > to do whatever! :)
-> > > 
-> > > -Kees
-> > > 
-> > > [1] https://github.com/llvm/llvm-project/pull/86618
-> > 
-> > This is arse-about-face. Signed stuff wraps per -fno-strict-overflow.
-> > We've been writing code for years under that assumption.
-> > 
-> > You want to mark the non-wrapping case.
-> 
-> That is, anything that actively warns about signed overflow when build
-> with -fno-strict-overflow is a bug. If you want this warning you have to
-> explicitly mark things.
+On Thu, 25 Apr 2024, Chuck Lever III wrote:
+>=20
+> > On Apr 24, 2024, at 9:33=E2=80=AFAM, Chuck Lever III <chuck.lever@oracle.=
+com> wrote:
+> >=20
+> >> On Apr 24, 2024, at 3:42=E2=80=AFAM, Chris Packham <Chris.Packham@allied=
+telesis.co.nz> wrote:
+> >>=20
+> >> On 24/04/24 13:38, Chris Packham wrote:
+> >>>=20
+> >>> On 24/04/24 12:54, Chris Packham wrote:
+> >>>> Hi Jeff, Chuck, Greg,
+> >>>>=20
+> >>>> After updating one of our builds along the 5.15.y LTS branch our=20
+> >>>> testing caught a new kernel bug. Output below.
+> >>>>=20
+> >>>> I haven't dug into it yet but wondered if it rang any bells.
+> >>>=20
+> >>> A bit more info. This is happening at "reboot" for us. Our embedded=20
+> >>> devices use a bit of a hacked up reboot process so that they come back =
 
-This is confusing UB with "overflow detection". We're doing the latter.
+> >>> faster in the case of a failure.
+> >>>=20
+> >>> It doesn't happen with a proper `systemctl reboot` or with a SYSRQ+B
+> >>>=20
+> >>> I can trigger it with `killall -9 nfsd` which I'm not sure is a=20
+> >>> completely legit thing to do to kernel threads but it's probably close =
 
-> Signed overflow is not UB, is not a bug.
-> 
-> Now, it might be unexpected in some places, but fundamentally we run on
-> 2s complement and expect 2s complement. If you want more, mark it so.
+> >>> to what our customized reboot does.
+> >>=20
+> >> I've bisected between v5.15.153 and v5.15.155 and identified commit=20
+> >> dec6b8bcac73 ("nfsd: Simplify code around svc_exit_thread() call in=20
+> >> nfsd()") as the first bad commit. Based on the context that seems to=20
+> >> line up with my reproduction. I'm wondering if perhaps something got=20
+> >> missed out of the stable track? Unfortunately I'm not able to run a more=
+=20
+> >> recent kernel with all of the nfs related setup that is being used on =20
+> >> the system in question.
+> >=20
+> > Thanks for bisecting, that would have been my first suggestion.
+> >=20
+> > The backport included all of the NFSD patches up to v6.2, but
+> > there might be a missing server-side SunRPC patch.
+>=20
+> So dec6b8bcac73 ("nfsd: Simplify code around svc_exit_thread()
+> call in  nfsd()") is from v6.6, so it was applied to v5.15.y
+> only to get a subsequent NFSD fix to apply.
+>=20
+> The immediately previous upstream commit is missing:
+>=20
+>   390390240145 ("nfsd: don't allow nfsd threads to be signalled.")
+>=20
+> For testing, I've applied this to my nfsd-5.15.y branch here:
+>=20
+>   https://git.kernel.org/pub/scm/linux/kernel/git/cel/linux.git
+>=20
+> However even if that fixes the reported crash, this suggests
+> that after v6.6, nfsd threads are not going to respond to
+> "killall -9 nfsd".
 
-Regular C never provided us with enough choice in types to be able to
-select the overflow resolution strategy. :( So we're stuck mixing
-expectations into our types. (One early defense you were involved in
-touched on this too: refcount_t uses a saturating overflow strategy, as
-that works best for how it gets used.)
+I think this likely is the problem.  The nfsd threads must be being
+killed by a signal.
+One only other cause for an nfsd thread to exit is if
+svc_set_num_threads() is called, and all places that call that hold a
+ref on the serv structure so the final put won't happen when the thread
+exits.
 
-Regardless, yes, someone intent on wrapping gets their expected 2s
-complement results, but in the cases were a few values started collecting
-in some dark corner of protocol handling, having a calculation wrap around
-is at best a behavioral bug and at worst a total system compromise.
-Wrapping is the uncommon case here, so we mark those.
+Before the patch that bisect found, the nfsd thread would exit with
 
--- 
-Kees Cook
+ svc_get();
+ svc_exit_thread();
+ nfsd_put();
+
+This also holds a ref across the svc_exit_thread(), and ensures the
+final 'put' happens from nfsD_put(), not svc_put() (in
+svc_exit_thread()).
+
+Chris: what was the context when the crash happened?  Could the nfsd
+threads have been signalled?  That hasn't been the standard way to stop
+nfsd threads for a long time, so I'm a little surprised that it is
+happening.
+
+NeilBrown
 
