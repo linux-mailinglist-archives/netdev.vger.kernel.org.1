@@ -1,151 +1,129 @@
-Return-Path: <netdev+bounces-90845-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90847-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CFAF8B071A
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 12:18:27 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 008178B0741
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 12:26:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4EAEB1C21BDE
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 10:18:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 93F0F1F224D4
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 10:26:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37896159216;
-	Wed, 24 Apr 2024 10:18:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0951B159576;
+	Wed, 24 Apr 2024 10:25:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [205.139.111.44])
+Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03F271591F0
-	for <netdev@vger.kernel.org>; Wed, 24 Apr 2024 10:18:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.139.111.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6256A159564
+	for <netdev@vger.kernel.org>; Wed, 24 Apr 2024 10:25:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713953902; cv=none; b=fZSSJCWY2roJf2va9Z60ioJ1q7munVaLQoeWb0eZD5ijVwKZe2/qA4ASqnfHhcqKoLcqjX07q7unGmBvuhY/8qXSI2b0fZVdy3TaZq0TxerIwvXPpyegoSmMyJSBHkKq32yx/4xK/CUTTn60Nh2zNjkJB004/78G4otgHYYDsvo=
+	t=1713954358; cv=none; b=f1upXK58cQYmDPjsdhzz+OLvvCrpb+L4E/inAiD6ZcR5XmYQ2VgrignyqCcZlsHQNoQYq41IYJCLTC+orykQDscvrfQg3S3iTeqBp05MBe7R+5cpVSZxywBB0grkAmKV09d6jlpjJuy4Yfs+ItW3kMu783RYQq5P3EerW/+bcTI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713953902; c=relaxed/simple;
-	bh=Ms/kL5uYZ8RGAy+Ewand3vQOkDQURuccLAcO7HmSPd4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 In-Reply-To:Content-Type:Content-Disposition; b=s8s+VPKa0d3gr6gIPiP3IWX5F587NJAS401321qJecw7dhUjqWQNF25nl22koNQOEXJ72thfpHMXjo4nbPl1YsrMhpzQirKU80LpGtV5g4l4P42VNsKuwJb6CQImPl2Kbvv2kFBfmjuESrOr7h8ZBJwM9CV8WHt5Mo33e0hTQec=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=none smtp.mailfrom=queasysnail.net; arc=none smtp.client-ip=205.139.111.44
+	s=arc-20240116; t=1713954358; c=relaxed/simple;
+	bh=FWHiednQjU4kARUBpZDZqKwtgPotMYVlf3yumHpaBvI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=R50oe6EI7NzSqUGIKa7XlXKgri3ozA0ZvPJ/zN8dobvoHWQ/ebTbRX7kQX2YVLWPqp0dthFpZn8wP81lbo7Vj1g1X18bG6D18RONRaUXVA9+qt2z9suhLkLq95kdc6loY2vZrASVMYtGwbIVC/MTCrTE96FTZP7YgX6Vk/aEJqE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=none smtp.mailfrom=queasysnail.net; arc=none smtp.client-ip=217.70.183.196
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=queasysnail.net
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-160-an_liTfIMIWa-05WnuWjYg-1; Wed,
- 24 Apr 2024 06:18:14 -0400
-X-MC-Unique: an_liTfIMIWa-05WnuWjYg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 187CF38049FC;
-	Wed, 24 Apr 2024 10:18:14 +0000 (UTC)
-Received: from hog (unknown [10.39.193.137])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 63AFF1C060D0;
-	Wed, 24 Apr 2024 10:18:12 +0000 (UTC)
-Date: Wed, 24 Apr 2024 12:18:11 +0200
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 43BCBE000C;
+	Wed, 24 Apr 2024 10:25:49 +0000 (UTC)
 From: Sabrina Dubroca <sd@queasysnail.net>
-To: Rahul Rameshbabu <rrameshbabu@nvidia.com>
-Cc: netdev@vger.kernel.org, stable@vger.kernel.org,
+To: netdev@vger.kernel.org
+Cc: Sabrina Dubroca <sd@queasysnail.net>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Boris Pismenny <borisp@nvidia.com>,
+	John Fastabend <john.fastabend@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	Paolo Abeni <pabeni@redhat.com>, Gal Pressman <gal@nvidia.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Yossi Kuperman <yossiku@nvidia.com>,
-	Benjamin Poirier <bpoirier@nvidia.com>,
-	Cosmin Ratiu <cratiu@nvidia.com>
-Subject: Re: [PATCH net-next 2/3] macsec: Detect if Rx skb is macsec-related
- for offloading devices that update md_dst
-Message-ID: <ZijcY_DHlmP84U4S@hog>
-References: <20240419011740.333714-1-rrameshbabu@nvidia.com>
- <20240419011740.333714-3-rrameshbabu@nvidia.com>
- <ZiKIUC6bTCDhlnRw@hog>
- <87mspp6xh7.fsf@nvidia.com>
- <ZiYseYT62ZI0-_V9@hog>
- <87plugpqrk.fsf@nvidia.com>
+	Eric Dumazet <edumazet@google.com>
+Subject: [PATCH net] tls: fix lockless read of strp->msg_ready in ->poll
+Date: Wed, 24 Apr 2024 12:25:47 +0200
+Message-ID: <0b7ee062319037cf86af6b317b3d72f7bfcd2e97.1713797701.git.sd@queasysnail.net>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <87plugpqrk.fsf@nvidia.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.7
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: queasysnail.net
-Content-Type: text/plain; charset=UTF-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: sd@queasysnail.net
 
-2024-04-22, 22:55:02 -0700, Rahul Rameshbabu wrote:
-> On Mon, 22 Apr, 2024 11:23:05 +0200 Sabrina Dubroca <sd@queasysnail.net> =
-wrote:
-> > 2024-04-19, 11:01:20 -0700, Rahul Rameshbabu wrote:
-> >> On Fri, 19 Apr, 2024 17:05:52 +0200 Sabrina Dubroca <sd@queasysnail.ne=
-t> wrote:
-> >> > 2024-04-18, 18:17:16 -0700, Rahul Rameshbabu wrote:
-> >> <snip>
-> >> >> +=09=09=09/* This datapath is insecure because it is unable to
-> >> >> +=09=09=09 * enforce isolation of broadcast/multicast traffic and
-> >> >> +=09=09=09 * unicast traffic with promiscuous mode on the macsec
-> >> >> +=09=09=09 * netdev. Since the core stack has no mechanism to
-> >> >> +=09=09=09 * check that the hardware did indeed receive MACsec
-> >> >> +=09=09=09 * traffic, it is possible that the response handling
-> >> >> +=09=09=09 * done by the MACsec port was to a plaintext packet.
-> >> >> +=09=09=09 * This violates the MACsec protocol standard.
-> >> >> +=09=09=09 */
-> >> >> +=09=09=09DEBUG_NET_WARN_ON_ONCE(true);
-> >> >
-> >> > If you insist on this warning (and I'm not convinced it's useful,
-> >> > since if the HW is already built and cannot inform the driver, there=
-'s
-> >> > nothing the driver implementer can do), I would move it somewhere in=
-to
-> >> > the config path. macsec_update_offload would be a better location fo=
-r
-> >> > this kind of warning (maybe with a pr_warn (not limited to debug
-> >> > configs) saying something like "MACsec offload on devices that don't
-> >> > support md_dst are insecure: they do not provide proper isolation of
-> >> > traffic"). The comment can stay here.
-> >> >
-> >>=20
-> >> I do not like the warning either. I left it mainly if it needed furthe=
-r
-> >> discussion on the mailing list. Will remove it in my next revision. Th=
-at
-> >> said, it may make sense to advertise rx_uses_md_dst over netlink to
-> >> annotate what macsec offload path a device uses? Just throwing out an
-> >> idea here.
-> >
-> > Maybe. I was also thinking about adding a way to restrict offloading
-> > only to devices with rx_uses_md_dst.
->=20
-> That's an option. Basically, devices that do not support rx_uses_md_dst
-> really only just do SW MACsec but do not return an error if the offload
-> parameter is passed over netlink so user scripts do not break?
+tls_sk_poll is called without locking the socket, and needs to read
+strp->msg_ready (via tls_strp_msg_ready). Convert msg_ready to a bool
+and use READ_ONCE/WRITE_ONCE where needed. The remaining reads are
+only performed when the socket is locked.
 
-Forcing a fallback to SW could be considered a breakage because of the
-performance regression, so I don't think we can turn this on by
-default. Then I would simply reject offload on those devices. We could
-have a compat mode that does the SW fallback you suggest. I don't know
-if it would be used.
+Fixes: 121dca784fc0 ("tls: suppress wakeups unless we have a full record")
+Signed-off-by: Sabrina Dubroca <sd@queasysnail.net>
+---
+ include/net/tls.h  | 3 ++-
+ net/tls/tls.h      | 2 +-
+ net/tls/tls_strp.c | 6 +++---
+ 3 files changed, 6 insertions(+), 5 deletions(-)
 
-
-> > (Slightly related) I also find it annoying that users have to tell the
-> > kernel whether to use PHY or MAC offload, but have no way to know
-> > which one their HW supports. That should probably have been an
-> > implementation detail that didn't need to be part of uapi :/
->=20
-> We could leave the phy / mac netlink keywords and introduce an "on"
-> option. We deduce whether the device is a phydev or not when on is
-> passed and set the macsec->offload flag based on that. The phy and mac
-> options for offload in ip-macsec can then be deprecated.
-
-I thought about doing exactly that, and then dropped the idea because
-it would only help with newer kernels.
-
---=20
-Sabrina
+diff --git a/include/net/tls.h b/include/net/tls.h
+index 340ad43971e4..33f657d3c051 100644
+--- a/include/net/tls.h
++++ b/include/net/tls.h
+@@ -111,7 +111,8 @@ struct tls_strparser {
+ 	u32 stopped : 1;
+ 	u32 copy_mode : 1;
+ 	u32 mixed_decrypted : 1;
+-	u32 msg_ready : 1;
++
++	bool msg_ready;
+ 
+ 	struct strp_msg stm;
+ 
+diff --git a/net/tls/tls.h b/net/tls/tls.h
+index 762f424ff2d5..e5e47452308a 100644
+--- a/net/tls/tls.h
++++ b/net/tls/tls.h
+@@ -215,7 +215,7 @@ static inline struct sk_buff *tls_strp_msg(struct tls_sw_context_rx *ctx)
+ 
+ static inline bool tls_strp_msg_ready(struct tls_sw_context_rx *ctx)
+ {
+-	return ctx->strp.msg_ready;
++	return READ_ONCE(ctx->strp.msg_ready);
+ }
+ 
+ static inline bool tls_strp_msg_mixed_decrypted(struct tls_sw_context_rx *ctx)
+diff --git a/net/tls/tls_strp.c b/net/tls/tls_strp.c
+index ca1e0e198ceb..5df08d848b5c 100644
+--- a/net/tls/tls_strp.c
++++ b/net/tls/tls_strp.c
+@@ -360,7 +360,7 @@ static int tls_strp_copyin(read_descriptor_t *desc, struct sk_buff *in_skb,
+ 	if (strp->stm.full_len && strp->stm.full_len == skb->len) {
+ 		desc->count = 0;
+ 
+-		strp->msg_ready = 1;
++		WRITE_ONCE(strp->msg_ready, 1);
+ 		tls_rx_msg_ready(strp);
+ 	}
+ 
+@@ -528,7 +528,7 @@ static int tls_strp_read_sock(struct tls_strparser *strp)
+ 	if (!tls_strp_check_queue_ok(strp))
+ 		return tls_strp_read_copy(strp, false);
+ 
+-	strp->msg_ready = 1;
++	WRITE_ONCE(strp->msg_ready, 1);
+ 	tls_rx_msg_ready(strp);
+ 
+ 	return 0;
+@@ -580,7 +580,7 @@ void tls_strp_msg_done(struct tls_strparser *strp)
+ 	else
+ 		tls_strp_flush_anchor_copy(strp);
+ 
+-	strp->msg_ready = 0;
++	WRITE_ONCE(strp->msg_ready, 0);
+ 	memset(&strp->stm, 0, sizeof(strp->stm));
+ 
+ 	tls_strp_check_rcv(strp);
+-- 
+2.43.0
 
 
