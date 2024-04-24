@@ -1,87 +1,87 @@
-Return-Path: <netdev+bounces-90766-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90767-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E8438B003B
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 05:53:26 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 293BD8B003E
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 05:55:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 531431C22827
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 03:53:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7B7D01F23A7D
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 03:55:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 277231442EF;
-	Wed, 24 Apr 2024 03:52:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BECC113BC16;
+	Wed, 24 Apr 2024 03:55:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YsXnMLS/"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RSC4oSBq"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9134085C59
-	for <netdev@vger.kernel.org>; Wed, 24 Apr 2024 03:52:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D0C0139CEB
+	for <netdev@vger.kernel.org>; Wed, 24 Apr 2024 03:55:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713930751; cv=none; b=Qqm7ztfPObbnpp8XffOlbqkloOfIHaFAoAm4L5Ny5B4sCIiNGhGcGDA7xm3SsdmGS4KtsnH9/HfJoOzE6bdKrkjzKhFHZU4/DWNBXxKe43tnxPsAZ+S9mq3gv5XJbAMLPzbeDo8De1p1kLZ+ovX5sZuu4+laEUpMy/UE57wBepE=
+	t=1713930940; cv=none; b=oARvgtV5ULXylLte0kzdfLZ/sPtsCdSQrroOBaR83Y01CJBxyFhetDToV0l46OSjAqave7NqdMeOGKoxL1CU8lwofxwCTQ+F3uRElRz9qQorK1NwZlTzZfTgzWmXVeRCQjOxlYi9wYVzHUBr2qk6aPRB0+UWtESOtRXc3exEkbs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713930751; c=relaxed/simple;
-	bh=grgr8wFdoOCKelHN0/YG8NRrSXx88B1nTn4dCXxCUnA=;
+	s=arc-20240116; t=1713930940; c=relaxed/simple;
+	bh=KKcgxasDyJFXqv/hgRIywTzUidpY5yGFOfGd8BXBmas=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mNX1638/sB4mxEXhUUfGgJtUcSejGO6UvGF3ntWz1DfGF3alDOUlKzaQTA1958/pz7B+5uOBJy4WANaRdJVKGD9Vgeb9MEVoquLyW416T4zFMKv1JMWFyqesAYAPipcQwacjSOdf/C+78EddmOWj9hPcL0FBRNmzhpHpGOM5D9M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YsXnMLS/; arc=none smtp.client-ip=170.10.133.124
+	 To:Cc:Content-Type; b=CSeXMOwJbfsJ1vsLvbdP2a7887f/7qnC3HjT+7OkFTGLvg+8HpTBDxBq5+4u37UnMJWeD0NNr5/7JqxfctLeX+XBDczrdCJAipNq6Mwm7jQNZupccdoL2bYHGKjJjW+jKiDj36xwCqckZSVL0qaDUUEfdaQocHj9U1uwBM4Ef3o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RSC4oSBq; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1713930748;
+	s=mimecast20190719; t=1713930938;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=xJbnHKMdDBEsQMRLBXg/P+JcLGfgFupAvDL3tdrY4dk=;
-	b=YsXnMLS/wDVCN+7ictbVWKro5FOPRT+orrqKBW04uzuhvFWN75Q4uiFeDGs8NADG/ppp4a
-	LXUgw/c702sHVH0UNgC5Y+QQlgHWc3FyR3FWcq5YkFqgnDSY1YEtz8XbhInFsCP9e8q17R
-	HVa29b+X7w0bsqt4npoeqva8csL2y7g=
-Received: from mail-pg1-f198.google.com (mail-pg1-f198.google.com
- [209.85.215.198]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=3pzndRW90+wqE5EwVxS+cBCK5mYVppdbl6Yx4ow+tjY=;
+	b=RSC4oSBqXty50/kp0tewl1tu8bXMjKWtLu3BdvjkGA84D1ZU0KxBjw0axBbDxcfElvNqQj
+	qwwvkllkgvUlKf/4KcxmKfpDu9ED/yfyRhNR6lAoMHiheDJDz+a32C0ciDj++Vl21j1LZ7
+	vaycnXbR8q507N7IMw8QS5mZOlTCHGY=
+Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com
+ [209.85.214.200]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-636-pbqCAd2IPHSmhH2zw7ns5w-1; Tue, 23 Apr 2024 23:52:27 -0400
-X-MC-Unique: pbqCAd2IPHSmhH2zw7ns5w-1
-Received: by mail-pg1-f198.google.com with SMTP id 41be03b00d2f7-5cdfd47de98so6790164a12.1
-        for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 20:52:26 -0700 (PDT)
+ us-mta-259-4FsdwDi_OCaBoanF2mdQEA-1; Tue, 23 Apr 2024 23:55:36 -0400
+X-MC-Unique: 4FsdwDi_OCaBoanF2mdQEA-1
+Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-1e2c0d3eadeso76017575ad.0
+        for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 20:55:36 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713930746; x=1714535546;
+        d=1e100.net; s=20230601; t=1713930936; x=1714535736;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=xJbnHKMdDBEsQMRLBXg/P+JcLGfgFupAvDL3tdrY4dk=;
-        b=H8QbB5kRG9ceUGpzzipCLw2axDFV6b8n3JpQKclFqn3i6Y++nlDD2XeFHlyPMdBjl/
-         gAKvw88MfSXgeLth/PXZwhbRwT07FjHQt+wBdn55h+8YJVv0f0h3u3z0o3PmvIoGzIvZ
-         EWPhCqjcXHr91DxdTp8RjL34ueUnWnHBxKJrcio/pu4pibbWhFyNr+zPGdizM9b6/Xx9
-         Y1eQHzPacncjkaCNpSkRkPNEUtjqoMiBaMSAps3AZnnWpoPAuPa03yd0rg/rEFhFgr1f
-         FEEg4QDu0EAJ9SM+Xh+s7tKW2eOoLmbrkIC/NaZ8Q5kUaQHV+cF5VTcrZhaj3DwqwEaD
-         uiUQ==
-X-Gm-Message-State: AOJu0YwERPHgaPhOBNDEy6GbwIl1ZT+hdaEzMavcPv0XxsGND9A3WcHl
-	7fpeUy+jeMiQY4Hz1ryjM0yed7LK1fcGu4X6Hb9IlG/fsta/IC1H8hdyU6y2hvILyyCKAa528pu
-	nMTKClMSzrfizf8DQqtbiLzNz0GXrQjeuOJjjSfBvh3XiIYUYfOGWLnk321mVvRcoLPLE8BAj3R
-	qk1XAaT6TxRJ6OP5DDx3QJFmY2JSzz
-X-Received: by 2002:a05:6a20:9187:b0:1aa:118c:22cd with SMTP id v7-20020a056a20918700b001aa118c22cdmr1538202pzd.62.1713930746039;
-        Tue, 23 Apr 2024 20:52:26 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGA+deojCMQ8Z7djFD6weadRa90BTPWmlecKHcAHl1rKT0HigiYFO4WsDxVxXKywA17hDJwnoWBOWI53prC8JI=
-X-Received: by 2002:a05:6a20:9187:b0:1aa:118c:22cd with SMTP id
- v7-20020a056a20918700b001aa118c22cdmr1538188pzd.62.1713930745714; Tue, 23 Apr
- 2024 20:52:25 -0700 (PDT)
+        bh=3pzndRW90+wqE5EwVxS+cBCK5mYVppdbl6Yx4ow+tjY=;
+        b=ddQe3XbzMqJn9mE6vGaev+2lJa1fm6+IucEnl/V5lp8zsm9vDGnYQLXeUdslVl8Du1
+         JMsMg0+eVKlz34k/9ZlkvWR3kZpCvj2mIg1As2Xti2nJQkZKrIxQfTC5QIZ88uCzpIuQ
+         9PonR3xcx84go26WNhGGo/PBV+MdHm1lcnrEcrAZKMx6v46mclsc0c0yhzdzvjuRbZcv
+         hTqtXOa6lTHAnKqQYNRPpFVOkIA9cCZcy7lZ6HVaKFtJk8nTGZFy7Nj6+PI8DfLUv0me
+         sYBrg60NpVMrwfiRf7uO2qEE8kqTd3GAuFZISB8375mJ55VJ6czyxLDFMlDIAOFzq3IG
+         7Qqg==
+X-Gm-Message-State: AOJu0YwpRS9+CStDVbb8zOuZj03GqK//dKgrxfV29OPORSni5NsD3XtM
+	SVSk3mcb/H/F24BSA5zmu83c+DqsJq/G2seDxYBT5L+6jaSXjQfdmdR0mYbvvBSilRZxYrwVTip
+	NUzerYMmACDQLthG2OViIKS0X7uE06NdIZttpEoyEn5Mk1f6QHdkMCxZpBn4XmgkOLlrJ8OjEM2
+	5I+zFBS1gipMppRxeZe06+/PiqtmDZ
+X-Received: by 2002:a17:902:9897:b0:1e2:82fc:bf71 with SMTP id s23-20020a170902989700b001e282fcbf71mr1296392plp.22.1713930935681;
+        Tue, 23 Apr 2024 20:55:35 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGgSdtzrZUnBDlB/5t9CYlcaU1yJjdPtWZ7q9A2G3rYLw3S9Y2o9HHDb07alKkZ1waM2Madn5EeKEjJMNpAHkY=
+X-Received: by 2002:a17:902:9897:b0:1e2:82fc:bf71 with SMTP id
+ s23-20020a170902989700b001e282fcbf71mr1296382plp.22.1713930935374; Tue, 23
+ Apr 2024 20:55:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240423113141.1752-1-xuanzhuo@linux.alibaba.com> <20240423113141.1752-6-xuanzhuo@linux.alibaba.com>
-In-Reply-To: <20240423113141.1752-6-xuanzhuo@linux.alibaba.com>
+References: <20240423113141.1752-1-xuanzhuo@linux.alibaba.com> <20240423113141.1752-7-xuanzhuo@linux.alibaba.com>
+In-Reply-To: <20240423113141.1752-7-xuanzhuo@linux.alibaba.com>
 From: Jason Wang <jasowang@redhat.com>
-Date: Wed, 24 Apr 2024 11:52:12 +0800
-Message-ID: <CACGkMEvaJuujaXoJ3jnvMFYX1-CnXH7cUEz4KbXivgEmt=OUxA@mail.gmail.com>
-Subject: Re: [PATCH net-next v6 5/8] virtio_net: add the total stats field
+Date: Wed, 24 Apr 2024 11:55:24 +0800
+Message-ID: <CACGkMEvoOqcazXxAt6KwShwJxtn=Z-sF7-yZr+JcUGL3Vk=S7g@mail.gmail.com>
+Subject: Re: [PATCH net-next v6 6/8] virtio_net: rename stat tx_timeout to timeout
 To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
 Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
 	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
@@ -90,114 +90,82 @@ Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
 	Stanislav Fomichev <sdf@google.com>, Amritha Nambiar <amritha.nambiar@intel.com>, 
 	Larysa Zaremba <larysa.zaremba@intel.com>, Sridhar Samudrala <sridhar.samudrala@intel.com>, 
 	Maciej Fijalkowski <maciej.fijalkowski@intel.com>, virtualization@lists.linux.dev, 
-	bpf@vger.kernel.org
+	bpf@vger.kernel.org, Jiri Pirko <jiri@nvidia.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 On Tue, Apr 23, 2024 at 7:32=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba.c=
 om> wrote:
 >
-> Now, we just show the stats of every queue.
+> Now, we have this:
 >
-> But for the user, the total values of every stat may are valuable.
+>     tx_queue_0_tx_timeouts
 >
-> NIC statistics:
->      rx_packets: 373522
->      rx_bytes: 85919736
->      rx_drops: 0
->      rx_xdp_packets: 0
->      rx_xdp_tx: 0
->      rx_xdp_redirects: 0
->      rx_xdp_drops: 0
->      rx_kicks: 11125
->      rx_hw_notifications: 0
->      rx_hw_packets: 1325870
->      rx_hw_bytes: 263348963
->      rx_hw_interrupts: 0
->      rx_hw_drops: 1451
->      rx_hw_drop_overruns: 0
->      rx_hw_csum_valid: 1325870
->      rx_hw_needs_csum: 1325870
->      rx_hw_csum_none: 0
->      rx_hw_csum_bad: 0
->      rx_hw_ratelimit_packets: 0
->      rx_hw_ratelimit_bytes: 0
->      tx_packets: 10050
->      tx_bytes: 1230176
->      tx_xdp_tx: 0
->      tx_xdp_tx_drops: 0
->      tx_kicks: 10050
->      tx_timeouts: 0
->      tx_hw_notifications: 0
->      tx_hw_packets: 32281
->      tx_hw_bytes: 4315590
->      tx_hw_interrupts: 0
->      tx_hw_drops: 0
->      tx_hw_drop_malformed: 0
->      tx_hw_csum_none: 0
->      tx_hw_needs_csum: 32281
->      tx_hw_ratelimit_packets: 0
->      tx_hw_ratelimit_bytes: 0
->      rx0_packets: 373522
->      rx0_bytes: 85919736
->      rx0_drops: 0
->      rx0_xdp_packets: 0
->      rx0_xdp_tx: 0
->      rx0_xdp_redirects: 0
->      rx0_xdp_drops: 0
->      rx0_kicks: 11125
->      rx0_hw_notifications: 0
->      rx0_hw_packets: 1325870
->      rx0_hw_bytes: 263348963
->      rx0_hw_interrupts: 0
->      rx0_hw_drops: 1451
->      rx0_hw_drop_overruns: 0
->      rx0_hw_csum_valid: 1325870
->      rx0_hw_needs_csum: 1325870
->      rx0_hw_csum_none: 0
->      rx0_hw_csum_bad: 0
->      rx0_hw_ratelimit_packets: 0
->      rx0_hw_ratelimit_bytes: 0
->      tx0_packets: 10050
->      tx0_bytes: 1230176
->      tx0_xdp_tx: 0
->      tx0_xdp_tx_drops: 0
->      tx0_kicks: 10050
->      tx0_timeouts: 0
->      tx0_hw_notifications: 0
->      tx0_hw_packets: 32281
->      tx0_hw_bytes: 4315590
->      tx0_hw_interrupts: 0
->      tx0_hw_drops: 0
->      tx0_hw_drop_malformed: 0
->      tx0_hw_csum_none: 0
->      tx0_hw_needs_csum: 32281
->      tx0_hw_ratelimit_packets: 0
->      tx0_hw_ratelimit_bytes: 0
+> This is used to record the tx schedule timeout.
+> But this has two "tx". I think the below is enough.
+>
+>     tx_queue_0_timeouts
+>
+> So I rename this field.
 >
 > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 > ---
->  drivers/net/virtio_net.c | 81 ++++++++++++++++++++++++++++++++++------
->  1 file changed, 69 insertions(+), 12 deletions(-)
+>  drivers/net/virtio_net.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
 >
 > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index 6d24cd8fb15f..8a4d22f5f5b1 100644
+> index 8a4d22f5f5b1..51ce2308f4f5 100644
 > --- a/drivers/net/virtio_net.c
 > +++ b/drivers/net/virtio_net.c
-> @@ -3344,14 +3344,15 @@ static void virtnet_stats_sprintf(u8 **p, const c=
-har *fmt, const char *noq_fmt,
->         }
->  }
+> @@ -87,7 +87,7 @@ struct virtnet_sq_stats {
+>         u64_stats_t xdp_tx;
+>         u64_stats_t xdp_tx_drops;
+>         u64_stats_t kicks;
+> -       u64_stats_t tx_timeouts;
+> +       u64_stats_t timeouts;
+>  };
 >
-> +/* qid =3D=3D -1: for rx/tx queue total field */
->  static void virtnet_get_stats_string(struct virtnet_info *vi, int type, =
-int qid, u8 **data)
+>  struct virtnet_rq_stats {
+> @@ -111,7 +111,7 @@ static const struct virtnet_stat_desc virtnet_sq_stat=
+s_desc[] =3D {
+>         VIRTNET_SQ_STAT("xdp_tx",       xdp_tx),
+>         VIRTNET_SQ_STAT("xdp_tx_drops", xdp_tx_drops),
+>         VIRTNET_SQ_STAT("kicks",        kicks),
+> -       VIRTNET_SQ_STAT("tx_timeouts",  tx_timeouts),
+> +       VIRTNET_SQ_STAT("timeouts",     timeouts),
 
-Nit: -1 for all seems to be a wired API, could we have the caller to
-iterate the possible qid?
-
-Other parts look good.
+Not sure if it is too late to do this as it is noticeable by the userspace.
 
 Thanks
+
+>  };
+>
+>  static const struct virtnet_stat_desc virtnet_rq_stats_desc[] =3D {
+> @@ -2691,7 +2691,7 @@ static void virtnet_stats(struct net_device *dev,
+>                         start =3D u64_stats_fetch_begin(&sq->stats.syncp)=
+;
+>                         tpackets =3D u64_stats_read(&sq->stats.packets);
+>                         tbytes   =3D u64_stats_read(&sq->stats.bytes);
+> -                       terrors  =3D u64_stats_read(&sq->stats.tx_timeout=
+s);
+> +                       terrors  =3D u64_stats_read(&sq->stats.timeouts);
+>                 } while (u64_stats_fetch_retry(&sq->stats.syncp, start));
+>
+>                 do {
+> @@ -4639,7 +4639,7 @@ static void virtnet_tx_timeout(struct net_device *d=
+ev, unsigned int txqueue)
+>         struct netdev_queue *txq =3D netdev_get_tx_queue(dev, txqueue);
+>
+>         u64_stats_update_begin(&sq->stats.syncp);
+> -       u64_stats_inc(&sq->stats.tx_timeouts);
+> +       u64_stats_inc(&sq->stats.timeouts);
+>         u64_stats_update_end(&sq->stats.syncp);
+>
+>         netdev_err(dev, "TX timeout on queue: %u, sq: %s, vq: 0x%x, name:=
+ %s, %u usecs ago\n",
+> --
+> 2.32.0.3.g01195cf9f
+>
 
 
