@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-90862-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90861-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BEED08B0809
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 13:10:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3F3A8B0808
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 13:10:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ED5BD1C20988
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7B8EA1F21EB9
 	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 11:10:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 768A8159919;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7094A15990D;
 	Wed, 24 Apr 2024 11:10:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bVAGBNaM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pF368SZG"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B2DC13DDD9;
-	Wed, 24 Apr 2024 11:10:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B3291598FB
+	for <netdev@vger.kernel.org>; Wed, 24 Apr 2024 11:10:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713957027; cv=none; b=LCxHOaftmUEMIDrjwUJSDqp4hvYtX+6n7hHt75PtIlCKEwRHkv/EA3aLwO8apF9L1TbNEeKKvs98GXw3CBVeZs8THtMGWr1tN+7RiB/CDdy5DIMxHUWD4VQsslNZlJ6Ut/ISy04jKrBRa1ZytNLKCwhsNQxCzV6iyZCM3TJpsa8=
+	t=1713957027; cv=none; b=RuMWzyy7L58HyBGeCLDevM6Tz0Fn63+UHzrRfO4J6k/pnl/HYD1ul9NIHNWGl6VAlu+Rfkdo5OfSbGrD/Zu2dZsuTXszWwVz7QXaUaVnXDIuy5eMeuHJZYJqc83oYW0KnCEynQC9Hgpts7I6OOFJHtTVYY0ImzlORkmARfg4Mr8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1713957027; c=relaxed/simple;
-	bh=Ckxhz825vmza6vvWz/TLutSmlDWafm3SUwU+g4hqtAQ=;
+	bh=POdpAEQEe7fm2Px+29yIGpY1QIdZp0GUCLx43IaRMkE=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=A71NK1CgqxgdJFEx51u1hEQwRZMh/B5fPAbC8i+AHoP1BCPj71c/rYvQBZam0gBOyrCdur5EKV9BUTL20NmROHDplRZSTdD3AdUnZp/RWYWWBP3VO9f3G3AcxxGaJ4EdMbRUf9mcuPWBatpFLb2hoFJZsrJ9LRlCbYcGfIcbNaE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bVAGBNaM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id E210BC32781;
+	 In-Reply-To:To:Cc; b=D2NXz67mmga6CmS4lBQfDCxlkSCdQA8Npe5wC26zPlsmBHfut+Z4PjWZ1BKqL50B8LzYfv+tWC5poTvdPJ17oidheCc/ndoDLaV803ky6aYiA1eFIg+dtNAR8Y1tZa7bifyP6lXrnXxKr4dGrxsgxxvzuc+TcMxzKEk8Z1JbykI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pF368SZG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id ED799C2BD10;
 	Wed, 24 Apr 2024 11:10:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713957026;
-	bh=Ckxhz825vmza6vvWz/TLutSmlDWafm3SUwU+g4hqtAQ=;
+	s=k20201202; t=1713957027;
+	bh=POdpAEQEe7fm2Px+29yIGpY1QIdZp0GUCLx43IaRMkE=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=bVAGBNaM7DF00r6IsRzTLUj8CSJoy9XYR8ymyWFycWjZFrAU5SQq81tGhcuF2U/PC
-	 eUKTwL0QBd9POnCBbt8hJ9uLWdFYiP30TmXHtXKwCdUOYyidMwCqxJn/IRevcBVjOU
-	 55o+uv9QjLsMcdxJ/cKynz16F9GJPeYzm+bZKDqKWbKnMDOkg2MoiLb3Lh5yY73Tjc
-	 lQTG3EplQ3d9F44iTDCFeGVwg71NNMOA7/oSg33U0qPK9uxkOwu0YOVMwl1a2NnGj6
-	 SwbiUdScEGocf1tJ4IL3p7Tn947X9d5nZH7VEodftC4Br2fDlxnbbOPhn8qFxLFUKP
-	 ImdVKMeFRUnJA==
+	b=pF368SZGiD9CeHMmLCcMcqZsqwdlgCdo89Cvn90YRAuAJrakaD2uLjSjgi8fw8/wd
+	 WWy124um0mKGD+Nxcl2xR4qFP0F04U/3ERfX0KHwqw5YkwY4/uLw5Jw+ruYj1ohjEQ
+	 9j/fXuXlqfzjbCiSRFnnu+yk3yiVFCMNNlLXicDaG84TF9NI2jNZrczvNvJ7gS/WUZ
+	 6LU5tXbb1tAabccP1mm/kpe7R/bNMgE+/Nr9GvcdccxvQfxdn7RWDR3B2/0nAqRs2U
+	 ISwerjd1r5fD+c2nU/7pFPtfNUFom//MtezpJ3UA0ifLke+uK9L4Hog9GJ7XDv6W46
+	 bxKvorUVT8Cbg==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id CF635C43614;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id DC91ECF21D8;
 	Wed, 24 Apr 2024 11:10:26 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,40 +52,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net: phy: mediatek-ge-soc: follow netdev LED trigger
- semantics
+Subject: Re: [PATCH] net: gtp: Fix Use-After-Free in gtp_dellink
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171395702684.12181.223647631542261480.git-patchwork-notify@kernel.org>
+ <171395702689.12181.3425991361261164457.git-patchwork-notify@kernel.org>
 Date: Wed, 24 Apr 2024 11:10:26 +0000
-References: <4983a6b197ed999808c5690d01ec1ffb4f6407b7.1713656093.git.daniel@makrotopia.org>
-In-Reply-To: <4983a6b197ed999808c5690d01ec1ffb4f6407b7.1713656093.git.daniel@makrotopia.org>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: dqfext@gmail.com, SkyLake.Huang@mediatek.com, andrew@lunn.ch,
- hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
+References: <ZiYwUnZU+50fH0SN@v4bel-B760M-AORUS-ELITE-AX>
+In-Reply-To: <ZiYwUnZU+50fH0SN@v4bel-B760M-AORUS-ELITE-AX>
+To: Hyunwoo Kim <v4bel@theori.io>
+Cc: pablo@netfilter.or, edumazet@google.com, laforge@gnumonks.org,
+ imv4bel@gmail.com, davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ osmocom-net-gprs@lists.osmocom.org, netdev@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Sun, 21 Apr 2024 01:08:31 +0100 you wrote:
-> Only blink if the link is up on a LED which is programmed to also
-> indicate link-status.
+On Mon, 22 Apr 2024 05:39:30 -0400 you wrote:
+> Since call_rcu, which is called in the hlist_for_each_entry_rcu traversal
+> of gtp_dellink, is not part of the RCU read critical section, it
+> is possible that the RCU grace period will pass during the traversal and
+> the key will be free.
 > 
-> Otherwise, if both LEDs are in use to indicate different speeds, the
-> resulting blinking being inverted on LEDs which aren't switched on at
-> a specific speed is quite counter-intuitive.
+> To prevent this, it should be changed to hlist_for_each_entry_safe.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] net: phy: mediatek-ge-soc: follow netdev LED trigger semantics
-    https://git.kernel.org/netdev/net/c/5b5f724b05c5
+  - net: gtp: Fix Use-After-Free in gtp_dellink
+    https://git.kernel.org/netdev/net/c/f2a904107ee2
 
 You are awesome, thank you!
 -- 
