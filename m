@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-90715-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90716-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 329E68AFD0C
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 02:02:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3649C8AFD25
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 02:09:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7E46EB2310B
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 00:02:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 679741C21FB3
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 00:09:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1BEA363;
-	Wed, 24 Apr 2024 00:02:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1F21634;
+	Wed, 24 Apr 2024 00:08:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="C0BEo15Q"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="4bgLlrc9"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 699C3193;
-	Wed, 24 Apr 2024 00:02:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 512EF803;
+	Wed, 24 Apr 2024 00:08:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713916971; cv=none; b=IGohGt1BUeWHK7qU9Zq7nhM5TEDbKYgE53mN2xwcrUWSauuLzbrDESDrk47hhgfpeFAOzKfuPVgdSbqiW8ykkutHS5k9x00AuT/NvXMs/Wu1W0QJCJKpbjCerkEM5mwd+H9dfOXyshoMh8GpE3QprBAtOmpS7W1XyOmPF5MiShc=
+	t=1713917324; cv=none; b=pCbyIvDzeyp6LLZcxo1fmU68B/Br28AZ02dfZ8CNa/XYSWUDUKb/YyGeBKJnYR8ze7bccAIelkfG4zTypoWkrttBZnCIqOX6hCka8tT3AhmhPFPxVpldMso6GRLzzkmhA+F8w/ClJAShG106Khhl2dSyyCnGBXqgFkWjHuSMZA8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713916971; c=relaxed/simple;
-	bh=zvEIcMVTlwJZSglb1GiKi9TnhASLIxAL9lSNUP9cJFI=;
+	s=arc-20240116; t=1713917324; c=relaxed/simple;
+	bh=qesWVnD2Ad3ta6cw21DlBfTA+jZa4ZaJdbNCsj04dqE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZDoNDcPO+mxgn2TnALIBNzB7yV1TbQI1sNdkm3VTO0ZDLLlqRB91i0+WpRx+FRTN6U48syqnU/q9b4itNWGtwcj0hddAl5FeV2xWnARHjTBfAZUzbeEONK4fJRSa556tgI8hr6yJxlJAbekudSI12r1QPUsWmjEGu9JNpvcrX10=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=C0BEo15Q; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=jhi9DeCe0pLX8+sPOUc7X5cFPs+WkCWT3fzyooMaU3Ivl5JN812yQ+tubbA/GuC74W2pimEmNeOSbT9GltA98WYhqwgg3dp9J8OvAiqnvVpR4wUyikbKzKvfwwiZ4pX86hNT9f9ZXDNb19Z5F4myenNK7CsJll6ycdMtp09Ajt8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=4bgLlrc9; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,13 +36,13 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=L/ug2r4EVbSkWdawJ0j/nghtH+tymAoyGiGC07jOBcA=; b=C0BEo15Q9n41MglXN7Nc441kp3
-	Wjld1mD32vxcmfyS9ftxL9uaoaTenHu1cxmy3tSSmRkkIT90sj0gUR547uxUVRWcOypLMw3ntjG0d
-	P55ZuaelFIfdoHaIYaBsmodQRUF0UuwKu63Rz8vHFtT/m5cBUTfz3S0p7jOud7MFRWI0=;
+	bh=uNVDC5QsEnqtExxfYsYIt46tMXYa2LHua1cwNhaeBw4=; b=4bgLlrc9+y6ie0N//k5D4qgxYj
+	L369jntKjV0zhz2vD+jww0GjUevWKHsam1Ug42VzAnBLtKDN4NVi9LuQiyUB1KeMfePwIl6yXXoXW
+	FKF8KMxdD+ghHMhirLzpNzCQSefCY3xyyiaxJfPzJmsajyweA2zKyPMO6RmMHicrAvGc=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1rzQ5u-00DlJY-U9; Wed, 24 Apr 2024 02:02:38 +0200
-Date: Wed, 24 Apr 2024 02:02:38 +0200
+	id 1rzQBb-00DlLG-Te; Wed, 24 Apr 2024 02:08:31 +0200
+Date: Wed, 24 Apr 2024 02:08:31 +0200
 From: Andrew Lunn <andrew@lunn.ch>
 To: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
 Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
@@ -57,11 +57,11 @@ Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
 	Thorsten.Kummermehr@microchip.com, Pier.Beruto@onsemi.com,
 	Selvamani.Rajagopal@onsemi.com, Nicolas.Ferre@microchip.com,
 	benjamin.bigler@bernformulastudent.ch
-Subject: Re: [PATCH net-next v4 08/12] net: ethernet: oa_tc6: implement
- transmit path to transfer tx ethernet frames
-Message-ID: <460a42cf-2b67-49f5-be4d-fcce6c824ba6@lunn.ch>
+Subject: Re: [PATCH net-next v4 09/12] net: ethernet: oa_tc6: implement
+ receive path to receive rx ethernet frames
+Message-ID: <574fec4d-5a23-490a-ba12-c40432ebe4b8@lunn.ch>
 References: <20240418125648.372526-1-Parthiban.Veerasooran@microchip.com>
- <20240418125648.372526-9-Parthiban.Veerasooran@microchip.com>
+ <20240418125648.372526-10-Parthiban.Veerasooran@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,28 +70,18 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240418125648.372526-9-Parthiban.Veerasooran@microchip.com>
+In-Reply-To: <20240418125648.372526-10-Parthiban.Veerasooran@microchip.com>
 
-> +static int oa_tc6_process_extended_status(struct oa_tc6 *tc6)
+> +static int oa_tc6_allocate_rx_skb(struct oa_tc6 *tc6)
 > +{
-> +	u32 value;
-> +	int ret;
-> +
-> +	ret = oa_tc6_read_register(tc6, OA_TC6_REG_STATUS0, &value);
-> +	if (ret) {
-> +		netdev_err(tc6->netdev, "STATUS0 register read failed: %d\n",
-> +			   ret);
-> +		return -ENODEV;
+> +	tc6->rx_skb = netdev_alloc_skb(tc6->netdev, tc6->netdev->mtu + ETH_HLEN +
+> +				       ETH_FCS_LEN + NET_IP_ALIGN);
+> +	if (!tc6->rx_skb) {
+> +		tc6->netdev->stats.rx_dropped++;
+> +		return -ENOMEM;
 > +	}
-> +
-> +	/* Clear the error interrupts status */
-> +	ret = oa_tc6_write_register(tc6, OA_TC6_REG_STATUS0, value);
-> +	if (ret) {
-> +		netdev_err(tc6->netdev, "STATUS0 register write failed: %d\n",
-> +			   ret);
-> +		return -ENODEV;
+> +	skb_reserve(tc6->rx_skb, NET_IP_ALIGN);
 
-More examples where you replace one error code with a different one.
+I think you can use netdev_alloc_skb_ip_align() here.
 
-     Andrew
 
