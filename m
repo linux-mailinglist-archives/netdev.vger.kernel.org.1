@@ -1,97 +1,78 @@
-Return-Path: <netdev+bounces-90907-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90924-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01A338B0AF3
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 15:33:26 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 689AF8B0B48
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 15:41:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 17BADB2616A
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 13:33:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D4A341F22BA5
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 13:41:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8E5F15EFB4;
-	Wed, 24 Apr 2024 13:31:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB4A215EFCD;
+	Wed, 24 Apr 2024 13:38:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="I5bBNyCJ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Xz91AuEy"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2048.outbound.protection.outlook.com [40.107.95.48])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3815D15EFA1;
-	Wed, 24 Apr 2024 13:31:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.95.48
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713965501; cv=fail; b=kL1wnRS/zbuuriaFipbWjC9Mj2HDwLsh8qxanHQf5H4mrBX7HCTPtN+Bp6sXXHPMWpRIfWB4vvE+//zZCuFo0D8XCr9QFhP4caHzzW2fI1gdGzml1xFApiS9PcwzcWD3vC7YyjFASbIVUP5QThEAGNMsdZcWY4heT0bqmuviQzg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713965501; c=relaxed/simple;
-	bh=SdR8AK9p5eXkXVsxuQJGJMTlfnSMm8NrhQSC3qadvTo=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mjwPClzwBQUIpW9GE0U8KnPkTcwNu9hPxor/OPfU9ZdwVz22Pd62cG8BXa5WSHxzIz6pprlZxtejl7EhaOA+W1urGqqIsvH8NxNQtQcysJ1HcdtMYWbIZ44STwoW2hxp+BS180JzpALyctR9K0sbIWdGzSlyC+Nd7DtYFnILTig=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=I5bBNyCJ; arc=fail smtp.client-ip=40.107.95.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=jAAq6J9VPTadhzgwiyCgdSef4KdCIyA1ksKJTAflgvkap5qx2J5qy4KRGTo0NiujyW1Ue+/kOk0p0pYp1V+qmnhVmuPwKtsW0EO4lkN9GIS9XcI85ooBqokBO11ty+hp5TzoYsGYOirJgnjT23LunI801Z1uFy0+tliAwr+T4X6LzWhuCraVfDc+sfb6Z0GpE9aTT3w7KRYBO2ZSstFeTSe/5z81itfWfWhR2LANlcA7Jw7p7PFpZSuYj/wWOmM8wop6+49wdkClN/+gndA5NOtz/N0wv5e6QYn3JDY/GE53EtWrGGHNbZ1A9Yht7io59mvdXt2z4HrtSCTmgDjCNQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=6V1UnlOS3EMUCV6lMUtqtDUSLw94CQZRNztlwUtCjPU=;
- b=Jb0Q0hHPCLHwAzhGHjZCwbHFTZcPatv3X15juaH1U2YfRj9UZ+fQOrWrB/J45/qx7XlgdngfcIva495Qn7Fp7xfU3oihOLTfYcqBkjYegNdGjj0oCAaCodZloJhU84tQR/nOlPCnzTgN838fPRcwMPu+EJby1B+26yhwzymuGUt79wVdjolHmATkJNIZt0my/WUmV/GRF7HlKf2Q5Q3lhYH1d/cLMdY1TeGIloqisHV2GGQLbNFyE4+KK75rOU+USsTh9aMdIKXAnPeqwG4Tu5PnhSG0CHA3cVS/CCjhaV/l5Nt8+cC2gM1T14wv/PumHK3hGtLTnms42E6bgBqtTQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6V1UnlOS3EMUCV6lMUtqtDUSLw94CQZRNztlwUtCjPU=;
- b=I5bBNyCJU193Hy+APAV2lfyWHm/DmwtBioHwxHsrhw+gXypVhxj0WAHStxsTBjSu7bhAiI/ql9C3bU6+oh2slXHw7H0462n6kadpwe2r33LojQMV84IJCVzEWVpjp2FR9gDT9C9FXBRmNKs1DIvDOM734usF3JW1mQLCyJO2ft989Dx3DWrNHLhWGPPGGCxjrZil/w2NLsLPox4SFtfdoSADJS8aQcB04mYnPlezNw9/vFSUEtZ83Y+akYeEGfXMwuy4P0YVYOFsty9cQGZljaGdpp+Tf8uzaM9y1Y1evMZ9LPgTApEpxHG4KkELvdetj/hiClPNyWWeT1Kt3JYavg==
-Received: from DM5PR07CA0113.namprd07.prod.outlook.com (2603:10b6:4:ae::42) by
- MN0PR12MB6032.namprd12.prod.outlook.com (2603:10b6:208:3cc::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7472.46; Wed, 24 Apr
- 2024 13:31:37 +0000
-Received: from DS2PEPF00003446.namprd04.prod.outlook.com
- (2603:10b6:4:ae:cafe::74) by DM5PR07CA0113.outlook.office365.com
- (2603:10b6:4:ae::42) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7519.23 via Frontend
- Transport; Wed, 24 Apr 2024 13:31:36 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- DS2PEPF00003446.mail.protection.outlook.com (10.167.17.73) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7519.19 via Frontend Transport; Wed, 24 Apr 2024 13:31:36 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 24 Apr
- 2024 06:31:16 -0700
-Received: from dev-r-vrt-155.mtr.labs.mlnx (10.126.230.35) by
- rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Wed, 24 Apr 2024 06:31:10 -0700
-From: Danielle Ratson <danieller@nvidia.com>
-To: <netdev@vger.kernel.org>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <corbet@lwn.net>, <linux@armlinux.org.uk>,
-	<sdf@google.com>, <kory.maincent@bootlin.com>,
-	<maxime.chevallier@bootlin.com>, <vladimir.oltean@nxp.com>,
-	<przemyslaw.kitszel@intel.com>, <ahmed.zaki@intel.com>,
-	<richardcochran@gmail.com>, <shayagr@amazon.com>, <paul.greenwalt@intel.com>,
-	<jiri@resnulli.us>, <linux-doc@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <mlxsw@nvidia.com>, <petrm@nvidia.com>,
-	<idosch@nvidia.com>, <danieller@nvidia.com>
-Subject: [PATCH net-next v5 06/10] net: sfp: Add more extended compliance codes
-Date: Wed, 24 Apr 2024 16:30:19 +0300
-Message-ID: <20240424133023.4150624-7-danieller@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CD2415D5CE
+	for <netdev@vger.kernel.org>; Wed, 24 Apr 2024 13:38:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1713965887; cv=none; b=izMCBiDW7cjGX49BWeTEY3Byl95tu0jCdP3F8tSpSBpMSj8gn5L3zemNijhLalWzSFS4Q7JRtViN4I3nnGNWrlTtPJYnESHW0VUbomfRChDZBHRRfzRTNL/N7rUzZMKbXBWlxPwWTv97gvfSUDKwWBtlyxOrUDSH0PKqBb3ToBs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1713965887; c=relaxed/simple;
+	bh=s4sgp6Bw15nQo4Z0MYSeHCQlxmK95bxYNIjan8+JbSI=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=YpsRux/UdTGuVS4eN5QLyirmsHcim4rY06/V5vbsjuWjjwDzufyJwxlp6F8Lw+wyrz2vylGHx4lx4OgyHYf8oCEfwczJeUghACXc23VVULGjj4FBCivTZcZaPhI6jEp2jLdRjeX0oTZehLz3gxbBskf3LNJ/63dOHREIiVutODA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Xz91AuEy; arc=none smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1713965886; x=1745501886;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=s4sgp6Bw15nQo4Z0MYSeHCQlxmK95bxYNIjan8+JbSI=;
+  b=Xz91AuEyc10TK2riloUBlHjA5/tKGlbEGunhF4ifOVnMuSGRZzeiQgP2
+   ZCoFdtHSq0KrQ77NBE0pHunvl9sXXOFnYFNTSjyPGdB217XkSr4DcbLMN
+   Q4AX2uOXgSOM7N7MXTvzxljb7YB3v0b3erYudiBaLMP8mP9Um5rd5V5Qp
+   5d1BCpkKGvZbpq0U1NcUbV13J7tLV37zbTHRrvzhP+yRICy8xvZbxtCTM
+   tgeK5E3os/D0yl3amCxqP6HRv1pALkueyzfTipONaiwusocCmN585Wka1
+   M9V9CISJixS6pWzzKBVQRtAWww3mWgzNp6ge/8aDD8lrNcTC1r52yOZWA
+   A==;
+X-CSE-ConnectionGUID: Pxx/XHL2Snme53AXYJ10fw==
+X-CSE-MsgGUID: KvtW2tLkS+WicWVKQW0wOw==
+X-IronPort-AV: E=McAfee;i="6600,9927,11054"; a="27110506"
+X-IronPort-AV: E=Sophos;i="6.07,226,1708416000"; 
+   d="scan'208";a="27110506"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2024 06:38:06 -0700
+X-CSE-ConnectionGUID: yw7lg2WtRKC32+KoBvQIqQ==
+X-CSE-MsgGUID: UyHeORQ9THOS/u4UYXMybQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,226,1708416000"; 
+   d="scan'208";a="24601302"
+Received: from kkolacin-desk1.igk.intel.com ([10.102.102.152])
+  by orviesa010.jf.intel.com with ESMTP; 24 Apr 2024 06:38:03 -0700
+From: Karol Kolacinski <karol.kolacinski@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	anthony.l.nguyen@intel.com,
+	jesse.brandeburg@intel.com,
+	Karol Kolacinski <karol.kolacinski@intel.com>,
+	Igor Bagnucki <igor.bagnucki@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+Subject: [PATCH v10 iwl-next 11/12] ice: Support 2XNAC configuration using auxbus
+Date: Wed, 24 Apr 2024 15:30:19 +0200
+Message-ID: <20240424133542.113933-26-karol.kolacinski@intel.com>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240424133023.4150624-1-danieller@nvidia.com>
-References: <20240424133023.4150624-1-danieller@nvidia.com>
+In-Reply-To: <20240424133542.113933-16-karol.kolacinski@intel.com>
+References: <20240424133542.113933-16-karol.kolacinski@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -99,86 +80,295 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS2PEPF00003446:EE_|MN0PR12MB6032:EE_
-X-MS-Office365-Filtering-Correlation-Id: 486e89f2-20a9-4ffa-7e56-08dc6462ddb6
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?FPlJwzyfs1ZYI+1sZ5P4Dai5FehC4mgZYpo+BaTJmrPwycTq2aTJ3wbWzZvU?=
- =?us-ascii?Q?hLpTF87zOtfU2ql9bfWJvnc+PG535f0LSFei+Jiq8rteYS/TapKfPzqqnJwf?=
- =?us-ascii?Q?yPiuBOum4XRANNh08xlZ/OAlwddTXksbWdgM31h8c+fhv6S35OCGKJid2FfE?=
- =?us-ascii?Q?8hHv7mEFKVDoPvj/ywjZcQRZziREPfgzva4jNVPv834BvRaFSMIVUP37375W?=
- =?us-ascii?Q?cGkltBTBARqNsiaK1sMXyr0KG1hE+3pvL2Rx8DwkMpGkEWdCXPAAIZa+WvSh?=
- =?us-ascii?Q?bRjOSS5gwYtsGcpBPEWzhTtEtGWY7MFOtt/x0dcqNtcYVDy7kw8ZeDMi1hnZ?=
- =?us-ascii?Q?tgcJbthyhDHKabGY6h65mOphUdBZbW/rniMqnNcUdAyser0OotgveN/DEJlq?=
- =?us-ascii?Q?sTAgkuWk3LOCOUvrgsUIXUAFT5q9Loi3yWSU3tGtQ4yT/xdunxGUH2pIUpZC?=
- =?us-ascii?Q?L6ybGuw7eIix9Y6Ov4ow89tA+0sWku8iDJsFeHmu3/+gUXF/rKkLgq9ittM+?=
- =?us-ascii?Q?AeyoHIO+VpGASCrlkS5mF1byo6FuT/yfpSJr1rc7rXxcD3ZepKXnSOih8ZIU?=
- =?us-ascii?Q?v2KSte9/sran4d6nA/DeTtukuG8EgZTe8ygGhznTL+fCHj0xPqVyR9d150dG?=
- =?us-ascii?Q?zKFxVUHEpZjkRBXJAdJn392+355TKOkxgpE6xHw54lIWB/0WDXiKNg41vh07?=
- =?us-ascii?Q?zAwYrgLTey/bavX+6t1UkuA5FzTcwPnYCRd0GUgifayyXJobxGfaAjeqTFrm?=
- =?us-ascii?Q?m8moLfC/DZsCWAMFo8dc0ZmL1AUU8eMbBrP6CRQdD64i7zd8zv595wNvyE9k?=
- =?us-ascii?Q?BRRMrZAYSQ1+7M8J/wu9owb5Rwg/6G8TVD8ANzEJvqEcIj0f+O7xsJnBZ4O5?=
- =?us-ascii?Q?jNS/VYk3tQL7IErQpd+5Wlj+SMNxaD/qDVcLprVn4JzVRjaFLw3Sxoqe/quY?=
- =?us-ascii?Q?fDCAaFX34+9EWGJN+hpTaCZR4lTwKfgv/g7izU/ED2/5QQkhJlbcmzBvDbZk?=
- =?us-ascii?Q?dY9gxc+tL0A95jFFkhsh9on4zFuqpXzrXfmteAHLMd1eeQ2bhXhUL5wHhqO8?=
- =?us-ascii?Q?5BS8zRJEk8af2x92xftuXVBY2Kwxo8Bcv8jbGgeQyYW4NfMzmXjn6miwj5Ep?=
- =?us-ascii?Q?6KJx7UMOX7oQpaUYGtgqlFJRaabChhz7xew8421bWgr3aqNzM3F62FYyEkfZ?=
- =?us-ascii?Q?R3CicF/xkfKb8n6k6UiK0aE8rLQiYh1wiXarOCrHvlgj+Px9zX1zxFyJBaC4?=
- =?us-ascii?Q?bjAlK4P0Rtz0w8qUN4ScuXHDy4jGoYWIY1rNaf9MuezBOztWZROzOLwxCCyj?=
- =?us-ascii?Q?yfkDLv7iRzy463E+PI/HrmOeEKa3CvapGq5iEyLlwhlNhooWBpuEfd5BbGzg?=
- =?us-ascii?Q?VSJ4HrtZ1qgwgNZtAYsQGIIfBpHJ?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(7416005)(1800799015)(82310400014)(376005)(36860700004);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Apr 2024 13:31:36.7033
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 486e89f2-20a9-4ffa-7e56-08dc6462ddb6
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	DS2PEPF00003446.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB6032
 
-SFF-8024 is used to define various constants re-used in several SFF
-SFP-related specifications.
+There are E825C products featuring 2 NACs. Those have only one source
+clock on the primary NAC.
+For those devices, there
+should be only one clock controller on the primary NAC. All PFs from
+both NACs should connect as auxiliary devices to the auxiliary driver on
+the primary NAC.
 
-Add SFF-8024 extended compliance code definitions for CMIS compliant
-modules and use them in the next patch to determine the firmware flashing
-work.
-
-Signed-off-by: Danielle Ratson <danieller@nvidia.com>
-Reviewed-by: Petr Machata <petrm@nvidia.com>
-Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Reviewed-by: Igor Bagnucki <igor.bagnucki@intel.com>
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Reviewed-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
 ---
- include/linux/sfp.h | 6 ++++++
- 1 file changed, 6 insertions(+)
+V9 -> V10: added primary_hw initialization to NULL and checks before use
 
-diff --git a/include/linux/sfp.h b/include/linux/sfp.h
-index 55c0ab17c9e2..46c145fa855d 100644
---- a/include/linux/sfp.h
-+++ b/include/linux/sfp.h
-@@ -284,6 +284,12 @@ enum {
- 	SFF8024_ID_QSFP_8438		= 0x0c,
- 	SFF8024_ID_QSFP_8436_8636	= 0x0d,
- 	SFF8024_ID_QSFP28_8636		= 0x11,
-+	SFF8024_ID_QSFP_DD		= 0x18,
-+	SFF8024_ID_OSFP			= 0x19,
-+	SFF8024_ID_DSFP			= 0x1B,
-+	SFF8024_ID_QSFP_PLUS_CMIS	= 0x1E,
-+	SFF8024_ID_SFP_DD_CMIS		= 0x1F,
-+	SFF8024_ID_SFP_PLUS_CMIS	= 0x20,
+ drivers/net/ethernet/intel/ice/ice.h        | 27 ++++++++-
+ drivers/net/ethernet/intel/ice/ice_ptp.c    | 64 +++++++++++++++++++--
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.c | 28 +++++++--
+ drivers/net/ethernet/intel/ice/ice_type.h   |  2 +
+ 4 files changed, 107 insertions(+), 14 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice.h b/drivers/net/ethernet/intel/ice/ice.h
+index 67a3236ab1fc..401046578562 100644
+--- a/drivers/net/ethernet/intel/ice/ice.h
++++ b/drivers/net/ethernet/intel/ice/ice.h
+@@ -197,8 +197,6 @@
  
- 	SFF8024_ENCODING_UNSPEC		= 0x00,
- 	SFF8024_ENCODING_8B10B		= 0x01,
+ #define ice_pf_to_dev(pf) (&((pf)->pdev->dev))
+ 
+-#define ice_pf_src_tmr_owned(pf) ((pf)->hw.func_caps.ts_func_info.src_tmr_owned)
+-
+ enum ice_feature {
+ 	ICE_F_DSCP,
+ 	ICE_F_PHY_RCLK,
+@@ -1010,4 +1008,29 @@ static inline void ice_clear_rdma_cap(struct ice_pf *pf)
+ }
+ 
+ extern const struct xdp_metadata_ops ice_xdp_md_ops;
++
++/**
++ * ice_pf_src_tmr_owned - check if PF is owner of source timer
++ * @pf: Board private structure
++ *
++ * Return: true if source timer is owned by PF, false otherwise
++ */
++static inline bool ice_pf_src_tmr_owned(struct ice_pf *pf)
++{
++	if (pf->hw.ptp.phy_model == ICE_PHY_ETH56G && !pf->hw.ptp.primary_nac)
++		return false;
++	else
++		return pf->hw.func_caps.ts_func_info.src_tmr_owned;
++}
++
++/**
++ * ice_is_primary - check if PF is on a primary NAC
++ * @pf: Board private structure
++ *
++ * Return: true if PF is on a primary NAC, false otherwise
++ */
++static inline bool ice_is_primary(struct ice_pf *pf)
++{
++	return pf->hw.dev_caps.nac_topo.mode & ICE_NAC_TOPO_PRIMARY_M;
++}
+ #endif /* _ICE_H_ */
+diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
+index 3af0f4a2c3be..7a838f5c952d 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ptp.c
++++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
+@@ -371,6 +371,9 @@ ice_ptp_read_src_clk_reg(struct ice_pf *pf, struct ptp_system_timestamp *sts)
+ 	u32 hi, lo, lo2;
+ 	u8 tmr_idx;
+ 
++	if (!hw->ptp.primary_nac && hw->ptp.primary_hw)
++		hw = hw->ptp.primary_hw;
++
+ 	tmr_idx = ice_get_ptp_src_clock_index(hw);
+ 	guard(spinlock)(&pf->adapter->ptp_gltsyn_time_lock);
+ 	/* Read the system timestamp pre PHC read */
+@@ -2678,6 +2681,31 @@ static void ice_ptp_periodic_work(struct kthread_work *work)
+ 				   msecs_to_jiffies(err ? 10 : 500));
+ }
+ 
++/**
++ * ice_ptp_prepare_rebuild_sec - Prepare second NAC for PTP reset or rebuild
++ * @pf: Board private structure
++ * @rebuild: rebuild if true, prepare if false
++ * @reset_type: the reset type being performed
++ */
++static void ice_ptp_prepare_rebuild_sec(struct ice_pf *pf, bool rebuild,
++					enum ice_reset_req reset_type)
++{
++	struct ice_ptp_port *port;
++
++	mutex_lock(&pf->ptp.ports_owner.lock);
++	list_for_each_entry(port, &pf->ptp.ports_owner.ports, list_member) {
++		struct ice_pf *peer_pf = ptp_port_to_pf(port);
++
++		if (!peer_pf->hw.ptp.primary_nac) {
++			if (rebuild)
++				ice_ptp_rebuild(peer_pf, reset_type);
++			else
++				ice_ptp_prepare_for_reset(peer_pf, reset_type);
++		}
++	}
++	mutex_unlock(&pf->ptp.ports_owner.lock);
++}
++
+ /**
+  * ice_ptp_prepare_for_reset - Prepare PTP for reset
+  * @pf: Board private structure
+@@ -2686,6 +2714,7 @@ static void ice_ptp_periodic_work(struct kthread_work *work)
+ void ice_ptp_prepare_for_reset(struct ice_pf *pf, enum ice_reset_req reset_type)
+ {
+ 	struct ice_ptp *ptp = &pf->ptp;
++	struct ice_hw *hw = &pf->hw;
+ 	u8 src_tmr;
+ 
+ 	if (ptp->state != ICE_PTP_READY)
+@@ -2701,15 +2730,18 @@ void ice_ptp_prepare_for_reset(struct ice_pf *pf, enum ice_reset_req reset_type)
+ 	if (reset_type == ICE_RESET_PFR)
+ 		return;
+ 
++	if (ice_pf_src_tmr_owned(pf) && ice_is_e825c(hw))
++		ice_ptp_prepare_rebuild_sec(pf, false, reset_type);
++
+ 	ice_ptp_release_tx_tracker(pf, &pf->ptp.port.tx);
+ 
+ 	/* Disable periodic outputs */
+ 	ice_ptp_disable_all_clkout(pf);
+ 
+-	src_tmr = ice_get_ptp_src_clock_index(&pf->hw);
++	src_tmr = ice_get_ptp_src_clock_index(hw);
+ 
+ 	/* Disable source clock */
+-	wr32(&pf->hw, GLTSYN_ENA(src_tmr), (u32)~GLTSYN_ENA_TSYN_ENA_M);
++	wr32(hw, GLTSYN_ENA(src_tmr), (u32)~GLTSYN_ENA_TSYN_ENA_M);
+ 
+ 	/* Acquire PHC and system timer to restore after reset */
+ 	ptp->reset_time = ktime_get_real_ns();
+@@ -2805,6 +2837,9 @@ void ice_ptp_rebuild(struct ice_pf *pf, enum ice_reset_req reset_type)
+ 		err = ice_ptp_rebuild_owner(pf);
+ 		if (err)
+ 			goto err;
++
++		if (ice_is_e825c(&pf->hw))
++			ice_ptp_prepare_rebuild_sec(pf, true, reset_type);
+ 	}
+ 
+ 	ptp->state = ICE_PTP_READY;
+@@ -2877,6 +2912,9 @@ static int ice_ptp_auxbus_probe(struct auxiliary_device *aux_dev,
+ 		 &owner_pf->ptp.ports_owner.ports);
+ 	mutex_unlock(&owner_pf->ptp.ports_owner.lock);
+ 
++	if (!aux_pf->hw.ptp.primary_nac)
++		aux_pf->hw.ptp.primary_hw = &owner_pf->hw;
++
+ 	return 0;
+ }
+ 
+@@ -2954,6 +2992,7 @@ static int ice_ptp_register_auxbus_driver(struct ice_pf *pf)
+ {
+ 	struct auxiliary_driver *aux_driver;
+ 	struct ice_ptp *ptp;
++	char busdev[8] = {};
+ 	struct device *dev;
+ 	char *name;
+ 	int err;
+@@ -2963,8 +3002,10 @@ static int ice_ptp_register_auxbus_driver(struct ice_pf *pf)
+ 	aux_driver = &ptp->ports_owner.aux_driver;
+ 	INIT_LIST_HEAD(&ptp->ports_owner.ports);
+ 	mutex_init(&ptp->ports_owner.lock);
+-	name = devm_kasprintf(dev, GFP_KERNEL, "ptp_aux_dev_%u_%u_clk%u",
+-			      pf->pdev->bus->number, PCI_SLOT(pf->pdev->devfn),
++	if (ice_is_e810(&pf->hw))
++		sprintf(busdev, "%u_%u_", pf->pdev->bus->number,
++			PCI_SLOT(pf->pdev->devfn));
++	name = devm_kasprintf(dev, GFP_KERNEL, "ptp_%sclk%u", busdev,
+ 			      ice_get_ptp_src_clock_index(&pf->hw));
+ 	if (!name)
+ 		return -ENOMEM;
+@@ -3168,6 +3209,7 @@ static int ice_ptp_create_auxbus_device(struct ice_pf *pf)
+ {
+ 	struct auxiliary_device *aux_dev;
+ 	struct ice_ptp *ptp;
++	char busdev[8] = {};
+ 	struct device *dev;
+ 	char *name;
+ 	int err;
+@@ -3179,8 +3221,11 @@ static int ice_ptp_create_auxbus_device(struct ice_pf *pf)
+ 
+ 	aux_dev = &ptp->port.aux_dev;
+ 
+-	name = devm_kasprintf(dev, GFP_KERNEL, "ptp_aux_dev_%u_%u_clk%u",
+-			      pf->pdev->bus->number, PCI_SLOT(pf->pdev->devfn),
++	if (ice_is_e810(&pf->hw))
++		sprintf(busdev, "%u_%u_", pf->pdev->bus->number,
++			PCI_SLOT(pf->pdev->devfn));
++
++	name = devm_kasprintf(dev, GFP_KERNEL, "ptp_%sclk%u", busdev,
+ 			      ice_get_ptp_src_clock_index(&pf->hw));
+ 	if (!name)
+ 		return -ENOMEM;
+@@ -3268,6 +3313,13 @@ void ice_ptp_init(struct ice_pf *pf)
+ 
+ 	ptp->state = ICE_PTP_INITIALIZING;
+ 
++	if (ice_is_e825c(hw) && !ice_is_primary(pf)) {
++		hw->ptp.primary_nac = false;
++		hw->ptp.primary_hw = NULL;
++	} else {
++		hw->ptp.primary_nac = true;
++	}
++
+ 	ice_ptp_init_hw(hw);
+ 
+ 	ice_ptp_init_tx_interrupt_mode(pf);
+diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
+index be14f818122e..982114d120c8 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
++++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
+@@ -854,7 +854,10 @@ void ice_ptp_src_cmd(struct ice_hw *hw, enum ice_ptp_tmr_cmd cmd)
+ {
+ 	u32 cmd_val = ice_ptp_tmr_cmd_to_src_reg(hw, cmd);
+ 
+-	wr32(hw, GLTSYN_CMD, cmd_val);
++	if (!hw->ptp.primary_nac && hw->ptp.primary_hw)
++		wr32(hw->ptp.primary_hw, GLTSYN_CMD, cmd_val);
++	else
++		wr32(hw, GLTSYN_CMD, cmd_val);
+ }
+ 
+ /**
+@@ -870,7 +873,10 @@ static void ice_ptp_exec_tmr_cmd(struct ice_hw *hw)
+ 	struct ice_pf *pf = container_of(hw, struct ice_pf, hw);
+ 
+ 	guard(spinlock)(&pf->adapter->ptp_gltsyn_time_lock);
+-	wr32(hw, GLTSYN_CMD_SYNC, SYNC_EXEC_CMD);
++	if (!hw->ptp.primary_nac && hw->ptp.primary_hw)
++		wr32(hw->ptp.primary_hw, GLTSYN_CMD_SYNC, SYNC_EXEC_CMD);
++	else
++		wr32(hw, GLTSYN_CMD_SYNC, SYNC_EXEC_CMD);
+ 	ice_flush(hw);
+ }
+ 
+@@ -2348,8 +2354,13 @@ static int ice_read_phy_and_phc_time_eth56g(struct ice_hw *hw, u8 port,
+ 	ice_ptp_exec_tmr_cmd(hw);
+ 
+ 	/* Read the captured PHC time from the shadow time registers */
+-	zo = rd32(hw, GLTSYN_SHTIME_0(tmr_idx));
+-	lo = rd32(hw, GLTSYN_SHTIME_L(tmr_idx));
++	if (!hw->ptp.primary_nac && hw->ptp.primary_hw) {
++		zo = rd32(hw->ptp.primary_hw, GLTSYN_SHTIME_0(tmr_idx));
++		lo = rd32(hw->ptp.primary_hw, GLTSYN_SHTIME_L(tmr_idx));
++	} else {
++		zo = rd32(hw, GLTSYN_SHTIME_0(tmr_idx));
++		lo = rd32(hw, GLTSYN_SHTIME_L(tmr_idx));
++	}
+ 	*phc_time = (u64)lo << 32 | zo;
+ 
+ 	/* Read the captured PHY time from the PHY shadow registers */
+@@ -2511,8 +2522,13 @@ int ice_start_phy_timer_eth56g(struct ice_hw *hw, u8 port)
+ 	if (err)
+ 		return err;
+ 
+-	lo = rd32(hw, GLTSYN_INCVAL_L(tmr_idx));
+-	hi = rd32(hw, GLTSYN_INCVAL_H(tmr_idx));
++	if (hw->ptp.primary_nac && hw->ptp.primary_hw) {
++		lo = rd32(hw->ptp.primary_hw, GLTSYN_INCVAL_L(tmr_idx));
++		hi = rd32(hw->ptp.primary_hw, GLTSYN_INCVAL_H(tmr_idx));
++	} else {
++		lo = rd32(hw, GLTSYN_INCVAL_L(tmr_idx));
++		hi = rd32(hw, GLTSYN_INCVAL_H(tmr_idx));
++	}
+ 	incval = (u64)hi << 32 | lo;
+ 
+ 	err = ice_write_40b_ptp_reg_eth56g(hw, port, PHY_REG_TIMETUS_L, incval);
+diff --git a/drivers/net/ethernet/intel/ice/ice_type.h b/drivers/net/ethernet/intel/ice/ice_type.h
+index f4eb0d03ee4f..a3557284036a 100644
+--- a/drivers/net/ethernet/intel/ice/ice_type.h
++++ b/drivers/net/ethernet/intel/ice/ice_type.h
+@@ -857,6 +857,8 @@ struct ice_ptp_hw {
+ 	union ice_phy_params phy;
+ 	u8 num_lports;
+ 	u8 ports_per_phy;
++	bool primary_nac;
++	struct ice_hw *primary_hw;
+ };
+ 
+ /* Port hardware description */
 -- 
 2.43.0
 
