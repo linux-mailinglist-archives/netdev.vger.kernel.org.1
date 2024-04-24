@@ -1,92 +1,140 @@
-Return-Path: <netdev+bounces-91039-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91040-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 101B28B118B
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 19:58:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 505F48B1195
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 19:59:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B88181F254CF
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 17:58:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E4B9B1F27667
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 17:59:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85EAF16D4EF;
-	Wed, 24 Apr 2024 17:58:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94E3D16DEBA;
+	Wed, 24 Apr 2024 17:59:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="06b+6cLu"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gOYxPown"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f52.google.com (mail-qv1-f52.google.com [209.85.219.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 367D713C672
-	for <netdev@vger.kernel.org>; Wed, 24 Apr 2024 17:58:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22A7916D9DE;
+	Wed, 24 Apr 2024 17:59:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713981506; cv=none; b=jsiG/F2M71LxjNXWZiHkgnwN+EHGs5pX/ZEh7NNn2bM/zWfk/Pa4Bv8sX/OwJey6t8EhB4E9i7VUVEXrrB1HaUuyD3+Kn72UglFlfmXKj2sJE3OuYfQHuVHlRQMhz19gHTSeMXeyPkgzBew41tCjVVaM5t8n3wBCWyqjv1W7YaQ=
+	t=1713981572; cv=none; b=Boaat6uK44nqI3oHovLyjl+mG8qJQFKKLrTz4WwhdSS1CNM6EbPG6LWuzyAsGmS5qWTRQmfVrBWoO/4eZJsVlKVYNHnlcO8PTV7h/xFBNkxztdIAFvIQTokN6NI4j1TUbBJnqeobL3T2DNNf01GZH9B2so+BlURf2pr2FoM2Y88=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713981506; c=relaxed/simple;
-	bh=RWkXdDAPfkJpiKcltcBrQt7q1vz7/sgfqjDtuw5QtOk=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=c8mfxqYczp/L+C059X2OeP6FRgqNyZ+e7sa57VtwWHexe8DFtAiho1uIh/8NP4lmpSgrcLT1ybxPyvp9Mp3DC+K2cICF/jYzyLzJslBwEiJUKxQ059qRLrcAwzNZPd5VkaJB+XbKWEAMPI1Tz5tDiZta0atFBgQWZ97pJSlwM8o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=06b+6cLu; arc=none smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1713981504; x=1745517504;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=RWkXdDAPfkJpiKcltcBrQt7q1vz7/sgfqjDtuw5QtOk=;
-  b=06b+6cLu+NanqHr1qp3EzmWqm/xMO5ETlFdSb8CwBfNiWYYAPUt1Rkce
-   z6rJpvr2xgwxuO3+8ArfT1hR9T7pUPdB0H1DoO4JYLH7lz1huBm8mRY01
-   flOmmjaMt+Avgmg/sZ80AzLBj5t5COZn+K/BF0YdUD2g7Y+pbfQovxnyL
-   3+4Lv5+2BpiAp5q8csvkLXiyiNSXIALSB8cdWR9Kp4crdBcFJ3YzatfqL
-   TAwriXwstCCKrFeF6Tjje6YIEVOQeXeIGHqsXyj5lGYEyPdfaP0QREPgS
-   F3p2gdaM6lHcY7coP3mp1Yt9HEWQpBxcBgn/0T7nYsT2qnJ2YMUb2wQrC
-   g==;
-X-CSE-ConnectionGUID: uBieWstiSWigek204D9GSg==
-X-CSE-MsgGUID: mChtQ/qLQB+RA+UggCcafQ==
-X-IronPort-AV: E=Sophos;i="6.07,226,1708412400"; 
-   d="scan'208";a="24563112"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa1.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 24 Apr 2024 10:58:24 -0700
-Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
- chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Wed, 24 Apr 2024 10:57:54 -0700
-Received: from DEN-DL-M70577 (10.10.85.11) by chn-vm-ex03.mchp-main.com
- (10.10.85.151) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
- Transport; Wed, 24 Apr 2024 10:57:51 -0700
-Date: Wed, 24 Apr 2024 17:57:51 +0000
-From: Daniel Machon <daniel.machon@microchip.com>
+	s=arc-20240116; t=1713981572; c=relaxed/simple;
+	bh=cAkAYiHazk+6ficSxW+gfWAABuq28aURZDIh57H/oqM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=A9qFLER+HF6e6cZjSYN602E+EzSwDMzd2tbk/NFNw4ArBp4YmWTIGZh/kUtOY1CCI5oRs8tQwbblAyxoogWdE+zDHRBOP3SmzJEFklf5ppIztO2BSTgMNhqncLwAP95CI/I8JkUfEHs4TPlB6C+hveuHjAYLcnF3c8lIBka0Ev8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gOYxPown; arc=none smtp.client-ip=209.85.219.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f52.google.com with SMTP id 6a1803df08f44-69b2f6d31c1so903556d6.0;
+        Wed, 24 Apr 2024 10:59:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1713981570; x=1714586370; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=UviPyNamfMTO0wa9/YHBUwdb+S4+5wLBQZutMKBqdto=;
+        b=gOYxPownoOGZMxtVNEI0ftKZVUcCqe02JwKNdb/PKzbJ5pmMhvHe/T+OrRkwokBzAv
+         3vhT1Maz6THPTXffruT4JIBeu4u1cs6y7OFgcSavajmv88zHwacQmXZEr56FcZ2Qd4/k
+         ObzN6HqxfJvLwqCJyfrtf017wKXtAJpkuNPUZdmqTRJGXE+BNWy5AZ/UVY84EWIXOSYA
+         vsQykZUwfkxv8NSeuH5Ile5FVMHK8XVJUdaimUXu2/MGabx6Q2MVRkDSYpYZoBpWn5WS
+         RbBNg89RDoEpTikcPXheqGf29Ucq03XJYynFAX6LPY6ZUSIzZZzz8GxYskamnwSvhp20
+         WiCQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713981570; x=1714586370;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UviPyNamfMTO0wa9/YHBUwdb+S4+5wLBQZutMKBqdto=;
+        b=uKXW9whDFt5wLksf/IsJR/P9NUi1TU/WEiW2UXnvtS/Vzs42BDk/Kul+bZYgjhT361
+         z0E342phb9XSdvDYvPrp+mX0KXEWTfxm0NTbMYRCD+9A2YGH4p0rP8VeYIgMtmequqoA
+         Xkw8zvu5MEeS7kdfD2uBLGlFiLSmcjp/oxyzPLLDclZUzL2UPkvjy98pR4k0DTJPoWaK
+         F7nzUKfiKoTsoWxaQ+ARl9JQG2ynqPI5rZ194MBPHaDbqEMfsP0OsD1Eo6tdiJ1Bi7K0
+         9eXvVLRMlD6+38jFRjDTISipKt3K+AROkgDY/bcauTsSh+9eK1l2Cki0hixo5JBKkR0P
+         1Rlw==
+X-Forwarded-Encrypted: i=1; AJvYcCVEH2kshxN5asav5T95wKjMWMF370ye3X8jBPCTRZ+wgQ84MfiLhISW4cUgWvVbkhrwoanzD+IqIYECMZpOf02p0HuNGR09844lmi8d3NyONHQzGW90foWgRbXUr7oTJ9qNQPp5kE6A
+X-Gm-Message-State: AOJu0YzjOSAcYRbW1o08nolOuIwAB0I0gwhrDaTLXJoaovKNNIpPSXNj
+	ZhxwUdN/K7RlQPSO3d1Kd+jPvVMbEltyHgnBmSHpNbJHjHxFlWp2xlSZfXZa
+X-Google-Smtp-Source: AGHT+IHlkCkzPkV5Rdejgq9/gyOM3k6umMmvXMnEMrQSZsY8zKh/9VlyjWKU1mZ0dZRQgCvKLDnv1A==
+X-Received: by 2002:ad4:430f:0:b0:6a0:5fea:9892 with SMTP id c15-20020ad4430f000000b006a05fea9892mr3273972qvs.6.1713981570132;
+        Wed, 24 Apr 2024 10:59:30 -0700 (PDT)
+Received: from localhost (24-122-67-147.resi.cgocable.ca. [24.122.67.147])
+        by smtp.gmail.com with ESMTPSA id i11-20020a0cab4b000000b0069b59897310sm6252616qvb.63.2024.04.24.10.59.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 24 Apr 2024 10:59:29 -0700 (PDT)
+Date: Wed, 24 Apr 2024 13:59:29 -0400
+From: Benjamin Poirier <benjamin.poirier@gmail.com>
 To: Simon Horman <horms@kernel.org>
-CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Bryan Whitehead <bryan.whitehead@microchip.com>,
-	"Richard Cochran" <richardcochran@gmail.com>, Horatiu Vultur
-	<horatiu.vultur@microchip.com>, Lars Povlsen <lars.povlsen@microchip.com>,
-	Steen Hegelund <Steen.Hegelund@microchip.com>,
-	<UNGLinuxDriver@microchip.com>, <netdev@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>
-Subject: Re: [PATCH net-next v2 3/4] net: encx24j600: Correct spelling in
- comments
-Message-ID: <20240424175751.xed3irvvik6bm5yx@DEN-DL-M70577>
-References: <20240424-lan743x-confirm-v2-0-f0480542e39f@kernel.org>
- <20240424-lan743x-confirm-v2-3-f0480542e39f@kernel.org>
+Cc: Aaron Conole <aconole@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	dev@openvswitch.org, netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, Jiri Pirko <jiri@resnulli.us>
+Subject: Re: [ovs-dev] selftests: openvswitch: Questions about possible
+ enhancements
+Message-ID: <ZilIgbIvB04iUal2@f4>
+References: <20240424164405.GN42092@kernel.org>
+ <20240424173715.GP42092@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240424-lan743x-confirm-v2-3-f0480542e39f@kernel.org>
+In-Reply-To: <20240424173715.GP42092@kernel.org>
 
-> Correct spelling in comments, as flagged by codespell.
+On 2024-04-24 18:37 +0100, Simon Horman wrote:
+> On Wed, Apr 24, 2024 at 05:44:05PM +0100, Simon Horman wrote:
+> > Hi Aaron, Jakub, all,
+> > 
+> > I have recently been exercising the Open vSwitch kernel selftests,
+> > using vng, something like this:
+> > 
+> > 	TESTDIR="tools/testing/selftests/net/openvswitch"
+> > 
+> >         vng -v --run . --user root --cpus 2 \
+> >                 --overlay-rwdir "$PWD" -- \
+> >                 "modprobe openvswitch && \
+> > 		 echo \"timeout=90\" >> \"${TESTDIR}/settings\" && \
+> >                  make -C \"$TESTDIR\" run_tests"
+> > 
+> > And I have some observations that I'd like to ask about.
+> > 
+> > 1. Building the kernel using the following command does not
+> >    build the openvswitch kernel module.
+> > 
+> > 	vng -v --build \
+> > 		--config tools/testing/selftests/net/config
+> > 
+> >    All that seems to be missing is CONFIG_OPENVSWITCH=m
+> >    and I am wondering what the best way of resolving this is.
+> > 
+> >    Perhaps I am doing something wrong.
+> >    Or perhaps tools/testing/selftests/net/openvswitch/config
+> >    should be created? If so, should it include (most of?) what is in
+> >    tools/testing/selftests/net/config, or just CONFIG_OPENVSWITCH=m?
+
+I noticed something similar when testing Jiri's virtio_net selftests
+patchset [1].
+
+drivers/net/virtio_net/config includes virtio options but the
+test also needs at least CONFIG_NET_VRF=y which is part of net/config.
+
+Whatever the answer to your question, all config files should be
+coherent on this matter.
+
+[1] https://lore.kernel.org/netdev/20240424104049.3935572-1-jiri@resnulli.us/
+
+[...]
 > 
-> Signed-off-by: Simon Horman <horms@kernel.org>
+>   5. openvswitch.sh starts with "#!/bin/sh".
+>      But substitutions such as "${ns:0:1}0"  fail if /bin/sh is dash.
+>      Perhaps we should change openvswitch.sh to use bash?
 
-Reviewed-by: Daniel Machon <daniel.machon@microchip.com>
+I think so. A similar change was done in
+c2518da8e6b0 selftests: bonding: Change script interpreter (v6.8-rc1)
 
