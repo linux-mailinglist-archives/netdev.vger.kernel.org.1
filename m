@@ -1,83 +1,100 @@
-Return-Path: <netdev+bounces-90887-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90890-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C4FC8B0A13
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 14:52:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 384BF8B0A1D
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 14:54:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DC9D32819BF
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 12:52:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6955B1C24773
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 12:54:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9C3815686E;
-	Wed, 24 Apr 2024 12:52:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A794015B96B;
+	Wed, 24 Apr 2024 12:54:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="zxnjUag+"
+	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="CjwQSzW+"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85410134A5;
-	Wed, 24 Apr 2024 12:52:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C594E15B130;
+	Wed, 24 Apr 2024 12:54:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713963146; cv=none; b=mJvZyfqfOrjIRfY8UIpqohYf7JGc6ED7fu6d5NTnwCagSqvvbJfOKmsBykSyWI8tZOqoo4GR3m7I7RAIccYMg7GNdiCX72T3cmlwS8SaDT3UVr2xKc+yBk2hch0QktI2KoYbSSpoz7jRs5OmSx5nc01HINsBtjE59UBcYiO7NCM=
+	t=1713963250; cv=none; b=RYTDONUFyJ2E9h1+852h687D3NVKpEF4fA3ogIiyC7UMAlbNhwzdRS65cxRvr+ZY+yIiHMbl16oTOddMaDY/alnfwt09wZWf81RfEAEunzrYwuF5J+69b1bEUQDu4ZOsHpLKz4b6zVnIMtrOkRnjAoniT0NESxKFycAMT9iX/Vs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713963146; c=relaxed/simple;
-	bh=vanSXdv4Y6JZfy9ZTweKXIH65775yaAoxSbG12Wme1Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Pgz4p0cdBBQH9+Y4BJ27EHcu+xV4ys24JWQT2RS+Ldjxd3T6+AFKwUcw5/O/JERxLfIM94FYSUK+uTEwvHdVEAbPJ3Dm7LOiF97i9gEJaUYy6mCK1C+76etviQa1fjIU8IN7pvjew+owYcSoYwsOniKSeKKMr7Ixxle05w4xTa0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=zxnjUag+; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=8/pJWBK7NCR8cJ86fTwUM8CwNOEjC8NWwcVYq5e+ko0=; b=zxnjUag+JE3XLLairBeEV7ILY7
-	Iae8+V/6QtRA2b3lzUJ49mVXMNqMEDYByamF8gmOkZzKmXu98xegf4oFjgL4CvsSl3yXss6XD7F+K
-	Db/PdPuyN2qfC0vN8oy0DL4+/GmOAPoD9Jhgr22/9+y3jrpZ6gs901hD0zZPoPX6OXM8=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rzc6g-00DoYj-HQ; Wed, 24 Apr 2024 14:52:14 +0200
-Date: Wed, 24 Apr 2024 14:52:14 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
+	s=arc-20240116; t=1713963250; c=relaxed/simple;
+	bh=B0CItmNwVZMxKbpgVBG0RmpK9cd1EvQwEV3s4X97mFs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=QnWSu1uUP6VQMV4Jm6hJPkLZCrgz0ooMQiA2/K1MtKC5U0eBORPTViaiky1QB9R2R/AiDdTj9GHp3Ev9/U74BfmwlcZq/vwVEfPwklpweUz3/cQg7eDvNH2mDM0t0C/DlFMyxjfA8d4TJOwOlcrfbgwGJYTGi8YuY9Mhmc28+yg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=CjwQSzW+; arc=none smtp.client-ip=193.104.135.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
+Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
+	by mail1.fiberby.net (Postfix) with ESMTPSA id 85DBD600AF;
+	Wed, 24 Apr 2024 12:54:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
+	s=202008; t=1713963245;
+	bh=B0CItmNwVZMxKbpgVBG0RmpK9cd1EvQwEV3s4X97mFs=;
+	h=From:To:Cc:Subject:Date:From;
+	b=CjwQSzW+VeRNiJh+CPdV8Y2JSPn0pqVcCxi8ZHZthQn231jpF/ox9iepgyCW1pDJD
+	 fetjgbQ1ct0QamfBLM3EgPzLAFDVOlOqY9QInLZnBwuvYle3sfEekycbFhrym7Epcy
+	 6AB7EnmmUFS8TLwaXLllKmUAGfvN57pygai/OCoAWZB4lLwGfPy58vr8NUTHq3yLd8
+	 Azg6M5YTAHbbPk+Rl82eAbjNThFAmXd7IjsiLEThAgAkYing/iAIZOoehzDPrd/y38
+	 f1LACF4kfC7n2dJYePSpbnex0ZC5bL7DkS/3/v/m3sKWaC4DSuMVFa/EEgxopQZvyP
+	 y1AiHw/6OOfTw==
+Received: by x201s (Postfix, from userid 1000)
+	id 786802044F0; Wed, 24 Apr 2024 12:53:51 +0000 (UTC)
+From: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>
+To: netdev@vger.kernel.org
+Cc: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>,
+	Horatiu Vultur <horatiu.vultur@microchip.com>,
+	UNGLinuxDriver@microchip.com,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux@ew.tq-group.com
-Subject: Re: [PATCH net-next] net: phy: marvell: add support for MV88E6020
- internal PHYs
-Message-ID: <c66d04d4-8ae2-45f7-bedc-b6b09c417b25@lunn.ch>
-References: <20240424121022.160920-1-matthias.schiffer@ew.tq-group.com>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org,
+	Jiri Pirko <jiri@resnulli.us>,
+	Simon Horman <horms@kernel.org>
+Subject: [PATCH net-next v2 0/3] net: lan966x: flower: validate control flags
+Date: Wed, 24 Apr 2024 12:53:37 +0000
+Message-ID: <20240424125347.461995-1-ast@fiberby.net>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240424121022.160920-1-matthias.schiffer@ew.tq-group.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Wed, Apr 24, 2024 at 02:10:22PM +0200, Matthias Schiffer wrote:
-> The embedded PHYs of the MV88E6020 (88E6250 family) switch are very
-> basic - they do not even have an Extended Address / Page register.
-> +static struct marvell_hw_stat marvell_hw_stats_88e6020[] = {
+This series adds flower control flags validation to the
+lan966x driver, and changes it from assuming that it handles
+all control flags, to instead reject rules if they have
+masked any unknown/unsupported control flags.
 
-> +	{ "phy_receive_errors", 0, 21, 16},
+---
+Changelog:
 
-So the 0 here is bogus? 
+v2:
+* Split first patch into 2 (requested by Jiri)
+* Added cover letter (requested by Simon)
 
-This patch is quite invasive, and it is hard to say it is worth it. I
-would probably not try to reuses as much code, add functions which are
-specific to the 6250. Keep it KISS.
+v1: https://lore.kernel.org/netdev/20240423102720.228728-1-ast@fiberby.net/
 
-	 Andrew
+Asbjørn Sloth Tønnesen (3):
+  net: lan966x: flower: add extack to
+    lan966x_tc_flower_handler_control_usage()
+  net: lan966x: flower: rename goto in
+    lan966x_tc_flower_handler_control_usage()
+  net: lan966x: flower: check for unsupported control flags
+
+ .../ethernet/microchip/lan966x/lan966x_tc_flower.c | 14 ++++++++++----
+ 1 file changed, 10 insertions(+), 4 deletions(-)
+
+-- 
+2.43.0
+
 
