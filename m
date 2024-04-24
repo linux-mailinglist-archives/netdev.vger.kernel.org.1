@@ -1,253 +1,233 @@
-Return-Path: <netdev+bounces-90722-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90723-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B40568AFD65
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 02:43:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FABE8AFD67
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 02:43:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3A6411F23694
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 00:43:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EAF4C283F61
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 00:43:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E65134405;
-	Wed, 24 Apr 2024 00:43:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46FC946AF;
+	Wed, 24 Apr 2024 00:43:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BKfrCL1m"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="A2SEmj3V"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp-fw-52005.amazon.com (smtp-fw-52005.amazon.com [52.119.213.156])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 133ED23CE
-	for <netdev@vger.kernel.org>; Wed, 24 Apr 2024 00:43:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4341723BE;
+	Wed, 24 Apr 2024 00:43:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.156
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713919418; cv=none; b=TB6esKOuf6onPfNtHVWdCu/PpmZ/HZFSwtsdPBU+A4XDb3bKQM+4yX83VxCpqMyzQM1Io0tnSRxQYb7JQ80bM+vXrYkPlX0ZUGHMUoqjZM23C6xn0n4FkVbuOylFvgnJgiYu9H5gwHRfAVz6vaL6tlA2azS+usYPZymzE2i149c=
+	t=1713919433; cv=none; b=HkitpJgYKONyaAjERUuvHMWYCAgzElWdmuvseqhCDYB7nGY69Zhd2wxNy6OyEhfw5UfNZu5hLEWTWOM2DwIJfBHHSqbpzyK8DPx6xC6eo0tYRai/93iWVvJTC8v77gVoVsOusdHdEGTiNkJS4vQ60aD+UInZjGhoTW4Jq/nFEUY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713919418; c=relaxed/simple;
-	bh=nemwSq7LpjO98ubPkr4hoeo2ceohiKQurSIarYjontc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Ajkqg3BYBZHXKVWWfOOT6tyVXlxbnbDqgDQ+09z/oc0XX0TJf9V01Ut0FfCRIWYrNNT3NEkcwZgYKjA1eqffZAHTru7qDxqrBzNgthFk03bqEMYEuBOAKnuGa4OvmGOcOGBD4vE4Ja6eTKWBZ12YeOc2QzAv68LWOcKdXpTkTs8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BKfrCL1m; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1713919415;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nzqG4WxGO8CPSMgAY6cNKqF4exy1rnrpzJXQbq04bRE=;
-	b=BKfrCL1m35VAEEoczMn1VPq96+fKhOD5mYxZSwF2i2l4N4noyUsFMSPTHk8aDqt4M1ZmN9
-	pr0EtW4lOx+qJYR5/nIFfWwLgQc3aQFsIgRwMfoFvyWtA5+CoLgGeXxbX5zR9Cr2mC6hw3
-	Mk/sID7d1+arHEWWK/r6sTT1RuH3CXE=
-Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
- [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-327-ZNPHTbUUPB6RS9delqVfYA-1; Tue, 23 Apr 2024 20:43:34 -0400
-X-MC-Unique: ZNPHTbUUPB6RS9delqVfYA-1
-Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-2ae83527c22so1732761a91.3
-        for <netdev@vger.kernel.org>; Tue, 23 Apr 2024 17:43:34 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713919413; x=1714524213;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nzqG4WxGO8CPSMgAY6cNKqF4exy1rnrpzJXQbq04bRE=;
-        b=YpNokbMrGjT+LRb2cdhEN/RF75lgwsb+Ru90y9Z9qEDMjBl6WYcb5MyNwFXMmbiIy2
-         nhemzEvauCaoSth4vtmswhnzjaz3WGdGIaYyiflN8xTu0ZT+z4MR1/NCiiGOAeTM4lT2
-         jmv3YFuyjhg8zfDPCQU+1xXKkj/I00UG5lzt2k6gJzNoMX8/yZ6xzseKWN4V8VhvomPj
-         y8627Mv+HjLZaECtA81c6oCUaGsYWnpiEmRNBIOjKrNmv6iEW4McjH6kP8wsgshK1bEf
-         wCUSKLdgYmkAyXbKYIYn04LZaGQMRIp0THNVgvMCZFeNspuiRV4HJw1Fw42fVgqWiGAY
-         4xHA==
-X-Forwarded-Encrypted: i=1; AJvYcCXQSjVd5BcEQXOQf8e+TMWFDVFPLnTQgiJ8O5YDgjbHwGdhXvfYS5vq4EoK6HgRNjABTlCRnlKDvTEMykgeYTuKJuWo1VAP
-X-Gm-Message-State: AOJu0Yx+LgVax8+5mp+tAiTIirfW9mXdVWfb+6yiYkqMqoQO2ckfFBag
-	8DlHbI1YCDGLQCZs8FfNsDeQin6EZ3gBGTpKkHF5n3reNnSEKOYGMMxLQBEU7Zv9JPjfRjh1gPR
-	EenBMMc1Zw9/0672wI5K4/QMFkmIBgK0PHJaw4049CK6zV3FIEjF0WGRBNMTwyfJp+AzG995TBS
-	/SLI8K+ct9EgzhB9hhUqcIwnFERQN/
-X-Received: by 2002:a17:90b:4d88:b0:2a5:c3a7:39d9 with SMTP id oj8-20020a17090b4d8800b002a5c3a739d9mr866372pjb.45.1713919413111;
-        Tue, 23 Apr 2024 17:43:33 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IELSjXcvgOSQ+r2N0VSH03fv7YreOaB0eLmYEslhQzyiNcbnU6M94t1VCxSgJ4CJQjI4OBsDUmoN58B6iq4a/U=
-X-Received: by 2002:a17:90b:4d88:b0:2a5:c3a7:39d9 with SMTP id
- oj8-20020a17090b4d8800b002a5c3a739d9mr866362pjb.45.1713919412688; Tue, 23 Apr
- 2024 17:43:32 -0700 (PDT)
+	s=arc-20240116; t=1713919433; c=relaxed/simple;
+	bh=O8wl/Uhaoi25AoQcK8Qye2zjsMrxEmlq/WcSI1+5HuE=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=CjAHGyLR5dnxeuPh+aGil+PYO0Ku/7eHmCjGWyC7EpMnS+x+U2k8U9G73gqrZMarr3cYqgokn8HaJMTXkWH3AwSK75WKzByUUNzwHG2H9nkOyVfEsVUkD4LlOAeiyXNJNArr89R13GLg4QWmyZVALbfw+UeA05Qb/kwsGsMQUwU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=A2SEmj3V; arc=none smtp.client-ip=52.119.213.156
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1713919431; x=1745455431;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=TPqPRfF6wM4f85KoG+cWRKaYn2hNEwgBsXYhCaPG90g=;
+  b=A2SEmj3VwgqH3aANQ/GES5cjTBvJ+cr+ZWuQ5Q8ftMXvyoJvn7ssgx8o
+   AnMI+n/gWY1997QGDuEQfl4CJZwUNK4vyKdRwnFrKqJRWgrnKm35eHrg6
+   J/Z0CEj0/IS5ZjbvqyK17WpTtEGocci+T6PyUZN8/Sb4OUhBwoOkNhn5N
+   E=;
+X-IronPort-AV: E=Sophos;i="6.07,222,1708387200"; 
+   d="scan'208";a="649898425"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52005.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2024 00:43:48 +0000
+Received: from EX19MTAUWB002.ant.amazon.com [10.0.38.20:38367]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.18.168:2525] with esmtp (Farcaster)
+ id 8f7a98c8-b9a9-4758-bdd2-a2dc1fcce6d0; Wed, 24 Apr 2024 00:43:47 +0000 (UTC)
+X-Farcaster-Flow-ID: 8f7a98c8-b9a9-4758-bdd2-a2dc1fcce6d0
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Wed, 24 Apr 2024 00:43:45 +0000
+Received: from 88665a182662.ant.amazon.com (10.187.170.62) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Wed, 24 Apr 2024 00:43:42 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <syzbot+fa379358c28cc87cc307@syzkaller.appspotmail.com>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<pabeni@redhat.com>, <syzkaller-bugs@googlegroups.com>, <kuniyu@amazon.com>
+Subject: Re: [syzbot] [net?] possible deadlock in __unix_gc
+Date: Tue, 23 Apr 2024 17:43:34 -0700
+Message-ID: <20240424004334.10593-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <000000000000f1761a0616c5c629@google.com>
+References: <000000000000f1761a0616c5c629@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240422072408.126821-1-xuanzhuo@linux.alibaba.com>
- <20240422072408.126821-5-xuanzhuo@linux.alibaba.com> <CACGkMEuEYwR_QE-hhnD0KYujD6MVEArz3FPyjsfmJ-jk_02hZw@mail.gmail.com>
- <1713875473.8690095-1-xuanzhuo@linux.alibaba.com>
-In-Reply-To: <1713875473.8690095-1-xuanzhuo@linux.alibaba.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Wed, 24 Apr 2024 08:43:21 +0800
-Message-ID: <CACGkMEs=6Xfc1hELudF=+xvoJN+npQw11BqP0jjCxmUy2jaikg@mail.gmail.com>
-Subject: Re: [PATCH vhost v2 4/7] virtio_net: big mode support premapped
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: virtualization@lists.linux.dev, "Michael S. Tsirkin" <mst@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D043UWC003.ant.amazon.com (10.13.139.240) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Tue, Apr 23, 2024 at 8:38=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba.c=
-om> wrote:
->
-> On Tue, 23 Apr 2024 12:36:42 +0800, Jason Wang <jasowang@redhat.com> wrot=
-e:
-> > On Mon, Apr 22, 2024 at 3:24=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.aliba=
-ba.com> wrote:
-> > >
-> > > In big mode, pre-mapping DMA is beneficial because if the pages are n=
-ot
-> > > used, we can reuse them without needing to unmap and remap.
-> > >
-> > > We require space to store the DMA address. I use the page.dma_addr to
-> > > store the DMA address from the pp structure inside the page.
-> > >
-> > > Every page retrieved from get_a_page() is mapped, and its DMA address=
- is
-> > > stored in page.dma_addr. When a page is returned to the chain, we che=
-ck
-> > > the DMA status; if it is not mapped (potentially having been unmapped=
-),
-> > > we remap it before returning it to the chain.
-> > >
-> > > Based on the following points, we do not use page pool to manage thes=
-e
-> > > pages:
-> > >
-> > > 1. virtio-net uses the DMA APIs wrapped by virtio core. Therefore,
-> > >    we can only prevent the page pool from performing DMA operations, =
-and
-> > >    let the driver perform DMA operations on the allocated pages.
-> > > 2. But when the page pool releases the page, we have no chance to
-> > >    execute dma unmap.
-> > > 3. A solution to #2 is to execute dma unmap every time before putting
-> > >    the page back to the page pool. (This is actually a waste, we don'=
-t
-> > >    execute unmap so frequently.)
-> > > 4. But there is another problem, we still need to use page.dma_addr t=
-o
-> > >    save the dma address. Using page.dma_addr while using page pool is
-> > >    unsafe behavior.
-> > >
-> > > More:
-> > >     https://lore.kernel.org/all/CACGkMEu=3DAok9z2imB_c5qVuujSh=3Dvjj1=
-kx12fy9N7hqyi+M5Ow@mail.gmail.com/
-> > >
-> > > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > > ---
-> > >  drivers/net/virtio_net.c | 123 ++++++++++++++++++++++++++++++++++---=
---
-> > >  1 file changed, 108 insertions(+), 15 deletions(-)
-> > >
-> > > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> > > index 2c7a67ad4789..d4f5e65b247e 100644
-> > > --- a/drivers/net/virtio_net.c
-> > > +++ b/drivers/net/virtio_net.c
-> > > @@ -439,6 +439,81 @@ skb_vnet_common_hdr(struct sk_buff *skb)
-> > >         return (struct virtio_net_common_hdr *)skb->cb;
-> > >  }
-> > >
-> > > +static void sg_fill_dma(struct scatterlist *sg, dma_addr_t addr, u32=
- len)
-> > > +{
-> > > +       sg->dma_address =3D addr;
-> > > +       sg->length =3D len;
-> > > +}
-> > > +
-> > > +/* For pages submitted to the ring, we need to record its dma for un=
-map.
-> > > + * Here, we use the page.dma_addr and page.pp_magic to store the dma
-> > > + * address.
-> > > + */
-> > > +static void page_chain_set_dma(struct page *p, dma_addr_t addr)
-> > > +{
-> > > +       if (sizeof(dma_addr_t) > sizeof(unsigned long)) {
-> >
-> > Need a macro like PAGE_POOL_32BIT_ARCH_WITH_64BIT_DMA.
-> >
-> > > +               p->dma_addr =3D lower_32_bits(addr);
-> > > +               p->pp_magic =3D upper_32_bits(addr);
-> >
-> > And this uses three fields on page_pool which I'm not sure the other
-> > maintainers are happy with. For example, re-using pp_maing might be
-> > dangerous. See c07aea3ef4d40 ("mm: add a signature in struct page").
-> >
-> > I think a more safe way is to reuse page pool, for example introducing
-> > a new flag with dma callbacks?
->
-> If we use page pool, how can we chain the pages allocated for a packet?
+From: syzbot <syzbot+fa379358c28cc87cc307@syzkaller.appspotmail.com>
+Date: Tue, 23 Apr 2024 09:09:22 -0700
+> Hello,
+> 
+> syzbot found the following issue on:
+> 
+> HEAD commit:    4d2008430ce8 Merge tag 'docs-6.9-fixes2' of git://git.lwn...
+> git tree:       upstream
+> console+strace: https://syzkaller.appspot.com/x/log.txt?x=14a15280980000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=98d5a8e00ed1044a
+> dashboard link: https://syzkaller.appspot.com/bug?extid=fa379358c28cc87cc307
+> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16a8fb4f180000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=17ceeb73180000
+> 
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/5670e5771b96/disk-4d200843.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/03314e6c8879/vmlinux-4d200843.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/41aca7a9505a/bzImage-4d200843.xz
+> 
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+fa379358c28cc87cc307@syzkaller.appspotmail.com
+> 
+> ======================================================
+> WARNING: possible circular locking dependency detected
+> 6.9.0-rc5-syzkaller-00007-g4d2008430ce8 #0 Not tainted
+> ------------------------------------------------------
+> kworker/u8:1/11 is trying to acquire lock:
+> ffff88807cea4e70 (&u->lock){+.+.}-{2:2}, at: spin_lock include/linux/spinlock.h:351 [inline]
+> ffff88807cea4e70 (&u->lock){+.+.}-{2:2}, at: __unix_gc+0x40e/0xf70 net/unix/garbage.c:302
+> 
+> but task is already holding lock:
+> ffffffff8f6ab638 (unix_gc_lock){+.+.}-{2:2}, at: spin_lock include/linux/spinlock.h:351 [inline]
+> ffffffff8f6ab638 (unix_gc_lock){+.+.}-{2:2}, at: __unix_gc+0x117/0xf70 net/unix/garbage.c:261
+> 
+> which lock already depends on the new lock.
+> 
+> 
+> the existing dependency chain (in reverse order) is:
+> 
+> -> #1 (unix_gc_lock){+.+.}-{2:2}:
+>        lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5754
+>        __raw_spin_lock include/linux/spinlock_api_smp.h:133 [inline]
+>        _raw_spin_lock+0x2e/0x40 kernel/locking/spinlock.c:154
+>        spin_lock include/linux/spinlock.h:351 [inline]
+>        unix_notinflight+0x13d/0x390 net/unix/garbage.c:140
+>        unix_detach_fds net/unix/af_unix.c:1819 [inline]
+>        unix_destruct_scm+0x221/0x350 net/unix/af_unix.c:1876
+>        skb_release_head_state+0x100/0x250 net/core/skbuff.c:1188
+>        skb_release_all net/core/skbuff.c:1200 [inline]
+>        __kfree_skb net/core/skbuff.c:1216 [inline]
+>        kfree_skb_reason+0x16d/0x3b0 net/core/skbuff.c:1252
+>        kfree_skb include/linux/skbuff.h:1262 [inline]
+>        manage_oob net/unix/af_unix.c:2672 [inline]
+>        unix_stream_read_generic+0x1125/0x2700 net/unix/af_unix.c:2749
+>        unix_stream_splice_read+0x239/0x320 net/unix/af_unix.c:2981
 
-I'm not sure I get this, it is chained via the descriptor flag.
+This is a normal socket calling recvmsg(),
 
->
-> Yon know the "private" can not be used.
->
->
-> If the pp struct inside the page is not safe, how about:
->
->                 struct {        /* Page cache and anonymous pages */
->                         /**
->                          * @lru: Pageout list, eg. active_list protected =
-by
->                          * lruvec->lru_lock.  Sometimes used as a generic=
- list
->                          * by the page owner.
->                          */
->                         union {
->                                 struct list_head lru;
->
->                                 /* Or, for the Unevictable "LRU list" slo=
-t */
->                                 struct {
->                                         /* Always even, to negate PageTai=
-l */
->                                         void *__filler;
->                                         /* Count page's or folio's mlocks=
- */
->                                         unsigned int mlock_count;
->                                 };
->
->                                 /* Or, free page */
->                                 struct list_head buddy_list;
->                                 struct list_head pcp_list;
->                         };
->                         /* See page-flags.h for PAGE_MAPPING_FLAGS */
->                         struct address_space *mapping;
->                         union {
->                                 pgoff_t index;          /* Our offset wit=
-hin mapping. */
->                                 unsigned long share;    /* share count fo=
-r fsdax */
->                         };
->                         /**
->                          * @private: Mapping-private opaque data.
->                          * Usually used for buffer_heads if PagePrivate.
->                          * Used for swp_entry_t if PageSwapCache.
->                          * Indicates order in the buddy system if PageBud=
-dy.
->                          */
->                         unsigned long private;
->                 };
->
-> Or, we can map the private space of the page as a new structure.
 
-It could be a way. But such allocation might be huge if we are using
-indirect descriptors or I may miss something.
+>        do_splice_read fs/splice.c:985 [inline]
+>        splice_file_to_pipe+0x299/0x500 fs/splice.c:1295
+>        do_splice+0xf2d/0x1880 fs/splice.c:1379
+>        __do_splice fs/splice.c:1436 [inline]
+>        __do_sys_splice fs/splice.c:1652 [inline]
+>        __se_sys_splice+0x331/0x4a0 fs/splice.c:1634
+>        do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+>        do_syscall_64+0xf5/0x240 arch/x86/entry/common.c:83
+>        entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> 
+> -> #0 (&u->lock){+.+.}-{2:2}:
+>        check_prev_add kernel/locking/lockdep.c:3134 [inline]
+>        check_prevs_add kernel/locking/lockdep.c:3253 [inline]
+>        validate_chain+0x18cb/0x58e0 kernel/locking/lockdep.c:3869
+>        __lock_acquire+0x1346/0x1fd0 kernel/locking/lockdep.c:5137
+>        lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5754
+>        __raw_spin_lock include/linux/spinlock_api_smp.h:133 [inline]
+>        _raw_spin_lock+0x2e/0x40 kernel/locking/spinlock.c:154
+>        spin_lock include/linux/spinlock.h:351 [inline]
 
-Thanks
+and this is for TCP_LISTEN introduced by this patch.
+https://lore.kernel.org/netdev/20240409201047.1032217-1-mhal@rbox.co/
 
->
-> Thanks.
->
->
-> >
-> > Thanks
-> >
->
+So, this is false positive.
 
+
+>        __unix_gc+0x40e/0xf70 net/unix/garbage.c:302
+>        process_one_work kernel/workqueue.c:3254 [inline]
+>        process_scheduled_works+0xa10/0x17c0 kernel/workqueue.c:3335
+>        worker_thread+0x86d/0xd70 kernel/workqueue.c:3416
+>        kthread+0x2f0/0x390 kernel/kthread.c:388
+>        ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+>        ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+> 
+> other info that might help us debug this:
+> 
+>  Possible unsafe locking scenario:
+> 
+>        CPU0                    CPU1
+>        ----                    ----
+>   lock(unix_gc_lock);
+>                                lock(&u->lock);
+>                                lock(unix_gc_lock);
+>   lock(&u->lock);
+> 
+>  *** DEADLOCK ***
+> 
+> 3 locks held by kworker/u8:1/11:
+>  #0: ffff888015089148 ((wq_completion)events_unbound){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3229 [inline]
+>  #0: ffff888015089148 ((wq_completion)events_unbound){+.+.}-{0:0}, at: process_scheduled_works+0x8e0/0x17c0 kernel/workqueue.c:3335
+>  #1: ffffc90000107d00 (unix_gc_work){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3230 [inline]
+>  #1: ffffc90000107d00 (unix_gc_work){+.+.}-{0:0}, at: process_scheduled_works+0x91b/0x17c0 kernel/workqueue.c:3335
+>  #2: ffffffff8f6ab638 (unix_gc_lock){+.+.}-{2:2}, at: spin_lock include/linux/spinlock.h:351 [inline]
+>  #2: ffffffff8f6ab638 (unix_gc_lock){+.+.}-{2:2}, at: __unix_gc+0x117/0xf70 net/unix/garbage.c:261
+[...]
+> 
+> If you want syzbot to run the reproducer, reply with:
+> #syz test: git://repo/address.git branch-or-commit-hash
+> If you attach or paste a git patch, syzbot will apply it before testing.
+
+This suppressed the splat on my setup but just in case
+
+#syz test: git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git 4d2008430ce87061c9cefd4f83daf2d5bb323a96
+
+diff --git a/include/net/af_unix.h b/include/net/af_unix.h
+index 627ea8e2d915..6dcbccfaac04 100644
+--- a/include/net/af_unix.h
++++ b/include/net/af_unix.h
+@@ -85,6 +85,9 @@ enum unix_socket_lock_class {
+ 	U_LOCK_NORMAL,
+ 	U_LOCK_SECOND,	/* for double locking, see unix_state_double_lock(). */
+ 	U_LOCK_DIAG, /* used while dumping icons, see sk_diag_dump_icons(). */
++	U_LOCK_GC_LISTENER, /* used while determining gc candidates for listneing
++			     * socket to remove a small race window.
++			     */
+ };
+ 
+ static inline void unix_state_lock_nested(struct sock *sk,
+diff --git a/net/unix/garbage.c b/net/unix/garbage.c
+index 6433a414acf8..0104be9d4704 100644
+--- a/net/unix/garbage.c
++++ b/net/unix/garbage.c
+@@ -299,7 +299,7 @@ static void __unix_gc(struct work_struct *work)
+ 			__set_bit(UNIX_GC_MAYBE_CYCLE, &u->gc_flags);
+ 
+ 			if (sk->sk_state == TCP_LISTEN) {
+-				unix_state_lock(sk);
++				unix_state_lock_nested(sk, U_LOCK_GC_LISTENER);
+ 				unix_state_unlock(sk);
+ 			}
+ 		}
 
