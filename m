@@ -1,140 +1,179 @@
-Return-Path: <netdev+bounces-91077-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91079-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08C698B14B9
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 22:38:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8446F8B14C2
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 22:40:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BAD75286D57
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 20:38:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A92EE1C23128
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 20:40:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BF2216DEC8;
-	Wed, 24 Apr 2024 20:36:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A54A156674;
+	Wed, 24 Apr 2024 20:37:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XbIm1ALu"
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="Mn15PWv4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 767F4161913;
-	Wed, 24 Apr 2024 20:36:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61C77156888
+	for <netdev@vger.kernel.org>; Wed, 24 Apr 2024 20:37:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713990990; cv=none; b=HeL+dm79SzQP9jiyPSezv3GUg0OCdYVe7Wb4+woHhQqOFdKdaW4AMWyK/lSxocOS5qsTLOHuumoftvWDw+1Yg4M8iLhgZ2kYQDv28/r2zDbUbcBRhBG4X31pVh1m1z7wDsyl5U9VrwcYYLgBigtz7p2pqJ8nvk0s0Sh0NahpLbo=
+	t=1713991069; cv=none; b=OpZz5670J7+ieRRFtqNUzu2dSH78YHVK4D56JCVRAJA0f0jUkfsEINRZO0tUrgHSq6BbqzbmX7t8ajC5BHYb0TIKRdorDkAm2MejXoIAXXckCVDipsG72gE6QZT5VEJHDWGKtXpeAw7K1ua/iqAg9JV6Ptz5SDQNQlvalyK0ZNs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713990990; c=relaxed/simple;
-	bh=8Cigxoho0r+tMjpVglYL9iTtTctbGsJvMJo1lVtXGno=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=sfdj/owx8396Dx+kUZTESWMahzt/UC4JzZqk1ea3X6ri90yL9qCvjtXIIr8VConEjO5+RfiVx/l4fX3vL50yi6Ffg+9Cf11GuYlg/PHFI/RK+qhErrVNZCc0xoumW08rKCXecTat+ZM2uFJEV/nOYobtjcObrs4xD+0zC3e6pOI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XbIm1ALu; arc=none smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1713990988; x=1745526988;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=8Cigxoho0r+tMjpVglYL9iTtTctbGsJvMJo1lVtXGno=;
-  b=XbIm1ALu8iqweshks8Tk+Qk81D3lpxBy4xOtynhk+zclVxMTLzjQ5yNf
-   eHFV0TkezuXR3sFBFkv9sgqnNu66Hg9JtDb3KGcyoB6g0SNTOUq1G6ojM
-   4R8FsmgpCSq1/VZCjj26ZZwdPpYfOO+0ihptTVK/q4QipL1/y4IpDurR0
-   Z+XQA8YBjsS80YXv2+SvGJVz+aN/O3xd74An2ayt3lWkGAZCT3Y8tO/Vl
-   S3sk2VLROny3Khr4gy6pQsR6aQARGa9gw2+k4jfdjS7slJo01umT3aXZx
-   IuRZgg0Q8jiOfOyMJcmu/lpHpMS34AsGPN89Q+rOzzCOdXTAZZy+7NTI2
-   Q==;
-X-CSE-ConnectionGUID: z5pdg5MBTVKkPXH6MmrnKA==
-X-CSE-MsgGUID: HydkCTTNTm+qxxmvs/bB8Q==
-X-IronPort-AV: E=McAfee;i="6600,9927,11054"; a="9512006"
-X-IronPort-AV: E=Sophos;i="6.07,227,1708416000"; 
-   d="scan'208";a="9512006"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2024 13:36:22 -0700
-X-CSE-ConnectionGUID: 1UfQkPigTkGEuINXErWMyg==
-X-CSE-MsgGUID: 50srluUpRxKf2sE4mlqj0A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,227,1708416000"; 
-   d="scan'208";a="29315005"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by fmviesa003.fm.intel.com with ESMTP; 24 Apr 2024 13:36:21 -0700
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	netdev@vger.kernel.org
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
-	anthony.l.nguyen@intel.com,
-	hawk@kernel.org,
-	linux-mm@kvack.org,
-	przemyslaw.kitszel@intel.com,
-	alexanderduyck@fb.com,
-	ilias.apalodimas@linaro.org,
-	linux-kernel@vger.kernel.org,
-	linyunsheng@huawei.com,
-	nex.sw.ncis.osdt.itp.upstreaming@intel.com,
-	cl@linux.com,
-	akpm@linux-foundation.org,
-	vbabka@suse.cz
-Subject: [PATCH net-next v11 10/10] MAINTAINERS: add entry for libeth and libie
-Date: Wed, 24 Apr 2024 13:35:57 -0700
-Message-ID: <20240424203559.3420468-11-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20240424203559.3420468-1-anthony.l.nguyen@intel.com>
-References: <20240424203559.3420468-1-anthony.l.nguyen@intel.com>
+	s=arc-20240116; t=1713991069; c=relaxed/simple;
+	bh=Eaar1o6qWStq7g2C70s1orCG9FKn4AnoWIJHHRSPqNw=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=aFlqdWqiYP/OO1SkwgSL5dpfrCrKNzoXQTep3SkY1WOYy/hNDAJxsg60sKkTePWTh6N4ZoJVa8Kci0jznlwO+saQuvMNWj/jVcvrHLwhlgR2eoAWgECrnJr6WuWEazUI7jZfyJ+B3bN5OuvkFQrfO6Bt2/IikEWj0kVBjMCyCVM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=Mn15PWv4; arc=none smtp.client-ip=67.231.153.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+Received: from pps.filterd (m0148460.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 43OJpRSb000600
+	for <netdev@vger.kernel.org>; Wed, 24 Apr 2024 13:37:47 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding :
+ content-type; s=s2048-2021-q4;
+ bh=XTibnUZz+sBcamQII8TeL0LSlh99joVEVJjMbfnVinw=;
+ b=Mn15PWv4+sAki2Jgk8m8F0WmgV/8Mw8MCc/VMqGe9FhaadDvr8RFpGUi24nIbguwE8ci
+ Ml0bSUkMNRExsseaUWscI5Ft7IqBUwtpwQwBlOMKbQagM1Rc4a1THGp41DoTrsKMxI56
+ uDTmugVdFgbvzd+AB3e35lr+YdTgaJDy1Jhykcc4j7K9T/YuNVfCsjWTWQji9U4EbTBB
+ qD5Z25wDSLSfeT63qY5X3g8PekM+6ZMoTk4Hi90a+n0NQqRtyX8ntJ9UTm008p0BzBVw
+ Jp2meZSEds60eALt/TttnTnAM7gcncRZPt1f9E92CojPzHQm93tYLkX3+WaLzWnZ6Nm8 Xw== 
+Received: from maileast.thefacebook.com ([163.114.130.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3xpsq653tv-6
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Wed, 24 Apr 2024 13:37:46 -0700
+Received: from twshared24822.14.frc2.facebook.com (2620:10d:c0a8:1b::449c) by
+ mail.thefacebook.com (2620:10d:c0a8:83::8) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 24 Apr 2024 20:37:31 +0000
+Received: by devvm15954.vll0.facebook.com (Postfix, from userid 420730)
+	id 0BB9CC26A57F; Wed, 24 Apr 2024 13:37:22 -0700 (PDT)
+From: Miao Xu <miaxu@meta.com>
+To: Eric Dumazet <edumazet@google.com>,
+        "David S . Miller"
+	<davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>,
+        David Ahern <dsahern@kernel.org>, Martin Lau
+	<kafai@meta.com>
+CC: <netdev@vger.kernel.org>, <bpf@vger.kernel.org>, Miao Xu <miaxu@meta.com>
+Subject: [PATCH 1/2] [PATCH net-next,1/2] Add new args for cong_control in tcp_congestion_ops
+Date: Wed, 24 Apr 2024 13:37:12 -0700
+Message-ID: <20240424203713.4003974-1-miaxu@meta.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
+X-FB-Internal: Safe
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: wdx8EK6VRZXj6rBZDKFWumWrk4FH3xUz
+X-Proofpoint-GUID: wdx8EK6VRZXj6rBZDKFWumWrk4FH3xUz
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1011,Hydra:6.0.650,FMLib:17.11.176.26
+ definitions=2024-04-24_17,2024-04-24_01,2023-05-22_02
 
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
+This patch adds two new arguments for cong_control of struct
+tcp_congestion_ops:
+ - ack
+ - flag
+These two arguments are inherited from the caller tcp_cong_control in
+tcp_intput.c. One use case of them is to update cwnd and pacing rate
+inside cong_control based on the info they provide. For example, the
+flag can be used to decide if it is the right time to raise or reduce a
+sender's cwnd.
 
-Add myself as a maintainer/supporter for libeth and libie. Let they have
-separate entries from the Intel ethernet code as it's a bit different
-case and all patches will go through me rather than Tony.
+Another change in this patch is to allow the write of tp->snd_cwnd_stamp
+for a bpf tcp ca program. An use case of writing this field is to keep
+track of the time whenever tp->snd_cwnd is raised or reduced inside the
+cong_control callback.
 
-Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Signed-off-by: Miao Xu <miaxu@meta.com>
 ---
- MAINTAINERS | 20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
+ include/net/tcp.h     | 2 +-
+ net/ipv4/bpf_tcp_ca.c | 6 +++++-
+ net/ipv4/tcp_bbr.c    | 2 +-
+ net/ipv4/tcp_input.c  | 2 +-
+ 4 files changed, 8 insertions(+), 4 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index c0bfad334623..4f94e3aabed4 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -12390,6 +12390,26 @@ F:	drivers/ata/
- F:	include/linux/ata.h
- F:	include/linux/libata.h
- 
-+LIBETH COMMON ETHERNET LIBRARY
-+M:	Alexander Lobakin <aleksander.lobakin@intel.com>
-+L:	netdev@vger.kernel.org
-+L:	intel-wired-lan@lists.osuosl.org (moderated for non-subscribers)
-+S:	Supported
-+T:	git https://github.com/alobakin/linux.git
-+F:	drivers/net/ethernet/intel/libeth/
-+F:	include/net/libeth/
-+K:	libeth
-+
-+LIBIE COMMON INTEL ETHERNET LIBRARY
-+M:	Alexander Lobakin <aleksander.lobakin@intel.com>
-+L:	intel-wired-lan@lists.osuosl.org (moderated for non-subscribers)
-+L:	netdev@vger.kernel.org
-+S:	Supported
-+T:	git https://github.com/alobakin/linux.git
-+F:	drivers/net/ethernet/intel/libie/
-+F:	include/linux/net/intel/libie/
-+K:	libie
-+
- LIBNVDIMM BTT: BLOCK TRANSLATION TABLE
- M:	Vishal Verma <vishal.l.verma@intel.com>
- M:	Dan Williams <dan.j.williams@intel.com>
--- 
-2.41.0
+diff --git a/include/net/tcp.h b/include/net/tcp.h
+index b935e1ae4caf..b37b8219060a 100644
+--- a/include/net/tcp.h
++++ b/include/net/tcp.h
+@@ -1167,7 +1167,7 @@ struct tcp_congestion_ops {
+ 	/* call when packets are delivered to update cwnd and pacing rate,
+ 	 * after all the ca_state processing. (optional)
+ 	 */
+-	void (*cong_control)(struct sock *sk, const struct rate_sample *rs);
++	void (*cong_control)(struct sock *sk, u32 ack, int flag, const struct r=
+ate_sample *rs);
+=20
+=20
+ 	/* new value of cwnd after loss (required) */
+diff --git a/net/ipv4/bpf_tcp_ca.c b/net/ipv4/bpf_tcp_ca.c
+index 7f518ea5f4ac..18227757ec0c 100644
+--- a/net/ipv4/bpf_tcp_ca.c
++++ b/net/ipv4/bpf_tcp_ca.c
+@@ -107,6 +107,9 @@ static int bpf_tcp_ca_btf_struct_access(struct bpf_ve=
+rifier_log *log,
+ 	case offsetof(struct tcp_sock, snd_cwnd_cnt):
+ 		end =3D offsetofend(struct tcp_sock, snd_cwnd_cnt);
+ 		break;
++	case offsetof(struct tcp_sock, snd_cwnd_stamp):
++		end =3D offsetofend(struct tcp_sock, snd_cwnd_stamp);
++		break;
+ 	case offsetof(struct tcp_sock, snd_ssthresh):
+ 		end =3D offsetofend(struct tcp_sock, snd_ssthresh);
+ 		break;
+@@ -307,7 +310,8 @@ static u32 bpf_tcp_ca_min_tso_segs(struct sock *sk)
+ 	return 0;
+ }
+=20
+-static void bpf_tcp_ca_cong_control(struct sock *sk, const struct rate_s=
+ample *rs)
++static void bpf_tcp_ca_cong_control(struct sock *sk, u32 ack, int flag,
++				    const struct rate_sample *rs)
+ {
+ }
+=20
+diff --git a/net/ipv4/tcp_bbr.c b/net/ipv4/tcp_bbr.c
+index 05dc2d05bc7c..c13d263dae06 100644
+--- a/net/ipv4/tcp_bbr.c
++++ b/net/ipv4/tcp_bbr.c
+@@ -1024,7 +1024,7 @@ static void bbr_update_model(struct sock *sk, const=
+ struct rate_sample *rs)
+ 	bbr_update_gains(sk);
+ }
+=20
+-__bpf_kfunc static void bbr_main(struct sock *sk, const struct rate_samp=
+le *rs)
++__bpf_kfunc static void bbr_main(struct sock *sk, u32 ack, int flag, con=
+st struct rate_sample *rs)
+ {
+ 	struct bbr *bbr =3D inet_csk_ca(sk);
+ 	u32 bw;
+diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+index 384fa5e2f065..661dca9e3895 100644
+--- a/net/ipv4/tcp_input.c
++++ b/net/ipv4/tcp_input.c
+@@ -3541,7 +3541,7 @@ static void tcp_cong_control(struct sock *sk, u32 a=
+ck, u32 acked_sacked,
+ 	const struct inet_connection_sock *icsk =3D inet_csk(sk);
+=20
+ 	if (icsk->icsk_ca_ops->cong_control) {
+-		icsk->icsk_ca_ops->cong_control(sk, rs);
++		icsk->icsk_ca_ops->cong_control(sk, ack, flag, rs);
+ 		return;
+ 	}
+=20
+--=20
+2.43.0
 
 
