@@ -1,152 +1,121 @@
-Return-Path: <netdev+bounces-90982-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90983-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3EC478B0D41
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 16:53:37 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9CCE8B0D42
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 16:53:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EE69E28B893
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 14:53:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BCAAFB253D9
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 14:53:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 884E115F40B;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F357315F41B;
 	Wed, 24 Apr 2024 14:52:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="WW821IC6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="syIDAmzU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E977615EFC8
-	for <netdev@vger.kernel.org>; Wed, 24 Apr 2024 14:52:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF35915F414
+	for <netdev@vger.kernel.org>; Wed, 24 Apr 2024 14:52:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713970356; cv=none; b=IWdSeDZWv6i/j3/jlT8nmvgXHajlCcF9Py1cRUPllmfSXvYjZySwO7m8AaujDstlHw/94HUpohhHfcS458GJvM2+5N7xZkZgiv2MWFUdTkD+uHcLDlirBhUqHmPwhsHwPgHlWDJg2YiPMhPqpavqjP1qFDDF97CTohwH9qPZUJA=
+	t=1713970356; cv=none; b=E8Y5pU9siMW7XCuvh3MAfh6dZ6uUB02nBkGBbCdebZKqBSm4CwLABOv10Wimau0sxPu7K/Jt0s0kK9PU+VntNh4KAZZ5OkA3LdZNfDQNEVmonXR/95gA+c62eEBoPbuinyIL9Ayp9tFeIB4ERIkSJ+D0EtM24Hy3XdaO9gp8LCE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1713970356; c=relaxed/simple;
-	bh=uwMlOajpsTG7Nvu/GdqkCHHfqk+DgHsocAsnwQtfytk=;
+	bh=5x3yHfuXonp2WI73CmKckwBu5jWagrDv+Ekt4EbPEaM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QdxSHag4ZLXtT3AqWINZuvmVyyioBolmSQLZBSzJirDkD6r5Vn4K6njVLoOIxrgLfTriqLbSuI1SQWKnP4ERfPXakK+y5setzODZItN+XQAw3TDhTG088/ylD6IqmnkODHzn1lmviDaGvUO/0apzgNLMPXz9pAfXzeTqd3N/7Z8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=WW821IC6; arc=none smtp.client-ip=209.85.167.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-516ef30b16eso8565546e87.3
-        for <netdev@vger.kernel.org>; Wed, 24 Apr 2024 07:52:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1713970353; x=1714575153; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=U7XnI+BXV8UmW2sRzD+hzCEM7gwy7DDAc2EqtkuzGdE=;
-        b=WW821IC638aKkEVNJ1SI4qdJdp32abv2tsasowSJrxJXD/WZMGypwjC9OGZz0QxQAP
-         L4q+PRmYCbm6dzrAs02icdNaPVO0edEkI1r+BLz6xc1Ubjxrv51bOvepNZlOXAGbMHgy
-         RIUHnT1gRbmyhe2y+op6emBQDoP8FDCL2vuL/7xStCb2rS3k4BFXQpYWg3DYnX28dT1v
-         2rfMj/sEcpuTjjSo9cD2xiQyBH+t+cdEfkQPDyR0GCcxGUQgn4kFp0pbjasdSy4uZMdN
-         Q24y2yHrr1DM4BNU9lpfKoz8tXS9CWKRU5OKnbymqIld5KxIwHFOphIpqpbYpdfX1q5S
-         Kc1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713970353; x=1714575153;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=U7XnI+BXV8UmW2sRzD+hzCEM7gwy7DDAc2EqtkuzGdE=;
-        b=OVko41T02W5BZvxhRjABYr4v67RLZhzEvg/HlLtRmqSUXgXEtvzeNfBgcg04hnrKhU
-         PcxED21RIs0GAESejOGXfb1jULJCfNNY0Gh7FChHKrJeBvtooO6nvJG9KSRwQOGHoJ3e
-         pWV8CdsNj5/5SYC6Ixe3G0r725TEeIu9N429OnkLZhmE1coeOC3A9lFys1YhM0Do37ne
-         Q96efXROg1jjzPsc9hveWrhLbsSRIWDDnwv3Jy91H9kfr2oGmLhRKbo1ODTBmYat0FGK
-         GtZgbyMhXEjHB+6WNTy/b1gRgoYeUIZKfCbslzG5e/1nVxQS3FC+XX9AyrY7uFujeFBk
-         SH1A==
-X-Gm-Message-State: AOJu0YwJvy5BVnQOUo+29uIlbrmrququ3o66rAwl1KlF0a9RR6ZZ4cPB
-	vZuZU37J7ZagyMYmp5ZrWFwMH3uTu/4AmOdtoTKzUrjT64tyKqpENraKPWKnyEM=
-X-Google-Smtp-Source: AGHT+IH9F9eP/2XPHDQWflN29dAuAUFe6jszWIggRCsEU6DATfYGnMJ4GGP77Hb98kuV+APO2prnzQ==
-X-Received: by 2002:a05:6512:3d2a:b0:518:8d15:8810 with SMTP id d42-20020a0565123d2a00b005188d158810mr2738510lfv.14.1713970352642;
-        Wed, 24 Apr 2024 07:52:32 -0700 (PDT)
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id k15-20020a170906128f00b00a473a1fe089sm8442813ejb.1.2024.04.24.07.52.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Apr 2024 07:52:31 -0700 (PDT)
-Date: Wed, 24 Apr 2024 16:52:27 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: =?iso-8859-1?Q?Asbj=F8rn_Sloth_T=F8nnesen?= <ast@fiberby.net>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=bL0fwcIYKIDPlIh0+SKhn/s46cRYKUp6/mKqZ+qR0+2He7TYWDTCSinrYYRVH6WBTekxsXdpmYaqZlhF4mGVxSOK/uKn6I+W2MolEacjl1kGYnChdxvlhpZ2lXhVrNgrDMZlb5/KwhISB76fQqXHOJEho0rUTKkY7a0foHlHYvk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=syIDAmzU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 761B0C2BD10;
+	Wed, 24 Apr 2024 14:52:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713970356;
+	bh=5x3yHfuXonp2WI73CmKckwBu5jWagrDv+Ekt4EbPEaM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=syIDAmzUIETVy84bRuRhJAdvNe5and4Osfsszd9Gc2RWV3fVV0ftalynsLRBx4+OE
+	 leeWIJls97oM8ACzo8/314E0qB3tDqDe/9rzQh49zVEJLP1WdD1phhepa2TJBseqeh
+	 LJGZBzwJL0G+jRbJgA3/vwcmdYMpFzsFwI3g3PYlCvTFP290pzFaUNF6icbxKbiPeC
+	 KQbimIicsm9ytenGlVkQaKshfxfjgJmy7DrfUFoCSa4ynckMPrqrM8+GpjgRuibBl/
+	 5gsbV5Vn3U2evRvN2YSa5p7hzdUn89Y2X/uO720e4XNBv/+Y8K7JCwQLa0qPYtqOag
+	 MwkGd6eXMRddg==
+Date: Wed, 24 Apr 2024 15:52:32 +0100
+From: Simon Horman <horms@kernel.org>
+To: Petr Machata <petrm@nvidia.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Ariel Elior <aelior@marvell.com>,
-	Manish Chopra <manishc@marvell.com>
-Subject: Re: [PATCH net-next] net: qede: flower: validate control flags
-Message-ID: <Zikcq2S90S97h7Z0@nanopsycho>
-References: <20240424134250.465904-1-ast@fiberby.net>
+	netdev@vger.kernel.org, Ido Schimmel <idosch@nvidia.com>,
+	Jiri Pirko <jiri@resnulli.us>, Alexander Zubkov <green@qrator.net>,
+	mlxsw@nvidia.com
+Subject: Re: [PATCH net 7/9] mlxsw: spectrum_acl_tcam: Fix warning during
+ rehash
+Message-ID: <20240424145232.GI42092@kernel.org>
+References: <cover.1713797103.git.petrm@nvidia.com>
+ <cc17eed86b41dd829d39b07906fec074a9ce580e.1713797103.git.petrm@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240424134250.465904-1-ast@fiberby.net>
+In-Reply-To: <cc17eed86b41dd829d39b07906fec074a9ce580e.1713797103.git.petrm@nvidia.com>
 
-Wed, Apr 24, 2024 at 03:42:48PM CEST, ast@fiberby.net wrote:
->This driver currently doesn't support any flower control flags.
->
->Implement check for control flags, such as can be set through
->`tc flower ... ip_flags frag`.
->
->Since qede_parse_flow_attr() are called by both qede_add_tc_flower_fltr()
->and qede_flow_spec_to_rule(), as the latter doesn't having access to
->extack, then flow_rule_*_control_flags() can't be used in this driver.
-
-Why? You can pass null.
-
->
->This patch therefore re-implements flow_rule_match_has_control_flags(),
->but with error messaging via DP_NOTICE, instead of NL_SET_ERR_MSG_FMT_MOD.
->
->So in case any control flags are masked, we call DP_NOTICE() and
->return -EOPNOTSUPP.
->
->Only compile-tested.
->
->Signed-off-by: Asbjørn Sloth Tønnesen <ast@fiberby.net>
->---
->
->This is AFAICT the last driver which didn't validate these flags.
->
->$ git grep FLOW_DISSECTOR_KEY_CONTROL drivers/
->$ git grep 'flow_rule_.*_control_flags' drivers/
->
-> drivers/net/ethernet/qlogic/qede/qede_filter.c | 13 +++++++++++++
-> 1 file changed, 13 insertions(+)
->
->diff --git a/drivers/net/ethernet/qlogic/qede/qede_filter.c b/drivers/net/ethernet/qlogic/qede/qede_filter.c
->index a5ac21a0ee33..40f72e700d8e 100644
->--- a/drivers/net/ethernet/qlogic/qede/qede_filter.c
->+++ b/drivers/net/ethernet/qlogic/qede/qede_filter.c
->@@ -1843,6 +1843,19 @@ qede_parse_flow_attr(struct qede_dev *edev, __be16 proto,
-> 		return -EPROTONOSUPPORT;
-> 	}
+On Mon, Apr 22, 2024 at 05:26:00PM +0200, Petr Machata wrote:
+> From: Ido Schimmel <idosch@nvidia.com>
 > 
->+	if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_CONTROL)) {
->+		struct flow_match_control match;
->+
->+		flow_rule_match_control(rule, &match);
->+
->+		if (match.mask->flags) {
->+			DP_NOTICE(edev,
->+				  "Unsupported match on control.flags %#x",
->+				  match.mask->flags);
->+			return -EOPNOTSUPP;
->+		}
->+	}
->+
-> 	if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_BASIC)) {
-> 		struct flow_match_basic match;
+> As previously explained, the rehash delayed work migrates filters from
+> one region to another. This is done by iterating over all chunks (all
+> the filters with the same priority) in the region and in each chunk
+> iterating over all the filters.
 > 
->-- 
->2.43.0
->
->
+> When the work runs out of credits it stores the current chunk and entry
+> as markers in the per-work context so that it would know where to resume
+> the migration from the next time the work is scheduled.
+> 
+> Upon error, the chunk marker is reset to NULL, but without resetting the
+> entry markers despite being relative to it. This can result in migration
+> being resumed from an entry that does not belong to the chunk being
+> migrated. In turn, this will eventually lead to a chunk being iterated
+> over as if it is an entry. Because of how the two structures happen to
+> be defined, this does not lead to KASAN splats, but to warnings such as
+> [1].
+> 
+> Fix by creating a helper that resets all the markers and call it from
+> all the places the currently only reset the chunk marker. For good
+> measures also call it when starting a completely new rehash. Add a
+> warning to avoid future cases.
+> 
+> [1]
+> WARNING: CPU: 7 PID: 1076 at drivers/net/ethernet/mellanox/mlxsw/core_acl_flex_keys.c:407 mlxsw_afk_encode+0x242/0x2f0
+> Modules linked in:
+> CPU: 7 PID: 1076 Comm: kworker/7:24 Tainted: G        W          6.9.0-rc3-custom-00880-g29e61d91b77b #29
+> Hardware name: Mellanox Technologies Ltd. MSN3700/VMOD0005, BIOS 5.11 01/06/2019
+> Workqueue: mlxsw_core mlxsw_sp_acl_tcam_vregion_rehash_work
+> RIP: 0010:mlxsw_afk_encode+0x242/0x2f0
+> [...]
+> Call Trace:
+>  <TASK>
+>  mlxsw_sp_acl_atcam_entry_add+0xd9/0x3c0
+>  mlxsw_sp_acl_tcam_entry_create+0x5e/0xa0
+>  mlxsw_sp_acl_tcam_vchunk_migrate_all+0x109/0x290
+>  mlxsw_sp_acl_tcam_vregion_rehash_work+0x6c/0x470
+>  process_one_work+0x151/0x370
+>  worker_thread+0x2cb/0x3e0
+>  kthread+0xd0/0x100
+>  ret_from_fork+0x34/0x50
+>  </TASK>
+> 
+> Fixes: 6f9579d4e302 ("mlxsw: spectrum_acl: Remember where to continue rehash migration")
+> Signed-off-by: Ido Schimmel <idosch@nvidia.com>
+> Tested-by: Alexander Zubkov <green@qrator.net>
+> Reviewed-by: Petr Machata <petrm@nvidia.com>
+> Signed-off-by: Petr Machata <petrm@nvidia.com>
+
+Reviewed-by: Simon Horman <horms@kernel.org>
+
 
