@@ -1,111 +1,92 @@
-Return-Path: <netdev+bounces-90876-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90878-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E18488B090A
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 14:17:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F98F8B0918
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 14:19:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9F4DB284B2E
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 12:17:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A5AC81C238D9
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 12:19:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88D6515B137;
-	Wed, 24 Apr 2024 12:16:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2723215ADA1;
+	Wed, 24 Apr 2024 12:18:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="U9zkW1MA"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="1lbAuKeu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8FD415AD9E;
-	Wed, 24 Apr 2024 12:16:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57963157468;
+	Wed, 24 Apr 2024 12:18:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713961015; cv=none; b=oahlixZyowEeWPvjEOyUfA7q+x0da2mdyJs6srCc3K66HB7VL9rxMQrDoneXUTBKlR8XPwxEIMbAtnOVqhcWynTUxLcUiMhebP5Oi7//vOzV3xdyiMqO7tPcQN0Mf9Tewib/KdRA6RooUp0UF22iSnh+5gGRdmgB+3m01vYRyEU=
+	t=1713961124; cv=none; b=efK59Egq3IkhpoFZMqckIjRJkQIWoa7sh6BjfvKTINaHHhAMeZX1QigwPPG1bp0K1nyzUXoIJD7AQjazxp1OF5B+367JNY3RxOr1s5ST2XTGpJcwQ1YjD3FDbHDlmr7f3AlPKAT00lib0pmjM7ND6uetfMN67v31hALIDS+duso=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713961015; c=relaxed/simple;
-	bh=h8eKlpA8aZZwVUqM78/5h1yz+b7OYeMXRZb+mmI+cIU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lhvn9sPhp3gfuOmGVTkkd9HurA0OOu7kJxSW5JMLgydddikSuRAT7ImP/VsUW7cv897Kom0L/LaXgz9TvThD9Ox1PQepcTjRdmX9K8CsKGAO980759UBHEdIT/fKme9zXGvjBPvUaINrid6Lr4o3nEOlgMuLTPNSbLUYlr9F4K0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=U9zkW1MA; arc=none smtp.client-ip=193.104.135.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
-Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
-	by mail1.fiberby.net (Postfix) with ESMTPSA id E8314600A7;
-	Wed, 24 Apr 2024 12:16:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
-	s=202008; t=1713961004;
-	bh=h8eKlpA8aZZwVUqM78/5h1yz+b7OYeMXRZb+mmI+cIU=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=U9zkW1MAsDL+1CvLFFtUVK7aRTXGk8uRkn6uMXraIMcQn6NzX5hl0EiM0Gl6ElnEJ
-	 XDzQBzeRUo41sc1ojdtewLOsdgTN8q3EP500OlzAYqRMDiwuoURt0uASR8FV0x7bO7
-	 kE0l7KC8K1o3IcaIQIYf5huZ8ooqayvxQIM8DJvJ6njFGLRQGA7Td2LY9mphGkLTNO
-	 EobCx6XmWLTCPN5e4Mo+bzYapHLl+RpvcRMhBmcYh78RaGgfESuPa+j3l4toFXBwMd
-	 pAA1knpezKGuE9+viyyMHF3Rk5Assmuw+g9IlZj8IaL8pCzJoQfj2bskV3poGAbjxA
-	 w6nYC3DrGAzRQ==
-Received: by x201s (Postfix, from userid 1000)
-	id CA0D721BB49; Wed, 24 Apr 2024 12:16:37 +0000 (UTC)
-From: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>
-To: netdev@vger.kernel.org
-Cc: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>,
-	Steen Hegelund <Steen.Hegelund@microchip.com>,
-	Lars Povlsen <lars.povlsen@microchip.com>,
-	Daniel Machon <daniel.machon@microchip.com>,
-	UNGLinuxDriver@microchip.com,
+	s=arc-20240116; t=1713961124; c=relaxed/simple;
+	bh=SULN04cta+fMxT+A7uGTXzI3Jjh1sMkfuGFHWvafAXU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RV6W/hyAxg1pwBggmBMRijMdYaS5Dmp0QMDKDyPl9qRGHfJprTyi1mx/PTSCakMFmriBN1tbCUglT9DpCYKsREIUOvVUSRqi+nyOuHY0kWwTRcC05LwDx6tKHYKqtwcsLHntumhFlla6zosS+JiaCg+gVKiyUxZ+Ef2/IpFxGQE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=1lbAuKeu; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=5YU6RLfJEcQkDYGp0nVtAW9ea3dToWjX8XmP9WmB4qY=; b=1lbAuKeuHQtGR5Xoqex+Vz8IKD
+	R14cRiF09njBi1f0wxU9n9ZAZ+VTdwMBSHHPn1ashAK0Rlpsa0EjCaUXqXosheKd/okYE74UdJjnd
+	faVQ4WN9xtHb8y5C8zN+wTZYzg3bOfkdqgdSIRS0Wf5fNjz4DbprPh2Rw/6hGYimsuQc=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rzbZx-00DoLZ-13; Wed, 24 Apr 2024 14:18:25 +0200
+Date: Wed, 24 Apr 2024 14:18:25 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Florian Fainelli <florian.fainelli@broadcom.com>
+Cc: Andy Shevchenko <andy.shevchenko@gmail.com>,
+	linux-kernel@vger.kernel.org,
+	Jarkko Nikula <jarkko.nikula@linux.intel.com>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Mika Westerberg <mika.westerberg@linux.intel.com>,
+	Jan Dabros <jsd@semihalf.com>, Andi Shyti <andi.shyti@kernel.org>,
+	Lee Jones <lee@kernel.org>, Jiawen Wu <jiawenwu@trustnetic.com>,
+	Mengyuan Lou <mengyuanlou@net-swift.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org,
-	Jiri Pirko <jiri@resnulli.us>,
-	Simon Horman <horms@kernel.org>
-Subject: [PATCH net-next v2 4/4] net: sparx5: flower: check for unsupported control flags
-Date: Wed, 24 Apr 2024 12:16:25 +0000
-Message-ID: <20240424121632.459022-5-ast@fiberby.net>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240424121632.459022-1-ast@fiberby.net>
-References: <20240424121632.459022-1-ast@fiberby.net>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Duanqiang Wen <duanqiangwen@net-swift.com>,
+	"open list:SYNOPSYS DESIGNWARE I2C DRIVER" <linux-i2c@vger.kernel.org>,
+	"open list:WANGXUN ETHERNET DRIVER" <netdev@vger.kernel.org>
+Subject: Re: [PATCH 1/4] i2c: designware: Create shared header hosting driver
+ name
+Message-ID: <b3cdfeb7-6eb0-4522-96ae-d3155d677002@lunn.ch>
+References: <20240423233622.1494708-1-florian.fainelli@broadcom.com>
+ <20240423233622.1494708-2-florian.fainelli@broadcom.com>
+ <ZihLSKe_BHxasBql@surfacebook.localdomain>
+ <0aac2975-42d0-4abe-9405-bf8a38a94104@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0aac2975-42d0-4abe-9405-bf8a38a94104@broadcom.com>
 
-Use flow_rule_is_supp_control_flags() to reject filters with
-unsupported control flags.
+> > >   #include <linux/i2c.h>
+> > > +#include <linux/i2c-designware.h>
+> > 
+> > Can it be hidden in the subfolder?
+> 
+> That would require the MFD and ethernet drivers to include relative to where
+> they are in the source tree, do we really want that?
 
-In case any unsupported control flags are masked,
-flow_rule_is_supp_control_flags() sets a NL extended
-error message, and we return -EOPNOTSUPP.
+Maybe linux/platform_data/i2c-designware.h ? There are a few NAME
+macros in there.
 
-Only compile-tested.
-
-Signed-off-by: Asbjørn Sloth Tønnesen <ast@fiberby.net>
----
- drivers/net/ethernet/microchip/sparx5/sparx5_tc_flower.c | 5 +++++
- 1 file changed, 5 insertions(+)
-
-diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_tc_flower.c b/drivers/net/ethernet/microchip/sparx5/sparx5_tc_flower.c
-index 22f6c778afb0..8d67d9f24c76 100644
---- a/drivers/net/ethernet/microchip/sparx5/sparx5_tc_flower.c
-+++ b/drivers/net/ethernet/microchip/sparx5/sparx5_tc_flower.c
-@@ -197,6 +197,11 @@ sparx5_tc_flower_handler_control_usage(struct vcap_tc_flower_parse_usage *st)
- 		}
- 	}
- 
-+	if (!flow_rule_is_supp_control_flags(FLOW_DIS_IS_FRAGMENT |
-+					     FLOW_DIS_FIRST_FRAG,
-+					     mt.mask->flags, extack))
-+		return -EOPNOTSUPP;
-+
- 	st->used_keys |= BIT_ULL(FLOW_DISSECTOR_KEY_CONTROL);
- 
- 	return err;
--- 
-2.43.0
-
+       Andrew
 
