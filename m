@@ -1,93 +1,60 @@
-Return-Path: <netdev+bounces-90974-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90975-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E84398B0D18
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 16:48:25 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E2B5D8B0D1C
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 16:48:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 76EEB28A920
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 14:48:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 833D91F26510
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 14:48:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2A7A15ECD1;
-	Wed, 24 Apr 2024 14:48:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03D5715ECFA;
+	Wed, 24 Apr 2024 14:48:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="ogoM/PS1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f2J8Mrve"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37F5715E802
-	for <netdev@vger.kernel.org>; Wed, 24 Apr 2024 14:48:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D021815D5C7
+	for <netdev@vger.kernel.org>; Wed, 24 Apr 2024 14:48:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713970094; cv=none; b=ZqeVS1RIpKIAtoFmtsDEGCjmxRLaC6gAX1niY3jbinqd3hVcPwHlx40vhBqKkjSwB57OCfU7D5tqMSGmuGY351VWY5czlUhSnBFnItxCQxqYNlx72h53v0svZ+z5yHv1G3rpF296JH3o2dVX3RHsW1l9THov2cBoIX+H85hdKd8=
+	t=1713970116; cv=none; b=lenCozVFVc5ZDBTMuGJlRsIw/n+HdCqWVsxfra5/CnWihwBuM7dTHDE2TTVTvP9uX0F4dpL5l+KbG1HoUzY0V0tMGVIlhhP+dKnKzdhKPmEY0iXWkgRZdiJXLfyq+rjYIwpyf5fOx8cdYtfZzYShoaEA6ibDj8MWWnVjnHnWhko=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713970094; c=relaxed/simple;
-	bh=pZRMHeRrZ7PqTOAeDPMoXssbpZwAoT0QUjHK0yTI7G4=;
+	s=arc-20240116; t=1713970116; c=relaxed/simple;
+	bh=MtcBXVBoT7WsAzim0Ux670NdL79KlExVL9cJiDbfnQ0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RcCNpSOZcUjJ2cn4ikL4+I2V2dE2jCKHrfa9a1o7wQR0VxRqB0a4mKXMbSItM6Wna08aIqfRV+l47LtkoGhvrn+8IGfgFpRm7Kh9MIxceTipfKE8k0IaVh8/3XcmbLcviWT4srnJlgoKbgSMTz/KFbhckQHsD8qVCsFp7m2MSyI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=ogoM/PS1; arc=none smtp.client-ip=209.85.218.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-a5557e3ebcaso193111466b.1
-        for <netdev@vger.kernel.org>; Wed, 24 Apr 2024 07:48:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1713970091; x=1714574891; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=NVbaUyrmVafdj/cQpZaiAaBbKWO3w1dBZ7Hp+YT/Oh8=;
-        b=ogoM/PS1Y2jX+13pwUTQ0rudu54Dmu2iJ7RNx2vmuACcmsFTVv6vIHNhtekmDb3nCu
-         8BusBlotgIy49+T7uufsI7jkabpyw6Qgn0OOe9xrsHCF8b+/WiXRavurqvkpYDqGlY2W
-         bMdYlIbaX1V5LzLf1HkChyUNv5S35MFFI6vLVy+LVUycgNK0M1ntygEzSiL9dJFSH+JS
-         PjzZbANMK+XkJ3wqPfrrvKAnXwJmWfb3YtDwhpo7cbZnwWpLLczj6prwBaquXsTaPY7J
-         Dd9HshcE9GBUZzUwqvwxbq8eaUvX6emjkeYk+v4j1fiYaEu7x2CzW/PgSiDlkVmH2O/W
-         J5ow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713970091; x=1714574891;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NVbaUyrmVafdj/cQpZaiAaBbKWO3w1dBZ7Hp+YT/Oh8=;
-        b=HfKG35S7BlnrTupah2zufU7GGp34XfP70StpGEbUoz47DoXSIhoHGYGhJVQFO0NT5R
-         EBV4NIEbBs/eZpIeheeddvdeIflP0h2RMEoWS2ZPjuGEUyeuMHQh+hV4l/oatg50IkhM
-         xuUuWL8dJN8jghQHO80RJzEinI8hSdMOCUUuNwgwkFVPGQrWPd66maW7O2H+uDeR+Drv
-         FWMZB2Xpu/3uwZBPP9+XHtktK7eI9R6v3MPvOgEVeIsGkr2CY/Yi/q+1LBjSrb7S0Fyy
-         FlyF2YxvQ4Sdmo3q5O775lwm6G7kld+RT4OapQrUeJOLXgMU0VUs6OLVtNUFyE7XmQ5T
-         I6tg==
-X-Forwarded-Encrypted: i=1; AJvYcCVRbAmG0GtHMxH8Cy0SUEOxAv7IscYcZlbUwr3GZJ8rrpMXVSOLnfPdmioa+sUI6lvP1O2BWGxU4VOyPxfDgmzBuB+6npxR
-X-Gm-Message-State: AOJu0YxePh0HS54lsK0bSWccwshQE9r4B0D1DzT7cdr35TlAdbPoP9Pb
-	oTNzmy2uxx+3Ywf6sgViTcqdwn4FUkSRKdSVP4DyJXqcrBGp55QDfhU9YUzIcPk=
-X-Google-Smtp-Source: AGHT+IHyL7UR+GGslunB2Saa9OzbsgaAEz0dYE5qzWUKj2z2emKP9Bh5u/mfXv0ND1AFRSdoAqJmPw==
-X-Received: by 2002:a17:906:5650:b0:a52:6e87:77ef with SMTP id v16-20020a170906565000b00a526e8777efmr6378733ejr.6.1713970091244;
-        Wed, 24 Apr 2024 07:48:11 -0700 (PDT)
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id q21-20020a170906771500b00a51d408d446sm8438326ejm.26.2024.04.24.07.48.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Apr 2024 07:48:10 -0700 (PDT)
-Date: Wed, 24 Apr 2024 16:48:06 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Shradha Gupta <shradhagupta@linux.microsoft.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=OZjD9SWsqaO3TQwqVxMJMLr2Nv8YaWTXL21yRLd44lcDuUuDORUXfmZpOvcyfR4JiKUQZPnyDfPzjF+N13FLB0Sv2w0wgIh8VU9EgCiZ8KtHS5syaEAqubFtioRC6vUNfsQH/WikyWLFOLCR880eTzIveZ04WXBnYyoljdoJdIA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f2J8Mrve; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D410C113CD;
+	Wed, 24 Apr 2024 14:48:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713970116;
+	bh=MtcBXVBoT7WsAzim0Ux670NdL79KlExVL9cJiDbfnQ0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=f2J8MrveEpoVMmjQC1mQP7g4aeEj5b4LwQZPrzrkeDT1feMN5rpweBoEAov6iBmDR
+	 Qt6NfkpQVRXlcCC1Cf+SJMTA7bVZ7ca5e7oCQPdGdNHgJbflUNRcaUfQpsjS2Mix90
+	 1A7mtLNoiaWpAEQU2peZeS+3lxLn3mZRIqGBt748zTaZBJ3jD1rLJYW/ev1NppHncx
+	 8B+aJchG4gHUrM3SlZqEUKnyEF8/khq9lgVXSs9xH4FIa0UAcBqY6Wj5AHfLYBqiGe
+	 pvYnV2HI3tjWs+rqjviHSweY4NTnSsECIqtahhZ3X6BtFU1KZzkcpTC6TGAz089bk0
+	 LA89AjznsB/Jw==
+Date: Wed, 24 Apr 2024 15:48:31 +0100
+From: Simon Horman <horms@kernel.org>
+To: Petr Machata <petrm@nvidia.com>
 Cc: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Johannes Berg <johannes.berg@intel.com>,
-	Breno Leitao <leitao@debian.org>, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, "K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Long Li <longli@microsoft.com>,
-	Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>,
-	Konstantin Taranov <kotaranov@microsoft.com>,
-	Yury Norov <yury.norov@gmail.com>, linux-hyperv@vger.kernel.org,
-	shradhagupta@microsoft.com
-Subject: Re: [PATCH net-next v2 0/2] Add sysfs attributes for MANA
-Message-ID: <ZikbpoXWmcQrBP3V@nanopsycho>
-References: <1713954774-29953-1-git-send-email-shradhagupta@linux.microsoft.com>
+	netdev@vger.kernel.org, Ido Schimmel <idosch@nvidia.com>,
+	Jiri Pirko <jiri@resnulli.us>, Alexander Zubkov <green@qrator.net>,
+	mlxsw@nvidia.com
+Subject: Re: [PATCH net 2/9] mlxsw: spectrum_acl_tcam: Fix race during rehash
+ delayed work
+Message-ID: <20240424144831.GD42092@kernel.org>
+References: <cover.1713797103.git.petrm@nvidia.com>
+ <1ec1d54edf2bad0a369e6b4fa030aba64e1f124b.1713797103.git.petrm@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -96,36 +63,42 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1713954774-29953-1-git-send-email-shradhagupta@linux.microsoft.com>
+In-Reply-To: <1ec1d54edf2bad0a369e6b4fa030aba64e1f124b.1713797103.git.petrm@nvidia.com>
 
-Wed, Apr 24, 2024 at 12:32:54PM CEST, shradhagupta@linux.microsoft.com wrote:
->These patches include adding sysfs attributes for improving
->debuggability on MANA devices.
->
->The first patch consists on max_mtu, min_mtu attributes that are
->implemented generically for all devices
->
->The second patch has mana specific attributes max_num_msix and num_ports
+On Mon, Apr 22, 2024 at 05:25:55PM +0200, Petr Machata wrote:
+> From: Ido Schimmel <idosch@nvidia.com>
+> 
+> The purpose of the rehash delayed work is to reduce the number of masks
+> (eRPs) used by an ACL region as the eRP bank is a global and limited
+> resource.
+> 
+> This is done in three steps:
+> 
+> 1. Creating a new set of masks and a new ACL region which will use the
+>    new masks and to which the existing filters will be migrated to. The
+>    new region is assigned to 'vregion->region' and the region from which
+>    the filters are migrated from is assigned to 'vregion->region2'.
+> 
+> 2. Migrating all the filters from the old region to the new region.
+> 
+> 3. Destroying the old region and setting 'vregion->region2' to NULL.
+> 
+> Only the second steps is performed under the 'vregion->lock' mutex
+> although its comments says that among other things it "Protects
+> consistency of region, region2 pointers".
+> 
+> This is problematic as the first step can race with filter insertion
+> from user space that uses 'vregion->region', but under the mutex.
+> 
+> Fix by holding the mutex across the entirety of the delayed work and not
+> only during the second step.
+> 
+> Fixes: 2bffc5322fd8 ("mlxsw: spectrum_acl: Don't take mutex in mlxsw_sp_acl_tcam_vregion_rehash_work()")
+> Signed-off-by: Ido Schimmel <idosch@nvidia.com>
+> Tested-by: Alexander Zubkov <green@qrator.net>
+> Reviewed-by: Petr Machata <petrm@nvidia.com>
+> Signed-off-by: Petr Machata <petrm@nvidia.com>
 
-1) you implement only max, min is never implemented, no point
-introducing it.
-2) having driver implement sysfs entry feels *very wrong*, don't do that
-3) why DEVLINK_PARAM_GENERIC_ID_MSIX_VEC_PER_PF_MAX
-   and DEVLINK_PARAM_GENERIC_ID_MSIX_VEC_PER_PF_MIN
-   Are not what you want?
+Reviewed-by: Simon Horman <horms@kernel.org>
 
->
->Shradha Gupta (2):
->  net: Add sysfs atttributes for max_mtu min_mtu
->  net: mana: Add new device attributes for mana
->
-> Documentation/ABI/testing/sysfs-class-net     | 16 ++++++++++
-> .../net/ethernet/microsoft/mana/gdma_main.c   | 32 +++++++++++++++++++
-> net/core/net-sysfs.c                          |  4 +++
-> 3 files changed, 52 insertions(+)
->
->-- 
->2.34.1
->
->
 
