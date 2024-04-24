@@ -1,290 +1,188 @@
-Return-Path: <netdev+bounces-91081-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91082-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C975F8B14E0
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 22:48:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7B788B14E5
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 22:49:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 413321F2217D
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 20:48:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EBEC31C22C00
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 20:49:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DC52156984;
-	Wed, 24 Apr 2024 20:48:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iUb7cQHR"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9191156895;
+	Wed, 24 Apr 2024 20:49:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f170.google.com (mail-yb1-f170.google.com [209.85.219.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [205.139.111.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26D9E13BC29
-	for <netdev@vger.kernel.org>; Wed, 24 Apr 2024 20:48:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E341313A401
+	for <netdev@vger.kernel.org>; Wed, 24 Apr 2024 20:49:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.139.111.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713991698; cv=none; b=iTSk7oKavCeJFx51Da7Zyhu02U6Mm9b8gwyz6TlXQ+4sFwgQ8/RyDxZQJWRFLn7MBL1blTA/9L1wUwD4iKo6MSPmVqipsfoQ7keZIMTPSx5IbPTUNIp4mq/PjquCIDms12jovx1WZ1s5IajjvTUqn3IwdHfKcFddFTcH6rOmL4Y=
+	t=1713991754; cv=none; b=kXJZJLaSYUGYq5LaHzQSlg7UkY3oW8QJzuErKvfBM43aXaoThtxmW9oMC5aFxdHIaNG5nBApqFzIWeF7//yENdiR3DksJDLJQ4IGMl41L0NpyVYCRrk63QghEypkD7ugZ+r7qB6EllUggwUwZwjap5NfstMo8K3lEepcPwGKpF0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713991698; c=relaxed/simple;
-	bh=APvvGfjt6M4RGHG68kcPHxSbyBNeXdPdp01IWBW2Xh8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CXhsJJNFwSN92abQM4sUVCEPDqeu9c53Mcec+uqFPIM9CMTXSV3pwgYVEj4uY+C+WdWrKCHogJE1I/Vg7FmGzNoiNB4tcvHH4LJGpTrz0Bh4KwIS68Wb85gQl0+uuvDC6hnxBu5CRULBG3nf34YenwKAlSEh2HEjukjc2tmsRAc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=iUb7cQHR; arc=none smtp.client-ip=209.85.219.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-yb1-f170.google.com with SMTP id 3f1490d57ef6-dbed179f0faso1135765276.1
-        for <netdev@vger.kernel.org>; Wed, 24 Apr 2024 13:48:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1713991695; x=1714596495; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=l1pZWiUWl1nMefgATaw3YsOhf+pqCV2nzomHBQjDgDo=;
-        b=iUb7cQHRdPzSnLuOtQ10HQPxCXShHqlw84cVDllBYOK9PLxLXNpUcxPkGcxvBUu73J
-         hUmjPh0vxM8sawc1ymMSsanW8e05vYq5DQYUDciIRe4XmvrQaH38QOyruo0CWffkX4En
-         mZB0xm5MDcAx31d278omLoglYOBSzYO+dK1pSLTLH3AOtKqmDv9fIJ9Hh6yeLwA6jWxC
-         QEyVY8wJ1E4VhNsls+RKbnKQEA1F8ElpoSn75M4+2nTj9K7MhfyuVpjDPncxY0ydFrZ8
-         +eb1VbadOtXSSLQzh/s59jVAaQ9N5JNW2u5VFl8+ByPR3FPM26Am5gp3ADe0Vplq8JhC
-         9W6w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713991695; x=1714596495;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=l1pZWiUWl1nMefgATaw3YsOhf+pqCV2nzomHBQjDgDo=;
-        b=KVwENij35qF30A8vOBtRlV85LGabit7nBSvtqvpInW9wI3Ymo7lz7lMyADEL+zPC2E
-         Huy1j43CpmPYYoiTAhf3JPO9iCse8uvCMWCIFcQD9YSGc8WbKHy9KrKjTOUtAiM9XnSP
-         8viG8ITG4x+t1x6Yqw81ZVrOcb0Hu20Od+4Ud26mDWOKyOODC96ZFjQbgWUR2F11uS2n
-         wJwDcYjARvtRKif+8Quew99lUkwN4mVMtVV4EV+w3i2MQKh2WfBmH8EaQ8tBG+lN4xye
-         kI69t22tDnw4XorZ1ELiqUT1+dh5FK18V0yevkarGHvqmXyFQyG/9rcfWQeiKVv+CDc2
-         sLCA==
-X-Forwarded-Encrypted: i=1; AJvYcCU2pYVwHrXxl61SOx1RQ1HKi+aM0LuOmfaHrJBj+P4s39UYZ9h8VXC0ZX7hnSNMa1T9QWhiUNbVot0G3jOEokyoLQ28DqXg
-X-Gm-Message-State: AOJu0Yy6pj0rWAmg3C5PHUG7VG7AV4n9ObTM69LrW8oigeZFSMQ2jjns
-	IQvfuotRU7RTE8IQhXRBzfky/wNKshd/zsTr7JP6ZtaYqYJ6DXTsmEzC65+MmUQ4HCEy5Pl5Flk
-	cACfBIk1KNWAMMK75Uw3pfg6UNK2qVn/SITD4sw==
-X-Google-Smtp-Source: AGHT+IFoGSJUlBELzEJjb2GiElbJgSl6N/By/Nucv+WQf0ab/sVj/6V4J/pp7hLNpClrwGLOjUJdwEmao5p/n9i55u8=
-X-Received: by 2002:a25:ae85:0:b0:dcc:623e:1b5d with SMTP id
- b5-20020a25ae85000000b00dcc623e1b5dmr621667ybj.31.1713991695065; Wed, 24 Apr
- 2024 13:48:15 -0700 (PDT)
+	s=arc-20240116; t=1713991754; c=relaxed/simple;
+	bh=ta2HIQlhcQ2aeQnE00n8cD/LfrxUSp33wui/gOfjwl4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 In-Reply-To:Content-Type:Content-Disposition; b=sfxATVxwOO1Vx/FIq2o5XCKBzAzjoheyZ3L40SGxwbgWiowsrkPATz8prkWtbm+Y6wZLjI1qLIgSxtNfLQZ10ZFrQqwdG7tGlCzl3qaLiJq/szWtijEs66p/U27VkNr/ukGETeqc9nB0u0U/KcEd0Yubkdd0V+XYsdlJiEsShgc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=none smtp.mailfrom=queasysnail.net; arc=none smtp.client-ip=205.139.111.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=queasysnail.net
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-30-nrB5DHENOw25sVUgCYyYIg-1; Wed,
+ 24 Apr 2024 16:49:06 -0400
+X-MC-Unique: nrB5DHENOw25sVUgCYyYIg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 5E6933C000A2;
+	Wed, 24 Apr 2024 20:49:02 +0000 (UTC)
+Received: from hog (unknown [10.39.193.137])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id B35A25C772;
+	Wed, 24 Apr 2024 20:49:01 +0000 (UTC)
+Date: Wed, 24 Apr 2024 22:49:00 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: David J Wilder <dwilder@us.ibm.com>, netdev@vger.kernel.org,
+	edumazet@google.com
+Subject: Re: [RFC PATCH] net: skb: Increasing allocation in
+ __napi_alloc_skb() to 2k when needed.
+Message-ID: <ZilwPJ3QZC-7ideG@hog>
+References: <20240419222328.3231075-1-dwilder@us.ibm.com>
+ <e67ea4ee50b7a5e4774d3e91a1bfb4d14bfa308e.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240410124628.171783-1-brgl@bgdev.pl> <20240410124628.171783-2-brgl@bgdev.pl>
-In-Reply-To: <20240410124628.171783-2-brgl@bgdev.pl>
-From: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-Date: Wed, 24 Apr 2024 23:48:03 +0300
-Message-ID: <CAA8EJpq81Z4YH1apTidntwcfpsL3YjgMM_y+G0=waaoPjRL-Cw@mail.gmail.com>
-Subject: Re: [PATCH v7 01/16] regulator: dt-bindings: describe the PMU module
- of the QCA6390 package
-To: Bartosz Golaszewski <brgl@bgdev.pl>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Kalle Valo <kvalo@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
-	Konrad Dybcio <konrad.dybcio@linaro.org>, Liam Girdwood <lgirdwood@gmail.com>, 
-	Mark Brown <broonie@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>, 
-	Saravana Kannan <saravanak@google.com>, Geert Uytterhoeven <geert+renesas@glider.be>, 
-	Arnd Bergmann <arnd@arndb.de>, Neil Armstrong <neil.armstrong@linaro.org>, 
-	Marek Szyprowski <m.szyprowski@samsung.com>, Alex Elder <elder@linaro.org>, 
-	Srini Kandagatla <srinivas.kandagatla@linaro.org>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Abel Vesa <abel.vesa@linaro.org>, 
-	Manivannan Sadhasivam <mani@kernel.org>, Lukas Wunner <lukas@wunner.de>, Amit Pundir <amit.pundir@linaro.org>, 
-	Xilin Wu <wuxilin123@gmail.com>, linux-bluetooth@vger.kernel.org, 
-	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-pci@vger.kernel.org, linux-pm@vger.kernel.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <e67ea4ee50b7a5e4774d3e91a1bfb4d14bfa308e.camel@redhat.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: queasysnail.net
+Content-Type: text/plain; charset=UTF-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 10 Apr 2024 at 15:46, Bartosz Golaszewski <brgl@bgdev.pl> wrote:
->
-> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
->
-> The QCA6390 package contains discreet modules for WLAN and Bluetooth. They
-> are powered by the Power Management Unit (PMU) that takes inputs from the
-> host and provides LDO outputs. This document describes this module.
->
-> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> Acked-by: Mark Brown <broonie@kernel.org>
-> Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-> ---
->  .../bindings/regulator/qcom,qca6390-pmu.yaml  | 151 ++++++++++++++++++
->  1 file changed, 151 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/regulator/qcom,qca6390-pmu.yaml
->
-> diff --git a/Documentation/devicetree/bindings/regulator/qcom,qca6390-pmu.yaml b/Documentation/devicetree/bindings/regulator/qcom,qca6390-pmu.yaml
-> new file mode 100644
-> index 000000000000..9d39ff9a75fd
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/regulator/qcom,qca6390-pmu.yaml
-> @@ -0,0 +1,151 @@
-> +# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/regulator/qcom,qca6390-pmu.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: Qualcomm Technologies, Inc. QCA6390 PMU Regulators
-> +
-> +maintainers:
-> +  - Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> +
-> +description:
-> +  The QCA6390 package contains discreet modules for WLAN and Bluetooth. They
-> +  are powered by the Power Management Unit (PMU) that takes inputs from the
-> +  host and provides LDO outputs. This document describes this module.
-> +
-> +properties:
-> +  compatible:
-> +    const: qcom,qca6390-pmu
-> +
-> +  vddaon-supply:
-> +    description: VDD_AON supply regulator handle
-> +
-> +  vddpmu-supply:
-> +    description: VDD_PMU supply regulator handle
-> +
-> +  vddrfa0p95-supply:
-> +    description: VDD_RFA_0P95 supply regulator handle
-> +
-> +  vddrfa1p3-supply:
-> +    description: VDD_RFA_1P3 supply regulator handle
-> +
-> +  vddrfa1p9-supply:
-> +    description: VDD_RFA_1P9 supply regulator handle
-> +
-> +  vddpcie1p3-supply:
-> +    description: VDD_PCIE_1P3 supply regulator handle<S-Del>
-> +
-> +  vddpcie1p9-supply:
-> +    description: VDD_PCIE_1P9 supply regulator handle
-> +
-> +  vddio-supply:
-> +    description: VDD_IO supply regulator handle
-> +
-> +  wlan-enable-gpios:
-> +    maxItems: 1
-> +    description: GPIO line enabling the ATH11K WLAN module supplied by the PMU
-> +
-> +  bt-enable-gpios:
-> +    maxItems: 1
-> +    description: GPIO line enabling the ATH11K Bluetooth module supplied by the PMU
+2024-04-23, 09:56:33 +0200, Paolo Abeni wrote:
+> On Fri, 2024-04-19 at 15:23 -0700, David J Wilder wrote:
+> > When testing CONFIG_MAX_SKB_FRAGS=3D45 on ppc64le and x86_64 I ran into=
+ a
+> > couple of issues.
+> >=20
+> > __napi_alloc_skb() assumes its smallest fragment allocations will fit i=
+n
+> > 1K. When CONFIG_MAX_SKB_FRAGS is increased this may no longer be true
+> > resulting in __napi_alloc_skb() reverting to using page_frag_alloc().
+> > This results in the return of the bug fixed in:
+> > Commit 3226b158e67c ("net: avoid 32 x truesize under-estimation for
+> > tiny skbs")
+> >=20
+> > That commit insured that "small skb head fragments are kmalloc backed,
+> > so that other objects in the slab page can be reused instead of being h=
+eld
+> > as long as skbs are sitting in socket queues."
+> >=20
+> > On ppc64le the warning from napi_get_frags_check() is displayed when
+> > CONFIG_MAX_SKB_FRAGS is set to 45. The purpose of the warning is to det=
+ect
+> > when an increase of MAX_SKB_FRAGS has reintroduced the aforementioned b=
+ug.
+> > Unfortunately on x86_64 this warning is not seen, even though it should=
+ be.
+> > I found the warning was disabled by:
+> > commit dbae2b062824 ("net: skb: introduce and use a single page frag
+> > cache")
+> >=20
+> > This RFC patch to __napi_alloc_skb() determines if an skbuff allocation
+> > with a head fragment of size GRO_MAX_HEAD will fit in a 1k allocation,
+> > increasing the allocation to 2k if needed.
+> >=20
+> > I have functionally tested this patch, performance testing is still nee=
+ded.
+> >=20
+> > TBD: Remove the limitation on 4k page size from the single page frag ca=
+che
+> > allowing ppc64le (64K page size) to benefit from this change.
+> >=20
+> > TBD: I have not address the warning in napi_get_frags_check() on x86_64=
+.
+> > Will the warning still be needed once the other changes are completed?
+>=20
+>=20
+> Thanks for the detailed analysis.
+>=20
+> As mentioned by Eric in commit
+> bf9f1baa279f0758dc2297080360c5a616843927, it should be now possible to
+> revert dbae2b062824 without incurring in performance regressions for
+> the relevant use-case. I had that on my todo list since a lot of time,
+> but I was unable to allocate time for that.
+>=20
+> I think such revert would be preferable. Would you be able to evaluate
+> such option?
 
-As a side node, I think we should also steal swctrl pin from the
-bluetooth device node. It represents the status of the PMU and as such
-it is not BT-specific.
+I don't think reverting dbae2b062824 would fix David's issue.
 
-> +
-> +  regulators:
-> +    type: object
-> +    description:
-> +      LDO outputs of the PMU
-> +
-> +    patternProperties:
-> +      "^ldo[0-9]$":
-> +        $ref: regulator.yaml#
-> +        type: object
-> +        unevaluatedProperties: false
-> +
-> +    additionalProperties: false
-> +
-> +required:
-> +  - compatible
-> +  - regulators
-> +
-> +allOf:
-> +  - if:
-> +      properties:
-> +        compatible:
-> +          contains:
-> +            const: qcom,qca6390-pmu
-> +    then:
-> +      required:
-> +        - vddaon-supply
-> +        - vddpmu-supply
-> +        - vddrfa0p95-supply
-> +        - vddrfa1p3-supply
-> +        - vddrfa1p9-supply
-> +        - vddpcie1p3-supply
-> +        - vddpcie1p9-supply
-> +        - vddio-supply
-> +
-> +additionalProperties: false
-> +
-> +examples:
-> +  - |
-> +    #include <dt-bindings/gpio/gpio.h>
-> +    pmu {
-> +        compatible = "qcom,qca6390-pmu";
-> +
-> +        pinctrl-names = "default";
-> +        pinctrl-0 = <&bt_en_state>, <&wlan_en_state>;
-> +
-> +        vddaon-supply = <&vreg_s6a_0p95>;
-> +        vddpmu-supply = <&vreg_s2f_0p95>;
-> +        vddrfa0p95-supply = <&vreg_s2f_0p95>;
-> +        vddrfa1p3-supply = <&vreg_s8c_1p3>;
-> +        vddrfa1p9-supply = <&vreg_s5a_1p9>;
-> +        vddpcie1p3-supply = <&vreg_s8c_1p3>;
-> +        vddpcie1p9-supply = <&vreg_s5a_1p9>;
-> +        vddio-supply = <&vreg_s4a_1p8>;
-> +
-> +        wlan-enable-gpios = <&tlmm 20 GPIO_ACTIVE_HIGH>;
-> +        bt-enable-gpios = <&tlmm 21 GPIO_ACTIVE_HIGH>;
-> +
-> +        regulators {
-> +            vreg_pmu_rfa_cmn: ldo0 {
-> +                regulator-name = "vreg_pmu_rfa_cmn";
-> +            };
-> +
-> +            vreg_pmu_aon_0p59: ldo1 {
-> +                regulator-name = "vreg_pmu_aon_0p59";
-> +            };
-> +
-> +            vreg_pmu_wlcx_0p8: ldo2 {
-> +                regulator-name = "vreg_pmu_wlcx_0p8";
-> +            };
-> +
-> +            vreg_pmu_wlmx_0p85: ldo3 {
-> +                regulator-name = "vreg_pmu_wlmx_0p85";
-> +            };
-> +
-> +            vreg_pmu_btcmx_0p85: ldo4 {
-> +                regulator-name = "vreg_pmu_btcmx_0p85";
-> +            };
-> +
-> +            vreg_pmu_rfa_0p8: ldo5 {
-> +                regulator-name = "vreg_pmu_rfa_0p8";
-> +            };
-> +
-> +            vreg_pmu_rfa_1p2: ldo6 {
-> +                regulator-name = "vreg_pmu_rfa_1p2";
-> +            };
-> +
-> +            vreg_pmu_rfa_1p7: ldo7 {
-> +                regulator-name = "vreg_pmu_rfa_1p7";
-> +            };
-> +
-> +            vreg_pmu_pcie_0p9: ldo8 {
-> +                regulator-name = "vreg_pmu_pcie_0p9";
-> +            };
-> +
-> +            vreg_pmu_pcie_1p8: ldo9 {
-> +                regulator-name = "vreg_pmu_pcie_1p8";
-> +            };
-> +        };
-> +    };
-> --
-> 2.40.1
->
+The problem is that with MAX_SKB_FRAGS=3D45, skb_shared_info becomes
+huge, so 1024 is not enough for those small packets, and we use a
+pagefrag instead of kmalloc, which makes napi_get_frags_check unhappy.
 
+Even after reverting dbae2b062824, we would still go through the
+pagefrag path and not __alloc_skb.
 
--- 
-With best wishes
-Dmitry
+What about something like this?  (boot-tested on x86 only, but I
+disabled NAPI_HAS_SMALL_PAGE_FRAG. no perf testing at all.)
+
+-------- 8< --------
+diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+index f85e6989c36c..88923b7b64fe 100644
+--- a/net/core/skbuff.c
++++ b/net/core/skbuff.c
+@@ -108,6 +108,8 @@ static struct kmem_cache *skbuff_ext_cache __ro_after_i=
+nit;
+ #define SKB_SMALL_HEAD_HEADROOM=09=09=09=09=09=09\
+ =09SKB_WITH_OVERHEAD(SKB_SMALL_HEAD_CACHE_SIZE)
+=20
++#define SKB_SMALL_HEAD_THRESHOLD (SKB_SMALL_HEAD_HEADROOM + NET_SKB_PAD + =
+NET_IP_ALIGN)
++
+ int sysctl_max_skb_frags __read_mostly =3D MAX_SKB_FRAGS;
+ EXPORT_SYMBOL(sysctl_max_skb_frags);
+=20
+@@ -726,7 +728,7 @@ struct sk_buff *__netdev_alloc_skb(struct net_device *d=
+ev, unsigned int len,
+ =09/* If requested length is either too small or too big,
+ =09 * we use kmalloc() for skb->head allocation.
+ =09 */
+-=09if (len <=3D SKB_WITH_OVERHEAD(1024) ||
++=09if (len <=3D SKB_SMALL_HEAD_THRESHOLD ||
+ =09    len > SKB_WITH_OVERHEAD(PAGE_SIZE) ||
+ =09    (gfp_mask & (__GFP_DIRECT_RECLAIM | GFP_DMA))) {
+ =09=09skb =3D __alloc_skb(len, gfp_mask, SKB_ALLOC_RX, NUMA_NO_NODE);
+@@ -802,7 +804,7 @@ struct sk_buff *napi_alloc_skb(struct napi_struct *napi=
+, unsigned int len)
+ =09 * When the small frag allocator is available, prefer it over kmalloc
+ =09 * for small fragments
+ =09 */
+-=09if ((!NAPI_HAS_SMALL_PAGE_FRAG && len <=3D SKB_WITH_OVERHEAD(1024)) ||
++=09if ((!NAPI_HAS_SMALL_PAGE_FRAG && len <=3D SKB_SMALL_HEAD_THRESHOLD) ||
+ =09    len > SKB_WITH_OVERHEAD(PAGE_SIZE) ||
+ =09    (gfp_mask & (__GFP_DIRECT_RECLAIM | GFP_DMA))) {
+ =09=09skb =3D __alloc_skb(len, gfp_mask, SKB_ALLOC_RX | SKB_ALLOC_NAPI,
+-------- 8< --------
+
+(__)napi_alloc_skb extends the GRO_MAX_HEAD size by NET_SKB_PAD +
+NET_IP_ALIGN, so I added them here as well. Mainly this is reusing a
+size that we know if big enough to fit a small header and whatever
+size skb_shared_info is on the current build. Maybe this could be
+max(SKB_WITH_OVERHEAD(1024), <...>) to preserve the current behavior
+on MAX_SKB_FRAGS=3D17, since in that case
+SKB_WITH_OVERHEAD(1024) > SKB_SMALL_HEAD_HEADROOM
+
+--=20
+Sabrina
+
 
