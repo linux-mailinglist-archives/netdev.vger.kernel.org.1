@@ -1,78 +1,97 @@
-Return-Path: <netdev+bounces-90922-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-90906-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B0B98B0B46
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 15:41:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 201BA8B0AEF
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 15:33:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6FF6CB2169C
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 13:41:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CD5E4284E2D
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 13:32:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77EF015EFC1;
-	Wed, 24 Apr 2024 13:38:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 094E815ECE5;
+	Wed, 24 Apr 2024 13:31:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Co6AbvkS"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="H2lOAn9a"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2048.outbound.protection.outlook.com [40.107.94.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 404DB15EFB9
-	for <netdev@vger.kernel.org>; Wed, 24 Apr 2024 13:37:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713965881; cv=none; b=fsiLJjRqmJvJRemG3VKVrKusAQOwIiNMe0OQKqCGywFcSGB/KyVUsGA5ZS6/3FMSR84J3ifJwmqW4VuKIdKlVWk6dWFRAv5kGfVrxHVDFxGTVxhJDF7YwAJuQCF0hzOYXGT9xyMYOMZLON+AAcc6zGeHTlyx/N50lu84nyww66I=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713965881; c=relaxed/simple;
-	bh=AXkZ1G2QlMYF/Vh6K/qCmdRzNW53e2abJ9MxawLKyts=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=QTyWQNGQt1OTfcDjhsLhx9bfvNcGtXAv/8pa003d7gWGfoRjfmgFvj+6Rn+zCE+Tw2glUysKWwlfsWl5vn3htv1Ll9EQa6X8r2Xe9HliPmXmR4Khi6Mp9Ut0uPSRzMKidNZxPIVKhBlirlfd9dBEkhzc9ygzIXFJB63k+Mj/Lmo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Co6AbvkS; arc=none smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1713965879; x=1745501879;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=AXkZ1G2QlMYF/Vh6K/qCmdRzNW53e2abJ9MxawLKyts=;
-  b=Co6AbvkSZ5+nmmgZLU0jxQCQxMnZsJY+v4rDQG7WCr3fGzBoZoMVwvvT
-   5lwJsbHFxcS4Mcj+E4XElNU3y7STlM7w5HUS8RRoNx2Ske2kEtfY4XgZz
-   0litYtNL/nTPfhlpDCSEf0bwSLTSyedKFWrehXTwenMu2j6q4Ne6Oh5rf
-   6x/O4O9BPLJCKPQR4l0YaZNKKTuoJxqrkCMfRSdtIBxXhvMzMazWjhmx7
-   I3OWesOmngFntxMLyxa5WVEnQ/MMjEZAGbJbRmNEmYU+yqDFmDSdiVslX
-   IOmEa1NnbUP3ClbBUqYx5xXMynPiokt112skCmQo3Hh3A57IT8aaNrghC
-   g==;
-X-CSE-ConnectionGUID: HAyi8s0NQUK4BIlbinwVQQ==
-X-CSE-MsgGUID: FwA3kbGYQDmQHAtZX8N/ww==
-X-IronPort-AV: E=McAfee;i="6600,9927,11054"; a="27110491"
-X-IronPort-AV: E=Sophos;i="6.07,226,1708416000"; 
-   d="scan'208";a="27110491"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2024 06:37:58 -0700
-X-CSE-ConnectionGUID: xfcjT3SkQX2fzmhiK813uA==
-X-CSE-MsgGUID: MUG1W/TURny6y+hkDn1sgw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,226,1708416000"; 
-   d="scan'208";a="24601214"
-Received: from kkolacin-desk1.igk.intel.com ([10.102.102.152])
-  by orviesa010.jf.intel.com with ESMTP; 24 Apr 2024 06:37:55 -0700
-From: Karol Kolacinski <karol.kolacinski@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	anthony.l.nguyen@intel.com,
-	jesse.brandeburg@intel.com,
-	Michal Michalik <michal.michalik@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
-	Karol Kolacinski <karol.kolacinski@intel.com>
-Subject: [PATCH v10 iwl-next 09/12] ice: Add support for E825-C TS PLL handling
-Date: Wed, 24 Apr 2024 15:30:17 +0200
-Message-ID: <20240424133542.113933-24-karol.kolacinski@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D4B215B98B;
+	Wed, 24 Apr 2024 13:31:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.48
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1713965498; cv=fail; b=PzAXIPRnm/nld1fSASK4t7/qZOjfqPRygwYR1hCO5Gxa+GnTRC5mH0NMACGMIffDks1CGknnyUUuAfpw8VM4W7qeIxvnpL/mAeZQnRo1ucvPPno4oDC0EmdJcxhdCS4VLZmHXmEkh2pTDAVHs/byitxKUrDEb3QybLy7/u3Uu60=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1713965498; c=relaxed/simple;
+	bh=HBfSUAE8HO2a2X4SMNsQ9y/bEwbRmPnNjz/sM1xZotc=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=R7LebpI8bDKjkfvIahLP1RI6SikRRB1ke2hDmVUuHOkWOhsuFGeQcn3fXgYuUqhKI/CL5pkmqniKaRDYkmDta0Vvw4wI4NehBGe33/UjAzVWmAvENO+nKfD4nfID7xBN0+wMIye9sYY9lApUgnlJylAptCQVUirp+NlpxO/q3OI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=H2lOAn9a; arc=fail smtp.client-ip=40.107.94.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ld8bgV8G8DGWxu2SdrY+Dc5c6aVWsibhGdAFrZocweJ/u597NyHCmCbtUEGnd7leB7a2k0X3bdnQqwwS+SrqKjeWeofifCKH53W8d6haj4pazStzI/9emFYnADxIHRbXnx4sPSidPjh5KCe0HUao8aWqFoOb5GtWsqKIR2WHqfZWEztAgXhy5hSY7Okv74zDDwgQBIoTpOlU7/D30PGNtSS8eWbIWRYiKnbHmFxHFW+wOilMjF7KOISYojEI7DHO3N2a3510iYanUBdk/EL5zPyCRBkASETQBZW0JcXCthm/qATKa/ZG5Iv4eTYwUPmkQKuWAgDFQgmYuOJEWpCmYg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=LQK9sDNvbYSG4SJBkS7m1rJ72xo8vJ6F7v1calLBY8E=;
+ b=TbxMQeaLgBLMVQG1y/T5midNxcOgTLkhAuwB8gesko/PBK/6DOAguBKGpm4bVj9wFlvllCBi/xGvy8QZ7QArbqV7QaSM0sFcOQpuCoHYr0y9cNdcjxCoMTIw3W2re2OU2dDmAZsPy8VIfxBft+ygdRFlHyuyS0n2suicdw0fAwwtVq24WCvbn0KMjoAKLvzsoxSfVVfhVsnFulNUg0nNUcG2/YQ6Gx9EYd9/Jq3ZGC9+Udlo9ejbmmGZyd/vvk/gjChHWawNXiUDi1v+YcTlVI3gqkC8EfGhpwWY+QqfYB4XF5PvPVs+XiXE1crXUUrbjcHsgcisAgmIv9WvF7bnLw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=LQK9sDNvbYSG4SJBkS7m1rJ72xo8vJ6F7v1calLBY8E=;
+ b=H2lOAn9aeam0+ni+xesRhy+Zkg1xsL+ZTLhf720R1A/90G7WlPsjCEgxBF7r1R+3k9eHRMak7zO2duPR8lJ/ZJZXDuAtcLF0qjznnZEjKjxir5pT6sk8d0EgRtVr99xeAF9epkaPekswKDnB8vBhRkVxl+X8g6gIApwFEWXSXyeS7DjrhyYq37JMd5OkwguRD2ql2d4hlKU8whNGUSzRgCuXUKYbL1p6A2QPxSL+DKXcJQCS5Fho/PTlyu1PI6fcWwaK7pdVbnc9H0AbWr6DzSAzPhwUCzKycr4vlNN+agMHz4kAp5O8s7hO9j5ZEUTIOd9b7JRT2xteVkzpUKl/Jg==
+Received: from CH2PR03CA0018.namprd03.prod.outlook.com (2603:10b6:610:59::28)
+ by MW4PR12MB7144.namprd12.prod.outlook.com (2603:10b6:303:21b::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7472.44; Wed, 24 Apr
+ 2024 13:31:35 +0000
+Received: from DS2PEPF00003447.namprd04.prod.outlook.com
+ (2603:10b6:610:59:cafe::ce) by CH2PR03CA0018.outlook.office365.com
+ (2603:10b6:610:59::28) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7519.22 via Frontend
+ Transport; Wed, 24 Apr 2024 13:31:34 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ DS2PEPF00003447.mail.protection.outlook.com (10.167.17.74) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7519.19 via Frontend Transport; Wed, 24 Apr 2024 13:31:34 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 24 Apr
+ 2024 06:31:10 -0700
+Received: from dev-r-vrt-155.mtr.labs.mlnx (10.126.230.35) by
+ rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Wed, 24 Apr 2024 06:31:05 -0700
+From: Danielle Ratson <danieller@nvidia.com>
+To: <netdev@vger.kernel.org>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <corbet@lwn.net>, <linux@armlinux.org.uk>,
+	<sdf@google.com>, <kory.maincent@bootlin.com>,
+	<maxime.chevallier@bootlin.com>, <vladimir.oltean@nxp.com>,
+	<przemyslaw.kitszel@intel.com>, <ahmed.zaki@intel.com>,
+	<richardcochran@gmail.com>, <shayagr@amazon.com>, <paul.greenwalt@intel.com>,
+	<jiri@resnulli.us>, <linux-doc@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <mlxsw@nvidia.com>, <petrm@nvidia.com>,
+	<idosch@nvidia.com>, <danieller@nvidia.com>
+Subject: [PATCH net-next v5 05/10] include: netdevice: Add module firmware flashing in progress flag to net_device
+Date: Wed, 24 Apr 2024 16:30:18 +0300
+Message-ID: <20240424133023.4150624-6-danieller@nvidia.com>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240424133542.113933-16-karol.kolacinski@intel.com>
-References: <20240424133542.113933-16-karol.kolacinski@intel.com>
+In-Reply-To: <20240424133023.4150624-1-danieller@nvidia.com>
+References: <20240424133023.4150624-1-danieller@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,601 +99,91 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS2PEPF00003447:EE_|MW4PR12MB7144:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0217bd7b-569d-4357-3954-08dc6462dc83
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?AWkqy4nbr7bH0g1LTp4JBn8dMTzP6BkanG6QeW/BiX/BNMSjg63y/kNrel/t?=
+ =?us-ascii?Q?h/9deJEAXEcawfKY0nMqIwIdb0EjfOKPdHu0iU9H80R5zykTuvkerSL2rLvH?=
+ =?us-ascii?Q?ew9Cc4MY7CP49Sy7FZzGD4UgdcOVcl1t/UWIpbYseUUGgYUs7FOUQ9FdeLfu?=
+ =?us-ascii?Q?KFSaW2mtXOOHzDRLgZ+F1cGjfhGCjXf2o+Y3HrDV9vZB9ym/fEH80+YAcfXR?=
+ =?us-ascii?Q?FhqujY/s4CK4Tf/q121Qz9Ln4heSZWr5iYa6klE/sVMLO6MMq3VFqVBQE5en?=
+ =?us-ascii?Q?iUQcL9TJZW/6LtNAvmzUKfVKsc/hDP8k9wBNn+Jf/cpLpaouFEPBqAlKb0Jw?=
+ =?us-ascii?Q?ziLjpMhtyt5E6SmnrgYazOEs0eeSmdLiwqE4ffQQE9V6PbXQxfGMaWEpM7H/?=
+ =?us-ascii?Q?viXIdrQBWSOHXUYZEySikrwNUqKjQcqWkuc9UA9j6qTkrMYyAI951Ccebz8G?=
+ =?us-ascii?Q?IJzZyLfeFV0Cy6cBMy+vMeHrOGaa9jWovy3gd8bEjbWg9L+16FR+dlKu62zu?=
+ =?us-ascii?Q?ACcY8Wf3pIkXXXzKivBNEdEB1nMQEK5KndRE3Q9B2sVjm8FxbUI2ZAvlFsM1?=
+ =?us-ascii?Q?k8Q0sxR3Q/jbwOFDyjTGFpuVjUkMviJSJjVSvGCYreXtqYdb23NeI4D5pbhB?=
+ =?us-ascii?Q?0hBgv0gz/Se7OOl2631B2MfRor+e3tNmSamh7WnQlxOrRPZ1L4U+IWRkrWuj?=
+ =?us-ascii?Q?yFWkE8it2/UJN8+F8DGyTx890bwOWszOBzVG/AO/u+SkLz1RQx72dPBg+qot?=
+ =?us-ascii?Q?L/qDG3MUGP2DMNKrZ3CAEmd8eGOpmaUnCd47EFlz8k7yh1PYjCjkznMYRuXD?=
+ =?us-ascii?Q?OhuLxlVo4FfBPCHFjOu4amyFsDTMtlaBu+rWFMQz4d3ft5rPqJtdDq4eZifA?=
+ =?us-ascii?Q?e+Uq8Dd9j1RyaFaYk7A2edfcuBhPh8hD05hVZa85cEMCW3KuI6yQSPSzoByy?=
+ =?us-ascii?Q?nG/9s3H0LI02JqnIOq6niLeNu5sCosy3ERUHm23fnEmyrR4qvi1k+ebIRmp2?=
+ =?us-ascii?Q?yE3dpkh5l6Hn5RuvG1nF7E0qm7XeW3jQrNb9Dl2J+XLvm7gOAaM9fEHUB56j?=
+ =?us-ascii?Q?El1ePCPPWcDdKDs5LJTxzpg46mzJeixVydIi7m+D1cPFhRAIOGcx6/UL2ACv?=
+ =?us-ascii?Q?EP3xLy5mHWZFcxTt6xBUme+QVj4hbQ7h06/NKAcTphL8Rof8HPonvTjHe7KI?=
+ =?us-ascii?Q?6+dEGCh/NXgYLwoHwc6TAYoBCVxR2krEHPxsU7xYIvuvoyX1lsp1kB/xk63N?=
+ =?us-ascii?Q?RxrQuYGimdPLrtd4gCIF0fEV/Xl+DqMp1m1XAwByBwfOuu4L75HgS9XwIIFD?=
+ =?us-ascii?Q?twlVEAjHwDviB+OnouZTrIHPN52nf/8JhZc20pWVyADKsFP1jxSfcRa5fq0T?=
+ =?us-ascii?Q?OgvX35A=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(1800799015)(36860700004)(376005)(82310400014)(7416005);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Apr 2024 13:31:34.6740
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0217bd7b-569d-4357-3954-08dc6462dc83
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DS2PEPF00003447.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB7144
 
-From: Michal Michalik <michal.michalik@intel.com>
+Some operations cannot be performed during the firmware flashing
+process and will be vetoed later in the patchset.
+For example, flashing firmware on a device which is already in a flashing
+process should be forbidden.
 
-The CGU layout of E825-C is a little different than E822/E823. Add
-support the new hardware adding relevant functions.
+In order to veto those scenarios, add a flag in 'struct net_device' that
+indicates when a firmware flash is taking place on the module.
 
-Signed-off-by: Michal Michalik <michal.michalik@intel.com>
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Reviewed-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
+Signed-off-by: Danielle Ratson <danieller@nvidia.com>
+Reviewed-by: Petr Machata <petrm@nvidia.com>
 ---
-V9 -> V10: changed 1588 clk_src and clk_freq caps to fixed ones for E825C
-V4 -> V5: added UL to some of tspll_fbdiv_frac values in e825c_cgu_params
+ include/linux/netdevice.h | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
- drivers/net/ethernet/intel/ice/ice_cgu_regs.h |  65 +++++
- drivers/net/ethernet/intel/ice/ice_common.c   |   9 +-
- .../net/ethernet/intel/ice/ice_ptp_consts.h   |  87 ++++++
- drivers/net/ethernet/intel/ice/ice_ptp_hw.c   | 261 +++++++++++++++++-
- drivers/net/ethernet/intel/ice/ice_ptp_hw.h   |  24 +-
- drivers/net/ethernet/intel/ice/ice_type.h     |   2 +-
- 6 files changed, 429 insertions(+), 19 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/ice/ice_cgu_regs.h b/drivers/net/ethernet/intel/ice/ice_cgu_regs.h
-index 36aeb10eefb7..10d9d74f3545 100644
---- a/drivers/net/ethernet/intel/ice/ice_cgu_regs.h
-+++ b/drivers/net/ethernet/intel/ice/ice_cgu_regs.h
-@@ -27,6 +27,17 @@ union nac_cgu_dword9 {
- 	u32 val;
- };
- 
-+#define NAC_CGU_DWORD16_E825C 0x40
-+union nac_cgu_dword16_e825c {
-+	struct {
-+		u32 synce_remndr : 6;
-+		u32 synce_phlmt_en : 1;
-+		u32 misc13 : 17;
-+		u32 tspll_ck_refclkfreq : 8;
-+	};
-+	u32 val;
-+};
-+
- #define NAC_CGU_DWORD19 0x4c
- union nac_cgu_dword19 {
- 	struct {
-@@ -67,6 +78,22 @@ union nac_cgu_dword22 {
- 	u32 val;
- };
- 
-+#define NAC_CGU_DWORD23_E825C 0x5C
-+union nac_cgu_dword23_e825c {
-+	struct {
-+		u32 cgupll_fbdiv_intgr : 10;
-+		u32 ux56pll_fbdiv_intgr : 10;
-+		u32 misc20 : 4;
-+		u32 ts_pll_enable : 1;
-+		u32 time_sync_tspll_align_sel : 1;
-+		u32 ext_synce_sel : 1;
-+		u32 ref1588_ck_div : 4;
-+		u32 time_ref_sel : 1;
-+
-+	};
-+	u32 val;
-+};
-+
- #define NAC_CGU_DWORD24 0x60
- union nac_cgu_dword24 {
- 	struct {
-@@ -113,4 +140,42 @@ union tspll_ro_bwm_lf {
- 	u32 val;
- };
- 
-+#define TSPLL_RO_LOCK_E825C 0x3f0
-+union tspll_ro_lock_e825c {
-+	struct {
-+		u32 bw_freqov_high_cri_7_0 : 8;
-+		u32 bw_freqov_high_cri_9_8 : 2;
-+		u32 reserved455 : 1;
-+		u32 plllock_gain_tran_cri : 1;
-+		u32 plllock_true_lock_cri : 1;
-+		u32 pllunlock_flag_cri : 1;
-+		u32 afcerr_cri : 1;
-+		u32 afcdone_cri : 1;
-+		u32 feedfwrdgain_cal_cri_7_0 : 8;
-+		u32 reserved462 : 8;
-+	};
-+	u32 val;
-+};
-+
-+#define TSPLL_BW_TDC_E825C 0x31c
-+union tspll_bw_tdc_e825c {
-+	struct {
-+		u32 i_tdc_offset_lock_1_0 : 2;
-+		u32 i_bbthresh1_2_0 : 3;
-+		u32 i_bbthresh2_2_0 : 3;
-+		u32 i_tdcsel_1_0 : 2;
-+		u32 i_tdcovccorr_en_h : 1;
-+		u32 i_divretimeren : 1;
-+		u32 i_bw_ampmeas_window : 1;
-+		u32 i_bw_lowerbound_2_0 : 3;
-+		u32 i_bw_upperbound_2_0 : 3;
-+		u32 i_bw_mode_1_0 : 2;
-+		u32 i_ft_mode_sel_2_0 : 3;
-+		u32 i_bwphase_4_0 : 5;
-+		u32 i_plllock_sel_1_0 : 2;
-+		u32 i_afc_divratio : 1;
-+	};
-+	u32 val;
-+};
-+
- #endif /* _ICE_CGU_REGS_H_ */
-diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
-index c5473d05698e..b225f4a8bc21 100644
---- a/drivers/net/ethernet/intel/ice/ice_common.c
-+++ b/drivers/net/ethernet/intel/ice/ice_common.c
-@@ -2309,8 +2309,13 @@ ice_parse_1588_func_caps(struct ice_hw *hw, struct ice_hw_func_caps *func_p,
- 	info->tmr_index_owned = ((number & ICE_TS_TMR_IDX_OWND_M) != 0);
- 	info->tmr_index_assoc = ((number & ICE_TS_TMR_IDX_ASSOC_M) != 0);
- 
--	info->clk_freq = FIELD_GET(ICE_TS_CLK_FREQ_M, number);
--	info->clk_src = ((number & ICE_TS_CLK_SRC_M) != 0);
-+	if (!ice_is_e825c(hw)) {
-+		info->clk_freq = FIELD_GET(ICE_TS_CLK_FREQ_M, number);
-+		info->clk_src = ((number & ICE_TS_CLK_SRC_M) != 0);
-+	} else {
-+		info->clk_freq = ICE_TIME_REF_FREQ_156_250;
-+		info->clk_src = ICE_CLK_SRC_TCXO;
-+	}
- 
- 	if (info->clk_freq < NUM_ICE_TIME_REF_FREQ) {
- 		info->time_ref = (enum ice_time_ref_freq)info->clk_freq;
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_consts.h b/drivers/net/ethernet/intel/ice/ice_ptp_consts.h
-index ef180936f60c..e6980b94a6c1 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp_consts.h
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp_consts.h
-@@ -470,6 +470,93 @@ const struct ice_cgu_pll_params_e82x e822_cgu_params[NUM_ICE_TIME_REF_FREQ] = {
- 	},
- };
- 
-+const
-+struct ice_cgu_pll_params_e825c e825c_cgu_params[NUM_ICE_TIME_REF_FREQ] = {
-+	/* ICE_TIME_REF_FREQ_25_000 -> 25 MHz */
-+	{
-+		/* tspll_ck_refclkfreq */
-+		0x19,
-+		/* tspll_ndivratio */
-+		1,
-+		/* tspll_fbdiv_intgr */
-+		320,
-+		/* tspll_fbdiv_frac */
-+		0,
-+		/* ref1588_ck_div */
-+		0,
-+	},
-+
-+	/* ICE_TIME_REF_FREQ_122_880 -> 122.88 MHz */
-+	{
-+		/* tspll_ck_refclkfreq */
-+		0x29,
-+		/* tspll_ndivratio */
-+		3,
-+		/* tspll_fbdiv_intgr */
-+		195,
-+		/* tspll_fbdiv_frac */
-+		1342177280UL,
-+		/* ref1588_ck_div */
-+		0,
-+	},
-+
-+	/* ICE_TIME_REF_FREQ_125_000 -> 125 MHz */
-+	{
-+		/* tspll_ck_refclkfreq */
-+		0x3E,
-+		/* tspll_ndivratio */
-+		2,
-+		/* tspll_fbdiv_intgr */
-+		128,
-+		/* tspll_fbdiv_frac */
-+		0,
-+		/* ref1588_ck_div */
-+		0,
-+	},
-+
-+	/* ICE_TIME_REF_FREQ_153_600 -> 153.6 MHz */
-+	{
-+		/* tspll_ck_refclkfreq */
-+		0x33,
-+		/* tspll_ndivratio */
-+		3,
-+		/* tspll_fbdiv_intgr */
-+		156,
-+		/* tspll_fbdiv_frac */
-+		1073741824UL,
-+		/* ref1588_ck_div */
-+		0,
-+	},
-+
-+	/* ICE_TIME_REF_FREQ_156_250 -> 156.25 MHz */
-+	{
-+		/* tspll_ck_refclkfreq */
-+		0x1F,
-+		/* tspll_ndivratio */
-+		5,
-+		/* tspll_fbdiv_intgr */
-+		256,
-+		/* tspll_fbdiv_frac */
-+		0,
-+		/* ref1588_ck_div */
-+		0,
-+	},
-+
-+	/* ICE_TIME_REF_FREQ_245_760 -> 245.76 MHz */
-+	{
-+		/* tspll_ck_refclkfreq */
-+		0x52,
-+		/* tspll_ndivratio */
-+		3,
-+		/* tspll_fbdiv_intgr */
-+		97,
-+		/* tspll_fbdiv_frac */
-+		2818572288UL,
-+		/* ref1588_ck_div */
-+		0,
-+	},
-+};
-+
- /* struct ice_vernier_info_e82x
+diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+index f849e7d110ed..68a18911c8cf 100644
+--- a/include/linux/netdevice.h
++++ b/include/linux/netdevice.h
+@@ -1989,6 +1989,8 @@ enum netdev_reg_state {
   *
-  * E822 hardware calibrates the delay of the timestamp indication from the
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-index b57f82d92e40..be14f818122e 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-@@ -325,8 +325,8 @@ static const char *ice_clk_freq_str(enum ice_time_ref_freq clk_freq)
- static const char *ice_clk_src_str(enum ice_clk_src clk_src)
- {
- 	switch (clk_src) {
--	case ICE_CLK_SRC_TCX0:
--		return "TCX0";
-+	case ICE_CLK_SRC_TCXO:
-+		return "TCXO";
- 	case ICE_CLK_SRC_TIME_REF:
- 		return "TIME_REF";
- 	default:
-@@ -338,7 +338,7 @@ static const char *ice_clk_src_str(enum ice_clk_src clk_src)
-  * ice_cfg_cgu_pll_e82x - Configure the Clock Generation Unit
-  * @hw: pointer to the HW struct
-  * @clk_freq: Clock frequency to program
-- * @clk_src: Clock source to select (TIME_REF, or TCX0)
-+ * @clk_src: Clock source to select (TIME_REF, or TCXO)
+  *	@threaded:	napi threaded mode is enabled
   *
-  * Configure the Clock Generation Unit with the desired clock frequency and
-  * time reference, enabling the PLL which drives the PTP hardware clock.
-@@ -372,10 +372,10 @@ static int ice_cfg_cgu_pll_e82x(struct ice_hw *hw,
- 		return -EINVAL;
- 	}
- 
--	if (clk_src == ICE_CLK_SRC_TCX0 &&
-+	if (clk_src == ICE_CLK_SRC_TCXO &&
- 	    clk_freq != ICE_TIME_REF_FREQ_25_000) {
- 		dev_warn(ice_hw_to_dev(hw),
--			 "TCX0 only supports 25 MHz frequency\n");
-+			 "TCXO only supports 25 MHz frequency\n");
- 		return -EINVAL;
- 	}
- 
-@@ -480,16 +480,198 @@ static int ice_cfg_cgu_pll_e82x(struct ice_hw *hw,
- }
- 
- /**
-- * ice_init_cgu_e82x - Initialize CGU with settings from firmware
-- * @hw: pointer to the HW structure
-+ * ice_cfg_cgu_pll_e825c - Configure the Clock Generation Unit for E825-C
-+ * @hw: pointer to the HW struct
-+ * @clk_freq: Clock frequency to program
-+ * @clk_src: Clock source to select (TIME_REF, or TCXO)
-  *
-- * Initialize the Clock Generation Unit of the E822 device.
-+ * Configure the Clock Generation Unit with the desired clock frequency and
-+ * time reference, enabling the PLL which drives the PTP hardware clock.
-  *
-- * Return: 0 on success, other error codes when failed to read/write/cfg CGU
-+ * Return:
-+ * * %0       - success
-+ * * %-EINVAL - input parameters are incorrect
-+ * * %-EBUSY  - failed to lock TS PLL
-+ * * %other   - CGU read/write failure
-  */
--static int ice_init_cgu_e82x(struct ice_hw *hw)
-+static int ice_cfg_cgu_pll_e825c(struct ice_hw *hw,
-+				 enum ice_time_ref_freq clk_freq,
-+				 enum ice_clk_src clk_src)
-+{
-+	union tspll_ro_lock_e825c ro_lock;
-+	union nac_cgu_dword16_e825c dw16;
-+	union nac_cgu_dword23_e825c dw23;
-+	union nac_cgu_dword19 dw19;
-+	union nac_cgu_dword22 dw22;
-+	union nac_cgu_dword24 dw24;
-+	union nac_cgu_dword9 dw9;
-+	int err;
-+
-+	if (clk_freq >= NUM_ICE_TIME_REF_FREQ) {
-+		dev_warn(ice_hw_to_dev(hw), "Invalid TIME_REF frequency %u\n",
-+			 clk_freq);
-+		return -EINVAL;
-+	}
-+
-+	if (clk_src >= NUM_ICE_CLK_SRC) {
-+		dev_warn(ice_hw_to_dev(hw), "Invalid clock source %u\n",
-+			 clk_src);
-+		return -EINVAL;
-+	}
-+
-+	if (clk_src == ICE_CLK_SRC_TCXO &&
-+	    clk_freq != ICE_TIME_REF_FREQ_156_250) {
-+		dev_warn(ice_hw_to_dev(hw),
-+			 "TCXO only supports 156.25 MHz frequency\n");
-+		return -EINVAL;
-+	}
-+
-+	err = ice_read_cgu_reg_e82x(hw, NAC_CGU_DWORD9, &dw9.val);
-+	if (err)
-+		return err;
-+
-+	err = ice_read_cgu_reg_e82x(hw, NAC_CGU_DWORD24, &dw24.val);
-+	if (err)
-+		return err;
-+
-+	err = ice_read_cgu_reg_e82x(hw, NAC_CGU_DWORD16_E825C, &dw16.val);
-+	if (err)
-+		return err;
-+
-+	err = ice_read_cgu_reg_e82x(hw, NAC_CGU_DWORD23_E825C, &dw23.val);
-+	if (err)
-+		return err;
-+
-+	err = ice_read_cgu_reg_e82x(hw, TSPLL_RO_LOCK_E825C, &ro_lock.val);
-+	if (err)
-+		return err;
-+
-+	/* Log the current clock configuration */
-+	ice_debug(hw, ICE_DBG_PTP, "Current CGU configuration -- %s, clk_src %s, clk_freq %s, PLL %s\n",
-+		  dw24.ts_pll_enable ? "enabled" : "disabled",
-+		  ice_clk_src_str(dw23.time_ref_sel),
-+		  ice_clk_freq_str(dw9.time_ref_freq_sel),
-+		  ro_lock.plllock_true_lock_cri ? "locked" : "unlocked");
-+
-+	/* Disable the PLL before changing the clock source or frequency */
-+	if (dw23.ts_pll_enable) {
-+		dw23.ts_pll_enable = 0;
-+
-+		err = ice_write_cgu_reg_e82x(hw, NAC_CGU_DWORD23_E825C,
-+					     dw23.val);
-+		if (err)
-+			return err;
-+	}
-+
-+	/* Set the frequency */
-+	dw9.time_ref_freq_sel = clk_freq;
-+
-+	/* Enable the correct receiver */
-+	if (clk_src == ICE_CLK_SRC_TCXO) {
-+		dw9.time_ref_en = 0;
-+		dw9.clk_eref0_en = 1;
-+	} else {
-+		dw9.time_ref_en = 1;
-+		dw9.clk_eref0_en = 0;
-+	}
-+	err = ice_write_cgu_reg_e82x(hw, NAC_CGU_DWORD9, dw9.val);
-+	if (err)
-+		return err;
-+
-+	/* Choose the referenced frequency */
-+	dw16.tspll_ck_refclkfreq =
-+	e825c_cgu_params[clk_freq].tspll_ck_refclkfreq;
-+	err = ice_write_cgu_reg_e82x(hw, NAC_CGU_DWORD16_E825C, dw16.val);
-+	if (err)
-+		return err;
-+
-+	/* Configure the TS PLL feedback divisor */
-+	err = ice_read_cgu_reg_e82x(hw, NAC_CGU_DWORD19, &dw19.val);
-+	if (err)
-+		return err;
-+
-+	dw19.tspll_fbdiv_intgr =
-+		e825c_cgu_params[clk_freq].tspll_fbdiv_intgr;
-+	dw19.tspll_ndivratio =
-+		e825c_cgu_params[clk_freq].tspll_ndivratio;
-+
-+	err = ice_write_cgu_reg_e82x(hw, NAC_CGU_DWORD19, dw19.val);
-+	if (err)
-+		return err;
-+
-+	/* Configure the TS PLL post divisor */
-+	err = ice_read_cgu_reg_e82x(hw, NAC_CGU_DWORD22, &dw22.val);
-+	if (err)
-+		return err;
-+
-+	/* These two are constant for E825C */
-+	dw22.time1588clk_div = 5;
-+	dw22.time1588clk_sel_div2 = 0;
-+
-+	err = ice_write_cgu_reg_e82x(hw, NAC_CGU_DWORD22, dw22.val);
-+	if (err)
-+		return err;
-+
-+	/* Configure the TS PLL pre divisor and clock source */
-+	err = ice_read_cgu_reg_e82x(hw, NAC_CGU_DWORD23_E825C, &dw23.val);
-+	if (err)
-+		return err;
-+
-+	dw23.ref1588_ck_div =
-+		e825c_cgu_params[clk_freq].ref1588_ck_div;
-+	dw23.time_ref_sel = clk_src;
-+
-+	err = ice_write_cgu_reg_e82x(hw, NAC_CGU_DWORD23_E825C, dw23.val);
-+	if (err)
-+		return err;
-+
-+	dw24.tspll_fbdiv_frac =
-+		e825c_cgu_params[clk_freq].tspll_fbdiv_frac;
-+
-+	err = ice_write_cgu_reg_e82x(hw, NAC_CGU_DWORD24, dw24.val);
-+	if (err)
-+		return err;
-+
-+	/* Finally, enable the PLL */
-+	dw23.ts_pll_enable = 1;
-+
-+	err = ice_write_cgu_reg_e82x(hw, NAC_CGU_DWORD23_E825C, dw23.val);
-+	if (err)
-+		return err;
-+
-+	/* Wait to verify if the PLL locks */
-+	usleep_range(1000, 5000);
-+
-+	err = ice_read_cgu_reg_e82x(hw, TSPLL_RO_LOCK_E825C, &ro_lock.val);
-+	if (err)
-+		return err;
-+
-+	if (!ro_lock.plllock_true_lock_cri) {
-+		dev_warn(ice_hw_to_dev(hw), "CGU PLL failed to lock\n");
-+		return -EBUSY;
-+	}
-+
-+	/* Log the current clock configuration */
-+	ice_debug(hw, ICE_DBG_PTP, "New CGU configuration -- %s, clk_src %s, clk_freq %s, PLL %s\n",
-+		  dw24.ts_pll_enable ? "enabled" : "disabled",
-+		  ice_clk_src_str(dw23.time_ref_sel),
-+		  ice_clk_freq_str(dw9.time_ref_freq_sel),
-+		  ro_lock.plllock_true_lock_cri ? "locked" : "unlocked");
-+
-+	return 0;
-+}
-+
-+/**
-+ * ice_cfg_cgu_pll_dis_sticky_bits_e82x - disable TS PLL sticky bits
-+ * @hw: pointer to the HW struct
++ *	@module_fw_flash_in_progress:	Module firmware flashing is in progress.
 + *
-+ * Configure the Clock Generation Unit TS PLL sticky bits so they don't latch on
-+ * losing TS PLL lock, but always show current state.
-+ *
-+ * Return: 0 on success, other error codes when failed to read/write CGU
-+ */
-+static int ice_cfg_cgu_pll_dis_sticky_bits_e82x(struct ice_hw *hw)
- {
--	struct ice_ts_func_info *ts_info = &hw->func_caps.ts_func_info;
- 	union tspll_cntr_bist_settings cntr_bist;
- 	int err;
+  *	@net_notifier_list:	List of per-net netdev notifier block
+  *				that follow this device when it is moved
+  *				to another network namespace.
+@@ -2372,7 +2374,7 @@ struct net_device {
+ 	bool			proto_down;
+ 	unsigned		wol_enabled:1;
+ 	unsigned		threaded:1;
+-
++	unsigned		module_fw_flash_in_progress:1;
+ 	struct list_head	net_notifier_list;
  
-@@ -502,16 +684,65 @@ static int ice_init_cgu_e82x(struct ice_hw *hw)
- 	cntr_bist.i_plllock_sel_0 = 0;
- 	cntr_bist.i_plllock_sel_1 = 0;
- 
--	err = ice_write_cgu_reg_e82x(hw, TSPLL_CNTR_BIST_SETTINGS,
--				     cntr_bist.val);
-+	return ice_write_cgu_reg_e82x(hw, TSPLL_CNTR_BIST_SETTINGS,
-+				      cntr_bist.val);
-+}
-+
-+/**
-+ * ice_cfg_cgu_pll_dis_sticky_bits_e825c - disable TS PLL sticky bits for E825-C
-+ * @hw: pointer to the HW struct
-+ *
-+ * Configure the Clock Generation Unit TS PLL sticky bits so they don't latch on
-+ * losing TS PLL lock, but always show current state.
-+ *
-+ * Return: 0 on success, other error codes when failed to read/write CGU
-+ */
-+static int ice_cfg_cgu_pll_dis_sticky_bits_e825c(struct ice_hw *hw)
-+{
-+	union tspll_bw_tdc_e825c bw_tdc;
-+	int err;
-+
-+	err = ice_read_cgu_reg_e82x(hw, TSPLL_BW_TDC_E825C, &bw_tdc.val);
-+	if (err)
-+		return err;
-+
-+	bw_tdc.i_plllock_sel_1_0 = 0;
-+
-+	return ice_write_cgu_reg_e82x(hw, TSPLL_BW_TDC_E825C, bw_tdc.val);
-+}
-+
-+/**
-+ * ice_init_cgu_e82x - Initialize CGU with settings from firmware
-+ * @hw: pointer to the HW structure
-+ *
-+ * Initialize the Clock Generation Unit of the E822 device.
-+ *
-+ * Return: 0 on success, other error codes when failed to read/write/cfg CGU
-+ */
-+static int ice_init_cgu_e82x(struct ice_hw *hw)
-+{
-+	struct ice_ts_func_info *ts_info = &hw->func_caps.ts_func_info;
-+	int err;
-+
-+	/* Disable sticky lock detection so lock err reported is accurate */
-+	if (ice_is_e825c(hw))
-+		err = ice_cfg_cgu_pll_dis_sticky_bits_e825c(hw);
-+	else
-+		err = ice_cfg_cgu_pll_dis_sticky_bits_e82x(hw);
- 	if (err)
- 		return err;
- 
- 	/* Configure the CGU PLL using the parameters from the function
- 	 * capabilities.
- 	 */
--	return ice_cfg_cgu_pll_e82x(hw, ts_info->time_ref,
--				   (enum ice_clk_src)ts_info->clk_src);
-+	if (ice_is_e825c(hw))
-+		err = ice_cfg_cgu_pll_e825c(hw, ts_info->time_ref,
-+					    (enum ice_clk_src)ts_info->clk_src);
-+	else
-+		err = ice_cfg_cgu_pll_e82x(hw, ts_info->time_ref,
-+					   (enum ice_clk_src)ts_info->clk_src);
-+
-+	return err;
- }
- 
- /**
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-index 184573509e62..0852a34ade91 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-@@ -197,7 +197,7 @@ extern
- const struct ice_eth56g_mac_reg_cfg eth56g_mac_cfg[NUM_ICE_ETH56G_LNK_SPD];
- 
- /**
-- * struct ice_cgu_pll_params_e82x
-+ * struct ice_cgu_pll_params_e82x - E82X CGU parameters
-  * @refclk_pre_div: Reference clock pre-divisor
-  * @feedback_div: Feedback divisor
-  * @frac_n_div: Fractional divisor
-@@ -287,6 +287,28 @@ struct ice_cgu_pin_desc {
- extern const struct
- ice_cgu_pll_params_e82x e822_cgu_params[NUM_ICE_TIME_REF_FREQ];
- 
-+/**
-+ * struct ice_cgu_pll_params_e825c - E825C CGU parameters
-+ * @tspll_ck_refclkfreq: tspll_ck_refclkfreq selection
-+ * @tspll_ndivratio: ndiv ratio that goes directly to the pll
-+ * @tspll_fbdiv_intgr: TS PLL integer feedback divide
-+ * @tspll_fbdiv_frac:  TS PLL fractional feedback divide
-+ * @ref1588_ck_div: clock divider for tspll ref
-+ *
-+ * Clock Generation Unit parameters used to program the PLL based on the
-+ * selected TIME_REF/TCXO frequency.
-+ */
-+struct ice_cgu_pll_params_e825c {
-+	u32 tspll_ck_refclkfreq;
-+	u32 tspll_ndivratio;
-+	u32 tspll_fbdiv_intgr;
-+	u32 tspll_fbdiv_frac;
-+	u32 ref1588_ck_div;
-+};
-+
-+extern const struct
-+ice_cgu_pll_params_e825c e825c_cgu_params[NUM_ICE_TIME_REF_FREQ];
-+
- #define E810C_QSFP_C827_0_HANDLE 2
- #define E810C_QSFP_C827_1_HANDLE 3
- 
-diff --git a/drivers/net/ethernet/intel/ice/ice_type.h b/drivers/net/ethernet/intel/ice/ice_type.h
-index e09a0b8c5112..62ff21b3ee22 100644
---- a/drivers/net/ethernet/intel/ice/ice_type.h
-+++ b/drivers/net/ethernet/intel/ice/ice_type.h
-@@ -328,7 +328,7 @@ enum ice_time_ref_freq {
- 
- /* Clock source specification */
- enum ice_clk_src {
--	ICE_CLK_SRC_TCX0	= 0, /* Temperature compensated oscillator  */
-+	ICE_CLK_SRC_TCXO	= 0, /* Temperature compensated oscillator */
- 	ICE_CLK_SRC_TIME_REF	= 1, /* Use TIME_REF reference clock */
- 
- 	NUM_ICE_CLK_SRC
+ #if IS_ENABLED(CONFIG_MACSEC)
 -- 
 2.43.0
 
