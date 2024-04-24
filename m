@@ -1,538 +1,231 @@
-Return-Path: <netdev+bounces-91085-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91086-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 042408B14FE
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 23:03:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 296118B150E
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 23:08:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 307E31C232C8
-	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 21:03:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4DD861C238A4
+	for <lists+netdev@lfdr.de>; Wed, 24 Apr 2024 21:08:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29499156973;
-	Wed, 24 Apr 2024 21:03:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D188A15698E;
+	Wed, 24 Apr 2024 21:08:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="H6WUUMbm"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="b2fT9utL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEB4713B5A6;
-	Wed, 24 Apr 2024 21:03:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713992596; cv=none; b=Difl57vAVXGKUxb9c3P1YMgcoTxUtthhPAQlbQA7eIaroZwflILIRnpAf/I0fxDt3tgJlGVisy+T8QVP6iduiFMZAm7dzQkmB7klmZyvmvx1w3YK09kUeSTpYxm9akOXryWBfUXcBlmigPnUe9WNQ+PNUGz2tJ801QIocvRNWM0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713992596; c=relaxed/simple;
-	bh=j/lYSYjj+dUnHx5WEiiXyYxMRDx23I0XZKDAdZbWVcA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jB1AaLP8LqMs2oDj0p2U2hL4tob+rmozY1fIVl575cQWOrmJl8RDOARnYckuAVvMcNlgvJeizr/fwyV74r1Bn/7fM1gtnpboPQED0iuQ2y3QbTecb/YSfOdMfbGhZ+1iakQSHx/qUAwGv8uB4KjK51dXeBrXV45FGR9G7fvfdIQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=H6WUUMbm; arc=none smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23EB4156973
+	for <netdev@vger.kernel.org>; Wed, 24 Apr 2024 21:08:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.18
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1713992900; cv=fail; b=IxWH+clh2Ln/FVvcFmAbH1JoSi6rSeCR6cBZ2PuyUo649AD9bQZdMXRcGh67mpKEQt1UDFgq5OHlbCvHa5wrwF4wz2X1hCTYQQyYZR0Z77hvUKvO+fPc9ajMoFFIObFhsuonyjUy7f5+erijufqQAJbZMrM0Dys1/laV0JWxCFc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1713992900; c=relaxed/simple;
+	bh=W/pajr8frqwYQWyXNQfDQxoooVOzoofNcq1uoxDbcp0=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=TguUOCBG6vLAQ4v47Vz30CXKAKKHzA3BEpg4mc91FMFEaBiaNsZJ5J+C1gJMA3oW5b2w+iLSeVS1xVdiREfg7WLMArwq19U7XkeQEvl2IBUrxlWMJpmxTEH02nLnODpemxUj4dUFNieHTWwEAwhGeEgYtPSKaV120MQCtQb9eS4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=b2fT9utL; arc=fail smtp.client-ip=198.175.65.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1713992593; x=1745528593;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=j/lYSYjj+dUnHx5WEiiXyYxMRDx23I0XZKDAdZbWVcA=;
-  b=H6WUUMbmIHQDNG1PVkROyRaD2qO23hc3ywoX576u38Dxr5HqIV6dyD+C
-   YgUOhmof2GpIG1y5Et+bge+INmaBuUOuAxQ/ny01LM5nb/tjLK515Lee9
-   q3kF3KMoE3U+2I/OZISqNyzlR/DJ9Liqfl2qXEQwgoyWeevbrI0rrMlgl
-   41cHulyR3ZebAVTH+SC7rFJsOKljEImWvZj7JM3QTDhltUQDRoauTnel4
-   itBzn0VhYHC6VLS6vwgUu4n+ehk0fMhgYR1EQCm5bAa92ia1lI5bVjStq
-   XTnjrCJIT6TUlWwED7rXzzQ7wK8j6ZYePkpA5vJz2esXNUzGtGPJD9i0w
-   A==;
-X-CSE-ConnectionGUID: TVmzQLXFQG2SiyAzao7+lA==
-X-CSE-MsgGUID: wozs1icbRNmLNIwa6kJA7A==
-X-IronPort-AV: E=McAfee;i="6600,9927,11054"; a="9772468"
+  t=1713992900; x=1745528900;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=W/pajr8frqwYQWyXNQfDQxoooVOzoofNcq1uoxDbcp0=;
+  b=b2fT9utLGu487a/TBTHjEdjR6ySdAqOrx6hCSCtL/8YR5uOmqVllp0wq
+   ZTchExkLP7ahcTEHi62g7SG70zAudryfgVS94lMk6NWO4uf1d/8zdR2ho
+   dJVPL8hkf3CYEOnUTzC3FMkoPz1jVB9JV3POIavOJPWHHnVUdM2XAx7wq
+   z0o3bc2WQuHVAh9wtZ6I6kpZrPL2ctiCkUR9uRipd2e7EOFuRI7STvERx
+   KJL8opUbpDtcnjlCwsRTpFcEjXhc0NBR7ICR+Y8S1EB5AHai7MyKAjgoY
+   avSlD/wqjMIFN6i9f1L10kolW3M52urd0MjKlHJUK7lQGZvgFxXif5sOG
+   w==;
+X-CSE-ConnectionGUID: /VTZfx+pQGSdp/NzaIKjEQ==
+X-CSE-MsgGUID: rsxqTQljRcCX1RJC4dUTIQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11054"; a="9814416"
 X-IronPort-AV: E=Sophos;i="6.07,227,1708416000"; 
-   d="scan'208";a="9772468"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2024 14:03:12 -0700
-X-CSE-ConnectionGUID: ffKSuVa8Sv+dCqMw1YeQhg==
-X-CSE-MsgGUID: Sg4qlkxkSSmu97kFdrVaQw==
+   d="scan'208";a="9814416"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2024 14:08:19 -0700
+X-CSE-ConnectionGUID: etwvHxuXQUOhagokZR6bFQ==
+X-CSE-MsgGUID: BSpwdnGxQSarx8RhBgzJqg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,227,1708416000"; 
-   d="scan'208";a="24846551"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by fmviesa009.fm.intel.com with ESMTP; 24 Apr 2024 14:03:11 -0700
+   d="scan'208";a="29629182"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by orviesa005.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 24 Apr 2024 14:08:18 -0700
+Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 24 Apr 2024 14:08:18 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Wed, 24 Apr 2024 14:08:18 -0700
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (104.47.74.40) by
+ edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Wed, 24 Apr 2024 14:08:17 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=QGlOgRgEM76AzHLkxbL3CF5XNld6i01DzecDSFkzNpiW5u6flU1sXLtnwU2/rDcxUOO7cQ6bODow7n6maZ7lH/dpgElADETNmkcP0huoVUkZCIkjjI3X/PNoeeObMNmbCYUe7y6gRa7bKKYktQRyrvNV9VNUCE0m7IWRyYBIb2koKDrQ4x2LuBfdhXHmj6afRTOzXWwB3NLgANh0j0QsP/xzfnFFeofG9iolBTqSuH8ABzbj03l1G+3XpSSCaPjZKMTVMmMxZmO1tJW6IaeO1vZo9RUKgAoxeljWiefflgyUhYAc1wVLUe5O2HojTm9e0lxsaA7ITl5bS1MPxZj3Lw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=yoeRLMwlkUAGISS77NDiwnVWTQ1rtkBYH8Scy4Am6ww=;
+ b=EsMBN5sdsf8TH4c/YsyStpb/O8N0TKj8BYZZaqoSOVfY2GywaPVi6gjAv25RDGOJ1nNBaQV1KN7L6kYM4q9a1gVj3xhE/OrRh3b1bX9BXuiI+5RYCnz7shDlpP977Nv1EfDvwShHoZdDBp6w/7x6QoxVf6B8i/egWP/dAwUQaqP5fLwe4F3z9lCX5HB2Rp5FOaKRduBrwPIZNsBJTSnfgDhf6z0HGp6xCQBWn51R7l1IftfMKTGPQuivDcq3AE2416p2kbRhWV7JkBwZgkha1Zue/BqwpNO08nP2PBBHJaZRop/j8i3nIuDbSHgqAHkG0i4fWPGHEuqNU5+EU4vz6w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from BL3PR11MB6435.namprd11.prod.outlook.com (2603:10b6:208:3bb::9)
+ by PH8PR11MB6562.namprd11.prod.outlook.com (2603:10b6:510:1c1::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7519.19; Wed, 24 Apr
+ 2024 21:08:15 +0000
+Received: from BL3PR11MB6435.namprd11.prod.outlook.com
+ ([fe80::9c80:a200:48a2:b308]) by BL3PR11MB6435.namprd11.prod.outlook.com
+ ([fe80::9c80:a200:48a2:b308%4]) with mapi id 15.20.7519.021; Wed, 24 Apr 2024
+ 21:08:14 +0000
+Message-ID: <7003fe5e-4bb9-8335-6d3f-9edab0aa3570@intel.com>
+Date: Wed, 24 Apr 2024 14:08:11 -0700
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.1
+Subject: Re: [iwl-next v1 3/4] ice: move VSI configuration outside repr setup
+To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+	<intel-wired-lan@lists.osuosl.org>
+CC: <netdev@vger.kernel.org>, <jacob.e.keller@intel.com>,
+	<michal.kubiak@intel.com>, <maciej.fijalkowski@intel.com>,
+	<sridhar.samudrala@intel.com>, <przemyslaw.kitszel@intel.com>,
+	<wojciech.drewek@intel.com>, <pio.raczynski@gmail.com>, <jiri@nvidia.com>,
+	<mateusz.polchlopek@intel.com>, <shayd@nvidia.com>
+References: <20240419171336.11617-1-michal.swiatkowski@linux.intel.com>
+ <20240419171336.11617-4-michal.swiatkowski@linux.intel.com>
+Content-Language: en-US
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	netdev@vger.kernel.org
-Cc: Song Yoong Siang <yoong.siang.song@intel.com>,
-	anthony.l.nguyen@intel.com,
-	kurt@linutronix.de,
-	richardcochran@gmail.com,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	hawk@kernel.org,
-	john.fastabend@gmail.com,
-	sdf@google.com,
-	vinicius.gomes@intel.com,
-	florian.bezdeka@siemens.com,
-	maciej.fijalkowski@intel.com,
-	bpf@vger.kernel.org,
-	xdp-hints@xdp-project.net,
-	sasha.neftin@intel.com,
-	magnus.karlsson@intel.com,
-	Lai Peter Jun Ann <jun.ann.lai@intel.com>,
-	Naama Meir <naamax.meir@linux.intel.com>
-Subject: [PATCH net-next] igc: Add Tx hardware timestamp request for AF_XDP zero-copy packet
-Date: Wed, 24 Apr 2024 14:02:54 -0700
-Message-ID: <20240424210256.3440903-1-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.41.0
+In-Reply-To: <20240419171336.11617-4-michal.swiatkowski@linux.intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SJ0PR05CA0135.namprd05.prod.outlook.com
+ (2603:10b6:a03:33d::20) To BL3PR11MB6435.namprd11.prod.outlook.com
+ (2603:10b6:208:3bb::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL3PR11MB6435:EE_|PH8PR11MB6562:EE_
+X-MS-Office365-Filtering-Correlation-Id: aecdf8e6-0748-4150-c786-08dc64a2a7d6
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230031|366007|376005|1800799015;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?Wi90ZVpzU3N6c3NvV09HQ2tDUk5FeVJjeXVzbUdsVU43YUVicWtqVjB1QlVk?=
+ =?utf-8?B?d2NFb1orcHltT1ZidG43Q1g0NW4yYS9tUndiZ3FWWERKZVdXVlNFeWNucm5K?=
+ =?utf-8?B?U2hCTEZ1ejczM0Q3RE5sMlQyaW1LeWloNGYvZXdGMkdGdFBkSTFLb01EVnpR?=
+ =?utf-8?B?RVJsajVRcG5aZ21TWnV1aU45d2hJUmZINWlyaGNPSy8vS1pxMGFzQmEvcXBw?=
+ =?utf-8?B?dDMrVGQ4clhwb292VWxQdXpIa0NJRVJTUGltQVFLaXFBWDkxSVFqSE9XdVEz?=
+ =?utf-8?B?aWthVDlmRzBwLzhGeSt1QUJmS1M5NmhLT1BOT1l4UEkweFpLMnRQZkdxLzIy?=
+ =?utf-8?B?MEV1NEhqTGs1a3pJNndpWWUwcFN2Zms0Nnc3ajlqSXN0NkpGNVcwdUVHTVRZ?=
+ =?utf-8?B?N0YzbXhQb2xxeHp2eDVXSGRsOVBRQUw5OHl1dWl1WHg3RnBKZWJLbUhkbjJy?=
+ =?utf-8?B?bHZiN0Y3YVNKcyszMGVHQXVSVUgyVXpsOERla21jb0JVdnlnV1YrRVRDZXZI?=
+ =?utf-8?B?YUc4NVRiR09vb3hZZGg1aHdkaDlpZlY3UkpoMkZ6QWIyRThoWjFTS1lieDlF?=
+ =?utf-8?B?U2grbCs3VHpubHNGZitFdC9tRnZoYkZ1S2VWNFVyN2YyZTJjcUE5KzBaaGV6?=
+ =?utf-8?B?S3RvWXp1Z1VEeG5OdVlwRmdESU9oWTE1SHhXT1FRRm9zekFWLy9qTzV6aCtR?=
+ =?utf-8?B?N2g2Zm5OMGhBQnFDQlQvNWJYSWNYWERqaGg0bHJORzBIdmlZU3lCM09aaWN1?=
+ =?utf-8?B?bDlJVzFVUkxDVm4vSDBCUnNLNFRFeDdjK09Yc1VIT2t2cWRtU1Z2ZlU2ZWNz?=
+ =?utf-8?B?TWlFL3FHV1ZBSUVPTFl6NVloZngxeU1Tc2x4eU5Sdk1KcUVlWEV4YzRLdkpr?=
+ =?utf-8?B?QmdNejZqTDM0WkhlR0FCM1QzN0E4NkdJN0dHSHJXOUtiT2ZEaXZzOUtScmhK?=
+ =?utf-8?B?M292MmcxRGgyZDRhdW4rMUZXcGQzTy9tb0ptclY5WDkwZkxBUG1od0tjVCtQ?=
+ =?utf-8?B?bVRINWFMb3BWcUo1VU5JNUlXK1lIOFJFTDFyQUw3SHAwbUJ6QTRGSTRQYU01?=
+ =?utf-8?B?ajN5bkpHQ2N6YTlTSDZ3QTcya3JYbEgycy8vVEtkdFRneUU1V0d3NGY1K1Fn?=
+ =?utf-8?B?c2pjb0g2b3cveFhrSktIUDZObEJWcXk0NWRlZnJZMEdKdFg4Uy9Kck9YUTdI?=
+ =?utf-8?B?RGFsWVZJUXVnZWoyNW5rRk5rNGR3UjEyUERNcWR0YVgyUVRWQ1NwMVJrdEgy?=
+ =?utf-8?B?OFhsV2NNTnBtUmsvWGtTbjB5QTBWKy9jKytFdVJNVGsrdUtDcDFxWENSb2JZ?=
+ =?utf-8?B?bEdMbjU1NHo2Q1RUdlk2M3VwNTVNUDVNR1FBb29IR3hvbFkzWVd1UHpLbjhu?=
+ =?utf-8?B?b3R2VXBRY0FVUXBhNElhZUJOcHQrNVN3S0t0aG41TnZxL09KcS9RMlVUT1lo?=
+ =?utf-8?B?WmJBbnBQbDNXNzNROGJrd2wyYjFsK05vcXh2YzQ1cTFraVJBZ2RMOE1qM1dT?=
+ =?utf-8?B?MFp1cjk5UHM2VGxDQWRqaXFDbHlVZnNHb29CWE82S01BWCtvUHR4b25IQ2dt?=
+ =?utf-8?B?Ym5CaUh5TWRKeHFHZGUyM1c2dTZsOUpBbk9rWlVUeW9XeWVwWDdPQURQWDcw?=
+ =?utf-8?B?eGE3OEx4N1NLUmFhR245N0FiblZ2TUVJbUlHbFIzckpKWG1VTlpWSXZycWZh?=
+ =?utf-8?B?NXZWVzVEdzhqOENKQUFDSHhaalZ1V3pnZmtLZTVsWHB2WHpJNm04WHBnPT0=?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL3PR11MB6435.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(376005)(1800799015);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?dGg4MEp6ZXpIbWhKRWNzZUdKVHNoRmZ2SWJPZmJwSmxlK2hkTVRsV1RuT0JR?=
+ =?utf-8?B?Wi9tQzU0YlF5VDFWL0RmdGFvY0NlRVlZMXFOYVhBKzZFU1dWRmdwRy84enE5?=
+ =?utf-8?B?bDc4OTNWTGNkRVltOVA3V1NpcmxaYXJxMFNpUmhTRDBCWS9qOXhyanBWWlZM?=
+ =?utf-8?B?YS90Uk90KzVjMS9aSTc3czFRTWNZZjNZL1JLa1VsSW42ZEVqVC9URWVuVVNO?=
+ =?utf-8?B?M1p3ODZKZ0krZkkxSWQ4ZHlYZncrL1dnTWpBSkhMTSs0Q3JrODRnYWRkNDFN?=
+ =?utf-8?B?aE9sb1FmR1BCM2h3RnhHeFNXR09ueFhmVVoycHN2STNhbWlzT1JDWUJvclpK?=
+ =?utf-8?B?VzBVSVRrTGRua2FJb1M1cjd1ZGF2UmJsTnFaVDE0ejlYOThBbDdaUFJBcTBU?=
+ =?utf-8?B?Q1lRVnBsbmRzbHNrVjd2Z2d2UG9wWkRHQVpFYkpiT2dzVzNJQzJsN3dRNHB1?=
+ =?utf-8?B?MVBIVUtUaGNPQWlNdnpzOEs1MWs3aFhMYTU0MEQxWnBIRjNHYXBTMGN2ZGda?=
+ =?utf-8?B?T2ltNDhtZXhzMXVSN21JNTJuaWFZUzJCVUh0RC9iQ0c2SDZkc25jNlJkZ1J0?=
+ =?utf-8?B?RDg2a29mTllERUVXMFBjQ2pSVE1aWC83RUdhOWVzOXg5cFRTMlNSOGJNeTVN?=
+ =?utf-8?B?Z2EzTk9mZjZ0YTZWMGxkdGU3Ulh3TVNWSnh0ZDF6ejNEdkRnSUlUOHFVS2h6?=
+ =?utf-8?B?WllYOElnWWkzQjRsdXlQTlpCZ29TQmtKU0FUTjZSbjMvY0FHWDdXQU5FRVI4?=
+ =?utf-8?B?UFZFMjluR3BYeXBlU3k0Z2VRdmpTdWF1Q1hIaG93TUVSZFhDcmdONUllT2NB?=
+ =?utf-8?B?RkxaWnEzcHlFK1AyOURCL0dQOVQwOTJuOTdXYitWNk9vRUZ4TXNJWEE3TkVl?=
+ =?utf-8?B?c0h1RHl4MDl6V1JrNHJNZ05ReWNXRXlVRHo4WEdiTDhXeThxK1Y1OEdCOE05?=
+ =?utf-8?B?cHdZNmk3UDAwQWY2WlJZM2tvK3FneVMxQUExMExCQWc2TEp5UkU5VVF6bDVB?=
+ =?utf-8?B?VkVvT0VFY2xtY2lDZkpWd3FEMHdQUXIxZEVmeUZJdm9xTDVxMmdFb1RWNWR6?=
+ =?utf-8?B?SzhPbTRiWURnN2RONFp0ZnZ1QUQxVFdpWjhPcXV3RlF6TU83eFcyUzJFdFQ4?=
+ =?utf-8?B?TG5MMVFlN1Q0Smh6Z1NDbG9uYXFHS1NQRUtia29pUEFtUG14ZXJKbnZNck15?=
+ =?utf-8?B?ZzhNK2VZVExkWkh3azh3cGtFOWdhNzVEVUNIelo5MVpPdEVOZndjdTRCem9i?=
+ =?utf-8?B?UmlmSElWWGRYTGJxVVkvdkJTOVpEa0hJN3V6YWM2Q3NkVFVLM090dDB5bXh4?=
+ =?utf-8?B?Yy9xQlV1U1g1UTBTelM4bkRvUUM4OG15Z1FRTTdxbGI2eSs1SG9IMzA1c0RH?=
+ =?utf-8?B?M1EvZXl0VkZDd2xySlhXbk1jSE9QTTNiMnI3UWd5VHFsRVVYTmpvejRsTWM1?=
+ =?utf-8?B?MUY4ZVpBZHJXQlA5UWJXKzhabUdjc3VJTlFkM1dzNElod2tSRExwdWd2eXpT?=
+ =?utf-8?B?dTRhckZHVjVON2RHSFBkdWFSZDJNVVYxcjBacSs2d1RIUGVWejFmSGNTeEli?=
+ =?utf-8?B?Nk5lZWNGQkNwNWJVUGV2WTBDQmMwOWFnaTBDOXJXdEM5RXdNK2dIekFVQWRO?=
+ =?utf-8?B?WlptRThRVEgxTnBZc2lZMFVTZ2tlN3Y3bXAweitTQzNOaWM5QzR4WmRKVEhs?=
+ =?utf-8?B?eE9LQlN0Ujh4YjlKT2VUNi9xM1NsVDhmeWwwYkM0cEErRVpmRGFScFZKVklD?=
+ =?utf-8?B?S1RnQmNVTXBTL2doSFgyOEJUS2RtZHZlUXZNVVJXOHJoM3pRYzhUWG9kQXBY?=
+ =?utf-8?B?TjIyTXRncUxzMVFqQUZ6RGVmS3ZudVh1aExPSXEwZ1dlVjVyeSsxOGVzMkpH?=
+ =?utf-8?B?bHREUEhXL1p1Y2RxTEtVRVdXRDJnWWc4QVpEcUxvMGRLak5YbHNmRnY1ZnF5?=
+ =?utf-8?B?QlprYjlRcGZFVEtwVVRwQWhDb3lpb204U1l1ZEJwV0UyeGxmWkhNak9DNlpj?=
+ =?utf-8?B?Uk9uaGtOVFVHMU1zUmttNjREOVpKdUdoeitNRTVjNXFkU2hRUC94aEVJcWp4?=
+ =?utf-8?B?Z0RWNVg0em9Pb25UQzQ5U2tqa2w1R2I1bWF3STJ4UU1sMGloM0lEUzYzQUF5?=
+ =?utf-8?B?UEp2NHBkanRKRlFldWNDR0NMM2RrVnZBVjU4NkI5VzN4Y0xBb2trYnI5RVM5?=
+ =?utf-8?B?b1E9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: aecdf8e6-0748-4150-c786-08dc64a2a7d6
+X-MS-Exchange-CrossTenant-AuthSource: BL3PR11MB6435.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Apr 2024 21:08:14.4823
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: YpVX3zPm87wbipmCmtOdI3uFpjHfxNcIcaIDhymOZm3jLxfrLT6HU73klXos5ZrhN2s9LVjtZaQ/5kFwYkhF9phv+Gzut4cbuuSCC6iGwmg=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR11MB6562
+X-OriginatorOrg: intel.com
 
-From: Song Yoong Siang <yoong.siang.song@intel.com>
 
-This patch adds support to per-packet Tx hardware timestamp request to
-AF_XDP zero-copy packet via XDP Tx metadata framework. Please note that
-user needs to enable Tx HW timestamp capability via igc_ioctl() with
-SIOCSHWTSTAMP cmd before sending xsk Tx hardware timestamp request.
 
-Same as implementation in RX timestamp XDP hints kfunc metadata, Timer 0
-(adjustable clock) is used in xsk Tx hardware timestamp. i225/i226 have
-four sets of timestamping registers. *skb and *xsk_tx_buffer pointers
-are used to indicate whether the timestamping register is already occupied.
+On 4/19/2024 10:13 AM, Michal Swiatkowski wrote:
 
-Furthermore, a boolean variable named xsk_pending_ts is used to hold the
-transmit completion until the tx hardware timestamp is ready. This is
-because, for i225/i226, the timestamp notification event comes some time
-after the transmit completion event. The driver will retrigger hardware irq
-to clean the packet after retrieve the tx hardware timestamp.
+> +/**
+> + * ice_eswitch_cfg_vsi - configure VSI to work in slow-path
+> + * @vsi: VSI structure of representee
+> + * @mac: representee MAC
 
-Besides, xsk_meta is added into struct igc_tx_timestamp_request as a hook
-to the metadata location of the transmit packet. When the Tx timestamp
-interrupt is fired, the interrupt handler will copy the value of Tx hwts
-into metadata location via xsk_tx_metadata_complete().
+Can you fix the kdoc for this?
 
-This patch is tested with tools/testing/selftests/bpf/xdp_hw_metadata
-on Intel ADL-S platform. Below are the test steps and results.
+ > drivers/net/ethernet/intel/ice/ice_eswitch.c:140: warning: No 
+description found for return value of 'ice_eswitch_cfg_vsi'
 
-Test Step 1: Run xdp_hw_metadata app
- ./xdp_hw_metadata <iface> > /dev/shm/result.log
+Thanks,
+Tony
 
-Test Step 2: Enable Tx hardware timestamp
- hwstamp_ctl -i <iface> -t 1 -r 1
-
-Test Step 3: Run ptp4l and phc2sys for time synchronization
-
-Test Step 4: Generate UDP packets with 1ms interval for 10s
- trafgen --dev <iface> '{eth(da=<addr>), udp(dp=9091)}' -t 1ms -n 10000
-
-Test Step 5: Rerun Step 1-3 with 10s iperf3 as background traffic
-
-Test Step 6: Rerun Step 1-4 with 10s iperf3 as background traffic
-
-Based on iperf3 results below, the impact of holding tx completion to
-throughput is not observable.
-
-Result of last UDP packet (no. 10000) in Step 4:
-poll: 1 (0) skip=99 fail=0 redir=10000
-xsk_ring_cons__peek: 1
-0x5640a37972d0: rx_desc[9999]->addr=f2110 addr=f2110 comp_addr=f2110 EoP
-rx_hash: 0x2049BE1D with RSS type:0x1
-HW RX-time:   1679819246792971268 (sec:1679819246.7930) delta to User RX-time sec:0.0000 (14.990 usec)
-XDP RX-time:   1679819246792981987 (sec:1679819246.7930) delta to User RX-time sec:0.0000 (4.271 usec)
-No rx_vlan_tci or rx_vlan_proto, err=-95
-0x5640a37972d0: ping-pong with csum=ab19 (want 315b) csum_start=34 csum_offset=6
-0x5640a37972d0: complete tx idx=9999 addr=f010
-HW TX-complete-time:   1679819246793036971 (sec:1679819246.7930) delta to User TX-complete-time sec:0.0001 (77.656 usec)
-XDP RX-time:   1679819246792981987 (sec:1679819246.7930) delta to User TX-complete-time sec:0.0001 (132.640 usec)
-HW RX-time:   1679819246792971268 (sec:1679819246.7930) delta to HW TX-complete-time sec:0.0001 (65.703 usec)
-0x5640a37972d0: complete rx idx=10127 addr=f2110
-
-Result of iperf3 without tx hwts request in step 5:
-[ ID] Interval           Transfer     Bitrate         Retr
-[  5]   0.00-10.00  sec  2.74 GBytes  2.36 Gbits/sec    0             sender
-[  5]   0.00-10.05  sec  2.74 GBytes  2.34 Gbits/sec                  receiver
-
-Result of iperf3 running parallel with trafgen command in step 6:
-[ ID] Interval           Transfer     Bitrate         Retr
-[  5]   0.00-10.00  sec  2.74 GBytes  2.36 Gbits/sec    0             sender
-[  5]   0.00-10.04  sec  2.74 GBytes  2.34 Gbits/sec                  receiver
-
-Co-developed-by: Lai Peter Jun Ann <jun.ann.lai@intel.com>
-Signed-off-by: Lai Peter Jun Ann <jun.ann.lai@intel.com>
-Signed-off-by: Song Yoong Siang <yoong.siang.song@intel.com>
-Acked-by: John Fastabend <john.fastabend@gmail.com>
-Acked-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-Tested-by: Naama Meir <naamax.meir@linux.intel.com>
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
----
- drivers/net/ethernet/intel/igc/igc.h      |  71 ++++++++------
- drivers/net/ethernet/intel/igc/igc_main.c | 113 ++++++++++++++++++++--
- drivers/net/ethernet/intel/igc/igc_ptp.c  |  51 ++++++++--
- 3 files changed, 195 insertions(+), 40 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/igc/igc.h b/drivers/net/ethernet/intel/igc/igc.h
-index 90316dc58630..e71cd7d7955d 100644
---- a/drivers/net/ethernet/intel/igc/igc.h
-+++ b/drivers/net/ethernet/intel/igc/igc.h
-@@ -72,13 +72,46 @@ struct igc_rx_packet_stats {
- 	u64 other_packets;
- };
- 
-+enum igc_tx_buffer_type {
-+	IGC_TX_BUFFER_TYPE_SKB,
-+	IGC_TX_BUFFER_TYPE_XDP,
-+	IGC_TX_BUFFER_TYPE_XSK,
-+};
-+
-+/* wrapper around a pointer to a socket buffer,
-+ * so a DMA handle can be stored along with the buffer
-+ */
-+struct igc_tx_buffer {
-+	union igc_adv_tx_desc *next_to_watch;
-+	unsigned long time_stamp;
-+	enum igc_tx_buffer_type type;
-+	union {
-+		struct sk_buff *skb;
-+		struct xdp_frame *xdpf;
-+	};
-+	unsigned int bytecount;
-+	u16 gso_segs;
-+	__be16 protocol;
-+
-+	DEFINE_DMA_UNMAP_ADDR(dma);
-+	DEFINE_DMA_UNMAP_LEN(len);
-+	u32 tx_flags;
-+	bool xsk_pending_ts;
-+};
-+
- struct igc_tx_timestamp_request {
--	struct sk_buff *skb;   /* reference to the packet being timestamped */
-+	union {                /* reference to the packet being timestamped */
-+		struct sk_buff *skb;
-+		struct igc_tx_buffer *xsk_tx_buffer;
-+	};
-+	enum igc_tx_buffer_type buffer_type;
- 	unsigned long start;   /* when the tstamp request started (jiffies) */
- 	u32 mask;              /* _TSYNCTXCTL_TXTT_{X} bit for this request */
- 	u32 regl;              /* which TXSTMPL_{X} register should be used */
- 	u32 regh;              /* which TXSTMPH_{X} register should be used */
- 	u32 flags;             /* flags that should be added to the tx_buffer */
-+	u8 xsk_queue_index;    /* Tx queue which requesting timestamp */
-+	struct xsk_tx_metadata_compl xsk_meta;	/* ref to xsk Tx metadata */
- };
- 
- struct igc_inline_rx_tstamps {
-@@ -322,6 +355,9 @@ void igc_disable_tx_ring(struct igc_ring *ring);
- void igc_enable_tx_ring(struct igc_ring *ring);
- int igc_xsk_wakeup(struct net_device *dev, u32 queue_id, u32 flags);
- 
-+/* AF_XDP TX metadata operations */
-+extern const struct xsk_tx_metadata_ops igc_xsk_tx_metadata_ops;
-+
- /* igc_dump declarations */
- void igc_rings_dump(struct igc_adapter *adapter);
- void igc_regs_dump(struct igc_adapter *adapter);
-@@ -507,32 +543,6 @@ enum igc_boards {
- #define TXD_USE_COUNT(S)	DIV_ROUND_UP((S), IGC_MAX_DATA_PER_TXD)
- #define DESC_NEEDED	(MAX_SKB_FRAGS + 4)
- 
--enum igc_tx_buffer_type {
--	IGC_TX_BUFFER_TYPE_SKB,
--	IGC_TX_BUFFER_TYPE_XDP,
--	IGC_TX_BUFFER_TYPE_XSK,
--};
--
--/* wrapper around a pointer to a socket buffer,
-- * so a DMA handle can be stored along with the buffer
-- */
--struct igc_tx_buffer {
--	union igc_adv_tx_desc *next_to_watch;
--	unsigned long time_stamp;
--	enum igc_tx_buffer_type type;
--	union {
--		struct sk_buff *skb;
--		struct xdp_frame *xdpf;
--	};
--	unsigned int bytecount;
--	u16 gso_segs;
--	__be16 protocol;
--
--	DEFINE_DMA_UNMAP_ADDR(dma);
--	DEFINE_DMA_UNMAP_LEN(len);
--	u32 tx_flags;
--};
--
- struct igc_rx_buffer {
- 	union {
- 		struct {
-@@ -556,6 +566,13 @@ struct igc_xdp_buff {
- 	struct igc_inline_rx_tstamps *rx_ts; /* data indication bit IGC_RXDADV_STAT_TSIP */
- };
- 
-+struct igc_metadata_request {
-+	struct igc_tx_buffer *tx_buffer;
-+	struct xsk_tx_metadata *meta;
-+	struct igc_ring *tx_ring;
-+	u32 cmd_type;
-+};
-+
- struct igc_q_vector {
- 	struct igc_adapter *adapter;    /* backlink */
- 	void __iomem *itr_register;
-diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
-index d9bd001af7ba..6d504da395f4 100644
---- a/drivers/net/ethernet/intel/igc/igc_main.c
-+++ b/drivers/net/ethernet/intel/igc/igc_main.c
-@@ -2873,6 +2873,89 @@ static void igc_update_tx_stats(struct igc_q_vector *q_vector,
- 	q_vector->tx.total_packets += packets;
- }
- 
-+static void igc_xsk_request_timestamp(void *_priv)
-+{
-+	struct igc_metadata_request *meta_req = _priv;
-+	struct igc_ring *tx_ring = meta_req->tx_ring;
-+	struct igc_tx_timestamp_request *tstamp;
-+	u32 tx_flags = IGC_TX_FLAGS_TSTAMP;
-+	struct igc_adapter *adapter;
-+	unsigned long lock_flags;
-+	bool found = false;
-+	int i;
-+
-+	if (test_bit(IGC_RING_FLAG_TX_HWTSTAMP, &tx_ring->flags)) {
-+		adapter = netdev_priv(tx_ring->netdev);
-+
-+		spin_lock_irqsave(&adapter->ptp_tx_lock, lock_flags);
-+
-+		/* Search for available tstamp regs */
-+		for (i = 0; i < IGC_MAX_TX_TSTAMP_REGS; i++) {
-+			tstamp = &adapter->tx_tstamp[i];
-+
-+			/* tstamp->skb and tstamp->xsk_tx_buffer are in union.
-+			 * When tstamp->skb is equal to NULL,
-+			 * tstamp->xsk_tx_buffer is equal to NULL as well.
-+			 * This condition means that the particular tstamp reg
-+			 * is not occupied by other packet.
-+			 */
-+			if (!tstamp->skb) {
-+				found = true;
-+				break;
-+			}
-+		}
-+
-+		/* Return if no available tstamp regs */
-+		if (!found) {
-+			adapter->tx_hwtstamp_skipped++;
-+			spin_unlock_irqrestore(&adapter->ptp_tx_lock,
-+					       lock_flags);
-+			return;
-+		}
-+
-+		tstamp->start = jiffies;
-+		tstamp->xsk_queue_index = tx_ring->queue_index;
-+		tstamp->xsk_tx_buffer = meta_req->tx_buffer;
-+		tstamp->buffer_type = IGC_TX_BUFFER_TYPE_XSK;
-+
-+		/* Hold the transmit completion until timestamp is ready */
-+		meta_req->tx_buffer->xsk_pending_ts = true;
-+
-+		/* Keep the pointer to tx_timestamp, which is located in XDP
-+		 * metadata area. It is the location to store the value of
-+		 * tx hardware timestamp.
-+		 */
-+		xsk_tx_metadata_to_compl(meta_req->meta, &tstamp->xsk_meta);
-+
-+		/* Set timestamp bit based on the _TSTAMP(_X) bit. */
-+		tx_flags |= tstamp->flags;
-+		meta_req->cmd_type |= IGC_SET_FLAG(tx_flags,
-+						   IGC_TX_FLAGS_TSTAMP,
-+						   (IGC_ADVTXD_MAC_TSTAMP));
-+		meta_req->cmd_type |= IGC_SET_FLAG(tx_flags,
-+						   IGC_TX_FLAGS_TSTAMP_1,
-+						   (IGC_ADVTXD_TSTAMP_REG_1));
-+		meta_req->cmd_type |= IGC_SET_FLAG(tx_flags,
-+						   IGC_TX_FLAGS_TSTAMP_2,
-+						   (IGC_ADVTXD_TSTAMP_REG_2));
-+		meta_req->cmd_type |= IGC_SET_FLAG(tx_flags,
-+						   IGC_TX_FLAGS_TSTAMP_3,
-+						   (IGC_ADVTXD_TSTAMP_REG_3));
-+
-+		spin_unlock_irqrestore(&adapter->ptp_tx_lock, lock_flags);
-+	}
-+}
-+
-+static u64 igc_xsk_fill_timestamp(void *_priv)
-+{
-+	return *(u64 *)_priv;
-+}
-+
-+const struct xsk_tx_metadata_ops igc_xsk_tx_metadata_ops = {
-+	.tmo_request_timestamp		= igc_xsk_request_timestamp,
-+	.tmo_fill_timestamp		= igc_xsk_fill_timestamp,
-+};
-+
- static void igc_xdp_xmit_zc(struct igc_ring *ring)
- {
- 	struct xsk_buff_pool *pool = ring->xsk_pool;
-@@ -2894,24 +2977,34 @@ static void igc_xdp_xmit_zc(struct igc_ring *ring)
- 	budget = igc_desc_unused(ring);
- 
- 	while (xsk_tx_peek_desc(pool, &xdp_desc) && budget--) {
--		u32 cmd_type, olinfo_status;
-+		struct igc_metadata_request meta_req;
-+		struct xsk_tx_metadata *meta = NULL;
- 		struct igc_tx_buffer *bi;
-+		u32 olinfo_status;
- 		dma_addr_t dma;
- 
--		cmd_type = IGC_ADVTXD_DTYP_DATA | IGC_ADVTXD_DCMD_DEXT |
--			   IGC_ADVTXD_DCMD_IFCS | IGC_TXD_DCMD |
--			   xdp_desc.len;
-+		meta_req.cmd_type = IGC_ADVTXD_DTYP_DATA |
-+				    IGC_ADVTXD_DCMD_DEXT |
-+				    IGC_ADVTXD_DCMD_IFCS |
-+				    IGC_TXD_DCMD | xdp_desc.len;
- 		olinfo_status = xdp_desc.len << IGC_ADVTXD_PAYLEN_SHIFT;
- 
- 		dma = xsk_buff_raw_get_dma(pool, xdp_desc.addr);
-+		meta = xsk_buff_get_metadata(pool, xdp_desc.addr);
- 		xsk_buff_raw_dma_sync_for_device(pool, dma, xdp_desc.len);
-+		bi = &ring->tx_buffer_info[ntu];
-+
-+		meta_req.tx_ring = ring;
-+		meta_req.tx_buffer = bi;
-+		meta_req.meta = meta;
-+		xsk_tx_metadata_request(meta, &igc_xsk_tx_metadata_ops,
-+					&meta_req);
- 
- 		tx_desc = IGC_TX_DESC(ring, ntu);
--		tx_desc->read.cmd_type_len = cpu_to_le32(cmd_type);
-+		tx_desc->read.cmd_type_len = cpu_to_le32(meta_req.cmd_type);
- 		tx_desc->read.olinfo_status = cpu_to_le32(olinfo_status);
- 		tx_desc->read.buffer_addr = cpu_to_le64(dma);
- 
--		bi = &ring->tx_buffer_info[ntu];
- 		bi->type = IGC_TX_BUFFER_TYPE_XSK;
- 		bi->protocol = 0;
- 		bi->bytecount = xdp_desc.len;
-@@ -2974,6 +3067,13 @@ static bool igc_clean_tx_irq(struct igc_q_vector *q_vector, int napi_budget)
- 		if (!(eop_desc->wb.status & cpu_to_le32(IGC_TXD_STAT_DD)))
- 			break;
- 
-+		/* Hold the completions while there's a pending tx hardware
-+		 * timestamp request from XDP Tx metadata.
-+		 */
-+		if (tx_buffer->type == IGC_TX_BUFFER_TYPE_XSK &&
-+		    tx_buffer->xsk_pending_ts)
-+			break;
-+
- 		/* clear next_to_watch to prevent false hangs */
- 		tx_buffer->next_to_watch = NULL;
- 
-@@ -6802,6 +6902,7 @@ static int igc_probe(struct pci_dev *pdev,
- 
- 	netdev->netdev_ops = &igc_netdev_ops;
- 	netdev->xdp_metadata_ops = &igc_xdp_metadata_ops;
-+	netdev->xsk_tx_metadata_ops = &igc_xsk_tx_metadata_ops;
- 	igc_ethtool_set_ops(netdev);
- 	netdev->watchdog_timeo = 5 * HZ;
- 
-diff --git a/drivers/net/ethernet/intel/igc/igc_ptp.c b/drivers/net/ethernet/intel/igc/igc_ptp.c
-index 885faaa7b9de..1bb026232efc 100644
---- a/drivers/net/ethernet/intel/igc/igc_ptp.c
-+++ b/drivers/net/ethernet/intel/igc/igc_ptp.c
-@@ -11,6 +11,7 @@
- #include <linux/ktime.h>
- #include <linux/delay.h>
- #include <linux/iopoll.h>
-+#include <net/xdp_sock_drv.h>
- 
- #define INCVALUE_MASK		0x7fffffff
- #define ISGN			0x80000000
-@@ -545,6 +546,30 @@ static void igc_ptp_enable_rx_timestamp(struct igc_adapter *adapter)
- 	wr32(IGC_TSYNCRXCTL, val);
- }
- 
-+static void igc_ptp_free_tx_buffer(struct igc_adapter *adapter,
-+				   struct igc_tx_timestamp_request *tstamp)
-+{
-+	if (tstamp->buffer_type == IGC_TX_BUFFER_TYPE_XSK) {
-+		/* Release the transmit completion */
-+		tstamp->xsk_tx_buffer->xsk_pending_ts = false;
-+
-+		/* Note: tstamp->skb and tstamp->xsk_tx_buffer are in union.
-+		 * By setting tstamp->xsk_tx_buffer to NULL, tstamp->skb will
-+		 * become NULL as well.
-+		 */
-+		tstamp->xsk_tx_buffer = NULL;
-+		tstamp->buffer_type = 0;
-+
-+		/* Trigger txrx interrupt for transmit completion */
-+		igc_xsk_wakeup(adapter->netdev, tstamp->xsk_queue_index, 0);
-+
-+		return;
-+	}
-+
-+	dev_kfree_skb_any(tstamp->skb);
-+	tstamp->skb = NULL;
-+}
-+
- static void igc_ptp_clear_tx_tstamp(struct igc_adapter *adapter)
- {
- 	unsigned long flags;
-@@ -555,8 +580,8 @@ static void igc_ptp_clear_tx_tstamp(struct igc_adapter *adapter)
- 	for (i = 0; i < IGC_MAX_TX_TSTAMP_REGS; i++) {
- 		struct igc_tx_timestamp_request *tstamp = &adapter->tx_tstamp[i];
- 
--		dev_kfree_skb_any(tstamp->skb);
--		tstamp->skb = NULL;
-+		if (tstamp->skb)
-+			igc_ptp_free_tx_buffer(adapter, tstamp);
- 	}
- 
- 	spin_unlock_irqrestore(&adapter->ptp_tx_lock, flags);
-@@ -657,8 +682,9 @@ static int igc_ptp_set_timestamp_mode(struct igc_adapter *adapter,
- static void igc_ptp_tx_timeout(struct igc_adapter *adapter,
- 			       struct igc_tx_timestamp_request *tstamp)
- {
--	dev_kfree_skb_any(tstamp->skb);
--	tstamp->skb = NULL;
-+	if (tstamp->skb)
-+		igc_ptp_free_tx_buffer(adapter, tstamp);
-+
- 	adapter->tx_hwtstamp_timeouts++;
- 
- 	netdev_warn(adapter->netdev, "Tx timestamp timeout\n");
-@@ -729,10 +755,21 @@ static void igc_ptp_tx_reg_to_stamp(struct igc_adapter *adapter,
- 	shhwtstamps.hwtstamp =
- 		ktime_add_ns(shhwtstamps.hwtstamp, adjust);
- 
--	tstamp->skb = NULL;
-+	/* Copy the tx hardware timestamp into xdp metadata or skb */
-+	if (tstamp->buffer_type == IGC_TX_BUFFER_TYPE_XSK) {
-+		struct xsk_buff_pool *xsk_pool;
-+
-+		xsk_pool = adapter->tx_ring[tstamp->xsk_queue_index]->xsk_pool;
-+		if (xsk_pool && xp_tx_metadata_enabled(xsk_pool)) {
-+			xsk_tx_metadata_complete(&tstamp->xsk_meta,
-+						 &igc_xsk_tx_metadata_ops,
-+						 &shhwtstamps.hwtstamp);
-+		}
-+	} else {
-+		skb_tstamp_tx(skb, &shhwtstamps);
-+	}
- 
--	skb_tstamp_tx(skb, &shhwtstamps);
--	dev_kfree_skb_any(skb);
-+	igc_ptp_free_tx_buffer(adapter, tstamp);
- }
- 
- /**
--- 
-2.41.0
+> + */
+> +int ice_eswitch_cfg_vsi(struct ice_vsi *vsi, const u8 *mac)
+> +{
+> +	int err;
+> +
 
 
