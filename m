@@ -1,137 +1,112 @@
-Return-Path: <netdev+bounces-91325-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91326-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66E0A8B22B5
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 15:29:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04BED8B22F2
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 15:38:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 08DC91F2159C
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 13:29:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B6DFD2842CC
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 13:38:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0733E149C7D;
-	Thu, 25 Apr 2024 13:29:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED3BB84FC9;
+	Thu, 25 Apr 2024 13:37:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Wnt7oiI5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QQ/TkmY5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01E38149C70;
-	Thu, 25 Apr 2024 13:29:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA4DE3717F
+	for <netdev@vger.kernel.org>; Thu, 25 Apr 2024 13:37:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714051758; cv=none; b=nr81e9XkUS+lk+j/lboK7wYdx7V/TZ8kQtPObW5+eaUeFG5sjstYNuhGODhxk3NNHqPaX/YQaWl2K+3bve1OSzITP/0WzEV1nJNjdPaV8xyWbnWC3/YykKoaODjDJQAmVpxrE5uoRXVqqQhMrY/rWfB8Gshv8Cw2R4su1tG0UQ8=
+	t=1714052277; cv=none; b=eFen8jaAmKVOoTgc6oFfwMcMqdzuXUiANfcgWJGTW6Lp1a8MaZAOSUbci5oDL6tGYlaI9eMtk+Vrye4f+H4EU7J79mCm7ekfFNYUYMZmRnwcDL5kO7goV316k5IJvHJPROkdl9/x8O8sDTWL3qpXg6kBNpZ1/ZDDFfvVglooF/8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714051758; c=relaxed/simple;
-	bh=wskz/AmsaP1lhsfbNrm1mdT4szU5tDRPLVfU0H5AD8Q=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=CJ/KW5hGqHXbphLsm+4R8weJnhQuvlBLP9J9faHU70v731eVJH81oNlVOdIS5fF3x1qyndnjmyvkPfOvfhQnqkBzFunemrquAGhuROI1WFoYEUps4PuXpaxUO/SKT5TkBQhB013thTyAuMZVREqteJPPX4OM1Y38yQQWRgCHYXY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Wnt7oiI5; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 43PD28UN005279;
-	Thu, 25 Apr 2024 13:29:08 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- subject : to : cc : references : from : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=etx9ghK6vaLriQU+/XjIUoOHCizC2xGLldFfgXXdbEo=;
- b=Wnt7oiI5YeOgUd2vxzu9EnRLJ+Xlm7ErBahpBNx4dIIu8eE+MPxlDwxSq0p8FG4OjlY+
- en0wG8vCe/LT07VucDiBUzfpHhSaARLXzAD1L+iqsQTh65RN2PzO/aut6wC2uHB/xz1c
- FLXoMcerR/v5yXTGmWekn6IXXGDD8zqVqbOfB5FWkZTsSKz088blo+axJ6Yd1QgnHSMy
- 84QgwyPyIWSM7vbOyDTfneH+fVjHhZHyQLbuYuSUfskuTOT7gAnoYjT3itgJmiEzyD72
- niYUDW3IrhZP2Fdt9oduGEnojEP35gAlqHMbw5JOZ6PtGdi2McDjW9Lqrz2lurooI1KM hg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xqqpwr228-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 25 Apr 2024 13:29:07 +0000
-Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 43PDT7Hi013788;
-	Thu, 25 Apr 2024 13:29:07 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xqqpwr221-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 25 Apr 2024 13:29:07 +0000
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 43PD40ra005352;
-	Thu, 25 Apr 2024 13:29:06 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3xmx3crpbx-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 25 Apr 2024 13:29:05 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 43PDT0va42991884
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 25 Apr 2024 13:29:02 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id A473420049;
-	Thu, 25 Apr 2024 13:29:00 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 3D78520040;
-	Thu, 25 Apr 2024 13:29:00 +0000 (GMT)
-Received: from [9.152.224.141] (unknown [9.152.224.141])
-	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 25 Apr 2024 13:29:00 +0000 (GMT)
-Message-ID: <23cff564-a65c-4db6-a386-2a7e56be84c8@linux.ibm.com>
-Date: Thu, 25 Apr 2024 15:29:00 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v6 07/11] net/smc: register loopback-ism into
- SMC-D device list
-Content-Language: en-US
-To: Wenjia Zhang <wenjia@linux.ibm.com>, Wen Gu <guwen@linux.alibaba.com>,
-        twinkler@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
-        agordeev@linux.ibm.com, davem@davemloft.net, edumazet@google.com,
-        kuba@kernel.org, pabeni@redhat.com, jaka@linux.ibm.com
-Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com, alibuda@linux.alibaba.com,
-        tonylu@linux.alibaba.com, linux-kernel@vger.kernel.org,
-        linux-s390@vger.kernel.org, netdev@vger.kernel.org
-References: <20240414040304.54255-1-guwen@linux.alibaba.com>
- <20240414040304.54255-8-guwen@linux.alibaba.com>
- <ef936c58-e87c-4078-a4dc-ed7313dba2a3@linux.ibm.com>
-From: Alexandra Winter <wintera@linux.ibm.com>
-In-Reply-To: <ef936c58-e87c-4078-a4dc-ed7313dba2a3@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: EpMIQ47RwUwKg1qn6GATtcSYn5LIp0y-
-X-Proofpoint-GUID: mx6fJ0iRSsp-atADs5qci4ckRHoC4wcK
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+	s=arc-20240116; t=1714052277; c=relaxed/simple;
+	bh=igu+g38jZzVdAsr7p+xpDq3kc478JwjhucnC+QqU0bU=;
+	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=c//JjwV7T1ZF4si+OvFhouc6PFINJ1eHPBNN7ZF3kL425rtS3w2QcwMTgxcV2heeoS3zAwJlyYvZC7VaOoQNAJ4fAqQkLzg0053HSzVANI4UWxZH1sytlHMsssQZgO6BIF5wKTAX1t3srCQi87ICKyw7kNyDBrF7Qe7cvFN3jFc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QQ/TkmY5; arc=none smtp.client-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-1e84787b0a8so32365ad.1
+        for <netdev@vger.kernel.org>; Thu, 25 Apr 2024 06:37:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1714052276; x=1714657076; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=uEsRFIzgSvbLYjiIDk6MS0kl9NDC9LNX4khGTDo8tpI=;
+        b=QQ/TkmY5aZ/y4r496qb2WApiQ++aE/C33qwIYsNN280EOJqGelCsnlyoLXbS0vZmja
+         Px6QriCAQ+9vzOlEhIP6WCsu10aS4o0iIIPvLRGVjS9+gAWn6EflEcsLamls7kWNU7sz
+         Emt5C78PgIEB+zk8VaayNoa9276HD92luUaWnes8z2jCuBEHsFr2HZxNO63c37cRobf7
+         m+WHnfDAHRVfowMLBMYUEQgAWynGkEkIXhOmIxTEMyJh5qlCP6O69IrlHAZXx3ibU4vn
+         9M8WpI8sgmDkFbYGPvmihutl9yx6f+88eRytSRpJN+hE492oZE3ynMIoxUF/8kaLshAe
+         OXlQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714052276; x=1714657076;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=uEsRFIzgSvbLYjiIDk6MS0kl9NDC9LNX4khGTDo8tpI=;
+        b=QvV+CX+6NOpL57BTYrLIGke9aonzRHEsyS56uk47rQQNb45/5jrisN7OcXnySG6WwP
+         BvuzUHPbDgjojqHIjDR0J9zsF8WSl86fKvUvF4BwLbUP/pWaLb0l7J86fHtLwwbjBBOb
+         qGAOp7oEcm3Pz3l4Y9Mxp/RfNizY8IwWKAppqrb7uPZd8wCRLmjlavyN1+CzGDACfcNJ
+         bviK203yoRmdlRwg9binfC8LDBw1y28nNVCg2G+outHWbScSAT21v11HrSZ2C0EHBUfO
+         gSdxCGwR38JWg8uJTz1YaVa/yZVmEI3uGLIMNPPSTIh1J6NvEyu4fWgrOLii9mu1dI8I
+         26SQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX22doQCinxokVmwaVp8bSMDPGIMUsu4ukomAFfH14XUNK8jD7UEIl0AFPEsrz+wCL5txr1doap1bXtUVUYQJXhD12XmB+R
+X-Gm-Message-State: AOJu0Yyk4mTggitS53b4HhtQ6c2X2wdv9igy4b9ziWSbLxE6W2nSIk3I
+	egaoKIcf4YhejVmewaXQtexvOO+K7s8//OkMVhmwfrE9liezGPdIZULe1Q==
+X-Google-Smtp-Source: AGHT+IFs3Ai6p4kOgD2kmRfxFSAi7rbJH73snWJVvDUUygbMQCPeFWAep0cRioM4C5QUpNyHwLbv0A==
+X-Received: by 2002:a17:902:a613:b0:1dc:c28e:2236 with SMTP id u19-20020a170902a61300b001dcc28e2236mr6306599plq.2.1714052275704;
+        Thu, 25 Apr 2024 06:37:55 -0700 (PDT)
+Received: from localhost (p5315239-ipxg23901hodogaya.kanagawa.ocn.ne.jp. [180.34.87.239])
+        by smtp.gmail.com with ESMTPSA id a19-20020a170902ee9300b001e47972a2casm13813084pld.96.2024.04.25.06.37.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 25 Apr 2024 06:37:55 -0700 (PDT)
+Date: Thu, 25 Apr 2024 22:37:52 +0900 (JST)
+Message-Id: <20240425.223752.1359016853102318865.fujita.tomonori@gmail.com>
+To: andrew@lunn.ch
+Cc: fujita.tomonori@gmail.com, netdev@vger.kernel.org, horms@kernel.org
+Subject: Re: [PATCH net-next v2 1/6] net: tn40xx: add pci driver for Tehuti
+ Networks TN40xx chips
+From: FUJITA Tomonori <fujita.tomonori@gmail.com>
+In-Reply-To: <966aaf2a-a21c-4e8f-9ddd-a4541cfc94d2@lunn.ch>
+References: <20240425010354.32605-1-fujita.tomonori@gmail.com>
+	<20240425010354.32605-2-fujita.tomonori@gmail.com>
+	<966aaf2a-a21c-4e8f-9ddd-a4541cfc94d2@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1011,Hydra:6.0.650,FMLib:17.11.176.26
- definitions=2024-04-25_13,2024-04-25_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=859 adultscore=0
- phishscore=0 suspectscore=0 priorityscore=1501 malwarescore=0
- lowpriorityscore=0 mlxscore=0 spamscore=0 bulkscore=0 impostorscore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2404010000 definitions=main-2404250098
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 
+Hi,
 
+On Thu, 25 Apr 2024 14:54:09 +0200
+Andrew Lunn <andrew@lunn.ch> wrote:
 
-On 25.04.24 13:29, Wenjia Zhang wrote:
->> +    if (!smcd->pnetid[0]) {
->> +        fentry = list_first_entry_or_null(&smcd_dev_list.list,
->> +                          struct smcd_dev, list);
->> +        if (fentry && smc_ism_is_loopback(fentry))
->> +            list_add(&smcd->list, &fentry->list);
->> +        else
->> +            list_add(&smcd->list, &smcd_dev_list.list);
->> +    } else {
->>           list_add_tail(&smcd->list, &smcd_dev_list.list);
->> -    else
->> -        list_add(&smcd->list, &smcd_dev_list.list);
->> +    }
+>> +#define TN40_DRV_VERSION "0.3.6.17.2"
 > 
-> Nit: here the pair of curly brackets are unnecessary.
+> A version is generally a bad idea. What does this version even mean,
+> given that you are re-writting the driver? You might as well call it
+> 0.0.0.0.0.
 
-Actually
-https://www.kernel.org/doc/html/latest/process/coding-style.html#codingstyle
-tells you to use those braces.
+makes sense.
+
+> We recommend that for ethtool, you leave the version field
+> untouched. The core will then fill it with the kernel version. That
+> version makes sense, since it gives you both the driver and the kernel
+> around it.
+
+Understood. I'll remove the driver version in v3.
+
+
+thanks,
 
