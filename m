@@ -1,274 +1,317 @@
-Return-Path: <netdev+bounces-91273-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91274-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D32F48B1FAF
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 12:52:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A3C58B1FB4
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 12:53:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EF376B241C7
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 10:52:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 965161F2262C
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 10:53:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1290D3A1B0;
-	Thu, 25 Apr 2024 10:51:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0DE12C6B6;
+	Thu, 25 Apr 2024 10:52:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CcEvsUjE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.188.207])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F2DF376E6
-	for <netdev@vger.kernel.org>; Thu, 25 Apr 2024 10:51:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.188.207
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714042316; cv=none; b=Yj+yDUlPzxWMNxMQCKoAOnH/GWJQmw+cM43Tx0GLbXYSkW3siPN4lZTbzMIOVgxA4dvyOZ+Yujcy9/FPhx92A898fG0KL2jeh2rxz/7envjR6Xl3sBFRFnKrL1R+oEHRJ6gmkWsCz3Zt3zr1f84oTybW3Lrszjg2x8T3JNU5dCo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714042316; c=relaxed/simple;
-	bh=JydQiVphvhEZt1vHZCc+TOBgaFOfd7+3/jKnGevvKQE=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=o3Qu9sRnbMBiz9d8kxS1TaSuRF3ArWmodvS7yDSEFbbzBgB7pSNV/ftJk5JpU+8fsgktWmJgplrE8cwEmkFDNjYdzgM7kAxxal+2/1yMj0gDjhgW+zsHnKtL8FAu0AjpbsIFGqmwxT7D/V9ZtKAXGMbWnjJke15yN/TH/n6vZ7E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; arc=none smtp.client-ip=217.70.188.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	laforge@osmocom.org,
-	pespin@sysmocom.de,
-	osmith@sysmocom.de,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	fw@strlen.de
-Subject: [PATCH net-next 12/12] gtp: identify tunnel via GTP device + GTP version + TEID + family
-Date: Thu, 25 Apr 2024 12:51:38 +0200
-Message-Id: <20240425105138.1361098-13-pablo@netfilter.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20240425105138.1361098-1-pablo@netfilter.org>
-References: <20240425105138.1361098-1-pablo@netfilter.org>
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 843E22B9D5
+	for <netdev@vger.kernel.org>; Thu, 25 Apr 2024 10:52:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.9
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1714042348; cv=fail; b=GwMUeri6FwFDbSAREVQrEiafKzjJ3kaX20yN1AIvjL1s1V3nUpheG8q1cKlteNRo6ySG3jorD9mr7GYiCBb8kt4a6Y8L63LVs5rL8zS3iDj3bGkh8b7DLorytiYKVyxO8x2l4AX+Seb+PcwfyUgjIPQMLSLxOPyqva95u5BKJBM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1714042348; c=relaxed/simple;
+	bh=EVxMchTNuwVF9ecrv3CerzjUlOXxzYmdO/wIqVDqd54=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=Smdx/9VZGEoXA+7j8lywIBAivsVC1VIoB8YXGftBxwQ0N6JpzM8ZqTXo1xax5UuyUObYPdsPZJsgNkmTUSbKIxWoLzQOJNC1oPwOjlFeTegtT9L9Htz+qhH/0GFHjfL9hZaIyw9q87hepEugCoa8EQX79jUs/Xx4YxcVIylX4Ys=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CcEvsUjE; arc=fail smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1714042346; x=1745578346;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=EVxMchTNuwVF9ecrv3CerzjUlOXxzYmdO/wIqVDqd54=;
+  b=CcEvsUjEamiUHi1ZWauhatvgHv5TFx0X1PZf5YUkr5+6u4AbsNeoA1FG
+   SnsH+Cz6N/cJJB425PMRX7U3nebYIEYpv/MoKj1lm99r7R+4LlUlnLzJi
+   O5dYPrnY9s8PqYUI9gVw6EFez+JdnU7rlj6PvQ3AHFB6npJFLrDATsg/1
+   W47Ku1pWBy9y4TAQbm2wbjeQLu93zKVMaLE3C90qGw8nKRtc9RtZ4FhKZ
+   PMMtKisJUV0+sCXpNdwWc4zuotGZVAMbV8vWnAJJXQVD0pvX9wGvZi+Ow
+   sa1nms571nGfL7DsLSeifbyVMBVWGrNrIBlo0/SDLgvREiwknJgtXv31Q
+   A==;
+X-CSE-ConnectionGUID: EYdKvowwTFGNw5x8EITVLA==
+X-CSE-MsgGUID: 5e7qcmsmT1m6dSIi5lZYSQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11054"; a="32210191"
+X-IronPort-AV: E=Sophos;i="6.07,229,1708416000"; 
+   d="scan'208";a="32210191"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Apr 2024 03:52:26 -0700
+X-CSE-ConnectionGUID: PWvquleWQSCUDhAVIOQdzw==
+X-CSE-MsgGUID: BYLeTD33QGOIeESdzbYByA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,229,1708416000"; 
+   d="scan'208";a="25019302"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by fmviesa009.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 25 Apr 2024 03:52:26 -0700
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 25 Apr 2024 03:52:25 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 25 Apr 2024 03:52:24 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Thu, 25 Apr 2024 03:52:24 -0700
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.169)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Thu, 25 Apr 2024 03:52:24 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=CHKsn9/sIfuv/2MR3RlwMs1oDJoUIjqA8lrYBQZEuTBN2igZfV7A8EHRgkXPwP/EEi0kt5/nxu8lQ4kdheCQ52UEyPeUOZdJdzu4ki5RhG7iFf5TKJ3VemsezvvSpVBpBzPw2Tq6b0RposIQYVOHn0TlMtkTZ09GzZOYGWZlc7Kb6xCcfWiEYSbjUY/+FG5mHQ0q8i2eXwCeus55uvavbDaEmn1FbsWWy00Wjg6WBxHsFzQZkpuc+1eP3Zi+GvSrZjDhxXjHRzjB8jgBqGwUrEO54ATsVkK/SnkrBSWvseE4wznQS2BMoCIc324Jjva3RvoloMKBue8hVAxtK/bHlQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=1Uch5cNqf1/IO08Oom5VKGF3IK9bPu4jw60xqSOKjpU=;
+ b=S3ueocJnnQCv9qoZs70qsG+FIkHiK6ahBXDK/BQ2290z44oWNvBlKHpgtSV7TfpcPdA076pD5tEe3vVtctVKw15x5wqV2OuRpDoeKqyFSuxzhcssP+5fkc84/fsVuow3u4gzoGJVsaDE4kFU/07m2Gpwvf89Qt2YxWD2NL3MHHKmDSCsxr2F3nNesSlEtA1WY1A92IlDG1L1NKFjh6fXNciT7o3e61Y8EvBdkDVXgfzL9GYKBGGAPc4BGR36fBOAqJhuME7FFTXA8haCKDCMFwalHK12eJLZ7hs8cOhQqYCu+OTBo0Jo7sH12r375iHFxOE78k0+FQmHobwpiH42sg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CH0PR11MB8086.namprd11.prod.outlook.com (2603:10b6:610:190::8)
+ by IA1PR11MB7317.namprd11.prod.outlook.com (2603:10b6:208:427::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7472.46; Thu, 25 Apr
+ 2024 10:52:23 +0000
+Received: from CH0PR11MB8086.namprd11.prod.outlook.com
+ ([fe80::984b:141d:2923:8ae3]) by CH0PR11MB8086.namprd11.prod.outlook.com
+ ([fe80::984b:141d:2923:8ae3%5]) with mapi id 15.20.7519.020; Thu, 25 Apr 2024
+ 10:52:22 +0000
+Message-ID: <a3802100-21b0-4a8d-9b4a-d557996e7c2d@intel.com>
+Date: Thu, 25 Apr 2024 12:52:17 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next v5 08/12] iavf: periodically
+ cache PHC time
+To: "Keller, Jacob E" <jacob.e.keller@intel.com>, "Polchlopek, Mateusz"
+	<mateusz.polchlopek@intel.com>, Rahul Rameshbabu <rrameshbabu@nvidia.com>
+CC: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "horms@kernel.org"
+	<horms@kernel.org>, "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
+	"Drewek, Wojciech" <wojciech.drewek@intel.com>
+References: <20240418052500.50678-1-mateusz.polchlopek@intel.com>
+ <20240418052500.50678-9-mateusz.polchlopek@intel.com>
+ <87jzkue99b.fsf@nvidia.com> <9d8e656f-1b04-4fc5-a5b4-c04df7d34fdc@intel.com>
+ <CO1PR11MB5089E8856F06AC88C2B76F6AD6102@CO1PR11MB5089.namprd11.prod.outlook.com>
+Content-Language: en-US
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+In-Reply-To: <CO1PR11MB5089E8856F06AC88C2B76F6AD6102@CO1PR11MB5089.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: WA2P291CA0048.POLP291.PROD.OUTLOOK.COM
+ (2603:10a6:1d0:1f::10) To CH0PR11MB8086.namprd11.prod.outlook.com
+ (2603:10b6:610:190::8)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH0PR11MB8086:EE_|IA1PR11MB7317:EE_
+X-MS-Office365-Filtering-Correlation-Id: e8cb78c7-295c-4c68-f176-08dc6515c8fd
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?YXIwNnR0NjJONjNLc0JPM2NMZVpnNlpNdWxzbkRVamRvdmg4MXdVZjJKZlNW?=
+ =?utf-8?B?akMxS0czbXM2Qys5eUxsWlBNR1VVR1h0SkVCbkVodytsanlWQ25qZUN4Tytm?=
+ =?utf-8?B?aWt5SDFVQVNlditTUDZYNXd1Z1FQaE5qcGIxOEU3TW56eWUweEZORm9lL3FG?=
+ =?utf-8?B?Y0tBZk9XN0h5TlNwdERYc3J1SU1LK1Y0K21sRWFFMXl0eTlyMWloWEs0bjVj?=
+ =?utf-8?B?eXBTTm5sL3ZmeXBnUmZwNnhiWklCd1VYYTFIcFRzRHJidFJJNzZ1NWlUa0F3?=
+ =?utf-8?B?Z1hGRWZQUDRjWlFFbjdCbjFMYXQ0WG1veWFrbWhqWnFEMTY1Tk9DSGZWdEVZ?=
+ =?utf-8?B?N2VKVUZldDdYdmEzK21vT1JrcWVJdXlOeTBHMXlzcVUzaWRMK01CVU5Qb2JH?=
+ =?utf-8?B?TVk1a2FkUm9LNnBzUW5IU3BsMXZpUklGcnBHV3JZN1RkVFkyN0lwejJKWXRE?=
+ =?utf-8?B?T1U0WGNIRHJTZ0wwQ2NYWmIvRUY5TEdpd3VmYytwOG5memdRT3dYQjVTVTdI?=
+ =?utf-8?B?L0YrUGoyekR5UG5KWlFXQnNBb0tmSHBnbFRvZUl6L2JxTDQ4YWRFM2d2TEFo?=
+ =?utf-8?B?ejNUNnZuS1N1NXlMUU5Ea0E3SlRkdkZmRC93UHBabTNMTDM1N2dnK2ltREN0?=
+ =?utf-8?B?cW1mQXgrQmhpS0JPZWVvZlBVR3kxakdzb244UGVrc3Y5ZmxoVWRHS2xwSzd5?=
+ =?utf-8?B?bzVCUS9LMDVXOXI0MGVDeENsVGd0aGlWV1cwellhNnZvODhqV2FRTTFBU24w?=
+ =?utf-8?B?VDFEbTJ0NE1ubVZJcHUwNTBVZzVDb3c3K1IzWFRJQ0h3OHpCNlN3RGxCaFI4?=
+ =?utf-8?B?NDhPcy9HenBEbmMrTXlNS3hRTnI4dG9pWlQvZ00weExzcFFMQkZaZURZNEt3?=
+ =?utf-8?B?MFQ0c1NOTHZqb1ZGVE1xcnVtMEZpM2crVWtNRDZlVC9MRFZPUThDNmRUWHlu?=
+ =?utf-8?B?V3BvNVo5ZXdIMWw4bThSeDB6dGJGdmg3S25mUWhBcTFvYURkamNYWnVkc3Br?=
+ =?utf-8?B?TFVNcnRyRmxNaC8raUZLQ0hhWHNsN1Q0RHZjYXhYbVpMVlZLQkw1QzlYeldM?=
+ =?utf-8?B?eVNMZHdPRGFVNlV2REtlcW12WVExcUlFOXlXY015YVlCZHJJV280bFk4d05G?=
+ =?utf-8?B?QkI5MFhNY2NPYjJRblV3b1Zid0pCYUdNYUNxa2FWM3FDMVNwSlB6SGduT2p3?=
+ =?utf-8?B?cGVDb1BaZUtnQytOcDJhcTNKcmpPK3BmamFQS3Q1cWdRcFN3OUh1c1dmenlR?=
+ =?utf-8?B?T2lJWnVpeGJvdlhYVTdQQVkzQkJvM25mUS9DTW1XZzBQaldiYVRRTk5XcE1a?=
+ =?utf-8?B?M0l0NUtkOWFVN1VVVkx2aXZLb3hLZVNueXdtdFdhUFFhSEFqUXU4eFBYeWpr?=
+ =?utf-8?B?ZWNib1I2SEdvVExlbm5YUi9NdG1uMEhlbWwzcFl1WTlwSmttT1BoZExiWjFD?=
+ =?utf-8?B?aUVrY0IrZzhvbWFObjBKMk5UUXNPZTI4ZGxpZDQwQWxFY29kUkdwMlpESmFO?=
+ =?utf-8?B?S2lpeTZ2Z3RFVmlrRjRZUmlmUUlyZW1VNkovcW5lRFF6RGNjSEZTTVM4MWtJ?=
+ =?utf-8?B?TGcrWHIwSXZTdnhkcWFmeFNwbjlVMnpJeXhpWG9RRGs0b0xGZk9Yb2IzSitp?=
+ =?utf-8?B?YzBaNVYyV1JLb2djUElKSlNPQnBBS3BXallyaGtyM2JSbTFhRzc3eEh6eExE?=
+ =?utf-8?B?WXZ0UWVrYkxCcU42MzlCUGJEZGxqc3RqNXAwVENPekdSZ1RhMVJqcW1nPT0=?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH0PR11MB8086.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(376005)(1800799015);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?TnFSQWdnbEE0YnBveFZoNjl0MXplTW5uTXA1Ym9ubTZYYzJBam5FZ2ZOTXN0?=
+ =?utf-8?B?d1I4VmJNbTdkWlZCQ1hzMmo0QlpJWW1oeVNtZXB1WFFXamhjSTZMWUFCNnE5?=
+ =?utf-8?B?dnd3N1lYaDg1a0FmeUVPa1hFVTdnN3Vma3pialFiWUFmUncvUmQrQys3bW1x?=
+ =?utf-8?B?WnF4ejhQVFdBcHFMcHBHRjFTcmw4YnN0TkhQcmIzVUQ0SVp2Rmt4N3VnT1k3?=
+ =?utf-8?B?SDNkVjc2WUNyY1FFUkRpSHk0OU5yZC8yenNsb3psVWhnZW5aTmw4dURSM2VK?=
+ =?utf-8?B?TlpZN0pwV05NTFFWTUxNdnNHaEJHWVV2TUVqbkhKbTBkWXhhNFRKektOQzdl?=
+ =?utf-8?B?QnZXRUtXWW0rcWVDOFEzSXlqZWEza0N0REk5YlkvdDUvS0dZZjVrclJBU1Ez?=
+ =?utf-8?B?VzFWM2Y0OTVwSkY3ZXh6SkFiQ2lGMExDNEJqMGpUWWExT1U2Rk5tN0gwT3kw?=
+ =?utf-8?B?Wjd6bndxcFlqaHVMT2RqWkpuKzlXeDFvQ0tkSmp0V1VYOVBoVG5CQ1Buc0ov?=
+ =?utf-8?B?M2dOVnhVL2hZZm5UdDBoMFlacE5hYktmUjROTnk0UFFSZU9XMnFXdVFhdFJq?=
+ =?utf-8?B?bldsaXVxUHFpVkU3elFRd3Y2K0gvQ2xIaWRsLzF5M0pnci9ma2lLZW9LWFZR?=
+ =?utf-8?B?dkdzKzBLNWhlRjRidG5pRVh2WXhDSmFhNjNXSm5zb3pYTnIzV3diRG1PNkdl?=
+ =?utf-8?B?RzdkS1B6c2U0VEJ1bWpDNHJRVEZic3BZUW1KY2x3aFhRNzN3MHdVWmo2RXRj?=
+ =?utf-8?B?QlFBYkllejRHVlZLY053Zm1RTUc5RzJNTVIyeWozT1BzenRRM3pzZUxnbGV4?=
+ =?utf-8?B?K2dLTXJ1SUlzbWNjaW9OTTh4UjdOZU50a0E1c3FRZWJoZHdYcHpRaGxlcG9u?=
+ =?utf-8?B?RUdSOHhkMEUyN2J5MkViSXZ1bkhJckhJMWdxNGRSYkZiUjdiOVFlRUY5enZx?=
+ =?utf-8?B?Y0FVaFk0SFRTbkFnd2h4YkVyUmVTdTBaSHlJSTgzWitrTDFqUmZ6UE1sdUpZ?=
+ =?utf-8?B?ckFvOGcyTWt3L3BwZHNlemlOaVNwVmM4b09VbjdzQmZCSHBrcGJZekx4eWhJ?=
+ =?utf-8?B?aFp6T3JBTHJ4OHQvQWhqd1JlWHl5SVAzUERpZGgza0c3WTQwc2Q4aUZzbWth?=
+ =?utf-8?B?bzEvd3VNSXZwRVlkbDE4OUZzdjQyb1Nxa0taUHd6eDduQWF3c0lPMTFibXdl?=
+ =?utf-8?B?Y2MxQjBwOHFpWlNDYVkwTldsbDBUZHp4NGxCTmRjNjhKWlFXU1VPVGVRdnl6?=
+ =?utf-8?B?VEZUY1BxSjYyczFzWVlpSm5DY3dGWmYzS2NpakdxcUNFcTU0RURWN215WWRX?=
+ =?utf-8?B?VS9MWEpLaTRqeWg5U0NqN1dwSnN6UTdVWWRSM1U5eUVXTy85bDQ3djZxVGNw?=
+ =?utf-8?B?MWQ1ODFOMnlSK2RQVEJXZXlGb25aTGtlUlM3WGJWdUF4NkQrS1k0cExjSUZL?=
+ =?utf-8?B?ckdhMlVDSzdydHhvS1dRbVdHZ1ZnL0JYekVlVkljemhuTW1sMjJwVmNEUjVZ?=
+ =?utf-8?B?dUVJRXRrVm1TN0trNVlEK0ppVXNzMGJ0NEJxUzBmRHFSVkFTeUxkRFBjeDNX?=
+ =?utf-8?B?a01rUXFkS0hIVnlDdTZjaXpPdk5paXZlK1VRdk43NnZVczhUU21HdXRtcjFn?=
+ =?utf-8?B?MTFlUzhDVHhYVGxtcFdINmlJZVFDR1o5TG1adUQ0QmNoRFdJdVZLZXdDN1ZE?=
+ =?utf-8?B?d3RldG1qdVVid0JDTHRIaXh1Q3ROOVdIQmtaV0Fac1lqZkdITGFaMlJoYXNG?=
+ =?utf-8?B?eW02VFhPTytlWmZsZEEzTjl2MkZaNHpsUWNvUU1LNjkrdTN6c0gzeEtpdkhY?=
+ =?utf-8?B?WFdUWW1XNDdSVHpmR29QNXE1bDZLZFVvaE8wSnJkRWhlMmp6YlNnc2lJWS9n?=
+ =?utf-8?B?N3Z2c1E5ODg3K0pGZEhPUy9tQmlWYXdRcXB6dkZ2WFhpalVnb3JERGc1T2lP?=
+ =?utf-8?B?UTlNdnJ4WDV1Qlk2WG5acERua0tBNEVTL0s4bTNQTURZdTcwbkp6ZWtpcUN0?=
+ =?utf-8?B?NmFqei9ZWVRpNTY2OE5DbkxkN2F6bUZseVUzelEvU3RTaENOOE8xcUlyVlN2?=
+ =?utf-8?B?cUJXRnVzUUw1SEJxbnA1OHU1VDFtbEdiM0tuUi81cGpFUEhET0FzUVhoVk9Y?=
+ =?utf-8?B?Mk9nMndTZlBpVWlrTlBJdzg5QUR2QVErUk4zT3hFUFBRdm4rNkJJOGcvbHBN?=
+ =?utf-8?B?bHc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: e8cb78c7-295c-4c68-f176-08dc6515c8fd
+X-MS-Exchange-CrossTenant-AuthSource: CH0PR11MB8086.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Apr 2024 10:52:22.1868
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: VIL/Y0E/+jCw6IjGNcBVwMrIycbmFb2CLStVfQJHv6ZmmBSIXAIlTDX7YZFPqb9AHQfRKi3oTeY60kik0enTsk9ydTPEXVtn0Cn5tQMPdQc=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB7317
+X-OriginatorOrg: intel.com
 
-This allows to define a GTP tunnel for dual stack MS/UE with both IPv4
-and IPv6 addresses while using the same TEID via two PDP context
-objects.
+On 4/25/24 00:03, Keller, Jacob E wrote:
+> 
+> 
+>> -----Original Message-----
+>> From: Polchlopek, Mateusz <mateusz.polchlopek@intel.com>
+>> Sent: Monday, April 22, 2024 2:23 AM
+>> To: Rahul Rameshbabu <rrameshbabu@nvidia.com>
+>> Cc: intel-wired-lan@lists.osuosl.org; netdev@vger.kernel.org; horms@kernel.org;
+>> Nguyen, Anthony L <anthony.l.nguyen@intel.com>; Keller, Jacob E
+>> <jacob.e.keller@intel.com>; Drewek, Wojciech <wojciech.drewek@intel.com>
+>> Subject: Re: [Intel-wired-lan] [PATCH iwl-next v5 08/12] iavf: periodically cache
+>> PHC time
+>>
+>>
+>>
+>> On 4/18/2024 9:51 PM, Rahul Rameshbabu wrote:
+>>> On Thu, 18 Apr, 2024 01:24:56 -0400 Mateusz Polchlopek
+>> <mateusz.polchlopek@intel.com> wrote:
+>>>> From: Jacob Keller <jacob.e.keller@intel.com>
+>>>>
+>>>> The Rx timestamps reported by hardware may only have 32 bits of storage
+>>>> for nanosecond time. These timestamps cannot be directly reported to the
+>>>> Linux stack, as it expects 64bits of time.
+>>>>
+>>>> To handle this, the timestamps must be extended using an algorithm that
+>>>> calculates the corrected 64bit timestamp by comparison between the PHC
+>>>> time and the timestamp. This algorithm requires the PHC time to be
+>>>> captured within ~2 seconds of when the timestamp was captured.
+>>>>
+>>>> Instead of trying to read the PHC time in the Rx hotpath, the algorithm
+>>>> relies on a cached value that is periodically updated.
+>>>>
+>>>> Keep this cached time up to date by using the PTP .do_aux_work kthread
+>>>> function.
+>>>
+>>> Seems reasonable.
+>>>
+>>>>
+>>>> The iavf_ptp_do_aux_work will reschedule itself about twice a second,
+>>>> and will check whether or not the cached PTP time needs to be updated.
+>>>> If so, it issues a VIRTCHNL_OP_1588_PTP_GET_TIME to request the time
+>>>> from the PF. The jitter and latency involved with this command aren't
+>>>> important, because the cached time just needs to be kept up to date
+>>>> within about ~2 seconds.
+>>>>
+>>>> Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
+>>>> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+>>>> Co-developed-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+>>>> Signed-off-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+>>>> ---
+>>>>    drivers/net/ethernet/intel/iavf/iavf_ptp.c | 52 ++++++++++++++++++++++
+>>>>    drivers/net/ethernet/intel/iavf/iavf_ptp.h |  1 +
+>>>>    2 files changed, 53 insertions(+)
+>>>>
+>>>> diff --git a/drivers/net/ethernet/intel/iavf/iavf_ptp.c
+>> b/drivers/net/ethernet/intel/iavf/iavf_ptp.c
+>>> <snip>
+>>>> +/**
+>>>> + * iavf_ptp_do_aux_work - Perform periodic work required for PTP support
+>>>> + * @ptp: PTP clock info structure
+>>>> + *
+>>>> + * Handler to take care of periodic work required for PTP operation. This
+>>>> + * includes the following tasks:
+>>>> + *
+>>>> + *   1) updating cached_phc_time
+>>>> + *
+>>>> + *      cached_phc_time is used by the Tx and Rx timestamp flows in order to
+>>>> + *      perform timestamp extension, by carefully comparing the timestamp
+>>>> + *      32bit nanosecond timestamps and determining the corrected 64bit
+>>>> + *      timestamp value to report to userspace. This algorithm only works if
+>>>> + *      the cached_phc_time is within ~1 second of the Tx or Rx timestamp
+>>>> + *      event. This task periodically reads the PHC time and stores it, to
+>>>> + *      ensure that timestamp extension operates correctly.
+>>>> + *
+>>>> + * Returns: time in jiffies until the periodic task should be re-scheduled.
+>>>> + */
+>>>> +long iavf_ptp_do_aux_work(struct ptp_clock_info *ptp)
+>>>> +{
+>>>> +	struct iavf_adapter *adapter = clock_to_adapter(ptp);
+>>>> +
+>>>> +	iavf_ptp_cache_phc_time(adapter);
+>>>> +
+>>>> +	/* Check work about twice a second */
+>>>> +	return msecs_to_jiffies(500);
+>>>
+>>> HZ / 2 might be more intuitive?
+>>>
+> 
+> I've always found it more intuitive to think in terms of msecs myself, but HZ / 2 is ok if other folks agree.
 
-Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
----
- drivers/net/gtp.c | 85 +++++++++++++++++++++++++++++++++++------------
- 1 file changed, 63 insertions(+), 22 deletions(-)
+HZ/2 or HZ/3 as a timer period could be understood without thinking, but
+the same stands for 400ms. Problems starts when one thinks about it ;)
 
-diff --git a/drivers/net/gtp.c b/drivers/net/gtp.c
-index 586de5f013b5..9880f7d5c56c 100644
---- a/drivers/net/gtp.c
-+++ b/drivers/net/gtp.c
-@@ -141,7 +141,7 @@ static inline u32 ipv6_hashfn(const struct in6_addr *ip6)
- }
- 
- /* Resolve a PDP context structure based on the 64bit TID. */
--static struct pdp_ctx *gtp0_pdp_find(struct gtp_dev *gtp, u64 tid)
-+static struct pdp_ctx *gtp0_pdp_find(struct gtp_dev *gtp, u64 tid, u16 family)
- {
- 	struct hlist_head *head;
- 	struct pdp_ctx *pdp;
-@@ -149,7 +149,8 @@ static struct pdp_ctx *gtp0_pdp_find(struct gtp_dev *gtp, u64 tid)
- 	head = &gtp->tid_hash[gtp0_hashfn(tid) % gtp->hash_size];
- 
- 	hlist_for_each_entry_rcu(pdp, head, hlist_tid) {
--		if (pdp->gtp_version == GTP_V0 &&
-+		if (pdp->af == family &&
-+		    pdp->gtp_version == GTP_V0 &&
- 		    pdp->u.v0.tid == tid)
- 			return pdp;
- 	}
-@@ -157,7 +158,7 @@ static struct pdp_ctx *gtp0_pdp_find(struct gtp_dev *gtp, u64 tid)
- }
- 
- /* Resolve a PDP context structure based on the 32bit TEI. */
--static struct pdp_ctx *gtp1_pdp_find(struct gtp_dev *gtp, u32 tid)
-+static struct pdp_ctx *gtp1_pdp_find(struct gtp_dev *gtp, u32 tid, u16 family)
- {
- 	struct hlist_head *head;
- 	struct pdp_ctx *pdp;
-@@ -165,7 +166,8 @@ static struct pdp_ctx *gtp1_pdp_find(struct gtp_dev *gtp, u32 tid)
- 	head = &gtp->tid_hash[gtp1u_hashfn(tid) % gtp->hash_size];
- 
- 	hlist_for_each_entry_rcu(pdp, head, hlist_tid) {
--		if (pdp->gtp_version == GTP_V1 &&
-+		if (pdp->af == family &&
-+		    pdp->gtp_version == GTP_V1 &&
- 		    pdp->u.v1.i_tei == tid)
- 			return pdp;
- 	}
-@@ -305,15 +307,8 @@ static int gtp_inner_proto(struct sk_buff *skb, unsigned int hdrlen,
- }
- 
- static int gtp_rx(struct pdp_ctx *pctx, struct sk_buff *skb,
--		  unsigned int hdrlen, unsigned int role)
-+		  unsigned int hdrlen, unsigned int role, __u16 inner_proto)
- {
--	__u16 inner_proto;
--
--	if (gtp_inner_proto(skb, hdrlen, &inner_proto) < 0) {
--		netdev_dbg(pctx->dev, "GTP packet does not encapsulate an IP packet\n");
--		return -1;
--	}
--
- 	if (!gtp_check_ms(skb, pctx, hdrlen, role, inner_proto)) {
- 		netdev_dbg(pctx->dev, "No PDP ctx for this MS\n");
- 		return 1;
-@@ -562,6 +557,21 @@ static int gtp0_handle_echo_resp(struct gtp_dev *gtp, struct sk_buff *skb)
- 				       msg, 0, GTP_GENL_MCGRP, GFP_ATOMIC);
- }
- 
-+static int gtp_proto_to_family(__u16 proto)
-+{
-+	switch (proto) {
-+	case ETH_P_IP:
-+		return AF_INET;
-+	case ETH_P_IPV6:
-+		return AF_INET6;
-+	default:
-+		WARN_ON_ONCE(1);
-+		break;
-+	}
-+
-+	return AF_UNSPEC;
-+}
-+
- /* 1 means pass up to the stack, -1 means drop and 0 means decapsulated. */
- static int gtp0_udp_encap_recv(struct gtp_dev *gtp, struct sk_buff *skb)
- {
-@@ -569,6 +579,7 @@ static int gtp0_udp_encap_recv(struct gtp_dev *gtp, struct sk_buff *skb)
- 			      sizeof(struct gtp0_header);
- 	struct gtp0_header *gtp0;
- 	struct pdp_ctx *pctx;
-+	__u16 inner_proto;
- 
- 	if (!pskb_may_pull(skb, hdrlen))
- 		return -1;
-@@ -591,13 +602,19 @@ static int gtp0_udp_encap_recv(struct gtp_dev *gtp, struct sk_buff *skb)
- 	if (gtp0->type != GTP_TPDU)
- 		return 1;
- 
--	pctx = gtp0_pdp_find(gtp, be64_to_cpu(gtp0->tid));
-+	if (gtp_inner_proto(skb, hdrlen, &inner_proto) < 0) {
-+		netdev_dbg(pctx->dev, "GTP packet does not encapsulate an IP packet\n");
-+		return -1;
-+	}
-+
-+	pctx = gtp0_pdp_find(gtp, be64_to_cpu(gtp0->tid),
-+			     gtp_proto_to_family(inner_proto));
- 	if (!pctx) {
- 		netdev_dbg(gtp->dev, "No PDP ctx to decap skb=%p\n", skb);
- 		return 1;
- 	}
- 
--	return gtp_rx(pctx, skb, hdrlen, gtp->role);
-+	return gtp_rx(pctx, skb, hdrlen, gtp->role, inner_proto);
- }
- 
- /* msg_type has to be GTP_ECHO_REQ or GTP_ECHO_RSP */
-@@ -768,6 +785,7 @@ static int gtp1u_udp_encap_recv(struct gtp_dev *gtp, struct sk_buff *skb)
- 			      sizeof(struct gtp1_header);
- 	struct gtp1_header *gtp1;
- 	struct pdp_ctx *pctx;
-+	__u16 inner_proto;
- 
- 	if (!pskb_may_pull(skb, hdrlen))
- 		return -1;
-@@ -803,9 +821,15 @@ static int gtp1u_udp_encap_recv(struct gtp_dev *gtp, struct sk_buff *skb)
- 	if (!pskb_may_pull(skb, hdrlen))
- 		return -1;
- 
-+	if (gtp_inner_proto(skb, hdrlen, &inner_proto) < 0) {
-+		netdev_dbg(pctx->dev, "GTP packet does not encapsulate an IP packet\n");
-+		return -1;
-+	}
-+
- 	gtp1 = (struct gtp1_header *)(skb->data + sizeof(struct udphdr));
- 
--	pctx = gtp1_pdp_find(gtp, ntohl(gtp1->tid));
-+	pctx = gtp1_pdp_find(gtp, ntohl(gtp1->tid),
-+			     gtp_proto_to_family(inner_proto));
- 	if (!pctx) {
- 		netdev_dbg(gtp->dev, "No PDP ctx to decap skb=%p\n", skb);
- 		return 1;
-@@ -815,7 +839,7 @@ static int gtp1u_udp_encap_recv(struct gtp_dev *gtp, struct sk_buff *skb)
- 	    gtp_parse_exthdrs(skb, &hdrlen) < 0)
- 		return -1;
- 
--	return gtp_rx(pctx, skb, hdrlen, gtp->role);
-+	return gtp_rx(pctx, skb, hdrlen, gtp->role, inner_proto);
- }
- 
- static void __gtp_encap_destroy(struct sock *sk)
-@@ -1842,10 +1866,12 @@ static struct pdp_ctx *gtp_pdp_add(struct gtp_dev *gtp, struct sock *sk,
- 		found = true;
- 	if (version == GTP_V0)
- 		pctx_tid = gtp0_pdp_find(gtp,
--					 nla_get_u64(info->attrs[GTPA_TID]));
-+					 nla_get_u64(info->attrs[GTPA_TID]),
-+					 family);
- 	else if (version == GTP_V1)
- 		pctx_tid = gtp1_pdp_find(gtp,
--					 nla_get_u32(info->attrs[GTPA_I_TEI]));
-+					 nla_get_u32(info->attrs[GTPA_I_TEI]),
-+					 family);
- 	if (pctx_tid)
- 		found = true;
- 
-@@ -2024,6 +2050,12 @@ static struct pdp_ctx *gtp_find_pdp_by_link(struct net *net,
- 					    struct nlattr *nla[])
- {
- 	struct gtp_dev *gtp;
-+	int family;
-+
-+	if (nla[GTPA_FAMILY])
-+		family = nla_get_u8(nla[GTPA_FAMILY]);
-+	else
-+		family = AF_INET;
- 
- 	gtp = gtp_find_dev(net, nla);
- 	if (!gtp)
-@@ -2032,10 +2064,16 @@ static struct pdp_ctx *gtp_find_pdp_by_link(struct net *net,
- 	if (nla[GTPA_MS_ADDRESS]) {
- 		__be32 ip = nla_get_be32(nla[GTPA_MS_ADDRESS]);
- 
-+		if (family != AF_INET)
-+			return ERR_PTR(-EINVAL);
-+
- 		return ipv4_pdp_find(gtp, ip);
- 	} else if (nla[GTPA_MS_ADDR6]) {
- 		struct in6_addr addr = nla_get_in6_addr(nla[GTPA_MS_ADDR6]);
- 
-+		if (family != AF_INET6)
-+			return ERR_PTR(-EINVAL);
-+
- 		if (addr.s6_addr32[2] ||
- 		    addr.s6_addr32[3])
- 			return ERR_PTR(-EADDRNOTAVAIL);
-@@ -2044,10 +2082,13 @@ static struct pdp_ctx *gtp_find_pdp_by_link(struct net *net,
- 	} else if (nla[GTPA_VERSION]) {
- 		u32 gtp_version = nla_get_u32(nla[GTPA_VERSION]);
- 
--		if (gtp_version == GTP_V0 && nla[GTPA_TID])
--			return gtp0_pdp_find(gtp, nla_get_u64(nla[GTPA_TID]));
--		else if (gtp_version == GTP_V1 && nla[GTPA_I_TEI])
--			return gtp1_pdp_find(gtp, nla_get_u32(nla[GTPA_I_TEI]));
-+		if (gtp_version == GTP_V0 && nla[GTPA_TID]) {
-+			return gtp0_pdp_find(gtp, nla_get_u64(nla[GTPA_TID]),
-+					     family);
-+		} else if (gtp_version == GTP_V1 && nla[GTPA_I_TEI]) {
-+			return gtp1_pdp_find(gtp, nla_get_u32(nla[GTPA_I_TEI]),
-+					     family);
-+		}
- 	}
- 
- 	return ERR_PTR(-EINVAL);
--- 
-2.30.2
+For me HZ, which could be both literally and colloquially understood as
+"per second" should not mean 1000ms (just evaluate to).
+2Hz is a frequency with half second period, but 2*HZ evaluates to 2000ms
+which is 4 times more :/
+
+
+> 
+> Thanks,
+> Jake
+> 
 
 
