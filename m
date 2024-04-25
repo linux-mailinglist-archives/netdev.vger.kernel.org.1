@@ -1,109 +1,132 @@
-Return-Path: <netdev+bounces-91327-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91328-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2C948B22F7
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 15:40:21 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 042418B233E
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 15:57:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 06C67B22560
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 13:40:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6FE761F23A3C
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 13:57:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1856149C56;
-	Thu, 25 Apr 2024 13:40:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7954C149DE2;
+	Thu, 25 Apr 2024 13:56:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hpba6MS3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D/YFezP/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
+Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EA47149C41
-	for <netdev@vger.kernel.org>; Thu, 25 Apr 2024 13:40:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBC2C5B201;
+	Thu, 25 Apr 2024 13:56:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714052407; cv=none; b=KVqxGLFPPzNdMtizGJPu6GUp7rivVHmKektOv5kQy8TQ7jySWyUhSUF2lHsG1vjSY2vt781S2cYno4H/A6qemAmfTYB7+4M5icwfywZ7z4vkOcPQLppEYjorUAEoUY9+K9PMx8a6eOwGuFVi+VbvPGmX/e/MklUDums1+HuksLQ=
+	t=1714053414; cv=none; b=Rs6roTREsu3UT49xHQRlYj+8Zp+5zHtDqN7mMOaUj/WDU9U1Ql8afVcxcorwsxJd8Ps0f5rhy8cTkQyCLx62fmB0xu8csOgHynD/Wrsj/vf+atZ0r8cKyfs5t5du22DtoJvqFVHVk5yXUy/YV+7pPtYEUq9LLQvOpuHjX8TJmwI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714052407; c=relaxed/simple;
-	bh=jrqyPKS7Hlw8xz1o5hjpgOooQWgQAMzKu7QXs0/9e+g=;
-	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=YMmzEsxkJurTHbq9sYhFaS4pkoTzrTzXZ5I2ehSVc0hu6MCuEtuLYdZKiP66y/Ch38Ubq+ead6GiAD/LFSAbUvWudCjnFki3EseF7tUWH0GK0ufExOiRtjMEXoimC2XFNx9vTqSpAHEpWtS/B2zMuPgO5K8NRLWwQMXfjG1DaNE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hpba6MS3; arc=none smtp.client-ip=209.85.216.46
+	s=arc-20240116; t=1714053414; c=relaxed/simple;
+	bh=wylgrDvpmfKc/1c27fyhdHqRJd6ueA2a/2GtprMcJzI=;
+	h=Date:From:To:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=dSj8nPt0w5As9ZpmqJm5AtUVeOeKbICp6BNdQtJ1ejEXiKwhGFJQGFJ6jtHsBTuZ7kgrybD73NNwdqJ5v1mdoHJpUtzC455lrbvlKEcphnceMo+30zUR5N0ehh87Adcv6Mj4HNrF1pobCQ+F9p8XG6Omquf4Libi8fWzqgaVyg8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=D/YFezP/; arc=none smtp.client-ip=209.85.219.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-2ac074ba920so267087a91.1
-        for <netdev@vger.kernel.org>; Thu, 25 Apr 2024 06:40:06 -0700 (PDT)
+Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-69b5a87505cso5000526d6.2;
+        Thu, 25 Apr 2024 06:56:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1714052406; x=1714657206; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=apJH0Kcfr1yw96r7lDBX22wpYYdECb8ZVgsjTYPjMtE=;
-        b=hpba6MS3pLQyMc0fmFiuvqXJ6FUdWn2JgGEj86ip7CLVGruPjLypB8mlUM9/HPAD/0
-         QsnO0IQa8p+HkIh/yDzk5LJhIKY4TBRBlXkSOeS82d5I0IcPaqKOysJfwgudF3/i4rBr
-         6eu51nmqFacOLieB4DcoxHIURPnzwvS2Mu1MTU8mk89LbQuuhPCu7H+8Ai4EE1l54Apq
-         T1mm5BhHppgfUQUshzwgvyV+UULxCZ63ipSZMzTBhaQAUSu43QWUDmWRi3W7b65AD2AD
-         3JtPd1b0YGawqXvAH4PtXOJbcyKx6Qikj5+yL21LCTxyj7MvkXzopfRyorTXHwSrnR0j
-         YhSQ==
+        d=gmail.com; s=20230601; t=1714053412; x=1714658212; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1ZkTpLfnyx6tU6FqBNqPSCdKtnr0jGqDIJz99fTbxaY=;
+        b=D/YFezP/Tw6YRy75dMKapGoMlZxKLLoi/V3sxQ0vBT7cemhlPJtBDbaTf/NMW+Xm0z
+         L2AufIRO9RUL/HovzwpPRnmD+UUBjFlT0l6qZ/Cbsgc982yQ7yWH06E6GpHZvDmXnkHu
+         j4VEVQiH91x5yRB0Ok7tX31NrzxIICzDX8R4YJ1RChE9qHRDgsoz1v4NaPCn3VTMlV0x
+         4v2jUrbKAHteFmdH4Oze5cxzbN7ALktSpiuL49c7kIGrA8g/tBFJJlerhYIxYZpsA06y
+         ARPaIgsilZ1MbJd0F8NH+HbmD3P/ek8CJH/4H6Ed8jsp/98ojh6qGsSuOTJ/1uj0ibsw
+         9xAA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714052406; x=1714657206;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=apJH0Kcfr1yw96r7lDBX22wpYYdECb8ZVgsjTYPjMtE=;
-        b=p0BIxkw/B/uLVXPomZKKLzixJedUpRKFbr7D1soaX4tAEalzmFIG5SJaKSde93twKT
-         1zlNLFTBSFABgB5xeWUmRvhXwmeR6GDtrB9mC+eHbhnmYpfByKvFG8iDHGCM5Qkbb9ZC
-         CR5UflND+kdaYkOPO9EJ5ZsXwcsuegMdP3LNggiBcEF3VfM+3YgSqQ9FXcYxMbY3MG6+
-         h5qrB6Akqux3xsW+zGAkI/zCbYTBvXrDGCFdkoEbqOSnvfoMAmuhSUfzlo0tItcLM20g
-         ShD48K/F71UJQHpq4KtBsaOa9WpQxON8uaSSy6GSmJVDFe6l6lyV12HC7Irytu4eeU+4
-         kqEQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUAewrTRGya5OMBHvprA2JJgwo/ZM2W9iBozhsPXuU6RvCUe1l+cfy8GjkkrYBg5Wu/+TIeDIvYPI+nISV8rXvWtMilFdVz
-X-Gm-Message-State: AOJu0YyGpJElrwm+HOEx0JIFJEmFaxUGP5WrrZ2R6YyqI2pNDhgAB71O
-	0iAOfw7DrGiVw+hX1sAt9zcd6GKaUPLqaVnm8n+XZYT2Ybe+HnMt
-X-Google-Smtp-Source: AGHT+IGRcaLXdl5/UMvu12CvDVAMUF0LIKnuvw0XKhiV2au7XuVn0GTREN1t91qHocQDf+SWaEHt1A==
-X-Received: by 2002:a17:902:ba88:b0:1e0:99b2:8a91 with SMTP id k8-20020a170902ba8800b001e099b28a91mr5715324pls.4.1714052405802;
-        Thu, 25 Apr 2024 06:40:05 -0700 (PDT)
-Received: from localhost (p5315239-ipxg23901hodogaya.kanagawa.ocn.ne.jp. [180.34.87.239])
-        by smtp.gmail.com with ESMTPSA id l2-20020a170902f68200b001e0fcf995easm13738248plg.202.2024.04.25.06.40.04
+        d=1e100.net; s=20230601; t=1714053412; x=1714658212;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=1ZkTpLfnyx6tU6FqBNqPSCdKtnr0jGqDIJz99fTbxaY=;
+        b=NfUBJTOQgvWu+NtOqHt3dI67831GKadNJVcQdvld0p8oPxfDUNglx8oe9ie9OjsBjI
+         X7VphPCbthPc8Ao6oPh7db+VwEvdysGkfJCcqNciW6yIM5+iZI/OBYOZQX9oQp3d/DnH
+         Xe5fju/u0I5iHUtIxhMSAg4+UGzrD1t/PRtkIJZNHJSJvz+E8VuFrufr0MMVgAMYIkIb
+         0HUXLRr3ZkAeDwAQEaDRWCX9+jU+l/Iy8+WfsZjRI85Fk+7e5rH6e0zDRcQ54da/LFfW
+         oMakXNjp8lD7AEUFGOHFyYlwJfL8iZo4RrsIUX9aj3rsiz6JtmXXRpFpujVjYZOjaYug
+         rc6A==
+X-Forwarded-Encrypted: i=1; AJvYcCWpGaAbvfECzUoLUxVUik7H4BPAwqcBaH2WQqqs53UD4frwkIYIRscLHtJj1srC1bQOwi+EggS2UUSa0ZbLWLwf92OKvLGFb6B4MyYEtwJQ5aMm5w/QxzOiFjt6JxzSRchmCKa9
+X-Gm-Message-State: AOJu0Yx9zQTG32ndqYLg7LF0RZhWwNE2JpfgXROBwg07NbGXivJqgMix
+	biJXAGhhCecSBlI5vg9oMrs6J0H206oy20fcFQ5JwInRXFyZQlEZ
+X-Google-Smtp-Source: AGHT+IE/G2O3EEzK0J1FIG9XGxASGB30fiHnk14JNb/wHA79yML+Z9Q1yw+BE7YnS6r3waJRpgGRWQ==
+X-Received: by 2002:a0c:f8cb:0:b0:699:2eb9:9c09 with SMTP id h11-20020a0cf8cb000000b006992eb99c09mr5585565qvo.24.1714053411578;
+        Thu, 25 Apr 2024 06:56:51 -0700 (PDT)
+Received: from localhost (164.146.150.34.bc.googleusercontent.com. [34.150.146.164])
+        by smtp.gmail.com with ESMTPSA id g2-20020a0cf082000000b0069c5d4b95d8sm6918053qvk.73.2024.04.25.06.56.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Apr 2024 06:40:05 -0700 (PDT)
-Date: Thu, 25 Apr 2024 22:40:02 +0900 (JST)
-Message-Id: <20240425.224002.290103132276818797.fujita.tomonori@gmail.com>
-To: jiri@resnulli.us
-Cc: fujita.tomonori@gmail.com, netdev@vger.kernel.org, andrew@lunn.ch,
- horms@kernel.org
-Subject: Re: [PATCH net-next v2 0/6] add ethernet driver for Tehuti
- Networks TN40xx chips
-From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-In-Reply-To: <Zio_YgfX9SO9DHc4@nanopsycho>
-References: <20240425010354.32605-1-fujita.tomonori@gmail.com>
-	<Zio_YgfX9SO9DHc4@nanopsycho>
+        Thu, 25 Apr 2024 06:56:51 -0700 (PDT)
+Date: Thu, 25 Apr 2024 09:56:50 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Richard Gobert <richardbgobert@gmail.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ davem@davemloft.net, 
+ edumazet@google.com, 
+ kuba@kernel.org, 
+ pabeni@redhat.com, 
+ dsahern@kernel.org, 
+ alobakin@pm.me, 
+ netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org
+Message-ID: <662a6122eacff_1de39b29444@willemb.c.googlers.com.notmuch>
+In-Reply-To: <b330dfad-1ba6-4172-a76b-b965221b15f6@gmail.com>
+References: <20240424163045.123528-1-richardbgobert@gmail.com>
+ <20240424163045.123528-2-richardbgobert@gmail.com>
+ <6629bcc9486a3_1bd6b02949c@willemb.c.googlers.com.notmuch>
+ <b330dfad-1ba6-4172-a76b-b965221b15f6@gmail.com>
+Subject: Re: [PATCH net v3 1/2] net: gro: fix udp bad offset in socket lookup
+ by adding {inner_}network_offset to napi_gro_cb
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: 7bit
 
-Hi,
-
-On Thu, 25 Apr 2024 13:32:50 +0200
-Jiri Pirko <jiri@resnulli.us> wrote:
-
->>FUJITA Tomonori (6):
->>  net: tn40xx: add pci driver for Tehuti Networks TN40xx chips
->>  net: tn40xx: add register defines
->>  net: tn40xx: add basic Tx handling
->>  net: tn40xx: add basic Rx handling
->>  net: tn40xx: add mdio bus support
->>  net: tn40xx: add PHYLIB support
+> >> --- a/net/ipv6/tcpv6_offload.c
+> >> +++ b/net/ipv6/tcpv6_offload.c
+> >> @@ -29,7 +29,8 @@ struct sk_buff *tcp6_gro_receive(struct list_head *head, struct sk_buff *skb)
+> >>  
+> >>  INDIRECT_CALLABLE_SCOPE int tcp6_gro_complete(struct sk_buff *skb, int thoff)
+> >>  {
+> >> -	const struct ipv6hdr *iph = ipv6_hdr(skb);
+> >> +	const u16 offset = NAPI_GRO_CB(skb)->network_offsets[skb->encapsulation];
+> >> +	const struct ipv6hdr *iph = (struct ipv6hdr *)(skb->data + offset);
+> >>  	struct tcphdr *th = tcp_hdr(skb);
+> >>  
+> > 
+> > Only udp code is affected, as only that can be used as tunnel.
+> > 
+> > For bug fixes, let's try to avoid touching other code. Also that vlan.
+> > 
+> > As a minimal patch all that is needed is the following, right?
+> > 
+> > - add the fields
+> > - store in inet_gro_receive + ipv6_gro_receive
+> > - read in udp[46]_gro_complete and udp[46]_lib_lookup_skb
+> > 
 > 
-> In all patches, could you please maintain prefixes tn40_/TN40_ for all
-> function, struct and define names?
+> This approach is smaller, thanks for writing it down.
+> 
+> What do you think about doing this and still writing to
+> inner_network_offset exclusively in {inet,ipv6}_gro_receive? I still
+> prefer it for reasons discussed in the previous series. The code line
+> in vlan_gro_receive will still be there, but that will be the only
+> addition to your snippet.
 
-Got it. I'll do in v3.
-
-thanks,
+That sounds fine, thanks.
 
