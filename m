@@ -1,58 +1,89 @@
-Return-Path: <netdev+bounces-91220-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91221-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 661358B1BF0
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 09:33:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2680E8B1C09
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 09:39:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 07D4E1F251E3
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 07:33:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B3A3B1F22B73
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 07:39:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 955176CDC8;
-	Thu, 25 Apr 2024 07:33:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93D216CDC9;
+	Thu, 25 Apr 2024 07:39:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qxEbHlTZ"
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="W5S9mW2P"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from fhigh1-smtp.messagingengine.com (fhigh1-smtp.messagingengine.com [103.168.172.152])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D8526EB4A;
-	Thu, 25 Apr 2024 07:33:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06CA4535A5;
+	Thu, 25 Apr 2024 07:39:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714030401; cv=none; b=ZARGfsWkHWtDFIo2XHlwcDv+o48BiHQJrGWcLkkcE+keMiGsPEQQ1pifHNB+zunx9w2RUkIodxaXQ4rrFvGC6EvBZu7cQxuNuP86NoS1r6iqx87c9VHydBXJv8+BUJFScIkuwAqh0RB2nYzXv9/73FrBaEWCMMa9CmGJViIH4U8=
+	t=1714030775; cv=none; b=ZwG76hPWFE/T6st7PUR8SD+e0dUXSPZibTRa+4xzdSGnIOvaHqrBC0c5H1Hudqiod5LbQf+qsgbXhf4Hsoc4OM5gHHGZtQqiuiHYvRF9Ir5HPww0SUblqUfwEuKjaj8QzEj05HRzeTN1jRGs0UQ9J8WWS3vJs3HqDtrpBTgzCtY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714030401; c=relaxed/simple;
-	bh=IvDFJUyMXiZoCo3+3WAO6o6mM1VGEGQ/JIWJuBcDiww=;
+	s=arc-20240116; t=1714030775; c=relaxed/simple;
+	bh=NXH9DFSKlZTB8H14nYXZsm7pEec5UcVC0Q7UASNlYTw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jjXdHWzqGY3aWCgT6ZPsNnqQ8dSN6igSSO+SNra9UqHglbtB1FH6S5J7ub1dMhbQGRU6WoTShA78zJqPS+IjBg5mBcAkYv1P7T73HTreXSCL9UW5Dt/WaeOyIE8IXcUdKOpw//LpxcKvIYF6T/6PXTiSpquR//GHL+EkVFLQmkQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qxEbHlTZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 664DBC113CC;
-	Thu, 25 Apr 2024 07:33:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714030400;
-	bh=IvDFJUyMXiZoCo3+3WAO6o6mM1VGEGQ/JIWJuBcDiww=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=qxEbHlTZpkqN3noZ8+q1aOqtL9WoUhJp6u9GrZ2/UfHErnHsXpJdNBl3wJAawuHo3
-	 duH2DK+B6BiCibp3F7TQmgvrslQ98lqIwuHxG39LLez2NaDnTfE9ByWIw/4+5hk1Z0
-	 ReIzcNQvMKTWffr48hGdkeSZNjDgYyOo/iDCQ3gTN5H6EEBhjhHe6MV3aFW5zMJsD2
-	 DqRWMVlsFywKVpFCWATdXPZ0IlRXrkCV9ZnFGB0ArAqw3cr9LRoIDNVtAePLi+mi47
-	 a8eyS3hEDWjUE//wC5SovyW7JOFOWTsAIYBcy7ymmazi90mZbCpGLIMcxpKRADxeYT
-	 uCHX9sNjHpfpg==
-Date: Thu, 25 Apr 2024 08:33:17 +0100
-From: Simon Horman <horms@kernel.org>
-To: Benjamin Poirier <benjamin.poirier@gmail.com>
-Cc: Aaron Conole <aconole@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-	dev@openvswitch.org, netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, Jiri Pirko <jiri@resnulli.us>
-Subject: Re: [ovs-dev] selftests: openvswitch: Questions about possible
- enhancements
-Message-ID: <20240425073317.GS42092@kernel.org>
-References: <20240424164405.GN42092@kernel.org>
- <20240424173715.GP42092@kernel.org>
- <ZilIgbIvB04iUal2@f4>
+	 Content-Type:Content-Disposition:In-Reply-To; b=aFdC7v7E7cWcUTWy0CzqDJlaFnC0KvyRgnCiQE4t8TzA9Zq8JvAGD5qZMIgG2mM7jKaEbY500LMYn3w+p72dc5hQWmOnoxSeyP1oc3MZ5AWiwtFKDhnKMkgxkO9SLa17h1FjfXU3bVJuxuyA48zKQDXqdHa2XFlMP2w57aWyKDg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=W5S9mW2P; arc=none smtp.client-ip=103.168.172.152
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+	by mailfhigh.nyi.internal (Postfix) with ESMTP id F24A91140134;
+	Thu, 25 Apr 2024 03:39:32 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute5.internal (MEProxy); Thu, 25 Apr 2024 03:39:32 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+	fm3; t=1714030772; x=1714117172; bh=+iroGCBHnk6lu8W8CuyJ3SmNRcqb
+	HlQo8giK2UXnHgw=; b=W5S9mW2PHEWn2F2V9Kn04mjTM0H67/OonUvESwJqPIpA
+	TChtfeF+4E2olLEgnfe0rCO/ZntpD9rjNFkN53JAYnPJgxp1gTZdadEc8TZJIzKH
+	ZZ2pivpHMH2Irq+JKgRhHJu5gEV/J2VbLVAs8eE/YJIrOxDvsZCBAy6dB3/ij0Zs
+	i4U6g9AMYmIQy4VoWwS1T5Ul3D6Wfpf2LNtNXCMUzBl3Y6WeFvnv9keeJRsBUlBw
+	bTnuZnRqF8RGN7u/9Cu/H4e2PK5nnodTlUAp40hVPP2imihHfX1BBNoOOK38t6yN
+	s2jsKMPwYVfI9bMFXjknZUX0U3MbEz5qZOLTRDfaiA==
+X-ME-Sender: <xms:tAgqZqRfDmvY2wMg_7OMjN21KQ47bllRQ7OF7pfKZEJaix8auPdslQ>
+    <xme:tAgqZvwsMirF1LVvFrUsj0U3mjkfHuhkuSeh0g2_1tjNo-xjL2xXjULjnyvfRAaAW
+    HhqI4Y5G0PL_WU>
+X-ME-Received: <xmr:tAgqZn3ndwP0kfDtRSZ2vPtkyc2yQ-w-nCi62aqWm-OjZx2faHgeCFcPZniY>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrudeliedguddviecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
+    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+    enucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpefkugho
+    ucfutghhihhmmhgvlhcuoehiughoshgthhesihguohhstghhrdhorhhgqeenucggtffrrg
+    htthgvrhhnpedvudefveekheeugeeftddvveefgfduieefudeifefgleekheegleegjeej
+    geeghfenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
+    hiughoshgthhesihguohhstghhrdhorhhg
+X-ME-Proxy: <xmx:tAgqZmBKJ0bAjWIp8zZIo4q-sejqZpLMLjinyBUDvAay8_2jtgb1nw>
+    <xmx:tAgqZjivUDioYhho9Ff3JaNqXclCASN5Jv_9QnHzUgntS4xZFBp5zw>
+    <xmx:tAgqZiqHTRAyovXLStvxdVIgrxg0-uQIexcou-hUHbikSamwaq23fA>
+    <xmx:tAgqZmjaxxG4cAYTKuIdqKf67QKbmvtm6bc_FH8xua-DA7SpI6eKag>
+    <xmx:tAgqZuSno9Sh8o7kXlDnTSCSCtTZjr7wYBcCAGLsH4_PhLN2mUk8K53b>
+Feedback-ID: i494840e7:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 25 Apr 2024 03:39:31 -0400 (EDT)
+Date: Thu, 25 Apr 2024 10:39:23 +0300
+From: Ido Schimmel <idosch@idosch.org>
+To: Adrian Moreno <amorenoz@redhat.com>
+Cc: netdev@vger.kernel.org, aconole@redhat.com, echaudro@redhat.com,
+	horms@kernel.org, i.maximets@ovn.org,
+	Jamal Hadi Salim <jhs@mojatatu.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 5/8] net: sched: act_sample: add action cookie
+ to sample
+Message-ID: <ZioIq3kNjivL9AnM@shredder>
+References: <20240424135109.3524355-1-amorenoz@redhat.com>
+ <20240424135109.3524355-6-amorenoz@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,61 +92,13 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZilIgbIvB04iUal2@f4>
+In-Reply-To: <20240424135109.3524355-6-amorenoz@redhat.com>
 
-On Wed, Apr 24, 2024 at 01:59:29PM -0400, Benjamin Poirier wrote:
-> On 2024-04-24 18:37 +0100, Simon Horman wrote:
-> > On Wed, Apr 24, 2024 at 05:44:05PM +0100, Simon Horman wrote:
-> > > Hi Aaron, Jakub, all,
-> > > 
-> > > I have recently been exercising the Open vSwitch kernel selftests,
-> > > using vng, something like this:
-> > > 
-> > > 	TESTDIR="tools/testing/selftests/net/openvswitch"
-> > > 
-> > >         vng -v --run . --user root --cpus 2 \
-> > >                 --overlay-rwdir "$PWD" -- \
-> > >                 "modprobe openvswitch && \
-> > > 		 echo \"timeout=90\" >> \"${TESTDIR}/settings\" && \
-> > >                  make -C \"$TESTDIR\" run_tests"
-> > > 
-> > > And I have some observations that I'd like to ask about.
-> > > 
-> > > 1. Building the kernel using the following command does not
-> > >    build the openvswitch kernel module.
-> > > 
-> > > 	vng -v --build \
-> > > 		--config tools/testing/selftests/net/config
-> > > 
-> > >    All that seems to be missing is CONFIG_OPENVSWITCH=m
-> > >    and I am wondering what the best way of resolving this is.
-> > > 
-> > >    Perhaps I am doing something wrong.
-> > >    Or perhaps tools/testing/selftests/net/openvswitch/config
-> > >    should be created? If so, should it include (most of?) what is in
-> > >    tools/testing/selftests/net/config, or just CONFIG_OPENVSWITCH=m?
+On Wed, Apr 24, 2024 at 03:50:52PM +0200, Adrian Moreno wrote:
+> If the action has a user_cookie, pass it along to the sample so it can
+> be easily identified.
 > 
-> I noticed something similar when testing Jiri's virtio_net selftests
-> patchset [1].
-> 
-> drivers/net/virtio_net/config includes virtio options but the
-> test also needs at least CONFIG_NET_VRF=y which is part of net/config.
-> 
-> Whatever the answer to your question, all config files should be
-> coherent on this matter.
+> Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
 
-Yes, agreed. That is the main reason I'm asking about this.
-
-> [1] https://lore.kernel.org/netdev/20240424104049.3935572-1-jiri@resnulli.us/
-> 
-> [...]
-> > 
-> >   5. openvswitch.sh starts with "#!/bin/sh".
-> >      But substitutions such as "${ns:0:1}0"  fail if /bin/sh is dash.
-> >      Perhaps we should change openvswitch.sh to use bash?
-> 
-> I think so. A similar change was done in
-> c2518da8e6b0 selftests: bonding: Change script interpreter (v6.8-rc1)
-
-Thanks, this one seems straightforward.
+Reviewed-by: Ido Schimmel <idosch@nvidia.com>
 
