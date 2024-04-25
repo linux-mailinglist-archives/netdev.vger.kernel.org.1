@@ -1,95 +1,76 @@
-Return-Path: <netdev+bounces-91372-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91375-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9BE038B2563
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 17:40:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 907718B257D
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 17:45:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CB8FA1C22E27
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 15:40:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5042A1F21096
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 15:45:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 933FE14C5BA;
-	Thu, 25 Apr 2024 15:40:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66FC514A600;
+	Thu, 25 Apr 2024 15:45:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iPKYDCg0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZWYGpdSr"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B26D14C5A0;
-	Thu, 25 Apr 2024 15:40:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C0921494BF;
+	Thu, 25 Apr 2024 15:45:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714059630; cv=none; b=iscohRZ2oWR1Cmqisrrsp+MchN6Ww3ETI/NQF1fMrvGy5khrRqEvaBDG+GUsTuCUIWvm0f+wQqMAZeqaYMhoZRRw6u2s8zNec3sidekYMxsE6zCFEtP1ciOp5nCxsDTmHDOmQ4NGuQtWhh2JbnkE79Cz74uviSo1lhO1W2yHsdI=
+	t=1714059940; cv=none; b=iu5cpeyhTdF2fiwKPzDRipXtcxK7VO3AmIbTZtFwL/zPFlbvxbSgS4HfVPbKl8hXj+hFBsYg6AlucgfpDDXIYzkvdfOs2mitxEvAffB4VfnU1msnq1CGyWUZZQV7rPckSBTbAgffZW5kbU8fpNziSIKXxY1MDXfRf5ckmZp676A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714059630; c=relaxed/simple;
-	bh=b7GVQbEg3N5QP7SXqOpXjBURWNBnzbcnNGtzANRii64=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=XGq89KH+PAX8csMYj59wCoAuq377/jj1YgkiztcaBcpli+LEbdrlaqScZS0oDWDIk3JzhvRXj7Jwl7pBVOmCfOhAMybLIU/NXYMA6qQJTSU7aFxgW3gKqTOE49dKhv81tcNtT6dxvo426Biw5K509E1PiD8ipC8sVkPtKnXYKBU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iPKYDCg0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 21110C32786;
-	Thu, 25 Apr 2024 15:40:30 +0000 (UTC)
+	s=arc-20240116; t=1714059940; c=relaxed/simple;
+	bh=ivTRNNRVsf/5/k0lJkiiGxW01LVY2QvpE5H4WN6G1fc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=QGLJg61VIH/fDRUa78o63dS04yHaImkIqjZlPSLHO1yRXm5zCeKurO4UhPKDHAMtohJLA0gb2wCj95DiCctgvb65L5f4SSKTAUPsZj/hh0pv5I8ZX588TXN0ynI2+Q8iuDddhj6UZKEaDD0xsg2D92ZIoJnoCrOhnrM6UlMKCpM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZWYGpdSr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0BFF0C113CC;
+	Thu, 25 Apr 2024 15:45:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714059630;
-	bh=b7GVQbEg3N5QP7SXqOpXjBURWNBnzbcnNGtzANRii64=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=iPKYDCg0DxJRpzL9qiubfg6PSK8EAFDhAGdk6MREdcr1zJV5/t8KEdqqcUk+aZyzX
-	 IATLyX/xWcnh+2ZCdgmS+UQoBYRFy6ulpQcWy8zctwacMyp12GFN/naGSCNw9J2cFB
-	 m9+mZi+5Xnv+/qitDRK8nMyFs16uto5UwQmKWkbPjaamv9c36LXD4BGpg1B4AUQnHL
-	 kXEhNg3CyJAVhSgmPoZPnHkgCdNlnibPo1ZlnGv9RLTrlOq7SmJteXyxtslm0s3YWM
-	 W5KfLYqKOdvqJjiCemHbmP9IJ19Y+RSLGvvx0cC5D2/wFpvuky8LJ9NrP5ZvcLypqI
-	 QHJvsDHzOWwUQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 06A03CF21C2;
-	Thu, 25 Apr 2024 15:40:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1714059939;
+	bh=ivTRNNRVsf/5/k0lJkiiGxW01LVY2QvpE5H4WN6G1fc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ZWYGpdSrAGjApXVhM4YNwmnftEX8T5ZI8SYKxHx3hfLV9REa9rZXCh8pzr0psmlJW
+	 3C6kep7M2PElbnjoDNXVIApiXuE/RMEIeJu2KHzRfd/+mFlQMGDyaLzTUHOpw0zDB/
+	 4IAIPyYB0Gmo5Px/Nf+h6sZJqAmSlwi+oA6KFLL8/9qstq95AwZobl0HddXZwKCHOL
+	 YJWd2ApjvYBR/5j6XFrFD3OGnf9RqVHRJ/7XByFHlVTOFT0/yb8K4V4JEKOwHCgvvv
+	 P1yRt0aGQ/JHzqXdfgPKkRu1qNKTYltSBc9k9rzSCHbnQL8zwihaFfO+a9AEIsfBAL
+	 4Lt8gUNhZIzTg==
+Date: Thu, 25 Apr 2024 08:45:37 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: David Howells <dhowells@redhat.com>
+Cc: netdev@vger.kernel.org, Jeff Layton <jlayton@kernel.org>, Steve French
+ <sfrench@samba.org>, Herbert Xu <herbert@gondor.apana.org.au>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, netfs@lists.linux.dev,
+ linux-crypto@vger.kernel.org, linux-cifs@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] Fix a potential infinite loop in
+ extract_user_to_sg()
+Message-ID: <20240425084537.6e406d86@kernel.org>
+In-Reply-To: <1967121.1714034372@warthog.procyon.org.uk>
+References: <1967121.1714034372@warthog.procyon.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] dpll: fix dpll_pin_on_pin_register() for multiple
- parent pins
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171405963002.10966.12819145929067304526.git-patchwork-notify@kernel.org>
-Date: Thu, 25 Apr 2024 15:40:30 +0000
-References: <20240424101636.1491424-1-arkadiusz.kubalewski@intel.com>
-In-Reply-To: <20240424101636.1491424-1-arkadiusz.kubalewski@intel.com>
-To: Kubalewski@codeaurora.org,
-	Arkadiusz <arkadiusz.kubalewski@intel.com>
-Cc: netdev@vger.kernel.org, vadim.fedorenko@linux.dev, jiri@resnulli.us,
- davem@davemloft.net, rrameshbabu@nvidia.com, linux-kernel@vger.kernel.org,
- pabeni@redhat.com, kuba@kernel.org, mschmidt@redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Thu, 25 Apr 2024 09:39:32 +0100 David Howells wrote:
+> Fix extract_user_to_sg() so that it will break out of the loop if
+> iov_iter_extract_pages() returns 0 rather than looping around forever.
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Is "goto fail" the right way to break out here?
+My intuition would be "break".
 
-On Wed, 24 Apr 2024 12:16:36 +0200 you wrote:
-> In scenario where pin is registered with multiple parent pins via
-> dpll_pin_on_pin_register(..), all belonging to the same dpll device.
-> A second call to dpll_pin_on_pin_unregister(..) would cause a call trace,
-> as it tries to use already released registration resources (due to fix
-> introduced in b446631f355e). In this scenario pin was registered twice,
-> so resources are not yet expected to be release until each registered
-> pin/pin pair is unregistered.
-> 
-> [...]
-
-Here is the summary with links:
-  - [net,v2] dpll: fix dpll_pin_on_pin_register() for multiple parent pins
-    https://git.kernel.org/netdev/net/c/38d7b94e81d0
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+On a quick read it seems like res = 0 may occur if we run out of
+iterator, is passing maxsize > iter->count illegal?
 
