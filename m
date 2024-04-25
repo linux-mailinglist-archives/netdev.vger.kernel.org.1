@@ -1,178 +1,117 @@
-Return-Path: <netdev+bounces-91357-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91358-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83FAE8B24E7
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 17:19:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5B558B24F3
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 17:22:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3BC152870AE
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 15:19:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 242D61C216B8
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 15:22:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 753CA14A638;
-	Thu, 25 Apr 2024 15:19:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84AEA14AD15;
+	Thu, 25 Apr 2024 15:22:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RETx1rYi"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="f3Ob8V05"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9DA637152;
-	Thu, 25 Apr 2024 15:18:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A9D514A638;
+	Thu, 25 Apr 2024 15:22:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714058340; cv=none; b=ZDto8Jp/FoENq4LVROpCkHC4+zDJMKVPqAK4EZD49TnyhqcKmlSQpUKZdw57d7ZLwCJBsV5YuMYbTPYqJ+itkrhmT4/F+DdU13DQR5QU737uDGP0D/WWsF/lUj6A52DQUNm23VfGx5DtqgzyoJ7Dvuo5YzZ/WtjPi1hKcUnEAY8=
+	t=1714058535; cv=none; b=eZVz53xVJUeIbAOnSOEE+KFA8UWoFjT8Ylbge9uprGbuzdU4zwyteplwrMhCfxDrMqBTQMBk3e9EhHh4hdlFo57ONjdLMYWIzE4queFeUTGcWvWykU6P//Uccz1l8VMN7t5EKOT6M222KowQkqaKkGX0yt1RtLU2zig9J/QNnBs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714058340; c=relaxed/simple;
-	bh=9M6vtUakJu+k55Gvwn+/QlmTn6sbD+rg0lQOIarprlM=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=sqh87/T9IhbZ63u8ofFUt+OkSmdYhROZpEmxIlYzTD7j/FcuuaAcssRtry/PZIztfX4L3vt92KMRAgzgpscHSGIaCffPiIrPzXrYHc3hJaDDvLnU+t6yHIhlg6sy74sdxqjz7M4DeHU35L8H6tTwwtQM7WuTw6mcm8h/TPO4EWU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RETx1rYi; arc=none smtp.client-ip=209.85.160.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-43a14bce92dso6879731cf.0;
-        Thu, 25 Apr 2024 08:18:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1714058338; x=1714663138; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DEb4JCTaNACqAi0ozv0IUDrgXjigFGOhgDW02zP1PRE=;
-        b=RETx1rYiEV5CMXSlJ3xp+vzAbA6tLLTvg5JkVhlgr/cSnBP5aGelQ5kpGWVqqtJSRy
-         Ypu9vQdLlirO7jOGrJFQOQ3Hj5IBXINkMlNotH5vc2TV8IJsHK7P1PPPUVN64u72hMB+
-         YueE30I/Ysion97DvgUGN6eS6/bGpB38XtlAdQlUmWTXSGY66ixSdvLI/+akWAoCudAw
-         CQmKaOH9MIrl6CqcdqGQNVF1MxFI5aMPh4rk9i1B2xSZTPlLAR0hVJPCIE9fPYe3yiyd
-         W3Y5k33e8BTz3RKCPsdu3UTMLiRZkGwl8FcMqc9CK1J4b8Fk2v5FdOX0bw7aeeiHxpzL
-         0Lcw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714058338; x=1714663138;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=DEb4JCTaNACqAi0ozv0IUDrgXjigFGOhgDW02zP1PRE=;
-        b=JO/NQFBWpB08cFpJFCrstBB4yJvx1pye9f/H4Dvuf7+DhBbxZltci8U/P4zzM08n9S
-         yDdDtcoQTrNjQGWUEqt3BG4+EZ3MAtaWvF5uYqtoe17yuNpIA/Unsa9DSZXQimAzAmrS
-         QdR+GA8LjnYI0YejyEp6ByFLxC1qC2InW1UpAGWhL/vDVj4HspTi8gJM54whFwusu9JD
-         FXa4LfAPsIy43NxKBNFb5WKcWxYXdrL4K5YH1WaJ5kMYmgRa4g0AeCRkqYpimNmGR1it
-         5bDkJBRQ9SZbor8iY3bGYF/cv6487EK90nb4F1EFgISuTfvaVfXu5WVuzkqe/1Y/cvHo
-         2E3w==
-X-Forwarded-Encrypted: i=1; AJvYcCWUVul8C+re0gZs5LphxyCoEZtupuuLBQ6HlCnBm1q4vTfYowsxnhW1GkGYhINWnJFaE1lWQDg8U3GdYLoxuY+dzhKZluQkTEHyyekJqB0F7IH64bJo9BisLmCNP8iNR6YjVw1w
-X-Gm-Message-State: AOJu0Yx6tGonloxB+8nFz+pP27Z9CReoRvnhA6ptJwGzevMEA7jC/Km1
-	X6lAGjuwfh/c+4zvnC67PEm4L2ANhgKR2QNqJxwlHDaEGdRGWbQK
-X-Google-Smtp-Source: AGHT+IHNMcFHsQBa+kIhwaKZKKBm7/akFvzUGBJhM/lFn/CjGAKWF2ixGsiaiwYxrsmwKBDT9nl1LA==
-X-Received: by 2002:ad4:4ea5:0:b0:699:2cd9:fbee with SMTP id ed5-20020ad44ea5000000b006992cd9fbeemr104306qvb.3.1714058337683;
-        Thu, 25 Apr 2024 08:18:57 -0700 (PDT)
-Received: from localhost (164.146.150.34.bc.googleusercontent.com. [34.150.146.164])
-        by smtp.gmail.com with ESMTPSA id k10-20020a0c970a000000b006a079a9adc4sm4437276qvd.40.2024.04.25.08.18.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Apr 2024 08:18:57 -0700 (PDT)
-Date: Thu, 25 Apr 2024 11:18:57 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Felix Fietkau <nbd@nbd.name>, 
- netdev@vger.kernel.org, 
- Eric Dumazet <edumazet@google.com>, 
- "David S. Miller" <davem@davemloft.net>, 
- David Ahern <dsahern@kernel.org>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>
-Cc: willemdebruijn.kernel@gmail.com, 
- linux-kernel@vger.kernel.org
-Message-ID: <662a746130c38_1e1a1629422@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20240425150432.44142-4-nbd@nbd.name>
-References: <20240425150432.44142-1-nbd@nbd.name>
- <20240425150432.44142-4-nbd@nbd.name>
-Subject: Re: [PATCH v2 net-next v2 3/5] net: add code for TCP fraglist GRO
+	s=arc-20240116; t=1714058535; c=relaxed/simple;
+	bh=jizBKTX8MvHG0cRj+2IzEtYv+6KlE66nInc7exVUWzs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hPIS6XkjhuHnBuRhGrHHqZVKiZdri71xfcztPAtYOp6YDgTc9opImxqDo4IFi5JMHbynjTrvrwGMUmo0MY6rL1RTIjUO8wcoNnxBTI2HWb/wcX89L8Qd/A3432M7u6t5rWnqcGhQlu18kVQoB3l+74/lDqwkDqIYWXdwemXwDsE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=f3Ob8V05; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id C72B740E01C5;
+	Thu, 25 Apr 2024 15:22:05 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id zo89ggfrjeLT; Thu, 25 Apr 2024 15:22:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1714058521; bh=6wNh2/5WJqAiPo6RPMCDTroIUccA+3uUajnQfIANALw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=f3Ob8V057rdVSck90A83wZXeph/7GtAdQYLuTScSMYcMsRlDy322GITOZB08R+2zH
+	 WJAQPRKWgI6rGP5DekauVZRYVC6v+x0djmLHr4YM5x8Sn+yE6qw1+Tuw/dFLoxEgMt
+	 O4WWlkpuAoNiMRBJIWn6gaOqdtb0+P14QGl5fOYzlw1cGRu1xYEGnL3uxMdJKaBuJg
+	 R2OzjcscwRkLGZGJ3L9V1kttt6yFvrs+wGpvAlQIdZqVA1JLfMMFfr74b67uvPbPRS
+	 61vpzoxHqCtIK3bBjCPcbv3xBolTUaMjEqobmzgwaMNEViuOPbwbZLkVTaKtxPomon
+	 3wS2TjSW3M4l/KPIhyPrbevzhE8yRvOBxhxxkhaB0armH29aAtv0vcphTaf+tTHM8k
+	 69IEcBdf6tdGFrOUOn41HjjaBQyB0AtllH4DNANzvv/oerKUqq4NZ3AbGUpnosCefQ
+	 SAsCoJR+lxGWQL67jAC4kRYHVm12uzQyPEE0QCcHZbba2O+TG2976Zb9N7UsemohsT
+	 I9Y9qSmIgHdiLXC0hpawtrmiSpZ8y80rSue9T0oeWT5mdgSp2JwtFEfPzdeMkPY1Jv
+	 YTBrtpi4DOkMmVnoT1dzUQF30BsuCRgLfSnbYez9K4Kdomax740C14p2fW3I3gfpbh
+	 DxbQwYxgvWIRX+kxSk0WuNpo=
+Received: from zn.tnic (pd953020b.dip0.t-ipconnect.de [217.83.2.11])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 3D3DB40E0192;
+	Thu, 25 Apr 2024 15:21:36 +0000 (UTC)
+Date: Thu, 25 Apr 2024 17:21:30 +0200
+From: Borislav Petkov <bp@alien8.de>
+To: Alexey Makhalov <alexey.makhalov@broadcom.com>
+Cc: linux-kernel@vger.kernel.org, virtualization@lists.linux.dev,
+	hpa@zytor.com, dave.hansen@linux.intel.com, mingo@redhat.com,
+	tglx@linutronix.de, x86@kernel.org, netdev@vger.kernel.org,
+	richardcochran@gmail.com, linux-input@vger.kernel.org,
+	dmitry.torokhov@gmail.com, zackr@vmware.com,
+	linux-graphics-maintainer@vmware.com, pv-drivers@vmware.com,
+	timothym@vmware.com, akaher@vmware.com,
+	dri-devel@lists.freedesktop.org, daniel@ffwll.ch, airlied@gmail.com,
+	tzimmermann@suse.de, mripard@kernel.org,
+	maarten.lankhorst@linux.intel.com, horms@kernel.org,
+	kirill.shutemov@linux.intel.com
+Subject: Re: [PATCH v9 1/8] x86/vmware: Correct macro names
+Message-ID: <20240425152130.GJZip0-l040XCyUapN@fat_crate.local>
+References: <adcbfb9a-a4e1-4a32-b786-6c204d941e9f@broadcom.com>
+ <20240424231407.14098-1-alexey.makhalov@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240424231407.14098-1-alexey.makhalov@broadcom.com>
 
-Felix Fietkau wrote:
-> This implements fraglist GRO similar to how it's handled in UDP, however
-> no functional changes are added yet. The next change adds a heuristic for
-> using fraglist GRO instead of regular GRO.
-> 
-> Signed-off-by: Felix Fietkau <nbd@nbd.name>
-> ---
->  net/ipv4/tcp_offload.c   | 22 ++++++++++++++++++++++
->  net/ipv6/tcpv6_offload.c |  9 +++++++++
->  2 files changed, 31 insertions(+)
-> 
-> diff --git a/net/ipv4/tcp_offload.c b/net/ipv4/tcp_offload.c
-> index e455f884190c..68157130c264 100644
-> --- a/net/ipv4/tcp_offload.c
-> +++ b/net/ipv4/tcp_offload.c
-> @@ -336,6 +336,19 @@ struct sk_buff *tcp_gro_receive(struct list_head *head, struct sk_buff *skb)
->  	flush |= (ntohl(th2->seq) + skb_gro_len(p)) ^ ntohl(th->seq);
->  	flush |= skb_cmp_decrypted(p, skb);
->  
-> +	if (NAPI_GRO_CB(p)->is_flist) {
-> +		flush |= (__force int)(flags ^ tcp_flag_word(th2));
+On Wed, Apr 24, 2024 at 04:14:06PM -0700, Alexey Makhalov wrote:
+> VCPU_RESERVED and LEGACY_X2APIC are not VMware hypercall commands.
+> These are bits in return value of VMWARE_CMD_GETVCPU_INFO command.
+> Change VMWARE_CMD_ prefix to GETVCPU_INFO_ one. And move bit-shift
+> operation to the macro body.
 
-What is the purpose of this check, given the existing check above
+I don't understand:
 
-        flush |= (__force int)((flags ^ tcp_flag_word(th2)) &
-                  ~(TCP_FLAG_CWR | TCP_FLAG_FIN | TCP_FLAG_PSH));
+$ git grep GETVCPU_INFO
+arch/x86/kernel/cpu/vmware.c:51:#define VMWARE_CMD_GETVCPU_INFO  68
+arch/x86/kernel/cpu/vmware.c:478:       VMWARE_CMD(GETVCPU_INFO, eax, ebx, ecx, edx);
 
-> +		flush |= skb->ip_summed != p->ip_summed;
-> +		flush |= skb->csum_level != p->csum_level;
-> +		flush |= !pskb_may_pull(skb, skb_gro_offset(skb));
-> +		flush |= NAPI_GRO_CB(p)->count >= 64;
-> +
-> +		if (flush || skb_gro_receive_list(p, skb))
-> +			mss = 1;
-> +
-> +		goto out_check_final;
-> +	}
-> +
->  	if (flush || skb_gro_receive(p, skb)) {
->  		mss = 1;
->  		goto out_check_final;
-> @@ -402,6 +415,15 @@ INDIRECT_CALLABLE_SCOPE int tcp4_gro_complete(struct sk_buff *skb, int thoff)
->  	const struct iphdr *iph = ip_hdr(skb);
->  	struct tcphdr *th = tcp_hdr(skb);
->  
-> +	if (NAPI_GRO_CB(skb)->is_flist) {
-> +		skb_shinfo(skb)->gso_type |= SKB_GSO_FRAGLIST | SKB_GSO_TCPV4;
-> +		skb_shinfo(skb)->gso_segs = NAPI_GRO_CB(skb)->count;
-> +
-> +		__skb_incr_checksum_unnecessary(skb);
-> +
-> +		return 0;
-> +	}
-> +
->  	th->check = ~tcp_v4_check(skb->len - thoff, iph->saddr,
->  				  iph->daddr, 0);
->  
-> diff --git a/net/ipv6/tcpv6_offload.c b/net/ipv6/tcpv6_offload.c
-> index b3b8e1f6b92a..c97d55cf036f 100644
-> --- a/net/ipv6/tcpv6_offload.c
-> +++ b/net/ipv6/tcpv6_offload.c
-> @@ -32,6 +32,15 @@ INDIRECT_CALLABLE_SCOPE int tcp6_gro_complete(struct sk_buff *skb, int thoff)
->  	const struct ipv6hdr *iph = ipv6_hdr(skb);
->  	struct tcphdr *th = tcp_hdr(skb);
->  
-> +	if (NAPI_GRO_CB(skb)->is_flist) {
-> +		skb_shinfo(skb)->gso_type |= SKB_GSO_FRAGLIST | SKB_GSO_TCPV6;
-> +		skb_shinfo(skb)->gso_segs = NAPI_GRO_CB(skb)->count;
-> +
-> +		__skb_incr_checksum_unnecessary(skb);
-> +
-> +		return 0;
-> +	}
-> +
->  	th->check = ~tcp_v6_check(skb->len - thoff, &iph->saddr,
->  				  &iph->daddr, 0);
->  	skb_shinfo(skb)->gso_type |= SKB_GSO_TCPV6;
-> -- 
-> 2.44.0
-> 
+so that's a VMWARE_CMD 68, at least the prefix says so.
 
+And those two are *bits* in that eax which that hypercall returns.
 
+Or are those two bits generic but defined in a vmware-specific
+hypercall?
+
+Hm.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
 
