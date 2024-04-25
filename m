@@ -1,38 +1,38 @@
-Return-Path: <netdev+bounces-91313-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91314-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D70238B2235
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 15:06:59 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FE068B2236
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 15:07:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9469328292D
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 13:06:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 34B44B24676
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 13:07:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15402149C40;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B937F149E12;
 	Thu, 25 Apr 2024 13:06:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73F84149DF7
-	for <netdev@vger.kernel.org>; Thu, 25 Apr 2024 13:06:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DE5112BF20
+	for <netdev@vger.kernel.org>; Thu, 25 Apr 2024 13:06:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714050380; cv=none; b=MDHb7yefoxg3d3B8EaL1QFBXuXFi7B7MpH0FjMl/Y/ZhwREl9r3X133nY5dI1j96TGhP7sx+44jMRb69gBfNVQhAIobW0MJ210Qc3OD5l5AGqa05q6HvG+9JHCMRwv5V/m4rRy/T9fwZiTOgNw7o9y7BVtOpwimS4C4mIxfW9e8=
+	t=1714050380; cv=none; b=ctRAlci8U8Pt7Qo7iYwzl35GfnHjPSF4gR7vZqHQG3+QM04a9VDsEyeD/i80LM18Y+ypB8jVeWuQgctoBDvZciG2078t7JSW9iQ6Lbgdk8ZHCT3bf2mYdvjpFm2NhwccgjQ27VPpFbJ46aXA2adM7/ywGmWZICb6CulUfXQJB9U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1714050380; c=relaxed/simple;
-	bh=lH57qK56JQQNNsa5HXMthFjG6DN1H3kqfuaOcbTIXxY=;
+	bh=TGocwrZuFkyR06ES493W9WHh3UudDiqPF8DdJvWliGY=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=QT4ZEcZb6V8F64177ka4x5UALCFoRNTzGS292WRGKTKZfVtZckxAPgX/jWyKau61Q2RmWo5LxYJQII0DZdZ8EvMB0iQxb1Rpeo5f7TxxwsBMi9eG6KVGyTm09rF5bnkYAtTTxKLhcgQM42nkwZ8EbW2tHfKHviVzmDqyKglvVOg=
+	 MIME-Version; b=KGNVPKAh9KiQWbY0iQvmIypYaYsuCWvvFWnXUk4t4D4qcEG70uLvBZ+1MkBODOg/aI4CuyGxAu02fAyJWf2sCrTIQrATs4rcdrBvYsOlT9+easckNZpLtjER8Nq5nkJ5xCtkk01Jt5+n9Q04ZHJhmSU+K3isHAlKt5lBNhCRWMM=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
 Received: from loongson.cn (unknown [112.20.112.218])
-	by gateway (Coremail) with SMTP id _____8BxeOlGVSpmLdACAA--.774S3;
-	Thu, 25 Apr 2024 21:06:15 +0800 (CST)
+	by gateway (Coremail) with SMTP id _____8AxR_BIVSpmNdACAA--.13449S3;
+	Thu, 25 Apr 2024 21:06:16 +0800 (CST)
 Received: from localhost.localdomain (unknown [112.20.112.218])
-	by localhost.localdomain (Coremail) with SMTP id AQAAf8Bxut1EVSpmEhoFAA--.18043S2;
-	Thu, 25 Apr 2024 21:06:14 +0800 (CST)
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8Bxut1EVSpmEhoFAA--.18043S3;
+	Thu, 25 Apr 2024 21:06:15 +0800 (CST)
 From: Yanteng Si <siyanteng@loongson.cn>
 To: andrew@lunn.ch,
 	hkallweit1@gmail.com,
@@ -48,9 +48,9 @@ Cc: Yanteng Si <siyanteng@loongson.cn>,
 	netdev@vger.kernel.org,
 	chris.chenfeiyang@gmail.com,
 	siyanteng01@gmail.com
-Subject: [PATCH net-next v12 07/15] net: stmmac: dwmac-loongson: Add ref and ptp clocks for Loongson
-Date: Thu, 25 Apr 2024 21:06:10 +0800
-Message-Id: <aa9e291e181017146f88238cdeec9f18759915c3.1714046812.git.siyanteng@loongson.cn>
+Subject: [PATCH net-next v12 08/15] net: stmmac: dwmac-loongson: Add phy mask for Loongson GMAC
+Date: Thu, 25 Apr 2024 21:06:11 +0800
+Message-Id: <d0607989f5bf64c4251259af72d8816469e8865f.1714046812.git.siyanteng@loongson.cn>
 X-Mailer: git-send-email 2.31.4
 In-Reply-To: <cover.1714046812.git.siyanteng@loongson.cn>
 References: <cover.1714046812.git.siyanteng@loongson.cn>
@@ -61,48 +61,47 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:AQAAf8Bxut1EVSpmEhoFAA--.18043S2
+X-CM-TRANSID:AQAAf8Bxut1EVSpmEhoFAA--.18043S3
 X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
-X-Coremail-Antispam: 1Uk129KBj9xXoWrKw17ZrW3Zry7GF1ftr1xXrc_yoWDGFX_Wa
-	yIvFn3WF4DGrnakryjgw13ZFySvryDZF4fCFsFgayru3yvqrn8JrykurnxKF17urW5ZFnx
-	Gr1xKF48Cw1xtosvyTuYvTs0mTUanT9S1TB71UUUUjDqnTZGkaVYY2UrUUUUj1kv1TuYvT
+X-Coremail-Antispam: 1Uk129KBj9xXoWrKw17ZrW3Zry7GF1ftr1xXrc_yoW3Krb_WF
+	1Ivrn3XF1DJrn2y34jgw13ZryS9w1DX3Wru3ZFga95uw4q9rn8XF95Crn3XF13WrW5ZF9x
+	ur1fKr48Cw18JosvyTuYvTs0mTUanT9S1TB71UUUUjDqnTZGkaVYY2UrUUUUj1kv1TuYvT
 	s0mT0YCTnIWjqI5I8CrVACY4xI64kE6c02F40Ex7xfYxn0WfASr-VFAUDa7-sFnT9fnUUI
-	cSsGvfJTRUUUbhxYFVCjjxCrM7AC8VAFwI0_Jr0_Gr1l1xkIjI8I6I8E6xAIw20EY4v20x
+	cSsGvfJTRUUUb6xYFVCjjxCrM7AC8VAFwI0_Jr0_Gr1l1xkIjI8I6I8E6xAIw20EY4v20x
 	vaj40_Wr0E3s1l1IIY67AEw4v_Jrv_JF1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxS
 	w2x7M28EF7xvwVC0I7IYx2IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxV
-	WxJVW8Jr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
-	xVWxJr0_GcWln4kS14v26r126r1DM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12
-	xvs2x26I8E6xACxx1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26rWY
-	6Fy7McIj6I8E87Iv67AKxVWxJVW8Jr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7V
-	AKI48JMxkF7I0En4kS14v26r126r1DMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY
-	6r1j6r4UMxCIbckI1I0E14v26r126r1DMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7
-	xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xII
-	jxv20xvE14v26F1j6w1UMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWxJVW8Jr1lIxAIcVCF04
-	k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26F4j6r4UJwCI42IY6I8E87Iv6xkF
-	7I0E14v26r4UJVWxJrUvcSsGvfC2KfnxnUUI43ZEXa7IU022NJUUUUU==
+	W8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIEc7CjxVAF
+	wI0_Cr1j6rxdM2kKe7AKxVWUAVWUtwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
+	AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVW3
+	AVW8Xw1lYx0Ex4A2jsIE14v26r4UJVWxJr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48Icx
+	kI7VAKI48JMxkF7I0En4kS14v26r126r1DMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCj
+	c4AY6r1j6r4UMxCIbckI1I0E14v26r126r1DMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxV
+	Cjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY
+	6xIIjxv20xvE14v26F1j6w1UMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UMIIF0x
+	vE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWxJVW8Jr1lIxAIcVC2z280
+	aVCY1x0267AKxVW8Jr0_Cr1UYxBIdaVFxhVjvjDU0xZFpf9x07jVD73UUUUU=
 
-The ref/ptp clock of gmac(amd gnet) is 125000000.
+The phy mask of gmac(and gnet) is 0.
 
 Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
 Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
 Signed-off-by: Yanteng Si <siyanteng@loongson.cn>
 ---
- drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c | 3 +++
- 1 file changed, 3 insertions(+)
+ drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
 diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-index 904e288d0be0..9f208f84c1e7 100644
+index 9f208f84c1e7..f7618edf4a3a 100644
 --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
 +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-@@ -32,6 +32,9 @@ static void loongson_default_data(struct plat_stmmacenet_data *plat)
- 	/* Disable RX queues routing by default */
- 	plat->rx_queues_cfg[0].pkt_route = 0x0;
+@@ -48,6 +48,8 @@ static int loongson_gmac_data(struct plat_stmmacenet_data *plat)
+ {
+ 	loongson_default_data(plat);
  
-+	plat->clk_ref_rate = 125000000;
-+	plat->clk_ptp_rate = 125000000;
++	plat->mdio_bus_data->phy_mask = 0;
 +
- 	/* Default to phy auto-detection */
- 	plat->phy_addr = -1;
+ 	return 0;
+ }
  
 -- 
 2.31.4
