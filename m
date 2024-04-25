@@ -1,135 +1,163 @@
-Return-Path: <netdev+bounces-91207-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91208-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 114A58B1B12
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 08:30:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D90E68B1B32
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 08:44:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 569911F23BDF
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 06:30:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9901D1F235B2
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 06:44:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6F195A10A;
-	Thu, 25 Apr 2024 06:29:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D46C242A86;
+	Thu, 25 Apr 2024 06:44:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="WtlrpY2w"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from fllv0016.ext.ti.com (fllv0016.ext.ti.com [198.47.19.142])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 583F85A0F9
-	for <netdev@vger.kernel.org>; Thu, 25 Apr 2024 06:29:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C47CC3BBE8;
+	Thu, 25 Apr 2024 06:44:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.142
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714026580; cv=none; b=cEf0q2IaN0MRObJ2h62cU4rpTNANoEBnc/n6k73pzIRpDg1oa2MsV1yMaCbxcxKEixEYwIi3e5h4EQsfQ95urZBlFYkljYS1JFk6H917Kr3GwTfOybFDE4H3Mynfdcxn54zmllLpQHLSdqy/1HqZOOYgJgt7QUkUZEe17PhvNrM=
+	t=1714027466; cv=none; b=hTjBMYSOz9LPtWGIqeg1+oUviWhJWDOch2ico8swdmq5g5CLu+pxFNTD0HTKF2RI0ceWBi78qrQOTjq+7hhCeUFBvOMHAd1+zeoP13LKILvHsJ2DqkLoSUXQxTZqLIK3AQbzqUP5LPxFhi2aNYJR9zwKJouFcB1Eo1w6TEG6rNo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714026580; c=relaxed/simple;
-	bh=p0rpfcBvfX5VRHEn5gsxoCCeeNRXh0O+2772eFV+Sck=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ctxzQdriiZjf9zxQ8yFnoCg+ZNb38DphfAAN+gp1nreBlRFUtpaisREcxU4i6cw6vKu4SwnVmvoiaHutMCwBM+pjEMrT+XDlkpQPELptlx1Py51PVCnZaYg/HMbg1/3J4Ql3SdciouD9grSiuH9uGinvJyAu96f8j0g0dqJCZx4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1rzsbe-00029Q-C6; Thu, 25 Apr 2024 08:29:18 +0200
-Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1rzsba-00EDHo-OY; Thu, 25 Apr 2024 08:29:14 +0200
-Received: from pengutronix.de (unknown [172.20.34.65])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 4CAF72BF682;
-	Thu, 25 Apr 2024 06:29:14 +0000 (UTC)
-Date: Thu, 25 Apr 2024 08:29:13 +0200
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Gregor Herburger <gregor.herburger@ew.tq-group.com>
-Cc: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>, 
-	Thomas Kopp <thomas.kopp@microchip.com>, Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, linux-can@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux@ew.tq-group.com, alexander.stein@ew.tq-group.com
-Subject: Re: [PATCH 1/4] can: mcp251xfd: stop timestamp before sending chip
- to sleep
-Message-ID: <20240425-tall-quiet-wren-f00e44-mkl@pengutronix.de>
-References: <20240417-mcp251xfd-gpio-feature-v1-0-bc0c61fd0c80@ew.tq-group.com>
- <20240417-mcp251xfd-gpio-feature-v1-1-bc0c61fd0c80@ew.tq-group.com>
- <20240424-adaptable-zircon-badger-1fefd9-mkl@pengutronix.de>
- <ZinnV+GA20LWGUOV@herburgerg-w2>
+	s=arc-20240116; t=1714027466; c=relaxed/simple;
+	bh=WQSMwd+tNMCVO6kH1o+7mkTtu6LUon02eBDzLfrMOo8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=tVlKUs2reqQCZYJv2uTxqITTNy2LCSoMH0dhyOLviQpSLzyMW6gVz4NEuoGJq93zu4ZQtatHxFwgKifYFQ6Epbk/APqM7yl0D5gk2wfGwXAvLa0fdgFZNUgViPzDIPFam1MCwsOLQoJHICsxWklHN2zbaxPTOYub00FD02PA4Gg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=WtlrpY2w; arc=none smtp.client-ip=198.47.19.142
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from fllv0035.itg.ti.com ([10.64.41.0])
+	by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id 43P6i47Z085553;
+	Thu, 25 Apr 2024 01:44:04 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1714027444;
+	bh=/Ulz98hKzYu1co/cS/dOgIOLEVqfXbA1NDOWLo9MEUI=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=WtlrpY2wyJsxReczN5lBNBshDzijgx/oB1qSXDL2d4EzpXmf4Rsk2Z23+BJftc7cU
+	 Kp9kOEfEcZnWJ2ddjTrDbGWYr+Amlt0dI8Vk7feoEOSPJpugq2v7MO/o2ow/wDgOla
+	 wg+YaWkVUIA80cl21P/wr1cUxsEpKkkf/CHT5wMg=
+Received: from DLEE100.ent.ti.com (dlee100.ent.ti.com [157.170.170.30])
+	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 43P6i41E041580
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Thu, 25 Apr 2024 01:44:04 -0500
+Received: from DLEE110.ent.ti.com (157.170.170.21) by DLEE100.ent.ti.com
+ (157.170.170.30) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Thu, 25
+ Apr 2024 01:44:04 -0500
+Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DLEE110.ent.ti.com
+ (157.170.170.21) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Thu, 25 Apr 2024 01:44:04 -0500
+Received: from [10.24.69.25] (danish-tpc.dhcp.ti.com [10.24.69.25])
+	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 43P6hwhf010667;
+	Thu, 25 Apr 2024 01:43:59 -0500
+Message-ID: <1c5809f2-b69d-48d1-8c27-285f164ebeb8@ti.com>
+Date: Thu, 25 Apr 2024 12:13:58 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="jl5hounf2hkrpaap"
-Content-Disposition: inline
-In-Reply-To: <ZinnV+GA20LWGUOV@herburgerg-w2>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net: ti: icssg_prueth: Add SW TX / RX Coalescing
+ based on hrtimers
+Content-Language: en-US
+To: Andrew Lunn <andrew@lunn.ch>
+CC: Dan Carpenter <dan.carpenter@linaro.org>,
+        Heiner Kallweit
+	<hkallweit1@gmail.com>,
+        Jan Kiszka <jan.kiszka@siemens.com>,
+        Diogo Ivo
+	<diogo.ivo@siemens.com>, Paolo Abeni <pabeni@redhat.com>,
+        Jakub Kicinski
+	<kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <srk@ti.com>,
+        Vignesh Raghavendra <vigneshr@ti.com>, <r-gunasekaran@ti.com>,
+        Roger Quadros <rogerq@kernel.org>
+References: <20240424091823.1814136-1-danishanwar@ti.com>
+ <98588a89-4970-4d75-be8a-ac410d77789f@lunn.ch>
+From: MD Danish Anwar <danishanwar@ti.com>
+In-Reply-To: <98588a89-4970-4d75-be8a-ac410d77789f@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 
+Hi Andrew,
 
---jl5hounf2hkrpaap
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On 24/04/24 6:01 pm, Andrew Lunn wrote:
+> On Wed, Apr 24, 2024 at 02:48:23PM +0530, MD Danish Anwar wrote:
+>> Add SW IRQ coalescing based on hrtimers for RX and TX data path for ICSSG
+>> driver, which can be enabled by ethtool commands:
+>>
+>> - RX coalescing
+>>   ethtool -C eth1 rx-usecs 50
+>>
+>> - TX coalescing can be enabled per TX queue
+>>
+>>   - by default enables coalesing for TX0
+>>   ethtool -C eth1 tx-usecs 50
+>>   - configure TX0
+>>   ethtool -Q eth0 queue_mask 1 --coalesce tx-usecs 100
+>>   - configure TX1
+>>   ethtool -Q eth0 queue_mask 2 --coalesce tx-usecs 100
+>>   - configure TX0 and TX1
+>>   ethtool -Q eth0 queue_mask 3 --coalesce tx-usecs 100 --coalesce
+>> tx-usecs 100
+>>
+>> Minimum value for both rx-usecs and tx-usecs is 20us.
+> 
+> Do you have some benchmark numbers?
+> 
+> Did you see this patch on the mailing list:
+> 
+> https://lore.kernel.org/all/20240415094804.8016-1-paul.barker.ct@bp.renesas.com/T/#md50cb07bbdd6daf985f3796508cf4b246b085268
+> 
+> This is basically a one line change, which brings big performance
+> gains. Did you try something as simple as that, rather than all your
+> hrtimer code?
+> 
 
-On 25.04.2024 07:17:11, Gregor Herburger wrote:
-> On Wed, Apr 24, 2024 at 01:54:54PM +0200, Marc Kleine-Budde wrote:
-> > On 17.04.2024 15:43:54, Gregor Herburger wrote:
-> > > MCP2518FD exits Low-Power Mode (LPM) when CS is asserted. When chip
-> > > is send to sleep and the timestamp workqueue is not stopped chip is
-> > > waked by SPI transfer of mcp251xfd_timestamp_read.
-> >=20
-> > How does the Low-Power Mode affect the GPIO lines? Is there a difference
-> > if the device is only in sleep mode?
->=20
-> The MCP251XFD_REG_IOCON is cleared when leaving Low-Power Mode. This is
-> why I implemented regcache.
+I did some benchmarking today with,
+	1. Default driver (without any IRQ coalescing enabled)
+	2. IRQ Coalescing (With this patch)
+	3. Default IRQ Coalescing (Suggested by you in the above patch)
 
-But that means you have to power the chip if a GPIO is requested. You
-have to power up the chip in the request() callback and power it down in
-the free() callback.
+I have pasted the full logs at [1].
 
-I've 2 patches laying around, one that moves the timestamp
-init/start/stop into the chip_start/stop. And another one that moves the
-soft reset and basic configuration of the chip into the runtime pm
-functions. I have to make both patches compatible and send them to the
-list. Feel free to pick them up and integrate them into your series.
+Below are the final numbers,
 
-regards,
-Marc
+==============================================================
+Method                  | Tput_TX | CPU_TX | Tput_RX | CPU_RX |
+==============================================================
+Default Driver           943 Mbps    31%      517 Mbps  38%   |
+IRQ Coalescing (Patch)   943 Mbps    28%      518 Mbps  25%   |
+Default IRQ Coalescing   942 Mbps    32%      521 Mbps  25%   |
+==============================================================
 
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+I see that the performance number is more or less same for all three
+methods only the CPU load seems to be varying. The IRQ coalescing patch
+(using hrtimer) seems to improve the cpu load by 3-4% in TX and 13% in
+RX. Whereas the default method that you have suggested doesn't give any
+improvemnet in tx however cpu load improves in RX with the same amount
+as method 2.
 
---jl5hounf2hkrpaap
-Content-Type: application/pgp-signature; name="signature.asc"
+Please let me know if this patch is OK to you based on the benchmarking?
 
------BEGIN PGP SIGNATURE-----
+[1]
+https://gist.githubusercontent.com/danish-ti/47855631be9f3635cee994693662a988/raw/94b4eb86b42fe243ab03186a88a314e0cb272fd0/gistfile1.txt
 
-iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmYp+DYACgkQKDiiPnot
-vG+1vAgAl+G4ZfcqA1NGRKoDMVijFXRucCXAiJK55nBv/76cLqp/96ab3XAOeKRK
-OZMN8El/e/F0nj5LbKpkITaVAtUgIikru2MVx6GxIH1dOQ4YfLqJFABHaXznIDxL
-I9NcwSmkeFZyoVZy6ZmZ+AjV3IbAM+41cZBCgI41SpvzeWs38uBYt5RrB+VXrbOE
-6l/O9SI8DZ5cwvqHt10SeHhrMbZ8b/n+pyXze1RBVnVrFVp0n9rIC3gyfnVyyAhS
-5r5hhS3U4xxRcyyCTLP8f8qZ7HwltvcbW4hXoT5Nv/HOuz0hgAIktyugX2Gqhid7
-+2wUEuxF5DWNDB5qcIDXGB5LZVB4Qw==
-=jpnY
------END PGP SIGNATURE-----
+> 	Andrew
 
---jl5hounf2hkrpaap--
+-- 
+Thanks and Regards,
+Danish
 
