@@ -1,102 +1,82 @@
-Return-Path: <netdev+bounces-91171-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91174-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E38A8B192E
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 05:10:33 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D2898B193C
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 05:12:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E78592858CF
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 03:10:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D8CFAB2520B
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 03:12:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0189C17999;
-	Thu, 25 Apr 2024 03:10:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 509801AACB;
+	Thu, 25 Apr 2024 03:12:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U/C3FbjG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PspTijnP"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D15DE111AA
-	for <netdev@vger.kernel.org>; Thu, 25 Apr 2024 03:10:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8F78F513;
+	Thu, 25 Apr 2024 03:12:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714014628; cv=none; b=KBgUJJjgB8nQdPrINmbcF5272pWr7MHjZTf1BdYcJu2dCjbfFMAahB+X/0EGYf/C5ivdVcg8te4lIRgc1ZUBOzCjipZkV5k1DbadWRAsNetHw5TADjVfdGo4C/9S9Q08yFctE1RYR5Ka3kE536E+dZBe2RwS7McevrjVTQhc8OI=
+	t=1714014757; cv=none; b=qLuhEiTxRwQPDgzZx8mQQch319DdTsLoxugQLQ/G3sZGZdQeTLhabJD950yCU1z9x2MDoVup7lO0SouBZblOz7lE3ub6Nr0MNrbltB38NdG6jaC1btQob7fFDqf3/1taIn4RVA3rfBjswLDu9Hes1X0bJ5iWIEtKJbdmaqPOFqU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714014628; c=relaxed/simple;
-	bh=7wZDcemc98vJxrvvHyHoRU9k8w+k6alJcqxT+KclUKQ=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=V3OPn2xa74IbKbrKPMVToI7DaPF4zHNff39vAzxCHfkWPkz41ptrqkZbuKrtIcjILe6b+jyfRb3ZTymXwyQfQfSDSjqksUVXBQbEK4xRuMZiHlfPa+e5sM+Abg3JMQdEVajR6CxZZAZpzw3i8PhpiJHOlRpm5lyVxVkRKRQEAfc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U/C3FbjG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 61C75C2BD10;
-	Thu, 25 Apr 2024 03:10:28 +0000 (UTC)
+	s=arc-20240116; t=1714014757; c=relaxed/simple;
+	bh=Cc9/KJ14ILnwNdU8czLRH7creacZ14o3hne1jmTaNs0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=RsAbKdNp1mjCpTw7Guq/RC+smplDVwBwX1GiCMHzDvCSeMwaSHvw45y5qFh9NDn/XvUkQmS5r3Z87dljqRElzLc+FVU3IdOd0Z3OvcHIYskq8yLOBGR5a1bGkrHOO7r7cNUZvDgnCrS/Wg22ibqGQ/FqbhF+DmHZbrs1jCyzJGQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PspTijnP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 55C57C113CD;
+	Thu, 25 Apr 2024 03:12:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714014628;
-	bh=7wZDcemc98vJxrvvHyHoRU9k8w+k6alJcqxT+KclUKQ=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=U/C3FbjGn3kk+dqbTh0dPgbwux1dKnviQgKu/vnE3I96H/6awOXzDTWvCfQgbV82D
-	 qQHPhFUk+FTcZrPFTuZo74mdVTbHlr70rFQH09zBCPzHpjslcUJ+W3evVcqO8+tIFc
-	 41C9GNsHY0QO2xUZsG/BMtizn/bjKbL6z4oZbFx6uRz2V2DEfxR170I+71XS7ORcj+
-	 HSTknwQtBZ3yEa4aQ4edYoUIuCvUzBHWKaHahXcnOvA2S9nkko4qYRkJwnnfHKe4Qc
-	 Mul0b0cbKfZQZa9X2H6qmoOk3QBtJa7xrYp5a25CbYpJVLf37YhayT5NLFFD1Y+vVo
-	 QwATIJ8IlbnPg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 51896C595D2;
-	Thu, 25 Apr 2024 03:10:28 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1714014756;
+	bh=Cc9/KJ14ILnwNdU8czLRH7creacZ14o3hne1jmTaNs0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=PspTijnPTb4cLwKaUXaBK6lgKqrykqW7TnXryDjg7qy1V4DjZ9qYPfEzdMwJcLXmE
+	 2q4vN4nwJllD1z/pH7aACsx2p2ofCITa183q4xZiAclRBaq/82Q7A/KwffAzVOELei
+	 BATUW6SiIq4LeUt/sDYn/hnGKl2shhXeP1rwhzi0rZHTU/OxLjZRFcQA8QACF8kBTq
+	 Md3p5a2MNJIshoUuU+UOn1xH4LNXomCzxGby8JGUI0mSu2HkcgWhSAkP5pU+L9gZk0
+	 nFvpPG5wZraQmtC6JOcQTZn622/SbjwBkjxqFODHiN0ijyqtZ768dGuDQszSMnLkI8
+	 ayXyd+53H5Hzw==
+Date: Wed, 24 Apr 2024 20:12:34 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Thomas =?UTF-8?B?V2Vpw59zY2h1aA==?= <linux@weissschuh.net>
+Cc: Luis Chamberlain <mcgrof@kernel.org>, Joel Granados
+ <j.granados@samsung.com>, Kees Cook <keescook@chromium.org>, Eric Dumazet
+ <edumazet@google.com>, Dave Chinner <david@fromorbit.com>,
+ linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-s390@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org,
+ linux-mm@kvack.org, linux-security-module@vger.kernel.org,
+ bpf@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+ linux-xfs@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+ linux-perf-users@vger.kernel.org, netfilter-devel@vger.kernel.org,
+ coreteam@netfilter.org, kexec@lists.infradead.org,
+ linux-hardening@vger.kernel.org, bridge@lists.linux.dev,
+ lvs-devel@vger.kernel.org, linux-rdma@vger.kernel.org,
+ rds-devel@oss.oracle.com, linux-sctp@vger.kernel.org,
+ linux-nfs@vger.kernel.org, apparmor@lists.ubuntu.com
+Subject: Re: [PATCH v3 00/11] sysctl: treewide: constify ctl_table argument
+ of sysctl handlers
+Message-ID: <20240424201234.3cc2b509@kernel.org>
+In-Reply-To: <20240423-sysctl-const-handler-v3-0-e0beccb836e2@weissschuh.net>
+References: <20240423-sysctl-const-handler-v3-0-e0beccb836e2@weissschuh.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/6][pull request] ice: Support 5 layer Tx scheduler
- topology
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171401462833.4490.1421617944754978587.git-patchwork-notify@kernel.org>
-Date: Thu, 25 Apr 2024 03:10:28 +0000
-References: <20240422203913.225151-1-anthony.l.nguyen@intel.com>
-In-Reply-To: <20240422203913.225151-1-anthony.l.nguyen@intel.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, netdev@vger.kernel.org, mateusz.polchlopek@intel.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-Hello:
+On Tue, 23 Apr 2024 09:54:35 +0200 Thomas Wei=C3=9Fschuh wrote:
+> The series was split from my larger series sysctl-const series [0].
+> It only focusses on the proc_handlers but is an important step to be
+> able to move all static definitions of ctl_table into .rodata.
 
-This series was applied to netdev/net-next.git (main)
-by Tony Nguyen <anthony.l.nguyen@intel.com>:
-
-On Mon, 22 Apr 2024 13:39:05 -0700 you wrote:
-> Mateusz Polchlopek says:
-> 
-> For performance reasons there is a need to have support for selectable
-> Tx scheduler topology. Currently firmware supports only the default
-> 9-layer and 5-layer topology. This patch series enables switch from
-> default to 5-layer topology, if user decides to opt-in.
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next,1/6] devlink: extend devlink_param *set pointer
-    https://git.kernel.org/netdev/net-next/c/5625ca5640ca
-  - [net-next,2/6] ice: Support 5 layer topology
-    https://git.kernel.org/netdev/net-next/c/91427e6d9030
-  - [net-next,3/6] ice: Adjust the VSI/Aggregator layers
-    https://git.kernel.org/netdev/net-next/c/927127cda11a
-  - [net-next,4/6] ice: Enable switching default Tx scheduler topology
-    https://git.kernel.org/netdev/net-next/c/cc5776fe1832
-  - [net-next,5/6] ice: Add tx_scheduling_layers devlink param
-    https://git.kernel.org/netdev/net-next/c/109eb2917284
-  - [net-next,6/6] ice: Document tx_scheduling_layers parameter
-    https://git.kernel.org/netdev/net-next/c/9afff0de30db
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Split this per subsystem, please.
 
