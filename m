@@ -1,886 +1,146 @@
-Return-Path: <netdev+bounces-91389-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91390-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5FB18B26F9
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 18:58:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 885BB8B26FE
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 19:00:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5EDAB2853F7
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 16:58:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 445FB285444
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 16:59:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C55A14B06B;
-	Thu, 25 Apr 2024 16:58:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AB4914D6F1;
+	Thu, 25 Apr 2024 16:59:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dKoXemf7"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="l93QHUo0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-100.freemail.mail.aliyun.com (out30-100.freemail.mail.aliyun.com [115.124.30.100])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27040131746
-	for <netdev@vger.kernel.org>; Thu, 25 Apr 2024 16:57:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74520131746;
+	Thu, 25 Apr 2024 16:59:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.100
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714064282; cv=none; b=aOnzL/9L+62k1u6lX0Ddgwr0GHjd48T1R0u7BbUP9VVh45UOLSOLXeM351hn/p2vJge37JxtzZjwK+Md9T5FrdJOaUqVsPLL8omUV0JTwBts5n4Q+DQaX/VMc8y+ezx09OIXZ2FB6g8M+N1DXGZAnEXvKhMZSVc6jOOV11/4E74=
+	t=1714064397; cv=none; b=okEOkV3g6JP6zRpQIpHyLjsILyoY5HwP2F8+bWs3Znpea9toCTpTrqlGkqlJsWNiv2cfGzc1TLjfluyX4ctHYrkv8Q7Obj4Evrk4pKJIdkWrNDupt2OsgT20wYDIAHCe7fXizP7R3dGfMbh4ZbkC9Hf1Neuq60e0mLiOFXgQVIQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714064282; c=relaxed/simple;
-	bh=zjtff5nwU+YWVs0a1Mf4DuedDdg8h+5m6PIsOYf0nns=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=SxqdnfyxHsuMvyMw3IhsUoUick2XwT6pzRLr9DARSi8M1hH8Sa5piptaRWtr32iCqcmM6KPzq+Bi0Eaq5Ii4LBrDVtfipsOzXUjxPsFBw/SqH8RN/2N0xcWzgE+E5i8vgUbNI+Ox2xsVzufUqYd4N62uajCYd1+1aIR5yCB8nbE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dKoXemf7; arc=none smtp.client-ip=209.85.219.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dc6b269686aso2134959276.1
-        for <netdev@vger.kernel.org>; Thu, 25 Apr 2024 09:57:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1714064279; x=1714669079; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=1/tfH44aO6pTsLHH9VW3esHfq2EFfE2B2i1X8NTqiPc=;
-        b=dKoXemf7yS4R0I/M1k07bgAfLkP2MEwFDYXR3mrpeoKBBmqmWEhP1Di6YAzpW6uwOl
-         TcBLZYSoSCUvvxAnp/+Y4sFCFJzI3itgqH9JMkwzY0lc+f88hWcZHyPNNUtFf6YLa6GC
-         FEw82PJY7BNMcxvqqUdb5/Wr+VChQ7GYvSSTIa6C56i4PFn6f4E149nKAnhegwSHUFog
-         COk24n5OKoX6BM06ZD0BGr5VeTO9eY0g/TIwEnNeF3oHtIP12WWGmyTcXuW3VeqhasjF
-         W3x38Glv1f4F5r54oGZb/BdeYKpmoiGEEEOE7r67t1Bx8c1wCA06cBHiWzZ+UWghqNtn
-         FZ7g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714064279; x=1714669079;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=1/tfH44aO6pTsLHH9VW3esHfq2EFfE2B2i1X8NTqiPc=;
-        b=fmBCa6Ssv2eFFk9Zpfw2cL2t1Ow2PeLD2hdpirBaA2ojaNud0WIOJHcJ8KfYOXLeaV
-         erIX0+aCD1dJGA/Ow8eolhmWekV5igzDrsCM6FU4VgNavjtcanRD+p7kI8bwh7ItOslz
-         L0BY9FteaIRo17aYFPuEdzqJlEY/Fme8AG2v9rW4On4Rjl2j9TkrA/m8rIHrfVi6XIX0
-         S5Xd1/WuuxIM7T/FKTJ8XlrenZcrjkKwWd6KnUh3Ss8dNlo6j5PwN7IRU6fc5ZfvPPRi
-         icHHSZg6A2qS2rRWOYzeb2RYeYK+wxjBrgHA55EbcNXKbZ0R0k85vZRZInw9V5HEn5ak
-         sNew==
-X-Forwarded-Encrypted: i=1; AJvYcCUK1wCVvYJfFmY6gLOq5R1liDS85Ww0aS1GvNI+pntVBMFiVc3oS/rPzk04ewieaV/4cCzf3MONlzXqcgqHD4BemmAFltcL
-X-Gm-Message-State: AOJu0YzIL+fHL7hiM21nkDoQy2ksxaYVWqvQLMh814LoriX8/F6W0Lle
-	4uL9uThGZ8pwZLXWr9UdHyw1CUN+yTV9GyKPX/RWOAUH/DEHR2rWQ09cqJnY1sBTDx1or5gQmr7
-	FAKuAJopeHw==
-X-Google-Smtp-Source: AGHT+IE01YXWettsmX78Eug0WRe+hrmYupECVX6gRDjf89OofRujShR14qYCH+mMYOy3hPfyIjj6dm70cGtE8g==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:6902:2b0c:b0:de5:78:34d2 with SMTP id
- fi12-20020a0569022b0c00b00de5007834d2mr16741ybb.6.1714064279026; Thu, 25 Apr
- 2024 09:57:59 -0700 (PDT)
-Date: Thu, 25 Apr 2024 16:57:57 +0000
+	s=arc-20240116; t=1714064397; c=relaxed/simple;
+	bh=tljCbHvoaAGa+RNcP5k2kx2RNznl7sh37CaasUR51Qg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=HQ1O9wURPpmc7J90FHxF1l4asmuUNDghXLZJ44d0yAIp11NMmXaUt/y7R6Xl3/qjCjIcDiEH7N1IG2WGtVyXVy/dcVxLUOfyfI/ctomcylbOk49ygBWcZnszk/bM6OkdsBsoZ/XUNbyAFb3klEu9WnwPe21FcsPTXrUJ4C4mzzQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=l93QHUo0; arc=none smtp.client-ip=115.124.30.100
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1714064392; h=From:To:Subject:Date:Message-Id:MIME-Version;
+	bh=tbL/Dt24rw8UqlcGmfYlc+JaGppN9NltZdWAzZ1Pu8k=;
+	b=l93QHUo0y2GNZnGtXV26tocEp3Go/CcKXmdejJdjKHLebzAevT2p1PBKcXWCnj3flsIymJR2Tz39fA8nvFuG8yvcUkSYlW/lClo6N2DvC0dswDjcK4GwnUwOf8Cys50WUZwaI7VYgLLOEhkRi6gEBigI1eoE7RDiP8mFcxzXfa0=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R351e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037067113;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=23;SR=0;TI=SMTPD_---0W5G09nb_1714064388;
+Received: from localhost(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0W5G09nb_1714064388)
+          by smtp.aliyun-inc.com;
+          Fri, 26 Apr 2024 00:59:50 +0800
+From: Heng Qi <hengqi@linux.alibaba.com>
+To: netdev@vger.kernel.org,
+	virtualization@lists.linux.dev,
+	Jakub Kicinski <kuba@kernel.org>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jason Wang <jasowang@redhat.com>,
+	"Michael S . Tsirkin" <mst@redhat.com>,
+	Brett Creeley <bcreeley@amd.com>,
+	Ratheesh Kannoth <rkannoth@marvell.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Tal Gilboa <talgi@nvidia.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	linux-doc@vger.kernel.org,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Paul Greenwalt <paul.greenwalt@intel.com>,
+	Ahmed Zaki <ahmed.zaki@intel.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Kory Maincent <kory.maincent@bootlin.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	"justinstitt @ google . com" <justinstitt@google.com>
+Subject: [PATCH net-next v10 0/4] ethtool: provide the dim profile fine-tuning channel
+Date: Fri, 26 Apr 2024 00:59:44 +0800
+Message-Id: <20240425165948.111269-1-hengqi@linux.alibaba.com>
+X-Mailer: git-send-email 2.32.0.3.g01195cf9f
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.44.0.769.g3c40516874-goog
-Message-ID: <20240425165757.90458-1-edumazet@google.com>
-Subject: [PATCH net-next] ipv6: introduce dst_rt6_info() helper
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Instead of (struct rt6_info *)dst casts, we can use :
+The NetDIM library provides excellent acceleration for many modern
+network cards. However, the default profiles of DIM limits its maximum
+capabilities for different NICs, so providing a way which the NIC can
+be custom configured is necessary.
 
- #define dst_rt6_info(_ptr) \
-         container_of_const(_ptr, struct rt6_info, dst)
+Currently, the way is based on the commonly used "ethtool -C".
 
-Some places needed missing const qualifiers :
+Please review, thank you very much!
 
-ip6_confirm_neigh(), ipv6_anycast_destination(),
-ipv6_unicast_destination(), has_gateway()
+Changelog
+=====
+v9->v10:
+  - Collect dim related flags/mode/work into one place.
+  - Use rx_profile + tx_profile instead of four profiles.
+  - Add several helps.
+  - Update commit logs.
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- drivers/infiniband/core/addr.c                |  6 ++--
- .../ethernet/mellanox/mlxsw/spectrum_span.c   |  2 +-
- drivers/net/vrf.c                             |  2 +-
- drivers/s390/net/qeth_core.h                  |  2 +-
- include/net/ip6_fib.h                         |  6 ++--
- include/net/ip6_route.h                       | 11 ++++----
- net/bluetooth/6lowpan.c                       |  2 +-
- net/core/dst_cache.c                          |  2 +-
- net/core/filter.c                             |  2 +-
- net/ipv4/ip_tunnel.c                          |  2 +-
- net/ipv6/icmp.c                               |  8 +++---
- net/ipv6/ila/ila_lwt.c                        |  4 +--
- net/ipv6/ip6_output.c                         | 18 ++++++------
- net/ipv6/ip6mr.c                              |  2 +-
- net/ipv6/ndisc.c                              |  2 +-
- net/ipv6/ping.c                               |  2 +-
- net/ipv6/raw.c                                |  4 +--
- net/ipv6/route.c                              | 28 +++++++++----------
- net/ipv6/tcp_ipv6.c                           |  4 +--
- net/ipv6/udp.c                                | 11 +++-----
- net/ipv6/xfrm6_policy.c                       |  2 +-
- net/l2tp/l2tp_ip6.c                           |  2 +-
- net/mpls/mpls_iptunnel.c                      |  2 +-
- net/netfilter/ipvs/ip_vs_xmit.c               | 14 +++++-----
- net/netfilter/nf_flow_table_core.c            |  8 ++----
- net/netfilter/nf_flow_table_ip.c              |  4 +--
- net/netfilter/nft_rt.c                        |  2 +-
- net/sctp/ipv6.c                               |  2 +-
- net/xfrm/xfrm_policy.c                        |  3 +-
- 29 files changed, 75 insertions(+), 84 deletions(-)
+v8->v9:
+  - Fix the compilation error of conflicting names of rx_profile in
+    dim.h and ice driver: in dim.h, rx_profile is replaced with
+    dim_rx_profile. So does tx_profile.
 
-diff --git a/drivers/infiniband/core/addr.c b/drivers/infiniband/core/addr.c
-index f253295795f0a41c8fc78892051b09aa5df9cc66..f20dfe70fa0e4f2f4432e57e6259f756d9a2de49 100644
---- a/drivers/infiniband/core/addr.c
-+++ b/drivers/infiniband/core/addr.c
-@@ -348,15 +348,15 @@ static int dst_fetch_ha(const struct dst_entry *dst,
- 
- static bool has_gateway(const struct dst_entry *dst, sa_family_t family)
- {
--	struct rtable *rt;
--	struct rt6_info *rt6;
-+	const struct rtable *rt;
-+	const struct rt6_info *rt6;
- 
- 	if (family == AF_INET) {
- 		rt = container_of(dst, struct rtable, dst);
- 		return rt->rt_uses_gateway;
- 	}
- 
--	rt6 = container_of(dst, struct rt6_info, dst);
-+	rt6 = dst_rt6_info(dst);
- 	return rt6->rt6i_flags & RTF_GATEWAY;
- }
- 
-diff --git a/drivers/net/ethernet/mellanox/mlxsw/spectrum_span.c b/drivers/net/ethernet/mellanox/mlxsw/spectrum_span.c
-index 3de69b2eb5c41e9fd9fe664ceac9cc8f79a53bfd..4b5fd71c897ddb3f94f0579c8f774d8032ee03f4 100644
---- a/drivers/net/ethernet/mellanox/mlxsw/spectrum_span.c
-+++ b/drivers/net/ethernet/mellanox/mlxsw/spectrum_span.c
-@@ -540,7 +540,7 @@ mlxsw_sp_span_gretap6_route(const struct net_device *to_dev,
- 	if (!dst || dst->error)
- 		goto out;
- 
--	rt6 = container_of(dst, struct rt6_info, dst);
-+	rt6 = dst_rt6_info(dst);
- 
- 	dev = dst->dev;
- 	*saddrp = fl6.saddr;
-diff --git a/drivers/net/vrf.c b/drivers/net/vrf.c
-index 66f8542f3b18ce76fe75548b63805bfeef4466e1..784b9b2d275e9b3c11c57f31750f17a7729c284f 100644
---- a/drivers/net/vrf.c
-+++ b/drivers/net/vrf.c
-@@ -653,7 +653,7 @@ static int vrf_finish_output6(struct net *net, struct sock *sk,
- 	skb->dev = dev;
- 
- 	rcu_read_lock();
--	nexthop = rt6_nexthop((struct rt6_info *)dst, &ipv6_hdr(skb)->daddr);
-+	nexthop = rt6_nexthop(dst_rt6_info(dst), &ipv6_hdr(skb)->daddr);
- 	neigh = __ipv6_neigh_lookup_noref(dst->dev, nexthop);
- 	if (unlikely(!neigh))
- 		neigh = __neigh_create(&nd_tbl, nexthop, dst->dev, false);
-diff --git a/drivers/s390/net/qeth_core.h b/drivers/s390/net/qeth_core.h
-index 613eab729704648c5daeb430355bba22157d0dee..1de942d7abc70d66c31023657c3a1745e5cdbb20 100644
---- a/drivers/s390/net/qeth_core.h
-+++ b/drivers/s390/net/qeth_core.h
-@@ -978,7 +978,7 @@ static inline __be32 qeth_next_hop_v4_rcu(struct sk_buff *skb,
- static inline struct in6_addr *qeth_next_hop_v6_rcu(struct sk_buff *skb,
- 						    struct dst_entry *dst)
- {
--	struct rt6_info *rt = (struct rt6_info *) dst;
-+	struct rt6_info *rt = dst_rt6_info(dst);
- 
- 	if (rt && !ipv6_addr_any(&rt->rt6i_gateway))
- 		return &rt->rt6i_gateway;
-diff --git a/include/net/ip6_fib.h b/include/net/ip6_fib.h
-index 323c94f1845b9e3eed52a2a19a4871cf8174d9c2..73524fa0c064bb2fa812bf1f0b2db6d9295d64fd 100644
---- a/include/net/ip6_fib.h
-+++ b/include/net/ip6_fib.h
-@@ -234,9 +234,11 @@ struct fib6_result {
- 	for (rt = (w)->leaf; rt;					\
- 	     rt = rcu_dereference_protected(rt->fib6_next, 1))
- 
--static inline struct inet6_dev *ip6_dst_idev(struct dst_entry *dst)
-+#define dst_rt6_info(_ptr) container_of_const(_ptr, struct rt6_info, dst)
-+
-+static inline struct inet6_dev *ip6_dst_idev(const struct dst_entry *dst)
- {
--	return ((struct rt6_info *)dst)->rt6i_idev;
-+	return dst_rt6_info(dst)->rt6i_idev;
- }
- 
- static inline bool fib6_requires_src(const struct fib6_info *rt)
-diff --git a/include/net/ip6_route.h b/include/net/ip6_route.h
-index a30c6aa9e5cf3e442cd29e2d169ba0b0d46a1f46..a18ed24fed948e1e66b011d7bc2b74249d999b6f 100644
---- a/include/net/ip6_route.h
-+++ b/include/net/ip6_route.h
-@@ -210,12 +210,11 @@ void rt6_uncached_list_del(struct rt6_info *rt);
- static inline const struct rt6_info *skb_rt6_info(const struct sk_buff *skb)
- {
- 	const struct dst_entry *dst = skb_dst(skb);
--	const struct rt6_info *rt6 = NULL;
- 
- 	if (dst)
--		rt6 = container_of(dst, struct rt6_info, dst);
-+		return dst_rt6_info(dst);
- 
--	return rt6;
-+	return NULL;
- }
- 
- /*
-@@ -227,7 +226,7 @@ static inline void ip6_dst_store(struct sock *sk, struct dst_entry *dst,
- {
- 	struct ipv6_pinfo *np = inet6_sk(sk);
- 
--	np->dst_cookie = rt6_get_cookie((struct rt6_info *)dst);
-+	np->dst_cookie = rt6_get_cookie(dst_rt6_info(dst));
- 	sk_setup_caps(sk, dst);
- 	np->daddr_cache = daddr;
- #ifdef CONFIG_IPV6_SUBTREES
-@@ -240,7 +239,7 @@ void ip6_sk_dst_store_flow(struct sock *sk, struct dst_entry *dst,
- 
- static inline bool ipv6_unicast_destination(const struct sk_buff *skb)
- {
--	struct rt6_info *rt = (struct rt6_info *) skb_dst(skb);
-+	const struct rt6_info *rt = dst_rt6_info(skb_dst(skb));
- 
- 	return rt->rt6i_flags & RTF_LOCAL;
- }
-@@ -248,7 +247,7 @@ static inline bool ipv6_unicast_destination(const struct sk_buff *skb)
- static inline bool ipv6_anycast_destination(const struct dst_entry *dst,
- 					    const struct in6_addr *daddr)
- {
--	struct rt6_info *rt = (struct rt6_info *)dst;
-+	const struct rt6_info *rt = dst_rt6_info(dst);
- 
- 	return rt->rt6i_flags & RTF_ANYCAST ||
- 		(rt->rt6i_dst.plen < 127 &&
-diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
-index 27520a8a486f3c1e7649486ca1bd476ec20cf4e7..50cfec8ccac4f789fc1d4970878640dcbd8a4fac 100644
---- a/net/bluetooth/6lowpan.c
-+++ b/net/bluetooth/6lowpan.c
-@@ -133,7 +133,7 @@ static inline struct lowpan_peer *peer_lookup_dst(struct lowpan_btle_dev *dev,
- 						  struct in6_addr *daddr,
- 						  struct sk_buff *skb)
- {
--	struct rt6_info *rt = (struct rt6_info *)skb_dst(skb);
-+	struct rt6_info *rt = dst_rt6_info(skb_dst(skb));
- 	int count = atomic_read(&dev->peer_count);
- 	const struct in6_addr *nexthop;
- 	struct lowpan_peer *peer;
-diff --git a/net/core/dst_cache.c b/net/core/dst_cache.c
-index 0ccfd5fa5cb9b5f608ab6715a718cd57ee4eecab..b17171345d649b01a96f0eb949c26503479cce1f 100644
---- a/net/core/dst_cache.c
-+++ b/net/core/dst_cache.c
-@@ -112,7 +112,7 @@ void dst_cache_set_ip6(struct dst_cache *dst_cache, struct dst_entry *dst,
- 
- 	idst = this_cpu_ptr(dst_cache->cache);
- 	dst_cache_per_cpu_dst_set(this_cpu_ptr(dst_cache->cache), dst,
--				  rt6_get_cookie((struct rt6_info *)dst));
-+				  rt6_get_cookie(dst_rt6_info(dst)));
- 	idst->in6_saddr = *saddr;
- }
- EXPORT_SYMBOL_GPL(dst_cache_set_ip6);
-diff --git a/net/core/filter.c b/net/core/filter.c
-index 294670d3850d2dd7dd789ee7484e9163b8237ec4..5662464e1abd29230fb72c0db46620153fee7ef9 100644
---- a/net/core/filter.c
-+++ b/net/core/filter.c
-@@ -2215,7 +2215,7 @@ static int bpf_out_neigh_v6(struct net *net, struct sk_buff *skb,
- 	rcu_read_lock();
- 	if (!nh) {
- 		dst = skb_dst(skb);
--		nexthop = rt6_nexthop(container_of(dst, struct rt6_info, dst),
-+		nexthop = rt6_nexthop(dst_rt6_info(dst),
- 				      &ipv6_hdr(skb)->daddr);
- 	} else {
- 		nexthop = &nh->ipv6_nh;
-diff --git a/net/ipv4/ip_tunnel.c b/net/ipv4/ip_tunnel.c
-index 177f40c3a8e8f6abea37836d2dea0682d22f2fc0..ba46cf7612f4fc2cba33c098933b6578dd885587 100644
---- a/net/ipv4/ip_tunnel.c
-+++ b/net/ipv4/ip_tunnel.c
-@@ -543,7 +543,7 @@ static int tnl_update_pmtu(struct net_device *dev, struct sk_buff *skb,
- 		struct rt6_info *rt6;
- 		__be32 daddr;
- 
--		rt6 = skb_valid_dst(skb) ? (struct rt6_info *)skb_dst(skb) :
-+		rt6 = skb_valid_dst(skb) ? dst_rt6_info(skb_dst(skb)) :
- 					   NULL;
- 		daddr = md ? dst : tunnel->parms.iph.daddr;
- 
-diff --git a/net/ipv6/icmp.c b/net/ipv6/icmp.c
-index 1635da07285f263509a68624369a2746f3deb076..d285c1f6f1a618e430148167fb0f40de5b7dd72e 100644
---- a/net/ipv6/icmp.c
-+++ b/net/ipv6/icmp.c
-@@ -212,7 +212,7 @@ static bool icmpv6_xrlim_allow(struct sock *sk, u8 type,
- 	} else if (dst->dev && (dst->dev->flags&IFF_LOOPBACK)) {
- 		res = true;
- 	} else {
--		struct rt6_info *rt = (struct rt6_info *)dst;
-+		struct rt6_info *rt = dst_rt6_info(dst);
- 		int tmo = net->ipv6.sysctl.icmpv6_time;
- 		struct inet_peer *peer;
- 
-@@ -241,7 +241,7 @@ static bool icmpv6_rt_has_prefsrc(struct sock *sk, u8 type,
- 
- 	dst = ip6_route_output(net, sk, fl6);
- 	if (!dst->error) {
--		struct rt6_info *rt = (struct rt6_info *)dst;
-+		struct rt6_info *rt = dst_rt6_info(dst);
- 		struct in6_addr prefsrc;
- 
- 		rt6_get_prefsrc(rt, &prefsrc);
-@@ -616,7 +616,7 @@ void icmp6_send(struct sk_buff *skb, u8 type, u8 code, __u32 info,
- 	if (ip6_append_data(sk, icmpv6_getfrag, &msg,
- 			    len + sizeof(struct icmp6hdr),
- 			    sizeof(struct icmp6hdr),
--			    &ipc6, &fl6, (struct rt6_info *)dst,
-+			    &ipc6, &fl6, dst_rt6_info(dst),
- 			    MSG_DONTWAIT)) {
- 		ICMP6_INC_STATS(net, idev, ICMP6_MIB_OUTERRORS);
- 		ip6_flush_pending_frames(sk);
-@@ -803,7 +803,7 @@ static enum skb_drop_reason icmpv6_echo_reply(struct sk_buff *skb)
- 	if (ip6_append_data(sk, icmpv6_getfrag, &msg,
- 			    skb->len + sizeof(struct icmp6hdr),
- 			    sizeof(struct icmp6hdr), &ipc6, &fl6,
--			    (struct rt6_info *)dst, MSG_DONTWAIT)) {
-+			    dst_rt6_info(dst), MSG_DONTWAIT)) {
- 		__ICMP6_INC_STATS(net, idev, ICMP6_MIB_OUTERRORS);
- 		ip6_flush_pending_frames(sk);
- 	} else {
-diff --git a/net/ipv6/ila/ila_lwt.c b/net/ipv6/ila/ila_lwt.c
-index 8c1ce78956bae202f6e96c01c861e29895a0f959..0601bad798221389fe83318fbb17f192cec880d4 100644
---- a/net/ipv6/ila/ila_lwt.c
-+++ b/net/ipv6/ila/ila_lwt.c
-@@ -38,7 +38,7 @@ static inline struct ila_params *ila_params_lwtunnel(
- static int ila_output(struct net *net, struct sock *sk, struct sk_buff *skb)
- {
- 	struct dst_entry *orig_dst = skb_dst(skb);
--	struct rt6_info *rt = (struct rt6_info *)orig_dst;
-+	struct rt6_info *rt = dst_rt6_info(orig_dst);
- 	struct ila_lwt *ilwt = ila_lwt_lwtunnel(orig_dst->lwtstate);
- 	struct dst_entry *dst;
- 	int err = -EINVAL;
-@@ -70,7 +70,7 @@ static int ila_output(struct net *net, struct sock *sk, struct sk_buff *skb)
- 		memset(&fl6, 0, sizeof(fl6));
- 		fl6.flowi6_oif = orig_dst->dev->ifindex;
- 		fl6.flowi6_iif = LOOPBACK_IFINDEX;
--		fl6.daddr = *rt6_nexthop((struct rt6_info *)orig_dst,
-+		fl6.daddr = *rt6_nexthop(dst_rt6_info(orig_dst),
- 					 &ip6h->daddr);
- 
- 		dst = ip6_route_output(net, NULL, &fl6);
-diff --git a/net/ipv6/ip6_output.c b/net/ipv6/ip6_output.c
-index b9dd3a66e4236fbf67af75c5f98c921b38c18bf6..8f906e9fbc380583dd80e81150eda6c19bef1ff6 100644
---- a/net/ipv6/ip6_output.c
-+++ b/net/ipv6/ip6_output.c
-@@ -120,7 +120,7 @@ static int ip6_finish_output2(struct net *net, struct sock *sk, struct sk_buff *
- 	IP6_UPD_PO_STATS(net, idev, IPSTATS_MIB_OUT, skb->len);
- 
- 	rcu_read_lock();
--	nexthop = rt6_nexthop((struct rt6_info *)dst, daddr);
-+	nexthop = rt6_nexthop(dst_rt6_info(dst), daddr);
- 	neigh = __ipv6_neigh_lookup_noref(dev, nexthop);
- 
- 	if (unlikely(IS_ERR_OR_NULL(neigh))) {
-@@ -599,7 +599,7 @@ int ip6_forward(struct sk_buff *skb)
- 		 *	send a redirect.
- 		 */
- 
--		rt = (struct rt6_info *) dst;
-+		rt = dst_rt6_info(dst);
- 		if (rt->rt6i_flags & RTF_GATEWAY)
- 			target = &rt->rt6i_gateway;
- 		else
-@@ -856,7 +856,7 @@ int ip6_fragment(struct net *net, struct sock *sk, struct sk_buff *skb,
- 		 int (*output)(struct net *, struct sock *, struct sk_buff *))
- {
- 	struct sk_buff *frag;
--	struct rt6_info *rt = (struct rt6_info *)skb_dst(skb);
-+	struct rt6_info *rt = dst_rt6_info(skb_dst(skb));
- 	struct ipv6_pinfo *np = skb->sk && !dev_recursion_level() ?
- 				inet6_sk(skb->sk) : NULL;
- 	bool mono_delivery_time = skb->mono_delivery_time;
-@@ -1063,7 +1063,7 @@ static struct dst_entry *ip6_sk_dst_check(struct sock *sk,
- 		return NULL;
- 	}
- 
--	rt = (struct rt6_info *)dst;
-+	rt = dst_rt6_info(dst);
- 	/* Yes, checking route validity in not connected
- 	 * case is not very simple. Take into account,
- 	 * that we do not support routing by source, TOS,
-@@ -1118,7 +1118,7 @@ static int ip6_dst_lookup_tail(struct net *net, const struct sock *sk,
- 		struct rt6_info *rt;
- 
- 		*dst = ip6_route_output(net, sk, fl6);
--		rt = (*dst)->error ? NULL : (struct rt6_info *)*dst;
-+		rt = (*dst)->error ? NULL : dst_rt6_info(*dst);
- 
- 		rcu_read_lock();
- 		from = rt ? rcu_dereference(rt->from) : NULL;
-@@ -1159,7 +1159,7 @@ static int ip6_dst_lookup_tail(struct net *net, const struct sock *sk,
- 	 * dst entry and replace it instead with the
- 	 * dst entry of the nexthop router
- 	 */
--	rt = (struct rt6_info *) *dst;
-+	rt = dst_rt6_info(*dst);
- 	rcu_read_lock();
- 	n = __ipv6_neigh_lookup_noref(rt->dst.dev,
- 				      rt6_nexthop(rt, &fl6->daddr));
-@@ -1423,7 +1423,7 @@ static int __ip6_append_data(struct sock *sk,
- 	int offset = 0;
- 	bool zc = false;
- 	u32 tskey = 0;
--	struct rt6_info *rt = (struct rt6_info *)cork->dst;
-+	struct rt6_info *rt = dst_rt6_info(cork->dst);
- 	bool paged, hold_tskey, extra_uref = false;
- 	struct ipv6_txoptions *opt = v6_cork->opt;
- 	int csummode = CHECKSUM_NONE;
-@@ -1877,7 +1877,7 @@ struct sk_buff *__ip6_make_skb(struct sock *sk,
- 	struct net *net = sock_net(sk);
- 	struct ipv6hdr *hdr;
- 	struct ipv6_txoptions *opt = v6_cork->opt;
--	struct rt6_info *rt = (struct rt6_info *)cork->base.dst;
-+	struct rt6_info *rt = dst_rt6_info(cork->base.dst);
- 	struct flowi6 *fl6 = &cork->fl.u.ip6;
- 	unsigned char proto = fl6->flowi6_proto;
- 
-@@ -1949,7 +1949,7 @@ struct sk_buff *__ip6_make_skb(struct sock *sk,
- int ip6_send_skb(struct sk_buff *skb)
- {
- 	struct net *net = sock_net(skb->sk);
--	struct rt6_info *rt = (struct rt6_info *)skb_dst(skb);
-+	struct rt6_info *rt = dst_rt6_info(skb_dst(skb));
- 	int err;
- 
- 	err = ip6_local_out(net, skb->sk, skb);
-diff --git a/net/ipv6/ip6mr.c b/net/ipv6/ip6mr.c
-index cb0ee81a068a4c895d5d8b21f3fc557bf1784dfb..dd342e6ecf3f456bba4a9fa25f68fb13f1e03db3 100644
---- a/net/ipv6/ip6mr.c
-+++ b/net/ipv6/ip6mr.c
-@@ -2273,7 +2273,7 @@ int ip6mr_get_route(struct net *net, struct sk_buff *skb, struct rtmsg *rtm,
- 	int err;
- 	struct mr_table *mrt;
- 	struct mfc6_cache *cache;
--	struct rt6_info *rt = (struct rt6_info *)skb_dst(skb);
-+	struct rt6_info *rt = dst_rt6_info(skb_dst(skb));
- 
- 	mrt = ip6mr_get_table(net, RT6_TABLE_DFLT);
- 	if (!mrt)
-diff --git a/net/ipv6/ndisc.c b/net/ipv6/ndisc.c
-index ae134634c323cab27c03328015b24ae397f97cfc..d914b23256ce6372cc764236edcf224273f5257a 100644
---- a/net/ipv6/ndisc.c
-+++ b/net/ipv6/ndisc.c
-@@ -1722,7 +1722,7 @@ void ndisc_send_redirect(struct sk_buff *skb, const struct in6_addr *target)
- 	if (IS_ERR(dst))
- 		return;
- 
--	rt = (struct rt6_info *) dst;
-+	rt = dst_rt6_info(dst);
- 
- 	if (rt->rt6i_flags & RTF_GATEWAY) {
- 		ND_PRINTK(2, warn,
-diff --git a/net/ipv6/ping.c b/net/ipv6/ping.c
-index ef2059c889554aaae237ed2cddca0b5402c77bbb..88b3fcacd4f948218608e9bc210c177d59a8312a 100644
---- a/net/ipv6/ping.c
-+++ b/net/ipv6/ping.c
-@@ -154,7 +154,7 @@ static int ping_v6_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
- 	dst = ip6_sk_dst_lookup_flow(sk, &fl6, daddr, false);
- 	if (IS_ERR(dst))
- 		return PTR_ERR(dst);
--	rt = (struct rt6_info *) dst;
-+	rt = dst_rt6_info(dst);
- 
- 	if (!fl6.flowi6_oif && ipv6_addr_is_multicast(&fl6.daddr))
- 		fl6.flowi6_oif = READ_ONCE(np->mcast_oif);
-diff --git a/net/ipv6/raw.c b/net/ipv6/raw.c
-index 0d896ca7b589122270b9e85815a64ce37d0d932d..2eedf255600b9ec93cdb1f381d8e1fbf41524bfc 100644
---- a/net/ipv6/raw.c
-+++ b/net/ipv6/raw.c
-@@ -598,7 +598,7 @@ static int rawv6_send_hdrinc(struct sock *sk, struct msghdr *msg, int length,
- 	struct ipv6hdr *iph;
- 	struct sk_buff *skb;
- 	int err;
--	struct rt6_info *rt = (struct rt6_info *)*dstp;
-+	struct rt6_info *rt = dst_rt6_info(*dstp);
- 	int hlen = LL_RESERVED_SPACE(rt->dst.dev);
- 	int tlen = rt->dst.dev->needed_tailroom;
- 
-@@ -917,7 +917,7 @@ static int rawv6_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
- 		ipc6.opt = opt;
- 		lock_sock(sk);
- 		err = ip6_append_data(sk, raw6_getfrag, &rfv,
--			len, 0, &ipc6, &fl6, (struct rt6_info *)dst,
-+			len, 0, &ipc6, &fl6, dst_rt6_info(dst),
- 			msg->msg_flags);
- 
- 		if (err)
-diff --git a/net/ipv6/route.c b/net/ipv6/route.c
-index 1f4b935a0e57ab89ce4c71b9dc6da6341d1663b1..3e0b2cb20fd201fd6a4da68817adaf3f0b349a42 100644
---- a/net/ipv6/route.c
-+++ b/net/ipv6/route.c
-@@ -226,7 +226,7 @@ static struct neighbour *ip6_dst_neigh_lookup(const struct dst_entry *dst,
- 					      struct sk_buff *skb,
- 					      const void *daddr)
- {
--	const struct rt6_info *rt = container_of(dst, struct rt6_info, dst);
-+	const struct rt6_info *rt = dst_rt6_info(dst);
- 
- 	return ip6_neigh_lookup(rt6_nexthop(rt, &in6addr_any),
- 				dst->dev, skb, daddr);
-@@ -234,8 +234,8 @@ static struct neighbour *ip6_dst_neigh_lookup(const struct dst_entry *dst,
- 
- static void ip6_confirm_neigh(const struct dst_entry *dst, const void *daddr)
- {
-+	const struct rt6_info *rt = dst_rt6_info(dst);
- 	struct net_device *dev = dst->dev;
--	struct rt6_info *rt = (struct rt6_info *)dst;
- 
- 	daddr = choose_neigh_daddr(rt6_nexthop(rt, &in6addr_any), NULL, daddr);
- 	if (!daddr)
-@@ -354,7 +354,7 @@ EXPORT_SYMBOL(ip6_dst_alloc);
- 
- static void ip6_dst_destroy(struct dst_entry *dst)
- {
--	struct rt6_info *rt = (struct rt6_info *)dst;
-+	struct rt6_info *rt = dst_rt6_info(dst);
- 	struct fib6_info *from;
- 	struct inet6_dev *idev;
- 
-@@ -373,7 +373,7 @@ static void ip6_dst_destroy(struct dst_entry *dst)
- 
- static void ip6_dst_ifdown(struct dst_entry *dst, struct net_device *dev)
- {
--	struct rt6_info *rt = (struct rt6_info *)dst;
-+	struct rt6_info *rt = dst_rt6_info(dst);
- 	struct inet6_dev *idev = rt->rt6i_idev;
- 
- 	if (idev && idev->dev != blackhole_netdev) {
-@@ -1288,7 +1288,7 @@ struct rt6_info *rt6_lookup(struct net *net, const struct in6_addr *daddr,
- 
- 	dst = fib6_rule_lookup(net, &fl6, skb, flags, ip6_pol_route_lookup);
- 	if (dst->error == 0)
--		return (struct rt6_info *) dst;
-+		return dst_rt6_info(dst);
- 
- 	dst_release(dst);
- 
-@@ -2647,7 +2647,7 @@ struct dst_entry *ip6_route_output_flags(struct net *net,
- 
- 	rcu_read_lock();
- 	dst = ip6_route_output_flags_noref(net, sk, fl6, flags);
--	rt6 = (struct rt6_info *)dst;
-+	rt6 = dst_rt6_info(dst);
- 	/* For dst cached in uncached_list, refcnt is already taken. */
- 	if (list_empty(&rt6->dst.rt_uncached) && !dst_hold_safe(dst)) {
- 		dst = &net->ipv6.ip6_null_entry->dst;
-@@ -2661,7 +2661,7 @@ EXPORT_SYMBOL_GPL(ip6_route_output_flags);
- 
- struct dst_entry *ip6_blackhole_route(struct net *net, struct dst_entry *dst_orig)
- {
--	struct rt6_info *rt, *ort = (struct rt6_info *) dst_orig;
-+	struct rt6_info *rt, *ort = dst_rt6_info(dst_orig);
- 	struct net_device *loopback_dev = net->loopback_dev;
- 	struct dst_entry *new = NULL;
- 
-@@ -2744,7 +2744,7 @@ INDIRECT_CALLABLE_SCOPE struct dst_entry *ip6_dst_check(struct dst_entry *dst,
- 	struct fib6_info *from;
- 	struct rt6_info *rt;
- 
--	rt = container_of(dst, struct rt6_info, dst);
-+	rt = dst_rt6_info(dst);
- 
- 	if (rt->sernum)
- 		return rt6_is_valid(rt) ? dst : NULL;
-@@ -2772,7 +2772,7 @@ EXPORT_INDIRECT_CALLABLE(ip6_dst_check);
- 
- static struct dst_entry *ip6_negative_advice(struct dst_entry *dst)
- {
--	struct rt6_info *rt = (struct rt6_info *) dst;
-+	struct rt6_info *rt = dst_rt6_info(dst);
- 
- 	if (rt) {
- 		if (rt->rt6i_flags & RTF_CACHE) {
-@@ -2796,7 +2796,7 @@ static void ip6_link_failure(struct sk_buff *skb)
- 
- 	icmpv6_send(skb, ICMPV6_DEST_UNREACH, ICMPV6_ADDR_UNREACH, 0);
- 
--	rt = (struct rt6_info *) skb_dst(skb);
-+	rt = dst_rt6_info(skb_dst(skb));
- 	if (rt) {
- 		rcu_read_lock();
- 		if (rt->rt6i_flags & RTF_CACHE) {
-@@ -2852,7 +2852,7 @@ static void __ip6_rt_update_pmtu(struct dst_entry *dst, const struct sock *sk,
- 				 bool confirm_neigh)
- {
- 	const struct in6_addr *daddr, *saddr;
--	struct rt6_info *rt6 = (struct rt6_info *)dst;
-+	struct rt6_info *rt6 = dst_rt6_info(dst);
- 
- 	/* Note: do *NOT* check dst_metric_locked(dst, RTAX_MTU)
- 	 * IPv6 pmtu discovery isn't optional, so 'mtu lock' cannot disable it.
-@@ -4174,7 +4174,7 @@ static void rt6_do_redirect(struct dst_entry *dst, struct sock *sk, struct sk_bu
- 		}
- 	}
- 
--	rt = (struct rt6_info *) dst;
-+	rt = dst_rt6_info(dst);
- 	if (rt->rt6i_flags & RTF_REJECT) {
- 		net_dbg_ratelimited("rt6_redirect: source isn't a valid nexthop for redirect target\n");
- 		return;
-@@ -5608,7 +5608,7 @@ static int rt6_fill_node(struct net *net, struct sk_buff *skb,
- 			 int iif, int type, u32 portid, u32 seq,
- 			 unsigned int flags)
- {
--	struct rt6_info *rt6 = (struct rt6_info *)dst;
-+	struct rt6_info *rt6 = dst_rt6_info(dst);
- 	struct rt6key *rt6_dst, *rt6_src;
- 	u32 *pmetrics, table, rt6_flags;
- 	unsigned char nh_flags = 0;
-@@ -6111,7 +6111,7 @@ static int inet6_rtm_getroute(struct sk_buff *in_skb, struct nlmsghdr *nlh,
- 	}
- 
- 
--	rt = container_of(dst, struct rt6_info, dst);
-+	rt = dst_rt6_info(dst);
- 	if (rt->dst.error) {
- 		err = rt->dst.error;
- 		ip6_rt_put(rt);
-diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
-index bb7c3caf4f8536dabdcb3dbe7c90aff9c8985c90..7263249a6ea3a0ebf2b588eb4e0d965922f8ddb9 100644
---- a/net/ipv6/tcp_ipv6.c
-+++ b/net/ipv6/tcp_ipv6.c
-@@ -95,11 +95,9 @@ static void inet6_sk_rx_dst_set(struct sock *sk, const struct sk_buff *skb)
- 	struct dst_entry *dst = skb_dst(skb);
- 
- 	if (dst && dst_hold_safe(dst)) {
--		const struct rt6_info *rt = (const struct rt6_info *)dst;
--
- 		rcu_assign_pointer(sk->sk_rx_dst, dst);
- 		sk->sk_rx_dst_ifindex = skb->skb_iif;
--		sk->sk_rx_dst_cookie = rt6_get_cookie(rt);
-+		sk->sk_rx_dst_cookie = rt6_get_cookie(dst_rt6_info(dst));
- 	}
- }
- 
-diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
-index 9914e73f47858864da965975be8e4c087b4aee4d..8625a9920d931fec36491f92efd5bcb203c9e0fc 100644
---- a/net/ipv6/udp.c
-+++ b/net/ipv6/udp.c
-@@ -910,11 +910,8 @@ static int __udp6_lib_mcast_deliver(struct net *net, struct sk_buff *skb,
- 
- static void udp6_sk_rx_dst_set(struct sock *sk, struct dst_entry *dst)
- {
--	if (udp_sk_rx_dst_set(sk, dst)) {
--		const struct rt6_info *rt = (const struct rt6_info *)dst;
--
--		sk->sk_rx_dst_cookie = rt6_get_cookie(rt);
--	}
-+	if (udp_sk_rx_dst_set(sk, dst))
-+		sk->sk_rx_dst_cookie = rt6_get_cookie(dst_rt6_info(dst));
- }
- 
- /* wrapper for udp_queue_rcv_skb tacking care of csum conversion and
-@@ -1584,7 +1581,7 @@ int udpv6_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
- 
- 		skb = ip6_make_skb(sk, getfrag, msg, ulen,
- 				   sizeof(struct udphdr), &ipc6,
--				   (struct rt6_info *)dst,
-+				   dst_rt6_info(dst),
- 				   msg->msg_flags, &cork);
- 		err = PTR_ERR(skb);
- 		if (!IS_ERR_OR_NULL(skb))
-@@ -1611,7 +1608,7 @@ int udpv6_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
- 		ipc6.dontfrag = inet6_test_bit(DONTFRAG, sk);
- 	up->len += ulen;
- 	err = ip6_append_data(sk, getfrag, msg, ulen, sizeof(struct udphdr),
--			      &ipc6, fl6, (struct rt6_info *)dst,
-+			      &ipc6, fl6, dst_rt6_info(dst),
- 			      corkreq ? msg->msg_flags|MSG_MORE : msg->msg_flags);
- 	if (err)
- 		udp_v6_flush_pending_frames(sk);
-diff --git a/net/ipv6/xfrm6_policy.c b/net/ipv6/xfrm6_policy.c
-index 4891012b692fb0ee77097ada8cd785415ec4db60..7924e08ee142d136954b3388568354628435db29 100644
---- a/net/ipv6/xfrm6_policy.c
-+++ b/net/ipv6/xfrm6_policy.c
-@@ -70,7 +70,7 @@ static int xfrm6_get_saddr(struct net *net, int oif,
- static int xfrm6_fill_dst(struct xfrm_dst *xdst, struct net_device *dev,
- 			  const struct flowi *fl)
- {
--	struct rt6_info *rt = (struct rt6_info *)xdst->route;
-+	struct rt6_info *rt = dst_rt6_info(xdst->route);
- 
- 	xdst->u.dst.dev = dev;
- 	netdev_hold(dev, &xdst->u.dst.dev_tracker, GFP_ATOMIC);
-diff --git a/net/l2tp/l2tp_ip6.c b/net/l2tp/l2tp_ip6.c
-index 7bf14cf9ffaa967483ac0ee01e3f8e835754cd57..8780ec64f3769c5e00d96127824adac1a95307bb 100644
---- a/net/l2tp/l2tp_ip6.c
-+++ b/net/l2tp/l2tp_ip6.c
-@@ -630,7 +630,7 @@ static int l2tp_ip6_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
- 	ulen = len + (skb_queue_empty(&sk->sk_write_queue) ? transhdrlen : 0);
- 	err = ip6_append_data(sk, ip_generic_getfrag, msg,
- 			      ulen, transhdrlen, &ipc6,
--			      &fl6, (struct rt6_info *)dst,
-+			      &fl6, dst_rt6_info(dst),
- 			      msg->msg_flags);
- 	if (err)
- 		ip6_flush_pending_frames(sk);
-diff --git a/net/mpls/mpls_iptunnel.c b/net/mpls/mpls_iptunnel.c
-index 8fc790f2a01bb3af597281250eb5964cc34af6c2..606349c8df0e67aab833e375c642303078c9e939 100644
---- a/net/mpls/mpls_iptunnel.c
-+++ b/net/mpls/mpls_iptunnel.c
-@@ -90,7 +90,7 @@ static int mpls_xmit(struct sk_buff *skb)
- 			ttl = net->mpls.default_ttl;
- 		else
- 			ttl = ipv6_hdr(skb)->hop_limit;
--		rt6 = (struct rt6_info *)dst;
-+		rt6 = dst_rt6_info(dst);
- 	} else {
- 		goto drop;
- 	}
-diff --git a/net/netfilter/ipvs/ip_vs_xmit.c b/net/netfilter/ipvs/ip_vs_xmit.c
-index 39b5fd6bbf65ad5066626b1a29a30c2ce5f750a7..6e8b9d100ad275c8a22d7f6b0c27fade464f045f 100644
---- a/net/netfilter/ipvs/ip_vs_xmit.c
-+++ b/net/netfilter/ipvs/ip_vs_xmit.c
-@@ -180,7 +180,7 @@ static inline bool crosses_local_route_boundary(int skb_af, struct sk_buff *skb,
- 			(!skb->dev || skb->dev->flags & IFF_LOOPBACK) &&
- 			(addr_type & IPV6_ADDR_LOOPBACK);
- 		old_rt_is_local = __ip_vs_is_local_route6(
--			(struct rt6_info *)skb_dst(skb));
-+			dst_rt6_info(skb_dst(skb)));
- 	} else
- #endif
- 	{
-@@ -481,7 +481,7 @@ __ip_vs_get_out_rt_v6(struct netns_ipvs *ipvs, int skb_af, struct sk_buff *skb,
- 	if (dest) {
- 		dest_dst = __ip_vs_dst_check(dest);
- 		if (likely(dest_dst))
--			rt = (struct rt6_info *) dest_dst->dst_cache;
-+			rt = dst_rt6_info(dest_dst->dst_cache);
- 		else {
- 			u32 cookie;
- 
-@@ -501,7 +501,7 @@ __ip_vs_get_out_rt_v6(struct netns_ipvs *ipvs, int skb_af, struct sk_buff *skb,
- 				ip_vs_dest_dst_free(dest_dst);
- 				goto err_unreach;
- 			}
--			rt = (struct rt6_info *) dst;
-+			rt = dst_rt6_info(dst);
- 			cookie = rt6_get_cookie(rt);
- 			__ip_vs_dst_set(dest, dest_dst, &rt->dst, cookie);
- 			spin_unlock_bh(&dest->dst_lock);
-@@ -517,7 +517,7 @@ __ip_vs_get_out_rt_v6(struct netns_ipvs *ipvs, int skb_af, struct sk_buff *skb,
- 					      rt_mode);
- 		if (!dst)
- 			goto err_unreach;
--		rt = (struct rt6_info *) dst;
-+		rt = dst_rt6_info(dst);
- 	}
- 
- 	local = __ip_vs_is_local_route6(rt);
-@@ -862,7 +862,7 @@ ip_vs_nat_xmit_v6(struct sk_buff *skb, struct ip_vs_conn *cp,
- 				      IP_VS_RT_MODE_RDR);
- 	if (local < 0)
- 		goto tx_error;
--	rt = (struct rt6_info *) skb_dst(skb);
-+	rt = dst_rt6_info(skb_dst(skb));
- 	/*
- 	 * Avoid duplicate tuple in reply direction for NAT traffic
- 	 * to local address when connection is sync-ed
-@@ -1288,7 +1288,7 @@ ip_vs_tunnel_xmit_v6(struct sk_buff *skb, struct ip_vs_conn *cp,
- 	if (local)
- 		return ip_vs_send_or_cont(NFPROTO_IPV6, skb, cp, 1);
- 
--	rt = (struct rt6_info *) skb_dst(skb);
-+	rt = dst_rt6_info(skb_dst(skb));
- 	tdev = rt->dst.dev;
- 
- 	/*
-@@ -1590,7 +1590,7 @@ ip_vs_icmp_xmit_v6(struct sk_buff *skb, struct ip_vs_conn *cp,
- 				      &cp->daddr.in6, NULL, ipvsh, 0, rt_mode);
- 	if (local < 0)
- 		goto tx_error;
--	rt = (struct rt6_info *) skb_dst(skb);
-+	rt = dst_rt6_info(skb_dst(skb));
- 	/*
- 	 * Avoid duplicate tuple in reply direction for NAT traffic
- 	 * to local address when connection is sync-ed
-diff --git a/net/netfilter/nf_flow_table_core.c b/net/netfilter/nf_flow_table_core.c
-index a0571339239c40ded96c4a9466d53d5de2887ed5..5c1ff07eaee0bdc5d8d4e8445051451f82ad46f0 100644
---- a/net/netfilter/nf_flow_table_core.c
-+++ b/net/netfilter/nf_flow_table_core.c
-@@ -77,12 +77,8 @@ EXPORT_SYMBOL_GPL(flow_offload_alloc);
- 
- static u32 flow_offload_dst_cookie(struct flow_offload_tuple *flow_tuple)
- {
--	const struct rt6_info *rt;
--
--	if (flow_tuple->l3proto == NFPROTO_IPV6) {
--		rt = (const struct rt6_info *)flow_tuple->dst_cache;
--		return rt6_get_cookie(rt);
--	}
-+	if (flow_tuple->l3proto == NFPROTO_IPV6)
-+		return rt6_get_cookie(dst_rt6_info(flow_tuple->dst_cache));
- 
- 	return 0;
- }
-diff --git a/net/netfilter/nf_flow_table_ip.c b/net/netfilter/nf_flow_table_ip.c
-index 5383bed3d3e002661f01468e1a8bef8425e229b4..100887beed314de3c72ca2e7181c72aca02ae165 100644
---- a/net/netfilter/nf_flow_table_ip.c
-+++ b/net/netfilter/nf_flow_table_ip.c
-@@ -729,7 +729,7 @@ nf_flow_offload_ipv6_hook(void *priv, struct sk_buff *skb,
- 		return NF_ACCEPT;
- 
- 	if (unlikely(tuplehash->tuple.xmit_type == FLOW_OFFLOAD_XMIT_XFRM)) {
--		rt = (struct rt6_info *)tuplehash->tuple.dst_cache;
-+		rt = dst_rt6_info(tuplehash->tuple.dst_cache);
- 		memset(skb->cb, 0, sizeof(struct inet6_skb_parm));
- 		IP6CB(skb)->iif = skb->dev->ifindex;
- 		IP6CB(skb)->flags = IP6SKB_FORWARDED;
-@@ -741,7 +741,7 @@ nf_flow_offload_ipv6_hook(void *priv, struct sk_buff *skb,
- 
- 	switch (tuplehash->tuple.xmit_type) {
- 	case FLOW_OFFLOAD_XMIT_NEIGH:
--		rt = (struct rt6_info *)tuplehash->tuple.dst_cache;
-+		rt = dst_rt6_info(tuplehash->tuple.dst_cache);
- 		outdev = rt->dst.dev;
- 		skb->dev = outdev;
- 		nexthop = rt6_nexthop(rt, &flow->tuplehash[!dir].tuple.src_v6);
-diff --git a/net/netfilter/nft_rt.c b/net/netfilter/nft_rt.c
-index 24d977138572988e87b8c726daf67441f0b41de2..2434c624aafde17dfcbe358328f950540985a8b6 100644
---- a/net/netfilter/nft_rt.c
-+++ b/net/netfilter/nft_rt.c
-@@ -80,7 +80,7 @@ void nft_rt_get_eval(const struct nft_expr *expr,
- 		if (nft_pf(pkt) != NFPROTO_IPV6)
- 			goto err;
- 
--		memcpy(dest, rt6_nexthop((struct rt6_info *)dst,
-+		memcpy(dest, rt6_nexthop(dst_rt6_info(dst),
- 					 &ipv6_hdr(skb)->daddr),
- 		       sizeof(struct in6_addr));
- 		break;
-diff --git a/net/sctp/ipv6.c b/net/sctp/ipv6.c
-index 24368f755ab19a07e6e6ed4be99043fd41b99421..f7b809c0d142c0e6c8e29c2badc4428648117f31 100644
---- a/net/sctp/ipv6.c
-+++ b/net/sctp/ipv6.c
-@@ -415,7 +415,7 @@ static void sctp_v6_get_dst(struct sctp_transport *t, union sctp_addr *saddr,
- 	if (!IS_ERR_OR_NULL(dst)) {
- 		struct rt6_info *rt;
- 
--		rt = (struct rt6_info *)dst;
-+		rt = dst_rt6_info(dst);
- 		t->dst_cookie = rt6_get_cookie(rt);
- 		pr_debug("rt6_dst:%pI6/%d rt6_src:%pI6\n",
- 			 &rt->rt6i_dst.addr, rt->rt6i_dst.plen,
-diff --git a/net/xfrm/xfrm_policy.c b/net/xfrm/xfrm_policy.c
-index 6affe5cd85d8f14fb1689b830422eaea56d0dafc..1a41650d9d7b6ee168dfc0bb17af358a08907446 100644
---- a/net/xfrm/xfrm_policy.c
-+++ b/net/xfrm/xfrm_policy.c
-@@ -2598,8 +2598,7 @@ static void xfrm_init_path(struct xfrm_dst *path, struct dst_entry *dst,
- 			   int nfheader_len)
- {
- 	if (dst->ops->family == AF_INET6) {
--		struct rt6_info *rt = (struct rt6_info *)dst;
--		path->path_cookie = rt6_get_cookie(rt);
-+		path->path_cookie = rt6_get_cookie(dst_rt6_info(dst));
- 		path->u.rt6.rt6i_nfheader_len = nfheader_len;
- 	}
- }
+v7->v8:
+  - Use kmemdup() instead of kzalloc()/memcpy() in dev_dim_profile_init().
+
+v6->v7:
+  - A new wrapper struct pointer is used in struct net_device.
+  - Add IS_ENABLED(CONFIG_DIMLIB) to avoid compiler warnings.
+  - Profile fields changed from u16 to u32.
+
+v5->v6:
+  - Place the profile in netdevice to bypass the driver.
+    The interaction code of ethtool <-> kernel has not changed at all,
+    only the interaction part of kernel <-> driver has changed.
+
+v4->v5:
+  - Update some snippets from Kuba, Thanks.
+
+v3->v4:
+  - Some tiny updates and patch 1 only add a new comment.
+
+v2->v3:
+  - Break up the attributes to avoid the use of raw c structs.
+  - Use per-device profile instead of global profile in the driver.
+
+v1->v2:
+  - Use ethtool tool instead of net-sysfs
+
+Heng Qi (4):
+  linux/dim: move useful macros to .h file
+  ethtool: provide customized dim profile management
+  dim: add new interfaces for initialization and getting results
+  virtio-net: support dim profile fine-tuning
+
+ Documentation/netlink/specs/ethtool.yaml     |  23 ++
+ Documentation/networking/ethtool-netlink.rst |   4 +
+ drivers/net/virtio_net.c                     |  44 +++-
+ include/linux/dim.h                          | 115 ++++++++
+ include/linux/ethtool.h                      |   7 +-
+ include/linux/netdevice.h                    |   5 +
+ include/uapi/linux/ethtool_netlink.h         |  20 ++
+ lib/dim/net_dim.c                            | 139 ++++++++++
+ net/ethtool/coalesce.c                       | 264 ++++++++++++++++++-
+ 9 files changed, 612 insertions(+), 9 deletions(-)
+
 -- 
-2.44.0.769.g3c40516874-goog
+2.32.0.3.g01195cf9f
 
 
