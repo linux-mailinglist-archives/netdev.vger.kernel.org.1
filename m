@@ -1,59 +1,66 @@
-Return-Path: <netdev+bounces-91344-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91345-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FFB08B248F
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 17:04:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E2ED8B2490
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 17:04:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A4B461F22403
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 15:04:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3184B1C20B13
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 15:04:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E117814A62D;
-	Thu, 25 Apr 2024 15:04:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFC0D14AD24;
+	Thu, 25 Apr 2024 15:04:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b="KcZ5k8qB"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b="pdVuGTe5"
 X-Original-To: netdev@vger.kernel.org
 Received: from nbd.name (nbd.name [46.4.11.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2143514A633
-	for <netdev@vger.kernel.org>; Thu, 25 Apr 2024 15:04:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83CA214A632;
+	Thu, 25 Apr 2024 15:04:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.4.11.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714057485; cv=none; b=b5t5i0GLrPi1A8ZqIRYyJZNUHjDKiriTUnf1q9H4pIMC0cvn48UBx1OhkgW2TmNcBucPgny1r0Z4UHy08awyaDRGE79gmhob9e2QunZegpEg5HfD2w171jaBFHLf+tsMIG0YsyPncS5fIyySW642TirKPjmNIBCSD1uE8pyOPWo=
+	t=1714057486; cv=none; b=aWEoGv457iafbUhfC6PXrqfJqxOdm4wNJwJ0aAtBg9FpPKHhgUtfUH0gcn/KU0Kd3kV4nhQGQmqJJhc25eOB/VbIzWwLMmuX4RzyM29EwFrH9ccRozIQofZs6a4PC+SoV4GxmNsn4uGhurbgSorVGkpkUKLQK9JimZd8Ggkm0Ng=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714057485; c=relaxed/simple;
-	bh=cTu52Me6wRM2IAkkeIRqQRBbUTQff922qvNyBCr31dA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QfiQ7bbguMq8PM/afqcf1ytyWe3IZb506fMPTzfA7TlY/900k4gFjlkJL6PQn3wT6BzHtl5OPh2TGfsY1oSICl6+9b4X4qtdRi4tETtBYe5qyNJm8Dc+vRUzS6opfDGzD1u6X3qTSycotVWR6UwIxkBHtNBUc3g2jWSbBq0XPRY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nbd.name; spf=none smtp.mailfrom=nbd.name; dkim=pass (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b=KcZ5k8qB; arc=none smtp.client-ip=46.4.11.11
+	s=arc-20240116; t=1714057486; c=relaxed/simple;
+	bh=IXZq04hiu+Pn+sF7BKtV+tVHTOSfOBndsfo4YDuDbeo=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=c8ZsclHfXlDzoC3LCLXJVH6G4fkWibNlT5sk6tbRmhE6Ij1HyLDGK3s254WQTQODJa7OvC7IIDIYxdpTInAF0oe4pBGhrGs4oOoUk/4b3f2N/RprKMCAAydPePKfcffBeHmmgFyb+1n4jfqY0jR/84enKWxCmD7cM/079Imycss=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nbd.name; spf=none smtp.mailfrom=nbd.name; dkim=pass (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b=pdVuGTe5; arc=none smtp.client-ip=46.4.11.11
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nbd.name
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=nbd.name
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=nbd.name;
-	s=20160729; h=Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject:
-	Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:Content-Description:
-	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
-	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	s=20160729; h=Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:
+	Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
 	List-Post:List-Owner:List-Archive;
-	bh=nFtwZtb2yySq5GOrBig0z2AZLjwf9d+Zi5i5jQVPw7Q=; b=KcZ5k8qBN2oONHDFF1UiUivaLF
-	xGEbdciFBdRY4+AByNZolyBjVOBskkttA6fiutth9AL5ub3rO7oY/LnI5HXa2UAHXLMCQwDPhEpy1
-	YIx/EzEQUh3GjJYG++LLfpUryTptXr6Q6+zot7x+9Ae5wJW86/FT67SK7KIASqinWwvo=;
+	bh=3H6dBRGk+BHU+y8mRcNlZ506UX4DS949WCdH9l5DVuI=; b=pdVuGTe5qp3xdEIL1WukCCnQy9
+	a8V/oy2Vc+imIoWzCjmcGeVHdPI4MrQSOfDcYPhEqaJ6GB2FmEptvjc4zoNEgjyKUqv2Zq0V158p5
+	6+StQG7Gz6NCE0hAIafUnrCs6z/htE4mClHpjGGR9UMExdM9cNUh22AOHJPS9k0aVPnQ=;
 Received: from p54ae9c93.dip0.t-ipconnect.de ([84.174.156.147] helo=localhost.localdomain)
 	by ds12 with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256
 	(Exim 4.96)
 	(envelope-from <nbd@nbd.name>)
-	id 1s00eH-007MWz-1Y;
-	Thu, 25 Apr 2024 17:04:33 +0200
+	id 1s00eI-007MWz-16;
+	Thu, 25 Apr 2024 17:04:34 +0200
 From: Felix Fietkau <nbd@nbd.name>
-To: netdev@vger.kernel.org
+To: netdev@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	David Ahern <dsahern@kernel.org>
 Cc: willemdebruijn.kernel@gmail.com,
-	pabeni@redhat.com,
-	edumazet@google.com
-Subject: [PATCH v2 net-next 0/5] Add TCP fraglist GRO support
-Date: Thu, 25 Apr 2024 17:04:23 +0200
-Message-ID: <20240425150432.44142-1-nbd@nbd.name>
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2 net-next v2 1/5] net: move skb_gro_receive_list from udp to core
+Date: Thu, 25 Apr 2024 17:04:24 +0200
+Message-ID: <20240425150432.44142-2-nbd@nbd.name>
 X-Mailer: git-send-email 2.44.0
+In-Reply-To: <20240425150432.44142-1-nbd@nbd.name>
+References: <20240425150432.44142-1-nbd@nbd.name>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,49 +69,103 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When forwarding TCP after GRO, software segmentation is very expensive,
-especially when the checksum needs to be recalculated.
-One case where that's currently unavoidable is when routing packets over
-PPPoE. Performance improves significantly when using fraglist GRO
-implemented in the same way as for UDP.
+This helper function will be used for TCP fraglist GRO support
 
-When NETIF_F_GRO_FRAGLIST is enabled, perform a lookup for an established
-socket in the same netns as the receiving device. While this may not
-cover all relevant use cases in multi-netns configurations, it should be
-good enough for most configurations that need this.
+Signed-off-by: Felix Fietkau <nbd@nbd.name>
+---
+ include/net/gro.h      |  1 +
+ net/core/gro.c         | 27 +++++++++++++++++++++++++++
+ net/ipv4/udp_offload.c | 27 ---------------------------
+ 3 files changed, 28 insertions(+), 27 deletions(-)
 
-Here's a measurement of running 2 TCP streams through a MediaTek MT7622
-device (2-core Cortex-A53), which runs NAT with flow offload enabled from
-one ethernet port to PPPoE on another ethernet port + cake qdisc set to
-1Gbps.
-
-rx-gro-list off: 630 Mbit/s, CPU 35% idle
-rx-gro-list on:  770 Mbit/s, CPU 40% idle
-
-Changes since v1:
- - revert bogus tcp flags overwrite on segmentation
- - fix kbuild issue with !CONFIG_IPV6
- - only perform socket lookup for the first skb in the GRO train
-
-Changes since RFC:
- - split up patches
- - handle TCP flags mutations
-
-Felix Fietkau (5):
-  net: move skb_gro_receive_list from udp to core
-  net: add support for segmenting TCP fraglist GSO packets
-  net: add code for TCP fraglist GRO
-  net: create tcp_gro_lookup helper function
-  net: add heuristic for enabling TCP fraglist GRO
-
- include/net/gro.h        |   1 +
- include/net/tcp.h        |   1 +
- net/core/gro.c           |  27 ++++++
- net/ipv4/tcp_offload.c   | 180 +++++++++++++++++++++++++++++++++++----
- net/ipv4/udp_offload.c   |  27 ------
- net/ipv6/tcpv6_offload.c |  63 ++++++++++++++
- 6 files changed, 256 insertions(+), 43 deletions(-)
-
+diff --git a/include/net/gro.h b/include/net/gro.h
+index 50f1e403dbbb..ca8e4b3de044 100644
+--- a/include/net/gro.h
++++ b/include/net/gro.h
+@@ -429,6 +429,7 @@ static inline __wsum ip6_gro_compute_pseudo(const struct sk_buff *skb,
+ }
+ 
+ int skb_gro_receive(struct sk_buff *p, struct sk_buff *skb);
++int skb_gro_receive_list(struct sk_buff *p, struct sk_buff *skb);
+ 
+ /* Pass the currently batched GRO_NORMAL SKBs up to the stack. */
+ static inline void gro_normal_list(struct napi_struct *napi)
+diff --git a/net/core/gro.c b/net/core/gro.c
+index 2459ab697f7f..268c6c826d09 100644
+--- a/net/core/gro.c
++++ b/net/core/gro.c
+@@ -231,6 +231,33 @@ int skb_gro_receive(struct sk_buff *p, struct sk_buff *skb)
+ 	return 0;
+ }
+ 
++int skb_gro_receive_list(struct sk_buff *p, struct sk_buff *skb)
++{
++	if (unlikely(p->len + skb->len >= 65536))
++		return -E2BIG;
++
++	if (NAPI_GRO_CB(p)->last == p)
++		skb_shinfo(p)->frag_list = skb;
++	else
++		NAPI_GRO_CB(p)->last->next = skb;
++
++	skb_pull(skb, skb_gro_offset(skb));
++
++	NAPI_GRO_CB(p)->last = skb;
++	NAPI_GRO_CB(p)->count++;
++	p->data_len += skb->len;
++
++	/* sk ownership - if any - completely transferred to the aggregated packet */
++	skb->destructor = NULL;
++	skb->sk = NULL;
++	p->truesize += skb->truesize;
++	p->len += skb->len;
++
++	NAPI_GRO_CB(skb)->same_flow = 1;
++
++	return 0;
++}
++
+ 
+ static void napi_gro_complete(struct napi_struct *napi, struct sk_buff *skb)
+ {
+diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
+index 3498dd1d0694..a3cd546a1aea 100644
+--- a/net/ipv4/udp_offload.c
++++ b/net/ipv4/udp_offload.c
+@@ -433,33 +433,6 @@ static struct sk_buff *udp4_ufo_fragment(struct sk_buff *skb,
+ 	return segs;
+ }
+ 
+-static int skb_gro_receive_list(struct sk_buff *p, struct sk_buff *skb)
+-{
+-	if (unlikely(p->len + skb->len >= 65536))
+-		return -E2BIG;
+-
+-	if (NAPI_GRO_CB(p)->last == p)
+-		skb_shinfo(p)->frag_list = skb;
+-	else
+-		NAPI_GRO_CB(p)->last->next = skb;
+-
+-	skb_pull(skb, skb_gro_offset(skb));
+-
+-	NAPI_GRO_CB(p)->last = skb;
+-	NAPI_GRO_CB(p)->count++;
+-	p->data_len += skb->len;
+-
+-	/* sk ownership - if any - completely transferred to the aggregated packet */
+-	skb->destructor = NULL;
+-	skb->sk = NULL;
+-	p->truesize += skb->truesize;
+-	p->len += skb->len;
+-
+-	NAPI_GRO_CB(skb)->same_flow = 1;
+-
+-	return 0;
+-}
+-
+ 
+ #define UDP_GRO_CNT_MAX 64
+ static struct sk_buff *udp_gro_receive_segment(struct list_head *head,
 -- 
 2.44.0
 
