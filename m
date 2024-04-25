@@ -1,73 +1,105 @@
-Return-Path: <netdev+bounces-91449-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91450-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A5CB8B29A2
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 22:22:43 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2ABA8B29E8
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 22:34:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 57567281E17
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 20:22:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 63F0B1F21460
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 20:34:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7D4D1534FC;
-	Thu, 25 Apr 2024 20:22:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1BD75A0EA;
+	Thu, 25 Apr 2024 20:34:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="F0lsvCv9"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cYg6OFE3"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ua1-f42.google.com (mail-ua1-f42.google.com [209.85.222.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0510215250D;
-	Thu, 25 Apr 2024 20:22:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E6E918EAB
+	for <netdev@vger.kernel.org>; Thu, 25 Apr 2024 20:34:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714076552; cv=none; b=VEKypFUxI8dVM3MgxyAUbykF5p19wgubUCmh+L0C6DxEy9j1nApsIWzXkIHAEWbxMLgivbVle5ZBGQ8W0N74iMLYILhXNXKCtNclpE0EbknKOZduBohPffsV/VCe2tY2LXePcwb3wcdQvFLl9iN40GOf0SyLbF/O3Imt7Siwtzo=
+	t=1714077286; cv=none; b=Q2xLd7kKsgMX9BCl321sxxFttiQI9fH8MPDcDrZyJwpebM/wEFL7+IA8Z4+/xD8eu2DZUVbuJ47kvonV/AQAbHisL//gch/cm6CKlFDd+IiEYs4fnA8UWGoCj83S+km1sivH2NjmwoC2m6beRxSpUTS5qig5IgbhzbmfkWOffxE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714076552; c=relaxed/simple;
-	bh=iY/YqeSYhU/HR4W6nMkGqDZLbFNVXXqdil/ssUvHapI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ddcKN/TUlZ4z3wH0tuR9LXUVoOO6ka2fjzm3Mp6RnUjGxmzwqW8XYxWBuoJTif9sFIhPH38qAADxLpxl1qbmu+TU5gtqQkrPOGTKsdBsvaLEEsL/BZLliPbHipwCd5Gp4jMluexfl+bi9kAhkTA6VW579bi9/9SmFF5BKtCBz80=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=F0lsvCv9; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=1S9WPFSJU4dUJ5lqX6EbRE0n7VBs3SkuGiMw5pUdzL0=; b=F0lsvCv9eGsS9rejykVhEDbh/k
-	qLvWU5esmLEFG6hKJnqKI4gycP5a1Ww7RGu38zDb4EACxLcg26HUVGPgLYn0uKFxAWHiaWjcLrwq4
-	4QxEYCDEYL3dEySc1+TIYpT86IhOY5rYYROmBA7N2iYVxp6YJZh6J1H9rjg8fhMf/wIo=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1s05bw-00E1Eh-N6; Thu, 25 Apr 2024 22:22:28 +0200
-Date: Thu, 25 Apr 2024 22:22:28 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, netdev-driver-reviewers@vger.kernel.org
-Subject: Re: [ANN] Differentiating "Supported" and "Maintained" drivers on
- something other than $$$
-Message-ID: <0673a490-cebc-4b24-b231-95ecd15b5a41@lunn.ch>
-References: <20240425114200.3effe773@kernel.org>
+	s=arc-20240116; t=1714077286; c=relaxed/simple;
+	bh=V/6DRcfVBeYI/EV9EeadqQiL8ogpcOEiqAoK1MwLNCo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=If6r3xEWZaqntScbHjxIY8nroieLgjZpvPcB85pM+gQSD1h7cpYm2Yig/aifpg95piiyblw1cMenOF4hOFHPM9Dufk4lBIbdl0EbLfKdiN3wD8m6RpDHmWWD9uqEPuBknn/Jy6iZgrQ8erT9useg3UAN/DZyoW5nitVNuHcF70k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cYg6OFE3; arc=none smtp.client-ip=209.85.222.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ua1-f42.google.com with SMTP id a1e0cc1a2514c-7ef180ad3b5so492678241.1
+        for <netdev@vger.kernel.org>; Thu, 25 Apr 2024 13:34:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1714077284; x=1714682084; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=V/6DRcfVBeYI/EV9EeadqQiL8ogpcOEiqAoK1MwLNCo=;
+        b=cYg6OFE3C3Cd/Tqspqyuyako6Vye5UZM0c34M70TP1dIK0RR5nn5AQlF3SkQlVWkOW
+         VtcGCFXNRWrXQc0w7Bmi21UJr02iIBBTU+vGeW7aBYkheVyiM7gLRbpEvVkdRfCoPAxW
+         eH5HnM3pGJbdIO+ZxR8ordCz2LUa43haCstDgJbm57intrV0KxCDQN+Eyo7lK2kHqL7O
+         u2KAW2bnhaVEO4DBt7wtgT4PsVzMNCs/5XIHWtiouyIlsv3aBPNrHaIpAXyAEkr/2Nxw
+         I6okbYko1RQwg7wEKlwOdac1UYG/ZYvHMv/sjQtlNERbZH3uA/8/7djpuQeg3nPqVy6T
+         S3nQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714077284; x=1714682084;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=V/6DRcfVBeYI/EV9EeadqQiL8ogpcOEiqAoK1MwLNCo=;
+        b=uj0oOT6OxlJ7OttUZIzV9GWKzB1zuZZ4IUTf8pfDOiur6kJ5KXl4Y6Wzb4wJ8ktmp6
+         snw1rr3q7CUmAOH5M+BGNtl1eI7phv33vmS5vHrb4OM0Gby4dULjowR4bq8nZhljzuRF
+         152tc7m4WWGYd5RexMqdpEh6cOelqusjcPkYuPXXVW/EdVqyWncKRNUkSxsij3F4hCPP
+         28BJuchREse39AE3dGHzik+W2NXktkzFaW8pQo7PeV4jHd9bN87nVIq9kUNDckGX0plt
+         XraLtTXvzP9WqgTB3Iu6dfeYTo42ViFYG3jzIQeE7wh+6LFzZEfy6X4fx7ybNi4/SIhg
+         09bQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVeDqLzSLSxpSFkX8qSbz9cf6bi3AoL62V7UxhG/HaWmKpPNeKcUB8sYt3S18E/5RpWW33SXvryd/c+T42oIswGBHDbr6UA
+X-Gm-Message-State: AOJu0YzkinZnbwjjKHcII9aEq8g9TsRC6XaqurM7XtUFQFdOclxBMZnG
+	rJgnbvcjBW5mhh/ccGJQ/HycpASPFEjiuVRgHpAH+VKJD5RU52ICQtNHfPzNj1PutGa4C42gI1f
+	e210BR230FZ4jMw1tg00AC3W6axsohbDx6Flk
+X-Google-Smtp-Source: AGHT+IHdUtFAbWwPDRr3GNYBdVZyNScxO1JKcp9RaUdWwHW4UjaN0ujk54ehAeO34V7fwRw976ta1xGZlNpGPo6qyHo=
+X-Received: by 2002:a05:6102:316b:b0:47b:dc17:104b with SMTP id
+ l11-20020a056102316b00b0047bdc17104bmr691179vsm.2.1714077282730; Thu, 25 Apr
+ 2024 13:34:42 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240425114200.3effe773@kernel.org>
+References: <20240425193450.411640-1-edumazet@google.com>
+In-Reply-To: <20240425193450.411640-1-edumazet@google.com>
+From: Neal Cardwell <ncardwell@google.com>
+Date: Thu, 25 Apr 2024 16:34:22 -0400
+Message-ID: <CADVnQymDnLd-S8zMKOF-ZGzaAHRu3yMkP+C34EaLdY_L79qQCg@mail.gmail.com>
+Subject: Re: [PATCH net-next] tcp: fix tcp_grow_skb() vs tstamps
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> The new guidance will take effect starting with Linux v6.12. This means
-> that any new driver merged for v6.12 (i.e. merged into net-next during
-> v6.11 release cycle) will need to come with running CI to be considered
-> Supported. During the v6.12 merge window all Ethernet drivers under
-> Supported status without CI will be updated to the Maintained status.
+On Thu, Apr 25, 2024 at 3:34=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> I forgot to call tcp_skb_collapse_tstamp() in the
+> case we consume the second skb in write queue.
+>
+> Neal suggested to create a common helper used by tcp_mtu_probe()
+> and tcp_grow_skb().
+>
+> Fixes: 8ee602c63520 ("tcp: try to send bigger TSO packets")
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Cc: Neal Cardwell <ncardwell@google.com>
+> ---
 
-Do we have any drivers which today fulfil the Supported requirements?
-Any which are close?
+Acked-by: Neal Cardwell <ncardwell@google.com>
 
-    Andrew
+Great. Thanks, Eric!
+
+neal
 
