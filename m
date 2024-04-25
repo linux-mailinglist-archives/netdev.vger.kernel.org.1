@@ -1,106 +1,93 @@
-Return-Path: <netdev+bounces-91342-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91343-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E5318B2471
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 16:57:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76B2C8B2480
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 17:03:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1A520281877
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 14:57:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A81781C20B43
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 15:03:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 214EB14A4D7;
-	Thu, 25 Apr 2024 14:57:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18FF014A09B;
+	Thu, 25 Apr 2024 15:03:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="dTuTsP+I"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="wKYBk/3S"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF05C1494BC;
-	Thu, 25 Apr 2024 14:57:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E3641EB36;
+	Thu, 25 Apr 2024 15:02:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714057036; cv=none; b=el0mm4IMxyACvVO1e14QaDCP90x91E1hWVGHZ3od08g2zi0j2xFEFQX9A1lgiUWr6mEwYiRvQtcUSQx4CEUP0mbrc8x6xktPk6GTsMvqMZW4S+MzN7YJX/kB9RZQibg51pjQ8rzBXt3vl0K+lRAC902AfevU1zNFxHPsMvrO7B4=
+	t=1714057380; cv=none; b=OkM/MjtVT6RScCIsqpxuf/hu0nc6nRhwbSOY6f6IiwHAKEXkwuWl+Zm5VAsDDnEY4KMk+836IFMaFj3vgcZJrgAQ9UwcFNejCuQ4l+9sjXHmSRe/HH0E5k+sCOJnCCkiRUKThj9mpf3HASSU6nDL84zJkQNfT4yLJaG70ZNwVM4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714057036; c=relaxed/simple;
-	bh=C+itTDL3A8PImRFwW+2p6GQPM8DKabS7q7T2fAZamHM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=i/doet/D29p/5iGs60yYNX4g2k/gNJLqmX004Z+ZqAahNN2e9Jrb5UwANUIWB4fL7Fmh2sXHq4eVoHw6TwbZTZOdXJllgNhFhWob8eD4i19/tKh2lQrjldNRaWfLHy9R07324O71k8ddiy3S5pGN4BZtUt+oumXcVni5mtAQ/G8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=dTuTsP+I; arc=none smtp.client-ip=217.70.183.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id C1A4DC000E;
-	Thu, 25 Apr 2024 14:57:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1714057031;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mLXxiz1Ky5nDojL/VVZQzWe2VuDpGkCwUW5hLfQwjTQ=;
-	b=dTuTsP+IJ5VW2lbM1ddRFj2We5xV5pmpubZYOL40eP5CzdUdw4HK5hI/TwjkkNGitqI+V7
-	EHOb4rX02VdKbmDDCzSRX1vu9J/lThB2MJ6N70EWe7YgWaaAEv405hgbnVa6wwCnwuxiTt
-	GvhRuv8tcGdo0UgWKU2YH9VbpOWAhRQnTW6ENgMphNngVpxIaGXKVZgw7evXyYNY1WYuiV
-	h6OPRKqksC7aSKUsrcHlDBh9GI0+dPtOt3txV1HaeyAdNf4XIdzNwrF+rcrOmx6fgRq3X0
-	P78gjr4+e+1X5wHYQaicz7vR4RECbCk06gHgHwtKf5oCSo0YhJHRp8wFj1+0SQ==
-Date: Thu, 25 Apr 2024 16:57:08 +0200
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Jiri Pirko <jiri@resnulli.us>, Oleksij Rempel <o.rempel@pengutronix.de>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn
- <andrew@lunn.ch>, Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Kyle Swenson
- <kyle.swenson@est.tech>, kernel test robot <lkp@intel.com>
-Subject: Re: [PATCH net-next v3 0/3] net: pse-pd: Fixes for few small issues
-Message-ID: <20240425165708.62637485@kmaincent-XPS-13-7390>
-In-Reply-To: <20240425074205.28677540@kernel.org>
-References: <20240423-fix_poe-v3-0-e50f32f5fa59@bootlin.com>
-	<ZiebQLdu9dOh1v-T@nanopsycho>
-	<20240425103110.33c02857@kmaincent-XPS-13-7390>
-	<20240425070619.601d5e40@kernel.org>
-	<20240425163002.5894c5e5@kmaincent-XPS-13-7390>
-	<20240425074205.28677540@kernel.org>
-Organization: bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1714057380; c=relaxed/simple;
+	bh=QHS1yGQZXUoSnRDuHcZwrOIfl3A8NHeslgjGYpY0ZTE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NIVIS0iMnmb/SMbbGB5CSW7pDqfv5wm/4pn8nl6I0Xd9GQFO1EMiRTltYLuC9HJj8APBnqatrrQQIdTA85MqGk7uancJuq3n+pnp/VIe+ZGKPeJ1FOORSTvnN9z1DgMa4cP82YznFlic5FOW0vhUIpSeN6t4e82ZvoPjqZk2Yiw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=wKYBk/3S; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=zDQWAKJALiVi/PMdJAFbHeiKbsvm/Zf8NbphStNYkGk=; b=wKYBk/3SIgC7174xUmP7jgz6pG
+	SmIw+57xyaLuR9+EhORyNkkxjBTpPWI5d/zpBmXmeWBrVGoxC7TLk1jl/8V1U9lgvqUFAqQeFmM7R
+	8ucZZSc2Ft9nQNJzjvEpDSIG2KNmsyzzD0ya84rgkBiUKPqLhd7euPMtnf54PQEIzJ+4=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1s00ce-00DzkG-JG; Thu, 25 Apr 2024 17:02:52 +0200
+Date: Thu, 25 Apr 2024 17:02:52 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Kamil =?iso-8859-1?B?SG9y4Wss?= 2N <kamilh@axis.com>
+Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
+	bcm-kernel-feedback-list@broadcom.com, hkallweit1@gmail.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: phy: bcm54811: add support for BroadR-Reach mode
+Message-ID: <feaa5d8f-f110-4ad2-be0e-94ddad9da719@lunn.ch>
+References: <20240416123811.1880177-1-kamilh@axis.com>
+ <3aaf1b82-247e-447d-a39c-c209105c2d7c@lunn.ch>
+ <1b985a54-8c47-4f62-8971-e2a4d7976c03@broadcom.com>
+ <4ddfdeba-cc85-47af-9762-b30143c4e606@axis.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: kory.maincent@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4ddfdeba-cc85-47af-9762-b30143c4e606@axis.com>
 
-On Thu, 25 Apr 2024 07:42:05 -0700
-Jakub Kicinski <kuba@kernel.org> wrote:
+> 1BR100 is really same as 100BASE-T1, in fact, the Broadcom's BroadR-Reach
+> 1BR100 became 100BASE-T1 standard (IEEE 802.3bw). However, there is also
+> 1BR10 to be implemented, which is neither 10BASE-T1S nor 10BASE-T1L.
+> Thus, there would be 100BASE-T1 and the remaining BRR modes (1BR10, 2BR10,
+> 2BR100, 4BR100), let alone the fact that it is questionable whether anyone
+> would need the modes with more than one wire pair.
+> So yes, for 100 MBit alone sure it would be better to make it 100BASE-T1 and
+> it should be interoperable with another device using same link mode on
+> non-Broadcom PHY.
+> Note that the BRR modes are always full duplex
+> 
+> Shall we change the 1BR100 to 100BASE-T1 and leave the rest?
+> 
+> Option 1: 1BR10, 2BR10, 1BR100, 2BR100, 4BR100 (= leave as-is)
+> 
+> Option 2: 100BaseT1_Full, 1BR10, 2BR10, 2BR100, 4BR100
+> 
+> Option 3: 100BaseT1_Full, 1BR10 (= leave out the modes that are practically
+> unusable)
+> 
+> In our application, 2-wire 10 and 100 MBit is used, the rest could be for
+> someone else or just to map all PHY capabilities.
 
-> On Thu, 25 Apr 2024 16:30:02 +0200 Kory Maincent wrote:
-> > > Could you experiment with tweaking the posting?
-> > > Maybe we can "bisect" the problem.   =20
-> >=20
-> > Do you want me to like post a v5 with the "pw-bot: cr" tag? But if I pu=
-t the
-> > tag only on the cover letter it won't work then.
-> > Maybe on all patches? =20
->=20
-> Probably not worth posting for a test. I'll try to be more careful when
-> applying in the future, we can experiment with real postings.
->=20
-> > Was it the same for the PoE support patch series? =20
->=20
-> Yeah, I had to apply that one manually.
+I would suggest you implement what you actually need. So option 3.
 
-Does this patch series is on the same state?
-https://lore.kernel.org/netdev/20240422-feature_ptp_netnext-v11-0-f14441f2a=
-1d8@bootlin.com/
-
-Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+	Andrew
 
