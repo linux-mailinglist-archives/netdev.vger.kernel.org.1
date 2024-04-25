@@ -1,541 +1,190 @@
-Return-Path: <netdev+bounces-91385-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91386-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42D5D8B266E
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 18:28:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54D5F8B2670
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 18:29:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ED72E2830D5
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 16:28:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0D242283A83
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 16:29:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69E7014D702;
-	Thu, 25 Apr 2024 16:28:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2DB414C586;
+	Thu, 25 Apr 2024 16:29:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="F864XmTD"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="GipJC5dF";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="1bC27S4l";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="GipJC5dF";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="1bC27S4l"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B4FB14D6E5
-	for <netdev@vger.kernel.org>; Thu, 25 Apr 2024 16:28:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1204D14C5A0;
+	Thu, 25 Apr 2024 16:29:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714062521; cv=none; b=NwOyXYIVfzEN1OoKw2VCiS3rVGBAbhEl85dXQZlOT5FQDZo4vgqKfSVJNVOvpOyrYEnw5nj639Qk1ucj/E6advUnRX8//0h3yOVRB/dwGnHJPgl1BJweWwofyHRIzW0ZkgPmWRM+/MDuaKoljFL3sXD2R86orh62r0jefUjHHcM=
+	t=1714062542; cv=none; b=gmlrirzaM+zaADEn9SZc4KmRJthEdTNPfDhgobYCBOVm3AOxu8e/8YVUSGJy8i1wzqqm/XubVQN9vhomqLpMWBQs+FrnIPcxx2KFNd6JgiO0H2H5IfnZzeAQKNphu9b4xWYXTZvZJUF4k/PbuZWZbjzUOFtiyzcZ/e0c0arRXho=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714062521; c=relaxed/simple;
-	bh=xNVuTXfRe95mmvBNaXGcSI/q8rzcTQhzGi3f0ril67w=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TR9+ycM1FAkhHDAiXbEwGfblovQ59kkl2/se3n0GvC0Vpp0qZURK7OAuz2k6Z1R2bqjHhq2J3fHtGNd2lfIioVdZYxOhOGStEC4BPGed4ZuQ1VYSLWEXrBWRNDzRxgP441/+WGnDAhjQsNAoi6fdgjPkjQa0xZcouVdMr0MlJQ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=F864XmTD; arc=none smtp.client-ip=91.218.175.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <8a8d7802-2429-478e-9835-0b56fde99393@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1714062516;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=HVX5QcYirRZnTTLovwgDoHTczsifh0DnWTlM5VEDtjc=;
-	b=F864XmTDybPoV/XzfTC8eGM+viaA+HlpO8295nABKqXHswLHFzqFG+ASWyEAKUpHa3e5Fl
-	q2nMwEeLbEjo9FhJFinkaxQ+uL2v2rB7xm8g7McjeE8dIXWSQcByAPolJtgHZarnzfIyD8
-	eBrcZREEqmdFQfl59eO6nxQ9es9lS2s=
-Date: Thu, 25 Apr 2024 09:28:24 -0700
+	s=arc-20240116; t=1714062542; c=relaxed/simple;
+	bh=ECPlObhEBIG/F5eZ/EaI4YFlNQTrHLMup8aVRDilkgY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=d49e+QhxunVeYDQU7raXlkfRUzyz+smP81F2iSwTTUMWmxj7s8tj44Dvv4sQrvhysLy9D2a+kSWDK69DLkRBgLegyPZFSMQcNZj5rAB20+/8dXwuMpj0uFuab0hiVOJxCyWsEoqBEyNFlPpffxZTuMRh61sLDUZ7nXqYU0LzL7U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=GipJC5dF; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=1bC27S4l; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=GipJC5dF; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=1bC27S4l; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 0581933F8B;
+	Thu, 25 Apr 2024 16:28:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1714062539; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=7Z5RtrRxhlie0zgpubMe5xW7HzPYgkOoPsvYnVoi4kI=;
+	b=GipJC5dF1e73XLJ5Ss3vVhAuShUgDXWB9QAiuOYbFDsUJE770aoT3mKsXpeGMfsZqUz3Zo
+	7LK1LxZC23cmrrIhJR9jBVso7BJrX337exTHoACpwZOxgjvwlDGr8u+bJE3jddcLexMObo
+	gC6dUXdh5XklleTMnv+ACUusCV78tMA=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1714062539;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=7Z5RtrRxhlie0zgpubMe5xW7HzPYgkOoPsvYnVoi4kI=;
+	b=1bC27S4lPEbJn/faNDewmEceDGG8CUT+FGBpMnnVQROR9K0fUvEMz+dHXLNN7CestZo+mb
+	6xmL5FSoanoQkWCQ==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1714062539; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=7Z5RtrRxhlie0zgpubMe5xW7HzPYgkOoPsvYnVoi4kI=;
+	b=GipJC5dF1e73XLJ5Ss3vVhAuShUgDXWB9QAiuOYbFDsUJE770aoT3mKsXpeGMfsZqUz3Zo
+	7LK1LxZC23cmrrIhJR9jBVso7BJrX337exTHoACpwZOxgjvwlDGr8u+bJE3jddcLexMObo
+	gC6dUXdh5XklleTMnv+ACUusCV78tMA=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1714062539;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=7Z5RtrRxhlie0zgpubMe5xW7HzPYgkOoPsvYnVoi4kI=;
+	b=1bC27S4lPEbJn/faNDewmEceDGG8CUT+FGBpMnnVQROR9K0fUvEMz+dHXLNN7CestZo+mb
+	6xmL5FSoanoQkWCQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id EC36D13991;
+	Thu, 25 Apr 2024 16:28:58 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id 78AeOcqEKmawIwAAD6G6ig
+	(envelope-from <iluceno@suse.de>); Thu, 25 Apr 2024 16:28:58 +0000
+From: Ismael Luceno <iluceno@suse.de>
+To: linux-kernel@vger.kernel.org
+Cc: Ismael Luceno <iluceno@suse.de>,
+	Firo Yang <firo.yang@suse.com>,
+	Andreas Taschner <andreas.taschner@suse.com>,
+	=?UTF-8?q?Michal=20Kube=C4=8Dek?= <mkubecek@suse.com>,
+	Simon Horman <horms@verge.net.au>,
+	Julian Anastasov <ja@ssi.bg>,
+	lvs-devel@vger.kernel.org,
+	netfilter-devel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	coreteam@netfilter.org
+Subject: [PATCH v3] ipvs: Fix checksumming on GSO of SCTP packets
+Date: Thu, 25 Apr 2024 18:28:40 +0200
+Message-ID: <20240425162842.23900-1-iluceno@suse.de>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next v3 07/11] bpf: Fix a false rejection caused by
- AND operation
-Content-Language: en-GB
-To: Xu Kuohai <xukuohai@huaweicloud.com>, Eduard Zingerman
- <eddyz87@gmail.com>, bpf@vger.kernel.org, netdev@vger.kernel.org,
- linux-security-module@vger.kernel.org, linux-kselftest@vger.kernel.org
-Cc: Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Matt Bobrowski <mattbobrowski@google.com>,
- Brendan Jackman <jackmanb@chromium.org>, Paul Moore <paul@paul-moore.com>,
- James Morris <jmorris@namei.org>, "Serge E . Hallyn" <serge@hallyn.com>,
- Khadija Kamran <kamrankhadijadj@gmail.com>,
- Casey Schaufler <casey@schaufler-ca.com>,
- Ondrej Mosnacek <omosnace@redhat.com>, Kees Cook <keescook@chromium.org>,
- John Johansen <john.johansen@canonical.com>,
- Lukas Bulwahn <lukas.bulwahn@gmail.com>,
- Roberto Sassu <roberto.sassu@huawei.com>,
- Shung-Hsi Yu <shung-hsi.yu@suse.com>
-References: <20240411122752.2873562-1-xukuohai@huaweicloud.com>
- <20240411122752.2873562-8-xukuohai@huaweicloud.com>
- <e62e2971301ca7f2e9eb74fc500c520285cad8f5.camel@gmail.com>
- <f80991aa-3a49-451a-9a82-ac57982dcb28@huaweicloud.com>
- <bdc84c6c-7415-4b84-a883-1988cb5f77d1@linux.dev>
- <576c7c44-d1b4-42c8-8b6e-2e6b93d7547a@huaweicloud.com>
- <3ed8b579-8342-4d74-9050-b0bf6afe5ab3@linux.dev>
- <2ef84dfa-44a9-4d4c-b3b2-9d0b2a2e0d8e@huaweicloud.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yonghong Song <yonghong.song@linux.dev>
-In-Reply-To: <2ef84dfa-44a9-4d4c-b3b2-9d0b2a2e0d8e@huaweicloud.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+X-Spam-Flag: NO
+X-Spam-Score: -0.30
+X-Spam-Level: 
+X-Spamd-Result: default: False [-0.30 / 50.00];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_CONTAINS_FROM(1.00)[];
+	NEURAL_HAM_SHORT(-0.20)[-0.998];
+	MIME_GOOD(-0.10)[text/plain];
+	BAYES_HAM(-0.00)[23.28%];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ARC_NA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_TLS_ALL(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	TO_DN_SOME(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,suse.com:email,imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns]
 
+It was observed in the wild that pairs of consecutive packets would leave
+the IPVS with the same wrong checksum, and the issue only went away when
+disabling GSO.
 
-On 4/24/24 7:42 PM, Xu Kuohai wrote:
-> On 4/25/2024 6:06 AM, Yonghong Song wrote:
->>
->> On 4/23/24 7:25 PM, Xu Kuohai wrote:
->>> On 4/24/2024 5:55 AM, Yonghong Song wrote:
->>>>
->>>> On 4/20/24 1:33 AM, Xu Kuohai wrote:
->>>>> On 4/20/2024 7:00 AM, Eduard Zingerman wrote:
->>>>>> On Thu, 2024-04-11 at 20:27 +0800, Xu Kuohai wrote:
->>>>>>> From: Xu Kuohai <xukuohai@huawei.com>
->>>>>>>
->>>>>>> With lsm return value check, the no-alu32 version 
->>>>>>> test_libbpf_get_fd_by_id_opts
->>>>>>> is rejected by the verifier, and the log says:
->>>>>>>
->>>>>>>    0: R1=ctx() R10=fp0
->>>>>>>    ; int BPF_PROG(check_access, struct bpf_map *map, fmode_t 
->>>>>>> fmode) @ test_libbpf_get_fd_by_id_opts.c:27
->>>>>>>    0: (b7) r0 = 0                        ; R0_w=0
->>>>>>>    1: (79) r2 = *(u64 *)(r1 +0)
->>>>>>>    func 'bpf_lsm_bpf_map' arg0 has btf_id 916 type STRUCT 'bpf_map'
->>>>>>>    2: R1=ctx() R2_w=trusted_ptr_bpf_map()
->>>>>>>    ; if (map != (struct bpf_map *)&data_input) @ 
->>>>>>> test_libbpf_get_fd_by_id_opts.c:29
->>>>>>>    2: (18) r3 = 0xffff9742c0951a00       ; 
->>>>>>> R3_w=map_ptr(map=data_input,ks=4,vs=4)
->>>>>>>    4: (5d) if r2 != r3 goto pc+4         ; 
->>>>>>> R2_w=trusted_ptr_bpf_map() R3_w=map_ptr(map=data_input,ks=4,vs=4)
->>>>>>>    ; int BPF_PROG(check_access, struct bpf_map *map, fmode_t 
->>>>>>> fmode) @ test_libbpf_get_fd_by_id_opts.c:27
->>>>>>>    5: (79) r0 = *(u64 *)(r1 +8)          ; R0_w=scalar() R1=ctx()
->>>>>>>    ; if (fmode & FMODE_WRITE) @ test_libbpf_get_fd_by_id_opts.c:32
->>>>>>>    6: (67) r0 <<= 62                     ; 
->>>>>>> R0_w=scalar(smax=0x4000000000000000,umax=0xc000000000000000,smin32=0,smax32=umax32=0,var_off=(0x0; 
->>>>>>> 0xc000000000000000))
->>>>>>>    7: (c7) r0 s>>= 63                    ; 
->>>>>>> R0_w=scalar(smin=smin32=-1,smax=smax32=0)
->>>>>>>    ;  @ test_libbpf_get_fd_by_id_opts.c:0
->>>>>>>    8: (57) r0 &= -13                     ; 
->>>>>>> R0_w=scalar(smax=0x7ffffffffffffff3,umax=0xfffffffffffffff3,smax32=0x7ffffff3,umax32=0xfffffff3,var_off=(0x0; 
->>>>>>> 0xfffffffffffffff3))
->>>>>>>    ; int BPF_PROG(check_access, struct bpf_map *map, fmode_t 
->>>>>>> fmode) @ test_libbpf_get_fd_by_id_opts.c:27
->>>>>>>    9: (95) exit
->>>>>>>
->>>>>>> And here is the C code of the prog.
->>>>>>>
->>>>>>> SEC("lsm/bpf_map")
->>>>>>> int BPF_PROG(check_access, struct bpf_map *map, fmode_t fmode)
->>>>>>> {
->>>>>>>     if (map != (struct bpf_map *)&data_input)
->>>>>>>         return 0;
->>>>>>>
->>>>>>>     if (fmode & FMODE_WRITE)
->>>>>>>         return -EACCES;
->>>>>>>
->>>>>>>     return 0;
->>>>>>> }
->>>>>>>
->>>>>>> It is clear that the prog can only return either 0 or -EACCESS, 
->>>>>>> and both
->>>>>>> values are legal.
->>>>>>>
->>>>>>> So why is it rejected by the verifier?
->>>>>>>
->>>>>>> The verifier log shows that the second if and return value setting
->>>>>>> statements in the prog is optimized to bitwise operations "r0 
->>>>>>> s>>= 63"
->>>>>>> and "r0 &= -13". The verifier correctly deduces that the the 
->>>>>>> value of
->>>>>>> r0 is in the range [-1, 0] after verifing instruction "r0 s>>= 63".
->>>>>>> But when the verifier proceeds to verify instruction "r0 &= 
->>>>>>> -13", it
->>>>>>> fails to deduce the correct value range of r0.
->>>>>>>
->>>>>>> 7: (c7) r0 s>>= 63                    ; 
->>>>>>> R0_w=scalar(smin=smin32=-1,smax=smax32=0)
->>>>>>> 8: (57) r0 &= -13                     ; 
->>>>>>> R0_w=scalar(smax=0x7ffffffffffffff3,umax=0xfffffffffffffff3,smax32=0x7ffffff3,umax32=0xfffffff3,var_off=(0x0; 
->>>>>>> 0xfffffffffffffff3))
->>>>>>>
->>>>>>> So why the verifier fails to deduce the result of 'r0 &= -13'?
->>>>>>>
->>>>>>> The verifier uses tnum to track values, and the two ranges "[-1, 
->>>>>>> 0]" and
->>>>>>> "[0, -1ULL]" are encoded to the same tnum. When verifing 
->>>>>>> instruction
->>>>>>> "r0 &= -13", the verifier erroneously deduces the result from
->>>>>>> "[0, -1ULL] AND -13", which is out of the expected return range
->>>>>>> [-4095, 0].
->>>>>>>
->>>>>>> To fix it, this patch simply adds a special SCALAR32 case for the
->>>>>>> verifier. That is, when the source operand of the AND 
->>>>>>> instruction is
->>>>>>> a constant and the destination operand changes from negative to
->>>>>>> non-negative and falls in range [-256, 256], deduce the result 
->>>>>>> range
->>>>>>> by enumerating all possible AND results.
->>>>>>>
->>>>>>> Signed-off-by: Xu Kuohai <xukuohai@huawei.com>
->>>>>>> ---
->>>>>>
->>>>>> Hello,
->>>>>>
->>>>>> Sorry for the delay, I had to think about this issue a bit.
->>>>>> I found the clang transformation that generates the pattern this 
->>>>>> patch
->>>>>> tries to handle.
->>>>>> It is located in DAGCombiner::SimplifySelectCC() method (see [1]).
->>>>>> The transformation happens as a part of DAG to DAG rewrites
->>>>>> (LLVM uses several internal representations:
->>>>>>   - generic optimizer uses LLVM IR, most of the work is done
->>>>>>     using this representation;
->>>>>>   - before instruction selection IR is converted to Selection DAG,
->>>>>>     some optimizations are applied at this stage,
->>>>>>     all such optimizations are a set of pattern replacements;
->>>>>>   - Selection DAG is converted to machine code, some optimizations
->>>>>>     are applied at the machine code level).
->>>>>>
->>>>>> Full pattern is described as follows:
->>>>>>
->>>>>>    // fold (select_cc seteq (and x, y), 0, 0, A) -> (and (sra 
->>>>>> (shl x)) A)
->>>>>>    // where y is has a single bit set.
->>>>>>    // A plaintext description would be, we can turn the SELECT_CC 
->>>>>> into an AND
->>>>>>    // when the condition can be materialized as an all-ones 
->>>>>> register.  Any
->>>>>>    // single bit-test can be materialized as an all-ones register 
->>>>>> with
->>>>>>    // shift-left and shift-right-arith.
->>>>>>
->>>>>> For this particular test case the DAG is converted as follows:
->>>>>>
->>>>>>                      .---------------- lhs         The meaning of 
->>>>>> this select_cc is:
->>>>>>                      |        .------- rhs         `lhs == rhs ? 
->>>>>> true value : false value`
->>>>>>                      |        | .----- true value
->>>>>>                      |        | |  .-- false value
->>>>>>                      v        v v  v
->>>>>>    (select_cc seteq (and X 2) 0 0 -13)
->>>>>>                            ^
->>>>>> ->                        '---------------.
->>>>>>    (and (sra (sll X 62) 63)                |
->>>>>>         -13)                               |
->>>>>>                                            |
->>>>>> Before pattern is applied, it checks that second 'and' operand has
->>>>>> only one bit set, (which is true for '2').
->>>>>>
->>>>>> The pattern itself generates logical shift left / arithmetic shift
->>>>>> right pair, that ensures that result is either all ones (-1) or all
->>>>>> zeros (0). Hence, applying 'and' to shifts result and false value
->>>>>> generates a correct result.
->>>>>>
->>>>>
->>>>> Thanks for your detailed and invaluable explanation!
->>>>
->>>> Thanks Eduard for detailed explanation. It looks like we could
->>>> resolve this issue without adding too much complexity to verifier.
->>>> Also, this code pattern above seems generic enough to be worthwhile
->>>> with verifier change.
->>>>
->>>> Kuohai, please added detailed explanation (as described by Eduard)
->>>> in the commit message.
->>>>
->>>
->>> Sure, already added, the commit message and the change now is like 
->>> this:
->>>
->>> ---
->>>
->>>     bpf: Fix a false rejection caused by AND operation
->>>
->>>     With lsm return value check, the no-alu32 version 
->>> test_libbpf_get_fd_by_id_opts
->>>     is rejected by the verifier, and the log says:
->>>
->>>     0: R1=ctx() R10=fp0
->>>     ; int BPF_PROG(check_access, struct bpf_map *map, fmode_t fmode) 
->>> @ test_libbpf_get_fd_by_id_opts.c:27
->>>     0: (b7) r0 = 0                        ; R0_w=0
->>>     1: (79) r2 = *(u64 *)(r1 +0)
->>>     func 'bpf_lsm_bpf_map' arg0 has btf_id 916 type STRUCT 'bpf_map'
->>>     2: R1=ctx() R2_w=trusted_ptr_bpf_map()
->>>     ; if (map != (struct bpf_map *)&data_input) @ 
->>> test_libbpf_get_fd_by_id_opts.c:29
->>>     2: (18) r3 = 0xffff9742c0951a00       ; 
->>> R3_w=map_ptr(map=data_input,ks=4,vs=4)
->>>     4: (5d) if r2 != r3 goto pc+4         ; 
->>> R2_w=trusted_ptr_bpf_map() R3_w=map_ptr(map=data_input,ks=4,vs=4)
->>>     ; int BPF_PROG(check_access, struct bpf_map *map, fmode_t fmode) 
->>> @ test_libbpf_get_fd_by_id_opts.c:27
->>>     5: (79) r0 = *(u64 *)(r1 +8)          ; R0_w=scalar() R1=ctx()
->>>     ; if (fmode & FMODE_WRITE) @ test_libbpf_get_fd_by_id_opts.c:32
->>>     6: (67) r0 <<= 62                     ; 
->>> R0_w=scalar(smax=0x4000000000000000,umax=0xc000000000000000,smin32=0,smax32=umax32=0,var_off=(0x0; 
->>> 0xc000000000000000))
->>>     7: (c7) r0 s>>= 63                    ; 
->>> R0_w=scalar(smin=smin32=-1,smax=smax32=0)
->>>     ;  @ test_libbpf_get_fd_by_id_opts.c:0
->>>     8: (57) r0 &= -13                     ; 
->>> R0_w=scalar(smax=0x7ffffffffffffff3,umax=0xfffffffffffffff3,smax32=0x7ffffff3,umax32=0xfffffff3,var_off=(0x0; 
->>> 0xfffffffffffffff3))
->>>     ; int BPF_PROG(check_access, struct bpf_map *map, fmode_t fmode) 
->>> @ test_libbpf_get_fd_by_id_opts.c:27
->>>     9: (95) exit
->>>
->>>     And here is the C code of the prog.
->>>
->>>     SEC("lsm/bpf_map")
->>>     int BPF_PROG(check_access, struct bpf_map *map, fmode_t fmode)
->>>     {
->>>         if (map != (struct bpf_map *)&data_input)
->>>                 return 0;
->>>
->>>         if (fmode & FMODE_WRITE)
->>>                 return -EACCES;
->>>
->>>         return 0;
->>>     }
->>>
->>>     It is clear that the prog can only return either 0 or -EACCESS, 
->>> and both
->>>     values are legal.
->>>
->>>     So why is it rejected by the verifier?
->>>
->>>     The verifier log shows that the second if and return value setting
->>>     statements in the prog is optimized to bitwise operations "r0 
->>> s>>= 63"
->>>     and "r0 &= -13". The verifier correctly deduces that the the 
->>> value of
->>>     r0 is in the range [-1, 0] after verifing instruction "r0 s>>= 63".
->>>     But when the verifier proceeds to verify instruction "r0 &= 
->>> -13", it
->>>     fails to deduce the correct value range of r0.
->>>
->>>     7: (c7) r0 s>>= 63                    ; 
->>> R0_w=scalar(smin=smin32=-1,smax=smax32=0)
->>>     8: (57) r0 &= -13                     ; 
->>> R0_w=scalar(smax=0x7ffffffffffffff3,umax=0xfffffffffffffff3,smax32=0x7ffffff3,umax32=0xfffffff3,var_off=(0x0; 
->>> 0xfffffffffffffff3))
->>>
->>>     So why the verifier fails to deduce the result of 'r0 &= -13'?
->>>
->>>     The verifier uses tnum to track values, and the two ranges "[-1, 
->>> 0]" and
->>>     "[0, -1ULL]" are encoded to the same tnum. When verifing 
->>> instruction
->>>     "r0 &= -13", the verifier erroneously deduces the result from
->>>     "[0, -1ULL] AND -13", which is out of the expected return range
->>>     [-4095, 0].
->>>
->>>     As explained by Eduard in [0], the clang transformation that 
->>> generates this
->>>     pattern is located in DAGCombiner::SimplifySelectCC() method 
->>> (see [1]).
->>>
->>>     The transformation happens as a part of DAG to DAG rewrites
->>>     (LLVM uses several internal representations:
->>>      - generic optimizer uses LLVM IR, most of the work is done
->>>        using this representation;
->>>      - before instruction selection IR is converted to Selection DAG,
->>>        some optimizations are applied at this stage,
->>>        all such optimizations are a set of pattern replacements;
->>>      - Selection DAG is converted to machine code, some optimizations
->>>        are applied at the machine code level).
->>>
->>>     Full pattern is described as follows:
->>>
->>>       // fold (select_cc seteq (and x, y), 0, 0, A) -> (and (sra 
->>> (shl x)) A)
->>>       // where y is has a single bit set.
->>>       // A plaintext description would be, we can turn the SELECT_CC 
->>> into an AND
->>>       // when the condition can be materialized as an all-ones 
->>> register.  Any
->>>       // single bit-test can be materialized as an all-ones register 
->>> with
->>>       // shift-left and shift-right-arith.
->>>
->>>     For this particular test case the DAG is converted as follows:
->>>
->>>                         .---------------- lhs         The meaning of 
->>> this select_cc is:
->>>                         |        .------- rhs         `lhs == rhs ? 
->>> true value : false value`
->>>                         |        | .----- true value
->>>                         |        | |  .-- false value
->>>                         v        v v  v
->>>       (select_cc seteq (and X 2) 0 0 -13)
->>>                               ^
->>>     ->                        '---------------.
->>>       (and (sra (sll X 62) 63)                |
->>>            -13)                               |
->>>                                               |
->>>     Before pattern is applied, it checks that second 'and' operand has
->>>     only one bit set, (which is true for '2').
->>>
->>>     The pattern itself generates logical shift left / arithmetic shift
->>>     right pair, that ensures that result is either all ones (-1) or all
->>>     zeros (0). Hence, applying 'and' to shifts result and false value
->>>     generates a correct result.
->>>
->>>     As suggested by Eduard, this patch makes a special case for source
->>>     or destination register of '&=' operation being in range [-1, 0].
->>>
->>>     Meaning that one of the '&=' operands is either:
->>>     - all ones, in which case the counterpart is the result of the 
->>> operation;
->>>     - all zeros, in which case zero is the result of the operation.
->>>
->>>     And MIN and MAX values could be derived based on above two 
->>> observations.
->>>
->>>     [0] 
->>> https://lore.kernel.org/bpf/e62e2971301ca7f2e9eb74fc500c520285cad8f5.camel@gmail.com/
->>>     [1] 
->>> https://github.com/llvm/llvm-project/blob/4523a267829c807f3fc8fab8e5e9613985a51565/llvm/lib/CodeGen/SelectionDAG/DAGCombiner.cpp
->>>
->>>     Suggested-by: Eduard Zingerman <eddyz87@gmail.com>
->>>     Signed-off-by: Xu Kuohai <xukuohai@huawei.com>
->>>
->>> diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
->>> index 640747b53745..30c551d39329 100644
->>> --- a/kernel/bpf/verifier.c
->>> +++ b/kernel/bpf/verifier.c
->>> @@ -13374,6 +13374,24 @@ static void scalar32_min_max_and(struct 
->>> bpf_reg_state *dst_reg,
->>>         dst_reg->u32_min_value = var32_off.value;
->>>         dst_reg->u32_max_value = min(dst_reg->u32_max_value, umax_val);
->>>
->>> +       /* Special case: src_reg is known and dst_reg is in range 
->>> [-1, 0] */
->>> +       if (src_known &&
->>> +               dst_reg->s32_min_value == -1 && 
->>> dst_reg->s32_max_value == 0 &&
->>> +               dst_reg->smin_value == -1 && dst_reg->smax_value == 
->>> 0) {
->>
->> do we need to check dst_reg->smin_value/smax_value here? They should 
->> not impact
->> final dst_reg->s32_{min,max}_value computation, right?
->
-> right, the check was simply copied from the old code, which only handled
-> the case where 64-bit range is the same as the 32-bit range
+IPVS needs to avoid computing the SCTP checksum when using GSO.
 
-What if we do not have 64bit smin_value/smax_value check? Could you give more
-explanation here? In my opinion, deducing lower 32bit range should not care
-upper 32bit values.
+Fixes: 90017accff61 ("sctp: Add GSO support", 2016-06-02)
+Co-developed-by: Firo Yang <firo.yang@suse.com>
+Signed-off-by: Ismael Luceno <iluceno@suse.de>
+Tested-by: Andreas Taschner <andreas.taschner@suse.com>
+CC: Michal Kubeček <mkubecek@suse.com>
+CC: Simon Horman <horms@verge.net.au>
+CC: Julian Anastasov <ja@ssi.bg>
+CC: lvs-devel@vger.kernel.org
+CC: netfilter-devel@vger.kernel.org
+CC: netdev@vger.kernel.org
+CC: coreteam@netfilter.org
+---
 
->
->> Similarly, for later 64bit min/max and, 32bit value does not really 
->> matter.
->>
->
-> hmm, the 32-bit check is completely unnecessary.
->
->
->>> + dst_reg->s32_min_value = min_t(s32, src_reg->s32_min_value, 0);
->>> +               dst_reg->s32_max_value = max_t(s32, 
->>> src_reg->s32_min_value, 0);
->>> +               return;
->>> +       }
->>> +
->>> +       /* Special case: dst_reg is known and src_reg is in range 
->>> [-1, 0] */
->>> +       if (dst_known &&
->>> +               src_reg->s32_min_value == -1 && 
->>> src_reg->s32_max_value == 0 &&
->>> +               src_reg->smin_value == -1 && src_reg->smax_value == 
->>> 0) {
->>> +               dst_reg->s32_min_value = min_t(s32, 
->>> dst_reg->s32_min_value, 0);
->>> +               dst_reg->s32_max_value = max_t(s32, 
->>> dst_reg->s32_min_value, 0);
->>> +               return;
->>> +       }
->>> +
->>>         /* Safe to set s32 bounds by casting u32 result into s32 
->>> when u32
->>>          * doesn't cross sign boundary. Otherwise set s32 bounds to 
->>> unbounded.
->>>          */
->>> @@ -13404,6 +13422,24 @@ static void scalar_min_max_and(struct 
->>> bpf_reg_state *dst_reg,
->>>         dst_reg->umin_value = dst_reg->var_off.value;
->>>         dst_reg->umax_value = min(dst_reg->umax_value, umax_val);
->>>
->>> +       /* Special case: src_reg is known and dst_reg is in range 
->>> [-1, 0] */
->>> +       if (src_known &&
->>> +               dst_reg->smin_value == -1 && dst_reg->smax_value == 
->>> 0 &&
->>> +               dst_reg->s32_min_value == -1 && 
->>> dst_reg->s32_max_value == 0) {
->>> +               dst_reg->smin_value = min_t(s64, 
->>> src_reg->smin_value, 0);
->>> +               dst_reg->smax_value = max_t(s64, 
->>> src_reg->smin_value, 0);
->>> +               return;
->>> +       }
->>> +
->>> +       /* Special case: dst_reg is known and src_reg is in range 
->>> [-1, 0] */
->>> +       if (dst_known &&
->>> +               src_reg->smin_value == -1 && src_reg->smax_value == 
->>> 0 &&
->>> +               src_reg->s32_min_value == -1 && 
->>> src_reg->s32_max_value == 0) {
->>> +               dst_reg->smin_value = min_t(s64, 
->>> dst_reg->smin_value, 0);
->>> +               dst_reg->smax_value = max_t(s64, 
->>> dst_reg->smin_value, 0);
->>> +               return;
->>> +       }
->>> +
->>>         /* Safe to set s64 bounds by casting u64 result into s64 
->>> when u64
->>>          * doesn't cross sign boundary. Otherwise set s64 bounds to 
->>> unbounded.
->>>          */
->>>
->>>>>
->>>>>> In my opinion the approach taken by this patch is sub-optimal:
->>>>>> - 512 iterations is too much;
->>>>>> - this does not cover all code that could be generated by the above
->>>>>>    mentioned LLVM transformation
->>>>>>    (e.g. second 'and' operand could be 1 << 16).
->>>>>>
->>>>>> Instead, I suggest to make a special case for source or dst register
->>>>>> of '&=' operation being in range [-1,0].
->>>>>> Meaning that one of the '&=' operands is either:
->>>>>> - all ones, in which case the counterpart is the result of the 
->>>>>> operation;
->>>>>> - all zeros, in which case zero is the result of the operation;
->>>>>> - derive MIN and MAX values based on above two observations.
->>>>>>
->>>>>
->>>>> Totally agree, I'll cook a new patch as you suggested.
->>>>>
->>>>>> [1] 
->>>>>> https://github.com/llvm/llvm-project/blob/4523a267829c807f3fc8fab8e5e9613985a51565/llvm/lib/CodeGen/SelectionDAG/DAGCombiner.cpp#L5391
->>>>>>
->>>>>> Best regards,
->>>>>> Eduard
->>>>>
->>>>>
->>>>
->>>
->
+Notes:
+    Changes since v2:
+    * Use only skb_is_gso, no need to check for GSO type
+    
+    Changes since v1:
+    * Added skb_is_gso before skb_is_gso_sctp.
+    * Added "Fixes" tag.
+
+ net/netfilter/ipvs/ip_vs_proto_sctp.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/net/netfilter/ipvs/ip_vs_proto_sctp.c b/net/netfilter/ipvs/ip_vs_proto_sctp.c
+index a0921adc31a9..83e452916403 100644
+--- a/net/netfilter/ipvs/ip_vs_proto_sctp.c
++++ b/net/netfilter/ipvs/ip_vs_proto_sctp.c
+@@ -126,7 +126,8 @@ sctp_snat_handler(struct sk_buff *skb, struct ip_vs_protocol *pp,
+ 	if (sctph->source != cp->vport || payload_csum ||
+ 	    skb->ip_summed == CHECKSUM_PARTIAL) {
+ 		sctph->source = cp->vport;
+-		sctp_nat_csum(skb, sctph, sctphoff);
++		if (!skb_is_gso(skb))
++			sctp_nat_csum(skb, sctph, sctphoff);
+ 	} else {
+ 		skb->ip_summed = CHECKSUM_UNNECESSARY;
+ 	}
+@@ -174,7 +175,8 @@ sctp_dnat_handler(struct sk_buff *skb, struct ip_vs_protocol *pp,
+ 	    (skb->ip_summed == CHECKSUM_PARTIAL &&
+ 	     !(skb_dst(skb)->dev->features & NETIF_F_SCTP_CRC))) {
+ 		sctph->dest = cp->dport;
+-		sctp_nat_csum(skb, sctph, sctphoff);
++		if (!skb_is_gso(skb))
++			sctp_nat_csum(skb, sctph, sctphoff);
+ 	} else if (skb->ip_summed != CHECKSUM_PARTIAL) {
+ 		skb->ip_summed = CHECKSUM_UNNECESSARY;
+ 	}
+-- 
+2.43.0
+
 
