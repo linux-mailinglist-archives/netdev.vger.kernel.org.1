@@ -1,198 +1,303 @@
-Return-Path: <netdev+bounces-91360-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91361-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A7898B2505
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 17:25:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E96B78B250C
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 17:26:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 971A21F22906
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 15:25:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A19BC2894A9
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 15:26:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EE3914AD19;
-	Thu, 25 Apr 2024 15:25:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE53014AD33;
+	Thu, 25 Apr 2024 15:26:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="LMh4SoTK"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Kh7wNSRW"
 X-Original-To: netdev@vger.kernel.org
-Received: from wfout2-smtp.messagingengine.com (wfout2-smtp.messagingengine.com [64.147.123.145])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A4E514AD0D;
-	Thu, 25 Apr 2024 15:25:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=64.147.123.145
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08F7114B082
+	for <netdev@vger.kernel.org>; Thu, 25 Apr 2024 15:26:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714058713; cv=none; b=iRWesEYQC/ZlbK9HnY5Wy893QLr7ae1eIYWbqv1V7yYdT/gIfN03rL2FE4EBNvno2S1vDvJLGGy6sJ9mxu1fuHn/IEbu8skFgScP6ltKPwhaIVX//fWjNoO1prUpP60F7jP9JngXgO2K9FHClWt9AyXiJKkI/9+TPEQoH1cxxjc=
+	t=1714058781; cv=none; b=Z2v3YzZv0ARUlUHI2VaTG/jVbJQYFb7P63Tl8UZzI2ckRF2c0jIiPglqk5rTbv8c5QWFAT6MNQLMooJasU+piVLt+OX3OdQ/CuquvNPcWDZXqURwzMxFD78iEk+c+GHtiQ0+HiMOjvLuEFCXou7BWccmNRoyDd8qqAT7yxT460E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714058713; c=relaxed/simple;
-	bh=D1YZtZoG/iorYX0P4Sd27XTodaOqG0lZGJunJ+yYmEM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PDOxBzrTP7UiunZxQqUE7f9eJG5wq/63YukTHkZkxEdzMGqO9/gGqO0UTm4IwQXZC8MM/+ezx1f+A4vCFsV1mJb/rz10FiGpgQH1NQF2Iwr13Tw7dKMcxtBfx/cffqnZqGpBeDhGp/QvoO+mj7yQpBSEUYDUDig4a4HAmOdqKVo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=LMh4SoTK; arc=none smtp.client-ip=64.147.123.145
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
-Received: from compute7.internal (compute7.nyi.internal [10.202.2.48])
-	by mailfout.west.internal (Postfix) with ESMTP id 7399A1C0007D;
-	Thu, 25 Apr 2024 11:25:09 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute7.internal (MEProxy); Thu, 25 Apr 2024 11:25:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-	fm3; t=1714058708; x=1714145108; bh=X57KbIDS0KjetKwJGCKi+ngre7Ua
-	Muq40Z/WbGCU/SI=; b=LMh4SoTKIn8IuTnRGPlthrieGlUHIuBboCGoivfxAwnX
-	hJthLeCY3qo85efbCPE/PfQEicez/HThLVYte1Rdcwz3pGi0MwigQntgDESeLnI6
-	/YW25M/Gj1yynfFwlypJbg/F7s9ucKf2V7w83k9hm4RdQYuCacHlHqVIRmn91BIR
-	SW6WpgVNFBgv4st8OzvQPa8KbPDqGkiHt1QVHgmJ+DDujat8wIpolybRlQaq/IRK
-	Dqd8TT53jZ1TkwZFv+oPao9wX8QlZAlDZdjw6YCwkfSwQpEhoq5GKsumHQW3FYwW
-	UeyAcSlurrvnu/m6vp4EdnJxKcKA85roG0LENTBYNQ==
-X-ME-Sender: <xms:1HUqZsyZRa2DNABfbHgcgjs-z2W803i-usJGhTjXFSsXvPBj7PRNaQ>
-    <xme:1HUqZgTg1UY7pAP-zjzGCDm8vxnP7bmNemnTisp7sn95YgcgQVOYNDsNBGJpU3jB_
-    67tvHvKoCWBoc8>
-X-ME-Received: <xmr:1HUqZuVRZEOFO3m_xrzKiqn3NjoSlQi0VAutkeIowF1JkmyWaf4H7gk1YYhj>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrudeljedgkeekucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtvdenucfhrhhomhepkfguohcu
-    ufgthhhimhhmvghluceoihguohhstghhsehiughoshgthhdrohhrgheqnecuggftrfgrth
-    htvghrnhepveekteevgeehheeuffeikeeuuddvueehkedvjeefjeeuveejffejveeivdeu
-    tedtnecuffhomhgrihhnpehgihhthhhusgdrtghomhdpkhgvrhhnvghlrdhorhhgnecuve
-    hluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepihguohhstghh
-    sehiughoshgthhdrohhrgh
-X-ME-Proxy: <xmx:1HUqZqgISi10DlSEGqiGPELARNnbMTLw0ZaDwPXuEw740f1yt0BS9g>
-    <xmx:1HUqZuBjcLPVC9n62zedoE3BkA6ItGx82PSRTIkbziKORnTc6W-MMg>
-    <xmx:1HUqZrJi_DNUJLd63QQaqnKvSZSHq6l0Ky-3Z2C65-18zG3pv75YFQ>
-    <xmx:1HUqZlCD16031XrOi_suWl2x8m1J9w3t4KfuuCh1AOOYxg2pnU4oXw>
-    <xmx:1HUqZvKFGOOOOmm4fdon-uNGqc5eN480707kKmmWNLQC36dnpZWfLXpX>
-Feedback-ID: i494840e7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 25 Apr 2024 11:25:07 -0400 (EDT)
-Date: Thu, 25 Apr 2024 18:25:00 +0300
-From: Ido Schimmel <idosch@idosch.org>
-To: Adrian Moreno <amorenoz@redhat.com>
-Cc: netdev@vger.kernel.org, aconole@redhat.com, echaudro@redhat.com,
-	horms@kernel.org, i.maximets@ovn.org,
-	Yotam Gigi <yotam.gi@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 4/8] net: psample: add tracepoint
-Message-ID: <Zip1zKzG5aF1ceom@shredder>
-References: <20240424135109.3524355-1-amorenoz@redhat.com>
- <20240424135109.3524355-5-amorenoz@redhat.com>
- <ZioDvluh7ymBI8qF@shredder>
- <542ed8dd-2d9c-4e4f-81dc-e2a9bdaac3b0@redhat.com>
+	s=arc-20240116; t=1714058781; c=relaxed/simple;
+	bh=cHWyebxt5OQl4mT21gySDT3/gmUfFdKMxDeguLjl4yI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=U4EPlh+YmQh2WYbT3PpR1iGPI0w+iDmx8a29Z3ldEZVovvKfpdiKmBDMw8w7C4Z06QCxWzWPg5EMvI6k0z1CwpV11l4DWQqPKdU9KST+uSVBKh3kHwfP/TkrIx473XZFpGFj6IsG4Z2vtd8UiCS+3XxADckVSq6y4EhDamdOqmI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Kh7wNSRW; arc=none smtp.client-ip=209.85.208.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-5724736770cso5378a12.1
+        for <netdev@vger.kernel.org>; Thu, 25 Apr 2024 08:26:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1714058778; x=1714663578; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qyLMtfVD3hHfrVSsuLjWOoTcQ0JXVPh5F7fHPduNv2k=;
+        b=Kh7wNSRWIia7fITMOS1ZFH82nrbEVH8W//pVJJf1L5lR8ZShDvqphBI1rXV8rz5fwM
+         5+Cc97ENzQgBPEn3mmHCkY4tgMGan28x1aVMhpdMhOkGp1AUt5mlI5HyFK7r80A8Rtr9
+         8MNelVazeMcmYcEgpsMVlin+zrVU5YwvQXXD0s4NkJwTFXP1aqKrLHZ6CfOpqcLsAa6u
+         5MpkzT75pxIQBA1U5ymHhcgQbBv8jxLHEEE5Ao3ak46fvDTkDYvnGp5YwhQ4KR1KMy5R
+         wBU/cPDRsxt4xiLcqJcc746Ie4BClxm6Kam6vwwax8SRBxWiQ4Zxv+x2YkFqymE+Jywi
+         TvOA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714058778; x=1714663578;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=qyLMtfVD3hHfrVSsuLjWOoTcQ0JXVPh5F7fHPduNv2k=;
+        b=lNZ4k4qLNxKVQ2wzfiAT8aTrZSzW8IAMITPzyY1IqijdsXpL8jxdtMcDypRou9B6gc
+         2e8UoJ/RnK0VFMde97o1phL5erOb/vpUMDnc5Y3G54quRtVZnPDkJUPUuM/9/cjIpYQZ
+         vMumCo9NV/i25c5jVH7vBQ3IEsyuLiiwgOzyrIm7jaeP5ARJbSeDzdu8BhkAwPLM2V3I
+         tp9LUBnOuOpvt7O4j4wSXj4jd2cZF6IIPLBPg7IX8RnT13kQpt65g/SQuEDApG71IPel
+         q+NoZMn5pvf80wRSFw9y/4CO/hzCfpIu2xsLPoM8EjlkoUZdgVek4WRWoIw8I10ubvZS
+         1rHw==
+X-Gm-Message-State: AOJu0YwVsDdivUt42RfBW7Zyw7MCzU735Gzj1i6jAbXWzSWkHHVK7hlO
+	0QGSUVm9tAVu6wZDZDgx+SMkhcxeGYDhN3K94uvDySGi9WXJMj5U8d/9OPU8MCAo7fxWF9vac9q
+	E0+UwpfMZz/egjOKXxbT4391m1BT6WwOoAyqC
+X-Google-Smtp-Source: AGHT+IFiTUdvpYl91YDCAcS2bV0dz1FYCL5wneUM7lpb4Q/trYbnMteWBIQObXG8f2Mi7GjKqJNSG9gZrbhzkgSThRY=
+X-Received: by 2002:a05:6402:40cb:b0:572:3b8c:b936 with SMTP id
+ z11-20020a05640240cb00b005723b8cb936mr236550edb.2.1714058778010; Thu, 25 Apr
+ 2024 08:26:18 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <542ed8dd-2d9c-4e4f-81dc-e2a9bdaac3b0@redhat.com>
+References: <20240425150432.44142-1-nbd@nbd.name> <20240425150432.44142-7-nbd@nbd.name>
+In-Reply-To: <20240425150432.44142-7-nbd@nbd.name>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 25 Apr 2024 17:26:04 +0200
+Message-ID: <CANn89iLqpADT6T_JtecgMJKKcTEBORVdVqTYYBRtwWWnk6=4ng@mail.gmail.com>
+Subject: Re: [PATCH v2 net-next v2 5/5] net: add heuristic for enabling TCP
+ fraglist GRO
+To: Felix Fietkau <nbd@nbd.name>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
+	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	willemdebruijn.kernel@gmail.com, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Apr 25, 2024 at 10:06:20AM +0200, Adrian Moreno wrote:
-> 
-> 
-> On 4/25/24 09:18, Ido Schimmel wrote:
-> > On Wed, Apr 24, 2024 at 03:50:51PM +0200, Adrian Moreno wrote:
-> > > Currently there are no widely-available tools to dump the metadata and
-> > > group information when a packet is sampled, making it difficult to
-> > > troubleshoot related issues.
-> > > 
-> > > This makes psample use the event tracing framework to log the sampling
-> > > of a packet so that it's easier to quickly identify the source
-> > > (i.e: group) and context (i.e: metadata) of a packet being sampled.
-> > > 
-> > > This patch creates some checkpatch splats, but the style of the
-> > > tracepoint definition mimics that of other modules so it seems
-> > > acceptable.
-> > 
-> > I don't see a good reason to add this tracepoint (which we won't be able
-> > to remove) when you can easily do that with bpftrace which by now should
-> > be widely available:
-> > 
-> > #!/usr/bin/bpftrace
-> > 
-> > kfunc:psample_sample_packet
-> > {
-> >          $ts_us = nsecs() / 1000;
-> >          $secs = $ts_us / 1000000;
-> >          $us = $ts_us % 1000000;
-> >          $group = args.group;
-> >          $skb = args.skb;
-> >          $md = args.md;
-> > 
-> >          printf("%-16s %-6d %6llu.%6llu group_num = %u refcount=%u seq=%u skbaddr=%p len=%u data_len=%u sample_rate=%u in_ifindex=%d out_ifindex=%d user_cookie=%rx\n",
-> >                 comm, pid, $secs, $us, $group->group_num, $group->refcount, $group->seq,
-> >                 $skb, $skb->len, $skb->data_len, args.sample_rate,
-> >                 $md->in_ifindex, $md->out_ifindex,
-> >                 buf($md->user_cookie, $md->user_cookie_len));
-> > }
-> > 
-> > Example output:
-> > 
-> > mausezahn        984      3299.200626 group_num = 1 refcount=1 seq=13775 skbaddr=0xffffa21143fd4000 len=42 data_len=0 sample_rate=10 in_ifindex=0 out_ifindex=20 user_cookie=
-> > \xde\xad\xbe\xef
-> > mausezahn        984      3299.281424 group_num = 1 refcount=1 seq=13776 skbaddr=0xffffa21143fd4000 len=42 data_len=0 sample_rate=10 in_ifindex=0 out_ifindex=20 user_cookie=
-> > \xde\xad\xbe\xef
-> > 
-> > Note that it prints the cookie itself unlike the tracepoint which only
-> > prints the hashed pointer.
-> > 
-> 
-> I agree that bpftrace can do the work relying on kfuncs/kprobes. But I guess
-> that also true for many other tracepoints out there, right?
+On Thu, Apr 25, 2024 at 5:04=E2=80=AFPM Felix Fietkau <nbd@nbd.name> wrote:
+>
+> When forwarding TCP after GRO, software segmentation is very expensive,
+> especially when the checksum needs to be recalculated.
+> One case where that's currently unavoidable is when routing packets over
+> PPPoE. Performance improves significantly when using fraglist GRO
+> implemented in the same way as for UDP.
+>
+> When NETIF_F_GRO_FRAGLIST is enabled, perform a lookup for an established
+> socket in the same netns as the receiving device. While this may not
+> cover all relevant use cases in multi-netns configurations, it should be
+> good enough for most configurations that need this.
+>
+> Here's a measurement of running 2 TCP streams through a MediaTek MT7622
+> device (2-core Cortex-A53), which runs NAT with flow offload enabled from
+> one ethernet port to PPPoE on another ethernet port + cake qdisc set to
+> 1Gbps.
+>
+> rx-gro-list off: 630 Mbit/s, CPU 35% idle
+> rx-gro-list on:  770 Mbit/s, CPU 40% idle
+>
+> Signe-off-by: Felix Fietkau <nbd@nbd.name>
+> ---
+>  net/ipv4/tcp_offload.c   | 48 +++++++++++++++++++++++++++++++++++++
+>  net/ipv6/tcpv6_offload.c | 51 ++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 99 insertions(+)
+>
+> diff --git a/net/ipv4/tcp_offload.c b/net/ipv4/tcp_offload.c
+> index 520fd425ab19..3bb96a110402 100644
+> --- a/net/ipv4/tcp_offload.c
+> +++ b/net/ipv4/tcp_offload.c
+> @@ -405,6 +405,52 @@ void tcp_gro_complete(struct sk_buff *skb)
+>  }
+>  EXPORT_SYMBOL(tcp_gro_complete);
+>
+> +static void tcp4_check_fraglist_gro(struct list_head *head, struct sk_bu=
+ff *skb)
+> +{
+> +       const struct iphdr *iph =3D skb_gro_network_header(skb);
 
-Maybe, but this particular tracepoint is not buried deep inside some
-complex function with manipulated data being passed as arguments.
-Instead, this tracepoint is placed at the very beginning of the function
-and takes the function arguments as its own arguments. The tracepoint
-can be easily replaced with fentry/kprobes like I've shown with the
-example above.
+I do not think loading iph before all skb_gro_header() and
+skb_gro_header_slow() calls is wise.
 
-> For development and labs bpftrace is perfectly fine, but using kfuncs and
-> requiring recompilation is harder in production systems compared with using
-> smaller CO-RE tools.
+pskb_may_pull() can re-allocate skb->head
 
-I used bpftrace because it is very easy to write, but I could have done
-the same with libbpf. I have a bunch of such tools that I wrote over the
-years that I compiled once on my laptop and which I copy to various
-machines where I need them.
+> +       struct net *net =3D dev_net(skb->dev);
+> +       unsigned int off, hlen, thlen;
+> +       struct sk_buff *p;
+> +       struct tcphdr *th;
+> +       struct sock *sk;
+> +       int iif, sdif;
+> +
+> +       if (!(skb->dev->features & NETIF_F_GRO_FRAGLIST))
+> +               return;
+> +
+> +       off =3D skb_gro_offset(skb);
+> +       hlen =3D off + sizeof(*th);
+> +       th =3D skb_gro_header(skb, hlen, off);
+> +       if (unlikely(!th))
+> +               return;
+> +
+> +       thlen =3D th->doff * 4;
+> +       if (thlen < sizeof(*th))
+> +               return;
+> +
+> +       hlen =3D off + thlen;
+> +       if (!skb_gro_may_pull(skb, hlen)) {
+> +               th =3D skb_gro_header_slow(skb, hlen, off);
+> +               if (unlikely(!th))
+> +                       return;
+> +       }
+> +
+> +       p =3D tcp_gro_lookup(head, th);
+> +       if (p) {
+> +               NAPI_GRO_CB(skb)->is_flist =3D NAPI_GRO_CB(p)->is_flist;
+> +               return;
+> +       }
+> +
+> +       inet_get_iif_sdif(skb, &iif, &sdif);
+> +       sk =3D __inet_lookup_established(net, net->ipv4.tcp_death_row.has=
+hinfo,
+> +                                      iph->saddr, th->source,
+> +                                      iph->daddr, ntohs(th->dest),
+> +                                      iif, sdif);
+> +       NAPI_GRO_CB(skb)->is_flist =3D !sk;
+> +       if (sk)
+> +               sock_put(sk);
+> +}
+> +
+>  INDIRECT_CALLABLE_SCOPE
+>  struct sk_buff *tcp4_gro_receive(struct list_head *head, struct sk_buff =
+*skb)
+>  {
+> @@ -416,6 +462,8 @@ struct sk_buff *tcp4_gro_receive(struct list_head *he=
+ad, struct sk_buff *skb)
+>                 return NULL;
+>         }
+>
 
-> If OVS starts using psample heavily and users need to troubleshoot or merely
-> observe packets as they are sampled in a more efficient way, they are likely
-> to use ebpf for that. I think making it a bit easier (as in, providing a
-> sligthly more stable tracepoint) is worth considering.
+I would probably pull the whole TCP header here, before calling
+tcp4_check_fraglist_gro(head, skb)
+and no longer do this twice from tcp4_check_fraglist_gro() and tcp_gro_rece=
+ive()
 
-I'm not saying that it's not worth considering, I'm simply saying that
-it should be done after gathering operational experience with existing
-mechanisms. It's possible you will conclude that this tracepoint is not
-actually needed.
+Perhaps define a new inline helper, that will be called from
+tcp4_gro_receive() and tcp6_gro_receive(),
+and not anymore from  tcp_gro_receive()
 
-Also, there are some disadvantages in using tracepoints compared to
-fentry:
+static inline struct tcphdr *tcp_gro_pull_header(...)
+{
+     ....
+       off =3D skb_gro_offset(skb);
+       hlen =3D off + sizeof(*th);
+       th =3D skb_gro_header(skb, hlen, off);
+       if (unlikely(!th))
+               return NULL;
 
-https://github.com/Mellanox/mlxsw/commit/e996fd583eff1c43aacb9c79e55f5add12402d7d
-https://lore.kernel.org/all/CAEf4BzbhvD_f=y3SDAiFqNvuErcnXt4fErMRSfanjYQg5=7GJg@mail.gmail.com/#t
+       thlen =3D th->doff * 4;
+       if (thlen < sizeof(*th))
+               return NULL;
 
-Not saying that's the case here, but worth considering / being aware.
+       hlen =3D off + thlen;
+       if (!skb_gro_may_pull(skb, hlen))
+               th =3D skb_gro_header_slow(skb, hlen, off);
 
-> Can you please expand on your concerns about the tracepoint? It's on the
-> main internal function of the module so, even though the function name or
-> its arguments might change, it doesn't seem probable that it'll disappear
-> altogether. Why else would we want to remove the tracepoint?
+      return th;
+}
 
-It's not really concerns, but dissatisfaction. It's my impression (might
-be wrong) that this series commits to adding new interfaces without
-first seriously evaluating existing ones. This is true for this patch
-and patch #2 that adds a new netlink command instead of using
-SO_ATTACH_FILTER like existing applications are doing to achieve the
-same goal.
 
-I guess some will disagree, but wanted to voice my opinion nonetheless.
+> +       tcp4_check_fraglist_gro(head, skb);
+> +
+>         return tcp_gro_receive(head, skb);
+>  }
+>
+> diff --git a/net/ipv6/tcpv6_offload.c b/net/ipv6/tcpv6_offload.c
+> index c97d55cf036f..7948420dcad0 100644
+> --- a/net/ipv6/tcpv6_offload.c
+> +++ b/net/ipv6/tcpv6_offload.c
+> @@ -7,12 +7,61 @@
+>   */
+>  #include <linux/indirect_call_wrapper.h>
+>  #include <linux/skbuff.h>
+> +#include <net/inet6_hashtables.h>
+>  #include <net/gro.h>
+>  #include <net/protocol.h>
+>  #include <net/tcp.h>
+>  #include <net/ip6_checksum.h>
+>  #include "ip6_offload.h"
+>
+> +static void tcp6_check_fraglist_gro(struct list_head *head, struct sk_bu=
+ff *skb)
+> +{
+> +#if IS_ENABLED(CONFIG_IPV6)
+> +       const struct ipv6hdr *hdr =3D skb_gro_network_header(skb);
+> +       struct net *net =3D dev_net(skb->dev);
+> +       unsigned int off, hlen, thlen;
+> +       struct sk_buff *p;
+> +       struct tcphdr *th;
+> +       struct sock *sk;
+> +       int iif, sdif;
+> +
+> +       if (!(skb->dev->features & NETIF_F_GRO_FRAGLIST))
+> +               return;
+> +
+> +       off =3D skb_gro_offset(skb);
+> +       hlen =3D off + sizeof(*th);
+> +       th =3D skb_gro_header(skb, hlen, off);
+> +       if (unlikely(!th))
+> +               return;
+> +
+> +       thlen =3D th->doff * 4;
+> +       if (thlen < sizeof(*th))
+> +               return;
+> +
+> +       hlen =3D off + thlen;
+> +       if (!skb_gro_may_pull(skb, hlen)) {
+> +               th =3D skb_gro_header_slow(skb, hlen, off);
+> +               if (unlikely(!th))
+> +                       return;
+> +       }
+> +
+> +       p =3D tcp_gro_lookup(head, th);
+> +       if (p) {
+> +               NAPI_GRO_CB(skb)->is_flist =3D NAPI_GRO_CB(p)->is_flist;
+> +               return;
+> +       }
+> +
+> +       inet6_get_iif_sdif(skb, &iif, &sdif);
+> +       sk =3D __inet6_lookup_established(net, net->ipv4.tcp_death_row.ha=
+shinfo,
+> +                                       &hdr->saddr, th->source,
+> +                                       &hdr->daddr, ntohs(th->dest),
+> +                                       iif, sdif);
+> +       NAPI_GRO_CB(skb)->is_flist =3D !sk;
+> +       if (sk)
+> +               sock_put(sk);
+> +#endif /* IS_ENABLED(CONFIG_IPV6) */
+> +}
+> +
+>  INDIRECT_CALLABLE_SCOPE
+>  struct sk_buff *tcp6_gro_receive(struct list_head *head, struct sk_buff =
+*skb)
+>  {
+> @@ -24,6 +73,8 @@ struct sk_buff *tcp6_gro_receive(struct list_head *head=
+, struct sk_buff *skb)
+>                 return NULL;
+>         }
+>
+> +       tcp6_check_fraglist_gro(head, skb);
+> +
+>         return tcp_gro_receive(head, skb);
+>  }
+>
+> --
+> 2.44.0
+>
 
