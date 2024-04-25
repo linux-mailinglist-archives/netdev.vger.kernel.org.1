@@ -1,90 +1,93 @@
-Return-Path: <netdev+bounces-91351-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91352-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B11BB8B24A1
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 17:06:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 901488B24A9
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 17:07:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E33A41C21DDE
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 15:06:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C19A21C22012
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 15:07:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6290014A63D;
-	Thu, 25 Apr 2024 15:05:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62EC014A622;
+	Thu, 25 Apr 2024 15:07:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="qcMS9Dci"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HsmNNe9U"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD61C14B07A;
-	Thu, 25 Apr 2024 15:05:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3993614A4D7;
+	Thu, 25 Apr 2024 15:07:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714057507; cv=none; b=V60H/8cvK8EC3Q9lu5I2GDxGCOdd5iYzeSBJkVTwewKGWCN/O1THfkA0pxsJMhOeZS3dIHQroFAD9aFazum/+epvsAJa2R75PCFmAgPDpfu6RZExRPEv5nIaRy9Ww1QNBhVcVvBQqzCVw2u/FS6pnVibGkOhb9PlJnLYDPQydsI=
+	t=1714057646; cv=none; b=M/Bnd/tFZ8/zfQlqttXXGO6H3Z67UJHRc6F0ZFOPujGl6oSkZhrEbE5dAtBZsKnhBNQx9jaKQRWc8vqSNaV4I09qD5MmjQGane+PMXGxait303fOmv+xX2faUMzX5pUjjcbhDeL36JthYj8XUmFdRpO0XxUyBFhaEG8ogDIelI8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714057507; c=relaxed/simple;
-	bh=Ad9CMeQCfwBbypuBlH9YPi1w4Sfr5suUraBUndAtP30=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ozEnvcJLH0+f7WzjN1zFOnMUcH8kUPGPSVcZ/XfuUKUxt30kSzb4/bHfQNZfr70/MhXagJU9Kn1mMw8pHloqgSIDBmSm9PTkk/+6fNBp192xc8M+wDtvFJoQcjLBEoaFuZ+byKL1KrkFK7WNoF1DHo0m0vFFmgfbwnkx169Bmpw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=qcMS9Dci; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=Ce5t81AR4LLzMmw7ptIOBPkiZfOh30AXyQ1jcb4c9X0=; b=qcMS9Dciv3ySUmIgtvGkMaGAdY
-	h7bYPEdhfM3QW5df/VVQPAEl41AXD8vzCGBPPRhH6Aa1Ji5E+Jy9MNL+4skbUXRJp63qWDiQyFhGe
-	hNIQJYIy2Upvh0Rg+NaG60GKh1dt/clUxZo5JrH40RWLH5fqXVkTWabwgrnQTX7COgaM=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1s00eY-00DzlT-0q; Thu, 25 Apr 2024 17:04:50 +0200
-Date: Thu, 25 Apr 2024 17:04:50 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Sky Huang <SkyLake.Huang@mediatek.com>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Qingfang Deng <dqfext@gmail.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	Steven Liu <Steven.Liu@mediatek.com>
-Subject: Re: [PATCH 1/3] net: phy: mediatek: Re-organize MediaTek ethernet
- phy drivers
-Message-ID: <8d9ef4a5-9bf5-4f59-89d0-86722f90e8eb@lunn.ch>
-References: <20240425023325.15586-1-SkyLake.Huang@mediatek.com>
- <20240425023325.15586-2-SkyLake.Huang@mediatek.com>
+	s=arc-20240116; t=1714057646; c=relaxed/simple;
+	bh=3HaJ982+LvRQFGm7HWvZdOyHnH1lP26jjUNa9dheZXI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=hUjFxVQ95iyYOVPaZ6UonPiTddSc2VTx5uVvKJ2U/i1xQzQBgs6GKqe4i9/jrYtfCQouHDaABvid4VAsVYNT9PTQ6BRCQH55HqKSWOihUiQgOJ8/prCiKlSYBkQroNplYCe6unxohT7mhjJAmPT8QIxoumQXQHNFsphxaDvvqjQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HsmNNe9U; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B75AC113CC;
+	Thu, 25 Apr 2024 15:07:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714057645;
+	bh=3HaJ982+LvRQFGm7HWvZdOyHnH1lP26jjUNa9dheZXI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=HsmNNe9UozPgIPoy9mWGmNdUYAfB4O0PAx/pUcnAsQXUzlliouKJEEqjbk0w5rtlB
+	 JBC/spq7bf3GCk3k0TSNEyR5/JtzMQvU+wJGkW7qMfIh8XE5k4IXfDVBENDm/TKs7W
+	 Zz8L8NRmAhGXlJ1t608f26K5iaB9um6QjOgIbYOqBa6pSQTcyfcYxnmrVBcK/0iR2r
+	 kjg8PaFJx0WkXT2JLcNK40MuHLRPRZ4lnsBirn9hB4PIfVnfIF+V3jDL4C6sZNdnqL
+	 jyp5JQuC7pN9z+z5kBLcoCRsj/kLNd1GnrDj4j7wpHRodQpSHC4c9e267SZyA5QObZ
+	 y5nkyvXN4KQiQ==
+Date: Thu, 25 Apr 2024 08:07:24 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: Jiri Pirko <jiri@resnulli.us>, Oleksij Rempel <o.rempel@pengutronix.de>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn
+ <andrew@lunn.ch>, Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Kyle Swenson
+ <kyle.swenson@est.tech>, kernel test robot <lkp@intel.com>
+Subject: Re: [PATCH net-next v3 0/3] net: pse-pd: Fixes for few small issues
+Message-ID: <20240425080724.15be46e9@kernel.org>
+In-Reply-To: <20240425165708.62637485@kmaincent-XPS-13-7390>
+References: <20240423-fix_poe-v3-0-e50f32f5fa59@bootlin.com>
+	<ZiebQLdu9dOh1v-T@nanopsycho>
+	<20240425103110.33c02857@kmaincent-XPS-13-7390>
+	<20240425070619.601d5e40@kernel.org>
+	<20240425163002.5894c5e5@kmaincent-XPS-13-7390>
+	<20240425074205.28677540@kernel.org>
+	<20240425165708.62637485@kmaincent-XPS-13-7390>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240425023325.15586-2-SkyLake.Huang@mediatek.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Apr 25, 2024 at 10:33:23AM +0800, Sky Huang wrote:
-> From: "SkyLake.Huang" <skylake.huang@mediatek.com>
+On Thu, 25 Apr 2024 16:57:08 +0200 Kory Maincent wrote:
+> On Thu, 25 Apr 2024 07:42:05 -0700
+> > > Do you want me to like post a v5 with the "pw-bot: cr" tag? But if I put the
+> > > tag only on the cover letter it won't work then.
+> > > Maybe on all patches?    
+> > 
+> > Probably not worth posting for a test. I'll try to be more careful when
+> > applying in the future, we can experiment with real postings.
+> >   
+> > > Was it the same for the PoE support patch series?    
+> > 
+> > Yeah, I had to apply that one manually.  
 > 
-> Re-organize MediaTek ethernet phy driver files and get ready to integrate
-> some common functions and add new 2.5G phy driver.
-> mtk-ge.c: MT7530 Gphy on MT7621 & MT7531 Gphy
-> mtk-ge-soc.c: Built-in Gphy on MT7981 & Built-in switch Gphy on MT7988
-> mtk-2p5ge.c: Planned for built-in 2.5G phy on MT7988
-> 
-> Signed-off-by: SkyLake.Huang <skylake.huang@mediatek.com>
+> Does this patch series is on the same state?
+> https://lore.kernel.org/netdev/20240422-feature_ptp_netnext-v11-0-f14441f2a1d8@bootlin.com/
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+That one was fine:
 
-    Andrew
+https://patchwork.kernel.org/project/netdevbpf/cover/20240422-feature_ptp_netnext-v11-0-f14441f2a1d8@bootlin.com/
+
+Are you thinking it's the extra From in the cover letter?
 
