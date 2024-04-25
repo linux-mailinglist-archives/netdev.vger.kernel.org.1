@@ -1,87 +1,58 @@
-Return-Path: <netdev+bounces-91219-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91220-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 768568B1BEE
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 09:33:11 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 661358B1BF0
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 09:33:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 371351F21267
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 07:33:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 07D4E1F251E3
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 07:33:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94BE86CDC1;
-	Thu, 25 Apr 2024 07:33:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 955176CDC8;
+	Thu, 25 Apr 2024 07:33:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="VwRq2FIJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qxEbHlTZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout4-smtp.messagingengine.com (fout4-smtp.messagingengine.com [103.168.172.147])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDD433A268;
-	Thu, 25 Apr 2024 07:33:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.147
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D8526EB4A;
+	Thu, 25 Apr 2024 07:33:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714030385; cv=none; b=gmdLxEUVVbx9C5yOo+3NoxE2K6i+NFzcBm/CpuPuotjCwDjN5JuaRJu6yPylQgiHo5SUNS8HNXhD5BA6AoNwQ2FQntvqb0P2mQ3CItwGemge+MFsWquCif5uFkV0Aaql0pppTH+iuo8hLvExF4B+glHG7AYHHc8eupF6sPXdbJQ=
+	t=1714030401; cv=none; b=ZARGfsWkHWtDFIo2XHlwcDv+o48BiHQJrGWcLkkcE+keMiGsPEQQ1pifHNB+zunx9w2RUkIodxaXQ4rrFvGC6EvBZu7cQxuNuP86NoS1r6iqx87c9VHydBXJv8+BUJFScIkuwAqh0RB2nYzXv9/73FrBaEWCMMa9CmGJViIH4U8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714030385; c=relaxed/simple;
-	bh=EnEiQRFJoJpZqIEia4zGx+kZs4v4yYeavFjjY/vEY8o=;
+	s=arc-20240116; t=1714030401; c=relaxed/simple;
+	bh=IvDFJUyMXiZoCo3+3WAO6o6mM1VGEGQ/JIWJuBcDiww=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JIVppWkC+262zIEve99Pw3Um46EBWJJyiqe+s93csQuq7ggt0F04LCvp14Tq7uWhd1Mkxzq95RTzKVUdgFndHPbB8VmamDZ9dYzLpnFe/aKmrZC6TwMFbFAN5QQ0erOLRBXkkUDD0YhrKQ1R4vWJt7QX+/vq7rDdc3JCSnAz5Z0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=VwRq2FIJ; arc=none smtp.client-ip=103.168.172.147
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
-Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
-	by mailfout.nyi.internal (Postfix) with ESMTP id AD1941380130;
-	Thu, 25 Apr 2024 03:33:02 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute6.internal (MEProxy); Thu, 25 Apr 2024 03:33:02 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-	fm3; t=1714030382; x=1714116782; bh=SLXYBozdGuze8fwEhSYkE2RdoqPW
-	Tdv6MrJs350+i6I=; b=VwRq2FIJYnOWzzcbNm9ISw77YEfS0U5O1dGEVXOlC7DK
-	iQJroVwQeFxiTMLbtwquAyzPH43vTkpyIW/nJt7+ufRHxNdWY89m3JUngdPNyi1f
-	0opldTLAqVK+z96J9NqeacHdOh4XMm8DMMeLnSkD6HtwDIOXDhTicbroJfR/q8S4
-	K7k4x3N0gKHZFtUXVgNK9lYdmC1We+jdeux6DwpNwqlMFeiXadvnIOt8x5AMFYiE
-	LdUtszFBWzQGQHXYnO6EEecJ9DvmQPvD+GPnezxJID7QBdCcmI8Iyn8A2MPt3pxW
-	aorn09OcynIPIZsbvlTfJHqDCfmuxIWsR+4fLh4yEQ==
-X-ME-Sender: <xms:LgcqZteMGf2qI0ToSP05ohFSS7bJC_v7ibz-GbiRVbqdUelyAbDGmw>
-    <xme:LgcqZrM9lEjRhprFSWn2NBWrLIaKeM1S5D4UoRj9kKhY86BbO2tBC5qErphzWEdZ1
-    vL3CnPV2UiXrUw>
-X-ME-Received: <xmr:LgcqZmhv8Sgt6-F0AFxWIMEVvVubUZTx44b6eC3bndAbZc3ose2Jh1ZmOrDf>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrudeliedguddvgecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
-    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-    enucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpefkugho
-    ucfutghhihhmmhgvlhcuoehiughoshgthhesihguohhstghhrdhorhhgqeenucggtffrrg
-    htthgvrhhnpedvudefveekheeugeeftddvveefgfduieefudeifefgleekheegleegjeej
-    geeghfenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
-    hiughoshgthhesihguohhstghhrdhorhhg
-X-ME-Proxy: <xmx:LgcqZm9Lp4GLpknzHZa8hI0-1PcBATL5uCWDgWxsf8BnqGeXNutU9g>
-    <xmx:LgcqZpucmIqMdrd-Rka75lmhHFpf5BAz0hKO7sOU8g2WVF828c8gLg>
-    <xmx:LgcqZlGMeGk3cEdToSspE0QZxjpTQUwU9kvW28NsmU-4r_vFuvi7Yw>
-    <xmx:LgcqZgMWrkHR7Ga_D5aSjZj8gywknfKvg-9CcN4GdqmnIaAsG82Nxw>
-    <xmx:LgcqZlFV_uu0sxxmzD7j5G5iOP1LlYSmfwiubwCJNJWiRmzuDnP77h8d>
-Feedback-ID: i494840e7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 25 Apr 2024 03:33:01 -0400 (EDT)
-Date: Thu, 25 Apr 2024 10:32:54 +0300
-From: Ido Schimmel <idosch@idosch.org>
-To: Adrian Moreno <amorenoz@redhat.com>
-Cc: netdev@vger.kernel.org, aconole@redhat.com, echaudro@redhat.com,
-	horms@kernel.org, i.maximets@ovn.org,
-	Yotam Gigi <yotam.gi@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 3/8] net: psample: add user cookie
-Message-ID: <ZioHJtWPNbb3bcqT@shredder>
-References: <20240424135109.3524355-1-amorenoz@redhat.com>
- <20240424135109.3524355-4-amorenoz@redhat.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=jjXdHWzqGY3aWCgT6ZPsNnqQ8dSN6igSSO+SNra9UqHglbtB1FH6S5J7ub1dMhbQGRU6WoTShA78zJqPS+IjBg5mBcAkYv1P7T73HTreXSCL9UW5Dt/WaeOyIE8IXcUdKOpw//LpxcKvIYF6T/6PXTiSpquR//GHL+EkVFLQmkQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qxEbHlTZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 664DBC113CC;
+	Thu, 25 Apr 2024 07:33:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714030400;
+	bh=IvDFJUyMXiZoCo3+3WAO6o6mM1VGEGQ/JIWJuBcDiww=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=qxEbHlTZpkqN3noZ8+q1aOqtL9WoUhJp6u9GrZ2/UfHErnHsXpJdNBl3wJAawuHo3
+	 duH2DK+B6BiCibp3F7TQmgvrslQ98lqIwuHxG39LLez2NaDnTfE9ByWIw/4+5hk1Z0
+	 ReIzcNQvMKTWffr48hGdkeSZNjDgYyOo/iDCQ3gTN5H6EEBhjhHe6MV3aFW5zMJsD2
+	 DqRWMVlsFywKVpFCWATdXPZ0IlRXrkCV9ZnFGB0ArAqw3cr9LRoIDNVtAePLi+mi47
+	 a8eyS3hEDWjUE//wC5SovyW7JOFOWTsAIYBcy7ymmazi90mZbCpGLIMcxpKRADxeYT
+	 uCHX9sNjHpfpg==
+Date: Thu, 25 Apr 2024 08:33:17 +0100
+From: Simon Horman <horms@kernel.org>
+To: Benjamin Poirier <benjamin.poirier@gmail.com>
+Cc: Aaron Conole <aconole@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	dev@openvswitch.org, netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, Jiri Pirko <jiri@resnulli.us>
+Subject: Re: [ovs-dev] selftests: openvswitch: Questions about possible
+ enhancements
+Message-ID: <20240425073317.GS42092@kernel.org>
+References: <20240424164405.GN42092@kernel.org>
+ <20240424173715.GP42092@kernel.org>
+ <ZilIgbIvB04iUal2@f4>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -90,47 +61,61 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240424135109.3524355-4-amorenoz@redhat.com>
+In-Reply-To: <ZilIgbIvB04iUal2@f4>
 
-On Wed, Apr 24, 2024 at 03:50:50PM +0200, Adrian Moreno wrote:
-> @@ -579,6 +580,15 @@ void psample_sample_packet(struct psample_group *group, struct sk_buff *skb,
->  			goto error;
->  	}
->  #endif
-> +	if (md->user_cookie && md->user_cookie_len) {
-> +		int nla_len = nla_total_size(md->user_cookie_len);
-> +		struct nlattr *nla;
-> +
-> +		nla = skb_put(nl_skb, nla_len);
-> +		nla->nla_type = PSAMPLE_ATTR_USER_COOKIE;
-> +		nla->nla_len = nla_attr_size(md->user_cookie_len);
-> +		memcpy(nla_data(nla), md->user_cookie, md->user_cookie_len);
-> +	}
+On Wed, Apr 24, 2024 at 01:59:29PM -0400, Benjamin Poirier wrote:
+> On 2024-04-24 18:37 +0100, Simon Horman wrote:
+> > On Wed, Apr 24, 2024 at 05:44:05PM +0100, Simon Horman wrote:
+> > > Hi Aaron, Jakub, all,
+> > > 
+> > > I have recently been exercising the Open vSwitch kernel selftests,
+> > > using vng, something like this:
+> > > 
+> > > 	TESTDIR="tools/testing/selftests/net/openvswitch"
+> > > 
+> > >         vng -v --run . --user root --cpus 2 \
+> > >                 --overlay-rwdir "$PWD" -- \
+> > >                 "modprobe openvswitch && \
+> > > 		 echo \"timeout=90\" >> \"${TESTDIR}/settings\" && \
+> > >                  make -C \"$TESTDIR\" run_tests"
+> > > 
+> > > And I have some observations that I'd like to ask about.
+> > > 
+> > > 1. Building the kernel using the following command does not
+> > >    build the openvswitch kernel module.
+> > > 
+> > > 	vng -v --build \
+> > > 		--config tools/testing/selftests/net/config
+> > > 
+> > >    All that seems to be missing is CONFIG_OPENVSWITCH=m
+> > >    and I am wondering what the best way of resolving this is.
+> > > 
+> > >    Perhaps I am doing something wrong.
+> > >    Or perhaps tools/testing/selftests/net/openvswitch/config
+> > >    should be created? If so, should it include (most of?) what is in
+> > >    tools/testing/selftests/net/config, or just CONFIG_OPENVSWITCH=m?
+> 
+> I noticed something similar when testing Jiri's virtio_net selftests
+> patchset [1].
+> 
+> drivers/net/virtio_net/config includes virtio options but the
+> test also needs at least CONFIG_NET_VRF=y which is part of net/config.
+> 
+> Whatever the answer to your question, all config files should be
+> coherent on this matter.
 
-Did you consider using nla_put() instead?
+Yes, agreed. That is the main reason I'm asking about this.
 
-diff --git a/net/psample/psample.c b/net/psample/psample.c
-index 92db8ffa2ba2..ea59ca46b119 100644
---- a/net/psample/psample.c
-+++ b/net/psample/psample.c
-@@ -589,15 +589,10 @@ void psample_sample_packet(struct psample_group *group, struct sk_buff *skb,
-                        goto error;
-        }
- #endif
--       if (md->user_cookie && md->user_cookie_len) {
--               int nla_len = nla_total_size(md->user_cookie_len);
--               struct nlattr *nla;
--
--               nla = skb_put(nl_skb, nla_len);
--               nla->nla_type = PSAMPLE_ATTR_USER_COOKIE;
--               nla->nla_len = nla_attr_size(md->user_cookie_len);
--               memcpy(nla_data(nla), md->user_cookie, md->user_cookie_len);
--       }
-+       if (md->user_cookie && md->user_cookie_len &&
-+           nla_put(nl_skb, PSAMPLE_ATTR_USER_COOKIE, md->user_cookie_len,
-+                   md->user_cookie))
-+               goto error;
- 
-        genlmsg_end(nl_skb, data);
-        psample_nl_obj_desc_init(&desc, group->group_num);
+> [1] https://lore.kernel.org/netdev/20240424104049.3935572-1-jiri@resnulli.us/
+> 
+> [...]
+> > 
+> >   5. openvswitch.sh starts with "#!/bin/sh".
+> >      But substitutions such as "${ns:0:1}0"  fail if /bin/sh is dash.
+> >      Perhaps we should change openvswitch.sh to use bash?
+> 
+> I think so. A similar change was done in
+> c2518da8e6b0 selftests: bonding: Change script interpreter (v6.8-rc1)
+
+Thanks, this one seems straightforward.
 
