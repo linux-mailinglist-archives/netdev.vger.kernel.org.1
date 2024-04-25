@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-91163-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91167-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A96D8B1918
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 05:00:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B3E48B191C
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 05:00:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 45321B24AB6
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 03:00:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 726611C21419
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 03:00:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 355B6134BC;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA3E81AACC;
 	Thu, 25 Apr 2024 03:00:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MbhBm8vx"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k/w2EzJb"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 077F64C7B
-	for <netdev@vger.kernel.org>; Thu, 25 Apr 2024 03:00:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1819179B7;
+	Thu, 25 Apr 2024 03:00:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714014029; cv=none; b=T8OIK6+vGGQjz3dHTDdvwC29QiSPG0ZutktQFqQCEKlDGit4iY8PoTsduyiI6+M4kcghEjMfs1GoeZzHfoE/087PR0X1MEAxEpTqjsqW2M2PDQ1Kiu96L0TwEcIdMgv/4m27Ad7GaNEHrxNc8zk+YFaBVHV973d+MLW2OyTonI4=
+	t=1714014029; cv=none; b=uS6jQSVhMIFNYIDSXp783uEIaEW2IIOuvlnwjbmhFCUm4hUrY8lyuhc+StzyBvd2AmDhIDFXW8349z3K6luQ502dt33U6+nrAqD528oS8FNzHTv38I2HHmrgjBlhzdo+VpaelhXxKGx7NxaDvtTRLTmxUYx87tABM3C8wVUgpjg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1714014029; c=relaxed/simple;
-	bh=KXDrmsQ8gaADcvuuNPkchPjAtqQaSFFuxa8vGXqs2NY=;
+	bh=iMlUC33Nu90EzRIc2y/LB/9ZIZIxEjsdNc+qBGF0cKw=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ugvp3avrg1WT0ITOiRD+5aA6w4TtJTd2GNenmyHf3bTUQlbO2SxDT7537uPQ/Kab1+iSbSQZZU0oWCb3WUBG5yRM5IoxqXMqZtnriRwJ+SHNEfPnPwLOytl7CEoIcTL9XttAs3JoxFU/xf2WzA+hrRUfEslfSEw4EGixYZ0F/og=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MbhBm8vx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 61F90C113CE;
-	Thu, 25 Apr 2024 03:00:28 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=R3snzVP6EmJwNbI43oD6IxY76V6Iw4fa23MeuxSJlY+FyA/zOY6lRJK/viVBGghVBZYmKl1rjC07C9qzsR+ZQFsmvBUvfmnSZESN8Sk8Vl5bz38TL+5zSl4t8w8pffQctRCla0Jfu+3rF/DPpaqIQWNYj4/w3dq6OFValiDS9LM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k/w2EzJb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 261B6C32786;
+	Thu, 25 Apr 2024 03:00:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714014028;
-	bh=KXDrmsQ8gaADcvuuNPkchPjAtqQaSFFuxa8vGXqs2NY=;
+	s=k20201202; t=1714014029;
+	bh=iMlUC33Nu90EzRIc2y/LB/9ZIZIxEjsdNc+qBGF0cKw=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=MbhBm8vxUSGO1f42qVvH09Bjsvvmr75dLxeUWgougc8Fm80OvJQo1kAd8tkIqkopu
-	 ECLVPoolXtojS3iKZIEHqVj9HP1V/uKlhPTc0o8/xZY6ZQF9q2evBxdyN9fvsLi7St
-	 mP/Ur8WbT3A7+Po3vG2hcyvB8VnyjlQZYQ+xu0EU/cPc3LxrmfQ11cd1o3NgARAl2O
-	 GWTj9EoB3E51L49dgzl3PT1qE/BJd9JYoRnGADQxPUkBb6gLO5bk6uUODGXbBn7iFo
-	 rc+fdJJjRsO3Be3x7gzcNc7UabT4IJc3P0xHPQ8ZEZTfCVA2iKmOtcOtFGv/zuh9FV
-	 QKnOB4W5ALM3Q==
+	b=k/w2EzJbRRNS5/bS7ArVPsITZoNjrYkMbep41yvrTapxkE6LbARGqkgqKF3VwGr3/
+	 Ps3hk3yGlQTd2cbvtRx26isC6O1qpjJed4d3qjzNMswSFiPlyZUeEuNddNqEbAedk/
+	 /FZ+rj8eQrt1kK4WUpDElh3XuBjN1/XhE3h4+QFcAe7N4zuyHZ2mYnhZbWOlQRItnH
+	 VCr4JYkxH2ZB2DiRTK28JstSW79ZtBuX0xP7R0S13gPI4oEwzK9QrP+iuTxp4kVzgC
+	 GaJ/I9zlHHj/l9tXvGiPJADbBBGCart36fF2hxt3/pysiaY6BVeHVpqiQGANQs1EFE
+	 VueA9iWX9NtAA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 505C7C595D2;
-	Thu, 25 Apr 2024 03:00:28 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 0F131C595D2;
+	Thu, 25 Apr 2024 03:00:29 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,40 +52,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 1/2] Revert "net: txgbe: fix i2c dev name cannot match
- clkdev"
+Subject: Re: [PATCH net-next] net: ethernet: ti: cpsw: flower: validate control
+ flags
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171401402832.32160.14071159006302877526.git-patchwork-notify@kernel.org>
-Date: Thu, 25 Apr 2024 03:00:28 +0000
-References: <20240422084109.3201-1-duanqiangwen@net-swift.com>
-In-Reply-To: <20240422084109.3201-1-duanqiangwen@net-swift.com>
-To: Duanqiang Wen <duanqiangwen@net-swift.com>
-Cc: netdev@vger.kernel.org, jiawenwu@trustnetic.com,
- mengyuanlou@net-swift.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, maciej.fijalkowski@intel.com,
- andrew@lunn.ch
+ <171401402905.32160.3489921688576506312.git-patchwork-notify@kernel.org>
+Date: Thu, 25 Apr 2024 03:00:29 +0000
+References: <20240422152656.175627-1-ast@fiberby.net>
+In-Reply-To: <20240422152656.175627-1-ast@fiberby.net>
+To: =?utf-8?b?QXNiasO4cm4gU2xvdGggVMO4bm5lc2VuIDxhc3RAZmliZXJieS5uZXQ+?=@codeaurora.org
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, s-vadapalli@ti.com,
+ r-gunasekaran@ti.com, rogerq@kernel.org, linux-omap@vger.kernel.org
 
 Hello:
 
-This series was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 22 Apr 2024 16:41:08 +0800 you wrote:
-> This reverts commit c644920ce9220d83e070f575a4df711741c07f07.
-> when register i2c dev, txgbe shorten "i2c_designware" to "i2c_dw",
-> will cause this i2c dev can't match platfom driver i2c_designware_platform.
+On Mon, 22 Apr 2024 15:26:55 +0000 you wrote:
+> This driver currently doesn't support any control flags.
 > 
-> Signed-off-by: Duanqiang Wen <duanqiangwen@net-swift.com>
-> ---
->  drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c | 8 +++-----
->  1 file changed, 3 insertions(+), 5 deletions(-)
+> Use flow_rule_match_has_control_flags() to check for control flags,
+> such as can be set through `tc flower ... ip_flags frag`.
+> 
+> In case any control flags are masked, flow_rule_match_has_control_flags()
+> sets a NL extended error message, and we return -EOPNOTSUPP.
+> 
+> [...]
 
 Here is the summary with links:
-  - [net,1/2] Revert "net: txgbe: fix i2c dev name cannot match clkdev"
-    https://git.kernel.org/netdev/net/c/8d6bf83f6740
-  - [net,2/2] Revert "net: txgbe: fix clk_name exceed MAX_DEV_ID limits"
-    https://git.kernel.org/netdev/net/c/edd2d250fb3b
+  - [net-next] net: ethernet: ti: cpsw: flower: validate control flags
+    https://git.kernel.org/netdev/net-next/c/f97e0a5eac15
 
 You are awesome, thank you!
 -- 
