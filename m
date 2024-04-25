@@ -1,135 +1,108 @@
-Return-Path: <netdev+bounces-91322-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91323-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F2B08B2245
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 15:12:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EDFC68B224B
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 15:12:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D7B0C1F21728
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 13:12:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A9842283940
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 13:12:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1177149C45;
-	Thu, 25 Apr 2024 13:12:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2016F1494BC;
+	Thu, 25 Apr 2024 13:12:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JJD6JBgB"
+	dkim=pass (2048-bit key) header.d=dolcini.it header.i=@dolcini.it header.b="0GZa0gQU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail11.truemail.it (mail11.truemail.it [217.194.8.81])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A280A149C44;
-	Thu, 25 Apr 2024 13:12:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A5A5139D16;
+	Thu, 25 Apr 2024 13:12:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.194.8.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714050727; cv=none; b=TuKUlgihAE+WCMHYbjN0st0Zo5LCleeS+cZRCeCXp3ZLACTnvEfD75kqt88EUCeUGU1+K0m+QNaR5kex++uwc9wiMh+fv3FqN5P86ko06kwbc/+nXXCALa99WbDPQgDypLVL1J2zwlSbTW0mAWbmd6dIXnv3xBqsEHXV3I6+YZc=
+	t=1714050765; cv=none; b=nmqesciStK3SQKJ4Sq28OqGkqMgRMry4I8bGEliFNk/v3665k/o3veeDn5+P/+nFgMbYHGzWidL+l6X+dZuaSg3daw9w5PIJRIBYjVswWySFNPuis3xPpk5O9zUSXqx+AWPIOtI9hEhaBqkDlI1g6woEmWzREcAGwsfuMS7FzJM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714050727; c=relaxed/simple;
-	bh=6oZ89fNLVqBFlw2FqXYow9IUd50x0ChIAGq7WZrSWb8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=vAIbOgKkWZSE/NRVExmdIG9ykJqigN10Li3t5qOOM0dNHsEe+g8I8mGOJOilZB1Juv5ulpKXqE2My4iHvoirSseAZT8Awt9dyrky9Oa0dOkGSugDeXD+Y067G/qwLwkSFi2vpb+bz7InsKAV1s9sj2RcUtc+87qI7ZymmhAQ1Ng=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JJD6JBgB; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1714050726; x=1745586726;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=6oZ89fNLVqBFlw2FqXYow9IUd50x0ChIAGq7WZrSWb8=;
-  b=JJD6JBgBGFhGEhO0E2Tbaf5masdI2+xUR1EccyJtiHWcoetP0Jv8Xgh2
-   BZpwiaSiXkuRt/0KAjeyxESLMUZOv8bt5f1keWElTgqF8qJJyEVuqm7DM
-   8usw7LKalCq8GG3Vk+nWMeSC8+NWmzetAFFR6z5Lp4sY1L4e+6oye9EVO
-   rmHQCU8qHt53b6x6UT2woqHr9IvQEylVvo1HATeYk4CsCA8WXNyafjtHO
-   rywqBo/8Vfb5PCIMAHNoWagsHTID/S2i3AHJq5FK3gtN2vDQ+nmWfu0AR
-   NIFYgZqGvrVGGWutYBOziQjpoheQrw7+Jl5t/Eo6hsVd4gmYm6n2Ha1Vj
-   w==;
-X-CSE-ConnectionGUID: qGJhRqLnTmqE67o8RNBtPg==
-X-CSE-MsgGUID: you8vt16Q4KW4dBFnUJbeg==
-X-IronPort-AV: E=McAfee;i="6600,9927,11054"; a="27190441"
-X-IronPort-AV: E=Sophos;i="6.07,229,1708416000"; 
-   d="scan'208";a="27190441"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Apr 2024 06:12:04 -0700
-X-CSE-ConnectionGUID: gJLLNdAVRh+rRxXktGAXqg==
-X-CSE-MsgGUID: OlnglW8xS+6HlMR2Clurrg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,229,1708416000"; 
-   d="scan'208";a="56010371"
-Received: from ehlflashnuc2.fi.intel.com (HELO [10.237.72.57]) ([10.237.72.57])
-  by orviesa002.jf.intel.com with ESMTP; 25 Apr 2024 06:11:59 -0700
-Message-ID: <62e58960-f568-459d-8690-0c9c608a4d9f@linux.intel.com>
-Date: Thu, 25 Apr 2024 16:11:58 +0300
+	s=arc-20240116; t=1714050765; c=relaxed/simple;
+	bh=SWbsN8gb0T+55zIEnnjHmugKc2Hefu/p5fPeAaJnVvQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=pOtXfDMnazh8+9QyrCn8gLWVSxfQQ7Y2tyhD3whZP1KvwKJdNN/XRrr2sm7kHBhi8ZqEcTmqgADFGME0dYQH9hrYbvvZJJ+VvpbrPLsgf3fKF0Eq04ng3TEJWAmlZpx2JvMfjz1LLgmhiW0/LXvl/uJFbOXvaFy6l8LzMDm2WKQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=dolcini.it; spf=pass smtp.mailfrom=dolcini.it; dkim=pass (2048-bit key) header.d=dolcini.it header.i=@dolcini.it header.b=0GZa0gQU; arc=none smtp.client-ip=217.194.8.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=dolcini.it
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dolcini.it
+Received: from francesco-nb (31-10-206-125.static.upc.ch [31.10.206.125])
+	by mail11.truemail.it (Postfix) with ESMTPA id 569331F9E9;
+	Thu, 25 Apr 2024 15:12:34 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dolcini.it;
+	s=default; t=1714050754;
+	bh=mjjqNnQB3Y3PmO3eF7RCQ6exiD5LgwcG2Ut4A6E+9WE=; h=From:To:Subject;
+	b=0GZa0gQUG+IjBubLquW3DLf34IruRGf2YYuTX+SKmE8vh0fYBcnrocw6OSc5Sgj1+
+	 cTtKdsqUymXImgTdD4XxFy/ZmzGypggh0t9/bOYSqAdamNlntUSwPqvBnI2ZR/+SEc
+	 PYJsRN6kuiCiPRfkD3Sr4uTkV3/IkzkWuuqT6Yy+IGiqrqmeKsy68rjY05WvBze+a1
+	 jX5Az0VNqfOXfHjj6AxQ+CKgxxtiU9fFRfBMjynmyI9X7WgeDT5TS+X5GaKS0PKf1q
+	 HXImYdeUeA3SKvuigNSUP6Y8ju+1ABoPe040XE75ZqFlNWYJM9MrDXSub6Uij1mJpi
+	 h9txzP/TXhung==
+Date: Thu, 25 Apr 2024 15:12:28 +0200
+From: Francesco Dolcini <francesco@dolcini.it>
+To: mkl@pengutronix.de
+Cc: Vitor Soares <ivitro@gmail.com>,
+	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
+	Thomas Kopp <thomas.kopp@microchip.com>,
+	Wolfgang Grandegger <wg@grandegger.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Vitor Soares <vitor.soares@toradex.com>, linux-can@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH v3] can: mcp251xfd: fix infinite loop when xmit fails
+Message-ID: <20240425131228.GA15857@francesco-nb>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 0/4] Define i2c_designware in a header file
-Content-Language: en-US
-To: Florian Fainelli <florian.fainelli@broadcom.com>,
- linux-kernel@vger.kernel.org
-Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
- Mika Westerberg <mika.westerberg@linux.intel.com>,
- Jan Dabros <jsd@semihalf.com>, Andi Shyti <andi.shyti@kernel.org>,
- Lee Jones <lee@kernel.org>, Jiawen Wu <jiawenwu@trustnetic.com>,
- Mengyuan Lou <mengyuanlou@net-swift.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
- Andrew Lunn <andrew@lunn.ch>, Duanqiang Wen <duanqiangwen@net-swift.com>,
- "open list:SYNOPSYS DESIGNWARE I2C DRIVER" <linux-i2c@vger.kernel.org>,
- "open list:WANGXUN ETHERNET DRIVER" <netdev@vger.kernel.org>
-References: <20240425002642.2053657-1-florian.fainelli@broadcom.com>
-From: Jarkko Nikula <jarkko.nikula@linux.intel.com>
-In-Reply-To: <20240425002642.2053657-1-florian.fainelli@broadcom.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240311121143.306403-1-ivitro@gmail.com>
 
-On 4/25/24 3:26 AM, Florian Fainelli wrote:
-> This patch series depends upon the following two patches being applied:
-> 
-> https://lore.kernel.org/all/20240422084109.3201-1-duanqiangwen@net-swift.com/
-> https://lore.kernel.org/all/20240422084109.3201-2-duanqiangwen@net-swift.com/
-> 
-> There is no reason why each driver should have to repeat the
-> "i2c_designware" string all over the place, because when that happens we
-> see the reverts like the above being necessary.
-> 
-> Changes in v2:
-> 
-> - avoid changing i2c-designware-pcidrv.c more than necessary
-> - move constant to include/linux/platform_data/i2c-designware.h
-> - add comments as to how this constant is used and why
-> 
-> Florian Fainelli (4):
->    i2c: designware: Create shared header hosting driver name
->    mfd: intel-lpss: Utilize i2c-designware.h
->    mfd: intel_quark_i2c_gpio: Utilize i2c-designware.h
->    net: txgbe: Utilize i2c-designware.h
-> 
->   MAINTAINERS                                    |  1 +
->   drivers/i2c/busses/i2c-designware-pcidrv.c     |  3 ++-
->   drivers/i2c/busses/i2c-designware-platdrv.c    |  5 +++--
->   drivers/mfd/intel-lpss.c                       |  3 ++-
->   drivers/mfd/intel_quark_i2c_gpio.c             |  5 +++--
->   drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c |  7 ++++---
->   include/linux/platform_data/i2c-designware.h   | 11 +++++++++++
->   7 files changed, 26 insertions(+), 9 deletions(-)
->   create mode 100644 include/linux/platform_data/i2c-designware.h
-> 
-I have mixed feeling about this set will it help maintaining and 
-developing new code or do the opposite. Surely misnaming as referenced 
-above can happen but I think it's not too common pattern while having 
-single define header put under include/ feels added burden.
+Hello Mark,
 
-Also I personally like explicit strings put into MODULE_ALIAS() since 
-they are easier to grep from sources and modules.alias file when 
-debugging autoloading issues. So change like below makes that debugging 
-one step more labor.
+On Mon, Mar 11, 2024 at 12:11:43PM +0000, Vitor Soares wrote:
+> From: Vitor Soares <vitor.soares@toradex.com>
+> 
+> When the mcp251xfd_start_xmit() function fails, the driver stops
+> processing messages, and the interrupt routine does not return,
+> running indefinitely even after killing the running application.
+> 
+> Error messages:
+> [  441.298819] mcp251xfd spi2.0 can0: ERROR in mcp251xfd_start_xmit: -16
+> [  441.306498] mcp251xfd spi2.0 can0: Transmit Event FIFO buffer not empty. (seq=0x000017c7, tef_tail=0x000017cf, tef_head=0x000017d0, tx_head=0x000017d3).
+> ... and repeat forever.
+> 
+> The issue can be triggered when multiple devices share the same
+> SPI interface. And there is concurrent access to the bus.
+> 
+> The problem occurs because tx_ring->head increments even if
+> mcp251xfd_start_xmit() fails. Consequently, the driver skips one
+> TX package while still expecting a response in
+> mcp251xfd_handle_tefif_one().
+> 
+> This patch resolves the issue by decreasing tx_ring->head if
+> mcp251xfd_start_xmit() fails. With the fix, if we trigger the issue and
+> the err = -EBUSY, the driver returns NETDEV_TX_BUSY. The network stack
+> retries to transmit the message.
+> Otherwise, it prints an error and discards the message.
+> 
+> Fixes: 55e5b97f003e ("can: mcp25xxfd: add driver for Microchip MCP25xxFD SPI CAN")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Vitor Soares <vitor.soares@toradex.com>
 
--MODULE_ALIAS("platform:i2c_designware");
-+MODULE_ALIAS("platform:" I2C_DESIGNWARE_NAME);
+Any other feedback on this? Just reaching out to be that this does not
+fall through the cracks.
+
+Francesco
+
 
