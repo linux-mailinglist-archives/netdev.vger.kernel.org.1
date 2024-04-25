@@ -1,75 +1,98 @@
-Return-Path: <netdev+bounces-91134-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91135-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 093118B180B
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 02:30:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50FDA8B180F
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 02:30:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3BE551C25275
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 00:30:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F15B028AB89
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 00:30:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20219A3D;
-	Thu, 25 Apr 2024 00:30:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 643A280C;
+	Thu, 25 Apr 2024 00:30:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WzGSqQIJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p70p+OkF"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA421816;
-	Thu, 25 Apr 2024 00:30:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C31B800;
+	Thu, 25 Apr 2024 00:30:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714005002; cv=none; b=KlRvIg/EYWF2/4+MHWJAFqdQAdqHJOo9Ow08yiBrBeXi3228H/U5VhfmihqNCcz9QsspxH1ZA5PWuN+2qu8Y4IRy161Z4va6Z66yPc7N9RapakzG7ItMp5r1BsmvxZkhB+6531Arku7vfmEQkXknJ8UDmOdsLah2HD3cB+F7mbc=
+	t=1714005029; cv=none; b=JfynH0pclhcx8ztUWkUB9q0WH8vsu19igvz9Nk5G8PT+UI49X4jyIhcRweKrEWrrMPWCdZtBifK1kv50Y+RjkvqyMdjnvs9SyFLnAUyA9b70rLiQyXi4ihuMNpnRUYcW8FBiDICN+ljK4u9/FeQVzuSKB+HP3opIjpF7k6I7mO8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714005002; c=relaxed/simple;
-	bh=WbIAErx155OHROJyjjTEAtiQOif5dHzxJ/2nLoOUoVo=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SVuRW41D5hmtcbwpWp2JiPTqo6sDXt85mjK44vSMbueFRYIYMmQz93+f/3UKCf2jUJSwqs/ONLaA/s9FprXcuj72fM+CeLANUsmfUCdP0W3xngCojboOlvGqPu6VCRnvNrK+6hip3MJXGVif1uCH8Fwcg2CzFFqIma3ElZOZz3I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WzGSqQIJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 41A7EC113CD;
-	Thu, 25 Apr 2024 00:30:01 +0000 (UTC)
+	s=arc-20240116; t=1714005029; c=relaxed/simple;
+	bh=TMouWAKGI9DGVxwAmwJzKVQLS6yKS2cOmK2SttfRxW8=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=otTYrEI0GeFfLBiLpFlW5n/gpm14BUUqHR3LJZI+by2bUiL5TuktIwgKBh+k9D1x8lr+mJlj7n/znwfniT0l+9bT7NxWYD2WCivtcOog8eTd2qXGpipFA8uQbMJSLuZHz3MmtIGzHcAKtfjbNGCMiF/ud2HDAVQylLELqE73mQw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p70p+OkF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 18F40C2BBFC;
+	Thu, 25 Apr 2024 00:30:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714005001;
-	bh=WbIAErx155OHROJyjjTEAtiQOif5dHzxJ/2nLoOUoVo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=WzGSqQIJYqVVmeR0Axg/A/1a59UPQAstvMECUJJMfi9jFPynFjQtyradhBzYRrxQG
-	 Z5T9Bsea8kDdH6Z0YHs1Tkuyy+VrdMELSWyDy0ZuWZc3eM2dLzDWCl6b0O9LXWJNJ+
-	 KIM4+IN/J0FiEcm1atseZC7zVkuDU44WarmCe2/Pt06EeQIBo67Zhw8UseJY+MXjfO
-	 FTMzANnAba2dkmfiNqZ+bMd2KAJ+1LgLcQgaGwpoB4lVt2PrZZewbe3TGEDHzcIVMe
-	 8rT1975sZaAsBjIBvyj1vU76pJqeZ2BAKkLpVs+ziEmV9cFxnrSG7y7+ipUHYjCR4Y
-	 bE0NZrOtuPrOQ==
-Date: Wed, 24 Apr 2024 17:30:00 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Simon Horman <horms@kernel.org>
-Cc: Aaron Conole <aconole@redhat.com>, netdev@vger.kernel.org,
- dev@openvswitch.org, linux-kselftest@vger.kernel.org
-Subject: Re: selftests: openvswitch: Questions about possible enhancements
-Message-ID: <20240424173000.21c12587@kernel.org>
-In-Reply-To: <20240424164405.GN42092@kernel.org>
-References: <20240424164405.GN42092@kernel.org>
+	s=k20201202; t=1714005029;
+	bh=TMouWAKGI9DGVxwAmwJzKVQLS6yKS2cOmK2SttfRxW8=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=p70p+OkF6/xTwDinEY69hrufvEqdbK09wXCYXdKrGtPLZk6UmQVP+dcl/4lbI5yTQ
+	 6OjEilgFLUMOAwzKUMH8p/OpjfQEhxCk+zr8r1+crPVPLbturoWMl/RHkEy5qllAmW
+	 i1WmChTH+qQH9zAX1fDSjyTYfwGOyQfFE8YyJuu+a7d/BgSNrESsn0Fbhap1wXzHUo
+	 VpViN5MsNQ9TDi12R1H+gUancwZzh9dUclpyuTs6NkioXgEMouoSEgAEH7xO5MRrrR
+	 XSpVm6DL3rfUkpxdY4dvxBv6w/Db4nSfNi1Q23yjicQqXSbDQ/XwZR86drN/xjuifm
+	 ZXLkE6XC4E7lg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 0A2ABC00448;
+	Thu, 25 Apr 2024 00:30:29 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] selftests: netfilter: fix conntrack_dump_flush
+ retval on unsupported kernel
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171400502903.22410.6999732132330673626.git-patchwork-notify@kernel.org>
+Date: Thu, 25 Apr 2024 00:30:29 +0000
+References: <20240422103358.3511-1-fw@strlen.de>
+In-Reply-To: <20240422103358.3511-1-fw@strlen.de>
+To: Florian Westphal <fw@strlen.de>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, netfilter-devel@vger.kernel.org,
+ pablo@netfilter.org
 
-On Wed, 24 Apr 2024 17:44:05 +0100 Simon Horman wrote:
-> I have recently been exercising the Open vSwitch kernel selftests,
-> using vng,
+Hello:
 
-Speaking of ovs tests, we currently don't run them in CI (and suffer
-related skips in pmtu.sh) because Amazon Linux doesn't have ovs
-packaged and building it looks pretty hard.
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Is there an easy way to build just the CLI tooling or get a pre-built
-package somewhere?
+On Mon, 22 Apr 2024 12:33:53 +0200 you wrote:
+> With CONFIG_NETFILTER=n test passes instead of skip.  Before:
+> 
+>  ./run_kselftest.sh -t net/netfilter:conntrack_dump_flush
+> [..]
+>  # Starting 3 tests from 1 test cases.
+>  #  RUN           conntrack_dump_flush.test_dump_by_zone ...
+>  mnl_socket_open: Protocol not supported
+> [..]
+>  ok 3 conntrack_dump_flush.test_flush_by_zone_default
+>  # PASSED: 3 / 3 tests passed.
+>  # Totals: pass:3 fail:0 xfail:0 xpass:0 skip:0 error:0
+> 
+> [...]
 
-Or perhaps you'd be willing to run the OvS tests and we can move 
-the part of pmtu.sh into OvS test dir?
+Here is the summary with links:
+  - [net-next] selftests: netfilter: fix conntrack_dump_flush retval on unsupported kernel
+    https://git.kernel.org/netdev/net-next/c/dd99c29e83e4
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
