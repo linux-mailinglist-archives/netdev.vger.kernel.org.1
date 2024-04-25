@@ -1,127 +1,75 @@
-Return-Path: <netdev+bounces-91133-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91134-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A7D28B1802
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 02:27:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 093118B180B
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 02:30:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3BC801C248EC
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 00:27:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3BE551C25275
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 00:30:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 064028468;
-	Thu, 25 Apr 2024 00:26:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20219A3D;
+	Thu, 25 Apr 2024 00:30:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Ooz+ZMrB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WzGSqQIJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay.smtp-ext.broadcom.com (relay.smtp-ext.broadcom.com [192.19.144.208])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06754A35;
-	Thu, 25 Apr 2024 00:26:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.19.144.208
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA421816;
+	Thu, 25 Apr 2024 00:30:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714004816; cv=none; b=GjlQrAq9CADgzUv2szj4mHWjmu/tT9gHxHcHzu7FVlFbUqjxdaCyaUb1l/PnJ2mRAE/Zg8ftYfZ/FPNJsev+aS4t59+3Bn3cUoCnU8rjIe17zyUoeFusfscU8Y8HxYTBKEXiWJ3B9qfdJMbCfc4y8rKvCTYzGBG87aeUJaXBLRg=
+	t=1714005002; cv=none; b=KlRvIg/EYWF2/4+MHWJAFqdQAdqHJOo9Ow08yiBrBeXi3228H/U5VhfmihqNCcz9QsspxH1ZA5PWuN+2qu8Y4IRy161Z4va6Z66yPc7N9RapakzG7ItMp5r1BsmvxZkhB+6531Arku7vfmEQkXknJ8UDmOdsLah2HD3cB+F7mbc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714004816; c=relaxed/simple;
-	bh=ZFagWEYvJBD4GgAH/EVhAXHdfVqrRJ5Qc84fXqDt6To=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=u9jfYCYHq6f+Dj+eHPihl+ppe3+Mrsk+bNjS382SFXnqdHo7IMbSYedf3e+hJi7emlJutxPP4bYC4kUmArQpGWfkfbmuhQXnPl6NGf+ylh7A2707M9MdxbDlCffX1YIIGE07w/+0hegVWXj7XiCzyINP8wrvxNC8zQsq44BoqcI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Ooz+ZMrB; arc=none smtp.client-ip=192.19.144.208
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: from mail-lvn-it-01.lvn.broadcom.net (mail-lvn-it-01.lvn.broadcom.net [10.36.132.253])
-	by relay.smtp-ext.broadcom.com (Postfix) with ESMTP id 68382C00150E;
-	Wed, 24 Apr 2024 17:26:45 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 relay.smtp-ext.broadcom.com 68382C00150E
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=broadcom.com;
-	s=dkimrelay; t=1714004805;
-	bh=ZFagWEYvJBD4GgAH/EVhAXHdfVqrRJ5Qc84fXqDt6To=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Ooz+ZMrBGXlrrU/+yGUPCdaHyWxl5xE1O4jhIf2L7xDTF/nF41mHEjyOB/ENbXiV8
-	 58RWm616PZfFgHsrvglg9qcoF6MdMPY2Gpa6c0xmT2uqHCHiBeShN/+cupzcQc7Ajs
-	 glAOkNNaDoPvttnzrlZHuODUHE0OLv+4JA5EGLyw=
-Received: from fainelli-desktop.igp.broadcom.net (fainelli-desktop.dhcp.broadcom.net [10.67.48.245])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mail-lvn-it-01.lvn.broadcom.net (Postfix) with ESMTPSA id 76E9318041CAC6;
-	Wed, 24 Apr 2024 17:26:43 -0700 (PDT)
-From: Florian Fainelli <florian.fainelli@broadcom.com>
-To: linux-kernel@vger.kernel.org
-Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
-	Jarkko Nikula <jarkko.nikula@linux.intel.com>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Mika Westerberg <mika.westerberg@linux.intel.com>,
-	Jan Dabros <jsd@semihalf.com>,
-	Andi Shyti <andi.shyti@kernel.org>,
-	Lee Jones <lee@kernel.org>,
-	Jiawen Wu <jiawenwu@trustnetic.com>,
-	Mengyuan Lou <mengyuanlou@net-swift.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Duanqiang Wen <duanqiangwen@net-swift.com>,
-	linux-i2c@vger.kernel.org (open list:SYNOPSYS DESIGNWARE I2C DRIVER),
-	netdev@vger.kernel.org (open list:WANGXUN ETHERNET DRIVER)
-Subject: [PATCH v2 4/4] net: txgbe: Utilize i2c-designware.h
-Date: Wed, 24 Apr 2024 17:26:42 -0700
-Message-Id: <20240425002642.2053657-5-florian.fainelli@broadcom.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240425002642.2053657-1-florian.fainelli@broadcom.com>
-References: <20240425002642.2053657-1-florian.fainelli@broadcom.com>
+	s=arc-20240116; t=1714005002; c=relaxed/simple;
+	bh=WbIAErx155OHROJyjjTEAtiQOif5dHzxJ/2nLoOUoVo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=SVuRW41D5hmtcbwpWp2JiPTqo6sDXt85mjK44vSMbueFRYIYMmQz93+f/3UKCf2jUJSwqs/ONLaA/s9FprXcuj72fM+CeLANUsmfUCdP0W3xngCojboOlvGqPu6VCRnvNrK+6hip3MJXGVif1uCH8Fwcg2CzFFqIma3ElZOZz3I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WzGSqQIJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 41A7EC113CD;
+	Thu, 25 Apr 2024 00:30:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714005001;
+	bh=WbIAErx155OHROJyjjTEAtiQOif5dHzxJ/2nLoOUoVo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=WzGSqQIJYqVVmeR0Axg/A/1a59UPQAstvMECUJJMfi9jFPynFjQtyradhBzYRrxQG
+	 Z5T9Bsea8kDdH6Z0YHs1Tkuyy+VrdMELSWyDy0ZuWZc3eM2dLzDWCl6b0O9LXWJNJ+
+	 KIM4+IN/J0FiEcm1atseZC7zVkuDU44WarmCe2/Pt06EeQIBo67Zhw8UseJY+MXjfO
+	 FTMzANnAba2dkmfiNqZ+bMd2KAJ+1LgLcQgaGwpoB4lVt2PrZZewbe3TGEDHzcIVMe
+	 8rT1975sZaAsBjIBvyj1vU76pJqeZ2BAKkLpVs+ziEmV9cFxnrSG7y7+ipUHYjCR4Y
+	 bE0NZrOtuPrOQ==
+Date: Wed, 24 Apr 2024 17:30:00 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Simon Horman <horms@kernel.org>
+Cc: Aaron Conole <aconole@redhat.com>, netdev@vger.kernel.org,
+ dev@openvswitch.org, linux-kselftest@vger.kernel.org
+Subject: Re: selftests: openvswitch: Questions about possible enhancements
+Message-ID: <20240424173000.21c12587@kernel.org>
+In-Reply-To: <20240424164405.GN42092@kernel.org>
+References: <20240424164405.GN42092@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Rather than open code the i2c_designware string, utilize the newly
-defined constant in i2c-designware.h.
+On Wed, 24 Apr 2024 17:44:05 +0100 Simon Horman wrote:
+> I have recently been exercising the Open vSwitch kernel selftests,
+> using vng,
 
-Signed-off-by: Florian Fainelli <florian.fainelli@broadcom.com>
----
- drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+Speaking of ovs tests, we currently don't run them in CI (and suffer
+related skips in pmtu.sh) because Amazon Linux doesn't have ovs
+packaged and building it looks pretty hard.
 
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
-index 93295916b1d2..7545aacc9c19 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
-@@ -8,6 +8,7 @@
- #include <linux/clkdev.h>
- #include <linux/i2c.h>
- #include <linux/pci.h>
-+#include <linux/platform_data/i2c-designware.h>
- #include <linux/platform_device.h>
- #include <linux/regmap.h>
- #include <linux/pcs/pcs-xpcs.h>
-@@ -571,8 +572,8 @@ static int txgbe_clock_register(struct txgbe *txgbe)
- 	char clk_name[32];
- 	struct clk *clk;
- 
--	snprintf(clk_name, sizeof(clk_name), "i2c_designware.%d",
--		 pci_dev_id(pdev));
-+	snprintf(clk_name, sizeof(clk_name), "%s.%d",
-+		 I2C_DESIGNWARE_NAME, pci_dev_id(pdev));
- 
- 	clk = clk_register_fixed_rate(NULL, clk_name, NULL, 0, 156250000);
- 	if (IS_ERR(clk))
-@@ -634,7 +635,7 @@ static int txgbe_i2c_register(struct txgbe *txgbe)
- 
- 	info.parent = &pdev->dev;
- 	info.fwnode = software_node_fwnode(txgbe->nodes.group[SWNODE_I2C]);
--	info.name = "i2c_designware";
-+	info.name = I2C_DESIGNWARE_NAME;
- 	info.id = pci_dev_id(pdev);
- 
- 	info.res = &DEFINE_RES_IRQ(pdev->irq);
--- 
-2.34.1
+Is there an easy way to build just the CLI tooling or get a pre-built
+package somewhere?
 
+Or perhaps you'd be willing to run the OvS tests and we can move 
+the part of pmtu.sh into OvS test dir?
 
