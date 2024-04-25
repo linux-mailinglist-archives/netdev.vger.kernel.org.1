@@ -1,129 +1,92 @@
-Return-Path: <netdev+bounces-91236-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91237-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 896C18B1CEA
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 10:39:45 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C0F78B1D3F
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 11:02:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B4EB51C2173D
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 08:39:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 888D11F23F33
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 09:02:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E82B57F7F5;
-	Thu, 25 Apr 2024 08:39:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IVoU3rDp"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F10EF8172E;
+	Thu, 25 Apr 2024 09:02:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8CD47A13A
-	for <netdev@vger.kernel.org>; Thu, 25 Apr 2024 08:39:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.188.207])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E46CE1DFE4;
+	Thu, 25 Apr 2024 09:02:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.188.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714034382; cv=none; b=D8MBkuv5gTn/aHB3b007MrznaHr1ltJ3yfi5UdvQ2SxPEaKI8Z24WUAgHLuGy5KhBPLfSZgbLPXPqqwn17jYxoARTZgIO0pvI1UgeqWI3JIxXP3Mq9jAWRLFpw4aQETRwW9iQzXbMW6YTDuaJnW23sUQUTKF4oxJFjpLxL2kwN8=
+	t=1714035731; cv=none; b=dvcdAI8gDt79GkdGDvRiyCfnLp+pxVOm9178q8WL+MUEjqIuq7NSnmioz06/s6Ia+AjYLauFvvE0OIuc25AkISGq8RI/jpjEz1FMPZZoTFxFw3ALlQB0Y3BtZDSvG04WN+tkInfTcNEMF704IG/NVbg5l6fMWAC+E0RWhGZayiM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714034382; c=relaxed/simple;
-	bh=/9yyKzE8Zxtr4YeXsLr5diSzcU8HNZj+vrs/DZ3QOog=;
-	h=From:To:cc:Subject:MIME-Version:Content-Type:Date:Message-ID; b=lblUqX7Wenw5g3pGYnxTq9IrKuzyDpvELwDSoZTrbfFDD64zB9rjpTxAyYA5EJRN0lI5/Ocz/d48K7lU5vU4/xMZwhyhJLfrCSZ6WTZUWbB6nz3BN5/tIPXGWct3iBkUWVpl+ayJ54OnTAvbJ59Wc8UL2gVvCDtgs2uAo+FuroI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IVoU3rDp; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1714034379;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=QZ3es0/m9Be3HXMWlawHrU+ruWvHPUrW+BQXBx/9QME=;
-	b=IVoU3rDpUsnxmN4Xn1n1DGYR+kjfpJFe51XitIxifI1f5XTxf8bkI/rMMf2aHHmNVbXjrv
-	kJBUq234jKedENLX9n3ZKtemSWj9H29dgblSdNLLBbLON26SeCutrD57zLadMRazjf6Q2h
-	0PGDKazvGbQCHEZ2e4Xh1/oRRznTuMM=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-590-e4mtFl2tPqGayEHnj_tMnw-1; Thu,
- 25 Apr 2024 04:39:36 -0400
-X-MC-Unique: e4mtFl2tPqGayEHnj_tMnw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 85DBE29AA391;
-	Thu, 25 Apr 2024 08:39:35 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.200])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 829E551BF;
-	Thu, 25 Apr 2024 08:39:33 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-To: netdev@vger.kernel.org
-cc: dhowells@redhat.com, Jeff Layton <jlayton@kernel.org>,
-    Steve French <sfrench@samba.org>,
-    Herbert Xu <herbert@gondor.apana.org.au>,
-    "David S. Miller" <davem@davemloft.net>,
-    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-    Paolo Abeni <pabeni@redhat.com>, netfs@lists.linux.dev,
-    linux-crypto@vger.kernel.org, linux-cifs@vger.kernel.org,
-    linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH net] Fix a potential infinite loop in extract_user_to_sg()
+	s=arc-20240116; t=1714035731; c=relaxed/simple;
+	bh=80Gn9/EKOHSsLUvQLQNdkQLytYBWuZSbdaKEw8CrbZo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=nnFG/QsDk9pJLpfz+URPPBBOFBKhq1+TW2fJ0GR1aZEhVoe2ber2EtM19Dc2cGjfTflkrnYC2kTZnXIFvnRPtQxaOAlJvMiUbBoWslhaxomVGkP64RKYXLe1j+J1O2uV00gXhJj4/mMRMSF/Ltvpw1Xtr11hqgl+GQ7oGZd0lOI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; arc=none smtp.client-ip=217.70.188.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: netfilter-devel@vger.kernel.org
+Cc: davem@davemloft.net,
+	netdev@vger.kernel.org,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	fw@strlen.de
+Subject: [PATCH net 0/2] Netfilter/IPVS fixes for net
+Date: Thu, 25 Apr 2024 11:01:47 +0200
+Message-Id: <20240425090149.1359547-1-pablo@netfilter.org>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1967120.1714034372.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 25 Apr 2024 09:39:32 +0100
-Message-ID: <1967121.1714034372@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
+Content-Transfer-Encoding: 8bit
 
-    =
+Hi,
 
-Fix extract_user_to_sg() so that it will break out of the loop if
-iov_iter_extract_pages() returns 0 rather than looping around forever.
+The following patchset contains two Netfilter/IPVS fixes for net:
 
-[Note that I've included two fixes lines as the function got moved to a
-different file and renamed]
+Patch #1 fixes SCTP checksumming for IPVS with gso packets,
+	 from Ismael Luceno.
 
-Fixes: 85dd2c8ff368 ("netfs: Add a function to extract a UBUF or IOVEC int=
-o a BVEC iterator")
-Fixes: f5f82cd18732 ("Move netfs_extract_iter_to_sg() to lib/scatterlist.c=
-")
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Jeff Layton <jlayton@kernel.org>
-cc: Steve French <sfrench@samba.org>
-cc: Herbert Xu <herbert@gondor.apana.org.au>
-cc: "David S. Miller" <davem@davemloft.net>
-cc: Eric Dumazet <edumazet@google.com>
-cc: Jakub Kicinski <kuba@kernel.org>
-cc: Paolo Abeni <pabeni@redhat.com>
-cc: netfs@lists.linux.dev
-cc: linux-crypto@vger.kernel.org
-cc: linux-cifs@vger.kernel.org
-cc: linux-fsdevel@vger.kernel.org
-cc: netdev@vger.kernel.org
----
- lib/scatterlist.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Patch #2 honor dormant flag from netdev event path to fix a possible
+	 double hook unregistration.
 
-diff --git a/lib/scatterlist.c b/lib/scatterlist.c
-index 68b45c82c37a..7bc2220fea80 100644
---- a/lib/scatterlist.c
-+++ b/lib/scatterlist.c
-@@ -1124,7 +1124,7 @@ static ssize_t extract_user_to_sg(struct iov_iter *i=
-ter,
- 	do {
- 		res =3D iov_iter_extract_pages(iter, &pages, maxsize, sg_max,
- 					     extraction_flags, &off);
--		if (res < 0)
-+		if (res <=3D 0)
- 			goto failed;
- =
+Please, pull these changes from:
 
- 		len =3D res;
+  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git nf-24-04-25
 
+Thanks.
+
+----------------------------------------------------------------
+
+The following changes since commit a9176f7c66f0f438dfd9a1a6c86ca7b73280a494:
+
+  Merge branch 'mlxsw-fixes' (2024-04-19 20:43:17 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git nf-24-04-25
+
+for you to fetch changes up to 8e30abc9ace4f0add4cd761dfdbfaebae5632dd2:
+
+  netfilter: nf_tables: honor table dormant flag from netdev release event path (2024-04-25 10:42:57 +0200)
+
+----------------------------------------------------------------
+netfilter pull request 24-04-25
+
+----------------------------------------------------------------
+Ismael Luceno (1):
+      ipvs: Fix checksumming on GSO of SCTP packets
+
+Pablo Neira Ayuso (1):
+      netfilter: nf_tables: honor table dormant flag from netdev release event path
+
+ net/netfilter/ipvs/ip_vs_proto_sctp.c | 6 ++++--
+ net/netfilter/nft_chain_filter.c      | 4 +++-
+ 2 files changed, 7 insertions(+), 3 deletions(-)
 
