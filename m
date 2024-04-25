@@ -1,196 +1,450 @@
-Return-Path: <netdev+bounces-91454-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91455-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E497E8B2A14
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 22:47:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 718A08B2A1D
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 22:50:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1D085B259EA
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 20:47:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DE02E1F23FDA
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 20:50:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4287C14D70C;
-	Thu, 25 Apr 2024 20:47:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCA78153814;
+	Thu, 25 Apr 2024 20:50:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="rfJWzMPD"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=fritzc.com header.i=@fritzc.com header.b="D6I+DXvK"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80006.amazon.com (smtp-fw-80006.amazon.com [99.78.197.217])
+Received: from fritzc.com (mail.fritzc.com [213.160.72.247])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A7D911720
-	for <netdev@vger.kernel.org>; Thu, 25 Apr 2024 20:47:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.217
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91A6737143;
+	Thu, 25 Apr 2024 20:50:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.160.72.247
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714078065; cv=none; b=rMErIvNRyFgef/pV8teAXje2DCRvC9UXUK7SfEW/EcvsKODH3darJ3iu3KdYRRuxgQgFDfHSq44WaKR7xiqE7cpqYRHB/H0H0NbpJdXmR8q/rOsJOjNX9V/xTnB/e+fXqIFHx0l2fu/Djd98oz3qCJJ+SZMmEWZY3UlNA0xIbjY=
+	t=1714078211; cv=none; b=Penixw2ZacX+pR3tRypPZKkMcyv7Nf+oweSDcQDRI4lrhEBvr2XFHyvxc7iCEZKG1Y5IdZrUrIDd06Wz9bKibzueJP3yzsKyQIjT7hEoCd3adC5W/Djgjng0LVcFxoLfmDHet6sLwykg+VE51YEySXMBbK22YlpzEqSaj4tY6rg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714078065; c=relaxed/simple;
-	bh=EHt5zUjV7ZwuDQ2H7UEWfaVlfS8B58QFgaOjD97oCwg=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZulQ1dpWcQnG8236a4NyF7mpOm3i4YHIda5cDVwYsMckQwDiHBSDYUI8YUAvFekW4G7YM7MCE814trF7kgfTT8Kzlv6IEoild0kf2BMxYXv4ILRZRAJuxtGkKrKNWfZ2GDKdkxvk4WQ0pzRPDlbY5hJMBIfzOveTnQq5P80606U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=rfJWzMPD; arc=none smtp.client-ip=99.78.197.217
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1714078064; x=1745614064;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=7wgKOBh4p3y58lQMH90G9dgFHv1WgB4EdXkcuO04BfQ=;
-  b=rfJWzMPDma6RLA6oWxpjwvE8uGdjASPDyN611KYgxctCn1Scy91Wx3sR
-   Jtcrau0hC8BKWfhDAiW+roNQEzn/x+DX6fX8TOTCkdPy0WuVIGT6SyRY+
-   Y+6QvW1UWgGlYCriXAyzV3MjCyoT5hRtaUr1StOGinJc/jt6faxegfuA0
-   k=;
-X-IronPort-AV: E=Sophos;i="6.07,230,1708387200"; 
-   d="scan'208";a="290816250"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-80006.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Apr 2024 20:47:42 +0000
-Received: from EX19MTAUWA002.ant.amazon.com [10.0.7.35:32013]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.28.195:2525] with esmtp (Farcaster)
- id ba221815-1192-4c72-9808-e795cf1f8c4f; Thu, 25 Apr 2024 20:47:41 +0000 (UTC)
-X-Farcaster-Flow-ID: ba221815-1192-4c72-9808-e795cf1f8c4f
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Thu, 25 Apr 2024 20:47:36 +0000
-Received: from 88665a182662.ant.amazon.com (10.106.101.18) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Thu, 25 Apr 2024 20:47:33 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <edumazet@google.com>
-CC: <davem@davemloft.net>, <dsahern@kernel.org>, <kuba@kernel.org>,
-	<kuni1840@gmail.com>, <kuniyu@amazon.com>, <netdev@vger.kernel.org>,
-	<pabeni@redhat.com>
-Subject: Re: [PATCH v2 net-next 6/6] arp: Convert ioctl(SIOCGARP) to RCU.
-Date: Thu, 25 Apr 2024 13:47:25 -0700
-Message-ID: <20240425204725.98034-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <CANn89iJGJQeYiUYX9a_tPB00fCibuOED_mbxZwcJAQLbMYiy8w@mail.gmail.com>
-References: <CANn89iJGJQeYiUYX9a_tPB00fCibuOED_mbxZwcJAQLbMYiy8w@mail.gmail.com>
+	s=arc-20240116; t=1714078211; c=relaxed/simple;
+	bh=JlZ5SNw/c8lgIyAIwwqks3l+7NUsINRYRqt1oaRFElM=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=fFepNOfz2xk945j5o00hvuB8jdFEaxGxplrnoFwZw7zGz0ViHWMd0HLNeZZG9XiJrlE1eHwPbPxKp691sBDW3Q+QNKR8VwJXbBAu3RQFSIJgb6P07e40z/POm4H15Grwg6tZ0A0D8FWBZjTJHdSGMU8hs2IbvmHjpjbC3lvQ3B8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hexdev.de; spf=pass smtp.mailfrom=hexdev.de; dkim=pass (1024-bit key) header.d=fritzc.com header.i=@fritzc.com header.b=D6I+DXvK; arc=none smtp.client-ip=213.160.72.247
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hexdev.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hexdev.de
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=fritzc.com;
+	s=dkim; h=Content-Transfer-Encoding:MIME-Version:Content-Type:References:
+	In-Reply-To:Date:Cc:To:Reply-To:From:Subject:Message-ID:Sender:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=3++3z5ylpnDhpBpGdZfltMNRCAtctEtUSEKoliPaLzY=; b=D6I+DXvKKRGuwPZDMb6VKmy4bC
+	j5tfqY470Lc3/nCQ7wW6qzi5cgyKnfljidykRQC+ZJZORWzXcILTnBzRP1LaVT7mnzovdJh5gRQkp
+	lXRlbCV7SyncU4Sss0JSPj/R0yKlgaHhzhAQmD5U+TN7yD4TDC6+VNp3re/VNALVMUVY=;
+Received: from 127.0.0.1
+	by fritzc.com with esmtpsa (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim latest)
+	(envelope-from <christoph.fritz@hexdev.de>)
+	id 1s062M-001PQI-05;
+	Thu, 25 Apr 2024 22:49:46 +0200
+Message-ID: <97b22f7e79540fe228250414452c6049a255f310.camel@hexdev.de>
+Subject: Re: [PATCH 02/11] HID: hexLIN: Add support for USB LIN bus adapter
+From: Christoph Fritz <christoph.fritz@hexdev.de>
+Reply-To: christoph.fritz@hexdev.de
+To: Benjamin Tissoires <bentiss@kernel.org>
+Cc: Oliver Hartkopp <socketcan@hartkopp.net>, Marc Kleine-Budde
+ <mkl@pengutronix.de>, Vincent Mailhol <mailhol.vincent@wanadoo.fr>, "David
+ S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>, Rob
+ Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,  Conor
+ Dooley <conor+dt@kernel.org>, Jiri Kosina <jikos@kernel.org>, Greg
+ Kroah-Hartman <gregkh@linuxfoundation.org>, Jiri Slaby
+ <jirislaby@kernel.org>, Andreas Lauser <andreas.lauser@mercedes-benz.com>,
+ Jonathan Corbet <corbet@lwn.net>,  linux-can@vger.kernel.org,
+ netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+ linux-input@vger.kernel.org, linux-serial@vger.kernel.org
+Date: Thu, 25 Apr 2024 22:49:43 +0200
+In-Reply-To: <5w4fhdfplmaowyiu7i327pziniwqnftgpn3ei6uttuezwgfgql@xnxikjjv6fob>
+References: <20240422065114.3185505-1-christoph.fritz@hexdev.de>
+	 <20240422065114.3185505-3-christoph.fritz@hexdev.de>
+	 <5w4fhdfplmaowyiu7i327pziniwqnftgpn3ei6uttuezwgfgql@xnxikjjv6fob>
+Organization: hexDEV GmbH
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.46.4-2 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: EX19D031UWA001.ant.amazon.com (10.13.139.88) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Transfer-Encoding: 7bit
 
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 25 Apr 2024 22:35:38 +0200
-> On Thu, Apr 25, 2024 at 7:52 PM Kuniyuki Iwashima <kuniyu@amazon.com> wrote:
-> >
-> > From: Eric Dumazet <edumazet@google.com>
-> > Date: Thu, 25 Apr 2024 19:12:56 +0200
-> > > On Thu, Apr 25, 2024 at 7:02 PM Kuniyuki Iwashima <kuniyu@amazon.com> wrote:
-> > > >
-> > > > ioctl(SIOCGARP) holds rtnl_lock() for __dev_get_by_name() and
-> > > > later calls neigh_lookup(), which calls rcu_read_lock().
-> > > >
-> > > > Let's replace __dev_get_by_name() with dev_get_by_name_rcu() to
-> > > > avoid locking rtnl_lock().
-> > > >
-> > > > Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> > > > ---
-> > > >  net/ipv4/arp.c | 26 +++++++++++++++++---------
-> > > >  1 file changed, 17 insertions(+), 9 deletions(-)
-> > > >
-> > > > diff --git a/net/ipv4/arp.c b/net/ipv4/arp.c
-> > > > index 5034920be85a..9430b64558cd 100644
-> > > > --- a/net/ipv4/arp.c
-> > > > +++ b/net/ipv4/arp.c
-> > > > @@ -1003,11 +1003,15 @@ static int arp_rcv(struct sk_buff *skb, struct net_device *dev,
-> > > >   *     User level interface (ioctl)
-> > > >   */
-> > > >
-> > > > -static struct net_device *arp_req_dev_by_name(struct net *net, struct arpreq *r)
-> > > > +static struct net_device *arp_req_dev_by_name(struct net *net, struct arpreq *r,
-> > > > +                                             bool getarp)
-> > > >  {
-> > > >         struct net_device *dev;
-> > > >
-> > > > -       dev = __dev_get_by_name(net, r->arp_dev);
-> > > > +       if (getarp)
-> > > > +               dev = dev_get_by_name_rcu(net, r->arp_dev);
-> > > > +       else
-> > > > +               dev = __dev_get_by_name(net, r->arp_dev);
-> > > >         if (!dev)
-> > > >                 return ERR_PTR(-ENODEV);
-> > > >
-> > > > @@ -1028,7 +1032,7 @@ static struct net_device *arp_req_dev(struct net *net, struct arpreq *r)
-> > > >         __be32 ip;
-> > > >
-> > > >         if (r->arp_dev[0])
-> > > > -               return arp_req_dev_by_name(net, r);
-> > > > +               return arp_req_dev_by_name(net, r, false);
-> > > >
-> > > >         if (r->arp_flags & ATF_PUBL)
-> > > >                 return NULL;
-> > > > @@ -1166,7 +1170,7 @@ static int arp_req_get(struct net *net, struct arpreq *r)
-> > > >         if (!r->arp_dev[0])
-> > > >                 return -ENODEV;
-> > > >
-> > > > -       dev = arp_req_dev_by_name(net, r);
-> > > > +       dev = arp_req_dev_by_name(net, r, true);
-> > > >         if (IS_ERR(dev))
-> > > >                 return PTR_ERR(dev);
-> > > >
-> > > > @@ -1287,23 +1291,27 @@ int arp_ioctl(struct net *net, unsigned int cmd, void __user *arg)
-> > > >         else if (*netmask && *netmask != htonl(0xFFFFFFFFUL))
-> > > >                 return -EINVAL;
-> > > >
-> > > > -       rtnl_lock();
-> > > > -
-> > > >         switch (cmd) {
-> > > >         case SIOCDARP:
-> > > > +               rtnl_lock();
-> > > >                 err = arp_req_delete(net, &r);
-> > > > +               rtnl_unlock();
-> > > >                 break;
-> > > >         case SIOCSARP:
-> > > > +               rtnl_lock();
-> > > >                 err = arp_req_set(net, &r);
-> > > > +               rtnl_unlock();
-> > > >                 break;
-> > > >         case SIOCGARP:
-> > > > +               rcu_read_lock();
-> > > >                 err = arp_req_get(net, &r);
-> > > > +               rcu_read_unlock();
-> > >
-> > >
-> > > Note that arp_req_get() uses :
-> > >
-> > > strscpy(r->arp_dev, dev->name, sizeof(r->arp_dev));
-> > >
-> > > This currently depends on RTNL or devnet_rename_sem
-> >
-> > Ah, I missed this point, thanks for catching!
-> >
-> >
-> > >
-> > > Perhaps we should add a helper and use a seqlock to safely copy
-> > > dev->name into a temporary variable.
-> >
-> > So it's preferable to add seqlock around memcpy() in dev_change_name()
-> > and use a helper in arp_req_get() rather than adding devnet_rename_sem
-> > locking around memcpy() in arp_req_get() ?
+Hi Benjamin,
+
+ thanks for your review, please see my answers below.
+
+...
+> > +
+> > +static int hexlin_tx_req_status(struct hexlin_priv_data *priv,
+> > +				const void *out_report, int len)
+> > +{
+> > +	int ret;
+> > +	unsigned long t;
+> > +
+> > +	mutex_lock(&priv->tx_lock);
 > 
-> Under rcu_read_lock(), we can not sleep.
+> AFAICT, any operation using the device will use this function and
+> therefore this is enforcing a single user at the same time.
 > 
-> devnet_rename_sem is a semaphore... down_read() might sleep.
+> Is this a bus or a hw limitation?
 
-yes... -ENOCOFFEE :)
+It's a hw limitation.
 
+> > +
+> > +	reinit_completion(&priv->wait_in_report);
+> > +
+> > +	ret = hexlin_tx_report(priv, out_report, len);
+> > +	if (ret)
+> > +		goto tx_exit;
+> > +
+> > +	t = wait_for_completion_killable_timeout(&priv->wait_in_report,
+> > +						 msecs_to_jiffies(1000));
+> > +	if (!t)
+> > +		ret = -ETIMEDOUT;
+> > +
+> > +	if (priv->is_error)
+> > +		ret = -EINVAL;
+> > +
+> > +tx_exit:
+> > +	mutex_unlock(&priv->tx_lock);
+> > +
+> > +	return ret;
+> > +}
+...
+> > +static int hexlin_raw_event(struct hid_device *hdev,
+> > +			    struct hid_report *report, u8 *data, int sz)
+> > +{
+> > +	struct hexlin_priv_data *priv;
+> > +	int ret;
+> > +
+> > +	if (sz < 1 || sz > HEXLIN_PKGLEN_MAX)
+> > +		return -EREMOTEIO;
+> > +
+> > +	priv = hid_get_drvdata(hdev);
+> > +
+> > +	hid_dbg(hdev, "%s, size:%i, data[0]: 0x%02x\n", __func__, sz, data[0]);
+> > +
+> > +	priv->is_error = false;
+> > +
+> > +	switch (data[0]) {
+> > +	case HEXLIN_SUCCESS:
+> > +		if (sz != 1)
+> > +			return -EREMOTEIO;
+> 
+> Could we have some #define for all of these sizes (here and in all of
+> the other branches)?
+
+OK
 
 > 
-> So if you plan using current netdev_get_name(), you must call it
-> outside of rcu_read_lock() section.
->
+> > +		hid_dbg(hdev, "HEXLIN_SUCCESS: 0x%02x\n", data[0]);
+> > +		complete(&priv->wait_in_report);
+> 
+> Shouldn't you ensure that you currently have a request pending?
+> This works as long as no-one opens the hidraw node (see my remark
+> below).
 
-Will add seqlock helper in v3.
+Thanks for the heads up, there is no need for hidraw.
 
-Thanks!
+> > +		break;
+> > +	case HEXLIN_FAIL:
+> > +		if (sz != 1)
+> > +			return -EREMOTEIO;
+> > +		hid_err(hdev, "HEXLIN_FAIL: 0x%02x\n", data[0]);
+> > +		priv->is_error = true;
+> > +		complete(&priv->wait_in_report);
+> > +		break;
+> > +	case HEXLIN_GET_VERSION:
+> > +		if (sz != 2)
+> > +			return -EREMOTEIO;
+> > +		priv->fw_version = data[1];
+> > +		complete(&priv->wait_in_report);
+> > +		break;
+> > +	case HEXLIN_GET_RESPONDER_ANSWER_ID:
+> > +		if (sz != 20)
+> > +			return -EREMOTEIO;
+> > +		BUILD_BUG_ON(sizeof(priv->rar) != 20);
+> 
+> magical constants again
+
+OK
+
+> 
+> > +		memcpy(&priv->rar, data, sizeof(priv->rar));
+> > +		complete(&priv->wait_in_report);
+> > +		break;
+> > +	case HEXLIN_GET_BAUDRATE:
+> > +		if (sz != 3)
+> > +			return -EREMOTEIO;
+> > +		BUILD_BUG_ON(sizeof(priv->baudrate) != 2);
+> > +		memcpy(&priv->baudrate, &data[1], sizeof(priv->baudrate));
+> > +		le16_to_cpus(priv->baudrate);
+> > +		complete(&priv->wait_in_report);
+> > +		break;
+> > +	/* following cases not initiated by us, so no complete() */
+> > +	case HEXLIN_FRAME:
+> > +		if (sz != 17) {
+> > +			hid_err_once(hdev, "frame size mismatch: %i\n", sz);
+> > +			return -EREMOTEIO;
+> > +		}
+> > +		ret = hexlin_queue_frames_insert(priv, &data[1], sz-1);
+> > +		if (ret) {
+> > +			hid_err(hdev, "failed to add frame: %i\n", ret);
+> > +			return ret;
+> > +		}
+> > +		break;
+> > +	case HEXLIN_ERROR:
+> > +		hid_err(hdev, "error from adapter\n");
+> > +		break;
+> > +	default:
+> > +		hid_err(hdev, "unknown event: 0x%02x\n", data[0]);
+> > +	}
+> > +
+> > +	return 0;
+> > +}
+> > +
+> > +static int init_hw(struct hexlin_priv_data *priv)
+> > +{
+> > +	int ret;
+> > +
+> > +	ret = hexlin_reset_dev(priv);
+> > +	if (ret)
+> > +		return ret;
+> > +
+> > +	ret = hexlin_get_version(priv);
+> > +	if (ret)
+> > +		return ret;
+> > +
+> > +	priv->baudrate = LIN_DEFAULT_BAUDRATE;
+> > +	ret = hexlin_set_baudrate(priv, priv->baudrate);
+> > +	if (ret)
+> > +		return ret;
+> > +
+> > +	return 0;
+> > +}
+> > +
+> > +static int hexlin_probe(struct hid_device *hdev,
+> > +			const struct hid_device_id *id)
+> > +{
+> > +	struct hexlin_priv_data *priv;
+> > +	int ret;
+> > +
+> > +	priv = devm_kzalloc(&hdev->dev, sizeof(*priv), GFP_KERNEL);
+> > +	if (!priv)
+> > +		return -ENOMEM;
+> > +
+> > +	priv->hid_dev = hdev;
+> > +	hid_set_drvdata(hdev, priv);
+> > +
+> > +	mutex_init(&priv->tx_lock);
+> > +
+> > +	ret = hid_parse(hdev);
+> > +	if (ret) {
+> > +		hid_err(hdev, "hid parse failed with %d\n", ret);
+> > +		goto fail_and_free;
+> > +	}
+> > +
+> > +	ret = hid_hw_start(hdev, HID_CONNECT_HIDRAW);
+> 
+> Are you sure you want HID_CONNECT_HIDRAW?
+> 
+> Given that your whole driver relies on the assumption that any command
+> sent to the device is guarded by the mutex, if one client opens the
+> hidraw node and starts sending commands behind your back you are
+> screwed...
+> 
+> Maybe use HID_CONNECT_DRIVER instead.
+
+HID_CONNECT_DRIVER it is
+
+> 
+> > +	if (ret) {
+> > +		hid_err(hdev, "hid hw start failed with %d\n", ret);
+> > +		goto fail_and_stop;
+> > +	}
+> > +
+> > +	ret = hid_hw_open(hdev);
+> > +	if (ret) {
+> > +		hid_err(hdev, "hid hw open failed with %d\n", ret);
+> > +		goto fail_and_close;
+> > +	}
+> > +
+> > +	init_completion(&priv->wait_in_report);
+> > +
+> > +	hid_device_io_start(hdev);
+> > +
+> > +	ret = init_hw(priv);
+> > +	if (ret)
+> > +		goto fail_and_close;
+> > +
+> > +	priv->ldev = register_lin(&hdev->dev, &hexlin_ldo);
+> > +	if (IS_ERR_OR_NULL(priv->ldev)) {
+> > +		ret = PTR_ERR(priv->ldev);
+> > +		goto fail_and_close;
+> > +	}
+> > +
+> > +	hid_info(hdev, "hexLIN (fw-version: %u) probed\n", priv->fw_version);
+> 
+> you are not calling hid_hw_close(hdev) here (on purpose I guess).
+> 
+> However, this prevents the device to enter any sleep mode as the kernel
+> will always consider it to be in use.
+> Is there some open/close mechanism in LIN or in CAN that can tell the
+> device that it needs to be opened or do we assume that the device needs
+> to be powered on all the time?
+
+One can bring the LIN device up and down, just like any other Ethernet
+or CAN device. So, for revision 2 of this patchset, I added open/stop
+handling. This allows for hid_hw_close(hdev) here and also makes
+remove() handling way easier. Thanks for the heads up.
+
+> 
+> > +
+> > +	return 0;
+> > +
+> > +fail_and_close:
+> > +	hid_hw_close(hdev);
+> > +fail_and_stop:
+> > +	hid_hw_stop(hdev);
+> > +fail_and_free:
+> > +	mutex_destroy(&priv->tx_lock);
+> > +	return ret;
+> > +}
+> > +
+> > +static void hexlin_remove(struct hid_device *hdev)
+> > +{
+> > +	struct hexlin_priv_data *priv = hid_get_drvdata(hdev);
+> > +
+> > +	complete(&priv->wait_in_report);
+> 
+> what if you get one LIN request just now, between those 2 calls?
+> 
+> You should probably disable the ability to take the mutex before sending
+> the complete call above or you might still have the mutex taken here.
+> 
+> Also shouldn't you set priv->is_error = true before the complete?
+> 
+> > +	unregister_lin(priv->ldev);
+> > +	hid_hw_close(hdev);
+> > +	hid_hw_stop(hdev);
+> > +	mutex_destroy(&priv->tx_lock);
+> 
+> Given how the device works, I think it would be safer to do this in the
+> following order:
+> 
+> // prevent any incoming event (assuming hidraw is not available)
+> hid_hw_close(hdev);
+> // ensure the device is powered off
+> hid_hw_stop(hdev);
+> // mark any pending request as failed
+> priv->is_error = true;
+> // mark the device as unusable
+> priv->removed = true;
+> complete(&priv->wait_in_report);
+> // unregister
+> unregister_lin(priv->ldev);
+> // mutex is not used anymore
+> mutex_destroy(&priv->tx_lock);
+> 
+> (I might be wrong but this seems more sensible to me).
+> 
+> Actually, instead of having a priv->removed boolean, you could also take
+> and release the mutex before releasing it, this way you are sure to not
+> be in the critical code section. This should work because you are using
+> wait_for_completion_killable_timeout() and so after 1 s you are
+> guaranteed to exit the mutex.
+
+Thanks for the great explanation.
+
+> > +}
+> > +
+> > +static const struct hid_device_id hexlin_table[] = {
+> > +	{ HID_USB_DEVICE(USB_VENDOR_ID_MCS, USB_DEVICE_ID_MCS_HEXLIN) },
+> > +	{ }
+> > +};
+> > +
+> > +MODULE_DEVICE_TABLE(hid, hexlin_table);
+> > +
+> > +static struct hid_driver hexlin_driver = {
+> > +	.name = "hexLIN",
+> > +	.id_table = hexlin_table,
+> > +	.probe = hexlin_probe,
+> > +	.remove = hexlin_remove,
+> > +	.raw_event = hexlin_raw_event,
+> > +};
+> > +
+> > +static int __init hexlin_init(void)
+> > +{
+> > +	return hid_register_driver(&hexlin_driver);
+> > +}
+> > +
+> > +static void __exit hexlin_exit(void)
+> > +{
+> > +	hid_unregister_driver(&hexlin_driver);
+> > +}
+> > +
+> > +/*
+> > + * When compiled into the kernel, initialize after the hid bus.
+> > + */
+> > +late_initcall(hexlin_init);
+> > +module_exit(hexlin_exit);
+> > +
+> > +MODULE_LICENSE("GPL");
+> > +MODULE_AUTHOR("Christoph Fritz <christoph.fritz@hexdev.de>");
+> > +MODULE_DESCRIPTION("LIN bus driver for hexLIN USB adapter");
+> > diff --git a/drivers/hid/hid-ids.h b/drivers/hid/hid-ids.h
+> > index 8376fb5e2d0b4..157d234e1d400 100644
+> > --- a/drivers/hid/hid-ids.h
+> > +++ b/drivers/hid/hid-ids.h
+> > @@ -903,6 +903,7 @@
+> >  #define USB_DEVICE_ID_MCC_PMD1208LS	0x007a
+> >  
+> >  #define USB_VENDOR_ID_MCS		0x16d0
+> > +#define USB_DEVICE_ID_MCS_HEXLIN	0x0648
+> >  #define USB_DEVICE_ID_MCS_GAMEPADBLOCK	0x0bcc
+> >  
+> >  #define USB_VENDOR_MEGAWORLD		0x07b5
+> > diff --git a/drivers/hid/hid-quirks.c b/drivers/hid/hid-quirks.c
+> > index e0bbf0c6345d6..328fcc61303f3 100644
+> > --- a/drivers/hid/hid-quirks.c
+> > +++ b/drivers/hid/hid-quirks.c
+> > @@ -436,6 +436,9 @@ static const struct hid_device_id hid_have_special_driver[] = {
+> >  	{ HID_USB_DEVICE(USB_VENDOR_ID_GYRATION, USB_DEVICE_ID_GYRATION_REMOTE_2) },
+> >  	{ HID_USB_DEVICE(USB_VENDOR_ID_GYRATION, USB_DEVICE_ID_GYRATION_REMOTE_3) },
+> >  #endif
+> > +#if IS_ENABLED(CONFIG_HID_HEXLIN)
+> > +	{ HID_USB_DEVICE(USB_VENDOR_ID_MCS, USB_DEVICE_ID_MCS_HEXLIN) },
+> 
+> Generally, the pattern for drivers in the HID subsystem is to rely on
+> the vendor name, not the product, in order to be able to extend it to
+> more than one product.
+> 
+> Is your vendor name MCS? Or Hexdev?
+> 
+> If so, the driver should likely be hid-hexdev.c...
+
+We got the PID from MCS online shop here:
+
+https://www.mcselec.com/index.php?page=shop.product_details&product_id=92&option=com_phpshop
+
+Our vendor name is hexDEV, but the USB VID is MCS, and the product name
+is hexLIN...
+
+So is 'hid-hexlin.c' or 'hid-hexdev-hexlin.c' okay or does it need to
+be named 'hid-mcs-hexlin.c' in spite MCS has nearly nothing to do with
+it?
+
+
+Cheers
+  -- Christoph
+
 
