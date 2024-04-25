@@ -1,115 +1,99 @@
-Return-Path: <netdev+bounces-91225-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91226-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D12528B1C37
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 09:51:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94D008B1C5D
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 10:00:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 94452282169
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 07:51:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C53201C21657
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 08:00:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E8366EB4B;
-	Thu, 25 Apr 2024 07:51:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27BA06EB40;
+	Thu, 25 Apr 2024 08:00:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b="h+zgT3Dq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tBzLtcdP"
 X-Original-To: netdev@vger.kernel.org
-Received: from nbd.name (nbd.name [46.4.11.11])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2394D6D1D7;
-	Thu, 25 Apr 2024 07:51:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.4.11.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2CB16CDBF;
+	Thu, 25 Apr 2024 08:00:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714031488; cv=none; b=dhwAKJeDY8VzIkeZCz5Qfw6WM4KhNw4evwIECkdl9YU5VgoO0H0Za+jOm5SblxEBkbcTPfKb31G7VyHq4uhXUdv/cf6bCYn//Y4GLtigENFZOVWzvk3aBLtBaUoGklFwFCZtwf6wuPuSap4RUIiPIYBTt5fcnyKcMZ2Do9SV8zA=
+	t=1714032028; cv=none; b=sR6YWMuAMo9TQAdx6sVrcnkBy/ZsfpLcdHTkRk2r6UllAfAxVGu1m/L2Y8suAo7wAdXifpmfWtKf/iyHdpGTGxoywEKrnpL80GtrH8jyZa6N3FX3HQddA13f6g5894HtIotEegktc8Shu2r+Md/P0BEIGqMV8axUwsPVJ/cnACo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714031488; c=relaxed/simple;
-	bh=E8nqpW5ZzmfZlyFxMTgnUG0S6w7Wm5x7ngIcV+KYTrs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=F+Y/TATiWuXPmvcLazlu+9n5VONof9WPThfUhnvUx3kFBwO6rvzIlEgijfRsngWSn4gyrfdnJK7F2bPxQdoUBW8isjpfTl+/nFvptWAZgu8rTvER5eMEgcTbM3w4EosTxcRjFN45ggdm0g0tawZzjmK2Cd0DtY0leEpBBPgWihU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nbd.name; spf=none smtp.mailfrom=nbd.name; dkim=pass (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b=h+zgT3Dq; arc=none smtp.client-ip=46.4.11.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nbd.name
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=nbd.name
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=nbd.name;
-	s=20160729; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-	References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender:Reply-To:
-	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=IalwHlFT6sSBOYgqoWx3ZddcL59v2TYDVEDNgoSvy0w=; b=h+zgT3DqsdtXGefzg157RtSARo
-	CRH/apCaMvTZJ/qFG/uMw8dVDp5W8aPYvxIa+1HOPXaAzUak4tQU9iqh+EO3Mh2raFGIIqRYn1Wvc
-	mVjfm95ATzwhv+Ohef72DtCFa2ZWhZ7D2PhozT57hB27OomjLeDEqB9j9CzIkIRT0sMM=;
-Received: from p54ae9c93.dip0.t-ipconnect.de ([84.174.156.147] helo=nf.local)
-	by ds12 with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.96)
-	(envelope-from <nbd@nbd.name>)
-	id 1rztsu-007BVh-23;
-	Thu, 25 Apr 2024 09:51:12 +0200
-Message-ID: <1bc0ac3d-b18d-4969-a090-6803fa4dd5b4@nbd.name>
-Date: Thu, 25 Apr 2024 09:51:12 +0200
+	s=arc-20240116; t=1714032028; c=relaxed/simple;
+	bh=ptjAnjo4tFXKMp06ugTvfSuexjaunMRo+HICTqz+l5A=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=lIGPcaiRLvtJmloht1Ysr0CcYsOE7zye7O7PXFy5aoIpZ26grXf+1cZzBGhaOSkzjlmtqNV0QKxNjFjRF46zWMk2HBrBo72KZzJWD6bno18acEtTXihYwYTSXQ5WmkOOHNxjmB1NP9KbObDNADP8jP51e+0zwHI5upQUEVA4PpE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tBzLtcdP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 83254C2BD11;
+	Thu, 25 Apr 2024 08:00:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714032027;
+	bh=ptjAnjo4tFXKMp06ugTvfSuexjaunMRo+HICTqz+l5A=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=tBzLtcdP1/Lr9qAU24yu0IcON76IP8KIUoXSRT7ExXpQVgEDEWQmvIjVpDclxeMt1
+	 cAWzCyUAz7uGR5dQyAmn87PgYBQwbgft09LzJSKkyz2aL9i37rHiydA5+FVOLA2xiG
+	 hcbwAoYK4EEkGD5o4OqfAXyKpjB8OaTWocvmB3TvNEgT2H1z5Vmb8YfLpdbgQJ+8Fp
+	 qdYlo67A3Dw/+kt3owCiRng9RX32bufpevjvhwQghRQbOD817wHwyK34tIvyeV30SF
+	 crtTpCUHEAjalptCcpmPzRjt5g2Ucd09bbmtog7nW8SJ7nxgiMcXuWgBHJSlL+5fCA
+	 mQLOZPzYZlkgA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6D843C43140;
+	Thu, 25 Apr 2024 08:00:27 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/4] net: add support for segmenting TCP fraglist
- GSO packets
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
- "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: linux-kernel@vger.kernel.org
-References: <20240424180458.56211-1-nbd@nbd.name>
- <20240424180458.56211-3-nbd@nbd.name>
- <6629c805d808e_1bd6b029424@willemb.c.googlers.com.notmuch>
-From: Felix Fietkau <nbd@nbd.name>
-Content-Language: en-US
-Autocrypt: addr=nbd@nbd.name; keydata=
- xsDiBEah5CcRBADIY7pu4LIv3jBlyQ/2u87iIZGe6f0f8pyB4UjzfJNXhJb8JylYYRzIOSxh
- ExKsdLCnJqsG1PY1mqTtoG8sONpwsHr2oJ4itjcGHfn5NJSUGTbtbbxLro13tHkGFCoCr4Z5
- Pv+XRgiANSpYlIigiMbOkide6wbggQK32tC20QxUIwCg4k6dtV/4kwEeiOUfErq00TVqIiEE
- AKcUi4taOuh/PQWx/Ujjl/P1LfJXqLKRPa8PwD4j2yjoc9l+7LptSxJThL9KSu6gtXQjcoR2
- vCK0OeYJhgO4kYMI78h1TSaxmtImEAnjFPYJYVsxrhay92jisYc7z5R/76AaELfF6RCjjGeP
- wdalulG+erWju710Bif7E1yjYVWeA/9Wd1lsOmx6uwwYgNqoFtcAunDaMKi9xVQW18FsUusM
- TdRvTZLBpoUAy+MajAL+R73TwLq3LnKpIcCwftyQXK5pEDKq57OhxJVv1Q8XkA9Dn1SBOjNB
- l25vJDFAT9ntp9THeDD2fv15yk4EKpWhu4H00/YX8KkhFsrtUs69+vZQwc0cRmVsaXggRmll
- dGthdSA8bmJkQG5iZC5uYW1lPsJgBBMRAgAgBQJGoeQnAhsjBgsJCAcDAgQVAggDBBYCAwEC
- HgECF4AACgkQ130UHQKnbvXsvgCgjsAIIOsY7xZ8VcSm7NABpi91yTMAniMMmH7FRenEAYMa
- VrwYTIThkTlQzsFNBEah5FQQCACMIep/hTzgPZ9HbCTKm9xN4bZX0JjrqjFem1Nxf3MBM5vN
- CYGBn8F4sGIzPmLhl4xFeq3k5irVg/YvxSDbQN6NJv8o+tP6zsMeWX2JjtV0P4aDIN1pK2/w
- VxcicArw0VYdv2ZCarccFBgH2a6GjswqlCqVM3gNIMI8ikzenKcso8YErGGiKYeMEZLwHaxE
- Y7mTPuOTrWL8uWWRL5mVjhZEVvDez6em/OYvzBwbkhImrryF29e3Po2cfY2n7EKjjr3/141K
- DHBBdgXlPNfDwROnA5ugjjEBjwkwBQqPpDA7AYPvpHh5vLbZnVGu5CwG7NAsrb2isRmjYoqk
- wu++3117AAMFB/9S0Sj7qFFQcD4laADVsabTpNNpaV4wAgVTRHKV/kC9luItzwDnUcsZUPdQ
- f3MueRJ3jIHU0UmRBG3uQftqbZJj3ikhnfvyLmkCNe+/hXhPu9sGvXyi2D4vszICvc1KL4RD
- aLSrOsROx22eZ26KqcW4ny7+va2FnvjsZgI8h4sDmaLzKczVRIiLITiMpLFEU/VoSv0m1F4B
- FtRgoiyjFzigWG0MsTdAN6FJzGh4mWWGIlE7o5JraNhnTd+yTUIPtw3ym6l8P+gbvfoZida0
- TspgwBWLnXQvP5EDvlZnNaKa/3oBes6z0QdaSOwZCRA3QSLHBwtgUsrT6RxRSweLrcabwkkE
- GBECAAkFAkah5FQCGwwACgkQ130UHQKnbvW2GgCeMncXpbbWNT2AtoAYICrKyX5R3iMAoMhw
- cL98efvrjdstUfTCP2pfetyN
-In-Reply-To: <6629c805d808e_1bd6b029424@willemb.c.googlers.com.notmuch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next 0/2] tcp: update TCPCB_EVER_RETRANS after
+ trace_tcp_retransmit_skb()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171403202744.24256.9216557508325738302.git-patchwork-notify@kernel.org>
+Date: Thu, 25 Apr 2024 08:00:27 +0000
+References: <20240421042009.28046-1-lulie@linux.alibaba.com>
+In-Reply-To: <20240421042009.28046-1-lulie@linux.alibaba.com>
+To: Philo Lu <lulie@linux.alibaba.com>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, edumazet@google.com,
+ davem@davemloft.net, martin.lau@linux.dev, ast@kernel.org,
+ daniel@iogearbox.net, andrii@kernel.org, kuba@kernel.org, pabeni@redhat.com,
+ dsahern@kernel.org, xuanzhuo@linux.alibaba.com, fred.cc@alibaba-inc.com
 
-On 25.04.24 05:03, Willem de Bruijn wrote:
-> Felix Fietkau wrote:
->> Preparation for adding TCP fraglist GRO support. It expects packets to be
->> combined in a similar way as UDP fraglist GSO packets.
->> One difference is the fact that this code assumes that the TCP flags of
->> all packets have the same value. This allows simple handling of flags
->> mutations.
+Hello:
+
+This series was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
+
+On Sun, 21 Apr 2024 12:20:07 +0800 you wrote:
+> Move TCPCB_EVER_RETRANS updating after the trace_tcp_retransmit_skb()
+> in __tcp_retransmit_skb(), and then we are aware of whether the skb has
+> ever been retransmitted in this tracepoint. This can be used, e.g., to get
+> retransmission efficiency by counting skbs w/ and w/o TCPCB_EVER_RETRANS
+> (through bpf tracing programs).
 > 
-> Can you clarify this some more? We expect potentially different flags
-> on first and last packet in a TSO train. With fraglist, the segments
-> keep their original flags, as the headers are only pulled. When do
-> segment flags need to be replaced with those of the first segment?
+> For this purpose, TCPCB_EVER_RETRANS is also needed to be exposed to bpf.
+> Previously, the flags are defined as macros in struct tcp_skb_cb. I moved them
+> out into a new enum, and then they can be accessed with vmlinux.h.
+> 
+> [...]
 
-Maybe I just misunderstood a comment that Paolo made earlier regarding 
-TCP header mutations. Will review this again and compare with regular TSO.
+Here is the summary with links:
+  - [net-next,1/2] tcp: move tcp_skb_cb->sacked flags to enum
+    https://git.kernel.org/netdev/net-next/c/14b5fb2145ca
+  - [net-next,2/2] tcp: update sacked after tracepoint in __tcp_retransmit_skb
+    https://git.kernel.org/netdev/net-next/c/2bf90a57f0e6
 
-- Felix
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
