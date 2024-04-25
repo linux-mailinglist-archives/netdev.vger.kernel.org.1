@@ -1,50 +1,75 @@
-Return-Path: <netdev+bounces-91128-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91129-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA5E08B17EE
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 02:20:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 46C208B17F6
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 02:26:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 469C41F223F3
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 00:20:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D69BB1F22FFB
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 00:26:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E22B6386;
-	Thu, 25 Apr 2024 00:20:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 932A0A3F;
+	Thu, 25 Apr 2024 00:26:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MUXf/Lx5"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="OyS2bB6v"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from relay.smtp-ext.broadcom.com (relay.smtp-ext.broadcom.com [192.19.144.209])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B80E136E;
-	Thu, 25 Apr 2024 00:20:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01E9C80C;
+	Thu, 25 Apr 2024 00:26:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.19.144.209
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714004432; cv=none; b=VPQhDVd1RG0XVAdf30RJE7yD+4j2y7MvpNtAwsmrl3EVVpByIKcaPbzcN4J46w4bwrllxInaLYwWLc5M7ekBfljasbnVoNtb79jWF/sv3Gqqjyn79Zsca+Lijp2XRGopVCWEMS5htgpdntFN3U3sBvI6eri08Ed/6510PAf+/Gk=
+	t=1714004812; cv=none; b=dNoGujq+BM+tdgMFlLUARWVI+HxL8hLFRz2iClIyj3pGe5eWrs5UgsRt2yO1RVh25PuISkxQ2tPggALCq4a2cqA+oWOE10c85+5c+GsD7MWqS2/yDgm0WCku+HobnL8SoKNCBdACTpUgsmDJ9S9E1L55o7n9AYjEdoMdnL6PHyE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714004432; c=relaxed/simple;
-	bh=qSWWjL7tB5KUSxbPiYTwravedXCx7m/IfUKjfVO5Zx8=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=h2DvfKs08mA7O2mLDTZF30zjFqcc8qb+MwUh+Se/DZYzeX5ViVXUx2EjAk8rOxDz/p/FAFBeB2sJ4gPp6L8ftXAd/Sr5QraqTU0iK7U/jtCwYf7345CNVcFDCF1v2IGxa6CwODzv2j8p99ZeceB7+NUNVXW9aqCPw3+VZxJTuwU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MUXf/Lx5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 4CB42C113CD;
-	Thu, 25 Apr 2024 00:20:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714004432;
-	bh=qSWWjL7tB5KUSxbPiYTwravedXCx7m/IfUKjfVO5Zx8=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=MUXf/Lx5cKQgYdVgPD55K4jG5PZ82jGOBfwOGb22ebeiBwFE7mh9AJ3w+BhIVa78t
-	 FvLWooZ+oBiZl79OyBjdlRfDdZmKVz9KD9FId6K4I9e/x9gUuEOulvb8WwFA0/ILrh
-	 YL1Bs463AjuzuSt721xY9QcUiQrFVVqUsuW5oA5xsxTCWgZOEJ3siDOqoDVS+UwRM6
-	 xDH8r/BdGRkjEhXAmsNJJOf2/13zapYeuiUuU2+LUd8tyDCNI1TMvAzNnXIrtaq4Ua
-	 6vfWEXnbI8GkErJKRoONgkvQKwAYOGNOHVZJWVc9XtyjFp43w4YFbYhLh/EsqqVM0t
-	 uX7KIgnx6UIng==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3D720C43614;
-	Thu, 25 Apr 2024 00:20:32 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1714004812; c=relaxed/simple;
+	bh=HaoBt4MFIs7rbpfYTrZqabeZi67RiKEBJZpjORx5boU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=JoLOJomGEA+TSdrMk9o+x8WLMo2tHb7emA/HAdiq91o9QaSOhciaP5j0gzKFKZz9mWyIwRGxa6q0BB+edj8izBYi0u1IHhqDJeBOebnl4t/nbAYLXyaIH6rJUBKUWDjlFsN3azXy3r7+KBJ1A4BLMSXglhL1fCjd9meoqiaGOvk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=OyS2bB6v; arc=none smtp.client-ip=192.19.144.209
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: from mail-lvn-it-01.lvn.broadcom.net (mail-lvn-it-01.lvn.broadcom.net [10.36.132.253])
+	by relay.smtp-ext.broadcom.com (Postfix) with ESMTP id 73625C000C69;
+	Wed, 24 Apr 2024 17:26:44 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 relay.smtp-ext.broadcom.com 73625C000C69
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=broadcom.com;
+	s=dkimrelay; t=1714004804;
+	bh=HaoBt4MFIs7rbpfYTrZqabeZi67RiKEBJZpjORx5boU=;
+	h=From:To:Cc:Subject:Date:From;
+	b=OyS2bB6vg2HUhY6PRyT79pN/UZlr0BgM1GlLS13HMVzc464bjkWvQCKkN1FQZkZpD
+	 mZV11MHPOVHTuVBtNtIpjgTWSKz3JFHJjHChAas8yJYj6mJJkVH9JmemPJ9b4pZMU8
+	 L5tuzz5C9sk9BEAqaQRaIV/PMSX1kyBZuj553cLM=
+Received: from fainelli-desktop.igp.broadcom.net (fainelli-desktop.dhcp.broadcom.net [10.67.48.245])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mail-lvn-it-01.lvn.broadcom.net (Postfix) with ESMTPSA id 7AD5118041CAC4;
+	Wed, 24 Apr 2024 17:26:42 -0700 (PDT)
+From: Florian Fainelli <florian.fainelli@broadcom.com>
+To: linux-kernel@vger.kernel.org
+Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
+	Jarkko Nikula <jarkko.nikula@linux.intel.com>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Mika Westerberg <mika.westerberg@linux.intel.com>,
+	Jan Dabros <jsd@semihalf.com>,
+	Andi Shyti <andi.shyti@kernel.org>,
+	Lee Jones <lee@kernel.org>,
+	Jiawen Wu <jiawenwu@trustnetic.com>,
+	Mengyuan Lou <mengyuanlou@net-swift.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Duanqiang Wen <duanqiangwen@net-swift.com>,
+	linux-i2c@vger.kernel.org (open list:SYNOPSYS DESIGNWARE I2C DRIVER),
+	netdev@vger.kernel.org (open list:WANGXUN ETHERNET DRIVER)
+Subject: [PATCH v2 0/4] Define i2c_designware in a header file
+Date: Wed, 24 Apr 2024 17:26:38 -0700
+Message-Id: <20240425002642.2053657-1-florian.fainelli@broadcom.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,53 +77,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/7] selftest: netfilter: additional cleanups
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171400443224.18029.12861058417990114215.git-patchwork-notify@kernel.org>
-Date: Thu, 25 Apr 2024 00:20:32 +0000
-References: <20240423130604.7013-1-fw@strlen.de>
-In-Reply-To: <20240423130604.7013-1-fw@strlen.de>
-To: Florian Westphal <fw@strlen.de>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, netfilter-devel@vger.kernel.org,
- pablo@netfilter.org
 
-Hello:
+This patch series depends upon the following two patches being applied:
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+https://lore.kernel.org/all/20240422084109.3201-1-duanqiangwen@net-swift.com/
+https://lore.kernel.org/all/20240422084109.3201-2-duanqiangwen@net-swift.com/
 
-On Tue, 23 Apr 2024 15:05:43 +0200 you wrote:
-> This is the last planned series of the netfilter-selftest-move.
-> It contains cleanups (and speedups) and a few small updates to
-> scripts to improve error/skip reporting.
-> 
-> I intend to route future changes, if any, via nf(-next) trees
-> now that the 'massive code churn' phase is over.
-> 
-> [...]
+There is no reason why each driver should have to repeat the
+"i2c_designware" string all over the place, because when that happens we
+see the reverts like the above being necessary.
 
-Here is the summary with links:
-  - [net-next,1/7] selftests: netfilter: nft_concat_range.sh: move to lib.sh infra
-    https://git.kernel.org/netdev/net-next/c/546fb63fe85e
-  - [net-next,2/7] selftests: netfilter: nft_concat_range.sh: drop netcat support
-    https://git.kernel.org/netdev/net-next/c/ba6fbd383c12
-  - [net-next,3/7] selftests: netfilter: nft_concat_range.sh: shellcheck cleanups
-    https://git.kernel.org/netdev/net-next/c/c54fa6ae35b9
-  - [net-next,4/7] selftests: netfilter: nft_flowtable.sh: re-run with random mtu sizes
-    https://git.kernel.org/netdev/net-next/c/f84ab634904c
-  - [net-next,5/7] selftests: netfilter: nft_flowtable.sh: shellcheck cleanups
-    https://git.kernel.org/netdev/net-next/c/a18f284574ad
-  - [net-next,6/7] selftests: netfilter: skip tests on early errors
-    https://git.kernel.org/netdev/net-next/c/bb0ee78f9418
-  - [net-next,7/7] selftests: netfilter: conntrack_vrf.sh: prefer socat, not iperf3
-    https://git.kernel.org/netdev/net-next/c/99bc5950ebd4
+Changes in v2:
 
-You are awesome, thank you!
+- avoid changing i2c-designware-pcidrv.c more than necessary
+- move constant to include/linux/platform_data/i2c-designware.h
+- add comments as to how this constant is used and why
+
+Florian Fainelli (4):
+  i2c: designware: Create shared header hosting driver name
+  mfd: intel-lpss: Utilize i2c-designware.h
+  mfd: intel_quark_i2c_gpio: Utilize i2c-designware.h
+  net: txgbe: Utilize i2c-designware.h
+
+ MAINTAINERS                                    |  1 +
+ drivers/i2c/busses/i2c-designware-pcidrv.c     |  3 ++-
+ drivers/i2c/busses/i2c-designware-platdrv.c    |  5 +++--
+ drivers/mfd/intel-lpss.c                       |  3 ++-
+ drivers/mfd/intel_quark_i2c_gpio.c             |  5 +++--
+ drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c |  7 ++++---
+ include/linux/platform_data/i2c-designware.h   | 11 +++++++++++
+ 7 files changed, 26 insertions(+), 9 deletions(-)
+ create mode 100644 include/linux/platform_data/i2c-designware.h
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.34.1
 
 
