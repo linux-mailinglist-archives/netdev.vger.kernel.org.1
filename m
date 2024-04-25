@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-91373-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91374-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7FBB8B2564
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 17:40:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 78BE68B2566
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 17:40:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1E622B28558
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 15:40:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A69541C22EDA
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 15:40:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9618214C5BD;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7DCA14D293;
 	Thu, 25 Apr 2024 15:40:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YmjYbmUB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n0j+ubtl"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B2BC14C5A1;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8436414C5A4;
 	Thu, 25 Apr 2024 15:40:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714059630; cv=none; b=b3guUU/aKKK9Gu+z4kRGidjRHoweW5dDw0OSAMDNDNyu03IToKATmbL3C4on+7dIK32KyO9OGP5TkjRHkxXnf7itJ7gKR7C7EWXn2Ld8OWU8a9eZAv34C9Fv7UU7Iviszmkh+kT8aMR+vK/LIZuwTStjPjdaGf+EH8CT3FGGc4E=
+	t=1714059630; cv=none; b=q55RzXgF3iORynwaMW1GkerGIQdMUl77K1tMuz4rWDQ+mObBGezrx9r6O13Qeif72ByRfM3lEXqLnO0CYQDgOde8DXYGKmnD8PFhGY9qxItRwb/AB6FWituSPp4XGbfa+5cBYfE91q77wmhQYrtltYwwjkL5/vZNAoeYHBS8Fig=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1714059630; c=relaxed/simple;
-	bh=1EY6MgbTtDW/Fx+kD6yV6cKSy9yW23CtaOOoAnzw5T4=;
+	bh=3ybUVqEEGzUyKinz8YKEBg22A3kfpANtEE8tiKHbjn8=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=MrQzOvSdpLsc13kfCpzDAaIVLiQ4dzjLytIlp5qMlAma5FCbCs6hzg7Jazrnf7XqmBL8kjKCFeuHq/bVtyPKZ8C7Tjuh8wwtCEij1iGVmjpgWZSyasKad5sTV4mZEasZrTuCd1J4YBGbOARER/gurE1ZVjmhqr8kfSJOolapQ4E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YmjYbmUB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 265ADC4AF0B;
+	 In-Reply-To:To:Cc; b=KdPSiX51wsUJtxcZgecslIUOXYwAgT51yIa7FS5e024z1zYAU/HnwMHNqdoj5++5BprYHcNSsfEtT+EXj5dWMrPA42vsWQ0ykcthAAsMOCq6ROkIbmj4YRmZXZZ3iyHdO6uMuWh4ZkK8n3n2dco09DN2QuVYF6ryCUQTrClOimo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n0j+ubtl; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 315F8C4AF09;
 	Thu, 25 Apr 2024 15:40:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1714059630;
-	bh=1EY6MgbTtDW/Fx+kD6yV6cKSy9yW23CtaOOoAnzw5T4=;
+	bh=3ybUVqEEGzUyKinz8YKEBg22A3kfpANtEE8tiKHbjn8=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=YmjYbmUBC5jl434lpLCStAf0rh8Q1E8wh/EMuH3y4bCNq/FlVKRdOOTOgZYfjXx1r
-	 5p7a0VmjuKe3y9X2FxI6KBUKn56TLQxAlkEh+Lj65eWy4GVEcdC/86YASToyTV5DX2
-	 2wx+w+8bf8JECoJGkxkDTLeApIZ/xKomK/lLz7NIImVh5QhzA8BvNQOE8hIKN5t3gC
-	 A/E14bu2NHPXZDALc+nw1w8wB12uDtcEeaop5qQ25WUqJu9yeUdhFKir6V/EUEa63N
-	 QIKSL/SzoEkJV/biRHRMEgI2zHXmw0b4VPWxtbidaQyY0Xem4pcIAITIJGWh+Gtt/m
-	 NnetRUXbhpAVQ==
+	b=n0j+ubtls4hqHLXyurwGM9s1uJLxwJRNUrf2GU3qf7LfFLurLWCGR7g2JxziShxaD
+	 3AAH4DSE0uKjZnjaW/QVHlihaVmMJ2QM4iEqnQ5q328kRG8DDK6EhBXAOukITjb3ND
+	 OSPQllINlW7eFyiX9lBtjZsG8VTDN3+9N3SiZdiqWx6JrkgEG6Mh305p6GzAg6T6de
+	 Q5ZrvqNh4f33fTLPmI6vGbmRa3wLfzHD2ad6Z3oMxSzu94jbgnmRs4andOTabHJaN+
+	 vJ4OftBEc3vbrVFXytJ+nXRyDP/ZT7GkzVBXuDzs3e9mHhyrwwgOQlg4H3klcZ0NH0
+	 bCItniUxVCYuQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 0EF90CF21C4;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 19B01CF21C3;
 	Thu, 25 Apr 2024 15:40:30 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,41 +52,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] net: ravb: Fix registered interrupt names
+Subject: Re: [PATCH net] octeontx2-af: fix the double free in rvu_npc_freemem()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171405963005.10966.1749832467271464576.git-patchwork-notify@kernel.org>
+ <171405963010.10966.4709994529923785893.git-patchwork-notify@kernel.org>
 Date: Thu, 25 Apr 2024 15:40:30 +0000
-References: <cde67b68adf115b3cf0b44c32334ae00b2fbb321.1713944647.git.geert+renesas@glider.be>
-In-Reply-To: <cde67b68adf115b3cf0b44c32334ae00b2fbb321.1713944647.git.geert+renesas@glider.be>
-To: Geert Uytterhoeven <geert+renesas@glider.be>
-Cc: claudiu.beznea.uj@bp.renesas.com, s.shtylyov@omp.ru,
- paul.barker.ct@bp.renesas.com, niklas.soderlund+renesas@ragnatech.se,
+References: <20240424022724.144587-1-suhui@nfschina.com>
+In-Reply-To: <20240424022724.144587-1-suhui@nfschina.com>
+To: Su Hui <suhui@nfschina.com>
+Cc: sgoutham@marvell.com, lcherian@marvell.com, gakula@marvell.com,
+ jerinj@marvell.com, hkelam@marvell.com, sbhatta@marvell.com,
  davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org
+ nathan@kernel.org, ndesaulniers@google.com, morbo@google.com,
+ justinstitt@google.com, sumang@marvell.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, llvm@lists.linux.dev,
+ kernel-janitors@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 24 Apr 2024 09:45:21 +0200 you wrote:
-> As interrupts are now requested from ravb_probe(), before calling
-> register_netdev(), ndev->name still contains the template "eth%d",
-> leading to funny names in /proc/interrupts.  E.g. on R-Car E3:
+On Wed, 24 Apr 2024 10:27:25 +0800 you wrote:
+> Clang static checker(scan-build) warning：
+> drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c:line 2184, column 2
+> Attempt to free released memory.
 > 
-> 	89:  0      0  GICv2  93 Level  eth%d:ch22:multi
-> 	90:  0      3  GICv2  95 Level  eth%d:ch24:emac
-> 	91:  0  23484  GICv2  71 Level  eth%d:ch0:rx_be
-> 	92:  0      0  GICv2  72 Level  eth%d:ch1:rx_nc
-> 	93:  0  13735  GICv2  89 Level  eth%d:ch18:tx_be
-> 	94:  0      0  GICv2  90 Level  eth%d:ch19:tx_nc
+> npc_mcam_rsrcs_deinit() has released 'mcam->counters.bmap'. Deleted this
+> redundant kfree() to fix this double free problem.
 > 
 > [...]
 
 Here is the summary with links:
-  - net: ravb: Fix registered interrupt names
-    https://git.kernel.org/netdev/net/c/0c81ea5a8e23
+  - [net] octeontx2-af: fix the double free in rvu_npc_freemem()
+    https://git.kernel.org/netdev/net/c/6e965eba43e9
 
 You are awesome, thank you!
 -- 
