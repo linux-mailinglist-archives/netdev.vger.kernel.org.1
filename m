@@ -1,80 +1,45 @@
-Return-Path: <netdev+bounces-91260-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91262-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 247E98B1F3E
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 12:32:25 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 374E18B1FA2
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 12:51:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 474CFB248CF
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 10:32:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E1A881F22CC8
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 10:51:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 037C320B34;
-	Thu, 25 Apr 2024 10:32:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="t8KtZk+e"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7857B23746;
+	Thu, 25 Apr 2024 10:51:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FB6E1BF40;
-	Thu, 25 Apr 2024 10:32:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.249
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.188.207])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE7731D53F
+	for <netdev@vger.kernel.org>; Thu, 25 Apr 2024 10:51:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.188.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714041127; cv=none; b=IA/lJnl1mSOivb4xuiqSBPvYUsPINt6EA5tueNUArm3hjz1kM0PfjVlFvJLMBH2/DXp5rdiQ7bSeo8mKjSVqjwFZdIEA5HKspG51S3r/Pk1hOHLMTVZLcpfCgyFgZuvGCTjGaV1aoo2NFOR5AHb7RYJgfYKJq+cJkRwxt4Ts2/I=
+	t=1714042311; cv=none; b=dHN/gX7/1qhcddHtdZvCm4R6grm1XLx9ANoHnTGbyXNW+oo6ETfCmH+TUYquS8qzGAXRSajCaFaPdlSkR80Fsouj6enPGF6wDUZYdwdoExXwAd7Kr8k0d4cCw2SAB4mdFnxexpBMJeeBdW51MiSuWRCtjh0oigXZtdAzTbKuBQs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714041127; c=relaxed/simple;
-	bh=RMkbX26fdGoh43r6FT0+j6A0gxpNeQAV1acti6JwF98=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=QqgABKEAwuyJImRq8mw0TPc5tE+DqGPRjIr6HtXWz8En56RTJ7lXLsfMZKsZL70bPHrOtTM5gju2NwddVOS86jLTpv2aKhxIFHQN59ntGvYBFFuyqBiVk7/b6QdDJMRMWsxJ+Ws/6/HCGHcQBERo1iKXkdDUIyPNHBTLinPUmbQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=t8KtZk+e; arc=none smtp.client-ip=198.47.23.249
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from lelv0266.itg.ti.com ([10.180.67.225])
-	by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 43PAVjsQ124968;
-	Thu, 25 Apr 2024 05:31:45 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1714041105;
-	bh=28BXa8VxttMfc0TEExNi0FUUh3WfxcfWgxA0Q4ZUKPE=;
-	h=From:To:CC:Subject:Date;
-	b=t8KtZk+ecxXD8doaTgt1wGov/UDpusI/gGnUiENiBh+P1TO8UBQw8psil/SXcF9eq
-	 wvDmT7hSS6o30ZSIhgZso5P2mikYF+8aGBtg+keEGPy4Jm4e9RpZT1lIUzG2kkUtGb
-	 5+tO050xIM6jnIqS0fjCt8GGzbuC4pz/COsdWPSk=
-Received: from DFLE101.ent.ti.com (dfle101.ent.ti.com [10.64.6.22])
-	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 43PAVjg8056078
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Thu, 25 Apr 2024 05:31:45 -0500
-Received: from DFLE113.ent.ti.com (10.64.6.34) by DFLE101.ent.ti.com
- (10.64.6.22) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Thu, 25
- Apr 2024 05:31:44 -0500
-Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DFLE113.ent.ti.com
- (10.64.6.34) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Thu, 25 Apr 2024 05:31:44 -0500
-Received: from localhost (chintan-thinkstation-p360-tower.dhcp.ti.com [172.24.227.220])
-	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 43PAVim4024030;
-	Thu, 25 Apr 2024 05:31:44 -0500
-From: Chintan Vankar <c-vankar@ti.com>
-To: Tanmay Patil <t-patil@ti.com>,
-        =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>,
-        Simon
- Horman <horms@kernel.org>, Roger Quadros <rogerq@kernel.org>,
-        Vladimir Oltean
-	<vladimir.oltean@nxp.com>,
-        Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski
-	<kuba@kernel.org>,
-        Eric Dumazet <edumazet@google.com>,
-        "David S. Miller"
-	<davem@davemloft.net>, <s-vadapalli@ti.com>,
-        <srk@ti.com>, <danishanwar@ti.com>, <r-gunasekaran@ti.com>
-CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-        Chintan Vankar
-	<c-vankar@ti.com>
-Subject: [PATCH net-next] net: ethernet: ti: am65-cpsw-qos: Add support to taprio for past base_time
-Date: Thu, 25 Apr 2024 16:01:42 +0530
-Message-ID: <20240425103142.1999123-1-c-vankar@ti.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1714042311; c=relaxed/simple;
+	bh=+95QoQgxJhhS9NlLNFe3i8kiSPLnfZUJLNTNqJaWH7s=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=mNjytDHzGynS51dcU2UT2C8OR1kKr+6mvFSkI2fqp143c2ihE61YaW6xy4gDbe9EsMAwIkUxNZ7ECMa8EDjndMAqgLpmNZ41pTpRUHlT0iFpnoAbg4ACHfdNLoxHyE9Y4vqC/MZ58mQrxl+SbLdxm4XBIVWQW5mwEjZzQ9h4bdg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; arc=none smtp.client-ip=217.70.188.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	laforge@osmocom.org,
+	pespin@sysmocom.de,
+	osmith@sysmocom.de,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	fw@strlen.de
+Subject: [PATCH net-next 00/12] gtp updates for net-next (v2)
+Date: Thu, 25 Apr 2024 12:51:26 +0200
+Message-Id: <20240425105138.1361098-1-pablo@netfilter.org>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,70 +47,107 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 
-From: Tanmay Patil <t-patil@ti.com>
+Hi,
 
-If the base-time for taprio is in the past, start the schedule at the time
-of the form "base_time + N*cycle_time" where N is the smallest possible
-integer such that the above time is in the future.
+-o-
+This v2 includes a sparse fix for patch #5 reported by Jakub.
+-o-
 
-Signed-off-by: Tanmay Patil <t-patil@ti.com>
-Signed-off-by: Chintan Vankar <c-vankar@ti.com>
----
+The following patchset contains IPv6 GTP driver support for net-next,
+this also includes IPv6 over IPv4 and vice-versa:
 
-This patch is based on net-next commit d80687161271.
+Patch #1 removes a unnecessary stack variable initialization in the
+         socket routine.
 
- drivers/net/ethernet/ti/am65-cpsw-qos.c | 16 +++++++++++++---
- 1 file changed, 13 insertions(+), 3 deletions(-)
+Patch #2 deals with GTP extension headers. This variable length extension
+         header to decapsulate packets accordingly. Otherwise, packets are
+         dropped when these extension headers are present which breaks
+         interoperation with other non-Linux based GTP implementations.
 
-diff --git a/drivers/net/ethernet/ti/am65-cpsw-qos.c b/drivers/net/ethernet/ti/am65-cpsw-qos.c
-index 16f192a5b160..fa96db7c1a13 100644
---- a/drivers/net/ethernet/ti/am65-cpsw-qos.c
-+++ b/drivers/net/ethernet/ti/am65-cpsw-qos.c
-@@ -9,6 +9,7 @@
- 
- #include <linux/pm_runtime.h>
- #include <linux/math.h>
-+#include <linux/math64.h>
- #include <linux/time.h>
- #include <linux/units.h>
- #include <net/pkt_cls.h>
-@@ -837,6 +838,7 @@ static int am65_cpsw_taprio_replace(struct net_device *ndev,
- 	struct am65_cpsw_port *port = am65_ndev_to_port(ndev);
- 	struct am65_cpts *cpts = common->cpts;
- 	struct am65_cpsw_est *est_new;
-+	u64 cur_time, n;
- 	int ret, tact;
- 
- 	if (!netif_running(ndev)) {
-@@ -888,13 +890,21 @@ static int am65_cpsw_taprio_replace(struct net_device *ndev,
- 	if (tact == TACT_PROG)
- 		am65_cpsw_timer_stop(ndev);
- 
--	if (!est_new->taprio.base_time)
--		est_new->taprio.base_time = am65_cpts_ns_gettime(cpts);
--
- 	am65_cpsw_port_est_get_buf_num(ndev, est_new);
- 	am65_cpsw_est_set_sched_list(ndev, est_new);
- 	am65_cpsw_port_est_assign_buf_num(ndev, est_new->buf);
- 
-+	/* If the base-time is in the past, start schedule from the time:
-+	 * base_time + (N*cycle_time)
-+	 * where N is the smallest possible integer such that the above
-+	 * time is in the future.
-+	 */
-+	cur_time = am65_cpts_ns_gettime(cpts);
-+	if (est_new->taprio.base_time < cur_time) {
-+		n = div64_u64(cur_time - est_new->taprio.base_time, est_new->taprio.cycle_time);
-+		est_new->taprio.base_time += (n + 1) * est_new->taprio.cycle_time;
-+	}
-+
- 	am65_cpsw_est_set(ndev, 1);
- 
- 	if (tact == TACT_PROG) {
--- 
-2.34.1
+Patch #3 prepares for IPv6 support by moving IPv4 specific fields in PDP
+         context objects to a union.
 
+Patch #4 adds IPv6 support while retaining backward compatibility.
+         Three new attributes allows to declare an IPv6 GTP tunnel
+         GTPA_FAMILY, GTPA_PEER_ADDR6 and GTPA_MS_ADDR6 as well as
+         IFLA_GTP_LOCAL6 to declare the IPv6 GTP UDP socket. Up to this
+         patch, only IPv6 outer in IPv6 inner is supported.
+
+Patch #5 uses IPv6 address /64 prefix for UE/MS in the inner headers.
+         Unlike IPv4, which provides a 1:1 mapping between UE/MS,
+         IPv6 tunnel encapsulates traffic for /64 address as specified
+         by 3GPP TS. Patch has been split from Patch #4 to highlight
+         this behaviour.
+
+Patch #6 passes up IPv6 link-local traffic, such as IPv6 SLAAC, for
+         handling to userspace so they are handled as control packets.
+
+Patch #7 prepares to allow for GTP IPv4 over IPv6 and vice-versa by
+         moving IP specific debugging out of the function to build
+         IPv4 and IPv6 GTP packets.
+
+Patch #8 generalizes TOS/DSCP handling following similar approach as
+         in the existing iptunnel infrastructure.
+
+Patch #9 adds a helper function to build an IPv4 GTP packet in the outer
+         header.
+
+Patch #10 adds a helper function to build an IPv6 GTP packet in the outer
+          header.
+
+Patch #11 adds support for GTP IPv4-over-IPv6 and vice-versa.
+
+Patch #12 allows to use the same TID/TEID (tunnel identifier) for inner
+          IPv4 and IPv6 packets for better UE/MS dual stack integration.
+
+This series integrates with the osmocom.org project CI and TTCN-3 test
+infrastructure (Oliver Smith) as well as the userspace libgtpnl library.
+
+Thanks to Harald Welte, Oliver Smith and Pau Espin for reviewing and
+providing feedback through the osmocom.org redmine platform to make this
+happen.
+
+Please, pull these changes from:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/pablo/gtp.git tags/gtp-24-04-25
+
+Thanks.
+
+----------------------------------------------------------------
+
+The following changes since commit f42800e9b8bad1f9d1a88c61c10ea060c557fc20:
+
+  gtp: remove useless initialization (2024-04-23 23:44:24 +0200)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/pablo/gtp.git tags/gtp-24-04-25
+
+for you to fetch changes up to 1dd87a4c0c5c43fa41312345874e3e5b27746103:
+
+  gtp: identify tunnel via GTP device + GTP version + TEID + family (2024-04-24 17:58:49 +0200)
+
+----------------------------------------------------------------
+gtp pull request 24-04-25
+
+----------------------------------------------------------------
+Pablo Neira Ayuso (11):
+      gtp: properly parse extension headers
+      gtp: prepare for IPv6 support
+      gtp: add IPv6 support
+      gtp: use IPv6 address /64 prefix for UE/MS
+      gtp: pass up link local traffic to userspace socket
+      gtp: move debugging to skbuff build helper function
+      gtp: remove IPv4 and IPv6 header from context object
+      gtp: add helper function to build GTP packets from an IPv4 packet
+      gtp: add helper function to build GTP packets from an IPv6 packet
+      gtp: support for IPv4-in-IPv6-GTP and IPv6-in-IPv4-GTP
+      gtp: identify tunnel via GTP device + GTP version + TEID + family
+
+ drivers/net/gtp.c            | 852 ++++++++++++++++++++++++++++++++++++-------
+ include/net/gtp.h            |   5 +
+ include/uapi/linux/gtp.h     |   3 +
+ include/uapi/linux/if_link.h |   2 +
+ 4 files changed, 734 insertions(+), 128 deletions(-)
 
