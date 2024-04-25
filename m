@@ -1,137 +1,111 @@
-Return-Path: <netdev+bounces-91418-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91419-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16FD78B27EE
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 20:13:50 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 22B268B2821
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 20:22:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 321A81C214B6
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 18:13:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6BA6DB20F2B
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 18:22:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F14C14F107;
-	Thu, 25 Apr 2024 18:13:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D56A314EC5F;
+	Thu, 25 Apr 2024 18:22:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ppFh1xjW"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="3ILooPiY"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BE1A14D457;
-	Thu, 25 Apr 2024 18:13:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1005B146A74
+	for <netdev@vger.kernel.org>; Thu, 25 Apr 2024 18:22:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714068825; cv=none; b=mCjujPIbcto8YbFR533NDsdaC6fGK1enDHHAGCNZPRp0rfUUoujOYxepeVIEUF538IENhnGW+NzJlHL0iavS1J/E5BbmUtjT2jjF5nDGVMrhqQgw+j8uniSmUfzD8FxJgy7DbLFUKN2Gv0lb3+SlqHhAHa3kfRR06Zy5+cUeis8=
+	t=1714069361; cv=none; b=pi07f74osGViiilOUR2wkblSDielKbEd5VM8EHJ7sqluaz0oQYTrHnwDJqI0GjOlHe0six8V17aG5ZQOrgJ7sUgn8FMj9Rl2GPOMZPUEAyPvyAP2kkOyJaMWxRb4yfPHcTBCzQ6iY/j1k6G5Ust5SmAd4iWXZGw+X0n+UvwEaSE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714068825; c=relaxed/simple;
-	bh=3jpA0jxtOrM/Uqkdg7yxRM62YlSKAnUiGdGNzloi//4=;
+	s=arc-20240116; t=1714069361; c=relaxed/simple;
+	bh=wrX6JECkYQF0YS+9dQTr8HvQoKSCzrwxvFn5psgaBrI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=i3gt/I003tbSU4c3OB4nrLMQI0GWd5zDUp1YIE0wBfgrsJlF1sAbksm982dS6PKDqq2nGV46IyOGrJgs493CRLOCD0gbf6Fgn/AkfV0kQhPe1Z2Lqd/Yr6wFK+Dn3o2+SPRR7dDKw65k4Ni484iIOZXh65NAOH8IiLF2sm7GIqU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ppFh1xjW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11A35C113CC;
-	Thu, 25 Apr 2024 18:13:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714068824;
-	bh=3jpA0jxtOrM/Uqkdg7yxRM62YlSKAnUiGdGNzloi//4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ppFh1xjWf2kci1FJhtjIrbEINq9USZ4fYIi8a+kYjfczOXkx3LmJ6AXUDy51ynuwK
-	 tgpzVirWkM798pCefQbee4sl4FkDYdAO0m8qjX0LdrdaAfzvKuECTIj/7KqePQNbyR
-	 4XeC64zewqCWapZ14rt/FdWJIi3JIFJlGyqQvHC5STJiqWAqtKz8fjVh5UPOBvVsI9
-	 UrmtHG+oFGXaAvna5kjygKMn9LLDOQ7FlelZTFh/es67PFyUd7PVvUv44hYdqNnyEr
-	 ECF6rv66wFKaPb3KolI2i1AvRNTHe5FwMoyqudb2k+1pd7uoPBqegjb3Adxk4dAIH1
-	 ObHdNUgyXjhmg==
-Date: Thu, 25 Apr 2024 11:13:42 -0700
-From: Nathan Chancellor <nathan@kernel.org>
-To: Kees Cook <keescook@chromium.org>
-Cc: Johannes Berg <johannes@sipsolutions.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
-	Jeff Johnson <quic_jjohnson@quicinc.com>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
-Subject: Re: [PATCH] wifi: nl80211: Avoid address calculations via out of
- bounds array indexing
-Message-ID: <20240425181342.GA657080@dev-arch.thelio-3990X>
-References: <20240424220057.work.819-kees@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=mgtK2osuGLiZn33mduegFShAMsKfFSI5LFFNlTj+R7mT16nnzL8+7gbt8E+VbeV+T8rN5VAr+ronBtsc79cQnoSqBE6Y3no1FzJhHWaOgS0Q5KuQ3sT2hcge9sDAVOp+l67lRBgFqixR5x+gPCSgOElnTefX9YYcWe6irv1Y8NY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=3ILooPiY; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=Et44C1sQ7SlP0HPaD4v0FaOwx5CwaOxOF08xmqrjzU0=; b=3I
+	LooPiY0u8n+Mle/KP/e1Qv0L19izvYoBz3435MRJS7O5Bzh7d9svxN2tKEk/pHXaMAJ2irfcKO+ex
+	LN+NHzAd3qP63gOhe+sNogSdY9A5uQNYMeHweSnd/MGydV98tDIHmBRaenm3bcEn6aNOF5cMWk2ad
+	2ZugfaHNCC6HejQ=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1s03ju-00E0lx-Ir; Thu, 25 Apr 2024 20:22:34 +0200
+Date: Thu, 25 Apr 2024 20:22:34 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: SIMON BABY <simonkbaby@gmail.com>
+Cc: netdev@vger.kernel.org
+Subject: Re: ping test with DSA ports failing
+Message-ID: <05b24725-f266-4360-b8af-fd299fbff5be@lunn.ch>
+References: <CAEFUPH1q9MPNBrfzhSmCawM4y+A6SKe47Pc1PjqShy-0Oo4-2w@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20240424220057.work.819-kees@kernel.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAEFUPH1q9MPNBrfzhSmCawM4y+A6SKe47Pc1PjqShy-0Oo4-2w@mail.gmail.com>
 
-On Wed, Apr 24, 2024 at 03:01:01PM -0700, Kees Cook wrote:
-> Before request->channels[] can be used, request->n_channels must be set.
-> Additionally, address calculations for memory after the "channels" array
-> need to be calculated from the allocation base ("request") rather than
-> via the first "out of bounds" index of "channels", otherwise run-time
-> bounds checking will throw a warning.
+On Thu, Apr 25, 2024 at 10:37:38AM -0700, SIMON BABY wrote:
+> Hello team,
 > 
-> Reported-by: Nathan Chancellor <nathan@kernel.org>
-> Fixes: e3eac9f32ec0 ("wifi: cfg80211: Annotate struct cfg80211_scan_request with __counted_by")
-> Signed-off-by: Kees Cook <keescook@chromium.org>
+> 
+> My test setup with DSA ports is below. Please confirm if it is a valid test
+> case for ping. 
+> 
+> Ping is failing most of the time but succeeds sometimes. Attached is the
+> Wireshark capture from my laptop and the tcpdump from sama7 processor. 
+> 
+>  
+> 
+> __________                                                     
+> _______________   192.168.0.119/24                  192.168.0.155/24  _________
+> 
+> |                    |                                                    |
+>                                 |____________lan1__________________ ____|
+>                    |
+> 
+> |  SAMA7     |  eth0 (RGMII)                           |  marvel 88e6390 |
+> ___________  lan2                                                  |
+> laptop      |
+> 
+> |        gmac0|---------------------------------------|port0 (RGMII)       |
+> ___________  lan3                                                  |________ |
+> 
+> |_________|                                                    |
+>                                 |___________  lan4      
+> 
+>                                                                             |
+>                                 |___________  lan5
+> 
+>                                                                             |
+>                                 |___________  lan6
+> 
+>                                                                             |
+> ______________ |
+> 
 
-Tested-by: Nathan Chancellor <nathan@kernel.org>
+You ASCII art is all messed up and unreadable.
 
-> ---
-> Cc: Johannes Berg <johannes@sipsolutions.net>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: Eric Dumazet <edumazet@google.com>
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Cc: Paolo Abeni <pabeni@redhat.com>
-> Cc: linux-wireless@vger.kernel.org
-> Cc: netdev@vger.kernel.org
-> ---
->  net/wireless/nl80211.c | 14 +++++++-------
->  1 file changed, 7 insertions(+), 7 deletions(-)
-> 
-> diff --git a/net/wireless/nl80211.c b/net/wireless/nl80211.c
-> index f391b4055944..f1ed0981147e 100644
-> --- a/net/wireless/nl80211.c
-> +++ b/net/wireless/nl80211.c
-> @@ -9163,6 +9163,7 @@ static int nl80211_trigger_scan(struct sk_buff *skb, struct genl_info *info)
->  	struct wiphy *wiphy;
->  	int err, tmp, n_ssids = 0, n_channels, i;
->  	size_t ie_len, size;
-> +	size_t ssids_offset, ie_offset;
->  
->  	wiphy = &rdev->wiphy;
->  
-> @@ -9208,21 +9209,20 @@ static int nl80211_trigger_scan(struct sk_buff *skb, struct genl_info *info)
->  		return -EINVAL;
->  
->  	size = struct_size(request, channels, n_channels);
-> +	ssids_offset = size;
->  	size = size_add(size, array_size(sizeof(*request->ssids), n_ssids));
-> +	ie_offset = size;
->  	size = size_add(size, ie_len);
->  	request = kzalloc(size, GFP_KERNEL);
->  	if (!request)
->  		return -ENOMEM;
-> +	request->n_channels = n_channels;
->  
->  	if (n_ssids)
-> -		request->ssids = (void *)&request->channels[n_channels];
-> +		request->ssids = (void *)request + ssids_offset;
->  	request->n_ssids = n_ssids;
-> -	if (ie_len) {
-> -		if (n_ssids)
-> -			request->ie = (void *)(request->ssids + n_ssids);
-> -		else
-> -			request->ie = (void *)(request->channels + n_channels);
-> -	}
-> +	if (ie_len)
-> +		request->ie = (void *)request + ie_offset;
->  
->  	i = 0;
->  	if (scan_freqs) {
-> -- 
-> 2.34.1
-> 
+> Ping is failing most of the times. Interestingly it is passing sometime. Below
+> are the logs.
+
+As i've said before, RGMII delays are often the cause of the problem.
+
+   Andrew
 
