@@ -1,79 +1,104 @@
-Return-Path: <netdev+bounces-91333-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91334-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 862BD8B23B1
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 16:16:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D7068B241A
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 16:30:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B8B811C20A27
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 14:16:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8EFA61C22ABD
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 14:30:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 598EB149E00;
-	Thu, 25 Apr 2024 14:16:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 763ED14A0A0;
+	Thu, 25 Apr 2024 14:30:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vEDNtr9S"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="kYH3808D"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F7F1149C67;
-	Thu, 25 Apr 2024 14:16:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 774AE14A4DD;
+	Thu, 25 Apr 2024 14:30:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714054599; cv=none; b=VPUJrEi7YLYokKfisocck+QN17Fl9XYdDSA/1+ukTRaNtEdGbd49X70+rPL37GsF4KlBSZpuKfCS0aU/J7NabTgXZzXZguVfMyzhJeulFCuZXZoDdHyO8+xS8hvR3rYXG6/kR15yXGyaxLt4d7w3eyC6HR5tvwn614rE9BqjK5w=
+	t=1714055415; cv=none; b=nymhe/S9PtGIBK3ckIUCrcuacQsu3V2NiRLfntohr4IQLlMlsH0VJmfveOTLPVoKOyVc/pTEfkl11FBkA1p8i6qDefu/nTt8eDodCFz6fPBmzDcosk1IvN3I4/U0KFvpjRKCiYDDMXsBn125d4QtUYxMrPUIDdEwv1fEgLLTqFs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714054599; c=relaxed/simple;
-	bh=n+3q8cF6PNdO/izVSLJhs7im/d7HTf56k6kw7GXeHwQ=;
+	s=arc-20240116; t=1714055415; c=relaxed/simple;
+	bh=TEW1mcZD9eKXNx7NEGVW7zx92fjFU0ygxRhQm5D3gt0=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fmUYNFJNOwtErDn405i3gB6MQ8S4qkbP1EqNI9gSenSyqA9TrYy79gFyrMMJRRpO6HTtsoLjGP+JtpJxEibau/qrnKdGtHvRl70Uf5WtP5SLhltKw0FYm9JAZ3fG/ibmrfmssoQiGWdpQgc5RqtwFifDRXkme+IU9npuJ2GVewA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vEDNtr9S; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E63CC113CC;
-	Thu, 25 Apr 2024 14:16:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714054599;
-	bh=n+3q8cF6PNdO/izVSLJhs7im/d7HTf56k6kw7GXeHwQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=vEDNtr9S4/yVnJbJa+Jo8abru/GOebq/97NK9qGhWHrAJUzIzoW8iWKD2tjF5Wm1m
-	 RbOPoLb/Z5olaj2Dgb9YCJRASuHxTJ3ypF2c+/Nv723pSYzeulc+bg7ILfkc5fgUOo
-	 a83FG8/UBWt8Q6xcMf/QtTns2y0mQdjB1ExRak/W+v9RDRhbXfSv8Y6JIjy+bFFtAE
-	 WzCcoBKEVrF2F5qn5AlNQaGTzmnT7V5Avtr9O7AkeIErcjhmpZfgvSSf0vKrUelqUW
-	 HRTLRAy/WrFNBB14cDw7L2eL/JhkOdzY2/chhsPXkiNjUUAI2rpxb0HH5Ejvz2pLyE
-	 db1m7Mo9g0v/A==
-Date: Thu, 25 Apr 2024 07:16:37 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Geert Uytterhoeven <geert+renesas@glider.be>, Claudiu Beznea
- <claudiu.beznea.uj@bp.renesas.com>, Sergey Shtylyov <s.shtylyov@omp.ru>,
- Paul Barker <paul.barker.ct@bp.renesas.com>, Niklas =?UTF-8?B?U8O2ZGVy?=
- =?UTF-8?B?bHVuZA==?= <niklas.soderlund+renesas@ragnatech.se>, "David S .
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- linux-renesas-soc@vger.kernel.org
-Subject: Re: [PATCH] net: ravb: Fix registered interrupt names
-Message-ID: <20240425071637.5fe0199d@kernel.org>
-In-Reply-To: <1f131230-56a5-4547-bc77-c508e61e8a55@lunn.ch>
-References: <cde67b68adf115b3cf0b44c32334ae00b2fbb321.1713944647.git.geert+renesas@glider.be>
-	<1f131230-56a5-4547-bc77-c508e61e8a55@lunn.ch>
+	 MIME-Version:Content-Type; b=r7gJ6W4G2aFkAZyvO0wfBtPE0jqIpfdPe/FW0i+zr2OLRgDyAq5LTtok287V21FwGCEOem7bid7R1UjYfHfeVWOJsaDJatb5ABAHp5u4GSu1XUk1c6wwdug22Dd9AtwMHLlfjs4WS43oTXN1a+NCSq//emMgMvrs0dX/p32L7Q0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=kYH3808D; arc=none smtp.client-ip=217.70.183.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 6207540010;
+	Thu, 25 Apr 2024 14:30:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1714055405;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=TEW1mcZD9eKXNx7NEGVW7zx92fjFU0ygxRhQm5D3gt0=;
+	b=kYH3808DYYExVlgH8uPTwp7AfZX5ZmagrS5zr7XMxoNIFdeT5JWrDxygAuA6ljrkavT8sM
+	jAl4B/XGssFjE5/po7i8V0BjJ5fvhBA8T6hxOvF2KSNYbiKeQdOYRhINQPHZ1UuMOf0wXs
+	yNLhUNFsXRbp+IKrLQjN4RbAtAf32o6lF2MWbmvO3Ibt1bF/BM/3LOFVtyGWkfqcRzITek
+	opWhLKCxP3LN+ZICJMx56w6+6jBJQ57IwTmXKkMo04dbTypUkG2mg9I+N+9+d1Jfsne/07
+	qf7au1F+xWTvU+Uv0mTor7O6rXuDYfKJpyS9XLZwGIIhq6GJM2K5gibzXOHDXg==
+Date: Thu, 25 Apr 2024 16:30:02 +0200
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Jiri Pirko <jiri@resnulli.us>, Oleksij Rempel <o.rempel@pengutronix.de>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn
+ <andrew@lunn.ch>, Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Kyle Swenson
+ <kyle.swenson@est.tech>, kernel test robot <lkp@intel.com>
+Subject: Re: [PATCH net-next v3 0/3] net: pse-pd: Fixes for few small issues
+Message-ID: <20240425163002.5894c5e5@kmaincent-XPS-13-7390>
+In-Reply-To: <20240425070619.601d5e40@kernel.org>
+References: <20240423-fix_poe-v3-0-e50f32f5fa59@bootlin.com>
+	<ZiebQLdu9dOh1v-T@nanopsycho>
+	<20240425103110.33c02857@kmaincent-XPS-13-7390>
+	<20240425070619.601d5e40@kernel.org>
+Organization: bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: kory.maincent@bootlin.com
 
-On Thu, 25 Apr 2024 00:45:35 +0200 Andrew Lunn wrote:
-> > Rename the local variable dev_name, as it shadows the dev_name()
-> > function, and pre-initialize it, to simplify the code.  
-> 
-> Another option is to call dev_alloc_name() soon after alloc_netdev(),
-> to give the device its name earlier than register_netdev().
+On Thu, 25 Apr 2024 07:06:19 -0700
+Jakub Kicinski <kuba@kernel.org> wrote:
 
-Maybe we shouldn't be advertising that option too broadly. One has to
-hold rtnl for that to work. Mostly old and staging drivers seem to do
-this. Name are not stable. If other identifiers are available, that's
-a better option, IMHO.
+> On Thu, 25 Apr 2024 10:31:10 +0200 Kory Maincent wrote:
+> > Your reviewed-by tag has not been taken in the commit merged.
+> > It seems patchwork does not take the cover letter tag reply into
+> > account, I think only b4 does. =20
+>=20
+> Sorry about that.
+> The problem is that patchwork doesn't correctly group the cover letter
+> in your postings. Not sure why.=20
+
+Weird, I used b4 so it should work.
+
+> Could you experiment with tweaking the posting?
+> Maybe we can "bisect" the problem.
+
+Do you want me to like post a v5 with the "pw-bot: cr" tag? But if I put the
+tag only on the cover letter it won't work then. Maybe on all patches?
+Was it the same for the PoE support patch series?
+If so, we could look at it with my future patch series that will bring new
+features to PoE.
+
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
