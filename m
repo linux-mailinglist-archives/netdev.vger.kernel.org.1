@@ -1,81 +1,80 @@
-Return-Path: <netdev+bounces-91244-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91245-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 005A28B1E03
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 11:28:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0AAD88B1E09
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 11:31:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BB8B62868B2
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 09:28:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E09A81F2421C
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 09:31:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71FAB85646;
-	Thu, 25 Apr 2024 09:28:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD73784D1C;
+	Thu, 25 Apr 2024 09:30:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Ld0ONV5H"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PgXlwjHz"
 X-Original-To: netdev@vger.kernel.org
-Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D76D284FC8;
-	Thu, 25 Apr 2024 09:28:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA09728F7;
+	Thu, 25 Apr 2024 09:30:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714037306; cv=none; b=lXoNPrbHykCA8xlEeJ+6lyRiWfWoLSaeiLRdaXNlPB0kJX/0BIAkmOSIOOMDuH+hcNc9cVBoREx+S1EqvX6plIh1CTsXqdI5KeaFxeUD1ksMB/wIwVcFXvPw5+YJfeHtUZbnsXjj0PZdzuX1m4e/fjuQreLhPH/mgACviGvjHhk=
+	t=1714037457; cv=none; b=eiX2e2z6nRVkBIMf2tWI/iLyVOIkTmA3NyG9kl+6A2AACtDvia8fwSj489unz6QCkRhwdlS50hCFix0oU+qroyPv3Vr9ORXs223+coJgJnUvW3/xsTEm6Helo3/iChHKnU77OTFs7Ql1SQiBZrNqylcLhO87XHrdx0JiQCQF5cs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714037306; c=relaxed/simple;
-	bh=dNnb/1qJ74rZ11oCWnJ46aTq5rkrxAFUBf2wVkykw+U=;
+	s=arc-20240116; t=1714037457; c=relaxed/simple;
+	bh=BidwcMZvw8hOvIN0VNzLTIwSisk6VgByY2ElyypLUNs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gMlqYZnD1xR1CZQYC/2GJsQ/ogQjFXZDzLYYmUMTj5/kd8D7rAOjbexT2Jb9URTITr07Y+z+37jH/OK7v3FcSgtAxe+2cinkjs67aRMtu70aVIe2kcgrHSNUUYxisKKj0NPY1nSTvzzFnAqIlITpcW84D7/xN4yUgSZimRWNcyY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Ld0ONV5H; arc=none smtp.client-ip=90.155.92.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=2Zgzdc8bVIwFztt65g+xgtay+uCO2f+ZzLbfkYk6v1c=; b=Ld0ONV5HzIehLPpXBpxGFTUgf/
-	Io2uQvl1my1KVYMM0jZLYVXTwiarZKNNfirjlNMPaMGXaylE46iZ1j/hQ+gG4jIyNPC25cGVPPoV3
-	Cb4F9kAQubErw+1DLHSftowhQyYxk+pSTtPuxgzebeuOwXGrylBQBjF96uAd0nlti7jSrHErSb/4V
-	oWQF0bp0TMhGFHLtbOOsGPO7j9GiBbQU2Iu3ysNICNY2+7LyiUG/tnSXU9Db4h2pC6T7tvwXtoycT
-	s7eU5zr9eXNVU5RvMf2fgEZmUbR6cOzZV2BjAJx1Eru+g7U4/5dKNWDh8T6M1PXBIOGWiAM2O2CG4
-	4Ze0hkfg==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-	by desiato.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rzvOm-0000000EoZi-3Xul;
-	Thu, 25 Apr 2024 09:28:13 +0000
-Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
-	id 74649300439; Thu, 25 Apr 2024 11:28:12 +0200 (CEST)
-Date: Thu, 25 Apr 2024 11:28:12 +0200
-From: Peter Zijlstra <peterz@infradead.org>
-To: Kees Cook <keescook@chromium.org>
-Cc: Mark Rutland <mark.rutland@arm.com>, Will Deacon <will@kernel.org>,
-	Boqun Feng <boqun.feng@gmail.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>, Jakub Kicinski <kuba@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Andrew Morton <akpm@linux-foundation.org>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=RC5JlCwkfWoygg61jYCislNYsfbcDprEQcoANh8tu24NKjgCXjUpBs28TX0g9BPdE+r7xZsgzbGMZjErczTMndH55vbw1+JXPKb9KCK5qWtmStagp80v7WPVU5GmHl/SHywwNBXxUSEhDWfYh+UjV3rKmGytcC9YpPOZHlT8A7M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PgXlwjHz; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1714037456; x=1745573456;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=BidwcMZvw8hOvIN0VNzLTIwSisk6VgByY2ElyypLUNs=;
+  b=PgXlwjHzNZPObJJrN/9XPMFjPZrAf75xUCwX/3f0XKNM79m2OTwKkJLm
+   OzU6oAzoY8B6SdWPKMIrrRLvMUyNLnFu3QG/hev4EfhshiRTUS7mdHzbP
+   DmxQKI2/zUVeo3PQZGysGi7yoJ2FRTAek/Vjcrk9aHEPjTAiItMe1q3iR
+   djM4f1gsBxs2g3QGec4y0xt1BCAqQS4b/BPywfOAQo5tJiFvok8Vr2uML
+   BGa/P7jrqLeQilc+SDG0jVG/XFTY3TiacC904Oo+4RI+DssXrCXF3CtvG
+   ebd9VR2emUq3GyTqRdX2HfAtv9A0gK3/FCx4o3RHvRB34LmeFx3uPCfp8
+   w==;
+X-CSE-ConnectionGUID: YA3aW5ybQGK/qo0okejWXA==
+X-CSE-MsgGUID: mhgK/B53SxWVr+hPZhDFww==
+X-IronPort-AV: E=McAfee;i="6600,9927,11054"; a="13495975"
+X-IronPort-AV: E=Sophos;i="6.07,228,1708416000"; 
+   d="scan'208";a="13495975"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Apr 2024 02:30:55 -0700
+X-CSE-ConnectionGUID: 6Lpm9UTlRXC1Pzb3vKTFXg==
+X-CSE-MsgGUID: eDqDKVkqQ2CEowjwPnckpQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,228,1708416000"; 
+   d="scan'208";a="29472185"
+Received: from lkp-server01.sh.intel.com (HELO e434dd42e5a1) ([10.239.97.150])
+  by fmviesa005.fm.intel.com with ESMTP; 25 Apr 2024 02:30:52 -0700
+Received: from kbuild by e434dd42e5a1 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rzvRK-0002Dm-10;
+	Thu, 25 Apr 2024 09:30:50 +0000
+Date: Thu, 25 Apr 2024 17:30:47 +0800
+From: kernel test robot <lkp@intel.com>
+To: Felix Fietkau <nbd@nbd.name>, netdev@vger.kernel.org,
+	Eric Dumazet <edumazet@google.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	"Paul E. McKenney" <paulmck@kernel.org>,
-	Uros Bizjak <ubizjak@gmail.com>, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-arch@vger.kernel.org,
-	netdev@vger.kernel.org, linux-hardening@vger.kernel.org
-Subject: Re: [PATCH 1/4] locking/atomic/x86: Silence intentional wrapping
- addition
-Message-ID: <20240425092812.GB21980@noisy.programming.kicks-ass.net>
-References: <20240424191225.work.780-kees@kernel.org>
- <20240424191740.3088894-1-keescook@chromium.org>
- <20240424224141.GX40213@noisy.programming.kicks-ass.net>
- <202404241542.6AFC3042C1@keescook>
- <20240424225436.GY40213@noisy.programming.kicks-ass.net>
- <20240424230500.GG12673@noisy.programming.kicks-ass.net>
- <202404241621.8286B8A@keescook>
+	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	willemdebruijn.kernel@gmail.com, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 4/4] net: add heuristic for enabling TCP
+ fraglist GRO
+Message-ID: <202404251744.Tq24y05K-lkp@intel.com>
+References: <20240424180458.56211-5-nbd@nbd.name>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,47 +83,162 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <202404241621.8286B8A@keescook>
+In-Reply-To: <20240424180458.56211-5-nbd@nbd.name>
 
-On Wed, Apr 24, 2024 at 04:30:50PM -0700, Kees Cook wrote:
+Hi Felix,
 
-> > That is, anything that actively warns about signed overflow when build
-> > with -fno-strict-overflow is a bug. If you want this warning you have to
-> > explicitly mark things.
-> 
-> This is confusing UB with "overflow detection". We're doing the latter.
+kernel test robot noticed the following build errors:
 
-Well, all of this is confusing to me because it is not presented
-coherently.
+[auto build test ERROR on net-next/main]
 
-The traditional 'must not let signed overflow' is because of the UB
-nonsense, which we fixed.
+url:    https://github.com/intel-lab-lkp/linux/commits/Felix-Fietkau/net-move-skb_gro_receive_list-from-udp-to-core/20240425-060838
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20240424180458.56211-5-nbd%40nbd.name
+patch subject: [PATCH net-next 4/4] net: add heuristic for enabling TCP fraglist GRO
+config: um-x86_64_defconfig (https://download.01.org/0day-ci/archive/20240425/202404251744.Tq24y05K-lkp@intel.com/config)
+compiler: clang version 15.0.7 (https://github.com/llvm/llvm-project.git 8dfdcc7b7bf66834a761bd8de445840ef68e4d1a)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240425/202404251744.Tq24y05K-lkp@intel.com/reproduce)
 
-> > Signed overflow is not UB, is not a bug.
-> > 
-> > Now, it might be unexpected in some places, but fundamentally we run on
-> > 2s complement and expect 2s complement. If you want more, mark it so.
-> 
-> Regular C never provided us with enough choice in types to be able to
-> select the overflow resolution strategy. :( So we're stuck mixing
-> expectations into our types.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202404251744.Tq24y05K-lkp@intel.com/
 
-Traditionally C has explicit wrapping for unsigned and UB on signed. We
-fixed the UB, so now expect wrapping for everything.
+All errors (new ones prefixed by >>):
 
-You want to add overflow, so you should make that a special and preserve
-semantics for existing code.
+   In file included from net/ipv6/tcpv6_offload.c:9:
+   In file included from include/linux/skbuff.h:17:
+   In file included from include/linux/bvec.h:10:
+   In file included from include/linux/highmem.h:12:
+   In file included from include/linux/hardirq.h:11:
+   In file included from arch/um/include/asm/hardirq.h:5:
+   In file included from include/asm-generic/hardirq.h:17:
+   In file included from include/linux/irq.h:20:
+   In file included from include/linux/io.h:13:
+   In file included from arch/um/include/asm/io.h:24:
+   include/asm-generic/io.h:547:31: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+           val = __raw_readb(PCI_IOBASE + addr);
+                             ~~~~~~~~~~ ^
+   include/asm-generic/io.h:560:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+           val = __le16_to_cpu((__le16 __force)__raw_readw(PCI_IOBASE + addr));
+                                                           ~~~~~~~~~~ ^
+   include/uapi/linux/byteorder/little_endian.h:37:51: note: expanded from macro '__le16_to_cpu'
+   #define __le16_to_cpu(x) ((__force __u16)(__le16)(x))
+                                                     ^
+   In file included from net/ipv6/tcpv6_offload.c:9:
+   In file included from include/linux/skbuff.h:17:
+   In file included from include/linux/bvec.h:10:
+   In file included from include/linux/highmem.h:12:
+   In file included from include/linux/hardirq.h:11:
+   In file included from arch/um/include/asm/hardirq.h:5:
+   In file included from include/asm-generic/hardirq.h:17:
+   In file included from include/linux/irq.h:20:
+   In file included from include/linux/io.h:13:
+   In file included from arch/um/include/asm/io.h:24:
+   include/asm-generic/io.h:573:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+           val = __le32_to_cpu((__le32 __force)__raw_readl(PCI_IOBASE + addr));
+                                                           ~~~~~~~~~~ ^
+   include/uapi/linux/byteorder/little_endian.h:35:51: note: expanded from macro '__le32_to_cpu'
+   #define __le32_to_cpu(x) ((__force __u32)(__le32)(x))
+                                                     ^
+   In file included from net/ipv6/tcpv6_offload.c:9:
+   In file included from include/linux/skbuff.h:17:
+   In file included from include/linux/bvec.h:10:
+   In file included from include/linux/highmem.h:12:
+   In file included from include/linux/hardirq.h:11:
+   In file included from arch/um/include/asm/hardirq.h:5:
+   In file included from include/asm-generic/hardirq.h:17:
+   In file included from include/linux/irq.h:20:
+   In file included from include/linux/io.h:13:
+   In file included from arch/um/include/asm/io.h:24:
+   include/asm-generic/io.h:584:33: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+           __raw_writeb(value, PCI_IOBASE + addr);
+                               ~~~~~~~~~~ ^
+   include/asm-generic/io.h:594:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+           __raw_writew((u16 __force)cpu_to_le16(value), PCI_IOBASE + addr);
+                                                         ~~~~~~~~~~ ^
+   include/asm-generic/io.h:604:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+           __raw_writel((u32 __force)cpu_to_le32(value), PCI_IOBASE + addr);
+                                                         ~~~~~~~~~~ ^
+   include/asm-generic/io.h:692:20: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+           readsb(PCI_IOBASE + addr, buffer, count);
+                  ~~~~~~~~~~ ^
+   include/asm-generic/io.h:700:20: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+           readsw(PCI_IOBASE + addr, buffer, count);
+                  ~~~~~~~~~~ ^
+   include/asm-generic/io.h:708:20: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+           readsl(PCI_IOBASE + addr, buffer, count);
+                  ~~~~~~~~~~ ^
+   include/asm-generic/io.h:717:21: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+           writesb(PCI_IOBASE + addr, buffer, count);
+                   ~~~~~~~~~~ ^
+   include/asm-generic/io.h:726:21: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+           writesw(PCI_IOBASE + addr, buffer, count);
+                   ~~~~~~~~~~ ^
+   include/asm-generic/io.h:735:21: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+           writesl(PCI_IOBASE + addr, buffer, count);
+                   ~~~~~~~~~~ ^
+>> net/ipv6/tcpv6_offload.c:48:7: error: call to undeclared function '__inet6_lookup_established'; ISO C99 and later do not support implicit function declarations [-Werror,-Wimplicit-function-declaration]
+           sk = __inet6_lookup_established(net, net->ipv4.tcp_death_row.hashinfo,
+                ^
+   net/ipv6/tcpv6_offload.c:48:7: note: did you mean '__inet_lookup_established'?
+   include/net/inet_hashtables.h:371:14: note: '__inet_lookup_established' declared here
+   struct sock *__inet_lookup_established(struct net *net,
+                ^
+   net/ipv6/tcpv6_offload.c:48:5: error: incompatible integer to pointer conversion assigning to 'struct sock *' from 'int' [-Wint-conversion]
+           sk = __inet6_lookup_established(net, net->ipv4.tcp_death_row.hashinfo,
+              ^ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   12 warnings and 2 errors generated.
 
-Also I would very strongly suggest you add an overflow qualifier to the
-type system and please provide sane means of qualifier manipulation --
-stripping qualifiers is painful :/
 
-> Regardless, yes, someone intent on wrapping gets their expected 2s
-> complement results, but in the cases were a few values started collecting
-> in some dark corner of protocol handling, having a calculation wrap around
-> is at best a behavioral bug and at worst a total system compromise.
-> Wrapping is the uncommon case here, so we mark those.
+vim +/__inet6_lookup_established +48 net/ipv6/tcpv6_offload.c
 
-Then feel free to sprinkle copious amounts of 'overflow' qualifiers in
-the protocol handling code.
+    16	
+    17	static bool tcp6_check_fraglist_gro(struct sk_buff *skb)
+    18	{
+    19		const struct ipv6hdr *hdr = skb_gro_network_header(skb);
+    20		struct net *net = dev_net(skb->dev);
+    21		unsigned int off, hlen, thlen;
+    22		struct tcphdr *th;
+    23		struct sock *sk;
+    24		int iif, sdif;
+    25	
+    26		if (!(skb->dev->features & NETIF_F_GRO_FRAGLIST))
+    27			return false;
+    28	
+    29		inet6_get_iif_sdif(skb, &iif, &sdif);
+    30	
+    31		off = skb_gro_offset(skb);
+    32		hlen = off + sizeof(*th);
+    33		th = skb_gro_header(skb, hlen, off);
+    34		if (unlikely(!th))
+    35			return false;
+    36	
+    37		thlen = th->doff * 4;
+    38		if (thlen < sizeof(*th))
+    39			return false;
+    40	
+    41		hlen = off + thlen;
+    42		if (!skb_gro_may_pull(skb, hlen)) {
+    43			th = skb_gro_header_slow(skb, hlen, off);
+    44			if (unlikely(!th))
+    45				return false;
+    46		}
+    47	
+  > 48		sk = __inet6_lookup_established(net, net->ipv4.tcp_death_row.hashinfo,
+    49						&hdr->saddr, th->source,
+    50						&hdr->daddr, ntohs(th->dest),
+    51						iif, sdif);
+    52		if (!sk)
+    53			return true;
+    54	
+    55		sock_put(sk);
+    56	
+    57		return false;
+    58	}
+    59	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
