@@ -1,170 +1,132 @@
-Return-Path: <netdev+bounces-91223-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91224-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C86708B1C19
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 09:44:57 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BCB938B1C24
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 09:48:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 622E42882D6
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 07:44:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 455EF1F252AE
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 07:48:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6FE86D1B4;
-	Thu, 25 Apr 2024 07:44:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0D7371B50;
+	Thu, 25 Apr 2024 07:47:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Q+gL0k7z"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GUUSGQTB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 445235D477;
-	Thu, 25 Apr 2024 07:44:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8F056F076
+	for <netdev@vger.kernel.org>; Thu, 25 Apr 2024 07:47:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714031092; cv=none; b=W0RYQKTdImTGwTVYdoNwyFMYzASEcUK65H6EatzfOiIVnbgjl31qzDZng9cHa2cpgtMNKmABgbAIXZR9VfF3fDiAWarEeMEiGa9z7go7gKXA3BMO9kuh2TllvxsNL0cqYXV386QdNlX4OMPjwiMXxy+ltlElKzFPEYvEkb0Vqbo=
+	t=1714031262; cv=none; b=UF3/Ht5ojSBWWIYUtT3FN9eYa8wjmw6Gj38jTEFV7ZG9qtSF28ud8dC/i+mdhcBdhad4Pd99J1oWQXxrjLiL16NIFZQr0g2a2p796eTNf6rGewqO5K8+Clk7LxuASUqStwbS1eqpkvl3FS7ngln/xn81AX25ioW/tb4o72p+NoE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714031092; c=relaxed/simple;
-	bh=rbX1x4TtwxifDMMdKqyi1QPKjCEIzapcUurPaX8Pusg=;
+	s=arc-20240116; t=1714031262; c=relaxed/simple;
+	bh=IGabuA64NnpKP7f5ou4CdSEhvaPSr8P5eeKBc/hOv3I=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aqk6SSCfvCpANRi/w7FNMOt8rAODZrlIGEq2lct9UJgeNnkRMnFvxrvlUg4ISGI3g1nmTcouovgI000KDx5C8fWR3uH83vqaUlin6tp9kePUtZLP58fDtaRZ44BYFEExiHJWSWpAT2MHvKW1fp263oupmvE1E7Y2skDJm1RYJ6w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Q+gL0k7z; arc=none smtp.client-ip=198.175.65.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1714031091; x=1745567091;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=rbX1x4TtwxifDMMdKqyi1QPKjCEIzapcUurPaX8Pusg=;
-  b=Q+gL0k7zgTVNzGqoSZx1ZX/utkqdFj7dUE/kDCcNlgKgPRtF3WJCo5KA
-   sIRvToY/RO0o5gobPAKtzrvYCIA0mjHZ7SqgT3evlEwe0+B/90h2QuuG2
-   ddwiHf1156Ex610peGl46jZEpsw25BiN5xSicRGAi6Y2sjdPpENPkIorD
-   P+7bbeQCqYMmbaqrPpQwz7H/QwMC6Au9iDNUrAc/G8WmhU6zX8ZPBzMBh
-   45VYLfYXznOP48zJ2/amH2w7HCP/JSgkU4yV9PF7sbBQyd2sXSWM72gLe
-   bVa2KJNKxDyKT1gvB3QsM4zdlCrzYlVL/PIEr5AooS8HtAQWlee4Ncr/X
-   A==;
-X-CSE-ConnectionGUID: 9kAdhV/+QeSca8Y+jYd+pw==
-X-CSE-MsgGUID: HaHrPoW0SviBUXJzMugBfQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11054"; a="9863056"
-X-IronPort-AV: E=Sophos;i="6.07,228,1708416000"; 
-   d="scan'208";a="9863056"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Apr 2024 00:44:51 -0700
-X-CSE-ConnectionGUID: acf16ZVORAGiprmzlKwKDQ==
-X-CSE-MsgGUID: djmKY/R8TruoiMqNuEWQ4w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,228,1708416000"; 
-   d="scan'208";a="25017439"
-Received: from lkp-server01.sh.intel.com (HELO e434dd42e5a1) ([10.239.97.150])
-  by fmviesa007.fm.intel.com with ESMTP; 25 Apr 2024 00:44:48 -0700
-Received: from kbuild by e434dd42e5a1 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1rztmf-00028W-2m;
-	Thu, 25 Apr 2024 07:44:45 +0000
-Date: Thu, 25 Apr 2024 15:44:04 +0800
-From: kernel test robot <lkp@intel.com>
-To: Felix Fietkau <nbd@nbd.name>, netdev@vger.kernel.org,
-	Eric Dumazet <edumazet@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: oe-kbuild-all@lists.linux.dev, willemdebruijn.kernel@gmail.com,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 4/4] net: add heuristic for enabling TCP
- fraglist GRO
-Message-ID: <202404251517.ZUALo8e5-lkp@intel.com>
-References: <20240424180458.56211-5-nbd@nbd.name>
+	 Content-Type:Content-Disposition:In-Reply-To; b=d4aU+y323R0MuWz+ljP6ILla+BSIDtJ4IsvcH1NgQXFEwc052SxUQR2hA/UxIW97gFseXSkHenqjA1L12heeS+SlrBr4KuvjFpfG3Y9NA4H/NSAvg9/ST8ERjzGE2WS9kHHwC6VFIFMLymMI5Ljc3mWUCBOeI/VUY8gGiVQyKTA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GUUSGQTB; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1714031259;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=r6u2GQrZIUPc3UtWj+HqbRZ4C2sJ6DI8OwDGnwuEGQw=;
+	b=GUUSGQTBz1UFAP/JIAtepYX+/e/RaprOzVmUuknbNAd9aNDc7m8TQasX1BXu+UzkxaPZD/
+	j56+EfpLa2LphT57XUgh0sxHpDXeZxox47qYZNTwE4BBYzAE2YwARuWMNswiiCJamGeONl
+	DHSu1Ilk06OD2kynSpWCI+l3HsGrP0o=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-354-McY1q1EaOMCsVovORRBbHA-1; Thu,
+ 25 Apr 2024 03:47:35 -0400
+X-MC-Unique: McY1q1EaOMCsVovORRBbHA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 806E53813F2E;
+	Thu, 25 Apr 2024 07:47:34 +0000 (UTC)
+Received: from calimero.vinschen.de (unknown [10.39.194.197])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 3FDDA47B;
+	Thu, 25 Apr 2024 07:47:34 +0000 (UTC)
+Received: by calimero.vinschen.de (Postfix, from userid 500)
+	id 25647A80BA0; Thu, 25 Apr 2024 09:47:33 +0200 (CEST)
+Date: Thu, 25 Apr 2024 09:47:33 +0200
+From: Corinna Vinschen <vinschen@redhat.com>
+To: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
+	intel-wired-lan@lists.osuosl.org
+Subject: Re: [Intel-wired-lan] [PATCH] igc: fix a log entry using
+ uninitialized netdev
+Message-ID: <ZioKlQR9z8RWGFAB@calimero.vinschen.de>
+Mail-Followup-To: Vinicius Costa Gomes <vinicius.gomes@intel.com>,
+	Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
+	intel-wired-lan@lists.osuosl.org
+References: <20240423102455.901469-1-vinschen@redhat.com>
+ <033cce07-fe8f-42e6-8c27-7afee87fe13c@lunn.ch>
+ <8734raxq4z.fsf@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240424180458.56211-5-nbd@nbd.name>
+In-Reply-To: <8734raxq4z.fsf@intel.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
 
-Hi Felix,
+On Apr 24 17:06, Vinicius Costa Gomes wrote:
+> Andrew Lunn <andrew@lunn.ch> writes:
+> 
+> > On Tue, Apr 23, 2024 at 12:24:54PM +0200, Corinna Vinschen wrote:
+> >> During successful probe, igc logs this:
+> >> 
+> >> [    5.133667] igc 0000:01:00.0 (unnamed net_device) (uninitialized): PHC added
+> >>                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> >> The reason is that igc_ptp_init() is called very early, even before
+> >> register_netdev() has been called. So the netdev_info() call works
+> >> on a partially uninitialized netdev.
+> >> 
+> >> Fix this by calling igc_ptp_init() after register_netdev(), right
+> >> after the media autosense check, just as in igb.  Add a comment,
+> >> just as in igb.
+> >
+> > The network stack can start sending and receiving packet before
+> > register_netdev() returns. This is typical of NFS root for example. Is
+> > there anything in igc_ptp_init() which could cause such packet
+> > transfers to explode?
+> >
+> 
+> There might be a very narrow window (probably impossible?), what I can
+> see is:
+> 
+> 1. the netdevice is exposed to userspace;
+> 2. userspace does the SIOCSHWTSTAMP ioctl() to enable TX timestamps;
+> 3. userspace sends a packet that is going to be timestamped;
+> 
+> if this happens before igc_ptp_init() is called, adapter->ptp_tx_lock is
+> going to be uninitialized, and (3) is going to crash.
 
-kernel test robot noticed the following build warnings:
-
-[auto build test WARNING on net-next/main]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Felix-Fietkau/net-move-skb_gro_receive_list-from-udp-to-core/20240425-060838
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20240424180458.56211-5-nbd%40nbd.name
-patch subject: [PATCH net-next 4/4] net: add heuristic for enabling TCP fraglist GRO
-config: openrisc-defconfig (https://download.01.org/0day-ci/archive/20240425/202404251517.ZUALo8e5-lkp@intel.com/config)
-compiler: or1k-linux-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240425/202404251517.ZUALo8e5-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202404251517.ZUALo8e5-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
-   net/ipv6/tcpv6_offload.c: In function 'tcp6_check_fraglist_gro':
-   net/ipv6/tcpv6_offload.c:48:14: error: implicit declaration of function '__inet6_lookup_established'; did you mean '__inet_lookup_established'? [-Werror=implicit-function-declaration]
-      48 |         sk = __inet6_lookup_established(net, net->ipv4.tcp_death_row.hashinfo,
-         |              ^~~~~~~~~~~~~~~~~~~~~~~~~~
-         |              __inet_lookup_established
->> net/ipv6/tcpv6_offload.c:48:12: warning: assignment to 'struct sock *' from 'int' makes pointer from integer without a cast [-Wint-conversion]
-      48 |         sk = __inet6_lookup_established(net, net->ipv4.tcp_death_row.hashinfo,
-         |            ^
-   cc1: some warnings being treated as errors
+The same would then be possible on igb as well, wouldn't it?
 
 
-vim +48 net/ipv6/tcpv6_offload.c
+> If there's anything that makes this impossible/extremely unlikely, the
+> patch looks good:
+> 
+> Acked-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+> 
+> 
+> Cheers,
+> -- 
+> Vinicius
 
-    16	
-    17	static bool tcp6_check_fraglist_gro(struct sk_buff *skb)
-    18	{
-    19		const struct ipv6hdr *hdr = skb_gro_network_header(skb);
-    20		struct net *net = dev_net(skb->dev);
-    21		unsigned int off, hlen, thlen;
-    22		struct tcphdr *th;
-    23		struct sock *sk;
-    24		int iif, sdif;
-    25	
-    26		if (!(skb->dev->features & NETIF_F_GRO_FRAGLIST))
-    27			return false;
-    28	
-    29		inet6_get_iif_sdif(skb, &iif, &sdif);
-    30	
-    31		off = skb_gro_offset(skb);
-    32		hlen = off + sizeof(*th);
-    33		th = skb_gro_header(skb, hlen, off);
-    34		if (unlikely(!th))
-    35			return false;
-    36	
-    37		thlen = th->doff * 4;
-    38		if (thlen < sizeof(*th))
-    39			return false;
-    40	
-    41		hlen = off + thlen;
-    42		if (!skb_gro_may_pull(skb, hlen)) {
-    43			th = skb_gro_header_slow(skb, hlen, off);
-    44			if (unlikely(!th))
-    45				return false;
-    46		}
-    47	
-  > 48		sk = __inet6_lookup_established(net, net->ipv4.tcp_death_row.hashinfo,
-    49						&hdr->saddr, th->source,
-    50						&hdr->daddr, ntohs(th->dest),
-    51						iif, sdif);
-    52		if (!sk)
-    53			return true;
-    54	
-    55		sock_put(sk);
-    56	
-    57		return false;
-    58	}
-    59	
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Corinna
+
 
