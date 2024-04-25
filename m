@@ -1,131 +1,105 @@
-Return-Path: <netdev+bounces-91214-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91215-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FE5F8B1B68
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 09:04:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2FEAD8B1B8E
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 09:11:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ACEFE1F24BE3
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 07:04:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C6D3F1F240AF
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 07:11:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2222367C53;
-	Thu, 25 Apr 2024 07:04:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25ED06D1B4;
+	Thu, 25 Apr 2024 07:10:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="fv/fN9Ut"
+	dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b="MmasBUph"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from todd.t-8ch.de (todd.t-8ch.de [159.69.126.157])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7882C5FBB2
-	for <netdev@vger.kernel.org>; Thu, 25 Apr 2024 07:04:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 265FC6CDA5;
+	Thu, 25 Apr 2024 07:10:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.69.126.157
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714028667; cv=none; b=JST5Bkaix+//0WxlLvI32cGvcA2TRIdtQypXRpBwfZS74b3zKjSbVvSmpFucqBRpFWrDKmQyltFa5umJE5gNrvQlI09vAiBwzfX1seZUUEhxgeDki6lg67K57OlOQgASYuDvCeQXMupJpiDcRZMZK16Hfml77EOADHQe2qB9yQI=
+	t=1714029040; cv=none; b=uZlhU/LfITufdr6wUyubmn7V68w/ZlTtzgNBBFxXy8bUwO01JD1et/nSI0mp7VLDgueIne3fITim+YnlqFAhs+pEgdNN6rxk/Zj2zxO9lJq1zbr3218wWdisDtRsno2+CyirAzvAvpVOwdFPn2Nmhvjdz3kt18Hz7V5BGdSQI2o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714028667; c=relaxed/simple;
-	bh=/VjRoJE3IXRNkRzEdSWJMoni3iSBje1meeBcc8jOQog=;
+	s=arc-20240116; t=1714029040; c=relaxed/simple;
+	bh=rmNCwj/QZXocvFu/SV+UsAbq1yc1Onrw5e/MM6tpI4o=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ey/6p3/NLzZJJA59+XcsEwQTcBSdLQcjIrDCUZd4FxgxxpqRKy3/8gWNE/8fBDeUF+xGOdVF/V7n37cycTkbbgKKjumX+gXPeNQTDk0c0nuB5TCem70gO/glrnUV8c+k0kJEt3/i33AAzbQNvsGxdzN5F1ksx1oCCMMreYPR/5o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=fv/fN9Ut; arc=none smtp.client-ip=209.85.208.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-56e477db7fbso758274a12.3
-        for <netdev@vger.kernel.org>; Thu, 25 Apr 2024 00:04:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1714028664; x=1714633464; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=cBR6dncekgh5NrQLVvWpJ1bIu14pltXiH3AH2dGUbz4=;
-        b=fv/fN9UtkXWJblrg9TIz7VD/qvIR03gSA2pGOslX/floDTrKnkQrkTqhPW3+f0MbXM
-         Ikw3kyPXYf9NEYSu71ergzqF6T33BbiyOAbEyN0uETHwk2nvWsaF15FiUqE3VYCTzbw2
-         UP07sP89k3o6cmxUJb/ezwBrkz6eFzWIU++ySSE+x+DfRk1MzC8Ino29adNovHBS4VZp
-         DpsjTu5YMpoTyQyB+huyB+S39eLbAOwozjTNRHlNUMoveL3vFfXCbtbUMe0MGBm7wpot
-         uDPhbZ0xz8GrFdVWcFwR0sGf3VFDGDSZiJfK28OUpicmp0gEi8urhS6R+rDI434mCDhu
-         I/cw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714028664; x=1714633464;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cBR6dncekgh5NrQLVvWpJ1bIu14pltXiH3AH2dGUbz4=;
-        b=UpoODyf9xVMoa5zbbtpuUhL4TkOPSShL12UBdV27lk6rRlT0sN4tAr+p3t1LfbFNAb
-         CBKmrlVkyTkpC1+fB0CsU7K12yH6V2YlBEZdhqqvlRwBZonwIxZjoKjRDnkh2Tq3ftb1
-         k6g5HPaa3nirQWGtlgSQwaEHs6euBpDBvG8xQsUW/SzPYq0Wy81xK0SNmFSAMtzcyAzz
-         x9SIsZeVPmp3OpTqrP/vqDLxudlOIvPgr8KvKlEuqS1tNQ6RYrr9HevLTu9frwg6hUNL
-         epLbMS5w6hvQ0bVGGTYkEA3/cE/JYmV/YrcRxbxjijHD7iE4pNXy5BZda2/svwRLXKCa
-         VPlQ==
-X-Gm-Message-State: AOJu0YwYkNrgGj1snbXeS5zWoWoavjicsDjLT+v7MwgGkrW8OmmA4wyM
-	Ywm8l2lBcnB8xV3ZnM0PRzeuU8ZFL3pt6JGOUGBGBOV6z/XkBFRz5qC1/P8qOPs=
-X-Google-Smtp-Source: AGHT+IEQ8s8854EseHNz+L2jLHovAq6W0eWl2AJR515h0d/Dmap6/1Bkc0yyTsrA4vgsxATiLZQQSg==
-X-Received: by 2002:a50:9b55:0:b0:570:c8f:1a35 with SMTP id a21-20020a509b55000000b005700c8f1a35mr3456039edj.8.1714028663631;
-        Thu, 25 Apr 2024 00:04:23 -0700 (PDT)
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id et6-20020a056402378600b0057245a3fd4bsm117790edb.68.2024.04.25.00.04.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Apr 2024 00:04:23 -0700 (PDT)
-Date: Thu, 25 Apr 2024 09:04:18 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: =?iso-8859-1?Q?Asbj=F8rn_Sloth_T=F8nnesen?= <ast@fiberby.net>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Ariel Elior <aelior@marvell.com>,
-	Manish Chopra <manishc@marvell.com>
-Subject: Re: [PATCH net-next] net: qede: flower: validate control flags
-Message-ID: <ZioAchImQ65ck1Ua@nanopsycho>
-References: <20240424134250.465904-1-ast@fiberby.net>
- <Zikcq2S90S97h7Z0@nanopsycho>
- <923135c6-1bd1-414d-b574-c201644d35ab@fiberby.net>
+	 Content-Type:Content-Disposition:In-Reply-To; b=gieOt1pLr+D0qMK4OYcfBKCyFuFyZJ7Do7RWMt3ayutKnlctUSr2Giaov9NdiRm4Za70PQzA3qkWCBKWf1/H9AA4Nu5ldrBgQ/XdgGVcB+r1Ht+ee3gDsTp/K9jbn607DyqrWZKqMU3wvsVD4YOAM1Fwrm2yuESrIdV3F2KqHVU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=weissschuh.net; spf=pass smtp.mailfrom=weissschuh.net; dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b=MmasBUph; arc=none smtp.client-ip=159.69.126.157
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=weissschuh.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=weissschuh.net
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=weissschuh.net;
+	s=mail; t=1714029027;
+	bh=rmNCwj/QZXocvFu/SV+UsAbq1yc1Onrw5e/MM6tpI4o=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=MmasBUphC0hDmcDselWsqNDchcFNLbtyyIXYaTEfQv4BLOsVbY80KeyHb5BvHn9uV
+	 mXfX+53b9fklgAHnv4JHOlIL0SSIIXm5AmCALLJVlcCrmQacW/Cc+9xB5aBl8A7Dwb
+	 B9LRLV8RKBn3hp3tvoCofURazzoY7NMe3hrGTd84=
+Date: Thu, 25 Apr 2024 09:10:27 +0200
+From: Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <linux@weissschuh.net>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Luis Chamberlain <mcgrof@kernel.org>, 
+	Joel Granados <j.granados@samsung.com>, Kees Cook <keescook@chromium.org>, 
+	Eric Dumazet <edumazet@google.com>, Dave Chinner <david@fromorbit.com>, 
+	linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org, 
+	linux-mm@kvack.org, linux-security-module@vger.kernel.org, bpf@vger.kernel.org, 
+	linuxppc-dev@lists.ozlabs.org, linux-xfs@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
+	linux-perf-users@vger.kernel.org, netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
+	kexec@lists.infradead.org, linux-hardening@vger.kernel.org, bridge@lists.linux.dev, 
+	lvs-devel@vger.kernel.org, linux-rdma@vger.kernel.org, rds-devel@oss.oracle.com, 
+	linux-sctp@vger.kernel.org, linux-nfs@vger.kernel.org, apparmor@lists.ubuntu.com
+Subject: Re: [PATCH v3 00/11] sysctl: treewide: constify ctl_table argument
+ of sysctl handlers
+Message-ID: <9e657181-866a-4626-82d0-e0030051b003@t-8ch.de>
+References: <20240423-sysctl-const-handler-v3-0-e0beccb836e2@weissschuh.net>
+ <20240424201234.3cc2b509@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <923135c6-1bd1-414d-b574-c201644d35ab@fiberby.net>
+In-Reply-To: <20240424201234.3cc2b509@kernel.org>
 
-Wed, Apr 24, 2024 at 06:43:14PM CEST, ast@fiberby.net wrote:
->Hi Jiri,
->
->On 4/24/24 2:52 PM, Jiri Pirko wrote:
->> Wed, Apr 24, 2024 at 03:42:48PM CEST, ast@fiberby.net wrote:
->> > This driver currently doesn't support any flower control flags.
->> > 
->> > Implement check for control flags, such as can be set through
->> > `tc flower ... ip_flags frag`.
->> > 
->> > Since qede_parse_flow_attr() are called by both qede_add_tc_flower_fltr()
->> > and qede_flow_spec_to_rule(), as the latter doesn't having access to
->> > extack, then flow_rule_*_control_flags() can't be used in this driver.
->> 
->> Why? You can pass null.
->
->Ah, I see. I hadn't traced that option down through the defines,
->I incorrectly assumed that NL_SET_ERR_MSG* didn't allow NULL.
->
->Currently thinking about doing v2 in this style:
->
->if (flow_rule_match_has_control_flags(rule, extack)) {
->        if (!extack)
->                DP_NOTICE(edev, "Unsupported match on control.flags");
->        return -EOPNOTSUPP;
->}
+On 2024-04-24 20:12:34+0000, Jakub Kicinski wrote:
+> On Tue, 23 Apr 2024 09:54:35 +0200 Thomas WeiÃŸschuh wrote:
+> > The series was split from my larger series sysctl-const series [0].
+> > It only focusses on the proc_handlers but is an important step to be
+> > able to move all static definitions of ctl_table into .rodata.
+> 
+> Split this per subsystem, please.
 
-Looks ok.
+Unfortunately this would introduce an enormous amount of code churn.
 
->
->pw-bot: changes-requested
->
->-- 
->Best regards
->Asbjørn Sloth Tønnesen
->Network Engineer
->Fiberby - AS42541
+The function prototypes for each callback have to stay consistent.
+So a another callback member ("proc_handler_new") is needed and users
+would be migrated to it gradually.
+
+But then *all* definitions of "struct ctl_table" throughout the tree need to
+be touched.
+In contrast, the proposed series only needs to change the handler
+implementations, not their usage sites.
+
+There are many, many more usage sites than handler implementations.
+
+Especially, as the majority of sysctl tables use the standard handlers
+(proc_dostring, proc_dobool, ...) and are not affected by the proposed
+aproach at all.
+
+And then we would have introduced a new handler name "proc_handler_new"
+and maybe have to do the whole thing again to rename it back to
+the original and well-known "proc_handler".
+
+
+Of course if somebody has a better aproach, I'm all ears.
+
+
+Thomas
 
