@@ -1,155 +1,149 @@
-Return-Path: <netdev+bounces-91144-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91145-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C84D8B1863
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 03:19:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA6E88B186C
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 03:24:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A8EE5B23845
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 01:19:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AA0FB1C21A86
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 01:24:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62A21E545;
-	Thu, 25 Apr 2024 01:19:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15F95BA42;
+	Thu, 25 Apr 2024 01:24:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fWZwQRki"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i9juG4cN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D6B82599
-	for <netdev@vger.kernel.org>; Thu, 25 Apr 2024 01:19:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A07014C98
+	for <netdev@vger.kernel.org>; Thu, 25 Apr 2024 01:24:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714007958; cv=none; b=E0hmQAr7A7FjSTFh/sZVps9SPIWksr0mFQ2lgrl9TuWbvHJAskookJUb4ezYeliSUuPLt4n1Hdux07s+uEfZ99NSt/iF8YA6qY/xhjjT1pP9fMqRz0zylcPIijS3IU8ma9SDvppLO4d7BU9XN6LaOcHWzKGWf1upkc81jaNket4=
+	t=1714008284; cv=none; b=caIfD/V4Sd1bioe7Cx8u/dAyMs8bu0mOLb/T/jEaqedcCfJHr+Yj41hK9dSzvjxLWZnJur1BhgAhITXraRslRx6JYBE9h9G3FkzuahWY/wCtWCkW8fBO0zo9AwlZ4XQONwBBFVTjNg6u1GVp6AJ1iGEmWby+Uuhu1H4aWMWrGzg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714007958; c=relaxed/simple;
-	bh=uLT8FYB0z9hpMnlQW6hKjbJMmTUuyZlRXmjjQNhJGwU=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=sJbp0LzY9BEx3p3czteEjcF+WiRuIII/2dqNdJKss9tKKQL4BOtoprXGc1MGaWkJag/pmG6WOnbJ/RxyuFlKmnc/vS7belbg1w2VSM9TtND3Qbt5ed8sU8S14ixtR2MYwN2zRyQdq6FwtElmSrLKWcizzgVS3A6RhoUF100IpkI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--justinstitt.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fWZwQRki; arc=none smtp.client-ip=209.85.219.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--justinstitt.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-de549a4ea65so936419276.0
-        for <netdev@vger.kernel.org>; Wed, 24 Apr 2024 18:19:15 -0700 (PDT)
+	s=arc-20240116; t=1714008284; c=relaxed/simple;
+	bh=IxiIgt1/um8rVDGSwbMqcUYU5pJ4H8Z2Cr6OCeWhhmA=;
+	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=CII1RyTwwqXGo/jSrKcJsU8cNrxtzHD/d8sKkgwcFDVxM2XArhKEbb1nfBmqmrq8vfCFL5C+YXt26rlV8CForjHwd4BAsfe+NO3uVzc/nNSh0uKsxJMidhaT7XSiL5t5IHjRUjUiYBlWPhf5fk3QBc8WAkJHpwQn7hftsZnEucY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i9juG4cN; arc=none smtp.client-ip=209.85.216.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-2ac074ba920so108380a91.1
+        for <netdev@vger.kernel.org>; Wed, 24 Apr 2024 18:24:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1714007955; x=1714612755; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=fhtSrAi+//xuc+I8DI7Sfszz5H0fgzv1dQ1F/lNIbLU=;
-        b=fWZwQRkiXoY/CeWe6theD4Bl5iRjc0MB39xrBtIJEZ+eNmL3w6Wwr1rk6YqH6hcY05
-         8NUVxTmo5x6TFqbdPeDTIR0TDYURb8b42kevm629CV81PSLRz1PGjpSiKBiWuMAPo9He
-         QrBOUaJx5NWPnZpiqIlyO3vhX8csX+wFwEpsZcY6RAVYTHaY9U/6xN9wMqBQT/572cxD
-         VsMUXWF+/dKUwRgynAcOOufqIJrIWy+3eUzNfHWTK5HJtyGqSEwRuxWodUXuKb4v1xdw
-         Pu96x59JTEXsipO26B6Sm0j41e+LbcCDYuCTQN2Vhyz+UTywmbcPpHT8rQxRs97vzwej
-         AGsw==
+        d=gmail.com; s=20230601; t=1714008282; x=1714613082; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=BAK124w54JwFio9YSi3lq49s5Oi+2APGd79xc9vOVEc=;
+        b=i9juG4cNTo9uxDIjcWoHnxFMogW+rWAbVQ2YyYVsrsE5w1J3ANtHH3uThbsDt5tzEe
+         yFpsARs5Fp/Gz419tY7RokICJf/zG6ULOdu96o9ATJfFxsW+667lbxry2uMTq0wAcNaX
+         oCrzNij2JHrTSHytl3BAOKYtSUG8SWzvwMr8CdQWL+l9QY8XBpEp48WlwVzxhkA+hSf0
+         +3aK0QF1JfdgOnS6H2KWeFgC7Y0cCYIhDzLldvpTvR9Wvwvy/v+5Z74QEUbciw+WwTVt
+         e/DK9MUuHeDWbfEcOJI5pQeKqH5tryt/MoPEy1/NF6Lz+FJr4dtIHUeQrmb6ERwobS51
+         D0pA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714007955; x=1714612755;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=fhtSrAi+//xuc+I8DI7Sfszz5H0fgzv1dQ1F/lNIbLU=;
-        b=sVrY4dTAWaVqn1f+lb//rrZHwh2wezQNr1TkHGIu3s5TFVypuE9iEJJcXi6eOliyF3
-         xPUAkULQfTD5ShZJAgKgsehmUeUVNcefVgTtCGa/+wpgJF3cg/zz6FPY9SCtqcP9f63D
-         XKq/qcxmweM+QuuHQB2eQ7tmqS0ECye66WAiDt5sWXaLyc5PMx3GIo7YjJTsu3MbHmLA
-         YW3ZgD2Aq6RxwXUSxAVVkkuyjjRv48th/nsbXoC87/8wPhreLroyij2YJXuyzK7rz3zR
-         oTzQlQhvbxA13eN1W2x47Ygic5LaLfdv3oPVN1n+3OpsCx/pVfg1Y+2+zYEqBenf+vJS
-         9Otg==
-X-Gm-Message-State: AOJu0Yzj1nnk9keNsKNXcFk8qlfPJhltTaJeU3q+VQcLKfVp8BnO940K
-	JjyQtLRE3auNbf5DSEnIHJkzw3/c2u4HxCQGRE7dxJXPQsWXJeJu/I4UcZ1OlBe7LfFUBJKG24b
-	XRBC/8BJ4cHWw3/qHa0N0IQ==
-X-Google-Smtp-Source: AGHT+IGjyJXrIQ/HPFqodscDOz8YvnLkg3hYnAsGcpKNSDsZzEE8YFhfmdMCjhCj4C6Cs8vE34OjReb+sQ9JNy71xw==
-X-Received: from jstitt-linux1.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:23b5])
- (user=justinstitt job=sendgmr) by 2002:a05:6902:2b05:b0:dc6:d233:ffdd with
- SMTP id fi5-20020a0569022b0500b00dc6d233ffddmr1437183ybb.0.1714007955020;
- Wed, 24 Apr 2024 18:19:15 -0700 (PDT)
-Date: Thu, 25 Apr 2024 01:19:13 +0000
+        d=1e100.net; s=20230601; t=1714008282; x=1714613082;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=BAK124w54JwFio9YSi3lq49s5Oi+2APGd79xc9vOVEc=;
+        b=lDgzRWMEH4pNCKF5KGC+W/uClJt/E6dF3fXuVFadZuUMWPp+TwcYTmfTsLai6fTelX
+         oQCrq49HhbuHiJtMdT35hpOmlqPTpEoyKxYiY+yFs9eKUXXnVWiXf8RQJe8SxP2LHuXe
+         9gZ3szLo1v6qkP6ul0i0sjJPxDLRZTo04MR4Os2udaUX1U/1s0YOHACZHXA9XHEnzL8A
+         8kkItBkJgpiVppWvfiCcGxq4ybV9xuigWTbl/SiWuLazJY4wjKis6QzG84hRYz87L8Ri
+         ba5UOPDjFJGgHj88V2Uzub5TlwlbqNINGKo6834gRoiXdEh8DXNeBJX4YaQKM50ZxT9b
+         khUA==
+X-Forwarded-Encrypted: i=1; AJvYcCVbsDWA890ZmBB4+gAH1CT0TZ+RWYEzsx0ZtPNTWZGffUXhE54wufIVQdJaIrfd1F2Iz4WCcCykT/Ydk9YoCDbrbeB+ZwV6
+X-Gm-Message-State: AOJu0YxlYmjRcZndowrNUSsJ30Arg5IKoEFK8koffDmNhjV+cJbbGqpL
+	o/Cv0weMigDokEqBmXMGOKueVdEmdESHSt1t4zot9OXQsN0Zuqdo1EyNKg==
+X-Google-Smtp-Source: AGHT+IGRzk36CY1Pc5LoFftQr1jMfsSnqCMYzY/I48srPwZEbe+2BFTXX4uTmubl4Hx+JOrYJjeL0A==
+X-Received: by 2002:a17:902:ba88:b0:1e0:99b2:8a91 with SMTP id k8-20020a170902ba8800b001e099b28a91mr4220347pls.4.1714008281725;
+        Wed, 24 Apr 2024 18:24:41 -0700 (PDT)
+Received: from localhost (p5315239-ipxg23901hodogaya.kanagawa.ocn.ne.jp. [180.34.87.239])
+        by smtp.gmail.com with ESMTPSA id kg8-20020a170903060800b001ea699b79cbsm2042647plb.213.2024.04.24.18.24.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 24 Apr 2024 18:24:41 -0700 (PDT)
+Date: Thu, 25 Apr 2024 10:24:28 +0900 (JST)
+Message-Id: <20240425.102428.2029676913045396941.fujita.tomonori@gmail.com>
+To: andrew@lunn.ch
+Cc: fujita.tomonori@gmail.com, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v1 5/5] net: tn40xx: add PHYLIB support
+From: FUJITA Tomonori <fujita.tomonori@gmail.com>
+In-Reply-To: <daf9400f-c7e0-4f76-9a8d-977d9f82758a@lunn.ch>
+References: <7c20aefa-d93b-41e2-9a23-97782926369d@lunn.ch>
+	<20240416.211926.560322866915632259.fujita.tomonori@gmail.com>
+	<daf9400f-c7e0-4f76-9a8d-977d9f82758a@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-X-B4-Tracking: v=1; b=H4sIAJGvKWYC/53NwW5CIRCF4VcxrB0DM0Cxq75H4wJhvJIoGLghN
- ea+u2jSReOm7fKcxfffROOauIn31U1U7qmlksfQ65UIR58nhhTHFiiRlJQG2lxzuFwh1tS5Nsg
- 8Q2weTj5vSRKEUhkCWHLWGccmIIqBXSof0tcz9Lkb+5jaXOr12e3q8f450RUoMN7aYMgp/cYfU ynTiTehnMWj0fF/Lg73wHtt0BvCuH9x6dvVUkv3a5eGKwMpslsd0fx0l2W5Ax9tpi2NAQAA
-X-Developer-Key: i=justinstitt@google.com; a=ed25519; pk=tC3hNkJQTpNX/gLKxTNQKDmiQl6QjBNCGKJINqAdJsE=
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1714007954; l=2356;
- i=justinstitt@google.com; s=20230717; h=from:subject:message-id;
- bh=uLT8FYB0z9hpMnlQW6hKjbJMmTUuyZlRXmjjQNhJGwU=; b=CRkKkJ86IKr54dqqwbv7Lx0P+RGq3++z6F1qmKPSqj6SJ3t9Okv6f+h2SHOs+EFklHCfanqqy
- FLsGsHXWMXvCrfYcSeRJ0xUvYgFHj4oPOrqUanyaT2k/vnHJ8Y2ovY3
-X-Mailer: b4 0.12.3
-Message-ID: <20240425-strncpy-drivers-net-dsa-lan9303-core-c-v4-1-9fafd419d7bb@google.com>
-Subject: [PATCH v4] net: dsa: lan9303: use ethtool_puts() for lan9303_get_strings()
-From: Justin Stitt <justinstitt@google.com>
-To: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, 
-	Vladimir Oltean <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-hardening@vger.kernel.org, Kees Cook <keescook@chromium.org>, 
-	Alexander Lobakin <aleksander.lobakin@intel.com>, Justin Stitt <justinstitt@google.com>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 
-This pattern of strncpy with some pointer arithmetic setting fixed-sized
-intervals with string literal data is a bit weird so let's use
-ethtool_puts() as this has more obvious behavior and is less-error
-prone.
+Hi,
 
-Nicely, we also get to drop a usage of the now deprecated strncpy() [1].
+On Tue, 16 Apr 2024 14:57:58 +0200
+Andrew Lunn <andrew@lunn.ch> wrote:
 
-Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#strncpy-on-nul-terminated-strings [1]
-Link: https://github.com/KSPP/linux/issues/90
-Cc: linux-hardening@vger.kernel.org
-Cc: Kees Cook <keescook@chromium.org>
-Suggested-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-Reviewed-by: Kees Cook <keescook@chromium.org>
-Signed-off-by: Justin Stitt <justinstitt@google.com>
----
-Changes in v4:
-- drop unnecessary { } (thanks Alexander L.)
-- carry Kees' RB because of trivial change
-- Link to v3: https://lore.kernel.org/r/20240408-strncpy-drivers-net-dsa-lan9303-core-c-v3-1-0c313694d25b@google.com
+>> > Are there variants of this device using SFP? It might be you actually
+>> > want to use phylink, not phylib. That is a bit messy for a PCI device,
+>> > look at drivers/net/ethernet/wangxun.
+>> 
+>> phylink is necessary if PHY is hot-pluggable, right? if so, the driver
+>> doesn't need it. The PHYs that adapters with TN40XX use are
+> 
+> There is more to it than that. phylib has problems when the bandwidth
+> is > 1G and the MAC/PHY link becomes more problematic. Often the PHY
+> will change this link depending on what the media side is doing. If
+> you have a 1G SFP inserted, the QT2025 will change the MAC/PHY link to
+> 1000BaseX. If it has a 10G SFP it will use XAUI. phylink knows how to
+> decode the SFP EEPROM to determine what sort of module it is, and how
+> the PHY should be configured.
+> 
+> To fully support this hardware you are going to need to use phylink.
 
-Changes in v3:
-- use ethtool_puts over ethtool_sprintf
-- Link to v2: https://lore.kernel.org/r/20231005-strncpy-drivers-net-dsa-lan9303-core-c-v2-1-feb452a532db@google.com
+I updated the code to use phylink and posted v2. At least seems that
+it works with 10G SFP+ as before.
 
-Changes in v2:
-- use ethtool_sprintf (thanks Alexander)
-- Link to v1: https://lore.kernel.org/r/20231005-strncpy-drivers-net-dsa-lan9303-core-c-v1-1-5a66c538147e@google.com
----
- drivers/net/dsa/lan9303-core.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+I suppose that more changes are necessary for full support. For
+example, with 1G SFP inserted, the MAC driver has to configure the
+hardware for 1G. I'll investigate once I get 1G SFP.
 
-diff --git a/drivers/net/dsa/lan9303-core.c b/drivers/net/dsa/lan9303-core.c
-index fcb20eac332a..f3b50adae865 100644
---- a/drivers/net/dsa/lan9303-core.c
-+++ b/drivers/net/dsa/lan9303-core.c
-@@ -1007,15 +1007,14 @@ static const struct lan9303_mib_desc lan9303_mib[] = {
- static void lan9303_get_strings(struct dsa_switch *ds, int port,
- 				u32 stringset, uint8_t *data)
- {
-+	u8 *buf = data;
- 	unsigned int u;
- 
- 	if (stringset != ETH_SS_STATS)
- 		return;
- 
--	for (u = 0; u < ARRAY_SIZE(lan9303_mib); u++) {
--		strncpy(data + u * ETH_GSTRING_LEN, lan9303_mib[u].name,
--			ETH_GSTRING_LEN);
--	}
-+	for (u = 0; u < ARRAY_SIZE(lan9303_mib); u++)
-+		ethtool_puts(&buf, lan9303_mib[u].name);
- }
- 
- static void lan9303_get_ethtool_stats(struct dsa_switch *ds, int port,
+Note that the original driver supports only 10G SFP+.
 
----
-base-commit: c85af715cac0a951eea97393378e84bb49384734
-change-id: 20231005-strncpy-drivers-net-dsa-lan9303-core-c-6386858e5c22
 
-Best regards,
---
-Justin Stitt <justinstitt@google.com>
+>> >> diff --git a/drivers/net/ethernet/tehuti/Kconfig b/drivers/net/ethernet/tehuti/Kconfig
+>> >> index 4198fd59e42e..71f22471f9a0 100644
+>> >> --- a/drivers/net/ethernet/tehuti/Kconfig
+>> >> +++ b/drivers/net/ethernet/tehuti/Kconfig
+>> >> @@ -27,6 +27,7 @@ config TEHUTI_TN40
+>> >>  	tristate "Tehuti Networks TN40xx 10G Ethernet adapters"
+>> >>  	depends on PCI
+>> >>  	select FW_LOADER
+>> >> +	select AMCC_QT2025_PHY
+>> > 
+>> > That is pretty unusual, especially when you say there are a few
+>> > different choices.
+>> 
+>> I should not put any 'select *_PHY' here?
+> 
+> Correct. Most distributions just package everything.
+> 
+> We are going to get into an odd corner case that since Rust is still
+> experimental, i doubt distributions are building Rust modules. So they
+> will end up with a MAC driver but no PHY driver, at least not for the
+> QT2025. The Marvell and Aquantia PHY should just work.
+> 
+> Anybody who does want to use the QT2025 will either need to
+> build there own kernel, or black list the in kernel MAC driver and use
+> the out of tree driver. But eventually, Rust will start to be
+> packaged, and then it should work out O.K.
 
+Sure, I dropped the above in v2.
 
