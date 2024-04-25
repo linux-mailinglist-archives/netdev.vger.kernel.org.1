@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-91341-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91342-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF76A8B246A
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 16:54:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E5318B2471
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 16:57:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ACA2928162D
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 14:54:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1A520281877
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 14:57:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33CC714A4D7;
-	Thu, 25 Apr 2024 14:54:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 214EB14A4D7;
+	Thu, 25 Apr 2024 14:57:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="A22w9+DW"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="dTuTsP+I"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B192613328D;
-	Thu, 25 Apr 2024 14:54:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF05C1494BC;
+	Thu, 25 Apr 2024 14:57:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714056892; cv=none; b=D/pceD9CyudXCLkexUxQiJy72wnEp1DxSsivJ8K5enMrnPS6Bc+HBGJsMuirQBuBLC2WKaueQ9J+mCM8QS+deS/P60UwnWxbk7QvXnDXMAtyCc7E9zv5vLZ7PdQs9sRuNGC6Kw4h9zEDN+5gDKBS3AbjF3tANmfJspjV9mQnVPY=
+	t=1714057036; cv=none; b=el0mm4IMxyACvVO1e14QaDCP90x91E1hWVGHZ3od08g2zi0j2xFEFQX9A1lgiUWr6mEwYiRvQtcUSQx4CEUP0mbrc8x6xktPk6GTsMvqMZW4S+MzN7YJX/kB9RZQibg51pjQ8rzBXt3vl0K+lRAC902AfevU1zNFxHPsMvrO7B4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714056892; c=relaxed/simple;
-	bh=VlYgaZ8GrcH/Rr/2IGTRZlH1ZOcJxWZyvjJ0czF+Fx4=;
+	s=arc-20240116; t=1714057036; c=relaxed/simple;
+	bh=C+itTDL3A8PImRFwW+2p6GQPM8DKabS7q7T2fAZamHM=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=G9CyjWhEEeXG10X1hf1/oOpoUEeYklJhKuPyeXbRg6Zjf8uDbKrhZvDvGulQfFHEEqaVBWxmUUpqxpc5hRZ7VrHJjh4iubFDg9wEAiHIK16hJ6xUQ6yAWreKcUBGjY5UDGj9/ML31Inr9aW2rsrUJove6hagG5ZxMFmYs8yQQMo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=A22w9+DW; arc=none smtp.client-ip=217.70.183.200
+	 MIME-Version:Content-Type; b=i/doet/D29p/5iGs60yYNX4g2k/gNJLqmX004Z+ZqAahNN2e9Jrb5UwANUIWB4fL7Fmh2sXHq4eVoHw6TwbZTZOdXJllgNhFhWob8eD4i19/tKh2lQrjldNRaWfLHy9R07324O71k8ddiy3S5pGN4BZtUt+oumXcVni5mtAQ/G8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=dTuTsP+I; arc=none smtp.client-ip=217.70.183.198
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id C0CA12000A;
-	Thu, 25 Apr 2024 14:54:40 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id C1A4DC000E;
+	Thu, 25 Apr 2024 14:57:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1714056881;
+	t=1714057031;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=zuZ1u0XPoODtQKgA1bNoifGDi9IVoIWwmQloQXtBNSg=;
-	b=A22w9+DWR9N0noMUVe4uc1+se890e9j+oeoTLKqEZ61nbmpGKm7C0v442+nj+BJ3oYcRGT
-	1XNhtUU+eFeuCOm38ERNf/1wuGGXeDqLiC0FyBptbviekS0M9G2JzxeejeteW91MQmHYsJ
-	i9LKAhoeHakp1bD/Z9I+StOGh7VIeQphsTSHsI1VFMtY9U/bBkv+X3uPD9IsAFn339PjxO
-	+SCFMs2oxJhBRYEHDWIQrZTY3TTxCUAuYsQxgQ9Owa4PEwyQP3csqT+O+UHHpa14rlet8l
-	c1RYuIdj56LjFpToUPxNAEkmQcsMtDU+MAKZ1Un5TkvOj+q7Y2B1JKCX5E7uQg==
-Date: Thu, 25 Apr 2024 16:54:40 +0200
+	bh=mLXxiz1Ky5nDojL/VVZQzWe2VuDpGkCwUW5hLfQwjTQ=;
+	b=dTuTsP+IJ5VW2lbM1ddRFj2We5xV5pmpubZYOL40eP5CzdUdw4HK5hI/TwjkkNGitqI+V7
+	EHOb4rX02VdKbmDDCzSRX1vu9J/lThB2MJ6N70EWe7YgWaaAEv405hgbnVa6wwCnwuxiTt
+	GvhRuv8tcGdo0UgWKU2YH9VbpOWAhRQnTW6ENgMphNngVpxIaGXKVZgw7evXyYNY1WYuiV
+	h6OPRKqksC7aSKUsrcHlDBh9GI0+dPtOt3txV1HaeyAdNf4XIdzNwrF+rcrOmx6fgRq3X0
+	P78gjr4+e+1X5wHYQaicz7vR4RECbCk06gHgHwtKf5oCSo0YhJHRp8wFj1+0SQ==
+Date: Thu, 25 Apr 2024 16:57:08 +0200
 From: Kory Maincent <kory.maincent@bootlin.com>
 To: Jakub Kicinski <kuba@kernel.org>
 Cc: Jiri Pirko <jiri@resnulli.us>, Oleksij Rempel <o.rempel@pengutronix.de>,
@@ -55,7 +55,7 @@ Cc: Jiri Pirko <jiri@resnulli.us>, Oleksij Rempel <o.rempel@pengutronix.de>,
  netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Kyle Swenson
  <kyle.swenson@est.tech>, kernel test robot <lkp@intel.com>
 Subject: Re: [PATCH net-next v3 0/3] net: pse-pd: Fixes for few small issues
-Message-ID: <20240425165440.0a25c8da@kmaincent-XPS-13-7390>
+Message-ID: <20240425165708.62637485@kmaincent-XPS-13-7390>
 In-Reply-To: <20240425074205.28677540@kernel.org>
 References: <20240423-fix_poe-v3-0-e50f32f5fa59@bootlin.com>
 	<ZiebQLdu9dOh1v-T@nanopsycho>
@@ -94,8 +94,9 @@ t the
 >=20
 > Yeah, I had to apply that one manually.
 
-Mmh that's annoying.
-Thanks for the information.
+Does this patch series is on the same state?
+https://lore.kernel.org/netdev/20240422-feature_ptp_netnext-v11-0-f14441f2a=
+1d8@bootlin.com/
 
 Regards,
 --=20
