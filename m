@@ -1,77 +1,90 @@
-Return-Path: <netdev+bounces-91435-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91437-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21E988B28D4
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 21:13:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 048848B28F5
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 21:20:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D4A33283688
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 19:13:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 33D551C21E20
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 19:20:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB3E115217A;
-	Thu, 25 Apr 2024 19:13:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15B551514F4;
+	Thu, 25 Apr 2024 19:20:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kqNTc3NI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mBa3YIn8"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9601E1514F4;
-	Thu, 25 Apr 2024 19:13:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9D1D2135A;
+	Thu, 25 Apr 2024 19:20:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714072380; cv=none; b=tI4vOkqvFA+lJ1vvbOR/JdYCJtghojYeD/2qnCaysUteRa83ZA6hNJXnk7b4DEoo5bcqeQWsi+KOHKD8MtiGiSvsMdNS6ZJ3+2Tg0UiI2ER0cCHPiWfX6LBminnBYO6YdS6qlmr/5HfdiOUav2AG7yXrGydpSZYl8yXECJ1lVKk=
+	t=1714072835; cv=none; b=BB7riYaiQQ3luVkYa3yIttQf9THFaIkoAIiCcY2XtpcOR6kJX+4oZ1HR46hQQhISfgMJJ1f86E2oElizA0r/f6GiIyzaubohvUKRFGFoWLYn4Mr/y/KdmYbm6WWvdrK8sjoSuGP78Y3uQibRYLXm+s/UbXyTWcnG5wT9uLzoBHc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714072380; c=relaxed/simple;
-	bh=FuGJPh+rJqsQ0UMSARQXfXrqG1e5J7eavTHONg7vy8g=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Uutu6IMfvjM87aBd/j5TINb6/eiN/lNU8x4Ia4gC6Jfvg/Z3eLORFGPAKlwoQA6ECgyzYCJSPamAtP7ytu4VgQ/FnDj82P9D4MLRv02ctJ5gOKPIn2ZyuZYTVXaOAbDXhgnsAj6g3eHN/bJjZjtAAU21xIn3EoOG6vvdWB/9AOY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kqNTc3NI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DDFEAC113CC;
-	Thu, 25 Apr 2024 19:12:59 +0000 (UTC)
+	s=arc-20240116; t=1714072835; c=relaxed/simple;
+	bh=2q5pTz4kFYErglpJfVGh6PCItSi0g4nfm3Sbz1wusfY=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=migrlQzFWj+QesQ+SbRasYsFSccw4ktwZd+TV8Gvsr2Ajcg5KHV3hhcSP0DWQO00dLAswVfQzTW++5LdeimtpwWg30vPN3+LvOKHbQdot5hRx2gMTyYB32qGHFwOx8SLocMvrd5YYcrcX8ovVzo/1RNIKeQ0zW+mk1ntKN8dMSU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mBa3YIn8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 6284FC113CE;
+	Thu, 25 Apr 2024 19:20:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714072380;
-	bh=FuGJPh+rJqsQ0UMSARQXfXrqG1e5J7eavTHONg7vy8g=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=kqNTc3NIbWk7oG+9oscR2aNyu49rPwgDk+KZoigBuoZZaf/I5KVll/n52vcyAPEHP
-	 Mw0j6FCoGPvfp9POHri+DqTgLhm1iw9C75CzPBwFii/t9ejfL+N8J273JPchF8nYUY
-	 DN02DT38FPT+ejI5C/Pup+swIlT1Awt4rqXnBv2TwagzzQVio9SdRmWMQY4B7olC2T
-	 aqK+Vao+sUunpw3vtSJEZexRyWVwxh/7jInsYw5AD2u7Xw9cDf7wkVD7N1KBPiftMJ
-	 8FM5Klc5IrW9g91ww9xj3x+TdkHqpyTdjeYy9QHT5Ay7KbxxDJlm3U8+g0P5DM5NpR
-	 wQmdN8KkS9sww==
-Date: Thu, 25 Apr 2024 12:12:58 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Florian Westphal <fw@strlen.de>
-Cc: <netdev@vger.kernel.org>, Paolo Abeni <pabeni@redhat.com>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- <netfilter-devel@vger.kernel.org>, pablo@netfilter.org
-Subject: Re: [PATCH net-next 0/7] selftest: netfilter: additional cleanups
-Message-ID: <20240425121258.619c61de@kernel.org>
-In-Reply-To: <20240423130604.7013-1-fw@strlen.de>
-References: <20240423130604.7013-1-fw@strlen.de>
+	s=k20201202; t=1714072834;
+	bh=2q5pTz4kFYErglpJfVGh6PCItSi0g4nfm3Sbz1wusfY=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=mBa3YIn89E5adWGMHsgwF/kCI3GEAFA3G5QEaXU2w4yLfuHcmRTKTNlrjn2H1SnEs
+	 e4GT52g2P+w7YsF4CZr8ouaislXeMFi8tD5GUspNOFHh71vpzqOhkD7NnBmOF34K4l
+	 FYSujpv98eWpy/Zkmwv9w7G6EUKGylPPOQ5WSM7bXSNpOSKtrYmRtq2WRIObRMqEDF
+	 lwdZyUbyJjcJ75kSh2nY6W8kcDGJZhajXKclAucE68hfMbDL75p8Ytj87dxDr93spt
+	 7ymoF3ZW6RgErTML9t1u74roXUFvVOfcFkgkxJUXrlX4ZsM8BFkAHi3+yY+TUosTRK
+	 vlIwkLZ7G2U2Q==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4AB55C43614;
+	Thu, 25 Apr 2024 19:20:34 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: pull-request: wireless-next-2024-04-24
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171407283430.11019.15272419004126265111.git-patchwork-notify@kernel.org>
+Date: Thu, 25 Apr 2024 19:20:34 +0000
+References: <20240424100122.217AEC113CE@smtp.kernel.org>
+In-Reply-To: <20240424100122.217AEC113CE@smtp.kernel.org>
+To: Kalle Valo <kvalo@kernel.org>
+Cc: netdev@vger.kernel.org, linux-wireless@vger.kernel.org
 
-On Tue, 23 Apr 2024 15:05:43 +0200 Florian Westphal wrote:
-> I intend to route future changes, if any, via nf(-next) trees
-> now that the 'massive code churn' phase is over.
+Hello:
 
-I hooked the tests which reliably pass up to patchwork now.
-(The PW reporting is "combined" so basically the daemon will take 
-them into account for the "contest" check).
+This pull request was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-On the debug kernels we have a bunch of tests failing due to timeout.
-We multiply the timeout set in ksft settings by 2 for the debug kernel,
-so in netfilter we give them 1000 sec, but looks like that's not enough.
+On Wed, 24 Apr 2024 10:01:21 +0000 (UTC) you wrote:
+> Hi,
+> 
+> here's a pull request to net-next tree, more info below. Please let me know if
+> there are any problems.
+> 
+> Kalle
+> 
+> [...]
 
-Would you be willing to bump it up? I can override it in the config of
-the runner, as last resort.
+Here is the summary with links:
+  - pull-request: wireless-next-2024-04-24
+    https://git.kernel.org/netdev/net-next/c/e6be197f23c5
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
