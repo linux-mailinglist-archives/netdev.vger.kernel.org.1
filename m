@@ -1,190 +1,178 @@
-Return-Path: <netdev+bounces-91411-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91412-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6A4B8B2796
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 19:28:01 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id BEF938B27A2
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 19:34:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E5C04B274B2
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 17:27:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D62F8B20BC5
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 17:34:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0184B14E2FA;
-	Thu, 25 Apr 2024 17:27:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12F8514EC41;
+	Thu, 25 Apr 2024 17:34:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="A7tCBzb7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mYeRQ5vz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 958CB14BF87
-	for <netdev@vger.kernel.org>; Thu, 25 Apr 2024 17:27:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AB743BBE6;
+	Thu, 25 Apr 2024 17:34:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714066074; cv=none; b=K7qofK4/bYznNzle9Mop56LSxCOUyCi+BkZGCeSPsiOEPrqU8sDPPmjUHDe1Nx9hlMmr8fFm35zuklXJQ8y4qxRGmybri20chdL1qUCO0rbJAYFzA3sON9ls7G+3rOpqsJM84frNHkzL7alHFhyDEaBYKKu1EAsx5B1aGMdSNDw=
+	t=1714066445; cv=none; b=gYRCF75dt8al89K48j3anw88tWxTTUnWltJ7So30jf9eAIhWhmUxl7p1uTOXW47GFzRMHSlQXBB1X82k/jbqSa/3iaxYMl0t5DkBqEeX2viKg7VaAgycw8yTYht6uNYojJuJNIvarGDhkl3+g1ROK0WOxOSHFXQnhnGnE51heqE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714066074; c=relaxed/simple;
-	bh=ucctMWTxaxZbiTCOKrWgMO9r0QtqypX2GQdfC7kk5CQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Qe3jo8kVjv/b0NPuGdzC3Nxb7xwRSocyRVURkMFG7kEp4TQPXlMo3arx6iNnBGiqHcgSB6YsMEtxPrLT8o9o9uq1nC1pkpW8zbHrbDPDO42UED6Ti1IS92fHy16JWKv1LxCcfdt5hvRvN/KIGlg2rMmktTxnFxoCqx+0m78BWa8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=A7tCBzb7; arc=none smtp.client-ip=209.85.210.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-6ed2170d89fso1670071b3a.1
-        for <netdev@vger.kernel.org>; Thu, 25 Apr 2024 10:27:53 -0700 (PDT)
+	s=arc-20240116; t=1714066445; c=relaxed/simple;
+	bh=mFHENVV6vhpMmnZt9+RJELuGt+rY1L4LZMOqsl7ey08=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=f1kz83Q3OSGNE8G4RIqUZFIEyUWdzkKlU1pEwY6gy0XHJElWGmQ6uy68cigLJ8w4F4/Xq9iCTyHSgZvuLzWHBfFmkJC+YVuGzMIfDvFK/AkBdPjXtzbeHyV5KmFz460WQyfjNlrJgeyT6rY1gqlnnIFgvMTZ9MjgL1v+4lUobLU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mYeRQ5vz; arc=none smtp.client-ip=209.85.218.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a5883518135so145185666b.3;
+        Thu, 25 Apr 2024 10:34:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1714066073; x=1714670873; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=OOqmW9EMXSCXAzKPIqERIeQh9xbCR10AzpPSejSv1nY=;
-        b=A7tCBzb7ZD5sBXbQUb+cNHt4oQd5KJzMRnsKv/ZF1KwovVZneHtY/gnne96wfVGQh/
-         pn7Np/lsMN8k5sYPPdAZAAHWqgvleJwEg0JOzOmjb03gMQeJtINaP/htNPFpfVj8SOMs
-         k5fGiKKTXpf9bU/sdQalM2jBbPmSha9JI8neU=
+        d=gmail.com; s=20230601; t=1714066441; x=1714671241; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Fo50ytJ6ZK8+zpSoUQ2gQuHrRRP6s/CTdF/t7IzIcyc=;
+        b=mYeRQ5vzXJoJ69PtnQCqCW4YgFAfpykC5rW9jws97iXgq1Or6e7ZVMtwB0+KclGYN2
+         6FDdgwfOEcaG68O7lHrRJYU1sz2ObvahnyW+qCyiOvqsTuqsrdFl0AOx1BjXgGpK7CaY
+         CDQ9/WKXUkyuRI4qt/9bQtiXcIcXvOCM7KUf6T2LYTFTBgJ3OR5Bq6Bw+meE2bTDs0Vm
+         RLhGta8lJrtwdIRKmRkbl/yQ//CCvRnIaJw+nx1n+Z+N9itM4TZ+/W08BA+V3KR/K2Ll
+         LkHQs9AEKgPIGLcS6NRvLAYhq8/4w3MCEIVbBGb6HjUoNq0rumHT+q9GsA568sx7kvhk
+         OxBw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714066073; x=1714670873;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20230601; t=1714066441; x=1714671241;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=OOqmW9EMXSCXAzKPIqERIeQh9xbCR10AzpPSejSv1nY=;
-        b=WYqmFG6TpJHaCdwx3Iu/xXxTPBXzpL6lNgKIcjgi/7ymWuRq2PYfX+cHG8BJzX3CfP
-         RQlLYqUXSp+3YIWP0fRfDs/7uP38rTpHPRz+niFnEoztR4WskveO8/katdKNRWMusEMK
-         pL6qhrvStC80xE6vgZnBiCI3+oB5pJSwwopFF1+B3jEfYQzuIYmZvGuTfhfS52fWpXWC
-         2Cjl1/pQU2pc3LndQdxlDYL4Ji2nPcLo8/4/4krd9AsqpK9AahFc5dfP3Ti4/awStPwg
-         1dwlAwwJ520nKqLJO5Oiow/Lm3/04ZOCwSPbJnD9o2QRx7IDAJesQ8Na6crRgLJrjasX
-         pL4Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXOi2UMZZxO5uD156y20vdq72EcUz+sPvzRKwTW51f8ekwLb2qkawPBlnswCEZxRBXNojJvSdIUyT8xbcx6OEnwNHm1NbbJ
-X-Gm-Message-State: AOJu0YxyaThrUSdZIlRpCyePta3DQsYvDcJHau2Kp37WIJyqz3IbGhg7
-	96FCZrnTcorAKk97JDiLOIa0k8O1NzR/mWUbH5pMZS+Rgc9u8bQ7LR3Zj7Wr8w==
-X-Google-Smtp-Source: AGHT+IEyj9gBxZv62LFLgGLraFFkbznKTsTduDdrNLHM9g1XxKCbQgndWqkDDmR8l5zO3xGctaJgyw==
-X-Received: by 2002:a05:6a20:2454:b0:1a9:509c:eba6 with SMTP id t20-20020a056a20245400b001a9509ceba6mr594000pzc.25.1714066072683;
-        Thu, 25 Apr 2024 10:27:52 -0700 (PDT)
-Received: from [192.168.1.162] ([50.35.46.55])
-        by smtp.gmail.com with ESMTPSA id i22-20020aa78b56000000b006f095e6b702sm13095672pfd.73.2024.04.25.10.27.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 25 Apr 2024 10:27:52 -0700 (PDT)
-Message-ID: <8356c1a0-4a4d-42e6-94dc-97abad2f8e04@broadcom.com>
-Date: Thu, 25 Apr 2024 10:27:48 -0700
+        bh=Fo50ytJ6ZK8+zpSoUQ2gQuHrRRP6s/CTdF/t7IzIcyc=;
+        b=q5HwPojQa5MU1W/Xk4MzhFwDIgulihKJQiRpXMvt9tZETfle2tVYy9dhwJaweGz2fF
+         b70TmRH0WRloerHYu7USpLJtTJU/X1Zh4pykw9exe/a4lG8MA3BJKFvHN0I72sARQ/+j
+         SRRNK5HhZ0C/azSYMiZDMFkGTYxe7VL134sdYlfSSxPEvcSTwR6ayAsxM6aSsyC5kokS
+         jIi+AeIGcaT+JKTPGV3+JSRcSQ6/KyrwAL9jYiXFHIWAUr1CeHLBJNbWd/S+BezxnjcO
+         ROQz6kMtgTWqjJUzDM+1m0XP7phGsrpgLryLnZMvdD4qd8LdgTeyhBHtAqzStQpJw7EV
+         VihQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUViTfCP1HYpkY7Ejxu3bSvbBkH4zCm4czC9YBBOTrL7Dour/xjal0KXO60FaAxlUNeO1vNxqFIJWCU1+4oG1ogWh8DTe44qGs0qFq5depVgTOmLgCBpRxjsFQsITTIpddRdqQypFyOfgmUAEWu/AS+9KQtIiwXagzBWSp5pppjTg==
+X-Gm-Message-State: AOJu0YyrOZAYtGdfXPtgpdKUvVVZdHZh7S9PJ0k7NC4UkyOeYZTiF6xP
+	e/Wgh0HMVf7UOsqv1qV3GZ56JeodN7nKcJSz11OuB7n9TOUjoWJV
+X-Google-Smtp-Source: AGHT+IEmDItiAhHInVlm2t4+GhLVyfRh9JVcxAOxRoJNRewZGhelNZ44VMfOOqWxYRhRImmfWz4TrA==
+X-Received: by 2002:a17:906:6ad3:b0:a58:9a74:5e6d with SMTP id q19-20020a1709066ad300b00a589a745e6dmr313324ejs.11.1714066441426;
+        Thu, 25 Apr 2024 10:34:01 -0700 (PDT)
+Received: from eichest-laptop ([2a02:168:af72:0:aab0:e3cb:ca44:d27])
+        by smtp.gmail.com with ESMTPSA id f20-20020a17090624d400b00a5575cde7cdsm9410001ejb.220.2024.04.25.10.34.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 25 Apr 2024 10:34:00 -0700 (PDT)
+Date: Thu, 25 Apr 2024 19:33:59 +0200
+From: Stefan Eichenberger <eichest@gmail.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+	lxu@maxlinear.com, hkallweit1@gmail.com, michael@walle.cc,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 2/2] net: phy: mxl-gpy: add new device tree property
+ to disable SGMII autoneg
+Message-ID: <ZiqUB0lwgw7vIozG@eichest-laptop>
+References: <Zh6/oVHUvnOVtHaC@shell.armlinux.org.uk>
+ <Zh94yqo2EHRq8eEq@eichest-laptop>
+ <ZiE156+BPpx/ciL6@shell.armlinux.org.uk>
+ <Zikd+GxuwMRC+5Ae@shell.armlinux.org.uk>
+ <Zikrv5UOWvSGjgcv@eichest-laptop>
+ <ZilLz8f6vQQCg4NB@shell.armlinux.org.uk>
+ <Zio9g9+wsFX39Vkx@eichest-laptop>
+ <ZippHJrnvzXsTiK4@shell.armlinux.org.uk>
+ <Zip8Hd/ozP3R8ASS@eichest-laptop>
+ <ZiqFOko7zFjfTdz4@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v9 1/8] x86/vmware: Correct macro names
-To: Borislav Petkov <bp@alien8.de>
-Cc: linux-kernel@vger.kernel.org, virtualization@lists.linux.dev,
- hpa@zytor.com, dave.hansen@linux.intel.com, mingo@redhat.com,
- tglx@linutronix.de, x86@kernel.org, netdev@vger.kernel.org,
- richardcochran@gmail.com, linux-input@vger.kernel.org,
- dmitry.torokhov@gmail.com, zackr@vmware.com,
- linux-graphics-maintainer@vmware.com, pv-drivers@vmware.com,
- timothym@vmware.com, akaher@vmware.com, dri-devel@lists.freedesktop.org,
- daniel@ffwll.ch, airlied@gmail.com, tzimmermann@suse.de, mripard@kernel.org,
- maarten.lankhorst@linux.intel.com, horms@kernel.org,
- kirill.shutemov@linux.intel.com
-References: <adcbfb9a-a4e1-4a32-b786-6c204d941e9f@broadcom.com>
- <20240424231407.14098-1-alexey.makhalov@broadcom.com>
- <20240425152130.GJZip0-l040XCyUapN@fat_crate.local>
-Content-Language: en-US
-From: Alexey Makhalov <alexey.makhalov@broadcom.com>
-Autocrypt: addr=alexey.makhalov@broadcom.com; keydata=
- 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 EuY0
-In-Reply-To: <20240425152130.GJZip0-l040XCyUapN@fat_crate.local>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZiqFOko7zFjfTdz4@shell.armlinux.org.uk>
 
-
-
-On 4/25/24 8:21 AM, Borislav Petkov wrote:
-> On Wed, Apr 24, 2024 at 04:14:06PM -0700, Alexey Makhalov wrote:
->> VCPU_RESERVED and LEGACY_X2APIC are not VMware hypercall commands.
->> These are bits in return value of VMWARE_CMD_GETVCPU_INFO command.
->> Change VMWARE_CMD_ prefix to GETVCPU_INFO_ one. And move bit-shift
->> operation to the macro body.
+On Thu, Apr 25, 2024 at 05:30:50PM +0100, Russell King (Oracle) wrote:
+> On Thu, Apr 25, 2024 at 05:51:57PM +0200, Stefan Eichenberger wrote:
+> > On Thu, Apr 25, 2024 at 03:30:52PM +0100, Russell King (Oracle) wrote:
+> > > On Thu, Apr 25, 2024 at 01:24:51PM +0200, Stefan Eichenberger wrote:
+> > > > I think it should also work for mvneta, at least
+> > > > the code looks almost the same. I get the following for the Port
+> > > > Auto-Negotiation Configuration Register:
+> > > > 
+> > > > For 1Gbit/s it switches to SGMII and enables inband AN:
+> > > > Memory mapped at address 0xffffa0112000.
+> > > > Value at address 0xF2132E0C (0xffffa0112e0c): 0xB0C6
+> > > 
+> > > So here the link is forced up which is wrong for inband, because then
+> > > we have no way to detect the link going down.
+> > 
+> > Yes I also saw this and didn't understand it. When I clear the force bit
+> > it will be set back to 1 again when AN is enabled. I thought this might
+> > be a bug of the controller.
 > 
-> I don't understand:
+> No it isn't, the hardware never changes the value in this register.
+> The difference will be because of what I explained previously.
 > 
-> $ git grep GETVCPU_INFO
-> arch/x86/kernel/cpu/vmware.c:51:#define VMWARE_CMD_GETVCPU_INFO  68
-> arch/x86/kernel/cpu/vmware.c:478:       VMWARE_CMD(GETVCPU_INFO, eax, ebx, ecx, edx);
+> Because the mvneta and mvpp2 hardware is "weird" in that these two
+> registers provide both PCS and MAC functions, we have to deal with
+> them in a way that is split between the phylink PCS and MAC
+> operations.
 > 
-> so that's a VMWARE_CMD 68, at least the prefix says so.
+> This code was written at a time when all we had was MLO_AN_* and
+> none of the PHYLINK_PCS_NEG_* stuff. PCSes got passed the MLO_AN_*
+> constants which were the same as what was passed via the MAC
+> operations. This made the implementation entirely consistent.
 > 
-> And those two are *bits* in that eax which that hypercall returns.
+> However, that lead PCS implementers to go off and do their own
+> things, so we ended up with a range of different PCS behaviours
+> depending on the implementation (because the way people interpreted
+> MLO_AN_INBAND, interface mode, and the Autoneg bit in the advertising
+> mask was all different.
 > 
-> Or are those two bits generic but defined in a vmware-specific
-> hypercall?
+> So to bring some consistency, I changed the PCS interface to what we
+> have now, in the belief that it would later allow us to solve the
+> 2500base-X problem.
 > 
-> Hm.
+> However, I'd forgotten about the mvneta/mvpp2 details, but that was
+> fine at the time of this change because everything was still
+> consistent - we would only ever use PHYLINK_PCS_NEG_OUTBAND or
+> PHYLINK_PCS_NEG_NONE for non-MLO_AN_INBAND modes, and
+> PHYLINK_PCS_NEG_INBAND_* for interface modes that support inband
+> when using MLO_AN_INBAND.
+> 
+> Now, when trying to solve the 2500base-X problem which needs us to
+> use PHYLINK_PCS_NEG_OUTBAND in some situations, this means we can
+> end up with MLO_AN_INBAND + PHYLINK_PCS_NEG_OUTBAND, and this is
+> what is causing me problems (the link isn't forced up.)
+> 
+> Conversely, I suspect you have the situation where you have MLO_AN_PHY
+> or MLO_AN_FIXED being passed to the mac_config() and mac_link_up()
+> operations, but the PCS is being configured for a different mode.
+> 
+> I am wondering whether we should at the very least move the
+> configuration of the control register 0 and 2 to the pcs_config()
+> method so at least that's consistent with the PHYLINK_PCS_NEG_*
+> value passed to the PCS and thus the values programmed into the
+> autoneg config register. However, that still leaves a big hole in
+> how we handle the link forcing - which is necessary if inband AN
+> is disabled (in other words, if we need to read the link status
+> from the PHY as is done in MLO_AN_PHY mode.)
 > 
 
-These are VMware hypercall commands:
-#define VMWARE_CMD_GETVERSION    10
-#define VMWARE_CMD_GETHZ         45
-#define VMWARE_CMD_GETVCPU_INFO  68
-#define VMWARE_CMD_STEALCLOCK    91
+Now I got it, thanks a lot for the explanation. So the issue is that
+MLO_AN_INBAND + PHYLINK_PCS_NEG_OUTBAND is happening in my use case and
+therefore the link is not forced up because for that MLO_AN_PHY would be
+needed. I will also try to think about it.
+
+Thanks,
+Stefan
 
 
-These are VMware-specific macros to analyze return values of 
-corresponding commands. They are prefixed with command name.
-#define GETVCPU_INFO_LEGACY_X2APIC           BIT(3)
-#define GETVCPU_INFO_VCPU_RESERVED           BIT(31)
-
-#define STEALCLOCK_NOT_AVAILABLE (-1)
-#define STEALCLOCK_DISABLED        0
-#define STEALCLOCK_ENABLED         1
-
-
-Name VMWARE_CMD_LEGACY_X2APIC was not correct as LEGACY_X2APIC is not a 
-command but the meaning of 3rd bit of a return value of 
-VMWARE_CMD_GETVCPU_INFO. So, change it to GETVCPU_INFO_LEGACY_X2APIC.
-The same change with GETVCPU_INFO_VCPU_RESERVED.
-Both these bits are not generic.
-
---Alexey
 
