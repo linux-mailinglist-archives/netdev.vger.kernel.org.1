@@ -1,115 +1,95 @@
-Return-Path: <netdev+bounces-91257-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91258-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E03AB8B1F00
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 12:19:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13CF68B1F2E
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 12:30:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9EBEC287897
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 10:19:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 463C81C23CBC
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 10:30:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8625D86151;
-	Thu, 25 Apr 2024 10:19:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81E9E171CC;
+	Thu, 25 Apr 2024 10:30:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u9L6hE0p"
 X-Original-To: netdev@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B8515D477;
-	Thu, 25 Apr 2024 10:19:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 589B036D;
+	Thu, 25 Apr 2024 10:30:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714040364; cv=none; b=U9en/363kDOcA31yCesWJJU/10bZttUTdw3kk0lgb4iP9mVU/9LT76toAddPqMx57o324gvQ5yBZ4ufQnt32AwQMgrXyHaVt37YW5xomgbui5y2KonIJrK3V45Yuvz8fMaLNd8I2F77zkyzHfjSrXNg7+zy3kEM7adS7TfvLjbU=
+	t=1714041029; cv=none; b=ZcwCMwIBiOdtGh0/thnZJkniiFd3AACQ7Ky99cJJ/fCc/v33+27WU4ArSwsTQEQkUjFpREDpYkuiXB/XOBaVT1JUMIizj4geT8Ziry7XRFAll60rSN4CX+Hy0SAyxuWVHQRfT1yMvn0O9gimfLaskldXiQhQGy0BmOi8+1UkN38=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714040364; c=relaxed/simple;
-	bh=CO0oG3tcPoAXzns4+gVCxaDMq9og+CQjT5fProCOaYw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=K1PhFs5Omqf+39P6V+RRp+e68aLle5ILFkZNrKy/ZxIB31XjtZgEHNEKJHsv1HHaBeGg8a5ElOIDqce5Xuj6x9RRaCvaRFEnftKANYbkDL7BphXnPa39sQhybfsB31KIRQNk46ofe6R8ND4IRGorx7aLsfuxhXS+WjHHsasIQTY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A7F6F2F;
-	Thu, 25 Apr 2024 03:19:50 -0700 (PDT)
-Received: from FVFF77S0Q05N (unknown [10.57.21.118])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 98E2B3F64C;
-	Thu, 25 Apr 2024 03:19:18 -0700 (PDT)
-Date: Thu, 25 Apr 2024 11:19:15 +0100
-From: Mark Rutland <mark.rutland@arm.com>
-To: Peter Zijlstra <peterz@infradead.org>
-Cc: Kees Cook <keescook@chromium.org>, Will Deacon <will@kernel.org>,
-	Boqun Feng <boqun.feng@gmail.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>, Jakub Kicinski <kuba@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	"Paul E. McKenney" <paulmck@kernel.org>,
-	Uros Bizjak <ubizjak@gmail.com>, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-arch@vger.kernel.org,
-	netdev@vger.kernel.org, linux-hardening@vger.kernel.org
-Subject: Re: [PATCH 1/4] locking/atomic/x86: Silence intentional wrapping
- addition
-Message-ID: <ZiouI6rM8x83nXUF@FVFF77S0Q05N>
-References: <20240424191225.work.780-kees@kernel.org>
- <20240424191740.3088894-1-keescook@chromium.org>
- <20240424224141.GX40213@noisy.programming.kicks-ass.net>
- <202404241542.6AFC3042C1@keescook>
- <20240424225436.GY40213@noisy.programming.kicks-ass.net>
- <20240424230500.GG12673@noisy.programming.kicks-ass.net>
- <202404241621.8286B8A@keescook>
- <20240425092812.GB21980@noisy.programming.kicks-ass.net>
+	s=arc-20240116; t=1714041029; c=relaxed/simple;
+	bh=aSnk4tl0PCA0sPVmmyPb/wJFTj+/FjtqDBcLndI6hl8=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=IKfwJILi/ZZVWbLKQuYoKgJSy86NMgxaJWiQSFb2rkO9Xm/jhiMbnpjqoshXLCqvOjrS1BJMO7h6kpLvy43uDWaZIzfWx+m7KoZ5oziLnQW0Xhe468i4nKcukg2d8j1c5EYwYhEqhiAOFgm5L9gdO3O90WKR1xueIVY8uOa3j3E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u9L6hE0p; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id B4A95C2BBFC;
+	Thu, 25 Apr 2024 10:30:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714041028;
+	bh=aSnk4tl0PCA0sPVmmyPb/wJFTj+/FjtqDBcLndI6hl8=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=u9L6hE0pYWKliO5ohk+06svUmSV8CT+xaBOUS9f7QFBz7XGpoaWejbNjBh6xtcDsl
+	 rMyCMJndBv1TiAJCw3hd83051Kvfcx+jdAh4zVS4Jt62Qgba5dExpNbX/sdhrHxqWl
+	 fBPLbEOnfjQTVaiQrIfRlbuM9uX2Qh01fv8xKTHsC/9EgRsWA34i2x/Dz/BQ0ZZKfP
+	 gRITIn1DRPECkFefCEChkbppLw7N8luR97KTCTWUanLWqZgmWHaewjK71XBgo6hiGy
+	 cZs25MWlB7FGk7QbXCTZVnkrKTVMfKDqc6vVl7gH/4rpqmgUMYHGaTU5W9drpT6KDM
+	 v+HwGSw27xYYA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 9F19AC43140;
+	Thu, 25 Apr 2024 10:30:28 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240425092812.GB21980@noisy.programming.kicks-ass.net>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] net: phy: dp83869: Fix MII mode failure
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171404102864.28185.819517729147949329.git-patchwork-notify@kernel.org>
+Date: Thu, 25 Apr 2024 10:30:28 +0000
+References: <20240423084828.1309294-1-danishanwar@ti.com>
+In-Reply-To: <20240423084828.1309294-1-danishanwar@ti.com>
+To: MD Danish Anwar <danishanwar@ti.com>
+Cc: s-vadapalli@ti.com, pabeni@redhat.com, kuba@kernel.org,
+ edumazet@google.com, davem@davemloft.net, linux@armlinux.org.uk,
+ hkallweit1@gmail.com, andrew@lunn.ch, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, srk@ti.com, vigneshr@ti.com, r-gunasekaran@ti.com,
+ rogerq@kernel.org
 
-On Thu, Apr 25, 2024 at 11:28:12AM +0200, Peter Zijlstra wrote:
-> On Wed, Apr 24, 2024 at 04:30:50PM -0700, Kees Cook wrote:
-> 
-> > > That is, anything that actively warns about signed overflow when build
-> > > with -fno-strict-overflow is a bug. If you want this warning you have to
-> > > explicitly mark things.
-> > 
-> > This is confusing UB with "overflow detection". We're doing the latter.
-> 
-> Well, all of this is confusing to me because it is not presented
-> coherently.
-> 
-> The traditional 'must not let signed overflow' is because of the UB
-> nonsense, which we fixed.
-> 
-> > > Signed overflow is not UB, is not a bug.
-> > > 
-> > > Now, it might be unexpected in some places, but fundamentally we run on
-> > > 2s complement and expect 2s complement. If you want more, mark it so.
-> > 
-> > Regular C never provided us with enough choice in types to be able to
-> > select the overflow resolution strategy. :( So we're stuck mixing
-> > expectations into our types.
-> 
-> Traditionally C has explicit wrapping for unsigned and UB on signed. We
-> fixed the UB, so now expect wrapping for everything.
-> 
-> You want to add overflow, so you should make that a special and preserve
-> semantics for existing code.
-> 
-> Also I would very strongly suggest you add an overflow qualifier to the
-> type system and please provide sane means of qualifier manipulation --
-> stripping qualifiers is painful :/
+Hello:
 
-I agree that having an overflow/nooverflow qualifier that's separate from
-signed/unsigned would make more sense than inferring that from signed vs
-unsigned.
+This patch was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-Mark.
+On Tue, 23 Apr 2024 14:18:28 +0530 you wrote:
+> The DP83869 driver sets the MII bit (needed for PHY to work in MII mode)
+> only if the op-mode is either DP83869_100M_MEDIA_CONVERT or
+> DP83869_RGMII_100_BASE.
+> 
+> Some drivers i.e. ICSSG support MII mode with op-mode as
+> DP83869_RGMII_COPPER_ETHERNET for which the MII bit is not set in dp83869
+> driver. As a result MII mode on ICSSG doesn't work and below log is seen.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net] net: phy: dp83869: Fix MII mode failure
+    https://git.kernel.org/netdev/net/c/6c9cd59dbcb0
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
