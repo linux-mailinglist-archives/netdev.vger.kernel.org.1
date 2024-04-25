@@ -1,92 +1,99 @@
-Return-Path: <netdev+bounces-91209-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91210-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70D228B1B36
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 08:45:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB7A48B1B4D
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 08:56:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 956A0B2160E
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 06:45:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F2E1E1C20FA3
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 06:56:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 149D85A10B;
-	Thu, 25 Apr 2024 06:45:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=yeah.net header.i=@yeah.net header.b="YoGAAaHZ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16F015A4D5;
+	Thu, 25 Apr 2024 06:56:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-177131.yeah.net (mail-177131.yeah.net [123.58.177.131])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 624B541757;
-	Thu, 25 Apr 2024 06:45:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=123.58.177.131
+Received: from smtpbg150.qq.com (smtpbg150.qq.com [18.132.163.193])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A00B01DFE4
+	for <netdev@vger.kernel.org>; Thu, 25 Apr 2024 06:55:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.132.163.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714027515; cv=none; b=MJ1uyT4MlE7ffWgnF8/KwIoJGil3I8i1Ct7SQ6oduSqGQDOnGd0v/JVjmFPUGOUneiP8EazVeionSxzWk6L8enXrvzbFCjOVJ6XNwIwjebObuiojyHwLSvzaSP442mohApYtXVDeA5UYwUcv9yM+M173k5p91XJTimaey1xR0QQ=
+	t=1714028162; cv=none; b=N8nyBRhYmSqgqXqugELp3J5FLpnS9APZ5qdkdokRPBlneDXRDldtKnR6M7ePu9ejOb8KkU5YCSe246mjkfR1gKxYoM/5TMnuJrm7YJg+CztUpDdYxxEXfZ1hmZ9jzQJJOFk5cngvCF+jKZZrIy0MJsryhLGSENFjxGiQ+xDbupU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714027515; c=relaxed/simple;
-	bh=fXaXB/7WilQeiVeGRljODJClcYMb/jVpprpbj15TX3k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AB6XdR88ziNZVpAKuzlksliNH7u9GL5EflN5idhVqGwuVtt8Wx88YgKMf0GSIDZOVrB6voG9Xvg1bsE3DHl8EWVvDb17d7vrJXSyYGwSwaTaBocqZ+HSy4/DGzHwZUF0ELRIgKEuqNO8V5BGfErFS8j5POEHJ6rPRsIE66hMojs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yeah.net; spf=pass smtp.mailfrom=yeah.net; dkim=pass (1024-bit key) header.d=yeah.net header.i=@yeah.net header.b=YoGAAaHZ; arc=none smtp.client-ip=123.58.177.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yeah.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yeah.net
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yeah.net;
-	s=s110527; h=Date:From:Subject:Message-ID:MIME-Version:
-	Content-Type; bh=/0pD2LgYGt6bFsW0PFLDHfzM62bQBRByvMP3Eq5XtXQ=;
-	b=YoGAAaHZjr/D4GeyxXrsDkLmLguzwqgG06ThUmZmx6Blo04GEyRPEdBa85ympK
-	89KDavY2wSRqpoNHI+A9/CB6gujuIit4gv3lvhyUxdAfkZlOCxGvZ54yfcMeUcm6
-	iiTqKnHtL403aIzEyPMP/gez3tfKFsup6xQeVyORbbzPU=
-Received: from dragon (unknown [223.68.79.243])
-	by smtp1 (Coremail) with SMTP id ClUQrAD331bm+ylm031sAw--.3307S3;
-	Thu, 25 Apr 2024 14:44:55 +0800 (CST)
-Date: Thu, 25 Apr 2024 14:44:54 +0800
-From: Shawn Guo <shawnguo2@yeah.net>
-To: "Rob Herring (Arm)" <robh@kernel.org>
-Cc: Shawn Guo <shawnguo@kernel.org>, Li Yang <leoyang.li@nxp.com>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>,
-	linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH 0/2] arm64: dts: freescale: LS1028a PCI fixes
-Message-ID: <Zin75vhL27mZ+6le@dragon>
-References: <20240418-dt-ls1028a-pci-fixes-v1-0-95f17405e481@kernel.org>
+	s=arc-20240116; t=1714028162; c=relaxed/simple;
+	bh=O7gu1iG6btZE7MOBadHnNgNlv2vQSSeIveE3k1Yt8+s=;
+	h=From:To:Cc:References:In-Reply-To:Subject:Date:Message-ID:
+	 MIME-Version:Content-Type; b=ZfCh+ld18kC10rFFvKSdxJ1mhZxp3k7vAkDyzht4+pni4Qj2K9lssGc6FMLZYEpwuhST5q0mb2QPkoQau2SUlq1gt/vcLlvF459Qet+lfnrAf1Oq6eiP3EjlNpfCecH7xGOrTT/7cQkN7jLR2+AEwWF7f5kkFKLBF0fLvQjNjyc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=18.132.163.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
+X-QQ-mid:Yeas49t1714028005t763t52301
+Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [115.195.151.153])
+X-QQ-SSF:00400000000000F0FUF000000000000
+From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
+X-BIZMAIL-ID: 7907587342363166786
+To: "'Simon Horman'" <horms@kernel.org>
+Cc: <davem@davemloft.net>,
+	<edumazet@google.com>,
+	<kuba@kernel.org>,
+	<pabeni@redhat.com>,
+	<rmk+kernel@armlinux.org.uk>,
+	<andrew@lunn.ch>,
+	<netdev@vger.kernel.org>,
+	<mengyuanlou@net-swift.com>,
+	<duanqiangwen@net-swift.com>
+References: <20240416062952.14196-1-jiawenwu@trustnetic.com> <20240416062952.14196-5-jiawenwu@trustnetic.com> <20240418185851.GQ3975545@kernel.org>
+In-Reply-To: <20240418185851.GQ3975545@kernel.org>
+Subject: RE: [PATCH net 4/5] net: wangxun: change NETIF_F_HW_VLAN_STAG_* to fixed features
+Date: Thu, 25 Apr 2024 14:53:24 +0800
+Message-ID: <057001da96dd$44b592a0$ce20b7e0$@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240418-dt-ls1028a-pci-fixes-v1-0-95f17405e481@kernel.org>
-X-CM-TRANSID:ClUQrAD331bm+ylm031sAw--.3307S3
-X-Coremail-Antispam: 1Uf129KBjvJXoW7ur1UKryxKryxXw13XFWfGrg_yoW8Gw1kpF
-	WYkasxWrsaqFn3Gw18K3W8tF9xtrs5AF98tF18Kws7K3s2v3Wjqrsrtay5Cry5X3yUWryU
-	Xr1xtFy5Kas8JaUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jFksgUUUUU=
-X-CM-SenderInfo: pvkd40hjxrjqh1hdxhhqhw/1tbiBRjLZVsVCfraiAABsd
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+X-Mailer: Microsoft Outlook 16.0
+Thread-Index: AQMFotcmuiiFX27azvFEImaFqcAi9wCPUoUSAgYg8sevDcc6sA==
+Content-Language: zh-cn
+X-QQ-SENDSIZE: 520
+Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz8a-1
 
-On Thu, Apr 18, 2024 at 03:09:24PM -0500, Rob Herring (Arm) wrote:
-> This short series addresses a couple of schema warnings with the 
-> embedded PCI devices in the LS1028a:
+On Fri, April 19, 2024 2:59 AM, Simon Horman wrote:
+> On Tue, Apr 16, 2024 at 02:29:51PM +0800, Jiawen Wu wrote:
+> > Because the hardware doesn't support the configuration of VLAN STAG,
+> > remove NETIF_F_HW_VLAN_STAG_* in netdev->features, and set their state
+> > to be consistent with NETIF_F_HW_VLAN_CTAG_*.
+> >
+> > Fixes: 6670f1ece2c8 ("net: txgbe: Add netdev features support")
+> > Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
 > 
-> pcie@1f0000000: rcec@1f,0:interrupts:0:0: 0 is not one of [1, 2, 3, 4]
-> pcie@1f0000000: rcec@1f,0:interrupts:0: [0, 94, 4] is too long
-> pcie@1f0000000: mdio@0,3:compatible: ['fsl,enetc-mdio'] does not contain items matching the given schema
-> pcie@1f0000000: ethernet@0,6:compatible: ['fsl,enetc'] does not contain items matching the given schema
-> pcie@1f0000000: ethernet@0,4:compatible: ['fsl,enetc-ptp'] does not contain items matching the given schema
-> pcie@1f0000000: ethernet@0,2:compatible: ['fsl,enetc'] does not contain items matching the given schema
-> pcie@1f0000000: ethernet@0,1:compatible: ['fsl,enetc'] does not contain items matching the given schema
-> pcie@1f0000000: ethernet@0,0:compatible: ['fsl,enetc'] does not contain items matching the given schema
-> pcie@1f0000000: ethernet-switch@0,5:interrupts:0:0: 0 is not one of [1, 2, 3, 4]
-> pcie@1f0000000: ethernet-switch@0,5:interrupts:0: [0, 95, 4] is too long
+> Hi Jiawen Wu,
 > 
-> Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
-> ---
-> Rob Herring (Arm) (2):
->       arm64: dts: freescale: ls1028a: Fix embedded PCI interrupt mapping
->       arm64: dts: freescale: ls1028a: Add standard PCI device compatible strings to ENETC
+> I am having trouble reconciling "hardware doesn't support the configuration
+> of VLAN STAG" with both "set their state to be consistent with
+> NETIF_F_HW_VLAN_CTAG_*" and the code changes.
+> 
+> Is the problem here not that VLAN STAGs aren't supported by
+> the HW, but rather that the HW requires that corresponding
+> CTAG and STAG configuration always matches?
+> 
+> I.e, the HW requires:
+> 
+>   f & NETIF_F_HW_VLAN_CTAG_FILTER == f & NETIF_F_HW_VLAN_STAG_FILTER
+>   f & NETIF_F_HW_VLAN_CTAG_RX     == f & NETIF_F_HW_VLAN_STAG_RX
+>   f & NETIF_F_HW_VLAN_CTAG_TX     == f & NETIF_F_HW_VLAN_STAG_TX
+> 
+> If so, I wonder if only the wx_fix_features() portion of
+> this patch is required.
 
-Applied both, thanks!
+You are right. I need to set their state to be consistent in wx_fix_features(),
+this patch is missing the case when STAG changes.
+
 
 
