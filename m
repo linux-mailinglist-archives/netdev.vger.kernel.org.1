@@ -1,190 +1,157 @@
-Return-Path: <netdev+bounces-91386-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91387-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54D5F8B2670
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 18:29:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92F648B2688
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 18:32:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0D242283A83
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 16:29:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C33C41C23245
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 16:32:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2DB414C586;
-	Thu, 25 Apr 2024 16:29:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43B3E14D713;
+	Thu, 25 Apr 2024 16:31:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="GipJC5dF";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="1bC27S4l";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="GipJC5dF";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="1bC27S4l"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="uiaDC9Ge"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1204D14C5A0;
-	Thu, 25 Apr 2024 16:29:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E03E414D6FF;
+	Thu, 25 Apr 2024 16:31:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714062542; cv=none; b=gmlrirzaM+zaADEn9SZc4KmRJthEdTNPfDhgobYCBOVm3AOxu8e/8YVUSGJy8i1wzqqm/XubVQN9vhomqLpMWBQs+FrnIPcxx2KFNd6JgiO0H2H5IfnZzeAQKNphu9b4xWYXTZvZJUF4k/PbuZWZbjzUOFtiyzcZ/e0c0arRXho=
+	t=1714062671; cv=none; b=Mb5sahTjJ6VvISI/vTIjTvrt5nns+I386b+TMHEO/p1FS9Xfo6Vn12RQ3haCIKHdIqVhzky8iY5oxRnuEkQ5Qo2k0QNXg5Qy6p9Sx+1f/0HPRErgDx6Q9bDknMDqf3mJirzdt1WqyI0p4CcjgPeMdX2EZmHg4ypwF2bFZlJMXB0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714062542; c=relaxed/simple;
-	bh=ECPlObhEBIG/F5eZ/EaI4YFlNQTrHLMup8aVRDilkgY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=d49e+QhxunVeYDQU7raXlkfRUzyz+smP81F2iSwTTUMWmxj7s8tj44Dvv4sQrvhysLy9D2a+kSWDK69DLkRBgLegyPZFSMQcNZj5rAB20+/8dXwuMpj0uFuab0hiVOJxCyWsEoqBEyNFlPpffxZTuMRh61sLDUZ7nXqYU0LzL7U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=GipJC5dF; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=1bC27S4l; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=GipJC5dF; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=1bC27S4l; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 0581933F8B;
-	Thu, 25 Apr 2024 16:28:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1714062539; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=7Z5RtrRxhlie0zgpubMe5xW7HzPYgkOoPsvYnVoi4kI=;
-	b=GipJC5dF1e73XLJ5Ss3vVhAuShUgDXWB9QAiuOYbFDsUJE770aoT3mKsXpeGMfsZqUz3Zo
-	7LK1LxZC23cmrrIhJR9jBVso7BJrX337exTHoACpwZOxgjvwlDGr8u+bJE3jddcLexMObo
-	gC6dUXdh5XklleTMnv+ACUusCV78tMA=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1714062539;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=7Z5RtrRxhlie0zgpubMe5xW7HzPYgkOoPsvYnVoi4kI=;
-	b=1bC27S4lPEbJn/faNDewmEceDGG8CUT+FGBpMnnVQROR9K0fUvEMz+dHXLNN7CestZo+mb
-	6xmL5FSoanoQkWCQ==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1714062539; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=7Z5RtrRxhlie0zgpubMe5xW7HzPYgkOoPsvYnVoi4kI=;
-	b=GipJC5dF1e73XLJ5Ss3vVhAuShUgDXWB9QAiuOYbFDsUJE770aoT3mKsXpeGMfsZqUz3Zo
-	7LK1LxZC23cmrrIhJR9jBVso7BJrX337exTHoACpwZOxgjvwlDGr8u+bJE3jddcLexMObo
-	gC6dUXdh5XklleTMnv+ACUusCV78tMA=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1714062539;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=7Z5RtrRxhlie0zgpubMe5xW7HzPYgkOoPsvYnVoi4kI=;
-	b=1bC27S4lPEbJn/faNDewmEceDGG8CUT+FGBpMnnVQROR9K0fUvEMz+dHXLNN7CestZo+mb
-	6xmL5FSoanoQkWCQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id EC36D13991;
-	Thu, 25 Apr 2024 16:28:58 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 78AeOcqEKmawIwAAD6G6ig
-	(envelope-from <iluceno@suse.de>); Thu, 25 Apr 2024 16:28:58 +0000
-From: Ismael Luceno <iluceno@suse.de>
-To: linux-kernel@vger.kernel.org
-Cc: Ismael Luceno <iluceno@suse.de>,
-	Firo Yang <firo.yang@suse.com>,
-	Andreas Taschner <andreas.taschner@suse.com>,
-	=?UTF-8?q?Michal=20Kube=C4=8Dek?= <mkubecek@suse.com>,
-	Simon Horman <horms@verge.net.au>,
-	Julian Anastasov <ja@ssi.bg>,
-	lvs-devel@vger.kernel.org,
-	netfilter-devel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	coreteam@netfilter.org
-Subject: [PATCH v3] ipvs: Fix checksumming on GSO of SCTP packets
-Date: Thu, 25 Apr 2024 18:28:40 +0200
-Message-ID: <20240425162842.23900-1-iluceno@suse.de>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1714062671; c=relaxed/simple;
+	bh=poIxmZ0PRqfCzsMp3CR4zO6lhQO4pLpx1NaDDgLiP90=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=A95T3N7vRmVuhdVr30hcG6UKjO7mAk18yzFi8GEsDcL9WJj9wgMUZiVSCPfI5q+CWHFWS5kbITw21+Bt11uRqmjbCNs2a4aTLdYRMD5nKkzcH3tEnj8JoX5Uox1fCx81ui6bVAfOsyAVJTzPNrgQr08Ne6Xt7apCqzl6D/zOk/8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=uiaDC9Ge; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=8b1+faWGm5mpwKSaivBGykN20LEXfiYZflA8Z7Z08nc=; b=uiaDC9GeRFp3VmXg0uq3g+yLXO
+	dSI7fejWAgSCohZ1o8+LFjsqFL6fRYd14pTH47ELwpgj/vlKVqSgA6z9/mgKSHl4vFv0hI5U5BAGw
+	nUnMfsl1TO03Nc7+X6Nc9BY1T5bAkB9XhzgzSOpO1FjikkbRxe0JA2dp/JRYIxh/GTEeC5xG9ne8r
+	pgv7eu4/qzQX00jwYXo2fP/rEsQ9k4yp+qqEZ4eQvKVXuGAL3gUmUNVV5cxNFch1iolQY1tM8SVMz
+	V54VDnWeFYWGGHci1+Wexd+PaICF5ogtyqDHBs+DH5PFtNasmJ/aRFAC3Rmt3EarqJLoCDilAHYDA
+	ax7sDDYA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:49298)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1s01zo-0007f3-1A;
+	Thu, 25 Apr 2024 17:30:52 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1s01zm-0005j9-PF; Thu, 25 Apr 2024 17:30:50 +0100
+Date: Thu, 25 Apr 2024 17:30:50 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Stefan Eichenberger <eichest@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+	lxu@maxlinear.com, hkallweit1@gmail.com, michael@walle.cc,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 2/2] net: phy: mxl-gpy: add new device tree property
+ to disable SGMII autoneg
+Message-ID: <ZiqFOko7zFjfTdz4@shell.armlinux.org.uk>
+References: <Zh6z90iCpLqF4fla@eichest-laptop>
+ <Zh6/oVHUvnOVtHaC@shell.armlinux.org.uk>
+ <Zh94yqo2EHRq8eEq@eichest-laptop>
+ <ZiE156+BPpx/ciL6@shell.armlinux.org.uk>
+ <Zikd+GxuwMRC+5Ae@shell.armlinux.org.uk>
+ <Zikrv5UOWvSGjgcv@eichest-laptop>
+ <ZilLz8f6vQQCg4NB@shell.armlinux.org.uk>
+ <Zio9g9+wsFX39Vkx@eichest-laptop>
+ <ZippHJrnvzXsTiK4@shell.armlinux.org.uk>
+ <Zip8Hd/ozP3R8ASS@eichest-laptop>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spam-Flag: NO
-X-Spam-Score: -0.30
-X-Spam-Level: 
-X-Spamd-Result: default: False [-0.30 / 50.00];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_CONTAINS_FROM(1.00)[];
-	NEURAL_HAM_SHORT(-0.20)[-0.998];
-	MIME_GOOD(-0.10)[text/plain];
-	BAYES_HAM(-0.00)[23.28%];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ARC_NA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	RCVD_TLS_ALL(0.00)[];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	TO_DN_SOME(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,suse.com:email,imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns]
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Zip8Hd/ozP3R8ASS@eichest-laptop>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-It was observed in the wild that pairs of consecutive packets would leave
-the IPVS with the same wrong checksum, and the issue only went away when
-disabling GSO.
+On Thu, Apr 25, 2024 at 05:51:57PM +0200, Stefan Eichenberger wrote:
+> On Thu, Apr 25, 2024 at 03:30:52PM +0100, Russell King (Oracle) wrote:
+> > On Thu, Apr 25, 2024 at 01:24:51PM +0200, Stefan Eichenberger wrote:
+> > > I think it should also work for mvneta, at least
+> > > the code looks almost the same. I get the following for the Port
+> > > Auto-Negotiation Configuration Register:
+> > > 
+> > > For 1Gbit/s it switches to SGMII and enables inband AN:
+> > > Memory mapped at address 0xffffa0112000.
+> > > Value at address 0xF2132E0C (0xffffa0112e0c): 0xB0C6
+> > 
+> > So here the link is forced up which is wrong for inband, because then
+> > we have no way to detect the link going down.
+> 
+> Yes I also saw this and didn't understand it. When I clear the force bit
+> it will be set back to 1 again when AN is enabled. I thought this might
+> be a bug of the controller.
 
-IPVS needs to avoid computing the SCTP checksum when using GSO.
+No it isn't, the hardware never changes the value in this register.
+The difference will be because of what I explained previously.
 
-Fixes: 90017accff61 ("sctp: Add GSO support", 2016-06-02)
-Co-developed-by: Firo Yang <firo.yang@suse.com>
-Signed-off-by: Ismael Luceno <iluceno@suse.de>
-Tested-by: Andreas Taschner <andreas.taschner@suse.com>
-CC: Michal Kubeček <mkubecek@suse.com>
-CC: Simon Horman <horms@verge.net.au>
-CC: Julian Anastasov <ja@ssi.bg>
-CC: lvs-devel@vger.kernel.org
-CC: netfilter-devel@vger.kernel.org
-CC: netdev@vger.kernel.org
-CC: coreteam@netfilter.org
----
+Because the mvneta and mvpp2 hardware is "weird" in that these two
+registers provide both PCS and MAC functions, we have to deal with
+them in a way that is split between the phylink PCS and MAC
+operations.
 
-Notes:
-    Changes since v2:
-    * Use only skb_is_gso, no need to check for GSO type
-    
-    Changes since v1:
-    * Added skb_is_gso before skb_is_gso_sctp.
-    * Added "Fixes" tag.
+This code was written at a time when all we had was MLO_AN_* and
+none of the PHYLINK_PCS_NEG_* stuff. PCSes got passed the MLO_AN_*
+constants which were the same as what was passed via the MAC
+operations. This made the implementation entirely consistent.
 
- net/netfilter/ipvs/ip_vs_proto_sctp.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+However, that lead PCS implementers to go off and do their own
+things, so we ended up with a range of different PCS behaviours
+depending on the implementation (because the way people interpreted
+MLO_AN_INBAND, interface mode, and the Autoneg bit in the advertising
+mask was all different.
 
-diff --git a/net/netfilter/ipvs/ip_vs_proto_sctp.c b/net/netfilter/ipvs/ip_vs_proto_sctp.c
-index a0921adc31a9..83e452916403 100644
---- a/net/netfilter/ipvs/ip_vs_proto_sctp.c
-+++ b/net/netfilter/ipvs/ip_vs_proto_sctp.c
-@@ -126,7 +126,8 @@ sctp_snat_handler(struct sk_buff *skb, struct ip_vs_protocol *pp,
- 	if (sctph->source != cp->vport || payload_csum ||
- 	    skb->ip_summed == CHECKSUM_PARTIAL) {
- 		sctph->source = cp->vport;
--		sctp_nat_csum(skb, sctph, sctphoff);
-+		if (!skb_is_gso(skb))
-+			sctp_nat_csum(skb, sctph, sctphoff);
- 	} else {
- 		skb->ip_summed = CHECKSUM_UNNECESSARY;
- 	}
-@@ -174,7 +175,8 @@ sctp_dnat_handler(struct sk_buff *skb, struct ip_vs_protocol *pp,
- 	    (skb->ip_summed == CHECKSUM_PARTIAL &&
- 	     !(skb_dst(skb)->dev->features & NETIF_F_SCTP_CRC))) {
- 		sctph->dest = cp->dport;
--		sctp_nat_csum(skb, sctph, sctphoff);
-+		if (!skb_is_gso(skb))
-+			sctp_nat_csum(skb, sctph, sctphoff);
- 	} else if (skb->ip_summed != CHECKSUM_PARTIAL) {
- 		skb->ip_summed = CHECKSUM_UNNECESSARY;
- 	}
+So to bring some consistency, I changed the PCS interface to what we
+have now, in the belief that it would later allow us to solve the
+2500base-X problem.
+
+However, I'd forgotten about the mvneta/mvpp2 details, but that was
+fine at the time of this change because everything was still
+consistent - we would only ever use PHYLINK_PCS_NEG_OUTBAND or
+PHYLINK_PCS_NEG_NONE for non-MLO_AN_INBAND modes, and
+PHYLINK_PCS_NEG_INBAND_* for interface modes that support inband
+when using MLO_AN_INBAND.
+
+Now, when trying to solve the 2500base-X problem which needs us to
+use PHYLINK_PCS_NEG_OUTBAND in some situations, this means we can
+end up with MLO_AN_INBAND + PHYLINK_PCS_NEG_OUTBAND, and this is
+what is causing me problems (the link isn't forced up.)
+
+Conversely, I suspect you have the situation where you have MLO_AN_PHY
+or MLO_AN_FIXED being passed to the mac_config() and mac_link_up()
+operations, but the PCS is being configured for a different mode.
+
+I am wondering whether we should at the very least move the
+configuration of the control register 0 and 2 to the pcs_config()
+method so at least that's consistent with the PHYLINK_PCS_NEG_*
+value passed to the PCS and thus the values programmed into the
+autoneg config register. However, that still leaves a big hole in
+how we handle the link forcing - which is necessary if inband AN
+is disabled (in other words, if we need to read the link status
+from the PHY as is done in MLO_AN_PHY mode.)
+
 -- 
-2.43.0
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
