@@ -1,91 +1,132 @@
-Return-Path: <netdev+bounces-91250-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91251-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CAF9B8B1E39
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 11:40:42 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 350118B1E41
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 11:42:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2E5092825B3
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 09:40:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9368CB270A3
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 09:42:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5233B84E0B;
-	Thu, 25 Apr 2024 09:40:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06AFF84E17;
+	Thu, 25 Apr 2024 09:42:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XaPpShNJ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jKAUpUqN"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28F1882C63
-	for <netdev@vger.kernel.org>; Thu, 25 Apr 2024 09:40:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8905584D3B;
+	Thu, 25 Apr 2024 09:42:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714038029; cv=none; b=DZZ5zjBAqFz+4VPxEoI2N9idulJhfClSR3GorQd3TaFMb/iQ80/OpsrTQ1M5U9jpJxoLku7F8MTwbDsEKpKhp7Fy15zSymApOeNt1LTKzRtrfhfJSbF/prEjfo7yK80YPMcPLx3xd7PMraBFRyzVItUMKRtumS+TzME3yJkHZDo=
+	t=1714038146; cv=none; b=RtUC/YjjyASYM8tlQ1ryNYKaNaVHNv+nkgnuLV7UK5SZyopOLDbrFVCoeuInm4HLI9yABZHDd59mU6P3DU4ZRCYUBKnuj8iOSPH7z8cPtdN55ZhIHyBJoEJJ+8inXXthLfHsPGvLIOsbXTyFzU84gaDCeMLvP9scoBz/wgBipMY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714038029; c=relaxed/simple;
-	bh=E9yhwWtKo247qcUrK5W1k8RXEiFWzkOaYryJxmvZk9I=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Ocl3Gy5EytUVb+LBy+k8mSlheg+jND8debRIoVdyb7gnsNF48fZyetuTwY7fvEc3fMfubEsUmfDLbXGzIrmtV1Mr7ztIQbt6foJ8/s1qXHFTnD3UoqFf1e290aKiWCxlBb2z2iJlnFVRLu6XRWlzcrCLGU27BR8difEtdY/umX4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XaPpShNJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 92B39C2BBFC;
-	Thu, 25 Apr 2024 09:40:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714038028;
-	bh=E9yhwWtKo247qcUrK5W1k8RXEiFWzkOaYryJxmvZk9I=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=XaPpShNJsOwMFlxMI58HfZcJDPVFRtaymNNlQSecLY9uM+I63ev31JuCaswPLU6PF
-	 hozpqKEcEzCNtzM6+q1EXRuLTV65I/48PSqmBXVJyQaenehNTj+9o7Uf2dZXXdXtWT
-	 xqtesznzEcOS+8Sns3sFsCx9f6VEDF1F9IryHL/59E+iFDjtpm9E/Tz//SW94haxHI
-	 vRnJowp0sVNC+NdsvO9N1xuYo9ZamN2S0+Q9uKveTU7AaQXH6AYwvaDJ65sD9KZV3/
-	 jR5s6cFyz5ZYtiyJnxneayjKV8ULrFQCG/ff+86/Gd3MpNnU2QBLki/AARwfty2jsI
-	 u8EfyY0ATgS1A==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 7A6F7C595C5;
-	Thu, 25 Apr 2024 09:40:28 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1714038146; c=relaxed/simple;
+	bh=lnMOWh/JzwrvYbxxMcQCVB95Qapi9p3Hv3Alg2mH8yE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QCoRd2zZI1kfJ0hS/pBrXTrlGujuRJwBzuWipTq9J8ABHIwBXSbMIanWBZuiMH8XyLU6z1FZbeo5NUj5OiYoOf3v3qHG0i6dCSf6H1vgyLwEVrAcrfaeka0gxllN0d/4Fi0ggM8L7xrLUEB/PfpONwksYvwmCmOmKaGnzR28CD0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jKAUpUqN; arc=none smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1714038146; x=1745574146;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=lnMOWh/JzwrvYbxxMcQCVB95Qapi9p3Hv3Alg2mH8yE=;
+  b=jKAUpUqNdNePjWfovaC4cYXDrm778qNaZlC0vsSqOPvV9N+GJhQ1fJVz
+   GKzq4eHYLxpeDMnRDExGuHIWgNf/DNq609p3Rnphe7MA1VvmvAxg1h/uN
+   sxqIrOJkd2hyeM1JYlz2HArjNJTJZ7LrK06DIv/gqU3QGQ1QWLSAaiG6+
+   wG8jtSVXafPQh0CJpcE0IR3W4KMlSkRKWut5ty4RgBFPnR73qxWNT/7kY
+   gZYWP1TaMjzagQE0xUI0hGe0RqoK7+aTVaUd+yoFw4f+tPzaw/rMEyVuW
+   8MSLw2lUoFYhYnE1wOS+xMt2e3TRxVZQR9VnSpMIMGwn+2PmoNbM6BCmM
+   g==;
+X-CSE-ConnectionGUID: ChP4KVsKS2SbGPlSFY0vXQ==
+X-CSE-MsgGUID: ZPH0inqYTYWV9iDo2bW7RQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11054"; a="9561215"
+X-IronPort-AV: E=Sophos;i="6.07,228,1708416000"; 
+   d="scan'208";a="9561215"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Apr 2024 02:42:25 -0700
+X-CSE-ConnectionGUID: jYqQxlKNR1e0XTsLqbTyqg==
+X-CSE-MsgGUID: dDLB5tskQ+Kr44CO8fkS0w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,228,1708416000"; 
+   d="scan'208";a="25639133"
+Received: from smile.fi.intel.com ([10.237.72.54])
+  by orviesa008.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Apr 2024 02:42:21 -0700
+Received: from andy by smile.fi.intel.com with local (Exim 4.97)
+	(envelope-from <andriy.shevchenko@linux.intel.com>)
+	id 1rzvcP-00000000x0K-0KsB;
+	Thu, 25 Apr 2024 12:42:17 +0300
+Date: Thu, 25 Apr 2024 12:42:16 +0300
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Florian Fainelli <florian.fainelli@broadcom.com>
+Cc: linux-kernel@vger.kernel.org,
+	Jarkko Nikula <jarkko.nikula@linux.intel.com>,
+	Mika Westerberg <mika.westerberg@linux.intel.com>,
+	Jan Dabros <jsd@semihalf.com>, Andi Shyti <andi.shyti@kernel.org>,
+	Lee Jones <lee@kernel.org>, Jiawen Wu <jiawenwu@trustnetic.com>,
+	Mengyuan Lou <mengyuanlou@net-swift.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Duanqiang Wen <duanqiangwen@net-swift.com>,
+	"open list:SYNOPSYS DESIGNWARE I2C DRIVER" <linux-i2c@vger.kernel.org>,
+	"open list:WANGXUN ETHERNET DRIVER" <netdev@vger.kernel.org>
+Subject: Re: [PATCH v2 3/4] mfd: intel_quark_i2c_gpio: Utilize
+ i2c-designware.h
+Message-ID: <ZioleGboe_YYtm3d@smile.fi.intel.com>
+References: <20240425002642.2053657-1-florian.fainelli@broadcom.com>
+ <20240425002642.2053657-4-florian.fainelli@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] enic: Replace hardcoded values for vnic descriptor
- by defines
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171403802849.30265.357715525179258561.git-patchwork-notify@kernel.org>
-Date: Thu, 25 Apr 2024 09:40:28 +0000
-References: <20240423035305.6858-1-satishkh@cisco.com>
-In-Reply-To: <20240423035305.6858-1-satishkh@cisco.com>
-To: Satish Kharat <satishkh@cisco.com>
-Cc: netdev@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240425002642.2053657-4-florian.fainelli@broadcom.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 
-Hello:
+On Wed, Apr 24, 2024 at 05:26:41PM -0700, Florian Fainelli wrote:
+> Rather than open code the i2c_designware string, utilize the newly
+> defined constant in i2c-designware.h.
 
-This patch was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
+...
 
-On Mon, 22 Apr 2024 20:53:05 -0700 you wrote:
-> Replace the hardcoded values used in the calculations for
-> vnic descriptors and rings with defines. Minor code cleanup.
-> 
-> Signed-off-by: Satish Kharat <satishkh@cisco.com>
-> ---
->  drivers/net/ethernet/cisco/enic/vnic_dev.c | 20 ++++++++------------
->  drivers/net/ethernet/cisco/enic/vnic_dev.h |  5 +++++
->  2 files changed, 13 insertions(+), 12 deletions(-)
+> +++ b/drivers/mfd/intel_quark_i2c_gpio.c
+> @@ -17,6 +17,7 @@
+>  #include <linux/clk-provider.h>
+>  #include <linux/dmi.h>
+>  #include <linux/i2c.h>
 
-Here is the summary with links:
-  - [net-next] enic: Replace hardcoded values for vnic descriptor by defines
-    https://git.kernel.org/netdev/net-next/c/369dac68d22e
+> +#include <linux/platform_data/i2c-designware.h>
 
-You are awesome, thank you!
+Make it a separate group after linux/* ...
+
+>  #include <linux/property.h>
+>  
+
+...here.
+
+...
+
+> -#define INTEL_QUARK_I2C_CONTROLLER_CLK "i2c_designware.0"
+> +#define INTEL_QUARK_I2C_CONTROLLER_CLK I2C_DESIGNWARE_NAME ".0"
+
+I'm not fan of this, but I think creating another macro to help with
+constant device instance naming might be more cumbersome and overkill.
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+With Best Regards,
+Andy Shevchenko
 
 
 
