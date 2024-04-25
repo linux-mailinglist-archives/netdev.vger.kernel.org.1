@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-91365-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91364-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09AF48B251C
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 17:30:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9EB528B2519
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 17:30:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2329EB21117
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 15:30:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D171C1C20944
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 15:30:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B324514AD3F;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF65514AD36;
 	Thu, 25 Apr 2024 15:30:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B2IsKDSw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sCakQBQZ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B12214AD23;
-	Thu, 25 Apr 2024 15:30:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B0DC14A633
+	for <netdev@vger.kernel.org>; Thu, 25 Apr 2024 15:30:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714059034; cv=none; b=t1B5l+bZzXHQa8NxRuJgQkudiguUrxMMU63SvOfALfHWxjzock599TQCm9dEySUn242f/86nT9b1Zlq9euPTlklqwXGKAXXavNlj9drw+uD97et9Zl1hwoXeqrBn4tElkpDTiPEQbDVHMBe7Y7+mxnKNaX9GShk6ohMdBJwg01A=
+	t=1714059034; cv=none; b=YftFdLDkpJLtf2ETMUyyhqsTzQtjSDnfjQhY9kLLhtBy6scv0dcn8PpC2S7jy7Hb62NaPB4pGgqlpAlBhjjX5GwpEstFxKIVbDUH7FEapjdYM5V0iHEO2Tai8GeJZAl/w9d7fECEbhJaT76PYRYqAs+DjKjDJc7EbhQUzhdey6s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1714059034; c=relaxed/simple;
-	bh=VbGjhgWWdlPSkjyt2SJM8eeCw83uswTP11eIKLdpQUM=;
+	bh=VTSSHD4/85d4JjFy6I51WBIIQVRls4UCHjS6vWrDCho=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ZndsTpqKL9lqqlVZYfAZejou3s6cnjdfnvsgZenjjUcU69ByKwikKb70tAVT2NrAYUDIEwKsNqSZQnaYdIQbAC4UboDEBxLyhI7onfDnUu0GAFPmvDWKuPVIgu4UTAoCSzT6iZ1dSD77waGZl6e98YOAfAqNeVr4tAF02q3rtYs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B2IsKDSw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 3259DC2BD11;
+	 In-Reply-To:To:Cc; b=blpv+GjM6H7k68hHFxJQiIQTcBB4XU1BWdttYTK/HTLH+R69yIzsUedCQkxpfeUSs8Q1QGYZ9VEv44XjKmvL1K8VqaO5uMduK0jMs+xA6tRFa+uaOPJr6GXfnMS6EGniLCXfVmy9SZj2twI9poeLa7IAP/lNmGyfcjVOzPypWTw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sCakQBQZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 2C557C2BD10;
 	Thu, 25 Apr 2024 15:30:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1714059034;
-	bh=VbGjhgWWdlPSkjyt2SJM8eeCw83uswTP11eIKLdpQUM=;
+	bh=VTSSHD4/85d4JjFy6I51WBIIQVRls4UCHjS6vWrDCho=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=B2IsKDSwn4W7fm1+FcErufXYoUi8FaTVTAorecr6g/Y/2B/XjCgLepp4Bv6F4QCXE
-	 9m6jqP1fu2Cm9LHCYWYDpAQk+r/Obp02Mu5DnYExoZElasGPPQV7VfBpfj96KOV+Y1
-	 wjUS0o+XET9V252Y/tYrrjCb1URI5Az5oxGP6nsYMIVjeWFjXI0+MVE8VRbBxbGdrA
-	 nEW97W28yEKT9lFhQhKp+jmXDHeat3H+HTZ8S7HQ6jPtKm0zADZAlyTx7iz9YIN2i1
-	 bX+RS2sufGJq8efZmMXRtWKAUf+xQ6Xkb+1hEVMPU8dWJar+yyAljVzlSatt9bgd2x
-	 y3uPvum4zzBOQ==
+	b=sCakQBQZor99Tanhs/iHVgw9lbz1VoGpg2jx6nnMlGs+U6fzF0FDEFK6i+NVzac8X
+	 pcrvFdXwp6xCZCrwYm+yrAezWDP7c0mz+iTfsGjJW/eiwu4cf6qUfb6sa5Kz7ll2r1
+	 T4TKlmwaTOSNvGJckJAFjSrWmtKBdXezlTMjfxh5kAM0WlxsCJc/o1cw4xqacTBQJa
+	 Hz3lNryp00znlvL0K0tot/ijQxjQEj2FoD6rH57EtW9NronXB0snbE2ugUEwPpeHwN
+	 TsqQtVdSceCypcAbQOpS6y4HUcq1V6c7/Pqn1hwVnYr/RHXuBQpLese+G1urZHd9sq
+	 1Tmc6lAsHkSOA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 212F8CF21C2;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 1AAF6C595C5;
 	Thu, 25 Apr 2024 15:30:34 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,48 +52,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v3 0/4] Fix isolation of broadcast traffic and unmatched
- unicast traffic with MACsec offload
+Subject: Re: [PATCH net 0/4][pull request] Intel Wired LAN Driver Updates
+ 2024-04-23 (i40e, iavf, ice)
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171405903413.5824.688163186689727867.git-patchwork-notify@kernel.org>
+ <171405903410.5824.18116289504884714487.git-patchwork-notify@kernel.org>
 Date: Thu, 25 Apr 2024 15:30:34 +0000
-References: <20240423181319.115860-1-rrameshbabu@nvidia.com>
-In-Reply-To: <20240423181319.115860-1-rrameshbabu@nvidia.com>
-To: Rahul Rameshbabu <rrameshbabu@nvidia.com>
-Cc: netdev@vger.kernel.org, stable@vger.kernel.org, kuba@kernel.org,
- edumazet@google.com, davem@davemloft.net, pabeni@redhat.com, gal@nvidia.com,
- tariqt@nvidia.com, sd@queasysnail.net, yossiku@nvidia.com,
- bpoirier@nvidia.com, cratiu@nvidia.com
+References: <20240423182723.740401-1-anthony.l.nguyen@intel.com>
+In-Reply-To: <20240423182723.740401-1-anthony.l.nguyen@intel.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, netdev@vger.kernel.org
 
 Hello:
 
 This series was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 23 Apr 2024 11:13:01 -0700 you wrote:
-> Some device drivers support devices that enable them to annotate whether a
-> Rx skb refers to a packet that was processed by the MACsec offloading
-> functionality of the device. Logic in the Rx handling for MACsec offload
-> does not utilize this information to preemptively avoid forwarding to the
-> macsec netdev currently. Because of this, things like multicast messages or
-> unicast messages with an unmatched destination address such as ARP requests
-> are forwarded to the macsec netdev whether the message received was MACsec
-> encrypted or not. The goal of this patch series is to improve the Rx
-> handling for MACsec offload for devices capable of annotating skbs received
-> that were decrypted by the NIC offload for MACsec.
+On Tue, 23 Apr 2024 11:27:16 -0700 you wrote:
+> This series contains updates to i40e, iavf, and ice drivers.
+> 
+> Sindhu removes WQ_MEM_RECLAIM flag from workqueue for i40e.
+> 
+> Erwan Velu adjusts message to avoid confusion on base being reported on
+> i40e.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v3,1/4] macsec: Enable devices to advertise whether they update sk_buff md_dst during offloads
-    https://git.kernel.org/netdev/net/c/475747a19316
-  - [net,v3,2/4] ethernet: Add helper for assigning packet type when dest address does not match device address
-    https://git.kernel.org/netdev/net/c/6e159fd653d7
-  - [net,v3,3/4] macsec: Detect if Rx skb is macsec-related for offloading devices that update md_dst
-    https://git.kernel.org/netdev/net/c/642c984dd0e3
-  - [net,v3,4/4] net/mlx5e: Advertise mlx5 ethernet driver updates sk_buff md_dst for MACsec
-    https://git.kernel.org/netdev/net/c/39d26a8f2efc
+  - [net,1/4] i40e: Do not use WQ_MEM_RECLAIM flag for workqueue
+    https://git.kernel.org/netdev/net/c/2cc7d150550c
+  - [net,2/4] i40e: Report MFS in decimal base instead of hex
+    https://git.kernel.org/netdev/net/c/ef3c313119ea
+  - [net,3/4] iavf: Fix TC config comparison with existing adapter TC config
+    https://git.kernel.org/netdev/net/c/54976cf58d61
+  - [net,4/4] ice: fix LAG and VF lock dependency in ice_reset_vf()
+    https://git.kernel.org/netdev/net/c/96fdd1f6b4ed
 
 You are awesome, thank you!
 -- 
