@@ -1,99 +1,187 @@
-Return-Path: <netdev+bounces-91366-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91368-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1796E8B251A
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 17:30:40 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66FB28B254B
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 17:38:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AA5791F2161E
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 15:30:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8D828B27EE9
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 15:38:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBC4F14B06A;
-	Thu, 25 Apr 2024 15:30:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B878914B08A;
+	Thu, 25 Apr 2024 15:37:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WZkw8+EZ"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="B/tLuWPl"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9443514AD2F;
-	Thu, 25 Apr 2024 15:30:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2781184D2D;
+	Thu, 25 Apr 2024 15:37:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714059034; cv=none; b=cqLq/OXvcLif+Ew2V0hkKvKAnvRwkcRSWPyZNVUaaicb6DXTJKHzqCuSCEHyYUeIQO54bxr+q6OYvZwL5B7ZE3s94aR7lnDLezznkPdmNiI12X0OqY5u07hKxwa358rbdnpnUSeJtxvU2EhektG00CK19gzSB0L8ozB1k178kMw=
+	t=1714059475; cv=none; b=uELu/YQhykgLbU7hk1q6Q+6n9N5852ufpxIoShhTwQ+oVTB/o3jXe1fBcx0KQya8Hg8bG5dO0ERsdy2a7inhrOPYFGQ0KQvrXglDzFo/i3XWqiBIevnTkUQSYTWgika2sryJ1OafZ1udjrFeTq+EmCFwYllC41grgYDuJJyjau4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714059034; c=relaxed/simple;
-	bh=gUSLbzxAFjoTHvhf/UGxNryWbTZm3Kr57AkiJjhbJSI=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=CqMA19p++iq8yHgF9yQkyPz3xXK8f2ZSGhhwGfqV2LKGp2+RnK8akAHXpDSqgYECAS/cAwyyToKxpX04BFiGWTHcGOuTjmHU3a0w6OmoSZEQhMzbhmy2KWHVXH2CPIvgo58gyGXYEFA+DycHw88SHZNaE2U87MrOQmJoIkXpDbo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WZkw8+EZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 3E7A4C113CE;
-	Thu, 25 Apr 2024 15:30:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714059034;
-	bh=gUSLbzxAFjoTHvhf/UGxNryWbTZm3Kr57AkiJjhbJSI=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=WZkw8+EZoMU7PoHKxuEmTbaq+kiMkDD3op0/mrQDsnXFkSHAJhMucNjzxssHKJ8Wg
-	 cqyarp90+aSaWtlxV6rJ1LqWgoEkp8eErMSsc7EVL+uYasvswzWnSIt34MQj4a5Qn4
-	 kjBgoiAy9XBtYKZvGPweZXbueImUSnRcs0ZZP4FYB6aX0PRKm2M8Q41kgaj5/2oE5o
-	 pKvRexppZtx/Dc/PUBWlc3x8BLjsL2iLj9qy6xmOxVYGfzotTlkcIucwJAAihlfTOg
-	 QknvVUHD26M2f2lmKO+eETZeCVyb5hMrj/IkRCbIy9DrJgJGAY7ZM51mIA+IsxuHuG
-	 sQnL3U1WZR5lQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 29F3EC595CE;
-	Thu, 25 Apr 2024 15:30:34 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1714059475; c=relaxed/simple;
+	bh=TQ/IMaQSQUBfEjQdb7XmGSR/6+c5RT7iuARKdBoCyR4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cdCn2urSFcPjlSG9vXfQebeoFqgCVSDdS7FUjAaz06GnyhR5cmTiLoCH+IaUVAXt2Ce3xGPtNWAVpbqK1271VoX4g9IqTmntKI8nDf+MdQ4PcAP9WgqAw3yr6grWrBeMf3+Zw8ssLtntqbHJl6eb+7xNzyaGaBGMLVzQiJSavgc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=B/tLuWPl; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=+nXxaAUOW4lfzHbDCaI6nz0stAky/8ykgKzIVjuNI0U=; b=B/tLuWPlOLDKNO1iW2Ezj29OUk
+	WTMG4duEi+g4B0typzSnuggrUlh9x2pZTGhPfKXGUUvCXYLFgH5IMK3cqlerAJgQfMVh3iKFJFkr0
+	KDEF6viTCHIuWiU3GplSzav2mpfHD229evx7m2eAWN6lKdeCEvHS/Q0NGqqEuJDCut40=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1s01AM-00Dzys-Pb; Thu, 25 Apr 2024 17:37:42 +0200
+Date: Thu, 25 Apr 2024 17:37:42 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Sky Huang <SkyLake.Huang@mediatek.com>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Qingfang Deng <dqfext@gmail.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	Steven Liu <Steven.Liu@mediatek.com>
+Subject: Re: [PATCH 3/3] net: phy: mediatek: add support for built-in 2.5G
+ ethernet PHY on MT7988
+Message-ID: <9241a551-1547-41c6-aae2-54dd45e49c2f@lunn.ch>
+References: <20240425023325.15586-1-SkyLake.Huang@mediatek.com>
+ <20240425023325.15586-4-SkyLake.Huang@mediatek.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] net: ethernet: ti: am65-cpts: Fix PTPv1 message type
- on TX packets
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171405903416.5824.618925777912040630.git-patchwork-notify@kernel.org>
-Date: Thu, 25 Apr 2024 15:30:34 +0000
-References: <20240424071626.32558-1-r-gunasekaran@ti.com>
-In-Reply-To: <20240424071626.32558-1-r-gunasekaran@ti.com>
-To: Ravi Gunasekaran <r-gunasekaran@ti.com>
-Cc: s-vadapalli@ti.com, rogerq@kernel.org, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- richardcochran@gmail.com, jreeder@ti.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, srk@ti.com, ed.trexel@hp.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240425023325.15586-4-SkyLake.Huang@mediatek.com>
 
-Hello:
+> +static int mt7988_2p5ge_phy_config_init(struct phy_device *phydev)
+> +{
+> +	int ret, i;
+> +	const struct firmware *fw;
+> +	struct device *dev = &phydev->mdio.dev;
+> +	struct device_node *np;
+> +	void __iomem *pmb_addr;
+> +	void __iomem *md32_en_cfg_base;
+> +	struct mtk_i2p5ge_phy_priv *priv = phydev->priv;
+> +	u16 reg;
+> +	struct pinctrl *pinctrl;
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Reverse Christmas Tree please.
 
-On Wed, 24 Apr 2024 12:46:26 +0530 you wrote:
-> From: Jason Reeder <jreeder@ti.com>
-> 
-> The CPTS, by design, captures the messageType (Sync, Delay_Req, etc.)
-> field from the second nibble of the PTP header which is defined in the
-> PTPv2 (1588-2008) specification. In the PTPv1 (1588-2002) specification
-> the first two bytes of the PTP header are defined as the versionType
-> which is always 0x0001. This means that any PTPv1 packets that are
-> tagged for TX timestamping by the CPTS will have their messageType set
-> to 0x0 which corresponds to a Sync message type. This causes issues
-> when a PTPv1 stack is expecting a Delay_Req (messageType: 0x1)
-> timestamp that never appears.
-> 
-> [...]
+> +static int mt7988_2p5ge_phy_config_aneg(struct phy_device *phydev)
+> +{
+> +	bool changed = false;
+> +	u32 adv;
+> +	int ret;
+> +
+> +	if (phydev->autoneg == AUTONEG_DISABLE) {
+> +		/* Configure half duplex with genphy_setup_forced,
+> +		 * because genphy_c45_pma_setup_forced does not support.
+> +		 */
 
-Here is the summary with links:
-  - [net,v2] net: ethernet: ti: am65-cpts: Fix PTPv1 message type on TX packets
-    https://git.kernel.org/netdev/net/c/1b9e743e923b
+The English in that comment is wrong.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Ah, it appears to be a copy/paste, e.g. from mxl-gpy.c. In fact, a lot
+of this function is identical to gpy_config_aneg(). Maybe it should be
+pulled out into a helper.
 
+> +static int mt7988_2p5ge_phy_get_features(struct phy_device *phydev)
+> +{
+> +	int ret;
+> +
+> +	ret = genphy_read_abilities(phydev);
+> +	if (ret)
+> +		return ret;
+> +
+> +	/* We don't support HDX at MAC layer on mt7988.
+> +	 * So mask phy's HDX capabilities, too.
+> +	 */
 
+This comment seems to contradict the comment above? 
+
+Also, this code does not mask anything, it sets bits.  What does
+genphy_read_abilities() find out about the device? If the hardware
+confirms to the standard, it should not indicate is supports 1/2
+duplex, genphy_read_abilities() should then not return those link
+modes, but it should return 10, 100 and 1000 full duplex.
+
+> +	linkmode_set_bit(ETHTOOL_LINK_MODE_10baseT_Full_BIT,
+> +			 phydev->supported);
+> +	linkmode_set_bit(ETHTOOL_LINK_MODE_100baseT_Full_BIT,
+> +			 phydev->supported);
+> +	linkmode_set_bit(ETHTOOL_LINK_MODE_1000baseT_Full_BIT,
+> +			 phydev->supported);
+> +	linkmode_set_bit(ETHTOOL_LINK_MODE_2500baseT_Full_BIT,
+> +			 phydev->supported);
+> +	linkmode_set_bit(ETHTOOL_LINK_MODE_Autoneg_BIT, phydev->supported);
+
+What does genphy_c45_pma_read_abilities() report about the device?
+
+> +static int mt7988_2p5ge_phy_read_status(struct phy_device *phydev)
+> +{
+> +	int ret;
+> +
+> +	ret = genphy_update_link(phydev);
+> +	if (ret)
+> +		return ret;
+> +
+> +	phydev->speed = SPEED_UNKNOWN;
+> +	phydev->duplex = DUPLEX_UNKNOWN;
+> +	phydev->pause = 0;
+> +	phydev->asym_pause = 0;
+> +
+> +	if (phydev->autoneg == AUTONEG_ENABLE) {
+> +		if (phydev->autoneg_complete) {
+> +			ret = genphy_c45_read_lpa(phydev);
+> +			if (ret < 0)
+> +				return ret;
+> +
+> +			/* Read the link partner's 1G advertisement */
+> +			ret = phy_read(phydev, MII_STAT1000);
+> +			if (ret < 0)
+> +				return ret;
+> +			mii_stat1000_mod_linkmode_lpa_t(phydev->lp_advertising, ret);
+
+> +		} else if (!linkmode_test_bit(ETHTOOL_LINK_MODE_2500baseT_Full_BIT,
+> +					      phydev->advertising) &&
+> +			   linkmode_test_bit(ETHTOOL_LINK_MODE_1000baseT_Full_BIT,
+> +					     phydev->advertising)) {
+> +			extend_an_new_lp_cnt_limit(phydev);
+> +		}
+
+A comment about what is happening here would be good.
+
+> +	} else if (phydev->autoneg == AUTONEG_DISABLE) {
+> +		linkmode_zero(phydev->lp_advertising);
+> +	}
+
+This if does not make much sense.
+
+> +	ret = phy_read_mmd(phydev, MDIO_MMD_VEND1, MTK_PHY_LINK_STATUS_MISC);
+> +	if (ret < 0)
+> +		return ret;
+> +	phydev->duplex = (ret & MTK_PHY_FDX_ENABLE) ? DUPLEX_FULL : DUPLEX_HALF;
+
+Do does it support half duplex or not?
+
+   Andrew
 
