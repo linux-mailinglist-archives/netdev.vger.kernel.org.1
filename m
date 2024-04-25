@@ -1,176 +1,146 @@
-Return-Path: <netdev+bounces-91464-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91465-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57BF38B2A8F
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 23:16:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 565298B2AA4
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 23:26:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C3AA01F21D94
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 21:16:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 892C51C20FB4
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 21:26:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D4D01553A0;
-	Thu, 25 Apr 2024 21:15:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E3271553B9;
+	Thu, 25 Apr 2024 21:26:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="ZojpZkhq"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="f+3lXJq6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
+Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8034514F9ED
-	for <netdev@vger.kernel.org>; Thu, 25 Apr 2024 21:15:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBAFF153812
+	for <netdev@vger.kernel.org>; Thu, 25 Apr 2024 21:26:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714079756; cv=none; b=msBdzSDn6+4qkrq6cgeTBPqp8dshSgI1IosPu6z/pGjOeCcn8rdeNLipARY/3Dzd15YTU+Ar0eX7gDTbXWun3AFUj0+V1GMzKesyOYEg8SzLlzuaELq2QhpOaNTlslS4Y8waszKUK30llyL86g3EJbXfOgxZ5TR/59CKMv6rVjI=
+	t=1714080389; cv=none; b=j3b7kOkLL7Gz4URaTs4QKJXxaTokX/7Mxp51NudiPzQE7UD5gTycHXI09xjy+e/CxHA3er5Cw+nXo1y+i++a6dQqxkcFmyHcp2CEmvaITUP02/YPyaCKL1aLzV9wrFqLQNE084Q/NV2H0jaq2mBnG1hbVMHyZ8As2PzRwPh6RKM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714079756; c=relaxed/simple;
-	bh=/FFmdsR9O9Fym31s3IonpaadQSALFxi+gkgXELQJDnA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=KImwcmiFgsLgxulZkXPOdP0wSseEvHU7P4IK79NvKa1M091yqIstlrqX+113wq7SOJL/zOZGPC11MOxtIHfMWyJSFhFYZo7WGa2WG28qlbImFZN8/aB5GQa5Fz65FUHsxJckRPiReTIWWxtj18WLTWbMHgpaRCsJuuk7wjoSIpM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=ZojpZkhq; arc=none smtp.client-ip=209.85.128.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
-Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-61af74a010aso15058177b3.0
-        for <netdev@vger.kernel.org>; Thu, 25 Apr 2024 14:15:53 -0700 (PDT)
+	s=arc-20240116; t=1714080389; c=relaxed/simple;
+	bh=p9dKe6PGi+JyhXbK6BGLsXbSJ30ygRk9pgeR5iqV+G8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=X7TfhPFxJ4by13QhsOYNm3aZ69ytilU0+vHkGOgmdJZk9bjHEdSgPfYvp3k/M3v0+6ypbQDqV8JgD78sItWKY4dM7l80ZvLuIZ7m/8hVzqs94wYWQfpv4tkpiBs+Pp5LZXDR88piwss2o4rCYNfpffdwfmXLhvXFUAmHNs7MW1o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=f+3lXJq6; arc=none smtp.client-ip=209.85.215.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
+Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-5c6bd3100fcso998861a12.3
+        for <netdev@vger.kernel.org>; Thu, 25 Apr 2024 14:26:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paul-moore.com; s=google; t=1714079752; x=1714684552; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=blHg8bPgQUhKFHhF3jugQx9VV2zZlze7Lx295xv8KO8=;
-        b=ZojpZkhq/yy3e12S1EdvW7NZ1HQqwDsjipNIlBAwkZHQBp3wL6s4Ak7nUpEXQiX8Ah
-         ypZ4D/HjUCmVnLg6/oCHHFLbibbB8os3U2eQUCtn+mrnSNaahEvJxfx2rMMW2/TTMSF+
-         I8TzsJEaz3bJNQAVZQoWnFBYA7kz4tGsyHVyWk73o98IxKhctpcdIPR7lnWruDCcO7Jw
-         ackP23FAux8skycWtVUt+fd8u8u89H6eUFhALRLfXWEmoT+B+XybtWgjNJtm0uP0QGwR
-         8K5U3KhTPOTyAvfrcb2eF8ljc67XdxM18J96xaevr9amVnqwVaoelPwS74TjZtw8/Mga
-         Dw9w==
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1714080387; x=1714685187; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=KBSosczOPmeZ+rUL7ilccZarqFMd/yU4chc0Xq7jKIU=;
+        b=f+3lXJq6btOv9GR9py6nET8F50Efv+iITLql70SNV/QvqAw5dtP6JOsoAlQw5bVlfK
+         INcckZXlKWToV5n1MBgQi1K4d84Aew3ojIEiwi8JwY8VECH7F51h5Fl2JzblNkkhGS0k
+         w3sgjQhODD1PzRKgCr2ut3jMe48ArD0JP0lIIaTFrirtFnPocufqNIJ3uDjOcvqoj+dp
+         eylQ8xsSggpHKppKhlTct4Ed+34Tf7cIBbWYulvTZEV5IHnK7Ks7nxamorlTW5+P35UI
+         kvdO0R9q3/DDTDTMSywzuRAJ9BWbTLdqIV35LtgV8pAX88BH2x3YhPOvajQNil6uDHO4
+         gb/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714079752; x=1714684552;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=blHg8bPgQUhKFHhF3jugQx9VV2zZlze7Lx295xv8KO8=;
-        b=ty6Nc2ZXknQqdxz2LdfQCZiNiZjsumLq6FsdHbHwpRdowcE1cJsJwH+MZch5qqbskx
-         zwjoV7Lz7LMDBWtiXqzscxOqu+eH3Hw/6qq/3gjdoc+pt0Zpau5N4YVE5OQbUSqnsmzP
-         Pm/bfTzKYpODBIOJVHPWdvgtFX8IA91KjfWeSOKPzNGisTDTVPR4KCBrBefwUebDSCeA
-         J6LRl38xKdaEOb1gQNyuLaLKoj1OXYrxuZbC5tY/x6AxvQGX/f/eZ0/NgOULmEIKbYUV
-         4MoGx1zTHUqbw4LV/0DWhbUMUHiZ64pkpB8Bi67wM09wywZZBDyrSE5L1fnYPvTGb9CF
-         TG5A==
-X-Gm-Message-State: AOJu0YxL8HVCObJCL53RAFf51SO4dCviqZqX9bBubxgLnjr5mWf8rJzC
-	U5227uxR/S4/LrYDS0URZXP+2W2aN4uFDbpX+xXMh3Ub1/U0vhUxzh74c2SuAd4bKuKWS+GwmO9
-	fKQt003s0UXmTdnKTaaenX/tYK+5x/mkYYB6RUWLMSNqQeuw=
-X-Google-Smtp-Source: AGHT+IFMG9abgUnUOH42JDmyak5//G7o2zxfCzKspMlLs8dzKSAWFr7GjM1qAAC+DwceIip9znmuHzM0W7zyN3KgmQg=
-X-Received: by 2002:a05:690c:6803:b0:61b:df5:7876 with SMTP id
- id3-20020a05690c680300b0061b0df57876mr803329ywb.6.1714079752424; Thu, 25 Apr
- 2024 14:15:52 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1714080387; x=1714685187;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=KBSosczOPmeZ+rUL7ilccZarqFMd/yU4chc0Xq7jKIU=;
+        b=p9eFC+S20sEOZfT0cDTqvGfCjLH7paq3lcv1B7EI9wUQtMgPve2Pj8MYvhLLr8/cQa
+         i40SY0sqYZ+z/giEHyWKbcYC0VrVEtMAtmr9N2pDYuL78OPKaeRfoUIAv6nCedcJw7bP
+         OmbNun2bdnmGrehribIsfgEFs0x4GGKQ53px9LOe2NJ0VnRvm0HC2zylwTrjeJz519ui
+         9XycBn528+fL9xvw/9rXfVIB/Z2pVIhePg4xvtjFG8tQGZBvcUPxwcjqAwUoo5mNIm9F
+         TOKzSJMS1H4LXZG/qhNQBnf3qDw3FNkwndfumAfk+a6c6Z3yqodS5CkyWqDXeh03wqT/
+         RMtw==
+X-Gm-Message-State: AOJu0Yy5ipm1OmCXhW+TSu0YhsdUkHw+hQXUWppfSdRKCzAj9xQyrUsc
+	OPPFRoFtUunvwWjLfvmE2+bL+2xq/wODOZJSckQ18jevtS2CeyI6d2EAxVez88wr9QxILmzRvtc
+	u
+X-Google-Smtp-Source: AGHT+IHZOiSPc/XG/0am2gEf8VfElx4yfkyTO15BwsU2//CsLxUwU/cbxIZ938/3DfPi41MUFJtsrw==
+X-Received: by 2002:a17:90b:3d86:b0:2ac:40c8:1ed3 with SMTP id pq6-20020a17090b3d8600b002ac40c81ed3mr937099pjb.5.1714080386695;
+        Thu, 25 Apr 2024 14:26:26 -0700 (PDT)
+Received: from localhost (fwdproxy-prn-011.fbsv.net. [2a03:2880:ff:b::face:b00c])
+        by smtp.gmail.com with ESMTPSA id e7-20020a17090a7c4700b002ad6b1e5b6fsm8610969pjl.56.2024.04.25.14.26.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 25 Apr 2024 14:26:26 -0700 (PDT)
+From: David Wei <dw@davidwei.uk>
+To: netdev@vger.kernel.org,
+	Michael Chan <michael.chan@broadcom.com>,
+	Pavan Chebbi <pavan.chebbi@broadcom.com>,
+	Andy Gospodarek <andrew.gospodarek@broadcom.com>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH net-next v1] bnxt: fix bnxt_get_avail_msix() returning negative values
+Date: Thu, 25 Apr 2024 14:26:24 -0700
+Message-ID: <20240425212624.2703397-1-dw@davidwei.uk>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240416152913.1527166-2-omosnace@redhat.com> <0a814ce3acdea2c07cef6f7c31008e19@paul-moore.com>
- <CAFqZXNvsumcLSKKRGzvUDmz=6WYfw3a0tG43juBjnUTdbfsDsw@mail.gmail.com>
-In-Reply-To: <CAFqZXNvsumcLSKKRGzvUDmz=6WYfw3a0tG43juBjnUTdbfsDsw@mail.gmail.com>
-From: Paul Moore <paul@paul-moore.com>
-Date: Thu, 25 Apr 2024 17:15:41 -0400
-Message-ID: <CAHC9VhRdcMS6WQ1QJD1h+YbNGh0x=Ex-+MvKLSaVqaPdfuZueQ@mail.gmail.com>
-Subject: Re: [PATCH 1/2] cipso: fix total option length computation
-To: Ondrej Mosnacek <omosnace@redhat.com>
-Cc: netdev@vger.kernel.org, linux-security-module@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Wed, Apr 17, 2024 at 8:49=E2=80=AFAM Ondrej Mosnacek <omosnace@redhat.co=
-m> wrote:
-> On Tue, Apr 16, 2024 at 8:39=E2=80=AFPM Paul Moore <paul@paul-moore.com> =
-wrote:
-> > On Apr 16, 2024 Ondrej Mosnacek <omosnace@redhat.com> wrote:
-> > >
-> > > As evident from the definition of ip_options_get(), the IP option
-> > > IPOPT_END is used to pad the IP option data array, not IPOPT_NOP. Yet
-> > > the loop that walks the IP options to determine the total IP options
-> > > length in cipso_v4_delopt() doesn't take it into account.
-> > >
-> > > Fix it by recognizing the IPOPT_END value as the end of actual option=
-s.
-> > > Also add safety checks in case the options are invalid/corrupted.
-> > >
-> > > Fixes: 014ab19a69c3 ("selinux: Set socket NetLabel based on connectio=
-n endpoint")
-> > > Signed-off-by: Ondrej Mosnacek <omosnace@redhat.com>
-> > > ---
-> > >  net/ipv4/cipso_ipv4.c | 19 ++++++++++++++-----
-> > >  1 file changed, 14 insertions(+), 5 deletions(-)
-> > >
-> > > diff --git a/net/ipv4/cipso_ipv4.c b/net/ipv4/cipso_ipv4.c
-> > > index 8b17d83e5fde4..75b5e3c35f9bf 100644
-> > > --- a/net/ipv4/cipso_ipv4.c
-> > > +++ b/net/ipv4/cipso_ipv4.c
-> > > @@ -2012,12 +2012,21 @@ static int cipso_v4_delopt(struct ip_options_=
-rcu __rcu **opt_ptr)
-> > >                * from there we can determine the new total option len=
-gth */
-> > >               iter =3D 0;
-> > >               optlen_new =3D 0;
-> > > -             while (iter < opt->opt.optlen)
-> > > -                     if (opt->opt.__data[iter] !=3D IPOPT_NOP) {
-> > > -                             iter +=3D opt->opt.__data[iter + 1];
-> > > -                             optlen_new =3D iter;
-> > > -                     } else
-> > > +             while (iter < opt->opt.optlen) {
-> > > +                     if (opt->opt.__data[iter] =3D=3D IPOPT_END) {
-> > > +                             break;
-> > > +                     } else if (opt->opt.__data[iter] =3D=3D IPOPT_N=
-OP) {
-> > >                               iter++;
-> > > +                     } else {
-> > > +                             if (WARN_ON(opt->opt.__data[iter + 1] <=
- 2))
-> > > +                                     iter +=3D 2;
-> > > +                             else
-> > > +                                     iter +=3D opt->opt.__data[iter =
-+ 1];
-> > > +                             optlen_new =3D iter;
-> >
-> > I worry that WARN_ON(), especially in conjunction with the one below,
-> > could generate a lot of noise on the console and system logs, let's
-> > be a bit more selective about what we check and report on.  Presumably
-> > the options have already gone through a basic sanity check so there
-> > shouldn't be anything too scary in there.
-> >
-> >   if (opt =3D=3D IPOPT_END) {
-> >     /* ... */
-> >   } else if (opt =3D=3D IPOPT_NOP) {
-> >     /* ... */
-> >   } else {
-> >     iter +=3D opt[iter + 1];
-> >     optlen_new =3D iter;
-> >   }
->
-> How about turning it to WARN_ON_ONCE() instead? It's actually the
-> better choice in this case (alerts to a possible kernel bug, not to an
-> event that would need to be logged every time), I just used WARN_ON()
-> instinctively and didn't think of the _ONCE variant.
+Current net-next/main does not boot for older chipsets e.g. Stratus.
 
-I'd really prefer to not have the WARN_ON(), even the _ONCE() variant.
-We're seeing more and more discussion about avoiding the use of
-WARN_ON() similar to the current BUG_ON() guidelines.
+Sample dmesg:
+[   11.368315] bnxt_en 0000:02:00.0 (unnamed net_device) (uninitialized): Able to reserve only 0 out of 9 requested RX rings
+[   11.390181] bnxt_en 0000:02:00.0 (unnamed net_device) (uninitialized): Unable to reserve tx rings
+[   11.438780] bnxt_en 0000:02:00.0 (unnamed net_device) (uninitialized): 2nd rings reservation failed.
+[   11.487559] bnxt_en 0000:02:00.0 (unnamed net_device) (uninitialized): Not enough rings available.
+[   11.506012] bnxt_en 0000:02:00.0: probe with driver bnxt_en failed with error -12
 
-> > > +                     }
-> > > +             }
-> > > +             if (WARN_ON(optlen_new > opt->opt.optlen))
-> > > +                     optlen_new =3D opt->opt.optlen;
-> >
-> > This is also probably not really necessary, but it bothers me less.
->
-> I would convert this one to WARN_ON_ONCE() as well, or drop both if
-> you still don't like either of them to be there.
+This is caused by bnxt_get_avail_msix() returning a negative value for
+these chipsets not using the new resource manager i.e. !BNXT_NEW_RM.
+This in turn causes hwr.cp in __bnxt_reserve_rings() to be set to 0.
 
-My preference would be to drop both, although as I said earlier this
-last one bothers me less.
+In the current call stack, __bnxt_reserve_rings() is called from
+bnxt_set_dflt_rings() before bnxt_init_int_mode(). Therefore,
+bp->total_irqs is always 0 and for !BNXT_NEW_RM bnxt_get_avail_msix()
+always returns a negative number.
 
---=20
-paul-moore.com
+Comparing with a newer chipset e.g. Thor and the codepath for
+BNXT_NEW_RM, I believe the intent is for bnxt_get_avail_msix() to always
+return >= 0. Fix the issue by using max().
+
+Alternatively, perhaps __bnxt_reserve_rings() should be reverted back.
+But there may be paths calling into it where bnxt_get_avail_msix()
+returns a positive integer.
+
+Fixes: d630624ebd70 ("bnxt_en: Utilize ulp client resources if RoCE is not registered")
+Signed-off-by: David Wei <dw@davidwei.uk>
+---
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 9 +++------
+ 1 file changed, 3 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+index be96bb494ae6..06b7a963bbbd 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+@@ -10486,14 +10486,11 @@ int bnxt_get_avail_msix(struct bnxt *bp, int num)
+ 		max_idx = min_t(int, bp->total_irqs, max_cp);
+ 	avail_msix = max_idx - bp->cp_nr_rings;
+ 	if (!BNXT_NEW_RM(bp) || avail_msix >= num)
+-		return avail_msix;
++		return max(avail_msix, 0);
+ 
+-	if (max_irq < total_req) {
++	if (max_irq < total_req)
+ 		num = max_irq - bp->cp_nr_rings;
+-		if (num <= 0)
+-			return 0;
+-	}
+-	return num;
++	return max(num, 0);
+ }
+ 
+ static int bnxt_get_num_msix(struct bnxt *bp)
+-- 
+2.43.0
+
 
