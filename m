@@ -1,50 +1,67 @@
-Return-Path: <netdev+bounces-91425-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91427-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FA1C8B2874
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 20:50:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C88448B287C
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 20:54:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 356C81F222E2
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 18:50:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 79AB61F2259E
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 18:54:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A223C14A0A7;
-	Thu, 25 Apr 2024 18:50:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83D931514E7;
+	Thu, 25 Apr 2024 18:53:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qztlQEUz"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="mWf5RM7H"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from relay.smtp-ext.broadcom.com (relay.smtp-ext.broadcom.com [192.19.144.209])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 792062135A;
-	Thu, 25 Apr 2024 18:50:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 119CD12C7FF;
+	Thu, 25 Apr 2024 18:53:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.19.144.209
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714071034; cv=none; b=IZWlU84ycwboG4dZXcaDhT8kvftbUqRXiouq3m0e1VujSznS47YojwylBY92KT5YT/nCCSUS1I+E/bnccefidGVn27CzYW7Pc7Spv5y0jy9cn7FnA+mmxb2n/hUmkgA6ug6mXgCRHrKzFiI52mo0p65QvWBBD2IPqN+Lsq3S/mQ=
+	t=1714071221; cv=none; b=kZI4MbCIzOD6hJN+UqIV75MutTn4aN+c5rFjTygERdzR/st9mtiB2BdTxfnLxE1rGy1ZnF1XLVk9oRE617+lvheUnnUkM1yPv+N1jkE7lWjmYyvgh80ogGQALFn1mjDxVz74ya5nxU7C5i2EpHJUMp4IuitWkwEvsvNMApDgEo8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714071034; c=relaxed/simple;
-	bh=kt8WoX1FzFxbm3s2wti1UEz7nEy1w2bo9zkTOhlslRg=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=DI+oMgfgzz46v+11PEIS2vt09W38aStH4JbtbrtW3WozRpPKrTM6Lpb6qXUaCGK/WmhQ544y3naqAcPazKOCxUckj8T5ISPDIgD3MzeBwOU3eY9G4hdWPbeDd5xdcxUJlHyCsineC7kRg9ipOukj58vOGACRMF8H2p59yBpNxIA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qztlQEUz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id EC6E9C2BD10;
-	Thu, 25 Apr 2024 18:50:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714071034;
-	bh=kt8WoX1FzFxbm3s2wti1UEz7nEy1w2bo9zkTOhlslRg=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=qztlQEUzIcGecgUOLaJcIw+pwInH4URPwrWfroNrxpprZeKywT1h4/UO1oEPpx2a5
-	 37W5fm8Au5hBjwYAwNCRARExfoqYIqqA1aRu8+yOwHG9/ukbKl3CrKioXVzsn0ugpy
-	 AMWB2mPIwPkb/Ls/tTYW2wC6TS/domdxkwvF1hQPBFAj7AgtYNXcTLqk/6LUINk71q
-	 Q/i8wmdAxPSLx+8INMISQTICl7Nm8YGX+UX4xVs9GSIgO5mXaCuGQL3U9/ZZeAjhzL
-	 PUeyTZcjypSZefDIgKsaIMutWBlsbJWvwyi4cqYm2UwCSYPzixAR4B+gOkTEUtJuTB
-	 CTrVS1zjGmqiw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id DF640C43140;
-	Thu, 25 Apr 2024 18:50:33 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1714071221; c=relaxed/simple;
+	bh=i229HuGnK6rnO0c8XB389KhSn7gIi9EvW1umOfM9bsw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=tFonw9/Mi3uY9UeT0yYNnd+3GGEY9sTFqQXrXydEiT080vwfWLNr+bQK/HhRb19ra2oXllMakFZR+fu3GKa4h/8VNCngY36+LevJfG/I70ByR2+Og/Ph6zVtirfq0nQVx0oheSPgRHwKHLpmCGZYLM1ESbPY65XhiUzav6Np8UY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=mWf5RM7H; arc=none smtp.client-ip=192.19.144.209
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: from mail-lvn-it-01.lvn.broadcom.net (mail-lvn-it-01.lvn.broadcom.net [10.36.132.253])
+	by relay.smtp-ext.broadcom.com (Postfix) with ESMTP id E5F72C0005E7;
+	Thu, 25 Apr 2024 11:53:37 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 relay.smtp-ext.broadcom.com E5F72C0005E7
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=broadcom.com;
+	s=dkimrelay; t=1714071218;
+	bh=i229HuGnK6rnO0c8XB389KhSn7gIi9EvW1umOfM9bsw=;
+	h=From:To:Cc:Subject:Date:From;
+	b=mWf5RM7HHqlww6PpMnfpHP2vCzipEdxptglTp4J9T74DTOu1T4J8Aq9CRsx53JCsE
+	 L+33QUdWJ4tq1XCTCbcZfHqQ0S7GOT34CCQSMO4L2Aq+TCzWNJMo/FZwZY9mlt0CjR
+	 BynAWffPdjePFdXCdMUTmZMEHkhVg8PEwZ/Nes9o=
+Received: from fainelli-desktop.igp.broadcom.net (fainelli-desktop.dhcp.broadcom.net [10.67.48.245])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mail-lvn-it-01.lvn.broadcom.net (Postfix) with ESMTPSA id ECCB218041CAC4;
+	Thu, 25 Apr 2024 11:53:35 -0700 (PDT)
+From: Florian Fainelli <florian.fainelli@broadcom.com>
+To: netdev@vger.kernel.org
+Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH net-next 0/2] net: dsa: adjust_link removal
+Date: Thu, 25 Apr 2024 11:53:34 -0700
+Message-Id: <20240425185336.2084871-1-florian.fainelli@broadcom.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,61 +69,21 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/8] net: dsa: b53: Remove adjust_link
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171407103390.26281.405270567595119985.git-patchwork-notify@kernel.org>
-Date: Thu, 25 Apr 2024 18:50:33 +0000
-References: <20240423183339.1368511-1-florian.fainelli@broadcom.com>
-In-Reply-To: <20240423183339.1368511-1-florian.fainelli@broadcom.com>
-To: Florian Fainelli <florian.fainelli@broadcom.com>
-Cc: netdev@vger.kernel.org, andrew@lunn.ch, olteanv@gmail.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- linux@armlinux.org.uk, linux-kernel@vger.kernel.org
 
-Hello:
+Now that the last in-tree driver (b53) has been converted to PHYLINK, we
+can get rid of all of code that catered to working with drivers
+implementing only PHYLIB's adjust_link callback.
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Florian Fainelli (2):
+  net: dsa: Remove fixed_link_update member
+  net: dsa: Remove adjust_link paths
 
-On Tue, 23 Apr 2024 11:33:31 -0700 you wrote:
-> b53 is now the only remaining driver that uses both PHYLIB's adjust_link
-> and PHYLINK's mac_ops callbacks, convert entirely to PHYLINK.
-> 
-> Florian Fainelli (8):
->   net: dsa: b53: Stop exporting b53_phylink_* routines
->   net: dsa: b53: Introduce b53_adjust_531x5_rgmii()
->   net: dsa: b53: Introduce b53_adjust_5325_mii()
->   net: dsa: b53: Force flow control for BCM5301X CPU port(s)
->   net: dsa: b53: Configure RGMII for 531x5 and MII for 5325
->   net: dsa: b53: Call b53_eee_init() from b53_mac_link_up()
->   net: dsa: b53: Remove b53_adjust_link()
->   net: dsa: b53: provide own phylink MAC operations
-> 
-> [...]
+ include/net/dsa.h |  11 ----
+ net/dsa/dsa.c     |   3 +-
+ net/dsa/port.c    | 135 ++++------------------------------------------
+ 3 files changed, 12 insertions(+), 137 deletions(-)
 
-Here is the summary with links:
-  - [net-next,1/8] net: dsa: b53: Stop exporting b53_phylink_* routines
-    https://git.kernel.org/netdev/net-next/c/65245197ecec
-  - [net-next,2/8] net: dsa: b53: Introduce b53_adjust_531x5_rgmii()
-    https://git.kernel.org/netdev/net-next/c/b3d06dc3707f
-  - [net-next,3/8] net: dsa: b53: Introduce b53_adjust_5325_mii()
-    https://git.kernel.org/netdev/net-next/c/0d18dea4cde6
-  - [net-next,4/8] net: dsa: b53: Force flow control for BCM5301X CPU port(s)
-    https://git.kernel.org/netdev/net-next/c/93a2579ed08c
-  - [net-next,5/8] net: dsa: b53: Configure RGMII for 531x5 and MII for 5325
-    https://git.kernel.org/netdev/net-next/c/536e5b2ecbae
-  - [net-next,6/8] net: dsa: b53: Call b53_eee_init() from b53_mac_link_up()
-    https://git.kernel.org/netdev/net-next/c/888128f360e1
-  - [net-next,7/8] net: dsa: b53: Remove b53_adjust_link()
-    https://git.kernel.org/netdev/net-next/c/600354352cf2
-  - [net-next,8/8] net: dsa: b53: provide own phylink MAC operations
-    https://git.kernel.org/netdev/net-next/c/d0a35d2948ec
-
-You are awesome, thank you!
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.34.1
 
 
