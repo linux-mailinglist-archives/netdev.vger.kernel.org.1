@@ -1,76 +1,82 @@
-Return-Path: <netdev+bounces-91475-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91476-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D1878B2CE2
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 00:16:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A27E08B2CE3
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 00:16:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6F4571C2182F
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 22:16:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 610D4289013
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 22:16:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 134D9156647;
-	Thu, 25 Apr 2024 22:10:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0DB3156979;
+	Thu, 25 Apr 2024 22:10:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XN7UFxu8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VvcXadWh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
+Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8524156250
-	for <netdev@vger.kernel.org>; Thu, 25 Apr 2024 22:10:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EEDB156F34;
+	Thu, 25 Apr 2024 22:10:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714083019; cv=none; b=lAa9iPzQJ8TI9kcckp+u+kFnxSmEw7tKz03pjLeKFZr199o7wMq9GT7mgVHa+Um/a7wbkQXpsFpWUUwJF7PrOQXTYVXv8cuuNqpJhcIXPOIsAFg6LQOnmsyuhwFHaOEVvZaXPvT1C5lk3ZCgrPnUx692++BoWeFQJq04nGEjAM0=
+	t=1714083020; cv=none; b=UlQU5U8HgiqtqwPE1XgoisesUCndbYFNwIW79TwGnum7GtlVcFk67TgAFivTxuRONRo7XL7/qaV8Jh89CCogPMjdIYXtTtmGwCmhrJwPxMiSlpETAphvm+7EF5myBJOwZlZU1/yCLQy7VacoVfldAoWXGjgdFEZ2g/UoxBjMoVU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714083019; c=relaxed/simple;
-	bh=u5YCPBbfU1mP1ZcMWk36sIHt5zaVaIMvB2Iu7ja/E7E=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=iDDR1YwQ7Hr9eF38+a58TvZqAYhLQDYXG0VK9lGRDpHRWYyj1j8YwDvb8CiExYzUHvYRP2sKWtWXe7oNFD2druui3dZdP/xNo7c4RJF8WjD96B6hLCuDiYFtqiz/b+53TjVBGGaPfqijOw324oI5+sL5QUqob9cP83sPj8OyFL4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XN7UFxu8; arc=none smtp.client-ip=209.85.215.179
+	s=arc-20240116; t=1714083020; c=relaxed/simple;
+	bh=1SF70NTHCTRYZByoZHjPlVMIlx5+KlolbViI5fbMAFc=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=oKcyaGYOsVfam9/WmGlZ0pBmuPxpDvAoh8tzcp2GFfgOSoWuh2NsgOfALrK4BzKDc1YaiXeyO1sP6nP5oqCdP/U00xYov7PeAF6pfdGV/y6OXLUrDLhS8w5fEGRa4zzVnOv+ooVuTQ4J+4KouAmZRF3z83NBVqLOvrfTs3cEq0k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VvcXadWh; arc=none smtp.client-ip=209.85.216.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-60585faa69fso1078976a12.1
-        for <netdev@vger.kernel.org>; Thu, 25 Apr 2024 15:10:17 -0700 (PDT)
+Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-2a87bd53dc3so1320671a91.2;
+        Thu, 25 Apr 2024 15:10:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1714083017; x=1714687817; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=l4ObHrHeCFN64wSM7NzDkDxv31XoYnyH95XTbkMwAw0=;
-        b=XN7UFxu89UjnOolvYxtuV8vaSw38GV3K/lYqkmjEi+NREcXCenMyP/8S/54VqrJsz6
-         w1rVRBWJoISRLg3LaC+DlTySRXu2zgWcagD/BZ+0I/gBU22q5Ub+HJyORfZw2rElvkv5
-         V73XOOjteFkb3JOgHRo24tbBbEJFnpShmwyrBm4q8DTFzwYCwmnOUqQXaXed1dufgcGs
-         dn6pzKNsWZGnNYNWGB+/yGs09KD/2T83Yx9d2Aw4hz0NwlarYQMre5D690ZI6YLcFBlx
-         fqluNaMRWQZs7hJy0iyLxQlK/dZXTDuaFu6TpsjnBi2yn+CvCTKj8+CDWGKyELqjr9U4
-         ZZsA==
+        d=gmail.com; s=20230601; t=1714083018; x=1714687818; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=o13Arm3Rvf2gFBkSt1a4X4Ztws3UYrTbZey0ecJRfQk=;
+        b=VvcXadWhHGJEe6Sixyqlq102YV3d3uUU9nHcRYqUtLevgex3uK/LjTRKY4qMhaZQ5Z
+         qZ4Qnz6B8y9wJ5WAjY6apLIXEUVFiOXz2kesv6PCs1T/TOidrSgSMOYF5quf3A+tpGW7
+         bcYeWIRjdA55aZvdyMgwoDOHeUszzfEQxvhu07vN0jY1+ulT+pIxbrcHuuhuZ2dgy5fS
+         qHKCFdpDLue4haZQ0rMBomphSYHIsuyCDAr4vEWkGHUsfsGMezupCIlXYa5yRm9L5P2j
+         AJuBj/KRXk66ZkFrEAmsJ0NZUyvhXPBpsJThd8ZJx8O88WvfBcTwcyg60SmyJJg83Xt/
+         bv/Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714083017; x=1714687817;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=l4ObHrHeCFN64wSM7NzDkDxv31XoYnyH95XTbkMwAw0=;
-        b=HzXa9OUBg9tiqNlXeKmYG76aaS2shCUZ0YwbHudTi9m6EFQia9v+D+cmTNgp7db539
-         4rJE1Utgj0kAwImyPXCyQn2RAuHYSLKtbjf1RiOXA1olXppWb/OX6wPwGBAdi9qW12fp
-         8I18tWgZFIZylBMoBte1LvEiZOCS9HfRIGtG9J+IGEVKOBNE60DjefDFFk1jJjGgnLBz
-         0XhSTv/7JNaB5b3JZxyaeuZ5feb1avsBXAUoolXdZFXRHE0uRNZqEfRlC266+/7xaXDi
-         nWIXjJK6hBMLL39qLzdkKpn3JFq1oIIEKDi1lfdDTxyPg9RG4KU8OooP/c3ylMhzQ2VG
-         ThzQ==
-X-Gm-Message-State: AOJu0Yy3FIL9Rld8XlYqb8PXidWWb1USIJhQ5A3GasdE4fiChXHZFZJw
-	oGAqFwYr7AgGDHUg0zPfPxGCzOiIwYZDZ12qeZXcZ+YkfyOaRk+jB3Zbig==
-X-Google-Smtp-Source: AGHT+IGd+/ZlsSmsAskam+Ti+AZUk16zxsI/1v9saOmqyoUfaIyU3KDBhU2rBkcTYxKAen4oSOwDPw==
-X-Received: by 2002:a17:90a:d397:b0:2ac:7bd6:cc6a with SMTP id q23-20020a17090ad39700b002ac7bd6cc6amr1500980pju.0.1714083016613;
-        Thu, 25 Apr 2024 15:10:16 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1714083018; x=1714687818;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=o13Arm3Rvf2gFBkSt1a4X4Ztws3UYrTbZey0ecJRfQk=;
+        b=sddrUfKxlszhPnVP5XQJJMWUezuG/4Zg6V6RAJ9gPnm5jbN/tBTp5n7w7Qp6Oe35Dj
+         uQCqu1VjZ+QZySoPjeask8rawsPz6Tp/igNTr/Oy/K/PrKjO5/W3s0l2UcsUvo5CW/97
+         0U2vNhP5AMO04zgKz/ZlYisLn9giY6BhXtJ8sLcfvzo3s2sJ8FWufh0yyMNNXD6kHn7S
+         djZXZl7Q/F/yP7PesL8+SksPsUA25TXdqDrLP+HzAkbFji+qVQyCTBaGxvPH1GU5eo4u
+         5wn3DvuS6NLXMFtBxCgJ5Ko5J+NNiAOvbj9pKIh2nKc9z2JG+t3oAyNuo7BO8bkto3Zx
+         sT2Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVtKJrKjnIPdEG/SWk0738aB37jHFrP8wOphcxjINfsIQbJDcOTU340UiU9CKkUBxA7eeWHNuWk2uCpx+Qbu4mu2/tc9CZO
+X-Gm-Message-State: AOJu0Yykqw4ZpDjI14cj3a7/EB6epSqMf/KcbWo4oOwSibu5LKoY5Sxy
+	4ZfYqOS6XW9B7tvxWv0JZB0Z5lZwASbUKJ0xhWptAhtVQfy3H2UQ2FGd6Q==
+X-Google-Smtp-Source: AGHT+IHlRS1u7K5WU9f7KDrUkw7flbMGd+rwc8wHlXIIYFTOixaANHJOWKGvqQYECG7KwoklSKEODg==
+X-Received: by 2002:a17:90a:bd97:b0:2ac:504f:af8b with SMTP id z23-20020a17090abd9700b002ac504faf8bmr909457pjr.36.1714083017786;
+        Thu, 25 Apr 2024 15:10:17 -0700 (PDT)
 Received: from stbirv-lnx-1.igp.broadcom.net ([192.19.223.252])
-        by smtp.gmail.com with ESMTPSA id e5-20020a17090a4a0500b002a269828bb8sm13394766pjh.40.2024.04.25.15.10.15
+        by smtp.gmail.com with ESMTPSA id e5-20020a17090a4a0500b002a269828bb8sm13394766pjh.40.2024.04.25.15.10.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Apr 2024 15:10:16 -0700 (PDT)
+        Thu, 25 Apr 2024 15:10:17 -0700 (PDT)
 From: Doug Berger <opendmb@gmail.com>
 To: netdev@vger.kernel.org
-Cc: Doug Berger <opendmb@gmail.com>
-Subject: [PATCH 0/3] net: bcmgenet: protect contended accesses
-Date: Thu, 25 Apr 2024 15:10:04 -0700
-Message-Id: <20240425221007.2140041-1-opendmb@gmail.com>
+Cc: Doug Berger <opendmb@gmail.com>,
+	stable@vger.kernel.org
+Subject: [PATCH 1/3] net: bcmgenet: synchronize EXT_RGMII_OOB_CTRL access
+Date: Thu, 25 Apr 2024 15:10:05 -0700
+Message-Id: <20240425221007.2140041-2-opendmb@gmail.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20240425221007.2140041-1-opendmb@gmail.com>
+References: <20240425221007.2140041-1-opendmb@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,23 +85,53 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Some registers may be modified by parallel execution contexts and
-require protections to prevent corruption.
+The EXT_RGMII_OOB_CTRL register can be written from different
+contexts. It is predominantly written from the adjust_link
+handler which is synchronized by the phydev->lock, but can
+also be written from a different context when configuring the
+mii in bcmgenet_mii_config().
 
-A review of the driver revealed the need for these additional
-protections.
+The chances of contention are quite low, but it is conceivable
+that adjust_link could occur during resume when WoL is enabled
+so use the phydev->lock synchronizer in bcmgenet_mii_config()
+to be sure.
 
-Doug Berger (3):
-  net: bcmgenet: synchronize EXT_RGMII_OOB_CTRL access
-  net: bcmgenet: synchronize use of bcmgenet_set_rx_mode()
-  net: bcmgenet: synchronize UMAC_CMD access
+Fixes: afe3f907d20f ("net: bcmgenet: power on MII block for all MII modes")
+Cc: stable@vger.kernel.org
+Signed-off-by: Doug Berger <opendmb@gmail.com>
+---
+ drivers/net/ethernet/broadcom/genet/bcmmii.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
- drivers/net/ethernet/broadcom/genet/bcmgenet.c   | 16 ++++++++++++++--
- drivers/net/ethernet/broadcom/genet/bcmgenet.h   |  4 +++-
- .../net/ethernet/broadcom/genet/bcmgenet_wol.c   |  8 +++++++-
- drivers/net/ethernet/broadcom/genet/bcmmii.c     |  6 +++++-
- 4 files changed, 29 insertions(+), 5 deletions(-)
-
+diff --git a/drivers/net/ethernet/broadcom/genet/bcmmii.c b/drivers/net/ethernet/broadcom/genet/bcmmii.c
+index 9ada89355747..86a4aa72b3d4 100644
+--- a/drivers/net/ethernet/broadcom/genet/bcmmii.c
++++ b/drivers/net/ethernet/broadcom/genet/bcmmii.c
+@@ -2,7 +2,7 @@
+ /*
+  * Broadcom GENET MDIO routines
+  *
+- * Copyright (c) 2014-2017 Broadcom
++ * Copyright (c) 2014-2024 Broadcom
+  */
+ 
+ #include <linux/acpi.h>
+@@ -275,6 +275,7 @@ int bcmgenet_mii_config(struct net_device *dev, bool init)
+ 	 * block for the interface to work, unconditionally clear the
+ 	 * Out-of-band disable since we do not need it.
+ 	 */
++	mutex_lock(&phydev->lock);
+ 	reg = bcmgenet_ext_readl(priv, EXT_RGMII_OOB_CTRL);
+ 	reg &= ~OOB_DISABLE;
+ 	if (priv->ext_phy) {
+@@ -286,6 +287,7 @@ int bcmgenet_mii_config(struct net_device *dev, bool init)
+ 			reg |= RGMII_MODE_EN;
+ 	}
+ 	bcmgenet_ext_writel(priv, reg, EXT_RGMII_OOB_CTRL);
++	mutex_unlock(&phydev->lock);
+ 
+ 	if (init)
+ 		dev_info(kdev, "configuring instance for %s\n", phy_name);
 -- 
 2.34.1
 
