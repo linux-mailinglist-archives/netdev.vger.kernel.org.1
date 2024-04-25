@@ -1,122 +1,156 @@
-Return-Path: <netdev+bounces-91355-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91356-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79AB28B24CD
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 17:14:12 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 882A48B24E0
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 17:17:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AB2351C20C4A
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 15:14:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3DE2F1F22271
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 15:17:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 836C614A61B;
-	Thu, 25 Apr 2024 15:14:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3110E14A62E;
+	Thu, 25 Apr 2024 15:17:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="lB5WciM7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FoMDjhYe"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05BFB14A623;
-	Thu, 25 Apr 2024 15:14:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABDE237152;
+	Thu, 25 Apr 2024 15:17:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714058048; cv=none; b=W7TgOvIcy31TQ4dYbZoE3CuDQz3dngTx4m1t88V+5fdH03BgvQOJQec6z0iopb9lJGzo69rDXyf5SW2jDk7JzAzKUbffg1zPJZlsDw79cnjcvejT3QWOILzylvFcG/XcyzSDoreul6GeioU2IbNUESM4bhALhOPx679eiF+E0jw=
+	t=1714058243; cv=none; b=od2f8co8tZGkga0hBLBjxo32olpr1kyMmDGNTJnayWArkOGUsElR/aKyBV30ZflDsbNljc7KRO/LYYLVPezA/U8WjfwX7+oI0YPGqnB+jqjyBQYt/z4nd7jM42To3cEsA5txP+4Gte9ill/Yy+dhOBPXqb14sTjZBPorX84JQiI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714058048; c=relaxed/simple;
-	bh=p5edgbalxUotiAK4g9UR1BVKXC2vuTUeta0FUdZr7qo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UPwVlpGWNltjVZmX10lJAR7fbd6vmacNl2y/FO46uwhTfwezBa4s51KkDcGSuA0v9BxkC+/49hVZnSCSSsMuu+nXNqNOs7/NaMDzm0xlVC0VvT/+GfA5NjE0IU8dypZTOvll5/hhiPr39VZZXeMR9Wi/5Ik5K6nUKzFDxYqAaHo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=lB5WciM7; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=SOcqtwMWjNdrJ7DWWV47YY5kyFrg6cLoJn7IbJl/aRk=; b=lB5WciM7UX8DfNBtZYPNwydUK5
-	A1CQwdEOoWDDLpfYy1EoNst+ybo7mpFVMQBn0tAE/pKhNRFSdy4raiSMKTNNDLJRzN5Av0QJzkLsC
-	pLOBsvdaOjBBLsEw2nnKSP4dPsTsUskX6t87asb4QzV70D/rVdKNyXbBw69aaEBcA9tE=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1s00nK-00Dzqc-5y; Thu, 25 Apr 2024 17:13:54 +0200
-Date: Thu, 25 Apr 2024 17:13:54 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Sky Huang <SkyLake.Huang@mediatek.com>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Qingfang Deng <dqfext@gmail.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	Steven Liu <Steven.Liu@mediatek.com>
-Subject: Re: [PATCH 2/3] net: phy: mediatek: Add mtk phy lib for token ring
- access & LED/other manipulations
-Message-ID: <d6c62ab9-256b-47d2-8145-7dc6ffcbd020@lunn.ch>
-References: <20240425023325.15586-1-SkyLake.Huang@mediatek.com>
- <20240425023325.15586-3-SkyLake.Huang@mediatek.com>
+	s=arc-20240116; t=1714058243; c=relaxed/simple;
+	bh=NyXHvmLZz8zCA1WSNDr/ZsGXkco2uGIpPV6bacmAaJs=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=nHIZs/M5Bdy76g20yT2skYtHzGS0S0K9sxR66u5ioaYZYYWSq8B59gG7qTEtQ0Ap3iJVld/lASurJoWU7NshP4wvG68ece+UtVG1kfPDKTyl1+bOan3xecll27peN2QgcMqb1KoNVC+VapK+nUHeqSL71CeI6W3q7VKGogxEbzY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FoMDjhYe; arc=none smtp.client-ip=209.85.222.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-78f02298dc6so96953285a.1;
+        Thu, 25 Apr 2024 08:17:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1714058240; x=1714663040; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=x75rcgd1WZX02fFS2R1uxG8FYxRqmmpdo9LK26BpYN4=;
+        b=FoMDjhYeU6BPTOSrt4grvKlv7ejx59wPtdIUzgI5VeYi6Gy0Z+5w1Tz4SezylGCEyp
+         GvLhGAGVhGbqxSAyDquyQ7weR+LmYPHR9S518cQAmanLfYPEU+Yhw1Qizbjer0aVyhkj
+         Kj/8VfoTwxXFSCgwGLFU1hH6wR+49jw5DToNE97XCCcXucns1J59kvuuhil1Wi5XmA8n
+         euqMMo3h0z/0gdw7LRbYt/h8aRzTdX/vw2Om92qOB6QBsDocsfEhp5mRLEa4q+3edlY5
+         DCRMFQJgFzN2/2OoHzzCzlLaN3qSVILfJ+9URCZagBccxYJtW6lK/QOmnfuAVd72WQ+l
+         ulHQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714058240; x=1714663040;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=x75rcgd1WZX02fFS2R1uxG8FYxRqmmpdo9LK26BpYN4=;
+        b=Amk3ziZ334LYQSZ+y/Teo7DVWNYaLNwAbK5zzuwSEUUC1t2reRmzdR89n+RuBgbfWU
+         DSuqZvt1nEoooLasXxAl74W+23CLX8Le008IVl0WkJG+ZnEml9kieaQGZk/TFpYVYIQI
+         xOVkVJkiIF9ujyyNVSaF2CLkL5H62CzQh0CT5sapHJJzxLcgFJM1xK8odUgemD8UtCfH
+         0Yp+MDlG1YPhap9/U0MQT0m/nXoZDhd6mbxqJeMwwd7GsTNFbgwsXom2U4mgHLNTRILe
+         /Z2RZ7djdwfboYDxxE08QNuxdiqVNN57lGYoKKBIF50yIKHOYBraHQZyPKsV0AM/oVny
+         D6jg==
+X-Forwarded-Encrypted: i=1; AJvYcCW98O+ZvM4ZQXXxonmjCgDzA5GBgIW8CfmTuNlWBl9xtvAav1dhY41eaKWAp9m2JgeJ/tbBO3j/K0DJ7RAd+Q7TuoIBT9aiR9j5zL25FlO3YPT/fGMlWzDB5DIjyuPxA2Ke/dhh
+X-Gm-Message-State: AOJu0Yw07j+owuGNP5Mmmr5hcCIWx2F+ho9BsMwv/iGhdw0lWmnOz2tr
+	3UWwEIfQpby/gmZx08BUkJQNP1UtmA6qp/kRiX1arBbW0zopaPKKsvZENQ==
+X-Google-Smtp-Source: AGHT+IFBfCpZhQZ7/W7MKJfETDSIG6OSdQZI9Jd/FO1VQetL9CAUU/ExHdb2gA7cfilvzV1Lp1ZS2g==
+X-Received: by 2002:a05:620a:31a2:b0:790:9666:5c8a with SMTP id bi34-20020a05620a31a200b0079096665c8amr4921395qkb.19.1714058240597;
+        Thu, 25 Apr 2024 08:17:20 -0700 (PDT)
+Received: from localhost (164.146.150.34.bc.googleusercontent.com. [34.150.146.164])
+        by smtp.gmail.com with ESMTPSA id k6-20020a05620a07e600b007905e4a1ae1sm5635698qkk.96.2024.04.25.08.17.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 25 Apr 2024 08:17:20 -0700 (PDT)
+Date: Thu, 25 Apr 2024 11:17:19 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Felix Fietkau <nbd@nbd.name>, 
+ netdev@vger.kernel.org, 
+ Eric Dumazet <edumazet@google.com>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ David Ahern <dsahern@kernel.org>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>
+Cc: willemdebruijn.kernel@gmail.com, 
+ linux-kernel@vger.kernel.org
+Message-ID: <662a73ffea9df_1e1a162941e@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20240425150432.44142-3-nbd@nbd.name>
+References: <20240425150432.44142-1-nbd@nbd.name>
+ <20240425150432.44142-3-nbd@nbd.name>
+Subject: Re: [PATCH v2 net-next v2 2/5] net: add support for segmenting TCP
+ fraglist GSO packets
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240425023325.15586-3-SkyLake.Huang@mediatek.com>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Apr 25, 2024 at 10:33:24AM +0800, Sky Huang wrote:
-> From: "SkyLake.Huang" <skylake.huang@mediatek.com>
+Felix Fietkau wrote:
+> Preparation for adding TCP fraglist GRO support. It expects packets to be
+> combined in a similar way as UDP fraglist GSO packets.
+> For IPv4 packets, NAT is handled in the same way as UDP fraglist GSO.
 > 
-> Integrate some common phy manipulations in mtk-phy-lib:
-> 1. Token ring access: This is proprietary register access on page 52b5.
-> Use these APIs so we can see which fields we're going to modify/set/clear.
-> 2. LED: External/internal giga & internal 2.5g phy share almost the same
-> LED control registers/logic.
-> 3. Extend 1G TX/RX link pulse time: We observe that some devices' 1G
-> training time violates specification, which may last 2230ms and affect
-> later TX/RX link pulse time. So we try to extend our 1G TX/RX link pulse
-> time so that we can still detect such devices.
-
-Please break this up into 3 patches.
-
-> -#define MTK_PHY_PAGE_EXTENDED_52B5		0x52b5
+> Signed-off-by: Felix Fietkau <nbd@nbd.name>
+> ---
+>  net/ipv4/tcp_offload.c   | 69 ++++++++++++++++++++++++++++++++++++++++
+>  net/ipv6/tcpv6_offload.c |  3 ++
+>  2 files changed, 72 insertions(+)
+> 
+> diff --git a/net/ipv4/tcp_offload.c b/net/ipv4/tcp_offload.c
+> index fab0973f995b..e455f884190c 100644
+> --- a/net/ipv4/tcp_offload.c
+> +++ b/net/ipv4/tcp_offload.c
+> @@ -28,6 +28,72 @@ static void tcp_gso_tstamp(struct sk_buff *skb, unsigned int ts_seq,
+>  	}
+>  }
+>  
+> +static void __tcpv4_gso_segment_csum(struct sk_buff *seg,
+> +				     __be32 *oldip, __be32 *newip,
+> +				     __be16 *oldport, __be16 *newport)
+> +{
+> +	struct tcphdr *th;
+> +	struct iphdr *iph;
 > +
-> +/* Registers on Token Ring debug nodes */
-> +/* ch_addr = 0x0, node_addr = 0x7, data_addr = 0x15 */
-> +#define NORMAL_MSE_LO_THRESH_MASK		GENMASK(15, 8) /* NormMseLoThresh */
+> +	if (*oldip == *newip && *oldport == *newport)
+> +		return;
 > +
-> +/* ch_addr = 0x0, node_addr = 0xf, data_addr = 0x3c */
-> +#define REMOTE_ACK_COUNT_LIMIT_CTRL_MASK	GENMASK(2, 1) /* RemAckCntLimitCtrl */
+> +	th = tcp_hdr(seg);
+> +	iph = ip_hdr(seg);
 > +
-> +/* ch_addr = 0x1, node_addr = 0xd, data_addr = 0x20 */
-> +#define VCO_SLICER_THRESH_HIGH_MASK		GENMASK(23, 0) /* VcoSlicerThreshBitsHigh */
+> +	inet_proto_csum_replace4(&th->check, seg, *oldip, *newip, true);
+> +	inet_proto_csum_replace2(&th->check, seg, *oldport, *newport, false);
+> +	*oldport = *newport;
 > +
-> +/* ch_addr = 0x1, node_addr = 0xf, data_addr = 0x0 */
-> +#define DFE_TAIL_EANBLE_VGA_TRHESH_1000		GENMASK(5, 1) /* DfeTailEnableVgaThresh1000 */
+> +	csum_replace4(&iph->check, *oldip, *newip);
+> +	*oldip = *newip;
+> +}
 > +
-> +/* ch_addr = 0x1, node_addr = 0xf, data_addr = 0x1 */
-> +#define MRVL_TR_FIX_100KP_MASK			GENMASK(22, 20) /* MrvlTrFix100Kp */
-> +#define MRVL_TR_FIX_100KF_MASK			GENMASK(19, 17) /* MrvlTrFix100Kf */
-> +#define MRVL_TR_FIX_1000KP_MASK			GENMASK(16, 14) /* MrvlTrFix1000Kp */
-> +#define MRVL_TR_FIX_1000KF_MASK			GENMASK(13, 11) /* MrvlTrFix1000Kf */
+> +static struct sk_buff *__tcpv4_gso_segment_list_csum(struct sk_buff *segs)
+> +{
+> +	struct sk_buff *seg;
+> +	struct tcphdr *th, *th2;
+> +	struct iphdr *iph, *iph2;
+> +	__be32 flags, flags2;
+> +
+> +	seg = segs;
+> +	th = tcp_hdr(seg);
+> +	iph = ip_hdr(seg);
+> +	flags = tcp_flag_word(th);
+> +	flags2 = tcp_flag_word(tcp_hdr(seg->next));
 
-This is not what i would expect for moving code into a library. I
-expect code to be deleted from one file and appear in another file,
-with some minor changes, static dropped, EXPORT_SYMBOL_PHY added.  If
-i see code just move, i don't need to review it line for line. If you
-do want to change the code, please move it into the library first, and
-make modifications.
+Vestigial, now that flag overwrite is removed in v2?
 
-Lots of small patches, which are obviously correct.
-
-	Andrew
+All this code is very similar to __udpv4_gso_segment_list_csum. But
+the zero checksum handling in __udpv4_gso_segment_csum makes it just
+different enough that I also do not immediately see a straightforward
+way to avoid duplicating.
 
