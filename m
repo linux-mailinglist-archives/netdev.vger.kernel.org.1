@@ -1,105 +1,132 @@
-Return-Path: <netdev+bounces-91450-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91451-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2ABA8B29E8
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 22:34:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1EEAA8B29EF
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 22:35:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 63F0B1F21460
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 20:34:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 412581C206AA
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 20:35:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1BD75A0EA;
-	Thu, 25 Apr 2024 20:34:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12533152539;
+	Thu, 25 Apr 2024 20:34:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cYg6OFE3"
+	dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b="Z+gqGa8P"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ua1-f42.google.com (mail-ua1-f42.google.com [209.85.222.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from todd.t-8ch.de (todd.t-8ch.de [159.69.126.157])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E6E918EAB
-	for <netdev@vger.kernel.org>; Thu, 25 Apr 2024 20:34:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D89C18EAB;
+	Thu, 25 Apr 2024 20:34:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.69.126.157
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714077286; cv=none; b=Q2xLd7kKsgMX9BCl321sxxFttiQI9fH8MPDcDrZyJwpebM/wEFL7+IA8Z4+/xD8eu2DZUVbuJ47kvonV/AQAbHisL//gch/cm6CKlFDd+IiEYs4fnA8UWGoCj83S+km1sivH2NjmwoC2m6beRxSpUTS5qig5IgbhzbmfkWOffxE=
+	t=1714077298; cv=none; b=YjbEIPA5ZQ3mGIn4jdMOZR4+KmHM+0oRUPUnWZlndMqz4cHzuTq4wbqEqyidD8Wo+gES6PwThNWpgy1vywzWZml8GTmNNOoDxpVeO54OF86YwWY8zYysI5rizDQGXGidhOtF2Tblp9A/ml/c+AENXNWw1WNowVwt/4NvLs+d6Is=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714077286; c=relaxed/simple;
-	bh=V/6DRcfVBeYI/EV9EeadqQiL8ogpcOEiqAoK1MwLNCo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=If6r3xEWZaqntScbHjxIY8nroieLgjZpvPcB85pM+gQSD1h7cpYm2Yig/aifpg95piiyblw1cMenOF4hOFHPM9Dufk4lBIbdl0EbLfKdiN3wD8m6RpDHmWWD9uqEPuBknn/Jy6iZgrQ8erT9useg3UAN/DZyoW5nitVNuHcF70k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cYg6OFE3; arc=none smtp.client-ip=209.85.222.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ua1-f42.google.com with SMTP id a1e0cc1a2514c-7ef180ad3b5so492678241.1
-        for <netdev@vger.kernel.org>; Thu, 25 Apr 2024 13:34:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1714077284; x=1714682084; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=V/6DRcfVBeYI/EV9EeadqQiL8ogpcOEiqAoK1MwLNCo=;
-        b=cYg6OFE3C3Cd/Tqspqyuyako6Vye5UZM0c34M70TP1dIK0RR5nn5AQlF3SkQlVWkOW
-         VtcGCFXNRWrXQc0w7Bmi21UJr02iIBBTU+vGeW7aBYkheVyiM7gLRbpEvVkdRfCoPAxW
-         eH5HnM3pGJbdIO+ZxR8ordCz2LUa43haCstDgJbm57intrV0KxCDQN+Eyo7lK2kHqL7O
-         u2KAW2bnhaVEO4DBt7wtgT4PsVzMNCs/5XIHWtiouyIlsv3aBPNrHaIpAXyAEkr/2Nxw
-         I6okbYko1RQwg7wEKlwOdac1UYG/ZYvHMv/sjQtlNERbZH3uA/8/7djpuQeg3nPqVy6T
-         S3nQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714077284; x=1714682084;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=V/6DRcfVBeYI/EV9EeadqQiL8ogpcOEiqAoK1MwLNCo=;
-        b=uj0oOT6OxlJ7OttUZIzV9GWKzB1zuZZ4IUTf8pfDOiur6kJ5KXl4Y6Wzb4wJ8ktmp6
-         snw1rr3q7CUmAOH5M+BGNtl1eI7phv33vmS5vHrb4OM0Gby4dULjowR4bq8nZhljzuRF
-         152tc7m4WWGYd5RexMqdpEh6cOelqusjcPkYuPXXVW/EdVqyWncKRNUkSxsij3F4hCPP
-         28BJuchREse39AE3dGHzik+W2NXktkzFaW8pQo7PeV4jHd9bN87nVIq9kUNDckGX0plt
-         XraLtTXvzP9WqgTB3Iu6dfeYTo42ViFYG3jzIQeE7wh+6LFzZEfy6X4fx7ybNi4/SIhg
-         09bQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVeDqLzSLSxpSFkX8qSbz9cf6bi3AoL62V7UxhG/HaWmKpPNeKcUB8sYt3S18E/5RpWW33SXvryd/c+T42oIswGBHDbr6UA
-X-Gm-Message-State: AOJu0YzkinZnbwjjKHcII9aEq8g9TsRC6XaqurM7XtUFQFdOclxBMZnG
-	rJgnbvcjBW5mhh/ccGJQ/HycpASPFEjiuVRgHpAH+VKJD5RU52ICQtNHfPzNj1PutGa4C42gI1f
-	e210BR230FZ4jMw1tg00AC3W6axsohbDx6Flk
-X-Google-Smtp-Source: AGHT+IHdUtFAbWwPDRr3GNYBdVZyNScxO1JKcp9RaUdWwHW4UjaN0ujk54ehAeO34V7fwRw976ta1xGZlNpGPo6qyHo=
-X-Received: by 2002:a05:6102:316b:b0:47b:dc17:104b with SMTP id
- l11-20020a056102316b00b0047bdc17104bmr691179vsm.2.1714077282730; Thu, 25 Apr
- 2024 13:34:42 -0700 (PDT)
+	s=arc-20240116; t=1714077298; c=relaxed/simple;
+	bh=bZqtcMhFx7TDPaIgrLqyfpl0/OfmMPAKopBgZDQprIg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tDTYRMm3ZJvyyo+JHX4346bHXwQk4zKH+Px/X2onJEJ5G1ZTJY86z5gwgO4Pk/C8HdqIMEKVQcbYl9VYu/L8H9xGbpqj2BAgVmHgk20Tn0rsKhomwQ+zr/X2wdCYjeJUrJTGjactRQqDGjQMSVbKVAG5nDnHLmEojx579uWTEWs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=weissschuh.net; spf=pass smtp.mailfrom=weissschuh.net; dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b=Z+gqGa8P; arc=none smtp.client-ip=159.69.126.157
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=weissschuh.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=weissschuh.net
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=weissschuh.net;
+	s=mail; t=1714077293;
+	bh=bZqtcMhFx7TDPaIgrLqyfpl0/OfmMPAKopBgZDQprIg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Z+gqGa8PD+3BrRxF+Exe+s/+n1FrcsSYPFeQUrvoT2UUvEiGsEXMDYuXjYQJDYiRJ
+	 9/0fJxtI2lDBLEHhkegO15rObvRhgIuWQMhE+D085PPIsVKHmI/z9Zz6qr7xUxUgOg
+	 gdOVIytSYg1zquf83mxdxD8VyvGj7mHBMGjmlG8k=
+Date: Thu, 25 Apr 2024 22:34:52 +0200
+From: Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <linux@weissschuh.net>
+To: Joel Granados <j.granados@samsung.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, Luis Chamberlain <mcgrof@kernel.org>, 
+	Kees Cook <keescook@chromium.org>, Eric Dumazet <edumazet@google.com>, 
+	Dave Chinner <david@fromorbit.com>, linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-riscv@lists.infradead.org, linux-mm@kvack.org, linux-security-module@vger.kernel.org, 
+	bpf@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, linux-xfs@vger.kernel.org, 
+	linux-trace-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org, 
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org, kexec@lists.infradead.org, 
+	linux-hardening@vger.kernel.org, bridge@lists.linux.dev, lvs-devel@vger.kernel.org, 
+	linux-rdma@vger.kernel.org, rds-devel@oss.oracle.com, linux-sctp@vger.kernel.org, 
+	linux-nfs@vger.kernel.org, apparmor@lists.ubuntu.com
+Subject: Re: [PATCH v3 00/11] sysctl: treewide: constify ctl_table argument
+ of sysctl handlers
+Message-ID: <d11f875e-4fb5-46dd-a412-84818208c575@t-8ch.de>
+References: <20240423-sysctl-const-handler-v3-0-e0beccb836e2@weissschuh.net>
+ <CGME20240425031241eucas1p1fb0790e0d03ccbe4fca2b5f6da83d6db@eucas1p1.samsung.com>
+ <20240424201234.3cc2b509@kernel.org>
+ <20240425110412.2n5d27smecfncsfa@joelS2.panther.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240425193450.411640-1-edumazet@google.com>
-In-Reply-To: <20240425193450.411640-1-edumazet@google.com>
-From: Neal Cardwell <ncardwell@google.com>
-Date: Thu, 25 Apr 2024 16:34:22 -0400
-Message-ID: <CADVnQymDnLd-S8zMKOF-ZGzaAHRu3yMkP+C34EaLdY_L79qQCg@mail.gmail.com>
-Subject: Re: [PATCH net-next] tcp: fix tcp_grow_skb() vs tstamps
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240425110412.2n5d27smecfncsfa@joelS2.panther.com>
 
-On Thu, Apr 25, 2024 at 3:34=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> I forgot to call tcp_skb_collapse_tstamp() in the
-> case we consume the second skb in write queue.
->
-> Neal suggested to create a common helper used by tcp_mtu_probe()
-> and tcp_grow_skb().
->
-> Fixes: 8ee602c63520 ("tcp: try to send bigger TSO packets")
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> Cc: Neal Cardwell <ncardwell@google.com>
-> ---
+Hi Joel,
 
-Acked-by: Neal Cardwell <ncardwell@google.com>
+On 2024-04-25 13:04:12+0000, Joel Granados wrote:
+> On Wed, Apr 24, 2024 at 08:12:34PM -0700, Jakub Kicinski wrote:
+> > On Tue, 23 Apr 2024 09:54:35 +0200 Thomas Weißschuh wrote:
+> > > The series was split from my larger series sysctl-const series [0].
+> > > It only focusses on the proc_handlers but is an important step to be
+> > > able to move all static definitions of ctl_table into .rodata.
+> > 
+> > Split this per subsystem, please.
+> It is tricky to do that because it changes the first argument (ctl*) to
+> const in the proc_handler function type defined in sysclt.h:
+> "
+> -typedef int proc_handler(struct ctl_table *ctl, int write, void *buffer,
+> +typedef int proc_handler(const struct ctl_table *ctl, int write, void *buffer,
+>                 size_t *lenp, loff_t *ppos);
+> "
+> This means that all the proc_handlers need to change at the same time.
+> 
+> However, there is an alternative way to do this that allows chunking. We
+> first define the proc_handler as a void pointer (casting it where it is
+> being used) [1]. Then we could do the constification by subsystem (like
+> Jakub proposes). Finally we can "revert the void pointer change so we
+> don't have one size fit all pointer as our proc_handler [2].
+> 
+> Here are some comments about the alternative:
+> 1. We would need to make the first argument const in all the derived
+>    proc_handlers [3] 
+> 2. There would be no undefined behavior for two reasons:
+>    2.1. There is no case where we change the first argument. We know
+>         this because there are no compile errors after we make it const.
+>    2.2. We would always go from non-const to const. This is the case
+>         because all the stuff that is unchanged in non-const.
+> 3. If the idea sticks, it should go into mainline as one patchset. I
+>    would not like to have a void* proc_handler in a kernel release.
+> 4. I think this is a "win/win" solution were the constification goes
+>    through and it is divided in such a way that it is reviewable.
+> 
+> I would really like to hear what ppl think about this "heretic"
+> alternative. @Thomas, @Luis, @Kees @Jakub?
 
-Great. Thanks, Eric!
+Thanks for that alternative, I'm not a big fan though.
 
-neal
+Besides the wonky syntax, Control Flow Integrity should trap on
+this construct. Functions are called through different pointers than
+their actual types which is exactly what CFI is meant to prevent.
+
+Maybe people find it easier to review when using
+"--word-diff" and/or "-U0" with git diff/show.
+There is really nothing going an besides adding a few "const"s.
+
+But if the consensus prefers this solution, I'll be happy to adopt it.
+
+> [1] https://git.kernel.org/pub/scm/linux/kernel/git/joel.granados/linux.git/commit/?h=jag/constfy_treewide_alternative&id=4a383503b1ea650d4e12c1f5838974e879f5aa6f
+> [2] https://git.kernel.org/pub/scm/linux/kernel/git/joel.granados/linux.git/commit/?h=jag/constfy_treewide_alternative&id=a3be65973d27ec2933b9e81e1bec60be3a9b460d
+> [3] proc_dostring, proc_dobool, proc_dointvec....
+
+
+Thomas
 
