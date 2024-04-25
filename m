@@ -1,117 +1,179 @@
-Return-Path: <netdev+bounces-91216-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91217-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF6B38B1BAE
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 09:14:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 278468B1BB7
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 09:18:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 64D39283296
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 07:14:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4B9CF1C22E7D
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 07:18:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4DF86BB30;
-	Thu, 25 Apr 2024 07:14:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E225D6BB39;
+	Thu, 25 Apr 2024 07:18:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="bSrZgZUZ"
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="OmT1VuBa"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-118.freemail.mail.aliyun.com (out30-118.freemail.mail.aliyun.com [115.124.30.118])
+Received: from fhigh8-smtp.messagingengine.com (fhigh8-smtp.messagingengine.com [103.168.172.159])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8DF05A7AB;
-	Thu, 25 Apr 2024 07:14:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.118
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E537333998;
+	Thu, 25 Apr 2024 07:18:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.159
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714029296; cv=none; b=XlbN/k12HmHTLxRLWDR0HeGqPKo7W9nMqoKcw89qHAXUx/6IPALavwF6IQhHuveXj3cGG0qXZ0V0XBiduzBrHqOK/O/mTLL6VZ4pd3tbW3YfOSWZzpsBLsdXqpv0jALB4nXJDwvDeRYiuwwXa9Igrme2RBOfHX87x6aLWP3V3/8=
+	t=1714029513; cv=none; b=Md22pDxep22JTVByJfE/aYXOlCTktk8ODYA7Xa1R7KeMPm3OodnTmgwO/Cld/MJ0peM3X2VN0eck1vcPEanfoa3CXV8enc4LJ3qnoX6e3+wu8JWjiVRecGyAPzktu6bTmWV7ARphrSimpwh6d1/QC9ONidec1ngYowi4CSFXvro=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714029296; c=relaxed/simple;
-	bh=FbcAIXFHTd/izhlpV83BqQBvkx5ULx32o2W4s4yEuAg=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=ZPBGpQISSZjQnhMLKtrcSuEKbeYNtujEnBdfx+r8ul3ahdpkRQaQKCadveT0+eya1pXIiAvt1GV0yWMZf7xr8qhTKBLK8aZluy7wXcEXD60Zpdw/QtvJHiCO8FTsxe+O4WZtPZwsVVX7B0UWqF/jMqwPlO7+Z7sSSsXDJa0bPq4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=bSrZgZUZ; arc=none smtp.client-ip=115.124.30.118
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1714029290; h=Message-ID:Subject:Date:From:To;
-	bh=shE6b0fVd04Boa5BpyRyRzFXzf9tW9katGzdX6PJz7E=;
-	b=bSrZgZUZhF80ynHUG8RoR9cUJQEwvpIT8CSZ06Qe/jz4vtjyKGOrsdgnimDOR/TNZuQwp2ZB8lnS3zcZpe42ey1jfWUdKdxjQh8yd5G2i7SZAxrbKzJgGUi8hlS1mBxxSUcEAwRRk3WJJ86R4fIoIwA7pbrJg4is2+S6HReKDcQ=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R141e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037067111;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=18;SR=0;TI=SMTPD_---0W5Efo1Z_1714029287;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W5Efo1Z_1714029287)
-          by smtp.aliyun-inc.com;
-          Thu, 25 Apr 2024 15:14:49 +0800
-Message-ID: <1714029274.2610173-1-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH net-next v6 8/8] virtio-net: support queue stat
-Date: Thu, 25 Apr 2024 15:14:34 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>,
- Eric  Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>,
- "Michael S.  Tsirkin" <mst@redhat.com>,
- Jason Wang <jasowang@redhat.com>,
- Alexei  Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- Stanislav Fomichev <sdf@google.com>,
- Amritha  Nambiar <amritha.nambiar@intel.com>,
- Larysa Zaremba <larysa.zaremba@intel.com>,
- Sridhar Samudrala <sridhar.samudrala@intel.com>,
- Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
- virtualization@lists.linux.dev,
- bpf@vger.kernel.org
-References: <20240423113141.1752-1-xuanzhuo@linux.alibaba.com>
- <20240423113141.1752-9-xuanzhuo@linux.alibaba.com>
- <20240424204422.71c20b3f@kernel.org>
-In-Reply-To: <20240424204422.71c20b3f@kernel.org>
+	s=arc-20240116; t=1714029513; c=relaxed/simple;
+	bh=CtIzOs4AG5fWmfykaA38i3gD9xUZxwUdbW+TQ3DYecE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=j1xV9+6bwgjduRb2Qmg6xK+PyVbHMJdGtRtTvpWpkiSiJdmdgPPR1jUjnedCP6FSTh3OXxCHJi3QsNibki+VW8zSK7ttLzxnMBgxRzCZNgLzrF4kK5vz9c9po1YePG8U8u4usAlalNiB/vQe8FnJtnTpqukvGBO33t05ipQHfM0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=OmT1VuBa; arc=none smtp.client-ip=103.168.172.159
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
+Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
+	by mailfhigh.nyi.internal (Postfix) with ESMTP id D67431140106;
+	Thu, 25 Apr 2024 03:18:30 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute2.internal (MEProxy); Thu, 25 Apr 2024 03:18:30 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+	fm3; t=1714029510; x=1714115910; bh=TgLiFnIKrdny1qGtk4AXJIMvNsfr
+	yUNeTWa7cQZ7fhk=; b=OmT1VuBaVvA/s+cW0JDJLKN+eIFPi1SnFx0wxInfBHLF
+	83CI8SPqDCTzmkU+XTnT6dAkjbP1OwCKxFcrMbKmJE2gxJXMA4HSDXt3H3YJyLAl
+	nByrQipK5wX0t6AnOdZQ/FGUk89vnmAVRN0Tdso4sPC5pIhJJmCFsOYUQRyMxUZF
+	zq2DsC9WN8wfiNBrC66B8VEnygq9MJsjpZ+kUJ4Tcslfy1p4PhYTQaBeYnbEU4N7
+	SaJH/2W7WamBT2IJwOJZya3xvzNJdwvdXO7+MkFaG8ThRABYZLUo2ZutngQR5Gmf
+	0aj2umTCzSNAnL6JL4Rnz1LYWLAPnn/uj60x8eYM6Q==
+X-ME-Sender: <xms:xgMqZlBaMuTJKKkN7-0nughPSEjS_fBERJmxp5X4KWvAIrgbjpolrg>
+    <xme:xgMqZjhwSlCC67GT3FJrBRiABskeY2ogC0uGs8YVQEQPZMCW-H_mAQYa95ounrJ0U
+    WA_vJHgkOKg094>
+X-ME-Received: <xmr:xgMqZglwhAtKqMM_QGW7NclKg2_GAJxaWj-3SI0GHVtU9O-W9Nfutm-_DDvA>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrudeliedguddvudcutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
+    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+    enucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpefkugho
+    ucfutghhihhmmhgvlhcuoehiughoshgthhesihguohhstghhrdhorhhgqeenucggtffrrg
+    htthgvrhhnpedvudefveekheeugeeftddvveefgfduieefudeifefgleekheegleegjeej
+    geeghfenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
+    hiughoshgthhesihguohhstghhrdhorhhg
+X-ME-Proxy: <xmx:xgMqZvw1Oz-JTNvS0BIPkhUv_BBACV5wTuyVIWkYsdKkG18qDoKM-Q>
+    <xmx:xgMqZqQoSqfkV28ueM8VVvldqs5fwdCeK2JMzkQVo5NUvPnPAv5fRg>
+    <xmx:xgMqZiZCLQswcQ60GLmpOFYLDCHJ5N0tuRnNqbqRT4q_REuyngHzTg>
+    <xmx:xgMqZrTfWM2jhK9ukc91SCh0lxXYLooOLZqiGHhhy-rUAryJ3h_I7w>
+    <xmx:xgMqZmYq0KhSjIJFv9ZBzgXWDy5UD4-33dvMM90y99DyrIPR0nWyEjZs>
+Feedback-ID: i494840e7:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 25 Apr 2024 03:18:29 -0400 (EDT)
+Date: Thu, 25 Apr 2024 10:18:22 +0300
+From: Ido Schimmel <idosch@idosch.org>
+To: Adrian Moreno <amorenoz@redhat.com>
+Cc: netdev@vger.kernel.org, aconole@redhat.com, echaudro@redhat.com,
+	horms@kernel.org, i.maximets@ovn.org,
+	Yotam Gigi <yotam.gi@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 4/8] net: psample: add tracepoint
+Message-ID: <ZioDvluh7ymBI8qF@shredder>
+References: <20240424135109.3524355-1-amorenoz@redhat.com>
+ <20240424135109.3524355-5-amorenoz@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240424135109.3524355-5-amorenoz@redhat.com>
 
-On Wed, 24 Apr 2024 20:44:22 -0700, Jakub Kicinski <kuba@kernel.org> wrote:
-> On Tue, 23 Apr 2024 19:31:41 +0800 Xuan Zhuo wrote:
-> > +static void virtnet_get_base_stats(struct net_device *dev,
-> > +				   struct netdev_queue_stats_rx *rx,
-> > +				   struct netdev_queue_stats_tx *tx)
-> > +{
-> > +	/* The queue stats of the virtio-net will not be reset. So here we
-> > +	 * return 0.
-> > +	 */
-> > +	rx->bytes = 0;
-> > +	rx->packets = 0;
-> > +	rx->alloc_fail = 0;
-> > +	rx->hw_drops = 0;
-> > +	rx->hw_drop_overruns = 0;
-> > +	rx->csum_unnecessary = 0;
-> > +	rx->csum_none = 0;
-> > +	rx->csum_bad = 0;
-> > +	rx->hw_gro_packets = 0;
-> > +	rx->hw_gro_bytes = 0;
-> > +	rx->hw_gro_wire_packets = 0;
-> > +	rx->hw_gro_wire_bytes = 0;
-> > +	rx->hw_drop_ratelimits = 0;
-> > +
-> > +	tx->bytes = 0;
-> > +	tx->packets = 0;
-> > +	tx->hw_drops = 0;
-> > +	tx->hw_drop_errors = 0;
-> > +	tx->csum_none = 0;
-> > +	tx->needs_csum = 0;
-> > +	tx->hw_gso_packets = 0;
-> > +	tx->hw_gso_bytes = 0;
-> > +	tx->hw_gso_wire_packets = 0;
-> > +	tx->hw_gso_wire_bytes = 0;
-> > +	tx->hw_drop_ratelimits = 0;
->
-> Doesn't this need to be conditional based on device capabilities?
-> We should only assign the stats that the device is collecting
-> (both in base stats and per-queue).
+On Wed, Apr 24, 2024 at 03:50:51PM +0200, Adrian Moreno wrote:
+> Currently there are no widely-available tools to dump the metadata and
+> group information when a packet is sampled, making it difficult to
+> troubleshoot related issues.
+> 
+> This makes psample use the event tracing framework to log the sampling
+> of a packet so that it's easier to quickly identify the source
+> (i.e: group) and context (i.e: metadata) of a packet being sampled.
+> 
+> This patch creates some checkpatch splats, but the style of the
+> tracepoint definition mimics that of other modules so it seems
+> acceptable.
 
+I don't see a good reason to add this tracepoint (which we won't be able
+to remove) when you can easily do that with bpftrace which by now should
+be widely available:
 
-Will be fixed in next version.
+#!/usr/bin/bpftrace
 
-Thanks.
+kfunc:psample_sample_packet
+{
+        $ts_us = nsecs() / 1000;
+        $secs = $ts_us / 1000000;
+        $us = $ts_us % 1000000;
+        $group = args.group;
+        $skb = args.skb;
+        $md = args.md;
+
+        printf("%-16s %-6d %6llu.%6llu group_num = %u refcount=%u seq=%u skbaddr=%p len=%u data_len=%u sample_rate=%u in_ifindex=%d out_ifindex=%d user_cookie=%rx\n",
+               comm, pid, $secs, $us, $group->group_num, $group->refcount, $group->seq,
+               $skb, $skb->len, $skb->data_len, args.sample_rate,
+               $md->in_ifindex, $md->out_ifindex,
+               buf($md->user_cookie, $md->user_cookie_len));
+}
+
+Example output:
+
+mausezahn        984      3299.200626 group_num = 1 refcount=1 seq=13775 skbaddr=0xffffa21143fd4000 len=42 data_len=0 sample_rate=10 in_ifindex=0 out_ifindex=20 user_cookie=
+\xde\xad\xbe\xef
+mausezahn        984      3299.281424 group_num = 1 refcount=1 seq=13776 skbaddr=0xffffa21143fd4000 len=42 data_len=0 sample_rate=10 in_ifindex=0 out_ifindex=20 user_cookie=
+\xde\xad\xbe\xef
+
+Note that it prints the cookie itself unlike the tracepoint which only
+prints the hashed pointer.
+
+> 
+> Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
+> ---
+>  net/psample/psample.c |  9 +++++++
+>  net/psample/trace.h   | 62 +++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 71 insertions(+)
+>  create mode 100644 net/psample/trace.h
+> 
+> diff --git a/net/psample/psample.c b/net/psample/psample.c
+> index 476aaad7a885..92db8ffa2ba2 100644
+> --- a/net/psample/psample.c
+> +++ b/net/psample/psample.c
+> @@ -18,6 +18,12 @@
+>  #include <net/ip_tunnels.h>
+>  #include <net/dst_metadata.h>
+>  
+> +#ifndef __CHECKER__
+> +#define CREATE_TRACE_POINTS
+> +#endif
+> +
+> +#include "trace.h"
+> +
+>  #define PSAMPLE_MAX_PACKET_SIZE 0xffff
+>  
+>  static LIST_HEAD(psample_groups_list);
+> @@ -470,6 +476,9 @@ void psample_sample_packet(struct psample_group *group, struct sk_buff *skb,
+>  	void *data;
+>  	int ret;
+>  
+> +	if (trace_psample_sample_packet_enabled())
+> +		trace_psample_sample_packet(group, skb, sample_rate, md);
+
+My understanding is that trace_x_enabled() should only be used if you
+need to do some work to prepare parameters for the tracepoint.
+
+> +
+>  	meta_len = (in_ifindex ? nla_total_size(sizeof(u16)) : 0) +
+>  		   (out_ifindex ? nla_total_size(sizeof(u16)) : 0) +
+>  		   (md->out_tc_valid ? nla_total_size(sizeof(u16)) : 0) +
 
