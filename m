@@ -1,130 +1,81 @@
-Return-Path: <netdev+bounces-91446-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91447-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3381E8B295E
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 22:04:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C19C8B2981
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 22:13:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E43C72829A1
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 20:04:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5A810282011
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 20:13:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6046C152511;
-	Thu, 25 Apr 2024 20:04:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE67F152DF1;
+	Thu, 25 Apr 2024 20:13:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JajRcWZz"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="CyFE91Rm"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFD6814D712
-	for <netdev@vger.kernel.org>; Thu, 25 Apr 2024 20:04:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 056F314EC5F
+	for <netdev@vger.kernel.org>; Thu, 25 Apr 2024 20:13:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714075483; cv=none; b=iaLsasopY7sb8Ks7gzgp+uXvOO1bj89kPlAynLJjbX2InctSQyGbeB17O+hqHB/O0XbK4TuPRl3fxT2aUSpttt0CP8TBSrbDZKT4Prd/ga8/Qi5vrOpZNRxEB6+arbOgVtfVAGREPu5XYCWUg0neDYEAFUcxO7G7sTDXwc8P2ao=
+	t=1714076028; cv=none; b=uFSUdIg1B0vhv5vn1uRQsn+Hufed8YGpHIn/RxvESq4VBU7OTCxG3e/s4sauSdXZp2o+SaD8TYeKLohAW24VupgyNpzvw1UTtsTm5Gn8rx2p+8FMW30ve91TWRVKjD2s3SUg4K53VEJ8PQ18Jag9wmKBwSi+9VmDnmMHgxBazTw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714075483; c=relaxed/simple;
-	bh=Vl4naPZ+M9zhxl2iiW3r7jXEsNcmJy33cza9OfjzaaM=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=nksoMAI0O+Hr0lTwaLxXDhnbeyFCTXPlmIscQChSdTrmG3zBk1C6O3INgIFQEzX0FBAT4ScNbyo1npUS0JO8vch8zjAv0ZRaybJTT8KV6+qx0YMflKaGefIEALICuEwGlW0p4gyQAgYq5Lx8Nkelzufqk+lBCYAGpzo9njso/r0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JajRcWZz; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1714075480;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qxE6XochzTWopeOrnU+9zZscC0cF4tZlDCAfcT1tbuA=;
-	b=JajRcWZzjw8ThKWpFjpF1Lzy5Ysu9RLc1II6TnR0fWoC4/MGCinZbgV2vwJ4jBL456hOXw
-	vPwOLmtl+MarHifcJk3WCiGmpapmqJ3ozbm/i7OPQDrQSFK4SZ6+6Z7Jlzk5+qwJQegVuA
-	C390zOEvJ5nDbyJKqpASYOjAoBnfcnk=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-608-3Fw2uxqpPMOnYT6G7ely5w-1; Thu, 25 Apr 2024 16:04:36 -0400
-X-MC-Unique: 3Fw2uxqpPMOnYT6G7ely5w-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B841780021A;
-	Thu, 25 Apr 2024 20:04:35 +0000 (UTC)
-Received: from RHTRH0061144 (unknown [10.22.33.7])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 741D0200A5C5;
-	Thu, 25 Apr 2024 20:04:35 +0000 (UTC)
-From: Aaron Conole <aconole@redhat.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Simon Horman <horms@kernel.org>,  dev@openvswitch.org,
-  netdev@vger.kernel.org,  linux-kselftest@vger.kernel.org
-Subject: Re: [ovs-dev] selftests: openvswitch: Questions about possible
- enhancements
-In-Reply-To: <20240425122151.1d5efcc2@kernel.org> (Jakub Kicinski's message of
-	"Thu, 25 Apr 2024 12:21:51 -0700")
-References: <20240424164405.GN42092@kernel.org>
-	<20240424173000.21c12587@kernel.org>
-	<20240425082637.GU42092@kernel.org>
-	<20240425185719.GV42092@kernel.org>
-	<20240425122151.1d5efcc2@kernel.org>
-Date: Thu, 25 Apr 2024 16:04:35 -0400
-Message-ID: <f7tsez98azw.fsf@redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1714076028; c=relaxed/simple;
+	bh=f38WUXexBGk2pULVpRYDsxPV+2Sb+bu7HCj9MoOd6hM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=n1N9gotODnPq3eIgjOCa/JPPtl2/yZshtIckW7C59eUQhcUo4sVj5ry3jTQmN46ouOQnS9njIh5DISIyzcMLIrURsyQljR4k7rjvwMkCJLNILQKc+yPqc+VSwR5o7QTZ+FSZ1HpYTYfM1Kf8YtB9BD7ogHwbg9LxSUVtncnqdLY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=CyFE91Rm; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=UVN7YbXysOsQP6tXORMHq8vJKYIg/blYjCMhLRxUk7Q=; b=Cy
+	FE91Rmg79WTSAPfIenEETv3vHTPqAWMLuuX7aqiEjRxpMxBozprqkCmLLbW7D09M0Wbq/HXkT3snl
+	hGNHqI2dwcbBkd8n2Kfy+TctigdcbJROQhruld+pFfii/FtDZBC4tDGrnYNwvDnrHGoMMAWdT1tDl
+	Vr6JNmDGEB0x3uc=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1s05TT-00E1D7-6s; Thu, 25 Apr 2024 22:13:43 +0200
+Date: Thu, 25 Apr 2024 22:13:43 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: SIMON BABY <simonkbaby@gmail.com>
+Cc: netdev@vger.kernel.org
+Subject: Re: ping test with DSA ports failing
+Message-ID: <11c3fe04-7aea-44eb-8f02-28bbe0c5ec03@lunn.ch>
+References: <CAEFUPH1q9MPNBrfzhSmCawM4y+A6SKe47Pc1PjqShy-0Oo4-2w@mail.gmail.com>
+ <05b24725-f266-4360-b8af-fd299fbff5be@lunn.ch>
+ <CAEFUPH0KNr=tOTpSX5ZrjiwHNMeZgGWroS7PR5YwX2=W7=1TdA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.4
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAEFUPH0KNr=tOTpSX5ZrjiwHNMeZgGWroS7PR5YwX2=W7=1TdA@mail.gmail.com>
 
-Jakub Kicinski <kuba@kernel.org> writes:
+On Thu, Apr 25, 2024 at 11:43:48AM -0700, SIMON BABY wrote:
+> Thank you so much Andrew. Sorry for the messed up diagram. attached is the
+> diagram Can you confirm it is a valid test case? 
 
-> On Thu, 25 Apr 2024 19:57:19 +0100 Simon Horman wrote:
->> openvswitch.sh does not appear to have any dependencies on Open vSwitch
->> user-space. My understanding is that, rather, it makes use of
->> tools/testing/selftests/net/openvswitch/ovs-dpctl.py to talk to the Kernel
->> using Netlink (which is also what Open vSwitch user-space does).
->> 
->> My brief testing indicates that for this the only dependencies
->> when running on Amazon Linux 2 are python3 and pyroute2.
->> 
->> I think that it should be possible to port pmtu.sh to use ovs-dpctl.py.
->> This would require some enhancements to ovs-dpctl.py to handle adding the
->> tunnel vports (interfaces).
+Don't use attachments with mailling lists. Just plain ASCII text.
 
-I have some work from some time back:
+> Note: The testing I am doing is with an actual PHY on the mac side as well. so
+> basically it is a PHY to PHY connection for the CPU port. Can it cause any data
+> plane issue with DSA ?
 
-https://github.com/apconole/linux-next-work/commit/61d2b9fc68a4e3fc950a24b06232c2fbcbfa0372
+So you have a standard patch cable in the middle? Then you can
+separate the system and test each half on its own. Is it the SoC side,
+or the switch side which is causing the packet less?
 
-https://github.com/apconole/linux-next-work/commit/7262107de7170d44b6dbf6c5ea6f7e6c0bb71d36
-
-https://github.com/apconole/linux-next-work/commit/af5338c9044660fa0eaaa967602aec706bbaeb5b
-
-I was using it to try and build up a test to check recursions in the
-datapath, but didn't get a chance to finish.
-
-BUT most of the stuff is there, just needs to be cleaned up.  It would
-at least cover the classic case, but the LWT support needs to be added.
-
->> As an aside, to run the Open vSwitch tests in pmtu.sh the openvswitch
->> kernel module is needed. So I think it would make sense to add
->> CONFIG_OPENVSWITCH to tools/testing/selftests/net/config.
->> 
->> That would mean that tools/testing/selftests/net/config also has all
->> the requirements to run openvswitch.sh. If so, we probably wouldn't need to
->> add tools/testing/selftests/net/openvswitch/config or otherwise do anything
->> special to configure the kernel for openvswitch.sh.
->
-> That sounds great, for simplicity we could move the ovs files down 
-> to the .../net/ directory. It'd be cool to not have to do that, and
-> let us separate tests more clearly into directories. But right now
-> every directory has its own runner so there's a high price to pay
-> for a primarily aesthetic gain :(
-
-Either one would work for me.  I will repost the RFC addressing some of
-the comments.  It should be runnable in a bare VM that has the required
-python packages that Simon notes (pyroute2 and python3).
-
+      Andrew
 
