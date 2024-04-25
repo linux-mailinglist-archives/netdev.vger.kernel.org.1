@@ -1,92 +1,79 @@
-Return-Path: <netdev+bounces-91489-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91490-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AFCA78B2D2F
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 00:40:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DFDE8B2D38
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 00:43:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 647971F2235D
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 22:40:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 24B721F21A77
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 22:43:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 089656CDC1;
-	Thu, 25 Apr 2024 22:40:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74A7815381B;
+	Thu, 25 Apr 2024 22:43:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="suQptEpZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bvAUAiqd"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D61022599
-	for <netdev@vger.kernel.org>; Thu, 25 Apr 2024 22:40:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 492D03EA9B;
+	Thu, 25 Apr 2024 22:43:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714084831; cv=none; b=IK0wGIQq9bLUbb3W2TckJng9dckZXl/oOyR5Tuxm/hjNIhgTnqnYHdWufxq2BKVedki0flYicjdVuHQ6CW1MBTkQpT2Pc/13ZhK6i4ayVCXVIoFbvG+4r3/4elhKQoPnFLWwb5G1epCTtIadn3kIHxi3XnaHp+HXplIBIEcN92k=
+	t=1714085003; cv=none; b=Hio27kiGApfrLad5RFjIln952M3s+X4Be9GzcWLrgtlAJUmAqpKmAvQ4xvJpq/sOtGU6aYtB/x9H/zRF32PRZD/oq+v/6AT+ZqsBzM5UogSkTStk/t0ei1YK3IWUrNtEr6bDO3AWRPIlFFq/YZRSofYfx0lXOTGkyXJK63djitg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714084831; c=relaxed/simple;
-	bh=Yy5iYpXK6C+III7zx8oWJ8sUBUqte1EM5YRdbaU3/C0=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=UP+k8tBtbNwXIeM8OcPfDlVek9PBelSgq7V1UADfmghAx9smy/2qjuYWxyrLpwf0m3QFUgaqTiFwrMYGNGRzf4yjql3sSzFeuyk5cf+OZoeJU2Ixdc5Y5Jzv98n845XKq+36e8zyBBMdXc/u5Wfy36QRlRgVIn19EGYhBnkAsyA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=suQptEpZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 54E15C2BBFC;
-	Thu, 25 Apr 2024 22:40:31 +0000 (UTC)
+	s=arc-20240116; t=1714085003; c=relaxed/simple;
+	bh=zdLuVH84OGqw7RgBSDevcy3yPUi7yV0lCoRUme7EejI=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=jXREna2jfw4VqjuuBRS2wm1oaLpR4Hs78BR18Nj7nriq6nmESL5FuJGp+1ib0GccHYYRaV1UGvv029sh4raWtpbIQy1vVOlUR3W/oc27ZXLfVFNJGV+XPjOiYjYKdndrbTBLB4SSjfFnRTB8oadNk92MPV0B8ktRPyfR1gPO2SU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bvAUAiqd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id C3742C113CC;
+	Thu, 25 Apr 2024 22:43:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714084831;
-	bh=Yy5iYpXK6C+III7zx8oWJ8sUBUqte1EM5YRdbaU3/C0=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=suQptEpZX4lR17/PAwBKp710V7NpCX9LxSCpDpw03e9Uetblua594f5UaAR71Bdqi
-	 h2tgDQGCEnhOVbPGn6L7CeyWviU9NPlH3xJAa47JjW9GmUYdrs609HvmI4kpIR9Qxn
-	 v+sGJWT0qnP8ChGidoZGbujDLkoXlDaRaa1x4p15KArMpY6FbW1ZwANDnUmyyIXk9M
-	 dJfe5WsZfFGUwl4QKQ9cN2VKqrLtKgIZQazaZIYeN8+K7ZxS/dKU4M3Pck00ONb0NG
-	 2uzs9Yd3dgLxuE1/CKlncEX6FrkBuy7nJnnOTvGXuPzu6thhGoxAJiwfxh+4/+kSrg
-	 TzESlF45cCiWg==
+	s=k20201202; t=1714085002;
+	bh=zdLuVH84OGqw7RgBSDevcy3yPUi7yV0lCoRUme7EejI=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=bvAUAiqdnVhUoT90KfLZoWMIloxHKzb83Ho6Ug5u3u4adNoK98VmNcbreqHLpVLxI
+	 wWAOF9gnHljJyfDMX66bL/iG4rY8JT+AtpyhrLchQvZtd8tSQAfR0hk4tFEF5RfqCn
+	 wXX2IwopietaS1EZQUVdiMswdkmbTKj625nvueY9RyJ2Czom69c0qrs5tjXThrcb0+
+	 +3w1enj398oY/YVU7oFeoBQ4MYxctgOV9KjZ/zo+FuSgm+BDO8/PhtMhzaGDgzQxMi
+	 Ms4s48fxQRLyLQP2xCgsbU6hxP6glFC/QDKKfs5YN2rtlhN33RUGmmB4HngCh+0xNv
+	 oKRoDTXIWpvtg==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4213FC595C5;
-	Thu, 25 Apr 2024 22:40:31 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id BAC5DC43614;
+	Thu, 25 Apr 2024 22:43:22 +0000 (UTC)
+Subject: Re: [GIT PULL] virtio: bugfix
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <20240425180106-mutt-send-email-mst@kernel.org>
+References: <20240425180106-mutt-send-email-mst@kernel.org>
+X-PR-Tracked-List-Id: <kvm.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20240425180106-mutt-send-email-mst@kernel.org>
+X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+X-PR-Tracked-Commit-Id: 98a821546b3919a10a58faa12ebe5e9a55cd638e
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: c942a0cd3603e34dd2d7237e064d9318cb7f9654
+Message-Id: <171408500275.32202.9237906041561329048.pr-tracker-bot@kernel.org>
+Date: Thu, 25 Apr 2024 22:43:22 +0000
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, lingshan.zhu@intel.com, mst@redhat.com
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: add two more call_rcu_hurry()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171408483126.30037.2645129333935579072.git-patchwork-notify@kernel.org>
-Date: Thu, 25 Apr 2024 22:40:31 +0000
-References: <20240423205408.39632-1-edumazet@google.com>
-In-Reply-To: <20240423205408.39632-1-edumazet@google.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- dsahern@kernel.org, netdev@vger.kernel.org, eric.dumazet@gmail.com,
- joel@joelfernandes.org, paulmck@kernel.org
 
-Hello:
+The pull request you sent on Thu, 25 Apr 2024 18:01:06 -0400:
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+> https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
 
-On Tue, 23 Apr 2024 20:54:08 +0000 you wrote:
-> I had failures with pmtu.sh selftests lately,
-> with netns dismantles firing ref_tracking alerts [1].
-> 
-> After much debugging, I found that some queued
-> rcu callbacks were delayed by minutes, because
-> of CONFIG_RCU_LAZY=y option.
-> 
-> [...]
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/c942a0cd3603e34dd2d7237e064d9318cb7f9654
 
-Here is the summary with links:
-  - [net-next] net: add two more call_rcu_hurry()
-    https://git.kernel.org/netdev/net-next/c/c4e86b4363ac
+Thank you!
 
-You are awesome, thank you!
 -- 
 Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+https://korg.docs.kernel.org/prtracker.html
 
