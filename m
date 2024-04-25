@@ -1,85 +1,93 @@
-Return-Path: <netdev+bounces-91183-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91185-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD7EE8B1980
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 05:27:09 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A1BF38B199E
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 05:40:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 06A451C20BFB
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 03:27:09 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EDC71B213A0
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 03:40:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E070E225D0;
-	Thu, 25 Apr 2024 03:27:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 130F723768;
+	Thu, 25 Apr 2024 03:40:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LmjBzoOm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tEHb37gP"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3B772110F;
-	Thu, 25 Apr 2024 03:27:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3B14200C3
+	for <netdev@vger.kernel.org>; Thu, 25 Apr 2024 03:40:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714015625; cv=none; b=cxkAZQmqvePMIA/eLFD5/HWHXwxCU+WCGvcq16yIAJoWoMaJ6SDV5z+d0hVMcfS55drivpErXrQFD5VdLylJbU+EUbh8P+rikVTyWwMclXjUPx6vNla7zvLD0JNIb8usARltrV/F5ttYpqt1/O8GfnfGcALmr4ZiButxRVW+Zm4=
+	t=1714016428; cv=none; b=IFTAKRVE0Dnz+Y3oWHqCPKbvu2FDg2OEMBo36RXWHG7FIGCJfvMypDP6N/ZS0/8lNjHZxiOLMNy7ibGYiD6XolPanQrvLljON34uHdjAsTYhjsTQIdMpD86SQzImp/f83t4CP0bznnaMW9obMgi2eR3WalQF+KW0W5XNSz3TRgo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714015625; c=relaxed/simple;
-	bh=My5MFhg/Ti3D+MPt/VmtN9NQVsT2BKm8TXTOezs6Y4k=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Vs1tCr6o+XEZ+2oicUjASWhqg8Ni9Ygq48Tha7pAhoE3MYZCHV4GlJkhr5vLT4e8jb36EVRmkMxSkxnB94F3R6J9T2+vsEM7wQ5OPBwF3QgH0RsN0F83TQz31L/te1vza+nLTd2zu590QTxgkpN+rViUJh9Ap2xwQAjnIaDF2xQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LmjBzoOm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7FB85C113CC;
-	Thu, 25 Apr 2024 03:27:04 +0000 (UTC)
+	s=arc-20240116; t=1714016428; c=relaxed/simple;
+	bh=tJCFAN95x3zb5AhyZ/GDoKWZY4OYt980WGKcQpMi+uo=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=pW1XxLfPs9GGvIOfJtlI3zAHy8qexkaSEDH6jSiPxqVDKhWTC89eqHyWYlxyuMUAxGzVvIW9G7nSzW4PidEffRZv8vuO3lWPZ6UAB/nbc781nImVTgQz5SYIpopPZ3i1/YllpSwdSZsITlPK/6BlMD1mOJIyZWp1K+E3Pe/VlH0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tEHb37gP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 89E5AC113CE;
+	Thu, 25 Apr 2024 03:40:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714015625;
-	bh=My5MFhg/Ti3D+MPt/VmtN9NQVsT2BKm8TXTOezs6Y4k=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=LmjBzoOmzmB104dVQfa8NJPB2d6PEG8tidOzXPlYVOCXAG6JZmbm3Fg0Z2qi7Cq/D
-	 rQ+5LLt5b9NTo7Ahrmxg6LUxuJeTw3igz4OWgDTEx1ScbGfCa7+0eN8iq2r7EM0JF4
-	 wTLEFmlqlF6e8axwzr1iZcBeYsrfNrK7qNJ4aCtthsXA/gqcpLfmdN1rgkzYGMfTDi
-	 aWLI/n/EAH0ByPXpLkW7svrHtaFxgM7+UXdcXI0Ypkv1HoJAa7gmyoAtPlDbVBfuds
-	 qfox/053+0paESXy1hHl493DCj919CJFySRcCBE0REB3M1aZHlpbF9FPivtZS2/Dez
-	 CDlw/cIrzuz7A==
-Date: Wed, 24 Apr 2024 20:27:03 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Shradha Gupta <shradhagupta@linux.microsoft.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Bjorn Helgaas
- <bhelgaas@google.com>, Jonathan Corbet <corbet@lwn.net>, Randy Dunlap
- <rdunlap@infradead.org>, Johannes Berg <johannes.berg@intel.com>, Breno
- Leitao <leitao@debian.org>, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, "K. Y. Srinivasan" <kys@microsoft.com>, Haiyang
- Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui
- <decui@microsoft.com>, Long Li <longli@microsoft.com>, Souradeep
- Chakrabarti <schakrabarti@linux.microsoft.com>, Konstantin Taranov
- <kotaranov@microsoft.com>, Yury Norov <yury.norov@gmail.com>,
- linux-hyperv@vger.kernel.org, shradhagupta@microsoft.com
-Subject: Re: [PATCH net-next v2 1/2] net: Add sysfs atttributes for max_mtu
- min_mtu
-Message-ID: <20240424202703.29f1b59a@kernel.org>
-In-Reply-To: <1713954817-30133-1-git-send-email-shradhagupta@linux.microsoft.com>
-References: <1713954774-29953-1-git-send-email-shradhagupta@linux.microsoft.com>
-	<1713954817-30133-1-git-send-email-shradhagupta@linux.microsoft.com>
+	s=k20201202; t=1714016427;
+	bh=tJCFAN95x3zb5AhyZ/GDoKWZY4OYt980WGKcQpMi+uo=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=tEHb37gPxc9DD2MEKdN2eyobA3QaKuyeJ6x8MUuGKhiYTxWQeFhX8XgyQvGycf3m4
+	 BCRg02v0ifQOGOH4BAGDXF1JmKke7R04L1d/+dZxH49k4QWyCo0KGrBCqSygjtlMAY
+	 yCwD+1b8R7XaIoMgwt2QbjRZfT2bB36ceJOL4tFMN870wK0FZoD8GP8bxMWYJnAJHx
+	 o3t1+w72doHXJ+Rsx7kW+ZrMFGQ0DWY2HZy0WsovNA7GAQfTUFug/yRdVcOF8+rQUU
+	 F4M7FL78mdKJPkObBzjosPoSU0sImi6S0dYOJOt5VHZbiEBtnkuo3MjCAEK2k+H8MF
+	 WsDa9TMxI1T5g==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 790D3C43140;
+	Thu, 25 Apr 2024 03:40:27 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] eth: bnxt: fix counting packets discarded due to OOM and
+ netpoll
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171401642749.20465.4420311650103709598.git-patchwork-notify@kernel.org>
+Date: Thu, 25 Apr 2024 03:40:27 +0000
+References: <20240424002148.3937059-1-kuba@kernel.org>
+In-Reply-To: <20240424002148.3937059-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, michael.chan@broadcom.com, edwin.peer@broadcom.com
 
-On Wed, 24 Apr 2024 03:33:37 -0700 Shradha Gupta wrote:
-> Add sysfs attributes to read max_mtu and min_mtu value for
-> network devices
+Hello:
 
-Absolutely pointless. You posted v1, dumping this as a driver
-specific value, even tho it's already reported by the core...
-And you can't even produce a meaningful commit message longer
-than one sentence.
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-This is not meeting the bar. Please get your patches reviewed
-internally at Microsoft by someone with good understanding of
-Linux networking before you post.
+On Tue, 23 Apr 2024 17:21:48 -0700 you wrote:
+> I added OOM and netpoll discard counters, naively assuming that
+> the cpr pointer is pointing to a common completion ring.
+> Turns out that is usually *a* completion ring but not *the*
+> completion ring which bnapi->cp_ring points to. bnapi->cp_ring
+> is where the stats are read from, so we end up reporting 0
+> thru ethtool -S and qstat even though the drop events have happened.
+> Make 100% sure we're recording statistics in the correct structure.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net] eth: bnxt: fix counting packets discarded due to OOM and netpoll
+    https://git.kernel.org/netdev/net/c/730117730709
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
