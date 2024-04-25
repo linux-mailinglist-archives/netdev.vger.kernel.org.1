@@ -1,38 +1,38 @@
-Return-Path: <netdev+bounces-91319-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91321-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F29118B2242
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 15:11:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C27948B2244
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 15:12:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ADAC42819A6
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 13:11:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7EFE7281768
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 13:12:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 713F3149C43;
-	Thu, 25 Apr 2024 13:11:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4864B149C6E;
+	Thu, 25 Apr 2024 13:11:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 718461EB48
-	for <netdev@vger.kernel.org>; Thu, 25 Apr 2024 13:11:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 882CA149C4F
+	for <netdev@vger.kernel.org>; Thu, 25 Apr 2024 13:11:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714050709; cv=none; b=JXoXObU+4UYqUje9JvRATbrZMh6kFLnLUxQc+HCv9C+EDMAkBrbKMWJxJCHS6d+K2INzudfLTsdCiEfYGyFKhHv/o6pCRblPgW4MCHISFeYwP+g6IfBTh/oPQqWan+ZFKenUyY4JY+/MmFYXvsP1DQM0IE/bmevphuvKVj69Uig=
+	t=1714050711; cv=none; b=MzX24mFokgXg/QYGjuRrAyh6Qd5njQIZSBOuoml0TfRr8xOiy6hy5f7BPqQ5S0rWQqVdVop+haGDOgQFBR7qqWX0hnZ4nNdv9magGbagmoMX7sOefCiJXgTpn6zJwJYvIdutDr9F+HY9va2lIfNaRcc5OxSwc9Qh16CL4iZ7eDU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714050709; c=relaxed/simple;
-	bh=TbRPAcVRZkLYnuObXUfDUFegYfbQpOkPdkru5YufLUo=;
+	s=arc-20240116; t=1714050711; c=relaxed/simple;
+	bh=I4Zo8UiS/cZhiMFLy5u2XhNniANH4ln2ujRxP2O0UQk=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=bwgQ119/si9RUOLjB8z8H4oGtEy3rAoKKuQ0Dzs4pr7LSQNEp/rB/RynylTAKLb7D7V3C4PSB2yngyaMlTo6l4shmWdxTAvctOR4iq2XPBbp2tkDCQ9/2Rt+BMYUNEmvAzqWbvBiDSN3SWXajpt8sfaITDwBX8LSArDYR2IC3Lw=
+	 MIME-Version; b=tHHWlMPSRspq/6LFQebD5YOOc/N7IGehvXjotS0xx3BqOvKqqamcfzgbOXU3Ak5/I5rMLL/ONye7cwGvjiGOA3ZgiTGfJyXfDe6+jBZ+q75cEm/lyiIwxrGZRSM7NC4EG63Kf/MaMsbZT/zLQAHSmUwtiMQlc7ZwsnFRixxtP80=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
 Received: from loongson.cn (unknown [112.20.112.218])
-	by gateway (Coremail) with SMTP id _____8Dxd_CSVipmwNACAA--.13271S3;
-	Thu, 25 Apr 2024 21:11:46 +0800 (CST)
+	by gateway (Coremail) with SMTP id _____8DxFumUVipmyNACAA--.661S3;
+	Thu, 25 Apr 2024 21:11:48 +0800 (CST)
 Received: from localhost.localdomain (unknown [112.20.112.218])
-	by localhost.localdomain (Coremail) with SMTP id AQAAf8BxnleKVipmWBsFAA--.13037S3;
-	Thu, 25 Apr 2024 21:11:44 +0800 (CST)
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8BxnleKVipmWBsFAA--.13037S4;
+	Thu, 25 Apr 2024 21:11:47 +0800 (CST)
 From: Yanteng Si <siyanteng@loongson.cn>
 To: andrew@lunn.ch,
 	hkallweit1@gmail.com,
@@ -48,9 +48,9 @@ Cc: Yanteng Si <siyanteng@loongson.cn>,
 	netdev@vger.kernel.org,
 	chris.chenfeiyang@gmail.com,
 	siyanteng01@gmail.com
-Subject: [PATCH net-next v12 14/15] net: stmmac: dwmac-loongson: Move disable_force flag to _gnet_date
-Date: Thu, 25 Apr 2024 21:11:37 +0800
-Message-Id: <7235e4af89c169e79f0404a3dc953f1756bab196.1714046812.git.siyanteng@loongson.cn>
+Subject: [PATCH net-next v12 15/15] net: stmmac: dwmac-loongson: Add loongson module author
+Date: Thu, 25 Apr 2024 21:11:38 +0800
+Message-Id: <30ba385282572a2a5803b762decde061f81b8cc0.1714046812.git.siyanteng@loongson.cn>
 X-Mailer: git-send-email 2.31.4
 In-Reply-To: <cover.1714046812.git.siyanteng@loongson.cn>
 References: <cover.1714046812.git.siyanteng@loongson.cn>
@@ -61,69 +61,46 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:AQAAf8BxnleKVipmWBsFAA--.13037S3
+X-CM-TRANSID:AQAAf8BxnleKVipmWBsFAA--.13037S4
 X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
-X-Coremail-Antispam: 1Uk129KBj93XoW7uFyDXw1xKryUXrW5CFW7Awc_yoW8WrW7p3
-	93Ca4j9ryfJF15Can8JrWDXFyY9FWUt397WFZFywnxuFZ7t3sIqr97KFWYyry7ZrWkXFy2
-	qr48Cr48uFn8GwbCm3ZEXasCq-sJn29KB7ZKAUJUUUU3529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUm2b4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26r4UJVWxJr1l84ACjcxK6I8E87Iv6xkF7I0E
-	14v26F4UJVW0owAaw2AFwI0_JF0_Jw1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2
-	xF0cIa020Ex4CE44I27wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_
-	ZF0_GryDMcIj6I8E87Iv67AKxVW8Jr0_Cr1UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0x
-	vY0x0EwIxGrwACjcxG6xCI17CEII8vrVW3JVW8Jr1lc7CjxVAaw2AFwI0_JF0_Jw1l42xK
-	82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1l4IxYO2xFxVAFwI0_JF0_Jw1lx2
-	IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v2
-	6r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_tr0E3s1lIxAIcVC0I7IYx2
-	IY6xkF7I0E14v26r4UJVWxJr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2
-	jsIE14v26r4UJVWxJr1lIxAIcVC2z280aVCY1x0267AKxVW8Jr0_Cr1UYxBIdaVFxhVjvj
-	DU0xZFpf9x07bOfHUUUUUU=
+X-Coremail-Antispam: 1Uk129KBj9xXoWrZw1ftw4kuw18tFW7ZF4rXrc_yoWfKrg_GF
+	W2vrn3XF1UGr4Sk345Ww45ZryS9FykW3WSk3ZrKas3ua12vwn8J3s5ur93JF13CrW5ZFn0
+	qF4fJr1xCw18JosvyTuYvTs0mTUanT9S1TB71UUUUjDqnTZGkaVYY2UrUUUUj1kv1TuYvT
+	s0mT0YCTnIWjqI5I8CrVACY4xI64kE6c02F40Ex7xfYxn0WfASr-VFAUDa7-sFnT9fnUUI
+	cSsGvfJTRUUUbv8YFVCjjxCrM7AC8VAFwI0_Jr0_Gr1l1xkIjI8I6I8E6xAIw20EY4v20x
+	vaj40_Wr0E3s1l1IIY67AEw4v_Jrv_JF1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxS
+	w2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxV
+	W8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIEc7CjxVAF
+	wI0_Cr1j6rxdM2kKe7AKxVWUAVWUtwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
+	AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVW3
+	AVW8Xw1lYx0Ex4A2jsIE14v26r4UJVWxJr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48Icx
+	kI7VAKI48JM4x0Y40E4IxF1VCIxcxG6Fyj6r4UJwCY1x0262kKe7AKxVWUAVWUtwCF04k2
+	0xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwCFI7km07C267AKxVWUAVWUtwC20s
+	026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_
+	Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWDJVCq3wCI42IY6xIIjxv20x
+	vEc7CjxVAFwI0_Gr1j6F4UJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280
+	aVAFwI0_Gr1j6F4UJwCI42IY6I8E87Iv6xkF7I0E14v26r4UJVWxJrUvcSsGvfC2KfnxnU
+	UI43ZEXa7IU5mXdUUUUUU==
 
-We've already introduced loongson_gnet_data(), so the
-STMMAC_FLAG_DISABLE_FORCE_1000 should be take away from
-loongson_dwmac_probe().
+Add Yanteng Si as MODULE_AUTHOR of  Loongson DWMAC PCI driver.
 
 Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
 Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
 Signed-off-by: Yanteng Si <siyanteng@loongson.cn>
 ---
- .../net/ethernet/stmicro/stmmac/dwmac-loongson.c    | 13 ++++++-------
- 1 file changed, 6 insertions(+), 7 deletions(-)
+ drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c | 1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-index 68de90c44feb..dea02de030e6 100644
+index dea02de030e6..f0eebed751f3 100644
 --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
 +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-@@ -286,6 +286,12 @@ static int loongson_gnet_data(struct pci_dev *pdev,
- 	plat->mdio_bus_data->phy_mask = ~(u32)BIT(2);
- 	plat->fix_mac_speed = loongson_gnet_fix_speed;
+@@ -638,4 +638,5 @@ module_pci_driver(loongson_dwmac_driver);
  
-+	/* GNET devices with dev revision 0x00 do not support manually
-+	 * setting the speed to 1000.
-+	 */
-+	if (pdev->revision == 0x00)
-+		plat->flags |= STMMAC_FLAG_DISABLE_FORCE_1000;
-+
- 	return 0;
- }
- 
-@@ -540,13 +546,6 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
- 		break;
- 	}
- 
--	/* GNET devices with dev revision 0x00 do not support manually
--	 * setting the speed to 1000.
--	 */
--	if (pdev->device == PCI_DEVICE_ID_LOONGSON_GNET &&
--	    pdev->revision == 0x00)
--		plat->flags |= STMMAC_FLAG_DISABLE_FORCE_1000;
--
- 	ret = stmmac_dvr_probe(&pdev->dev, plat, &res);
- 	if (ret)
- 		goto err_disable_device;
+ MODULE_DESCRIPTION("Loongson DWMAC PCI driver");
+ MODULE_AUTHOR("Qing Zhang <zhangqing@loongson.cn>");
++MODULE_AUTHOR("Yanteng Si <siyanteng@loongson.cn>");
+ MODULE_LICENSE("GPL v2");
 -- 
 2.31.4
 
