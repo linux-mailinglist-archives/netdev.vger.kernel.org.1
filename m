@@ -1,146 +1,125 @@
-Return-Path: <netdev+bounces-91253-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91254-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F8238B1E4F
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 11:45:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5D9C8B1E89
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 11:55:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 609871C219E5
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 09:45:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 149901C228A0
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 09:55:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 830BC84E1D;
-	Thu, 25 Apr 2024 09:44:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1AE685281;
+	Thu, 25 Apr 2024 09:54:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b="d0krcBJi";
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b="Nq8CLYD8"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HZ9+4Wyl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.tq-group.com (mx1.tq-group.com [93.104.207.81])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C68D484DFB;
-	Thu, 25 Apr 2024 09:44:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.104.207.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 304B984FD4
+	for <netdev@vger.kernel.org>; Thu, 25 Apr 2024 09:54:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714038296; cv=none; b=NR+xtk2td+kreOpJziw0yV9jEiTlb9LmxspcALPX8yduU2wZ6SOJaPmZniuCWRZ3Sa92BVrys64BaQ2BnNXhlEKZm/rktmb6X3Q8NcWMLt7DjG/2cpjnr8Q2OmOp2uDHjb/rYkcwX5MTTn8074Zhl7YzhMsbY3ZWE8yG6dWkrUw=
+	t=1714038895; cv=none; b=Nu0VXPkGzS4eWP3CKwP0aJhluwAmf7dy66Ckf0bQ7QL6axCo50gpvrj/ChEXmkulZdWDenVRghcDFu+YwCLHKqSp+gQcrLhAqOIvlMGpysmyp2ekW03ypGi95hcxNU2tOTg964Mo1LCCbvbG5ZlIEh+Q41b279jajl0pPt6xprc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714038296; c=relaxed/simple;
-	bh=3DB11IKP/T9/3xhOrWwdKlbwGKlVUxdv7gsOBmdeDHI=;
-	h=Subject:Date:From:To:Cc:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JzVAEJY6opSqDj/GkcrW11mPFJ7IhK0cy5fiVWxRz1n/XeJL1jYPkPzr18AgBJ7OQ91pqJUywNf8akwaO+v7Sz3Zh9KXydX9RQpt3Nxw04TLwfvlzaCTFgTSeOC77q8oM++XN0iUtLcjOTfK4LnB/j6x+2qjYh8gJdKGLmUjMP0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com; spf=pass smtp.mailfrom=ew.tq-group.com; dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b=d0krcBJi; dkim=fail (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b=Nq8CLYD8 reason="key not found in DNS"; arc=none smtp.client-ip=93.104.207.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ew.tq-group.com
+	s=arc-20240116; t=1714038895; c=relaxed/simple;
+	bh=hfbV/RZTarJj3gnQEpHtU3hSgVkyrIqXsZDPMv6z8CM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=dllxU1rS7xjcHb8r9fX0ndYNzwhjdCxClJF7TKZckITcWDqYtbBKfJejZ8cATPAX8cKBjDsjmT7spWn/JhaGD2EGX5HKPDEqBmgXvKw7JFFsiQdrFNu293WblvAAFKuFTzXbbSOm04cEEx6mV6t8rF3z6KMkeBY+nhZhgVckHmw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HZ9+4Wyl; arc=none smtp.client-ip=209.85.208.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-571e13cd856so12915a12.0
+        for <netdev@vger.kernel.org>; Thu, 25 Apr 2024 02:54:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
-  t=1714038292; x=1745574292;
-  h=date:from:to:cc:message-id:references:mime-version:
-   content-transfer-encoding:in-reply-to:subject;
-  bh=HLlh2QL5TbXjyNAR69Yvmpo/xTGS9Lo12NgQNCZ06YQ=;
-  b=d0krcBJiCro8dwV/UsQ41hTNK00RhxCS9pxR/t7ur4wyBZ+SNfGTqVzW
-   77IMTjoM2UunbSDklUQeCOESuBSnZjdWRFFhz+d9nAZ2acsexxsdaz2Q8
-   qYBXxTFMTQDqS5eZ5JeccM0O5Kw/YHhoPnXFd4cLTJ9KUV7tC4n1NL8rI
-   wImJT8RfCrJmHE+cVywmIEmGzJncWd9dVEa9pwW/DRk98NUOQsM+UTD5y
-   ZsxY0vlxepmzu7vwsJ8L33B87fmKxyDJaLisBleyGsjLnkxyXcf+MZAOZ
-   GaAjsBkjmASW5boKxt74t7kgKT/0J0Nx+a8QWc93pG1VJuhhtSKx+ac7E
-   g==;
-X-IronPort-AV: E=Sophos;i="6.07,228,1708383600"; 
-   d="scan'208";a="36610690"
-Subject: Re: Re: [PATCH 1/4] can: mcp251xfd: stop timestamp before sending chip to
- sleep
-Received: from vmailcow01.tq-net.de ([10.150.86.48])
-  by mx1.tq-group.com with ESMTP; 25 Apr 2024 11:44:48 +0200
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id BCAC516E686;
-	Thu, 25 Apr 2024 11:44:41 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ew.tq-group.com;
-	s=dkim; t=1714038284;
-	h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=HLlh2QL5TbXjyNAR69Yvmpo/xTGS9Lo12NgQNCZ06YQ=;
-	b=Nq8CLYD8RZR4BApO/dYg4PxApypWD1JWXYNDBi/QoJZKiDwzuBjz23RL6l+nX4XByGNPHU
-	JTMkKfte6NNmdQYX8pu5+xfAhavNby5URmwXf5jTSeDp+nLjuJ7kK1X65VVJfvXSXVKPep
-	NyOPhpcMVH3GSF6xsvBdqxYhekw4348A+7ngA3vEUDkZ9xOe7/qQf1G3vTIlU9Lp+Qo9IQ
-	/9qHR5VCjjDvZPrM8bYobzMlAT1v1gMaJObL/fKP6O0wdFrlhe8MTlQ9XcoAKE2PGJjPEG
-	0IdG3KOk9DEhyoEOeN5yuaNa1rC46QDyoO6syTp1xZHQbBCm7s+GQWGnXBv5KQ==
-Date: Thu, 25 Apr 2024 11:44:36 +0200
-From: Gregor Herburger <gregor.herburger@ew.tq-group.com>
-To: Marc Kleine-Budde <mkl@pengutronix.de>
-Cc: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
-	Thomas Kopp <thomas.kopp@microchip.com>,
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>, linux-can@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	devicetree@vger.kernel.org, linux@ew.tq-group.com,
-	alexander.stein@ew.tq-group.com
-Message-ID: <ZiomBNoSsXlYfKN2@herburgerg-w2>
-References: <20240417-mcp251xfd-gpio-feature-v1-0-bc0c61fd0c80@ew.tq-group.com>
- <20240417-mcp251xfd-gpio-feature-v1-1-bc0c61fd0c80@ew.tq-group.com>
- <20240424-adaptable-zircon-badger-1fefd9-mkl@pengutronix.de>
- <ZinnV+GA20LWGUOV@herburgerg-w2>
- <20240425-tall-quiet-wren-f00e44-mkl@pengutronix.de>
+        d=google.com; s=20230601; t=1714038892; x=1714643692; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9zqv/konk0WiXBafX4h8lK5bdqLuFg953XCNlD3iE7U=;
+        b=HZ9+4WylZcjlkxM5GD6OkLnN1wctJzCj+0l2NhJW+1w4CbZ3fALWqnfgMY/MTdhdrw
+         0txX2mq1x5WYAhkYScIbUKDIjAXoxkRhmCojcIx+UsZIeX759jA82VJRVtk4YD4Jmgbn
+         LCAZ68ysx6WMROTeQkuZpkCRZ7NjMIMwvDLz4iXYE2pYBQe5oX+V2Cr9GJ8T0SCYCBBT
+         p2OBoNEC4xNBys/X76hWyckjRAv2rEfk+N9yZrBi+mOVcIPuLWWgI5Aww/g1+nlEqTL7
+         ywv9eMbeEYmL5cykWcSOZYGaPYCy3fBlUKqCQ+ef4uADYelbpqrxVdGzirkwo7Vvm4N5
+         iKnQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714038892; x=1714643692;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=9zqv/konk0WiXBafX4h8lK5bdqLuFg953XCNlD3iE7U=;
+        b=RfSxoYvBYpot3XIzdNgUE07+90jgAM9R5iG/PRsjmkx4rviuq83dPdGB3fm3n/fi8A
+         8JB9soqZ2TVUkhPV0BoV68PWLzeUUVisCmF2c7d88U+NvuvtqjbTXCgOtPuXbcZ3L1gM
+         gMds4sHiWevfpigOhCXbp5RiVnBH1CytT0zEvUCUZCqtb0I4ul//QW4qSPljEv4zf2bG
+         IFD08AisP5BEo62drCOGhk/OAnbg9We9Sx1snzNo0UKbgC6ZAoDwuzcNBIPl5xIRav3T
+         Ec14VDz7kc/zcZWP8X3disOV83Y1IAQnntrTIwbKNdvJlDQItLriTdgI+qgM4PoW/YSa
+         zOUw==
+X-Forwarded-Encrypted: i=1; AJvYcCX17rjPz+t4vMM85wuUsroXpQtW+XHNDGIEA00PtF2PKx/6kzxfmnld3SuVcMtVS8n4duzxNToNUcMy5nVImg6BivFU/zdI
+X-Gm-Message-State: AOJu0YyF1PQQSHYrLV1AlZYW6NHPjsz2oqesTBbNAv1nz/y3c+dB+cYv
+	8XhJknP+/RjKi/NbVMDWmya/YtR/2+CLsR4k4yMZ+NkG7dZDzOeGohbUBI98PsHXHkY8jTq0tWZ
+	IYpiRBdre0HVVkq9tQlkqMGHF5tt7SDlWtZva
+X-Google-Smtp-Source: AGHT+IF1jUh8OEQl+WwRNPGSb8cJoC3wfyc9+wHbtxUxM55wwk2Dql1iVFlshN9cf2h9YRjlrgbHHSrRqqKgwo3pJrY=
+X-Received: by 2002:a05:6402:40cb:b0:572:3b8c:b936 with SMTP id
+ z11-20020a05640240cb00b005723b8cb936mr172669edb.2.1714038892171; Thu, 25 Apr
+ 2024 02:54:52 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240425-tall-quiet-wren-f00e44-mkl@pengutronix.de>
-X-Last-TLS-Session-Version: TLSv1.3
+References: <tencent_284407955020261D1B2BD142194A87C9EB0A@qq.com> <ZiokCzm41m21CxLR@calendula>
+In-Reply-To: <ZiokCzm41m21CxLR@calendula>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 25 Apr 2024 11:54:37 +0200
+Message-ID: <CANn89iLxRgYSsFokDo327B4CwwwN9B1Q8e+OHvQenn0a5SfxDQ@mail.gmail.com>
+Subject: Re: [PATCH] netfilter: mark racy access on ext->gen_id
+To: Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: linke li <lilinke99@qq.com>, xujianhao01@gmail.com, 
+	Jozsef Kadlecsik <kadlec@netfilter.org>, Florian Westphal <fw@strlen.de>, 
+	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Apr 25, 2024 at 08:29:13AM +0200, Marc Kleine-Budde wrote:
-> On 25.04.2024 07:17:11, Gregor Herburger wrote:
-> > On Wed, Apr 24, 2024 at 01:54:54PM +0200, Marc Kleine-Budde wrote:
-> > > On 17.04.2024 15:43:54, Gregor Herburger wrote:
-> > > > MCP2518FD exits Low-Power Mode (LPM) when CS is asserted. When chip
-> > > > is send to sleep and the timestamp workqueue is not stopped chip is
-> > > > waked by SPI transfer of mcp251xfd_timestamp_read.
-> > > 
-> > > How does the Low-Power Mode affect the GPIO lines? Is there a difference
-> > > if the device is only in sleep mode?
-> > 
-> > The MCP251XFD_REG_IOCON is cleared when leaving Low-Power Mode. This is
-> > why I implemented regcache.
-> 
-> But that means you have to power the chip if a GPIO is requested. You
-> have to power up the chip in the request() callback and power it down in
-> the free() callback.
+On Thu, Apr 25, 2024 at 11:36=E2=80=AFAM Pablo Neira Ayuso <pablo@netfilter=
+.org> wrote:
+>
+> On Tue, Apr 23, 2024 at 07:50:22PM +0800, linke li wrote:
+> > In __nf_ct_ext_find(), ext->gen_id can be changed by
+> > nf_ct_ext_valid_post(), using WRITE_ONCE. Mark data races on ext->gen_i=
+d
+> > as benign using READ_ONCE.
+> >
+> > This patch is aimed at reducing the number of benign races reported by
+> > KCSAN in order to focus future debugging effort on harmful races.
+>
+> There are a more uses ext->gen_id in the code, my understanding this
+> patch is just a stub.
 
-Ah I see. Currently the GPIO rigister is cached and only written to the
-chip if the netdevice is set up. I think to have a more generic gpio controller
-the chip should wake up when the GPIO is requested. Also the chip should
-not go to sleep while GPIO is requested and netdevice is set down.
+Anyway, ext->gen_id was already read and stored in @this_id
 
-> I've 2 patches laying around, one that moves the timestamp
-> init/start/stop into the chip_start/stop. And another one that moves the
-> soft reset and basic configuration of the chip into the runtime pm
-> functions. I have to make both patches compatible and send them to the
-> list. Feel free to pick them up and integrate them into your series.
+I would probably avoid reading it a second time.
 
-I will have a look at them.
-> 
-> regards,
-> Marc
-> 
-> -- 
-> Pengutronix e.K.                 | Marc Kleine-Budde          |
-> Embedded Linux                   | https://www.pengutronix.de |
-> Vertretung Nürnberg              | Phone: +49-5121-206917-129 |
-> Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+diff --git a/net/netfilter/nf_conntrack_extend.c
+b/net/netfilter/nf_conntrack_extend.c
+index dd62cc12e7750734fec9be8a90fd0defcbc815e0..747797b20bc7417a2b7270d84f6=
+2d24991a4b982
+100644
+--- a/net/netfilter/nf_conntrack_extend.c
++++ b/net/netfilter/nf_conntrack_extend.c
+@@ -141,7 +141,7 @@ void *__nf_ct_ext_find(const struct nf_ct_ext *ext, u8 =
+id)
+        if (!__nf_ct_ext_exist(ext, id))
+                return NULL;
 
-Best regards
-Gregor
--- 
-TQ-Systems GmbH | Mühlstraße 2, Gut Delling | 82229 Seefeld, Germany
-Amtsgericht München, HRB 105018
-Geschäftsführer: Detlef Schneider, Rüdiger Stahl, Stefan Schneider
-https://www.tq-group.com/
+-       if (this_id =3D=3D 0 || ext->gen_id =3D=3D gen_id)
++       if (this_id =3D=3D 0 || this_id =3D=3D gen_id)
+                return (void *)ext + ext->offset[id];
+
+        return NULL;
 
