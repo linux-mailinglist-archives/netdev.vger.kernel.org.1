@@ -1,81 +1,94 @@
-Return-Path: <netdev+bounces-91170-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91173-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F8038B192D
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 05:09:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0DA988B1930
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 05:10:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 614FB1C211C6
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 03:09:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ADAC5285864
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 03:10:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E602F17578;
-	Thu, 25 Apr 2024 03:09:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 239B1182CC;
+	Thu, 25 Apr 2024 03:10:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QQB9weRe"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d961RFXZ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1795629
-	for <netdev@vger.kernel.org>; Thu, 25 Apr 2024 03:09:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E896B17578;
+	Thu, 25 Apr 2024 03:10:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714014540; cv=none; b=CYn3mUU7fyfhEuv5dX7bIUnt7yp8jLeWMjUEGggPmv9e7XLxBR2RRmjsGOB2lGL4yo2COxAGGR4X82xvC+mH8u80YFo2Q9IiHB182OIsvdOraz+5tjJEraoOdBuSjT2ttYYYc/keNvMR4i5PjZa8dzb3aCRtXoIKqei5PsZrldo=
+	t=1714014629; cv=none; b=rWIbwfnjz3q09NYodW7xEsn6vf3WWfR+PERcaON8JTMaPEBwdBN4PeAI5VFO6aPffUHiwzyB01S8FHoP2HTTVJRVCmbSjVSaW6yZZsherILR2TI6qnrQXLuMNMxLjh7Z3EhpjeKQ2+6NJ5JWra/uBLplsh1FrLJkxny3emYw1dA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714014540; c=relaxed/simple;
-	bh=4o7WCAAF43+pArz7zT8w8IDBOYjPyyeP8m6d4/V/qGo=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rstUPIK2IbclFgw6AAQiSIHLXi24FNcn9mhMMiDn1iJF1Sf5eACzUrKShbYyBxLrY5lKtA02bCofDLX86Zw8svjs++MgQHGPclJXyOyEwrS7BHj9JxQWtlT4FOZwKkrM+nuyTzv9nMaZ2RV0l9sKAfxFNVHWOIbzAzHBJ3UBrgc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QQB9weRe; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC3CDC113CD;
-	Thu, 25 Apr 2024 03:08:59 +0000 (UTC)
+	s=arc-20240116; t=1714014629; c=relaxed/simple;
+	bh=Na+79jN4ihtVcXKmfLdMltW3hg4oUuFIHlU59f/pwPY=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=iOvLzyxV5slB8EO24MA7UQWrqKJrGDR71B3f8ffhAnxCYeXeghktz4sJvc5uO4MlCGQCWp3k2pvEsNoeXh+nqBdWjWGXphe7D4KGFtaVzOb05Yb0C40EOF2lH1SWPlPbUmB7QyuCkMq5X1f9wV3LwcUm5TS2whhWN4yHCE9gv1g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d961RFXZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 6F1C3C32781;
+	Thu, 25 Apr 2024 03:10:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714014540;
-	bh=4o7WCAAF43+pArz7zT8w8IDBOYjPyyeP8m6d4/V/qGo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=QQB9weResXSIglwsw4ytQm0w7d5Vi8Bdc79dF1kqrqg9RRVlyQQrdeRyOXjg/8Wgd
-	 678roeVarHHYVfcBDHx834Huh7yN9YW+vy4sL6kiyE5qjjN4h7ODDr9rbonNMOLUQd
-	 3nDBVBtx/DZORFlNso/7ts341WBk4U+NN+FQstO2iLY4sy/H0gMaeVG5urqCKWQDvg
-	 uK5YpnI54zJl08VPfcmt//zmC5TIiuNad2j15DlvzKw24PfxUl8KyMBdKSzSt9EubR
-	 0ovz9I9MpknPvRbS4xEFi+pAMIoWOon55OrKvTVguyNclCokZ2g79tGVWDkoLXdDHp
-	 jL2hPKHJ52lKg==
-Date: Wed, 24 Apr 2024 20:08:58 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: Mateusz Polchlopek <mateusz.polchlopek@intel.com>, Tony Nguyen
- <anthony.l.nguyen@intel.com>, <davem@davemloft.net>, <pabeni@redhat.com>,
- <edumazet@google.com>, <netdev@vger.kernel.org>, Jiri Pirko
- <jiri@nvidia.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Subject: Re: [PATCH net-next 1/6] devlink: extend devlink_param *set pointer
-Message-ID: <20240424200858.1d0740a4@kernel.org>
-In-Reply-To: <cdd3d9d7-1b21-4dc2-be21-ef137682b1ea@intel.com>
-References: <20240422203913.225151-1-anthony.l.nguyen@intel.com>
-	<20240422203913.225151-2-anthony.l.nguyen@intel.com>
-	<cdd3d9d7-1b21-4dc2-be21-ef137682b1ea@intel.com>
+	s=k20201202; t=1714014628;
+	bh=Na+79jN4ihtVcXKmfLdMltW3hg4oUuFIHlU59f/pwPY=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=d961RFXZlNVA6qOzRZa82wZKTccrLLa9zFFTaizzFTkI5O99Kr10hdgXiqpTrbUJS
+	 aIoaUZmTKw1tRYLvPkmc2zs/r8H3JoZQpupzs06MRmDnfuIBbHv/oji+IiM1sqnwBf
+	 /hclw3Y+kgRi+Y6PTqScfLTjdUkJUvEwVey+RoLzsKrMtFIPwTrSiNFFhSWOKNL1NL
+	 hSmX/4ZEbajh2kYmoib9Aex6pOXBPayWPxdaFEUsPYSce+2neDRHTNxBA37ji4n3O3
+	 0BA6OfzdaPZ5SH8fDjgrQYf6M37u022knVcUCFAUxoQ0GWLnzfS5gIrf6ryvPEQLgk
+	 W2LEhWk5+TVjQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 5EF05CF21C2;
+	Thu, 25 Apr 2024 03:10:28 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] octeontx2-pf: flower: check for unsupported control
+ flags
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171401462838.4490.15538727466149973306.git-patchwork-notify@kernel.org>
+Date: Thu, 25 Apr 2024 03:10:28 +0000
+References: <20240422152735.175693-1-ast@fiberby.net>
+In-Reply-To: <20240422152735.175693-1-ast@fiberby.net>
+To: =?utf-8?b?QXNiasO4cm4gU2xvdGggVMO4bm5lc2VuIDxhc3RAZmliZXJieS5uZXQ+?=@codeaurora.org
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ sgoutham@marvell.com, gakula@marvell.com, sbhatta@marvell.com,
+ hkelam@marvell.com, sumang@marvell.com
 
-On Wed, 24 Apr 2024 11:05:58 +0200 Alexander Lobakin wrote:
-> >  	int (*set)(struct devlink *devlink, u32 id,
-> > -		   struct devlink_param_gset_ctx *ctx);
-> > +		   struct devlink_param_gset_ctx *ctx,
-> > +		   struct netlink_ext_ack *extack);  
+Hello:
+
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Mon, 22 Apr 2024 15:27:34 +0000 you wrote:
+> Use flow_rule_is_supp_control_flags() to reject filters with
+> unsupported control flags.
 > 
-> Sorry for the late comment. Can't we embed extack to
-> devlink_param_gset_ctx instead? It would take much less lines.
+> In case any unsupported control flags are masked,
+> flow_rule_is_supp_control_flags() sets a NL extended
+> error message, and we return -EOPNOTSUPP.
+> 
+> [...]
 
-I think the way Mateusz wrote this is more prevalent today.
-Also feels a tiny bit cleaner to me, because if we embed
-extack why is devlink and id not embedded?
+Here is the summary with links:
+  - [net-next] octeontx2-pf: flower: check for unsupported control flags
+    https://git.kernel.org/netdev/net-next/c/3c3adb22510c
 
-We've seen this series enough times, let me apply this as is..
-Please follow up with the doc adjustments if you'd like, separately.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
