@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-91370-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91373-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 284BF8B2560
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 17:40:51 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7FBB8B2564
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 17:40:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 24DB51C22FB4
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 15:40:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1E622B28558
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 15:40:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F55F14C5A9;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9618214C5BD;
 	Thu, 25 Apr 2024 15:40:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f62C9s2D"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YmjYbmUB"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B1E614C59C
-	for <netdev@vger.kernel.org>; Thu, 25 Apr 2024 15:40:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B2BC14C5A1;
+	Thu, 25 Apr 2024 15:40:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714059630; cv=none; b=C5oTiqZy3aYwksJV/A9Qkvo9sNR0uyvLGUqgHepJT7xKoowKL6dcX527zhy1L1W3wTPwnRYIWh6VMS+9Xomc8GOCW/mMwu2pN17Yj7T84YNMOk/Yh7vbUjLWq427fLSpF+GZ1JoU8HPYJ2/M9u6yRz6ol0nNeLMJdiQFUOuAEa0=
+	t=1714059630; cv=none; b=b3guUU/aKKK9Gu+z4kRGidjRHoweW5dDw0OSAMDNDNyu03IToKATmbL3C4on+7dIK32KyO9OGP5TkjRHkxXnf7itJ7gKR7C7EWXn2Ld8OWU8a9eZAv34C9Fv7UU7Iviszmkh+kT8aMR+vK/LIZuwTStjPjdaGf+EH8CT3FGGc4E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1714059630; c=relaxed/simple;
-	bh=EzGKPy2St3dfFz8dVbWEjC4xNtRIUAyWGJXbDIimF4I=;
+	bh=1EY6MgbTtDW/Fx+kD6yV6cKSy9yW23CtaOOoAnzw5T4=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=cwPJwFxWdoM8x1+QeY/u/i7Su3uYqwNoND/xJoa4ZPISpZ9QQBA/1o/0abllCG/asxJqf1c70x8oNTa8bWODseBfFTzbmRMvNbZwTaOiGNxUAMCYw7yp/tgl1RrJAyU9iz+ZnVy0wCMVYudu+1o3cOINHrya1yzMXQc4tBmjEz4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f62C9s2D; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 1AC24C113CC;
+	 In-Reply-To:To:Cc; b=MrQzOvSdpLsc13kfCpzDAaIVLiQ4dzjLytIlp5qMlAma5FCbCs6hzg7Jazrnf7XqmBL8kjKCFeuHq/bVtyPKZ8C7Tjuh8wwtCEij1iGVmjpgWZSyasKad5sTV4mZEasZrTuCd1J4YBGbOARER/gurE1ZVjmhqr8kfSJOolapQ4E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YmjYbmUB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 265ADC4AF0B;
 	Thu, 25 Apr 2024 15:40:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1714059630;
-	bh=EzGKPy2St3dfFz8dVbWEjC4xNtRIUAyWGJXbDIimF4I=;
+	bh=1EY6MgbTtDW/Fx+kD6yV6cKSy9yW23CtaOOoAnzw5T4=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=f62C9s2DvzeNPgm7d7V3wgShqynr6sb3rAxqY1oCsixCCEf9o18U9VtDy8lPSpuz3
-	 eeDe+tNS4UFjUDz3SIxV4tBKF8XG+cTCdfzGjCdphlCPdmzxAhH5yfuyxcDUitsrW3
-	 zqHCwKRl2qxXFYNRFErAExhOAf5vejwq2ZaSjROQr26rthVuyVEBoqVbR0igZIZOh1
-	 CdjxDuZwa9V++vIx1S5pbVgghdDfnhhHYxnvL3UJhNzKRoX6eYsT6PR+xjF34gr3hJ
-	 qUByHFEqkVdgjtGDYhiK3M83cVyGuvlqj1le4lHWCw6pDWjRuO+D8Ipzb58KvtIrcT
-	 mbY9OLbN3UGow==
+	b=YmjYbmUBC5jl434lpLCStAf0rh8Q1E8wh/EMuH3y4bCNq/FlVKRdOOTOgZYfjXx1r
+	 5p7a0VmjuKe3y9X2FxI6KBUKn56TLQxAlkEh+Lj65eWy4GVEcdC/86YASToyTV5DX2
+	 2wx+w+8bf8JECoJGkxkDTLeApIZ/xKomK/lLz7NIImVh5QhzA8BvNQOE8hIKN5t3gC
+	 A/E14bu2NHPXZDALc+nw1w8wB12uDtcEeaop5qQ25WUqJu9yeUdhFKir6V/EUEa63N
+	 QIKSL/SzoEkJV/biRHRMEgI2zHXmw0b4VPWxtbidaQyY0Xem4pcIAITIJGWh+Gtt/m
+	 NnetRUXbhpAVQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id F3859C595C5;
-	Thu, 25 Apr 2024 15:40:29 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 0EF90CF21C4;
+	Thu, 25 Apr 2024 15:40:30 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,37 +52,41 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] tls: fix lockless read of strp->msg_ready in ->poll
+Subject: Re: [PATCH] net: ravb: Fix registered interrupt names
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171405962999.10966.471620243473812058.git-patchwork-notify@kernel.org>
-Date: Thu, 25 Apr 2024 15:40:29 +0000
-References: <0b7ee062319037cf86af6b317b3d72f7bfcd2e97.1713797701.git.sd@queasysnail.net>
-In-Reply-To: <0b7ee062319037cf86af6b317b3d72f7bfcd2e97.1713797701.git.sd@queasysnail.net>
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
- borisp@nvidia.com, john.fastabend@gmail.com, davem@davemloft.net,
- edumazet@google.com
+ <171405963005.10966.1749832467271464576.git-patchwork-notify@kernel.org>
+Date: Thu, 25 Apr 2024 15:40:30 +0000
+References: <cde67b68adf115b3cf0b44c32334ae00b2fbb321.1713944647.git.geert+renesas@glider.be>
+In-Reply-To: <cde67b68adf115b3cf0b44c32334ae00b2fbb321.1713944647.git.geert+renesas@glider.be>
+To: Geert Uytterhoeven <geert+renesas@glider.be>
+Cc: claudiu.beznea.uj@bp.renesas.com, s.shtylyov@omp.ru,
+ paul.barker.ct@bp.renesas.com, niklas.soderlund+renesas@ragnatech.se,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 24 Apr 2024 12:25:47 +0200 you wrote:
-> tls_sk_poll is called without locking the socket, and needs to read
-> strp->msg_ready (via tls_strp_msg_ready). Convert msg_ready to a bool
-> and use READ_ONCE/WRITE_ONCE where needed. The remaining reads are
-> only performed when the socket is locked.
+On Wed, 24 Apr 2024 09:45:21 +0200 you wrote:
+> As interrupts are now requested from ravb_probe(), before calling
+> register_netdev(), ndev->name still contains the template "eth%d",
+> leading to funny names in /proc/interrupts.  E.g. on R-Car E3:
 > 
-> Fixes: 121dca784fc0 ("tls: suppress wakeups unless we have a full record")
-> Signed-off-by: Sabrina Dubroca <sd@queasysnail.net>
+> 	89:  0      0  GICv2  93 Level  eth%d:ch22:multi
+> 	90:  0      3  GICv2  95 Level  eth%d:ch24:emac
+> 	91:  0  23484  GICv2  71 Level  eth%d:ch0:rx_be
+> 	92:  0      0  GICv2  72 Level  eth%d:ch1:rx_nc
+> 	93:  0  13735  GICv2  89 Level  eth%d:ch18:tx_be
+> 	94:  0      0  GICv2  90 Level  eth%d:ch19:tx_nc
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] tls: fix lockless read of strp->msg_ready in ->poll
-    https://git.kernel.org/netdev/net/c/0844370f8945
+  - net: ravb: Fix registered interrupt names
+    https://git.kernel.org/netdev/net/c/0c81ea5a8e23
 
 You are awesome, thank you!
 -- 
