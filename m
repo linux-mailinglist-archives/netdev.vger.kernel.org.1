@@ -1,145 +1,112 @@
-Return-Path: <netdev+bounces-91424-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91425-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB2138B2854
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 20:46:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7FA1C8B2874
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 20:50:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 687AF281708
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 18:46:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 356C81F222E2
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 18:50:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 708AC12BF22;
-	Thu, 25 Apr 2024 18:46:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A223C14A0A7;
+	Thu, 25 Apr 2024 18:50:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EJeIoP+f"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qztlQEUz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E26FF12C559
-	for <netdev@vger.kernel.org>; Thu, 25 Apr 2024 18:46:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 792062135A;
+	Thu, 25 Apr 2024 18:50:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714070789; cv=none; b=WFuOCnKJ6+/VHM4/0KbQAkEbhFsXKPdCd8zpcHWjH/tkMfjzEetWHbf5V5Kdiot+Vd8nf2aq61CQgXSXNQNEYg8cbsZVDw8iJ3BUjwGUQ26QcSBdP4ZupAH9AkFpS1evK4qpYB7cHCSdXn02zqIDM5kP5FAdyOqCeLw0M3vssAk=
+	t=1714071034; cv=none; b=IZWlU84ycwboG4dZXcaDhT8kvftbUqRXiouq3m0e1VujSznS47YojwylBY92KT5YT/nCCSUS1I+E/bnccefidGVn27CzYW7Pc7Spv5y0jy9cn7FnA+mmxb2n/hUmkgA6ug6mXgCRHrKzFiI52mo0p65QvWBBD2IPqN+Lsq3S/mQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714070789; c=relaxed/simple;
-	bh=ZsDqYu4ojuh9VuiJbaNfZoanFnnda5qja2yT5h3wsto=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=VoRg7UXgCrYAkKuoNIqq5cgSXwmUcpPDcDolJpRVJN6/356CfNFSQajVdKqeGLeRYK3UcZP3voP/SpyEub0SiEqwLr0U16DlwWAud3J62Zr8RSGA+alGsbeJ2VS+SCnm7aSxbqAgKBVnB6KEsz7hM+OGcLgn4BKYB4F9XVtRTAM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EJeIoP+f; arc=none smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1714070788; x=1745606788;
-  h=from:to:cc:subject:in-reply-to:references:date:
-   message-id:mime-version;
-  bh=ZsDqYu4ojuh9VuiJbaNfZoanFnnda5qja2yT5h3wsto=;
-  b=EJeIoP+f9DsIGS1QQpRext0zb0YEXuTXYmYss6314OJ6RhOtfwwVNBfK
-   wFK0x2CSenhivThGtZpnKvjnzOJ8iXidJUuNyY3fqg6D1WiYGzdjpqaFi
-   H7GHQZNhaw2sWoUvNEwqcBvcIVxkGMD9XaMD6evHvkPhLk52pWKXGncjO
-   DE6JeU72tCRBGAiuZMHhyD4f5mQ7jgqsN/S5hcS7ynF6VYyXs5NXHrAGe
-   DNSLd7C843Wwifh8G/AegWuNkLB6R5ob1NT3ReKi9jg553Pmh/zlqsMn3
-   lXiu9lB+pTJRs/bm3DIhO6/IZdHnUmtd2aMtY93RPfw0DJMS6j06dfPT1
-   w==;
-X-CSE-ConnectionGUID: lhCNUF7LRCG/m3AhFkjGCA==
-X-CSE-MsgGUID: T1kQVsMKR22ynHVAnVl69w==
-X-IronPort-AV: E=McAfee;i="6600,9927,11055"; a="13569734"
-X-IronPort-AV: E=Sophos;i="6.07,230,1708416000"; 
-   d="scan'208";a="13569734"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Apr 2024 11:46:27 -0700
-X-CSE-ConnectionGUID: pkPPmTyARQKBAQElP1o99A==
-X-CSE-MsgGUID: itgeq33yQP+DFUv66C/KQQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,230,1708416000"; 
-   d="scan'208";a="25666087"
-Received: from unknown (HELO vcostago-mobl3) ([10.124.220.196])
-  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Apr 2024 11:46:27 -0700
-From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-To: Corinna Vinschen <vinschen@redhat.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
- intel-wired-lan@lists.osuosl.org
-Subject: Re: [Intel-wired-lan] [PATCH] igc: fix a log entry using
- uninitialized netdev
-In-Reply-To: <ZioKlQR9z8RWGFAB@calimero.vinschen.de>
-References: <20240423102455.901469-1-vinschen@redhat.com>
- <033cce07-fe8f-42e6-8c27-7afee87fe13c@lunn.ch> <8734raxq4z.fsf@intel.com>
- <ZioKlQR9z8RWGFAB@calimero.vinschen.de>
-Date: Thu, 25 Apr 2024 11:46:26 -0700
-Message-ID: <87r0etwa9p.fsf@intel.com>
+	s=arc-20240116; t=1714071034; c=relaxed/simple;
+	bh=kt8WoX1FzFxbm3s2wti1UEz7nEy1w2bo9zkTOhlslRg=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=DI+oMgfgzz46v+11PEIS2vt09W38aStH4JbtbrtW3WozRpPKrTM6Lpb6qXUaCGK/WmhQ544y3naqAcPazKOCxUckj8T5ISPDIgD3MzeBwOU3eY9G4hdWPbeDd5xdcxUJlHyCsineC7kRg9ipOukj58vOGACRMF8H2p59yBpNxIA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qztlQEUz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id EC6E9C2BD10;
+	Thu, 25 Apr 2024 18:50:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714071034;
+	bh=kt8WoX1FzFxbm3s2wti1UEz7nEy1w2bo9zkTOhlslRg=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=qztlQEUzIcGecgUOLaJcIw+pwInH4URPwrWfroNrxpprZeKywT1h4/UO1oEPpx2a5
+	 37W5fm8Au5hBjwYAwNCRARExfoqYIqqA1aRu8+yOwHG9/ukbKl3CrKioXVzsn0ugpy
+	 AMWB2mPIwPkb/Ls/tTYW2wC6TS/domdxkwvF1hQPBFAj7AgtYNXcTLqk/6LUINk71q
+	 Q/i8wmdAxPSLx+8INMISQTICl7Nm8YGX+UX4xVs9GSIgO5mXaCuGQL3U9/ZZeAjhzL
+	 PUeyTZcjypSZefDIgKsaIMutWBlsbJWvwyi4cqYm2UwCSYPzixAR4B+gOkTEUtJuTB
+	 CTrVS1zjGmqiw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id DF640C43140;
+	Thu, 25 Apr 2024 18:50:33 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next 0/8] net: dsa: b53: Remove adjust_link
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171407103390.26281.405270567595119985.git-patchwork-notify@kernel.org>
+Date: Thu, 25 Apr 2024 18:50:33 +0000
+References: <20240423183339.1368511-1-florian.fainelli@broadcom.com>
+In-Reply-To: <20240423183339.1368511-1-florian.fainelli@broadcom.com>
+To: Florian Fainelli <florian.fainelli@broadcom.com>
+Cc: netdev@vger.kernel.org, andrew@lunn.ch, olteanv@gmail.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ linux@armlinux.org.uk, linux-kernel@vger.kernel.org
 
-Corinna Vinschen <vinschen@redhat.com> writes:
+Hello:
 
-> On Apr 24 17:06, Vinicius Costa Gomes wrote:
->> Andrew Lunn <andrew@lunn.ch> writes:
->> 
->> > On Tue, Apr 23, 2024 at 12:24:54PM +0200, Corinna Vinschen wrote:
->> >> During successful probe, igc logs this:
->> >> 
->> >> [    5.133667] igc 0000:01:00.0 (unnamed net_device) (uninitialized): PHC added
->> >>                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
->> >> The reason is that igc_ptp_init() is called very early, even before
->> >> register_netdev() has been called. So the netdev_info() call works
->> >> on a partially uninitialized netdev.
->> >> 
->> >> Fix this by calling igc_ptp_init() after register_netdev(), right
->> >> after the media autosense check, just as in igb.  Add a comment,
->> >> just as in igb.
->> >
->> > The network stack can start sending and receiving packet before
->> > register_netdev() returns. This is typical of NFS root for example. Is
->> > there anything in igc_ptp_init() which could cause such packet
->> > transfers to explode?
->> >
->> 
->> There might be a very narrow window (probably impossible?), what I can
->> see is:
->> 
->> 1. the netdevice is exposed to userspace;
->> 2. userspace does the SIOCSHWTSTAMP ioctl() to enable TX timestamps;
->> 3. userspace sends a packet that is going to be timestamped;
->> 
->> if this happens before igc_ptp_init() is called, adapter->ptp_tx_lock is
->> going to be uninitialized, and (3) is going to crash.
->
-> The same would then be possible on igb as well, wouldn't it?
->
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Given how many years igb is being used, perhaps "possible" is too strong
-:-)
+On Tue, 23 Apr 2024 11:33:31 -0700 you wrote:
+> b53 is now the only remaining driver that uses both PHYLIB's adjust_link
+> and PHYLINK's mac_ops callbacks, convert entirely to PHYLINK.
+> 
+> Florian Fainelli (8):
+>   net: dsa: b53: Stop exporting b53_phylink_* routines
+>   net: dsa: b53: Introduce b53_adjust_531x5_rgmii()
+>   net: dsa: b53: Introduce b53_adjust_5325_mii()
+>   net: dsa: b53: Force flow control for BCM5301X CPU port(s)
+>   net: dsa: b53: Configure RGMII for 531x5 and MII for 5325
+>   net: dsa: b53: Call b53_eee_init() from b53_mac_link_up()
+>   net: dsa: b53: Remove b53_adjust_link()
+>   net: dsa: b53: provide own phylink MAC operations
+> 
+> [...]
 
-On igb what exists is slightly different, as there's no ptp_tx_lock
-there, the "problem" there is trying to enqueue a job on a workqueue
-that is going to be uninitialized, during this time window.
+Here is the summary with links:
+  - [net-next,1/8] net: dsa: b53: Stop exporting b53_phylink_* routines
+    https://git.kernel.org/netdev/net-next/c/65245197ecec
+  - [net-next,2/8] net: dsa: b53: Introduce b53_adjust_531x5_rgmii()
+    https://git.kernel.org/netdev/net-next/c/b3d06dc3707f
+  - [net-next,3/8] net: dsa: b53: Introduce b53_adjust_5325_mii()
+    https://git.kernel.org/netdev/net-next/c/0d18dea4cde6
+  - [net-next,4/8] net: dsa: b53: Force flow control for BCM5301X CPU port(s)
+    https://git.kernel.org/netdev/net-next/c/93a2579ed08c
+  - [net-next,5/8] net: dsa: b53: Configure RGMII for 531x5 and MII for 5325
+    https://git.kernel.org/netdev/net-next/c/536e5b2ecbae
+  - [net-next,6/8] net: dsa: b53: Call b53_eee_init() from b53_mac_link_up()
+    https://git.kernel.org/netdev/net-next/c/888128f360e1
+  - [net-next,7/8] net: dsa: b53: Remove b53_adjust_link()
+    https://git.kernel.org/netdev/net-next/c/600354352cf2
+  - [net-next,8/8] net: dsa: b53: provide own phylink MAC operations
+    https://git.kernel.org/netdev/net-next/c/d0a35d2948ec
 
-And to be sure, I am still uncertain that this is possible.
-
->
->> If there's anything that makes this impossible/extremely unlikely, the
->> patch looks good:
->> 
->> Acked-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
->> 
->> 
->> Cheers,
->> -- 
->> Vinicius
->
->
-> Corinna
->
-
-Cheers,
+You are awesome, thank you!
 -- 
-Vinicius
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
