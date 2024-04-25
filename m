@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-91377-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91376-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 328698B25B8
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 17:53:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 84BF28B25AB
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 17:52:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 37D15B254D9
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 15:50:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 050E4B2557D
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 15:50:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D963414BFBC;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D62CE14BFA3;
 	Thu, 25 Apr 2024 15:50:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lcJrwTKd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jyxnrUCP"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1DFC14B098;
-	Thu, 25 Apr 2024 15:50:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1DAD14B084
+	for <netdev@vger.kernel.org>; Thu, 25 Apr 2024 15:50:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714060228; cv=none; b=bduw4uYXzmwx/y3pTFvv9VbXRV0tl5EfblndGo66DC+sivxCJWIp2H1zM3/skd1x9QKgOt/Cp4mLTAMHNyAln0xJDxuwj5YNYLpn+w2CmSzhXJjP0ELSXpxG511wsEVvqTyw63pr8UitOZt5+E7SyXeEVlRMIEUETeuea7MIBV0=
+	t=1714060228; cv=none; b=q7hBQ9pK8kLYzhEbw5lPu9VsdXaP8+VfeTnKjqWLODx2snQLdPNWDQwITF4Q912n9zdiieY2DuWks7cpeOhMVn9K9DtDvBAdIeq4pEuRKcwm2+v/9+Vgi5D0GUjwn74tYsBEJacmWCbkpisEtSHobfFabKvo/0gpU2HkPixtSgo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1714060228; c=relaxed/simple;
-	bh=8++MObKo1hHc9ffKYaUgO+WC2meH48Ztf80tXfFARHc=;
+	bh=V2UgF04EV4cy7R5SRKZ+wVV1SG6GzJT/cLT5ErNIZt0=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=cVEV1H49FFsxZlxQk2mQvmo8gT4V7K+yAjQHTeaQpWAz3TSRrcNu1zG2pIAGjzMlPeCORbagBAY6+fKRSe2Q61QYLhREKn+DIgoaJNa5ACwVmnYbNGz8+tC81L6cjr5L8+p8PBI3Izwb081kmRnCikChr/K38YYGaaBwssFNYNM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lcJrwTKd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 55AF2C2BD11;
+	 In-Reply-To:To:Cc; b=QFkU3T70xkLoE5/XmRdxvE5k4bOypXRrgMyRsGTfpv0i/JJZxNIwyNyxWibZHeleJI24PRKSl36rvajFyuKYPskyUBY4WJwSj6WEZnQMJbG7vNkjVfxLD49BTqmcwt89wG2vn90zx5TOtp7q2VANvsNil8oOV5vt5uN6uWKt/wA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jyxnrUCP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 4F833C2BD10;
 	Thu, 25 Apr 2024 15:50:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1714060228;
-	bh=8++MObKo1hHc9ffKYaUgO+WC2meH48Ztf80tXfFARHc=;
+	bh=V2UgF04EV4cy7R5SRKZ+wVV1SG6GzJT/cLT5ErNIZt0=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=lcJrwTKdBf/wFWlWZ26ZI7KhYGZDkLoKFYnAdUidvXO0k+86DOpxCiMovEKUTqsd9
-	 g4FANb5z28cJfh4JxnKRPv7kQgNxzN2GROpgSXKKSTLm2Sprsq7jGbpWz6Ki1U/Jx2
-	 Qnb/hR4Eney4sXMEtoXx1vV3Dbm9jYS4Ch7eTYglRWBYKQmLBIVPjFGhi13ck6ZMFr
-	 j6NkGlVJ/oRcrPlVe3NZTKUhugXCu8VhrGzcXbqhGs7g2roq/cvmlfJO1hYhKDvlXM
-	 F7jQ+CLzs9WqqDLBlr19InCXcKDnGRN+td7EfA/B9+2Hcr4Wd07wxdtmmekRHbqzfr
-	 8DO8DeOvnTNYQ==
+	b=jyxnrUCPuxkbZwiIrtKqSU6oS88IPycIMcKA83xHWHBPAJ6CDPBeYZiVQMUJ3UzSE
+	 QnligXpQJ2wMsFhalMd7PZn7GtF8NTPD6BJKpvhLz7GJce6ovM3gqK/gkhvIxTLH0V
+	 W2nYv3KloF4QgianKu6qxs4SGjWzFHPADuzWuMcuihk2MFkHi3EBsm+GlErBiquR/v
+	 PAVI6pE+8GD+CWw0klmuD+53l0vCvMVslWQvHQHwZnT1mjeyQ3KKvU989KdP4AbR/f
+	 nxXx89NQKrMcLMoxKobU1GxxKXwO48oqbNWjnPw1aL5JmIjOgyiX/a1QvNm23ywqxb
+	 loRPSFowxp4Vg==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 45775CF21C2;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3D558C595C5;
 	Thu, 25 Apr 2024 15:50:28 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,39 +52,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 1/2] ipvs: Fix checksumming on GSO of SCTP packets
+Subject: Re: [PATCH v3 net] af_unix: Suppress false-positive lockdep splat for
+ spin_lock() in __unix_gc().
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171406022828.18400.2283631341467593246.git-patchwork-notify@kernel.org>
+ <171406022824.18400.12892759544477412542.git-patchwork-notify@kernel.org>
 Date: Thu, 25 Apr 2024 15:50:28 +0000
-References: <20240425090149.1359547-2-pablo@netfilter.org>
-In-Reply-To: <20240425090149.1359547-2-pablo@netfilter.org>
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: netfilter-devel@vger.kernel.org, davem@davemloft.net,
- netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, fw@strlen.de
+References: <20240424170443.9832-1-kuniyu@amazon.com>
+In-Reply-To: <20240424170443.9832-1-kuniyu@amazon.com>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, mhal@rbox.co, kuni1840@gmail.com, netdev@vger.kernel.org,
+ syzbot+fa379358c28cc87cc307@syzkaller.appspotmail.com
 
 Hello:
 
-This series was applied to netdev/net.git (main)
-by Pablo Neira Ayuso <pablo@netfilter.org>:
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 25 Apr 2024 11:01:48 +0200 you wrote:
-> From: Ismael Luceno <iluceno@suse.de>
+On Wed, 24 Apr 2024 10:04:43 -0700 you wrote:
+> syzbot reported a lockdep splat regarding unix_gc_lock and
+> unix_state_lock().
 > 
-> It was observed in the wild that pairs of consecutive packets would leave
-> the IPVS with the same wrong checksum, and the issue only went away when
-> disabling GSO.
+> One is called from recvmsg() for a connected socket, and another
+> is called from GC for TCP_LISTEN socket.
 > 
-> IPVS needs to avoid computing the SCTP checksum when using GSO.
+> So, the splat is false-positive.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,1/2] ipvs: Fix checksumming on GSO of SCTP packets
-    https://git.kernel.org/netdev/net/c/e10d3ba4d434
-  - [net,2/2] netfilter: nf_tables: honor table dormant flag from netdev release event path
-    https://git.kernel.org/netdev/net/c/8e30abc9ace4
+  - [v3,net] af_unix: Suppress false-positive lockdep splat for spin_lock() in __unix_gc().
+    https://git.kernel.org/netdev/net/c/1971d13ffa84
 
 You are awesome, thank you!
 -- 
