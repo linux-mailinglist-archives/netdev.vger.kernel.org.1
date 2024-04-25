@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-91364-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91367-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9EB528B2519
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 17:30:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C6CB8B251B
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 17:30:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D171C1C20944
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 15:30:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DCF2A281B9A
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 15:30:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF65514AD36;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7AB114B07A;
 	Thu, 25 Apr 2024 15:30:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sCakQBQZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fypgInQV"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B0DC14A633
-	for <netdev@vger.kernel.org>; Thu, 25 Apr 2024 15:30:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 943EC14AD2E;
+	Thu, 25 Apr 2024 15:30:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714059034; cv=none; b=YftFdLDkpJLtf2ETMUyyhqsTzQtjSDnfjQhY9kLLhtBy6scv0dcn8PpC2S7jy7Hb62NaPB4pGgqlpAlBhjjX5GwpEstFxKIVbDUH7FEapjdYM5V0iHEO2Tai8GeJZAl/w9d7fECEbhJaT76PYRYqAs+DjKjDJc7EbhQUzhdey6s=
+	t=1714059034; cv=none; b=C05/mk+KhLk8KqwaKLdCVuZ1pW8rVf87ZVNVu22xtWbJ1Lfvt4XEq4yRDloJrIYOEIojaNsFdxHd3an70sref4aFAXX6FDunuGeCcaoaW/y0EMrzmU//XiZH7ouAV8iZ/vrrB0Kxkz5BM2V2SvDBxtyPL+SMUHO0L08DO5+KnlE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1714059034; c=relaxed/simple;
-	bh=VTSSHD4/85d4JjFy6I51WBIIQVRls4UCHjS6vWrDCho=;
+	bh=c72zLocSIR3CxXrqJBjeWWnmB7baaCULJUGYE4ucAbE=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=blpv+GjM6H7k68hHFxJQiIQTcBB4XU1BWdttYTK/HTLH+R69yIzsUedCQkxpfeUSs8Q1QGYZ9VEv44XjKmvL1K8VqaO5uMduK0jMs+xA6tRFa+uaOPJr6GXfnMS6EGniLCXfVmy9SZj2twI9poeLa7IAP/lNmGyfcjVOzPypWTw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sCakQBQZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 2C557C2BD10;
+	 In-Reply-To:To:Cc; b=g/Wrx3TeHN7z/omxIMNczbmF/4WESjrcXcxrmYJZqZPjwV9DTeq8YYRuFt3Gd6TxDoMJKdQXockXGT2IV0Tiykv+TEmIva6DQRHR3AqwfVcWWhyq6UxUI1gry/H0JYmpkXWY5rir7HaDVSBVnemJnYzr/jrKE+jdr2m7Iw/70Sk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fypgInQV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 4D065C4AF08;
 	Thu, 25 Apr 2024 15:30:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1714059034;
-	bh=VTSSHD4/85d4JjFy6I51WBIIQVRls4UCHjS6vWrDCho=;
+	bh=c72zLocSIR3CxXrqJBjeWWnmB7baaCULJUGYE4ucAbE=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=sCakQBQZor99Tanhs/iHVgw9lbz1VoGpg2jx6nnMlGs+U6fzF0FDEFK6i+NVzac8X
-	 pcrvFdXwp6xCZCrwYm+yrAezWDP7c0mz+iTfsGjJW/eiwu4cf6qUfb6sa5Kz7ll2r1
-	 T4TKlmwaTOSNvGJckJAFjSrWmtKBdXezlTMjfxh5kAM0WlxsCJc/o1cw4xqacTBQJa
-	 Hz3lNryp00znlvL0K0tot/ijQxjQEj2FoD6rH57EtW9NronXB0snbE2ugUEwPpeHwN
-	 TsqQtVdSceCypcAbQOpS6y4HUcq1V6c7/Pqn1hwVnYr/RHXuBQpLese+G1urZHd9sq
-	 1Tmc6lAsHkSOA==
+	b=fypgInQVBcqty0KxIrsiX/GKCIsHgr+fuUZMKrJzrAU/m3t6SmuNMNuQFymOwAvWU
+	 LMibSj3p3H4eYdUBhbimaegfVKffq5MaYAI7zfTYnOHhT6+A5PxrnEt300VeKKwYDk
+	 Ycw4Df+gSV4rx0iM7jwtxVLunaWzfclMNMFyYdcB0mmh2B1IwOikYmHIlK8iKUn3Rl
+	 jX0kNbM0CDPg0ey05biml++lwRjOIq82/PgtvFKd0UVfYedQNSTekpzlO0Jun5iAkx
+	 uV3apFJ67zT/2bMhYiwpxKjijPTJUtkhxQQg8phEqvKPLiaowxvb5IFJQYTYBpReUi
+	 kmlD/T1T9QopA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 1AAF6C595C5;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 33CD1CF21C4;
 	Thu, 25 Apr 2024 15:30:34 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,42 +52,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 0/4][pull request] Intel Wired LAN Driver Updates
- 2024-04-23 (i40e, iavf, ice)
+Subject: Re: [PATCH net] net: ti: icssg-prueth: Fix signedness bug in
+ prueth_init_rx_chns()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171405903410.5824.18116289504884714487.git-patchwork-notify@kernel.org>
+ <171405903420.5824.17370077851663422898.git-patchwork-notify@kernel.org>
 Date: Thu, 25 Apr 2024 15:30:34 +0000
-References: <20240423182723.740401-1-anthony.l.nguyen@intel.com>
-In-Reply-To: <20240423182723.740401-1-anthony.l.nguyen@intel.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, netdev@vger.kernel.org
+References: <05282415-e7f4-42f3-99f8-32fde8f30936@moroto.mountain>
+In-Reply-To: <05282415-e7f4-42f3-99f8-32fde8f30936@moroto.mountain>
+To: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: rogerq@ti.com, danishanwar@ti.com, rogerq@kernel.org, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, andrew@lunn.ch,
+ jan.kiszka@siemens.com, diogo.ivo@siemens.com, robh@kernel.org,
+ grygorii.strashko@ti.com, vigneshr@ti.com,
+ linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
 
 Hello:
 
-This series was applied to netdev/net.git (main)
+This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 23 Apr 2024 11:27:16 -0700 you wrote:
-> This series contains updates to i40e, iavf, and ice drivers.
+On Tue, 23 Apr 2024 19:15:22 +0300 you wrote:
+> The rx_chn->irq[] array is unsigned int but it should be signed for the
+> error handling to work.  Also if k3_udma_glue_rx_get_irq() returns zero
+> then we should return -ENXIO instead of success.
 > 
-> Sindhu removes WQ_MEM_RECLAIM flag from workqueue for i40e.
-> 
-> Erwan Velu adjusts message to avoid confusion on base being reported on
-> i40e.
+> Fixes: 128d5874c082 ("net: ti: icssg-prueth: Add ICSSG ethernet driver")
+> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,1/4] i40e: Do not use WQ_MEM_RECLAIM flag for workqueue
-    https://git.kernel.org/netdev/net/c/2cc7d150550c
-  - [net,2/4] i40e: Report MFS in decimal base instead of hex
-    https://git.kernel.org/netdev/net/c/ef3c313119ea
-  - [net,3/4] iavf: Fix TC config comparison with existing adapter TC config
-    https://git.kernel.org/netdev/net/c/54976cf58d61
-  - [net,4/4] ice: fix LAG and VF lock dependency in ice_reset_vf()
-    https://git.kernel.org/netdev/net/c/96fdd1f6b4ed
+  - [net] net: ti: icssg-prueth: Fix signedness bug in prueth_init_rx_chns()
+    https://git.kernel.org/netdev/net/c/4dcd0e83ea1d
 
 You are awesome, thank you!
 -- 
