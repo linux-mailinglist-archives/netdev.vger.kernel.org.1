@@ -1,279 +1,127 @@
-Return-Path: <netdev+bounces-91494-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91495-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 242858B2D99
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 01:34:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC2D88B2DB8
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 01:41:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4ADE1B21F61
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 23:34:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EE92D1C21D03
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 23:41:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C98F15686F;
-	Thu, 25 Apr 2024 23:34:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66B02156F26;
+	Thu, 25 Apr 2024 23:40:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="d0G9IVcR"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="NWiFplzW"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BA1C2599
-	for <netdev@vger.kernel.org>; Thu, 25 Apr 2024 23:34:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEC4116EBEF
+	for <netdev@vger.kernel.org>; Thu, 25 Apr 2024 23:40:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714088065; cv=none; b=hJLStYvrAIIixrQ514yjv8WsKInhglGC6FssXn8/Z6oa4gd8HrqPST/Y6EBpvgSMTyP+vZpVWZ8P2B5Bih56X0yvtgs5CskpxbtZBY52NG3+jt8T9fBA8xNJe6jfP6G4iqe5UBSjzTS9mNYcHQBXiRC5oTeRYKnQyRgDIZWYBXQ=
+	t=1714088409; cv=none; b=NkDoFvaxw2sc/utnGjbVGwfNjaFwpkZVNCH+ACmDG1HW/uEUjsz02lZ1F2m84X5AQTdX06rQQk8a3+9Bi+y11Yp8MDHlOIKi33CuIwJhA/WdNqnF/qytyHtf2cupc10jmczmKQFSphv72HLyWVFOu5GUDAVSG+zI80a1W3/eHK8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714088065; c=relaxed/simple;
-	bh=id+hnJkLt61FJtJo8fz8ahzKL90CIk0Uh0MPUmV6o7M=;
+	s=arc-20240116; t=1714088409; c=relaxed/simple;
+	bh=sqd+Pzkjq1by0yoGMGWkOlaOk2YG342Ax1yqdYHidcI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bWiSeqyth2FyEtdve+De0JilvvsWC3SHcng1b9T6Alj+Zo19Bv1crh0eCoBnmegeOI4N3sME1oQuABZGI2ncXU2DBSuRQAOyb7cBK9jARAVKz+l31H2AwcFcIS9S05Ca6tRcMoTNQPOtr7pYoskzCBN2TyFqeyekGbyEnKP94BM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=d0G9IVcR; arc=none smtp.client-ip=91.218.175.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <288b0d96-d5a8-4d81-9302-32b0d414a983@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1714088061;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=66kV9ps7FaYSXMZcqhfSKXR4R2nL1sFt/KozyHoKmpI=;
-	b=d0G9IVcR86zBKZHVsIFC7z4YOIPT/mJCtLtmVm4BG08IOQx3nKIxuamoACa4Qgp37X6Io/
-	bN/0AC+XYhfJWfwrVUC3ze7gOtMb5JjlpmuctAJxE5jg7KIOZBtZsFBkYnUbT9/ToqJSkc
-	4cEROvzSFwhV4J5LXGBXiXJ2Jt6NCQM=
-Date: Thu, 25 Apr 2024 16:34:11 -0700
+	 In-Reply-To:Content-Type; b=FoAdHL2cHekJKuVvCYow4ahZ2KdwqRUuxtyHoAAxknVHdNv9gUM2Wk/yKGhjsOUtZPHCly1gMNV2DF39utiaSP2A1fOaBCN43r5ehHe8grckXwAFJkyPenf2K7BXCbCDONkxctGpZRsa87FofSMjqGSglxyj92QXspaoKy+bx2w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=NWiFplzW; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-1e8b03fa5e5so14062865ad.1
+        for <netdev@vger.kernel.org>; Thu, 25 Apr 2024 16:40:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1714088407; x=1714693207; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=CNZNDCFaG4zLgZwNOp9mamznNRvdj0DfGLjcRWznK78=;
+        b=NWiFplzW/EzQ9qOLuTIPxSFK73CZh6mr4V3K6FyBQIhGnuM3p6n+ljr9XSZCUbHAiP
+         42DVzqf4sr6mGOdgQbn2eiJx/+pMlyybU0GIpjZkkJ3tgQ72hyZBfd8NZUAVuruhgJ2D
+         Vs0r6HFAfRr/WV2AP8P0J6jl5515grTCLNlfqL4Y6iw3HjoXKR8JnRjn2R7+a/Eq2pDq
+         6q8lsCbRGF7PV9s4bTbfg9uFLGcqyOtnQTAdRWq4poSZWQTeE4znyJj6Ph3WY4/CBZbE
+         CSkeqfaOVL4j54cQPmdqK1jsqyrSZHk815OYKF8t3VK1IwOL8SiS8C4dDJ0Ix4HxzRJ4
+         ASxw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714088407; x=1714693207;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=CNZNDCFaG4zLgZwNOp9mamznNRvdj0DfGLjcRWznK78=;
+        b=jKgE/pyLGNvnWKs8he/hcKLHswjeqaclc4inhcEVoKGExmUkzGknY7BsbltxIQ5VOi
+         tGwGiKKvVn3DuydoFqsj6caVPs4VOP01fIxoCQKwDhgN/Aq7fwNViadszDVJ4WH8jcMs
+         vZj1faG0hkmtUpMzHWRyc3NM2icNWX+od82gg0V8rmjzq5e+3ItcHnnrGmH7ov0MXeIO
+         vExoOs6eF0iX1sywk9++vxyUB5AAT2Hhnc7iJrxK/lRNDya9o/ILVsMoSxmxnHHx0uYq
+         LGt+YkuZN7YpoyzS720k3GWxjd3cdpqolVjUamC5dXX3QfWuo88BTWzqfOvNG04TBF9Q
+         wrMQ==
+X-Gm-Message-State: AOJu0YxQzjT6Y6HnCwf5vO3LP12SV0usKpIDbtmaWEJRPPwOPZPB1/FN
+	P3WUZtNKq1/Fln9SuiZdBt2yfZ9Wt98b7DNHBf2Wkp6/mRpzhJg/xHgbtsMbbvU=
+X-Google-Smtp-Source: AGHT+IFJWdpTKZCbwdg3s/6Q7j9U78KPSVH7gObfmppKsFrg7ppHuG8s6i0EgkluwGKJARl1vHTYvg==
+X-Received: by 2002:a17:903:234e:b0:1e7:d482:9d96 with SMTP id c14-20020a170903234e00b001e7d4829d96mr1579558plh.10.1714088407266;
+        Thu, 25 Apr 2024 16:40:07 -0700 (PDT)
+Received: from ?IPV6:2a03:83e0:1256:2:c51:2090:e106:83fa? ([2620:10d:c090:500::6:8d4c])
+        by smtp.gmail.com with ESMTPSA id mq8-20020a170902fd4800b001e23fcdebe9sm14375172plb.98.2024.04.25.16.40.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 25 Apr 2024 16:40:06 -0700 (PDT)
+Message-ID: <eb39f73b-d1a5-4bca-b1b9-c4f6715b6a10@davidwei.uk>
+Date: Thu, 25 Apr 2024 16:40:05 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next v2 2/2] selftests/bpf: Update tests for new ct
- zone opts for nf_conntrack kfuncs
-To: Brad Cowie <brad@faucet.nz>
-Cc: lorenzo@kernel.org, memxor@gmail.com, pablo@netfilter.org,
- davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, ast@kernel.org,
- daniel@iogearbox.net, andrii@kernel.org, song@kernel.org,
- john.fastabend@gmail.com, sdf@google.com, jolsa@kernel.org,
- netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
- netdev@vger.kernel.org, bpf@vger.kernel.org
-References: <20240424030027.3932184-1-brad@faucet.nz>
- <20240424030027.3932184-2-brad@faucet.nz>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-Content-Language: en-US
-In-Reply-To: <20240424030027.3932184-2-brad@faucet.nz>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v1] bnxt: fix bnxt_get_avail_msix() returning
+ negative values
+Content-Language: en-GB
+To: Michael Chan <michael.chan@broadcom.com>
+Cc: netdev@vger.kernel.org, Pavan Chebbi <pavan.chebbi@broadcom.com>,
+ Andy Gospodarek <andrew.gospodarek@broadcom.com>,
+ Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
+References: <20240425212624.2703397-1-dw@davidwei.uk>
+ <CACKFLingTDiXZOymZya33Zo_vJJZKtXOLefBPiow0Og5pL3sZw@mail.gmail.com>
+From: David Wei <dw@davidwei.uk>
+In-Reply-To: <CACKFLingTDiXZOymZya33Zo_vJJZKtXOLefBPiow0Og5pL3sZw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On 4/23/24 8:00 PM, Brad Cowie wrote:
-> Remove test for reserved options in bpf_ct_opts,
-> which have been removed.
+On 2024-04-25 3:25 pm, Michael Chan wrote:
+> On Thu, Apr 25, 2024 at 2:26 PM David Wei <dw@davidwei.uk> wrote:
+>>
+>> Current net-next/main does not boot for older chipsets e.g. Stratus.
+>>
+>> Sample dmesg:
+>> [   11.368315] bnxt_en 0000:02:00.0 (unnamed net_device) (uninitialized): Able to reserve only 0 out of 9 requested RX rings
+>> [   11.390181] bnxt_en 0000:02:00.0 (unnamed net_device) (uninitialized): Unable to reserve tx rings
+>> [   11.438780] bnxt_en 0000:02:00.0 (unnamed net_device) (uninitialized): 2nd rings reservation failed.
+>> [   11.487559] bnxt_en 0000:02:00.0 (unnamed net_device) (uninitialized): Not enough rings available.
+>> [   11.506012] bnxt_en 0000:02:00.0: probe with driver bnxt_en failed with error -12
+>>
+>> This is caused by bnxt_get_avail_msix() returning a negative value for
+>> these chipsets not using the new resource manager i.e. !BNXT_NEW_RM.
+>> This in turn causes hwr.cp in __bnxt_reserve_rings() to be set to 0.
+>>
+>> In the current call stack, __bnxt_reserve_rings() is called from
+>> bnxt_set_dflt_rings() before bnxt_init_int_mode(). Therefore,
+>> bp->total_irqs is always 0 and for !BNXT_NEW_RM bnxt_get_avail_msix()
+>> always returns a negative number.
 > 
-> Add test for allocating and looking up ct entry in a
-> non-default ct zone with kfuncs bpf_{xdp,skb}_ct_alloc
-> and bpf_{xdp,skb}_ct_lookup.
+> Thanks for the patch.  I'm still trying to understand the flow on this
+> older NIC.
 > 
-> Add negative test for looking up ct entry in a different
-> ct zone to where it was allocated.
+> If BNXT_NEW_RM() is not true, shouldn't bnxt_need_reserve_ring()
+> return false from the top of __bnxt_reserve_rings()?
 > 
-> Signed-off-by: Brad Cowie <brad@faucet.nz>
-> ---
-> v1 -> v2:
->    - Separate test changes into different patch
->    - Add test for allocating/looking up entry in non-default ct zone
-> ---
->   tools/testing/selftests/bpf/config            |  1 +
->   .../testing/selftests/bpf/prog_tests/bpf_nf.c |  6 +-
->   .../testing/selftests/bpf/progs/test_bpf_nf.c | 88 ++++++++++++++++---
->   3 files changed, 82 insertions(+), 13 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/bpf/config b/tools/testing/selftests/bpf/config
-> index afd675b1bf80..8d4110fe8d26 100644
-> --- a/tools/testing/selftests/bpf/config
-> +++ b/tools/testing/selftests/bpf/config
-> @@ -75,6 +75,7 @@ CONFIG_NETFILTER_XT_TARGET_CT=y
->   CONFIG_NETKIT=y
->   CONFIG_NF_CONNTRACK=y
->   CONFIG_NF_CONNTRACK_MARK=y
-> +CONFIG_NF_CONNTRACK_ZONES=y
->   CONFIG_NF_DEFRAG_IPV4=y
->   CONFIG_NF_DEFRAG_IPV6=y
->   CONFIG_NF_NAT=y
-> diff --git a/tools/testing/selftests/bpf/prog_tests/bpf_nf.c b/tools/testing/selftests/bpf/prog_tests/bpf_nf.c
-> index b30ff6b3b81a..853f694af6d4 100644
-> --- a/tools/testing/selftests/bpf/prog_tests/bpf_nf.c
-> +++ b/tools/testing/selftests/bpf/prog_tests/bpf_nf.c
-> @@ -103,7 +103,6 @@ static void test_bpf_nf_ct(int mode)
->   		goto end;
->   
->   	ASSERT_EQ(skel->bss->test_einval_bpf_tuple, -EINVAL, "Test EINVAL for NULL bpf_tuple");
-> -	ASSERT_EQ(skel->bss->test_einval_reserved, -EINVAL, "Test EINVAL for reserved not set to 0");
->   	ASSERT_EQ(skel->bss->test_einval_netns_id, -EINVAL, "Test EINVAL for netns_id < -1");
->   	ASSERT_EQ(skel->bss->test_einval_len_opts, -EINVAL, "Test EINVAL for len__opts != NF_BPF_CT_OPTS_SZ");
->   	ASSERT_EQ(skel->bss->test_eproto_l4proto, -EPROTO, "Test EPROTO for l4proto != TCP or UDP");
-> @@ -122,6 +121,11 @@ static void test_bpf_nf_ct(int mode)
->   	ASSERT_EQ(skel->bss->test_exist_lookup_mark, 43, "Test existing connection lookup ctmark");
->   	ASSERT_EQ(skel->data->test_snat_addr, 0, "Test for source natting");
->   	ASSERT_EQ(skel->data->test_dnat_addr, 0, "Test for destination natting");
-> +	ASSERT_EQ(skel->data->test_ct_zone_id_alloc_entry, 0, "Test for alloc new entry in specified ct zone");
-> +	ASSERT_EQ(skel->data->test_ct_zone_id_insert_entry, 0, "Test for insert new entry in specified ct zone");
-> +	ASSERT_EQ(skel->data->test_ct_zone_id_succ_lookup, 0, "Test for successful lookup in specified ct_zone");
-> +	ASSERT_EQ(skel->bss->test_ct_zone_id_enoent_lookup, -ENOENT, "Test ENOENT for lookup in wrong ct zone");
-> +
->   end:
->   	if (client_fd != -1)
->   		close(client_fd);
-> diff --git a/tools/testing/selftests/bpf/progs/test_bpf_nf.c b/tools/testing/selftests/bpf/progs/test_bpf_nf.c
-> index 77ad8adf68da..b47fa0708f1e 100644
-> --- a/tools/testing/selftests/bpf/progs/test_bpf_nf.c
-> +++ b/tools/testing/selftests/bpf/progs/test_bpf_nf.c
-> @@ -12,7 +12,6 @@
->   extern unsigned long CONFIG_HZ __kconfig;
->   
->   int test_einval_bpf_tuple = 0;
-> -int test_einval_reserved = 0;
->   int test_einval_netns_id = 0;
->   int test_einval_len_opts = 0;
->   int test_eproto_l4proto = 0;
-> @@ -22,6 +21,10 @@ int test_eafnosupport = 0;
->   int test_alloc_entry = -EINVAL;
->   int test_insert_entry = -EAFNOSUPPORT;
->   int test_succ_lookup = -ENOENT;
-> +int test_ct_zone_id_alloc_entry = -EINVAL;
-> +int test_ct_zone_id_insert_entry = -EAFNOSUPPORT;
-> +int test_ct_zone_id_succ_lookup = -ENOENT;
-> +int test_ct_zone_id_enoent_lookup = 0;
->   u32 test_delta_timeout = 0;
->   u32 test_status = 0;
->   u32 test_insert_lookup_mark = 0;
-> @@ -45,7 +48,10 @@ struct bpf_ct_opts___local {
->   	s32 netns_id;
->   	s32 error;
->   	u8 l4proto;
-> -	u8 reserved[3];
-> +	u8 dir;
-> +	u16 ct_zone_id;
-> +	u8 ct_zone_flags;
-> +	u8 ct_zone_dir;
+> Ah perhaps this NIC is using hwrm_spec_code >= 0x10601 and
+> !BNXT_NEW_RM().  In that case bnxt_need_reserve_rings() will return
+> true because we have to reserve only the TX rings.  Let me review this
+> code path some more.  Thanks again.
 
-Create a new struct instead of modifying the existing one such that the existing 
-test can test the size 12 still works.
-
-The new one can use the ___new suffix like "struct bpf_ct_opts___new".
-
->   } __attribute__((preserve_access_index));
->   
->   struct nf_conn *bpf_xdp_ct_alloc(struct xdp_md *, struct bpf_sock_tuple *, u32,
-> @@ -84,16 +90,6 @@ nf_ct_test(struct nf_conn *(*lookup_fn)(void *, struct bpf_sock_tuple *, u32,
->   	else
->   		test_einval_bpf_tuple = opts_def.error;
->   
-> -	opts_def.reserved[0] = 1;
-> -	ct = lookup_fn(ctx, &bpf_tuple, sizeof(bpf_tuple.ipv4), &opts_def,
-> -		       sizeof(opts_def));
-> -	opts_def.reserved[0] = 0;
-> -	opts_def.l4proto = IPPROTO_TCP;
-> -	if (ct)
-> -		bpf_ct_release(ct);
-> -	else
-> -		test_einval_reserved = opts_def.error;
-> -
->   	opts_def.netns_id = -2;
->   	ct = lookup_fn(ctx, &bpf_tuple, sizeof(bpf_tuple.ipv4), &opts_def,
->   		       sizeof(opts_def));
-> @@ -220,10 +216,77 @@ nf_ct_test(struct nf_conn *(*lookup_fn)(void *, struct bpf_sock_tuple *, u32,
->   	}
->   }
->   
-> +static __always_inline void
-> +nf_ct_zone_id_test(struct nf_conn *(*lookup_fn)(void *, struct bpf_sock_tuple *, u32,
-> +						struct bpf_ct_opts___local *, u32),
-> +		   struct nf_conn *(*alloc_fn)(void *, struct bpf_sock_tuple *, u32,
-> +					       struct bpf_ct_opts___local *, u32),
-> +		   void *ctx)
-> +{
-> +	struct bpf_ct_opts___local opts_def = { .l4proto = IPPROTO_TCP, .netns_id = -1 };
-> +	struct bpf_sock_tuple bpf_tuple;
-> +	struct nf_conn *ct;
-> +
-> +	__builtin_memset(&bpf_tuple, 0, sizeof(bpf_tuple.ipv4));
-> +
-> +	bpf_tuple.ipv4.saddr = bpf_get_prandom_u32(); /* src IP */
-> +	bpf_tuple.ipv4.daddr = bpf_get_prandom_u32(); /* dst IP */
-> +	bpf_tuple.ipv4.sport = bpf_get_prandom_u32(); /* src port */
-> +	bpf_tuple.ipv4.dport = bpf_get_prandom_u32(); /* dst port */
-> +
-> +	/* use non-default ct zone */
-> +	opts_def.ct_zone_id = 10;
-
-Can the ct_zone_flags and ct_zone_dir be tested also?
-
-pw-bot: cr
-
-> +	ct = alloc_fn(ctx, &bpf_tuple, sizeof(bpf_tuple.ipv4), &opts_def,
-> +		      sizeof(opts_def));
-> +	if (ct) {
-> +		__u16 sport = bpf_get_prandom_u32();
-> +		__u16 dport = bpf_get_prandom_u32();
-> +		union nf_inet_addr saddr = {};
-> +		union nf_inet_addr daddr = {};
-> +		struct nf_conn *ct_ins;
-> +
-> +		bpf_ct_set_timeout(ct, 10000);
-> +
-> +		/* snat */
-> +		saddr.ip = bpf_get_prandom_u32();
-> +		bpf_ct_set_nat_info(ct, &saddr, sport, NF_NAT_MANIP_SRC___local);
-> +		/* dnat */
-> +		daddr.ip = bpf_get_prandom_u32();
-> +		bpf_ct_set_nat_info(ct, &daddr, dport, NF_NAT_MANIP_DST___local);
-> +
-> +		ct_ins = bpf_ct_insert_entry(ct);
-> +		if (ct_ins) {
-> +			struct nf_conn *ct_lk;
-> +
-> +			/* entry should exist in same ct zone we inserted it */
-> +			ct_lk = lookup_fn(ctx, &bpf_tuple, sizeof(bpf_tuple.ipv4),
-> +					  &opts_def, sizeof(opts_def));
-> +			if (ct_lk) {
-> +				bpf_ct_release(ct_lk);
-> +				test_ct_zone_id_succ_lookup = 0;
-> +			}
-> +
-> +			/* entry should not exist in default ct zone */
-> +			opts_def.ct_zone_id = 0;
-> +			ct_lk = lookup_fn(ctx, &bpf_tuple, sizeof(bpf_tuple.ipv4),
-> +					  &opts_def, sizeof(opts_def));
-> +			if (ct_lk)
-> +				bpf_ct_release(ct_lk);
-> +			else
-> +				test_ct_zone_id_enoent_lookup = opts_def.error;
-> +
-> +			bpf_ct_release(ct_ins);
-> +			test_ct_zone_id_insert_entry = 0;
-> +		}
-> +		test_ct_zone_id_alloc_entry = 0;
-> +	}
-> +}
-> +
->   SEC("xdp")
->   int nf_xdp_ct_test(struct xdp_md *ctx)
->   {
->   	nf_ct_test((void *)bpf_xdp_ct_lookup, (void *)bpf_xdp_ct_alloc, ctx);
-> +	nf_ct_zone_id_test((void *)bpf_xdp_ct_lookup, (void *)bpf_xdp_ct_alloc, ctx);
->   	return 0;
->   }
->   
-> @@ -231,6 +294,7 @@ SEC("tc")
->   int nf_skb_ct_test(struct __sk_buff *ctx)
->   {
->   	nf_ct_test((void *)bpf_skb_ct_lookup, (void *)bpf_skb_ct_alloc, ctx);
-> +	nf_ct_zone_id_test((void *)bpf_skb_ct_lookup, (void *)bpf_skb_ct_alloc, ctx);
->   	return 0;
->   }
->   
-
+Yes, hwrm_spec_code >= 0x10601 and the first conditional in
+bnxt_need_reserve_rings() returns true.
 
