@@ -1,198 +1,218 @@
-Return-Path: <netdev+bounces-91452-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91453-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 867B48B29F9
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 22:35:59 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA0218B29FF
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 22:42:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A0D8B1C20A14
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 20:35:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8FEA8B2337C
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 20:42:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3D2D5B697;
-	Thu, 25 Apr 2024 20:35:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E7B614EC4A;
+	Thu, 25 Apr 2024 20:42:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RSJgOOLC"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gD5UC/7y"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F32E6BFBC
-	for <netdev@vger.kernel.org>; Thu, 25 Apr 2024 20:35:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7774F3FC2
+	for <netdev@vger.kernel.org>; Thu, 25 Apr 2024 20:42:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714077354; cv=none; b=qbJxBtbtq9DYM6oS1q+/tgq2ku9yuFfY73WmgJRhyjAxNMJVpW3H0H2v6VUzCKRUJ6VxoMEoo3kOVglsxZ4d+rzwkYpJiobhep9T+JzM5c3vXSl7o3yQJkepJ6xGw5R5Yu/dXDylHS40WXbGso5k80I/JoCy4QnbHtw+i0zPff8=
+	t=1714077762; cv=none; b=br/p+LlQlFsu36FRjKZWJfvvxtpH1oMJCADpJF6gvjkVqD6XdynuuhEkGZiA11wA6rJshHLwUbM5wBlApM+NT2hIXV/YfpAP8z08NxhyhHgVJmuW5hPvwIRsOZCALEU11UpKeLsPNg+CIEgI+u8klARU7ZPegUMGAC6tLoowcP0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714077354; c=relaxed/simple;
-	bh=pouMjJyt+QNlCKqX/KnbSgBr3kK1CB3YCtBLK3D4fHU=;
+	s=arc-20240116; t=1714077762; c=relaxed/simple;
+	bh=Edu66Pp361LP1TJKH9qQGwnWCXUz4E51XfhmasI4O5Y=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cO8Rpn/0YY/vlNQvtxnH96yo2yJ4nNHWi2emBYIF2jybl/fgNfHKVA8PgyZmbBVean0hxTAVpzrLyM9Yimx/L/d+2H06Il6MwrU2MB6+hqruC2hc3qVSrp7WIscuml0TYaKwtQBwIp9a/eId8asMZSBlR0jdV+MY42K4Tl0L/aY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RSJgOOLC; arc=none smtp.client-ip=209.85.208.53
+	 To:Cc:Content-Type; b=Zlx128/fQxfkIBxI33IMQ688If0aeKxlkykXSNt2ZTwy6BLUXfmq1n1ORZ4MmnvXtt3RpFIhRBNsv1es3nRU6QhDCAQVzu/Sq3ZU8vT8jJQKuDdR24OP1ZCsgNzxP5JjLgjYk9o3dfnVMLwQFX3duKk6q1bsxCQPvs3ROvnjfd8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gD5UC/7y; arc=none smtp.client-ip=209.85.208.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-571e13cd856so4053a12.0
-        for <netdev@vger.kernel.org>; Thu, 25 Apr 2024 13:35:52 -0700 (PDT)
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-56e47843cc7so1468244a12.0
+        for <netdev@vger.kernel.org>; Thu, 25 Apr 2024 13:42:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1714077351; x=1714682151; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1714077759; x=1714682559; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=fV5zqE16mi1eU3okesZU+zUjFNTAbDUZrH643aBLWXY=;
-        b=RSJgOOLCXp5Zseb4K5tnx8NTz1Um2ua24pvLJR2rfdg8xLEJzVR00XGwrmX5JW3/MP
-         6ET/XpY9y2avUH1E6N0fQHc+odai+t0uNvuWWC04uOWDfzMm8E/2nzDuMwx26fupqqz9
-         u5dI0Jwa66Ip0K34CuCtknLMWZ4hapN2lgTsmwHoSvJ5HmfyDNxH23UO+7BGSwl6jeQN
-         L0ChGf0rnGl/rbmjfe9jhPbwkBVi9eVDe39c1Q2BJUnIMbXghhFze+0MBAu4negZQk/G
-         IbmLkgTGpsfIw0om6MQnZhlRhjegiakqR7/9q9vmITbwxLleh81Z1Mb1azaA3oVmn2U9
-         WV0w==
+        bh=d8a5q661VPv7YxA4YAbF7nmm8AiOpL1vdq49c/Cxoac=;
+        b=gD5UC/7ycNlP/aZY5PO92oCaovzSljG23i9LpJzzvV+O/QH6c7nA/KovC4FPlGTu/9
+         VLTMkxc0luAZFEUJ2omEg/VS7hdLyEs8GAtrABePsPjvA5sUmDXsTHFV0baMK5wG2ncv
+         NdwHDLnWb6rhuJ8dZ2prpitF6bfKLYIR17M5qkxP3xAFqMxJCi6GlGYbCZe0J8lURtke
+         oihF/hK6U9Do+1fWuSj1VJyRsU02fU6xzIlyaQ7guOXTBrK9eexP0VxsEnuyRb9y23Qt
+         MaTcmQhcqUtATj6H75KltmL91WkQyxYGxMtw2Ia1zvcmx6f0pyK99OSgM5/qbks65il+
+         eWog==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714077351; x=1714682151;
+        d=1e100.net; s=20230601; t=1714077759; x=1714682559;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=fV5zqE16mi1eU3okesZU+zUjFNTAbDUZrH643aBLWXY=;
-        b=YTf2iIhTzx3uWzk6qnG4sa7tJvW+4XGoZZbEzvH7SgJ1O8V9+GPOSofwJeUaK+lmbw
-         HjdIBkQqj1d4mDodbJJliQsVXMrx9YbkM0rUkTgK6zs+CsjDx7dHXP2Qo1TEjgKRAbHo
-         FM6L3OEigw5vO1YDTWII5s3mcAeIS6/PeJJUJJw43FkwJvRdaBItS5+wiZN2zLBfHB+L
-         NpL0swzpeaUQPRku2wJpAeHhv6er90SYSYmXTvXYTbQV+Ye7la6oK5gwRdNaxLsRTH4L
-         ddhQOYBSyQpfEfuTKeTfTXAVr5zp867zGUlORP7kXwn+icEIqdZEXXNzTn7yAlcGBnDX
-         bAXA==
-X-Forwarded-Encrypted: i=1; AJvYcCXq9J0LvsxIWBp8XBTnl6njiLh/NZEZH6MbIMsxcxksNlfxcEjcTOJ65RBptWPY5hueQe/zNQPBDwcputTP5f4k/Suox/gy
-X-Gm-Message-State: AOJu0YwgBNlIBxAHsQFAkoUUcN3kD8C+U2BSBPN2A81qH3w4/LjG5sCZ
-	vlo8xMaQ1XlwJSLhsqC939y7pJQwfXL1zTOitB43M+c6+ap2Aj8Vnkrwdd38oe40EfQmOHVc7OW
-	q507y5lxXo2RA77rNExzGuC4gZgfM7HS99Yof
-X-Google-Smtp-Source: AGHT+IF+FAlJRy0Xe9vH5WAvaNDiVbM0cZgAG34n0rTv9K+r+t5mubf3h2ZkXxq7k7wvYc3wfVisj/nWwXSZz+mEQWg=
-X-Received: by 2002:a05:6402:313b:b0:572:469c:3c91 with SMTP id
- dd27-20020a056402313b00b00572469c3c91mr13527edb.6.1714077351158; Thu, 25 Apr
- 2024 13:35:51 -0700 (PDT)
+        bh=d8a5q661VPv7YxA4YAbF7nmm8AiOpL1vdq49c/Cxoac=;
+        b=IyGRXjz7TVB0ifTRw6Ls07GikMvtxDBHhvTRFcIGCW5Xsl9ZSdv262f2tX/86spzA3
+         3JX1S/fy0OMRRglfLDTVOJb3noCtLks8aObuhR7wDbzckOis5r2Q9vhJY0x+G+vdE5SA
+         saiOZf844Qhy7Wmy9lQ6iRbsIAqPsTYLNj9PCExRRu2Ng8FHMrNtcQS6ic/EHEWZzoxX
+         6Rh4ulmgxYrZ+a4Cf2MKOaHMEU7Mrs7SZvZf5Mnnfw+l6Wz1fw3tnbK+XfVs6au9pX+h
+         FfsVic2doGKazt7LtU2gJ9OW7G2iPgML807ZoMIf6dpW13om0ccugPDdfDz528r+HNCi
+         6Iow==
+X-Forwarded-Encrypted: i=1; AJvYcCXcEgvE91ogXjrCRib82H/wOg2/wwleEGhvZLll1mP/EoxEZ8Url7gdBd0KtYMDNELCA/MxddEel7mNEQguSsBKWqjV9Nti
+X-Gm-Message-State: AOJu0Yx4Vk3npFkxE5m7EdKcXEygSUnnXDD1TvJOP+TKXW7uCoQ3kysX
+	EtNs69pxbetPofBgAiE8vJ5E1KI/Ev3LDImVPUKjp+FqJLFDldYs3m9qwcEmYriAcCX8wjSc/eg
+	edFF9FJp5wn64oGzVLkzxtrVWxs+5YCaHiXno
+X-Google-Smtp-Source: AGHT+IF8glrQQZXivTHTEdZkivvyewVxG1or4YNFL13C7gDAHUAxcrvQ+LqyKeNL3S/zxBLZ9GrqgEsXW2c3S4x8MCc=
+X-Received: by 2002:a17:906:13c9:b0:a58:8fa6:df18 with SMTP id
+ g9-20020a17090613c900b00a588fa6df18mr483805ejc.41.1714077758402; Thu, 25 Apr
+ 2024 13:42:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CANn89iJEWs7AYSJqGCUABeVqOCTkErponfZdT5kV-iD=-SajnQ@mail.gmail.com>
- <20240425175146.73458-1-kuniyu@amazon.com>
-In-Reply-To: <20240425175146.73458-1-kuniyu@amazon.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 25 Apr 2024 22:35:38 +0200
-Message-ID: <CANn89iJGJQeYiUYX9a_tPB00fCibuOED_mbxZwcJAQLbMYiy8w@mail.gmail.com>
-Subject: Re: [PATCH v2 net-next 6/6] arp: Convert ioctl(SIOCGARP) to RCU.
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org, 
-	kuni1840@gmail.com, netdev@vger.kernel.org, pabeni@redhat.com
+References: <20240424165646.1625690-2-dtatulea@nvidia.com> <4ba023709249e11d97c78a98ac7db3b37f419960.camel@nvidia.com>
+ <CAHS8izMbAJHatnM6SvsZVLPY+N7LgGJg03pSdNfSRFCufGh9Zg@mail.gmail.com>
+ <4c20b500c2ed615aba424c0f3c7a79f5f5a04171.camel@nvidia.com>
+ <CAHS8izPkRJyLctmyj+Ppc5j3Qq5O1u3aPe5h9mnFNHDU2OxA=A@mail.gmail.com> <63222bf6a298ae38e77b0c0f49d13581dd9d3a74.camel@nvidia.com>
+In-Reply-To: <63222bf6a298ae38e77b0c0f49d13581dd9d3a74.camel@nvidia.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Thu, 25 Apr 2024 13:42:24 -0700
+Message-ID: <CAHS8izNyJWhcRro8OFPTqsh9J4LEbm7Le6-CiW_oxi2NopAqeQ@mail.gmail.com>
+Subject: Re: [RFC PATCH] net: Fix one page_pool page leak from skb_frag_unref
+To: Dragos Tatulea <dtatulea@nvidia.com>
+Cc: "davem@davemloft.net" <davem@davemloft.net>, "kuba@kernel.org" <kuba@kernel.org>, 
+	"ilias.apalodimas@linaro.org" <ilias.apalodimas@linaro.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	"jacob.e.keller@intel.com" <jacob.e.keller@intel.com>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "edumazet@google.com" <edumazet@google.com>, 
+	Jianbo Liu <jianbol@nvidia.com>, "pabeni@redhat.com" <pabeni@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Apr 25, 2024 at 7:52=E2=80=AFPM Kuniyuki Iwashima <kuniyu@amazon.co=
+On Thu, Apr 25, 2024 at 12:48=E2=80=AFPM Dragos Tatulea <dtatulea@nvidia.co=
 m> wrote:
 >
-> From: Eric Dumazet <edumazet@google.com>
-> Date: Thu, 25 Apr 2024 19:12:56 +0200
-> > On Thu, Apr 25, 2024 at 7:02=E2=80=AFPM Kuniyuki Iwashima <kuniyu@amazo=
-n.com> wrote:
+> On Thu, 2024-04-25 at 12:20 -0700, Mina Almasry wrote:
+> > On Thu, Apr 25, 2024 at 1:17=E2=80=AFAM Dragos Tatulea <dtatulea@nvidia=
+.com> wrote:
 > > >
-> > > ioctl(SIOCGARP) holds rtnl_lock() for __dev_get_by_name() and
-> > > later calls neigh_lookup(), which calls rcu_read_lock().
+> > > On Wed, 2024-04-24 at 15:08 -0700, Mina Almasry wrote:
+> > > >  If that doesn't work, I think I prefer
+> > > > reverting a580ea994fd3 ("net: mirror skb frag ref/unref helpers")
+> > > > rather than merging this fix to make sure we removed the underlying
+> > > > cause of the issue.
+> > > This is the safest bet.
 > > >
-> > > Let's replace __dev_get_by_name() with dev_get_by_name_rcu() to
-> > > avoid locking rtnl_lock().
+> > > So, to recap, I see 2 possibilities:
 > > >
-> > > Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> > > ---
-> > >  net/ipv4/arp.c | 26 +++++++++++++++++---------
-> > >  1 file changed, 17 insertions(+), 9 deletions(-)
+> > > 1) Revert a580ea994fd3 ("net: mirror skb frag ref/unref helpers"): sa=
+fe, but it
+> > > will probably have to come back in one way or another.
+> > > 2) Drop the recycle checks from skb_frag_ref/unref: this enforces the=
+ rule of
+> > > always referencing/dereferencing pages based on their type (page_pool=
+ or
+> > > normal).
 > > >
-> > > diff --git a/net/ipv4/arp.c b/net/ipv4/arp.c
-> > > index 5034920be85a..9430b64558cd 100644
-> > > --- a/net/ipv4/arp.c
-> > > +++ b/net/ipv4/arp.c
-> > > @@ -1003,11 +1003,15 @@ static int arp_rcv(struct sk_buff *skb, struc=
-t net_device *dev,
-> > >   *     User level interface (ioctl)
-> > >   */
-> > >
-> > > -static struct net_device *arp_req_dev_by_name(struct net *net, struc=
-t arpreq *r)
-> > > +static struct net_device *arp_req_dev_by_name(struct net *net, struc=
-t arpreq *r,
-> > > +                                             bool getarp)
-> > >  {
-> > >         struct net_device *dev;
-> > >
-> > > -       dev =3D __dev_get_by_name(net, r->arp_dev);
-> > > +       if (getarp)
-> > > +               dev =3D dev_get_by_name_rcu(net, r->arp_dev);
-> > > +       else
-> > > +               dev =3D __dev_get_by_name(net, r->arp_dev);
-> > >         if (!dev)
-> > >                 return ERR_PTR(-ENODEV);
-> > >
-> > > @@ -1028,7 +1032,7 @@ static struct net_device *arp_req_dev(struct ne=
-t *net, struct arpreq *r)
-> > >         __be32 ip;
-> > >
-> > >         if (r->arp_dev[0])
-> > > -               return arp_req_dev_by_name(net, r);
-> > > +               return arp_req_dev_by_name(net, r, false);
-> > >
-> > >         if (r->arp_flags & ATF_PUBL)
-> > >                 return NULL;
-> > > @@ -1166,7 +1170,7 @@ static int arp_req_get(struct net *net, struct =
-arpreq *r)
-> > >         if (!r->arp_dev[0])
-> > >                 return -ENODEV;
-> > >
-> > > -       dev =3D arp_req_dev_by_name(net, r);
-> > > +       dev =3D arp_req_dev_by_name(net, r, true);
-> > >         if (IS_ERR(dev))
-> > >                 return PTR_ERR(dev);
-> > >
-> > > @@ -1287,23 +1291,27 @@ int arp_ioctl(struct net *net, unsigned int c=
-md, void __user *arg)
-> > >         else if (*netmask && *netmask !=3D htonl(0xFFFFFFFFUL))
-> > >                 return -EINVAL;
-> > >
-> > > -       rtnl_lock();
-> > > -
-> > >         switch (cmd) {
-> > >         case SIOCDARP:
-> > > +               rtnl_lock();
-> > >                 err =3D arp_req_delete(net, &r);
-> > > +               rtnl_unlock();
-> > >                 break;
-> > >         case SIOCSARP:
-> > > +               rtnl_lock();
-> > >                 err =3D arp_req_set(net, &r);
-> > > +               rtnl_unlock();
-> > >                 break;
-> > >         case SIOCGARP:
-> > > +               rcu_read_lock();
-> > >                 err =3D arp_req_get(net, &r);
-> > > +               rcu_read_unlock();
+> >
+> > If this works, I would be very happy. I personally think ref/unref
+> > should be done based on the page type. For me the net stack using the
+> > regular {get|put}_page on a pp page isn't great. It requires special
+> > handling to make sure the ref + unref are in sync. Also if the last pp
+> > ref is dropped while there are pending regular refs,
+> > __page_pool_page_can_be_recycled() check will fail and the page will
+> > not be recycled.
+> >
+> > On the other hand, since 0a149ab78ee2 ("page_pool: transition to
+> > reference count management after page draining") I'm not sure there is
+> > any reason to continue to use get/put_page on pp-pages, we can use the
+> > new pp-ref instead.
+> >
+> > I don't see any regressions with this diff (needs cleanup), but your
+> > test setup seems much much better than mine (I think this is the
+> > second reffing issue you manage to repro):
+> >
+> > diff --git a/include/linux/skbuff_ref.h b/include/linux/skbuff_ref.h
+> > index 4dcdbe9fbc5f..4c72227dce1b 100644
+> > --- a/include/linux/skbuff_ref.h
+> > +++ b/include/linux/skbuff_ref.h
+> > @@ -31,7 +31,7 @@ static inline bool napi_pp_get_page(struct page *page=
+)
+> >  static inline void skb_page_ref(struct page *page, bool recycle)
+> >  {
+> >  #ifdef CONFIG_PAGE_POOL
+> > -       if (recycle && napi_pp_get_page(page))
+> > +       if (napi_pp_get_page(page))
+> >                 return;
+> >  #endif
+> >         get_page(page);
+> > @@ -69,7 +69,7 @@ static inline void
+> >  skb_page_unref(struct page *page, bool recycle)
+> >  {
+> >  #ifdef CONFIG_PAGE_POOL
+> > -       if (recycle && napi_pp_put_page(page))
+> > +       if (napi_pp_put_page(page))
+> >                 return;
+> >  #endif
+> >         put_page(page);
 > >
 > >
-> > Note that arp_req_get() uses :
-> >
-> > strscpy(r->arp_dev, dev->name, sizeof(r->arp_dev));
-> >
-> > This currently depends on RTNL or devnet_rename_sem
+> This is option 2. I thought this would fix everything. But I just tested =
+and
+> it's not the case: we are now reaching a negative pp_ref_count. So probab=
+ly
+> somewhere a regular page reference is still being taken...
 >
-> Ah, I missed this point, thanks for catching!
->
->
-> >
-> > Perhaps we should add a helper and use a seqlock to safely copy
-> > dev->name into a temporary variable.
->
-> So it's preferable to add seqlock around memcpy() in dev_change_name()
-> and use a helper in arp_req_get() rather than adding devnet_rename_sem
-> locking around memcpy() in arp_req_get() ?
 
-Under rcu_read_lock(), we can not sleep.
+I would guess the most likely root cause of this would be a call site
+that does get_page() instead of skb_frag_ref(), right?
 
-devnet_rename_sem is a semaphore... down_read() might sleep.
+The other possibility would be if something like:
 
-So if you plan using current netdev_get_name(), you must call it
-outside of rcu_read_lock() section.
+- page is not pp_page
+- skb_page_ref(page) // obtains a regular reference.
+- page is converted to pp_page
+- skb_page_unref(page) // drops a pp reference.
+
+But I'm not aware of non-pp pages ever being converted to pp pages.
+
+You probably figured this out already, but if you would like to dig
+further instead of reverting the offending patch, this diff would
+probably catch the get_page() callsite, no? (on my test setup this
+debug code doesn't trigger).
+
+diff --git a/include/linux/mm.h b/include/linux/mm.h
+index 7b0ee64225de..a22a676f4b6b 100644
+--- a/include/linux/mm.h
++++ b/include/linux/mm.h
+@@ -1473,8 +1473,14 @@ static inline void folio_get(struct folio *folio)
+        folio_ref_inc(folio);
+ }
+
++static inline bool debug_is_pp_page(struct page *page)
++{
++       return (page->pp_magic & ~0x3UL) =3D=3D PP_SIGNATURE;
++}
++
+ static inline void get_page(struct page *page)
+ {
++       WARN_ON_ONCE(debug_is_pp_page(page));
+        folio_get(page_folio(page));
+ }
+
+@@ -1569,6 +1575,8 @@ static inline void put_page(struct page *page)
+ {
+        struct folio *folio =3D page_folio(page);
+
++       WARN_ON_ONCE(debug_is_pp_page(page));
++
+        /*
+         * For some devmap managed pages we need to catch refcount transiti=
+on
+         * from 2 to 1:
+
+--=20
+Thanks,
+Mina
 
