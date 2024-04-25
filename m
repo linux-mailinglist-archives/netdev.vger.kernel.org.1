@@ -1,137 +1,81 @@
-Return-Path: <netdev+bounces-91169-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91170-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 005968B192A
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 05:06:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F8038B192D
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 05:09:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 115C71C211B3
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 03:06:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 614FB1C211C6
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 03:09:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20B3C1772F;
-	Thu, 25 Apr 2024 03:06:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E602F17578;
+	Thu, 25 Apr 2024 03:09:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QQB9weRe"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26A50111AA;
-	Thu, 25 Apr 2024 03:06:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1795629
+	for <netdev@vger.kernel.org>; Thu, 25 Apr 2024 03:09:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714014382; cv=none; b=XwCqLTeXhtSrkmCC8D/2ShlmUGEv3Pr7Uj7sIf9nf9sf/mAyIGJ0Q2j7jfV9u7JFeN8vaRUbrnuycAQGsuLwS7aeqAYksoRGpFJNNkP4o1zw261yaVnxo2FyCdOWQMLd+7QAQREDLqsVD+iBKZbvPO/ZX54bsxB6wWJkNL3ebFk=
+	t=1714014540; cv=none; b=CYn3mUU7fyfhEuv5dX7bIUnt7yp8jLeWMjUEGggPmv9e7XLxBR2RRmjsGOB2lGL4yo2COxAGGR4X82xvC+mH8u80YFo2Q9IiHB182OIsvdOraz+5tjJEraoOdBuSjT2ttYYYc/keNvMR4i5PjZa8dzb3aCRtXoIKqei5PsZrldo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714014382; c=relaxed/simple;
-	bh=+oi7f7SGjmXMBqcHIf7Ga8+Wqc+wY2R+gJZ+srRQAdc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=T115c9ckg15t3Cf5ITe2M3ruNdDoEmJ4BRvTRVUDAwOaE8LiAuRyS0RLPaBpG4aOx9hZjjwNFcEt4bW39yhhNmvmKeWOde8qd6917msyOHsR55ZZaAk8Wj1lrHVDOSnDp0yIiNLLN0vG6//mugNxl/ZWsLDbv7KhUQz1KpL+4eI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.97.1)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1rzpQt-000000000iK-0fH5;
-	Thu, 25 Apr 2024 03:05:59 +0000
-Date: Thu, 25 Apr 2024 04:05:55 +0100
-From: Daniel Golle <daniel@makrotopia.org>
-To: Sky Huang <SkyLake.Huang@mediatek.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Qingfang Deng <dqfext@gmail.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	Steven Liu <Steven.Liu@mediatek.com>
-Subject: Re: [PATCH 0/3] net: phy: mediatek: Integrate mtk-phy-lib and add
- 2.5Gphy support
-Message-ID: <ZinIk7b5jHtJXDJX@makrotopia.org>
-References: <20240425023325.15586-1-SkyLake.Huang@mediatek.com>
+	s=arc-20240116; t=1714014540; c=relaxed/simple;
+	bh=4o7WCAAF43+pArz7zT8w8IDBOYjPyyeP8m6d4/V/qGo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=rstUPIK2IbclFgw6AAQiSIHLXi24FNcn9mhMMiDn1iJF1Sf5eACzUrKShbYyBxLrY5lKtA02bCofDLX86Zw8svjs++MgQHGPclJXyOyEwrS7BHj9JxQWtlT4FOZwKkrM+nuyTzv9nMaZ2RV0l9sKAfxFNVHWOIbzAzHBJ3UBrgc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QQB9weRe; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC3CDC113CD;
+	Thu, 25 Apr 2024 03:08:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714014540;
+	bh=4o7WCAAF43+pArz7zT8w8IDBOYjPyyeP8m6d4/V/qGo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=QQB9weResXSIglwsw4ytQm0w7d5Vi8Bdc79dF1kqrqg9RRVlyQQrdeRyOXjg/8Wgd
+	 678roeVarHHYVfcBDHx834Huh7yN9YW+vy4sL6kiyE5qjjN4h7ODDr9rbonNMOLUQd
+	 3nDBVBtx/DZORFlNso/7ts341WBk4U+NN+FQstO2iLY4sy/H0gMaeVG5urqCKWQDvg
+	 uK5YpnI54zJl08VPfcmt//zmC5TIiuNad2j15DlvzKw24PfxUl8KyMBdKSzSt9EubR
+	 0ovz9I9MpknPvRbS4xEFi+pAMIoWOon55OrKvTVguyNclCokZ2g79tGVWDkoLXdDHp
+	 jL2hPKHJ52lKg==
+Date: Wed, 24 Apr 2024 20:08:58 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: Mateusz Polchlopek <mateusz.polchlopek@intel.com>, Tony Nguyen
+ <anthony.l.nguyen@intel.com>, <davem@davemloft.net>, <pabeni@redhat.com>,
+ <edumazet@google.com>, <netdev@vger.kernel.org>, Jiri Pirko
+ <jiri@nvidia.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Subject: Re: [PATCH net-next 1/6] devlink: extend devlink_param *set pointer
+Message-ID: <20240424200858.1d0740a4@kernel.org>
+In-Reply-To: <cdd3d9d7-1b21-4dc2-be21-ef137682b1ea@intel.com>
+References: <20240422203913.225151-1-anthony.l.nguyen@intel.com>
+	<20240422203913.225151-2-anthony.l.nguyen@intel.com>
+	<cdd3d9d7-1b21-4dc2-be21-ef137682b1ea@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240425023325.15586-1-SkyLake.Huang@mediatek.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hi SkyLake,
-
-On Thu, Apr 25, 2024 at 10:33:22AM +0800, Sky Huang wrote:
-> From: "SkyLake.Huang" <skylake.huang@mediatek.com>
+On Wed, 24 Apr 2024 11:05:58 +0200 Alexander Lobakin wrote:
+> >  	int (*set)(struct devlink *devlink, u32 id,
+> > -		   struct devlink_param_gset_ctx *ctx);
+> > +		   struct devlink_param_gset_ctx *ctx,
+> > +		   struct netlink_ext_ack *extack);  
 > 
-> Re-organize MTK ethernet phy drivers and integrate common manipulations
-> into mtk-phy-lib. Also, add support for build-in 2.5Gphy on MT7988.
+> Sorry for the late comment. Can't we embed extack to
+> devlink_param_gset_ctx instead? It would take much less lines.
 
-I assume this should go to net-next. You should mention the target tree
-like [PATCH net-next 0/3] and so on, in this case it's pretty obvious
-though.
+I think the way Mateusz wrote this is more prevalent today.
+Also feels a tiny bit cleaner to me, because if we embed
+extack why is devlink and id not embedded?
 
-Generally the series looks fine and I'm glad you factored-out common
-parts like the LED handling which is a great improvement also for the
-older PHYs found in MT7530 and MT7531 as well as MT7621 and MT7623N.
-
-Splitting the the 3rd patch into more atomic changes would make
-reviewing a bit easier.
-
-Also note that I've recently submitted some fixes for the LED support
-which now have already been accepted to the net tree, see
-
-https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git/commit/?id=5b5f724b05c550e10693a53a81cadca901aefd16
-
-So it might be the best to wait for the next round of rebase of net-next
-before dealing with your suggested changes to spare maintainers from
-having to deal with the merge conflicts otherwise.
-
-Generally it'd also be nice to add support for the NO_LINK rule to the
-netdev trigger, as it is supported by the hardware, but that can also be
-done later obviously.
-
-
-Cheers
-
-
-Daniel
-
-> 
-> SkyLake.Huang (3):
->   net: phy: mediatek: Re-organize MediaTek ethernet phy drivers
->   net: phy: mediatek: Add mtk phy lib for token ring access & LED/other
->     manipulations
->   net: phy: mediatek: add support for built-in 2.5G ethernet PHY on
->     MT7988
-> 
->  MAINTAINERS                                   |   7 +-
->  drivers/net/phy/Kconfig                       |  17 +-
->  drivers/net/phy/Makefile                      |   3 +-
->  drivers/net/phy/mediatek-ge.c                 | 111 ----
->  drivers/net/phy/mediatek/Kconfig              |  33 ++
->  drivers/net/phy/mediatek/Makefile             |   5 +
->  drivers/net/phy/mediatek/mtk-2p5ge.c          | 399 +++++++++++++
->  .../mtk-ge-soc.c}                             | 522 ++++++++----------
->  drivers/net/phy/mediatek/mtk-ge.c             | 191 +++++++
->  drivers/net/phy/mediatek/mtk-phy-lib.c        | 330 +++++++++++
->  drivers/net/phy/mediatek/mtk.h                |  97 ++++
->  11 files changed, 1277 insertions(+), 438 deletions(-)
->  delete mode 100644 drivers/net/phy/mediatek-ge.c
->  create mode 100644 drivers/net/phy/mediatek/Kconfig
->  create mode 100644 drivers/net/phy/mediatek/Makefile
->  create mode 100644 drivers/net/phy/mediatek/mtk-2p5ge.c
->  rename drivers/net/phy/{mediatek-ge-soc.c => mediatek/mtk-ge-soc.c} (79%)
->  create mode 100644 drivers/net/phy/mediatek/mtk-ge.c
->  create mode 100644 drivers/net/phy/mediatek/mtk-phy-lib.c
->  create mode 100644 drivers/net/phy/mediatek/mtk.h
-> 
-> -- 
-> 2.18.0
-> 
+We've seen this series enough times, let me apply this as is..
+Please follow up with the doc adjustments if you'd like, separately.
 
