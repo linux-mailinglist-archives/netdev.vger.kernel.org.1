@@ -1,94 +1,79 @@
-Return-Path: <netdev+bounces-91332-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91333-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB0F58B23A9
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 16:14:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 862BD8B23B1
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 16:16:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2898C1C20CFB
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 14:14:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B8B811C20A27
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 14:16:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BEF414A4E0;
-	Thu, 25 Apr 2024 14:13:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 598EB149E00;
+	Thu, 25 Apr 2024 14:16:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="PY+5C0qn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vEDNtr9S"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7A6214A09A;
-	Thu, 25 Apr 2024 14:13:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F7F1149C67;
+	Thu, 25 Apr 2024 14:16:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714054416; cv=none; b=qJPLMM8HrgSWl3PaAVEU/CRjQ9Y2qh8WG0ksritMaQGvuirUNo8pvTw5dI3jikHEyXoOHIGOgXwaEe6+ZT+9UVAUDqtk5tVcMAzztDdaYdOr+JOsz40NkrvJf0bMn6N77WEAVH+mpw+HnYazYXCoHZt4R5ZPHLsL2Dmn5ZQIj84=
+	t=1714054599; cv=none; b=VPUJrEi7YLYokKfisocck+QN17Fl9XYdDSA/1+ukTRaNtEdGbd49X70+rPL37GsF4KlBSZpuKfCS0aU/J7NabTgXZzXZguVfMyzhJeulFCuZXZoDdHyO8+xS8hvR3rYXG6/kR15yXGyaxLt4d7w3eyC6HR5tvwn614rE9BqjK5w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714054416; c=relaxed/simple;
-	bh=vnMkoliidnUgjWCP/KC7GNCTd2r4EQjwYmsuFjvucw0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NtCoS19L2JMjmcw+Kd8lwo0hBJF79JnaThhmL+DqFTjlMnrLgD71eXhoLMy2KkthnQHa2pcz611K1JzWHLZbq84YOuVf+bD+ml3ExhLRs9y0vWcfEN+tTnij8bwdzAfGj5crV4+28HVE2qEy0XL5mNPQMRMc5wMvB4Gf0WP3qQE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=PY+5C0qn; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=EdGAMsXDk5Z9irIqk6ZPajxgCEsTnc0pm/mZs2Sxzu8=; b=PY+5C0qnxpEuwhbKn2GR7rM+R8
-	6YnNaBVgt9UWSO43a7wyfqOGHbUf1zNLI86T7OeIl4D7Djf7H0BEWZaBes+fArDb//mPb9hD4VekJ
-	08PeYEJwR4YA0xZ1VNH6CRbE/82ew2FjYeJvemg8QE8BPAXe7nvbDg3S49kI2yftQ3i0=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rzzqk-00DzXE-V9; Thu, 25 Apr 2024 16:13:22 +0200
-Date: Thu, 25 Apr 2024 16:13:22 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Raju.Lakkaraju@microchip.com
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
-	pabeni@redhat.com, edumazet@google.com,
-	linux-kernel@vger.kernel.org, Bryan.Whitehead@microchip.com,
-	UNGLinuxDriver@microchip.com
-Subject: Re: [PATCH net V2 2/2] net: lan743x: support WOL in MAC even when
- PHY does not
-Message-ID: <38718a9b-bc7b-45d1-b15e-f4fea628db3d@lunn.ch>
-References: <20240320042107.903051-1-Raju.Lakkaraju@microchip.com>
- <20240320042107.903051-3-Raju.Lakkaraju@microchip.com>
- <22089299-a3e2-4cbd-942a-65ea070657b8@lunn.ch>
- <LV8PR11MB87003ABBCA98F00F3EEA9AB09F032@LV8PR11MB8700.namprd11.prod.outlook.com>
- <fb5a6f19-ae4c-443e-babb-cbbcf6ba5fc6@lunn.ch>
- <LV8PR11MB8700A34520EA2521BC5F59EF9F112@LV8PR11MB8700.namprd11.prod.outlook.com>
- <9c4f8fcd-ae95-4874-b829-d381928c5f13@lunn.ch>
- <LV8PR11MB8700D54F5E03440681BF0D449F172@LV8PR11MB8700.namprd11.prod.outlook.com>
+	s=arc-20240116; t=1714054599; c=relaxed/simple;
+	bh=n+3q8cF6PNdO/izVSLJhs7im/d7HTf56k6kw7GXeHwQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=fmUYNFJNOwtErDn405i3gB6MQ8S4qkbP1EqNI9gSenSyqA9TrYy79gFyrMMJRRpO6HTtsoLjGP+JtpJxEibau/qrnKdGtHvRl70Uf5WtP5SLhltKw0FYm9JAZ3fG/ibmrfmssoQiGWdpQgc5RqtwFifDRXkme+IU9npuJ2GVewA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vEDNtr9S; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E63CC113CC;
+	Thu, 25 Apr 2024 14:16:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714054599;
+	bh=n+3q8cF6PNdO/izVSLJhs7im/d7HTf56k6kw7GXeHwQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=vEDNtr9S4/yVnJbJa+Jo8abru/GOebq/97NK9qGhWHrAJUzIzoW8iWKD2tjF5Wm1m
+	 RbOPoLb/Z5olaj2Dgb9YCJRASuHxTJ3ypF2c+/Nv723pSYzeulc+bg7ILfkc5fgUOo
+	 a83FG8/UBWt8Q6xcMf/QtTns2y0mQdjB1ExRak/W+v9RDRhbXfSv8Y6JIjy+bFFtAE
+	 WzCcoBKEVrF2F5qn5AlNQaGTzmnT7V5Avtr9O7AkeIErcjhmpZfgvSSf0vKrUelqUW
+	 HRTLRAy/WrFNBB14cDw7L2eL/JhkOdzY2/chhsPXkiNjUUAI2rpxb0HH5Ejvz2pLyE
+	 db1m7Mo9g0v/A==
+Date: Thu, 25 Apr 2024 07:16:37 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Geert Uytterhoeven <geert+renesas@glider.be>, Claudiu Beznea
+ <claudiu.beznea.uj@bp.renesas.com>, Sergey Shtylyov <s.shtylyov@omp.ru>,
+ Paul Barker <paul.barker.ct@bp.renesas.com>, Niklas =?UTF-8?B?U8O2ZGVy?=
+ =?UTF-8?B?bHVuZA==?= <niklas.soderlund+renesas@ragnatech.se>, "David S .
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ linux-renesas-soc@vger.kernel.org
+Subject: Re: [PATCH] net: ravb: Fix registered interrupt names
+Message-ID: <20240425071637.5fe0199d@kernel.org>
+In-Reply-To: <1f131230-56a5-4547-bc77-c508e61e8a55@lunn.ch>
+References: <cde67b68adf115b3cf0b44c32334ae00b2fbb321.1713944647.git.geert+renesas@glider.be>
+	<1f131230-56a5-4547-bc77-c508e61e8a55@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <LV8PR11MB8700D54F5E03440681BF0D449F172@LV8PR11MB8700.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-> If PHY handles the magic packet or phy activity (i.e. WAKE_MAGIC or WAKE_PHY), our PCI11x1x's MAC will handle only interrupt (MDINT from PHY). Not MAC's magic packet.
-> In this case do we really call phy_speed_down( ) ?
+On Thu, 25 Apr 2024 00:45:35 +0200 Andrew Lunn wrote:
+> > Rename the local variable dev_name, as it shadows the dev_name()
+> > function, and pre-initialize it, to simplify the code.  
+> 
+> Another option is to call dev_alloc_name() soon after alloc_netdev(),
+> to give the device its name earlier than register_netdev().
 
-phy_speed_down() is orthogonal to who does the wake. Packets are
-packets. phy_speed_down() does not change that. All it does it drop
-the link to a slower speed. And slower speed means less power
-consumption. A PHY operating at 10Mbps uses about 1W less power than a
-PHY operating at 1G. The numbers will depend on the PHY, but you get
-the idea. Plus the link peer will also save a similar amount out
-power....
-
-If the MAC is needed for WoL, because the PHY does not support the
-needed modes, you probably also save power with the MAC running at
-10Mbps. Its clocks probably tick slower, etc.
-
-But there is a trade off. When resuming, you want to go back to the
-full speed link. And that takes time, a little over 1 second. So you
-need to decide, do you want to prioritise minimum power consumption
-when suspended, or fast resume?
-
-     Andrew
+Maybe we shouldn't be advertising that option too broadly. One has to
+hold rtnl for that to work. Mostly old and staging drivers seem to do
+this. Name are not stable. If other identifiers are available, that's
+a better option, IMHO.
 
