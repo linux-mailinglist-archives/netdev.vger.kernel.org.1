@@ -1,99 +1,146 @@
-Return-Path: <netdev+bounces-91210-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91211-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB7A48B1B4D
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 08:56:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA3A08B1B58
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 08:59:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F2E1E1C20FA3
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 06:56:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 61D3A1F22B09
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 06:59:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16F015A4D5;
-	Thu, 25 Apr 2024 06:56:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13EC2679E5;
+	Thu, 25 Apr 2024 06:59:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="jsgcpWFr"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbg150.qq.com (smtpbg150.qq.com [18.132.163.193])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A00B01DFE4
-	for <netdev@vger.kernel.org>; Thu, 25 Apr 2024 06:55:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.132.163.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93D555CDD0
+	for <netdev@vger.kernel.org>; Thu, 25 Apr 2024 06:59:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714028162; cv=none; b=N8nyBRhYmSqgqXqugELp3J5FLpnS9APZ5qdkdokRPBlneDXRDldtKnR6M7ePu9ejOb8KkU5YCSe246mjkfR1gKxYoM/5TMnuJrm7YJg+CztUpDdYxxEXfZ1hmZ9jzQJJOFk5cngvCF+jKZZrIy0MJsryhLGSENFjxGiQ+xDbupU=
+	t=1714028381; cv=none; b=D9RwPMSDsG1eF8dvqC40D7OEAbpKK3JTJdhaBeuqYV1nCHuxbnqJSNQ+TwBZq+Ro2YI+ATJV9P3hcGNtMbTA9QW+mA24n68FRC/6iiMrN8jNLjS7inCvvrZtfDI7hiQPio+IzIu78o7q1GR5jskw+IdJq/7hTL7O4KKBbx7AqGo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714028162; c=relaxed/simple;
-	bh=O7gu1iG6btZE7MOBadHnNgNlv2vQSSeIveE3k1Yt8+s=;
-	h=From:To:Cc:References:In-Reply-To:Subject:Date:Message-ID:
-	 MIME-Version:Content-Type; b=ZfCh+ld18kC10rFFvKSdxJ1mhZxp3k7vAkDyzht4+pni4Qj2K9lssGc6FMLZYEpwuhST5q0mb2QPkoQau2SUlq1gt/vcLlvF459Qet+lfnrAf1Oq6eiP3EjlNpfCecH7xGOrTT/7cQkN7jLR2+AEwWF7f5kkFKLBF0fLvQjNjyc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=18.132.163.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
-X-QQ-mid:Yeas49t1714028005t763t52301
-Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [115.195.151.153])
-X-QQ-SSF:00400000000000F0FUF000000000000
-From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
-X-BIZMAIL-ID: 7907587342363166786
-To: "'Simon Horman'" <horms@kernel.org>
-Cc: <davem@davemloft.net>,
-	<edumazet@google.com>,
-	<kuba@kernel.org>,
-	<pabeni@redhat.com>,
-	<rmk+kernel@armlinux.org.uk>,
-	<andrew@lunn.ch>,
-	<netdev@vger.kernel.org>,
-	<mengyuanlou@net-swift.com>,
-	<duanqiangwen@net-swift.com>
-References: <20240416062952.14196-1-jiawenwu@trustnetic.com> <20240416062952.14196-5-jiawenwu@trustnetic.com> <20240418185851.GQ3975545@kernel.org>
-In-Reply-To: <20240418185851.GQ3975545@kernel.org>
-Subject: RE: [PATCH net 4/5] net: wangxun: change NETIF_F_HW_VLAN_STAG_* to fixed features
-Date: Thu, 25 Apr 2024 14:53:24 +0800
-Message-ID: <057001da96dd$44b592a0$ce20b7e0$@trustnetic.com>
+	s=arc-20240116; t=1714028381; c=relaxed/simple;
+	bh=e1vlBiYgpPvF92O4Af9KuT1S8cWMNzZQEzACGAc/4QE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PHJHcpOQSJ3aEIszcP8XCCAVJosv5kJDjt1zrkxYt9FhNGPWtZGInFnyXCwfnzYbiQJD5Dqns/F1Y3qDf1lNAKGyJgIg6FWTwNTFKesaG23jnh7IMUdkLqI4j21AeaPYYajKjEEO0hG0Dq1776lmmX4N/L4XJ5U9ho8lvYsrF2E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=jsgcpWFr; arc=none smtp.client-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-41b4ff362a8so1815855e9.0
+        for <netdev@vger.kernel.org>; Wed, 24 Apr 2024 23:59:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1714028377; x=1714633177; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=peNA2dsXCHbUBK91wvLD3fmzxWkuZFoJfKP535nVv64=;
+        b=jsgcpWFrMEa6YkMAlH5ImNGm83ItBfKSOKdALMPb61zUIuihxH/EhmhRCHchdp4bQB
+         DRE5GFHYQ7KZ09HHENzWB1q3xs+0IS3G//SoqQzLDU1yH8SWw5SVZmkF4PmKVMTWFXp0
+         PxVrXW7A4/JddwRwWZP0XcVbjq6zYiwF2nv1H4uuLS6N3Up00npqOgShwP3X1ScrlgoP
+         gDnjzXqorG+dqEH+NI/dOc6BVrc2riVi2wks9HTbz0GvCerathKezYa8f6VY7rYkpEKL
+         Jl22fAygEzo06q4OH7OsbqbgTWwcow3zVTFAZm8EgPBeo2cTLiqCCj7F1ffr/Z27i5Lc
+         qO2g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714028377; x=1714633177;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=peNA2dsXCHbUBK91wvLD3fmzxWkuZFoJfKP535nVv64=;
+        b=P8ELfH2b+rWHXyOCLIVyXe66QHnTE+mD6rePag6xTT9EBZsDCweHygMB2rRnP5tKhB
+         9iwSKxTiDrb6Y4vZWsthoNRiR5XQrnLLgxEgqgJgNjvAYlvn2RGuiqlu2i+SDS58WYi6
+         ACUy7WcLgRX6Vfrru4hTOChMry5cEbTVm2hJFIJ4pHjGluBIXLIlnP5kT/OIkB0c1TCm
+         J6vW2ME8ce4RuEDyiXxnVb/VRqaQ9mC1FKf1ta+mTM37JWwiERa9EBsxexLoK/094mIk
+         LRD4cqjIC0AgSZsaoBbanAKKLvjrDUO7LPSQuQvnx4dEUv7eehjOGVur7quH5cLYHzZl
+         L7cQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVnMNFtHUwIufQqE+Q09RgDsBDTouqqrlCA+uWPLlPRo3LHKS09RVR7qlhiAODBVsqL9Z5mgUsGt3gaJhksXHk57A7HnIVa
+X-Gm-Message-State: AOJu0YyViMLen044KpusMz2bq/0MPSKncV5ayuQoQuXbknONqeXg99E0
+	+vwTerK7w0WqBBo3H7cSm4DdNvt29B3DZfr0HeogBqkARPSF8jzcrcx6t3y6KUHolnJt5yxqIYT
+	S
+X-Google-Smtp-Source: AGHT+IGr1zr4QKQl7DWg38CUYJnl+aOHDuzzAoVNuUJ8bzBpBTf+6ltkHS4meFQNnnEm0meI8FWDAw==
+X-Received: by 2002:a5d:525c:0:b0:34a:beb3:f6dc with SMTP id k28-20020a5d525c000000b0034abeb3f6dcmr4650743wrc.2.1714028376567;
+        Wed, 24 Apr 2024 23:59:36 -0700 (PDT)
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id a4-20020a170906368400b00a4e48e52ecbsm9123739ejc.198.2024.04.24.23.59.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 24 Apr 2024 23:59:35 -0700 (PDT)
+Date: Thu, 25 Apr 2024 08:59:31 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Sunil Kovvuri Goutham <sgoutham@marvell.com>
+Cc: Geethasowjanya Akula <gakula@marvell.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"edumazet@google.com" <edumazet@google.com>,
+	Subbaraya Sundeep Bhatta <sbhatta@marvell.com>,
+	Hariprasad Kelam <hkelam@marvell.com>
+Subject: Re: [net-next PATCH v2 5/9] octeontx2-af: Add packet path between
+ representor and VF
+Message-ID: <Zin_U-0PPfk5a_1d@nanopsycho>
+References: <20240422095401.14245-1-gakula@marvell.com>
+ <20240422095401.14245-6-gakula@marvell.com>
+ <Ziey7sruZrtq_5Hj@nanopsycho>
+ <BY3PR18MB47379134443CB002D80A7F90C6172@BY3PR18MB4737.namprd18.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-X-Mailer: Microsoft Outlook 16.0
-Thread-Index: AQMFotcmuiiFX27azvFEImaFqcAi9wCPUoUSAgYg8sevDcc6sA==
-Content-Language: zh-cn
-X-QQ-SENDSIZE: 520
-Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz8a-1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <BY3PR18MB47379134443CB002D80A7F90C6172@BY3PR18MB4737.namprd18.prod.outlook.com>
 
-On Fri, April 19, 2024 2:59 AM, Simon Horman wrote:
-> On Tue, Apr 16, 2024 at 02:29:51PM +0800, Jiawen Wu wrote:
-> > Because the hardware doesn't support the configuration of VLAN STAG,
-> > remove NETIF_F_HW_VLAN_STAG_* in netdev->features, and set their state
-> > to be consistent with NETIF_F_HW_VLAN_CTAG_*.
-> >
-> > Fixes: 6670f1ece2c8 ("net: txgbe: Add netdev features support")
-> > Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
-> 
-> Hi Jiawen Wu,
-> 
-> I am having trouble reconciling "hardware doesn't support the configuration
-> of VLAN STAG" with both "set their state to be consistent with
-> NETIF_F_HW_VLAN_CTAG_*" and the code changes.
-> 
-> Is the problem here not that VLAN STAGs aren't supported by
-> the HW, but rather that the HW requires that corresponding
-> CTAG and STAG configuration always matches?
-> 
-> I.e, the HW requires:
-> 
->   f & NETIF_F_HW_VLAN_CTAG_FILTER == f & NETIF_F_HW_VLAN_STAG_FILTER
->   f & NETIF_F_HW_VLAN_CTAG_RX     == f & NETIF_F_HW_VLAN_STAG_RX
->   f & NETIF_F_HW_VLAN_CTAG_TX     == f & NETIF_F_HW_VLAN_STAG_TX
-> 
-> If so, I wonder if only the wx_fix_features() portion of
-> this patch is required.
+Thu, Apr 25, 2024 at 08:01:47AM CEST, sgoutham@marvell.com wrote:
+>
+>
+>> -----Original Message-----
+>> From: Jiri Pirko <jiri@resnulli.us>
+>> Sent: Tuesday, April 23, 2024 6:39 PM
+>> To: Geethasowjanya Akula <gakula@marvell.com>
+>> Cc: netdev@vger.kernel.org; linux-kernel@vger.kernel.org; kuba@kernel.org;
+>> davem@davemloft.net; pabeni@redhat.com; edumazet@google.com; Sunil
+>> Kovvuri Goutham <sgoutham@marvell.com>; Subbaraya Sundeep Bhatta
+>> <sbhatta@marvell.com>; Hariprasad Kelam <hkelam@marvell.com>
+>> Subject: [EXTERNAL] Re: [net-next PATCH v2 5/9] octeontx2-af: Add packet
+>> path between representor and VF
+>> 
+>> Mon, Apr 22, 2024 at 11:53:57AM CEST, gakula@marvell.com wrote:
+>> >This patch installs tcam rules to stree traffic representors and VF
+>> >when swicthdev mode is set. To support this a HW loopback channel is
+>> >reserved. Through this channel packet are routed between representor
+>> >and VFs. "ESW_CFG" mbox is defined to notify AF for installing rules.
+>> 
+>> This sounds very wrong. In switchdev mode, there is no implicit packet
+>> forwarding. User configures that, either by setting up TC filters to
+>> match/forward packets, putting representors in a bridge, etc.
+>> Basically the driver offloads whatever configuration on representors the user
+>> does, in case it supports it.
+>> 
+>> Please make sure you follow that.
+>
+>In our HW, there is no in-built switch which will forward pkts between representee and representor.
+>When representor is put under a bridge and pkts needs to be sent to representee, then pkts from
+>representor are sent on a HW internal loopback channel, which again will be punted to ingress
+>pkt parser. Now the rules that this patch installs are the MCAM filters/rules which will match against
+>these pkts and forward them to representee.
+>
+>To be more clear the rules that this patch installs are for basic representor <-=> representee path
+>similar to Tun/TAP between VM and Host. Now for any further offloads (eg: L2 or ConnTrk)
+>user will have to install explicit rules via TC filters.
 
-You are right. I need to set their state to be consistent in wx_fix_features(),
-this patch is missing the case when STAG changes.
+Okay, makes sense.
 
 
+>
+>Thanks,
+>Sunil.
+>
+>
+>
 
