@@ -1,240 +1,284 @@
-Return-Path: <netdev+bounces-91492-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91493-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E00FA8B2D7E
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 01:19:00 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 553EF8B2D91
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 01:27:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 960A128506D
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 23:18:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BC5181F22ECA
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 23:27:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38358156258;
-	Thu, 25 Apr 2024 23:18:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C322156676;
+	Thu, 25 Apr 2024 23:27:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="zJuxruLY";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="bNdYA6J/";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="ckJTeLLE";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="truHWJsK"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="HnMLW7PF"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67F9684D0D;
-	Thu, 25 Apr 2024 23:18:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35781156644;
+	Thu, 25 Apr 2024 23:27:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714087137; cv=none; b=tMqAPFF6XR5E8yYKahh345NmoVeCBUBHeu6BfhekxPtjutwwLP+dPgti1SPjL6AiLmCvpYqv94eYPzw2mSo9e/Dftq9FFVSEF32iQHszqZMVqmlI5E0fDQ81h2wrvv52F84VCLdoRiHEae4JbZZIDnVeOaa1sq05z7yVAjvDq4E=
+	t=1714087656; cv=none; b=Kk/tNwe3VuxbVBy4mFmlPMqLMrfrKp9+gmYcfuM9hvOyIxkGn1bzd+3sdfFR4K0+bzmapjUqXw7PH9tbCu0sH7Cx6LAjVdT/NTckAgPb/Hjv2xajRryHf2BDWVTE+js3yiZAEQNOVVNgZy8Y1tjAItY5UV6izONBPoRe7GRp4hQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714087137; c=relaxed/simple;
-	bh=f7B8+aI+858znS4N0tv3mXyDzuhtmEEsi7y/rHt+Ngg=;
-	h=Content-Type:MIME-Version:From:To:Cc:Subject:In-reply-to:
-	 References:Date:Message-id; b=tcbDVVg7eJ1vIsBZlSwFNYxNfo2oSdf/8QkL+ovBUvF8hpTUlcpxHh7SuezgadklW6Kb6ttOSao2v2YV5RfeHD70CXGfl1eQ76PBYzzH6uH8h3MBTl4InB/RvfhNPKfsVSHPIOk+HrSqOkkNqZFRqr2ZtZJrLxnuMibxtcD3jwg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=zJuxruLY; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=bNdYA6J/; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=ckJTeLLE; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=truHWJsK; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id D80BD345E7;
-	Thu, 25 Apr 2024 23:18:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1714087128; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
+	s=arc-20240116; t=1714087656; c=relaxed/simple;
+	bh=0tFieE+HQ5I3pw7gyPPOiTeceDGOdd5tINy//LbG6nk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jPmZ7/ki6roY3f4sXvXvuY01v6a4eMJc7M184rCeAfIgEZY+xgI1G0LNZljIey+Pqm2/QFjED1/dI2UQZgV+RpL/F78Ffrmi1tczvUfzwBQqlJs2RgyOcn1Ea84gt1vd2KId6b7jE45hHSxQ4doFCmXqzXbAWP/a0H666osPj0U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=HnMLW7PF; arc=none smtp.client-ip=95.215.58.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <463c8ea7-08cf-412e-bb31-6fbb15b4df8b@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1714087652;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=52y5sBbq6yd4cZWzlgqBhsOglWePkg8NYEXLDnSj9n0=;
-	b=zJuxruLY+3JmcsK93MONqBjx88QO12qF0HxR8MD+Dqt77S0gjupa3fk6GBCAeKLhFePGJF
-	4D+rmmlZLXIy7Uf/7QX1Cd8MQZDNK49gmIIrhvOTVpvjamEGheBDcu1XpNTKh6KDA8QfND
-	N7kRtQU+Fko8SOvbR3LBXB+mVB5+7gI=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1714087128;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=52y5sBbq6yd4cZWzlgqBhsOglWePkg8NYEXLDnSj9n0=;
-	b=bNdYA6J/5fTjQwrU6+XbSnWrOQt1XJ35F8Zxe2Tf8he2hXyxVDQV2ZvWSsXOSNiZhGIFJd
-	v5cm3xrTeI/OlcCg==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=ckJTeLLE;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=truHWJsK
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1714087127; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=52y5sBbq6yd4cZWzlgqBhsOglWePkg8NYEXLDnSj9n0=;
-	b=ckJTeLLE28orgl8rFbmFAyUy5dYrotZueK/jUcfFlThwyFmZ5SURkJfzzjFS3ctbP3kl2+
-	p+LWAP010gsmbY6NZdys1NcFH3l6D2DFpBwm8busNpI6VYQjzS8C3V24XrdRdNRlGReySm
-	720ayNBM3rCYieiUTxUAQO8klAvyT0o=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1714087127;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=52y5sBbq6yd4cZWzlgqBhsOglWePkg8NYEXLDnSj9n0=;
-	b=truHWJsKYvh1OjfIMk/frIJqe4Kbb5eJinIys2r56Unm1a0khg86+kviit8839ArDNpz1e
-	th8hSwaTdyeiYaDQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 8AD391393C;
-	Thu, 25 Apr 2024 23:18:44 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([10.150.64.162])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id oXnAC9TkKmbQCQAAD6G6ig
-	(envelope-from <neilb@suse.de>); Thu, 25 Apr 2024 23:18:44 +0000
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+	bh=bHcXWetchZJOkIfTIAeJVtrEZuK6N84YVH9u3Y+Js74=;
+	b=HnMLW7PFQlxBSyuTCwvWv3+PEtXswZsQRrKEhDtKU7v/I12Vv+HaxnheElL4Ja7nbJiZZQ
+	cQL6TfSNkc7iQ1Zron1IqcTfTkNk0vqbwaNRWpAWXxfqjDSr0RanJt9aT0q0OP4Obj6XF6
+	i4Auhc31EXATV11uBAoSLwD9qg3/bOo=
+Date: Thu, 25 Apr 2024 16:27:22 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: "NeilBrown" <neilb@suse.de>
-To: "Chris Packham" <Chris.Packham@alliedtelesis.co.nz>
-Cc: "Chuck Lever III" <chuck.lever@oracle.com>,
- "Jeff Layton" <jlayton@kernel.org>,
- "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
- "Linux NFS Mailing List" <linux-nfs@vger.kernel.org>,
- "netdev" <netdev@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "stable@vger.kernel.org" <stable@vger.kernel.org>
-Subject: Re: kernel BUG at net/sunrpc/svc.c:570 after updating from v5.15.153
- to v5.15.155
-In-reply-to: <141fbaa0-f8fa-4bfe-8c2d-7749fcf78ab3@alliedtelesis.co.nz>
-References: <>, <141fbaa0-f8fa-4bfe-8c2d-7749fcf78ab3@alliedtelesis.co.nz>
-Date: Fri, 26 Apr 2024 09:18:40 +1000
-Message-id: <171408712052.7600.17665015984185673222@noble.neil.brown.name>
-X-Spam-Flag: NO
-X-Spam-Score: -4.51
-X-Rspamd-Action: no action
-X-Rspamd-Queue-Id: D80BD345E7
-X-Spam-Level: 
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Spamd-Result: default: False [-4.51 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ARC_NA(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim,oracle.com:email];
-	DKIM_TRACE(0.00)[suse.de:+]
+Subject: Re: [PATCH bpf-next v2 1/2] net: netfilter: Make ct zone opts
+ configurable for bpf ct helpers
+To: Brad Cowie <brad@faucet.nz>
+Cc: lorenzo@kernel.org, memxor@gmail.com, pablo@netfilter.org,
+ davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, ast@kernel.org,
+ daniel@iogearbox.net, andrii@kernel.org, song@kernel.org,
+ john.fastabend@gmail.com, sdf@google.com, jolsa@kernel.org,
+ netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+ bpf@vger.kernel.org, netdev@vger.kernel.org
+References: <20240424030027.3932184-1-brad@faucet.nz>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+Content-Language: en-US
+In-Reply-To: <20240424030027.3932184-1-brad@faucet.nz>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Fri, 26 Apr 2024, Chris Packham wrote:
->=20
-> On 25/04/24 11:37, NeilBrown wrote:
-> > On Thu, 25 Apr 2024, Chuck Lever III wrote:
-> >>> On Apr 24, 2024, at 9:33=E2=80=AFAM, Chuck Lever III <chuck.lever@oracl=
-e.com> wrote:
-> >>>
-> >>>> On Apr 24, 2024, at 3:42=E2=80=AFAM, Chris Packham <Chris.Packham@alli=
-edtelesis.co.nz> wrote:
-> >>>>
-> >>>> On 24/04/24 13:38, Chris Packham wrote:
-> >>>>> On 24/04/24 12:54, Chris Packham wrote:
-> >>>>>> Hi Jeff, Chuck, Greg,
-> >>>>>>
-> >>>>>> After updating one of our builds along the 5.15.y LTS branch our
-> >>>>>> testing caught a new kernel bug. Output below.
-> >>>>>>
-> >>>>>> I haven't dug into it yet but wondered if it rang any bells.
-> >>>>> A bit more info. This is happening at "reboot" for us. Our embedded
-> >>>>> devices use a bit of a hacked up reboot process so that they come back
-> >>>>> faster in the case of a failure.
-> >>>>>
-> >>>>> It doesn't happen with a proper `systemctl reboot` or with a SYSRQ+B
-> >>>>>
-> >>>>> I can trigger it with `killall -9 nfsd` which I'm not sure is a
-> >>>>> completely legit thing to do to kernel threads but it's probably close
-> >>>>> to what our customized reboot does.
-> >>>> I've bisected between v5.15.153 and v5.15.155 and identified commit
-> >>>> dec6b8bcac73 ("nfsd: Simplify code around svc_exit_thread() call in
-> >>>> nfsd()") as the first bad commit. Based on the context that seems to
-> >>>> line up with my reproduction. I'm wondering if perhaps something got
-> >>>> missed out of the stable track? Unfortunately I'm not able to run a mo=
-re
-> >>>> recent kernel with all of the nfs related setup that is being used on
-> >>>> the system in question.
-> >>> Thanks for bisecting, that would have been my first suggestion.
-> >>>
-> >>> The backport included all of the NFSD patches up to v6.2, but
-> >>> there might be a missing server-side SunRPC patch.
-> >> So dec6b8bcac73 ("nfsd: Simplify code around svc_exit_thread()
-> >> call in  nfsd()") is from v6.6, so it was applied to v5.15.y
-> >> only to get a subsequent NFSD fix to apply.
-> >>
-> >> The immediately previous upstream commit is missing:
-> >>
-> >>    390390240145 ("nfsd: don't allow nfsd threads to be signalled.")
-> >>
-> >> For testing, I've applied this to my nfsd-5.15.y branch here:
-> >>
-> >>    https://git.kernel.org/pub/scm/linux/kernel/git/cel/linux.git
-> >>
-> >> However even if that fixes the reported crash, this suggests
-> >> that after v6.6, nfsd threads are not going to respond to
-> >> "killall -9 nfsd".
-> > I think this likely is the problem.  The nfsd threads must be being
-> > killed by a signal.
-> > One only other cause for an nfsd thread to exit is if
-> > svc_set_num_threads() is called, and all places that call that hold a
-> > ref on the serv structure so the final put won't happen when the thread
-> > exits.
-> >
-> > Before the patch that bisect found, the nfsd thread would exit with
-> >
-> >   svc_get();
-> >   svc_exit_thread();
-> >   nfsd_put();
-> >
-> > This also holds a ref across the svc_exit_thread(), and ensures the
-> > final 'put' happens from nfsD_put(), not svc_put() (in
-> > svc_exit_thread()).
-> >
-> > Chris: what was the context when the crash happened?  Could the nfsd
-> > threads have been signalled?  That hasn't been the standard way to stop
-> > nfsd threads for a long time, so I'm a little surprised that it is
-> > happening.
->=20
-> We use a hacked up version of shutdown from util-linux and which does a=20
-> `kill (-1, SIGTERM);` then `kill (-1, SIGKILL);` (I don't think that=20
-> particular behaviour is the hackery). I'm not sure if -1 will pick up=20
-> kernel threads but based on the symptoms it appears to be doing so (or=20
-> maybe something else is in it's SIGTERM handler). I don't think we were=20
-> ever really intending to send the signals to nfsd so whether it actually=20
-> terminates or not I don't think is an issue for us. I can confirm that=20
-> applying 390390240145 resolves the symptom we were seeing.
->=20
->=20
+On 4/23/24 8:00 PM, Brad Cowie wrote:
+> Add ct zone id/flags/dir to bpf_ct_opts so that arbitrary ct zones
+> can be used for xdp/tc bpf ct helper functions bpf_{xdp,skb}_ct_alloc
+> and bpf_{xdp,skb}_ct_lookup.
+> 
+> Signed-off-by: Brad Cowie <brad@faucet.nz>
+> ---
+> v1 -> v2:
+>    - Make ct zone flags/dir configurable
+> ---
+>   net/netfilter/nf_conntrack_bpf.c | 97 ++++++++++++++++++++------------
+>   1 file changed, 61 insertions(+), 36 deletions(-)
+> 
+> diff --git a/net/netfilter/nf_conntrack_bpf.c b/net/netfilter/nf_conntrack_bpf.c
+> index d2492d050fe6..67f73b57089b 100644
+> --- a/net/netfilter/nf_conntrack_bpf.c
+> +++ b/net/netfilter/nf_conntrack_bpf.c
+> @@ -21,41 +21,44 @@
+>   /* bpf_ct_opts - Options for CT lookup helpers
+>    *
+>    * Members:
+> - * @netns_id   - Specify the network namespace for lookup
+> - *		 Values:
+> - *		   BPF_F_CURRENT_NETNS (-1)
+> - *		     Use namespace associated with ctx (xdp_md, __sk_buff)
+> - *		   [0, S32_MAX]
+> - *		     Network Namespace ID
+> - * @error      - Out parameter, set for any errors encountered
+> - *		 Values:
+> - *		   -EINVAL - Passed NULL for bpf_tuple pointer
+> - *		   -EINVAL - opts->reserved is not 0
+> - *		   -EINVAL - netns_id is less than -1
+> - *		   -EINVAL - opts__sz isn't NF_BPF_CT_OPTS_SZ (12)
+> - *		   -EPROTO - l4proto isn't one of IPPROTO_TCP or IPPROTO_UDP
+> - *		   -ENONET - No network namespace found for netns_id
+> - *		   -ENOENT - Conntrack lookup could not find entry for tuple
+> - *		   -EAFNOSUPPORT - tuple__sz isn't one of sizeof(tuple->ipv4)
+> - *				   or sizeof(tuple->ipv6)
+> - * @l4proto    - Layer 4 protocol
+> - *		 Values:
+> - *		   IPPROTO_TCP, IPPROTO_UDP
+> - * @dir:       - connection tracking tuple direction.
+> - * @reserved   - Reserved member, will be reused for more options in future
+> - *		 Values:
+> - *		   0
+> + * @netns_id	  - Specify the network namespace for lookup
+> + *		    Values:
+> + *		      BPF_F_CURRENT_NETNS (-1)
+> + *		        Use namespace associated with ctx (xdp_md, __sk_buff)
+> + *		      [0, S32_MAX]
+> + *		        Network Namespace ID
+> + * @error	  - Out parameter, set for any errors encountered
+> + *		    Values:
+> + *		      -EINVAL - Passed NULL for bpf_tuple pointer
+> + *		      -EINVAL - netns_id is less than -1
+> + *		      -EINVAL - opts__sz isn't NF_BPF_CT_OPTS_SZ (16)
+> + *			        or NF_BPF_CT_OPTS_OLD_SZ (12)
+> + *		      -EPROTO - l4proto isn't one of IPPROTO_TCP or IPPROTO_UDP
+> + *		      -ENONET - No network namespace found for netns_id
+> + *		      -ENOENT - Conntrack lookup could not find entry for tuple
+> + *		      -EAFNOSUPPORT - tuple__sz isn't one of sizeof(tuple->ipv4)
+> + *				      or sizeof(tuple->ipv6)
+> + * @l4proto	  - Layer 4 protocol
+> + *		    Values:
+> + *		      IPPROTO_TCP, IPPROTO_UDP
+> + * @dir:	  - connection tracking tuple direction.
 
-Makes sense - thanks.
-"kill -1 ..." does send the signal to *every* process including kernel
-threads.  I'm glad you weren't depending on that to kill nfsd.
-Hopefully no one else is.  I think the best way forward is to apply that
-patch to 5.15-stable as Chuck plans to do.
+Please avoid whitespace changes. It is unnecessary code churns.
 
-Thanks,
-NeilBrown
+> + * @ct_zone_id	  - connection tracking zone id.
+> + * @ct_zone_flags - connection tracking zone flags.
+> + * @ct_zone_dir   - connection tracking zone direction.
+>    */
+>   struct bpf_ct_opts {
+>   	s32 netns_id;
+>   	s32 error;
+>   	u8 l4proto;
+>   	u8 dir;
+> -	u8 reserved[2];
+> +	u16 ct_zone_id;
+> +	u8 ct_zone_flags;
+> +	u8 ct_zone_dir;
+
+The size is 16 now with 2 tail paddings.
+It needs a "u8 reserved[2];" at the end and need to check its 0.
+
+
+>   };
+>   
+>   enum {
+> -	NF_BPF_CT_OPTS_SZ = 12,
+> +	NF_BPF_CT_OPTS_SZ = 16,
+> +	NF_BPF_CT_OPTS_OLD_SZ = 12,
+
+Avoid adding NF_BPF_CT_OPTS_OLD_SZ for now. I don't see how it may be useful.
+
+>   };
+>   
+>   static int bpf_nf_ct_tuple_parse(struct bpf_sock_tuple *bpf_tuple,
+> @@ -104,11 +107,13 @@ __bpf_nf_ct_alloc_entry(struct net *net, struct bpf_sock_tuple *bpf_tuple,
+>   			u32 timeout)
+>   {
+>   	struct nf_conntrack_tuple otuple, rtuple;
+> +	struct nf_conntrack_zone ct_zone;
+>   	struct nf_conn *ct;
+>   	int err;
+>   
+> -	if (!opts || !bpf_tuple || opts->reserved[0] || opts->reserved[1] ||
+> -	    opts_len != NF_BPF_CT_OPTS_SZ)
+> +	if (!opts || !bpf_tuple)
+> +		return ERR_PTR(-EINVAL);
+> +	if (!(opts_len == NF_BPF_CT_OPTS_SZ || opts_len == NF_BPF_CT_OPTS_OLD_SZ))
+>   		return ERR_PTR(-EINVAL);
+>   
+>   	if (unlikely(opts->netns_id < BPF_F_CURRENT_NETNS))
+> @@ -130,7 +135,16 @@ __bpf_nf_ct_alloc_entry(struct net *net, struct bpf_sock_tuple *bpf_tuple,
+>   			return ERR_PTR(-ENONET);
+>   	}
+>   
+> -	ct = nf_conntrack_alloc(net, &nf_ct_zone_dflt, &otuple, &rtuple,
+> +	if (opts_len == NF_BPF_CT_OPTS_SZ) {
+> +		if (opts->ct_zone_dir == 0)
+
+I don't know the details about the dir in ct_zone, so a question: a 0 
+ct_zone_dir is invalid and can be reused to mean NF_CT_DEFAULT_ZONE_DIR?
+
+> +			opts->ct_zone_dir = NF_CT_DEFAULT_ZONE_DIR;
+> +		nf_ct_zone_init(&ct_zone,
+> +				opts->ct_zone_id, opts->ct_zone_dir, opts->ct_zone_flags);
+> +	} else {
+
+Better enforce "ct_zone_id == 0" also instead of ignoring it.
+
+> +		ct_zone = nf_ct_zone_dflt;
+> +	}
+> +
+> +	ct = nf_conntrack_alloc(net, &ct_zone, &otuple, &rtuple,
+>   				GFP_ATOMIC);
+>   	if (IS_ERR(ct))
+>   		goto out;
+> @@ -152,11 +166,13 @@ static struct nf_conn *__bpf_nf_ct_lookup(struct net *net,
+>   {
+>   	struct nf_conntrack_tuple_hash *hash;
+>   	struct nf_conntrack_tuple tuple;
+> +	struct nf_conntrack_zone ct_zone;
+>   	struct nf_conn *ct;
+>   	int err;
+>   
+> -	if (!opts || !bpf_tuple || opts->reserved[0] || opts->reserved[1] ||
+> -	    opts_len != NF_BPF_CT_OPTS_SZ)
+> +	if (!opts || !bpf_tuple)
+> +		return ERR_PTR(-EINVAL);
+> +	if (!(opts_len == NF_BPF_CT_OPTS_SZ || opts_len == NF_BPF_CT_OPTS_OLD_SZ))
+>   		return ERR_PTR(-EINVAL);
+>   	if (unlikely(opts->l4proto != IPPROTO_TCP && opts->l4proto != IPPROTO_UDP))
+>   		return ERR_PTR(-EPROTO);
+> @@ -174,7 +190,16 @@ static struct nf_conn *__bpf_nf_ct_lookup(struct net *net,
+>   			return ERR_PTR(-ENONET);
+>   	}
+>   
+> -	hash = nf_conntrack_find_get(net, &nf_ct_zone_dflt, &tuple);
+> +	if (opts_len == NF_BPF_CT_OPTS_SZ) {
+> +		if (opts->ct_zone_dir == 0)
+> +			opts->ct_zone_dir = NF_CT_DEFAULT_ZONE_DIR;
+> +		nf_ct_zone_init(&ct_zone,
+> +				opts->ct_zone_id, opts->ct_zone_dir, opts->ct_zone_flags);
+> +	} else {
+> +		ct_zone = nf_ct_zone_dflt;
+> +	}
+> +
+> +	hash = nf_conntrack_find_get(net, &ct_zone, &tuple);
+>   	if (opts->netns_id >= 0)
+>   		put_net(net);
+>   	if (!hash)
+> @@ -245,7 +270,7 @@ __bpf_kfunc_start_defs();
+>    * @opts	- Additional options for allocation (documented above)
+>    *		    Cannot be NULL
+>    * @opts__sz	- Length of the bpf_ct_opts structure
+> - *		    Must be NF_BPF_CT_OPTS_SZ (12)
+> + *		    Must be NF_BPF_CT_OPTS_SZ (16)
+>    */
+>   __bpf_kfunc struct nf_conn___init *
+>   bpf_xdp_ct_alloc(struct xdp_md *xdp_ctx, struct bpf_sock_tuple *bpf_tuple,
+> @@ -279,7 +304,7 @@ bpf_xdp_ct_alloc(struct xdp_md *xdp_ctx, struct bpf_sock_tuple *bpf_tuple,
+>    * @opts	- Additional options for lookup (documented above)
+>    *		    Cannot be NULL
+>    * @opts__sz	- Length of the bpf_ct_opts structure
+> - *		    Must be NF_BPF_CT_OPTS_SZ (12)
+> + *		    Must be NF_BPF_CT_OPTS_SZ (16)
+
+Either 16 or 12. Same for below.
+
+>    */
+>   __bpf_kfunc struct nf_conn *
+>   bpf_xdp_ct_lookup(struct xdp_md *xdp_ctx, struct bpf_sock_tuple *bpf_tuple,
+> @@ -312,7 +337,7 @@ bpf_xdp_ct_lookup(struct xdp_md *xdp_ctx, struct bpf_sock_tuple *bpf_tuple,
+>    * @opts	- Additional options for allocation (documented above)
+>    *		    Cannot be NULL
+>    * @opts__sz	- Length of the bpf_ct_opts structure
+> - *		    Must be NF_BPF_CT_OPTS_SZ (12)
+> + *		    Must be NF_BPF_CT_OPTS_SZ (16)
+>    */
+>   __bpf_kfunc struct nf_conn___init *
+>   bpf_skb_ct_alloc(struct __sk_buff *skb_ctx, struct bpf_sock_tuple *bpf_tuple,
+> @@ -347,7 +372,7 @@ bpf_skb_ct_alloc(struct __sk_buff *skb_ctx, struct bpf_sock_tuple *bpf_tuple,
+>    * @opts	- Additional options for lookup (documented above)
+>    *		    Cannot be NULL
+>    * @opts__sz	- Length of the bpf_ct_opts structure
+> - *		    Must be NF_BPF_CT_OPTS_SZ (12)
+> + *		    Must be NF_BPF_CT_OPTS_SZ (16)
+>    */
+>   __bpf_kfunc struct nf_conn *
+>   bpf_skb_ct_lookup(struct __sk_buff *skb_ctx, struct bpf_sock_tuple *bpf_tuple,
+
 
