@@ -1,179 +1,308 @@
-Return-Path: <netdev+bounces-91217-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91218-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 278468B1BB7
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 09:18:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2955C8B1BD5
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 09:24:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4B9CF1C22E7D
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 07:18:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DBBE42864C6
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 07:24:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E225D6BB39;
-	Thu, 25 Apr 2024 07:18:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8937D6BFD4;
+	Thu, 25 Apr 2024 07:24:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="OmT1VuBa"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GBZfkdru"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh8-smtp.messagingengine.com (fhigh8-smtp.messagingengine.com [103.168.172.159])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E537333998;
-	Thu, 25 Apr 2024 07:18:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.159
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCF1A3CF7E
+	for <netdev@vger.kernel.org>; Thu, 25 Apr 2024 07:23:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714029513; cv=none; b=Md22pDxep22JTVByJfE/aYXOlCTktk8ODYA7Xa1R7KeMPm3OodnTmgwO/Cld/MJ0peM3X2VN0eck1vcPEanfoa3CXV8enc4LJ3qnoX6e3+wu8JWjiVRecGyAPzktu6bTmWV7ARphrSimpwh6d1/QC9ONidec1ngYowi4CSFXvro=
+	t=1714029840; cv=none; b=Swy6zRCX/6Lt4mqfT6bBj8/cp7l672x5dKPyokJN36sq/nAuMLKBdx8rz7etvqaufGssy0KVRIo2nOkC8N8DuIDvXab7rR/qaC7aDCK3CKFj1Xcvv17ccehtEXfMWPE6B/7UsQp1NGSb4U8PHOyieJx3utlkdDasV98w+PErAm4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714029513; c=relaxed/simple;
-	bh=CtIzOs4AG5fWmfykaA38i3gD9xUZxwUdbW+TQ3DYecE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=j1xV9+6bwgjduRb2Qmg6xK+PyVbHMJdGtRtTvpWpkiSiJdmdgPPR1jUjnedCP6FSTh3OXxCHJi3QsNibki+VW8zSK7ttLzxnMBgxRzCZNgLzrF4kK5vz9c9po1YePG8U8u4usAlalNiB/vQe8FnJtnTpqukvGBO33t05ipQHfM0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=OmT1VuBa; arc=none smtp.client-ip=103.168.172.159
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
-Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
-	by mailfhigh.nyi.internal (Postfix) with ESMTP id D67431140106;
-	Thu, 25 Apr 2024 03:18:30 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute2.internal (MEProxy); Thu, 25 Apr 2024 03:18:30 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-	fm3; t=1714029510; x=1714115910; bh=TgLiFnIKrdny1qGtk4AXJIMvNsfr
-	yUNeTWa7cQZ7fhk=; b=OmT1VuBaVvA/s+cW0JDJLKN+eIFPi1SnFx0wxInfBHLF
-	83CI8SPqDCTzmkU+XTnT6dAkjbP1OwCKxFcrMbKmJE2gxJXMA4HSDXt3H3YJyLAl
-	nByrQipK5wX0t6AnOdZQ/FGUk89vnmAVRN0Tdso4sPC5pIhJJmCFsOYUQRyMxUZF
-	zq2DsC9WN8wfiNBrC66B8VEnygq9MJsjpZ+kUJ4Tcslfy1p4PhYTQaBeYnbEU4N7
-	SaJH/2W7WamBT2IJwOJZya3xvzNJdwvdXO7+MkFaG8ThRABYZLUo2ZutngQR5Gmf
-	0aj2umTCzSNAnL6JL4Rnz1LYWLAPnn/uj60x8eYM6Q==
-X-ME-Sender: <xms:xgMqZlBaMuTJKKkN7-0nughPSEjS_fBERJmxp5X4KWvAIrgbjpolrg>
-    <xme:xgMqZjhwSlCC67GT3FJrBRiABskeY2ogC0uGs8YVQEQPZMCW-H_mAQYa95ounrJ0U
-    WA_vJHgkOKg094>
-X-ME-Received: <xmr:xgMqZglwhAtKqMM_QGW7NclKg2_GAJxaWj-3SI0GHVtU9O-W9Nfutm-_DDvA>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrudeliedguddvudcutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
-    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-    enucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpefkugho
-    ucfutghhihhmmhgvlhcuoehiughoshgthhesihguohhstghhrdhorhhgqeenucggtffrrg
-    htthgvrhhnpedvudefveekheeugeeftddvveefgfduieefudeifefgleekheegleegjeej
-    geeghfenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
-    hiughoshgthhesihguohhstghhrdhorhhg
-X-ME-Proxy: <xmx:xgMqZvw1Oz-JTNvS0BIPkhUv_BBACV5wTuyVIWkYsdKkG18qDoKM-Q>
-    <xmx:xgMqZqQoSqfkV28ueM8VVvldqs5fwdCeK2JMzkQVo5NUvPnPAv5fRg>
-    <xmx:xgMqZiZCLQswcQ60GLmpOFYLDCHJ5N0tuRnNqbqRT4q_REuyngHzTg>
-    <xmx:xgMqZrTfWM2jhK9ukc91SCh0lxXYLooOLZqiGHhhy-rUAryJ3h_I7w>
-    <xmx:xgMqZmYq0KhSjIJFv9ZBzgXWDy5UD4-33dvMM90y99DyrIPR0nWyEjZs>
-Feedback-ID: i494840e7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 25 Apr 2024 03:18:29 -0400 (EDT)
-Date: Thu, 25 Apr 2024 10:18:22 +0300
-From: Ido Schimmel <idosch@idosch.org>
-To: Adrian Moreno <amorenoz@redhat.com>
-Cc: netdev@vger.kernel.org, aconole@redhat.com, echaudro@redhat.com,
-	horms@kernel.org, i.maximets@ovn.org,
-	Yotam Gigi <yotam.gi@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 4/8] net: psample: add tracepoint
-Message-ID: <ZioDvluh7ymBI8qF@shredder>
-References: <20240424135109.3524355-1-amorenoz@redhat.com>
- <20240424135109.3524355-5-amorenoz@redhat.com>
+	s=arc-20240116; t=1714029840; c=relaxed/simple;
+	bh=XdTPNqZDq+ziNwqJB8EliwXYFYvP8QmiviT9n15AnqY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rMHD452Kt1H5zEB1X1CIhMn69lLCQCohB/JbkN1suIjqVmwjC9XJ6Ehnm8tNGT+Rh+jsXef0LNfHll1duVe+Ni3V5hUzORFldnH3zkQboISHLshlEEaJX/ICV+/BxdSGdKPSUaHywxjRvaNAI5IqWjHQvkBsTeiNBa6OeFDv21k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GBZfkdru; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1714029837;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=IJ3Elwx6Y0fVYWKFfRMc1k14/K5qrk+7EMiwAoGT64Y=;
+	b=GBZfkdru1png09wrYymHmtuEsMcHFG6s3bqshxxLQdG4b5TLsTVQJY78jXPY1ID/7wn6iD
+	X461u+QCnMQ/8KgVgv5/BQ4DD8ri9w1/Otnh2hnPTRYl/EojfFH+okIjFt1U3Y154YSNRg
+	zBjAucRVrRZVFfM0K58y7Few63Yf2fg=
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
+ [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-518-KekS9lVlMcm0Rqm1V8OIlQ-1; Thu, 25 Apr 2024 03:23:56 -0400
+X-MC-Unique: KekS9lVlMcm0Rqm1V8OIlQ-1
+Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-7909d6637e3so34429085a.3
+        for <netdev@vger.kernel.org>; Thu, 25 Apr 2024 00:23:56 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714029835; x=1714634635;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=IJ3Elwx6Y0fVYWKFfRMc1k14/K5qrk+7EMiwAoGT64Y=;
+        b=f8xTIf2wUxR/jyprJtqbm9q7ZRqXLLRJinIFDiGxz+DWUQeZz+8IM7DfP8IlRa7KFo
+         4UUv6nhsAaBdQhrqUxpTiZNI8Ad7cDmc3+dEiChjkXtWDKuELILot7UXvtEkHlIu5Y40
+         H1b8NT6SCCzuoC1XbRU171vTlejx203Ay7HwuTojp7rVvosiF2gvfMnYiAqTr6C2nX1d
+         9vqTZiC4stWRfUYpdFE0j5AUFfEr/S0M1oPdiQIhwF5+wE9OQ9x+9p6WVq6FoRJYzNiC
+         2KN1q74w8u2fYf4YtvzttNjC2As2Ur8MlIAylZK5u4yjw8wz+xcHxeI0SUlOCpRaPOz9
+         KSDQ==
+X-Gm-Message-State: AOJu0Yzqz+J7+nWmQIzJEWAYXnWrq1uMUJrWHzh/ZcVZT+Oo0evQBsIL
+	Y4lqIE4Y8ojIPlfL38VPCNzQtWMkAXIepjRV/xuRmbjCVd9Sag0+F35fcWWBgVoXSC4PCMhNh/g
+	Q2l40TS/k6Cw8r3NWa0srPc4D5ZVW2SJV6rTs9xWEqruJhfBv8cs1qA==
+X-Received: by 2002:a05:6214:2469:b0:6a0:919d:e3e4 with SMTP id im9-20020a056214246900b006a0919de3e4mr6818324qvb.21.1714029835259;
+        Thu, 25 Apr 2024 00:23:55 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGzGtm//0CSWG48f1++BMvqfqT4o41XHdOjEhDYnuL+9J3A0be/e1vdfYhUUn52t3VJlr/GNg==
+X-Received: by 2002:a05:6214:2469:b0:6a0:919d:e3e4 with SMTP id im9-20020a056214246900b006a0919de3e4mr6818304qvb.21.1714029834913;
+        Thu, 25 Apr 2024 00:23:54 -0700 (PDT)
+Received: from [192.168.1.132] ([193.177.210.114])
+        by smtp.gmail.com with ESMTPSA id t10-20020a0ca68a000000b0069b432df140sm4315704qva.121.2024.04.25.00.23.52
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 25 Apr 2024 00:23:54 -0700 (PDT)
+Message-ID: <3878c16b-d6be-4935-a1ca-7f37dc677c59@redhat.com>
+Date: Thu, 25 Apr 2024 09:23:50 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240424135109.3524355-5-amorenoz@redhat.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 2/8] net: psample: add multicast filtering on
+ group_id
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: netdev@vger.kernel.org, aconole@redhat.com, echaudro@redhat.com,
+ horms@kernel.org, i.maximets@ovn.org, Yotam Gigi <yotam.gi@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ linux-kernel@vger.kernel.org
+References: <20240424135109.3524355-1-amorenoz@redhat.com>
+ <20240424135109.3524355-3-amorenoz@redhat.com> <ZikdFbmAbT5bWNxa@nanopsycho>
+Content-Language: en-US
+From: Adrian Moreno <amorenoz@redhat.com>
+In-Reply-To: <ZikdFbmAbT5bWNxa@nanopsycho>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Apr 24, 2024 at 03:50:51PM +0200, Adrian Moreno wrote:
-> Currently there are no widely-available tools to dump the metadata and
-> group information when a packet is sampled, making it difficult to
-> troubleshoot related issues.
+
+
+On 4/24/24 16:54, Jiri Pirko wrote:
+> Wed, Apr 24, 2024 at 03:50:49PM CEST, amorenoz@redhat.com wrote:
+>> Packet samples can come from several places (e.g: different tc sample
+>> actions), typically using the sample group (PSAMPLE_ATTR_SAMPLE_GROUP)
+>> to differentiate them.
+>>
+>> Likewise, sample consumers that listen on the multicast group may only
+>> be interested on a single group. However, they are currently forced to
+>> receive all samples and discard the ones that are not relevant, causing
+>> unnecessary overhead.
+>>
+>> Allow users to filter on the desired group_id by adding a new command
+>> PSAMPLE_SET_FILTER that can be used to pass the desired group id.
+>> Store this filter on the per-socket private pointer and use it for
+>> filtering multicasted samples.
+>>
+>> Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
+>> ---
+>> include/uapi/linux/psample.h |   1 +
+>> net/psample/psample.c        | 110 +++++++++++++++++++++++++++++++++--
+>> 2 files changed, 105 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/include/uapi/linux/psample.h b/include/uapi/linux/psample.h
+>> index e585db5bf2d2..9d62983af0a4 100644
+>> --- a/include/uapi/linux/psample.h
+>> +++ b/include/uapi/linux/psample.h
+>> @@ -28,6 +28,7 @@ enum psample_command {
+>> 	PSAMPLE_CMD_GET_GROUP,
+>> 	PSAMPLE_CMD_NEW_GROUP,
+>> 	PSAMPLE_CMD_DEL_GROUP,
+>> +	PSAMPLE_CMD_SET_FILTER,
+>> };
+>>
+>> enum psample_tunnel_key_attr {
+>> diff --git a/net/psample/psample.c b/net/psample/psample.c
+>> index a5d9b8446f77..f5f77515b969 100644
+>> --- a/net/psample/psample.c
+>> +++ b/net/psample/psample.c
+>> @@ -98,13 +98,77 @@ static int psample_nl_cmd_get_group_dumpit(struct sk_buff *msg,
+>> 	return msg->len;
+>> }
+>>
+>> -static const struct genl_small_ops psample_nl_ops[] = {
+>> +struct psample_obj_desc {
+>> +	struct rcu_head rcu;
+>> +	u32 group_num;
+>> +};
+>> +
+>> +struct psample_nl_sock_priv {
+>> +	struct psample_obj_desc __rcu *filter;
+>> +	spinlock_t filter_lock; /* Protects filter. */
+>> +};
+>> +
+>> +static void psample_nl_sock_priv_init(void *priv)
+>> +{
+>> +	struct psample_nl_sock_priv *sk_priv = priv;
+>> +
+>> +	spin_lock_init(&sk_priv->filter_lock);
+>> +}
+>> +
+>> +static void psample_nl_sock_priv_destroy(void *priv)
+>> +{
+>> +	struct psample_nl_sock_priv *sk_priv = priv;
+>> +	struct psample_obj_desc *filter;
+>> +
+>> +	filter = rcu_dereference_protected(sk_priv->filter, true);
+>> +	kfree_rcu(filter, rcu);
+>> +}
+>> +
+>> +static int psample_nl_set_filter_doit(struct sk_buff *skb,
+>> +				      struct genl_info *info)
+>> +{
+>> +	struct psample_obj_desc *filter = NULL;
+>> +	struct psample_nl_sock_priv *sk_priv;
+>> +	struct nlattr **attrs = info->attrs;
+>> +
+>> +	if (attrs[PSAMPLE_ATTR_SAMPLE_GROUP]) {
+>> +		filter = kzalloc(sizeof(*filter), GFP_KERNEL);
+>> +		filter->group_num =
+>> +			nla_get_u32(attrs[PSAMPLE_ATTR_SAMPLE_GROUP]);
+>> +	}
+>> +
+>> +	sk_priv = genl_sk_priv_get(&psample_nl_family, NETLINK_CB(skb).sk);
+>> +	if (IS_ERR(sk_priv)) {
+>> +		kfree(filter);
+>> +		return PTR_ERR(sk_priv);
+>> +	}
+>> +
+>> +	spin_lock(&sk_priv->filter_lock);
+>> +	filter = rcu_replace_pointer(sk_priv->filter, filter,
+>> +				     lockdep_is_held(&sk_priv->filter_lock));
+>> +	spin_unlock(&sk_priv->filter_lock);
+>> +	kfree_rcu(filter, rcu);
+>> +	return 0;
+>> +}
+>> +
+>> +static const struct nla_policy
+>> +psample_set_filter_policy[PSAMPLE_ATTR_SAMPLE_GROUP + 1] = {
+>> +	[PSAMPLE_ATTR_SAMPLE_GROUP] = { .type = NLA_U32, },
+>> +};
+>> +
+>> +static const struct genl_ops psample_nl_ops[] = {
+>> 	{
+>> 		.cmd = PSAMPLE_CMD_GET_GROUP,
+>> 		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
+>> 		.dumpit = psample_nl_cmd_get_group_dumpit,
+>> 		/* can be retrieved by unprivileged users */
+>> -	}
+>> +	},
+>> +	{
+>> +		.cmd		= PSAMPLE_CMD_SET_FILTER,
+>> +		.doit		= psample_nl_set_filter_doit,
+>> +		.policy		= psample_set_filter_policy,
+>> +		.flags		= 0,
+>> +	},
 > 
-> This makes psample use the event tracing framework to log the sampling
-> of a packet so that it's easier to quickly identify the source
-> (i.e: group) and context (i.e: metadata) of a packet being sampled.
-> 
-> This patch creates some checkpatch splats, but the style of the
-> tracepoint definition mimics that of other modules so it seems
-> acceptable.
-
-I don't see a good reason to add this tracepoint (which we won't be able
-to remove) when you can easily do that with bpftrace which by now should
-be widely available:
-
-#!/usr/bin/bpftrace
-
-kfunc:psample_sample_packet
-{
-        $ts_us = nsecs() / 1000;
-        $secs = $ts_us / 1000000;
-        $us = $ts_us % 1000000;
-        $group = args.group;
-        $skb = args.skb;
-        $md = args.md;
-
-        printf("%-16s %-6d %6llu.%6llu group_num = %u refcount=%u seq=%u skbaddr=%p len=%u data_len=%u sample_rate=%u in_ifindex=%d out_ifindex=%d user_cookie=%rx\n",
-               comm, pid, $secs, $us, $group->group_num, $group->refcount, $group->seq,
-               $skb, $skb->len, $skb->data_len, args.sample_rate,
-               $md->in_ifindex, $md->out_ifindex,
-               buf($md->user_cookie, $md->user_cookie_len));
-}
-
-Example output:
-
-mausezahn        984      3299.200626 group_num = 1 refcount=1 seq=13775 skbaddr=0xffffa21143fd4000 len=42 data_len=0 sample_rate=10 in_ifindex=0 out_ifindex=20 user_cookie=
-\xde\xad\xbe\xef
-mausezahn        984      3299.281424 group_num = 1 refcount=1 seq=13776 skbaddr=0xffffa21143fd4000 len=42 data_len=0 sample_rate=10 in_ifindex=0 out_ifindex=20 user_cookie=
-\xde\xad\xbe\xef
-
-Note that it prints the cookie itself unlike the tracepoint which only
-prints the hashed pointer.
-
-> 
-> Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
-> ---
->  net/psample/psample.c |  9 +++++++
->  net/psample/trace.h   | 62 +++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 71 insertions(+)
->  create mode 100644 net/psample/trace.h
-> 
-> diff --git a/net/psample/psample.c b/net/psample/psample.c
-> index 476aaad7a885..92db8ffa2ba2 100644
-> --- a/net/psample/psample.c
-> +++ b/net/psample/psample.c
-> @@ -18,6 +18,12 @@
->  #include <net/ip_tunnels.h>
->  #include <net/dst_metadata.h>
+> Sidenote:
+> Did you think about converting psample to split ops and to introcude
+> ynl spec file for it?
 >  
-> +#ifndef __CHECKER__
-> +#define CREATE_TRACE_POINTS
-> +#endif
-> +
-> +#include "trace.h"
-> +
->  #define PSAMPLE_MAX_PACKET_SIZE 0xffff
->  
->  static LIST_HEAD(psample_groups_list);
-> @@ -470,6 +476,9 @@ void psample_sample_packet(struct psample_group *group, struct sk_buff *skb,
->  	void *data;
->  	int ret;
->  
-> +	if (trace_psample_sample_packet_enabled())
-> +		trace_psample_sample_packet(group, skb, sample_rate, md);
 
-My understanding is that trace_x_enabled() should only be used if you
-need to do some work to prepare parameters for the tracepoint.
+If split opts are preferred then sure, I can do that.
 
-> +
->  	meta_len = (in_ifindex ? nla_total_size(sizeof(u16)) : 0) +
->  		   (out_ifindex ? nla_total_size(sizeof(u16)) : 0) +
->  		   (md->out_tc_valid ? nla_total_size(sizeof(u16)) : 0) +
+Thanks.
+
+>> };
+>>
+>> static struct genl_family psample_nl_family __ro_after_init = {
+>> @@ -114,10 +178,13 @@ static struct genl_family psample_nl_family __ro_after_init = {
+>> 	.netnsok	= true,
+>> 	.module		= THIS_MODULE,
+>> 	.mcgrps		= psample_nl_mcgrps,
+>> -	.small_ops	= psample_nl_ops,
+>> -	.n_small_ops	= ARRAY_SIZE(psample_nl_ops),
+>> +	.ops		= psample_nl_ops,
+>> +	.n_ops		= ARRAY_SIZE(psample_nl_ops),
+>> 	.resv_start_op	= PSAMPLE_CMD_GET_GROUP + 1,
+>> 	.n_mcgrps	= ARRAY_SIZE(psample_nl_mcgrps),
+>> +	.sock_priv_size		= sizeof(struct psample_nl_sock_priv),
+>> +	.sock_priv_init		= psample_nl_sock_priv_init,
+>> +	.sock_priv_destroy	= psample_nl_sock_priv_destroy,
+>> };
+>>
+>> static void psample_group_notify(struct psample_group *group,
+>> @@ -360,6 +427,32 @@ static int psample_tunnel_meta_len(struct ip_tunnel_info *tun_info)
+>> }
+>> #endif
+>>
+>> +static inline void psample_nl_obj_desc_init(struct psample_obj_desc *desc,
+>> +					    u32 group_num)
+>> +{
+>> +	memset(desc, 0, sizeof(*desc));
+>> +	desc->group_num = group_num;
+>> +}
+>> +
+>> +static int psample_nl_sample_filter(struct sock *dsk, struct sk_buff *skb,
+>> +				    void *data)
+>> +{
+>> +	struct psample_obj_desc *desc = data;
+>> +	struct psample_nl_sock_priv *sk_priv;
+>> +	struct psample_obj_desc *filter;
+>> +	int ret = 0;
+>> +
+>> +	rcu_read_lock();
+>> +	sk_priv = __genl_sk_priv_get(&psample_nl_family, dsk);
+>> +	if (!IS_ERR_OR_NULL(sk_priv)) {
+>> +		filter = rcu_dereference(sk_priv->filter);
+>> +		if (filter && desc)
+>> +			ret = (filter->group_num != desc->group_num);
+>> +	}
+>> +	rcu_read_unlock();
+>> +	return ret;
+>> +}
+>> +
+>> void psample_sample_packet(struct psample_group *group, struct sk_buff *skb,
+>> 			   u32 sample_rate, const struct psample_metadata *md)
+>> {
+>> @@ -370,6 +463,7 @@ void psample_sample_packet(struct psample_group *group, struct sk_buff *skb,
+>> #ifdef CONFIG_INET
+>> 	struct ip_tunnel_info *tun_info;
+>> #endif
+>> +	struct psample_obj_desc desc;
+>> 	struct sk_buff *nl_skb;
+>> 	int data_len;
+>> 	int meta_len;
+>> @@ -487,8 +581,12 @@ void psample_sample_packet(struct psample_group *group, struct sk_buff *skb,
+>> #endif
+>>
+>> 	genlmsg_end(nl_skb, data);
+>> -	genlmsg_multicast_netns(&psample_nl_family, group->net, nl_skb, 0,
+>> -				PSAMPLE_NL_MCGRP_SAMPLE, GFP_ATOMIC);
+>> +	psample_nl_obj_desc_init(&desc, group->group_num);
+>> +	genlmsg_multicast_netns_filtered(&psample_nl_family,
+>> +					 group->net, nl_skb, 0,
+>> +					 PSAMPLE_NL_MCGRP_SAMPLE,
+>> +					 GFP_ATOMIC, psample_nl_sample_filter,
+>> +					 &desc);
+>>
+>> 	return;
+>> error:
+>> -- 
+>> 2.44.0
+>>
+>>
+> 
+
 
