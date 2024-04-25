@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-91374-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91372-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78BE68B2566
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 17:40:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BE038B2563
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 17:40:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A69541C22EDA
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 15:40:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CB8FA1C22E27
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 15:40:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7DCA14D293;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 933FE14C5BA;
 	Thu, 25 Apr 2024 15:40:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n0j+ubtl"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iPKYDCg0"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8436414C5A4;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B26D14C5A0;
 	Thu, 25 Apr 2024 15:40:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714059630; cv=none; b=q55RzXgF3iORynwaMW1GkerGIQdMUl77K1tMuz4rWDQ+mObBGezrx9r6O13Qeif72ByRfM3lEXqLnO0CYQDgOde8DXYGKmnD8PFhGY9qxItRwb/AB6FWituSPp4XGbfa+5cBYfE91q77wmhQYrtltYwwjkL5/vZNAoeYHBS8Fig=
+	t=1714059630; cv=none; b=iscohRZ2oWR1Cmqisrrsp+MchN6Ww3ETI/NQF1fMrvGy5khrRqEvaBDG+GUsTuCUIWvm0f+wQqMAZeqaYMhoZRRw6u2s8zNec3sidekYMxsE6zCFEtP1ciOp5nCxsDTmHDOmQ4NGuQtWhh2JbnkE79Cz74uviSo1lhO1W2yHsdI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1714059630; c=relaxed/simple;
-	bh=3ybUVqEEGzUyKinz8YKEBg22A3kfpANtEE8tiKHbjn8=;
+	bh=b7GVQbEg3N5QP7SXqOpXjBURWNBnzbcnNGtzANRii64=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=KdPSiX51wsUJtxcZgecslIUOXYwAgT51yIa7FS5e024z1zYAU/HnwMHNqdoj5++5BprYHcNSsfEtT+EXj5dWMrPA42vsWQ0ykcthAAsMOCq6ROkIbmj4YRmZXZZ3iyHdO6uMuWh4ZkK8n3n2dco09DN2QuVYF6ryCUQTrClOimo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n0j+ubtl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 315F8C4AF09;
+	 In-Reply-To:To:Cc; b=XGq89KH+PAX8csMYj59wCoAuq377/jj1YgkiztcaBcpli+LEbdrlaqScZS0oDWDIk3JzhvRXj7Jwl7pBVOmCfOhAMybLIU/NXYMA6qQJTSU7aFxgW3gKqTOE49dKhv81tcNtT6dxvo426Biw5K509E1PiD8ipC8sVkPtKnXYKBU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iPKYDCg0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 21110C32786;
 	Thu, 25 Apr 2024 15:40:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1714059630;
-	bh=3ybUVqEEGzUyKinz8YKEBg22A3kfpANtEE8tiKHbjn8=;
+	bh=b7GVQbEg3N5QP7SXqOpXjBURWNBnzbcnNGtzANRii64=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=n0j+ubtls4hqHLXyurwGM9s1uJLxwJRNUrf2GU3qf7LfFLurLWCGR7g2JxziShxaD
-	 3AAH4DSE0uKjZnjaW/QVHlihaVmMJ2QM4iEqnQ5q328kRG8DDK6EhBXAOukITjb3ND
-	 OSPQllINlW7eFyiX9lBtjZsG8VTDN3+9N3SiZdiqWx6JrkgEG6Mh305p6GzAg6T6de
-	 Q5ZrvqNh4f33fTLPmI6vGbmRa3wLfzHD2ad6Z3oMxSzu94jbgnmRs4andOTabHJaN+
-	 vJ4OftBEc3vbrVFXytJ+nXRyDP/ZT7GkzVBXuDzs3e9mHhyrwwgOQlg4H3klcZ0NH0
-	 bCItniUxVCYuQ==
+	b=iPKYDCg0DxJRpzL9qiubfg6PSK8EAFDhAGdk6MREdcr1zJV5/t8KEdqqcUk+aZyzX
+	 IATLyX/xWcnh+2ZCdgmS+UQoBYRFy6ulpQcWy8zctwacMyp12GFN/naGSCNw9J2cFB
+	 m9+mZi+5Xnv+/qitDRK8nMyFs16uto5UwQmKWkbPjaamv9c36LXD4BGpg1B4AUQnHL
+	 kXEhNg3CyJAVhSgmPoZPnHkgCdNlnibPo1ZlnGv9RLTrlOq7SmJteXyxtslm0s3YWM
+	 W5KfLYqKOdvqJjiCemHbmP9IJ19Y+RSLGvvx0cC5D2/wFpvuky8LJ9NrP5ZvcLypqI
+	 QHJvsDHzOWwUQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 19B01CF21C3;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 06A03CF21C2;
 	Thu, 25 Apr 2024 15:40:30 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,40 +52,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] octeontx2-af: fix the double free in rvu_npc_freemem()
+Subject: Re: [PATCH net v2] dpll: fix dpll_pin_on_pin_register() for multiple
+ parent pins
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171405963010.10966.4709994529923785893.git-patchwork-notify@kernel.org>
+ <171405963002.10966.12819145929067304526.git-patchwork-notify@kernel.org>
 Date: Thu, 25 Apr 2024 15:40:30 +0000
-References: <20240424022724.144587-1-suhui@nfschina.com>
-In-Reply-To: <20240424022724.144587-1-suhui@nfschina.com>
-To: Su Hui <suhui@nfschina.com>
-Cc: sgoutham@marvell.com, lcherian@marvell.com, gakula@marvell.com,
- jerinj@marvell.com, hkelam@marvell.com, sbhatta@marvell.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- nathan@kernel.org, ndesaulniers@google.com, morbo@google.com,
- justinstitt@google.com, sumang@marvell.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, llvm@lists.linux.dev,
- kernel-janitors@vger.kernel.org
+References: <20240424101636.1491424-1-arkadiusz.kubalewski@intel.com>
+In-Reply-To: <20240424101636.1491424-1-arkadiusz.kubalewski@intel.com>
+To: Kubalewski@codeaurora.org,
+	Arkadiusz <arkadiusz.kubalewski@intel.com>
+Cc: netdev@vger.kernel.org, vadim.fedorenko@linux.dev, jiri@resnulli.us,
+ davem@davemloft.net, rrameshbabu@nvidia.com, linux-kernel@vger.kernel.org,
+ pabeni@redhat.com, kuba@kernel.org, mschmidt@redhat.com
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 24 Apr 2024 10:27:25 +0800 you wrote:
-> Clang static checker(scan-build) warning：
-> drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c:line 2184, column 2
-> Attempt to free released memory.
-> 
-> npc_mcam_rsrcs_deinit() has released 'mcam->counters.bmap'. Deleted this
-> redundant kfree() to fix this double free problem.
+On Wed, 24 Apr 2024 12:16:36 +0200 you wrote:
+> In scenario where pin is registered with multiple parent pins via
+> dpll_pin_on_pin_register(..), all belonging to the same dpll device.
+> A second call to dpll_pin_on_pin_unregister(..) would cause a call trace,
+> as it tries to use already released registration resources (due to fix
+> introduced in b446631f355e). In this scenario pin was registered twice,
+> so resources are not yet expected to be release until each registered
+> pin/pin pair is unregistered.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] octeontx2-af: fix the double free in rvu_npc_freemem()
-    https://git.kernel.org/netdev/net/c/6e965eba43e9
+  - [net,v2] dpll: fix dpll_pin_on_pin_register() for multiple parent pins
+    https://git.kernel.org/netdev/net/c/38d7b94e81d0
 
 You are awesome, thank you!
 -- 
