@@ -1,124 +1,129 @@
-Return-Path: <netdev+bounces-91235-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91236-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC01C8B1CDB
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 10:33:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 896C18B1CEA
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 10:39:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6EF4D282EC0
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 08:33:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B4EB51C2173D
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 08:39:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D14386BFA3;
-	Thu, 25 Apr 2024 08:33:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E82B57F7F5;
+	Thu, 25 Apr 2024 08:39:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VzvRNchD"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IVoU3rDp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0358817BAA;
-	Thu, 25 Apr 2024 08:33:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8CD47A13A
+	for <netdev@vger.kernel.org>; Thu, 25 Apr 2024 08:39:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714033990; cv=none; b=L0fWWPM5KmzJsa11LgDCIoRnPBmCHIQgsn3+gn5nGpe0EKjCuLxsvbxyeuML+Jb+fcYdCeW9R/tMJOvU67pcNkWjhKMelfe+rJnbFf1E4sePaa7QhPUEfU/7LpC47NGM+2bUqMvDCa6cUaAc9XnuC/WXao1dP4g2W8uWBxMEJS4=
+	t=1714034382; cv=none; b=D8MBkuv5gTn/aHB3b007MrznaHr1ltJ3yfi5UdvQ2SxPEaKI8Z24WUAgHLuGy5KhBPLfSZgbLPXPqqwn17jYxoARTZgIO0pvI1UgeqWI3JIxXP3Mq9jAWRLFpw4aQETRwW9iQzXbMW6YTDuaJnW23sUQUTKF4oxJFjpLxL2kwN8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714033990; c=relaxed/simple;
-	bh=4DkN2l8gkUSZtinE2eNxNSMW88fKkz++DbovXDGMTsg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CPs68sClRLdNOE/UWRcvrpFZglRObhDnJGwNPn+HSilDT6nbIdov+0AJIySFmyp49FMKdIjbaaAPeufbDw/g/1KbT7fLt97WGINDGOtpp+q4GABzh0kj9bW0bozzeWuAw1POc/45uiNmroKrU9eKjMSutaCkI1gjuiND5W80ruU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VzvRNchD; arc=none smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1714033989; x=1745569989;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=4DkN2l8gkUSZtinE2eNxNSMW88fKkz++DbovXDGMTsg=;
-  b=VzvRNchDHpLSqTQNohWtyFMkFuTpqawqbJF81oVYkOGmihz1c/nvZXTk
-   ldwUHdP4SZdICVFjXJICoil+iIGVBAIRb8NfOuO8BFG/pOuCPwUKZzRxN
-   DWnSMAAWsORORvzNmiLermBfkmbjyRi7kc+zVc2tNFQjOTH828JmTtJk8
-   Au2l2B0tvxzWRF7Z0aXl597tp9kwnbU7Rethz3xJeKn5BvNDASqz+zNCK
-   z87YYS4OsHochgpxjZYMfUO6tckf66o2jY0ai95OxMg8JCjbg7GEb2lbb
-   RSSPNT1r0FNGN4hTtLj2gOf1gPCj7N9zaqN0SfwgxftkC0cSVFS8IwXFr
-   Q==;
-X-CSE-ConnectionGUID: fsroxyC0SIOpXgK9+60NyA==
-X-CSE-MsgGUID: 7FIHw7jBSaS5+n8crgn7qQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11054"; a="20317505"
-X-IronPort-AV: E=Sophos;i="6.07,228,1708416000"; 
-   d="scan'208";a="20317505"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Apr 2024 01:33:08 -0700
-X-CSE-ConnectionGUID: uUcqACFWTmiIFBsib+QgvQ==
-X-CSE-MsgGUID: ORuMhv9RS1+iB5yeCRSKPw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,228,1708416000"; 
-   d="scan'208";a="48253104"
-Received: from ehlflashnuc2.fi.intel.com (HELO [10.237.72.57]) ([10.237.72.57])
-  by fmviesa002.fm.intel.com with ESMTP; 25 Apr 2024 01:33:03 -0700
-Message-ID: <59b7ba5a-14a8-497e-8cf8-53bdf4e8cb8e@linux.intel.com>
-Date: Thu, 25 Apr 2024 11:33:02 +0300
+	s=arc-20240116; t=1714034382; c=relaxed/simple;
+	bh=/9yyKzE8Zxtr4YeXsLr5diSzcU8HNZj+vrs/DZ3QOog=;
+	h=From:To:cc:Subject:MIME-Version:Content-Type:Date:Message-ID; b=lblUqX7Wenw5g3pGYnxTq9IrKuzyDpvELwDSoZTrbfFDD64zB9rjpTxAyYA5EJRN0lI5/Ocz/d48K7lU5vU4/xMZwhyhJLfrCSZ6WTZUWbB6nz3BN5/tIPXGWct3iBkUWVpl+ayJ54OnTAvbJ59Wc8UL2gVvCDtgs2uAo+FuroI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IVoU3rDp; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1714034379;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=QZ3es0/m9Be3HXMWlawHrU+ruWvHPUrW+BQXBx/9QME=;
+	b=IVoU3rDpUsnxmN4Xn1n1DGYR+kjfpJFe51XitIxifI1f5XTxf8bkI/rMMf2aHHmNVbXjrv
+	kJBUq234jKedENLX9n3ZKtemSWj9H29dgblSdNLLBbLON26SeCutrD57zLadMRazjf6Q2h
+	0PGDKazvGbQCHEZ2e4Xh1/oRRznTuMM=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-590-e4mtFl2tPqGayEHnj_tMnw-1; Thu,
+ 25 Apr 2024 04:39:36 -0400
+X-MC-Unique: e4mtFl2tPqGayEHnj_tMnw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 85DBE29AA391;
+	Thu, 25 Apr 2024 08:39:35 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.200])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 829E551BF;
+	Thu, 25 Apr 2024 08:39:33 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+To: netdev@vger.kernel.org
+cc: dhowells@redhat.com, Jeff Layton <jlayton@kernel.org>,
+    Steve French <sfrench@samba.org>,
+    Herbert Xu <herbert@gondor.apana.org.au>,
+    "David S. Miller" <davem@davemloft.net>,
+    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+    Paolo Abeni <pabeni@redhat.com>, netfs@lists.linux.dev,
+    linux-crypto@vger.kernel.org, linux-cifs@vger.kernel.org,
+    linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH net] Fix a potential infinite loop in extract_user_to_sg()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/4] i2c: designware: Create shared header hosting driver
- name
-To: Andy Shevchenko <andy.shevchenko@gmail.com>,
- Florian Fainelli <florian.fainelli@broadcom.com>
-Cc: linux-kernel@vger.kernel.org,
- Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
- Mika Westerberg <mika.westerberg@linux.intel.com>,
- Jan Dabros <jsd@semihalf.com>, Andi Shyti <andi.shyti@kernel.org>,
- Lee Jones <lee@kernel.org>, Jiawen Wu <jiawenwu@trustnetic.com>,
- Mengyuan Lou <mengyuanlou@net-swift.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
- Andrew Lunn <andrew@lunn.ch>, Duanqiang Wen <duanqiangwen@net-swift.com>,
- "open list:SYNOPSYS DESIGNWARE I2C DRIVER" <linux-i2c@vger.kernel.org>,
- "open list:WANGXUN ETHERNET DRIVER" <netdev@vger.kernel.org>
-References: <20240423233622.1494708-1-florian.fainelli@broadcom.com>
- <20240423233622.1494708-2-florian.fainelli@broadcom.com>
- <ZihLSKe_BHxasBql@surfacebook.localdomain>
-Content-Language: en-US
-From: Jarkko Nikula <jarkko.nikula@linux.intel.com>
-In-Reply-To: <ZihLSKe_BHxasBql@surfacebook.localdomain>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1967120.1714034372.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 25 Apr 2024 09:39:32 +0100
+Message-ID: <1967121.1714034372@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
 
-On 4/24/24 2:59 AM, Andy Shevchenko wrote:
-> Tue, Apr 23, 2024 at 04:36:19PM -0700, Florian Fainelli kirjoitti:
->> We have a number of drivers that reference the string "i2c_designware"
->> yet this is copied all over the places with opportunities for this
->> string being mis-used. Create a shared header that defines this as a
->> constant that other drivers can reference.
-> 
-> ...
-> 
->>   #include <linux/i2c.h>
->> +#include <linux/i2c-designware.h>
-> 
-> Can it be hidden in the subfolder?
-> 
-> ...
-> 
->> -#define DRIVER_NAME "i2c-designware-pci"
->> +#define DRIVER_NAME I2C_DESIGNWARE_NAME "-pci"
-> 
-> Oh, this makes all the things hard to read.
-> 
->>   /* Work with hotplug and coldplug */
->> -MODULE_ALIAS("i2c_designware-pci");
->> +MODULE_ALIAS(DRIVER_NAME);
-> 
-> I believe we shouldn't use MODULE_ALIAS() without real justification.
-> 
-I think MODULE_ALIAS() is even needless here since this device is not 
-added from another driver but loaded only for known PCI IDs in device table.
+    =
+
+Fix extract_user_to_sg() so that it will break out of the loop if
+iov_iter_extract_pages() returns 0 rather than looping around forever.
+
+[Note that I've included two fixes lines as the function got moved to a
+different file and renamed]
+
+Fixes: 85dd2c8ff368 ("netfs: Add a function to extract a UBUF or IOVEC int=
+o a BVEC iterator")
+Fixes: f5f82cd18732 ("Move netfs_extract_iter_to_sg() to lib/scatterlist.c=
+")
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Jeff Layton <jlayton@kernel.org>
+cc: Steve French <sfrench@samba.org>
+cc: Herbert Xu <herbert@gondor.apana.org.au>
+cc: "David S. Miller" <davem@davemloft.net>
+cc: Eric Dumazet <edumazet@google.com>
+cc: Jakub Kicinski <kuba@kernel.org>
+cc: Paolo Abeni <pabeni@redhat.com>
+cc: netfs@lists.linux.dev
+cc: linux-crypto@vger.kernel.org
+cc: linux-cifs@vger.kernel.org
+cc: linux-fsdevel@vger.kernel.org
+cc: netdev@vger.kernel.org
+---
+ lib/scatterlist.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/scatterlist.c b/lib/scatterlist.c
+index 68b45c82c37a..7bc2220fea80 100644
+--- a/lib/scatterlist.c
++++ b/lib/scatterlist.c
+@@ -1124,7 +1124,7 @@ static ssize_t extract_user_to_sg(struct iov_iter *i=
+ter,
+ 	do {
+ 		res =3D iov_iter_extract_pages(iter, &pages, maxsize, sg_max,
+ 					     extraction_flags, &off);
+-		if (res < 0)
++		if (res <=3D 0)
+ 			goto failed;
+ =
+
+ 		len =3D res;
+
 
