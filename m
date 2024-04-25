@@ -1,117 +1,87 @@
-Return-Path: <netdev+bounces-91402-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91403-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 005AB8B271B
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 19:04:50 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07C4C8B2733
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 19:09:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B08BB281B9A
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 17:04:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5FD60B21A31
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 17:09:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2340014E2D8;
-	Thu, 25 Apr 2024 17:04:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D49A814D6EE;
+	Thu, 25 Apr 2024 17:09:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="iaogSHYY"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sidaq.id header.i=@sidaq.id header.b="ApPd6kWp";
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=amazonses.com header.i=@amazonses.com header.b="OXo15VLO"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from a27-250.smtp-out.us-west-2.amazonses.com (a27-250.smtp-out.us-west-2.amazonses.com [54.240.27.250])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7271714D712;
-	Thu, 25 Apr 2024 17:04:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E78F12B9D9
+	for <netdev@vger.kernel.org>; Thu, 25 Apr 2024 17:08:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.240.27.250
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714064679; cv=none; b=fiT7xHASpDD0bghFXtdoR8waT8pWatoVmcReg+d24C2CUey/GWp/hZHJcNGxbLWhdsL++G/+CeJ41NlUNkl0HT0APup82VULl8kYXlCkt9iqVXbfQvLEEulH8imKEOlk+CoIQ6+WOd4ZMCgRjBKPCWQx8zsElbHHk/lvQM8Q9Ug=
+	t=1714064940; cv=none; b=io23qYXNizmaFJJezzfgGYLYk0DEu4bUHCjc2J44gvMOI1bQ4cQoJd9MdUwXg5EdC4ITp7LlBx1R6KmKs5m1mhXN7LI0akvYSGroaoF1Wi7Ey12Fk1VnYMSWkkbethgj1lio0FnJEDTZcD5nJ8wgs9ElDHUvIIyNX/NjKiMMjX0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714064679; c=relaxed/simple;
-	bh=vPXk3W1Em0sP8/1n+sKu/+dLayvvS+PDY4YXTTNNSHE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LEBJmu6LJkI8ir2C4vwxXamLZSAX4GSJ+R2T3bFgSC70s9Ka2GIGtZ/gcEHyVmpRUFkWIQ1CUEh+ea++Fya8c9bj/u1JZMXhJAInqapnufzuYxLQgfnNnZcnB92NloP6k/8aYy0eAbfrQNiY/CTDsKavf/kVvt4bvyGheR9UJOI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=iaogSHYY; arc=none smtp.client-ip=217.70.183.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id F150BC0005;
-	Thu, 25 Apr 2024 17:04:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1714064669;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+rqqSNOdhxenQbnUnZbxFCKBwQAMB5VEN1MZNUx2MRk=;
-	b=iaogSHYY8bx1pnh1lNzFru2hIG6E1IDKtRgHUbNckd5xW3VFVgKqyB0hkXU2tUKEPS4CtL
-	QqGE8edFTCHaNUnM2rCx1Nit/bZY2RxXOeP9LSz7tYdYrohg6/g3SuqGn6hXfhUcsPGqp9
-	clUHJiGDVTNI/TElxar1v1NhHQB8H1AmCyCIJobSVq7CXnBm5QAG83sK/9ZQfXuf9i8eCS
-	7geSDrkH4tNoDqaqx86cn7rRoB9rB12nqIPZezFjaYEWI2b9cdi6ZG96YhSTi85huBWMG0
-	I/L9GGcvIQHNbt8DSFToYMH8Ih0TQtdMPeQoLHBC8xt9yrFBsY0QeuwBeen1uw==
-Date: Thu, 25 Apr 2024 19:04:26 +0200
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Jiri Pirko <jiri@resnulli.us>, Oleksij Rempel <o.rempel@pengutronix.de>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn
- <andrew@lunn.ch>, Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Kyle Swenson
- <kyle.swenson@est.tech>, kernel test robot <lkp@intel.com>
-Subject: Re: [PATCH net-next v3 0/3] net: pse-pd: Fixes for few small issues
-Message-ID: <20240425190426.1a1a7d00@kmaincent-XPS-13-7390>
-In-Reply-To: <20240425080724.15be46e9@kernel.org>
-References: <20240423-fix_poe-v3-0-e50f32f5fa59@bootlin.com>
-	<ZiebQLdu9dOh1v-T@nanopsycho>
-	<20240425103110.33c02857@kmaincent-XPS-13-7390>
-	<20240425070619.601d5e40@kernel.org>
-	<20240425163002.5894c5e5@kmaincent-XPS-13-7390>
-	<20240425074205.28677540@kernel.org>
-	<20240425165708.62637485@kmaincent-XPS-13-7390>
-	<20240425080724.15be46e9@kernel.org>
-Organization: bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1714064940; c=relaxed/simple;
+	bh=hTjJTFBtyn7IsNny2GC0e4jhalc2bfCGI8u8nyXhIcI=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Ac7LI2qktK9Qn5LAzMXp3+Lvap22X2GYv/SHf3hSQ1qFSDTTEAuxSKFSvdXYwYFUAEcyzqPfbeAnyI+LTtMHN/GCOFhWi/LjOqtLMy6E6BXfs1l8waAkReusrSiMTvwfBiwRWeFpf7TUXJwMl0ojnYztKeVXIbUXZP8VJVydSq4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sidaq.id; spf=pass smtp.mailfrom=email.sidaq.id; dkim=pass (2048-bit key) header.d=sidaq.id header.i=@sidaq.id header.b=ApPd6kWp; dkim=pass (1024-bit key) header.d=amazonses.com header.i=@amazonses.com header.b=OXo15VLO; arc=none smtp.client-ip=54.240.27.250
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sidaq.id
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=email.sidaq.id
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/simple;
+	s=fm464lzmn5c36cqjghih4ejpjob272ef; d=sidaq.id; t=1714064936;
+	h=Reply-To:From:To:Subject:Date:Message-ID:MIME-Version:List-Unsubscribe:Content-Type:Content-Transfer-Encoding;
+	bh=hTjJTFBtyn7IsNny2GC0e4jhalc2bfCGI8u8nyXhIcI=;
+	b=ApPd6kWpF/F0st/AovhqMhQWLa11asNUykh3/xanyO5CqUdVajT4MrKHytz7BlkV
+	CmU1mRrVnhFlL1GIgc12Ru5AxPvvtvrZzrMXQl/5obzBf4vbJa0vTPba2FK9Vzn4Swv
+	a111MpSQYWWdKwfCmZ+D9grSMxH8Tn8Yi/73COzEkaHab23dvflj0EP3UatyV+5AYgZ
+	O0Wv4uWac5RAO12WWcW2iTNnCfoxQHQYlZHOabc0i2GTpMb0mztu3kaG45KcgcXtRlr
+	GSq//hT/rFTUuBbERU8N7n0uFeSsQVoNnDMvXmu49nsW1EjTNPJSUW6KNFzEgORCw0W
+	omfD8/oEkw==
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/simple;
+	s=7v7vs6w47njt4pimodk5mmttbegzsi6n; d=amazonses.com; t=1714064936;
+	h=Reply-To:From:To:Subject:Date:Message-ID:MIME-Version:List-Unsubscribe:Content-Type:Content-Transfer-Encoding:Feedback-ID;
+	bh=hTjJTFBtyn7IsNny2GC0e4jhalc2bfCGI8u8nyXhIcI=;
+	b=OXo15VLOdHWMn3wlGWfJ3uraLjytxfNPKjLZZI1N8b/fYw1oBtpKXamc3yVTS4TQ
+	Kl2vDteRhP0haTmYYP4ZTop8Q+urotuTip/5QZXlX8A+XUg/hJW5L2Ew0IeHd5OJ5yQ
+	mJ8LnYz4iT/fa1Q0aEJt203195xQ5xeyOiOr1jeQ=
+Reply-To: Name Name <davidchanel@lycos.com>
+From: David Chanel <dchanel@sidaq.id>
+To: netdev@vger.kernel.org
+Subject: 2023 Extension Tx Return
+Date: Thu, 25 Apr 2024 17:08:56 +0000
+Message-ID: <0101018f163b4c66-88edd3b2-2877-49ee-9e9b-b1136a4458e0-000000@us-west-2.amazonses.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain;
+	charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: kory.maincent@bootlin.com
+Feedback-ID: 1.us-west-2.nAxLNmqAh9SqIExJZA2BZaCwSiNMoigKLazTamLflEg=:AmazonSES
+X-SES-Outgoing: 2024.04.25-54.240.27.250
 
-On Thu, 25 Apr 2024 08:07:24 -0700
-Jakub Kicinski <kuba@kernel.org> wrote:
+Hi,
 
-> On Thu, 25 Apr 2024 16:57:08 +0200 Kory Maincent wrote:
-> > On Thu, 25 Apr 2024 07:42:05 -0700 =20
-> > > > Do you want me to like post a v5 with the "pw-bot: cr" tag? But if I
-> > > > put the tag only on the cover letter it won't work then.
-> > > > Maybe on all patches?     =20
-> > >=20
-> > > Probably not worth posting for a test. I'll try to be more careful wh=
-en
-> > > applying in the future, we can experiment with real postings.
-> > >    =20
-> > > > Was it the same for the PoE support patch series?     =20
-> > >=20
-> > > Yeah, I had to apply that one manually.   =20
-> >=20
-> > Does this patch series is on the same state?
-> > https://lore.kernel.org/netdev/20240422-feature_ptp_netnext-v11-0-f1444=
-1f2a1d8@bootlin.com/
-> > =20
->=20
-> That one was fine:
->=20
-> https://patchwork.kernel.org/project/netdevbpf/cover/20240422-feature_ptp=
-_netnext-v11-0-f14441f2a1d8@bootlin.com/
->=20
-> Are you thinking it's the extra From in the cover letter?
+ I checked online for a new Certified public Accountant and found=20
+your information, I need your service for my 2023 taxes. My tax=20
+return situation is very simple. it is just a basic 1040 with=20
+interest and dividend income and some deductions and credit.
 
-Maybe or some patches between b4 version 0.13.0 and 0.14-dev. I will try
-next time without my extra From b4 patch to test 0.14-dev.
 
-Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+I already filled my extension in anticipation to the end of tax=20
+season. incase you are busy right now, I can wait till end of May=20
+to come in.
+
+I can send you my previous tax return and current tax documents=20
+so you can review it and give me a quote.
+
+
+Kind regards,
+David.
 
