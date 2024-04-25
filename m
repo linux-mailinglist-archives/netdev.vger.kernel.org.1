@@ -1,303 +1,195 @@
-Return-Path: <netdev+bounces-91335-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91336-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12CD38B2420
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 16:31:21 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 299828B2429
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 16:33:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 379B21C2292C
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 14:31:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CAEB6B21154
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 14:31:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39700149E00;
-	Thu, 25 Apr 2024 14:31:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8956914A4EA;
+	Thu, 25 Apr 2024 14:31:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="jLH72VqO"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z/aJSmad"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f182.google.com (mail-qk1-f182.google.com [209.85.222.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEF8512C47C;
-	Thu, 25 Apr 2024 14:31:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5899149DF3;
+	Thu, 25 Apr 2024 14:31:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714055477; cv=none; b=pdf8aTD0efttSyTBc30F73nn4Zw18SvI57KvQ5mx5rnkZhklwlzWAKItLBQuDpGqQy1hsD15lBELRmuPd1vO7Du0R9rEW94+1ZVVYvR1DojdGnKPoNPw/FB3oOON+BV2TCYyUhFlLZjhtarxkqIJQtDKZzR1xHKQp2jDDCvYQwE=
+	t=1714055498; cv=none; b=Y6uOePbehr5+DnIAtO1cBXDY5RoyBLRuCewy/ymm7arEz4TpS20FN0UD+NYScVn20NBFEwjuhi3yuOays/xCCBYBBgDWhvIP88qyXMLWyK6FAvSD7gCAqnyEhDtMjwOnjAGCrGjSEnXL/OwchWzH9yP/8noeEAl18rrSc3pAAn4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714055477; c=relaxed/simple;
-	bh=XNDONZ50zkNw24VHGSrLtBVRo25TyhBYrvxwY6adhPA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=huMQSaWQt86n6eHp4G82uX/osamrxeoz8+ZwFLomUFexmCK/TOBa7t8kmNUcUI2aCMmFsDHWU4Y/EXYN2oAGPKgoXfxXlpCN5h4XkF2JiVXsLD3mMsE9Y9COR9SOWLMAn5AnBX8m7BNTF1VU3WrKRlGco5Ur/8ZlqcAWy82wIVc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=jLH72VqO; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=bhEOlHPHwzer5w9ZMmE08QQPlZ3NpIRrXVu+LpBumv4=; b=jLH72VqOH3gpURD01C2ne9BQzQ
-	vEWyeN+NPnbnu9rYbatMXdAw8ipHOyXtQ3jDk8Fp5vCppyACBIitFV4SsNvQzO/6LjE82J4cBIc7O
-	tesZD3ULKMHXIlVheHZuB96S3iZ0xubXxt6mkZyCDQfmTe2Bv93Smty/RhFLom3JekduJ7WUuFPow
-	jvowSjItxO6DtyotKyAm7HLiJFUJxxRG3HIuXFMYJe3cKLysaTNsjoFg51oRC7Q+GOrRzrcZJl0ST
-	NJ+QAABshwCgu8JVyQeD5/JW9Heij6jENzc/kvGkLq/spz3WUvmpcOUGLjEzyfJFUPUnubWPOISqb
-	8vN+3Npw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:44198)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1s007j-0007WW-1L;
-	Thu, 25 Apr 2024 15:30:55 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1s007g-0005ea-OW; Thu, 25 Apr 2024 15:30:52 +0100
-Date: Thu, 25 Apr 2024 15:30:52 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Stefan Eichenberger <eichest@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
-	lxu@maxlinear.com, hkallweit1@gmail.com, michael@walle.cc,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 2/2] net: phy: mxl-gpy: add new device tree property
- to disable SGMII autoneg
-Message-ID: <ZippHJrnvzXsTiK4@shell.armlinux.org.uk>
-References: <5ed39628-4ac0-4c4e-9a16-fd4bf9a6db29@lunn.ch>
- <Zh6mIv1Ee+1h21Xo@shell.armlinux.org.uk>
- <Zh6z90iCpLqF4fla@eichest-laptop>
- <Zh6/oVHUvnOVtHaC@shell.armlinux.org.uk>
- <Zh94yqo2EHRq8eEq@eichest-laptop>
- <ZiE156+BPpx/ciL6@shell.armlinux.org.uk>
- <Zikd+GxuwMRC+5Ae@shell.armlinux.org.uk>
- <Zikrv5UOWvSGjgcv@eichest-laptop>
- <ZilLz8f6vQQCg4NB@shell.armlinux.org.uk>
- <Zio9g9+wsFX39Vkx@eichest-laptop>
+	s=arc-20240116; t=1714055498; c=relaxed/simple;
+	bh=ecmt6fSKfVNHiV7pzewakbSpUymI5dTI7iLU+un23hU=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=MJy0lLN86zT+SPfWC2pGJLXqkkRxFz4Q346EA18HsBIf6tiyS8FAnKw9QAoL5ewoSUWHiipNn7pK58E1p4KMOAuiHL9ePwsy+E0O41Udl6Oxd/Z2veduxy8vt1ATBnXPXKr9r/hVLmrqK6J7SqdiBRrX+V4DHLX/ssDRQlOFhhA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Z/aJSmad; arc=none smtp.client-ip=209.85.222.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f182.google.com with SMTP id af79cd13be357-78ef59a369bso72896785a.2;
+        Thu, 25 Apr 2024 07:31:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1714055496; x=1714660296; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jHBuZMjN5QrOr2xxJTwOccHd/HM7ozS9zvz5VbClYLs=;
+        b=Z/aJSmadDKVKhnO9bfwoVsondBhzi5rhyGB72bAwQlbRt3P04rloXoy4VJKoqRFSyz
+         S+MCQL2PPzzjFOPz7KsEs0tWsq6WwqcoWBmRZMON/efTsyHHVEVeVzGCg5VtQx39+Phi
+         94JbhwmoPGDJL1UkFS8LkrMXE4aqzxBKz8Uylp2R7esBKwrM7e+K+dJKwjeWGO+jkRMS
+         +VbibBs0bWNR8RX7aAkXLtDaVVXrCho5Cj131rliRCqqSdSyHCvyH8UkR9Wvo4KkCeXU
+         LB/OvG+HeQYBj9ECVhKPxgrteqLYXS2MTYdwc3dXLgU6bzzVrZtAgfnxHku/EiLy4UA8
+         NDGQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714055496; x=1714660296;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=jHBuZMjN5QrOr2xxJTwOccHd/HM7ozS9zvz5VbClYLs=;
+        b=eAXE4baJNkNTLQmDZ2Cge8g7eNFdXXIdb2g1fK8+DLAcFKGebLuzDZrTBYKbTxmOxe
+         m/YPhX4G0dkxJqc5S9m9x/tPK3yfAmHQpQr1o579TpvfFPq7l5kfjNtRdQ2GqSR2vap1
+         EoC17DBIRbF6Tf3TdgVC9BUVTCvdXNhq1UWGJ0mr/OZBsBgXhV6e565uN/7ohDrLiA04
+         wmUwOPXHtsBSC9RxRVJnVZxCHE5hHTs+t3pIzRUBEC1Nwgcl/svDz71fXTLWuK9rhAF+
+         wgV0T2hI7AFUq3+j+ErVqVU6erzxRqyiTxnMeRc7WVOahKz3SI6LFTikAQjaxbelNpa+
+         mXzg==
+X-Forwarded-Encrypted: i=1; AJvYcCXYsfkCiZpvrBoGIddS/kDs3UekmxRhw7I5PEi965AucM9GZ6iIPNuxQ4FP7JdD4UcCKggcfTPCrT5vswwZcDop9zY5ZlUf/DcH62D1v5djONrym/8hQq813wjl7QlCI+lySyi4EVrVkx6sYZMYpVL91S0qsRxcSpD5
+X-Gm-Message-State: AOJu0Yxc0D7cYVABtkvxocE6/j0esh6UBti0VXqw5x/kgITSVopMgnTW
+	B5Wf08kVOdfr5SZgTrkjDF2mV/bDHR0sBznNZ1l2FLb8ZDh9kOlR
+X-Google-Smtp-Source: AGHT+IFhj2fzglKIYnI7HOQcCMnfJdrG3yZskBunJyTySdFaOsqQ/0OiuCKLYNFN9h0S3oFYGXU/kQ==
+X-Received: by 2002:a05:620a:46a3:b0:790:9976:797f with SMTP id bq35-20020a05620a46a300b007909976797fmr3704511qkb.13.1714055495697;
+        Thu, 25 Apr 2024 07:31:35 -0700 (PDT)
+Received: from localhost (164.146.150.34.bc.googleusercontent.com. [34.150.146.164])
+        by smtp.gmail.com with ESMTPSA id i19-20020ae9ee13000000b0078eca9de099sm7030903qkg.134.2024.04.25.07.31.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 25 Apr 2024 07:31:35 -0700 (PDT)
+Date: Thu, 25 Apr 2024 10:31:35 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Abhishek Chauhan <quic_abchauha@quicinc.com>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ Andrew Halaney <ahalaney@redhat.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ Martin KaFai Lau <martin.lau@kernel.org>, 
+ Martin KaFai Lau <martin.lau@linux.dev>, 
+ Daniel Borkmann <daniel@iogearbox.net>, 
+ bpf <bpf@vger.kernel.org>
+Cc: kernel@quicinc.com
+Message-ID: <662a69475869_1de39b29415@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20240424222028.1080134-2-quic_abchauha@quicinc.com>
+References: <20240424222028.1080134-1-quic_abchauha@quicinc.com>
+ <20240424222028.1080134-2-quic_abchauha@quicinc.com>
+Subject: Re: [RFC PATCH bpf-next v5 1/2] net: Rename mono_delivery_time to
+ tstamp_type for scalabilty
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Zio9g9+wsFX39Vkx@eichest-laptop>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Apr 25, 2024 at 01:24:51PM +0200, Stefan Eichenberger wrote:
-> On Wed, Apr 24, 2024 at 07:13:35PM +0100, Russell King (Oracle) wrote:
-> > On Wed, Apr 24, 2024 at 05:56:47PM +0200, Stefan Eichenberger wrote:
-> > > On Wed, Apr 24, 2024 at 03:58:00PM +0100, Russell King (Oracle) wrote:
-> > > > On Thu, Apr 18, 2024 at 04:01:59PM +0100, Russell King (Oracle) wrote:
-> > > > > On Wed, Apr 17, 2024 at 09:22:50AM +0200, Stefan Eichenberger wrote:
-> > > > > > I also checked the datasheet and you are right about the 1000base-X mode
-> > > > > > and in-band AN. What worked for us so far was to use SGMII mode even for
-> > > > > > 2.5Gbps and disable in-band AN (which is possible for SGMII). I think
-> > > > > > this works because as you wrote, the genphy just multiplies the clock by
-> > > > > > 2.5 and doesn't care if it's 1000base-X or SGMII. With your patches we
-> > > > > > might even be able to use in-band autonegoation for 10,100 and 1000Mbps
-> > > > > > and then just disable it for 2.5Gbps. I need to test it, but I have hope
-> > > > > > that this should work.
-> > > > > 
-> > > > > There is another way we could address this. If the querying support
-> > > > > had a means to identify that the endpoint supports bypass mode, we
-> > > > > could then have phylink identify that, and arrange to program the
-> > > > > mvpp2 end to be in 1000base-X + x2.5 clock + AN bypass, which would
-> > > > > mean it wouldn't require the inband 16-bit word to be present.
-> > > > > 
-> > > > > I haven't fully thought it through yet - for example, I haven't
-> > > > > considered how we should indicate to the PCS that AN bypass mode
-> > > > > should be enabled or disabled via the pcs_config() method.
-> > > > 
-> > > > Okay, I've been trying to put more effort into this, but it's been slow
-> > > > progress (sorry).
-> > > > 
-> > > > My thoughts from a design point of view were that we could just switch
-> > > > to PHYLINK_PCS_NEG_OUTBAND instead of PHYLINK_PCS_NEG_INBAND_* and
-> > > > everything at the PCS layer should be able to cope, but this is not the
-> > > > case, especially with mvneta/mvpp2.
-> > > > 
-> > > > The problem is that mvneta/mvpp2 (and probably more) expect that
-> > > > 
-> > > > 1) MLO_AN_INBAND means that the PCS will be using inband, and that
-> > > >    means the link up/down state won't be forced. This basically implies
-> > > >    that only PHYLINK_PCS_NEG_INBAND_* can be used can be used for the
-> > > >    PCS.
-> > > > 
-> > > > 2) !MLO_AN_INBAND means that an out-of-band mechanism will be used and
-> > > >    that means that the link needs to be forced (since there's no way
-> > > >    for the hardware to know whether the link should be up or down.)
-> > > >    It's therefore expected that only PHYLINK_PCS_NEG_OUTBAND will be
-> > > >    used for the PCS.
-> > > > 
-> > > > So, attempting to put a resolution of the PHY and PCS abilities into
-> > > > phylink_pcs_neg_mode() and select the appropriate PHYLINK_PCS_NEG_*
-> > > > mode alone just doesn't work. Yet... we need to do that in there when
-> > > > considering whether inband can be enabled or not for non-PHY links.
-> > > > 
-> > > > Basically, it needs a re-think how to solve this...
-> > > 
-> > > Today I was playing around with my combination of mxl-gpy and mvpp2 and
-> > > I got it working again with your patches applied. However, I hacked the
-> > > phylink driver to only rely on what the phy and pcs support. I know this
-> > > is not a proper solution, but it allowed me to verify the other changes.
-> > > My idea was if the phy and pcs support inband then use it, otherwise use
-> > > outband and ignore the rest.
-> > > 
-> > > Here is how my minimal phylink_pcs_neg_mode test function looks like:
-> > > 
-> > > static unsigned int phylink_pcs_neg_mode(struct phylink *pl,
-> > > 					 struct phylink_pcs *pcs,
-> > > 					 unsigned int mode,
-> > > 					 phy_interface_t interface,
-> > > 					 const unsigned long *advertising)
-> > > {
-> > > 	unsigned int phy_link_mode = 0;
-> > > 	unsigned int pcs_link_mode;
-> > > 
-> > > 	pcs_link_mode = phylink_pcs_query_inband(pcs, interface);
-> > > 	if (pl->phydev)
-> > > 		phy_link_mode = phy_query_inband(pl->phydev, interface);
-> > > 
-> > > 	/* If the PCS or PHY can not provide inband, then use
-> > > 	 * outband.
-> > > 	 */
-> > > 	if (!(pcs_link_mode & LINK_INBAND_VALID) ||
-> > > 	    !(phy_link_mode & LINK_INBAND_VALID))
-> > > 		return PHYLINK_PCS_NEG_OUTBAND;
-> > > 
-> > > 	return PHYLINK_PCS_NEG_INBAND_ENABLED;
-> > > }
-> > 
-> > Note that I've changed the flags that get reported to be disable (bit 0)/
-> > enable (bit 1) rather than valid/possible/required because the former
-> > makes the resolution easier.
-> > 
-> > The problem is that merely returning outband doesn't cause mvneta/mvpp2
-> > to force the link up. So for example, here's a SFP module which doesn't
-> > support any inband for 2500base-X nor SGMII:
-> > 
-> > mvneta f1034000.ethernet eno2: copper SFP: interfaces=[mac=4,9-12,19,22-23, sfp=
-> > 4,23,27]
-> > mvneta f1034000.ethernet eno2: copper SFP: chosen 2500base-x interface
-> > mvneta f1034000.ethernet eno2: PHY i2c:sfp:16 uses interfaces 4,23,27, validatin
-> > g 4,23
-> > mvneta f1034000.ethernet eno2:  interface 4 (sgmii) rate match none supports 2-3
-> > ,5-6,13
-> > mvneta f1034000.ethernet eno2:  interface 23 (2500base-x) rate match none suppor
-> > ts 6,13,47
-> > mvneta f1034000.ethernet eno2: PHY [i2c:sfp:16] driver [Broadcom BCM84881] (irq=
-> > POLL)
-> > mvneta f1034000.ethernet eno2: phy: 2500base-x setting supported 00,00000000,000
-> > 08000,0000206c advertising 00,00000000,00008000,0000206c
-> > mvneta f1034000.ethernet eno2: copper SFP: PHY link in-band modes 0x1
-> > mvneta f1034000.ethernet eno2: major config 2500base-x
-> > mvneta f1034000.ethernet eno2: link modes: pcs=02 phy=01
-> > mvneta f1034000.ethernet eno2: phylink_mac_config: mode=inband/2500base-x/none a
-> > dv=00,00000000,00008000,0000206c pause=04
-> > mvneta f1034000.ethernet eno2: phylink_sfp_module_start()
-> > mvneta f1034000.ethernet eno2: phylink_sfp_link_up()
-> > mvneta f1034000.ethernet eno2: phy link down 2500base-x/Unknown/Unknown/none/off
-> > mvneta f1034000.ethernet eno2: phy link up sgmii/1Gbps/Full/none/off
-> > mvneta f1034000.ethernet eno2: major config sgmii
-> > mvneta f1034000.ethernet eno2: link modes: pcs=03 phy=01
-> > mvneta f1034000.ethernet eno2: phylink_mac_config: mode=inband/sgmii/none adv=00,00000000,00008000,0000206c pause=00
-> > mvneta f1034000.ethernet eno2: pcs link down
-> > mvneta f1034000.ethernet eno2: pcs link down
-> > mvneta f1034000.ethernet eno2: can LPI, EEE enabled, active
-> > mvneta f1034000.ethernet eno2: enabling tx_lpi, timer 250us
-> > mvneta f1034000.ethernet eno2: Link is Up - 1Gbps/Full - flow control off
-> > 
-> > This looks like the link is up, but it isn't - note "pcs link down".
-> > If we look at the value of the GMAC AN status register:
-> > 
-> > Value at address 0xf1036c10: 0x0000600a
-> > 
-> > which indicates that the link is down, so no packets will pass.
+Abhishek Chauhan wrote:
+> mono_delivery_time was added to check if skb->tstamp has delivery
+> time in mono clock base (i.e. EDT) otherwise skb->tstamp has
+> timestamp in ingress and delivery_time at egress.
 > 
-> What I changed in mvpp2 is to allow turing off inband in 2500base-x. The
-> mvpp2 driver can handle this use case in pcs_config, it will turn off AN
-> and force the link up.
-
-pcs_config can't force the link up.
-
-> I think it should also work for mvneta, at least
-> the code looks almost the same. I get the following for the Port
-> Auto-Negotiation Configuration Register:
+> Renaming the bitfield from mono_delivery_time to tstamp_type is for
+> extensibilty for other timestamps such as userspace timestamp
+> (i.e. SO_TXTIME) set via sock opts.
 > 
-> For 1Gbit/s it switches to SGMII and enables inband AN:
-> Memory mapped at address 0xffffa0112000.
-> Value at address 0xF2132E0C (0xffffa0112e0c): 0xB0C6
-
-So here the link is forced up which is wrong for inband, because then
-we have no way to detect the link going down.
-
-> For 2.5Gbit/s it disables inband AN and forces the link to be up:
-> Memory mapped at address 0xffffaff88000.
-> Value at address 0xF2132E0C (0xffffaff88e0c): 0x9042
+> As we are renaming the mono_delivery_time to tstamp_type, it makes
+> sense to start assigning tstamp_type based on enum defined
+> in this commit.
 > 
-> Then the status register shows also link up for 2.5Gbit/s:
-> Memory mapped at address 0xffffa5fe2000.
-> Value at address 0xF2132E10 (0xffffa5fe2e10): 0x683B
+> Earlier we used bool arg flag to check if the tstamp is mono in
+> function skb_set_delivery_time, Now the signature of the functions
+> accepts tstamp_type to distinguish between mono and real time.
 > 
-> What might be confusing is that the port type, bit 1 in MAC Control
-> Register0, is set to SGMII for 2.5Gbit/s, because we can only turn off
-> autonegotiation for SGMII:
-> Memory mapped at address 0xffff8c26c000.
-> Value at address 0xF2132E00 (0xffff8c26ce00): 0x8BFD
-
-Control register 0 bit 1 is the port type bit, which controls whether
-the port is in "1000base-X" mode or SGMII mode. This has no effect on
-the interpretation of the inband control word.
-
-Control register 2 bit 0 controls whether the port uses 802.3z
-format control words or SGMII format control words.
-
-> My example patch still uses the old macros:
+> Introduce a new function to set tstamp_type based on clockid. 
 > 
-> diff --git a/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c b/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
-> index 97e38f61ac65..15fadfd61313 100644
-> --- a/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
-> +++ b/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
-> @@ -6223,9 +6223,12 @@ static unsigned int mvpp2_gmac_pcs_query_inband(struct phylink_pcs *pcs,
->  	 * When <PortType> = 1 (1000BASE-X) this field must be set to 1.
->  	 * Therefore, inband is "required".
->  	 */
-> -	if (phy_interface_mode_is_8023z(interface))
-> +	if (interface == PHY_INTERFACE_MODE_1000BASEX)
->  		return LINK_INBAND_VALID | LINK_INBAND_REQUIRED;
->  
-> +	if (interface == PHY_INTERFACE_MODE_2500BASEX)
-> +		return LINK_INBAND_VALID | LINK_INBAND_POSSIBLE;
+> In future tstamp_type:1 can be extended to support userspace timestamp
+> by increasing the bitfield.
+> 
+> Link: https://lore.kernel.org/netdev/bc037db4-58bb-4861-ac31-a361a93841d3@linux.dev/
+> Signed-off-by: Abhishek Chauhan <quic_abchauha@quicinc.com>
 
-This is not correct though. If we set PortType = 1, then this applies:
+> +static inline void skb_set_tstamp_type_frm_clkid(struct sk_buff *skb,
+> +						  ktime_t kt, clockid_t clockid)
+> +{
 
-  Bit   Field        Type / InitVal   Description
+Please don't garble words to save a few characters: .._from_clockid.
 
-  2     InBandAnEn   RW               In-band Auto-Negotiation enable.
-...
-                                      When <PortType> = 1 (1000BASE-X)
-                                      this field must be set to 1.
-                                                                                                                      When <PortType> = 0 (SGMII) and this
-                                      field is 1, in-band Flow Control not
-				      supported.
+And this is essentially skb_set_delivery_type, just taking another
+type. So skb_set_delivery_type_(by|from)_clockid.
 
-So, if we have the port in 1000base-X mode (PortType = 1) then bit 2
-of the Autoneg configuration register needs to be set to be compliant
-with the documentation. Therefore, since we set PortType = 1 for
-2500BASE-X (and note that I _do_ run 2500BASE-X with inband AN enabled
-over fibre transceivers here, so this is needed), we also need to
-enable InBandAnEn.
+Also, instead of reimplementing the same logic with a different
+type, could implement as a conversion function that calls the main
+function. It won't save lines. But will avoid duplicate logic that
+needs to be kept in sync whenever there are future changes (fragile).
 
-This is exactly where the difficulty comes - because what you're
-suggesting will break currently working setups such as what I have
-here.
+static inline void skb_set_delivery_type_by_clockid(struct sk_buff *skb,
+						    ktime_t kt, clockid_t clockid)
+{
+	u8 tstamp_type = SKB_CLOCK_REAL;
 
-Switching the port to SGMII mode for 2500base-X doesn't sound like a
-sensible thing to do.
+	switch(clockid) {
+	case CLOCK_REALTIME:
+		break;
+	case CLOCK_MONOTONIC:
+		tstamp_type = SKB_CLOCK_MONO;
+		break;
+	default:
+		WARN_ON_ONCE(1);
+		kt = 0;
+	};
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+	skb_set_delivery_type(skb, kt, tstamp_type);
+}
+
+
+> +	skb->tstamp = kt;
+> +
+> +	if (!kt) {
+> +		skb->tstamp_type = SKB_CLOCK_REALTIME;
+> +		return;
+> +	}
+> +
+> +	switch (clockid) {
+> +	case CLOCK_REALTIME:
+> +		skb->tstamp_type = SKB_CLOCK_REALTIME;
+> +		break;
+> +	case CLOCK_MONOTONIC:
+> +		skb->tstamp_type = SKB_CLOCK_MONOTONIC;
+> +		break;
+> +	}
+> +}
+> +
+>  static inline void skb_set_delivery_time(struct sk_buff *skb, ktime_t kt,
+> -					 bool mono)
+> +					  u8 tstamp_type)
+
+Indentation change: error?
+
+> @@ -9444,7 +9444,7 @@ static struct bpf_insn *bpf_convert_tstamp_read(const struct bpf_prog *prog,
+>  					TC_AT_INGRESS_MASK | SKB_MONO_DELIVERY_TIME_MASK);
+>  		*insn++ = BPF_JMP32_IMM(BPF_JNE, tmp_reg,
+>  					TC_AT_INGRESS_MASK | SKB_MONO_DELIVERY_TIME_MASK, 2);
+> -		/* skb->tc_at_ingress && skb->mono_delivery_time,
+> +		/* skb->tc_at_ingress && skb->tstamp_type:1,
+
+Is the :1 a stale comment after we discussed how to handle the 2-bit
+field going forward? I.e., not by ignoring the second bit.
+
+
 
