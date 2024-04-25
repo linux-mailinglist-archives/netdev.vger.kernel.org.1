@@ -1,101 +1,183 @@
-Return-Path: <netdev+bounces-91204-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91205-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65C438B1ADE
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 08:22:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C3008B1AE4
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 08:23:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2D39F2814EC
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 06:22:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0FF5828165F
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 06:23:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49A5F3EA86;
-	Thu, 25 Apr 2024 06:22:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3632F3EA86;
+	Thu, 25 Apr 2024 06:23:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="th1DddLb"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="VRxO/x38"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8A64249F9
-	for <netdev@vger.kernel.org>; Thu, 25 Apr 2024 06:22:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24FC42B9C8
+	for <netdev@vger.kernel.org>; Thu, 25 Apr 2024 06:23:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714026147; cv=none; b=URUIEc3VlFCS80tJ+6G+NgSCEcCMLEyOUjJWfwl8WyyqTdLR2ZO+J6iQU9d8MUA37te6NbauglWhq9zbtD8kJmEPDf4Qb+OzOec/tMxEtQme5+FIAcQRmnBCnlbG9fOQrcY8Cc7gF7b5QTixKfW4QvouPQh0dxb27TmNr++uhXw=
+	t=1714026224; cv=none; b=qBYmWFFDSpXoIABhdoLhrlX1m5xDZZMc/GI/Ody7X9FUH9lVoGjqns32d/vEjaaF+fgHbeqdWimv+pSzX6zGa9hPJvxVkNzfHkxa8ANHIvZC1WWQNQINYlXvDGn1YWGOcL3SBNGPX1tSQA12jAzbyJU4CF9VyoQkmeFGeKlJAdY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714026147; c=relaxed/simple;
-	bh=hqlfKxyILHk+W3hOnhD39Klnrf1fSlGlKNzSQVM9RT4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ONTCpVZyfrmMMmjrKNdnUbZy1I1s8YUkc6LbN1oS2hzGqhNu0+OKZBRfSxOSDv/Ccfz2s1ShSlFLLU7JiyHBEMWmyRr2uyo0vxaCr7Pjc2FQIKoTJvTNvUgHgu8gCYajI3+CbHpN7oGM0v48R89DmxKbJuqHiFEE3IlyCPuEafY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=th1DddLb; arc=none smtp.client-ip=209.85.208.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-571b5fba660so5048a12.1
-        for <netdev@vger.kernel.org>; Wed, 24 Apr 2024 23:22:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1714026144; x=1714630944; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hqlfKxyILHk+W3hOnhD39Klnrf1fSlGlKNzSQVM9RT4=;
-        b=th1DddLb/9LX51ekBPa7HpC10ImjaxCo+FNBn1oxJuCIF85jHAr6sGN0j34ck9QeTk
-         WdiC6Z0t25aTD0I/bbF/WxAse3O979dnZC51cRvek9jwjn7G8/hiiK8sORiDckaXZYz3
-         1cQywtXS6wylSuKpaI3y666AoOeOmT7iRFM7RO9TNkNypW1IK5J+Mrt3dTz/2rUSwz3Q
-         +ZZUioSwcL6svsE5540y6opNaoXCehX/MqXjUaWkEvi1smH0JWzFS+9Z2rih5/RpI0lb
-         iF0X64yr5H9MWbjTiVP2SnAZIQKd2fy1vF5lmuJi6qxJ7xhz7h+KqrpeP7uuaBZ/FH7k
-         WBbQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714026144; x=1714630944;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hqlfKxyILHk+W3hOnhD39Klnrf1fSlGlKNzSQVM9RT4=;
-        b=gwFNmitZNecqx4Woe43b/KBpoiXimxadDmzVs/1ozl6t8bmFac7pyeKRDDBqilVAwa
-         AEz1DR4sywX/wrJAmgPTGSzmo0mNE49oy5HFqrtdC80BxCZI1b2IuENFrBn7uufzXCm5
-         2KdA5ORJEwZn2rhOHqe9IaD93+OHGrR0CagDScO684KBT03VZjOWvB/9mAkRGIJ2Nox3
-         UAe1b91IBGj4YFgDlBr9r+KNEFRK73OGqLefjKiTvI/UrqImR8bqFJyZPU+3ep8Tzr2y
-         pKd/pQFwMwgeg/NVgXiZ4CHqC2sUPIB/GZCjTySpavBJzUwK6udwf8YSkffeIcV2/GQM
-         7HkA==
-X-Gm-Message-State: AOJu0YyZHK+1hKmqw65BzfzQh/rPFjAxyz5w3ARjG1/A958pB/1uREZP
-	Xq3eahkzAo3dOFBJqsg2jlOzPId5ak7S3b5P7Ee07Vw8Egv2DhDwAvz6VJLrdxNptiSkCslm3g0
-	D14F7KcXNyWaNQQaB74ExreL60S3AZRbVosbk
-X-Google-Smtp-Source: AGHT+IGJ4lWF6WXifymD7css8+iEWuOcEB+1CpQx2DAS8NJgjd1LPfRHFY/bJBldQPQyT0V+0adV8V80J6QcnIObYyQ=
-X-Received: by 2002:a50:c908:0:b0:572:ca7:989d with SMTP id
- o8-20020a50c908000000b005720ca7989dmr62554edh.3.1714026143778; Wed, 24 Apr
- 2024 23:22:23 -0700 (PDT)
+	s=arc-20240116; t=1714026224; c=relaxed/simple;
+	bh=QRt3FZlbSv2SvXyllhg9k9IEMCa/DyxLS84N/wBTeZ4=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=J82HRV9vjMLRzWIbuGydHa2iY0tlgZaLkU5mRv5gcVntrQGr7efSMeZ4myWN8LTvA3cuSUIeFsnowWf6Pe5hXnObmNlyQNPARo3qN8vPPOJhebNe38cr/zkmQQEJufkwSnLXEWhpj8c7Gf06MdadEtI84LzDs0GnSlVXksTrvOg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=VRxO/x38; arc=none smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1714026221; x=1745562221;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=QRt3FZlbSv2SvXyllhg9k9IEMCa/DyxLS84N/wBTeZ4=;
+  b=VRxO/x38KXUfbjIPTFIaTy7f0cm20wBzHZfJLnMjD4wmZPEC/aMeigL6
+   lBpEgEHYDFBbtL1R6B20Vd5RnTfQABEftLmQml+Zd0VkpffgH6tvWKMg8
+   vcPnk0Homl+TOJqQi1Kuf6m4tS/wQj6PDl/hAYCo1mZW70PIxC4gfL73h
+   2Wt5YAr9MiMCNZZdKQYSUQeni+nYqgaOWzfGSxF8kLloR9TZDpP2h1uQ8
+   KQE/sJjeVuLcTTRSo3Pw3bcTTDrK2GYCZoSAuzzG2ykzrobGGTmAXndwR
+   wP8mguArRX6TI6h/0aSNvFwZrgC3fIIUTxiUgBouK4Lc9njRSpg1ynovN
+   w==;
+X-CSE-ConnectionGUID: 0JM7YAHxRg+fq2TgAZK3AA==
+X-CSE-MsgGUID: 5sGsKnCQRgCzzJFq+XqhaA==
+X-IronPort-AV: E=Sophos;i="6.07,228,1708412400"; 
+   d="scan'208";a="22553402"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 24 Apr 2024 23:23:39 -0700
+Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 24 Apr 2024 23:23:38 -0700
+Received: from localhost (10.10.85.11) by chn-vm-ex01.mchp-main.com
+ (10.10.85.143) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
+ Transport; Wed, 24 Apr 2024 23:23:38 -0700
+Date: Thu, 25 Apr 2024 08:23:37 +0200
+From: Horatiu Vultur <horatiu.vultur@microchip.com>
+To: Simon Horman <horms@kernel.org>
+CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Bryan Whitehead <bryan.whitehead@microchip.com>,
+	"Richard Cochran" <richardcochran@gmail.com>, Lars Povlsen
+	<lars.povlsen@microchip.com>, Steen Hegelund <Steen.Hegelund@microchip.com>,
+	Daniel Machon <daniel.machon@microchip.com>, <UNGLinuxDriver@microchip.com>,
+	<netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>
+Subject: Re: [PATCH net-next v2 2/4] net: lan966x: Correct spelling in
+ comments
+Message-ID: <20240425062337.wffu3b2hl54dik6q@DEN-DL-M31836.microchip.com>
+References: <20240424-lan743x-confirm-v2-0-f0480542e39f@kernel.org>
+ <20240424-lan743x-confirm-v2-2-f0480542e39f@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240421042009.28046-1-lulie@linux.alibaba.com> <20240421042009.28046-2-lulie@linux.alibaba.com>
-In-Reply-To: <20240421042009.28046-2-lulie@linux.alibaba.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 25 Apr 2024 08:22:10 +0200
-Message-ID: <CANn89i+DHZGG9p4iCqcQExTd6u_6pKe+_OogPxjfEc2rPHyYFA@mail.gmail.com>
-Subject: Re: [PATCH net-next 1/2] tcp: move tcp_skb_cb->sacked flags to enum
-To: Philo Lu <lulie@linux.alibaba.com>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, davem@davemloft.net, 
-	martin.lau@linux.dev, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
-	kuba@kernel.org, pabeni@redhat.com, dsahern@kernel.org, 
-	xuanzhuo@linux.alibaba.com, fred.cc@alibaba-inc.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: inline
+In-Reply-To: <20240424-lan743x-confirm-v2-2-f0480542e39f@kernel.org>
 
-On Sun, Apr 21, 2024 at 6:20=E2=80=AFAM Philo Lu <lulie@linux.alibaba.com> =
-wrote:
->
-> Move the flag definitions for tcp_skb_cb->sacked into a new enum named
-> tcp_skb_cb_sacked_flags, then we can get access to them in bpf via
-> vmlinux.h, e.g., in tracepoints.
->
-> This patch does not change any existing functionality.
->
-> Signed-off-by: Philo Lu <lulie@linux.alibaba.com>
+The 04/24/2024 16:13, Simon Horman wrote:
+> EXTERNAL EMAIL: Do not click links or open attachments unless you know the content is safe
+> 
+> Correct spelling in comments, as flagged by codespell.
 
-Suggested-by: Martin KaFai Lau <martin.lau@kernel.org>
+Reviewed-by: Horatiu Vultur <horatiu.vultur@microchip.com>
+> 
+> Signed-off-by: Simon Horman <horms@kernel.org>
+> ---
+>  drivers/net/ethernet/microchip/lan966x/lan966x_ifh.h  | 2 +-
+>  drivers/net/ethernet/microchip/lan966x/lan966x_main.c | 4 ++--
+>  drivers/net/ethernet/microchip/lan966x/lan966x_main.h | 2 +-
+>  drivers/net/ethernet/microchip/lan966x/lan966x_port.c | 2 +-
+>  drivers/net/ethernet/microchip/lan966x/lan966x_vlan.c | 2 +-
+>  5 files changed, 6 insertions(+), 6 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/microchip/lan966x/lan966x_ifh.h b/drivers/net/ethernet/microchip/lan966x/lan966x_ifh.h
+> index f3b1e0d31826..e706163ce9cc 100644
+> --- a/drivers/net/ethernet/microchip/lan966x/lan966x_ifh.h
+> +++ b/drivers/net/ethernet/microchip/lan966x/lan966x_ifh.h
+> @@ -78,7 +78,7 @@
+>  /* Classified internal priority for queuing */
+>  #define IFH_POS_QOS_CLASS            100
+> 
+> -/* Bit mask with eight cpu copy classses */
+> +/* Bit mask with eight cpu copy classes */
+>  #define IFH_POS_CPUQ                 92
+> 
+>  /* Relearn + learn flags (*) */
+> diff --git a/drivers/net/ethernet/microchip/lan966x/lan966x_main.c b/drivers/net/ethernet/microchip/lan966x/lan966x_main.c
+> index 2635ef8958c8..b7e75da65834 100644
+> --- a/drivers/net/ethernet/microchip/lan966x/lan966x_main.c
+> +++ b/drivers/net/ethernet/microchip/lan966x/lan966x_main.c
+> @@ -276,7 +276,7 @@ static int lan966x_port_ifh_xmit(struct sk_buff *skb,
+>                 ++i;
+>         }
+> 
+> -       /* Inidcate EOF and valid bytes in the last word */
+> +       /* Indicate EOF and valid bytes in the last word */
+>         lan_wr(QS_INJ_CTRL_GAP_SIZE_SET(1) |
+>                QS_INJ_CTRL_VLD_BYTES_SET(skb->len < LAN966X_BUFFER_MIN_SZ ?
+>                                      0 : last) |
+> @@ -520,7 +520,7 @@ bool lan966x_hw_offload(struct lan966x *lan966x, u32 port, struct sk_buff *skb)
+>         u32 val;
+> 
+>         /* The IGMP and MLD frames are not forward by the HW if
+> -        * multicast snooping is enabled, therefor don't mark as
+> +        * multicast snooping is enabled, therefore don't mark as
+>          * offload to allow the SW to forward the frames accordingly.
+>          */
+>         val = lan_rd(lan966x, ANA_CPU_FWD_CFG(port));
+> diff --git a/drivers/net/ethernet/microchip/lan966x/lan966x_main.h b/drivers/net/ethernet/microchip/lan966x/lan966x_main.h
+> index caa9e0533c96..f8bebbcf77b2 100644
+> --- a/drivers/net/ethernet/microchip/lan966x/lan966x_main.h
+> +++ b/drivers/net/ethernet/microchip/lan966x/lan966x_main.h
+> @@ -326,7 +326,7 @@ struct lan966x {
+> 
+>         u8 base_mac[ETH_ALEN];
+> 
+> -       spinlock_t tx_lock; /* lock for frame transmition */
+> +       spinlock_t tx_lock; /* lock for frame transmission */
+> 
+>         struct net_device *bridge;
+>         u16 bridge_mask;
+> diff --git a/drivers/net/ethernet/microchip/lan966x/lan966x_port.c b/drivers/net/ethernet/microchip/lan966x/lan966x_port.c
+> index 2e83bbb9477e..fdfa4040d9ee 100644
+> --- a/drivers/net/ethernet/microchip/lan966x/lan966x_port.c
+> +++ b/drivers/net/ethernet/microchip/lan966x/lan966x_port.c
+> @@ -88,7 +88,7 @@ static void lan966x_port_link_down(struct lan966x_port *port)
+>                 SYS_FRONT_PORT_MODE_HDX_MODE,
+>                 lan966x, SYS_FRONT_PORT_MODE(port->chip_port));
+> 
+> -       /* 8: Flush the queues accociated with the port */
+> +       /* 8: Flush the queues associated with the port */
+>         lan_rmw(QSYS_SW_PORT_MODE_AGING_MODE_SET(3),
+>                 QSYS_SW_PORT_MODE_AGING_MODE,
+>                 lan966x, QSYS_SW_PORT_MODE(port->chip_port));
+> diff --git a/drivers/net/ethernet/microchip/lan966x/lan966x_vlan.c b/drivers/net/ethernet/microchip/lan966x/lan966x_vlan.c
+> index 3c44660128da..fa34a739c748 100644
+> --- a/drivers/net/ethernet/microchip/lan966x/lan966x_vlan.c
+> +++ b/drivers/net/ethernet/microchip/lan966x/lan966x_vlan.c
+> @@ -157,7 +157,7 @@ void lan966x_vlan_port_apply(struct lan966x_port *port)
+> 
+>         pvid = lan966x_vlan_port_get_pvid(port);
+> 
+> -       /* Ingress clasification (ANA_PORT_VLAN_CFG) */
+> +       /* Ingress classification (ANA_PORT_VLAN_CFG) */
+>         /* Default vlan to classify for untagged frames (may be zero) */
+>         val = ANA_VLAN_CFG_VLAN_VID_SET(pvid);
+>         if (port->vlan_aware)
+> 
+> --
+> 2.43.0
+> 
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+-- 
+/Horatiu
 
