@@ -1,261 +1,256 @@
-Return-Path: <netdev+bounces-91283-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91284-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA2BE8B2095
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 13:44:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63E448B20CA
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 13:57:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 22A072877E0
-	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 11:44:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 841E01C21090
+	for <lists+netdev@lfdr.de>; Thu, 25 Apr 2024 11:57:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 488FB12AACB;
-	Thu, 25 Apr 2024 11:44:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7592D12AAEC;
+	Thu, 25 Apr 2024 11:57:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Dqackj2t"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="dng4M3qQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D52B2AF03;
-	Thu, 25 Apr 2024 11:44:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.17
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714045492; cv=fail; b=FecrCbvsnbBe8P3Cvn1Ysh4rGIRlPhXEgaRxI/3OqgCH1XMvbfqMQVNlrFGYAPOXuCGOO6xEo8AgIEPv//p5rVJB6Whb5r3cyYG2HnuEHLAKs57KNdyI70pLOYwsNqGwJKVhpT1V4JpErUN1sqgy2PZFVs6CUlK7n+ts6BQXClw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714045492; c=relaxed/simple;
-	bh=J4gJoMO6WIoZRBltNygc5f/tf0/iwXCRT9WggIc6lcY=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=tXVrjotJqAFPmxcappKB2EKkkZbtaquT/+J4C6t2lwiyD0nXJwbVipQIDc+6OE7f2Cypb3dnXTyg/A0ECdTFoHKTP88+FrnV5ZecZnQkegRcnwbZWxtDVZi7G+TKpV5snxXK+IHXJczOy7Zy4DuZQmG55hbroUnpgr3ivdR507E=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Dqackj2t; arc=fail smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1714045490; x=1745581490;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=J4gJoMO6WIoZRBltNygc5f/tf0/iwXCRT9WggIc6lcY=;
-  b=Dqackj2t6GDpDCO/+AcrJFaKpFR+RS+utNcBX8mJyW6crTa3KZBvZQPH
-   d0MmojhXAWuQESfuzg76FXsH/2kug487/SMrTM+e0eFR+5dzbwKqE6nvC
-   WcNLHhUcFKHVcVLeTIcao+ftmBcNUHw5+o54w9Rr5i84APnqUjbhOqx4L
-   rvG/c2J8XVgCXoweycTqRFTMWnrczSFetmIk3FssYk0gKEYeZTo+Uttr5
-   UGr2immxF6jWEkNVcINrEZzztklZckBbMsr5dGoD97hQhEIsO1CE+6kJa
-   ubOkNzXliJlwA65E9u1DC1Wdian+BgzuFCA30yALpWyt/qFUfrnJRrqdR
-   w==;
-X-CSE-ConnectionGUID: 3ArNT/lQTaaxKIQ1xzECaw==
-X-CSE-MsgGUID: OEddqOBZTOe0nXYLT13NEA==
-X-IronPort-AV: E=McAfee;i="6600,9927,11054"; a="9592309"
-X-IronPort-AV: E=Sophos;i="6.07,229,1708416000"; 
-   d="scan'208";a="9592309"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Apr 2024 04:44:49 -0700
-X-CSE-ConnectionGUID: imQo0lRJTA2jSjrt3PU4gA==
-X-CSE-MsgGUID: F6QMr3ixR7ihEEJq2//N2A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,229,1708416000"; 
-   d="scan'208";a="48307090"
-Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
-  by fmviesa002.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 25 Apr 2024 04:44:49 -0700
-Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 25 Apr 2024 04:44:48 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 25 Apr 2024 04:44:48 -0700
-Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Thu, 25 Apr 2024 04:44:48 -0700
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (104.47.73.168)
- by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Thu, 25 Apr 2024 04:44:48 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=jEmMLW9tKBA4Iy0+coNrFEOAioxp4NqLY/hYcdi/fAtEJknbEPzDzYyKETHlX3uu/fDRAkScAubzfRiRx+VTXVAm4I5ETPS2jyfKAddz51S0w0QcPNlxNrdUxz7q11zrJ+u+Y35rbeSHPwE77DAsn/EJ1XzSp+RC/ICdLHpYWOVyif0IIB4d8JkvMIiWvx+31nhmfurrGJGftZvdQXUTYB7IHZ5zWPvxKFdPFyLkYjyqkcUYj0+wM9eRvY2EsDmgTetnt8CRgnkrqYZji1YbnuxPsvxhm70G3U45uYDJCox/8mIAV/yeVFnYZlsitRP8QN+4Mxd2CoT9d4FYvxCgsg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=HLkBa4dYE9pWM9MhJDo6lIwoW6RMpovCaxCgubaKv7U=;
- b=LWTtmx0d1F7frgLZy+HBO62anFhiWnCdmw7HvR1GmNRHZK6/1vJWGmKoQNh4wXau7U2IvepP1QJa0pMAe+ZBvdjUyvLn6WdtrWQl2U1MUlWmAvK6RArQdG+/We0zgEYKUM3uA0auJzLvVCOgGDWu7/VzqZHuulxKQ4qC2o3A3aQI4e89SVZnQRQoUckF+bMOQ5HPEAPaas+cUhNoY1bjdo3BzKudq+Oj5emYIj9dBPsj5p7E14E9+D9Aev8OdSb59w/qsM6iNBqMV8jRjCq/+ZMWfXOH2/YKLv3gmas8rAuDtbGhGKcemfncC5Mq4jHEST93PzHB3WsyZj46T+IFrQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from CH3PR11MB8313.namprd11.prod.outlook.com (2603:10b6:610:17c::15)
- by SA2PR11MB5067.namprd11.prod.outlook.com (2603:10b6:806:111::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7519.22; Thu, 25 Apr
- 2024 11:44:46 +0000
-Received: from CH3PR11MB8313.namprd11.prod.outlook.com
- ([fe80::d738:fa64:675d:8dbb]) by CH3PR11MB8313.namprd11.prod.outlook.com
- ([fe80::d738:fa64:675d:8dbb%7]) with mapi id 15.20.7519.021; Thu, 25 Apr 2024
- 11:44:46 +0000
-From: "Rout, ChandanX" <chandanx.rout@intel.com>
-To: "Zaremba, Larysa" <larysa.zaremba@intel.com>, "Nguyen, Anthony L"
-	<anthony.l.nguyen@intel.com>, "intel-wired-lan@lists.osuosl.org"
-	<intel-wired-lan@lists.osuosl.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>
-CC: "Fijalkowski, Maciej" <maciej.fijalkowski@intel.com>, "Tantilov, Emil S"
-	<emil.s.tantilov@intel.com>, "Czapnik, Lukasz" <lukasz.czapnik@intel.com>,
-	Eric Dumazet <edumazet@google.com>, "Brady, Alan" <alan.brady@intel.com>,
-	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "David S. Miller"
-	<davem@davemloft.net>, "Kuruvinakunnel, George"
-	<george.kuruvinakunnel@intel.com>, "Nagraj, Shravan"
-	<shravan.nagraj@intel.com>, "Pandey, Atul" <atul.pandey@intel.com>
-Subject: RE: [Intel-wired-lan] [PATCH RESEND iwl-net] ice: Interpret
- .set_channels() input differently
-Thread-Topic: [Intel-wired-lan] [PATCH RESEND iwl-net] ice: Interpret
- .set_channels() input differently
-Thread-Index: AQHakXfVPUlwAHZPXUGd0kLjMf5KprF46Ggg
-Date: Thu, 25 Apr 2024 11:44:46 +0000
-Message-ID: <CH3PR11MB8313C553C871B6CA07196ACBEA172@CH3PR11MB8313.namprd11.prod.outlook.com>
-References: <20240418095857.2827-1-larysa.zaremba@intel.com>
-In-Reply-To: <20240418095857.2827-1-larysa.zaremba@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: CH3PR11MB8313:EE_|SA2PR11MB5067:EE_
-x-ms-office365-filtering-correlation-id: 6959b21d-cd92-45ce-b25c-08dc651d1b23
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230031|1800799015|376005|366007|38070700009;
-x-microsoft-antispam-message-info: =?us-ascii?Q?NmeygTqpEyrwD5v+gjKIMnlSzs0E0oEctUMl9Fia9MDLmQ2w17wreLARwJHU?=
- =?us-ascii?Q?sPbv9ryR3XhD5S5K116zg5f6p0jqO4N6lfoWMW9ITdsFMoHtnTbrfn7FXrKN?=
- =?us-ascii?Q?ggdaCV6g+PP8WH3V97KWsbKmEO5chLaPZQOvhDkxsyizIGew4LQOVAhdjLBT?=
- =?us-ascii?Q?W3GR/d7sFWImXN8y7e7O69+ai7jJjg1yJxv79Q0Fs1udBB+lf7+l+L1+06GR?=
- =?us-ascii?Q?k2XcsE3Uo+s3j1fh+Sq97GYrSO6i8iEGDry/Ou6XddsbMHc9dLCjX37DWQyA?=
- =?us-ascii?Q?UAcaqcBOwrXZOxr0NHyR+rBzqzyyo+dTGlBau/bCbFa08yWPbzaGBCK0/zkd?=
- =?us-ascii?Q?lE8ovk2PQ5qgKHw6sAIs6INwKjgGeFTjfYj8cT82G3YKNLNG8ZQsqH7oY/nC?=
- =?us-ascii?Q?xRE5eUNKuL6hYY/AEhvVRBwkMs3bVAinXKyyAxMsqRAm/4yWX54i4lkPg6a2?=
- =?us-ascii?Q?1mlCo3uDXvPewvK1DLtcXFPJ/zlNLcDauL18eC37cRV4nnViCAg68wYiLWvW?=
- =?us-ascii?Q?GIEnkgkrcIwfdEKJARwRtqvdA3P5pFYVqqNJrfx+g+azaSl8ncw7q/ARPUL+?=
- =?us-ascii?Q?kzgdgUmqcQJb8gc90sasTUI2oo1RStvME6crLeHzxngRBhnUTk5sxkNWJEdp?=
- =?us-ascii?Q?Oj2slnJ92bLBUthEzLigXtwf27NzRdrsNxPlFEwfAePmHSskLYGW0X15wJ8U?=
- =?us-ascii?Q?+4qQsnMvpZDF19PAIERZJmLdubQeS6e1nhLMMXcmyo9tR8KLmbiTKO4dcpqE?=
- =?us-ascii?Q?mptisBBWbikThGqjH6w5UBNRuqvwb4wcds3vIRFvhT7NQ+Bt+UWiHh8ZyWFQ?=
- =?us-ascii?Q?+s/oK+mgkZ/4T2vnS96NJn33dSOY6Aigk9oFiOh+oY/PE0peuj8t0b+ncY7B?=
- =?us-ascii?Q?xpJ+4DyhxSAVPo7m/JrgqOmuUP/iD70T5YgKCHtYlFMOEv9++2Q/nhLmwMqM?=
- =?us-ascii?Q?Dx6TuxsedT+2UErNQqCFEgMHlJChkY8UK0UTSE38AZZXqMaSfb0JFCEU/gxQ?=
- =?us-ascii?Q?PSRyx4YJLP+MIFDmPUFDldT6oJTg0ZKljEVg7lFHzS2kLUYtY9bypTydTelm?=
- =?us-ascii?Q?RfhmU63Aq2TW8HjsN3OHSD1M+8IUv2BVbi5R41wtczNBj0ITzJJIw72zIauu?=
- =?us-ascii?Q?St5AAcjb0hYsSrIxC456rBNIRGpnWAtx4OBIzYhBFuBiK7Hyb7qtp8vmJu/h?=
- =?us-ascii?Q?mpCuNyoSaYbp6hVdZSLBkPj0QPJpsOe7qsL+ihHlHQ1OnhEHLLOTlz6sVWYd?=
- =?us-ascii?Q?LY3h1aWzVBdGbPoXaTRIatbYToKZpYiAUHa/CsGuoQ=3D=3D?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR11MB8313.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(376005)(366007)(38070700009);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?6rvysJ8fj9eLoUYRM0ZcMCo+Lu0l5PQZ6rb8IMFeyGhiQaucXiivyF3CXPsn?=
- =?us-ascii?Q?M4EPAZqOY5oMl/VCNoDdIl1WhrAyarInUaWoZZ/e5ocfE3B+ygCcoItaPrvo?=
- =?us-ascii?Q?s3KuRsfH7R+jY3YT+1gospcfvjUsKlzEIEoVp2ebQsFayECuEovtRsZSdwc0?=
- =?us-ascii?Q?TtO4PwXXATSmjeGzvNGHWpKzqTNPrpF8/XvuY06vRDxDJ1oDL/v2BmEoTtgo?=
- =?us-ascii?Q?midDpAZ4gLh4mFW6yljWLKKnVlMAkf535ZOlYzXFyiFosWV87VqLYk+mV/KI?=
- =?us-ascii?Q?5Dlofvuraz5SuuiatmHO9q8c0MY+RfRJF6e1OEe5pqad4u3JGj1GIzk3KFOW?=
- =?us-ascii?Q?Zs3WhkNgZ/M0slYHGEbkMJQc9vi6aUUfTfAh5MFpivbZAEHVrZ4p6bKugCWn?=
- =?us-ascii?Q?2Y2fZV+MgCv+RsFUzO4sV7XoYVzq+TCkdxPrAWMMSWhkuuTcvkeNbAoiP9Ag?=
- =?us-ascii?Q?1h2doWMMAq0BTxGx5pyc44iwtna6wrSuVS4hmSZraeEPkhmRKLklHdQ7f4Wv?=
- =?us-ascii?Q?C2FgjAmlPUplTIor4zUgKGBxR6uKXshboeLDTj8GjyJ/5Z10X3tLeKTZ9t1V?=
- =?us-ascii?Q?UtJUIcwWee8MSl5Ivrfxvf529i2oGBg3kCosBnsEqa2hXwmNLNf/aq8LKgOn?=
- =?us-ascii?Q?4UPXPxi5CT2IC9nPZzhVmsyOx92odZxIUYVR5TkAg+F9YN0kzobF76skd1Mp?=
- =?us-ascii?Q?i6FGjI6ZorFUpeLJmg98Rov3owfZMfYSko417V/J9Vi29dnAcn7FersgTzmW?=
- =?us-ascii?Q?c0LRrP4UGhkw7iilbouAC7Lx9Pe+FbJk8dHlbm5WmeNjR4msz+9U+BEPYf/z?=
- =?us-ascii?Q?iggelZfcKP1DfsyFIVYwYGApNnDWueSAqtAkyUPK8mAEXRhDv4SXFgnKIrg7?=
- =?us-ascii?Q?R7WGeoBSw4tUpq7k5wKtikEh/n+ULEcvZ0EseyZdM31LLHDKhOXL7kSvU5HZ?=
- =?us-ascii?Q?OeIdYk5bRQkvhKYdngPcj9FReqTusM2oYZBkOj33WIyEc/CsGXXa7oVSZPQl?=
- =?us-ascii?Q?t1HQFsr4L6KqoxT3ao+OHXq9P30o5xmQJXIgYds8Q3dYTEN/EPVDgST6v8zS?=
- =?us-ascii?Q?ZzLGoxFdl88ZQTZl2XfsjCdcYVNLoeS0j3nB3xIeeG8AoGtVEa2sneIOz6ZB?=
- =?us-ascii?Q?lEHFkmw0mRLHmzh1Toygar+Lq4XZiqdwnV67T+AIz+NZWcNu8W/BxCyiAW9j?=
- =?us-ascii?Q?/6+O8E71ZIq5dBU+D9LhpFaVRXGVgwcCU8jjWkvz1KLeoK2w3mXQCIFsoKje?=
- =?us-ascii?Q?mjwDGyMII97IfVjmCT/B6aK05ApuDF9VIJJ+qTo/nZbIDo0IxXsYSqj5f/Vv?=
- =?us-ascii?Q?A6moljaqWb+6BS1038Si+xYw3I9yTJF2wkv3j1e9vGNXuq8CWZr6bXWxA3/+?=
- =?us-ascii?Q?ci6sT3PIcCZlOhYj2DPHVkqnkbiHW2aKW9QN99LI3eOTPoyOWan2qxoTUMGs?=
- =?us-ascii?Q?t2/KO2LIhWKM649S4OeWsI0xQE1EmbVaKHh6Rph2YRX2je036ovf8eSuTLts?=
- =?us-ascii?Q?TJeLUqAs1l6DoloVBVe6WBgetm5VueJxP0aCnfjEJvtoQWNTC5SZz4/tRZpy?=
- =?us-ascii?Q?B6siOxyo5f/CSgiQJ7onTAukpGj5D8S5rqPd7JEj?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 776A885274;
+	Thu, 25 Apr 2024 11:57:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.141
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1714046254; cv=none; b=FtqB1zgeKCRDfXdk08w1Jb7lhVtF2qoenHIOEpfEvozDuMN9U4X/1yYbitHo/fB+xqXkn0TNXZaNmDOMQM5qdXowDp9E3XlEd1kiQ60w4hy97+Ypg3e0VjcYNUajcPdYljd7tblolcdn5m2tBA6pnHrMtyGQu3YqTmQ3Zvfg5Yo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1714046254; c=relaxed/simple;
+	bh=7uq2uY0Ys0ivugvgfajawnQtub7+oSvzDAS77t/I1q0=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:CC:References:
+	 In-Reply-To:Content-Type; b=XN80PuVsfFVdsPSobqXoROQ6PgcdvW2PME5HH085WFQay6B4m2cmY7PesLCx0IxngYrJtTjJr3FIu645XwmqMS1of1bqgllbbXWNHNH2RWcRq8wlves4HjyXRLFiuS949AOyIB46zZCJtS2fO+RsEn5piZwYwurrzoFiT+ltIUg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=dng4M3qQ; arc=none smtp.client-ip=198.47.19.141
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from lelv0265.itg.ti.com ([10.180.67.224])
+	by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 43PBv9BN013919;
+	Thu, 25 Apr 2024 06:57:09 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1714046229;
+	bh=XGs43/u3uem7yqAA7OT6OEKLkrxr4H8yBUmDsRcElWI=;
+	h=Date:From:Subject:To:CC:References:In-Reply-To;
+	b=dng4M3qQpKNEVq8Hm+zrJciDoVBMaV3lyh3OtM9/5Hallu0VxqCqtIYh1ldiB67pF
+	 oH4tVZKifqrq7dqySNqQm/HQMQNF8bb2R+sQpDT2B/jXDiH5webJ+69km4hZEiFocq
+	 bjfk9wW9VodNydnUoCpwmM8FActCpxQBgqH6k7YI=
+Received: from DLEE105.ent.ti.com (dlee105.ent.ti.com [157.170.170.35])
+	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 43PBv9IF001210
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Thu, 25 Apr 2024 06:57:09 -0500
+Received: from DLEE100.ent.ti.com (157.170.170.30) by DLEE105.ent.ti.com
+ (157.170.170.35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Thu, 25
+ Apr 2024 06:57:09 -0500
+Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DLEE100.ent.ti.com
+ (157.170.170.30) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Thu, 25 Apr 2024 06:57:08 -0500
+Received: from [10.24.69.25] (danish-tpc.dhcp.ti.com [10.24.69.25])
+	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 43PBv3nQ038298;
+	Thu, 25 Apr 2024 06:57:04 -0500
+Message-ID: <e311f2c9-f396-41ae-b78b-7bf8efafe066@ti.com>
+Date: Thu, 25 Apr 2024 17:27:03 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR11MB8313.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6959b21d-cd92-45ce-b25c-08dc651d1b23
-X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Apr 2024 11:44:46.3092
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: /BidVaq+b4kVR6mHiNtGFKtf0ck4mclDPQbqxN/Nl64khQQwFMOKFrI8LeDVmyWE3wtu296vvwRymN/6sFF49Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA2PR11MB5067
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+From: MD Danish Anwar <danishanwar@ti.com>
+Subject: Re: [PATCH net-next v4] net: ti: icssg_prueth: add TAPRIO offload
+ support
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+CC: Andrew Lunn <andrew@lunn.ch>, Roger Quadros <rogerq@kernel.org>,
+        Vignesh
+ Raghavendra <vigneshr@ti.com>,
+        Richard Cochran <richardcochran@gmail.com>,
+        Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+        Eric
+ Dumazet <edumazet@google.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Simon
+ Horman <horms@kernel.org>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <srk@ti.com>, <r-gunasekaran@ti.com>,
+        <linux-arm-kernel@lists.infradead.org>, Roger Quadros <rogerq@ti.com>,
+        Vinicius Costa Gomes <vinicius.gomes@intel.com>
+References: <20231006102028.3831341-1-danishanwar@ti.com>
+ <20231011102536.r65xyzmh5kap2cf2@skbuf>
+ <20231006102028.3831341-1-danishanwar@ti.com>
+ <20231011102536.r65xyzmh5kap2cf2@skbuf>
+ <cfb5edf6-90ac-4d2a-a138-981c276e24bb@ti.com>
+ <cfb5edf6-90ac-4d2a-a138-981c276e24bb@ti.com>
+ <20240118012714.gzgmfwzb6tuuyofs@skbuf>
+Content-Language: en-US
+In-Reply-To: <20240118012714.gzgmfwzb6tuuyofs@skbuf>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+
+On 18/01/24 6:57 am, Vladimir Oltean wrote:
+> On Mon, Jan 15, 2024 at 12:24:12PM +0530, MD Danish Anwar wrote:
+>>> I believe the intention is for this code to be run before any taprio
+>>> offload is added, correct? But it is possible for the user to add an
+>>
+>> Yes, the intention here is to run this code before any taprio offload is
+>> added.
+> 
+> Then it is misplaced?
+> 
+
+Where should I move it then? Perhaps to end of prueth_probe()?
+If this is moved to prueth_probe() then it will mean it's always called.
+If user adds an offloaded Qdisc even while the netdev has not yet been
+brought up, it will not result into any error
+
+>>> offloaded Qdisc even while the netdev has not yet been brought up.
+>>> Is that case handled correctly, or will it simply result in NULL pointer
+>>> dereferences (tas->config_list)?
+>>>
+>>
+>> In that case, it will eventually result in NULL pointer dereference as
+>> tas->config_list will be pointing to NULL. To handle this correctly we
+>> can add the below check in emac_taprio_replace().
+>>
+>> if (!ndev_running(ndev)) {
+>> 	netdev_err(ndev, "Device is not running");
+>> 	return -EINVAL;
+>> }
+> 
+> What is the reason for which the device has to be running, other than
+> your placement of icssg_qos_tas_init()?
+> 
+
+Yes, I only suggested this check for that. If icssg_qos_tas_init() is
+handled correctly and called before user adds qdisc, this cheeck will no
+longer be needed.
+
+>>>> +
+>>>> +	cycle_time = admin_list->cycle_time - 4; /* -4ns to compensate for IEP wraparound time */
+>>>
+>>> Details? Doesn't this make the phase alignment of the schedule diverge
+>>> from what the user expects?
+>>
+>> 4ns is needed to compensate for IEP wraparound time. IEP is the clock
+>> used by ICSSG driver. IEP tick is 4ns and we adjust this 4ns whenever
+>> calculating cycle_time. You may refer to [1] for details on IEP driver.
+> 
+> What is understood by "IEP wraparound time"? Its time wraps around what?
+
+IEP clock runs at 250 MHz, 1 tick of IEP clock = NSEC_PER_SEC /
+iep->refclk_freq i.e. 1000000000 / 250000000 = 4ns.
+
+Thus 1 tick of IEP clock is 4ns.
+
+> It wraps around exactly once every taprio cycle of each port and that's
+> why the cycle-time is compensated, or how does that work?
+> 
+
+Yes, it wraps around exactly once every taprio cycle and to compensate
+for that we adjust 4ns. Instead of hardcoding I will use a varaible here.
+
+It is a hardware errata but it is not public yet.
 
 
+>>>
+>>>> +	base_time = admin_list->base_time;
+>>>> +	cur_time = prueth_iep_gettime(emac, &sts);
+>>>> +
+>>>> +	if (base_time > cur_time)
+>>>> +		change_cycle_count = DIV_ROUND_UP_ULL(base_time - cur_time, cycle_time);
+>>>> +	else
+>>>> +		change_cycle_count = 1;
+>>>
+>>> I see that the base_time is only used to calculate the number of cycles
+>>> relative to cur_time. Taprio users want to specify a basetime value
+>>> which indicates the phase alignment of the schedule. This is important
+>>> when the device is synchronized over PTP with other switches in the
+>>> network. Can you explain how is the basetime taken into consideration in
+>>> your implementation?
+>>>
+>>
+>> In this implementation base_time is used only to obtain the
+>> change_cycle_count and to write it to TAS_CONFIG_CHANGE_CYCLE_COUNT. In
+>> this implementation base_time is not used for anything else.
+> 
+> So there is zero granularity in the base-time beyond the number of cycles?
+> That is very bad, because it means the hardware cannot be used in a
+> practical TSN network where schedules are offset in phase to each other.
+> It needs to be able to be told when the schedule begins, with precision.
+> Not just how many cycles from now (what does 'now' even mean?).
+> 
 
->-----Original Message-----
->From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of
->Zaremba, Larysa
->Sent: Thursday, April 18, 2024 3:29 PM
->To: Nguyen, Anthony L <anthony.l.nguyen@intel.com>; intel-wired-
->lan@lists.osuosl.org; linux-kernel@vger.kernel.org; netdev@vger.kernel.org
->Cc: Fijalkowski, Maciej <maciej.fijalkowski@intel.com>; Tantilov, Emil S
-><emil.s.tantilov@intel.com>; Zaremba, Larysa <larysa.zaremba@intel.com>;
->Czapnik, Lukasz <lukasz.czapnik@intel.com>; Eric Dumazet
-><edumazet@google.com>; Brady, Alan <alan.brady@intel.com>; Michal
->Swiatkowski <michal.swiatkowski@linux.intel.com>; Jakub Kicinski
-><kuba@kernel.org>; Paolo Abeni <pabeni@redhat.com>; David S. Miller
-><davem@davemloft.net>
->Subject: [Intel-wired-lan] [PATCH RESEND iwl-net] ice: Interpret .set_chan=
-nels()
->input differently
->
->A bug occurs because a safety check guarding AF_XDP-related queues in
->ethnl_set_channels(), does not trigger. This happens, because kernel and i=
-ce
->driver interpret the ethtool command differently.
->
->How the bug occurs:
->1. ethtool -l <IFNAME> -> combined: 40
->2. Attach AF_XDP to queue 30
->3. ethtool -L <IFNAME> rx 15 tx 15
->   combined number is not specified, so command becomes {rx_count =3D 15,
->   tx_count =3D 15, combined_count =3D 40}.
->4. ethnl_set_channels checks, if there are any AF_XDP of queues from the
->   new (combined_count + rx_count) to the old one, so from 55 to 40, check
->   does not trigger.
->5. ice interprets `rx 15 tx 15` as 15 combined channels and deletes the
->   queue that AF_XDP is attached to.
->
->Interpret the command in a way that is more consistent with ethtool manual
->[0] (--show-channels and --set-channels).
->
->Considering that in the ice driver only the difference between RX and TX q=
-ueues
->forms dedicated channels, change the correct way to set number of channels
->to:
->
->ethtool -L <IFNAME> combined 10 /* For symmetric queues */ ethtool -L
-><IFNAME> combined 8 tx 2 rx 0 /* For asymmetric queues */
->
->[0] https://man7.org/linux/man-pages/man8/ethtool.8.html
->
->Fixes: 87324e747fde ("ice: Implement ethtool ops for channels")
->Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
->Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
->---
-> drivers/net/ethernet/intel/ice/ice_ethtool.c | 22 ++++++--------------
-> 1 file changed, 6 insertions(+), 16 deletions(-)
->
+Currently base_time is only used for calculating number of cycles.
 
-Tested-by: Chandan Kumar Rout <chandanx.rout@intel.com> (A Contingent Worke=
-r at Intel)
+>>> Better to say what's the hardware maximum, than to report back num_entries
+>>> as being not supported.
+>>>
+>>
+>> Sure, I'll change it to below,
+>>
+>> if (taprio->num_entries > TAS_MAX_CMD_LISTS) {
+>> 	NL_SET_ERR_MSG_FMT_MOD(taprio->extack, "num_entries %ld is more than maximum supported entries %ld in taprio config\n",
+>> 				       taprio->num_entries, TAS_MAX_CMD_LISTS);
+>> 	return -EINVAL;
+>> }
+> 
+> Keep in mind that NETLINK_MAX_FMTMSG_LEN is only 80 characters. Also, \n
+> is not needed in netlink extack messages. And indentation also looks off.
+> 
+
+Sure.
+
+>>>> +
+>>>> +	emac_cp_taprio(taprio, est_new);
+>>>> +	emac->qos.tas.taprio_admin = est_new;
+>>>> +	ret = tas_update_oper_list(emac);
+>>>> +	if (ret)
+>>>> +		return ret;
+>>>> +
+>>>> +	ret =  tas_set_state(emac, TAS_STATE_ENABLE);
+>>>> +	if (ret)
+>>>> +		devm_kfree(&ndev->dev, est_new);
+>>>> +
+>>>> +	return ret;
+>>>> +}
+>>
+>> Below is how the code will look like.
+>>
+>> 	emac->qos.tas.taprio_admin = taprio_offload_get(taprio);
+> 
+> emac->qos.tas.taprio_admin can also hold an old offload, which is leaked
+> here when assigning the new one ("tc qdisc replace dev eth0 root taprio").
+> 
+>> 	ret = tas_update_oper_list(emac);
+>> 	if (ret)
+>> 		return ret;
+>>
+>> 	ret = tas_set_state(emac, TAS_STATE_ENABLE);
+>> 	if (ret) {
+>> 		emac->qos.tas.taprio_admin = NULL;
+>> 		taprio_offload_free(taprio);
+>> 	}
+>>
+>> 	return ret;
+>>
+>> Please let me know if all of these changes looks ok, I'll resend the
+>> patch once you confirm. Thanks for reviewing.
+> 
+> Hard to say from this snippet. taprio_offload_free() will be needed from
+> emac_taprio_destroy() as well.
+
+Sure. I will do that too. I will be sharing a next revision soon. Thanks
+for reviewing.
+
+-- 
+Thanks and Regards,
+Danish
 
