@@ -1,234 +1,356 @@
-Return-Path: <netdev+bounces-91717-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91718-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D7C68B38CD
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 15:45:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61C128B3972
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 16:04:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2BA821F238B0
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 13:45:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 853B51C2159F
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 14:04:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58898147C9A;
-	Fri, 26 Apr 2024 13:45:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BBC11487D3;
+	Fri, 26 Apr 2024 14:04:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="KtdTDYLh";
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="6We4iEeC"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="y6FIlB1n"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B3E7145B0C;
-	Fri, 26 Apr 2024 13:45:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=68.232.154.123
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714139142; cv=fail; b=MrLJlDA3XLlzpGVBlJFTa5t/gaxC/QIP+klCFdaq8WkZUZfN9+dNG1CuS/aXqQE6sTbGVKzuPI2lDmWT+DP/4lNYC1JkGhMXwOXhlc+f3Emizz2ll24Zd7KNXXED48Z9REFVtW5bEof6RhmxASh3Cm44cH7fe5sHZNn531c61XM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714139142; c=relaxed/simple;
-	bh=8aTT1vM44k7j1Cs5YpA9c/QIuaiZtpa7Kv1y8wzdeaU=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=q2m9BtXl4d1QSmc6GPy+nuZgVXQeVT9D1I4tjdu6Ah/o9G2vTPDQ1FiMFRUfsTvZOwvhqGLktiGLUnAaZMNCnvcQ4za+lNhU84NebyWKWluJgU7xUIFLOWfAqyRXAOBfh1pBS5nQ5sioR+8fdMQMoLVamZf8rKPrLBvK2WgeEcg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=KtdTDYLh; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=6We4iEeC; arc=fail smtp.client-ip=68.232.154.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C61EC824B3;
+	Fri, 26 Apr 2024 14:04:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1714140287; cv=none; b=ThoMLumihlp/AZ0uhlMdsMwF/X4gzejH16BCFrAUtXhUsjQ3Ed5QRociI+2lrmR1eybGdkuLrUkw1zUQUGNQfNXQrtqhznXsqOBoi4ja0FO8xU2JHDJ8F0CIKfLTPtly5e907rX4k4V2f+bXbU63EIpHbpscpzmlpMQ2aYwln7U=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1714140287; c=relaxed/simple;
+	bh=98JFam+pW6R5J+9cjLMRZ/4fFi3pp4waqix3AhY8j7M=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=OoqOdaRCddW2tqkDt+W844TbUqaS9N/6Gg6m6BRnMjUbh5jKNWy2lH0fKUZM1fQxzfk2zwQPxAX9LHtkztJHxtnzPWdVmUMR0lV7M/IjYAg9XJLX2CszhLsq4cD+EJlM2M5RGc3usj0bX3OeGWKcXbp2Oe365US58S2LTQdkc5A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=y6FIlB1n; arc=none smtp.client-ip=68.232.153.233
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1714139140; x=1745675140;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=8aTT1vM44k7j1Cs5YpA9c/QIuaiZtpa7Kv1y8wzdeaU=;
-  b=KtdTDYLhkuR0TrCRZAu4u7tz+32eF0POotdzQwABf6+RQcEs3Dw4gXSl
-   rDAPzenYq/HoifxM1VCK47waVWnINhhNTOAWWy7V/BZAF7Dsc1uNPJmXx
-   GTbAKEdfsHyWiJVlkdxE/muxVor5wpy0NHvN1PUnr3BbRfPaiuYY4/Npw
-   uOdBdEPc3cD0Rxovj26eJi1gShhp58tOqBLTZi/Bmf6V7axXDG0YnKVE8
-   rVpIcXwMhUvr1l0qT8XR6GucXmq8tHCxuuc+dC+ICxLmF6VAUS6C9Bod3
-   BZzgorm8MoXvjR0KYVNHaHRrnEpzp4WEULwMk0FtG3Q2yFTrjr9GqzfAb
-   A==;
-X-CSE-ConnectionGUID: VmB/uq37RC6yy2P+NILB0w==
-X-CSE-MsgGUID: 59bQu5KKTeaptK3ne4B7iQ==
+  t=1714140285; x=1745676285;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=98JFam+pW6R5J+9cjLMRZ/4fFi3pp4waqix3AhY8j7M=;
+  b=y6FIlB1nuUU++08Ty4o9dPZAIIO+xdiY3VHC+AgSUTbUcgkL1MMGWKBz
+   A4M0sTTkBZMJzhxnVeojWguWIqSgKaZZr/GleYeYk2JjAoacJHyiGKZPD
+   JJMxl2bjJl8HHd9E5Vfd3EXvcF2j57o8D71MHKpYrJZTjZwFwBZKO3fi6
+   6zti9v+3W7kNe1cXQS7kFY5muTiuzJlZd3atJkOthZGY+XZ/unfWh7dmg
+   MvNoeOcsqbBjoLpoYKzdQT3INEA5xVo4LccW+GSGnT7D+btQ8QZjlhgYj
+   h0QoK0HExoAZ9qr99i4OcwAh5y0apiVfpbtC8hR7xzYnHQsa44xlomq3V
+   g==;
+X-CSE-ConnectionGUID: CuhQwo/ZTjOAvRra8ggIZQ==
+X-CSE-MsgGUID: w9GiJVhaQeGvAHBD+h8Ntw==
 X-IronPort-AV: E=Sophos;i="6.07,232,1708412400"; 
-   d="scan'208";a="22771936"
+   d="scan'208";a="253620180"
 X-Amp-Result: SKIPPED(no attachment in message)
 Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 26 Apr 2024 06:45:39 -0700
+  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 26 Apr 2024 07:04:38 -0700
 Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
- chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Fri, 26 Apr 2024 06:45:23 -0700
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (10.10.215.250)
- by email.microchip.com (10.10.87.151) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Fri, 26 Apr 2024 06:45:23 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=fWTomt9uFUCbh5IETiDrBl8Mdc2VKUu9y3ws9+NfzEH0R0PhkCa5efnCsFpPvmAD5VBFxTk9KyLWMf6IMT9xuy1UvdRVYVq1rtXftFsdm8ydDd3DbTZ1NCq3vt6qmKu0LJR5sajJiv2hRndxAshcuiD+J+AR8teOjK0Fgs81qJSDOT8w7yHBFC5i0839kKBrT3H0vRiilQA4R2BU0/9RKryPRtThOu12J72ZmHPnxISs2RDXS1Ju/noTNFpZ4lrPGNY0t8jRilb5iJC/sAvrkIHSKGyjkn6uwrSzYv4LSBx/5oBi/Q+fqNdd/oZwF179VAKdRS9XZ7KsegiB0Ey19A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=8aTT1vM44k7j1Cs5YpA9c/QIuaiZtpa7Kv1y8wzdeaU=;
- b=BDpRxNPP9FxqLil9DyiELjQp/DDbnZDZMVty0ToMAZ3OEtB8ivaDjFTT2qwKgVO90QRPwXLMXVW/9ZxWPGE6VjR3vjLhV7mbau44txQTga93YnXUvaJ43cguKyodgI9qI21FkGJEJBX21kI80DG8+WQK5js1OG2DExneCpmmwLYpgsY+PwtC86EhdMCdUgtUVbYEknrLtTs3GOwMg+rlDowegzuQ2wQUA54dTu/k8btETPDO/JLCQCAChDzCH0HRv3P1dlOQwF/mrUSjeG4RXTE1Q4tBz63+xQS2hy3lEWzzo44cY3jImIXgWbhAcaPuCSd9K6W3irZ6LWGsfR7OkQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microchip.com; dmarc=pass action=none
- header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microchip.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8aTT1vM44k7j1Cs5YpA9c/QIuaiZtpa7Kv1y8wzdeaU=;
- b=6We4iEeCLJSfrbJnJGI5u4L5o+fIVL5msnC9L82S+/1UAUkwR5hsJYRQRLdoBJjHCAmOm0q7DWDGdoiMK/+DlH7fjwbX5T52iaIIjEREE9WbZ/yffXF+hf1EV6oV0ULjPiFub4dLlaRTBwErLIxm0mTUT3Pon1i6yQuiQSyLRv97Bt8ZOLX+H9Utq7XwdNJ2NzgIAAcOGX0ynKnBVMMefPlsXQuc19hYI/6I5jsd5kN3I4rfddoE37DEVSmAlTRs2GbR4BX4uLJo/bo1G4SOtEu4dQ1zso+lUiHmUbzVZFImwCyOi75lASZNxkqUJbqzDRRtm/jtKQJKEq8Qf5KPgQ==
-Received: from SA1PR11MB8278.namprd11.prod.outlook.com (2603:10b6:806:25b::19)
- by DM4PR11MB8089.namprd11.prod.outlook.com (2603:10b6:8:17f::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7519.20; Fri, 26 Apr
- 2024 13:45:20 +0000
-Received: from SA1PR11MB8278.namprd11.prod.outlook.com
- ([fe80::84fa:e267:e389:fa9]) by SA1PR11MB8278.namprd11.prod.outlook.com
- ([fe80::84fa:e267:e389:fa9%4]) with mapi id 15.20.7519.021; Fri, 26 Apr 2024
- 13:45:20 +0000
-From: <Parthiban.Veerasooran@microchip.com>
-To: <andrew@lunn.ch>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <horms@kernel.org>, <saeedm@nvidia.com>,
-	<anthony.l.nguyen@intel.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <corbet@lwn.net>,
-	<linux-doc@vger.kernel.org>, <robh+dt@kernel.org>,
-	<krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
-	<devicetree@vger.kernel.org>, <Horatiu.Vultur@microchip.com>,
-	<ruanjinjie@huawei.com>, <Steen.Hegelund@microchip.com>,
-	<vladimir.oltean@nxp.com>, <UNGLinuxDriver@microchip.com>,
-	<Thorsten.Kummermehr@microchip.com>, <Pier.Beruto@onsemi.com>,
-	<Selvamani.Rajagopal@onsemi.com>, <Nicolas.Ferre@microchip.com>,
-	<benjamin.bigler@bernformulastudent.ch>
-Subject: Re: [PATCH net-next v4 09/12] net: ethernet: oa_tc6: implement
- receive path to receive rx ethernet frames
-Thread-Topic: [PATCH net-next v4 09/12] net: ethernet: oa_tc6: implement
- receive path to receive rx ethernet frames
-Thread-Index: AQHakZAeMmJyUl87WkuqM6F297dNprF2k/SAgAQI+AA=
-Date: Fri, 26 Apr 2024 13:45:20 +0000
-Message-ID: <6e529720-3caa-4dc4-b9be-bc6674806ba5@microchip.com>
-References: <20240418125648.372526-1-Parthiban.Veerasooran@microchip.com>
- <20240418125648.372526-10-Parthiban.Veerasooran@microchip.com>
- <574fec4d-5a23-490a-ba12-c40432ebe4b8@lunn.ch>
-In-Reply-To: <574fec4d-5a23-490a-ba12-c40432ebe4b8@lunn.ch>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Mozilla Thunderbird
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microchip.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SA1PR11MB8278:EE_|DM4PR11MB8089:EE_
-x-ms-office365-filtering-correlation-id: f0dbc5ca-9bbc-40bf-e19a-08dc65f71d49
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230031|7416005|366007|376005|1800799015|38070700009;
-x-microsoft-antispam-message-info: =?utf-8?B?QVh4YjNLOUJWeFB4UE44YVFkaFhkdjNLUklBZTFLY2EwbkdNemxNd3hQdEVs?=
- =?utf-8?B?YWFDZGdrTGRic3dQMWVuSGNxNlJFNEdpWTY3SEozdGkwZUpiUmcrcTZZaVdM?=
- =?utf-8?B?blp5RTIzNmR3My9WbE8rTUg5UEY2RVM0RGE1a3pWYUNpR0Y4aEZKeEtIcm1X?=
- =?utf-8?B?aWdhMHk0UlNTR1ZVdGZCak9qR1ZoSmFtYXR5WWhyKzlDZnhFZFF3ZWwyRmpP?=
- =?utf-8?B?NDVlL3VBTjErK1ZCNk5oaVdkRzNCZnF4N090NUQ4eGR6ajM5U3NiTGtrUTRK?=
- =?utf-8?B?VzM2TWUzYkRrcEhpdU1EcUwzS3dqQmVvT0c4ZjRlbUhUWXRUTmNrSklBQlla?=
- =?utf-8?B?WXltVFIrUW9POVhMQW0weG9FZys0dEZrMXFVNnFNMXAybVRJMytCZkRYU3l0?=
- =?utf-8?B?aVBjWVA1TFJjeEVuVit0d21GSEdhKzMzRE0yVzJuOTFqOFBTWDFXc0xhUkoz?=
- =?utf-8?B?elZpQTl5a0QyeFJvSi9DMmpjMURFWlZDZ0dIRVVrajNESnowQzRWWm5oWmox?=
- =?utf-8?B?TVJJL05teVpCQkk3TVAwajd4NXBZc1AzNlVUQ2NEemdPMDhZTXROSVYwcVNk?=
- =?utf-8?B?c2E5QWtPdFNyR1MwUE42THZvSHlFOXFyVEJDa2t3MnJZZ2RjU2ppb1lORlRl?=
- =?utf-8?B?bTFXS1liTDh3a0dCdS9ROGtkR3lnU3V0V2lnR01qRjJLWm1JUlp5VXc4bWpw?=
- =?utf-8?B?M3ZSZmo4UkxiRExJR1pFeG9jL1NzTGc4MUREWkFMS1VOY29CT1FwbUtXdTRs?=
- =?utf-8?B?azRjVVJMWGZ3T3prbnhrZGNZRktVdkZheCt1RFMzdEJWQjVxczgwZTZrenFE?=
- =?utf-8?B?MUNhdll0MDBoWHBOd2o2N3RwUUoraUZtWnNQdkVJZGVtZHhwOHZJSURBOXp4?=
- =?utf-8?B?a0hNV24zZFVJejg3Smg5U0hmejRiVnd1cTQrQzlMU2Z2UmRPVVZnWExkdUli?=
- =?utf-8?B?bWp5SU1BcjZzRVhSNEN0NlBEbk5EYTR2R1JsclZ2ck51cGduVk5UU3hVbFlV?=
- =?utf-8?B?bWxPSkRXSDgxc2NMbU1CcGxLaHNuSmZuUDA1aHNhMkVWZGVUQXEwZjNDYlNO?=
- =?utf-8?B?cHVKSXRMWXlRVU0wL1pkeTl4L3cvbEp1RENEcXlCQ2hPdUcxMGJiSTYzWXRD?=
- =?utf-8?B?T2J2UU1GZlgvdEZ3YWU2VkxYamVhYUVGY3N1MlBMZFB0Yy9WUmxneEZJbFRS?=
- =?utf-8?B?OG4xQ3Zja1c1S09lNWZ3QjNLZ3dyYWo2V0d6bzAyVlJ5NTVYZXp0anBGVWM4?=
- =?utf-8?B?dkFqSTlXSnUyZ2xzZmYrQ1V1RVYxQXZUN1ZxYlpEbExrdGw1V29qZWNQUE12?=
- =?utf-8?B?Tms5Y1R3M0pNUExNNERxV1ZwTVdWekVZVDNaZFQzVXBRKzBmQVp4UTljUGh4?=
- =?utf-8?B?WjF3ZzJ4QnRwQiswYWF6TUlQaFFHeDhzOGxIWk5malQzZnJjVy9jY2czN24z?=
- =?utf-8?B?clRBTmtOUnh0K2M4dXJramIvR3VGdnZ6REYyQ3JyemdUeW9CSlJGNVVmWnJD?=
- =?utf-8?B?NG02SGFyVERndWRoMlZybGtNM1B4dXZURVdYekwxZ1pNYmR1ck9aUWRzb0hF?=
- =?utf-8?B?Nmh1ZmdVVDZQSU5MK0c0citDRnUydFo0clpneG44bzQvZ3RRajk5QU8vMWZX?=
- =?utf-8?B?bE02UEZJdVcvMngya1I1Sm1xZFNuNHRqVk9xUkVlUWRQZnBBQUo3OHJHMk96?=
- =?utf-8?B?SlYwN2NxdEhiUmtCNmxTUVBSY2hNTFJ0U3c5L1k3N2ZPZGRJSVpqQmJxRDh4?=
- =?utf-8?B?RHhZdmFNM3lVb3VzY09nTXo4V3JVazA4bENqbEFqVWlXREQyZStob1FOM3Jw?=
- =?utf-8?B?MFAwVmdjZTJSTDU5T0VKUT09?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR11MB8278.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7416005)(366007)(376005)(1800799015)(38070700009);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?RlRGR3VpK0dQZlk0TTNiTWswWWxLRGRHS0VZWXdDcUVoN3VEZXg0WXlKaFI2?=
- =?utf-8?B?ejhkM3pzaE1rMGd2Zk5jQXRoczNlZy9QM2NZUXl4M045K1ljWm9lcTZORjQ4?=
- =?utf-8?B?djM4VDJFcEZkYllaaWFSUm9aOHozQm9LdEdtK3ZPOERmbmpNWXhqekU5NlZD?=
- =?utf-8?B?Z09iVjlycGtjRDcvMWliYVRsU3pIMGpCQUVKRHFoSFBTZ1BTRW1vUU5ReGE5?=
- =?utf-8?B?ZFJ6c0JzcitTbnEvZENwdE9Eam0vKzZxLzdHc0F0bDdMYzZUQitieFdSVVFR?=
- =?utf-8?B?NUJYaDJYSW9kYTd4L2JtSDYwdG5rRUpPYzFIbWN4dFJZYkE2YUg4d3lHL0Zp?=
- =?utf-8?B?dWMxb0o1T2FCbzh6ZGdRWDhlTlJZb3BjNFgrU2J3Y2poWWZPSlRFL05kMjNO?=
- =?utf-8?B?M3o1aUo3dUM2L3JZMTdIZzdNajBvS0JYZDkwUC94U2ZPeEFZajhDN3ArcEEr?=
- =?utf-8?B?WW9RUHRnS3d1UVYwL0hQNzJPeW1ONkh0Q1gxQytTZHdRTWhkUUFoekE0RmNQ?=
- =?utf-8?B?aWkrY1JBUlBHaGRrTXdML2VLQVZZOWNVemhyMjFhRmFFZmVjcy93dWkrVEc5?=
- =?utf-8?B?NSt0ZUtwazc0VkszZ3pPb0NRNjF4aE9rbnNvUWNIUFEvazRmTHpBNCs4Y2FL?=
- =?utf-8?B?L2tDQXhzTldmbGQ4R1JXNGgvNEpFVEthaUlqdUlmajRHdzRWU1kveFBIK3BZ?=
- =?utf-8?B?MGQ1eDlxdVNJMHg3WG9TOUlZamxCekYvQmdRUVlPS3FnZXJjMHNaM0x0VGFq?=
- =?utf-8?B?WUF4UTFMWXorWXhqQTNzdDIyNXhKclJ3dHB2QWV0bXdDbmRQVndFMy82b0dO?=
- =?utf-8?B?UVpVWVNGQ0Fia0kvN0VvekpBVE9JZzlrYkNwejhIMFZmdG0yZzRncndvKzRY?=
- =?utf-8?B?MEpmSXBLRi9zL2Z6TklwYlRVbU5ubVdiQXlvcVFiWTdlNWc1SEYxNFRnek5E?=
- =?utf-8?B?elJYRzlaa2xYbzNyamRyK1RnM3BoSWJTTUFMbFlqNlpiNTlKSlVyZXc4Zk9M?=
- =?utf-8?B?VGxZb3JEVHhDN1JuSGkzRktHcHRNTEk2ZjBUdUIxdDRpK29qOHZ1bGZCS1I4?=
- =?utf-8?B?bkxDWXZvZTBlY1Z5TURWMWtjUzdFZXdFTW82WjZnbTZVOFpxSTc5aHZON0d1?=
- =?utf-8?B?MDhMUU5valUyWmpySTdjRUtiZUdIK24rYkgyZHRuY1R4emFONXNzNzFTeHkx?=
- =?utf-8?B?Uit2bjk5RzdFNzRCMmhYYjR6aEVTMk0xRkRFcVJaRWUvTGp4d3dmNlNGMm1a?=
- =?utf-8?B?VTA2bjRQeHJjTFlVcDVjcEk2aGYyTFZXTlNMYTNLbmtKL3RFb0gyanFmZTEw?=
- =?utf-8?B?a001blRmUFZNYkJBSy9iV1V5UzF6ZGMyclB1dEE4Q0RtSFJhdkZUZ2ZnRFZU?=
- =?utf-8?B?VGliQ2k4TGk4eStlTkIzL0Y2Mzc4T0JGaUszWHh1VlZvWGRYV0RlK3l0d282?=
- =?utf-8?B?VUdlZGczUSs1a093YndldTZnSFZVVG9zR01xSGRUK2ZRMWhRSUVRWG92dHRp?=
- =?utf-8?B?aURBRkNmd2VvdjZOMzAvSjQvR0dkMms4d0UraWNhbjlEVE5xMnVjSEI3Qktp?=
- =?utf-8?B?Q2srSW4raG5RUW0rdDNIS1MxYnh2TXB6TmZ4T1dIendGL1hKWXExbEh6ajFw?=
- =?utf-8?B?VTkrbEJsU1pFZXRWYmhVN3J4UkYxVC96U2NRSHE2MUtiSVVYUkZ2dW9SVUJI?=
- =?utf-8?B?NDdXNjBDOW9pSm1KSTh5cmkvOVBVNVhJbXgxeXJMejZ0S05yWW9QWEViaXNV?=
- =?utf-8?B?OEZvNVJGdWM1SUNseGhUZUhrSW8xWmx5Tis1Rk9wcXBIN1Yvc1NZSlpodE5D?=
- =?utf-8?B?MVlrb01mMW53ZTUxL1E4ZVVrMWh2QzRIbWM5eGllYVV2djZCakhkTWZib0gz?=
- =?utf-8?B?NVZzNkNmWkU3ZFNKQ2FEb2RhZ1gxRENPZUdZcENFeU1JVkNZU3ZYV0pmVTMw?=
- =?utf-8?B?YWxrTkw4MEZFdzJVOTlpbUowaEJlajIydlo3eEl2Yjh0YUUzeWU1Qmc5cmV6?=
- =?utf-8?B?a0R3NE1QK1dyTjFQSnlmbXg0QUJFR0ZFUDhETjNwNnM1Y0ZXMEk3RnphalBp?=
- =?utf-8?B?blRiRHJGOVpRZzZXZGoxWmdIRUVLbll4UzV6My9BYS84d21NcC9Ld1dwbmZR?=
- =?utf-8?B?Q3lReExSSUkrb0ZwSi81NGpVZFBna1VwdGp0bGFxQkZtTVBlclFSQnR4WWFK?=
- =?utf-8?B?Nnc9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <E298BE1B63DF824BABC8D3E1D9B40BA5@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ 15.1.2507.35; Fri, 26 Apr 2024 07:03:57 -0700
+Received: from DEN-DL-M31836.microsemi.net (10.10.85.11) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server id
+ 15.1.2507.35 via Frontend Transport; Fri, 26 Apr 2024 07:03:54 -0700
+From: Horatiu Vultur <horatiu.vultur@microchip.com>
+To: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <richardcochran@gmail.com>, <vadim.fedorenko@linux.dev>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Horatiu Vultur
+	<horatiu.vultur@microchip.com>
+Subject: [PATCH net-next v2] net: phy: micrel: Add support for PTP_PF_EXTTS for lan8814
+Date: Fri, 26 Apr 2024 16:02:24 +0200
+Message-ID: <20240426140224.2201919-1-horatiu.vultur@microchip.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SA1PR11MB8278.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f0dbc5ca-9bbc-40bf-e19a-08dc65f71d49
-X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Apr 2024 13:45:20.2204
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 3ffBhyMO3a+APNEHU2PgFtrcWmRaf2KfOhRBroY3H0U3XxJfVyehEJWExFoTuC5r8VPRtEaeKHJdpC2ge/b1aeC8HTrTrbNZWXrITzQnUDBJeD4K5rjS93vW7ksqgRhl
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB8089
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-SGkgQW5kcmV3LA0KDQpPbiAyNC8wNC8yNCA1OjM4IGFtLCBBbmRyZXcgTHVubiB3cm90ZToNCj4g
-RVhURVJOQUwgRU1BSUw6IERvIG5vdCBjbGljayBsaW5rcyBvciBvcGVuIGF0dGFjaG1lbnRzIHVu
-bGVzcyB5b3Uga25vdyB0aGUgY29udGVudCBpcyBzYWZlDQo+IA0KPj4gK3N0YXRpYyBpbnQgb2Ff
-dGM2X2FsbG9jYXRlX3J4X3NrYihzdHJ1Y3Qgb2FfdGM2ICp0YzYpDQo+PiArew0KPj4gKyAgICAg
-dGM2LT5yeF9za2IgPSBuZXRkZXZfYWxsb2Nfc2tiKHRjNi0+bmV0ZGV2LCB0YzYtPm5ldGRldi0+
-bXR1ICsgRVRIX0hMRU4gKw0KPj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-IEVUSF9GQ1NfTEVOICsgTkVUX0lQX0FMSUdOKTsNCj4+ICsgICAgIGlmICghdGM2LT5yeF9za2Ip
-IHsNCj4+ICsgICAgICAgICAgICAgdGM2LT5uZXRkZXYtPnN0YXRzLnJ4X2Ryb3BwZWQrKzsNCj4+
-ICsgICAgICAgICAgICAgcmV0dXJuIC1FTk9NRU07DQo+PiArICAgICB9DQo+PiArICAgICBza2Jf
-cmVzZXJ2ZSh0YzYtPnJ4X3NrYiwgTkVUX0lQX0FMSUdOKTsNCj4gDQo+IEkgdGhpbmsgeW91IGNh
-biB1c2UgbmV0ZGV2X2FsbG9jX3NrYl9pcF9hbGlnbigpIGhlcmUuDQpBaCBPSywgdGhlbiBkbyB5
-b3UgbWVhbiB3ZSBjYW4gcmV3cml0ZSB0aGUgZnVuY3Rpb24gDQpvYV90YzZfYWxsb2NhdGVfcnhf
-c2tiKCkgYXMgYmVsb3c/DQoNCnN0YXRpYyBpbnQgb2FfdGM2X2FsbG9jYXRlX3J4X3NrYihzdHJ1
-Y3Qgb2FfdGM2ICp0YzYpDQp7DQoJdGM2LT5yeF9za2IgPSBuZXRkZXZfYWxsb2Nfc2tiX2lwX2Fs
-aWduKHRjNi0+bmV0ZGV2LCB0YzYtPm5ldGRldi0+bXR1ICsgDQpFVEhfSExFTiArIEVUSF9GQ1Nf
-TEVOKTsNCglpZiAodGM2LT5yeF9za2IpDQoJCXJldHVybiAwOw0KDQoJdGM2LT5uZXRkZXYtPnN0
-YXRzLnJ4X2Ryb3BwZWQrKzsNCglyZXR1cm4gLUVOT01FTTsNCn0NCg0KQmVzdCByZWdhcmRzLA0K
-UGFydGhpYmFuIFYNCj4gDQoNCg==
+Extend the PTP programmable gpios to implement also PTP_PF_EXTTS
+function. The pins can be configured to capture both of rising
+and falling edge. Once the event is seen, then an interrupt is
+generated and the LTC is saved in the registers.
+On lan8814 only GPIO 3 can be configured for this.
+
+This was tested using:
+ts2phc -m -l 7 -s generic -f ts2phc.cfg
+
+Where the configuration was the following:
+    ---
+    [global]
+    ts2phc.pin_index  3
+
+    [eth0]
+    ---
+
+Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Signed-off-by: Horatiu Vultur <horatiu.vultur@microchip.com>
+---
+v1->v2:
+- fix commit message by indening the configuration with spaces
+---
+ drivers/net/phy/micrel.c | 182 ++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 181 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
+index 0e310a5e2bff0..2d11f38cbc243 100644
+--- a/drivers/net/phy/micrel.c
++++ b/drivers/net/phy/micrel.c
+@@ -167,6 +167,9 @@
+ #define PTP_CMD_CTL_PTP_LTC_STEP_SEC_		BIT(5)
+ #define PTP_CMD_CTL_PTP_LTC_STEP_NSEC_		BIT(6)
+ 
++#define PTP_COMMON_INT_ENA			0x0204
++#define PTP_COMMON_INT_ENA_GPIO_CAP_EN		BIT(2)
++
+ #define PTP_CLOCK_SET_SEC_HI			0x0205
+ #define PTP_CLOCK_SET_SEC_MID			0x0206
+ #define PTP_CLOCK_SET_SEC_LO			0x0207
+@@ -179,6 +182,27 @@
+ #define PTP_CLOCK_READ_NS_HI			0x022C
+ #define PTP_CLOCK_READ_NS_LO			0x022D
+ 
++#define PTP_GPIO_SEL				0x0230
++#define PTP_GPIO_SEL_GPIO_SEL(pin)		((pin) << 8)
++#define PTP_GPIO_CAP_MAP_LO			0x0232
++
++#define PTP_GPIO_CAP_EN				0x0233
++#define PTP_GPIO_CAP_EN_GPIO_RE_CAPTURE_ENABLE(gpio)	BIT(gpio)
++#define PTP_GPIO_CAP_EN_GPIO_FE_CAPTURE_ENABLE(gpio)	(BIT(gpio) << 8)
++
++#define PTP_GPIO_RE_LTC_SEC_HI_CAP		0x0235
++#define PTP_GPIO_RE_LTC_SEC_LO_CAP		0x0236
++#define PTP_GPIO_RE_LTC_NS_HI_CAP		0x0237
++#define PTP_GPIO_RE_LTC_NS_LO_CAP		0x0238
++#define PTP_GPIO_FE_LTC_SEC_HI_CAP		0x0239
++#define PTP_GPIO_FE_LTC_SEC_LO_CAP		0x023A
++#define PTP_GPIO_FE_LTC_NS_HI_CAP		0x023B
++#define PTP_GPIO_FE_LTC_NS_LO_CAP		0x023C
++
++#define PTP_GPIO_CAP_STS			0x023D
++#define PTP_GPIO_CAP_STS_PTP_GPIO_RE_STS(gpio)	BIT(gpio)
++#define PTP_GPIO_CAP_STS_PTP_GPIO_FE_STS(gpio)	(BIT(gpio) << 8)
++
+ #define PTP_OPERATING_MODE			0x0241
+ #define PTP_OPERATING_MODE_STANDALONE_		BIT(0)
+ 
+@@ -274,6 +298,7 @@
+ 
+ #define LAN8814_PTP_GPIO_NUM			24
+ #define LAN8814_PTP_PEROUT_NUM			2
++#define LAN8814_PTP_EXTTS_NUM			3
+ 
+ #define LAN8814_BUFFER_TIME			2
+ 
+@@ -3124,12 +3149,102 @@ static int lan8814_ptp_perout(struct ptp_clock_info *ptpci,
+ 	return 0;
+ }
+ 
++static void lan8814_ptp_extts_on(struct phy_device *phydev, int pin, u32 flags)
++{
++	u16 tmp;
++
++	/* Set as gpio input */
++	tmp = lanphy_read_page_reg(phydev, 4, LAN8814_GPIO_DIR_ADDR(pin));
++	tmp &= ~LAN8814_GPIO_DIR_BIT(pin);
++	lanphy_write_page_reg(phydev, 4, LAN8814_GPIO_DIR_ADDR(pin), tmp);
++
++	/* Map the pin to ltc pin 0 of the capture map registers */
++	tmp = lanphy_read_page_reg(phydev, 4, PTP_GPIO_CAP_MAP_LO);
++	tmp |= pin;
++	lanphy_write_page_reg(phydev, 4, PTP_GPIO_CAP_MAP_LO, tmp);
++
++	/* Enable capture on the edges of the ltc pin */
++	tmp = lanphy_read_page_reg(phydev, 4, PTP_GPIO_CAP_EN);
++	if (flags & PTP_RISING_EDGE)
++		tmp |= PTP_GPIO_CAP_EN_GPIO_RE_CAPTURE_ENABLE(0);
++	if (flags & PTP_FALLING_EDGE)
++		tmp |= PTP_GPIO_CAP_EN_GPIO_FE_CAPTURE_ENABLE(0);
++	lanphy_write_page_reg(phydev, 4, PTP_GPIO_CAP_EN, tmp);
++
++	/* Enable interrupt top interrupt */
++	tmp = lanphy_read_page_reg(phydev, 4, PTP_COMMON_INT_ENA);
++	tmp |= PTP_COMMON_INT_ENA_GPIO_CAP_EN;
++	lanphy_write_page_reg(phydev, 4, PTP_COMMON_INT_ENA, tmp);
++}
++
++static void lan8814_ptp_extts_off(struct phy_device *phydev, int pin)
++{
++	u16 tmp;
++
++	/* Set as gpio out */
++	tmp = lanphy_read_page_reg(phydev, 4, LAN8814_GPIO_DIR_ADDR(pin));
++	tmp |= LAN8814_GPIO_DIR_BIT(pin);
++	lanphy_write_page_reg(phydev, 4, LAN8814_GPIO_DIR_ADDR(pin), tmp);
++
++	/* Enable alternate, 0:for alternate function, 1:gpio */
++	tmp = lanphy_read_page_reg(phydev, 4, LAN8814_GPIO_EN_ADDR(pin));
++	tmp &= ~LAN8814_GPIO_EN_BIT(pin);
++	lanphy_write_page_reg(phydev, 4, LAN8814_GPIO_EN_ADDR(pin), tmp);
++
++	/* Clear the mapping of pin to registers 0 of the capture registers */
++	tmp = lanphy_read_page_reg(phydev, 4, PTP_GPIO_CAP_MAP_LO);
++	tmp &= ~GENMASK(3, 0);
++	lanphy_write_page_reg(phydev, 4, PTP_GPIO_CAP_MAP_LO, tmp);
++
++	/* Disable capture on both of the edges */
++	tmp = lanphy_read_page_reg(phydev, 4, PTP_GPIO_CAP_EN);
++	tmp &= ~PTP_GPIO_CAP_EN_GPIO_RE_CAPTURE_ENABLE(pin);
++	tmp &= ~PTP_GPIO_CAP_EN_GPIO_FE_CAPTURE_ENABLE(pin);
++	lanphy_write_page_reg(phydev, 4, PTP_GPIO_CAP_EN, tmp);
++
++	/* Disable interrupt top interrupt */
++	tmp = lanphy_read_page_reg(phydev, 4, PTP_COMMON_INT_ENA);
++	tmp &= ~PTP_COMMON_INT_ENA_GPIO_CAP_EN;
++	lanphy_write_page_reg(phydev, 4, PTP_COMMON_INT_ENA, tmp);
++}
++
++static int lan8814_ptp_extts(struct ptp_clock_info *ptpci,
++			     struct ptp_clock_request *rq, int on)
++{
++	struct lan8814_shared_priv *shared = container_of(ptpci, struct lan8814_shared_priv,
++							  ptp_clock_info);
++	struct phy_device *phydev = shared->phydev;
++	int pin;
++
++	if (rq->extts.flags & ~(PTP_ENABLE_FEATURE |
++				PTP_EXTTS_EDGES |
++				PTP_STRICT_FLAGS))
++		return -EOPNOTSUPP;
++
++	pin = ptp_find_pin(shared->ptp_clock, PTP_PF_EXTTS,
++			   rq->extts.index);
++	if (pin == -1 || pin != LAN8814_PTP_EXTTS_NUM)
++		return -EINVAL;
++
++	mutex_lock(&shared->shared_lock);
++	if (on)
++		lan8814_ptp_extts_on(phydev, pin, rq->extts.flags);
++	else
++		lan8814_ptp_extts_off(phydev, pin);
++
++	mutex_unlock(&shared->shared_lock);
++
++	return 0;
++}
++
+ static int lan8814_ptpci_enable(struct ptp_clock_info *ptpci,
+ 				struct ptp_clock_request *rq, int on)
+ {
+ 	switch (rq->type) {
+ 	case PTP_CLK_REQ_PEROUT:
+ 		return lan8814_ptp_perout(ptpci, rq, on);
++	case PTP_CLK_REQ_EXTTS:
++		return lan8814_ptp_extts(ptpci, rq, on);
+ 	default:
+ 		return -EINVAL;
+ 	}
+@@ -3148,6 +3263,10 @@ static int lan8814_ptpci_verify(struct ptp_clock_info *ptp, unsigned int pin,
+ 		if (pin >= LAN8814_PTP_PEROUT_NUM || pin != chan)
+ 			return -1;
+ 		break;
++	case PTP_PF_EXTTS:
++		if (pin != LAN8814_PTP_EXTTS_NUM)
++			return -1;
++		break;
+ 	default:
+ 		return -1;
+ 	}
+@@ -3320,6 +3439,64 @@ static void lan8814_handle_ptp_interrupt(struct phy_device *phydev, u16 status)
+ 	}
+ }
+ 
++static int lan8814_gpio_process_cap(struct lan8814_shared_priv *shared)
++{
++	struct phy_device *phydev = shared->phydev;
++	struct ptp_clock_event ptp_event = {0};
++	unsigned long nsec;
++	s64 sec;
++	u16 tmp;
++
++	/* This is 0 because whatever was the input pin it was mapped it to
++	 * ltc gpio pin 0
++	 */
++	tmp = lanphy_read_page_reg(phydev, 4, PTP_GPIO_SEL);
++	tmp |= PTP_GPIO_SEL_GPIO_SEL(0);
++	lanphy_write_page_reg(phydev, 4, PTP_GPIO_SEL, tmp);
++
++	tmp = lanphy_read_page_reg(phydev, 4, PTP_GPIO_CAP_STS);
++	if (!(tmp & PTP_GPIO_CAP_STS_PTP_GPIO_RE_STS(0)) &&
++	    !(tmp & PTP_GPIO_CAP_STS_PTP_GPIO_FE_STS(0)))
++		return -1;
++
++	if (tmp & BIT(0)) {
++		sec = lanphy_read_page_reg(phydev, 4, PTP_GPIO_RE_LTC_SEC_HI_CAP);
++		sec <<= 16;
++		sec |= lanphy_read_page_reg(phydev, 4, PTP_GPIO_RE_LTC_SEC_LO_CAP);
++
++		nsec = lanphy_read_page_reg(phydev, 4, PTP_GPIO_RE_LTC_NS_HI_CAP) & 0x3fff;
++		nsec <<= 16;
++		nsec |= lanphy_read_page_reg(phydev, 4, PTP_GPIO_RE_LTC_NS_LO_CAP);
++	} else {
++		sec = lanphy_read_page_reg(phydev, 4, PTP_GPIO_FE_LTC_SEC_HI_CAP);
++		sec <<= 16;
++		sec |= lanphy_read_page_reg(phydev, 4, PTP_GPIO_FE_LTC_SEC_LO_CAP);
++
++		nsec = lanphy_read_page_reg(phydev, 4, PTP_GPIO_FE_LTC_NS_HI_CAP) & 0x3fff;
++		nsec <<= 16;
++		nsec |= lanphy_read_page_reg(phydev, 4, PTP_GPIO_RE_LTC_NS_LO_CAP);
++	}
++
++	ptp_event.index = 0;
++	ptp_event.timestamp = ktime_set(sec, nsec);
++	ptp_event.type = PTP_CLOCK_EXTTS;
++	ptp_clock_event(shared->ptp_clock, &ptp_event);
++
++	return 0;
++}
++
++static int lan8814_handle_gpio_interrupt(struct phy_device *phydev, u16 status)
++{
++	struct lan8814_shared_priv *shared = phydev->shared->priv;
++	int ret;
++
++	mutex_lock(&shared->shared_lock);
++	ret = lan8814_gpio_process_cap(shared);
++	mutex_unlock(&shared->shared_lock);
++
++	return ret;
++}
++
+ static int lan8804_config_init(struct phy_device *phydev)
+ {
+ 	int val;
+@@ -3424,6 +3601,9 @@ static irqreturn_t lan8814_handle_interrupt(struct phy_device *phydev)
+ 		ret = IRQ_HANDLED;
+ 	}
+ 
++	if (!lan8814_handle_gpio_interrupt(phydev, irq_status))
++		ret = IRQ_HANDLED;
++
+ 	return ret;
+ }
+ 
+@@ -3541,7 +3721,7 @@ static int lan8814_ptp_probe_once(struct phy_device *phydev)
+ 	snprintf(shared->ptp_clock_info.name, 30, "%s", phydev->drv->name);
+ 	shared->ptp_clock_info.max_adj = 31249999;
+ 	shared->ptp_clock_info.n_alarm = 0;
+-	shared->ptp_clock_info.n_ext_ts = 0;
++	shared->ptp_clock_info.n_ext_ts = LAN8814_PTP_EXTTS_NUM;
+ 	shared->ptp_clock_info.n_pins = LAN8814_PTP_GPIO_NUM;
+ 	shared->ptp_clock_info.pps = 0;
+ 	shared->ptp_clock_info.pin_config = shared->pin_config;
+-- 
+2.34.1
+
 
