@@ -1,113 +1,116 @@
-Return-Path: <netdev+bounces-91513-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91514-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F7038B2EB0
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 04:29:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE9C38B2EB2
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 04:30:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 714341C215B2
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 02:29:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A34BF1F2234D
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 02:30:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E53C1860;
-	Fri, 26 Apr 2024 02:29:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBF123C2F;
+	Fri, 26 Apr 2024 02:30:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rdHuoK6a"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NOPT3X7I"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 099B74430
-	for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 02:29:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A37D71C3E;
+	Fri, 26 Apr 2024 02:30:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714098586; cv=none; b=MqdkGG4cBXa1XVJQ5ATWJpUyK4S6ps47PUfH6EEUXIEdaa/O2bxtxvkdWCGNoOpzsqvlLl0hSPH+hH4mOAm133QLHkULCgRk8N9MW1fHYWQXO+pkYa6tjKn5uNRgxLR8w5rYwufUZ8kKm15NPkTQjwULRUmdVCnzt8f4vjd+vlE=
+	t=1714098628; cv=none; b=HH7+7RjzJpXKX9uqECgAHtH9M029jsqdn/FqFR43dUUrODShZ8ZrOtRsQJXNnLr2kJ1Q1dr8llhtfSYvrCGtA7WD24oFQIU/XiHyZdUYpFgxIFCWHcX6Zx7g7dShMAbw2Zi8G7JjNQjF6IHhvIiSI5aMVRXvaIsXTQKoNTqcWt4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714098586; c=relaxed/simple;
-	bh=TKLY1/FgOBUJehL1qgt9TZFShFZtmUuoetJuy10tdE4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rLnXOSgvuTvuZMYUeaTvA2ndGbSc7nDPqPmJCy/hRYi+rDuAcc54SDrhpiIqULq+CfNlwnlmBKymj9zF2oXp37bKvsSlMTKayfCwW3Av1y2MAPPoiBV2njmiFRL7xL5ksxJmf7Ic2LodEBvgw6yvS1zuTSOj4bquk/ihodmtcrw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rdHuoK6a; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B44CC113CC;
-	Fri, 26 Apr 2024 02:29:45 +0000 (UTC)
+	s=arc-20240116; t=1714098628; c=relaxed/simple;
+	bh=eurkqHk3uRy+1rn1ochibBTH2vrQVR6SvX9c5yj2Uag=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=FS2Xh4Wc3XuqXO9IUFE9ZOYjR6BZ1FADqx9dgTlMtOucoRra9AM9l8mF5bWFiI0e346TspkQYeYQZlYwd1248FU5ORmaEoLX/H/Gud8Tzdhe/i2l4BWVL4wWVqMNyS0BSmExdvnaW6F/Oi6lEEq5mjN1ABjHsbpfHOREjgcuVYg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NOPT3X7I; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 2F0BBC2BBFC;
+	Fri, 26 Apr 2024 02:30:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714098585;
-	bh=TKLY1/FgOBUJehL1qgt9TZFShFZtmUuoetJuy10tdE4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=rdHuoK6aqMFGTxF3RTF1WIErMamefQUaBYr+qJtRaYnwoM9wC6Go04kYnCyFuEgQK
-	 Ide2JhAQCgY+s2NqhBhGWIhJlu+YP0fGGSDf8ljYTSGctyahkkXp1PulsOPWQCD9Hi
-	 hheYAhyU4kbrgmEn+33YP/gxFPDc/V9Ue90cl7x1njdfpsd5KYk1Uo9xBLtWJTJW/X
-	 DsnaHpUR5aG9CoUjJkqzvfnLPwWnq+y1bsTrjEUyz9w0X1Ozb+L7XHeYkNxIIDQmYm
-	 dNskh7bAlLATDFmQe0o3JRLWz2Ct3jr59gZcTqm8/brdMfb+gq1cpyyeHjRQqcR2Vl
-	 qsjrWJLuPL9ww==
-Date: Thu, 25 Apr 2024 19:29:44 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, laforge@osmocom.org,
- pespin@sysmocom.de, osmith@sysmocom.de, pabeni@redhat.com,
- edumazet@google.com, fw@strlen.de
-Subject: Re: [PATCH net-next 00/12] gtp updates for net-next (v2)
-Message-ID: <20240425192944.67c99bdf@kernel.org>
-In-Reply-To: <20240425105138.1361098-1-pablo@netfilter.org>
-References: <20240425105138.1361098-1-pablo@netfilter.org>
+	s=k20201202; t=1714098628;
+	bh=eurkqHk3uRy+1rn1ochibBTH2vrQVR6SvX9c5yj2Uag=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=NOPT3X7IeFl2EkRwRIVLn4bp/lBz/P9PVLpmU9i7nHEZYzqAUBm4JX8rsMrSnUrHN
+	 biPRfnqFQwOqKrc2TyuER/CO+VOUls/m+Bfs6Tn8XAL3l4UkdOhHhk76HEj4cwp4hQ
+	 NVdcdArE9v4DyIPjgZHDoIE3elvaxeY7BjGuHqNUi3HvZKjRjiffVLypz+eCRBMvtk
+	 9ngzeTfWdgizj3jykjL6O7COU44bMoHxTyA009S8sPutklby/m3IAfmRrx71xeNJVJ
+	 uWblH+kbfyJIZ3Z7B+4JMlVR8Xu42lFf2i0lGzxILzaWRd/57kt/uZGL9wqNi70AK5
+	 i5D4EHTpsudSw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 17608C43140;
+	Fri, 26 Apr 2024 02:30:28 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2 0/6] Ensure the copied buf is NUL terminated
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171409862809.13456.12723948130853178022.git-patchwork-notify@kernel.org>
+Date: Fri, 26 Apr 2024 02:30:28 +0000
+References: <20240424-fix-oob-read-v2-0-f1f1b53a10f4@gmail.com>
+In-Reply-To: <20240424-fix-oob-read-v2-0-f1f1b53a10f4@gmail.com>
+To: Bui Quang Minh <minhquangbui99@gmail.com>
+Cc: jesse.brandeburg@intel.com, anthony.l.nguyen@intel.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ paul.m.stillwell.jr@intel.com, rmody@marvell.com, skalluru@marvell.com,
+ GR-Linux-NIC-Dev@marvell.com, anil.gurumurthy@qlogic.com,
+ sudarsana.kalluru@qlogic.com, James.Bottomley@HansenPartnership.com,
+ martin.petersen@oracle.com, fabf@skynet.be, skashyap@marvell.com,
+ GR-QLogic-Storage-Upstream@marvell.com, nilesh.javali@cavium.com,
+ arun.easi@cavium.com, manish.rangankar@cavium.com, vneethv@linux.ibm.com,
+ oberpar@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
+ agordeev@linux.ibm.com, borntraeger@linux.ibm.com, svens@linux.ibm.com,
+ sgoutham@marvell.com, lcherian@marvell.com, gakula@marvell.com,
+ jerinj@marvell.com, hkelam@marvell.com, sbhatta@marvell.com,
+ intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
+ saurav.kashyap@cavium.com, linux-s390@vger.kernel.org, axboe@kernel.dk,
+ przemyslaw.kitszel@intel.com
 
-On Thu, 25 Apr 2024 12:51:26 +0200 Pablo Neira Ayuso wrote:
-> This v2 includes a sparse fix for patch #5 reported by Jakub.
+Hello:
 
-Sorry one more semi-automated compiler warning, clang has this to
-say about patch 12:
+This series was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-../drivers/net/gtp.c:606:14: warning: variable 'pctx' is uninitialized when used here [-Wuninitialized]
-  606 |                 netdev_dbg(pctx->dev, "GTP packet does not encapsulate an IP packet\n");
-      |                            ^~~~
-../include/net/net_debug.h:57:21: note: expanded from macro 'netdev_dbg'
-   57 |         dynamic_netdev_dbg(__dev, format, ##args);              \
-      |                            ^~~~~
-../include/linux/dynamic_debug.h:278:7: note: expanded from macro 'dynamic_netdev_dbg'
-  278 |                            dev, fmt, ##__VA_ARGS__)
-      |                            ^~~
-../include/linux/dynamic_debug.h:250:59: note: expanded from macro '_dynamic_func_call'
-  250 |         _dynamic_func_call_cls(_DPRINTK_CLASS_DFLT, fmt, func, ##__VA_ARGS__)
-      |                                                                  ^~~~~~~~~~~
-../include/linux/dynamic_debug.h:248:65: note: expanded from macro '_dynamic_func_call_cls'
-  248 |         __dynamic_func_call_cls(__UNIQUE_ID(ddebug), cls, fmt, func, ##__VA_ARGS__)
-      |                                                                        ^~~~~~~~~~~
-../include/linux/dynamic_debug.h:224:15: note: expanded from macro '__dynamic_func_call_cls'
-  224 |                 func(&id, ##__VA_ARGS__);                       \
-      |                             ^~~~~~~~~~~
-../drivers/net/gtp.c:581:22: note: initialize the variable 'pctx' to silence this warning
-  581 |         struct pdp_ctx *pctx;
-      |                             ^
-      |                              = NULL
-../drivers/net/gtp.c:825:14: warning: variable 'pctx' is uninitialized when used here [-Wuninitialized]
-  825 |                 netdev_dbg(pctx->dev, "GTP packet does not encapsulate an IP packet\n");
-      |                            ^~~~
-../include/net/net_debug.h:57:21: note: expanded from macro 'netdev_dbg'
-   57 |         dynamic_netdev_dbg(__dev, format, ##args);              \
-      |                            ^~~~~
-../include/linux/dynamic_debug.h:278:7: note: expanded from macro 'dynamic_netdev_dbg'
-  278 |                            dev, fmt, ##__VA_ARGS__)
-      |                            ^~~
-../include/linux/dynamic_debug.h:250:59: note: expanded from macro '_dynamic_func_call'
-  250 |         _dynamic_func_call_cls(_DPRINTK_CLASS_DFLT, fmt, func, ##__VA_ARGS__)
-      |                                                                  ^~~~~~~~~~~
-../include/linux/dynamic_debug.h:248:65: note: expanded from macro '_dynamic_func_call_cls'
-  248 |         __dynamic_func_call_cls(__UNIQUE_ID(ddebug), cls, fmt, func, ##__VA_ARGS__)
-      |                                                                        ^~~~~~~~~~~
-../include/linux/dynamic_debug.h:224:15: note: expanded from macro '__dynamic_func_call_cls'
-  224 |                 func(&id, ##__VA_ARGS__);                       \
-      |                             ^~~~~~~~~~~
-../drivers/net/gtp.c:787:22: note: initialize the variable 'pctx' to silence this warning
-  787 |         struct pdp_ctx *pctx;
-      |                             ^
-      |                              = NULL
+On Wed, 24 Apr 2024 21:44:17 +0700 you wrote:
+> Hi everyone,
+> 
+> I found that some drivers contains an out-of-bound read pattern like this
+> 
+> 	kern_buf = memdup_user(user_buf, count);
+> 	...
+> 	sscanf(kern_buf, ...);
+> 
+> [...]
+
+Here is the summary with links:
+  - [v2,1/6] ice: ensure the copied buf is NUL terminated
+    https://git.kernel.org/netdev/net/c/666854ea9cad
+  - [v2,2/6] bna: ensure the copied buf is NUL terminated
+    https://git.kernel.org/netdev/net/c/8c34096c7fdf
+  - [v2,3/6] bfa: ensure the copied buf is NUL terminated
+    (no matching commit)
+  - [v2,4/6] qedf: ensure the copied buf is NUL terminated
+    (no matching commit)
+  - [v2,5/6] cio: ensure the copied buf is NUL terminated
+    (no matching commit)
+  - [v2,6/6] octeontx2-af: avoid off-by-one read from userspace
+    https://git.kernel.org/netdev/net/c/f299ee709fb4
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
