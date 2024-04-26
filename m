@@ -1,108 +1,239 @@
-Return-Path: <netdev+bounces-91571-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91572-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A0008B3155
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 09:29:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 505498B3161
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 09:32:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 15C4E284449
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 07:29:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5EC3D1C2251C
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 07:32:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 364AC13BC36;
-	Fri, 26 Apr 2024 07:29:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DA4413C3DF;
+	Fri, 26 Apr 2024 07:32:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Fo7c0pvU"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HJSTZU7j"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2F0113BC18;
-	Fri, 26 Apr 2024 07:29:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4160013C3C3
+	for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 07:32:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714116586; cv=none; b=TQfTsEWqeYQACFrvhOYZfpL9GwqOJBXFZQZGgzO6RplwDwC+zg/0eKgcwaJ4vSF4kl86xxyPFeoZNdQ+SCQ3siNIYXZ86iVLaDDsHizfFg6fFECkiccW/f9hxp85vF0XCiXmj4eEl8Ow6n2nyWHDDCgrSdkC6TYZASYB8WGwcjg=
+	t=1714116746; cv=none; b=G7i9RgP8Qo8CaqK2QXnqA7EnwCtDZTvjd0c8LL1YnymftzyVWyR74YI3ER5L9Ot+DT3hoJdtWVGqBRQjNafJYV98CMA0dSzddavN4XYt9BhMDlJo2vnwLgSP0zz4l2r5JBmFZSmb5AMq6kFMWgSk4aU4d4EMMLHk5I4vf2m0LVo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714116586; c=relaxed/simple;
-	bh=elD+9XGLAdnCSlM802POq0qCA5eLDtUU1xAs/bhJBLY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QDm608qcf9TrNarJ8BHzZf2GndxqY/un26ko4zIvC3Rb1BioNe0iGuRy0h2KqDB/yToIXD+3wFxYbZiKgJlw+kip6eVttgCMF9/i3xrBZoYO8kY7nZCd3GeXb3id6gF0RVe61Aaz18u9ieNEVtFyGrM621wSDJ/Kn5usw2+cU9c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Fo7c0pvU; arc=none smtp.client-ip=217.70.183.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id CFFBBE000A;
-	Fri, 26 Apr 2024 07:29:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1714116575;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vWfgP9DpxfeThuAahkC7EFje7Rmo/njf+PU7vtdfr4I=;
-	b=Fo7c0pvUK5+Z0LuTvsKNkgCQXt6pPabRdLGioc1EvGbQI0cyPTtKWJAFd7l3nD8qcUor0h
-	jWs3/NiPc6PSXY+cW/xvMEOV7V6OQadj+aRdc0vv2N2d8zi4DfrAQhRozCyFn67lCjE9kS
-	kdmE5tzHcW6f34J61wzJxXN1pSONGXFsT9hkTa0X3rBo061dxU2X2A1k/Xy3xh2cZfvOxz
-	pdmO/tfdC03AxJX0odiklMV/goMX/F2Ld/U5jWMLi61iNY8HsYFkznL2C2VzRMGKdhJUrg
-	LntZCmkpL3AvUrh/6O3Q+Zilyhw3sa9OYNLqRwAUHb5rVbl+yDigRVbkungUDw==
-Date: Fri, 26 Apr 2024 09:29:32 +0200
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Jiri Pirko <jiri@resnulli.us>, Oleksij Rempel <o.rempel@pengutronix.de>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn
- <andrew@lunn.ch>, Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Kyle Swenson
- <kyle.swenson@est.tech>, kernel test robot <lkp@intel.com>
-Subject: Re: [PATCH net-next v3 0/3] net: pse-pd: Fixes for few small issues
-Message-ID: <20240426092932.0e1a5e2b@kmaincent-XPS-13-7390>
-In-Reply-To: <20240425101511.6a3a517c@kernel.org>
-References: <20240423-fix_poe-v3-0-e50f32f5fa59@bootlin.com>
-	<ZiebQLdu9dOh1v-T@nanopsycho>
-	<20240425103110.33c02857@kmaincent-XPS-13-7390>
-	<20240425070619.601d5e40@kernel.org>
-	<20240425163002.5894c5e5@kmaincent-XPS-13-7390>
-	<20240425074205.28677540@kernel.org>
-	<20240425165708.62637485@kmaincent-XPS-13-7390>
-	<20240425080724.15be46e9@kernel.org>
-	<20240425190426.1a1a7d00@kmaincent-XPS-13-7390>
-	<20240425101511.6a3a517c@kernel.org>
-Organization: bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1714116746; c=relaxed/simple;
+	bh=huZdh8GW0EXWSaQhXBQtDCOGAUHcTkfS3ydWBvzJTfs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=R6NqizkKDmMaKrXQaBKQ6MSj4S6EfaCl/hxEzdOkBAo1GEjnEz4wac7h6d9F1ZWzePh/a8Q5Y327hX/uVbK/Xr1gSgBkIceyxuEBjk8zuDs+IHBCHHD3uXzTY10Ouiqo/SWzwAdfXbYfd00tp6bhvUzlsC77xozqHTLgsivdZOI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HJSTZU7j; arc=none smtp.client-ip=209.85.208.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-571e13cd856so9204a12.0
+        for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 00:32:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1714116742; x=1714721542; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=55aGktq7fs+SXar6JRKvBBqXiEBqzDHYlydi7Q0XdwU=;
+        b=HJSTZU7j+4tZ/XgJccHtoLutXeJL0szwCVMk0kOv5/nyKUPJzzW0dw+V1WX0hVng9h
+         FM5aX2LcP5SbLPpS1oeH+KtpuYNgIPi1CZkCIsZoeeLqZTkjKh159YqmOl2G4C87WU2a
+         qqukPDrzrTkgD8UDpBtFqi1CE6y3SmE05k/rdbH3R+sjGKSwdwh88i9q8rhFDdw9+ymB
+         KIJFtVY85ECnRtQ+0L3xK8KzcezYiJZbBGFE9xJWmpPJA+GCXkmpi0A+5LQP3uLMl92y
+         G1UjxgaWTqTuzjgX6vOnKFshhqdYASpNPvjeHpEj/SIyrbhs2OO7unZqX/KouOkJRU8N
+         ZedQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714116742; x=1714721542;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=55aGktq7fs+SXar6JRKvBBqXiEBqzDHYlydi7Q0XdwU=;
+        b=fnDxBQZSduRaSSwQiPfYcup9cfqzJGZKLOHHJqV7MqSPZ15JVSEvGkOT49WahjciId
+         VxE3OonIKgDRjeca5oZ/tIcFzWEwPgrVYuRLIEbslXgNrGy1IKsw/IX8oK2CJZ0QNgqz
+         QNMZk0JQjr4/cO6ZM1Pq5EjE4qNOgRMAjXCtQhoF0j47VkGR5EJpLkeRAhDaz66O4eq2
+         qf93v+xC+rWRbIrivNw+Jm9A4B0eeYkeIonrpPWPd7hPnTOvbmMEE7nUg17tJ4wKwesc
+         dHRq8P9c6ffn7sDU3qR5RQPrvPLjGnfx3X2NFQjEvJuPBN2Ctw8FWcHENL7LKq1byiwT
+         b4FA==
+X-Gm-Message-State: AOJu0YwtNDLc+Od6rPxz4yvUXsP16IMzZWygFfKMD4xAHO2wsQ4Ipc87
+	xrVWHSzrJH482qIDliYs42N8t83MQIekR8yyaVjpaO61jf3VtOpUrSZNowT22ZmvS1kFV+FqDTf
+	SJLZ/VdSyQDyB5u1jnHoDbJg9FkA7J6JW6wIt
+X-Google-Smtp-Source: AGHT+IEmW9ouiJCqwPAVRnOSQEoBVj2s2LXB1190cNP9r+cvXOG1N7u66gEYNrtBxCX5nVZ0R/5anNWPcQRBeuT7d1k=
+X-Received: by 2002:a05:6402:2285:b0:570:49e3:60a8 with SMTP id
+ cw5-20020a056402228500b0057049e360a8mr70016edb.7.1714116742251; Fri, 26 Apr
+ 2024 00:32:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+References: <20240426065143.4667-1-nbd@nbd.name> <20240426065143.4667-7-nbd@nbd.name>
+In-Reply-To: <20240426065143.4667-7-nbd@nbd.name>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 26 Apr 2024 09:32:11 +0200
+Message-ID: <CANn89i+n76MEoQPbj8oxMMEw5N6T8KAP4Xp2YsUYb32fUzAJNg@mail.gmail.com>
+Subject: Re: [PATCH v3 net-next v3 6/6] net: add heuristic for enabling TCP
+ fraglist GRO
+To: Felix Fietkau <nbd@nbd.name>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
+	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	willemdebruijn.kernel@gmail.com, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: kory.maincent@bootlin.com
 
-On Thu, 25 Apr 2024 10:15:11 -0700
-Jakub Kicinski <kuba@kernel.org> wrote:
+On Fri, Apr 26, 2024 at 8:51=E2=80=AFAM Felix Fietkau <nbd@nbd.name> wrote:
+>
+> When forwarding TCP after GRO, software segmentation is very expensive,
+> especially when the checksum needs to be recalculated.
+> One case where that's currently unavoidable is when routing packets over
+> PPPoE. Performance improves significantly when using fraglist GRO
+> implemented in the same way as for UDP.
+>
+> When NETIF_F_GRO_FRAGLIST is enabled, perform a lookup for an established
+> socket in the same netns as the receiving device. While this may not
+> cover all relevant use cases in multi-netns configurations, it should be
+> good enough for most configurations that need this.
+>
+> Here's a measurement of running 2 TCP streams through a MediaTek MT7622
+> device (2-core Cortex-A53), which runs NAT with flow offload enabled from
+> one ethernet port to PPPoE on another ethernet port + cake qdisc set to
+> 1Gbps.
+>
+> rx-gro-list off: 630 Mbit/s, CPU 35% idle
+> rx-gro-list on:  770 Mbit/s, CPU 40% idle
+>
+> Signe-off-by: Felix Fietkau <nbd@nbd.name>
+> ---
+>  net/ipv4/tcp_offload.c   | 30 ++++++++++++++++++++++++++++++
+>  net/ipv6/tcpv6_offload.c | 33 +++++++++++++++++++++++++++++++++
+>  2 files changed, 63 insertions(+)
+>
+> diff --git a/net/ipv4/tcp_offload.c b/net/ipv4/tcp_offload.c
+> index ee5403760775..2ae83f4394dc 100644
+> --- a/net/ipv4/tcp_offload.c
+> +++ b/net/ipv4/tcp_offload.c
+> @@ -406,6 +406,34 @@ void tcp_gro_complete(struct sk_buff *skb)
+>  }
+>  EXPORT_SYMBOL(tcp_gro_complete);
+>
+> +static void tcp4_check_fraglist_gro(struct list_head *head, struct sk_bu=
+ff *skb,
+> +                                   struct tcphdr *th)
+> +{
+> +       const struct iphdr *iph =3D skb_gro_network_header(skb);
+> +       struct net *net =3D dev_net(skb->dev);
 
-> On Thu, 25 Apr 2024 19:04:26 +0200 Kory Maincent wrote:
-> > > That one was fine:
-> > >=20
-> > > https://patchwork.kernel.org/project/netdevbpf/cover/20240422-feature=
-_ptp_netnext-v11-0-f14441f2a1d8@bootlin.com/
-> > >=20
-> > > Are you thinking it's the extra From in the cover letter?   =20
-> >=20
-> > Maybe or some patches between b4 version 0.13.0 and 0.14-dev. I will try
-> > next time without my extra From b4 patch to test 0.14-dev. =20
->=20
-> Another random thought is that some people put the name in quotes if
-> it contains non-trivial chars, so may be worth trying with:
->=20
-> From: "Kory Maincent (Dent Project)" <kory.maincent@bootlin.com>
+Could you defer the initializations of iph and net after the
+NETIF_F_GRO_FRAGLIST check ?
 
-Ok, I will try also with quotes.
+dev_net() has an implicit READ_ONCE() ...
 
-Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+> +       struct sk_buff *p;
+> +       struct sock *sk;
+> +       int iif, sdif;
+> +
+> +       if (!(skb->dev->features & NETIF_F_GRO_FRAGLIST))
+> +               return;
+> +
+> +       p =3D tcp_gro_lookup(head, th);
+> +       if (p) {
+> +               NAPI_GRO_CB(skb)->is_flist =3D NAPI_GRO_CB(p)->is_flist;
+> +               return;
+> +       }
+> +
+> +       inet_get_iif_sdif(skb, &iif, &sdif);
+> +       sk =3D __inet_lookup_established(net, net->ipv4.tcp_death_row.has=
+hinfo,
+> +                                      iph->saddr, th->source,
+> +                                      iph->daddr, ntohs(th->dest),
+> +                                      iif, sdif);
+> +       NAPI_GRO_CB(skb)->is_flist =3D !sk;
+> +       if (sk)
+> +               sock_put(sk);
+> +}
+> +
+>  INDIRECT_CALLABLE_SCOPE
+>  struct sk_buff *tcp4_gro_receive(struct list_head *head, struct sk_buff =
+*skb)
+>  {
+> @@ -421,6 +449,8 @@ struct sk_buff *tcp4_gro_receive(struct list_head *he=
+ad, struct sk_buff *skb)
+>         if (!th)
+>                 goto flush;
+>
+> +       tcp4_check_fraglist_gro(head, skb, th);
+> +
+>         return tcp_gro_receive(head, skb, th);
+>
+>  flush:
+> diff --git a/net/ipv6/tcpv6_offload.c b/net/ipv6/tcpv6_offload.c
+> index c01ace2e9ff0..1ab45cca3936 100644
+> --- a/net/ipv6/tcpv6_offload.c
+> +++ b/net/ipv6/tcpv6_offload.c
+> @@ -7,12 +7,43 @@
+>   */
+>  #include <linux/indirect_call_wrapper.h>
+>  #include <linux/skbuff.h>
+> +#include <net/inet6_hashtables.h>
+>  #include <net/gro.h>
+>  #include <net/protocol.h>
+>  #include <net/tcp.h>
+>  #include <net/ip6_checksum.h>
+>  #include "ip6_offload.h"
+>
+> +static void tcp6_check_fraglist_gro(struct list_head *head, struct sk_bu=
+ff *skb,
+> +                                   struct tcphdr *th)
+> +{
+> +#if IS_ENABLED(CONFIG_IPV6)
+> +       const struct ipv6hdr *hdr =3D skb_gro_network_header(skb);
+> +       struct net *net =3D dev_net(skb->dev);
+
+Same remark here.
+
+> +       struct sk_buff *p;
+> +       struct sock *sk;
+> +       int iif, sdif;
+> +
+> +       if (!(skb->dev->features & NETIF_F_GRO_FRAGLIST))
+> +               return;
+> +
+> +       p =3D tcp_gro_lookup(head, th);
+> +       if (p) {
+> +               NAPI_GRO_CB(skb)->is_flist =3D NAPI_GRO_CB(p)->is_flist;
+> +               return;
+> +       }
+> +
+> +       inet6_get_iif_sdif(skb, &iif, &sdif);
+> +       sk =3D __inet6_lookup_established(net, net->ipv4.tcp_death_row.ha=
+shinfo,
+> +                                       &hdr->saddr, th->source,
+> +                                       &hdr->daddr, ntohs(th->dest),
+> +                                       iif, sdif);
+> +       NAPI_GRO_CB(skb)->is_flist =3D !sk;
+> +       if (sk)
+> +               sock_put(sk);
+> +#endif /* IS_ENABLED(CONFIG_IPV6) */
+> +}
+> +
+>  INDIRECT_CALLABLE_SCOPE
+>  struct sk_buff *tcp6_gro_receive(struct list_head *head, struct sk_buff =
+*skb)
+>  {
+> @@ -28,6 +59,8 @@ struct sk_buff *tcp6_gro_receive(struct list_head *head=
+, struct sk_buff *skb)
+>         if (!th)
+>                 goto flush;
+>
+> +       tcp6_check_fraglist_gro(head, skb, th);
+> +
+>         return tcp_gro_receive(head, skb, th);
+>
+>  flush:
+> --
+> 2.44.0
+>
 
