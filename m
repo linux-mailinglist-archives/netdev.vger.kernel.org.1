@@ -1,117 +1,123 @@
-Return-Path: <netdev+bounces-91749-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91757-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FEBB8B3C1E
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 17:58:11 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C2EA8B3C4E
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 18:03:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE9782842F8
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 15:58:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BF7041F20F46
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 16:03:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3BD614D6F8;
-	Fri, 26 Apr 2024 15:57:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B35714D29D;
+	Fri, 26 Apr 2024 16:02:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gigldITl"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="bty/pBwm"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1853F14D2B8
-	for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 15:57:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 123DC14AD26
+	for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 16:02:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714147077; cv=none; b=CFTzXzfo9kB9WBxJWM2HPvctNZDc3LOogBVY8BoRc/Ky1HJ0KkExtMX+utyS+7eUg24uRjywssrXTNc9aS4N0sLSJNIxHnGQF3CEgdkT+NUk5azpY82odVAMflz2b8Is7iJs2scDtIWdk+xy5SCxFvmxKrwaaWrnGqVJ42MrF40=
+	t=1714147346; cv=none; b=m96Ho8EkAkThH7mcFLfAtxdhqijsFMehyhnHl1hNFxLrOPCqK5p94PZmvD5S7FnYwqxYKbBZdvva99tjkmo8zjObu75bVlnLv9rbn9hTK70y9cbm4xl5U7GFIxMnIE3Tzl+jzQ8ZlvzByRZZO/W7+kqife7tpD3U75yBqvi0PVM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714147077; c=relaxed/simple;
-	bh=tVZm1NOaOpfDBvnM6Oow6dJig4w3fLjQoaLBHwmyJD8=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=ehh913RRpraCeTKVyFTd4Ii0BodKmKQP14cRdJ/9EDII/SQyNYe0X1tRmniK/A9n2Zy7sVrK+4l2XSgq6HhOw8+61zO31XzjOHkeQ+iyyYRpt8txuud4H4qaVfzEug866gHAUrsZ3jnNpywZAXb7SVmmzCkgSVy+nUPBvwwj5Hw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gigldITl; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1714147074;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5unUVLjNo+qjBW1OspxyrCDGLZZ03wMYpF4fiHvTxL0=;
-	b=gigldITlXZiAzrbCmGxc+oif3N7BUrsGgrgZhm+IWKolC7e6nEN0INI+mo/Wdjv6lJZYGR
-	RqBMBN6eFJaWHDUU7PvkYSk7sx0pU1NiTutbZSS2N+42yO2HlcYKCvzrST/5UpNgz5sah0
-	ngqdiQjwEeEU8SZ2gkrujOVNtu07oyM=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-142-Z51XDStMMs6IW8dDyTwKbw-1; Fri,
- 26 Apr 2024 11:57:49 -0400
-X-MC-Unique: Z51XDStMMs6IW8dDyTwKbw-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 143C93C000A1;
-	Fri, 26 Apr 2024 15:57:49 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.200])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id B94C3492BC7;
-	Fri, 26 Apr 2024 15:57:47 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <20240422115541.38548-1-linyunsheng@huawei.com>
-References: <20240422115541.38548-1-linyunsheng@huawei.com>
-To: Yunsheng Lin <linyunsheng@huawei.com>
-Cc: dhowells@redhat.com, davem@davemloft.net, kuba@kernel.org,
-    pabeni@redhat.com, netdev@vger.kernel.org,
-    linux-kernel@vger.kernel.org,
-    Alexander Duyck <alexander.duyck@gmail.com>,
-    Marc Dionne <marc.dionne@auristor.com>,
-    Eric Dumazet <edumazet@google.com>, linux-afs@lists.infradead.org
-Subject: Re: [PATCH net] rxrpc: Fix using alignmask being zero for __page_frag_alloc_align()
+	s=arc-20240116; t=1714147346; c=relaxed/simple;
+	bh=2PyvTdDENvimSafTrmQaUG8Zv0g9z1NstAi8Nbd8jg0=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=jyEXD+ERB/Ekk2ApJaHDv6PNcsQl1wTmadvq8/CF8p7DsMECvTxmfVfrrjRXykKXAjG9D/iE873zHe8L8SdHh+K6nkDzFfzZ02PNin/is7xHBwGb31sdgWV0XqNIA1PaxocQ3n8ClbN1ZEG32yjk9uto5HP6ajeM2CKQLvMYAEg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=bty/pBwm; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:Content-Type:MIME-Version:
+	Message-ID:Subject:Cc:To:From:Date:Reply-To:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=E2EnCkg7BBWpT1ip396iVXYIySuf0e+XVxe8/SaaEWU=; b=bty/pBwmcvoycevbUJV74BqqPA
+	v6ZBeWBR3p+1eOsr6pd3RGc7gTryy+CzLYewiNqGo5jnyYcmjGZfB0obzhh6EyAzWYAR7EYR+lxI/
+	J8WVvvnI9eMY1lTdKRZW/u2vkmoCOdrfDiFukKi74RX82J8RN+nUtwlon94BE0XZ0j+EHuDlrhcLY
+	UG2eoRdHcS/aL3Jb21fiUOjw8x3TFj6EVbyYTm2vhhhK2jcQPV451zT3qhKVcGfcwUC5W13tTurLo
+	yDHrbUX8ORiX+hXZlgJ3SDTw5BIKJI/GlLUJnEFviTwRELz9JcWWsQGbRZHylKCYbKsfq8/OqMM8W
+	3siSj9Wg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:58686)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1s0O1W-0000SD-39;
+	Fri, 26 Apr 2024 17:02:07 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1s0O1V-0006dn-LD; Fri, 26 Apr 2024 17:02:05 +0100
+Date: Fri, 26 Apr 2024 17:02:05 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Woojung Huh <woojung.huh@microchip.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>, UNGLinuxDriver@microchip.com
+Subject: [PATCH net-next 0/4] net: dsa: microchip: use phylink_mac_ops for
+ ksz driver
+Message-ID: <ZivP/R1IwKEPb5T6@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <2650222.1714147067.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 26 Apr 2024 16:57:47 +0100
-Message-ID: <2650223.1714147067@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.10
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Yunsheng Lin <linyunsheng@huawei.com> wrote:
+Hi,
 
-> rxrpc_alloc_data_txbuf() may be called with data_align being
-> zero in none_alloc_txbuf() and rxkad_alloc_txbuf(), data_align
-> is supposed to be an order-based alignment value, but zero is
-> not a valid order-based alignment value
+This four patch series switches the Microchip KSZ DSA driver to use
+phylink_mac_ops support, and for this one we go a little further
+beyond a simple conversion. This driver has four distinct cases:
 
-Ummm... 0 *would be* a valid order-based[*] alignment (pow(2,0) is 1).  It
-might actually make more sense to do that than to pass in the number of by=
-tes,
-then 0 is the default, but either way works.
+lan937x
+ksz9477
+ksz8
+ksz8830
 
-[*] Other places that take an order-based parameter include things like
-    alloc_pages().  The number of pages being requested is pow(2,order).
+Three of these cases are handled by shimming the existing DSA calls
+through ksz_dev_ops, and the final case is handled through a
+conditional in ksz_phylink_mac_config(). These can all be handled
+with separate phylink_mac_ops.
 
-> +	return rxrpc_alloc_data_txbuf(call, min_t(size_t, remain, RXRPC_JUMBO_=
-DATALEN), 1U, gfp);
-> +		return rxrpc_alloc_data_txbuf(call, space, 1U, gfp);
+To get there, we do a progressive conversion.
 
-The 'U' should be unnecessary.
+Patch 1 removes ksz_dev_ops' phylink_mac_config() method which is
+not populated in any of the arrays - and is thus redundant.
 
-> +	data_align =3D max_t(size_t, data_align, L1_CACHE_BYTES);
+Patch 2 switches the driver to use a common set of phylink_mac_ops
+for all cases, doing the simple conversion to avoid the DSA shim.
 
-data_align =3D umax(data_align, L1_CACHE_BYTES);
+Patch 3 pushes the phylink_mac_ops down to the first three classes
+(lan937x, ksz9477, ksz8) adding an appropriate pointer to the
+phylink_mac_ops to struct ksz_chip_data, and using that to
+populate DSA's ds->phylink_mac_ops pointer. The difference between
+each of these are the mac_link_up() method. mac_config() and
+mac_link_down() remain common between each at this stage.
 
-would be better, I think.
+Patch 4 splits out ksz8830, which needs different mac_config()
+handling, and thus means we have a difference in mac_config()
+methods between the now four phylink_mac_ops structures.
 
-Anyway, with the umax change above:
+Build tested only, with additional -Wunused-const-variable flag.
 
-Acked-by: David Howells <dhowells@redhat.com>
+ drivers/net/dsa/microchip/ksz8.h       |   6 +-
+ drivers/net/dsa/microchip/ksz8795.c    |  10 ++-
+ drivers/net/dsa/microchip/ksz_common.c | 121 ++++++++++++++++++++++-----------
+ drivers/net/dsa/microchip/ksz_common.h |   5 +-
+ 4 files changed, 94 insertions(+), 48 deletions(-)
 
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
