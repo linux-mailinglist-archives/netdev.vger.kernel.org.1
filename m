@@ -1,172 +1,388 @@
-Return-Path: <netdev+bounces-91833-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91834-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CBCD8B424C
-	for <lists+netdev@lfdr.de>; Sat, 27 Apr 2024 00:43:11 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 845438B425E
+	for <lists+netdev@lfdr.de>; Sat, 27 Apr 2024 00:52:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B85DD1F21F7F
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 22:43:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9A0E1B2186A
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 22:52:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 232C738FA5;
-	Fri, 26 Apr 2024 22:42:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74D833987B;
+	Fri, 26 Apr 2024 22:52:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="G1m5msKm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YJDm2U99"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85EB43BBE6;
-	Fri, 26 Apr 2024 22:42:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D04821101;
+	Fri, 26 Apr 2024 22:52:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714171375; cv=none; b=pwECL0NE6qFeT/JIzPAGe4MPcY/inlKPa4KmOE+PhzonxXEZ9rANTcGmY3kC9gyn+8ctejkZ9B5inkztgjdebprsMTiTfoCPdvNtOV5n6EgYQz9Rv4zN/HfxCtbYN7/WWhwLyN2Q4Ih818zbznqIBk+BUTLfUbmrRwswvShVRTQ=
+	t=1714171970; cv=none; b=PYdAHyp+nFO/EoupNM9Tr7UWzHovnPLSQwX6ZJNpP/vs6FG686I9j3aPiF/MNPxeINXxvJ9dXPfWCW92nuGgfLWTx2Mb35ybnBLLUDRTSfHaBcYJHQ/MoOLfEFY2/ACSVaJb4yQHJnO8Niat5M5TrsBLbKrodSnLuOq77QgV/sU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714171375; c=relaxed/simple;
-	bh=1T9WPb0ShseSt6MCLsMq6ZrJl4sruiRMyFdv22QrfLY=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=rybmZ/MUa9KCBZaSf37kmdWJ0n1dUvRHMocD/HGAxn6pDlk76iCVqxl9CPzzg1lPSSmgsrbj28VzGlJyjxPeF3htYd1QfS1gzv7BkRHftqIFX7whgWCRga5k4p2GlRDfpQTvWrpakQngaPALJWvfJlifjGCXB5jVwNCKgHB2AGk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=G1m5msKm; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:In-Reply-To:References;
-	bh=+DLaccrhT7k3iqNDz0dREoZuUXR57sjg+S8VyePm5mQ=; b=G1m5msKmAfBf9ZNueJ+c/Ji6BO
-	Yj6fnJV/s5myjTAETURpRbLGNB7kzaZIbnBth+ttT3hBkdWw5WcPnuAxSUiamGBJ1/OcTsgTW51+L
-	D02A5wLJHqdo6aotTVu+Mt/lplr5lyra6A8uZ+cOEwU9Fn4skXDvkmMRuMsK2bFBctngphVpVD3sG
-	ygQWk0W3KSXvO4RN8cCSo+FW0rmC60v18VsxF3FEM09YkiLqfHLM5T26y2NqQk+MGVIWqqy+SFU5S
-	10rDPC/wfJAkgI7SNeZ+FONEOt2nWa9fl1tHKrIQNAi3/KZPrZYQr8w/mDkdfgWajAIF1JDr34oQg
-	s/Kv7d7Q==;
-Received: from 19.249.197.178.dynamic.dsl-lte-bonding.lssmb00p-msn.res.cust.swisscom.ch ([178.197.249.19] helo=localhost)
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1s0UHJ-000EB8-5k; Sat, 27 Apr 2024 00:42:49 +0200
-From: Daniel Borkmann <daniel@iogearbox.net>
-To: davem@davemloft.net
-Cc: kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	daniel@iogearbox.net,
-	ast@kernel.org,
-	andrii@kernel.org,
-	martin.lau@linux.dev,
-	netdev@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: pull-request: bpf 2024-04-26
-Date: Sat, 27 Apr 2024 00:42:48 +0200
-Message-Id: <20240426224248.26197-1-daniel@iogearbox.net>
-X-Mailer: git-send-email 2.21.0
+	s=arc-20240116; t=1714171970; c=relaxed/simple;
+	bh=GGKvZY/aR+pMIP6jcgcCcgx8wajd6k+Nq0JvOWeoq/A=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=tZm6yY9+GpEhzq0FSIxTODenVI9Vm4abzKDlXHhmK+EYudKp4fuG8puFvkheiZWY/pJYB1lwHH16nc4M8/kSfvzfMVjf27VTj38gPkLIJlaxq9aGKGEFKEkG1V+n8e5AantGpRQ/2g8PY1g9GmFRLTafBbk8t2VMTVjyt80a3mI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YJDm2U99; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9CE99C113CD;
+	Fri, 26 Apr 2024 22:52:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714171969;
+	bh=GGKvZY/aR+pMIP6jcgcCcgx8wajd6k+Nq0JvOWeoq/A=;
+	h=Date:From:To:Cc:Subject:From;
+	b=YJDm2U9985ITJNTGGqD9z04mvBoKHm7XhoD9TMfQ1axuXVQe2yfyDLjgCLCeCNxAg
+	 kifRR3WzkdHd7olWi7Z7cq6Lb9ZKjlx3xWS8Ha7dR4GPNE+4JI+zn2f2wZD58acrLR
+	 dhbLXcwTExWFLNLXotRIy9epW87F9wRp/nl6Pe8va7yImlELjmhPne5F0MQgpBp7Dq
+	 11q0Zl3l9YVTimdHXFsuCqQDQNkvFDo8AaOHq9jIAP7dTqv0Z6ddWYGbLr7SATCli8
+	 apqF5E0ksjadwDcJAPG6xMUCDISuhHIx72Jthda+8dORes6NHpBtAIfGLJNl5KQ9Ft
+	 1QBgRtVpK774w==
+Date: Fri, 26 Apr 2024 16:52:46 -0600
+From: "Gustavo A. R. Silva" <gustavoars@kernel.org>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	linux-hardening@vger.kernel.org
+Subject: [PATCH v2][next] Bluetooth: hci_conn, hci_sync: Use __counted_by()
+ in multiple structs and avoid -Wfamnae warnings
+Message-ID: <ZiwwPmCvU25YzWek@neat>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27257/Fri Apr 26 10:25:03 2024)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Hi David, hi Jakub, hi Paolo, hi Eric,
+Prepare for the coming implementation by GCC and Clang of the
+__counted_by attribute. Flexible array members annotated with
+__counted_by can have their accesses bounds-checked at run-time
+via CONFIG_UBSAN_BOUNDS (for array indexing) and CONFIG_FORTIFY_SOURCE
+(for strcpy/memcpy-family functions).
 
-The following pull-request contains BPF updates for your *net* tree.
+Also, -Wflex-array-member-not-at-end is coming in GCC-14, and we are
+getting ready to enable it globally.
 
-We've added 12 non-merge commits during the last 22 day(s) which contain
-a total of 14 files changed, 168 insertions(+), 72 deletions(-).
+So, use the `DEFINE_FLEX()` helper for multiple on-stack definitions
+of a flexible structure where the size of the flexible-array member
+is known at compile-time, and refactor the rest of the code,
+accordingly.
 
-The main changes are:
+Notice that, due to the use of `__counted_by()` in `struct
+hci_cp_le_create_cis`, the for loop in function `hci_cs_le_create_cis()`
+had to be modified. Once the index `i`, through which `cp->cis[i]` is
+accessed, falls in the interval [0, cp->num_cis), `cp->num_cis` cannot
+be decremented all the way down to zero while accessing `cp->cis[]`:
 
-1) Fix BPF_PROBE_MEM in verifier and JIT to skip loads from vsyscall page, from Puranjay Mohan.
+net/bluetooth/hci_event.c:4310:
+4310    for (i = 0; cp->num_cis; cp->num_cis--, i++) {
+                ...
+4314            handle = __le16_to_cpu(cp->cis[i].cis_handle);
 
-2) Fix a crash in XDP with devmap broadcast redirect when the latter map is in process
-   of being torn down, from Toke Høiland-Jørgensen.
+otherwise, only half (one iteration before `cp->num_cis == i`) or half
+plus one (one iteration before `cp->num_cis < i`) of the items in the
+array will be accessed before running into an out-of-bounds issue. So,
+in order to avoid this, set `cp->num_cis` to zero just after the for
+loop.
 
-3) Fix arm64 and riscv64 BPF JITs to properly clear start time for BPF program runtime
-   stats, from Xu Kuohai.
+Also, make use of `aux_num_cis` variable to update `cmd->num_cis` after
+a `list_for_each_entry_rcu()` loop.
 
-4) Fix a sockmap KCSAN-reported data race in sk_psock_skb_ingress_enqueue, from Jason Xing.
+With these changes, fix the following warnings:
+net/bluetooth/hci_sync.c:1239:56: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+net/bluetooth/hci_sync.c:1415:51: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+net/bluetooth/hci_sync.c:1731:51: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+net/bluetooth/hci_sync.c:6497:45: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
 
-5) Fix BPF verifier error message in resolve_pseudo_ldimm64, from Anton Protopopov.
+Link: https://github.com/KSPP/linux/issues/202
+Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+---
+Changes in v2:
+ - Update `cmd->num_cis` after `list_for_each_entry_rcu()` loop.
 
-6) Fix missing DEBUG_INFO_BTF_MODULES Kconfig menu item, from Andrii Nakryiko.
+v1:
+ - Link: https://lore.kernel.org/linux-hardening/ZiwqqZCa7PK9bzCX@neat/
 
-Please consider pulling these changes from:
+ include/net/bluetooth/hci.h |  8 ++--
+ net/bluetooth/hci_event.c   |  3 +-
+ net/bluetooth/hci_sync.c    | 84 +++++++++++++++----------------------
+ 3 files changed, 40 insertions(+), 55 deletions(-)
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git tags/for-netdev
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index fe23e862921d..c4c6b8810701 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -2026,7 +2026,7 @@ struct hci_cp_le_set_ext_adv_data {
+ 	__u8  operation;
+ 	__u8  frag_pref;
+ 	__u8  length;
+-	__u8  data[];
++	__u8  data[] __counted_by(length);
+ } __packed;
+ 
+ #define HCI_OP_LE_SET_EXT_SCAN_RSP_DATA		0x2038
+@@ -2035,7 +2035,7 @@ struct hci_cp_le_set_ext_scan_rsp_data {
+ 	__u8  operation;
+ 	__u8  frag_pref;
+ 	__u8  length;
+-	__u8  data[];
++	__u8  data[] __counted_by(length);
+ } __packed;
+ 
+ #define HCI_OP_LE_SET_EXT_ADV_ENABLE		0x2039
+@@ -2061,7 +2061,7 @@ struct hci_cp_le_set_per_adv_data {
+ 	__u8  handle;
+ 	__u8  operation;
+ 	__u8  length;
+-	__u8  data[];
++	__u8  data[] __counted_by(length);
+ } __packed;
+ 
+ #define HCI_OP_LE_SET_PER_ADV_ENABLE		0x2040
+@@ -2162,7 +2162,7 @@ struct hci_cis {
+ 
+ struct hci_cp_le_create_cis {
+ 	__u8    num_cis;
+-	struct hci_cis cis[];
++	struct hci_cis cis[] __counted_by(num_cis);
+ } __packed;
+ 
+ #define HCI_OP_LE_REMOVE_CIG			0x2065
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 9a38e155537e..9a7ca084302e 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -4307,7 +4307,7 @@ static void hci_cs_le_create_cis(struct hci_dev *hdev, u8 status)
+ 	hci_dev_lock(hdev);
+ 
+ 	/* Remove connection if command failed */
+-	for (i = 0; cp->num_cis; cp->num_cis--, i++) {
++	for (i = 0; i < cp->num_cis; i++) {
+ 		struct hci_conn *conn;
+ 		u16 handle;
+ 
+@@ -4323,6 +4323,7 @@ static void hci_cs_le_create_cis(struct hci_dev *hdev, u8 status)
+ 			hci_conn_del(conn);
+ 		}
+ 	}
++	cp->num_cis = 0;
+ 
+ 	if (pending)
+ 		hci_le_create_cis_pending(hdev);
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index 9092b4d59545..6e15594d3565 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -1235,31 +1235,27 @@ int hci_setup_ext_adv_instance_sync(struct hci_dev *hdev, u8 instance)
+ 
+ static int hci_set_ext_scan_rsp_data_sync(struct hci_dev *hdev, u8 instance)
+ {
+-	struct {
+-		struct hci_cp_le_set_ext_scan_rsp_data cp;
+-		u8 data[HCI_MAX_EXT_AD_LENGTH];
+-	} pdu;
++	DEFINE_FLEX(struct hci_cp_le_set_ext_scan_rsp_data, pdu, data, length,
++		    HCI_MAX_EXT_AD_LENGTH);
+ 	u8 len;
+ 	struct adv_info *adv = NULL;
+ 	int err;
+ 
+-	memset(&pdu, 0, sizeof(pdu));
+-
+ 	if (instance) {
+ 		adv = hci_find_adv_instance(hdev, instance);
+ 		if (!adv || !adv->scan_rsp_changed)
+ 			return 0;
+ 	}
+ 
+-	len = eir_create_scan_rsp(hdev, instance, pdu.data);
++	len = eir_create_scan_rsp(hdev, instance, pdu->data);
+ 
+-	pdu.cp.handle = instance;
+-	pdu.cp.length = len;
+-	pdu.cp.operation = LE_SET_ADV_DATA_OP_COMPLETE;
+-	pdu.cp.frag_pref = LE_SET_ADV_DATA_NO_FRAG;
++	pdu->handle = instance;
++	pdu->length = len;
++	pdu->operation = LE_SET_ADV_DATA_OP_COMPLETE;
++	pdu->frag_pref = LE_SET_ADV_DATA_NO_FRAG;
+ 
+ 	err = __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_EXT_SCAN_RSP_DATA,
+-				    sizeof(pdu.cp) + len, &pdu.cp,
++				    struct_size(pdu, data, len), pdu,
+ 				    HCI_CMD_TIMEOUT);
+ 	if (err)
+ 		return err;
+@@ -1267,7 +1263,7 @@ static int hci_set_ext_scan_rsp_data_sync(struct hci_dev *hdev, u8 instance)
+ 	if (adv) {
+ 		adv->scan_rsp_changed = false;
+ 	} else {
+-		memcpy(hdev->scan_rsp_data, pdu.data, len);
++		memcpy(hdev->scan_rsp_data, pdu->data, len);
+ 		hdev->scan_rsp_data_len = len;
+ 	}
+ 
+@@ -1411,14 +1407,10 @@ static int hci_set_per_adv_params_sync(struct hci_dev *hdev, u8 instance,
+ 
+ static int hci_set_per_adv_data_sync(struct hci_dev *hdev, u8 instance)
+ {
+-	struct {
+-		struct hci_cp_le_set_per_adv_data cp;
+-		u8 data[HCI_MAX_PER_AD_LENGTH];
+-	} pdu;
++	DEFINE_FLEX(struct hci_cp_le_set_per_adv_data, pdu, data, length,
++		    HCI_MAX_PER_AD_LENGTH);
+ 	u8 len;
+ 
+-	memset(&pdu, 0, sizeof(pdu));
+-
+ 	if (instance) {
+ 		struct adv_info *adv = hci_find_adv_instance(hdev, instance);
+ 
+@@ -1426,14 +1418,14 @@ static int hci_set_per_adv_data_sync(struct hci_dev *hdev, u8 instance)
+ 			return 0;
+ 	}
+ 
+-	len = eir_create_per_adv_data(hdev, instance, pdu.data);
++	len = eir_create_per_adv_data(hdev, instance, pdu->data);
+ 
+-	pdu.cp.length = len;
+-	pdu.cp.handle = instance;
+-	pdu.cp.operation = LE_SET_ADV_DATA_OP_COMPLETE;
++	pdu->length = len;
++	pdu->handle = instance;
++	pdu->operation = LE_SET_ADV_DATA_OP_COMPLETE;
+ 
+ 	return __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_PER_ADV_DATA,
+-				     sizeof(pdu.cp) + len, &pdu,
++				     struct_size(pdu, data, len), pdu,
+ 				     HCI_CMD_TIMEOUT);
+ }
+ 
+@@ -1727,31 +1719,27 @@ int hci_le_terminate_big_sync(struct hci_dev *hdev, u8 handle, u8 reason)
+ 
+ static int hci_set_ext_adv_data_sync(struct hci_dev *hdev, u8 instance)
+ {
+-	struct {
+-		struct hci_cp_le_set_ext_adv_data cp;
+-		u8 data[HCI_MAX_EXT_AD_LENGTH];
+-	} pdu;
++	DEFINE_FLEX(struct hci_cp_le_set_ext_adv_data, pdu, data, length,
++		    HCI_MAX_EXT_AD_LENGTH);
+ 	u8 len;
+ 	struct adv_info *adv = NULL;
+ 	int err;
+ 
+-	memset(&pdu, 0, sizeof(pdu));
+-
+ 	if (instance) {
+ 		adv = hci_find_adv_instance(hdev, instance);
+ 		if (!adv || !adv->adv_data_changed)
+ 			return 0;
+ 	}
+ 
+-	len = eir_create_adv_data(hdev, instance, pdu.data);
++	len = eir_create_adv_data(hdev, instance, pdu->data);
+ 
+-	pdu.cp.length = len;
+-	pdu.cp.handle = instance;
+-	pdu.cp.operation = LE_SET_ADV_DATA_OP_COMPLETE;
+-	pdu.cp.frag_pref = LE_SET_ADV_DATA_NO_FRAG;
++	pdu->length = len;
++	pdu->handle = instance;
++	pdu->operation = LE_SET_ADV_DATA_OP_COMPLETE;
++	pdu->frag_pref = LE_SET_ADV_DATA_NO_FRAG;
+ 
+ 	err = __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_EXT_ADV_DATA,
+-				    sizeof(pdu.cp) + len, &pdu.cp,
++				    struct_size(pdu, data, len), pdu,
+ 				    HCI_CMD_TIMEOUT);
+ 	if (err)
+ 		return err;
+@@ -1760,7 +1748,7 @@ static int hci_set_ext_adv_data_sync(struct hci_dev *hdev, u8 instance)
+ 	if (adv) {
+ 		adv->adv_data_changed = false;
+ 	} else {
+-		memcpy(hdev->adv_data, pdu.data, len);
++		memcpy(hdev->adv_data, pdu->data, len);
+ 		hdev->adv_data_len = len;
+ 	}
+ 
+@@ -6496,10 +6484,8 @@ static int hci_le_create_conn_sync(struct hci_dev *hdev, void *data)
+ 
+ int hci_le_create_cis_sync(struct hci_dev *hdev)
+ {
+-	struct {
+-		struct hci_cp_le_create_cis cp;
+-		struct hci_cis cis[0x1f];
+-	} cmd;
++	DEFINE_FLEX(struct hci_cp_le_create_cis, cmd, cis, num_cis, 0x1f);
++	size_t aux_num_cis = 0;
+ 	struct hci_conn *conn;
+ 	u8 cig = BT_ISO_QOS_CIG_UNSET;
+ 
+@@ -6526,8 +6512,6 @@ int hci_le_create_cis_sync(struct hci_dev *hdev)
+ 	 * remains pending.
+ 	 */
+ 
+-	memset(&cmd, 0, sizeof(cmd));
+-
+ 	hci_dev_lock(hdev);
+ 
+ 	rcu_read_lock();
+@@ -6564,7 +6548,7 @@ int hci_le_create_cis_sync(struct hci_dev *hdev)
+ 		goto done;
+ 
+ 	list_for_each_entry_rcu(conn, &hdev->conn_hash.list, list) {
+-		struct hci_cis *cis = &cmd.cis[cmd.cp.num_cis];
++		struct hci_cis *cis = &cmd->cis[aux_num_cis];
+ 
+ 		if (hci_conn_check_create_cis(conn) ||
+ 		    conn->iso_qos.ucast.cig != cig)
+@@ -6573,25 +6557,25 @@ int hci_le_create_cis_sync(struct hci_dev *hdev)
+ 		set_bit(HCI_CONN_CREATE_CIS, &conn->flags);
+ 		cis->acl_handle = cpu_to_le16(conn->parent->handle);
+ 		cis->cis_handle = cpu_to_le16(conn->handle);
+-		cmd.cp.num_cis++;
++		aux_num_cis++;
+ 
+-		if (cmd.cp.num_cis >= ARRAY_SIZE(cmd.cis))
++		if (aux_num_cis >= 0x1f)
+ 			break;
+ 	}
++	cmd->num_cis = aux_num_cis;
+ 
+ done:
+ 	rcu_read_unlock();
+ 
+ 	hci_dev_unlock(hdev);
+ 
+-	if (!cmd.cp.num_cis)
++	if (!aux_num_cis)
+ 		return 0;
+ 
+ 	/* Wait for HCI_LE_CIS_Established */
+ 	return __hci_cmd_sync_status_sk(hdev, HCI_OP_LE_CREATE_CIS,
+-					sizeof(cmd.cp) + sizeof(cmd.cis[0]) *
+-					cmd.cp.num_cis, &cmd,
+-					HCI_EVT_LE_CIS_ESTABLISHED,
++					struct_size(cmd, cis, cmd->num_cis),
++					cmd, HCI_EVT_LE_CIS_ESTABLISHED,
+ 					conn->conn_timeout, NULL);
+ }
+ 
+-- 
+2.34.1
 
-Thanks a lot!
-
-Also thanks to reporters, reviewers and testers of commits in this pull-request:
-
-Björn Töpel, Breno Leitao, Daniel Borkmann, Hangbin Liu, Ilya 
-Leoshkevich, Ivan Babrou, Jesper Dangaard Brouer, John Fastabend, Pu 
-Lehui, Russell King (Oracle), Stanislav Fomichev, Vincent Li
-
-----------------------------------------------------------------
-
-The following changes since commit c88b9b4cde17aec34fb9bfaf69f9f72a1c44f511:
-
-  Merge tag 'net-6.9-rc3' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2024-04-04 14:49:10 -0700)
-
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git tags/for-netdev
-
-for you to fetch changes up to a86538a2efb826b9a62c7b41e0499948b04aec7d:
-
-  Merge branch 'bpf-prevent-userspace-memory-access' (2024-04-26 09:45:19 -0700)
-
-----------------------------------------------------------------
-bpf-for-netdev
-
-----------------------------------------------------------------
-Alexei Starovoitov (1):
-      Merge branch 'bpf-prevent-userspace-memory-access'
-
-Andrii Nakryiko (1):
-      bpf, kconfig: Fix DEBUG_INFO_BTF_MODULES Kconfig definition
-
-Anton Protopopov (1):
-      bpf: Fix a verifier verbose message
-
-Björn Töpel (1):
-      MAINTAINERS: bpf: Add Lehui and Puranjay as riscv64 reviewers
-
-Jason Xing (1):
-      bpf, skmsg: Fix NULL pointer dereference in sk_psock_skb_ingress_enqueue
-
-Puranjay Mohan (5):
-      MAINTAINERS: Update email address for Puranjay Mohan
-      arm32, bpf: Reimplement sign-extension mov instruction
-      bpf: verifier: prevent userspace memory access
-      bpf, x86: Fix PROBE_MEM runtime load check
-      selftests/bpf: Test PROBE_MEM of VSYSCALL_ADDR on x86-64
-
-Toke Høiland-Jørgensen (1):
-      xdp: use flags field to disambiguate broadcast redirect
-
-Xu Kuohai (2):
-      bpf, arm64: Fix incorrect runtime stats
-      riscv, bpf: Fix incorrect runtime stats
-
- .mailmap                                           |  1 +
- MAINTAINERS                                        |  8 +--
- arch/arm/net/bpf_jit_32.c                          | 56 ++++++++++++++-----
- arch/arm64/net/bpf_jit_comp.c                      |  6 +--
- arch/riscv/net/bpf_jit_comp64.c                    |  6 +--
- arch/x86/net/bpf_jit_comp.c                        | 63 +++++++++++-----------
- include/linux/filter.h                             |  1 +
- include/linux/skmsg.h                              |  2 +
- kernel/bpf/core.c                                  |  9 ++++
- kernel/bpf/verifier.c                              | 33 +++++++++++-
- lib/Kconfig.debug                                  |  5 +-
- net/core/filter.c                                  | 42 +++++++++++----
- net/core/skmsg.c                                   |  5 +-
- .../selftests/bpf/bpf_testmod/bpf_testmod.c        |  3 ++
- 14 files changed, 168 insertions(+), 72 deletions(-)
 
