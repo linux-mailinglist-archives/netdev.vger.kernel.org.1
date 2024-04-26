@@ -1,135 +1,164 @@
-Return-Path: <netdev+bounces-91615-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91611-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8DDD28B3303
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 10:37:36 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CC078B32DC
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 10:35:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B09BCB24793
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 08:37:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7BC50B23C0D
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 08:35:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F09F813FD78;
-	Fri, 26 Apr 2024 08:32:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vQ8mtMLc"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C8D5146A95;
+	Fri, 26 Apr 2024 08:31:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B441E13D52F;
-	Fri, 26 Apr 2024 08:32:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E5FF146A87;
+	Fri, 26 Apr 2024 08:31:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714120332; cv=none; b=haWEOI+7SSue+syBSyTWLkIs8nLPTtqVU+x9wW9KUmSPagxNFNvkohkT5nfvwAZ6+bh6MVqgqqU5m3M0uW007GEdGqhaC4B/hgSrxkIx7nc8X4/ccSvWJxlQk4ZDZkdGjLUd3JjoEFfea/RSTLlcHFsf85uL1dOFZiK4BiITKoA=
+	t=1714120295; cv=none; b=BHsrcCAJ2KxehalnPlhWdbLT/vdP31bAE83X06byq3SckScXjgPdih3PQQAP+HpyFn/4i8NXGx1YQvyn6BO8udEa2l3fgwHk8duqHurPqTnK+KlEuOhU8aZuxDPALQ9KSpy3rEckXkAMXuGZcGh4tyuJqnDoomgmYnNuEcxJlOA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714120332; c=relaxed/simple;
-	bh=+AOj3OMDSB3feHYUPdQfVhUVtDWDdcImqVlO1v4xpng=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=d4yTNvNciG6F2KxfthpWPe879IjVVOii7I592AN79HB+9qBhcmHkq03D4g3j+IRSgegoqfikD2DD0rKmxNror5Y8UyYoNENPAGSj1jPnOWFR2yND0pzvMRW9+GUbly1Eg3mt4oZivJEKVU6aELbc5YjpYysFWgMkIGxUdm5zXJQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vQ8mtMLc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B5724C2BD10;
-	Fri, 26 Apr 2024 08:32:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714120332;
-	bh=+AOj3OMDSB3feHYUPdQfVhUVtDWDdcImqVlO1v4xpng=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=vQ8mtMLcrimNPX91Y2YQmvdQw4cikExY2pLxFz+/UT+e9TLir0xOZ3FBo5RrzGpzb
-	 JWR44T3XJshDZMYXiba7l/A544v2LOC9MQLrngwOyrxDozIHscwKHoIb5QIGzqfNXg
-	 hlLFV/4Q2E5d2sHTZ7tlXh/zsv1dp1lvJElyqwmb0wchrenBmob4Dc1MtkVQ+MEtdh
-	 7oC9vfii7ckW0bsH176/J480uOF/fn8rgcExibP+RvW506G6An6Z0c8ibMrhm9JIVO
-	 4Z8XvkBOO1+QWHViSo081jrAt8THz37irqAEYTIKSADYbtZr55Yu4BB7vII7ZC4wKk
-	 Q8kmGiXMxjpQQ==
-From: Mike Rapoport <rppt@kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: Alexandre Ghiti <alexghiti@rivosinc.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	=?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	"David S. Miller" <davem@davemloft.net>,
-	Dinh Nguyen <dinguyen@kernel.org>,
-	Donald Dutile <ddutile@redhat.com>,
-	Eric Chanudet <echanude@redhat.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Helge Deller <deller@gmx.de>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	Kent Overstreet <kent.overstreet@linux.dev>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Mike Rapoport <rppt@kernel.org>,
-	Nadav Amit <nadav.amit@gmail.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Rick Edgecombe <rick.p.edgecombe@intel.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Sam Ravnborg <sam@ravnborg.org>,
-	Song Liu <song@kernel.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Will Deacon <will@kernel.org>,
-	bpf@vger.kernel.org,
-	linux-arch@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mips@vger.kernel.org,
-	linux-mm@kvack.org,
-	linux-modules@vger.kernel.org,
-	linux-parisc@vger.kernel.org,
-	linux-riscv@lists.infradead.org,
-	linux-s390@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org,
-	loongarch@lists.linux.dev,
-	netdev@vger.kernel.org,
-	sparclinux@vger.kernel.org,
-	x86@kernel.org
-Subject: [PATCH v6 16/16] bpf: remove CONFIG_BPF_JIT dependency on CONFIG_MODULES of
-Date: Fri, 26 Apr 2024 11:28:54 +0300
-Message-ID: <20240426082854.7355-17-rppt@kernel.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240426082854.7355-1-rppt@kernel.org>
-References: <20240426082854.7355-1-rppt@kernel.org>
+	s=arc-20240116; t=1714120295; c=relaxed/simple;
+	bh=ztikZnKwPPO3fTEhqHkzRqq/072CUY4gCrgpSsguOG8=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=gQ8Fw59RWGbQlFAzRmb/deQxCbRCkUKQRq6S1ZBNPiMyvgQ6tvDjA7IiXda3JsCqgM5yT4mbCz4lw4fXr+ZxBxTgKxSJHbALTDgY9n/QjQSfhMk3JgMlFWfQjEGJA9RODly5RkVpWVBgkEyqcnH6Tys38sv3s8G5lsSHcAy+wJQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.252])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4VQmBL4m7xzcb0k;
+	Fri, 26 Apr 2024 16:30:18 +0800 (CST)
+Received: from dggpemm500005.china.huawei.com (unknown [7.185.36.74])
+	by mail.maildlp.com (Postfix) with ESMTPS id 276DF180080;
+	Fri, 26 Apr 2024 16:31:24 +0800 (CST)
+Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
+ (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Fri, 26 Apr
+ 2024 16:31:23 +0800
+Subject: Re: [PATCH net] rxrpc: Fix using alignmask being zero for
+ __page_frag_alloc_align()
+To: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>, David
+ Howells <dhowells@redhat.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Alexander Duyck
+	<alexander.duyck@gmail.com>, Marc Dionne <marc.dionne@auristor.com>, Eric
+ Dumazet <edumazet@google.com>, <linux-afs@lists.infradead.org>
+References: <20240422115541.38548-1-linyunsheng@huawei.com>
+From: Yunsheng Lin <linyunsheng@huawei.com>
+Message-ID: <94ff6034-ce49-90e5-1f8a-afaf0ed20554@huawei.com>
+Date: Fri, 26 Apr 2024 16:31:23 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.2.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240422115541.38548-1-linyunsheng@huawei.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ dggpemm500005.china.huawei.com (7.185.36.74)
 
-From: "Mike Rapoport (IBM)" <rppt@kernel.org>
+On 2024/4/22 19:55, Yunsheng Lin wrote:
+> rxrpc_alloc_data_txbuf() may be called with data_align being
+> zero in none_alloc_txbuf() and rxkad_alloc_txbuf(), data_align
+> is supposed to be an order-based alignment value, but zero is
+> not a valid order-based alignment value, and '~(data_align - 1)'
+> doesn't result in a valid mask-based alignment value for
+> __page_frag_alloc_align().
+> 
+> Fix it by passing a valid order-based alignment value in
+> none_alloc_txbuf() and rxkad_alloc_txbuf().
+> 
+> Also use page_frag_alloc_align() expecting an order-based
+> alignment value in rxrpc_alloc_data_txbuf() to avoid doing the
+> alignment converting operation and to catch possible invalid
+> alignment value in the future. Remove the 'if (data_align)'
+> checking too, as it is always true for a valid order-based
+> alignment value.
+> 
 
-BPF just-in-time compiler depended on CONFIG_MODULES because it used
-module_alloc() to allocate memory for the generated code.
+Hi, All
 
-Since code allocations are now implemented with execmem, drop dependency of
-CONFIG_BPF_JIT on CONFIG_MODULES and make it select CONFIG_EXECMEM.
+Looking at the entry in MAINTAINERS, it seems this patch is
+supposed to go through David Howells's tree if this patch is
+ok to go as the state of this patch in netdevbpf' patchwork
+is changed to 'Not Applicable'?
 
-Suggested-by: Björn Töpel <bjorn@kernel.org>
-Signed-off-by: Mike Rapoport (IBM) <rppt@kernel.org>
----
- kernel/bpf/Kconfig | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+@David, please take a look if this patch is ok?
 
-diff --git a/kernel/bpf/Kconfig b/kernel/bpf/Kconfig
-index bc25f5098a25..f999e4e0b344 100644
---- a/kernel/bpf/Kconfig
-+++ b/kernel/bpf/Kconfig
-@@ -43,7 +43,7 @@ config BPF_JIT
- 	bool "Enable BPF Just In Time compiler"
- 	depends on BPF
- 	depends on HAVE_CBPF_JIT || HAVE_EBPF_JIT
--	depends on MODULES
-+	select EXECMEM
- 	help
- 	  BPF programs are normally handled by a BPF interpreter. This option
- 	  allows the kernel to generate native code when a program is loaded
--- 
-2.43.0
-
+> Fixes: 6b2536462fd4 ("rxrpc: Fix use of changed alignment param to page_frag_alloc_align()")
+> Fixes: 49489bb03a50 ("rxrpc: Do zerocopy using MSG_SPLICE_PAGES and page frags")
+> CC: David Howells <dhowells@redhat.com>
+> CC: Alexander Duyck <alexander.duyck@gmail.com>
+> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
+> ---
+>  net/rxrpc/insecure.c |  2 +-
+>  net/rxrpc/rxkad.c    |  2 +-
+>  net/rxrpc/txbuf.c    | 10 +++++-----
+>  3 files changed, 7 insertions(+), 7 deletions(-)
+> 
+> diff --git a/net/rxrpc/insecure.c b/net/rxrpc/insecure.c
+> index f2701068ed9e..b52b75a0fdac 100644
+> --- a/net/rxrpc/insecure.c
+> +++ b/net/rxrpc/insecure.c
+> @@ -19,7 +19,7 @@ static int none_init_connection_security(struct rxrpc_connection *conn,
+>   */
+>  static struct rxrpc_txbuf *none_alloc_txbuf(struct rxrpc_call *call, size_t remain, gfp_t gfp)
+>  {
+> -	return rxrpc_alloc_data_txbuf(call, min_t(size_t, remain, RXRPC_JUMBO_DATALEN), 0, gfp);
+> +	return rxrpc_alloc_data_txbuf(call, min_t(size_t, remain, RXRPC_JUMBO_DATALEN), 1U, gfp);
+>  }
+>  
+>  static int none_secure_packet(struct rxrpc_call *call, struct rxrpc_txbuf *txb)
+> diff --git a/net/rxrpc/rxkad.c b/net/rxrpc/rxkad.c
+> index f1a68270862d..c48e93a26b2a 100644
+> --- a/net/rxrpc/rxkad.c
+> +++ b/net/rxrpc/rxkad.c
+> @@ -155,7 +155,7 @@ static struct rxrpc_txbuf *rxkad_alloc_txbuf(struct rxrpc_call *call, size_t rem
+>  	switch (call->conn->security_level) {
+>  	default:
+>  		space = min_t(size_t, remain, RXRPC_JUMBO_DATALEN);
+> -		return rxrpc_alloc_data_txbuf(call, space, 0, gfp);
+> +		return rxrpc_alloc_data_txbuf(call, space, 1U, gfp);
+>  	case RXRPC_SECURITY_AUTH:
+>  		shdr = sizeof(struct rxkad_level1_hdr);
+>  		break;
+> diff --git a/net/rxrpc/txbuf.c b/net/rxrpc/txbuf.c
+> index e0679658d9de..994d6582d5e2 100644
+> --- a/net/rxrpc/txbuf.c
+> +++ b/net/rxrpc/txbuf.c
+> @@ -21,20 +21,20 @@ struct rxrpc_txbuf *rxrpc_alloc_data_txbuf(struct rxrpc_call *call, size_t data_
+>  {
+>  	struct rxrpc_wire_header *whdr;
+>  	struct rxrpc_txbuf *txb;
+> -	size_t total, hoff = 0;
+> +	size_t total, hoff;
+>  	void *buf;
+>  
+>  	txb = kmalloc(sizeof(*txb), gfp);
+>  	if (!txb)
+>  		return NULL;
+>  
+> -	if (data_align)
+> -		hoff = round_up(sizeof(*whdr), data_align) - sizeof(*whdr);
+> +	hoff = round_up(sizeof(*whdr), data_align) - sizeof(*whdr);
+>  	total = hoff + sizeof(*whdr) + data_size;
+>  
+> +	data_align = max_t(size_t, data_align, L1_CACHE_BYTES);
+>  	mutex_lock(&call->conn->tx_data_alloc_lock);
+> -	buf = __page_frag_alloc_align(&call->conn->tx_data_alloc, total, gfp,
+> -				      ~(data_align - 1) & ~(L1_CACHE_BYTES - 1));
+> +	buf = page_frag_alloc_align(&call->conn->tx_data_alloc, total, gfp,
+> +				    data_align);
+>  	mutex_unlock(&call->conn->tx_data_alloc_lock);
+>  	if (!buf) {
+>  		kfree(txb);
+> 
 
