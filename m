@@ -1,113 +1,289 @@
-Return-Path: <netdev+bounces-91631-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91632-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D4778B342B
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 11:34:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D3358B3445
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 11:38:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 162ACB232EE
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 09:34:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0481B2885D0
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 09:38:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9793813F00B;
-	Fri, 26 Apr 2024 09:34:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bJbjzZOn"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9A6913F011;
+	Fri, 26 Apr 2024 09:38:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 337A4143889
-	for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 09:34:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83A3313C9A7;
+	Fri, 26 Apr 2024 09:38:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714124052; cv=none; b=m9OkaoPlIqOFw4YxG006UJyKZBgnQL4r+yEgm0NEIOoyQ+14pz+Qu+rLwQRwY8ytv/mdGVqwMbBKG6ja5TjDft+J0wK3lf4gKm7BCyiyWTtPrhe8wQyKGHNQH9eScND+NZEnLLYjlslsya9fALkRWPZHqBQuzUTKowybnWlCgLY=
+	t=1714124292; cv=none; b=rkMLjVytVQ0BO/ToBHhvMCD2QiLASFVFPyzRKr7Pm+WTvzrHvPZALA2Q+q2TfXQiV3/ouCPMfYRIlnkZK0f5uxC1eGJhmISLmJSa6Ca217BQgfYrh0RCKXEYv3sm3jwJQf0BoH65JWxaq7be0bZmMwwa9bYudRbctH9ac12kRJI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714124052; c=relaxed/simple;
-	bh=RQ6woi85gw4qLIzei2PLjndUkuwHxa3Srvvg0Dvyk2w=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=LVY20s4lG8eAhEahQyi44l24Af+Kj4Y1CDAk6ab0XCJQXcWHf9j8II0dIiAHa1jJqmxZYnu/6TZ4gSUQ2xfqiWGoDW0ix+TtNJ3zI7iP7Q7Qeu5/khN1NtZjDT3Jcqqlny2DEgdaSMAkPHw5Eo3Smri7O3+S4juxQKGhZuEf4sc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bJbjzZOn; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1714124050;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=+5gSDiXXx19qBIFWwSlDQIfYsIaB/p4PVVkImpAFSKg=;
-	b=bJbjzZOnOFHMfYZqy25xaL4UavI3ClrR1gTA+3MMa90iPtOPTpcZUi+Lpub566fLSXDNWM
-	vMcNeu+4rURwvy2ewnXic55XoEMkKW1kNKXroSdZ6IFjuuq6yrGgaoCghEVWbwLInSKirE
-	RGu7622aoUY6fWXTuEKHFpB6ndbpnmY=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-592-5O-TXAlzM3mHg06vVBH9tA-1; Fri, 26 Apr 2024 05:34:08 -0400
-X-MC-Unique: 5O-TXAlzM3mHg06vVBH9tA-1
-Received: by mail-ed1-f71.google.com with SMTP id 4fb4d7f45d1cf-57021782d67so268869a12.0
-        for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 02:34:08 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714124048; x=1714728848;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+5gSDiXXx19qBIFWwSlDQIfYsIaB/p4PVVkImpAFSKg=;
-        b=WrIeGS7fwrBbFHcOTI4YjQO/VvzYAh9Vlqfq4EtYVcbw8VamFgib0ZqYVWWR5fukxL
-         cs8Vl+a0bh1EON7b5VmtA5TObMUP8SemmTNhSScf6LxFx/qGy1O4+CoypIB/hYTjjHq3
-         JCki5bJUHtdXhbD1bGsHmEdXX1S4rPo6VDx//tUTK8V54Vwton0iiewZpudz6crW97g1
-         h1vEnKg+cJLxZ8Qh162NE+Gx/HOYm5FZ/fm04BXBK2vT/vDWTtmKVcAfDH5VqiWEap35
-         SoXOlv+IS1TmoBUklFwhq6WvOm6IaLVcjirAbJ2kGmY/5Lt8BKhiD1wRQmQq0457RwYR
-         y2SQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWcFWk1ufwlEGpbYvpkhzz5ZMrWDQlBMjYqcqqa8XjitCYYBXUq44XqNy4lHsHDcQCSABkZlKOTxuCUMF9rFXZQNLwDbFhD
-X-Gm-Message-State: AOJu0YyZaBKAq1fgSkJouxR7naFyoxj/qYpcN3/Hydeby2+0n6/VZ/K6
-	COtn64T/MdVB2KindtwccHfuGORbC9ajx5GaJ4tCwkGslDtM7fWQjiLCA3K6K+6mH/VpWL5wzUr
-	7HWOcbUe0ECoRds4zeEO/ofxjAmuPKM4Rc/E+RxkRFwAz/IM8ipYx/w==
-X-Received: by 2002:a17:906:8312:b0:a58:be00:7e88 with SMTP id j18-20020a170906831200b00a58be007e88mr1263754ejx.2.1714124047804;
-        Fri, 26 Apr 2024 02:34:07 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFp5ht+oApyDbpznfxVly5cAfzBn9xYEuY/T4P3W646T8scZotXQsopA65XIGPo55np4nxLEQ==
-X-Received: by 2002:a17:906:8312:b0:a58:be00:7e88 with SMTP id j18-20020a170906831200b00a58be007e88mr1263738ejx.2.1714124047449;
-        Fri, 26 Apr 2024 02:34:07 -0700 (PDT)
-Received: from gerbillo.redhat.com ([2a0d:3344:171d:a510::f71])
-        by smtp.gmail.com with ESMTPSA id f7-20020a05600c154700b004190d7126c0sm25645991wmg.38.2024.04.26.02.34.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 26 Apr 2024 02:34:07 -0700 (PDT)
-Message-ID: <d1ff9e85ee4bf1b6347e2ebbf28490645e0cd8b7.camel@redhat.com>
-Subject: Re: [PATCH net-next v5 2/6] virtio_net: Remove command data from
- control_buf
-From: Paolo Abeni <pabeni@redhat.com>
-To: Daniel Jurgens <danielj@nvidia.com>, netdev@vger.kernel.org
-Cc: mst@redhat.com, jasowang@redhat.com, xuanzhuo@linux.alibaba.com, 
-	virtualization@lists.linux.dev, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, jiri@nvidia.com
-Date: Fri, 26 Apr 2024 11:34:05 +0200
-In-Reply-To: <20240423035746.699466-3-danielj@nvidia.com>
-References: <20240423035746.699466-1-danielj@nvidia.com>
-	 <20240423035746.699466-3-danielj@nvidia.com>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
+	s=arc-20240116; t=1714124292; c=relaxed/simple;
+	bh=1iMFtZnjk8H0Dg72c9aJ7ZABHqaO+HlPveUZ8X7NXBw=;
+	h=Subject:From:To:CC:References:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=QuzYdwFChNa0/c4nKsT5Og3ackesYpYej47hgPDxw5pmxPh15GKH3YubFuawso/t0F7f9kRAG1YP/uNIXwLuvnkHb8I2sz5meGfdIo21I2iHr1GvR8u7plq1AmQqS7RN/D82sfW/+nB/HjFBRgspgyZsllPn0byKdgIOqs+dfRg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.174])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4VQncr3VWLzwVGG;
+	Fri, 26 Apr 2024 17:34:52 +0800 (CST)
+Received: from dggpemm500005.china.huawei.com (unknown [7.185.36.74])
+	by mail.maildlp.com (Postfix) with ESMTPS id 68444140382;
+	Fri, 26 Apr 2024 17:38:05 +0800 (CST)
+Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
+ (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Fri, 26 Apr
+ 2024 17:38:05 +0800
+Subject: Re: [PATCH net-next v2 09/15] mm: page_frag: reuse MSB of 'size'
+ field for pfmemalloc
+From: Yunsheng Lin <linyunsheng@huawei.com>
+To: Alexander H Duyck <alexander.duyck@gmail.com>, <davem@davemloft.net>,
+	<kuba@kernel.org>, <pabeni@redhat.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Andrew Morton
+	<akpm@linux-foundation.org>, <linux-mm@kvack.org>
+References: <20240415131941.51153-1-linyunsheng@huawei.com>
+ <20240415131941.51153-10-linyunsheng@huawei.com>
+ <37d012438d4850c3d7090e784e09088d02a2780c.camel@gmail.com>
+ <8b7361c2-6f45-72e8-5aca-92e8a41a7e5e@huawei.com>
+ <17066b6a4f941eea3ef567767450b311096da22b.camel@gmail.com>
+ <c45fdd75-44be-82a6-8e47-42bbc5ee4795@huawei.com>
+Message-ID: <efd21f1d-8c67-b060-5ad2-0d500fac2ba6@huawei.com>
+Date: Fri, 26 Apr 2024 17:38:04 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.2.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+In-Reply-To: <c45fdd75-44be-82a6-8e47-42bbc5ee4795@huawei.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ dggpemm500005.china.huawei.com (7.185.36.74)
 
-On Tue, 2024-04-23 at 06:57 +0300, Daniel Jurgens wrote:
-> Allocate memory for the data when it's used. Ideally the could be on the
+On 2024/4/18 17:39, Yunsheng Lin wrote:
 
-Minor nit: 'buffer' or 'struct' is missing here          ^^^^
+...
 
-No need to repost just for this.
+> 
+>> combining the pagecnt_bias with the va. I'm wondering if it wouldn't
+>> make more sense to look at putting together the structure something
+>> like:
+>>
+>> #if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE)
+>> typedef u16 page_frag_bias_t;
+>> #else
+>> typedef u32 page_frag_bias_t;
+>> #endif
+>>
+>> struct page_frag_cache {
+>> 	/* page address and offset */
+>> 	void *va;
+> 
+> Generally I am agreed with combining the virtual address with the
+> offset for the reason you mentioned below.
+> 
+>> 	page_frag_bias_t pagecnt_bias;
+>> 	u8 pfmemalloc;
+>> 	u8 page_frag_order;
+>> }
+> 
+> The issue with the 'page_frag_order' I see is that we might need to do
+> a 'PAGE << page_frag_order' to get actual size, and we might also need
+> to do 'size - 1' to get the size_mask if we want to mask out the offset
+> from the 'va'.
+> 
+> For page_frag_order, we need to:
+> size = PAGE << page_frag_order
+> size_mask = size - 1
+> 
+> For size_mask, it seem we only need to do:
+> size = size_mask + 1
+> 
+> And as PAGE_FRAG_CACHE_MAX_SIZE = 32K, which can be fitted into 15 bits
+> if we use size_mask instead of size.
+> 
+> Does it make sense to use below, so that we only need to use bitfield
+> for SIZE < PAGE_FRAG_CACHE_MAX_SIZE in 32 bits system? And 'struct
+> page_frag' is using a similar '(BITS_PER_LONG > 32)' checking trick.
+> 
+> struct page_frag_cache {
+> 	/* page address and offset */
+> 	void *va;
+> 
+> #if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE) && (BITS_PER_LONG <= 32)
+> 	u16 pagecnt_bias;
+> 	u16 size_mask:15;
+> 	u16 pfmemalloc:1;
+> #else
+> 	u32 pagecnt_bias;
+> 	u16 size_mask;
+> 	u16 pfmemalloc;
+> #endif
+> };
+> 
 
-Thank,
+After considering a few different layouts for 'struct page_frag_cache',
+it seems the below is more optimized:
 
-Paolo
+struct page_frag_cache {
+	/* page address & pfmemalloc & order */
+	void *va;
 
+#if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE) && (BITS_PER_LONG <= 32)
+	u16 pagecnt_bias;
+	u16 size;
+#else
+	u32 pagecnt_bias;
+	u32 size;
+#endif
+}
+
+The lower bits of 'va' is or'ed with the page order & pfmemalloc instead
+of offset or pagecnt_bias, so that we don't have to add more checking
+for handling the problem of not having enough space for offset or
+pagecnt_bias for PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE and 32 bits system.
+And page address & pfmemalloc & order is unchanged for the same page
+in the same 'page_frag_cache' instance, it makes sense to fit them
+together.
+
+Also, it seems it is better to replace 'offset' with 'size', which indicates
+the remaining size for the cache in a 'page_frag_cache' instance, and we
+might be able to do a single 'size >= fragsz' checking for the case of cache
+being enough, which should be the fast path if we ensure size is zoro when
+'va' == NULL.
+
+Something like below:
+
+#define PAGE_FRAG_CACHE_ORDER_MASK	GENMASK(1, 0)
+#define PAGE_FRAG_CACHE_PFMEMALLOC_BIT	BIT(2)
+
+struct page_frag_cache {
+	/* page address & pfmemalloc & order */
+	void *va;
+
+#if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE) && (BITS_PER_LONG <= 32)
+	u16 pagecnt_bias;
+	u16 size;
+#else
+	u32 pagecnt_bias;
+	u32 size;
+#endif
+};
+
+
+static void *__page_frag_cache_refill(struct page_frag_cache *nc,
+				      unsigned int fragsz, gfp_t gfp_mask,
+				      unsigned int align_mask)
+{
+	gfp_t gfp = gfp_mask;
+	struct page *page;
+	void *va;
+
+#if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE)
+	/* Ensure free_unref_page() can be used to free the page fragment */
+	BUILD_BUG_ON(PAGE_FRAG_CACHE_MAX_ORDER > PAGE_ALLOC_COSTLY_ORDER);
+
+	gfp_mask = (gfp_mask & ~__GFP_DIRECT_RECLAIM) |  __GFP_COMP |
+		   __GFP_NOWARN | __GFP_NORETRY | __GFP_NOMEMALLOC;
+	page = alloc_pages_node(NUMA_NO_NODE, gfp_mask,
+				PAGE_FRAG_CACHE_MAX_ORDER);
+	if (likely(page)) {
+		nc->size = PAGE_FRAG_CACHE_MAX_SIZE - fragsz;
+		va = page_address(page);
+		nc->va = (void *)((unsigned long)va |
+				  PAGE_FRAG_CACHE_MAX_ORDER |
+				  (page_is_pfmemalloc(page) ?
+				   PAGE_FRAG_CACHE_PFMEMALLOC_BIT : 0));
+		page_ref_add(page, PAGE_FRAG_CACHE_MAX_SIZE);
+		nc->pagecnt_bias = PAGE_FRAG_CACHE_MAX_SIZE;
+		return va;
+	}
+#endif
+	page = alloc_pages_node(NUMA_NO_NODE, gfp, 0);
+	if (likely(page)) {
+		nc->size = PAGE_SIZE - fragsz;
+		va = page_address(page);
+		nc->va = (void *)((unsigned long)va |
+				  (page_is_pfmemalloc(page) ?
+				   PAGE_FRAG_CACHE_PFMEMALLOC_BIT : 0));
+		page_ref_add(page, PAGE_FRAG_CACHE_MAX_SIZE);
+		nc->pagecnt_bias = PAGE_FRAG_CACHE_MAX_SIZE;
+		return va;
+	}
+
+	nc->va = NULL;
+	nc->size = 0;
+	return NULL;
+}
+
+void *__page_frag_alloc_va_align(struct page_frag_cache *nc,
+				 unsigned int fragsz, gfp_t gfp_mask,
+				 unsigned int align_mask)
+{
+#if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE)
+	unsigned long page_order;
+#endif
+	unsigned long page_size;
+	unsigned long size;
+	struct page *page;
+	void *va;
+
+	size = nc->size & align_mask;
+	va = nc->va;
+#if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE)
+	page_order = (unsigned long)va & PAGE_FRAG_CACHE_ORDER_MASK;
+	page_size = PAGE_SIZE << page_order;
+#else
+	page_size = PAGE_SIZE;
+#endif
+
+	if (unlikely(fragsz > size)) {
+		if (unlikely(!va))
+			return __page_frag_cache_refill(nc, fragsz, gfp_mask,
+							align_mask);
+
+		/* fragsz is not supposed to be bigger than PAGE_SIZE as we are
+		 * allowing order 3 page allocation to fail easily under low
+		 * memory condition.
+		 */
+		if (WARN_ON_ONCE(fragsz > PAGE_SIZE))
+			return NULL;
+
+		page = virt_to_page(va);
+		if (!page_ref_sub_and_test(page, nc->pagecnt_bias))
+			return __page_frag_cache_refill(nc, fragsz, gfp_mask,
+							align_mask);
+
+		if (unlikely((unsigned long)va &
+			     PAGE_FRAG_CACHE_PFMEMALLOC_BIT)) {
+			free_unref_page(page, compound_order(page));
+			return __page_frag_cache_refill(nc, fragsz, gfp_mask,
+							align_mask);
+		}
+
+		/* OK, page count is 0, we can safely set it */
+		set_page_count(page, PAGE_FRAG_CACHE_MAX_SIZE + 1);
+
+		/* reset page count bias and offset to start of new frag */
+		nc->pagecnt_bias = PAGE_FRAG_CACHE_MAX_SIZE + 1;
+		size = page_size;
+	}
+
+	va = (void *)((unsigned long)va & PAGE_MASK);
+	va = va + (page_size - size);
+	nc->size = size - fragsz;
+	nc->pagecnt_bias--;
+
+	return va;
+}
+EXPORT_SYMBOL(__page_frag_alloc_va_align);
 
