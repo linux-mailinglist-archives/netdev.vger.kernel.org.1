@@ -1,79 +1,96 @@
-Return-Path: <netdev+bounces-91725-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91726-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3EC5B8B39F0
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 16:28:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7286E8B3A04
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 16:29:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 89FF8B237CC
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 14:28:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2E00728AD2E
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 14:29:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4ED981494CF;
-	Fri, 26 Apr 2024 14:26:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B17F148856;
+	Fri, 26 Apr 2024 14:29:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q/zg0/JL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jC4/NKyP"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 290CD14884B;
-	Fri, 26 Apr 2024 14:26:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB6661487F2;
+	Fri, 26 Apr 2024 14:29:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714141595; cv=none; b=NMeii71MHIIq/etD7H2s+mMbd2CPEnmhpgPhj40d3nWiPW5/A9HKOcE13m5N678okceK/GpLvpRSQrz/EsUkW1SagL65bWHBWDO5sNXvGm6C+jxi0z+8bEpsyZNtcAywSQePGxoTBRmXmULo1TcOibC7oQ34D2maZ8LqqUCWxwk=
+	t=1714141778; cv=none; b=bwSsokwvcWOVJ5R0675PJjJv09wIeplSq83aXUIstm1xyFFtvuLsIXLTZWVHJt3ozvgic946Ebqe/X7oPfYgN1zFMmCgm8VnoausDaAh6gKqu2zPU+fkNNmCjMiRvkJbSH9lVUw5qdXvkxaGek7ZxlOpiXo6OsVYooabm9uI+lI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714141595; c=relaxed/simple;
-	bh=SKecwnhJLO6qiYpZ/vNEzw2bRyqrPwNVSjtPzGEAWzc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=B43hpJLUwDMPF0khBODxAf8b23p+5kAFlIAjvUYGnKH9pLvz38o5NE0BbJcsa7ia6gNDZt/fVx1wC814AuuF1WIGwc59ZfLxL6aVxKwgEJlirhp47bfB3kfguGOF0p9LxtStVTtlBMP7syrAxTknTl9lXvgYXUyBu4S0g513cAw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q/zg0/JL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C87B9C113CD;
-	Fri, 26 Apr 2024 14:26:31 +0000 (UTC)
+	s=arc-20240116; t=1714141778; c=relaxed/simple;
+	bh=D3wKqM03L7wKjDEPdv4b0+dxrNwGKgX3ntMzPx9bXCI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=b+Tzm2Pw1oo/kWIZs9fC1V/jSts7nDGW6d99wXTXxRcilBkj4hJE8LEWpkGyieQcbNyiO6kE1A2qPvWvHcWwm8U8Fq4ivw4zEOkPJervoI4UykxJXMWscKmxQKKOeSmMHKRSd+b00p1nQ/L3ceyrzodVYV57DKugC8RLb3c5yLg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jC4/NKyP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EA6B9C113CD;
+	Fri, 26 Apr 2024 14:29:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714141594;
-	bh=SKecwnhJLO6qiYpZ/vNEzw2bRyqrPwNVSjtPzGEAWzc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=q/zg0/JLWDS1mrTmw6xYjan/krNKUcPDf3KGY4uS8UJMGZthrM63ejCmyLQHbjBO/
-	 h2s+UBuAOasen9R3PIRD4vylD4Y7xUYwWZMH2+sDwU1gJdEwlH3hmp1v4xKelUj3ut
-	 iiFyguyAozUaVnMCP7iDP8NZTUraZGVAzRtaLuefFU6UBZ4Xlr00sETmcAxaBZwoZ8
-	 9mKOM9mdOijbEPafhxWvSFRGrWa9poLjNwm0L5/OJkKBYpnbj6dqDPtRjRh4x+Xl8F
-	 RSfCnvyZLTXHrxlbJDbi0txOUXsM0QNO4soBj2cwEAWLNrj3FEY6xn+D2q1AJcX4DT
-	 amtEGh8cUk0Bg==
-Date: Fri, 26 Apr 2024 15:26:29 +0100
-From: Simon Horman <horms@kernel.org>
-To: Jijie Shao <shaojijie@huawei.com>
-Cc: yisen.zhuang@huawei.com, salil.mehta@huawei.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	jiri@resnulli.us, shenjian15@huawei.com, wangjie125@huawei.com,
-	liuyonglong@huawei.com, chenhao418@huawei.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH V2 net 2/7] net: hns3: change type of numa_node_mask as
- nodemask_t
-Message-ID: <20240426142629.GD513047@kernel.org>
-References: <20240426100045.1631295-1-shaojijie@huawei.com>
- <20240426100045.1631295-3-shaojijie@huawei.com>
+	s=k20201202; t=1714141777;
+	bh=D3wKqM03L7wKjDEPdv4b0+dxrNwGKgX3ntMzPx9bXCI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=jC4/NKyPtYBapka0fEDWLEC+l8sFcA8lrkKpQ4+IBz5j3DoHvd12xkr4IZl3Gu9Mm
+	 pi0Mr4hMYvA9ajOcMreC5jOkf7IllNBsmBzSIlXEF4vJmQzzB4OWN1dbCkEdQ0lzjj
+	 BLzVkvqIIXy80MpHe5kjbzUbbmiVBuUYeg92zMjUUd/Wyu3DDE3qmUgeLcS6o4hXTG
+	 17Ctw4aZRuj97Desn+YWKTaaNo2q3RPFfOgBCEPQiJsMBiwk5qoIs8GNtPGPPD0ZE2
+	 Xxhy3jfy5o90qR8UsvuaWAWlvtf3V9dmcEhA6sz2eNLwvZrKzyQxt2NHEp4JeaY5pG
+	 hgNVTuUjUHzjw==
+Date: Fri, 26 Apr 2024 07:29:34 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Alexander Gordeev <agordeev@linux.ibm.com>
+Cc: Bui Quang Minh <minhquangbui99@gmail.com>, Jesse Brandeburg
+ <jesse.brandeburg@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Paul M Stillwell Jr
+ <paul.m.stillwell.jr@intel.com>, Rasesh Mody <rmody@marvell.com>, Sudarsana
+ Kalluru <skalluru@marvell.com>, GR-Linux-NIC-Dev@marvell.com, Anil
+ Gurumurthy <anil.gurumurthy@qlogic.com>, Sudarsana Kalluru
+ <sudarsana.kalluru@qlogic.com>, "James E.J. Bottomley"
+ <James.Bottomley@hansenpartnership.com>, "Martin K. Petersen"
+ <martin.petersen@oracle.com>, Fabian Frederick <fabf@skynet.be>, Saurav
+ Kashyap <skashyap@marvell.com>, GR-QLogic-Storage-Upstream@marvell.com,
+ Nilesh Javali <nilesh.javali@cavium.com>, Arun Easi <arun.easi@cavium.com>,
+ Manish Rangankar <manish.rangankar@cavium.com>, Vineeth Vijayan
+ <vneethv@linux.ibm.com>, Peter Oberparleiter <oberpar@linux.ibm.com>, Heiko
+ Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, Christian
+ Borntraeger <borntraeger@linux.ibm.com>, Sven Schnelle
+ <svens@linux.ibm.com>, Sunil Goutham <sgoutham@marvell.com>, Linu Cherian
+ <lcherian@marvell.com>, Geetha sowjanya <gakula@marvell.com>, Jerin Jacob
+ <jerinj@marvell.com>, hariprasad <hkelam@marvell.com>, Subbaraya Sundeep
+ <sbhatta@marvell.com>, intel-wired-lan@lists.osuosl.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-scsi@vger.kernel.org, Saurav Kashyap <saurav.kashyap@cavium.com>,
+ linux-s390@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCH v2 5/6] cio: ensure the copied buf is NUL terminated
+Message-ID: <20240426072934.776f7b4d@kernel.org>
+In-Reply-To: <Zit9myOJp0SYFL1F@li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com>
+References: <20240424-fix-oob-read-v2-0-f1f1b53a10f4@gmail.com>
+	<20240424-fix-oob-read-v2-5-f1f1b53a10f4@gmail.com>
+	<ZikiZsSTGUUM69GE@li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com>
+	<Zit9myOJp0SYFL1F@li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240426100045.1631295-3-shaojijie@huawei.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri, Apr 26, 2024 at 06:00:40PM +0800, Jijie Shao wrote:
-> From: Peiyang Wang <wangpeiyang1@huawei.com>
+On Fri, 26 Apr 2024 12:10:35 +0200 Alexander Gordeev wrote:
+> On Wed, Apr 24, 2024 at 05:16:56PM +0200, Alexander Gordeev wrote:
+> > Applied, thanks!  
 > 
-> It provides nodemask_t to describe the numa node mask in kernel. To
-> improve transportability, change the type of numa_node_mask as nodemask_t.
+> Hi Jakub,
 > 
-> Fixes: 38caee9d3ee8 ("net: hns3: Add support of the HNAE3 framework")
-> Signed-off-by: Peiyang Wang <wangpeiyang1@huawei.com>
-> Signed-off-by: Jijie Shao <shaojijie@huawei.com>
+> I just want to make sure you do not have plans to pull this patch
+> via the net tree, right? (I schedulled it for the s390 tree already).
 
-Reviewed-by: Simon Horman <horms@kernel.org>
-
+Yes, go for it. I picked 1, 2 and 6, no interest in the other 3 :)
 
