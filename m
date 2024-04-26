@@ -1,150 +1,181 @@
-Return-Path: <netdev+bounces-91668-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91669-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E9F08B3631
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 13:01:00 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C5978B3645
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 13:04:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C87621F21D9C
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 11:00:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DE02EB22B8B
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 11:04:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E9C7144D07;
-	Fri, 26 Apr 2024 11:00:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Oe7SldBm"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3F57144D1F;
+	Fri, 26 Apr 2024 11:04:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27E381448E8
-	for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 11:00:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47A9A1448C0
+	for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 11:04:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.71
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714129257; cv=none; b=DrkRKULnYhK6lRmKHBqoOQvCxw5FSFs7GI1NaN+jF34bZfCxF87TFcpkAPyM+nKiIWZVOTBlhQhlSiRDCABrD94EVJWMhWsa2cBJcSAQ9DW2acHx5ES18IDJbq5YMBrTPogTN0kb8t05hCtYnEXwcglDsUYfx7iVBmy7uLXDWKA=
+	t=1714129477; cv=none; b=klBsPVb0opZuGdIYBs+IHhuezmzJHz6kkXZQFpFKPD+gr7y7IaqLNy9IDt8wB7I1j1sgOj3aQ/SHLLv6vt7oGGyVSaPQpHQrhpyykyGbmpA6eTYN3B2gcgSpB6kt/oO+9lyQgTfPTL+C7d8dFaaYc7IIaqkG45cXTWkZI5o0QyE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714129257; c=relaxed/simple;
-	bh=CmrlDavylDDpqbtRus8D6a/nwKMMzWcd+lfPhaJoR4U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dhtkLLo1RTq9AjCg5LuTiTbx54vayKMbHytHHdykHztMaqaoKigawrBvLzlHILYFoptYYHB/YKxZbb7N/YI/DIGl8vpW3MwwW/zHy07N99JSKcGMKN4Ywpw1umOnORf/j8amFo79EtHT5ROX5dBarKhOm8TR8bc5gdX1EADN3vo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Oe7SldBm; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=CrSSQOgsOazQGquPNOq2nYvIMsk0ndINFAR2+TzYLjo=; b=Oe7SldBmW3V8T9oNDsVKtzljIw
-	oC24BRhmJb0AVpz2zBarLAS8W/FV0AYa1RqHOGQtAUP81svFaPWh7rwOMXdpfFVak1FwQEDVxZYxi
-	eMto5UIoe++hyWxkeq07nHNHbxrWXawOujYEo1J0r35t9peNQEQFCeFcKt8Eh7qqQtwnXCkqsBhVf
-	nQNAxtmVV2zAkZjocyE4dGjm1pg1NnfO4qNrUaBPqlg98X/b5HzRsWh/7ZE+/uM/GJHRLlfIeaSwB
-	4BXLjbW8CZWtWk3r0Eo3deVypKFVGiYF2Q0bUdVZMvBpejfVv9nJeIF3/eois6+qnN4Zbw8i5DEZb
-	e9uh3R7w==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:36334)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1s0JJb-00007u-1y;
-	Fri, 26 Apr 2024 12:00:27 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1s0JJZ-0006TV-5L; Fri, 26 Apr 2024 12:00:25 +0100
-Date: Fri, 26 Apr 2024 12:00:25 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Yanteng Si <siyanteng@loongson.cn>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com,
-	alexandre.torgue@foss.st.com, joabreu@synopsys.com,
-	fancer.lancer@gmail.com, Jose.Abreu@synopsys.com,
-	chenhuacai@kernel.org, guyinggang@loongson.cn,
-	netdev@vger.kernel.org, chris.chenfeiyang@gmail.com,
-	siyanteng01@gmail.com
-Subject: Re: [PATCH net-next v12 09/15] net: stmmac: dwmac-loongson: Add
- phy_interface for Loongson GMAC
-Message-ID: <ZiuJSY5oC8DWFAxk@shell.armlinux.org.uk>
-References: <cover.1714046812.git.siyanteng@loongson.cn>
- <d0ca47778a424a142abbfa7947d8413dfbffc104.1714046812.git.siyanteng@loongson.cn>
- <ZipqaHivDaK/FJAs@shell.armlinux.org.uk>
- <36afcb40-7e09-4a17-ad12-c27ac50120e1@loongson.cn>
+	s=arc-20240116; t=1714129477; c=relaxed/simple;
+	bh=sfsJoZxQSWFGO6YIL6j+F7W4VxJutQawHdKEFeIlViw=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=jXednFJzzKZcvoGKViEvcB33+Dzd7Qq7Kgf0QFd/5C7ecSvPXs553uRkdg/cgBz00LomVq0e0Wien4ffPXkkIZS5F6HggS7zBGQtU7xw21pOxZ5QpoQADo/5X45TPoaTy586ti4LGDSEiw64h25w2RAJGVnZv/b7PP68wikZHHM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-7deb38521c1so2675839f.2
+        for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 04:04:36 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714129475; x=1714734275;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=96T6G7j+muiVvyjfPfVvzJDF6bpN9IPMSCr5jHjhvOs=;
+        b=MQPw8oKUEb8l0fHMhsnJbDPhdCMRPEOHZOdGDIEaLjMpCEEE2FlzKuWCnuYWbhphZe
+         ePVPU7mx8XVbC2tGnjA525dLGDs9dRaYU3bORkjQ0xhgBc3E+LCvUwtPpMXAu616Jpxl
+         6QcQHXy5xLOmK6/YmmKg32YLe5F1zBpXA2+2UhcKIbTMPp0xUp76P7eT6s5azZfw+FBY
+         1tQmVjjpwnZYviyExlVXfbPjlLJjfjOok/ThBGrmz0uBVM/Edkqf/jZvlsqvz0K+ivQ3
+         9gpywxSwfjxCVyUHBzD2vuf/wN5psKR3CBP1TI2Xlr6zSvbRVhiRHUtQorek6PltZjo2
+         k+jA==
+X-Forwarded-Encrypted: i=1; AJvYcCWgk7w3yAJwjjcnPxFtWSM1EJ0RgmdpRO+YBrSmyaUWfUiUVDfG1PoaIt2PapxHqQw4nbg0tJWhxudRzHsW2mUt8U2jkQAj
+X-Gm-Message-State: AOJu0Yxd3E8N47HwEpwmtqNdbAz4cEe7kQrvs6Pit6PEFVM5QGBRrCCp
+	/8vfxPdoe/QeTSrmd8CTbgSUQWqgHh69k0+zqZZTq7W4bPV5l37+Pon8vzeMHXRb3jseQkJNpJk
+	pfZ1Fa4liXxrurVrjxNnaWmMkxQgr0zY3U3WkazcqH3n7hQ3GUYC5b44=
+X-Google-Smtp-Source: AGHT+IGoQ4c4DdmeTiZMXV1mYTYQaKlTpqspTYrkcz9bVOL/1K8bYZn04qTheMtGMhqnGm642xOW5wuLD1KWvqM8J6lRBFh22ELf
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <36afcb40-7e09-4a17-ad12-c27ac50120e1@loongson.cn>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Received: by 2002:a05:6638:851e:b0:485:54ea:1d58 with SMTP id
+ is30-20020a056638851e00b0048554ea1d58mr152555jab.5.1714129475614; Fri, 26 Apr
+ 2024 04:04:35 -0700 (PDT)
+Date: Fri, 26 Apr 2024 04:04:35 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000007e4a2e0616fdde23@google.com>
+Subject: [syzbot] [can?] KMSAN: kernel-infoleak in raw_recvmsg
+From: syzbot <syzbot+5681e40d297b30f5b513@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, kernel@pengutronix.de, 
+	kuba@kernel.org, linux-can@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	mkl@pengutronix.de, netdev@vger.kernel.org, o.rempel@pengutronix.de, 
+	pabeni@redhat.com, robin@protonic.nl, socketcan@hartkopp.net, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, Apr 26, 2024 at 06:16:42PM +0800, Yanteng Si wrote:
-> Hi Russell,
-> 
-> 在 2024/4/25 22:36, Russell King (Oracle) 写道:
-> > > The mac_interface of gmac is PHY_INTERFACE_MODE_RGMII_ID.
-> > No it isn't!
-> Ok, that's a typo.
-> > 
-> > > +	plat->phy_interface = PHY_INTERFACE_MODE_RGMII_ID;
-> > You don't touch mac_interface here. Please read the big comment I put
-> > in include/linux/stmmac.h above these fields in struct
-> > plat_stmmacenet_data to indicate what the difference between
-> > mac_interface and phy_interface are, and then correct which-ever
-> > of the above needs to be corrected.
-> 
-> Copy your big comment here:
-> 
->     int phy_addr;
->     /* MAC ----- optional PCS ----- SerDes ----- optional PHY ----- Media
->      *       ^                               ^
->      * mac_interface                   phy_interface
->      *
->      * mac_interface is the MAC-side interface, which may be the same
->      * as phy_interface if there is no intervening PCS. If there is a
->      * PCS, then mac_interface describes the interface mode between the
->      * MAC and PCS, and phy_interface describes the interface mode
->      * between the PCS and PHY.
->      */
->     phy_interface_t mac_interface;
->     /* phy_interface is the PHY-side interface - the interface used by
->      * an attached PHY.
->      */
-> 
-> Our hardware engineer said we don't support pcs, and if I understand
-> 
-> your comment correctly, our mac_interface and phy_interface should
-> 
-> be the same, right?
+Hello,
 
-It only matters to the core code if priv->dma_cap.pcs is set true.
-If it isn't, then mac_interface doesn't seem to be relevent (it
-does get used by a truck load of platform specific code though
-which I haven't looked at to answer this.)
+syzbot found the following issue on:
 
-I would suggest that if priv->dma_cap.pcs is false, then setting
-mac_interface to PHY_INTERFACE_MODE_NA to make it explicit that
-it's not used would be a good idea.
+HEAD commit:    71b1543c83d6 Merge tag '6.9-rc5-ksmbd-fixes' of git://git...
+git tree:       upstream
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=1784bdd7180000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=776c05250f36d55c
+dashboard link: https://syzkaller.appspot.com/bug?extid=5681e40d297b30f5b513
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15b440d3180000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=14b00907180000
 
-While looking at this, however, I've come across the fact that
-stmmac manipulates the netif carrier via netif_carrier_off() and
-netif_carrier_on(), which is a _big_ no no when using phylink.
-Phylink manages the carrier for the driver, and its part of
-phylink's state. Fiddling with the carrier totally breaks the
-guarantee that phylink will make calls to mac_link_down() and
-mac_link_up().
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/14813ccfbcb3/disk-71b1543c.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/e7b88b42cf07/vmlinux-71b1543c.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/3a64a5abfbba/bzImage-71b1543c.xz
 
-If a driver wants to fiddle with the netif carrier, it must NOT
-use phylink. If it wants to use phylink, it must NOT fiddle with
-the netif carrier state. The two are mutually exclusive.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+5681e40d297b30f5b513@syzkaller.appspotmail.com
 
-stmmac is quickly becoming a driver I don't care about whether my
-changes to phylink end up breaking it or not because of abuses
-like this.
+=====================================================
+BUG: KMSAN: kernel-infoleak in instrument_copy_to_user include/linux/instrumented.h:114 [inline]
+BUG: KMSAN: kernel-infoleak in copy_to_user_iter lib/iov_iter.c:24 [inline]
+BUG: KMSAN: kernel-infoleak in iterate_ubuf include/linux/iov_iter.h:29 [inline]
+BUG: KMSAN: kernel-infoleak in iterate_and_advance2 include/linux/iov_iter.h:245 [inline]
+BUG: KMSAN: kernel-infoleak in iterate_and_advance include/linux/iov_iter.h:271 [inline]
+BUG: KMSAN: kernel-infoleak in _copy_to_iter+0x366/0x2520 lib/iov_iter.c:185
+ instrument_copy_to_user include/linux/instrumented.h:114 [inline]
+ copy_to_user_iter lib/iov_iter.c:24 [inline]
+ iterate_ubuf include/linux/iov_iter.h:29 [inline]
+ iterate_and_advance2 include/linux/iov_iter.h:245 [inline]
+ iterate_and_advance include/linux/iov_iter.h:271 [inline]
+ _copy_to_iter+0x366/0x2520 lib/iov_iter.c:185
+ copy_to_iter include/linux/uio.h:196 [inline]
+ memcpy_to_msg include/linux/skbuff.h:4113 [inline]
+ raw_recvmsg+0x2b8/0x9e0 net/can/raw.c:1008
+ sock_recvmsg_nosec net/socket.c:1046 [inline]
+ sock_recvmsg+0x2c4/0x340 net/socket.c:1068
+ ____sys_recvmsg+0x18a/0x620 net/socket.c:2803
+ ___sys_recvmsg+0x223/0x840 net/socket.c:2845
+ do_recvmmsg+0x4fc/0xfd0 net/socket.c:2939
+ __sys_recvmmsg net/socket.c:3018 [inline]
+ __do_sys_recvmmsg net/socket.c:3041 [inline]
+ __se_sys_recvmmsg net/socket.c:3034 [inline]
+ __x64_sys_recvmmsg+0x397/0x490 net/socket.c:3034
+ x64_sys_call+0xf6c/0x3b50 arch/x86/include/generated/asm/syscalls_64.h:300
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xcf/0x1e0 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Uninit was created at:
+ slab_post_alloc_hook mm/slub.c:3804 [inline]
+ slab_alloc_node mm/slub.c:3845 [inline]
+ kmem_cache_alloc_node+0x613/0xc50 mm/slub.c:3888
+ kmalloc_reserve+0x13d/0x4a0 net/core/skbuff.c:577
+ __alloc_skb+0x35b/0x7a0 net/core/skbuff.c:668
+ alloc_skb include/linux/skbuff.h:1313 [inline]
+ alloc_skb_with_frags+0xc8/0xbf0 net/core/skbuff.c:6504
+ sock_alloc_send_pskb+0xa81/0xbf0 net/core/sock.c:2795
+ sock_alloc_send_skb include/net/sock.h:1842 [inline]
+ j1939_sk_alloc_skb net/can/j1939/socket.c:878 [inline]
+ j1939_sk_send_loop net/can/j1939/socket.c:1142 [inline]
+ j1939_sk_sendmsg+0xc0a/0x2730 net/can/j1939/socket.c:1277
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ __sock_sendmsg+0x30f/0x380 net/socket.c:745
+ ____sys_sendmsg+0x877/0xb60 net/socket.c:2584
+ ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2638
+ __sys_sendmsg net/socket.c:2667 [inline]
+ __do_sys_sendmsg net/socket.c:2676 [inline]
+ __se_sys_sendmsg net/socket.c:2674 [inline]
+ __x64_sys_sendmsg+0x307/0x4a0 net/socket.c:2674
+ x64_sys_call+0xc4b/0x3b50 arch/x86/include/generated/asm/syscalls_64.h:47
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xcf/0x1e0 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Bytes 12-15 of 16 are uninitialized
+Memory access of size 16 starts at ffff888120969690
+Data copied to user address 00000000200017c0
+
+CPU: 1 PID: 5050 Comm: syz-executor198 Not tainted 6.9.0-rc5-syzkaller-00031-g71b1543c83d6 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
+=====================================================
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
