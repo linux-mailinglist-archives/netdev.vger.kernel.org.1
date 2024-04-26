@@ -1,109 +1,121 @@
-Return-Path: <netdev+bounces-91815-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91816-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF8738B4068
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 21:50:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E974C8B4091
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 22:00:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5ACE328840D
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 19:50:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8B9EE28BC0F
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 20:00:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81E672032A;
-	Fri, 26 Apr 2024 19:50:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91AC1208AF;
+	Fri, 26 Apr 2024 20:00:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cMC0F65B"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jhzKShcu"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4037FBE4A;
-	Fri, 26 Apr 2024 19:50:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6281518C19;
+	Fri, 26 Apr 2024 20:00:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714161028; cv=none; b=ZV5CWFkO1NUdE4yx/CjHRTmRK9Zsza4gprbw4zQx5SfohfP2KihMNhMhDQ6TkIKwTZ7qkg7aWyspGmJw0WdEZWte/G6JplHc1Kexhz/PgVzThKuThHEuK6j91nF7eOWeHMf65Q9AX9+rX6Elkr9pDeaHzwzUqZeEsBZVbHTZ+fg=
+	t=1714161619; cv=none; b=o9af1KRJMTgFOE30ND/Tatr5chu6aMrjaiHoB4vtzXPbNPi3OJt5oDb3Ho4Xq7iiNEvU44RjZ3sqs9HEk0vWMpIpzDtmamnl7Vj8SUSPQiAfAptCI2J22adHx6at8l2hjBT/yHpee+ldaxBUkYLU3EsNjaKsdUlNoS6GP29VPfg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714161028; c=relaxed/simple;
-	bh=MvhargL3ylJyOzWeH24MNc5xj2ittPCGif/aZcR1FPs=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=S0lb1llFE+aSQOPP/73ZPkHjh+qQPv+XuyqPuzyTFkUBxVrVTfpzfp119FdZxeQ8e/gy2Kv+RLCqD74X2x5O5KFVhlmLiADHbJy7+o3/c1FmmlGNlsRAMId8LKjvy/LD7qoAUZVcX2wn5jyakvmqU57hRJXCTlgO2J2gms0KMsg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cMC0F65B; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id B76F1C2BD10;
-	Fri, 26 Apr 2024 19:50:27 +0000 (UTC)
+	s=arc-20240116; t=1714161619; c=relaxed/simple;
+	bh=q4aTlNNuHzD5E4RuEu0bUccWhm5zkk/pvW5+DG/vs0s=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=lLI2GXXXEGXZTk6atwzaAQpjqIiZ7VC8oRRqYtd0MmTTfGz5ZuZ2y/X5TTO0v9odyuLnfNJIq2AzVekO1tx0O+k2LLV0LuPmSmSrkCKfiW+1lgO/FM/BvoQ7H8NmQ1adugyFLAG6fcH8R4v4Bt1IKEYd3d9+7/ZO7URzeP1sKlw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jhzKShcu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 899AEC113CD;
+	Fri, 26 Apr 2024 20:00:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714161027;
-	bh=MvhargL3ylJyOzWeH24MNc5xj2ittPCGif/aZcR1FPs=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=cMC0F65BXmJWlJe5+NgUBesegKZxh2ig+8v5Ys4vQHMoApRPFwxAkty8BQra0hE+D
-	 0KfB+g7Q54YQ9rb8m6DAT2O3Vjxte6qGjNFja5SwnNp8KwTrk8uRvBpRwTWuIf3awV
-	 zz6d5mpi5gNIan2CVlCHC+OpcLNoMWKfzc9kR8kXUKFCgVmrZmXl3x3Ze/4xRH866N
-	 BJKOtJXpYkWge93EyGCZoVBgIpo7dw/9EzT+/9yY+uB6EyBG8T3F44G1AhN03NAX5C
-	 9mE1zk80MVWhaEPkfJKt4oNt/lMZNMvbyFcK+0hvOoPRjMBUyikoLhwQPDxiN4230s
-	 /BZEDU+d7ZHxQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A20CFC433F2;
-	Fri, 26 Apr 2024 19:50:27 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1714161619;
+	bh=q4aTlNNuHzD5E4RuEu0bUccWhm5zkk/pvW5+DG/vs0s=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=jhzKShcuJk9piju/LR5do+bOKiVUfP+hO+LWVqc1oaalWIlBFcGzeu01fMLD0gO+l
+	 pg20CvAo87PWVWbzE4bteMVzwkgRUzKPbA9wqoaQTG3/Y6p9XlzKHDeUaPksZZOLeC
+	 ZppQe0YCp9rNVSXK6YJoisJ1zC1rWtc5Ew7UQ34h6aIzFaX2yiP7HT76DzdEk+PsiN
+	 IeISpGtZ4c5YaaDiHO5f0TpAw9YVBe0GFur234h4QIM1ptKNjj45qGIqzq6kBJvWlN
+	 o1NNsZ/UvcruMyvdzenexW6FbI0i1UshR/9b/BSc+nB8GGwQh/tSsKiGEU29T8ajZR
+	 zVnN3Y+as+X6A==
+Date: Fri, 26 Apr 2024 13:00:17 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Joe Damato <jdamato@fastly.com>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, tariqt@nvidia.com,
+ saeedm@nvidia.com, mkarsten@uwaterloo.ca, gal@nvidia.com,
+ nalramli@fastly.com, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ linux-rdma@vger.kernel.org (open list:MELLANOX MLX4 core VPI driver)
+Subject: Re: [PATCH net-next v2 1/3] net/mlx4: Track RX allocation failures
+ in a stat
+Message-ID: <20240426130017.6e38cd65@kernel.org>
+In-Reply-To: <20240426183355.500364-2-jdamato@fastly.com>
+References: <20240426183355.500364-1-jdamato@fastly.com>
+	<20240426183355.500364-2-jdamato@fastly.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] Fix a potential infinite loop in extract_user_to_sg()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171416102765.32161.2308930891250088286.git-patchwork-notify@kernel.org>
-Date: Fri, 26 Apr 2024 19:50:27 +0000
-References: <1967121.1714034372@warthog.procyon.org.uk>
-In-Reply-To: <1967121.1714034372@warthog.procyon.org.uk>
-To: David Howells <dhowells@redhat.com>
-Cc: netdev@vger.kernel.org, jlayton@kernel.org, sfrench@samba.org,
- herbert@gondor.apana.org.au, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, netfs@lists.linux.dev,
- linux-crypto@vger.kernel.org, linux-cifs@vger.kernel.org,
- linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Fri, 26 Apr 2024 18:33:53 +0000 Joe Damato wrote:
+> --- a/drivers/net/ethernet/mellanox/mlx4/en_port.c
+> +++ b/drivers/net/ethernet/mellanox/mlx4/en_port.c
+> @@ -151,7 +151,7 @@ void mlx4_en_fold_software_stats(struct net_device *dev)
+>  {
+>  	struct mlx4_en_priv *priv = netdev_priv(dev);
+>  	struct mlx4_en_dev *mdev = priv->mdev;
+> -	unsigned long packets, bytes;
+> +	unsigned long packets, bytes, dropped;
+>  	int i;
+>  
+>  	if (!priv->port_up || mlx4_is_master(mdev->dev))
+> @@ -159,14 +159,17 @@ void mlx4_en_fold_software_stats(struct net_device *dev)
+>  
+>  	packets = 0;
+>  	bytes = 0;
+> +	dropped = 0;
+>  	for (i = 0; i < priv->rx_ring_num; i++) {
+>  		const struct mlx4_en_rx_ring *ring = priv->rx_ring[i];
+>  
+>  		packets += READ_ONCE(ring->packets);
+>  		bytes   += READ_ONCE(ring->bytes);
+> +		dropped += READ_ONCE(ring->dropped);
+>  	}
+>  	dev->stats.rx_packets = packets;
+>  	dev->stats.rx_bytes = bytes;
+> +	dev->stats.rx_missed_errors = dropped;
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+I'd drop this chunk, there's a slight but meaningful difference in
+definition of rx_missed vs alloc-fail:
 
-On Thu, 25 Apr 2024 09:39:32 +0100 you wrote:
-> Fix extract_user_to_sg() so that it will break out of the loop if
-> iov_iter_extract_pages() returns 0 rather than looping around forever.
-> 
-> [Note that I've included two fixes lines as the function got moved to a
-> different file and renamed]
-> 
-> Fixes: 85dd2c8ff368 ("netfs: Add a function to extract a UBUF or IOVEC into a BVEC iterator")
-> Fixes: f5f82cd18732 ("Move netfs_extract_iter_to_sg() to lib/scatterlist.c")
-> Signed-off-by: David Howells <dhowells@redhat.com>
-> cc: Jeff Layton <jlayton@kernel.org>
-> cc: Steve French <sfrench@samba.org>
-> cc: Herbert Xu <herbert@gondor.apana.org.au>
-> cc: "David S. Miller" <davem@davemloft.net>
-> cc: Eric Dumazet <edumazet@google.com>
-> cc: Jakub Kicinski <kuba@kernel.org>
-> cc: Paolo Abeni <pabeni@redhat.com>
-> cc: netfs@lists.linux.dev
-> cc: linux-crypto@vger.kernel.org
-> cc: linux-cifs@vger.kernel.org
-> cc: linux-fsdevel@vger.kernel.org
-> cc: netdev@vger.kernel.org
-> 
-> [...]
+ * @rx_missed_errors: Count of packets missed by the host.
+ *   Folded into the "drop" counter in `/proc/net/dev`.
+ *
+ *   Counts number of packets dropped by the device due to lack
+ *   of buffer space. This usually indicates that the host interface
+ *   is slower than the network interface, or host is not keeping up
+ *   with the receive packet rate.
+---
+        name: rx-alloc-fail
+        doc: |
+          Number of times skb or buffer allocation failed on the Rx datapath.
+          Allocation failure may, or may not result in a packet drop, depending
+          on driver implementation and whether system recovers quickly.
 
-Here is the summary with links:
-  - [net] Fix a potential infinite loop in extract_user_to_sg()
-    https://git.kernel.org/netdev/net/c/6a30653b604a
+tl;dr "packets dropped" vs "may, or may not result in a packet drop"
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+In case of mlx4 looks like the buffer refill is "async", the driver
+tries to refill the buffers to max, but if it fails the next NAPI poll
+will try again. Allocation failures are not directly tied to packet
+drops. In case of bnxt if "replacement" buffer can't be allocated -
+packet is dropped and old buffer gets returned to the ring (although 
+if I'm 100% honest bnxt may be off by a couple, too, as the OOM stat
+gets incremented on ifup pre-fill failures).
 
