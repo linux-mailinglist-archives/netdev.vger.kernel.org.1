@@ -1,248 +1,227 @@
-Return-Path: <netdev+bounces-91795-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91797-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CCDFC8B3F25
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 20:19:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D367E8B3F39
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 20:28:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F10971C22FD6
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 18:19:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 611981F25375
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 18:28:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3EB416DED4;
-	Fri, 26 Apr 2024 18:19:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEB8516DED9;
+	Fri, 26 Apr 2024 18:28:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="hmpYJGje"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="oOvXIabc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F96C16DEB2
-	for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 18:19:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF15316D9DF
+	for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 18:28:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714155588; cv=none; b=P4oMQJwuy8KSyHF2cLH9sCwuhyES7oWps8p6OLu+5GgAe0V+yhLH+3LfcZVochUCp0YQKlcvjRCXB9/5XNphzCyNwYHrObgiN02AtnNQ5pJVzhhOOjhH3BrkpHFJmF78S0E9pypIbQl5thuI1jaLE5FsLFjlC/1LOoRIdvcYelo=
+	t=1714156120; cv=none; b=mQR6ivd89N68ZFfRaDgmAm/1uEJcA2APUHyzqtaImqM0ed/eYTiyJDFKEClQGqYrMyEudDGQSvQ/j7Q1JUdrwjZj4HX6zmsOFep81H0Vr9s4+BeOShtG4kCbi8fULusB/OYv1PlXY5tHS6gMcQ1DzTFNZto9+iBSFlX31Bl5bxU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714155588; c=relaxed/simple;
-	bh=TtBxZEz92v+cGHXg/gl+2pRsqC6lDwcYTw/ZjdnBs1g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GIS1A8RNMWou0I7qlHB0frYQnb47PhD4GmSHdFmx551/t2pQOC8qmaqD8BAf1ewNVtgdz5UkPhBj5sloyhaO/n/o+YNdVC9Wkqz7dkGXf6RBhfrx22m4Qm4xdYfo2eyY5jf+dVy7pH2n7FUTJdppSKuCIUViVL/cpRt9waC2Kbs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=hmpYJGje; arc=none smtp.client-ip=209.85.160.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-439884be4efso14556541cf.2
-        for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 11:19:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1714155586; x=1714760386; darn=vger.kernel.org;
-        h=in-reply-to:autocrypt:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=f1s88vxNbQKRWjT3YJ9c4BTPNPRoP9BirmSF7joUCSw=;
-        b=hmpYJGjeFXU+6ryPzpS7Fy6mma20Z5AB1bV87BXrIbq4L6c5JIoPG0TlxZEREvNqpH
-         wHAKa2zA8iioa2zSPaHrECfRnP006nB6S64YldHMOm4uVQ3OBJWMr8bK6+ukhxoTDzvk
-         r3J7bLAV7I3EyFTxEmVovELa2tRFNsFnM9b0c=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714155586; x=1714760386;
-        h=in-reply-to:autocrypt:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=f1s88vxNbQKRWjT3YJ9c4BTPNPRoP9BirmSF7joUCSw=;
-        b=ii7zoSXjayawYLyXxOnRClIWDbE6TB0C4U+jJGrCj7iaAH4xxPOJh7by7VkzIPP41T
-         fK7qOHIOwckyrc9am3me7Y3jRVdKtYcSgTcD3XfyP9wxLyoPPPJ7wAx78XhxOsQW+nZq
-         etvmIk/ZAHDaRyIYGHDKXO8uzMzHnEzf31gmAijAzoBQGjZXhBne/kw4UhjhvJZ+5+E8
-         8zPt9qVIkcjc7CWr/wwkwuvG3vnE7OAN+/RdiBKYZrMswOAJ5ifm3xh9UQ4dBuMeGbGs
-         vwNtTqe46PWZXF4N2iPuKrZPMzXxAmqAQ5S9vRUznQYxSUfg2EapWGe9Mfiu0w9x4nVJ
-         ZTuQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVK6axb5Tnmik6MGgDkTWU4VKQfa8RZg/G42uKt0r31iEfNznLlA4qDzWKt9mKpEV80XIccXAcxjp+bBjFwdqM5TakYcN8Y
-X-Gm-Message-State: AOJu0YyX+aovKYOO54PmvTFZcetqjDqro55k65MPRnZcYAgyQIY0l4SI
-	Lmtap9q74vmFtgV2TrHGIJSikbuqmVDzvRJjhzhG23FNZn6wJJRkLON/IQn1ZNcoNTJGiBN1TGo
-	=
-X-Google-Smtp-Source: AGHT+IEtWnOUBL/Wo273B+TJPOZCK6oXiiqa6KQyRmb4uwT1toVKcdnq9/DAky2/ulIW7iDpuT+LlQ==
-X-Received: by 2002:a05:622a:5d3:b0:43a:6a21:3808 with SMTP id d19-20020a05622a05d300b0043a6a213808mr4272952qtb.55.1714155586094;
-        Fri, 26 Apr 2024 11:19:46 -0700 (PDT)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.gmail.com with ESMTPSA id s24-20020ac87598000000b00436440fd8bfsm8135729qtq.3.2024.04.26.11.19.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 26 Apr 2024 11:19:45 -0700 (PDT)
-Message-ID: <07b4cb83-08db-449d-9d73-88e84fa570bd@broadcom.com>
-Date: Fri, 26 Apr 2024 11:19:43 -0700
+	s=arc-20240116; t=1714156120; c=relaxed/simple;
+	bh=faChdLL5XkkWwH0eCjLtQtfUevMjKcC2aKXpJ2qGG3w=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=muAjN1LAG/pkOwewi+Sw7hDMLTX3hCfHt6E5KLu4zOAkLnyxhvRMOn6o6wwN2Hq3Pv4zPWTnMbPfJd3JK8OmEQ2xAcEUKYxPqHwwTCjqesm6jsm9eptP3Fp0pcnXznoeCAnCZgVkUsA/aLUwN4+QmmnWU4gQFCFWLZllEdNpkdc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=us.ibm.com; spf=none smtp.mailfrom=linux.vnet.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=oOvXIabc; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=us.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.vnet.ibm.com
+Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 43QHpPhP023034;
+	Fri, 26 Apr 2024 18:28:35 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=9H+VVYN0JGjzkNGUjBNWPptTuPyWVDN0E28eym/1eLc=;
+ b=oOvXIabcUWkUuMxWnmSuk2ydP+yHbl3nODZyX0BnhXCt3j7Ds9k83IeepKHa+B3f0eA5
+ NozL4fUR0aliFHv8x36Gyjj7X1pumbXOZOhJzLPfBfJMqvoNaV+L8hkykS4tX77Kqhg7
+ 7digOFBZMrCJIYSr14XLliRP8hzAStfnmAqc8FbKsItQiSBaU6D+kKJAF61/UlBqLhNq
+ bJaAGaMIV/7bVlj0FcCj4V8/whEY/Ef3TCNx913jgsPfGoWtjXHYQQrtM3s9rahh9KZu
+ B4xsj9qCp0QtBvmQDtC/pmSctinWv9DsZmLbCK5cXKUU42fVifcpQQQCeOCVB10iIxt3 6w== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xrgw8g2u4-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 26 Apr 2024 18:28:34 +0000
+Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 43QISYNe017070;
+	Fri, 26 Apr 2024 18:28:34 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xrgw8g2r1-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 26 Apr 2024 18:28:34 +0000
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 43QFeoi7023065;
+	Fri, 26 Apr 2024 18:26:03 GMT
+Received: from smtprelay05.wdc07v.mail.ibm.com ([172.16.1.72])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3xms1ph6qj-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 26 Apr 2024 18:26:03 +0000
+Received: from smtpav06.wdc07v.mail.ibm.com (smtpav06.wdc07v.mail.ibm.com [10.39.53.233])
+	by smtprelay05.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 43QIQ07G16057028
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 26 Apr 2024 18:26:02 GMT
+Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id B615358060;
+	Fri, 26 Apr 2024 18:26:00 +0000 (GMT)
+Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 735575803F;
+	Fri, 26 Apr 2024 18:26:00 +0000 (GMT)
+Received: from localhost (unknown [9.61.50.69])
+	by smtpav06.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Fri, 26 Apr 2024 18:26:00 +0000 (GMT)
+From: David J Wilder <dwilder@us.ibm.com>
+To: edumazet@google.com
+Cc: dwilder@linux.ibm.com, netdev@vger.kernel.org, pabeni@redhat.com,
+        sd@queasysnail.net, wilder@us.ibm.com
+Subject: Re: [RFC PATCH] net: skb: Increasing allocation in __napi_alloc_skb() to 2k when needed.
+Date: Fri, 26 Apr 2024 11:25:59 -0700
+Message-Id: <20240426182559.3836970-1-dwilder@us.ibm.com>
+X-Mailer: git-send-email 2.39.3
+In-Reply-To: <CANn89iKWA=LjMUtLOXUfzRMirYfBa+uAfNsfs_Mpq9z0ngGgmA@mail.gmail.com>
+References: <CANn89iKWA=LjMUtLOXUfzRMirYfBa+uAfNsfs_Mpq9z0ngGgmA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2 3/3] net: bcmgenet: synchronize UMAC_CMD access
-To: Doug Berger <opendmb@gmail.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: bcm-kernel-feedback-list@broadcom.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, stable@vger.kernel.org
-References: <20240425222721.2148899-1-opendmb@gmail.com>
- <20240425222721.2148899-4-opendmb@gmail.com>
-From: Florian Fainelli <florian.fainelli@broadcom.com>
-Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
- xsBNBFPAG8ABCAC3EO02urEwipgbUNJ1r6oI2Vr/+uE389lSEShN2PmL3MVnzhViSAtrYxeT
- M0Txqn1tOWoIc4QUl6Ggqf5KP6FoRkCrgMMTnUAINsINYXK+3OLe7HjP10h2jDRX4Ajs4Ghs
- JrZOBru6rH0YrgAhr6O5gG7NE1jhly+EsOa2MpwOiXO4DE/YKZGuVe6Bh87WqmILs9KvnNrQ
- PcycQnYKTVpqE95d4M824M5cuRB6D1GrYovCsjA9uxo22kPdOoQRAu5gBBn3AdtALFyQj9DQ
- KQuc39/i/Kt6XLZ/RsBc6qLs+p+JnEuPJngTSfWvzGjpx0nkwCMi4yBb+xk7Hki4kEslABEB
- AAHNMEZsb3JpYW4gRmFpbmVsbGkgPGZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tPsLB
- IQQQAQgAywUCZWl41AUJI+Jo+hcKAAG/SMv+fS3xUQWa0NryPuoRGjsA3SAUAAAAAAAWAAFr
- ZXktdXNhZ2UtbWFza0BwZ3AuY29tjDAUgAAAAAAgAAdwcmVmZXJyZWQtZW1haWwtZW5jb2Rp
- bmdAcGdwLmNvbXBncG1pbWUICwkIBwMCAQoFF4AAAAAZGGxkYXA6Ly9rZXlzLmJyb2FkY29t
- Lm5ldAUbAwAAAAMWAgEFHgEAAAAEFQgJChYhBNXZKpfnkVze1+R8aIExtcQpvGagAAoJEIEx
- tcQpvGagWPEH/2l0DNr9QkTwJUxOoP9wgHfmVhqc0ZlDsBFv91I3BbhGKI5UATbipKNqG13Z
- TsBrJHcrnCqnTRS+8n9/myOF0ng2A4YT0EJnayzHugXm+hrkO5O9UEPJ8a+0553VqyoFhHqA
- zjxj8fUu1px5cbb4R9G4UAySqyeLLeqnYLCKb4+GklGSBGsLMYvLmIDNYlkhMdnnzsSUAS61
- WJYW6jjnzMwuKJ0ZHv7xZvSHyhIsFRiYiEs44kiYjbUUMcXor/uLEuTIazGrE3MahuGdjpT2
- IOjoMiTsbMc0yfhHp6G/2E769oDXMVxCCbMVpA+LUtVIQEA+8Zr6mX0Yk4nDS7OiBlvOwE0E
- U8AbwQEIAKxr71oqe+0+MYCc7WafWEcpQHFUwvYLcdBoOnmJPxDwDRpvU5LhqSPvk/yJdh9k
- 4xUDQu3rm1qIW2I9Puk5n/Jz/lZsqGw8T13DKyu8eMcvaA/irm9lX9El27DPHy/0qsxmxVmU
- pu9y9S+BmaMb2CM9IuyxMWEl9ruWFS2jAWh/R8CrdnL6+zLk60R7XGzmSJqF09vYNlJ6Bdbs
- MWDXkYWWP5Ub1ZJGNJQ4qT7g8IN0qXxzLQsmz6tbgLMEHYBGx80bBF8AkdThd6SLhreCN7Uh
- IR/5NXGqotAZao2xlDpJLuOMQtoH9WVNuuxQQZHVd8if+yp6yRJ5DAmIUt5CCPcAEQEAAcLB
- gQQYAQIBKwUCU8AbwgUbDAAAAMBdIAQZAQgABgUCU8AbwQAKCRCTYAaomC8PVQ0VCACWk3n+
- obFABEp5Rg6Qvspi9kWXcwCcfZV41OIYWhXMoc57ssjCand5noZi8bKg0bxw4qsg+9cNgZ3P
- N/DFWcNKcAT3Z2/4fTnJqdJS//YcEhlr8uGs+ZWFcqAPbteFCM4dGDRruo69IrHfyyQGx16s
- CcFlrN8vD066RKevFepb/ml7eYEdN5SRALyEdQMKeCSf3mectdoECEqdF/MWpfWIYQ1hEfdm
- C2Kztm+h3Nkt9ZQLqc3wsPJZmbD9T0c9Rphfypgw/SfTf2/CHoYVkKqwUIzI59itl5Lze+R5
- wDByhWHx2Ud2R7SudmT9XK1e0x7W7a5z11Q6vrzuED5nQvkhAAoJEIExtcQpvGagugcIAJd5
- EYe6KM6Y6RvI6TvHp+QgbU5dxvjqSiSvam0Ms3QrLidCtantcGT2Wz/2PlbZqkoJxMQc40rb
- fXa4xQSvJYj0GWpadrDJUvUu3LEsunDCxdWrmbmwGRKqZraV2oG7YEddmDqOe0Xm/NxeSobc
- MIlnaE6V0U8f5zNHB7Y46yJjjYT/Ds1TJo3pvwevDWPvv6rdBeV07D9s43frUS6xYd1uFxHC
- 7dZYWJjZmyUf5evr1W1gCgwLXG0PEi9n3qmz1lelQ8lSocmvxBKtMbX/OKhAfuP/iIwnTsww
- 95A2SaPiQZA51NywV8OFgsN0ITl2PlZ4Tp9hHERDe6nQCsNI/Us=
-In-Reply-To: <20240425222721.2148899-4-opendmb@gmail.com>
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000d1ff16061703f29b"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: i9PzY2lSxBb-4z7eDSVzGSh4AFDANs7r
+X-Proofpoint-ORIG-GUID: 1RauAGK-Xdm0r2EEgknKNuqoMd1bcOtJ
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1011,Hydra:6.0.650,FMLib:17.11.176.26
+ definitions=2024-04-26_15,2024-04-26_02,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ priorityscore=1501 mlxscore=0 suspectscore=0 clxscore=1011 adultscore=0
+ lowpriorityscore=0 spamscore=0 mlxlogscore=999 bulkscore=0 malwarescore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2404010000 definitions=main-2404260126
 
---000000000000d1ff16061703f29b
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+On Wed, Apr 24, 2024 at 10:49 PM Sabrina Dubroca <sd@queasysnail.net> wrote:
+>>
+>> 2024-04-23, 09:56:33 +0200, Paolo Abeni wrote:
+>> > On Fri, 2024-04-19 at 15:23 -0700, David J Wilder wrote:
+>> > > When testing CONFIG_MAX_SKB_FRAGS=45 on ppc64le and x86_64 I ran into a
+>> > > couple of issues.
+>> > >
+>> > > __napi_alloc_skb() assumes its smallest fragment allocations will fit in
+>> > > 1K. When CONFIG_MAX_SKB_FRAGS is increased this may no longer be true
+>> > > resulting in __napi_alloc_skb() reverting to using page_frag_alloc().
+>> > > This results in the return of the bug fixed in:
+>> > > Commit 3226b158e67c ("net: avoid 32 x truesize under-estimation for
+>> > > tiny skbs")
+>> > >
+>> > > That commit insured that "small skb head fragments are kmalloc backed,
+>> > > so that other objects in the slab page can be reused instead of being held
+>> > > as long as skbs are sitting in socket queues."
+>> > >
+>> > > On ppc64le the warning from napi_get_frags_check() is displayed when
+>> > > CONFIG_MAX_SKB_FRAGS is set to 45. The purpose of the warning is to detect
+>> > > when an increase of MAX_SKB_FRAGS has reintroduced the aforementioned bug.
+>> > > Unfortunately on x86_64 this warning is not seen, even though it should be.
+>> > > I found the warning was disabled by:
+>> > > commit dbae2b062824 ("net: skb: introduce and use a single page frag
+>> > > cache")
+>> > >
+>> > > This RFC patch to __napi_alloc_skb() determines if an skbuff allocation
+>> > > with a head fragment of size GRO_MAX_HEAD will fit in a 1k allocation,
+>> > > increasing the allocation to 2k if needed.
+>> > >
+>> > > I have functionally tested this patch, performance testing is still needed.
+>> > >
+>> > > TBD: Remove the limitation on 4k page size from the single page frag cache
+>> > > allowing ppc64le (64K page size) to benefit from this change.
+>> > >
+>> > > TBD: I have not address the warning in napi_get_frags_check() on x86_64.
+>> > > Will the warning still be needed once the other changes are completed?
+>> >
+>> >
+>> > Thanks for the detailed analysis.
+>> >
+>> > As mentioned by Eric in commit
+>> > bf9f1baa279f0758dc2297080360c5a616843927, it should be now possible to
+>> > revert dbae2b062824 without incurring in performance regressions for
+>> > the relevant use-case. I had that on my todo list since a lot of time,
+>> > but I was unable to allocate time for that.
+>> >
+>> > I think such revert would be preferable. Would you be able to evaluate
+>> > such option?
 
-On 4/25/24 15:27, Doug Berger wrote:
-> The UMAC_CMD register is written from different execution
-> contexts and has insufficient synchronization protections to
-> prevent possible corruption. Of particular concern are the
-> acceses from the phy_device delayed work context used by the
-> adjust_link call and the BH context that may be used by the
-> ndo_set_rx_mode call.
+Thanks Paolo,  yes, I can evaluate removing dbae2b062824. 
+
+>>
+>> I don't think reverting dbae2b062824 would fix David's issue.
+>>
+>> The problem is that with MAX_SKB_FRAGS=45, skb_shared_info becomes
+>> huge, so 1024 is not enough for those small packets, and we use a
+>> pagefrag instead of kmalloc, which makes napi_get_frags_check unhappy.
+>>
+>
+> 768 bytes is not huge ...
+>
+>> Even after reverting dbae2b062824, we would still go through the
+>> pagefrag path and not __alloc_skb.
+>>
+>> What about something like this?  (boot-tested on x86 only, but I
+>> disabled NAPI_HAS_SMALL_PAGE_FRAG. no perf testing at all.)
+>>
+>> -------- 8< --------
+>> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+>> index f85e6989c36c..88923b7b64fe 100644
+>> --- a/net/core/skbuff.c
+>> +++ b/net/core/skbuff.c
+>> @@ -108,6 +108,8 @@ static struct kmem_cache *skbuff_ext_cache __ro_after_init;
+>>  #define SKB_SMALL_HEAD_HEADROOM                                                \
+>>         SKB_WITH_OVERHEAD(SKB_SMALL_HEAD_CACHE_SIZE)
+>>
+>> +#define SKB_SMALL_HEAD_THRESHOLD (SKB_SMALL_HEAD_HEADROOM + NET_SKB_PAD + NET_IP_ALIGN)
+>> +
+>>  int sysctl_max_skb_frags __read_mostly = MAX_SKB_FRAGS;
+>>  EXPORT_SYMBOL(sysctl_max_skb_frags);
+>>
+>> @@ -726,7 +728,7 @@ struct sk_buff *__netdev_alloc_skb(struct net_device *dev, unsigned int len,
+>>         /* If requested length is either too small or too big,
+>>          * we use kmalloc() for skb->head allocation.
+>>          */
+>> -       if (len <= SKB_WITH_OVERHEAD(1024) ||
+>> +       if (len <= SKB_SMALL_HEAD_THRESHOLD ||
+>>             len > SKB_WITH_OVERHEAD(PAGE_SIZE) ||
+>>             (gfp_mask & (__GFP_DIRECT_RECLAIM | GFP_DMA))) {
+>>                 skb = __alloc_skb(len, gfp_mask, SKB_ALLOC_RX, NUMA_NO_NODE);
+>> @@ -802,7 +804,7 @@ struct sk_buff *napi_alloc_skb(struct napi_struct *napi, unsigned int len)
+>>          * When the small frag allocator is available, prefer it over kmalloc
+>>          * for small fragments
+>>          */
+>> -       if ((!NAPI_HAS_SMALL_PAGE_FRAG && len <= SKB_WITH_OVERHEAD(1024)) ||
+>> +       if ((!NAPI_HAS_SMALL_PAGE_FRAG && len <= SKB_SMALL_HEAD_THRESHOLD) ||
+>>             len > SKB_WITH_OVERHEAD(PAGE_SIZE) ||
+>>             (gfp_mask & (__GFP_DIRECT_RECLAIM | GFP_DMA))) {
+>>                 skb = __alloc_skb(len, gfp_mask, SKB_ALLOC_RX | SKB_ALLOC_NAPI,
+>> -------- 8< --------
+>>
+>> (__)napi_alloc_skb extends the GRO_MAX_HEAD size by NET_SKB_PAD +
+>> NET_IP_ALIGN, so I added them here as well. Mainly this is reusing a
+>> size that we know if big enough to fit a small header and whatever
+>> size skb_shared_info is on the current build. Maybe this could be
+>> max(SKB_WITH_OVERHEAD(1024), <...>) to preserve the current behavior
+>> on MAX_SKB_FRAGS=17, since in that case
+>> SKB_WITH_OVERHEAD(1024) > SKB_SMALL_HEAD_HEADROOM
+>>
+>>
+
+Thanks for the suggestion Sabrina, I will incorporate it. 
+
 > 
-> A spinlock is added to the driver to protect contended register
-> accesses (i.e. reg_lock) and it is used to synchronize accesses
-> to UMAC_CMD.
+> Here we simply use
 > 
-> Fixes: 1c1008c793fa ("net: bcmgenet: add main driver file")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Doug Berger <opendmb@gmail.com>
+> #define GRO_MAX_HEAD 192
 
-Acked-by: Florian Fainelli <florian.fainelli@broadcom.com>
-
-As a bug fix this is totally fine. I believe there could be an 
-improvement made in 'net-next' whereby we introduce an 
-unimac_rmw_locked() or something that essentially does:
-
-void unimac_rmw_locked(struct bcmgenet_priv *priv, u32 offset, u32 
-mask_clear, u32 mask_set)
-{
-	u32 reg;
-	spin_lock_bh(&priv->reg_lock);
-	reg = bcmgenet_umac_readl(priv, offset);
-	reg &= ~mask_clear;
-	reg |= mask_set;
-	bcmgenet_umac_writel(priv, reg, offset);
-	spin_unlock_bh(&priv->reg_lock);
-}
-
-At least a couple of callers could benefit from it. Thanks!
--- 
-Florian
-
-
---000000000000d1ff16061703f29b
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
-
-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
-riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
-QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
-UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
-M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
-Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
-14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
-a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
-XzCCBVgwggRAoAMCAQICDBP8P9hKRVySg3Qv5DANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
-RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
-UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAxMjE4MTFaFw0yNTA5MTAxMjE4MTFaMIGW
-MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
-BgNVBAoTDUJyb2FkY29tIEluYy4xGTAXBgNVBAMTEEZsb3JpYW4gRmFpbmVsbGkxLDAqBgkqhkiG
-9w0BCQEWHWZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tMIIBIjANBgkqhkiG9w0BAQEFAAOC
-AQ8AMIIBCgKCAQEA+oi3jMmHltY4LMUy8Up5+1zjd1iSgUBXhwCJLj1GJQF+GwP8InemBbk5rjlC
-UwbQDeIlOfb8xGqHoQFGSW8p9V1XUw+cthISLkycex0AJ09ufePshLZygRLREU0H4ecNPMejxCte
-KdtB4COST4uhBkUCo9BSy1gkl8DJ8j/BQ1KNUx6oYe0CntRag+EnHv9TM9BeXBBLfmMRnWNhvOSk
-nSmRX0J3d9/G2A3FIC6WY2XnLW7eAZCQPa1Tz3n2B5BGOxwqhwKLGLNu2SRCPHwOdD6e0drURF7/
-Vax85/EqkVnFNlfxtZhS0ugx5gn2pta7bTdBm1IG4TX+A3B1G57rVwIDAQABo4IB3jCCAdowDgYD
-VR0PAQH/BAQDAgWgMIGjBggrBgEFBQcBAQSBljCBkzBOBggrBgEFBQcwAoZCaHR0cDovL3NlY3Vy
-ZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAuY3J0MEEG
-CCsGAQUFBzABhjVodHRwOi8vb2NzcC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWdu
-MmNhMjAyMDBNBgNVHSAERjBEMEIGCisGAQQBoDIBKAowNDAyBggrBgEFBQcCARYmaHR0cHM6Ly93
-d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIwADBJBgNVHR8EQjBAMD6gPKA6
-hjhodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNy
-bDAoBgNVHREEITAfgR1mbG9yaWFuLmZhaW5lbGxpQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggr
-BgEFBQcDBDAfBgNVHSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQUUwwfJ6/F
-KL0fRdVROal/Lp4lAF0wDQYJKoZIhvcNAQELBQADggEBAKBgfteDc1mChZjKBY4xAplC6uXGyBrZ
-kNGap1mHJ+JngGzZCz+dDiHRQKGpXLxkHX0BvEDZLW6LGOJ83ImrW38YMOo3ZYnCYNHA9qDOakiw
-2s1RH00JOkO5SkYdwCHj4DB9B7KEnLatJtD8MBorvt+QxTuSh4ze96Jz3kEIoHMvwGFkgObWblsc
-3/YcLBmCgaWpZ3Ksev1vJPr5n8riG3/N4on8gO5qinmmr9Y7vGeuf5dmZrYMbnb+yCBalkUmZQwY
-NxADYvcRBA0ySL6sZpj8BIIhWiXiuusuBmt2Mak2eEv0xDbovE6Z6hYyl/ZnRadbgK/ClgbY3w+O
-AfUXEZ0xggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52
-LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwT
-/D/YSkVckoN0L+QwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEII8/Jwk/ZlSrMwrv
-78xk8GnzsRjo2rZZhQHyDCMW9AsaMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcN
-AQkFMQ8XDTI0MDQyNjE4MTk0NlowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZI
-AWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEH
-MAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQDjrAstw9oEGw5KyOyz984PMHl06F0Fyb6/
-VBk/FH6UQbrzGYxEpSjuoWVgwX5S817zzAxY+0/vhjADYEPufQEHi42u5vjMwA1XAeq7vkP0swHW
-kJ0ciRtjAvbdzq8H7Sj6GOtX/sa+GyaYnUnDQjEnasftN3nbGF6YM2EZuej9iVGFmDO1TSeIw/2o
-fX/JssnpW5cnci7A5taaRRf20csXhOpO66IUQdo/fNgrAkgR07uSddEPEeCpYCTEdOaBe/RqvZGM
-ItQueSfQRhHbEBWJsRxbWWs0DPl2QqaQdrCaVEC3d6kq7pExrz7kTHIKnMudHV0DAi7ZdynTATYp
-iGL+
---000000000000d1ff16061703f29b--
+Sorry Eric, where did 192 come from?
 
