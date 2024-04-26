@@ -1,121 +1,199 @@
-Return-Path: <netdev+bounces-91593-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91594-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB2AD8B3216
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 10:13:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BBF8B8B3219
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 10:14:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ECE4F1C21255
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 08:13:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 35A321F22534
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 08:14:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A4A613C915;
-	Fri, 26 Apr 2024 08:13:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D0EB13C9AA;
+	Fri, 26 Apr 2024 08:14:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=kpnmail.nl header.i=@kpnmail.nl header.b="AO5ZLfjF"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bMfa19Vb"
 X-Original-To: netdev@vger.kernel.org
-Received: from ewsoutbound.kpnmail.nl (ewsoutbound.kpnmail.nl [195.121.94.168])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EC2414293
-	for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 08:13:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.121.94.168
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF7D713C917
+	for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 08:14:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714119185; cv=none; b=J3KecCKFwNaTRJo5blfihWYuD5zHl+M1Z3Nl4aU7oqLLTUUuRD5u8jC+Bsxv33OKQMi4Jn7x1jYO+owWzjWkr12f3kulQUXrSOXzfoleuT6Fkct9HV9zfwg510VtxdHj+xOt/xjImvxwh/Ec2jWuVGNCY5lDGJ9YSL5f4cacVkE=
+	t=1714119255; cv=none; b=Nj1zWCJm88wH68/l6GZjX3My3Lu6imuAuDEXAScVjVgyRCjrrgxYnHnw+aIElYxskD7DgPzv6mZ/7uC65peNQMjt26ss7YiyPsuncW02/6xYjXumZpZRIqFYebqKGQYwF+qyP2PVMYXi1/irwqYSAamuTHx4yXlfp0huYrXEyXc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714119185; c=relaxed/simple;
-	bh=c6VRLJPp/4jZOqH/dlpkGx5osSz9dKhT2FMWS3WTX2M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LCaUyrV13RsKCl2IZIoO4RbwXlCXNPxNYLc0XO9rePEOEJBP6pTT1WEs6QW7DYyuwvIAEhummkNfQBAedAHp7JLxAdvzgaUz+Wnkbo9RmfR/Aq1OyVBY2Qltr+MY7hg99SG+gNqF6OVo4ylYQOR8W/0HL15nJ/v0K3eGC99zMrs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=phenome.org; spf=none smtp.mailfrom=phenome.org; dkim=pass (1024-bit key) header.d=kpnmail.nl header.i=@kpnmail.nl header.b=AO5ZLfjF; arc=none smtp.client-ip=195.121.94.168
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=phenome.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=phenome.org
-X-KPN-MessageId: a38760ad-03a4-11ef-836c-005056aba152
-Received: from smtp.kpnmail.nl (unknown [10.31.155.39])
-	by ewsoutbound.so.kpn.org (Halon) with ESMTPS
-	id a38760ad-03a4-11ef-836c-005056aba152;
-	Fri, 26 Apr 2024 10:11:52 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=kpnmail.nl; s=kpnmail01;
-	h=content-type:mime-version:message-id:subject:to:from:date;
-	bh=tbf/KYmDHZM+S/pkYVfdlKKNsDHA5SNUYGhE25ggmCM=;
-	b=AO5ZLfjF2o4jBFJmsKrNqTBA1VRCoGr+SSn7YPKdr/zYdewA9ttdzkBz78LR6VZum+jixmBcRMPMW
-	 /GE8Clg5bq1TTadmANCY0zn44cajpFvpbhqYXgCtf1082bccaeZz4JPilshvpEKfb5lo6MUR9aTanT
-	 NWJGR3Qb4pxjzKOk=
-X-KPN-MID: 33|elPe8iV/CJ+h15hIP5rRQFcepOze/+ShPEZ7Ju22YZhj0G5dXwrupnSu7LgCYQe
- fsIOuY8F9NQ/uEFb7oZ53roaNFgrVliZ9+ceqJwYi8GY=
-X-KPN-VerifiedSender: No
-X-CMASSUN: 33|dzh+neos4vfBtn0tagIZGRMEFNsDu5vrP91a8iVGRTUD//nMeiOk7hhzAQYKiKx
- 28CDEcMuPw4JfggBVhif4ug==
-Received: from Antony2201.local (213-10-186-43.fixed.kpn.net [213.10.186.43])
-	by smtp.xs4all.nl (Halon) with ESMTPSA
-	id a315032c-03a4-11ef-8d63-005056ab7447;
-	Fri, 26 Apr 2024 10:11:53 +0200 (CEST)
-Date: Fri, 26 Apr 2024 10:11:50 +0200
-From: Antony Antony <antony@phenome.org>
-To: nicolas.dichtel@6wind.com
-Cc: Sabrina Dubroca <sd@queasysnail.net>, antony.antony@secunet.com,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>, netdev@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	devel@linux-ipsec.org, Leon Romanovsky <leon@kernel.org>,
-	Eyal Birger <eyal.birger@gmail.com>
-Subject: Re: [PATCH ipsec-next v12 3/4] xfrm: Add dir validation to "in" data
- path lookup
-Message-ID: <ZithxsHLhPw1ZVHM@Antony2201.local>
-References: <cover.1713874887.git.antony.antony@secunet.com>
- <f7492e95b2a838f78032424a18c3509e0faacba5.1713874887.git.antony.antony@secunet.com>
- <8ac397dc-5498-493c-bcbc-926555ab60ab@6wind.com>
- <ZijFmMDST_ksUUnk@hog>
- <80f3257c-e214-41d2-8b40-b29af32310aa@6wind.com>
+	s=arc-20240116; t=1714119255; c=relaxed/simple;
+	bh=xnukKj82afXd616up3SVX4P1lCt0MFKwpZCZY6Zyco8=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=A3/M744ruFSuUirpU7Xj0wBl6RtcXDK+puUUKBlY9ZjeMyE9yDm3s4+mHba+iuSVnnLFysKAk4AjnyH1Kp1hMOzQOm1RAL823QwCnVz7MegBzZaar527JdmJocB3h5gCQyENn6QIJWW2D749T0e4lhRsfTjUlc7nylMmL9v/gaw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bMfa19Vb; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1714119252;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=BDqpBO7omNT7QL5cCt7YADimwVUvaeaLukFM/JMfaDQ=;
+	b=bMfa19Vbk+Sz0pw3kmGAwXJjMzIpjJYq4gcTV0FPabfFINcQh6vRYiohNOUeYUVUHqv0cE
+	IjX2U7qCHLAy1itPRdO1yG/YnXuWrYX8YIpa2gJs8u4Ls+mlKDWGJ2wN7uUvUHRNr3TJ14
+	Tiq6QmS40oadNRbU1zrxFgc33+5+QXU=
+Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
+ [209.85.167.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-47-s2rvKesXNCmYYHxItgwjaA-1; Fri, 26 Apr 2024 04:14:10 -0400
+X-MC-Unique: s2rvKesXNCmYYHxItgwjaA-1
+Received: by mail-lf1-f70.google.com with SMTP id 2adb3069b0e04-51bb2e13253so213783e87.1
+        for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 01:14:10 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714119249; x=1714724049;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=BDqpBO7omNT7QL5cCt7YADimwVUvaeaLukFM/JMfaDQ=;
+        b=YsM4TI3Bw/R4IB7dTMjrV9hi51mv0Wg9F6rZUvCggUkxSXvR1Qd23gGmobef/+BYh3
+         EsVFOxnFj3sQzVc8qWBmWR26lcieT9ozVbtWbEcOC/EfaRIuhL5mKXikkRopeCpyU1cY
+         C0UfFen/fJPvhfBSxoNc9c1tawb5fO+V3s76ReLqHzZ+05B6i78NIOuKqhlL16x1b3nI
+         zHdJXIQIHiynNRfsWm0ZhU9sED3FOoFnc545a4yO0cm+254vlUymhfUtQ0RhST9L0LFz
+         d1Hp4pLEvW9UvfM2Xqv6mJpZgczON4ZssSEoG4I2JThbg6vemURJxbGpEhsv8jKeDNJo
+         TEqg==
+X-Forwarded-Encrypted: i=1; AJvYcCWo3uS+lW+h4mNQbT1Ho480mak6wA/pev9rgRuTwcagRml7FGKdXgDjYqtJR2Iup8duNOs/eBsob/doP74hP7RibQOJKQPm
+X-Gm-Message-State: AOJu0YyAoJbKEMwy+GI4xBfD2hQqPmjf3NFT9N5Pwa/OzkdkCn8W9VBN
+	qhIvXMgQh7iR4r2oTc7Mxl9MY9guAIqRfOabky+kv4gU/kBiPbc9rH7P8vF7D1HsGExkFH6kukU
+	eVoKjPGfKgrmMETxuO3M2qvqzKSbwu/KycHnAaZkv4QeakIgvIFViFg==
+X-Received: by 2002:a2e:8194:0:b0:2de:6d53:fcd8 with SMTP id e20-20020a2e8194000000b002de6d53fcd8mr978653ljg.5.1714119249112;
+        Fri, 26 Apr 2024 01:14:09 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHJ9ofEkQeveoLtOGpbOvjocWfrh6SiycrseBVJIV7jmOr/hVHBQnJv2z07Kqdv5851n/hFAA==
+X-Received: by 2002:a2e:8194:0:b0:2de:6d53:fcd8 with SMTP id e20-20020a2e8194000000b002de6d53fcd8mr978635ljg.5.1714119248626;
+        Fri, 26 Apr 2024 01:14:08 -0700 (PDT)
+Received: from gerbillo.redhat.com ([2a0d:3344:171d:a510::f71])
+        by smtp.gmail.com with ESMTPSA id a12-20020a056000050c00b00349ac818326sm21795221wrf.43.2024.04.26.01.14.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 26 Apr 2024 01:14:08 -0700 (PDT)
+Message-ID: <ce46af97c03471c64f1fcff27c41e65ca82dd151.camel@redhat.com>
+Subject: Re: [PATCH net-next 3/4] net: add code for TCP fraglist GRO
+From: Paolo Abeni <pabeni@redhat.com>
+To: Felix Fietkau <nbd@nbd.name>, netdev@vger.kernel.org, Eric Dumazet
+ <edumazet@google.com>, "David S. Miller" <davem@davemloft.net>, Jakub
+ Kicinski <kuba@kernel.org>, David Ahern <dsahern@kernel.org>
+Cc: willemdebruijn.kernel@gmail.com, linux-kernel@vger.kernel.org
+Date: Fri, 26 Apr 2024 10:14:06 +0200
+In-Reply-To: <20240424180458.56211-4-nbd@nbd.name>
+References: <20240424180458.56211-1-nbd@nbd.name>
+	 <20240424180458.56211-4-nbd@nbd.name>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <80f3257c-e214-41d2-8b40-b29af32310aa@6wind.com>
 
-On Wed, Apr 24, 2024 at 12:04:12PM +0200, Nicolas Dichtel via Devel wrote:
-> Le 24/04/2024 à 10:40, Sabrina Dubroca a écrit :
-> [snip]
-> >>> diff --git a/Documentation/networking/xfrm_proc.rst b/Documentation/networking/xfrm_proc.rst
-> >>> index c237bef03fb6..b4f4d9552dea 100644
-> >>> --- a/Documentation/networking/xfrm_proc.rst
-> >>> +++ b/Documentation/networking/xfrm_proc.rst
-> >>> @@ -73,6 +73,9 @@ XfrmAcquireError:
-> >>>  XfrmFwdHdrError:
-> >>>  	Forward routing of a packet is not allowed
-> >>>
-> >>> +XfrmInStateDirError:
-> >>> +        State direction input mismatched with lookup path direction
-> >> It's a bit confusing because when this error occurs, the state direction is not
-> >> 'input'.
-> > 
-> > Agree.
-> > 
-> >> This statistic is under 'Inbound errors', so may something like this is enough:
-> >> 'State direction is output.'
-> > 
-> > Maybe something like:
-> > 
-> > State direction mismatch (lookup found an output state on the input path, expected input or no direction)
+On Wed, 2024-04-24 at 20:04 +0200, Felix Fietkau wrote:
+> This implements fraglist GRO similar to how it's handled in UDP, however
+> no functional changes are added yet. The next change adds a heuristic for
+> using fraglist GRO instead of regular GRO.
+>=20
+> Signed-off-by: Felix Fietkau <nbd@nbd.name>
+> ---
+>  include/net/tcp.h        |  3 ++-
+>  net/ipv4/tcp_offload.c   | 29 +++++++++++++++++++++++++++--
+>  net/ipv6/tcpv6_offload.c | 11 ++++++++++-
+>  3 files changed, 39 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/include/net/tcp.h b/include/net/tcp.h
+> index b935e1ae4caf..875cda53a7c9 100644
+> --- a/include/net/tcp.h
+> +++ b/include/net/tcp.h
+> @@ -2194,7 +2194,8 @@ void tcp_v4_destroy_sock(struct sock *sk);
+> =20
+>  struct sk_buff *tcp_gso_segment(struct sk_buff *skb,
+>  				netdev_features_t features);
+> -struct sk_buff *tcp_gro_receive(struct list_head *head, struct sk_buff *=
+skb);
+> +struct sk_buff *tcp_gro_receive(struct list_head *head, struct sk_buff *=
+skb,
+> +				bool fraglist);
+>  INDIRECT_CALLABLE_DECLARE(int tcp4_gro_complete(struct sk_buff *skb, int=
+ thoff));
+>  INDIRECT_CALLABLE_DECLARE(struct sk_buff *tcp4_gro_receive(struct list_h=
+ead *head, struct sk_buff *skb));
+>  INDIRECT_CALLABLE_DECLARE(int tcp6_gro_complete(struct sk_buff *skb, int=
+ thoff));
+> diff --git a/net/ipv4/tcp_offload.c b/net/ipv4/tcp_offload.c
+> index 06dbb2e2b2f3..6294e7a5c099 100644
+> --- a/net/ipv4/tcp_offload.c
+> +++ b/net/ipv4/tcp_offload.c
+> @@ -252,7 +252,8 @@ struct sk_buff *tcp_gso_segment(struct sk_buff *skb,
+>  	return segs;
+>  }
+> =20
+> -struct sk_buff *tcp_gro_receive(struct list_head *head, struct sk_buff *=
+skb)
+> +struct sk_buff *tcp_gro_receive(struct list_head *head, struct sk_buff *=
+skb,
+> +				bool fraglist)
+>  {
+>  	struct sk_buff *pp =3D NULL;
+>  	struct sk_buff *p;
+> @@ -289,6 +290,7 @@ struct sk_buff *tcp_gro_receive(struct list_head *hea=
+d, struct sk_buff *skb)
+>  	len =3D skb_gro_len(skb);
+>  	flags =3D tcp_flag_word(th);
+> =20
+> +	NAPI_GRO_CB(skb)->is_flist =3D fraglist;
+>  	list_for_each_entry(p, head, list) {
+>  		if (!NAPI_GRO_CB(p)->same_flow)
+>  			continue;
+> @@ -308,6 +310,7 @@ struct sk_buff *tcp_gro_receive(struct list_head *hea=
+d, struct sk_buff *skb)
+>  found:
+>  	/* Include the IP ID check below from the inner most IP hdr */
+>  	flush =3D NAPI_GRO_CB(p)->flush;
+> +	flush |=3D fraglist !=3D NAPI_GRO_CB(p)->is_flist;
+>  	flush |=3D (__force int)(flags & TCP_FLAG_CWR);
+>  	flush |=3D (__force int)((flags ^ tcp_flag_word(th2)) &
+>  		  ~(TCP_FLAG_CWR | TCP_FLAG_FIN | TCP_FLAG_PSH));
+> @@ -341,6 +344,19 @@ struct sk_buff *tcp_gro_receive(struct list_head *he=
+ad, struct sk_buff *skb)
+>  	flush |=3D (ntohl(th2->seq) + skb_gro_len(p)) ^ ntohl(th->seq);
+>  	flush |=3D skb_cmp_decrypted(p, skb);
+> =20
+> +	if (fraglist) {
+> +		flush |=3D (__force int)(flags ^ tcp_flag_word(th2));
 
-This is better. Fixed in v13.
+Don't we have this check already a few lines above?
 
-> > 
-> > It's a bit verbose, but I think those extra details would help users
-> > understand what went wrong.
-> > 
-> Sure, it's ok for me.
 
-thanks,
--antony
+> +		flush |=3D skb->ip_summed !=3D p->ip_summed;
+> +		flush |=3D skb->csum_level !=3D p->csum_level;
+> +		flush |=3D !pskb_may_pull(skb, skb_gro_offset(skb));
+
+Why we need this check? The earlier skb_gro_may_pull() should ensure
+that, right?
+
+> +		flush |=3D NAPI_GRO_CB(p)->count >=3D 64;
+> +
+> +		if (flush || skb_gro_receive_list(p, skb))
+> +			mss =3D 1;
+> +
+> +		goto out_check_final;
+
+TCP flags processing needs some care. You need to propagate the current
+packets flag to the old one, and update the older packet csum
+accordingly.
+
+Cheers,
+
+Paolo
 
 
