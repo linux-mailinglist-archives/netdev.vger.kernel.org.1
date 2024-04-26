@@ -1,143 +1,155 @@
-Return-Path: <netdev+bounces-91628-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91629-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 370CF8B33E5
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 11:26:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 084F28B33F0
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 11:28:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E19451F2330C
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 09:26:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3ADE31C222C8
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 09:28:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE52B13E052;
-	Fri, 26 Apr 2024 09:26:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA70F13E3F5;
+	Fri, 26 Apr 2024 09:28:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="DriDzvnH"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b="GFji33As"
 X-Original-To: netdev@vger.kernel.org
-Received: from m15.mail.163.com (m15.mail.163.com [45.254.50.220])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D654013C838;
-	Fri, 26 Apr 2024 09:25:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.254.50.220
+Received: from nbd.name (nbd.name [46.4.11.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD526282EA;
+	Fri, 26 Apr 2024 09:28:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.4.11.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714123561; cv=none; b=QEIEYfzJcdykqvEulmo5lEcwQTfCJB7ZkJ+J9+KPIjmgy4wMk2kTJiKah9kgv+LI1id2NX+DCbkeKHewHuJqijDRheDUvnL2RVoaEpl2zvR8L+tiulOe1otm67/gqKaZxmtPOxJCGTDRTJLNXV+o1XxEJQZ3dGEjeMjPLM2Dgq0=
+	t=1714123724; cv=none; b=WGGXefQFGjUQgVOpaat5T56yCidpH5rz0md7vvaKsnLeihUzQItYtrY7hDNz71+8nXiTB7/KZb+25IBv2h1KqD/GozaJiyiAMglkdHnmWbFkHLlxQYE96Qh2NEPf2rc9pAmo1kp6LToQSD2C0J9aC3Pw3wZNB2CUOMJ32ApoSvg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714123561; c=relaxed/simple;
-	bh=rp94rzmBiWYwRT1Xe9//2+dGBGbcwQT69S3QZcWHhbc=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=NtNwmK+fkjMG498GgYM7fTAAEO1Psn/FROHwRpFarnOqdrqbKBzqdDLAgnByROE/ZN9KfegestAOf2VBmFr+isGdwOsO91kN5ByFb8cGU+J21xGQMiSe+YjUw4pZrE3cNAuJkRlv1MrIoNnam3Kycwr3eX2xpBrIjY5rTCttXWw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=DriDzvnH; arc=none smtp.client-ip=45.254.50.220
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=ac8Ot
-	BpdXETb5u8j8PCiiZkMHIEDlMdWPHdK4ooOeGY=; b=DriDzvnHjrY+bGS417Fpf
-	MqinJ2/Lr3xAt/nI9aHCUjJHLhQsvJrFpYu38cEBn1Kv0PrRFdmdJsij2jFh5zgk
-	qn6aIf9q9ewZYsrs7K8EG2Gq8HHi2oxVFXMbeJBQPj9DiUsQWGHLB6ICAL1DCXXc
-	SBPfj5XaheRUIiNyG4x87M=
-Received: from localhost.localdomain (unknown [112.97.48.208])
-	by gzga-smtp-mta-g0-3 (Coremail) with SMTP id _____wD3v3Tecitm5obCCQ--.37650S2;
-	Fri, 26 Apr 2024 17:24:48 +0800 (CST)
-From: Slark Xiao <slark_xiao@163.com>
-To: loic.poulain@linaro.org,
-	ryazanov.s.a@gmail.com,
-	johannes@sipsolutions.net
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Slark Xiao <slark_xiao@163.com>,
-	Hariprasad Kelam <hkelam@marvell.com>
-Subject: [PATCH net v2] net: wwan: Fix missing net device name for error message print
-Date: Fri, 26 Apr 2024 17:24:44 +0800
-Message-Id: <20240426092444.825735-1-slark_xiao@163.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1714123724; c=relaxed/simple;
+	bh=uSg+JsA984ostLXPPYPAUTtsSiyJkCZ6SKROscXhfjc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=nlpxt0/hBPS8Kt1tau/E5Pzv6J8Gua0DcGelG91v2cAE/BMc6wdTtTedp5yyXiBkbHRbMey88kJLKQh+Rjodzb1NCO2kVh/dpZxzZclmWw1Dt2hxEgwLL48QKxirJnNx6WUzgQh+GPlSL/DIE6pyY8DUg05EuWL+lnjXTkpOh4Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nbd.name; spf=none smtp.mailfrom=nbd.name; dkim=pass (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b=GFji33As; arc=none smtp.client-ip=46.4.11.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nbd.name
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=nbd.name
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=nbd.name;
+	s=20160729; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+	References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender:Reply-To:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=AUvRK9BW9RFjx6ktJJTIck1J53QfoMTxbI/6X0yUxxA=; b=GFji33AsQgXWgjzYPkvZWTIrE+
+	YheGbKUOoO2Dqy6g2WtMoW66HTIyQZuXLk+v3m7HtINYx+jcuqUJUI3mQj+L8/4fO3QrT0DIPHTWg
+	NUI+t/0ehHDSTE3Ve2TeVm5JpNZ8d6dSYF9Yl6CbCxmidenNg8XjpxD77gtcKy0DQysM=;
+Received: from p54ae9c93.dip0.t-ipconnect.de ([84.174.156.147] helo=nf.local)
+	by ds12 with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.96)
+	(envelope-from <nbd@nbd.name>)
+	id 1s0Hsh-007sat-2G;
+	Fri, 26 Apr 2024 11:28:35 +0200
+Message-ID: <9f4bc3f2-d66b-42d4-af15-a8b1b1fc696a@nbd.name>
+Date: Fri, 26 Apr 2024 11:28:33 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 net-next v3 2/6] net: add support for segmenting TCP
+ fraglist GSO packets
+To: Eric Dumazet <edumazet@google.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, willemdebruijn.kernel@gmail.com,
+ linux-kernel@vger.kernel.org
+References: <20240426065143.4667-1-nbd@nbd.name>
+ <20240426065143.4667-3-nbd@nbd.name>
+ <CANn89iJKfgQNNXUL10-7aVZTn+ttqvVNZbnKi6jCdQGwzbFFYQ@mail.gmail.com>
+Content-Language: en-US
+From: Felix Fietkau <nbd@nbd.name>
+Autocrypt: addr=nbd@nbd.name; keydata=
+ xsDiBEah5CcRBADIY7pu4LIv3jBlyQ/2u87iIZGe6f0f8pyB4UjzfJNXhJb8JylYYRzIOSxh
+ ExKsdLCnJqsG1PY1mqTtoG8sONpwsHr2oJ4itjcGHfn5NJSUGTbtbbxLro13tHkGFCoCr4Z5
+ Pv+XRgiANSpYlIigiMbOkide6wbggQK32tC20QxUIwCg4k6dtV/4kwEeiOUfErq00TVqIiEE
+ AKcUi4taOuh/PQWx/Ujjl/P1LfJXqLKRPa8PwD4j2yjoc9l+7LptSxJThL9KSu6gtXQjcoR2
+ vCK0OeYJhgO4kYMI78h1TSaxmtImEAnjFPYJYVsxrhay92jisYc7z5R/76AaELfF6RCjjGeP
+ wdalulG+erWju710Bif7E1yjYVWeA/9Wd1lsOmx6uwwYgNqoFtcAunDaMKi9xVQW18FsUusM
+ TdRvTZLBpoUAy+MajAL+R73TwLq3LnKpIcCwftyQXK5pEDKq57OhxJVv1Q8XkA9Dn1SBOjNB
+ l25vJDFAT9ntp9THeDD2fv15yk4EKpWhu4H00/YX8KkhFsrtUs69+vZQwc0cRmVsaXggRmll
+ dGthdSA8bmJkQG5iZC5uYW1lPsJgBBMRAgAgBQJGoeQnAhsjBgsJCAcDAgQVAggDBBYCAwEC
+ HgECF4AACgkQ130UHQKnbvXsvgCgjsAIIOsY7xZ8VcSm7NABpi91yTMAniMMmH7FRenEAYMa
+ VrwYTIThkTlQzsFNBEah5FQQCACMIep/hTzgPZ9HbCTKm9xN4bZX0JjrqjFem1Nxf3MBM5vN
+ CYGBn8F4sGIzPmLhl4xFeq3k5irVg/YvxSDbQN6NJv8o+tP6zsMeWX2JjtV0P4aDIN1pK2/w
+ VxcicArw0VYdv2ZCarccFBgH2a6GjswqlCqVM3gNIMI8ikzenKcso8YErGGiKYeMEZLwHaxE
+ Y7mTPuOTrWL8uWWRL5mVjhZEVvDez6em/OYvzBwbkhImrryF29e3Po2cfY2n7EKjjr3/141K
+ DHBBdgXlPNfDwROnA5ugjjEBjwkwBQqPpDA7AYPvpHh5vLbZnVGu5CwG7NAsrb2isRmjYoqk
+ wu++3117AAMFB/9S0Sj7qFFQcD4laADVsabTpNNpaV4wAgVTRHKV/kC9luItzwDnUcsZUPdQ
+ f3MueRJ3jIHU0UmRBG3uQftqbZJj3ikhnfvyLmkCNe+/hXhPu9sGvXyi2D4vszICvc1KL4RD
+ aLSrOsROx22eZ26KqcW4ny7+va2FnvjsZgI8h4sDmaLzKczVRIiLITiMpLFEU/VoSv0m1F4B
+ FtRgoiyjFzigWG0MsTdAN6FJzGh4mWWGIlE7o5JraNhnTd+yTUIPtw3ym6l8P+gbvfoZida0
+ TspgwBWLnXQvP5EDvlZnNaKa/3oBes6z0QdaSOwZCRA3QSLHBwtgUsrT6RxRSweLrcabwkkE
+ GBECAAkFAkah5FQCGwwACgkQ130UHQKnbvW2GgCeMncXpbbWNT2AtoAYICrKyX5R3iMAoMhw
+ cL98efvrjdstUfTCP2pfetyN
+In-Reply-To: <CANn89iJKfgQNNXUL10-7aVZTn+ttqvVNZbnKi6jCdQGwzbFFYQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wD3v3Tecitm5obCCQ--.37650S2
-X-Coremail-Antispam: 1Uf129KBjvJXoWxAF4xCw13Cw45Wr43JF1kKrg_yoW5Cw1Upa
-	y7K3sxZr18Jay7X3WUJrWkZFWFywn5ta47Kry2v3WSvF1ayrWUWa4fJF95uw43ta1rAw17
-	tF4a9anxW3ZrG3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0piHa0PUUUUU=
-X-CM-SenderInfo: xvod2y5b0lt0i6rwjhhfrp/1tbiowPMZGVODGqReQAAst
 
-In my local, I got an error print in dmesg like below:
-"sequence number glitch prev=487 curr=0"
-After checking, it belongs to mhi_wwan_mbim.c. Refer to the usage
-of this net_err_ratelimited() API in other files, I think we
-should add net device name print before message context.
+On 26.04.24 09:44, Eric Dumazet wrote:
+> On Fri, Apr 26, 2024 at 8:51 AM Felix Fietkau <nbd@nbd.name> wrote:
+>>
+>> Preparation for adding TCP fraglist GRO support. It expects packets to be
+>> combined in a similar way as UDP fraglist GSO packets.
+>> For IPv4 packets, NAT is handled in the same way as UDP fraglist GSO.
+>>
+>> Signed-off-by: Felix Fietkau <nbd@nbd.name>
+>> ---
+>>  net/ipv4/tcp_offload.c   | 65 ++++++++++++++++++++++++++++++++++++++++
+>>  net/ipv6/tcpv6_offload.c |  3 ++
+>>  2 files changed, 68 insertions(+)
+>>
+>> diff --git a/net/ipv4/tcp_offload.c b/net/ipv4/tcp_offload.c
+>> index fab0973f995b..c493e95e09a5 100644
+>> --- a/net/ipv4/tcp_offload.c
+>> +++ b/net/ipv4/tcp_offload.c
+>> @@ -28,6 +28,68 @@ static void tcp_gso_tstamp(struct sk_buff *skb, unsigned int ts_seq,
+>>         }
+>>  }
+>>
+>> +static void __tcpv4_gso_segment_csum(struct sk_buff *seg,
+>> +                                    __be32 *oldip, __be32 *newip,
+>> +                                    __be16 *oldport, __be16 *newport)
+> 
+> 
+> Do we really need pointers for newip and newport ?
+> 
+>> +{
+>> +       struct tcphdr *th;
+>> +       struct iphdr *iph;
+>> +
+>> +       if (*oldip == *newip && *oldport == *newport)
+>> +               return;
+>> +
+>> +       th = tcp_hdr(seg);
+>> +       iph = ip_hdr(seg);
+>> +
+>> +       inet_proto_csum_replace4(&th->check, seg, *oldip, *newip, true);
+>> +       inet_proto_csum_replace2(&th->check, seg, *oldport, *newport, false);
+>> +       *oldport = *newport;
+>> +
+>> +       csum_replace4(&iph->check, *oldip, *newip);
+>> +       *oldip = *newip;
+>> +}
+>> +
+>> +static struct sk_buff *__tcpv4_gso_segment_list_csum(struct sk_buff *segs)
+>> +{
+>> +       struct sk_buff *seg;
+>> +       struct tcphdr *th, *th2;
+>> +       struct iphdr *iph, *iph2;
+> 
+> I would probably add a const qualifier to th and iph
 
-Fixes: aa730a9905b7 ("net: wwan: Add MHI MBIM network driver")
-Signed-off-by: Slark Xiao <slark_xiao@163.com>
-Reviewed-by: Hariprasad Kelam <hkelam@marvell.com>
----
- drivers/net/wwan/mhi_wwan_mbim.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+Will do, thanks.
 
-diff --git a/drivers/net/wwan/mhi_wwan_mbim.c b/drivers/net/wwan/mhi_wwan_mbim.c
-index 3f72ae943b29..6cefee25efc4 100644
---- a/drivers/net/wwan/mhi_wwan_mbim.c
-+++ b/drivers/net/wwan/mhi_wwan_mbim.c
-@@ -186,14 +186,14 @@ static int mbim_rx_verify_nth16(struct mhi_mbim_context *mbim, struct sk_buff *s
- 
- 	if (skb->len < sizeof(struct usb_cdc_ncm_nth16) +
- 			sizeof(struct usb_cdc_ncm_ndp16)) {
--		net_err_ratelimited("frame too short\n");
-+		net_err_ratelimited("mbim: frame too short\n");
- 		return -EINVAL;
- 	}
- 
- 	nth16 = (struct usb_cdc_ncm_nth16 *)skb->data;
- 
- 	if (nth16->dwSignature != cpu_to_le32(USB_CDC_NCM_NTH16_SIGN)) {
--		net_err_ratelimited("invalid NTH16 signature <%#010x>\n",
-+		net_err_ratelimited("mbim: invalid NTH16 signature <%#010x>\n",
- 				    le32_to_cpu(nth16->dwSignature));
- 		return -EINVAL;
- 	}
-@@ -201,7 +201,7 @@ static int mbim_rx_verify_nth16(struct mhi_mbim_context *mbim, struct sk_buff *s
- 	/* No limit on the block length, except the size of the data pkt */
- 	len = le16_to_cpu(nth16->wBlockLength);
- 	if (len > skb->len) {
--		net_err_ratelimited("NTB does not fit into the skb %u/%u\n",
-+		net_err_ratelimited("mbim: NTB does not fit into the skb %u/%u\n",
- 				    len, skb->len);
- 		return -EINVAL;
- 	}
-@@ -209,7 +209,7 @@ static int mbim_rx_verify_nth16(struct mhi_mbim_context *mbim, struct sk_buff *s
- 	if (mbim->rx_seq + 1 != le16_to_cpu(nth16->wSequence) &&
- 	    (mbim->rx_seq || le16_to_cpu(nth16->wSequence)) &&
- 	    !(mbim->rx_seq == 0xffff && !le16_to_cpu(nth16->wSequence))) {
--		net_err_ratelimited("sequence number glitch prev=%d curr=%d\n",
-+		net_err_ratelimited("mbim: sequence number glitch prev=%d curr=%d\n",
- 				    mbim->rx_seq, le16_to_cpu(nth16->wSequence));
- 	}
- 	mbim->rx_seq = le16_to_cpu(nth16->wSequence);
-@@ -222,7 +222,7 @@ static int mbim_rx_verify_ndp16(struct sk_buff *skb, struct usb_cdc_ncm_ndp16 *n
- 	int ret;
- 
- 	if (le16_to_cpu(ndp16->wLength) < USB_CDC_NCM_NDP16_LENGTH_MIN) {
--		net_err_ratelimited("invalid DPT16 length <%u>\n",
-+		net_err_ratelimited("mbim: invalid DPT16 length <%u>\n",
- 				    le16_to_cpu(ndp16->wLength));
- 		return -EINVAL;
- 	}
-@@ -233,7 +233,7 @@ static int mbim_rx_verify_ndp16(struct sk_buff *skb, struct usb_cdc_ncm_ndp16 *n
- 
- 	if (sizeof(struct usb_cdc_ncm_ndp16) +
- 	     ret * sizeof(struct usb_cdc_ncm_dpe16) > skb->len) {
--		net_err_ratelimited("Invalid nframes = %d\n", ret);
-+		net_err_ratelimited("mbim: Invalid nframes = %d\n", ret);
- 		return -EINVAL;
- 	}
- 
--- 
-2.25.1
+- Felix
 
 
