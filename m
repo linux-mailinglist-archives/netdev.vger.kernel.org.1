@@ -1,91 +1,97 @@
-Return-Path: <netdev+bounces-91835-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91836-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4DF878B4278
-	for <lists+netdev@lfdr.de>; Sat, 27 Apr 2024 01:05:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E26D78B427A
+	for <lists+netdev@lfdr.de>; Sat, 27 Apr 2024 01:06:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 07B74282EED
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 23:05:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 974C41F22589
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 23:06:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C7193A1C4;
-	Fri, 26 Apr 2024 23:05:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1F373A29A;
+	Fri, 26 Apr 2024 23:05:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UFrGIeyx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uorwIqEI"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68B0F39FCE
-	for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 23:05:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7980C39FC5;
+	Fri, 26 Apr 2024 23:05:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714172710; cv=none; b=H45dTVXuhIxCwiDM4cCnyK/EbnuzVroZ4q+SmIOwYKJ1VpjJ0FXBG83gTDMSOK0XXnTxFHddjeeAGsPclOq9pTMdIPk8vv6vhg4UayB2tTbwVDkfQEg7IPuyPDyBE7HZRDUUKaROlu/4Gp4tfv2DGq4BWHlLYhCqMK/AiV/rZfs=
+	t=1714172759; cv=none; b=LxrsmZv6VKHauEISkGyMsvEpXNgUpONK9oHGMWUhaxEBLQV/WegKxkOAVj7HDlbFlskt0VVPnaO9BbcSo3iUnCX7xFxqH64pfYAj1X7gIfHU/auNUVO0JPDc8X1aDMWrGP8mzjZDgh/QQc/PSDu8ExPx3AUu1ojUf4EXYfRG6bg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714172710; c=relaxed/simple;
-	bh=bPAOrx8VA9MQeQzzCZ7JlumKElBzGnkj0dGsoe1U1ik=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ufqTKKJ2jU3yNiWpZGa33KGylN0pq8k+QKpRgxCps470uePCd1alQZhQ7k8qOJiGyVuZ/HAF+nIlcdn+x4jmnID5FMrPnCcxhxy37EQFU3gIA+sRMFq9mZyZW6UAjJi+t8TJftdjRniMQzJchDN68bQHSBEbijzaaBNLtZMp+Dg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UFrGIeyx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6EC7FC113CD;
-	Fri, 26 Apr 2024 23:05:09 +0000 (UTC)
+	s=arc-20240116; t=1714172759; c=relaxed/simple;
+	bh=cz81g8dRd8WGS4FfF7yHOLy1Rtt7gsfw9coHC3cgGw4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=B1GWyjRfTi5YQlrQFs7jiPgFuUeRtMniu0Ja78KpUhbo3a3J1b8XFrtqllODQK9rvOlxz+MvNzYjfiCNSy3q2/2k03SUOPxVQXS2MYHu7pRUUUsi5nZcUxF1gXNiMWjCkzsz7gqfT1bHuMIpeYgXmHuAh6ru1gMGji3iHhtSNIs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uorwIqEI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 95794C113CD;
+	Fri, 26 Apr 2024 23:05:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714172709;
-	bh=bPAOrx8VA9MQeQzzCZ7JlumKElBzGnkj0dGsoe1U1ik=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=UFrGIeyx4u8FG/JJW9TokhUrklorj8fZ3+P6HOJlScjdlVjcVWJ11xc673b1DE7Y5
-	 oFDpDseGYsWeY5tnuKTtwlz0eBFTgw9cU4ekNNCssrgdL+WycpbKr0bF02Kefb0FFl
-	 /ULIqaDlC/aODMSRLwppfJxvIleLXIEX5iqUnH+SJ+k8y0D4lk4+k+2/Lz45sya8Xj
-	 hK17ekQsFeF9tdAKuSB7lsqFU8jADxZdpAgYyLaapM5RqqT3aOsdDPrKYDjBKdtY40
-	 EZhgUAgfL6AfVTb2qWpzuhMBdCWz8XUasyfim/nq3qa7nfqGIkgBmY1zEPdenG8ozV
-	 IuqeJHiqJrw2Q==
-Message-ID: <4c089edf-5c06-4120-a988-556a1f7acf58@kernel.org>
-Date: Fri, 26 Apr 2024 17:05:08 -0600
+	s=k20201202; t=1714172759;
+	bh=cz81g8dRd8WGS4FfF7yHOLy1Rtt7gsfw9coHC3cgGw4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=uorwIqEI92m1Q3QTYmc59i0meAi6h5Xwcn0yC4tWv48cgnTDHGurA6BMF/mJQk2Wu
+	 OYrq5jAWsEX5XlWtlbBIesUiuVtAU/XKNa0N5lRudKKCMtLGCub5hl9ZBOM9t8eFgZ
+	 2oUt64s/xDej+8hf32ZrLtfDOKZXey+INgy/VBSVN/mVYd7s87pg47GvKGMp6V0FZ9
+	 tIhdz3bjYtVAcCwU86vtD4dqfTD6GUEl/BcvY0YV5Ncin3srxySNWz52IGG+N0VmOS
+	 z1Mve9M4fbuzSDdVUpn3AswiA6k0zcwjAXrA91zTyWnQdEpa/w+UNTuWMuc4nqaTnt
+	 ovIzbbRIujwNQ==
+Date: Fri, 26 Apr 2024 16:05:57 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Dragos Tatulea <dtatulea@nvidia.com>
+Cc: "almasrymina@google.com" <almasrymina@google.com>, "davem@davemloft.net"
+ <davem@davemloft.net>, "pabeni@redhat.com" <pabeni@redhat.com>,
+ "ilias.apalodimas@linaro.org" <ilias.apalodimas@linaro.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "jacob.e.keller@intel.com" <jacob.e.keller@intel.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>, Jianbo Liu
+ <jianbol@nvidia.com>, "edumazet@google.com" <edumazet@google.com>
+Subject: Re: [RFC PATCH] net: Fix one page_pool page leak from
+ skb_frag_unref
+Message-ID: <20240426160557.51de91f9@kernel.org>
+In-Reply-To: <4c20b500c2ed615aba424c0f3c7a79f5f5a04171.camel@nvidia.com>
+References: <20240424165646.1625690-2-dtatulea@nvidia.com>
+	<4ba023709249e11d97c78a98ac7db3b37f419960.camel@nvidia.com>
+	<CAHS8izMbAJHatnM6SvsZVLPY+N7LgGJg03pSdNfSRFCufGh9Zg@mail.gmail.com>
+	<4c20b500c2ed615aba424c0f3c7a79f5f5a04171.camel@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3] ip link: hsr: Add support for passing information
- about INTERLINK device
-Content-Language: en-US
-To: Lukasz Majewski <lukma@denx.de>, Andrew Lunn <andrew@lunn.ch>,
- Stephen Hemminger <stephen@networkplumber.org>
-Cc: Eric Dumazet <edumazet@google.com>,
- Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean
- <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>,
- Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org
-References: <20240402124908.251648-1-lukma@denx.de>
- <20240426171352.2460390f@wsk>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20240426171352.2460390f@wsk>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On 4/26/24 9:13 AM, Lukasz Majewski wrote:
-> Hi Stephen,
-> 
->> The HSR capable device can operate in two modes of operations -
->> Doubly Attached Node for HSR (DANH) and RedBOX (HSR-SAN).
->>
->> The latter one allows connection of non-HSR aware device(s) to HSR
->> network.
->> This node is called SAN (Singly Attached Network) and is connected via
->> INTERLINK network device.
->>
->> This patch adds support for passing information about the INTERLINK
->> device, so the Linux driver can properly setup it.
->>
-> 
-> As the HSR-SAN support patches have been already pulled to next-next, I
-> would like to gentle remind about this patch.
-> 
+On Thu, 25 Apr 2024 08:17:28 +0000 Dragos Tatulea wrote:
+> >  The unref path always dropped a regular page
+> > ref, thanks to this commit as you point out:
+> > 
+> > https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=2cc3aeb5ecccec0d266813172fcd82b4b5fa5803
+> > 
+> > AFAICT the correct fix is to actually revert commit 2cc3aeb5eccc
+> > ("skbuff: Fix a potential race while recycling page_pool packets").
+> > The reason is that now that skb_frag_ref() can grab page-pool refs, we
+> > don't need to make sure there is only 1 SKB that triggers the recycle
+> > path anymore. All the skb and its clones can obtain page-pool refs,
+> > and in the unref path we drop the page-pool refs. page_pool_put_page()
+> > detects correctly that the last page-pool ref is put and recycles the
+> > page only then.
+> >   
+> I don't think this is a good way forward. For example, skb->pp_recycle is used
+> as a hint in skb_gro_receive to avoid coalescing skbs with different pp_recycle
+> flag states. This could interfere with that.
 
-You need to re-send. It took so long for the kernel side to merge, I
-marked it as waiting upstream.
+That's a bit speculative, right? The simple invariant we are trying to
+hold is that if skb->pp_recycle && skb_frag_is_pp(skb, i) then the
+reference skb is holding on that frag is a pp reference, not page
+reference.
 
+skb_gro_receive() needs to maintain that invariant, if it doesn't
+we need to fix it..
 
