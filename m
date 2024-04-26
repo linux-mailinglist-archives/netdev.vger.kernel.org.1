@@ -1,291 +1,234 @@
-Return-Path: <netdev+bounces-91671-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91673-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D1178B3670
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 13:19:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F16648B3674
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 13:22:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 667DEB22F6E
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 11:19:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A7DFA2846D2
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 11:22:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC05B144D2F;
-	Fri, 26 Apr 2024 11:19:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 345A1144D3A;
+	Fri, 26 Apr 2024 11:22:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="A06S6HA3"
+	dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b="VtLQF/R0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD100139CFC
-	for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 11:19:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714130383; cv=none; b=WNOSlYC6ggFbzNyd24gvRtdchCyZK1KJrkoyOPvmFA+MHrYQoyeG7mTa4SQqsAjnC4efcbIb8h1fDDTqpQIroI+zkX74CKNNiPbJ3nWX94+4cSnGEYsVK/Gq+LNvD6qx9/7UqP2MM4GQ+sbXKxt/r8HdZ6S/qP0dVCch0H9jXAA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714130383; c=relaxed/simple;
-	bh=isKXpcjjkIcWQxLdasdYFVFqvGPKQTZuIXO/vDE1IKU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Sr1hXcQkmSFH7ejtVbDMNC9LF0m/AnrcRL6cDTx1VGws2IbOzix+lWSwDVv6cTYh8NQiFr5RGd1yhlPKaXR00jbz1cATaLZXIIy4Nb79Uprfv2ISyOHpufdG2bVBhClFmkFZ3BHCUUjJisNfc6t0yNfo+I/MwCPigXUxKpqJJ7Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=A06S6HA3; arc=none smtp.client-ip=209.85.167.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-516d2b9cd69so2430931e87.2
-        for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 04:19:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1714130377; x=1714735177; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ak1RMSN7WMKgrndVkDP7RMG1/Cc+0qwytHL22aznKNE=;
-        b=A06S6HA3Ftm3Zql8qd2gsiHwarIQ95n3gQFwfh7SUvIOJteND77SLRNK4ZKvggrBrY
-         bhiYkegDzn9PyUgVfDF8JtIksJ7t/T/JnbuXY5l1uKO5JZCdcXy8y4nbaCdj1/+L5nxi
-         gCNOoUzQnpkMfkD2GGbjKYkgzKGZ6UAgw2FQrsvZXMd6zs9Z/tTqgV47gwOwlsYw51fr
-         HyDt3CfE31X3ei5qoX6kajlX6QWVz4FStR2Z6gy6NpcMr8rONLltQlwUE9sb2mt8nYKd
-         8Ek31vtDjWdxoVZaQ/9wvtDpo1k5yjgbD7rnpJwPM/Upu7xtNlibbSevxViX+KioJlTI
-         WHLg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714130377; x=1714735177;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ak1RMSN7WMKgrndVkDP7RMG1/Cc+0qwytHL22aznKNE=;
-        b=wot1391CE1yEV3kVL/UL/wNYy/6Qeq/qdwagSSvw+1jvDeQ2gN7oqOgmzBgWR7chp2
-         7KuWMzmbnhS7t32jjfc9SPXa6T9FodSgAkWEWVSzHggctYjc2V+W05HzdWlUnZ61gKEU
-         7QC6C7SaqWO12ISAfjqExFiwxE6o8lG+jfoz1IwwZfXBCNapkZGzRkTdYnSgakQQlEyI
-         wTgIKmzG0g8sxJOp6Ng5DKMqMlFQjqFttYq+cxgQ/InGitmZlSbEh0OqEVq3LMNJtmPA
-         nBz6KX4qK8hmQSmbFNSKPjFcFD2+SC3ThO5RyArODVbJMUwUVY7/8o/s6OCXKDR8Zdjc
-         xJJw==
-X-Forwarded-Encrypted: i=1; AJvYcCUBvtdnE83nfdYb3JgSNKol+WSGOIhv/9SikBiyhSa5bLm//7T7AZ//PQXo9apbaVwrd87btJFrxwhkMKdgaEjR+rnhD/FC
-X-Gm-Message-State: AOJu0YxkZmdhU56+UZptc6EcO2ha9NvFUd4JlTS/Ya2ABsQzSjJzTO3o
-	L2ahpjdQpVFLT9fN2WvleGglNDYe5X4537gcty3Wr6SyAMIyG3c5Na3OOpizn0Y=
-X-Google-Smtp-Source: AGHT+IGZZYVGNzDrHoYR8dgLyhp8BCCpkCguPwOK+0aXtgjNpL8FwtLDZKglxfcxx/SJvMRiYh4DqA==
-X-Received: by 2002:a05:6512:3b20:b0:518:dfae:2691 with SMTP id f32-20020a0565123b2000b00518dfae2691mr1681889lfv.11.1714130377106;
-        Fri, 26 Apr 2024 04:19:37 -0700 (PDT)
-Received: from localhost ([89.24.35.126])
-        by smtp.gmail.com with ESMTPSA id q2-20020adff942000000b00346bda84bf9sm22355916wrr.78.2024.04.26.04.19.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 26 Apr 2024 04:19:36 -0700 (PDT)
-Date: Fri, 26 Apr 2024 13:19:34 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jacob Keller <jacob.e.keller@intel.com>
-Cc: "Temerkhanov, Sergey" <sergey.temerkhanov@intel.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next v2] ice: Extend auxbus device
- naming
-Message-ID: <ZiuNxivU-haEQ5fC@nanopsycho>
-References: <20240423091459.72216-1-sergey.temerkhanov@intel.com>
- <ZiedKc5wE2-3LlaM@nanopsycho>
- <MW3PR11MB468117FD76AC6D15970A6E1080112@MW3PR11MB4681.namprd11.prod.outlook.com>
- <Zie0NIztebf5Qq1J@nanopsycho>
- <3a634778-9b72-4663-b305-3be18bd8f618@intel.com>
- <ZikgQhVpphnaAOpG@nanopsycho>
- <3877b086-142d-4897-866e-e667ca7091d7@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7910F13C9A7;
+	Fri, 26 Apr 2024 11:22:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=67.231.156.173
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1714130537; cv=fail; b=rnx5TP/iseMe1DUO5tSlxfgadlM+ymkRCZ+GrEcQVTQlBg5mMAxOPziaFdkFuOAmHDlhVr/SY0S+ulkWd65JtM48El8ESXbnzSlN2s/Oes3pgTUCOK37DoOG2LQt0DAFrNibfkhSh+fARv91pJlMjCOAmv6FQDkcJ9yW66mT5Xw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1714130537; c=relaxed/simple;
+	bh=GUoyaUW7yZD0c/JRGqmXlQvwSHywU6At9hYiUxh5aL4=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=Gx3JEYjbuX1Je5ExN5KEmN/l0h4EpdI9/uvgAAUg//mCXVFrTAfc/K2t5f8Mxo02MkOlji3gDtaGb62PHQq+8UR0v6lDXtqYbDUlTPsNpnOhkpafAs1LUqykdTSytWPk7mj/tEwUOFhxb9N1BMcHLX2IrpVrRMyxYHPqhW64eho=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b=VtLQF/R0; arc=fail smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 43Q6DF31016504;
+	Fri, 26 Apr 2024 04:21:52 -0700
+Received: from nam02-bn1-obe.outbound.protection.outlook.com (mail-bn1nam02lp2041.outbound.protection.outlook.com [104.47.51.41])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3xpxn1nhvy-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 26 Apr 2024 04:21:51 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=WSBjOprKnRFh06ESG6hX9MCG3ooHUJqvIIv/NGqmI4z3VhrH15Cj4xT4LzB3kph5AQM59WVocGGNUO3Akpv4vRV9U6TnAUhN+nZvaYph94IM4FoR3Nwb+larWO5nWUNhLAt5c3wI4shYQzh2z12o1YIOzYTTtnk9WwTbWLocM2jAfSAOfPWEBnL7iFD93UGPk1/Q9GNLSJduzLurbDQ7i2KdNmm+c15Z1M42zt+EPhkAkyuMZFtFM2iLJQ/ALk5StGHoUW03Rb4H5Pzx58sT6OdC8yneTebC4DcAZ3TMcf4olLwOramEkl5duvDh8mYBbUyB//1uGOCTG8H+gfkLow==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ngXRJ+uuzcZWc43RxpO358iWSOv9XNaS2x/bBMDOGcs=;
+ b=P7PQxpAZ8poOi3ANbeEBI9fBGAjO31RaMEewcz0+QrL5bYzlJY9SZBf9Ju71hF/f/0wg1rqR79NcGQlpNBEDCusK+iNpZ3nieV1gvYqEdfASKiaPUIZ1JoHF2TyEFzGZhc2tsxCDMRX5+PhCiOl7YRFVFlIYsyAoytOa0CWcJn5eiInx9BZIb6NwyAqawZYsrezKmgC65NZeMPsuSqOs5PaGWMjok2Rtl86BcOoMvx0uAUEWDhSUJ31oeAP25uK+d9MJOU+XX+Qg8YGU6P9a/cul6PAPqBp4s3b7PXsfhkbJydiWVlidh5iIeGAJvb9KNUoZxNXOOofwxZtOilghZg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
+ dkim=pass header.d=marvell.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ngXRJ+uuzcZWc43RxpO358iWSOv9XNaS2x/bBMDOGcs=;
+ b=VtLQF/R0t3z1OibEhg7xeSjFM2LKhfcsl4jiOwtYzyZNPItF60WVDW6fIz3dz5xYIEzd+sd8LqLbrmEbfs/8ZauqUK8TylrOuX3oh6vH3Qz4C+ONDIAIhp1/fAKZZFrYlcFo6KAmgIC76X9VVBwkiXhCVuI7zHtaoFcWKGvIpas=
+Received: from PH0PR18MB4474.namprd18.prod.outlook.com (2603:10b6:510:ea::22)
+ by DM4PR18MB4271.namprd18.prod.outlook.com (2603:10b6:5:396::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7472.46; Fri, 26 Apr
+ 2024 11:21:49 +0000
+Received: from PH0PR18MB4474.namprd18.prod.outlook.com
+ ([fe80::eeed:4f:2561:f916]) by PH0PR18MB4474.namprd18.prod.outlook.com
+ ([fe80::eeed:4f:2561:f916%5]) with mapi id 15.20.7452.049; Fri, 26 Apr 2024
+ 11:21:49 +0000
+From: Hariprasad Kelam <hkelam@marvell.com>
+To: Jijie Shao <shaojijie@huawei.com>,
+        "yisen.zhuang@huawei.com"
+	<yisen.zhuang@huawei.com>,
+        "salil.mehta@huawei.com" <salil.mehta@huawei.com>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "edumazet@google.com"
+	<edumazet@google.com>,
+        "kuba@kernel.org" <kuba@kernel.org>,
+        "pabeni@redhat.com" <pabeni@redhat.com>,
+        "jiri@resnulli.us"
+	<jiri@resnulli.us>
+CC: "shenjian15@huawei.com" <shenjian15@huawei.com>,
+        "wangjie125@huawei.com"
+	<wangjie125@huawei.com>,
+        "liuyonglong@huawei.com" <liuyonglong@huawei.com>,
+        "chenhao418@huawei.com" <chenhao418@huawei.com>,
+        "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>
+Subject: [PATCH V2 net 3/7] net: hns3: release PTP resources if pf
+ initialization failed
+Thread-Topic: [PATCH V2 net 3/7] net: hns3: release PTP resources if pf
+ initialization failed
+Thread-Index: AQHal8vuaXc5OkjYgE2P3Y6eJHWDXQ==
+Date: Fri, 26 Apr 2024 11:21:49 +0000
+Message-ID: 
+ <PH0PR18MB44740CF5F8A3DB7C992A3190DE162@PH0PR18MB4474.namprd18.prod.outlook.com>
+References: <20240426100045.1631295-1-shaojijie@huawei.com>
+ <20240426100045.1631295-4-shaojijie@huawei.com>
+In-Reply-To: <20240426100045.1631295-4-shaojijie@huawei.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PH0PR18MB4474:EE_|DM4PR18MB4271:EE_
+x-ms-office365-filtering-correlation-id: ba027c77-0fff-4b11-946c-08dc65e31117
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 
+ =?us-ascii?Q?U7p5yhGiYIavStubfQoQV6zy5HqLAX5q/bX5zMtbbAIb/fzQJEyTV3jB64gw?=
+ =?us-ascii?Q?zAebfv5IQIkPVILiWOVH7JT9jMtsd4jfzb6fDEAujj2zE/SmvUwI32n0s+fl?=
+ =?us-ascii?Q?g4jt/4tZDYR/q/n9nRPljf4fKbY7brpENRO8T6LRYwCBIES5CJwwSHfTAO+Y?=
+ =?us-ascii?Q?7/DaIWSRQbhKbZ/zGAAHyhXIVESsAVz52x7tfFU9di99saXEVKS/hvLFN+Qm?=
+ =?us-ascii?Q?7wfutFl6ZD2DfQhN5uZ4n0PtGJ2/Bg+omRLD6G9wa4yb60zChF16EE3eTLHO?=
+ =?us-ascii?Q?SC/TvX9cIAxwlDdtzYmMxycE4e3EIJn1lUfka2ziS1zkCJqMggiAy+nAyDF7?=
+ =?us-ascii?Q?nS7IdZMjnZxwqZZawdd/kwPTRCZOqMsw3ZlWDk7if9K2F2d6EVPL/2mUMzHy?=
+ =?us-ascii?Q?VpIyQrcXiWnpJjaBMvgttmtP4UfoBbAMhu88VEBGHVKWbsvH7xL+KRIpmr1r?=
+ =?us-ascii?Q?fTs7dJHZDSKeVBd+aeZf9huf/qn7QZd1h96aBSaVoSZyvcVR5z2tYMTnqFuL?=
+ =?us-ascii?Q?fUf399wnS+rhO2JI+MNZF4M9ILS59xrnNws6MXvh/NyRKt5pWv2Xsz4hnqJJ?=
+ =?us-ascii?Q?j+HRrMYU1U4H9Y2YcBWfQGFTd/qyMWCFvIZuHLCdWKM3PdqaiNsRLnGk3gVi?=
+ =?us-ascii?Q?qyPt/cUVEbmFwG7sWUuyw7IMUSkfuL7BL/S/LmrcG9EGNOQ6Hk4wGogleiwO?=
+ =?us-ascii?Q?4Sx0LpePiHLv4a1W8RqEoEuNVqIRf/GNVw2XaqC7JePjD2yaR1huZ/h6W9tB?=
+ =?us-ascii?Q?0L9y6g/X2yDNN6sU1aYCBqk4pjqXhaRgIAqej8HlprL7TTHROAe+/KtWAIlS?=
+ =?us-ascii?Q?a0Qq3HVeLFqU7HvSlOWnns5hdMIYbTA7VNtM3fQu44fTa9J0KdiuIscYS/iB?=
+ =?us-ascii?Q?RjE0mzu4zvVvedAu93stCeCGb6cOiKdBQU8qV4I82HR+bYE9X+IfJJiGzkEt?=
+ =?us-ascii?Q?t+w49osq37X2OHINhpJxqBso8U3ryZYXcJHK5hP6gCxJZmJ6AU5G5vRQ5KpF?=
+ =?us-ascii?Q?tm456IUSiL/NPicLHUPA1NX9Hf5u7Y63R9G1W97pOQhBXvrgj/tWkZWfRvTE?=
+ =?us-ascii?Q?qh+xXMTUxUV39RWLAcVuHFjZd1Sf186Uv+6z01CIOYc3FDeekEHdGhcLXHbF?=
+ =?us-ascii?Q?9QL5dbp9nPTNkq72hIJNm6wVbrfRefg2EgccUw8AqMKw0ZHA25FzdlCNpome?=
+ =?us-ascii?Q?JcfRah7f5uMLVKaIIXneaGT4n4LWXMEsHbl9UwOfhmP9TvzXaqYtpVM/b4Fx?=
+ =?us-ascii?Q?QGpwrmAXQtaoUkDnbIamJSI2OeUeSuTTyJM74+3cdP+7ut7oDd27jVpJWIE6?=
+ =?us-ascii?Q?VTJw8yWY5n8mO5i1nfS//fuMOhO1L3sdjV028Iw6eVOFXg=3D=3D?=
+x-forefront-antispam-report: 
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR18MB4474.namprd18.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7416005)(1800799015)(366007)(376005)(38070700009);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: 
+ =?us-ascii?Q?euTPLXY+CYaxBY101lrZT3Zh1yyq9mfqU5qGGAInQMwJDjMhDvdnnqzx0dGd?=
+ =?us-ascii?Q?QpvSA8LE4JiaD0vu+fA6WNktqXoHk4Tbekmo9xhzjrGeRObTw7PP90laqOEt?=
+ =?us-ascii?Q?RaXtzQheR1ycDFOQHsnwnpNB3YVVcFOdj/oSjzZSBSfJmOFWcx4WWYsUudDG?=
+ =?us-ascii?Q?Qz/Jfbk/YgNXvBEs+dFLTBLzJBWhzJgwyhQJ063NnuKZjXRUjx4m4ArCPtXV?=
+ =?us-ascii?Q?zw8cRT3AhV/qFBiVwH9V5c98vBi5rkt23VTiXaqspO1yQ771mrz6oZs+2OgB?=
+ =?us-ascii?Q?d9LIIxJjAiHsDnnt+sBsHo7YiUZmgQ/BH46LjF3Th/SXJ5ru5843s2GU8vl1?=
+ =?us-ascii?Q?4FNT4jPAFS7OC4CLj+DGimB7ORL2sI5qIRVHZ0fDA8zbOpaEr04kD8zW3n1Q?=
+ =?us-ascii?Q?gi1HW1oKDip/WnzgX6Pu3UtxNllL1LhGElreqmhyqqNwWP+HCNtaQoqqS+1A?=
+ =?us-ascii?Q?QhHIj3EwSnFxXqdqNXWlQde3HHV5PrfzosbCRaR6r4SljMuTBcT0Zno5NYvU?=
+ =?us-ascii?Q?gJIm/i6E5+/LNrewinuLcmmoqVSQuslRPEIHXLyWHntbhlksLzXgngjBGk1w?=
+ =?us-ascii?Q?d3EJ4z0ckCHvW5xzd0FQ8WLc8fCXqsaOXLgu1Tf72C2u3Zh3zAOYhuvq+jCO?=
+ =?us-ascii?Q?RCq5rzh3nCIW5s/SC326Wqeh5Nl6hcdCXgbfUhIdespb/YhV0o7EfC75uqaS?=
+ =?us-ascii?Q?DhzNI4PNSvPFWfaseGb/Y+3OphGk4M6fu8IbKmqZ0nbr/ZBA92YjRcNjcZxD?=
+ =?us-ascii?Q?jMASgGYHTbNdN4GN6JF7HaP8JRVPzTkVP5O8UcPXHn2nSlDu41WQgBKgLmei?=
+ =?us-ascii?Q?dn42f2P0aUDBdn3dc1yHOS0glWH0RD2GP3Jx2eQBKHuLcriSKcNHw8rzHVH9?=
+ =?us-ascii?Q?BNmYmtSdl0PKzxdGG8+eThldBraifW9Etl4deIatwFv1ZIM8JY4wbqU/GxbB?=
+ =?us-ascii?Q?p6AInXAvxvL5/QegN9xPZvGXn1bGi0ZURE6Z39ldR8d0hJxpLZ8J49CZd94k?=
+ =?us-ascii?Q?NDdpt438l3dJgieTCJyuewer/sCfykzzAKMINGpsEnxcJ85G1W334cg9YGYz?=
+ =?us-ascii?Q?JWSv/Eo+tHoaQ9pKGAc6nNrFg3JT2vdlo9PuRrIKn2ravX93v1lAb5ZySIrg?=
+ =?us-ascii?Q?5zL23UQ1nx5ygeWfqXGaOUFFpjR9ZQQ4fXMMf3W7VJUK2Pi+dEmXzMqFEQ7L?=
+ =?us-ascii?Q?HVjQi/acDiDtKPuGPKNrMQGhH59CZYwYj+y6fqoKvuumY+h4x16OsnGh5oaN?=
+ =?us-ascii?Q?J6F0+N/ivNemgPWqz1O/ptFaQvcjo83MPysd9bVLQAzm3rYu3SPIdpMyGuVQ?=
+ =?us-ascii?Q?pndT4ElEf78wpqKEEZ1km+YvM8qaO+bmfHOhZG+ODWlVD94MND+8mwvcwwq1?=
+ =?us-ascii?Q?RHv/pl1yG9LMx2l2tSjjWkm3pxesgqzlxvx2527VWoXiGfyBlfYrGwMv0G6D?=
+ =?us-ascii?Q?05V5KNNe+VWrnkkoVHMwsIFQBLZ1hlIGiUSS2FjtyaAEGiauj4uX6DRbuCwj?=
+ =?us-ascii?Q?9OtOb7GSaUL8fh//I/k4BP2YH2fMgFeU9AUzzXs2wBM+3lok8XaR+CeQOF3z?=
+ =?us-ascii?Q?wFDbmMaX9aYP0+k8mc0=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3877b086-142d-4897-866e-e667ca7091d7@intel.com>
+X-OriginatorOrg: marvell.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR18MB4474.namprd18.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ba027c77-0fff-4b11-946c-08dc65e31117
+X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Apr 2024 11:21:49.8107
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: R67R5YAPVi3o7KDPJrPWPiw6aNfNqToKFx5d9Pa4T4OyPDgBoQmdEyaPlF3evnzC3aj3xSadhX16pnKEgNZIjg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR18MB4271
+X-Proofpoint-GUID: MIAUoqGBIoAUfUXhgmgU1yOlf0EokhtM
+X-Proofpoint-ORIG-GUID: MIAUoqGBIoAUfUXhgmgU1yOlf0EokhtM
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1011,Hydra:6.0.650,FMLib:17.11.176.26
+ definitions=2024-04-26_12,2024-04-26_02,2023-05-22_02
 
-Wed, Apr 24, 2024 at 06:56:37PM CEST, jacob.e.keller@intel.com wrote:
->
->
->On 4/24/2024 8:07 AM, Jiri Pirko wrote:
->> Wed, Apr 24, 2024 at 12:03:25AM CEST, jacob.e.keller@intel.com wrote:
->>>
->>>
->>> On 4/23/2024 6:14 AM, Jiri Pirko wrote:
->>>> Tue, Apr 23, 2024 at 01:56:55PM CEST, sergey.temerkhanov@intel.com wrote:
->>>>>
->>>>>
->>>>>> -----Original Message-----
->>>>>> From: Jiri Pirko <jiri@resnulli.us>
->>>>>> Sent: Tuesday, April 23, 2024 1:36 PM
->>>>>> To: Temerkhanov, Sergey <sergey.temerkhanov@intel.com>
->>>>>> Cc: intel-wired-lan@lists.osuosl.org; netdev@vger.kernel.org; Kitszel,
->>>>>> Przemyslaw <przemyslaw.kitszel@intel.com>
->>>>>> Subject: Re: [PATCH iwl-next v2] ice: Extend auxbus device naming
->>>>>>
->>>>>> Tue, Apr 23, 2024 at 11:14:59AM CEST, sergey.temerkhanov@intel.com
->>>>>> wrote:
->>>>>>> Include segment/domain number in the device name to distinguish
->>>>>> between
->>>>>>> PCI devices located on different root complexes in multi-segment
->>>>>>> configurations. Naming is changed from ptp_<bus>_<slot>_clk<clock>  to
->>>>>>> ptp_<domain>_<bus>_<slot>_clk<clock>
->>>>>>
->>>>>> I don't understand why you need to encode pci properties of a parent device
->>>>>> into the auxiliary bus name. Could you please explain the motivation? Why
->>>>>> you need a bus instance per PF?
->>>>>>
->>>>>> The rest of the auxbus registrators don't do this. Could you please align? Just
->>>>>> have one bus for ice driver and that's it.
->>>>>
->>>>> This patch adds support for multi-segment PCIe configurations.
->>>>> An auxdev is created for each adapter, which has a clock, in the system. There can be
->>>>
->>>> You are trying to change auxiliary bus name.
->>>>
->>>>
->>>>> more than one adapter present, so there exists a possibility of device naming conflict.
->>>>> To avoid it, auxdevs are named according to the PCI geographical addresses of the adapters.
->>>>
->>>> Why? It's the auxdev, the name should not contain anything related to
->>>> PCI, no reason for it. I asked for motivation, you didn't provide any.
->>>>
->>>
->>> We aren't creating one auxbus per PF. We're creating one auxbus per
->>> *clock*. The device has multiple clocks in some configurations.
->> 
->> Does not matter. Why you need separate bus for whatever-instance? Why
->> can't you just have one ice-ptp bus and put devices on it?
->> 
->> 
->
->Because we only want ports on card A to be connected to the card owner
->on card A. We were using auxiliary bus to manage this. If we use a
-
-You do that by naming auxiliary bus according to the PCI device
-created it, which feels obviously wrong.
-
-
->single bus for ice-ptp, then we still have to implement separation
->between each set of devices on a single card, which doesn't solve the
->problems we had, and at least with the current code using auxiliary bus
->doesn't buy us much if it doesn't solve that problem.
-
-I don't think that auxiliary bus is the answer for your problem. Please
-don't abuse it.
-
->
->>>
->>> We need to connect each PF to the same clock controller, because there
->>> is only one clock owner for the device in a multi-port card.
->> 
->> Connect how? But putting a PF-device on a per-clock bus? That sounds
->> quite odd. How did you figure out this usage of auxiliary bus?
->> 
->> 
->
->Yea, its a multi-function board but the functions aren't fully
->independent. Each port has its own PF, but multiple ports can be tied to
->the same clock. We have similar problems with a variety of HW aspects.
->I've been told that the design is simpler for other operating systems,
->(something about the way the subsystems work so that they expect ports
->to be tied to functions). But its definitely frustrating from Linux
->perspective where a single driver instance for the device would be a lot
->easier to manage.
-
-You can always do it by internal accounting in ice, merge multiple PF
-pci devices into one internal instance. Or checkout
-drivers/base/component.c, perhaps it could be extended for your usecase.
-
-
->
->>>
->>>> Again, could you please avoid creating auxiliary bus per-PF and just
->>>> have one auxiliary but per-ice-driver?
->>>>
->>>
->>> We can't have one per-ice driver, because we don't want to connect ports
->>>from a different device to the same clock. If you have two ice devices
->>> plugged in, the ports on each device are separate from each other.
->>>
->>> The goal here is to connect the clock ports to the clock owner.
->>>
->>> Worse, as described here, we do have some devices which combine multiple
->>> adapters together and tie their clocks together via HW signaling. In
->>> those cases the clocks *do* need to communicate across the device, but
->>> only to other ports on the same physical device, not to ports on a
->>> different device.
->>>
->>> Perhaps auxbus is the wrong approach here? but how else can we connect
->> 
->> Yeah, feels quite wrong.
->> 
->> 
->>> these ports without over-connecting to other ports? We could write
->>> bespoke code which finds these devices, but that felt like it was risky
->>> and convoluted.
->> 
->> Sounds you need something you have for DPLL subsystem. Feels to me that
->> your hw design is quite disconnected from the Linux device model :/
->> 
->
->I'm not 100% sure how DPLL handles this. I'll have to investigate.
-
-DPLL leaves the merging on DPLL level. The ice driver just register
-entities multiple times. It is specifically designed to fit ice needs.
-
-
->
->One thing I've considered a lot in the past (such as back when I was
->working on devlink flash update) was to somehow have a sort of extra
->layer where we could register with PCI subsystem some sort of "whole
->device" driver, that would get registered first and could connect to the
->rest of the function driver instances as they load. But this seems like
->it would need a lot of work in the PCI layer, and apparently hasn't been
->an issue for other devices? though ice is far from unique at least for
->Intel NICs. Its just that the devices got significantly more complex and
->functions more interdependent with this generation, and the issues with
->global bits were solved in other ways: often via hiding them with
->firmware >:(
-
-I think that others could benefit from such "merged device" as well. I
-think it is about the time to introduce it.
-
-
->
->
->I've tried explaining the issues with this to HW designers here, but so
->far haven't gotten a lot of traction.
->
->>> We could make use of ice_adapter, though we'd need some logic to manage
->>> devices which have multiple clocks, as well as devices like the one
->>> Sergey is working on which tie multiple adapters together.
->> 
->> Perhaps that is an answer. Maybe we can make DPLL much more simple after
->> that :)
->
->The only major issue with ice_adapter is the case where we have one
->clock connected to multiple adapters, but hopefully Sergey has some
->ideas for how to solve that.
->
->I think we can mostly make the rest of the logic for the usual case work
->via ice_adapter:
->
->1) we already get an ice_adapter reference during early probe
->2) each PF knows whether its an owner or not from the NVM/firmware interface
->3) we can move the list of ports from the auxbus thing into ice_adapter,
->possibly keeping one list per clock number, so that NVMs with multiple
->clocks enabled don't have conflicts or put all ports onto the same clock.
->
->I'm not sure how best to solve the weird case when we have multiple
->adapters tied together, but perhaps something with extending how the
->ice_adapter lookup is done could work? Sergey, I think we can continue
->this design discussion off list and come up with a proposal.
->
->We also have to be careful that whatever new solution also handles
->things which we got with auxiliary bus:
->
->1) prevent issues with ordering if a clock port loads before the clock
->owner PF. If the clock owner loads first, then we need to ensure the
->port still gets initialized. If the clock owner loads second, we need to
->avoid issues with things not being setup yet, i.e. ensure all the
->structures were already initialized (for example by initializing lists
->and such when we create the ice_adapter, not when the clock owner loads).
->
->2) prevent issues with teardown ordering that were previously serialized
->by the auxiliary bus unregister bits, where the driver unregister
->function would wait for all ports to shutdown.
->
->I think this can be done correctly with ice_adapter, but I wanted to
->point them out because we get them implicitly with the current design
->with auxiliary bus.
+> From: Peiyang Wang <wangpeiyang1@huawei.com>
+>=20
+> During the PF initialization process, hclge_update_port_info may return a=
+n
+> error code for some reason. At this point,  the ptp initialization has be=
+en
+> completed. To void memory leaks, the resources that are applied by ptp
+> should be released. Therefore, when hclge_update_port_info returns an err=
+or
+> code, hclge_ptp_uninit is called to release the corresponding resources.
+>=20
+> Fixes: eaf83ae59e18 ("net: hns3: add querying fec ability from firmware")
+> Signed-off-by: Peiyang Wang <wangpeiyang1@huawei.com>
+> Signed-off-by: Jijie Shao <shaojijie@huawei.com>
+> ---
+>  drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
+> b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
+> index 62ddce05fa2b..a068cd745eb4 100644
+> --- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
+> +++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
+> @@ -11761,7 +11761,7 @@ static int hclge_init_ae_dev(struct hnae3_ae_dev
+> *ae_dev)
+>=20
+>  	ret =3D hclge_update_port_info(hdev);
+>  	if (ret)
+> -		goto err_mdiobus_unreg;
+> +		goto err_ptp_uninit;
+>=20
+>  	INIT_KFIFO(hdev->mac_tnl_log);
+>=20
+> @@ -11812,6 +11812,8 @@ static int hclge_init_ae_dev(struct hnae3_ae_dev
+> *ae_dev)
+>  	devl_unlock(hdev->devlink);
+>  	return 0;
+>=20
+> +err_ptp_uninit:
+> +	hclge_ptp_uninit(hdev);
+>  err_mdiobus_unreg:
+>  	if (hdev->hw.mac.phydev)
+>  		mdiobus_unregister(hdev->hw.mac.mdio_bus);
+> --
+> 2.30.0
+>=20
+Reviewed-by: Hariprasad Kelam <hkelam@marvell.com>
 
