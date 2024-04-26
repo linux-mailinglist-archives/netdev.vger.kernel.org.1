@@ -1,494 +1,145 @@
-Return-Path: <netdev+bounces-91822-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91823-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E3A78B40D4
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 22:32:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BCE938B40DF
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 22:36:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E7F011F230BD
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 20:32:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 786DF28420C
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 20:36:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B6BF2746D;
-	Fri, 26 Apr 2024 20:32:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 974FC28DBF;
+	Fri, 26 Apr 2024 20:36:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HtH/l0L7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Tlw9ecwa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E1862907;
-	Fri, 26 Apr 2024 20:32:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EC57125AE
+	for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 20:36:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714163535; cv=none; b=Yaz1uo+Eh8tSsM8ThFFe68PSYDEHTyKGl1AhxY7QjHw0RTXfhE+th7Yz6PFM/sHztO6QPsKRX/rBwXeUwzVemayRMIC6sndzmG1EYuPPqThx/PvgAbzf1Utw3IZblVIsx11CNQqdpO46qWHq/2oY2x9j1PPvXrC8zxzcLZNTQrE=
+	t=1714163767; cv=none; b=FGkKDU+zhZiV1dsKKr+U44l7AEF1ZMSmKGDG7iXn7YUEP9jJHmoap+4Sg6gQj5HeesVnpmCsW7mjORStJu2J+iEDBvFrFKoVGVmctq0+Ay62M8RQhb8Tj9BYUsbF1ohJvOtinMOx5tj+YJKmOZ/wnv77vqC0xTWMlFUI7uhTnls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714163535; c=relaxed/simple;
-	bh=3bHExOdqYcyCmt6ogViu3EK/aQTiP0HSBE9i3t9nrBA=;
-	h=Date:From:To:Cc:Subject:Message-ID; b=AcmpnKr/kTDowlZ/rkbUrub2KNXSRdtpkN2jEKdSbN9nZvSApczJ9VBP4cFSFfc2YaqDQMr3FrXTGQ2EiMZp0o+JzUziprsUBHEfr7zktiDcAG9gsg6K9YjVDfW850wi8eJ4lZjfuRZnznl5YlN8fwCQaBI3tsiAUn7phvu+nPk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HtH/l0L7; arc=none smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1714163532; x=1745699532;
-  h=date:from:to:cc:subject:message-id;
-  bh=3bHExOdqYcyCmt6ogViu3EK/aQTiP0HSBE9i3t9nrBA=;
-  b=HtH/l0L7nr9qWRjxSasmpgJ4lcWnHuMtAay2PY+JEVuBBoDetrtIjzk9
-   WKatLPW72UX+aQEvnIElrhuBWFpRuMjyDeb3AojLSS/OZwu7I7dVul4jH
-   BFAzDKjwnyvg28SrxkqN0N5ent6YPOsvLwRGcEXm6iGDgXCYE01Y1rlAK
-   CGDar2HTYDk5oXkTKgDicrcNhfs1Si++zFtXaiydYdvDwPEbfNx07U4Hz
-   J+e1bmyHk4LYgQ+6T3xnmWcae++ArUj3D94eVF/1ydgBDU8z4rsrpDPkU
-   G98l3cZaUSPo0Ig2sz36j0F+swNr8fAX/nA+iwnv21beyJjWIaLOFKSYP
-   Q==;
-X-CSE-ConnectionGUID: Ga+R1F+3Q0SiQJCUc4aGwQ==
-X-CSE-MsgGUID: Zepyi3EbTASdGtWrZ9UHew==
-X-IronPort-AV: E=McAfee;i="6600,9927,11056"; a="10445931"
-X-IronPort-AV: E=Sophos;i="6.07,233,1708416000"; 
-   d="scan'208";a="10445931"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Apr 2024 13:32:11 -0700
-X-CSE-ConnectionGUID: pRJrfhhiQ96ykwUd3G181g==
-X-CSE-MsgGUID: 4WPFTd39Q06+erqwLTpTEQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,233,1708416000"; 
-   d="scan'208";a="63005916"
-Received: from lkp-server01.sh.intel.com (HELO e434dd42e5a1) ([10.239.97.150])
-  by orviesa001.jf.intel.com with ESMTP; 26 Apr 2024 13:32:08 -0700
-Received: from kbuild by e434dd42e5a1 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1s0SEn-0004EQ-1Y;
-	Fri, 26 Apr 2024 20:32:05 +0000
-Date: Sat, 27 Apr 2024 04:31:43 +0800
-From: kernel test robot <lkp@intel.com>
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: Linux Memory Management List <linux-mm@kvack.org>,
- amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
- intel-gfx@lists.freedesktop.org, intel-xe@lists.freedesktop.org,
- linux-pwm@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
- linux-riscv@lists.infradead.org, linux-usb@vger.kernel.org,
- netdev@vger.kernel.org, nouveau@lists.freedesktop.org
-Subject: [linux-next:master] BUILD REGRESSION
- bb7a2467e6beef44a80a17d45ebf2931e7631083
-Message-ID: <202404270435.6z78k4Qz-lkp@intel.com>
-User-Agent: s-nail v14.9.24
+	s=arc-20240116; t=1714163767; c=relaxed/simple;
+	bh=nFDKK3TrNjYvDOKfWO08v7x7Xtz9S4pHHAvyccoTU5o=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=SpGpFSco08lHV1nX8DftgTlhlAWM8IOeAHrqUFl7tCj21tB/ff8vZJ5wXT6Wf2leTT9rQ/rV87gGxrObd9jXOV1u7z3/fs9L1xrFPaeF1GDrjdby/Za5FxzD9RYbrT18btBdh/JKIjFf19XqVlYXnpv5gl8B6TpsZbBgKdDgUEg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Tlw9ecwa; arc=none smtp.client-ip=209.85.210.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-6eff2be3b33so2508925b3a.2
+        for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 13:36:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1714163765; x=1714768565; darn=vger.kernel.org;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=MLyFeao1ebroNBWDVmyIXeO9ftXrv61s8m5GkOFXbbg=;
+        b=Tlw9ecwaQFfMsE5IVYiU8ATA7voB1CHLMwIAkzJBbiZQFrO+VCN4Baq7Xphx0Vqgrh
+         Ja3qvI4DBpRzsedUfy64t+3CXWUdW7WyPEB176u73Z6gNNofYeeEW95Exjz/++dl0nn1
+         r94vG7grLYbWYJep3pIWLlPN6wrOT9aK0ctdb2GEG6n+mCujQ2tyt94n/ZFyYf+DgXad
+         JrhjFgL+ZR6gBqx7obMUSMhC5mXfvnCmv1c0I2lsK8gCPn9SRzsRPIFZt+SSNQUGeHuq
+         1rphL9pwxunDAoKjF3pVsrpSPS/6HFNtS1pUEzoIIbvGT2mruLyH21HTmuPtmO96muhe
+         NngA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714163765; x=1714768565;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=MLyFeao1ebroNBWDVmyIXeO9ftXrv61s8m5GkOFXbbg=;
+        b=qnHAmpPnOrh5arHFqQ+9Df4qNkYyDUcJDD++b0BqxYPMon/QPAKerdfR/63rusefwM
+         oDs2JrtFElsfue4ON1ncrvOhej2GTs87CoG8ileNdJcanecRaeu/Pp4mOboGVDXSzJTW
+         iTiWlvSZUm7Nx52+lvLkDnltvGXzWzzF1F2gDrLr9G+kyRVEqM7J+GCaqieiIonqHx0N
+         w3f+FiIIQwQFxfQ2EQxzXopFo+ek2OjWPJ6N75YXr7jPKyOjLREjdzBVpLkf3ULERwbV
+         HZLEM7oyT3jGrb4xDUiqiOGN0jq5ebw91y2Jnk2jCoGQLzfhs4dQDDwCMU7tfBQZmrEA
+         lUxw==
+X-Gm-Message-State: AOJu0YxoeH30VP7ydIP73jjdbDetpAX7zYxnU2TEk89ydRorNWzPSdx3
+	WU/xQyW6cGXE2rr5Sp1Y8wzG/EPCuq3qZnj/KbU8LlsNX9Ftlk6GbPOy3Ex07HUIsrStURMoxN9
+	d7ru8aIgJFSOLN3yDgvlZ7WY9f0ggzmad
+X-Google-Smtp-Source: AGHT+IHUpRcJYrNhoC2zgIATzuRyZIYWOG5GwkIwslHd03b6dClnn4pbd3sOtUwpv0oIzBKM1H+sSsyxeGm2PZ40NZg=
+X-Received: by 2002:a05:6a21:2707:b0:1a9:9eb8:20e1 with SMTP id
+ rm7-20020a056a21270700b001a99eb820e1mr4078273pzb.22.1714163765068; Fri, 26
+ Apr 2024 13:36:05 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+From: Shane Miller <gshanemiller6@gmail.com>
+Date: Fri, 26 Apr 2024 16:35:28 -0400
+Message-ID: <CAFtQo5D8D861XjUuznfdBAJxYP1wCaf_L482OuyN4BnNazM1eg@mail.gmail.com>
+Subject: RE: SR-IOV + switchdev + vlan + Mellanox: Cannot ping
+To: netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git master
-branch HEAD: bb7a2467e6beef44a80a17d45ebf2931e7631083  Add linux-next specific files for 20240426
+Problem:
+-----------------------------------------------------------------
+root@machA $ ping 10.xx.xx.194
+PING 10.xx.xx.194 (10.xx.xx.194) 56(84) bytes of data
+From 10.xx.xx.191 icmp seq=10 Destination Host Unreachable
+Proximate Cause:
+-----------------------------------------------------------------
+This seems to be a side effect of "switchdev" mode. When the identical
+configuration is set up EXCEPT that the SR-IOV virtualized NIC is left
+"legacy", ping (and ncat) works just fine.
 
-Error/Warning reports:
+As far as I can tell I need a bridge or bridge commands, but I have no
+idea where to start. This environment will not allow me to add modify
+commands when enabling switchdev mode. devlink seems to accept
+"switchdev" alone without modifiers.
 
-https://lore.kernel.org/oe-kbuild-all/202404262217.Dt4HoodH-lkp@intel.com
+Note: putting a NIC into switchdev mode makes the virtual functions
+show as "link-state disable" which is confusing. (See below.) Contrary
+to what it seems to suggest, the virtual NICs are up and running
 
-Error/Warning: (recently discovered and may have been fixed)
+Running "arp -e" on machine A shows machine B's ieth3v0 MAC address as
+incomplete suggesting switchdev+ARP is broken.
 
-arch/riscv/mm/init.c:1495:25: error: 'MODULES_VADDR' undeclared (first use in this function)
-arch/riscv/mm/init.c:1496:23: error: 'MODULES_END' undeclared (first use in this function)
-drivers/gpu/drm/amd/amdgpu/../display/dc/dml2/dml21/src/dml2_dpmm/dml2_dpmm_dcn4.c:181:58: error: arithmetic between enumeration type 'enum dentist_divider_range' and floating-point type 'double' [-Werror,-Wenum-float-conversion]
-drivers/gpu/drm/drm_mm.c:152:1: error: unused function 'drm_mm_interval_tree_insert' [-Werror,-Wunused-function]
-drivers/gpu/drm/drm_mm.c:152:1: error: unused function 'drm_mm_interval_tree_iter_next' [-Werror,-Wunused-function]
+Problem Environment:
+-----------------------------------------------------------------
+OS: RHEL 8.6 4.18.0-372.46.1.el8 x64
+NICs: Mellanox ConnectX-6
 
-Unverified Error/Warning (likely false positive, please contact us if interested):
+Machine A Links:
+70 tst@ieth3: <...LOWER_UP...> mtu 1500
+   link/ether xx.xx.xx.xx.xx.xx
+   vlan protocol 802.1Q id 133 <REORDER_HDR>
+   Inet 10.xx.xx.191
 
-ERROR: modpost: "add_preferred_console_match" [drivers/tty/serial/serial_base.ko] undefined!
-ERROR: modpost: "pnp_bus_type" [drivers/tty/serial/serial_base.ko] undefined!
-drivers/usb/dwc3/core.c:679:15: warning: variable 'hw_mode' set but not used [-Wunused-but-set-variable]
+Machine B Links With ieth3 in SR-IOV mode in switchdev mode:
+# Physical Function and its virtual functions:
+                                                 2: ieth3:
+<...PROMISC,UP,LOWER_UP> mtu 1500
+    link/ether xx.xx.xx.xx.xx.f6 portname p0 switchid xxxxe988
+    vf 0 link/ether xx.xx.xx.xx.xx.00 vlan 133 spoof off, link-state
+disable, trust off
+    . . .
+# Port representers
+893: ieth3r0: <...UP,LOWER_UP> mtu 1500
+link/ether xx.xx.xx.xx.xx.e1 portname pf0vf0 switchid xxxxe988
+. . .
+# Virtual Links
+897: ieth3v0: <...UP,LOWER_UP> mtu 1500
+  link/ether xx.xx.xx.xx.xx.00 promiscuity 0
+  inet 10.xx.xx.194/24 scope global ieth3v0
+  . . .
 
-Error/Warning ids grouped by kconfigs:
+SR-IOV Setup Summary
+-----------------------------------------------------------------
+This is done right since, in legacy mode, ping/ncat works fine:
 
-gcc_recent_errors
-|-- arc-allmodconfig
-|   `-- drivers-usb-dwc3-core.c:warning:variable-hw_mode-set-but-not-used
-|-- arc-allyesconfig
-|   `-- drivers-usb-dwc3-core.c:warning:variable-hw_mode-set-but-not-used
-|-- arm-allmodconfig
-|   |-- drivers-gpu-drm-imx-ipuv3-imx-ldb.c:error:_sel-directive-output-may-be-truncated-writing-bytes-into-a-region-of-size-between-and
-|   |-- drivers-gpu-drm-nouveau-nouveau_backlight.c:error:d-directive-output-may-be-truncated-writing-between-and-bytes-into-a-region-of-size
-|   `-- drivers-usb-dwc3-core.c:warning:variable-hw_mode-set-but-not-used
-|-- arm-allyesconfig
-|   |-- drivers-gpu-drm-imx-ipuv3-imx-ldb.c:error:_sel-directive-output-may-be-truncated-writing-bytes-into-a-region-of-size-between-and
-|   |-- drivers-gpu-drm-nouveau-nouveau_backlight.c:error:d-directive-output-may-be-truncated-writing-between-and-bytes-into-a-region-of-size
-|   `-- drivers-usb-dwc3-core.c:warning:variable-hw_mode-set-but-not-used
-|-- arm-randconfig-r111-20240426
-|   `-- drivers-gpu-drm-panel-panel-lg-sw43408.c:sparse:sparse:symbol-sw43408_backlight_ops-was-not-declared.-Should-it-be-static
-|-- arm-randconfig-r132-20240426
-|   `-- drivers-usb-dwc3-core.c:warning:variable-hw_mode-set-but-not-used
-|-- csky-allmodconfig
-|   |-- drivers-gpu-drm-imx-ipuv3-imx-ldb.c:error:_sel-directive-output-may-be-truncated-writing-bytes-into-a-region-of-size-between-and
-|   |-- drivers-gpu-drm-nouveau-nouveau_backlight.c:error:d-directive-output-may-be-truncated-writing-between-and-bytes-into-a-region-of-size
-|   `-- drivers-usb-dwc3-core.c:warning:variable-hw_mode-set-but-not-used
-|-- csky-allyesconfig
-|   |-- drivers-gpu-drm-imx-ipuv3-imx-ldb.c:error:_sel-directive-output-may-be-truncated-writing-bytes-into-a-region-of-size-between-and
-|   |-- drivers-gpu-drm-nouveau-nouveau_backlight.c:error:d-directive-output-may-be-truncated-writing-between-and-bytes-into-a-region-of-size
-|   `-- drivers-usb-dwc3-core.c:warning:variable-hw_mode-set-but-not-used
-|-- i386-allyesconfig
-|   `-- drivers-usb-dwc3-core.c:warning:variable-hw_mode-set-but-not-used
-|-- i386-randconfig-001-20240426
-|   `-- drivers-usb-dwc3-core.c:warning:variable-hw_mode-set-but-not-used
-|-- i386-randconfig-053-20240427
-|   `-- drivers-usb-dwc3-core.c:warning:variable-hw_mode-set-but-not-used
-|-- i386-randconfig-r121-20240426
-|   |-- drivers-gpu-drm-panel-panel-lg-sw43408.c:(.text):undefined-reference-to-drm_dsc_pps_payload_pack
-|   |-- drivers-gpu-drm-panel-panel-lg-sw43408.c:sparse:sparse:symbol-sw43408_backlight_ops-was-not-declared.-Should-it-be-static
-|   `-- drivers-usb-dwc3-core.c:warning:variable-hw_mode-set-but-not-used
-|-- loongarch-randconfig-r064-20231215
-|   `-- ERROR:pnp_bus_type-drivers-tty-serial-serial_base.ko-undefined
-|-- mips-allyesconfig
-|   `-- drivers-usb-dwc3-core.c:warning:variable-hw_mode-set-but-not-used
-|-- mips-randconfig-r064-20240427
-|   `-- drivers-usb-dwc3-core.c:warning:variable-hw_mode-set-but-not-used
-|-- nios2-allmodconfig
-|   `-- drivers-usb-dwc3-core.c:warning:variable-hw_mode-set-but-not-used
-|-- nios2-allyesconfig
-|   `-- drivers-usb-dwc3-core.c:warning:variable-hw_mode-set-but-not-used
-|-- nios2-randconfig-001-20240426
-|   `-- drivers-usb-dwc3-core.c:warning:variable-hw_mode-set-but-not-used
-|-- powerpc-randconfig-r061-20240427
-|   `-- ERROR:drm_dsc_pps_payload_pack-drivers-gpu-drm-panel-panel-lg-sw43408.ko-undefined
-|-- powerpc64-randconfig-001-20240426
-|   `-- drivers-usb-dwc3-core.c:warning:variable-hw_mode-set-but-not-used
-|-- powerpc64-randconfig-002-20240426
-|   `-- drivers-usb-dwc3-core.c:warning:variable-hw_mode-set-but-not-used
-|-- powerpc64-randconfig-r131-20240426
-|   |-- drivers-gpu-drm-panel-panel-lg-sw43408.c:sparse:sparse:symbol-sw43408_backlight_ops-was-not-declared.-Should-it-be-static
-|   `-- panel-lg-sw43408.c:(.text):undefined-reference-to-drm_dsc_pps_payload_pack
-|-- riscv-randconfig-c024-20221028
-|   |-- arch-riscv-mm-init.c:error:MODULES_END-undeclared-(first-use-in-this-function)
-|   `-- arch-riscv-mm-init.c:error:MODULES_VADDR-undeclared-(first-use-in-this-function)
-|-- s390-allyesconfig
-|   |-- drivers-gpu-drm-imx-ipuv3-imx-ldb.c:error:_sel-directive-output-may-be-truncated-writing-bytes-into-a-region-of-size-between-and
-|   `-- drivers-gpu-drm-nouveau-nouveau_backlight.c:error:d-directive-output-may-be-truncated-writing-between-and-bytes-into-a-region-of-size
-|-- s390-randconfig-r064-20240412
-|   `-- ERROR:add_preferred_console_match-drivers-tty-serial-serial_base.ko-undefined
-|-- sparc-randconfig-001-20240426
-|   |-- (.head.text):relocation-truncated-to-fit:R_SPARC_WDISP22-against-init.text
-|   `-- drivers-usb-dwc3-core.c:warning:variable-hw_mode-set-but-not-used
-|-- sparc-randconfig-002-20240426
-|   |-- (.head.text):relocation-truncated-to-fit:R_SPARC_WDISP22-against-init.text
-|   `-- (.init.text):relocation-truncated-to-fit:R_SPARC_WDISP22-against-symbol-leon_smp_cpu_startup-defined-in-.text-section-in-arch-sparc-kernel-trampoline_32.o
-|-- sparc-randconfig-r112-20240426
-|   |-- (.head.text):relocation-truncated-to-fit:R_SPARC_WDISP22-against-init.text
-|   `-- (.init.text):relocation-truncated-to-fit:R_SPARC_WDISP22-against-symbol-leon_smp_cpu_startup-defined-in-.text-section-in-arch-sparc-kernel-trampoline_32.o
-|-- x86_64-buildonly-randconfig-002-20240426
-|   `-- drivers-usb-dwc3-core.c:warning:variable-hw_mode-set-but-not-used
-|-- x86_64-randconfig-012-20240426
-|   `-- drivers-usb-dwc3-core.c:warning:variable-hw_mode-set-but-not-used
-|-- x86_64-randconfig-013-20240426
-|   |-- drivers-gpu-drm-panel-panel-lg-sw43408.c:(.text):undefined-reference-to-drm_dsc_pps_payload_pack
-|   `-- drivers-usb-dwc3-core.c:warning:variable-hw_mode-set-but-not-used
-|-- x86_64-randconfig-014-20240426
-|   `-- drivers-usb-dwc3-core.c:warning:variable-hw_mode-set-but-not-used
-|-- x86_64-randconfig-015-20240426
-|   `-- drivers-usb-dwc3-core.c:warning:variable-hw_mode-set-but-not-used
-|-- x86_64-randconfig-075-20240426
-|   `-- drivers-usb-dwc3-core.c:warning:variable-hw_mode-set-but-not-used
-|-- x86_64-randconfig-122-20240426
-|   `-- drivers-gpu-drm-panel-panel-lg-sw43408.c:sparse:sparse:symbol-sw43408_backlight_ops-was-not-declared.-Should-it-be-static
-|-- x86_64-randconfig-161-20240426
-|   |-- drivers-pwm-core.c-pwm_cdev_ioctl()-warn:possible-spectre-second-half.-pwm
-|   `-- drivers-pwm-core.c-pwm_cdev_ioctl()-warn:potential-spectre-issue-cdata-pwm-r
-`-- xtensa-randconfig-001-20240426
-    `-- drivers-usb-dwc3-core.c:warning:variable-hw_mode-set-but-not-used
-clang_recent_errors
-|-- arm-randconfig-001-20240426
-|   |-- drivers-gpu-drm-drm_mm.c:error:function-drm_mm_node_scanned_block-is-not-needed-and-will-not-be-emitted-Werror-Wunneeded-internal-declaration
-|   |-- drivers-gpu-drm-drm_mm.c:error:unused-function-drm_mm_interval_tree_insert-Werror-Wunused-function
-|   |-- drivers-gpu-drm-drm_mm.c:error:unused-function-drm_mm_interval_tree_iter_next-Werror-Wunused-function
-|   `-- include-linux-vmstat.h:error:arithmetic-between-different-enumeration-types-(-enum-node_stat_item-and-enum-lru_list-)-Werror-Wenum-enum-conversion
-|-- arm64-allmodconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm.c:error:arithmetic-between-different-enumeration-types-(-enum-dc_irq_source-and-enum-irq_type-)-Werror-Wenum-enum-conversion
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-irq-dce110-irq_service_dce110.c:error:arithmetic-between-different-enumeration-types-(-enum-dc_irq_source-and-enum-irq_type-)-Werror-Wenum-enum-conversion
-|   |-- drivers-gpu-drm-drm_mm.c:error:unused-function-drm_mm_interval_tree_insert-Werror-Wunused-function
-|   |-- drivers-gpu-drm-drm_mm.c:error:unused-function-drm_mm_interval_tree_iter_next-Werror-Wunused-function
-|   |-- drivers-gpu-drm-i915-display-intel_cursor.c:error:arithmetic-between-different-enumeration-types-(-enum-pipe-and-enum-intel_display_power_domain-)-Werror-Wenum-enum-conversion
-|   |-- drivers-gpu-drm-i915-display-intel_ddi.c:error:arithmetic-between-different-enumeration-types-(-enum-hpd_pin-and-enum-port-)-Werror-Wenum-enum-conversion
-|   |-- drivers-gpu-drm-i915-display-intel_ddi.c:error:arithmetic-between-different-enumeration-types-(-enum-transcoder-and-enum-intel_display_power_domain-)-Werror-Wenum-enum-conversion
-|   |-- drivers-gpu-drm-i915-display-intel_display.c:error:arithmetic-between-different-enumeration-types-(-enum-phy-and-enum-port-)-Werror-Wenum-enum-conversion
-|   |-- drivers-gpu-drm-i915-display-intel_display.c:error:arithmetic-between-different-enumeration-types-(-enum-pipe-and-enum-intel_display_power_domain-)-Werror-Wenum-enum-conversion
-|   |-- drivers-gpu-drm-i915-display-intel_display.c:error:arithmetic-between-different-enumeration-types-(-enum-tc_port-and-enum-port-)-Werror-Wenum-enum-conversion
-|   |-- drivers-gpu-drm-i915-display-intel_display.c:error:arithmetic-between-different-enumeration-types-(-enum-transcoder-and-enum-intel_display_power_domain-)-Werror-Wenum-enum-conversion
-|   |-- drivers-gpu-drm-i915-display-intel_display_irq.c:error:arithmetic-between-different-enumeration-types-(-enum-pipe-and-enum-intel_display_power_domain-)-Werror-Wenum-enum-conversion
-|   |-- drivers-gpu-drm-i915-display-intel_display_irq.c:error:arithmetic-between-different-enumeration-types-(-enum-transcoder-and-enum-intel_display_power_domain-)-Werror-Wenum-enum-conversion
-|   |-- drivers-gpu-drm-i915-display-intel_dpll_mgr.c:error:arithmetic-between-different-enumeration-types-(-enum-tc_port-and-enum-intel_dpll_id-)-Werror-Wenum-enum-conversion
-|   |-- drivers-gpu-drm-i915-display-intel_hotplug.c:error:arithmetic-between-different-enumeration-types-(-enum-hpd_pin-and-enum-port-)-Werror-Wenum-enum-conversion
-|   |-- drivers-gpu-drm-i915-display-intel_pipe_crc.c:error:arithmetic-between-different-enumeration-types-(-enum-pipe-and-enum-intel_display_power_domain-)-Werror-Wenum-enum-conversion
-|   |-- drivers-gpu-drm-i915-display-intel_tc.c:error:arithmetic-between-different-enumeration-types-(-enum-intel_display_power_domain-and-enum-tc_port-)-Werror-Wenum-enum-conversion
-|   |-- drivers-gpu-drm-i915-display-intel_vdsc.c:error:arithmetic-between-different-enumeration-types-(-enum-pipe-and-enum-intel_display_power_domain-)-Werror-Wenum-enum-conversion
-|   |-- drivers-gpu-drm-i915-display-skl_universal_plane.c:error:arithmetic-between-different-enumeration-types-(-enum-pipe-and-enum-intel_display_power_domain-)-Werror-Wenum-enum-conversion
-|   |-- drivers-gpu-drm-i915-display-skl_watermark.c:error:arithmetic-between-different-enumeration-types-(-enum-pipe-and-enum-intel_display_power_domain-)-Werror-Wenum-enum-conversion
-|   |-- drivers-gpu-drm-renesas-rcar-du-rcar_cmm.c:error:unused-function-rcar_cmm_read-Werror-Wunused-function
-|   |-- drivers-usb-dwc3-core.c:warning:variable-hw_mode-set-but-not-used
-|   |-- include-linux-vmstat.h:error:arithmetic-between-different-enumeration-types-(-enum-node_stat_item-and-enum-lru_list-)-Werror-Wenum-enum-conversion
-|   `-- include-linux-vmstat.h:error:arithmetic-between-different-enumeration-types-(-enum-zone_stat_item-and-enum-numa_stat_item-)-Werror-Wenum-enum-conversion
-|-- arm64-randconfig-r063-20240427
-|   `-- drivers-usb-dwc3-core.c:warning:variable-hw_mode-set-but-not-used
-|-- hexagon-allmodconfig
-|   |-- drivers-gpu-drm-drm_mm.c:error:unused-function-drm_mm_interval_tree_insert-Werror-Wunused-function
-|   `-- drivers-gpu-drm-drm_mm.c:error:unused-function-drm_mm_interval_tree_iter_next-Werror-Wunused-function
-|-- hexagon-randconfig-r012-20220322
-|   `-- drivers-usb-dwc3-core.c:warning:variable-hw_mode-set-but-not-used
-|-- i386-randconfig-002-20240426
-|   `-- drivers-usb-dwc3-core.c:warning:variable-hw_mode-set-but-not-used
-|-- i386-randconfig-006-20240426
-|   `-- drivers-usb-dwc3-core.c:warning:variable-hw_mode-set-but-not-used
-|-- i386-randconfig-061-20240426
-|   `-- drivers-usb-dwc3-core.c:warning:variable-hw_mode-set-but-not-used
-|-- riscv-allmodconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm.c:error:arithmetic-between-different-enumeration-types-(-enum-dc_irq_source-and-enum-irq_type-)-Werror-Wenum-enum-conversion
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-dml2-dml21-src-dml2_dpmm-dml2_dpmm_dcn4.c:error:arithmetic-between-enumeration-type-enum-dentist_divider_range-and-floating-point-type-double-Werror-Wenum-floa
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-irq-dce110-irq_service_dce110.c:error:arithmetic-between-different-enumeration-types-(-enum-dc_irq_source-and-enum-irq_type-)-Werror-Wenum-enum-conversion
-|   |-- drivers-gpu-drm-drm_mm.c:error:unused-function-drm_mm_interval_tree_insert-Werror-Wunused-function
-|   |-- drivers-gpu-drm-drm_mm.c:error:unused-function-drm_mm_interval_tree_iter_next-Werror-Wunused-function
-|   |-- drivers-gpu-drm-i915-display-intel_cursor.c:error:arithmetic-between-different-enumeration-types-(-enum-pipe-and-enum-intel_display_power_domain-)-Werror-Wenum-enum-conversion
-|   |-- drivers-gpu-drm-i915-display-intel_ddi.c:error:arithmetic-between-different-enumeration-types-(-enum-hpd_pin-and-enum-port-)-Werror-Wenum-enum-conversion
-|   |-- drivers-gpu-drm-i915-display-intel_ddi.c:error:arithmetic-between-different-enumeration-types-(-enum-transcoder-and-enum-intel_display_power_domain-)-Werror-Wenum-enum-conversion
-|   |-- drivers-gpu-drm-i915-display-intel_display.c:error:arithmetic-between-different-enumeration-types-(-enum-phy-and-enum-port-)-Werror-Wenum-enum-conversion
-|   |-- drivers-gpu-drm-i915-display-intel_display.c:error:arithmetic-between-different-enumeration-types-(-enum-pipe-and-enum-intel_display_power_domain-)-Werror-Wenum-enum-conversion
-|   |-- drivers-gpu-drm-i915-display-intel_display.c:error:arithmetic-between-different-enumeration-types-(-enum-tc_port-and-enum-port-)-Werror-Wenum-enum-conversion
-|   |-- drivers-gpu-drm-i915-display-intel_display.c:error:arithmetic-between-different-enumeration-types-(-enum-transcoder-and-enum-intel_display_power_domain-)-Werror-Wenum-enum-conversion
-|   |-- drivers-gpu-drm-i915-display-intel_display_irq.c:error:arithmetic-between-different-enumeration-types-(-enum-pipe-and-enum-intel_display_power_domain-)-Werror-Wenum-enum-conversion
-|   |-- drivers-gpu-drm-i915-display-intel_display_irq.c:error:arithmetic-between-different-enumeration-types-(-enum-transcoder-and-enum-intel_display_power_domain-)-Werror-Wenum-enum-conversion
-|   |-- drivers-gpu-drm-i915-display-intel_dpll_mgr.c:error:arithmetic-between-different-enumeration-types-(-enum-tc_port-and-enum-intel_dpll_id-)-Werror-Wenum-enum-conversion
-|   |-- drivers-gpu-drm-i915-display-intel_hotplug.c:error:arithmetic-between-different-enumeration-types-(-enum-hpd_pin-and-enum-port-)-Werror-Wenum-enum-conversion
-|   |-- drivers-gpu-drm-i915-display-intel_pipe_crc.c:error:arithmetic-between-different-enumeration-types-(-enum-pipe-and-enum-intel_display_power_domain-)-Werror-Wenum-enum-conversion
-|   |-- drivers-gpu-drm-i915-display-intel_tc.c:error:arithmetic-between-different-enumeration-types-(-enum-intel_display_power_domain-and-enum-tc_port-)-Werror-Wenum-enum-conversion
-|   |-- drivers-gpu-drm-i915-display-intel_vdsc.c:error:arithmetic-between-different-enumeration-types-(-enum-pipe-and-enum-intel_display_power_domain-)-Werror-Wenum-enum-conversion
-|   |-- drivers-gpu-drm-i915-display-skl_universal_plane.c:error:arithmetic-between-different-enumeration-types-(-enum-pipe-and-enum-intel_display_power_domain-)-Werror-Wenum-enum-conversion
-|   |-- drivers-gpu-drm-i915-display-skl_watermark.c:error:arithmetic-between-different-enumeration-types-(-enum-pipe-and-enum-intel_display_power_domain-)-Werror-Wenum-enum-conversion
-|   |-- drivers-usb-dwc3-core.c:warning:variable-hw_mode-set-but-not-used
-|   |-- include-linux-vmstat.h:error:arithmetic-between-different-enumeration-types-(-enum-node_stat_item-and-enum-lru_list-)-Werror-Wenum-enum-conversion
-|   `-- include-linux-vmstat.h:error:arithmetic-between-different-enumeration-types-(-enum-zone_stat_item-and-enum-numa_stat_item-)-Werror-Wenum-enum-conversion
-|-- riscv-allyesconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm.c:error:arithmetic-between-different-enumeration-types-(-enum-dc_irq_source-and-enum-irq_type-)-Werror-Wenum-enum-conversion
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-irq-dce110-irq_service_dce110.c:error:arithmetic-between-different-enumeration-types-(-enum-dc_irq_source-and-enum-irq_type-)-Werror-Wenum-enum-conversion
-|   |-- drivers-gpu-drm-drm_mm.c:error:unused-function-drm_mm_interval_tree_insert-Werror-Wunused-function
-|   |-- drivers-gpu-drm-drm_mm.c:error:unused-function-drm_mm_interval_tree_iter_next-Werror-Wunused-function
-|   |-- drivers-usb-dwc3-core.c:warning:variable-hw_mode-set-but-not-used
-|   |-- include-linux-vmstat.h:error:arithmetic-between-different-enumeration-types-(-enum-node_stat_item-and-enum-lru_list-)-Werror-Wenum-enum-conversion
-|   `-- include-linux-vmstat.h:error:arithmetic-between-different-enumeration-types-(-enum-zone_stat_item-and-enum-numa_stat_item-)-Werror-Wenum-enum-conversion
-|-- x86_64-allnoconfig
-|   |-- Warning:MAINTAINERS-references-a-file-that-doesn-t-exist:Documentation-devicetree-bindings-display-exynos
-|   |-- Warning:MAINTAINERS-references-a-file-that-doesn-t-exist:Documentation-devicetree-bindings-reserved-memory-qcom
-|   `-- net-ipv6-udp.c:trace-events-udp.h-is-included-more-than-once.
-|-- x86_64-allyesconfig
-|   |-- drivers-gpu-drm-bridge-synopsys-dw-hdmi-i2s-audio.c:error:unused-function-hdmi_read-Werror-Wunused-function
-|   |-- drivers-gpu-drm-drm_mm.c:error:unused-function-drm_mm_interval_tree_insert-Werror-Wunused-function
-|   |-- drivers-gpu-drm-drm_mm.c:error:unused-function-drm_mm_interval_tree_iter_next-Werror-Wunused-function
-|   |-- drivers-gpu-drm-kmb-kmb_dsi.c:error:unused-function-set_test_mode_src_osc_freq_target_hi_bits-Werror-Wunused-function
-|   |-- drivers-gpu-drm-kmb-kmb_dsi.c:error:unused-function-set_test_mode_src_osc_freq_target_low_bits-Werror-Wunused-function
-|   `-- drivers-usb-dwc3-core.c:warning:variable-hw_mode-set-but-not-used
-|-- x86_64-buildonly-randconfig-001-20240426
-|   `-- drivers-usb-dwc3-core.c:warning:variable-hw_mode-set-but-not-used
-|-- x86_64-randconfig-004-20240426
-|   `-- drivers-usb-dwc3-core.c:warning:variable-hw_mode-set-but-not-used
-|-- x86_64-randconfig-006-20240426
-|   `-- ld.lld:error:undefined-symbol:drm_dsc_pps_payload_pack
-|-- x86_64-randconfig-011-20240426
-|   |-- drivers-gpu-drm-drm_mm.c:error:unused-function-drm_mm_interval_tree_insert-Werror-Wunused-function
-|   |-- drivers-gpu-drm-drm_mm.c:error:unused-function-drm_mm_interval_tree_iter_next-Werror-Wunused-function
-|   `-- drivers-usb-dwc3-core.c:warning:variable-hw_mode-set-but-not-used
-|-- x86_64-randconfig-103-20240427
-|   `-- ld.lld:error:undefined-symbol:drm_dsc_pps_payload_pack
-|-- x86_64-randconfig-104-20240427
-|   `-- ld.lld:error:undefined-symbol:drm_dsc_pps_payload_pack
-`-- x86_64-randconfig-123-20240426
-    |-- drivers-gpu-drm-drm_mm.c:error:unused-function-drm_mm_interval_tree_insert-Werror-Wunused-function
-    |-- drivers-gpu-drm-drm_mm.c:error:unused-function-drm_mm_interval_tree_iter_next-Werror-Wunused-function
-    `-- drivers-gpu-drm-panel-panel-lg-sw43408.c:sparse:sparse:symbol-sw43408_backlight_ops-was-not-declared.-Should-it-be-static
-
-elapsed time: 737m
-
-configs tested: 179
-configs skipped: 3
-
-tested configs:
-alpha                             allnoconfig   gcc  
-alpha                            allyesconfig   gcc  
-alpha                               defconfig   gcc  
-arc                              allmodconfig   gcc  
-arc                               allnoconfig   gcc  
-arc                              allyesconfig   gcc  
-arc                          axs101_defconfig   gcc  
-arc                                 defconfig   gcc  
-arc                   randconfig-001-20240426   gcc  
-arc                   randconfig-002-20240426   gcc  
-arm                              allmodconfig   gcc  
-arm                               allnoconfig   clang
-arm                              allyesconfig   gcc  
-arm                                 defconfig   clang
-arm                            dove_defconfig   gcc  
-arm                      footbridge_defconfig   clang
-arm                   randconfig-001-20240426   clang
-arm                   randconfig-002-20240426   gcc  
-arm                   randconfig-003-20240426   gcc  
-arm                   randconfig-004-20240426   gcc  
-arm                        vexpress_defconfig   gcc  
-arm64                            allmodconfig   clang
-arm64                             allnoconfig   gcc  
-arm64                               defconfig   gcc  
-arm64                 randconfig-001-20240426   gcc  
-arm64                 randconfig-002-20240426   gcc  
-arm64                 randconfig-003-20240426   clang
-arm64                 randconfig-004-20240426   gcc  
-csky                             allmodconfig   gcc  
-csky                              allnoconfig   gcc  
-csky                             allyesconfig   gcc  
-csky                                defconfig   gcc  
-csky                  randconfig-001-20240426   gcc  
-csky                  randconfig-002-20240426   gcc  
-hexagon                          allmodconfig   clang
-hexagon                           allnoconfig   clang
-hexagon                          allyesconfig   clang
-hexagon                             defconfig   clang
-hexagon               randconfig-001-20240426   clang
-hexagon               randconfig-002-20240426   clang
-i386                             allmodconfig   gcc  
-i386                              allnoconfig   gcc  
-i386                             allyesconfig   gcc  
-i386         buildonly-randconfig-001-20240426   gcc  
-i386         buildonly-randconfig-002-20240426   clang
-i386         buildonly-randconfig-003-20240426   gcc  
-i386         buildonly-randconfig-004-20240426   gcc  
-i386         buildonly-randconfig-005-20240426   clang
-i386         buildonly-randconfig-006-20240426   clang
-i386                                defconfig   clang
-i386                  randconfig-001-20240426   gcc  
-i386                  randconfig-002-20240426   clang
-i386                  randconfig-003-20240426   gcc  
-i386                  randconfig-004-20240426   gcc  
-i386                  randconfig-005-20240426   gcc  
-i386                  randconfig-006-20240426   clang
-i386                  randconfig-011-20240426   gcc  
-i386                  randconfig-012-20240426   clang
-i386                  randconfig-013-20240426   clang
-i386                  randconfig-014-20240426   clang
-i386                  randconfig-015-20240426   clang
-i386                  randconfig-016-20240426   clang
-loongarch                        allmodconfig   gcc  
-loongarch                         allnoconfig   gcc  
-loongarch                           defconfig   gcc  
-loongarch             randconfig-001-20240426   gcc  
-loongarch             randconfig-002-20240426   gcc  
-m68k                             alldefconfig   gcc  
-m68k                             allmodconfig   gcc  
-m68k                              allnoconfig   gcc  
-m68k                             allyesconfig   gcc  
-m68k                                defconfig   gcc  
-m68k                       m5475evb_defconfig   gcc  
-microblaze                       allmodconfig   gcc  
-microblaze                        allnoconfig   gcc  
-microblaze                       allyesconfig   gcc  
-microblaze                          defconfig   gcc  
-mips                              allnoconfig   gcc  
-mips                             allyesconfig   gcc  
-mips                         db1xxx_defconfig   clang
-mips                           xway_defconfig   clang
-nios2                            allmodconfig   gcc  
-nios2                             allnoconfig   gcc  
-nios2                            allyesconfig   gcc  
-nios2                               defconfig   gcc  
-nios2                 randconfig-001-20240426   gcc  
-nios2                 randconfig-002-20240426   gcc  
-openrisc                          allnoconfig   gcc  
-openrisc                         allyesconfig   gcc  
-openrisc                            defconfig   gcc  
-parisc                           allmodconfig   gcc  
-parisc                            allnoconfig   gcc  
-parisc                           allyesconfig   gcc  
-parisc                              defconfig   gcc  
-parisc                randconfig-001-20240426   gcc  
-parisc                randconfig-002-20240426   gcc  
-parisc64                            defconfig   gcc  
-powerpc                          allmodconfig   gcc  
-powerpc                           allnoconfig   gcc  
-powerpc                          allyesconfig   clang
-powerpc                     asp8347_defconfig   clang
-powerpc                       ebony_defconfig   clang
-powerpc                 mpc834x_itx_defconfig   clang
-powerpc               mpc834x_itxgp_defconfig   clang
-powerpc               randconfig-001-20240426   clang
-powerpc               randconfig-002-20240426   gcc  
-powerpc               randconfig-003-20240426   clang
-powerpc                        warp_defconfig   gcc  
-powerpc64             randconfig-001-20240426   gcc  
-powerpc64             randconfig-002-20240426   gcc  
-powerpc64             randconfig-003-20240426   clang
-riscv                            allmodconfig   clang
-riscv                             allnoconfig   gcc  
-riscv                            allyesconfig   clang
-riscv                               defconfig   clang
-riscv                 randconfig-001-20240426   clang
-riscv                 randconfig-002-20240426   gcc  
-s390                             allmodconfig   clang
-s390                              allnoconfig   clang
-s390                             allyesconfig   gcc  
-s390                                defconfig   clang
-s390                  randconfig-001-20240426   clang
-s390                  randconfig-002-20240426   clang
-sh                               allmodconfig   gcc  
-sh                                allnoconfig   gcc  
-sh                               allyesconfig   gcc  
-sh                                  defconfig   gcc  
-sh                        edosk7760_defconfig   gcc  
-sh                 kfr2r09-romimage_defconfig   gcc  
-sh                    randconfig-001-20240426   gcc  
-sh                    randconfig-002-20240426   gcc  
-sh                        sh7763rdp_defconfig   gcc  
-sparc                            allmodconfig   gcc  
-sparc                             allnoconfig   gcc  
-sparc                               defconfig   gcc  
-sparc64                          allmodconfig   gcc  
-sparc64                          allyesconfig   gcc  
-sparc64                             defconfig   gcc  
-sparc64               randconfig-001-20240426   gcc  
-sparc64               randconfig-002-20240426   gcc  
-um                               allmodconfig   clang
-um                                allnoconfig   clang
-um                               allyesconfig   gcc  
-um                                  defconfig   clang
-um                             i386_defconfig   gcc  
-um                    randconfig-001-20240426   gcc  
-um                    randconfig-002-20240426   gcc  
-um                           x86_64_defconfig   clang
-x86_64                            allnoconfig   clang
-x86_64                           allyesconfig   clang
-x86_64       buildonly-randconfig-001-20240426   clang
-x86_64       buildonly-randconfig-002-20240426   gcc  
-x86_64       buildonly-randconfig-003-20240426   clang
-x86_64       buildonly-randconfig-004-20240426   clang
-x86_64       buildonly-randconfig-005-20240426   gcc  
-x86_64       buildonly-randconfig-006-20240426   gcc  
-x86_64                              defconfig   gcc  
-x86_64                randconfig-001-20240426   gcc  
-x86_64                randconfig-002-20240426   gcc  
-x86_64                randconfig-003-20240426   gcc  
-x86_64                randconfig-004-20240426   clang
-x86_64                randconfig-005-20240426   clang
-x86_64                randconfig-006-20240426   clang
-x86_64                randconfig-011-20240426   clang
-x86_64                randconfig-012-20240426   gcc  
-x86_64                randconfig-013-20240426   gcc  
-x86_64                randconfig-014-20240426   gcc  
-x86_64                randconfig-015-20240426   gcc  
-x86_64                randconfig-016-20240426   clang
-x86_64                randconfig-071-20240426   clang
-x86_64                randconfig-072-20240426   clang
-x86_64                randconfig-073-20240426   clang
-x86_64                randconfig-074-20240426   gcc  
-x86_64                randconfig-075-20240426   gcc  
-x86_64                randconfig-076-20240426   gcc  
-x86_64                          rhel-8.3-rust   clang
-xtensa                            allnoconfig   gcc  
-xtensa                randconfig-001-20240426   gcc  
-xtensa                randconfig-002-20240426   gcc  
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+1. Enable IOMMU, Vtx in BIOS
+2. Boot Linux with iommu=on on command line
+3. Install Mellanox OFED
+4. Enable SR-IOV for max 8 devices in Mellanox firmware
+(reboot)
+5. Create 4 virtual NICs w/ SR-IOV
+6. Configure 4 virtual NICs mac, trust off, spoofchk off, state auto
+7. Unbind virtual NICs
+8. Put ieth3 into switchdev mode
+9. Rebind virtual NICs
+10. Bring all links up
+11. Assign IPV4 addresses to virtual links
 
