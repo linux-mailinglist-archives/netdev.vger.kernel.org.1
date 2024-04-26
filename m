@@ -1,272 +1,112 @@
-Return-Path: <netdev+bounces-91719-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91720-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE5B38B399E
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 16:19:48 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 026E88B39A7
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 16:20:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 119C8B22FB5
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 14:19:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AE4BC1F22ACE
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 14:20:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E5C6148821;
-	Fri, 26 Apr 2024 14:19:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5ED51148856;
+	Fri, 26 Apr 2024 14:19:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B7PconPL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail115-118.sinamail.sina.com.cn (mail115-118.sinamail.sina.com.cn [218.30.115.118])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E625842A99
-	for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 14:19:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=218.30.115.118
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0F911474D1;
+	Fri, 26 Apr 2024 14:19:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714141179; cv=none; b=KiaphXrro/jjcRU8LEJVZb7ADwKv+Bh6QDThGMJMApna77zqd+kjvIFd/gM+PdYn74s2w69/qU+/2QuXAoOxinulSNb52S94oN9y3jdPEJmIe8pHQnoi/wvCew5AkxtJD7QNmck3MFFnfZa4naI61pbsVv5kLvOizQFwFcM0tFU=
+	t=1714141188; cv=none; b=QVJr4o7qL9Sdoh/FpaFgauTC+12exowSnZduA19ovNGXv/6Fm/gIMReucahMFWV1jlQgLUle/IGTZall43ocACczX9ceSeDOZhrVCCA0I+swNioIS66Qlgill7h1+Ow6qLX73zBSH0eNx9Est8JXCnsRTs/LUZ6ayzl0DwiqZyU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714141179; c=relaxed/simple;
-	bh=i3kgqrHHpbXMW27S2FervM6XeCNKONpsKToZKBi58xQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=OcolmWYGLkQJvOYgPXpYZKxWsI3O1KmgORsv2dkSLtjNz1DYeY/8fhsE78hmkYmXn+GJDokpEBe3kGf0mAV2Bc+6OvsM9czyKhKGl/Yx8PHcRXMlP/L/AeSdNVIP2V6dOZYn1x7qEg66AY3unteuDOcvVwXQbGjHMA/MJD3YhWA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sina.com; spf=pass smtp.mailfrom=sina.com; arc=none smtp.client-ip=218.30.115.118
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sina.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
-X-SMAIL-HELO: localhost.localdomain
-Received: from unknown (HELO localhost.localdomain)([116.24.11.235])
-	by sina.com (172.16.235.25) with ESMTP
-	id 662BB75B00006D3A; Fri, 26 Apr 2024 22:17:03 +0800 (CST)
-X-Sender: hdanton@sina.com
-X-Auth-ID: hdanton@sina.com
-Authentication-Results: sina.com;
-	 spf=none smtp.mailfrom=hdanton@sina.com;
-	 dkim=none header.i=none;
-	 dmarc=none action=none header.from=hdanton@sina.com
-X-SMAIL-MID: 6332034210490
-X-SMAIL-UIID: 5E451C7B22CD492B879366B2EF650F06-20240426-221703-1
-From: Hillf Danton <hdanton@sina.com>
-To: syzbot <syzbot+705c61d60b091ef42c04@syzkaller.appspotmail.com>
-Cc: edumazet@google.com,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Boqun Feng <boqun.feng@gmail.com>,
-	syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] [net?] possible deadlock in team_del_slave (3)
-Date: Fri, 26 Apr 2024 22:17:02 +0800
-Message-Id: <20240426141702.3419-1-hdanton@sina.com>
-In-Reply-To: <000000000000ffc5d80616fea23d@google.com>
-References: 
+	s=arc-20240116; t=1714141188; c=relaxed/simple;
+	bh=1YPIyGpDitR6xzxqcXAI3KlvDHPDnDAVBabxqnFbikg=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ga//kroBx8lz6v18UU3ZibbHDAD+Om+y1Taup7v7or7sJjDfCKB2vpgVORX1bc77PQr1lNd7HlnRYjir0yeO3tBclSKDo93hxFUxag8ETrUJf7jmlKbUG+XkHcl9pgVQdtx4H4d+z6Xi5bc0GN0dwKXclKpKr2qIoN8DrFq1hP4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B7PconPL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E0EDC116B1;
+	Fri, 26 Apr 2024 14:19:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714141187;
+	bh=1YPIyGpDitR6xzxqcXAI3KlvDHPDnDAVBabxqnFbikg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=B7PconPLHaZbsSE+E2qb7kFxKKPiSGifdJxIO5nhpOcR+i/H6Rf/QpegOYMOrwrIT
+	 ZRBYBF7gNYzqS+/qeUumbeqlcHdDGW+dcRhBg8s7V/Bx2ygqJnoWHiS5PphSoESsHY
+	 wRLQw4fRqH4m26AoF1Fv5sD5hYTSpNK20oIHkZcB8KD5h1QygEo8apSWV73UV/NctU
+	 L4LxYtbi0OBSyEtXylLUnPdQBuisvmnPgFoxGk/57wq4H8Sikhl+RJz0nfdW862a6j
+	 ZTEGse7JAdOTZn5tS7OrtXwoHnMwy7yTsx06qEaYDXg2z1j1lkSEKF/9WUoF/Aj8KT
+	 kEQlDp7qR5gnA==
+Date: Fri, 26 Apr 2024 07:19:44 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Joel Granados <j.granados@samsung.com>
+Cc: Joel Granados via B4 Relay <devnull+j.granados.samsung.com@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Alexander Aring
+ <alex.aring@gmail.com>, Stefan Schmidt <stefan@datenfreihafen.org>, Miquel
+ Raynal <miquel.raynal@bootlin.com>, David Ahern <dsahern@kernel.org>,
+ Steffen Klassert <steffen.klassert@secunet.com>, Herbert Xu
+ <herbert@gondor.apana.org.au>, Matthieu Baerts <matttbe@kernel.org>, Mat
+ Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>, Ralf
+ Baechle <ralf@linux-mips.org>, Remi Denis-Courmont <courmisch@gmail.com>,
+ Allison Henderson <allison.henderson@oracle.com>, David Howells
+ <dhowells@redhat.com>, Marc Dionne <marc.dionne@auristor.com>, Marcelo
+ Ricardo Leitner <marcelo.leitner@gmail.com>, Xin Long
+ <lucien.xin@gmail.com>, Wenjia Zhang <wenjia@linux.ibm.com>, Jan Karcher
+ <jaka@linux.ibm.com>, "D. Wythe" <alibuda@linux.alibaba.com>, Tony Lu
+ <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>, Trond
+ Myklebust <trond.myklebust@hammerspace.com>, Anna Schumaker
+ <anna@kernel.org>, Chuck Lever <chuck.lever@oracle.com>, Jeff Layton
+ <jlayton@kernel.org>, Neil Brown <neilb@suse.de>, Olga Kornievskaia
+ <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey
+ <tom@talpey.com>, Jon Maloy <jmaloy@redhat.com>, Ying Xue
+ <ying.xue@windriver.com>, Martin Schiller <ms@dev.tdt.de>, Pablo Neira
+ Ayuso <pablo@netfilter.org>, Jozsef Kadlecsik <kadlec@netfilter.org>,
+ Florian Westphal <fw@strlen.de>, Roopa Prabhu <roopa@nvidia.com>, Nikolay
+ Aleksandrov <razor@blackwall.org>, Simon Horman <horms@verge.net.au>,
+ Julian Anastasov <ja@ssi.bg>, Joerg Reuter <jreuter@yaina.de>, Luis
+ Chamberlain <mcgrof@kernel.org>, Kees Cook <keescook@chromium.org>,
+ <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+ <dccp@vger.kernel.org>, <linux-wpan@vger.kernel.org>,
+ <mptcp@lists.linux.dev>, <linux-hams@vger.kernel.org>,
+ <linux-rdma@vger.kernel.org>, <rds-devel@oss.oracle.com>,
+ <linux-afs@lists.infradead.org>, <linux-sctp@vger.kernel.org>,
+ <linux-s390@vger.kernel.org>, <linux-nfs@vger.kernel.org>,
+ <tipc-discussion@lists.sourceforge.net>, <linux-x25@vger.kernel.org>,
+ <netfilter-devel@vger.kernel.org>, <coreteam@netfilter.org>,
+ <bridge@lists.linux.dev>, <lvs-devel@vger.kernel.org>
+Subject: Re: [PATCH v4 1/8] net: Remove the now superfluous sentinel
+ elements from ctl_table array
+Message-ID: <20240426071944.206e9cff@kernel.org>
+In-Reply-To: <20240426065931.wyrzevlheburnf47@joelS2.panther.com>
+References: <20240425-jag-sysctl_remset_net-v4-0-9e82f985777d@samsung.com>
+	<20240425-jag-sysctl_remset_net-v4-1-9e82f985777d@samsung.com>
+	<CGME20240425225817eucas1p21d1f3bcedc248575285a74af88e66966@eucas1p2.samsung.com>
+	<20240425155804.66f3bed5@kernel.org>
+	<20240426065931.wyrzevlheburnf47@joelS2.panther.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri, 26 Apr 2024 04:59:32 -0700
-> syzbot found the following issue on:
-> 
-> HEAD commit:    480e035fc4c7 Merge tag 'drm-next-2024-03-13' of https://gi..
-> git tree:       upstream
-> console+strace: https://syzkaller.appspot.com/x/log.txt?x=1662179e180000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=1e5b814e91787669
-> dashboard link: https://syzkaller.appspot.com/bug?extid=705c61d60b091ef42c04
-> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1058e7b9180000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=11919365180000
-> 
-> Downloadable assets:
-> disk image: https://storage.googleapis.com/syzbot-assets/5f73b6ef963d/disk-480e035f.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/46c949396aad/vmlinux-480e035f.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/e3b4d0f5a5f8/bzImage-480e035f.xz
-> 
-> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> Reported-by: syzbot+705c61d60b091ef42c04@syzkaller.appspotmail.com
-> 
-> ======================================================
-> WARNING: possible circular locking dependency detected
-> 6.8.0-syzkaller-08073-g480e035fc4c7 #0 Not tainted
-> ------------------------------------------------------
-> syz-executor419/5074 is trying to acquire lock:
-> ffff888023dc4d20 (team->team_lock_key){+.+.}-{3:3}, at: team_del_slave+0x32/0x1d0 drivers/net/team/team.c:1988
-> 
-> but task is already holding lock:
-> ffff88802a210768 (&rdev->wiphy.mtx){+.+.}-{3:3}, at: nl80211_del_interface+0x11a/0x140 net/wireless/nl80211.c:4389
-> 
-> which lock already depends on the new lock.
-> 
-> 
-> the existing dependency chain (in reverse order) is:
-> 
-> -> #1 (&rdev->wiphy.mtx){+.+.}-{3:3}:
->        lock_acquire+0x1e4/0x530 kernel/locking/lockdep.c:5754
->        __mutex_lock_common kernel/locking/mutex.c:608 [inline]
->        __mutex_lock+0x136/0xd70 kernel/locking/mutex.c:752
->        wiphy_lock include/net/cfg80211.h:5951 [inline]
->        ieee80211_open+0xe7/0x200 net/mac80211/iface.c:449
->        __dev_open+0x2d3/0x450 net/core/dev.c:1430
+On Fri, 26 Apr 2024 08:59:31 +0200 Joel Granados wrote:
+> Sorry about this. I pulled the trigger way too early. This is already
+> fixed in my v4.
+> >       |                ^~~~~~~~~~
+> > -- 
+> > netdev FAQ tl;dr:
+> >  - designate your patch to a tree - [PATCH net] or [PATCH net-next]
+> >  - for fixes the Fixes: tag is required, regardless of the tree
+> >  - don't post large series (> 15 patches), break them up
+> >  - don't repost your patches within one 24h period
 
-	ASSERT_RTNL();
-
->        dev_open+0xae/0x1b0 net/core/dev.c:1466
->        team_port_add drivers/net/team/team.c:1214 [inline]
->        team_add_slave+0x9b3/0x2750 drivers/net/team/team.c:1974
->        do_set_master net/core/rtnetlink.c:2685 [inline]
->        do_setlink+0xe70/0x41f0 net/core/rtnetlink.c:2891
->        rtnl_setlink+0x40d/0x5a0 net/core/rtnetlink.c:3185
->        rtnetlink_rcv_msg+0x89b/0x10d0 net/core/rtnetlink.c:6595
->        netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2559
->        netlink_unicast_kernel net/netlink/af_netlink.c:1335 [inline]
->        netlink_unicast+0x7ea/0x980 net/netlink/af_netlink.c:1361
->        netlink_sendmsg+0x8e1/0xcb0 net/netlink/af_netlink.c:1905
->        sock_sendmsg_nosec net/socket.c:730 [inline]
->        __sock_sendmsg+0x221/0x270 net/socket.c:745
->        ____sys_sendmsg+0x525/0x7d0 net/socket.c:2584
->        ___sys_sendmsg net/socket.c:2638 [inline]
->        __sys_sendmsg+0x2b0/0x3a0 net/socket.c:2667
->        do_syscall_64+0xfb/0x240
->        entry_SYSCALL_64_after_hwframe+0x6d/0x75
-> 
-> -> #0 (team->team_lock_key){+.+.}-{3:3}:
->        check_prev_add kernel/locking/lockdep.c:3134 [inline]
->        check_prevs_add kernel/locking/lockdep.c:3253 [inline]
->        validate_chain+0x18cb/0x58e0 kernel/locking/lockdep.c:3869
->        __lock_acquire+0x1346/0x1fd0 kernel/locking/lockdep.c:5137
->        lock_acquire+0x1e4/0x530 kernel/locking/lockdep.c:5754
->        __mutex_lock_common kernel/locking/mutex.c:608 [inline]
->        __mutex_lock+0x136/0xd70 kernel/locking/mutex.c:752
->        team_del_slave+0x32/0x1d0 drivers/net/team/team.c:1988
->        team_device_event+0x200/0x5b0 drivers/net/team/team.c:3029
->        notifier_call_chain+0x18f/0x3b0 kernel/notifier.c:93
->        call_netdevice_notifiers_extack net/core/dev.c:1988 [inline]
->        call_netdevice_notifiers net/core/dev.c:2002 [inline]
->        unregister_netdevice_many_notify+0xd96/0x16d0 net/core/dev.c:11096
->        unregister_netdevice_many net/core/dev.c:11154 [inline]
->        unregister_netdevice_queue+0x303/0x370 net/core/dev.c:11033
->        unregister_netdevice include/linux/netdevice.h:3115 [inline]
->        _cfg80211_unregister_wdev+0x162/0x560 net/wireless/core.c:1206
->        ieee80211_if_remove+0x25d/0x3a0 net/mac80211/iface.c:2242
-
-	ASSERT_RTNL();
-	lockdep_assert_wiphy(sdata->local->hw.wiphy);
-
-Given ASSERT_RTNL() on both sides, difficult to understand the
-deadlock reported.
-
->        ieee80211_del_iface+0x19/0x30 net/mac80211/cfg.c:202
->        rdev_del_virtual_intf net/wireless/rdev-ops.h:62 [inline]
->        cfg80211_remove_virtual_intf+0x230/0x3f0 net/wireless/util.c:2847
->        genl_family_rcv_msg_doit net/netlink/genetlink.c:1113 [inline]
->        genl_family_rcv_msg net/netlink/genetlink.c:1193 [inline]
->        genl_rcv_msg+0xb14/0xec0 net/netlink/genetlink.c:1208
->        netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2559
->        genl_rcv+0x28/0x40 net/netlink/genetlink.c:1217
->        netlink_unicast_kernel net/netlink/af_netlink.c:1335 [inline]
->        netlink_unicast+0x7ea/0x980 net/netlink/af_netlink.c:1361
->        netlink_sendmsg+0x8e1/0xcb0 net/netlink/af_netlink.c:1905
->        sock_sendmsg_nosec net/socket.c:730 [inline]
->        __sock_sendmsg+0x221/0x270 net/socket.c:745
->        ____sys_sendmsg+0x525/0x7d0 net/socket.c:2584
->        ___sys_sendmsg net/socket.c:2638 [inline]
->        __sys_sendmsg+0x2b0/0x3a0 net/socket.c:2667
->        do_syscall_64+0xfb/0x240
->        entry_SYSCALL_64_after_hwframe+0x6d/0x75
-> 
-> other info that might help us debug this:
-> 
->  Possible unsafe locking scenario:
-> 
->        CPU0                    CPU1
->        ----                    ----
->   lock(&rdev->wiphy.mtx);
->                                lock(team->team_lock_key);
->                                lock(&rdev->wiphy.mtx);
->   lock(team->team_lock_key);
-> 
->  *** DEADLOCK ***
-> 
-> 3 locks held by syz-executor419/5074:
->  #0: ffffffff8f3f1a30 (cb_lock){++++}-{3:3}, at: genl_rcv+0x19/0x40 net/netlink/genetlink.c:1216
->  #1: ffffffff8f38ce88 (rtnl_mutex){+.+.}-{3:3}, at: nl80211_pre_doit+0x5f/0x8b0 net/wireless/nl80211.c:16401
->  #2: ffff88802a210768 (&rdev->wiphy.mtx){+.+.}-{3:3}, at: nl80211_del_interface+0x11a/0x140 net/wireless/nl80211.c:4389
-> 
-> stack backtrace:
-> CPU: 1 PID: 5074 Comm: syz-executor419 Not tainted 6.8.0-syzkaller-08073-g480e035fc4c7 #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/29/2024
-> Call Trace:
->  <TASK>
->  __dump_stack lib/dump_stack.c:88 [inline]
->  dump_stack_lvl+0x241/0x360 lib/dump_stack.c:114
->  check_noncircular+0x36a/0x4a0 kernel/locking/lockdep.c:2187
->  check_prev_add kernel/locking/lockdep.c:3134 [inline]
->  check_prevs_add kernel/locking/lockdep.c:3253 [inline]
->  validate_chain+0x18cb/0x58e0 kernel/locking/lockdep.c:3869
->  __lock_acquire+0x1346/0x1fd0 kernel/locking/lockdep.c:5137
->  lock_acquire+0x1e4/0x530 kernel/locking/lockdep.c:5754
->  __mutex_lock_common kernel/locking/mutex.c:608 [inline]
->  __mutex_lock+0x136/0xd70 kernel/locking/mutex.c:752
->  team_del_slave+0x32/0x1d0 drivers/net/team/team.c:1988
->  team_device_event+0x200/0x5b0 drivers/net/team/team.c:3029
->  notifier_call_chain+0x18f/0x3b0 kernel/notifier.c:93
->  call_netdevice_notifiers_extack net/core/dev.c:1988 [inline]
->  call_netdevice_notifiers net/core/dev.c:2002 [inline]
->  unregister_netdevice_many_notify+0xd96/0x16d0 net/core/dev.c:11096
->  unregister_netdevice_many net/core/dev.c:11154 [inline]
->  unregister_netdevice_queue+0x303/0x370 net/core/dev.c:11033
->  unregister_netdevice include/linux/netdevice.h:3115 [inline]
->  _cfg80211_unregister_wdev+0x162/0x560 net/wireless/core.c:1206
->  ieee80211_if_remove+0x25d/0x3a0 net/mac80211/iface.c:2242
->  ieee80211_del_iface+0x19/0x30 net/mac80211/cfg.c:202
->  rdev_del_virtual_intf net/wireless/rdev-ops.h:62 [inline]
->  cfg80211_remove_virtual_intf+0x230/0x3f0 net/wireless/util.c:2847
->  genl_family_rcv_msg_doit net/netlink/genetlink.c:1113 [inline]
->  genl_family_rcv_msg net/netlink/genetlink.c:1193 [inline]
->  genl_rcv_msg+0xb14/0xec0 net/netlink/genetlink.c:1208
->  netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2559
->  genl_rcv+0x28/0x40 net/netlink/genetlink.c:1217
->  netlink_unicast_kernel net/netlink/af_netlink.c:1335 [inline]
->  netlink_unicast+0x7ea/0x980 net/netlink/af_netlink.c:1361
->  netlink_sendmsg+0x8e1/0xcb0 net/netlink/af_netlink.c:1905
->  sock_sendmsg_nosec net/socket.c:730 [inline]
->  __sock_sendmsg+0x221/0x270 net/socket.c:745
->  ____sys_sendmsg+0x525/0x7d0 net/socket.c:2584
->  ___sys_sendmsg net/socket.c:2638 [inline]
->  __sys_sendmsg+0x2b0/0x3a0 net/socket.c:2667
->  do_syscall_64+0xfb/0x240
->  entry_SYSCALL_64_after_hwframe+0x6d/0x75
-> RIP: 0033:0x7f963cb981a9
-> Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 d1 19 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-> RSP: 002b:00007ffdde1419a8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-> RAX: ffffffffffffffda RBX: 00007f963cbe53f6 RCX: 00007f963cb981a9
-> RDX: 0000000000000000 RSI: 0000000020000400 RDI: 0000000000000004
-> RBP: 00007f963cc17440 R08: 0000000000000000 R09: 0000000000000000
-> R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000031
-> R13: 0000000000000003 R14: 0000000000050012 R15: 00007ffdde141a02
->  </TASK>
-> team0: Port device wlan0 removed
-> 
-> 
-> ---
-> This report is generated by a bot. It may contain errors.
-> See https://goo.gl/tpsmEJ for more information about syzbot.
-> syzbot engineers can be reached at syzkaller@googlegroups.com.
-> 
-> syzbot will keep track of this issue. See:
-> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-> 
-> If the report is already addressed, let syzbot know by replying with:
-> #syz fix: exact-commit-title
-> 
-> If you want syzbot to run the reproducer, reply with:
-> #syz test: git://repo/address.git branch-or-commit-hash
-> If you attach or paste a git patch, syzbot will apply it before testing.
-> 
-> If you want to overwrite report's subsystems, reply with:
-> #syz set subsystems: new-subsystem
-> (See the list of subsystem names on the web dashboard)
-> 
-> If the report is a duplicate of another one, reply with:
-> #syz dup: exact-subject-of-another-report
-> 
-> If you want to undo deduplication, reply with:
-> #syz undup
-> 
+I guess you didn't bother reading the tl;dr I put in here.. SMH.
 
