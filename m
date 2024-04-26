@@ -1,386 +1,427 @@
-Return-Path: <netdev+bounces-91692-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91693-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14AAE8B3769
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 14:45:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4BC4F8B3773
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 14:50:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3DBBA28329A
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 12:45:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6F48B1C21E5C
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 12:50:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DFD01474A5;
-	Fri, 26 Apr 2024 12:45:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F20FC146A84;
+	Fri, 26 Apr 2024 12:49:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="YM/3lndi"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mfkHFZXA"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2071.outbound.protection.outlook.com [40.107.223.71])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AFE2146D56
-	for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 12:45:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.71
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0233E2A1B0
+	for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 12:49:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.15
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714135528; cv=fail; b=XEVDRCEjhGtQ3tiNdS6pFkWDB9clqmSkDPcfZmwgyrTmceX8NKIEnbdLO9XGuMrU+C+pcvtYiHmN5oXAryCQkhOHGS8yPGMtRE4DlO0S3jLZViujkfoK4t2LhY29DvKIwbm5wsAqtSOzhW6vQJAdCdw4haI/SBBqjRtCsL3ulkE=
+	t=1714135797; cv=fail; b=In2uKygBxmlTxEMcleiDvKL4riCPjK6PMHiynGmBDajZ99MI+MJqICxxLWLwpe924DNvGC12C6Ne1oJcZChMD+5mtY5WyT3rHm4NgTNDjmkjaqzgwajjeyIwz9Up3sKMNrsdXr4UAleqcsaGiScF3xxeExF5ZFHY+NpcTdiJqAU=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714135528; c=relaxed/simple;
-	bh=0yNNiBz6xLcjkxQn1YB0G6KQ2U0V1Uimu+d5ZOD59Qc=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GrMrdtIjkOEFY7F+RHnKrAc7rM6fW3gU6CjT3vkpF1nVRWyxVoPvwUTWBZeKPpCdGBKeNXgJA8X2I58C8mJK4B0eK/I/4eKRv3YrCrImDrVTCal0OUsHgttXYo/moAaJOEuTBeEWQVcjpL7BCBwUM0OY9aQ763NBZreTUYCexsM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=YM/3lndi; arc=fail smtp.client-ip=40.107.223.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	s=arc-20240116; t=1714135797; c=relaxed/simple;
+	bh=urkPQcLGraSVv/bFIyf0NwnJSB5V3bmvRdfX5vpOS3w=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=EEQTcR+AYMxyaKrr+wJsEssrjDk/INSL4a9yLNndSeb3ttCcm72PCmdkMVV5n+pLrYlp5uQgjbrxjh1sKLb8hczkH4BZpq+JX8oTC9qVFLVMxS/KUCy7XxqMSlMh7pkWppErJeOuEEWALF2TOnWd+pBcgygTIvI6VrTNCfI93fQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mfkHFZXA; arc=fail smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1714135796; x=1745671796;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=urkPQcLGraSVv/bFIyf0NwnJSB5V3bmvRdfX5vpOS3w=;
+  b=mfkHFZXAaT4awYjnUaxa6CLX8lGCSXOgmKpxMOlnHYUhEdJaTc8ZPjI2
+   2yDqxWu5dGX/5rMr1y4SkEWvnpAdgCPVyKPtLhng7KCEXlNWnaQ2Jx1us
+   FZYwKbe20s4xpPRtCIzT7YIWZ2ZYyKpahgPbfbYqRducBmWV2EYKTvzjI
+   HEg2LYemUmzOnbZZ1ON7bzvPdr+3ZzmJ2G2atPSjskcMBNvppSOFHkXSy
+   oKdvHJBcHnISjYnsVKUswFgFkomHOpa1Dc6ZDFqw4kFs243SgQE1ua0ns
+   KTV4KKq+XqieoCj+Fm3bP7Jap9DWafRJe1DtnZj22iIrDp766JMPX5s4I
+   g==;
+X-CSE-ConnectionGUID: av5Ad6w0QaazU4G9cUtByA==
+X-CSE-MsgGUID: 277+vyrtRsu9f1hztdyjSg==
+X-IronPort-AV: E=McAfee;i="6600,9927,11056"; a="10027301"
+X-IronPort-AV: E=Sophos;i="6.07,232,1708416000"; 
+   d="scan'208";a="10027301"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Apr 2024 05:49:55 -0700
+X-CSE-ConnectionGUID: MbRHxWHDS0q9wv/nBrZFfQ==
+X-CSE-MsgGUID: LCGEOX8LTkiG3K2UmY95uw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,232,1708416000"; 
+   d="scan'208";a="62885292"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by orviesa001.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 26 Apr 2024 05:49:55 -0700
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Fri, 26 Apr 2024 05:49:54 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Fri, 26 Apr 2024 05:49:54 -0700
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Fri, 26 Apr 2024 05:49:54 -0700
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.100)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Fri, 26 Apr 2024 05:49:53 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=JKWYDDLhrKasFEj1G5nRr53sdggFzx/dqccnHn3w8jxh2aRAVHBQi9AtWqltLc3Y0+XwvjwLXWPTfCE23ydIzhbr3VtQ3tSIMW4TTxTspSO3Pdz+CkNVGgMOVJTIcD+VAtAiNj26w9zy3omfgUI9LXSXYnxECn1iU/Zop6yUlibo35qTGKaszk8pXYHjZV5E84EqNhJW9H9lkw0cGVBtOExR3vJun/2bwJLxoCRa1M1Ns46ktxAdvl7RTiCHEesRJTpkn1YsZuxKuJquN5WM75POchzRRxyfhIQVAIr1pDqNIcTYGFFahYgnQhoy1Sou1HRrz+rX2NseM495MIQtVQ==
+ b=dkD0GHMJriGenzBKFaJcxGdYCKHNsv0kUSyuFk950Rnhu+zNKhXw0Q0BXCFzINaYhm6sgEmdqpz4mhPSneRkcOD80a/waQVAX06CE+mbAU9FEM0xbR9HJx/9Hf+bEVD0HhsTonvMlE6NiA0AtjspL9dYi/aqy+8wBiXN2RX350uTL0yYTzWoAbJULl7Ku/eK3Axq63ygHuXUd4wci0qjrpFIRLhF0l1hLYtp/ZgPGi5qNauTxgby7vQVaTna+kUeorVobl8j0vLmS5RQLnHKNnjtZheMW7ds086VU5JDDcoi8twLZzqGKlG+zfFPZ1lxz/ZaZkYseawl3W0bmMrmmQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ziKXYr6xWxeHSGFh7kZvwT7sSJL7jrsnVBM83uPjdZY=;
- b=IC02urM09w8O2I3GcNCqDES+KdDd7nztDwgZWah50gZcaMY45m98yqVoDO7ucFmWtwQz7w5LnIeUbUAaazBkxntkSdeKuRP8dzbWk95+77zSOhmz00Y3AE2uFQmDqzCzU892JXGPZXwfDxRHz+Q8+nhTxLZsLfznNLslgwMR1HhteOqfYfdc/gi9FWUTGVL3YEjNyzWu8ZhcWZqnCScdruNknCYfH3dsVVCtGo/5mQdLZTKiJuTy6o+I7+KgJplTXXuxdPQXuSJeaDVLk8I+GG3em4Np/H5s2vWPDfsBx/QoxHNqCMLXW81cNKVYYcSfAtQYoQKcGCYK/VjJw8rhPg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ziKXYr6xWxeHSGFh7kZvwT7sSJL7jrsnVBM83uPjdZY=;
- b=YM/3lndifk6PtOH6RsoLXQzOs+95QY1Fx7n+3wp/yJa+CbAmlkNDbnoQqBKeI2JhovCdDCLshjruiv2bWtcolGGmQuhRSVVBGSRENiJpbA/CqIoX/2rxIDAor6jklmZrzUjpACY4sBcUNjG/pUE/fq3iCOWy2TQvMpIf+Z8Wg6Fvygc4zD/rEDLyPf93tbl5t6Kg0Bv4Jp6mE/I+cDdk1F9UPsoydxJij0jJZLIAdafesLIjwMhTcvjdFCiubLtePDHJM2uD4f+ZK0ylpM0FoVQyXdeMl5FXaahdBOgXUQ68LDUgFIs6U1WPTBFqh9EWJVjHDR+49+awYzbyj3Y9mg==
-Received: from PH8PR20CA0001.namprd20.prod.outlook.com (2603:10b6:510:23c::15)
- by SA1PR12MB6800.namprd12.prod.outlook.com (2603:10b6:806:25c::9) with
+ bh=mnfZftssvr+x69I+FtcHGYPeG3MqV8H34kxJhnA5GAY=;
+ b=HjIl8ubb08wo+UHyNSKGSnbrHV/ngDk89NNBNrqM0BGij3aFRGWIfXXONLq16STtYKCqUrgJ82EmvXdZHP3vKQqKDxYYeW/HcfvD8xf6ZV6NJZSszI5FdG6f/1CcPdxPPzBnVOLvL4GfRfAuaPCRnNWgghdh4O2hzy5MC45wswrtvn32frUdn5USqgUcxTmuWsuGHO+y65ZVPRVf2E5cnwV0nnne0M7kNRERjUK0Shp0neBovu3uENDhi1lEl6t2U3IiBB3Fpb7aAVBxognMhGALZN7ySlajMn8B7rYL0Hysi/OqqNqDG3Xut7CDsHQ+s91xou2iDSjljPG+vrCc3w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CH0PR11MB8086.namprd11.prod.outlook.com (2603:10b6:610:190::8)
+ by CO1PR11MB5028.namprd11.prod.outlook.com (2603:10b6:303:9a::12) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7472.44; Fri, 26 Apr
- 2024 12:45:23 +0000
-Received: from CY4PEPF0000EE3B.namprd03.prod.outlook.com
- (2603:10b6:510:23c:cafe::38) by PH8PR20CA0001.outlook.office365.com
- (2603:10b6:510:23c::15) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7519.31 via Frontend
- Transport; Fri, 26 Apr 2024 12:45:23 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- CY4PEPF0000EE3B.mail.protection.outlook.com (10.167.242.15) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7519.19 via Frontend Transport; Fri, 26 Apr 2024 12:45:22 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Fri, 26 Apr
- 2024 05:45:09 -0700
-Received: from localhost.localdomain (10.126.230.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Fri, 26 Apr
- 2024 05:45:05 -0700
-From: Petr Machata <petrm@nvidia.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, <netdev@vger.kernel.org>
-CC: Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>, "Amit
- Cohen" <amcohen@nvidia.com>, <mlxsw@nvidia.com>
-Subject: [PATCH net-next 5/5] mlxsw: pci: Use NAPI for event processing
-Date: Fri, 26 Apr 2024 14:42:26 +0200
-Message-ID: <2a2eeac12c4d70b366f4e4afdfabdf133359acd2.1714134205.git.petrm@nvidia.com>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <cover.1714134205.git.petrm@nvidia.com>
-References: <cover.1714134205.git.petrm@nvidia.com>
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7519.23; Fri, 26 Apr
+ 2024 12:49:47 +0000
+Received: from CH0PR11MB8086.namprd11.prod.outlook.com
+ ([fe80::984b:141d:2923:8ae3]) by CH0PR11MB8086.namprd11.prod.outlook.com
+ ([fe80::984b:141d:2923:8ae3%5]) with mapi id 15.20.7519.020; Fri, 26 Apr 2024
+ 12:49:47 +0000
+Message-ID: <39daba1e-5fbe-495e-8398-200434f89230@intel.com>
+Date: Fri, 26 Apr 2024 14:49:40 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next v2] ice: Extend auxbus device
+ naming
+Content-Language: en-US
+To: Jiri Pirko <jiri@resnulli.us>, Jacob Keller <jacob.e.keller@intel.com>
+CC: "Temerkhanov, Sergey" <sergey.temerkhanov@intel.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"Knitter, Konrad" <konrad.knitter@intel.com>
+References: <20240423091459.72216-1-sergey.temerkhanov@intel.com>
+ <ZiedKc5wE2-3LlaM@nanopsycho>
+ <MW3PR11MB468117FD76AC6D15970A6E1080112@MW3PR11MB4681.namprd11.prod.outlook.com>
+ <Zie0NIztebf5Qq1J@nanopsycho>
+ <3a634778-9b72-4663-b305-3be18bd8f618@intel.com>
+ <ZikgQhVpphnaAOpG@nanopsycho>
+ <3877b086-142d-4897-866e-e667ca7091d7@intel.com>
+ <ZiuNxivU-haEQ5fC@nanopsycho>
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+In-Reply-To: <ZiuNxivU-haEQ5fC@nanopsycho>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4PR04CA0158.namprd04.prod.outlook.com
+ (2603:10b6:303:85::13) To CH0PR11MB8086.namprd11.prod.outlook.com
+ (2603:10b6:610:190::8)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE3B:EE_|SA1PR12MB6800:EE_
-X-MS-Office365-Filtering-Correlation-Id: f7e8bf69-4d4a-4c41-d5ed-08dc65eebd07
+X-MS-TrafficTypeDiagnostic: CH0PR11MB8086:EE_|CO1PR11MB5028:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5f45d9fe-3c21-4f9a-9f9d-08dc65ef5a64
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?b7UYs3me7su+m5lBvju6Su2VXqeo+2PSEPH6kRHrhTeqPW/EY3RyICNxcoAM?=
- =?us-ascii?Q?2H1CjTSPJ7Bxnz7SwU2O2A9hh4KUV9pvHiyO1yOFzOA9FEvz3Vxj8E3YTauI?=
- =?us-ascii?Q?PMOlWfwXVLSzmJCNX7gvVeMP9Pb3C1+qQySwAVyugayV5o6G195qadAaOlS8?=
- =?us-ascii?Q?MNKHMLPShR7pxoCA/jNwlZbRYebxQd2Tkb7aiRQsJJb2FD+iPFIkfxG0rgfh?=
- =?us-ascii?Q?sFXMCyrYdsHwuitO7KpID+0CWoxK2xczI7eoTBGVQlfgH3KkDb6ybuD8Oq3X?=
- =?us-ascii?Q?r+cXHrMBSV892mQx4ohXnHsJoSmHcD4UWyuBZzXZsUnxfk0HOTNSI+CHnvBH?=
- =?us-ascii?Q?5Cop+uhpWH1sVzdovHNc6hRbP4nJnAw2dhpVtC/h7Rk7VerL97qnU3xvJVX+?=
- =?us-ascii?Q?/25JiVWwphg35vzQY8geB8vi895ksA28xWa2Ets7jDlHyWn/gEvTjtEU6azN?=
- =?us-ascii?Q?LeVDcVqanANBSSjea7wWlQVjNrqAUCRXRfKgNfCCg8E3BmR6uLviNHWNdZZW?=
- =?us-ascii?Q?4G14g1dBuB9sUozo3MAKcc0TL+DpU4CBX5cDRH/A3rqp2YQuKREkiktDJ76T?=
- =?us-ascii?Q?f1TM6zOSlVqyM98uJ292Lk4Kv1R46V/zSi2CZ4Y26Jd2h22R6CC4DZPhgbdE?=
- =?us-ascii?Q?SJ6vK0b1IC6AyRQZ4R7cG9M5AsLG3dkpClwYrUN+QowmT4N++xYeDWJe5jOu?=
- =?us-ascii?Q?pfR4HRGNIbLVNeMMNfdaU1JEoYhIKEiieZlm0YXF16fv9aUJMkp4YV1bEekV?=
- =?us-ascii?Q?bvhPOEIjDPpchrQwZ2hjPRFUn1dXv+xlggTW/eaRJVyMGIQuuBPC329ZGm7U?=
- =?us-ascii?Q?a3Lo3yi1f4z5xth148FBWGIaBfjCCkwNs1VIOC5wZZlFwf3xqFbC1lm+GtF6?=
- =?us-ascii?Q?zgC1FD665+DtLon+W41QztOEWwekV9B8QBsV4lE9gkr45YTr0iGU1vh1VoeC?=
- =?us-ascii?Q?L53KpPzpbmjBVgz6j9+dd7zHYdo1pNgUv8SX0xFpxrL9ao3koNJTLWEJzpWJ?=
- =?us-ascii?Q?qRs2hCFPMVRujY0CJQoX7soS17j5Vk7wWk7XDQv1lgcjw7uZvBdoxTbQvDJY?=
- =?us-ascii?Q?1cz+kEhuGXu5CRolNZbSBLuHO9fNCb1ltSQRxIqYnkpy4gcjS06o+XkmUBM2?=
- =?us-ascii?Q?OtYuOLPdu9tBD1bjTY4d4EIKiKTg3LLfB/qrq0K3z/sQjfDJ/+zxnxrtm87a?=
- =?us-ascii?Q?i6Rlpw8O5YR/mCw8YLaWR7MOZz6mJM7Uupcf7WSZzeztWTpwFLY3pLQDzmt5?=
- =?us-ascii?Q?x7dr0FHtveWsFepAi8SRX1w2lYJO9TcNSKwRfRxI8x9bDSQ9DkmVDcn3oMXD?=
- =?us-ascii?Q?IvspiSE5Yd3MEmY5R3ap5Hw67NuaNgBn0y/FjbkL+Gk2mqug5tJwEDpfFO3v?=
- =?us-ascii?Q?27MRs4vkLvegsLLmY+PLXUaG0+FV?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230031)(82310400014)(1800799015)(36860700004)(376005);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Apr 2024 12:45:22.6703
+X-Microsoft-Antispam: BCL:0;ARA:13230031|376005|366007|1800799015;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?dG44T1JkdHdqd1UybDRCWHVDK1BNVmN6UGN2c1R5UllKS3BhM01CemllYy92?=
+ =?utf-8?B?anc0cjQvdGtVSDlES21vL1FNNWNjZ2tUNkluSERaaGhqU0QzM1UzWUxHUkJj?=
+ =?utf-8?B?MFNYSEJmam14N05jZnd0REtRVjVHVW52bm9wcWRyNDNsL1c3dXRuQkdGNDgy?=
+ =?utf-8?B?Mkl3MEROZTRsbWd5RE1FZ0M2ZGtHZ2ZoNzlVd1pSdEZ1ajRUblBCTzVlZnRN?=
+ =?utf-8?B?MGIvSEpCaTJkejgxRGppK2NtR3BCa1JqWEdwY1pIaFI4M1RibURvWWx1VEU2?=
+ =?utf-8?B?Wmh4WUs0VkkwQlZ6cDRxYmlSNW1ld3FaUGhPcUNKZG9uMlg0UUsvbkN6bHRq?=
+ =?utf-8?B?RzhCRFMrY2pxT2pjUWxlcElNc1NoUjcvMXpyN21qQ3J2WGNCRGtRMDh0NWM1?=
+ =?utf-8?B?T3lRYjhCaHVMWWNPTDExdmUwdTRUQ0cvc0xaYUQvaGsrUTZ2QXV2VW1QL1Bs?=
+ =?utf-8?B?eWFPMXdwSnpUZjBxaWx4dEF0RWttTVp1K2VrRGlTdUF0Z3pySHdOVjd1b1hI?=
+ =?utf-8?B?MXdsaW9WTFZLWUFsTXNqYmFxWTQ5MmNvSmloYkFHdk9vL3ZRcVFQaCtlNGdJ?=
+ =?utf-8?B?cGZ5UTZ3N0JzUG0xNlVYZDMrQVNRVnIyOUxTWkxwYUNjM0Y4ckhOdEQ2SFdP?=
+ =?utf-8?B?L01FSUJseFB6ZUQ5NFNWTHpQS25kRmhhazRhKzlNc1FYVm5UU2xNWEFqSGpr?=
+ =?utf-8?B?SmgzZ3ZzTDF1QVBmSHRHc1BYRjVZVzQwVjltbFNKbWFFQjdENW1heFdpeFoy?=
+ =?utf-8?B?WUNhQlBKVTFpZWZvWWJWRC9vRGFDeXlIeGxzMTFCNlFUVGp4VDkzUHRvMWVa?=
+ =?utf-8?B?eGcyUFlPRHJrTUQxUGdMR3drN29vbGdkcVYzd0V4cTJYRW1KVjE1cnA5Zml2?=
+ =?utf-8?B?bUVkSHNDYit4NUFhUFM3UE1KdWhYYzZJamxzMyt1eTdTcGxDR2VFQWZFQjBi?=
+ =?utf-8?B?R3pKbDdha3M4V3Fvci9tSUJjak8rcUZTNnlGVERpbmk1Z0V0d2VIWnJYMldM?=
+ =?utf-8?B?dHBCR01VQjRoU0ZHNE81QlE3S0ZYWlRCdkY4MmtaOXlhQTVkVzNqaitFdUxI?=
+ =?utf-8?B?dUFNdEZmSXNJZXdPeGdsajM4ejRSK1lJTXdjMjdzK2xSMllXT1ZxOXRZdC9G?=
+ =?utf-8?B?YlczdnI4VEFNWHpTelRLRXpSakNSL2NlRkY3TG5uMjZyL2VvODdGTmR1dnA5?=
+ =?utf-8?B?UXFOY2FIYjlpaXh3M1ZtNE9neTF2Z2I4L1V1bW1KVk9EemxuUjgrYUZPaFlI?=
+ =?utf-8?B?WGZBNWZWTFoyMUtQK25tV1c5ZDFwNnFZRDdIc3QzNUpzVmR4a21Kb3JieUZ5?=
+ =?utf-8?B?d01CalBzZUFCalVJNUt4ckhIelpieDR2MjYwYmZydVBaOVVjaHc1bUxCK0VG?=
+ =?utf-8?B?d01jZDYzMC9iZnFGZm5CclI2U0ZzSmFjaEZTcmp5bnhwMnkyN0VXNG81UExo?=
+ =?utf-8?B?MWpVV2NwSXdXdDFrRjg1UGxSYnJhMUhmNmVUWjlhVDFwdTBpd0pRMERQMWg2?=
+ =?utf-8?B?Y0huVWUyZ0RDWW9yTHNBVVZ1STBFaXBISnltN3MrYks5blpiQkt1WWVIamlP?=
+ =?utf-8?B?UThBbmhqWkhXUDAxcGVXb21PYnRnKzdxdWczVkU4bUZNR29GU29NSWFQdTRD?=
+ =?utf-8?B?bTRLWWdGbTgxWklFWXIvRDBuR0phU054ZlRZZ0hoOGF5eG93emtoZVhUUUJU?=
+ =?utf-8?B?dm1CUzFEZExnTlFrV1dJczhUd0FJdGRHRVVMRGJmejR4dmdtSHRUTHNRPT0=?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH0PR11MB8086.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(366007)(1800799015);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?NUtpS1dMNDJGTmY5QlJEOWkvMERlNWJWVE9pNlFGcGRmeWVMK09PUVlOTTJM?=
+ =?utf-8?B?ZzlDSmxJRFdkVmtQaXU2R0VqNE9rTTVmQTY0OWxMY0dLQVd4TU44andvYmtS?=
+ =?utf-8?B?YmIyVE5qNjFJc29KSEJVWHYzcTBablFGT3MvOTVaRDJPcytmZ0puWk1NbEYy?=
+ =?utf-8?B?VERmLzhPVGZOUDAwWVEwZDJ3Y2hTSDJFN09Hd05vM1lsK1NNU2ZFWVlvczVH?=
+ =?utf-8?B?UXRpREppSUtWYVBqTElnRWNaekFEaUl0dENLNXFOSTBYc1AvOTRqdlR1ZFR0?=
+ =?utf-8?B?REpuUStQMkxscWJsakpGRThEVTU1aTBBQllxNmRJbTJPZ1RPeTNSeVRxWFcr?=
+ =?utf-8?B?czNYQVB4U1EyODF4V2NFZi81d2UwMHhyVzFzejZzSFRPeklaWk9OZ2dxOExE?=
+ =?utf-8?B?ZERuUHJZSE8zSTNORVVsWGMvZDRlZ20zNVMxWTUrTHJraFllMXNPeHhjbVRr?=
+ =?utf-8?B?TUV0MHgrTU9jQTZIcnl1WWFheEFwSk1oNXVVT2FObE9mMFd0MlIyTzUwMTVo?=
+ =?utf-8?B?ZkRqOVNIdG82WnJRVWNGaGNmVTRJUWlraWR5SWlEbTc3di9udmNrcWJpbSs4?=
+ =?utf-8?B?b3VjTEVEVWlsamw0YmtxMXF2WlNkc3IwS0lSWmQ4aHJOUlBiYVA3c3Z3VjBR?=
+ =?utf-8?B?NmQwVkdId0Z3SkdqM3hVVmVaQTdWeG9HS1dXWmNPZ3I5amZ2TTBzckhZNXBx?=
+ =?utf-8?B?UUFWSTJlN1kvcDNRYVFwdDB4MElKMGltSkZPUkFVOVRmU01vS1NnMFY4SU9h?=
+ =?utf-8?B?Ymw0cFN6Rm1BanNNN3RjamhaRU5wTzJGRlZuWDlrc1E2NnFKejJBdlZZQ1py?=
+ =?utf-8?B?VEtORlZudk92UVdQc0Y5dUhoMFRXYXl6N1Q5Zk5meTZEeWtTcWZ1R0FGdHhO?=
+ =?utf-8?B?YkRIcWNJVnpQWWhrRHdUYmhEQWZvMXI1YTZIR2NHd3c0V1ZDRGVoYWlibDJO?=
+ =?utf-8?B?VEpGUDJIWmVLbHZXa2EwVDJDamM1ZmZ4SGVFMWQyOVJieVhDanVSQzdLTWFE?=
+ =?utf-8?B?M1lEYlowdENXckQ0blZwT05CcXROQjNRL3BsZEZhb3VVQURnODdyV0tXYURO?=
+ =?utf-8?B?TEVIVE14Qm1JQld2VUh4WEU5OUlwNHhaZDNMajVCTEQzZ1NSVDF4em5zSmJ6?=
+ =?utf-8?B?SjRwV2RHMjk4NytVMCt5T05VeTBkanQ0UUpEeTRXajc0SG1QaEJ0M2IvMHZV?=
+ =?utf-8?B?RVVOWG9PK01lZ3NmUFdhQlZ5aDFvUjZBcjlmNWRBSVFIay9yVmxqMjlkN2Qv?=
+ =?utf-8?B?cTE4VE9GN2p6SEJXOFhkMU85cTBFT3dOOVY5QjZLUjV0dEhDejFsT3ZKLzZx?=
+ =?utf-8?B?RjdaM3laQzRWZERkQzBaSWQvaWxOOUV3aVI1TFhnZTdITTdqMm1JR1lURUxn?=
+ =?utf-8?B?aDlOQWE0VzVIL2V0aWVBaHowdkVwOHVyOEIrM0NiUlJ2K2ZlNVYyUUNpZzZB?=
+ =?utf-8?B?dnhqYVRaRTNvWDVXSU93VFZZeGdPbWw2Tng4Ykh3bzJSUXZRbC84c0ZjYW5G?=
+ =?utf-8?B?d1JDL1Nyanl6aWtEOHFGVFUrbW1YakFSOHFSRS82dGI0UzhkODc5R09NbE5O?=
+ =?utf-8?B?UWJmaklzZU14bmpUTU5RZ3lkeUJuZmNYZGNUajQyUGtXZUJGdFVxTEtoVnVy?=
+ =?utf-8?B?YUdYUzJPWXQvOTc3Y0J5TlBtS0JyRVlhTGwwUks1Tkd3akYvbHp6SFNTd3RO?=
+ =?utf-8?B?bkFLZXJ6NUJsV2ZEQmdoSFRhWUxTWVgwbm1OTkU2aG95aFQrdnlMbEFJWHZI?=
+ =?utf-8?B?WUJlOWplMTlCWUZ6dVhjd01MMStGSWlQRXR6TGlVclNqbXVlZnZmMU1wU3JX?=
+ =?utf-8?B?azFuczVlMXFhT0gvRU5TbW1ORnRDQm52L2EvNU03dkt1ZU1LWUx6K3lERjRw?=
+ =?utf-8?B?SmNXaGxnOG1qSGdoM0xnSTFReFhxelJvZ1l1WTViSWN1OHdMeEFUa0Erdng4?=
+ =?utf-8?B?MzlmV1hyOXBGbWdEdEl4OGg0UzZFWHYyTEtaYjdnZTg3ak1zbUZvTWN6YUU3?=
+ =?utf-8?B?Q1l5YW5TRy9rODNPa296SWVjRXhvYkpRYlFRVG1sTlFCVFl2Y3lHazlnQm4w?=
+ =?utf-8?B?ZzhQd1E3RzRlQ3hJMjg3R2kyaktrZ0t3RGVDbVd0WXc5T0paL1krbDAvOWtB?=
+ =?utf-8?B?NDNodVFjTWQrQzZGVTJiRHRDSEp1UHpOeC9IYTkyaE1pNzFueFpydzhFY3Np?=
+ =?utf-8?Q?hoyUwganGs/vZt2yhKCueGM=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5f45d9fe-3c21-4f9a-9f9d-08dc65ef5a64
+X-MS-Exchange-CrossTenant-AuthSource: CH0PR11MB8086.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Apr 2024 12:49:46.9525
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: f7e8bf69-4d4a-4c41-d5ed-08dc65eebd07
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CY4PEPF0000EE3B.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB6800
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: VS/cqOYdW/fmRB3zsCwHpeaH0RMdijCZCj2uXXskHfC5pQAnYMkWe4QHJbqFL7oDpOe2wFKraBy+YiCm5Yk8VLPsMvX9DfVC1fj7hRVOHzs=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR11MB5028
+X-OriginatorOrg: intel.com
 
-From: Amit Cohen <amcohen@nvidia.com>
+On 4/26/24 13:19, Jiri Pirko wrote:
+> Wed, Apr 24, 2024 at 06:56:37PM CEST, jacob.e.keller@intel.com wrote:
+>>
+>>
+>> On 4/24/2024 8:07 AM, Jiri Pirko wrote:
+>>> Wed, Apr 24, 2024 at 12:03:25AM CEST, jacob.e.keller@intel.com wrote:
+>>>>
+>>>>
+>>>> On 4/23/2024 6:14 AM, Jiri Pirko wrote:
+>>>>> Tue, Apr 23, 2024 at 01:56:55PM CEST, sergey.temerkhanov@intel.com wrote:
+>>>>>>
+>>>>>>
+>>>>>>> -----Original Message-----
+>>>>>>> From: Jiri Pirko <jiri@resnulli.us>
+>>>>>>> Sent: Tuesday, April 23, 2024 1:36 PM
+>>>>>>> To: Temerkhanov, Sergey <sergey.temerkhanov@intel.com>
+>>>>>>> Cc: intel-wired-lan@lists.osuosl.org; netdev@vger.kernel.org; Kitszel,
+>>>>>>> Przemyslaw <przemyslaw.kitszel@intel.com>
+>>>>>>> Subject: Re: [PATCH iwl-next v2] ice: Extend auxbus device naming
+>>>>>>>
+>>>>>>> Tue, Apr 23, 2024 at 11:14:59AM CEST, sergey.temerkhanov@intel.com
+>>>>>>> wrote:
+>>>>>>>> Include segment/domain number in the device name to distinguish
+>>>>>>> between
+>>>>>>>> PCI devices located on different root complexes in multi-segment
+>>>>>>>> configurations. Naming is changed from ptp_<bus>_<slot>_clk<clock>  to
+>>>>>>>> ptp_<domain>_<bus>_<slot>_clk<clock>
+>>>>>>>
+>>>>>>> I don't understand why you need to encode pci properties of a parent device
+>>>>>>> into the auxiliary bus name. Could you please explain the motivation? Why
+>>>>>>> you need a bus instance per PF?
+>>>>>>>
+>>>>>>> The rest of the auxbus registrators don't do this. Could you please align? Just
+>>>>>>> have one bus for ice driver and that's it.
+>>>>>>
+>>>>>> This patch adds support for multi-segment PCIe configurations.
+>>>>>> An auxdev is created for each adapter, which has a clock, in the system. There can be
+>>>>>
+>>>>> You are trying to change auxiliary bus name.
+>>>>>
+>>>>>
+>>>>>> more than one adapter present, so there exists a possibility of device naming conflict.
+>>>>>> To avoid it, auxdevs are named according to the PCI geographical addresses of the adapters.
+>>>>>
+>>>>> Why? It's the auxdev, the name should not contain anything related to
+>>>>> PCI, no reason for it. I asked for motivation, you didn't provide any.
+>>>>>
+>>>>
+>>>> We aren't creating one auxbus per PF. We're creating one auxbus per
+>>>> *clock*. The device has multiple clocks in some configurations.
+>>>
+>>> Does not matter. Why you need separate bus for whatever-instance? Why
+>>> can't you just have one ice-ptp bus and put devices on it?
+>>>
+>>>
+>>
+>> Because we only want ports on card A to be connected to the card owner
+>> on card A. We were using auxiliary bus to manage this. If we use a
+> 
+> You do that by naming auxiliary bus according to the PCI device
+> created it, which feels obviously wrong.
+> 
+> 
+>> single bus for ice-ptp, then we still have to implement separation
+>> between each set of devices on a single card, which doesn't solve the
+>> problems we had, and at least with the current code using auxiliary bus
+>> doesn't buy us much if it doesn't solve that problem.
+> 
+> I don't think that auxiliary bus is the answer for your problem. Please
+> don't abuse it.
+> 
+>>
+>>>>
+>>>> We need to connect each PF to the same clock controller, because there
+>>>> is only one clock owner for the device in a multi-port card.
+>>>
+>>> Connect how? But putting a PF-device on a per-clock bus? That sounds
+>>> quite odd. How did you figure out this usage of auxiliary bus?
+>>>
+>>>
+>>
+>> Yea, its a multi-function board but the functions aren't fully
+>> independent. Each port has its own PF, but multiple ports can be tied to
+>> the same clock. We have similar problems with a variety of HW aspects.
+>> I've been told that the design is simpler for other operating systems,
+>> (something about the way the subsystems work so that they expect ports
+>> to be tied to functions). But its definitely frustrating from Linux
+>> perspective where a single driver instance for the device would be a lot
+>> easier to manage.
+> 
+> You can always do it by internal accounting in ice, merge multiple PF
+> pci devices into one internal instance. Or checkout
+> drivers/base/component.c, perhaps it could be extended for your usecase.
+> 
+> 
+>>
+>>>>
+>>>>> Again, could you please avoid creating auxiliary bus per-PF and just
+>>>>> have one auxiliary but per-ice-driver?
+>>>>>
+>>>>
+>>>> We can't have one per-ice driver, because we don't want to connect ports
+>>> >from a different device to the same clock. If you have two ice devices
+>>>> plugged in, the ports on each device are separate from each other.
+>>>>
+>>>> The goal here is to connect the clock ports to the clock owner.
+>>>>
+>>>> Worse, as described here, we do have some devices which combine multiple
+>>>> adapters together and tie their clocks together via HW signaling. In
+>>>> those cases the clocks *do* need to communicate across the device, but
+>>>> only to other ports on the same physical device, not to ports on a
+>>>> different device.
+>>>>
+>>>> Perhaps auxbus is the wrong approach here? but how else can we connect
+>>>
+>>> Yeah, feels quite wrong.
+>>>
+>>>
+>>>> these ports without over-connecting to other ports? We could write
+>>>> bespoke code which finds these devices, but that felt like it was risky
+>>>> and convoluted.
+>>>
+>>> Sounds you need something you have for DPLL subsystem. Feels to me that
+>>> your hw design is quite disconnected from the Linux device model :/
+>>>
+>>
+>> I'm not 100% sure how DPLL handles this. I'll have to investigate.
+> 
+> DPLL leaves the merging on DPLL level. The ice driver just register
+> entities multiple times. It is specifically designed to fit ice needs.
+> 
+> 
+>>
+>> One thing I've considered a lot in the past (such as back when I was
+>> working on devlink flash update) was to somehow have a sort of extra
+>> layer where we could register with PCI subsystem some sort of "whole
+>> device" driver, that would get registered first and could connect to the
+>> rest of the function driver instances as they load. But this seems like
+>> it would need a lot of work in the PCI layer, and apparently hasn't been
+>> an issue for other devices? though ice is far from unique at least for
+>> Intel NICs. Its just that the devices got significantly more complex and
+>> functions more interdependent with this generation, and the issues with
+>> global bits were solved in other ways: often via hiding them with
+>> firmware >:(
+> 
+> I think that others could benefit from such "merged device" as well. I
+> think it is about the time to introduce it.
 
-Spectrum ASICs only support a single interrupt, that means that all the
-events are handled by one IRQ (interrupt request) handler. Once an
-interrupt is received, we schedule tasklet to handle events from EQ and
-then schedule tasklets to handle completions from CQs. Tasklet runs in
-softIRQ (software IRQ) context, and will be run on the same CPU which
-scheduled it. That means that today we use only one CPU to handle all the
-packets (both network packets and EMADs) from hardware.
+so far I see that we want to merge based on different bits, but let's
+see what will come from exploratory work that Sergey is doing right now.
 
-This can be improved using NAPI. The idea is to use NAPI instance per
-CQ, which is mapped 1:1 to DQ (RDQ or SDQ). NAPI poll method can be run
-in kernel thread, so then the driver will be able to handle WQEs in several
-CPUs. Convert the existing code to use NAPI APIs.
+and anything that is not a device/driver feels much more lightweight to
+operate with (think &ice_adapter, but extended with more fields).
+Could you elaborate more on what you have in mind? (Or what you could
+imagine reusing).
 
-Add NAPI instance as part of 'struct mlxsw_pci_queue' and initialize it
-as part of CQs initialization. Set the appropriate poll method and dummy
-net device, according to queue number, similar to tasklet setup. For CQs
-which are used for completions of RDQ, use Rx poll method and
-'napi_dev_rx', which is set as 'threaded'. It means that Rx poll method
-will run in kernel context, so several RDQs will be handled in parallel.
-For CQs which are used for completions of SDQ, use Tx poll method and
-'napi_dev_tx', this method will run in softIRQ context, as it is
-recommended in NAPI documentation, as Tx packets' processing is short task.
+offtop:
+It will be a good hook to put resources that are shared across ports
+under it in devlink resources, so making this "merged device" an entity
+would enable higher layer over what we have with devlink xxx $pf.
 
-Convert mlxsw_pci_cq_{rx,tx}_tasklet() to poll methods. Handle 'budget'
-argument - ignore it in Tx poll method, as it is recommended to not limit
-Tx processing. For Rx processing, handle up to 'budget' completions.
-Return 'work_done' which is the amount of completions that were handled.
-
-Handle the following cases:
-1. After processing 'budget' completions, the driver still has work to do:
-   Return work-done = budget. In that case, the NAPI instance will be
-   polled again (without the need to be rescheduled). Do not re-arm the
-   queue, as NAPI will handle the reschedule, so we do not have to involve
-   hardware to send an additional interrupt for the completions that should
-   be processed.
-
-2. Event processing has been completed:
-   Call napi_complete_done() to mark NAPI processing as completed, which
-   means that the poll method will not be rescheduled. Re-arm the queue,
-   as all completions were handled.
-
-   In case that poll method handled exactly 'budget' completions, return
-   work-done = budget -1, to distinguish from the case that driver still
-   has completions to handle. Otherwise, return the amount of completions
-   that were handled.
-
-Signed-off-by: Amit Cohen <amcohen@nvidia.com>
-Reviewed-by: Ido Schimmel <idosch@nvidia.com>
-Signed-off-by: Petr Machata <petrm@nvidia.com>
----
- drivers/net/ethernet/mellanox/mlxsw/pci.c | 96 ++++++++++++++++++-----
- 1 file changed, 77 insertions(+), 19 deletions(-)
-
-diff --git a/drivers/net/ethernet/mellanox/mlxsw/pci.c b/drivers/net/ethernet/mellanox/mlxsw/pci.c
-index 7724f9a61479..bf66d996e32e 100644
---- a/drivers/net/ethernet/mellanox/mlxsw/pci.c
-+++ b/drivers/net/ethernet/mellanox/mlxsw/pci.c
-@@ -87,7 +87,7 @@ struct mlxsw_pci_queue {
- 		struct {
- 			enum mlxsw_pci_cqe_v v;
- 			struct mlxsw_pci_queue *dq;
--			struct tasklet_struct tasklet;
-+			struct napi_struct napi;
- 		} cq;
- 		struct {
- 			struct tasklet_struct tasklet;
-@@ -684,16 +684,29 @@ static char *mlxsw_pci_cq_sw_cqe_get(struct mlxsw_pci_queue *q)
- 	return elem;
- }
- 
--#define MLXSW_PCI_CQ_MAX_HANDLE 64
-+static bool mlxsw_pci_cq_cqe_to_handle(struct mlxsw_pci_queue *q)
-+{
-+	struct mlxsw_pci_queue_elem_info *elem_info;
-+	bool owner_bit;
-+
-+	elem_info = mlxsw_pci_queue_elem_info_consumer_get(q);
-+	owner_bit = mlxsw_pci_cqe_owner_get(q->u.cq.v, elem_info->elem);
-+	return !mlxsw_pci_elem_hw_owned(q, owner_bit);
-+}
- 
--static void mlxsw_pci_cq_rx_tasklet(struct tasklet_struct *t)
-+static int mlxsw_pci_napi_poll_cq_rx(struct napi_struct *napi, int budget)
- {
--	struct mlxsw_pci_queue *q = from_tasklet(q, t, u.cq.tasklet);
-+	struct mlxsw_pci_queue *q = container_of(napi, struct mlxsw_pci_queue,
-+						 u.cq.napi);
- 	struct mlxsw_pci_queue *rdq = q->u.cq.dq;
- 	struct mlxsw_pci *mlxsw_pci = q->pci;
--	int items = 0;
-+	int work_done = 0;
- 	char *cqe;
- 
-+	/* If the budget is 0, Rx processing should be skipped. */
-+	if (unlikely(!budget))
-+		return 0;
-+
- 	while ((cqe = mlxsw_pci_cq_sw_cqe_get(q))) {
- 		u16 wqe_counter = mlxsw_pci_cqe_wqe_counter_get(cqe);
- 		u8 sendq = mlxsw_pci_cqe_sr_get(q->u.cq.v, cqe);
-@@ -712,22 +725,44 @@ static void mlxsw_pci_cq_rx_tasklet(struct tasklet_struct *t)
- 		mlxsw_pci_cqe_rdq_handle(mlxsw_pci, rdq,
- 					 wqe_counter, q->u.cq.v, cqe);
- 
--		if (++items == MLXSW_PCI_CQ_MAX_HANDLE)
-+		if (++work_done == budget)
- 			break;
- 	}
- 
- 	mlxsw_pci_queue_doorbell_consumer_ring(mlxsw_pci, q);
- 	mlxsw_pci_queue_doorbell_producer_ring(mlxsw_pci, rdq);
--	mlxsw_pci_queue_doorbell_arm_consumer_ring(mlxsw_pci, q);
-+
-+	if (work_done < budget)
-+		goto processing_completed;
-+
-+	/* The driver still has outstanding work to do, budget was exhausted.
-+	 * Return exactly budget. In that case, the NAPI instance will be polled
-+	 * again.
-+	 */
-+	if (mlxsw_pci_cq_cqe_to_handle(q))
-+		goto out;
-+
-+	/* The driver processed all the completions and handled exactly
-+	 * 'budget'. Return 'budget - 1' to distinguish from the case that
-+	 * driver still has completions to handle.
-+	 */
-+	if (work_done == budget)
-+		work_done--;
-+
-+processing_completed:
-+	if (napi_complete_done(napi, work_done))
-+		mlxsw_pci_queue_doorbell_arm_consumer_ring(mlxsw_pci, q);
-+out:
-+	return work_done;
- }
- 
--static void mlxsw_pci_cq_tx_tasklet(struct tasklet_struct *t)
-+static int mlxsw_pci_napi_poll_cq_tx(struct napi_struct *napi, int budget)
- {
--	struct mlxsw_pci_queue *q = from_tasklet(q, t, u.cq.tasklet);
-+	struct mlxsw_pci_queue *q = container_of(napi, struct mlxsw_pci_queue,
-+						 u.cq.napi);
- 	struct mlxsw_pci_queue *sdq = q->u.cq.dq;
- 	struct mlxsw_pci *mlxsw_pci = q->pci;
--	int credits = q->count >> 1;
--	int items = 0;
-+	int work_done = 0;
- 	char *cqe;
- 
- 	while ((cqe = mlxsw_pci_cq_sw_cqe_get(q))) {
-@@ -752,11 +787,21 @@ static void mlxsw_pci_cq_tx_tasklet(struct tasklet_struct *t)
- 		mlxsw_pci_cqe_sdq_handle(mlxsw_pci, sdq,
- 					 wqe_counter, q->u.cq.v, ncqe);
- 
--		if (++items == credits)
--			break;
-+		work_done++;
- 	}
- 
-+	/* If the budget is 0 napi_complete_done() should never be called. */
-+	if (unlikely(!budget))
-+		goto processing_completed;
-+
-+	work_done = min(work_done, budget - 1);
-+	if (unlikely(!napi_complete_done(napi, work_done)))
-+		goto out;
-+
-+processing_completed:
- 	mlxsw_pci_queue_doorbell_arm_consumer_ring(mlxsw_pci, q);
-+out:
-+	return work_done;
- }
- 
- static enum mlxsw_pci_cq_type
-@@ -772,17 +817,29 @@ mlxsw_pci_cq_type(const struct mlxsw_pci *mlxsw_pci,
- 	return MLXSW_PCI_CQ_RDQ;
- }
- 
--static void mlxsw_pci_cq_tasklet_setup(struct mlxsw_pci_queue *q,
--				       enum mlxsw_pci_cq_type cq_type)
-+static void mlxsw_pci_cq_napi_setup(struct mlxsw_pci_queue *q,
-+				    enum mlxsw_pci_cq_type cq_type)
- {
-+	struct mlxsw_pci *mlxsw_pci = q->pci;
-+
- 	switch (cq_type) {
- 	case MLXSW_PCI_CQ_SDQ:
--		tasklet_setup(&q->u.cq.tasklet, mlxsw_pci_cq_tx_tasklet);
-+		netif_napi_add(mlxsw_pci->napi_dev_tx, &q->u.cq.napi,
-+			       mlxsw_pci_napi_poll_cq_tx);
- 		break;
- 	case MLXSW_PCI_CQ_RDQ:
--		tasklet_setup(&q->u.cq.tasklet, mlxsw_pci_cq_rx_tasklet);
-+		netif_napi_add(mlxsw_pci->napi_dev_rx, &q->u.cq.napi,
-+			       mlxsw_pci_napi_poll_cq_rx);
- 		break;
- 	}
-+
-+	napi_enable(&q->u.cq.napi);
-+}
-+
-+static void mlxsw_pci_cq_napi_teardown(struct mlxsw_pci_queue *q)
-+{
-+	napi_disable(&q->u.cq.napi);
-+	netif_napi_del(&q->u.cq.napi);
- }
- 
- static int mlxsw_pci_cq_init(struct mlxsw_pci *mlxsw_pci, char *mbox,
-@@ -817,7 +874,7 @@ static int mlxsw_pci_cq_init(struct mlxsw_pci *mlxsw_pci, char *mbox,
- 	err = mlxsw_cmd_sw2hw_cq(mlxsw_pci->core, mbox, q->num);
- 	if (err)
- 		return err;
--	mlxsw_pci_cq_tasklet_setup(q, mlxsw_pci_cq_type(mlxsw_pci, q));
-+	mlxsw_pci_cq_napi_setup(q, mlxsw_pci_cq_type(mlxsw_pci, q));
- 	mlxsw_pci_queue_doorbell_consumer_ring(mlxsw_pci, q);
- 	mlxsw_pci_queue_doorbell_arm_consumer_ring(mlxsw_pci, q);
- 	return 0;
-@@ -826,6 +883,7 @@ static int mlxsw_pci_cq_init(struct mlxsw_pci *mlxsw_pci, char *mbox,
- static void mlxsw_pci_cq_fini(struct mlxsw_pci *mlxsw_pci,
- 			      struct mlxsw_pci_queue *q)
- {
-+	mlxsw_pci_cq_napi_teardown(q);
- 	mlxsw_cmd_hw2sw_cq(mlxsw_pci->core, q->num);
- }
- 
-@@ -886,7 +944,7 @@ static void mlxsw_pci_eq_tasklet(struct tasklet_struct *t)
- 	cq_count = mlxsw_pci->num_cqs;
- 	for_each_set_bit(cqn, active_cqns, cq_count) {
- 		q = mlxsw_pci_cq_get(mlxsw_pci, cqn);
--		tasklet_schedule(&q->u.cq.tasklet);
-+		napi_schedule(&q->u.cq.napi);
- 	}
- }
- 
--- 
-2.43.0
+> 
+> 
+>>
+>>
+>> I've tried explaining the issues with this to HW designers here, but so
+>> far haven't gotten a lot of traction.
+>>
+>>>> We could make use of ice_adapter, though we'd need some logic to manage
+>>>> devices which have multiple clocks, as well as devices like the one
+>>>> Sergey is working on which tie multiple adapters together.
+>>>
+>>> Perhaps that is an answer. Maybe we can make DPLL much more simple after
+>>> that :)
+>>
+>> The only major issue with ice_adapter is the case where we have one
+>> clock connected to multiple adapters, but hopefully Sergey has some
+>> ideas for how to solve that.
+>>
+>> I think we can mostly make the rest of the logic for the usual case work
+>> via ice_adapter:
+>>
+>> 1) we already get an ice_adapter reference during early probe
+>> 2) each PF knows whether its an owner or not from the NVM/firmware interface
+>> 3) we can move the list of ports from the auxbus thing into ice_adapter,
+>> possibly keeping one list per clock number, so that NVMs with multiple
+>> clocks enabled don't have conflicts or put all ports onto the same clock.
+>>
+>> I'm not sure how best to solve the weird case when we have multiple
+>> adapters tied together, but perhaps something with extending how the
+>> ice_adapter lookup is done could work? Sergey, I think we can continue
+>> this design discussion off list and come up with a proposal.
+>>
+>> We also have to be careful that whatever new solution also handles
+>> things which we got with auxiliary bus:
+>>
+>> 1) prevent issues with ordering if a clock port loads before the clock
+>> owner PF. If the clock owner loads first, then we need to ensure the
+>> port still gets initialized. If the clock owner loads second, we need to
+>> avoid issues with things not being setup yet, i.e. ensure all the
+>> structures were already initialized (for example by initializing lists
+>> and such when we create the ice_adapter, not when the clock owner loads).
+>>
+>> 2) prevent issues with teardown ordering that were previously serialized
+>> by the auxiliary bus unregister bits, where the driver unregister
+>> function would wait for all ports to shutdown.
+>>
+>> I think this can be done correctly with ice_adapter, but I wanted to
+>> point them out because we get them implicitly with the current design
+>> with auxiliary bus.
 
 
