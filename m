@@ -1,152 +1,168 @@
-Return-Path: <netdev+bounces-91684-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91686-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8DE4C8B36E4
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 14:10:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D44768B3734
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 14:26:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 43801284284
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 12:10:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8A36E1F240F5
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 12:26:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A565145B07;
-	Fri, 26 Apr 2024 12:10:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4749146586;
+	Fri, 26 Apr 2024 12:26:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Jvkom9kI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D66B514534D
-	for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 12:10:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41258145B31;
+	Fri, 26 Apr 2024 12:26:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714133434; cv=none; b=bBEbeN+73R/G/l2ooVNR50lVgifYdXnG/QtQBLgTGOKQC6NG2GLZDfvEFeWuAUHxOcag6wRKZFMWuc/URGOgr1MGRPQxI3z6xFl3djd67JHZUNUH/7MHATNvmLLz/tsaNjNjfwzJ+bFDG0lZXiH+6j1mve9MPWkIuRjrguaF2Yo=
+	t=1714134395; cv=none; b=aNSG8cDVzJTqFVMG1VQXHq2UuUg5bp/9hFxU3fCu5MxJNOIlaBOmpd0VUdYDtT9NvLZ3LJa/5UOfiawitohOdWtvzFCIxMXXcfDNoItPk1DmLZMXIPqwLKJ80r5CVwdhz4UOJCWsZYlgP0lshIW0jSU4osUsmtOpGa130xEKjj0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714133434; c=relaxed/simple;
-	bh=VDak55zfLn9yH98huhlZNYU5hK4qGuSisAUpSY2QKnc=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Kgo4ErXA+KuRI5Xp1L0xZoZuhMDpTfxC7AHr+JEC9lrxLdvvU9aOtiP80zcVWjVJJeQWtVrqQaT/X13C4ZpidLPLwfha7wBXdh/bskOE1fK1w+jyGbeiQVMmUyM+Ny2s/de/MQIxxfI86In9gYhske9YAO1OkPYY9nd2A6HIJYM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-7d5f08fdba8so224490839f.0
-        for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 05:10:32 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714133432; x=1714738232;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=4UdzRBinvaLIUGUBa8Qs3FzTYEcAEXl0i7GmgW4GMdE=;
-        b=SLuM3bmYJAY+GZLn7w1RQdYTvIqzGZo2dqt0Fc4mH4xHcNxAGsNVuWTpUzx/W1h6sz
-         dMzIm9PrjSTOLXkpSHg+HK9Pq2o/+tRutgLnCL8+AQ027QDubr1CO3fJ9m1qh43rTrmh
-         XZD95ppqu1X+h7LbZac2ijd6HzsQz9RfWWiRRedx4k62bD/7ze2Nzr2HLJ0bzWIZ4YbG
-         MuJXT3QO5QChAe9lZ0oCrgu239ZOg9oKO1dgpyhSGMrTc8ETh9l1fX12CstMCNLxlINi
-         +9xNpeDs82lgswRn/HeDz9bZ2DgWHNn8oVjxmj8VR1VLU0D+3QHXFlWfvSLup5r5JKOQ
-         SBdQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXp5KEbYxKCLaxuqL5Cxt23fwGbhKcRaIDArCn0ogKmtsci6fDua3UcD6Lppb2QmLWE0t9kRRxwdAbs4+lDyX/eXT8yRptJ
-X-Gm-Message-State: AOJu0YwbX9sSpBE+D5NttFu85N3elEWxaDmjzD7Rm3llD1/0x9IYCoZo
-	4bAGFtrK17sq9Kym6YdziP6h/ygsnr2MZfbxB3oI2GVaACa4HS+PFJe1sB1DPHdK8ST5QGKWGiz
-	eWWQ5EBlFVPN6jj3laoaNNSoivxBLUNh7eDG6sklJBru9Gi0HrB2351c=
-X-Google-Smtp-Source: AGHT+IFavDCbEhFNVt/bk1n8KNjEVZOqlg4ILJAKbnXFWR+MljzAEqiFXZY+t1oxmWtl55qVTgM50Xik79tvs3G0NHE7Gk1Td9gd
+	s=arc-20240116; t=1714134395; c=relaxed/simple;
+	bh=Pbkg/ngrAoqu+aQpDwFHA6fzbz8gCEVgjlmTJ3VIByg=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=OQSDTBq2198AJ+hIcTVnJIA8F1MOvvhgCV+ZFJACXgiqDp4XKsxPHPUwXThFc9TiEK4cYe3q9oIfQ0kHWc9axdO4Sxqvr98iLRGsWsRFUC2ULOvYtqJyLOh+ZEib1D+/MWFgU5vncDjrbYvrNFJVCZ/S9CvB5HGE2R0jKiTiIO8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Jvkom9kI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 985C2C113CD;
+	Fri, 26 Apr 2024 12:26:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714134394;
+	bh=Pbkg/ngrAoqu+aQpDwFHA6fzbz8gCEVgjlmTJ3VIByg=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+	b=Jvkom9kIZ6ZoOCRjQjn9a0bkl2urlzt/qUolqWeJKwBFTg0g/7qNVw8NASFDVe1i0
+	 UEDHmza8cBYDEs4zV4FiBfzE1KP4Xs3iwpDeddUSaVFQ275fbh13J8R5lFHG+Pl41U
+	 u1oZ31xr1Pqd8GpjAVce1gnK8O5Jc5GfLUatTtJl2xwQFK6Yny9BdiUfqI3OpO35r7
+	 QJUUsUOhhmKM1vtgZWe9PRrmEgFMvC39cxG/VoPhkkuQ6Mh0ekMCqXwMq4uQz37ErB
+	 0O3D8PsJ5ccCBkjlAaGCHuVwfTMiRUzGl2tVWLuUPtwkPUcCnuP6/52faA7avqlwqf
+	 81oQdZ2Lk8R1g==
+Message-ID: <6b05026f14b6b1e1067876f3bc1c07266dfe2ac2.camel@kernel.org>
+Subject: Re: [PATCH v5 4/8] net: sunrpc: Remove the now superfluous sentinel
+ elements from ctl_table array
+From: Jeffrey Layton <jlayton@kernel.org>
+To: j.granados@samsung.com, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>,  Alexander Aring <alex.aring@gmail.com>, Stefan
+ Schmidt <stefan@datenfreihafen.org>, Miquel Raynal
+ <miquel.raynal@bootlin.com>, David Ahern <dsahern@kernel.org>, Steffen
+ Klassert <steffen.klassert@secunet.com>, Herbert Xu
+ <herbert@gondor.apana.org.au>,  Matthieu Baerts <matttbe@kernel.org>, Mat
+ Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>,  Ralf
+ Baechle <ralf@linux-mips.org>, Remi Denis-Courmont <courmisch@gmail.com>,
+ Allison Henderson <allison.henderson@oracle.com>, David Howells
+ <dhowells@redhat.com>, Marc Dionne <marc.dionne@auristor.com>, Marcelo
+ Ricardo Leitner <marcelo.leitner@gmail.com>, Xin Long
+ <lucien.xin@gmail.com>, Wenjia Zhang <wenjia@linux.ibm.com>, Jan Karcher
+ <jaka@linux.ibm.com>, "D. Wythe" <alibuda@linux.alibaba.com>, Tony Lu
+ <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>, Trond
+ Myklebust <trond.myklebust@hammerspace.com>, Anna Schumaker
+ <anna@kernel.org>, Chuck Lever <chuck.lever@oracle.com>, Neil Brown
+ <neilb@suse.de>, Olga Kornievskaia <kolga@netapp.com>,  Dai Ngo
+ <Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>, Jon Maloy
+ <jmaloy@redhat.com>, Ying Xue <ying.xue@windriver.com>, Martin Schiller
+ <ms@dev.tdt.de>, Pablo Neira Ayuso <pablo@netfilter.org>, Jozsef Kadlecsik
+ <kadlec@netfilter.org>, Florian Westphal <fw@strlen.de>, Roopa Prabhu
+ <roopa@nvidia.com>, Nikolay Aleksandrov <razor@blackwall.org>,  Simon
+ Horman <horms@verge.net.au>, Julian Anastasov <ja@ssi.bg>, Joerg Reuter
+ <jreuter@yaina.de>, Luis Chamberlain <mcgrof@kernel.org>, Kees Cook
+ <keescook@chromium.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ dccp@vger.kernel.org,  linux-wpan@vger.kernel.org, mptcp@lists.linux.dev,
+ linux-hams@vger.kernel.org,  linux-rdma@vger.kernel.org,
+ rds-devel@oss.oracle.com,  linux-afs@lists.infradead.org,
+ linux-sctp@vger.kernel.org,  linux-s390@vger.kernel.org,
+ linux-nfs@vger.kernel.org,  tipc-discussion@lists.sourceforge.net,
+ linux-x25@vger.kernel.org,  netfilter-devel@vger.kernel.org,
+ coreteam@netfilter.org, bridge@lists.linux.dev,  lvs-devel@vger.kernel.org
+Date: Fri, 26 Apr 2024 08:26:28 -0400
+In-Reply-To: <20240426-jag-sysctl_remset_net-v5-4-e3b12f6111a6@samsung.com>
+References: <20240426-jag-sysctl_remset_net-v5-0-e3b12f6111a6@samsung.com>
+	 <20240426-jag-sysctl_remset_net-v5-4-e3b12f6111a6@samsung.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.0 (3.52.0-1.fc40app1) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:170f:b0:36b:26df:cce0 with SMTP id
- u15-20020a056e02170f00b0036b26dfcce0mr151937ill.0.1714133432185; Fri, 26 Apr
- 2024 05:10:32 -0700 (PDT)
-Date: Fri, 26 Apr 2024 05:10:32 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000052c1d00616feca15@google.com>
-Subject: [syzbot] [bluetooth?] WARNING in hci_recv_frame
-From: syzbot <syzbot+3e07a461b836821ff70e@syzkaller.appspotmail.com>
-To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
-	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
 
-Hello,
+On Fri, 2024-04-26 at 12:46 +0200, Joel Granados via B4 Relay wrote:
+> From: Joel Granados <j.granados@samsung.com>
+>=20
+> This commit comes at the tail end of a greater effort to remove the
+> empty elements at the end of the ctl_table arrays (sentinels) which
+> will reduce the overall build time size of the kernel and run time
+> memory bloat by ~64 bytes per sentinel (further information Link :
+> https://lore.kernel.org/all/ZO5Yx5JFogGi%2FcBo@bombadil.infradead.org/)
+>=20
+> * Remove sentinel element from ctl_table structs.
+>=20
+> Signed-off-by: Joel Granados <j.granados@samsung.com>
+> ---
+>  net/sunrpc/sysctl.c             | 1 -
+>  net/sunrpc/xprtrdma/svc_rdma.c  | 1 -
+>  net/sunrpc/xprtrdma/transport.c | 1 -
+>  net/sunrpc/xprtsock.c           | 1 -
+>  4 files changed, 4 deletions(-)
+>=20
+> diff --git a/net/sunrpc/sysctl.c b/net/sunrpc/sysctl.c
+> index 93941ab12549..5f3170a1c9bb 100644
+> --- a/net/sunrpc/sysctl.c
+> +++ b/net/sunrpc/sysctl.c
+> @@ -160,7 +160,6 @@ static struct ctl_table debug_table[] =3D {
+>  		.mode		=3D 0444,
+>  		.proc_handler	=3D proc_do_xprt,
+>  	},
+> -	{ }
+>  };
+> =20
+>  void
+> diff --git a/net/sunrpc/xprtrdma/svc_rdma.c b/net/sunrpc/xprtrdma/svc_rdm=
+a.c
+> index f86970733eb0..474f7a98fe9e 100644
+> --- a/net/sunrpc/xprtrdma/svc_rdma.c
+> +++ b/net/sunrpc/xprtrdma/svc_rdma.c
+> @@ -209,7 +209,6 @@ static struct ctl_table svcrdma_parm_table[] =3D {
+>  		.extra1		=3D &zero,
+>  		.extra2		=3D &zero,
+>  	},
+> -	{ },
+>  };
+> =20
+>  static void svc_rdma_proc_cleanup(void)
+> diff --git a/net/sunrpc/xprtrdma/transport.c b/net/sunrpc/xprtrdma/transp=
+ort.c
+> index 29b0562d62e7..9a8ce5df83ca 100644
+> --- a/net/sunrpc/xprtrdma/transport.c
+> +++ b/net/sunrpc/xprtrdma/transport.c
+> @@ -137,7 +137,6 @@ static struct ctl_table xr_tunables_table[] =3D {
+>  		.mode		=3D 0644,
+>  		.proc_handler	=3D proc_dointvec,
+>  	},
+> -	{ },
+>  };
+> =20
+>  #endif
+> diff --git a/net/sunrpc/xprtsock.c b/net/sunrpc/xprtsock.c
+> index bb9b747d58a1..f62f7b65455b 100644
+> --- a/net/sunrpc/xprtsock.c
+> +++ b/net/sunrpc/xprtsock.c
+> @@ -160,7 +160,6 @@ static struct ctl_table xs_tunables_table[] =3D {
+>  		.mode		=3D 0644,
+>  		.proc_handler	=3D proc_dointvec_jiffies,
+>  	},
+> -	{ },
+>  };
+> =20
+>  /*
+>=20
 
-syzbot found the following issue on:
-
-HEAD commit:    2bd87951de65 Merge git://git.kernel.org/pub/scm/linux/kern..
-git tree:       net-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=1655ccef180000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=5ced800a6af0f5b0
-dashboard link: https://syzkaller.appspot.com/bug?extid=3e07a461b836821ff70e
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/167fa7ed263b/disk-2bd87951.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/d5451b036870/vmlinux-2bd87951.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/a0d784e076f2/bzImage-2bd87951.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+3e07a461b836821ff70e@syzkaller.appspotmail.com
-
-------------[ cut here ]------------
-WARNING: CPU: 0 PID: 14307 at kernel/workqueue.c:2322 __queue_work+0xc6c/0xef0 kernel/workqueue.c:2321
-Modules linked in:
-CPU: 0 PID: 14307 Comm: syz-executor.2 Not tainted 6.9.0-rc5-syzkaller-01160-g2bd87951de65 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
-RIP: 0010:__queue_work+0xc6c/0xef0 kernel/workqueue.c:2321
-Code: ff e8 48 38 36 00 90 0f 0b 90 e9 20 fd ff ff e8 3a 38 36 00 eb 13 e8 33 38 36 00 eb 0c e8 2c 38 36 00 eb 05 e8 25 38 36 00 90 <0f> 0b 90 48 83 c4 68 5b 41 5c 41 5d 41 5e 41 5f 5d c3 cc cc cc cc
-RSP: 0018:ffffc900034f78a0 EFLAGS: 00010093
-RAX: ffffffff815fc90d RBX: ffff88802a579e00 RCX: ffff88802a579e00
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
-RBP: 0000000000000000 R08: ffffffff815fbdd3 R09: 1ffff1100f64b9ac
-R10: dffffc0000000000 R11: ffffed100f64b9ad R12: ffff888068ebd9c0
-R13: dffffc0000000000 R14: ffff888068ebd800 R15: 0000000000000008
-FS:  000055557f1bb480(0000) GS:ffff8880b9400000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f0909aba170 CR3: 0000000079f8e000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- queue_work_on+0x14f/0x250 kernel/workqueue.c:2435
- queue_work include/linux/workqueue.h:605 [inline]
- hci_recv_frame+0x489/0x610 net/bluetooth/hci_core.c:2998
- vhci_get_user drivers/bluetooth/hci_vhci.c:521 [inline]
- vhci_write+0x35a/0x480 drivers/bluetooth/hci_vhci.c:617
- do_iter_readv_writev+0x5a4/0x800
- vfs_writev+0x395/0xbb0 fs/read_write.c:971
- do_writev+0x1b1/0x350 fs/read_write.c:1018
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf5/0x240 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f0909a7dc9d
-Code: 28 89 54 24 1c 48 89 74 24 10 89 7c 24 08 e8 0a 70 02 00 8b 54 24 1c 48 8b 74 24 10 41 89 c0 8b 7c 24 08 b8 14 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 33 44 89 c7 48 89 44 24 08 e8 5e 70 02 00 48
-RSP: 002b:00007fffb04b4630 EFLAGS: 00000293 ORIG_RAX: 0000000000000014
-RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 00007f0909a7dc9d
-RDX: 0000000000000003 RSI: 00007fffb04b4670 RDI: 00000000000000ca
-RBP: 000055557f1bb430 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000008 R11: 0000000000000293 R12: 0000000000000000
-R13: 0000000000000000 R14: 00007f0909bac9d8 R15: 000000000000000c
- </TASK>
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+Reviewed-by: Jeffrey Layton <jlayton@kernel.org>
 
