@@ -1,108 +1,88 @@
-Return-Path: <netdev+bounces-91852-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91853-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19FDA8B42D6
-	for <lists+netdev@lfdr.de>; Sat, 27 Apr 2024 01:51:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C96D08B42D9
+	for <lists+netdev@lfdr.de>; Sat, 27 Apr 2024 01:52:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4BA3E1C22792
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 23:51:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 069831C225AF
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 23:52:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58F2C3BBE1;
-	Fri, 26 Apr 2024 23:51:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8CA43BBE1;
+	Fri, 26 Apr 2024 23:52:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="CVb3ShiT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Jqsc11mz"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 849F33BBC1
-	for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 23:51:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71E083BBC5;
+	Fri, 26 Apr 2024 23:52:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714175472; cv=none; b=YOq0A2+8TrrM6pH/fjXWgBJOjn7CPpFZwbo0/LYE1M9Qqd0jU0bjCArwpVay5sOObhMty3anZXQvNvd/L+gIqUF3oV+/YioIlumUqPqZJ4/4YljODb+5kmsQxD16VOH3wDcT870E2aDD8iqHTXfT3FKWl+/zhFWJWSpaqRoI6rk=
+	t=1714175535; cv=none; b=KjPpGYEQ9ggHPmYY09XI4FIpHX+1IuLHRPzbseQaS7jE2BtGIOD4tT1eBdcVvC/AmK3Gac1psyZGdVHD03001CbQFsbl0OE21hTX5l2DUhwJerP9fgc6d9p13sZvq89ZCmotGPXUFSX9zZ1gLNXSRvZm5iUw83VcIAfZDnl0BOU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714175472; c=relaxed/simple;
-	bh=UOv2aSPHtSJ211fWROncfK9M6zsTUFl405ydVst3K9M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ueieWqEj5M46L1euryQEPGPrTsXVRRlJy2gShsE7t5ur2MdopfIlGuwbOMWkiyRgfCSpounk+GKFkzurd+PELcpyx+57y6LjTG/ETFrRcbEDob7YtkDK1sQnHc1/w7LgEAUeTUnuAnhNQ1J0gCjDTNDFoFnSdPeD0GqdXq0MCmA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=CVb3ShiT; arc=none smtp.client-ip=95.215.58.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <379558fe-a6e2-444b-a6a7-ef233efa8311@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1714175467;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/GHDmjtDOSTgx3MzgQxrNQiEz0qPRdRT76sy97OELOM=;
-	b=CVb3ShiTUn0xa4PG6OX8EmBXIc9zY36L10ebOPcSSWRWAE7ynY8/gPavHseNIiU3OkYG8v
-	E6WqKEfo2oqkeRd1ShabxM6aKsSO5SMJ8j1ZAIlXDfHVM6e79WE8T/nGiC7don6w97B1rs
-	GF92K151T07PZqqMpb5RpU4vCXP1b1w=
-Date: Fri, 26 Apr 2024 16:50:59 -0700
+	s=arc-20240116; t=1714175535; c=relaxed/simple;
+	bh=H/sLcQKdw9O29se32jTxTWE1RQxSOatw8x3g3EsaaCw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Yr8o2YUtiHQVjkz3haBakhphkAL3pRk9w9UtlInajDIXURF79WEBGLLA0ueikLFTM16n8VSyxG6KV9Xp52G0+eemgRKUqqhvPcibETzEHbyA+UN0uFvzySpPHrKlv04FLEMQaw7xG8xfHQlPt1Pm5ONQYUmYvgFZyqXClG4yNcw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Jqsc11mz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 618CFC113CD;
+	Fri, 26 Apr 2024 23:52:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714175534;
+	bh=H/sLcQKdw9O29se32jTxTWE1RQxSOatw8x3g3EsaaCw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Jqsc11mzcF+Ti0Cr1i/rzdC1wnB5utX0rXr6TsRCf2xyh2CeSl4WJPE4zLPqgyOtl
+	 RaevFikEgloO38h8pMH41z4Vy9IMVVDswj59pNLvhdXF/FSQajKyYqSPwqn0wUMvPM
+	 GmOBD/s2/UHsy5bpIVd7XMTF7iMSO0WPZOe/lJSsUKvPWsmip37yJNE7A5FhVACkei
+	 KJtxUo/4qoR+h+eb8nC+aw1CUU1qYTHX/6yJjKVvBTBkS2SN7xFJBUHl3jikTUUZ5z
+	 9o3SZAOxOWCWfK3X+OfBxi4h/KbLE9+ZEeiBn8lUjQSrqCxUnfZrU3rNzNWcAzMyX9
+	 m8kkVk9oXFk0A==
+Date: Fri, 26 Apr 2024 16:52:13 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Joe Damato <jdamato@fastly.com>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, tariqt@nvidia.com,
+ saeedm@nvidia.com, mkarsten@uwaterloo.ca, gal@nvidia.com,
+ nalramli@fastly.com, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, "open list:MELLANOX
+ MLX4 core VPI driver" <linux-rdma@vger.kernel.org>
+Subject: Re: [PATCH net-next v2 1/3] net/mlx4: Track RX allocation failures
+ in a stat
+Message-ID: <20240426165213.298d8409@kernel.org>
+In-Reply-To: <Ziw8OSchaOaph1i8@LQ3V64L9R2>
+References: <20240426183355.500364-1-jdamato@fastly.com>
+	<20240426183355.500364-2-jdamato@fastly.com>
+	<20240426130017.6e38cd65@kernel.org>
+	<Ziw8OSchaOaph1i8@LQ3V64L9R2>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [RFC PATCH bpf-next v5 2/2] net: Add additional bit to support
- clockid_t timestamp type
-To: "Abhishek Chauhan (ABC)" <quic_abchauha@quicinc.com>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, Andrew Halaney <ahalaney@redhat.com>,
- Martin KaFai Lau <martin.lau@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, bpf <bpf@vger.kernel.org>,
- kernel@quicinc.com
-References: <20240424222028.1080134-1-quic_abchauha@quicinc.com>
- <20240424222028.1080134-3-quic_abchauha@quicinc.com>
- <2b2c3eb1-df87-40fe-b871-b52812c8ecd0@linux.dev>
- <e761e1de-0e11-4541-a4db-a1b793a60674@quicinc.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <e761e1de-0e11-4541-a4db-a1b793a60674@quicinc.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On 4/26/24 11:46 AM, Abhishek Chauhan (ABC) wrote:
->>> diff --git a/net/ipv4/ip_output.c b/net/ipv4/ip_output.c
->>> index 591226dcde26..f195b31d6e75 100644
->>> --- a/net/ipv4/ip_output.c
->>> +++ b/net/ipv4/ip_output.c
->>> @@ -1457,7 +1457,7 @@ struct sk_buff *__ip_make_skb(struct sock *sk,
->>>          skb->priority = (cork->tos != -1) ? cork->priority: READ_ONCE(sk->sk_priority);
->>>        skb->mark = cork->mark;
->>> -    skb->tstamp = cork->transmit_time;
->>> +    skb_set_tstamp_type_frm_clkid(skb, cork->transmit_time, sk->sk_clockid);
->> hmm... I think this will break for tcp. This sequence in particular:
->>
->> tcp_v4_timewait_ack()
->>    tcp_v4_send_ack()
->>      ip_send_unicast_reply()
->>        ip_push_pending_frames()
->>          ip_finish_skb()
->>            __ip_make_skb()
->>              /* sk_clockid is REAL but cork->transmit_time should be in mono */
->>              skb_set_tstamp_type_frm_clkid(skb, cork->transmit_time, sk->sk_clockid);;
->>
->> I think I hit it from time to time when running the test in this patch set.
->>
-> do you think i need to check for protocol type here . since tcp uses Mono and the rest according to the new design is based on
-> sk->sk_clockid
-> if (iph->protocol == IPPROTO_TCP)
-> 	skb_set_tstamp_type_frm_clkid(skb, cork->transmit_time, CLOCK_MONOTONIC);
-> else
-> 	skb_set_tstamp_type_frm_clkid(skb, cork->transmit_time, sk->sk_clockid);
+On Fri, 26 Apr 2024 16:43:53 -0700 Joe Damato wrote:
+> > In case of mlx4 looks like the buffer refill is "async", the driver
+> > tries to refill the buffers to max, but if it fails the next NAPI poll
+> > will try again. Allocation failures are not directly tied to packet
+> > drops. In case of bnxt if "replacement" buffer can't be allocated -
+> > packet is dropped and old buffer gets returned to the ring (although 
+> > if I'm 100% honest bnxt may be off by a couple, too, as the OOM stat
+> > gets incremented on ifup pre-fill failures).  
+> 
+> Yes, I see that now. I'll drop this patch entirely from v3 and just leave
+> the other two and remove alloc_fail from the queue stats patch.
 
-Looks ok. iph->protocol is from sk->sk_protocol. I would defer to Willem input here.
+Up to you, but I'd keep alloc_fail itself.
+If mlx4 gets page pool support one day it will be useful to run this:
+https://lore.kernel.org/all/20240426232400.624864-1-kuba@kernel.org/
 
-There is at least one more place that needs this protocol check, __ip6_make_skb().
+And I think it's useful to be able to check in case there are Rx
+discards whether the system was also under transient memory pressure 
+or not.
 
