@@ -1,82 +1,81 @@
-Return-Path: <netdev+bounces-91675-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91676-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64B978B3688
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 13:33:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 651458B368D
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 13:35:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A3B84B226A0
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 11:33:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1AC911F22C39
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 11:35:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D975114037C;
-	Fri, 26 Apr 2024 11:33:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42A72144D24;
+	Fri, 26 Apr 2024 11:35:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="0QHVck+5"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="BGAR/sjS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8935144D26
-	for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 11:33:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94CBF1448DA
+	for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 11:35:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714131190; cv=none; b=Bjr2cj9j/oLqQqOqGqAw7xqhor9/UeC76oANZNE+BRtzSZKOUrJL91MTwAN0x/H5ow87pWFQd8uxak05CZCaW9Xabil0ibeupkvMNqermZ5U/p9i2F2FsUXTn/XLVl3YpCY3VcW/kf/7aRPViQFCzmD9uLGeAEUcvHoaZ5gQKF8=
+	t=1714131305; cv=none; b=plOAuDtUCWv5sFt676bEhJVys1BlxwexAxkwGlKv13TUJeuxutsSjsVPSaWFWPlWX+sLKGMxZMS2mgeZ6twKFXSGtEwhQsTXL8jHdnzsCzHCqbGMDzqA9d0fxN5b4zjZKUANv1kS11TbHJFKZDvEZJ6ueSM03SD8OPFmpMCbjhU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714131190; c=relaxed/simple;
-	bh=geBqZPdJKBHdolO8PO7FM1jSAd+Io8kVp5K3TQpvuP8=;
+	s=arc-20240116; t=1714131305; c=relaxed/simple;
+	bh=BhBGtJSejw4iIbF5/P7kNMzBBdbfrmREM7nc8ro0Sbc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ScMbARxREf4Utb6TdUOv1EiTeK3nQ2vO5ilnQy+Ogb8KuvOE/SwNebL2VPyxLOjZlKudw+9ecmy9XTTItgp+/u15YzEYlnW8/LM39ccZvdLLFUS1Vnex8DsIdc5gsUmBmBQij5U9gCyVhtYlllOeudGu88RDGuGbtVq339nKdsA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=0QHVck+5; arc=none smtp.client-ip=209.85.208.174
+	 Content-Type:Content-Disposition:In-Reply-To; b=NEVtHkYutyvB8NmPVkXPBWWQ/4AUDxGUL5lcnad+f50HcZ5W6v5VZ7FlSPypkov8AwBjfb4hgNYS4IqBTZjotUAUE4zMaQldB12BHCfelqj/QwNRbZtKNq/US1dLsc0aMOwz6BeB8OE2ZnzF4M+XWboIw2+gB/TbLnGip6FZ+fA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=BGAR/sjS; arc=none smtp.client-ip=209.85.208.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-2d8a2cbe1baso28234831fa.0
-        for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 04:33:08 -0700 (PDT)
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-56e78970853so5403997a12.0
+        for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 04:35:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1714131187; x=1714735987; darn=vger.kernel.org;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1714131302; x=1714736102; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=DAxZtDWunLrbApHdmQojPuCJgA5oa4jSx3wfchhqKB4=;
-        b=0QHVck+5wxVXzmxM0Bkk50aFP3iINnDadIsTn03Fx7xe116VMKdCV86MiR4kYy/o7A
-         F0MGtraJVOgtujpDP3/N9P6joJSHof4Z/JNMr+lljn7ld/z38/O1snCvoS094uCwqRnk
-         1J0i0+zPxCxl5LmG7M6gYcULlQyyF1TmMQ1yLYVJLs8xqdTQhGjWDFaNQMhDSlJ5uajT
-         E/AXQoJsrnYs5RuReWIKnBjq89L6yI2PYxGP0H3Aesy1+uxoe0FqxszGBipBdtIkLT1q
-         zBUk+OuVduvsGDJhaZzcYHEDNZWEUDWztnJWpgHEGwA8RjNHYmdZDQGkqWxRl0GJjWR5
-         ZIrw==
+        bh=BhBGtJSejw4iIbF5/P7kNMzBBdbfrmREM7nc8ro0Sbc=;
+        b=BGAR/sjSdYR3n1+37BuyaCF9f99JIlkBGgpwXGBxUoSXM7ipX8kmj+ZKLGzlvgoIM1
+         C/osL6msVzqsLYUyfna4ggF0MWfO19a1Y+H1MSGVlt414LXuB7jp7SBUcZzZi9lMolSI
+         OLpJfyo70JBREAY9wTFvXtJnRdLMzzZ+/2sMekn1Nut6ruBClWnIsOdW7vkj39kDlQQu
+         JBX111sB703e5lpJzMSMm9QwAEJEQuSA2JkRNTxu6mlG6WosMcqJKbey9AfmqWfhvqv9
+         uafJRjwoY9Oua0VCDPV0KLCMNaZvzjfs1Js/R+EVMeCVKqE84tPhUtaOJSJJwFFppVAF
+         XYSg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714131187; x=1714735987;
+        d=1e100.net; s=20230601; t=1714131302; x=1714736102;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=DAxZtDWunLrbApHdmQojPuCJgA5oa4jSx3wfchhqKB4=;
-        b=vJX4HHyvRUXHqItuvQSRviCs+WmOAtlk2L9/HL+GV1/DrUDy9aXaS7d/pY0Vi3Aax7
-         5DVDRzBr/DXSj4q1hKpfBXXuIKP23GL2YBDVZXnPF3nhQmPh58vwHuy3hc9Xgre9V6tH
-         3kYrmOS7FABOYDejxtIGv6tE201orK6iuJCMJZwf/9yeFyuCNy4BnhWxkSC6D8MINgnm
-         fnWT8ckcC8k0fttNk/i2xIyxl/XyH6Q+LI9vSFWjVSy386u6X3mZVXBFQ0SURP1JBEI5
-         XMLeAunPcGJ8mmuSaIN8W2fwDh8f0n1BMLtxpD2CRo5kdUnUDkmOLq8SNTm8rUQ1vSDM
-         Ym6g==
-X-Forwarded-Encrypted: i=1; AJvYcCV+4psCCN7Jy4WguRz5kjSbeRfYyyGghHYUFHhA5tWtoAYWjqw8mduOT5U8S4hp+yFBrcwdvQJ9xaaJWKcZ1CILWQOVozmA
-X-Gm-Message-State: AOJu0YwNHpjE+Tas0+DC7eI/J3qVoC+K1pHyx+p9tFC2qDnhssW8+TIX
-	QuRzG34wLPXiCM/J5UYif6/rFnO74qQZ3Byfecf4998dR1rLVWANFCvRX2J258I=
-X-Google-Smtp-Source: AGHT+IFLc/PqloyXRg++rSdNuN7+okZ9J+o4IZDykkrt4Th0AQi4RxfoPh1Ms89wn1jjCsQv/qjxnA==
-X-Received: by 2002:a05:651c:155:b0:2dd:cb34:ddbc with SMTP id c21-20020a05651c015500b002ddcb34ddbcmr2107369ljd.48.1714131186378;
-        Fri, 26 Apr 2024 04:33:06 -0700 (PDT)
+        bh=BhBGtJSejw4iIbF5/P7kNMzBBdbfrmREM7nc8ro0Sbc=;
+        b=QEhd088tvtPh9JCYWI/2aa+yOr0Q4+L5mtD8C58KzDv0niWiL6k7mZHs5CYe/QDKiH
+         c8qTMNWZ05LQHw4jx5ia4dl+KWUZQSckF8LSqrtv55ygVOK3kGrxgCm8o3sm2Hgzki1g
+         JyFFqJX7rxSNNgqUkPGQ+0XdbCCGft+n8aiJLqSXNqeVqwMVyIYF+/5RRRyCcxM+ErRN
+         VRqalrjJWu8dWlZOsQkGrzT0+A36MCV0hRil6gq99mLvpNW/oeciG3Q/RpzrZn9+rRmO
+         M2ehrpdOeGhO1FiYfp3eadYKLTm608UtQecHR0h8LDzy59hraiNe4eAogOGkqAtD3hWa
+         4vWg==
+X-Forwarded-Encrypted: i=1; AJvYcCV8ghlVXR9mAPYwIMdQXMgT8Q/E5ZuaxS2TsMLon6m+qIMCt7BiiZCAwFSdcv5RXMALnywniVPdz3MNHAsf1vvwB3Wio8OM
+X-Gm-Message-State: AOJu0YzBJy69I2JbthbcK9pg3Saqa9fhrIItkjakUBhDGNGRn8qCdLVD
+	UZCYJOI5LhtqNdRJk40t0rceGUX+h8GM9TCgYGuzE/18tWm/y36EdMyfum0Ihbk=
+X-Google-Smtp-Source: AGHT+IEnQFk7M+ytVNHjghewcWthREzizwV5s4bNdYx9JJ5/eSPrGZues6cCNIxVT8D5Z7b+ulwEmw==
+X-Received: by 2002:a50:99d4:0:b0:572:5122:4845 with SMTP id n20-20020a5099d4000000b0057251224845mr2095552edb.4.1714131301562;
+        Fri, 26 Apr 2024 04:35:01 -0700 (PDT)
 Received: from localhost (89-24-35-126.nat.epc.tmcz.cz. [89.24.35.126])
-        by smtp.gmail.com with ESMTPSA id i13-20020a05600c354d00b00419fba938d8sm21958029wmq.27.2024.04.26.04.33.05
+        by smtp.gmail.com with ESMTPSA id o9-20020aa7c7c9000000b005721127eefbsm5113539eds.17.2024.04.26.04.35.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 26 Apr 2024 04:33:05 -0700 (PDT)
-Date: Fri, 26 Apr 2024 13:33:04 +0200
+        Fri, 26 Apr 2024 04:35:01 -0700 (PDT)
+Date: Fri, 26 Apr 2024 13:34:59 +0200
 From: Jiri Pirko <jiri@resnulli.us>
-To: Slark Xiao <slark_xiao@163.com>
-Cc: loic.poulain@linaro.org, ryazanov.s.a@gmail.com,
-	johannes@sipsolutions.net, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Hariprasad Kelam <hkelam@marvell.com>
-Subject: Re: [PATCH net v2] net: wwan: Fix missing net device name for error
- message print
-Message-ID: <ZiuQ8LAL1uyTVAxJ@nanopsycho>
-References: <20240426092444.825735-1-slark_xiao@163.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, eric.dumazet@gmail.com
+Subject: Re: [PATCH net-next] net: give more chances to rcu in
+ netdev_wait_allrefs_any()
+Message-ID: <ZiuRYxOo0nsVY3bm@nanopsycho>
+References: <20240426064222.1152209-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -85,94 +84,29 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240426092444.825735-1-slark_xiao@163.com>
+In-Reply-To: <20240426064222.1152209-1-edumazet@google.com>
 
-Fri, Apr 26, 2024 at 11:24:44AM CEST, slark_xiao@163.com wrote:
->In my local, I got an error print in dmesg like below:
->"sequence number glitch prev=487 curr=0"
->After checking, it belongs to mhi_wwan_mbim.c. Refer to the usage
->of this net_err_ratelimited() API in other files, I think we
->should add net device name print before message context.
-
-You don't add dev device name, but rather constant string.
-
+Fri, Apr 26, 2024 at 08:42:22AM CEST, edumazet@google.com wrote:
+>This came while reviewing commit c4e86b4363ac ("net: add two more
+>call_rcu_hurry()").
 >
->Fixes: aa730a9905b7 ("net: wwan: Add MHI MBIM network driver")
->Signed-off-by: Slark Xiao <slark_xiao@163.com>
->Reviewed-by: Hariprasad Kelam <hkelam@marvell.com>
->---
-> drivers/net/wwan/mhi_wwan_mbim.c | 12 ++++++------
-> 1 file changed, 6 insertions(+), 6 deletions(-)
+>Paolo asked if adding one synchronize_rcu() would help.
 >
->diff --git a/drivers/net/wwan/mhi_wwan_mbim.c b/drivers/net/wwan/mhi_wwan_mbim.c
->index 3f72ae943b29..6cefee25efc4 100644
->--- a/drivers/net/wwan/mhi_wwan_mbim.c
->+++ b/drivers/net/wwan/mhi_wwan_mbim.c
->@@ -186,14 +186,14 @@ static int mbim_rx_verify_nth16(struct mhi_mbim_context *mbim, struct sk_buff *s
-> 
-> 	if (skb->len < sizeof(struct usb_cdc_ncm_nth16) +
-> 			sizeof(struct usb_cdc_ncm_ndp16)) {
->-		net_err_ratelimited("frame too short\n");
->+		net_err_ratelimited("mbim: frame too short\n");
-
-Does not make any sense. If you have multiple instances of mbim, you are
-still clueless. You can access netdevice, print out the name as other
-net_err_ratelimited() instances do. Btw, it would be more correct to use
-netdev_err(), but there is no "ratelimited" variant of that. Perhaps
-better to introduce it.
-
-pw-bot: cr
-
-
-> 		return -EINVAL;
-> 	}
-> 
-> 	nth16 = (struct usb_cdc_ncm_nth16 *)skb->data;
-> 
-> 	if (nth16->dwSignature != cpu_to_le32(USB_CDC_NCM_NTH16_SIGN)) {
->-		net_err_ratelimited("invalid NTH16 signature <%#010x>\n",
->+		net_err_ratelimited("mbim: invalid NTH16 signature <%#010x>\n",
-> 				    le32_to_cpu(nth16->dwSignature));
-> 		return -EINVAL;
-> 	}
->@@ -201,7 +201,7 @@ static int mbim_rx_verify_nth16(struct mhi_mbim_context *mbim, struct sk_buff *s
-> 	/* No limit on the block length, except the size of the data pkt */
-> 	len = le16_to_cpu(nth16->wBlockLength);
-> 	if (len > skb->len) {
->-		net_err_ratelimited("NTB does not fit into the skb %u/%u\n",
->+		net_err_ratelimited("mbim: NTB does not fit into the skb %u/%u\n",
-> 				    len, skb->len);
-> 		return -EINVAL;
-> 	}
->@@ -209,7 +209,7 @@ static int mbim_rx_verify_nth16(struct mhi_mbim_context *mbim, struct sk_buff *s
-> 	if (mbim->rx_seq + 1 != le16_to_cpu(nth16->wSequence) &&
-> 	    (mbim->rx_seq || le16_to_cpu(nth16->wSequence)) &&
-> 	    !(mbim->rx_seq == 0xffff && !le16_to_cpu(nth16->wSequence))) {
->-		net_err_ratelimited("sequence number glitch prev=%d curr=%d\n",
->+		net_err_ratelimited("mbim: sequence number glitch prev=%d curr=%d\n",
-> 				    mbim->rx_seq, le16_to_cpu(nth16->wSequence));
-> 	}
-> 	mbim->rx_seq = le16_to_cpu(nth16->wSequence);
->@@ -222,7 +222,7 @@ static int mbim_rx_verify_ndp16(struct sk_buff *skb, struct usb_cdc_ncm_ndp16 *n
-> 	int ret;
-> 
-> 	if (le16_to_cpu(ndp16->wLength) < USB_CDC_NCM_NDP16_LENGTH_MIN) {
->-		net_err_ratelimited("invalid DPT16 length <%u>\n",
->+		net_err_ratelimited("mbim: invalid DPT16 length <%u>\n",
-> 				    le16_to_cpu(ndp16->wLength));
-> 		return -EINVAL;
-> 	}
->@@ -233,7 +233,7 @@ static int mbim_rx_verify_ndp16(struct sk_buff *skb, struct usb_cdc_ncm_ndp16 *n
-> 
-> 	if (sizeof(struct usb_cdc_ncm_ndp16) +
-> 	     ret * sizeof(struct usb_cdc_ncm_dpe16) > skb->len) {
->-		net_err_ratelimited("Invalid nframes = %d\n", ret);
->+		net_err_ratelimited("mbim: Invalid nframes = %d\n", ret);
-> 		return -EINVAL;
-> 	}
-> 
->-- 
->2.25.1
+>While synchronize_rcu() does not help, making sure to call
+>rcu_barrier() before msleep(wait) is definitely helping
+>to make sure lazy call_rcu() are completed.
 >
+>Instead of waiting ~100 seconds in my tests, the ref_tracker
+>splats occurs one time only, and netdev_wait_allrefs_any()
+>latency is reduced to the strict minimum.
 >
+>Ideally we should audit our call_rcu() users to make sure
+>no refcount (or cascading call_rcu()) is held too long,
+>because rcu_barrier() is quite expensive.
+>
+>Fixes: 0e4be9e57e8c ("net: use exponential backoff in netdev_wait_allrefs")
+>Signed-off-by: Eric Dumazet <edumazet@google.com>
+>Link: https://lore.kernel.org/all/28bbf698-befb-42f6-b561-851c67f464aa@kernel.org/T/#m76d73ed6b03cd930778ac4d20a777f22a08d6824
+
+Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 
