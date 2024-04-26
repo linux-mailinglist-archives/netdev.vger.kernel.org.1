@@ -1,112 +1,179 @@
-Return-Path: <netdev+bounces-91676-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91677-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 651458B368D
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 13:35:09 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 723E78B3690
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 13:36:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1AC911F22C39
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 11:35:09 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A491CB21516
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 11:36:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42A72144D24;
-	Fri, 26 Apr 2024 11:35:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7C69145327;
+	Fri, 26 Apr 2024 11:36:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="BGAR/sjS"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b="Rn/L5oeL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from nbd.name (nbd.name [46.4.11.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94CBF1448DA
-	for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 11:35:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1C01144D3F;
+	Fri, 26 Apr 2024 11:36:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.4.11.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714131305; cv=none; b=plOAuDtUCWv5sFt676bEhJVys1BlxwexAxkwGlKv13TUJeuxutsSjsVPSaWFWPlWX+sLKGMxZMS2mgeZ6twKFXSGtEwhQsTXL8jHdnzsCzHCqbGMDzqA9d0fxN5b4zjZKUANv1kS11TbHJFKZDvEZJ6ueSM03SD8OPFmpMCbjhU=
+	t=1714131371; cv=none; b=YXpLAofokswkOqly2FzlqF/s/Km5Vre9mcsW647r431q8aghE6Iq8gjrm1UvxCMPlmQ61RON/lHT4352iK647a+Cle+Xg3pGhH9G0/sggIbIgKHkc3LTP71kLgDf5+xrDi+uDED3FD4IGDSY/s877WEAinE4HpspySduuMJ8R5o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714131305; c=relaxed/simple;
-	bh=BhBGtJSejw4iIbF5/P7kNMzBBdbfrmREM7nc8ro0Sbc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NEVtHkYutyvB8NmPVkXPBWWQ/4AUDxGUL5lcnad+f50HcZ5W6v5VZ7FlSPypkov8AwBjfb4hgNYS4IqBTZjotUAUE4zMaQldB12BHCfelqj/QwNRbZtKNq/US1dLsc0aMOwz6BeB8OE2ZnzF4M+XWboIw2+gB/TbLnGip6FZ+fA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=BGAR/sjS; arc=none smtp.client-ip=209.85.208.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-56e78970853so5403997a12.0
-        for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 04:35:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1714131302; x=1714736102; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=BhBGtJSejw4iIbF5/P7kNMzBBdbfrmREM7nc8ro0Sbc=;
-        b=BGAR/sjSdYR3n1+37BuyaCF9f99JIlkBGgpwXGBxUoSXM7ipX8kmj+ZKLGzlvgoIM1
-         C/osL6msVzqsLYUyfna4ggF0MWfO19a1Y+H1MSGVlt414LXuB7jp7SBUcZzZi9lMolSI
-         OLpJfyo70JBREAY9wTFvXtJnRdLMzzZ+/2sMekn1Nut6ruBClWnIsOdW7vkj39kDlQQu
-         JBX111sB703e5lpJzMSMm9QwAEJEQuSA2JkRNTxu6mlG6WosMcqJKbey9AfmqWfhvqv9
-         uafJRjwoY9Oua0VCDPV0KLCMNaZvzjfs1Js/R+EVMeCVKqE84tPhUtaOJSJJwFFppVAF
-         XYSg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714131302; x=1714736102;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BhBGtJSejw4iIbF5/P7kNMzBBdbfrmREM7nc8ro0Sbc=;
-        b=QEhd088tvtPh9JCYWI/2aa+yOr0Q4+L5mtD8C58KzDv0niWiL6k7mZHs5CYe/QDKiH
-         c8qTMNWZ05LQHw4jx5ia4dl+KWUZQSckF8LSqrtv55ygVOK3kGrxgCm8o3sm2Hgzki1g
-         JyFFqJX7rxSNNgqUkPGQ+0XdbCCGft+n8aiJLqSXNqeVqwMVyIYF+/5RRRyCcxM+ErRN
-         VRqalrjJWu8dWlZOsQkGrzT0+A36MCV0hRil6gq99mLvpNW/oeciG3Q/RpzrZn9+rRmO
-         M2ehrpdOeGhO1FiYfp3eadYKLTm608UtQecHR0h8LDzy59hraiNe4eAogOGkqAtD3hWa
-         4vWg==
-X-Forwarded-Encrypted: i=1; AJvYcCV8ghlVXR9mAPYwIMdQXMgT8Q/E5ZuaxS2TsMLon6m+qIMCt7BiiZCAwFSdcv5RXMALnywniVPdz3MNHAsf1vvwB3Wio8OM
-X-Gm-Message-State: AOJu0YzBJy69I2JbthbcK9pg3Saqa9fhrIItkjakUBhDGNGRn8qCdLVD
-	UZCYJOI5LhtqNdRJk40t0rceGUX+h8GM9TCgYGuzE/18tWm/y36EdMyfum0Ihbk=
-X-Google-Smtp-Source: AGHT+IEnQFk7M+ytVNHjghewcWthREzizwV5s4bNdYx9JJ5/eSPrGZues6cCNIxVT8D5Z7b+ulwEmw==
-X-Received: by 2002:a50:99d4:0:b0:572:5122:4845 with SMTP id n20-20020a5099d4000000b0057251224845mr2095552edb.4.1714131301562;
-        Fri, 26 Apr 2024 04:35:01 -0700 (PDT)
-Received: from localhost (89-24-35-126.nat.epc.tmcz.cz. [89.24.35.126])
-        by smtp.gmail.com with ESMTPSA id o9-20020aa7c7c9000000b005721127eefbsm5113539eds.17.2024.04.26.04.35.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 26 Apr 2024 04:35:01 -0700 (PDT)
-Date: Fri, 26 Apr 2024 13:34:59 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, eric.dumazet@gmail.com
-Subject: Re: [PATCH net-next] net: give more chances to rcu in
- netdev_wait_allrefs_any()
-Message-ID: <ZiuRYxOo0nsVY3bm@nanopsycho>
-References: <20240426064222.1152209-1-edumazet@google.com>
+	s=arc-20240116; t=1714131371; c=relaxed/simple;
+	bh=uIMBVVZN0rAr0YvSwbBAXPUUyJX6ueLcEdjL2EoKaAQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=QTjNrxUeEbe/WdVIBKzux7XcVtCyElUPXnAAL/8wNr5zWzhIli2UxLxpWMNpywdKKMdP2CHPaz6oeQfzFijaGJviynClab3Kr7CZCCJfYxgGI7g/F1oT73Yjs8XY5NQyhvjdXGsg5trKNUN6k3L/PsciKdYxQ/Wnl/EOMxypPRw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nbd.name; spf=none smtp.mailfrom=nbd.name; dkim=pass (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b=Rn/L5oeL; arc=none smtp.client-ip=46.4.11.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nbd.name
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=nbd.name
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=nbd.name;
+	s=20160729; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+	References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender:Reply-To:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=vl89SPPDdjqrDw3KYXpqLJi42kU9OHhpKP+Ax8ANpKc=; b=Rn/L5oeLFpfLOrAY3pTtATBJNU
+	wstRwJmcGepQ+Dbyu8kBFokOaRLfA3esAxoWoJpmCxoRzmu+y7xp0wmwIK5hoHLyGr1mlk0xobzqo
+	SDCdqz9MbbCiWJw6rHF18I3dMhTQgr8dsI2D4wzBUloImi+qMUgR0dTgNDqWpJ6H1YSs=;
+Received: from p54ae9c93.dip0.t-ipconnect.de ([84.174.156.147] helo=nf.local)
+	by ds12 with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.96)
+	(envelope-from <nbd@nbd.name>)
+	id 1s0Jrz-007x5k-1j;
+	Fri, 26 Apr 2024 13:35:59 +0200
+Message-ID: <ca40fe27-30b5-4941-9235-6cc444eed1fd@nbd.name>
+Date: Fri, 26 Apr 2024 13:35:57 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240426064222.1152209-1-edumazet@google.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 net-next v3 2/6] net: add support for segmenting TCP
+ fraglist GSO packets
+To: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ Eric Dumazet <edumazet@google.com>, "David S. Miller" <davem@davemloft.net>,
+ David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>
+Cc: willemdebruijn.kernel@gmail.com, linux-kernel@vger.kernel.org
+References: <20240426065143.4667-1-nbd@nbd.name>
+ <20240426065143.4667-3-nbd@nbd.name>
+ <5a95fea4156b492eb19124bb33b21be81766c617.camel@redhat.com>
+ <9350b6f7-abd8-45c5-931a-62f48a50bee4@nbd.name>
+ <869b3dbb8f5c80ead202c6db3ebc61c0007ee5e1.camel@redhat.com>
+From: Felix Fietkau <nbd@nbd.name>
+Content-Language: en-US
+Autocrypt: addr=nbd@nbd.name; keydata=
+ xsDiBEah5CcRBADIY7pu4LIv3jBlyQ/2u87iIZGe6f0f8pyB4UjzfJNXhJb8JylYYRzIOSxh
+ ExKsdLCnJqsG1PY1mqTtoG8sONpwsHr2oJ4itjcGHfn5NJSUGTbtbbxLro13tHkGFCoCr4Z5
+ Pv+XRgiANSpYlIigiMbOkide6wbggQK32tC20QxUIwCg4k6dtV/4kwEeiOUfErq00TVqIiEE
+ AKcUi4taOuh/PQWx/Ujjl/P1LfJXqLKRPa8PwD4j2yjoc9l+7LptSxJThL9KSu6gtXQjcoR2
+ vCK0OeYJhgO4kYMI78h1TSaxmtImEAnjFPYJYVsxrhay92jisYc7z5R/76AaELfF6RCjjGeP
+ wdalulG+erWju710Bif7E1yjYVWeA/9Wd1lsOmx6uwwYgNqoFtcAunDaMKi9xVQW18FsUusM
+ TdRvTZLBpoUAy+MajAL+R73TwLq3LnKpIcCwftyQXK5pEDKq57OhxJVv1Q8XkA9Dn1SBOjNB
+ l25vJDFAT9ntp9THeDD2fv15yk4EKpWhu4H00/YX8KkhFsrtUs69+vZQwc0cRmVsaXggRmll
+ dGthdSA8bmJkQG5iZC5uYW1lPsJgBBMRAgAgBQJGoeQnAhsjBgsJCAcDAgQVAggDBBYCAwEC
+ HgECF4AACgkQ130UHQKnbvXsvgCgjsAIIOsY7xZ8VcSm7NABpi91yTMAniMMmH7FRenEAYMa
+ VrwYTIThkTlQzsFNBEah5FQQCACMIep/hTzgPZ9HbCTKm9xN4bZX0JjrqjFem1Nxf3MBM5vN
+ CYGBn8F4sGIzPmLhl4xFeq3k5irVg/YvxSDbQN6NJv8o+tP6zsMeWX2JjtV0P4aDIN1pK2/w
+ VxcicArw0VYdv2ZCarccFBgH2a6GjswqlCqVM3gNIMI8ikzenKcso8YErGGiKYeMEZLwHaxE
+ Y7mTPuOTrWL8uWWRL5mVjhZEVvDez6em/OYvzBwbkhImrryF29e3Po2cfY2n7EKjjr3/141K
+ DHBBdgXlPNfDwROnA5ugjjEBjwkwBQqPpDA7AYPvpHh5vLbZnVGu5CwG7NAsrb2isRmjYoqk
+ wu++3117AAMFB/9S0Sj7qFFQcD4laADVsabTpNNpaV4wAgVTRHKV/kC9luItzwDnUcsZUPdQ
+ f3MueRJ3jIHU0UmRBG3uQftqbZJj3ikhnfvyLmkCNe+/hXhPu9sGvXyi2D4vszICvc1KL4RD
+ aLSrOsROx22eZ26KqcW4ny7+va2FnvjsZgI8h4sDmaLzKczVRIiLITiMpLFEU/VoSv0m1F4B
+ FtRgoiyjFzigWG0MsTdAN6FJzGh4mWWGIlE7o5JraNhnTd+yTUIPtw3ym6l8P+gbvfoZida0
+ TspgwBWLnXQvP5EDvlZnNaKa/3oBes6z0QdaSOwZCRA3QSLHBwtgUsrT6RxRSweLrcabwkkE
+ GBECAAkFAkah5FQCGwwACgkQ130UHQKnbvW2GgCeMncXpbbWNT2AtoAYICrKyX5R3iMAoMhw
+ cL98efvrjdstUfTCP2pfetyN
+In-Reply-To: <869b3dbb8f5c80ead202c6db3ebc61c0007ee5e1.camel@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Fri, Apr 26, 2024 at 08:42:22AM CEST, edumazet@google.com wrote:
->This came while reviewing commit c4e86b4363ac ("net: add two more
->call_rcu_hurry()").
->
->Paolo asked if adding one synchronize_rcu() would help.
->
->While synchronize_rcu() does not help, making sure to call
->rcu_barrier() before msleep(wait) is definitely helping
->to make sure lazy call_rcu() are completed.
->
->Instead of waiting ~100 seconds in my tests, the ref_tracker
->splats occurs one time only, and netdev_wait_allrefs_any()
->latency is reduced to the strict minimum.
->
->Ideally we should audit our call_rcu() users to make sure
->no refcount (or cascading call_rcu()) is held too long,
->because rcu_barrier() is quite expensive.
->
->Fixes: 0e4be9e57e8c ("net: use exponential backoff in netdev_wait_allrefs")
->Signed-off-by: Eric Dumazet <edumazet@google.com>
->Link: https://lore.kernel.org/all/28bbf698-befb-42f6-b561-851c67f464aa@kernel.org/T/#m76d73ed6b03cd930778ac4d20a777f22a08d6824
+On 26.04.24 12:40, Paolo Abeni wrote:
+> On Fri, 2024-04-26 at 11:39 +0200, Felix Fietkau wrote:
+>> On 26.04.24 10:28, Paolo Abeni wrote:
+>> > On Fri, 2024-04-26 at 08:51 +0200, Felix Fietkau wrote:
+>> > > Preparation for adding TCP fraglist GRO support. It expects packets to be
+>> > > combined in a similar way as UDP fraglist GSO packets.
+>> > > For IPv4 packets, NAT is handled in the same way as UDP fraglist GSO.
+>> > > 
+>> > > Signed-off-by: Felix Fietkau <nbd@nbd.name>
+>> > > ---
+>> > >  net/ipv4/tcp_offload.c   | 65 ++++++++++++++++++++++++++++++++++++++++
+>> > >  net/ipv6/tcpv6_offload.c |  3 ++
+>> > >  2 files changed, 68 insertions(+)
+>> > > 
+>> > > diff --git a/net/ipv4/tcp_offload.c b/net/ipv4/tcp_offload.c
+>> > > index fab0973f995b..c493e95e09a5 100644
+>> > > --- a/net/ipv4/tcp_offload.c
+>> > > +++ b/net/ipv4/tcp_offload.c
+>> > > @@ -28,6 +28,68 @@ static void tcp_gso_tstamp(struct sk_buff *skb, unsigned int ts_seq,
+>> > >  	}
+>> > >  }
+>> > >  
+>> > > +static void __tcpv4_gso_segment_csum(struct sk_buff *seg,
+>> > > +				     __be32 *oldip, __be32 *newip,
+>> > > +				     __be16 *oldport, __be16 *newport)
+>> > > +{
+>> > > +	struct tcphdr *th;
+>> > > +	struct iphdr *iph;
+>> > > +
+>> > > +	if (*oldip == *newip && *oldport == *newport)
+>> > > +		return;
+>> > > +
+>> > > +	th = tcp_hdr(seg);
+>> > > +	iph = ip_hdr(seg);
+>> > > +
+>> > > +	inet_proto_csum_replace4(&th->check, seg, *oldip, *newip, true);
+>> > > +	inet_proto_csum_replace2(&th->check, seg, *oldport, *newport, false);
+>> > > +	*oldport = *newport;
+>> > > +
+>> > > +	csum_replace4(&iph->check, *oldip, *newip);
+>> > > +	*oldip = *newip;
+>> > > +}
+>> > > +
+>> > > +static struct sk_buff *__tcpv4_gso_segment_list_csum(struct sk_buff *segs)
+>> > > +{
+>> > > +	struct sk_buff *seg;
+>> > > +	struct tcphdr *th, *th2;
+>> > > +	struct iphdr *iph, *iph2;
+>> > > +
+>> > > +	seg = segs;
+>> > > +	th = tcp_hdr(seg);
+>> > > +	iph = ip_hdr(seg);
+>> > > +	th2 = tcp_hdr(seg->next);
+>> > > +	iph2 = ip_hdr(seg->next);
+>> > > +
+>> > > +	if (!(*(u32 *)&th->source ^ *(u32 *)&th2->source) &&
+>> > > +	    iph->daddr == iph2->daddr && iph->saddr == iph2->saddr)
+>> > > +		return segs;
+>> > 
+>> > As mentioned in previous revisions, I think a problem with this
+>> > approach is that the stack could make other changes to the TCP header
+>> > after the GRO stage, that are unnoticed here and could cause csum
+>> > corruption, if the egress device does not recompute the packet csum.
+>> 
+>> On segmentation, each packet keeps its original TCP header and csum. If 
+>> the stack makes changes, they apply to the first packet only. I don't 
+>> see how we could get csum corruption.
+> 
+> You are right. I did not take in account that such changes (to the
+> first skb) are not reflected to the frag_list at segmentation time. The
+> end result could be different from what the user/admin is expecting,
+> but at least should not impact drops.
+> 
+> Side note: alike UDP, this is not supporting IPv6 NAT...
 
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+I will add that for both in the next version.
+
+Thanks,
+
+- Felix
+
 
