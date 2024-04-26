@@ -1,79 +1,82 @@
-Return-Path: <netdev+bounces-91674-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91675-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC8E78B3676
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 13:23:13 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64B978B3688
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 13:33:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1A3E41C20C4A
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 11:23:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A3B84B226A0
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 11:33:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BD2C144D3E;
-	Fri, 26 Apr 2024 11:23:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D975114037C;
+	Fri, 26 Apr 2024 11:33:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="jfqmAUK0"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="0QHVck+5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2F9D13C9A7
-	for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 11:23:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8935144D26
+	for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 11:33:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714130591; cv=none; b=iTA5hfLCNBvKN1m6LwGdLNL8hchlRWVykeJ3By0tYjDvn3mq4ZV9YC5FNX0GudEMiVkXgTm9bzctHVA79yAQlz76Ryf1sVx4LNwYw4dsKY8lDTB2n7WUmomCs6IeGrfkoJKz7z/NPeGzMzq1JzeUkCLSFPB0eBF65fQ8NevqZNs=
+	t=1714131190; cv=none; b=Bjr2cj9j/oLqQqOqGqAw7xqhor9/UeC76oANZNE+BRtzSZKOUrJL91MTwAN0x/H5ow87pWFQd8uxak05CZCaW9Xabil0ibeupkvMNqermZ5U/p9i2F2FsUXTn/XLVl3YpCY3VcW/kf/7aRPViQFCzmD9uLGeAEUcvHoaZ5gQKF8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714130591; c=relaxed/simple;
-	bh=cIieqdk7pVtNBY/gopPOPyoswEqfzxD821nCTfYUkDQ=;
+	s=arc-20240116; t=1714131190; c=relaxed/simple;
+	bh=geBqZPdJKBHdolO8PO7FM1jSAd+Io8kVp5K3TQpvuP8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=phtoWSlzQib30+tYm8HCx0/yaNkHgOeZ07UVsFFo6/Ig5yBe0R6Pz1XMzYijCdl3XTgEpJCuT0fGnf+MsYpnq2FNVa+A2SKvNiPwQ3nl+HF4toifvZOrklvD1OmvVlKNKdQfmnjXV1asPZ0FUhjPiemf74MlpaDs6752fByrZGQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=jfqmAUK0; arc=none smtp.client-ip=209.85.128.54
+	 Content-Type:Content-Disposition:In-Reply-To; b=ScMbARxREf4Utb6TdUOv1EiTeK3nQ2vO5ilnQy+Ogb8KuvOE/SwNebL2VPyxLOjZlKudw+9ecmy9XTTItgp+/u15YzEYlnW8/LM39ccZvdLLFUS1Vnex8DsIdc5gsUmBmBQij5U9gCyVhtYlllOeudGu88RDGuGbtVq339nKdsA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=0QHVck+5; arc=none smtp.client-ip=209.85.208.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-41a72f3a1edso16645025e9.2
-        for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 04:23:08 -0700 (PDT)
+Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-2d8a2cbe1baso28234831fa.0
+        for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 04:33:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1714130587; x=1714735387; darn=vger.kernel.org;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1714131187; x=1714735987; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=cIieqdk7pVtNBY/gopPOPyoswEqfzxD821nCTfYUkDQ=;
-        b=jfqmAUK09suzAaSqZY6lHOwzdqQPh4EopB1W6rEsO8YUS5+e3+DrdCQnd0dg2RaMml
-         qNFRCb2/at1jQ/ljwObu07EWaTtZdJol3RRnvkQ48lYpqklSCtdJtqL6F5JTUPDHRSuS
-         e1RFNBIjFKnKhUc08ws8G26fyWx0rTqL0XayXhG0XE16lZVCIDJwNGrezZ5U++2PIvBM
-         DCoOVdlhMoLV+FqDZvGluRBFiaNRrvq61/sEfRewiwZ2e5tJ4r5uSOJmPjXrw24jDcn0
-         6FxuN8ri5r9n2kromQPwdSL5ATEqQLXyGj+TSXnraVJ0snVBrRoszoysGXdU9LWL9P4Z
-         CR4g==
+        bh=DAxZtDWunLrbApHdmQojPuCJgA5oa4jSx3wfchhqKB4=;
+        b=0QHVck+5wxVXzmxM0Bkk50aFP3iINnDadIsTn03Fx7xe116VMKdCV86MiR4kYy/o7A
+         F0MGtraJVOgtujpDP3/N9P6joJSHof4Z/JNMr+lljn7ld/z38/O1snCvoS094uCwqRnk
+         1J0i0+zPxCxl5LmG7M6gYcULlQyyF1TmMQ1yLYVJLs8xqdTQhGjWDFaNQMhDSlJ5uajT
+         E/AXQoJsrnYs5RuReWIKnBjq89L6yI2PYxGP0H3Aesy1+uxoe0FqxszGBipBdtIkLT1q
+         zBUk+OuVduvsGDJhaZzcYHEDNZWEUDWztnJWpgHEGwA8RjNHYmdZDQGkqWxRl0GJjWR5
+         ZIrw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714130587; x=1714735387;
+        d=1e100.net; s=20230601; t=1714131187; x=1714735987;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=cIieqdk7pVtNBY/gopPOPyoswEqfzxD821nCTfYUkDQ=;
-        b=u5QSJpAHURWTTMD3EKpqMUDUf3+MpwVLToxU5DbOPixgffSbyACjhdZwgXAZBCVR29
-         RyN53Oa3+lywFeNiswu5pe7k2o3afEfqqKD8gnD0QblBDzEBQe/eWtNuOxYlA2kFsH1B
-         cJyAIEJe135l3IUwCg9B6B3HunDBY7CSimlwo+sNL0yDsHLTeiWq0JW+rwgqGVH9p52U
-         yfVfQ9yAqE3rs75YtXPiKc7RrHUOO6Ubt3xHF4g0JVZ04oXUECS//JDlnevRvHfrBxBR
-         m/kBwQ607/QsD+SXQI7jcErwENuoQjj2awTe49x4LM1MB3pHMwoGumzrGWeb2vogGX51
-         wI4A==
-X-Gm-Message-State: AOJu0YxUGlVGb6bhZZMocew8/HFZfbn82Z07W5/WJaeadgcOPGoHK0GU
-	D5tciWItYeAAfCYlk/srjPsUYuQBSHyJFcGY+QIkag9Vka/jtDT8ckMz6YP6ddp0Uxx8VsVrIbs
-	J
-X-Google-Smtp-Source: AGHT+IHe3HI7c5VsJyFD/6T4uyU9M13DPBjZBTLPo4xgqGvz0t5srYeu09GplAt0VdYRePork+cWqQ==
-X-Received: by 2002:a5d:4812:0:b0:343:eb7d:760e with SMTP id l18-20020a5d4812000000b00343eb7d760emr1441243wrq.17.1714130587064;
-        Fri, 26 Apr 2024 04:23:07 -0700 (PDT)
+        bh=DAxZtDWunLrbApHdmQojPuCJgA5oa4jSx3wfchhqKB4=;
+        b=vJX4HHyvRUXHqItuvQSRviCs+WmOAtlk2L9/HL+GV1/DrUDy9aXaS7d/pY0Vi3Aax7
+         5DVDRzBr/DXSj4q1hKpfBXXuIKP23GL2YBDVZXnPF3nhQmPh58vwHuy3hc9Xgre9V6tH
+         3kYrmOS7FABOYDejxtIGv6tE201orK6iuJCMJZwf/9yeFyuCNy4BnhWxkSC6D8MINgnm
+         fnWT8ckcC8k0fttNk/i2xIyxl/XyH6Q+LI9vSFWjVSy386u6X3mZVXBFQ0SURP1JBEI5
+         XMLeAunPcGJ8mmuSaIN8W2fwDh8f0n1BMLtxpD2CRo5kdUnUDkmOLq8SNTm8rUQ1vSDM
+         Ym6g==
+X-Forwarded-Encrypted: i=1; AJvYcCV+4psCCN7Jy4WguRz5kjSbeRfYyyGghHYUFHhA5tWtoAYWjqw8mduOT5U8S4hp+yFBrcwdvQJ9xaaJWKcZ1CILWQOVozmA
+X-Gm-Message-State: AOJu0YwNHpjE+Tas0+DC7eI/J3qVoC+K1pHyx+p9tFC2qDnhssW8+TIX
+	QuRzG34wLPXiCM/J5UYif6/rFnO74qQZ3Byfecf4998dR1rLVWANFCvRX2J258I=
+X-Google-Smtp-Source: AGHT+IFLc/PqloyXRg++rSdNuN7+okZ9J+o4IZDykkrt4Th0AQi4RxfoPh1Ms89wn1jjCsQv/qjxnA==
+X-Received: by 2002:a05:651c:155:b0:2dd:cb34:ddbc with SMTP id c21-20020a05651c015500b002ddcb34ddbcmr2107369ljd.48.1714131186378;
+        Fri, 26 Apr 2024 04:33:06 -0700 (PDT)
 Received: from localhost (89-24-35-126.nat.epc.tmcz.cz. [89.24.35.126])
-        by smtp.gmail.com with ESMTPSA id g18-20020adfa492000000b0033e9d9f891csm22391967wrb.58.2024.04.26.04.23.05
+        by smtp.gmail.com with ESMTPSA id i13-20020a05600c354d00b00419fba938d8sm21958029wmq.27.2024.04.26.04.33.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 26 Apr 2024 04:23:06 -0700 (PDT)
-Date: Fri, 26 Apr 2024 13:23:04 +0200
+        Fri, 26 Apr 2024 04:33:05 -0700 (PDT)
+Date: Fri, 26 Apr 2024 13:33:04 +0200
 From: Jiri Pirko <jiri@resnulli.us>
-To: Antony Antony <antony@phenome.org>
-Cc: netdev@vger.kernel.org, Steffen Klassert <steffen.klassert@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH ipsec] xfrm: Correct spelling mistake in xfrm.h comment
-Message-ID: <ZiuOmLqOXfPXwzRd@nanopsycho>
-References: <Zit-sTZoYp_JnQfd@Antony2201.local>
+To: Slark Xiao <slark_xiao@163.com>
+Cc: loic.poulain@linaro.org, ryazanov.s.a@gmail.com,
+	johannes@sipsolutions.net, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Hariprasad Kelam <hkelam@marvell.com>
+Subject: Re: [PATCH net v2] net: wwan: Fix missing net device name for error
+ message print
+Message-ID: <ZiuQ8LAL1uyTVAxJ@nanopsycho>
+References: <20240426092444.825735-1-slark_xiao@163.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,20 +85,94 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Zit-sTZoYp_JnQfd@Antony2201.local>
+In-Reply-To: <20240426092444.825735-1-slark_xiao@163.com>
 
-Fri, Apr 26, 2024 at 12:15:13PM CEST, antony@phenome.org wrote:
->From: Antony Antony <antony.antony@secunet.com>
->
->A spelling error was found in the comment section of
->include/uapi/linux/xfrm.h. Since this header file is copied to many
->userspace programs and undergoes Debian spellcheck, it's preferable to
->fix it in upstream rather than downstream having exceptions.
->
->This commit fixes the spelling mistake.
->
->Fixes: df71837d5024 ("[LSM-IPSec]: Security association restriction.")
->Signed-off-by: Antony Antony <antony.antony@secunet.com>
+Fri, Apr 26, 2024 at 11:24:44AM CEST, slark_xiao@163.com wrote:
+>In my local, I got an error print in dmesg like below:
+>"sequence number glitch prev=487 curr=0"
+>After checking, it belongs to mhi_wwan_mbim.c. Refer to the usage
+>of this net_err_ratelimited() API in other files, I think we
+>should add net device name print before message context.
 
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+You don't add dev device name, but rather constant string.
+
+>
+>Fixes: aa730a9905b7 ("net: wwan: Add MHI MBIM network driver")
+>Signed-off-by: Slark Xiao <slark_xiao@163.com>
+>Reviewed-by: Hariprasad Kelam <hkelam@marvell.com>
+>---
+> drivers/net/wwan/mhi_wwan_mbim.c | 12 ++++++------
+> 1 file changed, 6 insertions(+), 6 deletions(-)
+>
+>diff --git a/drivers/net/wwan/mhi_wwan_mbim.c b/drivers/net/wwan/mhi_wwan_mbim.c
+>index 3f72ae943b29..6cefee25efc4 100644
+>--- a/drivers/net/wwan/mhi_wwan_mbim.c
+>+++ b/drivers/net/wwan/mhi_wwan_mbim.c
+>@@ -186,14 +186,14 @@ static int mbim_rx_verify_nth16(struct mhi_mbim_context *mbim, struct sk_buff *s
+> 
+> 	if (skb->len < sizeof(struct usb_cdc_ncm_nth16) +
+> 			sizeof(struct usb_cdc_ncm_ndp16)) {
+>-		net_err_ratelimited("frame too short\n");
+>+		net_err_ratelimited("mbim: frame too short\n");
+
+Does not make any sense. If you have multiple instances of mbim, you are
+still clueless. You can access netdevice, print out the name as other
+net_err_ratelimited() instances do. Btw, it would be more correct to use
+netdev_err(), but there is no "ratelimited" variant of that. Perhaps
+better to introduce it.
+
+pw-bot: cr
+
+
+> 		return -EINVAL;
+> 	}
+> 
+> 	nth16 = (struct usb_cdc_ncm_nth16 *)skb->data;
+> 
+> 	if (nth16->dwSignature != cpu_to_le32(USB_CDC_NCM_NTH16_SIGN)) {
+>-		net_err_ratelimited("invalid NTH16 signature <%#010x>\n",
+>+		net_err_ratelimited("mbim: invalid NTH16 signature <%#010x>\n",
+> 				    le32_to_cpu(nth16->dwSignature));
+> 		return -EINVAL;
+> 	}
+>@@ -201,7 +201,7 @@ static int mbim_rx_verify_nth16(struct mhi_mbim_context *mbim, struct sk_buff *s
+> 	/* No limit on the block length, except the size of the data pkt */
+> 	len = le16_to_cpu(nth16->wBlockLength);
+> 	if (len > skb->len) {
+>-		net_err_ratelimited("NTB does not fit into the skb %u/%u\n",
+>+		net_err_ratelimited("mbim: NTB does not fit into the skb %u/%u\n",
+> 				    len, skb->len);
+> 		return -EINVAL;
+> 	}
+>@@ -209,7 +209,7 @@ static int mbim_rx_verify_nth16(struct mhi_mbim_context *mbim, struct sk_buff *s
+> 	if (mbim->rx_seq + 1 != le16_to_cpu(nth16->wSequence) &&
+> 	    (mbim->rx_seq || le16_to_cpu(nth16->wSequence)) &&
+> 	    !(mbim->rx_seq == 0xffff && !le16_to_cpu(nth16->wSequence))) {
+>-		net_err_ratelimited("sequence number glitch prev=%d curr=%d\n",
+>+		net_err_ratelimited("mbim: sequence number glitch prev=%d curr=%d\n",
+> 				    mbim->rx_seq, le16_to_cpu(nth16->wSequence));
+> 	}
+> 	mbim->rx_seq = le16_to_cpu(nth16->wSequence);
+>@@ -222,7 +222,7 @@ static int mbim_rx_verify_ndp16(struct sk_buff *skb, struct usb_cdc_ncm_ndp16 *n
+> 	int ret;
+> 
+> 	if (le16_to_cpu(ndp16->wLength) < USB_CDC_NCM_NDP16_LENGTH_MIN) {
+>-		net_err_ratelimited("invalid DPT16 length <%u>\n",
+>+		net_err_ratelimited("mbim: invalid DPT16 length <%u>\n",
+> 				    le16_to_cpu(ndp16->wLength));
+> 		return -EINVAL;
+> 	}
+>@@ -233,7 +233,7 @@ static int mbim_rx_verify_ndp16(struct sk_buff *skb, struct usb_cdc_ncm_ndp16 *n
+> 
+> 	if (sizeof(struct usb_cdc_ncm_ndp16) +
+> 	     ret * sizeof(struct usb_cdc_ncm_dpe16) > skb->len) {
+>-		net_err_ratelimited("Invalid nframes = %d\n", ret);
+>+		net_err_ratelimited("mbim: Invalid nframes = %d\n", ret);
+> 		return -EINVAL;
+> 	}
+> 
+>-- 
+>2.25.1
+>
+>
 
