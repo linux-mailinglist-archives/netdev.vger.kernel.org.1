@@ -1,77 +1,77 @@
-Return-Path: <netdev+bounces-91744-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91745-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A7908B3B62
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 17:27:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75FC68B3B64
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 17:28:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4E3401C22EC5
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 15:27:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2FE6A282E45
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 15:28:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0BF914A617;
-	Fri, 26 Apr 2024 15:27:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D29811494B8;
+	Fri, 26 Apr 2024 15:27:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aDB76egc"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cKVkkb3r"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44B9414882E
-	for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 15:27:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E81114AD26
+	for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 15:27:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714145246; cv=none; b=BnvGr48zmwojcqNUSY216ujx+C3pBznH/gTwPB1HiAOhgi7haHV6LtRP/epJ4NmFFyn7EsvmPRhgNg6RDdC5ZE2fVqEQmO/CwgT24ezlny6xutEjsJZ6K9E6HjqJbqp6j+nN/eZebprCNDnH9gPpP42f4gd/P0dFU/WrlXkHJOo=
+	t=1714145248; cv=none; b=JFsoP5dFxxfGUMGQOOaH2pKN1Rz3sL3NggTWjq7Cm64sBU0hoXHOFEbtCwB2kbaDjn8u5bui7T2hQsHGOm7u081z/3kZ1W1EYyxi0Bquh6LCZOGMY4jHwVy3FUH3IQqW/8DwbTN42um0+np7joQ5W+fjT5K+eRhrzMw1LVnuFkM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714145246; c=relaxed/simple;
-	bh=ON8O69L2WjrSwImkIL8SztoYHne6EyZJFFigOCgPOuo=;
+	s=arc-20240116; t=1714145248; c=relaxed/simple;
+	bh=JXaodUegtNTXGX4YvGAE7HGXQGEsi540gOcETWahphI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=e12jmkhgc//Zr9OJ/zmmBERuWUd9QITsJ52EVcWeQ+kZRyl6fgMIJIKggxQfXm/SQWoxz6PQE7f4i8gqLN4avMUsfHu/y/nJBXohGpohOizpzM+Vuru9azzPqjbV3JJqWlXuYsA2M5F85nNMyfdUjfr1u7Xl9aW3jZKumdTG44Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aDB76egc; arc=none smtp.client-ip=170.10.129.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=Txaq0TyjIIS8RUXPllYaqAdoM2lqvV79xfQn2c8550RvbYVUddUEbL0BpFIFbBHfScwSP7CSK4KOUK+E5Xf93MJPIV1r5jpsRKutEpinRgENjEcVC1w/nko4RsUpWy7O2HBdDyU8m2k9JE30q5nDs60QjxEJxrYny6b1kYxIG2c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cKVkkb3r; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1714145244;
+	s=mimecast20190719; t=1714145246;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=f1VNfaNuGWGfgCNdtKjqGHDe2lFtIktnJGH3dzXC+fM=;
-	b=aDB76egc0RzTQYYlTqDRbM2XJUOE0W7pg/kB8Yn30XX2j4A/edy90NjoezoTuzrKJpfiV1
-	Pj1+PoPyz/WrIa09FigQy7xQz+RE5k7hzcdDRvCg0h518P3Uxg1+/nWrEVgZS/0tMAusny
-	5SmdIK75e0Vydz5szu01iMLKvPLU/NI=
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
- [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=K3AYiuohrijx/ETTvR/seefnGOT1X10ejEbRZKf6zaM=;
+	b=cKVkkb3rlRuVIoN5gQs1gxynWLNtLb8TMALsUiO592zDBF6jvKAFr9HX5ZPhnZPRNchSdN
+	PoY31OWaynNVra52MjAxSHRWSkRK5Pq6fNDYuyOjQQplTEDDtKWTxa9QyxSAN6owR/1sNh
+	+ZTZ+2dEe/mSVSuCCYDohdN0jIBhtcA=
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
+ [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-515-3T1HvyDzOkeucnNsrB2YdQ-1; Fri, 26 Apr 2024 11:27:22 -0400
-X-MC-Unique: 3T1HvyDzOkeucnNsrB2YdQ-1
-Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-6a085b7a6ceso31055046d6.2
-        for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 08:27:22 -0700 (PDT)
+ us-mta-108-AQhYEwU0MsS6bsNWy0x84g-1; Fri, 26 Apr 2024 11:27:24 -0400
+X-MC-Unique: AQhYEwU0MsS6bsNWy0x84g-1
+Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-439de748c5eso31693801cf.0
+        for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 08:27:24 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714145242; x=1714750042;
+        d=1e100.net; s=20230601; t=1714145244; x=1714750044;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=f1VNfaNuGWGfgCNdtKjqGHDe2lFtIktnJGH3dzXC+fM=;
-        b=uUIN3XEnqQHL4ezEdecEOenjh1W1JpkkPzTUq5LKs8MMpAw/Z/AvkxZPfQqBSq4OUt
-         j0CSWF1B5qAH6C5vKSAr1GYUfP25R9wNTI8fYvj7+KPD/uF6jUpff9JvquEP25yKoUFG
-         wlyY+fhXjLP5JQciR/C3ECaYpphlRNVa8AQ2TV4skYtynuYzoES+H+jDHlVZZneIDOKC
-         3xjICCklq7supEnhR7sE3TkpeetTZT0Ne1fxLto7O7Xcq2PvDcY8B5tFvXOCsyti4bZP
-         0wpgcCSDd6tkOO9FctYKVCMO2oWHMFtEJafklQTdA/qHsHtmPh1jhfq3jvTjzlF7hinL
-         riPw==
-X-Gm-Message-State: AOJu0Yxu5PsonTNa04EkRCEMG4KkchGYfDRMp6kds12hMafPloGhDn6a
-	PlXuU7J2knC718/pg0Ke2LfatnCAz6edqgO5nZIiDwDcIrp2d3HIkW8w4cbeX+5gnjETxfOYmvA
-	FupbWO+w73wx4CkhlwmgZEQbYLTHwTYIWTpnG+bIgLnoyg+PfDZJLhg==
-X-Received: by 2002:a05:6214:212e:b0:6a0:9f93:1ee5 with SMTP id r14-20020a056214212e00b006a09f931ee5mr4347284qvc.13.1714145242328;
-        Fri, 26 Apr 2024 08:27:22 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGTQIk7SOs2UrQ6IbTUTGHdnp+MN9RMQrqGF0BBtvvCgtSilUbgR5l8fnQwjSmUs8bP4WxDuA==
-X-Received: by 2002:a05:6214:212e:b0:6a0:9f93:1ee5 with SMTP id r14-20020a056214212e00b006a09f931ee5mr4347257qvc.13.1714145242014;
-        Fri, 26 Apr 2024 08:27:22 -0700 (PDT)
+        bh=K3AYiuohrijx/ETTvR/seefnGOT1X10ejEbRZKf6zaM=;
+        b=Upm69Yr0ME7vjpUBjqV/6HQZuTOnWgY3WBu1Xa3tGdP09I8uLDuZqfhAsP9/pYAwWE
+         Z27mkqxLMXYWRUeguQrURdYvDvB5/mk86UMMAbltd9wHXJwPtNq2NAtFZIIXMvpyC7nN
+         bbM3+hJATy58mUGhmOygwhjQyYZ/X2tA0KwCXmV6xG7fwpAcBEirqapmsqgC9HnPnHNl
+         kE1vGBaTOYVUjMOv422VwZxKXB6BGEqz+1WXi0Q7mjgzAqlmmskxdbyNQQ+7YYSLjOsu
+         HX5bDZZCgVREPsnqjeP0vb3XznHS4E99ogtgrBh/da+crPq7xzd/trsJl5UdyNWkX/iR
+         Z/OQ==
+X-Gm-Message-State: AOJu0Ywo7HsmQNxWjwmptBRi10rLIaT1yflRAllykQ+XcXUmO8KmNKZO
+	8UC5rDpwY296qpf1/YAhm/omb/OZ84ybRGFbN6YmRs2TkiIZmWk0Z/w3Bvner4L5HFSwH1XQjw6
+	y02nas3kpnBkQCqLlvBtL3X0zwfFilo2Qw6Hxo7fLGm9MRn8LVOk+QQ==
+X-Received: by 2002:a05:622a:14c6:b0:43a:6d1f:19fb with SMTP id u6-20020a05622a14c600b0043a6d1f19fbmr2648651qtx.37.1714145244298;
+        Fri, 26 Apr 2024 08:27:24 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE6yxNPS3OpQ58X2dVmTyxkpMpUCDgUjjHdxVv1RyymWoqE5KGDokPUw0AmAAYn+XWzJojbQw==
+X-Received: by 2002:a05:622a:14c6:b0:43a:6d1f:19fb with SMTP id u6-20020a05622a14c600b0043a6d1f19fbmr2648635qtx.37.1714145244031;
+        Fri, 26 Apr 2024 08:27:24 -0700 (PDT)
 Received: from debian (2a01cb058918ce00d9135204d7b88de9.ipv6.abo.wanadoo.fr. [2a01:cb05:8918:ce00:d913:5204:d7b8:8de9])
-        by smtp.gmail.com with ESMTPSA id n20-20020a0ce494000000b006a0533b107dsm1917414qvl.69.2024.04.26.08.27.19
+        by smtp.gmail.com with ESMTPSA id f16-20020ac80690000000b00434347cda1bsm8007226qth.42.2024.04.26.08.27.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 26 Apr 2024 08:27:21 -0700 (PDT)
-Date: Fri, 26 Apr 2024 17:27:17 +0200
+        Fri, 26 Apr 2024 08:27:23 -0700 (PDT)
+Date: Fri, 26 Apr 2024 17:27:19 +0200
 From: Guillaume Nault <gnault@redhat.com>
 To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>
@@ -81,8 +81,9 @@ Cc: netdev@vger.kernel.org, Ido Schimmel <idosch@nvidia.com>,
 	Jiri Benc <jbenc@redhat.com>, Breno Leitao <leitao@debian.org>,
 	Roopa Prabhu <roopa@nvidia.com>,
 	stephen hemminger <shemminger@vyatta.com>
-Subject: [PATCH net 1/2] vxlan: Fix racy device stats updates.
-Message-ID: <ee4f5622d105ba9e0c7762acae7c73a7cce05b29.1714144439.git.gnault@redhat.com>
+Subject: [PATCH net 2/2] vxlan: Add missing VNI filter counter update in
+ arp_reduce().
+Message-ID: <fdba6a77fb820c04c0a67f7c0c56c957ce9fa4e5.1714144439.git.gnault@redhat.com>
 References: <cover.1714144439.git.gnault@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -94,131 +95,32 @@ Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <cover.1714144439.git.gnault@redhat.com>
 
-VXLAN devices update their stats locklessly. Therefore these counters
-should either be stored in per-cpu data structures or the updates
-should be done using atomic increments.
+VXLAN stores per-VNI statistics using vxlan_vnifilter_count().
+These statistics were not updated when arp_reduce() failed its
+pskb_may_pull() call.
 
-Since the net_device_core_stats infrastructure is already used in
-vxlan_rcv(), use it for the other rx_dropped and tx_dropped counter
-updates. Update the other counters atomically using DEV_STATS_INC().
+Use vxlan_vnifilter_count() to update the VNI counter when that
+happens.
 
-Fixes: d342894c5d2f ("vxlan: virtual extensible lan")
+Fixes: 4095e0e1328a ("drivers: vxlan: vnifilter: per vni stats")
 Signed-off-by: Guillaume Nault <gnault@redhat.com>
 ---
- drivers/net/vxlan/vxlan_core.c | 28 ++++++++++++++--------------
- 1 file changed, 14 insertions(+), 14 deletions(-)
+ drivers/net/vxlan/vxlan_core.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
 diff --git a/drivers/net/vxlan/vxlan_core.c b/drivers/net/vxlan/vxlan_core.c
-index ba319fc21957..0cd9e44c7be8 100644
+index 0cd9e44c7be8..c9e4e03ad214 100644
 --- a/drivers/net/vxlan/vxlan_core.c
 +++ b/drivers/net/vxlan/vxlan_core.c
-@@ -1766,8 +1766,8 @@ static int vxlan_rcv(struct sock *sk, struct sk_buff *skb)
- 	skb_reset_network_header(skb);
- 
- 	if (!vxlan_ecn_decapsulate(vs, oiph, skb)) {
--		++vxlan->dev->stats.rx_frame_errors;
--		++vxlan->dev->stats.rx_errors;
-+		DEV_STATS_INC(vxlan->dev, rx_frame_errors);
-+		DEV_STATS_INC(vxlan->dev, rx_errors);
- 		vxlan_vnifilter_count(vxlan, vni, vninode,
- 				      VXLAN_VNI_STATS_RX_ERRORS, 0);
- 		goto drop;
-@@ -1837,7 +1837,7 @@ static int arp_reduce(struct net_device *dev, struct sk_buff *skb, __be32 vni)
- 		goto out;
+@@ -1838,6 +1838,8 @@ static int arp_reduce(struct net_device *dev, struct sk_buff *skb, __be32 vni)
  
  	if (!pskb_may_pull(skb, arp_hdr_len(dev))) {
--		dev->stats.tx_dropped++;
-+		dev_core_stats_tx_dropped_inc(dev);
+ 		dev_core_stats_tx_dropped_inc(dev);
++		vxlan_vnifilter_count(vxlan, vni, NULL,
++				      VXLAN_VNI_STATS_TX_DROPS, 0);
  		goto out;
  	}
  	parp = arp_hdr(skb);
-@@ -1893,7 +1893,7 @@ static int arp_reduce(struct net_device *dev, struct sk_buff *skb, __be32 vni)
- 		reply->pkt_type = PACKET_HOST;
- 
- 		if (netif_rx(reply) == NET_RX_DROP) {
--			dev->stats.rx_dropped++;
-+			dev_core_stats_rx_dropped_inc(dev);
- 			vxlan_vnifilter_count(vxlan, vni, NULL,
- 					      VXLAN_VNI_STATS_RX_DROPS, 0);
- 		}
-@@ -2052,7 +2052,7 @@ static int neigh_reduce(struct net_device *dev, struct sk_buff *skb, __be32 vni)
- 			goto out;
- 
- 		if (netif_rx(reply) == NET_RX_DROP) {
--			dev->stats.rx_dropped++;
-+			dev_core_stats_rx_dropped_inc(dev);
- 			vxlan_vnifilter_count(vxlan, vni, NULL,
- 					      VXLAN_VNI_STATS_RX_DROPS, 0);
- 		}
-@@ -2263,7 +2263,7 @@ static void vxlan_encap_bypass(struct sk_buff *skb, struct vxlan_dev *src_vxlan,
- 				      len);
- 	} else {
- drop:
--		dev->stats.rx_dropped++;
-+		dev_core_stats_rx_dropped_inc(dev);
- 		vxlan_vnifilter_count(dst_vxlan, vni, NULL,
- 				      VXLAN_VNI_STATS_RX_DROPS, 0);
- 	}
-@@ -2295,7 +2295,7 @@ static int encap_bypass_if_local(struct sk_buff *skb, struct net_device *dev,
- 					   addr_family, dst_port,
- 					   vxlan->cfg.flags);
- 		if (!dst_vxlan) {
--			dev->stats.tx_errors++;
-+			DEV_STATS_INC(dev, tx_errors);
- 			vxlan_vnifilter_count(vxlan, vni, NULL,
- 					      VXLAN_VNI_STATS_TX_ERRORS, 0);
- 			kfree_skb(skb);
-@@ -2559,7 +2559,7 @@ void vxlan_xmit_one(struct sk_buff *skb, struct net_device *dev,
- 	return;
- 
- drop:
--	dev->stats.tx_dropped++;
-+	dev_core_stats_tx_dropped_inc(dev);
- 	vxlan_vnifilter_count(vxlan, vni, NULL, VXLAN_VNI_STATS_TX_DROPS, 0);
- 	dev_kfree_skb(skb);
- 	return;
-@@ -2567,11 +2567,11 @@ void vxlan_xmit_one(struct sk_buff *skb, struct net_device *dev,
- tx_error:
- 	rcu_read_unlock();
- 	if (err == -ELOOP)
--		dev->stats.collisions++;
-+		DEV_STATS_INC(dev, collisions);
- 	else if (err == -ENETUNREACH)
--		dev->stats.tx_carrier_errors++;
-+		DEV_STATS_INC(dev, tx_carrier_errors);
- 	dst_release(ndst);
--	dev->stats.tx_errors++;
-+	DEV_STATS_INC(dev, tx_errors);
- 	vxlan_vnifilter_count(vxlan, vni, NULL, VXLAN_VNI_STATS_TX_ERRORS, 0);
- 	kfree_skb(skb);
- }
-@@ -2604,7 +2604,7 @@ static void vxlan_xmit_nh(struct sk_buff *skb, struct net_device *dev,
- 	return;
- 
- drop:
--	dev->stats.tx_dropped++;
-+	dev_core_stats_tx_dropped_inc(dev);
- 	vxlan_vnifilter_count(netdev_priv(dev), vni, NULL,
- 			      VXLAN_VNI_STATS_TX_DROPS, 0);
- 	dev_kfree_skb(skb);
-@@ -2642,7 +2642,7 @@ static netdev_tx_t vxlan_xmit_nhid(struct sk_buff *skb, struct net_device *dev,
- 	return NETDEV_TX_OK;
- 
- drop:
--	dev->stats.tx_dropped++;
-+	dev_core_stats_tx_dropped_inc(dev);
- 	vxlan_vnifilter_count(netdev_priv(dev), vni, NULL,
- 			      VXLAN_VNI_STATS_TX_DROPS, 0);
- 	dev_kfree_skb(skb);
-@@ -2739,7 +2739,7 @@ static netdev_tx_t vxlan_xmit(struct sk_buff *skb, struct net_device *dev)
- 			    !is_multicast_ether_addr(eth->h_dest))
- 				vxlan_fdb_miss(vxlan, eth->h_dest);
- 
--			dev->stats.tx_dropped++;
-+			dev_core_stats_tx_dropped_inc(dev);
- 			vxlan_vnifilter_count(vxlan, vni, NULL,
- 					      VXLAN_VNI_STATS_TX_DROPS, 0);
- 			kfree_skb(skb);
 -- 
 2.39.2
 
