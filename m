@@ -1,474 +1,261 @@
-Return-Path: <netdev+bounces-91575-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91576-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BBA78B3199
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 09:43:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8FF158B319D
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 09:44:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 309EE2899F6
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 07:43:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B559A1C20834
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 07:44:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0604113C3EC;
-	Fri, 26 Apr 2024 07:43:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9B0313C3EA;
+	Fri, 26 Apr 2024 07:44:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="0Ys7zEif";
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="p6m4qZzc"
 X-Original-To: netdev@vger.kernel.org
-Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 292E813BC2B;
-	Fri, 26 Apr 2024 07:43:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714117420; cv=none; b=R3O6k3zCX47B9yO+iVV6WIO2LaVV+4FAaxDlwH9vO12Xn4mWnW4fuhLskG7zw/QgnKlO9CyT8Mh/dzSS1HGUz7sbGv080HJMbFD6Tb2du1hGg751k9PagJyIEHEPicODTev35U051JkkUxayo95MN6fVqnMRCcCL8gtnTStBmGI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714117420; c=relaxed/simple;
-	bh=4fLd2rNL2mayozdsDW6Ri6bCR80/W8dPV2kAAD9ZD/g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Bn+fB9fRSG7kVOOxm6cUukNg3jjOIsQHehXJkqy0f3uMi5zekp032LkGPPwDMP3GV7ayoe/MLKvRPpX7YjW9BFdJZMONvlu4MYSwkeEdS2Z5kOa/jOn2PSpb1psras3bqpb/Mr3Wh21bqf7IywN5SP4SlG3SgS8qbzLjAIyr8FE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.235])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4VQl8G6pGRz4f3jdB;
-	Fri, 26 Apr 2024 15:43:26 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.252])
-	by mail.maildlp.com (Postfix) with ESMTP id 8F0621A0572;
-	Fri, 26 Apr 2024 15:43:34 +0800 (CST)
-Received: from [10.67.111.192] (unknown [10.67.111.192])
-	by APP3 (Coremail) with SMTP id _Ch0CgDX3JQjWytmrjhTKw--.24004S2;
-	Fri, 26 Apr 2024 15:43:33 +0800 (CST)
-Message-ID: <4ef5ce36-8e1b-4e0f-ac51-e046bfe7bb17@huaweicloud.com>
-Date: Fri, 26 Apr 2024 15:43:31 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A93413AD25;
+	Fri, 26 Apr 2024 07:44:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=68.232.154.123
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1714117457; cv=fail; b=BsjPfLJIsFp9sOOaEe5Olz0cesIO+qWlrdFv6AkjC3UE/JatLykvv+O+p6oO2ByOpMSIKAb+S8kH3u2KMeKN1WWpE9xcIYp2e8n0Fn5RgZCHsSEZYiiAAMyDuMFS2Y7eVBTj4U3aK/gm8eNaG118+HoYoz4FWwIKNyhva5X2LUo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1714117457; c=relaxed/simple;
+	bh=nItGw23nLZHJ4WckFxw3Pygwqu/gG2eQXRAcZl7jg1Q=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=lM+McErFhAKJeGWH+L+ekf+FoXM/gMkH0u8TXjZTHPGkNFFO/SkonEyJ7liumonluN2Hp9A6EU0tLbHiqxaVysJT3PlypKYugSlhI/GlhEiSi1DDbwUo7AmZ+Nt/J2oLx8Gf5BrTtp2G9/lzD1FUCWysQrv0kpch7tJR5oRGolk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=0Ys7zEif; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=p6m4qZzc; arc=fail smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1714117454; x=1745653454;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=nItGw23nLZHJ4WckFxw3Pygwqu/gG2eQXRAcZl7jg1Q=;
+  b=0Ys7zEifwcg5lJDxCFhoJuKGKauPKbSs1vklcj/NDRA+87tgFKd0sNfi
+   vS5IcpK00XpDplUw19UfPvV5UW3pqM5U65uM7FDa4/nCaderA0SQpsZOR
+   oLWMrXfmN95lU+9luIJDuyWYgiprPVoGj8R75ZL0Mape6+a3izyK5x6wU
+   T7J802WvsvTF9e7oVIYDkPl4Fyj2wx3x3MafiM9dfG2FJzH233IXAvyP2
+   amt2GDY2BCGtwW/Yv8fzAsgQw6sYvWYp1cnoN7uMBi3T75Yutyu7OUqgo
+   QBjLsy1L4r7l8qVDf+KKjhFwkyYWP1T6TQzhhS8kIZI/EJhe2NiZyQcTD
+   A==;
+X-CSE-ConnectionGUID: XXuTBX8lTsyekX3bEufgsQ==
+X-CSE-MsgGUID: lF3VNejkRlavd9tbtxu6fA==
+X-IronPort-AV: E=Sophos;i="6.07,231,1708412400"; 
+   d="scan'208";a="22732993"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 26 Apr 2024 00:44:12 -0700
+Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Fri, 26 Apr 2024 00:43:39 -0700
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (10.10.215.250)
+ by email.microchip.com (10.10.87.72) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Fri, 26 Apr 2024 00:43:38 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Y6teiyHZheBnVz9UzGjpjoxaRnOBH4EQseTJZngz9CkHGWyLFtLNi3t6LJOWA3gZYyHrZb1ajFyegq6Hgb0jA3PxqdSB4r02witxW+nKM59h7VdyYrpAfaAz7OVhPVkDOCR4jWcmQvmrfzuFUXjlh3hdOxualKX7v/Blc8bOVnoY1T0UbEOQWW7qX126VdyS5YpkTmXH9l5DIhHXFYD7Suxodwp6NWmi9tz1lnU8ndLFrdyIrv/amIJ4v0YMFYsC4V2O/vmWMmdq3eVblQgtzIRDCWdDL9EBc9jagPBRrUdQAnr9lsrFYcKbbf08h4PB5SEstJgk7+ZBUxxZ98wpYg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=HjnAgTHedoHgb5NtKgsfM8733Fa7+tThtz/FMBgpB/8=;
+ b=DTpg9rfZ+nGNG4jcesTkQWO44exbWH3DPMNYTFDgxJsR+5t+BWAcEg6qYSNHaslXpbHrntn9HHx4lcmVziaHHbCcj1Cns4RJHogXyVRIh8BEclwk5HSdHwDm+aXt/hIkg7ubEHIEa6Et9FOv9NFnu3DlQPAD4mQsZSAHKQ35GjLcJYazC5jo3zceEv9mN0at1GDtbrEL3ZwOg4s3eaRM1yA/i4R8vj7sLmZ4oALHpyrJ+5xVxQ7yGndQbokHf5yLgbYaaVe+gRcyslkL15mirF56dZDwnmXHp9Q/xkWsQEVv9f/Z5zjGiPjZhPir71edr1ryjUU7YR8SC4L0x7R0sg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microchip.com; dmarc=pass action=none
+ header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microchip.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=HjnAgTHedoHgb5NtKgsfM8733Fa7+tThtz/FMBgpB/8=;
+ b=p6m4qZzctxAJNqMC4Y+0x+OvSGZ3JoB9yoHcbs7dVIr8oO9GNDOtbzm6e93030DRc65xrjbw2knyNdSORbPMT4+GhfDxwzbGcaDrU4flrnoczBQCdA1JUS3BPTjY4noVxfM+YDZw1VUO1PEH/YBDFpiNWUogBvh2LP2ESCMdKqUCLJ8Qody1HhPqQ+h95dyxserYvsi7jS6QmHxHgyK/69cJtwNlZUYKwbRbZzF2OSoe+ck+iV+wjCgrZblfiOy2YFVGbRzZzCdFgFqX+HVjDE00v+OsxHg+Of9vnOypp/bIrVBjE495zPidj+1ZQ+lAIdolk25dG14WklAmsI6xAQ==
+Received: from PH8PR11MB7965.namprd11.prod.outlook.com (2603:10b6:510:25c::13)
+ by SJ1PR11MB6106.namprd11.prod.outlook.com (2603:10b6:a03:48b::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7472.29; Fri, 26 Apr
+ 2024 07:43:36 +0000
+Received: from PH8PR11MB7965.namprd11.prod.outlook.com
+ ([fe80::1a3a:422d:1406:cd7]) by PH8PR11MB7965.namprd11.prod.outlook.com
+ ([fe80::1a3a:422d:1406:cd7%5]) with mapi id 15.20.7519.021; Fri, 26 Apr 2024
+ 07:43:36 +0000
+From: <Ronnie.Kunin@microchip.com>
+To: <andrew@lunn.ch>, <Raju.Lakkaraju@microchip.com>
+CC: <netdev@vger.kernel.org>, <davem@davemloft.net>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <edumazet@google.com>, <linux-kernel@vger.kernel.org>,
+	<Bryan.Whitehead@microchip.com>, <UNGLinuxDriver@microchip.com>
+Subject: RE: [PATCH net V2 2/2] net: lan743x: support WOL in MAC even when PHY
+ does not
+Thread-Topic: [PATCH net V2 2/2] net: lan743x: support WOL in MAC even when
+ PHY does not
+Thread-Index: AQHaen5pYcVCYAnMVEe2BSZT37paArFBPcYAgBgwmwCAAJVnAIAb45oAgACHioCAAqXqAIAAK6IAgAAtc4A=
+Date: Fri, 26 Apr 2024 07:43:35 +0000
+Message-ID: <PH8PR11MB7965D05E16D922C3B1F14E5E95162@PH8PR11MB7965.namprd11.prod.outlook.com>
+References: <20240320042107.903051-1-Raju.Lakkaraju@microchip.com>
+ <20240320042107.903051-3-Raju.Lakkaraju@microchip.com>
+ <22089299-a3e2-4cbd-942a-65ea070657b8@lunn.ch>
+ <LV8PR11MB87003ABBCA98F00F3EEA9AB09F032@LV8PR11MB8700.namprd11.prod.outlook.com>
+ <fb5a6f19-ae4c-443e-babb-cbbcf6ba5fc6@lunn.ch>
+ <LV8PR11MB8700A34520EA2521BC5F59EF9F112@LV8PR11MB8700.namprd11.prod.outlook.com>
+ <9c4f8fcd-ae95-4874-b829-d381928c5f13@lunn.ch>
+ <LV8PR11MB8700D54F5E03440681BF0D449F172@LV8PR11MB8700.namprd11.prod.outlook.com>
+ <38718a9b-bc7b-45d1-b15e-f4fea628db3d@lunn.ch>
+In-Reply-To: <38718a9b-bc7b-45d1-b15e-f4fea628db3d@lunn.ch>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microchip.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PH8PR11MB7965:EE_|SJ1PR11MB6106:EE_
+x-ms-office365-filtering-correlation-id: 5aeac992-94ea-42f2-fb94-08dc65c49492
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: =?us-ascii?Q?ALq/6rVzwvNpRAiYp9O8Zv0+K1KM2Vybe/OjHKtMyAlV3i+6GseNGoawKTwd?=
+ =?us-ascii?Q?0OSFrj+Crt7HtCn0qJvfQ575+8/P6PRI3u8rHLhp7CNVuFvdfysGRWEnWQet?=
+ =?us-ascii?Q?NNJXbCg/RyUNqtp4Ue/JsBYU3ZtGM+BKggIMN/Lx07+30fLyXpTQQCiyEr/G?=
+ =?us-ascii?Q?k1tb1KuBJyTZq1W64rlrjoo4x3P2N0ph4MMK4vhalvNhZl+z6+j/aY2rYHc2?=
+ =?us-ascii?Q?vHNh73yzP41orJ7B1Ud8Fc6gRacMiwGSYmruiDenxFYIPiuykOUo2WAOY8dj?=
+ =?us-ascii?Q?cXU0RI2P+WbYd6OAQoV3NIH37uaxojETsluEDKdmv4+NIEgMu3f/U21SdBej?=
+ =?us-ascii?Q?buGREl/ntEv1xuqd3+7Q2Ki6LWn0dVfa3QP6J7BH6DFwn5C/YBcxi3I5V8IT?=
+ =?us-ascii?Q?wwypZSR9GJcjHvNkX9KARSZDTwxkQz4i91YCuFOxJ414ilkL+YJeSwmFQzeN?=
+ =?us-ascii?Q?v2XSsIHDzvqzv5UOnRNM0T9XFmmfBOzaEdEib9xn+wGnDP7G8PZVlCymQMPx?=
+ =?us-ascii?Q?aP2HV2UFQUSZjvbljj04CJ1dVsp6yluhjhyuQmQ6njjVmPurJJN05+aCcO8U?=
+ =?us-ascii?Q?JKthCvH9xo3hpfchKYQ+dUTrUuzf11u8c7tquhXvURh8Z6KPX4jIl5LiccrK?=
+ =?us-ascii?Q?R3NuDpEQuon0HKnZXzGqKDcx2sNA/I2XH2d9dd0okr7i0yR8xfUByOnSiT8q?=
+ =?us-ascii?Q?yJlPYbWFoZvCjqvxnfm9FqwXs9lOWgnfSdFIfM83a4ZI8GDs+4Bsu7kG83Lp?=
+ =?us-ascii?Q?VElLlaFSruCJWCQMzn/O1p9J9wC690vg1kkB5OhJbYfaqrs0/9LnsQjD1iiC?=
+ =?us-ascii?Q?Ec56pOdq/X13LPFal1qMmwnKlcr+V56OiAm0zrVQvzWmruue8WuTctV/tVr3?=
+ =?us-ascii?Q?dZISknEWNPLvuk5kdwsilQLHuyL+JaTT7Z3bGyLRBlVD29g8gl+s69u5F+7Z?=
+ =?us-ascii?Q?bGbfY0t+1ixYK1Xz90ehW/Doyi7TkWv3TenUQy6ymMMh0rbZ7IxipfPjB8py?=
+ =?us-ascii?Q?TQD4Rnn07tzxP/pjKP4E+FH548vyvVaCZIYELYUrDcz1dcrt6twX42+GqSAr?=
+ =?us-ascii?Q?IIclET7lhN5V6S3X+yHOJPRyHKSIpkSW7I2howGJWN6bZ/a9KTA+j6hpR/6H?=
+ =?us-ascii?Q?aJUvnGXmgOtTWVndRDQGo1aqkgJxjbP98nrljg+5D32uyhnjkRttyVhngbnA?=
+ =?us-ascii?Q?2wbaJC4GulJvO0xFG5P3fGLxxyA1Fyd9FpBfCpabI09F+g9XgYZfqQWlpmtn?=
+ =?us-ascii?Q?rypjclI7r4neGrmHtr+On31KhTcJfIatmFqjVttsrg5c04ozcrrI8DRiqPrg?=
+ =?us-ascii?Q?JtkDkFnEiPlAUnjhTtYO71FtxMRGn075peN0qbNdRm9E/A=3D=3D?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR11MB7965.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(376005)(366007)(38070700009);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?KSkHryjkjh2Vr8tEL0DlJzA60/eiEBNlTxvMfTBo6KcAgr8OSU2M6PMo82ky?=
+ =?us-ascii?Q?GaL8/TWUcu5uPF3L55Uz9NKs6L2FjiZyfkE6AvvlFf58oZflkFoz2Nzrtnrw?=
+ =?us-ascii?Q?KWt0B2cvWOh+JTk297TQEKdSRunoC+jZ4zV+DYZ+xD8mnvMQb+04ulPH1cj6?=
+ =?us-ascii?Q?mzj1hzzadwbPGtelC8LsTI6Jo4DgVAbbvze6v9ggqnziqVix9o1O0NJ57emL?=
+ =?us-ascii?Q?F3MikPDjtrRTE6s5Y8RZFM/p6O43O/yfdkV7dsIj7RkWbNEwdiapMEvENBXD?=
+ =?us-ascii?Q?AHhMlt3LZ86TOuMatDVeyAzVirMF92q1hUak9OHDwPHPw3/nAesH6VGNa9+O?=
+ =?us-ascii?Q?qc0JIDl/bML1sHwz8SmJcuaJ+rKEkg+ZzviMkbYHmF9MlrMTnEUlG/ElOpMA?=
+ =?us-ascii?Q?8j3WL0paxUVWN0qAHXc6upljWkJ7yVFvr5uaJHgQ7TRUtyiXizt4KgJ9gA+0?=
+ =?us-ascii?Q?Vb37jEEM8oZnC3NLKbbf9ZCMP9z/i01oZM26nkaPzD3hEHl90nTc1baj+qca?=
+ =?us-ascii?Q?Y513vsUKZrCGw5up6eJVX0XgWBL2WM0200qpczpgNPQxpuUM4r/LSZhzwNZw?=
+ =?us-ascii?Q?phjC0YV4bc7k8c8EbRVTZGy34Kky/mLokB+ffoKOB/556F2qR+E1OX1lE7/q?=
+ =?us-ascii?Q?SKClaDJjcnic9UcONTntaFvXkM+t4HWi82kmeDZFeyMQTZJtkJ00Oc5cu+6K?=
+ =?us-ascii?Q?7xyhHZyeTKQZvxnl9905+obNS26utglNl+JWcHPbXRfjSHDvZh/VR+O5rnzo?=
+ =?us-ascii?Q?mQfhJlhQUKdvf+exZoUk2PhIy3k/FZDdzuU22oWo6az8ITn7pCr0AdrAFdPs?=
+ =?us-ascii?Q?+KkaRkyu3AhjOU4+jETzgSotr3S9eCS0ha2b0mYp68b1ctK4pzYnM8hiAEUk?=
+ =?us-ascii?Q?eHjG1V9sGiKNF47XUVQGo952wfRi3M2t/QNICMswKSweBFa+LUa+Zfmj5rQ4?=
+ =?us-ascii?Q?Y4hUtWYLyj+dfREKWu1EZr+ruBJoMyQx9+tEQVM06yavXVeT04td7YLeDaUs?=
+ =?us-ascii?Q?15niaQY+6mVaX1+cYYggoALa0t9LzvfuJmjkqYIUWtr0nVRiReYvnF5rhDRn?=
+ =?us-ascii?Q?fDGjcnOLYOfQR7cNm+Q2qE8zd+fpmgQkL/AQ46yHyhdgVxV3INUn2Wd5MqQE?=
+ =?us-ascii?Q?bRoIaCocEgpngOxZZx+wEDVBiaE918NDQqhVvUwUrvcFuwGdfpg5W1eGDOHH?=
+ =?us-ascii?Q?QgiNRq4YpF3/U4jTKVhkI5Flx3fjD8ad/Y5hteiDgjf36Jeuu+LAN08lSxZN?=
+ =?us-ascii?Q?RyOvwArFXdas5epQwK6RP4qebEJ+GPOHfnZs4tula3oyFjMpFq4fvuBM6iVI?=
+ =?us-ascii?Q?iJu/7M498xpGarZmW7902O2NZUhDGS38FSoadv8ovePp/bPGy+4HEhnfZQbL?=
+ =?us-ascii?Q?oqT24jkNHec6zAtfE2EdZTUhG9ikOlWsbVCEwACvfT34NV7TaFJd6sAZBmVy?=
+ =?us-ascii?Q?yJZPTxLh6xFn2Dxo4U2rgSP5+LtnTqhJ/ZAhcFKgk8AJctc3vzFpBj6DK3RA?=
+ =?us-ascii?Q?TRxxwcCyBdPxQcKPpf4Wt3kazncKJ8u4YNY0k6qi2+A3CqRqWkJv7DaPTMAB?=
+ =?us-ascii?Q?8miERrjvfQsFeybHLsQ29TviL0ep5S75pxTXwdfhxJGtFTzlopjx1hUoiT9E?=
+ =?us-ascii?Q?QQ=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf-next v3 07/11] bpf: Fix a false rejection caused by
- AND operation
-Content-Language: en-US
-To: Yonghong Song <yonghong.song@linux.dev>,
- Eduard Zingerman <eddyz87@gmail.com>, bpf@vger.kernel.org,
- netdev@vger.kernel.org, linux-security-module@vger.kernel.org,
- linux-kselftest@vger.kernel.org
-Cc: Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Matt Bobrowski <mattbobrowski@google.com>,
- Brendan Jackman <jackmanb@chromium.org>, Paul Moore <paul@paul-moore.com>,
- James Morris <jmorris@namei.org>, "Serge E . Hallyn" <serge@hallyn.com>,
- Khadija Kamran <kamrankhadijadj@gmail.com>,
- Casey Schaufler <casey@schaufler-ca.com>,
- Ondrej Mosnacek <omosnace@redhat.com>, Kees Cook <keescook@chromium.org>,
- John Johansen <john.johansen@canonical.com>,
- Lukas Bulwahn <lukas.bulwahn@gmail.com>,
- Roberto Sassu <roberto.sassu@huawei.com>,
- Shung-Hsi Yu <shung-hsi.yu@suse.com>
-References: <20240411122752.2873562-1-xukuohai@huaweicloud.com>
- <20240411122752.2873562-8-xukuohai@huaweicloud.com>
- <e62e2971301ca7f2e9eb74fc500c520285cad8f5.camel@gmail.com>
- <f80991aa-3a49-451a-9a82-ac57982dcb28@huaweicloud.com>
- <bdc84c6c-7415-4b84-a883-1988cb5f77d1@linux.dev>
- <576c7c44-d1b4-42c8-8b6e-2e6b93d7547a@huaweicloud.com>
- <3ed8b579-8342-4d74-9050-b0bf6afe5ab3@linux.dev>
- <2ef84dfa-44a9-4d4c-b3b2-9d0b2a2e0d8e@huaweicloud.com>
- <8a8d7802-2429-478e-9835-0b56fde99393@linux.dev>
-From: Xu Kuohai <xukuohai@huaweicloud.com>
-In-Reply-To: <8a8d7802-2429-478e-9835-0b56fde99393@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_Ch0CgDX3JQjWytmrjhTKw--.24004S2
-X-Coremail-Antispam: 1UD129KBjvAXoWfWF15Kw15AF48Xry7AF4DXFb_yoW8uw1xCo
-	Wjgr17Jr1rXF1UGF1UJw1UJr15Jw17JrnrJryUJr13Gr10yw4UX3y8JryUJ3yUtr18Wr1U
-	Ar1UJryUAFyUJr18n29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73VFW2AGmfu7bjvjm3
-	AaLaJ3UjIYCTnIWjp_UUUYj7kC6x804xWl14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK
-	8VAvwI8IcIk0rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4
-	AK67xGY2AK021l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF
-	7I0E14v26r4UJVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7
-	CjxVAFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8C
-	rVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4
-	IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrwACI402YVCY1x02628vn2kIc2xKxwCF04k20xvY
-	0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I
-	0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_GFv_WrylIxkGc2Ij64vIr41lIxAI
-	cVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcV
-	CF04k26cxKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280
-	aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU1c4S7UUUUU==
-X-CM-SenderInfo: 50xn30hkdlqx5xdzvxpfor3voofrz/
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH8PR11MB7965.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5aeac992-94ea-42f2-fb94-08dc65c49492
+X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Apr 2024 07:43:35.9992
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Ge0kKGnwaLHTj/SZoJBsD0o8Ow9zNrciGi3zxoJBH+TZicvBhwZOGOdD8eWelaBMkxdOLxGdZdZN6qU8Xn1allLtqjqMoUGrQ8FqIIHM7wQ=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR11MB6106
 
-On 4/26/2024 12:28 AM, Yonghong Song wrote:
-> 
-> On 4/24/24 7:42 PM, Xu Kuohai wrote:
->> On 4/25/2024 6:06 AM, Yonghong Song wrote:
->>>
->>> On 4/23/24 7:25 PM, Xu Kuohai wrote:
->>>> On 4/24/2024 5:55 AM, Yonghong Song wrote:
->>>>>
->>>>> On 4/20/24 1:33 AM, Xu Kuohai wrote:
->>>>>> On 4/20/2024 7:00 AM, Eduard Zingerman wrote:
->>>>>>> On Thu, 2024-04-11 at 20:27 +0800, Xu Kuohai wrote:
->>>>>>>> From: Xu Kuohai <xukuohai@huawei.com>
->>>>>>>>
->>>>>>>> With lsm return value check, the no-alu32 version test_libbpf_get_fd_by_id_opts
->>>>>>>> is rejected by the verifier, and the log says:
->>>>>>>>
->>>>>>>>    0: R1=ctx() R10=fp0
->>>>>>>>    ; int BPF_PROG(check_access, struct bpf_map *map, fmode_t fmode) @ test_libbpf_get_fd_by_id_opts.c:27
->>>>>>>>    0: (b7) r0 = 0                        ; R0_w=0
->>>>>>>>    1: (79) r2 = *(u64 *)(r1 +0)
->>>>>>>>    func 'bpf_lsm_bpf_map' arg0 has btf_id 916 type STRUCT 'bpf_map'
->>>>>>>>    2: R1=ctx() R2_w=trusted_ptr_bpf_map()
->>>>>>>>    ; if (map != (struct bpf_map *)&data_input) @ test_libbpf_get_fd_by_id_opts.c:29
->>>>>>>>    2: (18) r3 = 0xffff9742c0951a00       ; R3_w=map_ptr(map=data_input,ks=4,vs=4)
->>>>>>>>    4: (5d) if r2 != r3 goto pc+4         ; R2_w=trusted_ptr_bpf_map() R3_w=map_ptr(map=data_input,ks=4,vs=4)
->>>>>>>>    ; int BPF_PROG(check_access, struct bpf_map *map, fmode_t fmode) @ test_libbpf_get_fd_by_id_opts.c:27
->>>>>>>>    5: (79) r0 = *(u64 *)(r1 +8)          ; R0_w=scalar() R1=ctx()
->>>>>>>>    ; if (fmode & FMODE_WRITE) @ test_libbpf_get_fd_by_id_opts.c:32
->>>>>>>>    6: (67) r0 <<= 62                     ; R0_w=scalar(smax=0x4000000000000000,umax=0xc000000000000000,smin32=0,smax32=umax32=0,var_off=(0x0; 0xc000000000000000))
->>>>>>>>    7: (c7) r0 s>>= 63                    ; R0_w=scalar(smin=smin32=-1,smax=smax32=0)
->>>>>>>>    ;  @ test_libbpf_get_fd_by_id_opts.c:0
->>>>>>>>    8: (57) r0 &= -13                     ; R0_w=scalar(smax=0x7ffffffffffffff3,umax=0xfffffffffffffff3,smax32=0x7ffffff3,umax32=0xfffffff3,var_off=(0x0; 0xfffffffffffffff3))
->>>>>>>>    ; int BPF_PROG(check_access, struct bpf_map *map, fmode_t fmode) @ test_libbpf_get_fd_by_id_opts.c:27
->>>>>>>>    9: (95) exit
->>>>>>>>
->>>>>>>> And here is the C code of the prog.
->>>>>>>>
->>>>>>>> SEC("lsm/bpf_map")
->>>>>>>> int BPF_PROG(check_access, struct bpf_map *map, fmode_t fmode)
->>>>>>>> {
->>>>>>>>     if (map != (struct bpf_map *)&data_input)
->>>>>>>>         return 0;
->>>>>>>>
->>>>>>>>     if (fmode & FMODE_WRITE)
->>>>>>>>         return -EACCES;
->>>>>>>>
->>>>>>>>     return 0;
->>>>>>>> }
->>>>>>>>
->>>>>>>> It is clear that the prog can only return either 0 or -EACCESS, and both
->>>>>>>> values are legal.
->>>>>>>>
->>>>>>>> So why is it rejected by the verifier?
->>>>>>>>
->>>>>>>> The verifier log shows that the second if and return value setting
->>>>>>>> statements in the prog is optimized to bitwise operations "r0 s>>= 63"
->>>>>>>> and "r0 &= -13". The verifier correctly deduces that the the value of
->>>>>>>> r0 is in the range [-1, 0] after verifing instruction "r0 s>>= 63".
->>>>>>>> But when the verifier proceeds to verify instruction "r0 &= -13", it
->>>>>>>> fails to deduce the correct value range of r0.
->>>>>>>>
->>>>>>>> 7: (c7) r0 s>>= 63                    ; R0_w=scalar(smin=smin32=-1,smax=smax32=0)
->>>>>>>> 8: (57) r0 &= -13                     ; R0_w=scalar(smax=0x7ffffffffffffff3,umax=0xfffffffffffffff3,smax32=0x7ffffff3,umax32=0xfffffff3,var_off=(0x0; 0xfffffffffffffff3))
->>>>>>>>
->>>>>>>> So why the verifier fails to deduce the result of 'r0 &= -13'?
->>>>>>>>
->>>>>>>> The verifier uses tnum to track values, and the two ranges "[-1, 0]" and
->>>>>>>> "[0, -1ULL]" are encoded to the same tnum. When verifing instruction
->>>>>>>> "r0 &= -13", the verifier erroneously deduces the result from
->>>>>>>> "[0, -1ULL] AND -13", which is out of the expected return range
->>>>>>>> [-4095, 0].
->>>>>>>>
->>>>>>>> To fix it, this patch simply adds a special SCALAR32 case for the
->>>>>>>> verifier. That is, when the source operand of the AND instruction is
->>>>>>>> a constant and the destination operand changes from negative to
->>>>>>>> non-negative and falls in range [-256, 256], deduce the result range
->>>>>>>> by enumerating all possible AND results.
->>>>>>>>
->>>>>>>> Signed-off-by: Xu Kuohai <xukuohai@huawei.com>
->>>>>>>> ---
->>>>>>>
->>>>>>> Hello,
->>>>>>>
->>>>>>> Sorry for the delay, I had to think about this issue a bit.
->>>>>>> I found the clang transformation that generates the pattern this patch
->>>>>>> tries to handle.
->>>>>>> It is located in DAGCombiner::SimplifySelectCC() method (see [1]).
->>>>>>> The transformation happens as a part of DAG to DAG rewrites
->>>>>>> (LLVM uses several internal representations:
->>>>>>>   - generic optimizer uses LLVM IR, most of the work is done
->>>>>>>     using this representation;
->>>>>>>   - before instruction selection IR is converted to Selection DAG,
->>>>>>>     some optimizations are applied at this stage,
->>>>>>>     all such optimizations are a set of pattern replacements;
->>>>>>>   - Selection DAG is converted to machine code, some optimizations
->>>>>>>     are applied at the machine code level).
->>>>>>>
->>>>>>> Full pattern is described as follows:
->>>>>>>
->>>>>>>    // fold (select_cc seteq (and x, y), 0, 0, A) -> (and (sra (shl x)) A)
->>>>>>>    // where y is has a single bit set.
->>>>>>>    // A plaintext description would be, we can turn the SELECT_CC into an AND
->>>>>>>    // when the condition can be materialized as an all-ones register.  Any
->>>>>>>    // single bit-test can be materialized as an all-ones register with
->>>>>>>    // shift-left and shift-right-arith.
->>>>>>>
->>>>>>> For this particular test case the DAG is converted as follows:
->>>>>>>
->>>>>>>                      .---------------- lhs         The meaning of this select_cc is:
->>>>>>>                      |        .------- rhs         `lhs == rhs ? true value : false value`
->>>>>>>                      |        | .----- true value
->>>>>>>                      |        | |  .-- false value
->>>>>>>                      v        v v  v
->>>>>>>    (select_cc seteq (and X 2) 0 0 -13)
->>>>>>>                            ^
->>>>>>> ->                        '---------------.
->>>>>>>    (and (sra (sll X 62) 63)                |
->>>>>>>         -13)                               |
->>>>>>>                                            |
->>>>>>> Before pattern is applied, it checks that second 'and' operand has
->>>>>>> only one bit set, (which is true for '2').
->>>>>>>
->>>>>>> The pattern itself generates logical shift left / arithmetic shift
->>>>>>> right pair, that ensures that result is either all ones (-1) or all
->>>>>>> zeros (0). Hence, applying 'and' to shifts result and false value
->>>>>>> generates a correct result.
->>>>>>>
->>>>>>
->>>>>> Thanks for your detailed and invaluable explanation!
->>>>>
->>>>> Thanks Eduard for detailed explanation. It looks like we could
->>>>> resolve this issue without adding too much complexity to verifier.
->>>>> Also, this code pattern above seems generic enough to be worthwhile
->>>>> with verifier change.
->>>>>
->>>>> Kuohai, please added detailed explanation (as described by Eduard)
->>>>> in the commit message.
->>>>>
->>>>
->>>> Sure, already added, the commit message and the change now is like this:
->>>>
->>>> ---
->>>>
->>>>     bpf: Fix a false rejection caused by AND operation
->>>>
->>>>     With lsm return value check, the no-alu32 version test_libbpf_get_fd_by_id_opts
->>>>     is rejected by the verifier, and the log says:
->>>>
->>>>     0: R1=ctx() R10=fp0
->>>>     ; int BPF_PROG(check_access, struct bpf_map *map, fmode_t fmode) @ test_libbpf_get_fd_by_id_opts.c:27
->>>>     0: (b7) r0 = 0                        ; R0_w=0
->>>>     1: (79) r2 = *(u64 *)(r1 +0)
->>>>     func 'bpf_lsm_bpf_map' arg0 has btf_id 916 type STRUCT 'bpf_map'
->>>>     2: R1=ctx() R2_w=trusted_ptr_bpf_map()
->>>>     ; if (map != (struct bpf_map *)&data_input) @ test_libbpf_get_fd_by_id_opts.c:29
->>>>     2: (18) r3 = 0xffff9742c0951a00       ; R3_w=map_ptr(map=data_input,ks=4,vs=4)
->>>>     4: (5d) if r2 != r3 goto pc+4         ; R2_w=trusted_ptr_bpf_map() R3_w=map_ptr(map=data_input,ks=4,vs=4)
->>>>     ; int BPF_PROG(check_access, struct bpf_map *map, fmode_t fmode) @ test_libbpf_get_fd_by_id_opts.c:27
->>>>     5: (79) r0 = *(u64 *)(r1 +8)          ; R0_w=scalar() R1=ctx()
->>>>     ; if (fmode & FMODE_WRITE) @ test_libbpf_get_fd_by_id_opts.c:32
->>>>     6: (67) r0 <<= 62                     ; R0_w=scalar(smax=0x4000000000000000,umax=0xc000000000000000,smin32=0,smax32=umax32=0,var_off=(0x0; 0xc000000000000000))
->>>>     7: (c7) r0 s>>= 63                    ; R0_w=scalar(smin=smin32=-1,smax=smax32=0)
->>>>     ;  @ test_libbpf_get_fd_by_id_opts.c:0
->>>>     8: (57) r0 &= -13                     ; R0_w=scalar(smax=0x7ffffffffffffff3,umax=0xfffffffffffffff3,smax32=0x7ffffff3,umax32=0xfffffff3,var_off=(0x0; 0xfffffffffffffff3))
->>>>     ; int BPF_PROG(check_access, struct bpf_map *map, fmode_t fmode) @ test_libbpf_get_fd_by_id_opts.c:27
->>>>     9: (95) exit
->>>>
->>>>     And here is the C code of the prog.
->>>>
->>>>     SEC("lsm/bpf_map")
->>>>     int BPF_PROG(check_access, struct bpf_map *map, fmode_t fmode)
->>>>     {
->>>>         if (map != (struct bpf_map *)&data_input)
->>>>                 return 0;
->>>>
->>>>         if (fmode & FMODE_WRITE)
->>>>                 return -EACCES;
->>>>
->>>>         return 0;
->>>>     }
->>>>
->>>>     It is clear that the prog can only return either 0 or -EACCESS, and both
->>>>     values are legal.
->>>>
->>>>     So why is it rejected by the verifier?
->>>>
->>>>     The verifier log shows that the second if and return value setting
->>>>     statements in the prog is optimized to bitwise operations "r0 s>>= 63"
->>>>     and "r0 &= -13". The verifier correctly deduces that the the value of
->>>>     r0 is in the range [-1, 0] after verifing instruction "r0 s>>= 63".
->>>>     But when the verifier proceeds to verify instruction "r0 &= -13", it
->>>>     fails to deduce the correct value range of r0.
->>>>
->>>>     7: (c7) r0 s>>= 63                    ; R0_w=scalar(smin=smin32=-1,smax=smax32=0)
->>>>     8: (57) r0 &= -13                     ; R0_w=scalar(smax=0x7ffffffffffffff3,umax=0xfffffffffffffff3,smax32=0x7ffffff3,umax32=0xfffffff3,var_off=(0x0; 0xfffffffffffffff3))
->>>>
->>>>     So why the verifier fails to deduce the result of 'r0 &= -13'?
->>>>
->>>>     The verifier uses tnum to track values, and the two ranges "[-1, 0]" and
->>>>     "[0, -1ULL]" are encoded to the same tnum. When verifing instruction
->>>>     "r0 &= -13", the verifier erroneously deduces the result from
->>>>     "[0, -1ULL] AND -13", which is out of the expected return range
->>>>     [-4095, 0].
->>>>
->>>>     As explained by Eduard in [0], the clang transformation that generates this
->>>>     pattern is located in DAGCombiner::SimplifySelectCC() method (see [1]).
->>>>
->>>>     The transformation happens as a part of DAG to DAG rewrites
->>>>     (LLVM uses several internal representations:
->>>>      - generic optimizer uses LLVM IR, most of the work is done
->>>>        using this representation;
->>>>      - before instruction selection IR is converted to Selection DAG,
->>>>        some optimizations are applied at this stage,
->>>>        all such optimizations are a set of pattern replacements;
->>>>      - Selection DAG is converted to machine code, some optimizations
->>>>        are applied at the machine code level).
->>>>
->>>>     Full pattern is described as follows:
->>>>
->>>>       // fold (select_cc seteq (and x, y), 0, 0, A) -> (and (sra (shl x)) A)
->>>>       // where y is has a single bit set.
->>>>       // A plaintext description would be, we can turn the SELECT_CC into an AND
->>>>       // when the condition can be materialized as an all-ones register.  Any
->>>>       // single bit-test can be materialized as an all-ones register with
->>>>       // shift-left and shift-right-arith.
->>>>
->>>>     For this particular test case the DAG is converted as follows:
->>>>
->>>>                         .---------------- lhs         The meaning of this select_cc is:
->>>>                         |        .------- rhs         `lhs == rhs ? true value : false value`
->>>>                         |        | .----- true value
->>>>                         |        | |  .-- false value
->>>>                         v        v v  v
->>>>       (select_cc seteq (and X 2) 0 0 -13)
->>>>                               ^
->>>>     ->                        '---------------.
->>>>       (and (sra (sll X 62) 63)                |
->>>>            -13)                               |
->>>>                                               |
->>>>     Before pattern is applied, it checks that second 'and' operand has
->>>>     only one bit set, (which is true for '2').
->>>>
->>>>     The pattern itself generates logical shift left / arithmetic shift
->>>>     right pair, that ensures that result is either all ones (-1) or all
->>>>     zeros (0). Hence, applying 'and' to shifts result and false value
->>>>     generates a correct result.
->>>>
->>>>     As suggested by Eduard, this patch makes a special case for source
->>>>     or destination register of '&=' operation being in range [-1, 0].
->>>>
->>>>     Meaning that one of the '&=' operands is either:
->>>>     - all ones, in which case the counterpart is the result of the operation;
->>>>     - all zeros, in which case zero is the result of the operation.
->>>>
->>>>     And MIN and MAX values could be derived based on above two observations.
->>>>
->>>>     [0] https://lore.kernel.org/bpf/e62e2971301ca7f2e9eb74fc500c520285cad8f5.camel@gmail.com/
->>>>     [1] https://github.com/llvm/llvm-project/blob/4523a267829c807f3fc8fab8e5e9613985a51565/llvm/lib/CodeGen/SelectionDAG/DAGCombiner.cpp
->>>>
->>>>     Suggested-by: Eduard Zingerman <eddyz87@gmail.com>
->>>>     Signed-off-by: Xu Kuohai <xukuohai@huawei.com>
->>>>
->>>> diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
->>>> index 640747b53745..30c551d39329 100644
->>>> --- a/kernel/bpf/verifier.c
->>>> +++ b/kernel/bpf/verifier.c
->>>> @@ -13374,6 +13374,24 @@ static void scalar32_min_max_and(struct bpf_reg_state *dst_reg,
->>>>         dst_reg->u32_min_value = var32_off.value;
->>>>         dst_reg->u32_max_value = min(dst_reg->u32_max_value, umax_val);
->>>>
->>>> +       /* Special case: src_reg is known and dst_reg is in range [-1, 0] */
->>>> +       if (src_known &&
->>>> +               dst_reg->s32_min_value == -1 && dst_reg->s32_max_value == 0 &&
->>>> +               dst_reg->smin_value == -1 && dst_reg->smax_value == 0) {
->>>
->>> do we need to check dst_reg->smin_value/smax_value here? They should not impact
->>> final dst_reg->s32_{min,max}_value computation, right?
->>
->> right, the check was simply copied from the old code, which only handled
->> the case where 64-bit range is the same as the 32-bit range
-> 
-> What if we do not have 64bit smin_value/smax_value check? Could you give more
-> explanation here? In my opinion, deducing lower 32bit range should not care
-> upper 32bit values.
->
+Agreed about the tradeoff.=20
 
-I agree that for AND operation there's no need to check the upper 32bit. But
-for other operations, we may need to consider the impact of upper 32bit overflow.
+From your previous entry in this thread:
+>Renegotiation does take a little over 1s. It maybe not worth it for suspen=
+d to RAM. But for suspend to disk, a resume is probably going to take awhil=
+e, so maybe 1 second is less noticeable.
+With some of the partner PHYs we've used, specially when supporting higher =
+speeds such as 2.5G we had seen even much longer renegotiation times, reach=
+ing as much as 6-7 seconds in some cases. =20
 
-I added 64bit check in the old patch is to make sure the special case only works
-when 64bit and 32bit ranges are the same since ranges are the same in the failure
-verifier log.
+Raju,
+Due to the above and some of the other issues you mentioned you are facing =
+(i.e. undesired wakes on intermediate link changes that you would need to "=
+filter out" ) , I'd  rather not try to further optimize phy power consumpti=
+on by down-speeding the link at this time, and keep fast resume time and ov=
+erall simplicity the priority. If/when customers request it or power regula=
+tory norms (EU as mentioned by Andrew) make it a must have we can always re=
+visit it. That being said, after verifying wake functionality is correct as=
+ the first priority, please do look into turning off anything in the LAN743=
+x  and PCI11x1x devices that is not needed while asleep before completing t=
+he suspend.
 
->>
->>> Similarly, for later 64bit min/max and, 32bit value does not really matter.
->>>
->>
->> hmm, the 32-bit check is completely unnecessary.
->>
->>
->>>> + dst_reg->s32_min_value = min_t(s32, src_reg->s32_min_value, 0);
->>>> +               dst_reg->s32_max_value = max_t(s32, src_reg->s32_min_value, 0);
->>>> +               return;
->>>> +       }
->>>> +
->>>> +       /* Special case: dst_reg is known and src_reg is in range [-1, 0] */
->>>> +       if (dst_known &&
->>>> +               src_reg->s32_min_value == -1 && src_reg->s32_max_value == 0 &&
->>>> +               src_reg->smin_value == -1 && src_reg->smax_value == 0) {
->>>> +               dst_reg->s32_min_value = min_t(s32, dst_reg->s32_min_value, 0);
->>>> +               dst_reg->s32_max_value = max_t(s32, dst_reg->s32_min_value, 0);
->>>> +               return;
->>>> +       }
->>>> +
->>>>         /* Safe to set s32 bounds by casting u32 result into s32 when u32
->>>>          * doesn't cross sign boundary. Otherwise set s32 bounds to unbounded.
->>>>          */
->>>> @@ -13404,6 +13422,24 @@ static void scalar_min_max_and(struct bpf_reg_state *dst_reg,
->>>>         dst_reg->umin_value = dst_reg->var_off.value;
->>>>         dst_reg->umax_value = min(dst_reg->umax_value, umax_val);
->>>>
->>>> +       /* Special case: src_reg is known and dst_reg is in range [-1, 0] */
->>>> +       if (src_known &&
->>>> +               dst_reg->smin_value == -1 && dst_reg->smax_value == 0 &&
->>>> +               dst_reg->s32_min_value == -1 && dst_reg->s32_max_value == 0) {
->>>> +               dst_reg->smin_value = min_t(s64, src_reg->smin_value, 0);
->>>> +               dst_reg->smax_value = max_t(s64, src_reg->smin_value, 0);
->>>> +               return;
->>>> +       }
->>>> +
->>>> +       /* Special case: dst_reg is known and src_reg is in range [-1, 0] */
->>>> +       if (dst_known &&
->>>> +               src_reg->smin_value == -1 && src_reg->smax_value == 0 &&
->>>> +               src_reg->s32_min_value == -1 && src_reg->s32_max_value == 0) {
->>>> +               dst_reg->smin_value = min_t(s64, dst_reg->smin_value, 0);
->>>> +               dst_reg->smax_value = max_t(s64, dst_reg->smin_value, 0);
->>>> +               return;
->>>> +       }
->>>> +
->>>>         /* Safe to set s64 bounds by casting u64 result into s64 when u64
->>>>          * doesn't cross sign boundary. Otherwise set s64 bounds to unbounded.
->>>>          */
->>>>
->>>>>>
->>>>>>> In my opinion the approach taken by this patch is sub-optimal:
->>>>>>> - 512 iterations is too much;
->>>>>>> - this does not cover all code that could be generated by the above
->>>>>>>    mentioned LLVM transformation
->>>>>>>    (e.g. second 'and' operand could be 1 << 16).
->>>>>>>
->>>>>>> Instead, I suggest to make a special case for source or dst register
->>>>>>> of '&=' operation being in range [-1,0].
->>>>>>> Meaning that one of the '&=' operands is either:
->>>>>>> - all ones, in which case the counterpart is the result of the operation;
->>>>>>> - all zeros, in which case zero is the result of the operation;
->>>>>>> - derive MIN and MAX values based on above two observations.
->>>>>>>
->>>>>>
->>>>>> Totally agree, I'll cook a new patch as you suggested.
->>>>>>
->>>>>>> [1] https://github.com/llvm/llvm-project/blob/4523a267829c807f3fc8fab8e5e9613985a51565/llvm/lib/CodeGen/SelectionDAG/DAGCombiner.cpp#L5391
->>>>>>>
->>>>>>> Best regards,
->>>>>>> Eduard
->>>>>>
->>>>>>
->>>>>
->>>>
->>
-> 
+Thanks,
+Ronnie=20
 
+> -----Original Message-----
+> From: Andrew Lunn <andrew@lunn.ch>
+> Sent: Thursday, April 25, 2024 10:13 AM
+> To: Raju Lakkaraju - I30499 <Raju.Lakkaraju@microchip.com>
+> Cc: netdev@vger.kernel.org; davem@davemloft.net; kuba@kernel.org; pabeni@=
+redhat.com;
+> edumazet@google.com; linux-kernel@vger.kernel.org; Bryan Whitehead - C219=
+58
+> <Bryan.Whitehead@microchip.com>; UNGLinuxDriver <UNGLinuxDriver@microchip=
+.com>
+> Subject: Re: [PATCH net V2 2/2] net: lan743x: support WOL in MAC even whe=
+n PHY does not
+>=20
+> EXTERNAL EMAIL: Do not click links or open attachments unless you know th=
+e content is safe
+>=20
+> > If PHY handles the magic packet or phy activity (i.e. WAKE_MAGIC or WAK=
+E_PHY), our PCI11x1x's
+> MAC will handle only interrupt (MDINT from PHY). Not MAC's magic packet.
+> > In this case do we really call phy_speed_down( ) ?
+>=20
+> phy_speed_down() is orthogonal to who does the wake. Packets are packets.=
+ phy_speed_down() does
+> not change that. All it does it drop the link to a slower speed. And slow=
+er speed means less power
+> consumption. A PHY operating at 10Mbps uses about 1W less power than a PH=
+Y operating at 1G. The
+> numbers will depend on the PHY, but you get the idea. Plus the link peer =
+will also save a similar amount
+> out power....
+>=20
+> If the MAC is needed for WoL, because the PHY does not support the needed=
+ modes, you probably also
+> save power with the MAC running at 10Mbps. Its clocks probably tick slowe=
+r, etc.
+>=20
+> But there is a trade off. When resuming, you want to go back to the full =
+speed link. And that takes time,
+> a little over 1 second. So you need to decide, do you want to prioritise =
+minimum power consumption
+> when suspended, or fast resume?
+>=20
+>      Andrew
 
