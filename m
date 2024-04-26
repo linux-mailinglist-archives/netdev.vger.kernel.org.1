@@ -1,76 +1,93 @@
-Return-Path: <netdev+bounces-91504-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91507-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 508718B2E7D
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 03:57:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B9A88B2E85
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 04:00:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 032531F234DA
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 01:57:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9F23A1C220DA
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 02:00:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51FEEEBE;
-	Fri, 26 Apr 2024 01:56:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0675C1869;
+	Fri, 26 Apr 2024 02:00:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PTo33jvT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uYpx9lgg"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E80417C2
-	for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 01:56:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C944517C2;
+	Fri, 26 Apr 2024 02:00:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714096618; cv=none; b=PW+ocIX++X28V2AgoFbb7zF71VQLw4RpAMerE2biJFhWmczZmGGg3mW1ZPcACcjrfq2laoeSqQ6i8LM7rszVLnvYe142gIb+hCwYuexFQBmYzCnxNmELFbF7ncrnOQ23/W6/rq1rcvmb0wjfCay72086qZ8pHYc2g4tY7jaeq3w=
+	t=1714096828; cv=none; b=iu/MNvatSoDgjwJxP6Y6BudV5au5IK+xLSoLHjkXwtgUJ55eo91mrcxpo4FhfCV0tv57QbZHr7IAtHeBfj7ajojCgwdS+GfuMC6kf4fsoAAwqLn9NdClI3MuUa0RhY8InRhBQ90juwDepuydRcMkdb0f5q+i0Sv2FLp5fU2KL90=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714096618; c=relaxed/simple;
-	bh=tuViYu7Tm2HqOyts9R3r9Cz566SZObqSwBFbUnSA3DY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Qnzviyw9+U4/TikBeoxpSWly/bv0c1Gj9bQvtKqSUSz2pRs/ga/4CKUJc/gY0FjTJATl9+2HsX74kocn2eK7ewy8dOthv0Ic9dp7ffuzxhWZLHvHaSkz2lES/kEQo2gwawyzpFjO+0Jw35B51eksBC/8Leh2+MRqAL1PStVjqKs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PTo33jvT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 59D66C113CC;
-	Fri, 26 Apr 2024 01:56:57 +0000 (UTC)
+	s=arc-20240116; t=1714096828; c=relaxed/simple;
+	bh=DsIPGBLVH9lP/uIBGNBcKjMAl/KaQOIkK8PtsASW7zc=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=lPMFoVwb/tVyDRjHvbcGWYtrwn63vQvM+4+sTo7MLNQEC4kmyJwbbCdFtEjlv+pgxWgAp+Zz9PRZKEubtX25EtqvEXYMmH3LbY3gTk3igGAxl7WIDj9wTAAk5HyLckAcIQrdI/NiGEwS2hBahAxsk6GHn/rlvmMFRsXBbcWqFh8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uYpx9lgg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 630E2C2BD11;
+	Fri, 26 Apr 2024 02:00:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714096617;
-	bh=tuViYu7Tm2HqOyts9R3r9Cz566SZObqSwBFbUnSA3DY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=PTo33jvTo0rrocE1NUkhT4w6rcYBLtQIZA3e8BgHeY+oNwbB6DTyV1yy5imlKm4RI
-	 MMdpzrZvq6Tp1AtKEadWzW8TkIutfa0Q3zbX4VTwlcZTxGKpKqMl9w4r5Rx0tR9JY7
-	 ADlv52f12C31af5GM2sIA0qNzXDCQs+Yh8bE2pdS9Z50iF/rNmDqXdBDPL4neEsRSi
-	 EiyU0fbrtuAmga40He5cQAxp6zsnViHQYu7+tL+yM7t0PQCLl1ujbin+XLsgJzskOY
-	 HfyF8O7jwMGQOb7oWPg9wEnC0iDDfd73Fd9Bf34QgxQo+GDZOYnlzvbhOnkiWtp2of
-	 NxoOMaHPXva5A==
-Date: Thu, 25 Apr 2024 18:56:56 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: David Wei <dw@davidwei.uk>
-Cc: netdev@vger.kernel.org, Willem de Bruijn
- <willemdebruijn.kernel@gmail.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next v3 1/2] netdevsim: add NAPI support
-Message-ID: <20240425185656.452b31b4@kernel.org>
-In-Reply-To: <20240424023624.2320033-2-dw@davidwei.uk>
-References: <20240424023624.2320033-1-dw@davidwei.uk>
-	<20240424023624.2320033-2-dw@davidwei.uk>
+	s=k20201202; t=1714096828;
+	bh=DsIPGBLVH9lP/uIBGNBcKjMAl/KaQOIkK8PtsASW7zc=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=uYpx9lgglPuNknkAFBHiSoS02w3oAtZU7hLe0h/sSS4VC2dfo2gsSv/qR2dK4q2q5
+	 rVN/jOQn0vbhhlrbUbB7UlDc0ZRF1mZq+DiASMdcQn5Z26nHHjLrHPER76AhXfv0SB
+	 F5zy/ki6u+pZc+kkKmre2iC1Rxk8oKeAiWRMnJn0ZurU9UGwyO0BKNhSn1SfwxBZso
+	 hhAw1DUEZH1876Bu7xxMUI+0YWzIWLAYfkfCqRQ1AqZwZVhZ7sIzSLSDS4Bw9nuIxF
+	 9cSFyPfzywVibsGXl2kA3GoLAcyyidhspiT93Lcly883z+IYhZ2jejbU1Ac8iJ+D+I
+	 pOmjLnKetNeUw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4A600C595CE;
+	Fri, 26 Apr 2024 02:00:28 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2] net: usb: ax88179_178a: Add check for
+ usbnet_get_endpoints()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171409682830.30663.14820286388117700989.git-patchwork-notify@kernel.org>
+Date: Fri, 26 Apr 2024 02:00:28 +0000
+References: <20240424065634.1870027-1-make_ruc2021@163.com>
+In-Reply-To: <20240424065634.1870027-1-make_ruc2021@163.com>
+To: Ma Ke <make_ruc2021@163.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, jtornosm@redhat.com, andrew@lunn.ch, horms@kernel.org,
+ hkallweit1@gmail.com, linux-usb@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
-On Tue, 23 Apr 2024 19:36:23 -0700 David Wei wrote:
-> Add NAPI support to netdevim, similar to veth.
+Hello:
+
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Wed, 24 Apr 2024 14:56:34 +0800 you wrote:
+> To avoid the failure of usbnet_get_endpoints(), we should check the
+> return value of the usbnet_get_endpoints().
 > 
-> * Add a nsim_rq rx queue structure to hold a NAPI instance and a skb
->   queue.
-> * During xmit, store the skb in the peer skb queue and schedule NAPI.
-> * During napi_poll(), drain the skb queue and pass up the stack.
-> * Add assoc between rxq and NAPI instance using netif_queue_set_napi().
+> Signed-off-by: Ma Ke <make_ruc2021@163.com>
+> ---
+>  drivers/net/usb/ax88179_178a.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
 
-This one LG, FWIW.
+Here is the summary with links:
+  - [v2] net: usb: ax88179_178a: Add check for usbnet_get_endpoints()
+    https://git.kernel.org/netdev/net-next/c/3837639ebfdd
+
+You are awesome, thank you!
 -- 
-pw-bot: cr
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
