@@ -1,88 +1,99 @@
-Return-Path: <netdev+bounces-91853-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91854-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C96D08B42D9
-	for <lists+netdev@lfdr.de>; Sat, 27 Apr 2024 01:52:19 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0AACD8B42DF
+	for <lists+netdev@lfdr.de>; Sat, 27 Apr 2024 01:56:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 069831C225AF
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 23:52:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2F0EAB2106D
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 23:56:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8CA43BBE1;
-	Fri, 26 Apr 2024 23:52:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C97153C463;
+	Fri, 26 Apr 2024 23:56:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Jqsc11mz"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="lDVxE0l6"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71E083BBC5;
-	Fri, 26 Apr 2024 23:52:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E3733BBCE
+	for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 23:56:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714175535; cv=none; b=KjPpGYEQ9ggHPmYY09XI4FIpHX+1IuLHRPzbseQaS7jE2BtGIOD4tT1eBdcVvC/AmK3Gac1psyZGdVHD03001CbQFsbl0OE21hTX5l2DUhwJerP9fgc6d9p13sZvq89ZCmotGPXUFSX9zZ1gLNXSRvZm5iUw83VcIAfZDnl0BOU=
+	t=1714175768; cv=none; b=g2iszb9/03g3x0YN4GFKntJ14x9cHLQ9ksjHK7drBcjsmVxrhPcWOmAmKzqMb+ofSK/QliNpcUa9eNiUnC7uqB4X8lwdit8Ow18ek/Sl7nDkiBPhQipyvA0D23EJ8ukar+eHtyFkefARRS/G1FGwhxDTY/YA4pAA4e8HcmFSo40=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714175535; c=relaxed/simple;
-	bh=H/sLcQKdw9O29se32jTxTWE1RQxSOatw8x3g3EsaaCw=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Yr8o2YUtiHQVjkz3haBakhphkAL3pRk9w9UtlInajDIXURF79WEBGLLA0ueikLFTM16n8VSyxG6KV9Xp52G0+eemgRKUqqhvPcibETzEHbyA+UN0uFvzySpPHrKlv04FLEMQaw7xG8xfHQlPt1Pm5ONQYUmYvgFZyqXClG4yNcw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Jqsc11mz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 618CFC113CD;
-	Fri, 26 Apr 2024 23:52:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714175534;
-	bh=H/sLcQKdw9O29se32jTxTWE1RQxSOatw8x3g3EsaaCw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Jqsc11mzcF+Ti0Cr1i/rzdC1wnB5utX0rXr6TsRCf2xyh2CeSl4WJPE4zLPqgyOtl
-	 RaevFikEgloO38h8pMH41z4Vy9IMVVDswj59pNLvhdXF/FSQajKyYqSPwqn0wUMvPM
-	 GmOBD/s2/UHsy5bpIVd7XMTF7iMSO0WPZOe/lJSsUKvPWsmip37yJNE7A5FhVACkei
-	 KJtxUo/4qoR+h+eb8nC+aw1CUU1qYTHX/6yJjKVvBTBkS2SN7xFJBUHl3jikTUUZ5z
-	 9o3SZAOxOWCWfK3X+OfBxi4h/KbLE9+ZEeiBn8lUjQSrqCxUnfZrU3rNzNWcAzMyX9
-	 m8kkVk9oXFk0A==
-Date: Fri, 26 Apr 2024 16:52:13 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Joe Damato <jdamato@fastly.com>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, tariqt@nvidia.com,
- saeedm@nvidia.com, mkarsten@uwaterloo.ca, gal@nvidia.com,
- nalramli@fastly.com, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, "open list:MELLANOX
- MLX4 core VPI driver" <linux-rdma@vger.kernel.org>
-Subject: Re: [PATCH net-next v2 1/3] net/mlx4: Track RX allocation failures
- in a stat
-Message-ID: <20240426165213.298d8409@kernel.org>
-In-Reply-To: <Ziw8OSchaOaph1i8@LQ3V64L9R2>
-References: <20240426183355.500364-1-jdamato@fastly.com>
-	<20240426183355.500364-2-jdamato@fastly.com>
-	<20240426130017.6e38cd65@kernel.org>
-	<Ziw8OSchaOaph1i8@LQ3V64L9R2>
+	s=arc-20240116; t=1714175768; c=relaxed/simple;
+	bh=h35Bs0TjvjT5HMdqr6jDsiFes2b5MmRn8YsZIluWb3U=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=VoU5OLrFFLIuiMLzAhS5bPJWa3eyE8XesTzjh0xOPXbcGw0R4iwtQuZTrmbIR7rpqpURr6yl/a06urQAClwSv7GgEGNp35Z9bPXKvrCRp4Yjd2sZN2u6EnE/kppmzeAFOVuxDQP4eaOC5PeWAX/iTTtn2Dcaz8fUY+YoLTE5qxw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=lDVxE0l6; arc=none smtp.client-ip=95.215.58.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <c20eb574-22f4-49f8-a213-5ff57eb6222e@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1714175763;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/WB70c0JO1javGJ5ouAAz9GvqmsyBQq5+3gEbrQGxvU=;
+	b=lDVxE0l6gvF77tXSsj8hn5zx/V5zIfVbKZonEfyXmEcYVJHUUzs8tEVwYI7ADjFx5zpo8S
+	Ypjefc5ycidSx6N/Y13j8YDZ5++SaTTQkH901geqh/GaTgMG19SQAfEcgcQRyFjNC0KuNz
+	npYdiOPSY6K7kFECeqZbshwnXlD+Q0s=
+Date: Fri, 26 Apr 2024 16:55:57 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Subject: Re: [RFC PATCH bpf-next v5 2/2] net: Add additional bit to support
+ clockid_t timestamp type
+To: Abhishek Chauhan <quic_abchauha@quicinc.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Andrew Halaney <ahalaney@redhat.com>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Martin KaFai Lau <martin.lau@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, bpf <bpf@vger.kernel.org>,
+ kernel@quicinc.com
+References: <20240424222028.1080134-1-quic_abchauha@quicinc.com>
+ <20240424222028.1080134-3-quic_abchauha@quicinc.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <20240424222028.1080134-3-quic_abchauha@quicinc.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Fri, 26 Apr 2024 16:43:53 -0700 Joe Damato wrote:
-> > In case of mlx4 looks like the buffer refill is "async", the driver
-> > tries to refill the buffers to max, but if it fails the next NAPI poll
-> > will try again. Allocation failures are not directly tied to packet
-> > drops. In case of bnxt if "replacement" buffer can't be allocated -
-> > packet is dropped and old buffer gets returned to the ring (although 
-> > if I'm 100% honest bnxt may be off by a couple, too, as the OOM stat
-> > gets incremented on ifup pre-fill failures).  
-> 
-> Yes, I see that now. I'll drop this patch entirely from v3 and just leave
-> the other two and remove alloc_fail from the queue stats patch.
+On 4/24/24 3:20 PM, Abhishek Chauhan wrote:
+> diff --git a/net/ipv6/ip6_output.c b/net/ipv6/ip6_output.c
+> index a9e819115622..63e4cc30d18d 100644
+> --- a/net/ipv6/ip6_output.c
+> +++ b/net/ipv6/ip6_output.c
+> @@ -955,7 +955,7 @@ int ip6_fragment(struct net *net, struct sock *sk, struct sk_buff *skb,
+>   			if (iter.frag)
+>   				ip6_fraglist_prepare(skb, &iter);
+>   
+> -			skb_set_delivery_time(skb, tstamp, tstamp_type);
+> +			skb_set_tstamp_type_frm_clkid(skb, tstamp, tstamp_type);
+>   			err = output(net, sk, skb);
+>   			if (!err)
+>   				IP6_INC_STATS(net, ip6_dst_idev(&rt->dst),
+> @@ -1016,7 +1016,7 @@ int ip6_fragment(struct net *net, struct sock *sk, struct sk_buff *skb,
+>   		/*
+>   		 *	Put this fragment into the sending queue.
+>   		 */
+> -		skb_set_delivery_time(frag, tstamp, tstamp_type);
+> +		skb_set_tstamp_type_frm_clkid(frag, tstamp, tstamp_type);
+>   		err = output(net, sk, frag);
+>   		if (err)
+>   			goto fail;
 
-Up to you, but I'd keep alloc_fail itself.
-If mlx4 gets page pool support one day it will be useful to run this:
-https://lore.kernel.org/all/20240426232400.624864-1-kuba@kernel.org/
-
-And I think it's useful to be able to check in case there are Rx
-discards whether the system was also under transient memory pressure 
-or not.
+When replying another thread and looking closer at the ip6 changes, these two 
+line changes should not be needed.
 
