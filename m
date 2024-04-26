@@ -1,182 +1,103 @@
-Return-Path: <netdev+bounces-91732-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91750-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DCAF08B3A46
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 16:44:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04A008B3C36
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 18:01:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 98A3B285C66
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 14:44:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 81C1C28343B
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 16:01:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9F2F146016;
-	Fri, 26 Apr 2024 14:44:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5EB414B09E;
+	Fri, 26 Apr 2024 16:00:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QxHf3Tve"
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="uGlfKuSL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78FC634CD8;
-	Fri, 26 Apr 2024 14:44:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CDED149C4B;
+	Fri, 26 Apr 2024 16:00:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714142678; cv=none; b=R71xR2lrSCCxFVfqsVFLIz/EYyx9sfrcKLdbWVJB5/D7R/46U6OrgmUyCpUORIxvLQBg+Gk2uMJtdG3PIflKvw/MydKPaiJWKiHqRpyHhMcUnepGjTwEBH8ujtpWsCUDtZIQlO7SwC/ZEH/FA2acc0IUlN2ZiT+YGbPfB3ZTPrM=
+	t=1714147254; cv=none; b=Rr9h6IG+xVHopPOnI4+AzDdeE5mbAPWHiZrzl9Xm5t/4zP5jSnjngr3d9MZXnVzzajFKd0cnCkbOKLG7FxcF7jIvN1setzSjevmsgMW8+z1iBam7ASV1itJo4VNR7HZxOz9jIalLAznJP7AUphRtFxTiNZqDH5XCIWoJrGzjnJg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714142678; c=relaxed/simple;
-	bh=c0dO8Re1PPSOl6/PX/WShnH30RI1DTXQ2uGy1lx3ZGY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=sj9SO98A11SLfDxndMicwYessahSdIcak3aZ5+8csxlLEqN9Q8yBcEkW1Noh8dWoiAEsKNHIoTku9S7Fp9/H1xCujWHVA3ws6jNkmcOHSBuFUUpKJS7NrbVttHtwWllFUdLjugsu8nA5tWthcKT7esv+1oyxdVUYDf2AHbuuLE8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QxHf3Tve; arc=none smtp.client-ip=198.175.65.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1714142677; x=1745678677;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=c0dO8Re1PPSOl6/PX/WShnH30RI1DTXQ2uGy1lx3ZGY=;
-  b=QxHf3TveYWXhXkZs6VpVLsMZ8hCHVNxNzGmRuJ5SDkv5NciWWk45Xut0
-   US/KD4LApuDQ8VbilrbLhbvyx90hJVP/3oOByjv7yEYMouKaBQPT5TBBa
-   vvOE4CS6cIrkxawuG02Lab7kQwHeNIsrXEcOgncH+sowT8eyQgIF0fEWG
-   rPP7XGDToKC0mBblX7WyAxnglr1ePH6KsQ6LPNr9OlapAUHwkPVWb4kgG
-   ZTzGcp40dhhaFENcFdFrO4r35g5vTDrWkxv4Cgue8YcEooaTSwsuo6OCT
-   NoRiNHUGvjm4MrRnNnjb4ktGAg2oh+5IetB1d8jMTdwEhxUiVYGCOkxaq
-   w==;
-X-CSE-ConnectionGUID: XwGv4Kq3Q5CZcv5SOntvgw==
-X-CSE-MsgGUID: RLTt0K/iQze6EvHxFRUytw==
-X-IronPort-AV: E=McAfee;i="6600,9927,11056"; a="21027171"
-X-IronPort-AV: E=Sophos;i="6.07,232,1708416000"; 
-   d="scan'208";a="21027171"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Apr 2024 07:44:36 -0700
-X-CSE-ConnectionGUID: TSpeNl3CRVa+TG14ajS9gA==
-X-CSE-MsgGUID: lRRvpSkZQn6dyH8QEoaxqg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,232,1708416000"; 
-   d="scan'208";a="25441219"
-Received: from newjersey.igk.intel.com ([10.102.20.203])
-  by fmviesa007.fm.intel.com with ESMTP; 26 Apr 2024 07:44:33 -0700
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Michal Kubiak <michal.kubiak@intel.com>,
-	Wojciech Drewek <wojciech.drewek@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	nex.sw.ncis.osdt.itp.upstreaming@intel.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH iwl] idpf: don't enable NAPI and interrupts prior to allocating Rx buffers
-Date: Fri, 26 Apr 2024 16:44:08 +0200
-Message-ID: <20240426144408.1353962-1-aleksander.lobakin@intel.com>
-X-Mailer: git-send-email 2.44.0
+	s=arc-20240116; t=1714147254; c=relaxed/simple;
+	bh=PFmO1GjsH3ZnbXjVv4QA0fj5fCj+YtjfQKAlIFclL5I=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qQrpT6iHRUqRB2+w/GVskFSEjsgkz2UWzYQJy5sc/zi+3H92xo8/MjsfD3fuGRK82nuzLTEdc2BBblv1aZ/jWbAX54vj4TC8Astudx5dkBZfjuT3/dAGFOruChcjo5vztMTV7xGn6D4s4hfnY2CWBVc0Smj5NurP10Rs5cdHbEw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=uGlfKuSL; arc=none smtp.client-ip=85.214.62.61
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Received: from [127.0.0.1] (p578adb1c.dip0.t-ipconnect.de [87.138.219.28])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits))
+	(No client certificate requested)
+	(Authenticated sender: marex@denx.de)
+	by phobos.denx.de (Postfix) with ESMTPSA id D36B588221;
+	Fri, 26 Apr 2024 18:00:44 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+	s=phobos-20191101; t=1714147246;
+	bh=MbBx9Y1hMfZdkFnfEVCvE/hOTF3f77wjPkbrDnF6OaA=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=uGlfKuSLMpDsGs/aW46lZfoPSnPPN9ijCRIEy+VBNcNpuD7hsVmf+/gAHVuRx3iRK
+	 9xnLuq/ijpWbrlfmnokZ8WGNLBB9GSs5yt2QeFwfgW9Dl7OV7+LKZBTWc6XVETiif9
+	 tHm5L1onuijzcxUvykagrn6i4WI03Kt/IH/2w29fYy7GzTkk5QW2vgHhxjEJ2XMiAq
+	 rZsv9lFU58dqkgXFBrkfOSpT2cpoz8JY6am80tgsXcjrXWF6z5VSNGR2BevR2eTZON
+	 Ub45GvVtpGoia+tmRatERcxGYTs2SOeRMy5K+npgubrMfStbabmZ4159bRWekKpyBO
+	 zE4EYNejYy7+Q==
+Message-ID: <2ffaad98-8b43-444e-a4a0-985bee5e6a04@denx.de>
+Date: Fri, 26 Apr 2024 16:46:55 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 01/11] dt-bindings: net: add STM32MP13 compatible in
+ documentation for stm32
+To: Christophe Roullier <christophe.roullier@foss.st.com>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Richard Cochran <richardcochran@gmail.com>, Jose Abreu
+ <joabreu@synopsys.com>, Liam Girdwood <lgirdwood@gmail.com>,
+ Mark Brown <broonie@kernel.org>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <20240426125707.585269-1-christophe.roullier@foss.st.com>
+ <20240426125707.585269-2-christophe.roullier@foss.st.com>
+Content-Language: en-US
+From: Marek Vasut <marex@denx.de>
+In-Reply-To: <20240426125707.585269-2-christophe.roullier@foss.st.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
 
-Currently, idpf enables NAPI and interrupts prior to allocating Rx
-buffers.
-This may lead to frame loss (there are no buffers to place incoming
-frames) and even crashes on quick ifup-ifdown. Interrupts must be
-enabled only after all the resources are here and available.
-Split interrupt init into two phases: initialization and enabling,
-and perform the second only after the queues are fully initialized.
-Note that we can't just move interrupt initialization down the init
-process, as the queues must have correct a ::q_vector pointer set
-and NAPI already added in order to allocate buffers correctly.
-Also, during the deinit process, disable HW interrupts first and
-only then disable NAPI. Otherwise, there can be a HW event leading
-to napi_schedule(), but the NAPI will already be unavailable.
+On 4/26/24 2:56 PM, Christophe Roullier wrote:
+> New STM32 SOC
 
-Fixes: d4d558718266 ("idpf: initialize interrupts and enable vport")
-Reported-by: Michal Kubiak <michal.kubiak@intel.com>
-Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
-Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
----
- drivers/net/ethernet/intel/idpf/idpf_txrx.h |  1 +
- drivers/net/ethernet/intel/idpf/idpf_lib.c  |  1 +
- drivers/net/ethernet/intel/idpf/idpf_txrx.c | 12 +++++++-----
- 3 files changed, 9 insertions(+), 5 deletions(-)
+Which New STM32 SoC is that ? Please add type/model/...
 
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.h b/drivers/net/ethernet/intel/idpf/idpf_txrx.h
-index 3d046b81e507..551391e20464 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_txrx.h
-+++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.h
-@@ -990,6 +990,7 @@ int idpf_vport_intr_alloc(struct idpf_vport *vport);
- void idpf_vport_intr_update_itr_ena_irq(struct idpf_q_vector *q_vector);
- void idpf_vport_intr_deinit(struct idpf_vport *vport);
- int idpf_vport_intr_init(struct idpf_vport *vport);
-+void idpf_vport_intr_ena(struct idpf_vport *vport);
- enum pkt_hash_types idpf_ptype_to_htype(const struct idpf_rx_ptype_decoded *decoded);
- int idpf_config_rss(struct idpf_vport *vport);
- int idpf_init_rss(struct idpf_vport *vport);
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_lib.c b/drivers/net/ethernet/intel/idpf/idpf_lib.c
-index 5d3532c27d57..ae8a48c48070 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_lib.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_lib.c
-@@ -1394,6 +1394,7 @@ static int idpf_vport_open(struct idpf_vport *vport, bool alloc_res)
- 	}
- 
- 	idpf_rx_init_buf_tail(vport);
-+	idpf_vport_intr_ena(vport);
- 
- 	err = idpf_send_config_queues_msg(vport);
- 	if (err) {
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-index 285da2177ee4..b023704bbbda 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-@@ -3746,9 +3746,9 @@ static void idpf_vport_intr_ena_irq_all(struct idpf_vport *vport)
-  */
- void idpf_vport_intr_deinit(struct idpf_vport *vport)
- {
-+	idpf_vport_intr_dis_irq_all(vport);
- 	idpf_vport_intr_napi_dis_all(vport);
- 	idpf_vport_intr_napi_del_all(vport);
--	idpf_vport_intr_dis_irq_all(vport);
- 	idpf_vport_intr_rel_irq(vport);
- }
- 
-@@ -4179,7 +4179,6 @@ int idpf_vport_intr_init(struct idpf_vport *vport)
- 
- 	idpf_vport_intr_map_vector_to_qs(vport);
- 	idpf_vport_intr_napi_add_all(vport);
--	idpf_vport_intr_napi_ena_all(vport);
- 
- 	err = vport->adapter->dev_ops.reg_ops.intr_reg_init(vport);
- 	if (err)
-@@ -4193,17 +4192,20 @@ int idpf_vport_intr_init(struct idpf_vport *vport)
- 	if (err)
- 		goto unroll_vectors_alloc;
- 
--	idpf_vport_intr_ena_irq_all(vport);
--
- 	return 0;
- 
- unroll_vectors_alloc:
--	idpf_vport_intr_napi_dis_all(vport);
- 	idpf_vport_intr_napi_del_all(vport);
- 
- 	return err;
- }
- 
-+void idpf_vport_intr_ena(struct idpf_vport *vport)
-+{
-+	idpf_vport_intr_napi_ena_all(vport);
-+	idpf_vport_intr_ena_irq_all(vport);
-+}
-+
- /**
-  * idpf_config_rss - Send virtchnl messages to configure RSS
-  * @vport: virtual port
--- 
-2.44.0
+> have 2 GMACs instances.
+> GMAC IP version is SNPS 4.20.
 
+The commit message should describe what does this patch do, and why does 
+it do so, something like:
+
+"
+Document support for STM32MP13xx. This SoC contains two instances of 
+DWMAC 4.20 IP. Because this is <somehow special>, document <some 
+difference>.
+"
+
+[...]
 
