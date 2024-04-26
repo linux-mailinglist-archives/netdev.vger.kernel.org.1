@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-91634-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91635-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 846398B3451
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 11:39:47 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9C2E8B3458
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 11:42:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B2E9A1C22727
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 09:39:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3C2A4B212EA
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 09:42:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEA5613F01A;
-	Fri, 26 Apr 2024 09:39:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44CFA13F422;
+	Fri, 26 Apr 2024 09:42:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b="GU2VPrQA"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b="DOiA40nZ"
 X-Original-To: netdev@vger.kernel.org
 Received: from nbd.name (nbd.name [46.4.11.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1D337EF;
-	Fri, 26 Apr 2024 09:39:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34CD013EFE8;
+	Fri, 26 Apr 2024 09:42:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.4.11.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714124382; cv=none; b=OvjcG8DueyW57AaypYWe13kKINMtZPv4gg1ygvNJm9hiG/cDW3JD7mbI1iDCuKJ7iJIBCvXNaMt2dOHDZOldQCgN9x7ojcJ5Tj+UrVb13mGSk51mlj8LcUNupDrYg/RCDqkOAe18LlVPUQ4+ZnNK5ckoXQ9Yv87xDVpqJetDpVg=
+	t=1714124523; cv=none; b=FS8lfA1zg3I+v+uAIaRPEAVXb1J9M4XERC49vL2CBJ8PqSbXHt9fKUPcGTKEoN9YwQrsizE711rB2fRnM7ONTlr1uJIZM74qiyQlDXYtPK9d11L+sP3VE1Srv5mdgkThfVqqbEItvqAfPKNkARNDoKefRAQwA9SvlBPgY0VQQd0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714124382; c=relaxed/simple;
-	bh=oaDdFl/3lgKvaVpqyoxY9BccUbOJlb/+jgS8suJ9HI4=;
+	s=arc-20240116; t=1714124523; c=relaxed/simple;
+	bh=iffmhhS12mkojRuXCCXX7+sQI/+MPnrYxWoprfZ7Xa8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Jk40jWLFPbrlOxYI1NL4FDT4KLwg/s/obKOHlU3zO3zI8B4YNNgiQ/PDOmHqz5sTGy77o7HNsvRvmZ/KM6y7m7LrLayfFMjv5nnraAiyP/kfluZwufzzrq+DkdX0s55LSovlHKLT0ceRzME55nBWyBan2/qpU63P8J10dTeWHaI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nbd.name; spf=none smtp.mailfrom=nbd.name; dkim=pass (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b=GU2VPrQA; arc=none smtp.client-ip=46.4.11.11
+	 In-Reply-To:Content-Type; b=uz1sIVHI6/tEHB9yS8hSJraS3CAYQBJzFLdtz8C2HKb9ePh6SkT6a6R+dI2CLb0Tw9cX9QHY/U8/r7+qZTEcgd25Dgw+bwcsXMozh0hNRsaelsuCd1i4385xDqgoUunldOqvi+rVdfdyYzkuUzRhcXUnEprvml3uFvO8mFqiFT0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nbd.name; spf=none smtp.mailfrom=nbd.name; dkim=pass (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b=DOiA40nZ; arc=none smtp.client-ip=46.4.11.11
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nbd.name
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=nbd.name
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=nbd.name;
@@ -37,17 +37,17 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=nbd.name;
 	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
 	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
 	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=D/C00mYciwib9Vm5DuPUx5AWbZneVokRlK3ybHxbCNM=; b=GU2VPrQAlYACd2vH5y6/+5Zl1s
-	UWkupDc2hiIEE1PrlTBsj/cWxOURhCQUiE8a6HPS3j3i88QKeoBGo2idcEmq5zaH9JC3hp8ClQEow
-	R0/g2PJgPZBX2Tagqf19ZZFQlv/DFYLBb8noUw6wh6fA9+Vi0wbnud/gepjCp3auEFdU=;
+	bh=y+7iMbyGlijD6E+68cUdUiYR7TYmH32wmsCd0z32D2Q=; b=DOiA40nZBq6wqMDCFNeAVfjD2Y
+	Oj3Up4FUO4FKKj/xLSJqnpcsJxPAXmx7UvK1HQ9h+LdQVYGbWQZmv4xoNtHKpTKbxY3t8hYn6YDOn
+	2BNOed2BWR0xXidS3Qh1NKOt4Rlkp+l/yixpYy4luaZl8N7YXqv55lLxM4yf3D2lycKw=;
 Received: from p54ae9c93.dip0.t-ipconnect.de ([84.174.156.147] helo=nf.local)
 	by ds12 with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
 	(Exim 4.96)
 	(envelope-from <nbd@nbd.name>)
-	id 1s0I3I-007sy5-28;
-	Fri, 26 Apr 2024 11:39:32 +0200
-Message-ID: <9350b6f7-abd8-45c5-931a-62f48a50bee4@nbd.name>
-Date: Fri, 26 Apr 2024 11:39:31 +0200
+	id 1s0I5c-007t3m-07;
+	Fri, 26 Apr 2024 11:41:56 +0200
+Message-ID: <4d0f7392-06bf-414d-ab3e-158dc2c3f296@nbd.name>
+Date: Fri, 26 Apr 2024 11:41:55 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,17 +55,16 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 net-next v3 2/6] net: add support for segmenting TCP
- fraglist GSO packets
+Subject: Re: [PATCH v3 net-next v3 3/6] net: add code for TCP fraglist GRO
 To: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
  Eric Dumazet <edumazet@google.com>, "David S. Miller" <davem@davemloft.net>,
  David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>
 Cc: willemdebruijn.kernel@gmail.com, linux-kernel@vger.kernel.org
 References: <20240426065143.4667-1-nbd@nbd.name>
- <20240426065143.4667-3-nbd@nbd.name>
- <5a95fea4156b492eb19124bb33b21be81766c617.camel@redhat.com>
-From: Felix Fietkau <nbd@nbd.name>
+ <20240426065143.4667-4-nbd@nbd.name>
+ <17d72e2d11808ca678432749aaad7702d4d1ff8e.camel@redhat.com>
 Content-Language: en-US
+From: Felix Fietkau <nbd@nbd.name>
 Autocrypt: addr=nbd@nbd.name; keydata=
  xsDiBEah5CcRBADIY7pu4LIv3jBlyQ/2u87iIZGe6f0f8pyB4UjzfJNXhJb8JylYYRzIOSxh
  ExKsdLCnJqsG1PY1mqTtoG8sONpwsHr2oJ4itjcGHfn5NJSUGTbtbbxLro13tHkGFCoCr4Z5
@@ -89,75 +88,52 @@ Autocrypt: addr=nbd@nbd.name; keydata=
  TspgwBWLnXQvP5EDvlZnNaKa/3oBes6z0QdaSOwZCRA3QSLHBwtgUsrT6RxRSweLrcabwkkE
  GBECAAkFAkah5FQCGwwACgkQ130UHQKnbvW2GgCeMncXpbbWNT2AtoAYICrKyX5R3iMAoMhw
  cL98efvrjdstUfTCP2pfetyN
-In-Reply-To: <5a95fea4156b492eb19124bb33b21be81766c617.camel@redhat.com>
+In-Reply-To: <17d72e2d11808ca678432749aaad7702d4d1ff8e.camel@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 26.04.24 10:28, Paolo Abeni wrote:
+On 26.04.24 10:21, Paolo Abeni wrote:
 > On Fri, 2024-04-26 at 08:51 +0200, Felix Fietkau wrote:
->> Preparation for adding TCP fraglist GRO support. It expects packets to be
->> combined in a similar way as UDP fraglist GSO packets.
->> For IPv4 packets, NAT is handled in the same way as UDP fraglist GSO.
+>> This implements fraglist GRO similar to how it's handled in UDP, however
+>> no functional changes are added yet. The next change adds a heuristic for
+>> using fraglist GRO instead of regular GRO.
 >> 
 >> Signed-off-by: Felix Fietkau <nbd@nbd.name>
 >> ---
->>  net/ipv4/tcp_offload.c   | 65 ++++++++++++++++++++++++++++++++++++++++
->>  net/ipv6/tcpv6_offload.c |  3 ++
->>  2 files changed, 68 insertions(+)
+>>  net/ipv4/tcp_offload.c   | 22 ++++++++++++++++++++++
+>>  net/ipv6/tcpv6_offload.c |  9 +++++++++
+>>  2 files changed, 31 insertions(+)
 >> 
 >> diff --git a/net/ipv4/tcp_offload.c b/net/ipv4/tcp_offload.c
->> index fab0973f995b..c493e95e09a5 100644
+>> index c493e95e09a5..ffd6b7a4163a 100644
 >> --- a/net/ipv4/tcp_offload.c
 >> +++ b/net/ipv4/tcp_offload.c
->> @@ -28,6 +28,68 @@ static void tcp_gso_tstamp(struct sk_buff *skb, unsigned int ts_seq,
->>  	}
->>  }
+>> @@ -332,6 +332,19 @@ struct sk_buff *tcp_gro_receive(struct list_head *head, struct sk_buff *skb)
+>>  	flush |= (ntohl(th2->seq) + skb_gro_len(p)) ^ ntohl(th->seq);
+>>  	flush |= skb_cmp_decrypted(p, skb);
 >>  
->> +static void __tcpv4_gso_segment_csum(struct sk_buff *seg,
->> +				     __be32 *oldip, __be32 *newip,
->> +				     __be16 *oldport, __be16 *newport)
->> +{
->> +	struct tcphdr *th;
->> +	struct iphdr *iph;
->> +
->> +	if (*oldip == *newip && *oldport == *newport)
->> +		return;
->> +
->> +	th = tcp_hdr(seg);
->> +	iph = ip_hdr(seg);
->> +
->> +	inet_proto_csum_replace4(&th->check, seg, *oldip, *newip, true);
->> +	inet_proto_csum_replace2(&th->check, seg, *oldport, *newport, false);
->> +	*oldport = *newport;
->> +
->> +	csum_replace4(&iph->check, *oldip, *newip);
->> +	*oldip = *newip;
->> +}
->> +
->> +static struct sk_buff *__tcpv4_gso_segment_list_csum(struct sk_buff *segs)
->> +{
->> +	struct sk_buff *seg;
->> +	struct tcphdr *th, *th2;
->> +	struct iphdr *iph, *iph2;
->> +
->> +	seg = segs;
->> +	th = tcp_hdr(seg);
->> +	iph = ip_hdr(seg);
->> +	th2 = tcp_hdr(seg->next);
->> +	iph2 = ip_hdr(seg->next);
->> +
->> +	if (!(*(u32 *)&th->source ^ *(u32 *)&th2->source) &&
->> +	    iph->daddr == iph2->daddr && iph->saddr == iph2->saddr)
->> +		return segs;
+>> +	if (NAPI_GRO_CB(p)->is_flist) {
+>> +		flush |= (__force int)(flags ^ tcp_flag_word(th2));
+>> +		flush |= skb->ip_summed != p->ip_summed;
+>> +		flush |= skb->csum_level != p->csum_level;
+>> +		flush |= !pskb_may_pull(skb, skb_gro_offset(skb));
 > 
-> As mentioned in previous revisions, I think a problem with this
-> approach is that the stack could make other changes to the TCP header
-> after the GRO stage, that are unnoticed here and could cause csum
-> corruption, if the egress device does not recompute the packet csum.
+> I'm sorry, I'm lagging behind. I think the TCP flags handling here is
+> correct - preserving the original ones should work.
+> 
+> The question a made WRT 2 above checks being non necessary/redundant:
+> 
+> 		flush |= (__force int)(flags ^ tcp_flag_word(th2));
 
-On segmentation, each packet keeps its original TCP header and csum. If 
-the stack makes changes, they apply to the first packet only. I don't 
-see how we could get csum corruption.
+This one is not redundant, because the earlier flags check includes this 
+part: & ~(TCP_FLAG_CWR | TCP_FLAG_FIN | TCP_FLAG_PSH))
+
+> 		flush |= !pskb_may_pull(skb, skb_gro_offset(skb));
+
+This one looks like a redundant leftover, I will remove it in the next 
+version.
+
+Thanks,
 
 - Felix
 
