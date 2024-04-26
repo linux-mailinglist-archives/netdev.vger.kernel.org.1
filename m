@@ -1,144 +1,273 @@
-Return-Path: <netdev+bounces-91772-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91773-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F37F8B3D7C
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 19:01:41 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BBDA48B3DA6
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 19:12:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 911931C23FAF
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 17:01:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 310E21F23408
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 17:12:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3564315991C;
-	Fri, 26 Apr 2024 17:01:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10F7715B15E;
+	Fri, 26 Apr 2024 17:12:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DpRiJfSV"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="VPLBmivR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
+Received: from mail-yw1-f180.google.com (mail-yw1-f180.google.com [209.85.128.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD1811598F5;
-	Fri, 26 Apr 2024 17:01:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60B8015AACD
+	for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 17:12:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714150890; cv=none; b=uuLgPrq15ur/WH9lllWY0dIcNih4KxE7nEruca+gMk6aibJ3pdDgIglTRHT4xqGHY8wI+rNRDT6phrGnAL4kTL6ow1rvfwD1S79jjGfQqaBtNBDz2fUGJZMBe9/8dn2Kw5FsG3g1ieT9qptx4b5lNqH6A6zvyMmI4tyk6dGx+Ug=
+	t=1714151552; cv=none; b=MIxGGLOBtQ1xr6FghPR9SYulYNiJfP2DeWbraXoAVXWMUuwkRAz6SNrTO2jjePnQZe71nVPShrl/uL62Tj6eyp+AgCpa/sTlInC8P2H3rmvfvl4nDH5NPpxb2KK1hjbXApUIiSuXa5zHf85mskJ+86CB149/KgL9VfIAgR63BFU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714150890; c=relaxed/simple;
-	bh=cNkmau+vywNzy8mqG0zMAbEK0MlUjcRhEGqQHIaW/AY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Zwk82JuZdO5mk3OH9Z7UMQvI8FHIZJKD9zvaFFiLSH1eSabpLMafRrTIkOafbjrYigE5x628JWEbfNxO8Y8n/XYDGUGPZt9WodkMtJVCveiueum2HV9NaTppDsZBkFBDoLGotT7x4pb2cWLaGu0+/Vw2OP+12L7wo+ZndgT8rnU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DpRiJfSV; arc=none smtp.client-ip=209.85.216.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-2af71daeec1so624513a91.0;
-        Fri, 26 Apr 2024 10:01:28 -0700 (PDT)
+	s=arc-20240116; t=1714151552; c=relaxed/simple;
+	bh=8le8AOiUF4XShDRyL//11qap1YksJ2uMZn28bMd3utg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=YBSWQHJz2meQdfQjFjD3q0aI8KK1zB4fRs36yTUhjGkns8lnFxoYfyYJ+5sbq+kRR2zVvxpfadHeMB8WZcg2MZpJMZuj912PfyFFNQOkNtq7mQ2+aMIWPqRNNl5bRBQlgOC2tghalK1oba23Xt0dptj/KPoSCnFwRGAwGaISGus=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=VPLBmivR; arc=none smtp.client-ip=209.85.128.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-yw1-f180.google.com with SMTP id 00721157ae682-6114c9b4d83so21033867b3.3
+        for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 10:12:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1714150888; x=1714755688; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=7usDOprlF0r0X4lUDaDQW+qbxy362dPjy11nZWPpOJM=;
-        b=DpRiJfSVMQsuMoySQcMW+KpoZK3v3IGm972SOe7BKT8KSJoR34LebsHEGk9Gjneo3N
-         cCOtKtxLPrW+2ZA0tbphL+dfeW5GRDIZOLW+uh1e8UTrzrwVNRjkSOGl310PxW6yrxLS
-         4o6K24TJnhi0TACnwAm1tCo57gnZ8W0wuUzs9sZ+h4kOzYjdGK5n6Tc9OZp4wZgRSRhr
-         p8vqT57TnRLFNwAjq6oiEerGyQUZA7mEdFJn7/3tJKqhohk+bNyI/SubZmja7B4dGMZA
-         fC8NnOdl1SWlenhjAVOLeZjWZz6IRKvevNKR8wopvk1KmfjXUxjiD2fvUs81sOjIODgB
-         8CxQ==
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1714151549; x=1714756349; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=F8QzGoGmXVJB8xQEravlNnVdd1KB5UO19cCDFD+j6iY=;
+        b=VPLBmivRiWuh+YYOIgbRo03c7bcervC0v/NrKrFJA3OMhitRnR6p1byE4dhT0eYOEP
+         qmhnJwzmg4BXvf4mwPc1Ea104k85Xli1d1Yae83TUvolfow2yYtFzhsSEzVX6kxMf9sv
+         yv669vMXfjoG+zlAVaVLqy/eDGRaroOHcb0TDBR2PANAaMjRZBjSioEeDr/hL9MSyCdS
+         BNgSIjgyY6e+ZX9crNJwpq4pi31QPbuWPyCHzZE2LQpClNlBBn1476gayeQyFcu1a8sW
+         AS3Mt58PL6qyhUd0hZqWQwONfIAQgp3rnDTZr5uA2pDL7oM25a+2scx6o243joPjxfAA
+         9sSQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714150888; x=1714755688;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7usDOprlF0r0X4lUDaDQW+qbxy362dPjy11nZWPpOJM=;
-        b=Dfv5PtxrVPuGLXJKUtUMNvrk85vYQMQ2KVjHNXySrN3dQ5OKp6VBqq50fvtq7rLWrQ
-         nAHCJpVUwwNblgBnkQavJcMF6xy538XTDoVKeLaBaaWx4iebFF+Ad28UDAm2XAkxFiQc
-         JcilyPPEJYb/rhl1MP7P79L5gA7GV78/hy4ck8Wq+w54e9OwWPocMSjmJYEKfIqp4dW5
-         FpcoOGOikIlfHBwNZ7ndxGPIeFLJVsue9xnOUNXWS4J1UbL7KQic+3ee5RZ1T7ImqPko
-         Jj5rDYrmD0bBL3sgcnAkKhNF77vitkjpK2b+LTzbt7qnnPJY9yZct/nNUt1PLHgVPHzb
-         GIww==
-X-Forwarded-Encrypted: i=1; AJvYcCVjLPPOkbnMNEVE1dVstMy4WPhD8/sLUmACui7FaFnS2qCPqnkIfe36UReIky2oVq4TDZVL6vl2va/neCEdeRaA7mOGewWqPdF/ApnxoWbiUIU3I6jzHuZXFUBsdWxaj5dM9Qxe3VI5jOzvibjWxq8yMwRsVu2HjQY9
-X-Gm-Message-State: AOJu0YxrPueAKY9jF1bbHHWrITewNourrMktAdjcttLNQ37JFyO66qqa
-	lyIb6dX1i4pFa21pKVXRjE5N+axVWiTfZnRH4FHAWpph4izX9sFWpmqwOmQU
-X-Google-Smtp-Source: AGHT+IESGyjLNOkbXq8I9S38SiHy0c/8WwKj54ERKLE9U1/0jRSqfrV7UJtLAfgyqC5Ls4scbGJHIA==
-X-Received: by 2002:a05:6a00:8b87:b0:6e9:ca7b:c150 with SMTP id ig7-20020a056a008b8700b006e9ca7bc150mr3883378pfb.3.1714150886677;
-        Fri, 26 Apr 2024 10:01:26 -0700 (PDT)
-Received: from vaxr-BM6660-BM6360 ([2001:288:7001:2703:751f:9418:61f4:229e])
-        by smtp.gmail.com with ESMTPSA id fv3-20020a056a00618300b006eb3c3db4afsm15036186pfb.186.2024.04.26.10.01.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 26 Apr 2024 10:01:26 -0700 (PDT)
-Date: Sat, 27 Apr 2024 01:01:21 +0800
-From: I Hsin Cheng <richard120310@gmail.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org,
-	pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, bpf@vger.kernel.org
-Subject: Re: [PATCH] tcp_bbr: replace lambda expression with bitwise
- operation for bit flip
-Message-ID: <Zivd4agQ8D6rUKvt@vaxr-BM6660-BM6360>
-References: <20240426152011.37069-1-richard120310@gmail.com>
- <CANn89iKenW5SxMGm753z8eawg+7drUz7oZcTR06habjcFmdqVg@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1714151549; x=1714756349;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=F8QzGoGmXVJB8xQEravlNnVdd1KB5UO19cCDFD+j6iY=;
+        b=wyT+/wJg957nGQHIDyokgvN4ittGgohWRUrxyfhyhQh/21bIi5BR8Qj/b2QTAbyHoe
+         fcC99Bz1IYod6HFusAJiNM1xBfjXDgjzJj9rvhwOgDOuciixVt7po39gulfdfK9Pddr7
+         1Opf6aE5tae1m+/uuNLgOBMPN6Xm+elB4R92oWPCi8Gt3d9bviLRY5B0q9a0knW6oxIJ
+         7oqb9VDq06V8fr6HNIJChZRwEIGVR3lRtXRIkhpmfQ/UPogDyEwGipBMWpZsuOuKs203
+         2cELGVXjRkc3PmsBoCdc+YVbmeSMDiOamN76KRhfbYd4kn8EdWWlAfCQQGu82+CLENdT
+         oDng==
+X-Gm-Message-State: AOJu0YytbHJBQgsXQumpR++hWsa+UL0mO2sCu6zdJTOpumJ8jp4dFrEb
+	BW61vQ7VRukyyptx9PsyxTUGIsLXPDqX133zh6GlnaF2D5UpgTgnHm1xbu6uqZJVUBg0ohNKNUz
+	/QltXYKZ5ReEv5i2we644pOa07e6yn+QgKUuz
+X-Google-Smtp-Source: AGHT+IE/Xd0wJM5xFVyE4bG55HyuddOD+VU6/xSegjPGwwfMYM/4YtCRjJAORCheau15QdizbsNW87MkxA/0Y214lbo=
+X-Received: by 2002:a05:690c:e:b0:61b:91e3:f954 with SMTP id
+ bc14-20020a05690c000e00b0061b91e3f954mr3594141ywb.8.1714151547373; Fri, 26
+ Apr 2024 10:12:27 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANn89iKenW5SxMGm753z8eawg+7drUz7oZcTR06habjcFmdqVg@mail.gmail.com>
+References: <20240410140141.495384-1-jhs@mojatatu.com> <41736ea4e81666e911fee5b880d9430ffffa9a58.camel@redhat.com>
+ <CAM0EoM=982OctjvSQpx0kR7e+JnQLhvZ=sM-tNB4xNiu7nhH5Q@mail.gmail.com>
+ <CAM0EoM=VhVn2sGV40SYttQyaiCn8gKaKHTUqFxB_WzKrayJJfQ@mail.gmail.com>
+ <87cf4830e2e46c1882998162526e108fb424a0f7.camel@redhat.com> <CAM0EoMkJwR0K-fF7qo0PfRw4Sf+=2L0L=rOcH5A2ELwagLrZMw@mail.gmail.com>
+In-Reply-To: <CAM0EoMkJwR0K-fF7qo0PfRw4Sf+=2L0L=rOcH5A2ELwagLrZMw@mail.gmail.com>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Fri, 26 Apr 2024 13:12:14 -0400
+Message-ID: <CAM0EoMmfDoZ9_ZdK-ZjHjFAjuNN8fVK+R57_UaFqAm=wA0AWVA@mail.gmail.com>
+Subject: Re: [PATCH net-next v16 00/15] Introducing P4TC (series 1)
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, deb.chatterjee@intel.com, anjali.singhai@intel.com, 
+	namrata.limaye@intel.com, tom@sipanda.io, mleitner@redhat.com, 
+	Mahesh.Shirshyad@amd.com, tomasz.osinski@intel.com, jiri@resnulli.us, 
+	xiyou.wangcong@gmail.com, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, vladbu@nvidia.com, horms@kernel.org, khalidm@nvidia.com, 
+	toke@redhat.com, victor@mojatatu.com, pctammela@mojatatu.com, 
+	Vipin.Jain@amd.com, dan.daly@intel.com, andy.fingerhut@gmail.com, 
+	chris.sommers@keysight.com, mattyk@nvidia.com, bpf@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Apr 26, 2024 at 05:32:57PM +0200, Eric Dumazet wrote:
-> On Fri, Apr 26, 2024 at 5:20 PM I Hsin Cheng <richard120310@gmail.com> wrote:
+On Fri, Apr 19, 2024 at 2:01=E2=80=AFPM Jamal Hadi Salim <jhs@mojatatu.com>=
+ wrote:
+>
+> On Fri, Apr 19, 2024 at 1:20=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> w=
+rote:
 > >
-> > In the origin implementation in function bbr_update_ack_aggregation(),
-> > we utilize a lambda expression to flip the bit value of
-> > bbr->extra_acked_win_idx. Since the data type of
-> > bbr->extra_acked_win_idx is simply a single bit, we are actually trying
-> > to perform a bit flip operation, under the fact we can simply perform a
-> > bitwise not operation on bbr->extra_acked_win_idx.
+> > On Fri, 2024-04-19 at 08:08 -0400, Jamal Hadi Salim wrote:
+> > > On Thu, Apr 11, 2024 at 12:24=E2=80=AFPM Jamal Hadi Salim <jhs@mojata=
+tu.com> wrote:
+> > > >
+> > > > On Thu, Apr 11, 2024 at 10:07=E2=80=AFAM Paolo Abeni <pabeni@redhat=
+.com> wrote:
+> > > > >
+> > > > > On Wed, 2024-04-10 at 10:01 -0400, Jamal Hadi Salim wrote:
+> > > > > > The only change that v16 makes is to add a nack to patch 14 on =
+kfuncs
+> > > > > > from Daniel and John. We strongly disagree with the nack; unfor=
+tunately I
+> > > > > > have to rehash whats already in the cover letter and has been d=
+iscussed over
+> > > > > > and over and over again:
+> > > > >
+> > > > > I feel bad asking, but I have to, since all options I have here a=
+re
+> > > > > IMHO quite sub-optimal.
+> > > > >
+> > > > > How bad would be dropping patch 14 and reworking the rest with
+> > > > > alternative s/w datapath? (I guess restoring it from oldest revis=
+ion of
+> > > > > this series).
+> > > >
+> > > >
+> > > > We want to keep using ebpf  for the s/w datapath if that is not cle=
+ar by now.
+> > > > I do not understand the obstructionism tbh. Are users allowed to us=
+e
+> > > > kfuncs as part of infra or not? My understanding is yes.
+> > > > This community is getting too political and my worry is that we hav=
+e
+> > > > corporatism creeping in like it is in standards bodies.
+> > > > We started by not using ebpf. The same people who are objecting now
+> > > > went up in arms and insisted we use ebpf. As a member of this
+> > > > community, my motivation was to meet them in the middle by
+> > > > compromising. We invested another year to move to that middle groun=
+d.
+> > > > Now they are insisting we do not use ebpf because they dont like ou=
+r
+> > > > design or how we are using ebpf or maybe it's not a use case they h=
+ave
+> > > > any need for or some other politics. I lost track of the moving goa=
+l
+> > > > posts. Open source is about solving your itch. This code is entirel=
+y
+> > > > on TC, zero code changed in ebpf core. The new goalpost is based on
+> > > > emotional outrage over use of functions. The whole thing is getting
+> > > > extremely toxic.
+> > > >
+> > >
+> > > Paolo,
+> > > Following up since no movement for a week now;->
+> > > I am going to give benefit of doubt that there was miscommunication o=
+r
+> > > misunderstanding for all the back and forth that has happened so far
+> > > with the nackers. I will provide a summary below on the main points
+> > > raised and then provide responses:
+> > >
+> > > 1) "Use maps"
+> > >
+> > > It doesnt make sense for our requirement. The reason we are using TC
+> > > is because a) P4 has an excellent fit with TC match action paradigm b=
+)
+> > > we are targeting both s/w and h/w and the TC model caters well for
+> > > this. The objects belong to TC, shared between s/w, h/w and control
+> > > plane (and netlink is the API). Maybe this diagram would help:
+> > > https://github.com/p4tc-dev/docs/blob/main/images/why-p4tc/p4tc-runti=
+me-pipeline.png
+> > >
+> > > While the s/w part stands on its own accord (as elaborated many
+> > > times), for TC which has offloads, the s/w twin is introduced before
+> > > the h/w equivalent. This is what this series is doing.
+> > >
+> > > 2) "but ... it is not performant"
+> > > This has been brought up in regards to netlink and kfuncs. Performanc=
+e
+> > > is a lower priority to P4 correctness and expressibility.
+> > > Netlink provides us the abstractions we need, it works with TC for
+> > > both s/w and h/w offload and has a lot of knowledge base for
+> > > expressing control plane APIs. We dont believe reinventing all that
+> > > makes sense.
+> > > Kfuncs are a means to an end - they provide us the gluing we need to
+> > > have an ebpf s/w datapath to the TC objects. Getting an extra
+> > > 10-100Kpps is not a driving factor.
+> > >
+> > > 3) "but you did it wrong, here's how you do it..."
+> > >
+> > > I gave up on responding to this - but do note this sentiment is a big
+> > > theme in the exchanges and consumed most of the electrons. We are
+> > > _never_ going to get any consensus with statements like "tc actions
+> > > are a mistake" or "use tcx".
+> > >
+> > > 4) "... drop the kfunc patch"
+> > >
+> > > kfuncs essentially boil down to function calls. They don't require an=
+y
+> > > special handling by the eBPF verifier nor introduce new semantics to
+> > > eBPF. They are similar in nature to the already existing kfuncs
+> > > interacting with other kernel objects such as nf_conntrack.
+> > > The precedence (repeated in conferences and email threads multiple
+> > > times) is: kfuncs dont have to be sent to ebpf list or reviewed by
+> > > folks in the ebpf world. And We believe that rule applies to us as
+> > > well. Either kfuncs (and frankly ebpf) is infrastructure glue or it's
+> > > not.
+> > >
+> > > Now for a little rant:
+> > >
+> > > Open source is not a zero-sum game. Ebpf already coexists with
+> > > netfilter, tc, etc and various subsystems happily.
+> > > I hope our requirement is clear and i dont have to keep justifying wh=
+y
+> > > P4 or relitigate over and over again why we need TC. Open source is
+> > > about scratching your itch and our itch is totally contained within
+> > > TC. I cant help but feel that this community is getting way too
+> > > pervasive with politics and obscure agendas. I understand agendas, I
+> > > just dont understand the zero-sum thinking.
+> > > My view is this series should still be applied with the nacks since i=
+t
+> > > sits entirely on its own silo within networking/TC (and has nothing t=
+o
+> > > do with ebpf).
 > >
-> > This way we can elimate the need of possible branches which generate by
-> > the lambda function, they could result in branch misses sometimes.
-> > Perform a bitwise not operation is more straightforward and wouldn't
-> > generate branches.
+> > It's really hard for me - meaning I'll not do that - applying a series
+> > that has been so fiercely nacked, especially given that the other
+> > maintainers are not supporting it.
 > >
-> > Signed-off-by: I Hsin Cheng <richard120310@gmail.com>
-> > ---
-> >  net/ipv4/tcp_bbr.c | 3 +--
-> >  1 file changed, 1 insertion(+), 2 deletions(-)
+> > I really understand this is very bad for you.
 > >
-> > diff --git a/net/ipv4/tcp_bbr.c b/net/ipv4/tcp_bbr.c
-> > index 146792cd2..75068ba25 100644
-> > --- a/net/ipv4/tcp_bbr.c
-> > +++ b/net/ipv4/tcp_bbr.c
-> > @@ -829,8 +829,7 @@ static void bbr_update_ack_aggregation(struct sock *sk,
-> >                                                 bbr->extra_acked_win_rtts + 1);
-> >                 if (bbr->extra_acked_win_rtts >= bbr_extra_acked_win_rtts) {
-> >                         bbr->extra_acked_win_rtts = 0;
-> > -                       bbr->extra_acked_win_idx = bbr->extra_acked_win_idx ?
-> > -                                                  0 : 1;
-> > +                       bbr->extra_acked_win_idx = ~(bbr->extra_acked_win_idx);
-> >                         bbr->extra_acked[bbr->extra_acked_win_idx] = 0;
-> >                 }
-> >         }
-> 
-> Or
-> 
-> bbr->extra_acked_win_idx ^= 1;
-> 
-> Note that C compilers generate the same code, for the 3 variants.
-> 
-> They do not generate branches for something simple like this.
+> > Let me try to do an extreme attempt to find some middle ground between
+> > this series and the bpf folks.
+> >
+> > My understanding is that the most disliked item is the lifecycle for
+> > the objects allocated via the kfunc(s).
+> >
+> > If I understand correctly, the hard requirement on bpf side is that any
+> > kernel object allocated by kfunc must be released at program unload
+> > time. p4tc postpone such allocation to recycle the structure.
+> >
+> > While there are other arguments, my reading of the past few iterations
+> > is that solving the above node should lift the nack, am I correct?
+> >
+> > Could p4tc pre-allocate all the p4tc_table_entry_act_bpf_kern entries
+> > and let p4a_runt_create_bpf() fail if the pool is empty? would that
+> > satisfy the bpf requirement?
+>
+> Let me think about it and weigh the consequences.
+>
 
-I see, thanks for your explanation.
-I thought the compilers behavior might alters due to different 
-architecture or different compilers.
-So would you recommend on the proposed changes or we should stick to
- the original implementation? 
-Personally I think my version or your proposed change are both more 
-understandable and elegant than the lambda expression.
+Sorry, was busy evaluating. Yes, we can enforce the memory allocation
+constraints such that when the ebpf program is removed any entries
+added by said ebpf program can be removed from the datapath.
 
+> > Otherwise could p4tc force free the p4tc_table_entry_act_bpf_kern at
+> > unload time?
+>
+> This one wont work for us unfortunately. If we have entries added by
+> the control plane with skip_sw just because the ebpf program is gone
+> doesnt mean they disappear.
 
+Just to clarify (the figure
+https://github.com/p4tc-dev/docs/blob/main/images/why-p4tc/p4tc-runtime-pip=
+eline.png
+should help) :
+For P4 table objects, there are 3 types of entries: 1) created by
+control path for s/w datapath with skip_hw 2) created by control path
+for h/w datapath with skip_sw and 3) dynamically created by s/w
+datapath (ebpf) not far off from conntrack.
+The only ones we can remove when the ebpf program goes away are from #3.
+
+cheers,
+jamal
 
