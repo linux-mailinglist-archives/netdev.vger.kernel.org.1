@@ -1,68 +1,88 @@
-Return-Path: <netdev+bounces-91670-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91671-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76CB58B3648
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 13:06:43 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D1178B3670
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 13:19:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C1A0FB22947
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 11:06:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 667DEB22F6E
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 11:19:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2396144D1A;
-	Fri, 26 Apr 2024 11:06:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC05B144D2F;
+	Fri, 26 Apr 2024 11:19:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="eBiLJ1bI"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="A06S6HA3"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 869CF142E62;
-	Fri, 26 Apr 2024 11:06:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD100139CFC
+	for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 11:19:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714129596; cv=none; b=HQiMwQmW2yYR2yUMF5EqmP5r5OgL3RsmcG8IpUUwflWuV2swM0Mu/ctpjxlQ1SoygOmJoQbe4Ag/VW/eJASc+Q6a2LbjGWM23yL5npEYValJ64fGBFkfeUnPoHy9J09JNvK0LZM+zh/VrRUn8dpeNVw4mwCspesH5EH+UwRBquQ=
+	t=1714130383; cv=none; b=WNOSlYC6ggFbzNyd24gvRtdchCyZK1KJrkoyOPvmFA+MHrYQoyeG7mTa4SQqsAjnC4efcbIb8h1fDDTqpQIroI+zkX74CKNNiPbJ3nWX94+4cSnGEYsVK/Gq+LNvD6qx9/7UqP2MM4GQ+sbXKxt/r8HdZ6S/qP0dVCch0H9jXAA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714129596; c=relaxed/simple;
-	bh=sEdc3Wd2Fm3DEJTPTv7niYyLcLuR3dw+/x1Hk9vi/hw=;
+	s=arc-20240116; t=1714130383; c=relaxed/simple;
+	bh=isKXpcjjkIcWQxLdasdYFVFqvGPKQTZuIXO/vDE1IKU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OG51pZfjqvOfj5GLNpurL8pMLU/ag70rzwbowMWZJkrbdHQQBYTLX+TxErVSbQQRnrjk4hpUJjMGp9GP4IZLtkfZTom66Ql3+/hFDnVbQzjofOS3RBi17xt8uu8DKBHixXiC7e7381uXrE5NM2xhouMRoHva2zGTe+N8gICxuus=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=eBiLJ1bI; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1134)
-	id 786D5210EF22; Fri, 26 Apr 2024 04:06:29 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 786D5210EF22
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1714129589;
-	bh=xkuHjmKRLCXBtGZZ4FZ4i74BJRj9p2Go7cH+OnO/rk0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=eBiLJ1bIi33wQRtMb/OLiSGvOBQe/3ClahGrmK4squu/fn+DxBcyR1aUbt2F9CNtt
-	 djN9YxxAfntWQ71OYTFmgKXB5XhCxj72nGt5bwYROgrV8Cr6Ho6AFOxvKNNP2ZejmN
-	 DHyRC6TGRfCfZyj+IJpn1q0rtWy2QEKpQeQCOTYY=
-Date: Fri, 26 Apr 2024 04:06:29 -0700
-From: Shradha Gupta <shradhagupta@linux.microsoft.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Johannes Berg <johannes.berg@intel.com>,
-	Breno Leitao <leitao@debian.org>, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, "K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Long Li <longli@microsoft.com>,
-	Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>,
-	Konstantin Taranov <kotaranov@microsoft.com>,
-	Yury Norov <yury.norov@gmail.com>, linux-hyperv@vger.kernel.org,
-	shradhagupta@microsoft.com
-Subject: Re: [PATCH net-next v2 1/2] net: Add sysfs atttributes for max_mtu
- min_mtu
-Message-ID: <20240426110629.GA19743@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-References: <1713954774-29953-1-git-send-email-shradhagupta@linux.microsoft.com>
- <1713954817-30133-1-git-send-email-shradhagupta@linux.microsoft.com>
- <20240424202703.29f1b59a@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Sr1hXcQkmSFH7ejtVbDMNC9LF0m/AnrcRL6cDTx1VGws2IbOzix+lWSwDVv6cTYh8NQiFr5RGd1yhlPKaXR00jbz1cATaLZXIIy4Nb79Uprfv2ISyOHpufdG2bVBhClFmkFZ3BHCUUjJisNfc6t0yNfo+I/MwCPigXUxKpqJJ7Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=A06S6HA3; arc=none smtp.client-ip=209.85.167.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-516d2b9cd69so2430931e87.2
+        for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 04:19:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1714130377; x=1714735177; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ak1RMSN7WMKgrndVkDP7RMG1/Cc+0qwytHL22aznKNE=;
+        b=A06S6HA3Ftm3Zql8qd2gsiHwarIQ95n3gQFwfh7SUvIOJteND77SLRNK4ZKvggrBrY
+         bhiYkegDzn9PyUgVfDF8JtIksJ7t/T/JnbuXY5l1uKO5JZCdcXy8y4nbaCdj1/+L5nxi
+         gCNOoUzQnpkMfkD2GGbjKYkgzKGZ6UAgw2FQrsvZXMd6zs9Z/tTqgV47gwOwlsYw51fr
+         HyDt3CfE31X3ei5qoX6kajlX6QWVz4FStR2Z6gy6NpcMr8rONLltQlwUE9sb2mt8nYKd
+         8Ek31vtDjWdxoVZaQ/9wvtDpo1k5yjgbD7rnpJwPM/Upu7xtNlibbSevxViX+KioJlTI
+         WHLg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714130377; x=1714735177;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ak1RMSN7WMKgrndVkDP7RMG1/Cc+0qwytHL22aznKNE=;
+        b=wot1391CE1yEV3kVL/UL/wNYy/6Qeq/qdwagSSvw+1jvDeQ2gN7oqOgmzBgWR7chp2
+         7KuWMzmbnhS7t32jjfc9SPXa6T9FodSgAkWEWVSzHggctYjc2V+W05HzdWlUnZ61gKEU
+         7QC6C7SaqWO12ISAfjqExFiwxE6o8lG+jfoz1IwwZfXBCNapkZGzRkTdYnSgakQQlEyI
+         wTgIKmzG0g8sxJOp6Ng5DKMqMlFQjqFttYq+cxgQ/InGitmZlSbEh0OqEVq3LMNJtmPA
+         nBz6KX4qK8hmQSmbFNSKPjFcFD2+SC3ThO5RyArODVbJMUwUVY7/8o/s6OCXKDR8Zdjc
+         xJJw==
+X-Forwarded-Encrypted: i=1; AJvYcCUBvtdnE83nfdYb3JgSNKol+WSGOIhv/9SikBiyhSa5bLm//7T7AZ//PQXo9apbaVwrd87btJFrxwhkMKdgaEjR+rnhD/FC
+X-Gm-Message-State: AOJu0YxkZmdhU56+UZptc6EcO2ha9NvFUd4JlTS/Ya2ABsQzSjJzTO3o
+	L2ahpjdQpVFLT9fN2WvleGglNDYe5X4537gcty3Wr6SyAMIyG3c5Na3OOpizn0Y=
+X-Google-Smtp-Source: AGHT+IGZZYVGNzDrHoYR8dgLyhp8BCCpkCguPwOK+0aXtgjNpL8FwtLDZKglxfcxx/SJvMRiYh4DqA==
+X-Received: by 2002:a05:6512:3b20:b0:518:dfae:2691 with SMTP id f32-20020a0565123b2000b00518dfae2691mr1681889lfv.11.1714130377106;
+        Fri, 26 Apr 2024 04:19:37 -0700 (PDT)
+Received: from localhost ([89.24.35.126])
+        by smtp.gmail.com with ESMTPSA id q2-20020adff942000000b00346bda84bf9sm22355916wrr.78.2024.04.26.04.19.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 26 Apr 2024 04:19:36 -0700 (PDT)
+Date: Fri, 26 Apr 2024 13:19:34 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jacob Keller <jacob.e.keller@intel.com>
+Cc: "Temerkhanov, Sergey" <sergey.temerkhanov@intel.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next v2] ice: Extend auxbus device
+ naming
+Message-ID: <ZiuNxivU-haEQ5fC@nanopsycho>
+References: <20240423091459.72216-1-sergey.temerkhanov@intel.com>
+ <ZiedKc5wE2-3LlaM@nanopsycho>
+ <MW3PR11MB468117FD76AC6D15970A6E1080112@MW3PR11MB4681.namprd11.prod.outlook.com>
+ <Zie0NIztebf5Qq1J@nanopsycho>
+ <3a634778-9b72-4663-b305-3be18bd8f618@intel.com>
+ <ZikgQhVpphnaAOpG@nanopsycho>
+ <3877b086-142d-4897-866e-e667ca7091d7@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,21 +91,201 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240424202703.29f1b59a@kernel.org>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+In-Reply-To: <3877b086-142d-4897-866e-e667ca7091d7@intel.com>
 
-On Wed, Apr 24, 2024 at 08:27:03PM -0700, Jakub Kicinski wrote:
-> On Wed, 24 Apr 2024 03:33:37 -0700 Shradha Gupta wrote:
-> > Add sysfs attributes to read max_mtu and min_mtu value for
-> > network devices
-> 
-> Absolutely pointless. You posted v1, dumping this as a driver
-> specific value, even tho it's already reported by the core...
-> And you can't even produce a meaningful commit message longer
-> than one sentence.
-> 
-> This is not meeting the bar. Please get your patches reviewed
-> internally at Microsoft by someone with good understanding of
-> Linux networking before you post.
-Noted, I'll do the needful going forward. Apologies.
+Wed, Apr 24, 2024 at 06:56:37PM CEST, jacob.e.keller@intel.com wrote:
+>
+>
+>On 4/24/2024 8:07 AM, Jiri Pirko wrote:
+>> Wed, Apr 24, 2024 at 12:03:25AM CEST, jacob.e.keller@intel.com wrote:
+>>>
+>>>
+>>> On 4/23/2024 6:14 AM, Jiri Pirko wrote:
+>>>> Tue, Apr 23, 2024 at 01:56:55PM CEST, sergey.temerkhanov@intel.com wrote:
+>>>>>
+>>>>>
+>>>>>> -----Original Message-----
+>>>>>> From: Jiri Pirko <jiri@resnulli.us>
+>>>>>> Sent: Tuesday, April 23, 2024 1:36 PM
+>>>>>> To: Temerkhanov, Sergey <sergey.temerkhanov@intel.com>
+>>>>>> Cc: intel-wired-lan@lists.osuosl.org; netdev@vger.kernel.org; Kitszel,
+>>>>>> Przemyslaw <przemyslaw.kitszel@intel.com>
+>>>>>> Subject: Re: [PATCH iwl-next v2] ice: Extend auxbus device naming
+>>>>>>
+>>>>>> Tue, Apr 23, 2024 at 11:14:59AM CEST, sergey.temerkhanov@intel.com
+>>>>>> wrote:
+>>>>>>> Include segment/domain number in the device name to distinguish
+>>>>>> between
+>>>>>>> PCI devices located on different root complexes in multi-segment
+>>>>>>> configurations. Naming is changed from ptp_<bus>_<slot>_clk<clock>  to
+>>>>>>> ptp_<domain>_<bus>_<slot>_clk<clock>
+>>>>>>
+>>>>>> I don't understand why you need to encode pci properties of a parent device
+>>>>>> into the auxiliary bus name. Could you please explain the motivation? Why
+>>>>>> you need a bus instance per PF?
+>>>>>>
+>>>>>> The rest of the auxbus registrators don't do this. Could you please align? Just
+>>>>>> have one bus for ice driver and that's it.
+>>>>>
+>>>>> This patch adds support for multi-segment PCIe configurations.
+>>>>> An auxdev is created for each adapter, which has a clock, in the system. There can be
+>>>>
+>>>> You are trying to change auxiliary bus name.
+>>>>
+>>>>
+>>>>> more than one adapter present, so there exists a possibility of device naming conflict.
+>>>>> To avoid it, auxdevs are named according to the PCI geographical addresses of the adapters.
+>>>>
+>>>> Why? It's the auxdev, the name should not contain anything related to
+>>>> PCI, no reason for it. I asked for motivation, you didn't provide any.
+>>>>
+>>>
+>>> We aren't creating one auxbus per PF. We're creating one auxbus per
+>>> *clock*. The device has multiple clocks in some configurations.
+>> 
+>> Does not matter. Why you need separate bus for whatever-instance? Why
+>> can't you just have one ice-ptp bus and put devices on it?
+>> 
+>> 
+>
+>Because we only want ports on card A to be connected to the card owner
+>on card A. We were using auxiliary bus to manage this. If we use a
+
+You do that by naming auxiliary bus according to the PCI device
+created it, which feels obviously wrong.
+
+
+>single bus for ice-ptp, then we still have to implement separation
+>between each set of devices on a single card, which doesn't solve the
+>problems we had, and at least with the current code using auxiliary bus
+>doesn't buy us much if it doesn't solve that problem.
+
+I don't think that auxiliary bus is the answer for your problem. Please
+don't abuse it.
+
+>
+>>>
+>>> We need to connect each PF to the same clock controller, because there
+>>> is only one clock owner for the device in a multi-port card.
+>> 
+>> Connect how? But putting a PF-device on a per-clock bus? That sounds
+>> quite odd. How did you figure out this usage of auxiliary bus?
+>> 
+>> 
+>
+>Yea, its a multi-function board but the functions aren't fully
+>independent. Each port has its own PF, but multiple ports can be tied to
+>the same clock. We have similar problems with a variety of HW aspects.
+>I've been told that the design is simpler for other operating systems,
+>(something about the way the subsystems work so that they expect ports
+>to be tied to functions). But its definitely frustrating from Linux
+>perspective where a single driver instance for the device would be a lot
+>easier to manage.
+
+You can always do it by internal accounting in ice, merge multiple PF
+pci devices into one internal instance. Or checkout
+drivers/base/component.c, perhaps it could be extended for your usecase.
+
+
+>
+>>>
+>>>> Again, could you please avoid creating auxiliary bus per-PF and just
+>>>> have one auxiliary but per-ice-driver?
+>>>>
+>>>
+>>> We can't have one per-ice driver, because we don't want to connect ports
+>>>from a different device to the same clock. If you have two ice devices
+>>> plugged in, the ports on each device are separate from each other.
+>>>
+>>> The goal here is to connect the clock ports to the clock owner.
+>>>
+>>> Worse, as described here, we do have some devices which combine multiple
+>>> adapters together and tie their clocks together via HW signaling. In
+>>> those cases the clocks *do* need to communicate across the device, but
+>>> only to other ports on the same physical device, not to ports on a
+>>> different device.
+>>>
+>>> Perhaps auxbus is the wrong approach here? but how else can we connect
+>> 
+>> Yeah, feels quite wrong.
+>> 
+>> 
+>>> these ports without over-connecting to other ports? We could write
+>>> bespoke code which finds these devices, but that felt like it was risky
+>>> and convoluted.
+>> 
+>> Sounds you need something you have for DPLL subsystem. Feels to me that
+>> your hw design is quite disconnected from the Linux device model :/
+>> 
+>
+>I'm not 100% sure how DPLL handles this. I'll have to investigate.
+
+DPLL leaves the merging on DPLL level. The ice driver just register
+entities multiple times. It is specifically designed to fit ice needs.
+
+
+>
+>One thing I've considered a lot in the past (such as back when I was
+>working on devlink flash update) was to somehow have a sort of extra
+>layer where we could register with PCI subsystem some sort of "whole
+>device" driver, that would get registered first and could connect to the
+>rest of the function driver instances as they load. But this seems like
+>it would need a lot of work in the PCI layer, and apparently hasn't been
+>an issue for other devices? though ice is far from unique at least for
+>Intel NICs. Its just that the devices got significantly more complex and
+>functions more interdependent with this generation, and the issues with
+>global bits were solved in other ways: often via hiding them with
+>firmware >:(
+
+I think that others could benefit from such "merged device" as well. I
+think it is about the time to introduce it.
+
+
+>
+>
+>I've tried explaining the issues with this to HW designers here, but so
+>far haven't gotten a lot of traction.
+>
+>>> We could make use of ice_adapter, though we'd need some logic to manage
+>>> devices which have multiple clocks, as well as devices like the one
+>>> Sergey is working on which tie multiple adapters together.
+>> 
+>> Perhaps that is an answer. Maybe we can make DPLL much more simple after
+>> that :)
+>
+>The only major issue with ice_adapter is the case where we have one
+>clock connected to multiple adapters, but hopefully Sergey has some
+>ideas for how to solve that.
+>
+>I think we can mostly make the rest of the logic for the usual case work
+>via ice_adapter:
+>
+>1) we already get an ice_adapter reference during early probe
+>2) each PF knows whether its an owner or not from the NVM/firmware interface
+>3) we can move the list of ports from the auxbus thing into ice_adapter,
+>possibly keeping one list per clock number, so that NVMs with multiple
+>clocks enabled don't have conflicts or put all ports onto the same clock.
+>
+>I'm not sure how best to solve the weird case when we have multiple
+>adapters tied together, but perhaps something with extending how the
+>ice_adapter lookup is done could work? Sergey, I think we can continue
+>this design discussion off list and come up with a proposal.
+>
+>We also have to be careful that whatever new solution also handles
+>things which we got with auxiliary bus:
+>
+>1) prevent issues with ordering if a clock port loads before the clock
+>owner PF. If the clock owner loads first, then we need to ensure the
+>port still gets initialized. If the clock owner loads second, we need to
+>avoid issues with things not being setup yet, i.e. ensure all the
+>structures were already initialized (for example by initializing lists
+>and such when we create the ice_adapter, not when the clock owner loads).
+>
+>2) prevent issues with teardown ordering that were previously serialized
+>by the auxiliary bus unregister bits, where the driver unregister
+>function would wait for all ports to shutdown.
+>
+>I think this can be done correctly with ice_adapter, but I wanted to
+>point them out because we get them implicitly with the current design
+>with auxiliary bus.
 
