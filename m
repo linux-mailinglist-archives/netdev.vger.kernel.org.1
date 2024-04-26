@@ -1,105 +1,123 @@
-Return-Path: <netdev+bounces-91758-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91759-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC0AA8B3C51
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 18:03:13 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 641768B3C6B
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 18:08:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2982E1C229D5
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 16:03:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 16F2C1F219EA
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 16:08:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B603214D2BC;
-	Fri, 26 Apr 2024 16:02:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1056114B09E;
+	Fri, 26 Apr 2024 16:08:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="y7UMIZuw"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="0KGyUGRY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CAC114F125
-	for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 16:02:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB7201474A0
+	for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 16:08:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714147379; cv=none; b=h3h6gI4fB/1nupkvZlnM3xMS3B2tbgP2EVJwHWdZZFM7TZLO690xLW8fdJYNTPB01qAoEApptA9ZydILfBZdh4XHGBhIHrQPNztOt4VzZdxoz7sm2b4K57xbBKBoymtj4sGk/pJwqwya3mBsmohOHArYdMRN+TPduk8ICaCtsYY=
+	t=1714147687; cv=none; b=gYVyWCEaPGwPahcdZTv1WOPtwkiGrj7IZat/Ou6aYaVn+NhUVa4eyYGJ8v0jSNSIJYKJLgvlNQAHJXRuZghuKYuzV2qhhmqq9g9phxaArXaa3EP80wXkQBABUJqnummn4e6RAELcqlkE9QzbuS2uyb4Z3zNhK4t3NejEazwdAcw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714147379; c=relaxed/simple;
-	bh=k7AljuFrApyTa8ww9MHZnaxrqs3qjeeqHGzJ5S16Yz4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jJpjTURonUpkYiFhbhse7RA8IwCI6892sWeFRVGC0udSws/nQxF/dCgZ1fgzApPBPLWyc2cVdUwQh0D7ckyRrxNN6uRM2V7MKf+9hZDfLN6Wt6ziIqbJaUqBjRQnFjlgWszoSRp26+vFnGEo7kajhVbAOv9X2OJDmlSeAuGpGWg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=y7UMIZuw; arc=none smtp.client-ip=209.85.208.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-571b5fba660so12687a12.1
-        for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 09:02:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1714147376; x=1714752176; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=k7AljuFrApyTa8ww9MHZnaxrqs3qjeeqHGzJ5S16Yz4=;
-        b=y7UMIZuwXfiKEbZ2Sta9lIq3iNfyY9fc1BT/afROPHanCGz5b/gx9RY4gFQFqH4NxC
-         JqBAC5n+AKHZNyJampzr4vxbFWusTbLKjRPDsHp1zhAfDdsy2S1i7bw0UxzGOXRGVaGb
-         nrcRPzC1R+czC6GO7nxTuoRqh1i+VY5L7bYO2WnYX2Uk0IABvnjJMYUSFmHERWAR/7qZ
-         rmZA4OxSI6TSrKfcAG2p9fG9cYZOxUD8G0/WxZ11WlryjayfAt1VQSwpl5bNAO53vUVi
-         bb/1hT+8WDiPMSNwwNBglbqTimQkQdtPGgvQGuVTKFc4TAr/7i8ookTaFobi4qp3rOzH
-         abTA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714147376; x=1714752176;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=k7AljuFrApyTa8ww9MHZnaxrqs3qjeeqHGzJ5S16Yz4=;
-        b=Smtb1TkFCbTRLfl850lsER1sn9EXsznJ4Ey75fZ11ij97PbeD6oZrMHqEw1svg7Sx5
-         qq3w110dsHXkatwy+hqC06Mwsmto4ojW5N/eEe9Bq/9VC2ILAHjF6v+H0x/tTyjkIR+x
-         99FTaqURBn3MGIb+QMfk8CNKBoevZJOs2jy1QKcV4dMwa4eSgT5NXXDTQVvIdTImjg3u
-         5G8JzKjlV9kqlh/Koc95QszlI4xusEGZpQyNY20u8TAFeLgHD/glK48NJ1kZJd89hLlt
-         6rExXkfiDDmar7RY6etT9WexdyZ7SS4su6rnItsRD4nVZxeWJEI3umHIWn80938JsbAB
-         Z0qQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW2mYHA4Fxz6oq4MhNcPUxrxu1B1ePmvoTKu6w2/06H2dWNsYjC/laGOnDPgfR7gy5A67feUI1lq0nHbNea8cm+pPhgiCmN
-X-Gm-Message-State: AOJu0Yx05970wy3/6iZ7+GUvN3LCP/yhssU98T6rVtK3W9PedstTHhE+
-	2valM4YGlePYhwWyEu2muSEXQlWXofKeppLLnhOdiz7g9RkBPr9nRZdHBr43Pvy7PqkHFv4q3EY
-	xuI/T7BGwEn6EVuBefNcle/eJKwTh4CuU/XBc
-X-Google-Smtp-Source: AGHT+IHIAMuNikWPfBDl4N/DTwTnfz10CVFQMo8z2v9ltMJesmcjBxArp5RuHaNK5cyR0xn/NZV5Q8DnnZvwpi3wqtE=
-X-Received: by 2002:a05:6402:2899:b0:572:fae:7f96 with SMTP id
- eg25-20020a056402289900b005720fae7f96mr181020edb.6.1714147376143; Fri, 26 Apr
- 2024 09:02:56 -0700 (PDT)
+	s=arc-20240116; t=1714147687; c=relaxed/simple;
+	bh=XiPwtNLmDVvOTa0KrgEClx2QJWpEAwEm/Qqpkr7WZHg=;
+	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
+	 Content-Disposition:Content-Type:Message-Id:Date; b=McmCb3bItY09Xi6gpBS0IfGMMbI08xhlgwEoioQvWXnhahMIoGpYZuNPGiGhbxjCx/7JWXvPpH5VzmojfKqBvYo8Wz2/RN8+ZaRlyVavAcizYwJ4s/3V5lDvmLLTtiv3CT2mIbwSGMwWYRwQQQSjBIgNHWUcmJPdf9a7BhYXUAE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=0KGyUGRY; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
+	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
+	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=7wS3u64mzk8R/EdSUQvc1bMvTrpSHU/1ojepj2hvF/E=; b=0KGyUGRYC8WXTnO/IC/sMpjTOO
+	jR+oneN8d65IMvFqHyU/v8NLDRZWnxBHvBtX7pUOhbruCaWtt3W2eU9ub0mEELQdBOy/0kp6seD1I
+	TufPRE8C6RNRO1HhJEP0jQ7ya6QTH9e1Li/06vdrkrnP3lyFBD0YDBW7I7Nygg0P+4knmbbDM3Pp3
+	y4a7cPdNVlyb2Wuiaa77Bfy7Mn4271Xgy/zNlUafuZ5pzsdN/J9evyQCkKN3ABx20U6MBS/XdO2/x
+	pOzMKEcVTgMXeWTMLPlZkKGEtBcAyFbG21/Sw1nsdCjFyPW+z31rW7XXppzEBAg9YefbjYmSs3D/r
+	StshgWDA==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:42106 helo=rmk-PC.armlinux.org.uk)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <rmk@armlinux.org.uk>)
+	id 1s0O7B-0000Tp-0L;
+	Fri, 26 Apr 2024 17:07:57 +0100
+Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
+	id 1s0O7C-009gpk-Dh; Fri, 26 Apr 2024 17:07:58 +0100
+In-Reply-To: <ZivP/R1IwKEPb5T6@shell.armlinux.org.uk>
+References: <ZivP/R1IwKEPb5T6@shell.armlinux.org.uk>
+From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>,
+	 Florian Fainelli <f.fainelli@gmail.com>,
+	 Vladimir Oltean <olteanv@gmail.com>,
+	 Woojung Huh <woojung.huh@microchip.com>
+Cc: UNGLinuxDriver@microchip.com,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Subject: [PATCH net-next 1/4] net: dsa: ksz_common: remove phylink_mac_config
+ from ksz_dev_ops
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1714144439.git.gnault@redhat.com> <ee4f5622d105ba9e0c7762acae7c73a7cce05b29.1714144439.git.gnault@redhat.com>
-In-Reply-To: <ee4f5622d105ba9e0c7762acae7c73a7cce05b29.1714144439.git.gnault@redhat.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 26 Apr 2024 18:02:45 +0200
-Message-ID: <CANn89iLYS9QXG7YVJ=DSCedQ5670Kps6dUuh1duaeZuYamM_Rw@mail.gmail.com>
-Subject: Re: [PATCH net 1/2] vxlan: Fix racy device stats updates.
-To: Guillaume Nault <gnault@redhat.com>
-Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-	Ido Schimmel <idosch@nvidia.com>, Amit Cohen <amcohen@nvidia.com>, Petr Machata <petrm@nvidia.com>, 
-	Nikolay Aleksandrov <razor@blackwall.org>, Jiri Benc <jbenc@redhat.com>, Breno Leitao <leitao@debian.org>, 
-	Roopa Prabhu <roopa@nvidia.com>, stephen hemminger <shemminger@vyatta.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Message-Id: <E1s0O7C-009gpk-Dh@rmk-PC.armlinux.org.uk>
+Sender: Russell King <rmk@armlinux.org.uk>
+Date: Fri, 26 Apr 2024 17:07:58 +0100
 
-On Fri, Apr 26, 2024 at 5:27=E2=80=AFPM Guillaume Nault <gnault@redhat.com>=
- wrote:
->
-> VXLAN devices update their stats locklessly. Therefore these counters
-> should either be stored in per-cpu data structures or the updates
-> should be done using atomic increments.
->
-> Since the net_device_core_stats infrastructure is already used in
-> vxlan_rcv(), use it for the other rx_dropped and tx_dropped counter
-> updates. Update the other counters atomically using DEV_STATS_INC().
->
-> Fixes: d342894c5d2f ("vxlan: virtual extensible lan")
-> Signed-off-by: Guillaume Nault <gnault@redhat.com>
-> ---
+The phylink_mac_config function pointer member of struct ksz_dev_ops is
+never initialised, so let's remove it to simplify the code.
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+---
+ drivers/net/dsa/microchip/ksz_common.c | 3 ---
+ drivers/net/dsa/microchip/ksz_common.h | 3 ---
+ 2 files changed, 6 deletions(-)
+
+diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
+index 2b510f150dd8..f4469ee24239 100644
+--- a/drivers/net/dsa/microchip/ksz_common.c
++++ b/drivers/net/dsa/microchip/ksz_common.c
+@@ -3087,9 +3087,6 @@ static void ksz_phylink_mac_config(struct dsa_switch *ds, int port,
+ 
+ 	ksz_set_xmii(dev, port, state->interface);
+ 
+-	if (dev->dev_ops->phylink_mac_config)
+-		dev->dev_ops->phylink_mac_config(dev, port, mode, state);
+-
+ 	if (dev->dev_ops->setup_rgmii_delay)
+ 		dev->dev_ops->setup_rgmii_delay(dev, port);
+ }
+diff --git a/drivers/net/dsa/microchip/ksz_common.h b/drivers/net/dsa/microchip/ksz_common.h
+index 40c11b0d6b62..c88ab5e89ecc 100644
+--- a/drivers/net/dsa/microchip/ksz_common.h
++++ b/drivers/net/dsa/microchip/ksz_common.h
+@@ -349,9 +349,6 @@ struct ksz_dev_ops {
+ 	int (*change_mtu)(struct ksz_device *dev, int port, int mtu);
+ 	void (*freeze_mib)(struct ksz_device *dev, int port, bool freeze);
+ 	void (*port_init_cnt)(struct ksz_device *dev, int port);
+-	void (*phylink_mac_config)(struct ksz_device *dev, int port,
+-				   unsigned int mode,
+-				   const struct phylink_link_state *state);
+ 	void (*phylink_mac_link_up)(struct ksz_device *dev, int port,
+ 				    unsigned int mode,
+ 				    phy_interface_t interface,
+-- 
+2.30.2
+
 
