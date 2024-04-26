@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-91508-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91509-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id ACD018B2E90
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 04:10:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 969EC8B2EA0
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 04:20:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 611161F23EED
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 02:10:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 41F651F21142
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 02:20:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A76517F7;
-	Fri, 26 Apr 2024 02:10:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 228DC186A;
+	Fri, 26 Apr 2024 02:20:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kZPx1kVb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B8hRfjfe"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 105756FA8;
-	Fri, 26 Apr 2024 02:10:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F31E11849
+	for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 02:20:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714097427; cv=none; b=uaqL6uE6Nfi9GeyfG5b5Ma7Msy0OKdgh2iIUUyKN5DvgzQeCAkOuu7V0enqBVByO6+OPLkrF4iyUmwrYC6k5ymV/OgzreMjziQj0dGtuglFjXKMKi2si4WiHu9XyvSaRksXmnet1cnjURN9ihZbXEl3kG7nVRXSUd80UC9jydxY=
+	t=1714098029; cv=none; b=VQsw+5xqswNsV2ZKPknqA6Q11sFCCOAsMW+F+P488xlFyID2MUlyVo8Iwn+0zilDy7ZtbFg5ii2Kfc8Vz307levkeO6Xjhqsw68HRp/ohwulEVCLT5Zc10eWcL7FDHQUTp4aBnH4i55ybIe2LNtDI3wHKl+HCwNnRmgiKzlE/lw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714097427; c=relaxed/simple;
-	bh=d5NSKlfN8vFI8kmDT6ViieDuxmShiRbsDaoL13ffb6g=;
+	s=arc-20240116; t=1714098029; c=relaxed/simple;
+	bh=WN+jNcwDEfQ6pOtaJSrADx+N2lOqITTTm7d/rist+Zc=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=pyAWf/zM/aOzPiUZoTp3JLi0mPqsjLeRVHust8STsL/7IltpN/9lglzuWG3RG3r47WUWU/I6Pi6q2v1H/xSjdwxlqxOWVao4m4U7LC85a1e2p0oH3ySiG7f2cT7CupRrDcexK4gDS6k2xv3at1uDFQvq6u2k8NS3V4Ne7XNyXZ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kZPx1kVb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 84803C2BBFC;
-	Fri, 26 Apr 2024 02:10:26 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=TQXHWQBsNWxZDMsRMWpQIIQOjt3ITK/O3YX3dg16lk012dZV3MmLXKXHyqI3nmR7TbmcmsvP+ZiwNTt+yLIZZWqxUIBBDW1EoDocEyli0l9hMlaaYQ3t7f+ZO/wow2plmSV+T1qTfQiIKPPKaTRppWtwzvGnivdcT7bkzSTRR/E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B8hRfjfe; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id B6674C2BD11;
+	Fri, 26 Apr 2024 02:20:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714097426;
-	bh=d5NSKlfN8vFI8kmDT6ViieDuxmShiRbsDaoL13ffb6g=;
+	s=k20201202; t=1714098028;
+	bh=WN+jNcwDEfQ6pOtaJSrADx+N2lOqITTTm7d/rist+Zc=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=kZPx1kVbBr87AkyaTEUJwUcWOOndd4LkJXrydvmccWWTFNfV6W6zE8liYWwoxvxQE
-	 I/bdasHz+GM5fV8l4/rsag8biCdmejCqbw7GnG6+NvCv1uZGuH4wWMWdqKSqZsYNgM
-	 FMJP5Sl0gMRnFZmPquyFZbcLeYUF6FtHM7yAFsEuk2tvmJ2GtXFmXhrNSqBSGVF0xh
-	 fb4E9zmodNNMgBLfZRdHDUaoC6wUz8dg9TI83RhtkNotDRsft0jc4ZhLoee9CN88cU
-	 tVPZ593ZUYYFX0xvLYxaNa4QrozMY1gEwZBqrIzmPXB2bpKvaSfw+/lEkJTToYuJaR
-	 fTiKU9RrVIORQ==
+	b=B8hRfjfeRT0zKBhlP5QKV8nnPA2DqcYC41Bnapl7n2XDBtg8sV3xcN2+QLdfl4m8x
+	 po/RLXXH77MCZuFyXPboDjKhq0etlmbfwNR7tzAe1dcVEb8nx5hnzomjQTOcTTlqHA
+	 3bu6DslfZjqOj+ODscrmzrzcsksE0EeuJ+dPKQdwORFq1/+PshUq/BE0b3629HdWcw
+	 geL1Mw6n6wSnnQtH+DhbGtAenjHqIh2Kw+H29rj1T1PprGhwuybxLJp/aYkg0BZ2pg
+	 zJJF2iO1+gXNvgfo/zhUgv029CvFelG0Ob6sPiR1c6bH14LsWgPRE6OjV6Sh+ik+Zh
+	 uirHsywNuDGuw==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6FB13C595CE;
-	Fri, 26 Apr 2024 02:10:26 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A926AC595CE;
+	Fri, 26 Apr 2024 02:20:28 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,39 +52,48 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] r8152: replace dev_info with dev_dbg for loading
- firmware
+Subject: Re: [PATCH net-next v2 0/4] net: microchip: Correct spelling in
+ comments
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171409742644.3002.17427557542313626166.git-patchwork-notify@kernel.org>
-Date: Fri, 26 Apr 2024 02:10:26 +0000
-References: <20240424084532.159649-1-hayeswang@realtek.com>
-In-Reply-To: <20240424084532.159649-1-hayeswang@realtek.com>
-To: Hayes Wang <hayeswang@realtek.com>
-Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
- nic_swsd@realtek.com, linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org
+ <171409802869.9165.13553858149750335707.git-patchwork-notify@kernel.org>
+Date: Fri, 26 Apr 2024 02:20:28 +0000
+References: <20240424-lan743x-confirm-v2-0-f0480542e39f@kernel.org>
+In-Reply-To: <20240424-lan743x-confirm-v2-0-f0480542e39f@kernel.org>
+To: Simon Horman <horms@kernel.org>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, bryan.whitehead@microchip.com, richardcochran@gmail.com,
+ horatiu.vultur@microchip.com, lars.povlsen@microchip.com,
+ Steen.Hegelund@microchip.com, daniel.machon@microchip.com,
+ UNGLinuxDriver@microchip.com, netdev@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 24 Apr 2024 16:45:32 +0800 you wrote:
-> Someone complains the message appears continuously. This occurs
-> because the device is woken from UPS mode, and the driver re-loads
-> the firmware.
+On Wed, 24 Apr 2024 16:13:22 +0100 you wrote:
+> Correct spelling in comments in Microchip drivers.
+> Flagged by codespell.
 > 
-> When the device enters runtime suspend and cable is unplugged, the
-> device would enter UPS mode. If the runtime resume occurs, and the
-> device is woken from UPS mode, the driver has to re-load the firmware
-> and causes the message. If someone wakes the device continuously, the
-> message would be shown continuously, too. Use dev_dbg to avoid it.
+> ---
+> Changes in v2:
+> - Patch 3/3: Use 'extack' in place of 'extact', not 'exact'
+>              Thanks to Daniel Machon.
+> - Link to v1: https://lore.kernel.org/r/20240419-lan743x-confirm-v1-0-2a087617a3e5@kernel.org
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next] r8152: replace dev_info with dev_dbg for loading firmware
-    https://git.kernel.org/netdev/net-next/c/092d214138fd
+  - [net-next,v2,1/4] net: lan743x: Correct spelling in comments
+    https://git.kernel.org/netdev/net-next/c/632c9550b999
+  - [net-next,v2,2/4] net: lan966x: Correct spelling in comments
+    https://git.kernel.org/netdev/net-next/c/896e47f5f481
+  - [net-next,v2,3/4] net: encx24j600: Correct spelling in comments
+    https://git.kernel.org/netdev/net-next/c/49c6e0a859f7
+  - [net-next,v2,4/4] net: sparx5: Correct spelling in comments
+    https://git.kernel.org/netdev/net-next/c/d896a374378a
 
 You are awesome, thank you!
 -- 
