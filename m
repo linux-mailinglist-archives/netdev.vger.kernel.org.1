@@ -1,123 +1,105 @@
-Return-Path: <netdev+bounces-91757-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91758-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C2EA8B3C4E
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 18:03:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC0AA8B3C51
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 18:03:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BF7041F20F46
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 16:03:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2982E1C229D5
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 16:03:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B35714D29D;
-	Fri, 26 Apr 2024 16:02:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B603214D2BC;
+	Fri, 26 Apr 2024 16:02:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="bty/pBwm"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="y7UMIZuw"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 123DC14AD26
-	for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 16:02:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CAC114F125
+	for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 16:02:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714147346; cv=none; b=m96Ho8EkAkThH7mcFLfAtxdhqijsFMehyhnHl1hNFxLrOPCqK5p94PZmvD5S7FnYwqxYKbBZdvva99tjkmo8zjObu75bVlnLv9rbn9hTK70y9cbm4xl5U7GFIxMnIE3Tzl+jzQ8ZlvzByRZZO/W7+kqife7tpD3U75yBqvi0PVM=
+	t=1714147379; cv=none; b=h3h6gI4fB/1nupkvZlnM3xMS3B2tbgP2EVJwHWdZZFM7TZLO690xLW8fdJYNTPB01qAoEApptA9ZydILfBZdh4XHGBhIHrQPNztOt4VzZdxoz7sm2b4K57xbBKBoymtj4sGk/pJwqwya3mBsmohOHArYdMRN+TPduk8ICaCtsYY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714147346; c=relaxed/simple;
-	bh=2PyvTdDENvimSafTrmQaUG8Zv0g9z1NstAi8Nbd8jg0=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=jyEXD+ERB/Ekk2ApJaHDv6PNcsQl1wTmadvq8/CF8p7DsMECvTxmfVfrrjRXykKXAjG9D/iE873zHe8L8SdHh+K6nkDzFfzZ02PNin/is7xHBwGb31sdgWV0XqNIA1PaxocQ3n8ClbN1ZEG32yjk9uto5HP6ajeM2CKQLvMYAEg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=bty/pBwm; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:Content-Type:MIME-Version:
-	Message-ID:Subject:Cc:To:From:Date:Reply-To:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-	Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=E2EnCkg7BBWpT1ip396iVXYIySuf0e+XVxe8/SaaEWU=; b=bty/pBwmcvoycevbUJV74BqqPA
-	v6ZBeWBR3p+1eOsr6pd3RGc7gTryy+CzLYewiNqGo5jnyYcmjGZfB0obzhh6EyAzWYAR7EYR+lxI/
-	J8WVvvnI9eMY1lTdKRZW/u2vkmoCOdrfDiFukKi74RX82J8RN+nUtwlon94BE0XZ0j+EHuDlrhcLY
-	UG2eoRdHcS/aL3Jb21fiUOjw8x3TFj6EVbyYTm2vhhhK2jcQPV451zT3qhKVcGfcwUC5W13tTurLo
-	yDHrbUX8ORiX+hXZlgJ3SDTw5BIKJI/GlLUJnEFviTwRELz9JcWWsQGbRZHylKCYbKsfq8/OqMM8W
-	3siSj9Wg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:58686)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1s0O1W-0000SD-39;
-	Fri, 26 Apr 2024 17:02:07 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1s0O1V-0006dn-LD; Fri, 26 Apr 2024 17:02:05 +0100
-Date: Fri, 26 Apr 2024 17:02:05 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Woojung Huh <woojung.huh@microchip.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>, UNGLinuxDriver@microchip.com
-Subject: [PATCH net-next 0/4] net: dsa: microchip: use phylink_mac_ops for
- ksz driver
-Message-ID: <ZivP/R1IwKEPb5T6@shell.armlinux.org.uk>
+	s=arc-20240116; t=1714147379; c=relaxed/simple;
+	bh=k7AljuFrApyTa8ww9MHZnaxrqs3qjeeqHGzJ5S16Yz4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=jJpjTURonUpkYiFhbhse7RA8IwCI6892sWeFRVGC0udSws/nQxF/dCgZ1fgzApPBPLWyc2cVdUwQh0D7ckyRrxNN6uRM2V7MKf+9hZDfLN6Wt6ziIqbJaUqBjRQnFjlgWszoSRp26+vFnGEo7kajhVbAOv9X2OJDmlSeAuGpGWg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=y7UMIZuw; arc=none smtp.client-ip=209.85.208.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-571b5fba660so12687a12.1
+        for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 09:02:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1714147376; x=1714752176; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=k7AljuFrApyTa8ww9MHZnaxrqs3qjeeqHGzJ5S16Yz4=;
+        b=y7UMIZuwXfiKEbZ2Sta9lIq3iNfyY9fc1BT/afROPHanCGz5b/gx9RY4gFQFqH4NxC
+         JqBAC5n+AKHZNyJampzr4vxbFWusTbLKjRPDsHp1zhAfDdsy2S1i7bw0UxzGOXRGVaGb
+         nrcRPzC1R+czC6GO7nxTuoRqh1i+VY5L7bYO2WnYX2Uk0IABvnjJMYUSFmHERWAR/7qZ
+         rmZA4OxSI6TSrKfcAG2p9fG9cYZOxUD8G0/WxZ11WlryjayfAt1VQSwpl5bNAO53vUVi
+         bb/1hT+8WDiPMSNwwNBglbqTimQkQdtPGgvQGuVTKFc4TAr/7i8ookTaFobi4qp3rOzH
+         abTA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714147376; x=1714752176;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=k7AljuFrApyTa8ww9MHZnaxrqs3qjeeqHGzJ5S16Yz4=;
+        b=Smtb1TkFCbTRLfl850lsER1sn9EXsznJ4Ey75fZ11ij97PbeD6oZrMHqEw1svg7Sx5
+         qq3w110dsHXkatwy+hqC06Mwsmto4ojW5N/eEe9Bq/9VC2ILAHjF6v+H0x/tTyjkIR+x
+         99FTaqURBn3MGIb+QMfk8CNKBoevZJOs2jy1QKcV4dMwa4eSgT5NXXDTQVvIdTImjg3u
+         5G8JzKjlV9kqlh/Koc95QszlI4xusEGZpQyNY20u8TAFeLgHD/glK48NJ1kZJd89hLlt
+         6rExXkfiDDmar7RY6etT9WexdyZ7SS4su6rnItsRD4nVZxeWJEI3umHIWn80938JsbAB
+         Z0qQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW2mYHA4Fxz6oq4MhNcPUxrxu1B1ePmvoTKu6w2/06H2dWNsYjC/laGOnDPgfR7gy5A67feUI1lq0nHbNea8cm+pPhgiCmN
+X-Gm-Message-State: AOJu0Yx05970wy3/6iZ7+GUvN3LCP/yhssU98T6rVtK3W9PedstTHhE+
+	2valM4YGlePYhwWyEu2muSEXQlWXofKeppLLnhOdiz7g9RkBPr9nRZdHBr43Pvy7PqkHFv4q3EY
+	xuI/T7BGwEn6EVuBefNcle/eJKwTh4CuU/XBc
+X-Google-Smtp-Source: AGHT+IHIAMuNikWPfBDl4N/DTwTnfz10CVFQMo8z2v9ltMJesmcjBxArp5RuHaNK5cyR0xn/NZV5Q8DnnZvwpi3wqtE=
+X-Received: by 2002:a05:6402:2899:b0:572:fae:7f96 with SMTP id
+ eg25-20020a056402289900b005720fae7f96mr181020edb.6.1714147376143; Fri, 26 Apr
+ 2024 09:02:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+References: <cover.1714144439.git.gnault@redhat.com> <ee4f5622d105ba9e0c7762acae7c73a7cce05b29.1714144439.git.gnault@redhat.com>
+In-Reply-To: <ee4f5622d105ba9e0c7762acae7c73a7cce05b29.1714144439.git.gnault@redhat.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 26 Apr 2024 18:02:45 +0200
+Message-ID: <CANn89iLYS9QXG7YVJ=DSCedQ5670Kps6dUuh1duaeZuYamM_Rw@mail.gmail.com>
+Subject: Re: [PATCH net 1/2] vxlan: Fix racy device stats updates.
+To: Guillaume Nault <gnault@redhat.com>
+Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+	Ido Schimmel <idosch@nvidia.com>, Amit Cohen <amcohen@nvidia.com>, Petr Machata <petrm@nvidia.com>, 
+	Nikolay Aleksandrov <razor@blackwall.org>, Jiri Benc <jbenc@redhat.com>, Breno Leitao <leitao@debian.org>, 
+	Roopa Prabhu <roopa@nvidia.com>, stephen hemminger <shemminger@vyatta.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi,
+On Fri, Apr 26, 2024 at 5:27=E2=80=AFPM Guillaume Nault <gnault@redhat.com>=
+ wrote:
+>
+> VXLAN devices update their stats locklessly. Therefore these counters
+> should either be stored in per-cpu data structures or the updates
+> should be done using atomic increments.
+>
+> Since the net_device_core_stats infrastructure is already used in
+> vxlan_rcv(), use it for the other rx_dropped and tx_dropped counter
+> updates. Update the other counters atomically using DEV_STATS_INC().
+>
+> Fixes: d342894c5d2f ("vxlan: virtual extensible lan")
+> Signed-off-by: Guillaume Nault <gnault@redhat.com>
+> ---
 
-This four patch series switches the Microchip KSZ DSA driver to use
-phylink_mac_ops support, and for this one we go a little further
-beyond a simple conversion. This driver has four distinct cases:
-
-lan937x
-ksz9477
-ksz8
-ksz8830
-
-Three of these cases are handled by shimming the existing DSA calls
-through ksz_dev_ops, and the final case is handled through a
-conditional in ksz_phylink_mac_config(). These can all be handled
-with separate phylink_mac_ops.
-
-To get there, we do a progressive conversion.
-
-Patch 1 removes ksz_dev_ops' phylink_mac_config() method which is
-not populated in any of the arrays - and is thus redundant.
-
-Patch 2 switches the driver to use a common set of phylink_mac_ops
-for all cases, doing the simple conversion to avoid the DSA shim.
-
-Patch 3 pushes the phylink_mac_ops down to the first three classes
-(lan937x, ksz9477, ksz8) adding an appropriate pointer to the
-phylink_mac_ops to struct ksz_chip_data, and using that to
-populate DSA's ds->phylink_mac_ops pointer. The difference between
-each of these are the mac_link_up() method. mac_config() and
-mac_link_down() remain common between each at this stage.
-
-Patch 4 splits out ksz8830, which needs different mac_config()
-handling, and thus means we have a difference in mac_config()
-methods between the now four phylink_mac_ops structures.
-
-Build tested only, with additional -Wunused-const-variable flag.
-
- drivers/net/dsa/microchip/ksz8.h       |   6 +-
- drivers/net/dsa/microchip/ksz8795.c    |  10 ++-
- drivers/net/dsa/microchip/ksz_common.c | 121 ++++++++++++++++++++++-----------
- drivers/net/dsa/microchip/ksz_common.h |   5 +-
- 4 files changed, 94 insertions(+), 48 deletions(-)
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
