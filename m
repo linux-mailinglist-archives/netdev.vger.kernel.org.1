@@ -1,237 +1,114 @@
-Return-Path: <netdev+bounces-91661-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91665-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EAF288B35F2
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 12:49:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B7F2C8B35FC
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 12:51:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1B1601C21D6B
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 10:49:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EACD71C21D18
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 10:50:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B108148301;
-	Fri, 26 Apr 2024 10:47:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C62FF144D07;
+	Fri, 26 Apr 2024 10:47:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kiW0Z0cQ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lSDM6goI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A84E714535D;
-	Fri, 26 Apr 2024 10:47:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 598E0143C67
+	for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 10:47:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714128431; cv=none; b=o0MkXFj2BIz9qBNB0iVrgOqRRABpBUo539MNig7tk3oB5eZoC3W/J4XAZrrqgDbxWtFHzEvF30oggOhrqyZ4tB0yo4bn3jesRwu1bkwIN4VrsCftdolVcuQ4cpV1HEmbF4ZkrWQ+RIeIYlWI710pnqkZyahR9jm/vcHpGZvDgaU=
+	t=1714128446; cv=none; b=RLTpc6Fd07TYj0DnR+VscKMAdrSoeHqOVFmqW5yk/HON6foVwe5HM+xOkDjR4KwmPPjBTwBKsn4dcZIaDamqJc8di06aBEy9tedYx/9WFW9mCsgIHddI/I+66P6TZbuVWQwNpVDbEXYWJCg5DzI0ConTk4ib6C/AJkM8/QUa4m0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714128431; c=relaxed/simple;
-	bh=GH2bezeza5fhtu1z47o7+tK1nF0tM45eNw6jY53xEPE=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=SiLYBwxYeIlfLNFJYabrANjp7c1AlzgiUFRRBl8MboaUw6K+ZU/rzDLL7teUvJnTz0Kq0jYi75RLHbtIowNQWDxxAl3u/yI0935gNaPq4Glh9fvybYGkTuLZcmlbTrDbF+1KsBPKoQagIh5xdrckoG5Epx4SHTEAHOPqvFVYlMg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kiW0Z0cQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 880CEC4DDFD;
-	Fri, 26 Apr 2024 10:47:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714128431;
-	bh=GH2bezeza5fhtu1z47o7+tK1nF0tM45eNw6jY53xEPE=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=kiW0Z0cQ7WgJZiEdkBZIJwyIs9FJJWesmJJEaKqH3PUZD+r+8eiASo2bq5QA60sYs
-	 fOjDLnkCC3ZMzNkfJvLJyCm7HafCnMGiswi/CvHmRHm1q6DSUzEinXnX+8vZl3Xbjx
-	 g68VikuKB0cl5riAY1SxrxfQSRaXpLWiBNrHsIFQz6AhWLKGHy6dJUfObhqZc1pMta
-	 hCSFc2e9f/PA+KGf79fXLB91SsVLHQrHfApiFpfGnho67Uv0Kl5cIs+xGWg0wnkD4x
-	 h/qb3LpKmoPC8USlaGIJbDPkK9Lc+4PMBnBfJHzudCYhY3uvm3YlM17h9ocXvWXIFf
-	 l7Xh7nkjHQx2Q==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76A85C4345F;
-	Fri, 26 Apr 2024 10:47:11 +0000 (UTC)
-From: Joel Granados via B4 Relay <devnull+j.granados.samsung.com@kernel.org>
-Date: Fri, 26 Apr 2024 12:47:00 +0200
-Subject: [PATCH v5 8/8] ax.25: x.25: Remove the now superfluous sentinel
- elements from ctl_table array
+	s=arc-20240116; t=1714128446; c=relaxed/simple;
+	bh=+x0TTtbTFeSJ2aAxUwYEVz0P7kHhxwjxBr8tm/4D7l8=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=qKIXAp6ryH6vVuA2y+EHrGT/M40dH7yPpv9ANpyCihOhVbPpcvHdI+RDHgtt1HAM+RPZEXzfDB/PbaWvXe8VCiK+Cu0e5i0K7GkWwifekZpGh/5dePEu5Ukle/wmBu0gC9ex6xGbhVk+im2QEByv7nWOBwn+RrKfWUvv2JMZDzs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lSDM6goI; arc=none smtp.client-ip=209.85.219.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dcdc3db67f0so4028370276.1
+        for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 03:47:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1714128444; x=1714733244; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=iiQEHuFKsDoR6yUT/ZR7h/b7KsBRa5O03elx5Ss59/8=;
+        b=lSDM6goIdlK/lhb1j9CuT7qKK0iyF/bohEuwkGNd2c7hq+oFAEmZFzrft1y5ybslZU
+         oGTL7vcT+/2beE4lHBMDsWVaTvK0l25SchTt99WFncAAEtdH+yhpAWeIpPXhfJLuUJBs
+         R6qctnmFGR9TkH7TyZAyLPhdYtqBecEbcYPoU5yQRc3iSW5XWH5l0yFQZa0y/j1L9NxB
+         qriHae4kp+wI1feSEnvmoQCrX8ZnIk8AvcmfuHOUA6QHzLse5yQAQC/y40rZonl82RL7
+         tPDtSviXN4kz8TcDN2J60WYanXk8UqbguiA7KxO0av1iXQPBzRzzOXzS9FrAcCEP1fqj
+         dd6w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714128444; x=1714733244;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=iiQEHuFKsDoR6yUT/ZR7h/b7KsBRa5O03elx5Ss59/8=;
+        b=FfW0aUG1YROj93O5o52v1WAx/Py0bGxYbFLojhNLhE3NlfWW1sfeBPVFc/CxfR91Ca
+         toERYm5gkqyPDVIaC0dRr+u+gDLtGYoO1u50cjb3USfRiRbCWX1kM36isqfZK05OfDNc
+         KuFDY/qXFFSCZI/d6rO5XmPyzZ58Li7DQ2hx0syfy4DcN/4V3ZW7hz1/6vFqI2LRWcVe
+         yoPDm/vlBxlndI/l6TK3lc0McPStHXE6enBOoUu9OLGWGvmSJ9lJjYH33ooWuJIf5xxv
+         FpXQ191mGRAUmcNUAqYnCRjKlRb4L9L6R7alaLFNrzq9mi4G5Wr8jIfHn6MNMbUvdATp
+         +HhQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUwj9NcR3Sc2ZlT5mCUKKiH+Gw5dkXhj2maSbv+JyHGR5D/6xqsuwQRfNT43anFI9cDyawumM6kMmOPXlaI7IxVsH/8vFJZ
+X-Gm-Message-State: AOJu0YyptVD7z5Mq05XhkP14/fDYIagM2GqxWnNRxY05APuMpfBIW3nt
+	KUz2O7mtCoMVPf4as0mLl8aOzJ8zj+N9haYR326oGIHOcUhLedPUScPk04awZ5+X+fPSSN/rekM
+	U/tZuBhclWQ==
+X-Google-Smtp-Source: AGHT+IF8QA+/3tE/pxZg8EZKZAzXTv5nvfnC6IQBOI6BTX/2MDZsFzfnZJdhYRfRekW7kMO6CjIba3Qcb7dtpQ==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a25:8e04:0:b0:de5:a68a:d757 with SMTP id
+ p4-20020a258e04000000b00de5a68ad757mr406995ybl.3.1714128444400; Fri, 26 Apr
+ 2024 03:47:24 -0700 (PDT)
+Date: Fri, 26 Apr 2024 10:47:22 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240426-jag-sysctl_remset_net-v5-8-e3b12f6111a6@samsung.com>
-References: <20240426-jag-sysctl_remset_net-v5-0-e3b12f6111a6@samsung.com>
-In-Reply-To: <20240426-jag-sysctl_remset_net-v5-0-e3b12f6111a6@samsung.com>
-To: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Alexander Aring <alex.aring@gmail.com>, 
- Stefan Schmidt <stefan@datenfreihafen.org>, 
- Miquel Raynal <miquel.raynal@bootlin.com>, David Ahern <dsahern@kernel.org>, 
- Steffen Klassert <steffen.klassert@secunet.com>, 
- Herbert Xu <herbert@gondor.apana.org.au>, 
- Matthieu Baerts <matttbe@kernel.org>, Mat Martineau <martineau@kernel.org>, 
- Geliang Tang <geliang@kernel.org>, Ralf Baechle <ralf@linux-mips.org>, 
- Remi Denis-Courmont <courmisch@gmail.com>, 
- Allison Henderson <allison.henderson@oracle.com>, 
- David Howells <dhowells@redhat.com>, Marc Dionne <marc.dionne@auristor.com>, 
- Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, 
- Xin Long <lucien.xin@gmail.com>, Wenjia Zhang <wenjia@linux.ibm.com>, 
- Jan Karcher <jaka@linux.ibm.com>, "D. Wythe" <alibuda@linux.alibaba.com>, 
- Tony Lu <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>, 
- Trond Myklebust <trond.myklebust@hammerspace.com>, 
- Anna Schumaker <anna@kernel.org>, Chuck Lever <chuck.lever@oracle.com>, 
- Jeff Layton <jlayton@kernel.org>, Neil Brown <neilb@suse.de>, 
- Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>, 
- Tom Talpey <tom@talpey.com>, Jon Maloy <jmaloy@redhat.com>, 
- Ying Xue <ying.xue@windriver.com>, Martin Schiller <ms@dev.tdt.de>, 
- Pablo Neira Ayuso <pablo@netfilter.org>, 
- Jozsef Kadlecsik <kadlec@netfilter.org>, Florian Westphal <fw@strlen.de>, 
- Roopa Prabhu <roopa@nvidia.com>, Nikolay Aleksandrov <razor@blackwall.org>, 
- Simon Horman <horms@verge.net.au>, Julian Anastasov <ja@ssi.bg>, 
- Joerg Reuter <jreuter@yaina.de>, Luis Chamberlain <mcgrof@kernel.org>, 
- Kees Cook <keescook@chromium.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- dccp@vger.kernel.org, linux-wpan@vger.kernel.org, mptcp@lists.linux.dev, 
- linux-hams@vger.kernel.org, linux-rdma@vger.kernel.org, 
- rds-devel@oss.oracle.com, linux-afs@lists.infradead.org, 
- linux-sctp@vger.kernel.org, linux-s390@vger.kernel.org, 
- linux-nfs@vger.kernel.org, tipc-discussion@lists.sourceforge.net, 
- linux-x25@vger.kernel.org, netfilter-devel@vger.kernel.org, 
- coreteam@netfilter.org, bridge@lists.linux.dev, lvs-devel@vger.kernel.org, 
- Joel Granados <j.granados@samsung.com>
-X-Mailer: b4 0.13-dev-2d940
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3995;
- i=j.granados@samsung.com; h=from:subject:message-id;
- bh=NZnJW6XWgopf75vh1g8TgFTlOj8qaKFukPEjDf1p53c=;
- b=owJ4nAHtARL+kA0DAAoBupfNUreWQU8ByyZiAGYrhixeiGtr0+3cn50MVCpNJqH3pUbctq+W8
- IALAHu076ZyXYkBswQAAQoAHRYhBK5HCVcl5jElzssnkLqXzVK3lkFPBQJmK4YsAAoJELqXzVK3
- lkFP14IL/RB8B5qMj08F0htyG3GLjxNGZowNF7f8ASmAGyCEJBAo1dwvrVPbWphTkoN0F4w8+69
- kGbOBFemyxiSB9/sU6hGmwbqBzLWGWVlGYoBQaFXmaXTshdupdmxkKyJAdWuvAvfxfoY/dy0yjJ
- swhEKwIONZVtmBlqZwBj7b7EILpjwK6jH3O/rEjU67bWlKPlu9GHoWb2N20nuaiReoU8StYBPot
- S6MsfjOAcaVqBGdtGdzGjeDbOrib3lAqRV8+iiXNPTG93cN67pyf5t+Np+t4HzhBHah9u3lF5Bw
- Qz9HZLtHnUuiU5ISlS2GpfSxRefL1afrN40+uIOGY8EjEZxZcYROoQ9u9ikf71rd4IXLXW8bTHN
- QeAj9nLYPFNQHiOSK4R6agj9tuJv+oTmvbBGndR9eq+KmjnatqxsdG7+30uFoHbQO+MVnuWW8bl
- 3pHTcsCdAFrNme6Mqym7SNGMPypA7b2bPTtnlyRxD2i+c7wV2M/IW2O6hZZLs5XxEyFzDq26WE6
- Tw=
-X-Developer-Key: i=j.granados@samsung.com; a=openpgp;
- fpr=F1F8E46D30F0F6C4A45FF4465895FAAC338C6E77
-X-Endpoint-Received: by B4 Relay for j.granados@samsung.com/default with
- auth_id=70
-X-Original-From: Joel Granados <j.granados@samsung.com>
-Reply-To: j.granados@samsung.com
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.44.0.769.g3c40516874-goog
+Message-ID: <20240426104722.1612331-1-edumazet@google.com>
+Subject: [PATCH net-next] ipv6: use call_rcu_hurry() in fib6_info_release()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-From: Joel Granados <j.granados@samsung.com>
+This is a followup of commit c4e86b4363ac ("net: add two more
+call_rcu_hurry()")
 
-This commit comes at the tail end of a greater effort to remove the
-empty elements at the end of the ctl_table arrays (sentinels) which will
-reduce the overall build time size of the kernel and run time memory
-bloat by ~64 bytes per sentinel (further information Link :
-https://lore.kernel.org/all/ZO5Yx5JFogGi%2FcBo@bombadil.infradead.org/)
+fib6_info_destroy_rcu() is calling nexthop_put() or fib6_nh_release()
 
-Avoid a buffer overflow when traversing the ctl_table by ensuring that
-AX25_MAX_VALUES is the same as the size of ax25_param_table. This is
-done with a BUILD_BUG_ON where ax25_param_table is defined and a
-CONFIG_AX25_DAMA_SLAVE guard in the unnamed enum definition as well as
-in the ax25_dev_device_up and ax25_ds_set_timer functions.
+We must not delay it too much or risk unregister_netdevice/ref_tracker
+traces because references to netdev are not released in time.
 
-The overflow happened when the sentinel was removed from
-ax25_param_table. The sentinel's data element was changed when
-CONFIG_AX25_DAMA_SLAVE was undefined. This had no adverse effects as it
-still stopped on the sentinel's null procname but needed to be addressed
-once the sentinel was removed.
+This should speedup device/netns dismantles when CONFIG_RCU_LAZY=y
 
-Signed-off-by: Joel Granados <j.granados@samsung.com>
+Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- include/net/ax25.h         | 2 ++
- net/ax25/ax25_dev.c        | 3 +++
- net/ax25/ax25_ds_timer.c   | 4 ++++
- net/ax25/sysctl_net_ax25.c | 3 +--
- net/x25/sysctl_net_x25.c   | 1 -
- 5 files changed, 10 insertions(+), 3 deletions(-)
+ include/net/ip6_fib.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/include/net/ax25.h b/include/net/ax25.h
-index 0d939e5aee4e..eb9cee8252c8 100644
---- a/include/net/ax25.h
-+++ b/include/net/ax25.h
-@@ -139,7 +139,9 @@ enum {
- 	AX25_VALUES_N2,		/* Default N2 value */
- 	AX25_VALUES_PACLEN,	/* AX.25 MTU */
- 	AX25_VALUES_PROTOCOL,	/* Std AX.25, DAMA Slave, DAMA Master */
-+#ifdef CONFIG_AX25_DAMA_SLAVE
- 	AX25_VALUES_DS_TIMEOUT,	/* DAMA Slave timeout */
-+#endif
- 	AX25_MAX_VALUES		/* THIS MUST REMAIN THE LAST ENTRY OF THIS LIST */
- };
- 
-diff --git a/net/ax25/ax25_dev.c b/net/ax25/ax25_dev.c
-index c5462486dbca..af547e185a94 100644
---- a/net/ax25/ax25_dev.c
-+++ b/net/ax25/ax25_dev.c
-@@ -78,7 +78,10 @@ void ax25_dev_device_up(struct net_device *dev)
- 	ax25_dev->values[AX25_VALUES_N2]        = AX25_DEF_N2;
- 	ax25_dev->values[AX25_VALUES_PACLEN]	= AX25_DEF_PACLEN;
- 	ax25_dev->values[AX25_VALUES_PROTOCOL]  = AX25_DEF_PROTOCOL;
-+
-+#ifdef CONFIG_AX25_DAMA_SLAVE
- 	ax25_dev->values[AX25_VALUES_DS_TIMEOUT]= AX25_DEF_DS_TIMEOUT;
-+#endif
- 
- #if defined(CONFIG_AX25_DAMA_SLAVE) || defined(CONFIG_AX25_DAMA_MASTER)
- 	ax25_ds_setup_timer(ax25_dev);
-diff --git a/net/ax25/ax25_ds_timer.c b/net/ax25/ax25_ds_timer.c
-index c4f8adbf8144..8f385d2a7628 100644
---- a/net/ax25/ax25_ds_timer.c
-+++ b/net/ax25/ax25_ds_timer.c
-@@ -49,12 +49,16 @@ void ax25_ds_del_timer(ax25_dev *ax25_dev)
- 
- void ax25_ds_set_timer(ax25_dev *ax25_dev)
+diff --git a/include/net/ip6_fib.h b/include/net/ip6_fib.h
+index 323c94f1845b9e3eed52a2a19a4871cf8174d9c2..7834f7f29d3c9323e753be9e46499784a619de1b 100644
+--- a/include/net/ip6_fib.h
++++ b/include/net/ip6_fib.h
+@@ -338,7 +338,7 @@ static inline void fib6_info_release(struct fib6_info *f6i)
  {
-+#ifdef CONFIG_AX25_DAMA_SLAVE
- 	if (ax25_dev == NULL)		/* paranoia */
- 		return;
- 
- 	ax25_dev->dama.slave_timeout =
- 		msecs_to_jiffies(ax25_dev->values[AX25_VALUES_DS_TIMEOUT]) / 10;
- 	mod_timer(&ax25_dev->dama.slave_timer, jiffies + HZ);
-+#else
-+	return;
-+#endif
+ 	if (f6i && refcount_dec_and_test(&f6i->fib6_ref)) {
+ 		DEBUG_NET_WARN_ON_ONCE(!hlist_unhashed(&f6i->gc_link));
+-		call_rcu(&f6i->rcu, fib6_info_destroy_rcu);
++		call_rcu_hurry(&f6i->rcu, fib6_info_destroy_rcu);
+ 	}
  }
  
- /*
-diff --git a/net/ax25/sysctl_net_ax25.c b/net/ax25/sysctl_net_ax25.c
-index db66e11e7fe8..4e593d36d311 100644
---- a/net/ax25/sysctl_net_ax25.c
-+++ b/net/ax25/sysctl_net_ax25.c
-@@ -141,8 +141,6 @@ static const struct ctl_table ax25_param_table[] = {
- 		.extra2		= &max_ds_timeout
- 	},
- #endif
--
--	{ }	/* that's all, folks! */
- };
- 
- int ax25_register_dev_sysctl(ax25_dev *ax25_dev)
-@@ -155,6 +153,7 @@ int ax25_register_dev_sysctl(ax25_dev *ax25_dev)
- 	if (!table)
- 		return -ENOMEM;
- 
-+	BUILD_BUG_ON(ARRAY_SIZE(ax25_param_table) != AX25_MAX_VALUES);
- 	for (k = 0; k < AX25_MAX_VALUES; k++)
- 		table[k].data = &ax25_dev->values[k];
- 
-diff --git a/net/x25/sysctl_net_x25.c b/net/x25/sysctl_net_x25.c
-index e9802afa43d0..643f50874dfe 100644
---- a/net/x25/sysctl_net_x25.c
-+++ b/net/x25/sysctl_net_x25.c
-@@ -71,7 +71,6 @@ static struct ctl_table x25_table[] = {
- 		.mode = 	0644,
- 		.proc_handler = proc_dointvec,
- 	},
--	{ },
- };
- 
- int __init x25_register_sysctl(void)
-
 -- 
-2.43.0
-
+2.44.0.769.g3c40516874-goog
 
 
