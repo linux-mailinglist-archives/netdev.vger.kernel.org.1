@@ -1,158 +1,140 @@
-Return-Path: <netdev+bounces-91589-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91591-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 145EC8B31F9
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 10:06:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF44E8B3204
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 10:09:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 45CA31C21E91
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 08:06:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 567241F225E9
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 08:09:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A95FB13C8F0;
-	Fri, 26 Apr 2024 08:06:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E550113C8FF;
+	Fri, 26 Apr 2024 08:09:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="SNGDCotE"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="jze/LJ6Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBA0513AD04
-	for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 08:06:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+Received: from m15.mail.163.com (m15.mail.163.com [45.254.50.220])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B33A13A3E7;
+	Fri, 26 Apr 2024 08:09:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.254.50.220
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714118771; cv=none; b=BicnRbLv5tMwCi9Hb8ns+sYlg/q9Iy6sqB4ErfmRLryMXPwDxXUbHexPDLPjnqNwpHXxOTUoOapTs21GxewJtoPL0Fv53RncdJ/GTJ5VXXMimvN9g2qFX5MO5T5ZJnrGx69k42Yr4hH+10nyXZsGSyaLr6bo4ABuJsXrO+ZjJHQ=
+	t=1714118968; cv=none; b=QfBfk9D7KzZOUwjD+BsObtvi4RwCihGnEPAmOo0NILkjDI07n6p9Z7cDWQ1aoBJMVzJY04VUKp6BOW33eNAMC0x/7gkUraXjHstGCiq0pEff5Vo2UNnyUJ5orjVqi6x7Q1xXJgCXlQ6mXDDAOBWInRpXLXXufuJPt7g5zlV+Feg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714118771; c=relaxed/simple;
-	bh=gZE+yVvVHW18i8ArWkqNeZ9lEX82xV7jJguIo8KAnd4=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nlb9b1sIhTSlgntn2HBBfQI863lnoIUANJFFGWw63LwztIpYTVvuBDcWCKNMD1TpHzEoQvwpZFeFFYd9xvhdoU0tCN0CetWvEKB3VQUSwSOwQGTJLP3JpNdg+c7nFmiLql+RIOlrX9SKm0Oxh+7LhQut2UgX51ovW7N64XxZMwA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=SNGDCotE; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id 7D9E820872;
-	Fri, 26 Apr 2024 10:06:08 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from a.mx.secunet.com ([127.0.0.1])
-	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 6G1uwrbx40G7; Fri, 26 Apr 2024 10:06:04 +0200 (CEST)
-Received: from mailout1.secunet.com (mailout1.secunet.com [62.96.220.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id 5187F201AA;
-	Fri, 26 Apr 2024 10:06:04 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 5187F201AA
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1714118764;
-	bh=NNKR9vY+a44TzoX5MLLVq09DuILwSrwTt1FZmvhl2FA=;
-	h=Date:From:To:CC:Subject:Reply-To:References:In-Reply-To:From;
-	b=SNGDCotEVu9XAre1OI3KYPRGoTu8Rrt0M3plkr4BIybzOQ8NclnBFWG7c9usCXXiT
-	 vevTyeT1KqFt7vfa2NTFpczNpcooUf40S51IVZ9nOX08a0nDAIrXH0XloGat8kZSNo
-	 3fsYed2W1eTJgywCcBRRCw7jmspUGhCvpGUk6d6KtuHK73+jDcGlgtD/JFXDkOad1h
-	 jGZGZhoRs07qUkt6+KEYcoevEH/hgMQIQvdvxrSvcpJy0EiGYibZ7qbf0o6I1lae9+
-	 163LYkevx51JLd+3g/SiO2zxP1Paj+13hKWEI/5QGJAHJi2cj/2/vVTPjpAolheRxm
-	 GxQ+VL24NTbmQ==
-Received: from cas-essen-01.secunet.de (unknown [10.53.40.201])
-	by mailout1.secunet.com (Postfix) with ESMTP id 44CF080004A;
-	Fri, 26 Apr 2024 10:06:04 +0200 (CEST)
-Received: from mbx-essen-01.secunet.de (10.53.40.197) by
- cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.37; Fri, 26 Apr 2024 10:06:04 +0200
-Received: from moon.secunet.de (172.18.149.1) by mbx-essen-01.secunet.de
- (10.53.40.197) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.37; Fri, 26 Apr
- 2024 10:06:03 +0200
-Date: Fri, 26 Apr 2024 10:05:56 +0200
-From: Antony Antony <antony.antony@secunet.com>
-To: Steffen Klassert <steffen.klassert@secunet.com>, Herbert Xu
-	<herbert@gondor.apana.org.au>, <netdev@vger.kernel.org>
-CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, <devel@linux-ipsec.org>, Leon Romanovsky
-	<leon@kernel.org>, Eyal Birger <eyal.birger@gmail.com>, Nicolas Dichtel
-	<nicolas.dichtel@6wind.com>, Sabrina Dubroca <sd@queasysnail.net>
-Subject: [PATCH ipsec-next v13 4/4] xfrm: Restrict SA direction attribute to
- specific netlink message types
-Message-ID: <8b3669fa6ddaed4b8ef5ee32bed76e2b8ab1f0a7.1714118266.git.antony.antony@secunet.com>
-Reply-To: <antony.antony@secunet.com>
-References: <cover.1714118266.git.antony.antony@secunet.com>
+	s=arc-20240116; t=1714118968; c=relaxed/simple;
+	bh=dqexjYVG/TRkkiRk3X4lAKrAzhWMuPT98yCFL7d1i0M=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=GwrE+JA1ycyehYPnrErsWDDA4nZ6lLn5I+hvs39ghg2aVKuWAmYVhixynAdCPbg2zSo0xILRiBzfb5hUr3F12C2L9ichZE5cY5fWvmv57VPUUxYNBzfQq00spjIBWpDVU7gAx7PRBLZDbAijOPV3jpKfx8OnQKwFJF6srjQkIzE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=jze/LJ6Q; arc=none smtp.client-ip=45.254.50.220
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=4ZX3C
+	2yV/g45GL3DnetD0/tBcmwuj74la9gUgdxLngs=; b=jze/LJ6Q9A3vEKrrQxIoU
+	gW/j8DkkC2mduhZzYHZ4zR1iLvOsk4MYU3CHKzTk27uMZU3GQifvRn50T3Hvjirn
+	r8SPUU+89foHJnloA7zNko9HpfMZSWfCUl9ls061xJ+WncdVxhPSuglyrBWJ2Ix6
+	eWyeiSvEtu3zvEdoIpbtGA=
+Received: from localhost.localdomain (unknown [112.97.48.208])
+	by gzga-smtp-mta-g0-4 (Coremail) with SMTP id _____wDnPprJYCtmjTm8CQ--.11148S2;
+	Fri, 26 Apr 2024 16:07:39 +0800 (CST)
+From: Slark Xiao <slark_xiao@163.com>
+To: loic.poulain@linaro.org,
+	ryazanov.s.a@gmail.com,
+	johannes@sipsolutions.net
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Slark Xiao <slark_xiao@163.com>
+Subject: [PATCH net] net: wwan: Add net device name for error message print
+Date: Fri, 26 Apr 2024 16:07:33 +0800
+Message-Id: <20240426080733.819633-1-slark_xiao@163.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <cover.1714118266.git.antony.antony@secunet.com>
-Precedence: first-class
-Priority: normal
-Organization: secunet
-X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
- mbx-essen-01.secunet.de (10.53.40.197)
-X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wDnPprJYCtmjTm8CQ--.11148S2
+X-Coremail-Antispam: 1Uf129KBjvJXoWxXry5KFW7XFyrCr15KF1ftFb_yoW5AF4DpF
+	W7K3sxZr1UJay7X3WUJrWkZFWYywn5ta47Kry2v3WSvF1ayrWUWa4fJF95uw43ta1rAr17
+	tF4S9anxW3ZrG3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0piH5l8UUUUU=
+X-CM-SenderInfo: xvod2y5b0lt0i6rwjhhfrp/1tbiowvLZGVODFttogABs1
 
-Reject the usage of the SA_DIR attribute in xfrm netlink messages when
-it's not applicable. This ensures that SA_DIR is only accepted for
-certain message types (NEWSA, UPDSA, and ALLOCSPI)
+In my local, I got an error print in dmesg like below:
+"sequence number glitch prev=487 curr=0"
+After checking, it belongs to mhi_wwan_mbim.c. Refer to the usage
+of this API in other files, I think we should add net device name
+print before message context.
 
-Signed-off-by: Antony Antony <antony.antony@secunet.com>
+Signed-off-by: Slark Xiao <slark_xiao@163.com>
 ---
-v12 -> 13
- - renamed the function for clarity
+ drivers/net/wwan/mhi_wwan_mbim.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-v11 -> 12
-  - fix spd look up. This broke xfrm_policy tests
----
- net/xfrm/xfrm_user.c | 24 ++++++++++++++++++++++++
- 1 file changed, 24 insertions(+)
-
-diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
-index 65948598be0b..e606c3012471 100644
---- a/net/xfrm/xfrm_user.c
-+++ b/net/xfrm/xfrm_user.c
-@@ -3200,6 +3200,24 @@ static const struct xfrm_link {
- 	[XFRM_MSG_GETDEFAULT  - XFRM_MSG_BASE] = { .doit = xfrm_get_default   },
- };
-
-+static int xfrm_reject_unused_attr(int type, struct nlattr **attrs,
-+				   struct netlink_ext_ack *extack)
-+{
-+	if (attrs[XFRMA_SA_DIR]) {
-+		switch (type) {
-+		case XFRM_MSG_NEWSA:
-+		case XFRM_MSG_UPDSA:
-+		case XFRM_MSG_ALLOCSPI:
-+			break;
-+		default:
-+			NL_SET_ERR_MSG(extack, "Invalid attribute SA_DIR");
-+			return -EINVAL;
-+		}
-+	}
-+
-+	return 0;
-+}
-+
- static int xfrm_user_rcv_msg(struct sk_buff *skb, struct nlmsghdr *nlh,
- 			     struct netlink_ext_ack *extack)
- {
-@@ -3259,6 +3277,12 @@ static int xfrm_user_rcv_msg(struct sk_buff *skb, struct nlmsghdr *nlh,
- 	if (err < 0)
- 		goto err;
-
-+	if (!link->nla_pol || link->nla_pol == xfrma_policy) {
-+		err = xfrm_reject_unused_attr((type + XFRM_MSG_BASE), attrs, extack);
-+		if (err < 0)
-+			goto err;
-+	}
-+
- 	if (link->doit == NULL) {
- 		err = -EINVAL;
- 		goto err;
---
-2.30.2
+diff --git a/drivers/net/wwan/mhi_wwan_mbim.c b/drivers/net/wwan/mhi_wwan_mbim.c
+index 3f72ae943b29..6cefee25efc4 100644
+--- a/drivers/net/wwan/mhi_wwan_mbim.c
++++ b/drivers/net/wwan/mhi_wwan_mbim.c
+@@ -186,14 +186,14 @@ static int mbim_rx_verify_nth16(struct mhi_mbim_context *mbim, struct sk_buff *s
+ 
+ 	if (skb->len < sizeof(struct usb_cdc_ncm_nth16) +
+ 			sizeof(struct usb_cdc_ncm_ndp16)) {
+-		net_err_ratelimited("frame too short\n");
++		net_err_ratelimited("mbim: frame too short\n");
+ 		return -EINVAL;
+ 	}
+ 
+ 	nth16 = (struct usb_cdc_ncm_nth16 *)skb->data;
+ 
+ 	if (nth16->dwSignature != cpu_to_le32(USB_CDC_NCM_NTH16_SIGN)) {
+-		net_err_ratelimited("invalid NTH16 signature <%#010x>\n",
++		net_err_ratelimited("mbim: invalid NTH16 signature <%#010x>\n",
+ 				    le32_to_cpu(nth16->dwSignature));
+ 		return -EINVAL;
+ 	}
+@@ -201,7 +201,7 @@ static int mbim_rx_verify_nth16(struct mhi_mbim_context *mbim, struct sk_buff *s
+ 	/* No limit on the block length, except the size of the data pkt */
+ 	len = le16_to_cpu(nth16->wBlockLength);
+ 	if (len > skb->len) {
+-		net_err_ratelimited("NTB does not fit into the skb %u/%u\n",
++		net_err_ratelimited("mbim: NTB does not fit into the skb %u/%u\n",
+ 				    len, skb->len);
+ 		return -EINVAL;
+ 	}
+@@ -209,7 +209,7 @@ static int mbim_rx_verify_nth16(struct mhi_mbim_context *mbim, struct sk_buff *s
+ 	if (mbim->rx_seq + 1 != le16_to_cpu(nth16->wSequence) &&
+ 	    (mbim->rx_seq || le16_to_cpu(nth16->wSequence)) &&
+ 	    !(mbim->rx_seq == 0xffff && !le16_to_cpu(nth16->wSequence))) {
+-		net_err_ratelimited("sequence number glitch prev=%d curr=%d\n",
++		net_err_ratelimited("mbim: sequence number glitch prev=%d curr=%d\n",
+ 				    mbim->rx_seq, le16_to_cpu(nth16->wSequence));
+ 	}
+ 	mbim->rx_seq = le16_to_cpu(nth16->wSequence);
+@@ -222,7 +222,7 @@ static int mbim_rx_verify_ndp16(struct sk_buff *skb, struct usb_cdc_ncm_ndp16 *n
+ 	int ret;
+ 
+ 	if (le16_to_cpu(ndp16->wLength) < USB_CDC_NCM_NDP16_LENGTH_MIN) {
+-		net_err_ratelimited("invalid DPT16 length <%u>\n",
++		net_err_ratelimited("mbim: invalid DPT16 length <%u>\n",
+ 				    le16_to_cpu(ndp16->wLength));
+ 		return -EINVAL;
+ 	}
+@@ -233,7 +233,7 @@ static int mbim_rx_verify_ndp16(struct sk_buff *skb, struct usb_cdc_ncm_ndp16 *n
+ 
+ 	if (sizeof(struct usb_cdc_ncm_ndp16) +
+ 	     ret * sizeof(struct usb_cdc_ncm_dpe16) > skb->len) {
+-		net_err_ratelimited("Invalid nframes = %d\n", ret);
++		net_err_ratelimited("mbim: Invalid nframes = %d\n", ret);
+ 		return -EINVAL;
+ 	}
+ 
+-- 
+2.25.1
 
 
