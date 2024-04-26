@@ -1,69 +1,59 @@
-Return-Path: <netdev+bounces-91791-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91792-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 341098B3F14
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 20:15:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A0738B3F18
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 20:16:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C91081F236C3
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 18:15:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CBC91286CEC
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 18:16:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B68A16FF3D;
-	Fri, 26 Apr 2024 18:14:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0083916DEA7;
+	Fri, 26 Apr 2024 18:15:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="PhFLJSfq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vAneWE1V"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF40916F839;
-	Fri, 26 Apr 2024 18:14:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB420160787;
+	Fri, 26 Apr 2024 18:15:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714155291; cv=none; b=qgcKJsIUFrqv7Nc2kRmZAO2ez7yo8tf2gFSnmht3rp3yVIXvyJl1yQTUp9sYmxZd/XzWbbqq8GEOl3W5Sb1PMvXQrruMjWPJ1cgAu+EpEtl5j3xaG3AJ/UuPdAC4IBvpMLVrxH+2fu494GUBgHCTvlK7PCaH6bPg6SEA7J1RYuU=
+	t=1714155322; cv=none; b=abpRVx1RbbHA4OXKjrM8pRvwcgwcg+PwG6ayzAUcGJ0EG0u/ieFKbYwCElx1s3Dk8kPsQrF0TLyIWDpz7i8Zg4uSAuYSB+9fC3OvWRQxMx8HkAvk3fvt/NccJA7fq9FMyeioySufU4TB5oqrLH/wRUpRQXkB3nwKVR+ljVEljlQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714155291; c=relaxed/simple;
-	bh=aL+AOy98y7p7r4a4ubMyOvDKADw2J3V43gkZpKNu/YU=;
+	s=arc-20240116; t=1714155322; c=relaxed/simple;
+	bh=NBx5WI2xYCiixhHhcbYtdw3q11V3t5DrEOf3fzBzeMg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=e7ptNUn7Ab3rdoSuRlpbM+ZUeIN0Kg8pfq4ta5GnD4f9XN/+GSGU8sfrijeTMEp9oNTgWXHZdH8RLPqqZYaOqtBdr1FcehvUkLrHxgFfjGcz1fE8aVt+2G8axokctBM+7vAu6JzNsgsdF/qXDEfrmGNKO+bE4ogL2YVv3kEXe6o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=PhFLJSfq; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=9Ns3sujM0QwOg09c35vecWwkpRlwfLNAqtRcHWhWbTM=; b=PhFLJSfqTf0Z0MWkRMYyV+tLm6
-	usldLZoaXjGgadC8qgt5l5vlBisDy2uBuskWtFyN/1C8b7HjC/017h/vCGKfN/O43vrAq6TSUEmsS
-	WVbUR0/Sa87dATDSPUYFVb9GkVslX6LNyWhE+UmeoShNGKsyXSG39pu6p7/7O57jVKVk=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1s0Q5n-00E636-6R; Fri, 26 Apr 2024 20:14:39 +0200
-Date: Fri, 26 Apr 2024 20:14:39 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Parthiban.Veerasooran@microchip.com
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, horms@kernel.org, saeedm@nvidia.com,
-	anthony.l.nguyen@intel.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, corbet@lwn.net,
-	linux-doc@vger.kernel.org, robh+dt@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
-	devicetree@vger.kernel.org, Horatiu.Vultur@microchip.com,
-	ruanjinjie@huawei.com, Steen.Hegelund@microchip.com,
-	vladimir.oltean@nxp.com, UNGLinuxDriver@microchip.com,
-	Thorsten.Kummermehr@microchip.com, Pier.Beruto@onsemi.com,
-	Selvamani.Rajagopal@onsemi.com, Nicolas.Ferre@microchip.com,
-	benjamin.bigler@bernformulastudent.ch
-Subject: Re: [PATCH net-next v4 11/12] microchip: lan865x: add driver support
- for Microchip's LAN865X MAC-PHY
-Message-ID: <4f6bac89-d6bb-43d8-8675-58a290fb8d5f@lunn.ch>
-References: <20240418125648.372526-1-Parthiban.Veerasooran@microchip.com>
- <20240418125648.372526-12-Parthiban.Veerasooran@microchip.com>
- <231ce196-6a68-4f09-8f9a-976c5ce1495d@lunn.ch>
- <9909d4c4-b3b9-4c4e-9923-64945b6c7bb3@microchip.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=YNFvjx+qY2v9OCVBrDH9AluWDfol9dgQkUeKyhyNC7OfiBJshqxIjQyef3o5+fwP+4BYOQIHZuwh602+7Ej1suL9pX4MH70vN9nsIELBB5QtEbm4nkgrSgngb0n+2vE/qPhcAWplS4kJ2BB6NQ7IUTVbE5YFBt+yOjh5dYxZXHM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vAneWE1V; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 882F5C113CD;
+	Fri, 26 Apr 2024 18:15:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714155322;
+	bh=NBx5WI2xYCiixhHhcbYtdw3q11V3t5DrEOf3fzBzeMg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=vAneWE1VrIVOKs/7nEtKGA2bRfxvJsvb6VfsGcnzDg9e5gzYQdHqUR+Y+VKr2DyKQ
+	 tn8MQvajhs6bc25GvyEUetum7btnsbu/ZvpwixQuhn7VN88NmcuAG2lYSHqaJlkfci
+	 A/O1YL6jWLHi/bjS/17O9cW/Ulbik/VBU2q4EVPW+pAnRtPQQF5Sbq623v2cXrsGgH
+	 4i9Wm+hDNoUlqbmXjup/SfQ2OtCZAPcJoyk8FdRs3yyFQB9HUdGi/YK/yMOd+T1FnK
+	 mS9E/YZYGu1zFKDvomJjjk318agOt9daawhzjOPdgFbesSy7In8ZSmbDeWCcKhGHDH
+	 xE2Bb/KQOzclw==
+Date: Fri, 26 Apr 2024 19:15:17 +0100
+From: Simon Horman <horms@kernel.org>
+To: Jijie Shao <shaojijie@huawei.com>
+Cc: yisen.zhuang@huawei.com, salil.mehta@huawei.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	jiri@resnulli.us, shenjian15@huawei.com, wangjie125@huawei.com,
+	liuyonglong@huawei.com, chenhao418@huawei.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH V2 net 6/7] net: hns3: fix port vlan filter not disabled
+ issue
+Message-ID: <20240426181517.GB516117@kernel.org>
+References: <20240426100045.1631295-1-shaojijie@huawei.com>
+ <20240426100045.1631295-7-shaojijie@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,13 +62,37 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <9909d4c4-b3b9-4c4e-9923-64945b6c7bb3@microchip.com>
+In-Reply-To: <20240426100045.1631295-7-shaojijie@huawei.com>
 
-> OK, I will implement this helper function as oa_tc6_enable_zarfe() in 
-> the oa_tc6.c. Also do you want me to move this helper function 
-> implementation to a new patch?
+On Fri, Apr 26, 2024 at 06:00:44PM +0800, Jijie Shao wrote:
+> From: Yonglong Liu <liuyonglong@huawei.com>
+> 
+> According to hardware limitation, for device support modify
+> VLAN filter state but not support bypass port VLAN filter,
+> it should always disable the port VLAN filter. but the driver
+> enables port VLAN filter when initializing, if there is no
+> VLAN(except VLAN 0) id added, the driver will disable it
+> in service task. In most time, it works fine. But there is
+> a time window before the service task shceduled and net device
+> being registered. So if user adds VLAN at this time, the driver
+> will not update the VLAN filter state,  and the port VLAN filter
+> remains enabled.
+> 
+> To fix the problem, if support modify VLAN filter state but not
+> support bypass port VLAN filter, set the port vlan filter to "off".
+> 
+> Fixes: 184cd221a863 ("net: hns3: disable port VLAN filter when support function level VLAN filter control")
+> Fixes: 2ba306627f59 ("net: hns3: add support for modify VLAN filter state")
 
-Yes please.
+For the record, my reading of this is:
 
-    Andrew
+184cd221a863 is a fix for 2ba306627f59. Both were included in v5.14.
+This patch fixes 184cd221a863 and in turn 2ba306627f59.
+
+> Signed-off-by: Yonglong Liu <liuyonglong@huawei.com>
+> Signed-off-by: Jijie Shao <shaojijie@huawei.com>
+
+Reviewed-by: Simon Horman <horms@kernel.org>
+
+...
 
