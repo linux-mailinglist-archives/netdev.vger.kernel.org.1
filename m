@@ -1,96 +1,115 @@
-Return-Path: <netdev+bounces-91726-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91727-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7286E8B3A04
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 16:29:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 330078B3A0D
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 16:30:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2E00728AD2E
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 14:29:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 65A071C23E2F
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 14:30:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B17F148856;
-	Fri, 26 Apr 2024 14:29:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1BFD1E507;
+	Fri, 26 Apr 2024 14:30:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jC4/NKyP"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VqgdVq9Y"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB6661487F2;
-	Fri, 26 Apr 2024 14:29:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 569361DFFC;
+	Fri, 26 Apr 2024 14:30:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714141778; cv=none; b=bwSsokwvcWOVJ5R0675PJjJv09wIeplSq83aXUIstm1xyFFtvuLsIXLTZWVHJt3ozvgic946Ebqe/X7oPfYgN1zFMmCgm8VnoausDaAh6gKqu2zPU+fkNNmCjMiRvkJbSH9lVUw5qdXvkxaGek7ZxlOpiXo6OsVYooabm9uI+lI=
+	t=1714141834; cv=none; b=bgyPF1m3viucTgJ+mivEBajvnhEYVyCe5IT2lbn0ojZL327poygRiDsxN8zd3v44SV5u5vaAtmwvZvh+eT4P7XtP6geW8jSV4uiRrMfJoVxtqEVCRkRNFAekYPc5fTHQ4mA4NOUX9kJsrrmdalb52fnz/YhcjI2O8vsMn6FZ2vQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714141778; c=relaxed/simple;
-	bh=D3wKqM03L7wKjDEPdv4b0+dxrNwGKgX3ntMzPx9bXCI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=b+Tzm2Pw1oo/kWIZs9fC1V/jSts7nDGW6d99wXTXxRcilBkj4hJE8LEWpkGyieQcbNyiO6kE1A2qPvWvHcWwm8U8Fq4ivw4zEOkPJervoI4UykxJXMWscKmxQKKOeSmMHKRSd+b00p1nQ/L3ceyrzodVYV57DKugC8RLb3c5yLg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jC4/NKyP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EA6B9C113CD;
-	Fri, 26 Apr 2024 14:29:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714141777;
-	bh=D3wKqM03L7wKjDEPdv4b0+dxrNwGKgX3ntMzPx9bXCI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=jC4/NKyPtYBapka0fEDWLEC+l8sFcA8lrkKpQ4+IBz5j3DoHvd12xkr4IZl3Gu9Mm
-	 pi0Mr4hMYvA9ajOcMreC5jOkf7IllNBsmBzSIlXEF4vJmQzzB4OWN1dbCkEdQ0lzjj
-	 BLzVkvqIIXy80MpHe5kjbzUbbmiVBuUYeg92zMjUUd/Wyu3DDE3qmUgeLcS6o4hXTG
-	 17Ctw4aZRuj97Desn+YWKTaaNo2q3RPFfOgBCEPQiJsMBiwk5qoIs8GNtPGPPD0ZE2
-	 Xxhy3jfy5o90qR8UsvuaWAWlvtf3V9dmcEhA6sz2eNLwvZrKzyQxt2NHEp4JeaY5pG
-	 hgNVTuUjUHzjw==
-Date: Fri, 26 Apr 2024 07:29:34 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Alexander Gordeev <agordeev@linux.ibm.com>
-Cc: Bui Quang Minh <minhquangbui99@gmail.com>, Jesse Brandeburg
- <jesse.brandeburg@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Paul M Stillwell Jr
- <paul.m.stillwell.jr@intel.com>, Rasesh Mody <rmody@marvell.com>, Sudarsana
- Kalluru <skalluru@marvell.com>, GR-Linux-NIC-Dev@marvell.com, Anil
- Gurumurthy <anil.gurumurthy@qlogic.com>, Sudarsana Kalluru
- <sudarsana.kalluru@qlogic.com>, "James E.J. Bottomley"
- <James.Bottomley@hansenpartnership.com>, "Martin K. Petersen"
- <martin.petersen@oracle.com>, Fabian Frederick <fabf@skynet.be>, Saurav
- Kashyap <skashyap@marvell.com>, GR-QLogic-Storage-Upstream@marvell.com,
- Nilesh Javali <nilesh.javali@cavium.com>, Arun Easi <arun.easi@cavium.com>,
- Manish Rangankar <manish.rangankar@cavium.com>, Vineeth Vijayan
- <vneethv@linux.ibm.com>, Peter Oberparleiter <oberpar@linux.ibm.com>, Heiko
- Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, Christian
- Borntraeger <borntraeger@linux.ibm.com>, Sven Schnelle
- <svens@linux.ibm.com>, Sunil Goutham <sgoutham@marvell.com>, Linu Cherian
- <lcherian@marvell.com>, Geetha sowjanya <gakula@marvell.com>, Jerin Jacob
- <jerinj@marvell.com>, hariprasad <hkelam@marvell.com>, Subbaraya Sundeep
- <sbhatta@marvell.com>, intel-wired-lan@lists.osuosl.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-scsi@vger.kernel.org, Saurav Kashyap <saurav.kashyap@cavium.com>,
- linux-s390@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Subject: Re: [PATCH v2 5/6] cio: ensure the copied buf is NUL terminated
-Message-ID: <20240426072934.776f7b4d@kernel.org>
-In-Reply-To: <Zit9myOJp0SYFL1F@li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com>
-References: <20240424-fix-oob-read-v2-0-f1f1b53a10f4@gmail.com>
-	<20240424-fix-oob-read-v2-5-f1f1b53a10f4@gmail.com>
-	<ZikiZsSTGUUM69GE@li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com>
-	<Zit9myOJp0SYFL1F@li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com>
+	s=arc-20240116; t=1714141834; c=relaxed/simple;
+	bh=7jaY6iKYpTLxfAVZPPuHMnYRCkS4mEJxcsaz7O6SumU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GsvdYZRK+jRyq4XC4ewBv7jnxNxVvjSvWEasO2B4A3TuJabOmqTZxCvs4lau5+z0DCx2v90Gh73hpwvf/WZ1JRShepu+FgUFFP4o95OGRogTNSzlP2mRs7gE8LvSQsKE8DP68QMgXvXG+2mqIl68+O6nD0dFgtFUeScUfInqIPI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VqgdVq9Y; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1714141833; x=1745677833;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=7jaY6iKYpTLxfAVZPPuHMnYRCkS4mEJxcsaz7O6SumU=;
+  b=VqgdVq9YLi7SQyrorzGhy7HHfxv1C/QMuMUF4EY2fYnvI/ddDU1tbHoH
+   pOTNf1Z03SDbRI8rVpKATbPhAbhXtot2fZus2uyvDebPJvJ/92/Z22Xlq
+   wpPCrTrtHoCe7bL2QFCuCxeIlZrRasn+3azpcPBjeySPj0ElxqlWhRVC8
+   SslFkLzVe4EFvywtwIS6dUqADbPIlU3V42UWR9hxCOdH+W/qraNxaDnq8
+   TEL4r/hmYLzOXPeT/nEld6yz1kbQXc6SD2syTMzhjpON92LIUm4d/EwsL
+   o70Ow0nV/hzIgyF9rs0bm+wsTEMv+BlCKI5RcJNaQ5B1YSVs6wFDp4wzG
+   Q==;
+X-CSE-ConnectionGUID: 7xCOhSf4S0KvSUSsV4N5Dw==
+X-CSE-MsgGUID: CbYAnsGJQkyX7LoRmsZIGw==
+X-IronPort-AV: E=McAfee;i="6600,9927,11056"; a="10410813"
+X-IronPort-AV: E=Sophos;i="6.07,232,1708416000"; 
+   d="scan'208";a="10410813"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Apr 2024 07:30:32 -0700
+X-CSE-ConnectionGUID: fC5i3e8/QKihJMqDtRb86Q==
+X-CSE-MsgGUID: Md3LwZRaRf6CT10gcwaJhg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,232,1708416000"; 
+   d="scan'208";a="25459838"
+Received: from smile.fi.intel.com ([10.237.72.54])
+  by fmviesa008.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Apr 2024 07:30:28 -0700
+Received: from andy by smile.fi.intel.com with local (Exim 4.97)
+	(envelope-from <andriy.shevchenko@linux.intel.com>)
+	id 1s0Man-00000001LTV-0yOy;
+	Fri, 26 Apr 2024 17:30:25 +0300
+Date: Fri, 26 Apr 2024 17:30:24 +0300
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Florian Fainelli <florian.fainelli@broadcom.com>
+Cc: linux-kernel@vger.kernel.org,
+	Jarkko Nikula <jarkko.nikula@linux.intel.com>,
+	Mika Westerberg <mika.westerberg@linux.intel.com>,
+	Jan Dabros <jsd@semihalf.com>, Andi Shyti <andi.shyti@kernel.org>,
+	Lee Jones <lee@kernel.org>, Jiawen Wu <jiawenwu@trustnetic.com>,
+	Mengyuan Lou <mengyuanlou@net-swift.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Duanqiang Wen <duanqiangwen@net-swift.com>,
+	"open list:SYNOPSYS DESIGNWARE I2C DRIVER" <linux-i2c@vger.kernel.org>,
+	"open list:WANGXUN ETHERNET DRIVER" <netdev@vger.kernel.org>
+Subject: Re: [PATCH v3 4/5] mfd: intel_quark_i2c_gpio: Utilize
+ i2c-designware.h
+Message-ID: <Ziu6gDOqhEYQNhcH@smile.fi.intel.com>
+References: <20240425214438.2100534-1-florian.fainelli@broadcom.com>
+ <20240425214438.2100534-5-florian.fainelli@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240425214438.2100534-5-florian.fainelli@broadcom.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 
-On Fri, 26 Apr 2024 12:10:35 +0200 Alexander Gordeev wrote:
-> On Wed, Apr 24, 2024 at 05:16:56PM +0200, Alexander Gordeev wrote:
-> > Applied, thanks!  
-> 
-> Hi Jakub,
-> 
-> I just want to make sure you do not have plans to pull this patch
-> via the net tree, right? (I schedulled it for the s390 tree already).
+On Thu, Apr 25, 2024 at 02:44:37PM -0700, Florian Fainelli wrote:
+> Rather than open code the i2c_designware string, utilize the newly
+> defined constant in i2c-designware.h.
 
-Yes, go for it. I picked 1, 2 and 6, no interest in the other 3 :)
+Acked-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+
+P.S>
+Note, my tags for MFD patches does not imply that I agree on the general idea
+of this series, it's just in case if it will be approved by the respective
+maintainers (I²C / MFD / etc).
+
+-- 
+With Best Regards,
+Andy Shevchenko
+
+
 
