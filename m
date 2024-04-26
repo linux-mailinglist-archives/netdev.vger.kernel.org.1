@@ -1,102 +1,135 @@
-Return-Path: <netdev+bounces-91746-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91747-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D88A8B3B80
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 17:31:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B60328B3BA2
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 17:33:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 022A21F21D72
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 15:31:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6A7F81F2507A
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 15:33:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45FB0149C5E;
-	Fri, 26 Apr 2024 15:30:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94CAE149C64;
+	Fri, 26 Apr 2024 15:33:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZBqGc7O3"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2p1+m/33"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1328314900B;
-	Fri, 26 Apr 2024 15:30:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0405F149C44
+	for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 15:33:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714145415; cv=none; b=PR2PL2g0lMOMh9HXWtZcVlUEaP/A1rQc2vfglVi1UJQceXj97VJ1Dk4wWf1OfXqY7mlKqc/yShrIbOnQXeMVmXiuPCrS1JIKapin6YVp1y+V7YnJW1kCyIN3G7pqeL55Z6DFu3p3nLzwZNIwF0y7xEqHyLULnXI7bYuDsI9rM+0=
+	t=1714145594; cv=none; b=gF53LsAItZCLieXyBwXXKqL0YHGrDCSghkcdfwT1HOIqZDQOV6TuE5ZwXQHiq01JtUl1DR4EsoF3mcAxznhCFZgsPSbE67rGNZqcuv5IXxFp40oeLd/ly+RGB9upLD+k7ynLYSFbe2xAlQYM1aCzRhUQYIX8hf4Zd2EVtV4FJd8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714145415; c=relaxed/simple;
-	bh=eZDyOOOoP7q4G7IjpLL4ncDtu1i7nV32WzyVZ3osXkk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TQZLabvlZyYP9uIKhad1WRLw8oMMRcTPrMdyU5Rms2Ta8cnpTL8C6D5/AC6fQS+5zY5kC38nPzIblE4UmnkGPuqT2czgaWHgtJK+jbPeAt/rEsgN56/uH75WfH86li5BTcl+qGdj/fK/jm/oL6D+WLcOI6mEpVncOyT55esLQ4E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZBqGc7O3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53343C116B1;
-	Fri, 26 Apr 2024 15:30:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714145414;
-	bh=eZDyOOOoP7q4G7IjpLL4ncDtu1i7nV32WzyVZ3osXkk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ZBqGc7O3HZH5bTPvMsxWHWOYGS6m4xLL7gji8LEsIMpSHxuCv0awqC5UoaH8CHR2x
-	 sxN0TiXapJ+dqO81S7sGeg8MArTR1LVBUkEb0041NjdrXyAIqB1G/zIPpzQwiKZI+f
-	 DLjFF5K4Muy1eRbNb7SUg6y+ytLxqZPke/Huila1nk6A3KLDQAWbjMnSm7Sb9sYK2Z
-	 fR6LytiIOLQtAlR/gqpqoW1djNA0cjV4B3WM270At05t/RMUZjI+wDBk6Hc3mtVtJf
-	 cZqg4BiFUQaEL+6Yb3fPdjIl1FNsGNW13kKjdw3U0yy95i2DLnZOs98M+bNrdwjLop
-	 1pwW65v0PfoWQ==
-Date: Fri, 26 Apr 2024 10:30:10 -0500
-From: Rob Herring <robh@kernel.org>
-To: Christophe Roullier <christophe.roullier@foss.st.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Liam Girdwood <lgirdwood@gmail.com>,
-	Mark Brown <broonie@kernel.org>, Marek Vasut <marex@denx.de>,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 02/11] dt-bindings: net: add phy-supply property for
- stm32
-Message-ID: <20240426153010.GA1910161-robh@kernel.org>
-References: <20240426125707.585269-1-christophe.roullier@foss.st.com>
- <20240426125707.585269-3-christophe.roullier@foss.st.com>
+	s=arc-20240116; t=1714145594; c=relaxed/simple;
+	bh=a+x+9QJcOjAjsTEqVdunD6qiMm7jqBNR+SHC13THGg4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=q9T8iEblBG6Y/r9yEVbgcsf2WFGW6zal9jzNZva+dK/VpftYm/t4oZjnBTjNu0OHqC+2IZk2bEbGCZXicUTNjwxtIZooe73MZd3QhTo7SthbRKjimPUGfeGIb2rFwmGa5pkfgF/y5oOhbJhm3kz63Cc9amwycQEWN4lEzYxYOtg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2p1+m/33; arc=none smtp.client-ip=209.85.208.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-571b5fba660so12149a12.1
+        for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 08:33:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1714145591; x=1714750391; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jQAKSfeSiNMwx23jPVYzccmGjENnrcaTmn472bWM+dw=;
+        b=2p1+m/33Ca229cGyj8MM8xvQ+TcRFoJ5xMFZZC4LEEYy5EM0ZGUdWs1cOe92gh1e0y
+         JgoHocZlnSAN8Uj3vgLz0qJfUFhaScjKB3VJK53KAOhuiJDfYdNDDqqW624fng+DW54+
+         Lv3xFHGsu/kK8XBY2VG84oLE7lg9vmFVzoxghp+b9ZEiRDU/yU6BftsY1PUt+qn5tYHw
+         LG/hSeeCa/jzquXS+FURC9pnA+7fRnoi9ZIYsTpxKZNbW/vtROvlZ40vKA7Qi1+Nk6z1
+         MLUNKpBhqRWA6cpytWhwrbEPR4kP2wsC3XOkkukKVvTTyYJo2GVvkkmQSgEBHwC7Ql3f
+         dXTQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714145591; x=1714750391;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=jQAKSfeSiNMwx23jPVYzccmGjENnrcaTmn472bWM+dw=;
+        b=ZuPCiO5f0el5awsCoKzLLrCqJZWb3IKETIcBXZEVqoip2KkgCPIUYh2lEb33EC+TTV
+         Cm8dINYlEmM3TGzvSCiEc6q5oXOf2iBVkpKSbhThdG5b8LT7OGMTiT4gmIwP02vEui6c
+         pvqfR/EDYmSchjxqX6iEPFgxcg4eIbLbVXeWPs18qDpI/vTSBNdLNuRGmMI/UiXmx5Ew
+         b2TZS3Ft4L0H0LUO94bw8wMOlQb9mOuvopSRfieRwdDCIIWLIu295OhbYo8aLdLfIiYD
+         w/b0xXhmYwpWWSIFt/fqObmOwQvPSzZOC2K8hUuYJxsgLidbC7XpxsWRyFYCbYIDgyIe
+         AsXw==
+X-Forwarded-Encrypted: i=1; AJvYcCW80g21uZZD4J+88dPrVIT8nVBQwQNmp1VZ1QpKBo+h70ylwZuVal7r/ZH/dN5AVukXasnVfe7J22UBdfj1/3xAt9bAmk2T
+X-Gm-Message-State: AOJu0YyVFBx3OP3QbxynSBUmp2nVugfSQFPnGMBiUh4YmATkjdURwqFL
+	h0DQkRkfdyiPPPfzyFeV8K7jDHetF2IqMENFtrHYakZF7ANkCXVvIRmczysdgwmA5A2vXnU/u59
+	ko+OIp72V0aJ3gbO6G2EXuREFa89lCplWGM8i
+X-Google-Smtp-Source: AGHT+IGFBkaX99SfmSYIhlRZCqbmREadhrxpgL9UrFo0Boe2aUlXFOiVrXsSsyd0ZAOJCYWvbdHlbxWVGOxfkpsUpkE=
+X-Received: by 2002:aa7:d497:0:b0:572:25e4:26eb with SMTP id
+ b23-20020aa7d497000000b0057225e426ebmr146199edr.7.1714145591147; Fri, 26 Apr
+ 2024 08:33:11 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240426125707.585269-3-christophe.roullier@foss.st.com>
+References: <20240426152011.37069-1-richard120310@gmail.com>
+In-Reply-To: <20240426152011.37069-1-richard120310@gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 26 Apr 2024 17:32:57 +0200
+Message-ID: <CANn89iKenW5SxMGm753z8eawg+7drUz7oZcTR06habjcFmdqVg@mail.gmail.com>
+Subject: Re: [PATCH] tcp_bbr: replace lambda expression with bitwise operation
+ for bit flip
+To: I Hsin Cheng <richard120310@gmail.com>
+Cc: davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org, 
+	pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	bpf@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Apr 26, 2024 at 02:56:58PM +0200, Christophe Roullier wrote:
-> Phandle to a regulator that provides power to the PHY. This
-> regulator will be managed during the PHY power on/off sequence.
-> 
-> Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-> Signed-off-by: Christophe Roullier <christophe.roullier@foss.st.com>
+On Fri, Apr 26, 2024 at 5:20=E2=80=AFPM I Hsin Cheng <richard120310@gmail.c=
+om> wrote:
+>
+> In the origin implementation in function bbr_update_ack_aggregation(),
+> we utilize a lambda expression to flip the bit value of
+> bbr->extra_acked_win_idx. Since the data type of
+> bbr->extra_acked_win_idx is simply a single bit, we are actually trying
+> to perform a bit flip operation, under the fact we can simply perform a
+> bitwise not operation on bbr->extra_acked_win_idx.
+>
+> This way we can elimate the need of possible branches which generate by
+> the lambda function, they could result in branch misses sometimes.
+> Perform a bitwise not operation is more straightforward and wouldn't
+> generate branches.
+>
+> Signed-off-by: I Hsin Cheng <richard120310@gmail.com>
 > ---
->  Documentation/devicetree/bindings/net/stm32-dwmac.yaml | 3 +++
->  1 file changed, 3 insertions(+)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/stm32-dwmac.yaml b/Documentation/devicetree/bindings/net/stm32-dwmac.yaml
-> index b901a432dfa9..7c3aa181abcb 100644
-> --- a/Documentation/devicetree/bindings/net/stm32-dwmac.yaml
-> +++ b/Documentation/devicetree/bindings/net/stm32-dwmac.yaml
-> @@ -84,6 +84,9 @@ properties:
->            - description: offset of the control register
->            - description: field to set mask in register
->  
-> +  phy-supply:
-> +    description: PHY regulator
+>  net/ipv4/tcp_bbr.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+>
+> diff --git a/net/ipv4/tcp_bbr.c b/net/ipv4/tcp_bbr.c
+> index 146792cd2..75068ba25 100644
+> --- a/net/ipv4/tcp_bbr.c
+> +++ b/net/ipv4/tcp_bbr.c
+> @@ -829,8 +829,7 @@ static void bbr_update_ack_aggregation(struct sock *s=
+k,
+>                                                 bbr->extra_acked_win_rtts=
+ + 1);
+>                 if (bbr->extra_acked_win_rtts >=3D bbr_extra_acked_win_rt=
+ts) {
+>                         bbr->extra_acked_win_rtts =3D 0;
+> -                       bbr->extra_acked_win_idx =3D bbr->extra_acked_win=
+_idx ?
+> -                                                  0 : 1;
+> +                       bbr->extra_acked_win_idx =3D ~(bbr->extra_acked_w=
+in_idx);
+>                         bbr->extra_acked[bbr->extra_acked_win_idx] =3D 0;
+>                 }
+>         }
 
-This is for which PHY? The serdes phy or ethernet phy? This only makes 
-sense here if the phy is part of the MAC. Otherwise, it belongs in the 
-phy node.
+Or
 
-Rob
+bbr->extra_acked_win_idx ^=3D 1;
+
+Note that C compilers generate the same code, for the 3 variants.
+
+They do not generate branches for something simple like this.
 
