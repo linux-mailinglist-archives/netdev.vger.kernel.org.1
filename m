@@ -1,273 +1,174 @@
-Return-Path: <netdev+bounces-91773-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91774-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBDA48B3DA6
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 19:12:36 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 789768B3DAC
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 19:15:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 310E21F23408
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 17:12:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DA49AB23C1D
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 17:15:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10F7715B15E;
-	Fri, 26 Apr 2024 17:12:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 311F915B0FB;
+	Fri, 26 Apr 2024 17:15:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="VPLBmivR"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="dfqvuQcE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f180.google.com (mail-yw1-f180.google.com [209.85.128.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60B8015AACD
-	for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 17:12:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D8E6148842
+	for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 17:15:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714151552; cv=none; b=MIxGGLOBtQ1xr6FghPR9SYulYNiJfP2DeWbraXoAVXWMUuwkRAz6SNrTO2jjePnQZe71nVPShrl/uL62Tj6eyp+AgCpa/sTlInC8P2H3rmvfvl4nDH5NPpxb2KK1hjbXApUIiSuXa5zHf85mskJ+86CB149/KgL9VfIAgR63BFU=
+	t=1714151713; cv=none; b=Kd+4QKy32MrPRhBopvFbvSp8pRRSlVbZ27yIsDqtdhN733xJygx4Yaj6mHL81T8J/iijcnYUwwcog4gPhtXvoeQo7sOuUvknSPXkTwkIyz8Dh60p5A+0kjKkohbuPrhkL3T+nM6HWugT9ipoRzO/rceg2w/tLzPcRk7TZ+ie34A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714151552; c=relaxed/simple;
-	bh=8le8AOiUF4XShDRyL//11qap1YksJ2uMZn28bMd3utg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YBSWQHJz2meQdfQjFjD3q0aI8KK1zB4fRs36yTUhjGkns8lnFxoYfyYJ+5sbq+kRR2zVvxpfadHeMB8WZcg2MZpJMZuj912PfyFFNQOkNtq7mQ2+aMIWPqRNNl5bRBQlgOC2tghalK1oba23Xt0dptj/KPoSCnFwRGAwGaISGus=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=VPLBmivR; arc=none smtp.client-ip=209.85.128.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-yw1-f180.google.com with SMTP id 00721157ae682-6114c9b4d83so21033867b3.3
-        for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 10:12:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1714151549; x=1714756349; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=F8QzGoGmXVJB8xQEravlNnVdd1KB5UO19cCDFD+j6iY=;
-        b=VPLBmivRiWuh+YYOIgbRo03c7bcervC0v/NrKrFJA3OMhitRnR6p1byE4dhT0eYOEP
-         qmhnJwzmg4BXvf4mwPc1Ea104k85Xli1d1Yae83TUvolfow2yYtFzhsSEzVX6kxMf9sv
-         yv669vMXfjoG+zlAVaVLqy/eDGRaroOHcb0TDBR2PANAaMjRZBjSioEeDr/hL9MSyCdS
-         BNgSIjgyY6e+ZX9crNJwpq4pi31QPbuWPyCHzZE2LQpClNlBBn1476gayeQyFcu1a8sW
-         AS3Mt58PL6qyhUd0hZqWQwONfIAQgp3rnDTZr5uA2pDL7oM25a+2scx6o243joPjxfAA
-         9sSQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714151549; x=1714756349;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=F8QzGoGmXVJB8xQEravlNnVdd1KB5UO19cCDFD+j6iY=;
-        b=wyT+/wJg957nGQHIDyokgvN4ittGgohWRUrxyfhyhQh/21bIi5BR8Qj/b2QTAbyHoe
-         fcC99Bz1IYod6HFusAJiNM1xBfjXDgjzJj9rvhwOgDOuciixVt7po39gulfdfK9Pddr7
-         1Opf6aE5tae1m+/uuNLgOBMPN6Xm+elB4R92oWPCi8Gt3d9bviLRY5B0q9a0knW6oxIJ
-         7oqb9VDq06V8fr6HNIJChZRwEIGVR3lRtXRIkhpmfQ/UPogDyEwGipBMWpZsuOuKs203
-         2cELGVXjRkc3PmsBoCdc+YVbmeSMDiOamN76KRhfbYd4kn8EdWWlAfCQQGu82+CLENdT
-         oDng==
-X-Gm-Message-State: AOJu0YytbHJBQgsXQumpR++hWsa+UL0mO2sCu6zdJTOpumJ8jp4dFrEb
-	BW61vQ7VRukyyptx9PsyxTUGIsLXPDqX133zh6GlnaF2D5UpgTgnHm1xbu6uqZJVUBg0ohNKNUz
-	/QltXYKZ5ReEv5i2we644pOa07e6yn+QgKUuz
-X-Google-Smtp-Source: AGHT+IE/Xd0wJM5xFVyE4bG55HyuddOD+VU6/xSegjPGwwfMYM/4YtCRjJAORCheau15QdizbsNW87MkxA/0Y214lbo=
-X-Received: by 2002:a05:690c:e:b0:61b:91e3:f954 with SMTP id
- bc14-20020a05690c000e00b0061b91e3f954mr3594141ywb.8.1714151547373; Fri, 26
- Apr 2024 10:12:27 -0700 (PDT)
+	s=arc-20240116; t=1714151713; c=relaxed/simple;
+	bh=cUVKhYIO27DoSHceS0qy0+2FUb0ZjxWvs7XQYIcpFS8=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=Ant4IQhta/3xqZGZeQJijxazk2Ty8uOQ6OKVdML/9gk4LrwHLRYAthevrRa4tEJXV7KyvAG4Oojr/WBTlPelmdKnU7rmiXRiR9ap3WqL+yehh83jwNNs8p/mNZi7ySuPqudsff3aB5O5gxjbmZ6CRXes7XTeIwYsVqHfkurwTWs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=dfqvuQcE; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=Content-Type:MIME-Version:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:In-Reply-To:References;
+	bh=m4G8nHzQIXCHO1y8p4LPoi+zqr2MAifzLs+fYjo9zpE=; b=dfqvuQcEnWC+1Ka5P7W34aMx1I
+	SgfipMEBewsRWdhlWJ/Uu0YeHnwY+gt+obbQXckdtKxh2ex8+UyUgCNS1nnIei7KNFwZeUmZQ96nt
+	f51+pwdKwN1wk9UQd6Z95sty6wW+xr7Yq4VtFpuwXaiBCfSF2L7VGHU6pSJHudcgMUuLvuTog34nG
+	tL9WE/U0odLpIThOIY+7lJ7kUUNKj8s+UlSPd1StTMgcxe/BVtFSpXrfYid8dFb1439HQ+NABernk
+	0ly6VPW2uQJfhO0MC/3oIqOfWLivf1GyfyFfczD76D1xS9HeR8zFm90tyOz7gw09J0RGDVCBppp7K
+	jSlJ2h5Q==;
+Received: from willy by casper.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1s0PAB-00000005ezT-1Zdf;
+	Fri, 26 Apr 2024 17:15:07 +0000
+Date: Fri, 26 Apr 2024 18:15:07 +0100
+From: Matthew Wilcox <willy@infradead.org>
+To: linux-mm@kvack.org, netdev@vger.kernel.org
+Cc: Suren Baghdasaryan <surenb@google.com>,
+	"Liam R. Howlett" <Liam.Howlett@oracle.com>,
+	Arjun Roy <arjunroy@google.com>
+Subject: [RFC] Make find_tcp_vma() more efficient
+Message-ID: <ZivhG0yrbpFqORDw@casper.infradead.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240410140141.495384-1-jhs@mojatatu.com> <41736ea4e81666e911fee5b880d9430ffffa9a58.camel@redhat.com>
- <CAM0EoM=982OctjvSQpx0kR7e+JnQLhvZ=sM-tNB4xNiu7nhH5Q@mail.gmail.com>
- <CAM0EoM=VhVn2sGV40SYttQyaiCn8gKaKHTUqFxB_WzKrayJJfQ@mail.gmail.com>
- <87cf4830e2e46c1882998162526e108fb424a0f7.camel@redhat.com> <CAM0EoMkJwR0K-fF7qo0PfRw4Sf+=2L0L=rOcH5A2ELwagLrZMw@mail.gmail.com>
-In-Reply-To: <CAM0EoMkJwR0K-fF7qo0PfRw4Sf+=2L0L=rOcH5A2ELwagLrZMw@mail.gmail.com>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Fri, 26 Apr 2024 13:12:14 -0400
-Message-ID: <CAM0EoMmfDoZ9_ZdK-ZjHjFAjuNN8fVK+R57_UaFqAm=wA0AWVA@mail.gmail.com>
-Subject: Re: [PATCH net-next v16 00/15] Introducing P4TC (series 1)
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, deb.chatterjee@intel.com, anjali.singhai@intel.com, 
-	namrata.limaye@intel.com, tom@sipanda.io, mleitner@redhat.com, 
-	Mahesh.Shirshyad@amd.com, tomasz.osinski@intel.com, jiri@resnulli.us, 
-	xiyou.wangcong@gmail.com, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, vladbu@nvidia.com, horms@kernel.org, khalidm@nvidia.com, 
-	toke@redhat.com, victor@mojatatu.com, pctammela@mojatatu.com, 
-	Vipin.Jain@amd.com, dan.daly@intel.com, andy.fingerhut@gmail.com, 
-	chris.sommers@keysight.com, mattyk@nvidia.com, bpf@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-On Fri, Apr 19, 2024 at 2:01=E2=80=AFPM Jamal Hadi Salim <jhs@mojatatu.com>=
- wrote:
->
-> On Fri, Apr 19, 2024 at 1:20=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> w=
-rote:
-> >
-> > On Fri, 2024-04-19 at 08:08 -0400, Jamal Hadi Salim wrote:
-> > > On Thu, Apr 11, 2024 at 12:24=E2=80=AFPM Jamal Hadi Salim <jhs@mojata=
-tu.com> wrote:
-> > > >
-> > > > On Thu, Apr 11, 2024 at 10:07=E2=80=AFAM Paolo Abeni <pabeni@redhat=
-.com> wrote:
-> > > > >
-> > > > > On Wed, 2024-04-10 at 10:01 -0400, Jamal Hadi Salim wrote:
-> > > > > > The only change that v16 makes is to add a nack to patch 14 on =
-kfuncs
-> > > > > > from Daniel and John. We strongly disagree with the nack; unfor=
-tunately I
-> > > > > > have to rehash whats already in the cover letter and has been d=
-iscussed over
-> > > > > > and over and over again:
-> > > > >
-> > > > > I feel bad asking, but I have to, since all options I have here a=
-re
-> > > > > IMHO quite sub-optimal.
-> > > > >
-> > > > > How bad would be dropping patch 14 and reworking the rest with
-> > > > > alternative s/w datapath? (I guess restoring it from oldest revis=
-ion of
-> > > > > this series).
-> > > >
-> > > >
-> > > > We want to keep using ebpf  for the s/w datapath if that is not cle=
-ar by now.
-> > > > I do not understand the obstructionism tbh. Are users allowed to us=
-e
-> > > > kfuncs as part of infra or not? My understanding is yes.
-> > > > This community is getting too political and my worry is that we hav=
-e
-> > > > corporatism creeping in like it is in standards bodies.
-> > > > We started by not using ebpf. The same people who are objecting now
-> > > > went up in arms and insisted we use ebpf. As a member of this
-> > > > community, my motivation was to meet them in the middle by
-> > > > compromising. We invested another year to move to that middle groun=
-d.
-> > > > Now they are insisting we do not use ebpf because they dont like ou=
-r
-> > > > design or how we are using ebpf or maybe it's not a use case they h=
-ave
-> > > > any need for or some other politics. I lost track of the moving goa=
-l
-> > > > posts. Open source is about solving your itch. This code is entirel=
-y
-> > > > on TC, zero code changed in ebpf core. The new goalpost is based on
-> > > > emotional outrage over use of functions. The whole thing is getting
-> > > > extremely toxic.
-> > > >
-> > >
-> > > Paolo,
-> > > Following up since no movement for a week now;->
-> > > I am going to give benefit of doubt that there was miscommunication o=
-r
-> > > misunderstanding for all the back and forth that has happened so far
-> > > with the nackers. I will provide a summary below on the main points
-> > > raised and then provide responses:
-> > >
-> > > 1) "Use maps"
-> > >
-> > > It doesnt make sense for our requirement. The reason we are using TC
-> > > is because a) P4 has an excellent fit with TC match action paradigm b=
-)
-> > > we are targeting both s/w and h/w and the TC model caters well for
-> > > this. The objects belong to TC, shared between s/w, h/w and control
-> > > plane (and netlink is the API). Maybe this diagram would help:
-> > > https://github.com/p4tc-dev/docs/blob/main/images/why-p4tc/p4tc-runti=
-me-pipeline.png
-> > >
-> > > While the s/w part stands on its own accord (as elaborated many
-> > > times), for TC which has offloads, the s/w twin is introduced before
-> > > the h/w equivalent. This is what this series is doing.
-> > >
-> > > 2) "but ... it is not performant"
-> > > This has been brought up in regards to netlink and kfuncs. Performanc=
-e
-> > > is a lower priority to P4 correctness and expressibility.
-> > > Netlink provides us the abstractions we need, it works with TC for
-> > > both s/w and h/w offload and has a lot of knowledge base for
-> > > expressing control plane APIs. We dont believe reinventing all that
-> > > makes sense.
-> > > Kfuncs are a means to an end - they provide us the gluing we need to
-> > > have an ebpf s/w datapath to the TC objects. Getting an extra
-> > > 10-100Kpps is not a driving factor.
-> > >
-> > > 3) "but you did it wrong, here's how you do it..."
-> > >
-> > > I gave up on responding to this - but do note this sentiment is a big
-> > > theme in the exchanges and consumed most of the electrons. We are
-> > > _never_ going to get any consensus with statements like "tc actions
-> > > are a mistake" or "use tcx".
-> > >
-> > > 4) "... drop the kfunc patch"
-> > >
-> > > kfuncs essentially boil down to function calls. They don't require an=
-y
-> > > special handling by the eBPF verifier nor introduce new semantics to
-> > > eBPF. They are similar in nature to the already existing kfuncs
-> > > interacting with other kernel objects such as nf_conntrack.
-> > > The precedence (repeated in conferences and email threads multiple
-> > > times) is: kfuncs dont have to be sent to ebpf list or reviewed by
-> > > folks in the ebpf world. And We believe that rule applies to us as
-> > > well. Either kfuncs (and frankly ebpf) is infrastructure glue or it's
-> > > not.
-> > >
-> > > Now for a little rant:
-> > >
-> > > Open source is not a zero-sum game. Ebpf already coexists with
-> > > netfilter, tc, etc and various subsystems happily.
-> > > I hope our requirement is clear and i dont have to keep justifying wh=
-y
-> > > P4 or relitigate over and over again why we need TC. Open source is
-> > > about scratching your itch and our itch is totally contained within
-> > > TC. I cant help but feel that this community is getting way too
-> > > pervasive with politics and obscure agendas. I understand agendas, I
-> > > just dont understand the zero-sum thinking.
-> > > My view is this series should still be applied with the nacks since i=
-t
-> > > sits entirely on its own silo within networking/TC (and has nothing t=
-o
-> > > do with ebpf).
-> >
-> > It's really hard for me - meaning I'll not do that - applying a series
-> > that has been so fiercely nacked, especially given that the other
-> > maintainers are not supporting it.
-> >
-> > I really understand this is very bad for you.
-> >
-> > Let me try to do an extreme attempt to find some middle ground between
-> > this series and the bpf folks.
-> >
-> > My understanding is that the most disliked item is the lifecycle for
-> > the objects allocated via the kfunc(s).
-> >
-> > If I understand correctly, the hard requirement on bpf side is that any
-> > kernel object allocated by kfunc must be released at program unload
-> > time. p4tc postpone such allocation to recycle the structure.
-> >
-> > While there are other arguments, my reading of the past few iterations
-> > is that solving the above node should lift the nack, am I correct?
-> >
-> > Could p4tc pre-allocate all the p4tc_table_entry_act_bpf_kern entries
-> > and let p4a_runt_create_bpf() fail if the pool is empty? would that
-> > satisfy the bpf requirement?
->
-> Let me think about it and weigh the consequences.
->
+Liam asked me if we could do away with the "bool *mmap_locked"
+parameter, and the problem is that some architctures don't support
+CONFIG_PER_VMA_LOCK yet.  But we can abstract it ... something like this
+maybe?
 
-Sorry, was busy evaluating. Yes, we can enforce the memory allocation
-constraints such that when the ebpf program is removed any entries
-added by said ebpf program can be removed from the datapath.
+(not particularly proposing this for inclusion; just wrote it and want
+to get it out of my tree so I can get back to other projects.  If anyone
+wants it, they can test it and submit it for inclusion and stick my
+S-o-B on it)
 
-> > Otherwise could p4tc force free the p4tc_table_entry_act_bpf_kern at
-> > unload time?
->
-> This one wont work for us unfortunately. If we have entries added by
-> the control plane with skip_sw just because the ebpf program is gone
-> doesnt mean they disappear.
-
-Just to clarify (the figure
-https://github.com/p4tc-dev/docs/blob/main/images/why-p4tc/p4tc-runtime-pip=
-eline.png
-should help) :
-For P4 table objects, there are 3 types of entries: 1) created by
-control path for s/w datapath with skip_hw 2) created by control path
-for h/w datapath with skip_sw and 3) dynamically created by s/w
-datapath (ebpf) not far off from conntrack.
-The only ones we can remove when the ebpf program goes away are from #3.
-
-cheers,
-jamal
+diff --git a/include/linux/mm.h b/include/linux/mm.h
+index 9849dfda44d4..570763351508 100644
+--- a/include/linux/mm.h
++++ b/include/linux/mm.h
+@@ -779,11 +779,22 @@ static inline void assert_fault_locked(struct vm_fault *vmf)
+ struct vm_area_struct *lock_vma_under_rcu(struct mm_struct *mm,
+ 					  unsigned long address);
+ 
++static inline void lock_vma_under_mmap_lock(struct vm_area_struct *vma)
++{
++	down_read(&vma->vm_lock->lock);
++	mmap_read_unlock(vma->vm_mm);
++}
++
+ #else /* CONFIG_PER_VMA_LOCK */
+ 
+ static inline bool vma_start_read(struct vm_area_struct *vma)
+ 		{ return false; }
+-static inline void vma_end_read(struct vm_area_struct *vma) {}
++static inline void vma_end_read(struct vm_area_struct *vma)
++{
++	mmap_read_unlock(vma->vm_mm);
++}
++
++static inline void lock_vma_under_mmap_lock(struct vm_area_struct *vma) {}
+ static inline void vma_start_write(struct vm_area_struct *vma) {}
+ static inline void vma_assert_write_locked(struct vm_area_struct *vma)
+ 		{ mmap_assert_write_locked(vma->vm_mm); }
+diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+index f23b97777ea5..e763916e5185 100644
+--- a/net/ipv4/tcp.c
++++ b/net/ipv4/tcp.c
+@@ -2051,27 +2051,25 @@ static void tcp_zc_finalize_rx_tstamp(struct sock *sk,
+ }
+ 
+ static struct vm_area_struct *find_tcp_vma(struct mm_struct *mm,
+-					   unsigned long address,
+-					   bool *mmap_locked)
++					   unsigned long address)
+ {
+ 	struct vm_area_struct *vma = lock_vma_under_rcu(mm, address);
+ 
+-	if (vma) {
+-		if (vma->vm_ops != &tcp_vm_ops) {
+-			vma_end_read(vma);
++	if (!vma) {
++		mmap_read_lock(mm);
++		vma = vma_lookup(mm, address);
++		if (vma) {
++			lock_vma_under_mmap_lock(vma);
++		} else {
++			mmap_read_unlock(mm);
+ 			return NULL;
+ 		}
+-		*mmap_locked = false;
+-		return vma;
+ 	}
+-
+-	mmap_read_lock(mm);
+-	vma = vma_lookup(mm, address);
+-	if (!vma || vma->vm_ops != &tcp_vm_ops) {
+-		mmap_read_unlock(mm);
++	if (vma->vm_ops != &tcp_vm_ops) {
++		vma_end_read(vma);
+ 		return NULL;
+ 	}
+-	*mmap_locked = true;
++
+ 	return vma;
+ }
+ 
+@@ -2092,7 +2090,6 @@ static int tcp_zerocopy_receive(struct sock *sk,
+ 	u32 seq = tp->copied_seq;
+ 	u32 total_bytes_to_map;
+ 	int inq = tcp_inq(sk);
+-	bool mmap_locked;
+ 	int ret;
+ 
+ 	zc->copybuf_len = 0;
+@@ -2117,7 +2114,7 @@ static int tcp_zerocopy_receive(struct sock *sk,
+ 		return 0;
+ 	}
+ 
+-	vma = find_tcp_vma(current->mm, address, &mmap_locked);
++	vma = find_tcp_vma(current->mm, address);
+ 	if (!vma)
+ 		return -EINVAL;
+ 
+@@ -2194,10 +2191,7 @@ static int tcp_zerocopy_receive(struct sock *sk,
+ 						   zc, total_bytes_to_map);
+ 	}
+ out:
+-	if (mmap_locked)
+-		mmap_read_unlock(current->mm);
+-	else
+-		vma_end_read(vma);
++	vma_end_read(vma);
+ 	/* Try to copy straggler data. */
+ 	if (!ret)
+ 		copylen = tcp_zc_handle_leftover(zc, sk, skb, &seq, copybuf_len, tss);
 
