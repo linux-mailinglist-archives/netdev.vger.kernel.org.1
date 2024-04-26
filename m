@@ -1,91 +1,117 @@
-Return-Path: <netdev+bounces-91755-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91749-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3EE868B3C45
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 18:02:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FEBB8B3C1E
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 17:58:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EE28F282BB6
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 16:02:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE9782842F8
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 15:58:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5379815F31D;
-	Fri, 26 Apr 2024 16:01:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3BD614D6F8;
+	Fri, 26 Apr 2024 15:57:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="FDYTfffN"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gigldITl"
 X-Original-To: netdev@vger.kernel.org
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB07215A4BE;
-	Fri, 26 Apr 2024 16:00:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1853F14D2B8
+	for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 15:57:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714147260; cv=none; b=DpgFe/8exPKqlOEm64IWCR1qhRm/0Gw9KuiKYehKVfnX//LqT3gpD7Z4Qm7Z7Cf+rVztlO3KKnwRtWxOEfRdcDcpiM1y6i5ALdoR7waNvl+fh/1vys51/HwIz7aBRlawZweQmrbz/1nR6KSz7fZpraEAP6RqOP/jdjItsN3FyWY=
+	t=1714147077; cv=none; b=CFTzXzfo9kB9WBxJWM2HPvctNZDc3LOogBVY8BoRc/Ky1HJ0KkExtMX+utyS+7eUg24uRjywssrXTNc9aS4N0sLSJNIxHnGQF3CEgdkT+NUk5azpY82odVAMflz2b8Is7iJs2scDtIWdk+xy5SCxFvmxKrwaaWrnGqVJ42MrF40=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714147260; c=relaxed/simple;
-	bh=fCADD2dHSi+1tKZaQFs2hqkpmbPHOa9MHnJF49LhTq8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PuL+pgcK7TzLhRNL+FbgjaVyr98Gt5AO2OgOFwV0Skqec4j4VmUrizL6y0W+XVa6optUHlAPtCEuAKcl9KJ+GPpQQ3wbi1xFt3zoagDTYyc+Ui9lO6SX6pYhtdE07j4F8Zrikwg+h7DkWB/MjIJIgw9mA9TNalSs+npdJl4sfqo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=FDYTfffN; arc=none smtp.client-ip=85.214.62.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from [127.0.0.1] (p578adb1c.dip0.t-ipconnect.de [87.138.219.28])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits))
+	s=arc-20240116; t=1714147077; c=relaxed/simple;
+	bh=tVZm1NOaOpfDBvnM6Oow6dJig4w3fLjQoaLBHwmyJD8=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=ehh913RRpraCeTKVyFTd4Ii0BodKmKQP14cRdJ/9EDII/SQyNYe0X1tRmniK/A9n2Zy7sVrK+4l2XSgq6HhOw8+61zO31XzjOHkeQ+iyyYRpt8txuud4H4qaVfzEug866gHAUrsZ3jnNpywZAXb7SVmmzCkgSVy+nUPBvwwj5Hw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gigldITl; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1714147074;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5unUVLjNo+qjBW1OspxyrCDGLZZ03wMYpF4fiHvTxL0=;
+	b=gigldITlXZiAzrbCmGxc+oif3N7BUrsGgrgZhm+IWKolC7e6nEN0INI+mo/Wdjv6lJZYGR
+	RqBMBN6eFJaWHDUU7PvkYSk7sx0pU1NiTutbZSS2N+42yO2HlcYKCvzrST/5UpNgz5sah0
+	ngqdiQjwEeEU8SZ2gkrujOVNtu07oyM=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-142-Z51XDStMMs6IW8dDyTwKbw-1; Fri,
+ 26 Apr 2024 11:57:49 -0400
+X-MC-Unique: Z51XDStMMs6IW8dDyTwKbw-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	(Authenticated sender: marex@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id D1A33885B4;
-	Fri, 26 Apr 2024 18:00:55 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1714147257;
-	bh=5qHEEgpwiFG2miTn8xs8E50XdPfGPzJ7ckT/98Ml6KI=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=FDYTfffNnOsIYfIN/TAx3FFrkDQnw1I8GBbZWMvr2/CplSFxq/wLQrKT56lNi3K77
-	 FmqOYxSUeX6GFs3ACYcGFuiXr+Nht2FaYMS1mfIOq7RVUyeUSaViJGzayhX4xfh9Is
-	 QywbKZ0B1AvIQJcF2yswf37FBgrQ3REALG8CnSwMogGqMOncWyISYFYM2/OqnAEZr0
-	 CYdXhRHO/CFjhkHGRCfc1W+N/JbNJPAYvgn2UjfQS2KqWQoXFxkKNVu7+Ab4DvrNf+
-	 5xahBNU8S1ajBZAQkmf90vqYDKiB23J0OWFHDHumcFe3oLP2bPe4RDA0nc/jPDh3rj
-	 J6uv3NNmNZDXw==
-Message-ID: <efee3462-e72b-48c0-81ee-a1f38f4791c7@denx.de>
-Date: Fri, 26 Apr 2024 17:48:38 +0200
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 143C93C000A1;
+	Fri, 26 Apr 2024 15:57:49 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.200])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id B94C3492BC7;
+	Fri, 26 Apr 2024 15:57:47 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <20240422115541.38548-1-linyunsheng@huawei.com>
+References: <20240422115541.38548-1-linyunsheng@huawei.com>
+To: Yunsheng Lin <linyunsheng@huawei.com>
+Cc: dhowells@redhat.com, davem@davemloft.net, kuba@kernel.org,
+    pabeni@redhat.com, netdev@vger.kernel.org,
+    linux-kernel@vger.kernel.org,
+    Alexander Duyck <alexander.duyck@gmail.com>,
+    Marc Dionne <marc.dionne@auristor.com>,
+    Eric Dumazet <edumazet@google.com>, linux-afs@lists.infradead.org
+Subject: Re: [PATCH net] rxrpc: Fix using alignmask being zero for __page_frag_alloc_align()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 07/11] net: stmmac: dwmac-stm32: support the phy-supply
- regulator binding
-To: Christophe Roullier <christophe.roullier@foss.st.com>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Richard Cochran <richardcochran@gmail.com>, Jose Abreu
- <joabreu@synopsys.com>, Liam Girdwood <lgirdwood@gmail.com>,
- Mark Brown <broonie@kernel.org>
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-References: <20240426125707.585269-1-christophe.roullier@foss.st.com>
- <20240426125707.585269-8-christophe.roullier@foss.st.com>
-Content-Language: en-US
-From: Marek Vasut <marex@denx.de>
-In-Reply-To: <20240426125707.585269-8-christophe.roullier@foss.st.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <2650222.1714147067.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 26 Apr 2024 16:57:47 +0100
+Message-ID: <2650223.1714147067@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.10
 
-On 4/26/24 2:57 PM, Christophe Roullier wrote:
-> Configure the phy regulator if defined by the "phy-supply" DT phandle.
-> 
-> Signed-off-by: Christophe Roullier <christophe.roullier@foss.st.com>
+Yunsheng Lin <linyunsheng@huawei.com> wrote:
 
-Maybe this should be separate from this series ?
+> rxrpc_alloc_data_txbuf() may be called with data_align being
+> zero in none_alloc_txbuf() and rxkad_alloc_txbuf(), data_align
+> is supposed to be an order-based alignment value, but zero is
+> not a valid order-based alignment value
+
+Ummm... 0 *would be* a valid order-based[*] alignment (pow(2,0) is 1).  It
+might actually make more sense to do that than to pass in the number of by=
+tes,
+then 0 is the default, but either way works.
+
+[*] Other places that take an order-based parameter include things like
+    alloc_pages().  The number of pages being requested is pow(2,order).
+
+> +	return rxrpc_alloc_data_txbuf(call, min_t(size_t, remain, RXRPC_JUMBO_=
+DATALEN), 1U, gfp);
+> +		return rxrpc_alloc_data_txbuf(call, space, 1U, gfp);
+
+The 'U' should be unnecessary.
+
+> +	data_align =3D max_t(size_t, data_align, L1_CACHE_BYTES);
+
+data_align =3D umax(data_align, L1_CACHE_BYTES);
+
+would be better, I think.
+
+Anyway, with the umax change above:
+
+Acked-by: David Howells <dhowells@redhat.com>
+
 
