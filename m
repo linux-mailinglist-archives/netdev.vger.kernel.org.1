@@ -1,208 +1,141 @@
-Return-Path: <netdev+bounces-91595-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91596-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8189E8B3221
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 10:17:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B372D8B323A
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 10:21:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ACA261F22293
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 08:17:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3FF6B1F21DB5
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 08:21:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87A6876028;
-	Fri, 26 Apr 2024 08:17:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B60413C9B0;
+	Fri, 26 Apr 2024 08:21:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="ZCTRv1x4"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E87rWalv"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-133.freemail.mail.aliyun.com (out30-133.freemail.mail.aliyun.com [115.124.30.133])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 118AB14293;
-	Fri, 26 Apr 2024 08:17:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DE1C13C9AA
+	for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 08:21:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714119437; cv=none; b=LWtiK1rW+bE1GF4mqOQ6fGzajCxNOcDE7XMDbx3s8ECEafwPAuVxI6SyhQM8d1IDPuDCbmaFVw1U3VP6qtYIkMACVjYAMPjLVhAs09YS4Ji+OxeTM2Zvk4CgW5QMFvl7CEfRuFIKkLcaOSXlfha1IaJgktyeVxrPecsX6UgL3cI=
+	t=1714119692; cv=none; b=MwpQy45ES1nnpM9osaGVmLBTf7+LbNFD9w0wrKJcY77UpxkF3sFUYoqUJX38LmS8dSzxdXta5IpIOzM0zd/pkRsYpMIMbKUaN5gAc/yXpG966t4qR1hsCkNl31HdV2VrXsPs7wqQKrfd8njXtmYX9Ixq5Bt35PNQkmzUj/Wo52s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714119437; c=relaxed/simple;
-	bh=KYXaZjdI+5IkXp0DualbSWgVlbRSytaWokMYpK++Zbc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ElFSAY1x5tnGYLiqT3vGHwpJL+GSs1AlkQbDe7brv/7A150SUjy+xirEcEtINo22rakPZRzOs3jZnQpYhwqXgW+lDYYTFdnLi9ui90m53LGlfkmcdCo6fXScjEnu1XiIfemas+y/cEFWhfR31p58R+cTtqmW37DkOnGVyFvpM/w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=ZCTRv1x4; arc=none smtp.client-ip=115.124.30.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1714119431; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=aS7zNkUjp+X466NnRKZw+mwarWr8jMNg/0m58+2vk84=;
-	b=ZCTRv1x46T6wUAiLrn0pjNOLPIZOzryCpGstk4b419L8hjZFwx4ZtXzroSj0I80Wy7Gy+zWpBOArUW96jAl0VDtq1OcmNQdFu4s/wIhoHrYZPzKHS3FskXefbuoDpPtYG/CZa3MF8DCzxAmG9c/D7/doAoHwkcaZfmGpC33jRto=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R131e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037067110;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=18;SR=0;TI=SMTPD_---0W5ISEMi_1714119429;
-Received: from 30.221.129.216(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0W5ISEMi_1714119429)
-          by smtp.aliyun-inc.com;
-          Fri, 26 Apr 2024 16:17:10 +0800
-Message-ID: <3f2a7456-c310-4fdc-a507-896fcaaad454@linux.alibaba.com>
-Date: Fri, 26 Apr 2024 16:17:08 +0800
+	s=arc-20240116; t=1714119692; c=relaxed/simple;
+	bh=lnYud5aJOqHbh4DFWlT+sclBir546QfmOn5fvmD4Yus=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=qDKtP8m4eXK0Fh2OU1KrGFEakPpXepnnKCyyt/CBhBkkHpzRRNl0zyDSpr611c9lIJqU8hZDsvPEqX0LF4OeinDPIYomhrHvXsPvM7sZbvJXmDelLAKIIdSm6VfM6jD9a9yT/Y+VLKOcf7A4qGnA4eLPQA6NYA7XMb09t9EdmSU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=E87rWalv; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1714119689;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=vg5yFseHR4p52Q+OUrRFDV07kK0bwj6ehh8BARaHsHQ=;
+	b=E87rWalv/kRydxYggvrpoUjoiWokprmHiK2ye8tb/qim9OK0lazPlIiFeIX4tKwMHpKPCj
+	YXEn3Q47m94jaZDiYpiE0m1gzd9uxV4c5wZKrNgviE9OehDj2H50eIknaWiqhZ/6+FVJze
+	LvN9PRbImkwEL2RkZTpCUgDvfN6pEkU=
+Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
+ [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-490-BWo_G-yOMIK-3zLa9aIQ2w-1; Fri, 26 Apr 2024 04:21:27 -0400
+X-MC-Unique: BWo_G-yOMIK-3zLa9aIQ2w-1
+Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-6a05ab06d96so6302866d6.3
+        for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 01:21:27 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714119687; x=1714724487;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vg5yFseHR4p52Q+OUrRFDV07kK0bwj6ehh8BARaHsHQ=;
+        b=tfCqEICDFJjN1J2dgfXv1P06vWSSuIY2aruAYMRC1jnVCd2xjeyNo90eLTCfOPoruR
+         zw05CUYxaHTgvsDy2DpFcm1G6Lgd2lLI6zhVV3oRo/XaQPCdl3dWWwTvNr29CcEFxG4z
+         RV4TSLczHJV59JKIILnTm7WIrHkHKYeb1l9Fu9Psr2K8RsNuydfDTf28SCfjoVOT1S7K
+         vwLObkfzZ7y7LMEItyhgDf+p9KNdZ3b3S4BEMik63951SvfwkMFuxqZB9sBO5cGc6zUN
+         iRKaOVx4T7sBwLTgoZBx9uNEZyLxwhMONWm75VM6zVN9NwxAsRpNG2UN2UyeAJlzGwrs
+         Us9g==
+X-Forwarded-Encrypted: i=1; AJvYcCULMNMqrXLdO7qlxVJWf9KW2s6OHfW0EM9cdSwEO6W0j04JU3kzlxZ86aA+X/BdS6xK4gvrtyfJJAn4x+wEVFL9uGdSpyQm
+X-Gm-Message-State: AOJu0YzVH6ccicS22D09SnSJ3p6iZ6VIuxZMKNrtQtZ0SKbq9pr0ir8C
+	iEwOsIjt4uG74ltWabse0xmXgzBs+2frxeJG1HlwZid+G0RU1WzSDc7qFVczqJy9S5EtC9NK2tW
+	N59/E1mJEjm6nEIuOIpLOZhhUZ0Dp9VYNSRqntcpn+NUdVqa4u6aLGA==
+X-Received: by 2002:a05:620a:4092:b0:790:9a35:4a37 with SMTP id f18-20020a05620a409200b007909a354a37mr2137230qko.4.1714119687145;
+        Fri, 26 Apr 2024 01:21:27 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFDAucunkTGMfCOr5V9vc+LO4VZ6M0c4FMlBPJiK3LmorPQwUc1TUN2Wm87uDbxEqc7CFHCrA==
+X-Received: by 2002:a05:620a:4092:b0:790:9a35:4a37 with SMTP id f18-20020a05620a409200b007909a354a37mr2137213qko.4.1714119686731;
+        Fri, 26 Apr 2024 01:21:26 -0700 (PDT)
+Received: from gerbillo.redhat.com ([2a0d:3344:171d:a510::f71])
+        by smtp.gmail.com with ESMTPSA id t17-20020a05620a451100b0078edf6393edsm7696690qkp.73.2024.04.26.01.21.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 26 Apr 2024 01:21:26 -0700 (PDT)
+Message-ID: <17d72e2d11808ca678432749aaad7702d4d1ff8e.camel@redhat.com>
+Subject: Re: [PATCH v3 net-next v3 3/6] net: add code for TCP fraglist GRO
+From: Paolo Abeni <pabeni@redhat.com>
+To: Felix Fietkau <nbd@nbd.name>, netdev@vger.kernel.org, Eric Dumazet
+ <edumazet@google.com>, "David S. Miller" <davem@davemloft.net>, David Ahern
+ <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>
+Cc: willemdebruijn.kernel@gmail.com, linux-kernel@vger.kernel.org
+Date: Fri, 26 Apr 2024 10:21:23 +0200
+In-Reply-To: <20240426065143.4667-4-nbd@nbd.name>
+References: <20240426065143.4667-1-nbd@nbd.name>
+	 <20240426065143.4667-4-nbd@nbd.name>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v6 00/11] net/smc: SMC intra-OS shortcut with
- loopback-ism
-To: Jan Karcher <jaka@linux.ibm.com>, wintera@linux.ibm.com,
- twinkler@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
- agordeev@linux.ibm.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, wenjia@linux.ibm.com
-Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com,
- alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
- linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
- netdev@vger.kernel.org
-References: <20240414040304.54255-1-guwen@linux.alibaba.com>
- <5f50bc62-f7d5-4094-94de-a77a103fc111@linux.ibm.com>
-From: Wen Gu <guwen@linux.alibaba.com>
-In-Reply-To: <5f50bc62-f7d5-4094-94de-a77a103fc111@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
 
+On Fri, 2024-04-26 at 08:51 +0200, Felix Fietkau wrote:
+> This implements fraglist GRO similar to how it's handled in UDP, however
+> no functional changes are added yet. The next change adds a heuristic for
+> using fraglist GRO instead of regular GRO.
+>=20
+> Signed-off-by: Felix Fietkau <nbd@nbd.name>
+> ---
+>  net/ipv4/tcp_offload.c   | 22 ++++++++++++++++++++++
+>  net/ipv6/tcpv6_offload.c |  9 +++++++++
+>  2 files changed, 31 insertions(+)
+>=20
+> diff --git a/net/ipv4/tcp_offload.c b/net/ipv4/tcp_offload.c
+> index c493e95e09a5..ffd6b7a4163a 100644
+> --- a/net/ipv4/tcp_offload.c
+> +++ b/net/ipv4/tcp_offload.c
+> @@ -332,6 +332,19 @@ struct sk_buff *tcp_gro_receive(struct list_head *he=
+ad, struct sk_buff *skb)
+>  	flush |=3D (ntohl(th2->seq) + skb_gro_len(p)) ^ ntohl(th->seq);
+>  	flush |=3D skb_cmp_decrypted(p, skb);
+> =20
+> +	if (NAPI_GRO_CB(p)->is_flist) {
+> +		flush |=3D (__force int)(flags ^ tcp_flag_word(th2));
+> +		flush |=3D skb->ip_summed !=3D p->ip_summed;
+> +		flush |=3D skb->csum_level !=3D p->csum_level;
+> +		flush |=3D !pskb_may_pull(skb, skb_gro_offset(skb));
 
+I'm sorry, I'm lagging behind. I think the TCP flags handling here is
+correct - preserving the original ones should work.
 
-On 2024/4/26 15:02, Jan Karcher wrote:
-> 
-> 
-> On 14/04/2024 06:02, Wen Gu wrote:
->> This patch set acts as the second part of the new version of [1] (The first
->> part can be referred from [2]), the updated things of this version are listed
->> at the end.
->>
->> - Background
->>
->> SMC-D is now used in IBM z with ISM function to optimize network interconnect
->> for intra-CPC communications. Inspired by this, we try to make SMC-D available
->> on the non-s390 architecture through a software-implemented Emulated-ISM device,
->> that is the loopback-ism device here, to accelerate inter-process or
->> inter-containers communication within the same OS instance.
->>
->> - Design
->>
->> This patch set includes 3 parts:
->>
->>   - Patch #1: some prepare work for loopback-ism.
->>   - Patch #2-#7: implement loopback-ism device and adapt SMC-D for it.
->>     loopback-ism now serves only SMC and no userspace interfaces exposed.
->>   - Patch #8-#11: memory copy optimization for intra-OS scenario.
->>
->> The loopback-ism device is designed as an ISMv2 device and not be limited to
->> a specific net namespace, ends of both inter-process connection (1/1' in diagram
->> below) or inter-container connection (2/2' in diagram below) can find the same
->> available loopback-ism and choose it during the CLC handshake.
->>
->>   Container 1 (ns1)                              Container 2 (ns2)
->>   +-----------------------------------------+    +-------------------------+
->>   | +-------+      +-------+      +-------+ |    |        +-------+        |
->>   | | App A |      | App B |      | App C | |    |        | App D |<-+     |
->>   | +-------+      +---^---+      +-------+ |    |        +-------+  |(2') |
->>   |     |127.0.0.1 (1')|             |192.168.0.11       192.168.0.12|     |
->>   |  (1)|   +--------+ | +--------+  |(2)   |    | +--------+   +--------+ |
->>   |     `-->|   lo   |-` |  eth0  |<-`      |    | |   lo   |   |  eth0  | |
->>   +---------+--|---^-+---+-----|--+---------+    +-+--------+---+-^------+-+
->>                |   |           |                                  |
->>   Kernel       |   |           |                                  |
->>   +----+-------v---+-----------v----------------------------------+---+----+
->>   |    |                            TCP                               |    |
->>   |    |                                                              |    |
->>   |    +--------------------------------------------------------------+    |
->>   |                                                                        |
->>   |                           +--------------+                             |
->>   |                           | smc loopback |                             |
->>   +---------------------------+--------------+-----------------------------+
->>
->> loopback-ism device creates DMBs (shared memory) for each connection peer.
->> Since data transfer occurs within the same kernel, the sndbuf of each peer
->> is only a descriptor and point to the same memory region as peer DMB, so that
->> the data copy from sndbuf to peer DMB can be avoided in loopback-ism case.
->>
->>   Container 1 (ns1)                              Container 2 (ns2)
->>   +-----------------------------------------+    +-------------------------+
->>   | +-------+                               |    |        +-------+        |
->>   | | App C |-----+                         |    |        | App D |        |
->>   | +-------+     |                         |    |        +-^-----+        |
->>   |               |                         |    |          |              |
->>   |           (2) |                         |    |     (2') |              |
->>   |               |                         |    |          |              |
->>   +---------------|-------------------------+    +----------|--------------+
->>                   |                                         |
->>   Kernel          |                                         |
->>   +---------------|-----------------------------------------|--------------+
->>   | +--------+ +--v-----+                           +--------+ +--------+  |
->>   | |dmb_desc| |snd_desc|                           |dmb_desc| |snd_desc|  |
->>   | +-----|--+ +--|-----+                           +-----|--+ +--------+  |
->>   | +-----|--+    |                                 +-----|--+             |
->>   | | DMB C  |    +---------------------------------| DMB D  |             |
->>   | +--------+                                      +--------+             |
->>   |                                                                        |
->>   |                           +--------------+                             |
->>   |                           | smc loopback |                             |
->>   +---------------------------+--------------+-----------------------------+
->>
->> - Benchmark Test
->>
->>   * Test environments:
->>        - VM with Intel Xeon Platinum 8 core 2.50GHz, 16 GiB mem.
->>        - SMC sndbuf/DMB size 1MB.
->>
->>   * Test object:
->>        - TCP: run on TCP loopback.
->>        - SMC lo: run on SMC loopback-ism.
->>
->> 1. ipc-benchmark (see [3])
->>
->>   - ./<foo> -c 1000000 -s 100
->>
->>                              TCP                  SMC-lo
->> Message
->> rate (msg/s)              79693                  148236(+86.01%)
->>
->> 2. sockperf
->>
->>   - serv: <smc_run> sockperf sr --tcp
->>   - clnt: <smc_run> sockperf { tp | pp } --tcp --msg-size={ 64000 for tp | 14 for pp } -i 127.0.0.1 -t 30
->>
->>                              TCP                  SMC-lo
->> Bandwidth(MBps)         4815.18                 8061.77(+67.42%)
->> Latency(us)               6.176                   3.449(-44.15%)
->>
->> 3. nginx/wrk
->>
->>   - serv: <smc_run> nginx
->>   - clnt: <smc_run> wrk -t 8 -c 1000 -d 30 http://127.0.0.1:80
->>
->>                             TCP                   SMC-lo
->> Requests/s           196555.02                263270.95(+33.94%)
->>
->> 4. redis-benchmark
->>
->>   - serv: <smc_run> redis-server
->>   - clnt: <smc_run> redis-benchmark -h 127.0.0.1 -q -t set,get -n 400000 -c 200 -d 1024
->>
->>                             TCP                   SMC-lo
->> GET(Requests/s)       88711.47                120048.02(+35.32%)
->> SET(Requests/s)       89465.44                123152.71(+37.65%)
->>
->>
-> 
-> Hi Wen Gu,
-> 
-> I did run the tests again with the v6 and reviewed the patchset. If you decide to address Simons nit feel free to add my:
-> 
-> Reviewed-and-tested-by: Jan Karcher <jaka@linux.ibm.com>
-> 
-> Thanks for your effort and contribution.
-> - J
+The question a made WRT 2 above checks being non necessary/redundant:
 
-Thank you all for the review and test! I will address Simon's nit and
-collect the Rb tags in the next version.
+		flush |=3D (__force int)(flags ^ tcp_flag_word(th2));
+		flush |=3D !pskb_may_pull(skb, skb_gro_offset(skb));
 
-Thanks!
+still stands, I think.
+
+Thanks,
+
+Paolo
+
 
