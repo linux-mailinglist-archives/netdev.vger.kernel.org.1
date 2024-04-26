@@ -1,120 +1,107 @@
-Return-Path: <netdev+bounces-91742-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91743-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 513CC8B3B57
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 17:27:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E0778B3B60
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 17:27:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A1EBEB25AC6
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 15:26:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 05D1328233B
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 15:27:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3BA7149C7B;
-	Fri, 26 Apr 2024 15:25:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3A0A1494A6;
+	Fri, 26 Apr 2024 15:27:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UNzHCQ/B"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fvS9pVkc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30EBD14A4C5
-	for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 15:25:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15CD4824B3
+	for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 15:27:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714145113; cv=none; b=sC4aNc8hiWiTmotvA88smfH/DHZU2OrT+axEf0xfWCQCTypowssChnjwbq1rVtV49f18Xa7LgEgWxrw2zjqY6UC19HmcinrCq0umLPQ8N0FNN8ecrFrpX5dgZNDwODmKBtsaVFwyXYw6W8zUWhhzaExpU4iZNbJ8UarrytRcLHE=
+	t=1714145245; cv=none; b=TGl0jUrpbl77sZpOvOx39bEYz6PGwbwbtoBYgdKyiaUIoXqYdSOYTz95ezQlBhT+u23jHmdOHLcZF4IERyJ5gK5EbSI+C262caFncRDDK3ZVUVKAz3eqCPDVzEGp8FmCfEQzICNZN5d361uv3UGmOYwx3/GLwIjT4cwYlDqmqHI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714145113; c=relaxed/simple;
-	bh=6N4aP4sE6VyJqTCJaJ3NQ0EAj/+TV667NwAa9Gr3yV0=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
-	 MIME-Version:Content-Type; b=rXYTecKcZnCNA4Y5tgCPp6Z7psr4+97qq4qR5vsItnsZxjCT3NrOeYUl6jNRMOAtgviyYw/H0BxRBwlOzBicJ4tvmRv0Qibmi/OaTVdfwJYoHvGdIKH93f2ROKD9d1x/vK2PKgqwaDBGYGz1U+yNzCTRcjIhh2UPcMeknoRK+fk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UNzHCQ/B; arc=none smtp.client-ip=209.85.221.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-347c197a464so1619011f8f.2
-        for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 08:25:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1714145110; x=1714749910; darn=vger.kernel.org;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=OEK8/+rMjT6YVD6gBtc7jlDXSLtHOuS5Ag8W00I4aPA=;
-        b=UNzHCQ/Bmu59MDmqDkIh6jOK88U8XIfACLqTJk4/JsR6444WJi0j9q1Jfw6eUtgn4U
-         ny5PoYMVQi5f3KTCXYIxLGPLztFIx25B/sn59SceWPhmRGLJ12D/nXq3uVyhGiHcHaUS
-         rX/d45aWr9pDJaoynFSN/Atlqk3bX0KrlqbFZ931aQOyF80OPAEDBCcWPRlKcMbwgo9e
-         Ab+n2Xl3vjkwRZWxBcAFSOINuvD5kRX68dnLpOdfdRDgKX4nE7NKfD4CAe80Ntr8gIVu
-         zcJSV2SKmUwv7T1wrKcUG9zlKbvARvStYKIB/ndVV3Y+n2QsMejenntoWt4DatmdHMi1
-         OL9Q==
+	s=arc-20240116; t=1714145245; c=relaxed/simple;
+	bh=nI7SOS2vPedhIDabk0VC9o7sJ6SFzCq+6Et4SXgM+IY=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=ox4r2QuDyJcBoIhRgOV9rjECixarJOzru0p3KhSj3Bmh8Z2EAW4M4mSRLZo9kSqCNZ54RjyCujkU4/V1fsYJ87hoh8Sx0b83mQSjivNWFTP36pClFG+fzLtVINbJRqPtoblSbiJRGKqKKOnDSNI7ytkZWxNqsRWp0smTdvUrSaU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fvS9pVkc; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1714145243;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=80T5g8sBllHGkC642tYAcJ8hHgE0Fk8A0xJ+F6y7lyc=;
+	b=fvS9pVkcCQo7o0efvJOg+Z+pJHRA4IU2vlyDxue2GKU43qO/4RWu64baT10Iqx1OC6cHeh
+	XZgnEG9srUpMv5f2Bax8Q9XMU8eRiA2oIJe7JZgW7KiAgh1mhFnYbbNG+8hh1v6f8y+u24
+	Ex6EY5niSx1MfH2B8Ns1slysUbjK6sY=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-218-7v8VzUM6N2CXlp6Dt5Zg-Q-1; Fri, 26 Apr 2024 11:27:21 -0400
+X-MC-Unique: 7v8VzUM6N2CXlp6Dt5Zg-Q-1
+Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-7907267421fso286441085a.1
+        for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 08:27:21 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714145110; x=1714749910;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OEK8/+rMjT6YVD6gBtc7jlDXSLtHOuS5Ag8W00I4aPA=;
-        b=gbkzTlXVuKMpFlr0mjARt0xjJFlOZGBfO4AWGV1Yp6poUb2INupGK9qlHQ2ocFAeCK
-         DPyWXpitHZoZCXQ98Eiu8S9iZ2gD/fQB9eA8DPf4WIHCI1sqFv9fo3cZWtoYC/qwQKmp
-         2BKYMoX/z7esdl1+7ergsglbP1MSbwNsUrRcrGW5vGSvpcpw2qD4hpq2ejvFQkvB6+mF
-         IYTGtW9u1bipa9NvpWM5fMZAN1MdqzEWsDFylRQoc9LMaEd2dJtHyy2SfBIQeuVJ3unb
-         DBmEm/bE59pRSten2C1Fm0pNGc3reFBHtUNZms1VKrCq+k2PDkO3ZFKNaOcSFu/BUbwc
-         3w6Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWU2cwvwfScjgaiQW9SCkJiNEwS0pHB7VnRMBY0FyRgqSM9B3e9K1r0f/1YJAubZpiDmWcD9Wp2sMqdXmX1yi0azVAyjFUY
-X-Gm-Message-State: AOJu0YyfPMQv/ILEGtl+arJtdYchqK7MgSX2JPAZaCM3Vs+StRkA9MSD
-	MKfAk6AGqN80aYYGp2j38pgAv6RR/eP98v6Xu3KjCfCHUuJWJJ+E
-X-Google-Smtp-Source: AGHT+IHwxPtmXmRI1u/lDAjpJM8vXASs/Q6+KDodBVEO81rsE0JwUXZpV82b9H+E4bQ06DFwo+/y1A==
-X-Received: by 2002:adf:f841:0:b0:349:9de8:9896 with SMTP id d1-20020adff841000000b003499de89896mr1960026wrq.29.1714145110361;
-        Fri, 26 Apr 2024 08:25:10 -0700 (PDT)
-Received: from imac ([2a02:8010:60a0:0:28ef:de16:bd69:2a94])
-        by smtp.gmail.com with ESMTPSA id v11-20020a5d4b0b000000b00349a6af3da5sm22591272wrq.51.2024.04.26.08.25.09
+        d=1e100.net; s=20230601; t=1714145241; x=1714750041;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=80T5g8sBllHGkC642tYAcJ8hHgE0Fk8A0xJ+F6y7lyc=;
+        b=ULH6FlXytmCSkxcxOk4GV5J3ILs1Cd3cZZmE6eudOF7AD4g6N94R3NyukwS7bw3ADc
+         TxYDdEFvy2zaLs9zbUvHIdFAm1IlT33XN+Rz76S4C9MUErd8eAnjHrhl0Vv/D+v3DA8w
+         oRiiUOcUHTDfdJfMG0udJ7zLntVBJS/NkmWa2f9P78KNA1xDPtn2biQz5Kj6B60+vqu4
+         kYAIKO0cg1IcKlpSXGdYkNoq0U+ioh9wlKWsqrwmkABEF8SmrZPBW2909j5AnHcOSkEs
+         f8N4ACi5+pI6owEPJYIefJPYPOr4DjKlhTUeBosbSGqbb272L1F9Ro0x+rYT+1Y53Xft
+         c3rA==
+X-Gm-Message-State: AOJu0Yzx+ubR8ayw/j6wiGwPGyDqHDh+0F9CotN+MCe9Rnfm4JcBhUJ/
+	gphAn8ipmF47hd8G09PfroHNs7qssP571BPTu6yHk+k3+CW1MU7h7BuONIPUxcAgImDOkM2lfC6
+	Z1ZqJ+qemlEUjhxKx/5BwW354KBhevwI99a714ncr5xIaN4fi5dyh2A==
+X-Received: by 2002:a05:6214:19e5:b0:69b:5c57:362 with SMTP id q5-20020a05621419e500b0069b5c570362mr3808425qvc.1.1714145240914;
+        Fri, 26 Apr 2024 08:27:20 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFUUuUwB7dZK/bsnxf+WEs4NbmqNozfevqhHC3Lme/+Y0GyY6zJONLKwU8muPP2yFjF9rQnmg==
+X-Received: by 2002:a05:6214:19e5:b0:69b:5c57:362 with SMTP id q5-20020a05621419e500b0069b5c570362mr3808402qvc.1.1714145240621;
+        Fri, 26 Apr 2024 08:27:20 -0700 (PDT)
+Received: from debian (2a01cb058918ce00d9135204d7b88de9.ipv6.abo.wanadoo.fr. [2a01:cb05:8918:ce00:d913:5204:d7b8:8de9])
+        by smtp.gmail.com with ESMTPSA id g18-20020ad45152000000b006a0af6e25c2sm568983qvq.94.2024.04.26.08.27.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 26 Apr 2024 08:25:09 -0700 (PDT)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net,  netdev@vger.kernel.org,  edumazet@google.com,
-  pabeni@redhat.com
-Subject: Re: [PATCH net-next] tools: ynl: don't append doc of missing type
- directly to the type
-In-Reply-To: <20240426003111.359285-1-kuba@kernel.org> (Jakub Kicinski's
-	message of "Thu, 25 Apr 2024 17:31:11 -0700")
-Date: Fri, 26 Apr 2024 16:25:03 +0100
-Message-ID: <m2sez8f8og.fsf@gmail.com>
-References: <20240426003111.359285-1-kuba@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+        Fri, 26 Apr 2024 08:27:20 -0700 (PDT)
+Date: Fri, 26 Apr 2024 17:27:15 +0200
+From: Guillaume Nault <gnault@redhat.com>
+To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>
+Cc: netdev@vger.kernel.org, Ido Schimmel <idosch@nvidia.com>,
+	Amit Cohen <amcohen@nvidia.com>, Petr Machata <petrm@nvidia.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Jiri Benc <jbenc@redhat.com>, Breno Leitao <leitao@debian.org>,
+	Roopa Prabhu <roopa@nvidia.com>,
+	stephen hemminger <shemminger@vyatta.com>
+Subject: [PATCH net 0/2] vxlan: Fix vxlan counters.
+Message-ID: <cover.1714144439.git.gnault@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Jakub Kicinski <kuba@kernel.org> writes:
+Like most virtual devices, vxlan needs special care when updating its
+netdevice counters. This is done in patch 1. Patch 2 just adds a
+missing VNI counter update (found while working on patch 1).
 
-> When using YNL in tests appending the doc string to the type
-> name makes it harder to check that we got the correct error.
-> Put the doc under a separate key.
->
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Guillaume Nault (2):
+  vxlan: Fix racy device stats updates.
+  vxlan: Add missing VNI filter counter update in arp_reduce().
 
-Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
+ drivers/net/vxlan/vxlan_core.c | 30 ++++++++++++++++--------------
+ 1 file changed, 16 insertions(+), 14 deletions(-)
 
-> ---
->  tools/net/ynl/lib/ynl.py | 5 ++---
->  1 file changed, 2 insertions(+), 3 deletions(-)
->
-> diff --git a/tools/net/ynl/lib/ynl.py b/tools/net/ynl/lib/ynl.py
-> index 35f82a2c2247..35e666928119 100644
-> --- a/tools/net/ynl/lib/ynl.py
-> +++ b/tools/net/ynl/lib/ynl.py
-> @@ -233,10 +233,9 @@ from .nlspec import SpecFamily
->                      miss_type = self.extack['miss-type']
->                      if miss_type in attr_space.attrs_by_val:
->                          spec = attr_space.attrs_by_val[miss_type]
-> -                        desc = spec['name']
-> +                        self.extack['miss-type'] = spec['name']
->                          if 'doc' in spec:
-> -                            desc += f" ({spec['doc']})"
-> -                        self.extack['miss-type'] = desc
-> +                            self.extack['miss-type-doc'] = spec['doc']
->  
->      def _decode_policy(self, raw):
->          policy = {}
+-- 
+2.39.2
+
 
