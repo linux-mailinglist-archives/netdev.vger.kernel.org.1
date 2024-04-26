@@ -1,140 +1,136 @@
-Return-Path: <netdev+bounces-91520-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91521-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 253BF8B2EEF
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 05:30:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D44888B2F0F
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 05:39:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 62724B22A65
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 03:30:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DA04EB20E73
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 03:39:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B463B763F8;
-	Fri, 26 Apr 2024 03:30:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AADA7828B;
+	Fri, 26 Apr 2024 03:39:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mZ0HtMw9"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="J9+ASLv7"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out30-124.freemail.mail.aliyun.com (out30-124.freemail.mail.aliyun.com [115.124.30.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AEFA762EF;
-	Fri, 26 Apr 2024 03:30:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEE0C394;
+	Fri, 26 Apr 2024 03:39:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714102228; cv=none; b=GDNP/kLw9GxSfOqzhPohwnsov16XxNydC2d2lHatyevQZwE6/wiBF52niQNfCxw7+UzFcZO1sbiz4SiaTk9tCvzvJGskIj+reyc8SpSVCzcdI6lqUFySy6tAlsDjnl1I3IK64S5X55uKqO3fifC6Kouq6vAdqfwtfjQJk6CVTmI=
+	t=1714102776; cv=none; b=byC7jw72Im46bB5tvCE70jof2hNr5sViYSityCyV352lxq/iPOGEDAyxArTH93Wop1s0Wr8nYgrdY5AQReuiAoC94GC7FyZT43cX1iJz/T0KUyc8NseL1veUc5R+CnZ2xFrwSKLMFoETl6uIfhsdBcpjH6BjYHwRKl88W1DfCxs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714102228; c=relaxed/simple;
-	bh=EdgVL+mjeevOY833THEkV8ftpwKHklYo0/miJTIw3KQ=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Nr5A0G0ar5lvqAir5GOrSzpTvJGGdtsT+JSQUjnMrm7ndau1jSMMxs3nwrUmQlkRl4qVaPrEv7enEyRTKywOXkbCf+9WiPMm/jDKx1Zl3L1Uy9n9gZm+SKJNUnd1OAHj9nPr1ldN21+2R3aZQE6CBo3bf7wkjbiAOIXwYXOg3vE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mZ0HtMw9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 13C99C2BD11;
-	Fri, 26 Apr 2024 03:30:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714102228;
-	bh=EdgVL+mjeevOY833THEkV8ftpwKHklYo0/miJTIw3KQ=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=mZ0HtMw9qHyNqgn5EB/WWtrssN6O887nOeLt4cDOOborhaSqhSA0s74YIjFOlMw/O
-	 voSjMh7bhhqgi7798goJKgWFo/rjO/u0dGqHmKCQYaYhF6wRnFYOFSqGUtNlCY8syV
-	 XLayyNPSNLJyVQ4a+9Qv24qYO3qF/XfWakilaVK4EAu/YEjDTfZzmO7gBvekGfr/6d
-	 UjMbs5MILVQ6cdZpy6fnAgPsFlLrKIEf2KNzSrPQ6lGU5EehnpB3jPL8y9qrSD2kFn
-	 aqInyb7KNnjVBBekJ316yj6Oo1VWz6EUQjFLDmS72Uqbbw/Fyb9DQBvOJZhGsYJZ3K
-	 XsRsPn2wi2/+A==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id EEEBFC595D2;
-	Fri, 26 Apr 2024 03:30:27 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1714102776; c=relaxed/simple;
+	bh=/ASHD4Wyz3SZUjAXn/LgSh11JoymE3SKlDvfYthl1Is=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=dnWh4geneUUfW4ues6vjINBOP44okY37dojiVxhy60VwKBCGx0xwtolkmFElkJkhS0ude/5BLi8wJBu/GypqBYZPa+BoHQHMwZC8Sw3vAFH1kbFDATki3ovnxZDwyt8Bz7R+nq6VWHAWQuLdwaW5YxeVEn0C/oAcdQEVp1To9jw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=J9+ASLv7; arc=none smtp.client-ip=115.124.30.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1714102770; h=From:To:Subject:Date:Message-Id:MIME-Version;
+	bh=CxlEd6LZH3PpraUX+0MZs/PrnMfei86AI7BjU1vvbt4=;
+	b=J9+ASLv7PDFc6pX0crSMS8cknV0kF4e0IYMOWZ9470vWcOnH2Xt+cxpYFi5IsbaJEnMRb0usWT+tGVm2SvphkQmkieIqZ3SSNq1FLamGxrDSiOv2LyjL+Uf/a0u/av2buEf0/rivvNnhc9a53u3CnXlv2JEfPIb0/O0k1LrHbag=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R201e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033032014016;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=19;SR=0;TI=SMTPD_---0W5HSYRX_1714102768;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W5HSYRX_1714102768)
+          by smtp.aliyun-inc.com;
+          Fri, 26 Apr 2024 11:39:29 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Stanislav Fomichev <sdf@google.com>,
+	Amritha Nambiar <amritha.nambiar@intel.com>,
+	Larysa Zaremba <larysa.zaremba@intel.com>,
+	Sridhar Samudrala <sridhar.samudrala@intel.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	virtualization@lists.linux.dev,
+	bpf@vger.kernel.org
+Subject: [PATCH net-next v7 0/8] virtio-net: support device stats
+Date: Fri, 26 Apr 2024 11:39:20 +0800
+Message-Id: <20240426033928.77778-1-xuanzhuo@linux.alibaba.com>
+X-Mailer: git-send-email 2.32.0.3.g01195cf9f
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-Git-Hash: 435b736161fa
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v11 00/10][pull request] net: intel: start The Great
- Code Dedup + Page Pool for iavf
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171410222797.8197.8566659158199091850.git-patchwork-notify@kernel.org>
-Date: Fri, 26 Apr 2024 03:30:27 +0000
-References: <20240424203559.3420468-1-anthony.l.nguyen@intel.com>
-In-Reply-To: <20240424203559.3420468-1-anthony.l.nguyen@intel.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, netdev@vger.kernel.org, hawk@kernel.org,
- linux-mm@kvack.org, przemyslaw.kitszel@intel.com, alexanderduyck@fb.com,
- ilias.apalodimas@linaro.org, linux-kernel@vger.kernel.org,
- aleksander.lobakin@intel.com, linyunsheng@huawei.com,
- nex.sw.ncis.osdt.itp.upstreaming@intel.com, cl@linux.com,
- akpm@linux-foundation.org, vbabka@suse.cz
 
-Hello:
+As the spec:
 
-This series was applied to netdev/net-next.git (main)
-by Tony Nguyen <anthony.l.nguyen@intel.com>:
+https://github.com/oasis-tcs/virtio-spec/commit/42f389989823039724f95bbbd243291ab0064f82
 
-On Wed, 24 Apr 2024 13:35:47 -0700 you wrote:
-> Alexander Lobakin says:
-> 
-> Here's a two-shot: introduce {,Intel} Ethernet common library (libeth and
-> libie) and switch iavf to Page Pool. Details are in the commit messages;
-> here's a summary:
-> 
-> Not a secret there's a ton of code duplication between two and more Intel
-> ethernet modules. Before introducing new changes, which would need to be
-> copied over again, start decoupling the already existing duplicate
-> functionality into a new module, which will be shared between several
-> Intel Ethernet drivers. The first name that came to my mind was
-> "libie" -- "Intel Ethernet common library". Also this sounds like
-> "lovelie" (-> one word, no "lib I E" pls) and can be expanded as
-> "lib Internet Explorer" :P
-> The "generic", pure-software part is placed separately, so that it can be
-> easily reused in any driver by any vendor without linking to the Intel
-> pre-200G guts. In a few words, it's something any modern driver does the
-> same way, but nobody moved it level up (yet).
-> The series is only the beginning. From now on, adding every new feature
-> or doing any good driver refactoring will remove much more lines than add
-> for quite some time. There's a basic roadmap with some deduplications
-> planned already, not speaking of that touching every line now asks:
-> "can I share this?". The final destination is very ambitious: have only
-> one unified driver for at least i40e, ice, iavf, and idpf with a struct
-> ops for each generation. That's never gonna happen, right? But you still
-> can at least try.
-> PP conversion for iavf lands within the same series as these two are tied
-> closely. libie will support Page Pool model only, so that a driver can't
-> use much of the lib until it's converted. iavf is only the example, the
-> rest will eventually be converted soon on a per-driver basis. That is
-> when it gets really interesting. Stay tech.
-> 
-> [...]
+The virtio net supports to get device stats.
 
-Here is the summary with links:
-  - [net-next,v11,01/10] net: intel: introduce {, Intel} Ethernet common library
-    https://git.kernel.org/netdev/net-next/c/306ec721d043
-  - [net-next,v11,02/10] iavf: kill "legacy-rx" for good
-    https://git.kernel.org/netdev/net-next/c/53844673d555
-  - [net-next,v11,03/10] iavf: drop page splitting and recycling
-    https://git.kernel.org/netdev/net-next/c/920d86f3c552
-  - [net-next,v11,04/10] slab: introduce kvmalloc_array_node() and kvcalloc_node()
-    https://git.kernel.org/netdev/net-next/c/a1d6063d9f2f
-  - [net-next,v11,05/10] page_pool: constify some read-only function arguments
-    https://git.kernel.org/netdev/net-next/c/ef9226cd56b7
-  - [net-next,v11,06/10] page_pool: add DMA-sync-for-CPU inline helper
-    https://git.kernel.org/netdev/net-next/c/ce230f4f8981
-  - [net-next,v11,07/10] libeth: add Rx buffer management
-    https://git.kernel.org/netdev/net-next/c/e6c91556b97f
-  - [net-next,v11,08/10] iavf: pack iavf_ring more efficiently
-    https://git.kernel.org/netdev/net-next/c/97cadd3d3ce3
-  - [net-next,v11,09/10] iavf: switch to Page Pool
-    https://git.kernel.org/netdev/net-next/c/5fa4caff59f2
-  - [net-next,v11,10/10] MAINTAINERS: add entry for libeth and libie
-    https://git.kernel.org/netdev/net-next/c/87a927efa7d9
+Please review.
 
-You are awesome, thank you!
+Thanks.
+
+v6:
+    1. remove 'maps'. check stats by if-else.
+
+v5:
+    1. Fix some small problems in last version
+    2. Not report stats that will be reported by netlink
+    3. remove "_queue" from  ethtool -S
+
+v4:
+    1. Support per-queue statistics API
+    2. Fix some small problems in last version
+
+v3:
+    1. rebase net-next
+
+v2:
+    1. fix the usage of the leXX_to_cpu()
+    2. add comment to the structure virtnet_stats_map
+
+v1:
+    1. fix some definitions of the marco and the struct
+
+
+
+
+
+
+
+
+Xuan Zhuo (8):
+  virtio_net: introduce ability to get reply info from device
+  virtio_net: introduce device stats feature and structures
+  virtio_net: remove "_queue" from ethtool -S
+  virtio_net: support device stats
+  virtio_net: device stats helpers support driver stats
+  virtio_net: add the total stats field
+  netdev: add queue stats
+  virtio-net: support queue stat
+
+ Documentation/netlink/specs/netdev.yaml |  104 +++
+ drivers/net/virtio_net.c                | 1010 +++++++++++++++++++++--
+ include/net/netdev_queues.h             |   27 +
+ include/uapi/linux/netdev.h             |   19 +
+ include/uapi/linux/virtio_net.h         |  143 ++++
+ net/core/netdev-genl.c                  |   23 +-
+ tools/include/uapi/linux/netdev.h       |   19 +
+ 7 files changed, 1284 insertions(+), 61 deletions(-)
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.32.0.3.g01195cf9f
 
 
