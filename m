@@ -1,112 +1,144 @@
-Return-Path: <netdev+bounces-91771-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91772-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A7E98B3D19
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 18:49:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F37F8B3D7C
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 19:01:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E694E2824A1
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 16:49:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 911931C23FAF
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 17:01:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C4B914C5BF;
-	Fri, 26 Apr 2024 16:49:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3564315991C;
+	Fri, 26 Apr 2024 17:01:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="FzUKR06f"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DpRiJfSV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
+Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C95EC148854
-	for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 16:49:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD1811598F5;
+	Fri, 26 Apr 2024 17:01:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714150143; cv=none; b=sP4lbw9ymCYPOCMHkO+NehRTD3WAzIdgb3QdJ3ilWeihCkEvHCRBcw9HRfxtneV20fgxMlfYaMHymf8LiVakOsNsze3T9bBuObPEb9GPDIG6JAO0iPvKz0tvZcxmTySfbgs8QCkMjBnahYTri4yPCt+PE6GcOIy1Xz6UpdpbeP4=
+	t=1714150890; cv=none; b=uuLgPrq15ur/WH9lllWY0dIcNih4KxE7nEruca+gMk6aibJ3pdDgIglTRHT4xqGHY8wI+rNRDT6phrGnAL4kTL6ow1rvfwD1S79jjGfQqaBtNBDz2fUGJZMBe9/8dn2Kw5FsG3g1ieT9qptx4b5lNqH6A6zvyMmI4tyk6dGx+Ug=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714150143; c=relaxed/simple;
-	bh=ceDHuhgb4HHjS0ZJN2dNYB8DNPxb1uu6ARLTxokHHMY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qvmNwUdwBLrA2/pOTAU6tKNtFDXCIeXY95fyZo6mDfa07GEBcQuCmanlc3KjBcHD+sAs5SoTDzMycX//ejlODzQWPF6sXumW83A36DfBiYipVhLxExpNwwTqjSCiCluI3g/T8FE2S/8gLiMP07AVPcnYreZoVAPoF/1onWCBEM4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=FzUKR06f; arc=none smtp.client-ip=209.85.221.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-346406a5fb9so1824051f8f.1
-        for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 09:49:01 -0700 (PDT)
+	s=arc-20240116; t=1714150890; c=relaxed/simple;
+	bh=cNkmau+vywNzy8mqG0zMAbEK0MlUjcRhEGqQHIaW/AY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Zwk82JuZdO5mk3OH9Z7UMQvI8FHIZJKD9zvaFFiLSH1eSabpLMafRrTIkOafbjrYigE5x628JWEbfNxO8Y8n/XYDGUGPZt9WodkMtJVCveiueum2HV9NaTppDsZBkFBDoLGotT7x4pb2cWLaGu0+/Vw2OP+12L7wo+ZndgT8rnU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DpRiJfSV; arc=none smtp.client-ip=209.85.216.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-2af71daeec1so624513a91.0;
+        Fri, 26 Apr 2024 10:01:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=6wind.com; s=google; t=1714150140; x=1714754940; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=nK8oPrc10MzYsI6YzX0sWr3Nf7RDGYNv9pEqtd7pqo0=;
-        b=FzUKR06fKnwsvBRNBHm8wp2GjOXFkFIlfo1UIb6fUcknLQflFAeQr68U8mSksrk4Kj
-         hGS9JzBsSaDmRPthy6BvzXfmyvmFHwUOa2ET6qUeCfvKWX8mCswamT6Wwcpm543s47d2
-         8bcHLFGx64VmtrWjHqfN685GEfPaaWp/EFwuj9RP73amRqmU5GHT+OiCjSPJKCKpYUP7
-         t5nM9aMtvMTj937m9rNehgHyB2t+rgRGVc+y6jxWcKz/3pQhW5gH23/p0kK1n8XzBiEf
-         LAF+OMPNCzhWMh6JpCILd5/tec/e19u3036KDEbCOglvr4c4lQJ1ibgv79GmAWe0cGxA
-         li2w==
+        d=gmail.com; s=20230601; t=1714150888; x=1714755688; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=7usDOprlF0r0X4lUDaDQW+qbxy362dPjy11nZWPpOJM=;
+        b=DpRiJfSVMQsuMoySQcMW+KpoZK3v3IGm972SOe7BKT8KSJoR34LebsHEGk9Gjneo3N
+         cCOtKtxLPrW+2ZA0tbphL+dfeW5GRDIZOLW+uh1e8UTrzrwVNRjkSOGl310PxW6yrxLS
+         4o6K24TJnhi0TACnwAm1tCo57gnZ8W0wuUzs9sZ+h4kOzYjdGK5n6Tc9OZp4wZgRSRhr
+         p8vqT57TnRLFNwAjq6oiEerGyQUZA7mEdFJn7/3tJKqhohk+bNyI/SubZmja7B4dGMZA
+         fC8NnOdl1SWlenhjAVOLeZjWZz6IRKvevNKR8wopvk1KmfjXUxjiD2fvUs81sOjIODgB
+         8CxQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714150140; x=1714754940;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=nK8oPrc10MzYsI6YzX0sWr3Nf7RDGYNv9pEqtd7pqo0=;
-        b=u7t0mrDhsL11HoZai6s61jU4RH803dYTf78gyd2Bqv8PSvTC7tekOAP3Y9AlAT4dOh
-         n3nKyIyA6mV86F4L4gGQrOk3BtRXJyAuBQeec+SaGx3EmZ5aJfzSc+W7y71bi3/SQSlS
-         ZwBxTcVlZZ8E8qX7ELh3IWKpxKWA/4gzXyBMxflxzz2GeO/Ry6DNFMhH/IK41DNreMpH
-         K72WnkSmzzmcqdj47wwBDfl3ZbJi/J7xIe2T/wzenwFqFSHQzR22a38viEKNt5gPsRsK
-         1Ghxxd+fZtMlXtj/xF2xuzFgOovZjrRFuuiTwJU3pQjXB7X2fwvAv8eSvXJpiwY27nzw
-         SaBA==
-X-Forwarded-Encrypted: i=1; AJvYcCWn76egk5sSDx17aIrx8dby+WAmtCUO3FNHq/ytbkGYLrS/RUTBCyTZ74aLCBh7gnvKtg6ECOJPIAl3+lGAaLaoln0UnPx5
-X-Gm-Message-State: AOJu0YyNXja79QOFGymG5DDXN3usAJkXYusohosACNEXvLU8UOpYN90Y
-	OM7ELnSUW2nXjqnsAAUV0fO7UmxuwAL/07nZbecR6lL3uw89/zARyrNHsjZ9pVgiC6HVV1s19Wl
-	C
-X-Google-Smtp-Source: AGHT+IHPkcTyEexs8s0tVfXw2zVcaafVYdhfxxaD6KxQpxjd4XfyQsSuY2io2l50cNz48pPm+6WM5A==
-X-Received: by 2002:a5d:550a:0:b0:349:cc20:2030 with SMTP id b10-20020a5d550a000000b00349cc202030mr2505070wrv.51.1714150140187;
-        Fri, 26 Apr 2024 09:49:00 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:b41:c160:7ec0:9b49:16d6:3c30? ([2a01:e0a:b41:c160:7ec0:9b49:16d6:3c30])
-        by smtp.gmail.com with ESMTPSA id e7-20020a5d65c7000000b00349eb6eae3esm23031751wrw.4.2024.04.26.09.48.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 26 Apr 2024 09:48:59 -0700 (PDT)
-Message-ID: <e5b210be-9a5f-4c61-8723-d7a71fe71a90@6wind.com>
-Date: Fri, 26 Apr 2024 18:48:57 +0200
+        d=1e100.net; s=20230601; t=1714150888; x=1714755688;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=7usDOprlF0r0X4lUDaDQW+qbxy362dPjy11nZWPpOJM=;
+        b=Dfv5PtxrVPuGLXJKUtUMNvrk85vYQMQ2KVjHNXySrN3dQ5OKp6VBqq50fvtq7rLWrQ
+         nAHCJpVUwwNblgBnkQavJcMF6xy538XTDoVKeLaBaaWx4iebFF+Ad28UDAm2XAkxFiQc
+         JcilyPPEJYb/rhl1MP7P79L5gA7GV78/hy4ck8Wq+w54e9OwWPocMSjmJYEKfIqp4dW5
+         FpcoOGOikIlfHBwNZ7ndxGPIeFLJVsue9xnOUNXWS4J1UbL7KQic+3ee5RZ1T7ImqPko
+         Jj5rDYrmD0bBL3sgcnAkKhNF77vitkjpK2b+LTzbt7qnnPJY9yZct/nNUt1PLHgVPHzb
+         GIww==
+X-Forwarded-Encrypted: i=1; AJvYcCVjLPPOkbnMNEVE1dVstMy4WPhD8/sLUmACui7FaFnS2qCPqnkIfe36UReIky2oVq4TDZVL6vl2va/neCEdeRaA7mOGewWqPdF/ApnxoWbiUIU3I6jzHuZXFUBsdWxaj5dM9Qxe3VI5jOzvibjWxq8yMwRsVu2HjQY9
+X-Gm-Message-State: AOJu0YxrPueAKY9jF1bbHHWrITewNourrMktAdjcttLNQ37JFyO66qqa
+	lyIb6dX1i4pFa21pKVXRjE5N+axVWiTfZnRH4FHAWpph4izX9sFWpmqwOmQU
+X-Google-Smtp-Source: AGHT+IESGyjLNOkbXq8I9S38SiHy0c/8WwKj54ERKLE9U1/0jRSqfrV7UJtLAfgyqC5Ls4scbGJHIA==
+X-Received: by 2002:a05:6a00:8b87:b0:6e9:ca7b:c150 with SMTP id ig7-20020a056a008b8700b006e9ca7bc150mr3883378pfb.3.1714150886677;
+        Fri, 26 Apr 2024 10:01:26 -0700 (PDT)
+Received: from vaxr-BM6660-BM6360 ([2001:288:7001:2703:751f:9418:61f4:229e])
+        by smtp.gmail.com with ESMTPSA id fv3-20020a056a00618300b006eb3c3db4afsm15036186pfb.186.2024.04.26.10.01.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 26 Apr 2024 10:01:26 -0700 (PDT)
+Date: Sat, 27 Apr 2024 01:01:21 +0800
+From: I Hsin Cheng <richard120310@gmail.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org,
+	pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, bpf@vger.kernel.org
+Subject: Re: [PATCH] tcp_bbr: replace lambda expression with bitwise
+ operation for bit flip
+Message-ID: <Zivd4agQ8D6rUKvt@vaxr-BM6660-BM6360>
+References: <20240426152011.37069-1-richard120310@gmail.com>
+ <CANn89iKenW5SxMGm753z8eawg+7drUz7oZcTR06habjcFmdqVg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: nicolas.dichtel@6wind.com
-Subject: Re: [PATCH ipsec-next v13 3/4] xfrm: Add dir validation to "in" data
- path lookup
-To: antony.antony@secunet.com, Steffen Klassert
- <steffen.klassert@secunet.com>, Herbert Xu <herbert@gondor.apana.org.au>,
- netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, devel@linux-ipsec.org,
- Leon Romanovsky <leon@kernel.org>, Eyal Birger <eyal.birger@gmail.com>,
- Sabrina Dubroca <sd@queasysnail.net>
-References: <cover.1714118266.git.antony.antony@secunet.com>
- <0d09e74d7716c1258ba820af2e73e0b721747830.1714118266.git.antony.antony@secunet.com>
-From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Content-Language: en-US
-Organization: 6WIND
-In-Reply-To: <0d09e74d7716c1258ba820af2e73e0b721747830.1714118266.git.antony.antony@secunet.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <CANn89iKenW5SxMGm753z8eawg+7drUz7oZcTR06habjcFmdqVg@mail.gmail.com>
 
-Le 26/04/2024 à 10:05, Antony Antony a écrit :
-> Introduces validation for the x->dir attribute within the XFRM input
-> data lookup path. If the configured direction does not match the
-> expected direction, input, increment the XfrmInStateDirError counter
-> and drop the packet to ensure data integrity and correct flow handling.
+On Fri, Apr 26, 2024 at 05:32:57PM +0200, Eric Dumazet wrote:
+> On Fri, Apr 26, 2024 at 5:20 PM I Hsin Cheng <richard120310@gmail.com> wrote:
+> >
+> > In the origin implementation in function bbr_update_ack_aggregation(),
+> > we utilize a lambda expression to flip the bit value of
+> > bbr->extra_acked_win_idx. Since the data type of
+> > bbr->extra_acked_win_idx is simply a single bit, we are actually trying
+> > to perform a bit flip operation, under the fact we can simply perform a
+> > bitwise not operation on bbr->extra_acked_win_idx.
+> >
+> > This way we can elimate the need of possible branches which generate by
+> > the lambda function, they could result in branch misses sometimes.
+> > Perform a bitwise not operation is more straightforward and wouldn't
+> > generate branches.
+> >
+> > Signed-off-by: I Hsin Cheng <richard120310@gmail.com>
+> > ---
+> >  net/ipv4/tcp_bbr.c | 3 +--
+> >  1 file changed, 1 insertion(+), 2 deletions(-)
+> >
+> > diff --git a/net/ipv4/tcp_bbr.c b/net/ipv4/tcp_bbr.c
+> > index 146792cd2..75068ba25 100644
+> > --- a/net/ipv4/tcp_bbr.c
+> > +++ b/net/ipv4/tcp_bbr.c
+> > @@ -829,8 +829,7 @@ static void bbr_update_ack_aggregation(struct sock *sk,
+> >                                                 bbr->extra_acked_win_rtts + 1);
+> >                 if (bbr->extra_acked_win_rtts >= bbr_extra_acked_win_rtts) {
+> >                         bbr->extra_acked_win_rtts = 0;
+> > -                       bbr->extra_acked_win_idx = bbr->extra_acked_win_idx ?
+> > -                                                  0 : 1;
+> > +                       bbr->extra_acked_win_idx = ~(bbr->extra_acked_win_idx);
+> >                         bbr->extra_acked[bbr->extra_acked_win_idx] = 0;
+> >                 }
+> >         }
 > 
-> grep -vw 0 /proc/net/xfrm_stat
-> XfrmInStateDirError     	1
+> Or
 > 
-> Signed-off-by: Antony Antony <antony.antony@secunet.com>
-Reviewed-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+> bbr->extra_acked_win_idx ^= 1;
+> 
+> Note that C compilers generate the same code, for the 3 variants.
+> 
+> They do not generate branches for something simple like this.
+
+I see, thanks for your explanation.
+I thought the compilers behavior might alters due to different 
+architecture or different compilers.
+So would you recommend on the proposed changes or we should stick to
+ the original implementation? 
+Personally I think my version or your proposed change are both more 
+understandable and elegant than the lambda expression.
+
+
 
