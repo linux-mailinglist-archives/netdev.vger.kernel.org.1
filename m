@@ -1,101 +1,106 @@
-Return-Path: <netdev+bounces-91557-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91558-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F6558B3108
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 09:05:39 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B343D8B310D
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 09:07:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DA0111F22396
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 07:05:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DDCF7B2250C
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 07:07:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCC9113AA56;
-	Fri, 26 Apr 2024 07:05:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEB3313AD0E;
+	Fri, 26 Apr 2024 07:07:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CHiQmS3m"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="kSwFZtrb"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94A8013A898;
-	Fri, 26 Apr 2024 07:05:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E74113A898;
+	Fri, 26 Apr 2024 07:07:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714115128; cv=none; b=MDEQL7x+G1r4sMgTVNjryyeDQtoJSyuaZv/Wwpzg40LLh1HeqQ//oprex+Y4TnxjmUTqZIlZHhsXq/+kNAE7pMGcJGHcUhlliVQ9o1SOl9NWeaOtWuST+2VcPKNbzWvDYVk9imRzD/OrWD68vjNYS2lLM7HstXpp4nOBiFpi1Vk=
+	t=1714115258; cv=none; b=Gp71nvOz3U+81FkZHrOYG9tfwWB58IRt+38xiS1iefD7X3NJMPs2RKs8cDGejy/p/Db+2Qk9smf5oG07R6K5QZg7d+PdgwTbNqWKVZPphmlxA/SUyxAp3d1664haPfP4wkd+wWlUzR91BO30hIrMSRLieSZ6LpRC4jP5Pa5wemk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714115128; c=relaxed/simple;
-	bh=F0iG2wx60KVc6Z76DVrQ1R2rFXUk0p5yuCUgEIyadF0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aveAYS/Mnh+0QUsow6PmqrTLvVLCjM+GIpLAvrjjAT7tfrq4hs/EWMCCpTF/1AV6WuGtP86whQbDOjFNX22S+t3NQ7FLBQQ+KVgrb9f/9X7z4V24bao04kKJqzdxVS47gkfYnIYwb/LPX3PjA01x5iJNRDMCV2g6X/Pdyte1v5I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CHiQmS3m; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC9BBC113CD;
-	Fri, 26 Apr 2024 07:05:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714115128;
-	bh=F0iG2wx60KVc6Z76DVrQ1R2rFXUk0p5yuCUgEIyadF0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=CHiQmS3mZcG7Yzh+VpPEdThNyAnZJFFV/Ew4XQ8qPa8xVYCT8vhmPhO6F6g3utfl/
-	 2ppTGYsWoL33ilZP6We57FkeXcTVcYpHuDimWP//oLe7wWOvTiLo9sm4ZiW0+lPTI/
-	 d13WGsLAtE4yk3boD2C1Cf8F28qXIpUQd4uj9ApYw0gvAvyD3f33LY1nlCgdWQm+pN
-	 SsVAI7fUvT9dKb6PEqRu9zAug+VAmjGFSFXKh6i+0aiwDufsj3v8XRoTWqPl4qApW0
-	 Dmytm9V9pNl6m2OuHzIfPYzarNTIk+SIWYPiMbV0W1398eUJebN69Iw3SxeljEyyKw
-	 BLcd0VF3ShJeQ==
-Date: Fri, 26 Apr 2024 08:05:24 +0100
-From: Simon Horman <horms@kernel.org>
+	s=arc-20240116; t=1714115258; c=relaxed/simple;
+	bh=NEBKdcFsswo3hwvjczlnLZCT7OYcGHc/4aLeOdQ+4vw=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=o8g/czoaqWNgW7jwop53IMlTBg0oPhbyL/hk0whEaaM+RQyqlBWjGkB7Ltev2b0CFDdRSSvzW4IornQVw9K+gVynmRXnZ+FMQ11UpxXrT7Aac+KT6y8Hl56Hq37ltPPzMS1nUc6wL76Zee2dL6EaUGK2+513YkFf7nPNREwAeoo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=kSwFZtrb; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1714115256; x=1745651256;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=NEBKdcFsswo3hwvjczlnLZCT7OYcGHc/4aLeOdQ+4vw=;
+  b=kSwFZtrbaKdArdcT0huRhGAJEMAHnafc5ZS6oZSLCy8b9SBCuA8l5HcE
+   NPuvFqRh2dXZfKXifCMlkXI0VI3RG0fYY3DlAsbH2wNTikTWdgfxozdVz
+   PSt+4hC7h4b8SRuOG3XOFzXP/O7r4iqVpb8LLuZOcE5O8pElz8MnEPEf4
+   dm2XbN7GnCBh934jbbEZymq4S2i+ytLw38RpQ4kFAw0UZDoyw2jWGTf/j
+   LBP6F2mq3PJPvwRNySdcOzkzdxTNsrp6xsrGMxGaexa0oeZt9fNjLVpQq
+   lbhUkI3hAijJTGHrvOGCLZxmsfeJyPRMn9vENcOXeXY9tVda8Qzq56A52
+   A==;
+X-CSE-ConnectionGUID: FQK/T8wqQH6Aah4DVsLuQw==
+X-CSE-MsgGUID: IHFoSuOBRYSvjKL3Q/TCJA==
+X-IronPort-AV: E=Sophos;i="6.07,231,1708412400"; 
+   d="scan'208";a="24859171"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa1.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 26 Apr 2024 00:07:35 -0700
+Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
+ chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Fri, 26 Apr 2024 00:07:24 -0700
+Received: from localhost (10.10.85.11) by chn-vm-ex03.mchp-main.com
+ (10.10.85.151) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
+ Transport; Fri, 26 Apr 2024 00:07:24 -0700
+Date: Fri, 26 Apr 2024 09:07:23 +0200
+From: Horatiu Vultur <horatiu.vultur@microchip.com>
 To: Jakub Kicinski <kuba@kernel.org>
-Cc: dev@openvswitch.org, netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, Aaron Conole <aconole@redhat.com>
-Subject: Re: [ovs-dev] selftests: openvswitch: Questions about possible
- enhancements
-Message-ID: <20240426070524.GW42092@kernel.org>
-References: <20240424164405.GN42092@kernel.org>
- <20240424173000.21c12587@kernel.org>
- <20240425082637.GU42092@kernel.org>
- <20240425185719.GV42092@kernel.org>
- <20240425122151.1d5efcc2@kernel.org>
+CC: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
+	<davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
+	<richardcochran@gmail.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next] net: phy: micrel: Add support for PTP_PF_EXTTS
+ for lan8814
+Message-ID: <20240426070723.kcwowvv56oojqdm2@DEN-DL-M31836.microchip.com>
+References: <20240423195732.3353522-1-horatiu.vultur@microchip.com>
+ <20240425184457.70d4748e@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="utf-8"
 Content-Disposition: inline
-In-Reply-To: <20240425122151.1d5efcc2@kernel.org>
+In-Reply-To: <20240425184457.70d4748e@kernel.org>
 
-On Thu, Apr 25, 2024 at 12:21:51PM -0700, Jakub Kicinski wrote:
-> On Thu, 25 Apr 2024 19:57:19 +0100 Simon Horman wrote:
-> > openvswitch.sh does not appear to have any dependencies on Open vSwitch
-> > user-space. My understanding is that, rather, it makes use of
-> > tools/testing/selftests/net/openvswitch/ovs-dpctl.py to talk to the Kernel
-> > using Netlink (which is also what Open vSwitch user-space does).
-> > 
-> > My brief testing indicates that for this the only dependencies
-> > when running on Amazon Linux 2 are python3 and pyroute2.
-> > 
-> > I think that it should be possible to port pmtu.sh to use ovs-dpctl.py.
-> > This would require some enhancements to ovs-dpctl.py to handle adding the
-> > tunnel vports (interfaces).
-> > 
-> > As an aside, to run the Open vSwitch tests in pmtu.sh the openvswitch
-> > kernel module is needed. So I think it would make sense to add
-> > CONFIG_OPENVSWITCH to tools/testing/selftests/net/config.
-> > 
-> > That would mean that tools/testing/selftests/net/config also has all
-> > the requirements to run openvswitch.sh. If so, we probably wouldn't need to
-> > add tools/testing/selftests/net/openvswitch/config or otherwise do anything
-> > special to configure the kernel for openvswitch.sh.
+The 04/25/2024 18:44, Jakub Kicinski wrote:
 > 
-> That sounds great, for simplicity we could move the ovs files down 
-> to the .../net/ directory. It'd be cool to not have to do that, and
-> let us separate tests more clearly into directories. But right now
-> every directory has its own runner so there's a high price to pay
-> for a primarily aesthetic gain :(
+> On Tue, 23 Apr 2024 21:57:32 +0200 Horatiu Vultur wrote:
+> > Where the configuration was the following:
+> > ---
+> > [global]
+> > ts2phc.pin_index  3
+> >
+> > [eth0]
+> > ---
+> 
+> You'll have to resend, sorry, the --- lines are "cut-off markers" for
+> git-am. So your commit message will get mangled. Either replace them or
+> indent the config sample by a couple of spaces, that does the trick.
 
-Understood. Let's work on getting the Open vSwitch portions of pmtu.sh, and
-openvswitch.sh into a little bit better shape. Then we can consider moving
-the contents of tools/.../net/openvswitch/. It would certainly be nice to
-have the Open vSwitch tests run automatically.
+That is true. I will indent the config sample with some spaces.
+Thanks.
 
+> --
+> pw-bot: cr
+
+-- 
+/Horatiu
 
