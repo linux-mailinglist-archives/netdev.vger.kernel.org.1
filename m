@@ -1,135 +1,226 @@
-Return-Path: <netdev+bounces-91747-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91754-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B60328B3BA2
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 17:33:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 588758B3C40
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 18:01:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6A7F81F2507A
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 15:33:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4C5721C20DFD
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 16:01:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94CAE149C64;
-	Fri, 26 Apr 2024 15:33:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E846D15AAC3;
+	Fri, 26 Apr 2024 16:00:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2p1+m/33"
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="KLc6eWKI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0405F149C44
-	for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 15:33:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CE3514A4D9;
+	Fri, 26 Apr 2024 16:00:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714145594; cv=none; b=gF53LsAItZCLieXyBwXXKqL0YHGrDCSghkcdfwT1HOIqZDQOV6TuE5ZwXQHiq01JtUl1DR4EsoF3mcAxznhCFZgsPSbE67rGNZqcuv5IXxFp40oeLd/ly+RGB9upLD+k7ynLYSFbe2xAlQYM1aCzRhUQYIX8hf4Zd2EVtV4FJd8=
+	t=1714147258; cv=none; b=CUKe4GzsJ2iDqSxyeLaR0lQmlpTqUZULlDK1vwnsbI2xuEVjipncwtvdgscWQ7EQBq4JsiOHsEYFMACa/XLM/qvU2CfarflZukDAyXDC6t8O3vEMCQSHdMRl7yle11Y6rfQXEI0oDkdogR6akm04jBDiI3GkBl2JyPWSZeAPEtQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714145594; c=relaxed/simple;
-	bh=a+x+9QJcOjAjsTEqVdunD6qiMm7jqBNR+SHC13THGg4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=q9T8iEblBG6Y/r9yEVbgcsf2WFGW6zal9jzNZva+dK/VpftYm/t4oZjnBTjNu0OHqC+2IZk2bEbGCZXicUTNjwxtIZooe73MZd3QhTo7SthbRKjimPUGfeGIb2rFwmGa5pkfgF/y5oOhbJhm3kz63Cc9amwycQEWN4lEzYxYOtg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2p1+m/33; arc=none smtp.client-ip=209.85.208.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-571b5fba660so12149a12.1
-        for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 08:33:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1714145591; x=1714750391; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jQAKSfeSiNMwx23jPVYzccmGjENnrcaTmn472bWM+dw=;
-        b=2p1+m/33Ca229cGyj8MM8xvQ+TcRFoJ5xMFZZC4LEEYy5EM0ZGUdWs1cOe92gh1e0y
-         JgoHocZlnSAN8Uj3vgLz0qJfUFhaScjKB3VJK53KAOhuiJDfYdNDDqqW624fng+DW54+
-         Lv3xFHGsu/kK8XBY2VG84oLE7lg9vmFVzoxghp+b9ZEiRDU/yU6BftsY1PUt+qn5tYHw
-         LG/hSeeCa/jzquXS+FURC9pnA+7fRnoi9ZIYsTpxKZNbW/vtROvlZ40vKA7Qi1+Nk6z1
-         MLUNKpBhqRWA6cpytWhwrbEPR4kP2wsC3XOkkukKVvTTyYJo2GVvkkmQSgEBHwC7Ql3f
-         dXTQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714145591; x=1714750391;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jQAKSfeSiNMwx23jPVYzccmGjENnrcaTmn472bWM+dw=;
-        b=ZuPCiO5f0el5awsCoKzLLrCqJZWb3IKETIcBXZEVqoip2KkgCPIUYh2lEb33EC+TTV
-         Cm8dINYlEmM3TGzvSCiEc6q5oXOf2iBVkpKSbhThdG5b8LT7OGMTiT4gmIwP02vEui6c
-         pvqfR/EDYmSchjxqX6iEPFgxcg4eIbLbVXeWPs18qDpI/vTSBNdLNuRGmMI/UiXmx5Ew
-         b2TZS3Ft4L0H0LUO94bw8wMOlQb9mOuvopSRfieRwdDCIIWLIu295OhbYo8aLdLfIiYD
-         w/b0xXhmYwpWWSIFt/fqObmOwQvPSzZOC2K8hUuYJxsgLidbC7XpxsWRyFYCbYIDgyIe
-         AsXw==
-X-Forwarded-Encrypted: i=1; AJvYcCW80g21uZZD4J+88dPrVIT8nVBQwQNmp1VZ1QpKBo+h70ylwZuVal7r/ZH/dN5AVukXasnVfe7J22UBdfj1/3xAt9bAmk2T
-X-Gm-Message-State: AOJu0YyVFBx3OP3QbxynSBUmp2nVugfSQFPnGMBiUh4YmATkjdURwqFL
-	h0DQkRkfdyiPPPfzyFeV8K7jDHetF2IqMENFtrHYakZF7ANkCXVvIRmczysdgwmA5A2vXnU/u59
-	ko+OIp72V0aJ3gbO6G2EXuREFa89lCplWGM8i
-X-Google-Smtp-Source: AGHT+IGFBkaX99SfmSYIhlRZCqbmREadhrxpgL9UrFo0Boe2aUlXFOiVrXsSsyd0ZAOJCYWvbdHlbxWVGOxfkpsUpkE=
-X-Received: by 2002:aa7:d497:0:b0:572:25e4:26eb with SMTP id
- b23-20020aa7d497000000b0057225e426ebmr146199edr.7.1714145591147; Fri, 26 Apr
- 2024 08:33:11 -0700 (PDT)
+	s=arc-20240116; t=1714147258; c=relaxed/simple;
+	bh=GHpAhp43gXbQiBLunOPFF1TgsOqR+/UXG5NrXX5hE8A=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qwyhfNqg7IeuTyhNQhYycgvRSdu5mSHRHxhj7trE0OdFutLYbhFcotwyJVKVQgg0MVnWCJxYwe1+JwpOkCBkweoiYAQpR4j+3hkthlIy/7+ISeANmolEpe6h5H4rHA2M5jJeiawWU9M8xc8mFGBwdCJayayZsidXHZHPLTSBbk4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=KLc6eWKI; arc=none smtp.client-ip=85.214.62.61
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Received: from [127.0.0.1] (p578adb1c.dip0.t-ipconnect.de [87.138.219.28])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits))
+	(No client certificate requested)
+	(Authenticated sender: marex@denx.de)
+	by phobos.denx.de (Postfix) with ESMTPSA id 7D9FB8857C;
+	Fri, 26 Apr 2024 18:00:50 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+	s=phobos-20191101; t=1714147251;
+	bh=Amw4/bajJowEQc3xMpXrC2fZXOfCeYn8U9XHLfZLBK8=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=KLc6eWKIpa/Wh3b5Q63HZaxGBZwMGpx4phoHXtpPPNVSgZ+sMEVfxdH41flNm35TC
+	 tO57KUR5RU12Ce3Kaz2k+xYbJT7Bj8qE+9qF2H7ljtYFh+Fd1PGUOOAzQY9HjmaiAU
+	 OlK22tHP3YNOk93pjPUEeBDY66K1zE3ZMgSgojIO6KEqsqNJ/ea9PGcDQDfYStXUkp
+	 SGJ9Yf9WetN+yRsDhTex6HVbCjWUngf4aI+7SVp08CrHttLxqvg3NupJ5hpUa6ST/c
+	 6xMeZm8JGlUR1IVvxMShD0QjSGLC5wcJsUECgLhWvpgiU4didTAzctuzdRiteOB9Gd
+	 NyTnMv0uMqW9A==
+Message-ID: <b790f34e-8bfb-44f6-869d-798508008483@denx.de>
+Date: Fri, 26 Apr 2024 17:37:51 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240426152011.37069-1-richard120310@gmail.com>
-In-Reply-To: <20240426152011.37069-1-richard120310@gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 26 Apr 2024 17:32:57 +0200
-Message-ID: <CANn89iKenW5SxMGm753z8eawg+7drUz7oZcTR06habjcFmdqVg@mail.gmail.com>
-Subject: Re: [PATCH] tcp_bbr: replace lambda expression with bitwise operation
- for bit flip
-To: I Hsin Cheng <richard120310@gmail.com>
-Cc: davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org, 
-	pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	bpf@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 05/11] net: stmmac: dwmac-stm32: update config
+ management for phy wo cristal
+To: Christophe Roullier <christophe.roullier@foss.st.com>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Richard Cochran <richardcochran@gmail.com>, Jose Abreu
+ <joabreu@synopsys.com>, Liam Girdwood <lgirdwood@gmail.com>,
+ Mark Brown <broonie@kernel.org>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <20240426125707.585269-1-christophe.roullier@foss.st.com>
+ <20240426125707.585269-6-christophe.roullier@foss.st.com>
+Content-Language: en-US
+From: Marek Vasut <marex@denx.de>
+In-Reply-To: <20240426125707.585269-6-christophe.roullier@foss.st.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
 
-On Fri, Apr 26, 2024 at 5:20=E2=80=AFPM I Hsin Cheng <richard120310@gmail.c=
-om> wrote:
->
-> In the origin implementation in function bbr_update_ack_aggregation(),
-> we utilize a lambda expression to flip the bit value of
-> bbr->extra_acked_win_idx. Since the data type of
-> bbr->extra_acked_win_idx is simply a single bit, we are actually trying
-> to perform a bit flip operation, under the fact we can simply perform a
-> bitwise not operation on bbr->extra_acked_win_idx.
->
-> This way we can elimate the need of possible branches which generate by
-> the lambda function, they could result in branch misses sometimes.
-> Perform a bitwise not operation is more straightforward and wouldn't
-> generate branches.
->
-> Signed-off-by: I Hsin Cheng <richard120310@gmail.com>
+On 4/26/24 2:57 PM, Christophe Roullier wrote:
+> Some cleaning because some Ethernet PHY configs do not need to add
+> st,ext-phyclk property.
+> Change print info message "No phy clock provided" only when debug.
+> 
+> Signed-off-by: Christophe Roullier <christophe.roullier@foss.st.com>
 > ---
->  net/ipv4/tcp_bbr.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
->
-> diff --git a/net/ipv4/tcp_bbr.c b/net/ipv4/tcp_bbr.c
-> index 146792cd2..75068ba25 100644
-> --- a/net/ipv4/tcp_bbr.c
-> +++ b/net/ipv4/tcp_bbr.c
-> @@ -829,8 +829,7 @@ static void bbr_update_ack_aggregation(struct sock *s=
-k,
->                                                 bbr->extra_acked_win_rtts=
- + 1);
->                 if (bbr->extra_acked_win_rtts >=3D bbr_extra_acked_win_rt=
-ts) {
->                         bbr->extra_acked_win_rtts =3D 0;
-> -                       bbr->extra_acked_win_idx =3D bbr->extra_acked_win=
-_idx ?
-> -                                                  0 : 1;
-> +                       bbr->extra_acked_win_idx =3D ~(bbr->extra_acked_w=
-in_idx);
->                         bbr->extra_acked[bbr->extra_acked_win_idx] =3D 0;
->                 }
->         }
+>   .../net/ethernet/stmicro/stmmac/dwmac-stm32.c | 27 ++++++++++---------
+>   1 file changed, 14 insertions(+), 13 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c
+> index 7529a8d15492..e648c4e790a7 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c
+> @@ -55,17 +55,17 @@
+>    *|         |        |      25MHz    |        50MHz       |                  |
+>    * ---------------------------------------------------------------------------
+>    *|  MII    |	 -   |     eth-ck    |	      n/a	  |	  n/a        |
+> - *|         |        | st,ext-phyclk |                    |		     |
+> + *|         |        |	             |                    |		     |
+>    * ---------------------------------------------------------------------------
+>    *|  GMII   |	 -   |     eth-ck    |	      n/a	  |	  n/a        |
+> - *|         |        | st,ext-phyclk |                    |		     |
+> + *|         |        |               |                    |		     |
+>    * ---------------------------------------------------------------------------
+>    *| RGMII   |	 -   |     eth-ck    |	      n/a	  |      eth-ck      |
+> - *|         |        | st,ext-phyclk |                    | st,eth-clk-sel or|
+> + *|         |        |               |                    | st,eth-clk-sel or|
+>    *|         |        |               |                    | st,ext-phyclk    |
+>    * ---------------------------------------------------------------------------
+>    *| RMII    |	 -   |     eth-ck    |	    eth-ck        |	  n/a        |
+> - *|         |        | st,ext-phyclk | st,eth-ref-clk-sel |		     |
+> + *|         |        |               | st,eth-ref-clk-sel |		     |
+>    *|         |        |               | or st,ext-phyclk   |		     |
+>    * ---------------------------------------------------------------------------
+>    *
+> @@ -174,23 +174,22 @@ static int stm32mp1_set_mode(struct plat_stmmacenet_data *plat_dat)
+>   	dwmac->enable_eth_ck = false;
+>   	switch (plat_dat->mac_interface) {
+>   	case PHY_INTERFACE_MODE_MII:
+> -		if (clk_rate == ETH_CK_F_25M && dwmac->ext_phyclk)
+> +		if (clk_rate == ETH_CK_F_25M)
 
-Or
+I see two problems here.
 
-bbr->extra_acked_win_idx ^=3D 1;
+First, according to the table above, in MII mode, clk_rate cannot be 
+anything else but 25 MHz, so the (clk_rate == ETH_CK_F_25M) condition is 
+always true. Why not drop that condition ?
 
-Note that C compilers generate the same code, for the 3 variants.
+The "dwmac->ext_phyclk" means "Ethernet PHY have no crystal", which 
+means the clock are provided by the STM32 RCC clock IP instead, which 
+means if the dwmac->ext_phyclk is true, dwmac->enable_eth_ck should be 
+set to true, because dwmac->enable_eth_ck controls the enablement of 
+these STM32 clock IP generated clock.
 
-They do not generate branches for something simple like this.
+Second, as far as I understand it, there is no way to operate this IP 
+with external clock in MII mode, so this section should always be only:
+
+dwmac->enable_eth_ck = true;
+
+>   			dwmac->enable_eth_ck = true;
+>   		val = dwmac->ops->pmcsetr.eth1_selmii;
+>   		pr_debug("SYSCFG init : PHY_INTERFACE_MODE_MII\n");
+>   		break;
+>   	case PHY_INTERFACE_MODE_GMII:
+>   		val = SYSCFG_PMCR_ETH_SEL_GMII;
+> -		if (clk_rate == ETH_CK_F_25M &&
+> -		    (dwmac->eth_clk_sel_reg || dwmac->ext_phyclk)) {
+> +		if (clk_rate == ETH_CK_F_25M)
+>   			dwmac->enable_eth_ck = true;
+> -			val |= dwmac->ops->pmcsetr.eth1_clk_sel;
+> -		}
+>   		pr_debug("SYSCFG init : PHY_INTERFACE_MODE_GMII\n");
+>   		break;
+>   	case PHY_INTERFACE_MODE_RMII:
+>   		val = dwmac->ops->pmcsetr.eth1_sel_rmii | dwmac->ops->pmcsetr.eth2_sel_rmii;
+> -		if ((clk_rate == ETH_CK_F_25M || clk_rate == ETH_CK_F_50M) &&
+> +		if (clk_rate == ETH_CK_F_25M)
+> +			dwmac->enable_eth_ck = true;
+> +		if (clk_rate == ETH_CK_F_50M &&
+>   		    (dwmac->eth_ref_clk_sel_reg || dwmac->ext_phyclk)) {
+
+This doesn't seem to be equivalent change to the previous code . Here, 
+if the clock frequency is 25 MHz, the clock are unconditionally enabled. 
+Before, the code enabled the clock only if clock frequency was 25 MHz 
+AND one of the "dwmac->eth_ref_clk_sel_reg" or "dwmac->ext_phyclk" was 
+set (i.e. clock provided by SoC RCC clock IP).
+
+I think it might make this code easier if you drop all of the frequency 
+test conditionals, which aren't really all that useful, and only enable 
+the clock if either dwmac->ext_phyclk / dwmac->eth_clk_sel_reg / 
+dwmac->eth_ref_clk_sel_reg is set , because effectively what this entire 
+convoluted code is implementing is "if (clock supplied by clock IP i.e. 
+RCC) enable the clock()" *, right ?
+
+* And it is also toggling the right clock mux bit in PMCSETR.
+
+So, for MII this would be plain:
+dwmac->enable_eth_ck = true;
+
+For GMII/RGMII this would be:
+if (dwmac->ext_phyclk || dwmac->eth_clk_sel_reg)
+   dwmac->enable_eth_ck = true;
+
+For RMII this would be:
+if (dwmac->ext_phyclk || dwmac->eth_ref_clk_sel_reg)
+   dwmac->enable_eth_ck = true;
+
+Maybe the clock frequency validation can be retained, but done separately?
+
+>   			dwmac->enable_eth_ck = true;
+>   			val |= dwmac->ops->pmcsetr.eth1_ref_clk_sel;
+> @@ -203,7 +202,9 @@ static int stm32mp1_set_mode(struct plat_stmmacenet_data *plat_dat)
+>   	case PHY_INTERFACE_MODE_RGMII_RXID:
+>   	case PHY_INTERFACE_MODE_RGMII_TXID:
+>   		val = dwmac->ops->pmcsetr.eth1_sel_rgmii | dwmac->ops->pmcsetr.eth2_sel_rgmii;
+> -		if ((clk_rate == ETH_CK_F_25M || clk_rate == ETH_CK_F_125M) &&
+> +		if (clk_rate == ETH_CK_F_25M)
+> +			dwmac->enable_eth_ck = true;
+> +		if (clk_rate == ETH_CK_F_125M &&
+>   		    (dwmac->eth_clk_sel_reg || dwmac->ext_phyclk)) {
+>   			dwmac->enable_eth_ck = true;
+>   			val |= dwmac->ops->pmcsetr.eth1_clk_sel;
+> @@ -219,7 +220,7 @@ static int stm32mp1_set_mode(struct plat_stmmacenet_data *plat_dat)
+>   	}
+>   
+>   	/* Need to update PMCCLRR (clear register) */
+> -	regmap_write(dwmac->regmap, reg + dwmac->ops->syscfg_clr_off,
+> +	regmap_write(dwmac->regmap, dwmac->ops->syscfg_clr_off,
+>   		     dwmac->mode_mask);
+>   
+>   	/* Update PMCSETR (set register) */
+> @@ -328,7 +329,7 @@ static int stm32mp1_parse_data(struct stm32_dwmac *dwmac,
+>   	/*  Get ETH_CLK clocks */
+>   	dwmac->clk_eth_ck = devm_clk_get(dev, "eth-ck");
+>   	if (IS_ERR(dwmac->clk_eth_ck)) {
+> -		dev_info(dev, "No phy clock provided...\n");
+> +		dev_dbg(dev, "No phy clock provided...\n");
+>   		dwmac->clk_eth_ck = NULL;
+>   	}
+>   
 
