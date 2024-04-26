@@ -1,174 +1,146 @@
-Return-Path: <netdev+bounces-91774-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91775-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 789768B3DAC
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 19:15:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E62FC8B3DB4
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 19:16:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DA49AB23C1D
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 17:15:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 235661C21F2B
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 17:16:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 311F915B0FB;
-	Fri, 26 Apr 2024 17:15:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECDC115D5A2;
+	Fri, 26 Apr 2024 17:16:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="dfqvuQcE"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MaQzblg2"
 X-Original-To: netdev@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D8E6148842
-	for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 17:15:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DA6715B15D
+	for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 17:16:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714151713; cv=none; b=Kd+4QKy32MrPRhBopvFbvSp8pRRSlVbZ27yIsDqtdhN733xJygx4Yaj6mHL81T8J/iijcnYUwwcog4gPhtXvoeQo7sOuUvknSPXkTwkIyz8Dh60p5A+0kjKkohbuPrhkL3T+nM6HWugT9ipoRzO/rceg2w/tLzPcRk7TZ+ie34A=
+	t=1714151795; cv=none; b=LNn70Fa12nt0f07lL7uEXFNlJwLLI0K4ffwMHrOofkQ8Nv1qpYy4J+ox2C4EEI3u2aYe7PBLuUn5abl4YsK0cnUYHVRVZkBodSZ2rnPeh7HeD1/AKQi3ok+LUjteQ/giIUnPSQVF0NgBiODI18NdBvBvR1Q87ypRKnE5Jvlzl6w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714151713; c=relaxed/simple;
-	bh=cUVKhYIO27DoSHceS0qy0+2FUb0ZjxWvs7XQYIcpFS8=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=Ant4IQhta/3xqZGZeQJijxazk2Ty8uOQ6OKVdML/9gk4LrwHLRYAthevrRa4tEJXV7KyvAG4Oojr/WBTlPelmdKnU7rmiXRiR9ap3WqL+yehh83jwNNs8p/mNZi7ySuPqudsff3aB5O5gxjbmZ6CRXes7XTeIwYsVqHfkurwTWs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=dfqvuQcE; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=Content-Type:MIME-Version:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:In-Reply-To:References;
-	bh=m4G8nHzQIXCHO1y8p4LPoi+zqr2MAifzLs+fYjo9zpE=; b=dfqvuQcEnWC+1Ka5P7W34aMx1I
-	SgfipMEBewsRWdhlWJ/Uu0YeHnwY+gt+obbQXckdtKxh2ex8+UyUgCNS1nnIei7KNFwZeUmZQ96nt
-	f51+pwdKwN1wk9UQd6Z95sty6wW+xr7Yq4VtFpuwXaiBCfSF2L7VGHU6pSJHudcgMUuLvuTog34nG
-	tL9WE/U0odLpIThOIY+7lJ7kUUNKj8s+UlSPd1StTMgcxe/BVtFSpXrfYid8dFb1439HQ+NABernk
-	0ly6VPW2uQJfhO0MC/3oIqOfWLivf1GyfyFfczD76D1xS9HeR8zFm90tyOz7gw09J0RGDVCBppp7K
-	jSlJ2h5Q==;
-Received: from willy by casper.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1s0PAB-00000005ezT-1Zdf;
-	Fri, 26 Apr 2024 17:15:07 +0000
-Date: Fri, 26 Apr 2024 18:15:07 +0100
-From: Matthew Wilcox <willy@infradead.org>
-To: linux-mm@kvack.org, netdev@vger.kernel.org
-Cc: Suren Baghdasaryan <surenb@google.com>,
-	"Liam R. Howlett" <Liam.Howlett@oracle.com>,
-	Arjun Roy <arjunroy@google.com>
-Subject: [RFC] Make find_tcp_vma() more efficient
-Message-ID: <ZivhG0yrbpFqORDw@casper.infradead.org>
+	s=arc-20240116; t=1714151795; c=relaxed/simple;
+	bh=5GBgcTHzbOIEDgorcFEzrdXexOgGt8UtgP6HqH2srao=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=H/5l0Sco+U2cNEtBUGI5wleav6YyHYP1Wc4biz6NRI+F9EAMgRkzMudJYGP86RQxI3f9nIZSgKu50RIDyGw2vFpCIebK7UCBjdYViL5RFNnR+sLIrbvV8b63aPj/sJhSlc7H67Yp0QlfS+EHyfVNrvVbvWgrhYD5o72Mzx51OH0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MaQzblg2; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1714151793;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5eZ7lmSsHEeWREkE8QMUgqjdRO8mkI1U+zkRl58HfpU=;
+	b=MaQzblg2NYVCe2IsckoFrq+r2AvGBmdv/O3WGPbF1iBB3/MbnKnwaNjVuEu61IOCqvzu4m
+	HIErDP6oWGHhRz9BP/oyJDUtQvEcgyTghimI74NqsvWjm7LGM8zXZMxAAZlvdEdhvOmUSx
+	EnLuW+gTiYPazxWLoQh7jryfjNox2gc=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-530-F2z9VHWJOKyN98hUIR0s_Q-1; Fri, 26 Apr 2024 13:16:29 -0400
+X-MC-Unique: F2z9VHWJOKyN98hUIR0s_Q-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1699F830D37;
+	Fri, 26 Apr 2024 17:16:29 +0000 (UTC)
+Received: from [10.45.225.10] (unknown [10.45.225.10])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 7C79A40C6DAE;
+	Fri, 26 Apr 2024 17:16:27 +0000 (UTC)
+Message-ID: <914424cb-d74a-40b3-95e4-03d17d653467@redhat.com>
+Date: Fri, 26 Apr 2024 19:16:26 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iwl-next v2 0/7] i40e: cleanups & refactors
+To: Tony Nguyen <anthony.l.nguyen@intel.com>, intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ mschmidt@redhat.com, aleksandr.loktionov@intel.com,
+ jesse.brandeburg@intel.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com
+References: <20240327075733.8967-1-ivecera@redhat.com>
+ <3bd08423-18cd-6e12-38ab-4d9656c9ecf1@intel.com>
+Content-Language: en-US
+From: Ivan Vecera <ivecera@redhat.com>
+In-Reply-To: <3bd08423-18cd-6e12-38ab-4d9656c9ecf1@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.2
 
-Liam asked me if we could do away with the "bool *mmap_locked"
-parameter, and the problem is that some architctures don't support
-CONFIG_PER_VMA_LOCK yet.  But we can abstract it ... something like this
-maybe?
+On 12. 04. 24 23:19, Tony Nguyen wrote:
+> 
+> 
+> On 3/27/2024 12:57 AM, Ivan Vecera wrote:
+>> This series do following:
+>> Patch 1 - Removes write-only flags field from i40e_veb structure and
+>>            from i40e_veb_setup() parameters
+>> Patch 2 - Refactors parameter of i40e_notify_client_of_l2_param_changes()
+>>            and i40e_notify_client_of_netdev_close()
+>> Patch 3 - Refactors parameter of i40e_detect_recover_hung()
+>> Patch 4 - Adds helper i40e_pf_get_main_vsi() to get main VSI and uses it
+>>            in existing code
+>> Patch 5 - Consolidates checks whether given VSI is the main one
+>> Patch 6 - Adds helper i40e_pf_get_main_veb() to get main VEB and uses it
+>>            in existing code
+>> Patch 7 - Adds helper i40e_vsi_reconfig_tc() to reconfigure TC for
+>>            particular and uses it to replace existing open-coded pieces
+> 
+> Hi Ivan,
+> 
+> With the new checks on kdoc [1], this now reports issues. Can you fix 
+> those? Feel free to send the new version to 'net-next' as our validation 
+> has finished their testing on this series.
+> 
+> You can add my
+> 
+> Reviewed-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+> 
+> Thanks,
+> Tony
 
-(not particularly proposing this for inclusion; just wrote it and want
-to get it out of my tree so I can get back to other projects.  If anyone
-wants it, they can test it and submit it for inclusion and stick my
-S-o-B on it)
+Huh, I missed your email. Will send v3.
 
-diff --git a/include/linux/mm.h b/include/linux/mm.h
-index 9849dfda44d4..570763351508 100644
---- a/include/linux/mm.h
-+++ b/include/linux/mm.h
-@@ -779,11 +779,22 @@ static inline void assert_fault_locked(struct vm_fault *vmf)
- struct vm_area_struct *lock_vma_under_rcu(struct mm_struct *mm,
- 					  unsigned long address);
- 
-+static inline void lock_vma_under_mmap_lock(struct vm_area_struct *vma)
-+{
-+	down_read(&vma->vm_lock->lock);
-+	mmap_read_unlock(vma->vm_mm);
-+}
-+
- #else /* CONFIG_PER_VMA_LOCK */
- 
- static inline bool vma_start_read(struct vm_area_struct *vma)
- 		{ return false; }
--static inline void vma_end_read(struct vm_area_struct *vma) {}
-+static inline void vma_end_read(struct vm_area_struct *vma)
-+{
-+	mmap_read_unlock(vma->vm_mm);
-+}
-+
-+static inline void lock_vma_under_mmap_lock(struct vm_area_struct *vma) {}
- static inline void vma_start_write(struct vm_area_struct *vma) {}
- static inline void vma_assert_write_locked(struct vm_area_struct *vma)
- 		{ mmap_assert_write_locked(vma->vm_mm); }
-diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-index f23b97777ea5..e763916e5185 100644
---- a/net/ipv4/tcp.c
-+++ b/net/ipv4/tcp.c
-@@ -2051,27 +2051,25 @@ static void tcp_zc_finalize_rx_tstamp(struct sock *sk,
- }
- 
- static struct vm_area_struct *find_tcp_vma(struct mm_struct *mm,
--					   unsigned long address,
--					   bool *mmap_locked)
-+					   unsigned long address)
- {
- 	struct vm_area_struct *vma = lock_vma_under_rcu(mm, address);
- 
--	if (vma) {
--		if (vma->vm_ops != &tcp_vm_ops) {
--			vma_end_read(vma);
-+	if (!vma) {
-+		mmap_read_lock(mm);
-+		vma = vma_lookup(mm, address);
-+		if (vma) {
-+			lock_vma_under_mmap_lock(vma);
-+		} else {
-+			mmap_read_unlock(mm);
- 			return NULL;
- 		}
--		*mmap_locked = false;
--		return vma;
- 	}
--
--	mmap_read_lock(mm);
--	vma = vma_lookup(mm, address);
--	if (!vma || vma->vm_ops != &tcp_vm_ops) {
--		mmap_read_unlock(mm);
-+	if (vma->vm_ops != &tcp_vm_ops) {
-+		vma_end_read(vma);
- 		return NULL;
- 	}
--	*mmap_locked = true;
-+
- 	return vma;
- }
- 
-@@ -2092,7 +2090,6 @@ static int tcp_zerocopy_receive(struct sock *sk,
- 	u32 seq = tp->copied_seq;
- 	u32 total_bytes_to_map;
- 	int inq = tcp_inq(sk);
--	bool mmap_locked;
- 	int ret;
- 
- 	zc->copybuf_len = 0;
-@@ -2117,7 +2114,7 @@ static int tcp_zerocopy_receive(struct sock *sk,
- 		return 0;
- 	}
- 
--	vma = find_tcp_vma(current->mm, address, &mmap_locked);
-+	vma = find_tcp_vma(current->mm, address);
- 	if (!vma)
- 		return -EINVAL;
- 
-@@ -2194,10 +2191,7 @@ static int tcp_zerocopy_receive(struct sock *sk,
- 						   zc, total_bytes_to_map);
- 	}
- out:
--	if (mmap_locked)
--		mmap_read_unlock(current->mm);
--	else
--		vma_end_read(vma);
-+	vma_end_read(vma);
- 	/* Try to copy straggler data. */
- 	if (!ret)
- 		copylen = tcp_zc_handle_leftover(zc, sk, skb, &seq, copybuf_len, tss);
+Thanks,
+Ivan
+
+>> Changes since v1:
+>> - adjusted titles for patches 2 & 3
+>>
+>> Ivan Vecera (8):
+>>    i40e: Remove flags field from i40e_veb
+>>    i40e: Refactor argument of several client notification functions
+>>    i40e: Refactor argument of i40e_detect_recover_hung()
+>>    i40e: Add helper to access main VSI
+>>    i40e: Consolidate checks whether given VSI is main
+>>    i40e: Add helper to access main VEB
+>>    i40e: Add and use helper to reconfigure TC for given VSI
+>>
+>>   drivers/net/ethernet/intel/i40e/i40e.h        |  30 ++-
+>>   drivers/net/ethernet/intel/i40e/i40e_client.c |  28 +--
+>>   drivers/net/ethernet/intel/i40e/i40e_ddp.c    |   3 +-
+>>   .../net/ethernet/intel/i40e/i40e_debugfs.c    |  36 +--
+>>   .../net/ethernet/intel/i40e/i40e_ethtool.c    |  29 ++-
+>>   drivers/net/ethernet/intel/i40e/i40e_main.c   | 205 ++++++++++--------
+>>   drivers/net/ethernet/intel/i40e/i40e_ptp.c    |   6 +-
+>>   .../net/ethernet/intel/i40e/i40e_register.h   |   3 +
+>>   drivers/net/ethernet/intel/i40e/i40e_txrx.c   |  98 ++++++---
+>>   drivers/net/ethernet/intel/i40e/i40e_txrx.h   |   3 +-
+>>   .../ethernet/intel/i40e/i40e_virtchnl_pf.c    |  14 +-
+>>   11 files changed, 282 insertions(+), 173 deletions(-)
+> 
+> [1] https://lore.kernel.org/netdev/20240411200608.2fcf7e36@kernel.org/
+> 
+
 
