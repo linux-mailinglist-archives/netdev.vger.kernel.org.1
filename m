@@ -1,427 +1,135 @@
-Return-Path: <netdev+bounces-91693-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91695-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4BC4F8B3773
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 14:50:03 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 426B58B37A2
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 15:00:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6F48B1C21E5C
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 12:50:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7086AB230EC
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 13:00:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F20FC146A84;
-	Fri, 26 Apr 2024 12:49:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDE17146D62;
+	Fri, 26 Apr 2024 12:59:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mfkHFZXA"
+	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="2OVL/9e+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+Received: from mx07-00178001.pphosted.com (mx08-00178001.pphosted.com [91.207.212.93])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0233E2A1B0
-	for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 12:49:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.15
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714135797; cv=fail; b=In2uKygBxmlTxEMcleiDvKL4riCPjK6PMHiynGmBDajZ99MI+MJqICxxLWLwpe924DNvGC12C6Ne1oJcZChMD+5mtY5WyT3rHm4NgTNDjmkjaqzgwajjeyIwz9Up3sKMNrsdXr4UAleqcsaGiScF3xxeExF5ZFHY+NpcTdiJqAU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714135797; c=relaxed/simple;
-	bh=urkPQcLGraSVv/bFIyf0NwnJSB5V3bmvRdfX5vpOS3w=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=EEQTcR+AYMxyaKrr+wJsEssrjDk/INSL4a9yLNndSeb3ttCcm72PCmdkMVV5n+pLrYlp5uQgjbrxjh1sKLb8hczkH4BZpq+JX8oTC9qVFLVMxS/KUCy7XxqMSlMh7pkWppErJeOuEEWALF2TOnWd+pBcgygTIvI6VrTNCfI93fQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mfkHFZXA; arc=fail smtp.client-ip=192.198.163.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1714135796; x=1745671796;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=urkPQcLGraSVv/bFIyf0NwnJSB5V3bmvRdfX5vpOS3w=;
-  b=mfkHFZXAaT4awYjnUaxa6CLX8lGCSXOgmKpxMOlnHYUhEdJaTc8ZPjI2
-   2yDqxWu5dGX/5rMr1y4SkEWvnpAdgCPVyKPtLhng7KCEXlNWnaQ2Jx1us
-   FZYwKbe20s4xpPRtCIzT7YIWZ2ZYyKpahgPbfbYqRducBmWV2EYKTvzjI
-   HEg2LYemUmzOnbZZ1ON7bzvPdr+3ZzmJ2G2atPSjskcMBNvppSOFHkXSy
-   oKdvHJBcHnISjYnsVKUswFgFkomHOpa1Dc6ZDFqw4kFs243SgQE1ua0ns
-   KTV4KKq+XqieoCj+Fm3bP7Jap9DWafRJe1DtnZj22iIrDp766JMPX5s4I
-   g==;
-X-CSE-ConnectionGUID: av5Ad6w0QaazU4G9cUtByA==
-X-CSE-MsgGUID: 277+vyrtRsu9f1hztdyjSg==
-X-IronPort-AV: E=McAfee;i="6600,9927,11056"; a="10027301"
-X-IronPort-AV: E=Sophos;i="6.07,232,1708416000"; 
-   d="scan'208";a="10027301"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Apr 2024 05:49:55 -0700
-X-CSE-ConnectionGUID: MbRHxWHDS0q9wv/nBrZFfQ==
-X-CSE-MsgGUID: LCGEOX8LTkiG3K2UmY95uw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,232,1708416000"; 
-   d="scan'208";a="62885292"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by orviesa001.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 26 Apr 2024 05:49:55 -0700
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Fri, 26 Apr 2024 05:49:54 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Fri, 26 Apr 2024 05:49:54 -0700
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Fri, 26 Apr 2024 05:49:54 -0700
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.100)
- by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Fri, 26 Apr 2024 05:49:53 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=dkD0GHMJriGenzBKFaJcxGdYCKHNsv0kUSyuFk950Rnhu+zNKhXw0Q0BXCFzINaYhm6sgEmdqpz4mhPSneRkcOD80a/waQVAX06CE+mbAU9FEM0xbR9HJx/9Hf+bEVD0HhsTonvMlE6NiA0AtjspL9dYi/aqy+8wBiXN2RX350uTL0yYTzWoAbJULl7Ku/eK3Axq63ygHuXUd4wci0qjrpFIRLhF0l1hLYtp/ZgPGi5qNauTxgby7vQVaTna+kUeorVobl8j0vLmS5RQLnHKNnjtZheMW7ds086VU5JDDcoi8twLZzqGKlG+zfFPZ1lxz/ZaZkYseawl3W0bmMrmmQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=mnfZftssvr+x69I+FtcHGYPeG3MqV8H34kxJhnA5GAY=;
- b=HjIl8ubb08wo+UHyNSKGSnbrHV/ngDk89NNBNrqM0BGij3aFRGWIfXXONLq16STtYKCqUrgJ82EmvXdZHP3vKQqKDxYYeW/HcfvD8xf6ZV6NJZSszI5FdG6f/1CcPdxPPzBnVOLvL4GfRfAuaPCRnNWgghdh4O2hzy5MC45wswrtvn32frUdn5USqgUcxTmuWsuGHO+y65ZVPRVf2E5cnwV0nnne0M7kNRERjUK0Shp0neBovu3uENDhi1lEl6t2U3IiBB3Fpb7aAVBxognMhGALZN7ySlajMn8B7rYL0Hysi/OqqNqDG3Xut7CDsHQ+s91xou2iDSjljPG+vrCc3w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CH0PR11MB8086.namprd11.prod.outlook.com (2603:10b6:610:190::8)
- by CO1PR11MB5028.namprd11.prod.outlook.com (2603:10b6:303:9a::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7519.23; Fri, 26 Apr
- 2024 12:49:47 +0000
-Received: from CH0PR11MB8086.namprd11.prod.outlook.com
- ([fe80::984b:141d:2923:8ae3]) by CH0PR11MB8086.namprd11.prod.outlook.com
- ([fe80::984b:141d:2923:8ae3%5]) with mapi id 15.20.7519.020; Fri, 26 Apr 2024
- 12:49:47 +0000
-Message-ID: <39daba1e-5fbe-495e-8398-200434f89230@intel.com>
-Date: Fri, 26 Apr 2024 14:49:40 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next v2] ice: Extend auxbus device
- naming
-Content-Language: en-US
-To: Jiri Pirko <jiri@resnulli.us>, Jacob Keller <jacob.e.keller@intel.com>
-CC: "Temerkhanov, Sergey" <sergey.temerkhanov@intel.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"Knitter, Konrad" <konrad.knitter@intel.com>
-References: <20240423091459.72216-1-sergey.temerkhanov@intel.com>
- <ZiedKc5wE2-3LlaM@nanopsycho>
- <MW3PR11MB468117FD76AC6D15970A6E1080112@MW3PR11MB4681.namprd11.prod.outlook.com>
- <Zie0NIztebf5Qq1J@nanopsycho>
- <3a634778-9b72-4663-b305-3be18bd8f618@intel.com>
- <ZikgQhVpphnaAOpG@nanopsycho>
- <3877b086-142d-4897-866e-e667ca7091d7@intel.com>
- <ZiuNxivU-haEQ5fC@nanopsycho>
-From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-In-Reply-To: <ZiuNxivU-haEQ5fC@nanopsycho>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MW4PR04CA0158.namprd04.prod.outlook.com
- (2603:10b6:303:85::13) To CH0PR11MB8086.namprd11.prod.outlook.com
- (2603:10b6:610:190::8)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ADAB146A8E;
+	Fri, 26 Apr 2024 12:59:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.207.212.93
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1714136391; cv=none; b=t46V31ML+lWUeeSRohcSNvn/KM/CyTye6CVL9v9uaDtWEP7I9XXZVSwpq6Vm/4degs67IfWMiGJ7cLbWAEtcMtPrsHwXGsMBDN0Ec40kB536/r8NGQ/MivC+h7WWWn+XBJI/AMV+OnRDtqnI3gPPR+JRggbyE4g7B6iCyq3x4oo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1714136391; c=relaxed/simple;
+	bh=ZxFJUIWX4TvIfLdPim81/AwMqb2DbXINuDtV5oNr/Lo=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=olzAv5Jl5ORv1cAOWhF6H7mrkqNW0rlTmko+rQkGSWJCg4yYpg11qv75KYitePl5lSW8ePGYfPf3Z/sYWjjsXtwY/Egsc7lgvR6VfD4IRB4nJye5QvgcS0TaBQCMrgRwZ6Do4PmWW3KT4TI5k6k4dWQ54+4v7oZrYuOZtIIzgQ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com; spf=pass smtp.mailfrom=foss.st.com; dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b=2OVL/9e+; arc=none smtp.client-ip=91.207.212.93
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
+Received: from pps.filterd (m0046661.ppops.net [127.0.0.1])
+	by mx07-00178001.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 43Q9bYBw032401;
+	Fri, 26 Apr 2024 14:59:24 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
+	from:to:cc:subject:date:message-id:mime-version
+	:content-transfer-encoding:content-type; s=selector1; bh=82TTePM
+	YeUp1fhEV5NgGPQLSJ7G6ou259POq1elrSMY=; b=2OVL/9e+vSzyhA5HF0B/8Iq
+	xe3L1jK8NSsvNDWRSO97bVSs5e1V62MzdPGWiLy2RKqJXfqyegKXmCZNhDROnj7c
+	Xitw6HLGG8t06OicTiBIMRSEb4ca11dqX5tbmgsIYD/iIscoZssnXHP5iN9IF5+Q
+	JPqz0X84+xB7fL16PqgztpuMaT/1hIVF6b8OQjrjpT8ifXg5NO8kzwJY6QuwiShI
+	71BrRnAfeSp35eKAUgtU1n5n4weFZCTOZsXlDlOTcrXNst1CqIwE2EbUt4DECacE
+	WYy2PIZETzito+gTgaqrSXDZ4WWXrvXBd0yxF719nTNn8eN3tbQ2X2JEym72WTA=
+	=
+Received: from beta.dmz-ap.st.com (beta.dmz-ap.st.com [138.198.100.35])
+	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3xm4kbhs8v-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 26 Apr 2024 14:59:24 +0200 (MEST)
+Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
+	by beta.dmz-ap.st.com (STMicroelectronics) with ESMTP id 70A5140046;
+	Fri, 26 Apr 2024 14:59:18 +0200 (CEST)
+Received: from Webmail-eu.st.com (shfdag1node2.st.com [10.75.129.70])
+	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 1A53B222C9E;
+	Fri, 26 Apr 2024 14:58:04 +0200 (CEST)
+Received: from localhost (10.252.17.191) by SHFDAG1NODE2.st.com (10.75.129.70)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Fri, 26 Apr
+ 2024 14:58:01 +0200
+From: Christophe Roullier <christophe.roullier@foss.st.com>
+To: "David S . Miller" <davem@davemloft.net>,
+        Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni
+	<pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski
+	<krzysztof.kozlowski+dt@linaro.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue
+	<alexandre.torgue@foss.st.com>,
+        Richard Cochran <richardcochran@gmail.com>,
+        Jose Abreu <joabreu@synopsys.com>, Liam Girdwood <lgirdwood@gmail.com>,
+        Mark
+ Brown <broonie@kernel.org>,
+        Christophe Roullier
+	<christophe.roullier@foss.st.com>,
+        Marek Vasut <marex@denx.de>
+CC: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>
+Subject: [PATCH v2 00/11] Series to deliver Ethernets for STM32MP13
+Date: Fri, 26 Apr 2024 14:56:56 +0200
+Message-ID: <20240426125707.585269-1-christophe.roullier@foss.st.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH0PR11MB8086:EE_|CO1PR11MB5028:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5f45d9fe-3c21-4f9a-9f9d-08dc65ef5a64
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230031|376005|366007|1800799015;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?dG44T1JkdHdqd1UybDRCWHVDK1BNVmN6UGN2c1R5UllKS3BhM01CemllYy92?=
- =?utf-8?B?anc0cjQvdGtVSDlES21vL1FNNWNjZ2tUNkluSERaaGhqU0QzM1UzWUxHUkJj?=
- =?utf-8?B?MFNYSEJmam14N05jZnd0REtRVjVHVW52bm9wcWRyNDNsL1c3dXRuQkdGNDgy?=
- =?utf-8?B?Mkl3MEROZTRsbWd5RE1FZ0M2ZGtHZ2ZoNzlVd1pSdEZ1ajRUblBCTzVlZnRN?=
- =?utf-8?B?MGIvSEpCaTJkejgxRGppK2NtR3BCa1JqWEdwY1pIaFI4M1RibURvWWx1VEU2?=
- =?utf-8?B?Wmh4WUs0VkkwQlZ6cDRxYmlSNW1ld3FaUGhPcUNKZG9uMlg0UUsvbkN6bHRq?=
- =?utf-8?B?RzhCRFMrY2pxT2pjUWxlcElNc1NoUjcvMXpyN21qQ3J2WGNCRGtRMDh0NWM1?=
- =?utf-8?B?T3lRYjhCaHVMWWNPTDExdmUwdTRUQ0cvc0xaYUQvaGsrUTZ2QXV2VW1QL1Bs?=
- =?utf-8?B?eWFPMXdwSnpUZjBxaWx4dEF0RWttTVp1K2VrRGlTdUF0Z3pySHdOVjd1b1hI?=
- =?utf-8?B?MXdsaW9WTFZLWUFsTXNqYmFxWTQ5MmNvSmloYkFHdk9vL3ZRcVFQaCtlNGdJ?=
- =?utf-8?B?cGZ5UTZ3N0JzUG0xNlVYZDMrQVNRVnIyOUxTWkxwYUNjM0Y4ckhOdEQ2SFdP?=
- =?utf-8?B?L01FSUJseFB6ZUQ5NFNWTHpQS25kRmhhazRhKzlNc1FYVm5UU2xNWEFqSGpr?=
- =?utf-8?B?SmgzZ3ZzTDF1QVBmSHRHc1BYRjVZVzQwVjltbFNKbWFFQjdENW1heFdpeFoy?=
- =?utf-8?B?WUNhQlBKVTFpZWZvWWJWRC9vRGFDeXlIeGxzMTFCNlFUVGp4VDkzUHRvMWVa?=
- =?utf-8?B?eGcyUFlPRHJrTUQxUGdMR3drN29vbGdkcVYzd0V4cTJYRW1KVjE1cnA5Zml2?=
- =?utf-8?B?bUVkSHNDYit4NUFhUFM3UE1KdWhYYzZJamxzMyt1eTdTcGxDR2VFQWZFQjBi?=
- =?utf-8?B?R3pKbDdha3M4V3Fvci9tSUJjak8rcUZTNnlGVERpbmk1Z0V0d2VIWnJYMldM?=
- =?utf-8?B?dHBCR01VQjRoU0ZHNE81QlE3S0ZYWlRCdkY4MmtaOXlhQTVkVzNqaitFdUxI?=
- =?utf-8?B?dUFNdEZmSXNJZXdPeGdsajM4ejRSK1lJTXdjMjdzK2xSMllXT1ZxOXRZdC9G?=
- =?utf-8?B?YlczdnI4VEFNWHpTelRLRXpSakNSL2NlRkY3TG5uMjZyL2VvODdGTmR1dnA5?=
- =?utf-8?B?UXFOY2FIYjlpaXh3M1ZtNE9neTF2Z2I4L1V1bW1KVk9EemxuUjgrYUZPaFlI?=
- =?utf-8?B?WGZBNWZWTFoyMUtQK25tV1c5ZDFwNnFZRDdIc3QzNUpzVmR4a21Kb3JieUZ5?=
- =?utf-8?B?d01CalBzZUFCalVJNUt4ckhIelpieDR2MjYwYmZydVBaOVVjaHc1bUxCK0VG?=
- =?utf-8?B?d01jZDYzMC9iZnFGZm5CclI2U0ZzSmFjaEZTcmp5bnhwMnkyN0VXNG81UExo?=
- =?utf-8?B?MWpVV2NwSXdXdDFrRjg1UGxSYnJhMUhmNmVUWjlhVDFwdTBpd0pRMERQMWg2?=
- =?utf-8?B?Y0huVWUyZ0RDWW9yTHNBVVZ1STBFaXBISnltN3MrYks5blpiQkt1WWVIamlP?=
- =?utf-8?B?UThBbmhqWkhXUDAxcGVXb21PYnRnKzdxdWczVkU4bUZNR29GU29NSWFQdTRD?=
- =?utf-8?B?bTRLWWdGbTgxWklFWXIvRDBuR0phU054ZlRZZ0hoOGF5eG93emtoZVhUUUJU?=
- =?utf-8?B?dm1CUzFEZExnTlFrV1dJczhUd0FJdGRHRVVMRGJmejR4dmdtSHRUTHNRPT0=?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH0PR11MB8086.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(366007)(1800799015);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?NUtpS1dMNDJGTmY5QlJEOWkvMERlNWJWVE9pNlFGcGRmeWVMK09PUVlOTTJM?=
- =?utf-8?B?ZzlDSmxJRFdkVmtQaXU2R0VqNE9rTTVmQTY0OWxMY0dLQVd4TU44andvYmtS?=
- =?utf-8?B?YmIyVE5qNjFJc29KSEJVWHYzcTBablFGT3MvOTVaRDJPcytmZ0puWk1NbEYy?=
- =?utf-8?B?VERmLzhPVGZOUDAwWVEwZDJ3Y2hTSDJFN09Hd05vM1lsK1NNU2ZFWVlvczVH?=
- =?utf-8?B?UXRpREppSUtWYVBqTElnRWNaekFEaUl0dENLNXFOSTBYc1AvOTRqdlR1ZFR0?=
- =?utf-8?B?REpuUStQMkxscWJsakpGRThEVTU1aTBBQllxNmRJbTJPZ1RPeTNSeVRxWFcr?=
- =?utf-8?B?czNYQVB4U1EyODF4V2NFZi81d2UwMHhyVzFzejZzSFRPeklaWk9OZ2dxOExE?=
- =?utf-8?B?ZERuUHJZSE8zSTNORVVsWGMvZDRlZ20zNVMxWTUrTHJraFllMXNPeHhjbVRr?=
- =?utf-8?B?TUV0MHgrTU9jQTZIcnl1WWFheEFwSk1oNXVVT2FObE9mMFd0MlIyTzUwMTVo?=
- =?utf-8?B?ZkRqOVNIdG82WnJRVWNGaGNmVTRJUWlraWR5SWlEbTc3di9udmNrcWJpbSs4?=
- =?utf-8?B?b3VjTEVEVWlsamw0YmtxMXF2WlNkc3IwS0lSWmQ4aHJOUlBiYVA3c3Z3VjBR?=
- =?utf-8?B?NmQwVkdId0Z3SkdqM3hVVmVaQTdWeG9HS1dXWmNPZ3I5amZ2TTBzckhZNXBx?=
- =?utf-8?B?UUFWSTJlN1kvcDNRYVFwdDB4MElKMGltSkZPUkFVOVRmU01vS1NnMFY4SU9h?=
- =?utf-8?B?Ymw0cFN6Rm1BanNNN3RjamhaRU5wTzJGRlZuWDlrc1E2NnFKejJBdlZZQ1py?=
- =?utf-8?B?VEtORlZudk92UVdQc0Y5dUhoMFRXYXl6N1Q5Zk5meTZEeWtTcWZ1R0FGdHhO?=
- =?utf-8?B?YkRIcWNJVnpQWWhrRHdUYmhEQWZvMXI1YTZIR2NHd3c0V1ZDRGVoYWlibDJO?=
- =?utf-8?B?VEpGUDJIWmVLbHZXa2EwVDJDamM1ZmZ4SGVFMWQyOVJieVhDanVSQzdLTWFE?=
- =?utf-8?B?M1lEYlowdENXckQ0blZwT05CcXROQjNRL3BsZEZhb3VVQURnODdyV0tXYURO?=
- =?utf-8?B?TEVIVE14Qm1JQld2VUh4WEU5OUlwNHhaZDNMajVCTEQzZ1NSVDF4em5zSmJ6?=
- =?utf-8?B?SjRwV2RHMjk4NytVMCt5T05VeTBkanQ0UUpEeTRXajc0SG1QaEJ0M2IvMHZV?=
- =?utf-8?B?RVVOWG9PK01lZ3NmUFdhQlZ5aDFvUjZBcjlmNWRBSVFIay9yVmxqMjlkN2Qv?=
- =?utf-8?B?cTE4VE9GN2p6SEJXOFhkMU85cTBFT3dOOVY5QjZLUjV0dEhDejFsT3ZKLzZx?=
- =?utf-8?B?RjdaM3laQzRWZERkQzBaSWQvaWxOOUV3aVI1TFhnZTdITTdqMm1JR1lURUxn?=
- =?utf-8?B?aDlOQWE0VzVIL2V0aWVBaHowdkVwOHVyOEIrM0NiUlJ2K2ZlNVYyUUNpZzZB?=
- =?utf-8?B?dnhqYVRaRTNvWDVXSU93VFZZeGdPbWw2Tng4Ykh3bzJSUXZRbC84c0ZjYW5G?=
- =?utf-8?B?d1JDL1Nyanl6aWtEOHFGVFUrbW1YakFSOHFSRS82dGI0UzhkODc5R09NbE5O?=
- =?utf-8?B?UWJmaklzZU14bmpUTU5RZ3lkeUJuZmNYZGNUajQyUGtXZUJGdFVxTEtoVnVy?=
- =?utf-8?B?YUdYUzJPWXQvOTc3Y0J5TlBtS0JyRVlhTGwwUks1Tkd3akYvbHp6SFNTd3RO?=
- =?utf-8?B?bkFLZXJ6NUJsV2ZEQmdoSFRhWUxTWVgwbm1OTkU2aG95aFQrdnlMbEFJWHZI?=
- =?utf-8?B?WUJlOWplMTlCWUZ6dVhjd01MMStGSWlQRXR6TGlVclNqbXVlZnZmMU1wU3JX?=
- =?utf-8?B?azFuczVlMXFhT0gvRU5TbW1ORnRDQm52L2EvNU03dkt1ZU1LWUx6K3lERjRw?=
- =?utf-8?B?SmNXaGxnOG1qSGdoM0xnSTFReFhxelJvZ1l1WTViSWN1OHdMeEFUa0Erdng4?=
- =?utf-8?B?MzlmV1hyOXBGbWdEdEl4OGg0UzZFWHYyTEtaYjdnZTg3ak1zbUZvTWN6YUU3?=
- =?utf-8?B?Q1l5YW5TRy9rODNPa296SWVjRXhvYkpRYlFRVG1sTlFCVFl2Y3lHazlnQm4w?=
- =?utf-8?B?ZzhQd1E3RzRlQ3hJMjg3R2kyaktrZ0t3RGVDbVd0WXc5T0paL1krbDAvOWtB?=
- =?utf-8?B?NDNodVFjTWQrQzZGVTJiRHRDSEp1UHpOeC9IYTkyaE1pNzFueFpydzhFY3Np?=
- =?utf-8?Q?hoyUwganGs/vZt2yhKCueGM=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5f45d9fe-3c21-4f9a-9f9d-08dc65ef5a64
-X-MS-Exchange-CrossTenant-AuthSource: CH0PR11MB8086.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Apr 2024 12:49:46.9525
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: VS/cqOYdW/fmRB3zsCwHpeaH0RMdijCZCj2uXXskHfC5pQAnYMkWe4QHJbqFL7oDpOe2wFKraBy+YiCm5Yk8VLPsMvX9DfVC1fj7hRVOHzs=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR11MB5028
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EQNCAS1NODE4.st.com (10.75.129.82) To SHFDAG1NODE2.st.com
+ (10.75.129.70)
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1011,Hydra:6.0.650,FMLib:17.11.176.26
+ definitions=2024-04-26_12,2024-04-26_02,2023-05-22_02
 
-On 4/26/24 13:19, Jiri Pirko wrote:
-> Wed, Apr 24, 2024 at 06:56:37PM CEST, jacob.e.keller@intel.com wrote:
->>
->>
->> On 4/24/2024 8:07 AM, Jiri Pirko wrote:
->>> Wed, Apr 24, 2024 at 12:03:25AM CEST, jacob.e.keller@intel.com wrote:
->>>>
->>>>
->>>> On 4/23/2024 6:14 AM, Jiri Pirko wrote:
->>>>> Tue, Apr 23, 2024 at 01:56:55PM CEST, sergey.temerkhanov@intel.com wrote:
->>>>>>
->>>>>>
->>>>>>> -----Original Message-----
->>>>>>> From: Jiri Pirko <jiri@resnulli.us>
->>>>>>> Sent: Tuesday, April 23, 2024 1:36 PM
->>>>>>> To: Temerkhanov, Sergey <sergey.temerkhanov@intel.com>
->>>>>>> Cc: intel-wired-lan@lists.osuosl.org; netdev@vger.kernel.org; Kitszel,
->>>>>>> Przemyslaw <przemyslaw.kitszel@intel.com>
->>>>>>> Subject: Re: [PATCH iwl-next v2] ice: Extend auxbus device naming
->>>>>>>
->>>>>>> Tue, Apr 23, 2024 at 11:14:59AM CEST, sergey.temerkhanov@intel.com
->>>>>>> wrote:
->>>>>>>> Include segment/domain number in the device name to distinguish
->>>>>>> between
->>>>>>>> PCI devices located on different root complexes in multi-segment
->>>>>>>> configurations. Naming is changed from ptp_<bus>_<slot>_clk<clock>  to
->>>>>>>> ptp_<domain>_<bus>_<slot>_clk<clock>
->>>>>>>
->>>>>>> I don't understand why you need to encode pci properties of a parent device
->>>>>>> into the auxiliary bus name. Could you please explain the motivation? Why
->>>>>>> you need a bus instance per PF?
->>>>>>>
->>>>>>> The rest of the auxbus registrators don't do this. Could you please align? Just
->>>>>>> have one bus for ice driver and that's it.
->>>>>>
->>>>>> This patch adds support for multi-segment PCIe configurations.
->>>>>> An auxdev is created for each adapter, which has a clock, in the system. There can be
->>>>>
->>>>> You are trying to change auxiliary bus name.
->>>>>
->>>>>
->>>>>> more than one adapter present, so there exists a possibility of device naming conflict.
->>>>>> To avoid it, auxdevs are named according to the PCI geographical addresses of the adapters.
->>>>>
->>>>> Why? It's the auxdev, the name should not contain anything related to
->>>>> PCI, no reason for it. I asked for motivation, you didn't provide any.
->>>>>
->>>>
->>>> We aren't creating one auxbus per PF. We're creating one auxbus per
->>>> *clock*. The device has multiple clocks in some configurations.
->>>
->>> Does not matter. Why you need separate bus for whatever-instance? Why
->>> can't you just have one ice-ptp bus and put devices on it?
->>>
->>>
->>
->> Because we only want ports on card A to be connected to the card owner
->> on card A. We were using auxiliary bus to manage this. If we use a
-> 
-> You do that by naming auxiliary bus according to the PCI device
-> created it, which feels obviously wrong.
-> 
-> 
->> single bus for ice-ptp, then we still have to implement separation
->> between each set of devices on a single card, which doesn't solve the
->> problems we had, and at least with the current code using auxiliary bus
->> doesn't buy us much if it doesn't solve that problem.
-> 
-> I don't think that auxiliary bus is the answer for your problem. Please
-> don't abuse it.
-> 
->>
->>>>
->>>> We need to connect each PF to the same clock controller, because there
->>>> is only one clock owner for the device in a multi-port card.
->>>
->>> Connect how? But putting a PF-device on a per-clock bus? That sounds
->>> quite odd. How did you figure out this usage of auxiliary bus?
->>>
->>>
->>
->> Yea, its a multi-function board but the functions aren't fully
->> independent. Each port has its own PF, but multiple ports can be tied to
->> the same clock. We have similar problems with a variety of HW aspects.
->> I've been told that the design is simpler for other operating systems,
->> (something about the way the subsystems work so that they expect ports
->> to be tied to functions). But its definitely frustrating from Linux
->> perspective where a single driver instance for the device would be a lot
->> easier to manage.
-> 
-> You can always do it by internal accounting in ice, merge multiple PF
-> pci devices into one internal instance. Or checkout
-> drivers/base/component.c, perhaps it could be extended for your usecase.
-> 
-> 
->>
->>>>
->>>>> Again, could you please avoid creating auxiliary bus per-PF and just
->>>>> have one auxiliary but per-ice-driver?
->>>>>
->>>>
->>>> We can't have one per-ice driver, because we don't want to connect ports
->>> >from a different device to the same clock. If you have two ice devices
->>>> plugged in, the ports on each device are separate from each other.
->>>>
->>>> The goal here is to connect the clock ports to the clock owner.
->>>>
->>>> Worse, as described here, we do have some devices which combine multiple
->>>> adapters together and tie their clocks together via HW signaling. In
->>>> those cases the clocks *do* need to communicate across the device, but
->>>> only to other ports on the same physical device, not to ports on a
->>>> different device.
->>>>
->>>> Perhaps auxbus is the wrong approach here? but how else can we connect
->>>
->>> Yeah, feels quite wrong.
->>>
->>>
->>>> these ports without over-connecting to other ports? We could write
->>>> bespoke code which finds these devices, but that felt like it was risky
->>>> and convoluted.
->>>
->>> Sounds you need something you have for DPLL subsystem. Feels to me that
->>> your hw design is quite disconnected from the Linux device model :/
->>>
->>
->> I'm not 100% sure how DPLL handles this. I'll have to investigate.
-> 
-> DPLL leaves the merging on DPLL level. The ice driver just register
-> entities multiple times. It is specifically designed to fit ice needs.
-> 
-> 
->>
->> One thing I've considered a lot in the past (such as back when I was
->> working on devlink flash update) was to somehow have a sort of extra
->> layer where we could register with PCI subsystem some sort of "whole
->> device" driver, that would get registered first and could connect to the
->> rest of the function driver instances as they load. But this seems like
->> it would need a lot of work in the PCI layer, and apparently hasn't been
->> an issue for other devices? though ice is far from unique at least for
->> Intel NICs. Its just that the devices got significantly more complex and
->> functions more interdependent with this generation, and the issues with
->> global bits were solved in other ways: often via hiding them with
->> firmware >:(
-> 
-> I think that others could benefit from such "merged device" as well. I
-> think it is about the time to introduce it.
+STM32MP13 is STM32 SOC with 2 GMACs instances
+This board have 2 RMII phy:
+  -Ethernet1: RMII with crystal
+  -Ethernet2: RMII without crystal
+Rework dwmac glue to simplify management for next stm32
+Add support for PHY regulator
 
-so far I see that we want to merge based on different bits, but let's
-see what will come from exploratory work that Sergey is doing right now.
+V2: - Remark from Rob Herring (add Krzysztof's ack in patch 02/11, update in yaml)
+      Remark from Serge Semin (upate commits msg)
 
-and anything that is not a device/driver feels much more lightweight to
-operate with (think &ice_adapter, but extended with more fields).
-Could you elaborate more on what you have in mind? (Or what you could
-imagine reusing).
+Christophe Roullier (11):
+  dt-bindings: net: add STM32MP13 compatible in documentation for stm32
+  dt-bindings: net: add phy-supply property for stm32
+  net: stmmac: dwmac-stm32: rework glue to simplify management
+  net: stmmac: dwmac-stm32: add management of stm32mp13
+  net: stmmac: dwmac-stm32: update config management for phy wo cristal
+  net: stmmac: dwmac-stm32: clean the way to manage wol irqwake
+  net: stmmac: dwmac-stm32: support the phy-supply regulator binding
+  ARM: dts: stm32: add ethernet1 and ethernet2 support on stm32mp13
+  ARM: dts: stm32: add ethernet1/2 RMII pins for STM32MP13F-DK board
+  ARM: dts: stm32: add ethernet1 and ethernet2 for STM32MP135F-DK board
+  ARM: multi_v7_defconfig: Add MCP23S08 pinctrl support
 
-offtop:
-It will be a good hook to put resources that are shared across ports
-under it in devlink resources, so making this "merged device" an entity
-would enable higher layer over what we have with devlink xxx $pf.
+ .../devicetree/bindings/net/stm32-dwmac.yaml  |  79 +++++-
+ arch/arm/boot/dts/st/stm32mp13-pinctrl.dtsi   |  71 ++++++
+ arch/arm/boot/dts/st/stm32mp131.dtsi          |  31 +++
+ arch/arm/boot/dts/st/stm32mp133.dtsi          |  30 +++
+ arch/arm/boot/dts/st/stm32mp135f-dk.dts       |  48 ++++
+ arch/arm/configs/multi_v7_defconfig           |   1 +
+ .../net/ethernet/stmicro/stmmac/dwmac-stm32.c | 235 ++++++++++++------
+ 7 files changed, 416 insertions(+), 79 deletions(-)
 
-> 
-> 
->>
->>
->> I've tried explaining the issues with this to HW designers here, but so
->> far haven't gotten a lot of traction.
->>
->>>> We could make use of ice_adapter, though we'd need some logic to manage
->>>> devices which have multiple clocks, as well as devices like the one
->>>> Sergey is working on which tie multiple adapters together.
->>>
->>> Perhaps that is an answer. Maybe we can make DPLL much more simple after
->>> that :)
->>
->> The only major issue with ice_adapter is the case where we have one
->> clock connected to multiple adapters, but hopefully Sergey has some
->> ideas for how to solve that.
->>
->> I think we can mostly make the rest of the logic for the usual case work
->> via ice_adapter:
->>
->> 1) we already get an ice_adapter reference during early probe
->> 2) each PF knows whether its an owner or not from the NVM/firmware interface
->> 3) we can move the list of ports from the auxbus thing into ice_adapter,
->> possibly keeping one list per clock number, so that NVMs with multiple
->> clocks enabled don't have conflicts or put all ports onto the same clock.
->>
->> I'm not sure how best to solve the weird case when we have multiple
->> adapters tied together, but perhaps something with extending how the
->> ice_adapter lookup is done could work? Sergey, I think we can continue
->> this design discussion off list and come up with a proposal.
->>
->> We also have to be careful that whatever new solution also handles
->> things which we got with auxiliary bus:
->>
->> 1) prevent issues with ordering if a clock port loads before the clock
->> owner PF. If the clock owner loads first, then we need to ensure the
->> port still gets initialized. If the clock owner loads second, we need to
->> avoid issues with things not being setup yet, i.e. ensure all the
->> structures were already initialized (for example by initializing lists
->> and such when we create the ice_adapter, not when the clock owner loads).
->>
->> 2) prevent issues with teardown ordering that were previously serialized
->> by the auxiliary bus unregister bits, where the driver unregister
->> function would wait for all ports to shutdown.
->>
->> I think this can be done correctly with ice_adapter, but I wanted to
->> point them out because we get them implicitly with the current design
->> with auxiliary bus.
+-- 
+2.25.1
 
 
