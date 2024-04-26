@@ -1,82 +1,83 @@
-Return-Path: <netdev+bounces-91563-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91564-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 900248B3119
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 09:11:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 583818B311A
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 09:12:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D1B3FB218CD
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 07:11:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 83530B21BE0
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 07:12:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A699513B5B3;
-	Fri, 26 Apr 2024 07:11:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AA8313B7AC;
+	Fri, 26 Apr 2024 07:12:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0D9YydhW"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xERvQg0d"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 274A513AD33
-	for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 07:11:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0614413B2A9
+	for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 07:12:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714115501; cv=none; b=HTlsOwX4IXmT8q3MOH75DCfao7jb96rN5bzsdz5+h0aA2gwGHnLoLCnnz9engypmUUK/2S/MWSgJsOLDkUjm4fIPiT2bnAmeJQ9GorWyCLBcQgjWZFerYJTSQi1c2ScSHIjzoHHMHpN/bq1IK9fvYGAN+qMAuowQFnPtkv/yxds=
+	t=1714115532; cv=none; b=Egfmkwb4lr6x76XVVW2kOVzdeuFJwzN4QJJnjYdNqeSVRJTCEEmJFNIcZbRK2kaEFjI1t1UjzU5yDZK9SwvCPnsoLyNhVo8LCEpVhCPsifGxBcn+xN7TwsKRrbdtL1fTZir4PRgX4z+cGxFCEJfPFpx5T2ZGSqqgNGTEkwQ6nvQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714115501; c=relaxed/simple;
-	bh=Nd4jaR/42dIYUGyfQPfs58FKm+xvVcQuYdvOUDI7cZQ=;
+	s=arc-20240116; t=1714115532; c=relaxed/simple;
+	bh=o4CijGE6DQCwbT0vcZY7rzU07Zixh1ND3g5gwlWNbNI=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mqEJ1WAwep2uP3SptuSvO7LPhbigBaCsisil+13jmWJ3K6V4nk1mQ18ewndBx9OAbooL0gh7i+N0iEzmhw59KwQba5nuYi9lIBh1ue0UvN67BDDhsyeVeeZPyBoocKWC4vGpQhU9zfRNEpyyXcGHMv1bnXeT54FH94TnyO62GzU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0D9YydhW; arc=none smtp.client-ip=209.85.208.53
+	 To:Cc:Content-Type; b=AACXzG5bKBfYjeRXJGOxP8av+yp64QAEiwJe1RptfOtsqIIk2KWJYc4+zK6vzzFZa51+S49h7cQEaY54CqCdv7Kiwcg++BACfscziNNk1SngYokgRXiqXch4y9rAFJ2xT4PMd580TwalH4DwTt4+61BMztVv7IODxJK1EiMqLEk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xERvQg0d; arc=none smtp.client-ip=209.85.208.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-571e13cd856so9053a12.0
-        for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 00:11:39 -0700 (PDT)
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-571b5fba660so5918a12.1
+        for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 00:12:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1714115498; x=1714720298; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1714115529; x=1714720329; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Nd4jaR/42dIYUGyfQPfs58FKm+xvVcQuYdvOUDI7cZQ=;
-        b=0D9YydhWENJKWGA4o9ID1jgksz19WvYswjLNXVQeMV1TZ0hL7VXLS9YD/WXxr2wo2S
-         8UnvYdiB7jXCJ17jAV1O74AgapZLr0ejWxT8+N7SFwFxLa/nMOXQzhDMrn+vr7IvM8S1
-         X4fofy7rKXl2jCSe+PZWw+4Do0+xneJexG9PwnJzvW+B7DSEC0n4cA9B6vueam3ih05V
-         8NgHpMNoSP0cCZ5onBgtrjFOqWzUy43pOCIRiZ6fwsCxAyDgMK2tKOrmhbV2TAqSaDCs
-         iunuUp/t4Q+ITi1fo/G+3uVHBNw4a4z4e4EUGo01WD+aQ/dicuVea325Aliowl6uUdkK
-         X/+g==
+        bh=o4CijGE6DQCwbT0vcZY7rzU07Zixh1ND3g5gwlWNbNI=;
+        b=xERvQg0dQHwVLMvTbKEcVsRsYVGHJUrhY3px0prfFdQ52BjZjqjKk0WrDjxQ4a0Q78
+         XDl16DZH7QMVkZoqgFD72lCewV0jMapepCUhvO+ozyoMw/Ncxi1u2B352abx6wBapy0d
+         TTdKtWQ5GLS6JXJaWClfFvznhbhrtkxtolzCiy6HWDWVFsqyyJVLMwxWYYcoysyxt1EX
+         WuagN6wbgxiH0f/LCFRtFNbDJWYp0cdYW4sIJAuYVASPSv1ELCWc/wIdLeHP4Ws9g+mR
+         oY5VOPumjeWBC+Vpfj9DVwk2h1VHQ5LOJ4zpvV6PzcPxYzqwx+jBzCmGODgwAWgl0ttD
+         E7IQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714115498; x=1714720298;
+        d=1e100.net; s=20230601; t=1714115529; x=1714720329;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Nd4jaR/42dIYUGyfQPfs58FKm+xvVcQuYdvOUDI7cZQ=;
-        b=p/h6Dxc8BoEjNzAundqOtCiRJ+xmpatO6hEW18py46ubYaJKT8xZ+gQ1hZnXopn5BQ
-         fVqEQuIckJJx7RmDTeHLZQP3Cdw1rUgGyyMnmRSHcU5kOe+6ZyPUfigwUvs63hOfSWYd
-         S309+nvKp+b3gf9Fny9SwnmICeEtgfRRC+95C+NhsjY89QHtBv3ddoyI6tJcxvL1k2Cs
-         GNK0KbL4Wp4IwtH0bOZBm5revwPl/HQ/LtYntIK+vouahVESFpHLHnrLtnpfP1E2GLL7
-         0XxEIhhoP95l9dNMCalE4JNpldEtmy6fUL8qnjr+tGJVZ2UTOini0Py2s1d0FnQz9AfS
-         3btA==
-X-Forwarded-Encrypted: i=1; AJvYcCUJe2xq5Jw1zMltN9utACcsDHapFmEM3T3okm0+faZfKxhXNv/EHra6Ddhoo7qHinRoI0+2qDY4Syv5jFC3IM3JDOdxASkH
-X-Gm-Message-State: AOJu0YyPuJyTy9ebg8MMu65SJbdb03+wbjnaH/dlaJj9Q5nsRHqi3LpS
-	QBafbm+EXQleFDYqyuCrkKycTGCPyD1+O8yIwx4xDyvD63A2DB1tfz/19WhNKqSZihX3nAz7a+L
-	ht+aUH4kf8KbNZ9SofvlWLbNwXpva5pf5ji9n
-X-Google-Smtp-Source: AGHT+IFGFOVqN9rWuwqHOOO+oH76cLWmGLatqVO6OwSVaACVskc25LUiElBUrODWl++2MM5fkppQkcjTxQG26Gykqd4=
-X-Received: by 2002:a05:6402:c6:b0:571:fee3:594c with SMTP id
- i6-20020a05640200c600b00571fee3594cmr83544edu.4.1714115498355; Fri, 26 Apr
- 2024 00:11:38 -0700 (PDT)
+        bh=o4CijGE6DQCwbT0vcZY7rzU07Zixh1ND3g5gwlWNbNI=;
+        b=KiOhyWv7mu9e4v4d1lWXzhSY3zN1zvJIfxWEvZLTV1mSp2uAbA9/pYu2kWdhg37qZO
+         0186YLxOJQ1Od+6Kd3HMCcjoW3Dxt7u4cLkrUZkFyhcWV1MSKKR+wfOK0sBMXZqOboVG
+         RD1fUEMkW4FY1eJx/KhzWrwjSx8KVM0YloRTVRiI44GjleVqNApqMZBlHez2uxf5uMy/
+         MgUUx/LKYAaL5XwvKr5zSupNPFqudgeBc8IAf3yaxt4DetafGzUTnzw17ZGrQRCqFQQG
+         gKx5gcUy8MsBsdsutgP/EjN6RzoOLn7L/FZOzSwqo/6NITqgF+6bgLgEz0Z8nf2cCRvC
+         mvrg==
+X-Forwarded-Encrypted: i=1; AJvYcCX0qjjbUJ7dxxOEqqzFHMU7Ght0VA1oQmOi7aTw3KCM4Lb99ozSa9Pf1XZLm3MgHZ14u3KD++86tYddBukIBM3lxj/wjIN8
+X-Gm-Message-State: AOJu0YxCzz72ZR8ksavjL8MFyTAzj3aQJ/WZNWGXp9QtRB10z06zbI+x
+	tMBgxfmoJAXjN9vU/4FuatnTfa+ljkCZDu2QOXuxK9/WWt6VwNMST3/ph4Xo9Wp8PWBIaH17LsF
+	pDGiQH8TcBuhMrDSGn9aKlqqbJQ0AKDJkYQ28
+X-Google-Smtp-Source: AGHT+IFGK6axy8x4vSxxxy3Oh+3ntHHua1mtJilCxbRJCerWML/wCChAU9qlPo9HVLrAqSWMm+hZgH/UuWi5SnGwh08=
+X-Received: by 2002:aa7:d497:0:b0:572:25e4:26eb with SMTP id
+ b23-20020aa7d497000000b0057225e426ebmr71684edr.7.1714115529122; Fri, 26 Apr
+ 2024 00:12:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240425031340.46946-1-kerneljasonxing@gmail.com> <20240425031340.46946-6-kerneljasonxing@gmail.com>
-In-Reply-To: <20240425031340.46946-6-kerneljasonxing@gmail.com>
+References: <20240425031340.46946-1-kerneljasonxing@gmail.com> <20240425031340.46946-7-kerneljasonxing@gmail.com>
+In-Reply-To: <20240425031340.46946-7-kerneljasonxing@gmail.com>
 From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 26 Apr 2024 09:11:27 +0200
-Message-ID: <CANn89iLEAyZVBYd+Sy=y4sxvqBEdev-VhJvW9k4eRRSBKff1Vg@mail.gmail.com>
-Subject: Re: [PATCH net-next v9 5/7] mptcp: support rstreason for passive reset
+Date: Fri, 26 Apr 2024 09:11:58 +0200
+Message-ID: <CANn89iK9Nqug+X8fPzRQ49fu+AydSqb2Js2FggkOHNFdNEcfAw@mail.gmail.com>
+Subject: Re: [PATCH net-next v9 6/7] mptcp: introducing a helper into active
+ reset logic
 To: Jason Xing <kerneljasonxing@gmail.com>
 Cc: dsahern@kernel.org, matttbe@kernel.org, martineau@kernel.org, 
 	geliang@kernel.org, kuba@kernel.org, pabeni@redhat.com, davem@davemloft.net, 
@@ -92,10 +93,15 @@ om> wrote:
 >
 > From: Jason Xing <kernelxing@tencent.com>
 >
-> It relies on what reset options in the skb are as rfc8684 says. Reusing
-> this logic can save us much energy. This patch replaces most of the prior
-> NOT_SPECIFIED reasons.
+> Since we have mapped every mptcp reset reason definition in enum
+> sk_rst_reason, introducing a new helper can cover some missing places
+> where we have already set the subflow->reset_reason.
 >
+> Note: using SK_RST_REASON_NOT_SPECIFIED is the same as
+> SK_RST_REASON_MPTCP_RST_EUNSPEC. They are both unknown. So we can convert
+> it directly.
+>
+> Suggested-by: Paolo Abeni <pabeni@redhat.com>
 > Signed-off-by: Jason Xing <kernelxing@tencent.com>
 > Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
 
