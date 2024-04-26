@@ -1,72 +1,58 @@
-Return-Path: <netdev+bounces-91718-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91719-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61C128B3972
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 16:04:52 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE5B38B399E
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 16:19:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 853B51C2159F
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 14:04:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 119C8B22FB5
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 14:19:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BBC11487D3;
-	Fri, 26 Apr 2024 14:04:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="y6FIlB1n"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E5C6148821;
+	Fri, 26 Apr 2024 14:19:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+Received: from mail115-118.sinamail.sina.com.cn (mail115-118.sinamail.sina.com.cn [218.30.115.118])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C61EC824B3;
-	Fri, 26 Apr 2024 14:04:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E625842A99
+	for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 14:19:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=218.30.115.118
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714140287; cv=none; b=ThoMLumihlp/AZ0uhlMdsMwF/X4gzejH16BCFrAUtXhUsjQ3Ed5QRociI+2lrmR1eybGdkuLrUkw1zUQUGNQfNXQrtqhznXsqOBoi4ja0FO8xU2JHDJ8F0CIKfLTPtly5e907rX4k4V2f+bXbU63EIpHbpscpzmlpMQ2aYwln7U=
+	t=1714141179; cv=none; b=KiaphXrro/jjcRU8LEJVZb7ADwKv+Bh6QDThGMJMApna77zqd+kjvIFd/gM+PdYn74s2w69/qU+/2QuXAoOxinulSNb52S94oN9y3jdPEJmIe8pHQnoi/wvCew5AkxtJD7QNmck3MFFnfZa4naI61pbsVv5kLvOizQFwFcM0tFU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714140287; c=relaxed/simple;
-	bh=98JFam+pW6R5J+9cjLMRZ/4fFi3pp4waqix3AhY8j7M=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=OoqOdaRCddW2tqkDt+W844TbUqaS9N/6Gg6m6BRnMjUbh5jKNWy2lH0fKUZM1fQxzfk2zwQPxAX9LHtkztJHxtnzPWdVmUMR0lV7M/IjYAg9XJLX2CszhLsq4cD+EJlM2M5RGc3usj0bX3OeGWKcXbp2Oe365US58S2LTQdkc5A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=y6FIlB1n; arc=none smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1714140285; x=1745676285;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=98JFam+pW6R5J+9cjLMRZ/4fFi3pp4waqix3AhY8j7M=;
-  b=y6FIlB1nuUU++08Ty4o9dPZAIIO+xdiY3VHC+AgSUTbUcgkL1MMGWKBz
-   A4M0sTTkBZMJzhxnVeojWguWIqSgKaZZr/GleYeYk2JjAoacJHyiGKZPD
-   JJMxl2bjJl8HHd9E5Vfd3EXvcF2j57o8D71MHKpYrJZTjZwFwBZKO3fi6
-   6zti9v+3W7kNe1cXQS7kFY5muTiuzJlZd3atJkOthZGY+XZ/unfWh7dmg
-   MvNoeOcsqbBjoLpoYKzdQT3INEA5xVo4LccW+GSGnT7D+btQ8QZjlhgYj
-   h0QoK0HExoAZ9qr99i4OcwAh5y0apiVfpbtC8hR7xzYnHQsa44xlomq3V
-   g==;
-X-CSE-ConnectionGUID: CuhQwo/ZTjOAvRra8ggIZQ==
-X-CSE-MsgGUID: w9GiJVhaQeGvAHBD+h8Ntw==
-X-IronPort-AV: E=Sophos;i="6.07,232,1708412400"; 
-   d="scan'208";a="253620180"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 26 Apr 2024 07:04:38 -0700
-Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
- chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Fri, 26 Apr 2024 07:03:57 -0700
-Received: from DEN-DL-M31836.microsemi.net (10.10.85.11) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server id
- 15.1.2507.35 via Frontend Transport; Fri, 26 Apr 2024 07:03:54 -0700
-From: Horatiu Vultur <horatiu.vultur@microchip.com>
-To: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <richardcochran@gmail.com>, <vadim.fedorenko@linux.dev>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Horatiu Vultur
-	<horatiu.vultur@microchip.com>
-Subject: [PATCH net-next v2] net: phy: micrel: Add support for PTP_PF_EXTTS for lan8814
-Date: Fri, 26 Apr 2024 16:02:24 +0200
-Message-ID: <20240426140224.2201919-1-horatiu.vultur@microchip.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1714141179; c=relaxed/simple;
+	bh=i3kgqrHHpbXMW27S2FervM6XeCNKONpsKToZKBi58xQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=OcolmWYGLkQJvOYgPXpYZKxWsI3O1KmgORsv2dkSLtjNz1DYeY/8fhsE78hmkYmXn+GJDokpEBe3kGf0mAV2Bc+6OvsM9czyKhKGl/Yx8PHcRXMlP/L/AeSdNVIP2V6dOZYn1x7qEg66AY3unteuDOcvVwXQbGjHMA/MJD3YhWA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sina.com; spf=pass smtp.mailfrom=sina.com; arc=none smtp.client-ip=218.30.115.118
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sina.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
+X-SMAIL-HELO: localhost.localdomain
+Received: from unknown (HELO localhost.localdomain)([116.24.11.235])
+	by sina.com (172.16.235.25) with ESMTP
+	id 662BB75B00006D3A; Fri, 26 Apr 2024 22:17:03 +0800 (CST)
+X-Sender: hdanton@sina.com
+X-Auth-ID: hdanton@sina.com
+Authentication-Results: sina.com;
+	 spf=none smtp.mailfrom=hdanton@sina.com;
+	 dkim=none header.i=none;
+	 dmarc=none action=none header.from=hdanton@sina.com
+X-SMAIL-MID: 6332034210490
+X-SMAIL-UIID: 5E451C7B22CD492B879366B2EF650F06-20240426-221703-1
+From: Hillf Danton <hdanton@sina.com>
+To: syzbot <syzbot+705c61d60b091ef42c04@syzkaller.appspotmail.com>
+Cc: edumazet@google.com,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Boqun Feng <boqun.feng@gmail.com>,
+	syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot] [net?] possible deadlock in team_del_slave (3)
+Date: Fri, 26 Apr 2024 22:17:02 +0800
+Message-Id: <20240426141702.3419-1-hdanton@sina.com>
+In-Reply-To: <000000000000ffc5d80616fea23d@google.com>
+References: 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,283 +60,213 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
 
-Extend the PTP programmable gpios to implement also PTP_PF_EXTTS
-function. The pins can be configured to capture both of rising
-and falling edge. Once the event is seen, then an interrupt is
-generated and the LTC is saved in the registers.
-On lan8814 only GPIO 3 can be configured for this.
+On Fri, 26 Apr 2024 04:59:32 -0700
+> syzbot found the following issue on:
+> 
+> HEAD commit:    480e035fc4c7 Merge tag 'drm-next-2024-03-13' of https://gi..
+> git tree:       upstream
+> console+strace: https://syzkaller.appspot.com/x/log.txt?x=1662179e180000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=1e5b814e91787669
+> dashboard link: https://syzkaller.appspot.com/bug?extid=705c61d60b091ef42c04
+> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1058e7b9180000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=11919365180000
+> 
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/5f73b6ef963d/disk-480e035f.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/46c949396aad/vmlinux-480e035f.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/e3b4d0f5a5f8/bzImage-480e035f.xz
+> 
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+705c61d60b091ef42c04@syzkaller.appspotmail.com
+> 
+> ======================================================
+> WARNING: possible circular locking dependency detected
+> 6.8.0-syzkaller-08073-g480e035fc4c7 #0 Not tainted
+> ------------------------------------------------------
+> syz-executor419/5074 is trying to acquire lock:
+> ffff888023dc4d20 (team->team_lock_key){+.+.}-{3:3}, at: team_del_slave+0x32/0x1d0 drivers/net/team/team.c:1988
+> 
+> but task is already holding lock:
+> ffff88802a210768 (&rdev->wiphy.mtx){+.+.}-{3:3}, at: nl80211_del_interface+0x11a/0x140 net/wireless/nl80211.c:4389
+> 
+> which lock already depends on the new lock.
+> 
+> 
+> the existing dependency chain (in reverse order) is:
+> 
+> -> #1 (&rdev->wiphy.mtx){+.+.}-{3:3}:
+>        lock_acquire+0x1e4/0x530 kernel/locking/lockdep.c:5754
+>        __mutex_lock_common kernel/locking/mutex.c:608 [inline]
+>        __mutex_lock+0x136/0xd70 kernel/locking/mutex.c:752
+>        wiphy_lock include/net/cfg80211.h:5951 [inline]
+>        ieee80211_open+0xe7/0x200 net/mac80211/iface.c:449
+>        __dev_open+0x2d3/0x450 net/core/dev.c:1430
 
-This was tested using:
-ts2phc -m -l 7 -s generic -f ts2phc.cfg
+	ASSERT_RTNL();
 
-Where the configuration was the following:
-    ---
-    [global]
-    ts2phc.pin_index  3
+>        dev_open+0xae/0x1b0 net/core/dev.c:1466
+>        team_port_add drivers/net/team/team.c:1214 [inline]
+>        team_add_slave+0x9b3/0x2750 drivers/net/team/team.c:1974
+>        do_set_master net/core/rtnetlink.c:2685 [inline]
+>        do_setlink+0xe70/0x41f0 net/core/rtnetlink.c:2891
+>        rtnl_setlink+0x40d/0x5a0 net/core/rtnetlink.c:3185
+>        rtnetlink_rcv_msg+0x89b/0x10d0 net/core/rtnetlink.c:6595
+>        netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2559
+>        netlink_unicast_kernel net/netlink/af_netlink.c:1335 [inline]
+>        netlink_unicast+0x7ea/0x980 net/netlink/af_netlink.c:1361
+>        netlink_sendmsg+0x8e1/0xcb0 net/netlink/af_netlink.c:1905
+>        sock_sendmsg_nosec net/socket.c:730 [inline]
+>        __sock_sendmsg+0x221/0x270 net/socket.c:745
+>        ____sys_sendmsg+0x525/0x7d0 net/socket.c:2584
+>        ___sys_sendmsg net/socket.c:2638 [inline]
+>        __sys_sendmsg+0x2b0/0x3a0 net/socket.c:2667
+>        do_syscall_64+0xfb/0x240
+>        entry_SYSCALL_64_after_hwframe+0x6d/0x75
+> 
+> -> #0 (team->team_lock_key){+.+.}-{3:3}:
+>        check_prev_add kernel/locking/lockdep.c:3134 [inline]
+>        check_prevs_add kernel/locking/lockdep.c:3253 [inline]
+>        validate_chain+0x18cb/0x58e0 kernel/locking/lockdep.c:3869
+>        __lock_acquire+0x1346/0x1fd0 kernel/locking/lockdep.c:5137
+>        lock_acquire+0x1e4/0x530 kernel/locking/lockdep.c:5754
+>        __mutex_lock_common kernel/locking/mutex.c:608 [inline]
+>        __mutex_lock+0x136/0xd70 kernel/locking/mutex.c:752
+>        team_del_slave+0x32/0x1d0 drivers/net/team/team.c:1988
+>        team_device_event+0x200/0x5b0 drivers/net/team/team.c:3029
+>        notifier_call_chain+0x18f/0x3b0 kernel/notifier.c:93
+>        call_netdevice_notifiers_extack net/core/dev.c:1988 [inline]
+>        call_netdevice_notifiers net/core/dev.c:2002 [inline]
+>        unregister_netdevice_many_notify+0xd96/0x16d0 net/core/dev.c:11096
+>        unregister_netdevice_many net/core/dev.c:11154 [inline]
+>        unregister_netdevice_queue+0x303/0x370 net/core/dev.c:11033
+>        unregister_netdevice include/linux/netdevice.h:3115 [inline]
+>        _cfg80211_unregister_wdev+0x162/0x560 net/wireless/core.c:1206
+>        ieee80211_if_remove+0x25d/0x3a0 net/mac80211/iface.c:2242
 
-    [eth0]
-    ---
+	ASSERT_RTNL();
+	lockdep_assert_wiphy(sdata->local->hw.wiphy);
 
-Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Signed-off-by: Horatiu Vultur <horatiu.vultur@microchip.com>
----
-v1->v2:
-- fix commit message by indening the configuration with spaces
----
- drivers/net/phy/micrel.c | 182 ++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 181 insertions(+), 1 deletion(-)
+Given ASSERT_RTNL() on both sides, difficult to understand the
+deadlock reported.
 
-diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
-index 0e310a5e2bff0..2d11f38cbc243 100644
---- a/drivers/net/phy/micrel.c
-+++ b/drivers/net/phy/micrel.c
-@@ -167,6 +167,9 @@
- #define PTP_CMD_CTL_PTP_LTC_STEP_SEC_		BIT(5)
- #define PTP_CMD_CTL_PTP_LTC_STEP_NSEC_		BIT(6)
- 
-+#define PTP_COMMON_INT_ENA			0x0204
-+#define PTP_COMMON_INT_ENA_GPIO_CAP_EN		BIT(2)
-+
- #define PTP_CLOCK_SET_SEC_HI			0x0205
- #define PTP_CLOCK_SET_SEC_MID			0x0206
- #define PTP_CLOCK_SET_SEC_LO			0x0207
-@@ -179,6 +182,27 @@
- #define PTP_CLOCK_READ_NS_HI			0x022C
- #define PTP_CLOCK_READ_NS_LO			0x022D
- 
-+#define PTP_GPIO_SEL				0x0230
-+#define PTP_GPIO_SEL_GPIO_SEL(pin)		((pin) << 8)
-+#define PTP_GPIO_CAP_MAP_LO			0x0232
-+
-+#define PTP_GPIO_CAP_EN				0x0233
-+#define PTP_GPIO_CAP_EN_GPIO_RE_CAPTURE_ENABLE(gpio)	BIT(gpio)
-+#define PTP_GPIO_CAP_EN_GPIO_FE_CAPTURE_ENABLE(gpio)	(BIT(gpio) << 8)
-+
-+#define PTP_GPIO_RE_LTC_SEC_HI_CAP		0x0235
-+#define PTP_GPIO_RE_LTC_SEC_LO_CAP		0x0236
-+#define PTP_GPIO_RE_LTC_NS_HI_CAP		0x0237
-+#define PTP_GPIO_RE_LTC_NS_LO_CAP		0x0238
-+#define PTP_GPIO_FE_LTC_SEC_HI_CAP		0x0239
-+#define PTP_GPIO_FE_LTC_SEC_LO_CAP		0x023A
-+#define PTP_GPIO_FE_LTC_NS_HI_CAP		0x023B
-+#define PTP_GPIO_FE_LTC_NS_LO_CAP		0x023C
-+
-+#define PTP_GPIO_CAP_STS			0x023D
-+#define PTP_GPIO_CAP_STS_PTP_GPIO_RE_STS(gpio)	BIT(gpio)
-+#define PTP_GPIO_CAP_STS_PTP_GPIO_FE_STS(gpio)	(BIT(gpio) << 8)
-+
- #define PTP_OPERATING_MODE			0x0241
- #define PTP_OPERATING_MODE_STANDALONE_		BIT(0)
- 
-@@ -274,6 +298,7 @@
- 
- #define LAN8814_PTP_GPIO_NUM			24
- #define LAN8814_PTP_PEROUT_NUM			2
-+#define LAN8814_PTP_EXTTS_NUM			3
- 
- #define LAN8814_BUFFER_TIME			2
- 
-@@ -3124,12 +3149,102 @@ static int lan8814_ptp_perout(struct ptp_clock_info *ptpci,
- 	return 0;
- }
- 
-+static void lan8814_ptp_extts_on(struct phy_device *phydev, int pin, u32 flags)
-+{
-+	u16 tmp;
-+
-+	/* Set as gpio input */
-+	tmp = lanphy_read_page_reg(phydev, 4, LAN8814_GPIO_DIR_ADDR(pin));
-+	tmp &= ~LAN8814_GPIO_DIR_BIT(pin);
-+	lanphy_write_page_reg(phydev, 4, LAN8814_GPIO_DIR_ADDR(pin), tmp);
-+
-+	/* Map the pin to ltc pin 0 of the capture map registers */
-+	tmp = lanphy_read_page_reg(phydev, 4, PTP_GPIO_CAP_MAP_LO);
-+	tmp |= pin;
-+	lanphy_write_page_reg(phydev, 4, PTP_GPIO_CAP_MAP_LO, tmp);
-+
-+	/* Enable capture on the edges of the ltc pin */
-+	tmp = lanphy_read_page_reg(phydev, 4, PTP_GPIO_CAP_EN);
-+	if (flags & PTP_RISING_EDGE)
-+		tmp |= PTP_GPIO_CAP_EN_GPIO_RE_CAPTURE_ENABLE(0);
-+	if (flags & PTP_FALLING_EDGE)
-+		tmp |= PTP_GPIO_CAP_EN_GPIO_FE_CAPTURE_ENABLE(0);
-+	lanphy_write_page_reg(phydev, 4, PTP_GPIO_CAP_EN, tmp);
-+
-+	/* Enable interrupt top interrupt */
-+	tmp = lanphy_read_page_reg(phydev, 4, PTP_COMMON_INT_ENA);
-+	tmp |= PTP_COMMON_INT_ENA_GPIO_CAP_EN;
-+	lanphy_write_page_reg(phydev, 4, PTP_COMMON_INT_ENA, tmp);
-+}
-+
-+static void lan8814_ptp_extts_off(struct phy_device *phydev, int pin)
-+{
-+	u16 tmp;
-+
-+	/* Set as gpio out */
-+	tmp = lanphy_read_page_reg(phydev, 4, LAN8814_GPIO_DIR_ADDR(pin));
-+	tmp |= LAN8814_GPIO_DIR_BIT(pin);
-+	lanphy_write_page_reg(phydev, 4, LAN8814_GPIO_DIR_ADDR(pin), tmp);
-+
-+	/* Enable alternate, 0:for alternate function, 1:gpio */
-+	tmp = lanphy_read_page_reg(phydev, 4, LAN8814_GPIO_EN_ADDR(pin));
-+	tmp &= ~LAN8814_GPIO_EN_BIT(pin);
-+	lanphy_write_page_reg(phydev, 4, LAN8814_GPIO_EN_ADDR(pin), tmp);
-+
-+	/* Clear the mapping of pin to registers 0 of the capture registers */
-+	tmp = lanphy_read_page_reg(phydev, 4, PTP_GPIO_CAP_MAP_LO);
-+	tmp &= ~GENMASK(3, 0);
-+	lanphy_write_page_reg(phydev, 4, PTP_GPIO_CAP_MAP_LO, tmp);
-+
-+	/* Disable capture on both of the edges */
-+	tmp = lanphy_read_page_reg(phydev, 4, PTP_GPIO_CAP_EN);
-+	tmp &= ~PTP_GPIO_CAP_EN_GPIO_RE_CAPTURE_ENABLE(pin);
-+	tmp &= ~PTP_GPIO_CAP_EN_GPIO_FE_CAPTURE_ENABLE(pin);
-+	lanphy_write_page_reg(phydev, 4, PTP_GPIO_CAP_EN, tmp);
-+
-+	/* Disable interrupt top interrupt */
-+	tmp = lanphy_read_page_reg(phydev, 4, PTP_COMMON_INT_ENA);
-+	tmp &= ~PTP_COMMON_INT_ENA_GPIO_CAP_EN;
-+	lanphy_write_page_reg(phydev, 4, PTP_COMMON_INT_ENA, tmp);
-+}
-+
-+static int lan8814_ptp_extts(struct ptp_clock_info *ptpci,
-+			     struct ptp_clock_request *rq, int on)
-+{
-+	struct lan8814_shared_priv *shared = container_of(ptpci, struct lan8814_shared_priv,
-+							  ptp_clock_info);
-+	struct phy_device *phydev = shared->phydev;
-+	int pin;
-+
-+	if (rq->extts.flags & ~(PTP_ENABLE_FEATURE |
-+				PTP_EXTTS_EDGES |
-+				PTP_STRICT_FLAGS))
-+		return -EOPNOTSUPP;
-+
-+	pin = ptp_find_pin(shared->ptp_clock, PTP_PF_EXTTS,
-+			   rq->extts.index);
-+	if (pin == -1 || pin != LAN8814_PTP_EXTTS_NUM)
-+		return -EINVAL;
-+
-+	mutex_lock(&shared->shared_lock);
-+	if (on)
-+		lan8814_ptp_extts_on(phydev, pin, rq->extts.flags);
-+	else
-+		lan8814_ptp_extts_off(phydev, pin);
-+
-+	mutex_unlock(&shared->shared_lock);
-+
-+	return 0;
-+}
-+
- static int lan8814_ptpci_enable(struct ptp_clock_info *ptpci,
- 				struct ptp_clock_request *rq, int on)
- {
- 	switch (rq->type) {
- 	case PTP_CLK_REQ_PEROUT:
- 		return lan8814_ptp_perout(ptpci, rq, on);
-+	case PTP_CLK_REQ_EXTTS:
-+		return lan8814_ptp_extts(ptpci, rq, on);
- 	default:
- 		return -EINVAL;
- 	}
-@@ -3148,6 +3263,10 @@ static int lan8814_ptpci_verify(struct ptp_clock_info *ptp, unsigned int pin,
- 		if (pin >= LAN8814_PTP_PEROUT_NUM || pin != chan)
- 			return -1;
- 		break;
-+	case PTP_PF_EXTTS:
-+		if (pin != LAN8814_PTP_EXTTS_NUM)
-+			return -1;
-+		break;
- 	default:
- 		return -1;
- 	}
-@@ -3320,6 +3439,64 @@ static void lan8814_handle_ptp_interrupt(struct phy_device *phydev, u16 status)
- 	}
- }
- 
-+static int lan8814_gpio_process_cap(struct lan8814_shared_priv *shared)
-+{
-+	struct phy_device *phydev = shared->phydev;
-+	struct ptp_clock_event ptp_event = {0};
-+	unsigned long nsec;
-+	s64 sec;
-+	u16 tmp;
-+
-+	/* This is 0 because whatever was the input pin it was mapped it to
-+	 * ltc gpio pin 0
-+	 */
-+	tmp = lanphy_read_page_reg(phydev, 4, PTP_GPIO_SEL);
-+	tmp |= PTP_GPIO_SEL_GPIO_SEL(0);
-+	lanphy_write_page_reg(phydev, 4, PTP_GPIO_SEL, tmp);
-+
-+	tmp = lanphy_read_page_reg(phydev, 4, PTP_GPIO_CAP_STS);
-+	if (!(tmp & PTP_GPIO_CAP_STS_PTP_GPIO_RE_STS(0)) &&
-+	    !(tmp & PTP_GPIO_CAP_STS_PTP_GPIO_FE_STS(0)))
-+		return -1;
-+
-+	if (tmp & BIT(0)) {
-+		sec = lanphy_read_page_reg(phydev, 4, PTP_GPIO_RE_LTC_SEC_HI_CAP);
-+		sec <<= 16;
-+		sec |= lanphy_read_page_reg(phydev, 4, PTP_GPIO_RE_LTC_SEC_LO_CAP);
-+
-+		nsec = lanphy_read_page_reg(phydev, 4, PTP_GPIO_RE_LTC_NS_HI_CAP) & 0x3fff;
-+		nsec <<= 16;
-+		nsec |= lanphy_read_page_reg(phydev, 4, PTP_GPIO_RE_LTC_NS_LO_CAP);
-+	} else {
-+		sec = lanphy_read_page_reg(phydev, 4, PTP_GPIO_FE_LTC_SEC_HI_CAP);
-+		sec <<= 16;
-+		sec |= lanphy_read_page_reg(phydev, 4, PTP_GPIO_FE_LTC_SEC_LO_CAP);
-+
-+		nsec = lanphy_read_page_reg(phydev, 4, PTP_GPIO_FE_LTC_NS_HI_CAP) & 0x3fff;
-+		nsec <<= 16;
-+		nsec |= lanphy_read_page_reg(phydev, 4, PTP_GPIO_RE_LTC_NS_LO_CAP);
-+	}
-+
-+	ptp_event.index = 0;
-+	ptp_event.timestamp = ktime_set(sec, nsec);
-+	ptp_event.type = PTP_CLOCK_EXTTS;
-+	ptp_clock_event(shared->ptp_clock, &ptp_event);
-+
-+	return 0;
-+}
-+
-+static int lan8814_handle_gpio_interrupt(struct phy_device *phydev, u16 status)
-+{
-+	struct lan8814_shared_priv *shared = phydev->shared->priv;
-+	int ret;
-+
-+	mutex_lock(&shared->shared_lock);
-+	ret = lan8814_gpio_process_cap(shared);
-+	mutex_unlock(&shared->shared_lock);
-+
-+	return ret;
-+}
-+
- static int lan8804_config_init(struct phy_device *phydev)
- {
- 	int val;
-@@ -3424,6 +3601,9 @@ static irqreturn_t lan8814_handle_interrupt(struct phy_device *phydev)
- 		ret = IRQ_HANDLED;
- 	}
- 
-+	if (!lan8814_handle_gpio_interrupt(phydev, irq_status))
-+		ret = IRQ_HANDLED;
-+
- 	return ret;
- }
- 
-@@ -3541,7 +3721,7 @@ static int lan8814_ptp_probe_once(struct phy_device *phydev)
- 	snprintf(shared->ptp_clock_info.name, 30, "%s", phydev->drv->name);
- 	shared->ptp_clock_info.max_adj = 31249999;
- 	shared->ptp_clock_info.n_alarm = 0;
--	shared->ptp_clock_info.n_ext_ts = 0;
-+	shared->ptp_clock_info.n_ext_ts = LAN8814_PTP_EXTTS_NUM;
- 	shared->ptp_clock_info.n_pins = LAN8814_PTP_GPIO_NUM;
- 	shared->ptp_clock_info.pps = 0;
- 	shared->ptp_clock_info.pin_config = shared->pin_config;
--- 
-2.34.1
-
+>        ieee80211_del_iface+0x19/0x30 net/mac80211/cfg.c:202
+>        rdev_del_virtual_intf net/wireless/rdev-ops.h:62 [inline]
+>        cfg80211_remove_virtual_intf+0x230/0x3f0 net/wireless/util.c:2847
+>        genl_family_rcv_msg_doit net/netlink/genetlink.c:1113 [inline]
+>        genl_family_rcv_msg net/netlink/genetlink.c:1193 [inline]
+>        genl_rcv_msg+0xb14/0xec0 net/netlink/genetlink.c:1208
+>        netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2559
+>        genl_rcv+0x28/0x40 net/netlink/genetlink.c:1217
+>        netlink_unicast_kernel net/netlink/af_netlink.c:1335 [inline]
+>        netlink_unicast+0x7ea/0x980 net/netlink/af_netlink.c:1361
+>        netlink_sendmsg+0x8e1/0xcb0 net/netlink/af_netlink.c:1905
+>        sock_sendmsg_nosec net/socket.c:730 [inline]
+>        __sock_sendmsg+0x221/0x270 net/socket.c:745
+>        ____sys_sendmsg+0x525/0x7d0 net/socket.c:2584
+>        ___sys_sendmsg net/socket.c:2638 [inline]
+>        __sys_sendmsg+0x2b0/0x3a0 net/socket.c:2667
+>        do_syscall_64+0xfb/0x240
+>        entry_SYSCALL_64_after_hwframe+0x6d/0x75
+> 
+> other info that might help us debug this:
+> 
+>  Possible unsafe locking scenario:
+> 
+>        CPU0                    CPU1
+>        ----                    ----
+>   lock(&rdev->wiphy.mtx);
+>                                lock(team->team_lock_key);
+>                                lock(&rdev->wiphy.mtx);
+>   lock(team->team_lock_key);
+> 
+>  *** DEADLOCK ***
+> 
+> 3 locks held by syz-executor419/5074:
+>  #0: ffffffff8f3f1a30 (cb_lock){++++}-{3:3}, at: genl_rcv+0x19/0x40 net/netlink/genetlink.c:1216
+>  #1: ffffffff8f38ce88 (rtnl_mutex){+.+.}-{3:3}, at: nl80211_pre_doit+0x5f/0x8b0 net/wireless/nl80211.c:16401
+>  #2: ffff88802a210768 (&rdev->wiphy.mtx){+.+.}-{3:3}, at: nl80211_del_interface+0x11a/0x140 net/wireless/nl80211.c:4389
+> 
+> stack backtrace:
+> CPU: 1 PID: 5074 Comm: syz-executor419 Not tainted 6.8.0-syzkaller-08073-g480e035fc4c7 #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/29/2024
+> Call Trace:
+>  <TASK>
+>  __dump_stack lib/dump_stack.c:88 [inline]
+>  dump_stack_lvl+0x241/0x360 lib/dump_stack.c:114
+>  check_noncircular+0x36a/0x4a0 kernel/locking/lockdep.c:2187
+>  check_prev_add kernel/locking/lockdep.c:3134 [inline]
+>  check_prevs_add kernel/locking/lockdep.c:3253 [inline]
+>  validate_chain+0x18cb/0x58e0 kernel/locking/lockdep.c:3869
+>  __lock_acquire+0x1346/0x1fd0 kernel/locking/lockdep.c:5137
+>  lock_acquire+0x1e4/0x530 kernel/locking/lockdep.c:5754
+>  __mutex_lock_common kernel/locking/mutex.c:608 [inline]
+>  __mutex_lock+0x136/0xd70 kernel/locking/mutex.c:752
+>  team_del_slave+0x32/0x1d0 drivers/net/team/team.c:1988
+>  team_device_event+0x200/0x5b0 drivers/net/team/team.c:3029
+>  notifier_call_chain+0x18f/0x3b0 kernel/notifier.c:93
+>  call_netdevice_notifiers_extack net/core/dev.c:1988 [inline]
+>  call_netdevice_notifiers net/core/dev.c:2002 [inline]
+>  unregister_netdevice_many_notify+0xd96/0x16d0 net/core/dev.c:11096
+>  unregister_netdevice_many net/core/dev.c:11154 [inline]
+>  unregister_netdevice_queue+0x303/0x370 net/core/dev.c:11033
+>  unregister_netdevice include/linux/netdevice.h:3115 [inline]
+>  _cfg80211_unregister_wdev+0x162/0x560 net/wireless/core.c:1206
+>  ieee80211_if_remove+0x25d/0x3a0 net/mac80211/iface.c:2242
+>  ieee80211_del_iface+0x19/0x30 net/mac80211/cfg.c:202
+>  rdev_del_virtual_intf net/wireless/rdev-ops.h:62 [inline]
+>  cfg80211_remove_virtual_intf+0x230/0x3f0 net/wireless/util.c:2847
+>  genl_family_rcv_msg_doit net/netlink/genetlink.c:1113 [inline]
+>  genl_family_rcv_msg net/netlink/genetlink.c:1193 [inline]
+>  genl_rcv_msg+0xb14/0xec0 net/netlink/genetlink.c:1208
+>  netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2559
+>  genl_rcv+0x28/0x40 net/netlink/genetlink.c:1217
+>  netlink_unicast_kernel net/netlink/af_netlink.c:1335 [inline]
+>  netlink_unicast+0x7ea/0x980 net/netlink/af_netlink.c:1361
+>  netlink_sendmsg+0x8e1/0xcb0 net/netlink/af_netlink.c:1905
+>  sock_sendmsg_nosec net/socket.c:730 [inline]
+>  __sock_sendmsg+0x221/0x270 net/socket.c:745
+>  ____sys_sendmsg+0x525/0x7d0 net/socket.c:2584
+>  ___sys_sendmsg net/socket.c:2638 [inline]
+>  __sys_sendmsg+0x2b0/0x3a0 net/socket.c:2667
+>  do_syscall_64+0xfb/0x240
+>  entry_SYSCALL_64_after_hwframe+0x6d/0x75
+> RIP: 0033:0x7f963cb981a9
+> Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 d1 19 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+> RSP: 002b:00007ffdde1419a8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+> RAX: ffffffffffffffda RBX: 00007f963cbe53f6 RCX: 00007f963cb981a9
+> RDX: 0000000000000000 RSI: 0000000020000400 RDI: 0000000000000004
+> RBP: 00007f963cc17440 R08: 0000000000000000 R09: 0000000000000000
+> R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000031
+> R13: 0000000000000003 R14: 0000000000050012 R15: 00007ffdde141a02
+>  </TASK>
+> team0: Port device wlan0 removed
+> 
+> 
+> ---
+> This report is generated by a bot. It may contain errors.
+> See https://goo.gl/tpsmEJ for more information about syzbot.
+> syzbot engineers can be reached at syzkaller@googlegroups.com.
+> 
+> syzbot will keep track of this issue. See:
+> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+> 
+> If the report is already addressed, let syzbot know by replying with:
+> #syz fix: exact-commit-title
+> 
+> If you want syzbot to run the reproducer, reply with:
+> #syz test: git://repo/address.git branch-or-commit-hash
+> If you attach or paste a git patch, syzbot will apply it before testing.
+> 
+> If you want to overwrite report's subsystems, reply with:
+> #syz set subsystems: new-subsystem
+> (See the list of subsystem names on the web dashboard)
+> 
+> If the report is a duplicate of another one, reply with:
+> #syz dup: exact-subject-of-another-report
+> 
+> If you want to undo deduplication, reply with:
+> #syz undup
+> 
 
