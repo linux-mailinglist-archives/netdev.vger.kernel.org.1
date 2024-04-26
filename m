@@ -1,102 +1,179 @@
-Return-Path: <netdev+bounces-91683-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91685-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A36EC8B36DE
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 14:05:44 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D7338B36ED
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 14:11:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EDC99B21F59
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 12:05:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 17E2F1F224A2
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 12:11:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC262145B04;
-	Fri, 26 Apr 2024 12:05:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73EDC146A70;
+	Fri, 26 Apr 2024 12:10:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iTIOmvUH"
+	dkim=pass (1024-bit key) header.d=ssi.bg header.i=@ssi.bg header.b="Ee8l6YFJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f45.google.com (mail-oo1-f45.google.com [209.85.161.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mg.ssi.bg (mg.ssi.bg [193.238.174.37])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26B49145B08
-	for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 12:05:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3451E145B03;
+	Fri, 26 Apr 2024 12:10:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.238.174.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714133117; cv=none; b=I/+BlYNPXFJLPgKQDcumClhwU6V6tGWSSxcFiEL9bZcwX5w1/McB3eUeTrcWzcTeRHDGJfIyg/iJS+GCqr6T884+9H/k4hteV8VY2Aqaywo5c8Ojb9geouzHQ9QDf3PN6G4yFlGD/xgNfG5ZPpfuZAhEbBY9BjNbhsu2bBVV4Q0=
+	t=1714133436; cv=none; b=ljBVKix4ocyINH+POhBUv/aIBehtk0kDog9VyUPVYY9S9UTk67l68gwe8a1ggoNjw5ohOy2+WuJkkKRvB/m0Cl0HPmD52KKHfUmSZ1Mb6lcEV8SgUip9IT4b96Wnm5pxSFGyy4eGp4tblvGS0gvKI1uhI5hUgwjOsMRoVBg18eE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714133117; c=relaxed/simple;
-	bh=r1E79nEG2G0/aOYL7SjrP43Oau3fXMrL0uYYhXjNjkE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hxCkNDYpK8JjiDopSf/2S1GaLJbQqPjO37I963ZEmwv5fPAlcX0AWWW82R4iQa79C5Fle+6zrhnD6eoNm8RidOVU8P39teuK95sLvyJQPl8jSuFwitvERhd/Mi/VybuB1qzElAMXA+7s2PfFC1FO+GscaPS8mEAjzoPWu+8Mbx0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=iTIOmvUH; arc=none smtp.client-ip=209.85.161.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-oo1-f45.google.com with SMTP id 006d021491bc7-5aa362cc2ccso1307306eaf.3
-        for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 05:05:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1714133115; x=1714737915; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=r1E79nEG2G0/aOYL7SjrP43Oau3fXMrL0uYYhXjNjkE=;
-        b=iTIOmvUHJwGmk0Z4Y67dF+vraktLEezx8e1tGLUDNgYP1TzGcnBrghKndnoXerwpyV
-         lYhC4ewd6o/Yw/rlOgyrhuNHA53bGaHFoAw/QMB7jISgEqyYcBNeFyfdfKcwLttIM+q4
-         EUZ/3YSvOWVJ0pVaahVWWvu8qJ32zxlJ4jJDKRFenMvJtuHWCv5/1/kejdjSkaQGvR40
-         aR//dOCvs5pKfCMqDykmYoge7BPUtln0IdK7kPvz/a/CjqsltP0UE/1yorAwsQ+TNoKD
-         oyKQnKFbTygXJxsEPtsONfMPatglVsfsiTUtkERUhxFrhhUcr8aYAk3YTZ2ivdIFH2QZ
-         iRLA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714133115; x=1714737915;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=r1E79nEG2G0/aOYL7SjrP43Oau3fXMrL0uYYhXjNjkE=;
-        b=ZDZVM89iVz5bwdW6UQLtrR47OT8kGe3Q3cTjtGrTta6O26X7rGMxvt+2U9Q0qDZSW2
-         LvPxHPkS0caRTIB3i/6Ir3JEogN3L8JweamJz2mast4Y1gF9kWTTafc+6EqxHkUzZ/0f
-         1zqIe+kBTWi53KTqVGx56zqG+Y7+QQEbsTxVGCZlN729xOhfbfp7Nu4tveLz+8bJ11bY
-         sGOv1nWt20T+0sYoBdtNKU8YbuP7wbtxoHG97upGZQpsRPr9vAY8o2HN13tfxBzhcOdU
-         QfuUY0LkhIPA9epNyJAHCJmbVKwTUrLIsPQI2Tqyr9L41OrNy9TfDOC+iQYsSrRcA3iF
-         5sgQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWP5u2j3avV0lqDyXLyliGibS/nVgmmZsT2DGnMeU0/eZ85LghvVIwFc5JRGznTa0TWBraXoh+/p8wF9vFGwwdBcSqqxWbA
-X-Gm-Message-State: AOJu0YzNnbATRN3kEk41d/dvF5kehxPgSAcFDf9vDH8Xr81PgkPY+I8R
-	hgiTmiBQqaynXJbhVSzvmI30XdweNOx175JUf5y9AWwkPjO6fWGyeL3bx5SqZnisBXPe8TgzdBy
-	T8+8HhuuGPhDnBS57ID6MZtpRMrl344E9uX3WIg==
-X-Google-Smtp-Source: AGHT+IGca8B9KX/Ii5lYQ3b9rLayT5KL2kDMlLOYI4c8cu6nOAGG3+yCexdUphLn8bJqAkemhCy6Xdc55amdXVXO+4M=
-X-Received: by 2002:a4a:abc5:0:b0:5aa:4d23:9114 with SMTP id
- o5-20020a4aabc5000000b005aa4d239114mr3138536oon.3.1714133115172; Fri, 26 Apr
- 2024 05:05:15 -0700 (PDT)
+	s=arc-20240116; t=1714133436; c=relaxed/simple;
+	bh=sk3F8kQlklKnamzgzVwKQ00rlNEpTKcd9WWMXq8UVps=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=bL7VxHb06nkWbs+qMkV5HqdEBbHr3+anYIz9D5apiX2sr1yEO543/OvCatCYZ7XioDWE0jzwwym/43EZ7F2NcBBHU8tswzsEsNsNkGD9/QyRIp4Fq7ghjRkd89lVLG2TM4D5DFk/8s+hq8jhQFmwbuVC+9XzqkxojVew/GVCVVY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ssi.bg; spf=pass smtp.mailfrom=ssi.bg; dkim=pass (1024-bit key) header.d=ssi.bg header.i=@ssi.bg header.b=Ee8l6YFJ; arc=none smtp.client-ip=193.238.174.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ssi.bg
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ssi.bg
+Received: from mg.ssi.bg (localhost [127.0.0.1])
+	by mg.ssi.bg (Proxmox) with ESMTP id 5E990201B2;
+	Fri, 26 Apr 2024 15:10:32 +0300 (EEST)
+Received: from ink.ssi.bg (ink.ssi.bg [193.238.174.40])
+	by mg.ssi.bg (Proxmox) with ESMTPS;
+	Fri, 26 Apr 2024 15:10:31 +0300 (EEST)
+Received: from ja.ssi.bg (unknown [213.16.62.126])
+	by ink.ssi.bg (Postfix) with ESMTPSA id C3D63900281;
+	Fri, 26 Apr 2024 15:09:52 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=ssi.bg; s=ink;
+	t=1714133398; bh=sk3F8kQlklKnamzgzVwKQ00rlNEpTKcd9WWMXq8UVps=;
+	h=Date:From:To:cc:Subject:In-Reply-To:References;
+	b=Ee8l6YFJS7RZ24aWwUO+TQ58uAlvKg44da8bN2aXoBnCDabYnu1QZRbWM/YCvMCtm
+	 KCb/TDE1mSM/2m6jLtLrvv6haBRhIsD746J+S3tEsYMKzO87OwtlGyaijhx9Z6novF
+	 rNPRpgWaQyfc0DLkHErLzQp3U+PMcMndbKLDFZiA=
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by ja.ssi.bg (8.17.1/8.17.1) with ESMTP id 43QC9jvI068943;
+	Fri, 26 Apr 2024 15:09:47 +0300
+Date: Fri, 26 Apr 2024 15:09:45 +0300 (EEST)
+From: Julian Anastasov <ja@ssi.bg>
+To: Joel Granados <j.granados@samsung.com>
+cc: "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Alexander Aring <alex.aring@gmail.com>,
+        Stefan Schmidt <stefan@datenfreihafen.org>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        David Ahern <dsahern@kernel.org>,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Matthieu Baerts <matttbe@kernel.org>,
+        Mat Martineau <martineau@kernel.org>,
+        Geliang Tang <geliang@kernel.org>, Ralf Baechle <ralf@linux-mips.org>,
+        Remi Denis-Courmont <courmisch@gmail.com>,
+        Allison Henderson <allison.henderson@oracle.com>,
+        David Howells <dhowells@redhat.com>,
+        Marc Dionne <marc.dionne@auristor.com>,
+        Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+        Xin Long <lucien.xin@gmail.com>, Wenjia Zhang <wenjia@linux.ibm.com>,
+        Jan Karcher <jaka@linux.ibm.com>,
+        "D. Wythe" <alibuda@linux.alibaba.com>,
+        Tony Lu <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Anna Schumaker <anna@kernel.org>, Chuck Lever <chuck.lever@oracle.com>,
+        Jeff Layton <jlayton@kernel.org>, Neil Brown <neilb@suse.de>,
+        Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>,
+        Tom Talpey <tom@talpey.com>, Jon Maloy <jmaloy@redhat.com>,
+        Ying Xue <ying.xue@windriver.com>, Martin Schiller <ms@dev.tdt.de>,
+        Pablo Neira Ayuso <pablo@netfilter.org>,
+        Jozsef Kadlecsik <kadlec@netfilter.org>,
+        Florian Westphal <fw@strlen.de>, Roopa Prabhu <roopa@nvidia.com>,
+        Nikolay Aleksandrov <razor@blackwall.org>,
+        Simon Horman <horms@verge.net.au>, Joerg Reuter <jreuter@yaina.de>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        Kees Cook <keescook@chromium.org>, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, dccp@vger.kernel.org,
+        linux-wpan@vger.kernel.org, mptcp@lists.linux.dev,
+        linux-hams@vger.kernel.org, linux-rdma@vger.kernel.org,
+        rds-devel@oss.oracle.com, linux-afs@lists.infradead.org,
+        linux-sctp@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-nfs@vger.kernel.org, tipc-discussion@lists.sourceforge.net,
+        linux-x25@vger.kernel.org, netfilter-devel@vger.kernel.org,
+        coreteam@netfilter.org, bridge@lists.linux.dev,
+        lvs-devel@vger.kernel.org
+Subject: Re: [PATCH v5 6/8] netfilter: Remove the now superfluous sentinel
+ elements from ctl_table array
+In-Reply-To: <20240426-jag-sysctl_remset_net-v5-6-e3b12f6111a6@samsung.com>
+Message-ID: <d78c6353-99b9-41f8-0c54-19eb86e1fce3@ssi.bg>
+References: <20240426-jag-sysctl_remset_net-v5-0-e3b12f6111a6@samsung.com> <20240426-jag-sysctl_remset_net-v5-6-e3b12f6111a6@samsung.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240426092444.825735-1-slark_xiao@163.com>
-In-Reply-To: <20240426092444.825735-1-slark_xiao@163.com>
-From: Loic Poulain <loic.poulain@linaro.org>
-Date: Fri, 26 Apr 2024 14:04:39 +0200
-Message-ID: <CAMZdPi-VNEUJK+AUcyCXii5in6OLfKjxrNM1KHwQf=9QV_cqJA@mail.gmail.com>
-Subject: Re: [PATCH net v2] net: wwan: Fix missing net device name for error
- message print
-To: Slark Xiao <slark_xiao@163.com>
-Cc: ryazanov.s.a@gmail.com, johannes@sipsolutions.net, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Hariprasad Kelam <hkelam@marvell.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
 
-Hello,
 
-On Fri, 26 Apr 2024 at 11:25, Slark Xiao <slark_xiao@163.com> wrote:
->
-> In my local, I got an error print in dmesg like below:
-> "sequence number glitch prev=487 curr=0"
-> After checking, it belongs to mhi_wwan_mbim.c. Refer to the usage
-> of this net_err_ratelimited() API in other files, I think we
-> should add net device name print before message context.
->
-> Fixes: aa730a9905b7 ("net: wwan: Add MHI MBIM network driver")
+	Hello,
 
-This is more a cosmetic change than a bugfix, you should target net-next IMO.
-Also as said in another feedback, the commit message does not match the change,
-since you're not printing the device name.
+On Fri, 26 Apr 2024, Joel Granados via B4 Relay wrote:
+
+> From: Joel Granados <j.granados@samsung.com>
+> 
+> This commit comes at the tail end of a greater effort to remove the
+> empty elements at the end of the ctl_table arrays (sentinels) which will
+> reduce the overall build time size of the kernel and run time memory
+> bloat by ~64 bytes per sentinel (further information Link :
+> https://lore.kernel.org/all/ZO5Yx5JFogGi%2FcBo@bombadil.infradead.org/)
+> 
+> * Remove sentinel elements from ctl_table structs
+> * Remove instances where an array element is zeroed out to make it look
+>   like a sentinel. This is not longer needed and is safe after commit
+>   c899710fe7f9 ("networking: Update to register_net_sysctl_sz") added
+>   the array size to the ctl_table registration
+> * Remove the need for having __NF_SYSCTL_CT_LAST_SYSCTL as the
+>   sysctl array size is now in NF_SYSCTL_CT_LAST_SYSCTL
+> * Remove extra element in ctl_table arrays declarations
+> 
+> Acked-by: Kees Cook <keescook@chromium.org> # loadpin & yama
+> Signed-off-by: Joel Granados <j.granados@samsung.com>
+> ---
+>  net/bridge/br_netfilter_hooks.c         | 1 -
+>  net/ipv6/netfilter/nf_conntrack_reasm.c | 1 -
+>  net/netfilter/ipvs/ip_vs_ctl.c          | 5 +----
+>  net/netfilter/ipvs/ip_vs_lblc.c         | 5 +----
+>  net/netfilter/ipvs/ip_vs_lblcr.c        | 5 +----
+>  net/netfilter/nf_conntrack_standalone.c | 6 +-----
+>  net/netfilter/nf_log.c                  | 3 +--
+>  7 files changed, 5 insertions(+), 21 deletions(-)
+
+...
+
+> diff --git a/net/netfilter/ipvs/ip_vs_ctl.c b/net/netfilter/ipvs/ip_vs_ctl.c
+> index 143a341bbc0a..50b5dbe40eb8 100644
+> --- a/net/netfilter/ipvs/ip_vs_ctl.c
+> +++ b/net/netfilter/ipvs/ip_vs_ctl.c
+
+...
+
+> @@ -4286,10 +4285,8 @@ static int __net_init ip_vs_control_net_init_sysctl(struct netns_ipvs *ipvs)
+>  			return -ENOMEM;
+>  
+>  		/* Don't export sysctls to unprivileged users */
+> -		if (net->user_ns != &init_user_ns) {
+> -			tbl[0].procname = NULL;
+> +		if (net->user_ns != &init_user_ns)
+>  			ctl_table_size = 0;
+> -		}
+>  	} else
+>  		tbl = vs_vars;
+>  	/* Initialize sysctl defaults */
+
+	We are in process of changing this code (not in trees yet):
+
+https://marc.info/?t=171345219600002&r=1&w=2
+
+	As I'm not sure which patch will win, the end result should
+be this single if-block/hunk to be removed.
+
+Regards
+
+--
+Julian Anastasov <ja@ssi.bg>
+
 
