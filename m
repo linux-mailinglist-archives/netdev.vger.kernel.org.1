@@ -1,261 +1,172 @@
-Return-Path: <netdev+bounces-91576-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91577-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FF158B319D
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 09:44:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 091558B31A1
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 09:45:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B559A1C20834
-	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 07:44:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B392028A4C0
+	for <lists+netdev@lfdr.de>; Fri, 26 Apr 2024 07:44:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9B0313C3EA;
-	Fri, 26 Apr 2024 07:44:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5503A13C830;
+	Fri, 26 Apr 2024 07:44:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="0Ys7zEif";
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="p6m4qZzc"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oawk07lh"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A93413AD25;
-	Fri, 26 Apr 2024 07:44:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=68.232.154.123
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714117457; cv=fail; b=BsjPfLJIsFp9sOOaEe5Olz0cesIO+qWlrdFv6AkjC3UE/JatLykvv+O+p6oO2ByOpMSIKAb+S8kH3u2KMeKN1WWpE9xcIYp2e8n0Fn5RgZCHsSEZYiiAAMyDuMFS2Y7eVBTj4U3aK/gm8eNaG118+HoYoz4FWwIKNyhva5X2LUo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714117457; c=relaxed/simple;
-	bh=nItGw23nLZHJ4WckFxw3Pygwqu/gG2eQXRAcZl7jg1Q=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=lM+McErFhAKJeGWH+L+ekf+FoXM/gMkH0u8TXjZTHPGkNFFO/SkonEyJ7liumonluN2Hp9A6EU0tLbHiqxaVysJT3PlypKYugSlhI/GlhEiSi1DDbwUo7AmZ+Nt/J2oLx8Gf5BrTtp2G9/lzD1FUCWysQrv0kpch7tJR5oRGolk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=0Ys7zEif; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=p6m4qZzc; arc=fail smtp.client-ip=68.232.154.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1714117454; x=1745653454;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=nItGw23nLZHJ4WckFxw3Pygwqu/gG2eQXRAcZl7jg1Q=;
-  b=0Ys7zEifwcg5lJDxCFhoJuKGKauPKbSs1vklcj/NDRA+87tgFKd0sNfi
-   vS5IcpK00XpDplUw19UfPvV5UW3pqM5U65uM7FDa4/nCaderA0SQpsZOR
-   oLWMrXfmN95lU+9luIJDuyWYgiprPVoGj8R75ZL0Mape6+a3izyK5x6wU
-   T7J802WvsvTF9e7oVIYDkPl4Fyj2wx3x3MafiM9dfG2FJzH233IXAvyP2
-   amt2GDY2BCGtwW/Yv8fzAsgQw6sYvWYp1cnoN7uMBi3T75Yutyu7OUqgo
-   QBjLsy1L4r7l8qVDf+KKjhFwkyYWP1T6TQzhhS8kIZI/EJhe2NiZyQcTD
-   A==;
-X-CSE-ConnectionGUID: XXuTBX8lTsyekX3bEufgsQ==
-X-CSE-MsgGUID: lF3VNejkRlavd9tbtxu6fA==
-X-IronPort-AV: E=Sophos;i="6.07,231,1708412400"; 
-   d="scan'208";a="22732993"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 26 Apr 2024 00:44:12 -0700
-Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
- chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Fri, 26 Apr 2024 00:43:39 -0700
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (10.10.215.250)
- by email.microchip.com (10.10.87.72) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Fri, 26 Apr 2024 00:43:38 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Y6teiyHZheBnVz9UzGjpjoxaRnOBH4EQseTJZngz9CkHGWyLFtLNi3t6LJOWA3gZYyHrZb1ajFyegq6Hgb0jA3PxqdSB4r02witxW+nKM59h7VdyYrpAfaAz7OVhPVkDOCR4jWcmQvmrfzuFUXjlh3hdOxualKX7v/Blc8bOVnoY1T0UbEOQWW7qX126VdyS5YpkTmXH9l5DIhHXFYD7Suxodwp6NWmi9tz1lnU8ndLFrdyIrv/amIJ4v0YMFYsC4V2O/vmWMmdq3eVblQgtzIRDCWdDL9EBc9jagPBRrUdQAnr9lsrFYcKbbf08h4PB5SEstJgk7+ZBUxxZ98wpYg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=HjnAgTHedoHgb5NtKgsfM8733Fa7+tThtz/FMBgpB/8=;
- b=DTpg9rfZ+nGNG4jcesTkQWO44exbWH3DPMNYTFDgxJsR+5t+BWAcEg6qYSNHaslXpbHrntn9HHx4lcmVziaHHbCcj1Cns4RJHogXyVRIh8BEclwk5HSdHwDm+aXt/hIkg7ubEHIEa6Et9FOv9NFnu3DlQPAD4mQsZSAHKQ35GjLcJYazC5jo3zceEv9mN0at1GDtbrEL3ZwOg4s3eaRM1yA/i4R8vj7sLmZ4oALHpyrJ+5xVxQ7yGndQbokHf5yLgbYaaVe+gRcyslkL15mirF56dZDwnmXHp9Q/xkWsQEVv9f/Z5zjGiPjZhPir71edr1ryjUU7YR8SC4L0x7R0sg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microchip.com; dmarc=pass action=none
- header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microchip.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=HjnAgTHedoHgb5NtKgsfM8733Fa7+tThtz/FMBgpB/8=;
- b=p6m4qZzctxAJNqMC4Y+0x+OvSGZ3JoB9yoHcbs7dVIr8oO9GNDOtbzm6e93030DRc65xrjbw2knyNdSORbPMT4+GhfDxwzbGcaDrU4flrnoczBQCdA1JUS3BPTjY4noVxfM+YDZw1VUO1PEH/YBDFpiNWUogBvh2LP2ESCMdKqUCLJ8Qody1HhPqQ+h95dyxserYvsi7jS6QmHxHgyK/69cJtwNlZUYKwbRbZzF2OSoe+ck+iV+wjCgrZblfiOy2YFVGbRzZzCdFgFqX+HVjDE00v+OsxHg+Of9vnOypp/bIrVBjE495zPidj+1ZQ+lAIdolk25dG14WklAmsI6xAQ==
-Received: from PH8PR11MB7965.namprd11.prod.outlook.com (2603:10b6:510:25c::13)
- by SJ1PR11MB6106.namprd11.prod.outlook.com (2603:10b6:a03:48b::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7472.29; Fri, 26 Apr
- 2024 07:43:36 +0000
-Received: from PH8PR11MB7965.namprd11.prod.outlook.com
- ([fe80::1a3a:422d:1406:cd7]) by PH8PR11MB7965.namprd11.prod.outlook.com
- ([fe80::1a3a:422d:1406:cd7%5]) with mapi id 15.20.7519.021; Fri, 26 Apr 2024
- 07:43:36 +0000
-From: <Ronnie.Kunin@microchip.com>
-To: <andrew@lunn.ch>, <Raju.Lakkaraju@microchip.com>
-CC: <netdev@vger.kernel.org>, <davem@davemloft.net>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <edumazet@google.com>, <linux-kernel@vger.kernel.org>,
-	<Bryan.Whitehead@microchip.com>, <UNGLinuxDriver@microchip.com>
-Subject: RE: [PATCH net V2 2/2] net: lan743x: support WOL in MAC even when PHY
- does not
-Thread-Topic: [PATCH net V2 2/2] net: lan743x: support WOL in MAC even when
- PHY does not
-Thread-Index: AQHaen5pYcVCYAnMVEe2BSZT37paArFBPcYAgBgwmwCAAJVnAIAb45oAgACHioCAAqXqAIAAK6IAgAAtc4A=
-Date: Fri, 26 Apr 2024 07:43:35 +0000
-Message-ID: <PH8PR11MB7965D05E16D922C3B1F14E5E95162@PH8PR11MB7965.namprd11.prod.outlook.com>
-References: <20240320042107.903051-1-Raju.Lakkaraju@microchip.com>
- <20240320042107.903051-3-Raju.Lakkaraju@microchip.com>
- <22089299-a3e2-4cbd-942a-65ea070657b8@lunn.ch>
- <LV8PR11MB87003ABBCA98F00F3EEA9AB09F032@LV8PR11MB8700.namprd11.prod.outlook.com>
- <fb5a6f19-ae4c-443e-babb-cbbcf6ba5fc6@lunn.ch>
- <LV8PR11MB8700A34520EA2521BC5F59EF9F112@LV8PR11MB8700.namprd11.prod.outlook.com>
- <9c4f8fcd-ae95-4874-b829-d381928c5f13@lunn.ch>
- <LV8PR11MB8700D54F5E03440681BF0D449F172@LV8PR11MB8700.namprd11.prod.outlook.com>
- <38718a9b-bc7b-45d1-b15e-f4fea628db3d@lunn.ch>
-In-Reply-To: <38718a9b-bc7b-45d1-b15e-f4fea628db3d@lunn.ch>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microchip.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH8PR11MB7965:EE_|SJ1PR11MB6106:EE_
-x-ms-office365-filtering-correlation-id: 5aeac992-94ea-42f2-fb94-08dc65c49492
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: =?us-ascii?Q?ALq/6rVzwvNpRAiYp9O8Zv0+K1KM2Vybe/OjHKtMyAlV3i+6GseNGoawKTwd?=
- =?us-ascii?Q?0OSFrj+Crt7HtCn0qJvfQ575+8/P6PRI3u8rHLhp7CNVuFvdfysGRWEnWQet?=
- =?us-ascii?Q?NNJXbCg/RyUNqtp4Ue/JsBYU3ZtGM+BKggIMN/Lx07+30fLyXpTQQCiyEr/G?=
- =?us-ascii?Q?k1tb1KuBJyTZq1W64rlrjoo4x3P2N0ph4MMK4vhalvNhZl+z6+j/aY2rYHc2?=
- =?us-ascii?Q?vHNh73yzP41orJ7B1Ud8Fc6gRacMiwGSYmruiDenxFYIPiuykOUo2WAOY8dj?=
- =?us-ascii?Q?cXU0RI2P+WbYd6OAQoV3NIH37uaxojETsluEDKdmv4+NIEgMu3f/U21SdBej?=
- =?us-ascii?Q?buGREl/ntEv1xuqd3+7Q2Ki6LWn0dVfa3QP6J7BH6DFwn5C/YBcxi3I5V8IT?=
- =?us-ascii?Q?wwypZSR9GJcjHvNkX9KARSZDTwxkQz4i91YCuFOxJ414ilkL+YJeSwmFQzeN?=
- =?us-ascii?Q?v2XSsIHDzvqzv5UOnRNM0T9XFmmfBOzaEdEib9xn+wGnDP7G8PZVlCymQMPx?=
- =?us-ascii?Q?aP2HV2UFQUSZjvbljj04CJ1dVsp6yluhjhyuQmQ6njjVmPurJJN05+aCcO8U?=
- =?us-ascii?Q?JKthCvH9xo3hpfchKYQ+dUTrUuzf11u8c7tquhXvURh8Z6KPX4jIl5LiccrK?=
- =?us-ascii?Q?R3NuDpEQuon0HKnZXzGqKDcx2sNA/I2XH2d9dd0okr7i0yR8xfUByOnSiT8q?=
- =?us-ascii?Q?yJlPYbWFoZvCjqvxnfm9FqwXs9lOWgnfSdFIfM83a4ZI8GDs+4Bsu7kG83Lp?=
- =?us-ascii?Q?VElLlaFSruCJWCQMzn/O1p9J9wC690vg1kkB5OhJbYfaqrs0/9LnsQjD1iiC?=
- =?us-ascii?Q?Ec56pOdq/X13LPFal1qMmwnKlcr+V56OiAm0zrVQvzWmruue8WuTctV/tVr3?=
- =?us-ascii?Q?dZISknEWNPLvuk5kdwsilQLHuyL+JaTT7Z3bGyLRBlVD29g8gl+s69u5F+7Z?=
- =?us-ascii?Q?bGbfY0t+1ixYK1Xz90ehW/Doyi7TkWv3TenUQy6ymMMh0rbZ7IxipfPjB8py?=
- =?us-ascii?Q?TQD4Rnn07tzxP/pjKP4E+FH548vyvVaCZIYELYUrDcz1dcrt6twX42+GqSAr?=
- =?us-ascii?Q?IIclET7lhN5V6S3X+yHOJPRyHKSIpkSW7I2howGJWN6bZ/a9KTA+j6hpR/6H?=
- =?us-ascii?Q?aJUvnGXmgOtTWVndRDQGo1aqkgJxjbP98nrljg+5D32uyhnjkRttyVhngbnA?=
- =?us-ascii?Q?2wbaJC4GulJvO0xFG5P3fGLxxyA1Fyd9FpBfCpabI09F+g9XgYZfqQWlpmtn?=
- =?us-ascii?Q?rypjclI7r4neGrmHtr+On31KhTcJfIatmFqjVttsrg5c04ozcrrI8DRiqPrg?=
- =?us-ascii?Q?JtkDkFnEiPlAUnjhTtYO71FtxMRGn075peN0qbNdRm9E/A=3D=3D?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR11MB7965.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(376005)(366007)(38070700009);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?KSkHryjkjh2Vr8tEL0DlJzA60/eiEBNlTxvMfTBo6KcAgr8OSU2M6PMo82ky?=
- =?us-ascii?Q?GaL8/TWUcu5uPF3L55Uz9NKs6L2FjiZyfkE6AvvlFf58oZflkFoz2Nzrtnrw?=
- =?us-ascii?Q?KWt0B2cvWOh+JTk297TQEKdSRunoC+jZ4zV+DYZ+xD8mnvMQb+04ulPH1cj6?=
- =?us-ascii?Q?mzj1hzzadwbPGtelC8LsTI6Jo4DgVAbbvze6v9ggqnziqVix9o1O0NJ57emL?=
- =?us-ascii?Q?F3MikPDjtrRTE6s5Y8RZFM/p6O43O/yfdkV7dsIj7RkWbNEwdiapMEvENBXD?=
- =?us-ascii?Q?AHhMlt3LZ86TOuMatDVeyAzVirMF92q1hUak9OHDwPHPw3/nAesH6VGNa9+O?=
- =?us-ascii?Q?qc0JIDl/bML1sHwz8SmJcuaJ+rKEkg+ZzviMkbYHmF9MlrMTnEUlG/ElOpMA?=
- =?us-ascii?Q?8j3WL0paxUVWN0qAHXc6upljWkJ7yVFvr5uaJHgQ7TRUtyiXizt4KgJ9gA+0?=
- =?us-ascii?Q?Vb37jEEM8oZnC3NLKbbf9ZCMP9z/i01oZM26nkaPzD3hEHl90nTc1baj+qca?=
- =?us-ascii?Q?Y513vsUKZrCGw5up6eJVX0XgWBL2WM0200qpczpgNPQxpuUM4r/LSZhzwNZw?=
- =?us-ascii?Q?phjC0YV4bc7k8c8EbRVTZGy34Kky/mLokB+ffoKOB/556F2qR+E1OX1lE7/q?=
- =?us-ascii?Q?SKClaDJjcnic9UcONTntaFvXkM+t4HWi82kmeDZFeyMQTZJtkJ00Oc5cu+6K?=
- =?us-ascii?Q?7xyhHZyeTKQZvxnl9905+obNS26utglNl+JWcHPbXRfjSHDvZh/VR+O5rnzo?=
- =?us-ascii?Q?mQfhJlhQUKdvf+exZoUk2PhIy3k/FZDdzuU22oWo6az8ITn7pCr0AdrAFdPs?=
- =?us-ascii?Q?+KkaRkyu3AhjOU4+jETzgSotr3S9eCS0ha2b0mYp68b1ctK4pzYnM8hiAEUk?=
- =?us-ascii?Q?eHjG1V9sGiKNF47XUVQGo952wfRi3M2t/QNICMswKSweBFa+LUa+Zfmj5rQ4?=
- =?us-ascii?Q?Y4hUtWYLyj+dfREKWu1EZr+ruBJoMyQx9+tEQVM06yavXVeT04td7YLeDaUs?=
- =?us-ascii?Q?15niaQY+6mVaX1+cYYggoALa0t9LzvfuJmjkqYIUWtr0nVRiReYvnF5rhDRn?=
- =?us-ascii?Q?fDGjcnOLYOfQR7cNm+Q2qE8zd+fpmgQkL/AQ46yHyhdgVxV3INUn2Wd5MqQE?=
- =?us-ascii?Q?bRoIaCocEgpngOxZZx+wEDVBiaE918NDQqhVvUwUrvcFuwGdfpg5W1eGDOHH?=
- =?us-ascii?Q?QgiNRq4YpF3/U4jTKVhkI5Flx3fjD8ad/Y5hteiDgjf36Jeuu+LAN08lSxZN?=
- =?us-ascii?Q?RyOvwArFXdas5epQwK6RP4qebEJ+GPOHfnZs4tula3oyFjMpFq4fvuBM6iVI?=
- =?us-ascii?Q?iJu/7M498xpGarZmW7902O2NZUhDGS38FSoadv8ovePp/bPGy+4HEhnfZQbL?=
- =?us-ascii?Q?oqT24jkNHec6zAtfE2EdZTUhG9ikOlWsbVCEwACvfT34NV7TaFJd6sAZBmVy?=
- =?us-ascii?Q?yJZPTxLh6xFn2Dxo4U2rgSP5+LtnTqhJ/ZAhcFKgk8AJctc3vzFpBj6DK3RA?=
- =?us-ascii?Q?TRxxwcCyBdPxQcKPpf4Wt3kazncKJ8u4YNY0k6qi2+A3CqRqWkJv7DaPTMAB?=
- =?us-ascii?Q?8miERrjvfQsFeybHLsQ29TviL0ep5S75pxTXwdfhxJGtFTzlopjx1hUoiT9E?=
- =?us-ascii?Q?QQ=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A84D713AD25
+	for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 07:44:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1714117496; cv=none; b=c7bWwjqrdKyKc9bOpGOPquexcREc0HoOlXQX+sYUJ8fq2PbuQy2/EOnYuM+fg5fo7HsBbrpdIEkh0sZWeN4yEOQauuCZYEXvnOxsuRSMUgJmrc9PMAaB1YBM1pgNc8dzplwuh0vENk3xUdbxozzygdZM1kguGQ0wjNWGx4ZoCO0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1714117496; c=relaxed/simple;
+	bh=IAy3KSdWgKQ5Dy6jkMVe3ewR5lCzfv6BECAXxzU/b10=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=c7RlAU4avgxhPmdehEiujt07QCw5uYNSxZEBID3VaflVRetO/QxxvwnjOiC6nybbmSFbi+Wfn2ZQDiQkn/yqjRSWHFJg6AmgZ58QZUL5IAxtMuEHRRLFvyEG4TR8AKeM8uGzXV33a4JC4zFyXOpyi/q9n5NoMptJmGnzPs0U+AY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=oawk07lh; arc=none smtp.client-ip=209.85.208.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-571e13cd856so9312a12.0
+        for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 00:44:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1714117493; x=1714722293; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=A33BurzJz4OQByTITh6Ot1PgPb3FP3Ow3zWOTt8U/FQ=;
+        b=oawk07lhJBcKEp94xHEuT4kwtNRyk0fJ6jXQFmX8JTGtEEyc7zahwKQtM/GDNtSbIG
+         20DdU4UHCMpnTh1Vo4rSdKKs/2tg/iy0bjN1sfn7gkM+BHPJ0sX8XRdDIR/Q9I36g/R4
+         ryJVNu3Sk7JS4fB+FTlwJDi9VmTQ643IAMft3uJHrr9CFZFj1xFb9bxR2Bj1PfuMjyO9
+         o5DF/Le5mOmd4PImviZJzV6cTQCMPILS+DHAeRMSR5Yg0kET7UboBOHkkLJVnBaPEK42
+         4+mElj8jGyEZ42+pvJf5pQ892CRFDX7mOOX6Ss+B0sA7TPQNs4yLijQde8x/wevZfzqS
+         GnfQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714117493; x=1714722293;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=A33BurzJz4OQByTITh6Ot1PgPb3FP3Ow3zWOTt8U/FQ=;
+        b=Pzb5G2iNv3wBnb5naovVAr8gop0mBGCgO95BU47dXH8wnTndilHYa1DgejkSxHf6u9
+         SjKvJpq6+jrc2iBT3gmuI+TwmoZAaU81hqTpWEIbjXWAeE34yh/0pQnoEiOXM9wBJca5
+         7PsnBsNbrsDOy3Rsdvg6ozr0kqhrilZ1b6615fLCRe3SSZZt+b0bpQmdhNpW4sbo2O2C
+         M5WhWhnCS7bc5pC6QYsLMtczXZgtzfKm4bntOuyWs2Kt/H2ATuDWXGIiZ0SKEloG1b0C
+         pL7ss3JPGKngZTvj+WTydzCbSB7AR1cYTbUs4/BclocCoLkdzNu/v2JzUwAlQljd9GxH
+         fdfA==
+X-Gm-Message-State: AOJu0Yx1PImN9qWYmdzZ7OvA0KNL4f5mmoA0WZBD/I/tZ9FWFD37tsKs
+	uU2jevmtxhOJF4RG6YlvVmxh42uleA99WovnX7oOdiZvRHJA9e66rlzHHrBgV9IUf+QrO41GkSv
+	59G0E1o5GsGao8rFxpcoHlvc7xPceslaRwWohuMsrFVPctwvBFRzA
+X-Google-Smtp-Source: AGHT+IEk1uXUIDXCS1Qd6f2BzElPYf3TlvuOyrYn14Ix9f6DOldn8oT6ET0aMSrOaQ5UNNf8yUYn6CTwM5ZjbPhg3Ow=
+X-Received: by 2002:a05:6402:26cc:b0:572:57d8:4516 with SMTP id
+ x12-20020a05640226cc00b0057257d84516mr47477edd.2.1714117492798; Fri, 26 Apr
+ 2024 00:44:52 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH8PR11MB7965.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5aeac992-94ea-42f2-fb94-08dc65c49492
-X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Apr 2024 07:43:35.9992
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Ge0kKGnwaLHTj/SZoJBsD0o8Ow9zNrciGi3zxoJBH+TZicvBhwZOGOdD8eWelaBMkxdOLxGdZdZN6qU8Xn1allLtqjqMoUGrQ8FqIIHM7wQ=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR11MB6106
+References: <20240426065143.4667-1-nbd@nbd.name> <20240426065143.4667-3-nbd@nbd.name>
+In-Reply-To: <20240426065143.4667-3-nbd@nbd.name>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 26 Apr 2024 09:44:40 +0200
+Message-ID: <CANn89iJKfgQNNXUL10-7aVZTn+ttqvVNZbnKi6jCdQGwzbFFYQ@mail.gmail.com>
+Subject: Re: [PATCH v3 net-next v3 2/6] net: add support for segmenting TCP
+ fraglist GSO packets
+To: Felix Fietkau <nbd@nbd.name>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
+	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	willemdebruijn.kernel@gmail.com, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Agreed about the tradeoff.=20
+On Fri, Apr 26, 2024 at 8:51=E2=80=AFAM Felix Fietkau <nbd@nbd.name> wrote:
+>
+> Preparation for adding TCP fraglist GRO support. It expects packets to be
+> combined in a similar way as UDP fraglist GSO packets.
+> For IPv4 packets, NAT is handled in the same way as UDP fraglist GSO.
+>
+> Signed-off-by: Felix Fietkau <nbd@nbd.name>
+> ---
+>  net/ipv4/tcp_offload.c   | 65 ++++++++++++++++++++++++++++++++++++++++
+>  net/ipv6/tcpv6_offload.c |  3 ++
+>  2 files changed, 68 insertions(+)
+>
+> diff --git a/net/ipv4/tcp_offload.c b/net/ipv4/tcp_offload.c
+> index fab0973f995b..c493e95e09a5 100644
+> --- a/net/ipv4/tcp_offload.c
+> +++ b/net/ipv4/tcp_offload.c
+> @@ -28,6 +28,68 @@ static void tcp_gso_tstamp(struct sk_buff *skb, unsign=
+ed int ts_seq,
+>         }
+>  }
+>
+> +static void __tcpv4_gso_segment_csum(struct sk_buff *seg,
+> +                                    __be32 *oldip, __be32 *newip,
+> +                                    __be16 *oldport, __be16 *newport)
 
-From your previous entry in this thread:
->Renegotiation does take a little over 1s. It maybe not worth it for suspen=
-d to RAM. But for suspend to disk, a resume is probably going to take awhil=
-e, so maybe 1 second is less noticeable.
-With some of the partner PHYs we've used, specially when supporting higher =
-speeds such as 2.5G we had seen even much longer renegotiation times, reach=
-ing as much as 6-7 seconds in some cases. =20
 
-Raju,
-Due to the above and some of the other issues you mentioned you are facing =
-(i.e. undesired wakes on intermediate link changes that you would need to "=
-filter out" ) , I'd  rather not try to further optimize phy power consumpti=
-on by down-speeding the link at this time, and keep fast resume time and ov=
-erall simplicity the priority. If/when customers request it or power regula=
-tory norms (EU as mentioned by Andrew) make it a must have we can always re=
-visit it. That being said, after verifying wake functionality is correct as=
- the first priority, please do look into turning off anything in the LAN743=
-x  and PCI11x1x devices that is not needed while asleep before completing t=
-he suspend.
+Do we really need pointers for newip and newport ?
 
-Thanks,
-Ronnie=20
+> +{
+> +       struct tcphdr *th;
+> +       struct iphdr *iph;
+> +
+> +       if (*oldip =3D=3D *newip && *oldport =3D=3D *newport)
+> +               return;
+> +
+> +       th =3D tcp_hdr(seg);
+> +       iph =3D ip_hdr(seg);
+> +
+> +       inet_proto_csum_replace4(&th->check, seg, *oldip, *newip, true);
+> +       inet_proto_csum_replace2(&th->check, seg, *oldport, *newport, fal=
+se);
+> +       *oldport =3D *newport;
+> +
+> +       csum_replace4(&iph->check, *oldip, *newip);
+> +       *oldip =3D *newip;
+> +}
+> +
+> +static struct sk_buff *__tcpv4_gso_segment_list_csum(struct sk_buff *seg=
+s)
+> +{
+> +       struct sk_buff *seg;
+> +       struct tcphdr *th, *th2;
+> +       struct iphdr *iph, *iph2;
 
-> -----Original Message-----
-> From: Andrew Lunn <andrew@lunn.ch>
-> Sent: Thursday, April 25, 2024 10:13 AM
-> To: Raju Lakkaraju - I30499 <Raju.Lakkaraju@microchip.com>
-> Cc: netdev@vger.kernel.org; davem@davemloft.net; kuba@kernel.org; pabeni@=
-redhat.com;
-> edumazet@google.com; linux-kernel@vger.kernel.org; Bryan Whitehead - C219=
-58
-> <Bryan.Whitehead@microchip.com>; UNGLinuxDriver <UNGLinuxDriver@microchip=
-.com>
-> Subject: Re: [PATCH net V2 2/2] net: lan743x: support WOL in MAC even whe=
-n PHY does not
->=20
-> EXTERNAL EMAIL: Do not click links or open attachments unless you know th=
-e content is safe
->=20
-> > If PHY handles the magic packet or phy activity (i.e. WAKE_MAGIC or WAK=
-E_PHY), our PCI11x1x's
-> MAC will handle only interrupt (MDINT from PHY). Not MAC's magic packet.
-> > In this case do we really call phy_speed_down( ) ?
->=20
-> phy_speed_down() is orthogonal to who does the wake. Packets are packets.=
- phy_speed_down() does
-> not change that. All it does it drop the link to a slower speed. And slow=
-er speed means less power
-> consumption. A PHY operating at 10Mbps uses about 1W less power than a PH=
-Y operating at 1G. The
-> numbers will depend on the PHY, but you get the idea. Plus the link peer =
-will also save a similar amount
-> out power....
->=20
-> If the MAC is needed for WoL, because the PHY does not support the needed=
- modes, you probably also
-> save power with the MAC running at 10Mbps. Its clocks probably tick slowe=
-r, etc.
->=20
-> But there is a trade off. When resuming, you want to go back to the full =
-speed link. And that takes time,
-> a little over 1 second. So you need to decide, do you want to prioritise =
-minimum power consumption
-> when suspended, or fast resume?
->=20
->      Andrew
+I would probably add a const qualifier to th and iph
+
+> +
+> +       seg =3D segs;
+> +       th =3D tcp_hdr(seg);
+> +       iph =3D ip_hdr(seg);
+> +       th2 =3D tcp_hdr(seg->next);
+> +       iph2 =3D ip_hdr(seg->next);
+> +
+> +       if (!(*(u32 *)&th->source ^ *(u32 *)&th2->source) &&
+
+
+> +           iph->daddr =3D=3D iph2->daddr && iph->saddr =3D=3D iph2->sadd=
+r)
+> +               return segs;
+> +
+> +       while ((seg =3D seg->next)) {
+> +               th2 =3D tcp_hdr(seg);
+> +               iph2 =3D ip_hdr(seg);
+> +
+> +               __tcpv4_gso_segment_csum(seg,
+> +                                        &iph2->saddr, &iph->saddr,
+> +                                        &th2->source, &th->source);
+> +               __tcpv4_gso_segment_csum(seg,
+> +                                        &iph2->daddr, &iph->daddr,
+> +                                        &th2->dest, &th->dest);
+> +       }
+> +
+> +       return segs;
+> +}
+>
 
