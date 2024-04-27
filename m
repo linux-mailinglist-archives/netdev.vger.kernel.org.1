@@ -1,146 +1,107 @@
-Return-Path: <netdev+bounces-91897-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91898-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49C1C8B4662
-	for <lists+netdev@lfdr.de>; Sat, 27 Apr 2024 14:59:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 499288B4664
+	for <lists+netdev@lfdr.de>; Sat, 27 Apr 2024 15:06:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 086FA284214
-	for <lists+netdev@lfdr.de>; Sat, 27 Apr 2024 12:59:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AC4041F22D3D
+	for <lists+netdev@lfdr.de>; Sat, 27 Apr 2024 13:06:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D800338F91;
-	Sat, 27 Apr 2024 12:58:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 013C7481BD;
+	Sat, 27 Apr 2024 13:06:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="eOcCdVkH"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="u2VRpjfU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7033763B9;
-	Sat, 27 Apr 2024 12:58:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B0F7433BF
+	for <netdev@vger.kernel.org>; Sat, 27 Apr 2024 13:06:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714222736; cv=none; b=QKf8AmB2isr/EGYFHgyx0i3P698icT1jMnOQdrT2iBt92aCkaRBM5Ss73ptNO1J3k6c3X0dtsmYYEgrRlFKPud1BTKArNMxNvq5z4S90iIQJ43Ee6TmBgwV2RQttq+GX4XFll/lzoLPRNM6YPWVsJW8RyGgRRPn1f6KuXcP+GFQ=
+	t=1714223205; cv=none; b=CtSvs578YQ2TiO3PTkgG78S9bQQ0LW+353br37Ynu7BnX/ohGu5Y6BGL9UrOse0CCEAfVIKbLziOD3lhb9MUTk4I4X0pLR1jjvLpaoGBDn4QLmgmLc5sZZ6zbWhyTniZB3M7TrOpnl5G13vGNZ0Y4JeoVfTM2ZBbaasfDPae33E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714222736; c=relaxed/simple;
-	bh=oGWx1uPQ3L1tVyWtUhcgy+p+cBF1ON8qmwJmbS5l0rs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ijiKFrNhcfZiFvQ/B7guhnMJEjZUl+gPmoDiILLC/QGdw6OuFR7XGV2463oqQfxdLu5HcLoeLMM7Ih06iJJOv9KzYmmr9tKlutslfxD2H1lLKBagEqO42sPnorj6mHzVrwZTT+ugOejLjiW2dBm+8Q1+IAUnCwYioIb+IheDowE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=eOcCdVkH; arc=none smtp.client-ip=193.104.135.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
-Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
-	by mail1.fiberby.net (Postfix) with ESMTPSA id 9A780600A2;
-	Sat, 27 Apr 2024 12:58:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
-	s=202008; t=1714222724;
-	bh=oGWx1uPQ3L1tVyWtUhcgy+p+cBF1ON8qmwJmbS5l0rs=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=eOcCdVkH9QkkaReDzhH5sqAdvN7pqyP5n7w8sRDliQ6IJ3doaxuzotk8klsknOnzR
-	 qq/GFsIljj8Od/MnJMISHzR25JyGw5X5bvkVdwxjJn/FOFNhjIAjpkFRP8ygSgzIGC
-	 9tjXA45iIE3kzaKX9LMqLH7FZu8S3hFgiAKX/GUmf+fIhO4W85Nyf7uWbWV8rkd8QQ
-	 Rjqx3M4y5pS1k7NIbykfLTYa3aiDNOo75Uc+RG5DW0SdbrxFCNRHnHA8o2Z1NIcvOp
-	 5WbdU09i5qmevBX6W6lJY1z2hT4qElte4jMV8uO0Zq1IVPd0UEDRBDnAhgq4+CyQuf
-	 FIvmVpdMYt+IA==
-Received: from [127.0.0.1] (localhost [127.0.0.1])
-	by x201s (Postfix) with ESMTP id 5626120257D;
-	Sat, 27 Apr 2024 12:58:38 +0000 (UTC)
-Message-ID: <ab165657-2c69-4b30-a371-6ad7fd28c539@fiberby.net>
-Date: Sat, 27 Apr 2024 12:58:38 +0000
+	s=arc-20240116; t=1714223205; c=relaxed/simple;
+	bh=leQrtatoiZ3Ha5OIk+geZJctYZOo/BVugVNXiKy/0Vs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ZjeO43ETSJd5rJgs0S7pSVZ9e9koPlqGc3WEgh1rRBRkwr0B9AHi7yyPiyjcTbKYFILHOS8scslPdNCUeiCHlYysxsLJ2x+iouUGY5MHE5/toeTv+e4nX9TqEVAxdmOO0BvGt0ohAjw2JW2nwL84pxJk/uuzoKZtwIZceSLb4yQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=u2VRpjfU; arc=none smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5722eb4f852so3811a12.0
+        for <netdev@vger.kernel.org>; Sat, 27 Apr 2024 06:06:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1714223203; x=1714828003; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uQUL5fl18WL0ZKXvOjs5LrQEgdQrTnHGFv8AkEWwYJ8=;
+        b=u2VRpjfUuRUrIxwjQCp3oKYVGWP1j7V2ufd+CZ2U8iY294lLoA+Eo8EVhcKqlSxNeE
+         yQi+GSBlSoTlmgzZjRBKFUD4ZdtJVxBZbFgr3QxW77eSWBLrg2qaKyTPE++GJzjICaKn
+         aPWbIjHPqD5jyI7eZk62fsuHnPaW8Q9B/9n/+fG+Gozhwketwb8uHx9SMNgBXrHKuG1D
+         9fwBduJND8+AzJgEfErIRyIDfkktMAGLZ1Q6ZZq8PGfU/geiQ3Ei7RirTJPTJMSafx3P
+         iDIVbLPYsGOKrUFk3yUMKnQAxco8nTp9VqpNnOsicoprOfzn+ELKXR7gCMtewdXWeAon
+         e7UA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714223203; x=1714828003;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=uQUL5fl18WL0ZKXvOjs5LrQEgdQrTnHGFv8AkEWwYJ8=;
+        b=fq2odbuGHpFyKg/EV9Tc0fLEA4Y3M1cHQrT3HFrnWYj8cRfI+obpH/11/Ocr/T9j/t
+         dOz+8LSzvtadfRq/YrCDF8+e5BvkH2tFqbIRUv9oi6z0uL7NxDzvozgk+qgZ8nxgH9NG
+         BUVsaTY0WqOHnS8A28SkFLFZHocFc/inCq3qvirp+IzMppt0+C7Fc9QyNZkGavLLRQ3a
+         p73nbFp4Js8WAvjKp4cCwYQRQ7j1dDBr7cmLoQCT834eIUzebRnE8h+5JkGFluNdwq0A
+         0+xUZTdqlPwoqcsYM7Im80/5dykL+tVqCVJzhSlhKOnBfkXRodcvRdSv3cGk0P3ZJ0By
+         ODxQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXqmATTMuc4KIiF2SXsqhMB/kFObysrnqKLHf9cAkobVEKPWq4HDH8S3FG1x5SeZNjW9s2EBPudBNE2i2inGKunzn8C5xmH
+X-Gm-Message-State: AOJu0YyjmSZk+bN+g5Eog7cDwJxyCLJSqN3aI38BcNFjxwvnsu3ffzgZ
+	Q4q6nspeZWjh2TstVo8oWyADD9wI3OHlbShhZZyrko5IEKrsgYIIX4K4GXAISuKEzRXrx7UNsG1
+	eOwbEqEHQkoE6GD1U+BRYdafT98ZEycuoyG4S
+X-Google-Smtp-Source: AGHT+IGWABgpAh73R+Nkuk9KHLNNB1TVJVsPGK9UUOMNEL4x+Ak23xL+y1CGqbsru3TcKWbCtlDHHgk4rv5VJgNTfKs=
+X-Received: by 2002:aa7:c6c9:0:b0:572:fae:7f96 with SMTP id
+ b9-20020aa7c6c9000000b005720fae7f96mr93652eds.6.1714223202418; Sat, 27 Apr
+ 2024 06:06:42 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 0/4] net: qede: avoid overruling error codes
-To: Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Ariel Elior <aelior@marvell.com>, Manish Chopra <manishc@marvell.com>,
- Jiri Pirko <jiri@resnulli.us>, Pablo Neira Ayuso <pablo@netfilter.org>
-References: <20240426091227.78060-1-ast@fiberby.net>
- <20240427114813.GG516117@kernel.org>
-Content-Language: en-US
-From: =?UTF-8?Q?Asbj=C3=B8rn_Sloth_T=C3=B8nnesen?= <ast@fiberby.net>
-In-Reply-To: <20240427114813.GG516117@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20240424203713.4003974-1-miaxu@meta.com>
+In-Reply-To: <20240424203713.4003974-1-miaxu@meta.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Sat, 27 Apr 2024 15:06:31 +0200
+Message-ID: <CANn89i+HO59Sxwu2fhrKOJCX_3DjOPp+os0LOO3TjvrTdvEiyQ@mail.gmail.com>
+Subject: Re: [PATCH 1/2] [PATCH net-next,1/2] Add new args for cong_control in tcp_congestion_ops
+To: Miao Xu <miaxu@meta.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>, Martin Lau <kafai@meta.com>, 
+	netdev@vger.kernel.org, bpf@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Simon,
+On Wed, Apr 24, 2024 at 10:38=E2=80=AFPM Miao Xu <miaxu@meta.com> wrote:
+>
+> This patch adds two new arguments for cong_control of struct
+> tcp_congestion_ops:
+>  - ack
+>  - flag
+> These two arguments are inherited from the caller tcp_cong_control in
+> tcp_intput.c. One use case of them is to update cwnd and pacing rate
+> inside cong_control based on the info they provide. For example, the
+> flag can be used to decide if it is the right time to raise or reduce a
+> sender's cwnd.
+>
+> Another change in this patch is to allow the write of tp->snd_cwnd_stamp
+> for a bpf tcp ca program. An use case of writing this field is to keep
+> track of the time whenever tp->snd_cwnd is raised or reduced inside the
+> cong_control callback.
+>
+> Signed-off-by: Miao Xu <miaxu@meta.com>
 
-Thank you for your review effort.
-
-On 4/27/24 11:48 AM, Simon Horman wrote:
-> On Fri, Apr 26, 2024 at 09:12:22AM +0000, Asbjørn Sloth Tønnesen wrote:
->> This series fixes the qede driver, so that
->> qede_parse_flow_attr() and it's subfunctions
->> doesn't get their error codes overruled
->> (ie. turning -EOPNOTSUPP into -EINVAL).
->>
->> ---
->> I have two more patches along the same lines,
->> but they are not yet causing any issues,
->> so I have them destined for net-next.
->> (those are for qede_flow_spec_validate_unused()
->> and qede_flow_parse_ports().)
->>
->> After that I have a series for converting to
->> extack + the final one for validating control
->> flags.
-> 
-> Hi,
-> 
-> I'm fine with these patches so far as the code changes go.
-> But it is not clear to me that they are fixing a bug.
-> 
-> If so, I think some explanation should go in the commit messages.
-> If not, I think these should be targeted at net-next
-> (and not have Fixes tags.
-
-Since I don't have the hardware I didn't try to construct commands, showing
-the wrong error code being returned. I could make up some hypothetical commands,
-and simulate how they would error. I assumed that the bug, was clear based on
-the list of possible return values for each function.
-
-As an example, in qede_parse_flow_attr() it validates dissector->used_keys,
-and if an unsupported FLOW_DISSECTOR_KEY_* is set, then ede_parse_flow_attr()
-returns -EOPNOTSUPP, which is returned to qede_add_tc_flower_fltr(),
-and only check for non-zero, and since -EOPNOTSUPP is non zero,
-then it returns -EINVAL. So if you try to match on a vlan tag,
-then FLOW_DISSECTOR_KEY_VLAN would be set, and cause a -EOPNOTSUPP
-to be returned, which then gets converted into a -EINVAL.
-
-All drivers generally returns -EOPNOTSUPP in their used_keys checks, and
-this driver clearly intended to do that as well.
-
-The -EINVAL override was introduced in the same commit as the above check,
-so it was broken from the start.
-
-Another example is 319a1d19471e (blamed in 4th patch), Jiri added
-a call to flow_action_basic_hw_stats_types_check() across multiple drivers,
-and since -EINVAL was returned only a few lines above, then he assumed
-that he could just return -EOPNOTSUPP, but that return value gets overruled
-into a -EINVAL. It is clear from the commit that Jiri intended to return
--EOPNOTSUPP, but this part of the driver didn't follow the principle of
-least astonishment, so that function could only fail with -EINVAL.
-
-I think it's a bug, when another error code is returned than the one that
-was clearly intended, but it's properly a low impact one.
-
-
-> Also, if you do end posting a v2, blamed, is misspelt several
-> times in commit messages.
-
-Sorry about that, will fix that if a v2 turns out to be needed.
-
--- 
-Best regards
-Asbjørn Sloth Tønnesen
-Network Engineer
-Fiberby - AS42541
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
