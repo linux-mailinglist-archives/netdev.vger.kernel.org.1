@@ -1,54 +1,56 @@
-Return-Path: <netdev+bounces-91945-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91946-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E18B88B47D1
-	for <lists+netdev@lfdr.de>; Sat, 27 Apr 2024 22:22:35 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0AFA8B4814
+	for <lists+netdev@lfdr.de>; Sat, 27 Apr 2024 22:41:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AD8121C20B76
-	for <lists+netdev@lfdr.de>; Sat, 27 Apr 2024 20:22:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1E932B214DA
+	for <lists+netdev@lfdr.de>; Sat, 27 Apr 2024 20:41:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F9441448E4;
-	Sat, 27 Apr 2024 20:22:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF624128365;
+	Sat, 27 Apr 2024 20:41:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PkYNMRet"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="eycmWNk8"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1916F23A6;
-	Sat, 27 Apr 2024 20:22:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3671523A6;
+	Sat, 27 Apr 2024 20:41:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714249351; cv=none; b=ZQmgCDcQAUR9V/EdUurtOd9XOyGIfS+DIbeTQY5+4qZBx6hubm7NG5IOnm4I+xn12uFAOiUdx1Vppv1sjnMPZgeV6S8NZOS3C2NTqmij4vFONSydpoWKT8iK7GF8eMwqZOuWkJuJ8mkx5tjeo+jYbQEfQiVT76tWy9fEUbWckj0=
+	t=1714250481; cv=none; b=URVJnPP3ldFZd0qKbBPPAm/IBoSXlMZA5yCxTWtnPS2bZbe5t9YJ0AaM2srjxMdOAb5uZUMu5qFGpBqLD38j1Jmu5NbfAt7d2aT/WbZt3aEGwF9+XhKblkeQo1vH7IGEFZJcZ6lxwfvnCld3vim4CWZuIafsqQmZNZjixxmE0Gc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714249351; c=relaxed/simple;
-	bh=LDjuDNnpc9lFvXeRQ8z4w2g/YhjMM5pK9irt+42ZJIA=;
+	s=arc-20240116; t=1714250481; c=relaxed/simple;
+	bh=4eyrROfeUeXZ1E/5bYqP9k5RTs62PAIZOFOjco+9aTs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MSxOh9nSWzs6rKFT05RpRNp2YQQV7jeSUniZI80F8Ody/squPbs2O57hr6tzdWEPf75TB5LT5HVy/EPGUNu20HkNEoDgptzHDiQ4rPX/7gOHykWeDLRNbItDjVMNkMlYXWX1LaLn4G5LBQhjBoBGz3IIkl7uDpORxbIkcfvV6ak=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PkYNMRet; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B935C113CE;
-	Sat, 27 Apr 2024 20:22:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714249350;
-	bh=LDjuDNnpc9lFvXeRQ8z4w2g/YhjMM5pK9irt+42ZJIA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=PkYNMRetqWM78vJ7xyZc5gRS9Cpqww62DSeZjJFWgUlflt8ECQcXP2AMRCdm2ZaGy
-	 OeTObP6A6pSQUUBrG1cJyfwvhTXL7AA2xcmIGfQFH7ZvXN4bgl52EJanexmHcFCDnh
-	 CW8uqah6piwWYMraHUK0JhTeVBo8Ge6euLLsHzZhYc8uug0l4/Jg+qH6xB3bv69HZt
-	 71JcZkDla0vAeAx7dJA29I2TCif7+fRH1OVf+y/tDi/A3gtTxD3gbda0Y73C9HyF2A
-	 kABY+0OodVVW+z07IE/Vcpoh7BCzoW0w9AbdwMo/+7EHpwIPU1TNj5pl4ZpQN59Y1/
-	 0eMbrJ3atrcTQ==
-Date: Sat, 27 Apr 2024 21:22:23 +0100
-From: Conor Dooley <conor@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Jts2RCbuixIODfRNHQKUJAeyB63ShqkWIhjBYoO51CL4Gd6ulCcl3SPDZFA1tjh4AaGgVSGG6hH8CKZX0GpaT58qHQDJXZKsTFArWS4jPv8lksfNppKQXCudANCTaQXI/NhQN3Kh+kHP+J8OBms2yqXudVvE+poOgnw2zRRZ9Yg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=eycmWNk8; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=ld+uHtgFt97ApwykW28eoE43v0b9A3xe0ERkCZIcfio=; b=ey
+	cmWNk8M6OukDwEBLzO5aoM0hJir2pzjZuluS3gyTAoc/cLbBfhIDzVYJtcuHevMEganX+mXSogiUL
+	rkIPdxmihbFIGFheEqjymAK/ZH6kQ0smN2+gceMjL6dpj9kNtBjST6X4mCH9iR9n32mqk5m/BtFsO
+	GqcX6dUyDh8feGc=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1s0oqr-00E9yX-Vn; Sat, 27 Apr 2024 22:40:53 +0200
+Date: Sat, 27 Apr 2024 22:40:53 +0200
+From: Andrew Lunn <andrew@lunn.ch>
 To: =?iso-8859-1?Q?Ram=F3n?= Nordin Rodriguez <ramon.nordin.rodriguez@ferroamp.se>
 Cc: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>,
 	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
 	pabeni@redhat.com, horms@kernel.org, saeedm@nvidia.com,
 	anthony.l.nguyen@intel.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, andrew@lunn.ch, corbet@lwn.net,
+	linux-kernel@vger.kernel.org, corbet@lwn.net,
 	linux-doc@vger.kernel.org, robh+dt@kernel.org,
 	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
 	devicetree@vger.kernel.org, horatiu.vultur@microchip.com,
@@ -59,92 +61,63 @@ Cc: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>,
 	benjamin.bigler@bernformulastudent.ch
 Subject: Re: [PATCH net-next v4 11/12] microchip: lan865x: add driver support
  for Microchip's LAN865X MAC-PHY
-Message-ID: <20240427-attention-negate-a3b6ede708d7@spud>
+Message-ID: <e89272b1-7780-4a91-888d-27ae7242f881@lunn.ch>
 References: <20240418125648.372526-1-Parthiban.Veerasooran@microchip.com>
  <20240418125648.372526-12-Parthiban.Veerasooran@microchip.com>
  <Zi1PxgANUWh1S0sO@builder>
- <20240427-vaporizer-pencil-be6a25030f08@spud>
- <Zi1cbScrKzFN3PNT@builder>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="Ht22igVR9zkqfURh"
-Content-Disposition: inline
-In-Reply-To: <Zi1cbScrKzFN3PNT@builder>
-
-
---Ht22igVR9zkqfURh
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <Zi1PxgANUWh1S0sO@builder>
 
-On Sat, Apr 27, 2024 at 10:13:33PM +0200, Ram=F3n Nordin Rodriguez wrote:
-> On Sat, Apr 27, 2024 at 08:57:43PM +0100, Conor Dooley wrote:
-> > >  static const struct of_device_id lan865x_dt_ids[] =3D {
-> > > -       { .compatible =3D "microchip,lan8651", "microchip,lan8650" },
-> >=20
-> > Huh, that's very strange. I don't see a single instance in the tree of a
-> > of_device_id struct like this with two compatibles like this (at least
-> > with a search of `rg "\.compatible.*\", \"" drivers/`.
-> >=20
-> > Given the fallbacks in the binding, only "microchip,lan8650" actually
-> > needs to be here.
-> >=20
-> > > +       { .compatible =3D "microchip,lan865x", "microchip,lan8650" },
-> > >         { /* Sentinel */ }
-> > >  };
-> > >  MODULE_DEVICE_TABLE(of, lan865x_dt_ids);
-> > >=20
-> > > Along with compatible =3D "microchip,lan865x" in the dts
-> >=20
-> > Just to be clear, the compatible w/ an x is unacceptable due to the
-> > wildcard and the binding should stay as-is. Whatever probing bugs
-> > the code has need to be resolved instead :)
-> >=20
->=20
-> All right, so when I change to
->=20
+On Sat, Apr 27, 2024 at 09:19:34PM +0200, Ramón Nordin Rodriguez wrote:
+> Hi,
+> 
+> For me the mac driver fails to probe with the following log
+> [    0.123325] SPI driver lan865x has no spi_device_id for microchip,lan8651
+> 
+> With this change the driver probes
+> 
+> diff --git a/drivers/net/ethernet/microchip/lan865x/lan865x.c b/drivers/net/ethernet/microchip/lan865x/lan865x.c
+> index 9abefa8b9d9f..72a663f14f50 100644
+> --- a/drivers/net/ethernet/microchip/lan865x/lan865x.c
+> +++ b/drivers/net/ethernet/microchip/lan865x/lan865x.c
 > @@ -364,7 +364,7 @@ static void lan865x_remove(struct spi_device *spi)
 >  }
->=20
->  static const struct of_device_id lan865x_dt_ids[] =3D {
-> -       { .compatible =3D "microchip,lan8651", "microchip,lan8650" },
-> +       { .compatible =3D "microchip,lan8650" },
+> 
+>  static const struct of_device_id lan865x_dt_ids[] = {
+> -       { .compatible = "microchip,lan8651", "microchip,lan8650" },
+> +       { .compatible = "microchip,lan865x", "microchip,lan8650" },
 >         { /* Sentinel */ }
 >  };
->  MODULE_DEVICE_TABLE(of, lan865x_dt_ids);
->=20
-> I still get the output
-> [    0.124266] SPI driver lan865x has no spi_device_id for microchip,lan8=
-650
-> But the driver does probe and I get a network interface.
->=20
-> If no one beats me to it I'll single step the probe tomorrow.
 
-I think the error pretty much is what it says it is, the driver doesn't
-appear to have a spi_device_id table containing lan8650. The name of
-the driver is lan685x which is used in the fallback clause in
-__spi_register_driver(), so it complains as it does not find lan8650 in
-either. If my understanding is correct, either a spi_device_id table is
-required or the driver needs a rename with s/x/0/.
+The device tree binding says:
 
-Cheers,
-Conor.
++  compatible:
++    oneOf:
++      - const: microchip,lan8650
++      - items:
++          - const: microchip,lan8651
++          - const: microchip,lan8650
 
---Ht22igVR9zkqfURh
-Content-Type: application/pgp-signature; name="signature.asc"
+So your DT node should either be:
 
------BEGIN PGP SIGNATURE-----
+compatible = "microchip,lan8651", "microchip,lan8650";
 
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZi1efwAKCRB4tDGHoIJi
-0jDsAP0cItUc6sedwNS3eRcU7KmYLY9HiiA9Ch9O5PlNtGXuWQEArfmeqLOOooG1
-PK0PZHRsFJKKp9IKbHS+rjwURy4eFgg=
-=s9NR
------END PGP SIGNATURE-----
+or
 
---Ht22igVR9zkqfURh--
+compatible = "microchip,lan8650"
+
+There is no mention of lan865x in the binding, so this patch is
+clearly wrong.
+
+What do you have in your DT node?
+
+     Andrew
 
