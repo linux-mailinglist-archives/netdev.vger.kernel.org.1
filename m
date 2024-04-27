@@ -1,135 +1,96 @@
-Return-Path: <netdev+bounces-91895-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91896-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D82418B4636
-	for <lists+netdev@lfdr.de>; Sat, 27 Apr 2024 13:40:50 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D10AD8B463D
+	for <lists+netdev@lfdr.de>; Sat, 27 Apr 2024 13:48:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 82CA61F26497
-	for <lists+netdev@lfdr.de>; Sat, 27 Apr 2024 11:40:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2A0E4B23B60
+	for <lists+netdev@lfdr.de>; Sat, 27 Apr 2024 11:48:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D6124AEF8;
-	Sat, 27 Apr 2024 11:40:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8076A4C626;
+	Sat, 27 Apr 2024 11:48:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="dXILapqo"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CTNfEdu/"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CA834EB30;
-	Sat, 27 Apr 2024 11:40:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54C721E52C;
+	Sat, 27 Apr 2024 11:48:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714218037; cv=none; b=jBlARM9TIb3H3euhdE1I+5WFpvunSAHtIrki18IbtCxwFVwsImnbO4UBLSGtjAVBxlOsWh7xbLHPkSq9qReiqpMBYW9a3PIX/ryw9VNGr6yjEpHPW+U+NaabWGR6RB5vCG5D9hBTHb/BBkjyoLEYDfJ2Ih2q++W73tJeE0PGWqg=
+	t=1714218498; cv=none; b=X+V/kg5B4X3eOOwY9RfiWNNgnGgIJrtjuvhd+z6wsFS2imhIgdk/AyDd0Ody9Hhp8NEfBrUD2QVBmBYXWPQy8PGIldrm/jyGk3vBkGFvtFHKNKUZJbsdakk2GLTeWYYprkphcIVkxI3H3zJh5UGfTuSn/gRo+QocvkmM8BR/7+4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714218037; c=relaxed/simple;
-	bh=qHnjax+wVI8Hd0+8rGo+MaTwitn/56tGJ2azAOki7Mg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Sa8M7CP/zo8gumlgngm9oMU/t6NL9zUOWw5Ry9wtIUpallUqDtPVJHoyfEwOQo2kan3plSh/8zVCeu+5oW7ve+P1diA2VFGNXi5t2bFJYCPtVfvOQvqwCZWiS9z60VfRzkj+SNVIgfv+Ya9aMKEpiEXMhRcXvSIzmwsfbkPaRnU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com; spf=pass smtp.mailfrom=arinc9.com; dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b=dXILapqo; arc=none smtp.client-ip=217.70.183.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arinc9.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 531CAFF808;
-	Sat, 27 Apr 2024 11:40:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
-	t=1714218032;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4Th/jadybDrg9puHNEAFgBTKzp4XwtZa5abxeCTq37w=;
-	b=dXILapqokkWTzyMm9VzvUN0Z6dDfxO9bU7rAgTMNYEXK7vDiqfCJOABQZ4wsL8UcT7QWRN
-	jHStMUmtR4NGqxAIVmKyYQCTm7kYSJyyFbBGgmO8xQ6a8llHGyGM0/M7dIWsZx3SmJ+dVM
-	jfwSs6oJIXKl9GDK3XXR9ZLcYyjhZWQJL4gRAASonKr8RLzzIup0GeZ769avxKj/8A+BN6
-	plqCU1JU/CgzUCLIzCPLAbyN3s1mM9zFbyRqpY8UNsytedIj1B/uivC67tjUDfM06txK7s
-	27Zqd4MZnhMSpciumma0VibwqY9aZ9/ZDzUu3w4C8djBGmBVdLoGKTU0/q8pwA==
-Message-ID: <f7af9006-492c-473a-bc77-054d85c6284a@arinc9.com>
-Date: Sat, 27 Apr 2024 14:40:01 +0300
+	s=arc-20240116; t=1714218498; c=relaxed/simple;
+	bh=HQxRaUraETKiT/XSDc967hn9ZV8LY4HtqHBIMVLyIJk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qtf6Cxp78Hy920CZfB1B84unnvhbZdj2mx56zXYCkulpdde6DKx20v5HyDgzV92vjHJEYOge4+F2mVoe9RtBPewC1EvZ9WIIltfC/BzlbDcOMZaEOmbe3jWHx7Il6xEugRdA7vn4PCkB6uKhpxMdulVL73VYMX1xrHuVTbx4ibs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CTNfEdu/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57044C113CE;
+	Sat, 27 Apr 2024 11:48:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714218497;
+	bh=HQxRaUraETKiT/XSDc967hn9ZV8LY4HtqHBIMVLyIJk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=CTNfEdu/AEHEWUzmxyB3MNb04hhRjFpqcz3VQSKdxFxDe64tuOx1ZWv2nUY/ly0J6
+	 oYYPuOpP4Lpo2utP1A0NPmCzM06xmsDu65Hf/QsZisb9GebnRbff7UdoCWwNASppeP
+	 wilehLazCJ9ds0o4dnL7HAF1xgTqiJHTkntKj8L5ef9RjWnqW5296rFpk5bQ3axP5z
+	 SEuUl78hMrld9SbuZK3Y6nYAPtFR9oF31Dqu4r24fHzw7mczs6gKT2rkDaW4x+2PUa
+	 hydhyVmtBAqtoqEABSVnFJV7GmmhJLbzF61gSdK9awObZDl5uLMurTN/MHHl1SkEdo
+	 4T8k1fshfeBAw==
+Date: Sat, 27 Apr 2024 12:48:13 +0100
+From: Simon Horman <horms@kernel.org>
+To: =?utf-8?Q?Asbj=C3=B8rn_Sloth_T=C3=B8nnesen?= <ast@fiberby.net>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Ariel Elior <aelior@marvell.com>,
+	Manish Chopra <manishc@marvell.com>, Jiri Pirko <jiri@resnulli.us>,
+	Pablo Neira Ayuso <pablo@netfilter.org>
+Subject: Re: [PATCH net 0/4] net: qede: avoid overruling error codes
+Message-ID: <20240427114813.GG516117@kernel.org>
+References: <20240426091227.78060-1-ast@fiberby.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 07/15] net: dsa: mt7530: move MT753X_MTRAP
- operations for MT7530
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: DENG Qingfang <dqfext@gmail.com>, Sean Wang <sean.wang@mediatek.com>,
- Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
- Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Russell King <linux@armlinux.org.uk>,
- Bartel Eerdekens <bartel.eerdekens@constell8.be>, mithat.guner@xeront.com,
- erkin.bozoglu@xeront.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org
-References: <20240422-for-netnext-mt7530-improvements-4-v2-0-a75157ba76ad@arinc9.com>
- <20240422-for-netnext-mt7530-improvements-4-v2-7-a75157ba76ad@arinc9.com>
- <Zixh0qsQat3ypqFp@makrotopia.org>
-Content-Language: en-US
-From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-In-Reply-To: <Zixh0qsQat3ypqFp@makrotopia.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-GND-Sasl: arinc.unal@arinc9.com
+In-Reply-To: <20240426091227.78060-1-ast@fiberby.net>
 
-On 27.04.2024 05:24, Daniel Golle wrote:
-> Hi Arınç,
+On Fri, Apr 26, 2024 at 09:12:22AM +0000, Asbjørn Sloth Tønnesen wrote:
+> This series fixes the qede driver, so that
+> qede_parse_flow_attr() and it's subfunctions
+> doesn't get their error codes overruled
+> (ie. turning -EOPNOTSUPP into -EINVAL).
 > 
-> On Mon, Apr 22, 2024 at 10:15:14AM +0300, Arınç ÜNAL via B4 Relay wrote:
->> From: Arınç ÜNAL <arinc.unal@arinc9.com>
->>
->> On MT7530, the media-independent interfaces of port 5 and 6 are controlled
->> by the MT7530_P5_DIS and MT7530_P6_DIS bits of the hardware trap. Deal with
->> these bits only when the relevant port is being enabled or disabled. This
->> ensures that these ports will be disabled when they are not in use.
->>
->> Do not set MT7530_CHG_TRAP on mt7530_setup_port5() as that's already being
->> done on mt7530_setup().
+> ---
+> I have two more patches along the same lines,
+> but they are not yet causing any issues,
+> so I have them destined for net-next.
+> (those are for qede_flow_spec_validate_unused()
+> and qede_flow_parse_ports().)
 > 
-> Multiple users reported ([1], [2]) that after I've imported the series
-> to OpenWrt they noticed that WAN connection on MT7621 boards using
-> PHY-muxing to hook up either port 0 or port 4 to GMAC1 no longer works.
-> 
-> The link still seems to come up, but no data flows. I went ahead and
-> confirmed the bug, then started bisecting the patches of this series,
-> and ended up identifying this very patch being the culprit.
-> 
-> I can't exclude that what ever the issue may be is caused by other
-> downstream patches we have, but can confirm that removing this patch of
-> your series [3] in OpenWrt fixes the issue. Please take a look and as
-> the cover letter states you have tested this on some MT7621 board,
-> please make sure traffic actually flows on the PHY-muxed port on that
-> board after this patch is applied, and if not, please figure out why and
-> repost a fixed version of this patch.
-> 
-> 
-> Cheers
-> 
-> 
-> Daniel
-> 
-> [1]: https://github.com/openwrt/openwrt/issues/15273
-> [2]: https://github.com/openwrt/openwrt/issues/15279
-> [3]: https://git.openwrt.org/?p=openwrt/openwrt.git;a=commit;h=a8dde7e5bd6d289db6485cf57d3512ea62eaa827
+> After that I have a series for converting to
+> extack + the final one for validating control
+> flags.
 
-Thanks for reporting this Daniel. I am not happy that I've caused all this
-fuss. My testing as described on the cover letter did not include the
-hardware design with PHY muxing. Lesson learned; next time, I'll make sure
-to test the specific hardware design when I work on the part of the code
-that would affect that hardware design.
+Hi,
 
-That said, I've submitted a patch that fixes this issue [1]. I have tested
-the hardware design with PHY muxing with this fix applied and I don't
-experience this issue anymore.
+I'm fine with these patches so far as the code changes go.
+But it is not clear to me that they are fixing a bug.
 
-[1] https://lore.kernel.org/netdev/20240427-for-netnext-mt7530-do-not-disable-port5-when-phy-muxing-v1-1-793cdf9d7707@arinc9.com/
+If so, I think some explanation should go in the commit messages.
+If not, I think these should be targeted at net-next
+(and not have Fixes tags.
 
-Arınç
+Also, if you do end posting a v2, blamed, is misspelt several
+times in commit messages.
 
