@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-91946-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91947-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0AFA8B4814
-	for <lists+netdev@lfdr.de>; Sat, 27 Apr 2024 22:41:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D501C8B4821
+	for <lists+netdev@lfdr.de>; Sat, 27 Apr 2024 22:58:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1E932B214DA
-	for <lists+netdev@lfdr.de>; Sat, 27 Apr 2024 20:41:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 90A0228204C
+	for <lists+netdev@lfdr.de>; Sat, 27 Apr 2024 20:58:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF624128365;
-	Sat, 27 Apr 2024 20:41:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77763144D2F;
+	Sat, 27 Apr 2024 20:58:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="eycmWNk8"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="l6MH/6rX"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3671523A6;
-	Sat, 27 Apr 2024 20:41:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B28F83BB47;
+	Sat, 27 Apr 2024 20:58:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714250481; cv=none; b=URVJnPP3ldFZd0qKbBPPAm/IBoSXlMZA5yCxTWtnPS2bZbe5t9YJ0AaM2srjxMdOAb5uZUMu5qFGpBqLD38j1Jmu5NbfAt7d2aT/WbZt3aEGwF9+XhKblkeQo1vH7IGEFZJcZ6lxwfvnCld3vim4CWZuIafsqQmZNZjixxmE0Gc=
+	t=1714251504; cv=none; b=EvILNKLym4Ic67WGOMGwlLI4gdgbNsQDeZ+vDM8qdba+cABOb+X/57XcfJyp+fzB+/NuOb1YHHQNjJGyOS+VoQ8x1PfEwk+TGWxaN2h63hKfkpr6rT3KKgdzWnGOibYgQcw5lXaO0jpyLhObX/j4fiD6dsjgFKX5BsJFk7MQF8Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714250481; c=relaxed/simple;
-	bh=4eyrROfeUeXZ1E/5bYqP9k5RTs62PAIZOFOjco+9aTs=;
+	s=arc-20240116; t=1714251504; c=relaxed/simple;
+	bh=12E5+m8WVS7UFjCvrrWn7Mcwu6k2ZqsOWomh6iStPTY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Jts2RCbuixIODfRNHQKUJAeyB63ShqkWIhjBYoO51CL4Gd6ulCcl3SPDZFA1tjh4AaGgVSGG6hH8CKZX0GpaT58qHQDJXZKsTFArWS4jPv8lksfNppKQXCudANCTaQXI/NhQN3Kh+kHP+J8OBms2yqXudVvE+poOgnw2zRRZ9Yg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=eycmWNk8; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=hmFcb36gvqw2h3N0XJxrXqa33fgzICuQuua0jYrCj9Xvoi//DkHSCfrn0XfevI2tPp26EZhc3h8s/KuzM+uQ8Hi4rTFuJc6gijFzHepZJDKxoEh7QbOv5bsJ6bp4hNXi9nQfyT2C158h6W81STza549viNfPAWv9L1HKOeUpBF4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=l6MH/6rX; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,14 +36,14 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
 	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
 	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=ld+uHtgFt97ApwykW28eoE43v0b9A3xe0ERkCZIcfio=; b=ey
-	cmWNk8M6OukDwEBLzO5aoM0hJir2pzjZuluS3gyTAoc/cLbBfhIDzVYJtcuHevMEganX+mXSogiUL
-	rkIPdxmihbFIGFheEqjymAK/ZH6kQ0smN2+gceMjL6dpj9kNtBjST6X4mCH9iR9n32mqk5m/BtFsO
-	GqcX6dUyDh8feGc=;
+	In-Reply-To:References; bh=O/bTlpjmn7jvv06zXkXwL7+2GnLGg8WPp/qSEgcnySE=; b=l6
+	MH/6rX/78seSbNTNrk2jUqdjFOLStFuJIIeupkVy4LvoA6VsFf0E3QsBkGCw72GAT+CkaxZe6nHPO
+	BvFx0PPphMg0J90YCYePpgzULbvASU3EDrHfMjAc9sUOXEdZ/lpR1TWOZE/Aw2BtdNJjnfKLCWzsh
+	4vjXDOUvDyZcHLw=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1s0oqr-00E9yX-Vn; Sat, 27 Apr 2024 22:40:53 +0200
-Date: Sat, 27 Apr 2024 22:40:53 +0200
+	id 1s0p7X-00E9zz-Q3; Sat, 27 Apr 2024 22:58:07 +0200
+Date: Sat, 27 Apr 2024 22:58:07 +0200
 From: Andrew Lunn <andrew@lunn.ch>
 To: =?iso-8859-1?Q?Ram=F3n?= Nordin Rodriguez <ramon.nordin.rodriguez@ferroamp.se>
 Cc: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>,
@@ -61,10 +61,10 @@ Cc: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>,
 	benjamin.bigler@bernformulastudent.ch
 Subject: Re: [PATCH net-next v4 11/12] microchip: lan865x: add driver support
  for Microchip's LAN865X MAC-PHY
-Message-ID: <e89272b1-7780-4a91-888d-27ae7242f881@lunn.ch>
+Message-ID: <50b7cb69-61c0-45a2-9a48-4160b2d1e24c@lunn.ch>
 References: <20240418125648.372526-1-Parthiban.Veerasooran@microchip.com>
  <20240418125648.372526-12-Parthiban.Veerasooran@microchip.com>
- <Zi1PxgANUWh1S0sO@builder>
+ <Zi1Tang5RQMmEFdx@builder>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,50 +74,28 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <Zi1PxgANUWh1S0sO@builder>
+In-Reply-To: <Zi1Tang5RQMmEFdx@builder>
 
-On Sat, Apr 27, 2024 at 09:19:34PM +0200, Ramón Nordin Rodriguez wrote:
-> Hi,
+On Sat, Apr 27, 2024 at 09:35:06PM +0200, Ramón Nordin Rodriguez wrote:
+> I'm running a dual lan8650 setup, neither IC passed the sw reset in the
+> oa_tc.c module, I need to pull the reset pin low to reset the pin before
+> the rest of the init stuff happens.
 > 
-> For me the mac driver fails to probe with the following log
-> [    0.123325] SPI driver lan865x has no spi_device_id for microchip,lan8651
-> 
-> With this change the driver probes
-> 
-> diff --git a/drivers/net/ethernet/microchip/lan865x/lan865x.c b/drivers/net/ethernet/microchip/lan865x/lan865x.c
-> index 9abefa8b9d9f..72a663f14f50 100644
-> --- a/drivers/net/ethernet/microchip/lan865x/lan865x.c
-> +++ b/drivers/net/ethernet/microchip/lan865x/lan865x.c
-> @@ -364,7 +364,7 @@ static void lan865x_remove(struct spi_device *spi)
->  }
-> 
->  static const struct of_device_id lan865x_dt_ids[] = {
-> -       { .compatible = "microchip,lan8651", "microchip,lan8650" },
-> +       { .compatible = "microchip,lan865x", "microchip,lan8650" },
->         { /* Sentinel */ }
->  };
+> The datasheet recommends not doing a sw reset, excerpt from section
+> 4.1.1.3 Software Reset
+> "Note: The SW_RESET bit of the Clause 22 Basic Control register will reset only the internal PHY, not
+> the entire device. This PHY only reset is not recommended for use. If such a reset is detected, by
+> reading the RESETC bit of the STS2 register, reset the entire device."
 
-The device tree binding says:
+That is not so good. The PHY driver does not know the PHY is embedded
+within another device. It has no idea of RESETC bit in STS2. Looking
+at the phy driver, i don't actually seeing it using
+genphy_soft_reset(). Do you see a code path where this could actually
+be an issue?
 
-+  compatible:
-+    oneOf:
-+      - const: microchip,lan8650
-+      - items:
-+          - const: microchip,lan8651
-+          - const: microchip,lan8650
-
-So your DT node should either be:
-
-compatible = "microchip,lan8651", "microchip,lan8650";
-
-or
-
-compatible = "microchip,lan8650"
-
-There is no mention of lan865x in the binding, so this patch is
-clearly wrong.
-
-What do you have in your DT node?
+Supporting a hardware reset does however make sense. It would be best
+if you submitted a proper clean patch. It can be added to the end of
+this series, keeping you as author.
 
      Andrew
 
