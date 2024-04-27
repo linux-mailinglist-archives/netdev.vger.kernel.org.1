@@ -1,387 +1,135 @@
-Return-Path: <netdev+bounces-91894-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91895-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 833A58B4621
-	for <lists+netdev@lfdr.de>; Sat, 27 Apr 2024 13:31:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D82418B4636
+	for <lists+netdev@lfdr.de>; Sat, 27 Apr 2024 13:40:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0D1751F219C1
-	for <lists+netdev@lfdr.de>; Sat, 27 Apr 2024 11:31:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 82CA61F26497
+	for <lists+netdev@lfdr.de>; Sat, 27 Apr 2024 11:40:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A68994C3CD;
-	Sat, 27 Apr 2024 11:31:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D6124AEF8;
+	Sat, 27 Apr 2024 11:40:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="YZps4iP4"
+	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="dXILapqo"
 X-Original-To: netdev@vger.kernel.org
-Received: from forward205a.mail.yandex.net (forward205a.mail.yandex.net [178.154.239.88])
+Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48E4945C18;
-	Sat, 27 Apr 2024 11:31:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.88
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CA834EB30;
+	Sat, 27 Apr 2024 11:40:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714217505; cv=none; b=ju5d+0xU9uGqvbox+1nAXYwLncqZgC0ZDWn6sL3ts000pfQ8yx42xMA3JHt/ZGiQKOk2hW0a1X8P0w/FyQh3gXNYI2Re28PZT5LYlRZb5del1U3/Vbt7t3Pu/vUYPGzjm9Ab7OwBw/HJGo487oGwwb77D7etl4TeyYFJttmAbAg=
+	t=1714218037; cv=none; b=jBlARM9TIb3H3euhdE1I+5WFpvunSAHtIrki18IbtCxwFVwsImnbO4UBLSGtjAVBxlOsWh7xbLHPkSq9qReiqpMBYW9a3PIX/ryw9VNGr6yjEpHPW+U+NaabWGR6RB5vCG5D9hBTHb/BBkjyoLEYDfJ2Ih2q++W73tJeE0PGWqg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714217505; c=relaxed/simple;
-	bh=rGiiYWN0bwz8S7WshuQ1nUQQHIR1C44r//9xZQ8agl8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=K0djdXOo1IncBXu5e40ZmpQN0PG6OiXQa9R1IsrMXkAKlRV9XWNstCYt18PBdSfyITExXIERlnaodtkZOCAChoSFVhUkUHh/BiUEKVmJ2KAK3aVCLfGlj7248no9Ldwf4iRaMVAqXjUHJ8kRNk/QFn6nPFlNN0jNP4fssfg2qVY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=YZps4iP4; arc=none smtp.client-ip=178.154.239.88
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
-Received: from forward100a.mail.yandex.net (forward100a.mail.yandex.net [IPv6:2a02:6b8:c0e:500:1:45:d181:d100])
-	by forward205a.mail.yandex.net (Yandex) with ESMTPS id 80A27667F1;
-	Sat, 27 Apr 2024 14:25:10 +0300 (MSK)
-Received: from mail-nwsmtp-smtp-production-main-51.vla.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-51.vla.yp-c.yandex.net [IPv6:2a02:6b8:c0d:2a02:0:640:77d9:0])
-	by forward100a.mail.yandex.net (Yandex) with ESMTPS id 9BCFC46D54;
-	Sat, 27 Apr 2024 14:25:02 +0300 (MSK)
-Received: by mail-nwsmtp-smtp-production-main-51.vla.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id uOMFvPQXlqM0-AesOqMtr;
-	Sat, 27 Apr 2024 14:25:01 +0300
-X-Yandex-Fwd: 1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
-	t=1714217101; bh=7Tx4MmiVvo3dc9P2ErVjG5tVev7EKB9T5e2ufGJi1cs=;
-	h=Message-ID:Date:In-Reply-To:Cc:Subject:References:To:From;
-	b=YZps4iP4CGkv2ggh0f3DO0HVDeqSwgnYAErWpgIjxVz/CDvq7BdKyxmpEAld8lg+E
-	 hnwVE3pUtohKTItUyHDqP1R3Qk7WcvA13W+/BXBAaX2ojROpq1xcvd38EoKRciX9pj
-	 PnVbkTIm0i5XS36BksrJwJ9Dt6JcHom4DEHFosIg=
-Authentication-Results: mail-nwsmtp-smtp-production-main-51.vla.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
-From: Stas Sergeev <stsp2@yandex.ru>
-To: linux-kernel@vger.kernel.org
-Cc: Stas Sergeev <stsp2@yandex.ru>,
-	Stefan Metzmacher <metze@samba.org>,
-	Eric Biederman <ebiederm@xmission.com>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Andy Lutomirski <luto@kernel.org>,
-	Christian Brauner <brauner@kernel.org>,
-	Jan Kara <jack@suse.cz>,
-	Jeff Layton <jlayton@kernel.org>,
-	Chuck Lever <chuck.lever@oracle.com>,
-	Alexander Aring <alex.aring@gmail.com>,
-	David Laight <David.Laight@ACULAB.COM>,
-	linux-fsdevel@vger.kernel.org,
-	linux-api@vger.kernel.org,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	=?UTF-8?q?Christian=20G=C3=B6ttsche?= <cgzones@googlemail.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Pavel Begunkov <asml.silence@gmail.com>,
-	linux-arch@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH v6 2/3] open: add O_CRED_ALLOW flag
-Date: Sat, 27 Apr 2024 14:24:50 +0300
-Message-ID: <20240427112451.1609471-3-stsp2@yandex.ru>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20240427112451.1609471-1-stsp2@yandex.ru>
-References: <20240427112451.1609471-1-stsp2@yandex.ru>
+	s=arc-20240116; t=1714218037; c=relaxed/simple;
+	bh=qHnjax+wVI8Hd0+8rGo+MaTwitn/56tGJ2azAOki7Mg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Sa8M7CP/zo8gumlgngm9oMU/t6NL9zUOWw5Ry9wtIUpallUqDtPVJHoyfEwOQo2kan3plSh/8zVCeu+5oW7ve+P1diA2VFGNXi5t2bFJYCPtVfvOQvqwCZWiS9z60VfRzkj+SNVIgfv+Ya9aMKEpiEXMhRcXvSIzmwsfbkPaRnU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com; spf=pass smtp.mailfrom=arinc9.com; dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b=dXILapqo; arc=none smtp.client-ip=217.70.183.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arinc9.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 531CAFF808;
+	Sat, 27 Apr 2024 11:40:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
+	t=1714218032;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=4Th/jadybDrg9puHNEAFgBTKzp4XwtZa5abxeCTq37w=;
+	b=dXILapqokkWTzyMm9VzvUN0Z6dDfxO9bU7rAgTMNYEXK7vDiqfCJOABQZ4wsL8UcT7QWRN
+	jHStMUmtR4NGqxAIVmKyYQCTm7kYSJyyFbBGgmO8xQ6a8llHGyGM0/M7dIWsZx3SmJ+dVM
+	jfwSs6oJIXKl9GDK3XXR9ZLcYyjhZWQJL4gRAASonKr8RLzzIup0GeZ769avxKj/8A+BN6
+	plqCU1JU/CgzUCLIzCPLAbyN3s1mM9zFbyRqpY8UNsytedIj1B/uivC67tjUDfM06txK7s
+	27Zqd4MZnhMSpciumma0VibwqY9aZ9/ZDzUu3w4C8djBGmBVdLoGKTU0/q8pwA==
+Message-ID: <f7af9006-492c-473a-bc77-054d85c6284a@arinc9.com>
+Date: Sat, 27 Apr 2024 14:40:01 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 07/15] net: dsa: mt7530: move MT753X_MTRAP
+ operations for MT7530
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: DENG Qingfang <dqfext@gmail.com>, Sean Wang <sean.wang@mediatek.com>,
+ Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
+ Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Russell King <linux@armlinux.org.uk>,
+ Bartel Eerdekens <bartel.eerdekens@constell8.be>, mithat.guner@xeront.com,
+ erkin.bozoglu@xeront.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org
+References: <20240422-for-netnext-mt7530-improvements-4-v2-0-a75157ba76ad@arinc9.com>
+ <20240422-for-netnext-mt7530-improvements-4-v2-7-a75157ba76ad@arinc9.com>
+ <Zixh0qsQat3ypqFp@makrotopia.org>
+Content-Language: en-US
+From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+In-Reply-To: <Zixh0qsQat3ypqFp@makrotopia.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-GND-Sasl: arinc.unal@arinc9.com
 
-This flag prevents an fd from being passed via unix socket, and
-makes it to be always closed on exec().
+On 27.04.2024 05:24, Daniel Golle wrote:
+> Hi Arınç,
+> 
+> On Mon, Apr 22, 2024 at 10:15:14AM +0300, Arınç ÜNAL via B4 Relay wrote:
+>> From: Arınç ÜNAL <arinc.unal@arinc9.com>
+>>
+>> On MT7530, the media-independent interfaces of port 5 and 6 are controlled
+>> by the MT7530_P5_DIS and MT7530_P6_DIS bits of the hardware trap. Deal with
+>> these bits only when the relevant port is being enabled or disabled. This
+>> ensures that these ports will be disabled when they are not in use.
+>>
+>> Do not set MT7530_CHG_TRAP on mt7530_setup_port5() as that's already being
+>> done on mt7530_setup().
+> 
+> Multiple users reported ([1], [2]) that after I've imported the series
+> to OpenWrt they noticed that WAN connection on MT7621 boards using
+> PHY-muxing to hook up either port 0 or port 4 to GMAC1 no longer works.
+> 
+> The link still seems to come up, but no data flows. I went ahead and
+> confirmed the bug, then started bisecting the patches of this series,
+> and ended up identifying this very patch being the culprit.
+> 
+> I can't exclude that what ever the issue may be is caused by other
+> downstream patches we have, but can confirm that removing this patch of
+> your series [3] in OpenWrt fixes the issue. Please take a look and as
+> the cover letter states you have tested this on some MT7621 board,
+> please make sure traffic actually flows on the PHY-muxed port on that
+> board after this patch is applied, and if not, please figure out why and
+> repost a fixed version of this patch.
+> 
+> 
+> Cheers
+> 
+> 
+> Daniel
+> 
+> [1]: https://github.com/openwrt/openwrt/issues/15273
+> [2]: https://github.com/openwrt/openwrt/issues/15279
+> [3]: https://git.openwrt.org/?p=openwrt/openwrt.git;a=commit;h=a8dde7e5bd6d289db6485cf57d3512ea62eaa827
 
-Selftest is added to check for both properties.
+Thanks for reporting this Daniel. I am not happy that I've caused all this
+fuss. My testing as described on the cover letter did not include the
+hardware design with PHY muxing. Lesson learned; next time, I'll make sure
+to test the specific hardware design when I work on the part of the code
+that would affect that hardware design.
 
-It is needed for the subsequent OA2_CRED_INHERIT addition, to work
-as an "opt-in" for the new cred-inherit functionality. Without using
-O_CRED_ALLOW when opening dir fd, OA2_CRED_INHERIT is going to return
-EPERM.
+That said, I've submitted a patch that fixes this issue [1]. I have tested
+the hardware design with PHY muxing with this fix applied and I don't
+experience this issue anymore.
 
-Signed-off-by: Stas Sergeev <stsp2@yandex.ru>
+[1] https://lore.kernel.org/netdev/20240427-for-netnext-mt7530-do-not-disable-port5-when-phy-muxing-v1-1-793cdf9d7707@arinc9.com/
 
-CC: Eric Biederman <ebiederm@xmission.com>
-CC: Alexander Viro <viro@zeniv.linux.org.uk>
-CC: Christian Brauner <brauner@kernel.org>
-CC: Jan Kara <jack@suse.cz>
-CC: Andy Lutomirski <luto@kernel.org>
-CC: David Laight <David.Laight@ACULAB.COM>
-CC: Arnd Bergmann <arnd@arndb.de>
-CC: "David S. Miller" <davem@davemloft.net>
-CC: Eric Dumazet <edumazet@google.com>
-CC: Jakub Kicinski <kuba@kernel.org>
-CC: Paolo Abeni <pabeni@redhat.com>
-CC: Jens Axboe <axboe@kernel.dk>
-CC: Kuniyuki Iwashima <kuniyu@amazon.com>
-CC: Pavel Begunkov <asml.silence@gmail.com>
-CC: linux-arch@vger.kernel.org
-CC: netdev@vger.kernel.org
-CC: linux-fsdevel@vger.kernel.org
-CC: linux-kernel@vger.kernel.org
-CC: linux-api@vger.kernel.org
----
- fs/fcntl.c                                |   2 +-
- fs/file.c                                 |  15 +--
- include/linux/fcntl.h                     |   2 +-
- include/uapi/asm-generic/fcntl.h          |   5 +
- net/core/scm.c                            |   5 +
- tools/testing/selftests/core/Makefile     |   2 +-
- tools/testing/selftests/core/cred_allow.c | 139 ++++++++++++++++++++++
- 7 files changed, 160 insertions(+), 10 deletions(-)
- create mode 100644 tools/testing/selftests/core/cred_allow.c
-
-diff --git a/fs/fcntl.c b/fs/fcntl.c
-index 54cc85d3338e..78c96b1293c2 100644
---- a/fs/fcntl.c
-+++ b/fs/fcntl.c
-@@ -1039,7 +1039,7 @@ static int __init fcntl_init(void)
- 	 * Exceptions: O_NONBLOCK is a two bit define on parisc; O_NDELAY
- 	 * is defined as O_NONBLOCK on some platforms and not on others.
- 	 */
--	BUILD_BUG_ON(21 - 1 /* for O_RDONLY being 0 */ !=
-+	BUILD_BUG_ON(22 - 1 /* for O_RDONLY being 0 */ !=
- 		HWEIGHT32(
- 			(VALID_OPEN_FLAGS & ~(O_NONBLOCK | O_NDELAY)) |
- 			__FMODE_EXEC | __FMODE_NONOTIFY));
-diff --git a/fs/file.c b/fs/file.c
-index 3b683b9101d8..2a09d5276676 100644
---- a/fs/file.c
-+++ b/fs/file.c
-@@ -827,22 +827,23 @@ void do_close_on_exec(struct files_struct *files)
- 	/* exec unshares first */
- 	spin_lock(&files->file_lock);
- 	for (i = 0; ; i++) {
-+		int j;
- 		unsigned long set;
- 		unsigned fd = i * BITS_PER_LONG;
- 		fdt = files_fdtable(files);
- 		if (fd >= fdt->max_fds)
- 			break;
- 		set = fdt->close_on_exec[i];
--		if (!set)
--			continue;
- 		fdt->close_on_exec[i] = 0;
--		for ( ; set ; fd++, set >>= 1) {
--			struct file *file;
--			if (!(set & 1))
--				continue;
--			file = fdt->fd[fd];
-+		for (j = 0; j < BITS_PER_LONG; j++, fd++, set >>= 1) {
-+			struct file *file = fdt->fd[fd];
- 			if (!file)
- 				continue;
-+			/* Close all cred-allow files. */
-+			if (file->f_flags & O_CRED_ALLOW)
-+				set |= 1;
-+			if (!(set & 1))
-+				continue;
- 			rcu_assign_pointer(fdt->fd[fd], NULL);
- 			__put_unused_fd(files, fd);
- 			spin_unlock(&files->file_lock);
-diff --git a/include/linux/fcntl.h b/include/linux/fcntl.h
-index a332e79b3207..e074ee9c1e36 100644
---- a/include/linux/fcntl.h
-+++ b/include/linux/fcntl.h
-@@ -10,7 +10,7 @@
- 	(O_RDONLY | O_WRONLY | O_RDWR | O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC | \
- 	 O_APPEND | O_NDELAY | O_NONBLOCK | __O_SYNC | O_DSYNC | \
- 	 FASYNC	| O_DIRECT | O_LARGEFILE | O_DIRECTORY | O_NOFOLLOW | \
--	 O_NOATIME | O_CLOEXEC | O_PATH | __O_TMPFILE)
-+	 O_NOATIME | O_CLOEXEC | O_PATH | __O_TMPFILE | O_CRED_ALLOW)
- 
- /* List of all valid flags for the how->resolve argument: */
- #define VALID_RESOLVE_FLAGS \
-diff --git a/include/uapi/asm-generic/fcntl.h b/include/uapi/asm-generic/fcntl.h
-index 80f37a0d40d7..9244c54bb933 100644
---- a/include/uapi/asm-generic/fcntl.h
-+++ b/include/uapi/asm-generic/fcntl.h
-@@ -89,6 +89,11 @@
- #define __O_TMPFILE	020000000
- #endif
- 
-+#ifndef O_CRED_ALLOW
-+/* On parisc bit 23 is taken. On alpha bit 24 is also taken. Try bit 25. */
-+#define O_CRED_ALLOW	0200000000
-+#endif
-+
- /* a horrid kludge trying to make sure that this will fail on old kernels */
- #define O_TMPFILE (__O_TMPFILE | O_DIRECTORY)
- 
-diff --git a/net/core/scm.c b/net/core/scm.c
-index 9cd4b0a01cd6..f54fb0ee9727 100644
---- a/net/core/scm.c
-+++ b/net/core/scm.c
-@@ -111,6 +111,11 @@ static int scm_fp_copy(struct cmsghdr *cmsg, struct scm_fp_list **fplp)
- 			fput(file);
- 			return -EINVAL;
- 		}
-+		/* don't allow files with creds */
-+		if (file->f_flags & O_CRED_ALLOW) {
-+			fput(file);
-+			return -EPERM;
-+		}
- 		if (unix_get_socket(file))
- 			fpl->count_unix++;
- 
-diff --git a/tools/testing/selftests/core/Makefile b/tools/testing/selftests/core/Makefile
-index ce262d097269..347a5a9d3f29 100644
---- a/tools/testing/selftests/core/Makefile
-+++ b/tools/testing/selftests/core/Makefile
-@@ -1,7 +1,7 @@
- # SPDX-License-Identifier: GPL-2.0-only
- CFLAGS += -g $(KHDR_INCLUDES)
- 
--TEST_GEN_PROGS := close_range_test
-+TEST_GEN_PROGS := close_range_test cred_allow
- 
- include ../lib.mk
- 
-diff --git a/tools/testing/selftests/core/cred_allow.c b/tools/testing/selftests/core/cred_allow.c
-new file mode 100644
-index 000000000000..07d533207a2c
---- /dev/null
-+++ b/tools/testing/selftests/core/cred_allow.c
-@@ -0,0 +1,139 @@
-+// SPDX-License-Identifier: GPL-2.0
-+#include <errno.h>
-+#include <fcntl.h>
-+#include <sched.h>
-+#include <stdio.h>
-+#include <stdbool.h>
-+#include <sys/stat.h>
-+#include <sys/syscall.h>
-+#include <sys/types.h>
-+#include <sys/wait.h>
-+#include <sys/socket.h>
-+#include <time.h>
-+#include <unistd.h>
-+#include <string.h>
-+
-+#include "../kselftest.h"
-+
-+#ifndef O_CRED_ALLOW
-+#define O_CRED_ALLOW 0x2000000
-+#endif
-+
-+enum { FD_NORM, FD_CE, FD_CA, FD_MAX };
-+
-+static int is_opened(int n)
-+{
-+	char buf[256];
-+
-+	snprintf(buf, sizeof(buf), "/proc/self/fd/%d", n);
-+	return (access(buf, F_OK) == 0);
-+}
-+
-+/* Sends an FD on a UNIX socket. Returns 0 on success or -errno. */
-+static int send_fd(int usock, int fd_tx)
-+{
-+	union {
-+		/* Aligned ancillary data buffer. */
-+		char buf[CMSG_SPACE(sizeof(fd_tx))];
-+		struct cmsghdr _align;
-+	} cmsg_tx = {};
-+	char data_tx = '.';
-+	struct iovec io = {
-+		.iov_base = &data_tx,
-+		.iov_len = sizeof(data_tx),
-+	};
-+	struct msghdr msg = {
-+		.msg_iov = &io,
-+		.msg_iovlen = 1,
-+		.msg_control = &cmsg_tx.buf,
-+		.msg_controllen = sizeof(cmsg_tx.buf),
-+	};
-+	struct cmsghdr *cmsg = CMSG_FIRSTHDR(&msg);
-+
-+	cmsg->cmsg_len = CMSG_LEN(sizeof(fd_tx));
-+	cmsg->cmsg_level = SOL_SOCKET;
-+	cmsg->cmsg_type = SCM_RIGHTS;
-+	memcpy(CMSG_DATA(cmsg), &fd_tx, sizeof(fd_tx));
-+
-+	if (sendmsg(usock, &msg, 0) < 0)
-+		return -errno;
-+	return 0;
-+}
-+
-+int main(int argc, char *argv[], char *env[])
-+{
-+	int status;
-+	int err;
-+	pid_t pid;
-+	int socket_fds[2];
-+	int fds[FD_MAX];
-+#define NFD(n) ((n) + 3)
-+#define FD_OK(n) (NFD(n) == fds[n] && is_opened(fds[n]))
-+
-+	if (argc > 1 && strcmp(argv[1], "--child") == 0) {
-+		int nfd = 0;
-+		ksft_print_msg("we are child\n");
-+		ksft_set_plan(3);
-+		nfd += is_opened(NFD(FD_NORM));
-+		ksft_test_result(nfd == 1, "normal fd opened\n");
-+		nfd += is_opened(NFD(FD_CE));
-+		ksft_test_result(nfd == 1, "O_CLOEXEC fd closed\n");
-+		nfd += is_opened(NFD(FD_CA));
-+		ksft_test_result(nfd == 1, "O_CRED_ALLOW fd closed\n");
-+		/* exit with non-zero status propagates to parent's failure */
-+		ksft_finished();
-+		return 0;
-+	}
-+
-+	ksft_set_plan(7);
-+
-+	fds[FD_NORM] = open("/proc/self/exe", O_RDONLY);
-+	fds[FD_CE] = open("/proc/self/exe", O_RDONLY | O_CLOEXEC);
-+	fds[FD_CA] = open("/proc/self/exe", O_RDONLY | O_CRED_ALLOW);
-+	ksft_test_result(FD_OK(FD_NORM), "regular open\n");
-+	ksft_test_result(FD_OK(FD_CE), "O_CLOEXEC open\n");
-+	ksft_test_result(FD_OK(FD_CA), "O_CRED_ALLOW open\n");
-+
-+	err = socketpair(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0, socket_fds);
-+	if (err) {
-+		ksft_perror("socketpair() failed");
-+		ksft_exit_fail_msg("socketpair\n");
-+		return 1;
-+	}
-+	err = send_fd(socket_fds[0], fds[FD_NORM]);
-+	ksft_test_result(err == 0, "normal fd sent\n");
-+	err = send_fd(socket_fds[0], fds[FD_CE]);
-+	ksft_test_result(err == 0, "O_CLOEXEC fd sent\n");
-+	err = send_fd(socket_fds[0], fds[FD_CA]);
-+	ksft_test_result(err == -EPERM, "O_CRED_ALLOW fd not sent, EPERM\n");
-+	close(socket_fds[0]);
-+	close(socket_fds[1]);
-+
-+	pid = fork();
-+	if (pid < 0) {
-+		ksft_perror("fork() failed");
-+		ksft_exit_fail_msg("fork\n");
-+		return 1;
-+	}
-+
-+	if (pid == 0) {
-+		char *cargv[] = {"cred_allow", "--child", NULL};
-+
-+		execve("/proc/self/exe", cargv, env);
-+		ksft_perror("execve() failed");
-+		ksft_exit_fail_msg("execve\n");
-+		return 1;
-+	}
-+
-+	if (waitpid(pid, &status, 0) != pid) {
-+		ksft_perror("waitpid() failed");
-+		ksft_exit_fail_msg("waitpid\n");
-+		return 1;
-+	}
-+	ksft_print_msg("back to parent\n");
-+
-+	ksft_test_result(status == 0, "child success\n");
-+
-+	ksft_finished();
-+	return 0;
-+}
--- 
-2.44.0
-
+Arınç
 
