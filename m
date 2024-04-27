@@ -1,54 +1,64 @@
-Return-Path: <netdev+bounces-91912-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91913-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6A5E8B4699
-	for <lists+netdev@lfdr.de>; Sat, 27 Apr 2024 16:16:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E9AB8B46B6
+	for <lists+netdev@lfdr.de>; Sat, 27 Apr 2024 16:56:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 81412283148
-	for <lists+netdev@lfdr.de>; Sat, 27 Apr 2024 14:16:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5FEA91C21120
+	for <lists+netdev@lfdr.de>; Sat, 27 Apr 2024 14:56:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A2C94F8A3;
-	Sat, 27 Apr 2024 14:16:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6112F631;
+	Sat, 27 Apr 2024 14:56:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EX72Qtxz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IoeVlFHN"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 425784F889;
-	Sat, 27 Apr 2024 14:16:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38EA91DA23;
+	Sat, 27 Apr 2024 14:56:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714227402; cv=none; b=drDm1xxAw9oUCQeRkFC7R68Xz6rJTOJL4igG9ctLZd4Y9jqFXfholVpZSWaqdK8Vy/I29uJ4777h7N3fIxTypDFw51nuPh/FcAkFR8is+30Nu9d7ebK2wFommNIplYWaPdw9YghRGWiR1M2aBg0VUEw/fs187Z5cYyL2tuoKCSQ=
+	t=1714229770; cv=none; b=aqL5Teizo6bSys1hDvm2NOpdqEmolJh9SMiCHmNBl4FwXL4p4D4GvpNSinLorShApDaLTVs6kfB17Ez/Fgcg1kHErt9TplEeqv6RUUIXsvTDdA0It6e2bXA7CmKBxT1TKcs9INoE8DlYF7teC73ML1ibuZzzsmic8c6gePx0gHg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714227402; c=relaxed/simple;
-	bh=s9YKAQy10BvdqFgbzq0HlhBSESg8PHKRRzpR+7pCxEA=;
+	s=arc-20240116; t=1714229770; c=relaxed/simple;
+	bh=2keqNmf75GCNlX26W+pv3/N2abISiBK9T2meqhf2yKg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MPja4QnitUtCb5ypCbxgri+b5in/t2qDFhHTpSzFAc/FihE4MSnzTpfBh1oX7vZhGVKyeMKDlsN4x8ePgkPZlQ8rgM5Y2/bwD1q8PhnjIEYm/VQ5fSLrDLftRjZzDfMZqioN/uwbYm+OlDzf+5sauJeu2DX1YsZ/Bq2O1diDNO8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EX72Qtxz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 33720C113CE;
-	Sat, 27 Apr 2024 14:16:41 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=Fgn7KdRXfiaqfKCMcDAiLN++fydkQKnSSqWcPoGSupS30T0ueLkNHQ1ToBjAOwLvGEnwZ6oWArP4Rs2VtbVQyR6ToA6VjtwrArSG9sDcBSuaN4h0H262OZDobE7ImNTVcXkedx3FZltwwzSEHNgEcsBBFRU79smMS3Jhw4c0it0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IoeVlFHN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D3D69C2BD10;
+	Sat, 27 Apr 2024 14:56:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714227402;
-	bh=s9YKAQy10BvdqFgbzq0HlhBSESg8PHKRRzpR+7pCxEA=;
+	s=k20201202; t=1714229769;
+	bh=2keqNmf75GCNlX26W+pv3/N2abISiBK9T2meqhf2yKg=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=EX72Qtxzh5E5rEb5amGJJko79zSx2pMrS+SHEmGGU5PA3r9VURDkffPfaq9o86YXj
-	 kXMcAACE6nowHup54Oc4RmVaOLdnya4tBgNfMKqL5QlhE65PMshLdmMsqNBZfiKtcl
-	 mrF8y9tmLdq51AG42v4m36dPjuePKdZ2ILSkKOEpdYxX/HwdIV6eENG62ZPL1kfebv
-	 hKbLQ43IyuYW7ktL1/kdC6dWlS/JS8cITpNyavynLbAarWM4EL+8t/ODMDy4CAaeuI
-	 HS2Qn1QsADxRnGCDCmEkAw5s64Ex61c9o9N5EE5XKDdR2sk7mTMCQwypORvfpt6stF
-	 q/jGYIkECir5Q==
-Date: Sat, 27 Apr 2024 15:16:38 +0100
+	b=IoeVlFHNBZ1r3y6yxNU4E/Hi+JX5xDfuX2bMA2Z2yHHFQVq6+XPTkAgZHkGdvftDY
+	 bEBW9Ly4Vqjd7B+SYCATvDD0knr1Pk66jqHaJKim51SZxaS3XcT6LDC3odoMKB/SX+
+	 zaZagQvoxCbPRraKYaZHQ/l+hWACXSdXjWF1lup19D+/JjQFIp7+YHZYCC5IsxpmOF
+	 /sLhWPSGikiCaJnRcVtxDsX7pQHtDvLXMqR5Yk101eXX9Q+jzn0mn/VcqyVJeRVTMs
+	 WPYSC1XkmjXEwhCdsd/OFnrLTrB5ONySIWeYsxRuEUE7BDzMBP2mX2+FrFx7M/2sDz
+	 b30hkhzYDOX+Q==
+Date: Sat, 27 Apr 2024 15:56:04 +0100
 From: Simon Horman <horms@kernel.org>
-To: Doug Berger <opendmb@gmail.com>
-Cc: netdev@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH 3/3] net: bcmgenet: synchronize UMAC_CMD access
-Message-ID: <20240427141638.GM516117@kernel.org>
-References: <20240425221007.2140041-1-opendmb@gmail.com>
- <20240425221007.2140041-4-opendmb@gmail.com>
+To: Ivan Vecera <ivecera@redhat.com>
+Cc: netdev@vger.kernel.org, Michal Schmidt <mschmidt@redhat.com>,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+	Kalesh AP <kalesh-anakkur.purayil@broadcom.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"moderated list:INTEL ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next v4 1/7] i40e: Remove flags field from i40e_veb
+Message-ID: <20240427145604.GN516117@kernel.org>
+References: <20240427072615.226151-1-ivecera@redhat.com>
+ <20240427072615.226151-2-ivecera@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,23 +67,18 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240425221007.2140041-4-opendmb@gmail.com>
+In-Reply-To: <20240427072615.226151-2-ivecera@redhat.com>
 
-On Thu, Apr 25, 2024 at 03:10:07PM -0700, Doug Berger wrote:
-> The UMAC_CMD register is written from different execution
-> contexts and has insufficient synchronization protections to
-> prevent possible corruption. Of particular concern are the
-> acceses from the phy_device delayed work context used by the
-> adjust_link call and the BH context that may be used by the
-> ndo_set_rx_mode call.
+On Sat, Apr 27, 2024 at 09:26:02AM +0200, Ivan Vecera wrote:
+> The field is initialized always to zero and it is never read.
+> Remove it.
 > 
-> A spinlock is added to the driver to protect contended register
-> accesses (i.e. reg_lock) and it is used to synchronize accesses
-> to UMAC_CMD.
-> 
-> Fixes: 1c1008c793fa ("net: bcmgenet: add main driver file")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Doug Berger <opendmb@gmail.com>
+> Reviewed-by: Michal Schmidt <mschmidt@redhat.com>
+> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+> Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
+> Reviewed-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+> Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>
+> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
 
 Reviewed-by: Simon Horman <horms@kernel.org>
 
