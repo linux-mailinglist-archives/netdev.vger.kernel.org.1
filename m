@@ -1,57 +1,60 @@
-Return-Path: <netdev+bounces-91899-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91900-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17B498B4668
-	for <lists+netdev@lfdr.de>; Sat, 27 Apr 2024 15:16:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B31238B466C
+	for <lists+netdev@lfdr.de>; Sat, 27 Apr 2024 15:22:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 23024B229E2
-	for <lists+netdev@lfdr.de>; Sat, 27 Apr 2024 13:16:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 871921C21399
+	for <lists+netdev@lfdr.de>; Sat, 27 Apr 2024 13:22:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE4704D5AC;
-	Sat, 27 Apr 2024 13:16:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 657C24EB3A;
+	Sat, 27 Apr 2024 13:22:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eSodTo8n"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="rUV84ovs"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8801443172
-	for <netdev@vger.kernel.org>; Sat, 27 Apr 2024 13:16:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 200A82032A;
+	Sat, 27 Apr 2024 13:22:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714223790; cv=none; b=sMU10Hw7ILFr+ngGfygpsgybKb35BqrnyXP5aFazEIkTY4W/rfuebqNJgRV95xWOyCDQ5VFKvkDm7CqjOQxjwaStyE99kJYxWXznhifffvNAn2AxK+o857Hu8t1Kt1uEeLSVzLwt3u2rC7PeT8U/A0Vk7H4gNuEDKk+r0EJFAQg=
+	t=1714224164; cv=none; b=VLoA7mMe/q9zpQofw8RG3Q5Pf9MwiHxXs6jLnnEfBfAwPIPVwJuvGMBjDJOw/WuERvb75FgqAOen99OM+KBHT6YR1acY12iSOEMr4QPrfuIltTRWpUDlOtyCX+uiShzlOn6IBom8kKdNtriwBAeuCZJBohrCE9axhODounHWp2I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714223790; c=relaxed/simple;
-	bh=fUUuB8Olt4La3VO4Sni1xzc+AGR154Gg5keMY31XNhc=;
+	s=arc-20240116; t=1714224164; c=relaxed/simple;
+	bh=0RgdNbqY5OmtO6lnbA+EATz/8l3MncfCfEd7jcYF6jo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=K9MMgpnRflLQFxc7VJhxvsdnA0BN+C0l3mVCm9RYST8P6G8irQrUIdRZnMxgABMskVbQTgUF+/Tqtt6Y8oSH3dMlVodz0BfUma22WLKh/HOK9dN4NKhId2tJak1HWyKqCEU/1fqr4oDv8kS1Bg9gQ1qM4lxMd+ath5Tb0vtTW90=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eSodTo8n; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B41AC113CE;
-	Sat, 27 Apr 2024 13:16:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714223790;
-	bh=fUUuB8Olt4La3VO4Sni1xzc+AGR154Gg5keMY31XNhc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=eSodTo8n0h8b/xKSnOD2kNyYL92d6QQxlSk9o/jaSaXse2AdHe8p5OYZ1+/lQz+IE
-	 JLKWRPJm1ieP/R8UHaX5CB6CICpggldyooeUfI1PQ4oJsYmMTWk3BOt0lKMcWrre04
-	 VybOxB1YS70creH2z6yJ5VjLaty96/wLQ4QBrmuUFCyJwwf8UAfKvMr565EQbqFwI2
-	 ogyd3dgfPizK8qFS1cDh9bglqtc8O3nbcUj4JxS8phU4Jqhd/S0WI9ijiHAHEpT6cX
-	 BtN/VzVVGrKK4zGif5J8ox6a8ExHedbD3J6juMzjhDAtA8rsfyBcBFKJTjPxh7cMoq
-	 pvcy3avvZ1+4w==
-Date: Sat, 27 Apr 2024 14:16:25 +0100
-From: Simon Horman <horms@kernel.org>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, eric.dumazet@gmail.com,
-	syzbot <syzkaller@googlegroups.com>,
-	Lukasz Majewski <lukma@denx.de>
-Subject: Re: [PATCH net-next] net: hsr: init prune_proxy_timer sooner
-Message-ID: <20240427131625.GH516117@kernel.org>
-References: <20240426163355.2613767-1-edumazet@google.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=U521cGuftJ8AzWeds3xWdVs3TbmlVqZwEN7MO8NDksgl2ziMbEXkvPI1py+KA33cmuJSGYyh9TG53OdPG82gHxdj+kxo8xlosNJTeb3flW8bHv5NFRw7/JZZGSM7esIPiOo/zLuW5qyEGTLJLP5cuSq826660W3W5N1+zgN9Fsk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=rUV84ovs; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=UN8sjUbj9W0OtZnCnQkLCROZCAo3ON6bY0D+KpYWEOQ=; b=rUV84ovse88jrzaIQysRpRhFe3
+	9nALNf8MgFWtijYpR8srHa69VDEe9uNb4LpXA+yAGAxaB0hDNc+xWnDWA3wBOmlkHb09a4BudDnae
+	LAqad1cvfNk3yHQpZVs0geXP2buKlVekilAeA9cLBm8/T93vCiFi8v9cs2aitQr/CfrU=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1s0i0X-00E8ye-Ae; Sat, 27 Apr 2024 15:22:25 +0200
+Date: Sat, 27 Apr 2024 15:22:25 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Slark Xiao <slark_xiao@163.com>
+Cc: loic.poulain@linaro.org, ryazanov.s.a@gmail.com,
+	johannes@sipsolutions.net, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: Re: [PATCH net] net: wwan: Add net device name for error message
+ print
+Message-ID: <56b839fb-6a69-4dff-b412-1960e98fcbf2@lunn.ch>
+References: <20240426080733.819633-1-slark_xiao@163.com>
+ <6f7c4b67-a6bd-4fc2-a7da-e4bb0c2b6f50@lunn.ch>
+ <c5a7151.250c.18f1e4425f4.Coremail.slark_xiao@163.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,50 +63,36 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240426163355.2613767-1-edumazet@google.com>
+In-Reply-To: <c5a7151.250c.18f1e4425f4.Coremail.slark_xiao@163.com>
 
-On Fri, Apr 26, 2024 at 04:33:55PM +0000, Eric Dumazet wrote:
-> We must initialize prune_proxy_timer before we attempt
-> a del_timer_sync() on it.
+> At 2024-04-27 06:21:03, "Andrew Lunn" <andrew@lunn.ch> wrote:
+> >>  	if (skb->len < sizeof(struct usb_cdc_ncm_nth16) +
+> >>  			sizeof(struct usb_cdc_ncm_ndp16)) {
+> >> -		net_err_ratelimited("frame too short\n");
+> >> +		net_err_ratelimited("mbim: frame too short\n");
+> >
+> >I don't know this code at all, but i think you can do
+> >
+> >dev_err_ratelimited(&mbim->mdev->dev, "frame too short\n");
+> >
+> >That way, it tells you which of the 42 mhi devices has received too
+> >short a frame.
+> >
+> >      Andrew
+> I tried in my case, and it will print:
+> mhi_wwan_mbim mhio_IP_HW0_MBIM: frame too short
 > 
-> syzbot reported the following splat:
-> 
-> INFO: trying to register non-static key.
-> The code is fine but needs lockdep annotation, or maybe
-> you didn't initialize this object before use?
-> turning off the locking correctness validator.
-> CPU: 1 PID: 11 Comm: kworker/u8:1 Not tainted 6.9.0-rc5-syzkaller-01199-gfc48de77d69d #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
-> Workqueue: netns cleanup_net
-> Call Trace:
->  <TASK>
->   __dump_stack lib/dump_stack.c:88 [inline]
->   dump_stack_lvl+0x241/0x360 lib/dump_stack.c:114
->   assign_lock_key+0x238/0x270 kernel/locking/lockdep.c:976
->   register_lock_class+0x1cf/0x980 kernel/locking/lockdep.c:1289
->   __lock_acquire+0xda/0x1fd0 kernel/locking/lockdep.c:5014
->   lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5754
->   __timer_delete_sync+0x148/0x310 kernel/time/timer.c:1648
->   del_timer_sync include/linux/timer.h:185 [inline]
->   hsr_dellink+0x33/0x80 net/hsr/hsr_netlink.c:132
->   default_device_exit_batch+0x956/0xa90 net/core/dev.c:11737
->   ops_exit_list net/core/net_namespace.c:175 [inline]
->   cleanup_net+0x89d/0xcc0 net/core/net_namespace.c:637
->   process_one_work kernel/workqueue.c:3254 [inline]
->   process_scheduled_works+0xa10/0x17c0 kernel/workqueue.c:3335
->   worker_thread+0x86d/0xd70 kernel/workqueue.c:3416
->   kthread+0x2f0/0x390 kernel/kthread.c:388
->   ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
->   ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
->  </TASK>
-> ODEBUG: assert_init not available (active state 0) object: ffff88806d3fcd88 object type: timer_list hint: 0x0
->  WARNING: CPU: 1 PID: 11 at lib/debugobjects.c:517 debug_print_object+0x17a/0x1f0 lib/debugobjects.c:514
-> 
-> Fixes: 5055cccfc2d1 ("net: hsr: Provide RedBox support (HSR-SAN)")
-> Reported-by: syzbot <syzkaller@googlegroups.com>
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> Cc: Lukasz Majewski <lukma@denx.de>
+> I think it's much more complicated, isn't it?
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+As i said, this is about making it clear which device has problems.
+mhio_IP_HW0_MBI is not a particularly good name, but it should be
+unique. The question is, is this built into the silicon, and can there
+only be one? The name is them pointless.
+
+It is also not too unusual to see drivers define macros
+
+mbim_err_ratelimited(mbin, "frame too short")
+
+	Andrew
 
 
