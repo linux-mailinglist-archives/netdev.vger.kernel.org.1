@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-91900-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91901-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B31238B466C
-	for <lists+netdev@lfdr.de>; Sat, 27 Apr 2024 15:22:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD4238B466E
+	for <lists+netdev@lfdr.de>; Sat, 27 Apr 2024 15:24:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 871921C21399
-	for <lists+netdev@lfdr.de>; Sat, 27 Apr 2024 13:22:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 78BD7285E63
+	for <lists+netdev@lfdr.de>; Sat, 27 Apr 2024 13:24:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 657C24EB3A;
-	Sat, 27 Apr 2024 13:22:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 806824EB3A;
+	Sat, 27 Apr 2024 13:24:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="rUV84ovs"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="EsjvKfEs"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 200A82032A;
-	Sat, 27 Apr 2024 13:22:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB83A3E47F
+	for <netdev@vger.kernel.org>; Sat, 27 Apr 2024 13:24:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714224164; cv=none; b=VLoA7mMe/q9zpQofw8RG3Q5Pf9MwiHxXs6jLnnEfBfAwPIPVwJuvGMBjDJOw/WuERvb75FgqAOen99OM+KBHT6YR1acY12iSOEMr4QPrfuIltTRWpUDlOtyCX+uiShzlOn6IBom8kKdNtriwBAeuCZJBohrCE9axhODounHWp2I=
+	t=1714224245; cv=none; b=eqhbmHRzfC8g3rDZfmigncOpq+UGZ2bJFFSCB9Wn/Y10XnCZ5SZz8xa3LjqS2HsaYZXvqgxfkvn3TnT5g5DGKDubRLwllJhzuxqWGv1RX778QhTA3rzJfNwjYo/v8ZgGM97aXbn3Ep1ROYZkZz13eAMtN6fmE3kfiIB6NPZ7U7o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714224164; c=relaxed/simple;
-	bh=0RgdNbqY5OmtO6lnbA+EATz/8l3MncfCfEd7jcYF6jo=;
+	s=arc-20240116; t=1714224245; c=relaxed/simple;
+	bh=kLomDDjExr7V+qAVBKSqHbIuC8ewPqpTzgdWuIGCDbs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=U521cGuftJ8AzWeds3xWdVs3TbmlVqZwEN7MO8NDksgl2ziMbEXkvPI1py+KA33cmuJSGYyh9TG53OdPG82gHxdj+kxo8xlosNJTeb3flW8bHv5NFRw7/JZZGSM7esIPiOo/zLuW5qyEGTLJLP5cuSq826660W3W5N1+zgN9Fsk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=rUV84ovs; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=o5RfGVroqQwagosnc9Mi3/XTUhtcMNUmBq08NT8c0MsUd563AM+Wq7CXYuNPYp4ORsJ4EmcNENlbdSxoblq/gEgUQ7ldjWhgF+9DNfi8teCAybZUxbKBv6KNnkfkIysOvwJ0Qc7pbTY1ccETRloUDN5XEwW5xieeTYxLDZCyRoE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=EsjvKfEs; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,25 +36,25 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=UN8sjUbj9W0OtZnCnQkLCROZCAo3ON6bY0D+KpYWEOQ=; b=rUV84ovse88jrzaIQysRpRhFe3
-	9nALNf8MgFWtijYpR8srHa69VDEe9uNb4LpXA+yAGAxaB0hDNc+xWnDWA3wBOmlkHb09a4BudDnae
-	LAqad1cvfNk3yHQpZVs0geXP2buKlVekilAeA9cLBm8/T93vCiFi8v9cs2aitQr/CfrU=;
+	bh=RqKICUK9jjEcG31AfuQoQ5Nux4EZ4sB/6bAIZDwtXXo=; b=EsjvKfEsna+Ibx44P2D/MK01NJ
+	rJYnaJQh4QZlyEQOZbeKBBvbP7diDgNWpWOSyLGsqgTZFROVgGukIY6pG4KmE5ERj8FEwBUQ4eYEZ
+	gPZbC1XQYBbhFrMJ1hJht9xITUFq1uYI0kPH+WhMQfL7b217Es2Xk9AB7iG0wKXiYNLA=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1s0i0X-00E8ye-Ae; Sat, 27 Apr 2024 15:22:25 +0200
-Date: Sat, 27 Apr 2024 15:22:25 +0200
+	id 1s0i21-00E8zU-34; Sat, 27 Apr 2024 15:23:57 +0200
+Date: Sat, 27 Apr 2024 15:23:57 +0200
 From: Andrew Lunn <andrew@lunn.ch>
-To: Slark Xiao <slark_xiao@163.com>
-Cc: loic.poulain@linaro.org, ryazanov.s.a@gmail.com,
-	johannes@sipsolutions.net, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: Re: [PATCH net] net: wwan: Add net device name for error message
- print
-Message-ID: <56b839fb-6a69-4dff-b412-1960e98fcbf2@lunn.ch>
-References: <20240426080733.819633-1-slark_xiao@163.com>
- <6f7c4b67-a6bd-4fc2-a7da-e4bb0c2b6f50@lunn.ch>
- <c5a7151.250c.18f1e4425f4.Coremail.slark_xiao@163.com>
+To: Simon Horman <horms@kernel.org>
+Cc: Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Dan Carpenter <dan.carpenter@linaro.org>, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next RFC v2] net: dsa: mv88e6xxx: Correct check for
+ empty list
+Message-ID: <5176e9a1-4fbc-440a-b369-24bae4311169@lunn.ch>
+References: <20240427-mv88e6xx-list_empty-v2-1-b7ce47c77bc7@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,36 +63,28 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <c5a7151.250c.18f1e4425f4.Coremail.slark_xiao@163.com>
+In-Reply-To: <20240427-mv88e6xx-list_empty-v2-1-b7ce47c77bc7@kernel.org>
 
-> At 2024-04-27 06:21:03, "Andrew Lunn" <andrew@lunn.ch> wrote:
-> >>  	if (skb->len < sizeof(struct usb_cdc_ncm_nth16) +
-> >>  			sizeof(struct usb_cdc_ncm_ndp16)) {
-> >> -		net_err_ratelimited("frame too short\n");
-> >> +		net_err_ratelimited("mbim: frame too short\n");
-> >
-> >I don't know this code at all, but i think you can do
-> >
-> >dev_err_ratelimited(&mbim->mdev->dev, "frame too short\n");
-> >
-> >That way, it tells you which of the 42 mhi devices has received too
-> >short a frame.
-> >
-> >      Andrew
-> I tried in my case, and it will print:
-> mhi_wwan_mbim mhio_IP_HW0_MBIM: frame too short
+On Sat, Apr 27, 2024 at 09:52:03AM +0100, Simon Horman wrote:
+> Since commit a3c53be55c95 ("net: dsa: mv88e6xxx: Support multiple MDIO
+> busses") mv88e6xxx_default_mdio_bus() has checked that the
+> return value of list_first_entry() is non-NULL.
 > 
-> I think it's much more complicated, isn't it?
+> This appears to be intended to guard against the list chip->mdios being
+> empty.  However, it is not the correct check as the implementation of
+> list_first_entry is not designed to return NULL for empty lists.
+> 
+> Instead, use list_first_entry() which does return NULL if the list is
+> empty.
+> 
+> Flagged by Smatch.
+> Compile tested only.
+> 
+> Signed-off-by: Simon Horman <horms@kernel.org>
 
-As i said, this is about making it clear which device has problems.
-mhio_IP_HW0_MBI is not a particularly good name, but it should be
-unique. The question is, is this built into the silicon, and can there
-only be one? The name is them pointless.
+For the code itself:
 
-It is also not too unusual to see drivers define macros
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-mbim_err_ratelimited(mbin, "frame too short")
-
-	Andrew
-
+    Andrew
 
