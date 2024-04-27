@@ -1,65 +1,64 @@
-Return-Path: <netdev+bounces-91860-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91861-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 773768B4341
-	for <lists+netdev@lfdr.de>; Sat, 27 Apr 2024 02:33:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C38D68B4345
+	for <lists+netdev@lfdr.de>; Sat, 27 Apr 2024 02:34:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A1FE71C21888
-	for <lists+netdev@lfdr.de>; Sat, 27 Apr 2024 00:33:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7F659283955
+	for <lists+netdev@lfdr.de>; Sat, 27 Apr 2024 00:34:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D86F12577B;
-	Sat, 27 Apr 2024 00:33:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA42F28385;
+	Sat, 27 Apr 2024 00:34:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VNmdvtPm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aLTz2TqG"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC8622570;
-	Sat, 27 Apr 2024 00:33:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC81B36AF2;
+	Sat, 27 Apr 2024 00:34:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714177999; cv=none; b=hQYn2XmsZPubxCbAiT+PhON2u1hdh4Ud7DFeTRqwkfAVFTfGih5WOFesLJ+VGnqq0xnSaO5rORaiG++BH0kLzUaJWkXp2e71IRSeStbblyXM+zkl5rimiR3J0bUI1gKh/N/rpkyBi12W0WP3/Ychc/rSYUmlY7nnBpn3fp9KqLs=
+	t=1714178048; cv=none; b=OyUVhOq2oO24bH+ZxOKuiWfRaAcD/sIVN0WPBgVWPbiaz5Yf2wcSY4lrHq3v/Ynpp+G6YndxnAVcIMH5Iqup3Y+gZMadxPb8uwx7DX1RuifQxVhmD5YVOXh3wMwrYKtdlWL0oSgv5sjOrLYwWfotmS/oLEV58+5BYkRLF1qPor4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714177999; c=relaxed/simple;
-	bh=ExI0y1eLtvdS5sSntyhpyLpfJfO/Kp4Z8xHkYB9tJeE=;
+	s=arc-20240116; t=1714178048; c=relaxed/simple;
+	bh=QOSurHx8KvEaTgm1R/FTe7IdK1kr1SKHl608kcWCsec=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=RGlh065Dqer/g9hHXEIVcUbSHS5Vv7VKwysCZVEOgUNNNB/efAI27fMgpord1wriZWJkv1Zkw89qz1TGQG+tx14gvgJGXJpk2uYrWr21Ce5IKfVjkVjFST78sNbS4wKm127vcWeE7y2HwZ1hqkKvvdpSum4zPT1jYiph8kFnitM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VNmdvtPm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53459C113CD;
-	Sat, 27 Apr 2024 00:33:18 +0000 (UTC)
+	 MIME-Version:Content-Type; b=nWxiI+RlJA41JK4Jz+h8D3945IQuppEPuHFFH1nXHkZpoT+0HR2xgKSdvyozwfXjpiZAi1J2nWI94Xhkus37Rg/BfR86sqnUi1DpMSCywfWfKxSG3V+xS+U74oPYf+hcRO3oMrQSUggDUwzZRQd/iC5wGVRbZR03CBmOOr2vPZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aLTz2TqG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ADCB6C113CD;
+	Sat, 27 Apr 2024 00:34:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714177999;
-	bh=ExI0y1eLtvdS5sSntyhpyLpfJfO/Kp4Z8xHkYB9tJeE=;
+	s=k20201202; t=1714178048;
+	bh=QOSurHx8KvEaTgm1R/FTe7IdK1kr1SKHl608kcWCsec=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=VNmdvtPmD+z7Dan9QGzpYm9/IVpPVXeZHY/xKgzwxWgaTRraPcAFeqs3/S8qkP9ac
-	 BfBwSCiey8KOnVAKoUZXkm4F0QSdSkoxDKu8poUVTXBnb1hYuto1iuplH4EubsHjbj
-	 A9K4G9OpHL3hWO39kw16yrfK3MkjFsGrc48v9+bW8nU1Og3DeLCDj/yJUM6L1ibxvO
-	 4SPKFBRBfZlRw6tvvFXRu62UfoXkARA99mlpHar3MV3liNplE7AO/fy78nvkVJWQRa
-	 g5A6agyrXEUNvBf4QB0DbS5HtWXsrmcJKPsz2Lo0AVi+p9DcfseDVmpipw01DvnWBy
-	 JNKl/S/9yYdJg==
-Date: Fri, 26 Apr 2024 17:33:17 -0700
+	b=aLTz2TqGGC4qRAvxIVAZfZzVvMsgGbIHXcIYLV++JSoHw911q3+Y5B/ti4aPl+GxG
+	 zVHVy15rLwy4Hmp84kiJ4VhYhGC2pdWYVNpxnqe98xqJ/1bZvA2oSlDk+8n7FK6m+g
+	 D82t/qPPcsyzAjYhb0azZln/qaVNuyghiceYAX3E7D0O5n8jfFV7ukQc0FnmJkYPzz
+	 lh7bRJzO3CGeSIiJuhCYtm24a46QO+PVwgEo7q9lnQo4bH5xTOUjCdOXX83rHz6vVH
+	 zc2O/Saatf8noA50lf/jeIpYIUqUCHSYR7AcTR+R4p941tShlIqZ9Xv5JZUbnLlhUi
+	 i0xlT6R6kKOkw==
+Date: Fri, 26 Apr 2024 17:34:06 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Lukasz Majewski <lukma@denx.de>
-Cc: netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, Casper
- Andersson <casper.casan@gmail.com>, Andrew Lunn <andrew@lunn.ch>, Eric
- Dumazet <edumazet@google.com>, Vladimir Oltean <olteanv@gmail.com>, "David
- S. Miller" <davem@davemloft.net>, Oleksij Rempel <o.rempel@pengutronix.de>,
- Tristram.Ha@microchip.com, Sebastian Andrzej Siewior
- <bigeasy@linutronix.de>, Ravi Gunasekaran <r-gunasekaran@ti.com>, Simon
- Horman <horms@kernel.org>, Nikita Zhandarovich <n.zhandarovich@fintech.ru>,
- Murali Karicheri <m-karicheri2@ti.com>, Jiri Pirko <jiri@resnulli.us>, Dan
- Carpenter <dan.carpenter@linaro.org>, Ziyang Xuan
- <william.xuanziyang@huawei.com>, Shigeru Yoshida <syoshida@redhat.com>,
- "Ricardo B. Marliere" <ricardo@marliere.net>, linux-kernel@vger.kernel.org
-Subject: Re: [net-next PATCH] hsr: Simplify code for announcing HSR nodes
- timer setup
-Message-ID: <20240426173317.2f6228a0@kernel.org>
-In-Reply-To: <20240425153958.2326772-1-lukma@denx.de>
-References: <20240425153958.2326772-1-lukma@denx.de>
+To: Joe Damato <jdamato@fastly.com>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, tariqt@nvidia.com,
+ saeedm@nvidia.com, mkarsten@uwaterloo.ca, gal@nvidia.com,
+ nalramli@fastly.com, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, "open list:MELLANOX
+ MLX4 core VPI driver" <linux-rdma@vger.kernel.org>
+Subject: Re: [PATCH net-next v2 1/3] net/mlx4: Track RX allocation failures
+ in a stat
+Message-ID: <20240426173406.3b2526d0@kernel.org>
+In-Reply-To: <ZixGk8dy8INWD6PV@LQ3V64L9R2>
+References: <20240426183355.500364-1-jdamato@fastly.com>
+	<20240426183355.500364-2-jdamato@fastly.com>
+	<20240426130017.6e38cd65@kernel.org>
+	<Ziw8OSchaOaph1i8@LQ3V64L9R2>
+	<20240426165213.298d8409@kernel.org>
+	<ZixGk8dy8INWD6PV@LQ3V64L9R2>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,36 +68,19 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 25 Apr 2024 17:39:58 +0200 Lukasz Majewski wrote:
-> Up till now the code to start HSR announce timer, which triggers sending
-> supervisory frames, was assuming that hsr_netdev_notify() would be called
-> at least twice for hsrX interface. This was required to have different
-> values for old and current values of network device's operstate.
+On Fri, 26 Apr 2024 17:28:03 -0700 Joe Damato wrote:
+> Ah, maybe I read what you wrote incorrectly in your previous message.
 > 
-> This is problematic for a case where hsrX interface is already in the
-> operational state when hsr_netdev_notify() is called, so timer is not
-> configured to trigger and as a result the hsrX is not sending supervisory
-> frames to HSR ring.
+> I think you were saying that I should drop just the
 > 
-> This error has been discovered when hsr_ping.sh script was run. To be
-> more specific - for the hsr1 and hsr2 the hsr_netdev_notify() was
-> called at least twice with different IF_OPER_{LOWERDOWN|DOWN|UP} states
-> assigned in hsr_check_carrier_and_operstate(hsr). As a result there was
-> no issue with sending supervisory frames.
-> However, with hsr3, the notify function was called only once with
-> operstate set to IF_OPER_UP and timer responsible for triggering
-> supervisory frames was not fired.
+>   dev->stats.rx_missed_errors = dropped;
 > 
-> The solution is to use netif_oper_up() helper function to assess if
-> network device is up and then setup timer. Otherwise the timer is
-> activated.
+> due to the definition of rx_missed_errors, but that by the definition of
+> rx-alloc-fail:
+> 
+>   alloc_fail = ring->dropped;
+> 
+> is still valid and can stay.
 
-NETDEV_CHANGE can get called for multiple trivial reasons, if the timer
-is already running we'll mess with the spacing of the frames, no?
-
-If there is a path where the device may get activated without the
-notifier firing - maybe we can check carrier there and schedule the
-timer?
-
-Also sounds like a bug fix, so please add a Fixes tag.
+That's right, yes.
 
