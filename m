@@ -1,219 +1,120 @@
-Return-Path: <netdev+bounces-91867-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91868-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9165A8B43D5
-	for <lists+netdev@lfdr.de>; Sat, 27 Apr 2024 04:24:44 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 563938B4410
+	for <lists+netdev@lfdr.de>; Sat, 27 Apr 2024 06:24:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B448F1C212A0
-	for <lists+netdev@lfdr.de>; Sat, 27 Apr 2024 02:24:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 64A22B21F0F
+	for <lists+netdev@lfdr.de>; Sat, 27 Apr 2024 04:24:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47B7138DF2;
-	Sat, 27 Apr 2024 02:24:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 124FA3C489;
+	Sat, 27 Apr 2024 04:24:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bFGovkoV"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BF83848E;
-	Sat, 27 Apr 2024 02:24:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 594565244
+	for <netdev@vger.kernel.org>; Sat, 27 Apr 2024 04:24:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714184681; cv=none; b=OoeuOFDi5+PxTZUC45LUvOxbOhD+OiKuge24Hw2rRSgiDsbhoD1suIMODfgPGUlQhPB0/TvsMrPNe6QE4CcjG5lNudKqoclng8CBD6csJDIXTDt5y6YTtbpy7Rk7qQAmQbtSvNR1RXQcvHS5stoHeK1IKztgAjIQQFBWyNVSuOU=
+	t=1714191867; cv=none; b=Pb4QLDFD6YT6EOGRmpmmvDeQNR1wwlZrAy76sCav3+i5m3lgb/pKldVIjeXFUu0Gd9cu7uaSU9KzSOKPnssEMI/N34K5y7KrzALt43SuqRygUYQ816Ys7D6L2rcAjPGtGkgzImVJnRDv3eHex8GORuRmxLez7uTGDYA6F7PqvgY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714184681; c=relaxed/simple;
-	bh=1g27sArCdxbgAlOBIQTYU/aDJvTnXRH0RTbjbh4Bvxo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mLXHk69iKzBqEg5xcC6uhbCxqw70u5InVzAkmNG4DP9mxXe4AbmNN+fMklgMECyMaJPo1UyRT81o4QKMEglTEp8XEsog4fz7k1yMDe1rFbsfOLqtkSlqsHs1iM+LqFln4JXKzbbLP2NQ11d3GBoSjW8LoP5Uu+4SjTqcLFv36pA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.97.1)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1s0Xjl-000000006AF-2noj;
-	Sat, 27 Apr 2024 02:24:25 +0000
-Date: Sat, 27 Apr 2024 03:24:18 +0100
-From: Daniel Golle <daniel@makrotopia.org>
-To: arinc.unal@arinc9.com
-Cc: DENG Qingfang <dqfext@gmail.com>, Sean Wang <sean.wang@mediatek.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Bartel Eerdekens <bartel.eerdekens@constell8.be>,
-	mithat.guner@xeront.com, erkin.bozoglu@xeront.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH net-next v2 07/15] net: dsa: mt7530: move MT753X_MTRAP
- operations for MT7530
-Message-ID: <Zixh0qsQat3ypqFp@makrotopia.org>
-References: <20240422-for-netnext-mt7530-improvements-4-v2-0-a75157ba76ad@arinc9.com>
- <20240422-for-netnext-mt7530-improvements-4-v2-7-a75157ba76ad@arinc9.com>
+	s=arc-20240116; t=1714191867; c=relaxed/simple;
+	bh=GF3vuRGY/dMb/2+U/QCXGtAoTBJg+SK/sms8ndt4Nq8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=l3c7/TXFetee6OBpja9zUwMQ3SZ25LaSOHhTVzVdL+ViVxEx/myk9d4uup31X+d8EWVNq29pvLTrquM1PdWyvi5zmTbG/32cbIbXskVMlChObQQaGDmFfTEgJLKJmNtSmOfzXH/JkiMCAnK3xeNjXlrWT0w7L909dcg4bq2e+ro=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bFGovkoV; arc=none smtp.client-ip=209.85.167.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-518a3e0d2ecso4294287e87.3
+        for <netdev@vger.kernel.org>; Fri, 26 Apr 2024 21:24:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1714191863; x=1714796663; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XNxrgthpetuuJLIByo953//VQpDMU/PX1l8amEjeAbY=;
+        b=bFGovkoVAFazBp8+HC9vaHz7phaaQo0Xqa3TB6AiChFGW7zVBU8DYgI5LZW4kgIoc7
+         e7aDEhil2fnR8aoszNytgKVNzAjjI42FpFA5Hm7x4fORXF5rXfQqJ+qBIAjOuATt471w
+         LW5Tr3BlTb4Dh3bLtHfMaZUJPQT05XXBes8bts+4nCdf+Fk5K+LO+68ZeF8wfcP1wu4d
+         b0y4NyEGsBrRKi0TQq5VNEPPwnm1ILbPEPzMiZuM1XNJPiOaJHYB9QppNmx4h2mgVY5h
+         Ox/U/UtqCPmUtT828F5jtBENejgUAjIHc4RCtqYrMB4nU6WPb85TVRree7OBv4i9sqM1
+         THXQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714191863; x=1714796663;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=XNxrgthpetuuJLIByo953//VQpDMU/PX1l8amEjeAbY=;
+        b=h8wQObLVrxpHfTlckhaKkSzKvBijAUT7O5SIrJ2IO4e5+nkRKhHgp/V8e0wNGPLX50
+         tmfp4hw/lOfHNIs9vDX7ylueUu5cWrwWIo9EEI4ffh7eF6JZEDDpabs6r0fuwn9lq+Z/
+         E6HgI3a1s1qAfV7TZ/L8wSQkX1GqlTIgmucRBIaS5iDGk1Dm3WBV0/GB8piYsRjXsbOu
+         7RO7eCaqfe3rnQ/tknNtrcOoSQcEtDN2Z51jXnODfHfIxRtaa5uvXwHeiGbLA9BXrA1y
+         nf6THyTi74U+rtPht9k2u6MJQOwdhCp9ilrgjuIbAJs+ZwDcYrXVzxyK5X8p4tuwGQnu
+         iMLw==
+X-Forwarded-Encrypted: i=1; AJvYcCXb5HNRYzOaX80d5KaCF02zwZFAiq6DxrPWR72sxonN9yrEeHWfPbQ01ei7McLto6ewNTd8YtWDCTY2sxqatfWDbk80MEGy
+X-Gm-Message-State: AOJu0Yx4+ekMQMHXBDhtDbPUthXQPJY8oeSPdWQlTobreWso/mH8s3+i
+	uEtvKm4ziGvOLxp+7LSPYBv0M5Awbj1dD2N/S6HWREU4fohrX7Sg37NGzs23LqNMFdpTUCJ+Sy0
+	lwmWaMsYzqC635HXjn7xfRUme3oDaNwCKXRkP
+X-Google-Smtp-Source: AGHT+IHo9p4JF6aSQDhZ+sGs4DSm+21yCY59QKzJAfgfI4cda+xzrQHekeg5PgpFIA651GAjXQtUPVUubZs18Io42GU=
+X-Received: by 2002:a05:6512:20ce:b0:51c:71cf:efc9 with SMTP id
+ u14-20020a05651220ce00b0051c71cfefc9mr3280756lfr.49.1714191863232; Fri, 26
+ Apr 2024 21:24:23 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240422-for-netnext-mt7530-improvements-4-v2-7-a75157ba76ad@arinc9.com>
+References: <20240424165646.1625690-2-dtatulea@nvidia.com> <4ba023709249e11d97c78a98ac7db3b37f419960.camel@nvidia.com>
+ <CAHS8izMbAJHatnM6SvsZVLPY+N7LgGJg03pSdNfSRFCufGh9Zg@mail.gmail.com>
+ <4c20b500c2ed615aba424c0f3c7a79f5f5a04171.camel@nvidia.com>
+ <CAHS8izPkRJyLctmyj+Ppc5j3Qq5O1u3aPe5h9mnFNHDU2OxA=A@mail.gmail.com> <20240426160859.0d85908e@kernel.org>
+In-Reply-To: <20240426160859.0d85908e@kernel.org>
+From: Mina Almasry <almasrymina@google.com>
+Date: Fri, 26 Apr 2024 21:24:09 -0700
+Message-ID: <CAHS8izNs-LV=6FE39sjF3V7qVfveOsOAOJ_X62TSzWpvamsS0Q@mail.gmail.com>
+Subject: Re: [RFC PATCH] net: Fix one page_pool page leak from skb_frag_unref
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Dragos Tatulea <dtatulea@nvidia.com>, "davem@davemloft.net" <davem@davemloft.net>, 
+	"pabeni@redhat.com" <pabeni@redhat.com>, 
+	"ilias.apalodimas@linaro.org" <ilias.apalodimas@linaro.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	"jacob.e.keller@intel.com" <jacob.e.keller@intel.com>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, Jianbo Liu <jianbol@nvidia.com>, 
+	"edumazet@google.com" <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Arınç,
+On Fri, Apr 26, 2024 at 4:09=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Thu, 25 Apr 2024 12:20:59 -0700 Mina Almasry wrote:
+> > -       if (recycle && napi_pp_get_page(page))
+> > +       if (napi_pp_get_page(page))
+>
+> Pretty sure you can't do that. The "recycle" here is a concurrency
+> guarantee. A guarantee someone is holding a pp ref on that page,
+> a ref which will not go away while napi_pp_get_page() is executing.
 
-On Mon, Apr 22, 2024 at 10:15:14AM +0300, Arınç ÜNAL via B4 Relay wrote:
-> From: Arınç ÜNAL <arinc.unal@arinc9.com>
-> 
-> On MT7530, the media-independent interfaces of port 5 and 6 are controlled
-> by the MT7530_P5_DIS and MT7530_P6_DIS bits of the hardware trap. Deal with
-> these bits only when the relevant port is being enabled or disabled. This
-> ensures that these ports will be disabled when they are not in use.
-> 
-> Do not set MT7530_CHG_TRAP on mt7530_setup_port5() as that's already being
-> done on mt7530_setup().
+I don't mean to argue, but I think the get_page()/put_page() pair we
+do in the page ref path is susceptible to the same issue. AFAIU it's
+not safe to get_page() if another CPU can be dropping the last ref,
+get_page_unless_zero() should be used instead.
 
-Multiple users reported ([1], [2]) that after I've imported the series
-to OpenWrt they noticed that WAN connection on MT7621 boards using
-PHY-muxing to hook up either port 0 or port 4 to GMAC1 no longer works.
+Since get_page() is good in the page ref path without some guarantee,
+it's not obvious to me why we need this guarantee in the pp ref path,
+but I could be missing some subtlety. At any rate, if you prefer us
+going down the road of reverting commit 2cc3aeb5eccc ("skbuff: Fix a
+potential race while recycling page_pool packets"), I think that could
+also fix the issue.
 
-The link still seems to come up, but no data flows. I went ahead and
-confirmed the bug, then started bisecting the patches of this series,
-and ended up identifying this very patch being the culprit.
-
-I can't exclude that what ever the issue may be is caused by other
-downstream patches we have, but can confirm that removing this patch of
-your series [3] in OpenWrt fixes the issue. Please take a look and as
-the cover letter states you have tested this on some MT7621 board,
-please make sure traffic actually flows on the PHY-muxed port on that
-board after this patch is applied, and if not, please figure out why and
-repost a fixed version of this patch.
-
-
-Cheers
-
-
-Daniel
-
-[1]: https://github.com/openwrt/openwrt/issues/15273
-[2]: https://github.com/openwrt/openwrt/issues/15279
-[3]: https://git.openwrt.org/?p=openwrt/openwrt.git;a=commit;h=a8dde7e5bd6d289db6485cf57d3512ea62eaa827
-
-> 
-> Instead of globally setting MT7530_P5_MAC_SEL, clear it, then set it only
-> on the appropriate case.
-> 
-> If PHY muxing is detected, clear MT7530_P5_DIS before calling
-> mt7530_setup_port5().
-> 
-> Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
-> ---
->  drivers/net/dsa/mt7530.c | 38 +++++++++++++++++++++++++++-----------
->  1 file changed, 27 insertions(+), 11 deletions(-)
-> 
-> diff --git a/drivers/net/dsa/mt7530.c b/drivers/net/dsa/mt7530.c
-> index 606516206fb9..83436723cb16 100644
-> --- a/drivers/net/dsa/mt7530.c
-> +++ b/drivers/net/dsa/mt7530.c
-> @@ -880,8 +880,7 @@ static void mt7530_setup_port5(struct dsa_switch *ds, phy_interface_t interface)
->  
->  	val = mt7530_read(priv, MT753X_MTRAP);
->  
-> -	val |= MT7530_CHG_TRAP | MT7530_P5_MAC_SEL | MT7530_P5_DIS;
-> -	val &= ~MT7530_P5_RGMII_MODE & ~MT7530_P5_PHY0_SEL;
-> +	val &= ~MT7530_P5_PHY0_SEL & ~MT7530_P5_MAC_SEL & ~MT7530_P5_RGMII_MODE;
->  
->  	switch (priv->p5_mode) {
->  	/* MUX_PHY_P0: P0 -> P5 -> SoC MAC */
-> @@ -891,15 +890,13 @@ static void mt7530_setup_port5(struct dsa_switch *ds, phy_interface_t interface)
->  
->  	/* MUX_PHY_P4: P4 -> P5 -> SoC MAC */
->  	case MUX_PHY_P4:
-> -		val &= ~MT7530_P5_MAC_SEL & ~MT7530_P5_DIS;
-> -
->  		/* Setup the MAC by default for the cpu port */
->  		mt7530_write(priv, MT753X_PMCR_P(5), 0x56300);
->  		break;
->  
->  	/* GMAC5: P5 -> SoC MAC or external PHY */
->  	default:
-> -		val &= ~MT7530_P5_DIS;
-> +		val |= MT7530_P5_MAC_SEL;
->  		break;
->  	}
->  
-> @@ -1193,6 +1190,14 @@ mt7530_port_enable(struct dsa_switch *ds, int port,
->  
->  	mutex_unlock(&priv->reg_mutex);
->  
-> +	if (priv->id != ID_MT7530 && priv->id != ID_MT7621)
-> +		return 0;
-> +
-> +	if (port == 5)
-> +		mt7530_clear(priv, MT753X_MTRAP, MT7530_P5_DIS);
-> +	else if (port == 6)
-> +		mt7530_clear(priv, MT753X_MTRAP, MT7530_P6_DIS);
-> +
->  	return 0;
->  }
->  
-> @@ -1211,6 +1216,14 @@ mt7530_port_disable(struct dsa_switch *ds, int port)
->  		   PCR_MATRIX_CLR);
->  
->  	mutex_unlock(&priv->reg_mutex);
-> +
-> +	if (priv->id != ID_MT7530 && priv->id != ID_MT7621)
-> +		return;
-> +
-> +	if (port == 5)
-> +		mt7530_set(priv, MT753X_MTRAP, MT7530_P5_DIS);
-> +	else if (port == 6)
-> +		mt7530_set(priv, MT753X_MTRAP, MT7530_P6_DIS);
->  }
->  
->  static int
-> @@ -2401,11 +2414,11 @@ mt7530_setup(struct dsa_switch *ds)
->  		mt7530_rmw(priv, MT7530_TRGMII_RD(i),
->  			   RD_TAP_MASK, RD_TAP(16));
->  
-> -	/* Enable port 6 */
-> -	val = mt7530_read(priv, MT753X_MTRAP);
-> -	val &= ~MT7530_P6_DIS & ~MT7530_PHY_INDIRECT_ACCESS;
-> -	val |= MT7530_CHG_TRAP;
-> -	mt7530_write(priv, MT753X_MTRAP, val);
-> +	/* Allow modifying the trap and directly access PHY registers via the
-> +	 * MDIO bus the switch is on.
-> +	 */
-> +	mt7530_rmw(priv, MT753X_MTRAP, MT7530_CHG_TRAP |
-> +		   MT7530_PHY_INDIRECT_ACCESS, MT7530_CHG_TRAP);
->  
->  	if ((val & MT7530_XTAL_MASK) == MT7530_XTAL_40MHZ)
->  		mt7530_pll_setup(priv);
-> @@ -2488,8 +2501,11 @@ mt7530_setup(struct dsa_switch *ds)
->  			break;
->  		}
->  
-> -		if (priv->p5_mode == MUX_PHY_P0 || priv->p5_mode == MUX_PHY_P4)
-> +		if (priv->p5_mode == MUX_PHY_P0 ||
-> +		    priv->p5_mode == MUX_PHY_P4) {
-> +			mt7530_clear(priv, MT753X_MTRAP, MT7530_P5_DIS);
->  			mt7530_setup_port5(ds, interface);
-> +		}
->  	}
->  
->  #ifdef CONFIG_GPIOLIB
-> 
-> -- 
-> 2.40.1
-> 
-> 
+--=20
+Thanks,
+Mina
 
