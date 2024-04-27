@@ -1,124 +1,206 @@
-Return-Path: <netdev+bounces-91956-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91957-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55DCC8B4869
-	for <lists+netdev@lfdr.de>; Sat, 27 Apr 2024 23:52:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 360608B486C
+	for <lists+netdev@lfdr.de>; Sat, 27 Apr 2024 23:55:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 16261282A04
-	for <lists+netdev@lfdr.de>; Sat, 27 Apr 2024 21:52:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AFC7A1F21974
+	for <lists+netdev@lfdr.de>; Sat, 27 Apr 2024 21:55:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AB94147C64;
-	Sat, 27 Apr 2024 21:52:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7DD3146590;
+	Sat, 27 Apr 2024 21:55:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="Rk4cooLt"
+	dkim=pass (2048-bit key) header.d=ferroamp-se.20230601.gappssmtp.com header.i=@ferroamp-se.20230601.gappssmtp.com header.b="AZs/6L0V"
 X-Original-To: netdev@vger.kernel.org
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 980D6146596
-	for <netdev@vger.kernel.org>; Sat, 27 Apr 2024 21:52:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4FA8145FEA
+	for <netdev@vger.kernel.org>; Sat, 27 Apr 2024 21:55:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714254725; cv=none; b=rAEr9VpRojbMunLrQtD2BPBkBbWUkl3Fer5Aty2Dh4bql4p4JC40vVRbLQgwPdL1MAL4BXKlspmLxo8bXoefnE2JYPzJPyXm0mTU4046NIZH2zcETso03S9UFE5+grRmTF2oea9hN12D/SVauSx8KRRG/AuHOF8bz5gBhrknoT8=
+	t=1714254918; cv=none; b=JCqptEPtXO8K+1ZgaShX4A3jwbRrLhNxmxKI44wWtpdB0YlAnFLp4WeFYxNMPmOwTHTxSmH4i7F5DM+KjuTPQxJm9rjt59YBxfvEtS1z3UVUgWLd7rab+RKcQv5YOpN1IPV/g/nhDwdB+yqmkmSyh4glt2P2TKQxYSCQ5e/q+M4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714254725; c=relaxed/simple;
-	bh=PAEi78i/q1Ai6HS+RfrS3zjzlK09a0vKprKd+v5SH78=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KBSYui++CuyY4E8JWSCkXIS0eCldQMHAr8j8db+UaVAlfGzTlQysEdsFTDKuOOTa52mx7T3OIECZMmn1IjlLmQMZWWeoZ/oeU1y5j6CBX1cbuVPndZI+N1/sO8xMa5+JulwcYqSdJUBI+eTkSkmRp+suTL8ruEbtMciLBvfQlvU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=Rk4cooLt; arc=none smtp.client-ip=85.214.62.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from tr.lan (ip-86-49-120-218.bb.vodafone.cz [86.49.120.218])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-	(No client certificate requested)
-	(Authenticated sender: marex@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id 55F6F88273;
-	Sat, 27 Apr 2024 23:51:55 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1714254715;
-	bh=jKpKs4GtT9EcKjmxAKxi39HW1VXhl5ucGSc5jkdyUGQ=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Rk4cooLtRc3Do/WZCiAUbPed3t90hRP+9iOiHt5DKp3Y3y7rBPf4d1WtwtCcfCrDr
-	 txcHvCRxP3IcV16hoTc39RRo9v2HZ6qll3aEGTn8rFacWGisS46dK9UPdf1JmovYCV
-	 lrdMWhOjgC0BKZqJ6QAVLinjXyBlGu/1KKj8RD+G1e1dZlgqpVaNKfvW8f4San53u6
-	 L1ecper7g+nC8sSr0n1MQpnnKt11XDEUk0ZsILGCdnC8e6jpoHiBD0VgW3hmIYVBgD
-	 /yKWHTC6y3Q8/XlAunJx2h8E3Fq6iGTpiCULPgTy8+kKc4JHTt9Me7yvfc0CwDjvdR
-	 zMcXS33Q2IxvQ==
-From: Marek Vasut <marex@denx.de>
-To: netdev@vger.kernel.org
-Cc: Marek Vasut <marex@denx.de>,
-	"David S. Miller" <davem@davemloft.net>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Christophe Roullier <christophe.roullier@foss.st.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com
-Subject: [net-next,RFC,PATCH 5/5] net: stmmac: dwmac-stm32: Fix Mhz to MHz
-Date: Sat, 27 Apr 2024 23:50:44 +0200
-Message-ID: <20240427215113.57548-5-marex@denx.de>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240427215113.57548-1-marex@denx.de>
-References: <20240427215113.57548-1-marex@denx.de>
+	s=arc-20240116; t=1714254918; c=relaxed/simple;
+	bh=qTuigNDdiHEJoWocTvujjWAtm0BR7RewD/9z6NMtGVA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dZTqVhxz43nzqaVME88xqkfVULpDaqtY0KKJ3n3QAWDRqWYsUJwcNDR7Tfg5owjjvQ5r+r90fCSUlS0sel7ZsNF7rA86GhzOfuqSnExT2cJF/38BBPCG2rBTfO6CClFswdz2z8D0qOYyMy8O10Rh4EfjfcStJshbb+mpMQI0NYU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ferroamp.se; spf=pass smtp.mailfrom=ferroamp.se; dkim=pass (2048-bit key) header.d=ferroamp-se.20230601.gappssmtp.com header.i=@ferroamp-se.20230601.gappssmtp.com header.b=AZs/6L0V; arc=none smtp.client-ip=209.85.208.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ferroamp.se
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ferroamp.se
+Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-2def3637f88so31442501fa.1
+        for <netdev@vger.kernel.org>; Sat, 27 Apr 2024 14:55:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ferroamp-se.20230601.gappssmtp.com; s=20230601; t=1714254915; x=1714859715; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=vLlP8BQFTBi5+r04P6ikzCsGSqpejVR29HttdqjKMoM=;
+        b=AZs/6L0VKdX+VNy1x+r2Gu4DNGy0TFGBOQl8aCj9DNehRcK3jMgzuEL3U49u8IfnPl
+         iTFZy7avAw68JQlS44+YDDfvJF/LyRrj+WRkPlgFsnJQHkJH5cVKOLYGeJiCq1/WFCXy
+         ijVaAqGQlgO0IDYTl83z7cphUrMVBfFeGdObesXjumUc80mJ8xecNK3s9N7CW7rlfURw
+         uadPbjJMcTHMY2e0ZT3EgpgKbZi8jSYfYgrS640qeKtBgA+WitkdBYPH0imc+jGJeDuV
+         XXbxzYRrf+EICUAYS3JTwzzdDmM3cQqctMgVsQiN1jZq520wSvKh/wI8E84RppPc3yP4
+         ALSQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714254915; x=1714859715;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vLlP8BQFTBi5+r04P6ikzCsGSqpejVR29HttdqjKMoM=;
+        b=D+CVAxA3bt7ot8+nu1t8hf9BfF9lMuw3vDqmoesKV1IgnEKpX4ebmJLCoGtK2VOVy9
+         P4AKR1DbO3j0hXASgnjwBLW+YsZVz4RN0q/RxUCfAKGnpsIc6OLnbTqCIWeZ3EHaMJ/k
+         KFQ1PTzBk9Yh7QXlQrY6gCTDuJ7xUWa+xAn2wTdJWW/sKUESMlBkCa7bNDAzk/Z14ypd
+         KhATNecvDarTaSuUPjU6rKzyf++6bjqkzanuxleOyM2yi8k/eZDnIdgi+ct0R3ZSOmg0
+         P79L/5uX4+4AtIgdWwuBVMxG43EaGxeL6YHIcZySWyvGsEWHU0jVChRmSaNHFipXl78M
+         8DAw==
+X-Forwarded-Encrypted: i=1; AJvYcCXU5HSMFrGa6R1UZ5GIkhbrfxeH8ciFeZL4Rflgprhfj0rVMRorGeP6WfubL28jeih3IxTpm4ssq6eyoQX0yI78GfMXZH+a
+X-Gm-Message-State: AOJu0YwGY5XKeZS3ErGkdR+WPEFWa+hqYCA78c+n7dottA7UvwuTM355
+	gK9Yl/DO0iYqCq9Wdt7ZphPCocEewKSYjUka1submhxeSA0TXXFQ7gVClXvWiw8=
+X-Google-Smtp-Source: AGHT+IEkK6xoPaL6AbQGT5BbsmF2Hzb/99RIByBNxh6oxjLHRWnJqaoDT3kxQEGfmN/14L+wPO5Z8w==
+X-Received: by 2002:a05:6512:3b91:b0:519:5fb9:832b with SMTP id g17-20020a0565123b9100b005195fb9832bmr1201223lfv.12.1714254915122;
+        Sat, 27 Apr 2024 14:55:15 -0700 (PDT)
+Received: from builder (c188-149-135-220.bredband.tele2.se. [188.149.135.220])
+        by smtp.gmail.com with ESMTPSA id e7-20020a05651236c700b0051b81ab0002sm1825348lfs.45.2024.04.27.14.55.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 27 Apr 2024 14:55:14 -0700 (PDT)
+Date: Sat, 27 Apr 2024 23:55:13 +0200
+From: =?iso-8859-1?Q?Ram=F3n?= Nordin Rodriguez <ramon.nordin.rodriguez@ferroamp.se>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, horms@kernel.org, saeedm@nvidia.com,
+	anthony.l.nguyen@intel.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, corbet@lwn.net,
+	linux-doc@vger.kernel.org, robh+dt@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+	devicetree@vger.kernel.org, horatiu.vultur@microchip.com,
+	ruanjinjie@huawei.com, steen.hegelund@microchip.com,
+	vladimir.oltean@nxp.com, UNGLinuxDriver@microchip.com,
+	Thorsten.Kummermehr@microchip.com, Pier.Beruto@onsemi.com,
+	Selvamani.Rajagopal@onsemi.com, Nicolas.Ferre@microchip.com,
+	benjamin.bigler@bernformulastudent.ch
+Subject: Re: [PATCH net-next v4 05/12] net: ethernet: oa_tc6: implement error
+ interrupts unmasking
+Message-ID: <Zi10QS6UGGaNVRaB@builder>
+References: <20240418125648.372526-1-Parthiban.Veerasooran@microchip.com>
+ <20240418125648.372526-6-Parthiban.Veerasooran@microchip.com>
+ <Zi1Xbz7ARLm3HkqW@builder>
+ <77d7d190-0847-4dc9-8fc5-4e33308ce7c8@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <77d7d190-0847-4dc9-8fc5-4e33308ce7c8@lunn.ch>
 
-Trivial, fix up the comments using 'Mhz' to 'MHz'.
-No functional change.
+> How fast is your SPI bus? Faster than the link speed? Or slower?
+> 
+> It could be different behaviour is needed depending on the SPI bus
+> speed. If the SPI bus is faster than the link speed, by some margin,
+> the receiver buffer should not overflow, since the CPU can empty the
+> buffer faster than it fills.
 
-Signed-off-by: Marek Vasut <marex@denx.de>
----
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>
-Cc: Christophe Roullier <christophe.roullier@foss.st.com>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Jose Abreu <joabreu@synopsys.com>
-Cc: Maxime Coquelin <mcoquelin.stm32@gmail.com>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: linux-arm-kernel@lists.infradead.org
-Cc: linux-stm32@st-md-mailman.stormreply.com
-Cc: netdev@vger.kernel.org
----
- drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+I'm running at 25MHz, I'm guessing that should translate to fast enough
+for the 10MBit half duplex link.
+But I'm not sure how the spi clock translates to bps here.
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c
-index 91e1a540616d1..260b5eb27b07c 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c
-@@ -58,7 +58,7 @@
-  * Below table summarizes the clock requirement and clock sources for
-  * supported phy interface modes.
-  * __________________________________________________________________________
-- *|PHY_MODE | Normal | PHY wo crystal|   PHY wo crystal   |No 125Mhz from PHY|
-+ *|PHY_MODE | Normal | PHY wo crystal|   PHY wo crystal   |No 125MHz from PHY|
-  *|         |        |      25MHz    |        50MHz       |                  |
-  * ---------------------------------------------------------------------------
-  *|  MII    |	 -   |     eth-ck    |	      n/a	  |	  n/a        |
-@@ -370,7 +370,7 @@ static int stm32mp1_parse_data(struct stm32_dwmac *dwmac,
- 	/* Gigabit Ethernet 125MHz clock selection. */
- 	dwmac->eth_clk_sel_reg = of_property_read_bool(np, "st,eth-clk-sel");
- 
--	/* Ethernet 50Mhz RMII clock selection */
-+	/* Ethernet 50MHz RMII clock selection */
- 	dwmac->eth_ref_clk_sel_reg =
- 		of_property_read_bool(np, "st,eth-ref-clk-sel");
- 
--- 
-2.43.0
+> 
+> If however, the SPI bus is slower than the link speed, there will be
+> buffer overflows, and a reliance on TCP backing off and slowing down.
+> The driver should not be spamming the log, since it is going to happen
+> and there is nothing that can be done about it.
+> 
 
+I agree, I think the print could be a DBG if deemed necessary, but there
+is also the dropped counter to look at.
+
+> > I tried this patch
+> > 
+> > diff --git a/drivers/net/ethernet/oa_tc6.c b/drivers/net/ethernet/oa_tc6.c
+> > index 9f17f3712137..bd7bd3ef6897 100644
+> > --- a/drivers/net/ethernet/oa_tc6.c
+> > +++ b/drivers/net/ethernet/oa_tc6.c
+> > @@ -615,21 +615,9 @@ static int oa_tc6_sw_reset_macphy(struct oa_tc6 *tc6)
+> >         return oa_tc6_write_register(tc6, OA_TC6_REG_STATUS0, regval);
+> >  }
+> > 
+> > -static int oa_tc6_unmask_macphy_error_interrupts(struct oa_tc6 *tc6)
+> > +static int oa_tc6_disable_imask0_interrupts(struct oa_tc6 *tc6)
+> >  {
+> > -       u32 regval;
+> > -       int ret;
+> > -
+> > -       ret = oa_tc6_read_register(tc6, OA_TC6_REG_INT_MASK0, &regval);
+> > -       if (ret)
+> > -               return ret;
+> > -
+> > -       regval &= ~(INT_MASK0_TX_PROTOCOL_ERR_MASK |
+> > -                   INT_MASK0_RX_BUFFER_OVERFLOW_ERR_MASK |
+> > -                   INT_MASK0_LOSS_OF_FRAME_ERR_MASK |
+> > -                   INT_MASK0_HEADER_ERR_MASK);
+> > -
+> > -       return oa_tc6_write_register(tc6, OA_TC6_REG_INT_MASK0, regval);
+> > +       return oa_tc6_write_register(tc6, OA_TC6_REG_INT_MASK0, (u32)-1);
+> 
+> So this appears to be disabling all error interrupts?
+
+Yes, and I think you are right in that it's an overcorrection. There is
+a secondary interrupt mask register as well that is not touched by the
+driver, so that's left at whatever the chip defaults to on reset.
+
+> 
+> This is maybe going too far. Overflow errors are going to happen if
+> you have a slow SPI bus. So i probably would not enable that. However,
+> are the other errors actually expected in normal usage? If not, leave
+> them enabled, because they might indicate real problems.
+
+I'm guessing you are right and that the others actually would be
+meningful to log.
+There is a nested question here as well, and that is wheter to keep or
+drop the code that drops the rx buffer on overflow interrupt.
+I think not dropping the full buffer could be one of the reasons for the
+perf change.
+
+> 
+> > Which results in no log spam, ~5-10% higher throughput and no dropped
+> > packets when I look at /sys/class/net/eth0/statistics/rx_dropped
+> 
+> You cannot trust rx_dropped because you just disabled the code which
+> increments it! The device is probably still dropping packets, and they
+> are no longer counted.
+
+I'll curb my enthusiasm a bit :)
+
+> 
+> It could be the performance increase comes from two places:
+> 
+> 1) Spending time and bus bandwidth dealing with the buffer overflow
+> interrupt
+> 
+> 2) Printing out the serial port.
+> 
+
+I think it's possible that the buffer cleanup triggered after the
+overflow interrupt hits could be cause 3) here, but just a guess.
+
+> Please could you benchmark a few things:
+> 
+> 1) Remove the printk("Receive buffer overflow error"), but otherwise
+> keep the code the same. That will give us an idea how much the serial
+> port matters.
+> 
+> 2) Disable only the RX buffer overflow interrupt
+> 
+> 3) Disable all error interrupts.
+> 
+
+Thanks for layout it out so clearly. I'll run through the scenarios!
+
+R
 
