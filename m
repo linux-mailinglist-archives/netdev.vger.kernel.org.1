@@ -1,125 +1,94 @@
-Return-Path: <netdev+bounces-92010-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92011-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E68D8B4C47
-	for <lists+netdev@lfdr.de>; Sun, 28 Apr 2024 16:51:25 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5FCCA8B4C4A
+	for <lists+netdev@lfdr.de>; Sun, 28 Apr 2024 17:00:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8FBE61C20CF4
-	for <lists+netdev@lfdr.de>; Sun, 28 Apr 2024 14:51:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9E679B20F51
+	for <lists+netdev@lfdr.de>; Sun, 28 Apr 2024 14:59:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E70CC5D732;
-	Sun, 28 Apr 2024 14:51:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD78B6A8BE;
+	Sun, 28 Apr 2024 14:59:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="MPbc/J/z"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="raNQShi9"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BE424A01
-	for <netdev@vger.kernel.org>; Sun, 28 Apr 2024 14:51:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28F621EB2C;
+	Sun, 28 Apr 2024 14:59:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714315879; cv=none; b=RKoLYENzDH/4kYYFA4DfCcazfCmrBGPeOqZYk5HsmChanReC1g3ijW5ra4EWDcKzb+xtPkjnxwq0cgM8lQ/1+V1KrZVI4B7FqJUw/OaRD9vB8sGblNtHgTQ1FPzCbm16HZJXMd46FDGP3wN1fXTKfg6VFT/kJJ4GbIYx80Mr1g8=
+	t=1714316394; cv=none; b=bRv/9YTS8SA1niNPlaIeAMmFEUId5z8OkqEO67wvjvEGpuOGYbFL1WwsKZV2acn+AOW5Lqm8FK93od9ENtI0lfTr+9BLLlwgY5KktiYH9nf9j1UbsClPZjBk/sxoRbGny1X2asgpFgtLAN+eTQyjaCRsPJMBvaMLqNOkVvZePNk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714315879; c=relaxed/simple;
-	bh=FCJXitBn4PWTLT+b/MyQePOnZDxsB62gNWgagvvn4VI=;
-	h=From:To:Cc:Subject:MIME-Version:Content-Disposition:Content-Type:
-	 Message-Id:Date; b=gA+aWBi018xjjcR/NYC0V0J7t5Pm22wYTTPfFVYcmHgZlrQFb74JaBaK4WuM48g8kwxVWxgBELt3sOGVFYmJiffAjXIxgPzsi6y/TDFhOZ5RTAmimL7/sdVIl1prniZ3D3mDUjSCj5yHyvqp66GAAEKaM/0hB7jZhJoUZzIB9Ls=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=MPbc/J/z; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:Reply-To:Content-ID
-	:Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:
-	Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=QrDZGah/Y1vzOmCz3w453gWXAImNf2omFABCMv89MV8=; b=MPbc/J/zasjCwe2LkkVSXzuwu/
-	17sFSoN/4yx9W8/4MaXIlkFUCQSwbgTQmoxRfL3DljLn+VDff/mx6e6emVlxtu/FcoUdpHD4mgs5B
-	Hl41rhlVAkCl5vUTyAqayNmsDKJdCRYu1QVpEo9/toafw99z8EfeG4UAjP3tQC0vX8SCVufxsV3db
-	q4aIfa8sB0TA7rBcyilSN6eIcqFcv116UkzqY0MEWzZDkZtoysQHR+XafYItyoJoQM1TOlsBLoJ/T
-	oyJAGLcICmGJOlxl/A31ZkokMXzLoS/69SJ0NnV2511H6iVoR4fT0UswSXhGvmyGDg9fnF1a7VaC4
-	bMhL6HVg==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:49228 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1s15ry-0002Fn-31;
-	Sun, 28 Apr 2024 15:51:11 +0100
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1s15s0-00AHyq-8E; Sun, 28 Apr 2024 15:51:12 +0100
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Subject: [PATCH net-next] net: sfp-bus: constify link_modes to
- sfp_select_interface()
+	s=arc-20240116; t=1714316394; c=relaxed/simple;
+	bh=2HXWv+oO6mi7iiAFeXK5e3ntyuc98kfi34Ka5nCyn3w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CQJEs3HuXdPzfJ8Qy8a+VHrZtr617i5lHym45Vupy9HbZ3FOuccfGQtvSqVlqT+ktM8sLT0rF/634q/DkppfZ8jlmC1D3TQSWcUzFv1kFGZgaa/Gaux0ERWB932Dw1NGKf57wPiEkkY55v48urVBQn87xiUEA+q/0AswdwP34S4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=raNQShi9; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=YLxb0x4FrND/0FR9KaFczjg3H4SAZkyUWJ+1D4HM91c=; b=raNQShi92LlU5lNoq8qXwThBcX
+	VQQwRqf2fhlhVGRjqBXYeGVwIXYfEkSD3ch1gatPiP8pb+0XFbddRs/geUGdOcLft8amJDqgcEb7u
+	YyHIQ4Fwmn4IJ4n2+w09i5kKx/uFeQM8airzcTbB1wIg0jcRdJ2QCJ0LcrjV5z8gNmgk=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1s160C-00EC2M-TB; Sun, 28 Apr 2024 16:59:40 +0200
+Date: Sun, 28 Apr 2024 16:59:40 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: =?iso-8859-1?Q?Ram=F3n?= Nordin Rodriguez <ramon.nordin.rodriguez@ferroamp.se>
+Cc: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, horms@kernel.org, saeedm@nvidia.com,
+	anthony.l.nguyen@intel.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, corbet@lwn.net,
+	linux-doc@vger.kernel.org, robh+dt@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+	devicetree@vger.kernel.org, horatiu.vultur@microchip.com,
+	ruanjinjie@huawei.com, steen.hegelund@microchip.com,
+	vladimir.oltean@nxp.com, UNGLinuxDriver@microchip.com,
+	Thorsten.Kummermehr@microchip.com, Pier.Beruto@onsemi.com,
+	Selvamani.Rajagopal@onsemi.com, Nicolas.Ferre@microchip.com,
+	benjamin.bigler@bernformulastudent.ch
+Subject: Re: [PATCH net-next v4 05/12] net: ethernet: oa_tc6: implement error
+ interrupts unmasking
+Message-ID: <874654d4-3c52-4b0e-944a-dc5822f54a5d@lunn.ch>
+References: <20240418125648.372526-1-Parthiban.Veerasooran@microchip.com>
+ <20240418125648.372526-6-Parthiban.Veerasooran@microchip.com>
+ <Zi1Xbz7ARLm3HkqW@builder>
+ <77d7d190-0847-4dc9-8fc5-4e33308ce7c8@lunn.ch>
+ <Zi4czGX8jlqSdNrr@builder>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1s15s0-00AHyq-8E@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Sun, 28 Apr 2024 15:51:12 +0100
+In-Reply-To: <Zi4czGX8jlqSdNrr@builder>
 
-sfp_select_interface() does not modify its link_modes argument, so
-make this a const pointer.
+> n  |  name     |  min  |  avg  |  max  |  rx dropped  |  samples
+> 1  |  no mod   |  827K |  846K |  891K |      945     |     5
+> 2  |  no log   |  711K |  726K |  744K |      562     |     5
+> 3  |  less irq |  815K |  833K |  846K |      N/A     |     5
+> 4  |  no irq   |  914K |  924K |  931K |      N/A     |     5
+> 5  |  simple   |  857K |  868K |  879K |      615     |     5
 
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
----
- drivers/net/phy/sfp-bus.c | 2 +-
- include/linux/sfp.h       | 4 ++--
- 2 files changed, 3 insertions(+), 3 deletions(-)
+That is odd.
 
-diff --git a/drivers/net/phy/sfp-bus.c b/drivers/net/phy/sfp-bus.c
-index c6e3baf00f23..37c85f1e6534 100644
---- a/drivers/net/phy/sfp-bus.c
-+++ b/drivers/net/phy/sfp-bus.c
-@@ -355,7 +355,7 @@ EXPORT_SYMBOL_GPL(sfp_parse_support);
-  * modes mask.
-  */
- phy_interface_t sfp_select_interface(struct sfp_bus *bus,
--				     unsigned long *link_modes)
-+				     const unsigned long *link_modes)
- {
- 	if (phylink_test(link_modes, 25000baseCR_Full) ||
- 	    phylink_test(link_modes, 25000baseKR_Full) ||
-diff --git a/include/linux/sfp.h b/include/linux/sfp.h
-index 55c0ab17c9e2..5ebc57f78c95 100644
---- a/include/linux/sfp.h
-+++ b/include/linux/sfp.h
-@@ -554,7 +554,7 @@ bool sfp_may_have_phy(struct sfp_bus *bus, const struct sfp_eeprom_id *id);
- void sfp_parse_support(struct sfp_bus *bus, const struct sfp_eeprom_id *id,
- 		       unsigned long *support, unsigned long *interfaces);
- phy_interface_t sfp_select_interface(struct sfp_bus *bus,
--				     unsigned long *link_modes);
-+				     const unsigned long *link_modes);
- 
- int sfp_get_module_info(struct sfp_bus *bus, struct ethtool_modinfo *modinfo);
- int sfp_get_module_eeprom(struct sfp_bus *bus, struct ethtool_eeprom *ee,
-@@ -593,7 +593,7 @@ static inline void sfp_parse_support(struct sfp_bus *bus,
- }
- 
- static inline phy_interface_t sfp_select_interface(struct sfp_bus *bus,
--						   unsigned long *link_modes)
-+						const unsigned long *link_modes)
- {
- 	return PHY_INTERFACE_MODE_NA;
- }
--- 
-2.30.2
+Side question: What CONFIG_HZ= do you have? 100, 250, 1000?  Try
+1000. I've seen problems where the driver wants to sleep for a short
+time, but the CONFIG_HZ value limits how short a time it can actually
+sleep. It ends up sleeping much longer than it wants.
 
+	Andrew
 
