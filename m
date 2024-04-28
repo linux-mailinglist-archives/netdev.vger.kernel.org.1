@@ -1,74 +1,51 @@
-Return-Path: <netdev+bounces-92018-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92019-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD0B08B4E75
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 00:05:11 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6ED578B4EC0
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 01:17:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EF6D71C208E1
-	for <lists+netdev@lfdr.de>; Sun, 28 Apr 2024 22:05:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C9FBF1F21919
+	for <lists+netdev@lfdr.de>; Sun, 28 Apr 2024 23:17:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2BF2BA50;
-	Sun, 28 Apr 2024 22:05:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 109AC125CD;
+	Sun, 28 Apr 2024 23:17:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ferroamp-se.20230601.gappssmtp.com header.i=@ferroamp-se.20230601.gappssmtp.com header.b="x69P09HD"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="gnifZcZF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49C39C144
-	for <netdev@vger.kernel.org>; Sun, 28 Apr 2024 22:04:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39C4CB664;
+	Sun, 28 Apr 2024 23:17:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714341900; cv=none; b=BIXim+FX6U1sVNbrLCjWZpL9IvoWuCp/jtjUn3LXrrc2Gq1cgkfp1NeBr81XJaohrgrFjxrSQmVJkJRYGTzjsOkfV4cXgiCbVCegtd4r5bumIrewPN3gBGBdS8ZAKKQnp8MrvgFoxcs8KWmavesQF4KYb9Yg2STgWvm0OImFvZc=
+	t=1714346259; cv=none; b=Ic74vHarZf32p7uZI3FHrC0LWNnyggiFfCd4UP9qWCO35LCJ92J1vZ0Njl+A397mnASloFOfAEPIe97xcwX+YXO9KFn8neapzakydCEgPgE1VEjMYh3Qd20rp3f62f8qnFHBqeiDqxpNESCCtzeEj8rVgoMroOG8SMx4X9s4bPA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714341900; c=relaxed/simple;
-	bh=4RqsDjz6bW3uKuO0Fsvr3+kThoLZuoIPu0ISXkKrTyE=;
+	s=arc-20240116; t=1714346259; c=relaxed/simple;
+	bh=yddcab5au8dcJoHAuuTUrC0HJdHCkbWtQT1Frk4wJt0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JJBfjY6g1GQUohCD3fRyjP4TFux+3nirftTL57fdOVW35w2PMlcmIiyncHxM4LuCG59taxebjSPxnR+yBbiQxPj41EyerlSU5plclyLa8g3FJ5//mXi7gQCg8MMvwyEO3aBc+iR75OZ2AWwze9xPwQcZQ5VuFKVNgUxe4P75YVA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ferroamp.se; spf=pass smtp.mailfrom=ferroamp.se; dkim=pass (2048-bit key) header.d=ferroamp-se.20230601.gappssmtp.com header.i=@ferroamp-se.20230601.gappssmtp.com header.b=x69P09HD; arc=none smtp.client-ip=209.85.167.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ferroamp.se
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ferroamp.se
-Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-518a56cdc03so4222792e87.1
-        for <netdev@vger.kernel.org>; Sun, 28 Apr 2024 15:04:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ferroamp-se.20230601.gappssmtp.com; s=20230601; t=1714341897; x=1714946697; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=H1dBr2tBHwkZy3R1A5ZSprdad8ekfhB+9jofNOvQ5fE=;
-        b=x69P09HDqj18ZyhohC3t9ioNl3G/T7Z05fJnLDxHMnHKU/CrzSFEeLkrriCO1dri+e
-         lS8P99CTC4dapjY/qpnsbe8u7iwnE1U0glIaPnej8sk/lS0YKqCgkHxkX7Yn7O3UkQnh
-         5OnY/8uirQgSUF7RK5hr3NT5mmhmLDV7lz/fdATjRXIK5fnECMF8j5DyZLOeDcCQH1XF
-         r758vnNfKGCzQz5frBzNlCziqFw4m1NjTUgVgWkk/AGlSAj66sLzLdqJcXNOlFmX1/VM
-         dZjM6O1PnpBc3MtSKY8aGudcQKADRNm43jAFSFh5qP/8G3VyOs0WbTl02PNRZxDtso9x
-         cdGg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714341897; x=1714946697;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=H1dBr2tBHwkZy3R1A5ZSprdad8ekfhB+9jofNOvQ5fE=;
-        b=NlvNhrgaWyksqcYy38M4by/kuiB+iS/ZMi4aqPjW+ord14I7SUW84n+FwtMK8pXJS+
-         PXJj0BCJ2H+ZRE6RQgejnPqtRgsoOwOOWcmgtg6X7QMzFn+jytBK7pyCxX4wZ435yVOt
-         3wripzlEq0HqEsLBrPWOBSk1HoqaoebXJzifh4Z2hz0hQDDChgLsAfKprBUNeHIjzC2p
-         BMaDNua7mue6/KBcXM5v5EpO5o4chVFnBMzn3y+Tl0bP2eNLexbZfmAAGcJ0BjYT3WvE
-         mTOSGy/03iyM5fSKuxDB67yUYvl4tXRljcn5bSf8ydkA8G6TXzOiwq+BD94WB9r5rt32
-         NzLQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV1TZh/Qu7//U44c5zN3JVFaFlhk4hPHDSj8zV4PlPaclHtBQ4v+RvdhaeOhM4vbSGfq8BMHP7S49qn5lyLWaxCiiYGLg6/
-X-Gm-Message-State: AOJu0YytY7EcMUxjsvH4DdeUnHqJ8n6IhknpeAJqI45L67yxbkUHHv4X
-	2V8d8NLHL8I4+9evYQM4hx75QdhPyM4wMgR5yEY33sYZghIFzSWAS+lU+vGEEY8=
-X-Google-Smtp-Source: AGHT+IGsfdQ5hwxsPrYlKFP4rOafGl9ZX1COj2lhKabxTOxWM5ZO2gZkVWsJ4WnGwxMJE16O6x9P0Q==
-X-Received: by 2002:a05:6512:3294:b0:51d:4473:48eb with SMTP id p20-20020a056512329400b0051d447348ebmr2172432lfe.38.1714341897439;
-        Sun, 28 Apr 2024 15:04:57 -0700 (PDT)
-Received: from builder (c188-149-135-220.bredband.tele2.se. [188.149.135.220])
-        by smtp.gmail.com with ESMTPSA id o2-20020ac25e22000000b0051cc6cd306fsm901709lfg.168.2024.04.28.15.04.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 28 Apr 2024 15:04:57 -0700 (PDT)
-Date: Mon, 29 Apr 2024 00:04:55 +0200
-From: =?iso-8859-1?Q?Ram=F3n?= Nordin Rodriguez <ramon.nordin.rodriguez@ferroamp.se>
-To: Andrew Lunn <andrew@lunn.ch>
+	 Content-Type:Content-Disposition:In-Reply-To; b=l5bmsJtYKkC/UO1JSuvWR+a+VdfzSeKD2BaVaW9QzhTQK2Vb5WkBow5dhmXQhi9lgkTXnaM+1sllWUooQWevt7zIUQyTLVUHINDeSRhuBXWOn99SFItOCmT03jaA4/LmGsTrf+G93vWVhjNyrkXIk2AchSVXoHAh9FH1Nl83lnQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=gnifZcZF; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=SMe0vlJFp/xalizO6Sd1gmUR5ZkmrPZTdfiEBeCz/LQ=; b=gn
+	ifZcZFkS4YmYfgxdFm6pJvh18z15pOUad4fald1wPhy8iZNEjhQRtTQCyPKUmEqLum0IUIWyDtFAv
+	ejkJL10FFOIALO/HmNmmV6ZGg3rBiou7Sh2ibZS/NDEaeevOqxLYwNzWth9jdnOAmTpb2dbEHHHc/
+	WLsv+poAhHxnNa8=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1s1Dlf-00ECv4-01; Mon, 29 Apr 2024 01:17:11 +0200
+Date: Mon, 29 Apr 2024 01:17:10 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: =?iso-8859-1?Q?Ram=F3n?= Nordin Rodriguez <ramon.nordin.rodriguez@ferroamp.se>
 Cc: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>,
 	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
 	pabeni@redhat.com, horms@kernel.org, saeedm@nvidia.com,
@@ -82,41 +59,107 @@ Cc: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>,
 	Thorsten.Kummermehr@microchip.com, Pier.Beruto@onsemi.com,
 	Selvamani.Rajagopal@onsemi.com, Nicolas.Ferre@microchip.com,
 	benjamin.bigler@bernformulastudent.ch
-Subject: Re: [PATCH net-next v4 05/12] net: ethernet: oa_tc6: implement error
- interrupts unmasking
-Message-ID: <Zi7IB_uKdFkJLtCS@builder>
+Subject: Re: [PATCH net-next v4 13/12] net: lan865x: optional hardware reset
+Message-ID: <13c38696-25ed-418d-b85e-950736384a0b@lunn.ch>
 References: <20240418125648.372526-1-Parthiban.Veerasooran@microchip.com>
- <20240418125648.372526-6-Parthiban.Veerasooran@microchip.com>
- <Zi1Xbz7ARLm3HkqW@builder>
- <77d7d190-0847-4dc9-8fc5-4e33308ce7c8@lunn.ch>
- <Zi4czGX8jlqSdNrr@builder>
- <874654d4-3c52-4b0e-944a-dc5822f54a5d@lunn.ch>
+ <Zi68sDje4wfgftyZ@builder>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <874654d4-3c52-4b0e-944a-dc5822f54a5d@lunn.ch>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <Zi68sDje4wfgftyZ@builder>
 
-On Sun, Apr 28, 2024 at 04:59:40PM +0200, Andrew Lunn wrote:
-> > n  |  name     |  min  |  avg  |  max  |  rx dropped  |  samples
-> > 1  |  no mod   |  827K |  846K |  891K |      945     |     5
-> > 2  |  no log   |  711K |  726K |  744K |      562     |     5
-> > 3  |  less irq |  815K |  833K |  846K |      N/A     |     5
-> > 4  |  no irq   |  914K |  924K |  931K |      N/A     |     5
-> > 5  |  simple   |  857K |  868K |  879K |      615     |     5
-> 
-> That is odd.
-> 
-> Side question: What CONFIG_HZ= do you have? 100, 250, 1000?  Try
-> 1000. I've seen problems where the driver wants to sleep for a short
-> time, but the CONFIG_HZ value limits how short a time it can actually
-> sleep. It ends up sleeping much longer than it wants.
-> 
+On Sun, Apr 28, 2024 at 11:16:32PM +0200, Ramón Nordin Rodriguez wrote:
+> >From c65e42982684d5fd8b2294eb6acf755aa0fcab83 Mon Sep 17 00:00:00 2001
+> From: =?UTF-8?q?Ram=C3=B3n=20Nordin=20Rodriguez?=
+>  <ramon.nordin.rodriguez@ferroamp.se>
+> Date: Sun, 28 Apr 2024 22:25:12 +0200
+> Subject: [PATCH net-next v4 13/12] net: lan865x: optional hardware reset
+> MIME-Version: 1.0
+> Content-Type: text/plain; charset=UTF-8
+> Content-Transfer-Encoding: 8bit
 
-Good catch, had it set to 250. I'll rebuild with CONFIG_HZ=1000 and
-rerun the tests.
+You sent this patch in an odd way. We don't normally see headers like
+this. I've been using b4 recently for patch management:
+
+https://b4.docs.kernel.org/en/latest/contributor/prep.html
+
+Using `b4 send` is a good idea. Otherwise git format-patch; git send-email
+
+> index 9abefa8b9d9f..bed9033574b2 100644
+> --- a/drivers/net/ethernet/microchip/lan865x/lan865x.c
+> +++ b/drivers/net/ethernet/microchip/lan865x/lan865x.c
+> @@ -9,6 +9,7 @@
+>  #include <linux/kernel.h>
+>  #include <linux/phy.h>
+>  #include <linux/oa_tc6.h>
+> +#include <linux/gpio/driver.h>
+
+This is not a gpio driver, it is a gpio consumer. So you should be
+using linux/gpio/consumer.h. Also, i _think_ the includes are sorted,
+so it probably should go earlier.
+
+>  
+>  #define DRV_NAME			"lan865x"
+>  
+> @@ -33,6 +34,7 @@
+>  
+>  struct lan865x_priv {
+>  	struct work_struct multicast_work;
+> +	struct gpio_desc *reset_gpio;
+>  	struct net_device *netdev;
+>  	struct spi_device *spi;
+>  	struct oa_tc6 *tc6;
+> @@ -283,6 +285,24 @@ static int lan865x_set_zarfe(struct lan865x_priv *priv)
+>  	return oa_tc6_write_register(priv->tc6, OA_TC6_REG_CONFIG0, regval);
+>  }
+>  
+> +static int lan865x_probe_reset_gpio(struct lan865x_priv *priv)
+> +{
+> +	priv->reset_gpio = devm_gpiod_get_optional(&priv->spi->dev, "reset",
+> +						   GPIOD_OUT_HIGH);
+> +	if (IS_ERR(priv->reset_gpio))
+> +		return PTR_ERR(priv->reset_gpio);
+> +
+> +	return 0;
+> +}
+> +
+> +static void lan865x_hw_reset(struct lan865x_priv *priv)
+> +{
+> +	gpiod_set_value_cansleep(priv->reset_gpio, 1);
+> +	// section 9.6.3 RESET_N Timing specifies a minimum hold of 5us
+> +	usleep_range(5, 10);
+> +	gpiod_set_value_cansleep(priv->reset_gpio, 0);
+> +}
+
+Do you see a need to do a reset at any time other than probe? If not,
+i would probably combine these two functions into one. Also, since you
+pass GPIOD_OUT_HIGH, you have already put it into reset. So setting
+the gpio to 1 is pointless.
+
+Does the datasheet say anything about how long you should wait after
+releasing the reset?
+
+> +
+>  static int lan865x_probe(struct spi_device *spi)
+>  {
+>  	struct net_device *netdev;
+> @@ -297,6 +317,14 @@ static int lan865x_probe(struct spi_device *spi)
+>  	priv->netdev = netdev;
+>  	priv->spi = spi;
+>  	spi_set_drvdata(spi, priv);
+> +	if (lan865x_probe_reset_gpio(priv)) {
+> +		dev_err(&spi->dev, "failed to probe reset pin");
+> +		ret = -ENODEV;
+
+It is normal that a function like lan865x_probe_reset_gpio() would
+return an error code. You should then return that error code, rather
+than replace it with ENODEV.
+
+     Andrew
 
