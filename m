@@ -1,154 +1,102 @@
-Return-Path: <netdev+bounces-91996-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91997-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 377298B4B7C
-	for <lists+netdev@lfdr.de>; Sun, 28 Apr 2024 13:19:20 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 377FD8B4BE4
+	for <lists+netdev@lfdr.de>; Sun, 28 Apr 2024 15:07:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6827A1C20992
-	for <lists+netdev@lfdr.de>; Sun, 28 Apr 2024 11:19:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D81B81F2145E
+	for <lists+netdev@lfdr.de>; Sun, 28 Apr 2024 13:07:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F56A54F96;
-	Sun, 28 Apr 2024 11:19:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 136AA6CDA0;
+	Sun, 28 Apr 2024 13:07:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r/guf0pd"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21A3A58AA4;
-	Sun, 28 Apr 2024 11:19:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF2D16BFBD;
+	Sun, 28 Apr 2024 13:07:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714303154; cv=none; b=GYnBqGQrcJX/Rt9XYJUXhp+g5N5MFCHMD9lR/MRKnWVzivbzqAICF5n2cvB0UzqDaMQYIOKa+ZyDN5Hdk4UUrdTuJjrBw3w0YE/gC/A621WjfHKrLnekMS7qEco+Pj/reqdX/Ji7jeXC3hzT9TdWpVWEw8xeHE2hcdHvkhQTIK8=
+	t=1714309643; cv=none; b=oAKW3KIlag5Kk8l3qMgCPmlAZVCq4NEY6jVZngsFyznimnKL6lDlldI69pmGofkK1CFRsZM0v5H6FMmkgzkwpDjEWLUr/99vT4VqAcmjVCIfLdguAK0jDC9CGAoT6c0E2XvMaD/CqTQlSfnsMcHU8l29l+FFMc5lKj50ZHU+pA8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714303154; c=relaxed/simple;
-	bh=4+r6r9mLcw3DG9xwAzvLFDmxGy+SCZxO28Cxfof2pZU=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=QezDR5QEkDtNz5Jw2cRX0QcGfcl/IzHqvq/He4KedXQQqs2M5Y9HwzTibCHi8SE4zSR7hee3WY6akLTvhWb276VxA07P/2ASKsaRhxFztNYmDRFsrCz0+PAKmdFp6+sW6EXKUEnRb2QunOyK4Q3qXaRz/m2SSZpYKY5HeSSzUgc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.162.254])
-	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4VS3mW54lPz1RB0m;
-	Sun, 28 Apr 2024 19:15:55 +0800 (CST)
-Received: from dggpemm500005.china.huawei.com (unknown [7.185.36.74])
-	by mail.maildlp.com (Postfix) with ESMTPS id 77B0F18007C;
-	Sun, 28 Apr 2024 19:19:02 +0800 (CST)
-Received: from localhost.localdomain (10.69.192.56) by
- dggpemm500005.china.huawei.com (7.185.36.74) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Sun, 28 Apr 2024 19:19:02 +0800
-From: Yunsheng Lin <linyunsheng@huawei.com>
-To: David Howells <dhowells@redhat.com>, Marc Dionne
-	<marc.dionne@auristor.com>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>
-CC: Yunsheng Lin <linyunsheng@huawei.com>, Alexander Duyck
-	<alexander.duyck@gmail.com>, <linux-afs@lists.infradead.org>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH v2] rxrpc: Fix using alignmask being zero for __page_frag_alloc_align()
-Date: Sun, 28 Apr 2024 19:16:38 +0800
-Message-ID: <20240428111640.27306-1-linyunsheng@huawei.com>
-X-Mailer: git-send-email 2.33.0
+	s=arc-20240116; t=1714309643; c=relaxed/simple;
+	bh=9yyE8eKKUc/4RgJtB91ozG6CzRgB3As3mCsWRI33/p8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=M8qqNEJ1SS5an+zUmMI8whw9LtmAMYwLH4BQhwM5K3qYH1i7B6T9SuYKFyjUNkc967b1dYv32k8lo/k6RXSqfTTlQpb2VHJrcpTYxQN2xDZFP5m1S6yuP1DDP3Nrudpbehamp3yLlvEk7UoORflN9ooZ6r/1Iax37AFcYwGENEQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r/guf0pd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E3CCC113CC;
+	Sun, 28 Apr 2024 13:07:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714309642;
+	bh=9yyE8eKKUc/4RgJtB91ozG6CzRgB3As3mCsWRI33/p8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=r/guf0pdPIsuUe0cpmgz5Sa/Tenb1I0LoY3zNdoDXGIfG6OEQiZ80sJwWn/8B2wx/
+	 4vM4xurlTQWZYLbMQ6906XXRVQqPAPx2SCGLYWo5ptROnX9dASaf9+szPiymGckRj3
+	 YJ9rvucBXr9Q3BiaW69uVmgT3YtzZxQC8fX1LnBqPFSjRAUVf0Uktl9gmwOkR+F57J
+	 aRkpk72IcQEzyujKFfxh86eHPDU4/vwJdD7CQmBTRQypYQvDuqKDO7DGpvCHZRFRbt
+	 zS2D45/U/6Yn8W9OpZkRE0AlR5LfDCHxoUyMmAoMqr04nVcLnyAx+Cb2LgtTwDV50w
+	 kWwUWzzd7HqSQ==
+Date: Sun, 28 Apr 2024 14:05:47 +0100
+From: Simon Horman <horms@kernel.org>
+To: Corinna Vinschen <vinschen@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	intel-wired-lan@lists.osuosl.org,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Jason Xing <kerneljasonxing@gmail.com>,
+	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>
+Subject: Re: [PATCH net v2] igb: cope with large MAX_SKB_FRAGS
+Message-ID: <20240428130547.GV516117@kernel.org>
+References: <20240423134731.918157-1-vinschen@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- dggpemm500005.china.huawei.com (7.185.36.74)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240423134731.918157-1-vinschen@redhat.com>
 
-rxrpc_alloc_data_txbuf() may be called with data_align being
-zero in none_alloc_txbuf() and rxkad_alloc_txbuf(), data_align
-is supposed to be an order-based alignment value, but zero is
-not a valid order-based alignment value, and '~(data_align - 1)'
-doesn't result in a valid mask-based alignment value for
-__page_frag_alloc_align().
+On Tue, Apr 23, 2024 at 03:47:31PM +0200, Corinna Vinschen wrote:
+> From: Paolo Abeni <pabeni@redhat.com>
+> 
+> Sabrina reports that the igb driver does not cope well with large
+> MAX_SKB_FRAG values: setting MAX_SKB_FRAG to 45 causes payload
+> corruption on TX.
+> 
+> An easy reproducer is to run ssh to connect to the machine.  With
+> MAX_SKB_FRAGS=17 it works, with MAX_SKB_FRAGS=45 it fails.
+> 
+> The root cause of the issue is that the driver does not take into
+> account properly the (possibly large) shared info size when selecting
+> the ring layout, and will try to fit two packets inside the same 4K
+> page even when the 1st fraglist will trump over the 2nd head.
+> 
+> Address the issue forcing the driver to fit a single packet per page,
+> leaving there enough room to store the (currently) largest possible
+> skb_shared_info.
+> 
+> Fixes: 3948b05950fd ("net: introduce a config option to tweak MAX_SKB_FRAG")
 
-Fix it by passing a valid order-based alignment value in
-none_alloc_txbuf() and rxkad_alloc_txbuf().
+nit: The trailing "S" in the subject for the fixes tag seems to have been lost.
 
-Also use page_frag_alloc_align() expecting an order-based
-alignment value in rxrpc_alloc_data_txbuf() to avoid doing the
-alignment converting operation and to catch possible invalid
-alignment value in the future. Remove the 'if (data_align)'
-checking too, as it is always true for a valid order-based
-alignment value.
+Fixes: 3948b05950fd ("net: introduce a config option to tweak MAX_SKB_FRAGS")
 
-Fixes: 6b2536462fd4 ("rxrpc: Fix use of changed alignment param to page_frag_alloc_align()")
-Fixes: 49489bb03a50 ("rxrpc: Do zerocopy using MSG_SPLICE_PAGES and page frags")
-CC: David Howells <dhowells@redhat.com>
-CC: Alexander Duyck <alexander.duyck@gmail.com>
-Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
-Acked-by: David Howells <dhowells@redhat.com>
----
-V2: use 'umax' and drop 'U' as suggested by David.
----
- net/rxrpc/insecure.c |  2 +-
- net/rxrpc/rxkad.c    |  2 +-
- net/rxrpc/txbuf.c    | 10 +++++-----
- 3 files changed, 7 insertions(+), 7 deletions(-)
+> Reported-by: Jan Tluka <jtluka@redhat.com>
+> Reported-by: Jirka Hladky <jhladky@redhat.com>
+> Reported-by: Sabrina Dubroca <sd@queasysnail.net>
+> Tested-by: Sabrina Dubroca <sd@queasysnail.net>
+> Tested-by: Corinna Vinschen <vinschen@redhat.com>
+> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 
-diff --git a/net/rxrpc/insecure.c b/net/rxrpc/insecure.c
-index f2701068ed9e..6716c021a532 100644
---- a/net/rxrpc/insecure.c
-+++ b/net/rxrpc/insecure.c
-@@ -19,7 +19,7 @@ static int none_init_connection_security(struct rxrpc_connection *conn,
-  */
- static struct rxrpc_txbuf *none_alloc_txbuf(struct rxrpc_call *call, size_t remain, gfp_t gfp)
- {
--	return rxrpc_alloc_data_txbuf(call, min_t(size_t, remain, RXRPC_JUMBO_DATALEN), 0, gfp);
-+	return rxrpc_alloc_data_txbuf(call, min_t(size_t, remain, RXRPC_JUMBO_DATALEN), 1, gfp);
- }
- 
- static int none_secure_packet(struct rxrpc_call *call, struct rxrpc_txbuf *txb)
-diff --git a/net/rxrpc/rxkad.c b/net/rxrpc/rxkad.c
-index f1a68270862d..48a1475e6b06 100644
---- a/net/rxrpc/rxkad.c
-+++ b/net/rxrpc/rxkad.c
-@@ -155,7 +155,7 @@ static struct rxrpc_txbuf *rxkad_alloc_txbuf(struct rxrpc_call *call, size_t rem
- 	switch (call->conn->security_level) {
- 	default:
- 		space = min_t(size_t, remain, RXRPC_JUMBO_DATALEN);
--		return rxrpc_alloc_data_txbuf(call, space, 0, gfp);
-+		return rxrpc_alloc_data_txbuf(call, space, 1, gfp);
- 	case RXRPC_SECURITY_AUTH:
- 		shdr = sizeof(struct rxkad_level1_hdr);
- 		break;
-diff --git a/net/rxrpc/txbuf.c b/net/rxrpc/txbuf.c
-index e0679658d9de..c3913d8a50d3 100644
---- a/net/rxrpc/txbuf.c
-+++ b/net/rxrpc/txbuf.c
-@@ -21,20 +21,20 @@ struct rxrpc_txbuf *rxrpc_alloc_data_txbuf(struct rxrpc_call *call, size_t data_
- {
- 	struct rxrpc_wire_header *whdr;
- 	struct rxrpc_txbuf *txb;
--	size_t total, hoff = 0;
-+	size_t total, hoff;
- 	void *buf;
- 
- 	txb = kmalloc(sizeof(*txb), gfp);
- 	if (!txb)
- 		return NULL;
- 
--	if (data_align)
--		hoff = round_up(sizeof(*whdr), data_align) - sizeof(*whdr);
-+	hoff = round_up(sizeof(*whdr), data_align) - sizeof(*whdr);
- 	total = hoff + sizeof(*whdr) + data_size;
- 
-+	data_align = umax(data_align, L1_CACHE_BYTES);
- 	mutex_lock(&call->conn->tx_data_alloc_lock);
--	buf = __page_frag_alloc_align(&call->conn->tx_data_alloc, total, gfp,
--				      ~(data_align - 1) & ~(L1_CACHE_BYTES - 1));
-+	buf = page_frag_alloc_align(&call->conn->tx_data_alloc, total, gfp,
-+				    data_align);
- 	mutex_unlock(&call->conn->tx_data_alloc_lock);
- 	if (!buf) {
- 		kfree(txb);
--- 
-2.33.0
-
+...
 
