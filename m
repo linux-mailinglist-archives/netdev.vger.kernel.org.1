@@ -1,89 +1,116 @@
-Return-Path: <netdev+bounces-92003-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92004-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10E598B4C22
-	for <lists+netdev@lfdr.de>; Sun, 28 Apr 2024 16:25:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E554F8B4C27
+	for <lists+netdev@lfdr.de>; Sun, 28 Apr 2024 16:29:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1D4A91C20C6B
-	for <lists+netdev@lfdr.de>; Sun, 28 Apr 2024 14:25:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1AAA81C20A6B
+	for <lists+netdev@lfdr.de>; Sun, 28 Apr 2024 14:29:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 802C76E61E;
-	Sun, 28 Apr 2024 14:25:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB0F06D1C7;
+	Sun, 28 Apr 2024 14:29:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="PsybsRSJ"
+	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="sXwpeMVa"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C01F9AD52;
-	Sun, 28 Apr 2024 14:25:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6A5A1C32;
+	Sun, 28 Apr 2024 14:29:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=60.244.123.138
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714314342; cv=none; b=UMNFsUXqtxgHq4bwF0XLWsMGvbTXT8v1OYXRBJBGE+8IzhEj8aTGS0bC1hSZH619gew4KK2okliFhpVljwtWIkFLZOvoD+8aESDs+KivaaYpN96iWlGVjF8tdzQtHaxA5JRs94nNPY+NBrOgAQM//HnLl1EtL35Ki2aCAri5iJg=
+	t=1714314567; cv=none; b=uRpA8SrhYnkV9Bu3HpF7MU0BT1Mf0+demejSL2G5SutWb4jETT7jF+LAWsr4fE28ymkkyqViwYrxCegz4zyzTHqoyqWgOAaVLELf5z0sBOyR8ivPPo0AWwIqfGxp9hXvIYYqFccT+K4fYfZiAoj+sSCUL+s+0flYhCq++YbWDEQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714314342; c=relaxed/simple;
-	bh=lZxJrpNHn0XSynHk/uJrhAg3iT15StGrcBJXagCaH9Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DOuarzbh5njgD/7kLQvIb3pDDasTpqNfmgjaYSvrqW0/tuej1UkNApO9mbfeXYROqBhAtJEQViMJZknjrEghyV+DVqaqqjkbABXTLquZWPktRBZfEeAQ50jOnkKFpE7mU5yLYDuPRC8/pD7G19N7V6p+WyBbp7HQ0BJ1LMmZeJI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=PsybsRSJ; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=M2ewwiL2pIG/9gVc441cLBbAgSNOqpkmdmS7M7cFcKk=; b=PsybsRSJOkK+rGQOMjU4XdJfQ2
-	PAtzE8sZGN0AlyQlsLwcVCWK1ocgaCJtSWG1akpwGdSZwplwCtDlbtCe5PTLrCit+FU2ronl8NDUN
-	GcRnDxwgLBGDFw8M/GbLCDRtpwsfyW56zlGdCguvofmc0UMTGgjaifCWtXsb7p8+t3KY=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1s15T6-00EBwA-JJ; Sun, 28 Apr 2024 16:25:28 +0200
-Date: Sun, 28 Apr 2024 16:25:28 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: =?iso-8859-1?Q?Ram=F3n?= Nordin Rodriguez <ramon.nordin.rodriguez@ferroamp.se>
-Cc: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, horms@kernel.org, saeedm@nvidia.com,
-	anthony.l.nguyen@intel.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, corbet@lwn.net,
-	linux-doc@vger.kernel.org, robh+dt@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
-	devicetree@vger.kernel.org, horatiu.vultur@microchip.com,
-	ruanjinjie@huawei.com, steen.hegelund@microchip.com,
-	vladimir.oltean@nxp.com, UNGLinuxDriver@microchip.com,
-	Thorsten.Kummermehr@microchip.com, Pier.Beruto@onsemi.com,
-	Selvamani.Rajagopal@onsemi.com, Nicolas.Ferre@microchip.com,
-	benjamin.bigler@bernformulastudent.ch
-Subject: Re: [PATCH net-next v4 11/12] microchip: lan865x: add driver support
- for Microchip's LAN865X MAC-PHY
-Message-ID: <8e06c952-b5ab-4591-8ab0-7aebf612a67e@lunn.ch>
-References: <20240418125648.372526-1-Parthiban.Veerasooran@microchip.com>
- <20240418125648.372526-12-Parthiban.Veerasooran@microchip.com>
- <Zi1Tang5RQMmEFdx@builder>
- <50b7cb69-61c0-45a2-9a48-4160b2d1e24c@lunn.ch>
- <Zi1uIjoIgzir1cwA@builder>
+	s=arc-20240116; t=1714314567; c=relaxed/simple;
+	bh=pEOEFwml9g9Ku1dfnMgPeNijnvjb2rGfZrouDU5XDvs=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=O+7ARqPXee4yxe4nzttFbcAViYqK3diKFRoZnHworYNvTYmWfj5N3/nl3Kc1n3wZPPw6IlaZivOqSwyUpCLHCmqIL/yyagX2vWnUkdqOyh152OW9JGFsLGJ4rQ6g61yIdcfy3Sg2TkVk3tlfIH4BGDFJRCn3gESpdL8/Zp1kKZs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=sXwpeMVa; arc=none smtp.client-ip=60.244.123.138
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
+X-UUID: b2522164056b11efb92737409a0e9459-20240428
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+	h=Content-Type:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=+AJLIaBitYxpEmHqEZ77HT8/gK2VQB6rWKd5c7RlOhA=;
+	b=sXwpeMVaadQuhbwLlpl8riuhQtqjOyMbj8n9tZlrkBbxt9Y4ZPnbF0fnqheyAzzcU8MzU3MLv+LlqPSx/xThANZj3sxqIPVSS2Nu6tSJFkUhBfcnMH5KNKKZhqdrmAN+zBRfm5E9TazusmfGvB7Ita7Ml12Ycb+XLXIot2ezQoo=;
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.38,REQID:a218aa2d-9b93-4571-bfc4-a000bf3160cd,IP:0,U
+	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
+	release,TS:0
+X-CID-META: VersionHash:82c5f88,CLOUDID:010ab166-72bc-4ae0-ab39-a531fe78e0a5,B
+	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0,EDM:-3,IP:nil,U
+	RL:11|1,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES
+	:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
+X-CID-BVR: 0
+X-CID-BAS: 0,_,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_ULN
+X-UUID: b2522164056b11efb92737409a0e9459-20240428
+Received: from mtkmbs14n1.mediatek.inc [(172.21.101.75)] by mailgw01.mediatek.com
+	(envelope-from <shiming.cheng@mediatek.com>)
+	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+	with ESMTP id 1209379289; Sun, 28 Apr 2024 22:29:18 +0800
+Received: from mtkmbs13n2.mediatek.inc (172.21.101.108) by
+ mtkmbs11n2.mediatek.inc (172.21.101.187) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.26; Sun, 28 Apr 2024 22:29:17 +0800
+Received: from mbjsdccf07.gcn.mediatek.inc (10.15.20.246) by
+ mtkmbs13n2.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
+ 15.2.1118.26 via Frontend Transport; Sun, 28 Apr 2024 22:29:16 +0800
+From: <shiming.cheng@mediatek.com>
+To: <willemdebruijn.kernel@gmail.com>, <edumazet@google.com>,
+	<davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<matthias.bgg@gmail.com>
+CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<shiming.cheng@mediatek.com>, Lena Wang <lena.wang@mediatek.com>
+Subject: [PATCH net] net: prevent pulling SKB_GSO_FRAGLIST skb
+Date: Sun, 28 Apr 2024 22:29:13 +0800
+Message-ID: <20240428142913.18666-1-shiming.cheng@mediatek.com>
+X-Mailer: git-send-email 2.18.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Zi1uIjoIgzir1cwA@builder>
+Content-Type: text/plain
+X-MTK: N
 
-> I agree with your assesment, the phy won't reset itself, but maybe we
-> could add some comment doc about not adding it for the lan8670,
-> so no one trips over that in the future.
+From: Shiming Cheng <shiming.cheng@mediatek.com>
 
-In the PHY driver, you can provide your own .soft_reset handler. It
-could return -EOPNOTSUPP, or -EINVAL. Maybe check the data sheets for
-the standalone devices supported by the driver. Can you limit this to
-just the TC6 PHY?
+BPF or TC callers may pull in a length longer than skb_headlen()
+for a SKB_GSO_FRAGLIST skb. The data in fraglist will be pulled
+into the linear space. However it destroys the skb's structure
+and may result in an invalid segmentation or kernel exception.
 
-     Andrew
+So we should add protection to stop the operation and return
+error to remind callers.
+
+Fixes: 3a1296a38d0c ("net: Support GRO/GSO fraglist chaining.")
+Signed-off-by: Shiming Cheng <shiming.cheng@mediatek.com>
+Signed-off-by: Lena Wang <lena.wang@mediatek.com>
+---
+ net/core/skbuff.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+index f68f2679b086..2d35e009e814 100644
+--- a/net/core/skbuff.c
++++ b/net/core/skbuff.c
+@@ -6100,6 +6100,12 @@ EXPORT_SYMBOL(skb_vlan_untag);
+ 
+ int skb_ensure_writable(struct sk_buff *skb, unsigned int write_len)
+ {
++	if (skb_is_gso(skb) &&
++	    (skb_shinfo(skb)->gso_type & SKB_GSO_FRAGLIST) &&
++	     write_len > skb_headlen(skb)) {
++		return -ENOMEM;
++	}
++
+ 	if (!pskb_may_pull(skb, write_len))
+ 		return -ENOMEM;
+ 
+-- 
+2.18.0
+
 
