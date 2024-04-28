@@ -1,114 +1,144 @@
-Return-Path: <netdev+bounces-91979-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91980-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FFC28B4AAE
-	for <lists+netdev@lfdr.de>; Sun, 28 Apr 2024 10:15:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6DC48B4AF3
+	for <lists+netdev@lfdr.de>; Sun, 28 Apr 2024 11:20:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 50DF81C20B57
-	for <lists+netdev@lfdr.de>; Sun, 28 Apr 2024 08:15:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ECC141C20B3C
+	for <lists+netdev@lfdr.de>; Sun, 28 Apr 2024 09:20:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4ED351C5B;
-	Sun, 28 Apr 2024 08:15:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D30C654BDE;
+	Sun, 28 Apr 2024 09:20:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XZKXGUVw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 118D250A7A
-	for <netdev@vger.kernel.org>; Sun, 28 Apr 2024 08:15:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9D6E33C8;
+	Sun, 28 Apr 2024 09:20:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714292145; cv=none; b=JdzEqO2i7jpLv/ONMnu5BT1nekx/pqW3nYjGKtIsrrZucKleM4A3BY1GBSVzfTkjGWPoYNZk56+py383JBCbkPHE4/uvzzUDe0BRGpefuvZbUPORN1R1YXECws7/FgASSTyQ4uZPguO7sn1igyuMK9bWrlwEFGn28p7W9InuXSg=
+	t=1714296022; cv=none; b=icaj8fNXpTlfutY+biaE+YcNC4i9Xzy5QtlXYwYyHdqJP9QEpsbu6lvcpRNKDnHXN5iPBWdZrUp/Wpf1NbYonCZL+ZY2dH5LEGdYQkyal1rsIl2dHGtMUqBRptCidUfQYsFLIDL8ofJ1W4S+RDlqBwqL3t54llAvshePUuh5tb4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714292145; c=relaxed/simple;
-	bh=l/k+vM0/NzBXJOI3pUm4+hls/7uEKnTncklT5+b+ouw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=aqNwrkXWl9az2pV1anZzjLh4N4a9+nQYszJeYPzJoYTWIZ8wIzIU0LTFoac+TqGnL3rffvGmYhWtuQyPaTQWE6ijVzL568NXlTUtHHhbL+B7cMRhQDy9edooF5Kh7v0+CisRPN0vP7CrrgZXc8OUgd/3Jh1SfLgN9QZVepnh1fk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2d874b89081so8329201fa.0
-        for <netdev@vger.kernel.org>; Sun, 28 Apr 2024 01:15:43 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714292142; x=1714896942;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=enjxRNkKuZiWZ2RiN4WqGso5DfY7oIJ6tL/Jqqxp350=;
-        b=dL1KjqPYSSWuiyBy+mS/rgFRqoiUCDKx2mQqAcdf0MCdlbaS0ju04a43kcTv8F17yb
-         RSseb0brtBpdr8QphDkb40NxMvAyo00Jr5IHBFLSv0Avh2pdmdK63gpD+b2LtLhoI7sv
-         3udWwt9m/2/9JtfXuaLKEDXN1xyazLZ733+DRyYl7KNrxL/ovIWtYPOhnWSrz6l/bf+F
-         uJJomi0TElRAjaHHK3gs/4qxFzY8qvTEc0Zqv9UEMp8tWuGqi2r9gWgzIX/vefPw5duV
-         Y1VVbOn9KwDDZWT5cKkgKkj1LJXSOiIkfL2EQ+miuoEqrXkG5kHwerO6AJ1WcJxPhDRm
-         8GFg==
-X-Forwarded-Encrypted: i=1; AJvYcCXaWHnQhiapJMe42CT4dIVkG8MN/DIos0bF/loDwxVI30uxFkT/poZ5uzkDegRYLFxy9FV/ZKPd16i3xsFu3rUpysqXrI60
-X-Gm-Message-State: AOJu0YwwZjRcZuajd+wyBEs2nXpk5ldFBLmPPEl7KZl1Vpf6VJSnIQ/n
-	wKe7LBgW9ogam1jfE16i+UU1aCI84d9V8OuL4MPMK8URDL8d/Y3B
-X-Google-Smtp-Source: AGHT+IGgjtFA6/cgUSNKNIFtaCVcvt+A4VZ8wiDKLn1OldQJe21264nSpXFsT4bzNQX2wDoiLY87SQ==
-X-Received: by 2002:a2e:97d4:0:b0:2df:1e3e:27e8 with SMTP id m20-20020a2e97d4000000b002df1e3e27e8mr4050673ljj.0.1714292141883;
-        Sun, 28 Apr 2024 01:15:41 -0700 (PDT)
-Received: from [10.100.102.74] (85.65.192.64.dynamic.barak-online.net. [85.65.192.64])
-        by smtp.gmail.com with ESMTPSA id fm9-20020a05600c0c0900b0041bf21a62bcsm3462222wmb.1.2024.04.28.01.15.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 28 Apr 2024 01:15:41 -0700 (PDT)
-Message-ID: <9a38f4db-bff5-4f0f-ac54-6ac23f748441@grimberg.me>
-Date: Sun, 28 Apr 2024 11:15:38 +0300
+	s=arc-20240116; t=1714296022; c=relaxed/simple;
+	bh=tTcSI2He67CI3Bx08DQeboEo2tW7XByRd7BFoSlFVNI=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=rRj5qsX6N7hEAqEBNDLcgq/6BbiG/8zDInMT+Sl7ZL8HBuslZD04P6G8kO9CFq85Tz1bxABcp3hCycS+gfNNt5OXLQzBFggilX02Cyazrq2GkO/CuL7UUdaIZmc+5l86JCtIGaPRAvFZR9EPXzc7qtngYmmpzLRB5OypfQxmius=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XZKXGUVw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 1FCC3C113CC;
+	Sun, 28 Apr 2024 09:20:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714296022;
+	bh=tTcSI2He67CI3Bx08DQeboEo2tW7XByRd7BFoSlFVNI=;
+	h=From:Date:Subject:To:Cc:Reply-To:From;
+	b=XZKXGUVwBO3S/f+J33iIx2bUkBDqcBhVQNzXpdKlZHIXBp7tHqCinBxD/4a3uUXEq
+	 oVb0wiN1anfd9DWl3LtauefrWiszXFknLYEiIRhHkK78HeP5s1SOiz5Xfl+/7Sp1fh
+	 3R3dHd9u3lJZINnAEQBQOV3BzCCS+XSDOXpwdtIZNcda+6ODZVhguXm0q6Dudv7/hu
+	 hrKVaQPUEokY3oz4qpHEhz2HkJ6Q1hETt1zVaH38dydhIz5p27YduGZVsokX0kytJp
+	 0gMxJy2W07ZdirlDbmW1z7Nu6oaAxv53XuiwSJyfye0wOLNHWs4Pb2JGUSZ+uw+/Md
+	 VsqwZaY1CJquw==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A01EC4345F;
+	Sun, 28 Apr 2024 09:20:22 +0000 (UTC)
+From: =?utf-8?q?Ar=C4=B1n=C3=A7_=C3=9CNAL_via_B4_Relay?= <devnull+arinc.unal.arinc9.com@kernel.org>
+Date: Sun, 28 Apr 2024 12:19:58 +0300
+Subject: [PATCH net-next v2] net: dsa: mt7530: do not set MT7530_P5_DIS
+ when PHY muxing is being used
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v24 01/20] net: Introduce direct data placement tcp
- offload
-To: Aurelien Aptel <aaptel@nvidia.com>, linux-nvme@lists.infradead.org,
- netdev@vger.kernel.org, hch@lst.de, kbusch@kernel.org, axboe@fb.com,
- chaitanyak@nvidia.com, davem@davemloft.net, kuba@kernel.org
-Cc: Boris Pismenny <borisp@nvidia.com>, aurelien.aptel@gmail.com,
- smalin@nvidia.com, malin1024@gmail.com, ogerlitz@nvidia.com,
- yorayz@nvidia.com, galshalom@nvidia.com, mgurtovoy@nvidia.com,
- edumazet@google.com, pabeni@redhat.com, dsahern@kernel.org, ast@kernel.org,
- jacob.e.keller@intel.com
-References: <20240404123717.11857-1-aaptel@nvidia.com>
- <20240404123717.11857-2-aaptel@nvidia.com>
- <3ab22e14-35eb-473e-a821-6dbddea96254@grimberg.me>
- <253o79wr3lh.fsf@mtr-vdi-124.i-did-not-set--mail-host-address--so-tickle-me>
-Content-Language: he-IL, en-US
-From: Sagi Grimberg <sagi@grimberg.me>
-In-Reply-To: <253o79wr3lh.fsf@mtr-vdi-124.i-did-not-set--mail-host-address--so-tickle-me>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Message-Id: <20240428-for-netnext-mt7530-do-not-disable-port5-when-phy-muxing-v2-1-bb7c37d293f8@arinc9.com>
+X-B4-Tracking: v=1; b=H4sIAL0ULmYC/6WOQQqDMBBFryKz7pQYlZCueo/iwpqJDtREktQq4
+ t2beoUuHx/e+ztECkwRbsUOgRaO7F0GeSmgHzs3ELLJDFLIWtRSofUBHSVHa8IpqaYSaDw6n9B
+ w7J4vwtmH1OBnJIfzuOH0XtkNqKxtrBFaN0ZBts+BLK9n+QFZiD8jtHkZOSYftvPSUp773/Wlx
+ BKVrnpjtVFKqHsX2PX62vsJ2uM4voIqUjcJAQAA
+To: Daniel Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>, 
+ Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>, 
+ Florian Fainelli <f.fainelli@gmail.com>, 
+ Vladimir Oltean <olteanv@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Matthias Brugger <matthias.bgg@gmail.com>, 
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org, 
+ =?utf-8?q?Ar=C4=B1n=C3=A7_=C3=9CNAL?= <arinc.unal@arinc9.com>
+X-Mailer: b4 0.13.0
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1714295997; l=2134;
+ i=arinc.unal@arinc9.com; s=arinc9-patatt; h=from:subject:message-id;
+ bh=mooBBatpyIktEez2DpRO7+tS0DbjK7qafqYlayMk1R4=;
+ b=EH/F59K96vk3QVfn9tauaQDX4oX1KGLZrhENnMQ3zPIzdDGpVuG9d19WaDUmDkSL9oXlKYEUD
+ RqTQzjjJFslCKXPH20Nulu1HorEX1WU6Kmh1q5sJpvuvG/541ly6mX6
+X-Developer-Key: i=arinc.unal@arinc9.com; a=ed25519;
+ pk=VmvgMWwm73yVIrlyJYvGtnXkQJy9CvbaeEqPQO9Z4kA=
+X-Endpoint-Received: by B4 Relay for arinc.unal@arinc9.com/arinc9-patatt
+ with auth_id=115
+X-Original-From: =?utf-8?q?Ar=C4=B1n=C3=A7_=C3=9CNAL?= <arinc.unal@arinc9.com>
+Reply-To: arinc.unal@arinc9.com
+
+From: Arınç ÜNAL <arinc.unal@arinc9.com>
+
+DSA initalises the ds->num_ports amount of ports in
+dsa_switch_touch_ports(). When the PHY muxing feature is in use, port 5
+won't be defined in the device tree. Because of this, the type member of
+the dsa_port structure for this port will be assigned DSA_PORT_TYPE_UNUSED.
+The dsa_port_setup() function calls ds->ops->port_disable() when the port
+type is DSA_PORT_TYPE_UNUSED.
+
+The MT7530_P5_DIS bit is unset in mt7530_setup() when PHY muxing is being
+used. mt7530_port_disable() which is assigned to ds->ops->port_disable() is
+called afterwards. Currently, mt7530_port_disable() sets MT7530_P5_DIS
+which breaks network connectivity when PHY muxing is being used.
+
+Therefore, do not set MT7530_P5_DIS when PHY muxing is being used.
+
+Fixes: 377174c5760c ("net: dsa: mt7530: move MT753X_MTRAP operations for MT7530")
+Reported-by: Daniel Golle <daniel@makrotopia.org>
+Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
+---
+Hello.
+
+I've sent this to net-next as the patch it fixes is on the current
+development cycle.
+---
+Changes in v2:
+- Add a comment to the code.
+- Improve the patch log.
+- Link to v1: https://lore.kernel.org/r/20240427-for-netnext-mt7530-do-not-disable-port5-when-phy-muxing-v1-1-793cdf9d7707@arinc9.com
+---
+ drivers/net/dsa/mt7530.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/dsa/mt7530.c b/drivers/net/dsa/mt7530.c
+index 2b9f904a98f0..2090f34e5289 100644
+--- a/drivers/net/dsa/mt7530.c
++++ b/drivers/net/dsa/mt7530.c
+@@ -1220,7 +1220,8 @@ mt7530_port_disable(struct dsa_switch *ds, int port)
+ 	if (priv->id != ID_MT7530 && priv->id != ID_MT7621)
+ 		return;
+ 
+-	if (port == 5)
++	/* Do not set MT7530_P5_DIS when port 5 is being used for PHY muxing. */
++	if (port == 5 && priv->p5_mode == GMAC5)
+ 		mt7530_set(priv, MT753X_MTRAP, MT7530_P5_DIS);
+ 	else if (port == 6)
+ 		mt7530_set(priv, MT753X_MTRAP, MT7530_P6_DIS);
+
+---
+base-commit: 5c4c0edca68a5841a8d53ccd49596fe199c8334c
+change-id: 20240427-for-netnext-mt7530-do-not-disable-port5-when-phy-muxing-7ff5fd0995d7
+
+Best regards,
+-- 
+Arınç ÜNAL <arinc.unal@arinc9.com>
 
 
-
-On 26/04/2024 10:21, Aurelien Aptel wrote:
-> Hi Sagi,
->
-> Sagi Grimberg <sagi@grimberg.me> writes:
->>> +     config->io_cpu = sk->sk_incoming_cpu;
->>> +     ret = netdev->netdev_ops->ulp_ddp_ops->sk_add(netdev, sk, config);
->> Still don't understand why you need the io_cpu config if you are passing
->> the sk to the driver...
-> With our HW we cannot move the offload queues to a different CPU without
-> destroying and recreating the offload resources on the new CPU.
-
-This is not simply a steering rule that can be overwritten at any point?
-
->
-> Since the connection is created from a different CPU then the io queue
-> thread, we cannot predict which CPU we should create our offload context
-> on.
->
-> Ideally, io_cpu should be set to nvme_queue->io_cpu or it should be removed
-> and the socket should be offloaded from the io thread. What do you
-> prefer?
-
-I was simply referring to the fact that you set config->io_cpu from 
-sk->sk_incoming_cpu
-and then you pass sk (and config) to .sk_add, so why does this 
-assignment need to
-exist here and not below the interface down at the driver?
 
