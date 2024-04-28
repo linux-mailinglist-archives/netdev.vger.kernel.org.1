@@ -1,144 +1,149 @@
-Return-Path: <netdev+bounces-91980-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91981-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6DC48B4AF3
-	for <lists+netdev@lfdr.de>; Sun, 28 Apr 2024 11:20:27 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 054E68B4B00
+	for <lists+netdev@lfdr.de>; Sun, 28 Apr 2024 11:33:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ECC141C20B3C
-	for <lists+netdev@lfdr.de>; Sun, 28 Apr 2024 09:20:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9C1611F215D2
+	for <lists+netdev@lfdr.de>; Sun, 28 Apr 2024 09:33:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D30C654BDE;
-	Sun, 28 Apr 2024 09:20:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 996F954F86;
+	Sun, 28 Apr 2024 09:33:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XZKXGUVw"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EXgk+ZaC"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9D6E33C8;
-	Sun, 28 Apr 2024 09:20:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39AD554904;
+	Sun, 28 Apr 2024 09:33:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714296022; cv=none; b=icaj8fNXpTlfutY+biaE+YcNC4i9Xzy5QtlXYwYyHdqJP9QEpsbu6lvcpRNKDnHXN5iPBWdZrUp/Wpf1NbYonCZL+ZY2dH5LEGdYQkyal1rsIl2dHGtMUqBRptCidUfQYsFLIDL8ofJ1W4S+RDlqBwqL3t54llAvshePUuh5tb4=
+	t=1714296825; cv=none; b=Dj7Wy7HTABvquxg31CJRD5AvQk7Imw1YVJE1imLbuKkamETOrO/1ByMGdZP23fz5rhU+Yri95RZnP5EXp1OzOejCCjpQisaT8Q0SPtTT5grbUkWBSokU4GXYBatAdZjg3G6SgXjeyiE/CUJNbbfMu/8nAiyEYnTlE6QArtctp7w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714296022; c=relaxed/simple;
-	bh=tTcSI2He67CI3Bx08DQeboEo2tW7XByRd7BFoSlFVNI=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=rRj5qsX6N7hEAqEBNDLcgq/6BbiG/8zDInMT+Sl7ZL8HBuslZD04P6G8kO9CFq85Tz1bxABcp3hCycS+gfNNt5OXLQzBFggilX02Cyazrq2GkO/CuL7UUdaIZmc+5l86JCtIGaPRAvFZR9EPXzc7qtngYmmpzLRB5OypfQxmius=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XZKXGUVw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 1FCC3C113CC;
-	Sun, 28 Apr 2024 09:20:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714296022;
-	bh=tTcSI2He67CI3Bx08DQeboEo2tW7XByRd7BFoSlFVNI=;
-	h=From:Date:Subject:To:Cc:Reply-To:From;
-	b=XZKXGUVwBO3S/f+J33iIx2bUkBDqcBhVQNzXpdKlZHIXBp7tHqCinBxD/4a3uUXEq
-	 oVb0wiN1anfd9DWl3LtauefrWiszXFknLYEiIRhHkK78HeP5s1SOiz5Xfl+/7Sp1fh
-	 3R3dHd9u3lJZINnAEQBQOV3BzCCS+XSDOXpwdtIZNcda+6ODZVhguXm0q6Dudv7/hu
-	 hrKVaQPUEokY3oz4qpHEhz2HkJ6Q1hETt1zVaH38dydhIz5p27YduGZVsokX0kytJp
-	 0gMxJy2W07ZdirlDbmW1z7Nu6oaAxv53XuiwSJyfye0wOLNHWs4Pb2JGUSZ+uw+/Md
-	 VsqwZaY1CJquw==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A01EC4345F;
-	Sun, 28 Apr 2024 09:20:22 +0000 (UTC)
-From: =?utf-8?q?Ar=C4=B1n=C3=A7_=C3=9CNAL_via_B4_Relay?= <devnull+arinc.unal.arinc9.com@kernel.org>
-Date: Sun, 28 Apr 2024 12:19:58 +0300
-Subject: [PATCH net-next v2] net: dsa: mt7530: do not set MT7530_P5_DIS
- when PHY muxing is being used
+	s=arc-20240116; t=1714296825; c=relaxed/simple;
+	bh=9/H4hIcmfu3JjOnIknoqVVHVuWndxPUkScSTTOjWtG4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rW0PxVdwZz3+lN679IMlUBpHHU41f/63cNBWc3ly6DSXzq49NrD9PC/7JcedrhyAhdMAZSUtWk9KHlSnJPfoIxRqASmsaNkZ+KHTWTs364Q3dLYY6YxiwXruJCcmpJak70Yv6Ql7R1FBd8Plb4Mr1qkrHetfgtcY8nyMR4fv250=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EXgk+ZaC; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-1e5715a9ebdso29934785ad.2;
+        Sun, 28 Apr 2024 02:33:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1714296823; x=1714901623; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=8y4J2jKG4zMmITnzKwBDxurX5+DaqJx/4k4xBWp5hO0=;
+        b=EXgk+ZaCl+3bGpJ2C7A0ZIR8drscLI/4k97m8HeskipOVmmbf8SqmWNc31qCC508m7
+         3Y7YbqWiYZ2OINXnufQ5LSkiYsplF/Xf03193/DkTciTbe1F7AWbyNzLSHfNh41+P9MU
+         LtUAu796OO3rT3OOF+CVJ3jhdUhDR89ZZ4noscO57r71bFmjO0V+rx6MphyCJyIkHDHG
+         QLentiqDwocZM4vTBOF3yKGbCfzuChl4D6zw45HbB7KLSXfsMKqehV4QfxrNbCOkNaQf
+         bqygTaGSMStwOCg2vUuDt0NJVpgYswIHqVNxENokl8wC6aswB24ytHBdywH6mY3MWut4
+         9GMA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714296823; x=1714901623;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8y4J2jKG4zMmITnzKwBDxurX5+DaqJx/4k4xBWp5hO0=;
+        b=JQV6oHQORGkn3zzQIyAIxvJ7/dk9wSYnMTiKlihRqKfJwkRSxWkvO7hg9hyCY8aN1K
+         OP8ltKqvOBXlpr1UQQjNntk+4HB6SQlim5LKiHeahiBrg28nouC5xCOqQBYoa/ki2p03
+         GfjYTO9dqxXl0FJNG3UckbX3S4c/BWws4JJQARUC/p1PMvd6GB+Jm82+ddDFp1HvE15k
+         nsWIcYjXWNSZY5/L2ZZOKMIv5fITR2bY1N6Umtsb4Kv386SrGF5prLz5hUJc1Udztm2A
+         3vMwwr0KcLXs9HtZb39u5RTbapu16vd/U5XKSpXsraIUf6Qa7p/BvFc/GDRAJU83M4dM
+         tPYg==
+X-Forwarded-Encrypted: i=1; AJvYcCWHhXQe/e13LyOGTfM4/rtKMvKEYY7/MKyilp0bhodmfemOeGTfkQSybJ26mOCUSzVQIxW/8/QzJOmJlK52jr+HfGBHBpy+0pS1AWvY/+PxEdHKrj2s31NtZMVflbRbh2YmqagW6UMNDuIPdrq8grcJ0fk554A0xxsafn72zAQ4TkA/b1vtY9EaE4JzFtUVmY/XSe/lkw8C1zQQhg==
+X-Gm-Message-State: AOJu0YyJzGg3y6J34AN4SlFX64rZKMWPkHIhUXIlA7WQBPnlNNO5jv3a
+	3LOULX57KB/aMULPGt8DoD1U2tRdNPA1eYdEcTqNxQsHLjF2gzIx
+X-Google-Smtp-Source: AGHT+IGY8wQOviArarfgPhxPvt9bnQiBDGjv4NNlhGEdkQKoEG2Trea3tp+JYSu9ILqwtee0EG7LMA==
+X-Received: by 2002:a17:902:bb83:b0:1de:fbc8:53af with SMTP id m3-20020a170902bb8300b001defbc853afmr3761373pls.25.1714296823253;
+        Sun, 28 Apr 2024 02:33:43 -0700 (PDT)
+Received: from archie.me ([103.124.138.155])
+        by smtp.gmail.com with ESMTPSA id l18-20020a170903005200b001e85cf937ffsm18171609pla.101.2024.04.28.02.33.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 28 Apr 2024 02:33:42 -0700 (PDT)
+Received: by archie.me (Postfix, from userid 1000)
+	id A981B184692DC; Sun, 28 Apr 2024 16:33:36 +0700 (WIB)
+Date: Sun, 28 Apr 2024 16:33:36 +0700
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+To: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, horms@kernel.org, saeedm@nvidia.com,
+	anthony.l.nguyen@intel.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, andrew@lunn.ch, corbet@lwn.net,
+	linux-doc@vger.kernel.org, robh+dt@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+	devicetree@vger.kernel.org, horatiu.vultur@microchip.com,
+	ruanjinjie@huawei.com, steen.hegelund@microchip.com,
+	vladimir.oltean@nxp.com
+Cc: UNGLinuxDriver@microchip.com, Thorsten.Kummermehr@microchip.com,
+	Pier.Beruto@onsemi.com, Selvamani.Rajagopal@onsemi.com,
+	Nicolas.Ferre@microchip.com, benjamin.bigler@bernformulastudent.ch
+Subject: Re: [PATCH net-next v4 01/12] Documentation: networking: add OPEN
+ Alliance 10BASE-T1x MAC-PHY serial interface
+Message-ID: <Zi4X8NO9SkhffJ98@archie.me>
+References: <20240418125648.372526-1-Parthiban.Veerasooran@microchip.com>
+ <20240418125648.372526-2-Parthiban.Veerasooran@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20240428-for-netnext-mt7530-do-not-disable-port5-when-phy-muxing-v2-1-bb7c37d293f8@arinc9.com>
-X-B4-Tracking: v=1; b=H4sIAL0ULmYC/6WOQQqDMBBFryKz7pQYlZCueo/iwpqJDtREktQq4
- t2beoUuHx/e+ztECkwRbsUOgRaO7F0GeSmgHzs3ELLJDFLIWtRSofUBHSVHa8IpqaYSaDw6n9B
- w7J4vwtmH1OBnJIfzuOH0XtkNqKxtrBFaN0ZBts+BLK9n+QFZiD8jtHkZOSYftvPSUp773/Wlx
- BKVrnpjtVFKqHsX2PX62vsJ2uM4voIqUjcJAQAA
-To: Daniel Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>, 
- Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>, 
- Florian Fainelli <f.fainelli@gmail.com>, 
- Vladimir Oltean <olteanv@gmail.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Matthias Brugger <matthias.bgg@gmail.com>, 
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org, 
- =?utf-8?q?Ar=C4=B1n=C3=A7_=C3=9CNAL?= <arinc.unal@arinc9.com>
-X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1714295997; l=2134;
- i=arinc.unal@arinc9.com; s=arinc9-patatt; h=from:subject:message-id;
- bh=mooBBatpyIktEez2DpRO7+tS0DbjK7qafqYlayMk1R4=;
- b=EH/F59K96vk3QVfn9tauaQDX4oX1KGLZrhENnMQ3zPIzdDGpVuG9d19WaDUmDkSL9oXlKYEUD
- RqTQzjjJFslCKXPH20Nulu1HorEX1WU6Kmh1q5sJpvuvG/541ly6mX6
-X-Developer-Key: i=arinc.unal@arinc9.com; a=ed25519;
- pk=VmvgMWwm73yVIrlyJYvGtnXkQJy9CvbaeEqPQO9Z4kA=
-X-Endpoint-Received: by B4 Relay for arinc.unal@arinc9.com/arinc9-patatt
- with auth_id=115
-X-Original-From: =?utf-8?q?Ar=C4=B1n=C3=A7_=C3=9CNAL?= <arinc.unal@arinc9.com>
-Reply-To: arinc.unal@arinc9.com
-
-From: Arınç ÜNAL <arinc.unal@arinc9.com>
-
-DSA initalises the ds->num_ports amount of ports in
-dsa_switch_touch_ports(). When the PHY muxing feature is in use, port 5
-won't be defined in the device tree. Because of this, the type member of
-the dsa_port structure for this port will be assigned DSA_PORT_TYPE_UNUSED.
-The dsa_port_setup() function calls ds->ops->port_disable() when the port
-type is DSA_PORT_TYPE_UNUSED.
-
-The MT7530_P5_DIS bit is unset in mt7530_setup() when PHY muxing is being
-used. mt7530_port_disable() which is assigned to ds->ops->port_disable() is
-called afterwards. Currently, mt7530_port_disable() sets MT7530_P5_DIS
-which breaks network connectivity when PHY muxing is being used.
-
-Therefore, do not set MT7530_P5_DIS when PHY muxing is being used.
-
-Fixes: 377174c5760c ("net: dsa: mt7530: move MT753X_MTRAP operations for MT7530")
-Reported-by: Daniel Golle <daniel@makrotopia.org>
-Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
----
-Hello.
-
-I've sent this to net-next as the patch it fixes is on the current
-development cycle.
----
-Changes in v2:
-- Add a comment to the code.
-- Improve the patch log.
-- Link to v1: https://lore.kernel.org/r/20240427-for-netnext-mt7530-do-not-disable-port5-when-phy-muxing-v1-1-793cdf9d7707@arinc9.com
----
- drivers/net/dsa/mt7530.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/dsa/mt7530.c b/drivers/net/dsa/mt7530.c
-index 2b9f904a98f0..2090f34e5289 100644
---- a/drivers/net/dsa/mt7530.c
-+++ b/drivers/net/dsa/mt7530.c
-@@ -1220,7 +1220,8 @@ mt7530_port_disable(struct dsa_switch *ds, int port)
- 	if (priv->id != ID_MT7530 && priv->id != ID_MT7621)
- 		return;
- 
--	if (port == 5)
-+	/* Do not set MT7530_P5_DIS when port 5 is being used for PHY muxing. */
-+	if (port == 5 && priv->p5_mode == GMAC5)
- 		mt7530_set(priv, MT753X_MTRAP, MT7530_P5_DIS);
- 	else if (port == 6)
- 		mt7530_set(priv, MT753X_MTRAP, MT7530_P6_DIS);
-
----
-base-commit: 5c4c0edca68a5841a8d53ccd49596fe199c8334c
-change-id: 20240427-for-netnext-mt7530-do-not-disable-port5-when-phy-muxing-7ff5fd0995d7
-
-Best regards,
--- 
-Arınç ÜNAL <arinc.unal@arinc9.com>
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="5Fqs5imMNEU2vqXw"
+Content-Disposition: inline
+In-Reply-To: <20240418125648.372526-2-Parthiban.Veerasooran@microchip.com>
 
 
+--5Fqs5imMNEU2vqXw
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Thu, Apr 18, 2024 at 06:26:37PM +0530, Parthiban Veerasooran wrote:
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 04e5f7c20e30..79fa7abb4ec9 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -16400,6 +16400,12 @@ L:	linux-rdma@vger.kernel.org
+>  S:	Supported
+>  F:	drivers/infiniband/ulp/opa_vnic
+> =20
+> +OPEN ALLIANCE 10BASE-T1S MACPHY SERIAL INTERFACE FRAMEWORK
+> +M:	Parthiban Veerasooran <parthiban.veerasooran@microchip.com>
+> +L:	netdev@vger.kernel.org
+> +S:	Maintained
+> +F:	Documentation/networking/oa-tc6-framework.rst
+> +
+>  OPEN FIRMWARE AND FLATTENED DEVICE TREE
+>  M:	Rob Herring <robh+dt@kernel.org>
+>  M:	Frank Rowand <frowand.list@gmail.com>
+
+I can't apply this series on top of current net-next due to MAINTAINERS diff
+above (on context line 16400 I have Omnivision entries). Care to reroll?
+(Hint: also specify --base=3D to git-send-email(1) so that I and other
+reviewers know where to apply this series.)
+
+Confused...
+
+--=20
+An old man doll... just what I always wanted! - Clara
+
+--5Fqs5imMNEU2vqXw
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZi4X5gAKCRD2uYlJVVFO
+o1AvAP4nLo1+SkG4LHoDx0UG7x2GO8EAVGWa2xA0bfEy+LmYZwD+Nkv8oXNIABg7
+t7tyeXn5/fcA0D6fn+xGvTd0RKT37g0=
+=jFZ9
+-----END PGP SIGNATURE-----
+
+--5Fqs5imMNEU2vqXw--
 
