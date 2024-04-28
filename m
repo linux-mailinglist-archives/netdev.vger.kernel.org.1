@@ -1,102 +1,104 @@
-Return-Path: <netdev+bounces-91997-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92000-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 377FD8B4BE4
-	for <lists+netdev@lfdr.de>; Sun, 28 Apr 2024 15:07:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5612E8B4C0C
+	for <lists+netdev@lfdr.de>; Sun, 28 Apr 2024 15:53:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D81B81F2145E
-	for <lists+netdev@lfdr.de>; Sun, 28 Apr 2024 13:07:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7383A1C20D22
+	for <lists+netdev@lfdr.de>; Sun, 28 Apr 2024 13:53:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 136AA6CDA0;
-	Sun, 28 Apr 2024 13:07:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 480EB6E5EC;
+	Sun, 28 Apr 2024 13:53:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r/guf0pd"
+	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="iJCxfvPQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp.smtpout.orange.fr (smtp-17.smtpout.orange.fr [80.12.242.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF2D16BFBD;
-	Sun, 28 Apr 2024 13:07:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42F721E534;
+	Sun, 28 Apr 2024 13:53:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714309643; cv=none; b=oAKW3KIlag5Kk8l3qMgCPmlAZVCq4NEY6jVZngsFyznimnKL6lDlldI69pmGofkK1CFRsZM0v5H6FMmkgzkwpDjEWLUr/99vT4VqAcmjVCIfLdguAK0jDC9CGAoT6c0E2XvMaD/CqTQlSfnsMcHU8l29l+FFMc5lKj50ZHU+pA8=
+	t=1714312416; cv=none; b=Cve9urjghhLTsjidgh9XUddFeqhRhQLWrS8xR0aNTdkMtqq4DHEbeKH5y5cT0oAO3DC/8npVu59LIKAa3sTFPe8AzYd2Twufn7kj6yeQ/a+4ELxMqa2H2vurvGwUiLuvO52h+Rsx2z6loEuMQrBIvfNx/2vCtCEC64MQ8qr+TRI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714309643; c=relaxed/simple;
-	bh=9yyE8eKKUc/4RgJtB91ozG6CzRgB3As3mCsWRI33/p8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=M8qqNEJ1SS5an+zUmMI8whw9LtmAMYwLH4BQhwM5K3qYH1i7B6T9SuYKFyjUNkc967b1dYv32k8lo/k6RXSqfTTlQpb2VHJrcpTYxQN2xDZFP5m1S6yuP1DDP3Nrudpbehamp3yLlvEk7UoORflN9ooZ6r/1Iax37AFcYwGENEQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r/guf0pd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E3CCC113CC;
-	Sun, 28 Apr 2024 13:07:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714309642;
-	bh=9yyE8eKKUc/4RgJtB91ozG6CzRgB3As3mCsWRI33/p8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=r/guf0pdPIsuUe0cpmgz5Sa/Tenb1I0LoY3zNdoDXGIfG6OEQiZ80sJwWn/8B2wx/
-	 4vM4xurlTQWZYLbMQ6906XXRVQqPAPx2SCGLYWo5ptROnX9dASaf9+szPiymGckRj3
-	 YJ9rvucBXr9Q3BiaW69uVmgT3YtzZxQC8fX1LnBqPFSjRAUVf0Uktl9gmwOkR+F57J
-	 aRkpk72IcQEzyujKFfxh86eHPDU4/vwJdD7CQmBTRQypYQvDuqKDO7DGpvCHZRFRbt
-	 zS2D45/U/6Yn8W9OpZkRE0AlR5LfDCHxoUyMmAoMqr04nVcLnyAx+Cb2LgtTwDV50w
-	 kWwUWzzd7HqSQ==
-Date: Sun, 28 Apr 2024 14:05:47 +0100
-From: Simon Horman <horms@kernel.org>
-To: Corinna Vinschen <vinschen@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	intel-wired-lan@lists.osuosl.org,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Jason Xing <kerneljasonxing@gmail.com>,
-	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	s=arc-20240116; t=1714312416; c=relaxed/simple;
+	bh=lTFv0Q0Z3uFaOtcQQ+hX7KQXjKB3radCUsB3LqiEqVI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Bb5I3JxedAauVIhM3GOL3aCTGZmjskH1mfyWxfoUXCCxG5N27cLy9Y8/igLlzTBAxPeHjD4UOgXEYV9SXo0lJRHcgE7L8kDLJjFA3DWeto7iUPw+S48gYMqEN5v0v9TrOETppcEWTl8BL2eLLX7iDWgvUpd6O7addbkfIq+azNY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=iJCxfvPQ; arc=none smtp.client-ip=80.12.242.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
+Received: from localhost.localdomain ([86.243.17.157])
+	by smtp.orange.fr with ESMTPA
+	id 14P4stNDdAF5O14P4souK9; Sun, 28 Apr 2024 15:17:16 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
+	s=t20230301; t=1714310236;
+	bh=5GLdy3SIJPdRWjFGBT9YX8GGLcU1G11y2fVbo+S63bY=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version;
+	b=iJCxfvPQpjLgWOxQlG7TF1q0zv7Hbq1FYZ1ZAhqXyKYaU1ej0Azkailcxl+NaHnNb
+	 kXPvPPxX3D9jT4Br7a9mBbvFYi3ZWp4gu0HvCtvh6a64DhUwLrslTcdnzRWq+lL2dw
+	 RFqvk1uO3DwkDBW1G6dkQCYJtVtzCbaq97jlvmfXPIHEdGb7hEDM0qCkweMiLkpUFY
+	 zR9Rga4W5OcIWetDkk/BKH3Kdm7c0Zk3Xp6w2UI/m/Ri4W2T8rEjly3m6hX0auNz1+
+	 2LJQQZ/AEdxkJjVY69Om6sT6+NHyRSxzQq67OB+7xBzpF/9sVhQ9p8iHDrwKK1+NDA
+	 7AFEZQHplx7Ow==
+X-ME-Helo: localhost.localdomain
+X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
+X-ME-Date: Sun, 28 Apr 2024 15:17:16 +0200
+X-ME-IP: 86.243.17.157
+From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+To: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>
-Subject: Re: [PATCH net v2] igb: cope with large MAX_SKB_FRAGS
-Message-ID: <20240428130547.GV516117@kernel.org>
-References: <20240423134731.918157-1-vinschen@redhat.com>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: linux-kernel@vger.kernel.org,
+	kernel-janitors@vger.kernel.org,
+	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+	netdev@vger.kernel.org
+Subject: [PATCH] wifi: brcmfmac: remove unused niclist structure
+Date: Sun, 28 Apr 2024 15:17:04 +0200
+Message-ID: <c40be4fd791658bf9e9099237f2b37aa8c51f396.1714310206.git.christophe.jaillet@wanadoo.fr>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240423134731.918157-1-vinschen@redhat.com>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Apr 23, 2024 at 03:47:31PM +0200, Corinna Vinschen wrote:
-> From: Paolo Abeni <pabeni@redhat.com>
-> 
-> Sabrina reports that the igb driver does not cope well with large
-> MAX_SKB_FRAG values: setting MAX_SKB_FRAG to 45 causes payload
-> corruption on TX.
-> 
-> An easy reproducer is to run ssh to connect to the machine.  With
-> MAX_SKB_FRAGS=17 it works, with MAX_SKB_FRAGS=45 it fails.
-> 
-> The root cause of the issue is that the driver does not take into
-> account properly the (possibly large) shared info size when selecting
-> the ring layout, and will try to fit two packets inside the same 4K
-> page even when the 1st fraglist will trump over the 2nd head.
-> 
-> Address the issue forcing the driver to fit a single packet per page,
-> leaving there enough room to store the (currently) largest possible
-> skb_shared_info.
-> 
-> Fixes: 3948b05950fd ("net: introduce a config option to tweak MAX_SKB_FRAG")
+struct niclist was added in the initial commit f21fb3ed364b ("Add support
+of Cavium Liquidio ethernet adapters").
 
-nit: The trailing "S" in the subject for the fixes tag seems to have been lost.
+Apparently it was never used.
 
-Fixes: 3948b05950fd ("net: introduce a config option to tweak MAX_SKB_FRAGS")
+So, remove the structure definition now. This saves a few lines of code.
 
-> Reported-by: Jan Tluka <jtluka@redhat.com>
-> Reported-by: Jirka Hladky <jhladky@redhat.com>
-> Reported-by: Sabrina Dubroca <sd@queasysnail.net>
-> Tested-by: Sabrina Dubroca <sd@queasysnail.net>
-> Tested-by: Corinna Vinschen <vinschen@redhat.com>
-> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+---
+Compile tested only
+---
+ drivers/net/ethernet/cavium/liquidio/octeon_droq.c | 5 -----
+ 1 file changed, 5 deletions(-)
 
-...
+diff --git a/drivers/net/ethernet/cavium/liquidio/octeon_droq.c b/drivers/net/ethernet/cavium/liquidio/octeon_droq.c
+index 0d6ee30affb9..eef12fdd246d 100644
+--- a/drivers/net/ethernet/cavium/liquidio/octeon_droq.c
++++ b/drivers/net/ethernet/cavium/liquidio/octeon_droq.c
+@@ -30,11 +30,6 @@
+ #include "cn23xx_pf_device.h"
+ #include "cn23xx_vf_device.h"
+ 
+-struct niclist {
+-	struct list_head list;
+-	void *ptr;
+-};
+-
+ struct __dispatch {
+ 	struct list_head list;
+ 	struct octeon_recv_info *rinfo;
+-- 
+2.44.0
+
 
