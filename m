@@ -1,241 +1,290 @@
-Return-Path: <netdev+bounces-91982-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91983-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1618C8B4B0C
-	for <lists+netdev@lfdr.de>; Sun, 28 Apr 2024 11:54:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 558398B4B43
+	for <lists+netdev@lfdr.de>; Sun, 28 Apr 2024 12:33:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 222761C20B4B
-	for <lists+netdev@lfdr.de>; Sun, 28 Apr 2024 09:54:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7935F1C20FCF
+	for <lists+netdev@lfdr.de>; Sun, 28 Apr 2024 10:33:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70F5955C2E;
-	Sun, 28 Apr 2024 09:54:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FF5C2AF01;
+	Sun, 28 Apr 2024 10:33:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ferroamp-se.20230601.gappssmtp.com header.i=@ferroamp-se.20230601.gappssmtp.com header.b="uZwkVbrQ"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="ajWycqwU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 882993EA96
-	for <netdev@vger.kernel.org>; Sun, 28 Apr 2024 09:54:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A164F21101
+	for <netdev@vger.kernel.org>; Sun, 28 Apr 2024 10:33:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714298066; cv=none; b=Adf3zyypG8QkNU1mNaqzbYrdWyAx1ZOQCQ9WX/XLLdzubKKWUQ5faD7H2tJ4098MVDoa8iSZ6Od/7ByqNHk23D+GflFywegnN/cXF777lljG0CQKYM3QWO50cGeaO6cOzoWzxZQ+bZUbyK5BXZWq2XZ73M54Mt84Lk1LuyhEaAM=
+	t=1714300407; cv=none; b=dNx0aedDbM9GrUMAuQ0K35IGZWDU3VUI363aQKbMfJLxsJw7S7l3+hyDcUffXyV2BoAa5TbjMhaC4Ge1xO2um+a004ck/96RJEFaLpao9zm/Q+a9gw48uvsGLP0betCjy2yUNRwVrp5rChvfgofDfvliQAYSk+McQ4D73EiqfSs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714298066; c=relaxed/simple;
-	bh=XfwPvtFVa37rQ9j0JNfy5Q8xawgeFhod/zhdXWAvcW0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gUbtOuE6t5OInrx5ijljPo1qD4tRzuwQS170h3DEV7/BUrZ84f9PX+FJgVQAcFkN2/sQJEmrr+YJ4TPl93UU9sJepUKsnadl7k2FUnuJK3ZdbHWNiaodcqtHt2+DOb8Sk+DYEq/pqZlwOKxTa5MMmJ2BxKOmg7sPkkQ4NMtk4Ic=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ferroamp.se; spf=pass smtp.mailfrom=ferroamp.se; dkim=pass (2048-bit key) header.d=ferroamp-se.20230601.gappssmtp.com header.i=@ferroamp-se.20230601.gappssmtp.com header.b=uZwkVbrQ; arc=none smtp.client-ip=209.85.167.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ferroamp.se
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ferroamp.se
-Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-518f8a69f82so3984772e87.2
-        for <netdev@vger.kernel.org>; Sun, 28 Apr 2024 02:54:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ferroamp-se.20230601.gappssmtp.com; s=20230601; t=1714298063; x=1714902863; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=lMrhY6/jdHr+5rbk2vYpIblfqORgrZnbq6o4kFL2leY=;
-        b=uZwkVbrQlvguK8Wt+X9Ta4u9WiSuOKwvIgRL4/CiWxXVEke52BTXTXSIemT64bhvpC
-         d6XYuSg+af72JcIQ3uE6oKGT8E/pX8fhgU1NQUGYUAytvvZzePh6+UiizmfVRQg/Sj4b
-         /6Nqrd1U2CkFqSv2cdwXsigAX83Uj9/42SetQazhsqg/9Z5rJYrVV6J6m5iZv1vLuLgD
-         4srN3znNw7yh2lCcUfQ9pHMP3qFrNmQ/TqBYtrQcYUM+YBRYTVm9DdPCISsKPymw4nRP
-         RrBy1CTaRvEzJdc36zwjDjFRRnsuH+qa2NWk7jFKViEYZjxELTplcuGbbg8MAdNd4Hzv
-         GP5A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714298063; x=1714902863;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lMrhY6/jdHr+5rbk2vYpIblfqORgrZnbq6o4kFL2leY=;
-        b=wjqsaKlYe6M8kzyNKk5q1WNaMS5rQNArO3FHBx1eVK11drD0xz+olNTLsEprql9yph
-         2oZZ5lE4E/v1/aKcdFvk5wxlvUQVccD599KPBAiLFcch36i8Zdm0RxlUJZmasEZtE3yL
-         TB9ooK+GYGneuMzjWMu+DZIrN54LXqFQBxvRQsWlxNCuSZg9OPgWW3b0JCw4GfyDGlSO
-         XIaIqJTdoew2WQqm912WwlByKRQPMf6dngVxmnuyhsPSq6dpe62e/D/Rok3KJ14+s/kh
-         N+CWEy2k5qXzcSBQT/LEPxGWrGICOA1IkWTlehsE33QA4VD1DZGP2SCodrOIPEGmwFvH
-         /CRg==
-X-Forwarded-Encrypted: i=1; AJvYcCVf6Wcy1uM/ASb/6crPArTF909mPfGfxkisKs5CB/qMeivEHhr3LP6I/8mIrt4fi7CeV8sVZ089OA+SHWx3QCXbQZ57KWLO
-X-Gm-Message-State: AOJu0Yy0spoyDQkHb1qjfvUaFMjdxKVHMo1qmr+D3qIktrjD6+h/zhLj
-	xdp0NIAe91+axTptd6RtPkLjgN99/qkXuYRRXEQoZrlGX5H78xOMw+/1m9Q+Ozs=
-X-Google-Smtp-Source: AGHT+IGn32KqwhwvFwaFNH1nncKg1jRLmaHfbV2LvHlzEopH2e+yZMzEFTLRlpSlHe3WAJQd/h2+Lw==
-X-Received: by 2002:a05:6512:46c:b0:518:ce4b:17ef with SMTP id x12-20020a056512046c00b00518ce4b17efmr2768833lfd.60.1714298062439;
-        Sun, 28 Apr 2024 02:54:22 -0700 (PDT)
-Received: from builder (c188-149-135-220.bredband.tele2.se. [188.149.135.220])
-        by smtp.gmail.com with ESMTPSA id l17-20020ac24a91000000b005196e3e8a84sm3719795lfp.177.2024.04.28.02.54.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 28 Apr 2024 02:54:22 -0700 (PDT)
-Date: Sun, 28 Apr 2024 11:54:20 +0200
-From: =?iso-8859-1?Q?Ram=F3n?= Nordin Rodriguez <ramon.nordin.rodriguez@ferroamp.se>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, horms@kernel.org, saeedm@nvidia.com,
-	anthony.l.nguyen@intel.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, corbet@lwn.net,
-	linux-doc@vger.kernel.org, robh+dt@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
-	devicetree@vger.kernel.org, horatiu.vultur@microchip.com,
-	ruanjinjie@huawei.com, steen.hegelund@microchip.com,
-	vladimir.oltean@nxp.com, UNGLinuxDriver@microchip.com,
-	Thorsten.Kummermehr@microchip.com, Pier.Beruto@onsemi.com,
-	Selvamani.Rajagopal@onsemi.com, Nicolas.Ferre@microchip.com,
-	benjamin.bigler@bernformulastudent.ch
-Subject: Re: [PATCH net-next v4 05/12] net: ethernet: oa_tc6: implement error
- interrupts unmasking
-Message-ID: <Zi4czGX8jlqSdNrr@builder>
-References: <20240418125648.372526-1-Parthiban.Veerasooran@microchip.com>
- <20240418125648.372526-6-Parthiban.Veerasooran@microchip.com>
- <Zi1Xbz7ARLm3HkqW@builder>
- <77d7d190-0847-4dc9-8fc5-4e33308ce7c8@lunn.ch>
+	s=arc-20240116; t=1714300407; c=relaxed/simple;
+	bh=NZw7kRl7XCRLruXIqG70pRehj0F2PFd5GGVIGlCRbBI=;
+	h=From:To:Cc:Subject:MIME-Version:Content-Disposition:Content-Type:
+	 Message-Id:Date; b=Bal2QmQdfmqF/dCCDYBLEZwJVPHk7zHmEojcc0+tuETXK6M5U+A9L6b5ZRHQljO8AM5Zk02dhSYh7h5sQfLiNqJ5eF8kC+NExL0qrrrjZpqLGtIwnu1oNkpLFVx98xSqPhXX4EJEU6t2lMI2DuP3BlUACUyzUGN/iySk4wh9INQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=ajWycqwU; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
+	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:Reply-To:Content-ID
+	:Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:
+	Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=kNJ7nWzVlQEkLdteBM2EE+GHhSKQb4WFO6svtQyPy34=; b=ajWycqwUqzOOFX5Z40mdTh+rMY
+	YvwTYi587mHIFIAJjKxKsLKIkA2ZxQOikcbwYxsP9soVANoD5JbCJfFArq6YfeRw7tdZheKeJlPHT
+	76W66YFRWMWjKaapiRJ/bVLCXJ4byWLTKdYObSTjygQy8twxsoe0EhIqQnxHLiuk2tI0IaK2/OUaF
+	RUBij3RAVlRT1cR/ncFZP2sLycT8iw1eNWaKJqQnUcsf57rjjaRl8smIdel8+rFF8fNcdev/XA814
+	lvzIUUH+VtMkwFpmFluXju/SW/Kh7eROfd+VI1QOBqgk0XWS/OicXb7w9nmbheTMypGEfRzJhtA2E
+	3sCNDmvQ==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:35438 helo=rmk-PC.armlinux.org.uk)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <rmk@armlinux.org.uk>)
+	id 1s11qI-00024i-0j;
+	Sun, 28 Apr 2024 11:33:10 +0100
+Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
+	id 1s11qJ-00AHi0-Kk; Sun, 28 Apr 2024 11:33:11 +0100
+From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+To: =?utf-8?q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
+	 Linus Walleij <linus.walleij@linaro.org>
+Cc: Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Subject: [PATCH net-next] net: dsa: realtek: provide own phylink MAC
+ operations
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <77d7d190-0847-4dc9-8fc5-4e33308ce7c8@lunn.ch>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Message-Id: <E1s11qJ-00AHi0-Kk@rmk-PC.armlinux.org.uk>
+Sender: Russell King <rmk@armlinux.org.uk>
+Date: Sun, 28 Apr 2024 11:33:11 +0100
 
-> It could be the performance increase comes from two places:
-> 
-> 1) Spending time and bus bandwidth dealing with the buffer overflow
-> interrupt
-> 
-> 2) Printing out the serial port.
-> 
-> Please could you benchmark a few things:
-> 
-> 1) Remove the printk("Receive buffer overflow error"), but otherwise
-> keep the code the same. That will give us an idea how much the serial
-> port matters.
-> 
-> 2) Disable only the RX buffer overflow interrupt
-> 
-> 3) Disable all error interrupts.
-> 
+Convert realtek to provide its own phylink MAC operations, thus
+avoiding the shim layer in DSA's port.c. We need to provide a stub for
+the mandatory mac_config() method for rtl8366rb.
 
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+---
+This patch has been built-tested with -Wunused-const-variable
 
+ drivers/net/dsa/realtek/realtek.h   |  2 ++
+ drivers/net/dsa/realtek/rtl8365mb.c | 32 +++++++++++++++++++----------
+ drivers/net/dsa/realtek/rtl8366rb.c | 29 +++++++++++++++++++-------
+ drivers/net/dsa/realtek/rtl83xx.c   |  1 +
+ 4 files changed, 46 insertions(+), 18 deletions(-)
 
-Test setup
-- Server side - 
-PC with a lan8670 usb eval board running a http server that serves
-a 10MB binary blob. The http server is just python3 -m http.server
-
-- Client side -
-iMX8mn board (quad core arm64) with lan8650 mac-phy (25MHz spi)
-running curl to download the blob from the server and writing to
-a ramfs (ddr4 1.xGHz, so should not be a bottleneck)
-
-Below are a collection of samples of different test runs. All of the
-test runs have run a minor patch for hw reset (else nothing works for me).
-Using curl is not the most scientific approach here, but iperf has
-not exposed any problems for me earlier with overflows.
-So sticking with curl since it's easy and definetly gets the overflows.
-
-n  |  name     |  min  |  avg  |  max  |  rx dropped  |  samples
-1  |  no mod   |  827K |  846K |  891K |      945     |     5
-2  |  no log   |  711K |  726K |  744K |      562     |     5
-3  |  less irq |  815K |  833K |  846K |      N/A     |     5
-4  |  no irq   |  914K |  924K |  931K |      N/A     |     5
-5  |  simple   |  857K |  868K |  879K |      615     |     5
-
-Description of each scenario
-
-1 - no mod
-So this just runs a hw reset to get the chip working (described in earlier posts)
-
-2 - no log
-This scenario just removes the logging when handling the irq state
---- a/drivers/net/ethernet/oa_tc6.c
-+++ b/drivers/net/ethernet/oa_tc6.c
-@@ -688,8 +688,6 @@ static int oa_tc6_process_extended_status(struct oa_tc6 *tc6)
-        if (FIELD_GET(STATUS0_RX_BUFFER_OVERFLOW_ERROR, value)) {
-                tc6->rx_buf_overflow = true;
-                oa_tc6_cleanup_ongoing_rx_skb(tc6);
--               net_err_ratelimited("%s: Receive buffer overflow error\n",
--                                   tc6->netdev->name);
-                return -EAGAIN;
-        }
-        if (FIELD_GET(STATUS0_TX_PROTOCOL_ERROR, value)) {
-
-3 - less irq
-This scenario disables the overflow interrupt but keeps the others
-
---- a/drivers/net/ethernet/oa_tc6.c
-+++ b/drivers/net/ethernet/oa_tc6.c
-@@ -625,10 +625,10 @@ static int oa_tc6_unmask_macphy_error_interrupts(struct oa_tc6 *tc6)
-                return ret;
-
-        regval &= ~(INT_MASK0_TX_PROTOCOL_ERR_MASK |
--                   INT_MASK0_RX_BUFFER_OVERFLOW_ERR_MASK |
-                    INT_MASK0_LOSS_OF_FRAME_ERR_MASK |
-                    INT_MASK0_HEADER_ERR_MASK);
-
-+       regval |= INT_MASK0_RX_BUFFER_OVERFLOW_ERR_MASK;
-        return oa_tc6_write_register(tc6, OA_TC6_REG_INT_MASK0, regval);
+diff --git a/drivers/net/dsa/realtek/realtek.h b/drivers/net/dsa/realtek/realtek.h
+index e0b1aa01337b..a1b2e0b529d5 100644
+--- a/drivers/net/dsa/realtek/realtek.h
++++ b/drivers/net/dsa/realtek/realtek.h
+@@ -17,6 +17,7 @@
+ #define REALTEK_HW_STOP_DELAY		25	/* msecs */
+ #define REALTEK_HW_START_DELAY		100	/* msecs */
+ 
++struct phylink_mac_ops;
+ struct realtek_ops;
+ struct dentry;
+ struct inode;
+@@ -117,6 +118,7 @@ struct realtek_ops {
+ struct realtek_variant {
+ 	const struct dsa_switch_ops *ds_ops;
+ 	const struct realtek_ops *ops;
++	const struct phylink_mac_ops *phylink_mac_ops;
+ 	unsigned int clk_delay;
+ 	u8 cmd_read;
+ 	u8 cmd_write;
+diff --git a/drivers/net/dsa/realtek/rtl8365mb.c b/drivers/net/dsa/realtek/rtl8365mb.c
+index 12665a8a3412..b9674f68b756 100644
+--- a/drivers/net/dsa/realtek/rtl8365mb.c
++++ b/drivers/net/dsa/realtek/rtl8365mb.c
+@@ -1048,11 +1048,13 @@ static void rtl8365mb_phylink_get_caps(struct dsa_switch *ds, int port,
+ 		phy_interface_set_rgmii(config->supported_interfaces);
  }
-
-4 - no irq
-This scenario disables all imask0 interrupts with the following change
-
-diff --git a/drivers/net/ethernet/oa_tc6.c b/drivers/net/ethernet/oa_tc6.c
-index 9f17f3712137..88a9c6ccb37a 100644
---- a/drivers/net/ethernet/oa_tc6.c
-+++ b/drivers/net/ethernet/oa_tc6.c
-@@ -624,12 +624,7 @@ static int oa_tc6_unmask_macphy_error_interrupts(struct oa_tc6 *tc6)
-        if (ret)
-                return ret;
-
--       regval &= ~(INT_MASK0_TX_PROTOCOL_ERR_MASK |
--                   INT_MASK0_RX_BUFFER_OVERFLOW_ERR_MASK |
--                   INT_MASK0_LOSS_OF_FRAME_ERR_MASK |
--                   INT_MASK0_HEADER_ERR_MASK);
--
--       return oa_tc6_write_register(tc6, OA_TC6_REG_INT_MASK0, regval);
-+       return oa_tc6_write_register(tc6, OA_TC6_REG_INT_MASK0, (u32)-1);
+ 
+-static void rtl8365mb_phylink_mac_config(struct dsa_switch *ds, int port,
++static void rtl8365mb_phylink_mac_config(struct phylink_config *config,
+ 					 unsigned int mode,
+ 					 const struct phylink_link_state *state)
+ {
+-	struct realtek_priv *priv = ds->priv;
++	struct dsa_port *dp = dsa_phylink_to_port(config);
++	struct realtek_priv *priv = dp->ds->priv;
++	u8 port = dp->index;
+ 	int ret;
+ 
+ 	if (mode != MLO_AN_PHY && mode != MLO_AN_FIXED) {
+@@ -1076,13 +1078,15 @@ static void rtl8365mb_phylink_mac_config(struct dsa_switch *ds, int port,
+ 	 */
  }
+ 
+-static void rtl8365mb_phylink_mac_link_down(struct dsa_switch *ds, int port,
++static void rtl8365mb_phylink_mac_link_down(struct phylink_config *config,
+ 					    unsigned int mode,
+ 					    phy_interface_t interface)
+ {
+-	struct realtek_priv *priv = ds->priv;
++	struct dsa_port *dp = dsa_phylink_to_port(config);
++	struct realtek_priv *priv = dp->ds->priv;
+ 	struct rtl8365mb_port *p;
+ 	struct rtl8365mb *mb;
++	u8 port = dp->index;
+ 	int ret;
+ 
+ 	mb = priv->chip_data;
+@@ -1101,16 +1105,18 @@ static void rtl8365mb_phylink_mac_link_down(struct dsa_switch *ds, int port,
+ 	}
+ }
+ 
+-static void rtl8365mb_phylink_mac_link_up(struct dsa_switch *ds, int port,
++static void rtl8365mb_phylink_mac_link_up(struct phylink_config *config,
++					  struct phy_device *phydev,
+ 					  unsigned int mode,
+ 					  phy_interface_t interface,
+-					  struct phy_device *phydev, int speed,
+-					  int duplex, bool tx_pause,
++					  int speed, int duplex, bool tx_pause,
+ 					  bool rx_pause)
+ {
+-	struct realtek_priv *priv = ds->priv;
++	struct dsa_port *dp = dsa_phylink_to_port(config);
++	struct realtek_priv *priv = dp->ds->priv;
+ 	struct rtl8365mb_port *p;
+ 	struct rtl8365mb *mb;
++	u8 port = dp->index;
+ 	int ret;
+ 
+ 	mb = priv->chip_data;
+@@ -2106,15 +2112,18 @@ static int rtl8365mb_detect(struct realtek_priv *priv)
+ 	return 0;
+ }
+ 
++static const struct phylink_mac_ops rtl8365mb_phylink_mac_ops = {
++	.mac_config = rtl8365mb_phylink_mac_config,
++	.mac_link_down = rtl8365mb_phylink_mac_link_down,
++	.mac_link_up = rtl8365mb_phylink_mac_link_up,
++};
++
+ static const struct dsa_switch_ops rtl8365mb_switch_ops = {
+ 	.get_tag_protocol = rtl8365mb_get_tag_protocol,
+ 	.change_tag_protocol = rtl8365mb_change_tag_protocol,
+ 	.setup = rtl8365mb_setup,
+ 	.teardown = rtl8365mb_teardown,
+ 	.phylink_get_caps = rtl8365mb_phylink_get_caps,
+-	.phylink_mac_config = rtl8365mb_phylink_mac_config,
+-	.phylink_mac_link_down = rtl8365mb_phylink_mac_link_down,
+-	.phylink_mac_link_up = rtl8365mb_phylink_mac_link_up,
+ 	.port_stp_state_set = rtl8365mb_port_stp_state_set,
+ 	.get_strings = rtl8365mb_get_strings,
+ 	.get_ethtool_stats = rtl8365mb_get_ethtool_stats,
+@@ -2136,6 +2145,7 @@ static const struct realtek_ops rtl8365mb_ops = {
+ const struct realtek_variant rtl8365mb_variant = {
+ 	.ds_ops = &rtl8365mb_switch_ops,
+ 	.ops = &rtl8365mb_ops,
++	.phylink_mac_ops = &rtl8365mb_phylink_mac_ops,
+ 	.clk_delay = 10,
+ 	.cmd_read = 0xb9,
+ 	.cmd_write = 0xb8,
+diff --git a/drivers/net/dsa/realtek/rtl8366rb.c b/drivers/net/dsa/realtek/rtl8366rb.c
+index e10ae94cf771..6fb271c2e62d 100644
+--- a/drivers/net/dsa/realtek/rtl8366rb.c
++++ b/drivers/net/dsa/realtek/rtl8366rb.c
+@@ -1077,11 +1077,19 @@ static void rtl8366rb_phylink_get_caps(struct dsa_switch *ds, int port,
+ }
+ 
+ static void
+-rtl8366rb_mac_link_up(struct dsa_switch *ds, int port, unsigned int mode,
+-		      phy_interface_t interface, struct phy_device *phydev,
++rtl8366rb_mac_config(struct phylink_config *config, unsigned int mode,
++		     const struct phylink_link_state *state)
++{
++}
++
++static void
++rtl8366rb_mac_link_up(struct phylink_config *config, struct phy_device *phydev,
++		      unsigned int mode, phy_interface_t interface,
+ 		      int speed, int duplex, bool tx_pause, bool rx_pause)
+ {
+-	struct realtek_priv *priv = ds->priv;
++	struct dsa_port *dp = dsa_phylink_to_port(config);
++	struct realtek_priv *priv = dp->ds->priv;
++	int port = dp->index;
+ 	unsigned int val;
+ 	int ret;
+ 
+@@ -1147,10 +1155,12 @@ rtl8366rb_mac_link_up(struct dsa_switch *ds, int port, unsigned int mode,
+ }
+ 
+ static void
+-rtl8366rb_mac_link_down(struct dsa_switch *ds, int port, unsigned int mode,
++rtl8366rb_mac_link_down(struct phylink_config *config, unsigned int mode,
+ 			phy_interface_t interface)
+ {
+-	struct realtek_priv *priv = ds->priv;
++	struct dsa_port *dp = dsa_phylink_to_port(config);
++	struct realtek_priv *priv = dp->ds->priv;
++	int port = dp->index;
+ 	int ret;
+ 
+ 	if (port != priv->cpu_port)
+@@ -1849,12 +1859,16 @@ static int rtl8366rb_detect(struct realtek_priv *priv)
+ 	return 0;
+ }
+ 
++static const struct phylink_mac_ops rtl8366rb_phylink_mac_ops = {
++	.mac_config = rtl8366rb_mac_config,
++	.mac_link_down = rtl8366rb_mac_link_down,
++	.mac_link_up = rtl8366rb_mac_link_up,
++};
++
+ static const struct dsa_switch_ops rtl8366rb_switch_ops = {
+ 	.get_tag_protocol = rtl8366_get_tag_protocol,
+ 	.setup = rtl8366rb_setup,
+ 	.phylink_get_caps = rtl8366rb_phylink_get_caps,
+-	.phylink_mac_link_up = rtl8366rb_mac_link_up,
+-	.phylink_mac_link_down = rtl8366rb_mac_link_down,
+ 	.get_strings = rtl8366_get_strings,
+ 	.get_ethtool_stats = rtl8366_get_ethtool_stats,
+ 	.get_sset_count = rtl8366_get_sset_count,
+@@ -1892,6 +1906,7 @@ static const struct realtek_ops rtl8366rb_ops = {
+ const struct realtek_variant rtl8366rb_variant = {
+ 	.ds_ops = &rtl8366rb_switch_ops,
+ 	.ops = &rtl8366rb_ops,
++	.phylink_mac_ops = &rtl8366rb_phylink_mac_ops,
+ 	.clk_delay = 10,
+ 	.cmd_read = 0xa9,
+ 	.cmd_write = 0xa8,
+diff --git a/drivers/net/dsa/realtek/rtl83xx.c b/drivers/net/dsa/realtek/rtl83xx.c
+index d2e876805393..5f46deb8a21f 100644
+--- a/drivers/net/dsa/realtek/rtl83xx.c
++++ b/drivers/net/dsa/realtek/rtl83xx.c
+@@ -236,6 +236,7 @@ int rtl83xx_register_switch(struct realtek_priv *priv)
+ 	ds->priv = priv;
+ 	ds->dev = priv->dev;
+ 	ds->ops = priv->variant->ds_ops;
++	ds->phylink_mac_ops = priv->variant->phylink_mac_ops;
+ 	ds->num_ports = priv->num_ports;
+ 
+ 	ret = dsa_register_switch(ds);
+-- 
+2.30.2
 
- static int oa_tc6_enable_data_transfer(struct oa_tc6 *tc6)
-
-
-5 - simple
-This keeps the interrupt but does not log or drop the socket buffer on irq
-Moving the rx dropped increment here makes it more of a irq counter I guess,
-so maybe not relevant.
-
-diff --git a/drivers/net/ethernet/oa_tc6.c b/drivers/net/ethernet/oa_tc6.c
-index 9f17f3712137..cbc20a725ad0 100644
---- a/drivers/net/ethernet/oa_tc6.c
-+++ b/drivers/net/ethernet/oa_tc6.c
-@@ -687,10 +687,7 @@ static int oa_tc6_process_extended_status(struct oa_tc6 *tc6)
-
-        if (FIELD_GET(STATUS0_RX_BUFFER_OVERFLOW_ERROR, value)) {
-                tc6->rx_buf_overflow = true;
--               oa_tc6_cleanup_ongoing_rx_skb(tc6);
--               net_err_ratelimited("%s: Receive buffer overflow error\n",
--                                   tc6->netdev->name);
--               return -EAGAIN;
-+               tc6->netdev->stats.rx_dropped++;
-        }
-        if (FIELD_GET(STATUS0_TX_PROTOCOL_ERROR, value)) {
-                netdev_err(tc6->netdev, "Transmit protocol error\n");
-
-
-- postamble -
-
-Removing the logging made things considerably slower which probably
-indicates that there is a timing dependent behaviour in the driver.
-
-I have a hard time explaining why there is a throughput difference
-between scenario 3 and 4 since I did not get the logs that any of the
-other interrupts happened.
-Maybe the irq handling adds some unexpected context switching overhead.
-
-My recommendation going forward would be to disable the rx buffer
-overlow interrupt and removing any code related to handling of it.
-
-R
 
