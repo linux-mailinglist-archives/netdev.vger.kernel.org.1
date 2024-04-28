@@ -1,129 +1,122 @@
-Return-Path: <netdev+bounces-92005-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92006-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15BC08B4C29
-	for <lists+netdev@lfdr.de>; Sun, 28 Apr 2024 16:30:06 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 528868B4C40
+	for <lists+netdev@lfdr.de>; Sun, 28 Apr 2024 16:49:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4241F1C2094E
-	for <lists+netdev@lfdr.de>; Sun, 28 Apr 2024 14:30:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B2F6DB21046
+	for <lists+netdev@lfdr.de>; Sun, 28 Apr 2024 14:49:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3ABD6EB70;
-	Sun, 28 Apr 2024 14:30:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 455555465C;
+	Sun, 28 Apr 2024 14:48:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="J0R83qi6"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="GjY/AysB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7C651C32;
-	Sun, 28 Apr 2024 14:30:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=60.244.123.138
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80E25AD52;
+	Sun, 28 Apr 2024 14:48:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714314602; cv=none; b=qTWO0uUExI6SxwtW+WsmCKx6gqNZMBHS3j3mRW3Vzq6OqgADiwu3SR2eImemQ3I4ZPeMGugvvbUogHdb/NtlUpJaMzSdJ1WGGq8WMNuOeKvUHilHpeVAzrg+MM/Crpbvf0YmK00RWA6zRiuFI7vn8GUK+vrAYKh1hWqLWMDCBXc=
+	t=1714315739; cv=none; b=Nse+Z9yGSy4mONuEkHnbzTnGWcCsp1dZB1Pa0FK4JAWwSRMP0nPRE2SWPBk/L85CgThuzUbC/f4cnSh9DHwWdFcwrhbuMcItbFV4tmigY1yS6uBXHUwrCk/Ms1f/677MWqx3DTVlzZd4j6VNDq/72G2oHbQgI+NEAFxdt7Mn25w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714314602; c=relaxed/simple;
-	bh=NqZBkRYnYes+Rg+x6msRDkpz+oUasi4o3teBF2EsQy4=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=i8+cP8XRAj0KYkgqzJtP0NkSBpvmXfp4hxAZnFo9d6T+ujIwXn6rJcdStHnkpZ+DiTLTCsTVZGHRMBnD5OfCBr7ww3aExVlouR8OqXWQBosCJTG+iICMMwPjLCw9Kh7TPulbpKu0C/3ZFejxiI8KNJG3wi4M3Akd7Vy9k3K6P/c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=J0R83qi6; arc=none smtp.client-ip=60.244.123.138
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
-X-UUID: c8911534056b11efb92737409a0e9459-20240428
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
-	h=Content-Type:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=XXRJ81xwIuTFUgX0JZRvcELJ+oqPi5PwBncGpAHuDC0=;
-	b=J0R83qi65ZejTNxWY547thJUp8/BMHx3kmKTlKW0/5c6NJg2E4nfXpqcWkXipuwMLQsLxiFkdO2CNnIpT1T932lITIdH8RfbRi7fIHg/qL+5mrcP1FPQY/SphoNSlNbm7vre/7liEDavXq7/P2OhNhoiL4BCH6349DQa34WlRt8=;
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.38,REQID:06c68dc0-168e-4e65-bcd9-97a7df2127f0,IP:0,U
-	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
-	release,TS:0
-X-CID-META: VersionHash:82c5f88,CLOUDID:720ab166-72bc-4ae0-ab39-a531fe78e0a5,B
-	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0,EDM:-3,IP:nil,U
-	RL:11|1,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES
-	:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
-X-CID-BVR: 0
-X-CID-BAS: 0,_,0,_
-X-CID-FACTOR: TF_CID_SPAM_ULN,TF_CID_SPAM_SNR
-X-UUID: c8911534056b11efb92737409a0e9459-20240428
-Received: from mtkmbs10n1.mediatek.inc [(172.21.101.34)] by mailgw01.mediatek.com
-	(envelope-from <shiming.cheng@mediatek.com>)
-	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
-	with ESMTP id 2096129537; Sun, 28 Apr 2024 22:29:55 +0800
-Received: from mtkmbs13n2.mediatek.inc (172.21.101.108) by
- MTKMBS09N1.mediatek.inc (172.21.101.35) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.26; Sun, 28 Apr 2024 22:29:54 +0800
-Received: from mbjsdccf07.gcn.mediatek.inc (10.15.20.246) by
- mtkmbs13n2.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
- 15.2.1118.26 via Frontend Transport; Sun, 28 Apr 2024 22:29:53 +0800
-From: <shiming.cheng@mediatek.com>
-To: <willemdebruijn.kernel@gmail.com>, <edumazet@google.com>,
-	<davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<matthias.bgg@gmail.com>
-CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<shiming.cheng@mediatek.com>, Lena Wang <lena.wang@mediatek.com>
-Subject: [PATCH net] net: drop pulled SKB_GSO_FRAGLIST skb
-Date: Sun, 28 Apr 2024 22:30:10 +0800
-Message-ID: <20240428143010.18719-1-shiming.cheng@mediatek.com>
-X-Mailer: git-send-email 2.18.0
+	s=arc-20240116; t=1714315739; c=relaxed/simple;
+	bh=TwQA7/miNNOphY2D3FI8tBXZwUzrt3mN49X+VNAy1tA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BJereALt65o2jsJNMwf8ggrwNsxaZj9xaVH4Q7ugo6rDAE8E0+KOlXVTIE1sBfpmbqjR/tX634QoohYS9aJP5BkaXIJ2PytjIgSOYyWkpDcc4bI9pn4n/A5EGilGm4OxrrEXJ2jwAO7ELv+xmf0YB9it8EG4gHlJ0RQt6cDL3kc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=GjY/AysB; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=xqq21paJKP2+riMYLIjLYPLWIPBCPPYAVbbEQpB67Mg=; b=Gj
+	Y/AysBpQW6z8Qb8hIUYe9BIu8ptnZKE/aFs2RjpMVx6H+3IW+JA74hS3uJr92JIqa/K8uulLDD9lK
+	17hzYyijU6s5haNc0DJAJQkHjnUlyCERbSthBROv2NlN8TSYlrqE+twK3ilp/HJKIaF6FKaLKZJEa
+	3DQvvwpUT2bzOlg=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1s15pa-00EBzI-9b; Sun, 28 Apr 2024 16:48:42 +0200
+Date: Sun, 28 Apr 2024 16:48:42 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: =?iso-8859-1?Q?Ram=F3n?= Nordin Rodriguez <ramon.nordin.rodriguez@ferroamp.se>
+Cc: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, horms@kernel.org, saeedm@nvidia.com,
+	anthony.l.nguyen@intel.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, corbet@lwn.net,
+	linux-doc@vger.kernel.org, robh+dt@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+	devicetree@vger.kernel.org, horatiu.vultur@microchip.com,
+	ruanjinjie@huawei.com, steen.hegelund@microchip.com,
+	vladimir.oltean@nxp.com, UNGLinuxDriver@microchip.com,
+	Thorsten.Kummermehr@microchip.com, Pier.Beruto@onsemi.com,
+	Selvamani.Rajagopal@onsemi.com, Nicolas.Ferre@microchip.com,
+	benjamin.bigler@bernformulastudent.ch
+Subject: Re: [PATCH net-next v4 05/12] net: ethernet: oa_tc6: implement error
+ interrupts unmasking
+Message-ID: <4ea06ce4-d1df-49ea-8667-1f43dac7e747@lunn.ch>
+References: <20240418125648.372526-1-Parthiban.Veerasooran@microchip.com>
+ <20240418125648.372526-6-Parthiban.Veerasooran@microchip.com>
+ <Zi1Xbz7ARLm3HkqW@builder>
+ <77d7d190-0847-4dc9-8fc5-4e33308ce7c8@lunn.ch>
+ <Zi10QS6UGGaNVRaB@builder>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-MTK: N
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <Zi10QS6UGGaNVRaB@builder>
 
-From: Shiming Cheng <shiming.cheng@mediatek.com>
+On Sat, Apr 27, 2024 at 11:55:13PM +0200, Ramón Nordin Rodriguez wrote:
+> > How fast is your SPI bus? Faster than the link speed? Or slower?
+> > 
+> > It could be different behaviour is needed depending on the SPI bus
+> > speed. If the SPI bus is faster than the link speed, by some margin,
+> > the receiver buffer should not overflow, since the CPU can empty the
+> > buffer faster than it fills.
+> 
+> I'm running at 25MHz, I'm guessing that should translate to fast enough
+> for the 10MBit half duplex link.
+> But I'm not sure how the spi clock translates to bps here.
 
-A SKB_GSO_FRAGLIST skb without GSO_BY_FRAGS is
-expected to have all segments except the last
-to be gso_size long. If this does not hold, the
-skb has been modified and the fraglist gso integrity
-is lost. Drop the packet, as it cannot be segmented
-correctly by skb_segment_list.
+That seems plenty fast. Maybe you can get a bus pirate or similar
+sniffing the bus. Maybe there are big gaps between the transfers for
+some reason? Or the interrupt controller is very slow?
 
-The skb could be salvaged. By linearizing, dropping
-the SKB_GSO_FRAGLIST bit and entering the normal
-skb_segment path rather than the skb_segment_list path.
+> I'm guessing you are right and that the others actually would be
+> meningful to log.
+> There is a nested question here as well, and that is wheter to keep or
+> drop the code that drops the rx buffer on overflow interrupt.
+> I think not dropping the full buffer could be one of the reasons for the
+> perf change.
 
-That choice is currently made in the protocol caller,
-__udp_gso_segment. It's not trivial to add such a
-backup path here. So let's add this backstop against
-kernel crashes.
+You need to look careful at what a buffer overflow means, as written
+in the standard. Does it mean a chunk has been dropped from the frame
+currently being transferred over the SPI bus? If so, you need to drop
+the frame, because it is missing 64 bytes somewhere. That could happen
+if the device has very minimal buffering and does cut through. So the
+frame goes straight to the SPI bus while it is still being received
+from the line. Or the device could have sufficient buffers to hold a
+few full frames. It has run out of such buffers while receiving, and
+so dropped the frame. You never see that frame over SPI because it has
+already been discarded. If so, linux should not be dropping anything,
+the device already has.
 
-Fixes: 3a1296a38d0c ("net: Support GRO/GSO fraglist chaining.")
-Signed-off-by: Shiming Cheng <shiming.cheng@mediatek.com>
-Signed-off-by: Lena Wang <lena.wang@mediatek.com>
----
- net/core/skbuff.c | 4 ++++
- 1 file changed, 4 insertions(+)
+Given your 25Mhz bus speed, i think there at least two things wrong
+here. Dropping frames is too noise, and potentially doing it wrong. I
+also think there is something not optimal in your SPI master, because
+25MHz should not have trouble with 10Mbps line speed.
 
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index b99127712e67..4777f5fea6c3 100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -4491,6 +4491,7 @@ struct sk_buff *skb_segment_list(struct sk_buff *skb,
- {
- 	struct sk_buff *list_skb = skb_shinfo(skb)->frag_list;
- 	unsigned int tnl_hlen = skb_tnl_header_len(skb);
-+	unsigned int mss = skb_shinfo(skb)->gso_size;
- 	unsigned int delta_truesize = 0;
- 	unsigned int delta_len = 0;
- 	struct sk_buff *tail = NULL;
-@@ -4504,6 +4505,9 @@ struct sk_buff *skb_segment_list(struct sk_buff *skb,
- 	if (err)
- 		goto err_linearize;
- 
-+	if (mss != GSO_BY_FRAGS && mss != skb_headlen(skb))
-+		return ERR_PTR(-EFAULT);
-+
- 	skb_shinfo(skb)->frag_list = NULL;
- 
- 	while (list_skb) {
--- 
-2.18.0
-
+	Andrew
 
