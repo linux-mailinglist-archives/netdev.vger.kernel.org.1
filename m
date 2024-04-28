@@ -1,149 +1,241 @@
-Return-Path: <netdev+bounces-91981-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-91982-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 054E68B4B00
-	for <lists+netdev@lfdr.de>; Sun, 28 Apr 2024 11:33:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1618C8B4B0C
+	for <lists+netdev@lfdr.de>; Sun, 28 Apr 2024 11:54:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9C1611F215D2
-	for <lists+netdev@lfdr.de>; Sun, 28 Apr 2024 09:33:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 222761C20B4B
+	for <lists+netdev@lfdr.de>; Sun, 28 Apr 2024 09:54:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 996F954F86;
-	Sun, 28 Apr 2024 09:33:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70F5955C2E;
+	Sun, 28 Apr 2024 09:54:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EXgk+ZaC"
+	dkim=pass (2048-bit key) header.d=ferroamp-se.20230601.gappssmtp.com header.i=@ferroamp-se.20230601.gappssmtp.com header.b="uZwkVbrQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39AD554904;
-	Sun, 28 Apr 2024 09:33:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 882993EA96
+	for <netdev@vger.kernel.org>; Sun, 28 Apr 2024 09:54:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714296825; cv=none; b=Dj7Wy7HTABvquxg31CJRD5AvQk7Imw1YVJE1imLbuKkamETOrO/1ByMGdZP23fz5rhU+Yri95RZnP5EXp1OzOejCCjpQisaT8Q0SPtTT5grbUkWBSokU4GXYBatAdZjg3G6SgXjeyiE/CUJNbbfMu/8nAiyEYnTlE6QArtctp7w=
+	t=1714298066; cv=none; b=Adf3zyypG8QkNU1mNaqzbYrdWyAx1ZOQCQ9WX/XLLdzubKKWUQ5faD7H2tJ4098MVDoa8iSZ6Od/7ByqNHk23D+GflFywegnN/cXF777lljG0CQKYM3QWO50cGeaO6cOzoWzxZQ+bZUbyK5BXZWq2XZ73M54Mt84Lk1LuyhEaAM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714296825; c=relaxed/simple;
-	bh=9/H4hIcmfu3JjOnIknoqVVHVuWndxPUkScSTTOjWtG4=;
+	s=arc-20240116; t=1714298066; c=relaxed/simple;
+	bh=XfwPvtFVa37rQ9j0JNfy5Q8xawgeFhod/zhdXWAvcW0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rW0PxVdwZz3+lN679IMlUBpHHU41f/63cNBWc3ly6DSXzq49NrD9PC/7JcedrhyAhdMAZSUtWk9KHlSnJPfoIxRqASmsaNkZ+KHTWTs364Q3dLYY6YxiwXruJCcmpJak70Yv6Ql7R1FBd8Plb4Mr1qkrHetfgtcY8nyMR4fv250=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EXgk+ZaC; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-1e5715a9ebdso29934785ad.2;
-        Sun, 28 Apr 2024 02:33:44 -0700 (PDT)
+	 Content-Type:Content-Disposition:In-Reply-To; b=gUbtOuE6t5OInrx5ijljPo1qD4tRzuwQS170h3DEV7/BUrZ84f9PX+FJgVQAcFkN2/sQJEmrr+YJ4TPl93UU9sJepUKsnadl7k2FUnuJK3ZdbHWNiaodcqtHt2+DOb8Sk+DYEq/pqZlwOKxTa5MMmJ2BxKOmg7sPkkQ4NMtk4Ic=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ferroamp.se; spf=pass smtp.mailfrom=ferroamp.se; dkim=pass (2048-bit key) header.d=ferroamp-se.20230601.gappssmtp.com header.i=@ferroamp-se.20230601.gappssmtp.com header.b=uZwkVbrQ; arc=none smtp.client-ip=209.85.167.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ferroamp.se
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ferroamp.se
+Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-518f8a69f82so3984772e87.2
+        for <netdev@vger.kernel.org>; Sun, 28 Apr 2024 02:54:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1714296823; x=1714901623; darn=vger.kernel.org;
+        d=ferroamp-se.20230601.gappssmtp.com; s=20230601; t=1714298063; x=1714902863; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=8y4J2jKG4zMmITnzKwBDxurX5+DaqJx/4k4xBWp5hO0=;
-        b=EXgk+ZaCl+3bGpJ2C7A0ZIR8drscLI/4k97m8HeskipOVmmbf8SqmWNc31qCC508m7
-         3Y7YbqWiYZ2OINXnufQ5LSkiYsplF/Xf03193/DkTciTbe1F7AWbyNzLSHfNh41+P9MU
-         LtUAu796OO3rT3OOF+CVJ3jhdUhDR89ZZ4noscO57r71bFmjO0V+rx6MphyCJyIkHDHG
-         QLentiqDwocZM4vTBOF3yKGbCfzuChl4D6zw45HbB7KLSXfsMKqehV4QfxrNbCOkNaQf
-         bqygTaGSMStwOCg2vUuDt0NJVpgYswIHqVNxENokl8wC6aswB24ytHBdywH6mY3MWut4
-         9GMA==
+        bh=lMrhY6/jdHr+5rbk2vYpIblfqORgrZnbq6o4kFL2leY=;
+        b=uZwkVbrQlvguK8Wt+X9Ta4u9WiSuOKwvIgRL4/CiWxXVEke52BTXTXSIemT64bhvpC
+         d6XYuSg+af72JcIQ3uE6oKGT8E/pX8fhgU1NQUGYUAytvvZzePh6+UiizmfVRQg/Sj4b
+         /6Nqrd1U2CkFqSv2cdwXsigAX83Uj9/42SetQazhsqg/9Z5rJYrVV6J6m5iZv1vLuLgD
+         4srN3znNw7yh2lCcUfQ9pHMP3qFrNmQ/TqBYtrQcYUM+YBRYTVm9DdPCISsKPymw4nRP
+         RrBy1CTaRvEzJdc36zwjDjFRRnsuH+qa2NWk7jFKViEYZjxELTplcuGbbg8MAdNd4Hzv
+         GP5A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714296823; x=1714901623;
+        d=1e100.net; s=20230601; t=1714298063; x=1714902863;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=8y4J2jKG4zMmITnzKwBDxurX5+DaqJx/4k4xBWp5hO0=;
-        b=JQV6oHQORGkn3zzQIyAIxvJ7/dk9wSYnMTiKlihRqKfJwkRSxWkvO7hg9hyCY8aN1K
-         OP8ltKqvOBXlpr1UQQjNntk+4HB6SQlim5LKiHeahiBrg28nouC5xCOqQBYoa/ki2p03
-         GfjYTO9dqxXl0FJNG3UckbX3S4c/BWws4JJQARUC/p1PMvd6GB+Jm82+ddDFp1HvE15k
-         nsWIcYjXWNSZY5/L2ZZOKMIv5fITR2bY1N6Umtsb4Kv386SrGF5prLz5hUJc1Udztm2A
-         3vMwwr0KcLXs9HtZb39u5RTbapu16vd/U5XKSpXsraIUf6Qa7p/BvFc/GDRAJU83M4dM
-         tPYg==
-X-Forwarded-Encrypted: i=1; AJvYcCWHhXQe/e13LyOGTfM4/rtKMvKEYY7/MKyilp0bhodmfemOeGTfkQSybJ26mOCUSzVQIxW/8/QzJOmJlK52jr+HfGBHBpy+0pS1AWvY/+PxEdHKrj2s31NtZMVflbRbh2YmqagW6UMNDuIPdrq8grcJ0fk554A0xxsafn72zAQ4TkA/b1vtY9EaE4JzFtUVmY/XSe/lkw8C1zQQhg==
-X-Gm-Message-State: AOJu0YyJzGg3y6J34AN4SlFX64rZKMWPkHIhUXIlA7WQBPnlNNO5jv3a
-	3LOULX57KB/aMULPGt8DoD1U2tRdNPA1eYdEcTqNxQsHLjF2gzIx
-X-Google-Smtp-Source: AGHT+IGY8wQOviArarfgPhxPvt9bnQiBDGjv4NNlhGEdkQKoEG2Trea3tp+JYSu9ILqwtee0EG7LMA==
-X-Received: by 2002:a17:902:bb83:b0:1de:fbc8:53af with SMTP id m3-20020a170902bb8300b001defbc853afmr3761373pls.25.1714296823253;
-        Sun, 28 Apr 2024 02:33:43 -0700 (PDT)
-Received: from archie.me ([103.124.138.155])
-        by smtp.gmail.com with ESMTPSA id l18-20020a170903005200b001e85cf937ffsm18171609pla.101.2024.04.28.02.33.42
+        bh=lMrhY6/jdHr+5rbk2vYpIblfqORgrZnbq6o4kFL2leY=;
+        b=wjqsaKlYe6M8kzyNKk5q1WNaMS5rQNArO3FHBx1eVK11drD0xz+olNTLsEprql9yph
+         2oZZ5lE4E/v1/aKcdFvk5wxlvUQVccD599KPBAiLFcch36i8Zdm0RxlUJZmasEZtE3yL
+         TB9ooK+GYGneuMzjWMu+DZIrN54LXqFQBxvRQsWlxNCuSZg9OPgWW3b0JCw4GfyDGlSO
+         XIaIqJTdoew2WQqm912WwlByKRQPMf6dngVxmnuyhsPSq6dpe62e/D/Rok3KJ14+s/kh
+         N+CWEy2k5qXzcSBQT/LEPxGWrGICOA1IkWTlehsE33QA4VD1DZGP2SCodrOIPEGmwFvH
+         /CRg==
+X-Forwarded-Encrypted: i=1; AJvYcCVf6Wcy1uM/ASb/6crPArTF909mPfGfxkisKs5CB/qMeivEHhr3LP6I/8mIrt4fi7CeV8sVZ089OA+SHWx3QCXbQZ57KWLO
+X-Gm-Message-State: AOJu0Yy0spoyDQkHb1qjfvUaFMjdxKVHMo1qmr+D3qIktrjD6+h/zhLj
+	xdp0NIAe91+axTptd6RtPkLjgN99/qkXuYRRXEQoZrlGX5H78xOMw+/1m9Q+Ozs=
+X-Google-Smtp-Source: AGHT+IGn32KqwhwvFwaFNH1nncKg1jRLmaHfbV2LvHlzEopH2e+yZMzEFTLRlpSlHe3WAJQd/h2+Lw==
+X-Received: by 2002:a05:6512:46c:b0:518:ce4b:17ef with SMTP id x12-20020a056512046c00b00518ce4b17efmr2768833lfd.60.1714298062439;
+        Sun, 28 Apr 2024 02:54:22 -0700 (PDT)
+Received: from builder (c188-149-135-220.bredband.tele2.se. [188.149.135.220])
+        by smtp.gmail.com with ESMTPSA id l17-20020ac24a91000000b005196e3e8a84sm3719795lfp.177.2024.04.28.02.54.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 28 Apr 2024 02:33:42 -0700 (PDT)
-Received: by archie.me (Postfix, from userid 1000)
-	id A981B184692DC; Sun, 28 Apr 2024 16:33:36 +0700 (WIB)
-Date: Sun, 28 Apr 2024 16:33:36 +0700
-From: Bagas Sanjaya <bagasdotme@gmail.com>
-To: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>,
+        Sun, 28 Apr 2024 02:54:22 -0700 (PDT)
+Date: Sun, 28 Apr 2024 11:54:20 +0200
+From: =?iso-8859-1?Q?Ram=F3n?= Nordin Rodriguez <ramon.nordin.rodriguez@ferroamp.se>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>,
 	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
 	pabeni@redhat.com, horms@kernel.org, saeedm@nvidia.com,
 	anthony.l.nguyen@intel.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, andrew@lunn.ch, corbet@lwn.net,
+	linux-kernel@vger.kernel.org, corbet@lwn.net,
 	linux-doc@vger.kernel.org, robh+dt@kernel.org,
 	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
 	devicetree@vger.kernel.org, horatiu.vultur@microchip.com,
 	ruanjinjie@huawei.com, steen.hegelund@microchip.com,
-	vladimir.oltean@nxp.com
-Cc: UNGLinuxDriver@microchip.com, Thorsten.Kummermehr@microchip.com,
-	Pier.Beruto@onsemi.com, Selvamani.Rajagopal@onsemi.com,
-	Nicolas.Ferre@microchip.com, benjamin.bigler@bernformulastudent.ch
-Subject: Re: [PATCH net-next v4 01/12] Documentation: networking: add OPEN
- Alliance 10BASE-T1x MAC-PHY serial interface
-Message-ID: <Zi4X8NO9SkhffJ98@archie.me>
+	vladimir.oltean@nxp.com, UNGLinuxDriver@microchip.com,
+	Thorsten.Kummermehr@microchip.com, Pier.Beruto@onsemi.com,
+	Selvamani.Rajagopal@onsemi.com, Nicolas.Ferre@microchip.com,
+	benjamin.bigler@bernformulastudent.ch
+Subject: Re: [PATCH net-next v4 05/12] net: ethernet: oa_tc6: implement error
+ interrupts unmasking
+Message-ID: <Zi4czGX8jlqSdNrr@builder>
 References: <20240418125648.372526-1-Parthiban.Veerasooran@microchip.com>
- <20240418125648.372526-2-Parthiban.Veerasooran@microchip.com>
+ <20240418125648.372526-6-Parthiban.Veerasooran@microchip.com>
+ <Zi1Xbz7ARLm3HkqW@builder>
+ <77d7d190-0847-4dc9-8fc5-4e33308ce7c8@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="5Fqs5imMNEU2vqXw"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240418125648.372526-2-Parthiban.Veerasooran@microchip.com>
+In-Reply-To: <77d7d190-0847-4dc9-8fc5-4e33308ce7c8@lunn.ch>
+
+> It could be the performance increase comes from two places:
+> 
+> 1) Spending time and bus bandwidth dealing with the buffer overflow
+> interrupt
+> 
+> 2) Printing out the serial port.
+> 
+> Please could you benchmark a few things:
+> 
+> 1) Remove the printk("Receive buffer overflow error"), but otherwise
+> keep the code the same. That will give us an idea how much the serial
+> port matters.
+> 
+> 2) Disable only the RX buffer overflow interrupt
+> 
+> 3) Disable all error interrupts.
+> 
 
 
---5Fqs5imMNEU2vqXw
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, Apr 18, 2024 at 06:26:37PM +0530, Parthiban Veerasooran wrote:
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 04e5f7c20e30..79fa7abb4ec9 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -16400,6 +16400,12 @@ L:	linux-rdma@vger.kernel.org
->  S:	Supported
->  F:	drivers/infiniband/ulp/opa_vnic
-> =20
-> +OPEN ALLIANCE 10BASE-T1S MACPHY SERIAL INTERFACE FRAMEWORK
-> +M:	Parthiban Veerasooran <parthiban.veerasooran@microchip.com>
-> +L:	netdev@vger.kernel.org
-> +S:	Maintained
-> +F:	Documentation/networking/oa-tc6-framework.rst
-> +
->  OPEN FIRMWARE AND FLATTENED DEVICE TREE
->  M:	Rob Herring <robh+dt@kernel.org>
->  M:	Frank Rowand <frowand.list@gmail.com>
+Test setup
+- Server side - 
+PC with a lan8670 usb eval board running a http server that serves
+a 10MB binary blob. The http server is just python3 -m http.server
 
-I can't apply this series on top of current net-next due to MAINTAINERS diff
-above (on context line 16400 I have Omnivision entries). Care to reroll?
-(Hint: also specify --base=3D to git-send-email(1) so that I and other
-reviewers know where to apply this series.)
+- Client side -
+iMX8mn board (quad core arm64) with lan8650 mac-phy (25MHz spi)
+running curl to download the blob from the server and writing to
+a ramfs (ddr4 1.xGHz, so should not be a bottleneck)
 
-Confused...
+Below are a collection of samples of different test runs. All of the
+test runs have run a minor patch for hw reset (else nothing works for me).
+Using curl is not the most scientific approach here, but iperf has
+not exposed any problems for me earlier with overflows.
+So sticking with curl since it's easy and definetly gets the overflows.
 
---=20
-An old man doll... just what I always wanted! - Clara
+n  |  name     |  min  |  avg  |  max  |  rx dropped  |  samples
+1  |  no mod   |  827K |  846K |  891K |      945     |     5
+2  |  no log   |  711K |  726K |  744K |      562     |     5
+3  |  less irq |  815K |  833K |  846K |      N/A     |     5
+4  |  no irq   |  914K |  924K |  931K |      N/A     |     5
+5  |  simple   |  857K |  868K |  879K |      615     |     5
 
---5Fqs5imMNEU2vqXw
-Content-Type: application/pgp-signature; name="signature.asc"
+Description of each scenario
 
------BEGIN PGP SIGNATURE-----
+1 - no mod
+So this just runs a hw reset to get the chip working (described in earlier posts)
 
-iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZi4X5gAKCRD2uYlJVVFO
-o1AvAP4nLo1+SkG4LHoDx0UG7x2GO8EAVGWa2xA0bfEy+LmYZwD+Nkv8oXNIABg7
-t7tyeXn5/fcA0D6fn+xGvTd0RKT37g0=
-=jFZ9
------END PGP SIGNATURE-----
+2 - no log
+This scenario just removes the logging when handling the irq state
+--- a/drivers/net/ethernet/oa_tc6.c
++++ b/drivers/net/ethernet/oa_tc6.c
+@@ -688,8 +688,6 @@ static int oa_tc6_process_extended_status(struct oa_tc6 *tc6)
+        if (FIELD_GET(STATUS0_RX_BUFFER_OVERFLOW_ERROR, value)) {
+                tc6->rx_buf_overflow = true;
+                oa_tc6_cleanup_ongoing_rx_skb(tc6);
+-               net_err_ratelimited("%s: Receive buffer overflow error\n",
+-                                   tc6->netdev->name);
+                return -EAGAIN;
+        }
+        if (FIELD_GET(STATUS0_TX_PROTOCOL_ERROR, value)) {
 
---5Fqs5imMNEU2vqXw--
+3 - less irq
+This scenario disables the overflow interrupt but keeps the others
+
+--- a/drivers/net/ethernet/oa_tc6.c
++++ b/drivers/net/ethernet/oa_tc6.c
+@@ -625,10 +625,10 @@ static int oa_tc6_unmask_macphy_error_interrupts(struct oa_tc6 *tc6)
+                return ret;
+
+        regval &= ~(INT_MASK0_TX_PROTOCOL_ERR_MASK |
+-                   INT_MASK0_RX_BUFFER_OVERFLOW_ERR_MASK |
+                    INT_MASK0_LOSS_OF_FRAME_ERR_MASK |
+                    INT_MASK0_HEADER_ERR_MASK);
+
++       regval |= INT_MASK0_RX_BUFFER_OVERFLOW_ERR_MASK;
+        return oa_tc6_write_register(tc6, OA_TC6_REG_INT_MASK0, regval);
+ }
+
+4 - no irq
+This scenario disables all imask0 interrupts with the following change
+
+diff --git a/drivers/net/ethernet/oa_tc6.c b/drivers/net/ethernet/oa_tc6.c
+index 9f17f3712137..88a9c6ccb37a 100644
+--- a/drivers/net/ethernet/oa_tc6.c
++++ b/drivers/net/ethernet/oa_tc6.c
+@@ -624,12 +624,7 @@ static int oa_tc6_unmask_macphy_error_interrupts(struct oa_tc6 *tc6)
+        if (ret)
+                return ret;
+
+-       regval &= ~(INT_MASK0_TX_PROTOCOL_ERR_MASK |
+-                   INT_MASK0_RX_BUFFER_OVERFLOW_ERR_MASK |
+-                   INT_MASK0_LOSS_OF_FRAME_ERR_MASK |
+-                   INT_MASK0_HEADER_ERR_MASK);
+-
+-       return oa_tc6_write_register(tc6, OA_TC6_REG_INT_MASK0, regval);
++       return oa_tc6_write_register(tc6, OA_TC6_REG_INT_MASK0, (u32)-1);
+ }
+
+ static int oa_tc6_enable_data_transfer(struct oa_tc6 *tc6)
+
+
+5 - simple
+This keeps the interrupt but does not log or drop the socket buffer on irq
+Moving the rx dropped increment here makes it more of a irq counter I guess,
+so maybe not relevant.
+
+diff --git a/drivers/net/ethernet/oa_tc6.c b/drivers/net/ethernet/oa_tc6.c
+index 9f17f3712137..cbc20a725ad0 100644
+--- a/drivers/net/ethernet/oa_tc6.c
++++ b/drivers/net/ethernet/oa_tc6.c
+@@ -687,10 +687,7 @@ static int oa_tc6_process_extended_status(struct oa_tc6 *tc6)
+
+        if (FIELD_GET(STATUS0_RX_BUFFER_OVERFLOW_ERROR, value)) {
+                tc6->rx_buf_overflow = true;
+-               oa_tc6_cleanup_ongoing_rx_skb(tc6);
+-               net_err_ratelimited("%s: Receive buffer overflow error\n",
+-                                   tc6->netdev->name);
+-               return -EAGAIN;
++               tc6->netdev->stats.rx_dropped++;
+        }
+        if (FIELD_GET(STATUS0_TX_PROTOCOL_ERROR, value)) {
+                netdev_err(tc6->netdev, "Transmit protocol error\n");
+
+
+- postamble -
+
+Removing the logging made things considerably slower which probably
+indicates that there is a timing dependent behaviour in the driver.
+
+I have a hard time explaining why there is a throughput difference
+between scenario 3 and 4 since I did not get the logs that any of the
+other interrupts happened.
+Maybe the irq handling adds some unexpected context switching overhead.
+
+My recommendation going forward would be to disable the rx buffer
+overlow interrupt and removing any code related to handling of it.
+
+R
 
