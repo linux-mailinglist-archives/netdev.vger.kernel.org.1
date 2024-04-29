@@ -1,216 +1,455 @@
-Return-Path: <netdev+bounces-92272-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92273-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C95CE8B6551
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 00:07:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B2CB8B6564
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 00:17:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4F3F5B20AD1
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 22:07:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 31FF128342A
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 22:17:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C77C619068B;
-	Mon, 29 Apr 2024 22:07:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91BE219069F;
+	Mon, 29 Apr 2024 22:17:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fC5AsFe2"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Qftsq9t3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f195.google.com (mail-yb1-f195.google.com [209.85.219.195])
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45DE21779BD;
-	Mon, 29 Apr 2024 22:07:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E050190699
+	for <netdev@vger.kernel.org>; Mon, 29 Apr 2024 22:17:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714428448; cv=none; b=BDYMmZDgf6upoAJ8mKQxTpmMfAN0hL8kEoMmHJJJW9LMuYPQ2yt3ECB6SWXUZsDrGq9do6XlXKWuGyEqKZ9e0NxNnVnDLpgl1ecQJGq5G3blR2UwVwVyblP044GxzXZgQPu9aHnha7DkBWMFmk4t8HnPd9/baDPbjvh3I7Fnz5g=
+	t=1714429039; cv=none; b=dKsy1xmQBXMKDu6Wcr6HpiPxusGMj69ANym7p6MGxb/7xfAgAnGR3LGzcdEmb0npSDoLz9U2IlZBBGM482AvZd8+MN7cEEniuvcLFcQglI5r6GKeYJ2aZiEVVVq1sITj/76JJBxmmX/lQ0sJCVTkF1mJHYU0lQ9Fl5piGG2/c90=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714428448; c=relaxed/simple;
-	bh=7RZyMoqCetWeFs8/lvQs40Xf5QXXPfb8os+0zU2U8jA=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=rcBDrmDnQm7uDyVtyImdSZx8Vg9y7LzTGHy/xcIq2pF0i91rS9c1vqKLH5CRrUTijaihuLE7gZBoqkWQR433LHNRc1SWbELqWOVTiZITayTTyJttHDPERWQtwRWR9fi5OgTHQAJU7evZ2gsi9hiFriAp3aILJ/a1yDmWRYuoH+M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fC5AsFe2; arc=none smtp.client-ip=209.85.219.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f195.google.com with SMTP id 3f1490d57ef6-de5a7b18acdso4308084276.3;
-        Mon, 29 Apr 2024 15:07:27 -0700 (PDT)
+	s=arc-20240116; t=1714429039; c=relaxed/simple;
+	bh=oBVqI12B9dk8m32PErPVKEZP3bzYUd+pYrIzHdiB2lg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=BzuVr9XpfR0Z1x1XJqTbVpfXsQARHvfLP9XGRH+R7am00fT5xUN9XYVICpvUeIa4EjNWpM8MEotcUAT4QhDt73CPyTrPLtVmvw/aaQIbI4T+tSBEELv4SnTI+CuDyMDfmhn/ehb2+HpGHOGpgEd7ITtJ3wCU0PdAaRFA8blFF9I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Qftsq9t3; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-1e36b7e7dd2so41060855ad.1
+        for <netdev@vger.kernel.org>; Mon, 29 Apr 2024 15:17:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1714428446; x=1715033246; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=WNPjDuIsCAGhmSwDM3zYsna6zJmWSMRuz5bKNz3RO5o=;
-        b=fC5AsFe24P3CQo7VAQBR3RZVy6t9RlNKVTLAiBvXva03Rtpd+njz6Uav4pGdhqdJch
-         TT+WbrAh4umMeqKJHOMNmfAmXWEakKyCAMpF+Mq0sVKLWIL+U4N1BvbnzIjewgjmeOZW
-         mLWqK03nLmiMF4JerzA5i9S5kcakNB6v7SLYVuNMoHnK2v6ED4a1sEczuogHwKW1FJVD
-         vORyXaI9esspTcgzS6eisyRXjnT65fIsbZghbsM5jDbOEhm1V4r5lHnO3C6baNuwuzy/
-         egRC0X8p7/QuXAXw5z/VaALGMm3UC+IfquP6sDqkg8xKHuZZcHJpYPhzbkEsI6wE0/nO
-         K85w==
+        d=linaro.org; s=google; t=1714429037; x=1715033837; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=EZhleW+Ps4WRPrVdrP1CYU/kHoFoEgDlGeETjkUbRe4=;
+        b=Qftsq9t3NZOYf14vcLbiQBDNy0EF9D/rB4IsjR9DngDV9UpGa/preuRyujK090kw6N
+         iPHd6AfYpeDbJZIfFf0YB7y8Fw0h4IN06DzDo7h+TQ7U1ZgNBJ19wSPM0jMVZbR+cFpu
+         rYQBFMpA6Sfixi9iYoy2mMfeH6yIocNpGkUq52GDoH4rLSzDoVc+EYTbnmfLHwmlwNbo
+         xh+4JSWKd3TLyWBJiblnWlDKI6B+kmIuGNjL5hHDsFzTZNGIjFl+j3z0QIMcHR2RwpYA
+         Zv5MvKuTMYxtoVcLrinP0PK2+roue0Qpd5tnZTT+iyOiz8vy+7enOMElPVtkRDsPEyfp
+         /VAQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714428446; x=1715033246;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WNPjDuIsCAGhmSwDM3zYsna6zJmWSMRuz5bKNz3RO5o=;
-        b=BcX0bQ6peqsxuS7sKP2TqxELafQvZ0BZF5kXU6MHQPqucgVx15zyMf4jX9iHCgBMnm
-         w6Pn+ectvjPvvRV52DvWA9h30V58DlAmyS9qH/joksrFBf1aybmtu0CAB0nlyRL1SLnB
-         sbXaDS14NOZri31sippF3zxqc5UEfa0AHZD3WOrxvwCHWQ7zrSa7PtxOzOb7LJIfMpXo
-         TafEvwbP0r2DBTfwIC4+MqOJZda2WnhRfmi8NITzmoM296clzUCJGUIW9W98NkaVrK/+
-         s/1bWo0bGp8+IKCyppNJOwhJdsbqbRW419g19xJYdWJMaZXfMVzf1Ed6fA4C8KZJghrr
-         8Y7A==
-X-Forwarded-Encrypted: i=1; AJvYcCXmdL7alcszz8uQKCJ0ofsTrHyq4NhxbSe3rJKqPsAvrw8BwMr++Hjdcdj1pwO9r7QZZpKIbDXXXXB2i5cpCKN3odzrhXWNU2y150d4IHdpyQLkAvD/2veAqzSfRsvs/SioK6kG
-X-Gm-Message-State: AOJu0YxRHNj0tTRppscyJTiNrltTjIU72Zba0esAm22vXQi5kIfAjCVW
-	vH+QrVfvCXkuFPpT0dq9BJ8k4u6UCOUN1c0daze7QQvG39RbGEte
-X-Google-Smtp-Source: AGHT+IGtYKzgxUyvtAKAkuiRkW/bVBzN0cAJj+xLZAhum8thFmdQgHzmotfBbOFN2fm0pk66fwcnSg==
-X-Received: by 2002:a05:6902:1004:b0:de4:6f1e:c9bb with SMTP id w4-20020a056902100400b00de46f1ec9bbmr14605702ybt.26.1714428446201;
-        Mon, 29 Apr 2024 15:07:26 -0700 (PDT)
-Received: from [10.102.6.66] ([208.97.243.82])
-        by smtp.gmail.com with ESMTPSA id x3-20020a056902102300b00dcc0cbb0aeesm5745572ybt.27.2024.04.29.15.07.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 29 Apr 2024 15:07:25 -0700 (PDT)
-Message-ID: <d36e2b82-0353-4c9c-aa89-22383c3bda2b@gmail.com>
-Date: Mon, 29 Apr 2024 18:07:25 -0400
+        d=1e100.net; s=20230601; t=1714429037; x=1715033837;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=EZhleW+Ps4WRPrVdrP1CYU/kHoFoEgDlGeETjkUbRe4=;
+        b=sdOZIRo2KP1JPfkfkAlKk+AoSMztfNzys0lSiZQG9NoK6ZAEX5bCBEOtpP0hEL/sd7
+         vOtBNUhRm2fJnVAx22txFXH8UHAEluE7kjQlyUnQIYg9yUjvo8kMgV0zaXPEZfs/EHi7
+         jJ8/tsq3Hf2ZlABicnahnx0+OXAuBVaRukdy8BdgoEo2JgkSDpBAMbStfSHejK3260jE
+         yAkDbaR+PHotSL5Yql7BV4D7VK4kP7YacmH1vuCS4Ork9J5NcZttoSAfAr5lQcGo31Vi
+         xRxlkfcLr9vkb3gKqskHvl1O6SN4N5kfCvPk9/oWTFqq/7hvc2+fyY1TZvLktQ2Mod0f
+         dJYg==
+X-Forwarded-Encrypted: i=1; AJvYcCVZTRR9FuKZZAOajm1asrmeFCzWEPajD7c+X+Z/erl7uTuDnfdfW2rorSoatHSpGDEzybP3a3XALgHor2xKO6BKY6OkLnXV
+X-Gm-Message-State: AOJu0Yyfr02Hs+Om2ZX1YZcP9WvLVyCEyquA6tg+etxSdU1ruLOVEBgY
+	FVve5MMTwevMiKRxeZInHCLtwNnYWrzBnJcHL3qVoSl7wT+rd0mIZ648d4ddmxc=
+X-Google-Smtp-Source: AGHT+IH+MfK5HUbzYyMP7HAxYBTBpvjoDI8KPFVUXaywGlC17QuAZLhZK7OiLAHejhmAsM08nY+r9w==
+X-Received: by 2002:a17:903:187:b0:1e5:a3b2:4ba3 with SMTP id z7-20020a170903018700b001e5a3b24ba3mr11936145plg.56.1714429036489;
+        Mon, 29 Apr 2024 15:17:16 -0700 (PDT)
+Received: from localhost.localdomain ([2405:201:c00c:2308:970:8782:f539:c9c7])
+        by smtp.gmail.com with ESMTPSA id i15-20020a170902c94f00b001eb30118300sm5713396pla.132.2024.04.29.15.17.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 29 Apr 2024 15:17:16 -0700 (PDT)
+From: Naresh Kamboju <naresh.kamboju@linaro.org>
+To: lkft-triage@lists.linaro.org,
+	regressions@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: jhs@mojatatu.com,
+	xiyou.wangcong@gmail.com,
+	jiri@resnulli.us,
+	dcaratti@redhat.com,
+	cpaasch@apple.com,
+	pabeni@redhat.com,
+	xmu@redhat.com,
+	maxim@isovalent.com,
+	edumazet@google.com,
+	anders.roxell@linaro.org,
+	dan.carpenter@linaro.org,
+	arnd@arndb.de,
+	Linux Kernel Functional Testing <lkft@linaro.org>
+Subject: selftests: tc-testing: tdc.sh:  WARNING: at kernel/locking/lockdep.c:1226 lockdep_register_key
+Date: Tue, 30 Apr 2024 03:47:06 +0530
+Message-Id: <20240429221706.1492418-1-naresh.kamboju@linaro.org>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC net-next 07/10] net: dsa: mv88e6xxx: Track bridge mdb
- objects
-From: Joseph Huang <joseph.huang.2024@gmail.com>
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Joseph Huang <Joseph.Huang@garmin.com>, netdev@vger.kernel.org,
- Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Roopa Prabhu <roopa@nvidia.com>, Nikolay Aleksandrov <razor@blackwall.org>,
- =?UTF-8?Q?Linus_L=C3=BCssing?= <linus.luessing@c0d3.blue>,
- linux-kernel@vger.kernel.org, bridge@lists.linux.dev
-References: <20240402001137.2980589-1-Joseph.Huang@garmin.com>
- <20240402001137.2980589-8-Joseph.Huang@garmin.com>
- <20240402122343.a7o5narxsctrkaoo@skbuf>
- <b5f79571-b4a8-4f21-8dc8-e1aa11056a5d@gmail.com>
- <20240405110745.si4gc567jt5gwpbr@skbuf>
- <c4f5c444-832c-4376-845f-7c28e88e4436@gmail.com>
-Content-Language: en-US
-In-Reply-To: <c4f5c444-832c-4376-845f-7c28e88e4436@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-On 4/5/2024 2:58 PM, Joseph Huang wrote:
-> Hi Vladimir,
-> 
-> On 4/5/2024 7:07 AM, Vladimir Oltean wrote:
->> On Thu, Apr 04, 2024 at 04:43:38PM -0400, Joseph Huang wrote:
->>> Hi Vladimir,
->>>
->>> On 4/2/2024 8:23 AM, Vladimir Oltean wrote:
->>>> Can you comment on the feasibility/infeasibility of Tobias' proposal 
->>>> of:
->>>> "The bridge could just provide some MDB iterator to save us from having
->>>> to cache all the configured groups."?
->>>> https://lore.kernel.org/netdev/87sg31n04a.fsf@waldekranz.com/
->>>>
->>>> What is done here will have to be scaled to many drivers - potentially
->>>> all existing DSA ones, as far as I'm aware.
->>>>
->>>
->>> I thought about implementing an MDB iterator as suggested by Tobias, 
->>> but I'm
->>> a bit concerned about the coherence of these MDB objects. In theory, 
->>> when
->>> the device driver is trying to act on an event, the source of the 
->>> trigger
->>> may have changed its state in the bridge already.
->>
->> Yes, this is the result of SWITCHDEV_F_DEFER, used by both
->> SWITCHDEV_ATTR_ID_PORT_MROUTER and SWITCHDEV_OBJ_ID_PORT_MDB.
->>
->>> If, upon receiving an event in the device driver, we iterate over what
->>> the bridge has at that instant, the differences between the worlds as
->>> seen by the bridge and the device driver might lead to some unexpected
->>> results.
->>
->> Translated: iterating over bridge MDB objects needs to be serialized
->> with new switchdev events by acquiring rtnl_lock(). Then, once switchdev
->> events are temporarily blocked, the pending ones need to be flushed
->> using switchdev_deferred_process(), so resync the bridge state with the
->> driver state. Once the resync is done, the iteration is safe until
->> rtnl_unlock().
->>
->> Applied to our case, the MDB iterator is needed in 
->> mv88e6xxx_port_mrouter().
->> This is already called with rtnl_lock() acquired. The resync procedure
->> will indirectly call mv88e6xxx_port_mdb_add()/mv88e6xxx_port_mdb_del()
->> through switchdev_deferred_process(), and then the walk is consistent
->> for the remainder of the mv88e6xxx_port_mrouter() function.
->>
->> A helper which does this is what would be required - an iterator
->> function which calls an int (*cb)(struct net_device *brport, const 
->> struct switchdev_obj_port_mdb *mdb)
->> for each MDB entry. The DSA core could then offer some post-processing
->> services over this API, to recover the struct dsa_port associated with
->> the bridge port (in the LAG case they aren't the same) and the address
->> database associated with the bridge.
+While running selftests: tc-testing: tdc.sh the following kernel warnings,
+kernel Bug, kernel oops and kernel panic noticed with Linux next-20240429
+tag kernel as per the available data.
 
-Something like this (some layers omitted for brevity)?
+This build config is from kselftest merge config[1].
 
-                                       +br_iterator
-                                       |  for each mdb
-                                       |    _br_switchdev_mdb_notify
-rtnl_lock                             |      without F_DEFER flag
-  |                                    |      |
-  +switchdev_port_attr_set_deferred    |      +switchdev_port_obj_notify
-    |                                  |        |
-    +dsa_port_mrouter                  |        +dsa_user_port_obj_a/d
-      |                                |          |
-      +mv88e6xxx_port_mrouter----------+          +mv88e6xxx_port_obj_a/d
-                                         |
-  +--------------------------------------+
-  |
-rtnl_unlock
+Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
 
-Note that on the system I tested, each register read/write takes about 
-100us to complete. For 100's of mdb groups, this would mean that we will 
-be holding rtnl lock for 10's of ms. I don't know if it's considered too 
-long.
+selftests: tc-testing: tdc.sh log and crash log
+---------------
+
+[ 1826.047350] kselftest: Running tests in tc-testing
+TAP version 13
+1..1
+# timeout set to 900
+# selftests: tc-testing: tdc.sh
+# netdevsim
+[ 1826.536738] Mirror/redirect action on
+[ 1826.704305] Simple TC action Loaded
+[ 1827.053726] u32 classifier
+[ 1827.056463]     Performance counters on
+[ 1827.060324]     input device check on
+[ 1827.064007]     Actions configured
+# Module em_ipset not found... skipping.
+# em_ipt
+
+<trim>
+
+# sch_hhf
+# sch_htb
+# sch_teql
+#  -- ns/SubPlugin.__init__
+#  -- scapy/SubPlugin.__init__
+# Executing 1099 tests in parallel and 60 in serial
+# Using 36 batches and 4 workers
+[ 1834.080968] tc (27632) used greatest stack depth: 9848 bytes left
+[ 1844.138708] ------------[ cut here ]------------
+[ 1844.143341] WARNING: CPU: 0 PID: 27197 at kernel/locking/lockdep.c:1226 lockdep_register_key (kernel/locking/lockdep.c:1226 (discriminator 1)) 
+[ 1844.152735] Modules linked in: algif_hash sch_teql sch_htb sch_hhf sch_hfsc sch_gred sch_fq_pie sch_pie sch_ets sch_etf sch_drr sch_codel sch_choke sch_cbs sch_cake em_u32 em_text em_nbyte em_meta em_ipt em_cmp em_canid cls_u32 cls_route cls_matchall cls_flow cls_basic act_vlan act_tunnel_key act_skbmod act_skbedit act_simple act_sample act_police act_nat act_mpls act_mirred act_gate act_ctinfo act_ct nf_flow_table act_connmark act_csum act_pedit cls_fw xt_mark xt_length nft_compat nft_tproxy nf_tproxy_ipv6 nf_tproxy_ipv4 nft_socket nf_socket_ipv4 nf_socket_ipv6 nf_tables veth x86_pkg_temp_thermal fuse configfs
+[ 1844.206814] CPU: 0 PID: 27197 Comm: python3 Not tainted 6.9.0-rc6-next-20240429 #1
+[ 1844.214382] Hardware name: Supermicro SYS-5019S-ML/X11SSH-F, BIOS 2.7 12/07/2021
+[ 1844.221774] RIP: 0010:lockdep_register_key (kernel/locking/lockdep.c:1226 (discriminator 1)) 
+[ 1844.226826] Code: 0f 84 e3 00 00 00 4a 8b 04 e5 80 b1 bf 9f 48 85 c0 75 11 e9 a8 00 00 00 48 8b 00 48 85 c0 0f 84 9c 00 00 00 48 39 c3 75 ef 90 <0f> 0b 90 8b 3d 91 51 ad 04 85 ff 75 2c 9c 58 f6 c4 02 0f 85 ee 00
+All code
+========
+   0:	0f 84 e3 00 00 00    	je     0xe9
+   6:	4a 8b 04 e5 80 b1 bf 	mov    -0x60404e80(,%r12,8),%rax
+   d:	9f 
+   e:	48 85 c0             	test   %rax,%rax
+  11:	75 11                	jne    0x24
+  13:	e9 a8 00 00 00       	jmpq   0xc0
+  18:	48 8b 00             	mov    (%rax),%rax
+  1b:	48 85 c0             	test   %rax,%rax
+  1e:	0f 84 9c 00 00 00    	je     0xc0
+  24:	48 39 c3             	cmp    %rax,%rbx
+  27:	75 ef                	jne    0x18
+  29:	90                   	nop
+  2a:*	0f 0b                	ud2    		<-- trapping instruction
+  2c:	90                   	nop
+  2d:	8b 3d 91 51 ad 04    	mov    0x4ad5191(%rip),%edi        # 0x4ad51c4
+  33:	85 ff                	test   %edi,%edi
+  35:	75 2c                	jne    0x63
+  37:	9c                   	pushfq 
+  38:	58                   	pop    %rax
+  39:	f6 c4 02             	test   $0x2,%ah
+  3c:	0f                   	.byte 0xf
+  3d:	85 ee                	test   %ebp,%esi
+	...
+
+Code starting with the faulting instruction
+===========================================
+   0:	0f 0b                	ud2    
+   2:	90                   	nop
+   3:	8b 3d 91 51 ad 04    	mov    0x4ad5191(%rip),%edi        # 0x4ad519a
+   9:	85 ff                	test   %edi,%edi
+   b:	75 2c                	jne    0x39
+   d:	9c                   	pushfq 
+   e:	58                   	pop    %rax
+   f:	f6 c4 02             	test   $0x2,%ah
+  12:	0f                   	.byte 0xf
+  13:	85 ee                	test   %ebp,%esi
+	...
+[ 1844.245573] RSP: 0018:ffffb881880734f8 EFLAGS: 00010046
+[ 1844.250797] RAX: ffff9d321d473690 RBX: ffff9d321d473690 RCX: 0000000080000000
+[ 1844.257923] RDX: 0000000000000001 RSI: ffffffff9b35030d RDI: ffffffff9b35030d
+[ 1844.265053] RBP: ffffb88188073520 R08: 0000000000000001 R09: 00000000ffffffff
+[ 1844.272203] R10: 0000000000000000 R11: 0000000000000001 R12: 000000000000078b
+[ 1844.279329] R13: ffff9d32063c9d00 R14: 0000000000000206 R15: ffffffff9fbfedd8
+[ 1844.286461] FS:  00007f751447b4c0(0000) GS:ffff9d3567a00000(0000) knlGS:0000000000000000
+[ 1844.294546] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[ 1844.300282] CR2: 00007f75135b0450 CR3: 00000001063d4006 CR4: 00000000003706f0
+[ 1844.307408] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+[ 1844.314539] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+[ 1844.321664] Call Trace:
+[ 1844.324108]  <TASK>
+[ 1844.326205] ? show_regs (arch/x86/kernel/dumpstack.c:479) 
+[ 1844.329613] ? __warn (kernel/panic.c:693) 
+[ 1844.332844] ? lockdep_register_key (kernel/locking/lockdep.c:1226 (discriminator 1)) 
+[ 1844.337291] ? report_bug (lib/bug.c:180 lib/bug.c:219) 
+[ 1844.340957] ? handle_bug (arch/x86/kernel/traps.c:239) 
+[ 1844.344449] ? exc_invalid_op (arch/x86/kernel/traps.c:260 (discriminator 1)) 
+[ 1844.348288] ? asm_exc_invalid_op (arch/x86/include/asm/idtentry.h:621) 
+[ 1844.352478] ? __is_module_percpu_address (kernel/module/main.c:449 (discriminator 3)) 
+[ 1844.357527] ? __is_module_percpu_address (kernel/module/main.c:449 (discriminator 3)) 
+[ 1844.362580] ? lockdep_register_key (kernel/locking/lockdep.c:1226 (discriminator 1)) 
+[ 1844.367053] qdisc_alloc (include/linux/spinlock.h:326 net/sched/sch_generic.c:949) 
+[ 1844.370569] ? lock_acquire (kernel/locking/lockdep.c:467 (discriminator 4) kernel/locking/lockdep.c:5756 (discriminator 4) kernel/locking/lockdep.c:5719 (discriminator 4)) 
+[ 1844.374315] qdisc_create_dflt (net/sched/sch_generic.c:1003 (discriminator 1)) 
+[ 1844.378327] dev_activate (net/sched/sch_generic.c:1169 include/linux/netdevice.h:2503 net/sched/sch_generic.c:1186 net/sched/sch_generic.c:1245) 
+[ 1844.381995] __dev_open (net/core/dev.c:1468) 
+[ 1844.385486] __dev_change_flags (net/core/dev.c:8763) 
+[ 1844.389671] ? arch_stack_walk (arch/x86/kernel/stacktrace.c:27) 
+[ 1844.393686] dev_change_flags (net/core/dev.c:8836) 
+[ 1844.397524] do_setlink (net/core/rtnetlink.c:2886) 
+[ 1844.401106] ? stack_depot_save (lib/stackdepot.c:687) 
+[ 1844.405116] ? __nla_validate_parse (include/net/netlink.h:1267 lib/nlattr.c:622) 
+[ 1844.409560] ? rtnl_newlink (net/core/rtnetlink.c:3724) 
+[ 1844.413218] ? rtnetlink_rcv_msg (net/core/rtnetlink.c:6594) 
+[ 1844.417489] ? netlink_rcv_skb (net/netlink/af_netlink.c:2564) 
+[ 1844.421493] ? rtnetlink_rcv (net/core/rtnetlink.c:6613) 
+[ 1844.425238] ? netlink_unicast (net/netlink/af_netlink.c:1335 net/netlink/af_netlink.c:1361) 
+[ 1844.429329] ? netlink_sendmsg (net/netlink/af_netlink.c:1905) 
+[ 1844.433419] ? __sys_sendto (net/socket.c:730 (discriminator 1) net/socket.c:745 (discriminator 1) net/socket.c:2191 (discriminator 1)) 
+[ 1844.437259] ? __x64_sys_sendto (net/socket.c:2199) 
+[ 1844.441272] ? x64_sys_call (arch/x86/entry/syscall_64.c:33) 
+[ 1844.445290] __rtnl_newlink (net/core/rtnetlink.c:3680) 
+[ 1844.449138] ? preempt_count_sub (kernel/sched/core.c:5889 kernel/sched/core.c:5885 kernel/sched/core.c:5907) 
+[ 1844.453243] rtnl_newlink (net/core/rtnetlink.c:3728) 
+[ 1844.456733] rtnetlink_rcv_msg (net/core/rtnetlink.c:6594) 
+[ 1844.460835] ? __pfx_rtnetlink_rcv_msg (net/core/rtnetlink.c:6488) 
+[ 1844.465452] netlink_rcv_skb (net/netlink/af_netlink.c:2564) 
+[ 1844.469287] rtnetlink_rcv (net/core/rtnetlink.c:6613) 
+[ 1844.472863] netlink_unicast (net/netlink/af_netlink.c:1335 net/netlink/af_netlink.c:1361) 
+[ 1844.476788] netlink_sendmsg (net/netlink/af_netlink.c:1905) 
+[ 1844.480718] __sys_sendto (net/socket.c:730 (discriminator 1) net/socket.c:745 (discriminator 1) net/socket.c:2191 (discriminator 1)) 
+[ 1844.484397] __x64_sys_sendto (net/socket.c:2199) 
+[ 1844.488246] x64_sys_call (arch/x86/entry/syscall_64.c:33) 
+[ 1844.492083] do_syscall_64 (arch/x86/entry/common.c:52 (discriminator 1) arch/x86/entry/common.c:83 (discriminator 1)) 
+[ 1844.495747] ? trace_napi_poll (include/trace/events/napi.h:14 (discriminator 2)) 
+[ 1844.499677] ? __napi_poll.constprop.0 (net/core/dev.c:6714 (discriminator 1)) 
+[ 1844.504382] ? net_rx_action (net/core/dev.c:6777 net/core/dev.c:6893) 
+[ 1844.508311] ? trace_preempt_on (kernel/trace/trace_preemptirq.c:105) 
+[ 1844.512320] ? __do_softirq (kernel/softirq.c:401 (discriminator 2) kernel/softirq.c:583 (discriminator 2)) 
+[ 1844.516159] ? __local_bh_enable (kernel/softirq.c:343 (discriminator 1)) 
+[ 1844.520262] ? irqentry_exit_to_user_mode (kernel/entry/common.c:234) 
+[ 1844.525227] ? irqentry_exit (kernel/entry/common.c:367) 
+[ 1844.528978] ? common_interrupt (arch/x86/kernel/irq.c:247) 
+[ 1844.532990] entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:130) 
+[ 1844.538050] RIP: 0033:0x7f7514586b93
+[ 1844.541658] Code: 8b 15 71 72 0c 00 f7 d8 64 89 02 48 c7 c0 ff ff ff ff eb b8 0f 1f 00 80 3d 51 fa 0c 00 00 41 89 ca 74 14 b8 2c 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 75 c3 0f 1f 40 00 55 48 83 ec 30 44 89 4c 24
+All code
+========
+   0:	8b 15 71 72 0c 00    	mov    0xc7271(%rip),%edx        # 0xc7277
+   6:	f7 d8                	neg    %eax
+   8:	64 89 02             	mov    %eax,%fs:(%rdx)
+   b:	48 c7 c0 ff ff ff ff 	mov    $0xffffffffffffffff,%rax
+  12:	eb b8                	jmp    0xffffffffffffffcc
+  14:	0f 1f 00             	nopl   (%rax)
+  17:	80 3d 51 fa 0c 00 00 	cmpb   $0x0,0xcfa51(%rip)        # 0xcfa6f
+  1e:	41 89 ca             	mov    %ecx,%r10d
+  21:	74 14                	je     0x37
+  23:	b8 2c 00 00 00       	mov    $0x2c,%eax
+  28:	0f 05                	syscall 
+  2a:*	48 3d 00 f0 ff ff    	cmp    $0xfffffffffffff000,%rax		<-- trapping instruction
+  30:	77 75                	ja     0xa7
+  32:	c3                   	retq   
+  33:	0f 1f 40 00          	nopl   0x0(%rax)
+  37:	55                   	push   %rbp
+  38:	48 83 ec 30          	sub    $0x30,%rsp
+  3c:	44                   	rex.R
+  3d:	89                   	.byte 0x89
+  3e:	4c                   	rex.WR
+  3f:	24                   	.byte 0x24
+
+Code starting with the faulting instruction
+===========================================
+   0:	48 3d 00 f0 ff ff    	cmp    $0xfffffffffffff000,%rax
+   6:	77 75                	ja     0x7d
+   8:	c3                   	retq   
+   9:	0f 1f 40 00          	nopl   0x0(%rax)
+   d:	55                   	push   %rbp
+   e:	48 83 ec 30          	sub    $0x30,%rsp
+  12:	44                   	rex.R
+  13:	89                   	.byte 0x89
+  14:	4c                   	rex.WR
+  15:	24                   	.byte 0x24
+[ 1844.560401] RSP: 002b:00007ffc23a81e48 EFLAGS: 00000202 ORIG_RAX: 000000000000002c
+[ 1844.567970] RAX: ffffffffffffffda RBX: 00007ffc23a81ef8 RCX: 00007f7514586b93
+[ 1844.575101] RDX: 0000000000000020 RSI: 00007f7511b49260 RDI: 0000000000000010
+[ 1844.582224] RBP: 0000000000000000 R08: 00007ffc23a81f70 R09: 000000000000000c
+[ 1844.589349] R10: 0000000000000000 R11: 0000000000000202 R12: 0000000000000000
+[ 1844.596474] R13: ffffffffc4653600 R14: 0000000000000000 R15: 0000000000000000
+[ 1844.603612]  </TASK>
+[ 1844.605799] irq event stamp: 224795
+[ 1844.609292] hardirqs last enabled at (224795): _raw_spin_unlock_irqrestore (arch/x86/include/asm/irqflags.h:42 arch/x86/include/asm/irqflags.h:77 arch/x86/include/asm/irqflags.h:135 include/linux/spinlock_api_smp.h:151 kernel/locking/spinlock.c:194) 
+[ 1844.618937] hardirqs last disabled at (224794): _raw_spin_lock_irqsave (include/linux/spinlock_api_smp.h:108 (discriminator 1) kernel/locking/spinlock.c:162 (discriminator 1)) 
+[ 1844.628150] softirqs last enabled at (224790): __dev_open (net/core/dev.c:1467) 
+[ 1844.636495] softirqs last disabled at (224788): __dev_open (include/linux/bottom_half.h:20 (discriminator 1) include/linux/netdevice.h:4497 (discriminator 1) net/core/dev.c:8689 (discriminator 1) net/core/dev.c:1466 (discriminator 1)) 
+[ 1844.644843] ---[ end trace 0000000000000000 ]---
+[ 1846.004811] BUG: kernel NULL pointer dereference, address: 0000000000000000
+[ 1846.011772] #PF: supervisor write access in kernel mode
+[ 1846.016998] #PF: error_code(0x0002) - not-present page
+[ 1846.022131] PGD 0 P4D 0
+[ 1846.024670] Oops: Oops: 0002 [#1] PREEMPT SMP PTI
+[ 1846.029375] CPU: 0 PID: 23358 Comm: kworker/u16:5 Tainted: G        W          6.9.0-rc6-next-20240429 #1
+[ 1846.038933] Hardware name: Supermicro SYS-5019S-ML/X11SSH-F, BIOS 2.7 12/07/2021
+[ 1846.046318] Workqueue: netns cleanup_net
+[ 1846.050244] RIP: 0010:lockdep_unregister_key (include/linux/list.h:988 (discriminator 2) include/linux/rculist.h:513 (discriminator 2) kernel/locking/lockdep.c:6460 (discriminator 2)) 
+[ 1846.055469] Code: c0 4c 89 2d f1 41 ad 04 75 11 e9 f5 00 00 00 48 8b 00 48 85 c0 0f 84 e9 00 00 00 48 39 c3 75 ef 48 8b 10 48 8b 48 08 48 85 d2 <48> 89 11 74 04 48 89 4a 08 48 b9 22 01 00 00 00 00 ad de ba 01 00
+All code
+========
+   0:	c0 4c 89 2d f1       	rorb   $0xf1,0x2d(%rcx,%rcx,4)
+   5:	41 ad                	rex.B lods %ds:(%rsi),%eax
+   7:	04 75                	add    $0x75,%al
+   9:	11 e9                	adc    %ebp,%ecx
+   b:	f5                   	cmc    
+   c:	00 00                	add    %al,(%rax)
+   e:	00 48 8b             	add    %cl,-0x75(%rax)
+  11:	00 48 85             	add    %cl,-0x7b(%rax)
+  14:	c0 0f 84             	rorb   $0x84,(%rdi)
+  17:	e9 00 00 00 48       	jmpq   0x4800001c
+  1c:	39 c3                	cmp    %eax,%ebx
+  1e:	75 ef                	jne    0xf
+  20:	48 8b 10             	mov    (%rax),%rdx
+  23:	48 8b 48 08          	mov    0x8(%rax),%rcx
+  27:	48 85 d2             	test   %rdx,%rdx
+  2a:*	48 89 11             	mov    %rdx,(%rcx)		<-- trapping instruction
+  2d:	74 04                	je     0x33
+  2f:	48 89 4a 08          	mov    %rcx,0x8(%rdx)
+  33:	48 b9 22 01 00 00 00 	movabs $0xdead000000000122,%rcx
+  3a:	00 ad de 
+  3d:	ba                   	.byte 0xba
+  3e:	01 00                	add    %eax,(%rax)
+
+Code starting with the faulting instruction
+===========================================
+   0:	48 89 11             	mov    %rdx,(%rcx)
+   3:	74 04                	je     0x9
+   5:	48 89 4a 08          	mov    %rcx,0x8(%rdx)
+   9:	48 b9 22 01 00 00 00 	movabs $0xdead000000000122,%rcx
+  10:	00 ad de 
+  13:	ba                   	.byte 0xba
+  14:	01 00                	add    %eax,(%rax)
+[ 1846.074217] RSP: 0018:ffffb88184affbd8 EFLAGS: 00010046
+[ 1846.079442] RAX: ffff9d321d473690 RBX: ffff9d321d473690 RCX: 0000000000000000
+[ 1846.086573] RDX: 0000000000000000 RSI: ffffffff9b35030d RDI: ffffffff9b35030d
+[ 1846.093699] RBP: ffffb88184affbf8 R08: 0000000000000001 R09: 0000000000000004
+[ 1846.100831] R10: 0000000000000000 R11: 0000000000000000 R12: 000000000000078b
+[ 1846.107964] R13: ffff9d3204285680 R14: 0000000000000246 R15: ffff9d321d4b9000
+[ 1846.115097] FS:  0000000000000000(0000) GS:ffff9d3567a00000(0000) knlGS:0000000000000000
+[ 1846.123183] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[ 1846.128927] CR2: 0000000000000000 CR3: 00000001158be005 CR4: 00000000003706f0
+[ 1846.136065] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+[ 1846.143220] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+[ 1846.150352] Call Trace:
+[ 1846.152796]  <TASK>
+[ 1846.154895] ? show_regs (arch/x86/kernel/dumpstack.c:479) 
+[ 1846.158301] ? __die (arch/x86/kernel/dumpstack.c:421 arch/x86/kernel/dumpstack.c:434) 
+[ 1846.161360] ? page_fault_oops (arch/x86/mm/fault.c:715) 
+[ 1846.165463] ? do_user_addr_fault (arch/x86/mm/fault.c:1267) 
+[ 1846.169826] ? trace_irq_disable (include/trace/events/preemptirq.h:36 (discriminator 2)) 
+[ 1846.173926] ? exc_page_fault (arch/x86/include/asm/irqflags.h:26 arch/x86/include/asm/irqflags.h:67 arch/x86/include/asm/irqflags.h:127 arch/x86/mm/fault.c:1520 arch/x86/mm/fault.c:1570) 
+[ 1846.177853] ? asm_exc_page_fault (arch/x86/include/asm/idtentry.h:623) 
+[ 1846.182067] ? __is_module_percpu_address (kernel/module/main.c:449 (discriminator 3)) 
+[ 1846.187141] ? __is_module_percpu_address (kernel/module/main.c:449 (discriminator 3)) 
+[ 1846.192196] ? lockdep_unregister_key (include/linux/list.h:988 (discriminator 2) include/linux/rculist.h:513 (discriminator 2) kernel/locking/lockdep.c:6460 (discriminator 2)) 
+[ 1846.196815] __qdisc_destroy (net/sched/sch_generic.c:1074) 
+[ 1846.200653] qdisc_put (net/sched/sch_generic.c:1100) 
+[ 1846.203884] shutdown_scheduler_queue (net/sched/sch_generic.c:1154) 
+[ 1846.208418] dev_shutdown (include/linux/netdevice.h:2502 (discriminator 1) net/sched/sch_generic.c:1484 (discriminator 1)) 
+[ 1846.211998] unregister_netdevice_many_notify (include/net/tcx.h:169 net/core/dev.c:11196) 
+[ 1846.217401] default_device_exit_batch (net/core/dev.c:11743) 
+[ 1846.222201] ops_exit_list (net/core/net_namespace.c:175) 
+[ 1846.225778] cleanup_net (net/core/net_namespace.c:636 (discriminator 3)) 
+[ 1846.229358] process_one_work (kernel/workqueue.c:3222) 
+[ 1846.233373] worker_thread (kernel/workqueue.c:3297 (discriminator 2) kernel/workqueue.c:3384 (discriminator 2)) 
+[ 1846.237122] ? __pfx_worker_thread (kernel/workqueue.c:3330) 
+[ 1846.241395] kthread (kernel/kthread.c:389) 
+[ 1846.244540] ? __pfx_kthread (kernel/kthread.c:342) 
+[ 1846.248294] ret_from_fork (arch/x86/kernel/process.c:147) 
+[ 1846.251872] ? __pfx_kthread (kernel/kthread.c:342) 
+[ 1846.255627] ret_from_fork_asm (arch/x86/entry/entry_64.S:257) 
+[ 1846.259557]  </TASK>
+[ 1846.261751] Modules linked in: algif_hash sch_teql sch_htb sch_hhf sch_hfsc sch_gred sch_fq_pie sch_pie sch_ets sch_etf sch_drr sch_codel sch_choke sch_cbs sch_cake em_u32 em_text em_nbyte em_meta em_ipt em_cmp em_canid cls_u32 cls_route cls_matchall cls_flow cls_basic act_vlan act_tunnel_key act_skbmod act_skbedit act_simple act_sample act_police act_nat act_mpls act_mirred act_gate act_ctinfo act_ct nf_flow_table act_connmark act_csum act_pedit cls_fw xt_mark xt_length nft_compat nft_tproxy nf_tproxy_ipv6 nf_tproxy_ipv4 nft_socket nf_socket_ipv4 nf_socket_ipv6 nf_tables veth x86_pkg_temp_thermal fuse configfs
+[ 1846.315824] CR2: 0000000000000000
+[ 1846.319135] ---[ end trace 0000000000000000 ]---
+[ 1846.323752] RIP: 0010:lockdep_unregister_key (include/linux/list.h:988 (discriminator 2) include/linux/rculist.h:513 (discriminator 2) kernel/locking/lockdep.c:6460 (discriminator 2)) 
+[ 1846.328980] Code: c0 4c 89 2d f1 41 ad 04 75 11 e9 f5 00 00 00 48 8b 00 48 85 c0 0f 84 e9 00 00 00 48 39 c3 75 ef 48 8b 10 48 8b 48 08 48 85 d2 <48> 89 11 74 04 48 89 4a 08 48 b9 22 01 00 00 00 00 ad de ba 01 00
+All code
+========
+   0:	c0 4c 89 2d f1       	rorb   $0xf1,0x2d(%rcx,%rcx,4)
+   5:	41 ad                	rex.B lods %ds:(%rsi),%eax
+   7:	04 75                	add    $0x75,%al
+   9:	11 e9                	adc    %ebp,%ecx
+   b:	f5                   	cmc    
+   c:	00 00                	add    %al,(%rax)
+   e:	00 48 8b             	add    %cl,-0x75(%rax)
+  11:	00 48 85             	add    %cl,-0x7b(%rax)
+  14:	c0 0f 84             	rorb   $0x84,(%rdi)
+  17:	e9 00 00 00 48       	jmpq   0x4800001c
+  1c:	39 c3                	cmp    %eax,%ebx
+  1e:	75 ef                	jne    0xf
+  20:	48 8b 10             	mov    (%rax),%rdx
+  23:	48 8b 48 08          	mov    0x8(%rax),%rcx
+  27:	48 85 d2             	test   %rdx,%rdx
+  2a:*	48 89 11             	mov    %rdx,(%rcx)		<-- trapping instruction
+  2d:	74 04                	je     0x33
+  2f:	48 89 4a 08          	mov    %rcx,0x8(%rdx)
+  33:	48 b9 22 01 00 00 00 	movabs $0xdead000000000122,%rcx
+  3a:	00 ad de 
+  3d:	ba                   	.byte 0xba
+  3e:	01 00                	add    %eax,(%rax)
+
+Code starting with the faulting instruction
+===========================================
+   0:	48 89 11             	mov    %rdx,(%rcx)
+   3:	74 04                	je     0x9
+   5:	48 89 4a 08          	mov    %rcx,0x8(%rdx)
+   9:	48 b9 22 01 00 00 00 	movabs $0xdead000000000122,%rcx
+  10:	00 ad de 
+  13:	ba                   	.byte 0xba
+  14:	01 00                	add    %eax,(%rax)
+[ 1846.347724] RSP: 0018:ffffb88184affbd8 EFLAGS: 00010046
+[ 1846.352952] RAX: ffff9d321d473690 RBX: ffff9d321d473690 RCX: 0000000000000000
+[ 1846.360094] RDX: 0000000000000000 RSI: ffffffff9b35030d RDI: ffffffff9b35030d
+[ 1846.367226] RBP: ffffb88184affbf8 R08: 0000000000000001 R09: 0000000000000004
+[ 1846.374358] R10: 0000000000000000 R11: 0000000000000000 R12: 000000000000078b
+[ 1846.381491] R13: ffff9d3204285680 R14: 0000000000000246 R15: ffff9d321d4b9000
+[ 1846.388623] FS:  0000000000000000(0000) GS:ffff9d3567a00000(0000) knlGS:0000000000000000
+[ 1846.396708] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[ 1846.402445] CR2: 0000000000000000 CR3: 00000001158be005 CR4: 00000000003706f0
+[ 1846.409569] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+[ 1846.416693] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+[ 1846.423818] Kernel panic - not syncing: Fatal exception
+[ 1846.429068] Kernel Offset: 0x1a000000 from 0xffffffff81000000 (relocation range: 0xffffffff80000000-0xffffffffbfffffff)
+[ 1846.439851] ---[ end Kernel panic - not syncing: Fatal exception ]---
 
 
->>
->> Do you think there would be unexpected results even if we did this?
->> br_switchdev_mdb_replay() needs to handle a similarly complicated
->> situation of synchronizing with deferred MDB events.
->>  >> However, if we cache the MDB objects in the device driver, at least
->>> the order in which the events took place will be coherent and at any
->>> give time the state of the MDB objects in the device driver can be
->>> guaranteed to be sane. This is also the approach the prestera device
->>> driver took.
->>
->> Not contesting this, but I wouldn't like to see MDBs cached in each
->> device driver just for this. Switchdev is not very high on the list of
->> APIs which are easy to use, and making MDB caching a requirement
->> (for the common case that MDB entry destinations need software fixups
->> with the mrouter ports) isn't exactly going to make that any better.
->> Others' opinion may differ, but mine is that core offload APIs need to
->> consider what hardware is available in the real world, make the common
->> case easy, and the advanced cases possible. Rather than make every case
->> "advanced" :)
-> 
-> Just throwing some random ideas out there. Do you think it would make 
-> more sense if this whole solution (rtnl_lock, iterator cb,...etc.) is 
-> moved up to DSA so that other DSA drivers could benefit from it? I 
-> thought about implement it (not the iterator, the current form) in DSA 
-> at first, but I'm not sure how other drivers would behave, so I did it 
-> with mv instead.
-> 
-> I guess the question is, is the current limitation (mrouter not properly 
-> offloaded) an issue specific to mv or is it a limitation of hardware 
-> offloading in general? I tend to think it's the latter.
-> 
-> But then again, if we move it to DSA, we would lose the benefit of the 
-> optimization of consolidating multiple register writes into just one (as 
-> done in patch 10 currently), unless we add a new switch op which takes a 
-> portvec instead of a port when modifying mdb's.
+metadata:
+---
+git_ref: master
+git_repo: https://gitlab.com/Linaro/lkft/mirrors/next/linux-next
+git_sha: b0a2c79c6f3590b74742cbbc76687014d47972d8
+git_describe: next-20240429
+kernel_version: 6.9.0-rc6
+kernel-config:
+[1]  https://storage.tuxsuite.com/public/linaro/lkft/builds/2flbq1tpkBZoI95SsSfbE7zCTse/config
 
+Links:
+---
+- Test log: https://lkft.validation.linaro.org/scheduler/job/7524858#L1919
+- Build: https://storage.tuxsuite.com/public/linaro/lkft/builds/2flbq1tpkBZoI95SsSfbE7zCTse/
+- https://qa-reports.linaro.org/lkft/linux-next-master/build/next-20240429/testrun/23711809/suite/log-parser-test/tests/
+
+--
+Linaro LKFT
+https://lkft.linaro.org
 
