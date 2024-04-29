@@ -1,127 +1,258 @@
-Return-Path: <netdev+bounces-92062-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92063-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF0728B53E2
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 11:11:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35A698B5411
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 11:16:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 513641F21F63
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 09:11:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E11FB280F67
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 09:16:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCE7512E7F;
-	Mon, 29 Apr 2024 09:11:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="i/ASOKbN";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="9OKZWQzD"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAAB320309;
+	Mon, 29 Apr 2024 09:16:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from mxhk.zte.com.cn (mxhk.zte.com.cn [63.216.63.35])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6064D17BCB
-	for <netdev@vger.kernel.org>; Mon, 29 Apr 2024 09:11:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0D8A17C79;
+	Mon, 29 Apr 2024 09:16:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=63.216.63.35
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714381912; cv=none; b=Rlx4A731pvZD97ibQHirNSJ1oKaU5EQ8x1paydHNIpVBVSG7glRi7FdEiQmleIaM/B7LQSLfZ8QPF1xjWzroQ/hxu91YRwZ3/6WyQOzmYldts+sD6BEaUfTlfz+xXgg/9PFB3NFZ8KeQiIZ4gkCeqUlc6g71bz2+Vkcv0tXJ5AQ=
+	t=1714382194; cv=none; b=uI08aOqkLqLadBowdms7XiFgPh0ufp+7dg1FuovP8Kyg3UEEe9yu9ahEIZD8D4dswH1K7OVTbuJAjQmj1XRcdKXrRRg9rXg6HtcHa/FkPdwsJVog2xyORHq8aqKMS4p48/SG0s2VzJsxae1hNGMm9FrEd3ISNfDVeHUdXFX4ygQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714381912; c=relaxed/simple;
-	bh=N4NNr5A2CUMUnGazLWh+nrKjEdU312shalDUwfb2OmI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cORvmJseUnBSxiBdm1Ts/V0eKxee6b7o3CwIDxUXnm0yOvUKJnJzExMx4vtJERqW/nBM2kZJ/GWyddUM34+W1rB5Fx3zfkAN/na2m7dh39QevV8hPk0iUGG36VT0P/spuO6ygPBY9Cgckhu9xIMbEb51MjHRtU8q4r0qTN7dc8c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=i/ASOKbN; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=9OKZWQzD; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Mon, 29 Apr 2024 11:11:47 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1714381909;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=i6IP5zXxMx/vvA2rdUGJ1us7PrzkupexO0RU+IHTOF0=;
-	b=i/ASOKbNapASGXYcR+MifJjLKmMVeK7y9tACMnKxzB9xoHCcNfAGl/f0H2US9upwBnlwxu
-	CIBmb2t3JrnJVCqu7CpsrbWDc5Q9T3kx0tsQEm59cekE4xp30einlvYTWpjNFoLqhK8jTb
-	QEuE6UEfURa3FUxElvhky7ZYH2jEh9duYlXfANkcnc0ZXzN8jWDCdkwCYv8Fou0vxGOKym
-	Kr4b/NG13qxjspcOEhGOdpEq3tTr0bDQ2MlxbcrbUYUDaJccMqQUQWx6+eQskHxbGQ9t0o
-	S8+Gf0UsALxlR3VQkptp7Fp0H7S6wT4P8LxdIZZG3E0k029MT2Qim/VYabAquQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1714381909;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=i6IP5zXxMx/vvA2rdUGJ1us7PrzkupexO0RU+IHTOF0=;
-	b=9OKZWQzDM0kkjvDbqmGR+8GHJRvVgk4aX+nj1S868n88bm0uv5LdunHLrQPH3u6jk1V4yh
-	I5jhwNFfUdCAI4BQ==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: netdev@vger.kernel.org
-Cc: "John B. Wyatt IV" <jwyatt@redhat.com>,
-	Raju Rangoju <rajur@chelsio.com>, Juri Lelli <jlelli@redhat.com>,
-	Clark Williams <williams@redhat.com>,
-	"Luis Claudio R. Goncalves" <lgoncalv@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Thomas Gleixner <tglx@linutronix.de>
-Subject: [PATCH net] cxgb4: Properly lock TX queue for the selftest.
-Message-ID: <20240429091147.YWAaal4v@linutronix.de>
-References: <Zic0ot5aGgR-V4Ks@thinkpad2021>
+	s=arc-20240116; t=1714382194; c=relaxed/simple;
+	bh=TZaXfDgPaZgcxEi+ra9/iPiMANbZYn4vjy5qATk3lbw=;
+	h=Date:Message-ID:Mime-Version:From:To:Cc:Subject:Content-Type; b=T9CIM7coBGpJkR7OauBS6TpKZcfsd6et+ZSTTFFak9jlAeHNVWEifk3cRS22ZJHmWl5dWvQdvNULJ3ztje2+0cSxHSo1eCmFOxQ+VEDp5p2OcXuARNrPksfBgOnjb7zsO83Yl8VnXXsxOwII+CJJpYIKuR/5zST5e7dqPzzU9ZU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn; spf=pass smtp.mailfrom=zte.com.cn; arc=none smtp.client-ip=63.216.63.35
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zte.com.cn
+Received: from mse-fl2.zte.com.cn (unknown [10.5.228.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mxhk.zte.com.cn (FangMail) with ESMTPS id 4VSd482mZtz4xPGH;
+	Mon, 29 Apr 2024 17:16:24 +0800 (CST)
+Received: from xaxapp01.zte.com.cn ([10.88.99.176])
+	by mse-fl2.zte.com.cn with SMTP id 43T9Fti6063422;
+	Mon, 29 Apr 2024 17:15:55 +0800 (+08)
+	(envelope-from xu.xin16@zte.com.cn)
+Received: from mapi (xaxapp03[null])
+	by mapi (Zmail) with MAPI id mid32;
+	Mon, 29 Apr 2024 17:15:57 +0800 (CST)
+Date: Mon, 29 Apr 2024 17:15:57 +0800 (CST)
+X-Zmail-TransId: 2afb662f654d799-db7cc
+X-Mailer: Zmail v1.0
+Message-ID: <20240429171557482x0zswaWhCLkpHecR3bZqb@zte.com.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <Zic0ot5aGgR-V4Ks@thinkpad2021>
+Mime-Version: 1.0
+From: <xu.xin16@zte.com.cn>
+To: <edumazet@google.com>, <kuba@kernel.org>
+Cc: <horms@kernel.org>, <davem@davemloft.net>, <rostedt@goodmis.org>,
+        <mhiramat@kernel.org>, <dsahern@kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-trace-kernel@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <yang.yang29@zte.com.cn>,
+        <he.peilin@zte.com.cn>, <liu.chun2@zte.com.cn>,
+        <jiang.xuexin@zte.com.cn>, <zhang.yunkai@zte.com.cn>,
+        <kerneljasonxing@gmail.com>, <fan.yu9@zte.com.cn>,
+        <qiu.yutan@zte.com.cn>, <ran.xiaokai@zte.com.cn>,
+        <zhang.run@zte.com.cn>, <wang.haoyi@zte.com.cn>, <si.hao@zte.com.cn>
+Subject: =?UTF-8?B?W1BBVENIIG5ldC1uZXh0IHY4XSBuZXQvaXB2NDogYWRkIHRyYWNlcG9pbnQgZm9yIGljbXBfc2VuZMKgwqA=?=
+Content-Type: text/plain;
+	charset="UTF-8"
+X-MAIL:mse-fl2.zte.com.cn 43T9Fti6063422
+X-Fangmail-Anti-Spam-Filtered: true
+X-Fangmail-MID-QID: 662F6568.003/4VSd482mZtz4xPGH
 
-The selftest for the driver sends a dummy packet and checks if the
-packet will be received properly as it should be. The regular TX path
-and the selftest can use the same network queue so locking is required
-and was missing in the selftest path. This was addressed in the commit
-cited below.
-Unfortunately locking the TX queue requires BH to be disabled which is
-not the case in selftest path which is invoked in process context.
-Lockdep should be complaining about this.
+From: Peilin He <he.peilin@zte.com.cn>
 
-Use __netif_tx_lock_bh() for TX queue locking.
+Introduce a tracepoint for icmp_send, which can help users to get more
+detail information conveniently when icmp abnormal events happen.
 
-Fixes: c650e04898072 ("cxgb4: Fix race between loopback and normal Tx path")
-Reported-by: "John B. Wyatt IV" <jwyatt@redhat.com>
-Closes: https://lore.kernel.org/all/Zic0ot5aGgR-V4Ks@thinkpad2021/
-Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+1. Giving an usecase example:
+=============================
+When an application experiences packet loss due to an unreachable UDP
+destination port, the kernel will send an exception message through the
+icmp_send function. By adding a trace point for icmp_send, developers or
+system administrators can obtain detailed information about the UDP
+packet loss, including the type, code, source address, destination address,
+source port, and destination port. This facilitates the trouble-shooting
+of UDP packet loss issues especially for those network-service
+applications.
+
+2. Operation Instructions:
+==========================
+Switch to the tracing directory.
+        cd /sys/kernel/tracing
+Filter for destination port unreachable.
+        echo "type==3 && code==3" > events/icmp/icmp_send/filter
+Enable trace event.
+        echo 1 > events/icmp/icmp_send/enable
+
+3. Result View:
+================
+ udp_client_erro-11370   [002] ...s.12   124.728002:
+ icmp_send: icmp_send: type=3, code=3.
+ From 127.0.0.1:41895 to 127.0.0.1:6666 ulen=23
+ skbaddr=00000000589b167a
+
+Change log
+=========
+v7->v8:
+Some fixes according to
+https://lore.kernel.org/all/CANn89iKNtKmN5im8K4dSZGqAV8=e3bZb
+Z5AhxbcNbjFxk5V1Jw@mail.gmail.com/
+1.Combine all variable definitions together without mixing 
+code and variables.
+
+v6->v7:
+Some fixes according to
+https://lore.kernel.org/all/20240425081210.720a4cd9@kernel.org/
+1. Fix patch format issues.
+
+v5->v6:
+Some fixes according to
+https://lore.kernel.org/all/20240413161319.GA853376@kernel.org/
+1.Resubmit patches based on the latest net-next code.
+
+v4->v5:
+Some fixes according to
+https://lore.kernel.org/all/CAL+tcoDeXXh+zcRk4PHnUk8ELnx=CE2pc
+Cqs7sFm0y9aK-Eehg@mail.gmail.com/
+1.Adjust the position of trace_icmp_send() to before icmp_push_reply().
+
+v3->v4:
+Some fixes according to
+https://lore.kernel.org/all/CANn89i+EFEr7VHXNdOi59Ba_R1nFKSBJz
+BzkJFVgCTdXBx=YBg@mail.gmail.com/
+1.Add legality check for UDP header in SKB.
+2.Target this patch for net-next.
+
+v2->v3:
+Some fixes according to
+https://lore.kernel.org/all/20240319102549.7f7f6f53@gandalf.local.home/
+1. Change the tracking directory to/sys/kernel/tracking.
+2. Adjust the layout of the TP-STRUCT_entry parameter structure.
+
+v1->v2:
+Some fixes according to
+https://lore.kernel.org/all/CANn89iL-y9e_VFpdw=sZtRnKRu_tnUwqHu
+FQTJvJsv-nz1xPDw@mail.gmail.com/
+1. adjust the trace_icmp_send() to more protocols than UDP.
+2. move the calling of trace_icmp_send after sanity checks
+in __icmp_send().
+
+Signed-off-by: Peilin He <he.peilin@zte.com.cn>
+Signed-off-by: xu xin <xu.xin16@zte.com.cn>
+Reviewed-by: Yunkai Zhang <zhang.yunkai@zte.com.cn>
+Cc: Yang Yang <yang.yang29@zte.com.cn>
+Cc: Liu Chun <liu.chun2@zte.com.cn>
+Cc: Xuexin Jiang <jiang.xuexin@zte.com.cn>
 ---
- drivers/net/ethernet/chelsio/cxgb4/sge.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ include/trace/events/icmp.h | 67 +++++++++++++++++++++++++++++++++++++
+ net/ipv4/icmp.c             |  4 +++
+ 2 files changed, 71 insertions(+)
+ create mode 100644 include/trace/events/icmp.h
 
-diff --git a/drivers/net/ethernet/chelsio/cxgb4/sge.c b/drivers/net/ethernet/chelsio/cxgb4/sge.c
-index 49d5808b7d11d..de52bcb884c41 100644
---- a/drivers/net/ethernet/chelsio/cxgb4/sge.c
-+++ b/drivers/net/ethernet/chelsio/cxgb4/sge.c
-@@ -2670,12 +2670,12 @@ int cxgb4_selftest_lb_pkt(struct net_device *netdev)
- 	lb->loopback = 1;
- 
- 	q = &adap->sge.ethtxq[pi->first_qset];
--	__netif_tx_lock(q->txq, smp_processor_id());
-+	__netif_tx_lock_bh(q->txq);
- 
- 	reclaim_completed_tx(adap, &q->q, -1, true);
- 	credits = txq_avail(&q->q) - ndesc;
- 	if (unlikely(credits < 0)) {
--		__netif_tx_unlock(q->txq);
-+		__netif_tx_unlock_bh(q->txq);
- 		return -ENOMEM;
- 	}
- 
-@@ -2710,7 +2710,7 @@ int cxgb4_selftest_lb_pkt(struct net_device *netdev)
- 	init_completion(&lb->completion);
- 	txq_advance(&q->q, ndesc);
- 	cxgb4_ring_tx_db(adap, &q->q, ndesc);
--	__netif_tx_unlock(q->txq);
-+	__netif_tx_unlock_bh(q->txq);
- 
- 	/* wait for the pkt to return */
- 	ret = wait_for_completion_timeout(&lb->completion, 10 * HZ);
+diff --git a/include/trace/events/icmp.h b/include/trace/events/icmp.h
+new file mode 100644
+index 000000000000..31559796949a
+--- /dev/null
++++ b/include/trace/events/icmp.h
+@@ -0,0 +1,67 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++#undef TRACE_SYSTEM
++#define TRACE_SYSTEM icmp
++
++#if !defined(_TRACE_ICMP_H) || defined(TRACE_HEADER_MULTI_READ)
++#define _TRACE_ICMP_H
++
++#include <linux/icmp.h>
++#include <linux/tracepoint.h>
++
++TRACE_EVENT(icmp_send,
++
++		TP_PROTO(const struct sk_buff *skb, int type, int code),
++
++		TP_ARGS(skb, type, code),
++
++		TP_STRUCT__entry(
++			__field(const void *, skbaddr)
++			__field(int, type)
++			__field(int, code)
++			__array(__u8, saddr, 4)
++			__array(__u8, daddr, 4)
++			__field(__u16, sport)
++			__field(__u16, dport)
++			__field(unsigned short, ulen)
++		),
++
++		TP_fast_assign(
++			struct iphdr *iph = ip_hdr(skb);
++			struct udphdr *uh = udp_hdr(skb);
++			int proto_4 = iph->protocol;
++			__be32 *p32;
++
++			__entry->skbaddr = skb;
++			__entry->type = type;
++			__entry->code = code;
++
++			if (proto_4 != IPPROTO_UDP || (u8 *)uh < skb->head ||
++				(u8 *)uh + sizeof(struct udphdr)
++				> skb_tail_pointer(skb)) {
++				__entry->sport = 0;
++				__entry->dport = 0;
++				__entry->ulen = 0;
++			} else {
++				__entry->sport = ntohs(uh->source);
++				__entry->dport = ntohs(uh->dest);
++				__entry->ulen = ntohs(uh->len);
++			}
++
++			p32 = (__be32 *) __entry->saddr;
++			*p32 = iph->saddr;
++
++			p32 = (__be32 *) __entry->daddr;
++			*p32 = iph->daddr;
++		),
++
++		TP_printk("icmp_send: type=%d, code=%d. From %pI4:%u to %pI4:%u ulen=%d skbaddr=%p",
++			__entry->type, __entry->code,
++			__entry->saddr, __entry->sport, __entry->daddr,
++			__entry->dport, __entry->ulen, __entry->skbaddr)
++);
++
++#endif /* _TRACE_ICMP_H */
++
++/* This part must be outside protection */
++#include <trace/define_trace.h>
++
+diff --git a/net/ipv4/icmp.c b/net/ipv4/icmp.c
+index 8cebb476b3ab..30b302492613 100644
+--- a/net/ipv4/icmp.c
++++ b/net/ipv4/icmp.c
+@@ -92,6 +92,8 @@
+ #include <net/inet_common.h>
+ #include <net/ip_fib.h>
+ #include <net/l3mdev.h>
++#define CREATE_TRACE_POINTS
++#include <trace/events/icmp.h>
+
+ /*
+  *	Build xmit assembly blocks
+@@ -762,6 +764,8 @@ void __icmp_send(struct sk_buff *skb_in, int type, int code, __be32 info,
+ 	if (!fl4.saddr)
+ 		fl4.saddr = htonl(INADDR_DUMMY);
+
++	trace_icmp_send(skb_in, type, code);
++
+ 	icmp_push_reply(sk, &icmp_param, &fl4, &ipc, &rt);
+ ende:
+ 	ip_rt_put(rt);
 -- 
-2.43.0
+2.17.1
 
