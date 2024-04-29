@@ -1,78 +1,82 @@
-Return-Path: <netdev+bounces-92262-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92263-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D25C78B64CB
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 23:45:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA7018B64CC
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 23:45:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 169FEB21825
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 21:45:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 09FE01C21BDD
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 21:45:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F88218411D;
-	Mon, 29 Apr 2024 21:45:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D5B918412B;
+	Mon, 29 Apr 2024 21:45:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aTmRqZtO"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="p0i4bgQl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B818B184105
-	for <netdev@vger.kernel.org>; Mon, 29 Apr 2024 21:45:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99DC51836E9
+	for <netdev@vger.kernel.org>; Mon, 29 Apr 2024 21:45:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714427140; cv=none; b=js2733V3dV0Z+DNkeQgssCRa/ulJOfQx/ZxMByJ283cGPh0UmklJJtp4WZfi1DfC0jn98EH7yMbvSOGo/9ZsDcHra2+0xsIfnlZp+7YVqQAIz2xYUYmu4SFBH9o0R+1cXBG8+/IkcsO4f1X/6/3CKt7GmkjdCg9gl7LPe6apHK0=
+	t=1714427141; cv=none; b=CYKEoIIFJIkwdjJtHRCf8ALac1S8aIA/KYPpj5rm/y6Nouo1nfShY+blOTrm9HnFjUSbUoDg8K8ezR1UqVafbuLjKH/w9ezNCrUAxfZrKvpvCGqD5SzN6vzB/n1ia2PQ31dQUJDUzztlXjONEiHruq36KdbLy75IN/sTsq8Lo3g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714427140; c=relaxed/simple;
-	bh=CXdGvTleMNIv4GYdc9ZhHcot4PSSombN20TNzZWr8UI=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=FbJaV86GrBJYIYGcsAe3h7KJZYFnTEGjnWeyh/fTpezm4YchIEydeBHrn6L1rEGCYJ9Pzin20ytAHgKQab+vVac2hg2C4+jAWkfMIyPfcxbD4kan/E4Ore0EXoLulgI96exDjR0p5wVqoe5qmf9ccRELgc1io5mN6x1dJNcaeLk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jrife.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aTmRqZtO; arc=none smtp.client-ip=209.85.219.201
+	s=arc-20240116; t=1714427141; c=relaxed/simple;
+	bh=gH3Kew8OeVHbPt/et/Jq6DKHu1BGdkCA7/7iaJldhMA=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=prwPmn26OOj9gMp1aWzqyyYApkIrdgSUd/1T5C00OCFJ3HYPp9JnID0hCkqzZ36LxSLOUlLfiXyxR8ilqVWuElnbGSj/VkoRhUcg/Z3IGPAR/V5uBATxtfefK83n2m7Qd6C3KkUjnnT7HUz8mnqwuWg3yaF9TykSqHeBDN2GgIc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jrife.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=p0i4bgQl; arc=none smtp.client-ip=209.85.219.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jrife.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-de610854b8bso760964276.0
-        for <netdev@vger.kernel.org>; Mon, 29 Apr 2024 14:45:37 -0700 (PDT)
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-de51daf900cso9527312276.1
+        for <netdev@vger.kernel.org>; Mon, 29 Apr 2024 14:45:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1714427137; x=1715031937; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=/r6j/W9mUWONQY7ovRYyi9uqUz9mWwrTm/AdOjdCX/U=;
-        b=aTmRqZtOVSXV1y9fbysvl58xEMBmjBCCn/C6gvqq+WtcFkLq45ouCNdx1toBHuQJK/
-         x6uJtavnxcB5MnzD13FfWUWK3abEhPpaMsCulU6W5JBQnQZWmMsHAsXtjHmY4CNRAXf7
-         n0xBNohwEkTJaUmiRpOY59DG1G98jP6HqDsDk5xYtfhhyvl0UK4eCN/5YdTZicPAMS3h
-         gm/Yr47FiBUh2C56vgURKHYV1V/lKerm/yTO237gEME9IGQn65e+57evPdwB6Igzz8gf
-         mTqYFyjKhp42lOKTLIhzF6tBUXuHcFV3n1dnl5q4f0nBa5KB8hSZZ7jckudugjkqEghy
-         Ac0A==
+        d=google.com; s=20230601; t=1714427138; x=1715031938; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=vCy+fpf0yWvn0SKMsxJ2kXcAwcPbu8+bowrH/Q+MXV8=;
+        b=p0i4bgQlWzapKz8nn1z4tggQGkavTbrTBjO7TWy1xMli/S5bvZg3z9/epxz4NfTMg5
+         6xgmJhpsCXOAbLMpuOlABYBDgoOAEvp3hLXVSe020gafXvIEp2jgQwHAcicjTfU9hwIX
+         VpTyV1IiYkdirmz2c9hF0i0s0qNupjdWy0qrEdCaeHV2DXhVN3+AzTpapSbCZal+6RIl
+         shGEFuiXUMrDtE/U90ylZ/kr+sVcV694zQq8HqHbFPG+YqToZ82xI3uHTbZY2A0gKssJ
+         DHc9KSi9zP1kOoNWPC3+KYDXC5sSXxq8VEgxc2gURO14lsyZzEj2jaHxSCzbfYIeFz4Z
+         plaQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714427137; x=1715031937;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=/r6j/W9mUWONQY7ovRYyi9uqUz9mWwrTm/AdOjdCX/U=;
-        b=OTVSZb9yzYXslwCqenIgZV1wInlZK1GGycXOVP9IzEhq92hQEWiEqjFWklX2lbH08y
-         mLUTNBYjYLJlcizqNRBzR65osa+Wv7wgrLchkP5S+DZpkOJnsou0VVYDpf9gYiwFNAYE
-         iRwXCYEtQd7KVlzpJ6gGa31gh9Fqve0mnxO69iqsXR5JF+uuu8AWRPbDyPE2RQDl/lLR
-         5lRr4pEUCsGWEdVVrHZsWjWKv/0Q3mlW/ZOk4FjkwqVeKnPULhtat/NB2kugJfpKIvpH
-         Newrh0WQGUx1VpDaPvemM93yK1hBhiOhu3JlfRwecWTJVKYO5zMaYjJjtF3qclSzFejt
-         xzWA==
-X-Forwarded-Encrypted: i=1; AJvYcCXapGazNHJFk/ZI8XBBy6OcIUA+p17QmPhbuWeFoBmhsnp1aaFwIlnDVkM25UCrwhMVHyJMByHotXcAOkaspUqx12Vep5BR
-X-Gm-Message-State: AOJu0YwzrmlEIBZLBWVFz7xVgtBOJnsZmWyppvXhcwoIfAvrsxnTsGpf
-	RUFLaLvjTowWw/a6TN0ECHVaImWkVaoUu6QoFEshGhJR5o9gHiqQyetWyc/XntFRh3uFBegcqg=
+        d=1e100.net; s=20230601; t=1714427138; x=1715031938;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vCy+fpf0yWvn0SKMsxJ2kXcAwcPbu8+bowrH/Q+MXV8=;
+        b=ZpHnzbm+ybIWgHVgrGBfv1Y6VtKhQVc1QqQsYcq2wH2vS/TalJyUuQKtWoaiDJyGb5
+         g1i3oj+GPuVFZ555oMGr0udLrXoduQrn6vgSpl3HCiSs1OPC3WZvlqpbYtjUMvD98mwP
+         girFKQ5q8m02Mi/ajWICwrBX2mvBWtQnKwoqkT2CaUwrCAbya0JU9/495BWEXb8AxQUS
+         +ey5yS2VRHymLWigl3AkzUbfiliEsGcsxDV8CYwZsa2sHvtMbssU/bQM642Y0m0vT3bp
+         bcmcta0DicQ3sEy649xvJh8H9sN16XnrPQ0+bdJMfBeLw6rRlkGTqypvc03FQtKAe0k5
+         UZjg==
+X-Forwarded-Encrypted: i=1; AJvYcCWsXWF/4W7rzBz/Jm5X9WhpQRFuXle4VezC5x2BJlraaxuWP/jzCL1O3e+t9BPVjY0YPDrr6wuWJDvMIOaw49igHVwcYbIR
+X-Gm-Message-State: AOJu0YzJ7a2jrHCGpW4OBb1G2YKrauA7cDD2CGVznFCPZJqr/rtov3tU
+	26yr857zCrvpZRoJTFT4jPGltKalS2OJAiDrPBXD8FeFJ71bPWrneyhtmOf289OqRYlnbY7rNA=
 	=
-X-Google-Smtp-Source: AGHT+IEAAO56xjTLfoNQSFLAwnATKrv+gLtp1W9DP3wLkwXTGkheUj3EN6qI3g4PUDC20KIcGFPosz2rsw==
+X-Google-Smtp-Source: AGHT+IHoNWoNNRTxsr97FZ7/q/g/qbz5Q9ezThkgwC+EzxECZkvUoCNMvH5u9tWM17HBQabkNVhUsUZZ3Q==
 X-Received: from jrife.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:9f])
- (user=jrife job=sendgmr) by 2002:a25:d8d1:0:b0:de5:5304:3206 with SMTP id
- p200-20020a25d8d1000000b00de553043206mr756562ybg.11.1714427136747; Mon, 29
- Apr 2024 14:45:36 -0700 (PDT)
-Date: Mon, 29 Apr 2024 16:45:17 -0500
+ (user=jrife job=sendgmr) by 2002:a05:6902:110c:b0:dd9:1702:4837 with SMTP id
+ o12-20020a056902110c00b00dd917024837mr3741826ybu.3.1714427138565; Mon, 29 Apr
+ 2024 14:45:38 -0700 (PDT)
+Date: Mon, 29 Apr 2024 16:45:18 -0500
+In-Reply-To: <20240429214529.2644801-1-jrife@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20240429214529.2644801-1-jrife@google.com>
 X-Mailer: git-send-email 2.44.0.769.g3c40516874-goog
-Message-ID: <20240429214529.2644801-1-jrife@google.com>
-Subject: [PATCH v3 bpf-next 0/6] selftests/bpf: Add sockaddr tests for kernel networking
+Message-ID: <20240429214529.2644801-2-jrife@google.com>
+Subject: [PATCH v3 bpf-next 1/6] selftests/bpf: Fix bind program for big
+ endian systems
 From: Jordan Rife <jrife@google.com>
 To: bpf@vger.kernel.org
 Cc: Jordan Rife <jrife@google.com>, linux-kselftest@vger.kernel.org, 
@@ -89,104 +93,135 @@ Cc: Jordan Rife <jrife@google.com>, linux-kselftest@vger.kernel.org,
 	Willem de Bruijn <willemdebruijn.kernel@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 
-This patch series adds test coverage for BPF sockaddr hooks and their
-interactions with kernel socket functions (i.e. kernel_bind(),
-kernel_connect(), kernel_sendmsg(), sock_sendmsg(),
-kernel_getpeername(), and kernel_getsockname()) while also rounding out
-IPv4 and IPv6 sockaddr hook coverage in prog_tests/sock_addr.c.
+Without this fix, the bind4 and bind6 programs will reject bind attempts
+on big endian systems. This patch ensures that CI tests pass for the
+s390x architecture.
 
-As with v1 of this patch series, we add regression coverage for the
-issues addressed by these patches,
-
-- commit 0bdf399342c5("net: Avoid address overwrite in kernel_connect")
-- commit 86a7e0b69bd5("net: prevent rewrite of msg_name in sock_sendmsg()")
-- commit c889a99a21bf("net: prevent address rewrite in kernel_bind()")
-- commit 01b2885d9415("net: Save and restore msg_namelen in sock_sendmsg")
-
-but broaden the focus a bit.
-
-In order to extend prog_tests/sock_addr.c to test these kernel
-functions, we add a set of new kfuncs that wrap individual socket
-operations to bpf_testmod and invoke them through set of corresponding
-SYSCALL programs (progs/sock_addr_kern.c). Each test case can be
-configured to use a different set of "sock_ops" depending on whether it
-is testing kernel calls (kernel_bind(), kernel_connect(), etc.) or
-system calls (bind(), connect(), etc.).
-
-=======
-Patches
-=======
-* Patch 1 fixes the sock_addr bind test program to work for big endian
-  architectures such as s390x.
-* Patch 2 introduces the new kfuncs to bpf_testmod.
-* Patch 3 introduces the BPF program which allows us to invoke these
-  kfuncs invividually from the test program.
-* Patch 4 lays the groundwork for IPv4 and IPv6 sockaddr hook coverage
-  by migrating much of the environment setup logic from
-  bpf/test_sock_addr.sh into prog_tests/sock_addr.c and moves test cases
-  to cover bind4/6, connect4/6, sendmsg4/6 and recvmsg4/6 hooks.
-* Patch 5 makes the set of socket operations for each test case
-  configurable, laying the groundwork for Patch 6.
-* Patch 6 introduces two sets of sock_ops that invoke the kernel
-  equivalents of connect(), bind(), etc. and uses these to add coverage
-  for the kernel socket functions.
-
-=======
-Changes
-=======
-v2->v3
-------
-* Renamed bind helpers. Dropped "_ntoh" suffix.
-* Added guards to kfuncs to make sure addrlen and msglen do not exceed
-  the buffer capacity.
-* Added KF_SLEEPABLE flag to kfuncs.
-* Added a mutex (sock_lock) to kfuncs to serialize access to sock.
-* Added NULL check for sock to each kfunc.
-* Use the "sock_addr" networking namespace for all network interface
-  setup and testing.
-* Use "nodad" when calling "ip -6 addr add" during interface setup to
-  avoid delays and remove ping loop.
-* Removed test cases from test_sock_addr.c to make it clear what remains
-  to be migrated.
-* Removed unused parameter (expect_change) from sock_addr_op().
-
-Link: https://lore.kernel.org/bpf/20240412165230.2009746-1-jrife@google.com/T/#u
-
-v1->v2
-------
-* Dropped test_progs/sock_addr_kern.c and the sock_addr_kern test module
-  in favor of simply expanding bpf_testmod and test_progs/sock_addr.c.
-* Migrated environment setup logic from bpf/test_sock_addr.sh into
-  prog_tests/sock_addr.c rather than invoking the script from the test
-  program.
-* Added kfuncs to bpf_testmod as well as the sock_addr_kern BPF program
-  to enable us to invoke kernel socket functions from
-  test_progs/sock_addr.c.
-* Added test coverage for kernel socket functions to
-  test_progs/sock_addr.c.
-
-Link: https://lore.kernel.org/bpf/20240329191907.1808635-1-jrife@google.com/T/#u
-
-Jordan Rife (6):
-  selftests/bpf: Fix bind program for big endian systems
-  selftests/bpf: Implement socket kfuncs for bpf_testmod
-  selftests/bpf: Implement BPF programs for kernel socket operations
-  selftests/bpf: Move IPv4 and IPv6 sockaddr test cases
-  selftests/bpf: Make sock configurable for each test case
-  selftests/bpf: Add kernel socket operation tests
-
- .../selftests/bpf/bpf_testmod/bpf_testmod.c   | 255 +++++
- .../bpf/bpf_testmod/bpf_testmod_kfunc.h       |  27 +
- .../selftests/bpf/prog_tests/sock_addr.c      | 939 +++++++++++++++---
- .../testing/selftests/bpf/progs/bind4_prog.c  |  18 +-
- .../testing/selftests/bpf/progs/bind6_prog.c  |  18 +-
- tools/testing/selftests/bpf/progs/bind_prog.h |  19 +
- .../selftests/bpf/progs/sock_addr_kern.c      |  65 ++
- tools/testing/selftests/bpf/test_sock_addr.c  | 192 ----
- 8 files changed, 1192 insertions(+), 341 deletions(-)
+Signed-off-by: Jordan Rife <jrife@google.com>
+---
+ .../testing/selftests/bpf/progs/bind4_prog.c  | 18 ++++++++++--------
+ .../testing/selftests/bpf/progs/bind6_prog.c  | 18 ++++++++++--------
+ tools/testing/selftests/bpf/progs/bind_prog.h | 19 +++++++++++++++++++
+ 3 files changed, 39 insertions(+), 16 deletions(-)
  create mode 100644 tools/testing/selftests/bpf/progs/bind_prog.h
- create mode 100644 tools/testing/selftests/bpf/progs/sock_addr_kern.c
 
+diff --git a/tools/testing/selftests/bpf/progs/bind4_prog.c b/tools/testing/selftests/bpf/progs/bind4_prog.c
+index a487f60b73ac4..66005c1a5b367 100644
+--- a/tools/testing/selftests/bpf/progs/bind4_prog.c
++++ b/tools/testing/selftests/bpf/progs/bind4_prog.c
+@@ -12,6 +12,8 @@
+ #include <bpf/bpf_helpers.h>
+ #include <bpf/bpf_endian.h>
+ 
++#include "bind_prog.h"
++
+ #define SERV4_IP		0xc0a801feU /* 192.168.1.254 */
+ #define SERV4_PORT		4040
+ #define SERV4_REWRITE_IP	0x7f000001U /* 127.0.0.1 */
+@@ -118,23 +120,23 @@ int bind_v4_prog(struct bpf_sock_addr *ctx)
+ 
+ 	// u8 narrow loads:
+ 	user_ip4 = 0;
+-	user_ip4 |= ((volatile __u8 *)&ctx->user_ip4)[0] << 0;
+-	user_ip4 |= ((volatile __u8 *)&ctx->user_ip4)[1] << 8;
+-	user_ip4 |= ((volatile __u8 *)&ctx->user_ip4)[2] << 16;
+-	user_ip4 |= ((volatile __u8 *)&ctx->user_ip4)[3] << 24;
++	user_ip4 |= load_byte(ctx->user_ip4, 0, sizeof(user_ip4));
++	user_ip4 |= load_byte(ctx->user_ip4, 1, sizeof(user_ip4));
++	user_ip4 |= load_byte(ctx->user_ip4, 2, sizeof(user_ip4));
++	user_ip4 |= load_byte(ctx->user_ip4, 3, sizeof(user_ip4));
+ 	if (ctx->user_ip4 != user_ip4)
+ 		return 0;
+ 
+ 	user_port = 0;
+-	user_port |= ((volatile __u8 *)&ctx->user_port)[0] << 0;
+-	user_port |= ((volatile __u8 *)&ctx->user_port)[1] << 8;
++	user_port |= load_byte(ctx->user_port, 0, sizeof(user_port));
++	user_port |= load_byte(ctx->user_port, 1, sizeof(user_port));
+ 	if (ctx->user_port != user_port)
+ 		return 0;
+ 
+ 	// u16 narrow loads:
+ 	user_ip4 = 0;
+-	user_ip4 |= ((volatile __u16 *)&ctx->user_ip4)[0] << 0;
+-	user_ip4 |= ((volatile __u16 *)&ctx->user_ip4)[1] << 16;
++	user_ip4 |= load_word(ctx->user_ip4, 0, sizeof(user_ip4));
++	user_ip4 |= load_word(ctx->user_ip4, 1, sizeof(user_ip4));
+ 	if (ctx->user_ip4 != user_ip4)
+ 		return 0;
+ 
+diff --git a/tools/testing/selftests/bpf/progs/bind6_prog.c b/tools/testing/selftests/bpf/progs/bind6_prog.c
+index d62cd9e9cf0ea..9c86c712348cf 100644
+--- a/tools/testing/selftests/bpf/progs/bind6_prog.c
++++ b/tools/testing/selftests/bpf/progs/bind6_prog.c
+@@ -12,6 +12,8 @@
+ #include <bpf/bpf_helpers.h>
+ #include <bpf/bpf_endian.h>
+ 
++#include "bind_prog.h"
++
+ #define SERV6_IP_0		0xfaceb00c /* face:b00c:1234:5678::abcd */
+ #define SERV6_IP_1		0x12345678
+ #define SERV6_IP_2		0x00000000
+@@ -129,25 +131,25 @@ int bind_v6_prog(struct bpf_sock_addr *ctx)
+ 	// u8 narrow loads:
+ 	for (i = 0; i < 4; i++) {
+ 		user_ip6 = 0;
+-		user_ip6 |= ((volatile __u8 *)&ctx->user_ip6[i])[0] << 0;
+-		user_ip6 |= ((volatile __u8 *)&ctx->user_ip6[i])[1] << 8;
+-		user_ip6 |= ((volatile __u8 *)&ctx->user_ip6[i])[2] << 16;
+-		user_ip6 |= ((volatile __u8 *)&ctx->user_ip6[i])[3] << 24;
++		user_ip6 |= load_byte(ctx->user_ip6[i], 0, sizeof(user_ip6));
++		user_ip6 |= load_byte(ctx->user_ip6[i], 1, sizeof(user_ip6));
++		user_ip6 |= load_byte(ctx->user_ip6[i], 2, sizeof(user_ip6));
++		user_ip6 |= load_byte(ctx->user_ip6[i], 3, sizeof(user_ip6));
+ 		if (ctx->user_ip6[i] != user_ip6)
+ 			return 0;
+ 	}
+ 
+ 	user_port = 0;
+-	user_port |= ((volatile __u8 *)&ctx->user_port)[0] << 0;
+-	user_port |= ((volatile __u8 *)&ctx->user_port)[1] << 8;
++	user_port |= load_byte(ctx->user_port, 0, sizeof(user_port));
++	user_port |= load_byte(ctx->user_port, 1, sizeof(user_port));
+ 	if (ctx->user_port != user_port)
+ 		return 0;
+ 
+ 	// u16 narrow loads:
+ 	for (i = 0; i < 4; i++) {
+ 		user_ip6 = 0;
+-		user_ip6 |= ((volatile __u16 *)&ctx->user_ip6[i])[0] << 0;
+-		user_ip6 |= ((volatile __u16 *)&ctx->user_ip6[i])[1] << 16;
++		user_ip6 |= load_word(ctx->user_ip6[i], 0, sizeof(user_ip6));
++		user_ip6 |= load_word(ctx->user_ip6[i], 1, sizeof(user_ip6));
+ 		if (ctx->user_ip6[i] != user_ip6)
+ 			return 0;
+ 	}
+diff --git a/tools/testing/selftests/bpf/progs/bind_prog.h b/tools/testing/selftests/bpf/progs/bind_prog.h
+new file mode 100644
+index 0000000000000..e830caa940c35
+--- /dev/null
++++ b/tools/testing/selftests/bpf/progs/bind_prog.h
+@@ -0,0 +1,19 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++#ifndef __BIND_PROG_H__
++#define __BIND_PROG_H__
++
++#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
++#define load_byte(src, b, s) \
++	(((volatile __u8 *)&(src))[b] << 8 * b)
++#define load_word(src, w, s) \
++	(((volatile __u16 *)&(src))[w] << 16 * w)
++#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
++#define load_byte(src, b, s) \
++	(((volatile __u8 *)&(src))[(b) + (sizeof(src) - (s))] << 8 * ((s) - (b) - 1))
++#define load_word(src, w, s) \
++	(((volatile __u16 *)&(src))[w] << 16 * (((s) / 2) - (w) - 1))
++#else
++# error "Fix your compiler's __BYTE_ORDER__?!"
++#endif
++
++#endif
 -- 
 2.44.0.769.g3c40516874-goog
 
