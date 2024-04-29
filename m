@@ -1,102 +1,114 @@
-Return-Path: <netdev+bounces-92244-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92245-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 155C08B62FA
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 21:58:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 280BE8B630C
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 22:02:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 46EDA1C21167
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 19:58:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 417F41C20ACB
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 20:02:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9978213D8B3;
-	Mon, 29 Apr 2024 19:58:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9443E13F439;
+	Mon, 29 Apr 2024 20:02:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i6SisbN3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RACQStYK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5439D13C3D3;
-	Mon, 29 Apr 2024 19:58:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B26013DBBF;
+	Mon, 29 Apr 2024 20:02:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714420693; cv=none; b=gC335b8tLuzEHWRxDEDwlwk5a24RiSVcJfVlNB6xrMtf4PwBj9s4S3ges1iDQ0w083b3GYwFZs8EqfomOFgAovG+btPKphkwgkHse1kVa89i0m9n293+BH/tJoa11cGiVqyy9hF6VJD+KUIzrQLh0JBkySifjRhQ+GwEmpgcy4U=
+	t=1714420934; cv=none; b=KJkCIW6u7fQ/8vy3scK12U9GO3SCVrtoeIDXB6EfTIE/x3+JiK1qP0wPn5Fk/L3nt/oZEU/9Ppm5msicafNGG215q06WuRxkeOw7wJixkivzU7GMxnm1W/gmdf8wEoRqt9BE5QlDEzx3vmYCj8evV+ahKMlHF+DJNxA4xGACED8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714420693; c=relaxed/simple;
-	bh=uarQwPLkIzrmtboAHMQub7EbDIvk4lc3rgqCGLvSJhY=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=gdCUqV7pniD9l1IdyVMH1mcKDwzBw6yqO55DEiZTOS6MF/5AqUgBOFPrex7foYXxOI8FhybFwt0UTqao6cZNJ2MEsDg3v3J8yKWj7pwsiOxHlNSU4j2nmSUWdS4sffM/aypz9z/X4erWY0UVCOnFJOamRLZGBfzFDiXLdkbGxjQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i6SisbN3; arc=none smtp.client-ip=209.85.210.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-6ece8991654so4590079b3a.3;
-        Mon, 29 Apr 2024 12:58:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1714420691; x=1715025491; darn=vger.kernel.org;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=uarQwPLkIzrmtboAHMQub7EbDIvk4lc3rgqCGLvSJhY=;
-        b=i6SisbN3ENSIZZkCwiWt4Ic5wQ31oDPkKiXdqbolwEolF1k1ZvvjygcKUyh5kWsO+v
-         u3m5PTZeyo+n1RXhSfFsEHuHC5AfdsQAjN9MLyc5ge7Pt3UxnAowy0vRgjseatywWHIV
-         otyWbSnedWBMlPDSvch8antQAsRgmmzEBv/aEhgTZAn/rbyJDf2Xq53oELxRU/zC1onV
-         06FHmCHc832dQZNURlkfJfABpiA7wDJkonOpGLsUiHEfpEG5aUiXojlz40MH8b7W2ltD
-         YRoUCzz0WnjhofKq48SvGFfPR3EqAjq1Yqc4cFMFTCJPWBtew5IPOChORVpoh9DpxZFH
-         pmkg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714420691; x=1715025491;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=uarQwPLkIzrmtboAHMQub7EbDIvk4lc3rgqCGLvSJhY=;
-        b=YppQRqSaTPb6kozByxWTpv8eR3bgYJZygxHIqaZgchCvZSpmydSh4q5mhoJwVcgBQw
-         m8Ir5gw/ejHP69Q79GruRpCUXRaja+/ooK13UPKdKpKvys2oNAn6CGv4zaL1Wj533Caf
-         2C+dADGt1dw9NklVQDtbw2ze7wTLmX9z2HMz+X1Qwr5erKydWvoE3RpA6w38Se0ziHy0
-         mhNixbstK+iMdyaLpx6qbr/tRdFgpHzePNrcpZ4zXYTk2xvMaRL7JmO+4W7Z4gyHMa9M
-         6R3sVnn1SG8V/drIaROj9Ltd+UAa2dmW5V3L2kHf8TW9paeEQ1oUtId0wrecFRgQgo0C
-         J4vA==
-X-Forwarded-Encrypted: i=1; AJvYcCXyLy70Tc/+cZs2Th5obh66W/Cgm1jeEAjjLpSK2I+alEYXYzvShK1EodU0jfYLz4TEcTcyLslurPrtXu4mCGyI+1kJlPnVMKmUYFsqf+tXff8dEh1/QzOYMhP2
-X-Gm-Message-State: AOJu0YzYwioQyrB7pv2G+Eeln1EAi3eCXLd3SSqHQB3AUmCthQQRNbLl
-	ZUhH3AaamB67g5/UPt4lIpcPK778ZN1eRvZxoAa+66CfD2JG8J9Q
-X-Google-Smtp-Source: AGHT+IEPfmB4SjZ76nyXE/HvH55UAdeNhhgyHpiEyrFWyGcvBgornzH01bcIOFrQQikdaYu9riyKtw==
-X-Received: by 2002:a05:6a00:23cb:b0:6ea:e841:5889 with SMTP id g11-20020a056a0023cb00b006eae8415889mr15492752pfc.33.1714420691623;
-        Mon, 29 Apr 2024 12:58:11 -0700 (PDT)
-Received: from ?IPv6:2604:3d08:9880:5900:a18e:a67:fdb6:1a18? ([2604:3d08:9880:5900:a18e:a67:fdb6:1a18])
-        by smtp.gmail.com with ESMTPSA id r3-20020aa79883000000b006f3fc8f143asm2952372pfl.139.2024.04.29.12.58.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Apr 2024 12:58:10 -0700 (PDT)
-Message-ID: <13e873af1e2397fa7a9c3e19989784dccab27dcb.camel@gmail.com>
-Subject: Re: [PATCH bpf 3/3] selftests/bpf: Add sockopt case to verify
- prog_type
-From: Eduard Zingerman <eddyz87@gmail.com>
-To: Stanislav Fomichev <sdf@google.com>, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org
-Cc: ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
- martin.lau@linux.dev,  song@kernel.org, yhs@fb.com,
- john.fastabend@gmail.com, kpsingh@kernel.org,  haoluo@google.com,
- jolsa@kernel.org
-Date: Mon, 29 Apr 2024 12:58:09 -0700
-In-Reply-To: <20240426231621.2716876-4-sdf@google.com>
-References: <20240426231621.2716876-1-sdf@google.com>
-	 <20240426231621.2716876-4-sdf@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.4-0ubuntu2 
+	s=arc-20240116; t=1714420934; c=relaxed/simple;
+	bh=vHS/ptla2mwP6XYt6Xcx0zxc8F6JczcDTaQZFsC9CTM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hapvLgZFy5kubKJZ46UT+9Ubqg+M6kMcZwlkWCorp+/YLKHdB8T1lYO74/IaDsysVsLHtJfAoau6ng02d2dXuIcvqmHlTMyxs0/VrOeHcAPBstTD+CseEtsXduIFkaV37JrCNq/lN2floWMnzg4BSHVEdJp+stERv0LeJ/+fgCE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RACQStYK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5137C113CD;
+	Mon, 29 Apr 2024 20:02:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714420934;
+	bh=vHS/ptla2mwP6XYt6Xcx0zxc8F6JczcDTaQZFsC9CTM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=RACQStYKfNgky/pH6fJjctmTggrmtCY6pXdPArKgQc5jef1EmUYyc5tb4bhJ3poAB
+	 6la/44JKo2+fkGm+p8SvPJdo/QCE83wGIzEqFrGmk6byNUighgERJuj/zKf9sFksBP
+	 0R6ZDsoI35+PAeUJojTt1Q+PEoieNkB6G85kvCwMJQggR0eeZvv63unTNCE3c4ZzrS
+	 ZAri7x/Mx/2ii1SV0GQTz03DvyXGxGxdzy18tZyPNdihPIY2ydeycYW8NPktzX/HGu
+	 sCB18Maf5MiJw+CE6AEbqo8a6ldQkkHTAKVnz/ZmhZVHTOlDDYGl8OieArjFl4IqH8
+	 cTTHEWjh6qgUg==
+Date: Mon, 29 Apr 2024 21:00:39 +0100
+From: Simon Horman <horms@kernel.org>
+To: Florian Fainelli <florian.fainelli@broadcom.com>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next v2 2/2] net: dsa: Remove adjust_link paths
+Message-ID: <20240429200039.GH516117@kernel.org>
+References: <20240429165405.2298962-1-florian.fainelli@broadcom.com>
+ <20240429165405.2298962-3-florian.fainelli@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240429165405.2298962-3-florian.fainelli@broadcom.com>
 
-On Fri, 2024-04-26 at 16:16 -0700, Stanislav Fomichev wrote:
-> Make sure only sockopt programs can be attached to the setsockopt
-> and getsockopt hooks.
->=20
-> Signed-off-by: Stanislav Fomichev <sdf@google.com>
-> ---
+On Mon, Apr 29, 2024 at 09:54:05AM -0700, Florian Fainelli wrote:
+> Now that we no longer any drivers using PHYLIB's adjust_link callback,
+> remove all paths that made use of adjust_link as well as the associated
+> functions.
+> 
+> Signed-off-by: Florian Fainelli <florian.fainelli@broadcom.com>
 
-Acked-by: Eduard Zingerman <eddyz87@gmail.com>
+...
+
+> @@ -1616,17 +1597,13 @@ static void dsa_port_phylink_mac_link_down(struct phylink_config *config,
+>  					   phy_interface_t interface)
+>  {
+>  	struct dsa_port *dp = dsa_phylink_to_port(config);
+> -	struct phy_device *phydev = NULL;
+
+Hi Florian,
+
+I'm wondering if some changes got lost somewhere.
+
+phydev is removed here...
+
+>  	struct dsa_switch *ds = dp->ds;
+>  
+>  	if (dsa_port_is_user(dp))
+>  		phydev = dp->user->phydev;
+
+... assigned here, but not used.
+
+Perhaps the three lines above should be removed?
+
+>  
+> -	if (!ds->ops->phylink_mac_link_down) {
+> -		if (ds->ops->adjust_link && phydev)
+> -			ds->ops->adjust_link(ds, dp->index, phydev);
+> +	if (!ds->ops->phylink_mac_link_down)
+>  		return;
+> -	}
+>  
+>  	ds->ops->phylink_mac_link_down(ds, dp->index, mode, interface);
+>  }
+
+...
+
+-- 
+pw-client: changes-requested
 
