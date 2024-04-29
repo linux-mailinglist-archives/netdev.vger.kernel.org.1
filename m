@@ -1,164 +1,217 @@
-Return-Path: <netdev+bounces-92078-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92079-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E69968B54C1
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 12:10:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B3B38B54D5
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 12:15:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 71E0C282542
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 10:10:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2FF3E1C219B9
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 10:15:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AB4E2942C;
-	Mon, 29 Apr 2024 10:10:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCC142C68F;
+	Mon, 29 Apr 2024 10:15:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D3q+NFEs"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="LbpXGuXH"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC31D2837E
-	for <netdev@vger.kernel.org>; Mon, 29 Apr 2024 10:10:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ED882940D;
+	Mon, 29 Apr 2024 10:15:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714385434; cv=none; b=lq4FpoIr+ioohJmzqmWKrFbuCOkYfovkkLhFX/kFy6bzS+qJshwYWmdSqpgTUPRRqZIEAhRm191iIngWZJ1wRI4UwKfs6BmRzdFNLaMI4MMeOdwV3GfF8qig/Db/yD5THzKK4HFNxjGkbLd8rSIYjmUgGiAtjJ7OUqUFqRM92Os=
+	t=1714385737; cv=none; b=o+3sZRSSffNljqk+Vmfgz1yuGADOLR3LTrx/lm0moYcFkiLJZ3A8AP24rhjHmEWOlhtHC2k+OWLFrkPFZ/opZ0ncRAqsBf/HO4fzrhieBpUIKrA3WvvJJfk+7ws9ba+yoCILfXbVGZavDDP3C23zHwCwPJlFe/mpuKttil26VaY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714385434; c=relaxed/simple;
-	bh=xQ7hNCE0DNOP4U41pP3s0ClJGxIz6zSi+Jgjtu12jcc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Rlhnkkfkw+7W1drad/zIKfHmeYm4/gqsI7gi9wW6dj0VD3PbdCX8Ks4llMTYwGWGGB2h6NRyVk/ooII4UeTUQxOo4V/Fwgbo4Jca3Cx6VjweF76rEYLNEOOdm0cIY0IYh/t67i09Ou8LjFEiufedCjrf+KFZH7MZW4FBduP6SAg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=D3q+NFEs; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1714385431;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=yrFSV+enroO5/Kb8/GKX96Hz0vjFPPsWJvTVuF9uIxc=;
-	b=D3q+NFEsSOS7cODd4bLUOima3BfVpJQCIhwVr51xeRadF25F6H0oejVdLkVm2tc60dbBlW
-	TLPw8MOPTJNkOvG3tqS5LZONhxIAb7VRMcDesaJCE1GYYe0p7jfmMXwzexlZnjKykU7ykj
-	13pYRlGOTBaOm5yPh0vZB5UbSsibsyE=
-Received: from mail-ot1-f71.google.com (mail-ot1-f71.google.com
- [209.85.210.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-631-fl8HxNUwOTGxGELDvU6hTw-1; Mon, 29 Apr 2024 06:10:30 -0400
-X-MC-Unique: fl8HxNUwOTGxGELDvU6hTw-1
-Received: by mail-ot1-f71.google.com with SMTP id 46e09a7af769-6ee2846ec10so1385766a34.1
-        for <netdev@vger.kernel.org>; Mon, 29 Apr 2024 03:10:30 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714385430; x=1714990230;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yrFSV+enroO5/Kb8/GKX96Hz0vjFPPsWJvTVuF9uIxc=;
-        b=SCryDDS7wAMngZuqAk7HRmtCkFMwhzmpXHqpc7D3EZ1r/XZNYoVPvewuUsXBTKwvom
-         0gf08jALOFZG8iyjc8gc9GssUC9HoxqvQWnzXc4v4HQztihs1fVbOXGhLl34AtN4qz2i
-         ZGZicI65fWr6E/lZAnm/pinBCA8OML86AQv4uLs1YAnTWvVfyJSyb2T7uaAvrhfeEPbi
-         xca8M/4a67D6Ibsv98RzMTsQ+aDJ/TfcJVJuTcRMTaVGjG7WX6fu4IIxGYJfFZExgnZ1
-         jLfJsdu44XUH5nR9mx4whAbv08M+IHD1aLCurczrlLdKaraCes6gVwWQAzNOeLTWspv1
-         4zwg==
-X-Forwarded-Encrypted: i=1; AJvYcCW+WoXVJI9sySC3JPy1ma77XXQbaUT/UHYA0auJ7op4RJ6D43ayKWSqHUnHHdZQyFchJCBRV+yRxVehWP+Fto46o5NqjQao
-X-Gm-Message-State: AOJu0YyVSMUM29HFWqRZJ4l6741ZxkVMW0gBDm3r2K5espE0mN+ew45f
-	TCLeZOEr78TsTyX819jTe9zQ09FP9+avgT6vDVF3i4XTH+Kbmb0RZ+GEMi2ssNTv3fyDIBjUXrN
-	1AULNP2Ka5c59lvB+SMf4codP/RgPJkmiZVIa9Vu5JmAO4m9wXxvqfg==
-X-Received: by 2002:a9d:7991:0:b0:6ee:2ca2:4370 with SMTP id h17-20020a9d7991000000b006ee2ca24370mr2789814otm.15.1714385429719;
-        Mon, 29 Apr 2024 03:10:29 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHrvfVsOcM4emYdUYKViS3N6+afe+LNkfiEGNb0K0Zlc2Ov17BGL5mY6doHoVFVADHAZxJpjw==
-X-Received: by 2002:a9d:7991:0:b0:6ee:2ca2:4370 with SMTP id h17-20020a9d7991000000b006ee2ca24370mr2789795otm.15.1714385429234;
-        Mon, 29 Apr 2024 03:10:29 -0700 (PDT)
-Received: from localhost ([2a01:e11:1007:ea0:8374:5c74:dd98:a7b2])
-        by smtp.gmail.com with ESMTPSA id t3-20020a05620a034300b0078ef13a3d9csm10354459qkm.39.2024.04.29.03.10.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Apr 2024 03:10:28 -0700 (PDT)
-Date: Mon, 29 Apr 2024 12:10:27 +0200
-From: Davide Caratti <dcaratti@redhat.com>
-To: Paul Moore <paul@paul-moore.com>
-Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Casey Schaufler <casey@schaufler-ca.com>,
-	linux-security-module@vger.kernel.org, netdev@vger.kernel.org,
-	Xiumei Mu <xmu@redhat.com>
-Subject: Re: [PATCH v2] netlabel: fix RCU annotation for IPv4 options on
- socket  creation
-Message-ID: <Zi9yE099IYtqhCzN@dcaratti.users.ipa.redhat.com>
-References: <c1ba274b19f6d1399636d018333d14a032d05454.1713967592.git.dcaratti@redhat.com>
- <b6f94a1fd73d464e1da169e929109c3c@paul-moore.com>
+	s=arc-20240116; t=1714385737; c=relaxed/simple;
+	bh=nLArAdMr2jal4mp6LgZ1sjlUXe2KL679GmsRHQcMBYE=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=nZnbRLjzp30ad64Ei76GsIY3nUa3BKlBu9NfH0DgTBhO75huhRNk06VDwM41gzmYVHtN/83kITJBVqMbr7YclCPrIdzQsgC3SMu5jwJWFMxI3wrOfcOMhlEb8CufFcD4HOEc7D+c4kO187c+PATuTCoPjXHvPoipi+7ysSBLrsY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=LbpXGuXH; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=RLKngZJHQpUdyJR5CjVI1+0RCYiuk8UgdVpG4nXdkOY=; b=LbpXGuXH687JoPRdMp4xwLnwfC
+	meo+Tux23veztcRY9kdujxM89bVOsEXonCM2esIngwguzWaxnA80NS06eRdke1HY3sldmHJ8zyHY6
+	P8HLpIVpk16X8FWYsmZrG4Udtz3ElpprGgQEO+wTDFX1ij+x3GIJ3gxA+7ZQR6oqjUtSX8223KuVB
+	NaCfKUYmTAY9bnATuzXfpnYPYn7rnCqPbF40N/4Fi+bwYGHGbI18ZKCtuMVbuJSVFREMR5rtC/sgJ
+	BeeSEW5pwmcAi4K69VgFBehXiyENTx0ERtVspSG82JltcO6FXFP657gFmnL6HHrWW/K6siw4tTwLF
+	qyCcAWtQ==;
+Received: from sslproxy05.your-server.de ([78.46.172.2])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1s1O2c-0009tw-Up; Mon, 29 Apr 2024 12:15:22 +0200
+Received: from [178.197.249.41] (helo=linux.home)
+	by sslproxy05.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1s1O2b-000Dc9-2r;
+	Mon, 29 Apr 2024 12:15:22 +0200
+Subject: Re: [PATCH net] udp: fix segmentation crash for GRO packet without
+ fraglist
+To: =?UTF-8?B?TGVuYSBXYW5nICjnjovlqJwp?= <Lena.Wang@mediatek.com>,
+ "maze@google.com" <maze@google.com>,
+ "willemdebruijn.kernel@gmail.com" <willemdebruijn.kernel@gmail.com>
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
+ "steffen.klassert@secunet.com" <steffen.klassert@secunet.com>,
+ "kuba@kernel.org" <kuba@kernel.org>,
+ =?UTF-8?B?U2hpbWluZyBDaGVuZyAo5oiQ6K+X5piOKQ==?=
+ <Shiming.Cheng@mediatek.com>, "pabeni@redhat.com" <pabeni@redhat.com>,
+ "edumazet@google.com" <edumazet@google.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "matthias.bgg@gmail.com" <matthias.bgg@gmail.com>,
+ "davem@davemloft.net" <davem@davemloft.net>,
+ "yan@cloudflare.com" <yan@cloudflare.com>
+References: <20240415150103.23316-1-shiming.cheng@mediatek.com>
+ <CANP3RGdh24xyH2V7Sa2fs9Ca=tiZNBdKu1qQ8LFHS3sY41CxmA@mail.gmail.com>
+ <b24bc70ae2c50dc50089c45afbed34904f3ee189.camel@mediatek.com>
+ <66227ce6c1898_116a9b294be@willemb.c.googlers.com.notmuch>
+ <CANP3RGfxeKDUmGwSsZrAs88Fmzk50XxN+-MtaJZTp641aOhotA@mail.gmail.com>
+ <6622acdd22168_122c5b2945@willemb.c.googlers.com.notmuch>
+ <9f097bcafc5bacead23c769df4c3f63a80dcbad5.camel@mediatek.com>
+ <6627ff5432c3a_1759e929467@willemb.c.googlers.com.notmuch>
+ <274c7e9837e5bbe468d19aba7718cc1cf0f9a6eb.camel@mediatek.com>
+ <66291716bcaed_1a760729446@willemb.c.googlers.com.notmuch>
+ <c28a5c635f38a47f1be266c4328e5fbba44ff084.camel@mediatek.com>
+ <662a63aeee385_1de39b294fd@willemb.c.googlers.com.notmuch>
+ <752468b66d2f5766ea16381a0c5d7b82ab77c5c4.camel@mediatek.com>
+ <ae0ba22a-049a-49c1-d791-d0e953625904@iogearbox.net>
+ <662cfd6db06df_28b9852949a@willemb.c.googlers.com.notmuch>
+ <afa6e302244a87c2a834fcc31d48b377e19a34a2.camel@mediatek.com>
+From: Daniel Borkmann <daniel@iogearbox.net>
+Message-ID: <5cc1c662-1cec-101c-8184-c32c210eeadc@iogearbox.net>
+Date: Mon, 29 Apr 2024 12:15:20 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b6f94a1fd73d464e1da169e929109c3c@paul-moore.com>
+In-Reply-To: <afa6e302244a87c2a834fcc31d48b377e19a34a2.camel@mediatek.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27260/Mon Apr 29 10:23:47 2024)
 
-hello Paul, thanks for reviewing!
-
-On Thu, Apr 25, 2024 at 05:01:36PM -0400, Paul Moore wrote:
-> On Apr 24, 2024 Davide Caratti <dcaratti@redhat.com> wrote:
-> >
-
-[...]
- 
-> > @@ -1826,7 +1827,8 @@ static int cipso_v4_genopt(unsigned char *buf, u32 buf_len,
-> >   */
-> >  int cipso_v4_sock_setattr(struct sock *sk,
-> >  			  const struct cipso_v4_doi *doi_def,
-> > -			  const struct netlbl_lsm_secattr *secattr)
-> > +			  const struct netlbl_lsm_secattr *secattr,
-> > +			  bool slock_held)
+On 4/28/24 9:48 AM, Lena Wang (王娜) wrote:
+> On Sat, 2024-04-27 at 09:28 -0400, Willem de Bruijn wrote:
+>>   	
+>> External email : Please do not click links or open attachments until
+>> you have verified the sender or the content.
+>>   
+>> Daniel Borkmann wrote:
+>>> On 4/26/24 11:52 AM, Lena Wang (王娜) wrote:
+>>> [...]
+>>>>>>   From 301da5c9d65652bac6091d4cd64b751b3338f8bb Mon Sep 17
+>> 00:00:00
+>>>>> 2001
+>>>>>> From: Shiming Cheng <shiming.cheng@mediatek.com>
+>>>>>> Date: Wed, 24 Apr 2024 13:42:35 +0800
+>>>>>> Subject: [PATCH net] net: prevent BPF pulling SKB_GSO_FRAGLIST
+>> skb
+>>>>>>
+>>>>>> A SKB_GSO_FRAGLIST skb can't be pulled data
+>>>>>> from its fraglist as it may result an invalid
+>>>>>> segmentation or kernel exception.
+>>>>>>
+>>>>>> For such structured skb we limit the BPF pulling
+>>>>>> data length smaller than skb_headlen() and return
+>>>>>> error if exceeding.
+>>>>>>
+>>>>>> Fixes: 3a1296a38d0c ("net: Support GRO/GSO fraglist chaining.")
+>>>>>> Signed-off-by: Shiming Cheng <shiming.cheng@mediatek.com>
+>>>>>> Signed-off-by: Lena Wang <lena.wang@mediatek.com>
+>>>>>> ---
+>>>>>>    net/core/filter.c | 5 +++++
+>>>>>>    1 file changed, 5 insertions(+)
+>>>>>>
+>>>>>> diff --git a/net/core/filter.c b/net/core/filter.c
+>>>>>> index 8adf95765cdd..8ed4d5d87167 100644
+>>>>>> --- a/net/core/filter.c
+>>>>>> +++ b/net/core/filter.c
+>>>>>> @@ -1662,6 +1662,11 @@ static DEFINE_PER_CPU(struct
+>> bpf_scratchpad,
+>>>>>> bpf_sp);
+>>>>>>    static inline int __bpf_try_make_writable(struct sk_buff
+>> *skb,
+>>>>>>      unsigned int write_len)
+>>>>>>    {
+>>>>>> +if (skb_is_gso(skb) &&
+>>>>>> +    (skb_shinfo(skb)->gso_type & SKB_GSO_FRAGLIST) &&
+>>>>>> +     write_len > skb_headlen(skb)) {
+>>>>>> +return -ENOMEM;
+>>>>>> +}
+>>>>>>    return skb_ensure_writable(skb, write_len);
+>>>
+>>> Dumb question, but should this guard be more generically part of
+>> skb_ensure_writable()
+>>> internals, presumably that would be inside pskb_may_pull_reason(),
+>> or only if we ever
+>>> see more code instances similar to this?
+>>
+>> Good point. Most callers of skb_ensure_writable correctly pull only
+>> headers, so wouldn't cause this problem. But it also adds coverage to
+>> things like tc pedit.
 > 
-> This is a nitpicky bikeshedding remark, but "slock_held" sounds really
-> awkward to me, something like "sk_locked" sounds much better.
-
-ok, will fix that in v3.
-
-[...]
-
-> > @@ -1876,18 +1878,15 @@ int cipso_v4_sock_setattr(struct sock *sk,
-> >  
-> >  	sk_inet = inet_sk(sk);
-> >  
-> > -	old = rcu_dereference_protected(sk_inet->inet_opt,
-> > -					lockdep_sock_is_held(sk));
-> > +	old = rcu_replace_pointer(sk_inet->inet_opt, opt, slock_held);
-> >  	if (inet_test_bit(IS_ICSK, sk)) {
-> >  		sk_conn = inet_csk(sk);
-> >  		if (old)
-> >  			sk_conn->icsk_ext_hdr_len -= old->opt.optlen;
-> > -		sk_conn->icsk_ext_hdr_len += opt->opt.optlen;
-> > +		sk_conn->icsk_ext_hdr_len += opt_len;
-> >  		sk_conn->icsk_sync_mss(sk, sk_conn->icsk_pmtu_cookie);
-> >  	}
-> > -	rcu_assign_pointer(sk_inet->inet_opt, opt);
-> > -	if (old)
-> > -		kfree_rcu(old, rcu);
-> > +	kfree_rcu(old, rcu);
+> Updated:
 > 
-> Thanks for sticking with this and posting a v2.
+>  From 3be30b8cf6e629f2615ef4eafe3b2a1c0d68c530 Mon Sep 17 00:00:00 2001
+> From: Shiming Cheng <shiming.cheng@mediatek.com>
+> Date: Sun, 28 Apr 2024 15:03:12 +0800
+> Subject: [PATCH net] net: prevent pulling SKB_GSO_FRAGLIST skb
 > 
-> These changes look okay to me, but considering the 'Fixes:' tag and the
-> RCU splat it is reasonable to expect that this is going to be backported
-> to the various stable trees.  With that in mind, I think we should try
-> to keep the immediate fix as simple as possible, saving the other
-> changes for a separate patch.  This means sticking with
-> rcu_dereference_protected() and omitting the opt_len optimization; both
-> can be done in a second patch without the 'Fixes:' marking.
+> BPF or TC callers may pull in a length longer than skb_headlen()
+> for a SKB_GSO_FRAGLIST skb. The data in fraglist will be pulled
+> into the linear space. However it destroys the skb's structure
+> and may result in an invalid segmentation or kernel exception.
 > 
-> Unless I missing something and those changes are somehow part of the
-> fix?
+> So we should add protection to stop the operation and return
+> error to remind callers.
+> 
+> Fixes: 3a1296a38d0c ("net: Support GRO/GSO fraglist chaining.")
+> Signed-off-by: Shiming Cheng <shiming.cheng@mediatek.com>
+> Signed-off-by: Lena Wang <lena.wang@mediatek.com>
+> ---
+>   include/linux/skbuff.h | 6 ++++++
+>   1 file changed, 6 insertions(+)
+> 
+> diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
+> index 9d24aec064e8..3eef65b3db24 100644
+> --- a/include/linux/skbuff.h
+> +++ b/include/linux/skbuff.h
+> @@ -2740,6 +2740,12 @@ pskb_may_pull_reason(struct sk_buff *skb,
+> unsigned int len)
+>   	if (unlikely(len > skb->len))
+>   		return SKB_DROP_REASON_PKT_TOO_SMALL;
+>   
+> +	if (skb_is_gso(skb) &&
+> +	    (skb_shinfo(skb)->gso_type & SKB_GSO_FRAGLIST) &&
+> +	     write_len > skb_headlen(skb)) {
+> +		return SKB_DROP_REASON_NOMEM;
+> +	}
 
-just checked, rcu_replace_pointer() can be used also in the oldest LTS
-but I'm not sure if kfree_rcu(NULL, ...) is ok. I agree to keep
-rcu_dereference_protected(), and the useless NULL check - I will
-follow-up with another patch (targeting net-next), after this one is
-merged.
+The 'write_len > skb_headlen(skb)' test is redundant, no ?
 
---
-davide
+It is covered by the earlier test :
+
+         if (likely(len <= skb_headlen(skb)))
+                 return SKB_NOT_DROPPED_YET;
+
+Also, was this patch even compile tested since there is no write_len var ?
+
+>   	if (unlikely(!__pskb_pull_tail(skb, len - skb_headlen(skb))))
+>   		return SKB_DROP_REASON_NOMEM;
+>   
+> 
 
 
