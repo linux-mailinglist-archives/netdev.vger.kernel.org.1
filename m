@@ -1,98 +1,105 @@
-Return-Path: <netdev+bounces-92182-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92183-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBD828B5C14
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 16:57:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EFE758B5C2B
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 17:00:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5D0F11F21246
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 14:57:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2D2701C210D4
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 15:00:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D5AB80023;
-	Mon, 29 Apr 2024 14:57:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECC647FBC8;
+	Mon, 29 Apr 2024 15:00:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="5kNs7mmv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DMZxveWv"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EFB37EEF2;
-	Mon, 29 Apr 2024 14:57:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C39AB7E0E8;
+	Mon, 29 Apr 2024 15:00:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714402663; cv=none; b=Tw9vvKVenAaR/KMT3G7X8tM20IX0cghrfCmDBYCS6urb//xg2WXw0xxqF3Fn1n6qPxrpw5kNK/il+7IMVTt7GLgPPF/JvT65jOUuSlwxhpLY/1R8WIMpjd/6iZkEW+/mU91qvDitWNohnqlrB0phk0UBQPwiKRQYYepTwXffXzk=
+	t=1714402825; cv=none; b=FRNBXoL2wKLQew6MHJBTV5kNn2EovUPhWq4GQ/sN0STv5ErGwSacbNJOuEuphhu86Du/o8AVyyeLM1DDcDvKHpR7rUJTwky1SXLvjfppUduz9nexWAzk2J1pRGzMiUfdUh4953lb/usQWyPDPoVDh/VvXchc2LioscYO4XsDE5s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714402663; c=relaxed/simple;
-	bh=IcugJ0QwbKQ6I/BOBlgoBQscijLsbDvk0jtQCL+HSjU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=q0p5NsCvlVFBVMuf/3IXrTRYEqTtu3GYnNpft9kynleG9KlwdoWPZmfjLYJhW0zQ1mzNiNIkrHqfTbU4ko8NZFHqSJrISrZd+KsamdVia+MVCU9ers7uDVbotE62O+H5jNl8osvGbLlfdEp2N2njd33fntnF5Nzmb2gVzWUo2/k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=5kNs7mmv; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=cWBfapoZi8jsbt7Iy+JKtlaopk7WUGuiHafZVePp7/w=; b=5kNs7mmveYPQjgP4V1Uy81UUsm
-	G1WP+1HAONV/YqfaHS9jlLRXy04i7tL67Yz7VRyu/TQ2w9Mcg1V3sgOaXpJcD1MHl9ir+tsKOT+Jv
-	TJcryVSOW+nIY1+6gM18qqyTpEkT/gdOCxn4FVhIQNv09WefiIxr0Ylx/YW6qMtPayZw=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1s1SRj-00EGI7-6N; Mon, 29 Apr 2024 16:57:35 +0200
-Date: Mon, 29 Apr 2024 16:57:35 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Kory Maincent <kory.maincent@bootlin.com>,
-	Mark Brown <broonie@kernel.org>,
-	Kyle Swenson <kyle.swenson@est.tech>,
-	Liam Girdwood <lgirdwood@gmail.com>, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: PoE complex usage of regulator API
-Message-ID: <5063429d-5dca-4538-b240-50c35cbf5e93@lunn.ch>
-References: <20240426124253.56fd0933@kmaincent-XPS-13-7390>
- <57a79abd-722c-4907-b0e7-2396392ae675@lunn.ch>
- <20240429145203.219bee06@kmaincent-XPS-13-7390>
- <Zi-vhKx-WlYPQe3c@pengutronix.de>
+	s=arc-20240116; t=1714402825; c=relaxed/simple;
+	bh=VmHwpGGRoY1SKBqjn2H7w2QMYcuoLTkqQAl5r7KlsGI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=UUxUuPC06T88u+d8HW66pt4RWpFuKqikfkKzD9+Uhjdt2cjbdu/9h9hZv82PYbL9iVm2ZS3pM+3wL9eI7kikGQUVDJCg/dJY3CnIbRVMnjOcrKgKULqmtyzurPn11ZNSB+K5eprjpnM5TVQvQWB2uG1uTgdRH2bI8f1RggBEFpM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DMZxveWv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E9C4FC113CD;
+	Mon, 29 Apr 2024 15:00:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714402824;
+	bh=VmHwpGGRoY1SKBqjn2H7w2QMYcuoLTkqQAl5r7KlsGI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=DMZxveWviuEWLZFgBKggE03uoHY90WE09ANHyLG4gJASmt4mNa+5VIz5ObPICztrc
+	 h+wv/AZNFm5LW8uFVX8qgCUadPzI6tBCobcXhDXg2gHjYF7mRo3qafoBfpu4iqLvD9
+	 fFZwvP213pB1zKMq1dc7wd0YbaABW1jJpz9acIvFycANUb4x183p7BOyGYFjujH2gk
+	 j9hovHIQkmPmEK8pLwtes1MxzgMDrbjHcUd/RaX0N0OwsScVKRWCe29HhHLDcD3ZRy
+	 fBGv72+KXijBcrKIuDoyXUb4pFCJ/pzioiz+R0A682ZyaMeec9fboohr0T1g0Bq/Lz
+	 FfzG+ThtxVviw==
+Date: Mon, 29 Apr 2024 08:00:22 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Mina Almasry <almasrymina@google.com>
+Cc: Dragos Tatulea <dtatulea@nvidia.com>, "davem@davemloft.net"
+ <davem@davemloft.net>, "pabeni@redhat.com" <pabeni@redhat.com>,
+ "ilias.apalodimas@linaro.org" <ilias.apalodimas@linaro.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "jacob.e.keller@intel.com" <jacob.e.keller@intel.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>, Jianbo Liu
+ <jianbol@nvidia.com>, "edumazet@google.com" <edumazet@google.com>
+Subject: Re: [RFC PATCH] net: Fix one page_pool page leak from
+ skb_frag_unref
+Message-ID: <20240429080022.214a9df9@kernel.org>
+In-Reply-To: <CAHS8izNs-LV=6FE39sjF3V7qVfveOsOAOJ_X62TSzWpvamsS0Q@mail.gmail.com>
+References: <20240424165646.1625690-2-dtatulea@nvidia.com>
+	<4ba023709249e11d97c78a98ac7db3b37f419960.camel@nvidia.com>
+	<CAHS8izMbAJHatnM6SvsZVLPY+N7LgGJg03pSdNfSRFCufGh9Zg@mail.gmail.com>
+	<4c20b500c2ed615aba424c0f3c7a79f5f5a04171.camel@nvidia.com>
+	<CAHS8izPkRJyLctmyj+Ppc5j3Qq5O1u3aPe5h9mnFNHDU2OxA=A@mail.gmail.com>
+	<20240426160859.0d85908e@kernel.org>
+	<CAHS8izNs-LV=6FE39sjF3V7qVfveOsOAOJ_X62TSzWpvamsS0Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Zi-vhKx-WlYPQe3c@pengutronix.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-> Since there is already support to work with current (I) values, there
-> are is also overcurrent protection. If a device is beyond the power
-> budget limit, it is practically an over current event. Regulator
-> framework already capable on handling some of this events, what we need
-> for PoE is prioritization. If we detect overcurrent on supply root/node
-> we need to shutdown enough low prio consumers to provide enough power
-> for the high prio consumers.
+On Fri, 26 Apr 2024 21:24:09 -0700 Mina Almasry wrote:
+> On Fri, Apr 26, 2024 at 4:09=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> =
+wrote:
+> >
+> > On Thu, 25 Apr 2024 12:20:59 -0700 Mina Almasry wrote: =20
+> > > -       if (recycle && napi_pp_get_page(page))
+> > > +       if (napi_pp_get_page(page)) =20
+> >
+> > Pretty sure you can't do that. The "recycle" here is a concurrency
+> > guarantee. A guarantee someone is holding a pp ref on that page,
+> > a ref which will not go away while napi_pp_get_page() is executing. =20
+>=20
+> I don't mean to argue, but I think the get_page()/put_page() pair we
+> do in the page ref path is susceptible to the same issue. AFAIU it's
+> not safe to get_page() if another CPU can be dropping the last ref,
+> get_page_unless_zero() should be used instead.
 
-So the assumption is we allow over provisioning?
+Whoever gave us the pointer to operate on has a reference, so the page
+can't disappear. get_page() is safe. The problem with pp is that we
+don't know whether the caller has a pp ref or a page ref. IOW the pp
+ref may not be owned by whoever called us.
 
-> > So there is a potential second user, that's great to hear it! Could the
-> > priority stuff be also interesting? Like to allow only high priority SFP to use
-> > higher power class in case of a limiting power budget.
+I guess the situation may actually be worse and we can only pp-ref a
+page if both "source" and "destination" skb has pp_recycle =3D 1 :S
 
-I was not expecting over-provisioning to happen. So prioritisation
-does not make much sense. You either have the power budget, or you
-don't. The SFP gets to use a higher power class if there is budget, or
-it is kept at a lower power class if there is no budget. I _guess_ you
-could give it a high power class, let it establish link, monitor its
-actual power consumption, and then decide to drop it to a lower class
-if the actual consumption indicates it could work at a lower
-class. But the danger is, you are going to loose link.
-
-I've no real experience with this, and all systems today hide this
-away in firmware, rather than have Linux control it.
-
-     Andrew
-
+> Since get_page() is good in the page ref path without some guarantee,
+> it's not obvious to me why we need this guarantee in the pp ref path,
+> but I could be missing some subtlety. At any rate, if you prefer us
+> going down the road of reverting commit 2cc3aeb5eccc ("skbuff: Fix a
+> potential race while recycling page_pool packets"), I think that could
+> also fix the issue.
 
