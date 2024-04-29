@@ -1,116 +1,121 @@
-Return-Path: <netdev+bounces-92151-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92149-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FCCA8B59E4
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 15:28:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CCEFC8B59D3
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 15:25:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CA7251F210B1
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 13:28:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 827EA1F24F84
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 13:25:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 002BD5F861;
-	Mon, 29 Apr 2024 13:28:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF68556B6C;
+	Mon, 29 Apr 2024 13:25:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="KRnjXvpl"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iwR95npn"
 X-Original-To: netdev@vger.kernel.org
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+Received: from mail-qk1-f182.google.com (mail-qk1-f182.google.com [209.85.222.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A12D7317F
-	for <netdev@vger.kernel.org>; Mon, 29 Apr 2024 13:28:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33D5D42055;
+	Mon, 29 Apr 2024 13:25:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714397299; cv=none; b=CgHj/buOsx1uIvDztwzwyj1loaBlQCKYo6A8ebf4+52hUfXfOv80nkPOLWZqh+12ORZ5psXUpHNqljgKETM4+hy2ezRpe1LN1sI88ldGxa+snJWanY8OQdNUZJb70oDJA96Ao1HzkLjUnu0hLLgJiiXwhitkGXld6tsY4FeuuBY=
+	t=1714397133; cv=none; b=q4vL3R/pa0e0L3TX6s0i2f3BXAOC+pzookvZ9dwqub6EbBkQF9FDPkPrerv1RS8gmiNnoQjnjFmOk52SeD++L/jUwDVaX25YoD6eELXYF0WBKFW58wteKBJ03vbshOBQIhyBe5n/aGYW54BIKALyUS5uKy8UtuRcM5DATaFKqD8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714397299; c=relaxed/simple;
-	bh=6hd2ZESwHfIxH8+Zvwh04skQgMyBwVzIqYlKEBIA0S4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RkrBXQpQMNyi69b5jaGHBfXxKbWlb+DZVO8SZHLS9ggPU3tIYHqtLNr6jQb7HqOLDsaLABBFfIAWHWL8EKb7TxGyYEaXDdp91NeA+/j9v1YBXAP1wLbxIWimkX8rUUCYZaAcQoasasEtl22FZ1jOJ5IIAXs+uKWYA6npWL8gqvY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=KRnjXvpl; arc=none smtp.client-ip=85.214.62.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from [127.0.0.1] (p578adb1c.dip0.t-ipconnect.de [87.138.219.28])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits))
-	(No client certificate requested)
-	(Authenticated sender: marex@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id 95CBA888EA;
-	Mon, 29 Apr 2024 15:28:14 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1714397295;
-	bh=v3578JMxi7WxGcVmX3sr/pNv0BW2+lSt7wC1vY49/JY=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=KRnjXvplmCQzf4QB59hxkDRWktSjfBwpb/exLlHo+T4+aprHHvyrqm6AkXqIVzJ6O
-	 8ERdalQnXAxH8AFwDcEgue4FEYRb0w942/N2lEqG4OG3tXyB0ynzL+4vQlkagWdKxa
-	 qGtCmZsumQWn/I2WD3Y53GW1j1/9zvQhx+8wq/qjXXAs+/0i97CAt6SpRI5M6Sr4Ij
-	 KoyVMgcta+nqUyA8p+ZtQutcpQua3HFJidb+sWpjOnDuO0ybP4AwDG6QEVzJtpjApS
-	 aT4Za/5pjmBhvo7Bgi8cvQu5EV6Sx8S6ESfeiMPf/y5Qp1j9erzwAkk9fjIikJVtHT
-	 MYuKvC/owpssA==
-Message-ID: <16f52bb6-59a1-4f6f-8d1a-c30198b0f743@denx.de>
-Date: Mon, 29 Apr 2024 15:23:18 +0200
+	s=arc-20240116; t=1714397133; c=relaxed/simple;
+	bh=OkGqsz24HaQ8U2SLy0X0H8hrrM/zi1dkI/vFgwhn/uQ=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=gyIxuStPRn8rtoQhwLT9uqKE9DN5rbSdgTmghsODoGWdGYRRTU/aE8/gvA0SVQDUNNDaJL2O4H/ug+3eqrxrKYAjKFshJ0ww1mnfqHxZXclAfxbEZCnAq1khoRQ8i3+Txe1qLOtR7AlfZdHPulruJm/Fiat6AwNuafD8oWpRXt4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iwR95npn; arc=none smtp.client-ip=209.85.222.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f182.google.com with SMTP id af79cd13be357-790fb2b780dso55842285a.0;
+        Mon, 29 Apr 2024 06:25:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1714397130; x=1715001930; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1cRqB/pgj2GzUQ8QqpEYAm3EnSOnu+i1KftcUkQHuOo=;
+        b=iwR95npnDYmpwzLAl04pqLIlzIzGY/St+actfwN1a0fBtKHZ/oq5D1tBhxM0xH2381
+         NniEltmADqe82W4+rTxD+CtWD07HGNJUFm2b5Wv4U+w1/zp4gHUCG+y37TungxyjdiCy
+         G0Wx6Dj07szgivNi1JpX16tMFHyRAzhoNqj8usq9ybouOAJfU1Aff8q2OgiW9GKA7qj3
+         xHBxJnySP3+lnoCg1ra0cy6HTA9u1vRrENECtXWwrfjHzlDFtLa5Vxed3B6DQupu2hET
+         NiNql8LLvb6ILD+aXx1cpBF9BKvsUwpR7ZExKBKIwrB6/LF10eQ1s5wQW/y0Qp260WEx
+         glPw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714397130; x=1715001930;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=1cRqB/pgj2GzUQ8QqpEYAm3EnSOnu+i1KftcUkQHuOo=;
+        b=uiE41OdtNrLI6gkF2uKCgvkEctRCWevw4maDVE1M2nvDbWjOJj5sFWk9Bp7bNlosBA
+         vY9+ibL2yKnSpAwOCfMKCf2yBNAEuRTeY57hXm8MOHW6AuaYMNBrEbq0Tw7B02hhmJov
+         E0B8AammkLfpVz6FnqCfxYwuUyJmHx4F2qbTxIiaE65EMU8K9sz/zHh/1D2+SEj0aZJs
+         NZycpmyfG/oahuB4teFO73Rv1FduvWaCxOUVsP6oM3Tr/SROSUs+E8PR756gx5hpzrYz
+         Py/NnXJ94REs0JNkqhbhfm/y8ZJiiF1dWY9cRB0lsoGI+bNu7KsG2ezu2yUboZrVC4dI
+         Cwiw==
+X-Forwarded-Encrypted: i=1; AJvYcCVwSHjYTOLsHsWoDeeEvxbOXppqIJ+6owRRSaV6sZlj6dSTHp7+vpBggZmjP2LmbRygnWOrbtmhugBK4973CO1xh4JiF7VF
+X-Gm-Message-State: AOJu0YytWtgvQI5afhEOuF4oo7FGSBswtOsbq9yZeLbwAh8wp856j+Uc
+	eZJy7HWILjYGTdrhQEiGu5TpaY8LmJoZZeDfNWSmz8Z/UtrahGx0
+X-Google-Smtp-Source: AGHT+IG9x6Gj2FQJ7A+ca3azZZYIXGA4pH/chdp4e42edoCOV+sYv8S45PCZtvS+Q0OSVBRLf1DUYg==
+X-Received: by 2002:a05:620a:1a28:b0:790:f03a:243f with SMTP id bk40-20020a05620a1a2800b00790f03a243fmr4628229qkb.46.1714397130011;
+        Mon, 29 Apr 2024 06:25:30 -0700 (PDT)
+Received: from localhost (164.146.150.34.bc.googleusercontent.com. [34.150.146.164])
+        by smtp.gmail.com with ESMTPSA id de28-20020a05620a371c00b0078d6b2b6fdbsm10352985qkb.133.2024.04.29.06.25.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 29 Apr 2024 06:25:29 -0700 (PDT)
+Date: Mon, 29 Apr 2024 09:25:29 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: shiming.cheng@mediatek.com, 
+ willemdebruijn.kernel@gmail.com, 
+ edumazet@google.com, 
+ davem@davemloft.net, 
+ kuba@kernel.org, 
+ pabeni@redhat.com, 
+ matthias.bgg@gmail.com
+Cc: linux-kernel@vger.kernel.org, 
+ netdev@vger.kernel.org, 
+ shiming.cheng@mediatek.com, 
+ Lena Wang <lena.wang@mediatek.com>
+Message-ID: <662f9fc92a908_2e2f1d294c2@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20240428143010.18719-1-shiming.cheng@mediatek.com>
+References: <20240428143010.18719-1-shiming.cheng@mediatek.com>
+Subject: Re: [PATCH net] net: drop pulled SKB_GSO_FRAGLIST skb
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2] net: ks8851: Handle softirqs at the end of IRQ thread
- to fix hang
-To: Ronald Wahl <ronald.wahl@raritan.com>, netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
- =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
- Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
- Dmitry Torokhov <dmitry.torokhov@gmail.com>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Mark Brown <broonie@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>
-References: <20240331142353.93792-1-marex@denx.de>
- <20240331142353.93792-2-marex@denx.de>
- <fa332bfc-68fb-4eea-a70a-8ac9c0d3c990@raritan.com>
-Content-Language: en-US
-From: Marek Vasut <marex@denx.de>
-In-Reply-To: <fa332bfc-68fb-4eea-a70a-8ac9c0d3c990@raritan.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On 4/29/24 1:46 PM, Ronald Wahl wrote:
-> Hi,
-
-Hi,
-
-> for the spi version of the chip this change now leads to
+shiming.cheng@ wrote:
+> From: Shiming Cheng <shiming.cheng@mediatek.com>
 > 
-> [   23.793000] BUG: sleeping function called from invalid context at 
-> kernel/locking/mutex.c:283
-> [   23.801915] in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 
-> 857, name: irq/52-eth-link
-> [   23.810895] preempt_count: 200, expected: 0
-> [   23.815288] CPU: 0 PID: 857 Comm: irq/52-eth-link Not tainted 
-> 6.6.28-sama5 #1
-> [   23.822790] Hardware name: Atmel SAMA5
-> [   23.826717]  unwind_backtrace from show_stack+0xb/0xc
-> [   23.831992]  show_stack from dump_stack_lvl+0x19/0x1e
-> [   23.837433]  dump_stack_lvl from __might_resched+0xb7/0xec
-> [   23.843122]  __might_resched from mutex_lock+0xf/0x2c
-> [   23.848540]  mutex_lock from ks8851_irq+0x1f/0x164
-> [   23.853525]  ks8851_irq from irq_thread_fn+0xf/0x28
-> [   23.858776]  irq_thread_fn from irq_thread+0x93/0x130
-> [   23.864037]  irq_thread from kthread+0x7f/0x90
-> [   23.868699]  kthread from ret_from_fork+0x11/0x1c
+> A SKB_GSO_FRAGLIST skb without GSO_BY_FRAGS is
+> expected to have all segments except the last
+> to be gso_size long. If this does not hold, the
+> skb has been modified and the fraglist gso integrity
+> is lost. Drop the packet, as it cannot be segmented
+> correctly by skb_segment_list.
 > 
-> Actually the spi driver variant does not suffer from the issue as it has
-> different locking so we probably should do the
-> local_bh_disable/local_bh_enable only for the "par" version. What do you 
-> think?
+> The skb could be salvaged. By linearizing, dropping
+> the SKB_GSO_FRAGLIST bit and entering the normal
+> skb_segment path rather than the skb_segment_list path.
+> 
+> That choice is currently made in the protocol caller,
+> __udp_gso_segment. It's not trivial to add such a
+> backup path here. So let's add this backstop against
+> kernel crashes.
+> 
+> Fixes: 3a1296a38d0c ("net: Support GRO/GSO fraglist chaining.")
+> Signed-off-by: Shiming Cheng <shiming.cheng@mediatek.com>
+> Signed-off-by: Lena Wang <lena.wang@mediatek.com>
 
-Ah sigh, sorry for the breakage. Indeed, the locking is not great here.
-
-I am not entirely sure about the local_bh_disable/enable being par only.
-
-I will try to prepare some sort of a patch, would you be willing to test 
-it on the SPI variant ?
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 
