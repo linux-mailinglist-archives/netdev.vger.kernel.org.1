@@ -1,312 +1,103 @@
-Return-Path: <netdev+bounces-92215-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92217-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F12F8B5FBC
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 19:11:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AD7E78B5FC8
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 19:12:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 42D231C21430
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 17:11:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DF6201C22366
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 17:12:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C524F86AE9;
-	Mon, 29 Apr 2024 17:11:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E67B86AE3;
+	Mon, 29 Apr 2024 17:12:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hSkNJHLQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECD0C8627B
-	for <netdev@vger.kernel.org>; Mon, 29 Apr 2024 17:11:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7806486AE2
+	for <netdev@vger.kernel.org>; Mon, 29 Apr 2024 17:12:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714410679; cv=none; b=lG3BpMqe59jPbgiAMNP+0OsPVWDb7bn6tbCElqmU7sErF1RsCklKpRPmYH7/wkuZlUifnEHLx6RpBNFFIUw93e+GX/ZOtNf5Z2f96KmJhIxAI2rWW1gSpBACiYXfXhZxj8RNdQAJ5G1Qz1V5qFAgA75KY7kEmGJyNTx+ccCbqOo=
+	t=1714410756; cv=none; b=PpYLGXO1S8vWcxEX5tgTCk75EYjMY8/wDbQ+YEqojfmIvFk5A8Bn6Epaf30n0ICWDH5DWnpsezzM6Fkb6W2lO6wTMKTsWfNq3CuYqutsp+GEbAqn3+XJV+j8d745zVnKxKqtIQ5G1bTVbI2E1lPB2kU/u2eFNJ7C0y3jyfb9UJ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714410679; c=relaxed/simple;
-	bh=+9MR4piNIv+zjuZgXxfP5lKUsdj0hQNwsnNEuUfFDXY=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=WtqFKJ8gx+xGm8n7bb2CO3/4lR5jqZCPYN4U04Kygsn6YUBVibTeM6Uhq/6b+dPwGjT2ZX7kK7d4LKL0K4UbpmtfrmqrqnEAe30FoqIUk1zxgQMgPt9b4UJhDSbYhbLS69JxMqR/Wfdt8KsrTUMs6gYtTctlOlU7uKmkgQGtACQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1s1UX4-00017B-VA
-	for netdev@vger.kernel.org; Mon, 29 Apr 2024 19:11:14 +0200
-Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1s1UX4-00F1IH-Ex
-	for netdev@vger.kernel.org; Mon, 29 Apr 2024 19:11:14 +0200
-Received: from dspam.blackshift.org (localhost [127.0.0.1])
-	by bjornoya.blackshift.org (Postfix) with SMTP id 2970C2C22F9
-	for <netdev@vger.kernel.org>; Mon, 29 Apr 2024 17:11:14 +0000 (UTC)
-Received: from hardanger.blackshift.org (unknown [172.20.34.65])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by bjornoya.blackshift.org (Postfix) with ESMTPS id 6B9A22C22DC;
-	Mon, 29 Apr 2024 17:11:12 +0000 (UTC)
-Received: from [172.20.34.65] (localhost [::1])
-	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id 3a2fb012;
-	Mon, 29 Apr 2024 17:11:11 +0000 (UTC)
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-Date: Mon, 29 Apr 2024 19:10:59 +0200
-Subject: [PATCH 3/3] can: mcp251xfd: move chip sleep mode into runtime pm
+	s=arc-20240116; t=1714410756; c=relaxed/simple;
+	bh=YnNGZkFthO+IGKLSlO4AbJTNHdTC6vMFBv2xF3NYB/8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=VJlnqO5HvE0qEhXjrHKXlTIBxscncatozo20k6usgbX9K7DoXUs5iyakg3E7sUx9NsnaPvZOP+slZhEMrIXmGlb8G5+K7kPFxADkc5ZxHmCGNzHqYoC+D5vGTHto5MDePLH98b6ADSp+RHHjyhQMBHSe7ZenUwesAlRYCUUbFeQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hSkNJHLQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A7C4EC4AF1B;
+	Mon, 29 Apr 2024 17:12:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714410756;
+	bh=YnNGZkFthO+IGKLSlO4AbJTNHdTC6vMFBv2xF3NYB/8=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=hSkNJHLQQAtbiV0p4L0ihQ/BnCkQYh1iD4yZdYvEH3atNpHnN4pHfAxQQk88EH8uM
+	 mUPPwcM9Ue8Nt9+TUupDs+iYi4h/UkNuWI9QWrNqYwAr0lpbbw4hfHJ5eR3HVxP76t
+	 XYOM0I30JpZa3UREKjMUOzX68zHfEMbUMiDiemW7UWcb6IO9teoSeNAzTEr21alN7E
+	 iEcNsrijc2Z0WvKje9g3ODiKlLlhxBC69Smyo7YJKR+xgdd5bql/sdp2ATqvfI6WRI
+	 3AM5CQSWBEvv3zp2FcXE9RYvcVp5Tqq6iPK1NjvjAfxAstoLn45uWj9duDFwLOj9lK
+	 +dPHm3+/6WmBA==
+Message-ID: <b3fffc10-3671-4a00-b1e4-6f0f8cd861da@kernel.org>
+Date: Mon, 29 Apr 2024 11:12:34 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 0/5] net: three additions to net_hotdata
+Content-Language: en-US
+To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com
+References: <20240429134025.1233626-1-edumazet@google.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20240429134025.1233626-1-edumazet@google.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240429-mcp251xfd-runtime_pm-v1-3-c26a93a66544@pengutronix.de>
-References: <20240429-mcp251xfd-runtime_pm-v1-0-c26a93a66544@pengutronix.de>
-In-Reply-To: <20240429-mcp251xfd-runtime_pm-v1-0-c26a93a66544@pengutronix.de>
-To: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>, 
- Thomas Kopp <thomas.kopp@microchip.com>, 
- Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
- Gregor Herburger <gregor.herburger@ew.tq-group.com>
-Cc: linux-can@vger.kernel.org, netdev@vger.kernel.org, 
- kernel@pengutronix.de, Marc Kleine-Budde <mkl@pengutronix.de>
-X-Mailer: b4 0.14-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=6388; i=mkl@pengutronix.de;
- h=from:subject:message-id; bh=+9MR4piNIv+zjuZgXxfP5lKUsdj0hQNwsnNEuUfFDXY=;
- b=owGbwMvMwMWoYbHIrkp3Tz7jabUkhjT9K2tuKeb/WHqjPqftXWdy1UfjY5zp5aWxHS/ftiXUR
- U7fXejTyWjEwsDIxSArpsgS4LCr7cE2lruae+ziYQaxMoFMYeDiFICJPO1h/8wSMtuQr2KjqPRv
- 0UTXT/ZvnXyaP7G/vcJjdkKVqbjW1/utxK1Lgucsuf7v2Wnj8C5ZXHDLmhV65yJjJ0WaW736dv/
- y5T9lby2LAnb7XVpg2aD8POSou086V8HaiAjnJ4u8g3cWJDYnF6e71Su2uzF/+rxhw8bK6vo1S8
- 2uXDFTahVcf+f8Desfbatqrd9bqWf7Z8mt1/hx6IqtdcD0sr2BVQxsNR1Gf3YyZz9N7PC5rj0hf
- OO6Z1I9JYXXutPLLrrk37QvnsR3rzdJUyRLW17RZ6W1yZZTkxul6wz9b2Y6sZ89Y/Z0eQHPW3Z/
- gRwWVt/Nfyv0pZ9K7HDnuTtdu2578KGFTrolK8/cew8A
-X-Developer-Key: i=mkl@pengutronix.de; a=openpgp;
- fpr=C1400BA0B3989E6FBC7D5B5C2B5EE211C58AEA54
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-This is a preparation patch to add GPIO support.
+On 4/29/24 7:40 AM, Eric Dumazet wrote:
+> This series moves three fast path sysctls to net_hotdata.
+> 
+> To avoid <net/hotdata.h> inclusion from <net/sock.h>,
+> create <net/proto_memory.h> to hold proto memory definitions.
+> 
+> Eric Dumazet (5):
+>   net: move sysctl_max_skb_frags to net_hotdata
+>   net: move sysctl_skb_defer_max to net_hotdata
+>   tcp: move tcp_out_of_memory() to net/ipv4/tcp.c
+>   net: add <net/proto_memory.h>
+>   net: move sysctl_mem_pcpu_rsv to net_hotdata
+> 
+>  include/linux/skbuff.h     |  2 -
+>  include/net/hotdata.h      |  3 ++
+>  include/net/proto_memory.h | 83 ++++++++++++++++++++++++++++++++++++++
+>  include/net/sock.h         | 78 -----------------------------------
+>  include/net/tcp.h          | 10 +----
+>  net/core/dev.c             |  1 -
+>  net/core/dev.h             |  1 -
+>  net/core/hotdata.c         |  7 +++-
+>  net/core/skbuff.c          |  7 +---
+>  net/core/sock.c            |  2 +-
+>  net/core/sysctl_net_core.c |  7 ++--
+>  net/ipv4/proc.c            |  1 +
+>  net/ipv4/tcp.c             | 14 ++++++-
+>  net/ipv4/tcp_input.c       |  1 +
+>  net/ipv4/tcp_output.c      |  1 +
+>  net/mptcp/protocol.c       |  3 +-
+>  net/sctp/sm_statefuns.c    |  1 +
+>  17 files changed, 117 insertions(+), 105 deletions(-)
+>  create mode 100644 include/net/proto_memory.h
+> 
 
-Up to now, the Vdd regulator and the clocks have been managed by
-Runtime-PM (on systems without CONFIG_PM these remain permanently
-switched on).
+For the set:
 
-During the mcp251xfd_open() callback the mcp251xfd is powered,
-soft-reset and configured. In mcp251xfd_stop() the chip is shut down
-again. To support the on-chip GPIOs, the chip must be supplied with
-power while GPIOs are being requested, even if the networking
-interface ist down.
-
-To support this, move the functions mcp251xfd_chip_softreset() and
-mcp251xfd_chip_clock_init() from mcp251xfd_chip_start() to
-mcp251xfd_runtime_resume(). Instead of setting the controller to sleep
-mode in mcp251xfd_chip_stop(), bring it into configuration mode. This
-way it doesn't take part in bus activity and doesn't enter sleep mode.
-
-Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
----
- drivers/net/can/spi/mcp251xfd/mcp251xfd-core.c | 99 ++++++++++++++++----------
- 1 file changed, 61 insertions(+), 38 deletions(-)
-
-diff --git a/drivers/net/can/spi/mcp251xfd/mcp251xfd-core.c b/drivers/net/can/spi/mcp251xfd/mcp251xfd-core.c
-index 4ae201426a46..4739ad80ef2a 100644
---- a/drivers/net/can/spi/mcp251xfd/mcp251xfd-core.c
-+++ b/drivers/net/can/spi/mcp251xfd/mcp251xfd-core.c
-@@ -745,21 +745,13 @@ static void mcp251xfd_chip_stop(struct mcp251xfd_priv *priv,
- 	mcp251xfd_chip_interrupts_disable(priv);
- 	mcp251xfd_chip_rx_int_disable(priv);
- 	mcp251xfd_timestamp_stop(priv);
--	mcp251xfd_chip_sleep(priv);
-+	mcp251xfd_chip_set_mode(priv, MCP251XFD_REG_CON_MODE_CONFIG);
- }
- 
- static int mcp251xfd_chip_start(struct mcp251xfd_priv *priv)
- {
- 	int err;
- 
--	err = mcp251xfd_chip_softreset(priv);
--	if (err)
--		goto out_chip_stop;
--
--	err = mcp251xfd_chip_clock_init(priv);
--	if (err)
--		goto out_chip_stop;
--
- 	err = mcp251xfd_chip_timestamp_init(priv);
- 	if (err)
- 		goto out_chip_stop;
-@@ -1602,8 +1594,11 @@ static int mcp251xfd_open(struct net_device *ndev)
- 		return err;
- 
- 	err = pm_runtime_resume_and_get(ndev->dev.parent);
--	if (err)
-+	if (err) {
-+		if (err == -ETIMEDOUT || err == -ENODEV)
-+			pm_runtime_set_suspended(ndev->dev.parent);
- 		goto out_close_candev;
-+	}
- 
- 	err = mcp251xfd_ring_alloc(priv);
- 	if (err)
-@@ -1872,53 +1867,53 @@ static int mcp251xfd_register(struct mcp251xfd_priv *priv)
- 	struct net_device *ndev = priv->ndev;
- 	int err;
- 
-+	mcp251xfd_register_quirks(priv);
-+
- 	err = mcp251xfd_clks_and_vdd_enable(priv);
- 	if (err)
- 		return err;
- 
-+	err = mcp251xfd_chip_softreset(priv);
-+	if (err == -ENODEV)
-+		goto out_clks_and_vdd_disable;
-+	if (err)
-+		goto out_chip_sleep;
-+
-+	err = mcp251xfd_chip_clock_init(priv);
-+	if (err == -ENODEV)
-+		goto out_clks_and_vdd_disable;
-+	if (err)
-+		goto out_chip_sleep;
-+
- 	pm_runtime_get_noresume(ndev->dev.parent);
- 	err = pm_runtime_set_active(ndev->dev.parent);
- 	if (err)
- 		goto out_runtime_put_noidle;
- 	pm_runtime_enable(ndev->dev.parent);
- 
--	mcp251xfd_register_quirks(priv);
--
--	err = mcp251xfd_chip_softreset(priv);
--	if (err == -ENODEV)
--		goto out_runtime_disable;
--	if (err)
--		goto out_chip_sleep;
--
--	err = mcp251xfd_chip_clock_init(priv);
--	if (err == -ENODEV)
--		goto out_runtime_disable;
--	if (err)
--		goto out_chip_sleep;
--
- 	err = mcp251xfd_register_chip_detect(priv);
- 	if (err)
--		goto out_chip_sleep;
-+		goto out_runtime_disable;
- 
- 	err = mcp251xfd_register_check_rx_int(priv);
- 	if (err)
--		goto out_chip_sleep;
-+		goto out_runtime_disable;
- 
- 	mcp251xfd_ethtool_init(priv);
- 
- 	err = register_candev(ndev);
- 	if (err)
--		goto out_chip_sleep;
-+		goto out_runtime_disable;
- 
- 	err = mcp251xfd_register_done(priv);
- 	if (err)
- 		goto out_unregister_candev;
- 
--	/* Put controller into sleep mode and let pm_runtime_put()
--	 * disable the clocks and vdd. If CONFIG_PM is not enabled,
--	 * the clocks and vdd will stay powered.
-+	/* Put controller into Config mode and let pm_runtime_put()
-+	 * put in sleep mode, disable the clocks and vdd. If CONFIG_PM
-+	 * is not enabled, the clocks and vdd will stay powered.
- 	 */
--	err = mcp251xfd_chip_sleep(priv);
-+	err = mcp251xfd_chip_set_mode(priv, MCP251XFD_REG_CON_MODE_CONFIG);
- 	if (err)
- 		goto out_unregister_candev;
- 
-@@ -1928,12 +1923,13 @@ static int mcp251xfd_register(struct mcp251xfd_priv *priv)
- 
- out_unregister_candev:
- 	unregister_candev(ndev);
--out_chip_sleep:
--	mcp251xfd_chip_sleep(priv);
- out_runtime_disable:
- 	pm_runtime_disable(ndev->dev.parent);
- out_runtime_put_noidle:
- 	pm_runtime_put_noidle(ndev->dev.parent);
-+out_chip_sleep:
-+	mcp251xfd_chip_sleep(priv);
-+out_clks_and_vdd_disable:
- 	mcp251xfd_clks_and_vdd_disable(priv);
- 
- 	return err;
-@@ -1945,10 +1941,12 @@ static inline void mcp251xfd_unregister(struct mcp251xfd_priv *priv)
- 
- 	unregister_candev(ndev);
- 
--	if (pm_runtime_enabled(ndev->dev.parent))
-+	if (pm_runtime_enabled(ndev->dev.parent)) {
- 		pm_runtime_disable(ndev->dev.parent);
--	else
-+	} else {
-+		mcp251xfd_chip_sleep(priv);
- 		mcp251xfd_clks_and_vdd_disable(priv);
-+	}
- }
- 
- static const struct of_device_id mcp251xfd_of_match[] = {
-@@ -2175,16 +2173,41 @@ static void mcp251xfd_remove(struct spi_device *spi)
- 
- static int __maybe_unused mcp251xfd_runtime_suspend(struct device *device)
- {
--	const struct mcp251xfd_priv *priv = dev_get_drvdata(device);
-+	struct mcp251xfd_priv *priv = dev_get_drvdata(device);
- 
-+	mcp251xfd_chip_sleep(priv);
- 	return mcp251xfd_clks_and_vdd_disable(priv);
- }
- 
- static int __maybe_unused mcp251xfd_runtime_resume(struct device *device)
- {
--	const struct mcp251xfd_priv *priv = dev_get_drvdata(device);
-+	struct mcp251xfd_priv *priv = dev_get_drvdata(device);
-+	int err;
- 
--	return mcp251xfd_clks_and_vdd_enable(priv);
-+	err = mcp251xfd_clks_and_vdd_enable(priv);
-+	if (err)
-+		return err;
-+
-+	err = mcp251xfd_chip_softreset(priv);
-+	if (err == -ENODEV)
-+		goto out_clks_and_vdd_disable;
-+	if (err)
-+		goto out_chip_sleep;
-+
-+	err = mcp251xfd_chip_clock_init(priv);
-+	if (err == -ENODEV)
-+		goto out_clks_and_vdd_disable;
-+	if (err)
-+		goto out_chip_sleep;
-+
-+	return 0;
-+
-+out_chip_sleep:
-+	mcp251xfd_chip_sleep(priv);
-+out_clks_and_vdd_disable:
-+	mcp251xfd_clks_and_vdd_disable(priv);
-+
-+	return err;
- }
- 
- static const struct dev_pm_ops mcp251xfd_pm_ops = {
-
--- 
-2.43.0
-
+Reviewed-by: David Ahern <dsahern@kernel.org>
 
 
