@@ -1,105 +1,73 @@
-Return-Path: <netdev+bounces-92183-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92184-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EFE758B5C2B
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 17:00:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 462E88B5C3F
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 17:02:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2D2701C210D4
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 15:00:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0B54E28352F
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 15:02:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECC647FBC8;
-	Mon, 29 Apr 2024 15:00:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EAB280624;
+	Mon, 29 Apr 2024 15:02:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DMZxveWv"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Ash2DRyD"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C39AB7E0E8;
-	Mon, 29 Apr 2024 15:00:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E16247E0E8;
+	Mon, 29 Apr 2024 15:02:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714402825; cv=none; b=FRNBXoL2wKLQew6MHJBTV5kNn2EovUPhWq4GQ/sN0STv5ErGwSacbNJOuEuphhu86Du/o8AVyyeLM1DDcDvKHpR7rUJTwky1SXLvjfppUduz9nexWAzk2J1pRGzMiUfdUh4953lb/usQWyPDPoVDh/VvXchc2LioscYO4XsDE5s=
+	t=1714402930; cv=none; b=sU7XRliZDMY+zriYrA/5Y9XKoEm5wvxqIdXqW2yIVA5Qr3q5/tetF3yq4u+25kLLf8BAA+jnZf3a+rLa/JrGpCSViNQQ12tWjitAWaZ6Qluher/m8ykrWQBtYRGIdDD6JEYsqEJ+K5hbDnWtMk8IdaPgoTyVPR69ykyGjZ5IZUs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714402825; c=relaxed/simple;
-	bh=VmHwpGGRoY1SKBqjn2H7w2QMYcuoLTkqQAl5r7KlsGI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=UUxUuPC06T88u+d8HW66pt4RWpFuKqikfkKzD9+Uhjdt2cjbdu/9h9hZv82PYbL9iVm2ZS3pM+3wL9eI7kikGQUVDJCg/dJY3CnIbRVMnjOcrKgKULqmtyzurPn11ZNSB+K5eprjpnM5TVQvQWB2uG1uTgdRH2bI8f1RggBEFpM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DMZxveWv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E9C4FC113CD;
-	Mon, 29 Apr 2024 15:00:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714402824;
-	bh=VmHwpGGRoY1SKBqjn2H7w2QMYcuoLTkqQAl5r7KlsGI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=DMZxveWviuEWLZFgBKggE03uoHY90WE09ANHyLG4gJASmt4mNa+5VIz5ObPICztrc
-	 h+wv/AZNFm5LW8uFVX8qgCUadPzI6tBCobcXhDXg2gHjYF7mRo3qafoBfpu4iqLvD9
-	 fFZwvP213pB1zKMq1dc7wd0YbaABW1jJpz9acIvFycANUb4x183p7BOyGYFjujH2gk
-	 j9hovHIQkmPmEK8pLwtes1MxzgMDrbjHcUd/RaX0N0OwsScVKRWCe29HhHLDcD3ZRy
-	 fBGv72+KXijBcrKIuDoyXUb4pFCJ/pzioiz+R0A682ZyaMeec9fboohr0T1g0Bq/Lz
-	 FfzG+ThtxVviw==
-Date: Mon, 29 Apr 2024 08:00:22 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Mina Almasry <almasrymina@google.com>
-Cc: Dragos Tatulea <dtatulea@nvidia.com>, "davem@davemloft.net"
- <davem@davemloft.net>, "pabeni@redhat.com" <pabeni@redhat.com>,
- "ilias.apalodimas@linaro.org" <ilias.apalodimas@linaro.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "jacob.e.keller@intel.com" <jacob.e.keller@intel.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>, Jianbo Liu
- <jianbol@nvidia.com>, "edumazet@google.com" <edumazet@google.com>
-Subject: Re: [RFC PATCH] net: Fix one page_pool page leak from
- skb_frag_unref
-Message-ID: <20240429080022.214a9df9@kernel.org>
-In-Reply-To: <CAHS8izNs-LV=6FE39sjF3V7qVfveOsOAOJ_X62TSzWpvamsS0Q@mail.gmail.com>
-References: <20240424165646.1625690-2-dtatulea@nvidia.com>
-	<4ba023709249e11d97c78a98ac7db3b37f419960.camel@nvidia.com>
-	<CAHS8izMbAJHatnM6SvsZVLPY+N7LgGJg03pSdNfSRFCufGh9Zg@mail.gmail.com>
-	<4c20b500c2ed615aba424c0f3c7a79f5f5a04171.camel@nvidia.com>
-	<CAHS8izPkRJyLctmyj+Ppc5j3Qq5O1u3aPe5h9mnFNHDU2OxA=A@mail.gmail.com>
-	<20240426160859.0d85908e@kernel.org>
-	<CAHS8izNs-LV=6FE39sjF3V7qVfveOsOAOJ_X62TSzWpvamsS0Q@mail.gmail.com>
+	s=arc-20240116; t=1714402930; c=relaxed/simple;
+	bh=uXR2C2zdCLSmD0RP0XnuR32Du5EyvSSAy0wrm3IQp6I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Nwtav7sy/RUqQnqUQeZujqO1JELpuIeDDnCE0aZGIo16TBkP+TvmueSYNEoKKnaOKjR4geI86Q0QQyk/liMRREF7VijLes5dtZM/qt9YjlBnsN9S+81I7gBlX+iSAgpmqD3xyp1ceBix3vDkcb/Pjrw6fj1+Xig0GMHxM3Fg8/c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Ash2DRyD; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=I5imaSlytIgQxMA+frMHaOvS86c3yZoGnlyXDQjIMhU=; b=Ash2DRyDdKuOEDjdwMXEIJXrAw
+	fv5bH5PaLkfyqGbBTSzStqqngil/XDPHFGuQS18L1q1UE4r3Kn50wk9o2i/I1tJ2SHDytgdE/Z+SE
+	1aRIlbwywpiz3ZL+CN629zHTKCVHbl7aTHeqVIhkupRE2A9wdCHFYgGI3CIg2CZbjVYY=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1s1SVv-00EGK1-Vi; Mon, 29 Apr 2024 17:01:55 +0200
+Date: Mon, 29 Apr 2024 17:01:55 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, linux-kselftest@vger.kernel.org,
+	willemdebruijn.kernel@gmail.com
+Subject: Re: [PATCH net-next 0/6] selftests: net: page_poll allocation error
+ injection
+Message-ID: <f59287a5-99ba-4f37-8019-b176f0307ec3@lunn.ch>
+References: <20240426232400.624864-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240426232400.624864-1-kuba@kernel.org>
 
-On Fri, 26 Apr 2024 21:24:09 -0700 Mina Almasry wrote:
-> On Fri, Apr 26, 2024 at 4:09=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> =
-wrote:
-> >
-> > On Thu, 25 Apr 2024 12:20:59 -0700 Mina Almasry wrote: =20
-> > > -       if (recycle && napi_pp_get_page(page))
-> > > +       if (napi_pp_get_page(page)) =20
-> >
-> > Pretty sure you can't do that. The "recycle" here is a concurrency
-> > guarantee. A guarantee someone is holding a pp ref on that page,
-> > a ref which will not go away while napi_pp_get_page() is executing. =20
->=20
-> I don't mean to argue, but I think the get_page()/put_page() pair we
-> do in the page ref path is susceptible to the same issue. AFAIU it's
-> not safe to get_page() if another CPU can be dropping the last ref,
-> get_page_unless_zero() should be used instead.
+> I'm not super happy with the traffic generation using iperf3,
+> my initial approach was to use mausezahn. But it turned out to be
+> 5x slower in terms of PPS. Hopefully this is good enough for now.
 
-Whoever gave us the pointer to operate on has a reference, so the page
-can't disappear. get_page() is safe. The problem with pp is that we
-don't know whether the caller has a pp ref or a page ref. IOW the pp
-ref may not be owned by whoever called us.
+How important is PPS? In order to get 'Maintained' status, automotive
+vendors are going to want to test their 10Mbps T1 links.
 
-I guess the situation may actually be worse and we can only pp-ref a
-page if both "source" and "destination" skb has pp_recycle =3D 1 :S
-
-> Since get_page() is good in the page ref path without some guarantee,
-> it's not obvious to me why we need this guarantee in the pp ref path,
-> but I could be missing some subtlety. At any rate, if you prefer us
-> going down the road of reverting commit 2cc3aeb5eccc ("skbuff: Fix a
-> potential race while recycling page_pool packets"), I think that could
-> also fix the issue.
+	Andrew
 
