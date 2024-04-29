@@ -1,159 +1,164 @@
-Return-Path: <netdev+bounces-92190-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92192-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 736198B5D77
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 17:23:45 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2AF5D8B5DE9
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 17:40:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 146181F21B89
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 15:23:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D46F8B22B8B
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 15:38:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 350A781745;
-	Mon, 29 Apr 2024 15:20:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E745F823A2;
+	Mon, 29 Apr 2024 15:38:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="zpGPjFtn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="De4NP2yx"
 X-Original-To: netdev@vger.kernel.org
-Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56B27823B7;
-	Mon, 29 Apr 2024 15:20:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFC007F487;
+	Mon, 29 Apr 2024 15:38:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714404035; cv=none; b=g7VZv5WxYiaXAZ4j8cQdaK3UIqXDQuTlYIk6lskpCCBnKOsv0VX61Udq1vOgx1fyZP47DvoPPDv/xk402YgeUvWmx1ROqbOK0l6xStG92WKJFOWkqAR9sJC9LZain4ogrixvIsB1F17mPVSS1XtNXOwnlGVP0F/UhOgCaMjhPvY=
+	t=1714405093; cv=none; b=hkii+Tjosr365tneensqB5NpkjMuQrTa+YFctV0KyU19WTIe+Evm26W73jOLVwTodrQ2BZ5BQMxAv9ruP6j0MaJvXo/YVCIc326hGVahTESnGtdER+KC3vlnFcTqF+9SwYh3kbqtWLXvY0Cl9zouoDUqJjd2PDZN4TVG1GIefXY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714404035; c=relaxed/simple;
-	bh=PKPAWpRk72Gmqc3xXY6xgd8eKht2/V+7i35EFFUDGpM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=i++10RNHdPLSxAKV59Brjr6YQ3wsOPwNTgSnAOHG6zk/D5Y/t6Z7uMnTYCErpN/Rk8k5Q67zBjBp70G0p3yBK3HCY3e1BTg4IVj5Zm7ZzKTjBQrRWUz8bPu01pTxSRnrzMukEXUCRU5S3qBIJu1Ns4KYrChGmEvy8tsg+MhWc/I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=zpGPjFtn; arc=none smtp.client-ip=144.76.82.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=From:Cc:To:Date:Message-ID;
-	bh=A9ktU0Nf4obPdWQwapwO4Fue1aOYnmHa/ofJdgBDRUs=; b=zpGPjFtnZ6GaKQKZXq10ucwhLa
-	VtWqH5hnkxprC+3k6fB9xaso9eMcly2wLESyp0c3jeqr+FDBkGrf4KA826rEe5bgeeAWyHm/1bCaV
-	c3Dbuc9KRF9o6QxxdqZGbz1oxJ5h5iG9JqJT2iHL662kdkfqfQ4qf9LQgZrKaIc5+yGQvMnpXnBnY
-	lx02FXgcCQH0zOCSIFLs0k5MA5RaTZyLkG9Q/9n2WpVTHbHtFMM+ZhWZQzMkUpTvetstaVzQOQFZT
-	8ravFC28+1TzSrjmri3stsdv6t6nOoVdbvqrCJ6b0WyDVkNLfnsXCBsNhBoFCeQ0uZRdhhMlQ7jLX
-	3UE51s8mvFl1xn4CA23bNBN1eYeyhUdME1u3Gymq/elQsggrCstgeG3vX8B8bH1r/HuaBhtaXSbSp
-	chjmGOmRHh0BR7+z3IwE9VswiihPuEgnJ8bmZIk5bUY2mx3GUM4NZNhz9hB7CYFlZqLQK1lrDiXFv
-	qmpIWBbP36Ms89qytcWuukrU;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1s1Snn-008ww2-0f;
-	Mon, 29 Apr 2024 15:20:23 +0000
-Message-ID: <2365b657-bea4-4527-9fce-ad11c690bde3@samba.org>
-Date: Mon, 29 Apr 2024 17:20:22 +0200
+	s=arc-20240116; t=1714405093; c=relaxed/simple;
+	bh=ly8rcgZd4JErsD1woWLcZbIKhq8mxl/wpftoaI/yZJA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=I7gn9xQA70Uh7W9ndxjQPRdmBoBwp8k+QukowtgRChWCZwvsdnPu0YThYkpGBH7a6nBArgTd29cARc6k9zytPX2Ri6aN7fW1s9i422/jLZKgBXg8t6EiV/U1n2HYHGup5ThVrpXkMSqRS2P/kkfgrEddSQyoH9yq+67rs16izwI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=De4NP2yx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1A90C4AF14;
+	Mon, 29 Apr 2024 15:38:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714405093;
+	bh=ly8rcgZd4JErsD1woWLcZbIKhq8mxl/wpftoaI/yZJA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=De4NP2yxDV3QCA73CgXXmVmBw6RyjAg44x00dghbOwaSiNtjx+n3UifNCYvTcZZzi
+	 +SfvjsUQOm6Qbksxs8qHx5gnVMEuOFQHhXfRuoGUW9hdrbtxMlEl3E6+FFuYtijPTG
+	 lCB/MO2rssRosHjrqGq85plIlefugvA2nHV25zrABVby7cgaaWPcaqbDk9TvR6lSFo
+	 4TVfn7ncaMzk6uc131MC0HANcCcFh1pBVlHmS6lMdz9Fs6nohdCeElUKydCDbDrrZz
+	 /sr4SunWBgRR2QpuhOeMfDYsihcgHK6uE2lqoa9M/9z80SF+KnKtLFmVjtRgMOd8sJ
+	 a4AzZ8Gyv0vUg==
+Date: Tue, 30 Apr 2024 00:38:10 +0900
+From: Mark Brown <broonie@kernel.org>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+	Kyle Swenson <kyle.swenson@est.tech>,
+	Liam Girdwood <lgirdwood@gmail.com>, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Subject: Re: PoE complex usage of regulator API
+Message-ID: <Zi--4ko_vAtFSxyn@finisterre.sirena.org.uk>
+References: <20240426124253.56fd0933@kmaincent-XPS-13-7390>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH net-next 0/5] net: In-kernel QUIC implementation with
- Userspace handshake
-To: Xin Long <lucien.xin@gmail.com>
-Cc: network dev <netdev@vger.kernel.org>, davem@davemloft.net,
- kuba@kernel.org, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Steve French <smfrench@gmail.com>,
- Namjae Jeon <linkinjeon@kernel.org>, Chuck Lever III
- <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>,
- Sabrina Dubroca <sd@queasysnail.net>, Tyler Fanelli <tfanelli@redhat.com>,
- Pengtao He <hepengtao@xiaomi.com>,
- "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
- Samba Technical <samba-technical@lists.samba.org>
-References: <cover.1710173427.git.lucien.xin@gmail.com>
- <74d5db09-6b5c-4054-b9d3-542f34769083@samba.org>
- <CADvbK_dzVcDKsJ9RN9oc0K1Jwd+kYjxgE6q=ioRbVGhJx7Qznw@mail.gmail.com>
- <f427b422-6cfc-45ac-88eb-3e7694168b63@samba.org>
- <CADvbK_cA-RCLiUUWkyNsS=4OhkWrUWb68QLg28yO2=8PqNuGBQ@mail.gmail.com>
- <438496a6-7f90-403d-9558-4a813e842540@samba.org>
- <CADvbK_fkbOnhKL+Rb+pp+NF+VzppOQ68c=nk_6MSNjM_dxpCoQ@mail.gmail.com>
- <1456b69c-4ffd-4a08-b120-6a00abf1eb05@samba.org>
- <CADvbK_cQRpyzHG4UUOzfgmqLndvpx5Cd+d59rrqGRp0ic3PyxA@mail.gmail.com>
- <95922a2f-07a1-4555-acd2-c745e59bcb8e@samba.org>
- <CADvbK_eR4++HbR_RncjV9N__M-uTHtmqcC+_Of1RKVw7Uqf9Cw@mail.gmail.com>
- <CADvbK_dEWNNA_i1maRk4cmAB_uk4G4x0eZfZbrVX=zJ+2H9o_A@mail.gmail.com>
- <dc3815af-5b46-452b-8bcc-30a0934740a2@samba.org>
- <CADvbK_e__qpCa44uF+J2Z+2Lhb2suktTNT+CeQayk_uhckVYqQ@mail.gmail.com>
-Content-Language: en-US, de-DE
-From: Stefan Metzmacher <metze@samba.org>
-In-Reply-To: <CADvbK_e__qpCa44uF+J2Z+2Lhb2suktTNT+CeQayk_uhckVYqQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="+E3lYl72hi9pExTY"
+Content-Disposition: inline
+In-Reply-To: <20240426124253.56fd0933@kmaincent-XPS-13-7390>
+X-Cookie: lisp, v.:
 
-Hi Xin Long,
 
->>
-> Just confirmed from other ebpf experts, there are no in-kernel interfaces
-> for loading and interacting with BPF maps/programs(other than from BPF itself).
-> 
-> It seems that we have to do this match in QUIC stack. In the latest QUIC
-> code, I added quic_packet_get_alpn(), a 59-line function, to parse ALPNs
-> and then it will search for the listen sock with these ALPNs in
-> quic_sock_lookup().
-> 
-> I introduced 'alpn_match' module param, and it can be enabled when loading
-> the module QUIC by:
-> 
->    # modprobe quic alpn_match=1
-> 
-> You can test it by tests/sample_test in the latest code:
-> 
->    Start 3 servers:
-> 
->      # ./sample_test server 0.0.0.0 1234 \
->          ./keys/server-key.pem ./keys/server-cert.pem smbd
->      # ./sample_test server 0.0.0.0 1234 \
->          ./keys/server-key.pem ./keys/server-cert.pem h3
->      # ./sample_test server 0.0.0.0 1234 \
->          ./keys/server-key.pem ./keys/server-cert.pem ksmbd
-> 
->    Try to connect on clients with:
-> 
->      # ./sample_test client 127.0.0.1 1234 ksmbd
->      # ./sample_test client 127.0.0.1 1234 smbd
->      # ./sample_test client 127.0.0.1 1234 h3
-> 
->    to see if the corresponding server responds.
-> 
-> There might be some concerns but it's also a useful feature that can not
-> be implemented in userland QUICs. The commit is here:
-> 
-> https://github.com/lxin/quic/commit/de82f8135f4e9196b503b4ab5b359d88f2b2097f
-> 
-> Please check if this is enough for SMB applications.
+--+E3lYl72hi9pExTY
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-It look great thanks!
+On Fri, Apr 26, 2024 at 12:42:53PM +0200, Kory Maincent wrote:
 
-> Note as a listen socket is now identified by [address + port + ALPN] when
-> alpn_match=1, this feature does NOT require SO_REUSEPORT socket option to
-> be set, unless one wants multiple sockets to listen to
-> the same [address + port + ALPN].
+> Let's begin simple, in PSE world we are more talking about power.
+> Would it be ok to add a regulator_get/set_power_limit() and
+> regulator_get_power() callback to regulator API. Would regulator API have
+> interest to such callbacks?
 
-I'd argue that this should be the default and be required before listen()
-or maybe before bind(), so that it can return EADDRINUSE. As EADDRINUSE should only
-happen for servers it might be useful to have a QUIC_SOCKOPT_LISTEN_ALPN instead of
-QUIC_SOCKOPT_ALPN. As QUIC_SOCKOPT_ALPN on a client socket should not generate let
-bind() care about the alpn value at all.
+Why would these be different to the existing support for doing current
+limiting?  If the voltage for the supply is known then the power is a
+simple function of the current and the voltage.  I suppose you could try
+to do a convenience functions for a fixed voltage, but there'd be issues
+there if the voltage isn't configured to an exact voltage and might
+vary.
 
-For listens on tcp you also need to specify an explicit port (at least in order
-to be useful).
+> Port priority, more complex subject:
+> Indeed a PSE controller managing several ports may be able to turn off po=
+rts
+> with low priority if the total power consumption exceed a certain level.
+> - There are controller like PD692x0 that can managed this on the hardware=
+ side.
+>   In that case we would have a regulator_get/set_power_limit() callbacks =
+=66rom
+>   the regulator parent (the PSE contoller) and a regulator_get/set_priory=
+()
+>   callbacks for the regulator children (PSE ports).
 
-And it would mean that all application would use it and not block other applications
-from using an explicit alpn.
+All this priority stuff feels very PSE specific but possibly doable.
+You'd have to define the domains in which priorities apply as well as
+the priorities themselves.
 
-Also an module parameter for this means the administrator would have to take care
-of it, which means it might be unuseable if loaded with it.
+> - There are controller like TPS23881 or LTC4266 that can set two prioriti=
+es
+>   levels on their ports and a level change in one of their input pin can
+>   shutdown all the low priority ports. In that case the same callbacks co=
+uld be
+>   used. regulator_get/set_power_limit() from the parent will be only at s=
+oftware
+>   level. regulator_get/set_priority() will set the priorities of the port=
+s on
+>   hardware level. A polling function have to read frequently the total po=
+wer
+>   used and compare it to the power budget, then it has to call something =
+like
+>   regulator_shutdown_consumer() in case of power overflow. =20
 
-I hope to find some time in the next weeks to play with this.
-Should be relatively trivial create a prototype for samba's smbd.
+I would expect the regulators can generate notifications when they go
+out of regulation?  Having to poll feels very crude for something with
+configurable power limits.
 
-Thanks!
-metze
+> https://lore.kernel.org/netdev/20240417-feature_poe-v9-10-242293fd1900@bo=
+otlin.com/
+> But in case the port is enabled from Linux then shutdown from the PSE con=
+troller
+> for any reason, I have to run disable and enable command to enable it aga=
+in. Not
+> really efficient :/
+
+If that is a hot path something has gone very wrong with the system,
+especially if it's such a hot path that the cost of a disable is making
+a difference.  Note that hardware may have multiple error handling
+strategies, some hardware will turn off outputs when there's a problem
+while other implementations will try to provide as good an output as
+they can.  Sometimes the strategy will depend on the specific error
+condition, and there may be timeouts involved.  This all makes it very
+difficult to assume any particular state after an error has occurred, or
+that the state configured in the control registers reflects the physical
+state of the hardware so you probably want some explicit handling for
+any new state you're looking for.
+
+> I am thinking of disabling the usage of counters in case of a
+> regulator_get_exclusive(). What do you think? Could it break other usage?
+
+Yes, that seems likely to break other users and in general a sharp edge
+for people working with the API.
+
+--+E3lYl72hi9pExTY
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmYvvuIACgkQJNaLcl1U
+h9BgCgf/XuyrLBmNpdApLYYi0hsSfYV4lOxPUrKZvgnLl+FPoP0yx50VrcCsKSml
+xNDnTaNsJWRQqYWXA4sjCSUbclzSlEZT9tCtg8cjDDzoRuYoNL5xQzIBMMVsu2Lo
+UdmPnbUI/an3UyAfgpSUBwLP+u7kkJZShaJ8Fua+xaeTGG/vYb5G8qRudKx3f/on
+lpO/riGAPjOb0xlwSy+VzQEdAATpZy6HscNigBhqitXnBMuqr65WePxrlvnJZU8A
+XD1HS+NNA8ppBiKV8Na9nZJPG4JenykcRUVBoHWpIqrql+qChb3hjap9owh9+1Oq
+x2SYFA7wlHtQsWtrRi24iqgASLL4Qw==
+=vqvN
+-----END PGP SIGNATURE-----
+
+--+E3lYl72hi9pExTY--
 
