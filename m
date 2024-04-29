@@ -1,203 +1,121 @@
-Return-Path: <netdev+bounces-92235-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92236-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A098E8B611C
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 20:30:49 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF42B8B6132
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 20:36:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5BD3C28243E
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 18:30:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1749FB21275
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 18:36:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60B54129E6F;
-	Mon, 29 Apr 2024 18:30:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA40F12A146;
+	Mon, 29 Apr 2024 18:36:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F+4A0mhF"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SMH/AINQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3602E1E529;
-	Mon, 29 Apr 2024 18:30:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57A2E8592B
+	for <netdev@vger.kernel.org>; Mon, 29 Apr 2024 18:36:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714415440; cv=none; b=e1cQuPhNBCqpt/u7Rm7sCi/myxl84K+QpTKri5URIIyUTJPQDV9S+ypd9S7feM1RBkDir28fGnDS57Lb0B2InC52DepK2eUWqOs8TIkvt58d0H0o7jrh4i/7B29a7IiKy02t4+iIJyuZFclfNC2jCgYoEL4GUbOEMCjpeXGTnkk=
+	t=1714415806; cv=none; b=vDQujew91u/bb54dmNgtLWetEIguKoY+mER8W/x4nv6jLDatlKccZGntKIhdc+ZEznub9Hx3mDltsrXrNFnNU6R4hG5b/jabkqrVYm697HkUn4izfT2BgQYn/Xf9+Y71fy2koVYBnwxmxM1JKk1LxeP3yRxlwnNaEMPDyg4ycu4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714415440; c=relaxed/simple;
-	bh=FaReNWfkCpcHh4aoUxanTbqVxVGYZtVPHbOmTpw9Lts=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kCT2KWIgDbxCX/UbomRNH+hN54UNvPeDTufWNuvI+F6dA+Ezx5Ueq9lj0zd1Guv3rM+R8z49zUtqnZf+mWIOcXT6ffYX7rlys066MwKJBgL6FqEnL7rMS3hfxulkllJO+Fz2G8PGknX4HuZjmsiX2eA24AVJK/GvtPTDCmvnScg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F+4A0mhF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D3DEC113CD;
-	Mon, 29 Apr 2024 18:30:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714415439;
-	bh=FaReNWfkCpcHh4aoUxanTbqVxVGYZtVPHbOmTpw9Lts=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=F+4A0mhFdeQrbGu6U7QJo3MzgH4oVDAqzBApw0imCfDSAXhowcIuz2uW4FPcz8x8X
-	 E5sIkC+nVa3suvMOUTAkCLBo6SK9Cz21qXae+vl/xeXOnEwc6PbzeuvyRaUtlh2svF
-	 7oEqSMezkAWzC284OLKQ6Q5YcnnQ94kOQP+6BNxlCS6SZcywAPKZzoF1VXis3KtqhN
-	 HVx3E2GOk8d4VO8BQj6Lb7tRRECIoioclQCULwVlGukzz4JJ5ihfHu2iXDObEUCep4
-	 rSVMxMPhrkySGl7GGHO1wAtNjLs7j8bdSZAHca8E11cTaRzPQOlhCPJNyowk+jziG4
-	 WShAN9rOo/zQg==
-Date: Mon, 29 Apr 2024 19:30:34 +0100
-From: Simon Horman <horms@kernel.org>
-To: MD Danish Anwar <danishanwar@ti.com>
-Cc: Dan Carpenter <dan.carpenter@linaro.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>, Jan Kiszka <jan.kiszka@siemens.com>,
-	Diogo Ivo <diogo.ivo@siemens.com>, Paolo Abeni <pabeni@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, srk@ti.com,
-	Vignesh Raghavendra <vigneshr@ti.com>, r-gunasekaran@ti.com,
-	Roger Quadros <rogerq@kernel.org>
-Subject: Re: [PATCH net-next v2] net: ti: icssg_prueth: Add SW TX / RX
- Coalescing based on hrtimers
-Message-ID: <20240429183034.GG516117@kernel.org>
-References: <20240429071501.547680-1-danishanwar@ti.com>
+	s=arc-20240116; t=1714415806; c=relaxed/simple;
+	bh=/9yF00uPTY45eY+mtMWXUdod+TyzSQg4k6Wsi0nYkig=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=jEG1KjW+znKTQD5mPsvjJzbG0f39+UAhG/dpWI2A1+U5QSGrAzGp7NE1klYoZT/67mUcp7R0IxmiVRDhJLDiMLCd2fja+ucBC7LBbJdKkJ8OZVjd9mcJFPJzvqW+2x7/ia1xr3nad+siKu1T4ig0hyXbYw1ckvPCkqn1uyhjr48=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SMH/AINQ; arc=none smtp.client-ip=209.85.128.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-618891b439eso74886807b3.3
+        for <netdev@vger.kernel.org>; Mon, 29 Apr 2024 11:36:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1714415804; x=1715020604; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=WKIA6swcPY3s1b77BB4hvTzuXbmWGFcpA5AbXMeeSRw=;
+        b=SMH/AINQegX8dPbPNdDPI4GPwdrOzsFCf/N6OCT4Xnb+fa+8Ho5eR6+HsAMKqvDy+4
+         rd+/EejmivV6wsX/+ko1jG4gZ4c6o1uBhmJ3uHGAzAOT+m+nF+eOLYJXXXy0ynkpa4G/
+         1n8IjuD3b917u47Wq+M9NcmizyElWbfx4t/k1HTASlUtybfa1/N/yo98sF6lF3ewzaAM
+         j6/PYDFafckXiXtW2P5krxYGrcmNEZpBLpvBxbLa74KjLqcy3FBf5DhNgW1rDPhbaizi
+         P4Z0PNP0/gxx7OMmzSME6HfvFwU8cZUqroZ8J41UKcQTj1mrY5rQ3gh2JHY9bUqtBIgD
+         CxHg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714415804; x=1715020604;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=WKIA6swcPY3s1b77BB4hvTzuXbmWGFcpA5AbXMeeSRw=;
+        b=PaZNvp0oQXg9be2KjMY3ic+QGO/BdlJjJH4mAse0Dfo/ElDZ6fquNGcXDg5i8McFEa
+         bdJ5k4qTPhLtidAqF5/85q1aYwS52gLnNszqR3LG0pjuNwR7iNq0o1dTa3AQbJzxxFwX
+         gfJnrEV/6z9qnd780VDEDYTbHCrAQtF0JeXVNWnQSqtXyQml8Lm1A/SNlH97sAhkdCgn
+         5P4x8ewEZkPFtgPKg4ZpT8DIS84Cf3O657E/Il185OeOxEAWb9ekPm5Mkcb51YD9UMgG
+         v8OOa4JD/g6eH6P0AuTGZw0NviW+HFZshMrQzj6Ko10eamQsaobOvItSdUiFLKFI8ZA9
+         kkog==
+X-Forwarded-Encrypted: i=1; AJvYcCXlalrb9vLIY+znjIavGV+i4R7qCRb4D33mHXorkV56qTv69fsaJ8WT6NvDU8AGyXKIpO83b3ZrdWsH5FaEOAnVZG8UuH/W
+X-Gm-Message-State: AOJu0YyHcOf8pqRfvdf50VgPtgAg69TOjI4MBHGNwk1e7HOOUQa5GuDP
+	fxm/UvxyRdIAhgiLfuGQe4c5PPPVOHQO2rgN24gwpeUgG1pK62l9U4UTDRlWYNUH+1m+E+w+kWP
+	MYvydWVANlg==
+X-Google-Smtp-Source: AGHT+IG51emMWBAb5be69d9MQl1/V5hFaTMj9Bqf3VwMtQQzMWHTK2uBy6JPz3aO5GNa/xiOHOh5NwP/mFOm/Q==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a05:6902:f88:b0:de5:2ce1:b62d with SMTP
+ id ft8-20020a0569020f8800b00de52ce1b62dmr1196548ybb.10.1714415804319; Mon, 29
+ Apr 2024 11:36:44 -0700 (PDT)
+Date: Mon, 29 Apr 2024 18:36:43 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240429071501.547680-1-danishanwar@ti.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.44.0.769.g3c40516874-goog
+Message-ID: <20240429183643.2029108-1-edumazet@google.com>
+Subject: [PATCH net-next] ipv6: anycast: use call_rcu_hurry() in aca_put()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Apr 29, 2024 at 12:45:01PM +0530, MD Danish Anwar wrote:
-> Add SW IRQ coalescing based on hrtimers for RX and TX data path for ICSSG
-> driver, which can be enabled by ethtool commands:
-> 
-> - RX coalescing
->   ethtool -C eth1 rx-usecs 50
-> 
-> - TX coalescing can be enabled per TX queue
-> 
->   - by default enables coalesing for TX0
+This is a followup of commit b5327b9a300e ("ipv6: use
+call_rcu_hurry() in fib6_info_release()").
 
-nit: coalescing
+I had another pmtu.sh failure, and found another lazy
+call_rcu() causing this failure.
 
-Please consider running patches through ./checkpatch --codespell
+aca_free_rcu() calls fib6_info_release() which releases
+devices references.
 
->   ethtool -C eth1 tx-usecs 50
->   - configure TX0
->   ethtool -Q eth0 queue_mask 1 --coalesce tx-usecs 100
->   - configure TX1
->   ethtool -Q eth0 queue_mask 2 --coalesce tx-usecs 100
->   - configure TX0 and TX1
->   ethtool -Q eth0 queue_mask 3 --coalesce tx-usecs 100 --coalesce
-> tx-usecs 100
-> 
-> Minimum value for both rx-usecs and tx-usecs is 20us.
-> 
-> Compared to gro_flush_timeout and napi_defer_hard_irqs this patch allows
-> to enable IRQ coalescing for RX path separately.
-> 
-> Benchmarking numbers:
->  ===============================================================
-> | Method                  | Tput_TX | CPU_TX | Tput_RX | CPU_RX |
-> | ==============================================================
-> | Default Driver           943 Mbps    31%      517 Mbps  38%   |
-> | IRQ Coalescing (Patch)   943 Mbps    28%      518 Mbps  25%   |
->  ===============================================================
-> 
-> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
-> ---
-> Changes from v1 [1] to v2:
-> *) Added Benchmarking numbers in the commit message as suggested by
->    Andrew Lunn <andrew@lunn.ch>. Full logs [2]
-> *) Addressed comments given by Simon Horman <horms@kernel.org> in v1.
+We must not delay it too much or risk unregister_netdevice/ref_tracker
+traces because references to netdev are not released in time.
 
-Sorry to be bothersome, but the W=1 problem isn't entirely fixed.
+This should speedup device/netns dismantles when CONFIG_RCU_LAZY=y
 
-> 
-> [1] https://lore.kernel.org/all/20240424091823.1814136-1-danishanwar@ti.com/
-> 
-> [2] https://gist.githubusercontent.com/danish-ti/47855631be9f3635cee994693662a988/raw/94b4eb86b42fe243ab03186a88a314e0cb272fd0/gistfile1.txt
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+ net/ipv6/anycast.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-...
-
-> diff --git a/drivers/net/ethernet/ti/icssg/icssg_common.c b/drivers/net/ethernet/ti/icssg/icssg_common.c
-
-...
-
-> @@ -190,19 +191,37 @@ int emac_tx_complete_packets(struct prueth_emac *emac, int chn,
->  	return num_tx;
->  }
->  
-> +static enum hrtimer_restart emac_tx_timer_callback(struct hrtimer *timer)
-> +{
-> +	struct prueth_tx_chn *tx_chns =
-> +			container_of(timer, struct prueth_tx_chn, tx_hrtimer);
-> +
-> +	enable_irq(tx_chns->irq);
-> +	return HRTIMER_NORESTART;
-> +}
-> +
->  static int emac_napi_tx_poll(struct napi_struct *napi_tx, int budget)
->  {
->  	struct prueth_tx_chn *tx_chn = prueth_napi_to_tx_chn(napi_tx);
->  	struct prueth_emac *emac = tx_chn->emac;
-> +	bool tdown = false;
->  	int num_tx_packets;
->  
-> -	num_tx_packets = emac_tx_complete_packets(emac, tx_chn->id, budget);
-> +	num_tx_packets = emac_tx_complete_packets(emac, tx_chn->id, budget,
-> +						  &tdown);
->  
->  	if (num_tx_packets >= budget)
->  		return budget;
->  
-> -	if (napi_complete_done(napi_tx, num_tx_packets))
-> -		enable_irq(tx_chn->irq);
-> +	if (napi_complete_done(napi_tx, num_tx_packets)) {
-> +		if (unlikely(tx_chn->tx_pace_timeout_ns && !tdown)) {
-> +			hrtimer_start(&tx_chn->tx_hrtimer,
-> +				      ns_to_ktime(tx_chn->tx_pace_timeout_ns),
-> +				      HRTIMER_MODE_REL_PINNED);
-> +		} else {
-> +			enable_irq(tx_chn->irq);
-> +		}
-
-This compiles with gcc-13 and clang-18 W=1
-(although the inner {} are unnecessary).
-
-> +	}
->  
->  	return num_tx_packets;
->  }
-
-...
-
-> @@ -872,7 +894,13 @@ int emac_napi_rx_poll(struct napi_struct *napi_rx, int budget)
->  	}
->  
->  	if (num_rx < budget && napi_complete_done(napi_rx, num_rx))
-> -		enable_irq(emac->rx_chns.irq[rx_flow]);
-> +		if (unlikely(emac->rx_pace_timeout_ns)) {
-> +			hrtimer_start(&emac->rx_hrtimer,
-> +				      ns_to_ktime(emac->rx_pace_timeout_ns),
-> +				      HRTIMER_MODE_REL_PINNED);
-> +		} else {
-> +			enable_irq(emac->rx_chns.irq[rx_flow]);
-> +		}
-
-But this does not; I think outer (but not inner) {} are needed.
-
-FIIIW, I believe this doesn't show-up in the netdev automated testing
-because this driver isn't built for x86 allmodconfig.
-
->  
->  	return num_rx;
->  }
-
-...
-
+diff --git a/net/ipv6/anycast.c b/net/ipv6/anycast.c
+index 0f2506e3535925468dcc5fa6cc30ae0952a67ea7..0627c4c18d1a5067a668da778ad444855194cbeb 100644
+--- a/net/ipv6/anycast.c
++++ b/net/ipv6/anycast.c
+@@ -252,9 +252,8 @@ static void aca_free_rcu(struct rcu_head *h)
+ 
+ static void aca_put(struct ifacaddr6 *ac)
+ {
+-	if (refcount_dec_and_test(&ac->aca_refcnt)) {
+-		call_rcu(&ac->rcu, aca_free_rcu);
+-	}
++	if (refcount_dec_and_test(&ac->aca_refcnt))
++		call_rcu_hurry(&ac->rcu, aca_free_rcu);
+ }
+ 
+ static struct ifacaddr6 *aca_alloc(struct fib6_info *f6i,
 -- 
-pw-bot: changes-requested
+2.44.0.769.g3c40516874-goog
+
 
