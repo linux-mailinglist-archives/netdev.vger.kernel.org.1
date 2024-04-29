@@ -1,52 +1,54 @@
-Return-Path: <netdev+bounces-92148-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92151-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F4E68B59B3
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 15:18:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FCCA8B59E4
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 15:28:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF912284F08
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 13:18:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CA7251F210B1
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 13:28:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D2363EA71;
-	Mon, 29 Apr 2024 13:18:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 002BD5F861;
+	Mon, 29 Apr 2024 13:28:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="FGEd0IUV"
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="KRnjXvpl"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B071674404;
-	Mon, 29 Apr 2024 13:18:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A12D7317F
+	for <netdev@vger.kernel.org>; Mon, 29 Apr 2024 13:28:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714396701; cv=none; b=Q/skNZEUV07BRMCzKnqML/vlQ3yPToFl2Fff8oR5rtmTGf0xuHbzuiYhkCLT1vBN65gMqDbIt6IL331DXxkhCvmu8uAV5l9bozmt80JZl3TZExX4+fXp9tJdpKS8uIm1ZBW3ygOf3S28NkVIodgE+7vBnza1cTicectnhzaIprs=
+	t=1714397299; cv=none; b=CgHj/buOsx1uIvDztwzwyj1loaBlQCKYo6A8ebf4+52hUfXfOv80nkPOLWZqh+12ORZ5psXUpHNqljgKETM4+hy2ezRpe1LN1sI88ldGxa+snJWanY8OQdNUZJb70oDJA96Ao1HzkLjUnu0hLLgJiiXwhitkGXld6tsY4FeuuBY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714396701; c=relaxed/simple;
-	bh=EUNYM67ljV/1+l6ugAx8BfuV7yZemSgbjdsgHuN1rzU=;
+	s=arc-20240116; t=1714397299; c=relaxed/simple;
+	bh=6hd2ZESwHfIxH8+Zvwh04skQgMyBwVzIqYlKEBIA0S4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Ta39qU74o4aQRWbPSlinkK+n0d/sOVbKQsiNKNX6qENo9nu5/bqhLVbAVwJC0MU/SQIw6Tn+MJPyUupwEz9FmrJWrTuoP2ocmVq9RhWYQ+WDVpfrA7PPiTWhC0xL9I554ekr/XiZWorH0zIeFW4CsJJKcKC+cgThCEBa7WyKkZI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com; spf=pass smtp.mailfrom=arinc9.com; dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b=FGEd0IUV; arc=none smtp.client-ip=217.70.183.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arinc9.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id D4C1DC0005;
-	Mon, 29 Apr 2024 13:18:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
-	t=1714396691;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6WIxTn0pRjbZXHgFG8AwaR4joGVxkdi8wOuc1SO7gIs=;
-	b=FGEd0IUVUimnHqEMC3oAwvto00HNVnMflL0L7Ph/Ryrk7N/JOd8t1z4bbBPy5b58KRO9k5
-	I3szYcCy8KVwRYHA1I6NfbF0HWGffDxy9+baoG19copWjA/jxRvbpIWFAaMDBDjyaWLWXk
-	IKPn/HbPA4OqlW2+y/DGE85RCCMAklQrxnr+rWemcMa7T4IlOjaPDGsuV3y00M+UGoipOp
-	Lsv/aCYhblt5FsBnUNpFA/1mLETUrUj0KaEnJ+E/2UYRMLXP3yc6HN0o0gYxq4oRf5EWh1
-	txO81TyFcNZxEJVl4hf3JCF+BaPQlmyEXsv00J6rxXu9sd40YeFXkPafTdvXzg==
-Message-ID: <f5eb359a-fdbf-4b0a-8df5-be034da1aca3@arinc9.com>
-Date: Mon, 29 Apr 2024 16:17:40 +0300
+	 In-Reply-To:Content-Type; b=RkrBXQpQMNyi69b5jaGHBfXxKbWlb+DZVO8SZHLS9ggPU3tIYHqtLNr6jQb7HqOLDsaLABBFfIAWHWL8EKb7TxGyYEaXDdp91NeA+/j9v1YBXAP1wLbxIWimkX8rUUCYZaAcQoasasEtl22FZ1jOJ5IIAXs+uKWYA6npWL8gqvY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=KRnjXvpl; arc=none smtp.client-ip=85.214.62.61
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Received: from [127.0.0.1] (p578adb1c.dip0.t-ipconnect.de [87.138.219.28])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits))
+	(No client certificate requested)
+	(Authenticated sender: marex@denx.de)
+	by phobos.denx.de (Postfix) with ESMTPSA id 95CBA888EA;
+	Mon, 29 Apr 2024 15:28:14 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+	s=phobos-20191101; t=1714397295;
+	bh=v3578JMxi7WxGcVmX3sr/pNv0BW2+lSt7wC1vY49/JY=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=KRnjXvplmCQzf4QB59hxkDRWktSjfBwpb/exLlHo+T4+aprHHvyrqm6AkXqIVzJ6O
+	 8ERdalQnXAxH8AFwDcEgue4FEYRb0w942/N2lEqG4OG3tXyB0ynzL+4vQlkagWdKxa
+	 qGtCmZsumQWn/I2WD3Y53GW1j1/9zvQhx+8wq/qjXXAs+/0i97CAt6SpRI5M6Sr4Ij
+	 KoyVMgcta+nqUyA8p+ZtQutcpQua3HFJidb+sWpjOnDuO0ybP4AwDG6QEVzJtpjApS
+	 aT4Za/5pjmBhvo7Bgi8cvQu5EV6Sx8S6ESfeiMPf/y5Qp1j9erzwAkk9fjIikJVtHT
+	 MYuKvC/owpssA==
+Message-ID: <16f52bb6-59a1-4f6f-8d1a-c30198b0f743@denx.de>
+Date: Mon, 29 Apr 2024 15:23:18 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -54,87 +56,61 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net: dsa: mt7530: detect PHY muxing when PHY is
- defined on switch MDIO bus
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Daniel Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>,
- Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
- Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean
- <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>,
+Subject: Re: [PATCH 2/2] net: ks8851: Handle softirqs at the end of IRQ thread
+ to fix hang
+To: Ronald Wahl <ronald.wahl@raritan.com>, netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+ =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
+ Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+ Dmitry Torokhov <dmitry.torokhov@gmail.com>,
  Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Bartel Eerdekens <bartel.eerdekens@constell8.be>, mithat.guner@xeront.com,
- erkin.bozoglu@xeront.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org
-References: <20240429-b4-for-netnext-mt7530-use-switch-mdio-bus-for-phy-muxing-v1-1-1f775983e155@arinc9.com>
- <Zi9vYLwgekd0Pmzn@shell.armlinux.org.uk>
+ Mark Brown <broonie@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>
+References: <20240331142353.93792-1-marex@denx.de>
+ <20240331142353.93792-2-marex@denx.de>
+ <fa332bfc-68fb-4eea-a70a-8ac9c0d3c990@raritan.com>
 Content-Language: en-US
-From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-In-Reply-To: <Zi9vYLwgekd0Pmzn@shell.armlinux.org.uk>
+From: Marek Vasut <marex@denx.de>
+In-Reply-To: <fa332bfc-68fb-4eea-a70a-8ac9c0d3c990@raritan.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-GND-Sasl: arinc.unal@arinc9.com
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
 
-On 29.04.2024 12:58, Russell King (Oracle) wrote:
-> On Mon, Apr 29, 2024 at 12:46:43PM +0300, Arınç ÜNAL via B4 Relay wrote:
->> From: Arınç ÜNAL <arinc.unal@arinc9.com>
->>
->> Currently, the MT7530 DSA subdriver configures the MT7530 switch to provide
->> direct access to switch PHYs, meaning, the switch PHYs listen on the MDIO
->> bus the switch listens on. The PHY muxing feature makes use of this.
->>
->> This is problematic as the PHY may be probed before the switch is
->> initialised, in which case attaching the PHY will fail.
->>
->> Since commit 91374ba537bd ("net: dsa: mt7530: support OF-based registration
->> of switch MDIO bus"), we can describe the switch PHYs on the MDIO bus of
->> the switch on the device tree. Extend the check to detect PHY muxing when
->> the PHY is defined on the MDIO bus of the switch on the device tree.
->>
->> When the PHY is described this way, the switch will be initialised first,
->> then the switch MDIO bus will be registered. Only after these steps, the
->> PHY will be probed.
+On 4/29/24 1:46 PM, Ronald Wahl wrote:
+> Hi,
+
+Hi,
+
+> for the spi version of the chip this change now leads to
 > 
-> Looking at the commit description and the patch, I'm not sure whether
-> you really mean "probed" or whether you mean "attached".
+> [   23.793000] BUG: sleeping function called from invalid context at 
+> kernel/locking/mutex.c:283
+> [   23.801915] in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 
+> 857, name: irq/52-eth-link
+> [   23.810895] preempt_count: 200, expected: 0
+> [   23.815288] CPU: 0 PID: 857 Comm: irq/52-eth-link Not tainted 
+> 6.6.28-sama5 #1
+> [   23.822790] Hardware name: Atmel SAMA5
+> [   23.826717]  unwind_backtrace from show_stack+0xb/0xc
+> [   23.831992]  show_stack from dump_stack_lvl+0x19/0x1e
+> [   23.837433]  dump_stack_lvl from __might_resched+0xb7/0xec
+> [   23.843122]  __might_resched from mutex_lock+0xf/0x2c
+> [   23.848540]  mutex_lock from ks8851_irq+0x1f/0x164
+> [   23.853525]  ks8851_irq from irq_thread_fn+0xf/0x28
+> [   23.858776]  irq_thread_fn from irq_thread+0x93/0x130
+> [   23.864037]  irq_thread from kthread+0x7f/0x90
+> [   23.868699]  kthread from ret_from_fork+0x11/0x1c
 > 
-> PHY drivers will bind to PHY devices when they are detected on the MDIO
-> bus (either by scanning or instantiating firmware description) and the
-> devices are registered. As each device is registered, the drivers for
-> the bus type are scanned and any matches will have their probe function
-> called. This happens outside of any control of the DSA driver if the
-> DSA device is on the same MDIO bus.
-> 
-> This is separate from the process of looking up a PHY and attaching the
-> PHY.
-> 
-> So, I think there is probably a terminology issue with the patch
-> description. I suspect you don't mean "probing" as in phy_probe() being
-> called. Looking at the code, it looks like the driver is making
-> decisions based on how PHYs are connected to the ethernet MACs in the
-> device tree, and you're making decisions based on that. I wouldn't call
-> that "probing" a PHY.
+> Actually the spi driver variant does not suffer from the issue as it has
+> different locking so we probably should do the
+> local_bh_disable/local_bh_enable only for the "par" version. What do you 
+> think?
 
-Yes, I meant to say "looking up a PHY and attaching the PHY" by probing a
-PHY. I'll adjust the patch log to below, thanks.
+Ah sigh, sorry for the breakage. Indeed, the locking is not great here.
 
-Currently, the MT7530 DSA subdriver configures the MT7530 switch to provide
-direct access to switch PHYs, meaning, the switch PHYs listen on the MDIO
-bus the switch listens on. The PHY muxing feature makes use of this.
+I am not entirely sure about the local_bh_disable/enable being par only.
 
-This is problematic as the PHY may be attached before the switch is
-initialised, in which case, the PHY will fail to be attached.
-
-Since commit 91374ba537bd ("net: dsa: mt7530: support OF-based registration
-of switch MDIO bus"), we can describe the switch PHYs on the MDIO bus of
-the switch on the device tree. Extend the check to detect PHY muxing when
-the PHY is defined on the MDIO bus of the switch on the device tree.
-
-When the PHY is described this way, the switch will be initialised first,
-then the switch MDIO bus will be registered. Only after these steps, the
-PHY will be attached.
-
-Arınç
+I will try to prepare some sort of a patch, would you be willing to test 
+it on the SPI variant ?
 
