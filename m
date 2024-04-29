@@ -1,90 +1,98 @@
-Return-Path: <netdev+bounces-92181-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92182-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A74B48B5BF5
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 16:52:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BBD828B5C14
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 16:57:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0FF7C2873C3
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 14:52:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5D0F11F21246
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 14:57:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A45E7FBC8;
-	Mon, 29 Apr 2024 14:52:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D5AB80023;
+	Mon, 29 Apr 2024 14:57:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T/Kv3oms"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="5kNs7mmv"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03042535A2;
-	Mon, 29 Apr 2024 14:51:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EFB37EEF2;
+	Mon, 29 Apr 2024 14:57:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714402320; cv=none; b=vF5R8nDVqXRegkjlBByV+3HGhf9D1tgFA87Xo2tIvcGl3t6qjrcxP5rSJeG87PeqSpMvhVmz+ayrtkrj92+j9Qmvm+Iw+vZ7CuVyKwIR0VGGOj8zd4AujA5s+/n84YwX1sV1kwgcNTUFCwtUOlRx1vlgfE1Nc5oezlITt/W1y68=
+	t=1714402663; cv=none; b=Tw9vvKVenAaR/KMT3G7X8tM20IX0cghrfCmDBYCS6urb//xg2WXw0xxqF3Fn1n6qPxrpw5kNK/il+7IMVTt7GLgPPF/JvT65jOUuSlwxhpLY/1R8WIMpjd/6iZkEW+/mU91qvDitWNohnqlrB0phk0UBQPwiKRQYYepTwXffXzk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714402320; c=relaxed/simple;
-	bh=KBmQLdrKWbY6Yx6w5tXJwf208CEEBKROzHu5YyBxMgw=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gPa49bupL7NwzGkGfW3uRotUU6I5kIjGCw5FKfxkQas7bYM1b7xjFZCeYyitNV+tQbZxoYGvTrLg7j/F1lOwb90mRzKQYeKJ9wU/aqVbRmrPK/XTctIkjx+lLNx1z/8DyBnksIfnFwbIGMRmCTYH2xKjSDrQmJzBhI7COHzP/LU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T/Kv3oms; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 419C6C113CD;
-	Mon, 29 Apr 2024 14:51:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714402319;
-	bh=KBmQLdrKWbY6Yx6w5tXJwf208CEEBKROzHu5YyBxMgw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=T/Kv3omsX8+ptGUwbwtEBOnHhbmbAvQGYAGI2KHBCP4lsnlZ0aGE7E2rPf78zp808
-	 q5pe2u1pcfDIz6ykOtOKjmAyTsAkTRk8ryadYU3EsHJi2CfsvmkqLgqgU9i1Xv9b6N
-	 PMUxvusxk4T30ueI38TqVcD6EAL8q6887xhtNdfyJ6JS0pJ3qaXoT+DBsuJTp4f470
-	 qHlNDGkjDO/m+lwdYmKjNHNiKXWj31wl8iu5rGXV5dvE4wHAO1MoGbZOwNrz3KJyua
-	 I0MU91vT1dIpifyatvHatcidZQcbe+M9ip6a5yMSqRP1x/tWtx2RPXpY/K2Gimz7zx
-	 E+LQ9jfHc7pXw==
-Date: Mon, 29 Apr 2024 07:51:58 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net-next 6/6] selftests: drv-net-hw: add test for memory
- allocation failures with page pool
-Message-ID: <20240429075158.51b3f8d6@kernel.org>
-In-Reply-To: <662d0268e71c5_28b98529417@willemb.c.googlers.com.notmuch>
-References: <20240426232400.624864-1-kuba@kernel.org>
-	<20240426232400.624864-7-kuba@kernel.org>
-	<662d0268e71c5_28b98529417@willemb.c.googlers.com.notmuch>
+	s=arc-20240116; t=1714402663; c=relaxed/simple;
+	bh=IcugJ0QwbKQ6I/BOBlgoBQscijLsbDvk0jtQCL+HSjU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=q0p5NsCvlVFBVMuf/3IXrTRYEqTtu3GYnNpft9kynleG9KlwdoWPZmfjLYJhW0zQ1mzNiNIkrHqfTbU4ko8NZFHqSJrISrZd+KsamdVia+MVCU9ers7uDVbotE62O+H5jNl8osvGbLlfdEp2N2njd33fntnF5Nzmb2gVzWUo2/k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=5kNs7mmv; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=cWBfapoZi8jsbt7Iy+JKtlaopk7WUGuiHafZVePp7/w=; b=5kNs7mmveYPQjgP4V1Uy81UUsm
+	G1WP+1HAONV/YqfaHS9jlLRXy04i7tL67Yz7VRyu/TQ2w9Mcg1V3sgOaXpJcD1MHl9ir+tsKOT+Jv
+	TJcryVSOW+nIY1+6gM18qqyTpEkT/gdOCxn4FVhIQNv09WefiIxr0Ylx/YW6qMtPayZw=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1s1SRj-00EGI7-6N; Mon, 29 Apr 2024 16:57:35 +0200
+Date: Mon, 29 Apr 2024 16:57:35 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: Kory Maincent <kory.maincent@bootlin.com>,
+	Mark Brown <broonie@kernel.org>,
+	Kyle Swenson <kyle.swenson@est.tech>,
+	Liam Girdwood <lgirdwood@gmail.com>, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Subject: Re: PoE complex usage of regulator API
+Message-ID: <5063429d-5dca-4538-b240-50c35cbf5e93@lunn.ch>
+References: <20240426124253.56fd0933@kmaincent-XPS-13-7390>
+ <57a79abd-722c-4907-b0e7-2396392ae675@lunn.ch>
+ <20240429145203.219bee06@kmaincent-XPS-13-7390>
+ <Zi-vhKx-WlYPQe3c@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Zi-vhKx-WlYPQe3c@pengutronix.de>
 
-On Sat, 27 Apr 2024 09:49:28 -0400 Willem de Bruijn wrote:
-> Eventually probably want a more generic fault injection class.
-> 
-> And for both fault injection and background traffic the with object
-> construct to ensure cleanup in all cases.
-> 
-> Maybe even the same for ethtool, as ip and ethtool config changes that
-> need to be reverted to original state will be common.
+> Since there is already support to work with current (I) values, there
+> are is also overcurrent protection. If a device is beyond the power
+> budget limit, it is practically an over current event. Regulator
+> framework already capable on handling some of this events, what we need
+> for PoE is prioritization. If we detect overcurrent on supply root/node
+> we need to shutdown enough low prio consumers to provide enough power
+> for the high prio consumers.
 
-Agreed, the nice way of wrapping all that has not revealed itself to me
-yet. When we discussed it with Petr a while back he was suggesting
-"with", and I was thinking of creating an object with test as the
-parent. The with is nicer but here we'd end up doing:
+So the assumption is we allow over provisioning?
 
-	with a():
-		# some code
-		with b():
-			# more code
-				with c():
-					# check traffic
+> > So there is a potential second user, that's great to hear it! Could the
+> > priority stuff be also interesting? Like to allow only high priority SFP to use
+> > higher power class in case of a limiting power budget.
 
-which offends my sensibilities.
+I was not expecting over-provisioning to happen. So prioritisation
+does not make much sense. You either have the power budget, or you
+don't. The SFP gets to use a higher power class if there is budget, or
+it is kept at a lower power class if there is no budget. I _guess_ you
+could give it a high power class, let it establish link, monitor its
+actual power consumption, and then decide to drop it to a lower class
+if the actual consumption indicates it could work at a lower
+class. But the danger is, you are going to loose link.
 
-There are many options, hard to say which one is best without having 
-a bunch of tests to convert as a litmus test :S So I stuck to "finally"
+I've no real experience with this, and all systems today hide this
+away in firmware, rather than have Linux control it.
+
+     Andrew
+
 
