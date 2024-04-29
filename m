@@ -1,324 +1,153 @@
-Return-Path: <netdev+bounces-92210-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92212-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4DA168B5F66
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 18:54:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6D798B5FB5
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 19:10:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0381828237C
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 16:54:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D7E171C2189D
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 17:10:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AA1086263;
-	Mon, 29 Apr 2024 16:54:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFC6E8627B;
+	Mon, 29 Apr 2024 17:10:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="M+vaCcAL"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VQEbmlSW"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay.smtp-ext.broadcom.com (relay.smtp-ext.broadcom.com [192.19.144.207])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AA078612E;
-	Mon, 29 Apr 2024 16:54:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.19.144.207
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4631147A5C;
+	Mon, 29 Apr 2024 17:10:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714409661; cv=none; b=PJrTVDuNXpw4wqi0xeXkOM12dcXD+nQQOxkUDgXJnf0EU3QbUZndqSSS24D0Nhbgs8/uwHmYO+bncgZuOW5XrD5nDnJ3TIhmdrkO+QnYs/yukHTjwMAmKEirj1c/PZzyNq7QiQfFEHTpepawUcn/YKsL0Ck7otu3hSdZ/T4K7ew=
+	t=1714410649; cv=none; b=TTfoWx1k1wbuUQZDnClSrNJnSJ58dwDyVv2gLPDJukG3MnZmokfoSOdHT4PG+K18W9jlSOA2ntjigWMbB4qaK/syM9VBDGTJX32Ulo+A3KpB31vbcNAMcOqSxdJ7pHEQUNn+w30oLrZ2G9237ww6ItS5400RwHAszV5fmVFP6Ro=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714409661; c=relaxed/simple;
-	bh=YHT5rUvGSuucmsJOnLypI9mOEo8qAfWMPGLdOe9cpk0=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=gXFEUu/tV/YcK1BFs5mL1LvOT54I8dZEa1EiZOZ24NYQ/CvTYwSy47oQMdngp/cZPLCWa4/cyj4F2YFz05V0zNghCo3VdjD2RfktG1mEvrZy1WD9Y5euW0Y9fhTon2VOue+rs+evunE6q6qhMAVQhWYJEI7syoyQL5NeQZvMJ4Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=M+vaCcAL; arc=none smtp.client-ip=192.19.144.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: from mail-lvn-it-01.lvn.broadcom.net (mail-lvn-it-01.lvn.broadcom.net [10.36.132.253])
-	by relay.smtp-ext.broadcom.com (Postfix) with ESMTP id 72CE7C0000ED;
-	Mon, 29 Apr 2024 09:54:12 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 relay.smtp-ext.broadcom.com 72CE7C0000ED
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=broadcom.com;
-	s=dkimrelay; t=1714409652;
-	bh=YHT5rUvGSuucmsJOnLypI9mOEo8qAfWMPGLdOe9cpk0=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=M+vaCcALWUI+Xh9vfCD2kHT0edLuFmYvK4v1oTcxrfbJt/9zQ51ooX64NydZF7y4h
-	 eWik99FLpwv8ASJn72kxU3DZkO5C86AJwA8MCnBXkXZO9VzcE4YmVvgFZq4wqlmpGO
-	 9JhGIdL5Al6e/XGw+tLrsybRzUdpNdVD5IhmbGuY=
-Received: from fainelli-desktop.igp.broadcom.net (fainelli-desktop.dhcp.broadcom.net [10.67.48.245])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mail-lvn-it-01.lvn.broadcom.net (Postfix) with ESMTPSA id 88EB218041CAC7;
-	Mon, 29 Apr 2024 09:54:10 -0700 (PDT)
-From: Florian Fainelli <florian.fainelli@broadcom.com>
-To: netdev@vger.kernel.org
-Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>,
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net-next v2 2/2] net: dsa: Remove adjust_link paths
-Date: Mon, 29 Apr 2024 09:54:05 -0700
-Message-Id: <20240429165405.2298962-3-florian.fainelli@broadcom.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240429165405.2298962-1-florian.fainelli@broadcom.com>
-References: <20240429165405.2298962-1-florian.fainelli@broadcom.com>
+	s=arc-20240116; t=1714410649; c=relaxed/simple;
+	bh=WKdk6WwgPqc2YoANVbL2/w23zvFWOoCOfZ03rXJUwiE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=EI82BwUXAzq0REHJnJ6Zw8oJsNPoVLzFq0rT337lEaVzv26OFtxJ2tCmJvw7VpKR0gUhV8JsbUVXUymM55/Olqj9r0vuuR/mXRTF2iHeHytTewO8owvBLgKvCOyLyllwLvXQQmslVMGqCEfWhg53lM+bm0kq6dcEjleRYbSfUPw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VQEbmlSW; arc=none smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1714410647; x=1745946647;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=WKdk6WwgPqc2YoANVbL2/w23zvFWOoCOfZ03rXJUwiE=;
+  b=VQEbmlSWU047JzvVCLY6f0shtYqCbVAz2gDAWj2C9jR2/sSXSNi2U0bW
+   bGv7/vmclDZ8Ln47TPv6jsTIsv9Q8uxkrXPuq1RTd0ssO76Tus7bRbZGP
+   o0L/5LIC8I/DdHHFH9OnJRT06KIm3UOtX6DJbN0QbHFucI06It0KsTFES
+   Mj6/cx7eq48EG5eTs70+nWTDCVtqNfuKlZco0DVCSGED0FtLUwq1f46WM
+   9LJvjDhckZfLy1ZTASq66jxXGR2+EIRLLEF9HooKeKCPNnm2Zr0GJgwW5
+   de65WFHFFsFL4JJdT6xCcN5lDb9e2sQozQTqnxB6pppOHHZyzTmVAQeh7
+   g==;
+X-CSE-ConnectionGUID: 6b9TkGKGQGyUbfWQClWORQ==
+X-CSE-MsgGUID: gXRQySm3RoilEhCmZQ8Cew==
+X-IronPort-AV: E=McAfee;i="6600,9927,11059"; a="13909560"
+X-IronPort-AV: E=Sophos;i="6.07,240,1708416000"; 
+   d="scan'208";a="13909560"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Apr 2024 10:10:46 -0700
+X-CSE-ConnectionGUID: Nuo6ZQFPSsul+fuSL7vKIw==
+X-CSE-MsgGUID: VKUvT9ANRqmsO2/og0S4uQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,240,1708416000"; 
+   d="scan'208";a="26788735"
+Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
+  by orviesa008.jf.intel.com with ESMTP; 29 Apr 2024 10:10:46 -0700
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	netdev@vger.kernel.org
+Cc: Vitaly Lifshits <vitaly.lifshits@intel.com>,
+	anthony.l.nguyen@intel.com,
+	regressions@leemhuis.info,
+	stable@vger.kernel.org,
+	=?UTF-8?q?J=C3=A9r=C3=B4me=20Carretero?= <cJ@zougloub.eu>,
+	Sasha Neftin <sasha.neftin@intel.com>,
+	Dima Ruinskiy <dima.ruinskiy@intel.com>
+Subject: [PATCH net] e1000e: change usleep_range to udelay in PHY mdic access
+Date: Mon, 29 Apr 2024 10:10:40 -0700
+Message-ID: <20240429171040.1152516-1-anthony.l.nguyen@intel.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Now that we no longer any drivers using PHYLIB's adjust_link callback,
-remove all paths that made use of adjust_link as well as the associated
-functions.
+From: Vitaly Lifshits <vitaly.lifshits@intel.com>
 
-Signed-off-by: Florian Fainelli <florian.fainelli@broadcom.com>
+This is a partial revert of commit 6dbdd4de0362 ("e1000e: Workaround
+for sporadic MDI error on Meteor Lake systems"). The referenced commit
+used usleep_range inside the PHY access routines, which are sometimes
+called from an atomic context. This can lead to a kernel panic in some
+scenarios, such as cable disconnection and reconnection on vPro systems.
+
+Solve this by changing the usleep_range calls back to udelay.
+
+Fixes: 6dbdd4de0362 ("e1000e: Workaround for sporadic MDI error on Meteor Lake systems")
+Cc: stable@vger.kernel.org
+Reported-by: Jérôme Carretero <cJ@zougloub.eu>
+Closes: https://bugzilla.kernel.org/show_bug.cgi?id=218740
+Closes: https://lore.kernel.org/lkml/a7eb665c74b5efb5140e6979759ed243072cb24a.camel@zougloub.eu/
+Co-developed-by: Sasha Neftin <sasha.neftin@intel.com>
+Signed-off-by: Sasha Neftin <sasha.neftin@intel.com>
+Signed-off-by: Vitaly Lifshits <vitaly.lifshits@intel.com>
+Tested-by: Dima Ruinskiy <dima.ruinskiy@intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- include/net/dsa.h |   7 ---
- net/dsa/dsa.c     |   3 +-
- net/dsa/port.c    | 136 ++++------------------------------------------
- 3 files changed, 12 insertions(+), 134 deletions(-)
+ drivers/net/ethernet/intel/e1000e/phy.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/include/net/dsa.h b/include/net/dsa.h
-index 678f1fd8b189..eef702dbea78 100644
---- a/include/net/dsa.h
-+++ b/include/net/dsa.h
-@@ -24,8 +24,6 @@
+diff --git a/drivers/net/ethernet/intel/e1000e/phy.c b/drivers/net/ethernet/intel/e1000e/phy.c
+index 93544f1cc2a5..f7ae0e0aa4a4 100644
+--- a/drivers/net/ethernet/intel/e1000e/phy.c
++++ b/drivers/net/ethernet/intel/e1000e/phy.c
+@@ -157,7 +157,7 @@ s32 e1000e_read_phy_reg_mdic(struct e1000_hw *hw, u32 offset, u16 *data)
+ 		 * the lower time out
+ 		 */
+ 		for (i = 0; i < (E1000_GEN_POLL_TIMEOUT * 3); i++) {
+-			usleep_range(50, 60);
++			udelay(50);
+ 			mdic = er32(MDIC);
+ 			if (mdic & E1000_MDIC_READY)
+ 				break;
+@@ -181,7 +181,7 @@ s32 e1000e_read_phy_reg_mdic(struct e1000_hw *hw, u32 offset, u16 *data)
+ 		 * reading duplicate data in the next MDIC transaction.
+ 		 */
+ 		if (hw->mac.type == e1000_pch2lan)
+-			usleep_range(100, 150);
++			udelay(100);
  
- struct dsa_8021q_context;
- struct tc_action;
--struct phy_device;
--struct phylink_link_state;
+ 		if (success) {
+ 			*data = (u16)mdic;
+@@ -237,7 +237,7 @@ s32 e1000e_write_phy_reg_mdic(struct e1000_hw *hw, u32 offset, u16 data)
+ 		 * the lower time out
+ 		 */
+ 		for (i = 0; i < (E1000_GEN_POLL_TIMEOUT * 3); i++) {
+-			usleep_range(50, 60);
++			udelay(50);
+ 			mdic = er32(MDIC);
+ 			if (mdic & E1000_MDIC_READY)
+ 				break;
+@@ -261,7 +261,7 @@ s32 e1000e_write_phy_reg_mdic(struct e1000_hw *hw, u32 offset, u16 data)
+ 		 * reading duplicate data in the next MDIC transaction.
+ 		 */
+ 		if (hw->mac.type == e1000_pch2lan)
+-			usleep_range(100, 150);
++			udelay(100);
  
- #define DSA_TAG_PROTO_NONE_VALUE		0
- #define DSA_TAG_PROTO_BRCM_VALUE		1
-@@ -867,11 +865,6 @@ struct dsa_switch_ops {
- 	int	(*phy_write)(struct dsa_switch *ds, int port,
- 			     int regnum, u16 val);
- 
--	/*
--	 * Link state adjustment (called from libphy)
--	 */
--	void	(*adjust_link)(struct dsa_switch *ds, int port,
--				struct phy_device *phydev);
- 	/*
- 	 * PHYLINK integration
- 	 */
-diff --git a/net/dsa/dsa.c b/net/dsa/dsa.c
-index 2f347cd37316..12521a7d4048 100644
---- a/net/dsa/dsa.c
-+++ b/net/dsa/dsa.c
-@@ -1511,8 +1511,7 @@ static int dsa_switch_probe(struct dsa_switch *ds)
- 		    ds->ops->phylink_mac_config ||
- 		    ds->ops->phylink_mac_finish ||
- 		    ds->ops->phylink_mac_link_down ||
--		    ds->ops->phylink_mac_link_up ||
--		    ds->ops->adjust_link)
-+		    ds->ops->phylink_mac_link_up)
- 			return -EINVAL;
- 	}
- 
-diff --git a/net/dsa/port.c b/net/dsa/port.c
-index c6febc3d96d9..68955014f83d 100644
---- a/net/dsa/port.c
-+++ b/net/dsa/port.c
-@@ -1535,25 +1535,6 @@ void dsa_port_set_tag_protocol(struct dsa_port *cpu_dp,
- 	cpu_dp->tag_ops = tag_ops;
- }
- 
--static struct phy_device *dsa_port_get_phy_device(struct dsa_port *dp)
--{
--	struct device_node *phy_dn;
--	struct phy_device *phydev;
--
--	phy_dn = of_parse_phandle(dp->dn, "phy-handle", 0);
--	if (!phy_dn)
--		return NULL;
--
--	phydev = of_phy_find_device(phy_dn);
--	if (!phydev) {
--		of_node_put(phy_dn);
--		return ERR_PTR(-EPROBE_DEFER);
--	}
--
--	of_node_put(phy_dn);
--	return phydev;
--}
--
- static struct phylink_pcs *
- dsa_port_phylink_mac_select_pcs(struct phylink_config *config,
- 				phy_interface_t interface)
-@@ -1616,17 +1597,13 @@ static void dsa_port_phylink_mac_link_down(struct phylink_config *config,
- 					   phy_interface_t interface)
- {
- 	struct dsa_port *dp = dsa_phylink_to_port(config);
--	struct phy_device *phydev = NULL;
- 	struct dsa_switch *ds = dp->ds;
- 
- 	if (dsa_port_is_user(dp))
- 		phydev = dp->user->phydev;
- 
--	if (!ds->ops->phylink_mac_link_down) {
--		if (ds->ops->adjust_link && phydev)
--			ds->ops->adjust_link(ds, dp->index, phydev);
-+	if (!ds->ops->phylink_mac_link_down)
- 		return;
--	}
- 
- 	ds->ops->phylink_mac_link_down(ds, dp->index, mode, interface);
- }
-@@ -1641,11 +1618,8 @@ static void dsa_port_phylink_mac_link_up(struct phylink_config *config,
- 	struct dsa_port *dp = dsa_phylink_to_port(config);
- 	struct dsa_switch *ds = dp->ds;
- 
--	if (!ds->ops->phylink_mac_link_up) {
--		if (ds->ops->adjust_link && phydev)
--			ds->ops->adjust_link(ds, dp->index, phydev);
-+	if (!ds->ops->phylink_mac_link_up)
- 		return;
--	}
- 
- 	ds->ops->phylink_mac_link_up(ds, dp->index, mode, interface, phydev,
- 				     speed, duplex, tx_pause, rx_pause);
-@@ -1708,78 +1682,6 @@ void dsa_port_phylink_destroy(struct dsa_port *dp)
- 	dp->pl = NULL;
- }
- 
--static int dsa_shared_port_setup_phy_of(struct dsa_port *dp, bool enable)
--{
--	struct dsa_switch *ds = dp->ds;
--	struct phy_device *phydev;
--	int port = dp->index;
--	int err = 0;
--
--	phydev = dsa_port_get_phy_device(dp);
--	if (!phydev)
--		return 0;
--
--	if (IS_ERR(phydev))
--		return PTR_ERR(phydev);
--
--	if (enable) {
--		err = genphy_resume(phydev);
--		if (err < 0)
--			goto err_put_dev;
--
--		err = genphy_read_status(phydev);
--		if (err < 0)
--			goto err_put_dev;
--	} else {
--		err = genphy_suspend(phydev);
--		if (err < 0)
--			goto err_put_dev;
--	}
--
--	if (ds->ops->adjust_link)
--		ds->ops->adjust_link(ds, port, phydev);
--
--	dev_dbg(ds->dev, "enabled port's phy: %s", phydev_name(phydev));
--
--err_put_dev:
--	put_device(&phydev->mdio.dev);
--	return err;
--}
--
--static int dsa_shared_port_fixed_link_register_of(struct dsa_port *dp)
--{
--	struct device_node *dn = dp->dn;
--	struct dsa_switch *ds = dp->ds;
--	struct phy_device *phydev;
--	int port = dp->index;
--	phy_interface_t mode;
--	int err;
--
--	err = of_phy_register_fixed_link(dn);
--	if (err) {
--		dev_err(ds->dev,
--			"failed to register the fixed PHY of port %d\n",
--			port);
--		return err;
--	}
--
--	phydev = of_phy_find_device(dn);
--
--	err = of_get_phy_mode(dn, &mode);
--	if (err)
--		mode = PHY_INTERFACE_MODE_NA;
--	phydev->interface = mode;
--
--	genphy_read_status(phydev);
--
--	if (ds->ops->adjust_link)
--		ds->ops->adjust_link(ds, port, phydev);
--
--	put_device(&phydev->mdio.dev);
--
--	return 0;
--}
--
- static int dsa_shared_port_phylink_register(struct dsa_port *dp)
- {
- 	struct dsa_switch *ds = dp->ds;
-@@ -1983,44 +1885,28 @@ int dsa_shared_port_link_register_of(struct dsa_port *dp)
- 					dsa_switches_apply_workarounds))
- 		return -EINVAL;
- 
--	if (!ds->ops->adjust_link) {
--		if (missing_link_description) {
--			dev_warn(ds->dev,
--				 "Skipping phylink registration for %s port %d\n",
--				 dsa_port_is_cpu(dp) ? "CPU" : "DSA", dp->index);
--		} else {
--			dsa_shared_port_link_down(dp);
-+	if (missing_link_description) {
-+		dev_warn(ds->dev,
-+			 "Skipping phylink registration for %s port %d\n",
-+			 dsa_port_is_cpu(dp) ? "CPU" : "DSA", dp->index);
-+	} else {
-+		dsa_shared_port_link_down(dp);
- 
--			return dsa_shared_port_phylink_register(dp);
--		}
--		return 0;
-+		return dsa_shared_port_phylink_register(dp);
- 	}
- 
--	dev_warn(ds->dev,
--		 "Using legacy PHYLIB callbacks. Please migrate to PHYLINK!\n");
--
--	if (of_phy_is_fixed_link(dp->dn))
--		return dsa_shared_port_fixed_link_register_of(dp);
--	else
--		return dsa_shared_port_setup_phy_of(dp, true);
-+	return 0;
- }
- 
- void dsa_shared_port_link_unregister_of(struct dsa_port *dp)
- {
--	struct dsa_switch *ds = dp->ds;
--
--	if (!ds->ops->adjust_link && dp->pl) {
-+	if (dp->pl) {
- 		rtnl_lock();
- 		phylink_disconnect_phy(dp->pl);
- 		rtnl_unlock();
- 		dsa_port_phylink_destroy(dp);
- 		return;
- 	}
--
--	if (of_phy_is_fixed_link(dp->dn))
--		of_phy_deregister_fixed_link(dp->dn);
--	else
--		dsa_shared_port_setup_phy_of(dp, false);
- }
- 
- int dsa_port_hsr_join(struct dsa_port *dp, struct net_device *hsr,
+ 		if (success)
+ 			return 0;
 -- 
-2.34.1
+2.41.0
 
 
