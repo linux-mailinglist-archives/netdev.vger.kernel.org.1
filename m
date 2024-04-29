@@ -1,176 +1,103 @@
-Return-Path: <netdev+bounces-92126-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92130-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9BDA78B5854
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 14:23:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 123328B587D
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 14:27:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CDEC11C21EB2
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 12:23:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BD0811F23E42
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 12:27:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC9D582C6C;
-	Mon, 29 Apr 2024 12:19:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C27D3F9C2;
+	Mon, 29 Apr 2024 12:27:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VJLIXPpr"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f179.google.com (mail-yb1-f179.google.com [209.85.219.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AE2882890;
-	Mon, 29 Apr 2024 12:19:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 756501B94D
+	for <netdev@vger.kernel.org>; Mon, 29 Apr 2024 12:27:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714393175; cv=none; b=PjST0qj3GxF0ZyfpoIT18wxPrcingQNTTvWPVvs2bhfKswqjEbYC8lVaU7KW6rCxvozEhTT/cOF5R8cNuHZsWV7fqKp8kRb2xQJxWmusdXSrG+G4DQ/D3IVF4NOGhtaZIrEEkJ03c0m84UTFtrRV8IcaGeRDM0SiAX06Sj2LQ7M=
+	t=1714393624; cv=none; b=ViSDTJcF9nhiD+N/k4MDfuVtzYL5f2jCeGB3x8Joc6Jzd64BggNF/0FpRjMiMxPfq29LuewnXfKjLW5WiAFKBbEzRUMTx6fF48O4c5LeYYeREZHnEqrYqcAcgsV9cj+L3fpN3Yw3vQqK+kGJ/ZBFJxekFTvuXmQk4tXq8f94jXU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714393175; c=relaxed/simple;
-	bh=6RqH7FPuxpSJD0mJfXR/KNcfyHNIKJWC4vgrpa/5Cg8=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PmJk3PQLTk66RdRZKwGE3i44FsIBSPrf76BYAhM5mKWsBn2ILuf6xREIRwGz09QTok/c9d99/wLuATHEuCpb6Cn+UQNVqRPeVlZU4knR3nMXEz8rqjA12lJh86h5fyE389CTqhDQBx21i/hG+FEl3+l+zw0+fpx/pu82oA0fX44=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.194])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4VSj3g3L7KzwVQn;
-	Mon, 29 Apr 2024 20:16:15 +0800 (CST)
-Received: from dggpeml500026.china.huawei.com (unknown [7.185.36.106])
-	by mail.maildlp.com (Postfix) with ESMTPS id C373514035F;
-	Mon, 29 Apr 2024 20:19:31 +0800 (CST)
-Received: from huawei.com (10.175.101.6) by dggpeml500026.china.huawei.com
- (7.185.36.106) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Mon, 29 Apr
- 2024 20:19:31 +0800
-From: Zhengchao Shao <shaozhengchao@huawei.com>
-To: <stable@vger.kernel.org>
-CC: <netdev@vger.kernel.org>, <gregkh@linuxfoundation.org>,
-	<davem@davemloft.net>, <kuznet@ms2.inr.ac.ru>, <yoshfuji@linux-ipv6.org>,
-	<kuba@kernel.org>, <edumazet@google.com>, <kuniyu@amazon.com>,
-	<weiyongjun1@huawei.com>, <yuehaibing@huawei.com>, <shaozhengchao@huawei.com>
-Subject: [PATCH stable,5.15 2/2] tcp: Fix NEW_SYN_RECV handling in inet_twsk_purge()
-Date: Mon, 29 Apr 2024 20:24:48 +0800
-Message-ID: <20240429122448.2661647-3-shaozhengchao@huawei.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240429122448.2661647-1-shaozhengchao@huawei.com>
-References: <20240429122448.2661647-1-shaozhengchao@huawei.com>
+	s=arc-20240116; t=1714393624; c=relaxed/simple;
+	bh=tuSTpIVn0SW01pSetjW8tMVtLjmm5VhmOL04c8cHDCQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=rFXvC2r7CUd8v14rK/lrBHQy3fpOuog7+aMS1Q/T2bp/WWnFqPX53mjVNNkJBt6YZQ9COB1PczPkCSNMW0GxSV3fyxFOhyx1wthnp2l782YVgGyo2O1hDSBhqkLxjX3JzfcMNixL5LSt3QZ2k9cfF3qG328MbuCXixww+/ubkBU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=VJLIXPpr; arc=none smtp.client-ip=209.85.219.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-yb1-f179.google.com with SMTP id 3f1490d57ef6-de5e74939fdso773588276.0
+        for <netdev@vger.kernel.org>; Mon, 29 Apr 2024 05:27:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1714393622; x=1714998422; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tuSTpIVn0SW01pSetjW8tMVtLjmm5VhmOL04c8cHDCQ=;
+        b=VJLIXPpr8UdGBj1Gmhc96X9sp4ugSZjmWMvES3wD9OrxEpCutO6TL4K+LyVgs+Wx0C
+         JQk1lc2zb23Ba2lezrIEuZcOuS0/2+76fPjEnIL2qwJiGa7sY15dNsSXtRCluDuZ9uXb
+         6Fg+oI8pyYz5ze06uZNLeAUqHJeixh/sIfin1OY9e4lIpxSR1ULGlu4ByYhETPdhsRd8
+         G7f3qcnmHdpcm0gO/ZKxQhSfA1aMm+7cJa3LndpJskns7vZSl+X1nDP9EL2tGbmA6fxd
+         VfIiqdTHS38u73zP3o3nQ70UZrdhjN9oYDWTAZcG6AAVYaxrN8XPtV0u37wHmOI6Uxqj
+         ZyGw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714393622; x=1714998422;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=tuSTpIVn0SW01pSetjW8tMVtLjmm5VhmOL04c8cHDCQ=;
+        b=nZfHXBeq37/fDUYUpY5bPThpouvNEQvphbzjy69DmF2z3R8wCRZDUb8JljAxJOuHTm
+         +haAVJmhJvYSQEBoS6w1MN+net8y/9Hrmt7SKkpSC3S1JaE8WCi1Ur8cX4K6ijR28gxF
+         y5BYJrkRWkA75kNQoSgqONDkG8RFhfHjKbVjNLjzglN+YOoCQPMOddG93euZnuXXF5LG
+         KdIUIzAVyFqODqyX2oAUGF2dDlDTc4tmKNe1sWth3bZxajbA/qNc6/J96egO3DJaZIQt
+         5g6bHOrkAplvu0xRwGxUqVDDN+gdSf+frpiofsBR3fdw+0sEr3dCVC9CzVPSp1Q9zU2u
+         CXZQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU7ANDEr6+HCdYDcAj+oV7LAN6ow7/YmxumvvmqMBwo3AeFEtDgsDJr/0f7BrhBdmkPRWcd+B/MsEO9BCHj70Ysw987th/G
+X-Gm-Message-State: AOJu0YxprMHVpMUmXmigUksg2DypJ3DDR0BPvcr1i+Qbt02jzTxBBmJQ
+	Ve18B6aS3CvgDiAxUEontDVqj+o9lAhkuBK49UbfUzoi5jNn/KGqOzUGkGlniQZYIujho8x5jBK
+	flJSc5QQfCeZDDMbSFPHkzuc+WvRwvpApp9KbBvE9ptkz2xjO
+X-Google-Smtp-Source: AGHT+IFtKvHq4pOnPt4rIKsXtd9zM5FkEROME21Y+SD6+vds/LzBJ1ndg26Hh25Abbz9C/YUM2Xia9UkxmWN68qSwNI=
+X-Received: by 2002:a25:d509:0:b0:de5:9e29:b5bd with SMTP id
+ r9-20020a25d509000000b00de59e29b5bdmr9417884ybe.64.1714393622160; Mon, 29 Apr
+ 2024 05:27:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- dggpeml500026.china.huawei.com (7.185.36.106)
+References: <E1s11qJ-00AHi0-Kk@rmk-PC.armlinux.org.uk>
+In-Reply-To: <E1s11qJ-00AHi0-Kk@rmk-PC.armlinux.org.uk>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Mon, 29 Apr 2024 14:26:50 +0200
+Message-ID: <CACRpkdZ46ji6Sc==S3dwjWLbehwjadmDm_QrnCmJsuY=GXVUtg@mail.gmail.com>
+Subject: Re: [PATCH net-next] net: dsa: realtek: provide own phylink MAC operations
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Cc: =?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>, 
+	Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, 
+	Vladimir Oltean <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Eric Dumazet <edumazet@google.com>
+On Sun, Apr 28, 2024 at 12:33=E2=80=AFPM Russell King (Oracle)
+<rmk+kernel@armlinux.org.uk> wrote:
 
-commit 1c4e97dd2d3c9a3e84f7e26346aa39bc426d3249 upstream
+> Convert realtek to provide its own phylink MAC operations, thus
+> avoiding the shim layer in DSA's port.c. We need to provide a stub for
+> the mandatory mac_config() method for rtl8366rb.
+>
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
-inet_twsk_purge() uses rcu to find TIME_WAIT and NEW_SYN_RECV
-objects to purge.
+Looks good to me!
+Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
 
-These objects use SLAB_TYPESAFE_BY_RCU semantic and need special
-care. We need to use refcount_inc_not_zero(&sk->sk_refcnt).
-
-Reuse the existing correct logic I wrote for TIME_WAIT,
-because both structures have common locations for
-sk_state, sk_family, and netns pointer.
-
-If after the refcount_inc_not_zero() the object fields longer match
-the keys, use sock_gen_put(sk) to release the refcount.
-
-Then we can call inet_twsk_deschedule_put() for TIME_WAIT,
-inet_csk_reqsk_queue_drop_and_put() for NEW_SYN_RECV sockets,
-with BH disabled.
-
-Then we need to restart the loop because we had drop rcu_read_lock().
-
-Fixes: 740ea3c4a0b2 ("tcp: Clean up kernel listener's reqsk in inet_twsk_purge()")
-Link: https://lore.kernel.org/netdev/CANn89iLvFuuihCtt9PME2uS1WJATnf5fKjDToa1WzVnRzHnPfg@mail.gmail.com/T/#u
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Link: https://lore.kernel.org/r/20240308200122.64357-2-kuniyu@amazon.com
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
----
- net/ipv4/inet_timewait_sock.c | 41 ++++++++++++++++-------------------
- 1 file changed, 19 insertions(+), 22 deletions(-)
-
-diff --git a/net/ipv4/inet_timewait_sock.c b/net/ipv4/inet_timewait_sock.c
-index 9b891d6296ec..25809e06f111 100644
---- a/net/ipv4/inet_timewait_sock.c
-+++ b/net/ipv4/inet_timewait_sock.c
-@@ -254,12 +254,12 @@ void __inet_twsk_schedule(struct inet_timewait_sock *tw, int timeo, bool rearm)
- }
- EXPORT_SYMBOL_GPL(__inet_twsk_schedule);
- 
-+/* Remove all non full sockets (TIME_WAIT and NEW_SYN_RECV) for dead netns */
- void inet_twsk_purge(struct inet_hashinfo *hashinfo, int family)
- {
--	struct inet_timewait_sock *tw;
--	struct sock *sk;
- 	struct hlist_nulls_node *node;
- 	unsigned int slot;
-+	struct sock *sk;
- 
- 	for (slot = 0; slot <= hashinfo->ehash_mask; slot++) {
- 		struct inet_ehash_bucket *head = &hashinfo->ehash[slot];
-@@ -268,38 +268,35 @@ void inet_twsk_purge(struct inet_hashinfo *hashinfo, int family)
- 		rcu_read_lock();
- restart:
- 		sk_nulls_for_each_rcu(sk, node, &head->chain) {
--			if (sk->sk_state != TCP_TIME_WAIT) {
--				/* A kernel listener socket might not hold refcnt for net,
--				 * so reqsk_timer_handler() could be fired after net is
--				 * freed.  Userspace listener and reqsk never exist here.
--				 */
--				if (unlikely(sk->sk_state == TCP_NEW_SYN_RECV &&
--					     hashinfo->pernet)) {
--					struct request_sock *req = inet_reqsk(sk);
--
--					inet_csk_reqsk_queue_drop_and_put(req->rsk_listener, req);
--				}
-+			int state = inet_sk_state_load(sk);
- 
-+			if ((1 << state) & ~(TCPF_TIME_WAIT |
-+					     TCPF_NEW_SYN_RECV))
- 				continue;
--			}
- 
--			tw = inet_twsk(sk);
--			if ((tw->tw_family != family) ||
--				refcount_read(&twsk_net(tw)->ns.count))
-+			if (sk->sk_family != family ||
-+			    refcount_read(&sock_net(sk)->ns.count))
- 				continue;
- 
--			if (unlikely(!refcount_inc_not_zero(&tw->tw_refcnt)))
-+			if (unlikely(!refcount_inc_not_zero(&sk->sk_refcnt)))
- 				continue;
- 
--			if (unlikely((tw->tw_family != family) ||
--				     refcount_read(&twsk_net(tw)->ns.count))) {
--				inet_twsk_put(tw);
-+			if (unlikely(sk->sk_family != family ||
-+				     refcount_read(&sock_net(sk)->ns.count))) {
-+				sock_gen_put(sk);
- 				goto restart;
- 			}
- 
- 			rcu_read_unlock();
- 			local_bh_disable();
--			inet_twsk_deschedule_put(tw);
-+			if (state == TCP_TIME_WAIT) {
-+				inet_twsk_deschedule_put(inet_twsk(sk));
-+			} else {
-+				struct request_sock *req = inet_reqsk(sk);
-+
-+				inet_csk_reqsk_queue_drop_and_put(req->rsk_listener,
-+								  req);
-+			}
- 			local_bh_enable();
- 			goto restart_rcu;
- 		}
--- 
-2.34.1
-
+Yours,
+Linus Walleij
 
