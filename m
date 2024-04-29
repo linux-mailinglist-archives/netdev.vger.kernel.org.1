@@ -1,148 +1,140 @@
-Return-Path: <netdev+bounces-92207-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92208-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A59798B5F44
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 18:41:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D2538B5F49
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 18:42:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5C4281F210B2
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 16:41:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E6343281133
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 16:42:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2278885C76;
-	Mon, 29 Apr 2024 16:41:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E942D85958;
+	Mon, 29 Apr 2024 16:42:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cc+/Xx8I"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K/bEROam"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f178.google.com (mail-vk1-f178.google.com [209.85.221.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE56385C6C;
-	Mon, 29 Apr 2024 16:41:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AAE61DA23
+	for <netdev@vger.kernel.org>; Mon, 29 Apr 2024 16:42:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714408884; cv=none; b=QAw5IUNHCkxfP3uJwm60YdDTAjoCECgBr16AE3dmkHlRnHyt5uRuyFPUjdai5u5gd08E5QTxCmHThUZUfsDpN+LJIl53vLeJUVpc6sjMmbrZywJyk9B0XfwuWf4WiW0ziuO1s1XRWMJlM0fZ921Gqep7jVVdMsApmwDSUo4vMDo=
+	t=1714408934; cv=none; b=Fhi6Dv0alANmS84SiizfVyXxmtcojY9/P25YYxsIZ/LTaS70/kG5SlWoVH4qFobp4yLp7YNjLupk0E37u/ZTNaUKOuJWWCM/Z03Jh4F2NY1CqcJX1pnkzDTmXFdCDsePe9jBFyBvi4YnwQRztbp75o+YdM40/luOKEEk1WhNpqY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714408884; c=relaxed/simple;
-	bh=RspDC4859kGMgSkyYFyIkNCEccqvD+abVhafD7M8wy0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dpGEt2mfU0kJYe8ttTlV+bWGKuzWJcfXW86+d3FCWX4ZanUyQgSm8YTX/2MW59ofROQYs37N8YspsxkK5uxUsCMu2ScYvPZgS99OvkYkPBfSloKcbw2lpp8HJk9OoXBCwmKwr0jUYhmG4PuT65e6DbQbECZLxLna/Fuob82hRxM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cc+/Xx8I; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37C58C113CD;
-	Mon, 29 Apr 2024 16:41:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714408883;
-	bh=RspDC4859kGMgSkyYFyIkNCEccqvD+abVhafD7M8wy0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=cc+/Xx8IIGyKgtBMl4bG4Ih1tCcNRVJTTPfaKFVN51WfCPGtwvpMU1UO6qmcBy3jS
-	 VT+hvaMR03E+9tFtgilqBDfx+zLSZ9poMbUu4kfFiYa9WWX84PTbTOYmcqLLgPnh1D
-	 uQd7SHLnbQMXz/GdLFE1WVJmG2fE6ZpBJgC+gfXbV2uwR4qQ+bxUzz9GrzhbPBJde/
-	 Mc3Kc1JhdAN64mOj8KVYOCrHwRe7ZmihmlngOX+zrTvjYalZS8Y4UY7dO2zpv/m6Ze
-	 o08PwTne6oTnmo4C2Xq5exlSR7uLLyWEXz5Jj2r5ocEmADF8LohY6N0GOhqquRT4dp
-	 i2eI04VoSUvTw==
-Date: Mon, 29 Apr 2024 17:41:18 +0100
-From: Simon Horman <horms@kernel.org>
-To: Ryosuke Yasuoka <ryasuoka@redhat.com>
-Cc: krzk@kernel.org, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, syoshida@redhat.com,
-	syzbot+d7b4dc6cd50410152534@syzkaller.appspotmail.com
-Subject: Re: [PATCH net v2] nfc: nci: Fix uninit-value in nci_rx_work
-Message-ID: <20240429164118.GB516117@kernel.org>
-References: <20240427103558.161706-1-ryasuoka@redhat.com>
- <20240428134525.GW516117@kernel.org>
- <Zi-vGH1ROjiv1yJ2@zeus>
+	s=arc-20240116; t=1714408934; c=relaxed/simple;
+	bh=YXfK9bDetba6PWZtX6QHFi8FVcqIVR0VvuucNVqOVQ0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=B+YitP5e/5DyPXTyuTO4/zmFHQ/YiuWPs4k1w54mxeXy1QqN2hOzrovhnOpWdK5TFYDVo/pKfFNbdhHB9hluXlGlFOm3fLpOf6QQjpCjN3301qJhO1A5yCvlNtoj1NpPF/+nDe/zL7ZfetUJW1V42ZNvBMqASWB+UK0Q00wUfz4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=K/bEROam; arc=none smtp.client-ip=209.85.221.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vk1-f178.google.com with SMTP id 71dfb90a1353d-4dcceac3ae1so1722458e0c.2
+        for <netdev@vger.kernel.org>; Mon, 29 Apr 2024 09:42:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1714408932; x=1715013732; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=Z3GYAswhgqLLThvewnR9J5Vd0wCAQUQOXcPZU0AwFWA=;
+        b=K/bEROamySceSWfO6IWieAxLQdq9aJJdai+WcXnBDCdLGkiZ0WCbh8rQQQlwj69Ota
+         LEasaVeaszpsiiN+LQHE0+foiM7CD073Jir0qOglImShJ/qxOdUazzGbRuIlIUErMiCt
+         aNvDEKdnJB5UhQcPh7r1LYV3hl5WIRvkslnxeAgrOk31v+suG3Zz/j30LQFevA5sqb/g
+         BqX0G5rudrxgOYsU+D7tnkgeJI6DHk3hifSxb7zzV7q+WqUTYVTRMqQ9QFsxxMbAktCo
+         nbfT+cJwea4NBIPm5sxj7JTqBAvUuCYV6WBt9J72bnzNEgG4QvQa97HzhXq/PddMUVo3
+         RtZg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714408932; x=1715013732;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Z3GYAswhgqLLThvewnR9J5Vd0wCAQUQOXcPZU0AwFWA=;
+        b=kXcuNnT4UABPv065n8cariSNIF5IWS++f+BuPRZg9Xgf+vMLn2Rjmlvqqi4HMLZQs+
+         bj36LDULSiStsz1HDsm/GQLSpgVzqCBh6nXc09ID6wAUXw+50r+XTIghXkNZOvvL0uV4
+         ghdD2aP7G2AvjDvGZCnO343vIVi2vItJTTbR+5yfqsMyeR0rCPpQOt8ZsqpA+ExLu/mc
+         ZYbyVqI6wV16zbE7wZLUqlUMNtla9vC0iNPhUDKLUwN/Djmld9A83iprAv0mmlrA0/bi
+         lZaND2FZVljwdMMvDy4CIpeN/eCchZmk3yntaCOeVjqUnHF8002qHHi2HARNhnm55MoY
+         GaiQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWSKcRwhtVsqIUBmnMJN0TbERUG8jGuKyjVbfxSZa8WwNmCYWoFWwC8QQECM80MFKxPiFo5xYg4PIePxsYmrba8u6Ji8JO9
+X-Gm-Message-State: AOJu0YwFnvY0hOil0O53rX6a5ag3MZkSVPaCz8EPvaospL+vq6iOinQC
+	9Wl1DEjHDssChwbXOsGnYkofimQroV+T0mgVX7wESDI6ONsc1za3
+X-Google-Smtp-Source: AGHT+IFT2La2YVmDvYHvRaa8tf3nI9/my8w73K/a3lEJeFI5GQE7w0TO1iwVLo0FRm5aTGYARrEU7A==
+X-Received: by 2002:a05:6122:1d13:b0:4c8:ee1:5a0b with SMTP id gc19-20020a0561221d1300b004c80ee15a0bmr325402vkb.15.1714408932308;
+        Mon, 29 Apr 2024 09:42:12 -0700 (PDT)
+Received: from [192.168.99.58] ([216.14.52.203])
+        by smtp.gmail.com with ESMTPSA id l6-20020ac87246000000b004369f4d31f2sm10591933qtp.50.2024.04.29.09.42.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 29 Apr 2024 09:42:09 -0700 (PDT)
+Message-ID: <fc5c37e6-07c2-4635-bd16-a4b29512fbd3@gmail.com>
+Date: Mon, 29 Apr 2024 09:42:07 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Zi-vGH1ROjiv1yJ2@zeus>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: dsa: mv88e6xxx: Fix number of databases for
+ 88E6141 / 88E6341
+To: =?UTF-8?Q?Marek_Beh=C3=BAn?= <kabel@kernel.org>, netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
+ Eric Dumazet <edumazet@google.com>,
+ Gregory CLEMENT <gregory.clement@bootlin.com>,
+ Vivien Didelot <vivien.didelot@gmail.com>
+References: <20240429133832.9547-1-kabel@kernel.org>
+Content-Language: en-US
+From: Florian Fainelli <f.fainelli@gmail.com>
+Autocrypt: addr=f.fainelli@gmail.com; keydata=
+ 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
+ HGuUuzv+GKZ6nsysJw==
+In-Reply-To: <20240429133832.9547-1-kabel@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Mon, Apr 29, 2024 at 11:30:48PM +0900, Ryosuke Yasuoka wrote:
-> On Sun, Apr 28, 2024 at 02:45:25PM +0100, Simon Horman wrote:
-> > On Sat, Apr 27, 2024 at 07:35:54PM +0900, Ryosuke Yasuoka wrote:
 
-...
 
-> Thank you for your comment, Simon.
+On 4/29/2024 6:38 AM, Marek Behún wrote:
+> The Topaz family (88E6141 and 88E6341) only support 256 Forwarding
+> Information Tables.
 > 
-> Yes, if it handles packets correctly in nci_{rsp,ntf,rx_data}_packet(),
-> it should not reach invalid_pkt_free and it should continue to work in
-> the for statement. Sorry, it is my mistake and need to fix it.
-> 
-> BTW, in the current implementation, if the payload is zero, it will free
-> the skb and exit the for statement. I wonder it is intended. 
-> 
-> > > -		if (!nci_plen(skb->data)) {
-> > > -			kfree_skb(skb);
-> > > -			break;
-> > > -		}
-> 
-> When the packet is invalid, it should be discarded but it should not
-> exit the for statement by break. Instead, the skb should just free and
-> it should handle the subsequent packet by continue. If yes, then it 
-> may be like below,
-> 
-> 	for (; (skb = skb_dequeue(&ndev->rx_q)); kcov_remote_stop()) {
-> 		kcov_remote_start_common(skb_get_kcov_handle(skb));
-> 
-> 		/* Send copy to sniffer */
-> 		nfc_send_to_raw_sock(ndev->nfc_dev, skb,
-> 				     RAW_PAYLOAD_NCI, NFC_DIRECTION_RX);
-> 
-> 		if (!skb->len)
-> 			goto invalid_pkt_free;
-> 
-> 		/* Process frame */
-> 		switch (nci_mt(skb->data)) {
-> 		case NCI_MT_RSP_PKT:
-> 			if (!nci_valid_size(skb, NCI_CTRL_HDR_SIZE))
-> 				goto invalid_pkt_free;
-> 			nci_rsp_packet(ndev, skb);
-> 			continue;   <<<---
-> 
-> 		case NCI_MT_NTF_PKT:
-> 			if (!nci_valid_size(skb, NCI_CTRL_HDR_SIZE))
-> 				goto invalid_pkt_free;
-> 			nci_ntf_packet(ndev, skb);
-> 			continue;   <<<---
-> 
-> 		case NCI_MT_DATA_PKT:
-> 			if (!nci_valid_size(skb, NCI_DATA_HDR_SIZE))
-> 				goto invalid_pkt_free;
-> 			nci_rx_data_packet(ndev, skb);
-> 			continue;   <<<---
-> 
-> 		default:
-> 			pr_err("unknown MT 0x%x\n", nci_mt(skb->data));
-> 			goto invalid_pkt_free;
-> 		}
-> invalid_pkt_free:
-> 		kfree_skb(skb);
-> 	}
-> 
-> Could I hear your opinion?
+> Fixes: a75961d0ebfd ("net: dsa: mv88e6xxx: Add support for ethernet switch 88E6341")
+> Fixes: 1558727a1c1b ("net: dsa: mv88e6xxx: Add support for ethernet switch 88E6141")
+> Signed-off-by: Marek Behún <kabel@kernel.org>
 
-Hi Yasuoka-san,
-
-Thanks for pointing this out.
-
-I agree that it is not good to 'break' after kfree_skb() for two reasons:
-
-1. As you mention, the loop should keep going and process other skbs
-2. kcov_remote_stop() needs to be called for each skb
-
-I might have used a 'continue' above the invalid_pkt_free label.
-But I think your suggestion - using 'continue' inside the switch statement
-- is also correct, and seems fine to me.
-
-Please post a v3 when you are ready.
-
+Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
 -- 
-pw-bot: changes-requested
+Florian
 
