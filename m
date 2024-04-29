@@ -1,153 +1,193 @@
-Return-Path: <netdev+bounces-92261-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92262-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE5788B64C5
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 23:45:19 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D25C78B64CB
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 23:45:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E90D51C21C75
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 21:45:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 169FEB21825
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 21:45:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2001184116;
-	Mon, 29 Apr 2024 21:45:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F88218411D;
+	Mon, 29 Apr 2024 21:45:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IjwFzcWC"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aTmRqZtO"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D7F318410D
-	for <netdev@vger.kernel.org>; Mon, 29 Apr 2024 21:45:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B818B184105
+	for <netdev@vger.kernel.org>; Mon, 29 Apr 2024 21:45:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714427115; cv=none; b=T4CC13BP/3BSLO06qxeQTKnuSn/J8Dg1nRJEPAxMgRiDM6ti+GleZjI5UOxPWK/0S1UPA+BWP7Xdq7miXXVDACFmxvRYVwkPCMUXEKIEv9/nd0S8FFEliAnrOSQYnyxlszerzTnoUkBI10UGs0MOJ1qogVQSXf/x1QDqGcXPi4g=
+	t=1714427140; cv=none; b=js2733V3dV0Z+DNkeQgssCRa/ulJOfQx/ZxMByJ283cGPh0UmklJJtp4WZfi1DfC0jn98EH7yMbvSOGo/9ZsDcHra2+0xsIfnlZp+7YVqQAIz2xYUYmu4SFBH9o0R+1cXBG8+/IkcsO4f1X/6/3CKt7GmkjdCg9gl7LPe6apHK0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714427115; c=relaxed/simple;
-	bh=Q93dw3eKrm4AOJORuAk2GQV34PUlaSTj4Mj0/loawWY=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=bzmqfUsmTayr7ospZXB2dSpSRDOkZB4IYik037Vr9sa4a4uPl7FmqnJJ02DIjHC+gUZJARbRJZSiDK081NOmiQsTy3zfzFWDKL5RQ/y7hDCEPtzbktt9Lk23ETEY3Xv2VUUV0E2XoJuSlm+xHFWXjs6P6vq1RquvuE+loHMH1no=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IjwFzcWC; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1714427113;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=QdU3RyAhhNJtPcn7BJGK9yJoXLvf1QCQv7HYg0QISNs=;
-	b=IjwFzcWCeFZXXEhVubskF/7Hl8gSXFYfH8HVjSNZRaHNssH41kdT6QIAIBpb2KeTeLdqvy
-	d1b83KmiiT2aJMo4H25kbHWWcVPieMwEATQKnE+5ncgwLiXcAIzfk6Sw7A03RjiHiRu+Yg
-	BERvRzGw2FZlgbEEhJ094ILbBq6UQlE=
-Received: from mail-pl1-f198.google.com (mail-pl1-f198.google.com
- [209.85.214.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-45-6nNG-1uqO6S7UbKyS6ZBFw-1; Mon, 29 Apr 2024 17:45:10 -0400
-X-MC-Unique: 6nNG-1uqO6S7UbKyS6ZBFw-1
-Received: by mail-pl1-f198.google.com with SMTP id d9443c01a7336-1e63ff880f5so62265525ad.1
-        for <netdev@vger.kernel.org>; Mon, 29 Apr 2024 14:45:09 -0700 (PDT)
+	s=arc-20240116; t=1714427140; c=relaxed/simple;
+	bh=CXdGvTleMNIv4GYdc9ZhHcot4PSSombN20TNzZWr8UI=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=FbJaV86GrBJYIYGcsAe3h7KJZYFnTEGjnWeyh/fTpezm4YchIEydeBHrn6L1rEGCYJ9Pzin20ytAHgKQab+vVac2hg2C4+jAWkfMIyPfcxbD4kan/E4Ore0EXoLulgI96exDjR0p5wVqoe5qmf9ccRELgc1io5mN6x1dJNcaeLk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jrife.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aTmRqZtO; arc=none smtp.client-ip=209.85.219.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jrife.bounces.google.com
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-de610854b8bso760964276.0
+        for <netdev@vger.kernel.org>; Mon, 29 Apr 2024 14:45:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1714427137; x=1715031937; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=/r6j/W9mUWONQY7ovRYyi9uqUz9mWwrTm/AdOjdCX/U=;
+        b=aTmRqZtOVSXV1y9fbysvl58xEMBmjBCCn/C6gvqq+WtcFkLq45ouCNdx1toBHuQJK/
+         x6uJtavnxcB5MnzD13FfWUWK3abEhPpaMsCulU6W5JBQnQZWmMsHAsXtjHmY4CNRAXf7
+         n0xBNohwEkTJaUmiRpOY59DG1G98jP6HqDsDk5xYtfhhyvl0UK4eCN/5YdTZicPAMS3h
+         gm/Yr47FiBUh2C56vgURKHYV1V/lKerm/yTO237gEME9IGQn65e+57evPdwB6Igzz8gf
+         mTqYFyjKhp42lOKTLIhzF6tBUXuHcFV3n1dnl5q4f0nBa5KB8hSZZ7jckudugjkqEghy
+         Ac0A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714427109; x=1715031909;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=QdU3RyAhhNJtPcn7BJGK9yJoXLvf1QCQv7HYg0QISNs=;
-        b=LkKakt+ZnBVDMJdeFSv3mGMB7e9PQm3DgltedK2XYAHWRaojwglXUhA1nu0Q36ZCnp
-         gKJY/ogH5cSYEPChnYLO2tUtIs7E2YKb9ZmVGHLnf3TOHrWoiIv8epCnQTy+hdC7gvUJ
-         Ofg7JZQ/62wb3YAGjsnQpY/0A76uV1oh5m0Md0iHARYMTOtmQlF4ZuqN7fxAcg6bEVdr
-         G7D3JKFIdiRWsI8m83CapXOp6a0suAn1P6ixQtXcKVHaPzVg0g0IN3da3gcYWgIrN8ls
-         SNgmNr8yhtMgF4uKX8ggNOWWHhLyV9MQwcx3MmagM17DE4FMTmce1wRi6tQa88WQ80jK
-         8NmQ==
-X-Gm-Message-State: AOJu0Yyhgup3jXzBCCzyoIo9YDI21yJIEr4gh1RrSlsU3YEQ68hfBSxV
-	cyUgi4/gDXW7Mrp5CkZ5dgBhKGeZ2IQLwfR4PRXZZBc7dGkA17B1LewOXnhrRNxnG97chF2evVZ
-	EAnJ5pSLwZu6AorSDAOoKK55x+Bz8dC00l8R4PC53RxMDP154o16OUg==
-X-Received: by 2002:a17:902:ce87:b0:1eb:7285:d6fe with SMTP id f7-20020a170902ce8700b001eb7285d6femr9045676plg.23.1714427108689;
-        Mon, 29 Apr 2024 14:45:08 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEGRQ9LT7NJkVOb6GUEq9lwThklv0tGP954t0tZVLJEW83PPF8uBigHzkBa6EHJUPWcRTTkqQ==
-X-Received: by 2002:a17:902:ce87:b0:1eb:7285:d6fe with SMTP id f7-20020a170902ce8700b001eb7285d6femr9045663plg.23.1714427108354;
-        Mon, 29 Apr 2024 14:45:08 -0700 (PDT)
-Received: from [192.168.1.111] ([2600:1700:1ff0:d0e0::33])
-        by smtp.gmail.com with ESMTPSA id q5-20020a170902bd8500b001db8145a1a2sm20731655pls.274.2024.04.29.14.45.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Apr 2024 14:45:07 -0700 (PDT)
-From: Andrew Halaney <ahalaney@redhat.com>
-Date: Mon, 29 Apr 2024 16:45:05 -0500
-Subject: [PATCH RFC/RFT net-next] net: stmmac: drop the ethtool begin()
- callback
+        d=1e100.net; s=20230601; t=1714427137; x=1715031937;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=/r6j/W9mUWONQY7ovRYyi9uqUz9mWwrTm/AdOjdCX/U=;
+        b=OTVSZb9yzYXslwCqenIgZV1wInlZK1GGycXOVP9IzEhq92hQEWiEqjFWklX2lbH08y
+         mLUTNBYjYLJlcizqNRBzR65osa+Wv7wgrLchkP5S+DZpkOJnsou0VVYDpf9gYiwFNAYE
+         iRwXCYEtQd7KVlzpJ6gGa31gh9Fqve0mnxO69iqsXR5JF+uuu8AWRPbDyPE2RQDl/lLR
+         5lRr4pEUCsGWEdVVrHZsWjWKv/0Q3mlW/ZOk4FjkwqVeKnPULhtat/NB2kugJfpKIvpH
+         Newrh0WQGUx1VpDaPvemM93yK1hBhiOhu3JlfRwecWTJVKYO5zMaYjJjtF3qclSzFejt
+         xzWA==
+X-Forwarded-Encrypted: i=1; AJvYcCXapGazNHJFk/ZI8XBBy6OcIUA+p17QmPhbuWeFoBmhsnp1aaFwIlnDVkM25UCrwhMVHyJMByHotXcAOkaspUqx12Vep5BR
+X-Gm-Message-State: AOJu0YwzrmlEIBZLBWVFz7xVgtBOJnsZmWyppvXhcwoIfAvrsxnTsGpf
+	RUFLaLvjTowWw/a6TN0ECHVaImWkVaoUu6QoFEshGhJR5o9gHiqQyetWyc/XntFRh3uFBegcqg=
+	=
+X-Google-Smtp-Source: AGHT+IEAAO56xjTLfoNQSFLAwnATKrv+gLtp1W9DP3wLkwXTGkheUj3EN6qI3g4PUDC20KIcGFPosz2rsw==
+X-Received: from jrife.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:9f])
+ (user=jrife job=sendgmr) by 2002:a25:d8d1:0:b0:de5:5304:3206 with SMTP id
+ p200-20020a25d8d1000000b00de553043206mr756562ybg.11.1714427136747; Mon, 29
+ Apr 2024 14:45:36 -0700 (PDT)
+Date: Mon, 29 Apr 2024 16:45:17 -0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240429-stmmac-no-ethtool-begin-v1-1-04c629c1c142@redhat.com>
-X-B4-Tracking: v=1; b=H4sIAOAUMGYC/x2MsQqDMBBAfyXc3MMYg0PXgh8g3YqD1Yse1EtJj
- iKI/27o8IY3vHdApsSU4W4OSPTjzFGK1DcD0zrKQshzcXDWeeudx6zbNk4oEUlXjfGDb1pYMDS
- 2DS7UBQ+l/iYKvP/PL+i7R9V3TyOkKLQrDOd5AQ+jaCR7AAAA
-To: Alexandre Torgue <alexandre.torgue@foss.st.com>, 
- Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
- Abhishek Chauhan <quic_abchauha@quicinc.com>, 
- Sagar Cheluvegowda <quic_scheluve@quicinc.com>
-Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
- Andrew Halaney <ahalaney@redhat.com>
-X-Mailer: b4 0.13.0
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.44.0.769.g3c40516874-goog
+Message-ID: <20240429214529.2644801-1-jrife@google.com>
+Subject: [PATCH v3 bpf-next 0/6] selftests/bpf: Add sockaddr tests for kernel networking
+From: Jordan Rife <jrife@google.com>
+To: bpf@vger.kernel.org
+Cc: Jordan Rife <jrife@google.com>, linux-kselftest@vger.kernel.org, 
+	netdev@vger.kernel.org, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
+	Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
+	Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>, 
+	Kui-Feng Lee <thinker.li@gmail.com>, Artem Savkov <asavkov@redhat.com>, 
+	Dave Marchevsky <davemarchevsky@fb.com>, Menglong Dong <imagedong@tencent.com>, Daniel Xu <dxu@dxuuu.xyz>, 
+	David Vernet <void@manifault.com>, Daan De Meyer <daan.j.demeyer@gmail.com>, 
+	Benjamin Tissoires <bentiss@kernel.org>, Hou Tao <houtao1@huawei.com>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 
-This callback doesn't seem to serve much purpose, and prevents things
-like:
+This patch series adds test coverage for BPF sockaddr hooks and their
+interactions with kernel socket functions (i.e. kernel_bind(),
+kernel_connect(), kernel_sendmsg(), sock_sendmsg(),
+kernel_getpeername(), and kernel_getsockname()) while also rounding out
+IPv4 and IPv6 sockaddr hook coverage in prog_tests/sock_addr.c.
 
-    - systemd.link files from disabling autonegotiation
-    - carrier detection in NetworkManager
+As with v1 of this patch series, we add regression coverage for the
+issues addressed by these patches,
 
-prior to userspace bringing the link up.
+- commit 0bdf399342c5("net: Avoid address overwrite in kernel_connect")
+- commit 86a7e0b69bd5("net: prevent rewrite of msg_name in sock_sendmsg()")
+- commit c889a99a21bf("net: prevent address rewrite in kernel_bind()")
+- commit 01b2885d9415("net: Save and restore msg_namelen in sock_sendmsg")
 
-The only fear I can think of is accessing unclocked resources due to
-pm_runtime, but ethtool ioctls handle that as of commit
-f32a21376573 ("ethtool: runtime-resume netdev parent before ethtool ioctl ops")
+but broaden the focus a bit.
 
-Signed-off-by: Andrew Halaney <ahalaney@redhat.com>
----
- drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c | 8 --------
- 1 file changed, 8 deletions(-)
+In order to extend prog_tests/sock_addr.c to test these kernel
+functions, we add a set of new kfuncs that wrap individual socket
+operations to bpf_testmod and invoke them through set of corresponding
+SYSCALL programs (progs/sock_addr_kern.c). Each test case can be
+configured to use a different set of "sock_ops" depending on whether it
+is testing kernel calls (kernel_bind(), kernel_connect(), etc.) or
+system calls (bind(), connect(), etc.).
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
-index 542e2633a6f5..c2e2723f7c6a 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
-@@ -438,13 +438,6 @@ static void stmmac_ethtool_setmsglevel(struct net_device *dev, u32 level)
- 
- }
- 
--static int stmmac_check_if_running(struct net_device *dev)
--{
--	if (!netif_running(dev))
--		return -EBUSY;
--	return 0;
--}
--
- static int stmmac_ethtool_get_regs_len(struct net_device *dev)
- {
- 	struct stmmac_priv *priv = netdev_priv(dev);
-@@ -1273,7 +1266,6 @@ static int stmmac_set_tunable(struct net_device *dev,
- static const struct ethtool_ops stmmac_ethtool_ops = {
- 	.supported_coalesce_params = ETHTOOL_COALESCE_USECS |
- 				     ETHTOOL_COALESCE_MAX_FRAMES,
--	.begin = stmmac_check_if_running,
- 	.get_drvinfo = stmmac_ethtool_getdrvinfo,
- 	.get_msglevel = stmmac_ethtool_getmsglevel,
- 	.set_msglevel = stmmac_ethtool_setmsglevel,
+=======
+Patches
+=======
+* Patch 1 fixes the sock_addr bind test program to work for big endian
+  architectures such as s390x.
+* Patch 2 introduces the new kfuncs to bpf_testmod.
+* Patch 3 introduces the BPF program which allows us to invoke these
+  kfuncs invividually from the test program.
+* Patch 4 lays the groundwork for IPv4 and IPv6 sockaddr hook coverage
+  by migrating much of the environment setup logic from
+  bpf/test_sock_addr.sh into prog_tests/sock_addr.c and moves test cases
+  to cover bind4/6, connect4/6, sendmsg4/6 and recvmsg4/6 hooks.
+* Patch 5 makes the set of socket operations for each test case
+  configurable, laying the groundwork for Patch 6.
+* Patch 6 introduces two sets of sock_ops that invoke the kernel
+  equivalents of connect(), bind(), etc. and uses these to add coverage
+  for the kernel socket functions.
 
----
-base-commit: a59668a9397e7245b26e9be85d23f242ff757ae8
-change-id: 20240424-stmmac-no-ethtool-begin-f306f2f1f2f4
+=======
+Changes
+=======
+v2->v3
+------
+* Renamed bind helpers. Dropped "_ntoh" suffix.
+* Added guards to kfuncs to make sure addrlen and msglen do not exceed
+  the buffer capacity.
+* Added KF_SLEEPABLE flag to kfuncs.
+* Added a mutex (sock_lock) to kfuncs to serialize access to sock.
+* Added NULL check for sock to each kfunc.
+* Use the "sock_addr" networking namespace for all network interface
+  setup and testing.
+* Use "nodad" when calling "ip -6 addr add" during interface setup to
+  avoid delays and remove ping loop.
+* Removed test cases from test_sock_addr.c to make it clear what remains
+  to be migrated.
+* Removed unused parameter (expect_change) from sock_addr_op().
 
-Best regards,
+Link: https://lore.kernel.org/bpf/20240412165230.2009746-1-jrife@google.com/T/#u
+
+v1->v2
+------
+* Dropped test_progs/sock_addr_kern.c and the sock_addr_kern test module
+  in favor of simply expanding bpf_testmod and test_progs/sock_addr.c.
+* Migrated environment setup logic from bpf/test_sock_addr.sh into
+  prog_tests/sock_addr.c rather than invoking the script from the test
+  program.
+* Added kfuncs to bpf_testmod as well as the sock_addr_kern BPF program
+  to enable us to invoke kernel socket functions from
+  test_progs/sock_addr.c.
+* Added test coverage for kernel socket functions to
+  test_progs/sock_addr.c.
+
+Link: https://lore.kernel.org/bpf/20240329191907.1808635-1-jrife@google.com/T/#u
+
+Jordan Rife (6):
+  selftests/bpf: Fix bind program for big endian systems
+  selftests/bpf: Implement socket kfuncs for bpf_testmod
+  selftests/bpf: Implement BPF programs for kernel socket operations
+  selftests/bpf: Move IPv4 and IPv6 sockaddr test cases
+  selftests/bpf: Make sock configurable for each test case
+  selftests/bpf: Add kernel socket operation tests
+
+ .../selftests/bpf/bpf_testmod/bpf_testmod.c   | 255 +++++
+ .../bpf/bpf_testmod/bpf_testmod_kfunc.h       |  27 +
+ .../selftests/bpf/prog_tests/sock_addr.c      | 939 +++++++++++++++---
+ .../testing/selftests/bpf/progs/bind4_prog.c  |  18 +-
+ .../testing/selftests/bpf/progs/bind6_prog.c  |  18 +-
+ tools/testing/selftests/bpf/progs/bind_prog.h |  19 +
+ .../selftests/bpf/progs/sock_addr_kern.c      |  65 ++
+ tools/testing/selftests/bpf/test_sock_addr.c  | 192 ----
+ 8 files changed, 1192 insertions(+), 341 deletions(-)
+ create mode 100644 tools/testing/selftests/bpf/progs/bind_prog.h
+ create mode 100644 tools/testing/selftests/bpf/progs/sock_addr_kern.c
+
 -- 
-Andrew Halaney <ahalaney@redhat.com>
+2.44.0.769.g3c40516874-goog
 
 
