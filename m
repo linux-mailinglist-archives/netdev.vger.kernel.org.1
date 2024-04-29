@@ -1,133 +1,147 @@
-Return-Path: <netdev+bounces-92185-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92186-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B20C8B5C42
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 17:02:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8FC658B5CDB
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 17:11:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 01EB1280F69
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 15:02:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 09E1D1F21DB0
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 15:11:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED3BA8063B;
-	Mon, 29 Apr 2024 15:02:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6B941292F9;
+	Mon, 29 Apr 2024 15:05:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S6cMH6ag"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c5QnIuR4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
+Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 876177A15C;
-	Mon, 29 Apr 2024 15:02:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A4FE12C486;
+	Mon, 29 Apr 2024 15:05:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714402974; cv=none; b=T8TD0bUx1CjKtqgyZL0GdJ+usOBdan/iHK3odP2ch9qVQZomULIYEXdWAe6Hufaym0RDys+KkCayHjBdqxiULqpY4eiTDo20jC+keu/ZjrcsSW7aLn+eGzzqqynJRWNZFmvW0V96T+jS1l28Fu7i81IEJwdCjH4exCR/D408Cpk=
+	t=1714403124; cv=none; b=YOuvXcj+HpkRUYuGAqIJWnLNZZxDQgz9WwyhdowYCRfQc12rSo/S1i252unyWCCNIh5KX92qXfRqirtcDZBAwpujhu2dO072lsAVD3ot6ofT9WRLX61gR79ywduHfoev6ZGgSekzKnet7hGSbMETddaKY1JeG3jJkiu1axP307g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714402974; c=relaxed/simple;
-	bh=9mH8mEOE1dSSYwgn2rU6/gupBcn8q44CEw5+mQNPKC4=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=gFovlcXRN9GNje8IEPIS4724Ni6YyfZaL0IMgFTj/qXnj2coKcA4aVbRp8gOQlZmRVsyZbejqYfejIbIbXAYkmUg8HO0xxaVgZSQFh9vCQjnvGyzI4Rrwz/SN5d20BIrrSPVu1IY7KUmW8UIwI3Xiw1Dv05GQX9wD9Yeoctyurc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S6cMH6ag; arc=none smtp.client-ip=209.85.222.169
+	s=arc-20240116; t=1714403124; c=relaxed/simple;
+	bh=Czf3Qf2QtCITmmu5rDJ793XRKMMcRoe9FeUXQg11vmg=;
+	h=Content-Type:Mime-Version:Date:Message-Id:To:Cc:Subject:From:
+	 References:In-Reply-To; b=GvdFRXNMGT5keEagp1pO/BAFfZow5CMRCnRvrfyorrzmP3vCynpzS28wAVrTDiCrwGd3BrsEjGmHTgFmMeVyBWPaHQHMWgcDUdV2/8ajrNDU5fLudf2HHlwKVdUlCsYv/d+kM54zpRbYjNkqrZCJrR4rR7AhDS+UXHCg0oBj8R0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=c5QnIuR4; arc=none smtp.client-ip=209.85.218.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-790fb2b780dso64145385a.0;
-        Mon, 29 Apr 2024 08:02:53 -0700 (PDT)
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-a58872c07d8so993262066b.0;
+        Mon, 29 Apr 2024 08:05:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1714402972; x=1715007772; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0b4utLXVbvyB8TX/ZY7IuTcEIFQDuGxLkh23ndrmBYc=;
-        b=S6cMH6agAju6h95jbdkCco4WIu8PSOVqR1PiJ2OeXNnLsnHHw7tkDUy31SvOBl1bC8
-         sBcN3N/JAG1AajrjhKz5sGIEtzDdx3sYoeX6LAz1qejZ3kGLdyFpUFkqlXqfIreAXZr6
-         mp3qe1/SQgAsbhYCzvcxg44yfqjjc/CBDWG9CHzMqyhjjH+zgR8BKJTkhwm3uIv7PGwi
-         V3bRazOO5X+1qqo4dTfMVc6UdqJepswo/1EnW4tdzOwmGVu3umNibhbsyaaz/cbS2Zkc
-         9yxxxGWbjV6GmNN3CfAL6gQT6OjINXAEPUJ3gd9coiw2SVb+fjNfgZEz/nTOpm258uIm
-         eXXA==
+        d=gmail.com; s=20230601; t=1714403111; x=1715007911; darn=vger.kernel.org;
+        h=in-reply-to:references:from:subject:cc:to:message-id:date
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=jRLnMQt74RAYZqrOQceAPqjFBeZeSYFo8RlZsGguPTo=;
+        b=c5QnIuR4QKxXnvtsRuLbK1ZnEoYXLeA5u28rib1jtJB+7N9tQR457iR+eYRk/SZn65
+         EwvFe+s/C5yyMKltlXbkiDZko8ujo+AGw0VDM6LKfd4dlV4Ks/zCt/SkSGjQbZEoLq75
+         VHeqxmloZ8eGb1XIkQnuQ9abcmCqDRXwDyBeJKNBZih/kgCNBaduCKtnvRGqF+JesHG2
+         bwTs7105vhkGci/Npf6Xtmd167FROCvMRd/Kw1X23JT6KGvJLDEYTqFQI2jcBz6NgdWc
+         rN546iDuNBjVdvLQsKq3O5SR96AoJ6aS1noT7sDFPwEa9MhdjYf+vTRoAnPVbwMtm2/g
+         +TAg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714402972; x=1715007772;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=0b4utLXVbvyB8TX/ZY7IuTcEIFQDuGxLkh23ndrmBYc=;
-        b=PTtpOUvmpUxFlmZPKJT8kokoZQZiwIx9WVaOsjJ954kZpnET56LRsf6oljDDpnmj68
-         OE9uJpvBbCMjh2CKb2mT3Wec7edblvk8appUyk3Jtol7lKHwEdHB5HoLVKj2y11C2HK4
-         sp4DF9b2pT9gQdmy74DJkR0PIoIkK79IrwTET44Pml8J6K84t1R7uEZipxF9iKaAOOJ0
-         QfX2RBPab3mqJSIO8ayB+GXPNf23r9s2Zjzgo9J8tJQHP4S2jUaYtbwvkDxZ4TnD3MhL
-         F45mbVP8MzNkv34P059BuVzyPa4rNk1lbEb1JD1HvB5GdZtUZPsPDZQxQUvw+Y9YTIQy
-         yo+w==
-X-Forwarded-Encrypted: i=1; AJvYcCUhq/z+3nAnrjdgeMSfXJoF7/pP1eC4rpvVgp9DvgoxJ03CEhDjOyeBhLWd26btyNtU3oKL55bh2qmswF9FxQ4vtynpn+YDUN7XlG1dLBctIEmkYhqYNcOaFJ7bPY8UCNSqbDbdeKbh
-X-Gm-Message-State: AOJu0YxgrkGW5SqTeVlgnQ/wVxvdW9fPCKzEoKf7hq9dLLeqTJB3uCGa
-	gEXUztz5tG2keWEdnf/69qG1J8mOjv0Cs6Zb4GTDG/NSeg2Eemh0
-X-Google-Smtp-Source: AGHT+IFfdsyUdB3MEnaRf39QtbrDkeRho2UKF7CuRGNRm1CnVlBH/LY39EQ4B8tYyRoIIdUExf/7DQ==
-X-Received: by 2002:a05:620a:2699:b0:790:f387:c2d1 with SMTP id c25-20020a05620a269900b00790f387c2d1mr4894104qkp.5.1714402972174;
-        Mon, 29 Apr 2024 08:02:52 -0700 (PDT)
-Received: from localhost (164.146.150.34.bc.googleusercontent.com. [34.150.146.164])
-        by smtp.gmail.com with ESMTPSA id oo8-20020a05620a530800b0078d693c0b4bsm10469745qkn.135.2024.04.29.08.02.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Apr 2024 08:02:51 -0700 (PDT)
-Date: Mon, 29 Apr 2024 11:02:51 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: davem@davemloft.net, 
- netdev@vger.kernel.org, 
- edumazet@google.com, 
- pabeni@redhat.com, 
- linux-kselftest@vger.kernel.org
-Message-ID: <662fb69baa4b7_2e6aae2947c@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20240429075158.51b3f8d6@kernel.org>
-References: <20240426232400.624864-1-kuba@kernel.org>
- <20240426232400.624864-7-kuba@kernel.org>
- <662d0268e71c5_28b98529417@willemb.c.googlers.com.notmuch>
- <20240429075158.51b3f8d6@kernel.org>
-Subject: Re: [PATCH net-next 6/6] selftests: drv-net-hw: add test for memory
- allocation failures with page pool
+        d=1e100.net; s=20230601; t=1714403111; x=1715007911;
+        h=in-reply-to:references:from:subject:cc:to:message-id:date
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=jRLnMQt74RAYZqrOQceAPqjFBeZeSYFo8RlZsGguPTo=;
+        b=dzMcSstCA0COs7xVhEsnReTh3veQsahdpBydKyvIuwboih2Ge0czga3UzJGHWbUIFF
+         rdc4NVPFI9LLoVxwvkrWupDo10URgVJ8eyVE1+cYv3km4yAgosZOHtoVSxXYIE8xf5xM
+         LcYfNvp1OBvyM5qZG4816lLDsEDfaiTxMBVeXMsEZ35ihfUq/BmaZOB0YxMIzZaXJOfz
+         4O0BdHHEEiPlX+zvwNmiwa95+Cj4MPCTuEcMvb0Xz7XIz9LT3yMM6wdDmv4Kh19rFxUo
+         69QjCdN8B2bmh2tAFO07RAWyjlNoV2fPJfiu4Bu+E5tfEMUWtQNFH0ei+mNwtsTz4L0R
+         Kd2A==
+X-Forwarded-Encrypted: i=1; AJvYcCWhMDp5muKCra3WSnRl7WGlGwVNqj0XVv6vkYMJN+NGiScGVXtHjKpXZO1vDE64a5yHyr/NQ5Vu1Deo8zRdfKz3DMZ4EGgtHIE/uN3ro84ib3QyMk6a59QTJimDL4CCRJHrB3fnkWSZ5Hp5y76h/WbMtyvlV3OycotC0WxusIQG6FveaWHLu8rZn55Fwq/xXhzt4+s18Ax4153HgvvG5R0R
+X-Gm-Message-State: AOJu0YzceG2hk4SVz3sU1KM6E6asmMFHFn5YZrUYcbLNVKhrcsLqyuIf
+	NJtg/b6iOm8OABYr7kaBVOCIHe0BRG44yoiUcw6vm6I5c8JjuhQJ
+X-Google-Smtp-Source: AGHT+IEhcxyiDkn4etHYTk4Ajtaz+3EvULJi9TZG7CDYngTG1q+F7q123kJC9XMpFvy8FUWZaxjBUg==
+X-Received: by 2002:a17:906:c111:b0:a58:eb9a:420d with SMTP id do17-20020a170906c11100b00a58eb9a420dmr6898891ejc.17.1714403111239;
+        Mon, 29 Apr 2024 08:05:11 -0700 (PDT)
+Received: from localhost (p200300e41f162000f22f74fffe1f3a53.dip0.t-ipconnect.de. [2003:e4:1f16:2000:f22f:74ff:fe1f:3a53])
+        by smtp.gmail.com with ESMTPSA id v5-20020a170906380500b00a58f36e5fecsm2350418ejc.67.2024.04.29.08.05.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 29 Apr 2024 08:05:10 -0700 (PDT)
+Content-Type: multipart/signed;
+ boundary=64d8f73e5566f44c66d078f5487c89221898d7d8af4e7f37e5a21c35e662;
+ micalg=pgp-sha256; protocol="application/pgp-signature"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+Date: Mon, 29 Apr 2024 17:05:10 +0200
+Message-Id: <D0WP6K0OPG1U.3B8RHWV50GB9W@gmail.com>
+To: "Rob Herring (Arm)" <robh@kernel.org>, "Russell King"
+ <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>, "Paolo
+ Abeni" <pabeni@redhat.com>, "Krzysztof Kozlowski"
+ <krzysztof.kozlowski+dt@linaro.org>, "Conor Dooley" <conor+dt@kernel.org>,
+ "Bharat Kumar Gogada" <bharat.kumar.gogada@amd.com>, "Michal Simek"
+ <michal.simek@amd.com>, "Bjorn Helgaas" <bhelgaas@google.com>, "Lorenzo
+ Pieralisi" <lpieralisi@kernel.org>, =?utf-8?q?Krzysztof_Wilczy=C5=84ski?=
+ <kw@linux.com>, "Vinod Koul" <vkoul@kernel.org>, "Kishon Vijay Abraham I"
+ <kishon@kernel.org>, "Liam Girdwood" <lgirdwood@gmail.com>, "Mark Brown"
+ <broonie@kernel.org>, "Jonathan Hunter" <jonathanh@nvidia.com>
+Cc: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, <linux-pci@vger.kernel.org>,
+ <linux-arm-kernel@lists.infradead.org>, <linux-phy@lists.infradead.org>,
+ <linux-tegra@vger.kernel.org>
+Subject: Re: [PATCH] dt-bindings: Drop unnecessary quotes on keys
+From: "Thierry Reding" <thierry.reding@gmail.com>
+X-Mailer: aerc 0.16.0-1-0-g560d6168f0ed-dirty
+References: <20240426202239.2837516-1-robh@kernel.org>
+In-Reply-To: <20240426202239.2837516-1-robh@kernel.org>
 
-Jakub Kicinski wrote:
-> On Sat, 27 Apr 2024 09:49:28 -0400 Willem de Bruijn wrote:
-> > Eventually probably want a more generic fault injection class.
-> > 
-> > And for both fault injection and background traffic the with object
-> > construct to ensure cleanup in all cases.
-> > 
-> > Maybe even the same for ethtool, as ip and ethtool config changes that
-> > need to be reverted to original state will be common.
-> 
-> Agreed, the nice way of wrapping all that has not revealed itself to me
-> yet. When we discussed it with Petr a while back he was suggesting
-> "with", and I was thinking of creating an object with test as the
-> parent. The with is nicer but here we'd end up doing:
-> 
-> 	with a():
-> 		# some code
-> 		with b():
-> 			# more code
-> 				with c():
-> 					# check traffic
-> 
-> which offends my sensibilities.
-> 
-> There are many options, hard to say which one is best without having 
-> a bunch of tests to convert as a litmus test :S So I stuck to "finally"
+--64d8f73e5566f44c66d078f5487c89221898d7d8af4e7f37e5a21c35e662
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
 
-Entirely reasonable.
+On Fri Apr 26, 2024 at 10:22 PM CEST, Rob Herring (Arm) wrote:
+> The yamllint quoted-strings check wasn't checking keys for quotes, but
+> support for checking keys was added in 1.34 release. Fix all the errors
+> found when enabling the check.
+>
+> Clean-up the xilinx-versal-cpm formatting while we're here.
+>
+> Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
+> ---
+>  Documentation/devicetree/bindings/net/sff,sfp.yaml   | 12 ++++++------
+>  .../devicetree/bindings/pci/xilinx-versal-cpm.yaml   |  7 +++++--
+>  .../devicetree/bindings/pci/xlnx,nwl-pcie.yaml       |  2 +-
+>  .../devicetree/bindings/phy/brcm,sata-phy.yaml       |  8 ++++----
+>  .../devicetree/bindings/regulator/ti,tps62864.yaml   |  2 +-
+>  .../bindings/soc/tegra/nvidia,tegra20-pmc.yaml       |  6 +++---
+>  Documentation/devicetree/bindings/tpm/ibm,vtpm.yaml  |  4 ++--
+>  7 files changed, 22 insertions(+), 19 deletions(-)
 
-Btw, I have a preliminary tools/testing/selftests/net/csum test on
-top of this series.
+Acked-by: Thierry Reding <treding@nvidia.com>
 
-The only interesting points so far are the use of deploy (which I
-assume you have on some internal patch already) and that with bkg
-would not fail the test if the background process exits with error.
+--64d8f73e5566f44c66d078f5487c89221898d7d8af4e7f37e5a21c35e662
+Content-Type: application/pgp-signature; name="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCAAdFiEEiOrDCAFJzPfAjcif3SOs138+s6EFAmYvtyYACgkQ3SOs138+
+s6Fo9g//fBFtmm6Kzzagoso58OU0++dfARWpxNf/HxdA/8KmVTIBMzo0T+ZfHo26
+56OwCliAQnav38XNkTce1vi3t/ZSC7ZVfH3Ox8Xd/ezD5joI0LtRmHVp73EOn65W
+eTRYiezydhG+skWTEWxAzwV/FWZyePwhlnNDdYPc4GBWgYmw0cYRV/GsSLqVfly8
+EoD0PlswlKZ3xaBhyhhLjBpdXYkCS+c3P1R5tG85ZaF1SFxr7Z8qyf6zIas1l/ze
+QTxdOEQGrlhF0kWhxwJh3Ad0DDHGpdbNVf7UEISNId8ubvZxwQwvFAMPhvOUh9wi
+ViVoIHaRv1fD+nJDPf+I27RYyjjMRpoXadGAOH/nB8Pk+/4oDv0VTLacCtKngpJS
+xGsVf9l50NQNp4Qp/WvsMSEj4JKodIMoD2Gp51TsrD+7rLd9rLKynq2+Spjs0BFX
+gz3Fwt74Qth8w647xL31X+MBD2Ay8N2DjxyTp93JFbDwmqF2qpqTLKbJPDXoVuGJ
+PrT3kUvEsEueguFPZM6IqzqvZWjS/ziu8OIbwMrMOWhQKPtqnRkFpgkxoFSHyX7n
+PZrPL4DLPDeNL6ZPClkt21EvpoHXzdzIYQDbMslhMBVrngKmoMUPopLHiJYqn+X9
++E/4DDlE5rskMoc416HYi5iIHERtrDSeVoWzqDGWaGYY4UbkpH4=
+=AP3j
+-----END PGP SIGNATURE-----
+
+--64d8f73e5566f44c66d078f5487c89221898d7d8af4e7f37e5a21c35e662--
 
