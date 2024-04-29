@@ -1,168 +1,273 @@
-Return-Path: <netdev+bounces-92230-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92231-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0436F8B60D7
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 20:01:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 997CC8B60F0
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 20:16:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 41C74286C34
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 18:01:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5016028218F
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 18:16:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D9F3127E20;
-	Mon, 29 Apr 2024 18:01:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0B98128394;
+	Mon, 29 Apr 2024 18:16:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l4r0V0Cj"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="nl6h1rwq"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0855883CBA;
-	Mon, 29 Apr 2024 18:01:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6838186655
+	for <netdev@vger.kernel.org>; Mon, 29 Apr 2024 18:16:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714413693; cv=none; b=IPKxnvrKSmfUUydyeuvv+3gHk+mEEkaMKfjukZkWp92dSM7aKXKWxsU9A78biZAbQ0vZWtHEB8LzzwGNyUmIWf28IxJy9XmTSqWRTXmyWS4uK6sI8KL5kHnJyFq+YUJ8XcBVcvkqVi6Sc7n1BYTE0TRqIpOfQF+PQSft4Sut2EA=
+	t=1714414574; cv=none; b=nPEIbY0CSRqUAU+Obshf4m/Y8PX3EObAMyWGAPCYAjm0Xxfko1IAoZvVSZNOf0KGie8judh4Y7hoC7IEX6yxh1XCt6elGpg3jIkkl6q0svT6wDcdzEXtzSikkCWPGjpzuaqUy7V9PvheUtKSC3pKj6yUn+5G4DcpUHJpAJRzzB4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714413693; c=relaxed/simple;
-	bh=HnQX04g3H4aGl0kOgsahnA7O/urfcjX5rQYi9xXRvfA=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=S9cmJV5kgG6H3ZebeA1uk4NxMll5VD4InFNDjnr2djfbLOFZQm+4banu/B+ftsRhmrZmCDbRA1kVF80DyiJg80uLhX3Vgb2RO7AarE5vzg2MZnS9Tm9Dw8am+B9EeNL68SD/x/sQo1/Ls8+tG/UNcyQ9oPpg3CY1F7jZwLajlnU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l4r0V0Cj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CAD37C113CD;
-	Mon, 29 Apr 2024 18:01:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714413692;
-	bh=HnQX04g3H4aGl0kOgsahnA7O/urfcjX5rQYi9xXRvfA=;
-	h=From:Date:Subject:To:Cc:From;
-	b=l4r0V0Cj/ClfZtI2+M6SVJ009QE5l00rm0yGksF08mH8aqqq5eVFdU8auSlCHli5s
-	 KMaUrrs+eeXS+4DoYLqQuLDfQpSNcCQS7IrVlZvvwfj9w06E6REFcrHGWXFhu6TKW/
-	 54uecAJnjZYEJgDWhgYOHujTre977PDeYGFfTcqFtWVGZ6OPX4BS3GPygxr5Lol5SK
-	 cSAVULvtwjhttNae5v5OSkwJ8jJ1yJAOn/QFOgu2Gu6GualOlTzvTFhOXie83EGx38
-	 4h9zIu5z+qFIs98WyeJjh2iqUpDWV2ZXACVsn7kxXpknVAqGudVdo0P/c8RmH4a5fc
-	 gRYJr1vvSYaWg==
-From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Date: Mon, 29 Apr 2024 20:00:31 +0200
-Subject: [PATCH net] mptcp: ensure snd_nxt is properly initialized on
- connect
+	s=arc-20240116; t=1714414574; c=relaxed/simple;
+	bh=WcXW/buP9MAu0vMBF5Js5v7YGSUnlUAbpElCKfwLszc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FIGX5nUMtPzNse0xblwLBgvRmMBFanCltxzVtZGZhOrxV6dyRKtZRKBX0kD76rZjoEpb0y7g6pd8MOZN6oRzOhMlInpKIHp1MdrYP6Fe+yOOBTSoFYNYzsQqGeYe+yWepDDT7YLzZLDgMTyifZ+toWQfUHtXzpcR+WxKS0GW150=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=nl6h1rwq; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-1e4c4fb6af3so32682835ad.0
+        for <netdev@vger.kernel.org>; Mon, 29 Apr 2024 11:16:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1714414573; x=1715019373; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=OnZ1vLukMpdqrqD0r/VM8L5RpjpCprM81qtpwZ8cNP0=;
+        b=nl6h1rwq3iLZfIjRmHtoR1qqzAcLmll+mg0FsLNREaFSsDODhKtJ7QFSou821XFhTx
+         OwNqRW5epiElYi7zNZ6RXxyKWoEfuS6Jn/axupB5fxPOrAOloqoE+RNH+MLLTTkFpT8w
+         K8IvudBhrFEfLYsEn1LZqQ0j+KDmDoDBBPRfI=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714414573; x=1715019373;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OnZ1vLukMpdqrqD0r/VM8L5RpjpCprM81qtpwZ8cNP0=;
+        b=J5s1MwqxBXfnNatnt0JhiWCAG/GW6p8PVHZrQtI0wZpuA5MW0Z2apxleRiH6bRtyBP
+         4DCRnUCoZYpy0hFBGweXOrqt+OasxZGoZfvdV/ilhwdiQPL4vNj3f3Sh0HqGVKhCeayZ
+         nnsNGSpYNrELYDcvBJ0+6tnorip8ikxNaCacEPv1CPmF4gbqiG3Kf3Aqxaui5UzMWNCO
+         8s7RpR+T4ll1PR9lDYuMRMQdX411x2V3Zj5oAw2KD3jeh2kvDymGjx0HohRb8V27WdfU
+         Vppe1Q5jt9J93DyNph4E2+OGfxZyHEUQRzTIwxKfArctGK4gBHiFg39HboHqM+eTODwq
+         zhIw==
+X-Forwarded-Encrypted: i=1; AJvYcCVu1EAD8S1+7J5JbEnVBx1KmO8ZOd9J3LaudmqrKRoQtoz7kZeXmxasnLiPHpJB7HXQMGSJ92AUrng4QIXs+hMZKvQiA5G6
+X-Gm-Message-State: AOJu0Yy7fq1TAdOQx6TNR/HwaD4tw/SVTNnQMlaWLwtg+9aGo5vrL7Vs
+	uHe713RJjFe94+EdHir2FV4+fXjQTYJOaPcn0gueIQJHH1DwH+gYwsOym//ujg==
+X-Google-Smtp-Source: AGHT+IFHuanPGgh9O4MDAeEUubDx/pf+02lBFuayRPoTqeON76gFZdZ04TBnnFcYIylPNzk4FROTQQ==
+X-Received: by 2002:a17:903:1c8:b0:1e4:320b:4311 with SMTP id e8-20020a17090301c800b001e4320b4311mr562818plh.34.1714414572641;
+        Mon, 29 Apr 2024 11:16:12 -0700 (PDT)
+Received: from www.outflux.net ([198.0.35.241])
+        by smtp.gmail.com with ESMTPSA id u17-20020a17090341d100b001eb3d459143sm5154929ple.48.2024.04.29.11.16.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 29 Apr 2024 11:16:11 -0700 (PDT)
+Date: Mon, 29 Apr 2024 11:16:11 -0700
+From: Kees Cook <keescook@chromium.org>
+To: "Gustavo A. R. Silva" <gustavoars@kernel.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+Subject: Re: [PATCH v2][next] Bluetooth: hci_conn, hci_sync: Use
+ __counted_by() in multiple structs and avoid -Wfamnae warnings
+Message-ID: <202404291110.6159F7EA5@keescook>
+References: <ZiwwPmCvU25YzWek@neat>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240429-upstream-net-20240429-mptcp-snd_nxt-init-connect-v1-1-59ceac0a7dcb@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAD7gL2YC/z2NMQrDMAwAvxI0V+AaDU6/UkoJttJqiGIstQRC/
- h7ToePdcLeDcRM2uA07NP6KyaodrpcB8nvSF6OUzhBDpEBxxE81bzwtqOz4t0v1XNG0PHVzFBX
- HvKpydixjIiophZkS9GxtPMv2W96hR+BxHCe/WyL+hwAAAA==
-To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
- Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Davide Caratti <dcaratti@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- stable@vger.kernel.org, Christoph Paasch <cpaasch@apple.com>, 
- "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3765; i=matttbe@kernel.org;
- h=from:subject:message-id; bh=4DC3uSMFTJhiH+tjuyCzuGWfOrPmEvBhyUaXOn+ngXI=;
- b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBmL+B4xsRUyWBPNFj4ImKhOSMfiA0bEkPlKfCuo
- gS2+pFda4uJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZi/geAAKCRD2t4JPQmmg
- cw6ZEACKIZuD6B9nxlXS0mrv/rrVLtxTD70oRzZUAEY5D5RIIwQLC+cely9HUTKBrg/+OW1Uul/
- hCidmg+XZGD0gghxawOeOhbLUo+n/xzrHtgU+AgYsS1+jHUG5zHaj9T2NhBpGWQLEPxYzB3LbIF
- iDDDkqwPB8CfD/Va08UQsu13wsGxCepM7Rc2devVjvCIBpKvUqlwKNXNa5nAmMGl2jk0d4mP7S9
- h+7RrYVDRZd65Dh3eAKsyR/fwS7DTsiaZRu8yJ6hsFlMk3xTpxLqjHvvT7ptfCuLVaJllxNHlhZ
- WxxUF21HPSKrp3y5tEoUNIEswwsTyi76rwqk6HKBs96W1JVN1AtRg4Sk9NJgxa3eQ0DqU6TTvax
- ipbKBD4dGlccDNMlIAhotDmsnLT1tcijoSLZbP8uuQgUq1FwOK73uowh7oHo9foajmHfqSsCURr
- xaX2FSfdPcZ6SBRsyfkOracvUjTDAak+VwYEikjcy96KCEMhE/ry+r5oHzI48XjJSc0G1mRIQEI
- obG6HxfFElc7PIvHVkCzJ529aGzfkwrBzDTBRa4CWxKa32vhlBGGT2LqVwYkZDpDpxuP+5+qI1h
- l9DycXQaw2mgul0KadqjUw/xZa/3NGQecIWZkl5P7jn2ncyhtkx9zmsTsmjMj1ECxGbVj8KIEvc
- tSHTWSH50i7S89w==
-X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
- fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZiwwPmCvU25YzWek@neat>
 
-From: Paolo Abeni <pabeni@redhat.com>
+On Fri, Apr 26, 2024 at 04:52:46PM -0600, Gustavo A. R. Silva wrote:
+> Prepare for the coming implementation by GCC and Clang of the
+> __counted_by attribute. Flexible array members annotated with
+> __counted_by can have their accesses bounds-checked at run-time
+> via CONFIG_UBSAN_BOUNDS (for array indexing) and CONFIG_FORTIFY_SOURCE
+> (for strcpy/memcpy-family functions).
+> 
+> Also, -Wflex-array-member-not-at-end is coming in GCC-14, and we are
+> getting ready to enable it globally.
+> 
+> So, use the `DEFINE_FLEX()` helper for multiple on-stack definitions
+> of a flexible structure where the size of the flexible-array member
+> is known at compile-time, and refactor the rest of the code,
+> accordingly.
+> 
+> Notice that, due to the use of `__counted_by()` in `struct
+> hci_cp_le_create_cis`, the for loop in function `hci_cs_le_create_cis()`
+> had to be modified. Once the index `i`, through which `cp->cis[i]` is
+> accessed, falls in the interval [0, cp->num_cis), `cp->num_cis` cannot
+> be decremented all the way down to zero while accessing `cp->cis[]`:
+> 
+> net/bluetooth/hci_event.c:4310:
+> 4310    for (i = 0; cp->num_cis; cp->num_cis--, i++) {
+>                 ...
+> 4314            handle = __le16_to_cpu(cp->cis[i].cis_handle);
+> 
+> otherwise, only half (one iteration before `cp->num_cis == i`) or half
+> plus one (one iteration before `cp->num_cis < i`) of the items in the
+> array will be accessed before running into an out-of-bounds issue. So,
+> in order to avoid this, set `cp->num_cis` to zero just after the for
+> loop.
+> 
+> Also, make use of `aux_num_cis` variable to update `cmd->num_cis` after
+> a `list_for_each_entry_rcu()` loop.
+> 
+> With these changes, fix the following warnings:
+> net/bluetooth/hci_sync.c:1239:56: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+> net/bluetooth/hci_sync.c:1415:51: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+> net/bluetooth/hci_sync.c:1731:51: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+> net/bluetooth/hci_sync.c:6497:45: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+> 
+> Link: https://github.com/KSPP/linux/issues/202
+> Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+> ---
+> Changes in v2:
+>  - Update `cmd->num_cis` after `list_for_each_entry_rcu()` loop.
+> 
+> v1:
+>  - Link: https://lore.kernel.org/linux-hardening/ZiwqqZCa7PK9bzCX@neat/
+> 
+>  include/net/bluetooth/hci.h |  8 ++--
+>  net/bluetooth/hci_event.c   |  3 +-
+>  net/bluetooth/hci_sync.c    | 84 +++++++++++++++----------------------
+>  3 files changed, 40 insertions(+), 55 deletions(-)
+> 
+> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+> index fe23e862921d..c4c6b8810701 100644
+> --- a/include/net/bluetooth/hci.h
+> +++ b/include/net/bluetooth/hci.h
+> @@ -2026,7 +2026,7 @@ struct hci_cp_le_set_ext_adv_data {
+>  	__u8  operation;
+>  	__u8  frag_pref;
+>  	__u8  length;
+> -	__u8  data[];
+> +	__u8  data[] __counted_by(length);
+>  } __packed;
 
-Christoph reported a splat hinting at a corrupted snd_una:
+I noticed some of the other structs here aren't flexible arrays, so it
+made me go take a look at these ones. I see that the only user of struct
+hci_cp_le_set_ext_adv_data uses a fixed-size array:
 
-  WARNING: CPU: 1 PID: 38 at net/mptcp/protocol.c:1005 __mptcp_clean_una+0x4b3/0x620 net/mptcp/protocol.c:1005
-  Modules linked in:
-  CPU: 1 PID: 38 Comm: kworker/1:1 Not tainted 6.9.0-rc1-gbbeac67456c9 #59
-  Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.11.0-2.el7 04/01/2014
-  Workqueue: events mptcp_worker
-  RIP: 0010:__mptcp_clean_una+0x4b3/0x620 net/mptcp/protocol.c:1005
-  Code: be 06 01 00 00 bf 06 01 00 00 e8 a8 12 e7 fe e9 00 fe ff ff e8
-  	8e 1a e7 fe 0f b7 ab 3e 02 00 00 e9 d3 fd ff ff e8 7d 1a e7 fe
-  	<0f> 0b 4c 8b bb e0 05 00 00 e9 74 fc ff ff e8 6a 1a e7 fe 0f 0b e9
-  RSP: 0018:ffffc9000013fd48 EFLAGS: 00010293
-  RAX: 0000000000000000 RBX: ffff8881029bd280 RCX: ffffffff82382fe4
-  RDX: ffff8881003cbd00 RSI: ffffffff823833c3 RDI: 0000000000000001
-  RBP: 0000000000000000 R08: 0000000000000001 R09: 0000000000000000
-  R10: 0000000000000000 R11: fefefefefefefeff R12: ffff888138ba8000
-  R13: 0000000000000106 R14: ffff8881029bd908 R15: ffff888126560000
-  FS:  0000000000000000(0000) GS:ffff88813bd00000(0000) knlGS:0000000000000000
-  CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-  CR2: 00007f604a5dae38 CR3: 0000000101dac002 CR4: 0000000000170ef0
-  Call Trace:
-   <TASK>
-   __mptcp_clean_una_wakeup net/mptcp/protocol.c:1055 [inline]
-   mptcp_clean_una_wakeup net/mptcp/protocol.c:1062 [inline]
-   __mptcp_retrans+0x7f/0x7e0 net/mptcp/protocol.c:2615
-   mptcp_worker+0x434/0x740 net/mptcp/protocol.c:2767
-   process_one_work+0x1e0/0x560 kernel/workqueue.c:3254
-   process_scheduled_works kernel/workqueue.c:3335 [inline]
-   worker_thread+0x3c7/0x640 kernel/workqueue.c:3416
-   kthread+0x121/0x170 kernel/kthread.c:388
-   ret_from_fork+0x44/0x50 arch/x86/kernel/process.c:147
-   ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
-   </TASK>
+        struct {
+                struct hci_cp_le_set_ext_adv_data cp;
+                u8 data[HCI_MAX_EXT_AD_LENGTH];
+        } pdu;
 
-When fallback to TCP happens early on a client socket, snd_nxt
-is not yet initialized and any incoming ack will copy such value
-into snd_una. If the mptcp worker (dumbly) tries mptcp-level
-re-injection after such ack, that would unconditionally trigger a send
-buffer cleanup using 'bad' snd_una values.
+Let's just change this from a flex array to a fixed-size array?
 
-We could easily disable re-injection for fallback sockets, but such
-dumb behavior already helped catching a few subtle issues and a very
-low to zero impact in practice.
+>  
+>  #define HCI_OP_LE_SET_EXT_SCAN_RSP_DATA		0x2038
+> @@ -2035,7 +2035,7 @@ struct hci_cp_le_set_ext_scan_rsp_data {
+>  	__u8  operation;
+>  	__u8  frag_pref;
+>  	__u8  length;
+> -	__u8  data[];
+> +	__u8  data[] __counted_by(length);
+>  } __packed;
 
-Instead address the issue always initializing snd_nxt (and write_seq,
-for consistency) at connect time.
+Same for this one:
 
-Fixes: 8fd738049ac3 ("mptcp: fallback in case of simultaneous connect")
-Cc: stable@vger.kernel.org
-Reported-by: Christoph Paasch <cpaasch@apple.com>
-Closes: https://github.com/multipath-tcp/mptcp_net-next/issues/485
-Tested-by: Christoph Paasch <cpaasch@apple.com>
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-Reviewed-by: Mat Martineau <martineau@kernel.org>
-Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
----
- net/mptcp/protocol.c | 3 +++
- 1 file changed, 3 insertions(+)
+        struct {
+                struct hci_cp_le_set_ext_scan_rsp_data cp;
+                u8 data[HCI_MAX_EXT_AD_LENGTH];
+        } pdu;
 
-diff --git a/net/mptcp/protocol.c b/net/mptcp/protocol.c
-index 7e74b812e366..965eb69dc5de 100644
---- a/net/mptcp/protocol.c
-+++ b/net/mptcp/protocol.c
-@@ -3723,6 +3723,9 @@ static int mptcp_connect(struct sock *sk, struct sockaddr *uaddr, int addr_len)
- 		MPTCP_INC_STATS(sock_net(ssk), MPTCP_MIB_TOKENFALLBACKINIT);
- 		mptcp_subflow_early_fallback(msk, subflow);
- 	}
-+
-+	WRITE_ONCE(msk->write_seq, subflow->idsn);
-+	WRITE_ONCE(msk->snd_nxt, subflow->idsn);
- 	if (likely(!__mptcp_check_fallback(msk)))
- 		MPTCP_INC_STATS(sock_net(sk), MPTCP_MIB_MPCAPABLEACTIVE);
- 
+>  
+>  #define HCI_OP_LE_SET_EXT_ADV_ENABLE		0x2039
+> @@ -2061,7 +2061,7 @@ struct hci_cp_le_set_per_adv_data {
+>  	__u8  handle;
+>  	__u8  operation;
+>  	__u8  length;
+> -	__u8  data[];
+> +	__u8  data[] __counted_by(length);
+>  } __packed;
 
----
-base-commit: ba1cb99b559e3b12db8b65ca9ff03358ea318064
-change-id: 20240429-upstream-net-20240429-mptcp-snd_nxt-init-connect-d9844d880f48
+And this one. :P
 
-Best regards,
+        struct {
+                struct hci_cp_le_set_per_adv_data cp;
+                u8 data[HCI_MAX_PER_AD_LENGTH];
+        } pdu;
+
+>  
+>  #define HCI_OP_LE_SET_PER_ADV_ENABLE		0x2040
+> @@ -2162,7 +2162,7 @@ struct hci_cis {
+>  
+>  struct hci_cp_le_create_cis {
+>  	__u8    num_cis;
+> -	struct hci_cis cis[];
+> +	struct hci_cis cis[] __counted_by(num_cis);
+>  } __packed;
+
+This one isn't as obvious, so I'd say keep your changes for this one.
+
+>  
+>  #define HCI_OP_LE_REMOVE_CIG			0x2065
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index 9a38e155537e..9a7ca084302e 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -4307,7 +4307,7 @@ static void hci_cs_le_create_cis(struct hci_dev *hdev, u8 status)
+>  	hci_dev_lock(hdev);
+>  
+>  	/* Remove connection if command failed */
+> -	for (i = 0; cp->num_cis; cp->num_cis--, i++) {
+> +	for (i = 0; i < cp->num_cis; i++) {
+>  		struct hci_conn *conn;
+>  		u16 handle;
+>  
+> @@ -4323,6 +4323,7 @@ static void hci_cs_le_create_cis(struct hci_dev *hdev, u8 status)
+>  			hci_conn_del(conn);
+>  		}
+>  	}
+> +	cp->num_cis = 0;
+
+Yeah, this loop never leaves early, and if it did, it processing the
+array forward, so having num_cis reduced during the loop iteration
+doesn't make sense. What you have looks right to me!
+
+
+>  
+>  	if (pending)
+>  		hci_le_create_cis_pending(hdev);
+> diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+> index 9092b4d59545..6e15594d3565 100644
+> --- a/net/bluetooth/hci_sync.c
+> +++ b/net/bluetooth/hci_sync.c
+> @@ -1235,31 +1235,27 @@ int hci_setup_ext_adv_instance_sync(struct hci_dev *hdev, u8 instance)
+>  
+>  static int hci_set_ext_scan_rsp_data_sync(struct hci_dev *hdev, u8 instance)
+>  {
+> -	struct {
+> -		struct hci_cp_le_set_ext_scan_rsp_data cp;
+> -		u8 data[HCI_MAX_EXT_AD_LENGTH];
+> -	} pdu;
+> +	DEFINE_FLEX(struct hci_cp_le_set_ext_scan_rsp_data, pdu, data, length,
+> +		    HCI_MAX_EXT_AD_LENGTH);
+>  	u8 len;
+>  	struct adv_info *adv = NULL;
+>  	int err;
+>  
+> -	memset(&pdu, 0, sizeof(pdu));
+
+These become much easier, just:
+
+	struct hci_cp_le_set_ext_scan_rsp_data cp = { };
+
+etc...
+
+
 -- 
-Matthieu Baerts (NGI0) <matttbe@kernel.org>
-
+Kees Cook
 
