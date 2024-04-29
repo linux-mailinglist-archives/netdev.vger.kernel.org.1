@@ -1,88 +1,114 @@
-Return-Path: <netdev+bounces-92224-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92225-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3EC08B6046
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 19:40:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7975C8B604B
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 19:40:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3A7CC1C215D3
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 17:40:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 19F121F21740
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 17:40:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD3978627D;
-	Mon, 29 Apr 2024 17:40:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A757D1272BA;
+	Mon, 29 Apr 2024 17:40:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iF93v2hv"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="brnwMV9e"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85A5580630;
-	Mon, 29 Apr 2024 17:40:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF3D88665A
+	for <netdev@vger.kernel.org>; Mon, 29 Apr 2024 17:40:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714412428; cv=none; b=BcKnU1w2oaNTziDgCXTPDjTBms3j+pWvjFPS+V6VpC+A3FFpMVyIP03gfLyIun6RwSHCMYZ6yQwGJK5y0Cbf+pfeYQv33ezzlRf0Sj/fpi9HlrV4bMNEDkyRWSF5USn7w7J6zeMr6aLoikgUZyyOL9pjAXsHYIosuy7blvmFMvc=
+	t=1714412451; cv=none; b=uGITHyFyXqsn1yHEZaNpX8AXIkFTwdEB1CsNV0UAT/vSJv4EFbihynJvacXLD+k/sQ3QfSQ6fQ4bwVvM4u3K2qYyQ9d36eYuko1FBD9GNJ0BHc5zYkHF0E9oMVA6RwV+Legdu2ZTCg+bZwDPSzmh5y+7ndwmFbn9CkEn1FFe+94=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714412428; c=relaxed/simple;
-	bh=E11Va/fGQEDHKI15S2rcyyuzQ+3AMPPAvFdsSakTQGg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=M/VbbNWtRmujlHn5Eiljryp77YX/j0xNTzTWCLqD5O9vbNZcAjjnlutbaurO9kmw5O9C1FotaoeqVzAVWfXH7F35oIt9jnDbg+GJGLDJi+SJr6yJPIVbbOUYzBB78Qv0yFwXYEKkxN4NrYHoGWiraVxftAJHBJBPU97AukEPwPc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iF93v2hv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5111EC113CD;
-	Mon, 29 Apr 2024 17:40:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714412428;
-	bh=E11Va/fGQEDHKI15S2rcyyuzQ+3AMPPAvFdsSakTQGg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=iF93v2hvlLt56jU2WHJ2RyfRv/vPO6wqrX9sMGF7/xMB2jeAXWCfeZRgl7SqDhDcb
-	 4AowmGyxC1i/lzZBLW1bfcIM+9CGscCLTPEjZU5LvY8g0O4+rwepIQVe9p2d7SkkB5
-	 TKKCKcc0yxblXpFaid0P6jQ2N+1jX2s/1AGk7DtOdU6OwVMStQyA13tKPalhCAD9LT
-	 2BLdTA+kKiof/YIuzATMWtuAbzKz5aT13JfwEh1mT/YU39Tl/4Fiqo5O06rPZ5Cx1w
-	 duL+Vhjg5nqkc9tzg2M+NEZ/JAMhkup1Rp4xwuAolm8DbMtiOcVsLlSa5RIZvKqdt0
-	 4leSwn0D5efWQ==
-Date: Mon, 29 Apr 2024 10:40:26 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Lukasz Majewski <lukma@denx.de>
-Cc: netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, Casper
- Andersson <casper.casan@gmail.com>, Andrew Lunn <andrew@lunn.ch>, Eric
- Dumazet <edumazet@google.com>, Vladimir Oltean <olteanv@gmail.com>, "David
- S. Miller" <davem@davemloft.net>, Oleksij Rempel <o.rempel@pengutronix.de>,
- Tristram.Ha@microchip.com, Sebastian Andrzej Siewior
- <bigeasy@linutronix.de>, Ravi Gunasekaran <r-gunasekaran@ti.com>, Simon
- Horman <horms@kernel.org>, Nikita Zhandarovich <n.zhandarovich@fintech.ru>,
- Murali Karicheri <m-karicheri2@ti.com>, Jiri Pirko <jiri@resnulli.us>, Dan
- Carpenter <dan.carpenter@linaro.org>, Ziyang Xuan
- <william.xuanziyang@huawei.com>, Shigeru Yoshida <syoshida@redhat.com>,
- "Ricardo B. Marliere" <ricardo@marliere.net>, linux-kernel@vger.kernel.org
-Subject: Re: [net-next PATCH] hsr: Simplify code for announcing HSR nodes
- timer setup
-Message-ID: <20240429104026.0fe3de0f@kernel.org>
-In-Reply-To: <20240429120904.2ab5248c@wsk>
-References: <20240425153958.2326772-1-lukma@denx.de>
-	<20240426173317.2f6228a0@kernel.org>
-	<20240429120904.2ab5248c@wsk>
+	s=arc-20240116; t=1714412451; c=relaxed/simple;
+	bh=3xTlTJjhRm3cXyQ8UM6bBL/hXQ1YAqOG9nl56uUW6Wo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=BpDz0ExHc13ad9UWLptdASgsZhM9rTDVIXeiYlexfqJVDbAvOBqjsUoZZpoNkaQ0BlvOb9zo+5cLXI0IEQk5mwjL5qMvPpaFpiRPZh3vaSZR9ElbOZ32mbSK2CUIVEL+3a3v54X7zYnrcQMFVRyfQH+2E98DCmG8RPSBZF1ZVE4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=brnwMV9e; arc=none smtp.client-ip=91.218.175.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <62e430de-46ff-4eac-b8ba-408cb8eefac7@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1714412447;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+iDHGxBqKd8OEix+628lJvy5ZJIFKICpft6C1hJLvu0=;
+	b=brnwMV9eoxOHdfyB/SKbUvFB9xJydfOgW9G/imP6Ne/3njy5UWV9Z7sXBLff3aVT4Eb0T+
+	dm1DJaCU+fGYM4duxHdFVnEKto0fRNMG7K50ip06BZL39vLdWl6YrDIpXB27Nk+P1ApCVi
+	D7mrAi16NJKmlwUqR/vVmAFJLKWljeQ=
+Date: Mon, 29 Apr 2024 10:40:40 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Subject: Re: [PATCH v2 bpf-next 4/6] selftests/bpf: Add IPv4 and IPv6 sockaddr
+ test cases
+To: Jordan Rife <jrife@google.com>
+Cc: bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ netdev@vger.kernel.org, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
+ Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+ Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>,
+ Shuah Khan <shuah@kernel.org>, Kui-Feng Lee <thinker.li@gmail.com>,
+ Artem Savkov <asavkov@redhat.com>, Dave Marchevsky <davemarchevsky@fb.com>,
+ Menglong Dong <imagedong@tencent.com>, Daniel Xu <dxu@dxuuu.xyz>,
+ David Vernet <void@manifault.com>, Daan De Meyer <daan.j.demeyer@gmail.com>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+References: <20240412165230.2009746-1-jrife@google.com>
+ <20240412165230.2009746-5-jrife@google.com>
+ <3df13496-a644-4a3a-9f9b-96ccc070f2a3@linux.dev>
+ <CADKFtnQDJbSFRS4oyEsn3ZBDAN7T6EvxXUNdrz1kU3Bnhzfgug@mail.gmail.com>
+ <f164369a-2b6b-45e0-8e3e-aa0035038cb6@linux.dev>
+ <CADKFtnQHy0MFeDNg6x2gzUJpuyaF6ELLyMg3tTxze3XV28qo7w@mail.gmail.com>
+ <8c9e51b2-5401-4d58-a319-ed620fadcc63@linux.dev>
+ <CADKFtnQ7L_CSq+CzAOt3PM_Jz2mboGe+Si2TPByt=DuL5Nu=1g@mail.gmail.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <CADKFtnQ7L_CSq+CzAOt3PM_Jz2mboGe+Si2TPByt=DuL5Nu=1g@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, 29 Apr 2024 12:09:04 +0200 Lukasz Majewski wrote:
-> > if the
-> > timer is already running we'll mess with the spacing of the frames,
-> > no?  
+On 4/28/24 10:47 AM, Jordan Rife wrote:
+>> Also, all this setup (and test) has to be done in a new netns. Anything blocking
+>> the kfunc in patch 2 using the current task netns instead of the init_net?
+>> Add nodad to the "ip -6 addr add...". just in case it may add unnecessary delay.
+>> This interface/address ping should not be needed. Other tests under prog_tests/
+>> don't need this interface/address ping also.
 > 
-> When NETDEV_CHANGE is trigger for reason different than carrier (or
-> port state) change and the netif_oper_up() returns true, the period for
-> HSR supervisory frames (i.e. HSR_ANNOUNCE_INTEVAL) would be violated.
+> I was able to make these changes.
 > 
-> What are here the potential threads?
+>> Does it need a veth pair? The %s2 interface is not used.
+>>
+>> Can it be done in lo alone?
+> 
+> I think it may be better to keep it as-is for now with the veth pair.
+> It turns out that these BPF programs (progs/bind6_prog.c,
+> progs/bind4_prog.c, and progs/connect4_prog.c) expect the veth pair
+> setup with these names (test_sock_addr1, test_sock_addr2). We may be
+> able to update the logic in these BPF programs to allow us to just use
+> lo, but I'm not sure if we'd be losing out on important test coverage.
+> Additionally, since we aren't fully retiring test_sock_addr.c yet we'd
+> also need to change test_sock_addr.sh if we changed
+> progs/bind6_prog.c, progs/bind4_prog.c, and progs/connect4_prog.c. If
+> there are no objections to leaving things as-is here, I will send out
+> v3 with the rest of the changes listed above.
 
-Practically speaking I'm not sure if anyone uses any of the weird IFF_*
-flags, but they are defined in uAPI (enum net_device_flags) and I don't
-see much validation so presumably it's possible to flip them.
+Yep, the veth cleanup could be done when the test_sock_addr.c is fully retired. 
+Thanks for checking.
+
+For the tests that moved to sock_addr.c, please also remove them from 
+test_sock_addr.c.
 
