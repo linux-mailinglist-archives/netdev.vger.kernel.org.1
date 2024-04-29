@@ -1,57 +1,59 @@
-Return-Path: <netdev+bounces-92192-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92193-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2AF5D8B5DE9
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 17:40:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13EB38B5E01
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 17:47:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D46F8B22B8B
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 15:38:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 97BB0282B1A
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 15:47:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E745F823A2;
-	Mon, 29 Apr 2024 15:38:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E0FF82881;
+	Mon, 29 Apr 2024 15:47:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="De4NP2yx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kcUmaELw"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFC007F487;
-	Mon, 29 Apr 2024 15:38:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6706B81745;
+	Mon, 29 Apr 2024 15:47:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714405093; cv=none; b=hkii+Tjosr365tneensqB5NpkjMuQrTa+YFctV0KyU19WTIe+Evm26W73jOLVwTodrQ2BZ5BQMxAv9ruP6j0MaJvXo/YVCIc326hGVahTESnGtdER+KC3vlnFcTqF+9SwYh3kbqtWLXvY0Cl9zouoDUqJjd2PDZN4TVG1GIefXY=
+	t=1714405674; cv=none; b=jSTjRSzsQWREzlwcR/ieaWlK6VxW+/5PWXyQPGTtbIwB1IvRm8Aafprxt3CHvbiFvLY8RT/rk0mujOCQsSx2c2S5lcOJ1i7p3AjonQy6dFqE2LBHrN89R48S0OwVJ2VDHOjo/5FINaYabTtzw56ubSlqjbGTiDTdO8KDSir0A9s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714405093; c=relaxed/simple;
-	bh=ly8rcgZd4JErsD1woWLcZbIKhq8mxl/wpftoaI/yZJA=;
+	s=arc-20240116; t=1714405674; c=relaxed/simple;
+	bh=MXEUogA99lTzY+rAVdsNJFMUbYG/L9I1Xzm+BQCRy3k=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=I7gn9xQA70Uh7W9ndxjQPRdmBoBwp8k+QukowtgRChWCZwvsdnPu0YThYkpGBH7a6nBArgTd29cARc6k9zytPX2Ri6aN7fW1s9i422/jLZKgBXg8t6EiV/U1n2HYHGup5ThVrpXkMSqRS2P/kkfgrEddSQyoH9yq+67rs16izwI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=De4NP2yx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1A90C4AF14;
-	Mon, 29 Apr 2024 15:38:12 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=OE8EkhjdqbuJEnNATkmwK/z7L58iLZ95+4Z3yyKIesTmhn/UtpK9daMDttmwpwGUDa7v3hm3nqJgELwRDQabRDGkWJ0tseas59Aa7W5dwVLKhMmqOL0yu3dKJGcYOufcH4H3d88IISLiVweQ3vX8eqKx6HstvjaVdaQrGedD+K0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kcUmaELw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C5135C113CD;
+	Mon, 29 Apr 2024 15:47:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714405093;
-	bh=ly8rcgZd4JErsD1woWLcZbIKhq8mxl/wpftoaI/yZJA=;
+	s=k20201202; t=1714405674;
+	bh=MXEUogA99lTzY+rAVdsNJFMUbYG/L9I1Xzm+BQCRy3k=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=De4NP2yxDV3QCA73CgXXmVmBw6RyjAg44x00dghbOwaSiNtjx+n3UifNCYvTcZZzi
-	 +SfvjsUQOm6Qbksxs8qHx5gnVMEuOFQHhXfRuoGUW9hdrbtxMlEl3E6+FFuYtijPTG
-	 lCB/MO2rssRosHjrqGq85plIlefugvA2nHV25zrABVby7cgaaWPcaqbDk9TvR6lSFo
-	 4TVfn7ncaMzk6uc131MC0HANcCcFh1pBVlHmS6lMdz9Fs6nohdCeElUKydCDbDrrZz
-	 /sr4SunWBgRR2QpuhOeMfDYsihcgHK6uE2lqoa9M/9z80SF+KnKtLFmVjtRgMOd8sJ
-	 a4AzZ8Gyv0vUg==
-Date: Tue, 30 Apr 2024 00:38:10 +0900
+	b=kcUmaELwtBnIWmSY3ozAgMoCaxxzNDMTn2KC5r/IuRVD3B7+azkCqWzbAe2+FQPho
+	 IGs6gKfAQvcMXN6EnTb4IMoYNqk69GGluSe+D/jG31e2bVQFymhIO5YBOoN6H2qyGa
+	 ZhP2cuTEV6BMNzBs77lEzCYUHKPEWqJ3cE30VnW46VGiH7KMEMef9Q630NNAAcqq8m
+	 +Q6rA6B5MqVLXE9tU0Ka7tuognfY6XOp1LcnwtcX0R/cgzks20lrsF9avU1wjowW+D
+	 8cMjQtUJwIzHjsXze61szxUxUJCuyb5bBcTum469sduiQ1rFO2c8KEaPTvAVkPR9NV
+	 unTYglmB72GdA==
+Date: Tue, 30 Apr 2024 00:47:52 +0900
 From: Mark Brown <broonie@kernel.org>
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Kory Maincent <kory.maincent@bootlin.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
 	Kyle Swenson <kyle.swenson@est.tech>,
 	Liam Girdwood <lgirdwood@gmail.com>, linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org,
 	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
 Subject: Re: PoE complex usage of regulator API
-Message-ID: <Zi--4ko_vAtFSxyn@finisterre.sirena.org.uk>
+Message-ID: <Zi_BKFa4Sk3IAFFU@finisterre.sirena.org.uk>
 References: <20240426124253.56fd0933@kmaincent-XPS-13-7390>
+ <57a79abd-722c-4907-b0e7-2396392ae675@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,106 +61,54 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="+E3lYl72hi9pExTY"
+	protocol="application/pgp-signature"; boundary="z0k5BVdQYkZbQzID"
 Content-Disposition: inline
-In-Reply-To: <20240426124253.56fd0933@kmaincent-XPS-13-7390>
+In-Reply-To: <57a79abd-722c-4907-b0e7-2396392ae675@lunn.ch>
 X-Cookie: lisp, v.:
 
 
---+E3lYl72hi9pExTY
+--z0k5BVdQYkZbQzID
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Fri, Apr 26, 2024 at 12:42:53PM +0200, Kory Maincent wrote:
+On Sat, Apr 27, 2024 at 12:41:19AM +0200, Andrew Lunn wrote:
 
-> Let's begin simple, in PSE world we are more talking about power.
-> Would it be ok to add a regulator_get/set_power_limit() and
-> regulator_get_power() callback to regulator API. Would regulator API have
-> interest to such callbacks?
+> I'm assuming this is mostly about book keeping? When a regulator is
+> created, we want to say is can deliver up to X Kilowatts. We then want
+> to allocate power to ports. So there needs to be a call asking it to
+> allocate part of X to a consumer, which could fail if there is not
+> sufficient power budget left. And there needs to be a call to release
+> such an allocation.
 
-Why would these be different to the existing support for doing current
-limiting?  If the voltage for the supply is known then the power is a
-simple function of the current and the voltage.  I suppose you could try
-to do a convenience functions for a fixed voltage, but there'd be issues
-there if the voltage isn't configured to an exact voltage and might
-vary.
+The current limits for regulators are generally imposed in hardware as a
+safety measure, this also happens for example with USB where there's
+regulators in the PHYs.  Whatever is providing the power is very likely
+to have reasonable headroom for robustness.
 
-> Port priority, more complex subject:
-> Indeed a PSE controller managing several ports may be able to turn off po=
-rts
-> with low priority if the total power consumption exceed a certain level.
-> - There are controller like PD692x0 that can managed this on the hardware=
- side.
->   In that case we would have a regulator_get/set_power_limit() callbacks =
-=66rom
->   the regulator parent (the PSE contoller) and a regulator_get/set_priory=
-()
->   callbacks for the regulator children (PSE ports).
+> We are probably not so much interested in what the actual current
+> power draw is, assuming there is no wish to over provision?
 
-All this priority stuff feels very PSE specific but possibly doable.
-You'd have to define the domains in which priorities apply as well as
-the priorities themselves.
+One of the goals is to protect the system in the case that something
+malfunctions and tries to draw more current than can be sustained.  A
+system that is overprovisioned might choose to allow excessive draw,
+especially transiently to cover bootsrapping issues, though there's
+tradeoffs with system protection vs interoperability with poor quality
+implementations there.
 
-> - There are controller like TPS23881 or LTC4266 that can set two prioriti=
-es
->   levels on their ports and a level change in one of their input pin can
->   shutdown all the low priority ports. In that case the same callbacks co=
-uld be
->   used. regulator_get/set_power_limit() from the parent will be only at s=
-oftware
->   level. regulator_get/set_priority() will set the priorities of the port=
-s on
->   hardware level. A polling function have to read frequently the total po=
-wer
->   used and compare it to the power budget, then it has to call something =
-like
->   regulator_shutdown_consumer() in case of power overflow. =20
-
-I would expect the regulators can generate notifications when they go
-out of regulation?  Having to poll feels very crude for something with
-configurable power limits.
-
-> https://lore.kernel.org/netdev/20240417-feature_poe-v9-10-242293fd1900@bo=
-otlin.com/
-> But in case the port is enabled from Linux then shutdown from the PSE con=
-troller
-> for any reason, I have to run disable and enable command to enable it aga=
-in. Not
-> really efficient :/
-
-If that is a hot path something has gone very wrong with the system,
-especially if it's such a hot path that the cost of a disable is making
-a difference.  Note that hardware may have multiple error handling
-strategies, some hardware will turn off outputs when there's a problem
-while other implementations will try to provide as good an output as
-they can.  Sometimes the strategy will depend on the specific error
-condition, and there may be timeouts involved.  This all makes it very
-difficult to assume any particular state after an error has occurred, or
-that the state configured in the control registers reflects the physical
-state of the hardware so you probably want some explicit handling for
-any new state you're looking for.
-
-> I am thinking of disabling the usage of counters in case of a
-> regulator_get_exclusive(). What do you think? Could it break other usage?
-
-Yes, that seems likely to break other users and in general a sharp edge
-for people working with the API.
-
---+E3lYl72hi9pExTY
+--z0k5BVdQYkZbQzID
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmYvvuIACgkQJNaLcl1U
-h9BgCgf/XuyrLBmNpdApLYYi0hsSfYV4lOxPUrKZvgnLl+FPoP0yx50VrcCsKSml
-xNDnTaNsJWRQqYWXA4sjCSUbclzSlEZT9tCtg8cjDDzoRuYoNL5xQzIBMMVsu2Lo
-UdmPnbUI/an3UyAfgpSUBwLP+u7kkJZShaJ8Fua+xaeTGG/vYb5G8qRudKx3f/on
-lpO/riGAPjOb0xlwSy+VzQEdAATpZy6HscNigBhqitXnBMuqr65WePxrlvnJZU8A
-XD1HS+NNA8ppBiKV8Na9nZJPG4JenykcRUVBoHWpIqrql+qChb3hjap9owh9+1Oq
-x2SYFA7wlHtQsWtrRi24iqgASLL4Qw==
-=vqvN
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmYvwScACgkQJNaLcl1U
+h9BE5wf/eGMbGuMBrgTE/BBGw7ZPtzshbhPpItvoGiNej1Aa8AeY6iPc6OJy3g27
+Ara8ZgQ0qWxv1hkOrgzlgNEq/BxkG5pGcNIRp68dJWM31xI2YkGAH4FiI0Yo74eD
+3fnt5adFdZzVVA/jHguYIzzdXp5AK32YEfZ4mbdaPO+gLM4VakFWiRVOU/P3jQoa
+asM2b9FLIFjMKtzlHYefDMUIC28WMbkVcpq9YJUy2Sr4goqJFObKFzIZhe2B7rmA
+kGEBGEh3c/vjcYGepZ2ivGD5yInwRK5njcTGgGI8kZ3YnyQOIX63Y0Ep+RaawToJ
+D3uv6/3i/nbUBM1TetHgPEjcafc+WQ==
+=I9We
 -----END PGP SIGNATURE-----
 
---+E3lYl72hi9pExTY--
+--z0k5BVdQYkZbQzID--
 
