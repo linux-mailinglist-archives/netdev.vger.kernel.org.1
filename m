@@ -1,164 +1,152 @@
-Return-Path: <netdev+bounces-92068-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92069-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id EFC948B5444
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 11:29:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D2A58B544A
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 11:32:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 417B8B2136F
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 09:29:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 276CD280EE6
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 09:32:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19F7D22F19;
-	Mon, 29 Apr 2024 09:29:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCDF722F19;
+	Mon, 29 Apr 2024 09:32:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="D5SIQ/B/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 676042E62B
-	for <netdev@vger.kernel.org>; Mon, 29 Apr 2024 09:29:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FDE117C60;
+	Mon, 29 Apr 2024 09:32:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714382964; cv=none; b=b/rkEb0p9qy0oCVf7N9CF4/XCow/O4qLqdsLzmSLtVFFEsTUMDgZsHNQZ+NfBfoFDU5hhAHP9BoY+Wel2Rxyy2VHdjMWxvoT6mRYo8E/5Yfr+LfPQy17GLi81aR3YtKKs94pRjJPCk5mDgttNgkALI+BCK/w5YTsJ6kW4AeOBgA=
+	t=1714383143; cv=none; b=U9FSmex0Mp0mGGqvUUWvq9F5vHvFXeDkaHjuI9UF2Kozm1hiS11uyhORfwUPOO7uIjmNjo5kPZULvnmcDWn4SQp+sPNwFnVE0Fm5SaEC5oSBvisqQqiRD9TPoepTKqSS9vap/Ut7Il2glnOaQBXDxc13fprgaXV7bx+vTpGYNmw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714382964; c=relaxed/simple;
-	bh=q45+hjjmLxml1aJNtwd5XFVUIciX6r6bmdXOp91wvSo=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Y/C1FR6GDl9jWDAlLIS1NvodIk+3RR4I+0bXJLCC66QKIHbmmDP98bFVK3SmW6Krs97XDMrSqmY7M9Y5EM0/VA2TiWd3b24xXlRs19qjnGIW+W6CrSzDER2zsTib+r4C0QtKbBU+/9c4Yvz86H4m1g3jLjp4bgE27+8JKyAPLzA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-7d9913d3174so445681939f.0
-        for <netdev@vger.kernel.org>; Mon, 29 Apr 2024 02:29:22 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714382961; x=1714987761;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=hJ+5Yb2Ln58wiDSoBQwENTmi0SaJH0WHD9oB1lDL3Cs=;
-        b=S5IsPmQhNgYn8OgI3/rrQikA7sBK2SYDIZq0W8Cm/Gy900eu6vnIGcHMOHpyc73T52
-         lMfNpumyS2B1F4GyF1XdFiMtj9GaxPukMJI90wtb72MxCYh/a0WvBy8pnU0roVsV0Jgl
-         zOA/3lAHJs3RtPhsCy1wR/6CckNn/nHn17RfsANjsiDkebY+HY4dajzQfH15Usr5iTQh
-         8+WaIwJoKGVawqfdKEFUIIicHmRXQNgIcgvQh8YvVc65NF+Tl14JcQy9l4x+h+41D0Fm
-         NvBCTkFrlJhFlM4rkw03CWhJyN824b+Hvvwik6q3s8R5mMbq3gnQt3XH5SNklyx9YZ29
-         p6Ew==
-X-Forwarded-Encrypted: i=1; AJvYcCXhdCIlo+LXUrkx5YcCK2PwsPRpswn7oMxniygYDVMA+QP+sWLZ0RNXNe9bnMbyBMoWM8aR8/QKbfvBxPcSnfrB4iohSQqV
-X-Gm-Message-State: AOJu0Yxj2AFdiQeQ7673FrodwVkB3W9DjPcLvUR3D6oGQKNoqXd+jhWM
-	sNdXhXL82TWqPvqfBcgwMlTDQnehzu+O2Mq146eohYa46GKXHppBMeCX4KlH+JcPF0+sljNXnJW
-	WFywP5uUOYZ0IhPpReF6DuGKvDA6+0BkRvOLC1wzX6DeauZzHJLwBetQ=
-X-Google-Smtp-Source: AGHT+IGOSnK61WCYmFa2d18gGFKctUlhzvIRl1iR74ZajCvsYB5LqaVvQwzRqZSp1JoOOne0FxaTR9iW9re5ONjKvGOV33tYi3hj
+	s=arc-20240116; t=1714383143; c=relaxed/simple;
+	bh=XNloNzoCKfywSthQl66EQHHudIv1fxwmL/2J+3y+tLg=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=sn+C8b8XPV8og0GbkbAOr+quzAI1VADILkWhnqLZS8rAZPl1Vv02RZbwFxXedr+GnH+L7XjI8NyoByMiQ0OP+QXalmcYUjYq/EAJmPdHtX/x7uQiTZUS4z0qulSnY/dj9OsjH/mAq1p/QwlIzNGYhbt2SdzRPOfD2+/AIYUapx8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=D5SIQ/B/; arc=none smtp.client-ip=85.214.62.61
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Received: from wsk (85-222-111-42.dynamic.chello.pl [85.222.111.42])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+	(No client certificate requested)
+	(Authenticated sender: lukma@denx.de)
+	by phobos.denx.de (Postfix) with ESMTPSA id 47F3188921;
+	Mon, 29 Apr 2024 11:32:18 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+	s=phobos-20191101; t=1714383140;
+	bh=681o/mJoNfUKWFCVcPu8QnHizCVqw29Eqq6HLhF92TY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=D5SIQ/B/UmDW/iri0AZWnFo/QNGXmXo+z5QJ5Y0BrYaoW2UWkzL9LGh4FllXPjbAR
+	 +eVHr7GYOxKMaa3saUZlR2PEWyB4Z4LCS5qrOiwiKlPMyib87wFh6+mLqV8uXVkR0Z
+	 6o4LNzL7nyB5CvbFIgn52nbYFcWnz3rU30ZZUq71JnkYqgeahkyQiT9+JwjhRjLssO
+	 rJqN86Pzv4ZrYPqwu8vvVBxh9Q4TaUhRGRubZ9U2HKP7yXnOZf5zrPq7HyGTRi9dB5
+	 BnGZpOgJELbLwwVmE5m+R0MjwRsxx1o+8JmASvYiXWcrz/3gMR5nu6ataH3TxQ0V/2
+	 Y5fPoES6hmfQQ==
+Date: Mon, 29 Apr 2024 11:32:17 +0200
+From: Lukasz Majewski <lukma@denx.de>
+To: Casper Andersson <casper.casan@gmail.com>
+Cc: netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn
+ <andrew@lunn.ch>, Eric Dumazet <edumazet@google.com>, Vladimir Oltean
+ <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, Jakub
+ Kicinski <kuba@kernel.org>, Oleksij Rempel <o.rempel@pengutronix.de>,
+ Tristram.Ha@microchip.com, Sebastian Andrzej Siewior
+ <bigeasy@linutronix.de>, Ravi Gunasekaran <r-gunasekaran@ti.com>, Simon
+ Horman <horms@kernel.org>, Nikita Zhandarovich <n.zhandarovich@fintech.ru>,
+ Murali Karicheri <m-karicheri2@ti.com>, Jiri Pirko <jiri@resnulli.us>, Dan
+ Carpenter <dan.carpenter@linaro.org>, Ziyang Xuan
+ <william.xuanziyang@huawei.com>, Shigeru Yoshida <syoshida@redhat.com>,
+ "Ricardo B. Marliere" <ricardo@marliere.net>, linux-kernel@vger.kernel.org
+Subject: Re: [net-next PATCH v5 1/4] net: hsr: Provide RedBox support
+ (HSR-SAN)
+Message-ID: <20240429113217.0fb8d6d7@wsk>
+In-Reply-To: <8634rho41l.fsf@gmail.com>
+References: <20240415124928.1263240-1-lukma@denx.de>
+	<20240415124928.1263240-2-lukma@denx.de>
+	<86mspt7glf.fsf@gmail.com>
+	<20240416150359.7362c762@wsk>
+	<86bk66hjyf.fsf@gmail.com>
+	<20240418173706.206e6a2f@wsk>
+	<86mspploa3.fsf@gmail.com>
+	<20240419124223.2388295d@wsk>
+	<8634rho41l.fsf@gmail.com>
+Organization: denx.de
+X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:12eb:b0:36b:3c17:28d0 with SMTP id
- l11-20020a056e0212eb00b0036b3c1728d0mr238702iln.6.1714382961663; Mon, 29 Apr
- 2024 02:29:21 -0700 (PDT)
-Date: Mon, 29 Apr 2024 02:29:21 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000070759a061738e388@google.com>
-Subject: [syzbot] [wireless?] WARNING in _ieee80211_change_chanctx
-From: syzbot <syzbot+bc0f5b92cc7091f45fb6@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, johannes@sipsolutions.net, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; boundary="Sig_/C6CorqEZXRzDpTNmg9+Lr3=";
+ protocol="application/pgp-signature"; micalg=pgp-sha512
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
 
-Hello,
+--Sig_/C6CorqEZXRzDpTNmg9+Lr3=
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-syzbot found the following issue on:
+Hi Casper,
 
-HEAD commit:    e88c4cfcb7b8 Merge tag 'for-6.9-rc5-tag' of git://git.kern..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=12aea028980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=545d4b3e07d6ccbc
-dashboard link: https://syzkaller.appspot.com/bug?extid=bc0f5b92cc7091f45fb6
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+> >
+> > Hmm... I'm wondering how "proxy" is implemented then.
+> > Also, what is the purpose of ProxyNodeTable in that case? =20
+>=20
+> The ProxyNodeTable becomes the same as the MAC table for the interlink
+> port. I.e. normal MAC learning, when a frame is sent by a SAN and
+> received on interlink the HW learns that that SMAC is on the interlink
+> port (until it ages out).=20
 
-Unfortunately, I don't have any reproducer for this issue yet.
++1
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/cc2737f2e766/disk-e88c4cfc.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/c53581da70d1/vmlinux-e88c4cfc.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/c90cde48e98f/bzImage-e88c4cfc.xz
+> This table can be read out and used for
+> supervision frames.
+>=20
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+bc0f5b92cc7091f45fb6@syzkaller.appspotmail.com
+I've go through the standard again and it looks like it is mandatory
+for RedBox to send supervisory frames with MAC addresses from
+ProxyNodeTable as its payload. Moreover, the RedBox MAC address shall
+be also send as the second (i.e. following) payload in this frame.
 
-------------[ cut here ]------------
-WARNING: CPU: 0 PID: 3146 at net/mac80211/chan.c:501 _ieee80211_change_chanctx+0x363/0x11c0 net/mac80211/chan.c:501
-Modules linked in:
-CPU: 0 PID: 3146 Comm: syz-executor.2 Not tainted 6.9.0-rc5-syzkaller-00042-ge88c4cfcb7b8 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
-RIP: 0010:_ieee80211_change_chanctx+0x363/0x11c0 net/mac80211/chan.c:501
-Code: 0f 8e 1a 0c 00 00 8b 7b 08 48 c7 c6 00 e3 4f 8c 49 89 fc e8 5f d5 33 f7 41 83 fc 05 76 0f 41 83 fc 0d 74 09 e8 0e da 33 f7 90 <0f> 0b 90 e8 05 da 33 f7 48 8b 74 24 10 ba 01 00 00 00 48 8b 3c 24
-RSP: 0018:ffffc90003376e20 EFLAGS: 00010287
-RAX: 0000000000001a65 RBX: ffffc90003376fd0 RCX: ffffc90004012000
-RDX: 0000000000040000 RSI: ffffffff8a59e842 RDI: 0000000000000005
-RBP: ffff88807b6f80b6 R08: 0000000000000005 R09: 000000000000000d
-R10: 0000000000000006 R11: 0000000000000000 R12: 0000000000000006
-R13: 0000000000000000 R14: ffff88805de532f8 R15: ffff88807b6f8000
-FS:  00007f75cdf286c0(0000) GS:ffff8880b9400000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000001b2d823000 CR3: 0000000040486000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000003
-DR3: 0000000000000000 DR6: 00000000ffff0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- ieee80211_change_chanctx net/mac80211/chan.c:547 [inline]
- ieee80211_recalc_chanctx_chantype+0x69c/0x870 net/mac80211/chan.c:773
- ieee80211_link_change_chanreq+0x7aa/0xd70 net/mac80211/chan.c:1920
- ieee80211_set_ap_chanwidth+0x181/0x320 net/mac80211/cfg.c:4343
- rdev_set_ap_chanwidth net/wireless/rdev-ops.h:1136 [inline]
- __nl80211_set_channel+0x4cb/0x990 net/wireless/nl80211.c:3418
- nl80211_set_wiphy+0xcc8/0x2d00 net/wireless/nl80211.c:3575
- genl_family_rcv_msg_doit+0x202/0x2f0 net/netlink/genetlink.c:1113
- genl_family_rcv_msg net/netlink/genetlink.c:1193 [inline]
- genl_rcv_msg+0x565/0x800 net/netlink/genetlink.c:1208
- netlink_rcv_skb+0x16b/0x440 net/netlink/af_netlink.c:2559
- genl_rcv+0x28/0x40 net/netlink/genetlink.c:1217
- netlink_unicast_kernel net/netlink/af_netlink.c:1335 [inline]
- netlink_unicast+0x542/0x820 net/netlink/af_netlink.c:1361
- netlink_sendmsg+0x8b8/0xd70 net/netlink/af_netlink.c:1905
- sock_sendmsg_nosec net/socket.c:730 [inline]
- __sock_sendmsg net/socket.c:745 [inline]
- ____sys_sendmsg+0xab5/0xc90 net/socket.c:2584
- ___sys_sendmsg+0x135/0x1e0 net/socket.c:2638
- __sys_sendmsg+0x117/0x1f0 net/socket.c:2667
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xcf/0x260 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f75cd27dea9
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 e1 20 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f75cdf280c8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007f75cd3abf80 RCX: 00007f75cd27dea9
-RDX: 0000000000000000 RSI: 0000000020000200 RDI: 0000000000000004
-RBP: 00007f75cd2ca4a4 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 000000000000000b R14: 00007f75cd3abf80 R15: 00007ffd05dbb2b8
- </TASK>
+The current RedBox (from net-next) needs to be extended to support it
+ - I've started working on this.
+
+> Though, the NodesTable I don't think is used in HW. As I understand
+> it's an optional feature.
+
++1
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+Best regards,
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+Lukasz Majewski
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+--
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
+DENX Software Engineering GmbH,      Managing Director: Erika Unter
+HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
+Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
 
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
+--Sig_/C6CorqEZXRzDpTNmg9+Lr3=
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
-If you want to undo deduplication, reply with:
-#syz undup
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmYvaSEACgkQAR8vZIA0
+zr2klgf9FsTRrBZ8kpx4smbAThax9QN7aEiGWidRjn19R88sc8gDaGp0I3DCWs/c
+uGcLx/7VwFQwjj5FqCxfwWbus7+1Wo3B67dNU62U0TCpN9fqtKeHLFNgtjqStrOO
+Q8E3g+pWwvTQFar+FTOSAzmExX4R7eK3BAlq8bFsTT4nd3ET030lVRa/sisDOhWi
+RMWHKCea7svwuOYV45dYwzlfXdu0hx8Y7cGUHBmbp8zxcfKN+MJa+ktWwdqNgUPn
+xAGGvo4IAzluqbzjNZjaeok1uML4nw8Vm6g/FigO0fM1JylKawhwyy9HpxZhh0jF
+zxo+jvH+MSVrvg4Hsh1AzWUUeyqfww==
+=H3gL
+-----END PGP SIGNATURE-----
+
+--Sig_/C6CorqEZXRzDpTNmg9+Lr3=--
 
