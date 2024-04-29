@@ -1,65 +1,58 @@
-Return-Path: <netdev+bounces-92206-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92207-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94E2B8B5F27
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 18:36:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A59798B5F44
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 18:41:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9EF921C2199D
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 16:36:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5C4281F210B2
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 16:41:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6441F85922;
-	Mon, 29 Apr 2024 16:36:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2278885C76;
+	Mon, 29 Apr 2024 16:41:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WDHwpBwM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cc+/Xx8I"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 352EE84E1B;
-	Mon, 29 Apr 2024 16:36:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE56385C6C;
+	Mon, 29 Apr 2024 16:41:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714408598; cv=none; b=n4TYRqOLE863M5/+dOKeIV0NxB7WEfr7XZnWatqHCSUW3ilkl/q9nK9G9iDR0QS98TWArBjvEP8kqrj3hNLMwT9wogxX+4IKFL3U+bHk+/BUFVgft5mWDRLn8aUL0fHv9Wysq1Xfs9PYp5rOHdzw2OjzvQoA0AZZdjn2uhW4Ko4=
+	t=1714408884; cv=none; b=QAw5IUNHCkxfP3uJwm60YdDTAjoCECgBr16AE3dmkHlRnHyt5uRuyFPUjdai5u5gd08E5QTxCmHThUZUfsDpN+LJIl53vLeJUVpc6sjMmbrZywJyk9B0XfwuWf4WiW0ziuO1s1XRWMJlM0fZ921Gqep7jVVdMsApmwDSUo4vMDo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714408598; c=relaxed/simple;
-	bh=fgSKb2lwvDBvPMmVmRJwxhth9YzFQDQdsEr9HfbL5yE=;
+	s=arc-20240116; t=1714408884; c=relaxed/simple;
+	bh=RspDC4859kGMgSkyYFyIkNCEccqvD+abVhafD7M8wy0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iibVxYdeWYCp+ibUpkPiYDdiXuSWw1fdp7e5pwIRY4zDH8qwxJU8hmq4cCBQPelHS5hxxMk11WlDszwENfJn0HM/WJpMZ28Q2gRnHOSj9v3hoZ1i52HcJXnNN77tlhfgU3L68OQr/0yNoZDZRq3AofEGCCorpj1UCIcytHkWxn0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WDHwpBwM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EA721C4AF18;
-	Mon, 29 Apr 2024 16:36:32 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=dpGEt2mfU0kJYe8ttTlV+bWGKuzWJcfXW86+d3FCWX4ZanUyQgSm8YTX/2MW59ofROQYs37N8YspsxkK5uxUsCMu2ScYvPZgS99OvkYkPBfSloKcbw2lpp8HJk9OoXBCwmKwr0jUYhmG4PuT65e6DbQbECZLxLna/Fuob82hRxM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cc+/Xx8I; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37C58C113CD;
+	Mon, 29 Apr 2024 16:41:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714408597;
-	bh=fgSKb2lwvDBvPMmVmRJwxhth9YzFQDQdsEr9HfbL5yE=;
+	s=k20201202; t=1714408883;
+	bh=RspDC4859kGMgSkyYFyIkNCEccqvD+abVhafD7M8wy0=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=WDHwpBwM0YY0dIOhxTwSvBih1XHfmxFemrNC7H1vsZlRU9dtpxx+3aGi8e6qGXSet
-	 ++0V0LqyYXCYxdCJbv/FJtIqcUxL+tIm9bLc9lziMj1QFk6JJo9oG4MP7R25D9+gWS
-	 GoFcqyCB2oYcF45xMN1Tfvgf6YxbNmKJTXlPFDTgsNektWqutM5oXTGFPrsX+xLBsc
-	 9HAYUsH4KqkjGYt9dy3SWzopNfYlE9svOuR7WTvN12yJqF15MLOSDDKSq6Mj80iLUw
-	 RswJOryh47sAEEpxriPPbqALSbvVRmP2UmXWDXO12grOycXywOeSNeUgx3EO6hy+17
-	 fbvSEa5+nanbg==
-Date: Mon, 29 Apr 2024 17:36:30 +0100
+	b=cc+/Xx8IIGyKgtBMl4bG4Ih1tCcNRVJTTPfaKFVN51WfCPGtwvpMU1UO6qmcBy3jS
+	 VT+hvaMR03E+9tFtgilqBDfx+zLSZ9poMbUu4kfFiYa9WWX84PTbTOYmcqLLgPnh1D
+	 uQd7SHLnbQMXz/GdLFE1WVJmG2fE6ZpBJgC+gfXbV2uwR4qQ+bxUzz9GrzhbPBJde/
+	 Mc3Kc1JhdAN64mOj8KVYOCrHwRe7ZmihmlngOX+zrTvjYalZS8Y4UY7dO2zpv/m6Ze
+	 o08PwTne6oTnmo4C2Xq5exlSR7uLLyWEXz5Jj2r5ocEmADF8LohY6N0GOhqquRT4dp
+	 i2eI04VoSUvTw==
+Date: Mon, 29 Apr 2024 17:41:18 +0100
 From: Simon Horman <horms@kernel.org>
-To: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, saeedm@nvidia.com, anthony.l.nguyen@intel.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	andrew@lunn.ch, corbet@lwn.net, linux-doc@vger.kernel.org,
-	robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
-	conor+dt@kernel.org, devicetree@vger.kernel.org,
-	horatiu.vultur@microchip.com, ruanjinjie@huawei.com,
-	steen.hegelund@microchip.com, vladimir.oltean@nxp.com,
-	UNGLinuxDriver@microchip.com, Thorsten.Kummermehr@microchip.com,
-	Pier.Beruto@onsemi.com, Selvamani.Rajagopal@onsemi.com,
-	Nicolas.Ferre@microchip.com, benjamin.bigler@bernformulastudent.ch
-Subject: Re: [PATCH net-next v4 02/12] net: ethernet: oa_tc6: implement
- register write operation
-Message-ID: <20240429163630.GA516117@kernel.org>
-References: <20240418125648.372526-1-Parthiban.Veerasooran@microchip.com>
- <20240418125648.372526-3-Parthiban.Veerasooran@microchip.com>
+To: Ryosuke Yasuoka <ryasuoka@redhat.com>
+Cc: krzk@kernel.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, syoshida@redhat.com,
+	syzbot+d7b4dc6cd50410152534@syzkaller.appspotmail.com
+Subject: Re: [PATCH net v2] nfc: nci: Fix uninit-value in nci_rx_work
+Message-ID: <20240429164118.GB516117@kernel.org>
+References: <20240427103558.161706-1-ryasuoka@redhat.com>
+ <20240428134525.GW516117@kernel.org>
+ <Zi-vGH1ROjiv1yJ2@zeus>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,53 +61,88 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240418125648.372526-3-Parthiban.Veerasooran@microchip.com>
+In-Reply-To: <Zi-vGH1ROjiv1yJ2@zeus>
 
-On Thu, Apr 18, 2024 at 06:26:38PM +0530, Parthiban Veerasooran wrote:
-> Implement register write operation according to the control communication
-> specified in the OPEN Alliance 10BASE-T1x MACPHY Serial Interface
-> document. Control write commands are used by the SPI host to write
-> registers within the MAC-PHY. Each control write commands are composed of
-> a 32 bits control command header followed by register write data.
+On Mon, Apr 29, 2024 at 11:30:48PM +0900, Ryosuke Yasuoka wrote:
+> On Sun, Apr 28, 2024 at 02:45:25PM +0100, Simon Horman wrote:
+> > On Sat, Apr 27, 2024 at 07:35:54PM +0900, Ryosuke Yasuoka wrote:
+
+...
+
+> Thank you for your comment, Simon.
 > 
-> The MAC-PHY ignores the final 32 bits of data from the SPI host at the
-> end of the control write command. The write command and data is also
-> echoed from the MAC-PHY back to the SPI host to enable the SPI host to
-> identify which register write failed in the case of any bus errors.
-> Control write commands can write either a single register or multiple
-> consecutive registers. When multiple consecutive registers are written,
-> the address is automatically post-incremented by the MAC-PHY. Writing to
-> any unimplemented or undefined registers shall be ignored and yield no
-> effect.
+> Yes, if it handles packets correctly in nci_{rsp,ntf,rx_data}_packet(),
+> it should not reach invalid_pkt_free and it should continue to work in
+> the for statement. Sorry, it is my mistake and need to fix it.
 > 
-> Signed-off-by: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
+> BTW, in the current implementation, if the payload is zero, it will free
+> the skb and exit the for statement. I wonder it is intended. 
+> 
+> > > -		if (!nci_plen(skb->data)) {
+> > > -			kfree_skb(skb);
+> > > -			break;
+> > > -		}
+> 
+> When the packet is invalid, it should be discarded but it should not
+> exit the for statement by break. Instead, the skb should just free and
+> it should handle the subsequent packet by continue. If yes, then it 
+> may be like below,
+> 
+> 	for (; (skb = skb_dequeue(&ndev->rx_q)); kcov_remote_stop()) {
+> 		kcov_remote_start_common(skb_get_kcov_handle(skb));
+> 
+> 		/* Send copy to sniffer */
+> 		nfc_send_to_raw_sock(ndev->nfc_dev, skb,
+> 				     RAW_PAYLOAD_NCI, NFC_DIRECTION_RX);
+> 
+> 		if (!skb->len)
+> 			goto invalid_pkt_free;
+> 
+> 		/* Process frame */
+> 		switch (nci_mt(skb->data)) {
+> 		case NCI_MT_RSP_PKT:
+> 			if (!nci_valid_size(skb, NCI_CTRL_HDR_SIZE))
+> 				goto invalid_pkt_free;
+> 			nci_rsp_packet(ndev, skb);
+> 			continue;   <<<---
+> 
+> 		case NCI_MT_NTF_PKT:
+> 			if (!nci_valid_size(skb, NCI_CTRL_HDR_SIZE))
+> 				goto invalid_pkt_free;
+> 			nci_ntf_packet(ndev, skb);
+> 			continue;   <<<---
+> 
+> 		case NCI_MT_DATA_PKT:
+> 			if (!nci_valid_size(skb, NCI_DATA_HDR_SIZE))
+> 				goto invalid_pkt_free;
+> 			nci_rx_data_packet(ndev, skb);
+> 			continue;   <<<---
+> 
+> 		default:
+> 			pr_err("unknown MT 0x%x\n", nci_mt(skb->data));
+> 			goto invalid_pkt_free;
+> 		}
+> invalid_pkt_free:
+> 		kfree_skb(skb);
+> 	}
+> 
+> Could I hear your opinion?
 
-...
+Hi Yasuoka-san,
 
-> diff --git a/drivers/net/ethernet/oa_tc6.c b/drivers/net/ethernet/oa_tc6.c
+Thanks for pointing this out.
 
-...
+I agree that it is not good to 'break' after kfree_skb() for two reasons:
 
-> +/**
-> + * oa_tc6_write_registers - function for writing multiple consecutive registers.
-> + * @tc6: oa_tc6 struct.
-> + * @address: address of the first register to be written in the MAC-PHY.
-> + * @value: values to be written from the starting register address @address.
-> + * @length: number of consecutive registers to be written from @address.
-> + *
-> + * Maximum of 128 consecutive registers can be written starting at @address.
-> + *
-> + * Returns 0 on success otherwise failed.
+1. As you mention, the loop should keep going and process other skbs
+2. kcov_remote_stop() needs to be called for each skb
 
-Nit: I think you need a ':' after "Returns" (or "Return")
-     in order for kernel-doc -Wall to recognise this as a return section.
+I might have used a 'continue' above the invalid_pkt_free label.
+But I think your suggestion - using 'continue' inside the switch statement
+- is also correct, and seems fine to me.
 
-Likewise elsewhere in this patch(set).
+Please post a v3 when you are ready.
 
-> + */
-> +int oa_tc6_write_registers(struct oa_tc6 *tc6, u32 address, u32 value[],
-> +			   u8 length)
-> +{
-
-...
+-- 
+pw-bot: changes-requested
 
