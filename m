@@ -1,247 +1,178 @@
-Return-Path: <netdev+bounces-92081-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92077-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 882DC8B5503
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 12:20:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25EAB8B54BE
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 12:09:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3DA16282D74
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 10:20:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3F61F1C218A1
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 10:09:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3F7D3A1CF;
-	Mon, 29 Apr 2024 10:19:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97DA429421;
+	Mon, 29 Apr 2024 10:09:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="RSpw6nIp"
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="Z7Yw9T90"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1EA92D05D;
-	Mon, 29 Apr 2024 10:19:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B574936B08;
+	Mon, 29 Apr 2024 10:09:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714385997; cv=none; b=e8eECQiLmtMkPlXxeJn/Y2V2l63ZXnga3MVhatyNNLurhHFuxQyZgpNGBtS1ATWmrJxSqNX97CrlVWbSejC8ynPwcwA0AvrzpMCBBR270g2tRcwb4aMuuvcgBD+Z7XS1itTN2B6Kc/mqtMP45CFuHu66l86iHp6LcgYfZBi5ukA=
+	t=1714385358; cv=none; b=PltI9Np5/JcQEK2+ZD4aTRNLtGUyNDIiC+3fjpUDYrQVnBuI0W1N7qwZkF+cyLGLJ+sUXmNmQenMOq8VoxK5sJL6gQYnJ8omkJ1by1MQ2Hh4gV/0JjOucZtk/9M2ek8TTPAnSeOvVlTd3d7NaKQgCB391wozqP2b/uBMMrwrcmA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714385997; c=relaxed/simple;
-	bh=+xuPfbXvhD2U4XcHwIfiRxmnbADxy6SiZ2zq4uWs7iw=;
-	h=Date:From:To:CC:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To:References; b=eHcMeS37GRliDblLAeiJJbB8AFvnXMaZoE+BGY/ponNxZvkYTbELiTFwEEdYlAWZjmUbSGZOVoXduDbIXLBbh/5PvR22YR+5ITf40Vdry2bkmzZa+QTyePFQxFiMf6pbwb6stPQi9r3STqXVBzmMMGn3HkPLxcI46Q2nimc+noc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=RSpw6nIp; arc=none smtp.client-ip=210.118.77.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-	by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20240429101946euoutp02bcba7df2dd482b14951a0e09fb36b1f1~KuPive-7J3135131351euoutp02A;
-	Mon, 29 Apr 2024 10:19:46 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20240429101946euoutp02bcba7df2dd482b14951a0e09fb36b1f1~KuPive-7J3135131351euoutp02A
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1714385986;
-	bh=IsX0/OYWENCn2AKVFXUYtEljPBkMSVXjMzGVqGRtqqY=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-	b=RSpw6nIps+sB50xXUP2hQnx6gtzdn+JgtCcQ4OlLWC6ZzJSQMDtlsdSqdimIxS1sj
-	 qutuFkfucSGuffUxWbbS2RUljuWojvrqprbWBHZqfjwUNfs+tBW2GMMy75pHczIH6E
-	 YGSTVsEeFqLVJowZ9tsPLPtdu8TXdkhRatlSQ1qo=
-Received: from eusmges3new.samsung.com (unknown [203.254.199.245]) by
-	eucas1p1.samsung.com (KnoxPortal) with ESMTP id
-	20240429101946eucas1p16e7be4f597183714ed35d847022021d5~KuPiaF5TY2266622666eucas1p14;
-	Mon, 29 Apr 2024 10:19:46 +0000 (GMT)
-Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
-	eusmges3new.samsung.com (EUCPMTA) with SMTP id 3D.CC.09620.1447F266; Mon, 29
-	Apr 2024 11:19:45 +0100 (BST)
-Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
-	eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
-	20240429101945eucas1p2dc8fc97bb946c330b71475078348f67e~KuPhxHl0R2151621516eucas1p2Y;
-	Mon, 29 Apr 2024 10:19:45 +0000 (GMT)
-Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
-	eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
-	20240429101945eusmtrp1d65903bf5cdc9f7d12521f49410530aa~KuPhvnvd_1698316983eusmtrp1C;
-	Mon, 29 Apr 2024 10:19:45 +0000 (GMT)
-X-AuditID: cbfec7f5-d31ff70000002594-9e-662f7441cf35
-Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
-	eusmgms1.samsung.com (EUCPMTA) with SMTP id E1.2A.08810.1447F266; Mon, 29
-	Apr 2024 11:19:45 +0100 (BST)
-Received: from CAMSVWEXC02.scsc.local (unknown [106.1.227.72]) by
-	eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
-	20240429101944eusmtip1f78b789847ce17b03a0ec2e1131a8947~KuPhaVhcL0051600516eusmtip1G;
-	Mon, 29 Apr 2024 10:19:44 +0000 (GMT)
-Received: from localhost (106.110.32.44) by CAMSVWEXC02.scsc.local
-	(2002:6a01:e348::6a01:e348) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
-	Mon, 29 Apr 2024 11:19:44 +0100
-Date: Mon, 29 Apr 2024 12:05:48 +0200
-From: Joel Granados <j.granados@samsung.com>
-To: Sabrina Dubroca <sd@queasysnail.net>
-CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt
-	<stefan@datenfreihafen.org>, Miquel Raynal <miquel.raynal@bootlin.com>,
-	"David Ahern" <dsahern@kernel.org>, Steffen Klassert
-	<steffen.klassert@secunet.com>, Herbert Xu <herbert@gondor.apana.org.au>,
-	Matthieu Baerts <matttbe@kernel.org>, Mat Martineau <martineau@kernel.org>,
-	Geliang Tang <geliang@kernel.org>, Remi Denis-Courmont
-	<courmisch@gmail.com>, "Allison Henderson" <allison.henderson@oracle.com>,
-	David Howells <dhowells@redhat.com>, Marc Dionne <marc.dionne@auristor.com>,
-	"Marcelo Ricardo Leitner" <marcelo.leitner@gmail.com>, Xin Long
-	<lucien.xin@gmail.com>, Wenjia Zhang <wenjia@linux.ibm.com>, Jan Karcher
-	<jaka@linux.ibm.com>, "D. Wythe" <alibuda@linux.alibaba.com>, Tony Lu
-	<tonylu@linux.alibaba.com>, "Wen Gu" <guwen@linux.alibaba.com>, Trond
-	Myklebust <trond.myklebust@hammerspace.com>, Anna Schumaker
-	<anna@kernel.org>, "Chuck Lever" <chuck.lever@oracle.com>, Jeff Layton
-	<jlayton@kernel.org>, Neil Brown <neilb@suse.de>, Olga Kornievskaia
-	<kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey
-	<tom@talpey.com>, Jon Maloy <jmaloy@redhat.com>, Ying Xue
-	<ying.xue@windriver.com>, Martin Schiller <ms@dev.tdt.de>, Pablo Neira Ayuso
-	<pablo@netfilter.org>, Jozsef Kadlecsik <kadlec@netfilter.org>, Florian
-	Westphal <fw@strlen.de>, Roopa Prabhu <roopa@nvidia.com>, Nikolay
-	Aleksandrov <razor@blackwall.org>, Simon Horman <horms@verge.net.au>, Julian
-	Anastasov <ja@ssi.bg>, Joerg Reuter <jreuter@yaina.de>, Luis Chamberlain
-	<mcgrof@kernel.org>, Kees Cook <keescook@chromium.org>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<dccp@vger.kernel.org>, <linux-wpan@vger.kernel.org>,
-	<mptcp@lists.linux.dev>, <linux-hams@vger.kernel.org>,
-	<linux-rdma@vger.kernel.org>, <rds-devel@oss.oracle.com>,
-	<linux-afs@lists.infradead.org>, <linux-sctp@vger.kernel.org>,
-	<linux-s390@vger.kernel.org>, <linux-nfs@vger.kernel.org>,
-	<tipc-discussion@lists.sourceforge.net>, <linux-x25@vger.kernel.org>,
-	<netfilter-devel@vger.kernel.org>, <coreteam@netfilter.org>,
-	<bridge@lists.linux.dev>, <lvs-devel@vger.kernel.org>
-Subject: Re: [PATCH v5 8/8] ax.25: x.25: Remove the now superfluous sentinel
- elements from ctl_table array
-Message-ID: <20240429100548.cl4b3wx7lww3yejl@joelS2.panther.com>
+	s=arc-20240116; t=1714385358; c=relaxed/simple;
+	bh=G2/+Y3GgbI8aI/B+0/EYdGDtINvqDlJjG6idi7Fd8R8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=J1+NAlZXtZEzCGzMNqWDGdtZMVU9zx8ls1uJyN8r0a+610YAWKpdDaW9bY7v/lYOMGaSUK3gogwiLyXUYsOyhaLl0LLy9EkGUU0YP+3SwRhoKz3d8rIfMHy8Zxsqj7treAYFx0Na8gDNDDqVzxObXPqV4iXBQBS2nNE3vKdlexQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=Z7Yw9T90; arc=none smtp.client-ip=85.214.62.61
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Received: from wsk (85-222-111-42.dynamic.chello.pl [85.222.111.42])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+	(No client certificate requested)
+	(Authenticated sender: lukma@denx.de)
+	by phobos.denx.de (Postfix) with ESMTPSA id B2F18888B9;
+	Mon, 29 Apr 2024 12:09:12 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+	s=phobos-20191101; t=1714385354;
+	bh=hozHacjgRDNOnhvQH0iZPoT7EiNmXii511+IJqeqwM4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Z7Yw9T903myUj6aIGuaBmFOR0Nqk9IbNmQjxpp3OeoR+R9mYlduBDEPhs1JwiOqz6
+	 /3Epii+HdNFysW3ZWr88FJEKessu0x3O76NkO6LLiyXU8MHYXhjTw6BnyzojhkIusZ
+	 /ZOp/M9Bt6A/Z/YgJi+Z+OXhi3QbwxfPNLd+YuMhTDLLfcmBJ74tdVPlyaAAzg5HQl
+	 /FA5XOBGsvnLke+08/ZSJ+yiNq7MV6QD4f5MNVmx+Wact3z5ZVnSx6rzFXsE/XBc5p
+	 Hcj4WHQOw2oyk1BeKcCKt66U1Izx1kZHj4ZEkAgRqdX2KXPK1qIb87r3m+69Gxga1S
+	 IiFw/ewlW3/vA==
+Date: Mon, 29 Apr 2024 12:09:04 +0200
+From: Lukasz Majewski <lukma@denx.de>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, Casper
+ Andersson <casper.casan@gmail.com>, Andrew Lunn <andrew@lunn.ch>, Eric
+ Dumazet <edumazet@google.com>, Vladimir Oltean <olteanv@gmail.com>, "David
+ S. Miller" <davem@davemloft.net>, Oleksij Rempel <o.rempel@pengutronix.de>,
+ Tristram.Ha@microchip.com, Sebastian Andrzej Siewior
+ <bigeasy@linutronix.de>, Ravi Gunasekaran <r-gunasekaran@ti.com>, Simon
+ Horman <horms@kernel.org>, Nikita Zhandarovich <n.zhandarovich@fintech.ru>,
+ Murali Karicheri <m-karicheri2@ti.com>, Jiri Pirko <jiri@resnulli.us>, Dan
+ Carpenter <dan.carpenter@linaro.org>, Ziyang Xuan
+ <william.xuanziyang@huawei.com>, Shigeru Yoshida <syoshida@redhat.com>,
+ "Ricardo B. Marliere" <ricardo@marliere.net>, linux-kernel@vger.kernel.org
+Subject: Re: [net-next PATCH] hsr: Simplify code for announcing HSR nodes
+ timer setup
+Message-ID: <20240429120904.2ab5248c@wsk>
+In-Reply-To: <20240426173317.2f6228a0@kernel.org>
+References: <20240425153958.2326772-1-lukma@denx.de>
+	<20240426173317.2f6228a0@kernel.org>
+Organization: denx.de
+X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg="pgp-sha512";
-	protocol="application/pgp-signature"; boundary="io5uz7byzuh34bpr"
-Content-Disposition: inline
-In-Reply-To: <ZiyxJFnJimaRr9nK@hog>
-X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
-	CAMSVWEXC02.scsc.local (2002:6a01:e348::6a01:e348)
-X-Brightmail-Tracker: H4sIAAAAAAAAA2WTW1ATdxTG57+7yQZq6IKM/geY4WJpqXeUTg+jtmB92Ic+SG2t40xLGV3B
-	CgETwFsdIyBKkIuCUJBC8BKQtGAhRhApDFqJAYlUKqhEhiRAJ3KxYlCuKWGxdaZvv/N955tz
-	zsMRkW55Ig/RXkk8J5VERPsJnSntnQnDqtD4NXvWtt0KhGb5x9B3UyEAeUoqASfq7BRoL6YT
-	YDcOEjBTd5KEsb5BAZRcqBFCkSGFgpmudCGMJE1RUHnjBAH9d0w0aDPUCNRJPRRcH3wlhHSr
-	FyRfsyGwZJkE0Kl6LoQJVQUNvTYTBROZ70CBIpmAtvQYqDVaKLivzRRAtj4QHl43EvDgRpEQ
-	7je1CmCgOYOC7NJkEvqVzwTQk6OioKmhBIGpapSA5JIXJCSPmUmYLG8RQHuGnYTCygoSurP7
-	Edw6+ZsA2qqSaBgv1pHQUCKn4I5yCWRX6ikYbx1CkD/0Jwn6l3YC2mvGBDBWFADdDjOnXENA
-	fdprGjSG70E/qSfA/GpQCPbuT+F4m5YGc1cXGRLCPjbZSHak/S5ii38+wp6Xd1Ds5MRyVnPl
-	EcGm37aSbF2hkWa1Tf6ssjqBnW7+lWarK9KEbF1fMJt9oQmxNZeOsX/VFKCtvjudN+7movcm
-	ctI1n3znHDVuaRDGKV0P3lPqKDmacFEgJxFmgrBi2k4rkLPIjSlHWGEsFvDFS4RfXL6G+GIM
-	4aSOXOJNpMVgXDDKEL46bqL/7RrOG1lwahAuyjHSjgjF+ONaXSPpYCGzEhuGeubZnQnAlpNa
-	0hEgmUlXPFzRMR9YzETj81kD801iJgQXT+XQPLviuwUWysEkcxBfHUiZmyaaY09cNityyE7M
-	MpxbbllY1RfbLj6leD6K9ZrHhGMWZn5fhO/1Wmne2IJnFQrE82JsbdEs6F64Nec0xQdyEG6c
-	fU7zhRph1XHbwogNOKXTspAIxe1/lAkcG2HGBXcPu/KLuuCz2nySl8X4VKob3/0+Vj8dorLR
-	ssK3Tit867TC/07j5ZVYWf9C+D95BVaVPiN53oQrK0cpJaIr0FIuQRYTycnWS7gDq2URMbIE
-	SeTqXbEx1WjuXVtnW2y1qNz69+pmRIhQM3pvLmy6qr6PPChJrITzcxdXF63Y4ybeHXHoMCeN
-	DZcmRHOyZuQpovyWiv13e3NuTGREPLeP4+I46RuXEDl5yIn9QdrPRr3Wr3I6vMN7w87t8cSj
-	d6vq8kO/cN51kM4XSnP3Hvpp25MTpcd+CPas3X/I92jLN+PyFVGJZvWR0P5QH5lTbFka1EeX
-	+Ozymx7evm7pwNONQZ7rnC433hZ7+ffbwrjTU57sw/yJA30Bm1blXVuSeripdio5VhxwJtD7
-	cqa5f1BlP64p8H4dHiyJa7mSunb/h0A9P9c+mWqQmAd6t0QrHwSHzf6ytdrAMhkqn9LEjX26
-	7lONnZulIQrjPd0Z69m4iq4hfflMlibMfBO+bMvzCKiP+ZZJKN5csK37SZ3k7NcffZB0rsN9
-	Z7hufMeI177Pe6cv0Xm+txb9qAuxqqe/SvSjZFERgctJqSziH4ZCIl4pBQAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA2WTeUyTdxjH83uPtkjqyuXeIFkEMTGwFcrlU4MMw+bemSxbzBLMzIJVXg6F
-	wtpCECerICBlIBtuC7UUhMk4HHKtUDaQoXIURgG5xqHh7AaoQ45a5BjQLTPZf5/f9/l+v3ny
-	Sx4Obl3JtueEi2WMRCyKcGLtIjo2WsfeOipzC3EvmbGAZvkhGP9FQYL8SgoGydpNAjSF6Rhs
-	jhkwWNem4rA4biAhr6CaBSr9FQLWB9NZ8DTxJQHl9ckYTLdMsEGTUYagLHGUgFqDkQXpsw6Q
-	9NMygqlrEyT0Ff3FAlNRKRseL08QYMq0hBxFEgad6ZFQNzZFQLcmk4QsnQAGascweFivYkF3
-	UwcJM80ZBGTdTMJhOn+OhNHsIgKaGvIQTNx5hkFS3nMckhYncVgtbiWhK2MTB2V5KQ5DWdMI
-	7qU2ktB5J5ENK+o2HBry5AS05O+BrHIdASsd8wi+m+/HQbe0iUFX9SIJi6qDMLQ9zC6uweDn
-	tBdsqNGfA92qDoNJo4EFm0Nvw+VODRsmBwdxf396eGIZp592tSNaffsifUPeQ9CrJhe6puR3
-	jE6/P4vTWuUYm9Y0HaDzq2LoteZKNl1VmsaiteNCOqugCdHV339B/1Gdgz5y/ITvK4mKkTH7
-	wqKksiNOpwTgwRcIge/hJeQLPA99etjD28nNzzeYiQiPZSRufqf5YQ+S34lWW8VlD9/C5ci4
-	W4EsOBTPi2rVjyEF2sWx5t1CVMlvd0nzwIGqXOr/h22otQEFy2xaQJSipQYzP6oRtawrwLZd
-	BO8AVdd2F99mFu9NSj8/usO2vIPUVKoG3w7gvFUr6n5/xU7AhhdB3bg2s2Pi8vwp9ctstrn1
-	BaJ6Bs2tXJ4V1Z4zRWwzzoulklYebgU4W7yX+mGDsy1b8PZT14unMPOqjtRy4SPCzJeoxfUZ
-	lIVslK80KV9pUv7XZJZdqKGNP7H/ya5U0c053MxHqPLyZ0Q+YpciWyZGGhkaKRXwpaJIaYw4
-	lH82KrIKbd2LpsVUXYfUswv8ZoRxUDNy3kpOVJR1I3tCHCVmnGy5VSrXEGtusOhCPCOJCpLE
-	RDDSZuS99Y1f4fZ2Z6O2jk8sCxL4uHsLvHyE7t5CH0+n17nvR18VWfNCRTLmPMNEM5J/cxjH
-	wl6OFWsLY0fiTqWwWICXxB4zwKP37pXujQlYsPITuno65/f2ug3rCz7GvlZmksd/NLkOeF8m
-	jSEfNqrP1IYf9m+Q8h0TngR2xrs7I1W3nU/vzH61xNU1PoG9wNYnB27mvnbSLvez8+K1grYl
-	B8vF9qoKndbZK04bQozsvriuTFuTWNakNHExvbzlVwvT0a6y49mi8H192LfBdZdkEQqi5bHf
-	yLsn92hz3niwn1GIj8mnwnLnCpefp9ZVfR6Q4BsXaeiz1DeeoFT1tSYHF4egD+ieuavG1dKN
-	6TPT38QauYN2gW7r8bdLiKLo/j6bEwEFqi91F2baG58YzvWTVrGnU4ROhDRMJHDBJVLR3zvr
-	51XEBAAA
-X-CMS-MailID: 20240429101945eucas1p2dc8fc97bb946c330b71475078348f67e
-X-Msg-Generator: CA
-X-RootMTR: 20240427081456eucas1p2618580c2e3463ebed3192108249d505c
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20240427081456eucas1p2618580c2e3463ebed3192108249d505c
-References: <20240426-jag-sysctl_remset_net-v5-0-e3b12f6111a6@samsung.com>
-	<20240426-jag-sysctl_remset_net-v5-8-e3b12f6111a6@samsung.com>
-	<CGME20240427081456eucas1p2618580c2e3463ebed3192108249d505c@eucas1p2.samsung.com>
-	<ZiyxJFnJimaRr9nK@hog>
+Content-Type: multipart/signed; boundary="Sig_/I+vBB1VmXraGYDKfIpStYt9";
+ protocol="application/pgp-signature"; micalg=pgp-sha512
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
 
---io5uz7byzuh34bpr
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
+--Sig_/I+vBB1VmXraGYDKfIpStYt9
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 
-On Sat, Apr 27, 2024 at 10:14:36AM +0200, Sabrina Dubroca wrote:
-> 2024-04-26, 12:47:00 +0200, Joel Granados via B4 Relay wrote:
-> > diff --git a/net/ax25/ax25_ds_timer.c b/net/ax25/ax25_ds_timer.c
-> > index c4f8adbf8144..8f385d2a7628 100644
-> > --- a/net/ax25/ax25_ds_timer.c
-> > +++ b/net/ax25/ax25_ds_timer.c
-> > @@ -49,12 +49,16 @@ void ax25_ds_del_timer(ax25_dev *ax25_dev)
-> > =20
-> >  void ax25_ds_set_timer(ax25_dev *ax25_dev)
-> >  {
-> > +#ifdef CONFIG_AX25_DAMA_SLAVE
->=20
-> Is this really needed? Looks like this file is only compiled when this
-> config is set:
->=20
-> grep ax25_ds_timer net/ax25/Makefile
-> ax25-$(CONFIG_AX25_DAMA_SLAVE) +=3D ax25_ds_in.o ax25_ds_subr.o ax25_ds_t=
-imer.o
-Good point. I had missed this detail when addressing
-https://lore.kernel.org/oe-kbuild-all/202404040301.qzKmVQGB-lkp@intel.com/.
-Thx for pointing it out. I'll remove the guards for V6.
+Hi Jakub,
 
-Best
+> On Thu, 25 Apr 2024 17:39:58 +0200 Lukasz Majewski wrote:
+> > Up till now the code to start HSR announce timer, which triggers
+> > sending supervisory frames, was assuming that hsr_netdev_notify()
+> > would be called at least twice for hsrX interface. This was
+> > required to have different values for old and current values of
+> > network device's operstate.
+> >=20
+> > This is problematic for a case where hsrX interface is already in
+> > the operational state when hsr_netdev_notify() is called, so timer
+> > is not configured to trigger and as a result the hsrX is not
+> > sending supervisory frames to HSR ring.
+> >=20
+> > This error has been discovered when hsr_ping.sh script was run. To
+> > be more specific - for the hsr1 and hsr2 the hsr_netdev_notify() was
+> > called at least twice with different IF_OPER_{LOWERDOWN|DOWN|UP}
+> > states assigned in hsr_check_carrier_and_operstate(hsr). As a
+> > result there was no issue with sending supervisory frames.
+> > However, with hsr3, the notify function was called only once with
+> > operstate set to IF_OPER_UP and timer responsible for triggering
+> > supervisory frames was not fired.
+> >=20
+> > The solution is to use netif_oper_up() helper function to assess if
+> > network device is up and then setup timer. Otherwise the timer is
+> > activated. =20
+>=20
+> NETDEV_CHANGE can get called for multiple trivial reasons,
+
+I've assumed that NETDEV_CHANGE would be called when the link has
+changed - i.e. it is down/up or carrier is down/up.
+
+The timer shall be running _only_ when the hsrX port is fully
+operational (i.e. at least one of 'slave' ports is up and running).
+
+The motivation for this patch was to enable HSR announce timer not only
+on state change, but also when the ethernet device is already up (as it
+happens with QEMU + netns setup).
+=20
+
+> if the
+> timer is already running we'll mess with the spacing of the frames,
+> no?
+
+When NETDEV_CHANGE is trigger for reason different than carrier (or
+port state) change and the netif_oper_up() returns true, the period for
+HSR supervisory frames (i.e. HSR_ANNOUNCE_INTEVAL) would be violated.
+
+What are here the potential threads?
 
 >=20
->=20
-> >  	if (ax25_dev =3D=3D NULL)		/* paranoia */
-> >  		return;
-> > =20
-> >  	ax25_dev->dama.slave_timeout =3D
-> >  		msecs_to_jiffies(ax25_dev->values[AX25_VALUES_DS_TIMEOUT]) / 10;
-> >  	mod_timer(&ax25_dev->dama.slave_timer, jiffies + HZ);
-> > +#else
-> > +	return;
-> > +#endif
-> >  }
->=20
-> --=20
-> Sabrina
->=20
+> If there is a path where the device may get activated without the
+> notifier firing - maybe we can check carrier there and schedule the
+> timer?
 
---=20
+As I've stated above - IMHO the "announce" supervisory frames shall be
+send only when HSR interface is up and running.
 
-Joel Granados
+>=20
+> Also sounds like a bug fix, so please add a Fixes tag.
 
---io5uz7byzuh34bpr
-Content-Type: application/pgp-signature; name="signature.asc"
+Ok.
+
+
+Best regards,
+
+Lukasz Majewski
+
+--
+
+DENX Software Engineering GmbH,      Managing Director: Erika Unter
+HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
+Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
+
+--Sig_/I+vBB1VmXraGYDKfIpStYt9
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
 -----BEGIN PGP SIGNATURE-----
 
-iQGzBAABCgAdFiEErkcJVyXmMSXOyyeQupfNUreWQU8FAmYvcPsACgkQupfNUreW
-QU8kOgv/Szgz25tSMOfSIaZpyg2Cpnxp4UcX7u5vIz6oeGkD9oVszd+E6XY5iMw8
-4K2SSlMe0P4Z0OJhzl/kXrvweAvKKkVhqA/OQcSUb2XTaqiEQU1tcnif+JrqK4jB
-DkpPeP5wF8bLnYIoQxlyn44qkEnZCTVU5xX3eVB8Gt8Pc/JlV5M4H4gG+O62C277
-WeGuBsSUqBiRPpowjmv9a7q0NMnubQpbGsL8XDoTLhDd6ymzGtwI3QcTTS9WcYY7
-wDs7+59o3pCZ5+WBkyXvTGoWibP6WKzIpoXh1RPpey74uIu3wsxpJ8nYyaXy1Tp/
-A5TscEgHgU/V5pg9xfTeEWD9Cokep+yYumVvL8LiqtDNH1g7dNGtyf1QuCkKAtH3
-Q652w5aEB+gyyqv7uDlWVeK2BzM9WfhksxVeDTZAXxi5MPkQFnsxqzXs0ONL4k+R
-6w1r+BCxo+5TS2iyTapH9PGhkgK6WY2Fv747fpiSfDiJILXrTBD8qWI0woE2dPWI
-WZbNe4bq
-=lZ5V
+iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmYvccAACgkQAR8vZIA0
+zr0TQwgAmiinnrEjl02V7oRVmns2RXgo0N67PHRCw/opUZQcwZmVg411wwf6q3et
+ixxfTSpNU6W/lKji8tOFxTRnWKJ60ihmSPoCV35JSa6lpgLC/0GKR64S2LbSuwpT
+J4t3S2//UapEMJbLBS6hMF2Pzr3DrGDqsu1Nl7GFVllbQSLkFlbzZ2gCWTArSL+l
+5ZTcjVJifc6ymnYS69zlHtyzfuvpqdhSHtJZyZZsV3ovoNXpFCvJSnJ5ZgreXkf+
+AMNI1L+U8dXgj43CvBJAkV9+JjUiBMdmkZE1wcXwCpgpVkGeTWXVUB3lGiyyQSk3
+BUCZhX+eZl3uwotqA+FGRbfDa7GbRQ==
+=DHDP
 -----END PGP SIGNATURE-----
 
---io5uz7byzuh34bpr--
+--Sig_/I+vBB1VmXraGYDKfIpStYt9--
 
