@@ -1,178 +1,164 @@
-Return-Path: <netdev+bounces-92077-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92078-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25EAB8B54BE
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 12:09:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E69968B54C1
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 12:10:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3F61F1C218A1
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 10:09:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 71E0C282542
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 10:10:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97DA429421;
-	Mon, 29 Apr 2024 10:09:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AB4E2942C;
+	Mon, 29 Apr 2024 10:10:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="Z7Yw9T90"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D3q+NFEs"
 X-Original-To: netdev@vger.kernel.org
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B574936B08;
-	Mon, 29 Apr 2024 10:09:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC31D2837E
+	for <netdev@vger.kernel.org>; Mon, 29 Apr 2024 10:10:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714385358; cv=none; b=PltI9Np5/JcQEK2+ZD4aTRNLtGUyNDIiC+3fjpUDYrQVnBuI0W1N7qwZkF+cyLGLJ+sUXmNmQenMOq8VoxK5sJL6gQYnJ8omkJ1by1MQ2Hh4gV/0JjOucZtk/9M2ek8TTPAnSeOvVlTd3d7NaKQgCB391wozqP2b/uBMMrwrcmA=
+	t=1714385434; cv=none; b=lq4FpoIr+ioohJmzqmWKrFbuCOkYfovkkLhFX/kFy6bzS+qJshwYWmdSqpgTUPRRqZIEAhRm191iIngWZJ1wRI4UwKfs6BmRzdFNLaMI4MMeOdwV3GfF8qig/Db/yD5THzKK4HFNxjGkbLd8rSIYjmUgGiAtjJ7OUqUFqRM92Os=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714385358; c=relaxed/simple;
-	bh=G2/+Y3GgbI8aI/B+0/EYdGDtINvqDlJjG6idi7Fd8R8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=J1+NAlZXtZEzCGzMNqWDGdtZMVU9zx8ls1uJyN8r0a+610YAWKpdDaW9bY7v/lYOMGaSUK3gogwiLyXUYsOyhaLl0LLy9EkGUU0YP+3SwRhoKz3d8rIfMHy8Zxsqj7treAYFx0Na8gDNDDqVzxObXPqV4iXBQBS2nNE3vKdlexQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=Z7Yw9T90; arc=none smtp.client-ip=85.214.62.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from wsk (85-222-111-42.dynamic.chello.pl [85.222.111.42])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-	(No client certificate requested)
-	(Authenticated sender: lukma@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id B2F18888B9;
-	Mon, 29 Apr 2024 12:09:12 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1714385354;
-	bh=hozHacjgRDNOnhvQH0iZPoT7EiNmXii511+IJqeqwM4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Z7Yw9T903myUj6aIGuaBmFOR0Nqk9IbNmQjxpp3OeoR+R9mYlduBDEPhs1JwiOqz6
-	 /3Epii+HdNFysW3ZWr88FJEKessu0x3O76NkO6LLiyXU8MHYXhjTw6BnyzojhkIusZ
-	 /ZOp/M9Bt6A/Z/YgJi+Z+OXhi3QbwxfPNLd+YuMhTDLLfcmBJ74tdVPlyaAAzg5HQl
-	 /FA5XOBGsvnLke+08/ZSJ+yiNq7MV6QD4f5MNVmx+Wact3z5ZVnSx6rzFXsE/XBc5p
-	 Hcj4WHQOw2oyk1BeKcCKt66U1Izx1kZHj4ZEkAgRqdX2KXPK1qIb87r3m+69Gxga1S
-	 IiFw/ewlW3/vA==
-Date: Mon, 29 Apr 2024 12:09:04 +0200
-From: Lukasz Majewski <lukma@denx.de>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, Casper
- Andersson <casper.casan@gmail.com>, Andrew Lunn <andrew@lunn.ch>, Eric
- Dumazet <edumazet@google.com>, Vladimir Oltean <olteanv@gmail.com>, "David
- S. Miller" <davem@davemloft.net>, Oleksij Rempel <o.rempel@pengutronix.de>,
- Tristram.Ha@microchip.com, Sebastian Andrzej Siewior
- <bigeasy@linutronix.de>, Ravi Gunasekaran <r-gunasekaran@ti.com>, Simon
- Horman <horms@kernel.org>, Nikita Zhandarovich <n.zhandarovich@fintech.ru>,
- Murali Karicheri <m-karicheri2@ti.com>, Jiri Pirko <jiri@resnulli.us>, Dan
- Carpenter <dan.carpenter@linaro.org>, Ziyang Xuan
- <william.xuanziyang@huawei.com>, Shigeru Yoshida <syoshida@redhat.com>,
- "Ricardo B. Marliere" <ricardo@marliere.net>, linux-kernel@vger.kernel.org
-Subject: Re: [net-next PATCH] hsr: Simplify code for announcing HSR nodes
- timer setup
-Message-ID: <20240429120904.2ab5248c@wsk>
-In-Reply-To: <20240426173317.2f6228a0@kernel.org>
-References: <20240425153958.2326772-1-lukma@denx.de>
-	<20240426173317.2f6228a0@kernel.org>
-Organization: denx.de
-X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1714385434; c=relaxed/simple;
+	bh=xQ7hNCE0DNOP4U41pP3s0ClJGxIz6zSi+Jgjtu12jcc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Rlhnkkfkw+7W1drad/zIKfHmeYm4/gqsI7gi9wW6dj0VD3PbdCX8Ks4llMTYwGWGGB2h6NRyVk/ooII4UeTUQxOo4V/Fwgbo4Jca3Cx6VjweF76rEYLNEOOdm0cIY0IYh/t67i09Ou8LjFEiufedCjrf+KFZH7MZW4FBduP6SAg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=D3q+NFEs; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1714385431;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=yrFSV+enroO5/Kb8/GKX96Hz0vjFPPsWJvTVuF9uIxc=;
+	b=D3q+NFEsSOS7cODd4bLUOima3BfVpJQCIhwVr51xeRadF25F6H0oejVdLkVm2tc60dbBlW
+	TLPw8MOPTJNkOvG3tqS5LZONhxIAb7VRMcDesaJCE1GYYe0p7jfmMXwzexlZnjKykU7ykj
+	13pYRlGOTBaOm5yPh0vZB5UbSsibsyE=
+Received: from mail-ot1-f71.google.com (mail-ot1-f71.google.com
+ [209.85.210.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-631-fl8HxNUwOTGxGELDvU6hTw-1; Mon, 29 Apr 2024 06:10:30 -0400
+X-MC-Unique: fl8HxNUwOTGxGELDvU6hTw-1
+Received: by mail-ot1-f71.google.com with SMTP id 46e09a7af769-6ee2846ec10so1385766a34.1
+        for <netdev@vger.kernel.org>; Mon, 29 Apr 2024 03:10:30 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714385430; x=1714990230;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yrFSV+enroO5/Kb8/GKX96Hz0vjFPPsWJvTVuF9uIxc=;
+        b=SCryDDS7wAMngZuqAk7HRmtCkFMwhzmpXHqpc7D3EZ1r/XZNYoVPvewuUsXBTKwvom
+         0gf08jALOFZG8iyjc8gc9GssUC9HoxqvQWnzXc4v4HQztihs1fVbOXGhLl34AtN4qz2i
+         ZGZicI65fWr6E/lZAnm/pinBCA8OML86AQv4uLs1YAnTWvVfyJSyb2T7uaAvrhfeEPbi
+         xca8M/4a67D6Ibsv98RzMTsQ+aDJ/TfcJVJuTcRMTaVGjG7WX6fu4IIxGYJfFZExgnZ1
+         jLfJsdu44XUH5nR9mx4whAbv08M+IHD1aLCurczrlLdKaraCes6gVwWQAzNOeLTWspv1
+         4zwg==
+X-Forwarded-Encrypted: i=1; AJvYcCW+WoXVJI9sySC3JPy1ma77XXQbaUT/UHYA0auJ7op4RJ6D43ayKWSqHUnHHdZQyFchJCBRV+yRxVehWP+Fto46o5NqjQao
+X-Gm-Message-State: AOJu0YyVSMUM29HFWqRZJ4l6741ZxkVMW0gBDm3r2K5espE0mN+ew45f
+	TCLeZOEr78TsTyX819jTe9zQ09FP9+avgT6vDVF3i4XTH+Kbmb0RZ+GEMi2ssNTv3fyDIBjUXrN
+	1AULNP2Ka5c59lvB+SMf4codP/RgPJkmiZVIa9Vu5JmAO4m9wXxvqfg==
+X-Received: by 2002:a9d:7991:0:b0:6ee:2ca2:4370 with SMTP id h17-20020a9d7991000000b006ee2ca24370mr2789814otm.15.1714385429719;
+        Mon, 29 Apr 2024 03:10:29 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHrvfVsOcM4emYdUYKViS3N6+afe+LNkfiEGNb0K0Zlc2Ov17BGL5mY6doHoVFVADHAZxJpjw==
+X-Received: by 2002:a9d:7991:0:b0:6ee:2ca2:4370 with SMTP id h17-20020a9d7991000000b006ee2ca24370mr2789795otm.15.1714385429234;
+        Mon, 29 Apr 2024 03:10:29 -0700 (PDT)
+Received: from localhost ([2a01:e11:1007:ea0:8374:5c74:dd98:a7b2])
+        by smtp.gmail.com with ESMTPSA id t3-20020a05620a034300b0078ef13a3d9csm10354459qkm.39.2024.04.29.03.10.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 29 Apr 2024 03:10:28 -0700 (PDT)
+Date: Mon, 29 Apr 2024 12:10:27 +0200
+From: Davide Caratti <dcaratti@redhat.com>
+To: Paul Moore <paul@paul-moore.com>
+Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Casey Schaufler <casey@schaufler-ca.com>,
+	linux-security-module@vger.kernel.org, netdev@vger.kernel.org,
+	Xiumei Mu <xmu@redhat.com>
+Subject: Re: [PATCH v2] netlabel: fix RCU annotation for IPv4 options on
+ socket  creation
+Message-ID: <Zi9yE099IYtqhCzN@dcaratti.users.ipa.redhat.com>
+References: <c1ba274b19f6d1399636d018333d14a032d05454.1713967592.git.dcaratti@redhat.com>
+ <b6f94a1fd73d464e1da169e929109c3c@paul-moore.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/I+vBB1VmXraGYDKfIpStYt9";
- protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b6f94a1fd73d464e1da169e929109c3c@paul-moore.com>
 
---Sig_/I+vBB1VmXraGYDKfIpStYt9
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+hello Paul, thanks for reviewing!
 
-Hi Jakub,
+On Thu, Apr 25, 2024 at 05:01:36PM -0400, Paul Moore wrote:
+> On Apr 24, 2024 Davide Caratti <dcaratti@redhat.com> wrote:
+> >
 
-> On Thu, 25 Apr 2024 17:39:58 +0200 Lukasz Majewski wrote:
-> > Up till now the code to start HSR announce timer, which triggers
-> > sending supervisory frames, was assuming that hsr_netdev_notify()
-> > would be called at least twice for hsrX interface. This was
-> > required to have different values for old and current values of
-> > network device's operstate.
-> >=20
-> > This is problematic for a case where hsrX interface is already in
-> > the operational state when hsr_netdev_notify() is called, so timer
-> > is not configured to trigger and as a result the hsrX is not
-> > sending supervisory frames to HSR ring.
-> >=20
-> > This error has been discovered when hsr_ping.sh script was run. To
-> > be more specific - for the hsr1 and hsr2 the hsr_netdev_notify() was
-> > called at least twice with different IF_OPER_{LOWERDOWN|DOWN|UP}
-> > states assigned in hsr_check_carrier_and_operstate(hsr). As a
-> > result there was no issue with sending supervisory frames.
-> > However, with hsr3, the notify function was called only once with
-> > operstate set to IF_OPER_UP and timer responsible for triggering
-> > supervisory frames was not fired.
-> >=20
-> > The solution is to use netif_oper_up() helper function to assess if
-> > network device is up and then setup timer. Otherwise the timer is
-> > activated. =20
->=20
-> NETDEV_CHANGE can get called for multiple trivial reasons,
+[...]
+ 
+> > @@ -1826,7 +1827,8 @@ static int cipso_v4_genopt(unsigned char *buf, u32 buf_len,
+> >   */
+> >  int cipso_v4_sock_setattr(struct sock *sk,
+> >  			  const struct cipso_v4_doi *doi_def,
+> > -			  const struct netlbl_lsm_secattr *secattr)
+> > +			  const struct netlbl_lsm_secattr *secattr,
+> > +			  bool slock_held)
+> 
+> This is a nitpicky bikeshedding remark, but "slock_held" sounds really
+> awkward to me, something like "sk_locked" sounds much better.
 
-I've assumed that NETDEV_CHANGE would be called when the link has
-changed - i.e. it is down/up or carrier is down/up.
+ok, will fix that in v3.
 
-The timer shall be running _only_ when the hsrX port is fully
-operational (i.e. at least one of 'slave' ports is up and running).
+[...]
 
-The motivation for this patch was to enable HSR announce timer not only
-on state change, but also when the ethernet device is already up (as it
-happens with QEMU + netns setup).
-=20
+> > @@ -1876,18 +1878,15 @@ int cipso_v4_sock_setattr(struct sock *sk,
+> >  
+> >  	sk_inet = inet_sk(sk);
+> >  
+> > -	old = rcu_dereference_protected(sk_inet->inet_opt,
+> > -					lockdep_sock_is_held(sk));
+> > +	old = rcu_replace_pointer(sk_inet->inet_opt, opt, slock_held);
+> >  	if (inet_test_bit(IS_ICSK, sk)) {
+> >  		sk_conn = inet_csk(sk);
+> >  		if (old)
+> >  			sk_conn->icsk_ext_hdr_len -= old->opt.optlen;
+> > -		sk_conn->icsk_ext_hdr_len += opt->opt.optlen;
+> > +		sk_conn->icsk_ext_hdr_len += opt_len;
+> >  		sk_conn->icsk_sync_mss(sk, sk_conn->icsk_pmtu_cookie);
+> >  	}
+> > -	rcu_assign_pointer(sk_inet->inet_opt, opt);
+> > -	if (old)
+> > -		kfree_rcu(old, rcu);
+> > +	kfree_rcu(old, rcu);
+> 
+> Thanks for sticking with this and posting a v2.
+> 
+> These changes look okay to me, but considering the 'Fixes:' tag and the
+> RCU splat it is reasonable to expect that this is going to be backported
+> to the various stable trees.  With that in mind, I think we should try
+> to keep the immediate fix as simple as possible, saving the other
+> changes for a separate patch.  This means sticking with
+> rcu_dereference_protected() and omitting the opt_len optimization; both
+> can be done in a second patch without the 'Fixes:' marking.
+> 
+> Unless I missing something and those changes are somehow part of the
+> fix?
 
-> if the
-> timer is already running we'll mess with the spacing of the frames,
-> no?
-
-When NETDEV_CHANGE is trigger for reason different than carrier (or
-port state) change and the netif_oper_up() returns true, the period for
-HSR supervisory frames (i.e. HSR_ANNOUNCE_INTEVAL) would be violated.
-
-What are here the potential threads?
-
->=20
-> If there is a path where the device may get activated without the
-> notifier firing - maybe we can check carrier there and schedule the
-> timer?
-
-As I've stated above - IMHO the "announce" supervisory frames shall be
-send only when HSR interface is up and running.
-
->=20
-> Also sounds like a bug fix, so please add a Fixes tag.
-
-Ok.
-
-
-Best regards,
-
-Lukasz Majewski
+just checked, rcu_replace_pointer() can be used also in the oldest LTS
+but I'm not sure if kfree_rcu(NULL, ...) is ok. I agree to keep
+rcu_dereference_protected(), and the useless NULL check - I will
+follow-up with another patch (targeting net-next), after this one is
+merged.
 
 --
+davide
 
-DENX Software Engineering GmbH,      Managing Director: Erika Unter
-HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
-Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
-
---Sig_/I+vBB1VmXraGYDKfIpStYt9
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmYvccAACgkQAR8vZIA0
-zr0TQwgAmiinnrEjl02V7oRVmns2RXgo0N67PHRCw/opUZQcwZmVg411wwf6q3et
-ixxfTSpNU6W/lKji8tOFxTRnWKJ60ihmSPoCV35JSa6lpgLC/0GKR64S2LbSuwpT
-J4t3S2//UapEMJbLBS6hMF2Pzr3DrGDqsu1Nl7GFVllbQSLkFlbzZ2gCWTArSL+l
-5ZTcjVJifc6ymnYS69zlHtyzfuvpqdhSHtJZyZZsV3ovoNXpFCvJSnJ5ZgreXkf+
-AMNI1L+U8dXgj43CvBJAkV9+JjUiBMdmkZE1wcXwCpgpVkGeTWXVUB3lGiyyQSk3
-BUCZhX+eZl3uwotqA+FGRbfDa7GbRQ==
-=DHDP
------END PGP SIGNATURE-----
-
---Sig_/I+vBB1VmXraGYDKfIpStYt9--
 
