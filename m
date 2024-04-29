@@ -1,105 +1,163 @@
-Return-Path: <netdev+bounces-92107-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92108-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 616428B578A
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 14:12:06 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE1468B57A0
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 14:15:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 938D2B215DE
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 12:12:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 26B84B25994
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 12:15:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71580762D7;
-	Mon, 29 Apr 2024 12:09:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="RzZObxK1"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 285FF5380B;
+	Mon, 29 Apr 2024 12:11:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [207.211.30.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16F8874BEB;
-	Mon, 29 Apr 2024 12:09:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FBA253807
+	for <netdev@vger.kernel.org>; Mon, 29 Apr 2024 12:11:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.211.30.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714392579; cv=none; b=BNyteOcnaXLG1e1R1LFg28Ge1/gQIeZ0Q7VHEY7BY88DAJ0OezOMbZlh6gyqqbnFW541hIp9tFWi4Kw3l8Rat8n3npr6i9E/mwg1j94QodMTv1h5uaY4uZsmRiHACdXPjuWMRSIUSla3iOQoVq1MRoDQIa2KTXj6ql4Wty63kz8=
+	t=1714392705; cv=none; b=jc3MoPZt3TQ8/ELa9eXOCUmIIjqH3l7/4deDmyHh4nGixp8VPdzF4wS9K031WIuSuTWnVtHUOdzbpcxr3Y43eUDEVdSJOQFh3ypruwiPPShk8/kkTUY9/Z5RkNSJt40mUTCnx/9WcErLvKaLd5TyljpPxIUBbZkDViUabRt6TFU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714392579; c=relaxed/simple;
-	bh=5rT0MW8a+Q608EQ2WOLBLIOLnw2hvDV6qV7Xa4L4Vvo=;
+	s=arc-20240116; t=1714392705; c=relaxed/simple;
+	bh=a+0zT6CcnM8ty2cmKCndZtgy1nqayRcqE5kDOvpZkqU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NKxUHqN3ftUmL+t014HtoIeDFW+hGzoVefoTekc/520ZAF4JZ4dV2smtVZNNbPA2k90Kn+f+s06O2wWO6nqiZLBv4y8MzU17/q93Mb+SW6AriRy2du9cqoMzm4ZxhGxZJIETXYjctG+aDKFVGUMNjFwbx2vV2Ou868nhiCLAGog=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=RzZObxK1; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=h9t4XYnMZ7pWMVqItnio1QT6PeGN1g5MdB6mzR8+nTc=; b=RzZObxK1rl9M7ufGw2N+tp6YzK
-	+qFKeH4uRQ85TfaQzaBViNMA+CX3XUu172Z2q6ZVrkq5Ri+gtgvfZrY4/z0JOI0/19V3B07Ylutge
-	cPHzBbN/A0xqYbqTz1z/QRk4/+HcC1Fx4bOlDEANMrTQxRifPJ4cuurky6xxl829Zp64=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1s1Poq-00EFGB-Ci; Mon, 29 Apr 2024 14:09:16 +0200
-Date: Mon, 29 Apr 2024 14:09:16 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Parthiban.Veerasooran@microchip.com
-Cc: conor@kernel.org, ramon.nordin.rodriguez@ferroamp.se,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, horms@kernel.org, saeedm@nvidia.com,
-	anthony.l.nguyen@intel.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, corbet@lwn.net,
-	linux-doc@vger.kernel.org, robh+dt@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
-	devicetree@vger.kernel.org, Horatiu.Vultur@microchip.com,
-	ruanjinjie@huawei.com, Steen.Hegelund@microchip.com,
-	vladimir.oltean@nxp.com, UNGLinuxDriver@microchip.com,
-	Thorsten.Kummermehr@microchip.com, Pier.Beruto@onsemi.com,
-	Selvamani.Rajagopal@onsemi.com, Nicolas.Ferre@microchip.com,
-	benjamin.bigler@bernformulastudent.ch
-Subject: Re: [PATCH net-next v4 11/12] microchip: lan865x: add driver support
- for Microchip's LAN865X MAC-PHY
-Message-ID: <243dab3b-ac07-4d88-8c43-aed53a34cea9@lunn.ch>
-References: <20240418125648.372526-1-Parthiban.Veerasooran@microchip.com>
- <20240418125648.372526-12-Parthiban.Veerasooran@microchip.com>
- <Zi1PxgANUWh1S0sO@builder>
- <20240427-vaporizer-pencil-be6a25030f08@spud>
- <1ae4f1d5-140b-41b1-9191-da14fd67d409@microchip.com>
+	 In-Reply-To:Content-Type:Content-Disposition; b=dWOq8CASHWpGHrQCm3v8NMIHHfrc04XbNKAzGQ95xtNS2aEM8fF4bOHjiUg2qtz+5f8vIX5Zd1yZWc3FvCSFkwncfpIgEk7gi/3EArMO/A9gT5EWTb2FNQ0pzCHxV8ev/vNZWNtqeWDQW9oJqEuVKX3l+iOQul1SZEXGX9k9w3s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=none smtp.mailfrom=queasysnail.net; arc=none smtp.client-ip=207.211.30.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=queasysnail.net
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-139-sl8JIxUKNam_momG4F-aRQ-1; Mon, 29 Apr 2024 08:11:36 -0400
+X-MC-Unique: sl8JIxUKNam_momG4F-aRQ-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C0F9380D678;
+	Mon, 29 Apr 2024 12:11:35 +0000 (UTC)
+Received: from hog (unknown [10.39.193.137])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id EE8DE400EB2;
+	Mon, 29 Apr 2024 12:11:33 +0000 (UTC)
+Date: Mon, 29 Apr 2024 14:11:32 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Antony Antony <antony.antony@secunet.com>
+Cc: Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>, netdev@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	devel@linux-ipsec.org, Leon Romanovsky <leon@kernel.org>,
+	Eyal Birger <eyal.birger@gmail.com>,
+	Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Subject: Re: [PATCH ipsec-next v13 1/4] xfrm: Add Direction to the SA in or
+ out
+Message-ID: <Zi-OdMloMyZ-BynF@hog>
+References: <cover.1714118266.git.antony.antony@secunet.com>
+ <21d941a355a4d7655bb8647ba3db145b83969a6f.1714118266.git.antony.antony@secunet.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <21d941a355a4d7655bb8647ba3db145b83969a6f.1714118266.git.antony.antony@secunet.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.9
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: queasysnail.net
+Content-Type: text/plain; charset=UTF-8
 Content-Disposition: inline
-In-Reply-To: <1ae4f1d5-140b-41b1-9191-da14fd67d409@microchip.com>
+Content-Transfer-Encoding: quoted-printable
 
-> Looks like, the below changes needed to work correctly,
-> 
-> lan865x.c:
-> - compatible string to be changed like below as it is a fallback for all 
-> variants,
-> 	.compatible = "microchip,lan8650"
-> - DRV_NAME to be changed like below,
-> 	#define DRV_NAME                        "lan8650"
-> 
-> microchip,lan865x.example.dts for lan8650:
-> - compatible string to be changed like below,
-> 	.compatible = "microchip,lan8650";
-> 	OR
-> microchip,lan865x.example.dts for lan8651:
-> - compatible string to be changed like below,
-> 	compatible = "microchip,lan8651", "microchip,lan8650";
-> 
-> I tested with the above changes and there was no issues observed. Any 
-> comments on this? Otherwise we can stick with these changes for the next 
-> version.
+2024-04-26, 10:05:06 +0200, Antony Antony wrote:
+> diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
+> index 810b520493f3..65948598be0b 100644
+> --- a/net/xfrm/xfrm_user.c
+> +++ b/net/xfrm/xfrm_user.c
+> @@ -358,6 +383,64 @@ static int verify_newsa_info(struct xfrm_usersa_info=
+ *p,
+>  =09=09=09err =3D -EINVAL;
+>  =09=09=09goto out;
+>  =09=09}
+> +
+> +=09=09if (sa_dir =3D=3D XFRM_SA_DIR_OUT) {
+> +=09=09=09NL_SET_ERR_MSG(extack,
+> +=09=09=09=09       "MTIMER_THRESH attribute should not be set on output =
+SA");
+> +=09=09=09err =3D -EINVAL;
+> +=09=09=09goto out;
+> +=09=09}
+> +=09}
+> +
+> +=09if (sa_dir =3D=3D XFRM_SA_DIR_OUT) {
+> +=09=09if (p->flags & XFRM_STATE_DECAP_DSCP) {
+> +=09=09=09NL_SET_ERR_MSG(extack, "Flag DECAP_DSCP should not be set for o=
+utput SA");
+> +=09=09=09err =3D -EINVAL;
+> +=09=09=09goto out;
+> +=09=09}
+> +
+> +=09=09if (p->flags & XFRM_STATE_ICMP) {
+> +=09=09=09NL_SET_ERR_MSG(extack, "Flag ICMP should not be set for output =
+SA");
+> +=09=09=09err =3D -EINVAL;
+> +=09=09=09goto out;
+> +=09=09}
 
-As Conor said, this is probably relying on the fallback
-mechanism. Please look at other SPI devices, e.g. hwmon, and see how
-they probe for multiple different devices.
+Maybe also XFRM_STATE_WILDRECV? It looks pretty "input" to me.
 
-	Andrew
+> +
+> +=09=09if (p->replay_window) {
+> +=09=09=09NL_SET_ERR_MSG(extack, "Replay window should be 0 for output SA=
+");
+> +=09=09=09err =3D -EINVAL;
+> +=09=09=09goto out;
+> +=09=09}
+> +
+> +=09=09if (attrs[XFRMA_REPLAY_VAL]) {
+> +=09=09=09struct xfrm_replay_state *replay;
+> +
+> +=09=09=09replay =3D nla_data(attrs[XFRMA_REPLAY_VAL]);
+> +
+> +=09=09=09if (replay->seq || replay->bitmap) {
+> +=09=09=09=09NL_SET_ERR_MSG(extack,
+> +=09=09=09=09=09       "Replay seq and bitmap should be 0 for output SA")=
+;
+> +=09=09=09=09err =3D -EINVAL;
+> +=09=09=09=09goto out;
+> +=09=09=09}
+> +=09=09}
+> +=09}
+> +
+> +=09if (sa_dir =3D=3D XFRM_SA_DIR_IN) {
+> +=09=09if (p->flags & XFRM_STATE_NOPMTUDISC) {
+> +=09=09=09NL_SET_ERR_MSG(extack, "Flag NOPMTUDISC should not be set for i=
+nput SA");
+> +=09=09=09err =3D -EINVAL;
+> +=09=09=09goto out;
+> +=09=09}
+> +
+> +=09=09if (attrs[XFRMA_SA_EXTRA_FLAGS]) {
+> +=09=09=09u32 xflags =3D nla_get_u32(attrs[XFRMA_SA_EXTRA_FLAGS]);
+> +
+> +=09=09=09if (xflags & XFRM_SA_XFLAG_DONT_ENCAP_DSCP) {
+
+Shouldn't XFRM_SA_XFLAG_OSEQ_MAY_WRAP also be excluded on input?
+
+Sorry I didn't check all the remaining flags until now.
+
+
+Apart from that, the series looks good now, so I can also ack it and
+add those two extra flags as a follow-up patch. Steffen/Antony, let me
+know what you prefer.
+
+Thanks.
+
+--=20
+Sabrina
+
 
