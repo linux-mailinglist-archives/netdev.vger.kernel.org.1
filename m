@@ -1,260 +1,109 @@
-Return-Path: <netdev+bounces-92177-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92178-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7AC2B8B5BBC
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 16:45:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A2E698B5BBE
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 16:45:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 268A0282185
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 14:45:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 63CE62823E9
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 14:45:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F73381AB1;
-	Mon, 29 Apr 2024 14:44:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91AFB3D56D;
+	Mon, 29 Apr 2024 14:45:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ozb+9x6H"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gB8vs2w9"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D96D781745;
-	Mon, 29 Apr 2024 14:44:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 616427F46C;
+	Mon, 29 Apr 2024 14:45:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714401875; cv=none; b=uqRihtv2FBQ+CcR1PE/HKwzYNKyQ+qy753nJ7SEJ+lZMGH2grbwCpGZsgTlt5yATYqJRMp9EdxmZJsPo93yBQDrLetN7Znsv3fQQjEYf+CfEeNFoLgLuNX6lylEDRPR7s1tn8BGuAEqMgP1l09jg0O2gqj2BNgjoZLVnJD/Hz+Q=
+	t=1714401939; cv=none; b=JYXjlzyiAySk9ewbCXTIjvnKFnCOJFiaQN/O3F+tW9Hj043xNRj71DjJ/2gUcHc6nRC5nqt5OK39nz1Lq/9hcs5Z/KG5ZPDrL86NJHxwqBsrbYtKX0LOFSwiFuMxCBsS9kPiCi1YbNRio9037eSCiR9lBXKU98d9JA833cnoXxs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714401875; c=relaxed/simple;
-	bh=SDllwCyBkau8KID+VjwwqBdxYX2WiKlosdaB+BB7p/k=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=OKdfjpbuy0Mq5F9HzVJEFVuBrBQ3uJGIrWr3MTLfi4X5FKWPTFMQ3iFWqO3g6iFQLkMYjRE8Azhe+SEV+KhOKn3MsZevjNIba7yMPKec8nYqPjfj7SnzbJhwMZfWvXLM0ca5hNs9R3VlCV6OuaWOrjiHx13ReU156hmCoyczKBc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ozb+9x6H; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1697AC4AF48;
-	Mon, 29 Apr 2024 14:44:35 +0000 (UTC)
+	s=arc-20240116; t=1714401939; c=relaxed/simple;
+	bh=HQFQVk/aUt7EGazaH6NoJ7OsnpPabPfhVzUB2hmzT9A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=s/I7Mooe1IEybAHMsOqNGcxS5KNPWHH8aL0/N1x4r+2mR5F3osu6vmOnRFIer1QEoS3btujHRKZ3ENVKEtF2RcTKpB5pyP17Q/HPa5EziQPeSk3GGmvLTpoV4dN8qPj1aTJIKby1AY46evSyIpMmddwJ/awsO+3hz6ey/+WNHWg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gB8vs2w9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A0810C4AF1C;
+	Mon, 29 Apr 2024 14:45:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714401875;
-	bh=SDllwCyBkau8KID+VjwwqBdxYX2WiKlosdaB+BB7p/k=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Ozb+9x6HnAzQG16hdeefNf56zilC9JvKfEzK5pOAl+oKkEArFfh7WPscf08oi9Fki
-	 ADLUDcpEmyYWpicYIEreXOouiWxp4/NIA1F1jM7wY4GubKKr2VwpDhN/gtOM/hcm3s
-	 9fUSVxVVt6e/qoIhiGY1gV/FwBX5uXQB4ulK8Y370Ic9Cvw+OjAGOHKMG80ico/qTN
-	 fwBN2myeDsG7xxZqwQ3qlMgiMPK5jsc0U6teiMq0GSjLB0QHR0vxqtseJIGC/c0/T0
-	 Ct82LM5RWIP2QG2rEcmSA+h4OFl/Ppo4qVC6ODdc53qNQc9Rza1GENMVg8C8IOHT7v
-	 TAgODWs1WNN5Q==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	linux-kselftest@vger.kernel.org,
-	willemdebruijn.kernel@gmail.com,
-	Jakub Kicinski <kuba@kernel.org>,
-	Willem de Bruijn <willemb@google.com>
-Subject: [PATCH net-next v2 6/6] selftests: drv-net-hw: add test for memory allocation failures with page pool
-Date: Mon, 29 Apr 2024 07:44:26 -0700
-Message-ID: <20240429144426.743476-7-kuba@kernel.org>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20240429144426.743476-1-kuba@kernel.org>
-References: <20240429144426.743476-1-kuba@kernel.org>
+	s=k20201202; t=1714401939;
+	bh=HQFQVk/aUt7EGazaH6NoJ7OsnpPabPfhVzUB2hmzT9A=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=gB8vs2w9acQgZ/W/pBv8sEYf7kYQGoGXQovwX3dDNem++Cui0NbKVh4o/aYcv7XDa
+	 P7ImS8mIsQ3AsX9dg1B9pMcdpx0qwB0jRUKGiNfLyPa4LeCLLgpSmsCjGjYEvAGsmD
+	 pYnz2FZBhzpjuso7K1IcCl9tXJUwajF12cphURy+GQllvrTlY9WivRNJ4b1+tJMpCA
+	 d2Q4cUEZNJi4kPGzqvQksLxhpCK0CDODJPuIOLH8bAh+k8wCGxpy8ZfaXCge2mYRzA
+	 6DP/nekSmWlgKjO33JkecU++lLEdoGSUJ6iIbVJ07eHdCUrP6WhBqBh4ELR5iH0SeV
+	 z6agpkn7PqvdQ==
+Date: Mon, 29 Apr 2024 23:45:36 +0900
+From: Mark Brown <broonie@kernel.org>
+To: "Rob Herring (Arm)" <robh@kernel.org>
+Cc: Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Bharat Kumar Gogada <bharat.kumar.gogada@amd.com>,
+	Michal Simek <michal.simek@amd.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kw@linux.com>,
+	Vinod Koul <vkoul@kernel.org>,
+	Kishon Vijay Abraham I <kishon@kernel.org>,
+	Liam Girdwood <lgirdwood@gmail.com>,
+	Thierry Reding <thierry.reding@gmail.com>,
+	Jonathan Hunter <jonathanh@nvidia.com>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-pci@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-phy@lists.infradead.org, linux-tegra@vger.kernel.org
+Subject: Re: [PATCH] dt-bindings: Drop unnecessary quotes on keys
+Message-ID: <Zi-ykPmrPqBxiHNz@finisterre.sirena.org.uk>
+References: <20240426202239.2837516-1-robh@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="BUMTG6XEkN0Ut87X"
+Content-Disposition: inline
+In-Reply-To: <20240426202239.2837516-1-robh@kernel.org>
+X-Cookie: TANSTAAFL
 
-Bugs in memory allocation failure paths are quite common.
-Add a test exercising those paths based on qstat and page pool
-failure hook.
 
-Running on bnxt:
+--BUMTG6XEkN0Ut87X
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-  # ./drivers/net/hw/pp_alloc_fail.py
-  KTAP version 1
-  1..1
-  # ethtool -G change retval: success
-  ok 1 pp_alloc_fail.test_pp_alloc
-  # Totals: pass:1 fail:0 xfail:0 xpass:0 skip:0 error:0
+On Fri, Apr 26, 2024 at 03:22:37PM -0500, Rob Herring (Arm) wrote:
+> The yamllint quoted-strings check wasn't checking keys for quotes, but
+> support for checking keys was added in 1.34 release. Fix all the errors
+> found when enabling the check.
 
-I initially wrote this test to validate commit be43b7489a3c ("net/mlx5e:
-RX, Fix page_pool allocation failure recovery for striding rq") but mlx5
-still doesn't have qstat. So I run it on bnxt, and while bnxt survives
-I found the problem fixed in commit 730117730709 ("eth: bnxt: fix counting
-packets discarded due to OOM and netpoll").
+Acked-by: Mark Brown <broonie@kernel.org>
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
- .../testing/selftests/drivers/net/hw/Makefile |   1 +
- .../selftests/drivers/net/hw/pp_alloc_fail.py | 129 ++++++++++++++++++
- tools/testing/selftests/net/lib/py/ksft.py    |   4 +
- 3 files changed, 134 insertions(+)
- create mode 100755 tools/testing/selftests/drivers/net/hw/pp_alloc_fail.py
+--BUMTG6XEkN0Ut87X
+Content-Type: application/pgp-signature; name="signature.asc"
 
-diff --git a/tools/testing/selftests/drivers/net/hw/Makefile b/tools/testing/selftests/drivers/net/hw/Makefile
-index 95f32158b095..1dd732855d76 100644
---- a/tools/testing/selftests/drivers/net/hw/Makefile
-+++ b/tools/testing/selftests/drivers/net/hw/Makefile
-@@ -9,6 +9,7 @@ TEST_PROGS = \
- 	hw_stats_l3.sh \
- 	hw_stats_l3_gre.sh \
- 	loopback.sh \
-+	pp_alloc_fail.py \
- 	#
- 
- TEST_FILES := \
-diff --git a/tools/testing/selftests/drivers/net/hw/pp_alloc_fail.py b/tools/testing/selftests/drivers/net/hw/pp_alloc_fail.py
-new file mode 100755
-index 000000000000..026d98976c35
---- /dev/null
-+++ b/tools/testing/selftests/drivers/net/hw/pp_alloc_fail.py
-@@ -0,0 +1,129 @@
-+#!/usr/bin/env python3
-+# SPDX-License-Identifier: GPL-2.0
-+
-+import time
-+import os
-+from lib.py import ksft_run, ksft_exit, ksft_pr
-+from lib.py import KsftSkipEx, KsftFailEx
-+from lib.py import NetdevFamily, NlError
-+from lib.py import NetDrvEpEnv
-+from lib.py import cmd, tool, GenerateTraffic
-+
-+
-+def _write_fail_config(config):
-+    for key, value in config.items():
-+        with open("/sys/kernel/debug/fail_function/" + key, "w") as fp:
-+            fp.write(str(value) + "\n")
-+
-+
-+def _enable_pp_allocation_fail():
-+    if not os.path.exists("/sys/kernel/debug/fail_function"):
-+        raise KsftSkipEx("Kernel built without function error injection (or DebugFS)")
-+
-+    if not os.path.exists("/sys/kernel/debug/fail_function/page_pool_alloc_pages"):
-+        with open("/sys/kernel/debug/fail_function/inject", "w") as fp:
-+            fp.write("page_pool_alloc_pages\n")
-+
-+    _write_fail_config({
-+        "verbose": 0,
-+        "interval": 511,
-+        "probability": 100,
-+        "times": -1,
-+    })
-+
-+
-+def _disable_pp_allocation_fail():
-+    if not os.path.exists("/sys/kernel/debug/fail_function"):
-+        return
-+
-+    if os.path.exists("/sys/kernel/debug/fail_function/page_pool_alloc_pages"):
-+        with open("/sys/kernel/debug/fail_function/inject", "w") as fp:
-+            fp.write("\n")
-+
-+    _write_fail_config({
-+        "probability": 0,
-+        "times": 0,
-+    })
-+
-+
-+def test_pp_alloc(cfg, netdevnl):
-+    def get_stats():
-+        return netdevnl.qstats_get({"ifindex": cfg.ifindex}, dump=True)[0]
-+
-+    def check_traffic_flowing():
-+        stat1 = get_stats()
-+        time.sleep(1)
-+        stat2 = get_stats()
-+        if stat2['rx-packets'] - stat1['rx-packets'] < 15000:
-+            raise KsftFailEx("Traffic seems low:", stat2['rx-packets'] - stat1['rx-packets'])
-+
-+
-+    try:
-+        stats = get_stats()
-+    except NlError as e:
-+        if e.nl_msg.error == -95:
-+            stats = {}
-+        else:
-+            raise
-+    if 'rx-alloc-fail' not in stats:
-+        raise KsftSkipEx("Driver does not report 'rx-alloc-fail' via qstats")
-+
-+    set_g = False
-+    traffic = None
-+    try:
-+        traffic = GenerateTraffic(cfg)
-+
-+        check_traffic_flowing()
-+
-+        _enable_pp_allocation_fail()
-+
-+        s1 = get_stats()
-+        time.sleep(3)
-+        s2 = get_stats()
-+
-+        if s2['rx-alloc-fail'] - s1['rx-alloc-fail'] < 1:
-+            raise KsftSkipEx("Allocation failures not increasing")
-+        if s2['rx-alloc-fail'] - s1['rx-alloc-fail'] < 100:
-+            raise KsftSkipEx("Allocation increasing too slowly", s2['rx-alloc-fail'] - s1['rx-alloc-fail'],
-+                             "packets:", s2['rx-packets'] - s1['rx-packets'])
-+
-+        # Basic failures are fine, try to wobble some settings to catch extra failures
-+        check_traffic_flowing()
-+        g = tool("ethtool", "-g " + cfg.ifname, json=True)[0]
-+        if 'rx' in g and g["rx"] * 2 <= g["rx-max"]:
-+            new_g = g['rx'] * 2
-+        elif 'rx' in g:
-+            new_g = g['rx'] // 2
-+        else:
-+            new_g = None
-+
-+        if new_g:
-+            set_g = cmd(f"ethtool -G {cfg.ifname} rx {new_g}", fail=False).ret == 0
-+            if set_g:
-+                ksft_pr("ethtool -G change retval: success")
-+            else:
-+                ksft_pr("ethtool -G change retval: did not succeed", new_g)
-+        else:
-+                ksft_pr("ethtool -G change retval: did not try")
-+
-+        time.sleep(0.1)
-+        check_traffic_flowing()
-+    finally:
-+        _disable_pp_allocation_fail()
-+        if traffic:
-+            traffic.stop()
-+        time.sleep(0.1)
-+        if set_g:
-+            cmd(f"ethtool -G {cfg.ifname} rx {g['rx']}")
-+
-+
-+def main() -> None:
-+    netdevnl = NetdevFamily()
-+    with NetDrvEpEnv(__file__, nsim_test=False) as cfg:
-+
-+        ksft_run([test_pp_alloc], args=(cfg, netdevnl, ))
-+    ksft_exit()
-+
-+
-+if __name__ == "__main__":
-+    main()
-diff --git a/tools/testing/selftests/net/lib/py/ksft.py b/tools/testing/selftests/net/lib/py/ksft.py
-index f84e9fdd0032..4769b4eb1ea1 100644
---- a/tools/testing/selftests/net/lib/py/ksft.py
-+++ b/tools/testing/selftests/net/lib/py/ksft.py
-@@ -11,6 +11,10 @@ KSFT_RESULT = None
- KSFT_RESULT_ALL = True
- 
- 
-+class KsftFailEx(Exception):
-+    pass
-+
-+
- class KsftSkipEx(Exception):
-     pass
- 
--- 
-2.44.0
+-----BEGIN PGP SIGNATURE-----
 
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmYvspAACgkQJNaLcl1U
+h9AK6gf/Xc+HslmuppG3Hp8ImYKauCbY+zuC48rT6Z0ZCBxjrjhiGQ1U1+BJdVkZ
+FZGn1bnIqVJ+yOq8uAy7L7v6DZs3NuPGLMAUJofSho2NZow1jZwDxH0Dt7L4DqRh
+SErFMkHo8rTw7YGdwLp3HI0XFlkm02oJz3HJ2v+O4RLkMgkGCRgvV5iOYjupfau/
+NscyXAgaFlf7wRz2rfHIP7xCsRmSNMf8M1Z4fK7miUk6iDnK6g/8CbXUMyPcrLfd
+f3S5/7ZM+MjizWf5ZLYoIxPTfhoX2BfRdjb6Upu9il2gZjoLDIlrtyyJL8XZJ2Tx
+FvUc+ybdxp4Ggo1kEUDK1LgU13YYOQ==
+=F/JM
+-----END PGP SIGNATURE-----
+
+--BUMTG6XEkN0Ut87X--
 
