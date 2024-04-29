@@ -1,114 +1,203 @@
-Return-Path: <netdev+bounces-92225-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92226-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7975C8B604B
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 19:40:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 38F298B6058
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 19:45:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 19F121F21740
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 17:40:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 930281F21E17
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 17:45:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A757D1272BA;
-	Mon, 29 Apr 2024 17:40:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BECB12839D;
+	Mon, 29 Apr 2024 17:45:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="brnwMV9e"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Ov084Mox"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF3D88665A
-	for <netdev@vger.kernel.org>; Mon, 29 Apr 2024 17:40:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25BEA127E01
+	for <netdev@vger.kernel.org>; Mon, 29 Apr 2024 17:45:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714412451; cv=none; b=uGITHyFyXqsn1yHEZaNpX8AXIkFTwdEB1CsNV0UAT/vSJv4EFbihynJvacXLD+k/sQ3QfSQ6fQ4bwVvM4u3K2qYyQ9d36eYuko1FBD9GNJ0BHc5zYkHF0E9oMVA6RwV+Legdu2ZTCg+bZwDPSzmh5y+7ndwmFbn9CkEn1FFe+94=
+	t=1714412723; cv=none; b=S5vEHVNAXiTJRaP0PDyw0wdICQcOPAcndICNJIBnQg4v7Z2AQ4F4uvwcNjZ5LRnlNWnBu5ivSRH/s+C8hOStYltPH7jbEwbdSHSSFeiLTALO0DXDeeHb/p30+ARTKZahTIxqXJXgBzOMPWoJI9YGvt9zkD3mYN4MVQBdkh6D0zU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714412451; c=relaxed/simple;
-	bh=3xTlTJjhRm3cXyQ8UM6bBL/hXQ1YAqOG9nl56uUW6Wo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BpDz0ExHc13ad9UWLptdASgsZhM9rTDVIXeiYlexfqJVDbAvOBqjsUoZZpoNkaQ0BlvOb9zo+5cLXI0IEQk5mwjL5qMvPpaFpiRPZh3vaSZR9ElbOZ32mbSK2CUIVEL+3a3v54X7zYnrcQMFVRyfQH+2E98DCmG8RPSBZF1ZVE4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=brnwMV9e; arc=none smtp.client-ip=91.218.175.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <62e430de-46ff-4eac-b8ba-408cb8eefac7@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1714412447;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+iDHGxBqKd8OEix+628lJvy5ZJIFKICpft6C1hJLvu0=;
-	b=brnwMV9eoxOHdfyB/SKbUvFB9xJydfOgW9G/imP6Ne/3njy5UWV9Z7sXBLff3aVT4Eb0T+
-	dm1DJaCU+fGYM4duxHdFVnEKto0fRNMG7K50ip06BZL39vLdWl6YrDIpXB27Nk+P1ApCVi
-	D7mrAi16NJKmlwUqR/vVmAFJLKWljeQ=
-Date: Mon, 29 Apr 2024 10:40:40 -0700
+	s=arc-20240116; t=1714412723; c=relaxed/simple;
+	bh=yC65xUsXdzGIMRm3JuMM7ViqdUqr5hPlZJ/3EznCieU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WCRXsmRg+d0jBfT4zwV6MVJ6zNvcP4trroMyBggNcBKOq2IRfbE5ECeWpbuFfOxyHnBZjBxbhWqzjLaNDPiDAT0otDaUiXRK7Ql8+JaxE3lvX6bM4ptcUoi0ThC3mSZmb4S0NTNq8g0Hek9t+Hg97OWAIReC0ATNtUfxAqRDw+k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=Ov084Mox; arc=none smtp.client-ip=209.85.210.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-6ece8991654so4478847b3a.3
+        for <netdev@vger.kernel.org>; Mon, 29 Apr 2024 10:45:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1714412721; x=1715017521; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=7G4KfVVL57asc6jdAgtmGDhKAJMXo7zTUk6MT6QrGQs=;
+        b=Ov084MoxZwzc68hma6vAnIR8uCO0cWqnShjwT6JUQeOskaP5u9lMmSKdobwGOfKmpk
+         Z1fIXOGeRFbrIpiQPsBF/ue70oWxkCy6vS0jvX6pe2exKXlXX4Ps9KADHxR7IlOtkeui
+         hXKLKj3VJZm3nwJYb67sGOlaK5iSmBXLe9+vI=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714412721; x=1715017521;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7G4KfVVL57asc6jdAgtmGDhKAJMXo7zTUk6MT6QrGQs=;
+        b=GIfM04lWWLvobcXf65059E6O6UKCm0qlmj9T0WcDALQjdK/Fns09mGJyQuKRYfOBV2
+         QRCCzGN/UUYsm5Np7IBYKUVCGIogO/UqKsw4EamdXTimADEIjIRDZEHmaBKn3O1afAfv
+         Mz5YHMccAWNsvD6wqKWcTsnGVB+noQ0nHjtdpROH5pia62LQ3WZbE87gvk+AH7CJu2lg
+         FeW8EyieOkcsmfujd9jwcJKcrZVXcCyAWNMBwlzVuFtXzLhEOOuQXeFz/1fB7fvc9c08
+         N/ao6zcex7iwHlIdxzH5qI18Dw1gd6glT1cWvCpnRJCKUK6zA/x6YhavK5UONEnpnOXp
+         9lJw==
+X-Forwarded-Encrypted: i=1; AJvYcCWYOLFdlbnW3nNZV0wgDkn8IZ32dox1bjqU9mn10l+RrWNeqwZsz5skSJW5oUEoBjFXiQuDKg9Tft/1AgkU6WZSY0Ja1tyX
+X-Gm-Message-State: AOJu0YxF4sHeqCX7EJsughAeNhIXxqxbt2KXF7We/rszhgVHIE31XnjQ
+	4T4a+00W/m5OGKsiHC3BZDCOFW/vxwXg1x6sl22honekkgstLb6KEKT7EZzOjQ==
+X-Google-Smtp-Source: AGHT+IFGc3/kOEV9/ewwKn9tq1l3GHLYlcfc71HQx0P4bfGndPtYd6mE9UF3L0lkmhnYTfEDthuc1g==
+X-Received: by 2002:a05:6a20:6a99:b0:1a5:bc5d:3c0a with SMTP id bi25-20020a056a206a9900b001a5bc5d3c0amr12084908pzb.61.1714412721543;
+        Mon, 29 Apr 2024 10:45:21 -0700 (PDT)
+Received: from www.outflux.net ([198.0.35.241])
+        by smtp.gmail.com with ESMTPSA id x5-20020a170902a38500b001e2bfd40b86sm21028740pla.47.2024.04.29.10.45.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 29 Apr 2024 10:45:21 -0700 (PDT)
+Date: Mon, 29 Apr 2024 10:45:20 -0700
+From: Kees Cook <keescook@chromium.org>
+To: Erick Archer <erick.archer@outlook.com>
+Cc: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+	Xin Long <lucien.xin@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	Justin Stitt <justinstitt@google.com>, linux-sctp@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-hardening@vger.kernel.org
+Subject: Re: [PATCH] sctp: prefer struct_size over open coded arithmetic
+Message-ID: <202404291044.E9A6A13@keescook>
+References: <PAXPR02MB724871DB78375AB06B5171C88B152@PAXPR02MB7248.eurprd02.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v2 bpf-next 4/6] selftests/bpf: Add IPv4 and IPv6 sockaddr
- test cases
-To: Jordan Rife <jrife@google.com>
-Cc: bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
- netdev@vger.kernel.org, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
- Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>,
- Shuah Khan <shuah@kernel.org>, Kui-Feng Lee <thinker.li@gmail.com>,
- Artem Savkov <asavkov@redhat.com>, Dave Marchevsky <davemarchevsky@fb.com>,
- Menglong Dong <imagedong@tencent.com>, Daniel Xu <dxu@dxuuu.xyz>,
- David Vernet <void@manifault.com>, Daan De Meyer <daan.j.demeyer@gmail.com>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-References: <20240412165230.2009746-1-jrife@google.com>
- <20240412165230.2009746-5-jrife@google.com>
- <3df13496-a644-4a3a-9f9b-96ccc070f2a3@linux.dev>
- <CADKFtnQDJbSFRS4oyEsn3ZBDAN7T6EvxXUNdrz1kU3Bnhzfgug@mail.gmail.com>
- <f164369a-2b6b-45e0-8e3e-aa0035038cb6@linux.dev>
- <CADKFtnQHy0MFeDNg6x2gzUJpuyaF6ELLyMg3tTxze3XV28qo7w@mail.gmail.com>
- <8c9e51b2-5401-4d58-a319-ed620fadcc63@linux.dev>
- <CADKFtnQ7L_CSq+CzAOt3PM_Jz2mboGe+Si2TPByt=DuL5Nu=1g@mail.gmail.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <CADKFtnQ7L_CSq+CzAOt3PM_Jz2mboGe+Si2TPByt=DuL5Nu=1g@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <PAXPR02MB724871DB78375AB06B5171C88B152@PAXPR02MB7248.eurprd02.prod.outlook.com>
 
-On 4/28/24 10:47 AM, Jordan Rife wrote:
->> Also, all this setup (and test) has to be done in a new netns. Anything blocking
->> the kfunc in patch 2 using the current task netns instead of the init_net?
->> Add nodad to the "ip -6 addr add...". just in case it may add unnecessary delay.
->> This interface/address ping should not be needed. Other tests under prog_tests/
->> don't need this interface/address ping also.
+On Sat, Apr 27, 2024 at 07:23:36PM +0200, Erick Archer wrote:
+> This is an effort to get rid of all multiplications from allocation
+> functions in order to prevent integer overflows [1][2].
 > 
-> I was able to make these changes.
+> As the "ids" variable is a pointer to "struct sctp_assoc_ids" and this
+> structure ends in a flexible array:
 > 
->> Does it need a veth pair? The %s2 interface is not used.
->>
->> Can it be done in lo alone?
-> 
-> I think it may be better to keep it as-is for now with the veth pair.
-> It turns out that these BPF programs (progs/bind6_prog.c,
-> progs/bind4_prog.c, and progs/connect4_prog.c) expect the veth pair
-> setup with these names (test_sock_addr1, test_sock_addr2). We may be
-> able to update the logic in these BPF programs to allow us to just use
-> lo, but I'm not sure if we'd be losing out on important test coverage.
-> Additionally, since we aren't fully retiring test_sock_addr.c yet we'd
-> also need to change test_sock_addr.sh if we changed
-> progs/bind6_prog.c, progs/bind4_prog.c, and progs/connect4_prog.c. If
-> there are no objections to leaving things as-is here, I will send out
-> v3 with the rest of the changes listed above.
+> struct sctp_assoc_ids {
+        __u32           gaids_number_of_ids;
+> 	sctp_assoc_t	gaids_assoc_id[];
+> };
 
-Yep, the veth cleanup could be done when the test_sock_addr.c is fully retired. 
-Thanks for checking.
+This could gain __counted_by:
 
-For the tests that moved to sock_addr.c, please also remove them from 
-test_sock_addr.c.
+diff --git a/include/uapi/linux/sctp.h b/include/uapi/linux/sctp.h
+index b7d91d4cf0db..836173e73401 100644
+--- a/include/uapi/linux/sctp.h
++++ b/include/uapi/linux/sctp.h
+@@ -1007,7 +1007,7 @@ enum sctp_sstat_state {
+  */
+ struct sctp_assoc_ids {
+ 	__u32		gaids_number_of_ids;
+-	sctp_assoc_t	gaids_assoc_id[];
++	sctp_assoc_t	gaids_assoc_id[] __counted_by(gaids_number_of_ids);
+ };
+ 
+ /*
+
+> 
+> the preferred way in the kernel is to use the struct_size() helper to
+> do the arithmetic instead of the calculation "size + size * count" in
+> the kmalloc() function.
+> 
+> Also, refactor the code adding the "ids_size" variable to avoid sizing
+> twice.
+> 
+> This way, the code is more readable and safer.
+> 
+> This code was detected with the help of Coccinelle, and audited and
+> modified manually.
+> 
+> Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#open-coded-arithmetic-in-allocator-arguments [1]
+> Link: https://github.com/KSPP/linux/issues/160 [2]
+> Signed-off-by: Erick Archer <erick.archer@outlook.com>
+> ---
+> Hi,
+> 
+> The Coccinelle script used to detect this code pattern is the following:
+> 
+> virtual report
+> 
+> @rule1@
+> type t1;
+> type t2;
+> identifier i0;
+> identifier i1;
+> identifier i2;
+> identifier ALLOC =~ "kmalloc|kzalloc|kmalloc_node|kzalloc_node|vmalloc|vzalloc|kvmalloc|kvzalloc";
+> position p1;
+> @@
+> 
+> i0 = sizeof(t1) + sizeof(t2) * i1;
+> ...
+> i2 = ALLOC@p1(..., i0, ...);
+> 
+> @script:python depends on report@
+> p1 << rule1.p1;
+> @@
+> 
+> msg = "WARNING: verify allocation on line %s" % (p1[0].line)
+> coccilib.report.print_report(p1[0],msg)
+> 
+> Regards,
+> Erick
+> ---
+>  net/sctp/socket.c | 7 ++++---
+>  1 file changed, 4 insertions(+), 3 deletions(-)
+> 
+> diff --git a/net/sctp/socket.c b/net/sctp/socket.c
+> index e416b6d3d270..64196b1dce1d 100644
+> --- a/net/sctp/socket.c
+> +++ b/net/sctp/socket.c
+> @@ -7119,6 +7119,7 @@ static int sctp_getsockopt_assoc_ids(struct sock *sk, int len,
+>  	struct sctp_sock *sp = sctp_sk(sk);
+>  	struct sctp_association *asoc;
+>  	struct sctp_assoc_ids *ids;
+> +	size_t ids_size;
+>  	u32 num = 0;
+>  
+>  	if (sctp_style(sk, TCP))
+> @@ -7131,11 +7132,11 @@ static int sctp_getsockopt_assoc_ids(struct sock *sk, int len,
+>  		num++;
+>  	}
+>  
+> -	if (len < sizeof(struct sctp_assoc_ids) + sizeof(sctp_assoc_t) * num)
+> +	ids_size = struct_size(ids, gaids_assoc_id, num);
+> +	if (len < ids_size)
+>  		return -EINVAL;
+>  
+> -	len = sizeof(struct sctp_assoc_ids) + sizeof(sctp_assoc_t) * num;
+> -
+> +	len = ids_size;
+>  	ids = kmalloc(len, GFP_USER | __GFP_NOWARN);
+>  	if (unlikely(!ids))
+>  		return -ENOMEM;
+
+But yes, this looks fine to me.
+
+Reviewed-by: Kees Cook <keescook@chromium.org>
+
+-- 
+Kees Cook
 
