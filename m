@@ -1,95 +1,100 @@
-Return-Path: <netdev+bounces-92082-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92084-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C88168B5524
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 12:24:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 826A18B554E
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 12:28:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 84232280D16
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 10:24:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B42C01C21E3A
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 10:28:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 262B83612D;
-	Mon, 29 Apr 2024 10:24:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=radisson97@web.de header.b="pbMIGjSI"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70C6C39FE0;
+	Mon, 29 Apr 2024 10:27:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.web.de (mout.web.de [212.227.17.12])
+Received: from smtpbgeu2.qq.com (smtpbgeu2.qq.com [18.194.254.142])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78A6513AEE
-	for <netdev@vger.kernel.org>; Mon, 29 Apr 2024 10:24:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 708BD2940C
+	for <netdev@vger.kernel.org>; Mon, 29 Apr 2024 10:27:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.194.254.142
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714386277; cv=none; b=h6GiUYqzfK/HIVBWMDetfdjrFyKGF4a5JvVU+EQqDdPdZnRmsTS7B1h+TW9E5XV8xKh141Qb5gkQvhCVBZ7nQYipec0/7zf0iihc+Ga8adBkooPw6h1aUv9j2wRnTM8isgrLoYUplG5qqwYoUiTAbq2iNDbfT1PuDo1VPoARtPs=
+	t=1714386466; cv=none; b=jKM0a+KxhG8A6xrNPEmtmXGvfVRs6r1GpXIpt2C3LbuQetBGKtD1z8AQHZw3kh4Ppi+Z44Ozr17FQ5+nnYOJzf+AKRWFc9sX85wTtUpwH0qGz2LA+U2lJAuEhgwYSqDFROVqYBB2skrDLQWZdHpyJWNDRSpwDGM166qq5Nq6KBc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714386277; c=relaxed/simple;
-	bh=V4eDadk1krfDjdq5JQaf1OoNc1a/sn4DuaHewdZv+V8=;
-	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type; b=N8a3bP8R0UGbalj5qae8Im9qLF0uDz/t3sYeotK6xGj77xlBBlAl3fmUwyE5Q8hd0j/5M8czITviXym+5KU9C2K5cMGXOqemH064EiZiazcXmsIj8cZ4lM1POFb+fp/TVaSeqUzVK1uNhjqDjZ51jYKfWBUbG7TueXYAwluqln4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=radisson97@web.de header.b=pbMIGjSI; arc=none smtp.client-ip=212.227.17.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
-	s=s29768273; t=1714386272; x=1714991072; i=radisson97@web.de;
-	bh=V4eDadk1krfDjdq5JQaf1OoNc1a/sn4DuaHewdZv+V8=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:From:Subject:
-	 Content-Type:Content-Transfer-Encoding:cc:
-	 content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=pbMIGjSIxtnYqTw5wG1JPRoaCJVzS9MykEepMg1Ok6FQtNpEO1RpqI6cIoaKsEOT
-	 w0MSGUXzOnId7DVaFGD2lB0SheK9xxH7SWQAemD7mmcPtb/25YuQx2FIKuFeMg5oI
-	 bNrScgv4YiryOExTyryGXi4NZZVFA4hOjQSWeSZpF7YaS3jEb7BL7JEFECTCJqy/g
-	 kyCz9XfjJzjjOeM2YhaY1zwGpt+3EJlgFlh0QT5zBtIPcB8SGa6gx/g5W0IlmnFwh
-	 DnZVsCpLpdgTETtL136gMKya3u1ZLsFGJkiztpFBNqSo57EwFM8ZZPtCYDjYuFZuA
-	 cbJptjonV4hcYp33Ow==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [10.186.0.33] ([193.174.231.69]) by smtp.web.de (mrweb106
- [213.165.67.124]) with ESMTPSA (Nemesis) id 1MFayq-1rt5v40ysw-00HIbm for
- <netdev@vger.kernel.org>; Mon, 29 Apr 2024 12:24:32 +0200
-Message-ID: <a2ef46ba-ba3a-42ea-8449-3e3ae773fa1e@web.de>
-Date: Mon, 29 Apr 2024 12:24:31 +0200
+	s=arc-20240116; t=1714386466; c=relaxed/simple;
+	bh=Q33MPfpUb3L4IkgHt9XEDWAQNMhubzsBGR62iZs+gIo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=GOYK4aGmsIyygIVdl6ecq+I7T+CHsuubAR3CIDsHD/7C0uqf95z3XBkiw9VZBt7x3gFjkwxtayYHdSZ7YftAKC/aep4wxbNXm/5G2M0ugHA94Yl1QuvAsdfetnSb49oUHk0iwcKnqa1fUdYXCrgh1pjnwbnA/T872Su0nN0nr4M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=18.194.254.142
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
+X-QQ-mid: bizesmtpsz15t1714386335tv9jhg
+X-QQ-Originating-IP: AL9LQXGd/TYgL+5+GIcXQgDP87CeeSEP27Q3XxWsZf0=
+Received: from lap-jiawenwu.trustnetic.com ( [125.120.150.70])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Mon, 29 Apr 2024 18:25:33 +0800 (CST)
+X-QQ-SSF: 01400000000000L0Z000000A0000000
+X-QQ-FEAT: QityeSR92A0tKna+fKjvdPp3o8jYrMuzUcxQ9KCRbZ+AUNYjDN6XJ3Etlh7QS
+	72gYYS44F8Gs7kksAktCpr/6EdMlz8ktTY80aMLVQ2qQ07WSbrbxNJ6kDqMTMOWyYReag96
+	0u3/ntxLylTa47uQe6uIrJJktY589EG2DnfAZmHURQYzbtcwYBAersKDmcdUDNiH7LIYwmx
+	VrEmimREaN2Wpk2kXF2zkuqVVGUNwvpNfuf7goezHAPoInuIyvmwn4FmrcPNTCzqlZPcaUc
+	gax8+kbnml3j0ZM11TRTpXdbFt56OQsRKpavlO1EE2ffa1LksFzj5ZLcnOqg6bAF4GVlY8g
+	7X9iONdOqj6ADi1qvJS8tR4jzazV4g2SQ/oyAiVWkhmJnTDQiO7gOi0szqZazxvQLXSHJhK
+X-QQ-GoodBg: 2
+X-BIZMAIL-ID: 17754811842953559949
+From: Jiawen Wu <jiawenwu@trustnetic.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	rmk+kernel@armlinux.org.uk,
+	andrew@lunn.ch,
+	netdev@vger.kernel.org
+Cc: mengyuanlou@net-swift.com,
+	duanqiangwen@net-swift.com,
+	Jiawen Wu <jiawenwu@trustnetic.com>
+Subject: [PATCH net v2 0/4] Wangxun fixes
+Date: Mon, 29 Apr 2024 18:25:15 +0800
+Message-Id: <20240429102519.25096-1-jiawenwu@trustnetic.com>
+X-Mailer: git-send-email 2.21.0.windows.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: netdev@vger.kernel.org
-From: Peter Radisson <radisson97@web.de>
-Subject: patch device tree and AX88796B
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Provags-ID: V03:K1:Y3cKgiC//jupaTbWH3W05dAvlaiQZR4HcbZhFEPUQ0zdrqEHkuA
- yiprFOMcljwSPiudOlrLfhLkRlhDExpIWHIVgpGkJ/7wWvrxFUbAqZ7yrALzkBTYXyfO7Nr
- iHwzXtm0jifWU1QDcbrkl1y6bv2mH97ieIF5Q/D9utWDdHnobNFWU97zN4OT8mYO+4m7Nir
- tv2jyp4MLl5Row1ek7V4Q==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:yt50ee55NmI=;DEjuHsvhrk6//b9fSDy/USVdFtO
- JK0BKJmtl0swMl6vNTj4Z9Tb/FrrSQNnkiDIHul4Xo18gpMOHLAdNd2LD/NqzNXHxB0Yzim9W
- /2BGdpDqpvjNz/Bal2i+yfqMyDKrzf37gWKilE6kJy27+xy9Xb0/gQ4GpzYp/nH9DnJ5Cr+TA
- YDiqNvBC1XgDV8drSOsmWv32Afpv1QRBsyM4SBQ717/QUqnI7dMMaIpApAxdXPgvWrPECJqsf
- PbOT2j8PMnEhMb3xdNqW3x1HmjcrZ/l4NHTaiqJlDxnjRb7zTw3IHmVZ+efLGE3EbMFQfLHF4
- ef6k/ZInVF2ZoE6R5LWB1oNr8ZZQ0gtUEJRT1gMEs4arGwDvuEZCWrLuarrmZzjhOTs1Jbb8f
- ngqRjGnsRsU+8J9nwMDUgM8DAp/OyhOebSMqQT9ymkmtsg3qZtFejaFPYBz0c01j6UtVOgGqS
- 28A/hNDlkBFajC+eEc089ONrLQoR4Xg7t9UrHHmbN4pUwM7KnDVd4G84EpPrrxqYB1Y4KrS/f
- 3tOVct+KZ8l0WcJ/EFEey4YLgDrJMzFKd6cUF0GPh6s6zGPTpzVdYxh9Y/ejmu1N/btVqR7Do
- /EoCjK5AsdSIDVqHqx7CWq2cTZgoVg3pIZ1pIY+30+gdsQVbM/MllxpU2bAp72CwmxoZirDYg
- lAjNcRtUOlKEyztQuQCGoKRGLXuHghrYlHSb+OvKMysCNDw5wCLfy+opbOYbKhKMh9WokKaY1
- iDHgSXHsAMs4cOX7nkZFl/lsTqLdHNn+H/q+RYm8SqbwKKBaneivGpshxIZw2CLp0Y2DuWiTp
- 8vMqZG8Du7ixdWTVccSmkN45NhbnDnJaTvC+fCGihkuYE=
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtpsz:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz8a-1
 
-Hello,
-we have a custom board that has a AX88796B on board. We have a company
-that wrote a device tree mapper for the driver (actualy for kernel 5.4).
-Is somebody interessted in picking that up ?
+Fixed some bugs when using ethtool to operate network devices.
 
-please reply directly, i am not a list member.
+v1 -> v2:
+- Factor out the same code.
+- Remove statistics printing with more than 64 queues.
+- Detail the commit logs to describe issues.
+- Remove reset flag check in wx_update_stats().
+- Change to set VLAN CTAG and STAG to be consistent.
 
-Note: i am not a kernel hacker and i may have easly missed that there is
-a device tree entry for AX88796B, iff i would like to know.
+Jiawen Wu (4):
+  net: wangxun: fix the incorrect display of queue number in statistics
+  net: wangxun: fix to change Rx features
+  net: wangxun: match VLAN CTAG and STAG features
+  net: txgbe: fix to control VLAN strip
 
-CU
+ .../net/ethernet/wangxun/libwx/wx_ethtool.c   | 23 ++++----
+ drivers/net/ethernet/wangxun/libwx/wx_hw.c    |  2 +
+ drivers/net/ethernet/wangxun/libwx/wx_lib.c   | 56 +++++++++++++++++--
+ drivers/net/ethernet/wangxun/libwx/wx_lib.h   |  2 +
+ drivers/net/ethernet/wangxun/libwx/wx_type.h  | 22 ++++++++
+ .../net/ethernet/wangxun/ngbe/ngbe_ethtool.c  | 18 ++++--
+ drivers/net/ethernet/wangxun/ngbe/ngbe_main.c |  1 +
+ .../ethernet/wangxun/txgbe/txgbe_ethtool.c    | 18 ++++--
+ .../net/ethernet/wangxun/txgbe/txgbe_main.c   | 31 ++++++++++
+ .../net/ethernet/wangxun/txgbe/txgbe_type.h   |  1 +
+ 10 files changed, 148 insertions(+), 26 deletions(-)
+
+-- 
+2.27.0
+
 
