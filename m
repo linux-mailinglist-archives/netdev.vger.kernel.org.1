@@ -1,198 +1,137 @@
-Return-Path: <netdev+bounces-92064-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92065-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 371DB8B542B
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 11:23:36 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C157B8B542C
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 11:24:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A368C1F2063E
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 09:23:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EC6C5B20D98
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 09:24:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 536C720309;
-	Mon, 29 Apr 2024 09:23:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBB9B2030B;
+	Mon, 29 Apr 2024 09:24:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="BJKdV3FQ"
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="b5f2wPjl"
 X-Original-To: netdev@vger.kernel.org
 Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AEAC14A8C
-	for <netdev@vger.kernel.org>; Mon, 29 Apr 2024 09:23:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7001214A8C
+	for <netdev@vger.kernel.org>; Mon, 29 Apr 2024 09:24:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714382611; cv=none; b=tbc9sGMf7Cnfojr34U9vm+YLGFJGljMOALaaE/6U7xBLyYjDUnc2Gr+/m3euFLgrV6IXwumzNP6FKqmr+07TCnHQILkVWdKLWRLKKs+jSL/RGCoZobsnwh9VUKPWJLrKj/NO+3nzgqd8o0pXLx/rM47yAr5efRxHY5diw/WR568=
+	t=1714382691; cv=none; b=lho4I4DdhkjVylBO9QwnJkzpDiStIQhQOD1DC3blhVIRgfNDOMsJl42Pp921rWG4w1T/3+kYMuPLP13UICNKZWbB2N8Cozb/Xo6qrDNxoJx9SCx1hzGt1SqF9H61R9KTAZterkvyDbSvUh3Q9PmBCPMFss3hgOblrrSFabatyOA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714382611; c=relaxed/simple;
-	bh=11xJcqXs/4lGZCUC0RQ3qQyagOuh/WgiYUQZZYuYgmg=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Q7aQJSvUXuXsit3McyWrLahMishwsDRH8D3YM+YkXQPEFsupEZ4ntHiju89V+PuRVSklNc0uTTB9EXcPni4GA8T+ZsMlgBqkYYWbjLBgDwNYDuOlCKminyTyB5yXQXxWJEitB7Twy8+2ig1iJX3Ly/Z1OcFXSvsM8Va2K2S5ZIo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=BJKdV3FQ; arc=none smtp.client-ip=85.214.62.61
+	s=arc-20240116; t=1714382691; c=relaxed/simple;
+	bh=QZKAIgYv0YUnSEbwB1mnjnCgd4w++HiIDdLkMxQqCko=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Tx6rPdwJKCdSxyycyvVTbLkpz5bdDmLnAs/UmMVQS5TtUe2r3ajkHqo5FsCGAXY/S7fGAcsBXt2Noa8N6uG1AN5rEKwonW6AJR17GadSvHJSnXsVCfuvqwhS18kHNKqqDzTXRJfHtcV0GbdtJgOVHBVL9w2CF8bu+0PSCsQqhW8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=b5f2wPjl; arc=none smtp.client-ip=85.214.62.61
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from localhost.localdomain (85-222-111-42.dynamic.chello.pl [85.222.111.42])
+Received: from wsk (85-222-111-42.dynamic.chello.pl [85.222.111.42])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
 	(No client certificate requested)
 	(Authenticated sender: lukma@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id D78AE8893B;
-	Mon, 29 Apr 2024 11:23:26 +0200 (CEST)
+	by phobos.denx.de (Postfix) with ESMTPSA id 5A4DB8893B;
+	Mon, 29 Apr 2024 11:24:48 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1714382607;
-	bh=4T2Bd0LFeBidj/9CPE3DyWoSu6F/oVy08mv+xckHUbQ=;
-	h=From:To:Cc:Subject:Date:From;
-	b=BJKdV3FQ7Ki61PNoYazZu7k5nC9bigNFoOVBB9cKGbS96hQPjvRoeQNmUg+pn3gd1
-	 LTiXk04YBqQ26xHngs47+fBhbaGhgaTOKaKnNbA/++gUDkG3/rKZyuEAS6d8cZtgPr
-	 E2lUUpWiIZjyx0/S4yNmIDdsmM1czG6YDtQVi+VtQESpSmrMrcoJO8jYVBnra1Dpz1
-	 NPZrCIQcqqJHik1PcOMHEliv1q4m5YlDkJ5obGmNQtcPEA5Wo9XrTZdqLMcMDEB6M4
-	 YmQAnT0cDFKnWusVOk//qchS/P7hGSZNtnEgBWNFqeM7JiKJIlvxnfN69MnDLERUEc
-	 aWCE/9ABwthpg==
+	s=phobos-20191101; t=1714382688;
+	bh=jsjoLlHLQ5d9L80+Wain/g9vnNzzF3+N8ImiI8DzZlA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=b5f2wPjloLU9Ysl6JcIzAmQBhMYUCQDHfWGobAOykuz8J1XTrSI/NQ45FCGhK4eUA
+	 q/3J4GnNmXpJcfIW9ReiGNvKeqn+0OitSnC/0Qa0P8W1EHwcAbvZWe0sjV/NYCYXIL
+	 n6i1BsmLsXz2agJRIzZDEJhk3G5QbFOSiHB6ghY10hMUHAJUf1zQ2/ZzJ3teXgddJ6
+	 zCWRsMUgX5YLApVNevmsQZtJQk8CudZGk9bckXC5IlXj4v/ZBU69BP8bgzFVIP0h/p
+	 GLR6P+ShPYm+Qh5xd+xWsCPXg4ISE4GIpclLh7uZq1ot8s0jux6ABSB0BJtUOIUGKm
+	 FylPY4mdq7JXQ==
+Date: Mon, 29 Apr 2024 11:24:42 +0200
 From: Lukasz Majewski <lukma@denx.de>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Stephen Hemminger <stephen@networkplumber.org>,
-	David Ahern <dsahern@kernel.org>
-Cc: Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	netdev@vger.kernel.org,
-	Lukasz Majewski <lukma@denx.de>
-Subject: [RESEND PATCH v3] ip link: hsr: Add support for passing information about INTERLINK device
-Date: Mon, 29 Apr 2024 11:23:09 +0200
-Message-Id: <20240429092309.2783208-1-lukma@denx.de>
-X-Mailer: git-send-email 2.39.2
+To: David Ahern <dsahern@kernel.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, Stephen Hemminger
+ <stephen@networkplumber.org>, Eric Dumazet <edumazet@google.com>, Florian
+ Fainelli <f.fainelli@gmail.com>, Vladimir Oltean <olteanv@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH v3] ip link: hsr: Add support for passing information
+ about INTERLINK device
+Message-ID: <20240429112442.122243d7@wsk>
+In-Reply-To: <4c089edf-5c06-4120-a988-556a1f7acf58@kernel.org>
+References: <20240402124908.251648-1-lukma@denx.de>
+	<20240426171352.2460390f@wsk>
+	<4c089edf-5c06-4120-a988-556a1f7acf58@kernel.org>
+Organization: denx.de
+X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; boundary="Sig_/PQ661UwgH+HnAueq7wTj1zD";
+ protocol="application/pgp-signature"; micalg=pgp-sha512
 X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
 X-Virus-Status: Clean
 
-The HSR capable device can operate in two modes of operations -
-Doubly Attached Node for HSR (DANH) and RedBOX (HSR-SAN).
+--Sig_/PQ661UwgH+HnAueq7wTj1zD
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-The latter one allows connection of non-HSR aware device(s) to HSR
-network.
-This node is called SAN (Singly Attached Network) and is connected via
-INTERLINK network device.
+Hi David,
 
-This patch adds support for passing information about the INTERLINK
-device, so the Linux driver can properly setup it.
+> On 4/26/24 9:13 AM, Lukasz Majewski wrote:
+> > Hi Stephen,
+> >  =20
+> >> The HSR capable device can operate in two modes of operations -
+> >> Doubly Attached Node for HSR (DANH) and RedBOX (HSR-SAN).
+> >>
+> >> The latter one allows connection of non-HSR aware device(s) to HSR
+> >> network.
+> >> This node is called SAN (Singly Attached Network) and is connected
+> >> via INTERLINK network device.
+> >>
+> >> This patch adds support for passing information about the INTERLINK
+> >> device, so the Linux driver can properly setup it.
+> >> =20
+> >=20
+> > As the HSR-SAN support patches have been already pulled to
+> > next-next, I would like to gentle remind about this patch.
+> >  =20
+>=20
+> You need to re-send. It took so long for the kernel side to merge, I
+> marked it as waiting upstream.
+>=20
 
-Signed-off-by: Lukasz Majewski <lukma@denx.de>
+I've just re-send the patch.
 
----
-Changes for v2:
 
-- Rebase the patch on top of iproute2-next/main repo
-- Replace matches() with strcmp() when interlink
-- Use print_color_string() instead of just print_string()
+Best regards,
 
-Changes for v3:
-- Add proper description to ip/iplink.c and man/man8/ip-link.8.in
----
- ip/iplink.c           |  4 ++--
- ip/iplink_hsr.c       | 18 +++++++++++++++++-
- man/man8/ip-link.8.in |  5 +++++
- 3 files changed, 24 insertions(+), 3 deletions(-)
+Lukasz Majewski
 
-diff --git a/ip/iplink.c b/ip/iplink.c
-index 96f294a2..5b484a9c 100644
---- a/ip/iplink.c
-+++ b/ip/iplink.c
-@@ -40,8 +40,8 @@ void iplink_types_usage(void)
- 	/* Remember to add new entry here if new type is added. */
- 	fprintf(stderr,
- 		"TYPE := { amt | bareudp | bond | bond_slave | bridge | bridge_slave |\n"
--		"          dsa | dummy | erspan | geneve | gre | gretap | gtp | ifb |\n"
--		"          ip6erspan | ip6gre | ip6gretap | ip6tnl |\n"
-+		"          dsa | dummy | erspan | geneve | gre | gretap | gtp | hsr |\n"
-+		"          ifb | ip6erspan | ip6gre | ip6gretap | ip6tnl |\n"
- 		"          ipip | ipoib | ipvlan | ipvtap |\n"
- 		"          macsec | macvlan | macvtap | netdevsim |\n"
- 		"          netkit | nlmon | pfcp | rmnet | sit | team | team_slave |\n"
-diff --git a/ip/iplink_hsr.c b/ip/iplink_hsr.c
-index 76f24a6a..42adb430 100644
---- a/ip/iplink_hsr.c
-+++ b/ip/iplink_hsr.c
-@@ -21,12 +21,15 @@ static void print_usage(FILE *f)
- {
- 	fprintf(f,
- 		"Usage:\tip link add name NAME type hsr slave1 SLAVE1-IF slave2 SLAVE2-IF\n"
--		"\t[ supervision ADDR-BYTE ] [version VERSION] [proto PROTOCOL]\n"
-+		"\t[ interlink INTERLINK-IF ] [ supervision ADDR-BYTE ] [ version VERSION ]\n"
-+		"\t[ proto PROTOCOL ]\n"
- 		"\n"
- 		"NAME\n"
- 		"	name of new hsr device (e.g. hsr0)\n"
- 		"SLAVE1-IF, SLAVE2-IF\n"
- 		"	the two slave devices bound to the HSR device\n"
-+		"INTERLINK-IF\n"
-+		"	the interlink device bound to the HSR network to connect SAN device(s)\n"
- 		"ADDR-BYTE\n"
- 		"	0-255; the last byte of the multicast address used for HSR supervision\n"
- 		"	frames (default = 0)\n"
-@@ -82,6 +85,12 @@ static int hsr_parse_opt(struct link_util *lu, int argc, char **argv,
- 			if (ifindex == 0)
- 				invarg("No such interface", *argv);
- 			addattr_l(n, 1024, IFLA_HSR_SLAVE2, &ifindex, 4);
-+		} else if (strcmp(*argv, "interlink") == 0) {
-+			NEXT_ARG();
-+			ifindex = ll_name_to_index(*argv);
-+			if (ifindex == 0)
-+				invarg("No such interface", *argv);
-+			addattr_l(n, 1024, IFLA_HSR_INTERLINK, &ifindex, 4);
- 		} else if (matches(*argv, "help") == 0) {
- 			usage();
- 			return -1;
-@@ -109,6 +118,9 @@ static void hsr_print_opt(struct link_util *lu, FILE *f, struct rtattr *tb[])
- 	if (tb[IFLA_HSR_SLAVE2] &&
- 	    RTA_PAYLOAD(tb[IFLA_HSR_SLAVE2]) < sizeof(__u32))
- 		return;
-+	if (tb[IFLA_HSR_INTERLINK] &&
-+	    RTA_PAYLOAD(tb[IFLA_HSR_INTERLINK]) < sizeof(__u32))
-+		return;
- 	if (tb[IFLA_HSR_SEQ_NR] &&
- 	    RTA_PAYLOAD(tb[IFLA_HSR_SEQ_NR]) < sizeof(__u16))
- 		return;
-@@ -132,6 +144,10 @@ static void hsr_print_opt(struct link_util *lu, FILE *f, struct rtattr *tb[])
- 	else
- 		print_null(PRINT_ANY, "slave2", "slave2 %s ", "<none>");
- 
-+	if (tb[IFLA_HSR_INTERLINK])
-+		print_color_string(PRINT_ANY, COLOR_IFNAME, "interlink", "interlink %s ",
-+				   ll_index_to_name(rta_getattr_u32(tb[IFLA_HSR_INTERLINK])));
-+
- 	if (tb[IFLA_HSR_SEQ_NR])
- 		print_int(PRINT_ANY,
- 			  "seq_nr",
-diff --git a/man/man8/ip-link.8.in b/man/man8/ip-link.8.in
-index b981ac91..534bb718 100644
---- a/man/man8/ip-link.8.in
-+++ b/man/man8/ip-link.8.in
-@@ -1626,6 +1626,8 @@ the following additional arguments are supported:
- 
- .BI "ip link add link " DEVICE " name " NAME " type hsr"
- .BI slave1 " SLAVE1-IF " slave2 " SLAVE2-IF "
-+.RB [ " interlink"
-+.IR INTERLINK-IF " ] "
- .RB [ " supervision"
- .IR ADDR-BYTE " ] ["
- .BR version " { " 0 " | " 1 " } ["
-@@ -1642,6 +1644,9 @@ the following additional arguments are supported:
- .BI slave2 " SLAVE2-IF "
- - Specifies the physical device used for the second of the two ring ports.
- 
-+.BI interlink " INTERLINK-IF"
-+- The interlink device bound to the HSR network to connect SAN device(s).
-+
- .BI supervision " ADDR-BYTE"
- - The last byte of the multicast address used for HSR supervision frames.
- Default option is "0", possible values 0-255.
--- 
-2.20.1
+--
 
+DENX Software Engineering GmbH,      Managing Director: Erika Unter
+HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
+Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
+
+--Sig_/PQ661UwgH+HnAueq7wTj1zD
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmYvZ1oACgkQAR8vZIA0
+zr2Vxwf+KSXk1giUTMxRBmDG6HJ7nPLV5yiwj0VRKxfXYcDAaqM1iFJgMGfyFd4L
+dfB/BgXhsB+naDVEKjV0L/t0INr4GTD5sldqbuD+XS8B1yL/F7DFtJhjn+jtzyn6
+3bh1KCKjeFwaiuLXqHH6DZmVjPazak9qauor3m3EBG4I4F1J9z3zPYKYU6RkACko
+rvJ0nwwID0YTr8i1aWfkc0ACzwhtUHO107UMWhMOZDNGlXQVAKCXnGSqY3K0Ilv4
+RaXeuE5VwvImTkzVaw51A/XuZl2pn1obfqN7NoS4v0c0987wqASuobxUHbHXa4Kw
+ZVl+9Ij0wLXetxDgpaom0jFbAhFYZw==
+=z9FJ
+-----END PGP SIGNATURE-----
+
+--Sig_/PQ661UwgH+HnAueq7wTj1zD--
 
