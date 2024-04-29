@@ -1,90 +1,96 @@
-Return-Path: <netdev+bounces-92135-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92136-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FF668B58B4
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 14:37:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id ACFE48B58BE
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 14:40:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2F8F51F2428E
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 12:37:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6135E288929
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 12:40:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2140EBA50;
-	Mon, 29 Apr 2024 12:37:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20C6C8487;
+	Mon, 29 Apr 2024 12:40:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="pUdKOUAy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HjZkj8F/"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E9AA8487;
-	Mon, 29 Apr 2024 12:36:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1169C133
+	for <netdev@vger.kernel.org>; Mon, 29 Apr 2024 12:40:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714394220; cv=none; b=kdUYQHRKYSdy/k4Iu0pVQV3d1LukxCHVlmUCPD+zl2x2iEUOkrUEmIFsh6NcjEKiPgP/Fc1K335gaFCht1v9VHoiav7csP++hkGx8G/fwEOuf9p82/11yHyNpU/CkUxhCXmrudOA/tFksaoD+0SOVTWgdL+qx1s51w8tgsC1sEk=
+	t=1714394429; cv=none; b=QvfFTr2eSDq2F9ccAa7Xo+XGN9pQ219TqhT4XaM+rkRMNXpxDDPTqqd8NhOyOTfnqByEFFXfkYLh9L+vol+pDXob+rXgK5q6tT95WH3wdnU559LDvLa6iUCNQT7FjIfuWENyXRQVfUnWN/VRBC4XD+ZgJ4Xswcb0GOqkw3ULmZY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714394220; c=relaxed/simple;
-	bh=/ZVMW7S4ba1fzlJuh0IoZdyiFmNQgBjBERO39t+nbC0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NiPb/va/wfYtz69yEwwf1IMrxYaLjCnFF+iC8ymoEN57Hb/B7AjFHQRE2v23w1grDhwya/9P4S04Nb8sxuByVVUjzjKxGyuA3jsY+49NB1tiNaNdQo+nH7Rr8xR++PRZz0ra6kdJACWH5zNEsNl1NPQSDlZGoFTzjnKAGyTuzAo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=pUdKOUAy; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=4rm+iSVUoeBsbsT8u7w4kcYSi0ko1/DqWhg4yghsUEk=; b=pUdKOUAygViyCfTwhA5WC5gnqS
-	2OwojHiZnRmBzi4PKEJFfc+QZjzChqXM1k7aDHaKDMNEoz6DUjgzK305jZAdJe8x0+QNHfwEZfX6O
-	poowUIuKnIbOXTmJfp2kv0rI4IwXlABp62jTDmwcbr20pTNovwyZgfjcFRtiUYqG6dwk=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1s1QFZ-00EFXi-LR; Mon, 29 Apr 2024 14:36:53 +0200
-Date: Mon, 29 Apr 2024 14:36:53 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Colin Foster <colin.foster@in-advantage.com>
-Cc: Andrew Halaney <ahalaney@redhat.com>, netdev@vger.kernel.org,
-	linux-omap@vger.kernel.org
-Subject: Re: Beaglebone Ethernet Probe Failure In 6.8+
-Message-ID: <44eaf045-3766-410f-bb2e-fb008b1513bf@lunn.ch>
-References: <Zh/tyozk1n0cFv+l@euler>
- <53a70554-61e5-414a-96a0-e6edd3b6c077@lunn.ch>
- <Zicyc0pj3g7/MemK@euler>
- <c11817a2-d743-4c27-a129-dd644c23110f@lunn.ch>
- <3kpvqcg3twpifzkxkrvhqew3cjuq2imgo4d4b775oypguik55g@npe75wf7rpdr>
- <Zi7+xqp1GG6Jl/kU@colin-ia-desktop>
+	s=arc-20240116; t=1714394429; c=relaxed/simple;
+	bh=0qPBO91g3okjlcGeTKrTyKB3jOuDG/m84/3bFg8zl8k=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=azXMP3cpc+98XhOX1Tp3MCm63cyGpKkRKVYw0gsYWjAAfLmpsWM8HR46I6w0dKLnVoZP5oSHbc1GrH7mbBCaVB8idg92ToSx0sK5kxvbss4ezFigWulP+dQp0RkZvUKYkbl8BTS4ak4XF47LrKyoiE+eFSXKPibOhWRpzuf/jUA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HjZkj8F/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 6755EC116B1;
+	Mon, 29 Apr 2024 12:40:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714394428;
+	bh=0qPBO91g3okjlcGeTKrTyKB3jOuDG/m84/3bFg8zl8k=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=HjZkj8F/y0E0sjBC+YZXP6UUYfTXjLREBu2rBP6gpT7pkjmUNZ9/d4a9zDCpiWRln
+	 ujgVU9LnvZILIG3pqVWtt1FqX5uXNtn+yHPusXo3K8qkvfORPDwyVTr7tlHy39jcEL
+	 9VdVJWcltIMJG/4cGPM04SrjRUhzFSeIaEEpB/Ej8GDWQezBTE8RTMDww7keMVHDvw
+	 U9YRwxwJSf61BKunxeNqJHVP8nMCzKwlu+7jjx3uRBO4Bs2hySAXN6J2dgJPYVu5Eh
+	 m2PbsBsrsT85ZbGy8nCCXhnfa9iVdqs/G+7L5MjaCT7fvwy7/ATTwd0lzLa+jqQQVz
+	 FxkdC0cJfR6FQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 5820BC54BAA;
+	Mon, 29 Apr 2024 12:40:28 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Zi7+xqp1GG6Jl/kU@colin-ia-desktop>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 0/2] vxlan: Fix vxlan counters.
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171439442835.25762.12780825413327777805.git-patchwork-notify@kernel.org>
+Date: Mon, 29 Apr 2024 12:40:28 +0000
+References: <cover.1714144439.git.gnault@redhat.com>
+In-Reply-To: <cover.1714144439.git.gnault@redhat.com>
+To: Guillaume Nault <gnault@redhat.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, netdev@vger.kernel.org, idosch@nvidia.com,
+ amcohen@nvidia.com, petrm@nvidia.com, razor@blackwall.org, jbenc@redhat.com,
+ leitao@debian.org, roopa@nvidia.com, shemminger@vyatta.com
 
-> I went all in and did a 100ms delay before returning from the resets of
-> 3 and 4 you mention. Sure enough, everything worked! It certainly should
-> be understood and optimized. I added the linux-omap list to this thread
-> (please let me know if there were others I should've CC'd on any of
-> these emails).
+Hello:
 
-It probably has little to do with the OMAP, it is the Microchip PHY
-you need more information about.
+This series was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-100ms is a very long time. The data sheet says:
+On Fri, 26 Apr 2024 17:27:15 +0200 you wrote:
+> Like most virtual devices, vxlan needs special care when updating its
+> netdevice counters. This is done in patch 1. Patch 2 just adds a
+> missing VNI counter update (found while working on patch 1).
+> 
+> Guillaume Nault (2):
+>   vxlan: Fix racy device stats updates.
+>   vxlan: Add missing VNI filter counter update in arp_reduce().
+> 
+> [...]
 
-  Note: For the first 16us after coming out of reset, the RMII
-  interface will run at 2.5 MHz. After this time, it will switch to 25
-  MHz if auto-negotiation is enabled.
+Here is the summary with links:
+  - [net,1/2] vxlan: Fix racy device stats updates.
+    https://git.kernel.org/netdev/net/c/6dee402daba4
+  - [net,2/2] vxlan: Add missing VNI filter counter update in arp_reduce().
+    https://git.kernel.org/netdev/net/c/b22ea4ef4c34
 
-I did not find anything else. I would try a deassert time the same as
-the asset time as a starting point. It could also be that you ask
-Linux for 100us sleep, and Linux actually gives your 1ms because of
-the resolution of the timers. But i doubt many application will care
-about a 1ms delay.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-    Andrew
+
 
