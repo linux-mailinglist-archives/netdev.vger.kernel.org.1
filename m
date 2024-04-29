@@ -1,153 +1,125 @@
-Return-Path: <netdev+bounces-92212-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92213-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6D798B5FB5
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 19:10:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C14D8B5FB9
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 19:11:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D7E171C2189D
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 17:10:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4D4FE1C219F9
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 17:11:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFC6E8627B;
-	Mon, 29 Apr 2024 17:10:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VQEbmlSW"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 436508664D;
+	Mon, 29 Apr 2024 17:11:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4631147A5C;
-	Mon, 29 Apr 2024 17:10:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A1A58626A
+	for <netdev@vger.kernel.org>; Mon, 29 Apr 2024 17:11:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714410649; cv=none; b=TTfoWx1k1wbuUQZDnClSrNJnSJ58dwDyVv2gLPDJukG3MnZmokfoSOdHT4PG+K18W9jlSOA2ntjigWMbB4qaK/syM9VBDGTJX32Ulo+A3KpB31vbcNAMcOqSxdJ7pHEQUNn+w30oLrZ2G9237ww6ItS5400RwHAszV5fmVFP6Ro=
+	t=1714410679; cv=none; b=hmVbJ0IFQMkhTrbxxTU87KExhIv1dVSRUbgoQNUNTggoLTnMQddijGZj/6WT3faWRXrfPqT01XU8hD3JbFCr3TEsYHv/jMwrX+UGeOCKtOkpP+Ku0HWUpR7APbe5aweGqVj0zgxTccs3rN1MhMaun5MMY6m57xRMqKOnJVtH9oE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714410649; c=relaxed/simple;
-	bh=WKdk6WwgPqc2YoANVbL2/w23zvFWOoCOfZ03rXJUwiE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=EI82BwUXAzq0REHJnJ6Zw8oJsNPoVLzFq0rT337lEaVzv26OFtxJ2tCmJvw7VpKR0gUhV8JsbUVXUymM55/Olqj9r0vuuR/mXRTF2iHeHytTewO8owvBLgKvCOyLyllwLvXQQmslVMGqCEfWhg53lM+bm0kq6dcEjleRYbSfUPw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VQEbmlSW; arc=none smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1714410647; x=1745946647;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=WKdk6WwgPqc2YoANVbL2/w23zvFWOoCOfZ03rXJUwiE=;
-  b=VQEbmlSWU047JzvVCLY6f0shtYqCbVAz2gDAWj2C9jR2/sSXSNi2U0bW
-   bGv7/vmclDZ8Ln47TPv6jsTIsv9Q8uxkrXPuq1RTd0ssO76Tus7bRbZGP
-   o0L/5LIC8I/DdHHFH9OnJRT06KIm3UOtX6DJbN0QbHFucI06It0KsTFES
-   Mj6/cx7eq48EG5eTs70+nWTDCVtqNfuKlZco0DVCSGED0FtLUwq1f46WM
-   9LJvjDhckZfLy1ZTASq66jxXGR2+EIRLLEF9HooKeKCPNnm2Zr0GJgwW5
-   de65WFHFFsFL4JJdT6xCcN5lDb9e2sQozQTqnxB6pppOHHZyzTmVAQeh7
-   g==;
-X-CSE-ConnectionGUID: 6b9TkGKGQGyUbfWQClWORQ==
-X-CSE-MsgGUID: gXRQySm3RoilEhCmZQ8Cew==
-X-IronPort-AV: E=McAfee;i="6600,9927,11059"; a="13909560"
-X-IronPort-AV: E=Sophos;i="6.07,240,1708416000"; 
-   d="scan'208";a="13909560"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Apr 2024 10:10:46 -0700
-X-CSE-ConnectionGUID: Nuo6ZQFPSsul+fuSL7vKIw==
-X-CSE-MsgGUID: VKUvT9ANRqmsO2/og0S4uQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,240,1708416000"; 
-   d="scan'208";a="26788735"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by orviesa008.jf.intel.com with ESMTP; 29 Apr 2024 10:10:46 -0700
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	netdev@vger.kernel.org
-Cc: Vitaly Lifshits <vitaly.lifshits@intel.com>,
-	anthony.l.nguyen@intel.com,
-	regressions@leemhuis.info,
-	stable@vger.kernel.org,
-	=?UTF-8?q?J=C3=A9r=C3=B4me=20Carretero?= <cJ@zougloub.eu>,
-	Sasha Neftin <sasha.neftin@intel.com>,
-	Dima Ruinskiy <dima.ruinskiy@intel.com>
-Subject: [PATCH net] e1000e: change usleep_range to udelay in PHY mdic access
-Date: Mon, 29 Apr 2024 10:10:40 -0700
-Message-ID: <20240429171040.1152516-1-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.41.0
+	s=arc-20240116; t=1714410679; c=relaxed/simple;
+	bh=/bsCMEHgE0FH4Q37n2sNEuI196GZhVW+bZsnmdYiJDY=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=eGSKJWK0XNjNzXbPN7awKtTo2aRgqfo7kArnM17wtmfOtzpRFBwkxRhtQnBY2KGV1pAKYyrxmNd/SiFOfi24N9A8aDJTLjU9iYNFLpz1MIyCBD5lA30chRuOGKzbnxyKPNVHyz1a40IplefBpKmX5FFWPtTOKLWyNP8fQHlnoQE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1s1UX4-00016e-NN
+	for netdev@vger.kernel.org; Mon, 29 Apr 2024 19:11:14 +0200
+Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1s1UX4-00F1Hr-3m
+	for netdev@vger.kernel.org; Mon, 29 Apr 2024 19:11:14 +0200
+Received: from dspam.blackshift.org (localhost [127.0.0.1])
+	by bjornoya.blackshift.org (Postfix) with SMTP id C3D742C22F3
+	for <netdev@vger.kernel.org>; Mon, 29 Apr 2024 17:11:13 +0000 (UTC)
+Received: from hardanger.blackshift.org (unknown [172.20.34.65])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by bjornoya.blackshift.org (Postfix) with ESMTPS id 0E42B2C22D8;
+	Mon, 29 Apr 2024 17:11:12 +0000 (UTC)
+Received: from [172.20.34.65] (localhost [::1])
+	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id ea361e50;
+	Mon, 29 Apr 2024 17:11:11 +0000 (UTC)
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+Subject: [PATCH 0/3] can: mcp251xfd: move device init into runtime_pm
+Date: Mon, 29 Apr 2024 19:10:56 +0200
+Message-Id: <20240429-mcp251xfd-runtime_pm-v1-0-c26a93a66544@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAKDUL2YC/x3MTQqAIBBA4avIrBP8KciuEhGVY81CE60IorsnL
+ b/Few9kTIQZOvZAwosy7aFAVgyWbQorcrLFoISqRa0M90tUjbyd5ekMB3kco+dGztpo10qhHZQ
+ 0JnR0/9t+eN8PZKRoZWYAAAA=
+To: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>, 
+ Thomas Kopp <thomas.kopp@microchip.com>, 
+ Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
+ Gregor Herburger <gregor.herburger@ew.tq-group.com>
+Cc: linux-can@vger.kernel.org, netdev@vger.kernel.org, 
+ kernel@pengutronix.de, Marc Kleine-Budde <mkl@pengutronix.de>
+X-Mailer: b4 0.14-dev
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1318; i=mkl@pengutronix.de;
+ h=from:subject:message-id; bh=/bsCMEHgE0FH4Q37n2sNEuI196GZhVW+bZsnmdYiJDY=;
+ b=owEBbQGS/pANAwAKASg4oj56LbxvAcsmYgBmL9Shz2UKFrqeeS3Vr5ZWp3CGikwggTNuinR9d
+ kXUw2alM7+JATMEAAEKAB0WIQRQQLqG4LYE3Sm8Pl8oOKI+ei28bwUCZi/UoQAKCRAoOKI+ei28
+ b2xoB/0aIreRhaGtTvvlWi8eKhyuTIKcAcN0v2jk1hpvofHVsVt40EUo7lP7WKBGeSBBhRSpqOl
+ eNCMVMdC/PeesMMAk+7xlu3Vc0JOX0yjE4/TuOlK/NB3FPAQnXNb9muDUZDXkmbpD5ns8o1EXC2
+ HcKFCupRnszmVaVfC61ZS9+ai5XxFejEV3bQtbOuTdgMbZmR43TsiCQmm4uoiqKeTBVO+G6uD6y
+ m4pQxlQqSzs3LVg5Hk8QD7yzI8FTEOOvX2lASenJP7eX4Xh97Eh+YCzOCvWr3OMuG1H0Ub1DDGq
+ uuWO/jLH5yWFHROw7qp4J7qqITS2F8TkFpWoFwN6RZ6G4T1f
+X-Developer-Key: i=mkl@pengutronix.de; a=openpgp;
+ fpr=C1400BA0B3989E6FBC7D5B5C2B5EE211C58AEA54
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-From: Vitaly Lifshits <vitaly.lifshits@intel.com>
+In order to support GPIO support, the soft reset and basic
+configuration must be moved into runtime_pm.
 
-This is a partial revert of commit 6dbdd4de0362 ("e1000e: Workaround
-for sporadic MDI error on Meteor Lake systems"). The referenced commit
-used usleep_range inside the PHY access routines, which are sometimes
-called from an atomic context. This can lead to a kernel panic in some
-scenarios, such as cable disconnection and reconnection on vPro systems.
+This series first cleans up some code style and then moves the
+starting and stopping of the timestamp worker to ensure that the chip
+remains powered down. The last patch moves the soft reset and the
+basic configuration to runtime_pm.
 
-Solve this by changing the usleep_range calls back to udelay.
-
-Fixes: 6dbdd4de0362 ("e1000e: Workaround for sporadic MDI error on Meteor Lake systems")
-Cc: stable@vger.kernel.org
-Reported-by: Jérôme Carretero <cJ@zougloub.eu>
-Closes: https://bugzilla.kernel.org/show_bug.cgi?id=218740
-Closes: https://lore.kernel.org/lkml/a7eb665c74b5efb5140e6979759ed243072cb24a.camel@zougloub.eu/
-Co-developed-by: Sasha Neftin <sasha.neftin@intel.com>
-Signed-off-by: Sasha Neftin <sasha.neftin@intel.com>
-Signed-off-by: Vitaly Lifshits <vitaly.lifshits@intel.com>
-Tested-by: Dima Ruinskiy <dima.ruinskiy@intel.com>
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
 ---
- drivers/net/ethernet/intel/e1000e/phy.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+Marc Kleine-Budde (3):
+      can: mcp251xfd: properly indent labels
+      can: mcp251xfd: move mcp251xfd_timestamp_start()/stop() into mcp251xfd_chip_start/stop()
+      can: mcp251xfd: move chip sleep mode into runtime pm
 
-diff --git a/drivers/net/ethernet/intel/e1000e/phy.c b/drivers/net/ethernet/intel/e1000e/phy.c
-index 93544f1cc2a5..f7ae0e0aa4a4 100644
---- a/drivers/net/ethernet/intel/e1000e/phy.c
-+++ b/drivers/net/ethernet/intel/e1000e/phy.c
-@@ -157,7 +157,7 @@ s32 e1000e_read_phy_reg_mdic(struct e1000_hw *hw, u32 offset, u16 *data)
- 		 * the lower time out
- 		 */
- 		for (i = 0; i < (E1000_GEN_POLL_TIMEOUT * 3); i++) {
--			usleep_range(50, 60);
-+			udelay(50);
- 			mdic = er32(MDIC);
- 			if (mdic & E1000_MDIC_READY)
- 				break;
-@@ -181,7 +181,7 @@ s32 e1000e_read_phy_reg_mdic(struct e1000_hw *hw, u32 offset, u16 *data)
- 		 * reading duplicate data in the next MDIC transaction.
- 		 */
- 		if (hw->mac.type == e1000_pch2lan)
--			usleep_range(100, 150);
-+			udelay(100);
- 
- 		if (success) {
- 			*data = (u16)mdic;
-@@ -237,7 +237,7 @@ s32 e1000e_write_phy_reg_mdic(struct e1000_hw *hw, u32 offset, u16 data)
- 		 * the lower time out
- 		 */
- 		for (i = 0; i < (E1000_GEN_POLL_TIMEOUT * 3); i++) {
--			usleep_range(50, 60);
-+			udelay(50);
- 			mdic = er32(MDIC);
- 			if (mdic & E1000_MDIC_READY)
- 				break;
-@@ -261,7 +261,7 @@ s32 e1000e_write_phy_reg_mdic(struct e1000_hw *hw, u32 offset, u16 data)
- 		 * reading duplicate data in the next MDIC transaction.
- 		 */
- 		if (hw->mac.type == e1000_pch2lan)
--			usleep_range(100, 150);
-+			udelay(100);
- 
- 		if (success)
- 			return 0;
+ drivers/net/can/spi/mcp251xfd/mcp251xfd-core.c     | 137 ++++++++++++---------
+ drivers/net/can/spi/mcp251xfd/mcp251xfd-dump.c     |   2 +-
+ drivers/net/can/spi/mcp251xfd/mcp251xfd-regmap.c   |   2 +-
+ drivers/net/can/spi/mcp251xfd/mcp251xfd-tef.c      |   2 +-
+ .../net/can/spi/mcp251xfd/mcp251xfd-timestamp.c    |   7 +-
+ drivers/net/can/spi/mcp251xfd/mcp251xfd-tx.c       |   2 +-
+ drivers/net/can/spi/mcp251xfd/mcp251xfd.h          |   1 +
+ 7 files changed, 91 insertions(+), 62 deletions(-)
+---
+base-commit: d63394abc923093423c141d4049b72aa403fff07
+change-id: 20240429-mcp251xfd-runtime_pm-91b393f8103f
+
+Best regards,
 -- 
-2.41.0
+Marc Kleine-Budde <mkl@pengutronix.de>
+
 
 
