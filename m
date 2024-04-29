@@ -1,156 +1,74 @@
-Return-Path: <netdev+bounces-92169-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92170-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B87C8B5B48
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 16:33:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BFCF28B5BA8
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 16:44:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2D23F1F224C0
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 14:33:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7B4922811F0
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 14:44:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AEF47D3F4;
-	Mon, 29 Apr 2024 14:32:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C2337E105;
+	Mon, 29 Apr 2024 14:44:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EGfpQb7v"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AACA27D074
-	for <netdev@vger.kernel.org>; Mon, 29 Apr 2024 14:32:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8808745C5;
+	Mon, 29 Apr 2024 14:44:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714401171; cv=none; b=nvjElILcrm0KbVMV+pdotgTjtZIHofCGb2GwNZCP2HlYFb61H9R6XoTlHYLGOlFhhnYr/jSXvYXNIIG/ri76aqP16yx9SifPvQ2gAwPFEjtO+Sg92tETxXDecG6PYAFA/+xHynZY4nTST/W6yDZntU+md3s/fDrwlRDcjlGI9vg=
+	t=1714401842; cv=none; b=IDcxqqztUvqSbLI/EHELcP+yASJHPXQrPlS9dHE16C68qsHK/DQqzW9+A3iLeoPeIQrCFtvPDMSeO6rBvjRERcVnuVzGVsU9YtxNtrZmI4qrtMgFreXRGW/XiBdTrWkQPBlOoYfnGMX7MVsZhC4n9Q7A1Y6LmV48TUbx0diJtEE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714401171; c=relaxed/simple;
-	bh=cM+Kb+vHhPrqgKGWsTrNu6wlDlv/A4zfnq6HEVnW+W4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JyD5olSff89u7WtF1MGK6iThfhx2+JsTA+kiI8i/NcgCjNTgwEGc+VLxdCKQGXyxKlrcT/C8zT/xgLcBJ7pE+DEVPkM7Wgg6So7q/6XHuwwGRbX3m3ddEF7ZBDQSnenvLRv68tilFO4o8D1jJfo12MCnxXi1DmKvRTtYIjEPFk8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1s1S3a-0001g1-EV; Mon, 29 Apr 2024 16:32:38 +0200
-Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1s1S3Y-00EzuG-OO; Mon, 29 Apr 2024 16:32:36 +0200
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1s1S3Y-002Ue8-2A;
-	Mon, 29 Apr 2024 16:32:36 +0200
-Date: Mon, 29 Apr 2024 16:32:36 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Mark Brown <broonie@kernel.org>,
-	Kyle Swenson <kyle.swenson@est.tech>,
-	Liam Girdwood <lgirdwood@gmail.com>, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: PoE complex usage of regulator API
-Message-ID: <Zi-vhKx-WlYPQe3c@pengutronix.de>
-References: <20240426124253.56fd0933@kmaincent-XPS-13-7390>
- <57a79abd-722c-4907-b0e7-2396392ae675@lunn.ch>
- <20240429145203.219bee06@kmaincent-XPS-13-7390>
+	s=arc-20240116; t=1714401842; c=relaxed/simple;
+	bh=f/zyuqvJRLxvBVtrVUlxyhOWWeOQsE75kQN96zoTaJM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=d0lILbZCvluudjGxR+3QC7KkTJvMl5ESGGxgiZSTtkeablp2MaBathacUG2PkZNmraVXt6JoqN5B1QJwDo8NDOgqxGPESxciC9taUciW42ul36kI6B80tktdcPboF7vitzvBOw+g7fp4PLQ46i+1f1/Cq/nTSufZkzrOldTd+zg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EGfpQb7v; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75FBDC113CD;
+	Mon, 29 Apr 2024 14:44:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714401842;
+	bh=f/zyuqvJRLxvBVtrVUlxyhOWWeOQsE75kQN96zoTaJM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=EGfpQb7vZ9U2rKRbIRKWRF6YBevcHWA+uDr7JMwTW10VoWgt2bBhIwZ2pOok8O2OG
+	 9taHRx0njU88UEFMOpyFQgoT51GVYk3oTJz79r0IQwN2JTl5dxNnkt+xmUOZt9X5fk
+	 xd5PrJTMqfA59l/VW0DC0aIjWgMgvVRGFgtmhVd6ePNaOg8tdCRdbRorBeOq/+QFJg
+	 exZUA9YkijA8lMq6RjFxUiovhf69mln3jnVykyZQARAhEsVIU8lJX4TRJChPVWMYgW
+	 AzDplzCt+soD6jtz4hIHe7ZFNioJki43/i8lizkQ8woyZVXmiNj0Pir6MvRJME7xq2
+	 YK/HTYpi9cJPA==
+Date: Mon, 29 Apr 2024 07:44:01 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next 3/6] selftests: net: py: extract tool logic
+Message-ID: <20240429074401.78610666@kernel.org>
+In-Reply-To: <662d02c524ef7_28b985294cc@willemb.c.googlers.com.notmuch>
+References: <20240426232400.624864-1-kuba@kernel.org>
+	<20240426232400.624864-4-kuba@kernel.org>
+	<662d02c524ef7_28b985294cc@willemb.c.googlers.com.notmuch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240429145203.219bee06@kmaincent-XPS-13-7390>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hi Kory,
-
-On Mon, Apr 29, 2024 at 02:52:03PM +0200, Kory Maincent wrote:
-> On Sat, 27 Apr 2024 00:41:19 +0200
-> Andrew Lunn <andrew@lunn.ch> wrote:
+On Sat, 27 Apr 2024 09:51:01 -0400 Willem de Bruijn wrote:
+> > +def ip(args, json=None, ns=None, host=None):
+> > +    if ns:
+> > +        args = '-netns ' + ns + " " + args  
 > 
-> > > Let's begin simple, in PSE world we are more talking about power.
-> > > Would it be ok to add a regulator_get/set_power_limit() and
-> > > regulator_get_power() callback to regulator API. Would regulator API have
-> > > interest to such callbacks?  
-> > 
-> > Could you define this API in more details.
-> 
-> The first new PoE features targeted by this API was to read the consumed power
-> and get set the power limit for each ports. Yes mainly book keeping.
-> Few drivers callbacks that will be called by ethtool and maybe the read of power
-> limit and consumed power could be add to read-only sysfs regulator.
+> Minor: inconsistent use of single and double comma strings. Maybe
+> there's a reasoning that I'm just missing.
 
-regulator framework already supports operations with current (I):
-regulator_set_current_limit()
-regulator_get_current_limit()
-
-The power P = I * V. On one side you can calculate needed current value:
-I = P/V. On other side, may be regulator framework can be extended to do
-it to. In case of PoE/PoDL we have adjustable voltage, depending on the
-Class of the device, we will probably interact with PSE controller by
-using Power instate of Current.
-
-> > I'm assuming this is mostly about book keeping? When a regulator is
-> > created, we want to say is can deliver up to X Kilowatts. We then want
-> > to allocate power to ports. So there needs to be a call asking it to
-> > allocate part of X to a consumer, which could fail if there is not
-> > sufficient power budget left. And there needs to be a call to release
-> > such an allocation.
-> 
-> This is more the aim of the second point I have raised, power priority and
-> parent power budget. And how the core can manage it.
-
-Since there is already support to work with current (I) values, there
-are is also overcurrent protection. If a device is beyond the power
-budget limit, it is practically an over current event. Regulator
-framework already capable on handling some of this events, what we need
-for PoE is prioritization. If we detect overcurrent on supply root/node
-we need to shutdown enough low prio consumers to provide enough power
-for the high prio consumers.
-
-In reality, this will be done by the PoE controller in HW. Usually we
-will get 
-
-> > We are probably not so much interested in what the actual current
-> > power draw is, assuming there is no wish to over provision?
-> > 
-> > There is in theory a potential second user of this. Intel have been
-> > looking at power control for SFPs. Typically they are guaranteed a
-> > minimum of 1.5W. However, they can operate at higher power
-> > classes. You can have boards with multiple SFPs, with a theoretical
-> > maximum power draw more than what the supply can supply. So you need
-> > similar sort of power budget book keeping to allocate power to an SFP
-> > cage before telling the SFP module it can swap to a higher power
-> > class. I say this is theoretical, because the device Intel is working
-> > on has this hidden away in firmware. But maybe sometime in the future
-> > somebody will want Linux doing this.
-> 
-> So there is a potential second user, that's great to hear it! Could the
-> priority stuff be also interesting? Like to allow only high priority SFP to use
-> higher power class in case of a limiting power budget.
-
-There are even more use cases. For example on power loss with some
-limited backup power source, you wont to shut all low prio consumers
-and provided needed power and time for some device which may fail. For
-example storage devices.
-
-Regards,
-Oleksij
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+I also need to coerce ns to be a string, it may be class NetNS.
+v2 coming in 3... 2... 1...
 
