@@ -1,116 +1,200 @@
-Return-Path: <netdev+bounces-92038-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92036-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2BE18B50DD
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 07:58:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3FE78B50D4
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 07:55:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 774F41F2200C
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 05:58:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0181D1C211D3
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 05:55:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C0EDDF59;
-	Mon, 29 Apr 2024 05:58:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 689F2DF43;
+	Mon, 29 Apr 2024 05:55:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="Y//LCcHR"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="w9+EPYWQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
+Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E19DCDDD8
-	for <netdev@vger.kernel.org>; Mon, 29 Apr 2024 05:58:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 997D7DDD8;
+	Mon, 29 Apr 2024 05:55:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.141
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714370316; cv=none; b=WC45/MIXOyOhjXev8A2peTVYPTA65/f6e7UQNUAfCS8u8lRswUjwC1AbVlcM/oiREMZ5Ub1FquK02sz8bSbmASQcttioFlXGITrmMWdu6tY89wbBgtaI6oiVNciOkfVwcDbZZ3tLPB7ZmHbLG1V9+f8yNDMK3bh7/eX/0g2HPBs=
+	t=1714370104; cv=none; b=HrIdWDSeoJe+YXeCJzbrdJCKnnglBsVNR8mZAO2FRR8UMIsUfad+De2tRkSDR7IFh25ai1UwFq77qqS6X1OxzdjIJA7Jl7ULrbKLiAs1gdJyySALWZHM+QqRhh2auSiZOee9qdgg3n3YOOdyLEp1XFb7j5k1Pk0yzwZ8yTWczNw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714370316; c=relaxed/simple;
-	bh=U/cPSXPeXfpIRb3yhnbx+YjCExHp88crLiw8GhYFabk=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Os83NgKQ3ke+6HdySOnt6TSYdzq/lI+tic6X4hgQ+TXKSEbM1cL06Ncigi0DWVYiXmk1XfzlPBP/CU4EEMrLVQaZBoUPdMs8yrZLBsW06TV4nk9SWxWrK9y029kWbV3eh2DXSk7649edbfpI5ppGwvRDcObnuCtMzq67uoIw3rU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=Y//LCcHR; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id 54DA7206DF;
-	Mon, 29 Apr 2024 07:51:06 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from a.mx.secunet.com ([127.0.0.1])
-	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ME9Mh2XuXT2b; Mon, 29 Apr 2024 07:51:05 +0200 (CEST)
-Received: from mailout1.secunet.com (mailout1.secunet.com [62.96.220.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id 18D62201CC;
-	Mon, 29 Apr 2024 07:51:05 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 18D62201CC
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1714369865;
-	bh=ioJ7R0k4lpalT0wiDOkIhYPKYYHTb/N4WPwi94J6VUY=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
-	b=Y//LCcHRFwxz1R2wA0etT3DYXWMMCeZONv2RZ2K21/gAD+VsyP2fpoXNPoRi7cwBf
-	 o3yWkWjxrcvvNzkG3SJV/qj0cWYxROrW0sfHJFAnvuT2GiuR9u/gx/AEnjs/QfkbtD
-	 +5IqgbFh4uT3wNPdBuW5gP3S02lpH3zAsSnDHkXbpngnOHhq/pGZqi+pElt1vH/FS1
-	 mT4kOjOjFKjra/xJds9eWqTkIcfhe9PkwC/CNCtdwU2Vh57wa63XrP9yMCv9Ykx1NH
-	 UPnoDJHoCA8y3tr4Hcasff4IYVup5PZ1mlBQ6bz+lIeczGTYsKOM1OphgJceAM3Qqd
-	 qAiy4A+WDErYw==
-Received: from cas-essen-01.secunet.de (unknown [10.53.40.201])
-	by mailout1.secunet.com (Postfix) with ESMTP id 0959B80004A;
-	Mon, 29 Apr 2024 07:51:05 +0200 (CEST)
-Received: from mbx-essen-02.secunet.de (10.53.40.198) by
- cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Mon, 29 Apr 2024 07:51:04 +0200
-Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
- (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 29 Apr
- 2024 07:51:04 +0200
-Received: by gauss2.secunet.de (Postfix, from userid 1000)
-	id B6E1731801BB; Mon, 29 Apr 2024 07:51:03 +0200 (CEST)
-Date: Mon, 29 Apr 2024 07:51:03 +0200
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: Paul Davey <paul.davey@alliedtelesis.co.nz>
-CC: Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller"
-	<davem@davemloft.net>, <netdev@vger.kernel.org>
-Subject: Re: [PATCH net v2] xfrm: Preserve vlan tags for transport mode
- software GRO
-Message-ID: <Zi81R0Zw0aEw5tSb@gauss3.secunet.de>
-References: <20240423060100.2680602-1-paul.davey@alliedtelesis.co.nz>
+	s=arc-20240116; t=1714370104; c=relaxed/simple;
+	bh=B/8yaOKjqm4lDksZDUxYpsKoDBodUyrAGmiPUBu0eq8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=FcNKF+ueXNakm4DpS4za8oO071WDj2py2B3Z4G6pa7tkUVJOL0IGKAnSfDhPIhsSDhhnV9CjQtMoRvpiUgWLtrTI/rc5o4CutUIoYgSeX9pq3tYnrYSHxDsexvTkvXllYn5kOyQS6gpnHJw36140PmaaF7M4AQWR3DNcasdnHwo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=w9+EPYWQ; arc=none smtp.client-ip=198.47.19.141
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from fllv0035.itg.ti.com ([10.64.41.0])
+	by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 43T5s82Q052960;
+	Mon, 29 Apr 2024 00:54:08 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1714370048;
+	bh=9z+5mrcooFlbXR+nO+DTW5Jb0Y5LWwkCd9vReQSQTeA=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=w9+EPYWQ6GGF8dZ+J2fGTL2TArMBiqkkvdCS/SdNjSfGehyDyEIIFNgydFTJ5qJn9
+	 wqtCy7lD4trk/O+Tf+u6Qi9wLdqvlxsH/lmf6DShIvU6XOeqy+AkL6NI6eiNUrZKEZ
+	 AhWTL7a7MLqN3lh7Bxu9KDN8HIyTD2beCNDboNnI=
+Received: from DLEE115.ent.ti.com (dlee115.ent.ti.com [157.170.170.26])
+	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 43T5s873114950
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Mon, 29 Apr 2024 00:54:08 -0500
+Received: from DLEE112.ent.ti.com (157.170.170.23) by DLEE115.ent.ti.com
+ (157.170.170.26) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Mon, 29
+ Apr 2024 00:54:08 -0500
+Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DLEE112.ent.ti.com
+ (157.170.170.23) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Mon, 29 Apr 2024 00:54:08 -0500
+Received: from [10.24.69.25] (danish-tpc.dhcp.ti.com [10.24.69.25])
+	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 43T5s2m5029844;
+	Mon, 29 Apr 2024 00:54:03 -0500
+Message-ID: <c138f315-ed9d-4c10-b9b6-e88cc3ec5e8c@ti.com>
+Date: Mon, 29 Apr 2024 11:24:02 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20240423060100.2680602-1-paul.davey@alliedtelesis.co.nz>
-X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
- mbx-essen-02.secunet.de (10.53.40.198)
-X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net: ti: icssg_prueth: Add SW TX / RX Coalescing
+ based on hrtimers
+Content-Language: en-US
+To: Simon Horman <horms@kernel.org>
+CC: Dan Carpenter <dan.carpenter@linaro.org>,
+        Heiner Kallweit
+	<hkallweit1@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
+        Jan Kiszka
+	<jan.kiszka@siemens.com>,
+        Diogo Ivo <diogo.ivo@siemens.com>, Paolo Abeni
+	<pabeni@redhat.com>,
+        Jakub Kicinski <kuba@kernel.org>, Eric Dumazet
+	<edumazet@google.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <srk@ti.com>,
+        Vignesh Raghavendra
+	<vigneshr@ti.com>, <r-gunasekaran@ti.com>,
+        Roger Quadros <rogerq@kernel.org>
+References: <20240424091823.1814136-1-danishanwar@ti.com>
+ <20240427134120.GJ516117@kernel.org>
+From: MD Danish Anwar <danishanwar@ti.com>
+In-Reply-To: <20240427134120.GJ516117@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 
-On Tue, Apr 23, 2024 at 06:00:24PM +1200, Paul Davey wrote:
-> The software GRO path for esp transport mode uses skb_mac_header_rebuild
-> prior to re-injecting the packet via the xfrm_napi_dev.  This only
-> copies skb->mac_len bytes of header which may not be sufficient if the
-> packet contains 802.1Q tags or other VLAN tags.  Worse copying only the
-> initial header will leave a packet marked as being VLAN tagged but
-> without the corresponding tag leading to mangling when it is later
-> untagged.
-> 
-> The VLAN tags are important when receiving the decrypted esp transport
-> mode packet after GRO processing to ensure it is received on the correct
-> interface.
-> 
-> Therefore record the full mac header length in xfrm*_transport_input for
-> later use in corresponding xfrm*_transport_finish to copy the entire mac
-> header when rebuilding the mac header for GRO.  The skb->data pointer is
-> left pointing skb->mac_header bytes after the start of the mac header as
-> is expected by the network stack and network and transport header
-> offsets reset to this location.
-> 
-> Fixes: 7785bba299a8 ("esp: Add a software GRO codepath")
-> Signed-off-by: Paul Davey <paul.davey@alliedtelesis.co.nz>
 
-Applied, thanks a lot!
+
+On 27/04/24 7:11 pm, Simon Horman wrote:
+> On Wed, Apr 24, 2024 at 02:48:23PM +0530, MD Danish Anwar wrote:
+>> Add SW IRQ coalescing based on hrtimers for RX and TX data path for ICSSG
+>> driver, which can be enabled by ethtool commands:
+>>
+>> - RX coalescing
+>>   ethtool -C eth1 rx-usecs 50
+>>
+>> - TX coalescing can be enabled per TX queue
+>>
+>>   - by default enables coalesing for TX0
+>>   ethtool -C eth1 tx-usecs 50
+>>   - configure TX0
+>>   ethtool -Q eth0 queue_mask 1 --coalesce tx-usecs 100
+>>   - configure TX1
+>>   ethtool -Q eth0 queue_mask 2 --coalesce tx-usecs 100
+>>   - configure TX0 and TX1
+>>   ethtool -Q eth0 queue_mask 3 --coalesce tx-usecs 100 --coalesce
+>> tx-usecs 100
+>>
+>> Minimum value for both rx-usecs and tx-usecs is 20us.
+>>
+>> Comapared to gro_flush_timeout and napi_defer_hard_irqs this patch
+> 
+> nit: Compared
+> 
+>> allows to enable IRQ coalescing for RX path separately.
+>>
+>> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
+> 
+> ...
+> 
+>> @@ -190,19 +191,35 @@ int emac_tx_complete_packets(struct prueth_emac *emac, int chn,
+>>  	return num_tx;
+>>  }
+>>  
+>> +static enum hrtimer_restart emac_tx_timer_callback(struct hrtimer *timer)
+>> +{
+>> +	struct prueth_tx_chn *tx_chns =
+>> +			container_of(timer, struct prueth_tx_chn, tx_hrtimer);
+>> +
+>> +	enable_irq(tx_chns->irq);
+>> +	return HRTIMER_NORESTART;
+>> +}
+>> +
+>>  static int emac_napi_tx_poll(struct napi_struct *napi_tx, int budget)
+>>  {
+>>  	struct prueth_tx_chn *tx_chn = prueth_napi_to_tx_chn(napi_tx);
+>>  	struct prueth_emac *emac = tx_chn->emac;
+>> +	bool tdown = false;
+>>  	int num_tx_packets;
+>>  
+>> -	num_tx_packets = emac_tx_complete_packets(emac, tx_chn->id, budget);
+>> +	num_tx_packets = emac_tx_complete_packets(emac, tx_chn->id, budget, &tdown);
+> 
+> Please consider limiting lines to 80 columns wide in Networking code.
+> 
+>>  
+>>  	if (num_tx_packets >= budget)
+>>  		return budget;
+>>  
+>> -	if (napi_complete_done(napi_tx, num_tx_packets))
+>> -		enable_irq(tx_chn->irq);
+>> +	if (napi_complete_done(napi_tx, num_tx_packets)) {
+>> +		if (unlikely(tx_chn->tx_pace_timeout_ns && !tdown))
+>> +			hrtimer_start(&tx_chn->tx_hrtimer,
+>> +				      ns_to_ktime(tx_chn->tx_pace_timeout_ns),
+>> +				      HRTIMER_MODE_REL_PINNED);
+>> +		else
+>> +			enable_irq(tx_chn->irq);
+>> +	}
+>>  
+>>  	return num_tx_packets;
+>>  }
+> 
+> ...
+> 
+>> @@ -870,7 +889,12 @@ int emac_napi_rx_poll(struct napi_struct *napi_rx, int budget)
+>>  	}
+>>  
+>>  	if (num_rx < budget && napi_complete_done(napi_rx, num_rx))
+>> -		enable_irq(emac->rx_chns.irq[rx_flow]);
+>> +		if (unlikely(emac->rx_pace_timeout_ns))
+>> +			hrtimer_start(&emac->rx_hrtimer,
+>> +				      ns_to_ktime(emac->rx_pace_timeout_ns),
+>> +				      HRTIMER_MODE_REL_PINNED);
+>> +		else
+>> +			enable_irq(emac->rx_chns.irq[rx_flow]);
+> 
+> clang-18 and gcc-13 both complain about the if/else logic above.
+> I think it would be best to add {} to the outer if statement.
+> 
+>>  
+>>  	return num_rx;
+>>  }
+> 
+> ...
+
+Sure Simon, I'll fix all this and send v2.
+
+-- 
+Thanks and Regards,
+Danish
 
