@@ -1,110 +1,124 @@
-Return-Path: <netdev+bounces-92141-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92142-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BF578B5906
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 14:50:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D8F648B5928
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 14:54:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 17E5B28BF35
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 12:50:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7B2BD1F2116A
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 12:54:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C04FF3771E;
-	Mon, 29 Apr 2024 12:50:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF03F745C5;
+	Mon, 29 Apr 2024 12:52:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="gaM/NZtx"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="ClwGfZEy"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1175210971;
-	Mon, 29 Apr 2024 12:50:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E36A535C1;
+	Mon, 29 Apr 2024 12:52:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714395012; cv=none; b=Pi1Dd9DHXxyPjTuTzyjF1R4+S20zQ38oSljcbtvEXpoOMNiLQHCauAK8GXv2U4ns8TUnt9dilnnWlVpoybmYt7DKbM1gKZyUo1TnnZDT4WdV0ZPOhFDvSS5sJTxF6ABMTgDepuAlMwCRYaUwr3Os4IPBup1tO/wyzqDtljw5Syg=
+	t=1714395135; cv=none; b=f5U8ZC+EtOVn1ZJzS1Nlb39RnRD7TEHkFHrpDIUXr01KOoRQrhmZ69hC+yDq3V9aLra/vWy1PrWrHA99DhB1NQMqk4ISLqSa1AP86BcrDqPEiqNKIF4V9xg33v4Va+JWBlv7x+Qoge7Yg+ymuI/sMtc1RS9qIK1A/h4ys8u3ZRc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714395012; c=relaxed/simple;
-	bh=3bCfWRhZDG5RMBFy4B87guz7rihAVZVJAV0wmeZj5N4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GK2t/OrTfyUjfSytyZcpRCBqdJiYDAS2kXhhyERXGxZ3ovHD1DByDq3fKvemGruu89ya41kOe8P8X9JRaLya+DZRr/5vJ15jM3ALtLuZ1M2pJt00QeOBWIkQmN9aC7RQ0xln4L8pLTv3CU8AcL63oXOj4e17wu1KRThAIYzT+iI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=gaM/NZtx; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=KWQYXuDuosAhIoS7yaKxvAY/333rDoKrL+wGRGUy7tE=; b=gaM/NZtxcxE+rJFwU11gku/dTr
-	LZ1qKm3fD6gW+U5HfTyktM1YdR8KwfbWY0Cc8HvD78fW/0gCK/c3NhXjNME5VumgoTQetM8ANuHXp
-	dp7zp+uGoEjqlSVtJ2+EoLcuPF3UPga7TVS+P2aeuk7FUnFp7uV/uq2kMxOLNG8BCs14=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1s1QSG-00EFdQ-UJ; Mon, 29 Apr 2024 14:50:00 +0200
-Date: Mon, 29 Apr 2024 14:50:00 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: MD Danish Anwar <danishanwar@ti.com>
-Cc: Dan Carpenter <dan.carpenter@linaro.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Jan Kiszka <jan.kiszka@siemens.com>,
-	Diogo Ivo <diogo.ivo@siemens.com>, Paolo Abeni <pabeni@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, srk@ti.com,
-	Vignesh Raghavendra <vigneshr@ti.com>, r-gunasekaran@ti.com,
-	Roger Quadros <rogerq@kernel.org>
-Subject: Re: [PATCH net-next v2] net: ti: icssg_prueth: Add SW TX / RX
- Coalescing based on hrtimers
-Message-ID: <e061956a-59e6-435e-99fe-6c6c7b2d6a5d@lunn.ch>
-References: <20240429071501.547680-1-danishanwar@ti.com>
+	s=arc-20240116; t=1714395135; c=relaxed/simple;
+	bh=pdAFVM/qnBIS1H9MPF0LH/pChAoh+tp5F7+U71Pkzdg=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Pusf2tWd6uyjmNGT5ExNkeCj6LWrKH5dOSPM8iPZ0z2v9rOvalV8YwExJGzuXA/L13TjA9IGsMUgdpnzSOwjBlcM0I4vFK5jwoY5ScxJfBdvfXm7x871LMXzqEoIo31Kcwa4eVzWdsZngqnpUn4BN7wFDgyG8Jtz03EVwFQ2viI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=ClwGfZEy; arc=none smtp.client-ip=217.70.183.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 9BD444000E;
+	Mon, 29 Apr 2024 12:52:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1714395125;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=pdAFVM/qnBIS1H9MPF0LH/pChAoh+tp5F7+U71Pkzdg=;
+	b=ClwGfZEyV24yncIWiggonM/ucJfSBqdQgHdnhKlvJa2cQhtgdCflYYjIK/oG3djeECtzxl
+	f/oq9VtM7oOjLZvbYP/EtF5mnlBsdhdtA5WMQjzXe69qALjL/Ug6idojlwieZOMxe3gf7K
+	sUt9XpIaMY6TTpwDPzKarvjx3kF3mh2uKouvX+SC9IHSGUBB90xkEJDNXC8tU/I3/9KuRq
+	Gn9klPmx79uNM/G/AfzL7t8eXdRy5RaqId0jLkZLxkX0GdB/W4+1wozAs6XzwdQ2TGoRzS
+	80C2oetRpk+cyscIcPGw6322msRskyO9w1B7jGDxnl21QSngQLNH/VzUN+uK+w==
+Date: Mon, 29 Apr 2024 14:52:03 +0200
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>, Mark Brown
+ <broonie@kernel.org>, Kyle Swenson <kyle.swenson@est.tech>, Liam Girdwood
+ <lgirdwood@gmail.com>, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Subject: Re: PoE complex usage of regulator API
+Message-ID: <20240429145203.219bee06@kmaincent-XPS-13-7390>
+In-Reply-To: <57a79abd-722c-4907-b0e7-2396392ae675@lunn.ch>
+References: <20240426124253.56fd0933@kmaincent-XPS-13-7390>
+	<57a79abd-722c-4907-b0e7-2396392ae675@lunn.ch>
+Organization: bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240429071501.547680-1-danishanwar@ti.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: kory.maincent@bootlin.com
 
-On Mon, Apr 29, 2024 at 12:45:01PM +0530, MD Danish Anwar wrote:
-> Add SW IRQ coalescing based on hrtimers for RX and TX data path for ICSSG
-> driver, which can be enabled by ethtool commands:
-> 
-> - RX coalescing
->   ethtool -C eth1 rx-usecs 50
-> 
-> - TX coalescing can be enabled per TX queue
-> 
->   - by default enables coalesing for TX0
->   ethtool -C eth1 tx-usecs 50
->   - configure TX0
->   ethtool -Q eth0 queue_mask 1 --coalesce tx-usecs 100
->   - configure TX1
->   ethtool -Q eth0 queue_mask 2 --coalesce tx-usecs 100
->   - configure TX0 and TX1
->   ethtool -Q eth0 queue_mask 3 --coalesce tx-usecs 100 --coalesce
-> tx-usecs 100
-> 
-> Minimum value for both rx-usecs and tx-usecs is 20us.
-> 
-> Compared to gro_flush_timeout and napi_defer_hard_irqs this patch allows
-> to enable IRQ coalescing for RX path separately.
-> 
-> Benchmarking numbers:
->  ===============================================================
-> | Method                  | Tput_TX | CPU_TX | Tput_RX | CPU_RX |
-> | ==============================================================
-> | Default Driver           943 Mbps    31%      517 Mbps  38%   |
-> | IRQ Coalescing (Patch)   943 Mbps    28%      518 Mbps  25%   |
->  ===============================================================
-> 
-> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
+On Sat, 27 Apr 2024 00:41:19 +0200
+Andrew Lunn <andrew@lunn.ch> wrote:
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> > Let's begin simple, in PSE world we are more talking about power.
+> > Would it be ok to add a regulator_get/set_power_limit() and
+> > regulator_get_power() callback to regulator API. Would regulator API ha=
+ve
+> > interest to such callbacks? =20
+>=20
+> Could you define this API in more details.
 
-    Andrew
+The first new PoE features targeted by this API was to read the consumed po=
+wer
+and get set the power limit for each ports. Yes mainly book keeping.
+Few drivers callbacks that will be called by ethtool and maybe the read of =
+power
+limit and consumed power could be add to read-only sysfs regulator.
+
+> I'm assuming this is mostly about book keeping? When a regulator is
+> created, we want to say is can deliver up to X Kilowatts. We then want
+> to allocate power to ports. So there needs to be a call asking it to
+> allocate part of X to a consumer, which could fail if there is not
+> sufficient power budget left. And there needs to be a call to release
+> such an allocation.
+
+This is more the aim of the second point I have raised, power priority and
+parent power budget. And how the core can manage it.
+
+> We are probably not so much interested in what the actual current
+> power draw is, assuming there is no wish to over provision?
+>=20
+> There is in theory a potential second user of this. Intel have been
+> looking at power control for SFPs. Typically they are guaranteed a
+> minimum of 1.5W. However, they can operate at higher power
+> classes. You can have boards with multiple SFPs, with a theoretical
+> maximum power draw more than what the supply can supply. So you need
+> similar sort of power budget book keeping to allocate power to an SFP
+> cage before telling the SFP module it can swap to a higher power
+> class. I say this is theoretical, because the device Intel is working
+> on has this hidden away in firmware. But maybe sometime in the future
+> somebody will want Linux doing this.
+
+So there is a potential second user, that's great to hear it! Could the
+priority stuff be also interesting? Like to allow only high priority SFP to=
+ use
+higher power class in case of a limiting power budget.
+
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
