@@ -1,152 +1,135 @@
-Return-Path: <netdev+bounces-92069-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92070-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D2A58B544A
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 11:32:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E0A18B5474
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 11:47:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 276CD280EE6
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 09:32:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D9B2B2834A8
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 09:47:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCDF722F19;
-	Mon, 29 Apr 2024 09:32:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 801BA24B34;
+	Mon, 29 Apr 2024 09:47:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="D5SIQ/B/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HQO5NSRt"
 X-Original-To: netdev@vger.kernel.org
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FDE117C60;
-	Mon, 29 Apr 2024 09:32:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56AFA29428;
+	Mon, 29 Apr 2024 09:47:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714383143; cv=none; b=U9FSmex0Mp0mGGqvUUWvq9F5vHvFXeDkaHjuI9UF2Kozm1hiS11uyhORfwUPOO7uIjmNjo5kPZULvnmcDWn4SQp+sPNwFnVE0Fm5SaEC5oSBvisqQqiRD9TPoepTKqSS9vap/Ut7Il2glnOaQBXDxc13fprgaXV7bx+vTpGYNmw=
+	t=1714384043; cv=none; b=BBWUVq7JkqyU2wA4K3/Sn69KFFcgNUx209a83zY75sHDbmcifL/Ke3hoM5sl6eZmFww+/Eq45weaj4+EC4v3WZrxQpzLuoYJLQ2P7Xnn5qWAkOtaFvaWAeRzI7BWv5W6pWnG6j/k8k0uOJKcyYnGTNyj9EhuwcYa+4ckKqT05wQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714383143; c=relaxed/simple;
-	bh=XNloNzoCKfywSthQl66EQHHudIv1fxwmL/2J+3y+tLg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sn+C8b8XPV8og0GbkbAOr+quzAI1VADILkWhnqLZS8rAZPl1Vv02RZbwFxXedr+GnH+L7XjI8NyoByMiQ0OP+QXalmcYUjYq/EAJmPdHtX/x7uQiTZUS4z0qulSnY/dj9OsjH/mAq1p/QwlIzNGYhbt2SdzRPOfD2+/AIYUapx8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=D5SIQ/B/; arc=none smtp.client-ip=85.214.62.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from wsk (85-222-111-42.dynamic.chello.pl [85.222.111.42])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-	(No client certificate requested)
-	(Authenticated sender: lukma@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id 47F3188921;
-	Mon, 29 Apr 2024 11:32:18 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1714383140;
-	bh=681o/mJoNfUKWFCVcPu8QnHizCVqw29Eqq6HLhF92TY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=D5SIQ/B/UmDW/iri0AZWnFo/QNGXmXo+z5QJ5Y0BrYaoW2UWkzL9LGh4FllXPjbAR
-	 +eVHr7GYOxKMaa3saUZlR2PEWyB4Z4LCS5qrOiwiKlPMyib87wFh6+mLqV8uXVkR0Z
-	 6o4LNzL7nyB5CvbFIgn52nbYFcWnz3rU30ZZUq71JnkYqgeahkyQiT9+JwjhRjLssO
-	 rJqN86Pzv4ZrYPqwu8vvVBxh9Q4TaUhRGRubZ9U2HKP7yXnOZf5zrPq7HyGTRi9dB5
-	 BnGZpOgJELbLwwVmE5m+R0MjwRsxx1o+8JmASvYiXWcrz/3gMR5nu6ataH3TxQ0V/2
-	 Y5fPoES6hmfQQ==
-Date: Mon, 29 Apr 2024 11:32:17 +0200
-From: Lukasz Majewski <lukma@denx.de>
-To: Casper Andersson <casper.casan@gmail.com>
-Cc: netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn
- <andrew@lunn.ch>, Eric Dumazet <edumazet@google.com>, Vladimir Oltean
- <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, Jakub
- Kicinski <kuba@kernel.org>, Oleksij Rempel <o.rempel@pengutronix.de>,
- Tristram.Ha@microchip.com, Sebastian Andrzej Siewior
- <bigeasy@linutronix.de>, Ravi Gunasekaran <r-gunasekaran@ti.com>, Simon
- Horman <horms@kernel.org>, Nikita Zhandarovich <n.zhandarovich@fintech.ru>,
- Murali Karicheri <m-karicheri2@ti.com>, Jiri Pirko <jiri@resnulli.us>, Dan
- Carpenter <dan.carpenter@linaro.org>, Ziyang Xuan
- <william.xuanziyang@huawei.com>, Shigeru Yoshida <syoshida@redhat.com>,
- "Ricardo B. Marliere" <ricardo@marliere.net>, linux-kernel@vger.kernel.org
-Subject: Re: [net-next PATCH v5 1/4] net: hsr: Provide RedBox support
- (HSR-SAN)
-Message-ID: <20240429113217.0fb8d6d7@wsk>
-In-Reply-To: <8634rho41l.fsf@gmail.com>
-References: <20240415124928.1263240-1-lukma@denx.de>
-	<20240415124928.1263240-2-lukma@denx.de>
-	<86mspt7glf.fsf@gmail.com>
-	<20240416150359.7362c762@wsk>
-	<86bk66hjyf.fsf@gmail.com>
-	<20240418173706.206e6a2f@wsk>
-	<86mspploa3.fsf@gmail.com>
-	<20240419124223.2388295d@wsk>
-	<8634rho41l.fsf@gmail.com>
-Organization: denx.de
-X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1714384043; c=relaxed/simple;
+	bh=NM6evQjYLnroF7Q2T+xgCdVK89+I3dLZ0fOu5qXvXuU=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=UhQ0TKnm5jBNtUyYt8Gd2PqzhbHOEMwktNnpjYzrntojKXjTJsN6luQbpm32q4+I2dol875t/Hp/FeiOnw7ZHclIlibLlHJSeYEOoU1kH1q65sqhJSljSSMfNcYUys6n1xUxSPLLxfeRAuVmkouL1+SYZaFxurcwYSmsw8Jktlc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HQO5NSRt; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id D5BC3C113CD;
+	Mon, 29 Apr 2024 09:47:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714384042;
+	bh=NM6evQjYLnroF7Q2T+xgCdVK89+I3dLZ0fOu5qXvXuU=;
+	h=From:Date:Subject:To:Cc:Reply-To:From;
+	b=HQO5NSRtsNRAd5p8HtrxVIvFV7XzARyZBhe/9abXPitkqGgLwjgaGobgZzj2fr3Jy
+	 RNn4H9TdrU4r/kk0QoKFDGhYwSmj0TgUmsFo9C9qRWGC2bw9qEIUG+aCl6vrQBwn1P
+	 XtLiU54iDeVX4hRj/xByeoStQ79orF44wjz6Q/vQ1UV/5x374iDJEzDKCx40f13WVT
+	 TT0eyFag8yE14sQCNZG0aev1ppupFq1bIQE75Zft/x5c5Y+q4x0SSLc2IxrYRrDIBj
+	 573WNaIabG42dmqeAxKNxQgTNLUu04shvXv8ccuvOsN6lG1eyGAZ1bMyEpSff7b0l0
+	 uOfO8kJDq1wmQ==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5010C4345F;
+	Mon, 29 Apr 2024 09:47:22 +0000 (UTC)
+From: =?utf-8?q?Ar=C4=B1n=C3=A7_=C3=9CNAL_via_B4_Relay?= <devnull+arinc.unal.arinc9.com@kernel.org>
+Date: Mon, 29 Apr 2024 12:46:43 +0300
+Subject: [PATCH net-next] net: dsa: mt7530: detect PHY muxing when PHY is
+ defined on switch MDIO bus
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/C6CorqEZXRzDpTNmg9+Lr3=";
- protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Message-Id: <20240429-b4-for-netnext-mt7530-use-switch-mdio-bus-for-phy-muxing-v1-1-1f775983e155@arinc9.com>
+X-B4-Tracking: v=1; b=H4sIAIJsL2YC/x3NQQ6DIBCF4auYWXcSRNDaq5guqo4yC8AAtjTGu
+ 5e6/JOX7x0QKTBFeFQHBHpzZO9K1LcKJvNyKyHPpUEKqYSSPY4KFx/QUXKUE9rU6UbgHgnjh9N
+ k0M7scdzjNdvMF+2e2a2o761s+6arJ62h8FughfN1PUDh8O/B8zx/gMKG6ZQAAAA=
+To: Daniel Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>, 
+ Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>, 
+ Florian Fainelli <f.fainelli@gmail.com>, 
+ Vladimir Oltean <olteanv@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Matthias Brugger <matthias.bgg@gmail.com>, 
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Cc: Bartel Eerdekens <bartel.eerdekens@constell8.be>, 
+ mithat.guner@xeront.com, erkin.bozoglu@xeront.com, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+ linux-mediatek@lists.infradead.org, 
+ =?utf-8?q?Ar=C4=B1n=C3=A7_=C3=9CNAL?= <arinc.unal@arinc9.com>
+X-Mailer: b4 0.13.0
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1714384017; l=1737;
+ i=arinc.unal@arinc9.com; s=arinc9-patatt; h=from:subject:message-id;
+ bh=aV0b87E50oYhQ0oa+qVZ0uBYjOG8eoZT/UzGqSKMX+s=;
+ b=Nq09mU0p4YPp/xi2o2FjpG+iFQnXvtEU3rSX2+/m1lN0qfURodE/M/xzNPYmVb0YMAjA29jt+
+ mrN3+nAmij2A4jISevUV4uDaSgAoMYbC1kaiDm0ucx49S8SbqUYx8X2
+X-Developer-Key: i=arinc.unal@arinc9.com; a=ed25519;
+ pk=VmvgMWwm73yVIrlyJYvGtnXkQJy9CvbaeEqPQO9Z4kA=
+X-Endpoint-Received: by B4 Relay for arinc.unal@arinc9.com/arinc9-patatt
+ with auth_id=115
+X-Original-From: =?utf-8?q?Ar=C4=B1n=C3=A7_=C3=9CNAL?= <arinc.unal@arinc9.com>
+Reply-To: arinc.unal@arinc9.com
 
---Sig_/C6CorqEZXRzDpTNmg9+Lr3=
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+From: Arınç ÜNAL <arinc.unal@arinc9.com>
 
-Hi Casper,
+Currently, the MT7530 DSA subdriver configures the MT7530 switch to provide
+direct access to switch PHYs, meaning, the switch PHYs listen on the MDIO
+bus the switch listens on. The PHY muxing feature makes use of this.
 
-> >
-> > Hmm... I'm wondering how "proxy" is implemented then.
-> > Also, what is the purpose of ProxyNodeTable in that case? =20
->=20
-> The ProxyNodeTable becomes the same as the MAC table for the interlink
-> port. I.e. normal MAC learning, when a frame is sent by a SAN and
-> received on interlink the HW learns that that SMAC is on the interlink
-> port (until it ages out).=20
+This is problematic as the PHY may be probed before the switch is
+initialised, in which case attaching the PHY will fail.
 
-+1
+Since commit 91374ba537bd ("net: dsa: mt7530: support OF-based registration
+of switch MDIO bus"), we can describe the switch PHYs on the MDIO bus of
+the switch on the device tree. Extend the check to detect PHY muxing when
+the PHY is defined on the MDIO bus of the switch on the device tree.
 
-> This table can be read out and used for
-> supervision frames.
->=20
+When the PHY is described this way, the switch will be initialised first,
+then the switch MDIO bus will be registered. Only after these steps, the
+PHY will be probed.
 
-I've go through the standard again and it looks like it is mandatory
-for RedBox to send supervisory frames with MAC addresses from
-ProxyNodeTable as its payload. Moreover, the RedBox MAC address shall
-be also send as the second (i.e. following) payload in this frame.
+Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
+---
+ drivers/net/dsa/mt7530.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-The current RedBox (from net-next) needs to be extended to support it
- - I've started working on this.
+diff --git a/drivers/net/dsa/mt7530.c b/drivers/net/dsa/mt7530.c
+index 2b9f904a98f0..6cf21c9d523b 100644
+--- a/drivers/net/dsa/mt7530.c
++++ b/drivers/net/dsa/mt7530.c
+@@ -2483,7 +2483,8 @@ mt7530_setup(struct dsa_switch *ds)
+ 			if (!phy_node)
+ 				continue;
+ 
+-			if (phy_node->parent == priv->dev->of_node->parent) {
++			if (phy_node->parent == priv->dev->of_node->parent ||
++			    phy_node->parent->parent == priv->dev->of_node) {
+ 				ret = of_get_phy_mode(mac_np, &interface);
+ 				if (ret && ret != -ENODEV) {
+ 					of_node_put(mac_np);
 
-> Though, the NodesTable I don't think is used in HW. As I understand
-> it's an optional feature.
-
-+1
-
+---
+base-commit: 5c4c0edca68a5841a8d53ccd49596fe199c8334c
+change-id: 20240429-b4-for-netnext-mt7530-use-switch-mdio-bus-for-phy-muxing-586269371c55
 
 Best regards,
+-- 
+Arınç ÜNAL <arinc.unal@arinc9.com>
 
-Lukasz Majewski
 
---
-
-DENX Software Engineering GmbH,      Managing Director: Erika Unter
-HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
-Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
-
---Sig_/C6CorqEZXRzDpTNmg9+Lr3=
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmYvaSEACgkQAR8vZIA0
-zr2klgf9FsTRrBZ8kpx4smbAThax9QN7aEiGWidRjn19R88sc8gDaGp0I3DCWs/c
-uGcLx/7VwFQwjj5FqCxfwWbus7+1Wo3B67dNU62U0TCpN9fqtKeHLFNgtjqStrOO
-Q8E3g+pWwvTQFar+FTOSAzmExX4R7eK3BAlq8bFsTT4nd3ET030lVRa/sisDOhWi
-RMWHKCea7svwuOYV45dYwzlfXdu0hx8Y7cGUHBmbp8zxcfKN+MJa+ktWwdqNgUPn
-xAGGvo4IAzluqbzjNZjaeok1uML4nw8Vm6g/FigO0fM1JylKawhwyy9HpxZhh0jF
-zxo+jvH+MSVrvg4Hsh1AzWUUeyqfww==
-=H3gL
------END PGP SIGNATURE-----
-
---Sig_/C6CorqEZXRzDpTNmg9+Lr3=--
 
