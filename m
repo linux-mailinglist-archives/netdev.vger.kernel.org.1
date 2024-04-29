@@ -1,89 +1,83 @@
-Return-Path: <netdev+bounces-92238-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92239-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F7418B616D
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 20:52:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81E0C8B6177
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 20:56:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 916FF1C2199F
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 18:52:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3DEC72825B5
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 18:56:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB65913AA31;
-	Mon, 29 Apr 2024 18:52:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CF2813AA3E;
+	Mon, 29 Apr 2024 18:56:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LY5C0fF/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EimzHSED"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7A681E529
-	for <netdev@vger.kernel.org>; Mon, 29 Apr 2024 18:52:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B0EC839FD;
+	Mon, 29 Apr 2024 18:56:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714416720; cv=none; b=GCB+VUTSqVqNJgnT7aqNqEBb2AgrBDzUhA/fo1cdu2UiPiwPRyZ5Bi/2F0LFdW0D4rQZ4X70E1JQfFl+7Yn6Mq+5jt43p8jxsXb+B7HROIvLjL6QDDkAYhaQ1SH9dmwmbi1ECR2vTh7p2tZL5Rt3ZDPiCRNHH/uelbOkPzHrjo8=
+	t=1714417005; cv=none; b=K77mfcvxteRxhrbHMQ4W+ZpkH4VNNFDOfDsXMpdx4Gg1zdob/HHrjSvHbaD5XsG3GmpNbOOogm8GzFnGWvjaskpYFHcKXZt6Gm1EaRnd8bsDIag0yaVQZWYRZMEu/HFQYl5X68fBI5fRXT1lkDOhavcCik+SokqrtQlFiw+YJdo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714416720; c=relaxed/simple;
-	bh=4kwN+5xyXnMW3XybXTZ2reHGMB/y/8/HbmYBixznca0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=C2YpiYGVzwtrMqqk8EWE5+3VxtJNBks4K8sPcHP/aDl8yaGNr0JbhWPT+yHc4GaJm+R63FHfsAHxICgwJCUkr6O/ptuhO+YtCzQLYMJvz77t9pRFtu0gE57/+a8vldpNtrt7ajrJbTi59mve1MFEkNFfUXjmnAuuGqwuKAJiDis=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LY5C0fF/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D59ABC113CD;
-	Mon, 29 Apr 2024 18:51:59 +0000 (UTC)
+	s=arc-20240116; t=1714417005; c=relaxed/simple;
+	bh=H9Q95f6F5LwV4K5g2LuL9fA176ugt3P9s6YgDq8alk8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=euihEI5Mz3I2vN53AvYJiLf/7z3BEZT5QHvUKviYkRXD9suFaC4CpXBqsqObub5IC82CfDMAavkumTy2Lms6T4dMkK4h/51MxejWMr8ZJRF76aDdyFJrKhNLK6lFP5Q9LEQ9+KcbEyju0TiENkGuj+EW+Ue0EFeiMRccNr7Wrvk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EimzHSED; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 29FDBC113CD;
+	Mon, 29 Apr 2024 18:56:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714416720;
-	bh=4kwN+5xyXnMW3XybXTZ2reHGMB/y/8/HbmYBixznca0=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=LY5C0fF/XTb0t0EMRRXZTvde0ME3hl7+m08ogN3uCYSy+t2fU2yXiaHFLiYQiN3IA
-	 51IOjmB/oZFRDmNCgSsZqkZDswYjbSqUKJSZcqzwLQ7JPte91S1e4JVIF5zKjFwUbG
-	 HLVt9OGPEBrfX6Zf1yoxItso3M9CUOCdHVBouR7EmryofgQalCTleWlacGN5+EIpPS
-	 BDj9F22Kqzohns/CpG0Ez6qUV2qkbvasqDeJa4DgYRJ1eouCZ3lNV5jF1pwOdDOFlE
-	 aLc7NitTrYok/5evP3ED2wEVg20TpTwX3jv1Rt2hk5wXLkGvTjkJjFBJmj5uSysQCm
-	 lxfV/EIUodKRw==
-Message-ID: <06e75c94-1015-404b-ae41-2ef3bfa34352@kernel.org>
-Date: Mon, 29 Apr 2024 12:51:59 -0600
+	s=k20201202; t=1714417004;
+	bh=H9Q95f6F5LwV4K5g2LuL9fA176ugt3P9s6YgDq8alk8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=EimzHSEDVJ1X8wTQ/hEZh1CZyDeCB+JCrErM3IC3+QROiosYV62WhVkC8SVmKZhMC
+	 NVSBNCuVCMLrzsfCt4R8bkLP8drNYN7d3d69RR6lPUES41rkQWmb9R2+Fzsq5k+AJH
+	 XjSbYFT/MsdtYdjPJDoadTjYiYN3p7FkF20/tNJKgFd+YRn4/xJEQSRDow9d0t8Lj8
+	 SZu6SpHy4AN+Y6QdJJiQKZkLExyehFWLyYQabpp73zH4DGiKWkQ32qF+P35mCdVe3s
+	 K6TDWhqgTNy3NLfKSX9voLvOG9VOb0M7PC0IHHCTjMwZmqHKk0acxKr7HY4+lj7BIl
+	 pD9laMsz5PUcA==
+Date: Mon, 29 Apr 2024 11:56:43 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Stephen Rothwell <sfr@canb.auug.org.au>
+Cc: Daniel Borkmann <daniel@iogearbox.net>, Alexei Starovoitov
+ <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, David Miller
+ <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, bpf
+ <bpf@vger.kernel.org>, Networking <netdev@vger.kernel.org>, Linux Kernel
+ Mailing List <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>, Martin KaFai Lau <martin.lau@kernel.org>,
+ Puranjay Mohan <puranjay12@gmail.com>, Puranjay Mohan <puranjay@kernel.org>
+Subject: Re: linux-next: manual merge of the bpf-next tree with the net tree
+Message-ID: <20240429115643.7df77e08@kernel.org>
+In-Reply-To: <20240429114939.210328b0@canb.auug.org.au>
+References: <20240429114939.210328b0@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] ipv6: anycast: use call_rcu_hurry() in aca_put()
-Content-Language: en-US
-To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com
-References: <20240429183643.2029108-1-edumazet@google.com>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20240429183643.2029108-1-edumazet@google.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On 4/29/24 12:36 PM, Eric Dumazet wrote:
-> This is a followup of commit b5327b9a300e ("ipv6: use
-> call_rcu_hurry() in fib6_info_release()").
-> 
-> I had another pmtu.sh failure, and found another lazy
-> call_rcu() causing this failure.
-> 
-> aca_free_rcu() calls fib6_info_release() which releases
-> devices references.
-> 
-> We must not delay it too much or risk unregister_netdevice/ref_tracker
-> traces because references to netdev are not released in time.
-> 
-> This should speedup device/netns dismantles when CONFIG_RCU_LAZY=y
-> 
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> ---
->  net/ipv6/anycast.c | 5 ++---
->  1 file changed, 2 insertions(+), 3 deletions(-)
-> 
+On Mon, 29 Apr 2024 11:49:39 +1000 Stephen Rothwell wrote:
+>  +u64 __weak bpf_arch_uaddress_limit(void)
+>  +{
+>  +#if defined(CONFIG_64BIT) && defined(CONFIG_ARCH_HAS_NON_OVERLAPPING_ADDRESS_SPACE)
+>  +	return TASK_SIZE;
+>  +#else
+>  +	return 0;
+>  +#endif
+>  +}
+>  +
+> + bool __weak bpf_jit_supports_insn(struct bpf_insn *insn, bool in_arena)
+> + {
+> + 	return false;
+> + }
 
-Reviewed-by: David Ahern <dsahern@kernel.org>
-
-
+Thanks! FTR I plan to used the inverse order, if that matters..
 
