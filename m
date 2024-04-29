@@ -1,167 +1,120 @@
-Return-Path: <netdev+bounces-92205-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92206-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6829C8B5F26
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 18:36:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94E2B8B5F27
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 18:36:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8A0D0B21F96
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 16:36:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9EF921C2199D
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 16:36:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EA8185933;
-	Mon, 29 Apr 2024 16:36:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6441F85922;
+	Mon, 29 Apr 2024 16:36:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NhL5vx+7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WDHwpBwM"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B3C71DA23
-	for <netdev@vger.kernel.org>; Mon, 29 Apr 2024 16:36:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 352EE84E1B;
+	Mon, 29 Apr 2024 16:36:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714408595; cv=none; b=btUxaM+TLulncY/Mi8E+uX4zePNvzNZTFkgtBqCxrGf+fXxdUTsfit5bqQr1KR1oftSImOQPI8k5PtqnKNpsLtfLw2+rIi2Sld6rsVveAH2ttstsAh3axTS0TZ/jfGaiscROF7VrsePV+HouQj/6acR9x04sBRsO9Wbquwx6aGg=
+	t=1714408598; cv=none; b=n4TYRqOLE863M5/+dOKeIV0NxB7WEfr7XZnWatqHCSUW3ilkl/q9nK9G9iDR0QS98TWArBjvEP8kqrj3hNLMwT9wogxX+4IKFL3U+bHk+/BUFVgft5mWDRLn8aUL0fHv9Wysq1Xfs9PYp5rOHdzw2OjzvQoA0AZZdjn2uhW4Ko4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714408595; c=relaxed/simple;
-	bh=WYvfWnsRpu0RLSxmTgg+qqm5H1A6I0HfRFjKBasBoFw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QdryU8iaK/+88Yg/v6pGWuK4a73AYG0+ZMJGhHSecNf3HZ/vDeO1fDzV1nDiBBJldPvK7s6sbcSOt/5r2neFd4BZYaMBdrWK8sLR9A4rjiXhK5SpxHZB7xd4w3pis/tUexoQdAcQvUmLFha2kmKLCKgd7qYxUQWSqWn75CUiIPo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NhL5vx+7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D00E4C113CD;
-	Mon, 29 Apr 2024 16:36:33 +0000 (UTC)
+	s=arc-20240116; t=1714408598; c=relaxed/simple;
+	bh=fgSKb2lwvDBvPMmVmRJwxhth9YzFQDQdsEr9HfbL5yE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iibVxYdeWYCp+ibUpkPiYDdiXuSWw1fdp7e5pwIRY4zDH8qwxJU8hmq4cCBQPelHS5hxxMk11WlDszwENfJn0HM/WJpMZ28Q2gRnHOSj9v3hoZ1i52HcJXnNN77tlhfgU3L68OQr/0yNoZDZRq3AofEGCCorpj1UCIcytHkWxn0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WDHwpBwM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EA721C4AF18;
+	Mon, 29 Apr 2024 16:36:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714408595;
-	bh=WYvfWnsRpu0RLSxmTgg+qqm5H1A6I0HfRFjKBasBoFw=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=NhL5vx+7+iFM8jtr2hzWosvjiPdS79Y4VRbMlvAx57bK8Ez9KLT5NxtJv2oBBzjoX
-	 9UvNupF2K1DA38KkPuwIxuWTC2gPD0TNZAKyZPA6ogMj+v8hJFyGIzNxqNkoWdcTRH
-	 AxywmiZTi9RHliu4fbJmbB7/xjlyGvuwGsilvvaQ2bgdlMTVCfezSDPXLa6FeqCdXO
-	 d3oi7GoOnPNlO7sNweB85/0Ac/MyCmBuqqvejoXVHW63OTQ2gFYD//L0TSbFsZCDrN
-	 1BGyFyaBqqqbSRVXBm2yG3OamJLQ6+PxQc7/ciyX50F6DyjPCSgjxIrCkgvJQFv4SD
-	 3K7Ihb+Gvd75w==
-From: =?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>
-To: netdev@vger.kernel.org,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>
-Cc: =?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>
-Subject: [PATCH net-next 2/2] net: dsa: update the unicast MAC address when changing conduit
-Date: Mon, 29 Apr 2024 18:36:27 +0200
-Message-ID: <20240429163627.16031-3-kabel@kernel.org>
-X-Mailer: git-send-email 2.43.2
-In-Reply-To: <20240429163627.16031-1-kabel@kernel.org>
-References: <20240429163627.16031-1-kabel@kernel.org>
+	s=k20201202; t=1714408597;
+	bh=fgSKb2lwvDBvPMmVmRJwxhth9YzFQDQdsEr9HfbL5yE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=WDHwpBwM0YY0dIOhxTwSvBih1XHfmxFemrNC7H1vsZlRU9dtpxx+3aGi8e6qGXSet
+	 ++0V0LqyYXCYxdCJbv/FJtIqcUxL+tIm9bLc9lziMj1QFk6JJo9oG4MP7R25D9+gWS
+	 GoFcqyCB2oYcF45xMN1Tfvgf6YxbNmKJTXlPFDTgsNektWqutM5oXTGFPrsX+xLBsc
+	 9HAYUsH4KqkjGYt9dy3SWzopNfYlE9svOuR7WTvN12yJqF15MLOSDDKSq6Mj80iLUw
+	 RswJOryh47sAEEpxriPPbqALSbvVRmP2UmXWDXO12grOycXywOeSNeUgx3EO6hy+17
+	 fbvSEa5+nanbg==
+Date: Mon, 29 Apr 2024 17:36:30 +0100
+From: Simon Horman <horms@kernel.org>
+To: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, saeedm@nvidia.com, anthony.l.nguyen@intel.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	andrew@lunn.ch, corbet@lwn.net, linux-doc@vger.kernel.org,
+	robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
+	conor+dt@kernel.org, devicetree@vger.kernel.org,
+	horatiu.vultur@microchip.com, ruanjinjie@huawei.com,
+	steen.hegelund@microchip.com, vladimir.oltean@nxp.com,
+	UNGLinuxDriver@microchip.com, Thorsten.Kummermehr@microchip.com,
+	Pier.Beruto@onsemi.com, Selvamani.Rajagopal@onsemi.com,
+	Nicolas.Ferre@microchip.com, benjamin.bigler@bernformulastudent.ch
+Subject: Re: [PATCH net-next v4 02/12] net: ethernet: oa_tc6: implement
+ register write operation
+Message-ID: <20240429163630.GA516117@kernel.org>
+References: <20240418125648.372526-1-Parthiban.Veerasooran@microchip.com>
+ <20240418125648.372526-3-Parthiban.Veerasooran@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240418125648.372526-3-Parthiban.Veerasooran@microchip.com>
 
-DSA exhibits different behavior regarding the primary unicast MAC
-address stored in port standalone FDB and the conduit device UC
-database while the interface is down vs up.
+On Thu, Apr 18, 2024 at 06:26:38PM +0530, Parthiban Veerasooran wrote:
+> Implement register write operation according to the control communication
+> specified in the OPEN Alliance 10BASE-T1x MACPHY Serial Interface
+> document. Control write commands are used by the SPI host to write
+> registers within the MAC-PHY. Each control write commands are composed of
+> a 32 bits control command header followed by register write data.
+> 
+> The MAC-PHY ignores the final 32 bits of data from the SPI host at the
+> end of the control write command. The write command and data is also
+> echoed from the MAC-PHY back to the SPI host to enable the SPI host to
+> identify which register write failed in the case of any bus errors.
+> Control write commands can write either a single register or multiple
+> consecutive registers. When multiple consecutive registers are written,
+> the address is automatically post-incremented by the MAC-PHY. Writing to
+> any unimplemented or undefined registers shall be ignored and yield no
+> effect.
+> 
+> Signed-off-by: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
 
-If we put a switch port down while changing the conduit with
-  ip link set sw0p0 down
-  ip link set sw0p0 type dsa conduit conduit1
-  ip link set sw0p0 up
-we delete the address in dsa_user_close() and install the (possibly
-different) address dsa_user_open().
+...
 
-But when changing the conduit on the fly, the old address is not
-deleted and the new one is not installed.
+> diff --git a/drivers/net/ethernet/oa_tc6.c b/drivers/net/ethernet/oa_tc6.c
 
-Since we explicitly want to support live-changing the conduit, uninstall
-the old address before the dsa_port_change_conduit() call and install
-the (possibly different) new one afterwards.
+...
 
-Because the dsa_user_change_conduit() call tries to smoothly restore the
-old conduit if anything fails while setting new one (except the MTU
-change), this leaves us with the question about what to do if the
-installation of the new address fails. Since we have already deleted the
-old address, we can expect that restoring the old address would also fail,
-and thus we can't revert the conduit change correctly. I have therefore
-decided to treat it as a fatal error printed into the kernel log.
+> +/**
+> + * oa_tc6_write_registers - function for writing multiple consecutive registers.
+> + * @tc6: oa_tc6 struct.
+> + * @address: address of the first register to be written in the MAC-PHY.
+> + * @value: values to be written from the starting register address @address.
+> + * @length: number of consecutive registers to be written from @address.
+> + *
+> + * Maximum of 128 consecutive registers can be written starting at @address.
+> + *
+> + * Returns 0 on success otherwise failed.
 
-Fixes: 95f510d0b792 ("net: dsa: allow the DSA master to be seen and changed through rtnetlink")
-Signed-off-by: Marek Behún <kabel@kernel.org>
----
- net/dsa/user.c | 45 +++++++++++++++++++++++++++++++++++++--------
- 1 file changed, 37 insertions(+), 8 deletions(-)
+Nit: I think you need a ':' after "Returns" (or "Return")
+     in order for kernel-doc -Wall to recognise this as a return section.
 
-diff --git a/net/dsa/user.c b/net/dsa/user.c
-index b1d8d1827f91..70d7be1b6a79 100644
---- a/net/dsa/user.c
-+++ b/net/dsa/user.c
-@@ -2767,9 +2767,37 @@ int dsa_user_change_conduit(struct net_device *dev, struct net_device *conduit,
- 	if (err)
- 		goto out_revert_old_conduit_unlink;
- 
-+	/* If live-changing, we also need to uninstall the user device address
-+	 * from the port FDB and the conduit interface. This has to be done
-+	 * before the conduit is changed.
-+	 */
-+	if (dev->flags & IFF_UP)
-+		dsa_user_host_uc_uninstall(dev);
-+
- 	err = dsa_port_change_conduit(dp, conduit, extack);
- 	if (err)
--		goto out_revert_conduit_link;
-+		goto out_revert_host_address;
-+
-+	/* If the port doesn't have its own MAC address and relies on the DSA
-+	 * conduit's one, inherit it again from the new DSA conduit.
-+	 */
-+	if (is_zero_ether_addr(dp->mac))
-+		eth_hw_addr_inherit(dev, conduit);
-+
-+	/* If live-changing, we need to install the user device address to the
-+	 * port FDB and the conduit interface. Since the device address needs to
-+	 * be installed towards the new conduit in the port FDB, this needs to
-+	 * be done after the conduit is changed.
-+	 */
-+	if (dev->flags & IFF_UP) {
-+		err = dsa_user_host_uc_install(dev, dev->dev_addr);
-+		if (err) {
-+			netdev_err(dev,
-+				   "fatal error installing new host address: %pe\n",
-+				   ERR_PTR(err));
-+			return err;
-+		}
-+	}
- 
- 	/* Update the MTU of the new CPU port through cross-chip notifiers */
- 	err = dsa_user_change_mtu(dev, dev->mtu);
-@@ -2779,15 +2807,16 @@ int dsa_user_change_conduit(struct net_device *dev, struct net_device *conduit,
- 			    ERR_PTR(err));
- 	}
- 
--	/* If the port doesn't have its own MAC address and relies on the DSA
--	 * conduit's one, inherit it again from the new DSA conduit.
--	 */
--	if (is_zero_ether_addr(dp->mac))
--		eth_hw_addr_inherit(dev, conduit);
--
- 	return 0;
- 
--out_revert_conduit_link:
-+out_revert_host_address:
-+	if (dev->flags & IFF_UP) {
-+		err = dsa_user_host_uc_install(dev, dev->dev_addr);
-+		if (err)
-+			netdev_err(dev,
-+				   "fatal error restoring old host address: %pe\n",
-+				   ERR_PTR(err));
-+	}
- 	netdev_upper_dev_unlink(conduit, dev);
- out_revert_old_conduit_unlink:
- 	netdev_upper_dev_link(old_conduit, dev, NULL);
--- 
-2.43.2
+Likewise elsewhere in this patch(set).
 
+> + */
+> +int oa_tc6_write_registers(struct oa_tc6 *tc6, u32 address, u32 value[],
+> +			   u8 length)
+> +{
+
+...
 
