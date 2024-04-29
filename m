@@ -1,121 +1,109 @@
-Return-Path: <netdev+bounces-92236-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92237-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF42B8B6132
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 20:36:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 282E08B616C
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 20:51:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1749FB21275
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 18:36:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BD5191F22C10
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 18:51:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA40F12A146;
-	Mon, 29 Apr 2024 18:36:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E932D13AA31;
+	Mon, 29 Apr 2024 18:51:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SMH/AINQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fDLhzZF2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57A2E8592B
-	for <netdev@vger.kernel.org>; Mon, 29 Apr 2024 18:36:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C56F7127E20
+	for <netdev@vger.kernel.org>; Mon, 29 Apr 2024 18:51:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714415806; cv=none; b=vDQujew91u/bb54dmNgtLWetEIguKoY+mER8W/x4nv6jLDatlKccZGntKIhdc+ZEznub9Hx3mDltsrXrNFnNU6R4hG5b/jabkqrVYm697HkUn4izfT2BgQYn/Xf9+Y71fy2koVYBnwxmxM1JKk1LxeP3yRxlwnNaEMPDyg4ycu4=
+	t=1714416702; cv=none; b=A6NquClxYWeGvjYpbnc+bHV+met9LS5TemoTdJ4NcrSsRTw6N1OAJoI1pRoh4axasl8jHeN2E+MwpxRfa3miaTKqWgeeNiQ6lr286bs5goOek9VeROfQ/2brnwSNj5enylZOmedwrLeFWK+/9J8cAe4qcOOu/fkRPGLPp2/aAVo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714415806; c=relaxed/simple;
-	bh=/9yF00uPTY45eY+mtMWXUdod+TyzSQg4k6Wsi0nYkig=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=jEG1KjW+znKTQD5mPsvjJzbG0f39+UAhG/dpWI2A1+U5QSGrAzGp7NE1klYoZT/67mUcp7R0IxmiVRDhJLDiMLCd2fja+ucBC7LBbJdKkJ8OZVjd9mcJFPJzvqW+2x7/ia1xr3nad+siKu1T4ig0hyXbYw1ckvPCkqn1uyhjr48=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SMH/AINQ; arc=none smtp.client-ip=209.85.128.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-618891b439eso74886807b3.3
-        for <netdev@vger.kernel.org>; Mon, 29 Apr 2024 11:36:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1714415804; x=1715020604; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=WKIA6swcPY3s1b77BB4hvTzuXbmWGFcpA5AbXMeeSRw=;
-        b=SMH/AINQegX8dPbPNdDPI4GPwdrOzsFCf/N6OCT4Xnb+fa+8Ho5eR6+HsAMKqvDy+4
-         rd+/EejmivV6wsX/+ko1jG4gZ4c6o1uBhmJ3uHGAzAOT+m+nF+eOLYJXXXy0ynkpa4G/
-         1n8IjuD3b917u47Wq+M9NcmizyElWbfx4t/k1HTASlUtybfa1/N/yo98sF6lF3ewzaAM
-         j6/PYDFafckXiXtW2P5krxYGrcmNEZpBLpvBxbLa74KjLqcy3FBf5DhNgW1rDPhbaizi
-         P4Z0PNP0/gxx7OMmzSME6HfvFwU8cZUqroZ8J41UKcQTj1mrY5rQ3gh2JHY9bUqtBIgD
-         CxHg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714415804; x=1715020604;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=WKIA6swcPY3s1b77BB4hvTzuXbmWGFcpA5AbXMeeSRw=;
-        b=PaZNvp0oQXg9be2KjMY3ic+QGO/BdlJjJH4mAse0Dfo/ElDZ6fquNGcXDg5i8McFEa
-         bdJ5k4qTPhLtidAqF5/85q1aYwS52gLnNszqR3LG0pjuNwR7iNq0o1dTa3AQbJzxxFwX
-         gfJnrEV/6z9qnd780VDEDYTbHCrAQtF0JeXVNWnQSqtXyQml8Lm1A/SNlH97sAhkdCgn
-         5P4x8ewEZkPFtgPKg4ZpT8DIS84Cf3O657E/Il185OeOxEAWb9ekPm5Mkcb51YD9UMgG
-         v8OOa4JD/g6eH6P0AuTGZw0NviW+HFZshMrQzj6Ko10eamQsaobOvItSdUiFLKFI8ZA9
-         kkog==
-X-Forwarded-Encrypted: i=1; AJvYcCXlalrb9vLIY+znjIavGV+i4R7qCRb4D33mHXorkV56qTv69fsaJ8WT6NvDU8AGyXKIpO83b3ZrdWsH5FaEOAnVZG8UuH/W
-X-Gm-Message-State: AOJu0YyHcOf8pqRfvdf50VgPtgAg69TOjI4MBHGNwk1e7HOOUQa5GuDP
-	fxm/UvxyRdIAhgiLfuGQe4c5PPPVOHQO2rgN24gwpeUgG1pK62l9U4UTDRlWYNUH+1m+E+w+kWP
-	MYvydWVANlg==
-X-Google-Smtp-Source: AGHT+IG51emMWBAb5be69d9MQl1/V5hFaTMj9Bqf3VwMtQQzMWHTK2uBy6JPz3aO5GNa/xiOHOh5NwP/mFOm/Q==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:6902:f88:b0:de5:2ce1:b62d with SMTP
- id ft8-20020a0569020f8800b00de52ce1b62dmr1196548ybb.10.1714415804319; Mon, 29
- Apr 2024 11:36:44 -0700 (PDT)
-Date: Mon, 29 Apr 2024 18:36:43 +0000
+	s=arc-20240116; t=1714416702; c=relaxed/simple;
+	bh=DW0F/0fyFOLtcXYzljdANlvFobwcwUaH9zyAqyyR72E=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kWVc3MUapjUCia5qlINH6o4iHHmrAmUFruo1KPWQreq9lEljMDIIhbwrCdp1RksEWYd6sD8gT1XDJedg0572ETDYRFn1ei+pDbYemangnNLWM01YYLERo2q9zkzZ4tbPEOq2y799LvWoyrTuXrWWa2egGVFlaRqElAy90bPxIAc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fDLhzZF2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E7E83C113CD;
+	Mon, 29 Apr 2024 18:51:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714416702;
+	bh=DW0F/0fyFOLtcXYzljdANlvFobwcwUaH9zyAqyyR72E=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=fDLhzZF2Pjcl7UrJkdKuvE9VZCkhqPBm85sf6VQ35zu/P1YkpNWuAcT5hhjFZG9FH
+	 LbukMh+RUb6+KMSUKals5xXmfQ7hWVpuDgUUI2QeuQB1LvREdS9nqn+JwOMTb6kgGb
+	 I4IQRi3GgmQiNwgJD89M0d+G6DuX7+Pn3w2/cbmNUKHS+uN+9F7tztqes08rmlMvP/
+	 QKNcSa2jAtyP5z8yCetSVpLmH+oPT/QBUIBq8xWUynzfXO9r44xj2IAO+j8lJoBk0C
+	 Df5PaebXxpN5xZXyN3lDr5xlq7VawvF4ZWQD3BZe0A9UPPrB5MdAGZvkzxvxFQoHRO
+	 ZKJBKbOPwP2SQ==
+Message-ID: <53eafc84-c51e-4c88-93ad-18c33ffe426c@kernel.org>
+Date: Mon, 29 Apr 2024 12:51:40 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.44.0.769.g3c40516874-goog
-Message-ID: <20240429183643.2029108-1-edumazet@google.com>
-Subject: [PATCH net-next] ipv6: anycast: use call_rcu_hurry() in aca_put()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] inet: introduce dst_rtable() helper
+Content-Language: en-US
+To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com
+References: <20240429133009.1227754-1-edumazet@google.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20240429133009.1227754-1-edumazet@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-This is a followup of commit b5327b9a300e ("ipv6: use
-call_rcu_hurry() in fib6_info_release()").
+On 4/29/24 7:30 AM, Eric Dumazet wrote:
+> I added dst_rt6_info() in commit
+> e8dfd42c17fa ("ipv6: introduce dst_rt6_info() helper")
+> 
+> This patch does a similar change for IPv4.
+> 
+> Instead of (struct rtable *)dst casts, we can use :
+> 
+>  #define dst_rtable(_ptr) \
+>              container_of_const(_ptr, struct rtable, dst)
+> 
+> Patch is smaller than IPv6 one, because IPv4 has skb_rtable() helper.
+> 
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> ---
+>  drivers/infiniband/core/addr.c   | 12 +++---------
+>  drivers/net/vrf.c                |  2 +-
+>  drivers/s390/net/qeth_core.h     |  5 ++---
+>  include/linux/skbuff.h           |  9 ---------
+>  include/net/ip.h                 |  4 ++--
+>  include/net/route.h              | 11 +++++++++++
+>  net/atm/clip.c                   |  2 +-
+>  net/core/dst_cache.c             |  2 +-
+>  net/core/filter.c                |  3 +--
+>  net/ipv4/af_inet.c               |  2 +-
+>  net/ipv4/icmp.c                  | 26 ++++++++++++++------------
+>  net/ipv4/ip_input.c              |  2 +-
+>  net/ipv4/ip_output.c             |  8 ++++----
+>  net/ipv4/route.c                 | 24 +++++++++++-------------
+>  net/ipv4/udp.c                   |  2 +-
+>  net/ipv4/xfrm4_policy.c          |  2 +-
+>  net/l2tp/l2tp_ip.c               |  2 +-
+>  net/mpls/mpls_iptunnel.c         |  2 +-
+>  net/netfilter/ipvs/ip_vs_xmit.c  |  2 +-
+>  net/netfilter/nf_flow_table_ip.c |  4 ++--
+>  net/netfilter/nft_rt.c           |  2 +-
+>  net/sctp/protocol.c              |  4 ++--
+>  net/tipc/udp_media.c             |  2 +-
+>  23 files changed, 64 insertions(+), 70 deletions(-)
+> 
 
-I had another pmtu.sh failure, and found another lazy
-call_rcu() causing this failure.
+Reviewed-by: David Ahern <dsahern@kernel.org>
 
-aca_free_rcu() calls fib6_info_release() which releases
-devices references.
-
-We must not delay it too much or risk unregister_netdevice/ref_tracker
-traces because references to netdev are not released in time.
-
-This should speedup device/netns dismantles when CONFIG_RCU_LAZY=y
-
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- net/ipv6/anycast.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
-
-diff --git a/net/ipv6/anycast.c b/net/ipv6/anycast.c
-index 0f2506e3535925468dcc5fa6cc30ae0952a67ea7..0627c4c18d1a5067a668da778ad444855194cbeb 100644
---- a/net/ipv6/anycast.c
-+++ b/net/ipv6/anycast.c
-@@ -252,9 +252,8 @@ static void aca_free_rcu(struct rcu_head *h)
- 
- static void aca_put(struct ifacaddr6 *ac)
- {
--	if (refcount_dec_and_test(&ac->aca_refcnt)) {
--		call_rcu(&ac->rcu, aca_free_rcu);
--	}
-+	if (refcount_dec_and_test(&ac->aca_refcnt))
-+		call_rcu_hurry(&ac->rcu, aca_free_rcu);
- }
- 
- static struct ifacaddr6 *aca_alloc(struct fib6_info *f6i,
--- 
-2.44.0.769.g3c40516874-goog
 
 
