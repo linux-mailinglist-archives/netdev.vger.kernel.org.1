@@ -1,140 +1,94 @@
-Return-Path: <netdev+bounces-92208-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92209-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D2538B5F49
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 18:42:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DB3608B5F65
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 18:54:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E6343281133
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 16:42:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6B7C62823AC
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 16:54:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E942D85958;
-	Mon, 29 Apr 2024 16:42:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D46B686245;
+	Mon, 29 Apr 2024 16:54:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K/bEROam"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="aR8IZmw8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f178.google.com (mail-vk1-f178.google.com [209.85.221.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay.smtp-ext.broadcom.com (relay.smtp-ext.broadcom.com [192.19.144.205])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AAE61DA23
-	for <netdev@vger.kernel.org>; Mon, 29 Apr 2024 16:42:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62BF88613E;
+	Mon, 29 Apr 2024 16:54:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.19.144.205
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714408934; cv=none; b=Fhi6Dv0alANmS84SiizfVyXxmtcojY9/P25YYxsIZ/LTaS70/kG5SlWoVH4qFobp4yLp7YNjLupk0E37u/ZTNaUKOuJWWCM/Z03Jh4F2NY1CqcJX1pnkzDTmXFdCDsePe9jBFyBvi4YnwQRztbp75o+YdM40/luOKEEk1WhNpqY=
+	t=1714409660; cv=none; b=Clge0UMdZVMOxTFJgF6EjbIciXcw28lVEsJnYdDX5/QJuCIcVC7W6t3P1p9FAU9htOr+0NNweV+ynXsehnacQhgzysBNum0kvM/aIhQWfmXKRk6eh7ZJPimbhCapTjL8avAgKkd3eGrSnG+FqU5Kw8RLbwiACJxRA+c5AZJv7XQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714408934; c=relaxed/simple;
-	bh=YXfK9bDetba6PWZtX6QHFi8FVcqIVR0VvuucNVqOVQ0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=B+YitP5e/5DyPXTyuTO4/zmFHQ/YiuWPs4k1w54mxeXy1QqN2hOzrovhnOpWdK5TFYDVo/pKfFNbdhHB9hluXlGlFOm3fLpOf6QQjpCjN3301qJhO1A5yCvlNtoj1NpPF/+nDe/zL7ZfetUJW1V42ZNvBMqASWB+UK0Q00wUfz4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=K/bEROam; arc=none smtp.client-ip=209.85.221.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vk1-f178.google.com with SMTP id 71dfb90a1353d-4dcceac3ae1so1722458e0c.2
-        for <netdev@vger.kernel.org>; Mon, 29 Apr 2024 09:42:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1714408932; x=1715013732; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Z3GYAswhgqLLThvewnR9J5Vd0wCAQUQOXcPZU0AwFWA=;
-        b=K/bEROamySceSWfO6IWieAxLQdq9aJJdai+WcXnBDCdLGkiZ0WCbh8rQQQlwj69Ota
-         LEasaVeaszpsiiN+LQHE0+foiM7CD073Jir0qOglImShJ/qxOdUazzGbRuIlIUErMiCt
-         aNvDEKdnJB5UhQcPh7r1LYV3hl5WIRvkslnxeAgrOk31v+suG3Zz/j30LQFevA5sqb/g
-         BqX0G5rudrxgOYsU+D7tnkgeJI6DHk3hifSxb7zzV7q+WqUTYVTRMqQ9QFsxxMbAktCo
-         nbfT+cJwea4NBIPm5sxj7JTqBAvUuCYV6WBt9J72bnzNEgG4QvQa97HzhXq/PddMUVo3
-         RtZg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714408932; x=1715013732;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Z3GYAswhgqLLThvewnR9J5Vd0wCAQUQOXcPZU0AwFWA=;
-        b=kXcuNnT4UABPv065n8cariSNIF5IWS++f+BuPRZg9Xgf+vMLn2Rjmlvqqi4HMLZQs+
-         bj36LDULSiStsz1HDsm/GQLSpgVzqCBh6nXc09ID6wAUXw+50r+XTIghXkNZOvvL0uV4
-         ghdD2aP7G2AvjDvGZCnO343vIVi2vItJTTbR+5yfqsMyeR0rCPpQOt8ZsqpA+ExLu/mc
-         ZYbyVqI6wV16zbE7wZLUqlUMNtla9vC0iNPhUDKLUwN/Djmld9A83iprAv0mmlrA0/bi
-         lZaND2FZVljwdMMvDy4CIpeN/eCchZmk3yntaCOeVjqUnHF8002qHHi2HARNhnm55MoY
-         GaiQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWSKcRwhtVsqIUBmnMJN0TbERUG8jGuKyjVbfxSZa8WwNmCYWoFWwC8QQECM80MFKxPiFo5xYg4PIePxsYmrba8u6Ji8JO9
-X-Gm-Message-State: AOJu0YwFnvY0hOil0O53rX6a5ag3MZkSVPaCz8EPvaospL+vq6iOinQC
-	9Wl1DEjHDssChwbXOsGnYkofimQroV+T0mgVX7wESDI6ONsc1za3
-X-Google-Smtp-Source: AGHT+IFT2La2YVmDvYHvRaa8tf3nI9/my8w73K/a3lEJeFI5GQE7w0TO1iwVLo0FRm5aTGYARrEU7A==
-X-Received: by 2002:a05:6122:1d13:b0:4c8:ee1:5a0b with SMTP id gc19-20020a0561221d1300b004c80ee15a0bmr325402vkb.15.1714408932308;
-        Mon, 29 Apr 2024 09:42:12 -0700 (PDT)
-Received: from [192.168.99.58] ([216.14.52.203])
-        by smtp.gmail.com with ESMTPSA id l6-20020ac87246000000b004369f4d31f2sm10591933qtp.50.2024.04.29.09.42.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 29 Apr 2024 09:42:09 -0700 (PDT)
-Message-ID: <fc5c37e6-07c2-4635-bd16-a4b29512fbd3@gmail.com>
-Date: Mon, 29 Apr 2024 09:42:07 -0700
+	s=arc-20240116; t=1714409660; c=relaxed/simple;
+	bh=m+a0mpd9lPCvf7rECTwJNwAyUY/aioHvQrkAhuahk7c=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=GphrjEWmPhcClEclA+sXuRWtxthfulvoXFqxzW2F7evUQXgCRLrUj9t4uWSODd3wjWKo7wtHzJ+6BiIRgXAp7XGlPBZr79mdRdOTewwTRTy3oYVwBgmhi/kl5s8/il9iZfB24HIRmHKt0EO5Cz0yejDyTKEPUuAXSuqdX52q2yU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=aR8IZmw8; arc=none smtp.client-ip=192.19.144.205
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: from mail-lvn-it-01.lvn.broadcom.net (mail-lvn-it-01.lvn.broadcom.net [10.36.132.253])
+	by relay.smtp-ext.broadcom.com (Postfix) with ESMTP id 1F4ECC0000E7;
+	Mon, 29 Apr 2024 09:54:12 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 relay.smtp-ext.broadcom.com 1F4ECC0000E7
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=broadcom.com;
+	s=dkimrelay; t=1714409652;
+	bh=m+a0mpd9lPCvf7rECTwJNwAyUY/aioHvQrkAhuahk7c=;
+	h=From:To:Cc:Subject:Date:From;
+	b=aR8IZmw8AueI1Pf30pWHZiYSPYjF3df3uyCgMZJJg0+ckeR1ICbBaZsXseg4GQ38n
+	 XQYL1UfzR4B/jA0iS0HyTF1wgqrHAXwr3ZagwhCrglkSCmODtvXBYnt1COqIkRoKW9
+	 ZVAJ1dI4q09Ol/XAsSBufK+LIfE72i4Y9Lft1P5w=
+Received: from fainelli-desktop.igp.broadcom.net (fainelli-desktop.dhcp.broadcom.net [10.67.48.245])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mail-lvn-it-01.lvn.broadcom.net (Postfix) with ESMTPSA id 2C56818041CAC4;
+	Mon, 29 Apr 2024 09:54:10 -0700 (PDT)
+From: Florian Fainelli <florian.fainelli@broadcom.com>
+To: netdev@vger.kernel.org
+Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH net-next v2 0/2] net: dsa: adjust_link removal
+Date: Mon, 29 Apr 2024 09:54:03 -0700
+Message-Id: <20240429165405.2298962-1-florian.fainelli@broadcom.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: dsa: mv88e6xxx: Fix number of databases for
- 88E6141 / 88E6341
-To: =?UTF-8?Q?Marek_Beh=C3=BAn?= <kabel@kernel.org>, netdev@vger.kernel.org
-Cc: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
- Eric Dumazet <edumazet@google.com>,
- Gregory CLEMENT <gregory.clement@bootlin.com>,
- Vivien Didelot <vivien.didelot@gmail.com>
-References: <20240429133832.9547-1-kabel@kernel.org>
-Content-Language: en-US
-From: Florian Fainelli <f.fainelli@gmail.com>
-Autocrypt: addr=f.fainelli@gmail.com; keydata=
- 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
- HGuUuzv+GKZ6nsysJw==
-In-Reply-To: <20240429133832.9547-1-kabel@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
+Now that the last in-tree driver (b53) has been converted to PHYLINK, we
+can get rid of all of code that catered to working with drivers
+implementing only PHYLIB's adjust_link callback.
 
+Changes in v2:
 
-On 4/29/2024 6:38 AM, Marek Behún wrote:
-> The Topaz family (88E6141 and 88E6341) only support 256 Forwarding
-> Information Tables.
-> 
-> Fixes: a75961d0ebfd ("net: dsa: mv88e6xxx: Add support for ethernet switch 88E6341")
-> Fixes: 1558727a1c1b ("net: dsa: mv88e6xxx: Add support for ethernet switch 88E6141")
-> Signed-off-by: Marek Behún <kabel@kernel.org>
+- remove a now unused phy_device pointer in
+  dsa_port_phylink_mac_link_down
 
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+Florian Fainelli (2):
+  net: dsa: Remove fixed_link_update member
+  net: dsa: Remove adjust_link paths
+
+ include/net/dsa.h |  11 ----
+ net/dsa/dsa.c     |   3 +-
+ net/dsa/port.c    | 136 ++++------------------------------------------
+ 3 files changed, 12 insertions(+), 138 deletions(-)
+
 -- 
-Florian
+2.34.1
+
 
