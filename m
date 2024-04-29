@@ -1,73 +1,73 @@
-Return-Path: <netdev+bounces-92149-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92150-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CCEFC8B59D3
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 15:25:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30E2B8B59E3
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 15:28:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 827EA1F24F84
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 13:25:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DC200284887
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 13:28:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF68556B6C;
-	Mon, 29 Apr 2024 13:25:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4460C5F861;
+	Mon, 29 Apr 2024 13:28:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iwR95npn"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g+BUAKZk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f182.google.com (mail-qk1-f182.google.com [209.85.222.182])
+Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33D5D42055;
-	Mon, 29 Apr 2024 13:25:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFB2656B6C;
+	Mon, 29 Apr 2024 13:28:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714397133; cv=none; b=q4vL3R/pa0e0L3TX6s0i2f3BXAOC+pzookvZ9dwqub6EbBkQF9FDPkPrerv1RS8gmiNnoQjnjFmOk52SeD++L/jUwDVaX25YoD6eELXYF0WBKFW58wteKBJ03vbshOBQIhyBe5n/aGYW54BIKALyUS5uKy8UtuRcM5DATaFKqD8=
+	t=1714397291; cv=none; b=jBIb7/9ehAZmVfKI8e2pUGq4P8Wr8YNDjIZQ32eXL8EKRMxVpgAdFu07XahUkuhpaw8cphESYIIPExBkgDLvYKGTIkpbu6VbYgAJNaVzSBSRcoeTvtasPWvkih2MclV27ubDttFiH0n6W6IqLYKdtwIlnVZU4quV9Hum0y8CrxE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714397133; c=relaxed/simple;
-	bh=OkGqsz24HaQ8U2SLy0X0H8hrrM/zi1dkI/vFgwhn/uQ=;
+	s=arc-20240116; t=1714397291; c=relaxed/simple;
+	bh=pR7/a0by9yBxrfh6k79m1vRnSAYmPWUcYcwe7V2g0kE=;
 	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=gyIxuStPRn8rtoQhwLT9uqKE9DN5rbSdgTmghsODoGWdGYRRTU/aE8/gvA0SVQDUNNDaJL2O4H/ug+3eqrxrKYAjKFshJ0ww1mnfqHxZXclAfxbEZCnAq1khoRQ8i3+Txe1qLOtR7AlfZdHPulruJm/Fiat6AwNuafD8oWpRXt4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iwR95npn; arc=none smtp.client-ip=209.85.222.182
+	 Mime-Version:Content-Type; b=ouIcnosTv2lfiHWyp2zwe5u6hEz7XNDIyY+lRqjoaG0KJBo45HJsrOFnVnSpA3ijdGyQ/ckTpK8n1bXo0v0qIkr6WeNR8x4OUDCeEQUBOjaKKTwZE/1nBLnG7RXk0NdjlHR7SAeOWzO0ouRZnsSUGVzxHrj3krQrRyT8joHrU0I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g+BUAKZk; arc=none smtp.client-ip=209.85.222.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f182.google.com with SMTP id af79cd13be357-790fb2b780dso55842285a.0;
-        Mon, 29 Apr 2024 06:25:30 -0700 (PDT)
+Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-790e7c02430so144627885a.0;
+        Mon, 29 Apr 2024 06:28:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1714397130; x=1715001930; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1714397289; x=1715002089; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=1cRqB/pgj2GzUQ8QqpEYAm3EnSOnu+i1KftcUkQHuOo=;
-        b=iwR95npnDYmpwzLAl04pqLIlzIzGY/St+actfwN1a0fBtKHZ/oq5D1tBhxM0xH2381
-         NniEltmADqe82W4+rTxD+CtWD07HGNJUFm2b5Wv4U+w1/zp4gHUCG+y37TungxyjdiCy
-         G0Wx6Dj07szgivNi1JpX16tMFHyRAzhoNqj8usq9ybouOAJfU1Aff8q2OgiW9GKA7qj3
-         xHBxJnySP3+lnoCg1ra0cy6HTA9u1vRrENECtXWwrfjHzlDFtLa5Vxed3B6DQupu2hET
-         NiNql8LLvb6ILD+aXx1cpBF9BKvsUwpR7ZExKBKIwrB6/LF10eQ1s5wQW/y0Qp260WEx
-         glPw==
+        bh=Zvb50xK6t3u+mnfQxJVlidFaDH9bNsJDchVJ2caNt0c=;
+        b=g+BUAKZkDBnVLDlbz6wiUWlDdDuOukfJYBAjC04CBEbMz7enTPF3BlyhO8THuQ1x9q
+         e8R983ReNKFUlCrFDUOwwAXLdh1Mw3VhJPPnVYJZ9cSUGaEVylLMwHJRKzAZ+EBYBpWn
+         hVQcZmpamnihtMgNMboZ9TD8B9vDoD1aY0CieeLcPZ0qJRzppurrYij3qhQuX1+y2GXK
+         aOb3Gh68KI5Hj4FPHWjlD32/7jWlSjO7xitI5c6WM9kiT4jhyO79M2c7lYPCjghJ5bCU
+         cNMUqLuII/9qCwQxWa1X7hmaWyWVhv2oHxtYwzyU1fSdjCtYKPVw/qXLMRN9KTMpA2KY
+         3Lpw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714397130; x=1715001930;
+        d=1e100.net; s=20230601; t=1714397289; x=1715002089;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=1cRqB/pgj2GzUQ8QqpEYAm3EnSOnu+i1KftcUkQHuOo=;
-        b=uiE41OdtNrLI6gkF2uKCgvkEctRCWevw4maDVE1M2nvDbWjOJj5sFWk9Bp7bNlosBA
-         vY9+ibL2yKnSpAwOCfMKCf2yBNAEuRTeY57hXm8MOHW6AuaYMNBrEbq0Tw7B02hhmJov
-         E0B8AammkLfpVz6FnqCfxYwuUyJmHx4F2qbTxIiaE65EMU8K9sz/zHh/1D2+SEj0aZJs
-         NZycpmyfG/oahuB4teFO73Rv1FduvWaCxOUVsP6oM3Tr/SROSUs+E8PR756gx5hpzrYz
-         Py/NnXJ94REs0JNkqhbhfm/y8ZJiiF1dWY9cRB0lsoGI+bNu7KsG2ezu2yUboZrVC4dI
-         Cwiw==
-X-Forwarded-Encrypted: i=1; AJvYcCVwSHjYTOLsHsWoDeeEvxbOXppqIJ+6owRRSaV6sZlj6dSTHp7+vpBggZmjP2LmbRygnWOrbtmhugBK4973CO1xh4JiF7VF
-X-Gm-Message-State: AOJu0YytWtgvQI5afhEOuF4oo7FGSBswtOsbq9yZeLbwAh8wp856j+Uc
-	eZJy7HWILjYGTdrhQEiGu5TpaY8LmJoZZeDfNWSmz8Z/UtrahGx0
-X-Google-Smtp-Source: AGHT+IG9x6Gj2FQJ7A+ca3azZZYIXGA4pH/chdp4e42edoCOV+sYv8S45PCZtvS+Q0OSVBRLf1DUYg==
-X-Received: by 2002:a05:620a:1a28:b0:790:f03a:243f with SMTP id bk40-20020a05620a1a2800b00790f03a243fmr4628229qkb.46.1714397130011;
-        Mon, 29 Apr 2024 06:25:30 -0700 (PDT)
+        bh=Zvb50xK6t3u+mnfQxJVlidFaDH9bNsJDchVJ2caNt0c=;
+        b=EnbKfApxs6PhusYQXeE2K7/d6Gm3wCTLYnR11w/Kp2dehPHbCa9qOYxmZme7d4MhrM
+         ii2lp7LSwwdnLdr5Gu6iXASXSMLRNVC1xcCNlm47EjZSQnKXjHZ7KbuY1qBaAn6HMXUa
+         +Xrnh3fvR4ErbxPXzwy1nSVGwn9O20XUQ/CaD3oUgfG16lp6AZcxRmw9gMTKv7s6c7ZI
+         TqrcYLpFUstpO/EonFTN0sJdOyHBzlOJaDrFIiPwupO30jzTiy3iihfmX4UFIJw1G4oK
+         Z1He7kL6qMw7d5G+t5E2NGl2PCeRjfA8kd7sj5Ioa09ykj9F3CaKGzlWq7hlC0eLYxEp
+         Kraw==
+X-Forwarded-Encrypted: i=1; AJvYcCXitax0o+ZasoNS/arW2nwNU/bt+/+mz29ms0kNd3T16SB98dbXcNZC+nZ+bwoS50cWF00IdthdKUxzXSdPm/KPN9e71fZs
+X-Gm-Message-State: AOJu0YyXizo+7M91thmK7t1kz7S5kLR6U+JI/ZgUTI63/pk+bHgXI7TF
+	8Lc3kQzjUWp/KW+2HAVWLis36vOhW2qVwtE7PEjr1xRuZXLnnNS6
+X-Google-Smtp-Source: AGHT+IH2Vufgr8rm7sw/n0lcdtaQaTzClaMd6bA1+jrR1BRGGyolktP24UxusELVdcvcf2HlYYJbYg==
+X-Received: by 2002:ae9:e915:0:b0:790:fd4f:3daf with SMTP id x21-20020ae9e915000000b00790fd4f3dafmr1316897qkf.67.1714397288602;
+        Mon, 29 Apr 2024 06:28:08 -0700 (PDT)
 Received: from localhost (164.146.150.34.bc.googleusercontent.com. [34.150.146.164])
-        by smtp.gmail.com with ESMTPSA id de28-20020a05620a371c00b0078d6b2b6fdbsm10352985qkb.133.2024.04.29.06.25.29
+        by smtp.gmail.com with ESMTPSA id pa2-20020a05620a830200b0078ede2e9125sm10353067qkn.57.2024.04.29.06.28.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Apr 2024 06:25:29 -0700 (PDT)
-Date: Mon, 29 Apr 2024 09:25:29 -0400
+        Mon, 29 Apr 2024 06:28:08 -0700 (PDT)
+Date: Mon, 29 Apr 2024 09:28:07 -0400
 From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
 To: shiming.cheng@mediatek.com, 
  willemdebruijn.kernel@gmail.com, 
@@ -79,11 +79,12 @@ To: shiming.cheng@mediatek.com,
 Cc: linux-kernel@vger.kernel.org, 
  netdev@vger.kernel.org, 
  shiming.cheng@mediatek.com, 
- Lena Wang <lena.wang@mediatek.com>
-Message-ID: <662f9fc92a908_2e2f1d294c2@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20240428143010.18719-1-shiming.cheng@mediatek.com>
-References: <20240428143010.18719-1-shiming.cheng@mediatek.com>
-Subject: Re: [PATCH net] net: drop pulled SKB_GSO_FRAGLIST skb
+ Lena Wang <lena.wang@mediatek.com>, 
+ daniel@iogearbox.net
+Message-ID: <662fa067c7066_2e2f1d294a0@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20240428142913.18666-1-shiming.cheng@mediatek.com>
+References: <20240428142913.18666-1-shiming.cheng@mediatek.com>
+Subject: Re: [PATCH net] net: prevent pulling SKB_GSO_FRAGLIST skb
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -97,25 +98,47 @@ Content-Transfer-Encoding: 7bit
 shiming.cheng@ wrote:
 > From: Shiming Cheng <shiming.cheng@mediatek.com>
 > 
-> A SKB_GSO_FRAGLIST skb without GSO_BY_FRAGS is
-> expected to have all segments except the last
-> to be gso_size long. If this does not hold, the
-> skb has been modified and the fraglist gso integrity
-> is lost. Drop the packet, as it cannot be segmented
-> correctly by skb_segment_list.
+> BPF or TC callers may pull in a length longer than skb_headlen()
+> for a SKB_GSO_FRAGLIST skb. The data in fraglist will be pulled
+> into the linear space. However it destroys the skb's structure
+> and may result in an invalid segmentation or kernel exception.
 > 
-> The skb could be salvaged. By linearizing, dropping
-> the SKB_GSO_FRAGLIST bit and entering the normal
-> skb_segment path rather than the skb_segment_list path.
-> 
-> That choice is currently made in the protocol caller,
-> __udp_gso_segment. It's not trivial to add such a
-> backup path here. So let's add this backstop against
-> kernel crashes.
+> So we should add protection to stop the operation and return
+> error to remind callers.
 > 
 > Fixes: 3a1296a38d0c ("net: Support GRO/GSO fraglist chaining.")
 > Signed-off-by: Shiming Cheng <shiming.cheng@mediatek.com>
 > Signed-off-by: Lena Wang <lena.wang@mediatek.com>
+>
+> ---
+>  net/core/skbuff.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
+> 
+> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+> index f68f2679b086..2d35e009e814 100644
+> --- a/net/core/skbuff.c
+> +++ b/net/core/skbuff.c
+> @@ -6100,6 +6100,12 @@ EXPORT_SYMBOL(skb_vlan_untag);
+>  
+>  int skb_ensure_writable(struct sk_buff *skb, unsigned int write_len)
+>  {
+> +	if (skb_is_gso(skb) &&
+> +	    (skb_shinfo(skb)->gso_type & SKB_GSO_FRAGLIST) &&
+> +	     write_len > skb_headlen(skb)) {
+> +		return -ENOMEM;
+> +	}
+> +
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+Most callers of skb_ensure_writable pull less than headlen.
+It might be good to start with the write_len check. Before
+looking at gso type.
+
+>  	if (!pskb_may_pull(skb, write_len))
+>  		return -ENOMEM;
+>  
+> -- 
+> 2.18.0
+> 
+
+
 
