@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-92033-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92034-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 262EB8B50AD
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 07:20:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 277898B50BB
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 07:30:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A980C281E79
-	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 05:20:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C122B28184F
+	for <lists+netdev@lfdr.de>; Mon, 29 Apr 2024 05:30:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C50DDD530;
-	Mon, 29 Apr 2024 05:20:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55FD8DDA8;
+	Mon, 29 Apr 2024 05:30:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PFrAUDIY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RqItNznC"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99BB7DF42;
-	Mon, 29 Apr 2024 05:20:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2759E8BE2;
+	Mon, 29 Apr 2024 05:30:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714368029; cv=none; b=b/uzsnGdvM4XmLJiqgYgPoXDlm3N+7SaJBYYz393T0lb/ndQIBY0qMQEYLd2IQRA7UHYukW7I56tADDxNoIubTRqSiycBJARSvbn/69749CXyQsNnuZyoJpOMSXVjalu2Ahdx91cHn4etSjDnxdOODIh/h1y1107s0W/Ljn7o2w=
+	t=1714368630; cv=none; b=AwX/EZR6jwCbLJ12oT4TENvO4cgexN+yodygcsTkYvu3nFdGNNsUQkbAhWDgAGY4eZabJgZJwOmJrZCgvBb5cwS8CDSrVuDNUCmwmLMOf0PM6bUhCZTOYLGO0LJbkKBCdst7gGezJ8gqsKKmjklOw+Pe8ZBBWvLFWER47YAJIyc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714368029; c=relaxed/simple;
-	bh=Wo/8jyOFvv40aWOe9D6ib4cudZP9jjxvEIduxgqymVU=;
+	s=arc-20240116; t=1714368630; c=relaxed/simple;
+	bh=rjOSUBao3IhikJsSx41/jAuu9PGrkqmrRnBC8aR66X0=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=IetEK/x1PdtMaL4kKbhXM29sv19vTKuC4hhd9T6fn7K3p6PvawZ4aRL4ZpZGSmBANEntIP0CU/7Yr+NxScCIw6KnPI4GEO1Iwepdbm6VQF3qoDv+72QRGTTzXOpQCS6zbxmdhp6tf8cMFJ8ktdo1RP4bGT12IIclzgBahHyorto=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PFrAUDIY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 18701C4AF14;
-	Mon, 29 Apr 2024 05:20:29 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=pIuHjAMk32GV/0jLXOCGbepPOA4POUwS1JvlUSfcUw0SVoghtoQ7pdDXqkbYrvLArirAlriGK5rpKBSB9+W5yI+1J82kTxamfWGixuNaEG8kEk+Izy+9LiNLJeDp9YvTkW5f4eVaKKsEZ7rFAl/pg+/BPh4U2IH94vh3kWkagQo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RqItNznC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 95DD7C4AF14;
+	Mon, 29 Apr 2024 05:30:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714368029;
-	bh=Wo/8jyOFvv40aWOe9D6ib4cudZP9jjxvEIduxgqymVU=;
+	s=k20201202; t=1714368629;
+	bh=rjOSUBao3IhikJsSx41/jAuu9PGrkqmrRnBC8aR66X0=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=PFrAUDIYPi5jln4Yl2xEySAJ8cxdfQy8ArBXzXSSiYszCIicfaYahUQGIxNNSGEBM
-	 kvEE/iyiUhV8VsqG8tmjfCTc3YglVBDnchTfO1Ct13fqMVnbovNve5jsuib81Jgaai
-	 JGIpOTTY9jtgZnl8bQ5/WUoxUnPlJgTq1Ww9OktUaRsoEpNHy07ALeUONv9CTd44Zc
-	 XEMd7AdigM5TpFrr+U/GH6/l0I/i2NYOBDLF4LrSKrJGQflDCXs+3MmVUGDA5WsgwE
-	 9JfW3FZpFolYJc9cVp1JD7TENU60QyTDCUyZQ2Jvcf05yGT0//QcAqGjz1hugHgpk8
-	 JkJVr1zDU6GCQ==
+	b=RqItNznC19fEOWHh054rGf7J5A3iJahvG1KOlb/GS9XZK6HLbf3SJvSGjBWX/ljAR
+	 tg2249mS2SzdUZirHcW2DfcZS9Hur+pxfiwZpCeeaotxOddodiwoBuYpEVAG7oxz2L
+	 97iFPQl8iwyKdpfG5julladRROmKw2QdmTYtfnT8NMMqvZERNxeUg5zDA9XE7s8e0B
+	 VV1UFJId4Wi2MBvcmLnbyrYKjuLQIz6kMw3epdGgAsrzBR0H4jQ/3ByFATHG1rLfaZ
+	 0ZQ9BUeIvDh59IvM4clCOR9EQCy9abne7O2YisjyeCOeKc/9VuhoPltuHRdXatU6DU
+	 xFpvH+hg54d5w==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 07E3BC4361B;
-	Mon, 29 Apr 2024 05:20:29 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 83AA3C4361B;
+	Mon, 29 Apr 2024 05:30:29 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,41 +52,45 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: ethernet: ti: am65-cpsw-qos: Add support to
- taprio for past base_time
+Subject: Re: [PATCH net v2 0/3] net: bcmgenet: protect contended accesses
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171436802902.5790.15930390940383797476.git-patchwork-notify@kernel.org>
-Date: Mon, 29 Apr 2024 05:20:29 +0000
-References: <20240425103142.1999123-1-c-vankar@ti.com>
-In-Reply-To: <20240425103142.1999123-1-c-vankar@ti.com>
-To: Chintan Vankar <c-vankar@ti.com>
-Cc: t-patil@ti.com, ast@fiberby.net, horms@kernel.org, rogerq@kernel.org,
- vladimir.oltean@nxp.com, pabeni@redhat.com, kuba@kernel.org,
- edumazet@google.com, davem@davemloft.net, s-vadapalli@ti.com, srk@ti.com,
- danishanwar@ti.com, r-gunasekaran@ti.com, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org
+ <171436862953.10386.10913338084330805580.git-patchwork-notify@kernel.org>
+Date: Mon, 29 Apr 2024 05:30:29 +0000
+References: <20240425222721.2148899-1-opendmb@gmail.com>
+In-Reply-To: <20240425222721.2148899-1-opendmb@gmail.com>
+To: Doug Berger <opendmb@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, florian.fainelli@broadcom.com,
+ bcm-kernel-feedback-list@broadcom.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
+This series was applied to netdev/net.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Thu, 25 Apr 2024 16:01:42 +0530 you wrote:
-> From: Tanmay Patil <t-patil@ti.com>
+On Thu, 25 Apr 2024 15:27:18 -0700 you wrote:
+> Some registers may be modified by parallel execution contexts and
+> require protections to prevent corruption.
 > 
-> If the base-time for taprio is in the past, start the schedule at the time
-> of the form "base_time + N*cycle_time" where N is the smallest possible
-> integer such that the above time is in the future.
+> A review of the driver revealed the need for these additional
+> protections.
 > 
-> Signed-off-by: Tanmay Patil <t-patil@ti.com>
-> Signed-off-by: Chintan Vankar <c-vankar@ti.com>
+> Doug Berger (3):
+>   net: bcmgenet: synchronize EXT_RGMII_OOB_CTRL access
+>   net: bcmgenet: synchronize use of bcmgenet_set_rx_mode()
+>   net: bcmgenet: synchronize UMAC_CMD access
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next] net: ethernet: ti: am65-cpsw-qos: Add support to taprio for past base_time
-    https://git.kernel.org/netdev/net-next/c/d63394abc923
+  - [net,v2,1/3] net: bcmgenet: synchronize EXT_RGMII_OOB_CTRL access
+    https://git.kernel.org/netdev/net/c/d85cf67a3396
+  - [net,v2,2/3] net: bcmgenet: synchronize use of bcmgenet_set_rx_mode()
+    https://git.kernel.org/netdev/net/c/2dbe5f19368c
+  - [net,v2,3/3] net: bcmgenet: synchronize UMAC_CMD access
+    https://git.kernel.org/netdev/net/c/0d5e2a822326
 
 You are awesome, thank you!
 -- 
