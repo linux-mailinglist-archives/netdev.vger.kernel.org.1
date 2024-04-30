@@ -1,148 +1,101 @@
-Return-Path: <netdev+bounces-92609-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92610-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B23F8B817F
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 22:35:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E71C08B8189
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 22:36:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A8CDCB22973
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 20:34:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E345A1C22ECB
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 20:36:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D5DD1836E0;
-	Tue, 30 Apr 2024 20:34:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 023521A0AEE;
+	Tue, 30 Apr 2024 20:36:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iamRaAMj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OetM1xSZ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 342D2179B2;
-	Tue, 30 Apr 2024 20:34:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C26C7199E9B;
+	Tue, 30 Apr 2024 20:36:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714509293; cv=none; b=P6qbj/yk/+5H/0pzILK1ewOqC9PtUEUsKdkh/bV4BK8sz4EQHh3VqY/9xVzja9fnU4c5TZ/gavNLr8GTmAiSSiRX0tMvT70dXWuvLK2+XNJZpwjcEnQOCpRf2Q+p72hMsERB/dGLcdeVUDuKJjzD0MHTRQ5cJPwv46f9hKYhlkw=
+	t=1714509375; cv=none; b=EEGh1wMqq0hR9+LSfD7hlRkZ2DrYjTaoFPkHwGAyXnS57LmJ/0ONM3McAOh2aWaykO87mInIvQQgnqeDP+M99ZcV2aeG640YLYrRWs4s3KPUrUs5nZJQiN/4kiGaGLzeSITLudMZ9wdYyAbm8LGIujAL+MpFSfERDfFyJULJWno=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714509293; c=relaxed/simple;
-	bh=HtcQHmj985eQ+dg3uqxVTbR5cUoWPjp4+IhThC+KEug=;
+	s=arc-20240116; t=1714509375; c=relaxed/simple;
+	bh=Hkj282ZLhfbSUGTDTtv67ovkyS9SO/gWC6U/Vkj6ntE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FqKbcnHHFrfRrifzRL3BLrX93q+ViL/VRbYQzz7W3xc7GI8OVWB6llAr4NUF11+2ebGd+svWZU2UCVS/xrcwA/qVo+CSL/CSXXFpw/TsGLc7GwVH1LX8Ip2sXsKmHOmwchr7S9YJTC2/+P0mdIi5dtxqqOctd0s2JBsUUVioYFM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iamRaAMj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 43DA5C4AF17;
-	Tue, 30 Apr 2024 20:34:46 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=aGtfs7c5SgCzh7By2yX6e8tFARBTPOGhLMLBPIgtNU5DjtZhS5AUr6RZSRtekbJbSJIcX/EcoTZw9FCF/OhL3ImZMynIb/EYqBmEaB1ps25coUfcbaqLcRgj2XTNrJ0db8qtZpPhKf9GyA+aetzqyTQmlfv2BaCbBE3raxiqyaU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OetM1xSZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65FE6C2BBFC;
+	Tue, 30 Apr 2024 20:36:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714509292;
-	bh=HtcQHmj985eQ+dg3uqxVTbR5cUoWPjp4+IhThC+KEug=;
+	s=k20201202; t=1714509375;
+	bh=Hkj282ZLhfbSUGTDTtv67ovkyS9SO/gWC6U/Vkj6ntE=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=iamRaAMjbqYlRtYkrz98dWDUYhZmMcb96S8p7LdlmCtD4/yhJ8PQjUQr1Btp+8gJx
-	 /6Ch4UmQM5/8EwAfTSUpsknGmRvk/dbKCpr1Pi1Ey1/c9twfezgVcvmFu/YocQjYIC
-	 SUZIGp0RKKIKQ8IwXL33Mm7XKs2nHJVMonNJ1bTV/3EOg/+L0TZVZw2+xt2uuvLc98
-	 wUxV/fK8Ts91A178VA8EhaC6AInd5GNuVtvHlJZrwN4NNZ0YAJ7rnbyk/sT8/G5Xfz
-	 mXGtJY5YxB7RnPbnatdptWWdxXgCXge1K2zSbKP6Z+2QCbZ5VVL9pVxK8m2qcPsLz5
-	 i9Wr//FfNBRZw==
-Date: Tue, 30 Apr 2024 21:34:43 +0100
-From: Simon Horman <horms@kernel.org>
-To: Herve Codina <herve.codina@bootlin.com>
-Cc: Thomas Gleixner <tglx@linutronix.de>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Lee Jones <lee@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
-	Horatiu Vultur <horatiu.vultur@microchip.com>,
-	UNGLinuxDriver@microchip.com, Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Saravana Kannan <saravanak@google.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Lars Povlsen <lars.povlsen@microchip.com>,
-	Steen Hegelund <Steen.Hegelund@microchip.com>,
-	Daniel Machon <daniel.machon@microchip.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
-	netdev@vger.kernel.org, linux-pci@vger.kernel.org,
+	b=OetM1xSZk1J0d3YpjnwC9bXo2yKgdoivZ1Z2sUGNB56z1UgB9XmC+L6fSQBlWbQI/
+	 qKFuZWpF+P3kxNZoRXRfqPW6cU6T2XJW/G1Ux4af34+Tp7umnXcllQyUj+UjP06+p1
+	 a8VxltRmcsXGj1X7eQi9/gFo9y8jKV4xsGQy0EYHtFR8sWygzcmIb1Fd2WNYomut6L
+	 3qatP8rGrvwURD97AJZD99iqXpbk1DUASWyPQBNibwd+HI4tSiLzVkOWoEaMwko+9O
+	 e5ag0rcBDxffjSolV52iuRTxMkxf+ZNKtRV7ltVDUlTtkO8w7m+zvq40Im9rf7Wm1z
+	 Hu7AibVsyDe0Q==
+Date: Tue, 30 Apr 2024 15:36:14 -0500
+From: "Rob Herring (Arm)" <robh@kernel.org>
+To: "Rob Herring (Arm)" <robh@kernel.org>
+Cc: Kishon Vijay Abraham I <kishon@kernel.org>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kw@linux.com>,
+	Liam Girdwood <lgirdwood@gmail.com>,
+	Jonathan Hunter <jonathanh@nvidia.com>,
+	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+	Vinod Koul <vkoul@kernel.org>, Eric Dumazet <edumazet@google.com>,
 	linux-arm-kernel@lists.infradead.org,
-	Allan Nielsen <allan.nielsen@microchip.com>,
-	Luca Ceresoli <luca.ceresoli@bootlin.com>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	=?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>
-Subject: Re: [PATCH 01/17] mfd: syscon: Add reference counting and device
- managed support
-Message-ID: <20240430203443.GG2575892@kernel.org>
-References: <20240430083730.134918-1-herve.codina@bootlin.com>
- <20240430083730.134918-2-herve.codina@bootlin.com>
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-phy@lists.infradead.org, devicetree@vger.kernel.org,
+	Mark Brown <broonie@kernel.org>, linux-kernel@vger.kernel.org,
+	Bharat Kumar Gogada <bharat.kumar.gogada@amd.com>,
+	Thierry Reding <thierry.reding@gmail.com>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	Michal Simek <michal.simek@amd.com>, linux-pci@vger.kernel.org,
+	linux-tegra@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
+	Bjorn Helgaas <bhelgaas@google.com>
+Subject: Re: [PATCH] dt-bindings: Drop unnecessary quotes on keys
+Message-ID: <171450935610.1153506.3784386455405156371.robh@kernel.org>
+References: <20240426202239.2837516-1-robh@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240430083730.134918-2-herve.codina@bootlin.com>
+In-Reply-To: <20240426202239.2837516-1-robh@kernel.org>
 
-On Tue, Apr 30, 2024 at 10:37:10AM +0200, Herve Codina wrote:
-> From: Clément Léger <clement.leger@bootlin.com>
+
+On Fri, 26 Apr 2024 15:22:37 -0500, Rob Herring (Arm) wrote:
+> The yamllint quoted-strings check wasn't checking keys for quotes, but
+> support for checking keys was added in 1.34 release. Fix all the errors
+> found when enabling the check.
 > 
-> Syscon releasing is not supported.
-> Without release function, unbinding a driver that uses syscon whether
-> explicitly or due to a module removal left the used syscon in a in-use
-> state.
+> Clean-up the xilinx-versal-cpm formatting while we're here.
 > 
-> For instance a syscon_node_to_regmap() call from a consumer retrieve a
-> syscon regmap instance. Internally, syscon_node_to_regmap() can create
-> syscon instance and add it to the existing syscon list. No API is
-> available to release this syscon instance, remove it from the list and
-> free it when it is not used anymore.
+> Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
+> ---
+>  Documentation/devicetree/bindings/net/sff,sfp.yaml   | 12 ++++++------
+>  .../devicetree/bindings/pci/xilinx-versal-cpm.yaml   |  7 +++++--
+>  .../devicetree/bindings/pci/xlnx,nwl-pcie.yaml       |  2 +-
+>  .../devicetree/bindings/phy/brcm,sata-phy.yaml       |  8 ++++----
+>  .../devicetree/bindings/regulator/ti,tps62864.yaml   |  2 +-
+>  .../bindings/soc/tegra/nvidia,tegra20-pmc.yaml       |  6 +++---
+>  Documentation/devicetree/bindings/tpm/ibm,vtpm.yaml  |  4 ++--
+>  7 files changed, 22 insertions(+), 19 deletions(-)
 > 
-> Introduce reference counting in syscon in order to keep track of syscon
-> usage using syscon_{get,put}() and add a device managed version of
-> syscon_regmap_lookup_by_phandle(), to automatically release the syscon
-> instance on the consumer removal.
-> 
-> Signed-off-by: Clément Léger <clement.leger@bootlin.com>
-> Signed-off-by: Herve Codina <herve.codina@bootlin.com>
 
-...
+Applied, thanks!
 
-> diff --git a/include/linux/mfd/syscon.h b/include/linux/mfd/syscon.h
-> index c315903f6dab..164b9bcb49c3 100644
-> --- a/include/linux/mfd/syscon.h
-> +++ b/include/linux/mfd/syscon.h
-> @@ -15,6 +15,7 @@
->  #include <linux/errno.h>
->  
->  struct device_node;
-> +struct device;
->  
->  #ifdef CONFIG_MFD_SYSCON
->  struct regmap *device_node_to_regmap(struct device_node *np);
-> @@ -28,6 +29,11 @@ struct regmap *syscon_regmap_lookup_by_phandle_args(struct device_node *np,
->  						    unsigned int *out_args);
->  struct regmap *syscon_regmap_lookup_by_phandle_optional(struct device_node *np,
->  							const char *property);
-> +void syscon_put_regmap(struct regmap *regmap);
-> +
-> +struct regmap *devm_syscon_regmap_lookup_by_phandle(struct device *dev,
-> +						    struct device_node *np,
-> +						    const char *property);
->  #else
->  static inline struct regmap *device_node_to_regmap(struct device_node *np)
->  {
-> @@ -67,6 +73,18 @@ static inline struct regmap *syscon_regmap_lookup_by_phandle_optional(
->  	return NULL;
->  }
->  
-> +static intline void syscon_put_regmap(struct regmap *regmap)
-
-intline -> inline
-
-> +{
-> +}
-
-...
 
