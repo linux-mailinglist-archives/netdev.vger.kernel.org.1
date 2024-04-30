@@ -1,91 +1,70 @@
-Return-Path: <netdev+bounces-92605-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92606-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C6818B8127
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 22:07:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FC048B8131
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 22:10:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6A8C61C25993
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 20:07:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5AFFA2850C1
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 20:10:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B548C1A0AFF;
-	Tue, 30 Apr 2024 20:07:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06760199E99;
+	Tue, 30 Apr 2024 20:10:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jAq66FZ4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WImPU34v"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78C073308A
-	for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 20:06:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC259182C3;
+	Tue, 30 Apr 2024 20:10:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714507621; cv=none; b=KrhI1obGZqcpiRK0aRtVW52HnmLzq7+GK3dYhw3fcYkruEr1RZ52PLPt5kk6dqa8A5Tdo5k3c4mLoHS/xH12VNiv9nUD2Ayh2z59xSJ/ElQKUaWEhE5g+khL8iqcv9QZsTPqZWXTR7i+LcmlKE2FMWD8U4c7fTO0fL0h43kUE4U=
+	t=1714507821; cv=none; b=BAipFtDjk+jCJsVJbptCpSZhRoqbO028Jp40kTpTqcgsKGGdCYDYXNabUE4VkjbGLl4f0kAemB5diy2n8PmrID0xfxiMDQuM7lijUUeif8niIBh5w6NuelpvFip7AjC/IdoDMuoQrJeAyl5JGB+gxvMT2iI1+QLTvSLe+/vmGow=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714507621; c=relaxed/simple;
-	bh=ug3YfKik7AumLDou9Srebnw6+kedHrFJPLCWgOx1frE=;
+	s=arc-20240116; t=1714507821; c=relaxed/simple;
+	bh=58CBaYeu4exH4ljqyrgLewfHjjrJsr+lwEV4eBnRRBY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TlvFix0TmZfOva+frBZwIJvogA/5GvHL6Dr7PaawFqt0HkoS/eSODPW0w41SQz0vxCjpILHr1zU0JNMKcuQA3BpOjOS0p4jflCb7bPEdp+26e4O1inss1iFq/M13pS/8QbqGRsYXx5OQJZh3eGKApu2Gr4nHU4nFW1kO4huGvM4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=jAq66FZ4; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1714507618;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=dxTrrQAHX5LIHD8+8RfIAMS1TPkS1k3rljcnnnsPEVE=;
-	b=jAq66FZ4tlALHbPQhE/ZoM181Z5KaVwK5JqgoZvkc3hXGqI4AHAyPfmyWrljrNgyE/Xm5M
-	DH+Zv8/7YFinrf1L8i8nTQH9B1/Pa88b7oXud1+56AOGkf5dnmgj0GJE9GnYbq9A0sPE/0
-	gJfYmC3yw7JsWET72Yh01Ne4dOOk4Vc=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-518-CKmN4XdbPUecrRHCYOGStA-1; Tue, 30 Apr 2024 16:06:56 -0400
-X-MC-Unique: CKmN4XdbPUecrRHCYOGStA-1
-Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-a51eb0c14c8so231826066b.0
-        for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 13:06:56 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714507615; x=1715112415;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dxTrrQAHX5LIHD8+8RfIAMS1TPkS1k3rljcnnnsPEVE=;
-        b=HkL5KhbgLWsKBuAghkeUUceoxkNvUaSCHtcE62S3mmb3OO1n1FTP0rrfdVJc5owVz4
-         QC3R5oM6+nNsBjIw+tgNFJX9dJrIAg3TRBEH3N9msIcWryYGgkg62pgx6YfRj68xZQzb
-         PKBPUTfPZkYtTLNCb33o3h1NgO5mYgyHXK0tkpETNxnnkm50ZX7HjuleJ7RjBEEZczME
-         rjnqj8Mgr3x0lPujK2a5pm6JhaPYLDDt0pTkMmUvwnhWQ+2cLgvBFdpUUHLBSqT0+gAv
-         pQQO5vq5tFejeXm2PZBJPz3H2cV/C+zgYqRw88KDBsnl/RZFPROZjgaJM2v4agzpIEd2
-         refQ==
-X-Forwarded-Encrypted: i=1; AJvYcCURlOApXgtLjjK9341asF5IFjHo7yHrNEOHrKck6Rrwlps0eatSU5qUVkVcAdMyhAFGE8GWEB+t7kOWMNcxwdtLZx9xYlJr
-X-Gm-Message-State: AOJu0YzzvPs9c0Yu2GBRm+M1JZPd3GzEBtPl03dmOSCE80cNM00YcU4q
-	31nH1FQfSwemvnuJqO+TSnX5KeGOx6kR+O+aA8cQVlyyJbzJXxzSh80QRcDslc4RJaMsfoCG7Hh
-	n8RW6lHamtN2Dcr7fQBe+rY7T4jbCw/gqbR4Nd/UGzHYXD2jKpKQmzA==
-X-Received: by 2002:a17:906:2a44:b0:a58:ee10:ad05 with SMTP id k4-20020a1709062a4400b00a58ee10ad05mr484893eje.69.1714507615499;
-        Tue, 30 Apr 2024 13:06:55 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IF7ocL9+DqttG8t6q0QKC2cVrRfgcVUPqW7FLSaNzemeZLoe4wornulVDynqTC9/Zrj4O1LwA==
-X-Received: by 2002:a17:906:2a44:b0:a58:ee10:ad05 with SMTP id k4-20020a1709062a4400b00a58ee10ad05mr484881eje.69.1714507614890;
-        Tue, 30 Apr 2024 13:06:54 -0700 (PDT)
-Received: from redhat.com ([2.55.56.94])
-        by smtp.gmail.com with ESMTPSA id s8-20020a170906500800b00a4e24d259edsm15356306ejj.167.2024.04.30.13.06.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Apr 2024 13:06:54 -0700 (PDT)
-Date: Tue, 30 Apr 2024 16:06:50 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Darius Rad <darius@bluespec.com>
-Cc: Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=g75nd/95qxcb3wizd6G3VGiJ6SNr0k8mzVW4viBbOMPRAY3hIBo7Rpc9LL7dJMe0Ea73x5G7gtQe/83tJCQQVdDBgxQVj3aKNCEYIf8wp/XiwkyMgLazT8UuWKLeXQC9xLQrDfrZ/BnfaVIynXr96XETMy7nzCA2cq5D5CkIoZg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WImPU34v; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A0C0CC2BBFC;
+	Tue, 30 Apr 2024 20:10:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714507821;
+	bh=58CBaYeu4exH4ljqyrgLewfHjjrJsr+lwEV4eBnRRBY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=WImPU34vi9oog0mmRTYwMKyo1ISHKsDV6YPWI+6u3+xUXQD8qpYdkh3C/41+D6CJw
+	 k6UKJmZXrLyk5BK2449OfE1cJpyzZgF9BxLmxWHNjFuDNGZudLuAXQSJKMr8FdYCQV
+	 cIEig5Y9rFDOqmC2AJQLvqY3T39W804ABIfyx3tLU0gZeu1lre7MEyjzk+57HmK9OT
+	 mYlEXGZh2NVuCp9T1OIwqLDSqmZV580TjPigcNNiN6CtS4oF6eVQHiZ3WNf0YPsEbu
+	 W4pzjqjzlUQ7Y9m+2ZqyTh7DDtM1ly32OG7YCKWgtLAsuBKB4WT4rvc+6gb628z1ZP
+	 H8aC6Gjk+siug==
+Date: Tue, 30 Apr 2024 21:08:44 +0100
+From: Simon Horman <horms@kernel.org>
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>,
+	Felix Fietkau <nbd@nbd.name>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	virtualization@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] virtio_net: Warn if insufficient queue length for
- transmitting
-Message-ID: <20240430121730-mutt-send-email-mst@kernel.org>
-References: <ZjFH7Xb5gyTtOpWd@localhost.localdomain>
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Landen Chao <Landen.Chao@mediatek.com>, devicetree@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH net] net: dsa: mt7530: fix impossible MDIO address and
+ issue warning
+Message-ID: <20240430200844.GE2575892@kernel.org>
+References: <e615351aefba25e990215845e4812e6cb8153b28.1714433716.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -94,47 +73,34 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZjFH7Xb5gyTtOpWd@localhost.localdomain>
+In-Reply-To: <e615351aefba25e990215845e4812e6cb8153b28.1714433716.git.daniel@makrotopia.org>
 
-On Tue, Apr 30, 2024 at 03:35:09PM -0400, Darius Rad wrote:
-> The transmit queue is stopped when the number of free queue entries is less
-> than 2+MAX_SKB_FRAGS, in start_xmit().  If the queue length (QUEUE_NUM_MAX)
-> is less than then this, transmission will immediately trigger a netdev
-> watchdog timeout.  Report this condition earlier and more directly.
+On Tue, Apr 30, 2024 at 12:45:46AM +0100, Daniel Golle wrote:
+> The MDIO address of the MT7530 and MT7531 switch ICs can be configured
+> using bootstrap pins. However, there are only 4 possible options for the
+> switch itself: 7, 15, 23 and 31 (ie. only 3 and 4 can be configured, bit
+> 0~2 are always 111). Practically all boards known as of today use the
+> default setting which is to have the switch respond to address 31, while
+> the built-in switch PHYs respond to address 0~4 in this case.
 > 
-> Signed-off-by: Darius Rad <darius@bluespec.com>
-> ---
->  drivers/net/virtio_net.c | 3 +++
->  1 file changed, 3 insertions(+)
+> However, even in MediaTek's SDK the address of the switch is wrongly
+> stated in the device trees as 0 (while in reality it is 31), so warn the
+> user about such broken device tree and make a good guess what was
+> actually intended.
 > 
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index 115c3c5414f2..72ee8473b61c 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -4917,6 +4917,9 @@ static int virtnet_probe(struct virtio_device *vdev)
->  			set_bit(guest_offloads[i], &vi->guest_offloads);
->  	vi->guest_offloads_capable = vi->guest_offloads;
->  
-> +	if (virtqueue_get_vring_size(vi->sq->vq) < 2 + MAX_SKB_FRAGS)
-> +		netdev_warn_once(dev, "not enough queue entries, expect xmit timeout\n");
-> +
+> This is imporant to not break compatibility with older Device Trees as
+> with commit 868ff5f4944a ("net: dsa: mt7530-mdio: read PHY address of
+> switch from device tree") the address in device tree will be taken into
+> account. Doing so instead of assuming the switch is always at
+> address 31 which was previously hard-coded will obviously break things
+> for many existing downstream device trees as they contain the wrong
+> address (0) which previously didn't matter.
+> 
+> Fixes: b8f126a8d543 ("net-next: dsa: add dsa support for Mediatek MT7530 switch")
+> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 
-How about actually fixing it though? E.g. by linearizing...
+The cited commit is present in net-next but not net.
+So I think this patch should target net-next.
 
-It also bothers me that there's practically
-/proc/sys/net/core/max_skb_frags
-and if that's low then things could actually work.
-
-Finally, while originally it was just 17 typically, now it's
-configurable. So it's possible that you change the config to make big
-tcp work better and device stops working while it worked fine
-previously.
-
-
->  	pr_debug("virtnet: registered device %s with %d RX and TX vq's\n",
->  		 dev->name, max_queue_pairs);
->  
-> -- 
-> 2.39.2
-
+...
 
