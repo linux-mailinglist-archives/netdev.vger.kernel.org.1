@@ -1,139 +1,125 @@
-Return-Path: <netdev+bounces-92437-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92438-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1C7A8B7573
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 14:10:12 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63EE08B75AA
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 14:24:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 62E64280E39
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 12:10:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2E556B216A4
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 12:24:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 347B613D605;
-	Tue, 30 Apr 2024 12:10:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DAF713F430;
+	Tue, 30 Apr 2024 12:24:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="fv7V3wlD"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="CNROjM8O"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADBDA12D1FD;
-	Tue, 30 Apr 2024 12:10:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 793C713D8A0;
+	Tue, 30 Apr 2024 12:24:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.141
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714479009; cv=none; b=XmRiGrprHKT4+C6vQfjqTeMFpO7vacDXTqqtYBSNfyJRaoefwyxuqQEAdfTD6k1Fmcpb9/9hpjZFYGXSywI5veD7Fl7lYCnqQmN66WrdgUl4A6kwKgISiaCILsPxGLaNWsraOkr0+vJxZfZsJKInLB9jygQFcIG5kHURtuLEUJA=
+	t=1714479861; cv=none; b=CY4abMeaohie0sSAvdToorMIoyL5bj8562bovlJUn6OME4TNFXmliRY3F33WCt8CcJ6Nx8Dlv4+0t6+Ogyyftb/rbeEuW80ubv10436hXhL+iFGXyjFK0+OqEUV/sW9AM3Grxkrip50KDguLnoO88l18y72F47dg0HUXio/u6tE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714479009; c=relaxed/simple;
-	bh=1UcIyZIvw+nKRBOEaDY/eKddMigSGwNJTENljhqGoms=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=NN63wTog1JJls/cLnISsGE8j7sOt9r9ocSLLaGqL8tIBRFSaUMr9ZJGJZ+yuaBr5v8P/pmI2SREgeFgf9SYdygsOi2x3KBL2fCj+MewbzmMaeayCuSgsYXuj7HdJbJA/NKO4ToYQ6gjm/b/WW3iSDS4QGQGm91sK+Fjh2TMiC/Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=fv7V3wlD; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 43UC8GsS002897;
-	Tue, 30 Apr 2024 12:09:57 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : from : to : cc : references : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=2lmFc4PaATfWpyT/9i9Kuvqnyc2AHwa/tz9Tt5u/VDY=;
- b=fv7V3wlD6g8PrRtZYhICPKzkZxeUmYh8x59npFk8JBA7nAR4f9AFNO/fFAtmrf1oxq9m
- V7NuVPXdXSjF++KMtHVtl48LnNXz5pTb35dPyOMLpp+qT0ZV+LAyd8zEbSKOgfA0e+6M
- jWMyDHIiqPrqPHC2upEeamnYtXhtLA6V0Ve6E4ez+fK7COAJcBIa3+1F5QEFXDigFquZ
- 2O0aMckeo4Qyy1gusSWpoAylw6wUtef/p68aVI/NHg5I3NJ4TM+gBeJBbpVWbskmeVNB
- YWGkFUyGv/1mFCvpqkacCjg2Kz+ewRlf+M0ropTruP2wejd2srk2ywm8eG3USeAhsN0K fw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xu0cpr02x-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 30 Apr 2024 12:09:57 +0000
-Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 43UC9u6A004379;
-	Tue, 30 Apr 2024 12:09:57 GMT
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xu0cpr02u-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 30 Apr 2024 12:09:56 +0000
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 43U8eWCJ001440;
-	Tue, 30 Apr 2024 12:09:56 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3xsbptw4fr-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 30 Apr 2024 12:09:56 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 43UC9oqY53739978
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 30 Apr 2024 12:09:52 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id C685B2004E;
-	Tue, 30 Apr 2024 12:09:50 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 12FC32004B;
-	Tue, 30 Apr 2024 12:09:50 +0000 (GMT)
-Received: from [9.171.73.65] (unknown [9.171.73.65])
-	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 30 Apr 2024 12:09:49 +0000 (GMT)
-Message-ID: <0a955558-8fd9-4824-aac3-c16d6330b8fe@linux.ibm.com>
-Date: Tue, 30 Apr 2024 14:09:49 +0200
+	s=arc-20240116; t=1714479861; c=relaxed/simple;
+	bh=KOBeT7FoVPcUC7BYDDnv3FjM6P6bvRBPEN+qjN1WCSI=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=uyayIf91kKtanuLv8zUYi+KmCqXFh4mER3gBu9cgsBimH6mEPgZrHkoRUKO95zYYhjyiGW3zCn42ut5AvJQ1l3yptjKEOmNZ7U9uxIyJlXva+/boAdsIVG77ErsPCm/oJgJefNufjQqzV+qcvb1D77wSVKLoOG/KMs3rymN8L48=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=CNROjM8O; arc=none smtp.client-ip=198.47.19.141
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from fllv0034.itg.ti.com ([10.64.40.246])
+	by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 43UCO6Xt022903;
+	Tue, 30 Apr 2024 07:24:06 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1714479846;
+	bh=i4t/c5XrlILHAYh/3L3J0sESvCIgLKV9OPOQhJnD710=;
+	h=From:To:CC:Subject:Date;
+	b=CNROjM8O70oYQfs74Cby1vTcQvOP7MbXAb0QN6TSBs3DSMH8yyEbbIkPjjwolMBcC
+	 IO8EILZNXfXEvvOaocaYDkqg6BkV0i/7NcZIufKz7N7G/9z0rYJ9Mmq4CZ7LulupB+
+	 o1B+7LjSBmdMh/qvInBi3m0VbFil4H13Cbng/CAA=
+Received: from DFLE113.ent.ti.com (dfle113.ent.ti.com [10.64.6.34])
+	by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 43UCO6GX094617
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Tue, 30 Apr 2024 07:24:06 -0500
+Received: from DFLE100.ent.ti.com (10.64.6.21) by DFLE113.ent.ti.com
+ (10.64.6.34) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Tue, 30
+ Apr 2024 07:24:06 -0500
+Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DFLE100.ent.ti.com
+ (10.64.6.21) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Tue, 30 Apr 2024 07:24:06 -0500
+Received: from lelv0854.itg.ti.com (lelv0854.itg.ti.com [10.181.64.140])
+	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 43UCO6pA069552;
+	Tue, 30 Apr 2024 07:24:06 -0500
+Received: from localhost (danish-tpc.dhcp.ti.com [10.24.69.25])
+	by lelv0854.itg.ti.com (8.14.7/8.14.7) with ESMTP id 43UCO5A3027936;
+	Tue, 30 Apr 2024 07:24:06 -0500
+From: MD Danish Anwar <danishanwar@ti.com>
+To: Conor Dooley <conor+dt@kernel.org>,
+        Krzysztof Kozlowski
+	<krzk+dt@kernel.org>,
+        Rob Herring <robh@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>,
+        Jakub Kicinski <kuba@kernel.org>, Eric Dumazet
+	<edumazet@google.com>,
+        "David S. Miller" <davem@davemloft.net>
+CC: <linux-kernel@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+        <srk@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>,
+        <r-gunasekaran@ti.com>, Roger Quadros <rogerq@kernel.org>,
+        MD Danish Anwar <danishanwar@ti.com>
+Subject: [PATCH net-next] dt-bindings: net: ti: icssg_prueth: Add documentation for PA_STATS support
+Date: Tue, 30 Apr 2024 17:54:03 +0530
+Message-ID: <20240430122403.1562769-1-danishanwar@ti.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] s390/qeth: Fix kernel panic after setting hsuid
-Content-Language: en-US
-From: Alexandra Winter <wintera@linux.ibm.com>
-To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
-        Wenjia Zhang <wenjia@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>
-Cc: netdev@vger.kernel.org, linux-s390@vger.kernel.org,
-        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Thorsten Winkler <twinkler@linux.ibm.com>
-References: <20240430091004.2265683-1-wintera@linux.ibm.com>
-In-Reply-To: <20240430091004.2265683-1-wintera@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: myMygxWjoJjskkRw1PzaxeDCnrcC2znU
-X-Proofpoint-ORIG-GUID: 4eojujexLEwn2K6t046CNlVvoc042c-2
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1011,Hydra:6.0.650,FMLib:17.11.176.26
- definitions=2024-04-30_04,2024-04-30_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 spamscore=0
- mlxscore=0 impostorscore=0 suspectscore=0 priorityscore=1501 phishscore=0
- lowpriorityscore=0 bulkscore=0 mlxlogscore=999 clxscore=1015 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2404010000
- definitions=main-2404300086
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 
-Sorry, I forgot to CC Wenjia, Chirstian and Sven.
-They all saw early versions of the patch. 
-But of course my mistake, not to check with scripts/get_maintainer.pl
+Add documentation for ti,pa-stats property which is syscon regmap for
+PA_STATS register. This will be used to dump statistics maintained by
+ICSSG firmware.
 
+Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
+---
+ Documentation/devicetree/bindings/net/ti,icssg-prueth.yaml | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
+diff --git a/Documentation/devicetree/bindings/net/ti,icssg-prueth.yaml b/Documentation/devicetree/bindings/net/ti,icssg-prueth.yaml
+index e253fa786092..abf372f7191b 100644
+--- a/Documentation/devicetree/bindings/net/ti,icssg-prueth.yaml
++++ b/Documentation/devicetree/bindings/net/ti,icssg-prueth.yaml
+@@ -55,6 +55,11 @@ properties:
+     description:
+       phandle to MII_RT module's syscon regmap
+ 
++  ti,pa-stats:
++    $ref: /schemas/types.yaml#/definitions/phandle
++    description:
++      phandle to PA_STATS module's syscon regmap
++
+   ti,iep:
+     $ref: /schemas/types.yaml#/definitions/phandle-array
+     maxItems: 2
+@@ -194,6 +199,7 @@ examples:
+                     "tx1-0", "tx1-1", "tx1-2", "tx1-3",
+                     "rx0", "rx1";
+         ti,mii-g-rt = <&icssg2_mii_g_rt>;
++        ti,pa-stats = <&icssg2_pa_stats>;
+         ti,iep = <&icssg2_iep0>, <&icssg2_iep1>;
+         interrupt-parent = <&icssg2_intc>;
+         interrupts = <24 0 2>, <25 1 3>;
+-- 
+2.34.1
 
-On 30.04.24 11:10, Alexandra Winter wrote:
-> Fix:
-> There is no need to free the output queues when a completion queue is
-> added or removed.
-> card->qdio.state now indicates whether the inbound buffer pool and the
-> outbound queues are allocated.
-> card->qdio.c_q indicates whether a CQ is allocated.
-> 
-> Fixes: 1cfef80d4c2b ("s390/qeth: Don't call dev_close/dev_open (DOWN/UP)")
-> Signed-off-by: Alexandra Winter <wintera@linux.ibm.com>
-> ---
->  drivers/s390/net/qeth_core_main.c | 61 ++++++++++++++-----------------
->  1 file changed, 27 insertions(+), 34 deletions(-)
-> 
-> diff --git a/drivers/s390/net/qeth_core_main.c b/drivers/s390/net/qeth_core_main.c
-> index f0b8b709649f..a3adaec5504e 100644
-> --- a/drivers/s390/net/qeth_core_main.c
-> +++ b/drivers/s390/net/qeth_core_main.c
-> @@ -364,30 +364,33 @@ static int qeth_cq_init(struct qeth_card *card)
 
