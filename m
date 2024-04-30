@@ -1,151 +1,71 @@
-Return-Path: <netdev+bounces-92519-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92520-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54E388B7B5E
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 17:24:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD6BA8B7B77
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 17:27:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DB7D1284D2A
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 15:24:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7A0AA1F23468
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 15:27:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA68B14373D;
-	Tue, 30 Apr 2024 15:24:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AC4E172BC1;
+	Tue, 30 Apr 2024 15:27:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="dCJFfiu8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mossMODi"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-190a.mail.infomaniak.ch (smtp-190a.mail.infomaniak.ch [185.125.25.10])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13341770F0
-	for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 15:24:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.25.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69A70171E75;
+	Tue, 30 Apr 2024 15:27:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714490692; cv=none; b=PkVng7fCYKDlBKRYtzUgYVQYRcJHvmf9hQHRdFQtytaG9KVxkpoSynXnWyaxA/YytxfncXFVyjtIgRVhxOPhZfHvAqxl7qRXsAPjSx8P4Uyb9kmJQf648NFcSLm/nNhK+g7i/urcIHivRVTxGP3brxuQvZT50FmDNTffcF1TG0s=
+	t=1714490839; cv=none; b=pBPRDHyJhs3Y/ne/XXCUhI7ztVg/JF3Aps4wGjfzkqdlARVJePuoyBM2I3/DkcASeOP7mM6Sv055JizGcVUlwaTm4Ja6Pco6xAECDKV0lavZUO2CqBan43Ng6cKPZUbHCg0hcEU6VY/UHNetJoAobE334cwkx2DwcpQyioqFD4M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714490692; c=relaxed/simple;
-	bh=o9tw+r7HiK2cyxfIdnEKxzsdQ/OTiilNikfU3NSHVe0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MlMuWviOUxmzIH2aaIxiB2S0CyLw96R9NU/pWRGliL0G2Vq9dsJZTtlSiJo4RQa+IFyOtt809bTD2oNy3FemSZhp+Aw+yB2/M5fxR3jEYyucI6YpZ2qWXuukokAAEU07nmuj/jZpAOwd+mt4GrdDx9zgdrZcWWZJXmy9o64mgjA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=dCJFfiu8; arc=none smtp.client-ip=185.125.25.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
-Received: from smtp-3-0000.mail.infomaniak.ch (smtp-3-0000.mail.infomaniak.ch [10.4.36.107])
-	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4VTPBl21DwzwK5;
-	Tue, 30 Apr 2024 17:24:47 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=digikod.net;
-	s=20191114; t=1714490687;
-	bh=o9tw+r7HiK2cyxfIdnEKxzsdQ/OTiilNikfU3NSHVe0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=dCJFfiu8WGMiQ53xbHZ1FW9HOnnmCs2WrkKqstQM5CEf2ab5pQQD3GVv0pmnZJhDL
-	 8iD3bq+qImade0+0Vrdhs95JQMZcSwWLhABsB10SZlyjgeIzvySVt3evyecmyS2MXX
-	 wTmyf48w/uMNYgOBvz59alNnwDz6EJDyGZ02RIDg=
-Received: from unknown by smtp-3-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4VTPBk2xCtzhtX;
-	Tue, 30 Apr 2024 17:24:46 +0200 (CEST)
-Date: Tue, 30 Apr 2024 17:24:45 +0200
-From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
-To: Tahera Fahimi <fahimitahera@gmail.com>
-Cc: Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>, 
-	"Serge E. Hallyn" <serge@hallyn.com>, linux-security-module@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, outreachy@lists.linux.dev, netdev@vger.kernel.org, 
-	=?utf-8?B?QmrDtnJu?= Roy Baron <bjorn3_gh@protonmail.com>, Jann Horn <jannh@google.com>, 
-	=?utf-8?Q?G=C3=BCnther?= Noack <gnoack@google.com>
-Subject: Re: [PATCH v2] landlock: Add abstract unix socket connect
- restrictions
-Message-ID: <20240411.ahgeefeiNg4i@digikod.net>
-References: <ZgX5TRTrSDPrJFfF@tahera-OptiPlex-5000>
- <20240401.ieC2uqua5sha@digikod.net>
- <ZhcRnhVKFUgCleDi@tahera-OptiPlex-5000>
+	s=arc-20240116; t=1714490839; c=relaxed/simple;
+	bh=CkP4kGQkUb9bwINA+s2FGC4MkUQIgOZ+AbJw8o/rX64=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Ue8F4q0ODpnnwQsTWF+//IS44Szva908m6V3RRgQKg6AvnVJKhBgAuXtiRdh4fJX1qVuhrTiSk4NWJF3fKAkL278U1s/prJnBhXmj58EvhlCj7TtM+NuvCu9IH1nAeSiouZd0t0GhaKsC+D6zlH8+QZsN5vsdVgST0Tg81nlxmI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mossMODi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7CB7BC2BBFC;
+	Tue, 30 Apr 2024 15:27:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714490839;
+	bh=CkP4kGQkUb9bwINA+s2FGC4MkUQIgOZ+AbJw8o/rX64=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=mossMODiKr/2Om6tkOVagDUv4i1kljFeDt/qXxBNxfWo0SeBgESu5dRHsagblsPFI
+	 p5mld7EY+JKLy4ORKCBX/ghKwNJL5/F4/iJGtwmmcD61Mr2ccjmyPbIstv1f4uQ2UO
+	 z0gYHiOed5MukvURJnyLznjyyk1Z8gDnZ00Z0Vp3V8DEOTvl12pE2MpUxkOpYm25SY
+	 MiNtUPURc4SQoQc7vpzrrvHiKnZ+hpJ1epRMhnVvr9WSSrLh8THKPJmMSeTsg+S0EH
+	 vbzxwDXvIUXaX2Czk5+yEtG2RjzYOHl3pNMHqKMQ7hqwaOdHGA5SLYPXpMcs9/MEh/
+	 61uK4pKxwlnGw==
+Date: Tue, 30 Apr 2024 08:27:17 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: jtornosm@redhat.com
+Cc: Isaac Ganoung <inventor500@vivaldi.net>, davem@davemloft.net,
+ edumazet@google.com, jarkko.palviainen@gmail.com,
+ linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
+ netdev@vger.kernel.org, pabeni@redhat.com, stable@vger.kernel.org, Vadim
+ Fedorenko <vadim.fedorenko@linux.dev>
+Subject: Re: [PATCH v2] net: usb: ax88179_178a: avoid writing the mac
+ address before first reading
+Message-ID: <20240430082717.65f26140@kernel.org>
+In-Reply-To: <hzhomd7d7uc4dcnpvd6ki6v2f6camzm5ufqp2syqudrvzzfxi4@ykcirhonbqql>
+References: <hzhomd7d7uc4dcnpvd6ki6v2f6camzm5ufqp2syqudrvzzfxi4@ykcirhonbqql>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ZhcRnhVKFUgCleDi@tahera-OptiPlex-5000>
-X-Infomaniak-Routing: alpha
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, Apr 10, 2024 at 04:24:30PM -0600, Tahera Fahimi wrote:
-> On Tue, Apr 02, 2024 at 11:53:09AM +0200, Mickaël Salaün wrote:
-> > Thanks for this patch.  Please CC the netdev mailing list too, they may
-> > be interested by this feature. I also added a few folks that previously
-> > showed their interest for this feature.
-> > 
-> > On Thu, Mar 28, 2024 at 05:12:13PM -0600, TaheraFahimi wrote:
-> > > Abstract unix sockets are used for local interprocess communication without
-> > > relying on filesystem. Since landlock has no restriction for connecting to
-> > > a UNIX socket in the abstract namespace, a sandboxed process can connect to
-> > > a socket outside the sandboxed environment. Access to such sockets should
-> > > be scoped the same way ptrace access is limited.
-> > 
-> > This is good but it would be better to explain that Landlock doesn't
-> > currently control abstract unix sockets and that it would make sense for
-> > a sandbox.
-> > 
-> > 
-> > > 
-> > > For a landlocked process to be allowed to connect to a target process, it
-> > > must have a subset of the target process’s rules (the connecting socket
-> > > must be in a sub-domain of the listening socket). This patch adds a new
-> > > LSM hook for connect function in unix socket with the related access rights.
-> > 
-> > Because of compatibility reasons, and because Landlock should be
-> > flexible, we need to extend the user space interface.  As explained in
-> > the GitHub issue, we need to add a new "scoped" field to the
-> > landlock_ruleset_attr struct. This field will optionally contain a
-> > LANDLOCK_RULESET_SCOPED_ABSTRACT_UNIX_SOCKET flag to specify that this
-> > ruleset will deny any connection from within the sandbox to its parents
-> > (i.e. any parent sandbox or not-sandboxed processes).
+On Mon, 29 Apr 2024 18:16:05 -0500 Isaac Ganoung wrote:
+> uname -a output: Linux hostname 6.8.8-arch1-1 #1 SMP PREEMPT_DYNAMIC Sun, 28 Apr 2024 18:53:26 +0000 x86_64 GNU/Linux
+> This is Arch Linux's kernel. The patches applied are here: <https://github.com/archlinux/linux/releases/tag/v6.8.8-arch1>
 
-> Thanks for the feedback. Here is what I understood, please correct me if
-> I am wrong. First, I should add another field to the
-> landlock_ruleset_attr (a field like handled_access_net, but for the unix
-> sockets) with a flag LANDLOCK_ACCESS_UNIX_CONNECT (it is a flag like
-> LANDLOCK_ACCESS_NET_CONNECT_TCP but fot the unix sockets connect).
-
-That was the initial idea, but after thinking more about it and talking
-with some users, I now think we can get a more generic interface.
-
-Because unix sockets, signals, and other IPCs are fully controlled by
-the kernel (contrary to inet sockets that get out of the system), we can
-add ingress and egress control according to the source and the
-destination.
-
-To control the direction we could add an
-LANDLOCK_ACCESS_DOM_UNIX_ABSTRACT_RECEIVE and a
-LANDLOCK_ACCESS_DOM_UNIX_ABSTRACT_SEND rights (these names are a bit
-long but at least explicit).  To control the source and destination, it
-makes sense to use Landlock domain (i.e. sandboxes):
-LANDLOCK_DOMAIN_HIERARCHY_PARENT, LANDLOCK_DOMAIN_HIERARCHY_SELF, and
-LANDLOCK_DOMAIN_HIERARCHY_CHILD.  This could be used by extending the
-landlock_ruleset_attr type and adding a new
-landlock_domain_hierarchy_attr type:
-
-struct landlock_ruleset_attr ruleset_attr = {
-  .handled_access_dom = LANDLOCK_ACCESS_DOM_UNIX_ABSTRACT_RECEIVE | \
-                        LANDLOCK_ACCESS_DOM_UNIX_ABSTRACT_SEND,
-}
-
-// Allows sending data to and receiving data from processes in the same
-// domain or a child domain, through abstract unix sockets.
-struct landlock_domain_hierarchy_attr dom_attr = {
-  .allowed_access = LANDLOCK_ACCESS_DOM_UNIX_ABSTRACT_RECEIVE | \
-                    LANDLOCK_ACCESS_DOM_UNIX_ABSTRACT_SEND,
-  .relationship = LANDLOCK_DOMAIN_HIERARCHY_SELF | \
-                  LANDLOCK_DOMAIN_HIERARCHY_CHILD,
-};
-
-It should also work with other kind of IPCs:
-* LANDLOCK_ACCESS_DOM_UNIX_PATHNAME_RECEIVE/SEND (signal)
-* LANDLOCK_ACCESS_DOM_SIGNAL_RECEIVE/SEND (signal)
-* LANDLOCK_ACCESS_DOM_XSI_RECEIVE/SEND (XSI message queue)
-* LANDLOCK_ACCESS_DOM_MQ_RECEIVE/SEND (POSIX message queue)
-* LANDLOCK_ACCESS_DOM_PTRACE_RECEIVE/SEND (ptrace, which would be
-  limited)
-
-What do you think?
+v6.8.8 has 56f78615b already. We need another patch, Jose?
 
