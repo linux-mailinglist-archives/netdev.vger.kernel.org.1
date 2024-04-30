@@ -1,139 +1,92 @@
-Return-Path: <netdev+bounces-92619-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92620-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C05048B820E
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 23:43:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 954748B8223
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 23:52:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A4718B23C8A
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 21:43:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 005B12844D2
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 21:52:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6718D1BED70;
-	Tue, 30 Apr 2024 21:43:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84F7A1BED89;
+	Tue, 30 Apr 2024 21:51:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="1LZsSCsG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KNpn6BNP"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BFF31A38C3;
-	Tue, 30 Apr 2024 21:43:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D88C1BED7A;
+	Tue, 30 Apr 2024 21:51:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714513392; cv=none; b=XWoR3CUeGHn2sdALQhPDRlStcdkQ50Hq4N98ORkm3SUv7G/EZk/wDTkJ/UxIVAW5dOPneVj+Js0jDqanHi7iapbBkXRokWfma8I8e8OQOuVAdU9WK1Oa3ot4W3sHMzEJY8FZKMB0QNJrU4GqFlSNEKeYBM4hCls7DO1XbjDLF9c=
+	t=1714513918; cv=none; b=NC6CfRch9NS34wJ0X+HzRVA24iHp3McyGNCUDXyVkvSJIlP52Xt2bMlghq24cDb2BqvWRptFvF2czgVmdr7STx9pfbHxE4FDhW8+GKK2ugteLA9KaWIlakphuvDRNK95kv5R+Rtym36qTc0hHiqFWQaPMXylYaod79wTMm40tAY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714513392; c=relaxed/simple;
-	bh=PCdfWchWv0+l2t5VJQRsOj75G9AohlXXXJoHztzVjas=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=l1AqgFa26M0XsJB55oZcZGshQHXHzBkg02xDOFMxZzjvJ4M2/tjWlNoXGRNNITp8Iz2U/nqcQfUam9MoUGMAHznF9Fv9mZKMUiUU5njGazyDrnfeZa01IWI1QFQiv7/HIGH6uabOYlgvKykEQgjat9f4qZ/5nTyJhxYNtud3qTI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=1LZsSCsG; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=lggD9pYkib5zG81CMuS1CQFd5BKo9d5BLNerDS5nZpQ=; b=1LZsSCsGl88A0iFRIhQFVH50Vs
-	exc4TQqh5edpZ7j7aAe7dn1OHmPAxLtwK+0ilAWXWrcYYHYkK266WfeSZL/hA7hMPf5uMd/LTE5Nu
-	V0gb2tk0IIMLIYGx0J6jCeQM43fjWVKS9JFicDU5g/Q/jM6FSYLSZftvlGh4hU/1hxHDKFt9kuP8X
-	Fpvad71H7Kss9GjnLKqcgdd+We1QQc5kZXqKUMWbHCW0c9aEHPn7XBSeHMf1Vu2I/sjvynuQYLbrz
-	N+jNmDnNJrdQSQ7zVjcpHZiQhXhWEgEvSGXKGmc/wdmdxWC1pKFsd0wpJ5apN3ILheEP84daTo//L
-	uoVso/IQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:40672)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1s1vFd-0005XP-0g;
-	Tue, 30 Apr 2024 22:43:01 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1s1vFa-00026i-S0; Tue, 30 Apr 2024 22:42:58 +0100
-Date: Tue, 30 Apr 2024 22:42:58 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Halaney <ahalaney@redhat.com>
-Cc: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org,
-	alexandre.torgue@foss.st.com, joabreu@synopsys.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, mcoquelin.stm32@gmail.com, andrew@lunn.ch,
-	hkallweit1@gmail.com
-Subject: Re: racing ndo_open()/phylink*connect() with phy_probe()
-Message-ID: <ZjFl4rql0UgsHp97@shell.armlinux.org.uk>
-References: <uz66kbjbxieof6vkliuwgpzhlrbcmeb2f5aeuourw2vqcoc4hv@2adpvba3zszx>
+	s=arc-20240116; t=1714513918; c=relaxed/simple;
+	bh=+0rMFc8W9K6N8tTRcAbFLgTHxUGbC3wry46O1XEkCoE=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=bfRgwWwhZ7lfrqOzYCf8S4Yv8exNwcImFo537IdLYGxrBFPKq91oFrDPqmW4Wg1EcFEsGa2Nsj2I0torl10QMG6NG9/tKBf852K+31iHhmG2FyLmD7We7dQ9Gi4RpQlvFL+LtjEVq8x0zCIhfnVz7WI0lTHo8E9RGgpgyJ3f+UA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KNpn6BNP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 0EDE8C4AF19;
+	Tue, 30 Apr 2024 21:51:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714513918;
+	bh=+0rMFc8W9K6N8tTRcAbFLgTHxUGbC3wry46O1XEkCoE=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=KNpn6BNP23sWa+MZFKrEfAHnludgSYghf3qv04paljB3M4X9F7f/7u9eWNXeeTgpk
+	 4ZMMe02FoEMUPo0S3Bcq4CsmQqaa9VR8fvd6pbrpdikooxeHZp4zi/8IHQHd46Dd6G
+	 l0fYVw2QRV8tCyvS8KtQhEBIHR+oUdlJHQhj2naV4PZM0418/3IMjY1hwVa6SCMTa5
+	 9N+But4kfEbcvOpgm9TWKZkeRsgpVmzPTfs+t5sJK9EUd5bOkVGd8Hou5Q6Alct/Sk
+	 y/fH3+EKXAl+taQoGaK2qVLHtyPJk90Hydco4lzE5zu1tnMPCfGYLKQFSNdPisDHxO
+	 68vZYQ3/l7yaA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id F2EB1C43443;
+	Tue, 30 Apr 2024 21:51:57 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <uz66kbjbxieof6vkliuwgpzhlrbcmeb2f5aeuourw2vqcoc4hv@2adpvba3zszx>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+Subject: Re: pull request: bluetooth 2024-04-24
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <171451391799.30746.13972006009899083304.git-patchwork-notify@kernel.org>
+Date: Tue, 30 Apr 2024 21:51:57 +0000
+References: <20240424204102.2319483-1-luiz.dentz@gmail.com>
+In-Reply-To: <20240424204102.2319483-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: davem@davemloft.net, kuba@kernel.org, linux-bluetooth@vger.kernel.org,
+ netdev@vger.kernel.org
 
-On Tue, Apr 30, 2024 at 04:02:19PM -0500, Andrew Halaney wrote:
-> Basically, NetworkManager is setting both interfaces to up, and end1's
-> phy doesn't seem to be ready when ndo_open() runs, returning
-> -ENODEV in phylink_fwnode_phy_connect() and bubbling that back up. This doesn't
+Hello:
 
-Let's get something clear - you're attributing phylink to this, but this
-is not the case. phylink doesn't deal directly with PHYs, it makes use
-of phylib for that, and merely passes back to its caller whatever status
-it gets from phylib. It's also not fair to attribute this to phylib as
-we will see later...
+This pull request was applied to bluetooth/bluetooth-next.git (master)
+by Jakub Kicinski <kuba@kernel.org>:
 
-There are a few reasons for phylink_fwnode_phy_connect() would return
--ENODEV:
+On Wed, 24 Apr 2024 16:41:02 -0400 you wrote:
+> The following changes since commit 5b5f724b05c550e10693a53a81cadca901aefd16:
+> 
+>   net: phy: mediatek-ge-soc: follow netdev LED trigger semantics (2024-04-24 11:50:49 +0100)
+> 
+> are available in the Git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2024-04-24
+> 
+> [...]
 
-1) fwnode_get_phy_node() (a phylib function) returning an error,
-basically meaning the phy node isn't found. This would be a persistent
-error, so unlikely to be your issue.
+Here is the summary with links:
+  - pull request: bluetooth 2024-04-24
+    https://git.kernel.org/bluetooth/bluetooth-next/c/e6b219014fb3
 
-2) fwnode_phy_find_device() (another phylib function) not finding the
-PHY device corresponding to the fwnode returned by the above on the
-MDIO bus. This is possible if the PHY has not been detected on the
-MDIO bus, but I suspect this is not the cause of your issue.
-
-3) phy_attach_direct() (another phylib function) returning an error.
-This function calls phy_init_hw() which will attempt to talk to the
-hardware, and if that returns an error, it will be propagated up.
-
-(3) is the most likely scenario given your quoted DT description. I
-suspect that the stmmac/qcom-ethqos driver is what's at fault here.
-
-Your DT description shows that the PHYs are on one MDIO bus owned by
-one of the network interfaces. I suspect if that network interface
-is down, then the MDIO bus is not accessible.
-
-Therefore, when you attempt to open the _other_ network interface,
-accesses to its PHY fail with -ENODEV and that gets propagated all
-the way back up.
-
-What's more is if you did manage to get that network interface up
-(because the one with the MDIO bus on was up) then if you take
-that interface down, you'll end up with a phy_error() splat from
-phylib because the PHY it was using has become inaccessible.
-
-Basically, the network driver is buggy for this PHY setup. If a
-MDIO bus contains devices that are not owned by the network device
-owning that MDIO bus, then the MDIO bus _must_ be prepared to handle
-MDIO bus accesses _at_ _any_ _time_. This clearly is not the case
-here.
-
-It could also be the case that if the driver is using runtime PM,
-that when the network interface is runtime-PM suspended, it causes
-MDIO bus accesses to fail... that would be very chaotic though.
-
-In any case, I'm going to say... I don't think this is a phylink nor
-phylib issue, but a buggy network driver thinking that it has the
-right to shutdown MDIO bus access depending on its network interface
-state.
-
+You are awesome, thank you!
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
