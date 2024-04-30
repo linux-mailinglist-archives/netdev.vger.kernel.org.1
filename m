@@ -1,106 +1,91 @@
-Return-Path: <netdev+bounces-92321-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92322-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 909F48B6993
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 06:46:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6460A8B69A0
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 06:58:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BDF3A1C21BB2
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 04:46:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 95BA81C21B10
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 04:58:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FE25D518;
-	Tue, 30 Apr 2024 04:44:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB29A1401E;
+	Tue, 30 Apr 2024 04:58:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="iemwYYUw"
+	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="GvqvmYBT"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-100.freemail.mail.aliyun.com (out30-100.freemail.mail.aliyun.com [115.124.30.100])
+Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C4D9D531;
-	Tue, 30 Apr 2024 04:44:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06AD6125BA;
+	Tue, 30 Apr 2024 04:58:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714452290; cv=none; b=JTpQfLPYFVFJZKiFQhp486HwvewvIwzubAiPeCO++tI9O9ws8LCG93UoODAGAE+cQN5YinRsf8sCwTIOJ65VPz+hAwUATh1ZU9u8NZ2QDDzrtQtXX3gIhEHwVuNsakvOT8TFVm6x2HJlvPTA9FYv23Pdu9JPO+9tJ3FJ0qRGirs=
+	t=1714453100; cv=none; b=o4x05HsiZTx0XEVq654DZUi6CMVfkmhO6DTHT/FbZF07zrkVPoFHpl73tCGOTnRfbznhBz9AZ1vwr/yX687UBedI5Rp060SElw4+MtAFFjfUR5ekzFjZlugQ5fuiuH7MNykmk/JdEPym57mwUpnUwvywWLGZIml8pP2iFvnOmpY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714452290; c=relaxed/simple;
-	bh=vamxvV7ssmaZu1dRJfLYlSmXr+Xcmz3LVM+j0QFADm0=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=rYgGHXcLax2oHrhn76iD94G+xYKcs2Bvfi+t7eKRrwo9D0wBXlgL37KCZBuXHObAsG7zTQMkQvP0QyRIhCpP6MG6eV+f+GT/S1gBUDqMqygUt4zoNXxBHO8d5Z1A6FPsIQQisq+MRB/DM552PfY/d/XLhNsa3h8++jUVd4t49cU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=iemwYYUw; arc=none smtp.client-ip=115.124.30.100
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1714452284; h=Message-ID:Subject:Date:From:To;
-	bh=lLWhA6INtv3AySColRQE0PHFqgvrCTu7nUANAMJDBYk=;
-	b=iemwYYUwqa1JciEPf2lsLJxSPPTMv0n0saKLqCrLfmdNGNlvQDIvtDcMR8LeyGOATFvzTTSMWIPVN8E0cJ1CD6tcie9Wv86y45nB9bZVoNWj3lemWVz2NuCws+R+muOqYPVrzE8DzwN+/bmFc3mD5HTsmJ3pnhWQMniknDn9Mak=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R151e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033032014031;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=23;SR=0;TI=SMTPD_---0W5b5FBG_1714452281;
-Received: from localhost(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0W5b5FBG_1714452281)
-          by smtp.aliyun-inc.com;
-          Tue, 30 Apr 2024 12:44:42 +0800
-Message-ID: <1714452238.254616-2-hengqi@linux.alibaba.com>
-Subject: Re: [PATCH net-next v10 2/4] ethtool: provide customized dim profile management
-Date: Tue, 30 Apr 2024 12:43:58 +0800
-From: Heng Qi <hengqi@linux.alibaba.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org,
- virtualization@lists.linux.dev,
- "David S .   Miller" <davem@davemloft.net>,
- Paolo Abeni <pabeni@redhat.com>,
- Eric   Dumazet <edumazet@google.com>,
- Jason Wang <jasowang@redhat.com>,
- "Michael S   . Tsirkin" <mst@redhat.com>,
- Brett Creeley <bcreeley@amd.com>,
- Ratheesh   Kannoth <rkannoth@marvell.com>,
- Alexander Lobakin <aleksander.lobakin@intel.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
- Tal   Gilboa <talgi@nvidia.com>,
- Jonathan Corbet <corbet@lwn.net>,
- linux-doc@vger.kernel.org,
- Maxime Chevallier <maxime.chevallier@bootlin.com>,
- Jiri Pirko <jiri@resnulli.us>,
- Paul   Greenwalt <paul.greenwalt@intel.com>,
- Ahmed Zaki <ahmed.zaki@intel.com>,
- Vladimir Oltean <vladimir.oltean@nxp.com>,
- Kory Maincent <kory.maincent@bootlin.com>,
- Andrew Lunn <andrew@lunn.ch>,
- "justinstitt @   google . com" <justinstitt@google.com>
-References: <20240425165948.111269-1-hengqi@linux.alibaba.com>
- <20240425165948.111269-3-hengqi@linux.alibaba.com>
- <20240426183333.257ccae5@kernel.org>
- <98ea9d4d-1a90-45b9-a4e0-6941969295be@linux.alibaba.com>
- <20240429104741.3a628fe6@kernel.org>
- <1714442379.4695537-1-hengqi@linux.alibaba.com>
- <20240429201300.0760b6d6@kernel.org>
-In-Reply-To: <20240429201300.0760b6d6@kernel.org>
+	s=arc-20240116; t=1714453100; c=relaxed/simple;
+	bh=FxARK+Ac1zGzaPGYkJ1m/SwB3s0XeVwOgtFDsG9w8NQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=JdBkZslRQVF8E2k1NQJ9Xrl/tLpaub5jNBgHkNfogsOQChMfxxJnLgM7nzP5t7HEoKqjsrAFSfyg5Qom4y86+cE3lIkgZ2WP/Lhqbf8yChlJwYHfEYmQtHYwfo8TzhZvgy7RHNx1ohGISJuOdmcR18HRHIACa9Ywp7CkrDUzC5k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com; spf=pass smtp.mailfrom=arinc9.com; dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b=GvqvmYBT; arc=none smtp.client-ip=217.70.183.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arinc9.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 0C189240002;
+	Tue, 30 Apr 2024 04:58:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
+	t=1714453095;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=FxARK+Ac1zGzaPGYkJ1m/SwB3s0XeVwOgtFDsG9w8NQ=;
+	b=GvqvmYBTMir6yilmStEchowgXWLuj9LMkK0Iegexk6xEuqA/fTZrDaF9sc6ox/iy88ofS1
+	VeiY3TWT7VwSe0yIpNZrAryXpqBSGu4LpGjYjKjWi5e92jReF5OWMflTn0GMF0I2yVJ0pV
+	hWyxbhqP7Qte/5DmFp3NPvMwBe24f4Vx4JrMEKPxO2n3vPgwHn63UnmaY511Q3OV7T/990
+	K6VXaKbbpeOMUNnGjfuuooSaLfFfV68W62qT+7An4iCTrkL1vDAPMfl3NgUgzH8xj7dC+5
+	ARtBmgiKmlgl229n0IU8wHbfyBSxqTvH9A27v7E861JDg+wNAzkw5viozmMN/Q==
+Message-ID: <ded0ee71-dfa5-497e-a579-c212185f23ba@arinc9.com>
+Date: Tue, 30 Apr 2024 07:58:08 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: dsa: mt7530: fix impossible MDIO address and
+ issue warning
+To: Daniel Golle <daniel@makrotopia.org>, Felix Fietkau <nbd@nbd.name>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, DENG Qingfang <dqfext@gmail.com>,
+ Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
+ Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean
+ <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Landen Chao <Landen.Chao@mediatek.com>, devicetree@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
+References: <e615351aefba25e990215845e4812e6cb8153b28.1714433716.git.daniel@makrotopia.org>
+Content-Language: en-US
+From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+In-Reply-To: <e615351aefba25e990215845e4812e6cb8153b28.1714433716.git.daniel@makrotopia.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: arinc.unal@arinc9.com
 
-On Mon, 29 Apr 2024 20:13:00 -0700, Jakub Kicinski <kuba@kernel.org> wrote:
-> On Tue, 30 Apr 2024 09:59:39 +0800 Heng Qi wrote:
-> > + if (moder[ETHTOOL_A_IRQ_MODERATION_USEC]) {
-> > + 	if (irq_moder->coal_flags & DIM_COALESCE_USEC)
-> > + 		new_profile[i].usec =
-> > + 			nla_get_u32(moder[ETHTOOL_A_IRQ_MODERATION_USEC]);
-> > + 	else
-> > + 		return -EOPNOTSUPP;
-> > + }
-> 
-> Almost, the extack should still be there on error:
-> 
-> + if (moder[ETHTOOL_A_IRQ_MODERATION_USEC])
-> + 	if (irq_moder->coal_flags & DIM_COALESCE_USEC) {
-> + 		new_profile[i].usec =
-> + 			nla_get_u32(moder[ETHTOOL_A_IRQ_MODERATION_USEC]);
-> + 	} else {
-> +		NL_SET_BAD_ATTR(extack, moder[ETHTOOL_A_IRQ_MODERATION_USEC]);
-> + 		return -EOPNOTSUPP;
-> + 	}
-> 
+On 4/30/24 02:45, Daniel Golle wrote:
+> The MDIO address of the MT7530 and MT7531 switch ICs can be configured
+> using bootstrap pins. However, there are only 4 possible options for the
+> switch itself: 7, 15, 23 and 31 (ie. only 3 and 4 can be configured, bit
+> 0~2 are always 111). Practically all boards known as of today use the
+> default setting which is to have the switch respond to address 31, while
+> the built-in switch PHYs respond to address 0~4 in this case.
 
-Sure, thanks!
+I'm not aware of the MT7531 switch having bootstrap pins to configure the
+PHY address. Are you sure this is the case?
+
+Arınç
 
