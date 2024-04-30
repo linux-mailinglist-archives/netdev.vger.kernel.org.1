@@ -1,103 +1,93 @@
-Return-Path: <netdev+bounces-92459-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92458-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05FE78B775B
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 15:40:45 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 311528B7758
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 15:40:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B6A33281DAA
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 13:40:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DA0CB1F219CF
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 13:40:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA09D171E64;
-	Tue, 30 Apr 2024 13:40:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C614D171640;
+	Tue, 30 Apr 2024 13:40:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="KV0j+Kvh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Pi7io/92"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3821F85956;
-	Tue, 30 Apr 2024 13:40:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A01A785956
+	for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 13:40:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714484439; cv=none; b=UQMUCaV6APhhFazoJYeiFBd3rwotNI9E07EiRPmFAuD1odCheIQ/4PAikrW2284rncOgLLOiBWNDTEgFfJRLRMxe77B6d0dlxNDpjXTrCLP5JzNluqUZqR3UibAcFNSdOdUNJSJkuBhCuPFx8iVkzDbyKCNJYcBnA1PNyy/blVU=
+	t=1714484434; cv=none; b=XgkaO9qZx2hYcwhFx/kzcGOVO4PkKBxsDAMtF/9Py9NnJsOD3YAX54P2VtfgVGmTERObksG/312fdx6gN0E1dS8FsYDtpkfxfuvRtHou8o9Bkb4dw2ae/EpEtuMtwmYYOF2z3zXkCHUrv+o55hzC9mmXHswRUTFDc97BkQBbNpU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714484439; c=relaxed/simple;
-	bh=ZTYH03z4YSkkewuHlkyQiJdNerzGEwiVi62NucA1JRs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PdtgKB6Cg7+SFiCObHS9sChU3rmYbv5JUNG7tevBZ4YPdc2bgrlyRsNVqEYXNzZe69JVr5Qs9rPKT3F74vDieNfe1jHrJyN96a2ChPjo07ZEuM7hv4toTavF59mPE3XBxHwY4AjpHbTmtEwHPYBqsbr7j0F6tli+a/CHTJplQsQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=KV0j+Kvh; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=mkRUaVu7YuLLbPG/sEIdKbsrNJjXmv2kqwxQ10HArmo=; b=KV0j+KvhT099ZYRt0grZJXeYui
-	+izqQo/8eCvLo1wM/5GXYbkF3pgdoBmjzpQNaBHXGWVoWCj9sRl9uMPuVrL8BmhTZ4jTavfGnnDfr
-	SsOB0cwpE3xcfnSRde77OLZStLtE7VPssEhuEm4HMZ4+t29yXXn32HWwsbuajZiqxAok=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1s1niS-00ELH5-3S; Tue, 30 Apr 2024 15:40:16 +0200
-Date: Tue, 30 Apr 2024 15:40:16 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Herve Codina <herve.codina@bootlin.com>
-Cc: Thomas Gleixner <tglx@linutronix.de>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Lee Jones <lee@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
-	Horatiu Vultur <horatiu.vultur@microchip.com>,
-	UNGLinuxDriver@microchip.com,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Saravana Kannan <saravanak@google.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Lars Povlsen <lars.povlsen@microchip.com>,
-	Steen Hegelund <Steen.Hegelund@microchip.com>,
-	Daniel Machon <daniel.machon@microchip.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
-	netdev@vger.kernel.org, linux-pci@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Allan Nielsen <allan.nielsen@microchip.com>,
-	Luca Ceresoli <luca.ceresoli@bootlin.com>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH 00/17] Add support for the LAN966x PCI device using a DT
- overlay
-Message-ID: <4571846d-2001-4bbf-b311-d0b42844143d@lunn.ch>
-References: <20240430083730.134918-1-herve.codina@bootlin.com>
+	s=arc-20240116; t=1714484434; c=relaxed/simple;
+	bh=PkaaMUSzHkQlVVSzjRC9SaTkUSeCNsJP/b8Uju28AZY=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=tGKR7NQNNweq/Ih2ClY/ZqX0ffYc5TxIBNGsivgB3HiRl19x6EFhSM4Rw0PbrprQaKMKo+NjvWNlYyzUOTl0/9GZ2DNIg8wm/U9OsQ1n69j/TGHHeSYJPbcl0SOq62ulkxsyMuzs3LhzdhzGAKjSvL8bfB2BOOFduJ53m3IFaQM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Pi7io/92; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 7DD70C4AF19;
+	Tue, 30 Apr 2024 13:40:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714484434;
+	bh=PkaaMUSzHkQlVVSzjRC9SaTkUSeCNsJP/b8Uju28AZY=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Pi7io/92Lfr0vOQezCZ6LJdhFv/BApGh1sHbANh4bCXdYZkaPEu7f6CHsvwW2e+5W
+	 2GCzDczsLFgBQR9a+fAVa4ciV6KkDOy2sbhPVTL7UP5PxhrbGlvalwLWlYYjkJOlUi
+	 Z26W0hu8gqQnRwYpbQXrOoN4mxzBsQUIvRwFLj7+urO7EdoFwEkaoMsbXTt6eOJOQb
+	 v5PCGR0h/6qZfRSCL4ARmtOGfORFw8GZZyykJPkHw/5aH3T8g5xpfvOmarlLxsqBg0
+	 h+bVWqDidpVbEz7C2X+8S6BdKe/gWdFMckW/Y2o7Usxi32/gganysDqoAu2hMCs+Be
+	 08Daqej6dKwbA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 73D64C43617;
+	Tue, 30 Apr 2024 13:40:34 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240430083730.134918-1-herve.codina@bootlin.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] net: sfp-bus: constify link_modes to
+ sfp_select_interface()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171448443447.21603.1533307979454648924.git-patchwork-notify@kernel.org>
+Date: Tue, 30 Apr 2024 13:40:34 +0000
+References: <E1s15s0-00AHyq-8E@rmk-PC.armlinux.org.uk>
+In-Reply-To: <E1s15s0-00AHyq-8E@rmk-PC.armlinux.org.uk>
+To: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org
 
-On Tue, Apr 30, 2024 at 10:37:09AM +0200, Herve Codina wrote:
-> Hi,
+Hello:
+
+This patch was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Sun, 28 Apr 2024 15:51:12 +0100 you wrote:
+> sfp_select_interface() does not modify its link_modes argument, so
+> make this a const pointer.
 > 
-> This series adds support for the LAN966x chip when used as a PCI
-> device.
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> ---
+>  drivers/net/phy/sfp-bus.c | 2 +-
+>  include/linux/sfp.h       | 4 ++--
+>  2 files changed, 3 insertions(+), 3 deletions(-)
 
-> This patch series for now adds a Device Tree overlay that describes an
-> initial subset of the devices available over PCI in the LAN996x, and
-> follow-up patch series will add support for more once this initial
-> support has landed.
+Here is the summary with links:
+  - [net-next] net: sfp-bus: constify link_modes to sfp_select_interface()
+    https://git.kernel.org/netdev/net-next/c/5cd9fac3a369
 
-What host systems have you tested with? Are they all native DT, or
-have you tested on an ACPI system? I'm just wondering how well DT
-overlay works if i were to plug a LAN966x device into something like
-an x86 ComExpress board?
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-	Andrew
+
 
