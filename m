@@ -1,170 +1,129 @@
-Return-Path: <netdev+bounces-92600-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92601-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1BD698B80BA
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 21:44:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A97B8B80C3
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 21:49:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7D2411F240E7
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 19:44:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4FBCC1C22F79
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 19:49:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28AFA17BB25;
-	Tue, 30 Apr 2024 19:44:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A337D199E8C;
+	Tue, 30 Apr 2024 19:49:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="LR/WfzVk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Lu0o802u"
 X-Original-To: netdev@vger.kernel.org
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E814D190672
-	for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 19:44:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79A5112B73;
+	Tue, 30 Apr 2024 19:49:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714506262; cv=none; b=BAjIU8eyM72yjuix0lZGDqw2OFDj8vXPGaoTuwohNq+xFx7NhWtDmynNR9l8yl3wdaDcF5zcpMm7Hv8vhnxbPP2IZIviABTAqRnMmMwkodHsc/EV4kh5Qxkdp40UORqlCcGUdJPZkNywU6hnayzQSQKqN6q54Er7CoQpFiULg94=
+	t=1714506584; cv=none; b=LcwHWbDSx6LNGGwpsFStj0sMej4tJH4hMz5fdTADTp2CCIFYsU+3lpWs1pQFzJVAieAqpPtGIsNSSu7OxU+XoxcgBPiwEKMdbjWxp7ELoQ1PpjLj7XyQJEgrIESpw134K8peii7Rz2/pslEAkOE68cj4BK/Pacq53+Q9W8aU14k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714506262; c=relaxed/simple;
-	bh=5QZLb/Bh8dTMxh2pEN40k0KxyCJ2iydALhUyJju9CrQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WNoxmAs+oRYAAqituRK5uHFVesIxqKl8o1K9Fhcd3KWi15O1VHaaGKTnMQVAn30faeDoNr5LsVyonGuwNsgQ/+wmAfe/WjLdYspKZ11qAYdd+xrNCbW1AyMVD0fcswWlFCLWnsjoOhec6HyBBPT2xeCrlu0pRH7hhw20bPwXbIA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=LR/WfzVk; arc=none smtp.client-ip=85.214.62.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from tr.lan (ip-86-49-120-218.bb.vodafone.cz [86.49.120.218])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-	(No client certificate requested)
-	(Authenticated sender: marex@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id DE9DE881DE;
-	Tue, 30 Apr 2024 21:44:16 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1714506257;
-	bh=bQQzZBTvyjr2+tuL4mR6eHtX/eJnbEe/KDDxV9XumdA=;
-	h=From:To:Cc:Subject:Date:From;
-	b=LR/WfzVk3rqPEtkefAL6pgLxJeF9hF6Z//953U3JiCQWobRhv1dReDpfEVHhufBGp
-	 lQTpVs8d0gjOTdZl8Iv9lUq8DzJTnJ3Jx4geZULN2zR+Ethw7U695zgM5I6oW1xAx4
-	 0S5es3SRoknkM+/LuVCH+afeNtPwmLBvFKxUN+4csnMt5Q7gGy5u5JfNqyiOzN8POy
-	 S7H268wQNpj5BIAr+djLM4rCtBekuuymeoXuij0xNmxGxkEboKBcREaVvqD/U9U+te
-	 ElNsZIPvC2tTlHBZz7Px+EpnN4Q+zOfuO7K3qGnttviTRa7waWHIUTfyTOFkEoltOn
-	 m7Zn/0d0aI4Ng==
-From: Marek Vasut <marex@denx.de>
-To: netdev@vger.kernel.org
-Cc: Marek Vasut <marex@denx.de>,
-	Ronald Wahl <ronald.wahl@raritan.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
+	s=arc-20240116; t=1714506584; c=relaxed/simple;
+	bh=L44UUlMJiMRqZ33YFvdDMIt0qg//D0t3qFogmLwOHbA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nEBl1E2OLSAVDzBEqPtRJu1VzyT9+wx83Wh5F9KvRZIhgviWUxSnWUeZ0iJDKvaOqA+K8Yn3Sk7UWM/f3JCJ3I27kvo+ulY7sTVo3Xf6OZYStoWJeIxUOC2WqclALkkWoTQC4pH9xhKbsKlvqnBF45ps4J9A/FmcuLBn7vnPHpo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Lu0o802u; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6810CC2BBFC;
+	Tue, 30 Apr 2024 19:49:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714506584;
+	bh=L44UUlMJiMRqZ33YFvdDMIt0qg//D0t3qFogmLwOHbA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Lu0o802uikMvRSH2hVH/ntKAqjFEhQuKLi1pEvnAjtUk6qCI0wuLmfnLNsySFVH9r
+	 VtB1Gv3hjuFMKSfFYNM+xpcWj50TZDx2yntBcJC8ll4BfP1M95bZN7+DagyNX1dG4b
+	 Fa/jCNaS+C9EyCa5mhI7PyXYV8j6ajxQEhourAW3rkvlkzpyr8kwtoqeIg6YgTsVOd
+	 /BxpzCpawAPpQmIhnGqsJahpsq1/8LLTYMNaud7rV7t6AAqQ7pjsXHlNZUQBB6AXh5
+	 nGJka9NLm0yhgp4lmwtNR7/hJ07hEOOx+3+6AjSnQWGTL139ib/LUyNwnprn8aZPj9
+	 6RDkUflamtg/Q==
+Date: Tue, 30 Apr 2024 20:49:38 +0100
+From: Simon Horman <horms@kernel.org>
+To: MD Danish Anwar <danishanwar@ti.com>
+Cc: Dan Carpenter <dan.carpenter@linaro.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>, Jan Kiszka <jan.kiszka@siemens.com>,
+	Diogo Ivo <diogo.ivo@siemens.com>, Paolo Abeni <pabeni@redhat.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>
-Subject: [net,PATCH v2] net: ks8851: Queue RX packets in IRQ handler instead of disabling BHs
-Date: Tue, 30 Apr 2024 21:43:34 +0200
-Message-ID: <20240430194401.118950-1-marex@denx.de>
-X-Mailer: git-send-email 2.43.0
+	Eric Dumazet <edumazet@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, srk@ti.com,
+	Vignesh Raghavendra <vigneshr@ti.com>, r-gunasekaran@ti.com,
+	Roger Quadros <rogerq@kernel.org>
+Subject: Re: [PATCH net-next v3] net: ti: icssg_prueth: Add SW TX / RX
+ Coalescing based on hrtimers
+Message-ID: <20240430194938.GD2575892@kernel.org>
+References: <20240430120634.1558998-1-danishanwar@ti.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240430120634.1558998-1-danishanwar@ti.com>
 
-Currently the driver uses local_bh_disable()/local_bh_enable() in its
-IRQ handler to avoid triggering net_rx_action() softirq on exit from
-netif_rx(). The net_rx_action() could trigger this driver .start_xmit
-callback, which is protected by the same lock as the IRQ handler, so
-calling the .start_xmit from netif_rx() from the IRQ handler critical
-section protected by the lock could lead to an attempt to claim the
-already claimed lock, and a hang.
+On Tue, Apr 30, 2024 at 05:36:34PM +0530, MD Danish Anwar wrote:
+> Add SW IRQ coalescing based on hrtimers for RX and TX data path for ICSSG
+> driver, which can be enabled by ethtool commands:
+> 
+> - RX coalescing
+>   ethtool -C eth1 rx-usecs 50
+> 
+> - TX coalescing can be enabled per TX queue
+> 
+>   - by default enables coalescing for TX0
+>   ethtool -C eth1 tx-usecs 50
+>   - configure TX0
+>   ethtool -Q eth0 queue_mask 1 --coalesce tx-usecs 100
+>   - configure TX1
+>   ethtool -Q eth0 queue_mask 2 --coalesce tx-usecs 100
+>   - configure TX0 and TX1
+>   ethtool -Q eth0 queue_mask 3 --coalesce tx-usecs 100 --coalesce
+> tx-usecs 100
+> 
+> Minimum value for both rx-usecs and tx-usecs is 20us.
+> 
+> Compared to gro_flush_timeout and napi_defer_hard_irqs this patch allows
+> to enable IRQ coalescing for RX path separately.
+> 
+> Benchmarking numbers:
+>  ===============================================================
+> | Method                  | Tput_TX | CPU_TX | Tput_RX | CPU_RX |
+> | ==============================================================
+> | Default Driver           943 Mbps    31%      517 Mbps  38%   |
+> | IRQ Coalescing (Patch)   943 Mbps    28%      518 Mbps  25%   |
+>  ===============================================================
+> 
+> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
+> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> ---
+> Changes from v2 [2] to v3:
+> *) Collected RB tag from Andrew Lunn <andrew@lunn.ch>
+> *) Fixed warning caused by {} missing for outer if conditions in
+>    emac_napi_tx_poll() and emac_napi_rx_poll() APIs.
+> *) Fixed spelling mistake.
 
-The local_bh_disable()/local_bh_enable() approach works only in case
-the IRQ handler is protected by a spinlock, but does not work if the
-IRQ handler is protected by mutex, i.e. this works for KS8851 with
-Parallel bus interface, but not for KS8851 with SPI bus interface.
+Thanks for the updates.
+This one looks good to me.
 
-Remove the BH manipulation and instead of calling netif_rx() inside
-the IRQ handler code protected by the lock, queue all the received
-SKBs in the IRQ handler into a queue first, and once the IRQ handler
-exits the critical section protected by the lock, dequeue all the
-queued SKBs and push them all into netif_rx(). At this point, it is
-safe to trigger the net_rx_action() softirq, since the netif_rx()
-call is outside of the lock that protects the IRQ handler.
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-Fixes: be0384bf599c ("net: ks8851: Handle softirqs at the end of IRQ thread to fix hang")
-Tested-by: Ronald Wahl <ronald.wahl@raritan.com> # KS8851 SPI
-Signed-off-by: Marek Vasut <marex@denx.de>
----
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: Ronald Wahl <ronald.wahl@raritan.com>
-Cc: Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org
----
-V2: - Add TB from Ronald
-    - Operate private skb queue without locking as suggested by Eric
----
-Note: This is basically what Jakub originally suggested in
-      https://patchwork.kernel.org/project/netdevbpf/patch/20240331142353.93792-2-marex@denx.de/#25785606
----
- drivers/net/ethernet/micrel/ks8851.h        | 1 +
- drivers/net/ethernet/micrel/ks8851_common.c | 8 ++++----
- 2 files changed, 5 insertions(+), 4 deletions(-)
+> 
+> Changes from v1 [1] to v2:
+> *) Added Benchmarking numbers in the commit message as suggested by
+>    Andrew Lunn <andrew@lunn.ch>. Full logs [3]
+> *) Addressed comments given by Simon Horman <horms@kernel.org> in v1.
+> 
+> [1] https://lore.kernel.org/all/20240424091823.1814136-1-danishanwar@ti.com/
+> [2] https://lore.kernel.org/all/20240429071501.547680-1-danishanwar@ti.com/
+> [3] https://gist.githubusercontent.com/danish-ti/47855631be9f3635cee994693662a988/raw/94b4eb86b42fe243ab03186a88a314e0cb272fd0/gistfile1.txt
 
-diff --git a/drivers/net/ethernet/micrel/ks8851.h b/drivers/net/ethernet/micrel/ks8851.h
-index 31f75b4a67fd7..f311074ea13bc 100644
---- a/drivers/net/ethernet/micrel/ks8851.h
-+++ b/drivers/net/ethernet/micrel/ks8851.h
-@@ -399,6 +399,7 @@ struct ks8851_net {
- 
- 	struct work_struct	rxctrl_work;
- 
-+	struct sk_buff_head	rxq;
- 	struct sk_buff_head	txq;
- 	unsigned int		queued_len;
- 
-diff --git a/drivers/net/ethernet/micrel/ks8851_common.c b/drivers/net/ethernet/micrel/ks8851_common.c
-index d4cdf3d4f5525..813a41193e3ce 100644
---- a/drivers/net/ethernet/micrel/ks8851_common.c
-+++ b/drivers/net/ethernet/micrel/ks8851_common.c
-@@ -299,7 +299,7 @@ static void ks8851_rx_pkts(struct ks8851_net *ks)
- 					ks8851_dbg_dumpkkt(ks, rxpkt);
- 
- 				skb->protocol = eth_type_trans(skb, ks->netdev);
--				__netif_rx(skb);
-+				__skb_queue_tail(&ks->rxq, skb);
- 
- 				ks->netdev->stats.rx_packets++;
- 				ks->netdev->stats.rx_bytes += rxlen;
-@@ -330,8 +330,6 @@ static irqreturn_t ks8851_irq(int irq, void *_ks)
- 	unsigned long flags;
- 	unsigned int status;
- 
--	local_bh_disable();
--
- 	ks8851_lock(ks, &flags);
- 
- 	status = ks8851_rdreg16(ks, KS_ISR);
-@@ -408,7 +406,8 @@ static irqreturn_t ks8851_irq(int irq, void *_ks)
- 	if (status & IRQ_LCI)
- 		mii_check_link(&ks->mii);
- 
--	local_bh_enable();
-+	while (!skb_queue_empty(&ks->rxq))
-+		netif_rx(__skb_dequeue(&ks->rxq));
- 
- 	return IRQ_HANDLED;
- }
-@@ -1189,6 +1188,7 @@ int ks8851_probe_common(struct net_device *netdev, struct device *dev,
- 						NETIF_MSG_PROBE |
- 						NETIF_MSG_LINK);
- 
-+	__skb_queue_head_init(&ks->rxq);
- 	skb_queue_head_init(&ks->txq);
- 
- 	netdev->ethtool_ops = &ks8851_ethtool_ops;
--- 
-2.43.0
-
+...
 
