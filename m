@@ -1,217 +1,116 @@
-Return-Path: <netdev+bounces-92598-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92599-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB8A18B8066
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 21:19:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2544C8B80A4
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 21:35:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9DC51283CA5
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 19:19:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B99171F246F3
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 19:35:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB284199E95;
-	Tue, 30 Apr 2024 19:19:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06C97199E99;
+	Tue, 30 Apr 2024 19:35:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yhrCM4Yd"
+	dkim=pass (2048-bit key) header.d=bluespec-com.20230601.gappssmtp.com header.i=@bluespec-com.20230601.gappssmtp.com header.b="eW5L7EfS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
+Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAC82194C9C
-	for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 19:19:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52AA8199E88
+	for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 19:35:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714504776; cv=none; b=gwJdn3XpHDlx/YfZ+OhRUClMDdc8LQajzcXug8ApDvveHrq5HSWaSCJF55bH6eVuU1JfyRqP7ofBBtkIrrTpLtUkobSMTHOsbSxEg9HQ2jXH4jiwl6Tjq85oc0Go9g9Qyr47EvEiv/EF6VympOGpCMp4rltgjnk7UNcMI+QKc3s=
+	t=1714505717; cv=none; b=QdgKFT1USlUlxXKEkcmC7+uypjD3+foeFIHoUKTeq4K5k9t6XPQiSSrbLFT4+IfBPrrLKWDlJnWdmFGZkpIYyvS0O1ODkI+L4am2n+CxJgoomjkON8k19Qkos5zZ4Hf+cBUk0nRKBW4O7PCkt6xmZOZTfe400BteLj2nMVmOUUY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714504776; c=relaxed/simple;
-	bh=rXrYXwxz8utS37Zdd/NHXMvvYHT1Pko55fdXpz+a0f8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=UrRyi0YYgk8iOvQXKLl5ppv8ejwhxfgYZVjAkwvG4vTusSW8Xq2c7VSY5C2QktbGxxMOxYrimo6uV56ByNrdCjI0yxOLpi+3g1D09wbGZJolfiasNfyVhqeL6egf4b7hZ4OLfc1+GazbDaK3zs+Vo+0cyPXn7Dk+ZWNzkojF8vs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yhrCM4Yd; arc=none smtp.client-ip=209.85.167.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-51b09c3a111so8632085e87.1
-        for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 12:19:34 -0700 (PDT)
+	s=arc-20240116; t=1714505717; c=relaxed/simple;
+	bh=8VoMAvq3zO3JVqiphTJGZqYC0YcLa4T9AVNVLehqUQQ=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=fdn6UojHF/jsS2ijSQQCg54kYxK/yjleisss7RhkS1AvbRb62hxfADB4f7mYeFu2Tu9qarDW17Y5qEc+4A8/cv7QoF1GY7X18iWmzu9As3V5cW8axTbppKLdqvwU68eW5YdpauoUHR6cVt2Gsc4T6i/jqVrpwwphMkkS/7jDNkU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bluespec.com; spf=fail smtp.mailfrom=bluespec.com; dkim=pass (2048-bit key) header.d=bluespec-com.20230601.gappssmtp.com header.i=@bluespec-com.20230601.gappssmtp.com header.b=eW5L7EfS; arc=none smtp.client-ip=209.85.219.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bluespec.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=bluespec.com
+Received: by mail-qv1-f45.google.com with SMTP id 6a1803df08f44-69b9365e584so1408846d6.1
+        for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 12:35:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1714504773; x=1715109573; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JBbLSd4KX1Ml6Kx/U9tspaOWXAez2c+6/7rMF07WiMA=;
-        b=yhrCM4YdS1mVSkC6dZlf25VsI6foSQBCk1DyesxJ/3Nf9GIMHy2gLaao5m1yno4E4y
-         LtG62zQbF9BTkR0aOMYlQm1EEMYIDUCq9PMx9uJmf3kKE2VKFDXgbV/etlhd83AV68Mw
-         q0LoGQlekuHwfa+7Hc6GI0DZ/Iir29gHWQ93YeFSVeB4ebbTLs1IPAMrizUw1zcYmLPc
-         dGrMy+HB86r/BLLws08RKvC1H2mXBtxc86+vZP7uOFNjHzPyfH/Yc46yDsB17PHHg3/8
-         cmY8hLG3CzLveY5qMgQT1zM60pq2ET0rzg8DrUA3vcerRTlTRWGeqNRVTZKVEPp06M3c
-         o+RQ==
+        d=bluespec-com.20230601.gappssmtp.com; s=20230601; t=1714505714; x=1715110514; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=rkIPuP+CuWN9tKCMSVVGNkNWpD1n57mvYpOJRL642BE=;
+        b=eW5L7EfS+DZQQuw6+gpxz+aI9APHdEVnOIubMZqG6Od+J1aaZ5fi4XEhZNCC+pc7Z3
+         y6VpTW7S+0kK9zGw7l/kVOUBMquLGzNy2XiTNAqxIsP5tizKES31HLbmGO9tks4Ed43B
+         T1TeQP3Xotp4TmRCNSentvpRne9GOIyrZXCP8nVjgFpGOITWkD+QCVhCynFI7ayCW2ZS
+         0CkqURMOdG4XEXVbgr/J4uLyxc6+69APgh5CI6POr8IsoR8UzNeuvgBq0gcePZHvicHK
+         Wv1TM50JVB5g+aOwdnqLrC7s/eHrYK349UQUKepEd+vcsMNZI56sx+8wuhQrdbjv/dhG
+         +JiA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714504773; x=1715109573;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=JBbLSd4KX1Ml6Kx/U9tspaOWXAez2c+6/7rMF07WiMA=;
-        b=nhQ5d+tLFwqnslUFxn8jy6DwZ9EfyeBCo5UGrk/6b7dUP11BqTz4GsnQ0QeupKHOXF
-         5YK8FAKoksre/HLPcKIftB6kvttMLdQoAEhlF0l5ip4wWMus3dnEpkvtEM7vhs38+u7O
-         VNLov1k5vhn6CW3Jo6kbUYMC5ifboVK9XlSMIi/9oX1Ob+pnEC21d+e0cKheLixu+vgd
-         jikirJBmUh6rYOeOUiHroXekxQQ14AUwfU/O6uzA1+ydMpd/YyBhVT8KlZfglRvmS1Is
-         pKDFOiJEXLgAlcnhjlM6tNE+3V1gbJw7fMfM1fZ1icMZiplPuc1O6vObmMjBuWkbgYaE
-         Ljyg==
-X-Forwarded-Encrypted: i=1; AJvYcCXFw2ALhG9iFjI9Rbkwo1Ctzs/WmZHCmuDg/vmQg0erCoBfb97SrVqF2Hu/2I5tJ4BdDGZGfg40BUa9CLQcIk18ep/+dvI6
-X-Gm-Message-State: AOJu0YwghUPu8eG2SkNFgVrelByrzRkhcGcFd11x9uU2VijwCyRwVqgw
-	JYR2T36x/57Jeie8kiTCLSx7+riV6gjid90QGEK0gVtB4yH0ERr2rexboYKqJkjQNXDC4DHzQCD
-	B8mNf8CoAijDkT+gKwnZ8IFjyuUYghq8VqmjnKD/Pf+xGSEinXtOG
-X-Google-Smtp-Source: AGHT+IEv1vAD5KmPx2DuK83e++oMbqGnWC2h94YZYICJhje+Ouaos+1vgy9d2n+Zn+VtRp04liNfK+AEGoM+Z6BbCWI=
-X-Received: by 2002:a05:6512:3492:b0:517:8ad8:c64 with SMTP id
- v18-20020a056512349200b005178ad80c64mr259130lfr.21.1714504772286; Tue, 30 Apr
- 2024 12:19:32 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1714505714; x=1715110514;
+        h=content-disposition:mime-version:message-id:subject:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=rkIPuP+CuWN9tKCMSVVGNkNWpD1n57mvYpOJRL642BE=;
+        b=WQirci5lmqg0BZ2oRkgZYrmYtIsWF/YIoeYuKyulM0oZ6CJ5qIUxftqBzAZUdG3mzd
+         Y5IYFgs6Hn2yCaMx9I/8Bi5s00yjKVZlIuJ/OeVFrrkVRP7wTldIyeVWLIsEfc9qfnHr
+         YABf8lww0maet7go9o1KFzixIlooIBkkrdPn+NGZIE6rhx2lV+4kbo9kY4MyuyxoaMuA
+         EfY5E173ycVBQ0OTLniCBsABociiIV4gWdpeXT5O3tABa8zNIyysoAgFMXO4mtY+lL9d
+         39AjPieYEKu7rO42ARUr3KO1qtlV4bOISgqrlINlB6EtKsv2JQpVLFuLoG6clXYYpPYS
+         33Iw==
+X-Forwarded-Encrypted: i=1; AJvYcCXu35ERwq1nN37trnGw7R2pYMWpJ7dn9E+8qBUPd9Uk5PqbEenI/He3qiqa7E0iERfhc/cqQjoLv6Ofb6yAFHSTHJ5ft/i8
+X-Gm-Message-State: AOJu0YzLksPOwdMAMNHZGCrZJnt8zNzia+P4gKf/+AF+Q6zTm8ylxtKF
+	WWO9elYtTcT+WSx9pru+N6K6LZHT/xdOvxhJLh8ggSkLYxoS4RoXtnyQFFAF
+X-Google-Smtp-Source: AGHT+IGBKXU/7tRSFz93Y1xzcjPZPQaoRweolkwmfOyZ1X1BJG2s1+KA1acju3jrin1dLUxC2l0LEA==
+X-Received: by 2002:ad4:4ee4:0:b0:69b:6b28:f941 with SMTP id dv4-20020ad44ee4000000b0069b6b28f941mr7236867qvb.20.1714505714112;
+        Tue, 30 Apr 2024 12:35:14 -0700 (PDT)
+Received: from localhost.localdomain ([102.129.235.205])
+        by smtp.gmail.com with ESMTPSA id mg20-20020a056214561400b006a0cf4808dfsm2100850qvb.45.2024.04.30.12.35.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 30 Apr 2024 12:35:13 -0700 (PDT)
+Date: Tue, 30 Apr 2024 15:35:09 -0400
+From: Darius Rad <darius@bluespec.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	virtualization@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] virtio_net: Warn if insufficient queue length for
+ transmitting
+Message-ID: <ZjFH7Xb5gyTtOpWd@localhost.localdomain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240403002053.2376017-1-almasrymina@google.com>
- <20240403002053.2376017-8-almasrymina@google.com> <8357256a-f0e9-4640-8fec-23341fc607db@davidwei.uk>
- <CAHS8izPeYryoLdCAQdGQU-wn7YVdtuofVKNvRFjFjhqTDsT7zA@mail.gmail.com>
- <aafbbf09-a33d-4e73-99c8-9ddab5910657@kernel.dk> <CAHS8izMKLYATo6g3xkj_thFo3whCfq6LSoex5s0m5XZd-U7SVQ@mail.gmail.com>
- <11f52113-7b67-4b45-ba1d-29b070050cec@kernel.dk>
-In-Reply-To: <11f52113-7b67-4b45-ba1d-29b070050cec@kernel.dk>
-From: Mina Almasry <almasrymina@google.com>
-Date: Tue, 30 Apr 2024 12:19:17 -0700
-Message-ID: <CAHS8izP3KtH_CHyQKE+=vrY-yREq5Bb_Kd+KLyJ4j-_AdjNk-Q@mail.gmail.com>
-Subject: Re: [RFC PATCH net-next v8 07/14] page_pool: devmem support
-To: Jens Axboe <axboe@kernel.dk>
-Cc: David Wei <dw@davidwei.uk>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org, 
-	linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org, 
-	sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
-	linux-arch@vger.kernel.org, bpf@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Richard Henderson <richard.henderson@linaro.org>, 
-	Ivan Kokshaysky <ink@jurassic.park.msu.ru>, Matt Turner <mattst88@gmail.com>, 
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, Helge Deller <deller@gmx.de>, 
-	Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven Rostedt <rostedt@goodmis.org>, 
-	Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
-	Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
-	Jiri Olsa <jolsa@kernel.org>, Steffen Klassert <steffen.klassert@secunet.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>, 
-	Sumit Semwal <sumit.semwal@linaro.org>, =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
-	Amritha Nambiar <amritha.nambiar@intel.com>, 
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>, 
-	Alexander Mikhalitsyn <alexander@mihalicyn.com>, Kaiyuan Zhang <kaiyuanz@google.com>, 
-	Christian Brauner <brauner@kernel.org>, Simon Horman <horms@kernel.org>, 
-	David Howells <dhowells@redhat.com>, Florian Westphal <fw@strlen.de>, 
-	Yunsheng Lin <linyunsheng@huawei.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, 
-	Arseniy Krasnov <avkrasnov@salutedevices.com>, 
-	Aleksander Lobakin <aleksander.lobakin@intel.com>, Michael Lass <bevan@bi-co.net>, 
-	Jiri Pirko <jiri@resnulli.us>, Sebastian Andrzej Siewior <bigeasy@linutronix.de>, 
-	Lorenzo Bianconi <lorenzo@kernel.org>, Richard Gobert <richardbgobert@gmail.com>, 
-	Sridhar Samudrala <sridhar.samudrala@intel.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
-	Johannes Berg <johannes.berg@intel.com>, Abel Wu <wuyun.abel@bytedance.com>, 
-	Breno Leitao <leitao@debian.org>, Pavel Begunkov <asml.silence@gmail.com>, 
-	Jason Gunthorpe <jgg@ziepe.ca>, Shailend Chand <shailend@google.com>, 
-	Harshitha Ramamurthy <hramamurthy@google.com>, Shakeel Butt <shakeel.butt@linux.dev>, 
-	Jeroen de Borst <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>, linux-mm@kvack.org, 
-	Matthew Wilcox <willy@infradead.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 
-On Tue, Apr 30, 2024 at 11:55=E2=80=AFAM Jens Axboe <axboe@kernel.dk> wrote=
-:
->
-> On 4/30/24 12:29 PM, Mina Almasry wrote:
-> > On Tue, Apr 30, 2024 at 6:46?AM Jens Axboe <axboe@kernel.dk> wrote:
-> >>
-> >> On 4/26/24 8:11 PM, Mina Almasry wrote:
-> >>> On Fri, Apr 26, 2024 at 5:18?PM David Wei <dw@davidwei.uk> wrote:
-> >>>>
-> >>>> On 2024-04-02 5:20 pm, Mina Almasry wrote:
-> >>>>> @@ -69,20 +106,26 @@ net_iov_binding(const struct net_iov *niov)
-> >>>>>   */
-> >>>>>  typedef unsigned long __bitwise netmem_ref;
-> >>>>>
-> >>>>> +static inline bool netmem_is_net_iov(const netmem_ref netmem)
-> >>>>> +{
-> >>>>> +#if defined(CONFIG_PAGE_POOL) && defined(CONFIG_DMA_SHARED_BUFFER)
-> >>>>
-> >>>> I am guessing you added this to try and speed up the fast path? It's
-> >>>> overly restrictive for us since we do not need dmabuf necessarily. I
-> >>>> spent a bit too much time wondering why things aren't working only t=
-o
-> >>>> find this :(
-> >>>
-> >>> My apologies, I'll try to put the changelog somewhere prominent, or
-> >>> notify you when I do something that I think breaks you.
-> >>>
-> >>> Yes, this is a by-product of a discussion with regards to the
-> >>> page_pool benchmark regressions due to adding devmem. There is some
-> >>> background on why this was added and the impact on the
-> >>> bench_page_pool_simple tests in the cover letter.
-> >>>
-> >>> For you, I imagine you want to change this to something like:
-> >>>
-> >>> #if defined(CONFIG_PAGE_POOL)
-> >>> #if defined(CONFIG_DMA_SHARED_BUFFER) || defined(CONFIG_IOURING)
-> >>>
-> >>> or something like that, right? Not sure if this is something I should
-> >>> do here or if something more appropriate to be in the patches you
-> >>> apply on top.
-> >>
-> >> In general, attempting to hide overhead behind config options is alway=
-s
-> >> a losing proposition. It merely serves to say "look, if these things
-> >> aren't enabled, the overhead isn't there", while distros blindly enabl=
-e
-> >> pretty much everything and then you're back where you started.
-> >>
-> >
-> > The history there is that this check adds 1 cycle regression to the
-> > page_pool fast path benchmark. The regression last I measured is 8->9
-> > cycles, so in % wise it's a quite significant 12.5% (more details in
-> > the cover letter[1]). I doubt I can do much better than that to be
-> > honest.
->
-> I'm all for cycle counting, and do it myself too, but is that even
-> measurable in anything that isn't a super targeted microbenchmark? Or
-> even in that?
->
+The transmit queue is stopped when the number of free queue entries is less
+than 2+MAX_SKB_FRAGS, in start_xmit().  If the queue length (QUEUE_NUM_MAX)
+is less than then this, transmission will immediately trigger a netdev
+watchdog timeout.  Report this condition earlier and more directly.
 
-Not as far as I can tell, no. This was purely to improve the page_pool
-benchmark.
+Signed-off-by: Darius Rad <darius@bluespec.com>
+---
+ drivers/net/virtio_net.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-> > There was a desire not to pay this overhead in setups that will likely
-> > not care about devmem, like embedded devices maybe, or setups without
-> > GPUs. Adding a CONFIG check here seemed like very low hanging fruit,
-> > but yes it just hides the overhead in some configs, not really removes
-> > it.
-> >
-> > There was a discussion about adding this entire netmem/devmem work
-> > under a new CONFIG. There was pushback particularly from Willem that
-> > at the end of the day what is enabled on most distros is what matters
-> > and we added code churn and CONFIG churn for little value.
-> >
-> > If there is significant pushback to the CONFIG check I can remove it.
-> > I don't feel like it's critical, it just mirco-optimizes some setups
-> > that doesn't really care about this work area.
->
-> That is true, but in practice it'll be enabled anyway. Seems like it's
-> not really worth it in this scenario.
->
+diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+index 115c3c5414f2..72ee8473b61c 100644
+--- a/drivers/net/virtio_net.c
++++ b/drivers/net/virtio_net.c
+@@ -4917,6 +4917,9 @@ static int virtnet_probe(struct virtio_device *vdev)
+ 			set_bit(guest_offloads[i], &vi->guest_offloads);
+ 	vi->guest_offloads_capable = vi->guest_offloads;
+ 
++	if (virtqueue_get_vring_size(vi->sq->vq) < 2 + MAX_SKB_FRAGS)
++		netdev_warn_once(dev, "not enough queue entries, expect xmit timeout\n");
++
+ 	pr_debug("virtnet: registered device %s with %d RX and TX vq's\n",
+ 		 dev->name, max_queue_pairs);
+ 
+-- 
+2.39.2
 
-OK, no pushback from me. I'll remove the CONFIG check in the next iteration=
-.
-
---=20
-Thanks,
-Mina
 
