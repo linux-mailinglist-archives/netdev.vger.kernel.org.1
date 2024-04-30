@@ -1,63 +1,92 @@
-Return-Path: <netdev+bounces-92378-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92379-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94B748B6D3C
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 10:45:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2BF38B6D75
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 10:54:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4B5A91F22BF6
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 08:45:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 69E8F28805F
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 08:54:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62DBD127E3F;
-	Tue, 30 Apr 2024 08:43:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A093128362;
+	Tue, 30 Apr 2024 08:52:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="A6+M1fgI"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lCYBpJWB"
 X-Original-To: netdev@vger.kernel.org
-Received: from fanzine2.igalia.com (fanzine.igalia.com [178.60.130.6])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB1F01272DB
-	for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 08:43:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.60.130.6
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ADC61E48B;
+	Tue, 30 Apr 2024 08:52:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714466605; cv=none; b=T9AtkE/6A3GtjdfMS3Z0WsH0uAkV05blYFXjLOHGAnbhBDBPrA+F9S1bbOZ9aaAQAr32TRXY549Ph0f6WhQ81S/+DfACKlc73XmzkXNG4ISsGjEyIfFnSLsJkTZxPB1Mg7/hZCfQHF2F6YOOOMUWwQw2LtPs9qxJvMCPOJOcFGo=
+	t=1714467156; cv=none; b=JRb4nsvjGS5M+S8uQ+NRH2o/3hsiIyJvC5Fy6iHW99X4jUYSghci0I53cJohpv4U/R3brDtEbgcnGot7JjhOgSTxtxKeIB7cY7hO8ERMI/glpXJUOggvazziDTTIOBxe0MgJnBq07lLTaeg6wfCOm8XGd5Zks+H4AwnPPb2H4jk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714466605; c=relaxed/simple;
-	bh=yxm2k2a+Skqhd5mvCZqVhrGQNrjeDxywZrAlQxtr3Kg=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=U3/Ih+VM3tHSrro8O1N4b0xYAi5ZyIqIAjdC3Ic8izuySgKsrq9EHwaLaONCweuKi5mXCYBSMqnvFghljjtY8x2p+2+DSBuoKhLqadGoqdn0QTu2WIvCiUyhrj22pKbG+dEI8hpTTaj/r+5p+HYPgsWXc8NhegDFuobr6HKoK98=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com; spf=pass smtp.mailfrom=igalia.com; dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b=A6+M1fgI; arc=none smtp.client-ip=178.60.130.6
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=igalia.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
-	s=20170329; h=Content-Transfer-Encoding:MIME-Version:Message-Id:Date:Subject:
-	Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:Content-Description:
-	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
-	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=PipEzrDvx0NJs11I/QT6g83naEfqIc0qLqd/kmyL0jE=; b=A6+M1fgIzb/gvdD0rauSqu5ydL
-	6Gnt488KLWBrmFAkgLr4IvBiJ68Xu+C7CmCOxMiCUrsv6mgfuvvRW9VZg8ROIlYdt/U/uUcQLimr2
-	2BIDIynCIdGothfXxJ0vAvgq9pqV2vfvs6+c42H0vWVX39DSIqESxzcbtQCV/3mlgN8XPX3QBvLy/
-	ujM0zndDpHU176lbPPsaM5pFuHAB6g5dLoCRrL3oXIsyI2Jq4LZrN/+JhBuKJi4t7eo9FGF/vSUhR
-	Pe8sYof/sDgNd58fKOxBVxy5zjwHH/ZHbWFn/DPqYczq67R3037o/l2o4MCLgHq+gc8MFtEqUZ5w4
-	/fmdtf7g==;
-Received: from 179-125-79-232-dinamico.pombonet.net.br ([179.125.79.232] helo=quatroqueijos.lan)
-	by fanzine2.igalia.com with esmtpsa 
-	(Cipher TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256) (Exim)
-	id 1s1j4x-001hpA-TL; Tue, 30 Apr 2024 10:43:12 +0200
-From: Thadeu Lima de Souza Cascardo <cascardo@igalia.com>
-To: netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	kernel-dev@igalia.com,
-	Thadeu Lima de Souza Cascardo <cascardo@igalia.com>
-Subject: [PATCH] net: fix out-of-bounds access in ops_init
-Date: Tue, 30 Apr 2024 05:42:53 -0300
-Message-Id: <20240430084253.3272177-1-cascardo@igalia.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1714467156; c=relaxed/simple;
+	bh=TXs16JUTJJYiNwzKrUs3bjsFv/mqblL5veTLN9Ghv18=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=t1nUZhIG7SOYMzTW+JZONereLYNgoZgu6KCyd0Ioa1zAINff8gHFG6OePAwG2JCsyeETk9XN28PEL96UXNoU9RyqqJWFZEsa9bdadgRYPKJOhvzBlaflsJeIaJVwhWeIerx74UnQvPcfPNxaomsZujhhzuDmJ+mbSiHBGjraJ9s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lCYBpJWB; arc=none smtp.client-ip=198.175.65.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1714467155; x=1746003155;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=TXs16JUTJJYiNwzKrUs3bjsFv/mqblL5veTLN9Ghv18=;
+  b=lCYBpJWB4NG0WVV8tL38TWhr1T/2nqJmqLGIvD9khGJJxHVHtczvjchm
+   6mE/AjrCaQRxK//ooeSGKRWt+j/eM1wU7JBQpkoWXgtRyJL1soOkLMHW2
+   Jr8EJad9PPPNiQWM49AmJ2xqTACjoX2NJp8i7tZvlXyJOqaWjcGgpP1cq
+   VO8l7u4qQ4jPdyjV2ohi2k1SY5bnDlvqIPUNgMKUpEUZjgte6ZVTHdxBJ
+   AMwtRuBbiAN9vJE38WySwBX5AYrac0PShZQP6KPVVZ/Mglr8PbCIEj11B
+   9DYBllkZfNmQRAZan1BLdA4GZQ+vEFkE3ngQx5jIb/DxTo8VQKK1rcHpN
+   g==;
+X-CSE-ConnectionGUID: 1DYbti+OQ2e/uqdpDlTilA==
+X-CSE-MsgGUID: 3kEckPtkR+2GKYLFY30FrQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11059"; a="21311243"
+X-IronPort-AV: E=Sophos;i="6.07,241,1708416000"; 
+   d="scan'208";a="21311243"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Apr 2024 01:52:33 -0700
+X-CSE-ConnectionGUID: QlDMvrfbR4+RDn7PCv4t9A==
+X-CSE-MsgGUID: FPAD6XhCSMienCnGnbUeAQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,241,1708416000"; 
+   d="scan'208";a="26891476"
+Received: from inlubt0316.iind.intel.com ([10.191.20.213])
+  by orviesa007.jf.intel.com with ESMTP; 30 Apr 2024 01:52:26 -0700
+From: lakshmi.sowjanya.d@intel.com
+To: tglx@linutronix.de,
+	jstultz@google.com,
+	giometti@enneenne.com,
+	corbet@lwn.net,
+	linux-kernel@vger.kernel.org
+Cc: x86@kernel.org,
+	netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	intel-wired-lan@lists.osuosl.org,
+	andriy.shevchenko@linux.intel.com,
+	eddie.dong@intel.com,
+	christopher.s.hall@intel.com,
+	jesse.brandeburg@intel.com,
+	davem@davemloft.net,
+	alexandre.torgue@foss.st.com,
+	joabreu@synopsys.com,
+	mcoquelin.stm32@gmail.com,
+	perex@perex.cz,
+	linux-sound@vger.kernel.org,
+	anthony.l.nguyen@intel.com,
+	peter.hilber@opensynergy.com,
+	pandith.n@intel.com,
+	subramanian.mohan@intel.com,
+	thejesh.reddy.t.r@intel.com,
+	lakshmi.sowjanya.d@intel.com
+Subject: [PATCH v7 00/12] Add support for Intel PPS Generator
+Date: Tue, 30 Apr 2024 14:22:13 +0530
+Message-Id: <20240430085225.18086-1-lakshmi.sowjanya.d@intel.com>
+X-Mailer: git-send-email 2.35.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,84 +95,127 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-net_alloc_generic is called by net_alloc, which is called without any
-locking. It reads max_gen_ptrs, which is changed under pernet_ops_rwsem. It
-is read twice, first to allocate an array, then to set s.len, which is
-later used to limit the bounds of the array access.
+From: Lakshmi Sowjanya D <lakshmi.sowjanya.d@intel.com>
 
-It is possible that the array is allocated and another thread is
-registering a new pernet ops, increments max_gen_ptrs, which is then used
-to set s.len with a larger than allocated length for the variable array.
+The goal of the PPS (Pulse Per Second) hardware/software is to generate a
+signal from the system on a wire so that some third-party hardware can
+observe that signal and judge how close the system's time is to another
+system or piece of hardware.
 
-Fix it by delaying the allocation to setup_net, which is always called
-under pernet_ops_rwsem, and is called right after net_alloc.
+Existing methods (like parallel ports) require software to flip a bit at
+just the right time to create a PPS signal. Many things can prevent
+software from doing this precisely. This (Timed I/O) method is better
+because software only "arms" the hardware in advance and then depends on
+the hardware to "fire" and flip the signal at just the right time.
 
-Signed-off-by: Thadeu Lima de Souza Cascardo <cascardo@igalia.com>
----
- net/core/net_namespace.c | 18 ++++++------------
- 1 file changed, 6 insertions(+), 12 deletions(-)
+To generate a PPS signal with this new hardware, the kernel wakes up
+twice a second, once for 1->0 edge and other for the 0->1 edge. It does
+this shortly (~10ms) before the actual change in the signal needs to be
+made. It computes the TSC value at which edge will happen, convert to a
+value hardware understands and program this value to Timed I/O hardware.
+The actual edge transition happens without any further action from the
+kernel.
 
-diff --git a/net/core/net_namespace.c b/net/core/net_namespace.c
-index f0540c557515..879e49b10cca 100644
---- a/net/core/net_namespace.c
-+++ b/net/core/net_namespace.c
-@@ -87,7 +87,7 @@ static int net_assign_generic(struct net *net, unsigned int id, void *data)
- 
- 	old_ng = rcu_dereference_protected(net->gen,
- 					   lockdep_is_held(&pernet_ops_rwsem));
--	if (old_ng->s.len > id) {
-+	if (old_ng && old_ng->s.len > id) {
- 		old_ng->ptr[id] = data;
- 		return 0;
- 	}
-@@ -107,8 +107,9 @@ static int net_assign_generic(struct net *net, unsigned int id, void *data)
- 	 * the old copy for kfree after a grace period.
- 	 */
- 
--	memcpy(&ng->ptr[MIN_PERNET_OPS_ID], &old_ng->ptr[MIN_PERNET_OPS_ID],
--	       (old_ng->s.len - MIN_PERNET_OPS_ID) * sizeof(void *));
-+	if (old_ng)
-+		memcpy(&ng->ptr[MIN_PERNET_OPS_ID], &old_ng->ptr[MIN_PERNET_OPS_ID],
-+		       (old_ng->s.len - MIN_PERNET_OPS_ID) * sizeof(void *));
- 	ng->ptr[id] = data;
- 
- 	rcu_assign_pointer(net->gen, ng);
-@@ -422,15 +423,10 @@ static struct workqueue_struct *netns_wq;
- static struct net *net_alloc(void)
- {
- 	struct net *net = NULL;
--	struct net_generic *ng;
--
--	ng = net_alloc_generic();
--	if (!ng)
--		goto out;
- 
- 	net = kmem_cache_zalloc(net_cachep, GFP_KERNEL);
- 	if (!net)
--		goto out_free;
-+		goto out;
- 
- #ifdef CONFIG_KEYS
- 	net->key_domain = kzalloc(sizeof(struct key_tag), GFP_KERNEL);
-@@ -439,7 +435,7 @@ static struct net *net_alloc(void)
- 	refcount_set(&net->key_domain->usage, 1);
- #endif
- 
--	rcu_assign_pointer(net->gen, ng);
-+	rcu_assign_pointer(net->gen, NULL);
- out:
- 	return net;
- 
-@@ -448,8 +444,6 @@ static struct net *net_alloc(void)
- 	kmem_cache_free(net_cachep, net);
- 	net = NULL;
- #endif
--out_free:
--	kfree(ng);
- 	goto out;
- }
- 
+The result here is a signal coming out of the system that is roughly
+1,000 times more accurate than the old methods. If the system is heavily
+loaded, the difference in accuracy is larger in old methods.
+
+Application Interface:
+The API to use Timed I/O is very simple. It is enabled and disabled by
+writing a '1' or '0' value to the sysfs enable attribute associated with
+the Timed I/O PPS device. Each Timed I/O pin is represented by a PPS
+device. When enabled, a pulse-per-second (PPS) synchronized with the
+system clock is continuously produced on the Timed I/O pin, otherwise it
+is pulled low.
+
+The Timed I/O signal on the motherboard is enabled in the BIOS setup.
+Intel Advanced Menu -> PCH IO Configuration -> Timed I/O <Enable>
+
+References:
+https://en.wikipedia.org/wiki/Pulse-per-second_signal
+https://drive.google.com/file/d/1vkBRRDuELmY8I3FlfOZaEBp-DxLW6t_V/view
+https://youtu.be/JLUTT-lrDqw
+
+Patch 1 adds base clock properties in clocksource structure
+Patch 2 updates tsc, art values in the base clock structure
+Patch 3 - 7 removes reference to convert_art_to_tsc function across
+drivers
+Patch 8 removes the convert art to tsc functions which are no longer
+used
+Patch 9 adds function to convert realtime to base clock
+Patch 10 adds the pps(pulse per second) generator tio driver to the pps
+subsystem.
+Patch 11 documentation and usage of the pps tio generator module.
+Patch 12 includes documentation for sysfs interface.
+
+Please help to review the changes.
+
+Thanks in advance,
+Sowjanya
+
+Changes from v2:
+ - Split patch 1 to remove the functions in later stages.
+ - Include required headers in pps_gen_tio.
+
+Changes from v3:
+ - Corrections in Documentation.
+ - Introducing non-RFC version of the patch series.
+
+Changes from v4:
+ - Setting id in ice_ptp
+ - Modified conversion logic in convert_base_to_cs.
+ - Included the usage of the APIs in the commit message of 2nd patch.
+
+Changes from v5:
+ - Change nsecs variable to use_nsecs.
+ - Change order of 1&2 patches and modify the commit message.
+ - Add sysfs abi file entry in MAINTAINERS file.
+ - Add check to find if any event is missed and disable hardware
+   accordingly.
+
+Changes from v6:
+ - Split patch 1 into 1&2 patches.
+ - Add check for overflow in convert_ns_to_cs().
+ - Refine commit messages. 
+
+Lakshmi Sowjanya D (7):
+  timekeeping: Add base clock properties in clocksource structure
+  x86/tsc: Update tsc/art values in the base clock structure
+  x86/tsc: Remove art to tsc conversion functions which are obsolete
+  timekeeping: Add function to convert realtime to base clock
+  pps: generators: Add PPS Generator TIO Driver
+  Documentation: driver-api: pps: Add Intel Timed I/O PPS generator
+  ABI: pps: Add ABI documentation for Intel TIO
+
+Thomas Gleixner (5):
+  e1000e: remove convert_art_to_tsc()
+  igc: remove convert_art_ns_to_tsc()
+  stmmac: intel: remove convert_art_to_tsc()
+  ALSA: hda: remove convert_art_to_tsc()
+  ice/ptp: remove convert_art_to_tsc()
+
+ .../ABI/testing/sysfs-platform-pps-tio        |   7 +
+ Documentation/driver-api/pps.rst              |  22 ++
+ MAINTAINERS                                   |   1 +
+ arch/x86/include/asm/tsc.h                    |   3 -
+ arch/x86/kernel/tsc.c                         |  92 ++-----
+ drivers/net/ethernet/intel/e1000e/ptp.c       |   3 +-
+ drivers/net/ethernet/intel/ice/ice_ptp.c      |   3 +-
+ drivers/net/ethernet/intel/igc/igc_ptp.c      |   6 +-
+ .../net/ethernet/stmicro/stmmac/dwmac-intel.c |   3 +-
+ drivers/pps/generators/Kconfig                |  16 ++
+ drivers/pps/generators/Makefile               |   1 +
+ drivers/pps/generators/pps_gen_tio.c          | 260 ++++++++++++++++++
+ include/linux/clocksource.h                   |  27 ++
+ include/linux/clocksource_ids.h               |   1 +
+ include/linux/timekeeping.h                   |   6 +
+ kernel/time/timekeeping.c                     | 125 ++++++++-
+ sound/pci/hda/hda_controller.c                |   3 +-
+ 17 files changed, 496 insertions(+), 83 deletions(-)
+ create mode 100644 Documentation/ABI/testing/sysfs-platform-pps-tio
+ create mode 100644 drivers/pps/generators/pps_gen_tio.c
+
 -- 
-2.34.1
+2.35.3
 
 
