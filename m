@@ -1,140 +1,228 @@
-Return-Path: <netdev+bounces-92391-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92392-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 760458B6DA4
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 10:58:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0FC68B6DAE
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 11:03:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2F0C128B2F0
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 08:58:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C33C91C21B1E
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 09:03:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2FEE1C2301;
-	Tue, 30 Apr 2024 08:53:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F373127B58;
+	Tue, 30 Apr 2024 09:03:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QSjuvo0S"
+	dkim=pass (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b="BhVE6Jed"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36C96127B73;
-	Tue, 30 Apr 2024 08:53:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7464E205E2E
+	for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 09:03:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714467238; cv=none; b=JrvG8+hbcO/oIxdQTAYHORGZT5J6VB9wdQF34hsd8qjFJ/jdMsJD2pqhDTgI8pmCSIAGaDCKqblZ4Xypsy1RLOuEtllkcNbmA7BxdTsYzvDFfCALlLjEDQF5vyLkce1usmWXuf/8Th04/Km4ZA5zdhzxEQp3uosDfXR3MNLAkfo=
+	t=1714467802; cv=none; b=ftvyX0AwWJt86eJzntwjVI04ZEFd0teWolbVi1Nsaq7sVKlMOsVM1bI74watMrDUTkIbJUtQZqAL0quisjsmCwHr9LXiWegRG8ngYX5gJR6qh8X5X+tQIXQ2KhMsDuWnYAkNRMbBG/6awM6NTFueUSmhNuo0k0Uf7h0v7FRx1E4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714467238; c=relaxed/simple;
-	bh=BGKIvW+QuSy639MKv7/DBEUGPRf9QzPFu13XKIQ74uc=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=BfshZB/JRmxspU1Oi/eZZCKFyvdHi3ub+xILGNPa57scCCOMr/2gxjrx213zjQaQMvpFZO1C18v+vPDTu3nWi2qHPrU8lVc93Z9R/QfgiDl9utifu3Co43bCMyP9u8J7sa1ATs3ncU+9hK8/s1SkFW5n0OerhSd+a0GEPx2pyr0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QSjuvo0S; arc=none smtp.client-ip=198.175.65.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1714467238; x=1746003238;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=BGKIvW+QuSy639MKv7/DBEUGPRf9QzPFu13XKIQ74uc=;
-  b=QSjuvo0SW/0cCzvQRwylu7x/124QYbcJm3qZFvcOuR21Hrr3L4MtbLFo
-   GbM4QP1a6wb/9Xr4HgOgLqPvA7xxAXQw2iroVycWjETmiQc14+R/Pyh8l
-   zb1VC6EwvfoB7aiGb4LqZ6xDmIPY1G8oKwYfM+CkiRrsAtgSg7D02+Axv
-   kWYo3d0j2QzRwdx3zeMDPYt/J7sOnQjrByqhC6UUGCqxVbehHJn7c8mTl
-   wJ7CAXjOQ+gXBgp9jcjYGz98u2PR8GU7OX34SitpKUY69tNGonw3Jk2mv
-   m5zQoc7RSlHvEesILtoINaOivKLs0WZuhV2vcMNwHL8Uu3wHI6Hc1Xn6Z
-   A==;
-X-CSE-ConnectionGUID: j+xgJiCCRMS4RI5bFAud1g==
-X-CSE-MsgGUID: EWTQCX02QIuUa8Ae1rykGQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11059"; a="21311552"
-X-IronPort-AV: E=Sophos;i="6.07,241,1708416000"; 
-   d="scan'208";a="21311552"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Apr 2024 01:53:56 -0700
-X-CSE-ConnectionGUID: l241ZoNeQIeeof6w+W6Kmw==
-X-CSE-MsgGUID: PJqShxRRS+GYXQSyfxCF6A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,241,1708416000"; 
-   d="scan'208";a="26891701"
-Received: from inlubt0316.iind.intel.com ([10.191.20.213])
-  by orviesa007.jf.intel.com with ESMTP; 30 Apr 2024 01:53:49 -0700
-From: lakshmi.sowjanya.d@intel.com
-To: tglx@linutronix.de,
-	jstultz@google.com,
-	giometti@enneenne.com,
-	corbet@lwn.net,
-	linux-kernel@vger.kernel.org
-Cc: x86@kernel.org,
-	netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	intel-wired-lan@lists.osuosl.org,
-	andriy.shevchenko@linux.intel.com,
-	eddie.dong@intel.com,
-	christopher.s.hall@intel.com,
-	jesse.brandeburg@intel.com,
-	davem@davemloft.net,
-	alexandre.torgue@foss.st.com,
-	joabreu@synopsys.com,
-	mcoquelin.stm32@gmail.com,
-	perex@perex.cz,
-	linux-sound@vger.kernel.org,
-	anthony.l.nguyen@intel.com,
-	peter.hilber@opensynergy.com,
-	pandith.n@intel.com,
-	subramanian.mohan@intel.com,
-	thejesh.reddy.t.r@intel.com,
-	lakshmi.sowjanya.d@intel.com
-Subject: [PATCH v7 12/12] ABI: pps: Add ABI documentation for Intel TIO
-Date: Tue, 30 Apr 2024 14:22:25 +0530
-Message-Id: <20240430085225.18086-13-lakshmi.sowjanya.d@intel.com>
-X-Mailer: git-send-email 2.35.3
-In-Reply-To: <20240430085225.18086-1-lakshmi.sowjanya.d@intel.com>
-References: <20240430085225.18086-1-lakshmi.sowjanya.d@intel.com>
+	s=arc-20240116; t=1714467802; c=relaxed/simple;
+	bh=Fbt2A3UDLMG1pW8fVX9FN4VMTt7nP0+UBo3NdEI63+U=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Y1ecwL7NmG+itfd8yiEmTlD+vaLS9uX8MoDupKm/7cegJN7dJvObhe4LsjDzNJwLLpodaiyfQ/c7mZh69QsZNJgdMkH9fqnmBN1GkCvbcuxGBoeqfOcfnWbQjdGig2tQHqWOQS4t/JoseLkzoR0x9tCNsdTx1et7RgPsTy3dM6U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=citrix.com; spf=pass smtp.mailfrom=cloud.com; dkim=pass (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b=BhVE6Jed; arc=none smtp.client-ip=209.85.215.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=citrix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloud.com
+Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-5d81b08d6f2so3982384a12.0
+        for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 02:03:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=citrix.com; s=google; t=1714467800; x=1715072600; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sjBo2QVMI1CyWQlsIFe9ysVmh7llCcHOfQxc+A80P+Q=;
+        b=BhVE6Jedox7v5/DDiK1UZELvJXfCJSOXdV2Z+WKiM1v3HY47DFNQnXDg8biRrh1MVh
+         jGa2lkCAYQgNEMg8sG3WqVt2Che8fJVtcj6c37Ha9JfL3VPVb+9NvB1P1IitXjaDMkaL
+         AvZJ8hZ72pAZmXkxME87yKi5mN6xUo6Q8ml54=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714467800; x=1715072600;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=sjBo2QVMI1CyWQlsIFe9ysVmh7llCcHOfQxc+A80P+Q=;
+        b=ABH+cOxtaKwkYo7UbKHWjlyI4zljLy9f4gICCQp9cy97YeZCyqthHN9VtaUpqInoj5
+         McGw+CTfMS8NpedQ6jPtU8cecpJCOzwge/iuhpD41NNwqHWcmcnXHmaXmimcRCeee149
+         le5+lbWIKefHm8Un8ExWtB5J9n76hOEAYxMm6nTnPzL5abpaZg4OoxJhQ+tR3UTXlnPC
+         AazC3qecdN1gdFf9py6mHa4Duom3/VgAL6+05zi1jY5rWLd4IDrSrCRnezSg6fkQjCFg
+         C00KNnsXj0sE4SM+K0/wn9CwsRqMQEFJU26fXwnjWoZYaOK8gmLVs+Mlg/OKXZRJ5IRY
+         IxTw==
+X-Gm-Message-State: AOJu0YwO3EeOIxOj+hR7MJ6Rk9d3itEdIugf8hWaWMxUxE5j7jl2eHK2
+	Mk5vUMFw2tDPTSyQYx5obzioZ/RwxZferZAXiXC18FaRs9fTHSsaeG2Lr7Qkp5FVL2fYTBK81eX
+	Qd3agnhdR1tROmkJgcUL4Zd4Lhfsx3XJyBt1wcZCH23rbvmqABA==
+X-Google-Smtp-Source: AGHT+IHFA3yXARPgRd7WfRg9inQlkDKb45T+L+W2rOOOIIWOKTAuDP2mXbHpPw5MN5nf9McFe4daxw7WvYNPhjm8Tkw=
+X-Received: by 2002:a05:6a21:3948:b0:1ae:3d01:d with SMTP id
+ ac8-20020a056a21394800b001ae3d01000dmr2256870pzc.9.1714467799596; Tue, 30 Apr
+ 2024 02:03:19 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240429124922.2872002-1-ross.lagerwall@citrix.com> <a0359435-7e0f-4a48-9cc6-3db679bde1ac@molgen.mpg.de>
+In-Reply-To: <a0359435-7e0f-4a48-9cc6-3db679bde1ac@molgen.mpg.de>
+From: Ross Lagerwall <ross.lagerwall@citrix.com>
+Date: Tue, 30 Apr 2024 10:03:07 +0100
+Message-ID: <CAG7k0ErF+e2vMUYRuh2EBjWmE7iqdOMS1CQv-7r18T1mVbK1aA@mail.gmail.com>
+Subject: Re: [Intel-wired-lan] [PATCH v2] ice: Fix enabling SR-IOV with Xen
+To: Paul Menzel <pmenzel@molgen.mpg.de>
+Cc: netdev@vger.kernel.org, Tony Nguyen <anthony.l.nguyen@intel.com>, 
+	Javi Merino <javi.merino@kernel.org>, intel-wired-lan@lists.osuosl.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Lakshmi Sowjanya D <lakshmi.sowjanya.d@intel.com>
+On Mon, Apr 29, 2024 at 2:04=E2=80=AFPM Paul Menzel <pmenzel@molgen.mpg.de>=
+ wrote:
+>
+> Dear Ross,
+>
+>
+> Thank you for your patch.
+>
+> Am 29.04.24 um 14:49 schrieb Ross Lagerwall:
+> > When the PCI functions are created, Xen is informed about them and
+> > caches the number of MSI-X entries each function has.  However, the
+> > number of MSI-X entries is not set until after the hardware has been
+> > configured and the VFs have been started. This prevents
+> > PCI-passthrough from working because Xen rejects mapping MSI-X
+> > interrupts to domains because it thinks the MSI-X interrupts don't
+> > exist.
+>
+> Thank you for this great problem description. Is there any log message
+> shown, you could paste, so people can find this commit when searching
+> for the log message?
 
-Document sysfs interface for Intel Timed I/O PPS driver.
+When this issue occurs, QEMU repeatedly reports:
 
-Signed-off-by: Lakshmi Sowjanya D <lakshmi.sowjanya.d@intel.com>
----
- Documentation/ABI/testing/sysfs-platform-pps-tio | 7 +++++++
- MAINTAINERS                                      | 1 +
- 2 files changed, 8 insertions(+)
- create mode 100644 Documentation/ABI/testing/sysfs-platform-pps-tio
+msi_msix_setup: Error: Mapping of MSI-X (err: 22, vec: 0, entry 0x1)
 
-diff --git a/Documentation/ABI/testing/sysfs-platform-pps-tio b/Documentation/ABI/testing/sysfs-platform-pps-tio
-new file mode 100644
-index 000000000000..2d9f7dd3813c
---- /dev/null
-+++ b/Documentation/ABI/testing/sysfs-platform-pps-tio
-@@ -0,0 +1,7 @@
-+What:		/sys/devices/platform/INTCxxxx/enable
-+Date:		May 2024
-+KernelVersion:	6.10
-+Contact:	Lakshmi Sowjanya D <lakshmi.sowjanya.d@intel.com>
-+Description:
-+		(RW) Enable or disable PPS TIO generator output, read to
-+		see the status of hardware (Enabled/Disabled).
-diff --git a/MAINTAINERS b/MAINTAINERS
-index f6dc90559341..381e31343db9 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -17669,6 +17669,7 @@ M:	Rodolfo Giometti <giometti@enneenne.com>
- L:	linuxpps@ml.enneenne.com (subscribers-only)
- S:	Maintained
- W:	http://wiki.enneenne.com/index.php/LinuxPPS_support
-+F:	Documentation/ABI/testing/sysfs-platform-pps-tio
- F:	Documentation/ABI/testing/sysfs-pps
- F:	Documentation/devicetree/bindings/pps/pps-gpio.yaml
- F:	Documentation/driver-api/pps.rst
--- 
-2.35.3
+>
+> Do you have a minimal test case, so the maintainers can reproduce this
+> to test the fix?
 
+Testing this requires setting up Xen which I wouldn't expect anyone to
+do unless they already have an environment set up.
+
+In any case, a "minimal" test would be something like:
+
+1. Set up Xen with dom0 and another VM running Linux.
+2. Pass through a VF to the VM. See that QEMU reports the above message
+   and the VF is not usable within the VM.
+3. Rebuild the dom0 kernel with the attached patch.
+4. Pass through a VF to the VM. See that the VF is usable within the
+   VM.
+
+>
+> > Fix this by moving the call to pci_enable_sriov() later so that the
+> > number of MSI-X entries is set correctly in hardware by the time Xen
+> > reads it.
+>
+> It=E2=80=99d be great if you could be more specific on =E2=80=9Clater=E2=
+=80=9D, and why this is
+> the correct place.
+
+"later" in this case means after ice_start_vfs() since it is at that
+point that the hardware sets the number of MSI-X entries.
+I expect that a maintainer or someone with more knowledge of the
+hardware could explain why the hardware only sets the number of MSI-X
+entries at this point.
+
+>
+> > Signed-off-by: Ross Lagerwall <ross.lagerwall@citrix.com>
+> > Signed-off-by: Javi Merino <javi.merino@kernel.org>
+> > ---
+> >
+> > In v2:
+> > * Fix cleanup on if pci_enable_sriov() fails.
+> >
+> >   drivers/net/ethernet/intel/ice/ice_sriov.c | 23 +++++++++++++--------=
+-
+> >   1 file changed, 14 insertions(+), 9 deletions(-)
+> >
+> > diff --git a/drivers/net/ethernet/intel/ice/ice_sriov.c b/drivers/net/e=
+thernet/intel/ice/ice_sriov.c
+> > index a958fcf3e6be..bc97493046a8 100644
+> > --- a/drivers/net/ethernet/intel/ice/ice_sriov.c
+> > +++ b/drivers/net/ethernet/intel/ice/ice_sriov.c
+> > @@ -864,6 +864,8 @@ static int ice_ena_vfs(struct ice_pf *pf, u16 num_v=
+fs)
+> >       int total_vectors =3D pf->hw.func_caps.common_cap.num_msix_vector=
+s;
+> >       struct device *dev =3D ice_pf_to_dev(pf);
+> >       struct ice_hw *hw =3D &pf->hw;
+> > +     struct ice_vf *vf;
+> > +     unsigned int bkt;
+> >       int ret;
+> >
+> >       pf->sriov_irq_bm =3D bitmap_zalloc(total_vectors, GFP_KERNEL);
+> > @@ -877,24 +879,20 @@ static int ice_ena_vfs(struct ice_pf *pf, u16 num=
+_vfs)
+> >       set_bit(ICE_OICR_INTR_DIS, pf->state);
+> >       ice_flush(hw);
+> >
+> > -     ret =3D pci_enable_sriov(pf->pdev, num_vfs);
+> > -     if (ret)
+> > -             goto err_unroll_intr;
+> > -
+> >       mutex_lock(&pf->vfs.table_lock);
+> >
+> >       ret =3D ice_set_per_vf_res(pf, num_vfs);
+> >       if (ret) {
+> >               dev_err(dev, "Not enough resources for %d VFs, err %d. Tr=
+y with fewer number of VFs\n",
+> >                       num_vfs, ret);
+> > -             goto err_unroll_sriov;
+> > +             goto err_unroll_intr;
+> >       }
+> >
+> >       ret =3D ice_create_vf_entries(pf, num_vfs);
+> >       if (ret) {
+> >               dev_err(dev, "Failed to allocate VF entries for %d VFs\n"=
+,
+> >                       num_vfs);
+> > -             goto err_unroll_sriov;
+> > +             goto err_unroll_intr;
+> >       }
+> >
+> >       ice_eswitch_reserve_cp_queues(pf, num_vfs);
+> > @@ -905,6 +903,10 @@ static int ice_ena_vfs(struct ice_pf *pf, u16 num_=
+vfs)
+> >               goto err_unroll_vf_entries;
+> >       }
+> >
+> > +     ret =3D pci_enable_sriov(pf->pdev, num_vfs);
+> > +     if (ret)
+> > +             goto err_unroll_start_vfs;
+> > +
+> >       clear_bit(ICE_VF_DIS, pf->state);
+> >
+> >       /* rearm global interrupts */
+> > @@ -915,12 +917,15 @@ static int ice_ena_vfs(struct ice_pf *pf, u16 num=
+_vfs)
+> >
+> >       return 0;
+> >
+> > +err_unroll_start_vfs:
+> > +     ice_for_each_vf(pf, bkt, vf) {
+> > +             ice_dis_vf_mappings(vf);
+> > +             ice_vf_vsi_release(vf);
+> > +     }
+>
+> Why wasn=E2=80=99t this needed with `pci_enable_sriov()` done earlier?
+
+Previously ice_start_vifs() was the last function call that may fail
+in this function. That is no longer the case so when
+pci_enable_sriov() fails, it needs to undo what was done in
+ice_start_vifs().
+
+Thanks,
+Ross
 
