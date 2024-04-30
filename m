@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-92637-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92638-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 384758B82EB
-	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 01:14:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17D5F8B82EC
+	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 01:14:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4E7B41C228C7
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 23:14:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9915B1F236BD
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 23:14:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A4681C0DC3;
-	Tue, 30 Apr 2024 23:14:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCF131C0DDB;
+	Tue, 30 Apr 2024 23:14:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="faSwNBCX"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iYhiov9k"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB08B1BF6C0
-	for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 23:14:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 637C41C0DCF
+	for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 23:14:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714518878; cv=none; b=o9ysWDxCI7rWCBi3j14OOsEnhYgVuzD7e2HefqXo4Xo3eNsAKpazegGP9ELnC/+Wd5/FHXODzCcvQ6heLTfEq/gcYQIX9uh3L34knqhTPGTd1tuyGaQ9brFHWtWkwk8GaBJofOhNGiezSsPyOR8fZpZ+qlX9vsTGbas4olVF8kM=
+	t=1714518879; cv=none; b=NwohtX3Z6KixBMlyh3gVImcojG9hnSOFJV2rEITnz9YEwa5/fP/G64oJo4s6/Xas/Qes5VGSkGvub9V3pFnDchKq5lGFqWJ3wq8+suOx6QCxrm28qNKzopOobnpLFnptS4fy1AtFaC4tEwnRoapYS4/wdtE7kcpaoc6qESDjTeU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714518878; c=relaxed/simple;
-	bh=4xUUodiBIVxZkjvkbMI1u4kBI5P1wirbmcEa6D84Q7g=;
+	s=arc-20240116; t=1714518879; c=relaxed/simple;
+	bh=G9vTwaOh9tqpmWBRnbfIv95mAPnSNpQXI1b5OG2x6ro=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Gg0BR/GipD6/T80ZkEdF0mZkrQ54DAYS1w4WGsLblUhBQNTFoWi1BKBQU5xKoRqBPjlORYFuOgqb1Lv8oNSX1xTg0ia4sP1ccvE64quFRq3OKW0yMOP75bNVKqxYH4fOGt4Q/jMZeEfHsZGX8cTwGTQmrSaNU4g8V9V7EzcnJvk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--shailend.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=faSwNBCX; arc=none smtp.client-ip=209.85.210.202
+	 To:Cc:Content-Type; b=eXTh+YKFK6qBlOzWUHZbFQ6S6rJF+EDZU9z1plD6yssM53ZRNt2meYjHiP1BnG1N2UQZ5YqUqns7sMPpI1ieM3CaWAZ1wIcdGbIWC50dcH8J4HyiwB35H5oE7sX1uY8MdCi5Xmap5GXxeptUodHAkZJhm/EYI84gQdUd8cECpcA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--shailend.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iYhiov9k; arc=none smtp.client-ip=209.85.219.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--shailend.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-6ee089eedb7so7684576b3a.1
-        for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 16:14:36 -0700 (PDT)
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-de617c7649dso2012034276.0
+        for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 16:14:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1714518876; x=1715123676; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1714518877; x=1715123677; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=7U+1J2EEWQ/RQ/ejFdIxlreAtu0YNhB+rfukR0B4WJM=;
-        b=faSwNBCXo+gTIerb8HpAnRh7HKc7CM4QU4oXqgK9RgLjsUIXMlTY01+fLNB/ccFDOG
-         xO1QyVK/zRSDHExyC0QW9MGX+OcMJSvq7bBGVNKXcfItCSgb6a/UjMoTEi5ixrikkEsS
-         7Dslwlvx6YGFUAGCiJKaia74w2DNWg7tLbSv4oRjC9+26GLz5FygqGV2fTYxM5IQTrg9
-         obhRrl46boqt5dKfrh3WE1SuAdHXEBbPbz5rNn4KP3+n0nMqmTPsqrzCOkSBEquKB7WO
-         DjN4BL8Qzt6e44sHv0TwXGMBNjeE/kYliO50zyHOBjOif2P30fICE5CWUhEarWV3mY4w
-         HXuQ==
+        bh=yQKspPSBYhGlej/Z1yQFkrqQvo1+u8pB8UNnxcDCgXM=;
+        b=iYhiov9k56xdE+2tuh+hNLafjjZf5jaW9kCUnemKRq5EnkXnk91rErj/D15TUONu+K
+         3mBxAPOJpwNqGt1+aMZczQMv5D0Nf1X97F00fdplZAFAG+dZUSHAyb9TrcDss/pUzfKQ
+         fi2xSKuOcHpTBwA2kxU/TY9Ny00HvaS9zxWOP4tKaqlCqt3c/r3/HqY2td6381zE9g/q
+         pyBPr1Y2Ge1iP2WbL6CNKALCys4XKxmzPR/HS9219dOsNC7M3mz1rhR4OCL6b5Wa3saa
+         ihzaNoQWjlP2tSCjCJI5ZMZY0JOlWiVoE+J6/9Zjsw3fGmo8cHNQsTl+l9B/c6dgScqN
+         X2ow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714518876; x=1715123676;
+        d=1e100.net; s=20230601; t=1714518877; x=1715123677;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7U+1J2EEWQ/RQ/ejFdIxlreAtu0YNhB+rfukR0B4WJM=;
-        b=DNYTx1WV3vC1MZBMxB58TwkLwIMMqn8QEEY3DbFwUtQ/hPBI83jnd0WcASaB9epIUs
-         +6XZ77kuu2e2A8EnyUYO4rs5m06F5A+nidCvlGxDoklgK4SwHel51q+A32rAY+o+O+xS
-         oiQyTbCuz3TkiK2cTGC3qvDZaVKme6wjc/wQyFaFgL/kfKOlevAZvUV+vCKRbKy3H1mk
-         Z35WT9ctNS8LZZDI6mE2VIIwmXLG3UfQf8bZ60MjdcXGIuF7yodQJlGBUIZgdVjSB2BQ
-         jJEK3n/4ijGe6pZdLtxaUekjz2XmGEYRJ5eaGkc0UVDGqlEGs9TDfTkhdSl7aIN+gaUL
-         wYeA==
-X-Gm-Message-State: AOJu0YzfI12dkEGbV1vO3/wqai4pSQRIwjOEdoYvK4oFKEDyqLubcVqA
-	2AWJ8FWWm+dAcgQejeS88RUIyInAQQ3xrjvR8S6X0BwmmwQqjuTFEe2+rx+NDD6vpAbjzfxsJbt
-	dG0Iy0mVBbCCOdXmWeqQrNHxAhRr8GdQf2xKnFqYsBJD9QAhMg5h8TeJoFKzOC8B6iKl2aJTivE
-	WtvwuwBBMGaEHczS6xY6cKpB8lkxFFrYNsAegJBF6HIvY=
-X-Google-Smtp-Source: AGHT+IE4/8Ok2uWNDlTbdDpD46w3TCSp/6bkhgIEeFrltdtr/VLk4si7h+tb6g5gnYzwgrAXm8WddqPE5vlcdw==
+        bh=yQKspPSBYhGlej/Z1yQFkrqQvo1+u8pB8UNnxcDCgXM=;
+        b=YU+Zk9IWxySrKf5nmbVX8lto7pvuXDvj/28RfhOjzwA2svkvbQ2cyKZ7YZDwbV+KCc
+         CUmBo4G4mc4QFUczYRxaeT7w/RWo+rXjO4/MNgGC1fYUyojbyjQLf5gquQTV8gwp/Lgd
+         CqQF16djVfAvG7+qAgkZPhnNuQr6cs/Xdthrfk+RGHVNVGx7hN38hizhXmwMgBxN7Knj
+         R6lmOjzTAcLThq9F41+w1XM2tH4oNfbDMtlaBTx/tRroNHo/3T0QgkfkItLyjmnRg3Tm
+         y84NwPfic4MMsCmCxtfXhVkAXSYpUyJELBsko5ccnOtilu8TLte0EmGnLEh13ZIoFlk7
+         f73g==
+X-Gm-Message-State: AOJu0YynOVaRL9n9fp5DX6PoSYpWlDciE0FlPYvBsYIsQVhehzRdeCTl
+	adi5DspBTPc3G/2b8WltfihapN3hqQldF2lrhwufMD3DhDwa5hfefXcas/goiWnxTKCVGFLoSFm
+	3NF7oX4hLc/Dy2gq99RMlar1qqF/NcoFt5BTFiyFINg75Up5aiwb1kxqkEjI7KaWMsYjN+WACIk
+	0ScwUHj7jGDiDnAo9U4tdrE0GIqrObaiZkOBu1i6xvwA0=
+X-Google-Smtp-Source: AGHT+IEzqY05NkAq1Gn2LJqwB1WPzry6JpExZnGMwEJxmcc10xro9AzPpzGpuczywQ5DO+99AsfEAZdYSYSTUQ==
 X-Received: from shailendkvm.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:2648])
- (user=shailend job=sendgmr) by 2002:a05:6a00:9392:b0:6f3:f447:57e1 with SMTP
- id ka18-20020a056a00939200b006f3f44757e1mr46865pfb.1.1714518875684; Tue, 30
- Apr 2024 16:14:35 -0700 (PDT)
-Date: Tue, 30 Apr 2024 23:14:10 +0000
+ (user=shailend job=sendgmr) by 2002:a05:6902:18d2:b0:de0:ecc6:4681 with SMTP
+ id ck18-20020a05690218d200b00de0ecc64681mr170359ybb.1.1714518877261; Tue, 30
+ Apr 2024 16:14:37 -0700 (PDT)
+Date: Tue, 30 Apr 2024 23:14:11 +0000
 In-Reply-To: <20240430231420.699177-1-shailend@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,8 +74,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240430231420.699177-1-shailend@google.com>
 X-Mailer: git-send-email 2.45.0.rc0.197.gbae5840b3b-goog
-Message-ID: <20240430231420.699177-2-shailend@google.com>
-Subject: [PATCH net-next 01/10] queue_api: define queue api
+Message-ID: <20240430231420.699177-3-shailend@google.com>
+Subject: [PATCH net-next 02/10] gve: Make the GQ RX free queue funcs idempotent
 From: Shailend Chand <shailend@google.com>
 To: netdev@vger.kernel.org
 Cc: almasrymina@google.com, davem@davemloft.net, edumazet@google.com, 
@@ -84,80 +84,69 @@ Cc: almasrymina@google.com, davem@davemloft.net, edumazet@google.com,
 	Shailend Chand <shailend@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-From: Mina Almasry <almasrymina@google.com>
+Although this is not fixing any existing double free bug, making these
+functions idempotent allows for a simpler implementation of future ndo
+hooks that act on a single queue.
 
-This API enables the net stack to reset the queues used for devmem TCP.
-
-Signed-off-by: Mina Almasry <almasrymina@google.com>
+Tested-by: Mina Almasry <almasrymina@google.com>
+Reviewed-by: Praveen Kaligineedi <pkaligineedi@google.com>
+Reviewed-by: Harshitha Ramamurthy <hramamurthy@google.com>
 Signed-off-by: Shailend Chand <shailend@google.com>
 ---
- include/linux/netdevice.h   |  3 +++
- include/net/netdev_queues.h | 31 +++++++++++++++++++++++++++++++
- 2 files changed, 34 insertions(+)
+ drivers/net/ethernet/google/gve/gve_rx.c | 29 ++++++++++++++++--------
+ 1 file changed, 19 insertions(+), 10 deletions(-)
 
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index f849e7d110ed..6a58ec73c5e8 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -1957,6 +1957,7 @@ enum netdev_reg_state {
-  *	@sysfs_rx_queue_group:	Space for optional per-rx queue attributes
-  *	@rtnl_link_ops:	Rtnl_link_ops
-  *	@stat_ops:	Optional ops for queue-aware statistics
-+ *	@queue_mgmt_ops:	Optional ops for queue management
-  *
-  *	@gso_max_size:	Maximum size of generic segmentation offload
-  *	@tso_max_size:	Device (as in HW) limit on the max TSO request size
-@@ -2340,6 +2341,8 @@ struct net_device {
+diff --git a/drivers/net/ethernet/google/gve/gve_rx.c b/drivers/net/ethernet/google/gve/gve_rx.c
+index 9b56e89c4f43..0a3f88170411 100644
+--- a/drivers/net/ethernet/google/gve/gve_rx.c
++++ b/drivers/net/ethernet/google/gve/gve_rx.c
+@@ -30,6 +30,9 @@ static void gve_rx_unfill_pages(struct gve_priv *priv,
+ 	u32 slots = rx->mask + 1;
+ 	int i;
  
- 	const struct netdev_stat_ops *stat_ops;
- 
-+	const struct netdev_queue_mgmt_ops *queue_mgmt_ops;
++	if (!rx->data.page_info)
++		return;
 +
- 	/* for setting kernel sock attribute on TCP connection setup */
- #define GSO_MAX_SEGS		65535u
- #define GSO_LEGACY_MAX_SIZE	65536u
-diff --git a/include/net/netdev_queues.h b/include/net/netdev_queues.h
-index c7ac4539eafc..04bb1318c6cc 100644
---- a/include/net/netdev_queues.h
-+++ b/include/net/netdev_queues.h
-@@ -87,6 +87,37 @@ struct netdev_stat_ops {
- 			       struct netdev_queue_stats_tx *tx);
- };
+ 	if (rx->data.raw_addressing) {
+ 		for (i = 0; i < slots; i++)
+ 			gve_rx_free_buffer(&priv->pdev->dev, &rx->data.page_info[i],
+@@ -69,20 +72,26 @@ static void gve_rx_free_ring_gqi(struct gve_priv *priv, struct gve_rx_ring *rx,
+ 	int idx = rx->q_num;
+ 	size_t bytes;
  
-+/**
-+ * struct netdev_queue_mgmt_ops - netdev ops for queue management
-+ *
-+ * queue_mem_size: Size of the struct that describes a queue's memory.
-+ *
-+ * @ndo_queue_mem_alloc: Allocate memory for an RX queue at the specified index.
-+ *			 The new memory is written at the specified address.
-+ *
-+ * @ndo_queue_mem_free:	Free memory from an RX queue.
-+ *
-+ * @ndo_queue_start:	Start an RX queue with the specified memory and at the
-+ *			specified index.
-+ *
-+ * @ndo_queue_stop:	Stop the RX queue at the specified index. The stopped
-+ *			queue's memory is written at the specified address.
-+ */
-+struct netdev_queue_mgmt_ops {
-+	size_t			ndo_queue_mem_size;
-+	int			(*ndo_queue_mem_alloc)(struct net_device *dev,
-+						       void *per_queue_mem,
-+						       int idx);
-+	void			(*ndo_queue_mem_free)(struct net_device *dev,
-+						      void *per_queue_mem);
-+	int			(*ndo_queue_start)(struct net_device *dev,
-+						   void *per_queue_mem,
-+						   int idx);
-+	int			(*ndo_queue_stop)(struct net_device *dev,
-+						  void *per_queue_mem,
-+						  int idx);
-+};
-+
- /**
-  * DOC: Lockless queue stopping / waking helpers.
-  *
+-	bytes = sizeof(struct gve_rx_desc) * cfg->ring_size;
+-	dma_free_coherent(dev, bytes, rx->desc.desc_ring, rx->desc.bus);
+-	rx->desc.desc_ring = NULL;
++	if (rx->desc.desc_ring) {
++		bytes = sizeof(struct gve_rx_desc) * cfg->ring_size;
++		dma_free_coherent(dev, bytes, rx->desc.desc_ring, rx->desc.bus);
++		rx->desc.desc_ring = NULL;
++	}
+ 
+-	dma_free_coherent(dev, sizeof(*rx->q_resources),
+-			  rx->q_resources, rx->q_resources_bus);
+-	rx->q_resources = NULL;
++	if (rx->q_resources) {
++		dma_free_coherent(dev, sizeof(*rx->q_resources),
++				  rx->q_resources, rx->q_resources_bus);
++		rx->q_resources = NULL;
++	}
+ 
+ 	gve_rx_unfill_pages(priv, rx, cfg);
+ 
+-	bytes = sizeof(*rx->data.data_ring) * slots;
+-	dma_free_coherent(dev, bytes, rx->data.data_ring,
+-			  rx->data.data_bus);
+-	rx->data.data_ring = NULL;
++	if (rx->data.data_ring) {
++		bytes = sizeof(*rx->data.data_ring) * slots;
++		dma_free_coherent(dev, bytes, rx->data.data_ring,
++				  rx->data.data_bus);
++		rx->data.data_ring = NULL;
++	}
+ 
+ 	kvfree(rx->qpl_copy_pool);
+ 	rx->qpl_copy_pool = NULL;
 -- 
 2.45.0.rc0.197.gbae5840b3b-goog
 
