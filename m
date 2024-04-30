@@ -1,138 +1,140 @@
-Return-Path: <netdev+bounces-92604-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92605-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CF608B8112
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 22:04:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C6818B8127
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 22:07:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CBDF51C2607E
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 20:04:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6A8C61C25993
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 20:07:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32D821BF6DC;
-	Tue, 30 Apr 2024 20:03:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B548C1A0AFF;
+	Tue, 30 Apr 2024 20:07:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G5xcVyFd"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jAq66FZ4"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0589C1A0AFB;
-	Tue, 30 Apr 2024 20:03:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78C073308A
+	for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 20:06:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714507385; cv=none; b=r67fq/8GaB14LKZci2B2QGJXc+Sor+uGnP7MwiOZKCfJWRzejH7IPAkWs8DEc7tmWcMnV1JMLw7U2QcGzo+uy1asI5burNJlJzBqB2XL7fIXaBsRCBCEAktnQJmZy5kNbnE9E0VN9FmWsD8K6ZlMZLjlWVJSQTV2gZ5m/vPEl0c=
+	t=1714507621; cv=none; b=KrhI1obGZqcpiRK0aRtVW52HnmLzq7+GK3dYhw3fcYkruEr1RZ52PLPt5kk6dqa8A5Tdo5k3c4mLoHS/xH12VNiv9nUD2Ayh2z59xSJ/ElQKUaWEhE5g+khL8iqcv9QZsTPqZWXTR7i+LcmlKE2FMWD8U4c7fTO0fL0h43kUE4U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714507385; c=relaxed/simple;
-	bh=4MMWKqrqMWleDHuXwmb7LFjDvAuwnnOwOjLO3S5FiZI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IsVbPA3r4tunor2JDX1bN6NFmqHwZJ9+jZtcDEsXc7W4z9CWDTtiQT4pfetO2AZyRtaBySPc24AinmMpeMZdNdjR/ROFPaNhFOB7iI4MY4oRZ+QKce4MMxcwSNFkSQn2h9ZfrUl176KPsxeYQjbWL5vbk6mgx7CyuFSOSVDwPF8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G5xcVyFd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1608C4AF14;
-	Tue, 30 Apr 2024 20:03:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714507384;
-	bh=4MMWKqrqMWleDHuXwmb7LFjDvAuwnnOwOjLO3S5FiZI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=G5xcVyFdVtl54uX/hFKtu4Xp8ZRHZksXd2T0ai5bqu/MORN2M96uFMG3sxxhhlC/H
-	 eHLdTwN8NWUooPxQ72fGu9LdqjzUmnah1c2GzOzi2h8rbZafOHK2kv26V7JnufrNT3
-	 FS3XrMYp1cQi7Vr3IIh3A5PG79xUjoRRE1nLVXb2HxBEGVREkdwqfpGaXwh9e9tumO
-	 iKEzdopuvWlfen73mZa1yyUmfV/7ehba2fXmcYLk3PirbFwn6MblWfFEvlwWXWNqEr
-	 fCTfvdHw/bns0ZwhYpfTEEduzixTLb6RQ2S9Gj4MQz4/0QySN6OeMzY9QlGyLntwA9
-	 WXLgMwh/P4Pkg==
-Date: Tue, 30 Apr 2024 13:03:02 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Danielle Ratson <danieller@nvidia.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "davem@davemloft.net"
- <davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
- "pabeni@redhat.com" <pabeni@redhat.com>, "corbet@lwn.net" <corbet@lwn.net>,
- "linux@armlinux.org.uk" <linux@armlinux.org.uk>, "sdf@google.com"
- <sdf@google.com>, "kory.maincent@bootlin.com" <kory.maincent@bootlin.com>,
- "maxime.chevallier@bootlin.com" <maxime.chevallier@bootlin.com>,
- "vladimir.oltean@nxp.com" <vladimir.oltean@nxp.com>,
- "przemyslaw.kitszel@intel.com" <przemyslaw.kitszel@intel.com>,
- "ahmed.zaki@intel.com" <ahmed.zaki@intel.com>, "richardcochran@gmail.com"
- <richardcochran@gmail.com>, "shayagr@amazon.com" <shayagr@amazon.com>,
- "paul.greenwalt@intel.com" <paul.greenwalt@intel.com>, "jiri@resnulli.us"
- <jiri@resnulli.us>, "linux-doc@vger.kernel.org"
- <linux-doc@vger.kernel.org>, "linux-kernel@vger.kernel.org"
- <linux-kernel@vger.kernel.org>, mlxsw <mlxsw@nvidia.com>, Petr Machata
- <petrm@nvidia.com>, Ido Schimmel <idosch@nvidia.com>
-Subject: Re: [PATCH net-next v5 04/10] ethtool: Add flashing transceiver
- modules' firmware notifications ability
-Message-ID: <20240430130302.235d612d@kernel.org>
-In-Reply-To: <DM6PR12MB45168DC7D9D9D7A5AE3E2B2DD81A2@DM6PR12MB4516.namprd12.prod.outlook.com>
-References: <20240424133023.4150624-1-danieller@nvidia.com>
-	<20240424133023.4150624-5-danieller@nvidia.com>
-	<20240429201130.5fad6d05@kernel.org>
-	<DM6PR12MB45168DC7D9D9D7A5AE3E2B2DD81A2@DM6PR12MB4516.namprd12.prod.outlook.com>
+	s=arc-20240116; t=1714507621; c=relaxed/simple;
+	bh=ug3YfKik7AumLDou9Srebnw6+kedHrFJPLCWgOx1frE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TlvFix0TmZfOva+frBZwIJvogA/5GvHL6Dr7PaawFqt0HkoS/eSODPW0w41SQz0vxCjpILHr1zU0JNMKcuQA3BpOjOS0p4jflCb7bPEdp+26e4O1inss1iFq/M13pS/8QbqGRsYXx5OQJZh3eGKApu2Gr4nHU4nFW1kO4huGvM4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=jAq66FZ4; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1714507618;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=dxTrrQAHX5LIHD8+8RfIAMS1TPkS1k3rljcnnnsPEVE=;
+	b=jAq66FZ4tlALHbPQhE/ZoM181Z5KaVwK5JqgoZvkc3hXGqI4AHAyPfmyWrljrNgyE/Xm5M
+	DH+Zv8/7YFinrf1L8i8nTQH9B1/Pa88b7oXud1+56AOGkf5dnmgj0GJE9GnYbq9A0sPE/0
+	gJfYmC3yw7JsWET72Yh01Ne4dOOk4Vc=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-518-CKmN4XdbPUecrRHCYOGStA-1; Tue, 30 Apr 2024 16:06:56 -0400
+X-MC-Unique: CKmN4XdbPUecrRHCYOGStA-1
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-a51eb0c14c8so231826066b.0
+        for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 13:06:56 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714507615; x=1715112415;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dxTrrQAHX5LIHD8+8RfIAMS1TPkS1k3rljcnnnsPEVE=;
+        b=HkL5KhbgLWsKBuAghkeUUceoxkNvUaSCHtcE62S3mmb3OO1n1FTP0rrfdVJc5owVz4
+         QC3R5oM6+nNsBjIw+tgNFJX9dJrIAg3TRBEH3N9msIcWryYGgkg62pgx6YfRj68xZQzb
+         PKBPUTfPZkYtTLNCb33o3h1NgO5mYgyHXK0tkpETNxnnkm50ZX7HjuleJ7RjBEEZczME
+         rjnqj8Mgr3x0lPujK2a5pm6JhaPYLDDt0pTkMmUvwnhWQ+2cLgvBFdpUUHLBSqT0+gAv
+         pQQO5vq5tFejeXm2PZBJPz3H2cV/C+zgYqRw88KDBsnl/RZFPROZjgaJM2v4agzpIEd2
+         refQ==
+X-Forwarded-Encrypted: i=1; AJvYcCURlOApXgtLjjK9341asF5IFjHo7yHrNEOHrKck6Rrwlps0eatSU5qUVkVcAdMyhAFGE8GWEB+t7kOWMNcxwdtLZx9xYlJr
+X-Gm-Message-State: AOJu0YzzvPs9c0Yu2GBRm+M1JZPd3GzEBtPl03dmOSCE80cNM00YcU4q
+	31nH1FQfSwemvnuJqO+TSnX5KeGOx6kR+O+aA8cQVlyyJbzJXxzSh80QRcDslc4RJaMsfoCG7Hh
+	n8RW6lHamtN2Dcr7fQBe+rY7T4jbCw/gqbR4Nd/UGzHYXD2jKpKQmzA==
+X-Received: by 2002:a17:906:2a44:b0:a58:ee10:ad05 with SMTP id k4-20020a1709062a4400b00a58ee10ad05mr484893eje.69.1714507615499;
+        Tue, 30 Apr 2024 13:06:55 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IF7ocL9+DqttG8t6q0QKC2cVrRfgcVUPqW7FLSaNzemeZLoe4wornulVDynqTC9/Zrj4O1LwA==
+X-Received: by 2002:a17:906:2a44:b0:a58:ee10:ad05 with SMTP id k4-20020a1709062a4400b00a58ee10ad05mr484881eje.69.1714507614890;
+        Tue, 30 Apr 2024 13:06:54 -0700 (PDT)
+Received: from redhat.com ([2.55.56.94])
+        by smtp.gmail.com with ESMTPSA id s8-20020a170906500800b00a4e24d259edsm15356306ejj.167.2024.04.30.13.06.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 30 Apr 2024 13:06:54 -0700 (PDT)
+Date: Tue, 30 Apr 2024 16:06:50 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Darius Rad <darius@bluespec.com>
+Cc: Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	virtualization@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] virtio_net: Warn if insufficient queue length for
+ transmitting
+Message-ID: <20240430121730-mutt-send-email-mst@kernel.org>
+References: <ZjFH7Xb5gyTtOpWd@localhost.localdomain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZjFH7Xb5gyTtOpWd@localhost.localdomain>
 
-On Tue, 30 Apr 2024 18:11:18 +0000 Danielle Ratson wrote:
-> > Do we want to blast it to all listeners or treat it as an async reply?
-> > We can save the seq and portid of the original requester and use reply, I
-> > think.  
+On Tue, Apr 30, 2024 at 03:35:09PM -0400, Darius Rad wrote:
+> The transmit queue is stopped when the number of free queue entries is less
+> than 2+MAX_SKB_FRAGS, in start_xmit().  If the queue length (QUEUE_NUM_MAX)
+> is less than then this, transmission will immediately trigger a netdev
+> watchdog timeout.  Report this condition earlier and more directly.
 > 
-> I am sorry, I am not sure I understood what you meant here... it
-> should be an async reply, but not sure I understood your suggestion.
+> Signed-off-by: Darius Rad <darius@bluespec.com>
+> ---
+>  drivers/net/virtio_net.c | 3 +++
+>  1 file changed, 3 insertions(+)
 > 
-> Can you explain please?
+> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> index 115c3c5414f2..72ee8473b61c 100644
+> --- a/drivers/net/virtio_net.c
+> +++ b/drivers/net/virtio_net.c
+> @@ -4917,6 +4917,9 @@ static int virtnet_probe(struct virtio_device *vdev)
+>  			set_bit(guest_offloads[i], &vi->guest_offloads);
+>  	vi->guest_offloads_capable = vi->guest_offloads;
+>  
+> +	if (virtqueue_get_vring_size(vi->sq->vq) < 2 + MAX_SKB_FRAGS)
+> +		netdev_warn_once(dev, "not enough queue entries, expect xmit timeout\n");
+> +
 
-Make sure you have read the netlink intro, it should help fill in some
-gaps I won't explicitly cover:
-https://docs.kernel.org/next/userspace-api/netlink/intro.html
+How about actually fixing it though? E.g. by linearizing...
 
-"True" notifications will have pid = 0 and seq = 0, while replies to
-commands have those fields populated based on the request.
+It also bothers me that there's practically
+/proc/sys/net/core/max_skb_frags
+and if that's low then things could actually work.
 
-pid identifies the socket where the message should be delivered.
-ethnl_multicast() assumes that it's zero (since it's designed to work
-for notifications) and sends the message to all sockets subscribed to 
-a multicast / notification group (ETHNL_MCGRP_MONITOR).
+Finally, while originally it was just 17 typically, now it's
+configurable. So it's possible that you change the config to make big
+tcp work better and device stops working while it worked fine
+previously.
 
-So that's the background. What you're doing isn't incorrect but I think
-it'd be better if we didn't use the multicast group here, and sent the
-messages as a reply - just to the socket which requested the flashing.
-Still asynchronously, we just need to save the right pid and seq to use.
 
-Two reasons for this:
- 1) convenience, the user space socket won't have to subscribe to 
-    the multicast group
- 2) the multicast group is really intended for notifying about
-    _configuration changes_ done to the system. If there is a daemon
-    listening on that group, there's a very high chance it won't care
-    about progress of the flashing. Maybe we can send a single
-    notification that flashing has been completed but not "progress
-    updates"
+>  	pr_debug("virtnet: registered device %s with %d RX and TX vq's\n",
+>  		 dev->name, max_queue_pairs);
+>  
+> -- 
+> 2.39.2
 
-I think it should work.
-
-> > > +void ethnl_module_fw_flash_ntf_err(struct net_device *dev,
-> > > +				   char *err_msg, char *sub_err_msg) {
-> > > +	char status_msg[120];
-> > > +
-> > > +	if (sub_err_msg)
-> > > +		sprintf(status_msg, "%s, %s.", err_msg, sub_err_msg);
-> > > +	else
-> > > +		sprintf(status_msg, "%s.", err_msg);  
-> > 
-> > Hm, printing in the dot, and assuming sizeof err_msg + sub_err < 116 is a bit
-> > surprising. But I guess you have a reason...
-> > 
-> > Maybe pass them separately to ethnl_module_fw_flash_ntf() then you can
-> > nla_reserve() the right amount of space and sprintf() directly into the skb?  
-> 
-> I can get rid of the dot actually, would it be ok like that?
-
-It'd still be better to splice the two strings and the comma directly
-to the skb, rather than on the stack using a function which doesn't
-check the bounds of the buffer :S
 
