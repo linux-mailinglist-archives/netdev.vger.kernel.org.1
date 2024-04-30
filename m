@@ -1,111 +1,200 @@
-Return-Path: <netdev+bounces-92400-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92401-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B5C38B6EAA
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 11:40:37 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98B1B8B6EB6
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 11:43:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6BE991C22CDE
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 09:40:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8910FB2095E
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 09:43:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C83B128386;
-	Tue, 30 Apr 2024 09:40:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AD0412837E;
+	Tue, 30 Apr 2024 09:43:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qJfpqiGd"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="iUK3XQOI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from fllv0016.ext.ti.com (fllv0016.ext.ti.com [198.47.19.142])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7084A22618;
-	Tue, 30 Apr 2024 09:40:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55AB0FC02;
+	Tue, 30 Apr 2024 09:43:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.142
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714470033; cv=none; b=dBKxhO5GoStztb+J70VxhW0TqxfWd9Gv0Z5QBb3Gekh3v6+DQUX5PkJ9FjU/LQW+aplesh+4bS7Gh1L0PrNrctd/WcTp8UWaiUM7FiVhztaC0jhxyBtmh2moR0aHhrQHVeVgDC6jB90h2HahG50jvxV0J46e5Y6AZRl9rtiFMKU=
+	t=1714470207; cv=none; b=NbFQipzfLCyKY9FeFIMRmqpigfZFXZ+g2A6DUY7UwTJ4n0L65CF9nAEufGCSnredazVG7ngGcMgp9P1lLoYb0QL0xEJvqpZf71chgL/OYgYUCJ9M4hlClAwsn9osU/8eoLyMGAStpj8Duo8KI55W/ltflQNXLCTRNUwCq/78D4Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714470033; c=relaxed/simple;
-	bh=xR8ABvK2FjKgC5HeLW0NTCb2SyyQtugwt+6zGS947s4=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=G3SKDkWlwGQG6ieXRgapo3U+9ZpUi0GIZFvfZ2rDqZyrRSVDKCUbqiqvk86vyRNxB6PjflfbSZjjkLH/VURqDsgG9gl+yYnhYeNLusVXiVs4hhDzEHpcudO5xdvbCNHuF/WM0CmC7Z1MXd8XpmLd+qPFyGLyEzu8ajr0JibZSaM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qJfpqiGd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id D9CA7C4AF14;
-	Tue, 30 Apr 2024 09:40:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714470031;
-	bh=xR8ABvK2FjKgC5HeLW0NTCb2SyyQtugwt+6zGS947s4=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=qJfpqiGd2YHRjq49mU+llr8tzBXvTG0jTK+84tcRCW7HpTsLf7cohBrwk9vW7ujNu
-	 j4F/2khs/YjvDg3p2sojX4qtqFsMWavNspP9Bu1aMatm+U1kx1VhBLpENj+C2rL6nI
-	 SnJc0h2cvb9DPdzYKqRwVLMKkBzfax7PnozH2fklAtK346zqrcTh95Q6x2d3sBwWrC
-	 5Piy7avmZ0Zapm+az+m/xFfIeyme36CmGDFIQ8Pdwatx6zolCR75SacyfKLpSLbeZI
-	 eg9cM8J5ONJ/rC0UoWk1N3vcGZITGQj+ZXifYTkxfOt5eEKkMYPRdRj5xqOz1SbRGA
-	 Y4F0Ouk+9dw4Q==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C70C8C433E9;
-	Tue, 30 Apr 2024 09:40:31 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1714470207; c=relaxed/simple;
+	bh=nNKDIj70f3OJGWN1Jm4FkGhksBWfcRNnPzERl/P+L04=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=As52lV9IpIQYbhQOAKXrP8cpfrQL0oH6KQPq5yDhakdlGTLTPdhhAPQ4w1R9t7YFW8SU+7+WZWKkpZuMVjrQ9/9QHNa6L+2TaBZQ35Fvoth/McDumjRyDvJbTmetPicv4fWzCB/DPC8wRK980le6n9f+efYb/54qUAu87IJfPIw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=iUK3XQOI; arc=none smtp.client-ip=198.47.19.142
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from fllv0034.itg.ti.com ([10.64.40.246])
+	by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id 43U9h4RO117308;
+	Tue, 30 Apr 2024 04:43:04 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1714470184;
+	bh=+IMEMRV4HyNtb8jDdykw1iuOP3rGaHot5KjqWPyTFWU=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=iUK3XQOIrpBS+qF6c8ScfbmCK2GhgKKB1XdNkodMkDnm2eSKPpY4+guqzg/yOlma/
+	 d1XQxvxn80nwMBvXFzPr7iJk3UiZ77WzMnOkxyHcD+jHW9pP5dQINke6UazV65lCEb
+	 I9jX5ORczEt3bQNX3NrPp3UZnYrNdl0JDVpWnXys=
+Received: from DFLE108.ent.ti.com (dfle108.ent.ti.com [10.64.6.29])
+	by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 43U9h4d4110151
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Tue, 30 Apr 2024 04:43:04 -0500
+Received: from DFLE115.ent.ti.com (10.64.6.36) by DFLE108.ent.ti.com
+ (10.64.6.29) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Tue, 30
+ Apr 2024 04:43:04 -0500
+Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DFLE115.ent.ti.com
+ (10.64.6.36) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Tue, 30 Apr 2024 04:43:04 -0500
+Received: from [10.24.69.25] (danish-tpc.dhcp.ti.com [10.24.69.25])
+	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 43U9gxu1031409;
+	Tue, 30 Apr 2024 04:42:59 -0500
+Message-ID: <5b7cf22a-ca91-4975-bd26-c76a16781ad7@ti.com>
+Date: Tue, 30 Apr 2024 15:12:58 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v7 0/8] virtio-net: support device stats
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171447003181.1656.10069538136883769865.git-patchwork-notify@kernel.org>
-Date: Tue, 30 Apr 2024 09:40:31 +0000
-References: <20240426033928.77778-1-xuanzhuo@linux.alibaba.com>
-In-Reply-To: <20240426033928.77778-1-xuanzhuo@linux.alibaba.com>
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, mst@redhat.com, jasowang@redhat.com,
- ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
- john.fastabend@gmail.com, sdf@google.com, amritha.nambiar@intel.com,
- larysa.zaremba@intel.com, sridhar.samudrala@intel.com,
- maciej.fijalkowski@intel.com, virtualization@lists.linux.dev,
- bpf@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2] net: ti: icssg_prueth: Add SW TX / RX
+ Coalescing based on hrtimers
+Content-Language: en-US
+To: Simon Horman <horms@kernel.org>
+CC: Dan Carpenter <dan.carpenter@linaro.org>,
+        Heiner Kallweit
+	<hkallweit1@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
+        Jan Kiszka
+	<jan.kiszka@siemens.com>,
+        Diogo Ivo <diogo.ivo@siemens.com>, Paolo Abeni
+	<pabeni@redhat.com>,
+        Jakub Kicinski <kuba@kernel.org>, Eric Dumazet
+	<edumazet@google.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <srk@ti.com>,
+        Vignesh Raghavendra
+	<vigneshr@ti.com>, <r-gunasekaran@ti.com>,
+        Roger Quadros <rogerq@kernel.org>
+References: <20240429071501.547680-1-danishanwar@ti.com>
+ <20240429183034.GG516117@kernel.org>
+From: MD Danish Anwar <danishanwar@ti.com>
+In-Reply-To: <20240429183034.GG516117@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 
-Hello:
+Simon,
 
-This series was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Fri, 26 Apr 2024 11:39:20 +0800 you wrote:
-> As the spec:
+On 30/04/24 12:00 am, Simon Horman wrote:
+> On Mon, Apr 29, 2024 at 12:45:01PM +0530, MD Danish Anwar wrote:
+>> Add SW IRQ coalescing based on hrtimers for RX and TX data path for ICSSG
+>> driver, which can be enabled by ethtool commands:
+>>
+>> - RX coalescing
+>>   ethtool -C eth1 rx-usecs 50
+>>
+>> - TX coalescing can be enabled per TX queue
+>>
+>>   - by default enables coalesing for TX0
 > 
-> https://github.com/oasis-tcs/virtio-spec/commit/42f389989823039724f95bbbd243291ab0064f82
+> nit: coalescing
 > 
-> The virtio net supports to get device stats.
+> Please consider running patches through ./checkpatch --codespell
 > 
-> Please review.
-> 
-> [...]
+>>   ethtool -C eth1 tx-usecs 50
+>>   - configure TX0
+>>   ethtool -Q eth0 queue_mask 1 --coalesce tx-usecs 100
+>>   - configure TX1
+>>   ethtool -Q eth0 queue_mask 2 --coalesce tx-usecs 100
+>>   - configure TX0 and TX1
+>>   ethtool -Q eth0 queue_mask 3 --coalesce tx-usecs 100 --coalesce
+>> tx-usecs 100
+>>
+>> Minimum value for both rx-usecs and tx-usecs is 20us.
+>>
+>> Compared to gro_flush_timeout and napi_defer_hard_irqs this patch allows
+>> to enable IRQ coalescing for RX path separately.
+>>
+>> Benchmarking numbers:
+>>  ===============================================================
+>> | Method                  | Tput_TX | CPU_TX | Tput_RX | CPU_RX |
+>> | ==============================================================
+>> | Default Driver           943 Mbps    31%      517 Mbps  38%   |
+>> | IRQ Coalescing (Patch)   943 Mbps    28%      518 Mbps  25%   |
+>>  ===============================================================
+>>
+>> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
+>> ---
 
-Here is the summary with links:
-  - [net-next,v7,1/8] virtio_net: introduce ability to get reply info from device
-    https://git.kernel.org/netdev/net-next/c/aff5b0e605b0
-  - [net-next,v7,2/8] virtio_net: introduce device stats feature and structures
-    https://git.kernel.org/netdev/net-next/c/34cfe8722136
-  - [net-next,v7,3/8] virtio_net: remove "_queue" from ethtool -S
-    https://git.kernel.org/netdev/net-next/c/de6df26ffced
-  - [net-next,v7,4/8] virtio_net: support device stats
-    https://git.kernel.org/netdev/net-next/c/941168f8b40e
-  - [net-next,v7,5/8] virtio_net: device stats helpers support driver stats
-    https://git.kernel.org/netdev/net-next/c/d86769b9d23c
-  - [net-next,v7,6/8] virtio_net: add the total stats field
-    https://git.kernel.org/netdev/net-next/c/d806e1ff79e6
-  - [net-next,v7,7/8] netdev: add queue stats
-    https://git.kernel.org/netdev/net-next/c/0cfe71f45f42
-  - [net-next,v7,8/8] virtio-net: support queue stat
-    https://git.kernel.org/netdev/net-next/c/d888f04c09bb
+[ ... ]
+>>  	if (num_tx_packets >= budget)
+>>  		return budget;
+>>  
+>> -	if (napi_complete_done(napi_tx, num_tx_packets))
+>> -		enable_irq(tx_chn->irq);
+>> +	if (napi_complete_done(napi_tx, num_tx_packets)) {
+>> +		if (unlikely(tx_chn->tx_pace_timeout_ns && !tdown)) {
+>> +			hrtimer_start(&tx_chn->tx_hrtimer,
+>> +				      ns_to_ktime(tx_chn->tx_pace_timeout_ns),
+>> +				      HRTIMER_MODE_REL_PINNED);
+>> +		} else {
+>> +			enable_irq(tx_chn->irq);
+>> +		}
+> 
+> This compiles with gcc-13 and clang-18 W=1
+> (although the inner {} are unnecessary).
+> 
+>> +	}
+>>  
+>>  	return num_tx_packets;
+>>  }
+> 
+> ...
+> 
+>> @@ -872,7 +894,13 @@ int emac_napi_rx_poll(struct napi_struct *napi_rx, int budget)
+>>  	}
+>>  
+>>  	if (num_rx < budget && napi_complete_done(napi_rx, num_rx))
+>> -		enable_irq(emac->rx_chns.irq[rx_flow]);
+>> +		if (unlikely(emac->rx_pace_timeout_ns)) {
+>> +			hrtimer_start(&emac->rx_hrtimer,
+>> +				      ns_to_ktime(emac->rx_pace_timeout_ns),
+>> +				      HRTIMER_MODE_REL_PINNED);
+>> +		} else {
+>> +			enable_irq(emac->rx_chns.irq[rx_flow]);
+>> +		}
+> 
+> But this does not; I think outer (but not inner) {} are needed.
+> 
 
-You are awesome, thank you!
+For both of these if checks, by having {} for outer if I am not seeing
+the warnings anymore. The braces don't seem to be neccessary for inner if.
+
+For both of these ifs I'll keep both inner and outer ifs in braces as
+this will help readablity as Dan pointed out.
+
+I will post v3 with this change.
+
+> FIIIW, I believe this doesn't show-up in the netdev automated testing
+> because this driver isn't built for x86 allmodconfig.
+> 
+>>  
+>>  	return num_rx;
+>>  }
+> 
+> ...
+> 
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Thanks and Regards,
+Danish
 
