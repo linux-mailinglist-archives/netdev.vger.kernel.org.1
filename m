@@ -1,373 +1,104 @@
-Return-Path: <netdev+bounces-92474-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92476-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id CEB708B780C
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 16:03:36 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF9EE8B7816
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 16:04:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DD775B22687
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 14:03:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 03668B222B0
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 14:04:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A122D17B4FF;
-	Tue, 30 Apr 2024 14:01:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47F3017F362;
+	Tue, 30 Apr 2024 14:01:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QjrBC9Dx"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="FftPWpOh"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADAE8179950
-	for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 14:01:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7445217BB1B;
+	Tue, 30 Apr 2024 14:01:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714485690; cv=none; b=RFP24UBDs4I+K1Nm3vyoiymotsl9QgMRJ/xvPkuXV7S2p0bobVn3VUathINSrUFoBAP9xnBaeBf/yeO6hoYvHjqJt/raAdcpyyH0j2eQOSGpFwOQ9qPQuPzcFaFWk32MexcFg7PZVIcIJiXjymNQugK1UvDWCV0MiMCcyFjm9yg=
+	t=1714485694; cv=none; b=XenbudA+T5/yMFYFszynqMzXmQLh6eF1zy/l4vc8nDt593VWx2WvGb5LeMhXekt7lmPol1cMQzWBfWmGN2nWan9gW3nj/mn95Qpz5OGNCa/svBdJcmA6DdtMvKJwyupI1xPZzFSIrq/4xvrPueZmmgNEYcUOVIcilBYQN//qOMQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714485690; c=relaxed/simple;
-	bh=Z/ZI+z10JKszJ90TtA+Prn3zGsvoC3zFXF4vd8ED68Y=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=TtLaFk8QxVDBlcDcukOP6fzj4eahUvH/b9J/XDtb8Oj6GgGU8T0KtR1rh79fySJq70UQXN4Rq4ioJuZJw54m+gU4l2N0T5H1ZCGi6HmS+GZeOdaXZlb7JvXuzYP97M+ZMh6D8CytLDYKr3/heSecMhKost5FBlI0TWeTaf2XD6M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QjrBC9Dx; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1714485687;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Cm3cVHJn3glRWj2NOBwQjPn4OMyifol1a955ZreqhbY=;
-	b=QjrBC9DxQxSvInuo+sszM56DLkz3Jp38fMMSILLwdwIxAd0PT+ObTEuB7VJx2ZrnqjzMRx
-	Q8/RTCqbZ0L6OtsvQ0BN70uPjaRHaq/rWDjOdis1Wc0Z0ZFLXguH17XlU1oyv0s0pgjjjw
-	6Toxslb7xMDM+UfSnttjuSHB5MM7Vw0=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-339-T9vf6YSBORykhuQrbF8vEA-1; Tue, 30 Apr 2024 10:01:22 -0400
-X-MC-Unique: T9vf6YSBORykhuQrbF8vEA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 5892A18065B5;
-	Tue, 30 Apr 2024 14:01:20 +0000 (UTC)
-Received: from warthog.procyon.org.com (unknown [10.42.28.22])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 6AC5D581C8;
-	Tue, 30 Apr 2024 14:01:17 +0000 (UTC)
-From: David Howells <dhowells@redhat.com>
-To: Christian Brauner <christian@brauner.io>,
-	Jeff Layton <jlayton@kernel.org>,
-	Gao Xiang <hsiangkao@linux.alibaba.com>,
-	Dominique Martinet <asmadeus@codewreck.org>
-Cc: David Howells <dhowells@redhat.com>,
-	Matthew Wilcox <willy@infradead.org>,
-	Steve French <smfrench@gmail.com>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Paulo Alcantara <pc@manguebit.com>,
-	Shyam Prasad N <sprasad@microsoft.com>,
-	Tom Talpey <tom@talpey.com>,
-	Eric Van Hensbergen <ericvh@kernel.org>,
-	Ilya Dryomov <idryomov@gmail.com>,
-	netfs@lists.linux.dev,
-	linux-cachefs@redhat.com,
-	linux-afs@lists.infradead.org,
-	linux-cifs@vger.kernel.org,
-	linux-nfs@vger.kernel.org,
-	ceph-devel@vger.kernel.org,
-	v9fs@lists.linux.dev,
-	linux-erofs@lists.ozlabs.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 04/22] netfs: Remove deprecated use of PG_private_2 as a second writeback flag
-Date: Tue, 30 Apr 2024 15:00:35 +0100
-Message-ID: <20240430140056.261997-5-dhowells@redhat.com>
-In-Reply-To: <20240430140056.261997-1-dhowells@redhat.com>
-References: <20240430140056.261997-1-dhowells@redhat.com>
+	s=arc-20240116; t=1714485694; c=relaxed/simple;
+	bh=fOkQvKx3TkjoVLbIXCLjIhXaPdmdNknggbtEf/cT3yY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Nc8UjCh1WexD2aqfOsNFiD2Da2hn9xC3gqwkoTqNJsHDpi8G7RIv1UQ9lsR+lYJecTCzIE22sUlo8snkrX6n0x88iogN7Es8RmOoJPnduf5GbWAvJhojJUgQsfjtJmG3yQ5zLLLiz3xWHBls189jzw8k3sifGaxnxlatk6sMrfU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=FftPWpOh; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=cAKC+FytbCMqRhx/bKnkjsTVy7JI3n8TWD+vJCpv8t4=; b=FftPWpOhN2IU3ZbF5sbRbfzVgt
+	nMLGfJs77c0MbKf6spQZjQHA6ABKs/zK4WZHPpg73aq5Vbaj65Qz6ZYA16QahFl+DhqRb/Or1PzWj
+	ezxloudXaRZU+n6QiZr8F2ie8a8YkYi0M8F1eQOtD34hsUGSYWZioTPm+djth2ucU8r4=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1s1o2j-00ELSx-DV; Tue, 30 Apr 2024 16:01:13 +0200
+Date: Tue, 30 Apr 2024 16:01:13 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Herve Codina <herve.codina@bootlin.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Lee Jones <lee@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+	Horatiu Vultur <horatiu.vultur@microchip.com>,
+	UNGLinuxDriver@microchip.com,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Saravana Kannan <saravanak@google.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Lars Povlsen <lars.povlsen@microchip.com>,
+	Steen Hegelund <Steen.Hegelund@microchip.com>,
+	Daniel Machon <daniel.machon@microchip.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
+	netdev@vger.kernel.org, linux-pci@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Allan Nielsen <allan.nielsen@microchip.com>,
+	Luca Ceresoli <luca.ceresoli@bootlin.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	stable@vger.kernel.org
+Subject: Re: [PATCH 08/17] net: lan966x: remove debugfs directory in probe()
+ error path
+Message-ID: <c48e18d1-c54b-417d-9f24-3ccfeb15e974@lunn.ch>
+References: <20240430083730.134918-1-herve.codina@bootlin.com>
+ <20240430083730.134918-9-herve.codina@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240430083730.134918-9-herve.codina@bootlin.com>
 
-Remove the deprecated use of PG_private_2 in netfslib.
+On Tue, Apr 30, 2024 at 10:37:17AM +0200, Herve Codina wrote:
+> A debugfs directory entry is create early during probe(). This entry is
+> not removed on error path leading to some "already present" issues in
+> case of EPROBE_DEFER.
+> 
+> Create this entry later in the probe() code to avoid the need to change
+> many 'return' in 'goto' and add the removal in the already present error
+> path.
+> 
+> Fixes: 942814840127 ("net: lan966x: Add VCAP debugFS support")
+> Cc: <stable@vger.kernel.org>
+> Signed-off-by: Herve Codina <herve.codina@bootlin.com>
 
-Signed-off-by: David Howells <dhowells@redhat.com>
-Reviewed-by: Jeff Layton <jlayton@kernel.org>
-cc: Matthew Wilcox (Oracle) <willy@infradead.org>
-cc: linux-cachefs@redhat.com
-cc: linux-fsdevel@vger.kernel.org
-cc: linux-mm@kvack.org
----
- fs/ceph/addr.c           |  19 +-----
- fs/netfs/buffered_read.c |   8 +--
- fs/netfs/io.c            | 144 ---------------------------------------
- 3 files changed, 2 insertions(+), 169 deletions(-)
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-diff --git a/fs/ceph/addr.c b/fs/ceph/addr.c
-index 18ddacb00511..74bfd10b1b1a 100644
---- a/fs/ceph/addr.c
-+++ b/fs/ceph/addr.c
-@@ -498,11 +498,6 @@ const struct netfs_request_ops ceph_netfs_ops = {
- };
- 
- #ifdef CONFIG_CEPH_FSCACHE
--static void ceph_set_page_fscache(struct page *page)
--{
--	folio_start_private_2(page_folio(page)); /* [DEPRECATED] */
--}
--
- static void ceph_fscache_write_terminated(void *priv, ssize_t error, bool was_async)
- {
- 	struct inode *inode = priv;
-@@ -520,10 +515,6 @@ static void ceph_fscache_write_to_cache(struct inode *inode, u64 off, u64 len, b
- 			       ceph_fscache_write_terminated, inode, true, caching);
- }
- #else
--static inline void ceph_set_page_fscache(struct page *page)
--{
--}
--
- static inline void ceph_fscache_write_to_cache(struct inode *inode, u64 off, u64 len, bool caching)
- {
- }
-@@ -715,8 +706,6 @@ static int writepage_nounlock(struct page *page, struct writeback_control *wbc)
- 		len = wlen;
- 
- 	set_page_writeback(page);
--	if (caching)
--		ceph_set_page_fscache(page);
- 	ceph_fscache_write_to_cache(inode, page_off, len, caching);
- 
- 	if (IS_ENCRYPTED(inode)) {
-@@ -800,8 +789,6 @@ static int ceph_writepage(struct page *page, struct writeback_control *wbc)
- 		return AOP_WRITEPAGE_ACTIVATE;
- 	}
- 
--	folio_wait_private_2(page_folio(page)); /* [DEPRECATED] */
--
- 	err = writepage_nounlock(page, wbc);
- 	if (err == -ERESTARTSYS) {
- 		/* direct memory reclaimer was killed by SIGKILL. return 0
-@@ -1075,8 +1062,7 @@ static int ceph_writepages_start(struct address_space *mapping,
- 				unlock_page(page);
- 				break;
- 			}
--			if (PageWriteback(page) ||
--			    PagePrivate2(page) /* [DEPRECATED] */) {
-+			if (PageWriteback(page)) {
- 				if (wbc->sync_mode == WB_SYNC_NONE) {
- 					doutc(cl, "%p under writeback\n", page);
- 					unlock_page(page);
-@@ -1084,7 +1070,6 @@ static int ceph_writepages_start(struct address_space *mapping,
- 				}
- 				doutc(cl, "waiting on writeback %p\n", page);
- 				wait_on_page_writeback(page);
--				folio_wait_private_2(page_folio(page)); /* [DEPRECATED] */
- 			}
- 
- 			if (!clear_page_dirty_for_io(page)) {
-@@ -1269,8 +1254,6 @@ static int ceph_writepages_start(struct address_space *mapping,
- 			}
- 
- 			set_page_writeback(page);
--			if (caching)
--				ceph_set_page_fscache(page);
- 			len += thp_size(page);
- 		}
- 		ceph_fscache_write_to_cache(inode, offset, len, caching);
-diff --git a/fs/netfs/buffered_read.c b/fs/netfs/buffered_read.c
-index b3fd6e1fa322..1622cce535a3 100644
---- a/fs/netfs/buffered_read.c
-+++ b/fs/netfs/buffered_read.c
-@@ -464,7 +464,7 @@ int netfs_write_begin(struct netfs_inode *ctx,
- 	if (!netfs_is_cache_enabled(ctx) &&
- 	    netfs_skip_folio_read(folio, pos, len, false)) {
- 		netfs_stat(&netfs_n_rh_write_zskip);
--		goto have_folio_no_wait;
-+		goto have_folio;
- 	}
- 
- 	rreq = netfs_alloc_request(mapping, file,
-@@ -505,12 +505,6 @@ int netfs_write_begin(struct netfs_inode *ctx,
- 	netfs_put_request(rreq, false, netfs_rreq_trace_put_return);
- 
- have_folio:
--	if (test_bit(NETFS_ICTX_USE_PGPRIV2, &ctx->flags)) {
--		ret = folio_wait_private_2_killable(folio);
--		if (ret < 0)
--			goto error;
--	}
--have_folio_no_wait:
- 	*_folio = folio;
- 	_leave(" = 0");
- 	return 0;
-diff --git a/fs/netfs/io.c b/fs/netfs/io.c
-index 60a19f96e0ce..2641238aae82 100644
---- a/fs/netfs/io.c
-+++ b/fs/netfs/io.c
-@@ -98,146 +98,6 @@ static void netfs_rreq_completed(struct netfs_io_request *rreq, bool was_async)
- 	netfs_put_request(rreq, was_async, netfs_rreq_trace_put_complete);
- }
- 
--/*
-- * [DEPRECATED] Deal with the completion of writing the data to the cache.  We
-- * have to clear the PG_fscache bits on the folios involved and release the
-- * caller's ref.
-- *
-- * May be called in softirq mode and we inherit a ref from the caller.
-- */
--static void netfs_rreq_unmark_after_write(struct netfs_io_request *rreq,
--					  bool was_async)
--{
--	struct netfs_io_subrequest *subreq;
--	struct folio *folio;
--	pgoff_t unlocked = 0;
--	bool have_unlocked = false;
--
--	rcu_read_lock();
--
--	list_for_each_entry(subreq, &rreq->subrequests, rreq_link) {
--		XA_STATE(xas, &rreq->mapping->i_pages, subreq->start / PAGE_SIZE);
--
--		xas_for_each(&xas, folio, (subreq->start + subreq->len - 1) / PAGE_SIZE) {
--			if (xas_retry(&xas, folio))
--				continue;
--
--			/* We might have multiple writes from the same huge
--			 * folio, but we mustn't unlock a folio more than once.
--			 */
--			if (have_unlocked && folio->index <= unlocked)
--				continue;
--			unlocked = folio_next_index(folio) - 1;
--			trace_netfs_folio(folio, netfs_folio_trace_end_copy);
--			folio_end_private_2(folio);
--			have_unlocked = true;
--		}
--	}
--
--	rcu_read_unlock();
--	netfs_rreq_completed(rreq, was_async);
--}
--
--static void netfs_rreq_copy_terminated(void *priv, ssize_t transferred_or_error,
--				       bool was_async) /* [DEPRECATED] */
--{
--	struct netfs_io_subrequest *subreq = priv;
--	struct netfs_io_request *rreq = subreq->rreq;
--
--	if (IS_ERR_VALUE(transferred_or_error)) {
--		netfs_stat(&netfs_n_rh_write_failed);
--		trace_netfs_failure(rreq, subreq, transferred_or_error,
--				    netfs_fail_copy_to_cache);
--	} else {
--		netfs_stat(&netfs_n_rh_write_done);
--	}
--
--	trace_netfs_sreq(subreq, netfs_sreq_trace_write_term);
--
--	/* If we decrement nr_copy_ops to 0, the ref belongs to us. */
--	if (atomic_dec_and_test(&rreq->nr_copy_ops))
--		netfs_rreq_unmark_after_write(rreq, was_async);
--
--	netfs_put_subrequest(subreq, was_async, netfs_sreq_trace_put_terminated);
--}
--
--/*
-- * [DEPRECATED] Perform any outstanding writes to the cache.  We inherit a ref
-- * from the caller.
-- */
--static void netfs_rreq_do_write_to_cache(struct netfs_io_request *rreq)
--{
--	struct netfs_cache_resources *cres = &rreq->cache_resources;
--	struct netfs_io_subrequest *subreq, *next, *p;
--	struct iov_iter iter;
--	int ret;
--
--	trace_netfs_rreq(rreq, netfs_rreq_trace_copy);
--
--	/* We don't want terminating writes trying to wake us up whilst we're
--	 * still going through the list.
--	 */
--	atomic_inc(&rreq->nr_copy_ops);
--
--	list_for_each_entry_safe(subreq, p, &rreq->subrequests, rreq_link) {
--		if (!test_bit(NETFS_SREQ_COPY_TO_CACHE, &subreq->flags)) {
--			list_del_init(&subreq->rreq_link);
--			netfs_put_subrequest(subreq, false,
--					     netfs_sreq_trace_put_no_copy);
--		}
--	}
--
--	list_for_each_entry(subreq, &rreq->subrequests, rreq_link) {
--		/* Amalgamate adjacent writes */
--		while (!list_is_last(&subreq->rreq_link, &rreq->subrequests)) {
--			next = list_next_entry(subreq, rreq_link);
--			if (next->start != subreq->start + subreq->len)
--				break;
--			subreq->len += next->len;
--			list_del_init(&next->rreq_link);
--			netfs_put_subrequest(next, false,
--					     netfs_sreq_trace_put_merged);
--		}
--
--		ret = cres->ops->prepare_write(cres, &subreq->start, &subreq->len,
--					       subreq->len, rreq->i_size, true);
--		if (ret < 0) {
--			trace_netfs_failure(rreq, subreq, ret, netfs_fail_prepare_write);
--			trace_netfs_sreq(subreq, netfs_sreq_trace_write_skip);
--			continue;
--		}
--
--		iov_iter_xarray(&iter, ITER_SOURCE, &rreq->mapping->i_pages,
--				subreq->start, subreq->len);
--
--		atomic_inc(&rreq->nr_copy_ops);
--		netfs_stat(&netfs_n_rh_write);
--		netfs_get_subrequest(subreq, netfs_sreq_trace_get_copy_to_cache);
--		trace_netfs_sreq(subreq, netfs_sreq_trace_write);
--		cres->ops->write(cres, subreq->start, &iter,
--				 netfs_rreq_copy_terminated, subreq);
--	}
--
--	/* If we decrement nr_copy_ops to 0, the usage ref belongs to us. */
--	if (atomic_dec_and_test(&rreq->nr_copy_ops))
--		netfs_rreq_unmark_after_write(rreq, false);
--}
--
--static void netfs_rreq_write_to_cache_work(struct work_struct *work) /* [DEPRECATED] */
--{
--	struct netfs_io_request *rreq =
--		container_of(work, struct netfs_io_request, work);
--
--	netfs_rreq_do_write_to_cache(rreq);
--}
--
--static void netfs_rreq_write_to_cache(struct netfs_io_request *rreq) /* [DEPRECATED] */
--{
--	rreq->work.func = netfs_rreq_write_to_cache_work;
--	if (!queue_work(system_unbound_wq, &rreq->work))
--		BUG();
--}
--
- /*
-  * Handle a short read.
-  */
-@@ -410,10 +270,6 @@ static void netfs_rreq_assess(struct netfs_io_request *rreq, bool was_async)
- 	clear_bit_unlock(NETFS_RREQ_IN_PROGRESS, &rreq->flags);
- 	wake_up_bit(&rreq->flags, NETFS_RREQ_IN_PROGRESS);
- 
--	if (test_bit(NETFS_RREQ_COPY_TO_CACHE, &rreq->flags) &&
--	    test_bit(NETFS_RREQ_USE_PGPRIV2, &rreq->flags))
--		return netfs_rreq_write_to_cache(rreq);
--
- 	netfs_rreq_completed(rreq, was_async);
- }
- 
-
+    Andrew
 
