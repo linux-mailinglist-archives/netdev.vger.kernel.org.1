@@ -1,70 +1,77 @@
-Return-Path: <netdev+bounces-92606-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92607-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9FC048B8131
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 22:10:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 382EE8B815A
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 22:25:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5AFFA2850C1
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 20:10:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D303C282428
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 20:25:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06760199E99;
-	Tue, 30 Apr 2024 20:10:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A04D419DF5F;
+	Tue, 30 Apr 2024 20:25:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WImPU34v"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m4o0H8CN"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC259182C3;
-	Tue, 30 Apr 2024 20:10:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A81C18412A;
+	Tue, 30 Apr 2024 20:24:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714507821; cv=none; b=BAipFtDjk+jCJsVJbptCpSZhRoqbO028Jp40kTpTqcgsKGGdCYDYXNabUE4VkjbGLl4f0kAemB5diy2n8PmrID0xfxiMDQuM7lijUUeif8niIBh5w6NuelpvFip7AjC/IdoDMuoQrJeAyl5JGB+gxvMT2iI1+QLTvSLe+/vmGow=
+	t=1714508700; cv=none; b=QHzXOd42SisuQAPTpOA42NHt3y58SX9VE1Kh/RK53mrUb+PusvLx5D4HT/IbmTVtnC3DwHBrcNBcpKZzB9nrmeVR1pPfQLlU6YjGIbxOCroA+0lph8q6oZdpqIWICnq30T4Y/HjPcMBTAPUp/k2oaXjDkM1qYa5qZ70M1l1xhPU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714507821; c=relaxed/simple;
-	bh=58CBaYeu4exH4ljqyrgLewfHjjrJsr+lwEV4eBnRRBY=;
+	s=arc-20240116; t=1714508700; c=relaxed/simple;
+	bh=YK0ojQVxvVKavdRF62uiNBOU2ZXdClhDIYj2p8To/K8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=g75nd/95qxcb3wizd6G3VGiJ6SNr0k8mzVW4viBbOMPRAY3hIBo7Rpc9LL7dJMe0Ea73x5G7gtQe/83tJCQQVdDBgxQVj3aKNCEYIf8wp/XiwkyMgLazT8UuWKLeXQC9xLQrDfrZ/BnfaVIynXr96XETMy7nzCA2cq5D5CkIoZg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WImPU34v; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A0C0CC2BBFC;
-	Tue, 30 Apr 2024 20:10:16 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=eKPWfbYg77zikY6zZVYcqtF4KyAhxxsJhFZJq3Gn/ko2KkznEtIQXaJU9Pra3h8L09txvplQYc0P7BkGZpubQ5xHWlXKY9IuQy7e1a24A0Dd5zInsdzvnicJZB8V33AjOeEx4InFmol+//yq5ZDFK6YdGdWZSNRTVzcM1gq6Mt8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m4o0H8CN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9AF84C2BBFC;
+	Tue, 30 Apr 2024 20:24:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714507821;
-	bh=58CBaYeu4exH4ljqyrgLewfHjjrJsr+lwEV4eBnRRBY=;
+	s=k20201202; t=1714508699;
+	bh=YK0ojQVxvVKavdRF62uiNBOU2ZXdClhDIYj2p8To/K8=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=WImPU34vi9oog0mmRTYwMKyo1ISHKsDV6YPWI+6u3+xUXQD8qpYdkh3C/41+D6CJw
-	 k6UKJmZXrLyk5BK2449OfE1cJpyzZgF9BxLmxWHNjFuDNGZudLuAXQSJKMr8FdYCQV
-	 cIEig5Y9rFDOqmC2AJQLvqY3T39W804ABIfyx3tLU0gZeu1lre7MEyjzk+57HmK9OT
-	 mYlEXGZh2NVuCp9T1OIwqLDSqmZV580TjPigcNNiN6CtS4oF6eVQHiZ3WNf0YPsEbu
-	 W4pzjqjzlUQ7Y9m+2ZqyTh7DDtM1ly32OG7YCKWgtLAsuBKB4WT4rvc+6gb628z1ZP
-	 H8aC6Gjk+siug==
-Date: Tue, 30 Apr 2024 21:08:44 +0100
+	b=m4o0H8CNPOm4vbL22XkO3NBODXBP2RQxKga431SeRHapVBS6EZf3LpvX51Oxhn5Mr
+	 +5YJ8XrTkgqKDigdBnOIjPsCi0snH2cr8XBTCyHrOjVs4YeIMFw7sjXmu+z0HEV3tK
+	 haV3pwJtRzTnr9+FoRS2Fhniuppwk8ygYVCIwSEUMja07zPXlTbCB84N0RpfSGyuHn
+	 xw4KULT2KjHcjVMTcYiheycAb8TU4fPOAlFMEBjXyfrjJyyK4V2s6Co9jXbrjHvV+p
+	 5p8VyLLO8dRyeCSR7nnsq7pAvG2mmwDiG/i/NkRcxZJXvBEIP9iMkeb2546N7O0vh4
+	 pa5PE8ivPLC+Q==
+Date: Tue, 30 Apr 2024 21:24:51 +0100
 From: Simon Horman <horms@kernel.org>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>,
-	Felix Fietkau <nbd@nbd.name>, Rob Herring <robh@kernel.org>,
+To: Herve Codina <herve.codina@bootlin.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>, Rob Herring <robh@kernel.org>,
 	Krzysztof Kozlowski <krzk+dt@kernel.org>,
 	Conor Dooley <conor+dt@kernel.org>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Landen Chao <Landen.Chao@mediatek.com>, devicetree@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Lee Jones <lee@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+	Horatiu Vultur <horatiu.vultur@microchip.com>,
+	UNGLinuxDriver@microchip.com, Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Saravana Kannan <saravanak@google.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Lars Povlsen <lars.povlsen@microchip.com>,
+	Steen Hegelund <Steen.Hegelund@microchip.com>,
+	Daniel Machon <daniel.machon@microchip.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
+	netdev@vger.kernel.org, linux-pci@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH net] net: dsa: mt7530: fix impossible MDIO address and
- issue warning
-Message-ID: <20240430200844.GE2575892@kernel.org>
-References: <e615351aefba25e990215845e4812e6cb8153b28.1714433716.git.daniel@makrotopia.org>
+	Allan Nielsen <allan.nielsen@microchip.com>,
+	Luca Ceresoli <luca.ceresoli@bootlin.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH 12/17] irqchip: Add support for LAN966x OIC
+Message-ID: <20240430202451.GF2575892@kernel.org>
+References: <20240430083730.134918-1-herve.codina@bootlin.com>
+ <20240430083730.134918-13-herve.codina@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,34 +80,114 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <e615351aefba25e990215845e4812e6cb8153b28.1714433716.git.daniel@makrotopia.org>
+In-Reply-To: <20240430083730.134918-13-herve.codina@bootlin.com>
 
-On Tue, Apr 30, 2024 at 12:45:46AM +0100, Daniel Golle wrote:
-> The MDIO address of the MT7530 and MT7531 switch ICs can be configured
-> using bootstrap pins. However, there are only 4 possible options for the
-> switch itself: 7, 15, 23 and 31 (ie. only 3 and 4 can be configured, bit
-> 0~2 are always 111). Practically all boards known as of today use the
-> default setting which is to have the switch respond to address 31, while
-> the built-in switch PHYs respond to address 0~4 in this case.
+On Tue, Apr 30, 2024 at 10:37:21AM +0200, Herve Codina wrote:
+> The Microchip LAN966x outband interrupt controller (OIC) maps the
+> internal interrupt sources of the LAN966x device to an external
+> interrupt.
+> When the LAN966x device is used as a PCI device, the external interrupt
+> is routed to the PCI interrupt.
 > 
-> However, even in MediaTek's SDK the address of the switch is wrongly
-> stated in the device trees as 0 (while in reality it is 31), so warn the
-> user about such broken device tree and make a good guess what was
-> actually intended.
-> 
-> This is imporant to not break compatibility with older Device Trees as
-> with commit 868ff5f4944a ("net: dsa: mt7530-mdio: read PHY address of
-> switch from device tree") the address in device tree will be taken into
-> account. Doing so instead of assuming the switch is always at
-> address 31 which was previously hard-coded will obviously break things
-> for many existing downstream device trees as they contain the wrong
-> address (0) which previously didn't matter.
-> 
-> Fixes: b8f126a8d543 ("net-next: dsa: add dsa support for Mediatek MT7530 switch")
-> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+> Signed-off-by: Herve Codina <herve.codina@bootlin.com>
 
-The cited commit is present in net-next but not net.
-So I think this patch should target net-next.
+Hi Herve,
+
+> +static int lan966x_oic_probe(struct platform_device *pdev)
+> +{
+> +	struct device_node *node = pdev->dev.of_node;
+> +	struct lan966x_oic_data *lan966x_oic;
+> +	struct device *dev = &pdev->dev;
+> +	struct irq_chip_generic *gc;
+> +	int ret;
+> +	int i;
+> +
+> +	lan966x_oic = devm_kmalloc(dev, sizeof(*lan966x_oic), GFP_KERNEL);
+> +	if (!lan966x_oic)
+> +		return -ENOMEM;
+> +
+> +	lan966x_oic->regs = devm_platform_ioremap_resource(pdev, 0);
+> +	if (IS_ERR(lan966x_oic->regs))
+> +		return dev_err_probe(dev, PTR_ERR(lan966x_oic->regs),
+> +				     "failed to map resource\n");
+> +
+> +	lan966x_oic->domain = irq_domain_alloc_linear(of_node_to_fwnode(node),
+> +						      LAN966X_OIC_NR_IRQ,
+> +						      &irq_generic_chip_ops, NULL);
+
+nit: Please consider limiting lines to 80 columns wide in Networking code.
+
+> +	if (!lan966x_oic->domain) {
+> +		dev_err(dev, "failed to create an IRQ domain\n");
+> +		return -EINVAL;
+> +	}
+> +
+> +	lan966x_oic->irq = platform_get_irq(pdev, 0);
+> +	if (lan966x_oic->irq < 0) {
+> +		dev_err_probe(dev, lan966x_oic->irq, "failed to get the IRQ\n");
+> +		goto err_domain_free;
+
+Hi,
+
+This will result in the function returning ret.
+However, ret is uninitialised here.
+
+Flagged by W=1 builds with clang-18, and Smatch.
+
+> +	}
+> +
+> +	ret = irq_alloc_domain_generic_chips(lan966x_oic->domain, 32, 1, "lan966x-oic",
+> +					     handle_level_irq, 0, 0, 0);
+> +	if (ret) {
+> +		dev_err_probe(dev, ret, "failed to alloc irq domain gc\n");
+> +		goto err_domain_free;
+> +	}
+> +
+> +	/* Init chips */
+> +	BUILD_BUG_ON(DIV_ROUND_UP(LAN966X_OIC_NR_IRQ, 32) != ARRAY_SIZE(lan966x_oic_chip_regs));
+> +	for (i = 0; i < ARRAY_SIZE(lan966x_oic_chip_regs); i++) {
+> +		gc = irq_get_domain_generic_chip(lan966x_oic->domain, i * 32);
+> +		lan966x_oic_chip_init(lan966x_oic, gc, &lan966x_oic_chip_regs[i]);
+> +	}
+> +
+> +	irq_set_chained_handler_and_data(lan966x_oic->irq, lan966x_oic_irq_handler,
+> +					 lan966x_oic->domain);
+> +
+> +	irq_domain_publish(lan966x_oic->domain);
+> +	platform_set_drvdata(pdev, lan966x_oic);
+> +	return 0;
+> +
+> +err_domain_free:
+> +	irq_domain_free(lan966x_oic->domain);
+> +	return ret;
+> +}
+> +
+> +static void lan966x_oic_remove(struct platform_device *pdev)
+> +{
+> +	struct lan966x_oic_data *lan966x_oic = platform_get_drvdata(pdev);
+> +	struct irq_chip_generic *gc;
+> +	int i;
+> +
+> +	for (i = 0; i < ARRAY_SIZE(lan966x_oic_chip_regs); i++) {
+> +		gc = irq_get_domain_generic_chip(lan966x_oic->domain, i * 32);
+> +		lan966x_oic_chip_exit(gc);
+> +	}
+> +
+> +	irq_set_chained_handler_and_data(lan966x_oic->irq, NULL, NULL);
+> +
+> +	for (i = 0; i < LAN966X_OIC_NR_IRQ; i++)
+> +		irq_dispose_mapping(irq_find_mapping(lan966x_oic->domain, i));
+> +
+> +	irq_domain_unpublish(lan966x_oic->domain);
+> +
+> +	for (i = 0; i < ARRAY_SIZE(lan966x_oic_chip_regs); i++) {
+> +		gc = irq_get_domain_generic_chip(lan966x_oic->domain, i * 32);
+> +		irq_remove_generic_chip(gc, ~0, 0, 0);
+> +	}
+> +
+> +	kfree(lan966x_oic->domain->gc);
+> +	irq_domain_free(lan966x_oic->domain);
+> +}
 
 ...
 
