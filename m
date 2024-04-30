@@ -1,82 +1,121 @@
-Return-Path: <netdev+bounces-92290-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92293-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C124E8B67A9
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 03:49:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EFF1B8B67BD
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 03:58:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6BD831F22753
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 01:49:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9EEC21F22B96
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 01:58:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 026251843;
-	Tue, 30 Apr 2024 01:48:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74EB45C96;
+	Tue, 30 Apr 2024 01:58:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rwk/plWi"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="bmwUWNdv"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7978205E3C;
-	Tue, 30 Apr 2024 01:48:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90D1853A7
+	for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 01:58:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.49.90
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714441737; cv=none; b=COOv379kfHAI15R8R41uHxZNlsYMS8LZgO8GQWpYwza3x5J7SX5fdzClo4oAl8JaJfofufwfxfPWmKbmhspPnOr2r4bam/RN6yfK079pVepDuOcaWA/1a2EbhzGZeGLntaKoL7zt4DclCHmUObPPnWMFusvtmNGnf2PSXHMeno4=
+	t=1714442311; cv=none; b=DVMh1tBBVMg08f4LthfWRKWKT+3IhORPkg/hx1nuchA0/DYLoD/tqY6SMkGcwrdC+GzCa/sADvB9/pBWu4PbZPSnAUju/AYwy4U5+DEroyKh3XB9M82PmgWJT4LIAEhduKpb8yk87Wwk7WaA07H3vLO219CUrKbFT3YbVfR0SP8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714441737; c=relaxed/simple;
-	bh=c7QzoCOujtAxbTC0elHaSUaFysScZ8hXHLPiQh+BjXQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Q7zSb7F4hFGhwuQM4Njne79Dv9SuM3r3To6SalnxWSdGWngAQ6QMjkhkDZ1MVbRQoePjmceiKlVwzNO1+5AaT/p7ch+UnLP3P3sxJqhYJQmCMSRQft356O1RpkjyZH4/3ixWp6NyEgikufkhqIV0yJSMyybfae0obEkf6yytlv8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rwk/plWi; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A77E1C116B1;
-	Tue, 30 Apr 2024 01:48:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714441737;
-	bh=c7QzoCOujtAxbTC0elHaSUaFysScZ8hXHLPiQh+BjXQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Rwk/plWivRvxtyN78BMVb2XoOsELsLIR+aErjqj2rVheUi/FaWJxTgvxW0/T+8fSH
-	 6jIcT+QXtvW2LOxlHcr8p69xdyPZrFDNjY8JA1JsIbUZb1f8s5GH1V81fb+1BlbqOr
-	 mNBOYdU2q53f4YUuGN+eOdtxlBF4CbqDYCA2caP+aMy8RqIveNGubW6RLKSGxRYyjd
-	 tzh2UcP0tIfGT+rJ39pn58yns306motc80r4Egy3kPgDkrKGRvFdAG8svOcjTE9Wix
-	 GdV6V2niZodhkgH9enJ5XQaOYJOhEhzaa5NqgK+yMKKy8hhHPytu7pRlCap0Weyo8Y
-	 gCv7a2VynhYng==
-Date: Mon, 29 Apr 2024 18:48:55 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, "Michael S.
- Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Alexei
- Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend
- <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@google.com>, Amritha
- Nambiar <amritha.nambiar@intel.com>, Larysa Zaremba
- <larysa.zaremba@intel.com>, Sridhar Samudrala
- <sridhar.samudrala@intel.com>, Maciej Fijalkowski
- <maciej.fijalkowski@intel.com>, virtualization@lists.linux.dev,
- bpf@vger.kernel.org, Heng Qi <hengqi@linux.alibaba.com>
-Subject: Re: [PATCH net-next v7 0/8] virtio-net: support device stats
-Message-ID: <20240429184855.0d8d1eef@kernel.org>
-In-Reply-To: <20240426033928.77778-1-xuanzhuo@linux.alibaba.com>
-References: <20240426033928.77778-1-xuanzhuo@linux.alibaba.com>
+	s=arc-20240116; t=1714442311; c=relaxed/simple;
+	bh=ZKH9Axkb37UTxQ5wzd7xwsaoKElZA/sn8w9YiGBRvzw=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=OjQnEU2bXw92TK6sp9S9wZc0qqc3zvp5a12iuvDOEZiots4EldGGzEU+HoYYPrMtyst3KQksavu2SD7VM7U+a2/qBUHKYtYdOZxTHg0SucrjPhq+rHAg04LaphXl759Fy+hNs1pNoRBX8rxwnfUT4HCsBSJWuflS39ij9AD8pbo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=bmwUWNdv; arc=none smtp.client-ip=52.95.49.90
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1714442310; x=1745978310;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=H9tE6y/XyzeOjVrKhWDZRtq8cbmPt4wykpB3gQnXKBA=;
+  b=bmwUWNdvjFp5ne1wj8aNfiZoaOQtQEPjZGEc+7p7US+OrvFkDhJ/Jl8Y
+   gzk5ZmqcWJMnnsje/kjxpDTkyH1fwOTW/2kG9b4i+p6BNT/r/7ZU9IcU7
+   wezfWTQeEgtfaWBna7hMTlqNH9kSCMazVW1MOaRyBscLJHF+c+idNOgcB
+   Y=;
+X-IronPort-AV: E=Sophos;i="6.07,241,1708387200"; 
+   d="scan'208";a="403646777"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Apr 2024 01:58:27 +0000
+Received: from EX19MTAUWB002.ant.amazon.com [10.0.7.35:43666]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.51.46:2525] with esmtp (Farcaster)
+ id fb71ba4b-adda-4e96-8ee6-4d8b1791a117; Tue, 30 Apr 2024 01:58:25 +0000 (UTC)
+X-Farcaster-Flow-ID: fb71ba4b-adda-4e96-8ee6-4d8b1791a117
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Tue, 30 Apr 2024 01:58:25 +0000
+Received: from 88665a182662.ant.amazon.com (10.106.101.33) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Tue, 30 Apr 2024 01:58:22 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Paolo
+ Abeni" <pabeni@redhat.com>
+CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
+	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
+Subject: [PATCH v3 net-next 0/7] arp: Random clean up and RCU conversion for ioctl(SIOCGARP).
+Date: Mon, 29 Apr 2024 18:58:06 -0700
+Message-ID: <20240430015813.71143-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D044UWA003.ant.amazon.com (10.13.139.43) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Fri, 26 Apr 2024 11:39:20 +0800 Xuan Zhuo wrote:
-> As the spec:
-> 
-> https://github.com/oasis-tcs/virtio-spec/commit/42f389989823039724f95bbbd243291ab0064f82
-> 
-> The virtio net supports to get device stats.
+arp_ioctl() holds rtnl_lock() regardless of cmd (SIOCDARP, SIOCSARP,
+and SIOCGARP) to get net_device by __dev_get_by_name() and copy
+dev->name safely.
 
-These got marked as "not applicable" in netdev pw over the weekend, but
-I think net-next is the right target here. So unless someone disagrees
-or we need more reviews we shall apply these tomorrow.
+In the SIOCGARP path, arp_req_get() calls neigh_lookup(), which looks
+up a neighbour entry under RCU.
+
+This series cleans up ioctl() code a bit and extends the RCU section
+not to take rtnl_lock() and instead use dev_get_by_name_rcu() and
+netdev_copy_name() for SIOCGARP.
+
+
+Changes:
+  v3:
+    Add Patch 6 to read dev->name safely under seqlock.
+
+  v2: https://lore.kernel.org/netdev/20240425170002.68160-1-kuniyu@amazon.com/
+    Patch 5: s/!IS_ERR/IS_ERR/ in arp_req_delete().
+
+  v1: https://lore.kernel.org/netdev/20240422194755.4221-1-kuniyu@amazon.com/
+
+
+Kuniyuki Iwashima (7):
+  arp: Move ATF_COM setting in arp_req_set().
+  arp: Validate netmask earlier for SIOCDARP and SIOCSARP in
+    arp_ioctl().
+  arp: Factorise ip_route_output() call in arp_req_set() and
+    arp_req_delete().
+  arp: Remove a nest in arp_req_get().
+  arp: Get dev after calling arp_req_(delete|set|get)().
+  net: Protect dev->name by seqlock.
+  arp: Convert ioctl(SIOCGARP) to RCU.
+
+ include/linux/netdevice.h |   1 +
+ net/core/dev.c            |  27 ++++-
+ net/ipv4/arp.c            | 203 +++++++++++++++++++++++---------------
+ 3 files changed, 147 insertions(+), 84 deletions(-)
+
+-- 
+2.30.2
 
 
