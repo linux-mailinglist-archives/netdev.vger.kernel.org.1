@@ -1,187 +1,148 @@
-Return-Path: <netdev+bounces-92608-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92609-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 986DB8B815C
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 22:27:05 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B23F8B817F
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 22:35:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B5B801C22F4F
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 20:27:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A8CDCB22973
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 20:34:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29DDA19DF63;
-	Tue, 30 Apr 2024 20:26:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D5DD1836E0;
+	Tue, 30 Apr 2024 20:34:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dOpSz+E5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iamRaAMj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f46.google.com (mail-qv1-f46.google.com [209.85.219.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9949718412A;
-	Tue, 30 Apr 2024 20:26:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 342D2179B2;
+	Tue, 30 Apr 2024 20:34:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714508819; cv=none; b=iiZzPlguf5vp5u/S1UVGYO6GHxRc5jUmx5xemPJERDlcICmNTR+d2Zqwe3X51N38cIg1OrrQrznTrtDktgGof5W2D0rvS87R+Vt1fqOmbPFd/ERNQBuFpZdjBZoNNyi2r8rvbjiIvfm54XEgdZOcaQCwJhWIOGJPJg0YIfeQO98=
+	t=1714509293; cv=none; b=P6qbj/yk/+5H/0pzILK1ewOqC9PtUEUsKdkh/bV4BK8sz4EQHh3VqY/9xVzja9fnU4c5TZ/gavNLr8GTmAiSSiRX0tMvT70dXWuvLK2+XNJZpwjcEnQOCpRf2Q+p72hMsERB/dGLcdeVUDuKJjzD0MHTRQ5cJPwv46f9hKYhlkw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714508819; c=relaxed/simple;
-	bh=E47vfWHhgdEa6VDSww86DfgZL2xl0Ve2ZRdE0ayf/uI=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=Y+Jee6/x30iBRf3mw748NtvsKJZo1k20zQn7cqnBaCwDFbc64b4gEWIYXJw2HQnoFgPiDD8/6GBrz5TCDARli2F4hVxC2DORu0BYaFt64YOFyzLSU6WJ5NrE2E/HeRmqcEvxP1CAekx6so/72m5sd3YJCFzvFsNJ6NxLm1mzvK4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dOpSz+E5; arc=none smtp.client-ip=209.85.219.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f46.google.com with SMTP id 6a1803df08f44-69b5ece41dfso25776326d6.2;
-        Tue, 30 Apr 2024 13:26:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1714508816; x=1715113616; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=E47vfWHhgdEa6VDSww86DfgZL2xl0Ve2ZRdE0ayf/uI=;
-        b=dOpSz+E51HvmqeLOwgnXEBW9XEOb8gutuM+CaM3P9T9NOWbfHvIq2l/H08svS8tVNX
-         X0oJjyEcmoFfwJPdHtHO2ZNtKBNC539rMTyMLI3rvoRRw49fq0vEnNTvYNLl6ErPAp5R
-         MYk8o2WMA7S/q1zejb1/zs1rTSKVQhnPPVODRS1Aaxk3BuWZbdwpGnZ+bexhKa3H3QHk
-         kH1a+F51b1cBOO1PVtPzLrBqtmQKYalzzOmmTPcoTf+n0qYTCAr1muhdPp1rKoJ4tMtM
-         qbpZUSLuUq32wvQW2ZBnGZ7gaqEfY4p+cE2ndha+mFsl33B80sGWdE7CN7bnuzB8JOVD
-         9g1A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714508816; x=1715113616;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=E47vfWHhgdEa6VDSww86DfgZL2xl0Ve2ZRdE0ayf/uI=;
-        b=jtgXstx2Vx9PdEakWD/qMnXaP7szHWTfJCGUq4OS7iGtAzFOM7uqYZhoUmXoqVkzFl
-         3Vz/L3d0O2b0NL+evurqJxJK01EHs1f/5QPM+0X4gYZAii7SrGWP29VllgSkZBVPozk2
-         erX1NlQJd38wsv85YkEU9BSByqlYZd3PjM/XbKSfEdVuUhGacTuxFW1Btk+V3I5egToU
-         acfpkXZBh5oEXqoj4WqGZJQZy0bgU8ns9HMRUvO8eKSiB4WoBi2NFyADnIDHgpwyXGpL
-         qCsv0OdLdjlPoDFO1sxjbBT7CisypMzgf1JTjv3OHv4GRpEoxUKky8oLs4lSKxiCdLOL
-         Ci9w==
-X-Forwarded-Encrypted: i=1; AJvYcCVS1Ic96gFtj+cV8EOzhpqTnSyuZpJUeO/+ok+MLak653m/kuZQuIz9T6xM8ndqgAWWC9g625g25V6tGHqm8IglXKUioLOZouKlksw6eq0lYJ+lWWDVjI+dlZl+kIJ8R6IzMDFmrz8CWfUV36uMNXAQqO3+qjyLm7Zq
-X-Gm-Message-State: AOJu0Ywjf6gmHogJxxkzxahItAdMenDzQwAqS3pdV8v3mKrKG29QwfKZ
-	3tOCnA/nSDOawM52Y8fRznJuOPG9d3SINA94tmff8xZHJ4UKjzqh
-X-Google-Smtp-Source: AGHT+IH5xPp90KMXlMcTQ6n4sKv4HMLPSgkmdoyvuageJ8UukZuwiF/Rzto7QPz/r7BeQYjF7sv9Rg==
-X-Received: by 2002:a05:6214:2628:b0:69b:5d39:f556 with SMTP id gv8-20020a056214262800b0069b5d39f556mr487369qvb.1.1714508816411;
-        Tue, 30 Apr 2024 13:26:56 -0700 (PDT)
-Received: from localhost (164.146.150.34.bc.googleusercontent.com. [34.150.146.164])
-        by smtp.gmail.com with ESMTPSA id l19-20020ad44453000000b006a0ef060a2esm28974qvt.53.2024.04.30.13.26.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Apr 2024 13:26:41 -0700 (PDT)
-Date: Tue, 30 Apr 2024 16:26:33 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: "Abhishek Chauhan (ABC)" <quic_abchauha@quicinc.com>, 
- Martin KaFai Lau <martin.lau@linux.dev>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- Andrew Halaney <ahalaney@redhat.com>, 
- Martin KaFai Lau <martin.lau@kernel.org>, 
- Daniel Borkmann <daniel@iogearbox.net>, 
- bpf <bpf@vger.kernel.org>, 
- kernel@quicinc.com
-Message-ID: <663153f92a297_33210f29423@willemb.c.googlers.com.notmuch>
-In-Reply-To: <6eb5b283-a9bd-4081-8bce-a60d72af430c@quicinc.com>
-References: <20240424222028.1080134-1-quic_abchauha@quicinc.com>
- <20240424222028.1080134-3-quic_abchauha@quicinc.com>
- <2b2c3eb1-df87-40fe-b871-b52812c8ecd0@linux.dev>
- <e761e1de-0e11-4541-a4db-a1b793a60674@quicinc.com>
- <379558fe-a6e2-444b-a6a7-ef233efa8311@linux.dev>
- <6eb5b283-a9bd-4081-8bce-a60d72af430c@quicinc.com>
-Subject: Re: [RFC PATCH bpf-next v5 2/2] net: Add additional bit to support
- clockid_t timestamp type
+	s=arc-20240116; t=1714509293; c=relaxed/simple;
+	bh=HtcQHmj985eQ+dg3uqxVTbR5cUoWPjp4+IhThC+KEug=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FqKbcnHHFrfRrifzRL3BLrX93q+ViL/VRbYQzz7W3xc7GI8OVWB6llAr4NUF11+2ebGd+svWZU2UCVS/xrcwA/qVo+CSL/CSXXFpw/TsGLc7GwVH1LX8Ip2sXsKmHOmwchr7S9YJTC2/+P0mdIi5dtxqqOctd0s2JBsUUVioYFM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iamRaAMj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 43DA5C4AF17;
+	Tue, 30 Apr 2024 20:34:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714509292;
+	bh=HtcQHmj985eQ+dg3uqxVTbR5cUoWPjp4+IhThC+KEug=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=iamRaAMjbqYlRtYkrz98dWDUYhZmMcb96S8p7LdlmCtD4/yhJ8PQjUQr1Btp+8gJx
+	 /6Ch4UmQM5/8EwAfTSUpsknGmRvk/dbKCpr1Pi1Ey1/c9twfezgVcvmFu/YocQjYIC
+	 SUZIGp0RKKIKQ8IwXL33Mm7XKs2nHJVMonNJ1bTV/3EOg/+L0TZVZw2+xt2uuvLc98
+	 wUxV/fK8Ts91A178VA8EhaC6AInd5GNuVtvHlJZrwN4NNZ0YAJ7rnbyk/sT8/G5Xfz
+	 mXGtJY5YxB7RnPbnatdptWWdxXgCXge1K2zSbKP6Z+2QCbZ5VVL9pVxK8m2qcPsLz5
+	 i9Wr//FfNBRZw==
+Date: Tue, 30 Apr 2024 21:34:43 +0100
+From: Simon Horman <horms@kernel.org>
+To: Herve Codina <herve.codina@bootlin.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Lee Jones <lee@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+	Horatiu Vultur <horatiu.vultur@microchip.com>,
+	UNGLinuxDriver@microchip.com, Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Saravana Kannan <saravanak@google.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Lars Povlsen <lars.povlsen@microchip.com>,
+	Steen Hegelund <Steen.Hegelund@microchip.com>,
+	Daniel Machon <daniel.machon@microchip.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
+	netdev@vger.kernel.org, linux-pci@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Allan Nielsen <allan.nielsen@microchip.com>,
+	Luca Ceresoli <luca.ceresoli@bootlin.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	=?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>
+Subject: Re: [PATCH 01/17] mfd: syscon: Add reference counting and device
+ managed support
+Message-ID: <20240430203443.GG2575892@kernel.org>
+References: <20240430083730.134918-1-herve.codina@bootlin.com>
+ <20240430083730.134918-2-herve.codina@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240430083730.134918-2-herve.codina@bootlin.com>
 
-Abhishek Chauhan (ABC) wrote:
-> =
+On Tue, Apr 30, 2024 at 10:37:10AM +0200, Herve Codina wrote:
+> From: Clément Léger <clement.leger@bootlin.com>
+> 
+> Syscon releasing is not supported.
+> Without release function, unbinding a driver that uses syscon whether
+> explicitly or due to a module removal left the used syscon in a in-use
+> state.
+> 
+> For instance a syscon_node_to_regmap() call from a consumer retrieve a
+> syscon regmap instance. Internally, syscon_node_to_regmap() can create
+> syscon instance and add it to the existing syscon list. No API is
+> available to release this syscon instance, remove it from the list and
+> free it when it is not used anymore.
+> 
+> Introduce reference counting in syscon in order to keep track of syscon
+> usage using syscon_{get,put}() and add a device managed version of
+> syscon_regmap_lookup_by_phandle(), to automatically release the syscon
+> instance on the consumer removal.
+> 
+> Signed-off-by: Clément Léger <clement.leger@bootlin.com>
+> Signed-off-by: Herve Codina <herve.codina@bootlin.com>
 
-> =
+...
 
-> On 4/26/2024 4:50 PM, Martin KaFai Lau wrote:
-> > On 4/26/24 11:46 AM, Abhishek Chauhan (ABC) wrote:
-> >>>> diff --git a/net/ipv4/ip_output.c b/net/ipv4/ip_output.c
-> >>>> index 591226dcde26..f195b31d6e75 100644
-> >>>> --- a/net/ipv4/ip_output.c
-> >>>> +++ b/net/ipv4/ip_output.c
-> >>>> @@ -1457,7 +1457,7 @@ struct sk_buff *__ip_make_skb(struct sock *s=
-k,
-> >>>> =C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 skb->priority =3D (cor=
-k->tos !=3D -1) ? cork->priority: READ_ONCE(sk->sk_priority);
-> >>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 skb->mark =3D cork->mark;
-> >>>> -=C2=A0=C2=A0=C2=A0 skb->tstamp =3D cork->transmit_time;
-> >>>> +=C2=A0=C2=A0=C2=A0 skb_set_tstamp_type_frm_clkid(skb, cork->trans=
-mit_time, sk->sk_clockid);
-> >>> hmm... I think this will break for tcp. This sequence in particular=
-:
+> diff --git a/include/linux/mfd/syscon.h b/include/linux/mfd/syscon.h
+> index c315903f6dab..164b9bcb49c3 100644
+> --- a/include/linux/mfd/syscon.h
+> +++ b/include/linux/mfd/syscon.h
+> @@ -15,6 +15,7 @@
+>  #include <linux/errno.h>
+>  
+>  struct device_node;
+> +struct device;
+>  
+>  #ifdef CONFIG_MFD_SYSCON
+>  struct regmap *device_node_to_regmap(struct device_node *np);
+> @@ -28,6 +29,11 @@ struct regmap *syscon_regmap_lookup_by_phandle_args(struct device_node *np,
+>  						    unsigned int *out_args);
+>  struct regmap *syscon_regmap_lookup_by_phandle_optional(struct device_node *np,
+>  							const char *property);
+> +void syscon_put_regmap(struct regmap *regmap);
+> +
+> +struct regmap *devm_syscon_regmap_lookup_by_phandle(struct device *dev,
+> +						    struct device_node *np,
+> +						    const char *property);
+>  #else
+>  static inline struct regmap *device_node_to_regmap(struct device_node *np)
+>  {
+> @@ -67,6 +73,18 @@ static inline struct regmap *syscon_regmap_lookup_by_phandle_optional(
+>  	return NULL;
+>  }
+>  
+> +static intline void syscon_put_regmap(struct regmap *regmap)
 
-Good catch, thanks!
+intline -> inline
 
-> >>>
-> >>> tcp_v4_timewait_ack()
-> >>> =C2=A0=C2=A0 tcp_v4_send_ack()
-> >>> =C2=A0=C2=A0=C2=A0=C2=A0 ip_send_unicast_reply()
-> >>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ip_push_pending_frames()
-> >>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ip_finish_skb()
-> >>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 __ip_m=
-ake_skb()
-> >>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 /* sk_clockid is REAL but cork->transmit_time should be in mono */
-> >>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 skb_set_tstamp_type_frm_clkid(skb, cork->transmit_time, sk->sk_clocki=
-d);;
-> >>>
-> >>> I think I hit it from time to time when running the test in this pa=
-tch set.
-> >>>
-> >> do you think i need to check for protocol type here . since tcp uses=
- Mono and the rest according to the new design is based on
-> >> sk->sk_clockid
-> >> if (iph->protocol =3D=3D IPPROTO_TCP)
-> >> =C2=A0=C2=A0=C2=A0=C2=A0skb_set_tstamp_type_frm_clkid(skb, cork->tra=
-nsmit_time, CLOCK_MONOTONIC);
-> >> else
-> >> =C2=A0=C2=A0=C2=A0=C2=A0skb_set_tstamp_type_frm_clkid(skb, cork->tra=
-nsmit_time, sk->sk_clockid);
-> > =
+> +{
+> +}
 
-> > Looks ok. iph->protocol is from sk->sk_protocol. I would defer to Wil=
-lem input here.
-> > =
-
-> > There is at least one more place that needs this protocol check, __ip=
-6_make_skb().
-> =
-
-> Sounds good. I will wait for Willem to comment here. =
-
-
-This would be sk_is_tcp(sk).
-
-I think we want to avoid special casing if we can. Note the if.
-
-If TCP always uses monotonic, we could consider initializing
-sk_clockid to CLOCK_MONONOTIC in tcp_init_sock.
-
-I guess TCP logic currently entirely ignores sk_clockid. If we are to
-start using this, then setsocktop SO_TXTIME must explicitly fail or
-ignore for TCP sockets, or silently skip the write.
-
-All of that is more complexity. Than is maybe warranted for this one
-case. So no objections from me to special casing using sk_is_tcp(sk)
-either.
-
-
-
-
+...
 
