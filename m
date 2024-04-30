@@ -1,164 +1,166 @@
-Return-Path: <netdev+bounces-92339-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92342-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16DC68B6B2E
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 09:14:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6EAF38B6BAD
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 09:29:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C18A3282060
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 07:14:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 254951F2215F
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 07:29:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 040E92C184;
-	Tue, 30 Apr 2024 07:14:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 958D83FE46;
+	Tue, 30 Apr 2024 07:29:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=kpnmail.nl header.i=@kpnmail.nl header.b="ZDAuNTsi"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="IjzVdc4P"
 X-Original-To: netdev@vger.kernel.org
-Received: from ewsoutbound.kpnmail.nl (ewsoutbound.kpnmail.nl [195.121.94.168])
+Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD98D2556F
-	for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 07:13:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.121.94.168
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A145738396;
+	Tue, 30 Apr 2024 07:29:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714461241; cv=none; b=MryPHTcnKbOaZMcbpzSbkWnm1J5DCg+nPaxKXFS/W3V9IwlAfKUGD6LQUeiJEZqJXYVV69smSPHUnTzWWTVetZYzX7A98vWKaFG/u8ZDBOFzDjj05pwuuxFx995rXaiTdgclPIiocUBaeyiyBqginAox7fxhFmymHAHCsZcytSg=
+	t=1714462151; cv=none; b=pd2RjY5PqxBLapYorjLp+uwgF4IXG7K0yBKK6y5fWnXjxEwT0K9lIQHksz4dWdQL+jVi11W1Mp5+5S4BgvJFRUbH3byo9QldPZsYX1Xhl3yAY87/nAIEkq8co88oYPt2hvZ3L9XwyBUGfZxyiE5Fh6ZCurnBhZCxpARL4MR6JyE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714461241; c=relaxed/simple;
-	bh=1maMgUGLULgEBpuMVlI6qN4dTNKPBMv89C45lp89roc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rDWsUaa7zlHOVe66WKw/uPopaGesnqaR+IC09QxhrDRFiBAEos2DIMDykvNayjr4CoEEYc9t+IM8b8DWCzT+Y0aukm5KVAi7NjCsYuVhmndw04YeMhnLj+MOI3ca6Whgefl+2IokVWcvAsP75/5+GVSoUUvjzqhifM5Rf9wGwLs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=phenome.org; spf=none smtp.mailfrom=phenome.org; dkim=pass (1024-bit key) header.d=kpnmail.nl header.i=@kpnmail.nl header.b=ZDAuNTsi; arc=none smtp.client-ip=195.121.94.168
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=phenome.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=phenome.org
-X-KPN-MessageId: 304bd2ab-06c1-11ef-836c-005056aba152
-Received: from smtp.kpnmail.nl (unknown [10.31.155.39])
-	by ewsoutbound.so.kpn.org (Halon) with ESMTPS
-	id 304bd2ab-06c1-11ef-836c-005056aba152;
-	Tue, 30 Apr 2024 09:13:48 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=kpnmail.nl; s=kpnmail01;
-	h=content-type:mime-version:message-id:subject:to:from:date;
-	bh=zlSrHQFTqMbJzbw9UPPEmxAjU002p4f8WMKFA1cGgt8=;
-	b=ZDAuNTsic6OwaQtRd0NA+R2e6saMeWewp+G/lDlZ4nk7U+CkzlWGegH+X3kS3wPM0bf0IePhBpCJ8
-	 HIaiw31Imjx0XEBnoEOIMFc8ioh/XEgwYAXAdTUh2rajjCw7E+Yyl8lekhD91Xw4bSh2B39YNfldPT
-	 c1iqDtGf/HbVSAZw=
-X-KPN-MID: 33|DcY+D3IcxwZR3Divm6RUQ//JTBnB4404taX5wR2TCmmBlCBRkfR9ZEpAeO/UrJX
- 36nPDZ51jtza/G8LJ38s/V51uVNhG0orjP/htcN3w5L4=
-X-KPN-VerifiedSender: No
-X-CMASSUN: 33|pTScfeBsNrg1oTnoy8WJyDMQ2/uPlnmWQ/hT5xMD/5/Jy6zhhQ+aYtVNpEtek9X
- 4khyyPzq57d77m4/F1HxYsQ==
-Received: from Antony2201.local (213-10-186-43.fixed.kpn.net [213.10.186.43])
-	by smtp.xs4all.nl (Halon) with ESMTPSA
-	id 30f6dc61-06c1-11ef-8d64-005056ab7447;
-	Tue, 30 Apr 2024 09:13:50 +0200 (CEST)
-Date: Tue, 30 Apr 2024 09:13:48 +0200
-From: Antony Antony <antony@phenome.org>
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: Antony Antony <antony.antony@secunet.com>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>, netdev@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	devel@linux-ipsec.org, Leon Romanovsky <leon@kernel.org>,
-	Eyal Birger <eyal.birger@gmail.com>,
-	Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Subject: Re: [PATCH ipsec-next v13 1/4] xfrm: Add Direction to the SA in or
- out
-Message-ID: <ZjCaLKYVIEhJvn9t@Antony2201.local>
-References: <cover.1714118266.git.antony.antony@secunet.com>
- <21d941a355a4d7655bb8647ba3db145b83969a6f.1714118266.git.antony.antony@secunet.com>
- <Zi-OdMloMyZ-BynF@hog>
+	s=arc-20240116; t=1714462151; c=relaxed/simple;
+	bh=GL8N92QAeMgFt4XkyNeVeTu8Ol0R9O7pT2ilKco2X2o=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=B/0gcGO6a2cTSwWq419n2mWAk0csxMVE3yr7W1Mrgx67ZJoUdudbHB8yVG9o95pjt2gyTdyh1M3HSdD9iP8EZWHRtqureMLv2b7GItZgTY+bJAkavBjQ5neQLt/i5aNZ+FOrxy7DfmdedJJRlpHGPVGlzujJASLSHaKxV+2pb9c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=IjzVdc4P; arc=none smtp.client-ip=217.70.183.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 267F4240005;
+	Tue, 30 Apr 2024 07:29:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1714462144;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=fQD1CJTNwkZwiLmvdXIT1s+F6Ra4eUNZk70fwrI5wTU=;
+	b=IjzVdc4PuCxZ+uSFw5LswCv0DEOq/AyAdyVaqT4ZupNdm6A6jlGx9Gq0D08uKlR2kn9Kgy
+	fZ83fXhMV08UcaKRPWPmHDaDgeb7Aok7KTMXVGD0L7s3yIoqY4wG3K+59xvRoPxjQ5Rzfb
+	887jjJH7gROIDxb1YplcAuyWmyh4Q6ZTQFrIoxneGxCXkg++0eMAnxG2EL76eq+SiDMbz2
+	4JqdCkOlgFHSyJUGuLdlLoFNk8hfEdTfiSf/7ORVMZeqEvs3BBZ+YrxRHtFYUSIzx5buwc
+	K0a74n9zsjVFwxJ9eTY+rQ+YjD60BECTq7wjhAVB5DXmkKXMe7Cu2+nd5r3A/g==
+From: Romain Gantois <romain.gantois@bootlin.com>
+Subject: [PATCH net-next v5 0/7] net: stmmac: Add support for RZN1 GMAC
+ devices
+Date: Tue, 30 Apr 2024 09:29:40 +0200
+Message-Id: <20240430-rzn1-gmac1-v5-0-62f65a84f418@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Zi-OdMloMyZ-BynF@hog>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-B4-Tracking: v=1; b=H4sIAOWdMGYC/23NzW7DIBAE4FeJOJcK1ksNPfU9ohzwenGQGoiwZ
+ eVHfvcin2y5x9Hom3mLkUvkUXyf3qLwHMeYUw3m4yTo6tPAMvY1C1CAChXI8kpaDjdPWn5ZQ8G
+ 2rukViwruhUN8rGNnkXiSiR+TuNTmGscpl+f6Muu1/29w1lJJ0zF0YB32ln66nKffmD4p39ahG
+ bbY7TBU3DryaAIEat0RNxuszQ43FftOQwBCVLo/YtxgwB3Giq0BX4+JFak9XpblD8vZmUpnAQA
+ A
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
+ Conor Dooley <conor+dt@kernel.org>, 
+ Geert Uytterhoeven <geert+renesas@glider.be>, 
+ Magnus Damm <magnus.damm@gmail.com>, 
+ Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+ Jose Abreu <joabreu@synopsys.com>, 
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+ Russell King <linux@armlinux.org.uk>, 
+ =?utf-8?q?Cl=C3=A9ment_L=C3=A9ger?= <clement.leger@bootlin.com>, 
+ Serge Semin <fancer.lancer@gmail.com>
+Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org, 
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-renesas-soc@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+ linux-arm-kernel@lists.infradead.org, 
+ Romain Gantois <romain.gantois@bootlin.com>, 
+ "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>, 
+ Maxime Chevallier <maxime.chevallier@bootlin.com>
+X-Mailer: b4 0.13.0
+X-GND-Sasl: romain.gantois@bootlin.com
 
-On Mon, Apr 29, 2024 at 02:11:32PM +0200, Sabrina Dubroca via Devel wrote:
-> 2024-04-26, 10:05:06 +0200, Antony Antony wrote:
-> > diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
-> > index 810b520493f3..65948598be0b 100644
-> > --- a/net/xfrm/xfrm_user.c
-> > +++ b/net/xfrm/xfrm_user.c
-> > @@ -358,6 +383,64 @@ static int verify_newsa_info(struct xfrm_usersa_info *p,
-> >  			err = -EINVAL;
-> >  			goto out;
-> >  		}
-> > +
-> > +		if (sa_dir == XFRM_SA_DIR_OUT) {
-> > +			NL_SET_ERR_MSG(extack,
-> > +				       "MTIMER_THRESH attribute should not be set on output SA");
-> > +			err = -EINVAL;
-> > +			goto out;
-> > +		}
-> > +	}
-> > +
-> > +	if (sa_dir == XFRM_SA_DIR_OUT) {
-> > +		if (p->flags & XFRM_STATE_DECAP_DSCP) {
-> > +			NL_SET_ERR_MSG(extack, "Flag DECAP_DSCP should not be set for output SA");
-> > +			err = -EINVAL;
-> > +			goto out;
-> > +		}
-> > +
-> > +		if (p->flags & XFRM_STATE_ICMP) {
-> > +			NL_SET_ERR_MSG(extack, "Flag ICMP should not be set for output SA");
-> > +			err = -EINVAL;
-> > +			goto out;
-> > +		}
-> 
-> Maybe also XFRM_STATE_WILDRECV? It looks pretty "input" to me.
+Hello everyone,
 
-Now I think it is. I wasn't sure before. I have never seen this flag in use.
-> 
-> > +
-> > +		if (p->replay_window) {
-> > +			NL_SET_ERR_MSG(extack, "Replay window should be 0 for output SA");
-> > +			err = -EINVAL;
-> > +			goto out;
-> > +		}
-> > +
-> > +		if (attrs[XFRMA_REPLAY_VAL]) {
-> > +			struct xfrm_replay_state *replay;
-> > +
-> > +			replay = nla_data(attrs[XFRMA_REPLAY_VAL]);
-> > +
-> > +			if (replay->seq || replay->bitmap) {
-> > +				NL_SET_ERR_MSG(extack,
-> > +					       "Replay seq and bitmap should be 0 for output SA");
-> > +				err = -EINVAL;
-> > +				goto out;
-> > +			}
-> > +		}
-> > +	}
-> > +
-> > +	if (sa_dir == XFRM_SA_DIR_IN) {
-> > +		if (p->flags & XFRM_STATE_NOPMTUDISC) {
-> > +			NL_SET_ERR_MSG(extack, "Flag NOPMTUDISC should not be set for input SA");
-> > +			err = -EINVAL;
-> > +			goto out;
-> > +		}
-> > +
-> > +		if (attrs[XFRMA_SA_EXTRA_FLAGS]) {
-> > +			u32 xflags = nla_get_u32(attrs[XFRMA_SA_EXTRA_FLAGS]);
-> > +
-> > +			if (xflags & XFRM_SA_XFLAG_DONT_ENCAP_DSCP) {
-> 
-> Shouldn't XFRM_SA_XFLAG_OSEQ_MAY_WRAP also be excluded on input?
+This is version five of my series that adds support for a Gigabit Ethernet
+controller featured in the Renesas r9a06g032 SoC, of the RZ/N1 family. This
+GMAC device is based on a Synopsys IP and is compatible with the stmmac driver.
 
-I aggree. this is odd flag:) me wonders who use it.
+My former colleague Clément Léger originally sent a series for this driver,
+but an issue in bringing up the PCS clock had blocked the upstreaming
+process. This issue has since been resolved by the following series:
 
-> Sorry I didn't check all the remaining flags until now.
-> 
-> 
-> Apart from that, the series looks good now, so I can also ack it and
-> add those two extra flags as a follow-up patch. Steffen/Antony, let me
-> know what you prefer.
+https://lore.kernel.org/all/20240326-rxc_bugfix-v6-0-24a74e5c761f@bootlin.com/
 
-I just v4 lets see how it goes. Thanks Sabrina.
+This series consists of a devicetree binding describing the RZN1 GMAC
+controller IP, a node for the GMAC1 device in the r9a06g032 SoC device
+tree, and the GMAC driver itself which is a glue layer in stmmac.
+
+There are also two patches by Russell that improve pcs initialization handling
+in stmmac.
+
+Best Regards,
+
+Romain Gantois
+
+---
+Changes in v5:
+- Refactored the stmmac_xpcs_setup() function to group together XPCS and PCS
+  setup logic.
+- Added a stmmac_pcs_clean() function as a counterpart to stmmac_pcs_setup()
+- Link to v4: https://lore.kernel.org/r/20240424-rzn1-gmac1-v4-0-852a5f2ce0c0@bootlin.com
+
+Changes in v4:
+- Removed the second parameters of the new pcs_init/exit() callbacks
+- Removed unnecessary interrupt-parent reference in gmac1 device node
+- Link to v3: https://lore.kernel.org/r/20240415-rzn1-gmac1-v3-0-ab12f2c4401d@bootlin.com
+
+Changes in v3:
+- Fixed a typo in the socfpga patch
+- Link to v2: https://lore.kernel.org/r/20240409-rzn1-gmac1-v2-0-79ca45f2fc79@bootlin.com
+
+Changes in v2:
+- Add pcs_init/exit callbacks in stmmac to solve race condition
+- Use pcs_init/exit callbacks in dwmac_socfpga glue layer
+- Miscellaneous device tree binding corrections
+- Link to v1: https://lore.kernel.org/r/20240402-rzn1-gmac1-v1-0-5be2b2894d8c@bootlin.com
+
+---
+Clément Léger (3):
+      dt-bindings: net: renesas,rzn1-gmac: Document RZ/N1 GMAC support
+      net: stmmac: add support for RZ/N1 GMAC
+      ARM: dts: r9a06g032: describe GMAC1
+
+Russell King (Oracle) (2):
+      net: stmmac: introduce pcs_init/pcs_exit stmmac operations
+      net: stmmac: dwmac-socfpga: use pcs_init/pcs_exit
+
+Serge Semin (2):
+      net: stmmac: Add dedicated XPCS cleanup method
+      net: stmmac: Make stmmac_xpcs_setup() generic to all PCS devices
+
+ .../devicetree/bindings/net/renesas,rzn1-gmac.yaml |  66 +++++++++++++
+ MAINTAINERS                                        |   6 ++
+ arch/arm/boot/dts/renesas/r9a06g032.dtsi           |  18 ++++
+ drivers/net/ethernet/stmicro/stmmac/Kconfig        |  12 +++
+ drivers/net/ethernet/stmicro/stmmac/Makefile       |   1 +
+ drivers/net/ethernet/stmicro/stmmac/dwmac-rzn1.c   |  86 +++++++++++++++++
+ .../net/ethernet/stmicro/stmmac/dwmac-socfpga.c    | 107 ++++++++++-----------
+ drivers/net/ethernet/stmicro/stmmac/stmmac.h       |   3 +-
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c  |  14 +--
+ drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c  |  48 ++++++---
+ include/linux/stmmac.h                             |   2 +
+ 11 files changed, 287 insertions(+), 76 deletions(-)
+---
+base-commit: dd1941f801bc958d2ee13f5be8b38db6b034b806
+change-id: 20240402-rzn1-gmac1-685cf8793d0e
+
+Best regards,
+-- 
+Romain Gantois <romain.gantois@bootlin.com>
+
 
