@@ -1,91 +1,104 @@
-Return-Path: <netdev+bounces-92539-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92540-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A79F18B7C53
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 17:56:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8EFD18B7C70
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 18:01:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D6A941C22DAD
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 15:56:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8A6E11F211A5
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 16:01:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 120051802CB;
-	Tue, 30 Apr 2024 15:53:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6ED53178CFD;
+	Tue, 30 Apr 2024 16:01:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WQXNpkp3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 443CE174ECF;
-	Tue, 30 Apr 2024 15:53:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE486176FCE
+	for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 16:01:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714492427; cv=none; b=Me2P8fyJMLAW4gNrpRKQusnKHXEHheeAzKRuYx/xxPF5ivt4Ww4PSE+OMMbu7v3l3PACieysoDNbeN434E0LQYDrYi+vb0qHiReoTItBu0kT0svjnv0ChQHppYKrOoqFlcqgTNNIKSpeA+N6GDmrig77Wqe3ccDCA4R95tPti4U=
+	t=1714492872; cv=none; b=tnKQVKvktn6keFqyuH5pzVlxGRZo3P7SB3ZXkGuA0ZDldry1Du6dtcQni95kkAk6YCtacXUnqGxNg/UdrdlgRMVH7KiB1tpbaUKlQa5RfkujmH0rp33RM6mxyRmEdr46yE8+rlaZbTcfL2A5jARx4M6V1FyY1+txnwbhL//htnY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714492427; c=relaxed/simple;
-	bh=I89NMWOc+oSqQJ4rc1Mq3xhhpu353RBk5ietD8MITtg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SqQogsnaB8wE/aiJFKnFbyL0rlIKsLgjlB2+jn4gyk6gtAIcCC7Ks/0dXzf3gLET9TbQl0baXlfJPfQulINJpg6MH6Hdh4nb675ABsEoaDfYeIC/K9Ge2+kmtHBBEhvbYT8dCXXO7q4Tea0377MGvkZY4OYHqcqGoWGIuioMag4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-a51f9ad7684so402083566b.2;
-        Tue, 30 Apr 2024 08:53:44 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714492423; x=1715097223;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rmsdIh35cw7AWH4Zqk6LG7hPdUjW6CSZqbYw7zoyiBY=;
-        b=k9MGsC9JKde7RiBqX9Y5/TBGO+rmHy9vL5cU72GBJ6+5Wp0/WSwuIU3e7/Fwl+rI4l
-         i42/fgCbdZRmEbMkBSkYmT1x1w90zK7PfdVCz58zSs5OgALTBt1WWcAgNR8YHlZj9a/e
-         m6f2i/RS+N4d+5ECdS3on3xionPExB6BinFOTM7hmCA45xGQpHlOKN6a0xZlCzyhWLQI
-         jjDrdtYzFB2Q1AvYsjQbVCM94LLcfkajw9NNBfaxQyvgKhm7pL11WZNjE8VsRRNDRNW+
-         t8GMd6vT4ZOz4aGn5qct+yShhEwjGqyjd/DTRgl9rTuk3t/GoVcfDLis9d/aepNFkYXX
-         z0Lw==
-X-Forwarded-Encrypted: i=1; AJvYcCVKQjw3sQ+JEZeIDQ5K5ulu7WlZM1R1YhNQO/wg+l7oRrlhN3ixtCaJcSTOBzdJmNEmaTfoAEiUTYQ8nzB709AbD8KQl/Xg2X9XT+koKEJ6kquLDzTVeL66wHBEempa2k0oDWjP6nT7FONJT2DFE/DGiDZMqhNjXaWz3k7a8/jAEQ==
-X-Gm-Message-State: AOJu0Yy5rc+bWSr0pqOCKvHp4QdzFoEVXqeV0Tn85behA+GKJQmGILkt
-	UGlx8WijkrwyB/bGahZz1KUtE1Nz6h+Ix0iVlqq6d3HtMnuEcApDBEdBuw==
-X-Google-Smtp-Source: AGHT+IHm2Gp5IOd0nOhfzbq7G5ippoA+YneekBG3MuhYCYYd/2pc4Cz2eJlTpzlAmUIpifzIzmCx1g==
-X-Received: by 2002:a50:d49e:0:b0:572:67d9:6c3b with SMTP id s30-20020a50d49e000000b0057267d96c3bmr163655edi.26.1714492423279;
-        Tue, 30 Apr 2024 08:53:43 -0700 (PDT)
-Received: from gmail.com (fwdproxy-lla-008.fbsv.net. [2a03:2880:30ff:8::face:b00c])
-        by smtp.gmail.com with ESMTPSA id y23-20020aa7ccd7000000b005727c9aec9csm3018732edt.31.2024.04.30.08.53.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Apr 2024 08:53:43 -0700 (PDT)
-Date: Tue, 30 Apr 2024 08:53:40 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Leon Romanovsky <leon@kernel.org>,
-	Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>,
-	"open list:HFI1 DRIVER" <linux-rdma@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>,
-	linux-netdev <netdev@vger.kernel.org>
-Subject: Re: [PATCH net-next] IB/hfi1: allocate dummy net_device dynamically
-Message-ID: <ZjEUBGW7cVUalhNW@gmail.com>
-References: <20240426085606.1801741-1-leitao@debian.org>
- <20240430125047.GE100414@unreal>
- <49973089-1e5e-48a2-9616-09cf8b8d5a7f@cornelisnetworks.com>
- <20240430141039.GH100414@unreal>
- <20240430075534.435a686e@kernel.org>
+	s=arc-20240116; t=1714492872; c=relaxed/simple;
+	bh=uaQtm99TTwvcVB6dE70G+TricRvh3YWN7Mj9VbhFVoM=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=X7o/zEO9OpGPeQpiSefRJSz6mO2bFLUIj1FBKxtSCeN19iyW7E+p4KDU/uMwnnVApGy1GFc2pjy2q+t9OA64WLkVBF3+a0LzYfa5BXoDN0RqiaIw5bi90yamAmHkv/zjX7JKyPLnYp8DObe3AUVYvbMlWlCpxlGo9bFTL5aUQ6Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WQXNpkp3; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1714492869;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=uaQtm99TTwvcVB6dE70G+TricRvh3YWN7Mj9VbhFVoM=;
+	b=WQXNpkp3blUNsTNWWi8KYROrJyiaV6f11LV8XX4NxepTVf9FJDcU7Vv5VNn6X6h9IXnNc+
+	tof+DaCOdShOR1O/19YWW7NRjM/8fDK5Ys0zZBTm40RcpiScTSKhEIFN978l/cat8PPEkP
+	WeHRgLbi7jIEz3rHkayNEUt3fM6WqzM=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-483-yGeb0ux_NhCEedhVE30P2A-1; Tue, 30 Apr 2024 12:01:04 -0400
+X-MC-Unique: yGeb0ux_NhCEedhVE30P2A-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 25EC480E95D;
+	Tue, 30 Apr 2024 16:01:03 +0000 (UTC)
+Received: from fedora.redhat.com (unknown [10.39.193.71])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 119B620128EF;
+	Tue, 30 Apr 2024 16:00:58 +0000 (UTC)
+From: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
+To: kuba@kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	inventor500@vivaldi.net,
+	jarkko.palviainen@gmail.com,
+	jtornosm@redhat.com,
+	linux-kernel@vger.kernel.org,
+	linux-usb@vger.kernel.org,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	stable@vger.kernel.org,
+	vadim.fedorenko@linux.dev
+Subject: Re: [PATCH v2] net: usb: ax88179_178a: avoid writing the mac address before first reading
+Date: Tue, 30 Apr 2024 18:00:56 +0200
+Message-ID: <20240430160057.557295-1-jtornosm@redhat.com>
+In-Reply-To: <20240430082717.65f26140@kernel.org>
+References: <20240430082717.65f26140@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240430075534.435a686e@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.4
 
-On Tue, Apr 30, 2024 at 07:55:34AM -0700, Jakub Kicinski wrote:
-> On Tue, 30 Apr 2024 17:10:39 +0300 Leon Romanovsky wrote:
-> > > Nothing right now. Should be safe to sent to net-next.  
-> > 
-> > Jakub, can you please take this patch?
-> 
-> We'll need a repost, it wasn't CCed to netdev.
+> v6.8.8 has 56f78615b already. We need another patch, Jose?
 
-I can repost it and CC netdev.
+Hello Jakub,
+
+I will try to analyze it during the next week (I will be out until then).
+
+In the meantime, in order to get more information about the possible
+regression:
+
+Isaac,
+Which version was it working in?
+Do you know if it was working before d2689b6a86b9 ("net: usb: ax88179_178a:
+avoid two consecutive device resets")?
+
+
+Best regards
+José Ignacio
+
 
