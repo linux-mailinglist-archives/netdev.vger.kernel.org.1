@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-92518-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92517-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6F008B7B53
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 17:20:38 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47BC08B7B56
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 17:20:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6C8441F23437
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 15:20:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 42C8EB20B97
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 15:20:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86288143735;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86236143732;
 	Tue, 30 Apr 2024 15:20:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KZmcD39V"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iqzKQoQM"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CC61152799;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CCB6140E26;
 	Tue, 30 Apr 2024 15:20:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714490432; cv=none; b=Ly6OPH7fsV6p9TPhp9KLrt6SjxnOGuntBzXyrbNqyxtAIqCN8thYVrXcundYVfRatjd6UMii3C86QMnLOcabRsIztnmB6CfJolvzA272HSdXr8QzdQ6IKYrNgHqlUjzB+Ycj3396Tk2sXZgn9dxhtqUk9OdewlorlP+nyxDzOBA=
+	t=1714490432; cv=none; b=eV2C7Dx4HAr0qOcpz7UNOiwMoyImVg6MKj+0uJRE90Awnjy+5FbP9Ree2uO1w81d/tDMzT/hBaz7pxAwiHyeyPP+Rdjm+Uk2I84jUqxoGw0QEQVRl8lJ2+J0YAkJBWNeRobIQX3LScM+TOIx+B8qs/epY/n2NgTIAauMsfPDQ74=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1714490432; c=relaxed/simple;
-	bh=8RKsDLKFxHNFsoPYcuLW5YXWla9fw22pqt2LsmxYKsg=;
+	bh=JwUq2o3SycJ+v3mu19N1cEuDSkxRrtKf6DXZT8LZzzI=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=GrRGF2mZOdZo4MDO53qkrILkL1pQO25w99XrRhoBgrZYTRf5XbkvGrZpHeDFwxzV3he0HO0A9MNMjHKggaCKdN2ID801hpu5lqjHMui2NuGMH86FNLWuf57VL2n25DUuu24VqzhW67UbOJ1VCfrsdwDx/HWn3hWxyvRRBLPoz1s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KZmcD39V; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id E4B4AC4AF19;
+	 In-Reply-To:To:Cc; b=gbc3l0H0/zzowDZLfIRyhN5j0G65o26TLQQS9KBDUJjpXzHa4S2WeQQ9DRJHB3wXCzjkQRRnVYHl9I1lgRhqXeX+7PT9wum9UxTsKK76Icnp/AZxBDnOBo7EVMqXXcZ91nL6L+HRvGfwujj5ssFeeiGng9+5h++2GLRT3ZYx0i0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iqzKQoQM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id DD32CC4AF18;
 	Tue, 30 Apr 2024 15:20:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714490431;
-	bh=8RKsDLKFxHNFsoPYcuLW5YXWla9fw22pqt2LsmxYKsg=;
+	s=k20201202; t=1714490430;
+	bh=JwUq2o3SycJ+v3mu19N1cEuDSkxRrtKf6DXZT8LZzzI=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=KZmcD39VHHk0ClFCuf2BgWcVwc55VhLnKFG6+gw9dxuf0/ocHQz6TH+NfNfzyjLBZ
-	 KzvYwEvd1+o94W4A9U+OfusvCOEN5xELlnDAWX9QU6hqiyEn4L1jcjxjSqRF4uE7Mr
-	 2yMym75Kh8JyvVLQxV14Eknba/z9/b7gp0mL1m5/SZQNMeHD0+VEhNrj+8uJw7dDNB
-	 00xceVBUfMPtfelX2FxP0S0CbsKZ/Ym9dEYn6hVEfLqINrL4HgQ8iCsxm9N+wXkKKf
-	 MXOq15337A4L0heEQCTwgZrrsIdW3QQOeBgVQs6DlfLnVnVUhrhfCffmzTGM6eOYmz
-	 sPipX2ZaxoYig==
+	b=iqzKQoQMaXVfTnA+9lTRESVhcu3T+elFSXp++FIOWy127LmlTV0WcDWM+Zzn1SPaW
+	 +NN2ONY7Aqnv+zgV0iYenGqjaFEyLZKFBkUwDU1WF3WsftDTBwx6uuyibCOojXanhR
+	 zDfEGmXG4gHmzBb3NBc8HdiTcp/xhCVlW3zzSBDXj2DYtSC+ri0ZEdcGJZe8ywnga9
+	 HmWeHWVHTN3uDEE1pR67KCMgmYLHxVMpo+v5v5rQFYIWPTq4XuAdELFSh4LSML82kg
+	 FPs6oJvRISoeE+oA/KuKPN9cdjkCH3giAy3BKex7mSTsrRe4TF/qRQf+SUr5GxDO8c
+	 nz1v31H3UlGWw==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D1F7BC43616;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C9C6DC43617;
 	Tue, 30 Apr 2024 15:20:30 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,50 +52,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 0/6] selftests: net: page_poll allocation error
- injection
+Subject: Re: [PATCH net-next] selftests: netfilter: avoid test timeouts on debug
+ kernels
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171449043085.29434.16486450052469503597.git-patchwork-notify@kernel.org>
+ <171449043082.29434.12702226836543315240.git-patchwork-notify@kernel.org>
 Date: Tue, 30 Apr 2024 15:20:30 +0000
-References: <20240429144426.743476-1-kuba@kernel.org>
-In-Reply-To: <20240429144426.743476-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, linux-kselftest@vger.kernel.org,
- willemdebruijn.kernel@gmail.com
+References: <20240429105736.22677-1-fw@strlen.de>
+In-Reply-To: <20240429105736.22677-1-fw@strlen.de>
+To: Florian Westphal <fw@strlen.de>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, netfilter-devel@vger.kernel.org,
+ pablo@netfilter.org
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 29 Apr 2024 07:44:20 -0700 you wrote:
-> Add a test for exercising driver memory allocation failure paths.
-> page pool is a bit tricky to inject errors into at the page allocator
-> level because of the bulk alloc and recycling, so add explicit error
-> injection support "in front" of the caches.
+On Mon, 29 Apr 2024 12:57:28 +0200 you wrote:
+> Jakub reports that some tests fail on netdev CI when executed in a debug
+> kernel.
 > 
-> Add a test to exercise that using only the standard APIs.
-> This is the first useful test for the new tests with an endpoint.
-> There's no point testing netdevsim here, so this is also the first
-> HW-only test in Python.
+> Increase test timeout to 30m, this should hopefully be enough.
+> Also reduce test duration where possible for "slow" machines.
+> 
+> Signed-off-by: Florian Westphal <fw@strlen.de>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v2,1/6] net: page_pool: support error injection
-    https://git.kernel.org/netdev/net-next/c/12b6c3a0380a
-  - [net-next,v2,2/6] selftests: drv-net-hw: support using Python from net hw tests
-    https://git.kernel.org/netdev/net-next/c/ff4b2bfa63bd
-  - [net-next,v2,3/6] selftests: net: py: extract tool logic
-    https://git.kernel.org/netdev/net-next/c/32a4ca1361d7
-  - [net-next,v2,4/6] selftests: net: py: avoid all ports < 10k
-    https://git.kernel.org/netdev/net-next/c/ee2512d6bf41
-  - [net-next,v2,5/6] selftests: drv-net: support generating iperf3 load
-    https://git.kernel.org/netdev/net-next/c/0f0cdf312ecc
-  - [net-next,v2,6/6] selftests: drv-net-hw: add test for memory allocation failures with page pool
-    https://git.kernel.org/netdev/net-next/c/9da271f825e4
+  - [net-next] selftests: netfilter: avoid test timeouts on debug kernels
+    https://git.kernel.org/netdev/net-next/c/f581bcf02f0e
 
 You are awesome, thank you!
 -- 
