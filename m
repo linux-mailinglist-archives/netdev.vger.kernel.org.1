@@ -1,120 +1,106 @@
-Return-Path: <netdev+bounces-92585-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92586-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D3898B7F88
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 20:14:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66D078B7F8A
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 20:15:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E39271F23A2B
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 18:14:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 21E73285A9D
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 18:15:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A8ED179650;
-	Tue, 30 Apr 2024 18:14:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02E00181CE8;
+	Tue, 30 Apr 2024 18:15:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nFXiW8GC"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="OVcErK7x"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE2A51527A8
-	for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 18:14:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AF95179650;
+	Tue, 30 Apr 2024 18:15:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714500882; cv=none; b=umNLEs5nsPNgQ7NzTNnhE8q4tilTO8Ba9fChSrdMUIw1i/Cu51D5eANmQcyI6+O3lx538rVq/yK0rSatr1LiUI5qAhLdBvTY2eJ6xBGT3n69jKR3W1iqNntT1X1Ew0cHTLq+QZyc7uLzhXopW/lulz4/zlS6mqYntwc20+5Noq4=
+	t=1714500918; cv=none; b=DmhQMOCBpJyRzvyg8dozXdkPCRKQWjuYT3uS3On2LBacUMMNzD2WNsZmae707r/+SNVRiBvBuHFN1WKjGj2DUR1lvYL28rky8YTXKfpYoY/S9lvElsr0SLzc3XR2e4wCD9zzswjWQHxhK+FG3C1TuCRZUcY8Imvjefn9ZUl5Jvs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714500882; c=relaxed/simple;
-	bh=stTl1O8ZTdphmlHp//lcSAE3ur1Wh1V0/CFltudRVm0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=N9KQzyvKB+hn6y0sfyOL01n/Rb14xuGH98DhqR1fV53lBficwvUjz2IZc7BlvEl7Q29L5YMWWjVX/BHje/hT0Vywtl8TQRfM7hBviV82Q9WnI3/MZmxklbqIy9Z7zf2Vr1bv/7KUIOgH1BhicjqN9uu+qhkgvTGC/iGtDpZdJ50=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nFXiW8GC; arc=none smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1714500881; x=1746036881;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=stTl1O8ZTdphmlHp//lcSAE3ur1Wh1V0/CFltudRVm0=;
-  b=nFXiW8GCxHYcJM4PqFHT0AfccWOabz8TeuR7Qg9l0gXFit8Vy7l/nxnX
-   stsc8GTXSAfTP5zlkWE2KfpI26Nuw6xF2RwFwCHLNvXp0R+vMCwFKCyQE
-   7kLg5M/WNppHWP8N6eCQOeq/s+wkj6rFk+LnlYUPlRPoddXG6Sm5J1f2K
-   4fzchOV9k5XFBTJSy0G9I3sZ/j3zJFdfPNV+cRqsEfuhXiGhdTtZ0mrbm
-   gIQe9Z0X51mmXDwri2zjF2FycqEjvgLr7iMLIhkHJ7+5EsU+If8nZLr2N
-   3hW4H7BbGUQmDvaVqqIQIchwc44xknnQYLR9OkPyHd7cswjOMLdUvstGu
-   g==;
-X-CSE-ConnectionGUID: o3kkUz4sRzevZM7BDL/5kA==
-X-CSE-MsgGUID: SyDnxePjSQOuzRU5eCe0zQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11060"; a="20840379"
-X-IronPort-AV: E=Sophos;i="6.07,242,1708416000"; 
-   d="scan'208";a="20840379"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Apr 2024 11:14:40 -0700
-X-CSE-ConnectionGUID: pJxGr9ivTu+iTG5mVJWFcw==
-X-CSE-MsgGUID: 6qfNBnJGSbiB7Br2G9fojg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,242,1708416000"; 
-   d="scan'208";a="31149077"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by fmviesa004.fm.intel.com with ESMTP; 30 Apr 2024 11:14:39 -0700
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	netdev@vger.kernel.org
-Cc: Ngai-Mint Kwan <ngai-mint.kwan@intel.com>,
-	anthony.l.nguyen@intel.com,
-	Mateusz Polchlopek <mateusz.polchlopek@intel.com>,
-	Pawel Chmielewski <pawel.chmielewski@intel.com>,
-	Simon Horman <horms@kernel.org>,
-	Dawid Osuchowski <dawid.osuchowski@linux.intel.com>,
-	Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>
-Subject: [PATCH net] ice: Do not get coalesce settings while in reset
-Date: Tue, 30 Apr 2024 11:14:32 -0700
-Message-ID: <20240430181434.1942751-1-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.41.0
+	s=arc-20240116; t=1714500918; c=relaxed/simple;
+	bh=X8HAYBAZH/nxmniE/1cqLRfga2wy39yx06ebZq3l3/E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZnB4i8G6E52Tkt4AxJmdTz4+zs1IY0hc9pG9yg8GxICNL+e3oKWdZo6xdsDpl6CZ9fWg/eltVxMBOkD7n1SSGC5XNr9lUV7USqAbJDVZx8QWoJTr64sCGlvPbxpuAoWnQYWEayZ7kcO7F+ndqxF4qSToqIeSMIhn64dU3cYXU/0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=OVcErK7x; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=nAD2Nur76Zf3BvEl9/PM5+Xuqr6DOFdCXMuTEX+Eofc=; b=OVcErK7xVvv+7h/GyB1FfYeATt
+	GuyC1O656IqIK7sSzG67XDlzH87FmguF+ApCOreR3W3jt3z1XSVmEdEDo18q/wtuOcAUwH8c31/Ik
+	Y9LDrlvKgM8r1xPAFiCvuPo5jjnwWhyBQgYr+VG10ksQe7DNIZO64/XEVxD1JlW1Dp6c=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1s1s0O-00ENI1-GV; Tue, 30 Apr 2024 20:15:04 +0200
+Date: Tue, 30 Apr 2024 20:15:04 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Herve Codina <herve.codina@bootlin.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Lee Jones <lee@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+	Horatiu Vultur <horatiu.vultur@microchip.com>,
+	UNGLinuxDriver@microchip.com,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Saravana Kannan <saravanak@google.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Lars Povlsen <lars.povlsen@microchip.com>,
+	Steen Hegelund <Steen.Hegelund@microchip.com>,
+	Daniel Machon <daniel.machon@microchip.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
+	netdev@vger.kernel.org, linux-pci@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Allan Nielsen <allan.nielsen@microchip.com>,
+	Luca Ceresoli <luca.ceresoli@bootlin.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH 00/17] Add support for the LAN966x PCI device using a DT
+ overlay
+Message-ID: <dbbf505b-c3ed-4d2d-b518-f322636269a2@lunn.ch>
+References: <20240430083730.134918-1-herve.codina@bootlin.com>
+ <4571846d-2001-4bbf-b311-d0b42844143d@lunn.ch>
+ <20240430183301.46568e35@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240430183301.46568e35@bootlin.com>
 
-From: Ngai-Mint Kwan <ngai-mint.kwan@intel.com>
+> Also I tested on a x86 system (basically a simple PC).
+> Not all components are available upstream to have it working on a x86 (ACPI)
+> system. The missing component is not related to the LAN966x PCI driver itself
+> but in the way DT node are created up to the PCI device.
 
-Getting coalesce settings while reset is in progress can cause NULL
-pointer deference bug.
-If under reset, abort get coalesce for ethtool.
+Good to hear it nearly "just works". There does not seem to be any
+interest in describing complex network devices like this using ACPI,
+which is many years behind what we have in DT in terms of building
+blocks for networking devices. Like many PCIe devices, the LAN966x is
+pretty much self contained, so fits DT overlays nicely.
 
-Fixes: 67fe64d78c43 ("ice: Implement getting and setting ethtool coalesce")
-Signed-off-by: Ngai-Mint Kwan <ngai-mint.kwan@intel.com>
-Reviewed-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-Signed-off-by: Pawel Chmielewski <pawel.chmielewski@intel.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Signed-off-by: Dawid Osuchowski <dawid.osuchowski@linux.intel.com>
-Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Contingent worker at Intel)
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
----
- drivers/net/ethernet/intel/ice/ice_ethtool.c | 3 +++
- 1 file changed, 3 insertions(+)
+There is also a slowly growing trend to have PCIe network devices
+which Linux controls, rather than offloading to firmware. The wangxun
+drivers are another example. So it is great to see the remaining
+pieces being put in place to support this.
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.c b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-index 78b833b3e1d7..efdfe46a91ee 100644
---- a/drivers/net/ethernet/intel/ice/ice_ethtool.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-@@ -3825,6 +3825,9 @@ __ice_get_coalesce(struct net_device *netdev, struct ethtool_coalesce *ec,
- 	struct ice_netdev_priv *np = netdev_priv(netdev);
- 	struct ice_vsi *vsi = np->vsi;
- 
-+	if (ice_is_reset_in_progress(vsi->back->state))
-+		return -EBUSY;
-+
- 	if (q_num < 0)
- 		q_num = 0;
- 
--- 
-2.41.0
-
+Thanks
+	Andrew
 
