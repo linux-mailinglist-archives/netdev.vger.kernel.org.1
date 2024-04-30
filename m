@@ -1,190 +1,221 @@
-Return-Path: <netdev+bounces-92594-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92595-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E46558B7FF8
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 20:43:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7228A8B8027
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 20:55:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E3B4EB241DD
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 18:43:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 90A601C221DB
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 18:55:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCEF5181323;
-	Tue, 30 Apr 2024 18:43:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5322194C7E;
+	Tue, 30 Apr 2024 18:55:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QF7dW2DE"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="fHqmNmfo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+Received: from mail-io1-f46.google.com (mail-io1-f46.google.com [209.85.166.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18B7C1836ED
-	for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 18:43:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB47817BB25
+	for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 18:55:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714502619; cv=none; b=MLIfBA9hN8wi7EsKxtgUEOUw+OZkiL3IxIliAqgr24smsT6PUR5NOFZRBHXvIldH2sJgMbNHniS+VuhOgAhUsyVz1O17J0ldNC5AuARYR2GbwoX4jODr8vKVzPmjAPIskmZvuDF6Bi1TI81TOcmikSGjp6sBsOFBygFb5FQi5dM=
+	t=1714503313; cv=none; b=BUUpXh6n37q/XwF8cFX16p+yF0rKgs2f3kBv45P5ttCLLGQuykiwfA4ZZfb1h0lzWVqGDjER6uuc2XSrmCn4NcZ2NUMnZPyqW1XWy0C0N+cIOLsGjAd6FvwpX8LoYRmbv++YGibPVZTASvI3J3u9dSDH0JH3AyMaULJMcfpyJQ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714502619; c=relaxed/simple;
-	bh=BjVIpr6D6U+ovO1hSAr1d66XKDxRf1xtjfoJTfDOelg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hdr7uruPuyqaOnM9SLnvZ3DWRAMSZIbcUueb5vymN4F2em4zSDNsvGW3KpNL6X9lfN8yShxH0iL2RUtSstGR7gXEEAwysOHC7pMqKAbNkUfqxx6AnRyJ+ULpJ4HRh5VqkTh30odlwvoN/5OcYKH6DczWuBoI9dGBFAoR8S1MPoY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QF7dW2DE; arc=none smtp.client-ip=209.85.208.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-5724736770cso2177a12.1
-        for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 11:43:37 -0700 (PDT)
+	s=arc-20240116; t=1714503313; c=relaxed/simple;
+	bh=Y4zEuuEidL9HuzJO4epGfanxTN6QUEoob6ZCDJEvDGA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=D+s9XgNP7iuVdsUTgeQM8DG38+nWPV1PIRBypHHUr2qBwS1u5+fN8CKgvJEfiStByS+SlP6JMSC7D3oWvvKRkmGVsdChWPc8E2oC6X97vJcMQ6+YXjYKvqm09YUI1L9wPaKS7IsDSqpTGkLu9MUHTmYioTE2iiRXbXayl+jGa+o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=fHqmNmfo; arc=none smtp.client-ip=209.85.166.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Received: by mail-io1-f46.google.com with SMTP id ca18e2360f4ac-7dee034225eso7958639f.2
+        for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 11:55:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1714502616; x=1715107416; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sGtmvtOeHlyT269/j4Nxx3NTS8DnpOxlrTqOxni+Mpo=;
-        b=QF7dW2DE45VVFsFcrkGKpvVKB/8I5UWvziSDK7pRumJWi7CuHJHAl/g2GsajAJ5qE5
-         mdfnsmoaxQb+sb2RCKHMqImPrN7yEQtDt+di0PnI+Ns3f7d6phXnvv2ZrgXFjBaLtTaM
-         cInGLe72u3ISzl4vMHrUvKU1IGann8Du8Uik7d25uQpmsLyA9ntgK/P5Y4BAiEBpXYIa
-         9ukzbZgewV/99fLf20o/6KVc17+9EGK164NtCZHyf4/OHUFyl+Rf+N3dhpMGmgI2clJi
-         B5uFae0ZdKxzwz85PU1p1GdB+eCLGHpGK7OCX5JO2SYmNRaIGT4LbNHQwM+VGvZgow2J
-         o9xw==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1714503310; x=1715108110; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=SHR3RGRuxJEH/dBiKYgawHqY9Lnlphnx76oS7XwiA+c=;
+        b=fHqmNmfo5j3nkc0/YlfKBue3Uo54rLdcUx3usEOkU3PR8LAWsZB5mGsa98YQUIEP4O
+         NfUPjz2sWBba6nJMHrkxHT8QwnynajW9W7oimNjlrdurIiXHuFMKS+ogeCkHTkMcTGi7
+         ybm0qpbIpPiQ5fH2XMF3wNU4cc4faT7DKHnj/N8BdAgA+3uUeb/d/sWMrtIZK8qNSkpR
+         yFkNOapl3EP94cWGzjMPhyJrZgbJococGHKTUZXHyVcAV52JpSZfzYfQQZVcQMov3CY8
+         mPRPS8dXdQeJYqKis1T/ZT/M8f3n/u4wLvIrlX6JCtuXTIi0mOo/gsQ6UgRSV8MmS+zS
+         Gslg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714502616; x=1715107416;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=sGtmvtOeHlyT269/j4Nxx3NTS8DnpOxlrTqOxni+Mpo=;
-        b=f1ymzOywWe7L9MGd9CXltlDU1vF3iT/NqZT/hjsPG4Gk6iXfyyr2aNMXj2iLVF7WPG
-         2fT3/2LR1M2ejTKiJjUaA+HTXL59sBO6oqMdF/BKxPrlOIYiHO2coXNpWLLyIG7Wfnz0
-         CidA1lrI9kdOZuY4uv+1SsW5xqNILehIi6d2EyvF24uC0Ant7/ZG3OLy4gmLnQm4nx3H
-         /UIG9DcL7UrT8T0EvE75O/rcEwrzt/hYSLKKiOXXnUttGTeeGqpUFwB0DkwniNceJ6Ym
-         mdBgO+vrB2z9kev98ZdTir5CTXuKw42oW7pt/qZXnooqqKLhjTx+AkDX/22Dm6EdTBiS
-         KC7A==
-X-Forwarded-Encrypted: i=1; AJvYcCX9dXsEjB7Hlpj5oUtLyCxK/edCpDFlBXLSLpHJef0sHU0zjdKm7xE8pbPr7WDBkfsIyT0c7lCjkgIxg99HEm11mSL3hMiX
-X-Gm-Message-State: AOJu0YyyAINkfR8qWbpSDBGbwc4lTwvJfCwl2LpCjuXw6Uwx5PxFprx8
-	KT2ls9oEmPXIASYFQMcU/cJT/UNqqSlV5Grcf1pRWexMQx5Y2tC7TeRtK88QZ18GciO67vzSPsS
-	8cAugLNwyf21lGgSd0tTY9dn4LDvZeoRHihCG
-X-Google-Smtp-Source: AGHT+IFqPIi0I0U5uwXKA03lZTtFwh4EsQYs456jiVSWk9AzeCPyVuefsQznoRiZp8LqcSqjngx9Art7ZwUuf5F+fdw=
-X-Received: by 2002:a05:6402:6c7:b0:572:57d8:4516 with SMTP id
- n7-20020a05640206c700b0057257d84516mr25985edy.2.1714502615891; Tue, 30 Apr
- 2024 11:43:35 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1714503310; x=1715108110;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=SHR3RGRuxJEH/dBiKYgawHqY9Lnlphnx76oS7XwiA+c=;
+        b=RqtXTl8E36vxo0RYlQ0uzue+3cTsDgoFSb7iDO5r39ZCxNPbb+x1WX/g+dDYG568CK
+         HcgK4aYUSlhSSDSaJP/Zneoue5Dwe6AMVuwRgzvwhpnltsRxBVSwSQ1tRTqSUT8drzur
+         qRky+0gfdWrT1Gd+Wc8rZDuCFh+09oRqXOldPLG5v6984DnSBoP1eSSYr21HNQWZ8h7u
+         1XgWM+KKNR6rH7l0t9d5i7GKiMEbf/WJS8qq2IuHYn8sBt4ty5VD7HF8POi7w9aOi+nK
+         JZfp/ApTzVrBTrokbrKOQE6KhQ9ZIVH5LIYWQ8E3E4kG2pcmrdVWws+DJeL7kbhinr2A
+         Fu/Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVIDmjBXnedaKBerDa0z89BwKal55m8Ghc94JgxRS04Fk3v/bbiqKMKnNs19rIOnbw80DuwXfQcyRVbBVHCRN9ig8zSZrR5
+X-Gm-Message-State: AOJu0YyorElzsP1dnHHZdSWH+zZ2dZL+OfS6qPnFNWPQ2iPXaiKE5EQp
+	H+qJI3Yove859WJvB/yaUjBGHb/nE3iSsjDHNWi4UsE2tUZJXCKKXh5EXdGLY80=
+X-Google-Smtp-Source: AGHT+IFtf+wSV3MsQDY8kH1lbfF76eo7FuUDr/3x1d33gkfYgxzUOO8lZB4OHFgKKuLwCBSXBvT5jw==
+X-Received: by 2002:a6b:f110:0:b0:7de:e04b:42c3 with SMTP id e16-20020a6bf110000000b007dee04b42c3mr828170iog.0.1714503309571;
+        Tue, 30 Apr 2024 11:55:09 -0700 (PDT)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id v21-20020a05663812d500b00487f9ec16b9sm389802jas.173.2024.04.30.11.55.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 30 Apr 2024 11:55:08 -0700 (PDT)
+Message-ID: <11f52113-7b67-4b45-ba1d-29b070050cec@kernel.dk>
+Date: Tue, 30 Apr 2024 12:55:05 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <2aa1ca0c0a3aa0acc15925c666c777a4b5de553c.1714496886.git.dcaratti@redhat.com>
- <CANn89iJJefUheeur5E=bziiqxjqmKXEk3NCO=8em4XVJThExMQ@mail.gmail.com> <ZjE587MsVBZA61fJ@dcaratti.users.ipa.redhat.com>
-In-Reply-To: <ZjE587MsVBZA61fJ@dcaratti.users.ipa.redhat.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 30 Apr 2024 20:43:22 +0200
-Message-ID: <CANn89iJRA-1z60cvGnbqYa=Ua-ysR9uHufkrFmQGRmN-4Dod2Q@mail.gmail.com>
-Subject: Re: [PATCH net-next] net/sched: unregister lockdep keys in
- qdisc_create/qdisc_alloc error path
-To: Davide Caratti <dcaratti@redhat.com>
-Cc: Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
-	Jiri Pirko <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Naresh Kamboju <naresh.kamboju@linaro.org>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH net-next v8 07/14] page_pool: devmem support
+To: Mina Almasry <almasrymina@google.com>
+Cc: David Wei <dw@davidwei.uk>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-alpha@vger.kernel.org, linux-mips@vger.kernel.org,
+ linux-parisc@vger.kernel.org, sparclinux@vger.kernel.org,
+ linux-trace-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
+ bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Jonathan Corbet <corbet@lwn.net>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Ivan Kokshaysky <ink@jurassic.park.msu.ru>, Matt Turner
+ <mattst88@gmail.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+ "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
+ Helge Deller <deller@gmx.de>, Andreas Larsson <andreas@gaisler.com>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+ Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu
+ <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+ Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
+ Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
+ <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+ Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, Steffen Klassert
+ <steffen.klassert@secunet.com>, Herbert Xu <herbert@gondor.apana.org.au>,
+ David Ahern <dsahern@kernel.org>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Shuah Khan <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ Amritha Nambiar <amritha.nambiar@intel.com>,
+ Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+ Alexander Mikhalitsyn <alexander@mihalicyn.com>,
+ Kaiyuan Zhang <kaiyuanz@google.com>, Christian Brauner <brauner@kernel.org>,
+ Simon Horman <horms@kernel.org>, David Howells <dhowells@redhat.com>,
+ Florian Westphal <fw@strlen.de>, Yunsheng Lin <linyunsheng@huawei.com>,
+ Kuniyuki Iwashima <kuniyu@amazon.com>,
+ Arseniy Krasnov <avkrasnov@salutedevices.com>,
+ Aleksander Lobakin <aleksander.lobakin@intel.com>,
+ Michael Lass <bevan@bi-co.net>, Jiri Pirko <jiri@resnulli.us>,
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+ Lorenzo Bianconi <lorenzo@kernel.org>,
+ Richard Gobert <richardbgobert@gmail.com>,
+ Sridhar Samudrala <sridhar.samudrala@intel.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+ Johannes Berg <johannes.berg@intel.com>, Abel Wu <wuyun.abel@bytedance.com>,
+ Breno Leitao <leitao@debian.org>, Pavel Begunkov <asml.silence@gmail.com>,
+ Jason Gunthorpe <jgg@ziepe.ca>, Shailend Chand <shailend@google.com>,
+ Harshitha Ramamurthy <hramamurthy@google.com>,
+ Shakeel Butt <shakeel.butt@linux.dev>, Jeroen de Borst
+ <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>,
+ linux-mm@kvack.org, Matthew Wilcox <willy@infradead.org>
+References: <20240403002053.2376017-1-almasrymina@google.com>
+ <20240403002053.2376017-8-almasrymina@google.com>
+ <8357256a-f0e9-4640-8fec-23341fc607db@davidwei.uk>
+ <CAHS8izPeYryoLdCAQdGQU-wn7YVdtuofVKNvRFjFjhqTDsT7zA@mail.gmail.com>
+ <aafbbf09-a33d-4e73-99c8-9ddab5910657@kernel.dk>
+ <CAHS8izMKLYATo6g3xkj_thFo3whCfq6LSoex5s0m5XZd-U7SVQ@mail.gmail.com>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <CAHS8izMKLYATo6g3xkj_thFo3whCfq6LSoex5s0m5XZd-U7SVQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Apr 30, 2024 at 8:35=E2=80=AFPM Davide Caratti <dcaratti@redhat.com=
-> wrote:
->
-> hi Eric, thanks for looking at this!
->
-> On Tue, Apr 30, 2024 at 07:58:14PM +0200, Eric Dumazet wrote:
-> > On Tue, Apr 30, 2024 at 7:11=E2=80=AFPM Davide Caratti <dcaratti@redhat=
-.com> wrote:
-> > >
->
-> [...]
->
-> > > @@ -1389,6 +1389,7 @@ static struct Qdisc *qdisc_create(struct net_de=
-vice *dev,
-> > >                 ops->destroy(sch);
-> > >         qdisc_put_stab(rtnl_dereference(sch->stab));
-> > >  err_out3:
-> > > +       lockdep_unregister_key(&sch->root_lock_key);
-> > >         netdev_put(dev, &sch->dev_tracker);
-> > >         qdisc_free(sch);
-> > >  err_out2:
-> >
-> > For consistency with the other path, what about this instead ?
-> >
-> > This would also  allow a qdisc goten from an rcu lookup to allow its
-> > spinlock to be acquired.
-> > (I am not saying this can happen, but who knows...)
-> >
-> > Ie defer the  lockdep_unregister_key() right before the kfree()
->
-> the problem is, qdisc_free() is called also in a RCU callback. So, if we =
-move
-> lockdep_unregister_key() inside the function, the non-error path is
-> going to splat like this
+On 4/30/24 12:29 PM, Mina Almasry wrote:
+> On Tue, Apr 30, 2024 at 6:46?AM Jens Axboe <axboe@kernel.dk> wrote:
+>>
+>> On 4/26/24 8:11 PM, Mina Almasry wrote:
+>>> On Fri, Apr 26, 2024 at 5:18?PM David Wei <dw@davidwei.uk> wrote:
+>>>>
+>>>> On 2024-04-02 5:20 pm, Mina Almasry wrote:
+>>>>> @@ -69,20 +106,26 @@ net_iov_binding(const struct net_iov *niov)
+>>>>>   */
+>>>>>  typedef unsigned long __bitwise netmem_ref;
+>>>>>
+>>>>> +static inline bool netmem_is_net_iov(const netmem_ref netmem)
+>>>>> +{
+>>>>> +#if defined(CONFIG_PAGE_POOL) && defined(CONFIG_DMA_SHARED_BUFFER)
+>>>>
+>>>> I am guessing you added this to try and speed up the fast path? It's
+>>>> overly restrictive for us since we do not need dmabuf necessarily. I
+>>>> spent a bit too much time wondering why things aren't working only to
+>>>> find this :(
+>>>
+>>> My apologies, I'll try to put the changelog somewhere prominent, or
+>>> notify you when I do something that I think breaks you.
+>>>
+>>> Yes, this is a by-product of a discussion with regards to the
+>>> page_pool benchmark regressions due to adding devmem. There is some
+>>> background on why this was added and the impact on the
+>>> bench_page_pool_simple tests in the cover letter.
+>>>
+>>> For you, I imagine you want to change this to something like:
+>>>
+>>> #if defined(CONFIG_PAGE_POOL)
+>>> #if defined(CONFIG_DMA_SHARED_BUFFER) || defined(CONFIG_IOURING)
+>>>
+>>> or something like that, right? Not sure if this is something I should
+>>> do here or if something more appropriate to be in the patches you
+>>> apply on top.
+>>
+>> In general, attempting to hide overhead behind config options is always
+>> a losing proposition. It merely serves to say "look, if these things
+>> aren't enabled, the overhead isn't there", while distros blindly enable
+>> pretty much everything and then you're back where you started.
+>>
+> 
+> The history there is that this check adds 1 cycle regression to the
+> page_pool fast path benchmark. The regression last I measured is 8->9
+> cycles, so in % wise it's a quite significant 12.5% (more details in
+> the cover letter[1]). I doubt I can do much better than that to be
+> honest.
 
-Got it, but we do have ways of running a work queue after rcu grace period.
+I'm all for cycle counting, and do it myself too, but is that even
+measurable in anything that isn't a super targeted microbenchmark? Or
+even in that? 
 
-Let's use your patch, but I suspect we could have other issues.
+> There was a desire not to pay this overhead in setups that will likely
+> not care about devmem, like embedded devices maybe, or setups without
+> GPUs. Adding a CONFIG check here seemed like very low hanging fruit,
+> but yes it just hides the overhead in some configs, not really removes
+> it.
+> 
+> There was a discussion about adding this entire netmem/devmem work
+> under a new CONFIG. There was pushback particularly from Willem that
+> at the end of the day what is enabled on most distros is what matters
+> and we added code churn and CONFIG churn for little value.
+> 
+> If there is significant pushback to the CONFIG check I can remove it.
+> I don't feel like it's critical, it just mirco-optimizes some setups
+> that doesn't really care about this work area.
 
-Full disclosure, I have the following syzbot report:
+That is true, but in practice it'll be enabled anyway. Seems like it's
+not really worth it in this scenario.
 
-WARNING: bad unlock balance detected!
-6.9.0-rc5-syzkaller-01413-gdd1941f801bc #0 Not tainted
--------------------------------------
-kworker/u8:6/2474 is trying to release lock (&sch->root_lock_key) at:
-[<ffffffff897300c5>] spin_unlock_bh include/linux/spinlock.h:396 [inline]
-[<ffffffff897300c5>] dev_reset_queue+0x145/0x1b0 net/sched/sch_generic.c:13=
-04
-but there are no more locks to release!
+-- 
+Jens Axboe
 
-other info that might help us debug this:
-5 locks held by kworker/u8:6/2474:
-#0: ffff888015ecd948 ((wq_completion)netns){+.+.}-{0:0}, at:
-process_one_work kernel/workqueue.c:3229 [inline]
-#0: ffff888015ecd948 ((wq_completion)netns){+.+.}-{0:0}, at:
-process_scheduled_works+0x8e0/0x17c0 kernel/workqueue.c:3335
-#1: ffffc9000a3a7d00 (net_cleanup_work){+.+.}-{0:0}, at:
-process_one_work kernel/workqueue.c:3230 [inline]
-#1: ffffc9000a3a7d00 (net_cleanup_work){+.+.}-{0:0}, at:
-process_scheduled_works+0x91b/0x17c0 kernel/workqueue.c:3335
-#2: ffffffff8f59bd50 (pernet_ops_rwsem){++++}-{3:3}, at:
-cleanup_net+0x16a/0xcc0 net/core/net_namespace.c:591
-#3: ffffffff8f5a8648 (rtnl_mutex){+.+.}-{3:3}, at:
-cleanup_net+0x6af/0xcc0 net/core/net_namespace.c:627
-#4: ffff88802cbce258 (dev->qdisc_tx_busylock ?:
-&qdisc_tx_busylock#2){+...}-{2:2}, at: spin_lock_bh
-include/linux/spinlock.h:356 [inline]
-#4: ffff88802cbce258 (dev->qdisc_tx_busylock ?:
-&qdisc_tx_busylock#2){+...}-{2:2}, at: dev_reset_queue+0x126/0x1b0
-net/sched/sch_generic.c:1299
-
-stack backtrace:
-CPU: 1 PID: 2474 Comm: kworker/u8:6 Not tainted
-6.9.0-rc5-syzkaller-01413-gdd1941f801bc #0
-Hardware name: Google Google Compute Engine/Google Compute Engine,
-BIOS Google 03/27/2024
-Workqueue: netns cleanup_net
-Call Trace:
-<TASK>
-__dump_stack lib/dump_stack.c:88 [inline]
-dump_stack_lvl+0x241/0x360 lib/dump_stack.c:114
-print_unlock_imbalance_bug+0x256/0x2c0 kernel/locking/lockdep.c:5194
-__lock_release kernel/locking/lockdep.c:5431 [inline]
-lock_release+0x599/0x9f0 kernel/locking/lockdep.c:5774
-__raw_spin_unlock_bh include/linux/spinlock_api_smp.h:165 [inline]
-_raw_spin_unlock_bh+0x1b/0x40 kernel/locking/spinlock.c:210
-spin_unlock_bh include/linux/spinlock.h:396 [inline]
-dev_reset_queue+0x145/0x1b0 net/sched/sch_generic.c:1304
-netdev_for_each_tx_queue include/linux/netdevice.h:2503 [inline]
-dev_deactivate_many+0x54a/0xb10 net/sched/sch_generic.c:1368
-__dev_close_many+0x1a4/0x300 net/core/dev.c:1529
-dev_close_many+0x24e/0x4c0 net/core/dev.c:1567
-unregister_netdevice_many_notify+0x544/0x16e0 net/core/dev.c:11181
-cleanup_net+0x75d/0xcc0 net/core/net_namespace.c:632
-process_one_work kernel/workqueue.c:3254 [inline]
-process_scheduled_works+0xa10/0x17c0 kernel/workqueue.c:3335
-worker_thread+0x86d/0xd70 kernel/workqueue.c:3416
-kthread+0x2f0/0x390 kernel/kthread.c:388
-ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
-ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
-</TASK>
 
