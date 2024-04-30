@@ -1,104 +1,145 @@
-Return-Path: <netdev+bounces-92296-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92302-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5585D8B67C1
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 03:59:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B8FA8B67D9
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 04:14:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8E574B20D0E
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 01:59:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EDDA71F22BEE
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 02:14:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5CB46FB0;
-	Tue, 30 Apr 2024 01:59:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28FBDDDA9;
+	Tue, 30 Apr 2024 02:13:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bbmBjX7k"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="M23WbWHW"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out30-99.freemail.mail.aliyun.com (out30-99.freemail.mail.aliyun.com [115.124.30.99])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B014E8F49
-	for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 01:59:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D79E88F6F;
+	Tue, 30 Apr 2024 02:13:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.99
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714442383; cv=none; b=elRK4r1Wfg7HTyUhC0xWx+QH7TBH/6f6x/bMnqAa7VHlqA6uoaA3RaP1KOx/LPcLGzHAQL6KD4nw3ztxL7l+7KDwh8iz0lEobgic1n3BJq959IqUx9nex7RGbiSEmJy5QpiUPpBf8GGhva/Q6aHWvZIxSMV7RwmW0O8vzACYHF4=
+	t=1714443237; cv=none; b=bqqxGHuHcFqLSANVKyO05z6hTUwbQ6qs0B2GOXgxEIQnNn2QuXeiGaANF4kdu7GMaHtMVzW1KFxRbDCIYmezh73ti+9gXYaaQkHKsOR4KxDjAQ85H0gZUrQ7CayTU5ZbO4WSazP9Efvc1R2Nq+WgmKKM0ZPlIjUgkgdsAkzNlog=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714442383; c=relaxed/simple;
-	bh=gmJV+eyXc5ullhBIXnJzh6zZc8wBJRfAl36OX7QTHVY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QLAm/1XpySHXvA2EwHdlTCCTt9eWzFBhaMJbireHNI1U3fzzyB7IjXEDrxICZE2dpM1G/Va374Juo9M2Y63xBg2TK7N7r5uCIcfOIAmjcYPVwyT5DO51b8TSQed+BZeckNhQWQW6g6YRodRkNgGEK67Xy2cR4i+8yLU+eilIe9s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bbmBjX7k; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD9DFC116B1;
-	Tue, 30 Apr 2024 01:59:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714442383;
-	bh=gmJV+eyXc5ullhBIXnJzh6zZc8wBJRfAl36OX7QTHVY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=bbmBjX7kooxLeXCyoVnwZrgSBAgmhglSG6Cx0wtC+TYnkdSOo6h4SSp5csL91Q17E
-	 i8S5aFbNfT/17PyFCclVWqBz2qfGYiy+m4nyAtxvDH/o9p/0OrNoU7cLLVJdNTiI/F
-	 Bptd0ku/N4bcdzh/m74Inall2DhFYwmjNyrrgmvOKVsVrgpSoioPXtiClC0ocYDlQd
-	 cBC2tpQtfqoMayK9C0xJGlinzk7s9HwXGhiwbzG4aJFKUo4qQQ5+YYL60KnWgNi63L
-	 HtIbEqnmRU58O+T3e1e+lYj3toh59gg3vsWvUI2zzV7cBY4y9JfyNq1WpebNbErdaD
-	 YjzXJqbaaoXxw==
-Date: Mon, 29 Apr 2024 18:59:41 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
- "Knitter, Konrad" <konrad.knitter@intel.com>, "Samudrala, Sridhar"
- <sridhar.samudrala@intel.com>, "Brandeburg, Jesse"
- <jesse.brandeburg@intel.com>, Mateusz Polchlopek
- <mateusz.polchlopek@intel.com>, Ahmed Zaki <ahmed.zaki@intel.com>, "Simon
- Horman" <horms@kernel.org>, Michal Schmidt <mschmidt@redhat.com>, Paolo
- Abeni <pabeni@redhat.com>, Jiri Pirko <jiri@resnulli.us>, Pawel Chmielewski
- <pawel.chmielewski@intel.com>, "Nguyen, Anthony L"
- <anthony.l.nguyen@intel.com>
-Subject: Re: [RFC net-next (what uAPI?) ice: add support for more than 16
- RSS queues for VF
-Message-ID: <20240429185941.6229b944@kernel.org>
-In-Reply-To: <73ac167e-abc5-4e7b-96e3-7c6689b5665a@intel.com>
-References: <73ac167e-abc5-4e7b-96e3-7c6689b5665a@intel.com>
+	s=arc-20240116; t=1714443237; c=relaxed/simple;
+	bh=8sbxx22xmGWgECxkXVi/5b28FpNr1fg/fRLgHhiSgQE=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=HBCWbz072rfaM7XUER86iZFMBJZiSbTvSHdW9ox/x0yuSvmSXo3/9pOib17s/mvykCTFMhoqL8jFJrV0q7kkqIPRomnavcizxsO0RNibT9Huzx6kyZbA7nMQXu8KV9PWGB08kHgqKvn2RggHeN/xDO+raG0fPMRq6VdHr1qe048=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=M23WbWHW; arc=none smtp.client-ip=115.124.30.99
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1714443227; h=Message-ID:Subject:Date:From:To;
+	bh=y6BHbK1lWejK17N+PEG4y4GRz35g2lrll3r6j9O47ps=;
+	b=M23WbWHWhuG/M3daJPJcwdTdwSHdJefhEj71ZcoFmMDQEbSQIIlmIuZYkCB4RL6EDfttABeeG5tz78XDEs9aJXvoI+1c8gaG4kdEgo7DMIKUnb4C4uFBI1JoQGajno0W6JQLzLBgFjWyZMbAC4lSCL3hs6EV5LwW+NnB5BUWj8w=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R601e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037067111;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=23;SR=0;TI=SMTPD_---0W5ae2VQ_1714443224;
+Received: from localhost(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0W5ae2VQ_1714443224)
+          by smtp.aliyun-inc.com;
+          Tue, 30 Apr 2024 10:13:44 +0800
+Message-ID: <1714442379.4695537-1-hengqi@linux.alibaba.com>
+Subject: Re: [PATCH net-next v10 2/4] ethtool: provide customized dim profile management
+Date: Tue, 30 Apr 2024 09:59:39 +0800
+From: Heng Qi <hengqi@linux.alibaba.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org,
+ virtualization@lists.linux.dev,
+ "David S .  Miller" <davem@davemloft.net>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Eric  Dumazet <edumazet@google.com>,
+ Jason Wang <jasowang@redhat.com>,
+ "Michael S  . Tsirkin" <mst@redhat.com>,
+ Brett Creeley <bcreeley@amd.com>,
+ Ratheesh  Kannoth <rkannoth@marvell.com>,
+ Alexander Lobakin <aleksander.lobakin@intel.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+ Tal  Gilboa <talgi@nvidia.com>,
+ Jonathan Corbet <corbet@lwn.net>,
+ linux-doc@vger.kernel.org,
+ Maxime Chevallier <maxime.chevallier@bootlin.com>,
+ Jiri Pirko <jiri@resnulli.us>,
+ Paul  Greenwalt <paul.greenwalt@intel.com>,
+ Ahmed Zaki <ahmed.zaki@intel.com>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>,
+ Kory Maincent <kory.maincent@bootlin.com>,
+ Andrew Lunn <andrew@lunn.ch>,
+ "justinstitt @  google . com" <justinstitt@google.com>
+References: <20240425165948.111269-1-hengqi@linux.alibaba.com>
+ <20240425165948.111269-3-hengqi@linux.alibaba.com>
+ <20240426183333.257ccae5@kernel.org>
+ <98ea9d4d-1a90-45b9-a4e0-6941969295be@linux.alibaba.com>
+ <20240429104741.3a628fe6@kernel.org>
+In-Reply-To: <20240429104741.3a628fe6@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
 
-On Fri, 26 Apr 2024 15:22:02 +0200 Przemek Kitszel wrote:
-> ## devlink resources (with current API)
-> `devlink resource` is compelling, partially given the name sounds like a
-> perfect match. But when we dig just a little bit, the current Path+sizes
-> (min,max,step) is totally off to what is the most elegant picture of the
-> situation. In order to fit into existing uAPI, I would need to register
-> VFs as PF's resource, then GLOBAL LUT and PF LUT as a sub resource to
-> that (each VF gets two entries under it; plus two additional ones for
-> PF) I don't like it, I also feel like there is not that much use of
-> current resources API (it's not natural to use it for distribution, only
-> for limitation).
+On Mon, 29 Apr 2024 10:47:41 -0700, Jakub Kicinski <kuba@kernel.org> wrote:
+> On Sun, 28 Apr 2024 22:49:09 +0800 Heng Qi wrote:
+> > >> +	nla_for_each_nested_type(nest, ETHTOOL_A_PROFILE_IRQ_MODERATION, nests, rem) {
+> > >> +		ret = nla_parse_nested(moder,
+> > >> +				       ARRAY_SIZE(coalesce_irq_moderation_policy) - 1,
+> > >> +				       nest, coalesce_irq_moderation_policy,
+> > >> +				       extack);
+> > >> +		if (ret)
+> > >> +			return ret;
+> > >> +
+> > >> +		if (!NL_REQ_ATTR_CHECK(extack, nest, moder, ETHTOOL_A_IRQ_MODERATION_USEC)) {
+> > >> +			if (irq_moder->coal_flags & DIM_COALESCE_USEC)  
+> > > There are 3 options here, not 2:
+> > >
+> > > 	if (irq_moder->coal_flags & flag) {
+> > > 		if (NL_REQ_ATTR_CHECK())
+> > > 			val = nla_get_u32(...);
+> > > 		else
+> > > 			return -EINVAL;
+> > > 	} else {
+> > > 		if (moder[attr_type)) {
+> > > 			BAD_ATTR()
+> > > 			return -EOPNOTSUPP;
+> > > 		}
+> > > 	}  
+> > 
+> > Maybe we missed something.
+> > 
+> > As shown in the commit log, the user is allowed to modify only
+> > a certain fields in irq-moderation. It is assumed that the driver
+> > supports modification of usec and pkts, but the user may only
+> > modify usec and only fill in the usec attr.
+> > 
+> > Therefore, the kernel only gets usec attr here. Of course, the user
+> > may have passed in 5 groups of "n, n, n", which means that nothing
+> > is modified, and rx_profile and irq_moderation attrs are all empty.
+> 
+> What you describe sounds good, but it's not what the code seems to be
+> doing. NL_REQ_ATTR_CHECK() will set an error attribute if the attr is
+> not present.
 
-Can you share more on how that would look like?=20
+So here we can use:
 
-=46rom the description it does not sound so bad. Maybe with some CLI / UI
-changes it will be fine?
++ if (moder[ETHTOOL_A_IRQ_MODERATION_USEC]) {
++ 	if (irq_moder->coal_flags & DIM_COALESCE_USEC)
++ 		new_profile[i].usec =
++ 			nla_get_u32(moder[ETHTOOL_A_IRQ_MODERATION_USEC]);
++ 	else
++ 		return -EOPNOTSUPP;
++ }
 
-> ## devlink resources (with extended API)
-> It is possible to extend current `devlink resource` so instead of only
-> Path+size, there would be also Path+Owner option to use.
-> The default state for ice driver would be that PFs owns PF LUTs, GLOBAL
-> LUTs are all free.
->=20
-> example proposed flow to assign a GLOBAL LUT to VF0 and PF LUT to VF1:
-> pf=3D0000:03:00.0  # likely more meaningful than VSI idx, but open for
-> vf0=3D0000:03:00.1 #                                       suggestions
-> vf1=3D0000:03:00.2
-> devlink resource set pci/$pf path /lut/lut_table_512 owner $pf
-> devlink resource set pci/$pf path /lut/lut_table_2048 owner free
-> devlink resource set pci/$pf path /lut/lut_table_512 owner $vf0
-> devlink resource set pci/$pf path /lut/lut_table_2048 owner $vf1
+instead of:
 
-Don't we want some level of over-subscription to be allowed?
++ if (!NL_REQ_ATTR_CHECK(extack, nest, moder, ETHTOOL_A_IRQ_MODERATION_USEC)) {
++ 	if (irq_moder->coal_flags & DIM_COALESCE_USEC)
++ 		new_profile[i].usec =
++ 			nla_get_u32(moder[ETHTOOL_A_IRQ_MODERATION_USEC]);
++ 	else
++ 		return -EOPNOTSUPP;
++ }
+
+to avoid missing information set in extack?
+
+Thanks.
 
