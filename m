@@ -1,159 +1,195 @@
-Return-Path: <netdev+bounces-92439-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92440-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF05C8B75C6
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 14:33:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2AA48B75E0
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 14:39:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 26E281C21D6F
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 12:33:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 52EA31F2271F
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 12:39:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2D9417106C;
-	Tue, 30 Apr 2024 12:33:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 550F3171093;
+	Tue, 30 Apr 2024 12:38:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bcrZ10J7"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Tfv5ePqd"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4E7E38C;
-	Tue, 30 Apr 2024 12:33:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC9D017107A
+	for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 12:38:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714480399; cv=none; b=mfj4ZPe0MFHmoJVhmJp3BDTvU98vBL29e2TimK+VcgGPaOu7cmzQ0Ardoa015TxPYJMwdSAYhgb4y4BQebTceW0NAg8PSXomMeC8h5kld6V7/pC9e7ti0KeHdJ9Hyo096N/MmHkYZ7p5QogAfGt/bD3TNRomBptnKAm/KjVM83o=
+	t=1714480734; cv=none; b=cgdg9hHXDJvPNFlDiEB6pLlW3boDHxpQ9uv7xhkcOS3QIBTW44Yg3t+DxKf0oZEl6f8191sZRwz78LLTC4sFr4h8N1n8u/gM344rRJqK4xrPb+JxdUi7SkGW/j+nCLuvPexNJrkS8WWxYcamKwKv9cHV/2uKoVw5TKGEg0E6ibo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714480399; c=relaxed/simple;
-	bh=/LnjZchm5qf6ZsVqluE2uSwA/wQzWbCi7cL/XRfoVfM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hpe6GY88BPfEoHruY8wAg6Tg0f90DT4DeOysqkpuvxIxFARPFhxW4h3hZcwZH80tvuT/iAUzUHHKBLT49Vl2HrvEEmiZwSUqVNuEe73MR7iNiT0LXicIfTyj3PfXi2RhtbqZM/BILxnTgmgxQLW92pG8APt6ZLz+DDnrzQa0OVM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bcrZ10J7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62F33C2BBFC;
-	Tue, 30 Apr 2024 12:33:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714480399;
-	bh=/LnjZchm5qf6ZsVqluE2uSwA/wQzWbCi7cL/XRfoVfM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=bcrZ10J7HZw1Ti6R6KrcCQovLk25aS7vWWFHkg6qT5bFvMbJpcrgxNGW1yreFttky
-	 oT2lqPHSWiCraxSV9D7ehxQKSWcDAxusOKK9VJY1cTGnG42I9woJiDJVGiybY86oQ3
-	 ZMXhxqZNCZGcQsW5oPB+vEkXa3+MXJvcLhvk2BHp/8F5zueIuA+MUOR0rQxNbcKPA4
-	 NWZhC0p/Vko9J0y5CiUXFSj0HZEt0OqvQ7rYpPDq7SVR0k9AyFCNAknYogpy8kYXi/
-	 ep88yWYPnthf1NSiljI4mrpTIbsG44E9jqp7xM/imSjeB7uZL2enjb2z3TtdHFJt/1
-	 8ITiF7Ah5JNuA==
-Date: Tue, 30 Apr 2024 15:33:14 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Joe Damato <jdamato@fastly.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, tariqt@nvidia.com, saeedm@nvidia.com,
-	mkarsten@uwaterloo.ca, gal@nvidia.com, nalramli@fastly.com,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	"open list:MELLANOX MLX4 core VPI driver" <linux-rdma@vger.kernel.org>
-Subject: Re: [PATCH net-next 3/3] net/mlx4: support per-queue statistics via
- netlink
-Message-ID: <20240430123314.GC100414@unreal>
-References: <20240423194931.97013-1-jdamato@fastly.com>
- <20240423194931.97013-4-jdamato@fastly.com>
- <Zig5RZOkzhGITL7V@LQ3V64L9R2>
- <20240423175718.4ad4dc5a@kernel.org>
- <ZiieqiuqNiy_W0mr@LQ3V64L9R2>
- <20240424072818.2c68a1ab@kernel.org>
- <Zik1zCI9W9EUi13T@LQ3V64L9R2>
- <ZiqFUs-z5We2--5n@LQ3V64L9R2>
+	s=arc-20240116; t=1714480734; c=relaxed/simple;
+	bh=J69lym4Y1ijVS2l3VccQr4VnjGIc/ffT+ZVFdcU/Cg8=;
+	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=JB2+rA6wzyz4uCMFEX1NwflO0QcTSZXc68LroNtWu/KTl3Yq3jy/XuFakpnqs5ZGcKHZXaY+xaWqVBvRbXLU7sJ8Cs9JQrIm/f8v8yGzTNVPoo6ZlLbDPe6YxhsUCpQBvUePT6HWV/K4zBMLvYsK89DTPcO1YTSNOH05luaGafk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Tfv5ePqd; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1714480731;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=jTsVsZGEpgTzoqVRCmrDFKCPKwoBHLuOSJ7Pzk7+PZg=;
+	b=Tfv5ePqdw18/jWTfsBDO0MNOwJrKglJDIBVN/APBazgsTaFkIjGgSKyWL07LJwp5wcpzxZ
+	MVn8lrKj/v6NJvLSLqdMR9HKFKUDyrf30YIZKlte1btTiIB1cRqfzBYdRlj2Y/p3vJOc2D
+	tZRVbuLDEJ6/qnDavvyik9GhKDFYW80=
+Received: from mail-pf1-f197.google.com (mail-pf1-f197.google.com
+ [209.85.210.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-641-7Qvfp52OOkK5Ogwu8JhcFw-1; Tue, 30 Apr 2024 08:38:49 -0400
+X-MC-Unique: 7Qvfp52OOkK5Ogwu8JhcFw-1
+Received: by mail-pf1-f197.google.com with SMTP id d2e1a72fcca58-6ed4298be39so4238806b3a.3
+        for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 05:38:49 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714480728; x=1715085528;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=jTsVsZGEpgTzoqVRCmrDFKCPKwoBHLuOSJ7Pzk7+PZg=;
+        b=EH073eZkswVBm45u63HOlKqoK6H047Bb3nnPJLr4Zap8CE+Xxh7qB7HRiaiPppjhsi
+         Ry03PWGmFcEy7p0hAV4KuU2Id/7gdqn2XSWFG5eXPI/uSa5/A+6ZAHoX77UYdbFOhUFk
+         AElbB09UFL+g50jlhke7gqqKh6tWAymqxZDHcb7ep+dwyG1ZyoZ0koKFItey/jDUD1MN
+         I9xvD2T5wtLODMTzVUnmgMZbZyMs0sqG0euwIdu8ckwMBcono1ct5cZAr83lWQYsYC4W
+         PUCthTiY1YmXCKnGtTmT9hPzv396+wIUX0+K2lcRPrqOKUjmSU4eR0k3dZRWlnG3/5Ip
+         M9gA==
+X-Gm-Message-State: AOJu0Yz2QYvkHPo096sxJVUrkymkAc6UBKa80ZIGtURFs9XzUfeGzGWN
+	FnAZBbS8EsAhrbOi16GT0Jdal27A3l+p6ZKEXsMI2iEjl3TzOX4Ej6YOpJqw8nevjqihpNrv7tk
+	zS3EUf14K7x9m2ffQQ3deAMKxU1FP8AgkKYpvfL5YZ0sZuuBE653ELQ==
+X-Received: by 2002:a05:6a00:2352:b0:6ed:1c7:8c5d with SMTP id j18-20020a056a00235200b006ed01c78c5dmr2762956pfj.12.1714480728002;
+        Tue, 30 Apr 2024 05:38:48 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFztMv0UxyXJZbWLLW1L8xXAYOsfxU9m0GCXL6tXtHNGq5aaCWWYqCJstyFzENtRXtCfOyBPA==
+X-Received: by 2002:a05:6a00:2352:b0:6ed:1c7:8c5d with SMTP id j18-20020a056a00235200b006ed01c78c5dmr2762929pfj.12.1714480727495;
+        Tue, 30 Apr 2024 05:38:47 -0700 (PDT)
+Received: from localhost ([240d:1a:c0d:9f00:523b:c871:32d4:ccd0])
+        by smtp.gmail.com with ESMTPSA id km3-20020a056a003c4300b006eaa21301a7sm21009112pfb.162.2024.04.30.05.38.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 30 Apr 2024 05:38:47 -0700 (PDT)
+Date: Tue, 30 Apr 2024 21:38:40 +0900 (JST)
+Message-Id: <20240430.213840.1150978152260555051.syoshida@redhat.com>
+To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ syoshida@redhat.com, syzkaller@googlegroups.com
+Subject: Re: [PATCH net] ipv4: Fix uninit-value access in __ip_make_skb()
+From: Shigeru Yoshida <syoshida@redhat.com>
+In-Reply-To: <20240429151605.2055465-1-syoshida@redhat.com>
+References: <20240429151605.2055465-1-syoshida@redhat.com>
+X-Mailer: Mew version 6.9 on Emacs 29.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZiqFUs-z5We2--5n@LQ3V64L9R2>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 
-On Thu, Apr 25, 2024 at 09:31:14AM -0700, Joe Damato wrote:
-> On Wed, Apr 24, 2024 at 09:39:43AM -0700, Joe Damato wrote:
-> > On Wed, Apr 24, 2024 at 07:28:18AM -0700, Jakub Kicinski wrote:
-> > > On Tue, 23 Apr 2024 22:54:50 -0700 Joe Damato wrote:
-> > > > On Tue, Apr 23, 2024 at 05:57:18PM -0700, Jakub Kicinski wrote:
-> > > > > On Tue, 23 Apr 2024 12:42:13 -1000 Joe Damato wrote:  
-> > > > > > I realized in this case, I'll need to set the fields initialized to 0xff
-> > > > > > above to 0 before doing the increments below.  
-> > > > > 
-> > > > > I don't know mlx4 very well, but glancing at the code - are you sure we
-> > > > > need to loop over the queues is the "base" callbacks?
-> > > > > 
-> > > > > The base callbacks are for getting "historical" data, i.e. info which
-> > > > > was associated with queues which are no longer present. You seem to
-> > > > > sweep all queues, so I'd have expected "base" to just set the values 
-> > > > > to 0. And the real values to come from the per-queue callbacks.  
-> > > > 
-> > > > Hmm. Sorry I must have totally misunderstood what the purpose of "base"
-> > > > was. I've just now more closely looked at bnxt which (maybe?) is the only
-> > > > driver that implements base and I think maybe I kind of get it now.
-> > > > 
-> > > > For some reason, I thought it meant "the total stats of all queues"; I didn't
-> > > > know it was intended to provide "historical" data as you say.
-> > > > 
-> > > > Making it set everything to 0 makes sense to me. I suppose I could also simply
-> > > > omit it? What do you think?
-> > > 
-> > > The base is used to figure out which stats are reported when we dump 
-> > > a summary for the whole device. So you gotta set them to 0.
-> > 
-> > OK, thanks for your patience and the explanation. Will do.
-> > 
-> > > > > The init to 0xff looks quite sus.  
-> > > > 
-> > > > Yes the init to 0xff is wrong, too. I noticed that, as well.
-> > > > 
-> > > > Here's what I have listed so far in my changelog for the v2 (which I haven't
-> > > > sent yet), but perhaps the maintainers of mlx4 can weigh in?
-> > > > 
-> > > > v1 -> v2:
-> > > >  - Patch 1/3 now initializes dropped to 0.
-> > > >  - Patch 3/3 includes several changes:
-> > > >    - mlx4_get_queue_stats_rx and mlx4_get_queue_stats_tx check if i is
-> > > >      valid before proceeding.
-> > > >    - All initialization to 0xff for stats fields has been omit. The
-> > > >      network stack does this before calling into the driver functions, so
-> > > >      I've adjusted the driver functions to only set values if there is
-> > > >      data to set, leaving the network stack's 0xff in place if not.
-> > > >    - mlx4_get_base_stats sets all stats to 0 (no locking etc needed).
-> > > 
-> > > All the ones you report right? Not just zero the struct.
-> > > Any day now (tm) someone will add a lot more stats to the struct
-> > > so the init should be selective only to the stats that are actually
-> > > supported.
-> > 
-> > Yes, not just zero the struct. Since I am reporting bytes packets for both
-> > RX and TX and alloc_fail for RX I'll be setting those fields to 0
-> > explicitly.
-> > 
-> > And there's also a warning about unused qtype (oops) in patch 2/3.
-> > 
-> > So, the revised v2 list (pending anything Mellanox wants) is:
-> > 
-> >   v1 -> v2:
-> >    - Patch 1/3 now initializes dropped to 0.
-> >    - Patch 2/3 fix use of unitialized qtype warning.
-> >    - Patch 3/3 includes several changes:
-> >      - mlx4_get_queue_stats_rx and mlx4_get_queue_stats_tx check if i is
-> >        valid before proceeding.
-> >      - All initialization to 0xff for stats fields has been omit. The
-> >        network stack does this before calling into the driver functions, so
-> >        I've adjusted the driver functions to only set values if there is
-> >        data to set, leaving the network stack's 0xff in place if not.
-> >      - mlx4_get_base_stats set all stat fields to 0 individually (no locking etc needed).
-> > 
-> > I'll hold off on sending this v2 until we hear back from Mellanox to be
-> > sure there isn't anything else I'm missing.
+Sorry, I forgot to add "v2" to the prefix. I will repost this.
+
+On Tue, 30 Apr 2024 00:16:05 +0900, Shigeru Yoshida wrote:
+> KMSAN reported uninit-value access in __ip_make_skb() [1].  __ip_make_skb()
+> tests HDRINCL to know if the skb has icmphdr. However, HDRINCL can cause a
+> race condition. If calling setsockopt(2) with IP_HDRINCL changes HDRINCL
+> while __ip_make_skb() is running, the function will access icmphdr in the
+> skb even if it is not included. This causes the issue reported by KMSAN.
 > 
-> It's been a few days and I haven't heard back from the mlx4 folks, so I
-> think I'll probably send my v2 later today which, hopefully, will fix most
-> of the above issues.
+> Check FLOWI_FLAG_KNOWN_NH on fl4->flowi4_flags instead of testing HDRINCL
+> on the socket.
+> 
+> Also, fl4->fl4_icmp_type and fl4->fl4_icmp_code are not initialized. These
+> are union in struct flowi4 and are implicitly initialized by
+> flowi4_init_output(), but we should not rely on specific union layout.
+> 
+> Initialize these explicitly in raw_sendmsg().
+> 
+> [1]
+> BUG: KMSAN: uninit-value in __ip_make_skb+0x2b74/0x2d20 net/ipv4/ip_output.c:1481
+>  __ip_make_skb+0x2b74/0x2d20 net/ipv4/ip_output.c:1481
+>  ip_finish_skb include/net/ip.h:243 [inline]
+>  ip_push_pending_frames+0x4c/0x5c0 net/ipv4/ip_output.c:1508
+>  raw_sendmsg+0x2381/0x2690 net/ipv4/raw.c:654
+>  inet_sendmsg+0x27b/0x2a0 net/ipv4/af_inet.c:851
+>  sock_sendmsg_nosec net/socket.c:730 [inline]
+>  __sock_sendmsg+0x274/0x3c0 net/socket.c:745
+>  __sys_sendto+0x62c/0x7b0 net/socket.c:2191
+>  __do_sys_sendto net/socket.c:2203 [inline]
+>  __se_sys_sendto net/socket.c:2199 [inline]
+>  __x64_sys_sendto+0x130/0x200 net/socket.c:2199
+>  do_syscall_64+0xd8/0x1f0 arch/x86/entry/common.c:83
+>  entry_SYSCALL_64_after_hwframe+0x6d/0x75
+> 
+> Uninit was created at:
+>  slab_post_alloc_hook mm/slub.c:3804 [inline]
+>  slab_alloc_node mm/slub.c:3845 [inline]
+>  kmem_cache_alloc_node+0x5f6/0xc50 mm/slub.c:3888
+>  kmalloc_reserve+0x13c/0x4a0 net/core/skbuff.c:577
+>  __alloc_skb+0x35a/0x7c0 net/core/skbuff.c:668
+>  alloc_skb include/linux/skbuff.h:1318 [inline]
+>  __ip_append_data+0x49ab/0x68c0 net/ipv4/ip_output.c:1128
+>  ip_append_data+0x1e7/0x260 net/ipv4/ip_output.c:1365
+>  raw_sendmsg+0x22b1/0x2690 net/ipv4/raw.c:648
+>  inet_sendmsg+0x27b/0x2a0 net/ipv4/af_inet.c:851
+>  sock_sendmsg_nosec net/socket.c:730 [inline]
+>  __sock_sendmsg+0x274/0x3c0 net/socket.c:745
+>  __sys_sendto+0x62c/0x7b0 net/socket.c:2191
+>  __do_sys_sendto net/socket.c:2203 [inline]
+>  __se_sys_sendto net/socket.c:2199 [inline]
+>  __x64_sys_sendto+0x130/0x200 net/socket.c:2199
+>  do_syscall_64+0xd8/0x1f0 arch/x86/entry/common.c:83
+>  entry_SYSCALL_64_after_hwframe+0x6d/0x75
+> 
+> CPU: 1 PID: 15709 Comm: syz-executor.7 Not tainted 6.8.0-11567-gb3603fcb79b1 #25
+> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.3-1.fc39 04/01/2014
+> 
+> Fixes: 99e5acae193e ("ipv4: Fix potential uninit variable access bug in __ip_make_skb()")
+> Reported-by: syzkaller <syzkaller@googlegroups.com>
+> Signed-off-by: Shigeru Yoshida <syoshida@redhat.com>
+> ---
+> v1->v2: https://lore.kernel.org/all/20240324050554.1609460-1-syoshida@redhat.com/
+> - Explicitly initialize fl4->fl4_icmp_type and fl4->fl4_icmp_code because
+>   we should not rely on a specific union layout.
+> ---
+>  net/ipv4/ip_output.c | 2 +-
+>  net/ipv4/raw.c       | 3 +++
+>  2 files changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/net/ipv4/ip_output.c b/net/ipv4/ip_output.c
+> index 1fe794967211..39229fd0601a 100644
+> --- a/net/ipv4/ip_output.c
+> +++ b/net/ipv4/ip_output.c
+> @@ -1473,7 +1473,7 @@ struct sk_buff *__ip_make_skb(struct sock *sk,
+>  		 * by icmp_hdr(skb)->type.
+>  		 */
+>  		if (sk->sk_type == SOCK_RAW &&
+> -		    !inet_test_bit(HDRINCL, sk))
+> +		    !(fl4->flowi4_flags & FLOWI_FLAG_KNOWN_NH))
+>  			icmp_type = fl4->fl4_icmp_type;
+>  		else
+>  			icmp_type = icmp_hdr(skb)->type;
+> diff --git a/net/ipv4/raw.c b/net/ipv4/raw.c
+> index dcb11f22cbf2..4cb43401e0e0 100644
+> --- a/net/ipv4/raw.c
+> +++ b/net/ipv4/raw.c
+> @@ -612,6 +612,9 @@ static int raw_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
+>  			    (hdrincl ? FLOWI_FLAG_KNOWN_NH : 0),
+>  			   daddr, saddr, 0, 0, sk->sk_uid);
+>  
+> +	fl4.fl4_icmp_type = 0;
+> +	fl4.fl4_icmp_code = 0;
+> +
+>  	if (!hdrincl) {
+>  		rfv.msg = msg;
+>  		rfv.hlen = 0;
+> -- 
+> 2.44.0
+> 
 
-MLNX folks were in long vacation in last two weeks.
-
-Thanks
 
