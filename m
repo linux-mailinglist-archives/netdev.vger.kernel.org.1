@@ -1,121 +1,184 @@
-Return-Path: <netdev+bounces-92410-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92412-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 758378B6F99
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 12:24:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E03B8B6FA4
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 12:27:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2B4CA28213D
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 10:24:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 77B4D1C21A85
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 10:27:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E84B14265E;
-	Tue, 30 Apr 2024 10:24:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D0B713D240;
+	Tue, 30 Apr 2024 10:27:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TOjh1CgJ"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b="eMII8GUm"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from nbd.name (nbd.name [46.4.11.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC9B41422B0
-	for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 10:24:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62A09129A7B;
+	Tue, 30 Apr 2024 10:27:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.4.11.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714472644; cv=none; b=gK5XV9dhkAAVxHf1la5eiTGfKsG6d1bw1/jJNx/ofRfGUcKpxq4G8NGye3VmZRsjRX2ys96X0edNFDw6fLw8XWVOXxa7IC582jfHHiwiuWNMExUnchXyVg7CBXHF+hHM37w9vdonl58ciRSgKkjsMqi04l+uyUWC/nFeqKN77qE=
+	t=1714472868; cv=none; b=Lu/I7gYi6+A4zjhBovp9sdib8lljtseQ1esWXlkZqjBiwegV8sB1Sp41S5S/tLsqXvy9XMFG3MR+LeF6+SeKxD003qSMcsWvh8VaS/cRfyQM5GxM/pYLDD8ARmLNEaOwI41wvITe3VmGdFkZfkdeRMvxgAsJd4ypsqiSDlQMenw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714472644; c=relaxed/simple;
-	bh=EWsnYTb8ObHYFQO3n5zSeiUbnlRAhkKyZ8gGTPZUel8=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=dCf2A4M3/HIzhzBqjz8DbMO2AOetXgC+dv4gkAQRxsezIEorEUyUzp1aY4F8SUNdw6CU/q4CGWQmj8iDspUfFFFzq5IAJDM+ALTMI4McOj05aOJWdWvR1BKiw1GDI6ikF0krz1zf7aDW9vFkphWQtsPBus87Z2DnxSnLusiShDY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TOjh1CgJ; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1714472641;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=HoMvHQIf3kwWAn8n55awTvRVi3mblb1ik2ynYaQVwYI=;
-	b=TOjh1CgJkgv2i++8Gvx+FwUmQh1ZYGq6NSbc9IIF6pNthB2hLdkUCVDMY0cV347pueILbV
-	CRedCXX/blzRIbrF1e92acgm6EGCkoezte+rtHFReRaUaKDfJUVqwEKG1f2QwJ78jk/EN0
-	nkvdHI9DZMCTql4mIUEXY8rN9amqUS8=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-297-TVHsLNNJOHGUtj-V59BilQ-1; Tue, 30 Apr 2024 06:23:59 -0400
-X-MC-Unique: TVHsLNNJOHGUtj-V59BilQ-1
-Received: by mail-ed1-f71.google.com with SMTP id 4fb4d7f45d1cf-57061bffdd0so588875a12.2
-        for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 03:23:59 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714472638; x=1715077438;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HoMvHQIf3kwWAn8n55awTvRVi3mblb1ik2ynYaQVwYI=;
-        b=nYe+B4sec4zPiqojfQqJq6Gkj8eTowh9tH/kGK+QsrW0nbsMc5VtMuZohUHoDX0YuU
-         LaZ2lqseXdPe4gpfzRGrD8bf+Kmv025RWQAkKOqnmoz4w11J8lXgYZWvLramdJIffWxG
-         bNhxRECS36hBPUIZl+Bw/e2b32bEAr2uDym13Bep7QxcPLbSuqJj+buz+kiy4Kl8Hv88
-         zZig6LZuPkV7rTElbPZEvi7A4LDJxipDLej0kqGqz0OSC/tgkF70orax2CIp9p7dPTDS
-         nLYVNzzmrqw4YqDl3E5of2LGz/jj17jRDNYc96QvJZJbbVZYfudYeDRinka4W9M22ARQ
-         Wwgg==
-X-Forwarded-Encrypted: i=1; AJvYcCVzRcJGfjGocRDO4k4Yh5Xu4n4ibp3aVgpJTXZZJA0LLLJzemnnwv+1CepC62e338GoqOW1oCY9xmrI+a4iMYM6jEcaAah5
-X-Gm-Message-State: AOJu0YzAWRkxep5DRvPAiExv5OQbyiBFmI4CQHtISr0aNh7iDSPkz3sz
-	NyWkzpW6P2IFsrs8kefVY0/KCKwH5uWTXQX6IpayJRdylgD4HcAUbUG2DEid2urFqQBzssg9trb
-	ad+j3BDDs3SYs8Btnp2YUsEcHKTD/JrIwIIT+2HtWYgUoGdQccNkvkw==
-X-Received: by 2002:a17:907:1b25:b0:a54:c11b:527c with SMTP id mp37-20020a1709071b2500b00a54c11b527cmr9262126ejc.4.1714472638616;
-        Tue, 30 Apr 2024 03:23:58 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFqEVOD4qONhRO6MC8+pXVZeUlLb0CwvISVU8ZpU0JbpVxfZ9I14QZU7Ht4cv328wNCvjQlKg==
-X-Received: by 2002:a17:907:1b25:b0:a54:c11b:527c with SMTP id mp37-20020a1709071b2500b00a54c11b527cmr9262110ejc.4.1714472638212;
-        Tue, 30 Apr 2024 03:23:58 -0700 (PDT)
-Received: from gerbillo.redhat.com ([2a0d:3341:b0ae:6a10::f71])
-        by smtp.gmail.com with ESMTPSA id y20-20020a170906471400b00a58db2429b5sm4501364ejq.111.2024.04.30.03.23.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Apr 2024 03:23:57 -0700 (PDT)
-Message-ID: <2c48e13a26c55abf8e2199cae3b8b19596a419ec.camel@redhat.com>
-Subject: Re: [PATCH v4 net-next v4 2/6] net: add support for segmenting TCP
- fraglist GSO packets
-From: Paolo Abeni <pabeni@redhat.com>
-To: Felix Fietkau <nbd@nbd.name>, netdev@vger.kernel.org, Eric Dumazet
- <edumazet@google.com>, "David S. Miller" <davem@davemloft.net>, David Ahern
- <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>
-Cc: willemdebruijn.kernel@gmail.com, linux-kernel@vger.kernel.org
-Date: Tue, 30 Apr 2024 12:23:56 +0200
-In-Reply-To: <20240427182305.24461-3-nbd@nbd.name>
-References: <20240427182305.24461-1-nbd@nbd.name>
-	 <20240427182305.24461-3-nbd@nbd.name>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
+	s=arc-20240116; t=1714472868; c=relaxed/simple;
+	bh=qrAZSPLY9V2e06HjvA6dDash3QU5DWCWBNfcSaTwLlk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=j/4lqDFI5d5ZebB9j/CaDGUmXb7OHuBdwAIV5/k+dtmX9XaDVMQ/l4tGCWpURnIqWmIWrdpJcE67uh4CxYcYc5BMzSXJlSXOGuwMTibM4ExeNtPkpbT5rNbj5wg+Djv4h1lUTvEOM6ymZ8+wVs0OaLH51Ar0wwmSEwiOG/dXeDA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nbd.name; spf=none smtp.mailfrom=nbd.name; dkim=pass (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b=eMII8GUm; arc=none smtp.client-ip=46.4.11.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nbd.name
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=nbd.name
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=nbd.name;
+	s=20160729; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+	References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender:Reply-To:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=m9GOdwLtpGgxawicx0NC7KEnv3fWXOtUkoh5EDjZVXU=; b=eMII8GUmErLDjMspTFvaSuFQ8F
+	lvhUXbYeHhp2ihgR5wtRfChJ9L4wEiZ3K2AAwDjDCztrpWzqad3Umva32I0nlpQbwxt4RL7QzK5Mb
+	aHug0jQawIytTEU+2cQWYmTOY1R792jBUe3mDEbDGlpuUnwCE0NlrKmVggK9ugjs0w/c=;
+Received: from p54ae9c93.dip0.t-ipconnect.de ([84.174.156.147] helo=nf.local)
+	by ds12 with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.96)
+	(envelope-from <nbd@nbd.name>)
+	id 1s1ki4-00AEZo-32;
+	Tue, 30 Apr 2024 12:27:41 +0200
+Message-ID: <9e686cb4-ed1f-4886-a0b7-328367e62757@nbd.name>
+Date: Tue, 30 Apr 2024 12:27:40 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 net-next v4 2/6] net: add support for segmenting TCP
+ fraglist GSO packets
+To: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ Eric Dumazet <edumazet@google.com>, "David S. Miller" <davem@davemloft.net>,
+ David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>
+Cc: willemdebruijn.kernel@gmail.com, linux-kernel@vger.kernel.org
+References: <20240427182305.24461-1-nbd@nbd.name>
+ <20240427182305.24461-3-nbd@nbd.name>
+ <a20a0f0479cedc7f2f6abaf26e46ca7642e70958.camel@redhat.com>
+Content-Language: en-US
+From: Felix Fietkau <nbd@nbd.name>
+Autocrypt: addr=nbd@nbd.name; keydata=
+ xsDiBEah5CcRBADIY7pu4LIv3jBlyQ/2u87iIZGe6f0f8pyB4UjzfJNXhJb8JylYYRzIOSxh
+ ExKsdLCnJqsG1PY1mqTtoG8sONpwsHr2oJ4itjcGHfn5NJSUGTbtbbxLro13tHkGFCoCr4Z5
+ Pv+XRgiANSpYlIigiMbOkide6wbggQK32tC20QxUIwCg4k6dtV/4kwEeiOUfErq00TVqIiEE
+ AKcUi4taOuh/PQWx/Ujjl/P1LfJXqLKRPa8PwD4j2yjoc9l+7LptSxJThL9KSu6gtXQjcoR2
+ vCK0OeYJhgO4kYMI78h1TSaxmtImEAnjFPYJYVsxrhay92jisYc7z5R/76AaELfF6RCjjGeP
+ wdalulG+erWju710Bif7E1yjYVWeA/9Wd1lsOmx6uwwYgNqoFtcAunDaMKi9xVQW18FsUusM
+ TdRvTZLBpoUAy+MajAL+R73TwLq3LnKpIcCwftyQXK5pEDKq57OhxJVv1Q8XkA9Dn1SBOjNB
+ l25vJDFAT9ntp9THeDD2fv15yk4EKpWhu4H00/YX8KkhFsrtUs69+vZQwc0cRmVsaXggRmll
+ dGthdSA8bmJkQG5iZC5uYW1lPsJgBBMRAgAgBQJGoeQnAhsjBgsJCAcDAgQVAggDBBYCAwEC
+ HgECF4AACgkQ130UHQKnbvXsvgCgjsAIIOsY7xZ8VcSm7NABpi91yTMAniMMmH7FRenEAYMa
+ VrwYTIThkTlQzsFNBEah5FQQCACMIep/hTzgPZ9HbCTKm9xN4bZX0JjrqjFem1Nxf3MBM5vN
+ CYGBn8F4sGIzPmLhl4xFeq3k5irVg/YvxSDbQN6NJv8o+tP6zsMeWX2JjtV0P4aDIN1pK2/w
+ VxcicArw0VYdv2ZCarccFBgH2a6GjswqlCqVM3gNIMI8ikzenKcso8YErGGiKYeMEZLwHaxE
+ Y7mTPuOTrWL8uWWRL5mVjhZEVvDez6em/OYvzBwbkhImrryF29e3Po2cfY2n7EKjjr3/141K
+ DHBBdgXlPNfDwROnA5ugjjEBjwkwBQqPpDA7AYPvpHh5vLbZnVGu5CwG7NAsrb2isRmjYoqk
+ wu++3117AAMFB/9S0Sj7qFFQcD4laADVsabTpNNpaV4wAgVTRHKV/kC9luItzwDnUcsZUPdQ
+ f3MueRJ3jIHU0UmRBG3uQftqbZJj3ikhnfvyLmkCNe+/hXhPu9sGvXyi2D4vszICvc1KL4RD
+ aLSrOsROx22eZ26KqcW4ny7+va2FnvjsZgI8h4sDmaLzKczVRIiLITiMpLFEU/VoSv0m1F4B
+ FtRgoiyjFzigWG0MsTdAN6FJzGh4mWWGIlE7o5JraNhnTd+yTUIPtw3ym6l8P+gbvfoZida0
+ TspgwBWLnXQvP5EDvlZnNaKa/3oBes6z0QdaSOwZCRA3QSLHBwtgUsrT6RxRSweLrcabwkkE
+ GBECAAkFAkah5FQCGwwACgkQ130UHQKnbvW2GgCeMncXpbbWNT2AtoAYICrKyX5R3iMAoMhw
+ cL98efvrjdstUfTCP2pfetyN
+In-Reply-To: <a20a0f0479cedc7f2f6abaf26e46ca7642e70958.camel@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Sat, 2024-04-27 at 20:22 +0200, Felix Fietkau wrote:
-> @@ -37,6 +101,9 @@ static struct sk_buff *tcp4_gso_segment(struct sk_buff=
- *skb,
->  	if (!pskb_may_pull(skb, sizeof(struct tcphdr)))
->  		return ERR_PTR(-EINVAL);
-> =20
-> +	if (skb_shinfo(skb)->gso_type & SKB_GSO_FRAGLIST)
-> +		return __tcp4_gso_segment_list(skb, features);
+On 30.04.24 12:19, Paolo Abeni wrote:
+> On Sat, 2024-04-27 at 20:22 +0200, Felix Fietkau wrote:
+>> Preparation for adding TCP fraglist GRO support. It expects packets to be
+>> combined in a similar way as UDP fraglist GSO packets.
+>> For IPv4 packets, NAT is handled in the same way as UDP fraglist GSO.
+>> 
+>> Signed-off-by: Felix Fietkau <nbd@nbd.name>
+>> ---
+>>  net/ipv4/tcp_offload.c   | 67 ++++++++++++++++++++++++++++++++++++++++
+>>  net/ipv6/tcpv6_offload.c | 58 ++++++++++++++++++++++++++++++++++
+>>  2 files changed, 125 insertions(+)
+>> 
+>> diff --git a/net/ipv4/tcp_offload.c b/net/ipv4/tcp_offload.c
+>> index fab0973f995b..affd4ed28cfe 100644
+>> --- a/net/ipv4/tcp_offload.c
+>> +++ b/net/ipv4/tcp_offload.c
+>> @@ -28,6 +28,70 @@ static void tcp_gso_tstamp(struct sk_buff *skb, unsigned int ts_seq,
+>>  	}
+>>  }
+>>  
+>> +static void __tcpv4_gso_segment_csum(struct sk_buff *seg,
+>> +				     __be32 *oldip, __be32 newip,
+>> +				     __be16 *oldport, __be16 newport)
+>> +{
+>> +	struct tcphdr *th;
+>> +	struct iphdr *iph;
+>> +
+>> +	if (*oldip == newip && *oldport == newport)
+>> +		return;
+>> +
+>> +	th = tcp_hdr(seg);
+>> +	iph = ip_hdr(seg);
+>> +
+>> +	inet_proto_csum_replace4(&th->check, seg, *oldip, newip, true);
+>> +	inet_proto_csum_replace2(&th->check, seg, *oldport, newport, false);
+>> +	*oldport = newport;
+>> +
+>> +	csum_replace4(&iph->check, *oldip, newip);
+>> +	*oldip = newip;
+>> +}
+>> +
+>> +static struct sk_buff *__tcpv4_gso_segment_list_csum(struct sk_buff *segs)
+>> +{
+>> +	const struct tcphdr *th;
+>> +	const struct iphdr *iph;
+>> +	struct sk_buff *seg;
+>> +	struct tcphdr *th2;
+>> +	struct iphdr *iph2;
+>> +
+>> +	seg = segs;
+>> +	th = tcp_hdr(seg);
+>> +	iph = ip_hdr(seg);
+>> +	th2 = tcp_hdr(seg->next);
+>> +	iph2 = ip_hdr(seg->next);
+>> +
+>> +	if (!(*(const u32 *)&th->source ^ *(const u32 *)&th2->source) &&
+>> +	    iph->daddr == iph2->daddr && iph->saddr == iph2->saddr)
+>> +		return segs;
+>> +
+>> +	while ((seg = seg->next)) {
+>> +		th2 = tcp_hdr(seg);
+>> +		iph2 = ip_hdr(seg);
+>> +
+>> +		__tcpv4_gso_segment_csum(seg,
+>> +					 &iph2->saddr, iph->saddr,
+>> +					 &th2->source, th->source);
+>> +		__tcpv4_gso_segment_csum(seg,
+>> +					 &iph2->daddr, iph->daddr,
+>> +					 &th2->dest, th->dest);
+>> +	}
+>> +
+>> +	return segs;
+>> +}
+> 
+> AFAICS, all the above is really alike the UDP side, except for the
+> transport header zero csum.
+> 
+> What about renaming the udp version of this helpers as 'tcpudpv4_...',
+> move them in common code, add an explicit argument for
+> 'zerocsum_allowed' and reuse such helper for both tcp and udp?
+> 
+> The same for the ipv6 variant.
 
-I'm sorry for the incremental feedback, I almost forgot.
+Wouldn't that make it more convoluted when taking into account that the 
+checksum field offset is different for tcp vs udp?
+How would you handle that?
 
-Possibly the above condition could deserve an unlikely() annotation?
-less relevant than for GRO case, but at least we have consistent
-handling of such flag.
-
-Thanks!
-
-Paolo
-
+- Felix
 
