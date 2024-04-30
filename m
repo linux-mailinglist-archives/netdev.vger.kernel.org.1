@@ -1,90 +1,151 @@
-Return-Path: <netdev+bounces-92522-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92523-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C67F68B7BEC
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 17:40:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2EC488B7BEF
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 17:40:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 657951F2273E
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 15:40:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DF5DF285E23
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 15:40:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0EFB14374B;
-	Tue, 30 Apr 2024 15:40:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF77B143756;
+	Tue, 30 Apr 2024 15:40:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="RLYwH+Dp"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Asu18Cpb"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41677770F2
-	for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 15:40:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BBDA770F2;
+	Tue, 30 Apr 2024 15:40:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714491626; cv=none; b=B/SjokG7E4RFGb+ij3eRe/lPIavL3mAStbLXnoQ+lU8o8XpR/EnHu/ybmtgnZBuJ8qPKTmCzPnEMR6du6aVzg2ItWaXxVLHtmv4fhmU9TlU4sZAIW5/rGRVFuXZNYLYL1uFp/WnEb2tNDcRTKK1zLdBk6BIGti3UtFGaCnnvrQw=
+	t=1714491639; cv=none; b=XiG/smNoEsPZhMXbQTrPcsU1l+YgO+njy8KA/uGioWIF6vCUcaIYJoIaRL9EnlSb1/U+n0oB3AbqgVw9iOMjTDEWmmGLLBgcaMSJquwv/JkIAVY69ie1KW2ntt50TfXbZL6R9BzIL5beSxZg5lON9m1vcmtyqNUv3qE2DOKR/Xg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714491626; c=relaxed/simple;
-	bh=Kd2uGLlNLKqJ9a2/6nan6ocu5HJt0iiXyTMO0Yk0+aw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nrvEq1nnV98KfdzWmVrJ4gb/wJ+Hj3leFKpAcKQHoJM2ktnHQ5gcH0LLUDUmJbe/BalzynSMppc1yBAWnDSDMZjE1wo+P+VufZmQ6R4VyBGya8gz3DKCQSusC+TOWoax4rS1+LVaiFHn+6EbuMI/ndD+STB428lzfj6PFqpypjQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=RLYwH+Dp; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=c9ia+Qd3W7222wslcjcKdplaG/8RR+FF2nujhuEA0wU=; b=RLYwH+DpT2iAG6PAzqeDG9FIVC
-	KMoDsvs0W2jIhRTRyaxlrgscsHmoBtaxV+OFukErjRhnOb+FOlSh2oLSOYXLAOCl0qSaUOWRkHi7i
-	txupTGawteEhEzqfPyZPhu4DCNVw+zIzAakNf02xq6XAz49Z8TxTojrLgEBGH4LrhNrs=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1s1pad-00EM6m-4M; Tue, 30 Apr 2024 17:40:19 +0200
-Date: Tue, 30 Apr 2024 17:40:19 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>
-Cc: netdev@vger.kernel.org, jiri@resnulli.us, horms@kernel.org
-Subject: Re: [PATCH net-next v3 1/6] net: tn40xx: add pci driver for Tehuti
- Networks TN40xx chips
-Message-ID: <42a109d3-edce-42a6-bfcc-1924bb8ef8e7@lunn.ch>
-References: <20240429043827.44407-1-fujita.tomonori@gmail.com>
- <20240429043827.44407-2-fujita.tomonori@gmail.com>
+	s=arc-20240116; t=1714491639; c=relaxed/simple;
+	bh=3YMP6pSgBBioceZpWJJBMi0WiZgs2qMWAZjRqieBRIk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=VEfDCz78md7DoBYtkrBk5dAgVV8UhDcj25UxAULurhlQ6sZ6/QVO0yg2Gh7X8LjYp4SgwNRVh2YzwFv7jB1XYaYfDVvpqYfv8ZLL4AiSJJa5YCnDcNrwpk6w80XT13NrtAafn4B5PpSwE2GVCrtsIVbjr/m8HoIwklNXuomM+BY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Asu18Cpb; arc=none smtp.client-ip=217.70.183.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id C3CD71BF207;
+	Tue, 30 Apr 2024 15:40:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1714491629;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=o+cbSiCWqxupPEH7bg78CMjuOeT84VG73wF/YcMcoBg=;
+	b=Asu18CpbZFU7KZq8qT6sXy2TVSu2PEKElKdAxkrvGU3+Z/X9VRq3ii8G/8YyictrIDuCTh
+	rlTz5HRbXlhZPOLHfVNMEksHnkfieaypj8/AVwsMiLK/BmeUsNsfXIq3vqYsGEYchIt1qD
+	kwf5Xe8qWczC40Ddi/DM1Y+MVw0Yu8VQBPxeoDamtNuhTkHXE9LQTjUSPcZL/Nt6+KFt2B
+	avZf/aImihbeaH8tv20TcLrpTthuxQrrvI9JuUm/BOZReJ4bTW1mQj38LWUDCSIHvZr6F3
+	UXgL+HJGWG1b5kPauMm+s/BvrMiEPwVrx2HGSWaEsExoHbCsMDET/JPmX/Ty7A==
+Date: Tue, 30 Apr 2024 17:40:23 +0200
+From: Herve Codina <herve.codina@bootlin.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Thomas Gleixner <tglx@linutronix.de>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Lee Jones <lee@kernel.org>, Arnd Bergmann
+ <arnd@arndb.de>, Horatiu Vultur <horatiu.vultur@microchip.com>,
+ UNGLinuxDriver@microchip.com, Heiner Kallweit <hkallweit1@gmail.com>,
+ Russell King <linux@armlinux.org.uk>, Saravana Kannan
+ <saravanak@google.com>, Bjorn Helgaas <bhelgaas@google.com>, Philipp Zabel
+ <p.zabel@pengutronix.de>, Lars Povlsen <lars.povlsen@microchip.com>, Steen
+ Hegelund <Steen.Hegelund@microchip.com>, Daniel Machon
+ <daniel.machon@microchip.com>, Alexandre Belloni
+ <alexandre.belloni@bootlin.com>, linux-kernel@vger.kernel.org,
+ devicetree@vger.kernel.org, netdev@vger.kernel.org,
+ linux-pci@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Allan
+ Nielsen <allan.nielsen@microchip.com>, Luca Ceresoli
+ <luca.ceresoli@bootlin.com>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH 06/17] dt-bindings: net: mscc-miim: Add resets property
+Message-ID: <20240430174023.4d15a8a4@bootlin.com>
+In-Reply-To: <5d899584-38ed-4eee-9ba5-befdedbc5734@lunn.ch>
+References: <20240430083730.134918-1-herve.codina@bootlin.com>
+	<20240430083730.134918-7-herve.codina@bootlin.com>
+	<5d899584-38ed-4eee-9ba5-befdedbc5734@lunn.ch>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240429043827.44407-2-fujita.tomonori@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: herve.codina@bootlin.com
 
-> diff --git a/drivers/net/ethernet/tehuti/tn40.c b/drivers/net/ethernet/tehuti/tn40.c
-> new file mode 100644
-> index 000000000000..fe2c392abe31
-> --- /dev/null
-> +++ b/drivers/net/ethernet/tehuti/tn40.c
-> @@ -0,0 +1,56 @@
-> +// SPDX-License-Identifier: GPL-2.0+
-> +/* Copyright (c) Tehuti Networks Ltd. */
-> +
-> +#include "tn40.h"
+Hi Andrew,
 
-> +++ b/drivers/net/ethernet/tehuti/tn40.h
-> @@ -0,0 +1,14 @@
-> +/* SPDX-License-Identifier: GPL-2.0+ */
-> +/* Copyright (c) Tehuti Networks Ltd. */
-> +
-> +#ifndef _TN40_H_
-> +#define _TN40_H_
-> +
-> +#include <linux/module.h>
-> +#include <linux/pci.h>
+On Tue, 30 Apr 2024 15:55:58 +0200
+Andrew Lunn <andrew@lunn.ch> wrote:
 
-It is not the kernel style to hide standard headers within a header
-file. These includes should be in tn40.c.
+> On Tue, Apr 30, 2024 at 10:37:15AM +0200, Herve Codina wrote:
+> > Add the (optional) resets property.
+> > The mscc-miim device is impacted by the switch reset especially when the
+> > mscc-miim device is used as part of the LAN966x PCI device.
+> > 
+> > Signed-off-by: Herve Codina <herve.codina@bootlin.com>
+> > ---
+> >  Documentation/devicetree/bindings/net/mscc,miim.yaml | 8 ++++++++
+> >  1 file changed, 8 insertions(+)
+> > 
+> > diff --git a/Documentation/devicetree/bindings/net/mscc,miim.yaml b/Documentation/devicetree/bindings/net/mscc,miim.yaml
+> > index 5b292e7c9e46..a8c92cec85a6 100644
+> > --- a/Documentation/devicetree/bindings/net/mscc,miim.yaml
+> > +++ b/Documentation/devicetree/bindings/net/mscc,miim.yaml
+> > @@ -38,6 +38,14 @@ properties:
+> >  
+> >    clock-frequency: true
+> >  
+> > +  resets:
+> > +    items:
+> > +      - description: Reset controller used for switch core reset (soft reset)  
+> 
+> A follow up to the comment on the next patch. I think it should be
+> made clear in the patch and the binding, the aim is to reset the MDIO
+> bus master, not the switch. It just happens that the MDIO bus master
+> is within the domain of the switch core, and so the switch core reset
+> also resets the MDIO bus master.
 
-      Andrew
+Exactly.
+
+> 
+> Architecturally, this is important. I would not expect the MDIO driver
+> to be resetting the switch, the switch driver should be doing
+> that. But we have seen some odd Qualcomm patches where the MDIO driver
+> has been doing things outside the scope of MDIO, playing with resets
+> and clocks which are not directly related to the MDIO bus master. I
+> want to avoid any confusion here, especially when Qualcomm tries
+> again, and maybe points at this code.
+> 
+
+Sure.
+
+We have the same construction with the pinctrl driver used in the LAN966x
+  Documentation/devicetree/bindings/pinctrl/mscc,ocelot-pinctrl.yaml
+
+The reset name is 'switch' in the pinctrl binding.
+I can use the same description here as the one present in the pinctrl binding:
+  description: Optional shared switch reset.
+and keep 'switch' as reset name here (consistent with pinctrl reset name).
+
+What do you think about that ?
+
+Best regards,
+Hervé
+
+-- 
+Hervé Codina, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
 
