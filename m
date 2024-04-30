@@ -1,115 +1,114 @@
-Return-Path: <netdev+bounces-92416-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92417-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0B3E8B6FB7
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 12:32:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 120D58B6FBC
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 12:34:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0DC471C20E36
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 10:32:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A5AEA1F252D0
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 10:34:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57A3C12B176;
-	Tue, 30 Apr 2024 10:32:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF8E412BF32;
+	Tue, 30 Apr 2024 10:34:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="r36se5dJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [207.211.30.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 857DC27442
-	for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 10:32:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.211.30.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C7AA12B176
+	for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 10:34:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714473125; cv=none; b=tIGWqJcvjzCIWASi13D5y4tZkYgEfznzo6JqVzGATjjMtku65a/5UTOfibji/D/HrEU/FoQ1w+YWSLBjcGWBKC6u0q97mP1iqvLn+2Lw6B7xWBzhwFMR2UBp+SHBIyvGKkRthpk6jQPetuPSRc834UH9zmuu8C1Y4AxJv0u7hNQ=
+	t=1714473242; cv=none; b=AcNWUJ5+M24dGec92CvteJFhRRCHXawAbVdtqQFm2FJ5X0IPsGGK/Gn2y++tbjHcJmL11CiN03BB1RGy5pK1MkwHGZLBhgrnvbTjfDetH1PVGzpDsXSUikRw32Qj0WPC/49mpSuZkVUt5Vr6U0bHcHGbSvVjfi57/R5aEw9DNpo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714473125; c=relaxed/simple;
-	bh=5TRLQDv1fpVbGYlMV1LAqay1ymacRWAKNcukGSpcfUg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 In-Reply-To:Content-Type:Content-Disposition; b=nt1QKq2o/D4ahHipHEbn9+n5U42QYNCh2eBOGVmFzXYZLD8A4kb0b/rOJcBuBUxTJchosk402t0e7O2Gm+cgh06cmYaXcTkxgCO1G/P6BjbsuVZ3S/xL0snbZEqh+zwn2Vs0rDdmLGFr7GvJvuTfHfyo6QEdyUszgbKF9EfnPfI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=none smtp.mailfrom=queasysnail.net; arc=none smtp.client-ip=207.211.30.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=queasysnail.net
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-569-HCexMwtlPYygLWg2MVn3tQ-1; Tue,
- 30 Apr 2024 06:31:54 -0400
-X-MC-Unique: HCexMwtlPYygLWg2MVn3tQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9B80F38035A0;
-	Tue, 30 Apr 2024 10:31:53 +0000 (UTC)
-Received: from hog (unknown [10.39.193.137])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 409A21C060D0;
-	Tue, 30 Apr 2024 10:31:52 +0000 (UTC)
-Date: Tue, 30 Apr 2024 12:31:51 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org,
-	eric.dumazet@gmail.com
-Subject: Re: [PATCH net-next] inet: introduce dst_rtable() helper
-Message-ID: <ZjDIl3F2amAKLX02@hog>
-References: <20240429133009.1227754-1-edumazet@google.com>
+	s=arc-20240116; t=1714473242; c=relaxed/simple;
+	bh=uFm8Qgi91vGI3dt8K6sPdGExsyb2lsag5x2vqkD5m0o=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=n1lHHOGhQfbpdEMAZqYmwdU4aHSt9t7FpdIkZ3V6x/noTGduJ1KR9czHPR919cKzgCTHXxwFHLWwSYZeBinPag2NQUDnsLeBxZ3swSZN6fudrnYA9YY3UrI6soQMop64S72mJaqB3vQKT/mnJiYyR1N85h7ifcAngSLsDHvQ3yg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=r36se5dJ; arc=none smtp.client-ip=209.85.208.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-5727ce5b804so12430a12.0
+        for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 03:34:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1714473239; x=1715078039; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LMlLVgBu7y+Z1UA7TogJJjdkdi56Sm40tXjGRA7ggLo=;
+        b=r36se5dJQCKGcfsiBB0KPc2qk55NDdx4AomEXEz65ZfuiGL7KOqwsyGy4d0l7bpWHZ
+         KMF/XxGGXsq2Sp23VFet/2II3wMcf2+aW2wDlQDoxNES2itHGeaHmpu4UyRZnlOfs/hr
+         b9UW2W3Slatz9A+Tg0m4xxieq3k+dDgYjwcgxN60OmVOm9aH2ohbkATvhHR7qLGYdhsZ
+         BXTM5/gmahUf1BQb0mwK8hpGjmFC68ZZ0R+BqAzEoICQoO3c2TgaT6c5Tyt80tNgAojB
+         w8qad0Ip9OLmBGitCify/6AIO1lNYptdp4+gjACkXIFgPxHAzk7yzIDd+r2M1Z4iuAp1
+         //dQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714473239; x=1715078039;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=LMlLVgBu7y+Z1UA7TogJJjdkdi56Sm40tXjGRA7ggLo=;
+        b=WZjX17r7RBtbQDRheQiy7UhYtwot7hZyDIlsOGib9cXBXvcJyCOP0DNJpOYMQ2o3KR
+         JLF+3ytYShVaRFJaHho1+h/enmD3vy5PF2jqGwYg/xCHh8IbLvLfu99zjXotaoOxO12d
+         Efnn/lHKay2Bjc6kERNeIUbvHtzZSa8WHBSWTbeSHlGskKklDax0vyE1opz9DNCBciUG
+         MyYzVShdV1shcZUGaUy0av9xOXDLaXiUZi2MC6RmSosgWxXhj6jZc+ubat/dPG2fxf4U
+         bY0BQHxXb4TpOsYHrbkpZIMGEwcRXOSMm78eTi7Wkbe43Ig4radAqddgiojSw1+G3/ow
+         pGOg==
+X-Gm-Message-State: AOJu0Yz+Vf9kSU0DziMqIMXL8jAqxEw02JMtsLq6KSB8vAgC4+f0/W4V
+	aJxaf/liNiMnozdvr9aLGUV8Yh+1IPstoK19vVCrOfaAHcB2WKf4mZN+UyXXXiNVpQqfJhgiTCP
+	9hsT3K4TXDSmUP3PNna83Huz9TJw5Dg+M0JYu
+X-Google-Smtp-Source: AGHT+IEGoRSj77pAj1+8/T/SwwEZLP17Tgv8sozjKtTH7NkK88VClopgrecRadcPE+UqROtC1ej8ioxHLFgLfyHUHms=
+X-Received: by 2002:a05:6402:1cb9:b0:572:a1b1:1f99 with SMTP id
+ cz25-20020a0564021cb900b00572a1b11f99mr12520edb.1.1714473239040; Tue, 30 Apr
+ 2024 03:33:59 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240429133009.1227754-1-edumazet@google.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.7
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: queasysnail.net
-Content-Type: text/plain; charset=UTF-8
-Content-Disposition: inline
+References: <20240427182305.24461-1-nbd@nbd.name> <20240427182305.24461-7-nbd@nbd.name>
+In-Reply-To: <20240427182305.24461-7-nbd@nbd.name>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 30 Apr 2024 12:33:47 +0200
+Message-ID: <CANn89iKPrTktMF8EGV=o34ePe1vWcKHhBs71E0vOaymkhLy6dA@mail.gmail.com>
+Subject: Re: [PATCH v4 net-next v4 6/6] net: add heuristic for enabling TCP
+ fraglist GRO
+To: Felix Fietkau <nbd@nbd.name>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
+	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	willemdebruijn.kernel@gmail.com, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-2024-04-29, 13:30:09 +0000, Eric Dumazet wrote:
-> I added dst_rt6_info() in commit
-> e8dfd42c17fa ("ipv6: introduce dst_rt6_info() helper")
->=20
-> This patch does a similar change for IPv4.
->=20
-> Instead of (struct rtable *)dst casts, we can use :
->=20
->  #define dst_rtable(_ptr) \
->              container_of_const(_ptr, struct rtable, dst)
->=20
-> Patch is smaller than IPv6 one, because IPv4 has skb_rtable() helper.
->=20
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> ---
->  drivers/infiniband/core/addr.c   | 12 +++---------
->  drivers/net/vrf.c                |  2 +-
->  drivers/s390/net/qeth_core.h     |  5 ++---
->  include/linux/skbuff.h           |  9 ---------
->  include/net/ip.h                 |  4 ++--
->  include/net/route.h              | 11 +++++++++++
->  net/atm/clip.c                   |  2 +-
->  net/core/dst_cache.c             |  2 +-
->  net/core/filter.c                |  3 +--
->  net/ipv4/af_inet.c               |  2 +-
->  net/ipv4/icmp.c                  | 26 ++++++++++++++------------
->  net/ipv4/ip_input.c              |  2 +-
->  net/ipv4/ip_output.c             |  8 ++++----
->  net/ipv4/route.c                 | 24 +++++++++++-------------
->  net/ipv4/udp.c                   |  2 +-
->  net/ipv4/xfrm4_policy.c          |  2 +-
->  net/l2tp/l2tp_ip.c               |  2 +-
->  net/mpls/mpls_iptunnel.c         |  2 +-
->  net/netfilter/ipvs/ip_vs_xmit.c  |  2 +-
->  net/netfilter/nf_flow_table_ip.c |  4 ++--
->  net/netfilter/nft_rt.c           |  2 +-
->  net/sctp/protocol.c              |  4 ++--
->  net/tipc/udp_media.c             |  2 +-
->  23 files changed, 64 insertions(+), 70 deletions(-)
+On Sat, Apr 27, 2024 at 8:23=E2=80=AFPM Felix Fietkau <nbd@nbd.name> wrote:
+>
+> When forwarding TCP after GRO, software segmentation is very expensive,
+> especially when the checksum needs to be recalculated.
+> One case where that's currently unavoidable is when routing packets over
+> PPPoE. Performance improves significantly when using fraglist GRO
+> implemented in the same way as for UDP.
+>
+> When NETIF_F_GRO_FRAGLIST is enabled, perform a lookup for an established
+> socket in the same netns as the receiving device. While this may not
+> cover all relevant use cases in multi-netns configurations, it should be
+> good enough for most configurations that need this.
+>
+> Here's a measurement of running 2 TCP streams through a MediaTek MT7622
+> device (2-core Cortex-A53), which runs NAT with flow offload enabled from
+> one ethernet port to PPPoE on another ethernet port + cake qdisc set to
+> 1Gbps.
+>
+> rx-gro-list off: 630 Mbit/s, CPU 35% idle
+> rx-gro-list on:  770 Mbit/s, CPU 40% idle
+>
+> Signe-off-by: Felix Fietkau <nbd@nbd.name>
 
-Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
 
---=20
-Sabrina
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
+Thanks
 
