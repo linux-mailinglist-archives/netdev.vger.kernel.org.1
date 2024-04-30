@@ -1,143 +1,89 @@
-Return-Path: <netdev+bounces-92507-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92508-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 283EE8B7A53
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 16:44:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 624688B7A69
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 16:45:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DB1031F236FA
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 14:44:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 91AE21C22855
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 14:45:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 015F017B4EB;
-	Tue, 30 Apr 2024 14:40:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 609151527BA;
+	Tue, 30 Apr 2024 14:42:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c0dYtZZ3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X5zb0+b7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51D1817A931;
-	Tue, 30 Apr 2024 14:40:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38B931527B2;
+	Tue, 30 Apr 2024 14:42:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714488020; cv=none; b=tJcfIe3iT+aezY27pOtpTzCGci718c0RKY8AUh4SwmYDl42A6AaR0VeLGT5GzesEUj4whGlke43sc+m0YE1RCKaSihClFC309ZZBgiBxab7p6hjdaLx/lwxAB+NhuiresSQNKa9zJVwN9OPpuMfSqyPehaT1ReG8MKfZSrI/0jo=
+	t=1714488174; cv=none; b=UTcSqs6BVEu9Jp8f2U/9GZEEtNOaQycuu1vbcc18L8Fh6axa10nj9Dkm4EzR2s/jHZJSlqOXRotJub0Nn4/IFOeOFkJtJU/ij78j3OP3jsoczLbWAaH0m+vKhjdrTJCBjW+xUxsk0Zk+pH0Tjx/IHf/Mt3d7easYyWW2jlNl29k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714488020; c=relaxed/simple;
-	bh=LX/cja2FJFFGw7iFNRlpntXAi8MvhPRZ3BEfjetYX9k=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=kKBifYl31h1zIAasX1rbAtyojLg5C0l8e1qrW9rr1pnRNFWCar+3IQO/rQim1MzPavxl7QrPlKZdZ+Wyfdz0vUxmGrFrzjn4hXThruLbmUAvCa6EZr9f2JTFxvKlqwJG/vWbasFhmQnuZ5qQ6eMTWU1bIhogQOQEK+2H6o2swOQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=c0dYtZZ3; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-41b4ff362a8so53215755e9.0;
-        Tue, 30 Apr 2024 07:40:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1714488017; x=1715092817; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=iZxd/DI5QdY6rGwP24LbbxuJiqEuZoi+ZsrSMuiWkrQ=;
-        b=c0dYtZZ3BgHiPETbdpKFPEL7FjK5j58ieJ75CDDM1lcJCtgx3f9J8PCMSqrDGRqIl1
-         mAm9LVP7QCWrC2JOiFPEuhQrPnnqNR249W9Tu5UPF+7rrAGwaDazoidsUInagmJpwgTv
-         +gXHORk8gqBD6NoBGWDRAICkjzP1z9ZTraqjALID+4yaGk16KyHSepNEF5AtXvIgapeB
-         yMdz+IUZJfuBnImOYOfDmenlwxxqbFcSKgvW8RSartAijkT8NwMtiHeXywxaSEL5z9oV
-         +KDY23FSgR80TbDUAotPqskjGHLnGVebu+MEJpDg0uJgfr5o7F7T80BzQTzjKfZInUHj
-         PEDg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714488017; x=1715092817;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=iZxd/DI5QdY6rGwP24LbbxuJiqEuZoi+ZsrSMuiWkrQ=;
-        b=vOV9SeVVU8AZVJJQt/uVYnRUxh5q/bCl2yMUG2RNY+OnqpEviMEXu8HkLy41Q3PYAY
-         Gpl5bAUajiAVE/Sf1O0jxccPLyP/VIfd2Rqkrm3mjPhk89TshpGV3m4gu7jefBV7gcZR
-         T1dBF03SW5i2cpfKwdnaPMxlXsgItPTXfXzvEfgUbK9CBjq/4/YGZ7LVq/mRih4PTwG4
-         RHdQOcjAY4gG4+gpZ7szgxLVWBN/qUvATBkIirHN3jD6E01pXtz0T+uY/om70F0P31L7
-         FH42I3OLyjYE6RTVS5ffDcVGXa0VlSvZOJRUiS1QB9yF4jNQP0HBCNOoTfOK7+35CzQ8
-         fL8g==
-X-Forwarded-Encrypted: i=1; AJvYcCWYl7muIuyDnuerJB9PYnWNsZ27ZSOGE8CgHGzYLGrkZAk0rolK1ARftvo+9Pq7qFUbYhnwN+ln2ETki8TYpE9Yn+gMOx2YP6pe9YUzfioC0D0hKbNojDKSykOSKKrPjcPGmksE
-X-Gm-Message-State: AOJu0Yw8NxooLfQ2Ph7brPAQ/cZUhoZ859LDxJYRxmxL+9lJXgJ0yBEX
-	lXadDeyIgSUPfc/h0g9R4+SU2ywB8eYTvE8Vse7S8zl+mS8G+Drw
-X-Google-Smtp-Source: AGHT+IElt5ZeAiVH8HZctTdg1/Kk5OH+JkzF1XzccUyF4Lt231Cmm5evb/2WFVt18/J13+oAtC4k3Q==
-X-Received: by 2002:a05:600c:198c:b0:415:540e:74e3 with SMTP id t12-20020a05600c198c00b00415540e74e3mr12217850wmq.40.1714488017142;
-        Tue, 30 Apr 2024 07:40:17 -0700 (PDT)
-Received: from localhost ([146.70.204.204])
-        by smtp.gmail.com with ESMTPSA id h9-20020a5d4309000000b0034c78001f6asm10353790wrq.109.2024.04.30.07.40.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Apr 2024 07:40:16 -0700 (PDT)
-From: Richard Gobert <richardbgobert@gmail.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	dsahern@kernel.org,
-	willemdebruijn.kernel@gmail.com,
-	alobakin@pm.me,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Richard Gobert <richardbgobert@gmail.com>
-Subject: [PATCH net v4 2/2] net: gro: add flush check in udp_gro_receive_segment
-Date: Tue, 30 Apr 2024 16:35:55 +0200
-Message-Id: <20240430143555.126083-3-richardbgobert@gmail.com>
-In-Reply-To: <20240430143555.126083-1-richardbgobert@gmail.com>
-References: <20240430143555.126083-1-richardbgobert@gmail.com>
+	s=arc-20240116; t=1714488174; c=relaxed/simple;
+	bh=QH1dfcYyIcPetkUCl+atKwQJ978quIcfRWzXslCTQwI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=lkUgWS7fOMnXw9vFwNo7EUosT9XhEUYJla+bHpVZiRjxg0ClYJ9YkIfXliHH8i6bsGbaqcyeW/V/Y+qITlhS3oF0QmVtMdcx8bGv/TLe020Bqkx0Rpj1qbE/7UXTDXolAE2lgTuTwCyop50tTDOAa4ZIfLcinEyPGdoF/jilRZU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X5zb0+b7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E979C2BBFC;
+	Tue, 30 Apr 2024 14:42:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714488174;
+	bh=QH1dfcYyIcPetkUCl+atKwQJ978quIcfRWzXslCTQwI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=X5zb0+b7+f45iFblEiSD/PT3vhYkLnqmZt0lVzVvqm5be/Ryl5j5Vft1WqY9bN9vv
+	 Pg/BitOvX6C7v8nBBjjeLK4v4N1UmN5dyReZT/34rnVY0JK8/wRMuf57VbvhRkigVu
+	 ABwlzx19+Ymje6YrRjRfDsnkKL04JsgeCzJVm+O4JmuLTV6ua6BLEVXli/hl0cs+rG
+	 5GJZ4E8GKI83/KJLHc+WO8Uao8CRJzFInfiC5gkEsi0VjIzek1mgMqYpr6n53stEPy
+	 hFBOv+DeGDlc6v9sRWDYNmdaRmWSrCtKcPaI3RuIzDDeiRP1xuzsOkdW15u7sbRLzI
+	 KlG73TU8hz/+w==
+Date: Tue, 30 Apr 2024 07:42:52 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Lukasz Majewski <lukma@denx.de>
+Cc: netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, Casper
+ Andersson <casper.casan@gmail.com>, Andrew Lunn <andrew@lunn.ch>, Eric
+ Dumazet <edumazet@google.com>, Vladimir Oltean <olteanv@gmail.com>, "David
+ S. Miller" <davem@davemloft.net>, Oleksij Rempel <o.rempel@pengutronix.de>,
+ Tristram.Ha@microchip.com, Sebastian Andrzej Siewior
+ <bigeasy@linutronix.de>, Ravi Gunasekaran <r-gunasekaran@ti.com>, Simon
+ Horman <horms@kernel.org>, Nikita Zhandarovich <n.zhandarovich@fintech.ru>,
+ Murali Karicheri <m-karicheri2@ti.com>, Jiri Pirko <jiri@resnulli.us>, Dan
+ Carpenter <dan.carpenter@linaro.org>, Ziyang Xuan
+ <william.xuanziyang@huawei.com>, Shigeru Yoshida <syoshida@redhat.com>,
+ "Ricardo B. Marliere" <ricardo@marliere.net>, linux-kernel@vger.kernel.org
+Subject: Re: [net-next PATCH] hsr: Simplify code for announcing HSR nodes
+ timer setup
+Message-ID: <20240430074252.2690b639@kernel.org>
+In-Reply-To: <20240430145243.34b82105@wsk>
+References: <20240425153958.2326772-1-lukma@denx.de>
+	<20240426173317.2f6228a0@kernel.org>
+	<20240429120904.2ab5248c@wsk>
+	<20240429104026.0fe3de0f@kernel.org>
+	<20240430145243.34b82105@wsk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-GRO-GSO path is supposed to be transparent and as such L3 flush checks are
-relevant to all UDP flows merging in GRO. This patch uses the same logic
-and code from tcp_gro_receive, terminating merge if flush is non zero.
+On Tue, 30 Apr 2024 14:52:43 +0200 Lukasz Majewski wrote:
+> > Practically speaking I'm not sure if anyone uses any of the weird
+> > IFF_* flags, but they are defined in uAPI (enum net_device_flags) and
+> > I don't see much validation so presumably it's possible to flip them.  
+> 
+> Ok, I see.
+> 
+> Then - what would you recommend instead? The approach with manual
+> checking the previous state has described drawbacks.
 
-Fixes: e20cf8d3f1f7 ("udp: implement GRO for plain UDP sockets.")
-Signed-off-by: Richard Gobert <richardbgobert@gmail.com>
----
- net/ipv4/udp_offload.c | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
-
-diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
-index fd29d21d579c..8721fe5beca2 100644
---- a/net/ipv4/udp_offload.c
-+++ b/net/ipv4/udp_offload.c
-@@ -471,6 +471,7 @@ static struct sk_buff *udp_gro_receive_segment(struct list_head *head,
- 	struct sk_buff *p;
- 	unsigned int ulen;
- 	int ret = 0;
-+	int flush;
- 
- 	/* requires non zero csum, for symmetry with GSO */
- 	if (!uh->check) {
-@@ -504,13 +505,22 @@ static struct sk_buff *udp_gro_receive_segment(struct list_head *head,
- 			return p;
- 		}
- 
-+		flush = NAPI_GRO_CB(p)->flush;
-+
-+		if (NAPI_GRO_CB(p)->flush_id != 1 ||
-+		    NAPI_GRO_CB(p)->count != 1 ||
-+		    !NAPI_GRO_CB(p)->is_atomic)
-+			flush |= NAPI_GRO_CB(p)->flush_id;
-+		else
-+			NAPI_GRO_CB(p)->is_atomic = false;
-+
- 		/* Terminate the flow on len mismatch or if it grow "too much".
- 		 * Under small packet flood GRO count could elsewhere grow a lot
- 		 * leading to excessive truesize values.
- 		 * On len mismatch merge the first packet shorter than gso_size,
- 		 * otherwise complete the GRO packet.
- 		 */
--		if (ulen > ntohs(uh2->len)) {
-+		if (ulen > ntohs(uh2->len) || flush) {
- 			pp = p;
- 		} else {
- 			if (NAPI_GRO_CB(skb)->is_flist) {
--- 
-2.36.1
-
+Add a bool somewhere to track if the timer has been scheduled?
+The NETDEV_ events in question are called under rtnl_lock, so
+no extra locking should be needed.
 
