@@ -1,114 +1,93 @@
-Return-Path: <netdev+bounces-92555-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92556-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E6FD8B7DF7
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 19:00:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41D488B7DFC
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 19:01:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 457FEB2191B
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 17:00:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F01C12869BF
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 17:01:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D3B717BB0F;
-	Tue, 30 Apr 2024 16:52:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F188317BB0B;
+	Tue, 30 Apr 2024 16:55:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="wu87VAyq"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="FCluwWN2"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-8fae.mail.infomaniak.ch (smtp-8fae.mail.infomaniak.ch [83.166.143.174])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C77151802A0
-	for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 16:52:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.166.143.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5622172BC6;
+	Tue, 30 Apr 2024 16:55:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714495940; cv=none; b=aTDkrViy7tuN+ZRGiEAvwnewXD/W4PaL1b+tpDbZkIqpJM1sl+NoIT63m15tdW4cc4AQnbQrS8ex3jqFrvZVzWTXSPlIysGDQMOFu8Vnuw8mPLtX/fhXhwTJh1orVy0/hWlZqPAG4cawWxe2aw6QdOhIRh6XhTmyJvq5BkWugFQ=
+	t=1714496118; cv=none; b=HzvwWyVK1QThnujUqlu3XFnCHEw5yPkDGixHrWSlx0qFDEaEXoNXcQtif3YLN5sturdxgMeFCcoTERN+ayjCjibSoaI10ES4rsw+i+qeRSzzWRzcdj8Nd1E4oyL/oNrRHaH5z1NigBx3V6naZqI3NZh9/GB1xPYSq1y+p77m4Ko=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714495940; c=relaxed/simple;
-	bh=JSh9G8B/hhE3cjcRgoAQVV5csCa5MBscKddNaCVOwYU=;
+	s=arc-20240116; t=1714496118; c=relaxed/simple;
+	bh=q3Mtcb6WTFm/fPnOFpVQ3lGozboE4nEg4ZQJAN/Eyac=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OYEwTBzqqOFrM1d768uRWFMN4QQjnKTsUhMLOz0wyRW6noNphCd90y/MZdKqEAmkYNTKcb/IHWfpW2Fi7FS6U2UZnK9iLJ6guDvEUihDKAg0DEk+UgbvuQaNWcQGvdYEOdTH/Zzu/MDurRyUeu0PrZaH/4zZMXylgCbUoQKd4hA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=wu87VAyq; arc=none smtp.client-ip=83.166.143.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
-Received: from smtp-3-0001.mail.infomaniak.ch (smtp-3-0001.mail.infomaniak.ch [10.4.36.108])
-	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4VTR7f6JW2zjL8;
-	Tue, 30 Apr 2024 18:52:14 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=digikod.net;
-	s=20191114; t=1714495934;
-	bh=JSh9G8B/hhE3cjcRgoAQVV5csCa5MBscKddNaCVOwYU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=wu87VAyqG0g9pzocG398PQkwDaP655Xc+z/wpf4zOlnDGW0A0K2bm2AE8B0KLPoGP
-	 sBQoBn33iKNf5j1X5p2x54+sYDzhyynFDJGwFTgdU7R1AS/HgyTxfk+jLObEqedf98
-	 avJFepZnA9omeMZ2MTRFkm3hPRu1RLTQZQ15xybo=
-Received: from unknown by smtp-3-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4VTR7d44DkzNRV;
-	Tue, 30 Apr 2024 18:52:13 +0200 (CEST)
-Date: Tue, 30 Apr 2024 18:52:12 +0200
-From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
-To: Ivanov Mikhail <ivanov.mikhail1@huawei-partners.com>
-Cc: willemdebruijn.kernel@gmail.com, gnoack3000@gmail.com, 
-	linux-security-module@vger.kernel.org, netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, 
-	yusongping@huawei.com, artem.kuzin@huawei.com, konstantin.meskhidze@huawei.com, 
-	=?utf-8?Q?G=C3=BCnther?= Noack <gnoack@google.com>
-Subject: Re: [PATCH 1/2] landlock: Add hook on socket_listen()
-Message-ID: <20240430.beicheugee5T@digikod.net>
-References: <20240408094747.1761850-1-ivanov.mikhail1@huawei-partners.com>
- <20240408094747.1761850-2-ivanov.mikhail1@huawei-partners.com>
- <20240425.Soot5eNeexol@digikod.net>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Vx5UYfGS+zdsnqBDKR78qIAgA1ZX4RWwCLZj2nLZG9SJPiOGIu3h9PlVh9zleNhdGmwJBdP7mty7VowFiBIUXd2e/5NCBsitoAkHR9yoQxWhAJ5uC13NDxjr4DsGpVrCm0t29d2fNOWiSALYaTpr0L/LUN5MTji8UApPIH1D6kM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=FCluwWN2; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=RF9yx8dTNGWVZHPM8PUtYI0D1E5HGDUZkzK1++mcdwU=; b=FCluwWN2Ckp2/t1F/WFJTNugMa
+	31IRpdp15lFyJxOmLoQ87R+QNmwE1ssWWbCDrOrZjEj/P8bwVM0lsNKkDZhvjs5EWJ8AVC9uSjkq8
+	5VTYm83DHJZ/0hGxk24xFOB7/UvOq55DPg1JAewszQy+IyBdzGKvDfeMdVr7yjl/bAFoVTk6Ndg8O
+	egGcaH8cXhZmHrmrl7Ma/vSSAUXJQpUekrJaxM8cSpTT+/sPMWKSBE3YsYdf0BJrLXn2apFrrgukF
+	wSit8t68UcHLmYj6ySsfoC/quX277Hmya/8sieUR25WoRxI4TgLbNKeEtIhycDarXHKqUuZ1k/1mJ
+	r59T76OA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:36096)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1s1ql2-0005Hu-0y;
+	Tue, 30 Apr 2024 17:55:08 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1s1ql1-0001vZ-Bf; Tue, 30 Apr 2024 17:55:07 +0100
+Date: Tue, 30 Apr 2024 17:55:07 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Florian Fainelli <florian.fainelli@broadcom.com>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next v3 0/2] net: dsa: adjust_link removal
+Message-ID: <ZjEia+20WfldXpMn@shell.armlinux.org.uk>
+References: <20240430164816.2400606-1-florian.fainelli@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240425.Soot5eNeexol@digikod.net>
-X-Infomaniak-Routing: alpha
+In-Reply-To: <20240430164816.2400606-1-florian.fainelli@broadcom.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Tue, Apr 30, 2024 at 03:36:30PM +0200, Mickaël Salaün wrote:
-> On Mon, Apr 08, 2024 at 05:47:46PM +0800, Ivanov Mikhail wrote:
-> > Make hook for socket_listen(). It will check that the socket protocol is
-> > TCP, and if the socket's local port number is 0 (which means,
-> > that listen(2) was called without any previous bind(2) call),
-> > then listen(2) call will be legitimate only if there is a rule for bind(2)
-> > allowing binding to port 0 (or if LANDLOCK_ACCESS_NET_BIND_TCP is not
-> > supported by the sandbox).
-> 
-> Thanks for this patch and sorry for the late full review.  The code is
-> good overall.
-> 
-> We should either consider this patch as a fix or add a new flag/access
-> right to Landlock syscalls for compatibility reason.  I think this
-> should be a fix.  Calling listen(2) without a previous call to bind(2)
-> is a corner case that we should properly handle.  The commit message
-> should make that explicit and highlight the goal of the patch: first
-> explain why, and then how.
-> 
-> We also need to update the user documentation to explain that
-> LANDLOCK_ACCESS_NET_BIND_TCP also handles this case.
-> 
-> > 
-> > Create a new check_access_socket() function to prevent useless copy paste.
-> > It should be called by hook handlers after they perform special checks and
-> > calculate socket port value.
-> 
-> You can add this tag:
-> Fixes: fff69fb03dde ("landlock: Support network rules with TCP bind and connect")
-> 
-> > 
-> > Signed-off-by: Ivanov Mikhail <ivanov.mikhail1@huawei-partners.com>
-> > Reviewed-by: Konstantin Meskhidze <konstantin.meskhidze@huawei.com>
-> > ---
-> >  security/landlock/net.c | 104 +++++++++++++++++++++++++++++++++-------
-> >  1 file changed, 88 insertions(+), 16 deletions(-)
+On Tue, Apr 30, 2024 at 09:48:14AM -0700, Florian Fainelli wrote:
+> Now that the last in-tree driver (b53) has been converted to PHYLINK, we
+> can get rid of all of code that catered to working with drivers
+> implementing only PHYLIB's adjust_link callback.
 
+LGTM. For the whole series:
 
-> > +		if (inet_sk(sock->sk)->inet_num != 0)
-> 
-> Why do we want to allow listen() on any socket that is binded?
+Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
-Please ignore this comment. I was initially thinking about a new access
-right, which would be good to have anyway, but with another series.
+Thanks!
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
