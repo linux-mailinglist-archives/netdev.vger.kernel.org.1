@@ -1,275 +1,235 @@
-Return-Path: <netdev+bounces-92514-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92516-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB8E78B7AE9
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 17:03:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73D298B7B4B
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 17:17:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 640331F22862
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 15:03:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 32E0F281320
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 15:17:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45A8F13AA51;
-	Tue, 30 Apr 2024 15:02:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 986C5143726;
+	Tue, 30 Apr 2024 15:17:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b="IE2G/teV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76D7177110
-	for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 15:02:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714489349; cv=none; b=YSH00yB+RfMOWvJYW/wDIGy69/tsZcxSRLSSihT8b9VK/HWChp/eCe0ISglpzN7kj27jHv/Jp8IZE30T3jAmkmFQLrpu8J6GTfrYuwEtnMMVOtAo+CJ4zCX5Fj9bFx98q8PYKkF31EfalAemNEmMP+1sEbuMULOrgUEE1Bx3R6E=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714489349; c=relaxed/simple;
-	bh=7rmPFQ3DT++fNxZ0G1yoLQAgk3hBR6DMm4fIql/kEjE=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Bd16+K0kUtto7HBQGq8XqexwljMHLgfOUTCozl3ainB7IHQ75kzkCKfojh++zgOoaJ6MimpqHDtPwCVtxo897gKzFnR9r+hh2tJJLuNAxjM8MDKYQb0N4Je82wscEQtrem5VnklGT24xswdTbzi0TKGNI+5nmuee3v63/BPnRH8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-36c10cac5f9so36803015ab.3
-        for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 08:02:27 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714489346; x=1715094146;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=1ALJp+yxeJq2OA0p5gmt6WimV/9suDz8TH5aPp/0mBQ=;
-        b=apDSfvW5ixWPQc5JEDhxmgGA1OdeAkWvzjS1DubBSslPiPmn0mAC0YMiUr7R+4wT2D
-         skBUUj8bnx37HmgbP0YzvoNrL/i5dYSYTGm97+kVIOwmaLFljq14GvGTFaXny+EVs+4x
-         T9mROXP4l3udPcyTqR6qdzNr+y5q0/gdUKhkLZN7gBHuCf2ISoqryxrenxuras1N6EkE
-         2slKKXWHC9aZULDjdMVi7HZw0ahK9DZfzB3QY8gxk//rNOYJGO5WGazU35SttqELUaQP
-         jMQuzzi14JdoTMIfN7yesj1ULOA/HAQHCiZxvsQIVxNNyybF81YwpiZKVMpG9+RKK0SY
-         cogA==
-X-Forwarded-Encrypted: i=1; AJvYcCVGcrJrFzVWihrPcBjHxOHFFc5bGtusbWROEZZ6UCQUOvtaIN7Zq8zhnT5EiKZHUj8H8SMY0MOE7AH2cH6uT6zxXffbjtvZ
-X-Gm-Message-State: AOJu0YzlLxBGNkKpsndnwg4XyYSssMZkMocZE8jAhhhhYRAarkg8rGeF
-	dhhzJ4xsN12VbOSsxtKzEHUA4J8E1dwKcZ5FnIC3DfqaeIjWQPARYFCnGRU4ZsNw8behe/AGy3F
-	K8+tBH+kmWxYFY9ztBVSyvEoyifCy22HImbcajYbxNLIi/JkSclIowuU=
-X-Google-Smtp-Source: AGHT+IEodTkEwipf14NIaP2rVFtJwuOooYDO+mCGtrYaqcuLYsZ6rxdrtUA0sg1WCkbZS08IdThoiKQoUc6Tfbj+3lUyVNUXfyoC
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 961D1143720;
+	Tue, 30 Apr 2024 15:17:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=67.231.148.174
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1714490270; cv=fail; b=XesEAjWqAO4356dF3SgDNo+P5PU1NNenTEdOmidxrgGdB+yT9oRxedR1LjPpKQYCGzKSCHoMx5gYt4zonIPLzep37sI6Jd279wfU+45YF+hnO+cvEQtt5oqGleqLS7DnPxKhhom4Wikts5RoD0Oq5Txp8Wdc1/hfoTAygGNFbTQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1714490270; c=relaxed/simple;
+	bh=rNCoXK/oIPVjzqEsd0rzs4qvUsEBsPTW4fKiO1lSXh4=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=YVNstbuNni9Y7Jte2Bt2Mdsic7HRmDXsVeGFt2oYG3DmxtUNQhwqXZQ2ZheAvo3LHrBWjHXw2BHNZdLtSxGjmYMP1Qfl4+kIYdmO9cEeNDzFKL1GiCaz8cweEROs/r94siPG2o9veQimCBDP3Dn1kutgBMy1lMW7IJYVOl+z+50=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b=IE2G/teV; arc=fail smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 43U9Fg69032428;
+	Tue, 30 Apr 2024 08:17:34 -0700
+Received: from nam11-co1-obe.outbound.protection.outlook.com (mail-co1nam11lp2168.outbound.protection.outlook.com [104.47.56.168])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3xtwuwhb66-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 30 Apr 2024 08:17:34 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=i/KIs+op/7UWAcuwGTeJ/ELlCzrZPEm/nuGRB2i/ZgSTSAP/hNQlW2aYsKudP2fxpFcL0ncXe6kLQMytmOkNf3w94xMHPBpKF5gM6I1E+CmFALvMtnGmE403VE5gPNArHKkzpOVJ7MIvwqilqhZXBdSrpZXYDlf0ZEfdlXmXQexGD1eOzqM7BFdJi6rKH/gGMv3gj+ZmLIMUmnPb7uAOSACgMJ0J0yB4Ze3UHton0mkpGLRp7dFrto+tmnMsSuU9pzeqpiOVNLMH4SQg/MM+KOlHi1+SZQ7yqnw6yY44a8gKk+yhsEFbVbWBErfCSId0ikTaV1E8y5CT6i85xR1Ilg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=rNCoXK/oIPVjzqEsd0rzs4qvUsEBsPTW4fKiO1lSXh4=;
+ b=lQ2LVgzoIT9UhhauWV5RX8BqQGaD09D06TrpO6ji5RWkV6swV3uer5RNWX97IcQ8dtO0/g+Jbd20V2+9ymW7aZJ+SSNqDmfBtLdQ34U/2279UHnQaAol5b7ybeerRPcWob0ahwxdEGO857SgbePYDu0zBBxhrTOT5V1XZ14JzrbN0RMTfbukryTAPhH0IbJnTgtCsKWvdYvrSUvwXxhWK5aceHf9XfikdHLFbT4Sxh/+CkTUEEJeS6Jd+Wc6L5Kf8+ShmGRElg90FE44IFqHkmXmr/0lT/VCtxRLw6lq3fjRgf3AEx6Zu6Fky761RBnRWpOciCtYpIlld7u2BHEQpw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
+ dkim=pass header.d=marvell.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=rNCoXK/oIPVjzqEsd0rzs4qvUsEBsPTW4fKiO1lSXh4=;
+ b=IE2G/teVdcDBpo/G0EX97GkcxV/GRpVQS/9LedcWFI7gZ990oTmzI0aG+ELktapnCZICLtp05PTaQsvOrUZsiJjNFi7TKMpRdJssCqt7AvEJgozGkNogbzAwULEC0KuNAb1m2a3O+zPoo6ggSoKot73N/wntxY33AmOLMn+fqFg=
+Received: from CH0PR18MB4339.namprd18.prod.outlook.com (2603:10b6:610:d2::17)
+ by MN6PR18MB5544.namprd18.prod.outlook.com (2603:10b6:208:476::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7519.35; Tue, 30 Apr
+ 2024 15:17:30 +0000
+Received: from CH0PR18MB4339.namprd18.prod.outlook.com
+ ([fe80::61a0:b58d:907c:16af]) by CH0PR18MB4339.namprd18.prod.outlook.com
+ ([fe80::61a0:b58d:907c:16af%5]) with mapi id 15.20.7519.031; Tue, 30 Apr 2024
+ 15:17:29 +0000
+From: Geethasowjanya Akula <gakula@marvell.com>
+To: Jiri Pirko <jiri@resnulli.us>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kuba@kernel.org" <kuba@kernel.org>,
+        "davem@davemloft.net"
+	<davem@davemloft.net>,
+        "pabeni@redhat.com" <pabeni@redhat.com>,
+        "edumazet@google.com" <edumazet@google.com>,
+        Sunil Kovvuri Goutham
+	<sgoutham@marvell.com>,
+        Subbaraya Sundeep Bhatta <sbhatta@marvell.com>,
+        Hariprasad Kelam <hkelam@marvell.com>
+Subject: RE: [EXTERNAL] Re: [net-next PATCH v3 3/9] octeontx2-pf: Create
+ representor netdev
+Thread-Topic: [EXTERNAL] Re: [net-next PATCH v3 3/9] octeontx2-pf: Create
+ representor netdev
+Thread-Index: AQHamVpOk4r/tpYYKkK9e3oUMm7yXbF/H2GAgABOIvCAAPb6AIAAi29w
+Date: Tue, 30 Apr 2024 15:17:29 +0000
+Message-ID: 
+ <CH0PR18MB433976CB436652D485C66FCDCD1A2@CH0PR18MB4339.namprd18.prod.outlook.com>
+References: <20240428105312.9731-1-gakula@marvell.com>
+ <20240428105312.9731-4-gakula@marvell.com> <Zi-Fg7oZBCtCvbBA@nanopsycho>
+ <CH0PR18MB4339BF5712F2E93835E1EA08CD1B2@CH0PR18MB4339.namprd18.prod.outlook.com>
+ <ZjCWPEony0Q22AEt@nanopsycho>
+In-Reply-To: <ZjCWPEony0Q22AEt@nanopsycho>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: CH0PR18MB4339:EE_|MN6PR18MB5544:EE_
+x-ms-office365-filtering-correlation-id: 52b81b85-65cc-40a4-0a62-08dc6928a6bd
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230031|1800799015|376005|366007|38070700009;
+x-microsoft-antispam-message-info: 
+ =?us-ascii?Q?UayWGQYUbpbjJ6QwUW/RaAu1cU2IPdTs4njZzcVpsSqJLjPBd8d+V2N25ul1?=
+ =?us-ascii?Q?7gk7W2em/vaYgDzSALQZM7XhTs1vYnf2+UbnnxIcc08kA+oGM64FEkR+dBDr?=
+ =?us-ascii?Q?G9i8BkmnGi6NeNjLy32j8mt98CkTf3n/81vfwKlNkTEdfV4P9AAfH2G53F7P?=
+ =?us-ascii?Q?y7LrrSWaLhX8E5DQgbhVCgfjwM/YkOZuhOlUNwI4FFhhLHvbnGDfJKTNN3yQ?=
+ =?us-ascii?Q?cnC9l9d+QsV6R6dqhSV2rs7uxC811VYHSf4Ty52SO74sXT0Bm1XHXh4XfMuT?=
+ =?us-ascii?Q?kxpW1OBvdCBm31hK/29RkwMSQ+HgJpOBIFWedG0aYhpADijnQdJ2Bjlra1ZH?=
+ =?us-ascii?Q?YDLc9RJ6Z3tmh6GeAP7G1Njflwlfn7WxvFQt1sBC6xNjQ21PMQ9epA7EZW7k?=
+ =?us-ascii?Q?cVE0i0zJJAIBfggmARepshSQQqKnFC3HoJkA06MDLfm7M7fWZhlolS0xHy0J?=
+ =?us-ascii?Q?6QskrD6sKCDJrJ/1YVA41sulviKytbDevcl7V9zxHSgmxfsXHeuauDo9LUfP?=
+ =?us-ascii?Q?mssTy6UrA5U2azc2fPmGSeBcVjR7cEJ5znbIz+JL/89MgcPsS6lx4/wMRQo5?=
+ =?us-ascii?Q?FCaTWFT+An+JaQ9cpc8H3nGXXz3fyJBnA+s/2sUSCl1fdj47ern9Ri/WsW6B?=
+ =?us-ascii?Q?ootwr0H2FB2Rx08kSvIFEpDAoi+xu1dGNawPUWiyo7pikAuimCSHDrbklCB3?=
+ =?us-ascii?Q?6Hb5T8S7rwlPzhvRboLquQUWi6+O0yJqrdU/IiEDy5HehMM8g7hq2d0tWr+B?=
+ =?us-ascii?Q?5OA9dnxnOwA24/hM/xrS1E5p6okvvOt8BpguCzioqVuLzd477+7Spm6nA+Nx?=
+ =?us-ascii?Q?TyjT1kaDzYr/NlTmQR84Gj4+Hcj6FTN6ISDDNPepiE9qGoZnAI61Tg1hXc7w?=
+ =?us-ascii?Q?NF9LJ8nAQlxzRE+FurtneBa6mH36f1qj2PMrLC890FCl3TQz4lvTsWAkkoRv?=
+ =?us-ascii?Q?B4oNOhnlOZOjjO5njBM0boC3ec0O5FRsqFJ+C+n59KsIF0IvsuAe1egpgq/+?=
+ =?us-ascii?Q?7bs1uqhqoa/o/4KuBG2kYV7QmC+f/zLs2IsIzqC5cz4NbolymHrb1QtKy1wE?=
+ =?us-ascii?Q?MM7hVfEeGKNKuce13P925yYq7bD0FD1fgrGwhg8Nmxd9nkPWU7NE6eKgANkq?=
+ =?us-ascii?Q?yTP28ZDldv9vVn2+l5xRdxjR9qTXOWgY5uEkYTAPPShClDEDeamgmt7GIimU?=
+ =?us-ascii?Q?vbNMwqwmXrBlLP5Br+PimzToGKcH5xE6yqrPtXigWX3ukWX1obUwsyIn3qZk?=
+ =?us-ascii?Q?XAPWO0FOSIASKUewRzfU0Q7QNX1yD+n52Rec+wLCnAF8FB8bmlv/HFwvzPQZ?=
+ =?us-ascii?Q?HkgZWLAluLFoveTqwWRevPz2IngnMkiZxnWxu/tk83zaNQ=3D=3D?=
+x-forefront-antispam-report: 
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH0PR18MB4339.namprd18.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(376005)(366007)(38070700009);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: 
+ =?us-ascii?Q?Lc0kxkB3ezRvDRyUZVJ5xsuKf+/8vQpSTmKIUjfhEwMOXQkXz4ANIvEvfZIB?=
+ =?us-ascii?Q?RjIUyKrjvcIsrYc5AquT1d8mBJBAQw9ZC0tMYBk97LUsrGRovx+stuq6NDXq?=
+ =?us-ascii?Q?r0wbZ8y3IHXKrLAdCK05XyrZMqfp6pwUuXQPXWcLsqnA0Y8DBMCusVzk0moX?=
+ =?us-ascii?Q?LAKHFSpPpG73uybnq0ddfKf41ibtljzBeyQeNpTmC97ukyw98R2I5n+8Bs7y?=
+ =?us-ascii?Q?xkBC2wcBl2Y963baAcs6ffVipHpThEt4AVy3F9pMfbs3USDXs1yiertopTOw?=
+ =?us-ascii?Q?stiuKjHg3FKjs/nmc5qYzy3FTYqX0FyFbNYKDQEztKhBD3wLVlOeyaLevUgE?=
+ =?us-ascii?Q?w17gOtvk+HvQEfSL4LTvmBBfEJJxpfOkXumjeY/qY/5f/xeZ5WOO0p+4/0qQ?=
+ =?us-ascii?Q?U1icIS+eeajFbrI/lss74trSNzSf62VBpgXqgsUpyuXsztu0UEzcZqXcXkny?=
+ =?us-ascii?Q?rcUDfH3W6wFbgshcdltCvF7hdlSRmeBGl090Rd4nEKuxWUdijITnRLjEWxkd?=
+ =?us-ascii?Q?i9//MEjHCZgb3STR0/ypC1+vAOJhODIRBqaf8JcCnnls2BM++rz5YmHWqGug?=
+ =?us-ascii?Q?tmaPw4dF5txEesqWOEZwtNdHu6sXn/o82QaJO17aqjxK8F+DIlQTTKvWof3F?=
+ =?us-ascii?Q?erbj0tMQ74hHs7oh9tjgqZQJItcFGQw1fLBO30AV5GF0GfisT+t1Fi1hP5kL?=
+ =?us-ascii?Q?PkHWuhlNek9n71eHMKh/VT4fM8Jisj8X0dO7iEsNi2hanreM4vsdiE4IczYJ?=
+ =?us-ascii?Q?fERoUjOkhyFSYK1E8yCTJfxjYLTnR9Qq8Ai5FArkiu7QNztSSQEnj4aoaoK0?=
+ =?us-ascii?Q?qsaylDkkYL3+jz8LEUs/6gPfmjUR0KwNHi7pw6ToV8fKPtTUYVjeslBfhp0R?=
+ =?us-ascii?Q?8cYGaCkaXWYlObLeqTPKmpfNqpM6bYIOLR6E2MqEra/2qkxFLRynWCmUFUkS?=
+ =?us-ascii?Q?d9aJeUAtIoYrx3RPstaKtVEixk7V5VH0g/uFbHOCvZ0odwvfgiPNyCFJY6Ne?=
+ =?us-ascii?Q?mHgt0RRNZDc8vyVWww0lbd+w1oH0m71Z2NcY6zsrcD/F/UVDbJrpTEMdpGMX?=
+ =?us-ascii?Q?hVPkn+1N/8NgCvqej0J11EiTpv+po2C4TkrLl6yONaP/5bZ8gh1G8oCiBGcs?=
+ =?us-ascii?Q?H8788huhfYnkJHLNQH3TuN2ZhMs7ZzzCoRcOTnvd3uCqSTixh8nfT/Fu9njA?=
+ =?us-ascii?Q?wrqoUTJMjWzYa9K2tD9ixCOfovBFQJKLHQbpcvhC3rBMJ0umXlPpYmXP653z?=
+ =?us-ascii?Q?nIk/w3dc8YBzDl2VJt9z9iJMXjUShxSKbg6a2Ae+hcuhnOszrc9F/X/+Zv92?=
+ =?us-ascii?Q?VL28OFYSuV4o2U14sPeDWTGjb5jVfKr86y4z/zINe0hfLXvl2ggcRw/ChPWW?=
+ =?us-ascii?Q?yV4YDqJovQayhA4FFAuIWSK/kwe/h57s5TrKaO/a7D9hElyVChIKywcxQ3xW?=
+ =?us-ascii?Q?zxv/McfX/IAOELhRWHWNnQ2vDkZkB5ZDjRZEa0vCon0LjhlVM1QHv4R3HFeM?=
+ =?us-ascii?Q?c/bjoN9UFkjHZU3gcVIyDuHa0PKXbzq4v78h4/Mzj6MLrYGsjej5j/dHhV+a?=
+ =?us-ascii?Q?KfQ0ABo9XkxouRAio5E=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:154e:b0:36c:2976:3012 with SMTP id
- j14-20020a056e02154e00b0036c29763012mr569569ilu.2.1714489345740; Tue, 30 Apr
- 2024 08:02:25 -0700 (PDT)
-Date: Tue, 30 Apr 2024 08:02:25 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000006ca6cc061751a86a@google.com>
-Subject: [syzbot] [wireless?] [usb?] INFO: trying to register non-static key
- in skb_dequeue (3)
-From: syzbot <syzbot+2660b9135e6144ca41a5@syzkaller.appspotmail.com>
-To: kvalo@kernel.org, linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, pkshih@realtek.com, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-
-Hello,
-
-syzbot found the following issue on:
-
-HEAD commit:    3f12222a4beb usb: dwc3: core: Fix compile warning on s390 ..
-git tree:       https://git.kernel.org/pub/scm/linux/kernel/git/gregkh/usb.git usb-testing
-console output: https://syzkaller.appspot.com/x/log.txt?x=12dee6d8980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=6fe204286ac73e15
-dashboard link: https://syzkaller.appspot.com/bug?extid=2660b9135e6144ca41a5
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=127fb7bb180000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=118eeccf180000
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/25a4e2e32205/disk-3f12222a.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/e02cf02ad7b9/vmlinux-3f12222a.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/41deb6e53302/bzImage-3f12222a.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+2660b9135e6144ca41a5@syzkaller.appspotmail.com
-
-usb 1-1: reg 0xfe64, usbctrl_vendorreq TimeOut! status:0xffffffb9 value=0x0 reqtype=0xc0
-rtl_usb: rx_max_size 15360, rx_urb_num 8, in_ep 0
-rtl8192cu: Loading firmware rtlwifi/rtl8192cufw_TMSC.bin
-usb 1-1: USB disconnect, device number 2
-INFO: trying to register non-static key.
-The code is fine but needs lockdep annotation, or maybe
-you didn't initialize this object before use?
-turning off the locking correctness validator.
-CPU: 0 PID: 589 Comm: kworker/0:2 Not tainted 6.9.0-rc5-syzkaller-00105-g3f12222a4beb #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
-Workqueue: usb_hub_wq hub_event
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0x116/0x1f0 lib/dump_stack.c:114
- assign_lock_key kernel/locking/lockdep.c:976 [inline]
- register_lock_class+0xc2a/0x1230 kernel/locking/lockdep.c:1289
- __lock_acquire+0x111/0x3b30 kernel/locking/lockdep.c:5014
- lock_acquire kernel/locking/lockdep.c:5754 [inline]
- lock_acquire+0x1b1/0x560 kernel/locking/lockdep.c:5719
- __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:110 [inline]
- _raw_spin_lock_irqsave+0x3a/0x60 kernel/locking/spinlock.c:162
- skb_dequeue+0x20/0x180 net/core/skbuff.c:3835
- rtl_usb_cleanup drivers/net/wireless/realtek/rtlwifi/usb.c:706 [inline]
- rtl_usb_deinit drivers/net/wireless/realtek/rtlwifi/usb.c:721 [inline]
- rtl_usb_disconnect+0x49e/0x830 drivers/net/wireless/realtek/rtlwifi/usb.c:1051
- usb_unbind_interface+0x1e8/0x970 drivers/usb/core/driver.c:461
- device_remove drivers/base/dd.c:568 [inline]
- device_remove+0x122/0x170 drivers/base/dd.c:560
- __device_release_driver drivers/base/dd.c:1270 [inline]
- device_release_driver_internal+0x44a/0x610 drivers/base/dd.c:1293
- bus_remove_device+0x22f/0x420 drivers/base/bus.c:574
- device_del+0x396/0xa10 drivers/base/core.c:3909
- usb_disable_device+0x36c/0x7f0 drivers/usb/core/message.c:1418
- usb_disconnect+0x2e1/0x920 drivers/usb/core/hub.c:2305
- hub_port_connect drivers/usb/core/hub.c:5361 [inline]
- hub_port_connect_change drivers/usb/core/hub.c:5661 [inline]
- port_event drivers/usb/core/hub.c:5821 [inline]
- hub_event+0x1be4/0x4f50 drivers/usb/core/hub.c:5903
- process_one_work+0x9a9/0x1ac0 kernel/workqueue.c:3254
- process_scheduled_works kernel/workqueue.c:3335 [inline]
- worker_thread+0x6c8/0xf70 kernel/workqueue.c:3416
- kthread+0x2c1/0x3a0 kernel/kthread.c:388
- ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
- </TASK>
-BUG: unable to handle page fault for address: ffffffffffffffd8
-#PF: supervisor write access in kernel mode
-#PF: error_code(0x0002) - not-present page
-PGD 82a2067 P4D 82a2067 PUD 82a4067 PMD 0 
-Oops: 0002 [#1] PREEMPT SMP KASAN PTI
-CPU: 0 PID: 589 Comm: kworker/0:2 Not tainted 6.9.0-rc5-syzkaller-00105-g3f12222a4beb #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
-Workqueue: usb_hub_wq hub_event
-RIP: 0010:arch_atomic_fetch_add arch/x86/include/asm/atomic.h:97 [inline]
-RIP: 0010:raw_atomic_fetch_add_relaxed include/linux/atomic/atomic-arch-fallback.h:749 [inline]
-RIP: 0010:atomic_fetch_add_relaxed include/linux/atomic/atomic-instrumented.h:253 [inline]
-RIP: 0010:__refcount_add include/linux/refcount.h:184 [inline]
-RIP: 0010:__refcount_inc include/linux/refcount.h:241 [inline]
-RIP: 0010:refcount_inc include/linux/refcount.h:258 [inline]
-RIP: 0010:kref_get include/linux/kref.h:45 [inline]
-RIP: 0010:usb_get_urb.part.0+0x1c/0x90 drivers/usb/core/urb.c:114
-Code: 90 90 90 90 90 90 90 90 90 90 90 90 90 90 55 48 89 fd 53 bb 01 00 00 00 e8 81 19 2d fd be 04 00 00 00 48 89 ef e8 d4 02 7f fd <f0> 0f c1 5d 00 31 ff 89 de e8 46 14 2d fd 85 db 74 47 e8 5d 19 2d
-RSP: 0018:ffffc900019cf6b0 EFLAGS: 00010046
-RAX: 0000000000000001 RBX: 0000000000000001 RCX: ffffffff8425b71c
-RDX: fffffbfffffffffc RSI: 0000000000000004 RDI: ffffffffffffffd8
-RBP: ffffffffffffffd8 R08: 0000000000000001 R09: fffffbfffffffffb
-R10: ffffffffffffffdb R11: 0000000000000001 R12: ffff888118830228
-R13: ffffffffffffffd8 R14: ffff888118830288 R15: dffffc0000000000
-FS:  0000000000000000(0000) GS:ffff8881f6400000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: ffffffffffffffd8 CR3: 0000000116906000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- usb_get_urb drivers/usb/core/urb.c:816 [inline]
- usb_kill_anchored_urbs+0xa5/0x380 drivers/usb/core/urb.c:819
- rtl_usb_cleanup drivers/net/wireless/realtek/rtlwifi/usb.c:713 [inline]
- rtl_usb_deinit drivers/net/wireless/realtek/rtlwifi/usb.c:721 [inline]
- rtl_usb_disconnect+0x4d1/0x830 drivers/net/wireless/realtek/rtlwifi/usb.c:1051
- usb_unbind_interface+0x1e8/0x970 drivers/usb/core/driver.c:461
- device_remove drivers/base/dd.c:568 [inline]
- device_remove+0x122/0x170 drivers/base/dd.c:560
- __device_release_driver drivers/base/dd.c:1270 [inline]
- device_release_driver_internal+0x44a/0x610 drivers/base/dd.c:1293
- bus_remove_device+0x22f/0x420 drivers/base/bus.c:574
- device_del+0x396/0xa10 drivers/base/core.c:3909
- usb_disable_device+0x36c/0x7f0 drivers/usb/core/message.c:1418
- usb_disconnect+0x2e1/0x920 drivers/usb/core/hub.c:2305
- hub_port_connect drivers/usb/core/hub.c:5361 [inline]
- hub_port_connect_change drivers/usb/core/hub.c:5661 [inline]
- port_event drivers/usb/core/hub.c:5821 [inline]
- hub_event+0x1be4/0x4f50 drivers/usb/core/hub.c:5903
- process_one_work+0x9a9/0x1ac0 kernel/workqueue.c:3254
- process_scheduled_works kernel/workqueue.c:3335 [inline]
- worker_thread+0x6c8/0xf70 kernel/workqueue.c:3416
- kthread+0x2c1/0x3a0 kernel/kthread.c:388
- ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
- </TASK>
-Modules linked in:
-CR2: ffffffffffffffd8
----[ end trace 0000000000000000 ]---
-RIP: 0010:arch_atomic_fetch_add arch/x86/include/asm/atomic.h:97 [inline]
-RIP: 0010:raw_atomic_fetch_add_relaxed include/linux/atomic/atomic-arch-fallback.h:749 [inline]
-RIP: 0010:atomic_fetch_add_relaxed include/linux/atomic/atomic-instrumented.h:253 [inline]
-RIP: 0010:__refcount_add include/linux/refcount.h:184 [inline]
-RIP: 0010:__refcount_inc include/linux/refcount.h:241 [inline]
-RIP: 0010:refcount_inc include/linux/refcount.h:258 [inline]
-RIP: 0010:kref_get include/linux/kref.h:45 [inline]
-RIP: 0010:usb_get_urb.part.0+0x1c/0x90 drivers/usb/core/urb.c:114
-Code: 90 90 90 90 90 90 90 90 90 90 90 90 90 90 55 48 89 fd 53 bb 01 00 00 00 e8 81 19 2d fd be 04 00 00 00 48 89 ef e8 d4 02 7f fd <f0> 0f c1 5d 00 31 ff 89 de e8 46 14 2d fd 85 db 74 47 e8 5d 19 2d
-RSP: 0018:ffffc900019cf6b0 EFLAGS: 00010046
-RAX: 0000000000000001 RBX: 0000000000000001 RCX: ffffffff8425b71c
-RDX: fffffbfffffffffc RSI: 0000000000000004 RDI: ffffffffffffffd8
-RBP: ffffffffffffffd8 R08: 0000000000000001 R09: fffffbfffffffffb
-R10: ffffffffffffffdb R11: 0000000000000001 R12: ffff888118830228
-R13: ffffffffffffffd8 R14: ffff888118830288 R15: dffffc0000000000
-FS:  0000000000000000(0000) GS:ffff8881f6400000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: ffffffffffffffd8 CR3: 0000000116906000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-----------------
-Code disassembly (best guess):
-   0:	90                   	nop
-   1:	90                   	nop
-   2:	90                   	nop
-   3:	90                   	nop
-   4:	90                   	nop
-   5:	90                   	nop
-   6:	90                   	nop
-   7:	90                   	nop
-   8:	90                   	nop
-   9:	90                   	nop
-   a:	90                   	nop
-   b:	90                   	nop
-   c:	90                   	nop
-   d:	90                   	nop
-   e:	55                   	push   %rbp
-   f:	48 89 fd             	mov    %rdi,%rbp
-  12:	53                   	push   %rbx
-  13:	bb 01 00 00 00       	mov    $0x1,%ebx
-  18:	e8 81 19 2d fd       	call   0xfd2d199e
-  1d:	be 04 00 00 00       	mov    $0x4,%esi
-  22:	48 89 ef             	mov    %rbp,%rdi
-  25:	e8 d4 02 7f fd       	call   0xfd7f02fe
-* 2a:	f0 0f c1 5d 00       	lock xadd %ebx,0x0(%rbp) <-- trapping instruction
-  2f:	31 ff                	xor    %edi,%edi
-  31:	89 de                	mov    %ebx,%esi
-  33:	e8 46 14 2d fd       	call   0xfd2d147e
-  38:	85 db                	test   %ebx,%ebx
-  3a:	74 47                	je     0x83
-  3c:	e8                   	.byte 0xe8
-  3d:	5d                   	pop    %rbp
-  3e:	19                   	.byte 0x19
-  3f:	2d                   	.byte 0x2d
+X-OriginatorOrg: marvell.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: CH0PR18MB4339.namprd18.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 52b81b85-65cc-40a4-0a62-08dc6928a6bd
+X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Apr 2024 15:17:29.6587
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: UBSUJRjmSWbWC44tIr/+polBhEJ824EqOsL87De4EuipkJ1NnFAASApcFgO44nZNYCmJ8WlKWBj/9jlLNYeR5g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN6PR18MB5544
+X-Proofpoint-ORIG-GUID: DO6A6WIAOx5231HFifs8rPDnhxzkoxgZ
+X-Proofpoint-GUID: DO6A6WIAOx5231HFifs8rPDnhxzkoxgZ
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1011,Hydra:6.0.650,FMLib:17.11.176.26
+ definitions=2024-04-30_08,2024-04-30_01,2023-05-22_02
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+> -----Original Message-----
+> From: Jiri Pirko <jiri@resnulli.us>
+> Sent: Tuesday, April 30, 2024 12:27 PM
+> To: Geethasowjanya Akula <gakula@marvell.com>
+> Cc: netdev@vger.kernel.org; linux-kernel@vger.kernel.org; kuba@kernel.org=
+;
+> davem@davemloft.net; pabeni@redhat.com; edumazet@google.com; Sunil
+> Kovvuri Goutham <sgoutham@marvell.com>; Subbaraya Sundeep Bhatta
+> <sbhatta@marvell.com>; Hariprasad Kelam <hkelam@marvell.com>
+> Subject: Re: [EXTERNAL] Re: [net-next PATCH v3 3/9] octeontx2-pf: Create
+> representor netdev
+>=20
+> Mon, Apr 29, 2024 at 06:13:56PM CEST, gakula@marvell.com wrote:
+> >
+> >
+> >> -----Original Message-----
+> >> From: Jiri Pirko <jiri@resnulli.us>
+> >> Sent: Monday, April 29, 2024 5:03 PM
+> >> To: Geethasowjanya Akula <gakula@marvell.com>
+> >> Cc: netdev@vger.kernel.org; linux-kernel@vger.kernel.org;
+> >> kuba@kernel.org; davem@davemloft.net; pabeni@redhat.com;
+> >> edumazet@google.com; Sunil Kovvuri Goutham
+> <sgoutham@marvell.com>;
+> >> Subbaraya Sundeep Bhatta <sbhatta@marvell.com>; Hariprasad Kelam
+> >> <hkelam@marvell.com>
+> >> Subject: [EXTERNAL] Re: [net-next PATCH v3 3/9] octeontx2-pf: Create
+> >> representor netdev
+> >>
+> >> Prioritize security for external emails: Confirm sender and content
+> >> safety before clicking links or opening attachments
+> >>
+> >> ---------------------------------------------------------------------
+> >> - Sun, Apr 28, 2024 at 12:53:06PM CEST, gakula@marvell.com wrote:
+> >> >Adds initial devlink support to set/get the switchdev mode.
+> >> >Representor netdevs are created for each rvu devices when the switch
+> >> >mode is set to 'switchdev'. These netdevs are be used to control and
+> >> >configure VFs.
+> >> >
+> >> >Signed-off-by: Geetha sowjanya <gakula@marvell.com>
+> >>
+> >>
+> >> Are you still missing creating of devlink port as I requested? Why?
+> >Sorry I missed your comment on earlier patchset.
+> >Wrt adding devlink port support, our plan is to get the initial patchset
+> reviewed and then add 'devlink port' support.
+>=20
+> You need to do it in this patchset. Rep netdev without devlink port is
+> unacceptable from my perspective. Thanks!
+Ok. Will add devlink port support and submit next version.
+>=20
+>=20
+> >Will submit 'devlink port' support as a follow-up patch series.
 
