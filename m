@@ -1,160 +1,127 @@
-Return-Path: <netdev+bounces-92404-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92405-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B0D08B6F52
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 12:13:08 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 081068B6F72
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 12:18:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 11899281329
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 10:13:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CACE4B20AEB
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 10:18:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92DCD1292D2;
-	Tue, 30 Apr 2024 10:13:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34939129E66;
+	Tue, 30 Apr 2024 10:17:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VWtlgZz4"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ujiw2/sQ"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD1D2FC02
-	for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 10:13:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8629D128828
+	for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 10:17:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714471984; cv=none; b=lRXnSd6aBiuiy7xCb1ekNf9KV+XU0PayXZIq8tuIRzVTsVYlP60fweDauLrCHFSeKQBr6zkL0yqBGQCY+Zx3da4kBSJtEXnAWK1V2Y6kUUs/hKerwNNR+8DL4bWyghfqsXd3tAaUy1A1+jTRRbFUHPFjWsixy7scFRm3d9Qrulk=
+	t=1714472278; cv=none; b=n2zSJHxASu48zZrj/ffUu1OS1F0Y6P5EjP1GKjpleP7Ec+9YqfcGGgutvry/NGef69PpWayJIM2r47RuBbFIhImAN7sj6AZN3aHELmb1mx+X+eg5/YlXreBa8nU272c+ULcVtte0x8F3npnYQ2iI9XIY5JemkKEdRD+R1OBxRpg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714471984; c=relaxed/simple;
-	bh=c3oCz/hNloXup2zcmbrJly+6BVi1NnWIUKqEaHhRJcs=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=mcFr7ukjlTQGhTKFQr/YA0NirTRIwWy6rfUF6/WHsH2fLR+JHkg/cBuDKelexPTmsvneiux2MlwqXV62K2kQVcmr5uWSni/PA1W3V4ePCk3SM+3K2mbaUFva/bS8Cd8b6xWcOlKyUHONnxVczIK7vMNvZsatuQ3lPrOLzfbAMb4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VWtlgZz4; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1714472278; c=relaxed/simple;
+	bh=DxCBfW2ZX60itdmD+i2ZLg8FWHGDeeOaWCry5xKcra0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=rES6PwPwQiO9g7LNL3bpHnB9Yxx9UHLBTn4rHJV4OAHbZt9J53Kgq0LbqsLel4mVTiAuTjTrIBUlitOVdd9JN7G77okVxRQwk8IxX8KAvbMmQpYL7HoqgfXEl5L5xiym6odiaEBj6faDG+71tlz0cJymbfEEbh0zBKOy40wW9z4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ujiw2/sQ; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1714471981;
+	s=mimecast20190719; t=1714472275;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=2GzIAX1apMfrJy1ajxehnLgS+pyXtcpMXuXBJ+ivWZ0=;
-	b=VWtlgZz4caiBJvrcUctpHG0J3LTmrc0HzljdEslS95JrTqk/zjgN4xqTD99eZaIs9spfwS
-	kPPPv0n+D/mtizItKo7dt5O9klwXYg1fUm4jPqsVcKIasghy3pHl1/zbECs8KqbqEumz+N
-	R0HqNHNtQf52Yx34KSp0xJ4DB7TH1jw=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	 in-reply-to:in-reply-to:references:references;
+	bh=2WgfcDzbL6BdRnbQ/LMHjtoVFL3IiamXBZRn2Dk0E7Y=;
+	b=Ujiw2/sQhjh+EbZy4TR39jWD5+NwqeMdhfkKbOa/OrMp4zhhhQh/EddZ3JFxyOkWX4R2YA
+	bBkHOTwXnxoqpOxEvzWWBIvNm0BBHZQrYWUSlKJ1Iligbp9udvhNhbTzbkb4XAMoKBkpRl
+	MzuBKqxJ3Jv8Vb05vKShetFOdo3ArYU=
+Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
+ [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-9-Yhb6aSQ-PzeS2mPeAjWt-Q-1; Tue, 30 Apr 2024 06:13:00 -0400
-X-MC-Unique: Yhb6aSQ-PzeS2mPeAjWt-Q-1
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-343eb7d0e0eso755823f8f.1
-        for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 03:13:00 -0700 (PDT)
+ us-mta-623-KU2E0nyqNu-Mf6JBMH1UCQ-1; Tue, 30 Apr 2024 06:17:53 -0400
+X-MC-Unique: KU2E0nyqNu-Mf6JBMH1UCQ-1
+Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-2a2e0a51adfso6823490a91.0
+        for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 03:17:53 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714471978; x=1715076778;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2GzIAX1apMfrJy1ajxehnLgS+pyXtcpMXuXBJ+ivWZ0=;
-        b=sOsZ78y9YobwusUnggNGIfvz9Y9MeGCY8V+ma6C3TM9XwyMl6gfBU19frzg76QxqMR
-         mueOPOjSz3G10GMxM9gYSU7Kv7H9ayBc9AhUv+f8wuOLi8MKkkHeBSCzCmBGxZ2CP73Q
-         Ge+tLwmywOgxL/jGUf/yys43H98PrP7B8+zWSAofD/yWQves3/LDG5RbxOUaYhTZLto4
-         ZJhxIymsvEAeQZtY2lBhwhdNzkgpXd4ncxHPYsi6RZoUtTpnA8FNmNGsmyZlmdBrEuTT
-         dSESYYgn0S7Rlrukau8QDXc3j4WiDz7HOyIgFe6TMRH60hxEJHF3tAOe/a1dZ0hsuMZl
-         46oA==
-X-Forwarded-Encrypted: i=1; AJvYcCUW85eDVwlExAnmIqhHMm8mebNe8RVXqYNj+ekqupozDeK3ezc9gOdfdHg+UhlQwPLQhCmeUxCs6ZrIVteKLgNEAABklVlR
-X-Gm-Message-State: AOJu0YzdbuwF3TO9aNCEBusOUG65+oKn1SJAYlBsNaHHoNEA0vtu2CNd
-	8LSqvKgCNwBOgWR1QgiTYvU1/LZlD3LOiLSCDEImGtMd+GbFLwvov3HyBEXW2Z279nauH/5KHQs
-	d4QFy+b1bCMEmJcqyw7Hkhs0zjv3dnBLrXCCK8IECRI/ydHnoCYt1mOwKCBRObQ==
-X-Received: by 2002:a05:600c:1e25:b0:41b:fdf9:98b5 with SMTP id ay37-20020a05600c1e2500b0041bfdf998b5mr5887058wmb.4.1714471978625;
-        Tue, 30 Apr 2024 03:12:58 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE2JkyLdQO1ckGUp9sZHpLi8RtlsiXIzuC2cLAFTWukApXZN7bGlBrfA4y8T0dRGJD4ZoRGtA==
-X-Received: by 2002:a05:600c:1e25:b0:41b:fdf9:98b5 with SMTP id ay37-20020a05600c1e2500b0041bfdf998b5mr5887035wmb.4.1714471978116;
-        Tue, 30 Apr 2024 03:12:58 -0700 (PDT)
-Received: from gerbillo.redhat.com ([2a0d:3341:b0ae:6a10::f71])
-        by smtp.gmail.com with ESMTPSA id l23-20020a05600c1d1700b00418f99170f2sm42438481wms.32.2024.04.30.03.12.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Apr 2024 03:12:57 -0700 (PDT)
-Message-ID: <e590ba4608c9810d3d75fefdcbba9f2a02c23a0f.camel@redhat.com>
-Subject: Re: [PATCH v4 net-next v4 6/6] net: add heuristic for enabling TCP
- fraglist GRO
-From: Paolo Abeni <pabeni@redhat.com>
-To: Felix Fietkau <nbd@nbd.name>, netdev@vger.kernel.org, Eric Dumazet
- <edumazet@google.com>, "David S. Miller" <davem@davemloft.net>, David Ahern
- <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>
-Cc: willemdebruijn.kernel@gmail.com, linux-kernel@vger.kernel.org
-Date: Tue, 30 Apr 2024 12:12:56 +0200
-In-Reply-To: <20240427182305.24461-7-nbd@nbd.name>
-References: <20240427182305.24461-1-nbd@nbd.name>
-	 <20240427182305.24461-7-nbd@nbd.name>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
+        d=1e100.net; s=20230601; t=1714472273; x=1715077073;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=2WgfcDzbL6BdRnbQ/LMHjtoVFL3IiamXBZRn2Dk0E7Y=;
+        b=azfXHrS/+iQVx69G7l2YMxw6aw4xz9QvGc4qyTGK3tdRMNkNdRTezeKQffzs/DiRVK
+         orcwouKFOqNsnfK2ACJVgkwBUYFAlrHm1BReTcaXt72lXj/KUluuiNuTTHjlNP3HUNaB
+         4FMS1vY8DirbNPTixOn3x/gFCLMyO4nzBYCccH6iBdIB7Jl18yKyFInWk/rj0GzRhwUR
+         tSXFcycjIWsarRiboqD84OfCbJ5g2m/rDnIEN2YX0tYqSpKqHTZE9kBnQNw7h9uT++W3
+         oh56xdf1aJEqc/R/6asoppM0pwdof5Hxph/NZtCsnkoZ4IKWDgp55QY57tUq60yquCCh
+         XEHA==
+X-Forwarded-Encrypted: i=1; AJvYcCX2bSKcAT7QtrpT/Fg0zSYu16vmeEoy6WRe+Pyo2lyO0VSgkY1ogznbzqte7WMeUbH9CFa6Nu9rYP9duRwbtxgSkgerbZBq
+X-Gm-Message-State: AOJu0Yx6eeWSOJpW8yGyCXwx8BEYnKd6iptlT+P6FDSIFYsaSazI/Mza
+	0n31N9rQSW+G42jRZCDgdVjqiyJ+am1GgOu/YQsiehF0bzM2bCTx657zLZFIKaIQv8hroiJNjKV
+	Rf1eUNRsyJzNs/inzMD+PPGn6TWdedOLtnpurmXDewm3QVw6GjD0ygi1xBsVNLSxL45V1PhrWhg
+	jXhujxUijq7zDRq9POVAUopWdxdRYD
+X-Received: by 2002:a17:90b:3d86:b0:2af:4f4e:79a7 with SMTP id pq6-20020a17090b3d8600b002af4f4e79a7mr12470174pjb.30.1714472272816;
+        Tue, 30 Apr 2024 03:17:52 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFWSpkNXoLaxHPhUhC5NZ72tcHc7cFhFDuXAR7cTPWqMf81MdK6/Q7OPe/FNtSys3J7tuhnJJXuDUF4sBjb72Q=
+X-Received: by 2002:a17:90b:3d86:b0:2af:4f4e:79a7 with SMTP id
+ pq6-20020a17090b3d8600b002af4f4e79a7mr12470138pjb.30.1714472272243; Tue, 30
+ Apr 2024 03:17:52 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20240429221706.1492418-1-naresh.kamboju@linaro.org>
+In-Reply-To: <20240429221706.1492418-1-naresh.kamboju@linaro.org>
+From: Davide Caratti <dcaratti@redhat.com>
+Date: Tue, 30 Apr 2024 12:17:41 +0200
+Message-ID: <CAKa-r6vJjeYqGZERRr=B4ykLf-efPRY3h=HU3y3QxazwZ_cMAg@mail.gmail.com>
+Subject: Re: selftests: tc-testing: tdc.sh: WARNING: at kernel/locking/lockdep.c:1226
+ lockdep_register_key
+To: Naresh Kamboju <naresh.kamboju@linaro.org>
+Cc: lkft-triage@lists.linaro.org, regressions@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, jhs@mojatatu.com, 
+	xiyou.wangcong@gmail.com, jiri@resnulli.us, cpaasch@apple.com, 
+	pabeni@redhat.com, xmu@redhat.com, maxim@isovalent.com, edumazet@google.com, 
+	anders.roxell@linaro.org, dan.carpenter@linaro.org, arnd@arndb.de, 
+	Linux Kernel Functional Testing <lkft@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sat, 2024-04-27 at 20:23 +0200, Felix Fietkau wrote:
-> When forwarding TCP after GRO, software segmentation is very expensive,
-> especially when the checksum needs to be recalculated.
-> One case where that's currently unavoidable is when routing packets over
-> PPPoE. Performance improves significantly when using fraglist GRO
-> implemented in the same way as for UDP.
->=20
-> When NETIF_F_GRO_FRAGLIST is enabled, perform a lookup for an established
-> socket in the same netns as the receiving device. While this may not
-> cover all relevant use cases in multi-netns configurations, it should be
-> good enough for most configurations that need this.
->=20
-> Here's a measurement of running 2 TCP streams through a MediaTek MT7622
-> device (2-core Cortex-A53), which runs NAT with flow offload enabled from
-> one ethernet port to PPPoE on another ethernet port + cake qdisc set to
-> 1Gbps.
->=20
-> rx-gro-list off: 630 Mbit/s, CPU 35% idle
-> rx-gro-list on:  770 Mbit/s, CPU 40% idle
->=20
-> Signe-off-by: Felix Fietkau <nbd@nbd.name>
-> ---
->  net/ipv4/tcp_offload.c   | 32 ++++++++++++++++++++++++++++++++
->  net/ipv6/tcpv6_offload.c | 35 +++++++++++++++++++++++++++++++++++
->  2 files changed, 67 insertions(+)
->=20
-> diff --git a/net/ipv4/tcp_offload.c b/net/ipv4/tcp_offload.c
-> index 87ae9808e260..3e9b8c6f9c8c 100644
-> --- a/net/ipv4/tcp_offload.c
-> +++ b/net/ipv4/tcp_offload.c
-> @@ -407,6 +407,36 @@ void tcp_gro_complete(struct sk_buff *skb)
->  }
->  EXPORT_SYMBOL(tcp_gro_complete);
-> =20
-> +static void tcp4_check_fraglist_gro(struct list_head *head, struct sk_bu=
-ff *skb,
-> +				    struct tcphdr *th)
-> +{
-> +	const struct iphdr *iph;
-> +	struct sk_buff *p;
-> +	struct sock *sk;
-> +	struct net *net;
-> +	int iif, sdif;
-> +
-> +	if (!(skb->dev->features & NETIF_F_GRO_FRAGLIST))
+hello,
 
-Should we add an 'unlikely()' here to pair with unlikely(is_flist) in
-*gro_receive / *gro_complete?
+On Tue, Apr 30, 2024 at 12:17=E2=80=AFAM Naresh Kamboju
+<naresh.kamboju@linaro.org> wrote:
+>
+> While running selftests: tc-testing: tdc.sh the following kernel warnings=
+,
+> kernel Bug, kernel oops and kernel panic noticed with Linux next-20240429
+> tag kernel as per the available data.
+>
+> This build config is from kselftest merge config[1].
+>
+> Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
+>
+> selftests: tc-testing: tdc.sh log and crash log
 
-Should this test be moved into the caller, to avoid an unconditional
-function call in the ipv6 code?
+the problem is created by [1]. I think that at least we need to guard
+against failures to allocate sch->cpu_bstats and sch->cpu_qstats,
+otherwise the dynamic key is registered but never unregistered (though
+the key is freed  in the error path of of qdisc_alloc() ). But there
+might be also something else; however, I can reproduce some similar
+splat, will follow-up on the list.
 
-(Also waiting for explicit ack from Eric)
+sorry for the noise,
+--=20
+davide
 
-Thank,
-
-Paolo
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/com=
+mit/?id=3Daf0cb3fa3f9ed258d14abab0152e28a0f9593084
 
 
