@@ -1,113 +1,138 @@
-Return-Path: <netdev+bounces-92603-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92604-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A79C18B80F6
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 22:00:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CF608B8112
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 22:04:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D70461C229BA
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 20:00:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CBDF51C2607E
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 20:04:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C9F1199E9B;
-	Tue, 30 Apr 2024 20:00:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32D821BF6DC;
+	Tue, 30 Apr 2024 20:03:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="FF0FHltS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G5xcVyFd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6D43174EF1;
-	Tue, 30 Apr 2024 20:00:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0589C1A0AFB;
+	Tue, 30 Apr 2024 20:03:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714507213; cv=none; b=uihn9/NTt7kqRKo9iErQHr2k1anN7VkPZ83jiQ1q+GeZcNyTgYorhmoRcKl8czblpOyLQUPOGjXcNrC57f7FYeLKM7ZIWdcE+Gdv/MDpPuM/bgbyRLSraxp9jkIyT7pr6Tlj07Qni7DZUUI1GwQpN61kizCMQgRfncus7OUNNO0=
+	t=1714507385; cv=none; b=r67fq/8GaB14LKZci2B2QGJXc+Sor+uGnP7MwiOZKCfJWRzejH7IPAkWs8DEc7tmWcMnV1JMLw7U2QcGzo+uy1asI5burNJlJzBqB2XL7fIXaBsRCBCEAktnQJmZy5kNbnE9E0VN9FmWsD8K6ZlMZLjlWVJSQTV2gZ5m/vPEl0c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714507213; c=relaxed/simple;
-	bh=a0yrZPZEKYcyVZidoYzVQcM4ReLKOBzaNowogk7EJ0w=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=GmHWbyZ46K2snMuqRFIf5ihVJmzGmx7154NT10DrnrxMdsRdfB3GArxVU3wm9NyGuOgmYagPB+uGocROGvT2u0qarnoqq13paykp4suPNtnjWdG+8lPLldL7jtHpjBaUkur5c6sVghCtC23PwTGZJc1OGkRrsUMgAJm3Gg+hDPw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=FF0FHltS; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 43UIxZUE023766;
-	Tue, 30 Apr 2024 20:00:01 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=
-	qcppdkim1; bh=a0yrZPZEKYcyVZidoYzVQcM4ReLKOBzaNowogk7EJ0w=; b=FF
-	0FHltStIiKnAUGo+dClS3AUKZaSiR4AWJpgcbFPp2Rtj6z5QtNEdsENYu1PKqhhB
-	q95qMawFAGF0mEe5Sf8h+aRFVs4/guTdV82AqvTu2O5LLa5/KnMnRIzJr6+tjw7o
-	dwGo6IiD87EzXGGJTI823W26hs6tHsSfZkUXNIvT52c1WyO7fteOU2m6cY0YTYck
-	KOVQnU1+4swEvjssU9iUH4Piqx1+keXevo2NdmmswarnWXbnSv9ctu6DV48SC+rv
-	o0JWmafwazkRQT6h1nHfOb4QrOnlLjjdzlflgsiDXJSyAxTKOQheJU/FsZjyB0H6
-	r6Ec2Iq7LQup17xHYI7A==
-Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3xu6cug3av-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 30 Apr 2024 20:00:00 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 43UJxxj8003281
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 30 Apr 2024 19:59:59 GMT
-Received: from [10.110.13.147] (10.80.80.8) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Tue, 30 Apr
- 2024 12:59:58 -0700
-Message-ID: <9983345a-d590-4a78-94ca-6d96832860b1@quicinc.com>
-Date: Tue, 30 Apr 2024 12:59:57 -0700
+	s=arc-20240116; t=1714507385; c=relaxed/simple;
+	bh=4MMWKqrqMWleDHuXwmb7LFjDvAuwnnOwOjLO3S5FiZI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=IsVbPA3r4tunor2JDX1bN6NFmqHwZJ9+jZtcDEsXc7W4z9CWDTtiQT4pfetO2AZyRtaBySPc24AinmMpeMZdNdjR/ROFPaNhFOB7iI4MY4oRZ+QKce4MMxcwSNFkSQn2h9ZfrUl176KPsxeYQjbWL5vbk6mgx7CyuFSOSVDwPF8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G5xcVyFd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1608C4AF14;
+	Tue, 30 Apr 2024 20:03:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714507384;
+	bh=4MMWKqrqMWleDHuXwmb7LFjDvAuwnnOwOjLO3S5FiZI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=G5xcVyFdVtl54uX/hFKtu4Xp8ZRHZksXd2T0ai5bqu/MORN2M96uFMG3sxxhhlC/H
+	 eHLdTwN8NWUooPxQ72fGu9LdqjzUmnah1c2GzOzi2h8rbZafOHK2kv26V7JnufrNT3
+	 FS3XrMYp1cQi7Vr3IIh3A5PG79xUjoRRE1nLVXb2HxBEGVREkdwqfpGaXwh9e9tumO
+	 iKEzdopuvWlfen73mZa1yyUmfV/7ehba2fXmcYLk3PirbFwn6MblWfFEvlwWXWNqEr
+	 fCTfvdHw/bns0ZwhYpfTEEduzixTLb6RQ2S9Gj4MQz4/0QySN6OeMzY9QlGyLntwA9
+	 WXLgMwh/P4Pkg==
+Date: Tue, 30 Apr 2024 13:03:02 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Danielle Ratson <danieller@nvidia.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "davem@davemloft.net"
+ <davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
+ "pabeni@redhat.com" <pabeni@redhat.com>, "corbet@lwn.net" <corbet@lwn.net>,
+ "linux@armlinux.org.uk" <linux@armlinux.org.uk>, "sdf@google.com"
+ <sdf@google.com>, "kory.maincent@bootlin.com" <kory.maincent@bootlin.com>,
+ "maxime.chevallier@bootlin.com" <maxime.chevallier@bootlin.com>,
+ "vladimir.oltean@nxp.com" <vladimir.oltean@nxp.com>,
+ "przemyslaw.kitszel@intel.com" <przemyslaw.kitszel@intel.com>,
+ "ahmed.zaki@intel.com" <ahmed.zaki@intel.com>, "richardcochran@gmail.com"
+ <richardcochran@gmail.com>, "shayagr@amazon.com" <shayagr@amazon.com>,
+ "paul.greenwalt@intel.com" <paul.greenwalt@intel.com>, "jiri@resnulli.us"
+ <jiri@resnulli.us>, "linux-doc@vger.kernel.org"
+ <linux-doc@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+ <linux-kernel@vger.kernel.org>, mlxsw <mlxsw@nvidia.com>, Petr Machata
+ <petrm@nvidia.com>, Ido Schimmel <idosch@nvidia.com>
+Subject: Re: [PATCH net-next v5 04/10] ethtool: Add flashing transceiver
+ modules' firmware notifications ability
+Message-ID: <20240430130302.235d612d@kernel.org>
+In-Reply-To: <DM6PR12MB45168DC7D9D9D7A5AE3E2B2DD81A2@DM6PR12MB4516.namprd12.prod.outlook.com>
+References: <20240424133023.4150624-1-danieller@nvidia.com>
+	<20240424133023.4150624-5-danieller@nvidia.com>
+	<20240429201130.5fad6d05@kernel.org>
+	<DM6PR12MB45168DC7D9D9D7A5AE3E2B2DD81A2@DM6PR12MB4516.namprd12.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] wifi: nl80211: Avoid address calculations via out of
- bounds array indexing
-Content-Language: en-US
-To: Johannes Berg <johannes@sipsolutions.net>,
-        Kees Cook
-	<keescook@chromium.org>
-CC: Nathan Chancellor <nathan@kernel.org>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, <linux-wireless@vger.kernel.org>,
-        <netdev@vger.kernel.org>,
-        "Gustavo A. R.
- Silva" <gustavoars@kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-hardening@vger.kernel.org>
-References: <20240424220057.work.819-kees@kernel.org>
- <e2f20484fb1f4607d099d2184c1d74c6a39febc1.camel@sipsolutions.net>
-From: Jeff Johnson <quic_jjohnson@quicinc.com>
-In-Reply-To: <e2f20484fb1f4607d099d2184c1d74c6a39febc1.camel@sipsolutions.net>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: ZzcwzMuN5h_Vyv7lYwzGm3icX5xEMFDp
-X-Proofpoint-GUID: ZzcwzMuN5h_Vyv7lYwzGm3icX5xEMFDp
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1011,Hydra:6.0.650,FMLib:17.11.176.26
- definitions=2024-04-30_12,2024-04-30_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- suspectscore=0 adultscore=0 bulkscore=0 mlxlogscore=430 mlxscore=0
- priorityscore=1501 spamscore=0 malwarescore=0 lowpriorityscore=0
- clxscore=1011 phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2404010003 definitions=main-2404300143
 
-On 4/30/2024 3:01 AM, Johannes Berg wrote:
-> This really doesn't even seem right, shouldn't do pointer arithmetic on
-> void pointers.
+On Tue, 30 Apr 2024 18:11:18 +0000 Danielle Ratson wrote:
+> > Do we want to blast it to all listeners or treat it as an async reply?
+> > We can save the seq and portid of the original requester and use reply, I
+> > think.  
+> 
+> I am sorry, I am not sure I understood what you meant here... it
+> should be an async reply, but not sure I understood your suggestion.
+> 
+> Can you explain please?
 
-FWIW I argued this in the past in another context and Linus gave his opinion:
+Make sure you have read the netlink intro, it should help fill in some
+gaps I won't explicitly cover:
+https://docs.kernel.org/next/userspace-api/netlink/intro.html
 
-https://lore.kernel.org/all/CAHk-=whFKYMrF6euVvziW+drw7-yi1pYdf=uccnzJ8k09DoTXA@mail.gmail.com/
+"True" notifications will have pid = 0 and seq = 0, while replies to
+commands have those fields populated based on the request.
 
+pid identifies the socket where the message should be delivered.
+ethnl_multicast() assumes that it's zero (since it's designed to work
+for notifications) and sends the message to all sockets subscribed to 
+a multicast / notification group (ETHNL_MCGRP_MONITOR).
+
+So that's the background. What you're doing isn't incorrect but I think
+it'd be better if we didn't use the multicast group here, and sent the
+messages as a reply - just to the socket which requested the flashing.
+Still asynchronously, we just need to save the right pid and seq to use.
+
+Two reasons for this:
+ 1) convenience, the user space socket won't have to subscribe to 
+    the multicast group
+ 2) the multicast group is really intended for notifying about
+    _configuration changes_ done to the system. If there is a daemon
+    listening on that group, there's a very high chance it won't care
+    about progress of the flashing. Maybe we can send a single
+    notification that flashing has been completed but not "progress
+    updates"
+
+I think it should work.
+
+> > > +void ethnl_module_fw_flash_ntf_err(struct net_device *dev,
+> > > +				   char *err_msg, char *sub_err_msg) {
+> > > +	char status_msg[120];
+> > > +
+> > > +	if (sub_err_msg)
+> > > +		sprintf(status_msg, "%s, %s.", err_msg, sub_err_msg);
+> > > +	else
+> > > +		sprintf(status_msg, "%s.", err_msg);  
+> > 
+> > Hm, printing in the dot, and assuming sizeof err_msg + sub_err < 116 is a bit
+> > surprising. But I guess you have a reason...
+> > 
+> > Maybe pass them separately to ethnl_module_fw_flash_ntf() then you can
+> > nla_reserve() the right amount of space and sprintf() directly into the skb?  
+> 
+> I can get rid of the dot actually, would it be ok like that?
+
+It'd still be better to splice the two strings and the comma directly
+to the skb, rather than on the stack using a function which doesn't
+check the bounds of the buffer :S
 
