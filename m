@@ -1,87 +1,79 @@
-Return-Path: <netdev+bounces-92328-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92329-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36E5B8B6A73
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 08:17:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B176A8B6A74
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 08:20:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CCFC91F255E9
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 06:17:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D769E1C2011E
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 06:20:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82C482E822;
-	Tue, 30 Apr 2024 06:16:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C08114AAD;
+	Tue, 30 Apr 2024 06:20:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="WqVH6WWt"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="zoPrOxQ2"
 X-Original-To: netdev@vger.kernel.org
 Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D80622618
-	for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 06:16:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E33956FB1
+	for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 06:20:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714457811; cv=none; b=tHoOXwjjgYw9MolIXfMK2yuoJuow2U0XTpo9l8aHpg5WDuM02lwvUOCuk8Y6FfCDiu9rAxQ1xF9kwntFZZSuQDRXecio84VDGgHa9Ux35zSh9/YLEy823/V+Ocb/otNUMltFvHA3HhxRX56shOvq9mrYirHW2iKyFMCW+aRaRCk=
+	t=1714458020; cv=none; b=l+Mc0mozfp0Q7m6hfyj4js22ic/l2QOh0cdviWCls17LcjXMo7MogYdH8t8YMlxmt2qa25yqr2aykdIkzOrZLHvdajXzGTBzkIYgq15T4xKHq3CRl2NwKbyiPaz/SkFtHKvkzLCsMEJjiptv3+IvW0sUKt04FCG7kHLvnE0aFV0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714457811; c=relaxed/simple;
-	bh=ORyovM61vzZeh1mBmRb9r+voxEvwy0i9G5xf/N70y9I=;
+	s=arc-20240116; t=1714458020; c=relaxed/simple;
+	bh=voXRMEd9HTP5///3iog9Lsf9aMTQZ10qjYFWfSiM8WM=;
 	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LOVIHy+rjT0AW3LsQYFSTVZkZFIGda30WENJkOYnpgY9IUoqbsmMjgd5QmRnWqps9qn4AglKozwIp2recniUcUYE35Z+Bb40N3xX8PyXXsey17v8AOrJr7p4pFJUZYXwrrhpxYCYyTuBXU2KOhUumPsqjP96kpTrQBx07Bt3bM8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=WqVH6WWt; arc=none smtp.client-ip=62.96.220.36
+	 Content-Type:Content-Disposition:In-Reply-To; b=XAxrxQNjNN00PPtL7opEwTQLJZIlwuCPSJfm/DQesNG5yhqfE01QU3jLlkDEgNJKoJ2B3x7JXXa7ufaYawooeZU4S5ze9H0IxfNTO+47gDFwUpiG2pdSTzkulZFrpHdSkab+DmN3ktm/SbnAquMNtdB+lyNLQ199H7CK6RXW/Og=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=zoPrOxQ2; arc=none smtp.client-ip=62.96.220.36
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
 Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id B602420758;
-	Tue, 30 Apr 2024 08:16:40 +0200 (CEST)
+	by a.mx.secunet.com (Postfix) with ESMTP id 3DBAC207BB;
+	Tue, 30 Apr 2024 08:20:16 +0200 (CEST)
 X-Virus-Scanned: by secunet
 Received: from a.mx.secunet.com ([127.0.0.1])
 	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id aNWcarRYDiih; Tue, 30 Apr 2024 08:16:40 +0200 (CEST)
+	with ESMTP id znmoKJcz2CHV; Tue, 30 Apr 2024 08:20:15 +0200 (CEST)
 Received: from mailout2.secunet.com (mailout2.secunet.com [62.96.220.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id 388C520561;
-	Tue, 30 Apr 2024 08:16:40 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 388C520561
+	by a.mx.secunet.com (Postfix) with ESMTPS id ACC30207B2;
+	Tue, 30 Apr 2024 08:20:15 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com ACC30207B2
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1714457800;
-	bh=8i9nuchNnGcnoY8o+v+3ic/fBM9VqZJ7ljsIwbD2D3U=;
+	s=202301; t=1714458015;
+	bh=5k08DUPW8lDaLo1pLbi1kvrsmzn2uU/aq5iDGdLqQwc=;
 	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
-	b=WqVH6WWtGiIqg00/ztz/+3mIKbSHyCG4e+UBOSUTKTM2L0gDmoYhkD461jZLizJuq
-	 2uy8fxDcitwdmYYAA5CgnRNKjY44c+PeShUuwsLuSY2tfLchcuAAvqoRuEH6twddaw
-	 aZuIQSCrD4aLRdGMwUJcvXOROXbZDpzCL1UnnPCeucZEFhqY/NBj3vPfMzHFZ7zxg9
-	 EvjwIx2CjV2fPHl6Ib4QIQ5cdCGHE+fz7WF5c+PrcC66JEdExRQKCDYviJ8Vw7OTFK
-	 zBJPvPnkSbj78aZ5EO5z/IKlX+CoUFFg0zyBx++dNxQXAFdM8ehJGTGFfXs3wEnPbq
-	 i8EpJCMWA0+gQ==
+	b=zoPrOxQ2PaR6O7nqO0nlpYBI1/uo0e3myQb30njZmIgnI8XvPbMy2EYFy+LPcYWt1
+	 AX+si1reBJO+mqlGo+FwO1DM9RBIn+stYRiOItx6J/3GbPWTeNc+0paMFQCUpxWAxo
+	 pmGhvvU5HuZPazr43j9RSMPt/L/fRSVsocXgFPS8ACD+6kbXe3Ps+ZKX5qVGwu6WOx
+	 wGhaL33O9bsB2FUGRSt7LXiSk5hfy8k/OTgHQJbeBJuH5WZkCmuKxaphB4IfSiEa4G
+	 W/MiLTB/3dU14N+lo3yKaZ6w5pvRBQmWHXxjGgUXRqbqBolhy7LKJ16miJ9AP+sbDV
+	 fDrFPdxs7FnXA==
 Received: from cas-essen-01.secunet.de (unknown [10.53.40.201])
-	by mailout2.secunet.com (Postfix) with ESMTP id 2AC3280004A;
-	Tue, 30 Apr 2024 08:16:40 +0200 (CEST)
+	by mailout2.secunet.com (Postfix) with ESMTP id 9F97680004A;
+	Tue, 30 Apr 2024 08:20:15 +0200 (CEST)
 Received: from mbx-essen-02.secunet.de (10.53.40.198) by
  cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Tue, 30 Apr 2024 08:16:39 +0200
+ 15.1.2507.39; Tue, 30 Apr 2024 08:20:15 +0200
 Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
  (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Tue, 30 Apr
- 2024 08:16:39 +0200
+ 2024 08:20:14 +0200
 Received: by gauss2.secunet.de (Postfix, from userid 1000)
-	id 34F993182A0F; Tue, 30 Apr 2024 08:16:39 +0200 (CEST)
-Date: Tue, 30 Apr 2024 08:16:39 +0200
+	id ACEEA3182A0F; Tue, 30 Apr 2024 08:20:14 +0200 (CEST)
+Date: Tue, 30 Apr 2024 08:20:14 +0200
 From: Steffen Klassert <steffen.klassert@secunet.com>
-To: Sabrina Dubroca <sd@queasysnail.net>
-CC: Antony Antony <antony.antony@secunet.com>, Herbert Xu
-	<herbert@gondor.apana.org.au>, <netdev@vger.kernel.org>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, <devel@linux-ipsec.org>,
-	Leon Romanovsky <leon@kernel.org>, Eyal Birger <eyal.birger@gmail.com>,
-	Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Subject: Re: [PATCH ipsec-next v13 1/4] xfrm: Add Direction to the SA in or
- out
-Message-ID: <ZjCMxwhiIvAbqvxy@gauss3.secunet.de>
-References: <cover.1714118266.git.antony.antony@secunet.com>
- <21d941a355a4d7655bb8647ba3db145b83969a6f.1714118266.git.antony.antony@secunet.com>
- <Zi-OdMloMyZ-BynF@hog>
+To: Antony Antony <antony@phenome.org>
+CC: <netdev@vger.kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH ipsec] xfrm: Correct spelling mistake in xfrm.h comment
+Message-ID: <ZjCNnmUJV0yGnuMZ@gauss3.secunet.de>
+References: <Zit-sTZoYp_JnQfd@Antony2201.local>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -90,24 +82,23 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <Zi-OdMloMyZ-BynF@hog>
-X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
+In-Reply-To: <Zit-sTZoYp_JnQfd@Antony2201.local>
+X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
  mbx-essen-02.secunet.de (10.53.40.198)
 X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
 
-On Mon, Apr 29, 2024 at 02:11:32PM +0200, Sabrina Dubroca wrote:
-> 2024-04-26, 10:05:06 +0200, Antony Antony wrote:
+On Fri, Apr 26, 2024 at 12:15:13PM +0200, Antony Antony wrote:
+> From: Antony Antony <antony.antony@secunet.com>
 > 
-> Sorry I didn't check all the remaining flags until now.
+> A spelling error was found in the comment section of
+> include/uapi/linux/xfrm.h. Since this header file is copied to many
+> userspace programs and undergoes Debian spellcheck, it's preferable to
+> fix it in upstream rather than downstream having exceptions.
 > 
+> This commit fixes the spelling mistake.
 > 
-> Apart from that, the series looks good now, so I can also ack it and
-> add those two extra flags as a follow-up patch. Steffen/Antony, let me
-> know what you prefer.
+> Fixes: df71837d5024 ("[LSM-IPSec]: Security association restriction.")
+> Signed-off-by: Antony Antony <antony.antony@secunet.com>
 
-It would be nice if we could merge the patchset without known
-issues. OTOH this might be the last chance to get in in during
-this release cycle.
-
-Antony, can you provide an update today?
+Applied, thanks Antony!
 
