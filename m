@@ -1,211 +1,214 @@
-Return-Path: <netdev+bounces-92418-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92419-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 931788B6FE9
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 12:41:12 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D8F188B70D9
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 12:50:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B76E11C21A4D
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 10:41:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4F4331F23220
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 10:50:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 950EA12C53F;
-	Tue, 30 Apr 2024 10:40:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A3F712C49E;
+	Tue, 30 Apr 2024 10:50:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bT3SDQf3"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="C+X0FFdj"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0F0E12CDB1
-	for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 10:40:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D08F412B176;
+	Tue, 30 Apr 2024 10:50:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714473641; cv=none; b=qpWvhfqMpG8oOt8RVfhmwnjIPhcnTM9SCxlCy3gaGccdjWjt/ilzKzs59syfar5kfTRjFTPqFjJ0oVXW0rNl61JGt3CCOLJG4f2U5wxMmwDwrcOROZzZZFMQhk8WNSBLu+Y6OrWyYnCV9jOsS7VpT+cblEbuTWMmdvz0D7PE+/Q=
+	t=1714474237; cv=none; b=SgxwXiKzgPd2qPYCeXI1CUgmd5hdw2LGXPbJHRH3a/D5bG/7Col/2EgvccBrCLqO94l1vy59xGSlMUpdw6S6PYTyN8fuE6j69RGkSwoUn13bzi5H+eBQbcQ0zzQWJnQ4IObpJxaH62eCilKfsTNNwq+xv5U+aAJ+4TdzgCHluQg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714473641; c=relaxed/simple;
-	bh=MZrViSg8jsZ0VHahAlyxw7aZOP9IOSCCin+ffecckc8=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=ekhzAFXPOPYPxXIFslbQfARS9cXMH2tBCm2GXFQtMqcsFEVC6Q2ZVMZKrbU/oP7a9QhHLDQgOuSSrturUVRxbwnQpgZUt5OTzbrSmzQlF2U1ZeJ1B3hrblMVbgemMNLFkPpz1qMd9bzBe8mh/OUuoqnDAFx5ZFoNpF5ah+z3EAk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bT3SDQf3; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1714473639;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=z+3pI/52NLYbeniFa7s38Cg51LKELjtpe+t6gtnHwiY=;
-	b=bT3SDQf38H7XGTw45Wbtav77sceP/tNqc+eQr8uBbxlj7+0OFRu78xTskaj2y3gEPI4bp7
-	7LZ/aapXi83YaXfpHp91MB0qpVu51k3hMHNr4FIqBEbLdfe845fB7dEb4VEO0DU0W8uY28
-	ICbAPcZfepsuB9kAnWzk9+TiXbs8ZiE=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-182-E3mQS1RAOyiQlaxcsbACYw-1; Tue, 30 Apr 2024 06:40:37 -0400
-X-MC-Unique: E3mQS1RAOyiQlaxcsbACYw-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-41b2cf29762so6662645e9.0
-        for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 03:40:37 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714473636; x=1715078436;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=z+3pI/52NLYbeniFa7s38Cg51LKELjtpe+t6gtnHwiY=;
-        b=cvzEnAMMo2nYh+Y30vdEZmJQwZGMjcDdW6PoNxmP/Bzkp32v4FbL3loLn212mov6ov
-         FwYZwkT/HxIohr97JgUBuxmxZetdDwNxmvbQ/mtKp/j4YgvcQ9qnbNSmbCi4qKlQiU1w
-         NChEFq5GkV7dxq3ZwO7w5fh5DcmrIq2xT9O7lWeiT/+nBO9CayPEm+KizQLaaW9EhG/T
-         vhGiSLptjcXxyiV5CcZIt5FQvv9HaqZVFAiCwwcbqFnGb3Pmbr/fvPOrIrGvBn2LBGEs
-         N4ydBqRt30PCrZ2DE0gMEM6ZfgvD7CVegopTQacAkMJGLhO413M4g3C4x+ZZI2+6EZYe
-         8N+A==
-X-Forwarded-Encrypted: i=1; AJvYcCW302cHdMzGCdFGm7zhS2Lk9IIsURg8O0z2cPOzmebaTkGKs99V8/Qzr9j2LJmGJoGb+W6xvf13MMeYrba48sfBJRasZR/9
-X-Gm-Message-State: AOJu0YzE/tZ0O3TjogcE/+aj6ytGVonLpn8Tf/txPsAMZC9dX5QQCf+7
-	7GUSUIqBSERykZUYQZhgrCWKw85PxhOhDRFIdCib7IbatMgump255ITzH61CxtEj9MYsJeLzYvU
-	uSDpXrk+M0yipmqO3UpUbW9SWJQpHXCzIoROgPgxz4M4GNgcmnOqtG9fN+TJz7w==
-X-Received: by 2002:a05:600c:1d26:b0:41a:c04a:8021 with SMTP id l38-20020a05600c1d2600b0041ac04a8021mr9320321wms.0.1714473636176;
-        Tue, 30 Apr 2024 03:40:36 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHGIDRHUgcbr1K8Ie6wDrg7kUpsxvavfyrGxgyBY4SxyKPvAYu/OM+f0v5zhtSL3UFz3WEIwQ==
-X-Received: by 2002:a05:600c:1d26:b0:41a:c04a:8021 with SMTP id l38-20020a05600c1d2600b0041ac04a8021mr9320304wms.0.1714473635738;
-        Tue, 30 Apr 2024 03:40:35 -0700 (PDT)
-Received: from gerbillo.redhat.com ([2a0d:3341:b0ae:6a10::f71])
-        by smtp.gmail.com with ESMTPSA id b2-20020a05600010c200b0034c9f060a14sm8445728wrx.11.2024.04.30.03.40.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Apr 2024 03:40:35 -0700 (PDT)
-Message-ID: <bef0c2839b05d4f2692fa3cde82258e6af87e645.camel@redhat.com>
-Subject: Re: [PATCH v4 net-next v4 2/6] net: add support for segmenting TCP
- fraglist GSO packets
-From: Paolo Abeni <pabeni@redhat.com>
-To: Felix Fietkau <nbd@nbd.name>, netdev@vger.kernel.org, Eric Dumazet
- <edumazet@google.com>, "David S. Miller" <davem@davemloft.net>, David Ahern
- <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>
-Cc: willemdebruijn.kernel@gmail.com, linux-kernel@vger.kernel.org
-Date: Tue, 30 Apr 2024 12:40:33 +0200
-In-Reply-To: <9e686cb4-ed1f-4886-a0b7-328367e62757@nbd.name>
-References: <20240427182305.24461-1-nbd@nbd.name>
-	 <20240427182305.24461-3-nbd@nbd.name>
-	 <a20a0f0479cedc7f2f6abaf26e46ca7642e70958.camel@redhat.com>
-	 <9e686cb4-ed1f-4886-a0b7-328367e62757@nbd.name>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
+	s=arc-20240116; t=1714474237; c=relaxed/simple;
+	bh=TCc3/P/vb2bKsNgh0DMGDkw3+VtZMF32Qljv9aV8fpg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=Ei9dQGsCNhnT+2aothfTw0yYiOTNHnCSkxECMoBdE8qiIBwqr/+r3z/qcxm/OOPH2Wa8UY2DvI7+8eh178ibDiKzQSTmPXkDrPXHDHDAHigfYNiOR8vs7blB/zBqqlhUPHXgvFGL10ePEhuKd5TLL8WTTCEQ44wDLx5/jSugj1Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=C+X0FFdj; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 43UAjsB9009165;
+	Tue, 30 Apr 2024 10:50:14 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : references : content-type : in-reply-to :
+ mime-version; s=pp1; bh=KIXZsXA38DEVkkC2fzxHMp+LuAzjui54oRUIHYvigdE=;
+ b=C+X0FFdjvbC0a9Dm1DdNFSnKzLhE36e41tYMxbL+q1wYYnb1FIB8ZYD4QTPrjaZhHnuy
+ DAHQsk2IumldqJlT42G4sUClFnHKrd2CQCZzgCvIjXfLfHTal3hNHL+jiq/wh3Pdrxxi
+ PJE1Wqi3Rq6KI7Kv85WEHcQGwCr2SiAMl249bqqaKiSm96chaQoxD7d4Sbovs0NfLc9l
+ hYFPN/mxmu2A+KG+XtBbLB7ptCZ9OHAcxO5K6ASMVwtpdl3YqsACl5r3BnfSJBBCkNo/
+ Ky1MHqYOL9LnusTjoKzEpx73p/+1D5bOXpfa7j7vka7Z64crbKvGQo8oHGA33g4yxg+3 rQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xty1yg0h6-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 30 Apr 2024 10:50:14 +0000
+Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 43UAoD1G017171;
+	Tue, 30 Apr 2024 10:50:13 GMT
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xty1yg0h3-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 30 Apr 2024 10:50:13 +0000
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 43U7E7aa022334;
+	Tue, 30 Apr 2024 10:50:12 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3xsd6mme8t-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 30 Apr 2024 10:50:12 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 43UAo6NZ4456976
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 30 Apr 2024 10:50:08 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 9E2282004E;
+	Tue, 30 Apr 2024 10:50:06 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 4E9C420040;
+	Tue, 30 Apr 2024 10:50:06 +0000 (GMT)
+Received: from DESKTOP-2CCOB1S. (unknown [9.171.161.140])
+	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Tue, 30 Apr 2024 10:50:06 +0000 (GMT)
+Date: Tue, 30 Apr 2024 12:50:05 +0200
+From: Tobias Huschle <huschle@linux.ibm.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Luis Machado <luis.machado@arm.com>, Jason Wang <jasowang@redhat.com>,
+        Abel Wu <wuyun.abel@bytedance.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Linux Kernel <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
+        virtualization@lists.linux.dev, netdev@vger.kernel.org,
+        nd <nd@arm.com>, borntraeger@linux.ibm.com
+Subject: Re: EEVDF/vhost regression (bisected to 86bfbb7ce4f6 sched/fair: Add
+ lag based placement)
+Message-ID: <ZjDM3SsZ3NkZuphP@DESKTOP-2CCOB1S.>
+References: <89460.124020106474400877@us-mta-475.us.mimecast.lan>
+ <20240311130446-mutt-send-email-mst@kernel.org>
+ <cf813f92-9806-4449-b099-1bb2bd492b3c@arm.com>
+ <73123.124031407552500165@us-mta-156.us.mimecast.lan>
+ <20240314110649-mutt-send-email-mst@kernel.org>
+ <84704.124031504335801509@us-mta-515.us.mimecast.lan>
+ <20240315062839-mutt-send-email-mst@kernel.org>
+ <b3fd680c675208370fc4560bb3b4d5b8@linux.ibm.com>
+ <20240319042829-mutt-send-email-mst@kernel.org>
+ <4808eab5fc5c85f12fe7d923de697a78@linux.ibm.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4808eab5fc5c85f12fe7d923de697a78@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: OWDcAJbU4IsjSsDQmPO3kNj-5XcYWDnZ
+X-Proofpoint-ORIG-GUID: IscbDflkXN5EgID7BfMaWZI85fn9JhIq
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1011,Hydra:6.0.650,FMLib:17.11.176.26
+ definitions=2024-04-30_04,2024-04-29_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxlogscore=999
+ mlxscore=0 spamscore=0 lowpriorityscore=0 clxscore=1011 impostorscore=0
+ phishscore=0 malwarescore=0 adultscore=0 priorityscore=1501 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2404010000
+ definitions=main-2404300077
 
-On Tue, 2024-04-30 at 12:27 +0200, Felix Fietkau wrote:
-> On 30.04.24 12:19, Paolo Abeni wrote:
-> > On Sat, 2024-04-27 at 20:22 +0200, Felix Fietkau wrote:
-> > > Preparation for adding TCP fraglist GRO support. It expects packets t=
-o be
-> > > combined in a similar way as UDP fraglist GSO packets.
-> > > For IPv4 packets, NAT is handled in the same way as UDP fraglist GSO.
-> > >=20
-> > > Signed-off-by: Felix Fietkau <nbd@nbd.name>
-> > > ---
-> > >  net/ipv4/tcp_offload.c   | 67 ++++++++++++++++++++++++++++++++++++++=
-++
-> > >  net/ipv6/tcpv6_offload.c | 58 ++++++++++++++++++++++++++++++++++
-> > >  2 files changed, 125 insertions(+)
-> > >=20
-> > > diff --git a/net/ipv4/tcp_offload.c b/net/ipv4/tcp_offload.c
-> > > index fab0973f995b..affd4ed28cfe 100644
-> > > --- a/net/ipv4/tcp_offload.c
-> > > +++ b/net/ipv4/tcp_offload.c
-> > > @@ -28,6 +28,70 @@ static void tcp_gso_tstamp(struct sk_buff *skb, un=
-signed int ts_seq,
-> > >  	}
-> > >  }
-> > > =20
-> > > +static void __tcpv4_gso_segment_csum(struct sk_buff *seg,
-> > > +				     __be32 *oldip, __be32 newip,
-> > > +				     __be16 *oldport, __be16 newport)
-> > > +{
-> > > +	struct tcphdr *th;
-> > > +	struct iphdr *iph;
-> > > +
-> > > +	if (*oldip =3D=3D newip && *oldport =3D=3D newport)
-> > > +		return;
-> > > +
-> > > +	th =3D tcp_hdr(seg);
-> > > +	iph =3D ip_hdr(seg);
-> > > +
-> > > +	inet_proto_csum_replace4(&th->check, seg, *oldip, newip, true);
-> > > +	inet_proto_csum_replace2(&th->check, seg, *oldport, newport, false)=
-;
-> > > +	*oldport =3D newport;
-> > > +
-> > > +	csum_replace4(&iph->check, *oldip, newip);
-> > > +	*oldip =3D newip;
-> > > +}
-> > > +
-> > > +static struct sk_buff *__tcpv4_gso_segment_list_csum(struct sk_buff =
-*segs)
-> > > +{
-> > > +	const struct tcphdr *th;
-> > > +	const struct iphdr *iph;
-> > > +	struct sk_buff *seg;
-> > > +	struct tcphdr *th2;
-> > > +	struct iphdr *iph2;
-> > > +
-> > > +	seg =3D segs;
-> > > +	th =3D tcp_hdr(seg);
-> > > +	iph =3D ip_hdr(seg);
-> > > +	th2 =3D tcp_hdr(seg->next);
-> > > +	iph2 =3D ip_hdr(seg->next);
-> > > +
-> > > +	if (!(*(const u32 *)&th->source ^ *(const u32 *)&th2->source) &&
-> > > +	    iph->daddr =3D=3D iph2->daddr && iph->saddr =3D=3D iph2->saddr)
-> > > +		return segs;
-> > > +
-> > > +	while ((seg =3D seg->next)) {
-> > > +		th2 =3D tcp_hdr(seg);
-> > > +		iph2 =3D ip_hdr(seg);
-> > > +
-> > > +		__tcpv4_gso_segment_csum(seg,
-> > > +					 &iph2->saddr, iph->saddr,
-> > > +					 &th2->source, th->source);
-> > > +		__tcpv4_gso_segment_csum(seg,
-> > > +					 &iph2->daddr, iph->daddr,
-> > > +					 &th2->dest, th->dest);
-> > > +	}
-> > > +
-> > > +	return segs;
-> > > +}
-> >=20
-> > AFAICS, all the above is really alike the UDP side, except for the
-> > transport header zero csum.
-> >=20
-> > What about renaming the udp version of this helpers as 'tcpudpv4_...',
-> > move them in common code, add an explicit argument for
-> > 'zerocsum_allowed' and reuse such helper for both tcp and udp?
-> >=20
-> > The same for the ipv6 variant.
->=20
-> Wouldn't that make it more convoluted when taking into account that the=
-=20
-> checksum field offset is different for tcp vs udp?
-> How would you handle that?
+It took me a while, but I was able to figure out why EEVDF behaves 
+different then CFS does. I'm still waiting for some official confirmation
+of my assumptions but it all seems very plausible to me.
 
-Probably making a common helper just for
-__tcpudpv{4,6}_gso_segment_csum and pass it the target l4 csum pointer
-as an additional argument. It would not be spectacularly nice, so no
-strong opinion either way.
+Leaving aside all the specifics of vhost and kworkers, a more general
+description of the scenario would be as follows:
 
-Cheers,
+Assume that we have two tasks taking turns on a single CPU. 
+Task 1 does something and wakes up Task 2.
+Task 2 does something and goes to sleep.
+And we're just repeating that.
+Task 1 and task 2 only run for very short amounts of time, i.e. much 
+shorter than a regular time slice (vhost = task1, kworker = task2).
 
-Paolo
+Let's further assume, that task 1 runs longer than task 2. 
+In CFS, this means, that vruntime of task 1 starts to outrun the vruntime
+of task 2. This means that vruntime(task2) < vruntime(task1). Hence, task 2
+always gets picked on wake up because it has the smaller vruntime. 
+In EEVDF, this would translate to a permanent positive lag, which also 
+causes task 2 to get consistently scheduled on wake up.
 
+Let's now assume, that ocassionally, task 2 runs a little bit longer than
+task 1. In CFS, this means, that task 2 can close the vruntime gap by a
+bit, but, it can easily remain below the value of task 1. Task 2 would 
+still get picked on wake up.
+With EEVDF, in its current form, task 2 will now get a negative lag, which
+in turn, will cause it not being picked on the next wake up.
 
+So, it seems we have a change in the level of how far the both variants look 
+into the past. CFS being willing to take more history into account, whereas
+EEVDF does not (with update_entity_lag setting the lag value from scratch, 
+and place_entity not taking the original vruntime into account).
 
+All of this can be seen as correct by design, a task consumes more time
+than the others, so it has to give way to others. The big difference
+is now, that CFS allowed a task to collect some bonus by constantly using 
+less CPU time than others and trading that time against ocassionally taking
+more CPU time. EEVDF could do the same thing, by allowing the accumulation
+of positive lag, which can then be traded against the one time the task
+would get negative lag. This might clash with other EEVDF assumptions though.
 
+The patch below fixes the degredation, but is not at all aligned with what 
+EEVDF wants to achieve, but it helps as an indicator that my hypothesis is
+correct.
+
+So, what does this now mean for the vhost regression we were discussing?
+
+1. The behavior of the scheduler changed with regard to wake-up scenarios.
+2. vhost in its current form relies on the way how CFS works by assuming 
+   that the kworker always gets scheduled.
+
+I would like to argue that it therefore makes sense to reconsider the vhost
+implementation to make it less dependent on the internals of the scheduler.
+As proposed earlier in this thread, I see two options:
+
+1. Do an explicit schedule() after every iteration across the vhost queues
+2. Set the need_resched flag after writing to the socket that would trigger
+   eventfd and the underlying kworker
+
+Both options would make sure that the vhost gives up the CPU as it cannot
+continue anyway without the kworker handling the event. Option 1 will give
+up the CPU regardless of whether something was found in the queues, whereas
+option 2 would only give up the CPU if there is.
+
+It shall be noted, that we encountered similar behavior when running some
+fio benchmarks. From a brief glance at the code, I was seeing similar
+intentions: Loop over queues, then trigger an action through some event
+mechanism. Applying the same patch as mentioned above also fixes this issue.
+
+It could be argued, that this is still something that needs to be somehow
+addressed by the scheduler since it might affect others as well and there 
+are in fact patches coming in. Will they address our issue here? Not sure yet.
+On the other hand, it might just be beneficial to make vhost more resilient
+towards the scheduler's algorithm by not relying on a certain behavior in
+the wakeup path.
+Further discussion on additional commits to make EEVDF work correctly can 
+be found here: 
+https://lore.kernel.org/lkml/20240408090639.GD21904@noisy.programming.kicks-ass.net/T/
+So far these patches do not fix the degredation.
+
+diff --git a/kernel/sched/fair.c b/kernel/sched/fair.c
+index 03be0d1330a6..b83a72311d2a 100644
+--- a/kernel/sched/fair.c
++++ b/kernel/sched/fair.c
+@@ -701,7 +701,7 @@ static void update_entity_lag(struct cfs_rq *cfs_rq, struct sched_entity *se)
+        s64 lag, limit;
+ 
+        SCHED_WARN_ON(!se->on_rq);
+-       lag = avg_vruntime(cfs_rq) - se->vruntime;
++       lag = se->vlag + avg_vruntime(cfs_rq) - se->vruntime;
+ 
+        limit = calc_delta_fair(max_t(u64, 2*se->slice, TICK_NSEC), se);
+        se->vlag = clamp(lag, -limit, limit);
 
 
