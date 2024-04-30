@@ -1,221 +1,160 @@
-Return-Path: <netdev+bounces-92413-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92404-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28B3C8B6FA9
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 12:28:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B0D08B6F52
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 12:13:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4CC021C211B0
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 10:28:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 11899281329
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 10:13:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE71914265E;
-	Tue, 30 Apr 2024 10:28:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92DCD1292D2;
+	Tue, 30 Apr 2024 10:13:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VWtlgZz4"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5E1D1420D8
-	for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 10:28:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD1D2FC02
+	for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 10:13:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714472904; cv=none; b=MnZLgC2BfcFw+ruU4I2xFlbBSeu7tPfqdErTuXj7C8/sVSsdSDac3V9xx1fvIJSubz+Xvi55OBFvX3TUFRQ1gidUEDkgIZMI55u/YlEmhQzalC64C2rTQF3Pb4BXD9TAGtFu4b0VY4itJ+/n+awSmfdH3IuboMVOgbZokgEwE5k=
+	t=1714471984; cv=none; b=lRXnSd6aBiuiy7xCb1ekNf9KV+XU0PayXZIq8tuIRzVTsVYlP60fweDauLrCHFSeKQBr6zkL0yqBGQCY+Zx3da4kBSJtEXnAWK1V2Y6kUUs/hKerwNNR+8DL4bWyghfqsXd3tAaUy1A1+jTRRbFUHPFjWsixy7scFRm3d9Qrulk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714472904; c=relaxed/simple;
-	bh=17TzqhMYzGeft7fLUsMzLJTT61KYGgxRAOmEk0hDiTs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MBPG/AwjKINPUSwssbVTkX+cCxH9lD3Y6Aa3blJ0dKHIpHry1gdlhQ/VZO8CRNa0LeXEqERi0QseTxz7yRVIYANdHurKNNHvER5ddIB1HMS4eNXzn1UjtAQ9WHsXuu972EIlRAdy/PBBnnEK+h/uA2lPPkzjTdAG3MzxB05ozOA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1s1kiT-00011g-Lh; Tue, 30 Apr 2024 12:28:05 +0200
-Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1s1kiS-00F92s-3T; Tue, 30 Apr 2024 12:28:04 +0200
-Received: from pengutronix.de (unknown [172.20.34.65])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 0D24D2C4A51;
-	Tue, 30 Apr 2024 09:10:59 +0000 (UTC)
-Date: Tue, 30 Apr 2024 11:10:58 +0200
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Vitor Soares <ivitro@gmail.com>
-Cc: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>, 
-	Thomas Kopp <thomas.kopp@microchip.com>, Wolfgang Grandegger <wg@grandegger.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Vitor Soares <vitor.soares@toradex.com>, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH v3] can: mcp251xfd: fix infinite loop when xmit fails
-Message-ID: <20240430-curassow-of-improbable-poetry-1611f8-mkl@pengutronix.de>
-References: <20240311121143.306403-1-ivitro@gmail.com>
+	s=arc-20240116; t=1714471984; c=relaxed/simple;
+	bh=c3oCz/hNloXup2zcmbrJly+6BVi1NnWIUKqEaHhRJcs=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=mcFr7ukjlTQGhTKFQr/YA0NirTRIwWy6rfUF6/WHsH2fLR+JHkg/cBuDKelexPTmsvneiux2MlwqXV62K2kQVcmr5uWSni/PA1W3V4ePCk3SM+3K2mbaUFva/bS8Cd8b6xWcOlKyUHONnxVczIK7vMNvZsatuQ3lPrOLzfbAMb4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VWtlgZz4; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1714471981;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=2GzIAX1apMfrJy1ajxehnLgS+pyXtcpMXuXBJ+ivWZ0=;
+	b=VWtlgZz4caiBJvrcUctpHG0J3LTmrc0HzljdEslS95JrTqk/zjgN4xqTD99eZaIs9spfwS
+	kPPPv0n+D/mtizItKo7dt5O9klwXYg1fUm4jPqsVcKIasghy3pHl1/zbECs8KqbqEumz+N
+	R0HqNHNtQf52Yx34KSp0xJ4DB7TH1jw=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-9-Yhb6aSQ-PzeS2mPeAjWt-Q-1; Tue, 30 Apr 2024 06:13:00 -0400
+X-MC-Unique: Yhb6aSQ-PzeS2mPeAjWt-Q-1
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-343eb7d0e0eso755823f8f.1
+        for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 03:13:00 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714471978; x=1715076778;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=2GzIAX1apMfrJy1ajxehnLgS+pyXtcpMXuXBJ+ivWZ0=;
+        b=sOsZ78y9YobwusUnggNGIfvz9Y9MeGCY8V+ma6C3TM9XwyMl6gfBU19frzg76QxqMR
+         mueOPOjSz3G10GMxM9gYSU7Kv7H9ayBc9AhUv+f8wuOLi8MKkkHeBSCzCmBGxZ2CP73Q
+         Ge+tLwmywOgxL/jGUf/yys43H98PrP7B8+zWSAofD/yWQves3/LDG5RbxOUaYhTZLto4
+         ZJhxIymsvEAeQZtY2lBhwhdNzkgpXd4ncxHPYsi6RZoUtTpnA8FNmNGsmyZlmdBrEuTT
+         dSESYYgn0S7Rlrukau8QDXc3j4WiDz7HOyIgFe6TMRH60hxEJHF3tAOe/a1dZ0hsuMZl
+         46oA==
+X-Forwarded-Encrypted: i=1; AJvYcCUW85eDVwlExAnmIqhHMm8mebNe8RVXqYNj+ekqupozDeK3ezc9gOdfdHg+UhlQwPLQhCmeUxCs6ZrIVteKLgNEAABklVlR
+X-Gm-Message-State: AOJu0YzdbuwF3TO9aNCEBusOUG65+oKn1SJAYlBsNaHHoNEA0vtu2CNd
+	8LSqvKgCNwBOgWR1QgiTYvU1/LZlD3LOiLSCDEImGtMd+GbFLwvov3HyBEXW2Z279nauH/5KHQs
+	d4QFy+b1bCMEmJcqyw7Hkhs0zjv3dnBLrXCCK8IECRI/ydHnoCYt1mOwKCBRObQ==
+X-Received: by 2002:a05:600c:1e25:b0:41b:fdf9:98b5 with SMTP id ay37-20020a05600c1e2500b0041bfdf998b5mr5887058wmb.4.1714471978625;
+        Tue, 30 Apr 2024 03:12:58 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE2JkyLdQO1ckGUp9sZHpLi8RtlsiXIzuC2cLAFTWukApXZN7bGlBrfA4y8T0dRGJD4ZoRGtA==
+X-Received: by 2002:a05:600c:1e25:b0:41b:fdf9:98b5 with SMTP id ay37-20020a05600c1e2500b0041bfdf998b5mr5887035wmb.4.1714471978116;
+        Tue, 30 Apr 2024 03:12:58 -0700 (PDT)
+Received: from gerbillo.redhat.com ([2a0d:3341:b0ae:6a10::f71])
+        by smtp.gmail.com with ESMTPSA id l23-20020a05600c1d1700b00418f99170f2sm42438481wms.32.2024.04.30.03.12.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 30 Apr 2024 03:12:57 -0700 (PDT)
+Message-ID: <e590ba4608c9810d3d75fefdcbba9f2a02c23a0f.camel@redhat.com>
+Subject: Re: [PATCH v4 net-next v4 6/6] net: add heuristic for enabling TCP
+ fraglist GRO
+From: Paolo Abeni <pabeni@redhat.com>
+To: Felix Fietkau <nbd@nbd.name>, netdev@vger.kernel.org, Eric Dumazet
+ <edumazet@google.com>, "David S. Miller" <davem@davemloft.net>, David Ahern
+ <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>
+Cc: willemdebruijn.kernel@gmail.com, linux-kernel@vger.kernel.org
+Date: Tue, 30 Apr 2024 12:12:56 +0200
+In-Reply-To: <20240427182305.24461-7-nbd@nbd.name>
+References: <20240427182305.24461-1-nbd@nbd.name>
+	 <20240427182305.24461-7-nbd@nbd.name>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="kyt4gwwqp74cbnux"
-Content-Disposition: inline
-In-Reply-To: <20240311121143.306403-1-ivitro@gmail.com>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-
---kyt4gwwqp74cbnux
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On 11.03.2024 12:11:43, Vitor Soares wrote:
-> From: Vitor Soares <vitor.soares@toradex.com>
+On Sat, 2024-04-27 at 20:23 +0200, Felix Fietkau wrote:
+> When forwarding TCP after GRO, software segmentation is very expensive,
+> especially when the checksum needs to be recalculated.
+> One case where that's currently unavoidable is when routing packets over
+> PPPoE. Performance improves significantly when using fraglist GRO
+> implemented in the same way as for UDP.
 >=20
-> When the mcp251xfd_start_xmit() function fails, the driver stops
-> processing messages, and the interrupt routine does not return,
-> running indefinitely even after killing the running application.
+> When NETIF_F_GRO_FRAGLIST is enabled, perform a lookup for an established
+> socket in the same netns as the receiving device. While this may not
+> cover all relevant use cases in multi-netns configurations, it should be
+> good enough for most configurations that need this.
 >=20
-> Error messages:
-> [  441.298819] mcp251xfd spi2.0 can0: ERROR in mcp251xfd_start_xmit: -16
-> [  441.306498] mcp251xfd spi2.0 can0: Transmit Event FIFO buffer not empt=
-y. (seq=3D0x000017c7, tef_tail=3D0x000017cf, tef_head=3D0x000017d0, tx_head=
-=3D0x000017d3).
-> ... and repeat forever.
+> Here's a measurement of running 2 TCP streams through a MediaTek MT7622
+> device (2-core Cortex-A53), which runs NAT with flow offload enabled from
+> one ethernet port to PPPoE on another ethernet port + cake qdisc set to
+> 1Gbps.
 >=20
-> The issue can be triggered when multiple devices share the same
-> SPI interface. And there is concurrent access to the bus.
+> rx-gro-list off: 630 Mbit/s, CPU 35% idle
+> rx-gro-list on:  770 Mbit/s, CPU 40% idle
 >=20
-> The problem occurs because tx_ring->head increments even if
-> mcp251xfd_start_xmit() fails. Consequently, the driver skips one
-> TX package while still expecting a response in
-> mcp251xfd_handle_tefif_one().
->=20
-> This patch resolves the issue by decreasing tx_ring->head if
-> mcp251xfd_start_xmit() fails. With the fix, if we trigger the issue and
-> the err =3D -EBUSY, the driver returns NETDEV_TX_BUSY. The network stack
-> retries to transmit the message.
-> Otherwise, it prints an error and discards the message.
->=20
-> Fixes: 55e5b97f003e ("can: mcp25xxfd: add driver for Microchip MCP25xxFD =
-SPI CAN")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Vitor Soares <vitor.soares@toradex.com>
+> Signe-off-by: Felix Fietkau <nbd@nbd.name>
 > ---
+>  net/ipv4/tcp_offload.c   | 32 ++++++++++++++++++++++++++++++++
+>  net/ipv6/tcpv6_offload.c | 35 +++++++++++++++++++++++++++++++++++
+>  2 files changed, 67 insertions(+)
 >=20
-> V2->V3:
->   - Add tx_dropped stats.
->   - netdev_sent_queue() only if can_put_echo_skb() succeed.
->=20
-> V1->V2:
->   - Return NETDEV_TX_BUSY if mcp251xfd_tx_obj_write() =3D=3D -EBUSY.
->   - Rework the commit message to address the change above.
->   - Change can_put_echo_skb() to be called after mcp251xfd_tx_obj_write()=
- succeed.
->     Otherwise, we get Kernel NULL pointer dereference error.
->=20
->  drivers/net/can/spi/mcp251xfd/mcp251xfd-tx.c | 34 ++++++++++++--------
->  1 file changed, 21 insertions(+), 13 deletions(-)
->=20
-> diff --git a/drivers/net/can/spi/mcp251xfd/mcp251xfd-tx.c b/drivers/net/c=
-an/spi/mcp251xfd/mcp251xfd-tx.c
-> index 160528d3cc26..146c44e47c60 100644
-> --- a/drivers/net/can/spi/mcp251xfd/mcp251xfd-tx.c
-> +++ b/drivers/net/can/spi/mcp251xfd/mcp251xfd-tx.c
-> @@ -166,6 +166,7 @@ netdev_tx_t mcp251xfd_start_xmit(struct sk_buff *skb,
->  				 struct net_device *ndev)
->  {
->  	struct mcp251xfd_priv *priv =3D netdev_priv(ndev);
-> +	struct net_device_stats *stats =3D &ndev->stats;
->  	struct mcp251xfd_tx_ring *tx_ring =3D priv->tx;
->  	struct mcp251xfd_tx_obj *tx_obj;
->  	unsigned int frame_len;
-> @@ -181,25 +182,32 @@ netdev_tx_t mcp251xfd_start_xmit(struct sk_buff *sk=
-b,
->  	tx_obj =3D mcp251xfd_get_tx_obj_next(tx_ring);
->  	mcp251xfd_tx_obj_from_skb(priv, tx_obj, skb, tx_ring->head);
+> diff --git a/net/ipv4/tcp_offload.c b/net/ipv4/tcp_offload.c
+> index 87ae9808e260..3e9b8c6f9c8c 100644
+> --- a/net/ipv4/tcp_offload.c
+> +++ b/net/ipv4/tcp_offload.c
+> @@ -407,6 +407,36 @@ void tcp_gro_complete(struct sk_buff *skb)
+>  }
+>  EXPORT_SYMBOL(tcp_gro_complete);
 > =20
-> -	/* Stop queue if we occupy the complete TX FIFO */
->  	tx_head =3D mcp251xfd_get_tx_head(tx_ring);
-> -	tx_ring->head++;
-> -	if (mcp251xfd_get_tx_free(tx_ring) =3D=3D 0)
-> -		netif_stop_queue(ndev);
-> -
->  	frame_len =3D can_skb_get_frame_len(skb);
-> -	err =3D can_put_echo_skb(skb, ndev, tx_head, frame_len);
-> -	if (!err)
-> -		netdev_sent_queue(priv->ndev, frame_len);
+> +static void tcp4_check_fraglist_gro(struct list_head *head, struct sk_bu=
+ff *skb,
+> +				    struct tcphdr *th)
+> +{
+> +	const struct iphdr *iph;
+> +	struct sk_buff *p;
+> +	struct sock *sk;
+> +	struct net *net;
+> +	int iif, sdif;
 > +
-> +	tx_ring->head++;
-> =20
->  	err =3D mcp251xfd_tx_obj_write(priv, tx_obj);
-> -	if (err)
-> -		goto out_err;
-> +	if (err) {
-> +		tx_ring->head--;
-> =20
-> -	return NETDEV_TX_OK;
-> +		if (err =3D=3D -EBUSY)
-> +			return NETDEV_TX_BUSY;
-> =20
-> - out_err:
-> -	netdev_err(priv->ndev, "ERROR in %s: %d\n", __func__, err);
-> +		stats->tx_dropped++;
-> +
-> +		if (net_ratelimit())
-> +			netdev_err(priv->ndev,
-> +				   "ERROR in %s: %d\n", __func__, err);
-> +	} else {
-> +		err =3D can_put_echo_skb(skb, ndev, tx_head, frame_len);
-> +		if (!err)
-> +			netdev_sent_queue(priv->ndev, frame_len);
-> +
-> +		/* Stop queue if we occupy the complete TX FIFO */
-> +		if (mcp251xfd_get_tx_free(tx_ring) =3D=3D 0)
-> +			netif_stop_queue(ndev);
-> +	}
+> +	if (!(skb->dev->features & NETIF_F_GRO_FRAGLIST))
 
-Once you have sent the TX objects to the chip, it can trigger a TX
-complete IRQ. This is not very likely as the SPI sends asynchronously
-and the xmit handler cannot sleep.
+Should we add an 'unlikely()' here to pair with unlikely(is_flist) in
+*gro_receive / *gro_complete?
 
-This means you have to call can_put_echo_skb() and stop the queue if
-needed, _before_ you call mcp251xfd_tx_obj_write(). In case of an error,
-you have to roll-back these.
+Should this test be moved into the caller, to avoid an unconditional
+function call in the ipv6 code?
 
-regards,
-Marc
+(Also waiting for explicit ack from Eric)
 
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+Thank,
 
---kyt4gwwqp74cbnux
-Content-Type: application/pgp-signature; name="signature.asc"
+Paolo
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmYwtZMACgkQKDiiPnot
-vG8c8Af7B+kXfKdty6H3EChYBzrzZZFfPSb4H/y7hspY16T0JGasHn4yiY5AzDxf
-QlaTBrx2ritE5JLosJD4TRs/5yUw52Dd3fJCEXp50VP5ziT6t332RCSHMrHfT2aF
-aq5xU0srFHnfMgpiHgYidmfG/EIQXBAxGUlYFqnry7Q/JklyjOtYdrcyUQWaJ5R0
-CgqkjzYeaQ1vOu2C0pNXblx54xiu0cGsTio9/Zmn4rNrB/u3PvdMwVNYJan3uhIH
-HDOvKO/dvPkjfymriQutKSeUfLcnoiaFp44hglhfeKDnLDbQNFs7yIhzaKXUc9g3
-UScv9TaxR3r/0LHab+IThgsRIgTmZQ==
-=6kq0
------END PGP SIGNATURE-----
-
---kyt4gwwqp74cbnux--
 
