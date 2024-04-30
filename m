@@ -1,92 +1,148 @@
-Return-Path: <netdev+bounces-92620-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92621-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 954748B8223
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 23:52:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0276F8B8229
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 23:54:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 005B12844D2
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 21:52:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id ADF701F22635
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 21:54:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84F7A1BED89;
-	Tue, 30 Apr 2024 21:51:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KNpn6BNP"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7DAF1BED9E;
+	Tue, 30 Apr 2024 21:54:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D88C1BED7A;
-	Tue, 30 Apr 2024 21:51:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04BAF1BED7A;
+	Tue, 30 Apr 2024 21:54:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714513918; cv=none; b=NC6CfRch9NS34wJ0X+HzRVA24iHp3McyGNCUDXyVkvSJIlP52Xt2bMlghq24cDb2BqvWRptFvF2czgVmdr7STx9pfbHxE4FDhW8+GKK2ugteLA9KaWIlakphuvDRNK95kv5R+Rtym36qTc0hHiqFWQaPMXylYaod79wTMm40tAY=
+	t=1714514056; cv=none; b=dYCu1JIfK2xyX/Fj3oecFyyS4C1ZN0DprOZU3jHJQGSuMyRfC5jiy9sPhI+rZBUk4UfYZAsNMMKLd+a7j5YbCf9sK9rKLBtdJPvQ7qu37Ijs/h+JxGnjLPD/y3MLajEKLUI5mxA24JATe9PPQsheocVWMBAelZM9DTxW5F3COHw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714513918; c=relaxed/simple;
-	bh=+0rMFc8W9K6N8tTRcAbFLgTHxUGbC3wry46O1XEkCoE=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=bfRgwWwhZ7lfrqOzYCf8S4Yv8exNwcImFo537IdLYGxrBFPKq91oFrDPqmW4Wg1EcFEsGa2Nsj2I0torl10QMG6NG9/tKBf852K+31iHhmG2FyLmD7We7dQ9Gi4RpQlvFL+LtjEVq8x0zCIhfnVz7WI0lTHo8E9RGgpgyJ3f+UA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KNpn6BNP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 0EDE8C4AF19;
-	Tue, 30 Apr 2024 21:51:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714513918;
-	bh=+0rMFc8W9K6N8tTRcAbFLgTHxUGbC3wry46O1XEkCoE=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=KNpn6BNP23sWa+MZFKrEfAHnludgSYghf3qv04paljB3M4X9F7f/7u9eWNXeeTgpk
-	 4ZMMe02FoEMUPo0S3Bcq4CsmQqaa9VR8fvd6pbrpdikooxeHZp4zi/8IHQHd46Dd6G
-	 l0fYVw2QRV8tCyvS8KtQhEBIHR+oUdlJHQhj2naV4PZM0418/3IMjY1hwVa6SCMTa5
-	 9N+But4kfEbcvOpgm9TWKZkeRsgpVmzPTfs+t5sJK9EUd5bOkVGd8Hou5Q6Alct/Sk
-	 y/fH3+EKXAl+taQoGaK2qVLHtyPJk90Hydco4lzE5zu1tnMPCfGYLKQFSNdPisDHxO
-	 68vZYQ3/l7yaA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id F2EB1C43443;
-	Tue, 30 Apr 2024 21:51:57 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1714514056; c=relaxed/simple;
+	bh=zuO7Ws6HI2qfJ6Q89WdCK7XpUdWjT7P+8LS3uVnpW6E=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=GjNWfN16li4hD1bIoMqRiCBZApJfL+9xAyWNl/ijACjFoUztosSFMT8L+oIZ/btKM0TqS+wkoRFoB9xT31nYhs26kHLt2/gz+6NMqY3lwgPz/MK60ECRanmWgS5T1mX49ZrSt2aVEdcyujhl1JlarmeO5GvMdS0ak6E7So2zar8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.97.1)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1s1vQI-0000000016x-33u8;
+	Tue, 30 Apr 2024 21:54:02 +0000
+Date: Tue, 30 Apr 2024 22:53:55 +0100
+From: Daniel Golle <daniel@makrotopia.org>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>, Felix Fietkau <nbd@nbd.name>,
+	Daniel Golle <daniel@makrotopia.org>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: [PATCH] dt-bindings: net: mediatek: remove wrongly added clocks and
+ SerDes
+Message-ID: <ea2e786eda4561cb5d11b62a4edd7e75c0975f1f.1714513773.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: pull request: bluetooth 2024-04-24
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <171451391799.30746.13972006009899083304.git-patchwork-notify@kernel.org>
-Date: Tue, 30 Apr 2024 21:51:57 +0000
-References: <20240424204102.2319483-1-luiz.dentz@gmail.com>
-In-Reply-To: <20240424204102.2319483-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, linux-bluetooth@vger.kernel.org,
- netdev@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Hello:
+Several clocks as well as both sgmiisys phandles were added by mistake
+to the Ethernet bindings for MT7988.
 
-This pull request was applied to bluetooth/bluetooth-next.git (master)
-by Jakub Kicinski <kuba@kernel.org>:
+This happened because the vendor driver which served as a reference uses
+a high number of syscon phandles to access various parts of the SoC
+which wasn't acceptable upstream. Hence several parts which have never
+previously been supported (such SerDes PHY and USXGMII PCS) are going to
+be implemented by separate drivers. As a result the device tree will
+look much more sane.
 
-On Wed, 24 Apr 2024 16:41:02 -0400 you wrote:
-> The following changes since commit 5b5f724b05c550e10693a53a81cadca901aefd16:
-> 
->   net: phy: mediatek-ge-soc: follow netdev LED trigger semantics (2024-04-24 11:50:49 +0100)
-> 
-> are available in the Git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2024-04-24
-> 
-> [...]
+Quickly align the bindings with the upcoming reality of the drivers
+actually adding support for the remaining Ethernet-related features of
+the MT7988 SoC.
 
-Here is the summary with links:
-  - pull request: bluetooth 2024-04-24
-    https://git.kernel.org/bluetooth/bluetooth-next/c/e6b219014fb3
+Fixes: c94a9aabec36 ("dt-bindings: net: mediatek,net: add mt7988-eth binding")
+Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+---
+ .../devicetree/bindings/net/mediatek,net.yaml | 32 ++++---------------
+ 1 file changed, 7 insertions(+), 25 deletions(-)
 
-You are awesome, thank you!
+diff --git a/Documentation/devicetree/bindings/net/mediatek,net.yaml b/Documentation/devicetree/bindings/net/mediatek,net.yaml
+index e74502a0afe8..030d106bc7d3 100644
+--- a/Documentation/devicetree/bindings/net/mediatek,net.yaml
++++ b/Documentation/devicetree/bindings/net/mediatek,net.yaml
+@@ -337,32 +337,23 @@ allOf:
+           minItems: 4
+ 
+         clocks:
+-          minItems: 34
+-          maxItems: 34
++          minItems: 24
++          maxItems: 24
+ 
+         clock-names:
+           items:
+-            - const: crypto
++            - const: xgp1
++            - const: xgp2
++            - const: xgp3
+             - const: fe
+             - const: gp2
+             - const: gp1
+             - const: gp3
++            - const: esw
++            - const: crypto
+             - const: ethwarp_wocpu2
+             - const: ethwarp_wocpu1
+             - const: ethwarp_wocpu0
+-            - const: esw
+-            - const: netsys0
+-            - const: netsys1
+-            - const: sgmii_tx250m
+-            - const: sgmii_rx250m
+-            - const: sgmii2_tx250m
+-            - const: sgmii2_rx250m
+-            - const: top_usxgmii0_sel
+-            - const: top_usxgmii1_sel
+-            - const: top_sgm0_sel
+-            - const: top_sgm1_sel
+-            - const: top_xfi_phy0_xtal_sel
+-            - const: top_xfi_phy1_xtal_sel
+             - const: top_eth_gmii_sel
+             - const: top_eth_refck_50m_sel
+             - const: top_eth_sys_200m_sel
+@@ -375,15 +366,6 @@ allOf:
+             - const: top_netsys_sync_250m_sel
+             - const: top_netsys_ppefb_250m_sel
+             - const: top_netsys_warp_sel
+-            - const: wocpu1
+-            - const: wocpu0
+-            - const: xgp1
+-            - const: xgp2
+-            - const: xgp3
+-
+-        mediatek,sgmiisys:
+-          minItems: 2
+-          maxItems: 2
+ 
+ patternProperties:
+   "^mac@[0-1]$":
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.44.0
 
 
