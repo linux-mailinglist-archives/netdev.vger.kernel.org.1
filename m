@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-92642-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92643-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 735798B82F0
-	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 01:15:12 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A0E18B82F1
+	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 01:15:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 987F91C2271E
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 23:15:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DD4A3B23900
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 23:15:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48A5C1BF6FF;
-	Tue, 30 Apr 2024 23:14:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 280401C2325;
+	Tue, 30 Apr 2024 23:14:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2QXevQ32"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nbJzfE3h"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B48F31C230A
-	for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 23:14:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 607C51C2314
+	for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 23:14:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714518886; cv=none; b=qXRTOrfHv3dfQSGjShpV9mz+LzdoshA5XemfEKeWTD5z0QL1rM/b1s99j4sWDWabnv8sX9fxyisRzdkxsnWKoGJwJG8LPOmT/ykCMObt0VFTW/RAjH0QR6jtz98rCfVxVhCW36RaYOd9xCQXaHQoK+N7HsSq7hKtbRtipZTE/kw=
+	t=1714518888; cv=none; b=e0k+MZXBJSfWaIDub+6//dROYOD/gpYhGbZGHhsycRNWsUS9GeBYsEMIfsuaGu7+ufcTinHn+8Pf+MbdtUgQIWT/zUdtUFEjxI28n2c727hYXsOFwBudw8FU7FX3lyQVWGgCpO1OJl+B02iAwJbqdIC3B/dA66RCMTVx3Xd3f0w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714518886; c=relaxed/simple;
-	bh=Kcwo9z19w2X4PJZvh7/+SUOYEVJ9O743aJGBsQl493Q=;
+	s=arc-20240116; t=1714518888; c=relaxed/simple;
+	bh=nqU7lgRnFZ/X0PNcsH7nolu4PE5U2oVnLJQWPNzmGVY=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=KHE2iz0Sq1G9f7Ny2qxYhgfczAEa76YMpqmyLimH1oswzEgL5m/rLc0FUzGPWUjAFzriQ04D+jZYHwVlHJZHoyewLN4b0guQEcPKnCL0RwcxpjJgqYRP1yCI4OLrEFcVX49yZuCYLaM5q8lgf1OJTCThInCQUSL+y7I3k3pGNR4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--shailend.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2QXevQ32; arc=none smtp.client-ip=209.85.219.201
+	 To:Cc:Content-Type; b=TJY4jUe3YffwoC1BEdLOiAKLqLVwB5LkUGjqG6HzXURlGr7aJG0phDqi5Xtd7DPuwnFhb8FPu8PWa61UCduA7R/IrLJNWcBtGGdZ6YJFbCdskMLZTNocdbls/sREVKrQoznrglm3bGFPRjEOiqEfzf8zaK5OHAAsHvqexYRBxi0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--shailend.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nbJzfE3h; arc=none smtp.client-ip=209.85.128.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--shailend.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-de617c7649dso2012148276.0
-        for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 16:14:44 -0700 (PDT)
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-61be75e21fdso31895557b3.0
+        for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 16:14:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1714518884; x=1715123684; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1714518885; x=1715123685; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=JIWEL1Ar1WKeaXWtcbiWbbyFnhxykfVzID7b3E5pD1Y=;
-        b=2QXevQ3296fpHclMT7dzULr0cqAB8hWncMOi1LY2dqsayNBoHo5bce3vO6CG1aaMz8
-         UY3nTGWwKWn7fTIr7TX8nLBLo+8NaVONw28uLz9LI6UxT8r+UiEBMLQmyyFR2wmZ4MWT
-         xXbSKMaN9cVPb63ljIZLxLm1xIEV0pkVEx5rvw0Ctux1Im016GKUUARA/vBj8FnwlL2N
-         joqOgbbgiwHCdsbcwqaHtqftWTWldJhoxztjxhfaR6NCs6nGEhdbcjYl0IkGIMZiEMdR
-         Q5qNOn2PBC/z3MDoc+DTHNHH7L9Z9p5QPMGwbZ1Xar8wCXJU1rnzFIaq2++1fl+tk8OS
-         QsTA==
+        bh=X1h4LMrzCT+Amis4VKG8AAFYoLhhUQWunAXrHJrR4lI=;
+        b=nbJzfE3hoWnblFI+vePyEpt2GekhRZkqOZnPeD2BDbqHokYTv+XmSbAI7EJkjQ0J89
+         m5pMQDbUK9UnIdr0yauWsrgo0PsGhzhGB+4pXmCDdLy9OfLPfxxPRMpd0pW6CuQBbtJK
+         VOpoCRHNTBMsj2s8djIIEnEI8GH8jGDt1p1i29QR/vGGpubRDJYJY6hRYldClaBz81GL
+         r9VtPTumkIixr3UJCLNXsup5IQLAlOUykKSse8yAMKLQmBku7EugLIyJeZc4Ev+dhgwz
+         MXKfAmrlXFHT7BhSWpgadU4ALSTCkmMrLlE91J2JSiy7Ylo97ci9XzU3IMbpRxH41vZg
+         UvBg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714518884; x=1715123684;
+        d=1e100.net; s=20230601; t=1714518885; x=1715123685;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JIWEL1Ar1WKeaXWtcbiWbbyFnhxykfVzID7b3E5pD1Y=;
-        b=o4vxEaUPisSGCay639+LgjJG1Fbi6TOrDW8HXmddXfHp03opFhmoK7Y/g9G2o+TOfi
-         6ffkF7TVLMhnJzTct/m7mrbTNivmfmWHwKTjtB35AeKgnzylofmSh7f3ubHmOCfQiYXd
-         984JhKoJxsBw5hFSlzPO22Gv29kX2uRmCmhG7nDZPc05OrzVhGEtR2w2BVyyWJij+fzz
-         vtQDxWX+SxMOWycJuLOhDLyEdhptrWl1CVPRxZeiyepLX8Dyfl7UHlgnKJ1MslRZ/P/j
-         vn4WbZaIy5MvC/0xJ1+XmcUnJaWd812DZA61pLIRw75ss1zFDstvJYwGuKniEUckCDdg
-         3qAQ==
-X-Gm-Message-State: AOJu0YwNpPNThRrirB5xLMgji9eVh3RYfziOjbnYldpgxASKt2N/Ekmp
-	/f6fkMQyAYxA2cSeUZDxu7wQzqRuJPGxzGdYzEIdHF0mhyFQvMJGmLW7CydWH95y7koukdm/F9o
-	DoxroGjkXn1d4tAtoQiDG5WxKD62cEeQn0k3Qrr6la6FK3LxHXdze2FDngISX5KXB5zTiINaFOA
-	1YvSzqo84fTzjmWFvcGMpCmjLyFq4zGOa+858583xABRA=
-X-Google-Smtp-Source: AGHT+IHrd84vedK8kDVn4adgcF0t6RY1A7JQ4yVDVigBnBJ/hDldO7NfdnX5qQvNMfVtuZE5DpTRPP3frBE2Ng==
+        bh=X1h4LMrzCT+Amis4VKG8AAFYoLhhUQWunAXrHJrR4lI=;
+        b=PEjaN9k7gYLhgzeuUFqC7yqq0HasLo9qqDVNxu37NI4ARem/VV+nt7RbRr6hpQG1Fu
+         nOZQM7UCBTG/doMZzDG8njXYq7qRHzLOfXTcDB6m11+jzdosHe28LEyZKLRxiRRdN/64
+         G5g2mn6W2CRdGH4AiX3foDh/zrBGMUquWJ3BM+ueNtQ38AMeePb0cENsrV6knhFSJ1Hc
+         gZCdJl7sI9/NeYTFAESv+OMVU1Zv/3ykvguJoh5Jsi8h38QJ89mJ4qXytgcArN5GvgKZ
+         gWpqJRt5GzZ4nnbZtZIykykWvQyWnqJhVIxqrLFC0SjqSKREEOJoB/klHSd2f6dD76JJ
+         lgLw==
+X-Gm-Message-State: AOJu0YzCe636df7eANWA3Yr21L5Jz6YPL1QHU/xFzVTwWvYxPePjMBf2
+	49eh1oGBw+uPl0hboqkld0LXfeX3EdFLvvWAIMri8NcNcRjYZobD+Y11ep2lZbPP+xki4Q+D5vJ
+	bbHME8T04Gk2AuxGqg1JG8n5Tl0TEOrXQyd3+fY/Oi1zEamfaWFD6O4F86OaDPRhMUsyGMhc06g
+	8SHK8+HrrtzV2Zt7O750qUqEWLd3bXvJ8lYFYnygr+dtE=
+X-Google-Smtp-Source: AGHT+IFxTLJVhZ0ppLimVy7QqvU8zr+LhLmWPZm7IYSCzpK+j/DFd+pSfMRH8nyzcedsOQUjpq2hPG8UkPAbdw==
 X-Received: from shailendkvm.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:2648])
- (user=shailend job=sendgmr) by 2002:a05:6902:c0b:b0:de5:2ce1:b62d with SMTP
- id fs11-20020a0569020c0b00b00de52ce1b62dmr168525ybb.10.1714518883761; Tue, 30
- Apr 2024 16:14:43 -0700 (PDT)
-Date: Tue, 30 Apr 2024 23:14:15 +0000
+ (user=shailend job=sendgmr) by 2002:a0d:d2c5:0:b0:61d:3304:c25e with SMTP id
+ u188-20020a0dd2c5000000b0061d3304c25emr270225ywd.7.1714518885252; Tue, 30 Apr
+ 2024 16:14:45 -0700 (PDT)
+Date: Tue, 30 Apr 2024 23:14:16 +0000
 In-Reply-To: <20240430231420.699177-1-shailend@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,8 +74,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240430231420.699177-1-shailend@google.com>
 X-Mailer: git-send-email 2.45.0.rc0.197.gbae5840b3b-goog
-Message-ID: <20240430231420.699177-7-shailend@google.com>
-Subject: [PATCH net-next 06/10] gve: Avoid rescheduling napi if on wrong cpu
+Message-ID: <20240430231420.699177-8-shailend@google.com>
+Subject: [PATCH net-next 07/10] gve: Reset Rx ring state in the ring-stop funcs
 From: Shailend Chand <shailend@google.com>
 To: netdev@vger.kernel.org
 Cc: almasrymina@google.com, davem@davemloft.net, edumazet@google.com, 
@@ -84,121 +84,264 @@ Cc: almasrymina@google.com, davem@davemloft.net, edumazet@google.com,
 	Shailend Chand <shailend@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-In order to make possible the implementation of per-queue ndo hooks,
-gve_turnup was changed in a previous patch to account for queues already
-having some unprocessed descriptors: it does a one-off napi_schdule to
-handle them. If conditions of consistent high traffic persist in the
-immediate aftermath of this, the poll routine for a queue can be "stuck"
-on the cpu on which the ndo hooks ran, instead of the cpu its irq has
-affinity with.
+This does not fix any existing bug. In anticipation of the ndo queue api
+hooks that alloc/free/start/stop a single Rx queue, the already existing
+per-queue stop functions are being made more robust. Specifically for
+this use case: rx_queue_n.stop() + rx_queue_n.start()
 
-This situation is exacerbated by the fact that the ndo hooks for all the
-queues are invoked on the same cpu, potentially causing all the napi
-poll routines to be residing on the same cpu.
-
-A self correcting mechanism in the poll method itself solves this
-problem.
+Note that this is not the use case being used in devmem tcp (the first
+place these new ndo hooks would be used). There the usecase is:
+new_queue.alloc() + old_queue.stop() + new_queue.start() + old_queue.free()
 
 Tested-by: Mina Almasry <almasrymina@google.com>
 Reviewed-by: Praveen Kaligineedi <pkaligineedi@google.com>
 Reviewed-by: Harshitha Ramamurthy <hramamurthy@google.com>
 Signed-off-by: Shailend Chand <shailend@google.com>
 ---
- drivers/net/ethernet/google/gve/gve.h      |  1 +
- drivers/net/ethernet/google/gve/gve_main.c | 33 ++++++++++++++++++++--
- 2 files changed, 32 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/google/gve/gve_rx.c     |  48 +++++++--
+ drivers/net/ethernet/google/gve/gve_rx_dqo.c | 102 +++++++++++++++----
+ 2 files changed, 120 insertions(+), 30 deletions(-)
 
-diff --git a/drivers/net/ethernet/google/gve/gve.h b/drivers/net/ethernet/google/gve/gve.h
-index 53b5244dc7bc..f27a6d5fbecf 100644
---- a/drivers/net/ethernet/google/gve/gve.h
-+++ b/drivers/net/ethernet/google/gve/gve.h
-@@ -610,6 +610,7 @@ struct gve_notify_block {
- 	struct gve_priv *priv;
- 	struct gve_tx_ring *tx; /* tx rings on this block */
- 	struct gve_rx_ring *rx; /* rx rings on this block */
-+	u32 irq;
- };
- 
- /* Tracks allowed and current queue settings */
-diff --git a/drivers/net/ethernet/google/gve/gve_main.c b/drivers/net/ethernet/google/gve/gve_main.c
-index ef902b72b9a9..79b7a677ec0b 100644
---- a/drivers/net/ethernet/google/gve/gve_main.c
-+++ b/drivers/net/ethernet/google/gve/gve_main.c
-@@ -9,6 +9,7 @@
- #include <linux/etherdevice.h>
- #include <linux/filter.h>
- #include <linux/interrupt.h>
-+#include <linux/irq.h>
- #include <linux/module.h>
- #include <linux/pci.h>
- #include <linux/sched.h>
-@@ -253,6 +254,18 @@ static irqreturn_t gve_intr_dqo(int irq, void *arg)
- 	return IRQ_HANDLED;
+diff --git a/drivers/net/ethernet/google/gve/gve_rx.c b/drivers/net/ethernet/google/gve/gve_rx.c
+index 0a3f88170411..79c1d8f63621 100644
+--- a/drivers/net/ethernet/google/gve/gve_rx.c
++++ b/drivers/net/ethernet/google/gve/gve_rx.c
+@@ -53,6 +53,41 @@ static void gve_rx_unfill_pages(struct gve_priv *priv,
+ 	rx->data.page_info = NULL;
  }
  
-+static int gve_is_napi_on_home_cpu(struct gve_priv *priv, u32 irq)
++static void gve_rx_ctx_clear(struct gve_rx_ctx *ctx)
 +{
-+	int cpu_curr = smp_processor_id();
-+	const struct cpumask *aff_mask;
-+
-+	aff_mask = irq_get_effective_affinity_mask(irq);
-+	if (unlikely(!aff_mask))
-+		return 1;
-+
-+	return cpumask_test_cpu(cpu_curr, aff_mask);
++	ctx->skb_head = NULL;
++	ctx->skb_tail = NULL;
++	ctx->total_size = 0;
++	ctx->frag_cnt = 0;
++	ctx->drop_pkt = false;
 +}
 +
- int gve_napi_poll(struct napi_struct *napi, int budget)
- {
- 	struct gve_notify_block *block;
-@@ -322,8 +335,21 @@ int gve_napi_poll_dqo(struct napi_struct *napi, int budget)
- 		reschedule |= work_done == budget;
- 	}
- 
--	if (reschedule)
--		return budget;
-+	if (reschedule) {
-+		/* Reschedule by returning budget only if already on the correct
-+		 * cpu.
-+		 */
-+		if (likely(gve_is_napi_on_home_cpu(priv, block->irq)))
-+			return budget;
++static void gve_rx_init_ring_state_gqi(struct gve_rx_ring *rx)
++{
++	rx->desc.seqno = 1;
++	rx->cnt = 0;
++	gve_rx_ctx_clear(&rx->ctx);
++}
 +
-+		/* If not on the cpu with which this queue's irq has affinity
-+		 * with, we avoid rescheduling napi and arm the irq instead so
-+		 * that napi gets rescheduled back eventually onto the right
-+		 * cpu.
-+		 */
-+		if (work_done == budget)
-+			work_done--;
++static void gve_rx_reset_ring_gqi(struct gve_priv *priv, int idx)
++{
++	struct gve_rx_ring *rx = &priv->rx[idx];
++	const u32 slots = priv->rx_desc_cnt;
++	size_t size;
++
++	/* Reset desc ring */
++	if (rx->desc.desc_ring) {
++		size = slots * sizeof(rx->desc.desc_ring[0]);
++		memset(rx->desc.desc_ring, 0, size);
 +	}
++
++	/* Reset q_resources */
++	if (rx->q_resources)
++		memset(rx->q_resources, 0, sizeof(*rx->q_resources));
++
++	gve_rx_init_ring_state_gqi(rx);
++}
++
+ void gve_rx_stop_ring_gqi(struct gve_priv *priv, int idx)
+ {
+ 	int ntfy_idx = gve_rx_idx_to_ntfy(priv, idx);
+@@ -62,6 +97,7 @@ void gve_rx_stop_ring_gqi(struct gve_priv *priv, int idx)
  
- 	if (likely(napi_complete_done(napi, work_done))) {
- 		/* Enable interrupts again.
-@@ -428,6 +454,7 @@ static int gve_alloc_notify_blocks(struct gve_priv *priv)
- 				"Failed to receive msix vector %d\n", i);
- 			goto abort_with_some_ntfy_blocks;
- 		}
-+		block->irq = priv->msix_vectors[msix_idx].vector;
- 		irq_set_affinity_hint(priv->msix_vectors[msix_idx].vector,
- 				      get_cpu_mask(i % active_cpus));
- 		block->irq_db_index = &priv->irq_db_indices[i].index;
-@@ -441,6 +468,7 @@ static int gve_alloc_notify_blocks(struct gve_priv *priv)
- 		irq_set_affinity_hint(priv->msix_vectors[msix_idx].vector,
- 				      NULL);
- 		free_irq(priv->msix_vectors[msix_idx].vector, block);
-+		block->irq = 0;
+ 	gve_remove_napi(priv, ntfy_idx);
+ 	gve_rx_remove_from_block(priv, idx);
++	gve_rx_reset_ring_gqi(priv, idx);
+ }
+ 
+ static void gve_rx_free_ring_gqi(struct gve_priv *priv, struct gve_rx_ring *rx,
+@@ -222,15 +258,6 @@ static int gve_rx_prefill_pages(struct gve_rx_ring *rx,
+ 	return err;
+ }
+ 
+-static void gve_rx_ctx_clear(struct gve_rx_ctx *ctx)
+-{
+-	ctx->skb_head = NULL;
+-	ctx->skb_tail = NULL;
+-	ctx->total_size = 0;
+-	ctx->frag_cnt = 0;
+-	ctx->drop_pkt = false;
+-}
+-
+ void gve_rx_start_ring_gqi(struct gve_priv *priv, int idx)
+ {
+ 	int ntfy_idx = gve_rx_idx_to_ntfy(priv, idx);
+@@ -309,9 +336,8 @@ static int gve_rx_alloc_ring_gqi(struct gve_priv *priv,
+ 		err = -ENOMEM;
+ 		goto abort_with_q_resources;
  	}
- 	kvfree(priv->ntfy_blocks);
- 	priv->ntfy_blocks = NULL;
-@@ -474,6 +502,7 @@ static void gve_free_notify_blocks(struct gve_priv *priv)
- 		irq_set_affinity_hint(priv->msix_vectors[msix_idx].vector,
- 				      NULL);
- 		free_irq(priv->msix_vectors[msix_idx].vector, block);
-+		block->irq = 0;
+-	rx->cnt = 0;
+ 	rx->db_threshold = slots / 2;
+-	rx->desc.seqno = 1;
++	gve_rx_init_ring_state_gqi(rx);
+ 
+ 	rx->packet_buffer_size = GVE_DEFAULT_RX_BUFFER_SIZE;
+ 	gve_rx_ctx_clear(&rx->ctx);
+diff --git a/drivers/net/ethernet/google/gve/gve_rx_dqo.c b/drivers/net/ethernet/google/gve/gve_rx_dqo.c
+index 53fd2d87233f..7c2980c212f4 100644
+--- a/drivers/net/ethernet/google/gve/gve_rx_dqo.c
++++ b/drivers/net/ethernet/google/gve/gve_rx_dqo.c
+@@ -211,6 +211,82 @@ static void gve_rx_free_hdr_bufs(struct gve_priv *priv, struct gve_rx_ring *rx)
  	}
- 	free_irq(priv->msix_vectors[priv->mgmt_msix_idx].vector, priv);
- 	kvfree(priv->ntfy_blocks);
+ }
+ 
++static void gve_rx_init_ring_state_dqo(struct gve_rx_ring *rx,
++				       const u32 buffer_queue_slots,
++				       const u32 completion_queue_slots)
++{
++	int i;
++
++	/* Set buffer queue state */
++	rx->dqo.bufq.mask = buffer_queue_slots - 1;
++	rx->dqo.bufq.head = 0;
++	rx->dqo.bufq.tail = 0;
++
++	/* Set completion queue state */
++	rx->dqo.complq.num_free_slots = completion_queue_slots;
++	rx->dqo.complq.mask = completion_queue_slots - 1;
++	rx->dqo.complq.cur_gen_bit = 0;
++	rx->dqo.complq.head = 0;
++
++	/* Set RX SKB context */
++	rx->ctx.skb_head = NULL;
++	rx->ctx.skb_tail = NULL;
++
++	/* Set up linked list of buffer IDs */
++	if (rx->dqo.buf_states) {
++		for (i = 0; i < rx->dqo.num_buf_states - 1; i++)
++			rx->dqo.buf_states[i].next = i + 1;
++		rx->dqo.buf_states[rx->dqo.num_buf_states - 1].next = -1;
++	}
++
++	rx->dqo.free_buf_states = 0;
++	rx->dqo.recycled_buf_states.head = -1;
++	rx->dqo.recycled_buf_states.tail = -1;
++	rx->dqo.used_buf_states.head = -1;
++	rx->dqo.used_buf_states.tail = -1;
++}
++
++static void gve_rx_reset_ring_dqo(struct gve_priv *priv, int idx)
++{
++	struct gve_rx_ring *rx = &priv->rx[idx];
++	size_t size;
++	int i;
++
++	const u32 buffer_queue_slots = priv->rx_desc_cnt;
++	const u32 completion_queue_slots = priv->rx_desc_cnt;
++
++	/* Reset buffer queue */
++	if (rx->dqo.bufq.desc_ring) {
++		size = sizeof(rx->dqo.bufq.desc_ring[0]) *
++			buffer_queue_slots;
++		memset(rx->dqo.bufq.desc_ring, 0, size);
++	}
++
++	/* Reset completion queue */
++	if (rx->dqo.complq.desc_ring) {
++		size = sizeof(rx->dqo.complq.desc_ring[0]) *
++			completion_queue_slots;
++		memset(rx->dqo.complq.desc_ring, 0, size);
++	}
++
++	/* Reset q_resources */
++	if (rx->q_resources)
++		memset(rx->q_resources, 0, sizeof(*rx->q_resources));
++
++	/* Reset buf states */
++	if (rx->dqo.buf_states) {
++		for (i = 0; i < rx->dqo.num_buf_states; i++) {
++			struct gve_rx_buf_state_dqo *bs = &rx->dqo.buf_states[i];
++
++			if (bs->page_info.page)
++				gve_free_page_dqo(priv, bs, !rx->dqo.qpl);
++		}
++	}
++
++	gve_rx_init_ring_state_dqo(rx, buffer_queue_slots,
++				   completion_queue_slots);
++}
++
+ void gve_rx_stop_ring_dqo(struct gve_priv *priv, int idx)
+ {
+ 	int ntfy_idx = gve_rx_idx_to_ntfy(priv, idx);
+@@ -220,6 +296,7 @@ void gve_rx_stop_ring_dqo(struct gve_priv *priv, int idx)
+ 
+ 	gve_remove_napi(priv, ntfy_idx);
+ 	gve_rx_remove_from_block(priv, idx);
++	gve_rx_reset_ring_dqo(priv, idx);
+ }
+ 
+ static void gve_rx_free_ring_dqo(struct gve_priv *priv, struct gve_rx_ring *rx,
+@@ -273,10 +350,10 @@ static void gve_rx_free_ring_dqo(struct gve_priv *priv, struct gve_rx_ring *rx,
+ 	netif_dbg(priv, drv, priv->dev, "freed rx ring %d\n", idx);
+ }
+ 
+-static int gve_rx_alloc_hdr_bufs(struct gve_priv *priv, struct gve_rx_ring *rx)
++static int gve_rx_alloc_hdr_bufs(struct gve_priv *priv, struct gve_rx_ring *rx,
++				 const u32 buf_count)
+ {
+ 	struct device *hdev = &priv->pdev->dev;
+-	int buf_count = rx->dqo.bufq.mask + 1;
+ 
+ 	rx->dqo.hdr_bufs.data = dma_alloc_coherent(hdev, priv->header_buf_size * buf_count,
+ 						   &rx->dqo.hdr_bufs.addr, GFP_KERNEL);
+@@ -301,7 +378,6 @@ static int gve_rx_alloc_ring_dqo(struct gve_priv *priv,
+ {
+ 	struct device *hdev = &priv->pdev->dev;
+ 	size_t size;
+-	int i;
+ 
+ 	const u32 buffer_queue_slots = cfg->ring_size;
+ 	const u32 completion_queue_slots = cfg->ring_size;
+@@ -311,11 +387,6 @@ static int gve_rx_alloc_ring_dqo(struct gve_priv *priv,
+ 	memset(rx, 0, sizeof(*rx));
+ 	rx->gve = priv;
+ 	rx->q_num = idx;
+-	rx->dqo.bufq.mask = buffer_queue_slots - 1;
+-	rx->dqo.complq.num_free_slots = completion_queue_slots;
+-	rx->dqo.complq.mask = completion_queue_slots - 1;
+-	rx->ctx.skb_head = NULL;
+-	rx->ctx.skb_tail = NULL;
+ 
+ 	rx->dqo.num_buf_states = cfg->raw_addressing ?
+ 		min_t(s16, S16_MAX, buffer_queue_slots * 4) :
+@@ -328,19 +399,9 @@ static int gve_rx_alloc_ring_dqo(struct gve_priv *priv,
+ 
+ 	/* Allocate header buffers for header-split */
+ 	if (cfg->enable_header_split)
+-		if (gve_rx_alloc_hdr_bufs(priv, rx))
++		if (gve_rx_alloc_hdr_bufs(priv, rx, buffer_queue_slots))
+ 			goto err;
+ 
+-	/* Set up linked list of buffer IDs */
+-	for (i = 0; i < rx->dqo.num_buf_states - 1; i++)
+-		rx->dqo.buf_states[i].next = i + 1;
+-
+-	rx->dqo.buf_states[rx->dqo.num_buf_states - 1].next = -1;
+-	rx->dqo.recycled_buf_states.head = -1;
+-	rx->dqo.recycled_buf_states.tail = -1;
+-	rx->dqo.used_buf_states.head = -1;
+-	rx->dqo.used_buf_states.tail = -1;
+-
+ 	/* Allocate RX completion queue */
+ 	size = sizeof(rx->dqo.complq.desc_ring[0]) *
+ 		completion_queue_slots;
+@@ -368,6 +429,9 @@ static int gve_rx_alloc_ring_dqo(struct gve_priv *priv,
+ 	if (!rx->q_resources)
+ 		goto err;
+ 
++	gve_rx_init_ring_state_dqo(rx, buffer_queue_slots,
++				   completion_queue_slots);
++
+ 	return 0;
+ 
+ err:
 -- 
 2.45.0.rc0.197.gbae5840b3b-goog
 
