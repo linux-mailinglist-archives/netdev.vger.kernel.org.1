@@ -1,94 +1,151 @@
-Return-Path: <netdev+bounces-92517-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92519-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47BC08B7B56
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 17:20:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54E388B7B5E
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 17:24:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 42C8EB20B97
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 15:20:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DB7D1284D2A
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 15:24:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86236143732;
-	Tue, 30 Apr 2024 15:20:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA68B14373D;
+	Tue, 30 Apr 2024 15:24:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iqzKQoQM"
+	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="dCJFfiu8"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-190a.mail.infomaniak.ch (smtp-190a.mail.infomaniak.ch [185.125.25.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CCB6140E26;
-	Tue, 30 Apr 2024 15:20:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13341770F0
+	for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 15:24:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.25.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714490432; cv=none; b=eV2C7Dx4HAr0qOcpz7UNOiwMoyImVg6MKj+0uJRE90Awnjy+5FbP9Ree2uO1w81d/tDMzT/hBaz7pxAwiHyeyPP+Rdjm+Uk2I84jUqxoGw0QEQVRl8lJ2+J0YAkJBWNeRobIQX3LScM+TOIx+B8qs/epY/n2NgTIAauMsfPDQ74=
+	t=1714490692; cv=none; b=PkVng7fCYKDlBKRYtzUgYVQYRcJHvmf9hQHRdFQtytaG9KVxkpoSynXnWyaxA/YytxfncXFVyjtIgRVhxOPhZfHvAqxl7qRXsAPjSx8P4Uyb9kmJQf648NFcSLm/nNhK+g7i/urcIHivRVTxGP3brxuQvZT50FmDNTffcF1TG0s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714490432; c=relaxed/simple;
-	bh=JwUq2o3SycJ+v3mu19N1cEuDSkxRrtKf6DXZT8LZzzI=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=gbc3l0H0/zzowDZLfIRyhN5j0G65o26TLQQS9KBDUJjpXzHa4S2WeQQ9DRJHB3wXCzjkQRRnVYHl9I1lgRhqXeX+7PT9wum9UxTsKK76Icnp/AZxBDnOBo7EVMqXXcZ91nL6L+HRvGfwujj5ssFeeiGng9+5h++2GLRT3ZYx0i0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iqzKQoQM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id DD32CC4AF18;
-	Tue, 30 Apr 2024 15:20:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714490430;
-	bh=JwUq2o3SycJ+v3mu19N1cEuDSkxRrtKf6DXZT8LZzzI=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=iqzKQoQMaXVfTnA+9lTRESVhcu3T+elFSXp++FIOWy127LmlTV0WcDWM+Zzn1SPaW
-	 +NN2ONY7Aqnv+zgV0iYenGqjaFEyLZKFBkUwDU1WF3WsftDTBwx6uuyibCOojXanhR
-	 zDfEGmXG4gHmzBb3NBc8HdiTcp/xhCVlW3zzSBDXj2DYtSC+ri0ZEdcGJZe8ywnga9
-	 HmWeHWVHTN3uDEE1pR67KCMgmYLHxVMpo+v5v5rQFYIWPTq4XuAdELFSh4LSML82kg
-	 FPs6oJvRISoeE+oA/KuKPN9cdjkCH3giAy3BKex7mSTsrRe4TF/qRQf+SUr5GxDO8c
-	 nz1v31H3UlGWw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C9C6DC43617;
-	Tue, 30 Apr 2024 15:20:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1714490692; c=relaxed/simple;
+	bh=o9tw+r7HiK2cyxfIdnEKxzsdQ/OTiilNikfU3NSHVe0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MlMuWviOUxmzIH2aaIxiB2S0CyLw96R9NU/pWRGliL0G2Vq9dsJZTtlSiJo4RQa+IFyOtt809bTD2oNy3FemSZhp+Aw+yB2/M5fxR3jEYyucI6YpZ2qWXuukokAAEU07nmuj/jZpAOwd+mt4GrdDx9zgdrZcWWZJXmy9o64mgjA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=dCJFfiu8; arc=none smtp.client-ip=185.125.25.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
+Received: from smtp-3-0000.mail.infomaniak.ch (smtp-3-0000.mail.infomaniak.ch [10.4.36.107])
+	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4VTPBl21DwzwK5;
+	Tue, 30 Apr 2024 17:24:47 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=digikod.net;
+	s=20191114; t=1714490687;
+	bh=o9tw+r7HiK2cyxfIdnEKxzsdQ/OTiilNikfU3NSHVe0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=dCJFfiu8WGMiQ53xbHZ1FW9HOnnmCs2WrkKqstQM5CEf2ab5pQQD3GVv0pmnZJhDL
+	 8iD3bq+qImade0+0Vrdhs95JQMZcSwWLhABsB10SZlyjgeIzvySVt3evyecmyS2MXX
+	 wTmyf48w/uMNYgOBvz59alNnwDz6EJDyGZ02RIDg=
+Received: from unknown by smtp-3-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4VTPBk2xCtzhtX;
+	Tue, 30 Apr 2024 17:24:46 +0200 (CEST)
+Date: Tue, 30 Apr 2024 17:24:45 +0200
+From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
+To: Tahera Fahimi <fahimitahera@gmail.com>
+Cc: Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>, 
+	"Serge E. Hallyn" <serge@hallyn.com>, linux-security-module@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, outreachy@lists.linux.dev, netdev@vger.kernel.org, 
+	=?utf-8?B?QmrDtnJu?= Roy Baron <bjorn3_gh@protonmail.com>, Jann Horn <jannh@google.com>, 
+	=?utf-8?Q?G=C3=BCnther?= Noack <gnoack@google.com>
+Subject: Re: [PATCH v2] landlock: Add abstract unix socket connect
+ restrictions
+Message-ID: <20240411.ahgeefeiNg4i@digikod.net>
+References: <ZgX5TRTrSDPrJFfF@tahera-OptiPlex-5000>
+ <20240401.ieC2uqua5sha@digikod.net>
+ <ZhcRnhVKFUgCleDi@tahera-OptiPlex-5000>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] selftests: netfilter: avoid test timeouts on debug
- kernels
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171449043082.29434.12702226836543315240.git-patchwork-notify@kernel.org>
-Date: Tue, 30 Apr 2024 15:20:30 +0000
-References: <20240429105736.22677-1-fw@strlen.de>
-In-Reply-To: <20240429105736.22677-1-fw@strlen.de>
-To: Florian Westphal <fw@strlen.de>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, netfilter-devel@vger.kernel.org,
- pablo@netfilter.org
+In-Reply-To: <ZhcRnhVKFUgCleDi@tahera-OptiPlex-5000>
+X-Infomaniak-Routing: alpha
 
-Hello:
+On Wed, Apr 10, 2024 at 04:24:30PM -0600, Tahera Fahimi wrote:
+> On Tue, Apr 02, 2024 at 11:53:09AM +0200, Mickaël Salaün wrote:
+> > Thanks for this patch.  Please CC the netdev mailing list too, they may
+> > be interested by this feature. I also added a few folks that previously
+> > showed their interest for this feature.
+> > 
+> > On Thu, Mar 28, 2024 at 05:12:13PM -0600, TaheraFahimi wrote:
+> > > Abstract unix sockets are used for local interprocess communication without
+> > > relying on filesystem. Since landlock has no restriction for connecting to
+> > > a UNIX socket in the abstract namespace, a sandboxed process can connect to
+> > > a socket outside the sandboxed environment. Access to such sockets should
+> > > be scoped the same way ptrace access is limited.
+> > 
+> > This is good but it would be better to explain that Landlock doesn't
+> > currently control abstract unix sockets and that it would make sense for
+> > a sandbox.
+> > 
+> > 
+> > > 
+> > > For a landlocked process to be allowed to connect to a target process, it
+> > > must have a subset of the target process’s rules (the connecting socket
+> > > must be in a sub-domain of the listening socket). This patch adds a new
+> > > LSM hook for connect function in unix socket with the related access rights.
+> > 
+> > Because of compatibility reasons, and because Landlock should be
+> > flexible, we need to extend the user space interface.  As explained in
+> > the GitHub issue, we need to add a new "scoped" field to the
+> > landlock_ruleset_attr struct. This field will optionally contain a
+> > LANDLOCK_RULESET_SCOPED_ABSTRACT_UNIX_SOCKET flag to specify that this
+> > ruleset will deny any connection from within the sandbox to its parents
+> > (i.e. any parent sandbox or not-sandboxed processes).
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+> Thanks for the feedback. Here is what I understood, please correct me if
+> I am wrong. First, I should add another field to the
+> landlock_ruleset_attr (a field like handled_access_net, but for the unix
+> sockets) with a flag LANDLOCK_ACCESS_UNIX_CONNECT (it is a flag like
+> LANDLOCK_ACCESS_NET_CONNECT_TCP but fot the unix sockets connect).
 
-On Mon, 29 Apr 2024 12:57:28 +0200 you wrote:
-> Jakub reports that some tests fail on netdev CI when executed in a debug
-> kernel.
-> 
-> Increase test timeout to 30m, this should hopefully be enough.
-> Also reduce test duration where possible for "slow" machines.
-> 
-> Signed-off-by: Florian Westphal <fw@strlen.de>
-> 
-> [...]
+That was the initial idea, but after thinking more about it and talking
+with some users, I now think we can get a more generic interface.
 
-Here is the summary with links:
-  - [net-next] selftests: netfilter: avoid test timeouts on debug kernels
-    https://git.kernel.org/netdev/net-next/c/f581bcf02f0e
+Because unix sockets, signals, and other IPCs are fully controlled by
+the kernel (contrary to inet sockets that get out of the system), we can
+add ingress and egress control according to the source and the
+destination.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+To control the direction we could add an
+LANDLOCK_ACCESS_DOM_UNIX_ABSTRACT_RECEIVE and a
+LANDLOCK_ACCESS_DOM_UNIX_ABSTRACT_SEND rights (these names are a bit
+long but at least explicit).  To control the source and destination, it
+makes sense to use Landlock domain (i.e. sandboxes):
+LANDLOCK_DOMAIN_HIERARCHY_PARENT, LANDLOCK_DOMAIN_HIERARCHY_SELF, and
+LANDLOCK_DOMAIN_HIERARCHY_CHILD.  This could be used by extending the
+landlock_ruleset_attr type and adding a new
+landlock_domain_hierarchy_attr type:
 
+struct landlock_ruleset_attr ruleset_attr = {
+  .handled_access_dom = LANDLOCK_ACCESS_DOM_UNIX_ABSTRACT_RECEIVE | \
+                        LANDLOCK_ACCESS_DOM_UNIX_ABSTRACT_SEND,
+}
 
+// Allows sending data to and receiving data from processes in the same
+// domain or a child domain, through abstract unix sockets.
+struct landlock_domain_hierarchy_attr dom_attr = {
+  .allowed_access = LANDLOCK_ACCESS_DOM_UNIX_ABSTRACT_RECEIVE | \
+                    LANDLOCK_ACCESS_DOM_UNIX_ABSTRACT_SEND,
+  .relationship = LANDLOCK_DOMAIN_HIERARCHY_SELF | \
+                  LANDLOCK_DOMAIN_HIERARCHY_CHILD,
+};
+
+It should also work with other kind of IPCs:
+* LANDLOCK_ACCESS_DOM_UNIX_PATHNAME_RECEIVE/SEND (signal)
+* LANDLOCK_ACCESS_DOM_SIGNAL_RECEIVE/SEND (signal)
+* LANDLOCK_ACCESS_DOM_XSI_RECEIVE/SEND (XSI message queue)
+* LANDLOCK_ACCESS_DOM_MQ_RECEIVE/SEND (POSIX message queue)
+* LANDLOCK_ACCESS_DOM_PTRACE_RECEIVE/SEND (ptrace, which would be
+  limited)
+
+What do you think?
 
