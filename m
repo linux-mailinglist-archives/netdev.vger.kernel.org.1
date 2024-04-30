@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-92308-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92304-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2BCB8B67EB
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 04:20:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5A688B67E8
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 04:20:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8123C1F22F3D
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 02:20:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8082A281AFD
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 02:20:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C18FEC13C;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9C2BBE5D;
 	Tue, 30 Apr 2024 02:20:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UVsMtw17"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RDToFYiI"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B3908F6D
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9552F33D5
 	for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 02:20:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714443632; cv=none; b=i68ilR3y1DMxWbuTCj1Fd48juJ0E4Z2+C+w2FpIsbfjQbCsYDRjAueg4IlaRs5qIKdzPS0gCF9Ch2tJX6KNszHuUTraU43mgvMgCZC9tkpqEGc5yseBQFmP/q2KQWBqIxp3hFJ5hQcdWuFawHHRCKnOF0Dhz4RfbV6v6t14RIBY=
+	t=1714443632; cv=none; b=PkekyaOpLmi8GIN2aI180tj21F3X9qjWhLkvrb0M5HP9eyKAYgtcGgd01kK8ak/2C+/htQtKT1Od4JEPyrZOe1Zhr3y5vtOPtR93yRjjTRMFG38u1RS4F+RleReozds5LdUOgFboLwDlbPIntsD7Q5JjG7se8mYm5K9d0qaibNQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1714443632; c=relaxed/simple;
-	bh=4PN09eJ9U+1o0cfvLRn2Av3etzlS6zvZd6ETeobe8Fc=;
+	bh=75uCO5W6YZ+5eFiEslA6psfyrkEHJZO22B/hXLazq+A=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=jwkNkfbI6GOfunGZ54mxGJZUpG/+d6u9he/JronXJWZsBXZrQxJDIyVyyvJEqZA5qxE97DORdGtYj2Gow94m0/Z96uQU2npMS+SnijBcPm0xppWWaokPxE+Ynp3HaITp6olgrp22E1Kea/moE34YLc8bxxBP3Rr84M/qYhWv6Cw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UVsMtw17; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 5A202C4AF4D;
+	 In-Reply-To:To:Cc; b=ch4Yv1z2ht8l3rv+2pP/CD3a19A9ZlH5sTX6qENJcb4GJmDFJTowUqRGSg3hqpx2qenJjrDorsmECQjXfWW+if3okn6qmHyIyc6kBKnpIig0MVkQBIrNJCTuRfO9SqLqWUIxmvWQX+wTpRXunbFel8M9mUj6fDDK/JSY5F8i7xs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RDToFYiI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 51022C4AF1C;
 	Tue, 30 Apr 2024 02:20:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1714443632;
-	bh=4PN09eJ9U+1o0cfvLRn2Av3etzlS6zvZd6ETeobe8Fc=;
+	bh=75uCO5W6YZ+5eFiEslA6psfyrkEHJZO22B/hXLazq+A=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=UVsMtw17bOqxK86HgylHK4JTbUdXRKPsCzXqXtU7H5rtJ0iTNcfznpCiIQT7+D3Ny
-	 EZ1VgHFwjT7rnh7V2lrECQDb1ylOYQ3YgpGDg2r2+i/DGYJCh+X+b7Nyytxer9ainy
-	 pleqkLydnD6w+s61j+DpHPDKeI87FkJl5uVDUS8Kiz2OKDWCx2CV3JhZly81zpFFyB
-	 8smN2PqkYseCYgNwYjKX7FEYNOCZnFkYpY3PeqayjYrq3FGrNK8NUmr7O0/w9198H3
-	 KnCO7nkBvEsRAZ/HcRn44T6vG2Aa5/2V8hJMcQE7FN6cLZ8RYM78syFQVAcVU24F4r
-	 pcFdcWcL/9BnA==
+	b=RDToFYiIpwmG0Sb9DQZWM0nf6fquvX7XJgIJgOSWqMOsraXhXz0ECT5/y3gR9FW01
+	 olZIsHOekUSimuC43itTIQaYm4gipGK+e53HD1EMD3OPNlkOzJc8vymkltiMbNtj3i
+	 w/r2aoUh4+/y8DtLZZGEGr9xQH9QSBm9/qczOk3BfqQFpOCo1b6m6jgUCnmbzte+D2
+	 FQ14VEGmEbTJQywPKpZDIplMSheqcsAKzSDailOBeidGv6JzWmlXu13gPN6K6+02n3
+	 vEFQQ7a1Ip8EufFkYLbTDUTnIunNLoopHP9nxinooTLFb5Uxbu9zCvYtQbJic/O01M
+	 mBRM0FueekcmA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 49041C43613;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3EEDEC54BAD;
 	Tue, 30 Apr 2024 02:20:32 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,36 +52,65 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: mvneta: use phylink_pcs_change() to report PCS
- link change events
+Subject: Re: [PATCH net-next] net: hsr: init prune_proxy_timer sooner
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171444363229.30384.18345128085879171428.git-patchwork-notify@kernel.org>
+ <171444363225.30384.6401361631915185598.git-patchwork-notify@kernel.org>
 Date: Tue, 30 Apr 2024 02:20:32 +0000
-References: <E1s0OGs-009hgl-Jg@rmk-PC.armlinux.org.uk>
-In-Reply-To: <E1s0OGs-009hgl-Jg@rmk-PC.armlinux.org.uk>
-To: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-Cc: marcin.s.wojtas@gmail.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org
+References: <20240426163355.2613767-1-edumazet@google.com>
+In-Reply-To: <20240426163355.2613767-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, eric.dumazet@gmail.com, syzkaller@googlegroups.com,
+ lukma@denx.de
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri, 26 Apr 2024 17:17:58 +0100 you wrote:
-> Use phylink_pcs_change() when reporting changes in PCS link state to
-> phylink as the interrupts are informing us about changes to the PCS
-> state.
+On Fri, 26 Apr 2024 16:33:55 +0000 you wrote:
+> We must initialize prune_proxy_timer before we attempt
+> a del_timer_sync() on it.
 > 
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> ---
->  drivers/net/ethernet/marvell/mvneta.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+> syzbot reported the following splat:
+> 
+> INFO: trying to register non-static key.
+> The code is fine but needs lockdep annotation, or maybe
+> you didn't initialize this object before use?
+> turning off the locking correctness validator.
+> CPU: 1 PID: 11 Comm: kworker/u8:1 Not tainted 6.9.0-rc5-syzkaller-01199-gfc48de77d69d #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
+> Workqueue: netns cleanup_net
+> Call Trace:
+>  <TASK>
+>   __dump_stack lib/dump_stack.c:88 [inline]
+>   dump_stack_lvl+0x241/0x360 lib/dump_stack.c:114
+>   assign_lock_key+0x238/0x270 kernel/locking/lockdep.c:976
+>   register_lock_class+0x1cf/0x980 kernel/locking/lockdep.c:1289
+>   __lock_acquire+0xda/0x1fd0 kernel/locking/lockdep.c:5014
+>   lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5754
+>   __timer_delete_sync+0x148/0x310 kernel/time/timer.c:1648
+>   del_timer_sync include/linux/timer.h:185 [inline]
+>   hsr_dellink+0x33/0x80 net/hsr/hsr_netlink.c:132
+>   default_device_exit_batch+0x956/0xa90 net/core/dev.c:11737
+>   ops_exit_list net/core/net_namespace.c:175 [inline]
+>   cleanup_net+0x89d/0xcc0 net/core/net_namespace.c:637
+>   process_one_work kernel/workqueue.c:3254 [inline]
+>   process_scheduled_works+0xa10/0x17c0 kernel/workqueue.c:3335
+>   worker_thread+0x86d/0xd70 kernel/workqueue.c:3416
+>   kthread+0x2f0/0x390 kernel/kthread.c:388
+>   ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+>   ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+>  </TASK>
+> ODEBUG: assert_init not available (active state 0) object: ffff88806d3fcd88 object type: timer_list hint: 0x0
+>  WARNING: CPU: 1 PID: 11 at lib/debugobjects.c:517 debug_print_object+0x17a/0x1f0 lib/debugobjects.c:514
+> 
+> [...]
 
 Here is the summary with links:
-  - [net-next] net: mvneta: use phylink_pcs_change() to report PCS link change events
-    https://git.kernel.org/netdev/net-next/c/21c8e45acbdb
+  - [net-next] net: hsr: init prune_proxy_timer sooner
+    https://git.kernel.org/netdev/net-next/c/3c668cef61ad
 
 You are awesome, thank you!
 -- 
