@@ -1,145 +1,142 @@
-Return-Path: <netdev+bounces-92302-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92303-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B8FA8B67D9
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 04:14:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4DBC8B67DB
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 04:14:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EDDA71F22BEE
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 02:14:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2E8041F22BC8
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 02:14:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28FBDDDA9;
-	Tue, 30 Apr 2024 02:13:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 364068C10;
+	Tue, 30 Apr 2024 02:14:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="M23WbWHW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ThGrP9rU"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-99.freemail.mail.aliyun.com (out30-99.freemail.mail.aliyun.com [115.124.30.99])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D79E88F6F;
-	Tue, 30 Apr 2024 02:13:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.99
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F39A38BF0;
+	Tue, 30 Apr 2024 02:14:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714443237; cv=none; b=bqqxGHuHcFqLSANVKyO05z6hTUwbQ6qs0B2GOXgxEIQnNn2QuXeiGaANF4kdu7GMaHtMVzW1KFxRbDCIYmezh73ti+9gXYaaQkHKsOR4KxDjAQ85H0gZUrQ7CayTU5ZbO4WSazP9Efvc1R2Nq+WgmKKM0ZPlIjUgkgdsAkzNlog=
+	t=1714443283; cv=none; b=qO7euT9+O7QEX3eptwfHzebYFfGB8ouJlzulwHMdLrMC1ETrg+Ax968XgW4OMhVWuCqdCLTAo7jjWNX9FjjrEQanfs1shdrtAgL0NqXSDIPt8jWwMd+wBbyg4gPkKuun3xiDOZ6mV/rQgTnyhl6o5oNnKjv1/1Mg4mP5D0Eq0ac=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714443237; c=relaxed/simple;
-	bh=8sbxx22xmGWgECxkXVi/5b28FpNr1fg/fRLgHhiSgQE=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=HBCWbz072rfaM7XUER86iZFMBJZiSbTvSHdW9ox/x0yuSvmSXo3/9pOib17s/mvykCTFMhoqL8jFJrV0q7kkqIPRomnavcizxsO0RNibT9Huzx6kyZbA7nMQXu8KV9PWGB08kHgqKvn2RggHeN/xDO+raG0fPMRq6VdHr1qe048=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=M23WbWHW; arc=none smtp.client-ip=115.124.30.99
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1714443227; h=Message-ID:Subject:Date:From:To;
-	bh=y6BHbK1lWejK17N+PEG4y4GRz35g2lrll3r6j9O47ps=;
-	b=M23WbWHWhuG/M3daJPJcwdTdwSHdJefhEj71ZcoFmMDQEbSQIIlmIuZYkCB4RL6EDfttABeeG5tz78XDEs9aJXvoI+1c8gaG4kdEgo7DMIKUnb4C4uFBI1JoQGajno0W6JQLzLBgFjWyZMbAC4lSCL3hs6EV5LwW+NnB5BUWj8w=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R601e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037067111;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=23;SR=0;TI=SMTPD_---0W5ae2VQ_1714443224;
-Received: from localhost(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0W5ae2VQ_1714443224)
-          by smtp.aliyun-inc.com;
-          Tue, 30 Apr 2024 10:13:44 +0800
-Message-ID: <1714442379.4695537-1-hengqi@linux.alibaba.com>
-Subject: Re: [PATCH net-next v10 2/4] ethtool: provide customized dim profile management
-Date: Tue, 30 Apr 2024 09:59:39 +0800
-From: Heng Qi <hengqi@linux.alibaba.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org,
- virtualization@lists.linux.dev,
- "David S .  Miller" <davem@davemloft.net>,
- Paolo Abeni <pabeni@redhat.com>,
- Eric  Dumazet <edumazet@google.com>,
- Jason Wang <jasowang@redhat.com>,
- "Michael S  . Tsirkin" <mst@redhat.com>,
- Brett Creeley <bcreeley@amd.com>,
- Ratheesh  Kannoth <rkannoth@marvell.com>,
- Alexander Lobakin <aleksander.lobakin@intel.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
- Tal  Gilboa <talgi@nvidia.com>,
- Jonathan Corbet <corbet@lwn.net>,
- linux-doc@vger.kernel.org,
- Maxime Chevallier <maxime.chevallier@bootlin.com>,
- Jiri Pirko <jiri@resnulli.us>,
- Paul  Greenwalt <paul.greenwalt@intel.com>,
- Ahmed Zaki <ahmed.zaki@intel.com>,
- Vladimir Oltean <vladimir.oltean@nxp.com>,
- Kory Maincent <kory.maincent@bootlin.com>,
- Andrew Lunn <andrew@lunn.ch>,
- "justinstitt @  google . com" <justinstitt@google.com>
-References: <20240425165948.111269-1-hengqi@linux.alibaba.com>
- <20240425165948.111269-3-hengqi@linux.alibaba.com>
- <20240426183333.257ccae5@kernel.org>
- <98ea9d4d-1a90-45b9-a4e0-6941969295be@linux.alibaba.com>
- <20240429104741.3a628fe6@kernel.org>
-In-Reply-To: <20240429104741.3a628fe6@kernel.org>
+	s=arc-20240116; t=1714443283; c=relaxed/simple;
+	bh=FIilMgaRdUPaNn6QCuAfAl8l87+fZoiLcPoheYgRtVA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=aee7LMsvYj6cNlKeeXBbWTQ6m1+H7Qq9vobE/rMxXJ0j76X2fXSOG5sDoGT40qF7oDrXlCwuc86nzhOm5WXI8g6B4GoXG/LKpgXVazfOuTDRQJ5fM/sqPTaslNzU0qC0/l7I0qHPnuy4zSn7oRenWXKeum/UbesV28trY6qAN4c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ThGrP9rU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A13E1C116B1;
+	Tue, 30 Apr 2024 02:14:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714443282;
+	bh=FIilMgaRdUPaNn6QCuAfAl8l87+fZoiLcPoheYgRtVA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ThGrP9rUlZFkmUR02Uk4y9M16GQIf03bOK47sqbPD2tFiN4nnUwl8Ig+nhkubj3I0
+	 e2I6nKpZKkqv+dI6ksjBOZ4BHSy2RKfRTf0snQ03B7flnVFuDnSj3HRUfwJnMsJQ2A
+	 WGKXnVDPb7Y02XlQAjdjoMgXh5THdeOfsZHZXmrOAs6OXZs6YjEGU9bch8fb9MZmzC
+	 i46M5R+5PWVGKgBfrWBFz3Q6G4NBLsGkapZKQssx0BjMLaBJD0+OPHEwbNC7Ph3He7
+	 mQuHuvmcB1ADxhEEbBrS14NKYHLgfk6K0rhqrPYWIvBnrdIEjoJateGOiaMU9EnV9c
+	 aaFhI7Q2ZVQgw==
+Date: Mon, 29 Apr 2024 19:14:40 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Danielle Ratson <danieller@nvidia.com>
+Cc: <netdev@vger.kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
+ <pabeni@redhat.com>, <corbet@lwn.net>, <linux@armlinux.org.uk>,
+ <sdf@google.com>, <kory.maincent@bootlin.com>,
+ <maxime.chevallier@bootlin.com>, <vladimir.oltean@nxp.com>,
+ <przemyslaw.kitszel@intel.com>, <ahmed.zaki@intel.com>,
+ <richardcochran@gmail.com>, <shayagr@amazon.com>,
+ <paul.greenwalt@intel.com>, <jiri@resnulli.us>,
+ <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+ <mlxsw@nvidia.com>, <petrm@nvidia.com>, <idosch@nvidia.com>
+Subject: Re: [PATCH net-next v5 03/10] ethtool: Add an interface for
+ flashing transceiver modules' firmware
+Message-ID: <20240429191440.7b1182c3@kernel.org>
+In-Reply-To: <20240424133023.4150624-4-danieller@nvidia.com>
+References: <20240424133023.4150624-1-danieller@nvidia.com>
+	<20240424133023.4150624-4-danieller@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, 29 Apr 2024 10:47:41 -0700, Jakub Kicinski <kuba@kernel.org> wrote:
-> On Sun, 28 Apr 2024 22:49:09 +0800 Heng Qi wrote:
-> > >> +	nla_for_each_nested_type(nest, ETHTOOL_A_PROFILE_IRQ_MODERATION, nests, rem) {
-> > >> +		ret = nla_parse_nested(moder,
-> > >> +				       ARRAY_SIZE(coalesce_irq_moderation_policy) - 1,
-> > >> +				       nest, coalesce_irq_moderation_policy,
-> > >> +				       extack);
-> > >> +		if (ret)
-> > >> +			return ret;
-> > >> +
-> > >> +		if (!NL_REQ_ATTR_CHECK(extack, nest, moder, ETHTOOL_A_IRQ_MODERATION_USEC)) {
-> > >> +			if (irq_moder->coal_flags & DIM_COALESCE_USEC)  
-> > > There are 3 options here, not 2:
-> > >
-> > > 	if (irq_moder->coal_flags & flag) {
-> > > 		if (NL_REQ_ATTR_CHECK())
-> > > 			val = nla_get_u32(...);
-> > > 		else
-> > > 			return -EINVAL;
-> > > 	} else {
-> > > 		if (moder[attr_type)) {
-> > > 			BAD_ATTR()
-> > > 			return -EOPNOTSUPP;
-> > > 		}
-> > > 	}  
-> > 
-> > Maybe we missed something.
-> > 
-> > As shown in the commit log, the user is allowed to modify only
-> > a certain fields in irq-moderation. It is assumed that the driver
-> > supports modification of usec and pkts, but the user may only
-> > modify usec and only fill in the usec attr.
-> > 
-> > Therefore, the kernel only gets usec attr here. Of course, the user
-> > may have passed in 5 groups of "n, n, n", which means that nothing
-> > is modified, and rx_profile and irq_moderation attrs are all empty.
-> 
-> What you describe sounds good, but it's not what the code seems to be
-> doing. NL_REQ_ATTR_CHECK() will set an error attribute if the attr is
-> not present.
+On Wed, 24 Apr 2024 16:30:16 +0300 Danielle Ratson wrote:
+> +MODULE_FW_FLASH_ACT
+> +===================
+> +
+> +Flashes transceiver module firmware.
+> +
+> +Request contents:
+> +
+> +  =======================================  ======  ===========================
+> +  ``ETHTOOL_A_MODULE_FW_FLASH_HEADER``     nested  request header
+> +  ``ETHTOOL_A_MODULE_FW_FLASH_FILE_NAME``  string  firmware image file name
+> +  ``ETHTOOL_A_MODULE_FW_FLASH_PASSWORD``   u32     transceiver module password
+> +  =======================================  ======  ===========================
+> +
+> +The firmware update process consists of three logical steps:
+> +
+> +1. Downloading a firmware image to the transceiver module and validating it.
+> +2. Running the firmware image.
+> +3. Committing the firmware image so that it is run upon reset.
+> +
+> +When flash command is given, those three steps are taken in that order.
+> +
+> +The ``ETHTOOL_A_MODULE_FW_FLASH_FILE_NAME`` attribute encodes the firmware
+> +image file name. The firmware image is downloaded to the transceiver module,
+> +validated, run and committed.
+> +
+> +The optional ``ETHTOOL_A_MODULE_FW_FLASH_PASSWORD`` attribute encodes a password
+> +that might be required as part of the transceiver module firmware update
+> +process.
+> +
+> +The firmware update process can take several minutes to complete. Therefore,
+> +during the update process notifications are emitted from the kernel to user
+> +space updating it about the status and progress.
 
-So here we can use:
+We should spell out that the request only kicks off the process.
+devlink flashing blocks the netlink socket send() until it's completed,
+and the notifications have to be received on another socket.
+So someone who has devlink experience may expect the same behavior here.
 
-+ if (moder[ETHTOOL_A_IRQ_MODERATION_USEC]) {
-+ 	if (irq_moder->coal_flags & DIM_COALESCE_USEC)
-+ 		new_profile[i].usec =
-+ 			nla_get_u32(moder[ETHTOOL_A_IRQ_MODERATION_USEC]);
-+ 	else
-+ 		return -EOPNOTSUPP;
-+ }
+> +Notification contents:
+> +
+> + +---------------------------------------------------+--------+----------------+
+> + | ``ETHTOOL_A_MODULE_FW_FLASH_HEADER``              | nested | reply header   |
+> + +---------------------------------------------------+--------+----------------+
+> + | ``ETHTOOL_A_MODULE_FW_FLASH_STATUS``              | u32    | status         |
+> + +---------------------------------------------------+--------+----------------+
+> + | ``ETHTOOL_A_MODULE_FW_FLASH_STATUS_MSG``          | string | status message |
+> + +---------------------------------------------------+--------+----------------+
+> + | ``ETHTOOL_A_MODULE_FW_FLASH_DONE``                | uint   | progress       |
+> + +---------------------------------------------------+--------+----------------+
+> + | ``ETHTOOL_A_MODULE_FW_FLASH_TOTAL``               | uint   | total          |
+> + +---------------------------------------------------+--------+----------------+
 
-instead of:
+> +enum {
+> +	ETHTOOL_A_MODULE_FW_FLASH_UNSPEC,
+> +	ETHTOOL_A_MODULE_FW_FLASH_HEADER,		/* nest - _A_HEADER_* */
+> +	ETHTOOL_A_MODULE_FW_FLASH_FILE_NAME,		/* string */
+> +	ETHTOOL_A_MODULE_FW_FLASH_PASSWORD,		/* u32 */
+> +	ETHTOOL_A_MODULE_FW_FLASH_PAD,
 
-+ if (!NL_REQ_ATTR_CHECK(extack, nest, moder, ETHTOOL_A_IRQ_MODERATION_USEC)) {
-+ 	if (irq_moder->coal_flags & DIM_COALESCE_USEC)
-+ 		new_profile[i].usec =
-+ 			nla_get_u32(moder[ETHTOOL_A_IRQ_MODERATION_USEC]);
-+ 	else
-+ 		return -EOPNOTSUPP;
-+ }
+uint doesn't need pad, and pad is not specified in YAML, so 
+the following attribute IDs will be all off by one in YNL.
 
-to avoid missing information set in extack?
-
-Thanks.
+> +	ETHTOOL_A_MODULE_FW_FLASH_STATUS,		/* u32 */
+> +	ETHTOOL_A_MODULE_FW_FLASH_STATUS_MSG,		/* string */
+> +	ETHTOOL_A_MODULE_FW_FLASH_DONE,			/* uint */
+> +	ETHTOOL_A_MODULE_FW_FLASH_TOTAL,		/* uint */
+> +
+> +	/* add new constants above here */
+> +	__ETHTOOL_A_MODULE_FW_FLASH_CNT,
+> +	ETHTOOL_A_MODULE_FW_FLASH_MAX = (__ETHTOOL_A_MODULE_FW_FLASH_CNT - 1)
 
