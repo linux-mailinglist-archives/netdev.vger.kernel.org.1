@@ -1,212 +1,117 @@
-Return-Path: <netdev+bounces-92515-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92513-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65F768B7B41
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 17:14:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A2058B7ABA
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 16:59:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 98E66B227BB
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 15:14:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 365E5281F2E
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 14:59:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CD7713AA51;
-	Tue, 30 Apr 2024 15:14:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E403014372C;
+	Tue, 30 Apr 2024 14:58:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="qKt/VLxa"
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9A3A152799;
-	Tue, 30 Apr 2024 15:13:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 189607710D
+	for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 14:58:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714490041; cv=none; b=CyyTsjGSmBSvckRN2jxm2bEsin0gWbYtC6ENZ+JfXVOHqn6sD0mCDT/ebVtx9kmIrLfBkv8zoRuM31s0lHGjI4zZ0PHU7L76k6HYTUQWId8lz1PQC3PczfKduxcorc4O+6cs8i5Ur3eoElQlTX6ZYX0SbBkvemD09m+AxdCHywk=
+	t=1714489132; cv=none; b=cxb9jwE7poLvkPvGRK2Oftb3h0GBUX4XwvFIxzZpXKdTm4gD0Uuv+u4YxeuffZeubtMEGRPvnDJSvujM7Nv+gPU5Da5xwggUimPsuudYzNG4EDkVWm5HB93MuNFRUsOUEWQSB/8rTBPGV1MgDjZAQc1QPqmBNr5RrbJICf42oro=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714490041; c=relaxed/simple;
-	bh=oK4GHrFC398K3Gg4Ek1f4bcol1anIXwz2yoiJP9AEUo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ot/zvsXAH0Kg2+LO5583qiMijOR37SwwSaw73GqiqmUfiYd0K1SWMXgKVVVcDlSfb8QAjV2d8F78GQqv51FWz3sOpQCDGmur+ykPlcuTkXK6E7MoV+GWZK9VynjKpk8QlBauIX9yW1jXyl9K9UIEIPyDsr8UsO3JFf5NIW0my78=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=breakpoint.cc; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=breakpoint.cc
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@breakpoint.cc>)
-	id 1s1pB2-0004dT-5y; Tue, 30 Apr 2024 17:13:52 +0200
-From: Florian Westphal <fw@strlen.de>
-To: <netdev@vger.kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	<netfilter-devel@vger.kernel.org>,
-	pablo@netfilter.org
-Subject: [PATCH net-next] selftests: netfilter: nft_concat_range.sh: reduce debug kernel run time
-Date: Tue, 30 Apr 2024 16:58:07 +0200
-Message-ID: <20240430145810.23447-1-fw@strlen.de>
-X-Mailer: git-send-email 2.43.2
+	s=arc-20240116; t=1714489132; c=relaxed/simple;
+	bh=aK8rNc36l84FoofPl3zvU9soOmwm+ULYNmXvO9yTgsY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=nwrOXCykjoqoYyDPT1JVRR4c4fKf0F9iC4IZp31SsmXSms1VOFU+BX9UWWXrA52lbQe8MiGuz/v9EDcqmxWsTkIbQdGc+IGod7nPV1Twqmp3cAwmGliZfzLOB6wC74aCtBREcb2I/166umBeR6sA64opWXJoEYeaPdXOw+raO1s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=qKt/VLxa; arc=none smtp.client-ip=85.214.62.61
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Received: from [127.0.0.1] (p578adb1c.dip0.t-ipconnect.de [87.138.219.28])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits))
+	(No client certificate requested)
+	(Authenticated sender: marex@denx.de)
+	by phobos.denx.de (Postfix) with ESMTPSA id 45941885B7;
+	Tue, 30 Apr 2024 16:58:47 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+	s=phobos-20191101; t=1714489128;
+	bh=MbS5kmDoV9ij1Dnn8Ot86aNEiqzKcScaTzIQmjRFeFM=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=qKt/VLxaAjufqoXRReo15P3+8pbLhV8dZT5QpP88Mvh6q5U+G5ts8GWg6ZtxtbuL7
+	 Tc32qWdGLqCPc4zrJ3E3qj5LC1slyKkzaQJHJzB+PFgQHF5ajly4ZIwKPhJ/w33uGQ
+	 JGMSW1hBYvb3J+6aM5tPtutWBW4NqCfXA1fhUQ2Eyj4iVGK5ugqxKU00/Zwl4D30bH
+	 yvjpOOagxoPGbNKleoqaRK1RZTwjXy1P8e+9RATKbqUonn+iuo0lTTen5GVjbb4QhZ
+	 RjuGOkPvY6MYuPLSEdDB5ZuME2R3T7iNdijFKmebBRQkxif8HWiP2WyHWM/5P7ur/e
+	 R0c36JSp1HJ9g==
+Message-ID: <d51e8d34-10f3-431a-a3dc-d1daed046e86@denx.de>
+Date: Tue, 30 Apr 2024 16:58:46 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net,PATCH] net: ks8851: Queue RX packets in IRQ handler instead
+ of disabling BHs
+To: Ronald Wahl <ronald.wahl@raritan.com>, netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+References: <20240430011518.110416-1-marex@denx.de>
+ <959c3cf5-c604-4b36-adb8-ee28ed4ef9c4@raritan.com>
+Content-Language: en-US
+From: Marek Vasut <marex@denx.de>
+In-Reply-To: <959c3cf5-c604-4b36-adb8-ee28ed4ef9c4@raritan.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
 
-Even a 1h timeout isn't enough for nft_concat_range.sh to complete on
-debug kernels.
+On 4/30/24 10:24 AM, Ronald Wahl wrote:
+> On 30.04.24 03:14, Marek Vasut wrote:
+>> Currently the driver uses local_bh_disable()/local_bh_enable() in its
+>> IRQ handler to avoid triggering net_rx_action() softirq on exit from
+>> netif_rx(). The net_rx_action() could trigger this driver .start_xmit
+>> callback, which is protected by the same lock as the IRQ handler, so
+>> calling the .start_xmit from netif_rx() from the IRQ handler critical
+>> section protected by the lock could lead to an attempt to claim the
+>> already claimed lock, and a hang.
+>>
+>> The local_bh_disable()/local_bh_enable() approach works only in case
+>> the IRQ handler is protected by a spinlock, but does not work if the
+>> IRQ handler is protected by mutex, i.e. this works for KS8851 with
+>> Parallel bus interface, but not for KS8851 with SPI bus interface.
+>>
+>> Remove the BH manipulation and instead of calling netif_rx() inside
+>> the IRQ handler code protected by the lock, queue all the received
+>> SKBs in the IRQ handler into a queue first, and once the IRQ handler
+>> exits the critical section protected by the lock, dequeue all the
+>> queued SKBs and push them all into netif_rx(). At this point, it is
+>> safe to trigger the net_rx_action() softirq, since the netif_rx()
+>> call is outside of the lock that protects the IRQ handler.
+>>
+>> Fixes: be0384bf599c ("net: ks8851: Handle softirqs at the end of IRQ 
+>> thread to fix hang")
+>> Signed-off-by: Marek Vasut <marex@denx.de>
+>> ---
+>> Cc: "David S. Miller" <davem@davemloft.net>
+>> Cc: Eric Dumazet <edumazet@google.com>
+>> Cc: Jakub Kicinski <kuba@kernel.org>
+>> Cc: Paolo Abeni <pabeni@redhat.com>
+>> Cc: Ronald Wahl <ronald.wahl@raritan.com>
+>> Cc: Simon Horman <horms@kernel.org>
+>> Cc: netdev@vger.kernel.org
+> 
+> To me the code looks good. An iperf3 test shows that it now has even
+> slightly more throughput in my setup (two interconnected ks8851-spi).
+> Thanks for this fix!
+> 
+> Tested-by: Ronald Wahl <ronald.wahl@raritan.com>
 
-Reduce test complexity and only match on single entry if
-KSFT_MACHINE_SLOW is set.
-
-To spot 'slow' tests, print the subtest duration (in seconds) in
-addition to the status.
-
-Add new nft_concat_range_perf.sh script, not executed via kselftest,
-to run the performance (pps match rate) tests.
-
-Those need about 25m to complete which seems too much to run this
-via 'make run_tests'.
-
-Signed-off-by: Florian Westphal <fw@strlen.de>
----
- .../testing/selftests/net/netfilter/Makefile  |  2 ++
- tools/testing/selftests/net/netfilter/config  |  1 +
- .../net/netfilter/nft_concat_range.sh         | 28 +++++++++++++++----
- .../net/netfilter/nft_concat_range_perf.sh    |  9 ++++++
- 4 files changed, 34 insertions(+), 6 deletions(-)
- create mode 100755 tools/testing/selftests/net/netfilter/nft_concat_range_perf.sh
-
-diff --git a/tools/testing/selftests/net/netfilter/Makefile b/tools/testing/selftests/net/netfilter/Makefile
-index 72c6001964a6..e9a6c702b8c9 100644
---- a/tools/testing/selftests/net/netfilter/Makefile
-+++ b/tools/testing/selftests/net/netfilter/Makefile
-@@ -28,6 +28,8 @@ TEST_PROGS += nft_zones_many.sh
- TEST_PROGS += rpath.sh
- TEST_PROGS += xt_string.sh
- 
-+TEST_PROGS_EXTENDED = nft_concat_range_perf.sh
-+
- TEST_GEN_PROGS = conntrack_dump_flush
- 
- TEST_GEN_FILES = audit_logread
-diff --git a/tools/testing/selftests/net/netfilter/config b/tools/testing/selftests/net/netfilter/config
-index 60b86c7f3ea1..5b5b764f6cd0 100644
---- a/tools/testing/selftests/net/netfilter/config
-+++ b/tools/testing/selftests/net/netfilter/config
-@@ -85,3 +85,4 @@ CONFIG_VETH=m
- CONFIG_VLAN_8021Q=m
- CONFIG_XFRM_USER=m
- CONFIG_XFRM_STATISTICS=y
-+CONFIG_NET_PKTGEN=m
-diff --git a/tools/testing/selftests/net/netfilter/nft_concat_range.sh b/tools/testing/selftests/net/netfilter/nft_concat_range.sh
-index 2b6661519055..6d66240e149c 100755
---- a/tools/testing/selftests/net/netfilter/nft_concat_range.sh
-+++ b/tools/testing/selftests/net/netfilter/nft_concat_range.sh
-@@ -19,7 +19,7 @@ source lib.sh
- # - timeout: check that packets match entries until they expire
- # - performance: estimate matching rate, compare with rbtree and hash baselines
- TESTS="reported_issues correctness concurrency timeout"
--[ "${quicktest}" != "1" ] && TESTS="${TESTS} performance"
-+[ -n "$NFT_CONCAT_RANGE_TESTS" ] && TESTS="${NFT_CONCAT_RANGE_TESTS}"
- 
- # Set types, defined by TYPE_ variables below
- TYPES="net_port port_net net6_port port_proto net6_port_mac net6_port_mac_proto
-@@ -31,7 +31,7 @@ BUGS="flush_remove_add reload"
- 
- # List of possible paths to pktgen script from kernel tree for performance tests
- PKTGEN_SCRIPT_PATHS="
--	../../../../samples/pktgen/pktgen_bench_xmit_mode_netif_receive.sh
-+	../../../../../samples/pktgen/pktgen_bench_xmit_mode_netif_receive.sh
- 	pktgen/pktgen_bench_xmit_mode_netif_receive.sh"
- 
- # Definition of set types:
-@@ -951,6 +951,10 @@ cleanup() {
- 	killall iperf				2>/dev/null
- 	killall netperf				2>/dev/null
- 	killall netserver			2>/dev/null
-+}
-+
-+cleanup_exit() {
-+	cleanup
- 	rm -f "$tmp"
- }
- 
-@@ -1371,6 +1375,9 @@ test_timeout() {
- 	setup veth send_"${proto}" set || return ${ksft_skip}
- 
- 	timeout=3
-+
-+	[ "$KSFT_MACHINE_SLOW" = "yes" ] && timeout=8
-+
- 	range_size=1
- 	for i in $(seq "$start" $((start + count))); do
- 		end=$((start + range_size))
-@@ -1386,7 +1393,7 @@ test_timeout() {
- 		range_size=$((range_size + 1))
- 		start=$((end + range_size))
- 	done
--	sleep 3
-+	sleep $timeout
- 	for i in $(seq "$start" $((start + count))); do
- 		end=$((start + range_size))
- 		srcstart=$((start + src_delta))
-@@ -1480,10 +1487,13 @@ test_performance() {
- }
- 
- test_bug_flush_remove_add() {
-+	rounds=100
-+	[ "$KSFT_MACHINE_SLOW" = "yes" ] && rounds=10
-+
- 	set_cmd='{ set s { type ipv4_addr . inet_service; flags interval; }; }'
- 	elem1='{ 10.0.0.1 . 22-25, 10.0.0.1 . 10-20 }'
- 	elem2='{ 10.0.0.1 . 10-20, 10.0.0.1 . 22-25 }'
--	for i in $(seq 1 100); do
-+	for i in $(seq 1 $rounds); do
- 		nft add table t "$set_cmd"	|| return ${ksft_skip}
- 		nft add element t s "$elem1"	2>/dev/null || return 1
- 		nft flush set t s		2>/dev/null || return 1
-@@ -1552,7 +1562,7 @@ test_reported_issues() {
- # Run everything in a separate network namespace
- [ "${1}" != "run" ] && { unshare -n "${0}" run; exit $?; }
- tmp="$(mktemp)"
--trap cleanup EXIT
-+trap cleanup_exit EXIT
- 
- # Entry point for test runs
- passed=0
-@@ -1584,10 +1594,16 @@ for name in ${TESTS}; do
- 			continue
- 		fi
- 
--		printf "  %-60s  " "${display}"
-+		[ "$KSFT_MACHINE_SLOW" = "yes" ] && count=1
-+
-+		printf "  %-32s  " "${display}"
-+		tthen=$(date +%s)
- 		eval test_"${name}"
- 		ret=$?
- 
-+		tnow=$(date +%s)
-+		printf "%5ds%-30s" $((tnow-tthen))
-+
- 		if [ $ret -eq 0 ]; then
- 			printf "[ OK ]\n"
- 			info_flush
-diff --git a/tools/testing/selftests/net/netfilter/nft_concat_range_perf.sh b/tools/testing/selftests/net/netfilter/nft_concat_range_perf.sh
-new file mode 100755
-index 000000000000..5d276995a5c5
---- /dev/null
-+++ b/tools/testing/selftests/net/netfilter/nft_concat_range_perf.sh
-@@ -0,0 +1,9 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+#
-+
-+source lib.sh
-+
-+[ "$KSFT_MACHINE_SLOW" = yes ] && exit ${ksft_skip}
-+
-+NFT_CONCAT_RANGE_TESTS="performance" exec ./nft_concat_range.sh
--- 
-2.43.2
-
+That's nice. Thank you for testing. Sorry for the breakage.
 
