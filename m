@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-92314-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92315-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F9108B6866
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 05:22:44 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8BFC38B6871
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 05:23:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5F5101C213D2
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 03:22:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ED48CB2215D
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 03:23:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEF12F4EB;
-	Tue, 30 Apr 2024 03:22:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0757CFC12;
+	Tue, 30 Apr 2024 03:23:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sSkKNiCX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="myAu4gBs"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 851A81094E;
-	Tue, 30 Apr 2024 03:22:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D278214012;
+	Tue, 30 Apr 2024 03:23:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714447359; cv=none; b=f9gkeK4rmFwQqX0QniidS/dfoxj7zYziF9dCjiGswBYjTAX8gXZV7xB2/x+8N0/6vvPqwfIbCYXPxRP7h68zrsTCGON8xMOIfSZJPv/HCodB5IjZzvn30lyxCSmIzGKIUL48Jn1epK4I75aDvZL/5qekcwfuJ6Gdg9G04RzQMHM=
+	t=1714447413; cv=none; b=lxBpCSnoYo8v7RC96ym13LO7NN/0l4VqkeV9a73EY1epucARsrC8opCxSQQVAVsIcRe37nv83PPzgILQCyRr2UK/sXR8XMmIPFEmq07ne0owRmW0cnpkH2NCuNvDGN90Ksr9F2UsIGCIYljakRweVvBYjPWaQNOwG+kT+/7XQKE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714447359; c=relaxed/simple;
-	bh=/KpxBWy5mcEbkG7pQG0EPzcysWGUzPXDj0gBvqYdums=;
+	s=arc-20240116; t=1714447413; c=relaxed/simple;
+	bh=+ziwUOuJ/5z2kID1ktuoOnRRYM512wFNMBw8R4f1CH4=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TFaH6jjxIGKmFb2SeoIxsnJoJ2sWcAIKH/wbv77MtLukM64jllim8rWP/Fr3X7FsTkRLH9VJ4JDrHBxnab8iVEdn60K1zzgRWTcV/bywr3cy9WdRJb2oWIsGPpttJcgQf9Yr+hbOwwwB9DMvXrbTeRmxgJOg6DkAyvs5eSEWGo4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sSkKNiCX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8CD91C116B1;
-	Tue, 30 Apr 2024 03:22:38 +0000 (UTC)
+	 MIME-Version:Content-Type; b=UZqbAIPPZShs/18uXs+p47unwZUNf4ENnqdBZIGX1gqPeUPhwGAlrEpc7WzxmViTmp8oeonitNZ7wi70jmR6u3Nrp+IfWatdcbbVlkSoyjLce+MGb9hC42sA0ubFG2HeIP57kspvHTycCW39g/zhFMpee2CyjRjxLGLdXuPAJTk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=myAu4gBs; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6375C116B1;
+	Tue, 30 Apr 2024 03:23:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714447359;
-	bh=/KpxBWy5mcEbkG7pQG0EPzcysWGUzPXDj0gBvqYdums=;
+	s=k20201202; t=1714447413;
+	bh=+ziwUOuJ/5z2kID1ktuoOnRRYM512wFNMBw8R4f1CH4=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=sSkKNiCXpCcc/7pJ8gWMm5YCd3auiyTbpRyptUCMgG9FzN5zkVbZipqaxbdF3hPpx
-	 Geb61osFpYAPFdZvAxNGqTo5mLEMYXsyGz9fJGTOQKB4dNXfiAX3WjwYmz8tnaFfdD
-	 PbLFmVrwVAth+rr/5SZExtgs9UjWdtgAEGGxBbbeqdyHbLTA6xT2G6T1WL21orpZnE
-	 KzuJ9S8IryK8WpoCwKQH39ME1RvEXSwUt+981BiNi0hf4zixOLWsbwp9cB7tNZ7PJM
-	 XZLyDW94V+cfABtIkA1burVDaEciei33GzNeWzjSShKkOHpSXM8fzG7k/IDuKX3glu
-	 uTZzRAVgqnlFw==
-Date: Mon, 29 Apr 2024 20:22:37 -0700
+	b=myAu4gBsisirnn2O0lJ4Ig1Cm0FyC7rYAJzytGiDK4azOQ1ii9xHas1MwjaxUZLAQ
+	 Tgx19e1KESqZVBq5dhBBIiGIOCEBwVF+yDz+ZzUMdiVaEqL2bbx5zrvHElcVL864JW
+	 IU8x0ueDVSm2uE9wN447iR53NyOkkGnHKmBvxuEG/TwZ/IKkBuEE6bIZlOzJvCsVrh
+	 XCCw5fTkPrvQCsMOP0Rq5Fql8TUHSnRlzDipFPFHNBFehYq/+dhO2jChsq0YCuz6Y8
+	 0fQPGLST31rlspF0L5lH/5+WzoGh+++Z0Pv3cojd3ivdYyNCaYM0JgU7UZefZVWmJ0
+	 w3asVzGGnlBYw==
+Date: Mon, 29 Apr 2024 20:23:31 -0700
 From: Jakub Kicinski <kuba@kernel.org>
 To: Danielle Ratson <danieller@nvidia.com>
 Cc: <netdev@vger.kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
@@ -53,12 +53,12 @@ Cc: <netdev@vger.kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
  <paul.greenwalt@intel.com>, <jiri@resnulli.us>,
  <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
  <mlxsw@nvidia.com>, <petrm@nvidia.com>, <idosch@nvidia.com>
-Subject: Re: [PATCH net-next v5 09/10] ethtool: Add ability to flash
- transceiver modules' firmware
-Message-ID: <20240429202237.6bbd2cb3@kernel.org>
-In-Reply-To: <20240424133023.4150624-10-danieller@nvidia.com>
+Subject: Re: [PATCH net-next v5 10/10] ethtool: Veto some operations during
+ firmware flashing process
+Message-ID: <20240429202331.29f3dafa@kernel.org>
+In-Reply-To: <20240424133023.4150624-11-danieller@nvidia.com>
 References: <20240424133023.4150624-1-danieller@nvidia.com>
-	<20240424133023.4150624-10-danieller@nvidia.com>
+	<20240424133023.4150624-11-danieller@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,45 +68,26 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 24 Apr 2024 16:30:22 +0300 Danielle Ratson wrote:
-> +static int
-> +module_flash_fw_schedule(struct net_device *dev, const char *file_name,
-> +			 struct ethtool_module_fw_flash_params *params,
-> +			 struct netlink_ext_ack *extack)
-> +{
-> +	struct ethtool_module_fw_flash *module_fw;
-> +	int err;
-> +
-> +	err = __module_flash_fw_schedule(dev, extack);
-> +	if (err < 0)
-> +		return err;
+On Wed, 24 Apr 2024 16:30:23 +0300 Danielle Ratson wrote:
+> Some operations cannot be performed during the firmware flashing process.
+> 
+> For example:
+> 
+> - Port must be down during the whole flashing process to avoid packet loss
+>   while committing reset for example.
+> 
+> - Writing to EEPROM interrupts the flashing process, so operations like
+>   ethtool dump, module reset, get and set power mode should be vetoed.
+> 
+> - Split port firmware flashing should be vetoed.
+> 
+> - Flashing firmware on a device which is already in a flashing process
+>   should be forbidden.
+> 
+> Use the 'module_fw_flashing_in_progress' flag introduced in a previous
+> patch to veto those operations and prevent interruptions while preforming
+> module firmware flash.
 
-Basic dev validation should probably be called directly from
-ethnl_act_module_fw_flash() rather than two functions down.
-
-> +	module_fw = kzalloc(sizeof(*module_fw), GFP_KERNEL);
-> +	if (!module_fw)
-> +		return -ENOMEM;
-> +
-> +	module_fw->params = *params;
-> +	err = request_firmware_direct(&module_fw->fw, file_name, &dev->dev);
-> +	if (err) {
-> +		NL_SET_ERR_MSG(extack,
-> +			       "Failed to request module firmware image");
-> +		goto err_request_firmware;
-
-Please name the labels after the actions they perform.
-
-> +	}
-> +
-> +	err = module_flash_fw_work_init(module_fw, dev, extack);
-> +	if (err < 0) {
-> +		NL_SET_ERR_MSG(extack,
-> +			       "Flashing module firmware is not supported by this device");
-
-This overwrites the more accurate extack msg already set by
-module_flash_fw_work_init()
-
-> +		goto err_work_init;
-> +	}
+Feels a little out of order to add this check after the functionality.
+I'd merge this with patch 5.
 
