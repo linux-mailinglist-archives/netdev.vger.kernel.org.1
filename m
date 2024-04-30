@@ -1,115 +1,237 @@
-Return-Path: <netdev+bounces-92359-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92360-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 482088B6CC6
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 10:27:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD3178B6CEC
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 10:39:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 003AF28452E
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 08:27:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 55F5A1F23A08
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 08:39:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E41E7D3F4;
-	Tue, 30 Apr 2024 08:27:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 848701272D6;
+	Tue, 30 Apr 2024 08:39:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="As/yyuhw"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="OYa1XQLH"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E11422BB07
-	for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 08:27:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7B4E1272C6;
+	Tue, 30 Apr 2024 08:39:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714465643; cv=none; b=pGwdWihUvx2KNUDhnJSJzXxKJhqdQX7ylj4y7QGU7MizrNBUKII3W2rZ5gMWPeA0eH0Vw/phTRLiohvRIq02Zu5ljFab+MZWr1f0g7GgmiWOeMEJbSbY/k1BshJG+c4XfizNuvVkVn7DqOm1OjBlvwPz3NjY75/Vo7kwijE0cy8=
+	t=1714466346; cv=none; b=W8bNKUR+E0+BZIBKnAb7f2WVypYVH/UfeLd+yQwc+ACeEFTRFbqiAg1ShBFAphbtHgDcplWu808sO69a/eatH0RU3suU8/W16R6McpbLd1EtnesCFGQoZKKzpUaj7vyGeUQiIjaMvMUN8q5DBkSsBJoern9x8G/ZxG9ZK4ZA/64=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714465643; c=relaxed/simple;
-	bh=8p1WAGvJaxSN1ifEqgnkzuhV/WTumukGZGiUI7WXMzk=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=SsJxa9zNmq1xNndrry4b5vvY3FrMijGXjrnSrFeiaPvN8ne3Ya/uVTI7yQs/0czA94sGZEQAI8jX8lP1DENomz+5UtXDKEjrcD0vYTR+U0E9TQXEIjC/fAHetSSIF6XrI7e7dElwb0TrzlYEbDP/CsjnkyefEKri086qJc/OFSk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=As/yyuhw; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1714465640;
+	s=arc-20240116; t=1714466346; c=relaxed/simple;
+	bh=tGouIIMweCCg8lFI1k5a8Nmi7sj3tVWhoXa+yZ9Svjw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Jj6VVhcz2cadv7ILySFj1cGMuFcYhBldXrvX5K4K10awAS8pqJ0e2yQUigxS8uS5KfxHirmoqt+AFr8AAxTu3onOgO8RBKA3azh38s6IwZgNqG1VRYT1XfTYx8nvhhz3A0a9oSHqWalKH2vQbN+FXV9c/ZLFlR3MDX/3BW7/TmY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=OYa1XQLH; arc=none smtp.client-ip=217.70.183.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPA id 6105720013;
+	Tue, 30 Apr 2024 08:38:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1714466340;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=8p1WAGvJaxSN1ifEqgnkzuhV/WTumukGZGiUI7WXMzk=;
-	b=As/yyuhwLOvV7hbuyQz0GPJoWMHQy1YQr/PhQedhqqYw/TCbBrXNMhEtnvcxOvp+N8Jk9U
-	BSdG/dXoWAXITY3VQQeU41q7Xgjtg7xiRxwLMvoMQnjXtJiQ8DbMsp/uLsNyaxHRRe2VxK
-	IvOO9DJLuiqGaII3HypJj/M2bnpRbqg=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-353-50usCBtuMYqHmfg0qQlEOQ-1; Tue, 30 Apr 2024 04:27:19 -0400
-X-MC-Unique: 50usCBtuMYqHmfg0qQlEOQ-1
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-34d9627ffd0so39405f8f.1
-        for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 01:27:18 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714465638; x=1715070438;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8p1WAGvJaxSN1ifEqgnkzuhV/WTumukGZGiUI7WXMzk=;
-        b=RmbbJjvJC/kyG5lwEpbiZkeLsC/fv681b/oM2lKGHZousvFdzIMGOjCoXfWgfFSTaL
-         xonr53IvESqRDZzCxO3GWgF4KFbvCUWVfTGVYVTBGnAML3MRCnPS6qMLzFWFz6aVXPgk
-         88IrCeIodIrBybrK0mP/pR3g1MZ8VXGQfYhL2w3zWpZDOaYOAkUANaO3Lbs/c32u8dCS
-         cQCqdz9JHgOO3q5OHKo+5BZX7UO0kUmLfYckEOroMf8WNw3SsGKkEKYC6F/Us1YePl8O
-         jQOsUjpeEwoFsRQJXMWznReJDzbc31qTU4Q5LzeYeHs5/3VikJm50u01pQFKRAfTwKPt
-         Ttng==
-X-Forwarded-Encrypted: i=1; AJvYcCVwnm7ZdiWiQSA1Eqck5AfUBAwX95niHOW8MhkAY+2yGcQ8w1SZu7sPDdfbZKqD7gwPJflpUftBwNK37nTjNfOLz10X77H4
-X-Gm-Message-State: AOJu0YxnnqlLDW9YEI77zcQ7vpu3Q5Ft/BdgktBvNra0yM3BeqgugN3y
-	IPhjhSMqkAG+a/VYsI+PwFaYtw7WYO1MiGKstkLUVogM/7uZn91LHJRs9nenZ/fPSaOFsj3yR0a
-	DvTfYB/af70EDwr6fLjJsEvwrBJdGopEPHDUkdSa+clVGbdvHi0Uy7w==
-X-Received: by 2002:a05:600c:3b04:b0:41a:3150:cc83 with SMTP id m4-20020a05600c3b0400b0041a3150cc83mr9195865wms.2.1714465637955;
-        Tue, 30 Apr 2024 01:27:17 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEpOhdLDxpxI6heblPcZzxKzXobDgiSNF0APl5aZpDWQy/E1XE5Fa9gbIa7N7XI+F+GoTew8Q==
-X-Received: by 2002:a05:600c:3b04:b0:41a:3150:cc83 with SMTP id m4-20020a05600c3b0400b0041a3150cc83mr9195845wms.2.1714465637512;
-        Tue, 30 Apr 2024 01:27:17 -0700 (PDT)
-Received: from gerbillo.redhat.com ([2a0d:3341:b0ae:6a10::f71])
-        by smtp.gmail.com with ESMTPSA id v17-20020a05600c445100b0041c130520f3sm8836463wmn.6.2024.04.30.01.27.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Apr 2024 01:27:16 -0700 (PDT)
-Message-ID: <fbeb89142a37a442d0a2184441a0fb4033b82ac8.camel@redhat.com>
-Subject: Re: [PATCH net-next] tcp: add tracepoint for tcp_write_err()
-From: Paolo Abeni <pabeni@redhat.com>
-To: Philo Lu <lulie@linux.alibaba.com>, netdev@vger.kernel.org
-Cc: edumazet@google.com, rostedt@goodmis.org, mhiramat@kernel.org, 
-	mathieu.desnoyers@efficios.com, davem@davemloft.net, dsahern@kernel.org, 
-	kuba@kernel.org, fred.cc@alibaba-inc.com, xuanzhuo@linux.alibaba.com
-Date: Tue, 30 Apr 2024 10:27:14 +0200
-In-Reply-To: <20240425162556.83456-1-lulie@linux.alibaba.com>
-References: <20240425162556.83456-1-lulie@linux.alibaba.com>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=mQINBGISiDUBEAC5uMdJicjm3ZlWQJG4u2EU1EhWUSx8IZLUTmEE8zmjPJFSYDcjtfGcbzLPb63BvX7FADmTOkO7gwtDgm501XnQaZgBUnCOUT8qv5MkKsFH20h1XJyqjPeGM55YFAXc+a4WD0YyO5M0+KhDeRLoildeRna1ey944VlZ6Inf67zMYw9vfE5XozBtytFIrRyGEWkQwkjaYhr1cGM8ia24QQVQid3P7SPkR78kJmrT32sGk+TdR4YnZzBvVaojX4AroZrrAQVdOLQWR+w4w1mONfJvahNdjq73tKv51nIpu4SAC1Zmnm3x4u9r22mbMDr0uWqDqwhsvkanYmn4umDKc1ZkBnDIbbumd40x9CKgG6ogVlLYeJa9WyfVMOHDF6f0wRjFjxVoPO6p/ZDkuEa67KCpJnXNYipLJ3MYhdKWBZw0xc3LKiKc+nMfQlo76T/qHMDfRMaMhk+L8gWc3ZlRQFG0/Pd1pdQEiRuvfM5DUXDo/YOZLV0NfRFU9SmtIPhbdm9cV8Hf8mUwubihiJB/9zPvVq8xfiVbdT0sPzBtxW0fXwrbFxYAOFvT0UC2MjlIsukjmXOUJtdZqBE3v3Jf7VnjNVj9P58+MOx9iYo8jl3fNd7biyQWdPDfYk9ncK8km4skfZQIoUVqrWqGDJjHO1W9CQLAxkfOeHrmG29PK9tHIwARAQABtB9QYW9sbyBBYmVuaSA8cGFiZW5pQHJlZGhhdC5jb20+iQJSBBMBCAA8FiEEg1AjqC77wbdLX2LbKSR5jcyPE6QFAmISiDUCGwMFCwkIBwIDIgIBBhUKCQgLAgQWAgMBAh4HAheAAAoJECkkeY3MjxOkJSYQAJcc6MTsuFxYdYZkeWjW//zbD3ApRHzpNlHLVSuJqHr9/aDS+tyszgS8jj9MiqALzgq4iZbg
- 7ZxN9ZsDL38qVIuFkSpgMZCiUHdxBC11J8nbBSLlpnc924UAyr5XrGA99 6Wl5I4Km3128GY6iAkH54pZpOmpoUyBjcxbJWHstzmvyiXrjA2sMzYjt3Xkqp0cJfIEekOi75wnNPofEEJg28XPcFrpkMUFFvB4Aqrdc2yyR8Y36rbw18sIX3dJdomIP3dL7LoJi9mfUKOnr86Z0xltgcLPGYoCiUZMlXyWgB2IPmmcMP2jLJrusICjZxLYJJLofEjznAJSUEwB/3rlvFrSYvkKkVmfnfro5XEr5nStVTECxfy7RTtltwih85LlZEHP8eJWMUDj3P4Q9CWNgz2pWr1t68QuPHWaA+PrXyasDlcRpRXHZCOcvsKhAaCOG8TzCrutOZ5NxdfXTe3f1jVIEab7lNgr+7HiNVS+UPRzmvBc73DAyToKQBn9kC4jh9HoWyYTepjdcxnio0crmara+/HEyRZDQeOzSexf85I4dwxcdPKXv0fmLtxrN57Ae82bHuRlfeTuDG3x3vl/Bjx4O7Lb+oN2BLTmgpYq7V1WJPUwikZg8M+nvDNcsOoWGbU417PbHHn3N7yS0lLGoCCWyrK1OY0QM4EVsL3TjOfUtCNQYW9sbyBBYmVuaSA8cGFvbG8uYWJlbmlAZ21haWwuY29tPokCUgQTAQgAPBYhBINQI6gu+8G3S19i2ykkeY3MjxOkBQJiEoitAhsDBQsJCAcCAyICAQYVCgkICwIEFgIDAQIeBwIXgAAKCRApJHmNzI8TpBzHD/45pUctaCnhee1vkQnmStAYvHmwrWwIEH1lzDMDCpJQHTUQOOJWDAZOFnE/67bxSS81Wie0OKW2jvg1ylmpBA0gPpnzIExQmfP72cQ1TBoeVColVT6Io35BINn+ymM7c0Bn8RvngSEpr3jBtqvvWXjvtnJ5/HbOVQCg62NC6ewosoKJPWpGXMJ9SKsVIOUHsmoWK60spzeiJoSmAwm3zTJQnM5kRh2q
- iWjoCy8L35zPqR5TV+f5WR5hTVCqmLHSgm1jxwKhPg9L+GfuE4d0SWd84y GeOB3sSxlhWsuTj1K6K3MO9srD9hr0puqjO9sAizd0BJP8ucf/AACfrgmzIqZXCfVS7jJ/M+0ic+j1Si3yY8wYPEi3dvbVC0zsoGj9n1R7B7L9c3g1pZ4L9ui428vnPiMnDN3jh9OsdaXeWLvSvTylYvw9q0DEXVQTv4/OkcoMrfEkfbXbtZ3PRlAiddSZA5BDEkkm6P9KA2YAuooi1OD9d4MW8LFAeEicvHG+TPO6jtKTacdXDRe611EfRwTjBs19HmabSUfFcumL6BlVyceIoSqXFe5jOfGpbBevTZtg4kTSHqymGb6ra6sKs+/9aJiONs5NXY7iacZ55qG3Ib1cpQTps9bQILnqpwL2VTaH9TPGWwMY3Nc2VEc08zsLrXnA/yZKqZ1YzSY9MGXWYLkCDQRiEog1ARAAyXMKL+x1lDvLZVQjSUIVlaWswc0nV5y2EzBdbdZZCP3ysGC+s+n7xtq0o1wOvSvaG9h5q7sYZs+AKbuUbeZPu0bPWKoO02i00yVoSgWnEqDbyNeiSW+vI+VdiXITV83lG6pS+pAoTZlRROkpb5xo0gQ5ZeYok8MrkEmJbsPjdoKUJDBFTwrRnaDOfb+Qx1D22PlAZpdKiNtwbNZWiwEQFm6mHkIVSTUe2zSemoqYX4QQRvbmuMyPIbwbdNWlItukjHsffuPivLF/XsI1gDV67S1cVnQbBgrpFDxN62USwewXkNl+ndwa+15wgJFyq4Sd+RSMTPDzDQPFovyDfA/jxN2SK1Lizam6o+LBmvhIxwZOfdYH8bdYCoSpqcKLJVG3qVcTwbhGJr3kpRcBRz39Ml6iZhJyI3pEoX3bJTlR5Pr1Kjpx13qGydSMos94CIYWAKhegI06aTdvvuiigBwjngo/Rk5S+iEGR5KmTqGyp27o6YxZy6D4NIc6PKUzhIUxfvuHNvfu
- sD2W1U7eyLdm/jCgticGDsRtweytsgCSYfbz0gdgUuL3EBYN3JLbAU+UZpy v/fyD4cHDWaizNy/KmOI6FFjvVh4LRCpGTGDVPHsQXaqvzUybaMb7HSfmBBzZqqfVbq9n5FqPjAgD2lJ0rkzb9XnVXHgr6bmMRlaTlBMAEQEAAYkCNgQYAQgAIBYhBINQI6gu+8G3S19i2ykkeY3MjxOkBQJiEog1AhsMAAoJECkkeY3MjxOkY1YQAKdGjHyIdOWSjM8DPLdGJaPgJdugHZowaoyCxffilMGXqc8axBtmYjUIoXurpl+f+a7S0tQhXjGUt09zKlNXxGcebL5TEPFqgJTHN/77ayLslMTtZVYHE2FiIxkvW48yDjZUlefmphGpfpoXe4nRBNto1mMB9Pb9vR47EjNBZCtWWbwJTIEUwHP2Z5fV9nMx9Zw2BhwrfnODnzI8xRWVqk7/5R+FJvl7s3nY4F+svKGD9QHYmxfd8Gx42PZc/qkeCjUORaOf1fsYyChTtJI4iNm6iWbD9HK5LTMzwl0n0lL7CEsBsCJ97i2swm1DQiY1ZJ95G2Nz5PjNRSiymIw9/neTvUT8VJJhzRl3Nb/EmO/qeahfiG7zTpqSn2dEl+AwbcwQrbAhTPzuHIcoLZYV0xDWzAibUnn7pSrQKja+b8kHD9WF+m7dPlRVY7soqEYXylyCOXr5516upH8vVBmqweCIxXSWqPAhQq8d3hB/Ww2A0H0PBTN1REVw8pRLNApEA7C2nX6RW0XmA53PIQvAP0EAakWsqHoKZ5WdpeOcH9iVlUQhRgemQSkhfNaP9LqR1XKujlTuUTpoyT3xwAzkmSxN1nABoutHEO/N87fpIbpbZaIdinF7b9srwUvDOKsywfs5HMiUZhLKoZzCcU/AEFjQsPTATACGsWf3JYPnWxL9
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=1z1r8qP3wTyMtexbriJIq+WvlcDHX0KVVkOb8SF0acI=;
+	b=OYa1XQLHVHnDfDXtIRKkfKPMke4wZr/J4u5RQY/BSrxG8sI2nJ5TVTYix2l+xnjMM9nfKT
+	pUxdnTN/p7g90fsmFxCbPTezHmyDoXUwDdolMNTjhltSK2wkmedl8tOK9Rf96fdVNlX019
+	wDbq1dKt8FvjC2+O+Qff0nHwWUxnJ0NXrvCuYGLu1l+iNGv+LC0LVBkYXX7QQuwcApbFZ1
+	IZiMGwncytElcKLvDfwGr++lXQ6TGOHaCtnGokFAn145nzBS5/ezLhbZNnyHvfV10dJbmK
+	7GA0BLpt30XtoYDlxmcXZDYIIpcuHr7tLjrGwZlFlkZJ8S3vDlEuTA2DBBXaHA==
+From: Herve Codina <herve.codina@bootlin.com>
+To: Herve Codina <herve.codina@bootlin.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Lee Jones <lee@kernel.org>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Horatiu Vultur <horatiu.vultur@microchip.com>,
+	UNGLinuxDriver@microchip.com,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Saravana Kannan <saravanak@google.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Lars Povlsen <lars.povlsen@microchip.com>,
+	Steen Hegelund <Steen.Hegelund@microchip.com>,
+	Daniel Machon <daniel.machon@microchip.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>
+Cc: linux-kernel@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-pci@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Allan Nielsen <allan.nielsen@microchip.com>,
+	Steen Hegelund <steen.hegelund@microchip.com>,
+	Luca Ceresoli <luca.ceresoli@bootlin.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Subject: [PATCH 00/17] Add support for the LAN966x PCI device using a DT overlay
+Date: Tue, 30 Apr 2024 10:37:09 +0200
+Message-ID: <20240430083730.134918-1-herve.codina@bootlin.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: herve.codina@bootlin.com
 
-On Fri, 2024-04-26 at 00:25 +0800, Philo Lu wrote:
-> This tracepoint can be used to trace tcp write error events, e.g.,
-> retransmit timeout. Though there is a tracepoint in sk_error_report(),
-> the value of sk->sk_err depends on sk->sk_err_soft, and we cannot easily
-> recognized errors from tcp_write_err().
+Hi,
 
-Why not? you can look at the dumped sock protocol and ev. capture the
-sk_error_report tracepoint call-trace.=20
+This series adds support for the LAN966x chip when used as a PCI
+device.
 
-IMHO this provides little value and is not worthy.
+For reference, the LAN996x chip is a System-on-chip that integrates an
+Ethernet switch and a number of other traditional hardware blocks such
+as a GPIO controller, I2C controllers, SPI controllers, etc. The
+LAN996x can be used in two different modes:
 
-Cheers,
+- With Linux running on its Linux built-in ARM cores.
+  This mode is already supported by the upstream Linux kernel, with the
+  LAN996x described as a standard ARM Device Tree in
+  arch/arm/boot/dts/microchip/lan966x.dtsi. Thanks to this support,
+  all hardware blocks in the LAN996x already have drivers in the
+  upstream Linux kernel.
 
-Paolo
+- As a PCI device, thanks to its built-in PCI endpoint controller.
+  In this case, the LAN996x ARM cores are not used, but all peripherals
+  of the LAN996x can be accessed by the PCI host using memory-mapped
+  I/O through the PCI BARs.
+
+This series aims at supporting this second use-case. As all peripherals
+of the LAN996x already have drivers in the Linux kernel, our goal is to
+re-use them as-is to support this second use-case.
+
+Therefore, this patch series introduces a PCI driver that binds on the
+LAN996x PCI VID/PID, and when probed, instantiates all devices that are
+accessible through the PCI BAR. As the list and characteristics of such
+devices are non-discoverable, this PCI driver loads a Device Tree
+overlay that allows to teach the kernel about which devices are
+available, and allows to probe the relevant drivers in kernel, re-using
+all existing drivers with no change.
+
+This patch series for now adds a Device Tree overlay that describes an
+initial subset of the devices available over PCI in the LAN996x, and
+follow-up patch series will add support for more once this initial
+support has landed.
+
+In order to add this PCI driver, a number of preparation changes are
+needed:
+
+ - Patches 1 to 5 allow the reset driver used for the LAN996x to be
+   built as a module. Indeed, in the case where Linux runs on the ARM
+   cores, it is common to have the reset driver built-in. However, when
+   the LAN996x is used as a PCI device, it makes sense that all its
+   drivers can be loaded as modules.
+
+ - Patches 6 and 7 improve the MDIO controller driver to properly
+   handle its reset signal.
+
+ - Patch 8 fixes an issue in the LAN996x switch driver.
+
+ - Patches 9 to 13 introduce the internal interrupt controller used in
+   the LAN996x. It is one of the few peripherals in the LAN996x that
+   are only relevant when the LAN996x is used as a PCI device, which is
+   why this interrupt controller did not have a driver so far.
+
+ - Patches 14 and 15 make some small additions to the OF core and
+   PCI/OF core to consider the PCI device as an interrupt controller.
+   This topic was previously mentioned in [1] to avoid the need of
+   phandle interrupt parents which are not available at some points.
+
+ - Patches 16 and 17 introduce the LAN996x PCI driver itself, together
+   with its DT bindings.
+
+We believe all items from the above list can be merged separately, with
+no build dependencies. We expect:
+
+ - Patches 1 to 5 to be taken by reset maintainers
+
+ - Patches 6, 7 and 8 to be taken by network driver maintainers
+
+ - Patches 9 to 13 to be taken by irqchip maintainers
+
+ - Patch 14/15 to be taken by DT/PCI maintainers
+
+ - Patch 16/17 by the MFD maintainers
+
+Additionally, we also believe all preparation items in this patch series
+can be taken even before there's a final agreement on the last part of
+the series (the MFD driver itself).
+
+[1] https://lore.kernel.org/all/CAL_Jsq+je7+9ATR=B6jXHjEJHjn24vQFs4Tvi9=vhDeK9n42Aw@mail.gmail.com/
+
+Best regards,
+Hervé
+
+Clément Léger (5):
+  mfd: syscon: Add reference counting and device managed support
+  reset: mchp: sparx5: Remove dependencies and allow building as a
+    module
+  reset: mchp: sparx5: Release syscon when not use anymore
+  reset: core: add get_device()/put_device on rcdev
+  reset: mchp: sparx5: set the dev member of the reset controller
+
+Herve Codina (12):
+  dt-bindings: net: mscc-miim: Add resets property
+  net: mdio: mscc-miim: Handle the switch reset
+  net: lan966x: remove debugfs directory in probe() error path
+  dt-bindings: interrupt-controller: Add support for Microchip LAN966x
+    OIC
+  irqdomain: Add missing parameter descriptions in docs
+  irqdomain: Introduce irq_domain_alloc() and irq_domain_publish()
+  irqchip: Add support for LAN966x OIC
+  MAINTAINERS: Add the Microchip LAN966x OIC driver entry
+  of: dynamic: Introduce of_changeset_add_prop_bool()
+  pci: of_property: Add the interrupt-controller property in PCI device
+    nodes
+  mfd: Add support for LAN966x PCI device
+  MAINTAINERS: Add the Microchip LAN966x PCI driver entry
+
+ .../microchip,lan966x-oic.yaml                |  55 ++++
+ .../devicetree/bindings/net/mscc,miim.yaml    |   8 +
+ MAINTAINERS                                   |  12 +
+ drivers/irqchip/Kconfig                       |  12 +
+ drivers/irqchip/Makefile                      |   1 +
+ drivers/irqchip/irq-lan966x-oic.c             | 301 ++++++++++++++++++
+ drivers/mfd/Kconfig                           |  24 ++
+ drivers/mfd/Makefile                          |   4 +
+ drivers/mfd/lan966x_pci.c                     | 229 +++++++++++++
+ drivers/mfd/lan966x_pci.dtso                  | 167 ++++++++++
+ drivers/mfd/syscon.c                          | 145 ++++++++-
+ .../ethernet/microchip/lan966x/lan966x_main.c |   6 +-
+ drivers/net/mdio/mdio-mscc-miim.c             |   8 +
+ drivers/of/dynamic.c                          |  25 ++
+ drivers/pci/of_property.c                     |  24 ++
+ drivers/pci/quirks.c                          |   1 +
+ drivers/reset/Kconfig                         |   3 +-
+ drivers/reset/core.c                          |   2 +
+ drivers/reset/reset-microchip-sparx5.c        |  11 +-
+ include/linux/irqdomain.h                     |  16 +
+ include/linux/mfd/syscon.h                    |  18 ++
+ include/linux/of.h                            |   3 +
+ kernel/irq/irqdomain.c                        | 118 +++++--
+ 23 files changed, 1149 insertions(+), 44 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/interrupt-controller/microchip,lan966x-oic.yaml
+ create mode 100644 drivers/irqchip/irq-lan966x-oic.c
+ create mode 100644 drivers/mfd/lan966x_pci.c
+ create mode 100644 drivers/mfd/lan966x_pci.dtso
+
+-- 
+2.44.0
 
 
