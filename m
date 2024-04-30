@@ -1,235 +1,142 @@
-Return-Path: <netdev+bounces-92578-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92575-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EEB6D8B7F72
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 20:07:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 624138B7F6E
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 20:06:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A41CF28537F
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 18:07:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 924791C232C7
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 18:06:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7842190684;
-	Tue, 30 Apr 2024 18:06:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3293181D15;
+	Tue, 30 Apr 2024 18:06:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nEipXvFI"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cYM8MK2L"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E58A5181CEA
-	for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 18:06:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FC5F181328
+	for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 18:06:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714500407; cv=none; b=ogXax5TqI0D3TRmsvBMde/BJp9pzfJsAWUNAy/HbW38+IV3csQm0/5rt19Yb+r5ft+pYCE+pb7FEeMFnPoKVyZgH64cVByYHHocYmhFZP2jS/8u4yJ8LyniW2gX6/iYwcqS0QdTRYJwUhdQq/A9Dk746XV4zuqAg/DZ+qlYJUds=
+	t=1714500405; cv=none; b=nTUkSugiT/4y5+DSs9PXKPHxfIDj4fGV3cTdDHDrKHru8SN3Ba1OBud82UkcFcDcVjDaEXwcPq7E6+w97ZiFRuKFxlA5uBhizqYEoro9bbRcSsDq7aTlmHavO8DXhZCpo9Ny/kMsZxL1uVuNHFd1eKQxrAQ7CeCIdO2b4qwr/W0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714500407; c=relaxed/simple;
-	bh=/wliapDShNeNGhBWUHNo+NRtrqS0xb7XcN8rbXev5bU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PPQULtwhNVv+Dpwm0Nbb443M1G9fYaOcsJHfCwGNSnDYkQ5HsuYTCp4DxoKTcMeh8hYLeKwyZS9qVLP1FRkmCiAAoZr/j+vjEW68IvDJTzesl8CjqOF9CyyyodKop32rT8ILAp2Rbs6v97ug6sy/0CrOxwWoYcwSigD6XTFB57Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nEipXvFI; arc=none smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1714500406; x=1746036406;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=/wliapDShNeNGhBWUHNo+NRtrqS0xb7XcN8rbXev5bU=;
-  b=nEipXvFIuQ9fgx2IsgcnWZtju8jo86EAQrYKmAbyUgc1etTIXU/v4rI2
-   8Sa2nPEjsDlIKDkrjpQGeidz71/RNYgxVYHANHS4MV6gHUFcrA0wKT1Gl
-   F+2S6OZpuxftncd0xGMCtbhgZ97ATFnSQfEFbCBDxSBi5y0qA4qublkyE
-   KOyge3+dH6p6H6WUZUqG/smyzg36snC95wrezW0e7Ju3WWFnNBJjC7g8R
-   o2hFNtK7XfN64ZpN271efOkqbs3+Ad9/FuammNM2ztGi3CimH8ggSB8OY
-   FFkIfJeHGJKlkT6met1YxUbISA4rEBRQGwhsIZxZR3LaJWTSf7rb/rCI1
-   g==;
-X-CSE-ConnectionGUID: pGm0NuXqQPGgEqhbm/0ltg==
-X-CSE-MsgGUID: 0x+R82PiQ1CiTQl3uMDYSQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11060"; a="20839420"
-X-IronPort-AV: E=Sophos;i="6.07,242,1708416000"; 
-   d="scan'208";a="20839420"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Apr 2024 11:06:44 -0700
-X-CSE-ConnectionGUID: Nx/bR6uWRaGjpYmL4ZRnVw==
-X-CSE-MsgGUID: iGRwUsLuQLGPZVyNcbaZwA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,242,1708416000"; 
-   d="scan'208";a="31147297"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by fmviesa004.fm.intel.com with ESMTP; 30 Apr 2024 11:06:43 -0700
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	netdev@vger.kernel.org
-Cc: Ivan Vecera <ivecera@redhat.com>,
-	anthony.l.nguyen@intel.com,
-	Michal Schmidt <mschmidt@redhat.com>,
-	Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>,
-	Simon Horman <horms@kernel.org>
-Subject: [PATCH net-next 2/7] i40e: Refactor argument of several client notification functions
-Date: Tue, 30 Apr 2024 11:06:32 -0700
-Message-ID: <20240430180639.1938515-3-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20240430180639.1938515-1-anthony.l.nguyen@intel.com>
-References: <20240430180639.1938515-1-anthony.l.nguyen@intel.com>
+	s=arc-20240116; t=1714500405; c=relaxed/simple;
+	bh=qJioFQM6gatzhNfw88pAwDEH8AUYC7rqX3dJnAvMfM0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hPPzFxtjiQsaeReej0Ec0zjou5yUFvzMycvnTqG7HPZCIItcmUPQAbXPmZUbb0JMVx4lValHpQhVzfuDto2vVhUZEon0oj80jNKj+sgM6zZlmaoWK7oP2DP67VhsWvTHzp2k1gAhF2YS0wngLemiCWqi0gdmsMW0eG8BlU/d3BI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cYM8MK2L; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1714500403;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=F5zx7cpE5g24SyrILpVbFuVBHG+ow92d4f3RUXTPOCU=;
+	b=cYM8MK2LnCLBYlc7wIye0XiXT3QmnIp5mUS8KypWdXEnQDGE6WD88BRs+IHwSh0wAOORJV
+	331YFo7mn5xqeCJW7IW1cXWKYUcNuU6MOMx6hjVipViApc0oQzeN1UF38tmXSjNB2TDxwb
+	+vrh/RMOaGtoJVFz5Qo5JCRwemx9z/Q=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-319-pFDJ-sc2PjO2sroabirVGQ-1; Tue, 30 Apr 2024 14:06:40 -0400
+X-MC-Unique: pFDJ-sc2PjO2sroabirVGQ-1
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-a51a2113040so285381966b.0
+        for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 11:06:40 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714500399; x=1715105199;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=F5zx7cpE5g24SyrILpVbFuVBHG+ow92d4f3RUXTPOCU=;
+        b=HHAqPHbu3F40FSCviMwJAtWI4s3UJOAxS6GFbEEoowJBub7+my1FQQ1UEM0uKwnuqT
+         EBZsgdVTbsqHH+m542j2k8nJSZcuXZYZu0uVIo54ERiRdGmm/R7vz2I9qI59Q1Y1a4Kq
+         9W0V12o3madzdU1xI6VaD4Kc3sO8BrYNDBNyi7Pfcg/vPF5vh/VUteqQ0dgv0HBhHrl3
+         ybyzfVon3halNJFkX1Ol6ZmHlN/GLRyphgtzK5lpU0v9YcMhNfNcz0kZgJ+kBoQHfBnk
+         TuuA1CV9WEM76JzNEohsFbWH9aHnsoR2sGFzG9zQU9UCMGfwg8Qdct8qphuVGPbl/CkX
+         6bqg==
+X-Forwarded-Encrypted: i=1; AJvYcCVPsD3GHG1qUTml7h+pxr1taLc4EgW2Bq1yQfZIwiAGCEL/evlu92s9X6xyRqGrvIQGTARnUvgtTW+iYlFfqaOtbXh+7VJ7
+X-Gm-Message-State: AOJu0Yxde6L4RlPlkZyYuoGe+aeoyrgq4ZsCA5ntBJbBBlVQFfsF1qFF
+	ZjbkF0ilJjDg+zcijNFLcfCM7C9dWqnxl/Nb/VzXO7CmuFp+oK/YlaTMJHT7i75DDNia+rrr58x
+	ir3sXl0HrQfBxLMY+TjSjDZqd48+X0B5ii/6IGDxiJRYDnJeexNcy8w==
+X-Received: by 2002:a17:906:dffa:b0:a58:bd8e:f24 with SMTP id lc26-20020a170906dffa00b00a58bd8e0f24mr301832ejc.39.1714500399312;
+        Tue, 30 Apr 2024 11:06:39 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEAMU+eVyJELNlfDZqGybmwpL1icWgq7FgiEnNy2tDXnkcVLH1RcMMycitIzluk5myVZUO69Q==
+X-Received: by 2002:a17:906:dffa:b0:a58:bd8e:f24 with SMTP id lc26-20020a170906dffa00b00a58bd8e0f24mr301804ejc.39.1714500398788;
+        Tue, 30 Apr 2024 11:06:38 -0700 (PDT)
+Received: from redhat.com ([2.55.56.94])
+        by smtp.gmail.com with ESMTPSA id cd19-20020a170906b35300b00a4673706b4dsm15347234ejb.78.2024.04.30.11.06.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 30 Apr 2024 11:06:38 -0700 (PDT)
+Date: Tue, 30 Apr 2024 14:06:33 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Mike Christie <michael.christie@oracle.com>
+Cc: Edward Adam Davis <eadavis@qq.com>,
+	syzbot+98edc2df894917b3431f@syzkaller.appspotmail.com,
+	jasowang@redhat.com, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	syzkaller-bugs@googlegroups.com, virtualization@lists.linux.dev
+Subject: Re: [PATCH next] vhost_task: after freeing vhost_task it should not
+ be accessed in vhost_task_fn
+Message-ID: <20240430140613-mutt-send-email-mst@kernel.org>
+References: <000000000000a9613006174c1c4c@google.com>
+ <tencent_4271296B83A6E4413776576946DAB374E305@qq.com>
+ <b959b82a-510f-45c0-9e06-acf526c2f4a1@oracle.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b959b82a-510f-45c0-9e06-acf526c2f4a1@oracle.com>
 
-From: Ivan Vecera <ivecera@redhat.com>
+On Tue, Apr 30, 2024 at 11:23:04AM -0500, Mike Christie wrote:
+> On 4/30/24 8:05 AM, Edward Adam Davis wrote:
+> >  static int vhost_task_fn(void *data)
+> >  {
+> >  	struct vhost_task *vtsk = data;
+> > @@ -51,7 +51,7 @@ static int vhost_task_fn(void *data)
+> >  			schedule();
+> >  	}
+> >  
+> > -	mutex_lock(&vtsk->exit_mutex);
+> > +	mutex_lock(&exit_mutex);
+> >  	/*
+> >  	 * If a vhost_task_stop and SIGKILL race, we can ignore the SIGKILL.
+> >  	 * When the vhost layer has called vhost_task_stop it's already stopped
+> > @@ -62,7 +62,7 @@ static int vhost_task_fn(void *data)
+> >  		vtsk->handle_sigkill(vtsk->data);
+> >  	}
+> >  	complete(&vtsk->exited);
+> > -	mutex_unlock(&vtsk->exit_mutex);
+> > +	mutex_unlock(&exit_mutex);
+> >  
+> 
+> Edward, thanks for the patch. I think though I just needed to swap the
+> order of the calls above.
+> 
+> Instead of:
+> 
+> complete(&vtsk->exited);
+> mutex_unlock(&vtsk->exit_mutex);
+> 
+> it should have been:
+> 
+> mutex_unlock(&vtsk->exit_mutex);
+> complete(&vtsk->exited);
+> 
+> If my analysis is correct, then Michael do you want me to resubmit a
+> patch on top of your vhost branch or resubmit the entire patchset?
 
-Commit 0ef2d5afb12d ("i40e: KISS the client interface") simplified
-the client interface so in practice it supports only one client
-per i40e netdev. But we have still 2 notification functions that
-uses as parameter a pointer to VSI of netdevice associated with
-the client. After the mentioned commit only possible and used
-VSI is the main (LAN) VSI.
-So refactor these functions so they are called with PF pointer argument
-and the associated VSI (LAN) is taken inside them.
+Resubmit all please.
 
-Reviewed-by: Michal Schmidt <mschmidt@redhat.com>
-Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>
-Signed-off-by: Ivan Vecera <ivecera@redhat.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
----
- drivers/net/ethernet/intel/i40e/i40e.h        |  4 ++--
- drivers/net/ethernet/intel/i40e/i40e_client.c | 20 +++++++++----------
- drivers/net/ethernet/intel/i40e/i40e_main.c   | 12 +++++------
- 3 files changed, 17 insertions(+), 19 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/i40e/i40e.h b/drivers/net/ethernet/intel/i40e/i40e.h
-index 5248e78f7849..0792c7324527 100644
---- a/drivers/net/ethernet/intel/i40e/i40e.h
-+++ b/drivers/net/ethernet/intel/i40e/i40e.h
-@@ -1236,8 +1236,8 @@ static inline void i40e_dbg_exit(void) {}
- int i40e_lan_add_device(struct i40e_pf *pf);
- int i40e_lan_del_device(struct i40e_pf *pf);
- void i40e_client_subtask(struct i40e_pf *pf);
--void i40e_notify_client_of_l2_param_changes(struct i40e_vsi *vsi);
--void i40e_notify_client_of_netdev_close(struct i40e_vsi *vsi, bool reset);
-+void i40e_notify_client_of_l2_param_changes(struct i40e_pf *pf);
-+void i40e_notify_client_of_netdev_close(struct i40e_pf *pf, bool reset);
- void i40e_notify_client_of_vf_enable(struct i40e_pf *pf, u32 num_vfs);
- void i40e_notify_client_of_vf_reset(struct i40e_pf *pf, u32 vf_id);
- void i40e_client_update_msix_info(struct i40e_pf *pf);
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_client.c b/drivers/net/ethernet/intel/i40e/i40e_client.c
-index b32071ee84af..93e52138826e 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_client.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_client.c
-@@ -101,25 +101,26 @@ i40e_notify_client_of_vf_msg(struct i40e_vsi *vsi, u32 vf_id, u8 *msg, u16 len)
- 
- /**
-  * i40e_notify_client_of_l2_param_changes - call the client notify callback
-- * @vsi: the VSI with l2 param changes
-+ * @pf: PF device pointer
-  *
-- * If there is a client to this VSI, call the client
-+ * If there is a client, call its callback
-  **/
--void i40e_notify_client_of_l2_param_changes(struct i40e_vsi *vsi)
-+void i40e_notify_client_of_l2_param_changes(struct i40e_pf *pf)
- {
--	struct i40e_pf *pf = vsi->back;
- 	struct i40e_client_instance *cdev = pf->cinst;
-+	struct i40e_vsi *vsi = pf->vsi[pf->lan_vsi];
- 	struct i40e_params params;
- 
- 	if (!cdev || !cdev->client)
- 		return;
- 	if (!cdev->client->ops || !cdev->client->ops->l2_param_change) {
--		dev_dbg(&vsi->back->pdev->dev,
-+		dev_dbg(&pf->pdev->dev,
- 			"Cannot locate client instance l2_param_change routine\n");
- 		return;
- 	}
- 	if (!test_bit(__I40E_CLIENT_INSTANCE_OPENED, &cdev->state)) {
--		dev_dbg(&vsi->back->pdev->dev, "Client is not open, abort l2 param change\n");
-+		dev_dbg(&pf->pdev->dev,
-+			"Client is not open, abort l2 param change\n");
- 		return;
- 	}
- 	memset(&params, 0, sizeof(params));
-@@ -157,20 +158,19 @@ static void i40e_client_release_qvlist(struct i40e_info *ldev)
- 
- /**
-  * i40e_notify_client_of_netdev_close - call the client close callback
-- * @vsi: the VSI with netdev closed
-+ * @pf: PF device pointer
-  * @reset: true when close called due to a reset pending
-  *
-  * If there is a client to this netdev, call the client with close
-  **/
--void i40e_notify_client_of_netdev_close(struct i40e_vsi *vsi, bool reset)
-+void i40e_notify_client_of_netdev_close(struct i40e_pf *pf, bool reset)
- {
--	struct i40e_pf *pf = vsi->back;
- 	struct i40e_client_instance *cdev = pf->cinst;
- 
- 	if (!cdev || !cdev->client)
- 		return;
- 	if (!cdev->client->ops || !cdev->client->ops->close) {
--		dev_dbg(&vsi->back->pdev->dev,
-+		dev_dbg(&pf->pdev->dev,
- 			"Cannot locate client instance close routine\n");
- 		return;
- 	}
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
-index e27b2aa544b6..aa874d6ff8c3 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_main.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
-@@ -11276,14 +11276,12 @@ static void i40e_service_task(struct work_struct *work)
- 		i40e_fdir_reinit_subtask(pf);
- 		if (test_and_clear_bit(__I40E_CLIENT_RESET, pf->state)) {
- 			/* Client subtask will reopen next time through. */
--			i40e_notify_client_of_netdev_close(pf->vsi[pf->lan_vsi],
--							   true);
-+			i40e_notify_client_of_netdev_close(pf, true);
- 		} else {
- 			i40e_client_subtask(pf);
- 			if (test_and_clear_bit(__I40E_CLIENT_L2_CHANGE,
- 					       pf->state))
--				i40e_notify_client_of_l2_param_changes(
--								pf->vsi[pf->lan_vsi]);
-+				i40e_notify_client_of_l2_param_changes(pf);
- 		}
- 		i40e_sync_filters_subtask(pf);
- 	} else {
-@@ -16217,7 +16215,7 @@ static void i40e_remove(struct pci_dev *pdev)
- 	/* Client close must be called explicitly here because the timer
- 	 * has been stopped.
- 	 */
--	i40e_notify_client_of_netdev_close(pf->vsi[pf->lan_vsi], false);
-+	i40e_notify_client_of_netdev_close(pf, false);
- 
- 	i40e_fdir_teardown(pf);
- 
-@@ -16476,7 +16474,7 @@ static void i40e_shutdown(struct pci_dev *pdev)
- 	/* Client close must be called explicitly here because the timer
- 	 * has been stopped.
- 	 */
--	i40e_notify_client_of_netdev_close(pf->vsi[pf->lan_vsi], false);
-+	i40e_notify_client_of_netdev_close(pf, false);
- 
- 	if (test_bit(I40E_HW_CAP_WOL_MC_MAGIC_PKT_WAKE, pf->hw.caps) &&
- 	    pf->wol_en)
-@@ -16530,7 +16528,7 @@ static int i40e_suspend(struct device *dev)
- 	/* Client close must be called explicitly here because the timer
- 	 * has been stopped.
- 	 */
--	i40e_notify_client_of_netdev_close(pf->vsi[pf->lan_vsi], false);
-+	i40e_notify_client_of_netdev_close(pf, false);
- 
- 	if (test_bit(I40E_HW_CAP_WOL_MC_MAGIC_PKT_WAKE, pf->hw.caps) &&
- 	    pf->wol_en)
 -- 
-2.41.0
+MST
 
 
