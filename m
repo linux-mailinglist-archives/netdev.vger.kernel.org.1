@@ -1,208 +1,206 @@
-Return-Path: <netdev+bounces-92558-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92559-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0C828B7E18
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 19:03:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 629A38B7E3F
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 19:11:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9783B289F54
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 17:03:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 800A41C21209
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 17:11:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FAF4180A8A;
-	Tue, 30 Apr 2024 17:01:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FAB317B4E1;
+	Tue, 30 Apr 2024 17:11:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T6Mo9RCm"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BmCtr7xA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f194.google.com (mail-yw1-f194.google.com [209.85.128.194])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E94BF17B4EB;
-	Tue, 30 Apr 2024 17:01:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 791BE179654
+	for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 17:11:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714496472; cv=none; b=fFG4ANFNdACV7SIojiETuVQtme64MEGGsehKxECH/2siYIDTWu5QJ06FBEKOYbXhf/PgMu+cagOL+oW9BdqiXnH1KKOiynIeFlN4dYwuoZFduo4H9oTefJYsTgIThXnkIKXnPS8yWowBnBebtxD3WhJi/WgO9SxEHSqBc71FoKc=
+	t=1714497104; cv=none; b=iPi5FVlsoX1hXTQtbiXJtZfjQjCdgjAfZEK081a3DGlBhcMrAcYFlgJEaiVfimYKXyrqf4QH0zb8T3Vv4dqNyBnKnEXYC/pd08kZVHjq2Ds7iS0iMVXtu0qZ6O1fNmLESQoO3rNHn4SapxKCjaIrBHrFw3FYQOxxZCAq5H2lIA4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714496472; c=relaxed/simple;
-	bh=/hfseXbWrHSrt8y1mxI48f9ERs61F3BThMzjLWyNR6g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=juqJRVz2vNGAq+Ib7BRf2HYkc7NXIZ+kV1Vgi64J63PaxW9T6bfbIdxz6ugNIEzxiT1+8PdvC+aH9iOrzYBzc14bhetnx3zgeGqJss4YsIjmZeFPLbYSx77CnD42JYyFyiuBN+vMiq7tFjsVdgyyOhw4bSgT0GcROPqF0Hv4fZw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T6Mo9RCm; arc=none smtp.client-ip=209.85.128.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f194.google.com with SMTP id 00721157ae682-61df83231d1so266607b3.0;
-        Tue, 30 Apr 2024 10:01:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1714496470; x=1715101270; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=QsLnyG7voovmGuriZTP3Tq6cIlUoQEoRoHNx1oOzEiQ=;
-        b=T6Mo9RCm6jsleC0mGDnsG7lXF9aooDftRF2+F6FxKKfeWBRjSCJj3FaqmRPwlsoojV
-         KOaNLM2ZVxTEys441nh8XvXyHg+3ens/Jnis5wjV41Pwa2fohz9A8xhuUgXoxYNuqNL1
-         XX5CpClqg6WQ84HjUOHvgKWJ74hzYya9FB1PmxepOGM6d2bvs8Fc0AaJ80Dq0Va8dGK4
-         ggx4w6RwxRzisI54EaxEJaTzqxqw/XFivQBaU9p1mLFajeArlaEakOfVKroPJbUqkos4
-         dAlmv/iA31EZpQe441NrsX3iypTc60zjcAPGSfMOetZn8U3I2RMysQliN/V/9bJkyGSg
-         3qPQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714496470; x=1715101270;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=QsLnyG7voovmGuriZTP3Tq6cIlUoQEoRoHNx1oOzEiQ=;
-        b=Fhpwf3K2LzcdFGq3agzXaKxi10RveJxYjZS0/oFxvUq3wVKxog0+h21momlgMNBwGH
-         t7Sf+CmemXcQVwYN4fHBvtqBuNE3S9tfHIo2OS8iJ/4ySR/A5nwNJI7NoKJzos1nUj02
-         ZCRZZqVnPBaLfFLxk32/XdTDlxQkrzKv//cEGI47y4LnE1DI4iw9Ra6VUgm2u+f8nsgE
-         pONh+faB5d6yDZ1m3nxV/HVlkuWGUOLABJziNeGc79mSe+pbHxdyNKwl0zPmbu45JUKG
-         0VXXkHIS5oHM+qP5XO55pU/hgpzJA6k5NqJXNv86mx3vyRvKGUJ+yyqCAZDQYm03t/Oo
-         XMXQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW7tPHTpQJHJ6ylqog1VOVpbMAgPPMiCzNNK6KFmyPWSo0rgEvU3zwfr/lwJQpzcDWp9Num76OqlzELiWuJVUF/SqcrdpGZ0YjJPaSn/7Ukm0hOHSzJITbpXLoZjI9LPJycyVuS
-X-Gm-Message-State: AOJu0Yw4yrcJalfSX7/aXBK7xCqXzIE8ZkGDyxO+2T8F/xmB3hyxh/D8
-	PHeV9S/YC+fud34gLUVaG+o0n+IWCyxGhBWiQDiLaVcDKjjZVFlN
-X-Google-Smtp-Source: AGHT+IE+kb9HMLrlKxh6WjSxd75XtYt2UlpyAMcfpWeLW+RsJ29tXl9e8/cEdCSurYSIDMPS1JdTwQ==
-X-Received: by 2002:a81:83ce:0:b0:615:73f:d52d with SMTP id t197-20020a8183ce000000b00615073fd52dmr2467145ywf.17.1714496469850;
-        Tue, 30 Apr 2024 10:01:09 -0700 (PDT)
-Received: from [10.102.6.66] ([208.97.243.82])
-        by smtp.gmail.com with ESMTPSA id o13-20020a0dcc0d000000b0061bec63c153sm293362ywd.138.2024.04.30.10.01.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 30 Apr 2024 10:01:09 -0700 (PDT)
-Message-ID: <b90caf5f-fa1e-41e6-a7c2-5af042b0828e@gmail.com>
-Date: Tue, 30 Apr 2024 13:01:08 -0400
+	s=arc-20240116; t=1714497104; c=relaxed/simple;
+	bh=8X0UHY77IM6d1PXdNcSq6p0Xp+tqUykLoEp0INvARGQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fmCm/EG7iM1OhwTnqUuqsO3bdKuMkD/1uVzUfPYEzYUoCWjRsdEMxjdbxSQl34wVqN+avoB2xUiC45XP8XwF5YqfrAm37gTs4ecV2zVc3o2a+1zTOh+mM3cKOIBAZ4i7OroFDHtaCUpt0PGJVhcA2vc/wC/Ok3jBziNZ/PJ1pFE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BmCtr7xA; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1714497101;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=H+yz/Du7bMZUkgZkgBc01otupz3qNmd+HiaOEpj7YFQ=;
+	b=BmCtr7xA41+gVbOzwTqeFNLzk4jM0MeATCxbFr6QF2nh+3tf/LrlZurXi69AVQiFCKnvWj
+	O2ls7v9z2LJhh+dLE7tOqkn0PR40gfke5KrCu76dRezu8vgbMq/kcFjtTvLYFprOE5+JP0
+	1OflI+vbqnfnztjiwLMytltZ0opjGho=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-316-1Ma40_K5NviGnz7q7K-hlQ-1; Tue,
+ 30 Apr 2024 13:11:37 -0400
+X-MC-Unique: 1Ma40_K5NviGnz7q7K-hlQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 52ADB29AC016;
+	Tue, 30 Apr 2024 17:11:33 +0000 (UTC)
+Received: from dcaratti.users.ipa.redhat.com (unknown [10.45.225.235])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 326F72166B36;
+	Tue, 30 Apr 2024 17:11:30 +0000 (UTC)
+From: Davide Caratti <dcaratti@redhat.com>
+To: Jamal Hadi Salim <jhs@mojatatu.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>,
+	Jiri Pirko <jiri@resnulli.us>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Naresh Kamboju <naresh.kamboju@linaro.org>,
+	netdev@vger.kernel.org
+Subject: [PATCH net-next] net/sched: unregister lockdep keys in qdisc_create/qdisc_alloc error path
+Date: Tue, 30 Apr 2024 19:11:13 +0200
+Message-ID: <2aa1ca0c0a3aa0acc15925c666c777a4b5de553c.1714496886.git.dcaratti@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC net-next 00/10] MC Flood disable and snooping
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Nikolay Aleksandrov <razor@blackwall.org>,
- Joseph Huang <Joseph.Huang@garmin.com>, netdev@vger.kernel.org,
- Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Roopa Prabhu <roopa@nvidia.com>, =?UTF-8?Q?Linus_L=C3=BCssing?=
- <linus.luessing@c0d3.blue>, linux-kernel@vger.kernel.org,
- bridge@lists.linux.dev
-References: <20240402174348.wosc37adyub5o7xu@skbuf>
- <a8968719-a63b-4969-a971-173c010d708f@blackwall.org>
- <20240402204600.5ep4xlzrhleqzw7k@skbuf>
- <065b803f-14a9-4013-8f11-712bb8d54848@blackwall.org>
- <804b7bf3-1b29-42c4-be42-4c23f1355aaf@gmail.com>
- <20240405102033.vjkkoc3wy2i3vdvg@skbuf>
- <935c18c1-7736-416c-b5c5-13ca42035b1f@blackwall.org>
- <651c87fc-1f21-4153-bade-2dad048eecbd@gmail.com>
- <20240405211502.q5gfwcwyhkm6w7xy@skbuf>
- <1f385946-84d0-499c-9bf6-90ef65918356@gmail.com>
- <20240430012159.rmllu5s5gcdepjnc@skbuf>
-Content-Language: en-US
-From: Joseph Huang <joseph.huang.2024@gmail.com>
-In-Reply-To: <20240430012159.rmllu5s5gcdepjnc@skbuf>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
 
-On 4/29/2024 9:21 PM, Vladimir Oltean wrote:
-> On Mon, Apr 29, 2024 at 04:14:03PM -0400, Joseph Huang wrote:
->> How about the following syntax? I think it satisfies all the "not breaking
->> existing behavior" requirements (new option defaults to off, and missing
->> user space netlink attributes does not change the existing behavior):
->>
->> mcast_flood off
->>    all off
->> mcast_flood off mcast_flood_rfc4541 off
->>    all off
->> mcast_flood off mcast_flood_rfc4541 on
->>    224.0.0.X and ff02::1 on, the rest off
->> mcast_flood on
->>    all on
->> mcast_flood on mcast_flood_rfc4541 off
->>    all on (mcast_flood on overrides mcast_flood_rfc4541)
->> mcast_flood on mcast_flood_rfc4541 on
->>    all on
->> mcast_flood_rfc4541 off
->>    invalid (mcast_flood_rfc4541 is only valid if mcast_flood [on | off] is
->> specified first)
->> mcast_flood_rfc4541 on
->>    invalid (mcast_flood_rfc4541 is only valid if mcast_flood [on | off] is
->> specified first)
-> 
-> A bridge port defaults to having BR_MCAST_FLOOD set - see new_nbp().
-> Netlink attributes are only there to _change_ the state of properties in
-> the kernel. They don't need to be specified by user space if there's
-> nothing to be changed. "Only valid if another netlink attribute comes
-> first" makes no sense. You can alter 2 bridge port flags as part of the
-> same netlink message, or as part of different netlink messages (sent
-> over sockets of other processes).
-> 
->>
->> Think of mcast_flood_rfc4541 like a pet door if you will.
-> 
-> Ultimately, as far as I see it, both the OR-based and the AND-based UAPI
-> addition could be made to work in a way that's perhaps similarly backwards
-> compatible. It needs to be worked out with the bridge maintainers. Given
-> that I'm not doing great with my spare time, I will take a back seat on
-> that.
+Naresh and Eric report several errors (corrupted elements in the dynamic
+key hash list), when running tdc.py or syzbot. The error path of
+qdisc_alloc() and qdisc_create() frees the qdisc memory, but it forgets
+to unregister the lockdep key, thus causing use-after-free like the
+following one:
 
-Nik, do you have any objection to the following proposal?
+ ==================================================================
+ BUG: KASAN: slab-use-after-free in lockdep_register_key+0x5f2/0x700
+ Read of size 8 at addr ffff88811236f2a8 by task ip/7925
 
-mcast_flood ->          default/    off         on
-(existing flag)         missing     (specified/ (specified/
-                         (on)        nlmsg)      nlmsg)
+ CPU: 26 PID: 7925 Comm: ip Kdump: loaded Not tainted 6.9.0-rc2+ #648
+ Hardware name: Supermicro SYS-6027R-72RF/X9DRH-7TF/7F/iTF/iF, BIOS 3.0  07/26/2013
+ Call Trace:
+  <TASK>
+  dump_stack_lvl+0x7c/0xc0
+  print_report+0xc9/0x610
+  kasan_report+0x89/0xc0
+  lockdep_register_key+0x5f2/0x700
+  qdisc_alloc+0x21d/0xb60
+  qdisc_create_dflt+0x63/0x3c0
+  attach_one_default_qdisc.constprop.37+0x8e/0x170
+  dev_activate+0x4bd/0xc30
+  __dev_open+0x275/0x380
+  __dev_change_flags+0x3f1/0x570
+  dev_change_flags+0x7c/0x160
+  do_setlink+0x1ea1/0x34b0
+  __rtnl_newlink+0x8c9/0x1510
+  rtnl_newlink+0x61/0x90
+  rtnetlink_rcv_msg+0x2f0/0xbc0
+  netlink_rcv_skb+0x120/0x380
+  netlink_unicast+0x420/0x630
+  netlink_sendmsg+0x732/0xbc0
+  __sock_sendmsg+0x1ea/0x280
+  ____sys_sendmsg+0x5a9/0x990
+  ___sys_sendmsg+0xf1/0x180
+  __sys_sendmsg+0xd3/0x180
+  do_syscall_64+0x96/0x180
+  entry_SYSCALL_64_after_hwframe+0x71/0x79
+ RIP: 0033:0x7f9503f4fa07
+ Code: 0a 00 f7 d8 64 89 02 48 c7 c0 ff ff ff ff eb b9 0f 1f 00 f3 0f 1e fa 64 8b 04 25 18 00 00 00 85 c0 75 10 b8 2e 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 51 c3 48 83 ec 28 89 54 24 1c 48 89 74 24 10
+ RSP: 002b:00007fff6c729068 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+ RAX: ffffffffffffffda RBX: 000000006630c681 RCX: 00007f9503f4fa07
+ RDX: 0000000000000000 RSI: 00007fff6c7290d0 RDI: 0000000000000003
+ RBP: 0000000000000000 R08: 0000000000000001 R09: 0000000000000078
+ R10: 000000000000009b R11: 0000000000000246 R12: 0000000000000001
+ R13: 00007fff6c729180 R14: 0000000000000000 R15: 000055bf67dd9040
+  </TASK>
 
-mcast_flood_rfc4541
-(proposed new flag)
-      |
-      v
-default/                flood all   no flood    flood all
-missing
-(off)
+ Allocated by task 7745:
+  kasan_save_stack+0x1c/0x40
+  kasan_save_track+0x10/0x30
+  __kasan_kmalloc+0x7b/0x90
+  __kmalloc_node+0x1ff/0x460
+  qdisc_alloc+0xae/0xb60
+  qdisc_create+0xdd/0xfb0
+  tc_modify_qdisc+0x37e/0x1960
+  rtnetlink_rcv_msg+0x2f0/0xbc0
+  netlink_rcv_skb+0x120/0x380
+  netlink_unicast+0x420/0x630
+  netlink_sendmsg+0x732/0xbc0
+  __sock_sendmsg+0x1ea/0x280
+  ____sys_sendmsg+0x5a9/0x990
+  ___sys_sendmsg+0xf1/0x180
+  __sys_sendmsg+0xd3/0x180
+  do_syscall_64+0x96/0x180
+  entry_SYSCALL_64_after_hwframe+0x71/0x79
 
-off                     flood all   no flood    flood all
-(specified/nlmsg)
+ Freed by task 7745:
+  kasan_save_stack+0x1c/0x40
+  kasan_save_track+0x10/0x30
+  kasan_save_free_info+0x36/0x60
+  __kasan_slab_free+0xfe/0x180
+  kfree+0x113/0x380
+  qdisc_create+0xafb/0xfb0
+  tc_modify_qdisc+0x37e/0x1960
+  rtnetlink_rcv_msg+0x2f0/0xbc0
+  netlink_rcv_skb+0x120/0x380
+  netlink_unicast+0x420/0x630
+  netlink_sendmsg+0x732/0xbc0
+  __sock_sendmsg+0x1ea/0x280
+  ____sys_sendmsg+0x5a9/0x990
+  ___sys_sendmsg+0xf1/0x180
+  __sys_sendmsg+0xd3/0x180
+  do_syscall_64+0x96/0x180
+  entry_SYSCALL_64_after_hwframe+0x71/0x79
 
-on                      flood all   flood 4541  flood all
-(specified/nlmsg)                   ^^^^^^^^^^
-                                     only behavior change
+Fix this ensuring that lockdep_unregister_key() is called before the
+qdisc struct is freed, also in the error path of qdisc_create() and
+qdisc_alloc().
 
+Fixes: af0cb3fa3f9e ("net/sched: fix false lockdep warning on qdisc root lock")
+Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
+Closes: https://lore.kernel.org/netdev/20240429221706.1492418-1-naresh.kamboju@linaro.org/
+CC: Naresh Kamboju <naresh.kamboju@linaro.org>
+CC: Eric Dumazet <edumazet@google.com>
+Signed-off-by: Davide Caratti <dcaratti@redhat.com>
+---
+ net/sched/sch_api.c     | 1 +
+ net/sched/sch_generic.c | 1 +
+ 2 files changed, 2 insertions(+)
 
-Basically the attributes are OR'ed together to form the final flooding 
-decision.
+diff --git a/net/sched/sch_api.c b/net/sched/sch_api.c
+index 60239378d43f..6292d6d73b72 100644
+--- a/net/sched/sch_api.c
++++ b/net/sched/sch_api.c
+@@ -1389,6 +1389,7 @@ static struct Qdisc *qdisc_create(struct net_device *dev,
+ 		ops->destroy(sch);
+ 	qdisc_put_stab(rtnl_dereference(sch->stab));
+ err_out3:
++	lockdep_unregister_key(&sch->root_lock_key);
+ 	netdev_put(dev, &sch->dev_tracker);
+ 	qdisc_free(sch);
+ err_out2:
+diff --git a/net/sched/sch_generic.c b/net/sched/sch_generic.c
+index 31dfd6c7405b..d3f6006b563c 100644
+--- a/net/sched/sch_generic.c
++++ b/net/sched/sch_generic.c
+@@ -982,6 +982,7 @@ struct Qdisc *qdisc_alloc(struct netdev_queue *dev_queue,
+ 
+ 	return sch;
+ errout1:
++	lockdep_unregister_key(&sch->root_lock_key);
+ 	kfree(sch);
+ errout:
+ 	return ERR_PTR(err);
+-- 
+2.44.0
 
-
-> 
-> However, what I don't quite understand in your proposal is how many IPv4
-> addresses lie beyond the "224.0.0.X" notation? 256? Explain why there is
-> such a large discrepancy in the number of IPv4 addresses you are in
-> control of (256), vs only 1 IPv6 address with the new rfc4541 flag?
-
-That's straight out of RFC-4541 ("coincidentally", these are also the IP 
-addresses for which the bridge will not create mdb's):
-
-2.1.2.
-
-    2) Packets with a destination IP (DIP) address in the 224.0.0.X range
-       which are not IGMP must be forwarded on all ports.
-
-       This recommendation is based on the fact that many host systems do
-       not send Join IP multicast addresses in this range before sending
-       or listening to IP multicast packets.  Furthermore, since the
-       224.0.0.X address range is defined as link-local (not to be
-       routed), it seems unnecessary to keep the state for each address
-       in this range.  Additionally, some routers operate in the
-       224.0.0.X address range without issuing IGMP Joins, and these
-       applications would break if the switch were to prune them due to
-       not having seen a Join Group message from the router.
-
-and
-
-3.
-
-In IPv6, the data forwarding rules are more straight forward because
-    MLD is mandated for addresses with scope 2 (link-scope) or greater.
-    The only exception is the address FF02::1 which is the all hosts
-    link-scope address for which MLD messages are never sent.  Packets
-    with the all hosts link-scope address should be forwarded on all
-    ports.
 
