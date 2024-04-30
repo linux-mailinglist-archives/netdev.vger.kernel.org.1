@@ -1,104 +1,129 @@
-Return-Path: <netdev+bounces-92329-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92330-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B176A8B6A74
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 08:20:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0BF9F8B6ACB
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 08:46:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D769E1C2011E
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 06:20:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 796BC1F21A93
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 06:46:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C08114AAD;
-	Tue, 30 Apr 2024 06:20:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09E381B963;
+	Tue, 30 Apr 2024 06:46:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="zoPrOxQ2"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="y8Q/ryV9"
 X-Original-To: netdev@vger.kernel.org
-Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E33956FB1
-	for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 06:20:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BBAC1B806
+	for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 06:46:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714458020; cv=none; b=l+Mc0mozfp0Q7m6hfyj4js22ic/l2QOh0cdviWCls17LcjXMo7MogYdH8t8YMlxmt2qa25yqr2aykdIkzOrZLHvdajXzGTBzkIYgq15T4xKHq3CRl2NwKbyiPaz/SkFtHKvkzLCsMEJjiptv3+IvW0sUKt04FCG7kHLvnE0aFV0=
+	t=1714459579; cv=none; b=aTnnOL0XLKF6RfdTinbTN0h1T1J+0F/Ps+JesLZ02fE8v733moRPh2+dp2B48EBhbn64dBgTHrCbdaen14aoRaW9tiSYGf1gkp20siFgqrBCxMz8GoPwBCrYZX/MYK3ncfa1DpYExIhBRcYZeJdxiZN6YN3jH5jp4WyW3vtgU94=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714458020; c=relaxed/simple;
-	bh=voXRMEd9HTP5///3iog9Lsf9aMTQZ10qjYFWfSiM8WM=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XAxrxQNjNN00PPtL7opEwTQLJZIlwuCPSJfm/DQesNG5yhqfE01QU3jLlkDEgNJKoJ2B3x7JXXa7ufaYawooeZU4S5ze9H0IxfNTO+47gDFwUpiG2pdSTzkulZFrpHdSkab+DmN3ktm/SbnAquMNtdB+lyNLQ199H7CK6RXW/Og=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=zoPrOxQ2; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id 3DBAC207BB;
-	Tue, 30 Apr 2024 08:20:16 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from a.mx.secunet.com ([127.0.0.1])
-	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id znmoKJcz2CHV; Tue, 30 Apr 2024 08:20:15 +0200 (CEST)
-Received: from mailout2.secunet.com (mailout2.secunet.com [62.96.220.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id ACC30207B2;
-	Tue, 30 Apr 2024 08:20:15 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com ACC30207B2
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1714458015;
-	bh=5k08DUPW8lDaLo1pLbi1kvrsmzn2uU/aq5iDGdLqQwc=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
-	b=zoPrOxQ2PaR6O7nqO0nlpYBI1/uo0e3myQb30njZmIgnI8XvPbMy2EYFy+LPcYWt1
-	 AX+si1reBJO+mqlGo+FwO1DM9RBIn+stYRiOItx6J/3GbPWTeNc+0paMFQCUpxWAxo
-	 pmGhvvU5HuZPazr43j9RSMPt/L/fRSVsocXgFPS8ACD+6kbXe3Ps+ZKX5qVGwu6WOx
-	 wGhaL33O9bsB2FUGRSt7LXiSk5hfy8k/OTgHQJbeBJuH5WZkCmuKxaphB4IfSiEa4G
-	 W/MiLTB/3dU14N+lo3yKaZ6w5pvRBQmWHXxjGgUXRqbqBolhy7LKJ16miJ9AP+sbDV
-	 fDrFPdxs7FnXA==
-Received: from cas-essen-01.secunet.de (unknown [10.53.40.201])
-	by mailout2.secunet.com (Postfix) with ESMTP id 9F97680004A;
-	Tue, 30 Apr 2024 08:20:15 +0200 (CEST)
-Received: from mbx-essen-02.secunet.de (10.53.40.198) by
- cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Tue, 30 Apr 2024 08:20:15 +0200
-Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
- (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Tue, 30 Apr
- 2024 08:20:14 +0200
-Received: by gauss2.secunet.de (Postfix, from userid 1000)
-	id ACEEA3182A0F; Tue, 30 Apr 2024 08:20:14 +0200 (CEST)
-Date: Tue, 30 Apr 2024 08:20:14 +0200
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: Antony Antony <antony@phenome.org>
-CC: <netdev@vger.kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH ipsec] xfrm: Correct spelling mistake in xfrm.h comment
-Message-ID: <ZjCNnmUJV0yGnuMZ@gauss3.secunet.de>
-References: <Zit-sTZoYp_JnQfd@Antony2201.local>
+	s=arc-20240116; t=1714459579; c=relaxed/simple;
+	bh=eomxsH58n2Y7ul46c0ra6SHud53/uQqIv5l6KWdYkvU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XDlbx5etptV/L7rJYVFT9reFDOqZjOM9UA99GCAxtAOIwx77ZJ6YC3DvHjo/IegIvSU2rQusTe88B+LAesvx+u9l8fEIYNzlzDOFo0C+NHbBKrUKOzG1PW/ts48r7a4GUeYm2xxtM2m/3rQJKqmDi6v1stSgFpjXPTOmzNuiU8Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=y8Q/ryV9; arc=none smtp.client-ip=209.85.218.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-a5878caeb9eso652328366b.1
+        for <netdev@vger.kernel.org>; Mon, 29 Apr 2024 23:46:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1714459577; x=1715064377; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=7kmtuXvfOzTJE5RofB9OsnXxtdNCBS9vMin6Fo4lqPA=;
+        b=y8Q/ryV9UOWp3CoXmlCjKgkWUrLNm4HaTlgk8fKZylGOfOvjSHZ82Te8MIsvaUv2rz
+         HEVpbiKhwqpLwOl02BuGaYEMxG73/FEuEmzY12li/q+zBBDPgUx2pSfgXNx8s41woCtp
+         mGdTa2fFZEe7/0Ia/gySyhuJSdJiaVImFNQkA7bZ+WqO/6ExXHq0uB+UGfWTb7kZHSDJ
+         kX5TnAkCmKkK535E3uRHZUnKhfOSdoStsKF0xDjfgwdGrI3CXzwW4RwzFM7CSmNnQgKM
+         BrWWOCMsm4bj8QwXqUo0GKg/4AcqInyGETcOPrHnrFFgyID2GRKU+NtyNnvYLGLJmU4c
+         UleA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714459577; x=1715064377;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7kmtuXvfOzTJE5RofB9OsnXxtdNCBS9vMin6Fo4lqPA=;
+        b=UJ5wiLIKMdb5NSFrxdIEmHZHSt0dZdFeIAOmX9lne+97KOmJOB5gAVxCrDvlIgDbPU
+         DDUyPLdCSOX6EqMGrRyDAXjIgIhLvuC8+RBYnXIi2TooPQrGRIXLXVFaGKoO1CHP0KLd
+         sI2Yoe0JdE8XBdsC/tSjm69Re4PzNs6vg0LyIsL/5OWpX+PRBhkUsSWeaVuAX7Dy1muV
+         T3TjPMAM6ylcosVolJPOYFq20nbpe1UEVbjUPgFXkSFQA9eTZsp9lXcZIqK/YbdHjG0i
+         A8F3P+aFRYeFwt6qzyp8uw3RPb+hD9Ud5EbV2gd5M7V77OEeSsfUwAFLRaKD9Xav637h
+         nQOg==
+X-Forwarded-Encrypted: i=1; AJvYcCXdmBYJubt64yl01z7YpivtUNmP9PKPy30abGv/YiG8DCgE6v50Bfbgb+WwU6f1yyTTjTknx6hebR99Sk/vgkQURHBSMWfO
+X-Gm-Message-State: AOJu0Yz95NFlPBRJVurvQI8u4kaiNWp0Don838Y+QhoVwckugXiwS+43
+	GdGkail8ZySIP6ePlKpBlJmRI4srFYk4K0faUqAYntfuFVpRqGRwrCenBlIRXt9usQticNUqLuT
+	M
+X-Google-Smtp-Source: AGHT+IHfEGOIlAy1q7W+H3NzXIySOqeRKPAtUJlO+eVYUEG6rVWXp/uCTWruXEVrubSQ72MD88Po3A==
+X-Received: by 2002:a17:906:ddb:b0:a52:6b12:3078 with SMTP id p27-20020a1709060ddb00b00a526b123078mr1142634eji.55.1714459576234;
+        Mon, 29 Apr 2024 23:46:16 -0700 (PDT)
+Received: from localhost ([102.222.70.76])
+        by smtp.gmail.com with ESMTPSA id la8-20020a170906ad8800b00a5931d77634sm139728ejb.34.2024.04.29.23.46.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 29 Apr 2024 23:46:16 -0700 (PDT)
+Date: Tue, 30 Apr 2024 09:46:11 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Simon Horman <horms@kernel.org>
+Cc: MD Danish Anwar <danishanwar@ti.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>, Jan Kiszka <jan.kiszka@siemens.com>,
+	Diogo Ivo <diogo.ivo@siemens.com>, Paolo Abeni <pabeni@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, srk@ti.com,
+	Vignesh Raghavendra <vigneshr@ti.com>, r-gunasekaran@ti.com,
+	Roger Quadros <rogerq@kernel.org>
+Subject: Re: [PATCH net-next v2] net: ti: icssg_prueth: Add SW TX / RX
+ Coalescing based on hrtimers
+Message-ID: <183bb17e-8f2e-47d9-b15a-e8b6bfcb7f43@moroto.mountain>
+References: <20240429071501.547680-1-danishanwar@ti.com>
+ <20240429183034.GG516117@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Zit-sTZoYp_JnQfd@Antony2201.local>
-X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
- mbx-essen-02.secunet.de (10.53.40.198)
-X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
+In-Reply-To: <20240429183034.GG516117@kernel.org>
 
-On Fri, Apr 26, 2024 at 12:15:13PM +0200, Antony Antony wrote:
-> From: Antony Antony <antony.antony@secunet.com>
+On Mon, Apr 29, 2024 at 07:30:34PM +0100, Simon Horman wrote:
+> > -	num_tx_packets = emac_tx_complete_packets(emac, tx_chn->id, budget);
+> > +	num_tx_packets = emac_tx_complete_packets(emac, tx_chn->id, budget,
+> > +						  &tdown);
+> >  
+> >  	if (num_tx_packets >= budget)
+> >  		return budget;
+> >  
+> > -	if (napi_complete_done(napi_tx, num_tx_packets))
+> > -		enable_irq(tx_chn->irq);
+> > +	if (napi_complete_done(napi_tx, num_tx_packets)) {
+> > +		if (unlikely(tx_chn->tx_pace_timeout_ns && !tdown)) {
+> > +			hrtimer_start(&tx_chn->tx_hrtimer,
+> > +				      ns_to_ktime(tx_chn->tx_pace_timeout_ns),
+> > +				      HRTIMER_MODE_REL_PINNED);
+> > +		} else {
+> > +			enable_irq(tx_chn->irq);
+> > +		}
 > 
-> A spelling error was found in the comment section of
-> include/uapi/linux/xfrm.h. Since this header file is copied to many
-> userspace programs and undergoes Debian spellcheck, it's preferable to
-> fix it in upstream rather than downstream having exceptions.
+> This compiles with gcc-13 and clang-18 W=1
+> (although the inner {} are unnecessary).
 > 
-> This commit fixes the spelling mistake.
-> 
-> Fixes: df71837d5024 ("[LSM-IPSec]: Security association restriction.")
-> Signed-off-by: Antony Antony <antony.antony@secunet.com>
 
-Applied, thanks Antony!
+A lot of people have the rule that multi line indents get curly braces
+even when they're not required.  I feel like it does help readability.
+
+regards,
+dan carpenter
+
+
 
