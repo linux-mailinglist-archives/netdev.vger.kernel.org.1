@@ -1,146 +1,217 @@
-Return-Path: <netdev+bounces-92597-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92598-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8F898B805C
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 21:17:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB8A18B8066
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 21:19:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EE6E91C22859
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 19:17:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9DC51283CA5
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 19:19:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D82A7194C8B;
-	Tue, 30 Apr 2024 19:17:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB284199E95;
+	Tue, 30 Apr 2024 19:19:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="NZu4yp0/"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yhrCM4Yd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56B647710B;
-	Tue, 30 Apr 2024 19:17:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAC82194C9C
+	for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 19:19:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714504622; cv=none; b=pD2L4yENHxQeAnMYFV54fTqsbejT1KJPHnzELi7lsYNHWwlYXcc8bMtTpLbf9MeR1rAPb2dGzRFmWb6tvbkzkPNvXeH3pFqtrFTI3d2dU7l2AnX5dDjSDu6QXMGXrk52//Mx+Z3rt2HkNmRtNzU2qjqoJ/mayGg963yPOZ7tfpQ=
+	t=1714504776; cv=none; b=gwJdn3XpHDlx/YfZ+OhRUClMDdc8LQajzcXug8ApDvveHrq5HSWaSCJF55bH6eVuU1JfyRqP7ofBBtkIrrTpLtUkobSMTHOsbSxEg9HQ2jXH4jiwl6Tjq85oc0Go9g9Qyr47EvEiv/EF6VympOGpCMp4rltgjnk7UNcMI+QKc3s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714504622; c=relaxed/simple;
-	bh=RdFfCjNbgzIvSlpEj8Die0XDDORC4D/jlYBq+Mn5u/M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=gqDMHTa1WBihETz7GZDJOeinQHv4UNkPmHIM2CNLdZJYeHSR3GlbKXSSBA8bt5ACxAGwg1WiLsIICu52e07RAspbuFQEtbM0DnCpynLqPqO8ax4W6kFDpjdFw88h1HdSH4UsKejqAgWwIosdh9KlReAoAb2IY81MZQm+Ms/tkYw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=NZu4yp0/; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 43UFlrGY029101;
-	Tue, 30 Apr 2024 19:16:41 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=
-	qcppdkim1; bh=h1aRhctW+hflPZhe4iXejsBdSGqN0UtQR9Cwo3lKjq0=; b=NZ
-	u4yp0/wDWTElzpCautSiDsDUz4whkBxjpPa2caB+n03jig6kJPGcQXrjj6TcCDWa
-	oWpOeRlgZcMkTHFxH871v42UbdG/AQXExC30HQP+OPAVOv0fqlIfLaAiQ12ubCsc
-	nRumVMOffsJGJbmdj+zVFmNZi/IWndLev83iv9Eh49JmjeCu0SLz3xc4RguEjZ9k
-	RiOQPjvSw7Jey0AhXwvcmXJdyQL9Ai1To0qq64ONJ+KGy2c0rABoxtHt3ozE4d5o
-	EWozTG3/1vstI0R+x5JX5mcK9qqUVrRyJMa6L3coghZJhK6Oha6BoNMm7tzkW9iE
-	68sbReJe6NsTOyokzkVQ==
-Received: from nasanppmta04.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3xthgvv00r-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 30 Apr 2024 19:16:40 +0000 (GMT)
-Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
-	by NASANPPMTA04.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 43UJGdhi017136
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 30 Apr 2024 19:16:39 GMT
-Received: from [10.110.24.18] (10.80.80.8) by nasanex01a.na.qualcomm.com
- (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Tue, 30 Apr
- 2024 12:16:35 -0700
-Message-ID: <6eb5b283-a9bd-4081-8bce-a60d72af430c@quicinc.com>
-Date: Tue, 30 Apr 2024 12:16:35 -0700
+	s=arc-20240116; t=1714504776; c=relaxed/simple;
+	bh=rXrYXwxz8utS37Zdd/NHXMvvYHT1Pko55fdXpz+a0f8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UrRyi0YYgk8iOvQXKLl5ppv8ejwhxfgYZVjAkwvG4vTusSW8Xq2c7VSY5C2QktbGxxMOxYrimo6uV56ByNrdCjI0yxOLpi+3g1D09wbGZJolfiasNfyVhqeL6egf4b7hZ4OLfc1+GazbDaK3zs+Vo+0cyPXn7Dk+ZWNzkojF8vs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yhrCM4Yd; arc=none smtp.client-ip=209.85.167.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-51b09c3a111so8632085e87.1
+        for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 12:19:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1714504773; x=1715109573; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JBbLSd4KX1Ml6Kx/U9tspaOWXAez2c+6/7rMF07WiMA=;
+        b=yhrCM4YdS1mVSkC6dZlf25VsI6foSQBCk1DyesxJ/3Nf9GIMHy2gLaao5m1yno4E4y
+         LtG62zQbF9BTkR0aOMYlQm1EEMYIDUCq9PMx9uJmf3kKE2VKFDXgbV/etlhd83AV68Mw
+         q0LoGQlekuHwfa+7Hc6GI0DZ/Iir29gHWQ93YeFSVeB4ebbTLs1IPAMrizUw1zcYmLPc
+         dGrMy+HB86r/BLLws08RKvC1H2mXBtxc86+vZP7uOFNjHzPyfH/Yc46yDsB17PHHg3/8
+         cmY8hLG3CzLveY5qMgQT1zM60pq2ET0rzg8DrUA3vcerRTlTRWGeqNRVTZKVEPp06M3c
+         o+RQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714504773; x=1715109573;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=JBbLSd4KX1Ml6Kx/U9tspaOWXAez2c+6/7rMF07WiMA=;
+        b=nhQ5d+tLFwqnslUFxn8jy6DwZ9EfyeBCo5UGrk/6b7dUP11BqTz4GsnQ0QeupKHOXF
+         5YK8FAKoksre/HLPcKIftB6kvttMLdQoAEhlF0l5ip4wWMus3dnEpkvtEM7vhs38+u7O
+         VNLov1k5vhn6CW3Jo6kbUYMC5ifboVK9XlSMIi/9oX1Ob+pnEC21d+e0cKheLixu+vgd
+         jikirJBmUh6rYOeOUiHroXekxQQ14AUwfU/O6uzA1+ydMpd/YyBhVT8KlZfglRvmS1Is
+         pKDFOiJEXLgAlcnhjlM6tNE+3V1gbJw7fMfM1fZ1icMZiplPuc1O6vObmMjBuWkbgYaE
+         Ljyg==
+X-Forwarded-Encrypted: i=1; AJvYcCXFw2ALhG9iFjI9Rbkwo1Ctzs/WmZHCmuDg/vmQg0erCoBfb97SrVqF2Hu/2I5tJ4BdDGZGfg40BUa9CLQcIk18ep/+dvI6
+X-Gm-Message-State: AOJu0YwghUPu8eG2SkNFgVrelByrzRkhcGcFd11x9uU2VijwCyRwVqgw
+	JYR2T36x/57Jeie8kiTCLSx7+riV6gjid90QGEK0gVtB4yH0ERr2rexboYKqJkjQNXDC4DHzQCD
+	B8mNf8CoAijDkT+gKwnZ8IFjyuUYghq8VqmjnKD/Pf+xGSEinXtOG
+X-Google-Smtp-Source: AGHT+IEv1vAD5KmPx2DuK83e++oMbqGnWC2h94YZYICJhje+Ouaos+1vgy9d2n+Zn+VtRp04liNfK+AEGoM+Z6BbCWI=
+X-Received: by 2002:a05:6512:3492:b0:517:8ad8:c64 with SMTP id
+ v18-20020a056512349200b005178ad80c64mr259130lfr.21.1714504772286; Tue, 30 Apr
+ 2024 12:19:32 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH bpf-next v5 2/2] net: Add additional bit to support
- clockid_t timestamp type
-Content-Language: en-US
-To: Martin KaFai Lau <martin.lau@linux.dev>,
-        Willem de Bruijn
-	<willemdebruijn.kernel@gmail.com>
-CC: "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni
-	<pabeni@redhat.com>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, Andrew Halaney <ahalaney@redhat.com>,
-        "Martin
- KaFai Lau" <martin.lau@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>, bpf <bpf@vger.kernel.org>,
-        <kernel@quicinc.com>
-References: <20240424222028.1080134-1-quic_abchauha@quicinc.com>
- <20240424222028.1080134-3-quic_abchauha@quicinc.com>
- <2b2c3eb1-df87-40fe-b871-b52812c8ecd0@linux.dev>
- <e761e1de-0e11-4541-a4db-a1b793a60674@quicinc.com>
- <379558fe-a6e2-444b-a6a7-ef233efa8311@linux.dev>
-From: "Abhishek Chauhan (ABC)" <quic_abchauha@quicinc.com>
-In-Reply-To: <379558fe-a6e2-444b-a6a7-ef233efa8311@linux.dev>
+References: <20240403002053.2376017-1-almasrymina@google.com>
+ <20240403002053.2376017-8-almasrymina@google.com> <8357256a-f0e9-4640-8fec-23341fc607db@davidwei.uk>
+ <CAHS8izPeYryoLdCAQdGQU-wn7YVdtuofVKNvRFjFjhqTDsT7zA@mail.gmail.com>
+ <aafbbf09-a33d-4e73-99c8-9ddab5910657@kernel.dk> <CAHS8izMKLYATo6g3xkj_thFo3whCfq6LSoex5s0m5XZd-U7SVQ@mail.gmail.com>
+ <11f52113-7b67-4b45-ba1d-29b070050cec@kernel.dk>
+In-Reply-To: <11f52113-7b67-4b45-ba1d-29b070050cec@kernel.dk>
+From: Mina Almasry <almasrymina@google.com>
+Date: Tue, 30 Apr 2024 12:19:17 -0700
+Message-ID: <CAHS8izP3KtH_CHyQKE+=vrY-yREq5Bb_Kd+KLyJ4j-_AdjNk-Q@mail.gmail.com>
+Subject: Re: [RFC PATCH net-next v8 07/14] page_pool: devmem support
+To: Jens Axboe <axboe@kernel.dk>
+Cc: David Wei <dw@davidwei.uk>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org, 
+	linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org, 
+	sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
+	linux-arch@vger.kernel.org, bpf@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Jonathan Corbet <corbet@lwn.net>, Richard Henderson <richard.henderson@linaro.org>, 
+	Ivan Kokshaysky <ink@jurassic.park.msu.ru>, Matt Turner <mattst88@gmail.com>, 
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, Helge Deller <deller@gmx.de>, 
+	Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven Rostedt <rostedt@goodmis.org>, 
+	Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
+	Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
+	Jiri Olsa <jolsa@kernel.org>, Steffen Klassert <steffen.klassert@secunet.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>, 
+	Sumit Semwal <sumit.semwal@linaro.org>, =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+	Amritha Nambiar <amritha.nambiar@intel.com>, 
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>, 
+	Alexander Mikhalitsyn <alexander@mihalicyn.com>, Kaiyuan Zhang <kaiyuanz@google.com>, 
+	Christian Brauner <brauner@kernel.org>, Simon Horman <horms@kernel.org>, 
+	David Howells <dhowells@redhat.com>, Florian Westphal <fw@strlen.de>, 
+	Yunsheng Lin <linyunsheng@huawei.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, 
+	Arseniy Krasnov <avkrasnov@salutedevices.com>, 
+	Aleksander Lobakin <aleksander.lobakin@intel.com>, Michael Lass <bevan@bi-co.net>, 
+	Jiri Pirko <jiri@resnulli.us>, Sebastian Andrzej Siewior <bigeasy@linutronix.de>, 
+	Lorenzo Bianconi <lorenzo@kernel.org>, Richard Gobert <richardbgobert@gmail.com>, 
+	Sridhar Samudrala <sridhar.samudrala@intel.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	Johannes Berg <johannes.berg@intel.com>, Abel Wu <wuyun.abel@bytedance.com>, 
+	Breno Leitao <leitao@debian.org>, Pavel Begunkov <asml.silence@gmail.com>, 
+	Jason Gunthorpe <jgg@ziepe.ca>, Shailend Chand <shailend@google.com>, 
+	Harshitha Ramamurthy <hramamurthy@google.com>, Shakeel Butt <shakeel.butt@linux.dev>, 
+	Jeroen de Borst <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>, linux-mm@kvack.org, 
+	Matthew Wilcox <willy@infradead.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nasanex01a.na.qualcomm.com (10.52.223.231)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: pCjJTonkyvEVCMMeRHtr9PNDpOvoV3h1
-X-Proofpoint-GUID: pCjJTonkyvEVCMMeRHtr9PNDpOvoV3h1
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1011,Hydra:6.0.650,FMLib:17.11.176.26
- definitions=2024-04-30_12,2024-04-30_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 impostorscore=0
- adultscore=0 mlxscore=0 spamscore=0 lowpriorityscore=0 bulkscore=0
- mlxlogscore=982 priorityscore=1501 phishscore=0 malwarescore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2404010003 definitions=main-2404300138
+Content-Transfer-Encoding: quoted-printable
 
+On Tue, Apr 30, 2024 at 11:55=E2=80=AFAM Jens Axboe <axboe@kernel.dk> wrote=
+:
+>
+> On 4/30/24 12:29 PM, Mina Almasry wrote:
+> > On Tue, Apr 30, 2024 at 6:46?AM Jens Axboe <axboe@kernel.dk> wrote:
+> >>
+> >> On 4/26/24 8:11 PM, Mina Almasry wrote:
+> >>> On Fri, Apr 26, 2024 at 5:18?PM David Wei <dw@davidwei.uk> wrote:
+> >>>>
+> >>>> On 2024-04-02 5:20 pm, Mina Almasry wrote:
+> >>>>> @@ -69,20 +106,26 @@ net_iov_binding(const struct net_iov *niov)
+> >>>>>   */
+> >>>>>  typedef unsigned long __bitwise netmem_ref;
+> >>>>>
+> >>>>> +static inline bool netmem_is_net_iov(const netmem_ref netmem)
+> >>>>> +{
+> >>>>> +#if defined(CONFIG_PAGE_POOL) && defined(CONFIG_DMA_SHARED_BUFFER)
+> >>>>
+> >>>> I am guessing you added this to try and speed up the fast path? It's
+> >>>> overly restrictive for us since we do not need dmabuf necessarily. I
+> >>>> spent a bit too much time wondering why things aren't working only t=
+o
+> >>>> find this :(
+> >>>
+> >>> My apologies, I'll try to put the changelog somewhere prominent, or
+> >>> notify you when I do something that I think breaks you.
+> >>>
+> >>> Yes, this is a by-product of a discussion with regards to the
+> >>> page_pool benchmark regressions due to adding devmem. There is some
+> >>> background on why this was added and the impact on the
+> >>> bench_page_pool_simple tests in the cover letter.
+> >>>
+> >>> For you, I imagine you want to change this to something like:
+> >>>
+> >>> #if defined(CONFIG_PAGE_POOL)
+> >>> #if defined(CONFIG_DMA_SHARED_BUFFER) || defined(CONFIG_IOURING)
+> >>>
+> >>> or something like that, right? Not sure if this is something I should
+> >>> do here or if something more appropriate to be in the patches you
+> >>> apply on top.
+> >>
+> >> In general, attempting to hide overhead behind config options is alway=
+s
+> >> a losing proposition. It merely serves to say "look, if these things
+> >> aren't enabled, the overhead isn't there", while distros blindly enabl=
+e
+> >> pretty much everything and then you're back where you started.
+> >>
+> >
+> > The history there is that this check adds 1 cycle regression to the
+> > page_pool fast path benchmark. The regression last I measured is 8->9
+> > cycles, so in % wise it's a quite significant 12.5% (more details in
+> > the cover letter[1]). I doubt I can do much better than that to be
+> > honest.
+>
+> I'm all for cycle counting, and do it myself too, but is that even
+> measurable in anything that isn't a super targeted microbenchmark? Or
+> even in that?
+>
 
+Not as far as I can tell, no. This was purely to improve the page_pool
+benchmark.
 
-On 4/26/2024 4:50 PM, Martin KaFai Lau wrote:
-> On 4/26/24 11:46 AM, Abhishek Chauhan (ABC) wrote:
->>>> diff --git a/net/ipv4/ip_output.c b/net/ipv4/ip_output.c
->>>> index 591226dcde26..f195b31d6e75 100644
->>>> --- a/net/ipv4/ip_output.c
->>>> +++ b/net/ipv4/ip_output.c
->>>> @@ -1457,7 +1457,7 @@ struct sk_buff *__ip_make_skb(struct sock *sk,
->>>>          skb->priority = (cork->tos != -1) ? cork->priority: READ_ONCE(sk->sk_priority);
->>>>        skb->mark = cork->mark;
->>>> -    skb->tstamp = cork->transmit_time;
->>>> +    skb_set_tstamp_type_frm_clkid(skb, cork->transmit_time, sk->sk_clockid);
->>> hmm... I think this will break for tcp. This sequence in particular:
->>>
->>> tcp_v4_timewait_ack()
->>>    tcp_v4_send_ack()
->>>      ip_send_unicast_reply()
->>>        ip_push_pending_frames()
->>>          ip_finish_skb()
->>>            __ip_make_skb()
->>>              /* sk_clockid is REAL but cork->transmit_time should be in mono */
->>>              skb_set_tstamp_type_frm_clkid(skb, cork->transmit_time, sk->sk_clockid);;
->>>
->>> I think I hit it from time to time when running the test in this patch set.
->>>
->> do you think i need to check for protocol type here . since tcp uses Mono and the rest according to the new design is based on
->> sk->sk_clockid
->> if (iph->protocol == IPPROTO_TCP)
->>     skb_set_tstamp_type_frm_clkid(skb, cork->transmit_time, CLOCK_MONOTONIC);
->> else
->>     skb_set_tstamp_type_frm_clkid(skb, cork->transmit_time, sk->sk_clockid);
-> 
-> Looks ok. iph->protocol is from sk->sk_protocol. I would defer to Willem input here.
-> 
-> There is at least one more place that needs this protocol check, __ip6_make_skb().
+> > There was a desire not to pay this overhead in setups that will likely
+> > not care about devmem, like embedded devices maybe, or setups without
+> > GPUs. Adding a CONFIG check here seemed like very low hanging fruit,
+> > but yes it just hides the overhead in some configs, not really removes
+> > it.
+> >
+> > There was a discussion about adding this entire netmem/devmem work
+> > under a new CONFIG. There was pushback particularly from Willem that
+> > at the end of the day what is enabled on most distros is what matters
+> > and we added code churn and CONFIG churn for little value.
+> >
+> > If there is significant pushback to the CONFIG check I can remove it.
+> > I don't feel like it's critical, it just mirco-optimizes some setups
+> > that doesn't really care about this work area.
+>
+> That is true, but in practice it'll be enabled anyway. Seems like it's
+> not really worth it in this scenario.
+>
 
-Sounds good. I will wait for Willem to comment here. 
+OK, no pushback from me. I'll remove the CONFIG check in the next iteration=
+.
+
+--=20
+Thanks,
+Mina
 
