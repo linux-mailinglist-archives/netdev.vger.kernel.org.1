@@ -1,66 +1,66 @@
-Return-Path: <netdev+bounces-92633-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92634-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 651378B82BB
-	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 00:46:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C5408B82BC
+	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 00:46:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 85A771C22337
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 22:46:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 757731C20BAA
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 22:46:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 462961EA84;
-	Tue, 30 Apr 2024 22:46:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E60738DC3;
+	Tue, 30 Apr 2024 22:46:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="TCiLGaSu"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="P/hKvwk7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF0381E86E
-	for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 22:46:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65592219FF
+	for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 22:46:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714517181; cv=none; b=K+gCWyITm8Wv2Z5IgcMWUIe5SKQhhDtlpDRqStfMr5OV3UjPV+PDU250axgiOsqwCiNcOIUMOaikcIr12dUdYuW8dbibOnnXKe0CykZp5lxQM1GHtZRI0vl2J+Mc1mcEWOEa8oizPLUCWf9ugw9rAukvqPbV7V/GdjvX3ZjxZSI=
+	t=1714517183; cv=none; b=jEdj6sn8JtbfgWXJpCw7nCI5sds3lsKlxDUizXpsDf4jDRqR7JuXIO4J1p22EEBkt81G1fgMUkj41BrMLdZ7PCcbAxKXD7uN5YFv1S0AagFWbqsVsm7VUi8iI1aUVChca6fFucLK2dUbqRqDS1dU4yCIPdjx1/TXP+esZGW6ytc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714517181; c=relaxed/simple;
-	bh=kdzlwUF/UHFb2w0rbYfNxBu/C4MVgbSz5wt6LIrJALY=;
+	s=arc-20240116; t=1714517183; c=relaxed/simple;
+	bh=77zKzFjG2CTQIAkel9LrKBEyMLeh7H2qYAPCNTN663U=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LJ9nk0d34kNEHGUxt42HvmlH0B0Is7sAA1saJjzvlJi+7UIqSf+s5wMaW+HMDpAxGGZ766dHADlQA0vobe/CdKoTVUHFnjIcoAJcqYQCKa3PEmnKVun6CPRvAm6B7yM9gpzwG6M0it/jbtoxqFWkAoMnnmvMQrsJs7q7vrJeUMw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=TCiLGaSu; arc=none smtp.client-ip=209.85.214.182
+	 MIME-Version:Content-Type; b=BRxl6KNSH6QP/uqFx0ZX3tyyK1IOzTYvMW8y15oDOAgcHdF5CqYi1ZLXK15hywTT6LZskyunkLFjbXtrml6pafwUB1YbLvBI+p+CB6uHiYPhB6rGKKpN2McusSXemwbW/2wtpfYsGyfTUg0acQoLT67e+2xqv8CAJzW+RqHRHoE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=P/hKvwk7; arc=none smtp.client-ip=209.85.214.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-1ec41d82b8bso12336055ad.2
-        for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 15:46:19 -0700 (PDT)
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-1ec69e3dbe5so7780255ad.0
+        for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 15:46:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1714517179; x=1715121979; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1714517180; x=1715121980; darn=vger.kernel.org;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ow6G6TnDEsRyRmPppeXnL6X2ewoO6C6MophJ7XX5+0M=;
-        b=TCiLGaSuc0NQ0CoDUFwauAauIUaBhBw4EvCFd2liX0EWIC3EQXPBbRTuA0LgEC1bYP
-         kp1YFs5AJqT9PupaLsvpbFcx/8qiFgqhZn7Q+FmJoeyLRuCZswQLH4x9iXMyIY7n4Dse
-         7EFhhD0A+m7ynumBeU0pxMrLbFhJCnd3fij2g=
+        bh=9egGFzew9U8bi31/23yU44dJ+Tw23C/cwmi30lF79/s=;
+        b=P/hKvwk7qPKGhe+rcUxFx5EIodDXNNvv/9Q6XUogLDqBYQ8ZhREB0lWSUWvqC6n/PS
+         FbROrNgavhrvk8jZ06qhbpqy6VfiUJhNT8A+T506uVtVxIYAR6Bpif1UqNkxsg9ufrnu
+         4SBxuLN1MA766vcMWs5wZFIfTch3kFYfg3GCw=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714517179; x=1715121979;
+        d=1e100.net; s=20230601; t=1714517180; x=1715121980;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ow6G6TnDEsRyRmPppeXnL6X2ewoO6C6MophJ7XX5+0M=;
-        b=srSIvePd49OERfYRyT2LUytxW/jiv0ycE/lqEeIQLB9kX4bmpynGzcyVeQTSgcfe1u
-         Bgd3eaW2Yw6Vb5HAZGC1lVAq7ZMcMESLk2oECR5HN7JOw3pU1yYBJihUfJs2MsJAz6zm
-         PMRiniEhR4oTJYQjuyqYpLUDn6H/9tiyS4t48/P5vVT6lMedDCiTD6BLTut/RpfQty7B
-         7J71OJBpCWfNW3UW9h5WOjFBLe4V/6eveGTd2WUjurADJcXK/nJRyNvH+4izqXaO6U44
-         4PfUk3O0Mc0LPqy2ua9H95rKrevzYyU+5FQcGn6tnaCkuP7uV5hXvnMjzJzoF+d+Qezc
-         ZYCg==
-X-Gm-Message-State: AOJu0Yzul6QgRMGWPLPGDMowVXZ+EJmBEBoX+ZTd0a0zRylzv8MgUZA7
-	9aYQ631Sm/4H2n57BS/r5OVI42pSCf4DAw7HcvUh9YosEeOxYWbFKG4cZ6czqQ==
-X-Google-Smtp-Source: AGHT+IHQErMnaGaL2b5tBUz4PWQL1B5EpRf0oBVkCmpLE8AvF6U1yvnOYxmeLMvxQs739UyciKemHg==
-X-Received: by 2002:a17:902:c403:b0:1e0:ca47:4d96 with SMTP id k3-20020a170902c40300b001e0ca474d96mr811625plk.3.1714517178668;
-        Tue, 30 Apr 2024 15:46:18 -0700 (PDT)
+        bh=9egGFzew9U8bi31/23yU44dJ+Tw23C/cwmi30lF79/s=;
+        b=p7PnkEqX71JXlpbnftLoAa8LbFvDXTjb4rAtr/usg8+KYNzGATzRtVXMIe6qWTV8s1
+         aTHTV+nm4pZG32sDq87cTjZdqM5aowAWZsGM1/eD9/ngAkDGQi/t5thcTgOeI29dRTbC
+         6aacl41dxQJ080y/W/27o40sftmLCog3Yl3zPGBheimPUk6v3ZUZHU6KAR0Oifg/126B
+         d0oco4pohSt/7Li9ZLC8HFiHDkrug8U7DLCHRxaRNPbpPq/ksCOnLPb2b+qqRVIycVDF
+         cqm1R+JPHh8NA2uZ1ipPXD/WimNOcX9je3w+9WzvylsnkRYJkJtSC8GwPHJROk4+hROF
+         9m2Q==
+X-Gm-Message-State: AOJu0YyT1ZVk+QRIvdEzQkFVl4Xbl+O6NunFk6s97tflgp3+BS1PR5ph
+	VR3zTrPuXqe00t+2NZJF+WPpPn2IYIyCh9Pq9JoFotzalSkSCJ/jn2Nr9F0UtQ==
+X-Google-Smtp-Source: AGHT+IEjomUpI/KmMGFi7D4k7mjJLlp4GHtilnNB2HKmKxw9d/eCefGYBEXyf6FNB+U4/ETElIzJgA==
+X-Received: by 2002:a17:903:234e:b0:1e2:3e1e:3d9 with SMTP id c14-20020a170903234e00b001e23e1e03d9mr920536plh.63.1714517180388;
+        Tue, 30 Apr 2024 15:46:20 -0700 (PDT)
 Received: from lvnvda5233.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id s11-20020a170902a50b00b001eb2fb28eabsm7836476plq.227.2024.04.30.15.46.16
+        by smtp.gmail.com with ESMTPSA id s11-20020a170902a50b00b001eb2fb28eabsm7836476plq.227.2024.04.30.15.46.18
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 30 Apr 2024 15:46:17 -0700 (PDT)
+        Tue, 30 Apr 2024 15:46:19 -0700 (PDT)
 From: Michael Chan <michael.chan@broadcom.com>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -72,9 +72,9 @@ Cc: netdev@vger.kernel.org,
 	Selvin Thyparampil Xavier <selvin.xavier@broadcom.com>,
 	Vikas Gupta <vikas.gupta@broadcom.com>,
 	Pavan Chebbi <pavan.chebbi@broadcom.com>
-Subject: [PATCH net-next 5/7] bnxt_en: Add a mutex to synchronize ULP operations
-Date: Tue, 30 Apr 2024 15:44:36 -0700
-Message-Id: <20240430224438.91494-6-michael.chan@broadcom.com>
+Subject: [PATCH net-next 6/7] bnxt_en: Optimize recovery path ULP locking in the driver
+Date: Tue, 30 Apr 2024 15:44:37 -0700
+Message-Id: <20240430224438.91494-7-michael.chan@broadcom.com>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20240430224438.91494-1-michael.chan@broadcom.com>
 References: <20240430224438.91494-1-michael.chan@broadcom.com>
@@ -85,19 +85,28 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="0000000000006f65ba0617582393"
+	boundary="00000000000088041406175823ba"
 
---0000000000006f65ba0617582393
+--00000000000088041406175823ba
 Content-Transfer-Encoding: 8bit
 
 From: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
 
-The current scheme relies heavily on the RTNL lock for all ULP
-operations between the L2 and the RoCE driver.  Add a new en_dev_lock
-mutex so that the asynchronous ULP_STOP and ULP_START operations
-can be serialized with bnxt_register_dev() and bnxt_unregister_dev()
-calls without relying on the RTNL lock.  The next patch will remove
-the RTNL lock from the ULP_STOP and ULP_START calls.
+In the error recovery path (AER, firmware recovery, etc), the
+driver notifies the RoCE driver via ULP_STOP before the reset
+and via ULP_START after the reset, all under RTNL_LOCK.  The
+RoCE driver can take a long time if there are a lot of QPs to
+destroy, so it is not ideal to hold the global RTNL lock.
+
+Rely on the new en_dev_lock mutex instead for ULP_STOP and
+ULP_START.  For the most part, we move the ULP_STOP call before
+we take the RTNL lock and move the ULP_START after RTNL unlock.
+Note that SRIOV re-enablement must be done after ULP_START
+or RoCE on the VFs will not resume properly after reset.
+
+The one scenario in bnxt_hwrm_if_change() where the RTNL lock
+is already taken in the .ndo_open() context requires the ULP
+restart to be deferred to the bnxt_sp_task() workqueue.
 
 Reviewed-by: Selvin Thyparampil Xavier <selvin.xavier@broadcom.com>
 Reviewed-by: Vikas Gupta <vikas.gupta@broadcom.com>
@@ -105,116 +114,274 @@ Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
 Signed-off-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
 Signed-off-by: Michael Chan <michael.chan@broadcom.com>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c | 20 ++++++++++++++++++-
- drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.h |  3 +++
- 2 files changed, 22 insertions(+), 1 deletion(-)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 62 ++++++++++++-------
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h     |  1 +
+ .../net/ethernet/broadcom/bnxt/bnxt_devlink.c |  7 ++-
+ 3 files changed, 44 insertions(+), 26 deletions(-)
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c
-index d8927838f1cf..ba3fa1c2e5d9 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c
-@@ -113,6 +113,7 @@ int bnxt_register_dev(struct bnxt_en_dev *edev,
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+index 4d7b4eabe0af..67294835e10e 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+@@ -11552,7 +11552,7 @@ static int bnxt_hwrm_if_change(struct bnxt *bp, bool up)
+ 		if (fw_reset) {
+ 			set_bit(BNXT_STATE_FW_RESET_DET, &bp->state);
+ 			if (!test_bit(BNXT_STATE_IN_FW_RESET, &bp->state))
+-				bnxt_ulp_stop(bp);
++				bnxt_ulp_irq_stop(bp);
+ 			bnxt_free_ctx_mem(bp);
+ 			bnxt_dcb_free(bp);
+ 			rc = bnxt_fw_init_one(bp);
+@@ -12107,10 +12107,9 @@ static int bnxt_open(struct net_device *dev)
+ 		bnxt_hwrm_if_change(bp, false);
+ 	} else {
+ 		if (test_and_clear_bit(BNXT_STATE_FW_RESET_DET, &bp->state)) {
+-			if (!test_bit(BNXT_STATE_IN_FW_RESET, &bp->state)) {
+-				bnxt_ulp_start(bp, 0);
+-				bnxt_reenable_sriov(bp);
+-			}
++			if (!test_bit(BNXT_STATE_IN_FW_RESET, &bp->state))
++				bnxt_queue_sp_work(bp,
++						   BNXT_RESTART_ULP_SP_EVENT);
+ 		}
+ 	}
+ 
+@@ -13266,7 +13265,6 @@ static void bnxt_fw_fatal_close(struct bnxt *bp)
+ 
+ static void bnxt_fw_reset_close(struct bnxt *bp)
+ {
+-	bnxt_ulp_stop(bp);
+ 	/* When firmware is in fatal state, quiesce device and disable
+ 	 * bus master to prevent any potential bad DMAs before freeing
+ 	 * kernel memory.
+@@ -13347,6 +13345,7 @@ void bnxt_fw_exception(struct bnxt *bp)
+ {
+ 	netdev_warn(bp->dev, "Detected firmware fatal condition, initiating reset\n");
+ 	set_bit(BNXT_STATE_FW_FATAL_COND, &bp->state);
++	bnxt_ulp_stop(bp);
+ 	bnxt_rtnl_lock_sp(bp);
+ 	bnxt_force_fw_reset(bp);
+ 	bnxt_rtnl_unlock_sp(bp);
+@@ -13378,6 +13377,7 @@ static int bnxt_get_registered_vfs(struct bnxt *bp)
+ 
+ void bnxt_fw_reset(struct bnxt *bp)
+ {
++	bnxt_ulp_stop(bp);
+ 	bnxt_rtnl_lock_sp(bp);
+ 	if (test_bit(BNXT_STATE_OPEN, &bp->state) &&
+ 	    !test_bit(BNXT_STATE_IN_FW_RESET, &bp->state)) {
+@@ -13502,6 +13502,12 @@ static void bnxt_fw_echo_reply(struct bnxt *bp)
+ 	hwrm_req_send(bp, req);
+ }
+ 
++static void bnxt_ulp_restart(struct bnxt *bp)
++{
++	bnxt_ulp_stop(bp);
++	bnxt_ulp_start(bp, 0);
++}
++
+ static void bnxt_sp_task(struct work_struct *work)
+ {
+ 	struct bnxt *bp = container_of(work, struct bnxt, sp_task);
+@@ -13513,6 +13519,11 @@ static void bnxt_sp_task(struct work_struct *work)
+ 		return;
+ 	}
+ 
++	if (test_and_clear_bit(BNXT_RESTART_ULP_SP_EVENT, &bp->sp_event)) {
++		bnxt_ulp_restart(bp);
++		bnxt_reenable_sriov(bp);
++	}
++
+ 	if (test_and_clear_bit(BNXT_RX_MASK_SP_EVENT, &bp->sp_event))
+ 		bnxt_cfg_rx_mode(bp);
+ 
+@@ -13969,10 +13980,8 @@ static bool bnxt_fw_reset_timeout(struct bnxt *bp)
+ static void bnxt_fw_reset_abort(struct bnxt *bp, int rc)
+ {
+ 	clear_bit(BNXT_STATE_IN_FW_RESET, &bp->state);
+-	if (bp->fw_reset_state != BNXT_FW_RESET_STATE_POLL_VF) {
+-		bnxt_ulp_start(bp, rc);
++	if (bp->fw_reset_state != BNXT_FW_RESET_STATE_POLL_VF)
+ 		bnxt_dl_health_fw_status_update(bp, false);
+-	}
+ 	bp->fw_reset_state = 0;
+ 	dev_close(bp->dev);
+ }
+@@ -14003,7 +14012,7 @@ static void bnxt_fw_reset_task(struct work_struct *work)
+ 				bp->fw_reset_state = 0;
+ 				netdev_err(bp->dev, "Firmware reset aborted, bnxt_get_registered_vfs() returns %d\n",
+ 					   n);
+-				return;
++				goto ulp_start;
+ 			}
+ 			bnxt_queue_fw_reset_work(bp, HZ / 10);
+ 			return;
+@@ -14013,7 +14022,7 @@ static void bnxt_fw_reset_task(struct work_struct *work)
+ 		if (test_bit(BNXT_STATE_ABORT_ERR, &bp->state)) {
+ 			bnxt_fw_reset_abort(bp, rc);
+ 			rtnl_unlock();
+-			return;
++			goto ulp_start;
+ 		}
+ 		bnxt_fw_reset_close(bp);
+ 		if (bp->fw_cap & BNXT_FW_CAP_ERR_RECOVER_RELOAD) {
+@@ -14106,7 +14115,7 @@ static void bnxt_fw_reset_task(struct work_struct *work)
+ 			netdev_err(bp->dev, "bnxt_open() failed during FW reset\n");
+ 			bnxt_fw_reset_abort(bp, rc);
+ 			rtnl_unlock();
+-			return;
++			goto ulp_start;
+ 		}
+ 
+ 		if ((bp->fw_cap & BNXT_FW_CAP_ERROR_RECOVERY) &&
+@@ -14118,10 +14127,6 @@ static void bnxt_fw_reset_task(struct work_struct *work)
+ 		/* Make sure fw_reset_state is 0 before clearing the flag */
+ 		smp_mb__before_atomic();
+ 		clear_bit(BNXT_STATE_IN_FW_RESET, &bp->state);
+-		bnxt_ulp_start(bp, 0);
+-		bnxt_reenable_sriov(bp);
+-		bnxt_vf_reps_alloc(bp);
+-		bnxt_vf_reps_open(bp);
+ 		bnxt_ptp_reapply_pps(bp);
+ 		clear_bit(BNXT_STATE_FW_ACTIVATE, &bp->state);
+ 		if (test_and_clear_bit(BNXT_STATE_RECOVER, &bp->state)) {
+@@ -14129,6 +14134,12 @@ static void bnxt_fw_reset_task(struct work_struct *work)
+ 			bnxt_dl_health_fw_status_update(bp, true);
+ 		}
+ 		rtnl_unlock();
++		bnxt_ulp_start(bp, 0);
++		bnxt_reenable_sriov(bp);
++		rtnl_lock();
++		bnxt_vf_reps_alloc(bp);
++		bnxt_vf_reps_open(bp);
++		rtnl_unlock();
+ 		break;
+ 	}
+ 	return;
+@@ -14144,6 +14155,8 @@ static void bnxt_fw_reset_task(struct work_struct *work)
+ 	rtnl_lock();
+ 	bnxt_fw_reset_abort(bp, rc);
+ 	rtnl_unlock();
++ulp_start:
++	bnxt_ulp_start(bp, rc);
+ }
+ 
+ static int bnxt_init_board(struct pci_dev *pdev, struct net_device *dev)
+@@ -15530,8 +15543,9 @@ static int bnxt_suspend(struct device *device)
+ 	struct bnxt *bp = netdev_priv(dev);
  	int rc = 0;
  
- 	rtnl_lock();
-+	mutex_lock(&edev->en_dev_lock);
- 	if (!bp->irq_tbl) {
- 		rc = -ENODEV;
- 		goto exit;
-@@ -136,6 +137,7 @@ int bnxt_register_dev(struct bnxt_en_dev *edev,
- 	bnxt_fill_msix_vecs(bp, bp->edev->msix_entries);
- 	edev->flags |= BNXT_EN_FLAG_MSIX_REQUESTED;
- exit:
-+	mutex_unlock(&edev->en_dev_lock);
- 	rtnl_unlock();
+-	rtnl_lock();
+ 	bnxt_ulp_stop(bp);
++
++	rtnl_lock();
+ 	if (netif_running(dev)) {
+ 		netif_device_detach(dev);
+ 		rc = bnxt_close(dev);
+@@ -15586,10 +15600,10 @@ static int bnxt_resume(struct device *device)
+ 	}
+ 
+ resume_exit:
++	rtnl_unlock();
+ 	bnxt_ulp_start(bp, rc);
+ 	if (!rc)
+ 		bnxt_reenable_sriov(bp);
+-	rtnl_unlock();
  	return rc;
  }
-@@ -150,6 +152,7 @@ void bnxt_unregister_dev(struct bnxt_en_dev *edev)
  
- 	ulp = edev->ulp_tbl;
+@@ -15619,11 +15633,11 @@ static pci_ers_result_t bnxt_io_error_detected(struct pci_dev *pdev,
+ 
+ 	netdev_info(netdev, "PCI I/O error detected\n");
+ 
++	bnxt_ulp_stop(bp);
++
  	rtnl_lock();
-+	mutex_lock(&edev->en_dev_lock);
- 	if (ulp->msix_requested)
- 		edev->flags &= ~BNXT_EN_FLAG_MSIX_REQUESTED;
- 	edev->ulp_tbl->msix_requested = 0;
-@@ -165,6 +168,7 @@ void bnxt_unregister_dev(struct bnxt_en_dev *edev)
- 		msleep(100);
- 		i++;
- 	}
-+	mutex_unlock(&edev->en_dev_lock);
- 	rtnl_unlock();
- 	return;
- }
-@@ -223,6 +227,12 @@ void bnxt_ulp_stop(struct bnxt *bp)
- 	if (!edev)
- 		return;
+ 	netif_device_detach(netdev);
  
-+	mutex_lock(&edev->en_dev_lock);
-+	if (!bnxt_ulp_registered(edev)) {
-+		mutex_unlock(&edev->en_dev_lock);
-+		return;
-+	}
-+
- 	edev->flags |= BNXT_EN_FLAG_ULP_STOPPED;
- 	if (aux_priv) {
- 		struct auxiliary_device *adev;
-@@ -237,6 +247,7 @@ void bnxt_ulp_stop(struct bnxt *bp)
- 			adrv->suspend(adev, pm);
- 		}
- 	}
-+	mutex_unlock(&edev->en_dev_lock);
- }
- 
- void bnxt_ulp_start(struct bnxt *bp, int err)
-@@ -252,6 +263,12 @@ void bnxt_ulp_start(struct bnxt *bp, int err)
- 	if (err)
- 		return;
- 
-+	mutex_lock(&edev->en_dev_lock);
-+	if (!bnxt_ulp_registered(edev)) {
-+		mutex_unlock(&edev->en_dev_lock);
-+		return;
-+	}
-+
- 	if (edev->ulp_tbl->msix_requested)
- 		bnxt_fill_msix_vecs(bp, edev->msix_entries);
- 
-@@ -267,7 +284,7 @@ void bnxt_ulp_start(struct bnxt *bp, int err)
- 			adrv->resume(adev);
- 		}
- 	}
+-	bnxt_ulp_stop(bp);
 -
-+	mutex_unlock(&edev->en_dev_lock);
+ 	if (test_and_set_bit(BNXT_STATE_IN_FW_RESET, &bp->state)) {
+ 		netdev_err(bp->dev, "Firmware reset already in progress\n");
+ 		abort = true;
+@@ -15759,13 +15773,13 @@ static void bnxt_io_resume(struct pci_dev *pdev)
+ 	if (!err && netif_running(netdev))
+ 		err = bnxt_open(netdev);
+ 
+-	bnxt_ulp_start(bp, err);
+-	if (!err) {
+-		bnxt_reenable_sriov(bp);
++	if (!err)
+ 		netif_device_attach(netdev);
+-	}
+ 
+ 	rtnl_unlock();
++	bnxt_ulp_start(bp, err);
++	if (!err)
++		bnxt_reenable_sriov(bp);
  }
  
- void bnxt_ulp_irq_stop(struct bnxt *bp)
-@@ -383,6 +400,7 @@ static void bnxt_set_edev_info(struct bnxt_en_dev *edev, struct bnxt *bp)
- 	edev->l2_db_size = bp->db_size;
- 	edev->l2_db_size_nc = bp->db_size;
- 	edev->l2_db_offset = bp->db_offset;
-+	mutex_init(&edev->en_dev_lock);
+ static const struct pci_error_handlers bnxt_err_handler = {
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+index 003c00b229f2..c62bdbb7249f 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+@@ -2440,6 +2440,7 @@ struct bnxt {
+ #define BNXT_LINK_CFG_CHANGE_SP_EVENT	21
+ #define BNXT_THERMAL_THRESHOLD_SP_EVENT	22
+ #define BNXT_FW_ECHO_REQUEST_SP_EVENT	23
++#define BNXT_RESTART_ULP_SP_EVENT	24
  
- 	if (bp->flags & BNXT_FLAG_ROCEV1_CAP)
- 		edev->flags |= BNXT_EN_FLAG_ROCEV1_CAP;
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.h b/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.h
-index b86baf901a5d..4eafe6ec0abf 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.h
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.h
-@@ -88,6 +88,9 @@ struct bnxt_en_dev {
+ 	struct delayed_work	fw_reset_task;
+ 	int			fw_reset_state;
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.c
+index d9ea6fa23923..4cb0fabf977e 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.c
+@@ -437,18 +437,20 @@ static int bnxt_dl_reload_down(struct devlink *dl, bool netns_change,
  
- 	u16				ulp_num_msix_vec;
- 	u16				ulp_num_ctxs;
-+
-+					/* serialize ulp operations */
-+	struct mutex			en_dev_lock;
- };
+ 	switch (action) {
+ 	case DEVLINK_RELOAD_ACTION_DRIVER_REINIT: {
++		bnxt_ulp_stop(bp);
+ 		rtnl_lock();
+ 		if (bnxt_sriov_cfg(bp)) {
+ 			NL_SET_ERR_MSG_MOD(extack,
+ 					   "reload is unsupported while VFs are allocated or being configured");
+ 			rtnl_unlock();
++			bnxt_ulp_start(bp, 0);
+ 			return -EOPNOTSUPP;
+ 		}
+ 		if (bp->dev->reg_state == NETREG_UNREGISTERED) {
+ 			rtnl_unlock();
++			bnxt_ulp_start(bp, 0);
+ 			return -ENODEV;
+ 		}
+-		bnxt_ulp_stop(bp);
+ 		if (netif_running(bp->dev))
+ 			bnxt_close_nic(bp, true, true);
+ 		bnxt_vf_reps_free(bp);
+@@ -516,7 +518,6 @@ static int bnxt_dl_reload_up(struct devlink *dl, enum devlink_reload_action acti
+ 		bnxt_vf_reps_alloc(bp);
+ 		if (netif_running(bp->dev))
+ 			rc = bnxt_open_nic(bp, true, true);
+-		bnxt_ulp_start(bp, rc);
+ 		if (!rc) {
+ 			bnxt_reenable_sriov(bp);
+ 			bnxt_ptp_reapply_pps(bp);
+@@ -570,6 +571,8 @@ static int bnxt_dl_reload_up(struct devlink *dl, enum devlink_reload_action acti
+ 		dev_close(bp->dev);
+ 	}
+ 	rtnl_unlock();
++	if (action == DEVLINK_RELOAD_ACTION_DRIVER_REINIT)
++		bnxt_ulp_start(bp, rc);
+ 	return rc;
+ }
  
- static inline bool bnxt_ulp_registered(struct bnxt_en_dev *edev)
 -- 
 2.30.1
 
 
---0000000000006f65ba0617582393
+--00000000000088041406175823ba
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -285,14 +452,14 @@ hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
 E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
 aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
 EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIC2VPtRnp8ip0KQs4uhvzX3lQHUBJnQd
-lRYF4xCTlKwQMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDQz
-MDIyNDYxOVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIJxrOLnYQLOucufi2TQmLVbd9gUlVUG6
+j74tQGGv0yLjMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDQz
+MDIyNDYyMFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
 SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQAPniO+EjzmOCBPTdUPm3ZMgxOU5BQ7EzVht3jPf/IxPDhINsSI
-cLVQO96tngSIGITgUa3AKdA2Kk7nKb8SAhsrpQYJndsum49XNMym7dcdoRntvkdc8v7wZygw9of8
-qmCAr/NwLI5CASOqebGcjy8EsjbRXPyBnsuRd4EAN5i1WcfYcp7inVN2yWUt+L86Xb2jpg13PR6y
-4uVy+SLHnGCnO/mIrz+bEv0atF0QZ+xPz0RVLXPkjPW5sRh+Mg6kq7omKPaeICTp89eS1WxMc0XU
-qglAxvnd56sPzhwwZkGpXq+kHYZgyF75ulaajuiTaIkE2GzKPRqQAPNewE46kAVx
---0000000000006f65ba0617582393--
+ATANBgkqhkiG9w0BAQEFAASCAQAkQ6qJkDgFq1ysNaQMNb+ooRohJk4HdfWgWIlje4dJAIDPSiGt
+tdQ/AnIazUOrlVsE+DSp87iFy3jzLh3IvH0G1BeBySvWUZaVU+h2P4MXtePPtIvrd8LjJfQ+HRd/
+jWsOyQ3hPYYsEMpawMUiJJMk5z3FgCmy8E10QvZ2PQseN3TRv9U91kMPUb9j2fFSG/fPX8O5f5Dr
++ujVPJYA1vjpNZ4XPcBdCeckWQtRe4CgzeJtRrhO+bwTk8+0eequVrZY9B53SwzF9l9dFMmwwHy+
+SyQx+xdBGKXN+f8b6BY0MHn5PaRkTn8xBsbrPjph1PBGihJDVf3pDbQxCQ8N7JQr
+--00000000000088041406175823ba--
 
