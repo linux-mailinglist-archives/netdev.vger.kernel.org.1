@@ -1,98 +1,122 @@
-Return-Path: <netdev+bounces-92429-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92430-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E03D48B7486
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 13:31:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 512BE8B74A2
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 13:40:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1DF681C23437
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 11:31:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 181EE2827A0
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 11:40:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B817C12D769;
-	Tue, 30 Apr 2024 11:31:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2471F130E35;
+	Tue, 30 Apr 2024 11:40:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ovy3tA4L"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qVFUyQE/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CFC212D1FC
-	for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 11:31:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E636A1304BA;
+	Tue, 30 Apr 2024 11:40:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714476699; cv=none; b=ZEa0ZrYMAz50fxQLEgzUqqMzgKmQh5O9EhPWfMbuvSU2OJlRA76qJ5IvwKwpL2u8vmDljGtWxduColEGBXrmKZIiANLwAK9qfNCRcB2s5KrtW4LmZChTHzdwltXYYP6pyRS0UOaCRI97vmPAzOV/fxbADBqqWiRD+yt1uEghkjw=
+	t=1714477234; cv=none; b=Y/w7bkb1brh7whZhLxzF+9z/lRdqnNVmRoI+fPYAlc8m1WU86SYp/r+uNJxhPeg/Qq/zdB/z28bhrkfulVfV4MsKfJnAOtahlYJr8lJ2Pytu8/SQSwenr73OEjNgB2ZbUIc6hR+nu8iw1Kku/p/RzPTTZKfiITQWyYH+VMVskyU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714476699; c=relaxed/simple;
-	bh=yUIj4+FkYMEG1DEHNAUghGWkLxVUu3cILbv8A0YQeVU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=uUh8g5XKK4tS3+IYuSzKDoa3Io0ORJ7p5f9gVep2jkhakVeoUBR84SbIbVMIZjiG1CK6xvZBORgcKktt8MIUezHQNFLOj19X3hh7oLQCgC0IQ/IBPWa0/ZOdvJHcsqqDEG2in1y0Rp5bHSTK7Z4xg6xpuC/NBWVnbD+3JzV/WEo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Ovy3tA4L; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-41b48daaaf4so46645e9.0
-        for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 04:31:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1714476696; x=1715081496; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yUIj4+FkYMEG1DEHNAUghGWkLxVUu3cILbv8A0YQeVU=;
-        b=Ovy3tA4L9+QP3L4K3+g2c/RtCV3QqZ9TPLFsooCAeZYNTQmuSJBiyfIWdxv9pBEFhP
-         cmOkpzrBvC88mY6L5vishllQvGubhs8kv6XGRKTCFxmz/ZWIFOc7RNfRzt2gJLG6oFZN
-         qNADq4exrCvSIVFeKY5XbRegPmQjdeIUJlyfn+h7zzyHVq4XOgmXWnvr6haMVa/JI5gj
-         TTue32WNhTEKK6r/yQGYkrz4Eor5dC2UcSzZ1kydDvYtohEQOsYMTxLvzSDxJyLDuJn6
-         8ih5KndArM896GpGQsycCwC5+Xl2puaXFp7MU5dBGpAmTYc7kqhGJ2jLpDXod98vHJzR
-         VvQQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714476696; x=1715081496;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yUIj4+FkYMEG1DEHNAUghGWkLxVUu3cILbv8A0YQeVU=;
-        b=UwHVuxK8xcFosQKk+F5pgMVgUmEZBzjuB5F9uwSqSXVArbTXhORxl6qrDfid5hgZz5
-         nZT2Is08wgE2RdaoRBKkWWpOraGIQDBlGahXL8ficIyEHS4beLOnAcLmUTe2c4oj64Hw
-         RVqgEjitNO2cPkJUbELHZrkk3fCLU8qMCI3fMfZOiZYnQbVvEPmaLhHrPbHp5r6hDwBV
-         GPQMI+bRpvdSiuJIapdeoWSWgKIIEitTe6hrB56OWqWEh0d+nTXWAbGun4qgJBDZw7Lg
-         H2orW0OPKH47h5gJqGBVEbMTEWS2aTJ9SZYYXJX8K+CbrfbkxHFhcxDYysC1JgXLh+Vu
-         8SAw==
-X-Gm-Message-State: AOJu0YwHImxjWKomuAsR9jJ48tJ73EfiN8iARVUwm1TRyp/AlZSBAkjC
-	JyLGjF/dMzt1JfYlOPgjRO1BKUQqlThvHAFMHsc9R9MZ4RFkWijsU4UzACscYxUhglD9bQmiFRp
-	laqh3pd8DI8oeF9PKuzS5Zgsmm4qjlhnBVgL7
-X-Google-Smtp-Source: AGHT+IEZq+my3yJo4Codkqnr73ObIgvGdkvuSMgijj2W/0iEJpAGKjWPpu49gTHc+sAbFKv+yXyQLhkOgeUQcBKjn4s=
-X-Received: by 2002:a05:600c:4754:b0:419:f1b4:b426 with SMTP id
- w20-20020a05600c475400b00419f1b4b426mr171453wmo.2.1714476696227; Tue, 30 Apr
- 2024 04:31:36 -0700 (PDT)
+	s=arc-20240116; t=1714477234; c=relaxed/simple;
+	bh=wGhItbg8hWpo6Y3Z2EUM1pYHhakVAaxuom4u9x7t8KI=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=kDYBJKHEahojEw8WBb2Q+9+Uis71z7hlHmVRpzuyzbM5fHKiAA9PpO3Esq7pyQqwGXf//rPZg4TfCbcJCxthCCGM1T4NNDMcFKHVu5ZyuBDMXgG4wIxEMcXNK5A946RUubg370/fgtRP8c9vg0AOn6Prqx11qzyE6MBxf0432Jc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qVFUyQE/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 5FC4BC4AF18;
+	Tue, 30 Apr 2024 11:40:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714477233;
+	bh=wGhItbg8hWpo6Y3Z2EUM1pYHhakVAaxuom4u9x7t8KI=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=qVFUyQE/3JznSZlQI0nbEO3LrrIlBeZe29GwHTM8YX1OLe7EeXEZSekzjd6a9pOD0
+	 VQqCkugKMBc6ot7zsGdeZAMIqjdZvznS9r6CF6atMybWCz84MrHuKNxsX+Nc+w3Dsr
+	 EyYna3ZXzQqld+vxsN2EpqFUvwZ7NU5KJg9ZjztQQyOYzTAKcf/5kLy6xKWH8ZX3rF
+	 mOqoFMpV5sonHzM0fpuZoXOKZ8oBUFG0iqvPhC+lpNusGAU6LTIiwkdwCxZd6RRcPV
+	 oIBRmoDNOIyUQdToxizmr89E82ZLXWw7Tb3KNLrDj+tSWiqYiHLBgFSg0ncFygmBjq
+	 XMggzAF4KN/ag==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4D60FC43440;
+	Tue, 30 Apr 2024 11:40:33 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240427182305.24461-1-nbd@nbd.name> <20240427182305.24461-3-nbd@nbd.name>
-In-Reply-To: <20240427182305.24461-3-nbd@nbd.name>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 30 Apr 2024 13:31:25 +0200
-Message-ID: <CANn89i+-uWYYhxjnsqtxhDD_kjoiMBo+PO-5ZAtYVdh=njje-w@mail.gmail.com>
-Subject: Re: [PATCH v4 net-next v4 2/6] net: add support for segmenting TCP
- fraglist GSO packets
-To: Felix Fietkau <nbd@nbd.name>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	willemdebruijn.kernel@gmail.com, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v7 00/11] net/smc: SMC intra-OS shortcut with
+ loopback-ism
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171447723331.10444.16965496844638818442.git-patchwork-notify@kernel.org>
+Date: Tue, 30 Apr 2024 11:40:33 +0000
+References: <20240428060738.60843-1-guwen@linux.alibaba.com>
+In-Reply-To: <20240428060738.60843-1-guwen@linux.alibaba.com>
+To: Wen Gu <guwen@linux.alibaba.com>
+Cc: wintera@linux.ibm.com, twinkler@linux.ibm.com, hca@linux.ibm.com,
+ gor@linux.ibm.com, agordeev@linux.ibm.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ wenjia@linux.ibm.com, jaka@linux.ibm.com, borntraeger@linux.ibm.com,
+ svens@linux.ibm.com, alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
+ linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
+ netdev@vger.kernel.org
 
-On Sat, Apr 27, 2024 at 8:23=E2=80=AFPM Felix Fietkau <nbd@nbd.name> wrote:
->
-> Preparation for adding TCP fraglist GRO support. It expects packets to be
-> combined in a similar way as UDP fraglist GSO packets.
-> For IPv4 packets, NAT is handled in the same way as UDP fraglist GSO.
->
-> Signed-off-by: Felix Fietkau <nbd@nbd.name>
-> ---
->
+Hello:
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+This series was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Sun, 28 Apr 2024 14:07:27 +0800 you wrote:
+> This patch set acts as the second part of the new version of [1] (The first
+> part can be referred from [2]), the updated things of this version are listed
+> at the end.
+> 
+> - Background
+> 
+> SMC-D is now used in IBM z with ISM function to optimize network interconnect
+> for intra-CPC communications. Inspired by this, we try to make SMC-D available
+> on the non-s390 architecture through a software-implemented Emulated-ISM device,
+> that is the loopback-ism device here, to accelerate inter-process or
+> inter-containers communication within the same OS instance.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,v7,01/11] net/smc: decouple ism_client from SMC-D DMB registration
+    https://git.kernel.org/netdev/net-next/c/784c46f5467c
+  - [net-next,v7,02/11] net/smc: introduce loopback-ism for SMC intra-OS shortcut
+    https://git.kernel.org/netdev/net-next/c/46ac64419ded
+  - [net-next,v7,03/11] net/smc: implement ID-related operations of loopback-ism
+    https://git.kernel.org/netdev/net-next/c/45783ee85bf3
+  - [net-next,v7,04/11] net/smc: implement DMB-related operations of loopback-ism
+    https://git.kernel.org/netdev/net-next/c/f7a22071dbf3
+  - [net-next,v7,05/11] net/smc: mark optional smcd_ops and check for support when called
+    https://git.kernel.org/netdev/net-next/c/d1d8d0b6c7c6
+  - [net-next,v7,06/11] net/smc: ignore loopback-ism when dumping SMC-D devices
+    https://git.kernel.org/netdev/net-next/c/c8df2d449f64
+  - [net-next,v7,07/11] net/smc: register loopback-ism into SMC-D device list
+    https://git.kernel.org/netdev/net-next/c/04791343d858
+  - [net-next,v7,08/11] net/smc: add operations to merge sndbuf with peer DMB
+    https://git.kernel.org/netdev/net-next/c/439888826858
+  - [net-next,v7,09/11] net/smc: {at|de}tach sndbuf to peer DMB if supported
+    https://git.kernel.org/netdev/net-next/c/ae2be35cbed2
+  - [net-next,v7,10/11] net/smc: adapt cursor update when sndbuf and peer DMB are merged
+    https://git.kernel.org/netdev/net-next/c/cc0ab806fc52
+  - [net-next,v7,11/11] net/smc: implement DMB-merged operations of loopback-ism
+    https://git.kernel.org/netdev/net-next/c/c3a910f2380f
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
