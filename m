@@ -1,59 +1,71 @@
-Return-Path: <netdev+bounces-92500-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92502-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D17508B792A
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 16:25:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1BA098B7937
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 16:26:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8BAE12812DB
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 14:25:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C6AD31F21CD2
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 14:25:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 238201527AA;
-	Tue, 30 Apr 2024 14:10:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E51931BED6F;
+	Tue, 30 Apr 2024 14:14:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aSACFgJC"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="fisz1Kdp"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE8D41527A8;
-	Tue, 30 Apr 2024 14:10:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CC9B17A93D;
+	Tue, 30 Apr 2024 14:14:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714486245; cv=none; b=dizTcLNXf+RtLwVD/uwLd9ZtMtFKp2WTwru1BhFxrWvWu/gmVwNuYsn8aThuWspVGJnb0uJupsiR++SWzQU/4fuPofI2SJ+TrwnHbVIX1BYuC9vtGcEW/CntVgTcSq0yxVEK7DU2/sJWgEMH40/Fc+dPTLj06ILX3YUPxgfnVxE=
+	t=1714486459; cv=none; b=dJkGKqm31TzwVljHUmDZeDrpbzTAAr1Ovy1UbffdSPn485SvEyy7jnnfmmbBxncAChHMwk+1xpwMKNHDimuYXhk+FL1/bNwoZvbh5jlfS8wXJ0jmbTQm8Ykl4a02ar6cm4qdv8GYbbmErBEJu0TyuN/dtVF1T8MvdrbaNBpYRiM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714486245; c=relaxed/simple;
-	bh=DFmZGaD+ssIlT/B33ege35Nl6ftG7eXESOlm0ucRd2w=;
+	s=arc-20240116; t=1714486459; c=relaxed/simple;
+	bh=ENdoDuLwfsRKNzcTx8bsgX96EEjDRozpgGFsMolVNPs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nBr1q76jqfm7q1ynBOcWKPhRsSITQx3U5sCUyht1NbEN5JCiIX4bOPrpynXll6H6ffDHdgyq1co58KF3R99a04I8SU6V1cZ0k5t5FE/wRDdDhsgk34D66JYenfttkpR3CcpQbKUTuGV79UywplM1XqkjpBzZCAmc93+p4RDgZEI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aSACFgJC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C062BC4AF18;
-	Tue, 30 Apr 2024 14:10:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714486244;
-	bh=DFmZGaD+ssIlT/B33ege35Nl6ftG7eXESOlm0ucRd2w=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=aSACFgJCQTsoJH/MwklGL5d7BwvIk3JQvTZDjrN0140y44hhz89HBuA3VIZDS5Mxc
-	 DvBjVPJgfcsB6bdcfVi0ZplDPtKc3skOo1Dec3otryzUn8rV8jCHj+89IdFSloUjt1
-	 sHkPEng63oLz266ELuP4YDqKvgbiW3B3Hdpb0T60+RTKVGrwjlgNhC2XuS2Sl8XO2k
-	 JgyOWWhp5pax4oP4TpKTwY8Ht2lVvokqjd0bPcSDYzgQPuJ01PT2zcirBkFdeOxs8C
-	 sJBB1Gup943xkk+kKygTScyvi8VN2IluNEmeThT0DZmRQBZ93b2vcCCD5n0JoxLg/M
-	 e7ljDuWXHqRxA==
-Date: Tue, 30 Apr 2024 17:10:39 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>,
-	Jakub Kicinski <kuba@kernel.org>
-Cc: Breno Leitao <leitao@debian.org>, Jason Gunthorpe <jgg@ziepe.ca>,
-	"open list:HFI1 DRIVER" <linux-rdma@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>,
-	linux-netdev <netdev@vger.kernel.org>
-Subject: Re: [PATCH net-next] IB/hfi1: allocate dummy net_device dynamically
-Message-ID: <20240430141039.GH100414@unreal>
-References: <20240426085606.1801741-1-leitao@debian.org>
- <20240430125047.GE100414@unreal>
- <49973089-1e5e-48a2-9616-09cf8b8d5a7f@cornelisnetworks.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=RfjCBTrx6j6Bd2YVM7hUgyYfSogsg3ayxX+OJojkLcS5D+bChc//AiKTXohj18/Rd5Q+DFS03WQ2Fb3xXsIz7UbWNpnWCaWXiuVihvJn0jkHRrVfpXVaoT7QXm6K4RE4Y9vZQ4bQo4bmM6Lasiyalhm7nzu5CF2UOz2QtdVsFN8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=fisz1Kdp; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=yJ1XxJMQ5M4P8jDVlymHQ15RBEASqivIdtexJWW2a98=; b=fisz1KdpdOh41mp9RFPSz1o7tW
+	7gW0hNiQhLW0rJoOyJ0O2qTek0DJKhbGZrwXJp15ugMa2otOdd+XbTgStjNXNW4P+dUvcZv3upBVn
+	+GwP7FxkNS/9ytEzWezlQ1zSqMa12f1ggO0PWECAVjTsMZ5U8fkqxUejwVAnqvV+utss=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1s1oF9-00ELdZ-9N; Tue, 30 Apr 2024 16:14:03 +0200
+Date: Tue, 30 Apr 2024 16:14:03 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Parthiban.Veerasooran@microchip.com
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, horms@kernel.org, saeedm@nvidia.com,
+	anthony.l.nguyen@intel.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, corbet@lwn.net,
+	linux-doc@vger.kernel.org, robh+dt@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+	devicetree@vger.kernel.org, Horatiu.Vultur@microchip.com,
+	ruanjinjie@huawei.com, Steen.Hegelund@microchip.com,
+	vladimir.oltean@nxp.com, UNGLinuxDriver@microchip.com,
+	Thorsten.Kummermehr@microchip.com, Pier.Beruto@onsemi.com,
+	Selvamani.Rajagopal@onsemi.com, Nicolas.Ferre@microchip.com,
+	benjamin.bigler@bernformulastudent.ch,
+	ramon.nordin.rodriguez@ferroamp.se
+Subject: Re: [PATCH net-next v4 13/12] net: lan865x: optional hardware reset
+Message-ID: <a7c43359-5d5a-47a9-a9b5-819e164457d4@lunn.ch>
+References: <20240418125648.372526-1-Parthiban.Veerasooran@microchip.com>
+ <Zi68sDje4wfgftyZ@builder>
+ <dd9da345-e056-4f34-8e39-6901bf9c1636@microchip.com>
+ <Zi94jdVg8a5MaB3E@builder>
+ <eaa4eb3e-d82a-4b52-a375-1fc84be7225a@lunn.ch>
+ <a3719443-153b-49d5-b039-fa0a7928de28@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,62 +74,23 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <49973089-1e5e-48a2-9616-09cf8b8d5a7f@cornelisnetworks.com>
+In-Reply-To: <a3719443-153b-49d5-b039-fa0a7928de28@microchip.com>
 
-On Tue, Apr 30, 2024 at 10:03:49AM -0400, Dennis Dalessandro wrote:
-> On 4/30/24 8:50 AM, Leon Romanovsky wrote:
-> > On Fri, Apr 26, 2024 at 01:56:05AM -0700, Breno Leitao wrote:
-> >> Embedding net_device into structures prohibits the usage of flexible
-> >> arrays in the net_device structure. For more details, see the discussion
-> >> at [1].
-> >>
-> >> Un-embed the net_device from struct hfi1_netdev_rx by converting it
-> >> into a pointer. Then use the leverage alloc_netdev() to allocate the
-> >> net_device object at hfi1_alloc_rx().
-> >>
-> >> [1] https://lore.kernel.org/all/20240229225910.79e224cf@kernel.org/
-> >>
-> >> Acked-by: Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>
-> >> Signed-off-by: Breno Leitao <leitao@debian.org>
-> >> ---
-> >> Changelog
-> >>
-> >> v5:
-> >> 	* Basically replaced the old alloc_netdev() by the new helper
-> >> 	  alloc_netdev_dummy().
-> >> v4:
-> >> 	* Fix the changelog format
-> >> v3:
-> >> 	* Re-worded the comment, by removing the first paragraph.
-> >> v2:
-> >> 	* Free struct hfi1_netdev_rx allocation if alloc_netdev() fails
-> >> 	* Pass zero as the private size for alloc_netdev().
-> >> 	* Remove wrong reference for iwl in the comments
-> >> ---
-> >>
-> >>  drivers/infiniband/hw/hfi1/netdev.h    | 2 +-
-> >>  drivers/infiniband/hw/hfi1/netdev_rx.c | 9 +++++++--
-> >>  2 files changed, 8 insertions(+), 3 deletions(-)
-> > 
-> > Dennis,
-> > 
-> > Do you plan to send anything to rdma-next which can potentially create
-> > conflicts with netdev in this cycle?
-> > 
-> > If not, it will be safe to apply this patch directly to net-next.
-> > 
-> > Thanks
-> 
-> Nothing right now. Should be safe to sent to net-next.
+> In the spec, external RESET pin is mentioned as "if implemented", in my 
+> understanding it is MAC-PHY vendors choice of implementing it where 
+> Microchip is implemented it. Using this reset, can be a application 
+> requirement/decision. It can be controlled from an external application 
+> where it is not needed SPI to operate.
 
-Jakub, can you please take this patch?
+Since it is optional, controlling the reset pin is clearly not
+something for the TC6 core.
 
-> 
-> FYI, since I talked about it publicly at the OFA Workshop recently. We will be
-> starting the upstream of support for our new HW, soon.
+However, i doubt having an external application controlling the reset
+is a good idea. You don't want to reset during operation. So to me,
+this reset should be controlled by the driver. I tend to agree, that
+actually performing a reset is optional, but i would expect the driver
+to ensure the device is taken out of reset during probe, if the power
+on default of the board is to hold it in reset.
 
-Great, thanks
-
-> 
-> -Denny
+   Andrew
 
