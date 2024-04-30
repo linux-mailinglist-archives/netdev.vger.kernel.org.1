@@ -1,91 +1,140 @@
-Return-Path: <netdev+bounces-92322-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92323-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6460A8B69A0
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 06:58:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D4668B69AC
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 07:01:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 95BA81C21B10
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 04:58:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 65DD11C21AF0
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 05:01:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB29A1401E;
-	Tue, 30 Apr 2024 04:58:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76D7C14AA7;
+	Tue, 30 Apr 2024 05:01:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="GvqvmYBT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LTwGL2cB"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06AD6125BA;
-	Tue, 30 Apr 2024 04:58:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C9C114A89;
+	Tue, 30 Apr 2024 05:01:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714453100; cv=none; b=o4x05HsiZTx0XEVq654DZUi6CMVfkmhO6DTHT/FbZF07zrkVPoFHpl73tCGOTnRfbznhBz9AZ1vwr/yX687UBedI5Rp060SElw4+MtAFFjfUR5ekzFjZlugQ5fuiuH7MNykmk/JdEPym57mwUpnUwvywWLGZIml8pP2iFvnOmpY=
+	t=1714453299; cv=none; b=gV4Z0elIASLrrICjPPmDeR0kBaXtdjeqbz/cnj3/0V74cRGmjd5sMQ4PtMYq5iPdJkWbhn4mzf/WX9xcqituDcVV7Vj68zrsE5d6NavvrMK9kf7Ef3Yyr8gEbekALfL9fKuF6ul7TeVFQiFoGQyAJNFzB9YAiQGJlWzw98bldMQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714453100; c=relaxed/simple;
-	bh=FxARK+Ac1zGzaPGYkJ1m/SwB3s0XeVwOgtFDsG9w8NQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=JdBkZslRQVF8E2k1NQJ9Xrl/tLpaub5jNBgHkNfogsOQChMfxxJnLgM7nzP5t7HEoKqjsrAFSfyg5Qom4y86+cE3lIkgZ2WP/Lhqbf8yChlJwYHfEYmQtHYwfo8TzhZvgy7RHNx1ohGISJuOdmcR18HRHIACa9Ywp7CkrDUzC5k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com; spf=pass smtp.mailfrom=arinc9.com; dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b=GvqvmYBT; arc=none smtp.client-ip=217.70.183.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arinc9.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 0C189240002;
-	Tue, 30 Apr 2024 04:58:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
-	t=1714453095;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FxARK+Ac1zGzaPGYkJ1m/SwB3s0XeVwOgtFDsG9w8NQ=;
-	b=GvqvmYBTMir6yilmStEchowgXWLuj9LMkK0Iegexk6xEuqA/fTZrDaF9sc6ox/iy88ofS1
-	VeiY3TWT7VwSe0yIpNZrAryXpqBSGu4LpGjYjKjWi5e92jReF5OWMflTn0GMF0I2yVJ0pV
-	hWyxbhqP7Qte/5DmFp3NPvMwBe24f4Vx4JrMEKPxO2n3vPgwHn63UnmaY511Q3OV7T/990
-	K6VXaKbbpeOMUNnGjfuuooSaLfFfV68W62qT+7An4iCTrkL1vDAPMfl3NgUgzH8xj7dC+5
-	ARtBmgiKmlgl229n0IU8wHbfyBSxqTvH9A27v7E861JDg+wNAzkw5viozmMN/Q==
-Message-ID: <ded0ee71-dfa5-497e-a579-c212185f23ba@arinc9.com>
-Date: Tue, 30 Apr 2024 07:58:08 +0300
+	s=arc-20240116; t=1714453299; c=relaxed/simple;
+	bh=GGkybB3RbZ4yacytPZCe3ceKcaWca6ygWTw/PJtmpsk=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=QRWD6k4Qg1t5nZj6oj2xdwWDCGHQWHG2xj0lkYcEMm3dMkvPpLbCIOptpZBJtSq06TMxRjVJhgVJ9ATDTIYGKwCHJTx3JTxspI+YkxLsXsfnz9jNxMyQ/+CO3xzRjTuKg0mGP3fl1Q1xznm/8cenWMDUOrv/p1Wlg1XZ8s01edY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LTwGL2cB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 1A3AEC2BBFC;
+	Tue, 30 Apr 2024 05:01:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714453299;
+	bh=GGkybB3RbZ4yacytPZCe3ceKcaWca6ygWTw/PJtmpsk=;
+	h=From:Date:Subject:To:Cc:Reply-To:From;
+	b=LTwGL2cBtvmG8vpW/5yPEkA2A4EWbBIHkpxGRp6NhmQcwKx6T+Q4Gt/MKTUdGZ6pp
+	 FHxkNOtF/KeqTZc814r9H7gtR+6rzRBCcQfWYl2TIdj+1edX/UrwUARQa8CQYwWK3V
+	 jqfD9pCOCm+hptOHs6o0+j5FaW5TtN6QJTG/1GpftEfJkQYpsp/jEL28MY35u99DBK
+	 yZErlS77MlNQEMScOR7McNtMj0pYnTvgrZLefdORzeWQhX6REODGKFL2xoSWjtg9jw
+	 QeQUp07wKwtuwHpKI07IBsFwIsclZYD3/oXrjBSSZmvwHCCvAYT+PXRiH0moLzHERn
+	 aa8XczXBSlBVw==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04CA2C25B10;
+	Tue, 30 Apr 2024 05:01:39 +0000 (UTC)
+From: =?utf-8?q?Ar=C4=B1n=C3=A7_=C3=9CNAL_via_B4_Relay?= <devnull+arinc.unal.arinc9.com@kernel.org>
+Date: Tue, 30 Apr 2024 08:01:33 +0300
+Subject: [PATCH net-next v2] net: dsa: mt7530: detect PHY muxing when PHY
+ is defined on switch MDIO bus
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: dsa: mt7530: fix impossible MDIO address and
- issue warning
-To: Daniel Golle <daniel@makrotopia.org>, Felix Fietkau <nbd@nbd.name>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, DENG Qingfang <dqfext@gmail.com>,
- Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
- Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean
- <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Landen Chao <Landen.Chao@mediatek.com>, devicetree@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
-References: <e615351aefba25e990215845e4812e6cb8153b28.1714433716.git.daniel@makrotopia.org>
-Content-Language: en-US
-From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-In-Reply-To: <e615351aefba25e990215845e4812e6cb8153b28.1714433716.git.daniel@makrotopia.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-X-GND-Sasl: arinc.unal@arinc9.com
+Message-Id: <20240430-b4-for-netnext-mt7530-use-switch-mdio-bus-for-phy-muxing-v2-1-9104d886d0db@arinc9.com>
+X-B4-Tracking: v=1; b=H4sIACx7MGYC/6WOSw6DMBBDr1LNulNBIHy66j0qFhAGmAUJSgIFI
+ e7eNFeovLJsPfsER5bJwfN2gqWNHRsdjLjfQE2tHgm5Dx5EIvIkFzV2OQ7Goiavafc4+1JmCa6
+ O0H3Yqwnnng12q4u1ZTpwXnfWI8qqEEWdlamSEgJ+sTTwHqffEHD440ETkomdN/aIn7Y05v/Pb
+ ykGDWUp6yqjVMpXa1mr+qHMDM11XV8dryM7CwEAAA==
+To: Daniel Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>, 
+ Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>, 
+ Florian Fainelli <f.fainelli@gmail.com>, 
+ Vladimir Oltean <olteanv@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Matthias Brugger <matthias.bgg@gmail.com>, 
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Cc: Bartel Eerdekens <bartel.eerdekens@constell8.be>, 
+ mithat.guner@xeront.com, erkin.bozoglu@xeront.com, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+ linux-mediatek@lists.infradead.org, 
+ =?utf-8?q?Ar=C4=B1n=C3=A7_=C3=9CNAL?= <arinc.unal@arinc9.com>
+X-Mailer: b4 0.13.0
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1714453297; l=1949;
+ i=arinc.unal@arinc9.com; s=arinc9-PC; h=from:subject:message-id;
+ bh=c3IRARdnxa6x5otHszH4xrnla2RxJAal1114ej/d2wE=;
+ b=FL4WEHh4zYu1gBE7wbaN+X2OMCOIMJVsYBkXurHM0IC3CnI6XfpKE1V5QLUSXby75WZfvQ0se
+ lrMQos/eOAaCNbkyxUkmwb3opbC915iywMECA0lv/g0IAo6snRYzMae
+X-Developer-Key: i=arinc.unal@arinc9.com; a=ed25519;
+ pk=Bd1s2kQtNfZAWyeLHg39jaWBDqt8Ud1WJXLFh7gxl20=
+X-Endpoint-Received: by B4 Relay for arinc.unal@arinc9.com/arinc9-PC with
+ auth_id=158
+X-Original-From: =?utf-8?q?Ar=C4=B1n=C3=A7_=C3=9CNAL?= <arinc.unal@arinc9.com>
+Reply-To: arinc.unal@arinc9.com
 
-On 4/30/24 02:45, Daniel Golle wrote:
-> The MDIO address of the MT7530 and MT7531 switch ICs can be configured
-> using bootstrap pins. However, there are only 4 possible options for the
-> switch itself: 7, 15, 23 and 31 (ie. only 3 and 4 can be configured, bit
-> 0~2 are always 111). Practically all boards known as of today use the
-> default setting which is to have the switch respond to address 31, while
-> the built-in switch PHYs respond to address 0~4 in this case.
+From: Arınç ÜNAL <arinc.unal@arinc9.com>
 
-I'm not aware of the MT7531 switch having bootstrap pins to configure the
-PHY address. Are you sure this is the case?
+Currently, the MT7530 DSA subdriver configures the MT7530 switch to provide
+direct access to switch PHYs, meaning, the switch PHYs listen on the MDIO
+bus the switch listens on. The PHY muxing feature makes use of this.
 
-Arınç
+This is problematic as the PHY may be attached before the switch is
+initialised, in which case, the PHY will fail to be attached.
+
+Since commit 91374ba537bd ("net: dsa: mt7530: support OF-based registration
+of switch MDIO bus"), we can describe the switch PHYs on the MDIO bus of
+the switch on the device tree. Extend the check to detect PHY muxing when
+the PHY is defined on the MDIO bus of the switch on the device tree.
+
+When the PHY is described this way, the switch will be initialised first,
+then the switch MDIO bus will be registered. Only after these steps, the
+PHY will be attached.
+
+Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
+---
+Changes in v2:
+- Address the terminology on the patch log.
+- Link to v1: https://lore.kernel.org/r/20240429-b4-for-netnext-mt7530-use-switch-mdio-bus-for-phy-muxing-v1-1-1f775983e155@arinc9.com
+---
+ drivers/net/dsa/mt7530.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/dsa/mt7530.c b/drivers/net/dsa/mt7530.c
+index 2b9f904a98f0..6cf21c9d523b 100644
+--- a/drivers/net/dsa/mt7530.c
++++ b/drivers/net/dsa/mt7530.c
+@@ -2483,7 +2483,8 @@ mt7530_setup(struct dsa_switch *ds)
+ 			if (!phy_node)
+ 				continue;
+ 
+-			if (phy_node->parent == priv->dev->of_node->parent) {
++			if (phy_node->parent == priv->dev->of_node->parent ||
++			    phy_node->parent->parent == priv->dev->of_node) {
+ 				ret = of_get_phy_mode(mac_np, &interface);
+ 				if (ret && ret != -ENODEV) {
+ 					of_node_put(mac_np);
+
+---
+base-commit: 5c4c0edca68a5841a8d53ccd49596fe199c8334c
+change-id: 20240429-b4-for-netnext-mt7530-use-switch-mdio-bus-for-phy-muxing-586269371c55
+
+Best regards,
+-- 
+Arınç ÜNAL <arinc.unal@arinc9.com>
+
+
 
