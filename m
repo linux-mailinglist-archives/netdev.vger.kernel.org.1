@@ -1,76 +1,82 @@
-Return-Path: <netdev+bounces-92628-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92629-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 073128B82B6
-	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 00:46:18 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 414748B82B7
+	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 00:46:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 67E141F2405A
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 22:46:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 508BCB216F7
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 22:46:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A28EF17C6A;
-	Tue, 30 Apr 2024 22:46:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4060C3BB2E;
+	Tue, 30 Apr 2024 22:46:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="MMzevtOQ"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="gfbl6+FV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
+Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DC811CD21
-	for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 22:46:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD7F22C853
+	for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 22:46:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714517172; cv=none; b=cQAh8e5c7NXkOxC2QGuvpb+5ZtIqcDxTt3aTICfUl85yf0UkLxPFTjgFn9ZTAN5b2Ur0u56REB7CXvcd+Z8pxvbMn3vzbdFsKF+9F1dAaWuqlDdFZ/WBP3dNODU/5eQ0hrrqxPhD1rKexI23jKZuOPksfZyzU7Ob5Neava2y5Os=
+	t=1714517175; cv=none; b=kdNXbATSrGDrUXWa18AlLYqcUiVHeDPLi4JtVSeegEGG4OVGRhGBZWFg3u7n1u+kjxK3RWdBmfoGGk1k2gARWKG2xu7VzP0kdG/dkDqHknDN9r9Fl3sdwBYgP2w8JIT8Qqao7zpFuENVhAYZ/hpCWhUlEMe9gBzgtOdp2IXuz8s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714517172; c=relaxed/simple;
-	bh=kBaLHc8rExGMu8OlF2HhKGVpHNO7JKbu9VSj7iccY0U=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=nebS/NWAsgSMkUHP/Yv+AMu9ZbTUQwKd2uJ0zmlFuYoOHpQ+4dheleEedOVqWaaEVwOR7jAoSH8GPFVIIVdlCxfwUSIVma4d+2x9OH+Bmbtnf1jAa4Blhj5b7cePfe4UHziScitvbJttbgY94IWyIhF02RdxqxPlM/SnWK+Eqn8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=MMzevtOQ; arc=none smtp.client-ip=209.85.216.47
+	s=arc-20240116; t=1714517175; c=relaxed/simple;
+	bh=6mVPS7TncWc8rZeUJrQnSatBetIYzPKAWstvnb9Wqmg=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=N6dBydkbNQixTJFzUr0U4aqmuOGjCSK43/yeP9k21X6B2cdfA6f/5a0jHdxBhiBdHcroCk8xvdjeeVsOcBKkeEcfBMBqHY9zB8GdClObebDd31Z2FoBC2W0IInxKoKQSuN3aVqSossEErQlTMN0AFMbfLFtShgjrEHdaqXrJfx4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=gfbl6+FV; arc=none smtp.client-ip=209.85.215.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-2ad8fb779d2so5240846a91.0
-        for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 15:46:10 -0700 (PDT)
+Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-5e152c757a5so3960509a12.2
+        for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 15:46:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1714517170; x=1715121970; darn=vger.kernel.org;
-        h=mime-version:message-id:date:subject:cc:to:from:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=t1vVeT6zlMbtMXbJ1T8vScsknN5yM1eIgiMF3QHSlgA=;
-        b=MMzevtOQ92KRQW6DSksq44OIoU3xqXtRM0fuE5Jw9ayfi0qeXfIuCW0H6r1hLteOl0
-         yQavtL8EibFcEMMgVJha3GB0GludzaQzIvX39SY/m862+oFLVd4OHKKVZIIpPpl0HteM
-         FkSZVEdBEIrlPcreemm0tNr7ndoGnkEt0lbj0=
+        d=broadcom.com; s=google; t=1714517173; x=1715121973; darn=vger.kernel.org;
+        h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=L4aiW0tCtnnxe4pUVwZynZF9OlmD9SNkaQDmahQztks=;
+        b=gfbl6+FVEOmE9KPNsmY7ebb05vrtL+kB+ClYj35rpMWQZ+72Jtu27xkRPQO+LOhwtn
+         cr533J3XCWBeM87NrUfE8+1cfT63Y+2IJavpAs1+s2GPDXJnqugkLcik6PxuaEAgepS2
+         RdbtiCVw5VTbAVRSt00JQmgP1XiEWZYpHJxGE=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714517170; x=1715121970;
-        h=mime-version:message-id:date:subject:cc:to:from:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=t1vVeT6zlMbtMXbJ1T8vScsknN5yM1eIgiMF3QHSlgA=;
-        b=X78AJHzlnNRBOiAIZYMA+hBs9ugiV+ehbnm0tXiLC1qFYpCA8+W4Iyay6xlepqgQpz
-         h3+/b972dPGA/EoNjRXR986HskBThKyiHgg/6wqisSR/FjUp82mppTjei1/4X8Dsugyx
-         em7f9SDAyGtJl0Je6iu9IiguZA+jnuTDpqlu+CgSoC1kOY4e6CpvCxd6QLkPabPKeaBi
-         VJYS2UkGioYtwm6apoFeTc+UWYILdG55282hKvU2zMJrtaZSxkjV4vnTx9BO/it4dyyY
-         UOVVv3Kfnv6l6IDZOyyp3taTl7POySTHNs4rTB/5xIAI5ZLVG6HJ+Av7JuRAOpk6ny+M
-         Pkdw==
-X-Gm-Message-State: AOJu0YwLD0UL000r8E1G9tx1V4DNe86EOktBOzVEqxQMmV/QZl9/of+e
-	wK72llLGup4fDFEes7s1B8EywNWeNWWW2JooEUxnNdouebC7RYQVjQcbkmB4kQ==
-X-Google-Smtp-Source: AGHT+IFS+gQQeEu/Jd/oCu3pYdm1Baqjc4+8rJH7iQoQywfEd0025U/KB9AAsSvTFqNfj4MXG/16cw==
-X-Received: by 2002:a17:90a:4093:b0:2a8:1fdf:b1b0 with SMTP id l19-20020a17090a409300b002a81fdfb1b0mr853915pjg.29.1714517170034;
-        Tue, 30 Apr 2024 15:46:10 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1714517173; x=1715121973;
+        h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=L4aiW0tCtnnxe4pUVwZynZF9OlmD9SNkaQDmahQztks=;
+        b=fBQ3nmfysMtdQaYDIs41MaB/lSI2QMGXNUs7gzpslOC5wwqnMD4+F4zu6E/BcHdQrQ
+         OYoh+zi9Z9Z9lHiIjv6lPd07OgYNaNqiwTpBb+pOQaY1rPTuRBs6PYoXgXvY6EmxD8Sr
+         EYGktPC2CLfVn2JW2qbvYmoQFE4TB4CoKzVRD4OOlBR8W4INju2Wxkv8qkXmPQYbC6jL
+         v0q3KlVBqz43zYmJ0hNLG/dXP3x9rc9lWhetg7Ve/AAMBzCioNn39JE8ikuiRKcS0/wx
+         YOrHDlG+NU2G0aDlnmGBZWJNc1Z1GbULv1dS0+rh6bdLUGkL0UJ8WE7A3PpEvXjsxn+y
+         eTFg==
+X-Gm-Message-State: AOJu0YyYDyc858juXz7XCX7NQQhnCllLJFdxg8Bvc66g2yGutjTp5k58
+	19U+ySdU32CWOaXDpqZ46qxsj19ABkNGTrQq48TBdtvust46tYQSbSlJC/dOJw==
+X-Google-Smtp-Source: AGHT+IELbP68HhD34YUDfFjQwmkD0S83nH8oCLTpg70viNuifIf3Z8hp/lxMgOlCW1exJJI/dhBAcQ==
+X-Received: by 2002:a17:90a:bb89:b0:2a2:97f3:83b3 with SMTP id v9-20020a17090abb8900b002a297f383b3mr789203pjr.48.1714517172165;
+        Tue, 30 Apr 2024 15:46:12 -0700 (PDT)
 Received: from lvnvda5233.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id s11-20020a170902a50b00b001eb2fb28eabsm7836476plq.227.2024.04.30.15.46.09
+        by smtp.gmail.com with ESMTPSA id s11-20020a170902a50b00b001eb2fb28eabsm7836476plq.227.2024.04.30.15.46.10
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 30 Apr 2024 15:46:09 -0700 (PDT)
+        Tue, 30 Apr 2024 15:46:10 -0700 (PDT)
 From: Michael Chan <michael.chan@broadcom.com>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	andrew.gospodarek@broadcom.com
-Subject: [PATCH net-next 0/7] bnxt_en: Updates for net-next
-Date: Tue, 30 Apr 2024 15:44:31 -0700
-Message-Id: <20240430224438.91494-1-michael.chan@broadcom.com>
+	andrew.gospodarek@broadcom.com,
+	David Wei <dw@davidwei.uk>,
+	Pavan Chebbi <pavan.chebbi@broadcom.com>,
+	Ajit Khaparde <ajit.khaparde@broadcom.com>
+Subject: [PATCH net-next 1/7] bnxt_en: Fix and simplify bnxt_get_avail_msix() calls
+Date: Tue, 30 Apr 2024 15:44:32 -0700
+Message-Id: <20240430224438.91494-2-michael.chan@broadcom.com>
 X-Mailer: git-send-email 2.32.0
+In-Reply-To: <20240430224438.91494-1-michael.chan@broadcom.com>
+References: <20240430224438.91494-1-michael.chan@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,53 +84,135 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000ed5ca106175822cb"
+	boundary="000000000000125a4c0617582378"
 
---000000000000ed5ca106175822cb
+--000000000000125a4c0617582378
 Content-Transfer-Encoding: 8bit
 
-The first patch is a bug fix for a recent regression in net-next
-on older NICs.  The second patch converts the sw_stats field in
-the completion ring structure to a pointer.  This allows the
-group of completion rings using the same MSIX to share the same
-sw_stats structure.  Prior to this, the correct completion ring
-must be used to count packets.
+David reported this issue of the driver not initializing on an older
+chip not running in the new resource manager mode (!BNXT_NEW_RM()).
 
-The next four patches remove the RTNL lock when calling the RoCE
-driver for asynchronous stop and start during error recovery and
-firmware reset.  The RTNL ilock is replaced with a private mutex
-used to synchronize RoCE register, unregister, stop, and start.
+Sample dmesg:
 
-The last patch adds VF PCI IDs for the 5760X chips.
+bnxt_en 0000:02:00.0 (unnamed net_device) (uninitialized): Able to reserve only 0 out of 9 requested RX rings
+bnxt_en 0000:02:00.0 (unnamed net_device) (uninitialized): Unable to reserve tx rings
+bnxt_en 0000:02:00.0 (unnamed net_device) (uninitialized): 2nd rings reservation failed.
+bnxt_en 0000:02:00.0 (unnamed net_device) (uninitialized): Not enough rings available.
+bnxt_en 0000:02:00.0: probe with driver bnxt_en failed with error -12
 
-Ajit Khaparde (1):
-  bnxt_en: Add VF PCI ID for 5760X (P7) chips
+This is a regression caused by a recent commit that adds a call to
+bnxt_get_avail_msix() before MSIX is initialized:
 
-Edwin Peer (1):
-  bnxt_en: share NQ ring sw_stats memory with subrings
+bnxt_set_dflt_rings()
+  __bnxt_reserve_rings()
+    bnxt_get_avail_msix()
 
-Kalesh AP (3):
-  bnxt_en: Don't support offline self test when RoCE driver is loaded
-  bnxt_en: Add a mutex to synchronize ULP operations
-  bnxt_en: Optimize recovery path ULP locking in the driver
+bnxt_get_avail_msix() returns a negative number if !BNXT_NEW_RM() and
+when MSIX is not initialized.  This causes __bnxt_reserve_rings() to
+fail in this call sequence and the driver aborts initialization.
 
-Michael Chan (2):
-  bnxt_en: Fix and simplify bnxt_get_avail_msix() calls
-  bnxt_en: Don't call ULP_STOP/ULP_START during L2 reset
+Before this commit in 2022:
 
- drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 139 ++++++++++--------
- drivers/net/ethernet/broadcom/bnxt/bnxt.h     |   5 +-
- .../net/ethernet/broadcom/bnxt/bnxt_devlink.c |   7 +-
- .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c |  15 +-
- drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c |  20 ++-
- drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.h |   3 +
- 6 files changed, 115 insertions(+), 74 deletions(-)
+303432211324 ("bnxt_en: Remove runtime interrupt vector allocation")
 
+MSIX allocation for RoCE was dynamic and bnxt_get_avail_msix() was
+used to determine the available run-time MSIX available for RoCE.
+
+Today, bnxt_get_avail_msix() is only used to reserve some available
+MSIX ahead of time to be ready when the RoCE driver loads.  It
+only needs to be called when BNXT_NEW_RM() is true because older
+chips do not require reservations for MSIX.  Simplify
+bnxt_get_avail_msix() to only consider the BNXT_NEW_RM() case and
+only make this call if BNXT_NEW_RM() is true.
+
+Also change bnxt_get_avail_msix() to static since it is only used
+in bnxt.c.
+
+Reported-by: David Wei <dw@davidwei.uk>
+Fixes: d630624ebd70 ("bnxt_en: Utilize ulp client resources if RoCE is not registered")
+Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
+Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
+Reviewed-by: Ajit Khaparde <ajit.khaparde@broadcom.com>
+Signed-off-by: Michael Chan <michael.chan@broadcom.com>
+---
+Cc: David Wei <dw@davidwei.uk>
+---
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 20 ++++++++------------
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h |  1 -
+ 2 files changed, 8 insertions(+), 13 deletions(-)
+
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+index be96bb494ae6..0eb880766012 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+@@ -7459,6 +7459,8 @@ static bool bnxt_rings_ok(struct bnxt *bp, struct bnxt_hw_rings *hwr)
+ 	       hwr->stat && (hwr->cp_p5 || !(bp->flags & BNXT_FLAG_CHIP_P5_PLUS));
+ }
+ 
++static int bnxt_get_avail_msix(struct bnxt *bp, int num);
++
+ static int __bnxt_reserve_rings(struct bnxt *bp)
+ {
+ 	struct bnxt_hw_rings hwr = {0};
+@@ -7471,7 +7473,7 @@ static int __bnxt_reserve_rings(struct bnxt *bp)
+ 	if (!bnxt_need_reserve_rings(bp))
+ 		return 0;
+ 
+-	if (!bnxt_ulp_registered(bp->edev)) {
++	if (!bnxt_ulp_registered(bp->edev) && BNXT_NEW_RM(bp)) {
+ 		ulp_msix = bnxt_get_avail_msix(bp, bp->ulp_num_msix_want);
+ 		if (!ulp_msix)
+ 			bnxt_set_ulp_stat_ctxs(bp, 0);
+@@ -10474,19 +10476,13 @@ unsigned int bnxt_get_avail_stat_ctxs_for_en(struct bnxt *bp)
+ 	return bnxt_get_max_func_stat_ctxs(bp) - bnxt_get_func_stat_ctxs(bp);
+ }
+ 
+-int bnxt_get_avail_msix(struct bnxt *bp, int num)
++/* Only called if BNXT_NEW_RM() is true to get the available MSIX to
++ * reserve ahead of time before RoCE is registered.
++ */
++static int bnxt_get_avail_msix(struct bnxt *bp, int num)
+ {
+-	int max_cp = bnxt_get_max_func_cp_rings(bp);
+ 	int max_irq = bnxt_get_max_func_irqs(bp);
+ 	int total_req = bp->cp_nr_rings + num;
+-	int max_idx, avail_msix;
+-
+-	max_idx = bp->total_irqs;
+-	if (!(bp->flags & BNXT_FLAG_CHIP_P5_PLUS))
+-		max_idx = min_t(int, bp->total_irqs, max_cp);
+-	avail_msix = max_idx - bp->cp_nr_rings;
+-	if (!BNXT_NEW_RM(bp) || avail_msix >= num)
+-		return avail_msix;
+ 
+ 	if (max_irq < total_req) {
+ 		num = max_irq - bp->cp_nr_rings;
+@@ -10619,7 +10615,7 @@ int bnxt_reserve_rings(struct bnxt *bp, bool irq_re_init)
+ 	if (!bnxt_need_reserve_rings(bp))
+ 		return 0;
+ 
+-	if (!bnxt_ulp_registered(bp->edev)) {
++	if (!bnxt_ulp_registered(bp->edev) && BNXT_NEW_RM(bp)) {
+ 		int ulp_msix = bnxt_get_avail_msix(bp, bp->ulp_num_msix_want);
+ 
+ 		if (ulp_msix > bp->ulp_num_msix_want)
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+index ad57ef051798..0c680032ab66 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+@@ -2736,7 +2736,6 @@ unsigned int bnxt_get_max_func_stat_ctxs(struct bnxt *bp);
+ unsigned int bnxt_get_avail_stat_ctxs_for_en(struct bnxt *bp);
+ unsigned int bnxt_get_max_func_cp_rings(struct bnxt *bp);
+ unsigned int bnxt_get_avail_cp_rings_for_en(struct bnxt *bp);
+-int bnxt_get_avail_msix(struct bnxt *bp, int num);
+ int bnxt_reserve_rings(struct bnxt *bp, bool irq_re_init);
+ void bnxt_tx_disable(struct bnxt *bp);
+ void bnxt_tx_enable(struct bnxt *bp);
 -- 
 2.30.1
 
 
---000000000000ed5ca106175822cb
+--000000000000125a4c0617582378
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -195,14 +283,14 @@ hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
 E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
 aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
 EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEINsksPzSXDfx+yfycnG7oVC0cr6IQki1
-VFCDRKP3rxkOMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDQz
-MDIyNDYxMFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIGZPokqcnsFhDEtx+mhE1+YXqL2o3UJz
+55o2srGastq3MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDQz
+MDIyNDYxM1owaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
 SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQBdwBEfX/fFL5Tsd04f9TfAugszUtLpvnzz6JhATIhXvWNnlNA+
-ABHVMyzWTbNL+PpCNab7BDL1YkZybbPWGlqseS59w/3ok+o0lKfbjqxgyyd99Xh3OiLblWX9s4D/
-PPZVrBWmdKfDvpTjWDmM4eBz2ICq3Q2/VS4O/Ot8vziMceE2Ify8vDEI45ttxjT/yKEaKerC4WeG
-B4g06RMvsgzwUVrdcLqA8Qb1AoThx2OjO7W8dRXI6PJCJrXiU90VFuMdWxvYygbWgH3pdpVDNWpi
-UQ2ETp2O1UcYBM3kWKFPRiqgxSiPZ6DeIQviAXbZjWSzqWfQt6P49an9IjOZM+r7
---000000000000ed5ca106175822cb--
+ATANBgkqhkiG9w0BAQEFAASCAQBmw4nl5ws433pQrU4QiLElY346xuaFVmxAdDtkoHo2lxLWQyOm
+tczm8Oj10MjdHyTHHmOThQ/N2mzyn8cogalnUnHnGMu/L2U1Z4NDieLQxQ57pcbRA6K7Ll94K4IQ
+hoqqi703gkt2PfJFB2H6XI8jb7NRGTT9OuzT3aDNkp7I3jHFGD4a6bN1PTSEZ2/C8+5dGhu7cMZl
+97cE/1PRkq5qbuBP66ZRED7x2lrvOHQGX4OqIZWm93swBWh7+87IOBDePcGeBTfvQQ9bSiWBYth0
+O8MCDiYlcf+YoEXfmOevOwPm38WEn48eEShyrpYTIRZ04UqP2xK4cX8mBVQnInie
+--000000000000125a4c0617582378--
 
