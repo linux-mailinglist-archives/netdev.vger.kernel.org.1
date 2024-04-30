@@ -1,63 +1,74 @@
-Return-Path: <netdev+bounces-92325-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92326-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D814D8B69BE
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 07:11:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D66788B69C4
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 07:15:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 60E4C1F22A50
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 05:11:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C6D7285AB5
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 05:15:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E90DE17BA2;
-	Tue, 30 Apr 2024 05:10:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08FC417BC2;
+	Tue, 30 Apr 2024 05:15:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="JhcXc03K"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jPrMGh9I"
 X-Original-To: netdev@vger.kernel.org
-Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D8451798C;
-	Tue, 30 Apr 2024 05:10:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.141
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 474D517BBF;
+	Tue, 30 Apr 2024 05:15:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714453853; cv=none; b=uBgxGzVmqFinXo69DfKTVBeKZKtaVBj++5sH5GWd1CZ4pNrB1g2MxWoon7cF1V+RRjZNDVld70DhRw7zUw4+OX1NLRvXh4sJZIuI/ktj5gWvlVYGBPCfpZC7hmZGh8ty75e/7o1MNpihexH8kwwUaFTb5YjNImH0dAMRogskfoA=
+	t=1714454122; cv=none; b=NNOV5PN9xz+aFXlUk+o9WPVk7gK4VIomJin3gZkIT213lkcJAqKExngIaTDR23DgmBL/6+bJ/3QtAnDwmKPcVsuctclJzXQjCw+xq/azyHh3HeqTQ1SBUTQKc4tPdhuxzZkxK5ilbQZdV54chQzX9S0xQRfXyJ9OEtd8oMOcqpo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714453853; c=relaxed/simple;
-	bh=d/b4zlbqpIEY9DLFq4hSauJ4swz+iTTcDpUDBrY2dIo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=qMPT2K+/VR4EyoA0v3hi+cium650zOoeeMSMUSIsfyQnzI5M3v3OFSUhMOug6SzEHPtDj9LxuKl0SL/PkAfBea5cIpNyf+kujnm2atQZK9BBD25rpAeUAkjz2oZea8A9iZwKkVgYVlBLx0pVbnoJY4P1nghk5fh+Vjbi0sUE9Qk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=JhcXc03K; arc=none smtp.client-ip=198.47.19.141
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from lelv0265.itg.ti.com ([10.180.67.224])
-	by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 43U5Aafj037952;
-	Tue, 30 Apr 2024 00:10:36 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1714453836;
-	bh=tkSk8wJzJEVYrw0AlW1nQjgNmnwnpS8NgdvNoTuoYos=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=JhcXc03KP1fF0I7PCNuZIJl0uIrnLxgXMxv1byRI2Pdviip2mRj41lfWsDYD87OlM
-	 CSDjh/c2ltRuIaZ1y3r1uyMIM9TDwUsyt4tfdxiW6E57lAfibT9jPQXy7gNfZiN+Vv
-	 ykJQofBqWwIz6li8Tb02CVEy0fr1Hn4Ta48XnQRo=
-Received: from DFLE107.ent.ti.com (dfle107.ent.ti.com [10.64.6.28])
-	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 43U5AajI003539
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Tue, 30 Apr 2024 00:10:36 -0500
-Received: from DFLE115.ent.ti.com (10.64.6.36) by DFLE107.ent.ti.com
- (10.64.6.28) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Tue, 30
- Apr 2024 00:10:35 -0500
-Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DFLE115.ent.ti.com
- (10.64.6.36) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Tue, 30 Apr 2024 00:10:35 -0500
-Received: from [10.24.69.25] (danish-tpc.dhcp.ti.com [10.24.69.25])
-	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 43U5AUcF008960;
-	Tue, 30 Apr 2024 00:10:31 -0500
-Message-ID: <579faebd-1dd3-4665-b5d7-6939d9cc1ad4@ti.com>
-Date: Tue, 30 Apr 2024 10:40:29 +0530
+	s=arc-20240116; t=1714454122; c=relaxed/simple;
+	bh=Mrqb28j3cg1S8R/hkdlGfeMM4TLciHksWoU3jt4WOEc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=F6Zk6R08kz7HiY1Ld0hCa7FMSK4MfIlZiPtWAw4NRtkrGaIoWLcIon/vEDxZvQnRzjyYQ5m0zjOU5hsQ3SR0gjsxjKfT9J2l3jm1vzTLL0zjsaez8TVB3IdRxQ/P7YbIEI+qG3qXBG65MvpSiHF5T3Xfpnf865W9CuwuosOTQis=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jPrMGh9I; arc=none smtp.client-ip=209.85.128.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-41bab13ca4eso25521505e9.1;
+        Mon, 29 Apr 2024 22:15:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1714454120; x=1715058920; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=V5c0MrtuYndD4ZSoLwxQnnGXS/g1185v6hok/3pUhLs=;
+        b=jPrMGh9I+iqwzJLhis5ubGiBMExbC7VH7+UiBQF6Acnox4mUte/CYDB5nKrN5Mn2vi
+         XnCTqqshkBIyls482fclDUDOF3PlBLVKmelqgxc66uWcJqqlCem58uJtZWkPKLOcanQR
+         F5ForAg4oONEEtYsS7OGlUtgPbV12Zk2K6buqedjXIf+dcCttVeBwETQpCvQUSaAA3Sq
+         Iw2oH1Z6zXtMLDgE5x7Sn2E2UKUlmrNOsjL3gktq97GGiVoOXv/5KIrKxEkt4uFafsoM
+         QTCLhkgFOwuGGzoYa5kVVpSbs1FprKuDO1UEBoRxAoKuKLD+T9tiee7hRxqvQ6wc4sZ+
+         XJxg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714454120; x=1715058920;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=V5c0MrtuYndD4ZSoLwxQnnGXS/g1185v6hok/3pUhLs=;
+        b=WRbxeze4YyY6+SRTtlw38p7MPvkJR9Q2NecDjmRFlBTHR9CaN7hfPyGJonslzl738X
+         4wP09KyhFhrCFMCQvSa8XHfiqrNJzxdOwYPoUyw/qoMJd0HF0nuQbAz+MGjO7uyf6+AZ
+         hkpAkinRM92obAkMphKOidiFDMFJRt7tVO1Gt7kfsUqkvyNq86NJPZg61tTG1DAWOsQm
+         tsJB7NxdHz3O25B3Qa3lFvK9qwB5HghC8rm1K1ZwobG18D9CdhEku5Ati64TRuBqkRX/
+         nfoODAKpSSoMakwE5tXa0tGzAn2Zb5Ea1ZOc5gSy4JjD3WjxSXnhTWq8R7Sag9IJnbE6
+         9CeA==
+X-Forwarded-Encrypted: i=1; AJvYcCXAx1paocs9xNR54g4IOdST9Z/s0VVIkTgGSXnUNvRSqVXUzNZ5h+d3TOs1vEJR9W+u8bbc9uE14KsO0OUxljOvSkV3lzvc
+X-Gm-Message-State: AOJu0Yy+jF6EIE+WHBX+iODu4qO6VZCnkNEhlOtyg3wZexm6/ENGXEmp
+	e0fMFveVXFLLsh7cN1EXBueD5X2QiOF4NerPwUD+Pr+Dd+CohtPT29XxxQ==
+X-Google-Smtp-Source: AGHT+IG629YYhe/zAWAixthnGqw5lKcbI98CSQq0Ilbidef0mEkPXq/TxcjC/TvjSEsHwH2iKeGlmQ==
+X-Received: by 2002:a05:600c:358c:b0:41b:13a3:6183 with SMTP id p12-20020a05600c358c00b0041b13a36183mr9207421wmq.24.1714454119402;
+        Mon, 29 Apr 2024 22:15:19 -0700 (PDT)
+Received: from [172.27.19.83] ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id t20-20020a05600c199400b0041c012ca327sm9103986wmq.45.2024.04.29.22.15.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 29 Apr 2024 22:15:18 -0700 (PDT)
+Message-ID: <25a4890f-8b6f-4fb3-970f-b022b7ad5be8@gmail.com>
+Date: Tue, 30 Apr 2024 08:15:14 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,170 +76,78 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2] net: ti: icssg_prueth: Add SW TX / RX
- Coalescing based on hrtimers
+Subject: Re: [PATCH net-next v2] net/mlx5e: flower: check for unsupported
+ control flags
+To: =?UTF-8?Q?Asbj=C3=B8rn_Sloth_T=C3=B8nnesen?= <ast@fiberby.net>,
+ netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Saeed Mahameed <saeedm@nvidia.com>,
+ Tariq Toukan <tariqt@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+ Jianbo Liu <jianbol@nvidia.com>
+References: <20240422152728.175677-1-ast@fiberby.net>
 Content-Language: en-US
-To: Simon Horman <horms@kernel.org>
-CC: Dan Carpenter <dan.carpenter@linaro.org>,
-        Heiner Kallweit
-	<hkallweit1@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
-        Jan Kiszka
-	<jan.kiszka@siemens.com>,
-        Diogo Ivo <diogo.ivo@siemens.com>, Paolo Abeni
-	<pabeni@redhat.com>,
-        Jakub Kicinski <kuba@kernel.org>, Eric Dumazet
-	<edumazet@google.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>, <srk@ti.com>,
-        Vignesh Raghavendra
-	<vigneshr@ti.com>, <r-gunasekaran@ti.com>,
-        Roger Quadros <rogerq@kernel.org>
-References: <20240429071501.547680-1-danishanwar@ti.com>
- <20240429183034.GG516117@kernel.org>
-From: MD Danish Anwar <danishanwar@ti.com>
-In-Reply-To: <20240429183034.GG516117@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+From: Tariq Toukan <ttoukan.linux@gmail.com>
+In-Reply-To: <20240422152728.175677-1-ast@fiberby.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
 
 
-On 30/04/24 12:00 am, Simon Horman wrote:
-> On Mon, Apr 29, 2024 at 12:45:01PM +0530, MD Danish Anwar wrote:
->> Add SW IRQ coalescing based on hrtimers for RX and TX data path for ICSSG
->> driver, which can be enabled by ethtool commands:
->>
->> - RX coalescing
->>   ethtool -C eth1 rx-usecs 50
->>
->> - TX coalescing can be enabled per TX queue
->>
->>   - by default enables coalesing for TX0
+On 22/04/2024 18:27, Asbjørn Sloth Tønnesen wrote:
+> Use flow_rule_is_supp_control_flags() to reject filters
+> with unsupported control flags.
 > 
-> nit: coalescing
+> In case any unsupported control flags are masked,
+> flow_rule_is_supp_control_flags() sets a NL extended
+> error message, and we return -EOPNOTSUPP.
 > 
-> Please consider running patches through ./checkpatch --codespell
+> Remove FLOW_DIS_FIRST_FRAG specific error message,
+> and treat it as any other unsupported control flag.
 > 
->>   ethtool -C eth1 tx-usecs 50
->>   - configure TX0
->>   ethtool -Q eth0 queue_mask 1 --coalesce tx-usecs 100
->>   - configure TX1
->>   ethtool -Q eth0 queue_mask 2 --coalesce tx-usecs 100
->>   - configure TX0 and TX1
->>   ethtool -Q eth0 queue_mask 3 --coalesce tx-usecs 100 --coalesce
->> tx-usecs 100
->>
->> Minimum value for both rx-usecs and tx-usecs is 20us.
->>
->> Compared to gro_flush_timeout and napi_defer_hard_irqs this patch allows
->> to enable IRQ coalescing for RX path separately.
->>
->> Benchmarking numbers:
->>  ===============================================================
->> | Method                  | Tput_TX | CPU_TX | Tput_RX | CPU_RX |
->> | ==============================================================
->> | Default Driver           943 Mbps    31%      517 Mbps  38%   |
->> | IRQ Coalescing (Patch)   943 Mbps    28%      518 Mbps  25%   |
->>  ===============================================================
->>
->> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
->> ---
->> Changes from v1 [1] to v2:
->> *) Added Benchmarking numbers in the commit message as suggested by
->>    Andrew Lunn <andrew@lunn.ch>. Full logs [2]
->> *) Addressed comments given by Simon Horman <horms@kernel.org> in v1.
+> Only compile-tested.
 > 
-> Sorry to be bothersome, but the W=1 problem isn't entirely fixed.
+> Signed-off-by: Asbjørn Sloth Tønnesen <ast@fiberby.net>
+> ---
 > 
+> Changelog:
+> 
+> v2:
+> - remove existing FLOW_DIS_FIRST_FRAG "support" (requested by Jianbo)
+> 
+> v1: https://lore.kernel.org/netdev/20240417135110.99900-1-ast@fiberby.net/
+> 
+>   drivers/net/ethernet/mellanox/mlx5/core/en_tc.c | 10 ++++------
+>   1 file changed, 4 insertions(+), 6 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c b/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
+> index aeb32cb27182..30673292e15f 100644
+> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
+> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
+> @@ -2801,12 +2801,6 @@ static int __parse_cls_flower(struct mlx5e_priv *priv,
+>   		flow_rule_match_control(rule, &match);
+>   		addr_type = match.key->addr_type;
+>   
+> -		/* the HW doesn't support frag first/later */
+> -		if (match.mask->flags & FLOW_DIS_FIRST_FRAG) {
+> -			NL_SET_ERR_MSG_MOD(extack, "Match on frag first/later is not supported");
+> -			return -EOPNOTSUPP;
+> -		}
+> -
+>   		if (match.mask->flags & FLOW_DIS_IS_FRAGMENT) {
+>   			MLX5_SET(fte_match_set_lyr_2_4, headers_c, frag, 1);
+>   			MLX5_SET(fte_match_set_lyr_2_4, headers_v, frag,
+> @@ -2819,6 +2813,10 @@ static int __parse_cls_flower(struct mlx5e_priv *priv,
+>   			else
+>   				*match_level = MLX5_MATCH_L3;
+>   		}
+> +
+> +		if (!flow_rule_is_supp_control_flags(FLOW_DIS_IS_FRAGMENT,
+> +						     match.mask->flags, extack))
+> +			return -EOPNOTSUPP;
+>   	}
+>   
+>   	if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_BASIC)) {
 
-I'll check with W=1 and fix the warnings. I'll repost it soon.
-
->>
->> [1] https://lore.kernel.org/all/20240424091823.1814136-1-danishanwar@ti.com/
->>
->> [2] https://gist.githubusercontent.com/danish-ti/47855631be9f3635cee994693662a988/raw/94b4eb86b42fe243ab03186a88a314e0cb272fd0/gistfile1.txt
-> 
-> ...
-> 
->> diff --git a/drivers/net/ethernet/ti/icssg/icssg_common.c b/drivers/net/ethernet/ti/icssg/icssg_common.c
-> 
-> ...
-> 
->> @@ -190,19 +191,37 @@ int emac_tx_complete_packets(struct prueth_emac *emac, int chn,
->>  	return num_tx;
->>  }
->>  
->> +static enum hrtimer_restart emac_tx_timer_callback(struct hrtimer *timer)
->> +{
->> +	struct prueth_tx_chn *tx_chns =
->> +			container_of(timer, struct prueth_tx_chn, tx_hrtimer);
->> +
->> +	enable_irq(tx_chns->irq);
->> +	return HRTIMER_NORESTART;
->> +}
->> +
->>  static int emac_napi_tx_poll(struct napi_struct *napi_tx, int budget)
->>  {
->>  	struct prueth_tx_chn *tx_chn = prueth_napi_to_tx_chn(napi_tx);
->>  	struct prueth_emac *emac = tx_chn->emac;
->> +	bool tdown = false;
->>  	int num_tx_packets;
->>  
->> -	num_tx_packets = emac_tx_complete_packets(emac, tx_chn->id, budget);
->> +	num_tx_packets = emac_tx_complete_packets(emac, tx_chn->id, budget,
->> +						  &tdown);
->>  
->>  	if (num_tx_packets >= budget)
->>  		return budget;
->>  
->> -	if (napi_complete_done(napi_tx, num_tx_packets))
->> -		enable_irq(tx_chn->irq);
->> +	if (napi_complete_done(napi_tx, num_tx_packets)) {
->> +		if (unlikely(tx_chn->tx_pace_timeout_ns && !tdown)) {
->> +			hrtimer_start(&tx_chn->tx_hrtimer,
->> +				      ns_to_ktime(tx_chn->tx_pace_timeout_ns),
->> +				      HRTIMER_MODE_REL_PINNED);
->> +		} else {
->> +			enable_irq(tx_chn->irq);
->> +		}
-> 
-> This compiles with gcc-13 and clang-18 W=1
-> (although the inner {} are unnecessary).
-> 
->> +	}
->>  
->>  	return num_tx_packets;
->>  }
-> 
-> ...
-> 
->> @@ -872,7 +894,13 @@ int emac_napi_rx_poll(struct napi_struct *napi_rx, int budget)
->>  	}
->>  
->>  	if (num_rx < budget && napi_complete_done(napi_rx, num_rx))
->> -		enable_irq(emac->rx_chns.irq[rx_flow]);
->> +		if (unlikely(emac->rx_pace_timeout_ns)) {
->> +			hrtimer_start(&emac->rx_hrtimer,
->> +				      ns_to_ktime(emac->rx_pace_timeout_ns),
->> +				      HRTIMER_MODE_REL_PINNED);
->> +		} else {
->> +			enable_irq(emac->rx_chns.irq[rx_flow]);
->> +		}
-> 
-> But this does not; I think outer (but not inner) {} are needed.
-> 
-> FIIIW, I believe this doesn't show-up in the netdev automated testing
-> because this driver isn't built for x86 allmodconfig.
-> 
->>  
->>  	return num_rx;
->>  }
-> 
-> ...
-> 
-
--- 
-Thanks and Regards,
-Danish
+Acked-by: Tariq Toukan <tariqt@nvidia.com>
 
