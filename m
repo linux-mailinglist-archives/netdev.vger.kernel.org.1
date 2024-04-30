@@ -1,153 +1,111 @@
-Return-Path: <netdev+bounces-92326-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92327-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D66788B69C4
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 07:15:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5612E8B69F3
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 07:31:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C6D7285AB5
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 05:15:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 833001C21613
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 05:31:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08FC417BC2;
-	Tue, 30 Apr 2024 05:15:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09B2317584;
+	Tue, 30 Apr 2024 05:31:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jPrMGh9I"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="rZr/iCae"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 474D517BBF;
-	Tue, 30 Apr 2024 05:15:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FA2B5256;
+	Tue, 30 Apr 2024 05:31:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714454122; cv=none; b=NNOV5PN9xz+aFXlUk+o9WPVk7gK4VIomJin3gZkIT213lkcJAqKExngIaTDR23DgmBL/6+bJ/3QtAnDwmKPcVsuctclJzXQjCw+xq/azyHh3HeqTQ1SBUTQKc4tPdhuxzZkxK5ilbQZdV54chQzX9S0xQRfXyJ9OEtd8oMOcqpo=
+	t=1714455100; cv=none; b=t06z4NGFEplWk3YnuhXdqP1cFEW0C3YG7HZi3yHflcogJYoIgVE/qsDLWHFKwv+XfKV3uIySAt6SKzlkwrmV+3hRgUGzqLrX2ZV82KPdK+8HTtMEyuCAI1fsp8EoYwIsONVaZ8UJ7dmSPUKaRzpPc68ALrWO5v37civBmgo8LeU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714454122; c=relaxed/simple;
-	bh=Mrqb28j3cg1S8R/hkdlGfeMM4TLciHksWoU3jt4WOEc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=F6Zk6R08kz7HiY1Ld0hCa7FMSK4MfIlZiPtWAw4NRtkrGaIoWLcIon/vEDxZvQnRzjyYQ5m0zjOU5hsQ3SR0gjsxjKfT9J2l3jm1vzTLL0zjsaez8TVB3IdRxQ/P7YbIEI+qG3qXBG65MvpSiHF5T3Xfpnf865W9CuwuosOTQis=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jPrMGh9I; arc=none smtp.client-ip=209.85.128.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-41bab13ca4eso25521505e9.1;
-        Mon, 29 Apr 2024 22:15:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1714454120; x=1715058920; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=V5c0MrtuYndD4ZSoLwxQnnGXS/g1185v6hok/3pUhLs=;
-        b=jPrMGh9I+iqwzJLhis5ubGiBMExbC7VH7+UiBQF6Acnox4mUte/CYDB5nKrN5Mn2vi
-         XnCTqqshkBIyls482fclDUDOF3PlBLVKmelqgxc66uWcJqqlCem58uJtZWkPKLOcanQR
-         F5ForAg4oONEEtYsS7OGlUtgPbV12Zk2K6buqedjXIf+dcCttVeBwETQpCvQUSaAA3Sq
-         Iw2oH1Z6zXtMLDgE5x7Sn2E2UKUlmrNOsjL3gktq97GGiVoOXv/5KIrKxEkt4uFafsoM
-         QTCLhkgFOwuGGzoYa5kVVpSbs1FprKuDO1UEBoRxAoKuKLD+T9tiee7hRxqvQ6wc4sZ+
-         XJxg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714454120; x=1715058920;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=V5c0MrtuYndD4ZSoLwxQnnGXS/g1185v6hok/3pUhLs=;
-        b=WRbxeze4YyY6+SRTtlw38p7MPvkJR9Q2NecDjmRFlBTHR9CaN7hfPyGJonslzl738X
-         4wP09KyhFhrCFMCQvSa8XHfiqrNJzxdOwYPoUyw/qoMJd0HF0nuQbAz+MGjO7uyf6+AZ
-         hkpAkinRM92obAkMphKOidiFDMFJRt7tVO1Gt7kfsUqkvyNq86NJPZg61tTG1DAWOsQm
-         tsJB7NxdHz3O25B3Qa3lFvK9qwB5HghC8rm1K1ZwobG18D9CdhEku5Ati64TRuBqkRX/
-         nfoODAKpSSoMakwE5tXa0tGzAn2Zb5Ea1ZOc5gSy4JjD3WjxSXnhTWq8R7Sag9IJnbE6
-         9CeA==
-X-Forwarded-Encrypted: i=1; AJvYcCXAx1paocs9xNR54g4IOdST9Z/s0VVIkTgGSXnUNvRSqVXUzNZ5h+d3TOs1vEJR9W+u8bbc9uE14KsO0OUxljOvSkV3lzvc
-X-Gm-Message-State: AOJu0Yy+jF6EIE+WHBX+iODu4qO6VZCnkNEhlOtyg3wZexm6/ENGXEmp
-	e0fMFveVXFLLsh7cN1EXBueD5X2QiOF4NerPwUD+Pr+Dd+CohtPT29XxxQ==
-X-Google-Smtp-Source: AGHT+IG629YYhe/zAWAixthnGqw5lKcbI98CSQq0Ilbidef0mEkPXq/TxcjC/TvjSEsHwH2iKeGlmQ==
-X-Received: by 2002:a05:600c:358c:b0:41b:13a3:6183 with SMTP id p12-20020a05600c358c00b0041b13a36183mr9207421wmq.24.1714454119402;
-        Mon, 29 Apr 2024 22:15:19 -0700 (PDT)
-Received: from [172.27.19.83] ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id t20-20020a05600c199400b0041c012ca327sm9103986wmq.45.2024.04.29.22.15.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 29 Apr 2024 22:15:18 -0700 (PDT)
-Message-ID: <25a4890f-8b6f-4fb3-970f-b022b7ad5be8@gmail.com>
-Date: Tue, 30 Apr 2024 08:15:14 +0300
+	s=arc-20240116; t=1714455100; c=relaxed/simple;
+	bh=Q8V+3JOr+a1s8/qzOBuGdcCPedYadHh3WFecyLKH3wI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Jj+kXERdPZuRfU5X3l45ZHUGWtylU5ESHNREfjn6R1JC4xiy5N9I1uqeTWDIrzGKhb5KEf4kgnKER0rIKTBmoRlvkrVNyh/t9SCPU+DK7u1cmWSvrzv217m9PsMFh0EsWtX7PgvEX1gdlXvlbSxRhFzWTb5XTTHl7ssCUA6Rtds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=rZr/iCae; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1134)
+	id E1ACD210FBCF; Mon, 29 Apr 2024 22:31:38 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com E1ACD210FBCF
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1714455098;
+	bh=KzxTstJtvUd8l5rN/2EuPcSEUQvGKdejTaLmiq9IXsE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=rZr/iCaeB86PuU863wNDmHMaF42RuhfpgFeX8DMHrg7zO2gvIwKI2vqnOu9agG7rP
+	 Ah6600TxzkAhIbI2+muTf0bZgZV9WAeWghc+cHKUnaI12PkBud4l+PrvpsMM5FfRNu
+	 ois5YgS1cu1CY/1DmTiMVgwyQofPJslwJAZUXBmA=
+Date: Mon, 29 Apr 2024 22:31:38 -0700
+From: Shradha Gupta <shradhagupta@linux.microsoft.com>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	Johannes Berg <johannes.berg@intel.com>,
+	Breno Leitao <leitao@debian.org>, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, "K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+	Long Li <longli@microsoft.com>,
+	Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>,
+	Konstantin Taranov <kotaranov@microsoft.com>,
+	Yury Norov <yury.norov@gmail.com>, linux-hyperv@vger.kernel.org,
+	shradhagupta@microsoft.com
+Subject: Re: [PATCH net-next v2 0/2] Add sysfs attributes for MANA
+Message-ID: <20240430053138.GA6429@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <1713954774-29953-1-git-send-email-shradhagupta@linux.microsoft.com>
+ <ZikbpoXWmcQrBP3V@nanopsycho>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2] net/mlx5e: flower: check for unsupported
- control flags
-To: =?UTF-8?Q?Asbj=C3=B8rn_Sloth_T=C3=B8nnesen?= <ast@fiberby.net>,
- netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Saeed Mahameed <saeedm@nvidia.com>,
- Tariq Toukan <tariqt@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
- Jianbo Liu <jianbol@nvidia.com>
-References: <20240422152728.175677-1-ast@fiberby.net>
-Content-Language: en-US
-From: Tariq Toukan <ttoukan.linux@gmail.com>
-In-Reply-To: <20240422152728.175677-1-ast@fiberby.net>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZikbpoXWmcQrBP3V@nanopsycho>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 
-
-
-On 22/04/2024 18:27, Asbjørn Sloth Tønnesen wrote:
-> Use flow_rule_is_supp_control_flags() to reject filters
-> with unsupported control flags.
+On Wed, Apr 24, 2024 at 04:48:06PM +0200, Jiri Pirko wrote:
+> Wed, Apr 24, 2024 at 12:32:54PM CEST, shradhagupta@linux.microsoft.com wrote:
+> >These patches include adding sysfs attributes for improving
+> >debuggability on MANA devices.
+> >
+> >The first patch consists on max_mtu, min_mtu attributes that are
+> >implemented generically for all devices
+> >
+> >The second patch has mana specific attributes max_num_msix and num_ports
 > 
-> In case any unsupported control flags are masked,
-> flow_rule_is_supp_control_flags() sets a NL extended
-> error message, and we return -EOPNOTSUPP.
+> 1) you implement only max, min is never implemented, no point
+> introducing it.
+Sure. I had added it for the sake of completeness.
+> 2) having driver implement sysfs entry feels *very wrong*, don't do that
+> 3) why DEVLINK_PARAM_GENERIC_ID_MSIX_VEC_PER_PF_MAX
+>    and DEVLINK_PARAM_GENERIC_ID_MSIX_VEC_PER_PF_MIN
+>    Are not what you want?
+Thanks for pointing this out. We are still evaluating if this devlink param
+could be used for our usecase where we only need a read-only msix value for VF.
+We keep the thread updated.
 > 
-> Remove FLOW_DIS_FIRST_FRAG specific error message,
-> and treat it as any other unsupported control flag.
-> 
-> Only compile-tested.
-> 
-> Signed-off-by: Asbjørn Sloth Tønnesen <ast@fiberby.net>
-> ---
-> 
-> Changelog:
-> 
-> v2:
-> - remove existing FLOW_DIS_FIRST_FRAG "support" (requested by Jianbo)
-> 
-> v1: https://lore.kernel.org/netdev/20240417135110.99900-1-ast@fiberby.net/
-> 
->   drivers/net/ethernet/mellanox/mlx5/core/en_tc.c | 10 ++++------
->   1 file changed, 4 insertions(+), 6 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c b/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
-> index aeb32cb27182..30673292e15f 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
-> @@ -2801,12 +2801,6 @@ static int __parse_cls_flower(struct mlx5e_priv *priv,
->   		flow_rule_match_control(rule, &match);
->   		addr_type = match.key->addr_type;
->   
-> -		/* the HW doesn't support frag first/later */
-> -		if (match.mask->flags & FLOW_DIS_FIRST_FRAG) {
-> -			NL_SET_ERR_MSG_MOD(extack, "Match on frag first/later is not supported");
-> -			return -EOPNOTSUPP;
-> -		}
-> -
->   		if (match.mask->flags & FLOW_DIS_IS_FRAGMENT) {
->   			MLX5_SET(fte_match_set_lyr_2_4, headers_c, frag, 1);
->   			MLX5_SET(fte_match_set_lyr_2_4, headers_v, frag,
-> @@ -2819,6 +2813,10 @@ static int __parse_cls_flower(struct mlx5e_priv *priv,
->   			else
->   				*match_level = MLX5_MATCH_L3;
->   		}
-> +
-> +		if (!flow_rule_is_supp_control_flags(FLOW_DIS_IS_FRAGMENT,
-> +						     match.mask->flags, extack))
-> +			return -EOPNOTSUPP;
->   	}
->   
->   	if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_BASIC)) {
-
-Acked-by: Tariq Toukan <tariqt@nvidia.com>
+> >
+> >Shradha Gupta (2):
+> >  net: Add sysfs atttributes for max_mtu min_mtu
+> >  net: mana: Add new device attributes for mana
+> >
+> > Documentation/ABI/testing/sysfs-class-net     | 16 ++++++++++
+> > .../net/ethernet/microsoft/mana/gdma_main.c   | 32 +++++++++++++++++++
+> > net/core/net-sysfs.c                          |  4 +++
+> > 3 files changed, 52 insertions(+)
+> >
+> >-- 
+> >2.34.1
+> >
+> >
 
