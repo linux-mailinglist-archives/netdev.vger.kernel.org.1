@@ -1,206 +1,130 @@
-Return-Path: <netdev+bounces-92559-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92560-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 629A38B7E3F
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 19:11:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F91A8B7E68
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 19:27:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 800A41C21209
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 17:11:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3A7C3280AAA
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 17:27:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FAB317B4E1;
-	Tue, 30 Apr 2024 17:11:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E76A117F396;
+	Tue, 30 Apr 2024 17:27:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BmCtr7xA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ci7kPrCc"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 791BE179654
-	for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 17:11:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F7F317F37D
+	for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 17:27:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714497104; cv=none; b=iPi5FVlsoX1hXTQtbiXJtZfjQjCdgjAfZEK081a3DGlBhcMrAcYFlgJEaiVfimYKXyrqf4QH0zb8T3Vv4dqNyBnKnEXYC/pd08kZVHjq2Ds7iS0iMVXtu0qZ6O1fNmLESQoO3rNHn4SapxKCjaIrBHrFw3FYQOxxZCAq5H2lIA4=
+	t=1714498033; cv=none; b=hF5FkFbjbarbMF0Qo/T7Klk5ba89UO9JmVri4JIszd6+if72XWTf3RSJnw8XqxwoOEy2Duy0HBdGDK6fXKc/zJvuT+nl9mRtKI2NdwriEc7LLEc9GUOGjZRokYc0mMeVPzDIhjEH0Kg9kXgO2LRnmOPvtCa4fMD0mAjivVK3G6k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714497104; c=relaxed/simple;
-	bh=8X0UHY77IM6d1PXdNcSq6p0Xp+tqUykLoEp0INvARGQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fmCm/EG7iM1OhwTnqUuqsO3bdKuMkD/1uVzUfPYEzYUoCWjRsdEMxjdbxSQl34wVqN+avoB2xUiC45XP8XwF5YqfrAm37gTs4ecV2zVc3o2a+1zTOh+mM3cKOIBAZ4i7OroFDHtaCUpt0PGJVhcA2vc/wC/Ok3jBziNZ/PJ1pFE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BmCtr7xA; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1714497101;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=H+yz/Du7bMZUkgZkgBc01otupz3qNmd+HiaOEpj7YFQ=;
-	b=BmCtr7xA41+gVbOzwTqeFNLzk4jM0MeATCxbFr6QF2nh+3tf/LrlZurXi69AVQiFCKnvWj
-	O2ls7v9z2LJhh+dLE7tOqkn0PR40gfke5KrCu76dRezu8vgbMq/kcFjtTvLYFprOE5+JP0
-	1OflI+vbqnfnztjiwLMytltZ0opjGho=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-316-1Ma40_K5NviGnz7q7K-hlQ-1; Tue,
- 30 Apr 2024 13:11:37 -0400
-X-MC-Unique: 1Ma40_K5NviGnz7q7K-hlQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 52ADB29AC016;
-	Tue, 30 Apr 2024 17:11:33 +0000 (UTC)
-Received: from dcaratti.users.ipa.redhat.com (unknown [10.45.225.235])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 326F72166B36;
-	Tue, 30 Apr 2024 17:11:30 +0000 (UTC)
-From: Davide Caratti <dcaratti@redhat.com>
-To: Jamal Hadi Salim <jhs@mojatatu.com>,
-	Cong Wang <xiyou.wangcong@gmail.com>,
-	Jiri Pirko <jiri@resnulli.us>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Naresh Kamboju <naresh.kamboju@linaro.org>,
-	netdev@vger.kernel.org
-Subject: [PATCH net-next] net/sched: unregister lockdep keys in qdisc_create/qdisc_alloc error path
-Date: Tue, 30 Apr 2024 19:11:13 +0200
-Message-ID: <2aa1ca0c0a3aa0acc15925c666c777a4b5de553c.1714496886.git.dcaratti@redhat.com>
+	s=arc-20240116; t=1714498033; c=relaxed/simple;
+	bh=WfOVphmhv/9DHaLLypxzpDt16DQPjYoxL2liVI8RywI=;
+	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type; b=MzJrmN6VyD9LBOxAkBK9JV/hXBxQKgIsGCeK1TZ1ZDR3945icXHhjMhO07SO+1ZYyQ6F3sqUn7e0GnzgbPMckcOAE40rYfN+ePgUuHVhOEDqOulX0BoAEIocKUj1tcxIs/tWt7D1Wzy9vhLR9EM9oz7U51+7b2wbi0mIFB30k2M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ci7kPrCc; arc=none smtp.client-ip=209.85.218.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-a58e2740cd7so6585466b.1
+        for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 10:27:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1714498030; x=1715102830; darn=vger.kernel.org;
+        h=content-transfer-encoding:subject:from:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QMCNHrPxdvDu2iKw2+IACr5wzMFDcOz53bkBnPvdl4s=;
+        b=Ci7kPrCcCiE1TPAdUg9B65NofiY2xFYrUnIWWnQR42NoqJF2MyJkJxOSln8gXKv38L
+         0Mu2/eUm80IWELraWckc+TwjN7r7qP9wP6fYQZS9bNZRdSFJFJsC5P67vu5pakXW2qHT
+         5IO6E4xEThp6ir0zxTlAE3NSJJFQFq6r1NlcF6Fwb0gjBLX7CKjReBF2H56xdZ/MIZN4
+         OZ2KDPdEHoZ2wsTS9M+H/j8VgpsLGKgCytQr5lv2KmjhpiRBfpWvJkq4FexscUvn82zS
+         YBMHEaccUyMmN4wmR/1mQ7tqHt1eYpMlMGiUcFQR+kCb3DU6LDlHSLRqTN92tHS67jJu
+         idJg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714498030; x=1715102830;
+        h=content-transfer-encoding:subject:from:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=QMCNHrPxdvDu2iKw2+IACr5wzMFDcOz53bkBnPvdl4s=;
+        b=aw1cHTEoTiL4zf8IBFLEVxG9ZiCKj0j6xjiyQuYCYPzvKEWVh8qYNAu5ZUiJ8n9o+3
+         FCxXDUkhFQWfjMzj/Y/RM81tV6HGos10pJIGiGTNIUwOdKYgGJ2WaJXKCwUfULyGHqPm
+         oeTCstYjV++9QZEkUNE/6Nc9vkluAAPEDKwLOvnwB6WviKZrF16rUBTZloxwv1myrnhS
+         8+CVXYY+nxXkjsZ6TlhIgE4KXGNpqwwMAs5gjQiJa+bQVHYK+sfjrNRtjphRmlb9MXT7
+         ZnR97XGpvsVyguF3SCD1kDN7JmwJb/LE/n4m7sILtlBqeWgldfHhKz/tPbu8H/0Qez4e
+         FZJg==
+X-Gm-Message-State: AOJu0Yz6Oh32PNpmUtVLVOAE/TE2NslM+cB/q5O+G7ZI+YrYxApZI7z6
+	YLG31FIMmx/VuDGmqSo723fI9x8lTtoiqTNbU9IQd8bC2emu1CtcavSiag==
+X-Google-Smtp-Source: AGHT+IElM2df7WCzabPBH0lUQssVB+SbUKQASCb29cJVKULJ12TsmrYVr33mWuPsxmH+pj/PFmLXjw==
+X-Received: by 2002:a17:907:7627:b0:a59:43e5:2506 with SMTP id jy7-20020a170907762700b00a5943e52506mr250863ejc.38.1714498030077;
+        Tue, 30 Apr 2024 10:27:10 -0700 (PDT)
+Received: from [192.168.1.23] ([31.45.194.231])
+        by smtp.gmail.com with ESMTPSA id ww4-20020a170907084400b00a51d88e6164sm15285638ejb.203.2024.04.30.10.27.09
+        for <netdev@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 30 Apr 2024 10:27:09 -0700 (PDT)
+Message-ID: <1055ba5b-7230-466a-ba6d-4bc946c908c0@gmail.com>
+Date: Tue, 30 Apr 2024 19:27:08 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
+User-Agent: Betterbird (Linux)
+Content-Language: hr
+To: netdev@vger.kernel.org
+From: Antonio Prcela <antonio.prcela@gmail.com>
+Subject: [BUG] iproute2 - vlan-ids not shown when -details used
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Naresh and Eric report several errors (corrupted elements in the dynamic
-key hash list), when running tdc.py or syzbot. The error path of
-qdisc_alloc() and qdisc_create() frees the qdisc memory, but it forgets
-to unregister the lockdep key, thus causing use-after-free like the
-following one:
+Hi,
 
- ==================================================================
- BUG: KASAN: slab-use-after-free in lockdep_register_key+0x5f2/0x700
- Read of size 8 at addr ffff88811236f2a8 by task ip/7925
+the following bug has been found in iproute2's bridge tool. Reproduced with
+v6.8.0 running on kernel v6.8.8 and v5.17.0 running on kernel v5.15.70
 
- CPU: 26 PID: 7925 Comm: ip Kdump: loaded Not tainted 6.9.0-rc2+ #648
- Hardware name: Supermicro SYS-6027R-72RF/X9DRH-7TF/7F/iTF/iF, BIOS 3.0  07/26/2013
- Call Trace:
-  <TASK>
-  dump_stack_lvl+0x7c/0xc0
-  print_report+0xc9/0x610
-  kasan_report+0x89/0xc0
-  lockdep_register_key+0x5f2/0x700
-  qdisc_alloc+0x21d/0xb60
-  qdisc_create_dflt+0x63/0x3c0
-  attach_one_default_qdisc.constprop.37+0x8e/0x170
-  dev_activate+0x4bd/0xc30
-  __dev_open+0x275/0x380
-  __dev_change_flags+0x3f1/0x570
-  dev_change_flags+0x7c/0x160
-  do_setlink+0x1ea1/0x34b0
-  __rtnl_newlink+0x8c9/0x1510
-  rtnl_newlink+0x61/0x90
-  rtnetlink_rcv_msg+0x2f0/0xbc0
-  netlink_rcv_skb+0x120/0x380
-  netlink_unicast+0x420/0x630
-  netlink_sendmsg+0x732/0xbc0
-  __sock_sendmsg+0x1ea/0x280
-  ____sys_sendmsg+0x5a9/0x990
-  ___sys_sendmsg+0xf1/0x180
-  __sys_sendmsg+0xd3/0x180
-  do_syscall_64+0x96/0x180
-  entry_SYSCALL_64_after_hwframe+0x71/0x79
- RIP: 0033:0x7f9503f4fa07
- Code: 0a 00 f7 d8 64 89 02 48 c7 c0 ff ff ff ff eb b9 0f 1f 00 f3 0f 1e fa 64 8b 04 25 18 00 00 00 85 c0 75 10 b8 2e 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 51 c3 48 83 ec 28 89 54 24 1c 48 89 74 24 10
- RSP: 002b:00007fff6c729068 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
- RAX: ffffffffffffffda RBX: 000000006630c681 RCX: 00007f9503f4fa07
- RDX: 0000000000000000 RSI: 00007fff6c7290d0 RDI: 0000000000000003
- RBP: 0000000000000000 R08: 0000000000000001 R09: 0000000000000078
- R10: 000000000000009b R11: 0000000000000246 R12: 0000000000000001
- R13: 00007fff6c729180 R14: 0000000000000000 R15: 000055bf67dd9040
-  </TASK>
+Create a bridge and attach eth1 to it. Set vlan-ids, for example 10-15,
+set PVID of eth1 to something different than 1 but keep it inbetween the
+set vlan-ids. Ergo: if vlan-id 10-15 set, then: PVID > 10 && PVID < 15.
 
- Allocated by task 7745:
-  kasan_save_stack+0x1c/0x40
-  kasan_save_track+0x10/0x30
-  __kasan_kmalloc+0x7b/0x90
-  __kmalloc_node+0x1ff/0x460
-  qdisc_alloc+0xae/0xb60
-  qdisc_create+0xdd/0xfb0
-  tc_modify_qdisc+0x37e/0x1960
-  rtnetlink_rcv_msg+0x2f0/0xbc0
-  netlink_rcv_skb+0x120/0x380
-  netlink_unicast+0x420/0x630
-  netlink_sendmsg+0x732/0xbc0
-  __sock_sendmsg+0x1ea/0x280
-  ____sys_sendmsg+0x5a9/0x990
-  ___sys_sendmsg+0xf1/0x180
-  __sys_sendmsg+0xd3/0x180
-  do_syscall_64+0x96/0x180
-  entry_SYSCALL_64_after_hwframe+0x71/0x79
+Query the state via bridge vlan show:
 
- Freed by task 7745:
-  kasan_save_stack+0x1c/0x40
-  kasan_save_track+0x10/0x30
-  kasan_save_free_info+0x36/0x60
-  __kasan_slab_free+0xfe/0x180
-  kfree+0x113/0x380
-  qdisc_create+0xafb/0xfb0
-  tc_modify_qdisc+0x37e/0x1960
-  rtnetlink_rcv_msg+0x2f0/0xbc0
-  netlink_rcv_skb+0x120/0x380
-  netlink_unicast+0x420/0x630
-  netlink_sendmsg+0x732/0xbc0
-  __sock_sendmsg+0x1ea/0x280
-  ____sys_sendmsg+0x5a9/0x990
-  ___sys_sendmsg+0xf1/0x180
-  __sys_sendmsg+0xd3/0x180
-  do_syscall_64+0x96/0x180
-  entry_SYSCALL_64_after_hwframe+0x71/0x79
+$ bridge vlan show dev eth1
+port              vlan-id
+eth1              10
+                  11
+                  12
+                  13 PVID
+                  14
+                  15
 
-Fix this ensuring that lockdep_unregister_key() is called before the
-qdisc struct is freed, also in the error path of qdisc_create() and
-qdisc_alloc().
+Query the state by adding -details flag:
 
-Fixes: af0cb3fa3f9e ("net/sched: fix false lockdep warning on qdisc root lock")
-Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
-Closes: https://lore.kernel.org/netdev/20240429221706.1492418-1-naresh.kamboju@linaro.org/
-CC: Naresh Kamboju <naresh.kamboju@linaro.org>
-CC: Eric Dumazet <edumazet@google.com>
-Signed-off-by: Davide Caratti <dcaratti@redhat.com>
----
- net/sched/sch_api.c     | 1 +
- net/sched/sch_generic.c | 1 +
- 2 files changed, 2 insertions(+)
+$ bridge -details vlan show dev eth1
+port              vlan-id
+eth1              10-12
+                    state forwarding mcast_router 1 neigh_suppress off
+                  13 PVID
+                    state forwarding mcast_router 1 neigh_suppress off
 
-diff --git a/net/sched/sch_api.c b/net/sched/sch_api.c
-index 60239378d43f..6292d6d73b72 100644
---- a/net/sched/sch_api.c
-+++ b/net/sched/sch_api.c
-@@ -1389,6 +1389,7 @@ static struct Qdisc *qdisc_create(struct net_device *dev,
- 		ops->destroy(sch);
- 	qdisc_put_stab(rtnl_dereference(sch->stab));
- err_out3:
-+	lockdep_unregister_key(&sch->root_lock_key);
- 	netdev_put(dev, &sch->dev_tracker);
- 	qdisc_free(sch);
- err_out2:
-diff --git a/net/sched/sch_generic.c b/net/sched/sch_generic.c
-index 31dfd6c7405b..d3f6006b563c 100644
---- a/net/sched/sch_generic.c
-+++ b/net/sched/sch_generic.c
-@@ -982,6 +982,7 @@ struct Qdisc *qdisc_alloc(struct netdev_queue *dev_queue,
- 
- 	return sch;
- errout1:
-+	lockdep_unregister_key(&sch->root_lock_key);
- 	kfree(sch);
- errout:
- 	return ERR_PTR(err);
--- 
-2.44.0
 
+As one can see, the -details basically stops at the PVID and doesn't
+show any vlan-id(s) that come afterwards.
+
+This issue can also be reproduced in a standalone program that uses
+BRIDGE_VLANDB_*, like it's within iproute2 when -details is used.
+Whereas not using -details retreives the vlan-ids via IFLA_AF_SPEC
+and that works fine.
+
+Unfortunatley I do not fully understand iproute2 'under te hood' to
+provide a patch which would fix this issue.
+
+Hoping for some feedback regarding this. Might be 'works as designed'?
+
+Regards,
+Antonio P.
 
