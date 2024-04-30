@@ -1,114 +1,123 @@
-Return-Path: <netdev+bounces-92501-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92500-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7AB6A8B792E
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 16:25:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D17508B792A
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 16:25:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A99B21C22B87
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 14:25:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8BAE12812DB
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 14:25:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 806FB1BED66;
-	Tue, 30 Apr 2024 14:10:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 238201527AA;
+	Tue, 30 Apr 2024 14:10:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IRzstxTJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aSACFgJC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03D161BED6B
-	for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 14:10:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE8D41527A8;
+	Tue, 30 Apr 2024 14:10:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714486254; cv=none; b=svLbTXYgVOcwubXuMpumUvgBzb0T/CUnCr5hBj4U42y6QhXbK7ro3UvlNlVOLzXYHIi0A+gue3uN/1nTSHV57RgFSs9uiLwhHtTo93niJC5qn+TH5HpW3ypYN/1tcGs+t5LWsjJHk/0pp9ktnBuyXC/U/NIHTE0ZWFQsy0ULoEU=
+	t=1714486245; cv=none; b=dizTcLNXf+RtLwVD/uwLd9ZtMtFKp2WTwru1BhFxrWvWu/gmVwNuYsn8aThuWspVGJnb0uJupsiR++SWzQU/4fuPofI2SJ+TrwnHbVIX1BYuC9vtGcEW/CntVgTcSq0yxVEK7DU2/sJWgEMH40/Fc+dPTLj06ILX3YUPxgfnVxE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714486254; c=relaxed/simple;
-	bh=wXeEDI3PBBpnP38xgjZueBZM8hRXH32paMvVIPlN0zM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=RFNsc6ksUG6JfX2SQ5/vyFWT3o4KR38U7hy3G8LXiW1XODVDevaPXiyZng5rPFuh41bQe1sK18MmeRYKaI9S5KIRRfauy1yL+peocHWASxNkB/StB28LooJJc5aelECnfMBrycZvCiTmKxMp5YHo0dryB7tUmmBxv5qH5nsAOL0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IRzstxTJ; arc=none smtp.client-ip=209.85.208.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-5727ce5b804so16249a12.0
-        for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 07:10:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1714486250; x=1715091050; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=flcLrs0CTLkRp4lwBH/tgPTamGYUt9unQEu51+eSG9A=;
-        b=IRzstxTJEA+Opkhlppnte2uXbIU8lKD78ueMsFfsrZXc+DI8S3Cps4XcMMpx0FzZjh
-         EHa+Jy/KGn2S8lv62OKXMskW0Hzg0HKcWzsSj5swMBSJMMYDEEcZqqfl2VMj8w/W92L+
-         yQ+V+JcQqql7WBgXNDpFPFGJ8D4klufyYQlaNQ8aInVdZdnev75y+pDD/HVVvBVRrr4m
-         dqws/f1gVzsZqJCEojC9zuoo9Yx4RU1ebqHvhW5nuo3UJN3iGoJIQysPtyk1QPx+l9bu
-         vQJpIPykR90YuX251jvuXP/Moq2eIMjJq58PKUERi61z1GIvmNKdOix7TL3PO3fJWMQG
-         hdGg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714486250; x=1715091050;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=flcLrs0CTLkRp4lwBH/tgPTamGYUt9unQEu51+eSG9A=;
-        b=k9gShXSZzoTTlFyO3lGLAxJF4pgTbj0icJzaivJ+Dtoh2kXlGx40vLjFcbCR10r5CB
-         0Vy6co1bQrNwB0923XDoc9SvLeK1ZeUiyZSS7fRlEsE9M9k1b0VXhq+2yfaP/Tq8KPtr
-         FQD2JRcrgf9KQJqwq6HtPJKtW2nMmzCXbxeq3XAuqc6ZMqe3t1ImOwNa9Wonsf2rgawJ
-         RErVLmAT7jhmpjTKxNEht857CwcpBz6tbyGALiXQW6JGgicDepRZfK83I/wO9hDHV8wA
-         mTzTVz0pw9ZO39RzaVhF/cCLKsheYO1T11TlEeRDJbYIB2lNKYtsvUKi1TeXinpSLoGk
-         nncg==
-X-Gm-Message-State: AOJu0Ywla7mtn31BPkao6UkCIBQEwpf4zRFBe0Z262VNYJG2pDIdrdfA
-	zXitattfEly4HdpXEF0fx40tA9YQDTnFZU6OcxAe4eiRXEFMlVRLBRO41Y1D5ATmBYiSqZE4QZr
-	veuv1x3HdloZGL/z0QFgL65d0KnsAfwD6z1i8
-X-Google-Smtp-Source: AGHT+IFRVUNJVq9usLqD0aQ1nwKNEZGrhBiNwqO1rXgfFnz4VSVNxq2azlgdwljeZ+D7Qn5hsFjHAEsrjNRxWkII3/4=
-X-Received: by 2002:a05:6402:2032:b0:572:7c06:9c0 with SMTP id
- ay18-20020a056402203200b005727c0609c0mr272713edb.0.1714486249968; Tue, 30 Apr
- 2024 07:10:49 -0700 (PDT)
+	s=arc-20240116; t=1714486245; c=relaxed/simple;
+	bh=DFmZGaD+ssIlT/B33ege35Nl6ftG7eXESOlm0ucRd2w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nBr1q76jqfm7q1ynBOcWKPhRsSITQx3U5sCUyht1NbEN5JCiIX4bOPrpynXll6H6ffDHdgyq1co58KF3R99a04I8SU6V1cZ0k5t5FE/wRDdDhsgk34D66JYenfttkpR3CcpQbKUTuGV79UywplM1XqkjpBzZCAmc93+p4RDgZEI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aSACFgJC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C062BC4AF18;
+	Tue, 30 Apr 2024 14:10:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714486244;
+	bh=DFmZGaD+ssIlT/B33ege35Nl6ftG7eXESOlm0ucRd2w=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=aSACFgJCQTsoJH/MwklGL5d7BwvIk3JQvTZDjrN0140y44hhz89HBuA3VIZDS5Mxc
+	 DvBjVPJgfcsB6bdcfVi0ZplDPtKc3skOo1Dec3otryzUn8rV8jCHj+89IdFSloUjt1
+	 sHkPEng63oLz266ELuP4YDqKvgbiW3B3Hdpb0T60+RTKVGrwjlgNhC2XuS2Sl8XO2k
+	 JgyOWWhp5pax4oP4TpKTwY8Ht2lVvokqjd0bPcSDYzgQPuJ01PT2zcirBkFdeOxs8C
+	 sJBB1Gup943xkk+kKygTScyvi8VN2IluNEmeThT0DZmRQBZ93b2vcCCD5n0JoxLg/M
+	 e7ljDuWXHqRxA==
+Date: Tue, 30 Apr 2024 17:10:39 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>,
+	Jakub Kicinski <kuba@kernel.org>
+Cc: Breno Leitao <leitao@debian.org>, Jason Gunthorpe <jgg@ziepe.ca>,
+	"open list:HFI1 DRIVER" <linux-rdma@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>,
+	linux-netdev <netdev@vger.kernel.org>
+Subject: Re: [PATCH net-next] IB/hfi1: allocate dummy net_device dynamically
+Message-ID: <20240430141039.GH100414@unreal>
+References: <20240426085606.1801741-1-leitao@debian.org>
+ <20240430125047.GE100414@unreal>
+ <49973089-1e5e-48a2-9616-09cf8b8d5a7f@cornelisnetworks.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <752f1ccf762223d109845365d07f55414058e5a3.1714484273.git.pabeni@redhat.com>
-In-Reply-To: <752f1ccf762223d109845365d07f55414058e5a3.1714484273.git.pabeni@redhat.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 30 Apr 2024 16:10:38 +0200
-Message-ID: <CANn89iJoxoA92tF3avTTL+rthen_iYfA6pc6wevNRkwnvaLWjg@mail.gmail.com>
-Subject: Re: [PATCH net] tipc: fix UAF in error path
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, Jon Maloy <jmaloy@redhat.com>, 
-	Ying Xue <ying.xue@windriver.com>, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, tipc-discussion@lists.sourceforge.net, 
-	Long Xin <lxin@redhat.com>, stable@vger.kernel.org, zdi-disclosures@trendmicro.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <49973089-1e5e-48a2-9616-09cf8b8d5a7f@cornelisnetworks.com>
 
-On Tue, Apr 30, 2024 at 3:53=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wro=
-te:
->
-> Sam Page (sam4k) working with Trend Micro Zero Day Initiative reported
-> a UAF in the tipc_buf_append() error path:
->
-> BUG: KASAN: slab-use-after-free in kfree_skb_list_reason+0x47e/0x4c0
-> linux/net/core/skbuff.c:1183
-> Read of size 8 at addr ffff88804d2a7c80 by task poc/8034
->
->
-> In the critical scenario, either the relevant skb is freed or its
-> ownership is transferred into a frag_lists. In both cases, the cleanup
-> code must not free it again: we need to clear the skb reference earlier.
->
-> Fixes: 1149557d64c9 ("tipc: eliminate unnecessary linearization of incomi=
-ng buffers")
-> Cc: stable@vger.kernel.org
-> Reported-by: zdi-disclosures@trendmicro.com # ZDI-CAN-23852
-> Acked-by: Xin Long <lucien.xin@gmail.com>
-> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-> ---
->  net/tipc/msg.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
->
+On Tue, Apr 30, 2024 at 10:03:49AM -0400, Dennis Dalessandro wrote:
+> On 4/30/24 8:50 AM, Leon Romanovsky wrote:
+> > On Fri, Apr 26, 2024 at 01:56:05AM -0700, Breno Leitao wrote:
+> >> Embedding net_device into structures prohibits the usage of flexible
+> >> arrays in the net_device structure. For more details, see the discussion
+> >> at [1].
+> >>
+> >> Un-embed the net_device from struct hfi1_netdev_rx by converting it
+> >> into a pointer. Then use the leverage alloc_netdev() to allocate the
+> >> net_device object at hfi1_alloc_rx().
+> >>
+> >> [1] https://lore.kernel.org/all/20240229225910.79e224cf@kernel.org/
+> >>
+> >> Acked-by: Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>
+> >> Signed-off-by: Breno Leitao <leitao@debian.org>
+> >> ---
+> >> Changelog
+> >>
+> >> v5:
+> >> 	* Basically replaced the old alloc_netdev() by the new helper
+> >> 	  alloc_netdev_dummy().
+> >> v4:
+> >> 	* Fix the changelog format
+> >> v3:
+> >> 	* Re-worded the comment, by removing the first paragraph.
+> >> v2:
+> >> 	* Free struct hfi1_netdev_rx allocation if alloc_netdev() fails
+> >> 	* Pass zero as the private size for alloc_netdev().
+> >> 	* Remove wrong reference for iwl in the comments
+> >> ---
+> >>
+> >>  drivers/infiniband/hw/hfi1/netdev.h    | 2 +-
+> >>  drivers/infiniband/hw/hfi1/netdev_rx.c | 9 +++++++--
+> >>  2 files changed, 8 insertions(+), 3 deletions(-)
+> > 
+> > Dennis,
+> > 
+> > Do you plan to send anything to rdma-next which can potentially create
+> > conflicts with netdev in this cycle?
+> > 
+> > If not, it will be safe to apply this patch directly to net-next.
+> > 
+> > Thanks
+> 
+> Nothing right now. Should be safe to sent to net-next.
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+Jakub, can you please take this patch?
+
+> 
+> FYI, since I talked about it publicly at the OFA Workshop recently. We will be
+> starting the upstream of support for our new HW, soon.
+
+Great, thanks
+
+> 
+> -Denny
 
