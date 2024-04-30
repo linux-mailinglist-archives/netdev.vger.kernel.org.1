@@ -1,117 +1,275 @@
-Return-Path: <netdev+bounces-92513-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92514-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A2058B7ABA
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 16:59:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB8E78B7AE9
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 17:03:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 365E5281F2E
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 14:59:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 640331F22862
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 15:03:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E403014372C;
-	Tue, 30 Apr 2024 14:58:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="qKt/VLxa"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45A8F13AA51;
+	Tue, 30 Apr 2024 15:02:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 189607710D
-	for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 14:58:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76D7177110
+	for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 15:02:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714489132; cv=none; b=cxb9jwE7poLvkPvGRK2Oftb3h0GBUX4XwvFIxzZpXKdTm4gD0Uuv+u4YxeuffZeubtMEGRPvnDJSvujM7Nv+gPU5Da5xwggUimPsuudYzNG4EDkVWm5HB93MuNFRUsOUEWQSB/8rTBPGV1MgDjZAQc1QPqmBNr5RrbJICf42oro=
+	t=1714489349; cv=none; b=YSH00yB+RfMOWvJYW/wDIGy69/tsZcxSRLSSihT8b9VK/HWChp/eCe0ISglpzN7kj27jHv/Jp8IZE30T3jAmkmFQLrpu8J6GTfrYuwEtnMMVOtAo+CJ4zCX5Fj9bFx98q8PYKkF31EfalAemNEmMP+1sEbuMULOrgUEE1Bx3R6E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714489132; c=relaxed/simple;
-	bh=aK8rNc36l84FoofPl3zvU9soOmwm+ULYNmXvO9yTgsY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nwrOXCykjoqoYyDPT1JVRR4c4fKf0F9iC4IZp31SsmXSms1VOFU+BX9UWWXrA52lbQe8MiGuz/v9EDcqmxWsTkIbQdGc+IGod7nPV1Twqmp3cAwmGliZfzLOB6wC74aCtBREcb2I/166umBeR6sA64opWXJoEYeaPdXOw+raO1s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=qKt/VLxa; arc=none smtp.client-ip=85.214.62.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from [127.0.0.1] (p578adb1c.dip0.t-ipconnect.de [87.138.219.28])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits))
-	(No client certificate requested)
-	(Authenticated sender: marex@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id 45941885B7;
-	Tue, 30 Apr 2024 16:58:47 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1714489128;
-	bh=MbS5kmDoV9ij1Dnn8Ot86aNEiqzKcScaTzIQmjRFeFM=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=qKt/VLxaAjufqoXRReo15P3+8pbLhV8dZT5QpP88Mvh6q5U+G5ts8GWg6ZtxtbuL7
-	 Tc32qWdGLqCPc4zrJ3E3qj5LC1slyKkzaQJHJzB+PFgQHF5ajly4ZIwKPhJ/w33uGQ
-	 JGMSW1hBYvb3J+6aM5tPtutWBW4NqCfXA1fhUQ2Eyj4iVGK5ugqxKU00/Zwl4D30bH
-	 yvjpOOagxoPGbNKleoqaRK1RZTwjXy1P8e+9RATKbqUonn+iuo0lTTen5GVjbb4QhZ
-	 RjuGOkPvY6MYuPLSEdDB5ZuME2R3T7iNdijFKmebBRQkxif8HWiP2WyHWM/5P7ur/e
-	 R0c36JSp1HJ9g==
-Message-ID: <d51e8d34-10f3-431a-a3dc-d1daed046e86@denx.de>
-Date: Tue, 30 Apr 2024 16:58:46 +0200
+	s=arc-20240116; t=1714489349; c=relaxed/simple;
+	bh=7rmPFQ3DT++fNxZ0G1yoLQAgk3hBR6DMm4fIql/kEjE=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Bd16+K0kUtto7HBQGq8XqexwljMHLgfOUTCozl3ainB7IHQ75kzkCKfojh++zgOoaJ6MimpqHDtPwCVtxo897gKzFnR9r+hh2tJJLuNAxjM8MDKYQb0N4Je82wscEQtrem5VnklGT24xswdTbzi0TKGNI+5nmuee3v63/BPnRH8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-36c10cac5f9so36803015ab.3
+        for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 08:02:27 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714489346; x=1715094146;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=1ALJp+yxeJq2OA0p5gmt6WimV/9suDz8TH5aPp/0mBQ=;
+        b=apDSfvW5ixWPQc5JEDhxmgGA1OdeAkWvzjS1DubBSslPiPmn0mAC0YMiUr7R+4wT2D
+         skBUUj8bnx37HmgbP0YzvoNrL/i5dYSYTGm97+kVIOwmaLFljq14GvGTFaXny+EVs+4x
+         T9mROXP4l3udPcyTqR6qdzNr+y5q0/gdUKhkLZN7gBHuCf2ISoqryxrenxuras1N6EkE
+         2slKKXWHC9aZULDjdMVi7HZw0ahK9DZfzB3QY8gxk//rNOYJGO5WGazU35SttqELUaQP
+         jMQuzzi14JdoTMIfN7yesj1ULOA/HAQHCiZxvsQIVxNNyybF81YwpiZKVMpG9+RKK0SY
+         cogA==
+X-Forwarded-Encrypted: i=1; AJvYcCVGcrJrFzVWihrPcBjHxOHFFc5bGtusbWROEZZ6UCQUOvtaIN7Zq8zhnT5EiKZHUj8H8SMY0MOE7AH2cH6uT6zxXffbjtvZ
+X-Gm-Message-State: AOJu0YzlLxBGNkKpsndnwg4XyYSssMZkMocZE8jAhhhhYRAarkg8rGeF
+	dhhzJ4xsN12VbOSsxtKzEHUA4J8E1dwKcZ5FnIC3DfqaeIjWQPARYFCnGRU4ZsNw8behe/AGy3F
+	K8+tBH+kmWxYFY9ztBVSyvEoyifCy22HImbcajYbxNLIi/JkSclIowuU=
+X-Google-Smtp-Source: AGHT+IEodTkEwipf14NIaP2rVFtJwuOooYDO+mCGtrYaqcuLYsZ6rxdrtUA0sg1WCkbZS08IdThoiKQoUc6Tfbj+3lUyVNUXfyoC
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [net,PATCH] net: ks8851: Queue RX packets in IRQ handler instead
- of disabling BHs
-To: Ronald Wahl <ronald.wahl@raritan.com>, netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
-References: <20240430011518.110416-1-marex@denx.de>
- <959c3cf5-c604-4b36-adb8-ee28ed4ef9c4@raritan.com>
-Content-Language: en-US
-From: Marek Vasut <marex@denx.de>
-In-Reply-To: <959c3cf5-c604-4b36-adb8-ee28ed4ef9c4@raritan.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
+X-Received: by 2002:a05:6e02:154e:b0:36c:2976:3012 with SMTP id
+ j14-20020a056e02154e00b0036c29763012mr569569ilu.2.1714489345740; Tue, 30 Apr
+ 2024 08:02:25 -0700 (PDT)
+Date: Tue, 30 Apr 2024 08:02:25 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000006ca6cc061751a86a@google.com>
+Subject: [syzbot] [wireless?] [usb?] INFO: trying to register non-static key
+ in skb_dequeue (3)
+From: syzbot <syzbot+2660b9135e6144ca41a5@syzkaller.appspotmail.com>
+To: kvalo@kernel.org, linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, pkshih@realtek.com, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 4/30/24 10:24 AM, Ronald Wahl wrote:
-> On 30.04.24 03:14, Marek Vasut wrote:
->> Currently the driver uses local_bh_disable()/local_bh_enable() in its
->> IRQ handler to avoid triggering net_rx_action() softirq on exit from
->> netif_rx(). The net_rx_action() could trigger this driver .start_xmit
->> callback, which is protected by the same lock as the IRQ handler, so
->> calling the .start_xmit from netif_rx() from the IRQ handler critical
->> section protected by the lock could lead to an attempt to claim the
->> already claimed lock, and a hang.
->>
->> The local_bh_disable()/local_bh_enable() approach works only in case
->> the IRQ handler is protected by a spinlock, but does not work if the
->> IRQ handler is protected by mutex, i.e. this works for KS8851 with
->> Parallel bus interface, but not for KS8851 with SPI bus interface.
->>
->> Remove the BH manipulation and instead of calling netif_rx() inside
->> the IRQ handler code protected by the lock, queue all the received
->> SKBs in the IRQ handler into a queue first, and once the IRQ handler
->> exits the critical section protected by the lock, dequeue all the
->> queued SKBs and push them all into netif_rx(). At this point, it is
->> safe to trigger the net_rx_action() softirq, since the netif_rx()
->> call is outside of the lock that protects the IRQ handler.
->>
->> Fixes: be0384bf599c ("net: ks8851: Handle softirqs at the end of IRQ 
->> thread to fix hang")
->> Signed-off-by: Marek Vasut <marex@denx.de>
->> ---
->> Cc: "David S. Miller" <davem@davemloft.net>
->> Cc: Eric Dumazet <edumazet@google.com>
->> Cc: Jakub Kicinski <kuba@kernel.org>
->> Cc: Paolo Abeni <pabeni@redhat.com>
->> Cc: Ronald Wahl <ronald.wahl@raritan.com>
->> Cc: Simon Horman <horms@kernel.org>
->> Cc: netdev@vger.kernel.org
-> 
-> To me the code looks good. An iperf3 test shows that it now has even
-> slightly more throughput in my setup (two interconnected ks8851-spi).
-> Thanks for this fix!
-> 
-> Tested-by: Ronald Wahl <ronald.wahl@raritan.com>
+Hello,
 
-That's nice. Thank you for testing. Sorry for the breakage.
+syzbot found the following issue on:
+
+HEAD commit:    3f12222a4beb usb: dwc3: core: Fix compile warning on s390 ..
+git tree:       https://git.kernel.org/pub/scm/linux/kernel/git/gregkh/usb.git usb-testing
+console output: https://syzkaller.appspot.com/x/log.txt?x=12dee6d8980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=6fe204286ac73e15
+dashboard link: https://syzkaller.appspot.com/bug?extid=2660b9135e6144ca41a5
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=127fb7bb180000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=118eeccf180000
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/25a4e2e32205/disk-3f12222a.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/e02cf02ad7b9/vmlinux-3f12222a.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/41deb6e53302/bzImage-3f12222a.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+2660b9135e6144ca41a5@syzkaller.appspotmail.com
+
+usb 1-1: reg 0xfe64, usbctrl_vendorreq TimeOut! status:0xffffffb9 value=0x0 reqtype=0xc0
+rtl_usb: rx_max_size 15360, rx_urb_num 8, in_ep 0
+rtl8192cu: Loading firmware rtlwifi/rtl8192cufw_TMSC.bin
+usb 1-1: USB disconnect, device number 2
+INFO: trying to register non-static key.
+The code is fine but needs lockdep annotation, or maybe
+you didn't initialize this object before use?
+turning off the locking correctness validator.
+CPU: 0 PID: 589 Comm: kworker/0:2 Not tainted 6.9.0-rc5-syzkaller-00105-g3f12222a4beb #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
+Workqueue: usb_hub_wq hub_event
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0x116/0x1f0 lib/dump_stack.c:114
+ assign_lock_key kernel/locking/lockdep.c:976 [inline]
+ register_lock_class+0xc2a/0x1230 kernel/locking/lockdep.c:1289
+ __lock_acquire+0x111/0x3b30 kernel/locking/lockdep.c:5014
+ lock_acquire kernel/locking/lockdep.c:5754 [inline]
+ lock_acquire+0x1b1/0x560 kernel/locking/lockdep.c:5719
+ __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:110 [inline]
+ _raw_spin_lock_irqsave+0x3a/0x60 kernel/locking/spinlock.c:162
+ skb_dequeue+0x20/0x180 net/core/skbuff.c:3835
+ rtl_usb_cleanup drivers/net/wireless/realtek/rtlwifi/usb.c:706 [inline]
+ rtl_usb_deinit drivers/net/wireless/realtek/rtlwifi/usb.c:721 [inline]
+ rtl_usb_disconnect+0x49e/0x830 drivers/net/wireless/realtek/rtlwifi/usb.c:1051
+ usb_unbind_interface+0x1e8/0x970 drivers/usb/core/driver.c:461
+ device_remove drivers/base/dd.c:568 [inline]
+ device_remove+0x122/0x170 drivers/base/dd.c:560
+ __device_release_driver drivers/base/dd.c:1270 [inline]
+ device_release_driver_internal+0x44a/0x610 drivers/base/dd.c:1293
+ bus_remove_device+0x22f/0x420 drivers/base/bus.c:574
+ device_del+0x396/0xa10 drivers/base/core.c:3909
+ usb_disable_device+0x36c/0x7f0 drivers/usb/core/message.c:1418
+ usb_disconnect+0x2e1/0x920 drivers/usb/core/hub.c:2305
+ hub_port_connect drivers/usb/core/hub.c:5361 [inline]
+ hub_port_connect_change drivers/usb/core/hub.c:5661 [inline]
+ port_event drivers/usb/core/hub.c:5821 [inline]
+ hub_event+0x1be4/0x4f50 drivers/usb/core/hub.c:5903
+ process_one_work+0x9a9/0x1ac0 kernel/workqueue.c:3254
+ process_scheduled_works kernel/workqueue.c:3335 [inline]
+ worker_thread+0x6c8/0xf70 kernel/workqueue.c:3416
+ kthread+0x2c1/0x3a0 kernel/kthread.c:388
+ ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+ </TASK>
+BUG: unable to handle page fault for address: ffffffffffffffd8
+#PF: supervisor write access in kernel mode
+#PF: error_code(0x0002) - not-present page
+PGD 82a2067 P4D 82a2067 PUD 82a4067 PMD 0 
+Oops: 0002 [#1] PREEMPT SMP KASAN PTI
+CPU: 0 PID: 589 Comm: kworker/0:2 Not tainted 6.9.0-rc5-syzkaller-00105-g3f12222a4beb #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
+Workqueue: usb_hub_wq hub_event
+RIP: 0010:arch_atomic_fetch_add arch/x86/include/asm/atomic.h:97 [inline]
+RIP: 0010:raw_atomic_fetch_add_relaxed include/linux/atomic/atomic-arch-fallback.h:749 [inline]
+RIP: 0010:atomic_fetch_add_relaxed include/linux/atomic/atomic-instrumented.h:253 [inline]
+RIP: 0010:__refcount_add include/linux/refcount.h:184 [inline]
+RIP: 0010:__refcount_inc include/linux/refcount.h:241 [inline]
+RIP: 0010:refcount_inc include/linux/refcount.h:258 [inline]
+RIP: 0010:kref_get include/linux/kref.h:45 [inline]
+RIP: 0010:usb_get_urb.part.0+0x1c/0x90 drivers/usb/core/urb.c:114
+Code: 90 90 90 90 90 90 90 90 90 90 90 90 90 90 55 48 89 fd 53 bb 01 00 00 00 e8 81 19 2d fd be 04 00 00 00 48 89 ef e8 d4 02 7f fd <f0> 0f c1 5d 00 31 ff 89 de e8 46 14 2d fd 85 db 74 47 e8 5d 19 2d
+RSP: 0018:ffffc900019cf6b0 EFLAGS: 00010046
+RAX: 0000000000000001 RBX: 0000000000000001 RCX: ffffffff8425b71c
+RDX: fffffbfffffffffc RSI: 0000000000000004 RDI: ffffffffffffffd8
+RBP: ffffffffffffffd8 R08: 0000000000000001 R09: fffffbfffffffffb
+R10: ffffffffffffffdb R11: 0000000000000001 R12: ffff888118830228
+R13: ffffffffffffffd8 R14: ffff888118830288 R15: dffffc0000000000
+FS:  0000000000000000(0000) GS:ffff8881f6400000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: ffffffffffffffd8 CR3: 0000000116906000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ usb_get_urb drivers/usb/core/urb.c:816 [inline]
+ usb_kill_anchored_urbs+0xa5/0x380 drivers/usb/core/urb.c:819
+ rtl_usb_cleanup drivers/net/wireless/realtek/rtlwifi/usb.c:713 [inline]
+ rtl_usb_deinit drivers/net/wireless/realtek/rtlwifi/usb.c:721 [inline]
+ rtl_usb_disconnect+0x4d1/0x830 drivers/net/wireless/realtek/rtlwifi/usb.c:1051
+ usb_unbind_interface+0x1e8/0x970 drivers/usb/core/driver.c:461
+ device_remove drivers/base/dd.c:568 [inline]
+ device_remove+0x122/0x170 drivers/base/dd.c:560
+ __device_release_driver drivers/base/dd.c:1270 [inline]
+ device_release_driver_internal+0x44a/0x610 drivers/base/dd.c:1293
+ bus_remove_device+0x22f/0x420 drivers/base/bus.c:574
+ device_del+0x396/0xa10 drivers/base/core.c:3909
+ usb_disable_device+0x36c/0x7f0 drivers/usb/core/message.c:1418
+ usb_disconnect+0x2e1/0x920 drivers/usb/core/hub.c:2305
+ hub_port_connect drivers/usb/core/hub.c:5361 [inline]
+ hub_port_connect_change drivers/usb/core/hub.c:5661 [inline]
+ port_event drivers/usb/core/hub.c:5821 [inline]
+ hub_event+0x1be4/0x4f50 drivers/usb/core/hub.c:5903
+ process_one_work+0x9a9/0x1ac0 kernel/workqueue.c:3254
+ process_scheduled_works kernel/workqueue.c:3335 [inline]
+ worker_thread+0x6c8/0xf70 kernel/workqueue.c:3416
+ kthread+0x2c1/0x3a0 kernel/kthread.c:388
+ ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+ </TASK>
+Modules linked in:
+CR2: ffffffffffffffd8
+---[ end trace 0000000000000000 ]---
+RIP: 0010:arch_atomic_fetch_add arch/x86/include/asm/atomic.h:97 [inline]
+RIP: 0010:raw_atomic_fetch_add_relaxed include/linux/atomic/atomic-arch-fallback.h:749 [inline]
+RIP: 0010:atomic_fetch_add_relaxed include/linux/atomic/atomic-instrumented.h:253 [inline]
+RIP: 0010:__refcount_add include/linux/refcount.h:184 [inline]
+RIP: 0010:__refcount_inc include/linux/refcount.h:241 [inline]
+RIP: 0010:refcount_inc include/linux/refcount.h:258 [inline]
+RIP: 0010:kref_get include/linux/kref.h:45 [inline]
+RIP: 0010:usb_get_urb.part.0+0x1c/0x90 drivers/usb/core/urb.c:114
+Code: 90 90 90 90 90 90 90 90 90 90 90 90 90 90 55 48 89 fd 53 bb 01 00 00 00 e8 81 19 2d fd be 04 00 00 00 48 89 ef e8 d4 02 7f fd <f0> 0f c1 5d 00 31 ff 89 de e8 46 14 2d fd 85 db 74 47 e8 5d 19 2d
+RSP: 0018:ffffc900019cf6b0 EFLAGS: 00010046
+RAX: 0000000000000001 RBX: 0000000000000001 RCX: ffffffff8425b71c
+RDX: fffffbfffffffffc RSI: 0000000000000004 RDI: ffffffffffffffd8
+RBP: ffffffffffffffd8 R08: 0000000000000001 R09: fffffbfffffffffb
+R10: ffffffffffffffdb R11: 0000000000000001 R12: ffff888118830228
+R13: ffffffffffffffd8 R14: ffff888118830288 R15: dffffc0000000000
+FS:  0000000000000000(0000) GS:ffff8881f6400000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: ffffffffffffffd8 CR3: 0000000116906000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+----------------
+Code disassembly (best guess):
+   0:	90                   	nop
+   1:	90                   	nop
+   2:	90                   	nop
+   3:	90                   	nop
+   4:	90                   	nop
+   5:	90                   	nop
+   6:	90                   	nop
+   7:	90                   	nop
+   8:	90                   	nop
+   9:	90                   	nop
+   a:	90                   	nop
+   b:	90                   	nop
+   c:	90                   	nop
+   d:	90                   	nop
+   e:	55                   	push   %rbp
+   f:	48 89 fd             	mov    %rdi,%rbp
+  12:	53                   	push   %rbx
+  13:	bb 01 00 00 00       	mov    $0x1,%ebx
+  18:	e8 81 19 2d fd       	call   0xfd2d199e
+  1d:	be 04 00 00 00       	mov    $0x4,%esi
+  22:	48 89 ef             	mov    %rbp,%rdi
+  25:	e8 d4 02 7f fd       	call   0xfd7f02fe
+* 2a:	f0 0f c1 5d 00       	lock xadd %ebx,0x0(%rbp) <-- trapping instruction
+  2f:	31 ff                	xor    %edi,%edi
+  31:	89 de                	mov    %ebx,%esi
+  33:	e8 46 14 2d fd       	call   0xfd2d147e
+  38:	85 db                	test   %ebx,%ebx
+  3a:	74 47                	je     0x83
+  3c:	e8                   	.byte 0xe8
+  3d:	5d                   	pop    %rbp
+  3e:	19                   	.byte 0x19
+  3f:	2d                   	.byte 0x2d
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
