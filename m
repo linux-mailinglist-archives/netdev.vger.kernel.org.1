@@ -1,55 +1,85 @@
-Return-Path: <netdev+bounces-92614-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92615-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E8B18B81AB
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 22:58:25 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43E3D8B81B3
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 23:01:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B68921C21CFF
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 20:58:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4B928B20426
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 21:01:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6E521A0AF0;
-	Tue, 30 Apr 2024 20:58:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 457A41A0B07;
+	Tue, 30 Apr 2024 21:01:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="E0HmGlJJ"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="QT+YxEKZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37342F9D6
-	for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 20:58:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAE868F6E
+	for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 21:00:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714510701; cv=none; b=pD1xPkf040Zlc42hp9YfTERC8mylmZgmDQOPjIyuC68UPmUlx8KAFvbGznL+Ox106DwjE05LZp/HIB2n21gwXhtWYMBhFnN8gGPPQUR2S7vFqpN/0yJhHpyvNxfxWU/MwC3r9vWPV8vOdCRMKLJoOiDPpv7XbdSySNHC+G5M6o4=
+	t=1714510861; cv=none; b=DLIfspjNaRauWQfNZb/zUNTQBjhn0UWtP8+c69YMGTq/gLZ9oxiEXvpJYSwti5hymEPBQIU9pNLBp/dLYcIz+J3qdtCF0FY53NUfJx6c5qkcCm8R3ES+kWJqM9CZCDoFjKBUztDaso+eR3tWAySUaMcF2Vk9iInxWXzVMGPnJmo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714510701; c=relaxed/simple;
-	bh=z8XC2flYkdhbFz5hu7SXEjyyLoN0Ve9t2EZ6PngZsHc=;
+	s=arc-20240116; t=1714510861; c=relaxed/simple;
+	bh=9sgfqtMsWzv9o+g9mJtMOps7EusW138bXsllLt5r/dg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QvCmGwNdorABYj6Te//pLojEAYfiSoWY/TP+2gSeJ1FdSyZF2/SQmATGPFJu6a9BQj/EWhiIGrij7GJYPs6LNh9C0RWHBvxY3FlTnbS5bsU38vpg+xEpGb6DpD7E99eMRYKgxPcDSHUPLB6b7YaKtrGOTSyJT8nC207e9HlGQas=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=E0HmGlJJ; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=i9Xt/h20JUARTLQqDjiRuSQgrh0323nH5Vk3X0J2Xg8=; b=E0HmGlJJlfH3lW42ii87IwXtAk
-	/JMb3ho9pmecUNMuowcmfXnZ55WBKzpqhyVsDCzQqxTYzkkll5VUfwmikZBA/CkkATSeku00IIegh
-	ilDF30ebsfAvOOYfMtalWcxWsYesVCek83ZFmBe7NGHZRi8dXJzsq23D5P72c3hrv23M=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1s1uYL-00ENwW-9C; Tue, 30 Apr 2024 22:58:17 +0200
-Date: Tue, 30 Apr 2024 22:58:17 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>
-Cc: netdev@vger.kernel.org, jiri@resnulli.us, horms@kernel.org
-Subject: Re: [PATCH net-next v3 6/6] net: tn40xx: add PHYLIB support
-Message-ID: <9ec24d8f-62c4-4894-866a-b4ac448aaa9b@lunn.ch>
-References: <20240429043827.44407-1-fujita.tomonori@gmail.com>
- <20240429043827.44407-7-fujita.tomonori@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=RlAIvLoHHDs0xfpZBRZSLkrKlV9dqkrBFz2DwBtnNnMrryZ/+5VdRu4A1FC9Nw3xDVm9UmkKhyFGPa+0v+CvNWw27P5rnAj8nU2M9uDk/s+pG8Qr3Z3zhrurVSrdGlAK+mGsKZRRW8hkDkESd2aRcYa82WStKhG592c6S1W/Hsg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=QT+YxEKZ; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-1e5c7d087e1so53559595ad.0
+        for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 14:00:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1714510859; x=1715115659; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=+xIU8q6pWM6w3NaeJRA8h8N2JrHznXlpLpQKHyO9q7I=;
+        b=QT+YxEKZtYluZXnVbk5NdogepPybv1HDFeWh5NSGV45V3wCpBtvYa9QrKGLCNBS23m
+         YpNSgCvLvbYH1kOop5lg3GIEXIW9J9hQNXIB5s4HZONXEDOtbxXnBlPVWsWVWWs88DE0
+         HYTfN2XDACzmZ0sH6mvc/LXFGSb0Aozqp4KLo=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714510859; x=1715115659;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+xIU8q6pWM6w3NaeJRA8h8N2JrHznXlpLpQKHyO9q7I=;
+        b=ahONMLhfxVX+Nb9UgDa2giVBgF9f3wKkilLpzMzAjwHYOhpza9dQcvpoFouNKJ5zBT
+         jNesfZ6psgWhTjzmcuxcT+XoJRCJdY4SlLaf2mBridZhZGjlAySQMREtfu9mqo3b8/TX
+         tspKucMHMuYE3a9SmegOSRs4c1Ms9JLlG6+c0DdX8AROPsNwEBO/C8UVlX2BajFjjJBU
+         WCBdqZleDgnw/bZSGxe1n4IiW5qeaWnwjEr41I2FuuTSNBAlwPK01lWKkbShLvjpqtRM
+         xrK0HMgHhfo2k2JViM1jZqmAQX7h7DAYDu2PXfRaBnF73ZjOX/Y9Bg4o7UM7r0NBFIYK
+         7f3Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWAvipcH+MmfDxMxtX0GHJrgudO95HqLPeGjO8tKdiglxgCgAlCYzDClpSklyRRsr6g9FLfOAaBUWrwNXa2JaTCbnf4pqgR
+X-Gm-Message-State: AOJu0YzsHCRQt0yt0N3IW/JTyMvMVXu3gEFkJnZRCd7vje8Ri1X1a+Jo
+	+6md5SndkC+OAeiR7nEja666mwjycp/sSFCrtWVgO+B3vUYnGmEc4wJUf20o8A==
+X-Google-Smtp-Source: AGHT+IH/WlfSNtBhlJT6297Q0jgt35RvMUkm+sIKHyYlwaLfwwaWwP3me/gfM/Q1DQBlkcUJBS1qxQ==
+X-Received: by 2002:a17:903:228c:b0:1e5:9da5:a799 with SMTP id b12-20020a170903228c00b001e59da5a799mr676864plh.6.1714510859313;
+        Tue, 30 Apr 2024 14:00:59 -0700 (PDT)
+Received: from www.outflux.net ([198.0.35.241])
+        by smtp.gmail.com with ESMTPSA id j18-20020a170902c3d200b001eab1a1a752sm10560810plj.120.2024.04.30.14.00.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 30 Apr 2024 14:00:58 -0700 (PDT)
+Date: Tue, 30 Apr 2024 14:00:57 -0700
+From: Kees Cook <keescook@chromium.org>
+To: Jeff Johnson <quic_jjohnson@quicinc.com>
+Cc: Johannes Berg <johannes@sipsolutions.net>,
+	Nathan Chancellor <nathan@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+Subject: Re: [PATCH] wifi: nl80211: Avoid address calculations via out of
+ bounds array indexing
+Message-ID: <202404301358.CEA4B3D@keescook>
+References: <20240424220057.work.819-kees@kernel.org>
+ <e2f20484fb1f4607d099d2184c1d74c6a39febc1.camel@sipsolutions.net>
+ <9983345a-d590-4a78-94ca-6d96832860b1@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -58,63 +88,27 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240429043827.44407-7-fujita.tomonori@gmail.com>
+In-Reply-To: <9983345a-d590-4a78-94ca-6d96832860b1@quicinc.com>
 
-On Mon, Apr 29, 2024 at 01:38:27PM +0900, FUJITA Tomonori wrote:
-> This patch adds supports for multiple PHY hardware with PHYLIB. The
-> adapters with TN40xx chips use multiple PHY hardware; AMCC QT2025, TI
-> TLK10232, Aqrate AQR105, and Marvell 88X3120, 88X3310, and MV88E2010.
+On Tue, Apr 30, 2024 at 12:59:57PM -0700, Jeff Johnson wrote:
+> On 4/30/2024 3:01 AM, Johannes Berg wrote:
+> > This really doesn't even seem right, shouldn't do pointer arithmetic on
+> > void pointers.
 > 
-> For now, the PCI ID table of this driver enables adapters using only
-> QT2025 PHY. I've tested this driver and the QT2025 PHY driver with
-> Edimax EN-9320 10G adapter.
+> FWIW I argued this in the past in another context and Linus gave his opinion:
 > 
-> Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
-> ---
->  drivers/net/ethernet/tehuti/Kconfig    |  2 +
->  drivers/net/ethernet/tehuti/Makefile   |  2 +-
->  drivers/net/ethernet/tehuti/tn40.c     | 34 +++++++++++---
->  drivers/net/ethernet/tehuti/tn40.h     |  7 +++
->  drivers/net/ethernet/tehuti/tn40_phy.c | 61 ++++++++++++++++++++++++++
->  5 files changed, 99 insertions(+), 7 deletions(-)
->  create mode 100644 drivers/net/ethernet/tehuti/tn40_phy.c
-> 
-> diff --git a/drivers/net/ethernet/tehuti/Kconfig b/drivers/net/ethernet/tehuti/Kconfig
-> index 4198fd59e42e..94fda9fd4cc0 100644
-> --- a/drivers/net/ethernet/tehuti/Kconfig
-> +++ b/drivers/net/ethernet/tehuti/Kconfig
-> @@ -27,6 +27,8 @@ config TEHUTI_TN40
->  	tristate "Tehuti Networks TN40xx 10G Ethernet adapters"
->  	depends on PCI
->  	select FW_LOADER
-> +	select PHYLIB
-> +	select PHYLINK
+> https://lore.kernel.org/all/CAHk-=whFKYMrF6euVvziW+drw7-yi1pYdf=uccnzJ8k09DoTXA@mail.gmail.com/
 
-You don't need both. PHYLINK will pull in PHYLIB.
+I was going to make the same argument. :) For this case, (void *) is
+superior because we need to perform byte-granular arithmetic and we need
+to use the implicit cast to the assigned variable's type.
 
-> @@ -1179,21 +1179,25 @@ static void tn40_link_changed(struct tn40_priv *priv)
->  	u32 link = tn40_read_reg(priv,
->  				 TN40_REG_MAC_LNK_STAT) & TN40_MAC_LINK_STAT;
->  	if (!link) {
-> -		if (netif_carrier_ok(priv->ndev) && priv->link)
-> +		if (netif_carrier_ok(priv->ndev) && priv->link) {
->  			netif_stop_queue(priv->ndev);
-> +			phylink_mac_change(priv->phylink, false);
-> +		}
->  
->  		priv->link = 0;
->  		if (priv->link_loop_cnt++ > TN40_LINK_LOOP_MAX) {
->  			/* MAC reset */
->  			tn40_set_link_speed(priv, 0);
-> +			tn40_set_link_speed(priv, priv->phydev->speed);
+The reason not to use the channels[] array is because we're not addressing
+anything in the array -- we're addressing past it. Better to use the
+correct allocation base.
 
-You should not be references priv->phydev if you are using
-phylink. When phylink is managing an SFP, there might not be a phydev.
-phylink will tell you the speed when it calls your tn40_mac_config()
-callback.
+-Kees
 
-I suggest you read the documentation in include/linux/phylink.h
-because this is very wrong.
-
-	Andrew
+-- 
+Kees Cook
 
