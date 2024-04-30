@@ -1,195 +1,246 @@
-Return-Path: <netdev+bounces-92456-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92457-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 728A38B774A
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 15:36:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85AA68B774C
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 15:37:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7C68CB23808
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 13:36:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A90A41C2088E
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 13:37:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D0A0171E49;
-	Tue, 30 Apr 2024 13:36:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D42D17165C;
+	Tue, 30 Apr 2024 13:37:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="oT6l7mjN"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="T+sfuGgU"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-8fa9.mail.infomaniak.ch (smtp-8fa9.mail.infomaniak.ch [83.166.143.169])
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60D0117165C
-	for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 13:36:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.166.143.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B9F112CDB5;
+	Tue, 30 Apr 2024 13:37:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714484212; cv=none; b=PnWl/A7JxvBdLYJ0kLi5Pd1VP44cafnKgqgFAOhv1t2Y+0VgNOfZscT3EOp5EDI4BdwA7R+M+BDZKOUej83rGE+z43c3mmdVJrA53btZD/PFCQkImXCa8CMCZgfUAKjZno3QJGPXZn3l+Y0A4D9xGSUm08y4+r29webFgVG3Fag=
+	t=1714484229; cv=none; b=MWY8KvUrSKKgvZTjIcneijpt7mSE1QyJvBjDauUa3+NTOuQJmXSEamikVD7Nh33YIZ8Ts1zYQ4qIdwO6ZYcDXI5ABqxiIRrO64tSrWdwiurQYm/UadgVZXboDhKlJob62TRjS9c3WRLkWPZTxG2SpJM1d7VCUa+bMSL4CaK3PQw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714484212; c=relaxed/simple;
-	bh=2kb1NEv9MrJKyS+P6Z0fwlozV1tz+fFJTPpEA1OsNAM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DMkqLIzFbMISu/q0HB3i/pilEm6NtMcqhOhryvzMgdjP5SnE1070eLSeTiWzmZdIoJkulQ7kABM51PZYOI5gd7s1coE4ZS4cdHvRX+3VKrzm4t8BiHbUCJWHwYd0cOH1kgE0DIgk81TyHrTzMlHvmWHma4zYh50uhseYU5kbRKo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=oT6l7mjN; arc=none smtp.client-ip=83.166.143.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
-Received: from smtp-4-0000.mail.infomaniak.ch (smtp-4-0000.mail.infomaniak.ch [10.7.10.107])
-	by smtp-4-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4VTLp42R7GzSTs;
-	Tue, 30 Apr 2024 15:36:44 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=digikod.net;
-	s=20191114; t=1714484204;
-	bh=2kb1NEv9MrJKyS+P6Z0fwlozV1tz+fFJTPpEA1OsNAM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=oT6l7mjNCAfs9f9AJtweRfJAl0SZUgOcAzrCyxFPQmZRiZK0y2g0DpqEljd6RetXm
-	 FVK0bme6LRxqDmfaDWPMUgln99OUBEelzUZdI47NywZ6i2dBXc4PaBW5TjFBOtU3pV
-	 3ViHwe40Zehc8J36dmnfZalfYJVjEyzXAXZV6DXQ=
-Received: from unknown by smtp-4-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4VTLp36KLpzwvZ;
-	Tue, 30 Apr 2024 15:36:43 +0200 (CEST)
-Date: Tue, 30 Apr 2024 15:36:43 +0200
-From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
-To: Ivanov Mikhail <ivanov.mikhail1@huawei-partners.com>
-Cc: willemdebruijn.kernel@gmail.com, gnoack3000@gmail.com, 
-	linux-security-module@vger.kernel.org, netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, 
-	yusongping@huawei.com, artem.kuzin@huawei.com, konstantin.meskhidze@huawei.com, 
-	=?utf-8?Q?G=C3=BCnther?= Noack <gnoack@google.com>
-Subject: Re: [PATCH 2/2] selftests/landlock: Create 'listen_zero',
- 'deny_listen_zero' tests
-Message-ID: <20240430.ohruCa7giToo@digikod.net>
-References: <20240408094747.1761850-1-ivanov.mikhail1@huawei-partners.com>
- <20240408094747.1761850-3-ivanov.mikhail1@huawei-partners.com>
+	s=arc-20240116; t=1714484229; c=relaxed/simple;
+	bh=5yFphC5yPc/T4pS2Pcf0KOygyeRSPkokyRTwwuSopyQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=tY5E1z2n7N+IzFy7hCBgJi1B/Dg0ayQl/ThjlFEXrxipiwEi13acBQc3zm8ZE3h1MUuctLnwinYCyUK0oLeQxPxPziEFF0Dko6IhrdnIGjyIry7ZaP466UT2xLiDdnklhtyh1wKpzVLj8OP4y9gdT/MHu8SBhGxuTuJoiUYNQpw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=T+sfuGgU; arc=none smtp.client-ip=217.70.183.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 124CBC0012;
+	Tue, 30 Apr 2024 13:36:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1714484219;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gkM9d0xicBmnajscafdTXqIyu0TvtJ/Gq9ScB83e5TE=;
+	b=T+sfuGgU5KSE1xqFD4DqmpJcEqUDQLEqw80ye09yk02ttYXASrPoS7CY4ixjU205l+r48X
+	nuJHFs5/lTNcoWKdNiowEPUs8bSCcwB08eQ1HmHXATvgi/76W/JrmLnu3F/nVx3DtLAFFt
+	8dWs44KNLxdcvpvuJqSNjfizr8t7ovtI3DUbyFYE+GRCo23dyHA1aoHCbCUb1DD0f0yJFJ
+	vZcjQJt01t2DFxKX2narbYb6vSLMzL4dzbLNyoqJOkZ9IJPI+3bVl8unhPXGcgcMUvblsV
+	K7LuHYnmPQ3EBW3/e21Y46J624gYiHguO/Psw+ot1c6qZA876nSTd1DLkfnsbw==
+Date: Tue, 30 Apr 2024 15:36:55 +0200
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com, Andrew Lunn
+ <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Russell King
+ <linux@armlinux.org.uk>, linux-arm-kernel@lists.infradead.org, Christophe
+ Leroy <christophe.leroy@csgroup.eu>, Herve Codina
+ <herve.codina@bootlin.com>, Florian Fainelli <f.fainelli@gmail.com>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>, =?UTF-8?B?S8O2cnk=?= Maincent
+ <kory.maincent@bootlin.com>, Jesse Brandeburg <jesse.brandeburg@intel.com>,
+ Marek =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>, Piergiorgio Beruto
+ <piergiorgio.beruto@gmail.com>, Oleksij Rempel <o.rempel@pengutronix.de>,
+ =?UTF-8?B?Tmljb2zDsg==?= Veronese <nicveronese@gmail.com>, Simon Horman
+ <horms@kernel.org>, mwojtas@chromium.org, Nathan Chancellor
+ <nathan@kernel.org>, Antoine Tenart <atenart@kernel.org>
+Subject: Re: [PATCH net-next] net: phy: Don't conditionally compile the
+ phy_link_topology creation
+Message-ID: <20240430153655.2df7a54c@device-28.home>
+In-Reply-To: <20240430135734.503f51a2@device-28.home>
+References: <20240429131008.439231-1-maxime.chevallier@bootlin.com>
+	<1ed5b8cb-c79b-44b9-8dbe-f78d7505b3b4@gmail.com>
+	<20240430135734.503f51a2@device-28.home>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240408094747.1761850-3-ivanov.mikhail1@huawei-partners.com>
-X-Infomaniak-Routing: alpha
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-The subject should be something like:
-"selftests/landlock: Test listening on socket without binding"
+On Tue, 30 Apr 2024 13:57:34 +0200
+Maxime Chevallier <maxime.chevallier@bootlin.com> wrote:
 
-On Mon, Apr 08, 2024 at 05:47:47PM +0800, Ivanov Mikhail wrote:
-> Suggested code test scenarios where listen(2) call without explicit
-> bind(2) is allowed and forbidden.
+> Hello Heiner,
 > 
-> Signed-off-by: Ivanov Mikhail <ivanov.mikhail1@huawei-partners.com>
-> Reviewed-by: Konstantin Meskhidze <konstantin.meskhidze@huawei.com>
-> ---
->  tools/testing/selftests/landlock/net_test.c | 89 +++++++++++++++++++++
->  1 file changed, 89 insertions(+)
+> On Tue, 30 Apr 2024 10:17:31 +0200
+> Heiner Kallweit <hkallweit1@gmail.com> wrote:
 > 
-> diff --git a/tools/testing/selftests/landlock/net_test.c b/tools/testing/selftests/landlock/net_test.c
-> index 936cfc879f1d..6d6b5aef387f 100644
-> --- a/tools/testing/selftests/landlock/net_test.c
-> +++ b/tools/testing/selftests/landlock/net_test.c
-> @@ -1714,6 +1714,95 @@ TEST_F(port_specific, bind_connect_zero)
->  	EXPECT_EQ(0, close(bind_fd));
->  }
->  
-> +TEST_F(port_specific, listen_zero)
-> +{
-> +	int listen_fd, connect_fd;
-> +	uint16_t port;
-> +
-> +	/* Adds a rule layer with bind actions. */
-> +	if (variant->sandbox == TCP_SANDBOX) {
-> +		const struct landlock_ruleset_attr ruleset_attr = {
-> +			.handled_access_net = LANDLOCK_ACCESS_NET_BIND_TCP,
-> +		};
-> +		const struct landlock_net_port_attr tcp_bind_zero = {
-> +			.allowed_access = LANDLOCK_ACCESS_NET_BIND_TCP,
-> +			.port = 0,
-> +		};
-> +		int ruleset_fd;
-> +
-> +		ruleset_fd = landlock_create_ruleset(&ruleset_attr,
-> +						     sizeof(ruleset_attr), 0);
-> +		ASSERT_LE(0, ruleset_fd);
-> +
-> +		/* Checks zero port value on bind action. */
-> +		EXPECT_EQ(0,
-> +			  landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
-> +					    &tcp_bind_zero, 0));
-> +
-> +		enforce_ruleset(_metadata, ruleset_fd);
-> +		EXPECT_EQ(0, close(ruleset_fd));
-> +	}
-> +
-> +	listen_fd = socket_variant(&self->srv0);
-> +	ASSERT_LE(0, listen_fd);
-> +
-> +	connect_fd = socket_variant(&self->srv0);
-> +	ASSERT_LE(0, listen_fd);
-> +	/*
-> +	 * Allow listen(2) to select a random port for the socket,
-> +	 * since bind(2) wasn't called.
-> +	 */
-> +	EXPECT_EQ(0, listen(listen_fd, backlog));
-> +
-> +	/* Sets binded (by listen(2)) port for both protocol families. */
-> +	port = get_binded_port(listen_fd, &variant->prot);
-> +	EXPECT_NE(0, port);
-> +	set_port(&self->srv0, port);
-> +
-> +	/* Connects on the binded port. */
-> +	EXPECT_EQ(0, connect_variant(connect_fd, &self->srv0));
-> +
-> +	EXPECT_EQ(0, close(listen_fd));
-> +	EXPECT_EQ(0, close(connect_fd));
-> +}
-> +
-> +TEST_F(port_specific, deny_listen_zero)
-> +{
-> +	int listen_fd, ret;
-> +
-> +	/* Adds a rule layer with bind actions. */
-> +	if (variant->sandbox == TCP_SANDBOX) {
-> +		const struct landlock_ruleset_attr ruleset_attr = {
-> +			.handled_access_net = LANDLOCK_ACCESS_NET_BIND_TCP,
-> +		};
-> +		int ruleset_fd;
-> +
-> +		ruleset_fd = landlock_create_ruleset(&ruleset_attr,
-> +						     sizeof(ruleset_attr), 0);
-> +		ASSERT_LE(0, ruleset_fd);
-> +
-> +		/* Forbid binding to any port. */
-> +		enforce_ruleset(_metadata, ruleset_fd);
-> +		EXPECT_EQ(0, close(ruleset_fd));
-> +	}
-> +
-> +	listen_fd = socket_variant(&self->srv0);
-> +	ASSERT_LE(0, listen_fd);
-> +	/* 
+> > On 29.04.2024 15:10, Maxime Chevallier wrote:  
+> > > The core of the phy_link_topology isn't directly tied to phylib, and at
+> > > the moment it's initialized, phylib might not be loaded yet. Move the
+> > > initialization of the topology to the phy_link_topology_core header,
+> > > which contains the bare minimum so that we can initialize it at netdev
+> > > creation.
+> > >     
+> > 
+> > The change fixes the issue for me, but according to my personal taste
+> > the code isn't intuitive and still error-prone. Also there's no good
+> > reason to inline a function like phy_link_topo_create() and make it
+> > publicly available. Do you expect it to be ever used outside net core?
+> > In general it may make sense to add a config symbol for the topology
+> > extension, there seem to be very few, specialized use cases for it.  
+> 
+> I think I'm missing the point here then. Do you mean adding a Kconfig
+> option to explicitely turn phy_link_topology on ? or build it as a
+> dedicated kernel module ?
+> 
+> Or do you see something such as "if phylib is M or Y, then build the
+> topology stuff and make sure it's allocated when a netdev gets created
+> ?"
 
-nit: Extra space
+I've prototyped something that's cleaner and should fit what you
+described, which is to have a Kconfig option for phy_topology and
+have it autoselected by CONFIG_SFP (for now, the only case where we can
+have multiple PHYs on the link). When phy mux support is added (I'll
+followup with that once the topology is settled), we can also make is
+select the phy_topology config option. I'll send that patch when I'll
+have properly tested it, especially with all the different bits
+(phylib, sfp, drivers) being tested as modules or builtin.
 
-> +	 * Check that listen(2) call is prohibited without first calling bind(2).
+Thanks for the tips,
 
-This should fit in 80 columns.
+Maxime
 
-> +	 */
-> +	ret = listen(listen_fd, backlog);
-> +	if (is_restricted(&variant->prot, variant->sandbox)) {
-> +		/* Denied by Landlock. */
-> +		EXPECT_NE(0, ret);
-> +		EXPECT_EQ(EACCES, errno);
-> +	} else {
-> +		EXPECT_EQ(0, ret);
-> +	}
-> +
-> +	EXPECT_EQ(0, close(listen_fd));
-> +}
-
-These tests look good!
-
-> +
->  TEST_F(port_specific, bind_connect_1023)
->  {
->  	int bind_fd, connect_fd, ret;
-> -- 
-> 2.34.1
+> 
+> Thanks,
+> 
+> Maxime
+> 
+> >   
+> > > Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+> > > Closes: https://lore.kernel.org/netdev/2e11b89d-100f-49e7-9c9a-834cc0b82f97@gmail.com/
+> > > Closes: https://lore.kernel.org/netdev/20240409201553.GA4124869@dev-arch.thelio-3990X/
+> > > ---
+> > >  drivers/net/phy/phy_link_topology.c    | 23 --------------------
+> > >  include/linux/phy_link_topology.h      |  5 -----
+> > >  include/linux/phy_link_topology_core.h | 30 +++++++++++++++++---------
+> > >  3 files changed, 20 insertions(+), 38 deletions(-)
+> > > 
+> > > diff --git a/drivers/net/phy/phy_link_topology.c b/drivers/net/phy/phy_link_topology.c
+> > > index 985941c5c558..960aedd73308 100644
+> > > --- a/drivers/net/phy/phy_link_topology.c
+> > > +++ b/drivers/net/phy/phy_link_topology.c
+> > > @@ -12,29 +12,6 @@
+> > >  #include <linux/rtnetlink.h>
+> > >  #include <linux/xarray.h>
+> > >  
+> > > -struct phy_link_topology *phy_link_topo_create(struct net_device *dev)
+> > > -{
+> > > -	struct phy_link_topology *topo;
+> > > -
+> > > -	topo = kzalloc(sizeof(*topo), GFP_KERNEL);
+> > > -	if (!topo)
+> > > -		return ERR_PTR(-ENOMEM);
+> > > -
+> > > -	xa_init_flags(&topo->phys, XA_FLAGS_ALLOC1);
+> > > -	topo->next_phy_index = 1;
+> > > -
+> > > -	return topo;
+> > > -}
+> > > -
+> > > -void phy_link_topo_destroy(struct phy_link_topology *topo)
+> > > -{
+> > > -	if (!topo)
+> > > -		return;
+> > > -
+> > > -	xa_destroy(&topo->phys);
+> > > -	kfree(topo);
+> > > -}
+> > > -
+> > >  int phy_link_topo_add_phy(struct phy_link_topology *topo,
+> > >  			  struct phy_device *phy,
+> > >  			  enum phy_upstream upt, void *upstream)
+> > > diff --git a/include/linux/phy_link_topology.h b/include/linux/phy_link_topology.h
+> > > index 6b79feb607e7..ad72d7881257 100644
+> > > --- a/include/linux/phy_link_topology.h
+> > > +++ b/include/linux/phy_link_topology.h
+> > > @@ -32,11 +32,6 @@ struct phy_device_node {
+> > >  	struct phy_device *phy;
+> > >  };
+> > >  
+> > > -struct phy_link_topology {
+> > > -	struct xarray phys;
+> > > -	u32 next_phy_index;
+> > > -};
+> > > -
+> > >  static inline struct phy_device *
+> > >  phy_link_topo_get_phy(struct phy_link_topology *topo, u32 phyindex)
+> > >  {
+> > > diff --git a/include/linux/phy_link_topology_core.h b/include/linux/phy_link_topology_core.h
+> > > index 0a6479055745..0116ec49cd1b 100644
+> > > --- a/include/linux/phy_link_topology_core.h
+> > > +++ b/include/linux/phy_link_topology_core.h
+> > > @@ -2,24 +2,34 @@
+> > >  #ifndef __PHY_LINK_TOPOLOGY_CORE_H
+> > >  #define __PHY_LINK_TOPOLOGY_CORE_H
+> > >  
+> > > -struct phy_link_topology;
+> > > +#include <linux/xarray.h>
+> > >  
+> > > -#if IS_REACHABLE(CONFIG_PHYLIB)
+> > > -
+> > > -struct phy_link_topology *phy_link_topo_create(struct net_device *dev);
+> > > -void phy_link_topo_destroy(struct phy_link_topology *topo);
+> > > -
+> > > -#else
+> > > +struct phy_link_topology {
+> > > +	struct xarray phys;
+> > > +	u32 next_phy_index;
+> > > +};
+> > >  
+> > >  static inline struct phy_link_topology *phy_link_topo_create(struct net_device *dev)
+> > >  {
+> > > -	return NULL;
+> > > +	struct phy_link_topology *topo;
+> > > +
+> > > +	topo = kzalloc(sizeof(*topo), GFP_KERNEL);
+> > > +	if (!topo)
+> > > +		return ERR_PTR(-ENOMEM);
+> > > +
+> > > +	xa_init_flags(&topo->phys, XA_FLAGS_ALLOC1);
+> > > +	topo->next_phy_index = 1;
+> > > +
+> > > +	return topo;
+> > >  }
+> > >  
+> > >  static inline void phy_link_topo_destroy(struct phy_link_topology *topo)
+> > >  {
+> > > -}
+> > > +	if (!topo)
+> > > +		return;
+> > >  
+> > > -#endif
+> > > +	xa_destroy(&topo->phys);
+> > > +	kfree(topo);
+> > > +}
+> > >  
+> > >  #endif /* __PHY_LINK_TOPOLOGY_CORE_H */    
+> >   
 > 
 > 
+
 
