@@ -1,102 +1,168 @@
-Return-Path: <netdev+bounces-92588-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92589-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6E078B7F9D
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 20:20:36 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 986578B7FA0
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 20:21:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7C8A61F24939
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 18:20:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D783AB2288A
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 18:21:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48B3B181D0F;
-	Tue, 30 Apr 2024 18:20:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD25F1836C1;
+	Tue, 30 Apr 2024 18:21:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GPQcfOxV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uoKFBS0o"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CA89181B9D;
-	Tue, 30 Apr 2024 18:20:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81B71180A92;
+	Tue, 30 Apr 2024 18:21:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714501231; cv=none; b=HEdPbVQ5s6ePAOoQfYv6aXt/bE27adGYpLDCir+H4vQs6vI9CDBJop4Yw8AL3SIHVXTlIxoawKGCaAlPE/zAdmrfjdlVJebb+YFLJvIBs4RomHpSAf39WgehbeQDaUdUspCtzsRnEQZVA33Q8ohVwVWuNr/FL1lMFwkELq4gWlw=
+	t=1714501308; cv=none; b=r7c9RjhalFkgUXUbCSY0lGz2DYggp6p3GpMEK798vv/xWhu2TACtxCe+KSynDKlU6024ClnJkILrWIMZLS+mh9rSn2JeHGKmvnOOkD/zPdj16pjdWcSKnIxkM62wWV2T+9qguj1D2Q6RBRsCV5R4Hwb0nKcL2YzKOosCDy4WG9c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714501231; c=relaxed/simple;
-	bh=Gph9OZJ5MSqO5n8WVm+N4eurk/Ndi7bUW37HdqdrJmw=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=oGucj++bYtPzyxzGoWEm+ZUD8LsMTs5Ls155HMwanXzXRq8cyzcxYdrRE+pvsVUwaN8+LG/n3lkqfMAaIE3fY82x+fgCvVzhDJujV/9WHk8VxxuUCeFovpAOyXEn8Ys5z5IgORWDI9RM5RXLfq09kMJKxkpkFF9JjVbhXcqZrC4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GPQcfOxV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id A46BCC4AF17;
-	Tue, 30 Apr 2024 18:20:30 +0000 (UTC)
+	s=arc-20240116; t=1714501308; c=relaxed/simple;
+	bh=e8R5pNN2IsLACAwBDVyNGSn3zTMo3zNZ2dNsVU58FAY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EAcdDQO3/Qs+TmZC7bXbHXt9LVViMtGkijQO8IiHRU8sn0+AEn0RDtzBnzhjAPpPzkjEkwfgDLOe6LKAHBKUQlzfA41FR3hnX5co3MMdn2if3wHKjLwLLs85rvirexGZVn5AnUAm/6NgQQ26Z0LyTF2YdAexuhZE9UzAf/zs7Qs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uoKFBS0o; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C8DEC2BBFC;
+	Tue, 30 Apr 2024 18:21:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714501230;
-	bh=Gph9OZJ5MSqO5n8WVm+N4eurk/Ndi7bUW37HdqdrJmw=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=GPQcfOxVJ4OLGs5mFhfGXL0EyeKwMdLcSSUQ4y17/Iy1jYVGaknKBmCi/7dldoCy9
-	 i4WU5zRgvXUAcwjE8UUB+xeYNN5CvwbKvtQecaE9pJwUjHmXvA03rgFqqsMO6dqBP1
-	 uy9ZyHpQOxhT8xTW+86U1WlEH+QicFSUgKtrI6x/96Yu+Afh5LKDj06VoSjzH+L4Kl
-	 Pqe0D5S4B/+VUSwlQxIjZUX+c4hMZEPb/vuUSYtXM5pAeghY4Xjzz+7doeKs6f8YXy
-	 D1fgzSZi8YM66mP/fOwEXBdTVKuwVAwyf3T4H3rmp/5AxNrExyRut5SOn2BT2fj91D
-	 P2XDCfzauekkg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 8B7EAC43616;
-	Tue, 30 Apr 2024 18:20:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1714501308;
+	bh=e8R5pNN2IsLACAwBDVyNGSn3zTMo3zNZ2dNsVU58FAY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=uoKFBS0oWnJcn5AdrjfuWyIkjg2MAAkA4VXWGlkuJpeO3isRw7tzGSQCr8k0jK/s/
+	 j51yGThqNL/UTuSjLfQuERbZIA6/RR462aK9UR49PvH14iimEeBtauE97B+Rn144tA
+	 EAiYurlFqXopiuoOtIr/WqoIvx6xgAlvAwyXQMZ2KQ28kmbdzS+VpG+/c8D16SA84U
+	 Phw2RgTDYvjJWtggVTwYSUYuxKUtKuhAez8zUnAGm04qEp1b2tbX8zNIhvFkprsKnP
+	 I6ZydNCTiPdlowBbxVR8j0AXv5ugZVa2/YciVsAusdd5mKFFpEbFm/y0TZt//24ZDs
+	 1tNh0FQNdrhDQ==
+Date: Tue, 30 Apr 2024 19:21:42 +0100
+From: Simon Horman <horms@kernel.org>
+To: MD Danish Anwar <danishanwar@ti.com>
+Cc: Dan Carpenter <dan.carpenter@linaro.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>, Jan Kiszka <jan.kiszka@siemens.com>,
+	Diogo Ivo <diogo.ivo@siemens.com>, Paolo Abeni <pabeni@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, srk@ti.com,
+	Vignesh Raghavendra <vigneshr@ti.com>, r-gunasekaran@ti.com,
+	Roger Quadros <rogerq@kernel.org>
+Subject: Re: [PATCH net-next v2] net: ti: icssg_prueth: Add SW TX / RX
+ Coalescing based on hrtimers
+Message-ID: <20240430182142.GC2575892@kernel.org>
+References: <20240429071501.547680-1-danishanwar@ti.com>
+ <20240429183034.GG516117@kernel.org>
+ <5b7cf22a-ca91-4975-bd26-c76a16781ad7@ti.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH bpf 0/3] bpf: Add BPF_PROG_TYPE_CGROUP_SKB attach type
- enforcement in BPF_LINK_CREATE
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171450123056.11426.7177996325592706387.git-patchwork-notify@kernel.org>
-Date: Tue, 30 Apr 2024 18:20:30 +0000
-References: <20240426231621.2716876-1-sdf@google.com>
-In-Reply-To: <20240426231621.2716876-1-sdf@google.com>
-To: Stanislav Fomichev <sdf@google.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, ast@kernel.org,
- daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev,
- song@kernel.org, yhs@fb.com, john.fastabend@gmail.com, kpsingh@kernel.org,
- haoluo@google.com, jolsa@kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5b7cf22a-ca91-4975-bd26-c76a16781ad7@ti.com>
 
-Hello:
-
-This series was applied to bpf/bpf.git (master)
-by Martin KaFai Lau <martin.lau@kernel.org>:
-
-On Fri, 26 Apr 2024 16:16:17 -0700 you wrote:
-> Syzkaller found a case where it's possible to attach cgroup_skb program
-> to the sockopt hooks. Apparently it's currently possible to do that,
-> but only when using BPF_LINK_CREATE API. The first patch in the series
-> has more info on why that happens.
+On Tue, Apr 30, 2024 at 03:12:58PM +0530, MD Danish Anwar wrote:
+> Simon,
 > 
-> Stanislav Fomichev (3):
->   bpf: Add BPF_PROG_TYPE_CGROUP_SKB attach type enforcement in
->     BPF_LINK_CREATE
->   selftests/bpf: Extend sockopt tests to use BPF_LINK_CREATE
->   selftests/bpf: Add sockopt case to verify prog_type
+> On 30/04/24 12:00 am, Simon Horman wrote:
+> > On Mon, Apr 29, 2024 at 12:45:01PM +0530, MD Danish Anwar wrote:
+> >> Add SW IRQ coalescing based on hrtimers for RX and TX data path for ICSSG
+> >> driver, which can be enabled by ethtool commands:
+> >>
+> >> - RX coalescing
+> >>   ethtool -C eth1 rx-usecs 50
+> >>
+> >> - TX coalescing can be enabled per TX queue
+> >>
+> >>   - by default enables coalesing for TX0
+> > 
+> > nit: coalescing
+> > 
+> > Please consider running patches through ./checkpatch --codespell
+> > 
+> >>   ethtool -C eth1 tx-usecs 50
+> >>   - configure TX0
+> >>   ethtool -Q eth0 queue_mask 1 --coalesce tx-usecs 100
+> >>   - configure TX1
+> >>   ethtool -Q eth0 queue_mask 2 --coalesce tx-usecs 100
+> >>   - configure TX0 and TX1
+> >>   ethtool -Q eth0 queue_mask 3 --coalesce tx-usecs 100 --coalesce
+> >> tx-usecs 100
+> >>
+> >> Minimum value for both rx-usecs and tx-usecs is 20us.
+> >>
+> >> Compared to gro_flush_timeout and napi_defer_hard_irqs this patch allows
+> >> to enable IRQ coalescing for RX path separately.
+> >>
+> >> Benchmarking numbers:
+> >>  ===============================================================
+> >> | Method                  | Tput_TX | CPU_TX | Tput_RX | CPU_RX |
+> >> | ==============================================================
+> >> | Default Driver           943 Mbps    31%      517 Mbps  38%   |
+> >> | IRQ Coalescing (Patch)   943 Mbps    28%      518 Mbps  25%   |
+> >>  ===============================================================
+> >>
+> >> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
+> >> ---
 > 
-> [...]
+> [ ... ]
+> >>  	if (num_tx_packets >= budget)
+> >>  		return budget;
+> >>  
+> >> -	if (napi_complete_done(napi_tx, num_tx_packets))
+> >> -		enable_irq(tx_chn->irq);
+> >> +	if (napi_complete_done(napi_tx, num_tx_packets)) {
+> >> +		if (unlikely(tx_chn->tx_pace_timeout_ns && !tdown)) {
+> >> +			hrtimer_start(&tx_chn->tx_hrtimer,
+> >> +				      ns_to_ktime(tx_chn->tx_pace_timeout_ns),
+> >> +				      HRTIMER_MODE_REL_PINNED);
+> >> +		} else {
+> >> +			enable_irq(tx_chn->irq);
+> >> +		}
+> > 
+> > This compiles with gcc-13 and clang-18 W=1
+> > (although the inner {} are unnecessary).
+> > 
+> >> +	}
+> >>  
+> >>  	return num_tx_packets;
+> >>  }
+> > 
+> > ...
+> > 
+> >> @@ -872,7 +894,13 @@ int emac_napi_rx_poll(struct napi_struct *napi_rx, int budget)
+> >>  	}
+> >>  
+> >>  	if (num_rx < budget && napi_complete_done(napi_rx, num_rx))
+> >> -		enable_irq(emac->rx_chns.irq[rx_flow]);
+> >> +		if (unlikely(emac->rx_pace_timeout_ns)) {
+> >> +			hrtimer_start(&emac->rx_hrtimer,
+> >> +				      ns_to_ktime(emac->rx_pace_timeout_ns),
+> >> +				      HRTIMER_MODE_REL_PINNED);
+> >> +		} else {
+> >> +			enable_irq(emac->rx_chns.irq[rx_flow]);
+> >> +		}
+> > 
+> > But this does not; I think outer (but not inner) {} are needed.
+> > 
+> 
+> For both of these if checks, by having {} for outer if I am not seeing
+> the warnings anymore. The braces don't seem to be neccessary for inner if.
+> 
+> For both of these ifs I'll keep both inner and outer ifs in braces as
+> this will help readablity as Dan pointed out.
+> 
+> I will post v3 with this change.
 
-Here is the summary with links:
-  - [bpf,1/3] bpf: Add BPF_PROG_TYPE_CGROUP_SKB attach type enforcement in BPF_LINK_CREATE
-    https://git.kernel.org/bpf/bpf/c/543576ec15b1
-  - [bpf,2/3] selftests/bpf: Extend sockopt tests to use BPF_LINK_CREATE
-    https://git.kernel.org/bpf/bpf/c/d70b2660e75b
-  - [bpf,3/3] selftests/bpf: Add sockopt case to verify prog_type
-    https://git.kernel.org/bpf/bpf/c/095ddb501b39
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Thanks, sounds good to me.
 
