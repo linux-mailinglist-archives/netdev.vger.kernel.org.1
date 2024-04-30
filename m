@@ -1,130 +1,106 @@
-Return-Path: <netdev+bounces-92442-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92444-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B03AF8B75F1
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 14:41:43 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD7768B762C
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 14:51:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CA389B22167
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 12:41:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 83ADF1F222B0
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 12:51:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3049171658;
-	Tue, 30 Apr 2024 12:41:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 025E617166E;
+	Tue, 30 Apr 2024 12:50:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rCUkLJkh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bE7Uv54C"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 154A1171096
-	for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 12:41:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C994F17166A;
+	Tue, 30 Apr 2024 12:50:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714480891; cv=none; b=CbSmH5xXl+K/wSDbnmTmY4+wbjtvcWUJdPgJoh9OJ/EU5B/viaAV8G49TGvLMvrmikoGCgE9lUx+YBmS7UUAvfcZqJKfEKGH39qn4okxQ4VExeCkiLJLNZlqq6rq306gRWM7EZ9iDaRbW3C56MwyXD7HKncaWVEJSXricB9JUaA=
+	t=1714481453; cv=none; b=knNZHtIyDpzPXmimLD/7jAwT2LAXRAXLkrRimSEryF2V2/76VF5RgXy337gYEpf7hAZkU42IfsJSBiv0rLNOdbEMtOMQvF64vRrROT8wA9H71B20j3Tk/NPftDW7g0TSXYESoUw5OcCQ4NA8RolJKA3FaXUV3bE7Ze2y3/OX7ds=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714480891; c=relaxed/simple;
-	bh=EAkzlUPf87vK95pHRAftB3pj+wg3xtsMqv6zZ2xItvQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gGn20xYNfz8oTK/1XBTKgp1Un4RwVH04uh+46B7cmiOD9GalZDllN0zLk8QY3Jq3Qpo12M53vWRhL5CoSc2DN3Cr7oAcJtiSpI29pGEtY/4dnsakfp5MiKRVaStjRGi9SKu0XNB8tutTZT3AijItAYkFTaIPNAMMMZRjQu4G+XY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=rCUkLJkh; arc=none smtp.client-ip=209.85.167.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-5176f217b7bso9887274e87.0
-        for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 05:41:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1714480887; x=1715085687; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Z1zoRl9JNX91wxTFZ95WC2aOVdcvQqQ9ebO1YgbX9Wg=;
-        b=rCUkLJkhLTkgj0vZihEKMMlayMlyQ0cFd5TjQa4r0Jddy9PM8aCO1E3l7kk3Jz+SUF
-         GTxeTJy6Av4km5bpOTg+yOSdPvXLSxOOjQOnHQ2TvI4NWTmDRXUzyCtCI6w4n7BCRqGX
-         v4+oj/UExjkdmINHO5kKztJkDTG3sBR9dELu5NYmlYuEYKnM0rCgpyyvYeDrL9ZYplzq
-         iS3G0yI2yJVRGCkMXuuwWC4nn+VzEi5zzi8/pE6CeziV9EPrz4BvedgrUJ9mrXQ5Csgr
-         13a2BhyUlVwR/HKh44guz0Y+9aQRhc91cb/h1t+FvIAqWHgb/xjcLN8z5V0kus9g72LW
-         4QRA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714480887; x=1715085687;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Z1zoRl9JNX91wxTFZ95WC2aOVdcvQqQ9ebO1YgbX9Wg=;
-        b=kKoJObYVGs5obbTxPiTbZ+BZIilYtCXlAZN9HGVRE7eTyt7pLQd14Tn+OO+p7b6ks+
-         4jhD4XEt8Ce5VGdRYmgK/oqlI+tb1U3asky3U9CgbcKQuMZO+AVFhKAjENgc37urR/nz
-         usuAjillr/TRj2Qr4dCkZueL2YveAsGiH4C5t5t4cJ+ptU5zERsPStTsZX8q7jKjmdkY
-         epGCpWQRs73nZK0mRwqqix9k/eEHyhRcIGapkFtkLdULF7Dtor7Ai7NhSNHW+C3O4HHH
-         c4mMpkQOGj/4RCwpJPzNWTzXXGtxHWiVa/v7SgFNTes/AFeaBSVrw2JREtu+rRj0ZSpF
-         XcnA==
-X-Forwarded-Encrypted: i=1; AJvYcCXuWnCHX07QivssU8ISayMI8LBokvCHZT3yulrfISn8XrrZsjhKqLyaKCiQbV7fhOf85IsrHAEAMP84qoPFeHpR97CWZDpD
-X-Gm-Message-State: AOJu0YwfoTOTmDxPeUYpnrlZmmmFgytJ8xUBOgCAAQfRapLv6SfmQPvK
-	XdnpKDPjbaMAvoX196i8F+UZRFvtZxlKEPZ29nXFJT6safXdW7y7h/2YgJWhQ98=
-X-Google-Smtp-Source: AGHT+IE/W9/dkxBso0irV5VrVX3LkNO5o5h+kLfYM+38G90SJ9h02blz/dj31DJFXSXcVMXms6NQew==
-X-Received: by 2002:a05:6512:45c:b0:51c:2c7e:ac92 with SMTP id y28-20020a056512045c00b0051c2c7eac92mr11527071lfk.23.1714480887229;
-        Tue, 30 Apr 2024 05:41:27 -0700 (PDT)
-Received: from [192.168.69.100] (mab78-h01-176-184-55-179.dsl.sta.abo.bbox.fr. [176.184.55.179])
-        by smtp.gmail.com with ESMTPSA id i27-20020a17090639db00b00a58eab2bf0fsm3928326eje.179.2024.04.30.05.41.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 30 Apr 2024 05:41:26 -0700 (PDT)
-Message-ID: <c5248d22-672d-4acc-9b12-86815d6e22dc@linaro.org>
-Date: Tue, 30 Apr 2024 14:41:22 +0200
+	s=arc-20240116; t=1714481453; c=relaxed/simple;
+	bh=Gt9uzlCU6Bhi4Wo521ImdXL9omLXvut7bGKwKJCAJXU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qe9GRInBIHi0ZWIlPq3r8NPs/xtTjV4XUcuo7xzweklFsCEfCzInT+BKZywTm43riA0pEYLuWurBVe01mBmoYTj+l4hsFU0QHbdBPdFTi3ge8fSwAOdlqeGXSi+2uieI61jN0N24IaukaJE8N/sb67rqepk8SwjQi6wU0Tfln1I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bE7Uv54C; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 547CDC4AF1A;
+	Tue, 30 Apr 2024 12:50:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714481453;
+	bh=Gt9uzlCU6Bhi4Wo521ImdXL9omLXvut7bGKwKJCAJXU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=bE7Uv54CxnO5vUHcy5cGiflE6UIDmqH/58vkBioHHnNkPZknthr4CJG6ZCsUSmy7z
+	 Ja+JdC3Mde+ZxNCxsEoDd9ZgEQDxlwjsqBrDTtQaC4WtEBVplE9sRTZI2hf1tUCtem
+	 xVkkHSGeGfyBlUdpeHQs7YiRs/qzA2hnqGwpTpnpMwEUmj5fh4q07NU9SSLB5RZ9pH
+	 gFyKVauphjT9ysqG7KfV7U1tqb3Ayj9Tef9T9zy7mwrLImagyyP/+c+kCAj/EpxmeZ
+	 AulEleTnNow1MKJ1GQxXln7LGGaWOa+iXVsUoQ98qVBr2+zXasIFJlAjiNOT+wwlR4
+	 u3Q5YBI6/iYvA==
+Date: Tue, 30 Apr 2024 15:50:47 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>,
+	Breno Leitao <leitao@debian.org>, kuba@kernel.org
+Cc: Jason Gunthorpe <jgg@ziepe.ca>,
+	"open list:HFI1 DRIVER" <linux-rdma@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>,
+	linux-netdev <netdev@vger.kernel.org>
+Subject: Re: [PATCH net-next] IB/hfi1: allocate dummy net_device dynamically
+Message-ID: <20240430125047.GE100414@unreal>
+References: <20240426085606.1801741-1-leitao@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 05/16] module: make module_memory_{alloc,free} more
- self-contained
-To: Mike Rapoport <rppt@kernel.org>, linux-kernel@vger.kernel.org
-Cc: Alexandre Ghiti <alexghiti@rivosinc.com>,
- Andrew Morton <akpm@linux-foundation.org>, =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?=
- <bjorn@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
- Christophe Leroy <christophe.leroy@csgroup.eu>,
- "David S. Miller" <davem@davemloft.net>, Dinh Nguyen <dinguyen@kernel.org>,
- Donald Dutile <ddutile@redhat.com>, Eric Chanudet <echanude@redhat.com>,
- Heiko Carstens <hca@linux.ibm.com>, Helge Deller <deller@gmx.de>,
- Huacai Chen <chenhuacai@kernel.org>,
- Kent Overstreet <kent.overstreet@linux.dev>,
- Luis Chamberlain <mcgrof@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
- Masami Hiramatsu <mhiramat@kernel.org>, Michael Ellerman
- <mpe@ellerman.id.au>, Nadav Amit <nadav.amit@gmail.com>,
- Palmer Dabbelt <palmer@dabbelt.com>, Peter Zijlstra <peterz@infradead.org>,
- Rick Edgecombe <rick.p.edgecombe@intel.com>,
- Russell King <linux@armlinux.org.uk>, Sam Ravnborg <sam@ravnborg.org>,
- Song Liu <song@kernel.org>, Steven Rostedt <rostedt@goodmis.org>,
- Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
- Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
- bpf@vger.kernel.org, linux-arch@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
- linux-mm@kvack.org, linux-modules@vger.kernel.org,
- linux-parisc@vger.kernel.org, linux-riscv@lists.infradead.org,
- linux-s390@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org, loongarch@lists.linux.dev,
- netdev@vger.kernel.org, sparclinux@vger.kernel.org, x86@kernel.org
-References: <20240429121620.1186447-1-rppt@kernel.org>
- <20240429121620.1186447-6-rppt@kernel.org>
-Content-Language: en-US
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-In-Reply-To: <20240429121620.1186447-6-rppt@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240426085606.1801741-1-leitao@debian.org>
 
-On 29/4/24 14:16, Mike Rapoport wrote:
-> From: "Mike Rapoport (IBM)" <rppt@kernel.org>
+On Fri, Apr 26, 2024 at 01:56:05AM -0700, Breno Leitao wrote:
+> Embedding net_device into structures prohibits the usage of flexible
+> arrays in the net_device structure. For more details, see the discussion
+> at [1].
 > 
-> Move the logic related to the memory allocation and freeing into
-> module_memory_alloc() and module_memory_free().
+> Un-embed the net_device from struct hfi1_netdev_rx by converting it
+> into a pointer. Then use the leverage alloc_netdev() to allocate the
+> net_device object at hfi1_alloc_rx().
 > 
-> Signed-off-by: Mike Rapoport (IBM) <rppt@kernel.org>
+> [1] https://lore.kernel.org/all/20240229225910.79e224cf@kernel.org/
+> 
+> Acked-by: Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>
+> Signed-off-by: Breno Leitao <leitao@debian.org>
 > ---
->   kernel/module/main.c | 64 +++++++++++++++++++++++++++-----------------
->   1 file changed, 39 insertions(+), 25 deletions(-)
+> Changelog
+> 
+> v5:
+> 	* Basically replaced the old alloc_netdev() by the new helper
+> 	  alloc_netdev_dummy().
+> v4:
+> 	* Fix the changelog format
+> v3:
+> 	* Re-worded the comment, by removing the first paragraph.
+> v2:
+> 	* Free struct hfi1_netdev_rx allocation if alloc_netdev() fails
+> 	* Pass zero as the private size for alloc_netdev().
+> 	* Remove wrong reference for iwl in the comments
+> ---
+> 
+>  drivers/infiniband/hw/hfi1/netdev.h    | 2 +-
+>  drivers/infiniband/hw/hfi1/netdev_rx.c | 9 +++++++--
+>  2 files changed, 8 insertions(+), 3 deletions(-)
 
-Nice code simplification.
+Dennis,
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+Do you plan to send anything to rdma-next which can potentially create
+conflicts with netdev in this cycle?
 
+If not, it will be safe to apply this patch directly to net-next.
+
+Thanks
 
