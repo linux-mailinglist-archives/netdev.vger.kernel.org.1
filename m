@@ -1,217 +1,166 @@
-Return-Path: <netdev+bounces-92286-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92287-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5ED268B6735
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 03:13:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42BE68B673F
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 03:15:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 129BA1C22124
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 01:13:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DD9F71F22BDF
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 01:15:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 812BE1C33;
-	Tue, 30 Apr 2024 01:13:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECB52205E31;
+	Tue, 30 Apr 2024 01:15:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="ezH7qh2/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF9901843
-	for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 01:13:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.71
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA0071113
+	for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 01:15:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714439607; cv=none; b=fXsU+2FcHZbhK6vvJa4Manwqdoc9Si4AiyBsR9q2hicqkhBss5yWICSZyxrAAkSkm4+zzMspyHLY/PtXcHCUb6a6hMQoCDIJ9elTvmthUmSktZz2W7DGO98kThFkgYJUyfWqPlL3ADHLOQ7V9qpD70Rj/fXQBSoYYsCZ+aQwwuw=
+	t=1714439745; cv=none; b=gI4zJQWz6EStRAIL0atFBlhLDGoAb9bkUfQ9pFeiUylUc4i3/CN8ZdYAyb28wNG7LUfY07023dzcybGkNzUgaqu1DwQybv2J7MXZAr2Qh6x2T/WURLcJpnq8l3Hq5AkX4DN5CCLApk8i3k0n4yyGgKUQF1noMy4dT0QDH4Llc5Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714439607; c=relaxed/simple;
-	bh=XQSFypaAbLEQE7raPe7sh/Srg5rAA06pObg/IzZ7EKU=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=kJFrzfVjZE5bU9i4Tw+8/KKWSLHZ/yPETWGtnNCFb2GfwT/ocX3rB1fkM3w7Jnt8s49AjwQfrModlvNqkTbesCpGvfa0i2zvkuhaOHKy0z1KwAyBCq0nuBuykOhGMTf8H6GBI/WK8+DIYW+hwLp/FaR6yYn0npKeU21DoaYdF4I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-7dabc125bddso557025939f.1
-        for <netdev@vger.kernel.org>; Mon, 29 Apr 2024 18:13:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714439605; x=1715044405;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xj8ifUoPAj0YpEtjLTKabVAuD2CaWPMIe3YhVwHK608=;
-        b=bh2ycTCIwoCmr26IowP59hzpS3/7fbeznoXVS+r34hglVNZXqL1GIAclzRY0KRy2PF
-         Rv2HZlqFPq0newzbDMnttlgVdZw7WQP/c/8egiwkSKSMBWvcmHsAmp+XufAHgpRj1FZY
-         3126WCfTlMUO5+pz9N88CsU44ffpq6kFHGpAd0UdTAaWV5kD5y3tM50HCdJwXnyv8Wv9
-         d//4DouVrb9y7lA/3kIj0SCZ/l84ZJIwL9srHn/kALwnfzluDO93EPZ3ngNnYTPf9EZk
-         Wz+cvxSttelG07DibUb3j3rea9fAIDrXHhVKc8AuD5FrVnMixs9raL2ZCzGP5fY3I/8t
-         jD+Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVnkhGAH1uWg/XuljQIpgaCnmEpc/7HvUQwc3hsoOnwtoC4GU3qZkIIRZ+8l6wPgfidJONIUZjKaGJPtEOB5gQu7jbaS+Wf
-X-Gm-Message-State: AOJu0YwW3Vb7+x273KFi8seQt7EcEbBf2mRprYFnUQJTJcV+LVcHBRBL
-	4GJ9jEQPcFaTD9ElcSsv3I1dnKmuFfLgxoGXIspshzBZS/AwRD3QMvXbA9ysdByde6l+CV0SO1U
-	EDhEoNe9JeiUIgmXe+Fjp20l9GZy5N9FhmAVg7nZUXalcvj/yAHDTonA=
-X-Google-Smtp-Source: AGHT+IE1YHyTLbrnjl9SSYY9YHdagDNl3WcuSpRG8czs8NE6RcaRc5xfQ91PzQen727kPMJAC91LiBp1TsIIQKZAq64M8vgbZFqk
+	s=arc-20240116; t=1714439745; c=relaxed/simple;
+	bh=tyA/Fdu+Yk0iqk9l6tf/xqs5MBKuZU9Iz0SQumIgvh0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KxN2VfEz5aUEcsqMNG/2dbT1rwJKMIcKlsSiWpPSU6bDmJ/yE0T58DSXp7Bx3914ugs4x8XBAlz5p3cQfYBb1IYPlyI6yL20ZVnhmVHq3wsiTrYRApx76ydOp2/jAv8ZtgBEaklPCg0/5vtzWDSsVJNAsBRsYQVn/CCxAJTwb/Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=ezH7qh2/; arc=none smtp.client-ip=85.214.62.61
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Received: from tr.lan (ip-86-49-120-218.bb.vodafone.cz [86.49.120.218])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+	(No client certificate requested)
+	(Authenticated sender: marex@denx.de)
+	by phobos.denx.de (Postfix) with ESMTPSA id 99A6E884EE;
+	Tue, 30 Apr 2024 03:15:40 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+	s=phobos-20191101; t=1714439741;
+	bh=C2tdQOLxnshoDpoFduDoM28VnzxSbvfHM/++4tsgA0I=;
+	h=From:To:Cc:Subject:Date:From;
+	b=ezH7qh2/GJduAQSiRsXsPYymKTlSJ/BOeLurp+hXfVPZ4KtJH77xCP+IV692Hw4Ca
+	 bYahCyt4WNJXwXq0g0q19UbmpVd42RaJsIPiBoYWj7JVFeRZcIwxDL0UicsUHN22Ic
+	 bRFbc1zGrUtq1tksoVVPHQJ91A87Z7+hUgRt/E26McWGbPFVNgFNDHT3CEqmguUN63
+	 rkMCs/J4P+r2np5Pg5ySjd7N/+8FB+Oc78IFJKCL6kzO+uDiOn7gCoH6AmVqZmyz8R
+	 bvK6Ze+htrK4wPmdfRteMR5TQZfAsGkOB+qEQvKIs2vWTwy16hX2EFIKwKPixPeeBG
+	 Kf/K6ngiVmNtQ==
+From: Marek Vasut <marex@denx.de>
+To: netdev@vger.kernel.org
+Cc: Marek Vasut <marex@denx.de>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Ronald Wahl <ronald.wahl@raritan.com>,
+	Simon Horman <horms@kernel.org>
+Subject: [net,PATCH] net: ks8851: Queue RX packets in IRQ handler instead of disabling BHs
+Date: Tue, 30 Apr 2024 03:14:57 +0200
+Message-ID: <20240430011518.110416-1-marex@denx.de>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1c27:b0:36b:f94f:3022 with SMTP id
- m7-20020a056e021c2700b0036bf94f3022mr341844ilh.5.1714439605095; Mon, 29 Apr
- 2024 18:13:25 -0700 (PDT)
-Date: Mon, 29 Apr 2024 18:13:25 -0700
-In-Reply-To: <000000000000233ab00613f17f99@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000a69fc506174613ad@google.com>
-Subject: Re: [syzbot] [bpf?] [net?] possible deadlock in sock_map_delete_elem
-From: syzbot <syzbot+4ac2fe2b496abca8fa4b@syzkaller.appspotmail.com>
-To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
-	daniel@iogearbox.net, davem@davemloft.net, edumazet@google.com, 
-	jakub@cloudflare.com, john.fastabend@gmail.com, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
 
-syzbot has found a reproducer for the following issue on:
+Currently the driver uses local_bh_disable()/local_bh_enable() in its
+IRQ handler to avoid triggering net_rx_action() softirq on exit from
+netif_rx(). The net_rx_action() could trigger this driver .start_xmit
+callback, which is protected by the same lock as the IRQ handler, so
+calling the .start_xmit from netif_rx() from the IRQ handler critical
+section protected by the lock could lead to an attempt to claim the
+already claimed lock, and a hang.
 
-HEAD commit:    ba1cb99b559e Merge branch 'vxlan-stats'
-git tree:       net
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=176b097f180000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=98d5a8e00ed1044a
-dashboard link: https://syzkaller.appspot.com/bug?extid=4ac2fe2b496abca8fa4b
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10795c90980000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=114465e8980000
+The local_bh_disable()/local_bh_enable() approach works only in case
+the IRQ handler is protected by a spinlock, but does not work if the
+IRQ handler is protected by mutex, i.e. this works for KS8851 with
+Parallel bus interface, but not for KS8851 with SPI bus interface.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/a5f29f03f4a8/disk-ba1cb99b.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/b1a9f6891628/vmlinux-ba1cb99b.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/2f21db47d56d/bzImage-ba1cb99b.xz
+Remove the BH manipulation and instead of calling netif_rx() inside
+the IRQ handler code protected by the lock, queue all the received
+SKBs in the IRQ handler into a queue first, and once the IRQ handler
+exits the critical section protected by the lock, dequeue all the
+queued SKBs and push them all into netif_rx(). At this point, it is
+safe to trigger the net_rx_action() softirq, since the netif_rx()
+call is outside of the lock that protects the IRQ handler.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+4ac2fe2b496abca8fa4b@syzkaller.appspotmail.com
-
-======================================================
-WARNING: possible circular locking dependency detected
-6.9.0-rc5-syzkaller-00184-gba1cb99b559e #0 Not tainted
-------------------------------------------------------
-kworker/u8:6/1269 is trying to acquire lock:
-ffff88807e310200 (&stab->lock){+...}-{2:2}, at: spin_lock_bh include/linux/spinlock.h:356 [inline]
-ffff88807e310200 (&stab->lock){+...}-{2:2}, at: __sock_map_delete net/core/sock_map.c:417 [inline]
-ffff88807e310200 (&stab->lock){+...}-{2:2}, at: sock_map_delete_elem+0x175/0x250 net/core/sock_map.c:449
-
-but task is already holding lock:
-ffff888024253290 (&psock->link_lock){+...}-{2:2}, at: spin_lock_bh include/linux/spinlock.h:356 [inline]
-ffff888024253290 (&psock->link_lock){+...}-{2:2}, at: sock_map_del_link net/core/sock_map.c:145 [inline]
-ffff888024253290 (&psock->link_lock){+...}-{2:2}, at: sock_map_unref+0xcc/0x5e0 net/core/sock_map.c:180
-
-which lock already depends on the new lock.
-
-
-the existing dependency chain (in reverse order) is:
-
--> #1 (&psock->link_lock){+...}-{2:2}:
-       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5754
-       __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
-       _raw_spin_lock_bh+0x35/0x50 kernel/locking/spinlock.c:178
-       spin_lock_bh include/linux/spinlock.h:356 [inline]
-       sock_map_add_link net/core/sock_map.c:134 [inline]
-       sock_map_update_common+0x31c/0x5b0 net/core/sock_map.c:503
-       sock_map_update_elem_sys+0x55f/0x910 net/core/sock_map.c:582
-       map_update_elem+0x53a/0x6f0 kernel/bpf/syscall.c:1641
-       __sys_bpf+0x76f/0x810 kernel/bpf/syscall.c:5648
-       __do_sys_bpf kernel/bpf/syscall.c:5767 [inline]
-       __se_sys_bpf kernel/bpf/syscall.c:5765 [inline]
-       __x64_sys_bpf+0x7c/0x90 kernel/bpf/syscall.c:5765
-       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-       do_syscall_64+0xf5/0x240 arch/x86/entry/common.c:83
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
--> #0 (&stab->lock){+...}-{2:2}:
-       check_prev_add kernel/locking/lockdep.c:3134 [inline]
-       check_prevs_add kernel/locking/lockdep.c:3253 [inline]
-       validate_chain+0x18cb/0x58e0 kernel/locking/lockdep.c:3869
-       __lock_acquire+0x1346/0x1fd0 kernel/locking/lockdep.c:5137
-       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5754
-       __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
-       _raw_spin_lock_bh+0x35/0x50 kernel/locking/spinlock.c:178
-       spin_lock_bh include/linux/spinlock.h:356 [inline]
-       __sock_map_delete net/core/sock_map.c:417 [inline]
-       sock_map_delete_elem+0x175/0x250 net/core/sock_map.c:449
-       0xffffffffa00020cb
-       bpf_dispatcher_nop_func include/linux/bpf.h:1234 [inline]
-       __bpf_prog_run include/linux/filter.h:657 [inline]
-       bpf_prog_run include/linux/filter.h:664 [inline]
-       __bpf_trace_run kernel/trace/bpf_trace.c:2381 [inline]
-       bpf_trace_run2+0x204/0x420 kernel/trace/bpf_trace.c:2420
-       __traceiter_kfree+0x2b/0x50 include/trace/events/kmem.h:94
-       trace_kfree include/trace/events/kmem.h:94 [inline]
-       kfree+0x2af/0x3a0 mm/slub.c:4377
-       sk_psock_free_link include/linux/skmsg.h:421 [inline]
-       sock_map_del_link net/core/sock_map.c:158 [inline]
-       sock_map_unref+0x3ac/0x5e0 net/core/sock_map.c:180
-       sock_map_free+0x1e7/0x3e0 net/core/sock_map.c:351
-       bpf_map_free_deferred+0xe6/0x110 kernel/bpf/syscall.c:734
-       process_one_work kernel/workqueue.c:3254 [inline]
-       process_scheduled_works+0xa10/0x17c0 kernel/workqueue.c:3335
-       worker_thread+0x86d/0xd70 kernel/workqueue.c:3416
-       kthread+0x2f0/0x390 kernel/kthread.c:388
-       ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
-       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
-
-other info that might help us debug this:
-
- Possible unsafe locking scenario:
-
-       CPU0                    CPU1
-       ----                    ----
-  lock(&psock->link_lock);
-                               lock(&stab->lock);
-                               lock(&psock->link_lock);
-  lock(&stab->lock);
-
- *** DEADLOCK ***
-
-6 locks held by kworker/u8:6/1269:
- #0: ffff888015089148 ((wq_completion)events_unbound){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3229 [inline]
- #0: ffff888015089148 ((wq_completion)events_unbound){+.+.}-{0:0}, at: process_scheduled_works+0x8e0/0x17c0 kernel/workqueue.c:3335
- #1: ffffc90005557d00 ((work_completion)(&map->work)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3230 [inline]
- #1: ffffc90005557d00 ((work_completion)(&map->work)){+.+.}-{0:0}, at: process_scheduled_works+0x91b/0x17c0 kernel/workqueue.c:3335
- #2: ffff888023be2258 (sk_lock-AF_UNIX){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1673 [inline]
- #2: ffff888023be2258 (sk_lock-AF_UNIX){+.+.}-{0:0}, at: sock_map_free+0x11e/0x3e0 net/core/sock_map.c:349
- #3: ffffffff8e334d20 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:329 [inline]
- #3: ffffffff8e334d20 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:781 [inline]
- #3: ffffffff8e334d20 (rcu_read_lock){....}-{1:2}, at: sock_map_free+0x12a/0x3e0 net/core/sock_map.c:350
- #4: ffff888024253290 (&psock->link_lock){+...}-{2:2}, at: spin_lock_bh include/linux/spinlock.h:356 [inline]
- #4: ffff888024253290 (&psock->link_lock){+...}-{2:2}, at: sock_map_del_link net/core/sock_map.c:145 [inline]
- #4: ffff888024253290 (&psock->link_lock){+...}-{2:2}, at: sock_map_unref+0xcc/0x5e0 net/core/sock_map.c:180
- #5: ffffffff8e334d20 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:329 [inline]
- #5: ffffffff8e334d20 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:781 [inline]
- #5: ffffffff8e334d20 (rcu_read_lock){....}-{1:2}, at: __bpf_trace_run kernel/trace/bpf_trace.c:2380 [inline]
- #5: ffffffff8e334d20 (rcu_read_lock){....}-{1:2}, at: bpf_trace_run2+0x114/0x420 kernel/trace/bpf_trace.c:2420
-
-stack backtrace:
-CPU: 1 PID: 1269 Comm: kworker/u8:6 Not tainted 6.9.0-rc5-syzkaller-00184-gba1cb99b559e #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
-Workqueue: events_unbound bpf_map_free_deferred
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0x241/0x360 lib/dump_stack.c:114
- check_noncircular+0x36a/0x4a0 kernel/locking/lockdep.c:2187
- check_prev_add kernel/locking/lockdep.c:3134 [inline]
- check_prevs_add kernel/locking/lockdep.c:3253 [inline]
- validate_chain+0x18cb/0x58e0 kernel/locking/lockdep.c:3869
- __lock_acquire+0x1346/0x1fd0 kernel/locking/lockdep.c:5137
- lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5754
- __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
- _raw_spin_lock_bh+0x35/0x50 kernel/locking/spinlock.c:178
- spin_lock_bh include/linux/spinlock.h:356 [inline]
- __sock_map_delete net/core/sock_map.c:417 [inline]
- sock_map_delete_elem+0x175/0x250 net/core/sock_map.c:449
- </TASK>
-
-
+Fixes: be0384bf599c ("net: ks8851: Handle softirqs at the end of IRQ thread to fix hang")
+Signed-off-by: Marek Vasut <marex@denx.de>
 ---
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: Ronald Wahl <ronald.wahl@raritan.com>
+Cc: Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org
+---
+Note: This is basically what Jakub originally suggested in
+      https://patchwork.kernel.org/project/netdevbpf/patch/20240331142353.93792-2-marex@denx.de/#25785606
+---
+ drivers/net/ethernet/micrel/ks8851.h        | 1 +
+ drivers/net/ethernet/micrel/ks8851_common.c | 8 ++++----
+ 2 files changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/net/ethernet/micrel/ks8851.h b/drivers/net/ethernet/micrel/ks8851.h
+index 31f75b4a67fd7..f311074ea13bc 100644
+--- a/drivers/net/ethernet/micrel/ks8851.h
++++ b/drivers/net/ethernet/micrel/ks8851.h
+@@ -399,6 +399,7 @@ struct ks8851_net {
+ 
+ 	struct work_struct	rxctrl_work;
+ 
++	struct sk_buff_head	rxq;
+ 	struct sk_buff_head	txq;
+ 	unsigned int		queued_len;
+ 
+diff --git a/drivers/net/ethernet/micrel/ks8851_common.c b/drivers/net/ethernet/micrel/ks8851_common.c
+index d4cdf3d4f5525..f7b48e596631f 100644
+--- a/drivers/net/ethernet/micrel/ks8851_common.c
++++ b/drivers/net/ethernet/micrel/ks8851_common.c
+@@ -299,7 +299,7 @@ static void ks8851_rx_pkts(struct ks8851_net *ks)
+ 					ks8851_dbg_dumpkkt(ks, rxpkt);
+ 
+ 				skb->protocol = eth_type_trans(skb, ks->netdev);
+-				__netif_rx(skb);
++				skb_queue_tail(&ks->rxq, skb);
+ 
+ 				ks->netdev->stats.rx_packets++;
+ 				ks->netdev->stats.rx_bytes += rxlen;
+@@ -330,8 +330,6 @@ static irqreturn_t ks8851_irq(int irq, void *_ks)
+ 	unsigned long flags;
+ 	unsigned int status;
+ 
+-	local_bh_disable();
+-
+ 	ks8851_lock(ks, &flags);
+ 
+ 	status = ks8851_rdreg16(ks, KS_ISR);
+@@ -408,7 +406,8 @@ static irqreturn_t ks8851_irq(int irq, void *_ks)
+ 	if (status & IRQ_LCI)
+ 		mii_check_link(&ks->mii);
+ 
+-	local_bh_enable();
++	while (!skb_queue_empty(&ks->rxq))
++		netif_rx(skb_dequeue(&ks->rxq));
+ 
+ 	return IRQ_HANDLED;
+ }
+@@ -1189,6 +1188,7 @@ int ks8851_probe_common(struct net_device *netdev, struct device *dev,
+ 						NETIF_MSG_PROBE |
+ 						NETIF_MSG_LINK);
+ 
++	skb_queue_head_init(&ks->rxq);
+ 	skb_queue_head_init(&ks->txq);
+ 
+ 	netdev->ethtool_ops = &ks8851_ethtool_ops;
+-- 
+2.43.0
+
 
