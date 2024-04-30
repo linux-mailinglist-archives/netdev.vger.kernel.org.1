@@ -1,136 +1,149 @@
-Return-Path: <netdev+bounces-92292-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92288-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 950E18B67B0
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 03:50:49 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91EF28B675A
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 03:22:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 952AC1C21829
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 01:50:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D8833B22109
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 01:22:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E66778BF1;
-	Tue, 30 Apr 2024 01:50:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D3FF1C33;
+	Tue, 30 Apr 2024 01:22:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="k3GPcamv"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dl9UnBCS"
 X-Original-To: netdev@vger.kernel.org
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15BA11FB2
-	for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 01:50:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6D4F1843;
+	Tue, 30 Apr 2024 01:22:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714441837; cv=none; b=tr+c2jYOjpuzRrBHCKsVA0DqyhWfr8wwaf4QJ9sVhzurn5gk2wYx0r0T2I5s0QtKctreSBLCxQ7oKqmDhzYl1u/R2ndsg0jZ1ryRMcRzZidhToZ1uXa98unusy0LDeXdchA4FWE/1PIWUbz4gU3UEBoViOUdjxmb/xmIHAft658=
+	t=1714440126; cv=none; b=MBAZtWdqBPpDpAR5CLMujF80YDG5NXNjWv3WN13ymupSLjP7+87aJwYe/61TsAG5HyNU3jVsDpCcKPrQhQhkVXeANucHqcAaEgcN31tIK/D3tke9owIl8fC4Fub/9XlMYlgSdfr+GryLp10+1Zr5/P2yie0Jmj35o2RPhS2AANY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714441837; c=relaxed/simple;
-	bh=VXw7ofil+IGQG00hQ8zgj6MwKrzMuDqAcMWr7YIgSkc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gMxM5I2RduVxns90AYcF++mGiIM4P7e1YSRwluhoW31MnzVHd0QsljSoO+STRpJOx6R6P8EWCd595Hr6rvEK0HUZ9F/jwj1KY27bnt0t//IP7dYXeJ9QueJgvb8iwtxhKDzreoV95H7j4n7om9V4LDw5w5cG3hytKQ9susDWX7U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=k3GPcamv; arc=none smtp.client-ip=85.214.62.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from [127.0.0.1] (p578adb1c.dip0.t-ipconnect.de [87.138.219.28])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits))
-	(No client certificate requested)
-	(Authenticated sender: marex@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id 20E618872F;
-	Tue, 30 Apr 2024 03:50:33 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1714441833;
-	bh=gmv7a954P1DKOpnOtpQgTBhFZPwtSJUO1QwyR11v7ts=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=k3GPcamvgC3GQaSJAmNgji236n52HgaAvIcrAqpvgykK1c1Qug+wcdL7mIpPlJPb8
-	 2zvwIy/WZkryQRWwynZ0T9ujW62mC1xi9hM9ZI4cg45NWoNbVaPSd1MM0qIuEGYzjB
-	 JnREqLTPqRuFYIG875tCIsP5E0vUoLENZqSFlT2t9Swy1maHBd6giiTMWA0WrpNYTg
-	 thvHoOsY2Y4QGLC5OMXZiblt+AaMHGhgMrTa7vql+ctWuy+A9aHTwhZAbveKlqmiNy
-	 S9dC+IOjKrZHaQNiCK44CSrHg0R0eFTEfrZftgEydxfbH/I9LrTOoJTrdwdmYL5zSt
-	 GJpQtk0LgzioQ==
-Message-ID: <a8d51f07-030c-45fe-a99e-fb290488e3a8@denx.de>
-Date: Tue, 30 Apr 2024 03:18:17 +0200
+	s=arc-20240116; t=1714440126; c=relaxed/simple;
+	bh=UMqhj0rTdZLGeNTxC8kWhGYjzAOidG4Koh9u9oR661A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eg/Zz1gf7ZqGz337zzaoedFD+CwMrbb1BB8zPNm7DKrOwXRGoI33tPB47ybeNRrlfwsaf77XHdNl7WFVW5sN5m+PrPjQGMzrvbbAQ6i2LXMgu/UfAmF4lK9rYKP8OA6A+cVnRse2IGw6QWUdEbimqNdIjJEJ7WdmhMGE7PVkRFk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dl9UnBCS; arc=none smtp.client-ip=209.85.218.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-a5544fd07easo675402866b.0;
+        Mon, 29 Apr 2024 18:22:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1714440123; x=1715044923; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=0mRqa2ovWjws7B2sIgD6E2HvQPUnrNYKW4I30w74FzA=;
+        b=dl9UnBCSyO2d9lmlIVz8lGo13FUjeu8hwJAs+NPb/7EP8ZnENY/zBJaabhcvMpW4vF
+         EnOQiYOlXm1r91KomcPytUbbYP0gcvKY8iQcKCVL+DHRxsqa9msoYIj/+Pdwuv3TbOBt
+         yV5A/DtKo2I+EJ1Pf39SGWTkGEO3ur2WUh8j/BKoLqvz2A/BV+mNv3qQVqgPBogwTxT/
+         r72eYuD53N7oNZ4CKT661h93vfrufUXVd89+XA3StIuk5txouVegK4eSzSzxDE1wwlcy
+         G/eqMmjuZBy6VezxZFdgkBTW/6qw8mR4o27COyZm85TjZImVBXkixJGyC5MHMJ6tax1A
+         WIrw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714440123; x=1715044923;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0mRqa2ovWjws7B2sIgD6E2HvQPUnrNYKW4I30w74FzA=;
+        b=cupgNOJ603WWju97MChP+M9dluhTvoDYImjR4wDL+jM8YcPDPvX6rrMLfKaasUutxZ
+         PSK/Z2KkGQKEl7fKeP8YpXbCuMdG2ol1j44p6FUPxPmfIa1d7KbPbgsYDFtJyuDLNc6p
+         s3cS38pAR2s6CfSY7EGOraQSW2UVwPJEy+XEturJeqO5w3gWv4Q9DSs9t3OA7iN0Tscg
+         rY5U7XntpiIggrkMRKD0iutshL8doEVGcB6G1x/dzXuWBgmcidGbo3uZRpc5gypdl9CL
+         4UVeWakvPo1HcCNUmAPD/MWBqKXyBFENVg+5Z3LAWFYuyVd1dpNfv/yDw5B4b/Ia+4gl
+         HDGg==
+X-Forwarded-Encrypted: i=1; AJvYcCVh0JBZh1MT2w5U0PXPoODgYmf09VDQapWgFC6lmhkZ4lDMPJBg4W1T+h03zaMdffLCegUs7y3zD7+dGnt9OTta5Y3gMvq8KHtOt+Jm2alrFp/kLjwp2iP6l7S5ZTRA9pMHEEmw
+X-Gm-Message-State: AOJu0YwgIC0W330GlgZnj1UqbgQqdsYbAZ3dr8HH6iTa/mOqKKpC/b/P
+	OGCvScdaacmyi1rywafO/7lL17NSnW0vcxJQRrQMSGxkMrkrrRUq
+X-Google-Smtp-Source: AGHT+IFsFi0wMgKpgdlzgdLNfkp5iSSMe8elCVig3meaXHcygogd/Vsp/vWvDxyBkmV3BaICI9gqfw==
+X-Received: by 2002:a17:906:c252:b0:a52:6fcb:564a with SMTP id bl18-20020a170906c25200b00a526fcb564amr788676ejb.9.1714440123077;
+        Mon, 29 Apr 2024 18:22:03 -0700 (PDT)
+Received: from skbuf ([2a02:2f04:d70a:9c00::b2c])
+        by smtp.gmail.com with ESMTPSA id z6-20020a170906434600b00a518c69c4e3sm14388210ejm.23.2024.04.29.18.22.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 29 Apr 2024 18:22:02 -0700 (PDT)
+Date: Tue, 30 Apr 2024 04:21:59 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Joseph Huang <joseph.huang.2024@gmail.com>
+Cc: Nikolay Aleksandrov <razor@blackwall.org>,
+	Joseph Huang <Joseph.Huang@garmin.com>, netdev@vger.kernel.org,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Roopa Prabhu <roopa@nvidia.com>,
+	Linus =?utf-8?Q?L=C3=BCssing?= <linus.luessing@c0d3.blue>,
+	linux-kernel@vger.kernel.org, bridge@lists.linux.dev
+Subject: Re: [PATCH RFC net-next 00/10] MC Flood disable and snooping
+Message-ID: <20240430012159.rmllu5s5gcdepjnc@skbuf>
+References: <20240402174348.wosc37adyub5o7xu@skbuf>
+ <a8968719-a63b-4969-a971-173c010d708f@blackwall.org>
+ <20240402204600.5ep4xlzrhleqzw7k@skbuf>
+ <065b803f-14a9-4013-8f11-712bb8d54848@blackwall.org>
+ <804b7bf3-1b29-42c4-be42-4c23f1355aaf@gmail.com>
+ <20240405102033.vjkkoc3wy2i3vdvg@skbuf>
+ <935c18c1-7736-416c-b5c5-13ca42035b1f@blackwall.org>
+ <651c87fc-1f21-4153-bade-2dad048eecbd@gmail.com>
+ <20240405211502.q5gfwcwyhkm6w7xy@skbuf>
+ <1f385946-84d0-499c-9bf6-90ef65918356@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2] net: ks8851: Handle softirqs at the end of IRQ thread
- to fix hang
-To: Ronald Wahl <ronald.wahl@raritan.com>, netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
- =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
- Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
- Dmitry Torokhov <dmitry.torokhov@gmail.com>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Mark Brown <broonie@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>
-References: <20240331142353.93792-1-marex@denx.de>
- <20240331142353.93792-2-marex@denx.de>
- <fa332bfc-68fb-4eea-a70a-8ac9c0d3c990@raritan.com>
- <16f52bb6-59a1-4f6f-8d1a-c30198b0f743@denx.de>
- <001769c4-02de-4114-ab64-46530f36838e@raritan.com>
-Content-Language: en-US
-From: Marek Vasut <marex@denx.de>
-In-Reply-To: <001769c4-02de-4114-ab64-46530f36838e@raritan.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1f385946-84d0-499c-9bf6-90ef65918356@gmail.com>
 
-On 4/29/24 3:50 PM, Ronald Wahl wrote:
-> On 29.04.24 15:23, Marek Vasut wrote:
->> On 4/29/24 1:46 PM, Ronald Wahl wrote:
->>> Hi,
->>
->> Hi,
->>
->>> for the spi version of the chip this change now leads to
->>>
->>> [   23.793000] BUG: sleeping function called from invalid context at
->>> kernel/locking/mutex.c:283
->>> [   23.801915] in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid:
->>> 857, name: irq/52-eth-link
->>> [   23.810895] preempt_count: 200, expected: 0
->>> [   23.815288] CPU: 0 PID: 857 Comm: irq/52-eth-link Not tainted
->>> 6.6.28-sama5 #1
->>> [   23.822790] Hardware name: Atmel SAMA5
->>> [   23.826717]  unwind_backtrace from show_stack+0xb/0xc
->>> [   23.831992]  show_stack from dump_stack_lvl+0x19/0x1e
->>> [   23.837433]  dump_stack_lvl from __might_resched+0xb7/0xec
->>> [   23.843122]  __might_resched from mutex_lock+0xf/0x2c
->>> [   23.848540]  mutex_lock from ks8851_irq+0x1f/0x164
->>> [   23.853525]  ks8851_irq from irq_thread_fn+0xf/0x28
->>> [   23.858776]  irq_thread_fn from irq_thread+0x93/0x130
->>> [   23.864037]  irq_thread from kthread+0x7f/0x90
->>> [   23.868699]  kthread from ret_from_fork+0x11/0x1c
->>>
->>> Actually the spi driver variant does not suffer from the issue as it has
->>> different locking so we probably should do the
->>> local_bh_disable/local_bh_enable only for the "par" version. What do
->>> you think?
->>
->> Ah sigh, sorry for the breakage. Indeed, the locking is not great here.
->>
->> I am not entirely sure about the local_bh_disable/enable being par only.
->>
->> I will try to prepare some sort of a patch, would you be willing to test
->> it on the SPI variant ?
+On Mon, Apr 29, 2024 at 04:14:03PM -0400, Joseph Huang wrote:
+> How about the following syntax? I think it satisfies all the "not breaking
+> existing behavior" requirements (new option defaults to off, and missing
+> user space netlink attributes does not change the existing behavior):
 > 
-> Yes, I can help here, thanks. Meanwhile I also have some good understanding
-> at least on the TX path because we had some issues here in the past.
+> mcast_flood off
+>   all off
+> mcast_flood off mcast_flood_rfc4541 off
+>   all off
+> mcast_flood off mcast_flood_rfc4541 on
+>   224.0.0.X and ff02::1 on, the rest off
+> mcast_flood on
+>   all on
+> mcast_flood on mcast_flood_rfc4541 off
+>   all on (mcast_flood on overrides mcast_flood_rfc4541)
+> mcast_flood on mcast_flood_rfc4541 on
+>   all on
+> mcast_flood_rfc4541 off
+>   invalid (mcast_flood_rfc4541 is only valid if mcast_flood [on | off] is
+> specified first)
+> mcast_flood_rfc4541 on
+>   invalid (mcast_flood_rfc4541 is only valid if mcast_flood [on | off] is
+> specified first)
+
+A bridge port defaults to having BR_MCAST_FLOOD set - see new_nbp().
+Netlink attributes are only there to _change_ the state of properties in
+the kernel. They don't need to be specified by user space if there's
+nothing to be changed. "Only valid if another netlink attribute comes
+first" makes no sense. You can alter 2 bridge port flags as part of the
+same netlink message, or as part of different netlink messages (sent
+over sockets of other processes).
+
 > 
-> I will come up myself with another fix in the interrupt handler later. We
-> currently reset the ISR status flags too late risking a TX queue stall with
-> the SPI chip variant. They must be reset immediately after reading them.
-> Need
-> to wait a bit for field feedback as I was not able to reproduce this
-> mysqelf.
+> Think of mcast_flood_rfc4541 like a pet door if you will.
 
-This chip really is a gift that keeps on giving ... sigh.
+Ultimately, as far as I see it, both the OR-based and the AND-based UAPI
+addition could be made to work in a way that's perhaps similarly backwards
+compatible. It needs to be worked out with the bridge maintainers. Given
+that I'm not doing great with my spare time, I will take a back seat on
+that.
 
-I just sent this patch, you are on CC, please give it a try:
-
-https://patchwork.kernel.org/project/netdevbpf/patch/20240430011518.110416-1-marex@denx.de/
+However, what I don't quite understand in your proposal is how many IPv4
+addresses lie beyond the "224.0.0.X" notation? 256? Explain why there is
+such a large discrepancy in the number of IPv4 addresses you are in
+control of (256), vs only 1 IPv6 address with the new rfc4541 flag?
 
