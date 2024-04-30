@@ -1,116 +1,170 @@
-Return-Path: <netdev+bounces-92599-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92600-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2544C8B80A4
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 21:35:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1BD698B80BA
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 21:44:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B99171F246F3
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 19:35:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7D2411F240E7
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 19:44:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06C97199E99;
-	Tue, 30 Apr 2024 19:35:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28AFA17BB25;
+	Tue, 30 Apr 2024 19:44:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bluespec-com.20230601.gappssmtp.com header.i=@bluespec-com.20230601.gappssmtp.com header.b="eW5L7EfS"
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="LR/WfzVk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52AA8199E88
-	for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 19:35:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E814D190672
+	for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 19:44:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714505717; cv=none; b=QdgKFT1USlUlxXKEkcmC7+uypjD3+foeFIHoUKTeq4K5k9t6XPQiSSrbLFT4+IfBPrrLKWDlJnWdmFGZkpIYyvS0O1ODkI+L4am2n+CxJgoomjkON8k19Qkos5zZ4Hf+cBUk0nRKBW4O7PCkt6xmZOZTfe400BteLj2nMVmOUUY=
+	t=1714506262; cv=none; b=BAjIU8eyM72yjuix0lZGDqw2OFDj8vXPGaoTuwohNq+xFx7NhWtDmynNR9l8yl3wdaDcF5zcpMm7Hv8vhnxbPP2IZIviABTAqRnMmMwkodHsc/EV4kh5Qxkdp40UORqlCcGUdJPZkNywU6hnayzQSQKqN6q54Er7CoQpFiULg94=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714505717; c=relaxed/simple;
-	bh=8VoMAvq3zO3JVqiphTJGZqYC0YcLa4T9AVNVLehqUQQ=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=fdn6UojHF/jsS2ijSQQCg54kYxK/yjleisss7RhkS1AvbRb62hxfADB4f7mYeFu2Tu9qarDW17Y5qEc+4A8/cv7QoF1GY7X18iWmzu9As3V5cW8axTbppKLdqvwU68eW5YdpauoUHR6cVt2Gsc4T6i/jqVrpwwphMkkS/7jDNkU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bluespec.com; spf=fail smtp.mailfrom=bluespec.com; dkim=pass (2048-bit key) header.d=bluespec-com.20230601.gappssmtp.com header.i=@bluespec-com.20230601.gappssmtp.com header.b=eW5L7EfS; arc=none smtp.client-ip=209.85.219.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bluespec.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=bluespec.com
-Received: by mail-qv1-f45.google.com with SMTP id 6a1803df08f44-69b9365e584so1408846d6.1
-        for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 12:35:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bluespec-com.20230601.gappssmtp.com; s=20230601; t=1714505714; x=1715110514; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=rkIPuP+CuWN9tKCMSVVGNkNWpD1n57mvYpOJRL642BE=;
-        b=eW5L7EfS+DZQQuw6+gpxz+aI9APHdEVnOIubMZqG6Od+J1aaZ5fi4XEhZNCC+pc7Z3
-         y6VpTW7S+0kK9zGw7l/kVOUBMquLGzNy2XiTNAqxIsP5tizKES31HLbmGO9tks4Ed43B
-         T1TeQP3Xotp4TmRCNSentvpRne9GOIyrZXCP8nVjgFpGOITWkD+QCVhCynFI7ayCW2ZS
-         0CkqURMOdG4XEXVbgr/J4uLyxc6+69APgh5CI6POr8IsoR8UzNeuvgBq0gcePZHvicHK
-         Wv1TM50JVB5g+aOwdnqLrC7s/eHrYK349UQUKepEd+vcsMNZI56sx+8wuhQrdbjv/dhG
-         +JiA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714505714; x=1715110514;
-        h=content-disposition:mime-version:message-id:subject:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=rkIPuP+CuWN9tKCMSVVGNkNWpD1n57mvYpOJRL642BE=;
-        b=WQirci5lmqg0BZ2oRkgZYrmYtIsWF/YIoeYuKyulM0oZ6CJ5qIUxftqBzAZUdG3mzd
-         Y5IYFgs6Hn2yCaMx9I/8Bi5s00yjKVZlIuJ/OeVFrrkVRP7wTldIyeVWLIsEfc9qfnHr
-         YABf8lww0maet7go9o1KFzixIlooIBkkrdPn+NGZIE6rhx2lV+4kbo9kY4MyuyxoaMuA
-         EfY5E173ycVBQ0OTLniCBsABociiIV4gWdpeXT5O3tABa8zNIyysoAgFMXO4mtY+lL9d
-         39AjPieYEKu7rO42ARUr3KO1qtlV4bOISgqrlINlB6EtKsv2JQpVLFuLoG6clXYYpPYS
-         33Iw==
-X-Forwarded-Encrypted: i=1; AJvYcCXu35ERwq1nN37trnGw7R2pYMWpJ7dn9E+8qBUPd9Uk5PqbEenI/He3qiqa7E0iERfhc/cqQjoLv6Ofb6yAFHSTHJ5ft/i8
-X-Gm-Message-State: AOJu0YzLksPOwdMAMNHZGCrZJnt8zNzia+P4gKf/+AF+Q6zTm8ylxtKF
-	WWO9elYtTcT+WSx9pru+N6K6LZHT/xdOvxhJLh8ggSkLYxoS4RoXtnyQFFAF
-X-Google-Smtp-Source: AGHT+IGBKXU/7tRSFz93Y1xzcjPZPQaoRweolkwmfOyZ1X1BJG2s1+KA1acju3jrin1dLUxC2l0LEA==
-X-Received: by 2002:ad4:4ee4:0:b0:69b:6b28:f941 with SMTP id dv4-20020ad44ee4000000b0069b6b28f941mr7236867qvb.20.1714505714112;
-        Tue, 30 Apr 2024 12:35:14 -0700 (PDT)
-Received: from localhost.localdomain ([102.129.235.205])
-        by smtp.gmail.com with ESMTPSA id mg20-20020a056214561400b006a0cf4808dfsm2100850qvb.45.2024.04.30.12.35.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Apr 2024 12:35:13 -0700 (PDT)
-Date: Tue, 30 Apr 2024 15:35:09 -0400
-From: Darius Rad <darius@bluespec.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	s=arc-20240116; t=1714506262; c=relaxed/simple;
+	bh=5QZLb/Bh8dTMxh2pEN40k0KxyCJ2iydALhUyJju9CrQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WNoxmAs+oRYAAqituRK5uHFVesIxqKl8o1K9Fhcd3KWi15O1VHaaGKTnMQVAn30faeDoNr5LsVyonGuwNsgQ/+wmAfe/WjLdYspKZ11qAYdd+xrNCbW1AyMVD0fcswWlFCLWnsjoOhec6HyBBPT2xeCrlu0pRH7hhw20bPwXbIA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=LR/WfzVk; arc=none smtp.client-ip=85.214.62.61
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Received: from tr.lan (ip-86-49-120-218.bb.vodafone.cz [86.49.120.218])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+	(No client certificate requested)
+	(Authenticated sender: marex@denx.de)
+	by phobos.denx.de (Postfix) with ESMTPSA id DE9DE881DE;
+	Tue, 30 Apr 2024 21:44:16 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+	s=phobos-20191101; t=1714506257;
+	bh=bQQzZBTvyjr2+tuL4mR6eHtX/eJnbEe/KDDxV9XumdA=;
+	h=From:To:Cc:Subject:Date:From;
+	b=LR/WfzVk3rqPEtkefAL6pgLxJeF9hF6Z//953U3JiCQWobRhv1dReDpfEVHhufBGp
+	 lQTpVs8d0gjOTdZl8Iv9lUq8DzJTnJ3Jx4geZULN2zR+Ethw7U695zgM5I6oW1xAx4
+	 0S5es3SRoknkM+/LuVCH+afeNtPwmLBvFKxUN+4csnMt5Q7gGy5u5JfNqyiOzN8POy
+	 S7H268wQNpj5BIAr+djLM4rCtBekuuymeoXuij0xNmxGxkEboKBcREaVvqD/U9U+te
+	 ElNsZIPvC2tTlHBZz7Px+EpnN4Q+zOfuO7K3qGnttviTRa7waWHIUTfyTOFkEoltOn
+	 m7Zn/0d0aI4Ng==
+From: Marek Vasut <marex@denx.de>
+To: netdev@vger.kernel.org
+Cc: Marek Vasut <marex@denx.de>,
+	Ronald Wahl <ronald.wahl@raritan.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	virtualization@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] virtio_net: Warn if insufficient queue length for
- transmitting
-Message-ID: <ZjFH7Xb5gyTtOpWd@localhost.localdomain>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>
+Subject: [net,PATCH v2] net: ks8851: Queue RX packets in IRQ handler instead of disabling BHs
+Date: Tue, 30 Apr 2024 21:43:34 +0200
+Message-ID: <20240430194401.118950-1-marex@denx.de>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
 
-The transmit queue is stopped when the number of free queue entries is less
-than 2+MAX_SKB_FRAGS, in start_xmit().  If the queue length (QUEUE_NUM_MAX)
-is less than then this, transmission will immediately trigger a netdev
-watchdog timeout.  Report this condition earlier and more directly.
+Currently the driver uses local_bh_disable()/local_bh_enable() in its
+IRQ handler to avoid triggering net_rx_action() softirq on exit from
+netif_rx(). The net_rx_action() could trigger this driver .start_xmit
+callback, which is protected by the same lock as the IRQ handler, so
+calling the .start_xmit from netif_rx() from the IRQ handler critical
+section protected by the lock could lead to an attempt to claim the
+already claimed lock, and a hang.
 
-Signed-off-by: Darius Rad <darius@bluespec.com>
+The local_bh_disable()/local_bh_enable() approach works only in case
+the IRQ handler is protected by a spinlock, but does not work if the
+IRQ handler is protected by mutex, i.e. this works for KS8851 with
+Parallel bus interface, but not for KS8851 with SPI bus interface.
+
+Remove the BH manipulation and instead of calling netif_rx() inside
+the IRQ handler code protected by the lock, queue all the received
+SKBs in the IRQ handler into a queue first, and once the IRQ handler
+exits the critical section protected by the lock, dequeue all the
+queued SKBs and push them all into netif_rx(). At this point, it is
+safe to trigger the net_rx_action() softirq, since the netif_rx()
+call is outside of the lock that protects the IRQ handler.
+
+Fixes: be0384bf599c ("net: ks8851: Handle softirqs at the end of IRQ thread to fix hang")
+Tested-by: Ronald Wahl <ronald.wahl@raritan.com> # KS8851 SPI
+Signed-off-by: Marek Vasut <marex@denx.de>
 ---
- drivers/net/virtio_net.c | 3 +++
- 1 file changed, 3 insertions(+)
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: Ronald Wahl <ronald.wahl@raritan.com>
+Cc: Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org
+---
+V2: - Add TB from Ronald
+    - Operate private skb queue without locking as suggested by Eric
+---
+Note: This is basically what Jakub originally suggested in
+      https://patchwork.kernel.org/project/netdevbpf/patch/20240331142353.93792-2-marex@denx.de/#25785606
+---
+ drivers/net/ethernet/micrel/ks8851.h        | 1 +
+ drivers/net/ethernet/micrel/ks8851_common.c | 8 ++++----
+ 2 files changed, 5 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index 115c3c5414f2..72ee8473b61c 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -4917,6 +4917,9 @@ static int virtnet_probe(struct virtio_device *vdev)
- 			set_bit(guest_offloads[i], &vi->guest_offloads);
- 	vi->guest_offloads_capable = vi->guest_offloads;
+diff --git a/drivers/net/ethernet/micrel/ks8851.h b/drivers/net/ethernet/micrel/ks8851.h
+index 31f75b4a67fd7..f311074ea13bc 100644
+--- a/drivers/net/ethernet/micrel/ks8851.h
++++ b/drivers/net/ethernet/micrel/ks8851.h
+@@ -399,6 +399,7 @@ struct ks8851_net {
  
-+	if (virtqueue_get_vring_size(vi->sq->vq) < 2 + MAX_SKB_FRAGS)
-+		netdev_warn_once(dev, "not enough queue entries, expect xmit timeout\n");
-+
- 	pr_debug("virtnet: registered device %s with %d RX and TX vq's\n",
- 		 dev->name, max_queue_pairs);
+ 	struct work_struct	rxctrl_work;
  
++	struct sk_buff_head	rxq;
+ 	struct sk_buff_head	txq;
+ 	unsigned int		queued_len;
+ 
+diff --git a/drivers/net/ethernet/micrel/ks8851_common.c b/drivers/net/ethernet/micrel/ks8851_common.c
+index d4cdf3d4f5525..813a41193e3ce 100644
+--- a/drivers/net/ethernet/micrel/ks8851_common.c
++++ b/drivers/net/ethernet/micrel/ks8851_common.c
+@@ -299,7 +299,7 @@ static void ks8851_rx_pkts(struct ks8851_net *ks)
+ 					ks8851_dbg_dumpkkt(ks, rxpkt);
+ 
+ 				skb->protocol = eth_type_trans(skb, ks->netdev);
+-				__netif_rx(skb);
++				__skb_queue_tail(&ks->rxq, skb);
+ 
+ 				ks->netdev->stats.rx_packets++;
+ 				ks->netdev->stats.rx_bytes += rxlen;
+@@ -330,8 +330,6 @@ static irqreturn_t ks8851_irq(int irq, void *_ks)
+ 	unsigned long flags;
+ 	unsigned int status;
+ 
+-	local_bh_disable();
+-
+ 	ks8851_lock(ks, &flags);
+ 
+ 	status = ks8851_rdreg16(ks, KS_ISR);
+@@ -408,7 +406,8 @@ static irqreturn_t ks8851_irq(int irq, void *_ks)
+ 	if (status & IRQ_LCI)
+ 		mii_check_link(&ks->mii);
+ 
+-	local_bh_enable();
++	while (!skb_queue_empty(&ks->rxq))
++		netif_rx(__skb_dequeue(&ks->rxq));
+ 
+ 	return IRQ_HANDLED;
+ }
+@@ -1189,6 +1188,7 @@ int ks8851_probe_common(struct net_device *netdev, struct device *dev,
+ 						NETIF_MSG_PROBE |
+ 						NETIF_MSG_LINK);
+ 
++	__skb_queue_head_init(&ks->rxq);
+ 	skb_queue_head_init(&ks->txq);
+ 
+ 	netdev->ethtool_ops = &ks8851_ethtool_ops;
 -- 
-2.39.2
+2.43.0
 
 
