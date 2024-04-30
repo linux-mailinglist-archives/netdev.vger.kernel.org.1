@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-92430-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92431-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 512BE8B74A2
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 13:40:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4EC298B74D3
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 13:50:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 181EE2827A0
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 11:40:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 04A951F22734
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 11:50:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2471F130E35;
-	Tue, 30 Apr 2024 11:40:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5759B132C15;
+	Tue, 30 Apr 2024 11:50:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qVFUyQE/"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z9r9azER"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E636A1304BA;
-	Tue, 30 Apr 2024 11:40:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DD4512D76B;
+	Tue, 30 Apr 2024 11:50:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714477234; cv=none; b=Y/w7bkb1brh7whZhLxzF+9z/lRdqnNVmRoI+fPYAlc8m1WU86SYp/r+uNJxhPeg/Qq/zdB/z28bhrkfulVfV4MsKfJnAOtahlYJr8lJ2Pytu8/SQSwenr73OEjNgB2ZbUIc6hR+nu8iw1Kku/p/RzPTTZKfiITQWyYH+VMVskyU=
+	t=1714477830; cv=none; b=VEaxzm0jbmPdPoWnn8Y2l66xH35/LdBzJr9iY0ke9A48nPUFeROpsBKQ9ozyhDTS8vp51oYoISLyholk7rtZ7jWbazBe5uPT+jKU6gUvAnm8TERjZ3IKLJJvji90i6H5A7raoj/QG0IWuDvR1IL2XzcGCuVRa2M4QLWRr6bP58A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714477234; c=relaxed/simple;
-	bh=wGhItbg8hWpo6Y3Z2EUM1pYHhakVAaxuom4u9x7t8KI=;
+	s=arc-20240116; t=1714477830; c=relaxed/simple;
+	bh=p+ENwJCsykCW/qhdhEg1FQUbh2EUt27b+foeevRiMcw=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=kDYBJKHEahojEw8WBb2Q+9+Uis71z7hlHmVRpzuyzbM5fHKiAA9PpO3Esq7pyQqwGXf//rPZg4TfCbcJCxthCCGM1T4NNDMcFKHVu5ZyuBDMXgG4wIxEMcXNK5A946RUubg370/fgtRP8c9vg0AOn6Prqx11qzyE6MBxf0432Jc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qVFUyQE/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 5FC4BC4AF18;
-	Tue, 30 Apr 2024 11:40:33 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=nHGWBVs0q1WJCHLIQQwdPX0dvFA9v6mgfSVAwaWQs8Sh43aOaYzsD3Z6geJt5LpB2Q0f2chC+ny3oNGemHQMqE99dGAU9PFqUaAhulafgQplbh480bk1rC3YMhDdU7qmNTw7VcBHOBoscCgr1bFZY0UMvY7Vvpylo1eSQ4p+zoo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z9r9azER; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 9D1BCC4AF18;
+	Tue, 30 Apr 2024 11:50:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714477233;
-	bh=wGhItbg8hWpo6Y3Z2EUM1pYHhakVAaxuom4u9x7t8KI=;
+	s=k20201202; t=1714477829;
+	bh=p+ENwJCsykCW/qhdhEg1FQUbh2EUt27b+foeevRiMcw=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=qVFUyQE/3JznSZlQI0nbEO3LrrIlBeZe29GwHTM8YX1OLe7EeXEZSekzjd6a9pOD0
-	 VQqCkugKMBc6ot7zsGdeZAMIqjdZvznS9r6CF6atMybWCz84MrHuKNxsX+Nc+w3Dsr
-	 EyYna3ZXzQqld+vxsN2EpqFUvwZ7NU5KJg9ZjztQQyOYzTAKcf/5kLy6xKWH8ZX3rF
-	 mOqoFMpV5sonHzM0fpuZoXOKZ8oBUFG0iqvPhC+lpNusGAU6LTIiwkdwCxZd6RRcPV
-	 oIBRmoDNOIyUQdToxizmr89E82ZLXWw7Tb3KNLrDj+tSWiqYiHLBgFSg0ncFygmBjq
-	 XMggzAF4KN/ag==
+	b=Z9r9azER/+HcufesMEygLcC9skhZqlT25mKI/8CLRDemnzxbrKj0YD4cdB9P3IUSi
+	 dyITdqORqwEWm68mYvn6LDFaNYKzoNS7Io3ML7Aye6vUidzjoY2bQFIZwtAgkgbsg+
+	 voW+HRElcy/Kq13O4Q/DBSJPbn7wjwHRppVTmnjwk9dmJ4uVoFEBLXyZCWxV3NZDBg
+	 8F28E07Ti1KcIcLzLU6uPGAKjadJbba4iIWmeunxNArzYv9WTfGjpQYa3qw+gZ+EPI
+	 E0MLn4n7o2DyP6HDkahyTQbrQ9OyKg6X7ulCljdimGbT5MNeSSb5+6FnjaeDvZFiXQ
+	 XURCV+Q/VMkUQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4D60FC43440;
-	Tue, 30 Apr 2024 11:40:33 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 8B2BDC43444;
+	Tue, 30 Apr 2024 11:50:29 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,66 +52,44 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v7 00/11] net/smc: SMC intra-OS shortcut with
- loopback-ism
+Subject: Re: [PATCH net-next v2] net: dsa: mt7530: do not set MT7530_P5_DIS
+ when PHY muxing is being used
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171447723331.10444.16965496844638818442.git-patchwork-notify@kernel.org>
-Date: Tue, 30 Apr 2024 11:40:33 +0000
-References: <20240428060738.60843-1-guwen@linux.alibaba.com>
-In-Reply-To: <20240428060738.60843-1-guwen@linux.alibaba.com>
-To: Wen Gu <guwen@linux.alibaba.com>
-Cc: wintera@linux.ibm.com, twinkler@linux.ibm.com, hca@linux.ibm.com,
- gor@linux.ibm.com, agordeev@linux.ibm.com, davem@davemloft.net,
+ <171447782956.17629.8692193318005326042.git-patchwork-notify@kernel.org>
+Date: Tue, 30 Apr 2024 11:50:29 +0000
+References: <20240428-for-netnext-mt7530-do-not-disable-port5-when-phy-muxing-v2-1-bb7c37d293f8@arinc9.com>
+In-Reply-To: <20240428-for-netnext-mt7530-do-not-disable-port5-when-phy-muxing-v2-1-bb7c37d293f8@arinc9.com>
+To: =?utf-8?b?QXLEsW7DpyDDnE5BTCB2aWEgQjQgUmVsYXkgPGRldm51bGwrYXJpbmMudW5hbC5h?=@codeaurora.org,
+	=?utf-8?b?cmluYzkuY29tQGtlcm5lbC5vcmc+?=@codeaurora.org
+Cc: daniel@makrotopia.org, dqfext@gmail.com, sean.wang@mediatek.com,
+ andrew@lunn.ch, f.fainelli@gmail.com, olteanv@gmail.com, davem@davemloft.net,
  edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- wenjia@linux.ibm.com, jaka@linux.ibm.com, borntraeger@linux.ibm.com,
- svens@linux.ibm.com, alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
- linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
- netdev@vger.kernel.org
+ matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
+ arinc.unal@arinc9.com
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Paolo Abeni <pabeni@redhat.com>:
 
-On Sun, 28 Apr 2024 14:07:27 +0800 you wrote:
-> This patch set acts as the second part of the new version of [1] (The first
-> part can be referred from [2]), the updated things of this version are listed
-> at the end.
+On Sun, 28 Apr 2024 12:19:58 +0300 you wrote:
+> From: Arınç ÜNAL <arinc.unal@arinc9.com>
 > 
-> - Background
-> 
-> SMC-D is now used in IBM z with ISM function to optimize network interconnect
-> for intra-CPC communications. Inspired by this, we try to make SMC-D available
-> on the non-s390 architecture through a software-implemented Emulated-ISM device,
-> that is the loopback-ism device here, to accelerate inter-process or
-> inter-containers communication within the same OS instance.
+> DSA initalises the ds->num_ports amount of ports in
+> dsa_switch_touch_ports(). When the PHY muxing feature is in use, port 5
+> won't be defined in the device tree. Because of this, the type member of
+> the dsa_port structure for this port will be assigned DSA_PORT_TYPE_UNUSED.
+> The dsa_port_setup() function calls ds->ops->port_disable() when the port
+> type is DSA_PORT_TYPE_UNUSED.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v7,01/11] net/smc: decouple ism_client from SMC-D DMB registration
-    https://git.kernel.org/netdev/net-next/c/784c46f5467c
-  - [net-next,v7,02/11] net/smc: introduce loopback-ism for SMC intra-OS shortcut
-    https://git.kernel.org/netdev/net-next/c/46ac64419ded
-  - [net-next,v7,03/11] net/smc: implement ID-related operations of loopback-ism
-    https://git.kernel.org/netdev/net-next/c/45783ee85bf3
-  - [net-next,v7,04/11] net/smc: implement DMB-related operations of loopback-ism
-    https://git.kernel.org/netdev/net-next/c/f7a22071dbf3
-  - [net-next,v7,05/11] net/smc: mark optional smcd_ops and check for support when called
-    https://git.kernel.org/netdev/net-next/c/d1d8d0b6c7c6
-  - [net-next,v7,06/11] net/smc: ignore loopback-ism when dumping SMC-D devices
-    https://git.kernel.org/netdev/net-next/c/c8df2d449f64
-  - [net-next,v7,07/11] net/smc: register loopback-ism into SMC-D device list
-    https://git.kernel.org/netdev/net-next/c/04791343d858
-  - [net-next,v7,08/11] net/smc: add operations to merge sndbuf with peer DMB
-    https://git.kernel.org/netdev/net-next/c/439888826858
-  - [net-next,v7,09/11] net/smc: {at|de}tach sndbuf to peer DMB if supported
-    https://git.kernel.org/netdev/net-next/c/ae2be35cbed2
-  - [net-next,v7,10/11] net/smc: adapt cursor update when sndbuf and peer DMB are merged
-    https://git.kernel.org/netdev/net-next/c/cc0ab806fc52
-  - [net-next,v7,11/11] net/smc: implement DMB-merged operations of loopback-ism
-    https://git.kernel.org/netdev/net-next/c/c3a910f2380f
+  - [net-next,v2] net: dsa: mt7530: do not set MT7530_P5_DIS when PHY muxing is being used
+    https://git.kernel.org/netdev/net-next/c/16e6592cd5c5
 
 You are awesome, thank you!
 -- 
