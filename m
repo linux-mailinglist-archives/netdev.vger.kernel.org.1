@@ -1,91 +1,94 @@
-Return-Path: <netdev+bounces-92426-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92427-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F31D88B7262
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 13:07:43 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DEDB68B730B
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 13:15:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AB6AF282ABD
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 11:07:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5913F1F24017
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 11:15:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A526112D1FD;
-	Tue, 30 Apr 2024 11:07:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46B1A12F362;
+	Tue, 30 Apr 2024 11:14:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VLIiCAwa"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FM5OR15z"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27AD612C805
-	for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 11:07:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8150A12DD83
+	for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 11:14:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714475248; cv=none; b=M10QUPCMOB5ERsm2PvTF4lmi35/EkvGgD8udkW+bPMHthmZkSPBHZOFqOLBaYpwwEb5NltM5trJ3+/QUAWkvDZ6rrqLblX5x+2DfzV9DJoELPPUmkSHagKS96QaKSTcgmgjnZyXgh7ZJ+z1klWJK2PftWSQwmVMgAowBeoFJ9Z4=
+	t=1714475667; cv=none; b=KCYBdi8Qynwere3yw3sNzZ3bHIVgw6WIGoHTwOey3IjCMJnnn6cYeZXNbGzzEab0ogQMLzPRJdt+URBJgtN10cpkiVGUzcGslyPO1v2vAtOR4GJOBuJ5nMXMeVtlEF5iWTAQkaiYj5I/lEe9x5RVlYD6KrRLuvOa2HxumjYsSms=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714475248; c=relaxed/simple;
-	bh=2RAQXx9Hs2V88qI0iAiCTAiB8WYUsdO56+IVGIPnsSE=;
+	s=arc-20240116; t=1714475667; c=relaxed/simple;
+	bh=1v3iKbYRwkoqF4GswqbZSAc/O4twc8pg1X2WdcHj6nc=;
 	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=svjVqGrPbxigwlBUfYzBvF+/2ajtdxfhJWwLkeKtF5BxGg698zjapE7/T1iUCHm7tFXjUD7UKx7J54KP0svIZfp8ICnEHQBwRXW64mQHJ+JqyBvPkZUOb/kKJMkcYd9lBtrgPf6dqPrqpL2b3UJ7QRS+nNDkOyaY19ZkRiHUukc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VLIiCAwa; arc=none smtp.client-ip=170.10.129.124
+	 Content-Type:MIME-Version; b=j6e71nMvFzwR/w0u3VSWT9U+CvWfpI8c2sqgk7ezdFJWzC3BZmMmttNqQyU4NCpZy2J8eJlvtlGltFa/xSFYwcrE8Tn/agG3Hr9YyBwcyDNa0RWpqFlptKjiK3saMeoWwVxKVv0DUUYn3skqLZQ8RosrfQh4L02dFOv62LY2GvM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FM5OR15z; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1714475246;
+	s=mimecast20190719; t=1714475664;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=479+9n3x4cuBmKHOomGQFmMun7aOPyQx0HKnJJwE/uc=;
-	b=VLIiCAwaTQemw/dB7IQi/lQ6oCx5c7Hg73O0kLBZtdipOtt9qb1uxubGB51+2KlD71YbPn
-	2fLO5jjcjBEfLYAlzNnzbQi09gNc0a7CqyikEmqUoHrDTkKs8XrsB+29hmi8KCYUc1RNjQ
-	4y5GdWEgLP03mbPiM58K7J2tLZ9/50o=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=ZKlqsYerCfpJBU242kuBh82/O/c7RiKM2R2B8jV0WP8=;
+	b=FM5OR15zdOtbXLLfljDmyOcoHMi3a76jEzkB1FfMNOrKPpOzISGR8lM6KnEcMkaahWekvk
+	ZUXpY2jz3BMLF+vigDCVh1HhJWd9o3KqS6QgCy0XEKtJibn47iHUyCmX59nMDkjfNE+SZ1
+	2PoMNHw9I2g/8/vLfwpNAjJFAw04QVU=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-659-R9_SqXxmNhSjnbIS7ZdHuQ-1; Tue, 30 Apr 2024 07:07:24 -0400
-X-MC-Unique: R9_SqXxmNhSjnbIS7ZdHuQ-1
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-41b2cf29762so6692705e9.0
-        for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 04:07:24 -0700 (PDT)
+ us-mta-158-tqph3ITqOduSnCK8Xnd1fg-1; Tue, 30 Apr 2024 07:14:21 -0400
+X-MC-Unique: tqph3ITqOduSnCK8Xnd1fg-1
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-34d9467c5f9so57886f8f.2
+        for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 04:14:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714475243; x=1715080043;
+        d=1e100.net; s=20230601; t=1714475660; x=1715080460;
         h=mime-version:user-agent:content-transfer-encoding:autocrypt
          :references:in-reply-to:date:cc:to:from:subject:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=479+9n3x4cuBmKHOomGQFmMun7aOPyQx0HKnJJwE/uc=;
-        b=WJdAO1O9b16G0golvE7xMcg3YdCElnI2T4bsOonn1NTO63Td20JPf99lJtCXCQ79Xi
-         lOhAIi0eISpg/zptmHqENLvX75DsGcONJVVLe3VCtqfgbbMZS1ssUYIDh4mV7xIdbWwv
-         lNNDmeM/qjLy39pBN2rn3vPgbkanMSaVdG/zLWAXmRnMfK7NgbSDBp87XKQF88ElnFf6
-         NuQSVeecwjdZr5NlL9MfbBdx/1dY6lZb74s+I3UnpGRC3rluBAhi3CY3LRXCmgIxJ5f5
-         qPvAxiQVobW4/dNyloth2ysGZN22+bbN+jq3Hbkq0GCFLhbiol56M8etE4NtA1BYg67h
-         MmbA==
-X-Forwarded-Encrypted: i=1; AJvYcCXHoDropf8Re0Zv6nf8aWEaRWVpZOqBwhpt5ype1eHAxySNUoNOC9ftwTaeURrmvTy1GyivoDTFz2e3V60n4J7dECe83Ed/
-X-Gm-Message-State: AOJu0YysKWzkqHxlWV6LpjdilAzc6eMZ5hhoozWHHYQT+QM4HuINaE5j
-	Fr64BP755CuD/YGfpupOXIKQrdYD7XlpUdyTA8uYuqI3D8jF1Smwe8KmwSc2I26dd1kTJy8aMai
-	m3lnBGRGTZhNwYw2dnYP4AJc6kNXEMXOfYKRwowpWY3g12rS5kwBf3w==
-X-Received: by 2002:a5d:5692:0:b0:34d:7d77:36fa with SMTP id f18-20020a5d5692000000b0034d7d7736famr1006345wrv.5.1714475243631;
-        Tue, 30 Apr 2024 04:07:23 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGcLNke56JnTbPaAydHL1JwA1e2Rs1ezSc6zl5FkWobFVmpOsDpeZkzrMYwNPY8bl/KnnrD2g==
-X-Received: by 2002:a5d:5692:0:b0:34d:7d77:36fa with SMTP id f18-20020a5d5692000000b0034d7d7736famr1006332wrv.5.1714475243219;
-        Tue, 30 Apr 2024 04:07:23 -0700 (PDT)
+        bh=ZKlqsYerCfpJBU242kuBh82/O/c7RiKM2R2B8jV0WP8=;
+        b=fSXCHEtVjVnQHYbD1LuPA4bUQgCgPwQFfpMfI7Z0B/LtyPXbvaVLL/Zr8dDOtGshXr
+         zzQyTf2W6neDhtdjmQlc03xDQsR4xDa1qS0X1+BWdWjuE8WbrOCW+nNVkzXt0AklW4M3
+         hlCioibqn5ys+ua6LYLIGWuXQZmoqPW9Y+/UDHEOnw+S6c8tyF5tPd4POJO93JRE4Thl
+         fbmjdD0zeacMiP1IN+5Y5TukHz4CucoLN9ZMnNt/IkoeUQ8emvsarYRkfrokVFOqAw/E
+         He3GN/0vxMvYSzanuOyPLUvM9otiD+o4yY1B1c/uCExtXe05PTNy3y2XetQEh8Dgykb1
+         8rDA==
+X-Forwarded-Encrypted: i=1; AJvYcCUTFSzpkK1H1rJqDi0aBWvdXtIZeyoHkSkktdDpxvZpYWtjCaVvLqmHPTw6rcCVitX3wr6+8b7Spjfex4Ath3vt7opzWYGD
+X-Gm-Message-State: AOJu0Yxx8Ek87atXhF6TtmTRnbzHfeyZV9TzemBo3Ge+Qo8rDiEUdsqU
+	b6ssd9rgjbydzHYKnCWrCEXmgUjBaF1xhsIWR9jeqrYk0njjM67v5EpIDlxlSPqzbUU+mZfW2sw
+	HXqZJolAah4Z32Ex4XEsCy5RvQaSCzd9E3vLePad8tMhW4kqt2rU2Ng==
+X-Received: by 2002:a5d:42cb:0:b0:34d:8ccf:c9ce with SMTP id t11-20020a5d42cb000000b0034d8ccfc9cemr1046330wrr.5.1714475660003;
+        Tue, 30 Apr 2024 04:14:20 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFFGw/FQ4V7WgwOjQMrGJp7DK9lZTOj0lhUWJqhOwmJTT8pE4hscFbpaG6PtCgjwPrMgGRMyQ==
+X-Received: by 2002:a5d:42cb:0:b0:34d:8ccf:c9ce with SMTP id t11-20020a5d42cb000000b0034d8ccfc9cemr1046311wrr.5.1714475659527;
+        Tue, 30 Apr 2024 04:14:19 -0700 (PDT)
 Received: from gerbillo.redhat.com ([2a0d:3341:b0ae:6a10::f71])
-        by smtp.gmail.com with ESMTPSA id w5-20020a5d6805000000b0034c8b0354a6sm9179999wru.106.2024.04.30.04.07.22
+        by smtp.gmail.com with ESMTPSA id j9-20020a5d4489000000b0034d9605eb70sm965095wrq.49.2024.04.30.04.14.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Apr 2024 04:07:22 -0700 (PDT)
-Message-ID: <b763c28aa7cb3276136eac39a9144a4242587438.camel@redhat.com>
-Subject: Re: [PATCH net 1/2] net: bridge: fix multicast-to-unicast with
- fraglist GSO
+        Tue, 30 Apr 2024 04:14:19 -0700 (PDT)
+Message-ID: <e598e9eee3827fd173e3cd6f525df133eb3b54ec.camel@redhat.com>
+Subject: Re: [PATCH v4 net-next v4 6/6] net: add heuristic for enabling TCP
+ fraglist GRO
 From: Paolo Abeni <pabeni@redhat.com>
-To: Felix Fietkau <nbd@nbd.name>, netdev@vger.kernel.org, Roopa Prabhu
- <roopa@nvidia.com>, Nikolay Aleksandrov <razor@blackwall.org>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>,  Linus =?ISO-8859-1?Q?L=FCssing?=
- <linus.luessing@c0d3.blue>
-Cc: bridge@lists.linux.dev, linux-kernel@vger.kernel.org
-Date: Tue, 30 Apr 2024 13:07:21 +0200
-In-Reply-To: <20240427182420.24673-1-nbd@nbd.name>
-References: <20240427182420.24673-1-nbd@nbd.name>
+To: Felix Fietkau <nbd@nbd.name>, netdev@vger.kernel.org, Eric Dumazet
+ <edumazet@google.com>, "David S. Miller" <davem@davemloft.net>, David Ahern
+ <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>
+Cc: willemdebruijn.kernel@gmail.com, linux-kernel@vger.kernel.org
+Date: Tue, 30 Apr 2024 13:14:17 +0200
+In-Reply-To: <63c1cb0e-bd63-43da-b451-5383bb4a0f5f@nbd.name>
+References: <20240427182305.24461-1-nbd@nbd.name>
+	 <20240427182305.24461-7-nbd@nbd.name>
+	 <e590ba4608c9810d3d75fefdcbba9f2a02c23a0f.camel@redhat.com>
+	 <e3a3a499-11b3-4906-b0f1-b94e70825ca9@nbd.name>
+	 <18dee53b6ae7cd75196141e4c5d8984bc0f3296f.camel@redhat.com>
+	 <63c1cb0e-bd63-43da-b451-5383bb4a0f5f@nbd.name>
 Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=mQINBGISiDUBEAC5uMdJicjm3ZlWQJG4u2EU1EhWUSx8IZLUTmEE8zmjPJFSYDcjtfGcbzLPb63BvX7FADmTOkO7gwtDgm501XnQaZgBUnCOUT8qv5MkKsFH20h1XJyqjPeGM55YFAXc+a4WD0YyO5M0+KhDeRLoildeRna1ey944VlZ6Inf67zMYw9vfE5XozBtytFIrRyGEWkQwkjaYhr1cGM8ia24QQVQid3P7SPkR78kJmrT32sGk+TdR4YnZzBvVaojX4AroZrrAQVdOLQWR+w4w1mONfJvahNdjq73tKv51nIpu4SAC1Zmnm3x4u9r22mbMDr0uWqDqwhsvkanYmn4umDKc1ZkBnDIbbumd40x9CKgG6ogVlLYeJa9WyfVMOHDF6f0wRjFjxVoPO6p/ZDkuEa67KCpJnXNYipLJ3MYhdKWBZw0xc3LKiKc+nMfQlo76T/qHMDfRMaMhk+L8gWc3ZlRQFG0/Pd1pdQEiRuvfM5DUXDo/YOZLV0NfRFU9SmtIPhbdm9cV8Hf8mUwubihiJB/9zPvVq8xfiVbdT0sPzBtxW0fXwrbFxYAOFvT0UC2MjlIsukjmXOUJtdZqBE3v3Jf7VnjNVj9P58+MOx9iYo8jl3fNd7biyQWdPDfYk9ncK8km4skfZQIoUVqrWqGDJjHO1W9CQLAxkfOeHrmG29PK9tHIwARAQABtB9QYW9sbyBBYmVuaSA8cGFiZW5pQHJlZGhhdC5jb20+iQJSBBMBCAA8FiEEg1AjqC77wbdLX2LbKSR5jcyPE6QFAmISiDUCGwMFCwkIBwIDIgIBBhUKCQgLAgQWAgMBAh4HAheAAAoJECkkeY3MjxOkJSYQAJcc6MTsuFxYdYZkeWjW//zbD3ApRHzpNlHLVSuJqHr9/aDS+tyszgS8jj9MiqALzgq4iZbg
  7ZxN9ZsDL38qVIuFkSpgMZCiUHdxBC11J8nbBSLlpnc924UAyr5XrGA99 6Wl5I4Km3128GY6iAkH54pZpOmpoUyBjcxbJWHstzmvyiXrjA2sMzYjt3Xkqp0cJfIEekOi75wnNPofEEJg28XPcFrpkMUFFvB4Aqrdc2yyR8Y36rbw18sIX3dJdomIP3dL7LoJi9mfUKOnr86Z0xltgcLPGYoCiUZMlXyWgB2IPmmcMP2jLJrusICjZxLYJJLofEjznAJSUEwB/3rlvFrSYvkKkVmfnfro5XEr5nStVTECxfy7RTtltwih85LlZEHP8eJWMUDj3P4Q9CWNgz2pWr1t68QuPHWaA+PrXyasDlcRpRXHZCOcvsKhAaCOG8TzCrutOZ5NxdfXTe3f1jVIEab7lNgr+7HiNVS+UPRzmvBc73DAyToKQBn9kC4jh9HoWyYTepjdcxnio0crmara+/HEyRZDQeOzSexf85I4dwxcdPKXv0fmLtxrN57Ae82bHuRlfeTuDG3x3vl/Bjx4O7Lb+oN2BLTmgpYq7V1WJPUwikZg8M+nvDNcsOoWGbU417PbHHn3N7yS0lLGoCCWyrK1OY0QM4EVsL3TjOfUtCNQYW9sbyBBYmVuaSA8cGFvbG8uYWJlbmlAZ21haWwuY29tPokCUgQTAQgAPBYhBINQI6gu+8G3S19i2ykkeY3MjxOkBQJiEoitAhsDBQsJCAcCAyICAQYVCgkICwIEFgIDAQIeBwIXgAAKCRApJHmNzI8TpBzHD/45pUctaCnhee1vkQnmStAYvHmwrWwIEH1lzDMDCpJQHTUQOOJWDAZOFnE/67bxSS81Wie0OKW2jvg1ylmpBA0gPpnzIExQmfP72cQ1TBoeVColVT6Io35BINn+ymM7c0Bn8RvngSEpr3jBtqvvWXjvtnJ5/HbOVQCg62NC6ewosoKJPWpGXMJ9SKsVIOUHsmoWK60spzeiJoSmAwm3zTJQnM5kRh2q
  iWjoCy8L35zPqR5TV+f5WR5hTVCqmLHSgm1jxwKhPg9L+GfuE4d0SWd84y GeOB3sSxlhWsuTj1K6K3MO9srD9hr0puqjO9sAizd0BJP8ucf/AACfrgmzIqZXCfVS7jJ/M+0ic+j1Si3yY8wYPEi3dvbVC0zsoGj9n1R7B7L9c3g1pZ4L9ui428vnPiMnDN3jh9OsdaXeWLvSvTylYvw9q0DEXVQTv4/OkcoMrfEkfbXbtZ3PRlAiddSZA5BDEkkm6P9KA2YAuooi1OD9d4MW8LFAeEicvHG+TPO6jtKTacdXDRe611EfRwTjBs19HmabSUfFcumL6BlVyceIoSqXFe5jOfGpbBevTZtg4kTSHqymGb6ra6sKs+/9aJiONs5NXY7iacZ55qG3Ib1cpQTps9bQILnqpwL2VTaH9TPGWwMY3Nc2VEc08zsLrXnA/yZKqZ1YzSY9MGXWYLkCDQRiEog1ARAAyXMKL+x1lDvLZVQjSUIVlaWswc0nV5y2EzBdbdZZCP3ysGC+s+n7xtq0o1wOvSvaG9h5q7sYZs+AKbuUbeZPu0bPWKoO02i00yVoSgWnEqDbyNeiSW+vI+VdiXITV83lG6pS+pAoTZlRROkpb5xo0gQ5ZeYok8MrkEmJbsPjdoKUJDBFTwrRnaDOfb+Qx1D22PlAZpdKiNtwbNZWiwEQFm6mHkIVSTUe2zSemoqYX4QQRvbmuMyPIbwbdNWlItukjHsffuPivLF/XsI1gDV67S1cVnQbBgrpFDxN62USwewXkNl+ndwa+15wgJFyq4Sd+RSMTPDzDQPFovyDfA/jxN2SK1Lizam6o+LBmvhIxwZOfdYH8bdYCoSpqcKLJVG3qVcTwbhGJr3kpRcBRz39Ml6iZhJyI3pEoX3bJTlR5Pr1Kjpx13qGydSMos94CIYWAKhegI06aTdvvuiigBwjngo/Rk5S+iEGR5KmTqGyp27o6YxZy6D4NIc6PKUzhIUxfvuHNvfu
@@ -100,34 +103,91 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 
-On Sat, 2024-04-27 at 20:24 +0200, Felix Fietkau wrote:
-> Calling skb_copy on a SKB_GSO_FRAGLIST skb is not valid, since it returns
-> an invalid linearized skb. This code only needs to change the ethernet
-> header, so pskb_copy is the right function to call here.
+On Tue, 2024-04-30 at 12:55 +0200, Felix Fietkau wrote:
+> On 30.04.24 12:31, Paolo Abeni wrote:
+> > On Tue, 2024-04-30 at 12:23 +0200, Felix Fietkau wrote:
+> > > On 30.04.24 12:12, Paolo Abeni wrote:
+> > > > On Sat, 2024-04-27 at 20:23 +0200, Felix Fietkau wrote:
+> > > > > When forwarding TCP after GRO, software segmentation is very expe=
+nsive,
+> > > > > especially when the checksum needs to be recalculated.
+> > > > > One case where that's currently unavoidable is when routing packe=
+ts over
+> > > > > PPPoE. Performance improves significantly when using fraglist GRO
+> > > > > implemented in the same way as for UDP.
+> > > > >=20
+> > > > > When NETIF_F_GRO_FRAGLIST is enabled, perform a lookup for an est=
+ablished
+> > > > > socket in the same netns as the receiving device. While this may =
+not
+> > > > > cover all relevant use cases in multi-netns configurations, it sh=
+ould be
+> > > > > good enough for most configurations that need this.
+> > > > >=20
+> > > > > Here's a measurement of running 2 TCP streams through a MediaTek =
+MT7622
+> > > > > device (2-core Cortex-A53), which runs NAT with flow offload enab=
+led from
+> > > > > one ethernet port to PPPoE on another ethernet port + cake qdisc =
+set to
+> > > > > 1Gbps.
+> > > > >=20
+> > > > > rx-gro-list off: 630 Mbit/s, CPU 35% idle
+> > > > > rx-gro-list on:  770 Mbit/s, CPU 40% idle
+> > > > >=20
+> > > > > Signe-off-by: Felix Fietkau <nbd@nbd.name>
+> > > > > ---
+> > > > >  net/ipv4/tcp_offload.c   | 32 ++++++++++++++++++++++++++++++++
+> > > > >  net/ipv6/tcpv6_offload.c | 35 ++++++++++++++++++++++++++++++++++=
++
+> > > > >  2 files changed, 67 insertions(+)
+> > > > >=20
+> > > > > diff --git a/net/ipv4/tcp_offload.c b/net/ipv4/tcp_offload.c
+> > > > > index 87ae9808e260..3e9b8c6f9c8c 100644
+> > > > > --- a/net/ipv4/tcp_offload.c
+> > > > > +++ b/net/ipv4/tcp_offload.c
+> > > > > @@ -407,6 +407,36 @@ void tcp_gro_complete(struct sk_buff *skb)
+> > > > >  }
+> > > > >  EXPORT_SYMBOL(tcp_gro_complete);
+> > > > > =20
+> > > > > +static void tcp4_check_fraglist_gro(struct list_head *head, stru=
+ct sk_buff *skb,
+> > > > > +				    struct tcphdr *th)
+> > > > > +{
+> > > > > +	const struct iphdr *iph;
+> > > > > +	struct sk_buff *p;
+> > > > > +	struct sock *sk;
+> > > > > +	struct net *net;
+> > > > > +	int iif, sdif;
+> > > > > +
+> > > > > +	if (!(skb->dev->features & NETIF_F_GRO_FRAGLIST))
+> > > >=20
+> > > > Should we add an 'unlikely()' here to pair with unlikely(is_flist) =
+in
+> > > > *gro_receive / *gro_complete?
+> > > Not sure if unlikely() will make any difference here. I think it make=
+s=20
+> > > more sense in the other places than here.
+> >=20
+> > Why? AFAICS this will be called for every packet on the wire, exactly
+> > as the code getting this annotation in patch 3/6.
 >=20
-> Fixes: 6db6f0eae605 ("bridge: multicast to unicast")
-> Signed-off-by: Felix Fietkau <nbd@nbd.name>
-> ---
->  net/bridge/br_forward.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/net/bridge/br_forward.c b/net/bridge/br_forward.c
-> index 7431f89e897b..d7c35f55bd69 100644
-> --- a/net/bridge/br_forward.c
-> +++ b/net/bridge/br_forward.c
-> @@ -266,7 +266,7 @@ static void maybe_deliver_addr(struct net_bridge_port=
- *p, struct sk_buff *skb,
->  	if (skb->dev =3D=3D p->dev && ether_addr_equal(src, addr))
->  		return;
-> =20
-> -	skb =3D skb_copy(skb, GFP_ATOMIC);
-> +	skb =3D pskb_copy(skb, GFP_ATOMIC);
->  	if (!skb) {
->  		DEV_STATS_INC(dev, tx_dropped);
->  		return;
+> I had compared assembly after adding an annotation and didn't see a=20
+> difference. However, my annotation was wrong.
+> When I add: if (likely(!(skb->dev->features & NETIF_F_GRO_FRAGLIST)))
+> the generated code is different, and I probably should use that.
 
-LGTM, but let's wait a little more time for Nikolay
+I read the above as you intend to send a new revision. If so, feel free
+to add=20
 
 Acked-by: Paolo Abeni <pabeni@redhat.com>
+
+to the whole series.
+
+Otherwise, please LMK, I think we can merge it as-is and ev. follow-up.
+
+Thanks,
+
+Paolo
 
 
