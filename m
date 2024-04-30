@@ -1,158 +1,113 @@
-Return-Path: <netdev+bounces-92337-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92338-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36D0C8B6B23
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 09:09:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 592578B6B27
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 09:11:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E7166282070
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 07:09:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1121E1F2280E
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 07:11:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE455199AD;
-	Tue, 30 Apr 2024 07:09:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="Ai0C7NOg"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37D602C184;
+	Tue, 30 Apr 2024 07:11:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55A232556F
-	for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 07:09:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C16A2199AD
+	for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 07:11:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714460995; cv=none; b=KWASd7Z+ptfSO1XhLd5rjR68SWdM38GMTKrzEJK7ewNr+PaYXHyrNzgujbE5J4Zni49tTC8PtmN4JiMz/p2yCD+wF8+eVY0adT+xNIM9EuVlvBdeDSfnuXHYKn2l2XTExVIQwaF9Bn9hKiPX+7SgoU1EC8V4Ef0Tz2Bx55gdDHI=
+	t=1714461084; cv=none; b=jpfU6A7OxlHeiIbOHbysJXOYosgWCOG/0RKFTaa4hPfRF3cZKJQj0jDxyCsRbRImmTS8P3esy5tziiRm79S9u1tblLbD5vivasJ8tFygM+SEFmALLrMkrj9Ya/rB0xJTk+hKma9MTU/FGjzK87RzdTktUNumQIIXxhSPyR9MxQU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714460995; c=relaxed/simple;
-	bh=TlUOKuXz+sJmH3zkoaKpKP/Q9cgJVpsg9XoV5CNaK2s=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VSEiuLPuu5X0ye2PvAiaKDpAjwFDBtzsqPiCjtd9+4FG6WN+xee3TdG0qYPJbEMasFS3KS8v8glKB9JQFle2PP4RyMDBo4x9GXpIqq/X52yfBlkKRaO6PAP7TGLQrqH7FxBG5Zfv01Hn6F/1CH63dqcueBAbwDaIViDD+ccmaIc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=Ai0C7NOg; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id E7239206D2;
-	Tue, 30 Apr 2024 09:09:52 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from a.mx.secunet.com ([127.0.0.1])
-	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id w2RVBTLgIVpA; Tue, 30 Apr 2024 09:09:52 +0200 (CEST)
-Received: from mailout2.secunet.com (mailout2.secunet.com [62.96.220.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id 58ECB201E5;
-	Tue, 30 Apr 2024 09:09:52 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 58ECB201E5
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1714460992;
-	bh=IL6F0PatEbmU9BPMUrYtmkgk9qSnisrxntJNB/wHACM=;
-	h=Date:From:To:CC:Subject:Reply-To:References:In-Reply-To:From;
-	b=Ai0C7NOgx2Ru1wq7gbp4T9jgSLd1R4jENX4iUaYQusVX2/1DiIzDQnc9+pG4x2pSF
-	 S+VvOjtQhIIjUvUdTSc+tPhvWo7xRtJxuQArWCzAvpaAFwbTXg+FNRf5N9+/1GRgLu
-	 nh+ThNSOadx7+1x5ObdVhCXS+fFb4UN2+zVP/8UxwYZbNoRJ+xD3ZhjYlZKDNqyrGY
-	 Cv8nxuDTzg5/Xu71yW5E5KE0hepqOlz/kO7MVKxBEOC3CFMaGxDHZbnK6wPfX/grnX
-	 uaKRRK6WWPkuT9rVoiZquHpkU+pvqirLmy2bf/Nf4T384rS9QhzdoEy4AtGdw0vyRI
-	 jJt2Yof4cjXSA==
-Received: from cas-essen-02.secunet.de (unknown [10.53.40.202])
-	by mailout2.secunet.com (Postfix) with ESMTP id 4CB7380004A;
-	Tue, 30 Apr 2024 09:09:52 +0200 (CEST)
-Received: from mbx-essen-01.secunet.de (10.53.40.197) by
- cas-essen-02.secunet.de (10.53.40.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Tue, 30 Apr 2024 09:09:52 +0200
-Received: from moon.secunet.de (172.18.149.1) by mbx-essen-01.secunet.de
- (10.53.40.197) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Tue, 30 Apr
- 2024 09:09:51 +0200
-Date: Tue, 30 Apr 2024 09:09:45 +0200
-From: Antony Antony <antony.antony@secunet.com>
-To: Steffen Klassert <steffen.klassert@secunet.com>, Herbert Xu
-	<herbert@gondor.apana.org.au>, <netdev@vger.kernel.org>
-CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, <devel@linux-ipsec.org>, Leon Romanovsky
-	<leon@kernel.org>, Eyal Birger <eyal.birger@gmail.com>, Nicolas Dichtel
-	<nicolas.dichtel@6wind.com>, Sabrina Dubroca <sd@queasysnail.net>
-Subject: [PATCH ipsec-next v14 4/4] xfrm: Restrict SA direction attribute to
- specific netlink message types
-Message-ID: <35892b6ac691f9fcc5545a1f5b364111c25b1310.1714460330.git.antony.antony@secunet.com>
-Reply-To: <antony.antony@secunet.com>
-References: <cover.1714460330.git.antony.antony@secunet.com>
+	s=arc-20240116; t=1714461084; c=relaxed/simple;
+	bh=DfT3eej2m6KOPnni9bTCDfHoXF4S4yXSjrNpRAl+KZk=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=DpZ/pGfJIMqxBdLNve7EPNh0+w5HhuH1cJRJpYJ6g5wIjxf/AAGznA6346GmM9Q6weYOUulqdWB3VURTmjtWZYRveQ4Rms6lkV19LEYDQl0Cwuqy1uft4RD7yIYzS7lRe3Slc6SNnLtZa/24vRTG88tSpgZg5nZq30L1DZJkKwA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-36b3c9c65d7so51659905ab.3
+        for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 00:11:22 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714461082; x=1715065882;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=hB5JyjSp0fRxJ94Xv9k9vT1D7hNT4E6Sz9ZWtEnTjcc=;
+        b=MocvMRg/OB3kwbVN3mrcLU3Tz1n8hb+NcbAUlgNXNgTm4i9U21UXS44OC2soX/63qx
+         Be/ModekpHSXOjZBp26yPw1EXG1rX1CvOMhvJxgKMH1pO7H2WT/WqZ+znbL/VZbQLdX/
+         ECPZMMRwG+TiLHCRycpUyyH1Ts0Pc7hL5RbRsMnkfZhjvoor3DDK/51yckhgELwwKCJE
+         q8NhtaOj8yFwygsbwAV4pK1RmxDVlM8y9dljSxZbuZfYAzx1yK948Y/LWN107RJO8Fg4
+         bDxRTgGBD772b3riKbBIztMw5m8acAd6LzUC8EhvuaInTrtm71Dc/X1VW1+bfuuHH/1i
+         aDew==
+X-Forwarded-Encrypted: i=1; AJvYcCVwQ2H0s8t2HUxCuUvgDeYZ88SiPX81btGTS2lrb/MNGfY5br431SerER3y7eF4No4GZtF1ytMfORQ89IuMfAFR5+rdH9dH
+X-Gm-Message-State: AOJu0YwIGjVsn7OSRuw+4TspZtE8lUI+lVJwPMb/xZXOKx59PD4J3GlA
+	jQXt4P1txgR33qI0R6XslDYRucjiHEebSlJ+vzFfhoGRwodUWINSypHMAqr1+7qzsI+tRicpAjj
+	Fs76gTJLCVZmEVHvb85SpTb1pUJ0YE7QpUjMv5bTcdQQo6DS0xFoVnWE=
+X-Google-Smtp-Source: AGHT+IHsjGZ2+aJHmeRDbujWXxotx2yTRH3uY3yuAJQPBFmBl9X2WClPP8lQKMhRmpm9bwcj4RZOK7CPxPpz6+j107mRFPLkv/CL
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <cover.1714460330.git.antony.antony@secunet.com>
-Precedence: first-class
-Priority: normal
-Organization: secunet
-X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
- mbx-essen-01.secunet.de (10.53.40.197)
-X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
+X-Received: by 2002:a05:6e02:1d0b:b0:36c:5bd2:6b92 with SMTP id
+ i11-20020a056e021d0b00b0036c5bd26b92mr7923ila.0.1714461082103; Tue, 30 Apr
+ 2024 00:11:22 -0700 (PDT)
+Date: Tue, 30 Apr 2024 00:11:22 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000c7c09706174b1395@google.com>
+Subject: [syzbot] Monthly net report (Apr 2024)
+From: syzbot <syzbot+listd6cd52ac5782bd942fe3@syzkaller.appspotmail.com>
+To: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Reject the usage of the SA_DIR attribute in xfrm netlink messages when
-it's not applicable. This ensures that SA_DIR is only accepted for
-certain message types (NEWSA, UPDSA, and ALLOCSPI)
+Hello net maintainers/developers,
 
-Signed-off-by: Antony Antony <antony.antony@secunet.com>
+This is a 31-day syzbot report for the net subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/net
+
+During the period, 10 new issues were detected and 23 were fixed.
+In total, 79 issues are still open and 1428 have been fixed so far.
+
+Some of the still happening issues:
+
+Ref  Crashes Repro Title
+<1>  4504    Yes   KMSAN: uninit-value in eth_type_trans (2)
+                   https://syzkaller.appspot.com/bug?extid=0901d0cc75c3d716a3a3
+<2>  1404    Yes   unregister_netdevice: waiting for DEV to become free (8)
+                   https://syzkaller.appspot.com/bug?extid=881d65229ca4f9ae8c84
+<3>  1077    Yes   INFO: task hung in rfkill_global_led_trigger_worker (2)
+                   https://syzkaller.appspot.com/bug?extid=2e39bc6569d281acbcfb
+<4>  993     Yes   INFO: task hung in switchdev_deferred_process_work (2)
+                   https://syzkaller.appspot.com/bug?extid=8ecc009e206a956ab317
+<5>  914     Yes   INFO: task hung in rtnetlink_rcv_msg
+                   https://syzkaller.appspot.com/bug?extid=8218a8a0ff60c19b8eae
+<6>  534     Yes   general protection fault in skb_release_data (2)
+                   https://syzkaller.appspot.com/bug?extid=ccfa5775bc1bda21ddd1
+<7>  457     Yes   WARNING in inet_sock_destruct (4)
+                   https://syzkaller.appspot.com/bug?extid=de6565462ab540f50e47
+<8>  443     Yes   WARNING in kcm_write_msgs
+                   https://syzkaller.appspot.com/bug?extid=52624bdfbf2746d37d70
+<9>  377     Yes   INFO: rcu detected stall in tc_modify_qdisc
+                   https://syzkaller.appspot.com/bug?extid=9f78d5c664a8c33f4cce
+<10> 356     Yes   KMSAN: uninit-value in bpf_prog_run_generic_xdp
+                   https://syzkaller.appspot.com/bug?extid=0e6ddb1ef80986bdfe64
+
 ---
-v12 -> 13
- - renamed the function for clarity
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-v11 -> 12
-  - fix spd look up. This broke xfrm_policy tests
----
- net/xfrm/xfrm_user.c | 24 ++++++++++++++++++++++++
- 1 file changed, 24 insertions(+)
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
 
-diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
-index f5eb3af4fb81..e83c687bd64e 100644
---- a/net/xfrm/xfrm_user.c
-+++ b/net/xfrm/xfrm_user.c
-@@ -3213,6 +3213,24 @@ static const struct xfrm_link {
- 	[XFRM_MSG_GETDEFAULT  - XFRM_MSG_BASE] = { .doit = xfrm_get_default   },
- };
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
 
-+static int xfrm_reject_unused_attr(int type, struct nlattr **attrs,
-+				   struct netlink_ext_ack *extack)
-+{
-+	if (attrs[XFRMA_SA_DIR]) {
-+		switch (type) {
-+		case XFRM_MSG_NEWSA:
-+		case XFRM_MSG_UPDSA:
-+		case XFRM_MSG_ALLOCSPI:
-+			break;
-+		default:
-+			NL_SET_ERR_MSG(extack, "Invalid attribute SA_DIR");
-+			return -EINVAL;
-+		}
-+	}
-+
-+	return 0;
-+}
-+
- static int xfrm_user_rcv_msg(struct sk_buff *skb, struct nlmsghdr *nlh,
- 			     struct netlink_ext_ack *extack)
- {
-@@ -3272,6 +3290,12 @@ static int xfrm_user_rcv_msg(struct sk_buff *skb, struct nlmsghdr *nlh,
- 	if (err < 0)
- 		goto err;
-
-+	if (!link->nla_pol || link->nla_pol == xfrma_policy) {
-+		err = xfrm_reject_unused_attr((type + XFRM_MSG_BASE), attrs, extack);
-+		if (err < 0)
-+			goto err;
-+	}
-+
- 	if (link->doit == NULL) {
- 		err = -EINVAL;
- 		goto err;
---
-2.30.2
-
+You may send multiple commands in a single email message.
 
