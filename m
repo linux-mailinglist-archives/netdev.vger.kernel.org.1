@@ -1,183 +1,190 @@
-Return-Path: <netdev+bounces-92408-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92409-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1AC158B6F7A
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 12:18:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CCEA28B6F82
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 12:19:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C5FB01F243FF
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 10:18:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F027D1C227D4
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 10:19:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5ADE513D628;
-	Tue, 30 Apr 2024 10:18:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E102613BC3B;
+	Tue, 30 Apr 2024 10:19:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L/O2nECW"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D3sq/s3U"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D6EB13D29F;
-	Tue, 30 Apr 2024 10:18:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5144F129E66
+	for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 10:19:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714472322; cv=none; b=j8Fs0SoVJ8bhT8uFFv5EBugzuPI875rPqcd90A9542Yx7dVljCB+gTeTpMYrauuvEc0j9c8rbwiyZuIrFQcOX5rSk0aGDRwC02OlhSY5M1DMomhDs/RI+1anOXGo20c32BJp4OIgSa6fwTj67KhhBSK5TrBPMMOFmL5hadfQ0Y8=
+	t=1714472391; cv=none; b=rGbCIX7QwUFGDB4biap4tUJlfxpLe778MnBnJypNWYRxaY+0e1ZkuBDPmbk9QsWqA+EZe7qmYcdJYfCB8lKXk869esMa0kCDb1WITNjbScLg99Xsd+P2sK9Lrs46aLJBJUffHtakiyQZ63PVv7TaxN16XerZP+oq6OVC/Re5g90=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714472322; c=relaxed/simple;
-	bh=xcCoDx2SLp41DOXX9G4v/hl5Qy/EqrXmj92zGErUhKo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Jd8TKAq40276PHe4+IUzdIiNMNkg9Y8T4HCFJjQBH0IIeCy3BhfqLb0v/eVXPJ0PDkmLCTwkNn6TJf7nMlQGK+NLjfxyoJASpkXrwEb3zmntSWZmZ/TWbn8C8SSKLXJo20zJP2GPg0BteQ6irN082xMA+OA9XDlzDo4wyn7he8A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L/O2nECW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E0A1C2BBFC;
-	Tue, 30 Apr 2024 10:18:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714472322;
-	bh=xcCoDx2SLp41DOXX9G4v/hl5Qy/EqrXmj92zGErUhKo=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=L/O2nECW51RdQWPDCwJf8Gdv44JazUFAX+9MKmekKTEauVQLWHjREQsrXgaqYzRW+
-	 P4ekXC5g9GwHaFsqEkLn61k/nSq/AmsAn7VLKDhntThW3nsCE/LiMksjnZg1VnwPo+
-	 eLPqbrFqyU8SFvgHJMMxHRuFVLfKrWu7eAaZd35alrQ7Hz67f3jL5xQj27PdiKUNqU
-	 5N1lPeLzkePu89tlzOu+VjLdG/CvESM4hsfCWAKQ0Y/lW8slxwL0EfuPBaZVB3GH/u
-	 /iZgJUCpkuHVQYlJpfTad2v/LqHCGXz6DJmasjiWPek2Uh1X2lUiFMKW8vdc0jeZHN
-	 HvP9clEZhnXzQ==
-From: Leon Romanovsky <leon@kernel.org>
-To: David Ahern <dsahern@gmail.com>
-Cc: Chiara Meiohas <cmeiohas@nvidia.com>,
-	Jason Gunthorpe <jgg@nvidia.com>,
-	linux-netdev <netdev@vger.kernel.org>,
-	RDMA mailing list <linux-rdma@vger.kernel.org>
-Subject: [PATCH iproute2-next 2/2] rdma: Add an option to display driver-specific QPs in the rdma tool
-Date: Tue, 30 Apr 2024 13:18:20 +0300
-Message-ID: <71cf1e53d0255fd0979e05e9004993f0f9684812.1714472040.git.leonro@nvidia.com>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <cover.1714472040.git.leonro@nvidia.com>
-References: <cover.1714472040.git.leonro@nvidia.com>
+	s=arc-20240116; t=1714472391; c=relaxed/simple;
+	bh=RBvwsFiMJYsTuSDgHfJczO2jCg4XQ1haWtK29o2NpoA=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=Umt61RmqHKAnud8GIye1PFvgdqbC/8fA+M4SzJbX/uBPZf84n9WEDCYrD2NM3OcdJNBgbbms5aBtSI8vTAGH3z8XKj6OppL73kLMcI3YERPA8o+oNizHgJCP0cy4PNCX2b8yKXawcxHbs/NIXm8xdvXLbCw747zcwC8emsYWjmg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=D3sq/s3U; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1714472389;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=bMaZOXmwfkvy1y0270V5YasUqwBAP06Q+stByWGvEA8=;
+	b=D3sq/s3Ulg48wnhCMz+R0dBbRIadw8tWkoaK7XhY1X5FFLhDuI5XT9kVgQiqZwfQ0cTmhY
+	csTs4OWhoWFUZ5RePbwxARxY06MxYZbQGbpLXXDiPySWloa2i2O4R/I1pW4VKsG6zMEKYM
+	Ctw5bKe0XsyRYlYePFeoVkXWAbkHqAA=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-38-hJZAMJrhNripvvsoY_vjSQ-1; Tue, 30 Apr 2024 06:19:45 -0400
+X-MC-Unique: hJZAMJrhNripvvsoY_vjSQ-1
+Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-57057e848dcso731849a12.2
+        for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 03:19:45 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714472384; x=1715077184;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=bMaZOXmwfkvy1y0270V5YasUqwBAP06Q+stByWGvEA8=;
+        b=kcuTWnNiXGWpITz61oYUf3XCsFGiBFJA51bDcKyXaJg/WJZyE47WJiyNi49FY718JK
+         fxNZq+AmjaiuV3aIzUUf1CrM6WZ3uPbH7F8PNgwsae/AKiww5WpotnrvzA55vkX+cwcw
+         64jmjheqN+uUOx3XFPfuZifiLHJnf0iYEgMUgmTPfHVOQJb2ZsnwvIsasdjtbQn5UXAQ
+         L7P8BaKBxUcC5qbJBzQLtu+bTbSz3vyoZDtN0OtLOCNvyEhCfPqWGvizsMrfxfg5rXaS
+         h2SpdNDt68C8SyFTf/i71SUZupZzSrAUV9mRF726xa7fdsoZhDtWm3JLsUuV+iDoShlP
+         Js5g==
+X-Forwarded-Encrypted: i=1; AJvYcCUgcs5zd6/Mo5blPlKvC3d22zIrujUGy/DSh1UJUqUjAI+9LPk9H2D6hHS9RFmcnAUkAXqBYkSB+WIpLwTYWmoYBGxidBAg
+X-Gm-Message-State: AOJu0YyyyC2heh0CaF4p7wH0SxwNyB0QJ1YWhkPe5eBKopIfbABgFery
+	7XF8jcX/7dZVZhYorGiS4kT7+HUqytL+oZGfBnOz4Quo4wbWA8APQW4cRQ2rgtAJggPs6F+eFbr
+	m+PRr4RSsYWptACyelvwvAnHIssKBjLXvNTJ039Tia6ishCLBS0/xUQ==
+X-Received: by 2002:a05:6402:e8d:b0:572:58d3:a6bf with SMTP id h13-20020a0564020e8d00b0057258d3a6bfmr8032148eda.2.1714472384606;
+        Tue, 30 Apr 2024 03:19:44 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGfMsFBtyM3OlfXV3ingrrFUG8cA3jAtkmrlX9UvF6ywbd5RXuVKGhUk82uYA+uE/B3kxctHA==
+X-Received: by 2002:a05:6402:e8d:b0:572:58d3:a6bf with SMTP id h13-20020a0564020e8d00b0057258d3a6bfmr8032128eda.2.1714472384232;
+        Tue, 30 Apr 2024 03:19:44 -0700 (PDT)
+Received: from gerbillo.redhat.com ([2a0d:3341:b0ae:6a10::f71])
+        by smtp.gmail.com with ESMTPSA id y9-20020a50eb09000000b005727bdb1eafsm2770452edp.40.2024.04.30.03.19.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 30 Apr 2024 03:19:43 -0700 (PDT)
+Message-ID: <a20a0f0479cedc7f2f6abaf26e46ca7642e70958.camel@redhat.com>
+Subject: Re: [PATCH v4 net-next v4 2/6] net: add support for segmenting TCP
+ fraglist GSO packets
+From: Paolo Abeni <pabeni@redhat.com>
+To: Felix Fietkau <nbd@nbd.name>, netdev@vger.kernel.org, Eric Dumazet
+ <edumazet@google.com>, "David S. Miller" <davem@davemloft.net>, David Ahern
+ <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>
+Cc: willemdebruijn.kernel@gmail.com, linux-kernel@vger.kernel.org
+Date: Tue, 30 Apr 2024 12:19:42 +0200
+In-Reply-To: <20240427182305.24461-3-nbd@nbd.name>
+References: <20240427182305.24461-1-nbd@nbd.name>
+	 <20240427182305.24461-3-nbd@nbd.name>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-From: Chiara Meiohas <cmeiohas@nvidia.com>
+On Sat, 2024-04-27 at 20:22 +0200, Felix Fietkau wrote:
+> Preparation for adding TCP fraglist GRO support. It expects packets to be
+> combined in a similar way as UDP fraglist GSO packets.
+> For IPv4 packets, NAT is handled in the same way as UDP fraglist GSO.
+>=20
+> Signed-off-by: Felix Fietkau <nbd@nbd.name>
+> ---
+>  net/ipv4/tcp_offload.c   | 67 ++++++++++++++++++++++++++++++++++++++++
+>  net/ipv6/tcpv6_offload.c | 58 ++++++++++++++++++++++++++++++++++
+>  2 files changed, 125 insertions(+)
+>=20
+> diff --git a/net/ipv4/tcp_offload.c b/net/ipv4/tcp_offload.c
+> index fab0973f995b..affd4ed28cfe 100644
+> --- a/net/ipv4/tcp_offload.c
+> +++ b/net/ipv4/tcp_offload.c
+> @@ -28,6 +28,70 @@ static void tcp_gso_tstamp(struct sk_buff *skb, unsign=
+ed int ts_seq,
+>  	}
+>  }
+> =20
+> +static void __tcpv4_gso_segment_csum(struct sk_buff *seg,
+> +				     __be32 *oldip, __be32 newip,
+> +				     __be16 *oldport, __be16 newport)
+> +{
+> +	struct tcphdr *th;
+> +	struct iphdr *iph;
+> +
+> +	if (*oldip =3D=3D newip && *oldport =3D=3D newport)
+> +		return;
+> +
+> +	th =3D tcp_hdr(seg);
+> +	iph =3D ip_hdr(seg);
+> +
+> +	inet_proto_csum_replace4(&th->check, seg, *oldip, newip, true);
+> +	inet_proto_csum_replace2(&th->check, seg, *oldport, newport, false);
+> +	*oldport =3D newport;
+> +
+> +	csum_replace4(&iph->check, *oldip, newip);
+> +	*oldip =3D newip;
+> +}
+> +
+> +static struct sk_buff *__tcpv4_gso_segment_list_csum(struct sk_buff *seg=
+s)
+> +{
+> +	const struct tcphdr *th;
+> +	const struct iphdr *iph;
+> +	struct sk_buff *seg;
+> +	struct tcphdr *th2;
+> +	struct iphdr *iph2;
+> +
+> +	seg =3D segs;
+> +	th =3D tcp_hdr(seg);
+> +	iph =3D ip_hdr(seg);
+> +	th2 =3D tcp_hdr(seg->next);
+> +	iph2 =3D ip_hdr(seg->next);
+> +
+> +	if (!(*(const u32 *)&th->source ^ *(const u32 *)&th2->source) &&
+> +	    iph->daddr =3D=3D iph2->daddr && iph->saddr =3D=3D iph2->saddr)
+> +		return segs;
+> +
+> +	while ((seg =3D seg->next)) {
+> +		th2 =3D tcp_hdr(seg);
+> +		iph2 =3D ip_hdr(seg);
+> +
+> +		__tcpv4_gso_segment_csum(seg,
+> +					 &iph2->saddr, iph->saddr,
+> +					 &th2->source, th->source);
+> +		__tcpv4_gso_segment_csum(seg,
+> +					 &iph2->daddr, iph->daddr,
+> +					 &th2->dest, th->dest);
+> +	}
+> +
+> +	return segs;
+> +}
 
-Utilize the -dd flag (driver-specific details) in the rdmatool
-to view driver-specific QPs which are not exposed yet.
+AFAICS, all the above is really alike the UDP side, except for the
+transport header zero csum.
 
-The following examples show mlx5 UMR QP which is visible now:
+What about renaming the udp version of this helpers as 'tcpudpv4_...',
+move them in common code, add an explicit argument for
+'zerocsum_allowed' and reuse such helper for both tcp and udp?
 
-$ rdma resource show qp link ibp8s0f1
-link ibp8s0f1/1 lqpn 360 type UD state RTS sq-psn 0 comm [mlx5_ib]
-link ibp8s0f1/1 lqpn 0 type SMI state RTS sq-psn 0 comm [ib_core]
-link ibp8s0f1/1 lqpn 1 type GSI state RTS sq-psn 0 comm [ib_core]
+The same for the ipv6 variant.=C2=A0
 
-$ rdma resource show qp link ibp8s0f1 -dd
-link ibp8s0f1/1 lqpn 360 type UD state RTS sq-psn 0 comm [mlx5_ib]
-link ibp8s0f1/1 lqpn 465 type DRIVER subtype REG_UMR state RTS sq-psn 0 comm [mlx5_ib]
-link ibp8s0f1/1 lqpn 0 type SMI state RTS sq-psn 0 comm [ib_core]
-link ibp8s0f1/1 lqpn 1 type GSI state RTS sq-psn 0 comm [ib_core]
+Cheers,
 
-$ rdma resource show
-0: ibp8s0f0: pd 3 cq 4 qp 3 cm_id 0 mr 0 ctx 0 srq 2
-1: ibp8s0f1: pd 3 cq 4 qp 3 cm_id 0 mr 0 ctx 0 srq 2
-
-$ rdma resource show -dd
-0: ibp8s0f0: pd 3 cq 4 qp 4 cm_id 0 mr 0 ctx 0 srq 2
-1: ibp8s0f1: pd 3 cq 4 qp 4 cm_id 0 mr 0 ctx 0 srq 2
-
-Signed-off-by: Chiara Meiohas <cmeiohas@nvidia.com>
-Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
----
- rdma/res-qp.c | 15 +++++++++++++++
- rdma/res.c    |  5 +++++
- rdma/utils.c  |  1 +
- 3 files changed, 21 insertions(+)
-
-diff --git a/rdma/res-qp.c b/rdma/res-qp.c
-index 65ff54ab..a47225df 100644
---- a/rdma/res-qp.c
-+++ b/rdma/res-qp.c
-@@ -40,6 +40,15 @@ static void print_type(uint32_t val)
- 	print_string(PRINT_ANY, "type", "type %s ", qp_types_to_str(val));
- }
- 
-+/*
-+ * print the subtype only if the QPT is IB_QPT_DRIVER
-+ */
-+static void print_subtype(uint8_t type, const char *sub_type)
-+{
-+	if (type == 0xFF && sub_type)
-+		print_string(PRINT_ANY, "subtype", "subtype %s ", sub_type);
-+}
-+
- static void print_state(uint32_t val)
- {
- 	print_string(PRINT_ANY, "state", "state %s ", qp_states_to_str(val));
-@@ -81,6 +90,7 @@ static int res_qp_line(struct rd *rd, const char *name, int idx,
- {
- 	uint32_t lqpn, rqpn = 0, rq_psn = 0, sq_psn;
- 	uint8_t type, state, path_mig_state = 0;
-+	const char* sub_type = NULL;
- 	uint32_t port = 0, pid = 0;
- 	uint32_t pdn = 0;
- 	char *comm = NULL;
-@@ -134,6 +144,10 @@ static int res_qp_line(struct rd *rd, const char *name, int idx,
- 		    nla_line[RDMA_NLDEV_ATTR_RES_PATH_MIG_STATE]))
- 		goto out;
- 
-+	if (nla_line[RDMA_NLDEV_ATTR_RES_SUBTYPE])
-+		sub_type =
-+			mnl_attr_get_str(nla_line[RDMA_NLDEV_ATTR_RES_SUBTYPE]);
-+
- 	type = mnl_attr_get_u8(nla_line[RDMA_NLDEV_ATTR_RES_TYPE]);
- 	if (rd_is_string_filtered_attr(rd, "type", qp_types_to_str(type),
- 				       nla_line[RDMA_NLDEV_ATTR_RES_TYPE]))
-@@ -164,6 +178,7 @@ static int res_qp_line(struct rd *rd, const char *name, int idx,
- 	print_rqpn(rqpn, nla_line);
- 
- 	print_type(type);
-+	print_subtype(type, sub_type);
- 	print_state(state);
- 
- 	print_rqpsn(rq_psn, nla_line);
-diff --git a/rdma/res.c b/rdma/res.c
-index 3e024134..c311513a 100644
---- a/rdma/res.c
-+++ b/rdma/res.c
-@@ -99,6 +99,8 @@ int _res_send_idx_msg(struct rd *rd, uint32_t command, mnl_cb_t callback,
- 				 RDMA_NLDEV_ATTR_PORT_INDEX, rd->port_idx);
- 
- 	mnl_attr_put_u32(rd->nlh, id, idx);
-+	mnl_attr_put_u8(rd->nlh, RDMA_NLDEV_ATTR_DRIVER_DETAILS,
-+			rd->show_driver_details);
- 
- 	if (command == RDMA_NLDEV_CMD_STAT_GET)
- 		mnl_attr_put_u32(rd->nlh, RDMA_NLDEV_ATTR_STAT_RES,
-@@ -121,6 +123,9 @@ int _res_send_msg(struct rd *rd, uint32_t command, mnl_cb_t callback)
- 		flags |= NLM_F_DUMP;
- 
- 	rd_prepare_msg(rd, command, &seq, flags);
-+
-+	mnl_attr_put_u8(rd->nlh, RDMA_NLDEV_ATTR_DRIVER_DETAILS,
-+			rd->show_driver_details);
- 	mnl_attr_put_u32(rd->nlh, RDMA_NLDEV_ATTR_DEV_INDEX, rd->dev_idx);
- 	if (rd->port_idx)
- 		mnl_attr_put_u32(rd->nlh,
-diff --git a/rdma/utils.c b/rdma/utils.c
-index 27595a38..0f41013a 100644
---- a/rdma/utils.c
-+++ b/rdma/utils.c
-@@ -423,6 +423,7 @@ static const enum mnl_attr_data_type nldev_policy[RDMA_NLDEV_ATTR_MAX] = {
- 	[RDMA_NLDEV_ATTR_RES_SQ_PSN]		= MNL_TYPE_U32,
- 	[RDMA_NLDEV_ATTR_RES_PATH_MIG_STATE]	= MNL_TYPE_U8,
- 	[RDMA_NLDEV_ATTR_RES_TYPE]		= MNL_TYPE_U8,
-+	[RDMA_NLDEV_ATTR_RES_SUBTYPE]           = MNL_TYPE_NUL_STRING,
- 	[RDMA_NLDEV_ATTR_RES_STATE]		= MNL_TYPE_U8,
- 	[RDMA_NLDEV_ATTR_RES_PID]		= MNL_TYPE_U32,
- 	[RDMA_NLDEV_ATTR_RES_KERN_NAME]	= MNL_TYPE_NUL_STRING,
--- 
-2.44.0
+Paolo
 
 
