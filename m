@@ -1,72 +1,64 @@
-Return-Path: <netdev+bounces-92313-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92314-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51EA88B6834
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 05:13:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F9108B6866
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 05:22:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 82D111C214B2
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 03:13:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5F5101C213D2
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 03:22:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68FE5DDDF;
-	Tue, 30 Apr 2024 03:13:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEF12F4EB;
+	Tue, 30 Apr 2024 03:22:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rvRpVetV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sSkKNiCX"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A559DDA6;
-	Tue, 30 Apr 2024 03:13:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 851A81094E;
+	Tue, 30 Apr 2024 03:22:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714446783; cv=none; b=B8sNToxWARW1tcA5X+pfj8s4KwXRD6wy4EJnj4FAFNa86wLM+u257QJJnpGJMhnvTomB1V5qX/b0wSTpIF8HWTQ2A+55n405nX4OwnqYB5x875N1lgBB4avN7uDJad3KFeHkB6q4jc5azlTtBsq04of8MhmL8SdwaO3i+ELz1KI=
+	t=1714447359; cv=none; b=f9gkeK4rmFwQqX0QniidS/dfoxj7zYziF9dCjiGswBYjTAX8gXZV7xB2/x+8N0/6vvPqwfIbCYXPxRP7h68zrsTCGON8xMOIfSZJPv/HCodB5IjZzvn30lyxCSmIzGKIUL48Jn1epK4I75aDvZL/5qekcwfuJ6Gdg9G04RzQMHM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714446783; c=relaxed/simple;
-	bh=gVVnLpPWVK9UosOHYSAQpS6D2DcEHMe8dhidJZrY8rc=;
+	s=arc-20240116; t=1714447359; c=relaxed/simple;
+	bh=/KpxBWy5mcEbkG7pQG0EPzcysWGUzPXDj0gBvqYdums=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WzUX0i17rl5dKoRNVCgYQocoaqB4igitAbHVRVxSh8h7gKO53zwmNr1rlDlVauKYQOxGdl76Ii1G+3P0L7/4CrN77zHGnrtzC/0S2M8sRg8VolyjSLFYm/hiVwSsBdIBsr/mwGaef/jj4eUl2B3JR7HoTyyG9cNyCZC/VKs0Q/s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rvRpVetV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EABF3C116B1;
-	Tue, 30 Apr 2024 03:13:01 +0000 (UTC)
+	 MIME-Version:Content-Type; b=TFaH6jjxIGKmFb2SeoIxsnJoJ2sWcAIKH/wbv77MtLukM64jllim8rWP/Fr3X7FsTkRLH9VJ4JDrHBxnab8iVEdn60K1zzgRWTcV/bywr3cy9WdRJb2oWIsGPpttJcgQf9Yr+hbOwwwB9DMvXrbTeRmxgJOg6DkAyvs5eSEWGo4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sSkKNiCX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8CD91C116B1;
+	Tue, 30 Apr 2024 03:22:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714446782;
-	bh=gVVnLpPWVK9UosOHYSAQpS6D2DcEHMe8dhidJZrY8rc=;
+	s=k20201202; t=1714447359;
+	bh=/KpxBWy5mcEbkG7pQG0EPzcysWGUzPXDj0gBvqYdums=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=rvRpVetVnGKLc7ehmrflZ/u8Udny2jvVDN2xKnbLuN5eDU03EbJJ/EjGhfRJJLGxS
-	 ZyOehS1yn6dDg/aBsx7xtBEY9D2YjhYU1Y51L76A6tE2Y92kAhyRen5fqFY9PxzF2L
-	 8SGKZ0Ul9daWzXCbPKWrKTwQBGZX8G62W0nQAyAXi8atb9Rz2Rjz/SS68a8svQbjzf
-	 danO6u+uknWl1ASRf6OzwDmMG7JdMQq9IPt4kMwfwvmnSRGPSbvFhPat0ZsOw7831Z
-	 fMJG3JfVOBefV8MQd2bccGk1eKf03CugRqBfvISD7Yn5vOJnas+UXmd5SQzmonNGTt
-	 rkA0m9ENV2+1A==
-Date: Mon, 29 Apr 2024 20:13:00 -0700
+	b=sSkKNiCXpCcc/7pJ8gWMm5YCd3auiyTbpRyptUCMgG9FzN5zkVbZipqaxbdF3hPpx
+	 Geb61osFpYAPFdZvAxNGqTo5mLEMYXsyGz9fJGTOQKB4dNXfiAX3WjwYmz8tnaFfdD
+	 PbLFmVrwVAth+rr/5SZExtgs9UjWdtgAEGGxBbbeqdyHbLTA6xT2G6T1WL21orpZnE
+	 KzuJ9S8IryK8WpoCwKQH39ME1RvEXSwUt+981BiNi0hf4zixOLWsbwp9cB7tNZ7PJM
+	 XZLyDW94V+cfABtIkA1burVDaEciei33GzNeWzjSShKkOHpSXM8fzG7k/IDuKX3glu
+	 uTZzRAVgqnlFw==
+Date: Mon, 29 Apr 2024 20:22:37 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Heng Qi <hengqi@linux.alibaba.com>
-Cc: netdev@vger.kernel.org, virtualization@lists.linux.dev, "David S . 
- Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, Eric 
- Dumazet <edumazet@google.com>, Jason Wang <jasowang@redhat.com>, "Michael S
-  . Tsirkin" <mst@redhat.com>, Brett Creeley <bcreeley@amd.com>, Ratheesh 
- Kannoth <rkannoth@marvell.com>, Alexander Lobakin
- <aleksander.lobakin@intel.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Tal
-  Gilboa <talgi@nvidia.com>, Jonathan Corbet <corbet@lwn.net>,
- linux-doc@vger.kernel.org, Maxime Chevallier
- <maxime.chevallier@bootlin.com>, Jiri Pirko <jiri@resnulli.us>, Paul 
- Greenwalt <paul.greenwalt@intel.com>, Ahmed Zaki <ahmed.zaki@intel.com>,
- Vladimir Oltean <vladimir.oltean@nxp.com>, Kory Maincent
- <kory.maincent@bootlin.com>, Andrew Lunn <andrew@lunn.ch>, "justinstitt @ 
- google . com" <justinstitt@google.com>
-Subject: Re: [PATCH net-next v10 2/4] ethtool: provide customized dim
- profile management
-Message-ID: <20240429201300.0760b6d6@kernel.org>
-In-Reply-To: <1714442379.4695537-1-hengqi@linux.alibaba.com>
-References: <20240425165948.111269-1-hengqi@linux.alibaba.com>
-	<20240425165948.111269-3-hengqi@linux.alibaba.com>
-	<20240426183333.257ccae5@kernel.org>
-	<98ea9d4d-1a90-45b9-a4e0-6941969295be@linux.alibaba.com>
-	<20240429104741.3a628fe6@kernel.org>
-	<1714442379.4695537-1-hengqi@linux.alibaba.com>
+To: Danielle Ratson <danieller@nvidia.com>
+Cc: <netdev@vger.kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
+ <pabeni@redhat.com>, <corbet@lwn.net>, <linux@armlinux.org.uk>,
+ <sdf@google.com>, <kory.maincent@bootlin.com>,
+ <maxime.chevallier@bootlin.com>, <vladimir.oltean@nxp.com>,
+ <przemyslaw.kitszel@intel.com>, <ahmed.zaki@intel.com>,
+ <richardcochran@gmail.com>, <shayagr@amazon.com>,
+ <paul.greenwalt@intel.com>, <jiri@resnulli.us>,
+ <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+ <mlxsw@nvidia.com>, <petrm@nvidia.com>, <idosch@nvidia.com>
+Subject: Re: [PATCH net-next v5 09/10] ethtool: Add ability to flash
+ transceiver modules' firmware
+Message-ID: <20240429202237.6bbd2cb3@kernel.org>
+In-Reply-To: <20240424133023.4150624-10-danieller@nvidia.com>
+References: <20240424133023.4150624-1-danieller@nvidia.com>
+	<20240424133023.4150624-10-danieller@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,24 +68,45 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 30 Apr 2024 09:59:39 +0800 Heng Qi wrote:
-> + if (moder[ETHTOOL_A_IRQ_MODERATION_USEC]) {
-> + 	if (irq_moder->coal_flags & DIM_COALESCE_USEC)
-> + 		new_profile[i].usec =
-> + 			nla_get_u32(moder[ETHTOOL_A_IRQ_MODERATION_USEC]);
-> + 	else
-> + 		return -EOPNOTSUPP;
-> + }
+On Wed, 24 Apr 2024 16:30:22 +0300 Danielle Ratson wrote:
+> +static int
+> +module_flash_fw_schedule(struct net_device *dev, const char *file_name,
+> +			 struct ethtool_module_fw_flash_params *params,
+> +			 struct netlink_ext_ack *extack)
+> +{
+> +	struct ethtool_module_fw_flash *module_fw;
+> +	int err;
+> +
+> +	err = __module_flash_fw_schedule(dev, extack);
+> +	if (err < 0)
+> +		return err;
 
-Almost, the extack should still be there on error:
+Basic dev validation should probably be called directly from
+ethnl_act_module_fw_flash() rather than two functions down.
 
-+ if (moder[ETHTOOL_A_IRQ_MODERATION_USEC])
-+ 	if (irq_moder->coal_flags & DIM_COALESCE_USEC) {
-+ 		new_profile[i].usec =
-+ 			nla_get_u32(moder[ETHTOOL_A_IRQ_MODERATION_USEC]);
-+ 	} else {
-+		NL_SET_BAD_ATTR(extack, moder[ETHTOOL_A_IRQ_MODERATION_USEC]);
-+ 		return -EOPNOTSUPP;
-+ 	}
+> +	module_fw = kzalloc(sizeof(*module_fw), GFP_KERNEL);
+> +	if (!module_fw)
+> +		return -ENOMEM;
+> +
+> +	module_fw->params = *params;
+> +	err = request_firmware_direct(&module_fw->fw, file_name, &dev->dev);
+> +	if (err) {
+> +		NL_SET_ERR_MSG(extack,
+> +			       "Failed to request module firmware image");
+> +		goto err_request_firmware;
 
+Please name the labels after the actions they perform.
+
+> +	}
+> +
+> +	err = module_flash_fw_work_init(module_fw, dev, extack);
+> +	if (err < 0) {
+> +		NL_SET_ERR_MSG(extack,
+> +			       "Flashing module firmware is not supported by this device");
+
+This overwrites the more accurate extack msg already set by
+module_flash_fw_work_init()
+
+> +		goto err_work_init;
+> +	}
 
