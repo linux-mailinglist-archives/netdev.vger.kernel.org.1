@@ -1,98 +1,100 @@
-Return-Path: <netdev+bounces-92402-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92403-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0F808B6EF5
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 12:00:35 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 302128B6EFF
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 12:02:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F1D5F1C22DD0
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 10:00:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 34380B221B6
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 10:02:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E9A71292C4;
-	Tue, 30 Apr 2024 10:00:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50C0F1292CE;
+	Tue, 30 Apr 2024 10:02:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jUW17jeW"
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="KNvbA8vd"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62EE0127B52;
-	Tue, 30 Apr 2024 10:00:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BE3E3A8CB;
+	Tue, 30 Apr 2024 10:01:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714471229; cv=none; b=o4NFsB+vI0jxqigemrPyx/WGt5XKh383g/w/Gwk0IwTkAcwoQ+8nUFJ4MwmR0/k1qCJUSYp5+biqT9tUAEtdBNRUs0rlhHQC+1+hKLvFdzOfHKgHOxGZGzo8RSqdXVnn6ct/Lyk92dzceFz4+rvvKzJGpHzF9G7/6fUfk5JgCaI=
+	t=1714471329; cv=none; b=bB3+f2UdjeA31lNQsmrba9ZDl6kpWNKTlaMNet6HFA0qX2h+OqJhn/0IUaGYVvvQawPA0WHwn3B50rL9tdzOvvEWWoXmEg5nBtzB9ENEcev4a0pWQsGeVI3c0V9m9RvQ35WNbdTOfbGRJzGiBXrmck/KQYWa27Jv6seFOQ2VDgM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714471229; c=relaxed/simple;
-	bh=MHyZeaS+KsqiVPyuRvBCY6fQF1j4giypol4OIFp2woU=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=iO5O35wWH2Hqk4bb/b1z6AkFtzqss+AnrcydCB95EZry7M5H2PmJ5UrlHtP3oa0QOUQcs96QJkhl2i4Q6NJ1bhtCEhrvd9Z5AhVYJ1xboIksGgRvXHljir3h5yikvprgFAaBzt6PSZLaeov6urlx8S6BJekSCNBiavqdcFeDbuk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jUW17jeW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id DCCC7C2BBFC;
-	Tue, 30 Apr 2024 10:00:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714471228;
-	bh=MHyZeaS+KsqiVPyuRvBCY6fQF1j4giypol4OIFp2woU=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=jUW17jeW3GnlgGV/snuIvTuQPb1MDqNEQy9Ic+rwX905MzYk5ZOvQuzUBWfLzWdkH
-	 ndKs+91rKHk+opObKK2Q8uIDdOLeb4hDH0do0SOMxCHJmUMHD7N5iu493d0DiVm7bU
-	 QitGTzqG5u6gYOClgkhUO7ngUq/GbArRE7RIJkb01S9wUBrF+PN+4E3bFdGBiXRi3T
-	 LZ81btDHeNIZkdqDidAB5e3VY406WIreQb5hMQ6z1ib1JyBX/IzctUwHINrAP8hvDG
-	 KjbQCHNWb1a4EKADHcGAllTWPAl1PGKPZoAF8RlmeFJgunBXE7pADjisSxE0Qj1oi3
-	 AF2bgpYNS7dzw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id CAFDEC43440;
-	Tue, 30 Apr 2024 10:00:28 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1714471329; c=relaxed/simple;
+	bh=RsGWFUaXZsIM9XF86rOQ2hjMpDFzHHbu7QElEsefk1k=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=QZtA74B3fcOJTn4OrqZg/hT8B0QUmytBm85YAZRG7iREL500yHPExeNPPcv7FrezqFNFH8+6enVb7aMTmLzDBGKik8sbwOUmr1Zxka4baWtUStpWNjsCLOWGiCWnU2ShD6b+cMMNuTHc3toQhUyA//uYftJUc6+fsMmMxEUt0wc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=KNvbA8vd; arc=none smtp.client-ip=168.119.38.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
+	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+	Resent-Cc:Resent-Message-ID; bh=nOTmeD3yZAzeGoMmikPvoxrLw1CeqyXxgI5qLq+cYSw=;
+	t=1714471324; x=1715680924; b=KNvbA8vdM7Ulcwq3mZlLHwIta3+5ReBfw2Z0mU4stAswSEQ
+	urB4mH+emqF6umRP/oao+hdZz2qCcB29q9zfGzGG8caw+M3tKvAl/rAoXul6O82s+Cs+XoCZFoi+m
+	n5fuhWadIG2fUctooNUx0vsfyYWDOEOVBdilAOS4Cme1WCZQJ6NyInZQOySkeuyWb0HXw2rOUS93E
+	yZnyUrsCUSPO9lXeotvYVqtdh3K5tsXyWUY+TkvkAZg5EdLhXbDkhYHiwxpIXdhaHmt+oixvpianQ
+	CdURoEGGopZU/QOT1c4amPQ9aQQvcfGkSYsl/LHbLt8GI1TwfwslRiYSrbUfJRTw==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.97)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1s1kJ0-0000000E5yC-0RB5;
+	Tue, 30 Apr 2024 12:01:46 +0200
+Message-ID: <e2f20484fb1f4607d099d2184c1d74c6a39febc1.camel@sipsolutions.net>
+Subject: Re: [PATCH] wifi: nl80211: Avoid address calculations via out of
+ bounds array indexing
+From: Johannes Berg <johannes@sipsolutions.net>
+To: Kees Cook <keescook@chromium.org>
+Cc: Nathan Chancellor <nathan@kernel.org>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ linux-wireless@vger.kernel.org, netdev@vger.kernel.org, Jeff Johnson
+ <quic_jjohnson@quicinc.com>, "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+  linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+Date: Tue, 30 Apr 2024 12:01:44 +0200
+In-Reply-To: <20240424220057.work.819-kees@kernel.org>
+References: <20240424220057.work.819-kees@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] sctp: prefer struct_size over open coded arithmetic
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171447122882.13432.12922160974724151108.git-patchwork-notify@kernel.org>
-Date: Tue, 30 Apr 2024 10:00:28 +0000
-References: <PAXPR02MB724871DB78375AB06B5171C88B152@PAXPR02MB7248.eurprd02.prod.outlook.com>
-In-Reply-To: <PAXPR02MB724871DB78375AB06B5171C88B152@PAXPR02MB7248.eurprd02.prod.outlook.com>
-To: Erick Archer <erick.archer@outlook.com>
-Cc: marcelo.leitner@gmail.com, lucien.xin@gmail.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- keescook@chromium.org, gustavoars@kernel.org, justinstitt@google.com,
- linux-sctp@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+X-malware-bazaar: not-scanned
 
-Hello:
+On Wed, 2024-04-24 at 15:01 -0700, Kees Cook wrote:
+> Before request->channels[] can be used, request->n_channels must be set.
+> Additionally, address calculations for memory after the "channels" array
+> need to be calculated from the allocation base ("request") rather than
+> via the first "out of bounds" index of "channels", otherwise run-time
+> bounds checking will throw a warning.
+>=20
+> Reported-by: Nathan Chancellor <nathan@kernel.org>
+> Fixes: e3eac9f32ec0 ("wifi: cfg80211: Annotate struct cfg80211_scan_reque=
+st with __counted_by")
 
-This patch was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+While I was weighing whether or not to apply this for 6.9 still ...
 
-On Sat, 27 Apr 2024 19:23:36 +0200 you wrote:
-> This is an effort to get rid of all multiplications from allocation
-> functions in order to prevent integer overflows [1][2].
-> 
-> As the "ids" variable is a pointer to "struct sctp_assoc_ids" and this
-> structure ends in a flexible array:
-> 
-> struct sctp_assoc_ids {
-> 	[...]
-> 	sctp_assoc_t	gaids_assoc_id[];
-> };
-> 
-> [...]
+> +	request->n_channels =3D n_channels;
+> =20
+>  	if (n_ssids)
+> -		request->ssids =3D (void *)&request->channels[n_channels];
+> +		request->ssids =3D (void *)request + ssids_offset;
 
-Here is the summary with links:
-  - sctp: prefer struct_size over open coded arithmetic
-    https://git.kernel.org/netdev/net-next/c/e5c5f3596de2
+This really doesn't even seem right, shouldn't do pointer arithmetic on
+void pointers. Same applies below too.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+And also if you set n_channels before, perhaps it's actually OK to get a
+pointer to *after*? Not sure though.
 
-
+johannes
 
