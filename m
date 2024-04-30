@@ -1,89 +1,63 @@
-Return-Path: <netdev+bounces-92377-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92378-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0C728B6D36
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 10:44:17 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94B748B6D3C
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 10:45:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 365B3B22A64
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 08:44:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4B5A91F22BF6
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 08:45:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 709591C2338;
-	Tue, 30 Apr 2024 08:39:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62DBD127E3F;
+	Tue, 30 Apr 2024 08:43:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="AeWRr0Io"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="A6+M1fgI"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
+Received: from fanzine2.igalia.com (fanzine.igalia.com [178.60.130.6])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B43F1C2304;
-	Tue, 30 Apr 2024 08:39:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB1F01272DB
+	for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 08:43:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.60.130.6
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714466380; cv=none; b=Gve7HC/pLamaDfEOcYmIwE35jmeBWO0MvKT4wSKot+BeWU5dlnsKJa3ynjejb48XqLGM8TKBkylutocXfRTHA7fLTvNpwYRuB8Z/ZT3w4VDMM8d90GgZgNFiK48E63DBOVdicb2vTlCXN1HWnurg0ShMJdPSrAK1ozaT6GBJ+io=
+	t=1714466605; cv=none; b=T9AtkE/6A3GtjdfMS3Z0WsH0uAkV05blYFXjLOHGAnbhBDBPrA+F9S1bbOZ9aaAQAr32TRXY549Ph0f6WhQ81S/+DfACKlc73XmzkXNG4ISsGjEyIfFnSLsJkTZxPB1Mg7/hZCfQHF2F6YOOOMUWwQw2LtPs9qxJvMCPOJOcFGo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714466380; c=relaxed/simple;
-	bh=5RFr74Pe6D1ZFqvIhmLXlfFBy/4XhcaQ3RoCErooxVk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=bfd85p1DtTa+8+Gzh292IPPcRd3696K8hTHtPYeRhtWfWjDKxKbaNc0oCwQ3oe0vKjmlWC2nn4BUq1ZznXVgt1bzzqKu0po8lq5/MCdkYisD7Aq7X2MLIJamloLryH1RFNowB/LEbe9s6qjkIDv9r9CGs6BNlvwxbSQtB41YIWU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=AeWRr0Io; arc=none smtp.client-ip=217.70.183.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPA id 7E7A320005;
-	Tue, 30 Apr 2024 08:39:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1714466377;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=h9Wz1fNXtXid8B91ankxGvMHVtEanfjUpTSsFi3KMI4=;
-	b=AeWRr0IouEROb6M4dR7xEI6v5ErsDh8dNlttH5bdLK4fZ+HD/Sh36x4Mp2haqOSK7+EcYy
-	tYKhlo6ZSkIyKD8C0YlNyqr2ZYqPn68ml3TAjWPPshG1asqzHCBQHioMWdX3W5UM4iQigS
-	hzu/xySB6rv+53C/4ojuoc60Q+eNs+WkYwKgs95FiokWhQwnSwz+T0QZsR1bokAJcYUtf2
-	Vv5oK9qcwpRz54RGq8nRh+9f+7TCmV9jRYVWJNObufHWuA96XwNj041LzWsgXYNXyShYpm
-	ckZ06HlsumTk7uEqIR18tgU+RbTFlWR5ZTgoRi1KfN4Y904RpOXiGl0iTFz3FQ==
-From: Herve Codina <herve.codina@bootlin.com>
-To: Herve Codina <herve.codina@bootlin.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1714466605; c=relaxed/simple;
+	bh=yxm2k2a+Skqhd5mvCZqVhrGQNrjeDxywZrAlQxtr3Kg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=U3/Ih+VM3tHSrro8O1N4b0xYAi5ZyIqIAjdC3Ic8izuySgKsrq9EHwaLaONCweuKi5mXCYBSMqnvFghljjtY8x2p+2+DSBuoKhLqadGoqdn0QTu2WIvCiUyhrj22pKbG+dEI8hpTTaj/r+5p+HYPgsWXc8NhegDFuobr6HKoK98=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com; spf=pass smtp.mailfrom=igalia.com; dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b=A6+M1fgI; arc=none smtp.client-ip=178.60.130.6
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=igalia.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
+	s=20170329; h=Content-Transfer-Encoding:MIME-Version:Message-Id:Date:Subject:
+	Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:Content-Description:
+	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=PipEzrDvx0NJs11I/QT6g83naEfqIc0qLqd/kmyL0jE=; b=A6+M1fgIzb/gvdD0rauSqu5ydL
+	6Gnt488KLWBrmFAkgLr4IvBiJ68Xu+C7CmCOxMiCUrsv6mgfuvvRW9VZg8ROIlYdt/U/uUcQLimr2
+	2BIDIynCIdGothfXxJ0vAvgq9pqV2vfvs6+c42H0vWVX39DSIqESxzcbtQCV/3mlgN8XPX3QBvLy/
+	ujM0zndDpHU176lbPPsaM5pFuHAB6g5dLoCRrL3oXIsyI2Jq4LZrN/+JhBuKJi4t7eo9FGF/vSUhR
+	Pe8sYof/sDgNd58fKOxBVxy5zjwHH/ZHbWFn/DPqYczq67R3037o/l2o4MCLgHq+gc8MFtEqUZ5w4
+	/fmdtf7g==;
+Received: from 179-125-79-232-dinamico.pombonet.net.br ([179.125.79.232] helo=quatroqueijos.lan)
+	by fanzine2.igalia.com with esmtpsa 
+	(Cipher TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256) (Exim)
+	id 1s1j4x-001hpA-TL; Tue, 30 Apr 2024 10:43:12 +0200
+From: Thadeu Lima de Souza Cascardo <cascardo@igalia.com>
+To: netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Lee Jones <lee@kernel.org>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Horatiu Vultur <horatiu.vultur@microchip.com>,
-	UNGLinuxDriver@microchip.com,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Saravana Kannan <saravanak@google.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Lars Povlsen <lars.povlsen@microchip.com>,
-	Steen Hegelund <Steen.Hegelund@microchip.com>,
-	Daniel Machon <daniel.machon@microchip.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>
-Cc: linux-kernel@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-pci@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Allan Nielsen <allan.nielsen@microchip.com>,
-	Steen Hegelund <steen.hegelund@microchip.com>,
-	Luca Ceresoli <luca.ceresoli@bootlin.com>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: [PATCH 17/17] MAINTAINERS: Add the Microchip LAN966x PCI driver entry
-Date: Tue, 30 Apr 2024 10:37:26 +0200
-Message-ID: <20240430083730.134918-18-herve.codina@bootlin.com>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20240430083730.134918-1-herve.codina@bootlin.com>
-References: <20240430083730.134918-1-herve.codina@bootlin.com>
+	kernel-dev@igalia.com,
+	Thadeu Lima de Souza Cascardo <cascardo@igalia.com>
+Subject: [PATCH] net: fix out-of-bounds access in ops_init
+Date: Tue, 30 Apr 2024 05:42:53 -0300
+Message-Id: <20240430084253.3272177-1-cascardo@igalia.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -91,34 +65,85 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-GND-Sasl: herve.codina@bootlin.com
 
-After contributing the driver, add myself as the maintainer for the
-Microchip LAN966x PCI driver.
+net_alloc_generic is called by net_alloc, which is called without any
+locking. It reads max_gen_ptrs, which is changed under pernet_ops_rwsem. It
+is read twice, first to allocate an array, then to set s.len, which is
+later used to limit the bounds of the array access.
 
-Signed-off-by: Herve Codina <herve.codina@bootlin.com>
+It is possible that the array is allocated and another thread is
+registering a new pernet ops, increments max_gen_ptrs, which is then used
+to set s.len with a larger than allocated length for the variable array.
+
+Fix it by delaying the allocation to setup_net, which is always called
+under pernet_ops_rwsem, and is called right after net_alloc.
+
+Signed-off-by: Thadeu Lima de Souza Cascardo <cascardo@igalia.com>
 ---
- MAINTAINERS | 6 ++++++
- 1 file changed, 6 insertions(+)
+ net/core/net_namespace.c | 18 ++++++------------
+ 1 file changed, 6 insertions(+), 12 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index a15f19008d6e..2dfb010dc211 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -14471,6 +14471,12 @@ S:	Maintained
- F:	Documentation/devicetree/bindings/interrupt-controller/microchip,lan966x-oic.yaml
- F:	drivers/irqchip/irq-lan966x-oic.c
+diff --git a/net/core/net_namespace.c b/net/core/net_namespace.c
+index f0540c557515..879e49b10cca 100644
+--- a/net/core/net_namespace.c
++++ b/net/core/net_namespace.c
+@@ -87,7 +87,7 @@ static int net_assign_generic(struct net *net, unsigned int id, void *data)
  
-+MICROCHIP LAN966X PCI DRIVER
-+M:	Herve Codina <herve.codina@bootlin.com>
-+S:	Maintained
-+F:	drivers/mfd/lan966x_pci.c
-+F:	drivers/mfd/lan966x_pci.dtso
-+
- MICROCHIP LCDFB DRIVER
- M:	Nicolas Ferre <nicolas.ferre@microchip.com>
- L:	linux-fbdev@vger.kernel.org
+ 	old_ng = rcu_dereference_protected(net->gen,
+ 					   lockdep_is_held(&pernet_ops_rwsem));
+-	if (old_ng->s.len > id) {
++	if (old_ng && old_ng->s.len > id) {
+ 		old_ng->ptr[id] = data;
+ 		return 0;
+ 	}
+@@ -107,8 +107,9 @@ static int net_assign_generic(struct net *net, unsigned int id, void *data)
+ 	 * the old copy for kfree after a grace period.
+ 	 */
+ 
+-	memcpy(&ng->ptr[MIN_PERNET_OPS_ID], &old_ng->ptr[MIN_PERNET_OPS_ID],
+-	       (old_ng->s.len - MIN_PERNET_OPS_ID) * sizeof(void *));
++	if (old_ng)
++		memcpy(&ng->ptr[MIN_PERNET_OPS_ID], &old_ng->ptr[MIN_PERNET_OPS_ID],
++		       (old_ng->s.len - MIN_PERNET_OPS_ID) * sizeof(void *));
+ 	ng->ptr[id] = data;
+ 
+ 	rcu_assign_pointer(net->gen, ng);
+@@ -422,15 +423,10 @@ static struct workqueue_struct *netns_wq;
+ static struct net *net_alloc(void)
+ {
+ 	struct net *net = NULL;
+-	struct net_generic *ng;
+-
+-	ng = net_alloc_generic();
+-	if (!ng)
+-		goto out;
+ 
+ 	net = kmem_cache_zalloc(net_cachep, GFP_KERNEL);
+ 	if (!net)
+-		goto out_free;
++		goto out;
+ 
+ #ifdef CONFIG_KEYS
+ 	net->key_domain = kzalloc(sizeof(struct key_tag), GFP_KERNEL);
+@@ -439,7 +435,7 @@ static struct net *net_alloc(void)
+ 	refcount_set(&net->key_domain->usage, 1);
+ #endif
+ 
+-	rcu_assign_pointer(net->gen, ng);
++	rcu_assign_pointer(net->gen, NULL);
+ out:
+ 	return net;
+ 
+@@ -448,8 +444,6 @@ static struct net *net_alloc(void)
+ 	kmem_cache_free(net_cachep, net);
+ 	net = NULL;
+ #endif
+-out_free:
+-	kfree(ng);
+ 	goto out;
+ }
+ 
 -- 
-2.44.0
+2.34.1
 
 
