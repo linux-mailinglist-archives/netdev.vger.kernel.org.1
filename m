@@ -1,57 +1,64 @@
-Return-Path: <netdev+bounces-92289-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92290-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 237AA8B677F
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 03:36:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C124E8B67A9
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 03:49:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CC6B71F238CC
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 01:36:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6BD831F22753
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 01:49:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35B531113;
-	Tue, 30 Apr 2024 01:36:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 026251843;
+	Tue, 30 Apr 2024 01:48:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SNxDRsNt"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rwk/plWi"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CAE41C33;
-	Tue, 30 Apr 2024 01:36:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7978205E3C;
+	Tue, 30 Apr 2024 01:48:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714440992; cv=none; b=XFmv5cc2vYnSN18h6uf164bXMYFV0h62C5WR0bPFcS1g6mA2/JEBlI3+RFi7oRYHRz04FtVooJnxqnoeSru1LqRLLOUhUBGUTJa3fvPyfW9mAEI35eVwP9pHN0Lixb49pWoztJipUCuP6AO+K6rAQhpplSayu2lVZ7R558XhAXA=
+	t=1714441737; cv=none; b=COOv379kfHAI15R8R41uHxZNlsYMS8LZgO8GQWpYwza3x5J7SX5fdzClo4oAl8JaJfofufwfxfPWmKbmhspPnOr2r4bam/RN6yfK079pVepDuOcaWA/1a2EbhzGZeGLntaKoL7zt4DclCHmUObPPnWMFusvtmNGnf2PSXHMeno4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714440992; c=relaxed/simple;
-	bh=hLCqbm6aIHgWboKq7U6esLVQy2ezFjYgNfa+jq86Qms=;
+	s=arc-20240116; t=1714441737; c=relaxed/simple;
+	bh=c7QzoCOujtAxbTC0elHaSUaFysScZ8hXHLPiQh+BjXQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Cb5Q+33yOGuM08DiujyVAQi7ioHFQpmoP82yR2TIbLgbJDHQb8QisNgHbOy8ui4OF7ot97RZX/qgdsLII1eaWsJGzKISZ+kBQL006ABIU52nA+Q+CiGv7sqKP3Gx7qCBcEAmgU8Hn0Auv7E7XVE/zXD9PDks9RK6toE0e2eC2yw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SNxDRsNt; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5FCAAC116B1;
-	Tue, 30 Apr 2024 01:36:31 +0000 (UTC)
+	 MIME-Version:Content-Type; b=Q7zSb7F4hFGhwuQM4Njne79Dv9SuM3r3To6SalnxWSdGWngAQ6QMjkhkDZ1MVbRQoePjmceiKlVwzNO1+5AaT/p7ch+UnLP3P3sxJqhYJQmCMSRQft356O1RpkjyZH4/3ixWp6NyEgikufkhqIV0yJSMyybfae0obEkf6yytlv8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rwk/plWi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A77E1C116B1;
+	Tue, 30 Apr 2024 01:48:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714440991;
-	bh=hLCqbm6aIHgWboKq7U6esLVQy2ezFjYgNfa+jq86Qms=;
+	s=k20201202; t=1714441737;
+	bh=c7QzoCOujtAxbTC0elHaSUaFysScZ8hXHLPiQh+BjXQ=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=SNxDRsNth4mCdKAE8SCUUduLz58XEHWRJ66Ejp3clOgJy6mzJ66rHye7Ww32vrueX
-	 +Th/oK03WOn40YOaiCrz5qQB2Xw3qTO7I1VUl7wXc0yL+aZI1GssRgLA9/eTm19IWz
-	 eR6yy9Y9gs6eWkBaAighK+dJYYYSi/wCgrQZTnehBOQAGhJKFocjdXw+qdICOgSiHH
-	 frwN6LiFL//c27KEwY47qWEBUl4NUMx4e1dGm6NHxKV3h88yYl+b5UL34ZUgxhCRQx
-	 UmHBalOoNLAiTWNa5yuzQ6BDN5c9kg2SKWs8eLzAAYhAOPDtG1WjsVIcHASP/2UIjB
-	 jHDfQS1Xo0Tlw==
-Date: Mon, 29 Apr 2024 18:36:30 -0700
+	b=Rwk/plWivRvxtyN78BMVb2XoOsELsLIR+aErjqj2rVheUi/FaWJxTgvxW0/T+8fSH
+	 6jIcT+QXtvW2LOxlHcr8p69xdyPZrFDNjY8JA1JsIbUZb1f8s5GH1V81fb+1BlbqOr
+	 mNBOYdU2q53f4YUuGN+eOdtxlBF4CbqDYCA2caP+aMy8RqIveNGubW6RLKSGxRYyjd
+	 tzh2UcP0tIfGT+rJ39pn58yns306motc80r4Egy3kPgDkrKGRvFdAG8svOcjTE9Wix
+	 GdV6V2niZodhkgH9enJ5XQaOYJOhEhzaa5NqgK+yMKKy8hhHPytu7pRlCap0Weyo8Y
+	 gCv7a2VynhYng==
+Date: Mon, 29 Apr 2024 18:48:55 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Erhard Furtner <erhard_f@mailbox.org>
-Cc: netdev@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
- linux-kernel@vger.kernel.org
-Subject: Re: WARNING: CPU: 1 PID: 1 at net/core/netpoll.c:370
- netpoll_send_skb+0x1fc/0x20c at boot when netconsole is enabled (kernel
- v6.9-rc5, v6.8.7, sungem, PowerMac G4 DP)
-Message-ID: <20240429183630.399859e2@kernel.org>
-In-Reply-To: <20240428125306.2c3080ef@legion>
-References: <20240428125306.2c3080ef@legion>
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, "Michael S.
+ Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Alexei
+ Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend
+ <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@google.com>, Amritha
+ Nambiar <amritha.nambiar@intel.com>, Larysa Zaremba
+ <larysa.zaremba@intel.com>, Sridhar Samudrala
+ <sridhar.samudrala@intel.com>, Maciej Fijalkowski
+ <maciej.fijalkowski@intel.com>, virtualization@lists.linux.dev,
+ bpf@vger.kernel.org, Heng Qi <hengqi@linux.alibaba.com>
+Subject: Re: [PATCH net-next v7 0/8] virtio-net: support device stats
+Message-ID: <20240429184855.0d8d1eef@kernel.org>
+In-Reply-To: <20240426033928.77778-1-xuanzhuo@linux.alibaba.com>
+References: <20240426033928.77778-1-xuanzhuo@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,13 +68,15 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Sun, 28 Apr 2024 12:53:06 +0200 Erhard Furtner wrote:
-> With netconsole enabled I get this "WARNING: CPU: 1 PID: 1 at
-> net/core/netpoll.c:370 netpoll_send_skb+0x1fc/0x20c" and "WARNING:
-> CPU: 1 PID: 1 at kernel/locking/irqflag-debug.c:10
-> warn_bogus_irq_restore+0x30/0x44" at boot on my PowerMac G4 DP.
-> Happens more often than not (6-7 out of 10 times booting):
+On Fri, 26 Apr 2024 11:39:20 +0800 Xuan Zhuo wrote:
+> As the spec:
+> 
+> https://github.com/oasis-tcs/virtio-spec/commit/42f389989823039724f95bbbd243291ab0064f82
+> 
+> The virtio net supports to get device stats.
 
-Could you try with LOCKDEP enabled?
-I wonder if irqs_disabled() behaves differently than we expect.
+These got marked as "not applicable" in netdev pw over the weekend, but
+I think net-next is the right target here. So unless someone disagrees
+or we need more reviews we shall apply these tomorrow.
+
 
