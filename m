@@ -1,93 +1,123 @@
-Return-Path: <netdev+bounces-92467-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92468-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 214178B77A7
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 15:55:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54C1E8B77AC
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 15:56:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B63471F22A94
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 13:55:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 862911C22220
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 13:56:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96E89172BA4;
-	Tue, 30 Apr 2024 13:55:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CCC617278D;
+	Tue, 30 Apr 2024 13:56:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jFPMlwx5"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Gq+InA1z"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2921717278D
-	for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 13:55:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCD283AC16;
+	Tue, 30 Apr 2024 13:56:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714485302; cv=none; b=j86pImawv88vWcySPKGsN7J0vHVUcaZXue6U0C3xc0g6BIEHY2IEzJ0+28++lTrQKLHCZ+JXqgMiGRotWBp9U1tJZlDjK0Ol7M5rdevjA7hA6+vRCkOHsFQ1MINIch1qQU09HsKXGOLGAg7zLd0yf9M9ic4PwxQlTZ8kiC9jzqw=
+	t=1714485371; cv=none; b=YQqNKC0haB1FeGrXU3elKVo4adaiHo8jFOKpDJN8l1kXkGNCeV0d7SSEuenaBZvwXsUHT4EJZEm2RrWa6T1DkWnDsyvXyVh1P0/kXbHFLfROzXZqKiD7JJLgf9y2fxWsJ7+WmtdFvj8iTm82TD1eCjg62yJmdvb3zrs0/enZSvE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714485302; c=relaxed/simple;
-	bh=/nhvSoPlU3gbi4AJGgHtqm6XNGJevnMBIdpvHTnCxWE=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=mMWG/th9xtqvPDIGu1BDpBV3iUcvqg0W/9l5DsNxjKa7xhfoVSRB+4dtgH32fts/SuZPATcPcAiig2MIx1fnh+VC1I9TeMAzmio60F1oUFvCFRBnDs1v5eFwOX9fJ3NkXHqyG9Yq1VBzE3eqP3C0J2FiEycyZnVkbQJHWO63YPk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=jFPMlwx5; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1714485300;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/nhvSoPlU3gbi4AJGgHtqm6XNGJevnMBIdpvHTnCxWE=;
-	b=jFPMlwx5ojxT5b2/rrGnLmPrytw6+ngEGXj64bqXEXaKgLNBvnQRT4+8UK1TYevbYe+DO/
-	R7ddzjJqMEv2xbbxps8TS+84VohjK/uxSavI6hJVhtVwC6IR4ek8QPNKqhHsa+wwR2mdak
-	AnCyCCalUz80TjwiS67vIqAK5ssofPg=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-350-18FuFe9iP5Cq84ecOvC9wA-1; Tue,
- 30 Apr 2024 09:54:54 -0400
-X-MC-Unique: 18FuFe9iP5Cq84ecOvC9wA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1127A29AC012;
-	Tue, 30 Apr 2024 13:54:54 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.22])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 5223C2166B32;
-	Tue, 30 Apr 2024 13:54:52 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <e273971a5219cc240c4e9dda1adbbdf7a5ee6812.camel@redhat.com>
-References: <e273971a5219cc240c4e9dda1adbbdf7a5ee6812.camel@redhat.com> <20240428111640.27306-1-linyunsheng@huawei.com>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: dhowells@redhat.com, Alexander Duyck <alexander.duyck@gmail.com>,
-    linux-afs@lists.infradead.org, netdev@vger.kernel.org,
-    linux-kernel@vger.kernel.org, Yunsheng Lin <linyunsheng@huawei.com>,
-    Marc Dionne <marc.dionne@auristor.com>,
-    "David S. Miller" <davem@davemloft.net>,
-    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>
-Subject: Re: [PATCH v2] rxrpc: Fix using alignmask being zero for __page_frag_alloc_align()
+	s=arc-20240116; t=1714485371; c=relaxed/simple;
+	bh=KJAUaEgFcZsb19v2jnocVjIWhEitYWWvWoQpiXDUSVI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ey3gJt59tpT7iyyhBNpZCPc16fGx6HO2BOoZM47+el4uZcTo6aJut8OIXlWTdJjBJOKJ9aEZqBwWwygmATuDID7xHeqrZwbuzHe88wQxrM/7YwsBNy8xmGZrc8mzAvqqMKPoCf4ejGksXdy5gsdcZVclN9k1YcENc/5Y9I+Kg5c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Gq+InA1z; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=dH9Hrnu56eQ6hZPqq2X0hsqCxQsq5z3exzFLte5ULcw=; b=Gq+InA1z/ou0yW4hfvqA5DzEkK
+	fmHae/3NoDsB16hdWZ1IlOweivHyhah+zXNF/gO84adewtCO7zPXb+QEpsr3smHaVpqabfWzPP36i
+	hOwOrlUdFwRHN1ydlQer3QvO/hd1wa5GBmRzB13HPTCsfxf3L2vW469+0TSkId8OPVU8=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1s1nxe-00ELPE-K0; Tue, 30 Apr 2024 15:55:58 +0200
+Date: Tue, 30 Apr 2024 15:55:58 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Herve Codina <herve.codina@bootlin.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Lee Jones <lee@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+	Horatiu Vultur <horatiu.vultur@microchip.com>,
+	UNGLinuxDriver@microchip.com,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Saravana Kannan <saravanak@google.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Lars Povlsen <lars.povlsen@microchip.com>,
+	Steen Hegelund <Steen.Hegelund@microchip.com>,
+	Daniel Machon <daniel.machon@microchip.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
+	netdev@vger.kernel.org, linux-pci@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Allan Nielsen <allan.nielsen@microchip.com>,
+	Luca Ceresoli <luca.ceresoli@bootlin.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH 06/17] dt-bindings: net: mscc-miim: Add resets property
+Message-ID: <5d899584-38ed-4eee-9ba5-befdedbc5734@lunn.ch>
+References: <20240430083730.134918-1-herve.codina@bootlin.com>
+ <20240430083730.134918-7-herve.codina@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <261632.1714485291.1@warthog.procyon.org.uk>
-Date: Tue, 30 Apr 2024 14:54:51 +0100
-Message-ID: <261633.1714485291@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240430083730.134918-7-herve.codina@bootlin.com>
 
-Paolo Abeni <pabeni@redhat.com> wrote:
+On Tue, Apr 30, 2024 at 10:37:15AM +0200, Herve Codina wrote:
+> Add the (optional) resets property.
+> The mscc-miim device is impacted by the switch reset especially when the
+> mscc-miim device is used as part of the LAN966x PCI device.
+> 
+> Signed-off-by: Herve Codina <herve.codina@bootlin.com>
+> ---
+>  Documentation/devicetree/bindings/net/mscc,miim.yaml | 8 ++++++++
+>  1 file changed, 8 insertions(+)
+> 
+> diff --git a/Documentation/devicetree/bindings/net/mscc,miim.yaml b/Documentation/devicetree/bindings/net/mscc,miim.yaml
+> index 5b292e7c9e46..a8c92cec85a6 100644
+> --- a/Documentation/devicetree/bindings/net/mscc,miim.yaml
+> +++ b/Documentation/devicetree/bindings/net/mscc,miim.yaml
+> @@ -38,6 +38,14 @@ properties:
+>  
+>    clock-frequency: true
+>  
+> +  resets:
+> +    items:
+> +      - description: Reset controller used for switch core reset (soft reset)
 
-> @David: I assume from your ack you are fine with this patch being
-> merged via the net tree, am I correct?
+A follow up to the comment on the next patch. I think it should be
+made clear in the patch and the binding, the aim is to reset the MDIO
+bus master, not the switch. It just happens that the MDIO bus master
+is within the domain of the switch core, and so the switch core reset
+also resets the MDIO bus master.
 
-Yes, the net tree is fine.
+Architecturally, this is important. I would not expect the MDIO driver
+to be resetting the switch, the switch driver should be doing
+that. But we have seen some odd Qualcomm patches where the MDIO driver
+has been doing things outside the scope of MDIO, playing with resets
+and clocks which are not directly related to the MDIO bus master. I
+want to avoid any confusion here, especially when Qualcomm tries
+again, and maybe points at this code.
 
-David
-
+	Andrew
 
