@@ -1,112 +1,92 @@
-Return-Path: <netdev+bounces-92398-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92399-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A61E8B6E68
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 11:33:56 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD0928B6E8D
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 11:37:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 112B11F26A93
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 09:33:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 057BCB22353
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 09:37:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E895127E31;
-	Tue, 30 Apr 2024 09:33:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83DB512A144;
+	Tue, 30 Apr 2024 09:36:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gyX+AXMA"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [205.139.111.44])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B5EB22618
-	for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 09:33:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.139.111.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 568771292CE;
+	Tue, 30 Apr 2024 09:36:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714469631; cv=none; b=P38eE525V5hXR3uB2HbN5Ad2uKf/1neElNAaEw6v2sAcE+YTYPKiBNQm4GkNLgWhdmG+zx++HFwWYV+G9MrmA+Lf5JqmapUiO+9Vs7106eKaLEDOix0XNhmZ0eaE8yZMnGvNS2HKRhdKRF9ie+7f7/dKB/4Zj5aPC7DGPdENhKo=
+	t=1714469776; cv=none; b=MRRhs7Sq/Rdx3cMheMtuPHbg23Awvp1cmDW14lXP7osZ0/u6Az5Qob6zE86ROb95mxtG68MAWCXPmyDInfpmrLdfgVrNMGN8CZjx8hUiJDd+2zigXnC62FOkcJTaOj1+Qc9E4vc8s1/EUXXoXU9PFAw6WJ12TjbArviFeRdLITE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714469631; c=relaxed/simple;
-	bh=g58ZFJZxCRIIPX25vcNWUJoCTdmke4j0yQd3NCifP1s=;
+	s=arc-20240116; t=1714469776; c=relaxed/simple;
+	bh=3l20woefNrUTmYr2WXVuXJsLYYGk9ONQKilh/0kO8iQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 In-Reply-To:Content-Type:Content-Disposition; b=sjN295bL3qhLugt5SfubNp6MWqndcoZNyltU68c9exrjg8JPy9lxbgFxSqBMKWxThMgDQnL1cqfIDdzBrhN6d7dZGyYPJSDM2oH0QjLVtiNetNF1nVmzeP7LOClPs04kNTI8AvSvCnRR9uevpWKbRwhrkcxNVBoOxATYIzuRsOg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=none smtp.mailfrom=queasysnail.net; arc=none smtp.client-ip=205.139.111.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=queasysnail.net
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-602-88mza38tOn2iBm2D2w-f2g-1; Tue,
- 30 Apr 2024 05:33:42 -0400
-X-MC-Unique: 88mza38tOn2iBm2D2w-f2g-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 77AD43C0CEEA;
-	Tue, 30 Apr 2024 09:33:41 +0000 (UTC)
-Received: from hog (unknown [10.39.193.137])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 500B520169C4;
-	Tue, 30 Apr 2024 09:33:38 +0000 (UTC)
-Date: Tue, 30 Apr 2024 11:33:38 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Antony Antony <antony.antony@secunet.com>
-Cc: Steffen Klassert <steffen.klassert@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>, netdev@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	devel@linux-ipsec.org, Leon Romanovsky <leon@kernel.org>,
-	Eyal Birger <eyal.birger@gmail.com>,
-	Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Subject: Re: [PATCH ipsec-next v14 0/4] xfrm: Introduce direction attribute
- for SA
-Message-ID: <ZjC68onD2DvsX6Qy@hog>
-References: <cover.1714460330.git.antony.antony@secunet.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=FfDre1ZhayB4HWfrxOMm9nlpwmaHawrk6dC69qP8M/6nfG1jUIJuRSr4+UsLphNhI7XyaG6oalwKJBg40SfNcvyuGN0BUadb3/n6UpNE804Hk4s0kXAeb+S/R3H1/lu5RsAgr99LBszQX5WZRxlAUpprsgYI6XIsk+aGwFP7f90=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gyX+AXMA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 647EEC2BBFC;
+	Tue, 30 Apr 2024 09:36:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714469775;
+	bh=3l20woefNrUTmYr2WXVuXJsLYYGk9ONQKilh/0kO8iQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=gyX+AXMA9YSULYnBC+gtH6mJufvYQCBvx6Ht5xJUrQvYCrX49bBiw6tH+Xj6k01im
+	 Rmo5vvSa1PYWEDPmetLVJZCJqSxWc2rl/4x3WGZ0Urr3ZHirbdjZxcLwT35sJVJWA0
+	 oZGrVOL5ET+QVSwNr+1Bphxt6zLbUjS+lCHYMy4wdrernxtiLWEmdYvhCWcc6hKMD9
+	 r7OByvdGgwnHbb5Row0k7R4W/2AticzWeWOpyut759IWQSdvxGVNMp4+7Ypp2pVoBn
+	 t2c/FtoCBv2qm91Sph9G79mT1SovRErqRlHEKvx6Zg5DYmO7IgQMjDI1Q0Mx7OLKW0
+	 BxQLptzD3DobQ==
+Date: Tue, 30 Apr 2024 11:36:12 +0200
+From: Andi Shyti <andi.shyti@kernel.org>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Cc: Florian Fainelli <florian.fainelli@broadcom.com>, 
+	linux-kernel@vger.kernel.org, Jarkko Nikula <jarkko.nikula@linux.intel.com>, 
+	Mika Westerberg <mika.westerberg@linux.intel.com>, Jan Dabros <jsd@semihalf.com>, Lee Jones <lee@kernel.org>, 
+	Jiawen Wu <jiawenwu@trustnetic.com>, Mengyuan Lou <mengyuanlou@net-swift.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>, Andrew Lunn <andrew@lunn.ch>, 
+	Duanqiang Wen <duanqiangwen@net-swift.com>, 
+	"open list:SYNOPSYS DESIGNWARE I2C DRIVER" <linux-i2c@vger.kernel.org>, "open list:WANGXUN ETHERNET DRIVER" <netdev@vger.kernel.org>
+Subject: Re: [PATCH v3 4/5] mfd: intel_quark_i2c_gpio: Utilize
+ i2c-designware.h
+Message-ID: <fidbc7locp32lypdui67crj3qkj3nbcp5vpxcnlxrdmme2sn4c@npdan5ncxxog>
+References: <20240425214438.2100534-1-florian.fainelli@broadcom.com>
+ <20240425214438.2100534-5-florian.fainelli@broadcom.com>
+ <Ziu6gDOqhEYQNhcH@smile.fi.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <cover.1714460330.git.antony.antony@secunet.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.4
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: queasysnail.net
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=iso-8859-15
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <Ziu6gDOqhEYQNhcH@smile.fi.intel.com>
 
-2024-04-30, 09:08:06 +0200, Antony Antony wrote:
-> Hi,
->=20
-> Inspired by the upcoming IP-TFS patch set, and confusions experienced in
-> the past due to lack of direction attribute on SAs, add a new direction
-> "dir" attribute. It aims to streamline the SA configuration process and
-> enhance the clarity of existing SA attributes.
->=20
-> This patch set introduces the 'dir' attribute to SA, aka xfrm_state,
-> ('in' for input or 'out' for output). Alsp add validations of existing
-> direction-specific SA attributes during configuration and in the data
-> path lookup.
->=20
-> This change would not affect any existing use case or way of configuring
-> SA. You will notice improvements when the new 'dir' attribute is set.
->=20
-> v14: add more SA flag checks.
-> v13: has one fix, minor documenation updates, and function renaming.
->=20
-> Antony Antony (4):
->   xfrm: Add Direction to the SA in or out
->   xfrm: Add dir validation to "out" data path lookup
->   xfrm: Add dir validation to "in" data path lookup
->   xfrm: Restrict SA direction attribute to specific netlink message
->     types
+Hi Andy,
 
-Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
+On Fri, Apr 26, 2024 at 05:30:24PM +0300, Andy Shevchenko wrote:
+> On Thu, Apr 25, 2024 at 02:44:37PM -0700, Florian Fainelli wrote:
+> > Rather than open code the i2c_designware string, utilize the newly
+> > defined constant in i2c-designware.h.
+> 
+> Acked-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+> 
+> P.S>
+> Note, my tags for MFD patches does not imply that I agree on the general idea
+> of this series, it's just in case if it will be approved by the respective
+> maintainers (I²C / MFD / etc).
 
-Thanks Antony.
+I waited a bit to see if more comments were coming.
 
-Patches 2 and 3 are identical to v13 so you could have kept Nicolas's
-Reviewed-by tags. Steffen, I guess you can copy them in case Nicolas
-doesn't look at v14 by the time you apply it?
+Do you have a better approach in mind?
 
---=20
-Sabrina
-
+Andi
 
