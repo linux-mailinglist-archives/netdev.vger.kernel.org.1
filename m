@@ -1,221 +1,314 @@
-Return-Path: <netdev+bounces-92509-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92511-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CB248B7A6C
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 16:46:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A01F8B7AA7
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 16:55:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C191D287102
-	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 14:46:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D8DA5280D79
+	for <lists+netdev@lfdr.de>; Tue, 30 Apr 2024 14:55:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 724B51527AF;
-	Tue, 30 Apr 2024 14:43:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C757177109;
+	Tue, 30 Apr 2024 14:55:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b="eYXFu9ji"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jpMDiNLT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFE851527A3;
-	Tue, 30 Apr 2024 14:43:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=67.231.156.173
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714488208; cv=fail; b=sGv4WDwBPTNP30gZgMOiSSeZyxQBLDYSTO+rNMSWvECBEaYD+sufocYNKs8Av3uuQ0gy5Sogldd2Xjb7xhUe1Qmg1zpZHqAZxk5ugbQLbbKxz93UgfBt6aa1lrNqvkNdtst5qZ5pBJdIms7rTwQeOCFMJOtGeCPVFJpa3pkf+E8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714488208; c=relaxed/simple;
-	bh=cWpobIAyvQqYmAGEf122/PA+a8bn+TAwtt98Ke0JUEA=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=QSQlu8YmO7q9jcL8H+tI+Vary77t92Cp+G+bl3+PAcXGxGcgP0JTvmbcdBq2pYli1/FdnPWQUiar2kvAT5eocFfBpbpC43IZZ9CfTJFf14M7FfrxnGbxgCi0F29ZeCavbJiVd1z7JqkrwwD134PJHNPbNSRxvs0DBurTLZANTa0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b=eYXFu9ji; arc=fail smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 43UDT6BX008436;
-	Tue, 30 Apr 2024 07:43:21 -0700
-Received: from nam12-dm6-obe.outbound.protection.outlook.com (mail-dm6nam12lp2169.outbound.protection.outlook.com [104.47.59.169])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3xtxqf0vnt-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 30 Apr 2024 07:43:21 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=aLNbzj8oye1ZWPjA1AJCm4NC0dZ5oSSSQMB+2NjDExFz4GPaKcE4vakxaowAvn/TxDJFRNUEXDxTIy+ZRC8gjvJHCFtGtRktn+Yg1vdWTaMcm4GdKzJtuHHUa230y0WCxdwXcWEzver6Ceqf1xK8DmSArT3wvzETOrg6eLiuvHLwRzDv2NfOOEM2Ld6b5HScV8Xi77VC44RDfe3UPb5IydPNJRHPOHzeOBAiHChKW9nkkYmyi2tq0GRtQXfUKMWWS17SYJZh3PfPZXq1tniXm9tZ/0CSjbYJqd+OouukkXaoCb1prJXMwMyX/fii/UX7IsVoVOdV5nfKiJP2aQ8Gpw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=eXw6nqls+cERSULNdDluUD6NbfaIV8XXzokBpPwGr0k=;
- b=SdEoFaG8bq7JnQnaK//tereiSCcE2tRqSVcE8fcICy94b8xuwKvH+ri+Uf8wIn1sCZOY0FbdKCZ882lioktJJPcQYbxktFY1SUEJ9csl34vfssvEP+g4d1yXoG8SNOT6usrk/Fhi2mMb6eH1qowqW+tpNfi0ODTV6VJKlztPkd/gM3mSVHiHepIiNXDMWA0Ah/DEblu40U5x4s24XTlVAKV202ixweGwF37wEILrqH9Ikq9gJMhReGIJNF4+0l7VRM9CmwF5cptDi1/pcI3zPmszArBuUOOaRlWDvJKZAtvwpaz+OhqLs1fyxTI+ogVYAYNegtrzJhoq4R5KynyCtQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
- dkim=pass header.d=marvell.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=eXw6nqls+cERSULNdDluUD6NbfaIV8XXzokBpPwGr0k=;
- b=eYXFu9ji7Tzvw7t8Fp6sKisywF9M6Cl0D5kSSYeDmKfTukEPS4WT8ERsGE/cbHK8H96oqkepmXyTb1gTmdBbWBvBDPpqDtO1lCR4bYJZGFnhIpPMifqpg4OVo5732qAQlKMl9LXvFAMHQWCosrqJHv/JMb5Rj5Io2YFCXd/Q7ro=
-Received: from CO1PR18MB4666.namprd18.prod.outlook.com (2603:10b6:303:e5::24)
- by MN2PR18MB3653.namprd18.prod.outlook.com (2603:10b6:208:26b::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7519.35; Tue, 30 Apr
- 2024 14:43:15 +0000
-Received: from CO1PR18MB4666.namprd18.prod.outlook.com
- ([fe80::b3e1:2252:a09b:a64e]) by CO1PR18MB4666.namprd18.prod.outlook.com
- ([fe80::b3e1:2252:a09b:a64e%7]) with mapi id 15.20.7544.023; Tue, 30 Apr 2024
- 14:43:15 +0000
-From: Subbaraya Sundeep Bhatta <sbhatta@marvell.com>
-To: Leon Romanovsky <leon@kernel.org>, David Ahern <dsahern@gmail.com>
-CC: Chiara Meiohas <cmeiohas@nvidia.com>, Jason Gunthorpe <jgg@nvidia.com>,
-        linux-netdev <netdev@vger.kernel.org>,
-        RDMA mailing list
-	<linux-rdma@vger.kernel.org>
-Subject: RE: [EXTERNAL] [PATCH iproute2-next 1/2] rdma: update uapi header
-Thread-Topic: [EXTERNAL] [PATCH iproute2-next 1/2] rdma: update uapi header
-Thread-Index: AQHamufKZ0h06o0ddE2POm5Aay6MyLGA41Xw
-Date: Tue, 30 Apr 2024 14:43:15 +0000
-Message-ID: 
- <CO1PR18MB4666E319527D853C9F4179F5A11A2@CO1PR18MB4666.namprd18.prod.outlook.com>
-References: <cover.1714472040.git.leonro@nvidia.com>
- <b265f104d37354266a30238701d0f73b298a5209.1714472040.git.leonro@nvidia.com>
-In-Reply-To: 
- <b265f104d37354266a30238701d0f73b298a5209.1714472040.git.leonro@nvidia.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: CO1PR18MB4666:EE_|MN2PR18MB3653:EE_
-x-ms-office365-filtering-correlation-id: 5d1b69b8-2fa5-4489-fec5-08dc6923de69
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230031|1800799015|376005|366007|38070700009;
-x-microsoft-antispam-message-info: 
- =?us-ascii?Q?IHwvztbWHpfUGF+gGonaMvdwTpvd2xXPMsa7e9SiBBEBQ8rQOdjSjpXtHnTw?=
- =?us-ascii?Q?M3WfWOm3rdir8V/kKoLgHxOfO4SWqVh/B07fLrb2NLJZruANVCvPAMncIxVT?=
- =?us-ascii?Q?Dg3Sa/cKXo+VnGaXLnBM+YGoZ8us0MDv+EsMbWmxTJZjgxD/ADPyZaoZfV8d?=
- =?us-ascii?Q?/86XbKc/bpDyYSfPRaEOwP3M/pyuhadRavTOIcb7zHmDaiQsnbSMXhhoiLP0?=
- =?us-ascii?Q?UeekoWjBrc7lIcmNxp3Aj1tpuZNrZzEOfTZBQA7DxdI3UF9N8Ce0sc6+1LJB?=
- =?us-ascii?Q?Mn/BXXvmXp91tOphwKyubhRrObsrtydSJhmqqVfRi8q911n8wxAzJnRhhW6g?=
- =?us-ascii?Q?1vlBdPCzCWd4RoOdDqKacDLpwVer1a6JOsQVblY913NlG+Ml0EYZ8HoGpZsh?=
- =?us-ascii?Q?8cCrjCKhLfxMO+55GHCY8IktQqHdorQ3HwgGGf35UIfWUKpvd0nn2c8u3aBD?=
- =?us-ascii?Q?5qr85+v0FD17qF+TBUQl8JMyT37gG64hevWfZgAgYVKMFIFAcURyclRc+Pds?=
- =?us-ascii?Q?gtNbwA/ZFGtKg+GyLU7L/Vi16sCzrFqWk7Vf5KMcx8z98tXa2NM/aoJVhhe7?=
- =?us-ascii?Q?KPKJ9tk6N8VFXemtTGpBuu7Ai5mvLPKQBkdExkSXpMhA7JqpeAroLAW4Hnmq?=
- =?us-ascii?Q?gcwnl24tB/GRXF/D3OS5cCgQ84gM8XE1YBaPAyPohbuKDs1It7wgZQmlPeuW?=
- =?us-ascii?Q?rZMZLhxa13X4Ia5C2FxUOgaQeLdqMWhnTkRp4kMoGGD+LIkSuHOebFIh+ms8?=
- =?us-ascii?Q?TCDz/8VlHu6eTS9wN5QeTXaG1xHe+WY0kOiXP64TKOcbvcJ/O1rBKyovl+0h?=
- =?us-ascii?Q?g9jBHHl44R4DXFKQXFNNJw69Ykb4xF3Igp7Xl5kOMlDmm4BUmu9N00n+eTvn?=
- =?us-ascii?Q?C7ZOJ9HzzOK9QnxH9eJa+i5i9+Xmzvbu5y8ewEvaT4nNfJE1TokGmj+pIecn?=
- =?us-ascii?Q?A6EpKqmOlzJOwP+UaykacBWPy1OQcHZZhaJ70XE0rxHW2UjdR/grqaAD2Xvh?=
- =?us-ascii?Q?7BOQGhHBQV8oddvBpa/N/XKqJaM8Dvk2Yrw0vArQi2yrUeHYPChLkX2O5tGe?=
- =?us-ascii?Q?QCOlmhAB/apptlNKF8mM5S81Z8gB7fpBTE6LCZLySYfmULNztyK7D2v9IEtc?=
- =?us-ascii?Q?65iz69UmuNF0EPAc8vvymBZbKqX7mjF+Tk3pBWHfjdZBlwsbKp4LWf42hdqe?=
- =?us-ascii?Q?bz/IHcxzy1Xk0ukUZjN8KQVC0acWnxpPcNdMdGl+FMx9yLNIGHHI08Zx95Iy?=
- =?us-ascii?Q?ulkPA4se2o3EZWblBehh6Eu564LpoAfOaF/Hj4O8rNGkzuutwg3p/qQYKBvY?=
- =?us-ascii?Q?AUjgPowjyuTNL5++fNvytVJ/9Eny4w0elM7kZmTIA33A5w=3D=3D?=
-x-forefront-antispam-report: 
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR18MB4666.namprd18.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(376005)(366007)(38070700009);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: 
- =?us-ascii?Q?bY8/lN4CwZUGXlfISD7OQMZkNh9zd68tzYqCspmgZJF8s5s67ddPDXSTxvZM?=
- =?us-ascii?Q?U6q38Etp84Oc9inb/FSc4Wf7ONY36/xcTwlV8Z1BWTyMNMR0VP7O1quw7mXx?=
- =?us-ascii?Q?hJvG4xTr70hillJeKrcRFQoKFbbyGfz0qrhKoQlhoaA+P4MBOw8924KPbOgt?=
- =?us-ascii?Q?fQ9tuMiW2XXMSXo2SDyJe2Ha8WyElu4MyxYAA/ibVdVRyGUiwpSiwNxg61h4?=
- =?us-ascii?Q?1hhV+gk2OBDe/qp08XZkX1+Qq9u4uk+joVSI+spmL+p1Ij7S7mTo9l/COBU5?=
- =?us-ascii?Q?IOtI0zApoFIvhwA505++Hgb/qmRYLnZzXY3sO2bQOLR/2roYpEIfDCJqGBI9?=
- =?us-ascii?Q?0euFogqYPZ9++qBinBL9lvwHwOuxnNBAfiVSHhjkMUxnIPApUHr6yrozQF9D?=
- =?us-ascii?Q?Dp3+WBuZUnc2Y+bbu4eO5SyWy78UgLu84TA9nMjaFXdcYAwWqAOLjxUreEvn?=
- =?us-ascii?Q?Ir8Ny4EPtoiigblWN5mAr19u6SWCimCDf/Yz0DHz/ql0D3eZsmfP6JQNsrSl?=
- =?us-ascii?Q?za4HQ5ssMhEJ7XLplzEQbqu5ipvzODeFMk3FsSktLCHAEGoNSS0XNyiA2zPO?=
- =?us-ascii?Q?8EqPjCG8OodTf3EEBa6zBbxSb3pdjCbWq2H9aHHY+X2YhpRfGV528Lz/nsKB?=
- =?us-ascii?Q?4U9hQ/NkbFpSID6eTPgSln8dYMxbZ8KN9NmtbDQbNEjZyglkpm7j3PfGtQWo?=
- =?us-ascii?Q?SrWbfOs2qPlaQc/QguuTkghe7YtfSCqufe/m64UX+Q3WH/VYSWYKglv88uJe?=
- =?us-ascii?Q?usnjNfEpV6C0Tu5xsW0hPlTGEoMTF3GvwrzQ4Uv4a/YkaKTd3A28jmqeioKx?=
- =?us-ascii?Q?CYpGs571pQ+NAJO51zby9lpYcpHUiSwiEs/Ui67Ma3xckdDhonZziEaB4i8H?=
- =?us-ascii?Q?6qmPWprpfatFr5HDxuzirkduT892eAdbA+BhVEiEbZgZb33P0eErkXGb8xnE?=
- =?us-ascii?Q?7uDiu8QxA4ezF6lRb8pRKMp921KeWXTpBK97rSijM5iOgPJs+ysoVCnnMx+L?=
- =?us-ascii?Q?BQMKVHe189ynkH+dWDyJwoUxh+HQsDJVZasAmpfEsse7W7LKUquSXxiVQi/G?=
- =?us-ascii?Q?3jMikII0Ed/yl78lgMOYqjzdCr4ZuPLhfgctiMC2d7F5kTIYNiFxHtOC9bBw?=
- =?us-ascii?Q?erKxp+OHeSw3FHNyggKmlLPSA/4JxFmJcICyd32gyw2Gep1iLy7utU9H+YGZ?=
- =?us-ascii?Q?ComJGRLqcFW7aAZRUcvH9g9VM6SMm5LifnU52euAz5r5G0UDLt1Q0xDBMfZ/?=
- =?us-ascii?Q?oXIj29itGbqcB1wcPhY7GAPgN7hclfMRepCJa2dcfFEhr3/y/AMCMxqdrkdz?=
- =?us-ascii?Q?Bij6VeATyRMeGA/r5fRA3Wq6A29j6McGF0xiKMIURKOKO7DB8KZU8/h+VUtm?=
- =?us-ascii?Q?Uz9JeeCQ2077t8sPiCjrwP/pH29w997dvSTJXuOq6zUAJ5Ps/PGcV+ZQVbds?=
- =?us-ascii?Q?fE6WBC8jHoG5ehGX00+pD98+taPc9zmMs2xIevycyy89US8KVIPGzTomEHMh?=
- =?us-ascii?Q?GUhl1AGrXu+AdGpzV2i0/LDsOTRs77dOfVHW25GNPG4n7O5ZILNCGscqL/xV?=
- =?us-ascii?Q?NnbRjuU2MUO5Jp9jy/c=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E352C770F0;
+	Tue, 30 Apr 2024 14:55:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1714488926; cv=none; b=VauQq7ZxSiAMkzRNdn4x17g8kRq/jkIitSItf6cxzTU6Lq2n/e4jXZ+1IjkR7ZMoOfqyCy8e+nCauwzP38yV0ykQbl8Z95tJ4RB2Hf/yMmxvJXTUdvDTZ7Znud833jUMb+w/QFOUB7zoH7JTi2qaAY8lp6MdjrnmUn1Nt49DO9o=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1714488926; c=relaxed/simple;
+	bh=ozsvmW+zI0P4+pBpU0CrfQB9CjnrKd20Dsuravqlxf0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=JBMz5Viq9gusoziZHuWjPH/eccfP4lXzPY/nghJKti69p391Y7STTLcSvRjjv0cZopO+pUCAehM2LbWU+4V4pUQSNly/ji0zJDcIpWXtquIFNZ6sG2L1kfp1pELf7VHfwDtQHzE4sSgkpqefCwpE6Ch7YZRcQixs6OqIRtn1aaE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jpMDiNLT; arc=none smtp.client-ip=209.85.221.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-34d8f6cfe5bso449796f8f.3;
+        Tue, 30 Apr 2024 07:55:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1714488922; x=1715093722; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lu+OI8E2hEfJqf3bGvX533+gBV2a5UR/rM3gejZ5w40=;
+        b=jpMDiNLT6OwWNmN4m95HIL0goPgdHxY+FAGi1RCnpgBZ9g2ilqEvt5Qr5ZBGi3Iohq
+         YkQ1cLaM+LYNJN9vNhB93w+1wNs44v8MS0CB2miZgD6qBPQgk9uIhu0HZBRESB84ZGNh
+         wACPcqWpempi+T0F9/XBK/wpeeFkv0diLM1YLhxLBMxOBkicgDk5V3mDXfupfv9dGwuG
+         BaatgHC1fIwnTziGjuGrWRjuaMii/wZLMiUI2nZhPHhtYT5b2wd94kGR1F4OZDpQaKKT
+         04WkuiAC8pA9izwfoO5htgYAHYbWgfEd5xWB/3xOSM4Zrq6hyWseFn5AW9Q4RtOIXIR1
+         wc1w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714488922; x=1715093722;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=lu+OI8E2hEfJqf3bGvX533+gBV2a5UR/rM3gejZ5w40=;
+        b=sd7FE4wiuMDuO9S5h8y/Ghk9eWBXxTmmK5x0pjDxIo6Ro2HjanHn1Xblfi6i17wrcg
+         3/KDtwDG4Md1ot/8xtsoXH3iWuxp95tLJHhGZABCt2IUXp6k2JCyU2qSWdcN9ht9VF+0
+         0/d4HWSANOW1/l5S76njNZCrqiQ8Whm0s8wnSihooT9Tgv3SvGfWKIlYMMYGhYKnuBWj
+         602jynzoQ8xi70v+CUF1jnqukuko28yJog1hlTkr89dIGVPpV7hCqNcERQHu3VWj+0C3
+         rwKsC2WjtefPYa0P/thOqgD1d4FK2MOW/ZD3zbJhU/nq5j5hnHAJAsxUpAWr+gQnBjEA
+         A0Zg==
+X-Forwarded-Encrypted: i=1; AJvYcCWiIuH3Z4hyE3hPV4dloblC/H2fi8vUl9szYcPt6Ma4h0rl3PLPvw7gY4dqpZBU/Qk3pXJtF2jn3q8GDT86i2Zv7hkhz2ehMu5MM0wQCc7ma2zkFnd+XQesjqaa/otE72wgcbKX
+X-Gm-Message-State: AOJu0Yzvf005A8iPq+/CUJCuB9um92B7IU6tDTPOGMILUXN05jm7bmJ0
+	f4DNdlbaUnbGHyQmblGsY9Mo3qyRa7abwHJiKDLowVXhi1AXoVe2nbiDz+k5fOMZqliv8cVF69o
+	QWffd3S7//xNSea+C+XgOnom9q9E=
+X-Google-Smtp-Source: AGHT+IHUeit3DF3REJfQsH53Mx8vNwtloiw61MyXi7vr4lHdPZUfCq25XDOK386/J2Xhb+DZU49ErLiQMhD8XDnWtkI=
+X-Received: by 2002:a05:6000:1041:b0:34b:d659:7d0f with SMTP id
+ c1-20020a056000104100b0034bd6597d0fmr6752062wrx.16.1714488921771; Tue, 30 Apr
+ 2024 07:55:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: marvell.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CO1PR18MB4666.namprd18.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5d1b69b8-2fa5-4489-fec5-08dc6923de69
-X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Apr 2024 14:43:15.5663
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: kVCCRGfw0ScOOTnDOVqaAnlLOcljapwXoatx1i7S4I7TwuXrwvg6dTjKbBWXnfdfMi42+5OxFK/ODbzNQ9w8Qw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR18MB3653
-X-Proofpoint-GUID: r3FU2siam_MFkUtKso_jpVxXXVcxZo3A
-X-Proofpoint-ORIG-GUID: r3FU2siam_MFkUtKso_jpVxXXVcxZo3A
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1011,Hydra:6.0.650,FMLib:17.11.176.26
- definitions=2024-04-30_08,2024-04-30_01,2023-05-22_02
+References: <20240415131941.51153-1-linyunsheng@huawei.com>
+ <20240415131941.51153-10-linyunsheng@huawei.com> <37d012438d4850c3d7090e784e09088d02a2780c.camel@gmail.com>
+ <8b7361c2-6f45-72e8-5aca-92e8a41a7e5e@huawei.com> <17066b6a4f941eea3ef567767450b311096da22b.camel@gmail.com>
+ <c45fdd75-44be-82a6-8e47-42bbc5ee4795@huawei.com> <efd21f1d-8c67-b060-5ad2-0d500fac2ba6@huawei.com>
+ <CAKgT0UfQWEkaWM_mfk=FhCErTL_ZS3RL6x3iMzPdEP3FD+9zZQ@mail.gmail.com> <ceb36a97-31b5-62df-a216-8598210bbba8@huawei.com>
+In-Reply-To: <ceb36a97-31b5-62df-a216-8598210bbba8@huawei.com>
+From: Alexander Duyck <alexander.duyck@gmail.com>
+Date: Tue, 30 Apr 2024 07:54:45 -0700
+Message-ID: <CAKgT0Ufm0=1cmyRLcrcu1_FAAeBokj3rpFAXJvVxgARXSStAuA@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 09/15] mm: page_frag: reuse MSB of 'size'
+ field for pfmemalloc
+To: Yunsheng Lin <linyunsheng@huawei.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Tue, Apr 30, 2024 at 5:06=E2=80=AFAM Yunsheng Lin <linyunsheng@huawei.co=
+m> wrote:
+>
+> On 2024/4/29 22:49, Alexander Duyck wrote:
+>
+> ...
+>
+> >>>
+> >>
+> >> After considering a few different layouts for 'struct page_frag_cache'=
+,
+> >> it seems the below is more optimized:
+> >>
+> >> struct page_frag_cache {
+> >>         /* page address & pfmemalloc & order */
+> >>         void *va;
+> >
+> > I see. So basically just pack the much smaller bitfields in here.
+> >
+> >>
+> >> #if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE) && (BITS_PER_LONG <=3D 32)
+> >>         u16 pagecnt_bias;
+> >>         u16 size;
+> >> #else
+> >>         u32 pagecnt_bias;
+> >>         u32 size;
+> >> #endif
+> >> }
+> >>
+> >> The lower bits of 'va' is or'ed with the page order & pfmemalloc inste=
+ad
+> >> of offset or pagecnt_bias, so that we don't have to add more checking
+> >> for handling the problem of not having enough space for offset or
+> >> pagecnt_bias for PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE and 32 bits syst=
+em.
+> >> And page address & pfmemalloc & order is unchanged for the same page
+> >> in the same 'page_frag_cache' instance, it makes sense to fit them
+> >> together.
+> >>
+> >> Also, it seems it is better to replace 'offset' with 'size', which ind=
+icates
+> >> the remaining size for the cache in a 'page_frag_cache' instance, and =
+we
+> >> might be able to do a single 'size >=3D fragsz' checking for the case =
+of cache
+> >> being enough, which should be the fast path if we ensure size is zoro =
+when
+> >> 'va' =3D=3D NULL.
+> >
+> > I'm not sure the rename to size is called for as it is going to be
+> > confusing. Maybe something like "remaining"?
+>
+> Yes, using 'size' for that is a bit confusing.
+> Beside the above 'remaining', by googling, it seems we may have below
+> options too:
+> 'residual','unused', 'surplus'
+>
+> >
+> >> Something like below:
+> >>
+> >> #define PAGE_FRAG_CACHE_ORDER_MASK      GENMASK(1, 0)
+> >> #define PAGE_FRAG_CACHE_PFMEMALLOC_BIT  BIT(2)
+> >
+> > The only downside is that it is ossifying things so that we can only
+>
+> There is 12 bits that is always useful, we can always extend ORDER_MASK
+> to more bits if lager order number is needed.
+>
+> > ever do order 3 as the maximum cache size. It might be better to do a
+> > full 8 bytes as on x86 it would just mean accessing the low end of a
+> > 16b register. Then you can have pfmemalloc at bit 8.
+>
+> I am not sure I understand the above as it seems we may have below option=
+:
+> 1. Use somthing like the above ORDER_MASK and PFMEMALLOC_BIT.
+> 2. Use bitfield as something like below:
+>
+> unsigned long va:20;---or 52 for 64bit system
+> unsigned long pfmemalloc:1
+> unsigned long order:11;
+>
+> Or is there a better idea in your mind?
 
+All I was suggesting was to make the ORDER_MASK 8 bits. Doing that the
+compiler can just store VA in a register such as RCX and instead of
+having to bother with a mask it could then just use CL to access the
+order. As far as the flag bits such as pfmemalloc the 4 bits starting
+at 8 would make the most sense since it doesn't naturally align to
+anything and would have to be masked anyway.
 
->-----Original Message-----
->From: Leon Romanovsky <leon@kernel.org>
->Sent: Tuesday, April 30, 2024 3:48 PM
->To: David Ahern <dsahern@gmail.com>
->Cc: Chiara Meiohas <cmeiohas@nvidia.com>; Jason Gunthorpe
-><jgg@nvidia.com>; linux-netdev <netdev@vger.kernel.org>; RDMA mailing list
-><linux-rdma@vger.kernel.org>
->Subject: [EXTERNAL] [PATCH iproute2-next 1/2] rdma: update uapi header
->
->From: Chiara Meiohas <cmeiohas@nvidia.com>
->
->Update rdma_netlink.h file up to kernel commit e18fa0bbcedf
->("RDMA/core: Add an option to display driver-specific QPs in the rdmatool"=
-)
->
->Signed-off-by: Chiara Meiohas <cmeiohas@nvidia.com>
->Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
-Reviewed-by: Subbaraya Sundeep <sbhatta@marvell.com>
+Using a bitfield like you suggest would be problematic as the compiler
+would assume a shift is needed so you would have to add a shift to
+your code to offset it for accessing VA.
 
-Thanks,
-Sundeep
+> >
+> >> struct page_frag_cache {
+> >>         /* page address & pfmemalloc & order */
+> >>         void *va;
+> >>
+> >
+> > When you start combining things like this we normally would convert va
+> > to an unsigned long.
+>
+> Ack.
+>
+> >
+> >> #if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE) && (BITS_PER_LONG <=3D 32)
+> >>         u16 pagecnt_bias;
+> >>         u16 size;
+> >> #else
+> >>         u32 pagecnt_bias;
+> >>         u32 size;
+> >> #endif
+> >> };
+> >>
+> >>
+> >> static void *__page_frag_cache_refill(struct page_frag_cache *nc,
+> >>                                       unsigned int fragsz, gfp_t gfp_m=
+ask,
+> >>                                       unsigned int align_mask)
+> >> {
+> >>         gfp_t gfp =3D gfp_mask;
+> >>         struct page *page;
+> >>         void *va;
+> >>
+> >> #if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE)
+> >>         /* Ensure free_unref_page() can be used to free the page fragm=
+ent */
+> >>         BUILD_BUG_ON(PAGE_FRAG_CACHE_MAX_ORDER > PAGE_ALLOC_COSTLY_ORD=
+ER);
+> >>
+> >>         gfp_mask =3D (gfp_mask & ~__GFP_DIRECT_RECLAIM) |  __GFP_COMP =
+|
+> >>                    __GFP_NOWARN | __GFP_NORETRY | __GFP_NOMEMALLOC;
+> >>         page =3D alloc_pages_node(NUMA_NO_NODE, gfp_mask,
+> >>                                 PAGE_FRAG_CACHE_MAX_ORDER);
+> >>         if (likely(page)) {
+> >>                 nc->size =3D PAGE_FRAG_CACHE_MAX_SIZE - fragsz;
+> >
+> > I wouldn't pass fragsz here. Ideally we keep this from having to get
+> > pulled directly into the allocator and can instead treat this as a
+> > pristine page. We can do the subtraction further down in the actual
+> > frag alloc call.
+>
+> Yes for the maintanability point of view.
+> But for performance point of view, doesn't it make sense to do the
+> subtraction here, as doing the subtraction in the actual frag alloc
+> call may involve more load/store operation to do the subtraction?
 
->---
-> rdma/include/uapi/rdma/rdma_netlink.h | 6 ++++++
-> 1 file changed, 6 insertions(+)
->
->diff --git a/rdma/include/uapi/rdma/rdma_netlink.h
->b/rdma/include/uapi/rdma/rdma_netlink.h
->index e8861b5e..a6c8a52d 100644
->--- a/rdma/include/uapi/rdma/rdma_netlink.h
->+++ b/rdma/include/uapi/rdma/rdma_netlink.h
->@@ -558,6 +558,12 @@ enum rdma_nldev_attr {
->
-> 	RDMA_NLDEV_SYS_ATTR_PRIVILEGED_QKEY_MODE, /* u8 */
->
->+	RDMA_NLDEV_ATTR_DRIVER_DETAILS,		/* u8 */
->+	/*
->+	 * QP subtype string, used for driver QPs
->+	 */
->+	RDMA_NLDEV_ATTR_RES_SUBTYPE,		/* string */
->+
-> 	/*
-> 	 * Always the end
-> 	 */
->--
->2.44.0
->
+It just means more code paths doing different things. It doesn't add
+much here since what you are doing is juggling more variables in this
+function as a result of this.
 
+> >
+> >>                 va =3D page_address(page);
+> >>                 nc->va =3D (void *)((unsigned long)va |
+> >>                                   PAGE_FRAG_CACHE_MAX_ORDER |
+> >>                                   (page_is_pfmemalloc(page) ?
+> >>                                    PAGE_FRAG_CACHE_PFMEMALLOC_BIT : 0)=
+);
+> >>                 page_ref_add(page, PAGE_FRAG_CACHE_MAX_SIZE);
+> >>                 nc->pagecnt_bias =3D PAGE_FRAG_CACHE_MAX_SIZE;
+> >>                 return va;
+> >>         }
+> >> #endif
+> >>         page =3D alloc_pages_node(NUMA_NO_NODE, gfp, 0);
+> >>         if (likely(page)) {
+> >>                 nc->size =3D PAGE_SIZE - fragsz;
+> >>                 va =3D page_address(page);
+> >>                 nc->va =3D (void *)((unsigned long)va |
+> >>                                   (page_is_pfmemalloc(page) ?
+> >>                                    PAGE_FRAG_CACHE_PFMEMALLOC_BIT : 0)=
+);
+> >>                 page_ref_add(page, PAGE_FRAG_CACHE_MAX_SIZE);
+> >>                 nc->pagecnt_bias =3D PAGE_FRAG_CACHE_MAX_SIZE;
+> >>                 return va;
+> >>         }
+> >>
+> >>         nc->va =3D NULL;
+> >>         nc->size =3D 0;
+> >>         return NULL;
+> >> }
+> >>
+> >> void *__page_frag_alloc_va_align(struct page_frag_cache *nc,
+> >>                                  unsigned int fragsz, gfp_t gfp_mask,
+> >>                                  unsigned int align_mask)
+> >> {
+> >> #if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE)
+> >>         unsigned long page_order;
+> >> #endif
+> >>         unsigned long page_size;
+> >>         unsigned long size;
+> >>         struct page *page;
+> >>         void *va;
+> >>
+> >>         size =3D nc->size & align_mask;
+> >>         va =3D nc->va;
+> >> #if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE)
+> >>         page_order =3D (unsigned long)va & PAGE_FRAG_CACHE_ORDER_MASK;
+> >>         page_size =3D PAGE_SIZE << page_order;
+> >> #else
+> >>         page_size =3D PAGE_SIZE;
+> >> #endif
+> >
+> > So I notice you got rid of the loops within the function. One of the
+> > reasons for structuring it the way it was is to enable better code
+> > caching. By unfolding the loops you are increasing the number of
+> > instructions that have to be fetched and processed in order to
+> > allocate the buffers.
+>
+> I am not sure I understand what does 'the loops' means here, as there
+> is not 'while' or 'for' here. I suppose you are referring to the 'goto'
+> here?
+
+So there was logic before that would jump to a label back at the start
+of the function. It seems like you got rid of that logic and just
+flattened everything out. This is likely resulting in some duplication
+in the code and overall an increase in the number of instructions that
+need to be fetched to allocate the fragment. As I recall one of the
+reasons things were folded up the way they were was to allow it to use
+a short jump instruction instead of a longer one. I suspect we may be
+losing that with these changes.
 
