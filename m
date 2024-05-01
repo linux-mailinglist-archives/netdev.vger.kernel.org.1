@@ -1,359 +1,170 @@
-Return-Path: <netdev+bounces-92717-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92718-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E230D8B863A
-	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 09:44:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DDE478B865E
+	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 09:49:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 119501C21609
-	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 07:44:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 93B81282C24
+	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 07:49:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 279004D9FB;
-	Wed,  1 May 2024 07:44:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A49DE4D58A;
+	Wed,  1 May 2024 07:49:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="nyGLb6cT"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NzocMZC3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 696EE4D13F
-	for <netdev@vger.kernel.org>; Wed,  1 May 2024 07:44:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E26A94D9EF
+	for <netdev@vger.kernel.org>; Wed,  1 May 2024 07:48:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714549457; cv=none; b=a2Bi55yLewc8x1TfZDCaTncxZMbIdx/ni6jt1+2cX33JDu0vkmvPyaCXDyxtNB3xmi84nPMc11MOtFZNfWEQjWCXjntiSiNDUT/TlZ0UHyhV1fZF5DG06j09uTqgpN8ukMX9nd3paSN+ZVsn8mWs2sQRUtcwZVMYfqYN2ZaaVtw=
+	t=1714549741; cv=none; b=sc6wjHJr1zaxTRe3KKdwptMO07aCN1n3xPIyfMRuiDngAq8FcQYOIGqn0fdTaBJF/cliCUUxueckQ3f706j5NG/QDFzokAnDO1mZzVGT4bnwGm9GGw/WTeS3ZJCHKyWas/cgExvcZxwok3FzOlCX/OWX3GY+3blErRtnhZ6uiCs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714549457; c=relaxed/simple;
-	bh=md6jVbAS5qS0rwyKif0UFiJ92p+UOungs2JrhrKKl4E=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=A8ox6DRyNjX5SFm6/mxvp9uYc406CjZXMAURIxMpK688fLoCT9A2+WRM5orlIwe4NOInuvz38jhVkTPAku7RC2y7yk425xMglOHnCjITXvv4d68gJVW+8ZWk525RaZHJdTokwXlR2j7vOBO7vWI6mU7Nd4jHZJBM9X9sHwbza+8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=nyGLb6cT; arc=none smtp.client-ip=67.231.153.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
-Received: from pps.filterd (m0148460.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 44101Kbx002498
-	for <netdev@vger.kernel.org>; Wed, 1 May 2024 00:44:14 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding : content-type; s=s2048-2021-q4;
- bh=4lF8F4Lq71XKAlTdvWul2zbc0f5YYEDVLLeJgnkIzrg=;
- b=nyGLb6cT24nIXN0FCGkKfhn1Jdy11hdM1MdhYbsPCKMZkhN/aCgUYVttZdc29eJvgsLd
- VUSLDaUC+BVUqhZLrcoDfJclzrBFsQztc4mfWAoFFNAnU9E5UkIJcqQiR+RVA5+NHMn+
- o172uECYF8eI+yK9zZaIniHaxJwGaFdyZwKbApU6u/j6uvkHx4KmpWE9I1/UsdnZ8Bls
- TO1i6313sTfpcg7pNBRAmvH/a2hlxWsDK2ArGWLnEtLfDDtGizfj1uVUW0GVMg/zYHTz
- UDTVjEUxHGNEPWkY0PvQ58DOR2QNrPnHzpT5qv19kVa+mLoZEHVGLb6qTdPWjKvw0kme Og== 
-Received: from maileast.thefacebook.com ([163.114.130.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3xtxh3dube-16
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Wed, 01 May 2024 00:44:14 -0700
-Received: from twshared12096.14.prn3.facebook.com (2620:10d:c0a8:fe::f072) by
- mail.thefacebook.com (2620:10d:c0a8:82::b) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Wed, 1 May 2024 07:44:11 +0000
-Received: by devvm15954.vll0.facebook.com (Postfix, from userid 420730)
-	id 49C06CA32C04; Wed,  1 May 2024 00:44:06 -0700 (PDT)
-From: Miao Xu <miaxu@meta.com>
-To: Eric Dumazet <edumazet@google.com>,
-        "David S . Miller"
-	<davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>,
-        David Ahern <dsahern@kernel.org>, Martin Lau
-	<kafai@meta.com>
-CC: <netdev@vger.kernel.org>, <bpf@vger.kernel.org>, Miao Xu <miaxu@meta.com>
-Subject: [PATCH net-next v2 3/3] Add test for the use of new args in cong_control
-Date: Wed, 1 May 2024 00:43:38 -0700
-Message-ID: <20240501074338.362361-3-miaxu@meta.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240501074338.362361-1-miaxu@meta.com>
-References: <20240501074338.362361-1-miaxu@meta.com>
+	s=arc-20240116; t=1714549741; c=relaxed/simple;
+	bh=cGwK526R503ldDm/CriBnxuRBeqaMR26khdz4eVoYoA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=gblzRqUhBvG1ScnQ7m79PC8RRN0xg4v3KwC+9PjVpTnXxcXDQqRGcPrqWT8FEPYwXegtqbhTjNgZ2HjRY+XRZQu4ro5nGY27iUK5q08gfbLB8LJJPU5+Gf+fNi2zEMkp8Kj0xkI3Fx8Qm3b6vpyejOm8rf2jipvsNDYlt5daRoY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NzocMZC3; arc=none smtp.client-ip=209.85.208.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-57225322312so8643154a12.1
+        for <netdev@vger.kernel.org>; Wed, 01 May 2024 00:48:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1714549738; x=1715154538; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=S6caJNuoOcbTF2A8XjASgel2eyoPHbRLJ4yhUwfPsJg=;
+        b=NzocMZC3LreJ+QmatL3XEJtLc8PzGFznZ0sz+0GfTNbScnK/PxRu8ef65Wqi8hYvzB
+         8My69b2QfPtaP6pxCVV8py2hvmq+VmCKDfw9FPmh5YMcY6adIx9yNR3NRr7bkbqi1sqH
+         WPV+jki4lhuqOse9FO0dy4eNEBu1A9TpbhQQQ2sjDBeIDU+z40BZxryqE0P3cb6BSiku
+         RljMJj9ql1TwhirXFqoxtGUyhanUUWqoPjh/PEsrokBH0f8xm6iEeY4JqxmQwHy89/aq
+         U268mnYY8F0dERU4enxZdbnb6Pt984WwXhKu4eMzpxs0RBqGFTopzOxWndrExrwd7yTR
+         Ibdw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714549738; x=1715154538;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=S6caJNuoOcbTF2A8XjASgel2eyoPHbRLJ4yhUwfPsJg=;
+        b=IhaQA/ZyA1V/mPOXtz02+hlgWkZFPRSYsLb1Nrhy7dMWsyWuwMp3UGcaLaDyqb+yBZ
+         zvaeK5p3okVfaEc3uxkAB9C3v52V1rOrt/VcFcsgQIO+zJDv+QPNqSvy5gR13ybfr6mj
+         3PglYRAbC+UpAE7Bpm85Ow4uw4mMyY+JbjcLm8F6PrPQcsOhyyW7tPnFc4pYxDWmLwft
+         1uZUf7O7AcbH3Et3nMPEQTiQhCpTCEzCQ5KR8TaEvKn3E15u9Ljs1FgiKWWSOwF8wEhW
+         eZdIW1bzfMmeTlp4glx7mVqq8X96fc/A3az6CqZPh60Dqnc3HBIHFyv9ikKIfHuQwoR3
+         GLbQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUp2PWNiuHdOeYuRtJ8Svq1+vKcKJzBlODFBlb+hPL/7wx1X85YeQ51GOOcZky+uvdTkmJzH0Joj66qKzVY8aXljgOeRNaN
+X-Gm-Message-State: AOJu0YxECQHIj2Nq2XBF7mj3UcKjbKNDxUIq7LpwsUJautXLEGi35tYe
+	/Lkij5k3O4D9NpKlSAf6XOQioCiNqur1BjRELLbmkDIVEWojAgxWOmdRAX7l6khwG8i2OIeX10x
+	tkd/jBKdivWwKpw6ZGMo+S0aerdH9XihPLPP7
+X-Google-Smtp-Source: AGHT+IGhlKIspORV3UsoMFDJbaiFzOQH7V8xn49DkcxHrG8vlrT1eYyx0WJBZ3CEo2IQKHYAlSXX53YHVqq5Mgwl4Sc=
+X-Received: by 2002:a17:906:52c1:b0:a55:5ddd:e5f6 with SMTP id
+ w1-20020a17090652c100b00a555ddde5f6mr1398294ejn.28.1714549737800; Wed, 01 May
+ 2024 00:48:57 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20240424165646.1625690-2-dtatulea@nvidia.com> <4ba023709249e11d97c78a98ac7db3b37f419960.camel@nvidia.com>
+ <CAHS8izMbAJHatnM6SvsZVLPY+N7LgGJg03pSdNfSRFCufGh9Zg@mail.gmail.com>
+ <4c20b500c2ed615aba424c0f3c7a79f5f5a04171.camel@nvidia.com>
+ <20240426160557.51de91f9@kernel.org> <c307a3086d255d1dfed22284f500aa9fb70f11a3.camel@nvidia.com>
+ <7a5a1d74040052afc8cc6cc5c2700fdf2e836b0c.camel@nvidia.com>
+In-Reply-To: <7a5a1d74040052afc8cc6cc5c2700fdf2e836b0c.camel@nvidia.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Wed, 1 May 2024 00:48:43 -0700
+Message-ID: <CAHS8izOsFqiSiS4Z-E-jfD70aogNp5Bcyt7Rk8xFoR2TcDjz=g@mail.gmail.com>
+Subject: Re: [RFC PATCH] net: Fix one page_pool page leak from skb_frag_unref
+To: Dragos Tatulea <dtatulea@nvidia.com>
+Cc: "kuba@kernel.org" <kuba@kernel.org>, "davem@davemloft.net" <davem@davemloft.net>, 
+	"ilias.apalodimas@linaro.org" <ilias.apalodimas@linaro.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	"jacob.e.keller@intel.com" <jacob.e.keller@intel.com>, "pabeni@redhat.com" <pabeni@redhat.com>, 
+	Jianbo Liu <jianbol@nvidia.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+	"edumazet@google.com" <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-FB-Internal: Safe
-Content-Type: text/plain
-X-Proofpoint-GUID: DCnU0QcpqjeoVoeMpb6zb8m7Lk5ArVkf
-X-Proofpoint-ORIG-GUID: DCnU0QcpqjeoVoeMpb6zb8m7Lk5ArVkf
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1011,Hydra:6.0.650,FMLib:17.11.176.26
- definitions=2024-05-01_06,2024-04-30_01,2023-05-22_02
 
-This patch adds a selftest to show the usage of the new arguments in
-cong_control. For simplicity's sake, the testing example reuses cubic's
-kernel functions.
---
-Changes in v2:
-* Added highlights to explain major differences between the bpf program
-and tcp_cubic.c.
-* bpf_tcp_helpers.h should not be further extended, so remove the
-  dependency on this file. Use vmlinux.h instead.
-* Minor changes such as indentation.
+On Tue, Apr 30, 2024 at 11:20=E2=80=AFPM Dragos Tatulea <dtatulea@nvidia.co=
+m> wrote:
+>
+> On Mon, 2024-04-29 at 09:39 +0200, Dragos Tatulea wrote:
+> > On Fri, 2024-04-26 at 16:05 -0700, Jakub Kicinski wrote:
+> > > On Thu, 25 Apr 2024 08:17:28 +0000 Dragos Tatulea wrote:
+> > > > >  The unref path always dropped a regular page
+> > > > > ref, thanks to this commit as you point out:
+> > > > >
+> > > > > https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.gi=
+t/commit/?id=3D2cc3aeb5ecccec0d266813172fcd82b4b5fa5803
+> > > > >
+> > > > > AFAICT the correct fix is to actually revert commit 2cc3aeb5eccc
+> > > > > ("skbuff: Fix a potential race while recycling page_pool packets"=
+).
+> > > > > The reason is that now that skb_frag_ref() can grab page-pool ref=
+s, we
+> > > > > don't need to make sure there is only 1 SKB that triggers the rec=
+ycle
+> > > > > path anymore. All the skb and its clones can obtain page-pool ref=
+s,
+> > > > > and in the unref path we drop the page-pool refs. page_pool_put_p=
+age()
+> > > > > detects correctly that the last page-pool ref is put and recycles=
+ the
+> > > > > page only then.
+> > > > >
+> > > > I don't think this is a good way forward. For example, skb->pp_recy=
+cle is used
+> > > > as a hint in skb_gro_receive to avoid coalescing skbs with differen=
+t pp_recycle
+> > > > flag states. This could interfere with that.
+> > >
+> > > That's a bit speculative, right? The simple invariant we are trying t=
+o
+> > > hold is that if skb->pp_recycle && skb_frag_is_pp(skb, i) then the
+> > > reference skb is holding on that frag is a pp reference, not page
+> > > reference.
+> > >
+> > Yes, it was a speculative statement. After re-reading it and the code o=
+f
+> > skb_gro_receive() it makes less sense now.
+> >
+> > Mina's suggestion to revert commit 2cc3aeb5eccc ("skbuff: Fix a potenti=
+al race
+> > while recycling page_pool packets") seems less scary now. I just hope w=
+e don't
+> > bump into too many scenarios similar to the ipsec one...
+> >
+> > > skb_gro_receive() needs to maintain that invariant, if it doesn't
+> > > we need to fix it..
+> > >
+> >
+> Gentle ping. Not sure how to proceed with this:
+>
+> 1) Revert commit 2cc3aeb5eccc
+> ("skbuff: Fix a potential race while recycling page_pool packets"). I tes=
+ted
+> this btw and it works (for this specific scenario).
+>
+> 2) Revert Mina's commit a580ea994fd3 ("net: mirror skb frag ref/unref hel=
+pers")
+> for now.
+>
 
-Signed-off-by: Miao Xu <miaxu@meta.com>
----
- .../bpf/progs/bpf_cubic_cong_control.c        | 207 ++++++++++++++++++
- .../selftests/bpf/progs/bpf_tracing_net.h     |  10 +
- 2 files changed, 217 insertions(+)
- create mode 100644 tools/testing/selftests/bpf/progs/bpf_cubic_cong_cont=
-rol.c
+I vote for #1, and IIUC Jakub's feedback, he seems to prefer this as
+well. If we continue to run into edge cases after the revert of #1, I
+think we may want to do #2 and I can look to reland it with the kunit
+tests that Jakub suggested that reproduce these edge cases.
 
-diff --git a/tools/testing/selftests/bpf/progs/bpf_cubic_cong_control.c b=
-/tools/testing/selftests/bpf/progs/bpf_cubic_cong_control.c
-new file mode 100644
-index 000000000000..7ec9da0356c3
---- /dev/null
-+++ b/tools/testing/selftests/bpf/progs/bpf_cubic_cong_control.c
-@@ -0,0 +1,207 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+
-+/* Highlights:
-+ * 1. The major difference between this bpf program and tcp_cubic.c
-+ *    is that this bpf program relies on `cong_control` rather than
-+ *    `cong_avoid` in the struct tcp_congestion_ops.
-+ * 2. Logic such as tcp_cwnd_reduction, tcp_cong_avoid, and
-+ *    tcp_update_pacing_rate is bypassed when `cong_control` is
-+ *    defined, so moving these logic to `cong_control`.
-+ * 3. WARNING: This bpf program is NOT the same as tcp_cubic.c.
-+ *    The main purpose is to show use cases of the arguments in
-+ *    `cong_control`. For simplicity's sake, it reuses tcp cubic's
-+ *    kernel functions.
-+ */
-+
-+#include "vmlinux.h"
-+
-+#include <bpf/bpf_helpers.h>
-+#include <bpf/bpf_tracing.h>
-+#include "bpf_tracing_net.h"
-+
-+#define BPF_STRUCT_OPS(name, args...) \
-+SEC("struct_ops/"#name) \
-+BPF_PROG(name, args)
-+
-+
-+#define min(a, b) ((a) < (b) ? (a) : (b))
-+#define max(a, b) ((a) > (b) ? (a) : (b))
-+
-+static __always_inline struct inet_connection_sock *inet_csk(const struc=
-t sock *sk)
-+{
-+	return (struct inet_connection_sock *)sk;
-+}
-+
-+static __always_inline struct tcp_sock *tcp_sk(const struct sock *sk)
-+{
-+	return (struct tcp_sock *)sk;
-+}
-+
-+static __always_inline bool before(__u32 seq1, __u32 seq2)
-+{
-+	return (__s32)(seq1-seq2) < 0;
-+}
-+#define after(seq2, seq1) before(seq1, seq2)
-+
-+char _license[] SEC("license") =3D "GPL";
-+
-+extern void cubictcp_init(struct sock *sk) __ksym;
-+extern void cubictcp_cwnd_event(struct sock *sk, enum tcp_ca_event event=
-) __ksym;
-+extern __u32 cubictcp_recalc_ssthresh(struct sock *sk) __ksym;
-+extern void cubictcp_state(struct sock *sk, __u8 new_state) __ksym;
-+extern __u32 tcp_reno_undo_cwnd(struct sock *sk) __ksym;
-+extern void cubictcp_acked(struct sock *sk, const struct ack_sample *sam=
-ple) __ksym;
-+extern void cubictcp_cong_avoid(struct sock *sk, __u32 ack, __u32 acked)=
- __ksym;
-+
-+
-+void BPF_STRUCT_OPS(bpf_cubic_init, struct sock *sk)
-+{
-+	cubictcp_init(sk);
-+}
-+
-+void BPF_STRUCT_OPS(bpf_cubic_cwnd_event, struct sock *sk, enum tcp_ca_e=
-vent event)
-+{
-+	cubictcp_cwnd_event(sk, event);
-+}
-+
-+#define USEC_PER_SEC 1000000UL
-+#define TCP_PACING_SS_RATIO (200)
-+#define TCP_PACING_CA_RATIO (120)
-+#define TCP_REORDERING (12)
-+#define likely(x) (__builtin_expect(!!(x), 1))
-+
-+static __always_inline __u64 div64_u64(__u64 dividend, __u64 divisor)
-+{
-+	return dividend / divisor;
-+}
-+
-+static __always_inline void tcp_update_pacing_rate(struct sock *sk)
-+{
-+	const struct tcp_sock *tp =3D tcp_sk(sk);
-+	__u64 rate;
-+
-+	/* set sk_pacing_rate to 200 % of current rate (mss * cwnd / srtt) */
-+	rate =3D (__u64)tp->mss_cache * ((USEC_PER_SEC / 100) << 3);
-+
-+	/* current rate is (cwnd * mss) / srtt
-+	 * In Slow Start [1], set sk_pacing_rate to 200 % the current rate.
-+	 * In Congestion Avoidance phase, set it to 120 % the current rate.
-+	 *
-+	 * [1] : Normal Slow Start condition is (tp->snd_cwnd < tp->snd_ssthres=
-h)
-+	 *	 If snd_cwnd >=3D (tp->snd_ssthresh / 2), we are approaching
-+	 *	 end of slow start and should slow down.
-+	 */
-+	if (tp->snd_cwnd < tp->snd_ssthresh / 2)
-+		rate *=3D TCP_PACING_SS_RATIO;
-+	else
-+		rate *=3D TCP_PACING_CA_RATIO;
-+
-+	rate *=3D max(tp->snd_cwnd, tp->packets_out);
-+
-+	if (likely(tp->srtt_us))
-+		rate =3D div64_u64(rate, (__u64)tp->srtt_us);
-+
-+	sk->sk_pacing_rate =3D min(rate, sk->sk_max_pacing_rate);
-+}
-+
-+static __always_inline void tcp_cwnd_reduction(
-+		struct sock *sk,
-+		int newly_acked_sacked,
-+		int newly_lost,
-+		int flag) {
-+	struct tcp_sock *tp =3D tcp_sk(sk);
-+	int sndcnt =3D 0;
-+	__u32 pkts_in_flight =3D tp->packets_out - (tp->sacked_out + tp->lost_o=
-ut) + tp->retrans_out;
-+	int delta =3D tp->snd_ssthresh - pkts_in_flight;
-+
-+	if (newly_acked_sacked <=3D 0 || !tp->prior_cwnd)
-+		return;
-+
-+	__u32 prr_delivered =3D tp->prr_delivered + newly_acked_sacked;
-+
-+	if (delta < 0) {
-+		__u64 dividend =3D
-+			(__u64)tp->snd_ssthresh * prr_delivered + tp->prior_cwnd - 1;
-+		sndcnt =3D (__u32)div64_u64(dividend, (__u64)tp->prior_cwnd) - tp->prr=
-_out;
-+	} else {
-+		sndcnt =3D max(prr_delivered - tp->prr_out, newly_acked_sacked);
-+		if (flag & FLAG_SND_UNA_ADVANCED && !newly_lost)
-+			sndcnt++;
-+		sndcnt =3D min(delta, sndcnt);
-+	}
-+	/* Force a fast retransmit upon entering fast recovery */
-+	sndcnt =3D max(sndcnt, (tp->prr_out ? 0 : 1));
-+	tp->snd_cwnd =3D pkts_in_flight + sndcnt;
-+}
-+
-+/* Decide wheather to run the increase function of congestion control. *=
-/
-+static __always_inline bool tcp_may_raise_cwnd(
-+		const struct sock *sk,
-+		const int flag) {
-+	if (tcp_sk(sk)->reordering > TCP_REORDERING)
-+		return flag & FLAG_FORWARD_PROGRESS;
-+
-+	return flag & FLAG_DATA_ACKED;
-+}
-+
-+void BPF_STRUCT_OPS(bpf_cubic_cong_control, struct sock *sk, __u32 ack, =
-int flag,
-+		const struct rate_sample *rs)
-+{
-+	struct tcp_sock *tp =3D tcp_sk(sk);
-+
-+	if (((1<<TCP_CA_CWR) | (1<<TCP_CA_Recovery)) &
-+			(1 << inet_csk(sk)->icsk_ca_state)) {
-+		/* Reduce cwnd if state mandates */
-+		tcp_cwnd_reduction(sk, rs->acked_sacked, rs->losses, flag);
-+
-+		if (!before(tp->snd_una, tp->high_seq)) {
-+			/* Reset cwnd to ssthresh in CWR or Recovery (unless it's undone) */
-+			if (tp->snd_ssthresh < TCP_INFINITE_SSTHRESH &&
-+					inet_csk(sk)->icsk_ca_state =3D=3D TCP_CA_CWR) {
-+				tp->snd_cwnd =3D tp->snd_ssthresh;
-+				tp->snd_cwnd_stamp =3D tcp_jiffies32;
-+			}
-+			// __cwnd_event(sk, CA_EVENT_COMPLETE_CWR);
-+		}
-+	} else if (tcp_may_raise_cwnd(sk, flag)) {
-+		/* Advance cwnd if state allows */
-+		cubictcp_cong_avoid(sk, ack, rs->acked_sacked);
-+		tp->snd_cwnd_stamp =3D tcp_jiffies32;
-+	}
-+
-+	tcp_update_pacing_rate(sk);
-+}
-+
-+__u32 BPF_STRUCT_OPS(bpf_cubic_recalc_ssthresh, struct sock *sk)
-+{
-+	return cubictcp_recalc_ssthresh(sk);
-+}
-+
-+void BPF_STRUCT_OPS(bpf_cubic_state, struct sock *sk, __u8 new_state)
-+{
-+	cubictcp_state(sk, new_state);
-+}
-+
-+void BPF_STRUCT_OPS(bpf_cubic_acked, struct sock *sk,
-+		const struct ack_sample *sample)
-+{
-+	cubictcp_acked(sk, sample);
-+}
-+
-+__u32 BPF_STRUCT_OPS(bpf_cubic_undo_cwnd, struct sock *sk)
-+{
-+	return tcp_reno_undo_cwnd(sk);
-+}
-+
-+
-+SEC(".struct_ops")
-+struct tcp_congestion_ops cubic =3D {
-+	.init		=3D (void *)bpf_cubic_init,
-+	.ssthresh	=3D (void *)bpf_cubic_recalc_ssthresh,
-+	.cong_control	=3D (void *)bpf_cubic_cong_control,
-+	.set_state	=3D (void *)bpf_cubic_state,
-+	.undo_cwnd	=3D (void *)bpf_cubic_undo_cwnd,
-+	.cwnd_event	=3D (void *)bpf_cubic_cwnd_event,
-+	.pkts_acked     =3D (void *)bpf_cubic_acked,
-+	.name		=3D "bpf_cubic",
-+};
-diff --git a/tools/testing/selftests/bpf/progs/bpf_tracing_net.h b/tools/=
-testing/selftests/bpf/progs/bpf_tracing_net.h
-index 7001965d1cc3..f9ec630dfcd5 100644
---- a/tools/testing/selftests/bpf/progs/bpf_tracing_net.h
-+++ b/tools/testing/selftests/bpf/progs/bpf_tracing_net.h
-@@ -80,6 +80,14 @@
- #define TCP_INFINITE_SSTHRESH	0x7fffffff
- #define TCP_PINGPONG_THRESH	3
-=20
-+#define FLAG_DATA_ACKED 0x04 /* This ACK acknowledged new data.		*/
-+#define FLAG_SYN_ACKED 0x10 /* This ACK acknowledged SYN.		*/
-+#define FLAG_DATA_SACKED 0x20 /* New SACK.				*/
-+#define FLAG_SND_UNA_ADVANCED \
-+	0x400 /* Snd_una was changed (!=3D FLAG_DATA_ACKED) */
-+#define FLAG_ACKED (FLAG_DATA_ACKED | FLAG_SYN_ACKED)
-+#define FLAG_FORWARD_PROGRESS (FLAG_ACKED | FLAG_DATA_SACKED)
-+
- #define fib_nh_dev		nh_common.nhc_dev
- #define fib_nh_gw_family	nh_common.nhc_gw_family
- #define fib_nh_gw6		nh_common.nhc_gw.ipv6
-@@ -119,4 +127,6 @@
- #define tw_v6_daddr		__tw_common.skc_v6_daddr
- #define tw_v6_rcv_saddr		__tw_common.skc_v6_rcv_saddr
-=20
-+#define tcp_jiffies32 ((__u32)bpf_jiffies64())
-+
- #endif
+I can upload #1 in the morning if there are no objections. I don't see
+any regressions with #1 but I was never able to repo this issue.
+
 --=20
-2.43.0
-
+Thanks,
+Mina
 
