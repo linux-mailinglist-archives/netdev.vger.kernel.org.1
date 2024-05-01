@@ -1,333 +1,216 @@
-Return-Path: <netdev+bounces-92753-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92754-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45D588B8A31
-	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 14:42:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C68A18B8ACD
+	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 14:55:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C0A9D1F233A5
-	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 12:42:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3E30A1F23065
+	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 12:55:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEF1750A65;
-	Wed,  1 May 2024 12:42:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32B2F1292CA;
+	Wed,  1 May 2024 12:54:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=geanix.com header.i=@geanix.com header.b="kkafn2+E"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lFJYO6Ga"
 X-Original-To: netdev@vger.kernel.org
-Received: from www530.your-server.de (www530.your-server.de [188.40.30.78])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4D3C3FB3B;
-	Wed,  1 May 2024 12:42:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=188.40.30.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A450129E74
+	for <netdev@vger.kernel.org>; Wed,  1 May 2024 12:54:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714567361; cv=none; b=ETCqamoBl0ZV1dbsfmlKwSmfmeIgwX3ozHqymIuzUitqktVypdEK5Ct6JMnTu4/+5r5eDfYDVO+QgmUlqaLVNTkT6+HHlgRlW59QkJ22TsFtdRvfJwPGnXxlFN4L84B7pxTXBmySfdlc4lfKkO7ewIXOnHCRi+mTl7pcA5kV1xs=
+	t=1714568092; cv=none; b=gQqlvs45JAy5bzXIyvEAag8Hm3ZsPvLuNk+1QE6RCfyU/mWNW9FiXW3ctl+dBnMxgsoQJ/czTIYz1qzclTbP5HylB/CNy8vfMbj01BvBnTw8rX5xPMrwXR4CzwDXOAwomr7cJXKB6lhuQqDHhnC8VASLMnY5DycW7m2tNL5DhN4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714567361; c=relaxed/simple;
-	bh=2mvWFwvnyhiO7gdd/5IqYXs8PhYFwr04k79cjJMP0R0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=gO6aIh/0OMGWag/DH+W0YMV7nj9ATv7bN4e96OW+uU7mQxFF7myGzoh/yM51WSP+7QMqqHoFpXOM6IgWkSCpwoYzGoPn/EpH8wwlwZIcTp2eN1EnFzOSGLJ56dNrU1pFiL0SI15sImQl0as5tjpX0VFrmS6G4uvzuuT7MqOQE4c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=geanix.com; spf=pass smtp.mailfrom=geanix.com; dkim=pass (2048-bit key) header.d=geanix.com header.i=@geanix.com header.b=kkafn2+E; arc=none smtp.client-ip=188.40.30.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=geanix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=geanix.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=geanix.com;
-	s=default2211; h=Content-Transfer-Encoding:Content-Type:MIME-Version:
-	Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:In-Reply-To:References;
-	bh=PsJ1bUtExedTmewh63dJJIGm2USLf/ue8T14sDod4hg=; b=kkafn2+EnftqzxAnWp5SbpbsHJ
-	0dIcHeBNGNGkLlTjpQWgpFvjtxlT7OnM/4ZByzc5Qh+N2c++VFIOlgYkkYx2R/7RSNliwkZDXUuWo
-	etJjyGLAYEn1xX7mw3bIGtaopjyLaGKu4Tghu/UOpN5/eKo+huol8gkIFAX/DGukqQnssIJeWgdl4
-	OMwiYYZqkqcGkoaOEQWdO8MfYLBEhD9FZVTecrrbTCYsUx/9IYtAXhtoH/XY08cCPRT8bEDR2bIX3
-	G7Zj44bBoipI08dvtE+6B1N2Fug8upm0vJMxw3mc6sRYEqh30//l3ZXH767rk+DF+2aI7jUXg1Fpk
-	cvwYMe5w==;
-Received: from sslproxy02.your-server.de ([78.47.166.47])
-	by www530.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <martin@geanix.com>)
-	id 1s29I5-00007M-D6; Wed, 01 May 2024 14:42:29 +0200
-Received: from [185.17.218.86] (helo=zen..)
-	by sslproxy02.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <martin@geanix.com>)
-	id 1s29I4-00Fdis-2R;
-	Wed, 01 May 2024 14:42:28 +0200
-From: =?UTF-8?q?Martin=20Hundeb=C3=B8ll?= <martin@geanix.com>
-To: Chandrasekar Ramakrishnan <rcsekar@samsung.com>,
-	Marc Kleine-Budde <mkl@pengutronix.de>,
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Markus Schneider-Pargmann <msp@baylibre.com>,
-	=?UTF-8?q?Martin=20Hundeb=C3=B8ll?= <martin@geanix.com>,
-	linux-can@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2] can: m_can: don't enable transceiver when probing
-Date: Wed,  1 May 2024 14:42:03 +0200
-Message-ID: <20240501124204.3545056-1-martin@geanix.com>
-X-Mailer: git-send-email 2.44.0
+	s=arc-20240116; t=1714568092; c=relaxed/simple;
+	bh=JlO3frJ93xZAkhOIcubWmcMzHjfaD6wgHtwW2qFB1b0=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=IG5pi1bV++I316MdyTiVLhFyTvh5r9aQJl1c5lZWvLxTxzhcEBsO+F8fplV6pXl7UvOzMAG9QNK1bi/OZF0N/u17JUZYOU7S89srGpQI4vIVDIaBMeESoyugkQU03614w1QSJOMuifB4QjXNSc2Qc1/ooNgSHcvw6R/Y9r5Tqhk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lFJYO6Ga; arc=none smtp.client-ip=209.85.128.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-61b028ae5easo129620017b3.3
+        for <netdev@vger.kernel.org>; Wed, 01 May 2024 05:54:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1714568089; x=1715172889; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=z3sDLeGY64xFgBOhWbYFH5O94yTh9rxLYaJsq9lSZKc=;
+        b=lFJYO6GauwN+a++0HEhe2jmt5P8ddkJd6YU2RXkIyyXyyKaKahL9usLgJQCg/+UJbO
+         RsQRbasp0L4nLsSywis37nLozj/M9ypT4coGweiyIwWpK9iCNMogvJXILqM6hz/f4vfU
+         5dK0d7XI+Z9hdRZPcSZkcwSYNM3HRifjjea8TYXQF5kTgIG2uvwZPfZsT48NMZxp2RPK
+         RXs3N1B9VZLgJI/NrxHpQptNRRtRPWC+OG6PDkMobtHGP6gMFZVQEao74p6zTsD/+Zdj
+         ttBweTWbPqa3HgVGFyhZX3ITZwkwTXQtEZAWy/T0EjaEOUqSUrs6Vyd3isjR7wvWt0Aj
+         aXWA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714568089; x=1715172889;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=z3sDLeGY64xFgBOhWbYFH5O94yTh9rxLYaJsq9lSZKc=;
+        b=PPqwrQWCiXmA49O38BtN0kcWtwWWCgDlUrUxeB7TYk3OTBTerQYYBqNcLrGMKj7FXE
+         KUR8VpLFKbvE8JFHxw6j4CkbHNk6WbYdyfu/RYOcz+/Iwo7AhC+XOoo6o2cYbjYc/Ndx
+         qMSuwWyiTEEL88sk+9qZ79Ao01XtrLo7al3WEw2osqFbhzjz6fdKu/tVdxnByZ+cLInK
+         ctO275CEVf9Yw2XpELvjRgx8APGPYNrtAWsnlhyspqONTS0lOnolrHVF2JN+H+X51Jd4
+         ZYYvKvKFN2UV1nUsaI5ZUdR+qjT6YhH2bj140HFMufRb4NEDDxPULsHjXHKkWZow+RO3
+         NORA==
+X-Forwarded-Encrypted: i=1; AJvYcCVC27MvKVToSJUNpdy+sso9WoRL6sxvwcc95Vi4096p72k32ggDe1/uKp24COSpdwAMsgY5yBI2b3joVT6xmiYmUpr6iB6G
+X-Gm-Message-State: AOJu0YxdlIDkpydzzc3bh/kB9aP7y48EoSpgqRyf0L86jBdDnISz3Mp7
+	M1b4ai/nyplcZ+/e5g2dYre4crcjydk+fE7039+awb/5lkj8FqUaVI1WahMXCEMqpffX+zP4WGB
+	eGxikSJtGfQ==
+X-Google-Smtp-Source: AGHT+IHnTCeYKGlFoQqOsLo1AGoUHtsvsOR166NRw4vzoOVi+0fh/1zwKAOUYs0FMrGjesFi6omzH65n1KyZ1Q==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a05:690c:d8a:b0:61b:eb95:7924 with SMTP
+ id da10-20020a05690c0d8a00b0061beb957924mr783052ywb.3.1714568089497; Wed, 01
+ May 2024 05:54:49 -0700 (PDT)
+Date: Wed,  1 May 2024 12:54:48 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: martin@geanix.com
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27262/Wed May  1 10:22:56 2024)
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.45.0.rc0.197.gbae5840b3b-goog
+Message-ID: <20240501125448.896529-1-edumazet@google.com>
+Subject: [PATCH net] tcp: defer shutdown(SEND_SHUTDOWN) for TCP_SYN_RECV sockets
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Neal Cardwell <ncardwell@google.com>, Yuchung Cheng <ycheng@google.com>, 
+	Kuniyuki Iwashima <kuniyu@amazon.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>, syzbot <syzkaller@googlegroups.com>
+Content-Type: text/plain; charset="UTF-8"
 
-The m_can driver sets and clears the CCCR.INIT bit during probe (both
-when testing the NON-ISO bit, and when configuring the chip). After
-clearing the CCCR.INIT bit, the transceiver enters normal mode, where it
-affects the CAN bus (i.e. it ACKs frames). This can cause troubles when
-the m_can node is only used for monitoring the bus, as one cannot setup
-listen-only mode before the device is probed.
+TCP_SYN_RECV state is really special, it is only used by
+cross-syn connections, mostly used by fuzzers.
 
-Rework the probe flow, so that the CCCR.INIT bit is only cleared when
-upping the device. First, the tcan4x5x driver is changed to stay in
-standby mode during/after probe. This in turn requires changes when
-setting bits in the CCCR register, as its CSR and CSA bits are always
-high in standby mode.
+In the following crash [1], syzbot managed to trigger a divide
+by zero in tcp_rcv_space_adjust()
 
-Signed-off-by: Martin Hundebøll <martin@geanix.com>
+A socket makes the following state transitions,
+without ever calling tcp_init_transfer(),
+meaning tcp_init_buffer_space() is also not called.
+
+         TCP_CLOSE
+connect()
+         TCP_SYN_SENT
+         TCP_SYN_RECV
+shutdown() -> tcp_shutdown(sk, SEND_SHUTDOWN)
+         TCP_FIN_WAIT1
+
+To fix this issue, change tcp_shutdown() to not
+perform a TCP_SYN_RECV -> TCP_FIN_WAIT1 transition,
+which makes no sense anyway.
+
+When tcp_rcv_state_process() later changes socket state
+from TCP_SYN_RECV to TCP_ESTABLISH, then look at
+sk->sk_shutdown to finally enter TCP_FIN_WAIT1 state,
+and send a FIN packet from a sane socket state.
+
+This means tcp_send_fin() can now be called from BH
+context, and must use GFP_ATOMIC allocations.
+
+[1]
+divide error: 0000 [#1] PREEMPT SMP KASAN NOPTI
+CPU: 1 PID: 5084 Comm: syz-executor358 Not tainted 6.9.0-rc6-syzkaller-00022-g98369dccd2f8 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
+ RIP: 0010:tcp_rcv_space_adjust+0x2df/0x890 net/ipv4/tcp_input.c:767
+Code: e3 04 4c 01 eb 48 8b 44 24 38 0f b6 04 10 84 c0 49 89 d5 0f 85 a5 03 00 00 41 8b 8e c8 09 00 00 89 e8 29 c8 48 0f af c3 31 d2 <48> f7 f1 48 8d 1c 43 49 8d 96 76 08 00 00 48 89 d0 48 c1 e8 03 48
+RSP: 0018:ffffc900031ef3f0 EFLAGS: 00010246
+RAX: 0c677a10441f8f42 RBX: 000000004fb95e7e RCX: 0000000000000000
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
+RBP: 0000000027d4b11f R08: ffffffff89e535a4 R09: 1ffffffff25e6ab7
+R10: dffffc0000000000 R11: ffffffff8135e920 R12: ffff88802a9f8d30
+R13: dffffc0000000000 R14: ffff88802a9f8d00 R15: 1ffff1100553f2da
+FS:  00005555775c0380(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f1155bf2304 CR3: 000000002b9f2000 CR4: 0000000000350ef0
+Call Trace:
+ <TASK>
+  tcp_recvmsg_locked+0x106d/0x25a0 net/ipv4/tcp.c:2513
+  tcp_recvmsg+0x25d/0x920 net/ipv4/tcp.c:2578
+  inet6_recvmsg+0x16a/0x730 net/ipv6/af_inet6.c:680
+  sock_recvmsg_nosec net/socket.c:1046 [inline]
+  sock_recvmsg+0x109/0x280 net/socket.c:1068
+  ____sys_recvmsg+0x1db/0x470 net/socket.c:2803
+  ___sys_recvmsg net/socket.c:2845 [inline]
+  do_recvmmsg+0x474/0xae0 net/socket.c:2939
+  __sys_recvmmsg net/socket.c:3018 [inline]
+  __do_sys_recvmmsg net/socket.c:3041 [inline]
+  __se_sys_recvmmsg net/socket.c:3034 [inline]
+  __x64_sys_recvmmsg+0x199/0x250 net/socket.c:3034
+  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+  do_syscall_64+0xf5/0x240 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7faeb6363db9
+Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 c1 17 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffcc1997168 EFLAGS: 00000246 ORIG_RAX: 000000000000012b
+RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007faeb6363db9
+RDX: 0000000000000001 RSI: 0000000020000bc0 RDI: 0000000000000005
+RBP: 0000000000000000 R08: 0000000000000000 R09: 000000000000001c
+R10: 0000000000000122 R11: 0000000000000246 R12: 0000000000000000
+R13: 0000000000000000 R14: 0000000000000001 R15: 0000000000000001
+
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Reported-by: syzbot <syzkaller@googlegroups.com>
+Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
+ net/ipv4/tcp.c        | 4 ++--
+ net/ipv4/tcp_input.c  | 2 ++
+ net/ipv4/tcp_output.c | 4 +++-
+ 3 files changed, 7 insertions(+), 3 deletions(-)
 
-Changes since v1:
- * Implement Markus review comments:
-   - Rename m_can_cccr_wait_bits() to m_can_cccr_update_bits()
-   - Explicitly set CCCR_INIT bit in m_can_dev_setup()
-   - Revert to 5 timeouts/tries to 10
-   - Use m_can_config_{en|dis}able() in m_can_niso_supported()
-   - Revert move of call to m_can_enable_all_interrupts()
-   - Return -EBUSY on failure to enter normal mode
-   - Use tcan4x5x_clear_interrupts() in tcan4x5x_can_probe()
-
- drivers/net/can/m_can/m_can.c         | 131 +++++++++++++++-----------
- drivers/net/can/m_can/tcan4x5x-core.c |  13 ++-
- 2 files changed, 85 insertions(+), 59 deletions(-)
-
-diff --git a/drivers/net/can/m_can/m_can.c b/drivers/net/can/m_can/m_can.c
-index 14b231c4d7ec..7974aaa5d8cc 100644
---- a/drivers/net/can/m_can/m_can.c
-+++ b/drivers/net/can/m_can/m_can.c
-@@ -379,38 +379,60 @@ m_can_txe_fifo_read(struct m_can_classdev *cdev, u32 fgi, u32 offset, u32 *val)
- 	return cdev->ops->read_fifo(cdev, addr_offset, val, 1);
- }
+diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+index e767721b3a588b5d56567ae7badf5dffcd35a76a..66d77faca64f6db95e04f4c0e7dd3892628ae3f7 100644
+--- a/net/ipv4/tcp.c
++++ b/net/ipv4/tcp.c
+@@ -2710,7 +2710,7 @@ void tcp_shutdown(struct sock *sk, int how)
+ 	/* If we've already sent a FIN, or it's a closed state, skip this. */
+ 	if ((1 << sk->sk_state) &
+ 	    (TCPF_ESTABLISHED | TCPF_SYN_SENT |
+-	     TCPF_SYN_RECV | TCPF_CLOSE_WAIT)) {
++	     TCPF_CLOSE_WAIT)) {
+ 		/* Clear out any half completed packets.  FIN if needed. */
+ 		if (tcp_close_state(sk))
+ 			tcp_send_fin(sk);
+@@ -2819,7 +2819,7 @@ void __tcp_close(struct sock *sk, long timeout)
+ 		 * machine. State transitions:
+ 		 *
+ 		 * TCP_ESTABLISHED -> TCP_FIN_WAIT1
+-		 * TCP_SYN_RECV	-> TCP_FIN_WAIT1 (forget it, it's impossible)
++		 * TCP_SYN_RECV	-> TCP_FIN_WAIT1 (it is difficult)
+ 		 * TCP_CLOSE_WAIT -> TCP_LAST_ACK
+ 		 *
+ 		 * are legal only when FIN has been sent (i.e. in window),
+diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+index 5d874817a78db31a4a807ab80e9158300329423d..a140d9f7a0a36e6a0b90c97a44a1e54e7639c71f 100644
+--- a/net/ipv4/tcp_input.c
++++ b/net/ipv4/tcp_input.c
+@@ -6761,6 +6761,8 @@ tcp_rcv_state_process(struct sock *sk, struct sk_buff *skb)
  
--static void m_can_config_endisable(struct m_can_classdev *cdev, bool enable)
-+static bool m_can_cccr_update_bits(struct m_can_classdev *cdev, u32 mask, u32 val)
- {
--	u32 cccr = m_can_read(cdev, M_CAN_CCCR);
--	u32 timeout = 10;
--	u32 val = 0;
--
--	/* Clear the Clock stop request if it was set */
--	if (cccr & CCCR_CSR)
--		cccr &= ~CCCR_CSR;
--
--	if (enable) {
--		/* enable m_can configuration */
--		m_can_write(cdev, M_CAN_CCCR, cccr | CCCR_INIT);
--		udelay(5);
--		/* CCCR.CCE can only be set/reset while CCCR.INIT = '1' */
--		m_can_write(cdev, M_CAN_CCCR, cccr | CCCR_INIT | CCCR_CCE);
--	} else {
--		m_can_write(cdev, M_CAN_CCCR, cccr & ~(CCCR_INIT | CCCR_CCE));
--	}
-+	u32 val_before = m_can_read(cdev, M_CAN_CCCR);
-+	u32 val_after = (val_before & ~mask) | val;
-+	size_t tries = 10;
-+
-+	if (!(mask & CCCR_INIT) && !(val_before & CCCR_INIT))
-+		dev_warn(cdev->dev,
-+			 "trying to configure device when in normal mode. Expect failures\n");
-+
-+	/* The chip should be in standby mode when changing the CCCR register,
-+	 * and some chips set the CSR and CSA bits when in standby. Furthermore,
-+	 * the CSR and CSA bits should be written as zeros, even when they read
-+	 * ones.
-+	 */
-+	val_after &= ~(CCCR_CSR | CCCR_CSA);
-+
-+	while (tries--) {
-+		u32 val_read;
-+
-+		/* Write the desired value in each try, as setting some bits in
-+		 * the CCCR register require other bits to be set first. E.g.
-+		 * setting the NISO bit requires setting the CCE bit first.
-+		 */
-+		m_can_write(cdev, M_CAN_CCCR, val_after);
-+
-+		val_read = m_can_read(cdev, M_CAN_CCCR) & ~(CCCR_CSR | CCCR_CSA);
+ 		tcp_initialize_rcv_mss(sk);
+ 		tcp_fast_path_on(tp);
++		if (sk->sk_shutdown & SEND_SHUTDOWN)
++			tcp_shutdown(sk, SEND_SHUTDOWN);
+ 		break;
  
--	/* there's a delay for module initialization */
--	if (enable)
--		val = CCCR_INIT | CCCR_CCE;
--
--	while ((m_can_read(cdev, M_CAN_CCCR) & (CCCR_INIT | CCCR_CCE)) != val) {
--		if (timeout == 0) {
--			netdev_warn(cdev->net, "Failed to init module\n");
--			return;
--		}
--		timeout--;
--		udelay(1);
-+		if (val_read == val_after)
-+			return true;
-+
-+		usleep_range(1, 5);
- 	}
-+
-+	return false;
-+}
-+
-+static void m_can_config_enable(struct m_can_classdev *cdev)
-+{
-+	/* CCCR_INIT must be set in order to set CCCR_CCE, but access to
-+	 * configuration registers should only be enabled when in standby mode,
-+	 * where CCCR_INIT is always set.
-+	 */
-+	if (!m_can_cccr_update_bits(cdev, CCCR_CCE, CCCR_CCE))
-+		netdev_err(cdev->net, "failed to enable configuration mode\n");
-+}
-+
-+static void m_can_config_disable(struct m_can_classdev *cdev)
-+{
-+	/* Only clear CCCR_CCE, since CCCR_INIT cannot be cleared while in
-+	 * standby mode
-+	 */
-+	if (!m_can_cccr_update_bits(cdev, CCCR_CCE, 0))
-+		netdev_err(cdev->net, "failed to disable configuration registers\n");
- }
- 
- static void m_can_interrupt_enable(struct m_can_classdev *cdev, u32 interrupts)
-@@ -1403,7 +1425,7 @@ static int m_can_chip_config(struct net_device *dev)
- 	interrupts &= ~(IR_ARA | IR_ELO | IR_DRX | IR_TEFF | IR_TFE | IR_TCF |
- 			IR_HPM | IR_RF1F | IR_RF1W | IR_RF1N | IR_RF0F);
- 
--	m_can_config_endisable(cdev, true);
-+	m_can_config_enable(cdev);
- 
- 	/* RX Buffer/FIFO Element Size 64 bytes data field */
- 	m_can_write(cdev, M_CAN_RXESC,
-@@ -1521,7 +1543,7 @@ static int m_can_chip_config(struct net_device *dev)
- 		    FIELD_PREP(TSCC_TCP_MASK, 0xf) |
- 		    FIELD_PREP(TSCC_TSS_MASK, TSCC_TSS_INTERNAL));
- 
--	m_can_config_endisable(cdev, false);
-+	m_can_config_disable(cdev);
- 
- 	if (cdev->ops->init)
- 		cdev->ops->init(cdev);
-@@ -1550,6 +1572,11 @@ static int m_can_start(struct net_device *dev)
- 		cdev->tx_fifo_putidx = FIELD_GET(TXFQS_TFQPI_MASK,
- 						 m_can_read(cdev, M_CAN_TXFQS));
- 
-+	if (!m_can_cccr_update_bits(cdev, CCCR_INIT, 0)) {
-+		netdev_err(dev, "failed to enter normal mode\n");
-+		return -EBUSY;
-+	}
-+
- 	return 0;
- }
- 
-@@ -1603,33 +1630,20 @@ static int m_can_check_core_release(struct m_can_classdev *cdev)
-  */
- static bool m_can_niso_supported(struct m_can_classdev *cdev)
- {
--	u32 cccr_reg, cccr_poll = 0;
--	int niso_timeout = -ETIMEDOUT;
--	int i;
-+	bool niso_supported;
- 
--	m_can_config_endisable(cdev, true);
--	cccr_reg = m_can_read(cdev, M_CAN_CCCR);
--	cccr_reg |= CCCR_NISO;
--	m_can_write(cdev, M_CAN_CCCR, cccr_reg);
-+	m_can_config_enable(cdev);
- 
--	for (i = 0; i <= 10; i++) {
--		cccr_poll = m_can_read(cdev, M_CAN_CCCR);
--		if (cccr_poll == cccr_reg) {
--			niso_timeout = 0;
--			break;
--		}
-+	/* First try to set the NISO bit. */
-+	niso_supported = m_can_cccr_update_bits(cdev, CCCR_NISO, CCCR_NISO);
- 
--		usleep_range(1, 5);
--	}
-+	/* Then clear the it again. */
-+	if (!m_can_cccr_update_bits(cdev, CCCR_NISO, 0))
-+		dev_err(cdev->dev, "failed to revert the NON-ISO bit in CCCR\n");
- 
--	/* Clear NISO */
--	cccr_reg &= ~(CCCR_NISO);
--	m_can_write(cdev, M_CAN_CCCR, cccr_reg);
-+	m_can_config_disable(cdev);
- 
--	m_can_config_endisable(cdev, false);
--
--	/* return false if time out (-ETIMEDOUT), else return true */
--	return !niso_timeout;
-+	return niso_supported;
- }
- 
- static int m_can_dev_setup(struct m_can_classdev *cdev)
-@@ -1694,8 +1708,12 @@ static int m_can_dev_setup(struct m_can_classdev *cdev)
- 		return -EINVAL;
- 	}
- 
--	if (cdev->ops->init)
--		cdev->ops->init(cdev);
-+	/* Forcing standby mode should be redunant, as the chip should be in
-+	 * standby after a reset. Write the INIT bit anyways, should the chip
-+	 * be configured by previous stage.
-+	 */
-+	if (!m_can_cccr_update_bits(cdev, CCCR_INIT, CCCR_INIT))
-+		return -EBUSY;
- 
- 	return 0;
- }
-@@ -1708,7 +1726,8 @@ static void m_can_stop(struct net_device *dev)
- 	m_can_disable_all_interrupts(cdev);
- 
- 	/* Set init mode to disengage from the network */
--	m_can_config_endisable(cdev, true);
-+	if (!m_can_cccr_update_bits(cdev, CCCR_INIT, CCCR_INIT))
-+		netdev_err(dev, "failed to enter standby mode\n");
- 
- 	/* set the state as STOPPED */
- 	cdev->can.state = CAN_STATE_STOPPED;
-diff --git a/drivers/net/can/m_can/tcan4x5x-core.c b/drivers/net/can/m_can/tcan4x5x-core.c
-index a42600dac70d..d723206ac7c9 100644
---- a/drivers/net/can/m_can/tcan4x5x-core.c
-+++ b/drivers/net/can/m_can/tcan4x5x-core.c
-@@ -453,10 +453,17 @@ static int tcan4x5x_can_probe(struct spi_device *spi)
- 		goto out_power;
- 	}
- 
--	ret = tcan4x5x_init(mcan_class);
-+	tcan4x5x_check_wake(priv);
-+
-+	ret = tcan4x5x_write_tcan_reg(mcan_class, TCAN4X5X_INT_EN, 0);
- 	if (ret) {
--		dev_err(&spi->dev, "tcan initialization failed %pe\n",
--			ERR_PTR(ret));
-+		dev_err(&spi->dev, "Disabling interrupts failed %pe\n", ERR_PTR(ret));
-+		goto out_power;
-+	}
-+
-+	ret = tcan4x5x_clear_interrupts(mcan_class);
-+	if (ret) {
-+		dev_err(&spi->dev, "Clearing interrupts failed %pe\n", ERR_PTR(ret));
- 		goto out_power;
- 	}
+ 	case TCP_FIN_WAIT1: {
+diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
+index e3167ad965676facaacd8f82848c52cf966f97c3..02caeb7bcf6342713019d31891998fdbe426b573 100644
+--- a/net/ipv4/tcp_output.c
++++ b/net/ipv4/tcp_output.c
+@@ -3563,7 +3563,9 @@ void tcp_send_fin(struct sock *sk)
+ 			return;
+ 		}
+ 	} else {
+-		skb = alloc_skb_fclone(MAX_TCP_HEADER, sk->sk_allocation);
++		skb = alloc_skb_fclone(MAX_TCP_HEADER,
++				       sk_gfp_mask(sk, GFP_ATOMIC |
++						       __GFP_NOWARN));
+ 		if (unlikely(!skb))
+ 			return;
  
 -- 
-2.44.0
+2.45.0.rc0.197.gbae5840b3b-goog
 
 
