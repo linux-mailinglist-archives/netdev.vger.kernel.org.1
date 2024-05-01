@@ -1,216 +1,152 @@
-Return-Path: <netdev+bounces-92754-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92755-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C68A18B8ACD
-	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 14:55:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A7558B8AFD
+	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 15:16:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3E30A1F23065
-	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 12:55:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3BDED1F22CE3
+	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 13:16:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32B2F1292CA;
-	Wed,  1 May 2024 12:54:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lFJYO6Ga"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 944C912E1C6;
+	Wed,  1 May 2024 13:16:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [207.211.30.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A450129E74
-	for <netdev@vger.kernel.org>; Wed,  1 May 2024 12:54:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B37512DDB3
+	for <netdev@vger.kernel.org>; Wed,  1 May 2024 13:16:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.211.30.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714568092; cv=none; b=gQqlvs45JAy5bzXIyvEAag8Hm3ZsPvLuNk+1QE6RCfyU/mWNW9FiXW3ctl+dBnMxgsoQJ/czTIYz1qzclTbP5HylB/CNy8vfMbj01BvBnTw8rX5xPMrwXR4CzwDXOAwomr7cJXKB6lhuQqDHhnC8VASLMnY5DycW7m2tNL5DhN4=
+	t=1714569377; cv=none; b=JkQXm3bdBVFEJ6qmSrXCLpj84n1UTun8Ne4ycNMHp+Pz1g9szGwGbBjEnJSRwrs4NE87/q0NRxri3m9o70z3hGUuyES429vBLvij1fmyhvGGynpQc9XolRXWVusRS+xeaZgFP7UixxQYOjmEW+wCTwlVN9cnxISX72jO8ftet2k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714568092; c=relaxed/simple;
-	bh=JlO3frJ93xZAkhOIcubWmcMzHjfaD6wgHtwW2qFB1b0=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=IG5pi1bV++I316MdyTiVLhFyTvh5r9aQJl1c5lZWvLxTxzhcEBsO+F8fplV6pXl7UvOzMAG9QNK1bi/OZF0N/u17JUZYOU7S89srGpQI4vIVDIaBMeESoyugkQU03614w1QSJOMuifB4QjXNSc2Qc1/ooNgSHcvw6R/Y9r5Tqhk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lFJYO6Ga; arc=none smtp.client-ip=209.85.128.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-61b028ae5easo129620017b3.3
-        for <netdev@vger.kernel.org>; Wed, 01 May 2024 05:54:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1714568089; x=1715172889; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=z3sDLeGY64xFgBOhWbYFH5O94yTh9rxLYaJsq9lSZKc=;
-        b=lFJYO6GauwN+a++0HEhe2jmt5P8ddkJd6YU2RXkIyyXyyKaKahL9usLgJQCg/+UJbO
-         RsQRbasp0L4nLsSywis37nLozj/M9ypT4coGweiyIwWpK9iCNMogvJXILqM6hz/f4vfU
-         5dK0d7XI+Z9hdRZPcSZkcwSYNM3HRifjjea8TYXQF5kTgIG2uvwZPfZsT48NMZxp2RPK
-         RXs3N1B9VZLgJI/NrxHpQptNRRtRPWC+OG6PDkMobtHGP6gMFZVQEao74p6zTsD/+Zdj
-         ttBweTWbPqa3HgVGFyhZX3ITZwkwTXQtEZAWy/T0EjaEOUqSUrs6Vyd3isjR7wvWt0Aj
-         aXWA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714568089; x=1715172889;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=z3sDLeGY64xFgBOhWbYFH5O94yTh9rxLYaJsq9lSZKc=;
-        b=PPqwrQWCiXmA49O38BtN0kcWtwWWCgDlUrUxeB7TYk3OTBTerQYYBqNcLrGMKj7FXE
-         KUR8VpLFKbvE8JFHxw6j4CkbHNk6WbYdyfu/RYOcz+/Iwo7AhC+XOoo6o2cYbjYc/Ndx
-         qMSuwWyiTEEL88sk+9qZ79Ao01XtrLo7al3WEw2osqFbhzjz6fdKu/tVdxnByZ+cLInK
-         ctO275CEVf9Yw2XpELvjRgx8APGPYNrtAWsnlhyspqONTS0lOnolrHVF2JN+H+X51Jd4
-         ZYYvKvKFN2UV1nUsaI5ZUdR+qjT6YhH2bj140HFMufRb4NEDDxPULsHjXHKkWZow+RO3
-         NORA==
-X-Forwarded-Encrypted: i=1; AJvYcCVC27MvKVToSJUNpdy+sso9WoRL6sxvwcc95Vi4096p72k32ggDe1/uKp24COSpdwAMsgY5yBI2b3joVT6xmiYmUpr6iB6G
-X-Gm-Message-State: AOJu0YxdlIDkpydzzc3bh/kB9aP7y48EoSpgqRyf0L86jBdDnISz3Mp7
-	M1b4ai/nyplcZ+/e5g2dYre4crcjydk+fE7039+awb/5lkj8FqUaVI1WahMXCEMqpffX+zP4WGB
-	eGxikSJtGfQ==
-X-Google-Smtp-Source: AGHT+IHnTCeYKGlFoQqOsLo1AGoUHtsvsOR166NRw4vzoOVi+0fh/1zwKAOUYs0FMrGjesFi6omzH65n1KyZ1Q==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:690c:d8a:b0:61b:eb95:7924 with SMTP
- id da10-20020a05690c0d8a00b0061beb957924mr783052ywb.3.1714568089497; Wed, 01
- May 2024 05:54:49 -0700 (PDT)
-Date: Wed,  1 May 2024 12:54:48 +0000
+	s=arc-20240116; t=1714569377; c=relaxed/simple;
+	bh=E4JD48EzrcbVz6QbQEs6xRmajMOwhFuIhzhkDGkLnNg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 In-Reply-To:Content-Type:Content-Disposition; b=arSzXbGG6y+moY66JjQh1IGZE/BPXEfGgJ3eKi6tXVYFmALOnSKM2vscaBvSamosF8jy8Z++BoJWS/JRCf78La2S+AG/BDYCE06/0GRgFC3wA8qP66M+4CzAA/cx1J019/xkVuQl2Vn1q8a04k352f2vSy7VUmGM6gK3Jskn9hw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=none smtp.mailfrom=queasysnail.net; arc=none smtp.client-ip=207.211.30.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=queasysnail.net
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-569-7VD2Mx-0MruFMXPFfcU4hA-1; Wed, 01 May 2024 09:16:06 -0400
+X-MC-Unique: 7VD2Mx-0MruFMXPFfcU4hA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 085AE81F317;
+	Wed,  1 May 2024 13:16:06 +0000 (UTC)
+Received: from hog (unknown [10.39.193.137])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 0FC61C271A4;
+	Wed,  1 May 2024 13:15:55 +0000 (UTC)
+Date: Wed, 1 May 2024 15:15:54 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: j.granados@samsung.com
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Alexander Aring <alex.aring@gmail.com>,
+	Stefan Schmidt <stefan@datenfreihafen.org>,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
+	David Ahern <dsahern@kernel.org>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Matthieu Baerts <matttbe@kernel.org>,
+	Mat Martineau <martineau@kernel.org>,
+	Geliang Tang <geliang@kernel.org>,
+	Remi Denis-Courmont <courmisch@gmail.com>,
+	Allison Henderson <allison.henderson@oracle.com>,
+	David Howells <dhowells@redhat.com>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+	Xin Long <lucien.xin@gmail.com>,
+	Wenjia Zhang <wenjia@linux.ibm.com>,
+	Jan Karcher <jaka@linux.ibm.com>,
+	"D. Wythe" <alibuda@linux.alibaba.com>,
+	Tony Lu <tonylu@linux.alibaba.com>,
+	Wen Gu <guwen@linux.alibaba.com>,
+	Trond Myklebust <trond.myklebust@hammerspace.com>,
+	Anna Schumaker <anna@kernel.org>,
+	Chuck Lever <chuck.lever@oracle.com>,
+	Jeff Layton <jlayton@kernel.org>, Neil Brown <neilb@suse.de>,
+	Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>,
+	Tom Talpey <tom@talpey.com>, Jon Maloy <jmaloy@redhat.com>,
+	Ying Xue <ying.xue@windriver.com>, Martin Schiller <ms@dev.tdt.de>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	Florian Westphal <fw@strlen.de>, Roopa Prabhu <roopa@nvidia.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Simon Horman <horms@verge.net.au>, Julian Anastasov <ja@ssi.bg>,
+	Joerg Reuter <jreuter@yaina.de>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Kees Cook <keescook@chromium.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, dccp@vger.kernel.org,
+	linux-wpan@vger.kernel.org, mptcp@lists.linux.dev,
+	linux-hams@vger.kernel.org, linux-rdma@vger.kernel.org,
+	rds-devel@oss.oracle.com, linux-afs@lists.infradead.org,
+	linux-sctp@vger.kernel.org, linux-s390@vger.kernel.org,
+	linux-nfs@vger.kernel.org, tipc-discussion@lists.sourceforge.net,
+	linux-x25@vger.kernel.org, netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org, bridge@lists.linux.dev,
+	lvs-devel@vger.kernel.org
+Subject: Re: [PATCH net-next v6 8/8] ax.25: x.25: Remove the now superfluous
+ sentinel elements from ctl_table array
+Message-ID: <ZjJAikcdWzzaIr1s@hog>
+References: <20240501-jag-sysctl_remset_net-v6-0-370b702b6b4a@samsung.com>
+ <20240501-jag-sysctl_remset_net-v6-8-370b702b6b4a@samsung.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.45.0.rc0.197.gbae5840b3b-goog
-Message-ID: <20240501125448.896529-1-edumazet@google.com>
-Subject: [PATCH net] tcp: defer shutdown(SEND_SHUTDOWN) for TCP_SYN_RECV sockets
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Neal Cardwell <ncardwell@google.com>, Yuchung Cheng <ycheng@google.com>, 
-	Kuniyuki Iwashima <kuniyu@amazon.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, syzbot <syzkaller@googlegroups.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+In-Reply-To: <20240501-jag-sysctl_remset_net-v6-8-370b702b6b4a@samsung.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.8
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: queasysnail.net
+Content-Type: text/plain; charset=UTF-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-TCP_SYN_RECV state is really special, it is only used by
-cross-syn connections, mostly used by fuzzers.
+2024-05-01, 11:29:32 +0200, Joel Granados via B4 Relay wrote:
+> From: Joel Granados <j.granados@samsung.com>
+>=20
+> This commit comes at the tail end of a greater effort to remove the
+> empty elements at the end of the ctl_table arrays (sentinels) which will
+> reduce the overall build time size of the kernel and run time memory
+> bloat by ~64 bytes per sentinel (further information Link :
+> https://lore.kernel.org/all/ZO5Yx5JFogGi%2FcBo@bombadil.infradead.org/)
+>=20
+> Avoid a buffer overflow when traversing the ctl_table by ensuring that
+> AX25_MAX_VALUES is the same as the size of ax25_param_table. This is
+> done with a BUILD_BUG_ON where ax25_param_table is defined and a
+> CONFIG_AX25_DAMA_SLAVE guard in the unnamed enum definition as well as
+> in the ax25_dev_device_up and ax25_ds_set_timer functions.
+                                ^^
+nit:                            not anymore ;)
+(but not worth a repost IMO)
 
-In the following crash [1], syzbot managed to trigger a divide
-by zero in tcp_rcv_space_adjust()
 
-A socket makes the following state transitions,
-without ever calling tcp_init_transfer(),
-meaning tcp_init_buffer_space() is also not called.
+> diff --git a/net/ax25/ax25_ds_timer.c b/net/ax25/ax25_ds_timer.c
+> index c4f8adbf8144..c50a58d9e368 100644
+> --- a/net/ax25/ax25_ds_timer.c
+> +++ b/net/ax25/ax25_ds_timer.c
+> @@ -55,6 +55,7 @@ void ax25_ds_set_timer(ax25_dev *ax25_dev)
+>  =09ax25_dev->dama.slave_timeout =3D
+>  =09=09msecs_to_jiffies(ax25_dev->values[AX25_VALUES_DS_TIMEOUT]) / 10;
+>  =09mod_timer(&ax25_dev->dama.slave_timer, jiffies + HZ);
+> +=09return;
 
-         TCP_CLOSE
-connect()
-         TCP_SYN_SENT
-         TCP_SYN_RECV
-shutdown() -> tcp_shutdown(sk, SEND_SHUTDOWN)
-         TCP_FIN_WAIT1
+nit: return not needed here since we're already at the bottom of the
+function, but probably not worth a repost of the series.
 
-To fix this issue, change tcp_shutdown() to not
-perform a TCP_SYN_RECV -> TCP_FIN_WAIT1 transition,
-which makes no sense anyway.
+>  }
 
-When tcp_rcv_state_process() later changes socket state
-from TCP_SYN_RECV to TCP_ESTABLISH, then look at
-sk->sk_shutdown to finally enter TCP_FIN_WAIT1 state,
-and send a FIN packet from a sane socket state.
-
-This means tcp_send_fin() can now be called from BH
-context, and must use GFP_ATOMIC allocations.
-
-[1]
-divide error: 0000 [#1] PREEMPT SMP KASAN NOPTI
-CPU: 1 PID: 5084 Comm: syz-executor358 Not tainted 6.9.0-rc6-syzkaller-00022-g98369dccd2f8 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
- RIP: 0010:tcp_rcv_space_adjust+0x2df/0x890 net/ipv4/tcp_input.c:767
-Code: e3 04 4c 01 eb 48 8b 44 24 38 0f b6 04 10 84 c0 49 89 d5 0f 85 a5 03 00 00 41 8b 8e c8 09 00 00 89 e8 29 c8 48 0f af c3 31 d2 <48> f7 f1 48 8d 1c 43 49 8d 96 76 08 00 00 48 89 d0 48 c1 e8 03 48
-RSP: 0018:ffffc900031ef3f0 EFLAGS: 00010246
-RAX: 0c677a10441f8f42 RBX: 000000004fb95e7e RCX: 0000000000000000
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
-RBP: 0000000027d4b11f R08: ffffffff89e535a4 R09: 1ffffffff25e6ab7
-R10: dffffc0000000000 R11: ffffffff8135e920 R12: ffff88802a9f8d30
-R13: dffffc0000000000 R14: ffff88802a9f8d00 R15: 1ffff1100553f2da
-FS:  00005555775c0380(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f1155bf2304 CR3: 000000002b9f2000 CR4: 0000000000350ef0
-Call Trace:
- <TASK>
-  tcp_recvmsg_locked+0x106d/0x25a0 net/ipv4/tcp.c:2513
-  tcp_recvmsg+0x25d/0x920 net/ipv4/tcp.c:2578
-  inet6_recvmsg+0x16a/0x730 net/ipv6/af_inet6.c:680
-  sock_recvmsg_nosec net/socket.c:1046 [inline]
-  sock_recvmsg+0x109/0x280 net/socket.c:1068
-  ____sys_recvmsg+0x1db/0x470 net/socket.c:2803
-  ___sys_recvmsg net/socket.c:2845 [inline]
-  do_recvmmsg+0x474/0xae0 net/socket.c:2939
-  __sys_recvmmsg net/socket.c:3018 [inline]
-  __do_sys_recvmmsg net/socket.c:3041 [inline]
-  __se_sys_recvmmsg net/socket.c:3034 [inline]
-  __x64_sys_recvmmsg+0x199/0x250 net/socket.c:3034
-  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-  do_syscall_64+0xf5/0x240 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7faeb6363db9
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 c1 17 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffcc1997168 EFLAGS: 00000246 ORIG_RAX: 000000000000012b
-RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007faeb6363db9
-RDX: 0000000000000001 RSI: 0000000020000bc0 RDI: 0000000000000005
-RBP: 0000000000000000 R08: 0000000000000000 R09: 000000000000001c
-R10: 0000000000000122 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000000000 R14: 0000000000000001 R15: 0000000000000001
-
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Reported-by: syzbot <syzkaller@googlegroups.com>
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- net/ipv4/tcp.c        | 4 ++--
- net/ipv4/tcp_input.c  | 2 ++
- net/ipv4/tcp_output.c | 4 +++-
- 3 files changed, 7 insertions(+), 3 deletions(-)
-
-diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-index e767721b3a588b5d56567ae7badf5dffcd35a76a..66d77faca64f6db95e04f4c0e7dd3892628ae3f7 100644
---- a/net/ipv4/tcp.c
-+++ b/net/ipv4/tcp.c
-@@ -2710,7 +2710,7 @@ void tcp_shutdown(struct sock *sk, int how)
- 	/* If we've already sent a FIN, or it's a closed state, skip this. */
- 	if ((1 << sk->sk_state) &
- 	    (TCPF_ESTABLISHED | TCPF_SYN_SENT |
--	     TCPF_SYN_RECV | TCPF_CLOSE_WAIT)) {
-+	     TCPF_CLOSE_WAIT)) {
- 		/* Clear out any half completed packets.  FIN if needed. */
- 		if (tcp_close_state(sk))
- 			tcp_send_fin(sk);
-@@ -2819,7 +2819,7 @@ void __tcp_close(struct sock *sk, long timeout)
- 		 * machine. State transitions:
- 		 *
- 		 * TCP_ESTABLISHED -> TCP_FIN_WAIT1
--		 * TCP_SYN_RECV	-> TCP_FIN_WAIT1 (forget it, it's impossible)
-+		 * TCP_SYN_RECV	-> TCP_FIN_WAIT1 (it is difficult)
- 		 * TCP_CLOSE_WAIT -> TCP_LAST_ACK
- 		 *
- 		 * are legal only when FIN has been sent (i.e. in window),
-diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-index 5d874817a78db31a4a807ab80e9158300329423d..a140d9f7a0a36e6a0b90c97a44a1e54e7639c71f 100644
---- a/net/ipv4/tcp_input.c
-+++ b/net/ipv4/tcp_input.c
-@@ -6761,6 +6761,8 @@ tcp_rcv_state_process(struct sock *sk, struct sk_buff *skb)
- 
- 		tcp_initialize_rcv_mss(sk);
- 		tcp_fast_path_on(tp);
-+		if (sk->sk_shutdown & SEND_SHUTDOWN)
-+			tcp_shutdown(sk, SEND_SHUTDOWN);
- 		break;
- 
- 	case TCP_FIN_WAIT1: {
-diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
-index e3167ad965676facaacd8f82848c52cf966f97c3..02caeb7bcf6342713019d31891998fdbe426b573 100644
---- a/net/ipv4/tcp_output.c
-+++ b/net/ipv4/tcp_output.c
-@@ -3563,7 +3563,9 @@ void tcp_send_fin(struct sock *sk)
- 			return;
- 		}
- 	} else {
--		skb = alloc_skb_fclone(MAX_TCP_HEADER, sk->sk_allocation);
-+		skb = alloc_skb_fclone(MAX_TCP_HEADER,
-+				       sk_gfp_mask(sk, GFP_ATOMIC |
-+						       __GFP_NOWARN));
- 		if (unlikely(!skb))
- 			return;
- 
--- 
-2.45.0.rc0.197.gbae5840b3b-goog
+--=20
+Sabrina
 
 
