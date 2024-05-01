@@ -1,223 +1,137 @@
-Return-Path: <netdev+bounces-92720-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92721-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71FAA8B8675
-	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 09:54:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94A268B867F
+	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 09:55:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 29E30283EAB
-	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 07:54:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 358D01F2310E
+	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 07:55:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A761A4E1D9;
-	Wed,  1 May 2024 07:54:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7867D4EB31;
+	Wed,  1 May 2024 07:54:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Mzt2Z2qS"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="bfGhnYDC"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2087.outbound.protection.outlook.com [40.107.93.87])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6EF54D9FD;
-	Wed,  1 May 2024 07:54:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.87
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714550060; cv=fail; b=mlWQz2UqRyyIJz/QJHMJDvxndQoW4pDoBeiTUfkxRLv5Fe5YSKy3xSrJFKrATisuMM0kOrlmb4sF2bQrlSPt/uw4GUV6NUeVAgeNroLq4Bul+m+EitDXDYRsRPvf+U5pxL+in09uXlUao7eFwcH9oH3ZB8PEcET4IIEjqyX1xoA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714550060; c=relaxed/simple;
-	bh=bomAKge42TX+iDs1CTk73HICPJkzMe4cgJR+cRTRkw0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=SGnA2K8UNrfOh+cZmflfLdc3jmtEaIy0guNv8BB06/1gE+9Iiv2i+Kr9/Ps4LiJTURo20+qxR1PlFz3GuSd0qSUmmHTPXLsKNoq+LBsR58GZvSpVOXA8RvECDOToe3+25Rii8SaDvq68u8tYWQKibz2+xzVK4HxAXfarEn6iKQg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Mzt2Z2qS; arc=fail smtp.client-ip=40.107.93.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=OT7Ys2CQCqRLr+LyY6ReqbCV6aRh7BCF/ho0e7qObXfCXsn94fyIim/NIfg0QfV+w4BXBCsCX7Hqv1iclKqIrfIEJC4Tld3DkpfRTUDhVxLy4zTuzbm4aeYorJE94RpIzoWohLXwrWyPHRvalFDfiC8f2xCi3Wgm9oPnGK/S9yJqq7J9qNQHilT9K348LzpStO8N/4I/6hnN3oSNo9GS/REWe5EpDnaeC6kp/nxiNPqn1ayNlW7Hu0wl/qWuVC1zCiZc814P5jbxM59Th1t/JGimFM/eX2DDKqzHaFZlJ1wQdZgoXLMmafWAUorarKwDLdjPxHYfIbYI4eaW076Khw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=JgqVPDFlg122cJYmzVcy57rBqQPoSoVtZiIW7U2ERFk=;
- b=ZT5MawL4W9njdDfv2xKp9hh5Sum8xIckOGX7OylyuNYpT/4u5e5gYj3fjCT+qEOj/E7oPD7C133drDQk/ODlFCFaIRKOIBo8twvk5+qbhBBpFTG7nLYkl9WmJU9nvgnkfDCkpLPdEYORKVheMGPnG3kgQaCOTwBoInBEnq+5nwKZKudXA63JXYdQIQSavcoBrfMJqCzvK5p33hJlJEI59imZLsEp6s09JZXSzHTmTnyr3PhasM7+3nKd/oN+syDYNRb2xyR4HEETeJIKveHMtr+xwjM/RI/6teKqRwTLTtUnbicZdseT20+31BBzHko8Yj+AaG2+IF9YTj8xb7wsiw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=JgqVPDFlg122cJYmzVcy57rBqQPoSoVtZiIW7U2ERFk=;
- b=Mzt2Z2qSbGoQsFk1/0uasRD0pE1/ZyXHWDashYDjnfO2Uc8e45XCKD95F8j2wkNyza7LGwST0y5OQevTG/XIZY8AIylMOt8UZvc/2BPYC2NhkGmk3Y/C+Nsq2bGqYChT0yScwGM8nXk/SdVBrL4aJDZa/hsfqSMjCij3AuDc3bacr4+GcZ5XuAMjZlWxdAXbuhqJGu21Yw/46nKMCAFYAg31YJZZybwkNzODaZSaIHEhisAAyDUSqhHFePYHpBUjnGnwQimKGtCmVIfysIcARet4OVLvXZUbNUw3tG1UETkhSjkFQneOAvNOwmSFn1SJSwr+IyATz8RySkqbIwmg4Q==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from IA1PR12MB6163.namprd12.prod.outlook.com (2603:10b6:208:3e9::22)
- by DM4PR12MB9071.namprd12.prod.outlook.com (2603:10b6:8:bd::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7519.35; Wed, 1 May
- 2024 07:54:15 +0000
-Received: from IA1PR12MB6163.namprd12.prod.outlook.com
- ([fe80::210:5a16:2b80:6ded]) by IA1PR12MB6163.namprd12.prod.outlook.com
- ([fe80::210:5a16:2b80:6ded%3]) with mapi id 15.20.7519.031; Wed, 1 May 2024
- 07:53:56 +0000
-Date: Wed, 1 May 2024 10:53:48 +0300
-From: Ido Schimmel <idosch@nvidia.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Danielle Ratson <danieller@nvidia.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"corbet@lwn.net" <corbet@lwn.net>,
-	"linux@armlinux.org.uk" <linux@armlinux.org.uk>,
-	"sdf@google.com" <sdf@google.com>,
-	"kory.maincent@bootlin.com" <kory.maincent@bootlin.com>,
-	"maxime.chevallier@bootlin.com" <maxime.chevallier@bootlin.com>,
-	"vladimir.oltean@nxp.com" <vladimir.oltean@nxp.com>,
-	"przemyslaw.kitszel@intel.com" <przemyslaw.kitszel@intel.com>,
-	"ahmed.zaki@intel.com" <ahmed.zaki@intel.com>,
-	"richardcochran@gmail.com" <richardcochran@gmail.com>,
-	"shayagr@amazon.com" <shayagr@amazon.com>,
-	"paul.greenwalt@intel.com" <paul.greenwalt@intel.com>,
-	"jiri@resnulli.us" <jiri@resnulli.us>,
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	mlxsw <mlxsw@nvidia.com>, Petr Machata <petrm@nvidia.com>
-Subject: Re: [PATCH net-next v5 04/10] ethtool: Add flashing transceiver
- modules' firmware notifications ability
-Message-ID: <ZjH1DCu0rJTL_RYz@shredder>
-References: <20240424133023.4150624-1-danieller@nvidia.com>
- <20240424133023.4150624-5-danieller@nvidia.com>
- <20240429201130.5fad6d05@kernel.org>
- <DM6PR12MB45168DC7D9D9D7A5AE3E2B2DD81A2@DM6PR12MB4516.namprd12.prod.outlook.com>
- <20240430130302.235d612d@kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240430130302.235d612d@kernel.org>
-X-ClientProxiedBy: LO4P265CA0293.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:38f::11) To CY5PR12MB6179.namprd12.prod.outlook.com
- (2603:10b6:930:24::22)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DF564F5FA;
+	Wed,  1 May 2024 07:54:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1714550099; cv=none; b=rjdCquukknCfDz29ADYnVcV8mc1T3W8O/EvXQ0bz8iwSx6nh3jxHBmIn/qlZKdTD3Pb/14dNsB1UCbXYa/asjAiHhk92IQQ51SrkqbAqW49hVY7kk2pb3fwTo+YVBgr2VCaAmWbxGJvNgrchFsFb/u4aFRIARGpwAXMc8rccYXY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1714550099; c=relaxed/simple;
+	bh=8sTLmBe4e6NEzE5W91OaWrAkBkkpZr1qotPYVHDkhKw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BGujQ0JVbADiNrPSQQToPEbzRCzw93yUbGEhHmIbbMObrys3ZKFpnF8YmLZ/2rmNwGAoBzN9S+l6ih5IW+yiCBsMtLkotiU5iA0bKZNHDi1Z7XC7WF4Prr2CVpsiksd6oAuQsbkBBFKErb0YMHBura9cD+Xp9ez3zbGI5WsprQk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=bfGhnYDC; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Transfer-Encoding
+	:Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
+	Sender:Reply-To:Content-ID:Content-Description;
+	bh=aBV+1nnc4nEQPCYOtpvvVf+o4bvFOap0m5gmh/nCYCg=; b=bfGhnYDCggaTx9oehvzxFbXZrH
+	ZqN7cmIAB1BbFtRc1wHMmVusw6cJUlB1NhMP5Dv9X2RjN2QTpx0PK4oFkz9ZGdl187+6ZNQoywux3
+	YaswCMA448yCQjeTjqLvziQtoTm2XxogyzKlXiOR33bwaVqdb+dUgagWMMtAGzbvM5VW2eYbMPBp5
+	UZmgpSzzglnokVtmBzlR/PGhMgzd2ozpXwfaB65HARTyYzFd0mcijD9gKhI++AXS/jl1oL1qBWOYh
+	FhcojGxJt4eoAXXvprPABlnDQp25Z3AMOSchEbU7ghrBQivczGlag9TchdpTxarWXXcZG0Z6+9nxL
+	nvVbtMrg==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1s24nZ-00000008nfR-35ld;
+	Wed, 01 May 2024 07:54:41 +0000
+Date: Wed, 1 May 2024 00:54:41 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Mina Almasry <almasrymina@google.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org,
+	linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org,
+	sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+	linux-arch@vger.kernel.org, bpf@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org,
+	dri-devel@lists.freedesktop.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Ivan Kokshaysky <ink@jurassic.park.msu.ru>,
+	Matt Turner <mattst88@gmail.com>,
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
+	Helge Deller <deller@gmx.de>, Andreas Larsson <andreas@gaisler.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	David Ahern <dsahern@kernel.org>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+	Amritha Nambiar <amritha.nambiar@intel.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Alexander Mikhalitsyn <alexander@mihalicyn.com>,
+	Kaiyuan Zhang <kaiyuanz@google.com>,
+	Christian Brauner <brauner@kernel.org>,
+	Simon Horman <horms@kernel.org>,
+	David Howells <dhowells@redhat.com>,
+	Florian Westphal <fw@strlen.de>,
+	Yunsheng Lin <linyunsheng@huawei.com>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>, Jens Axboe <axboe@kernel.dk>,
+	Arseniy Krasnov <avkrasnov@salutedevices.com>,
+	Aleksander Lobakin <aleksander.lobakin@intel.com>,
+	Michael Lass <bevan@bi-co.net>, Jiri Pirko <jiri@resnulli.us>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Richard Gobert <richardbgobert@gmail.com>,
+	Sridhar Samudrala <sridhar.samudrala@intel.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Johannes Berg <johannes.berg@intel.com>,
+	Abel Wu <wuyun.abel@bytedance.com>,
+	Breno Leitao <leitao@debian.org>,
+	Pavel Begunkov <asml.silence@gmail.com>, David Wei <dw@davidwei.uk>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Shailend Chand <shailend@google.com>,
+	Harshitha Ramamurthy <hramamurthy@google.com>,
+	Shakeel Butt <shakeel.butt@linux.dev>,
+	Jeroen de Borst <jeroendb@google.com>,
+	Praveen Kaligineedi <pkaligineedi@google.com>
+Subject: Re: [RFC PATCH net-next v8 02/14] net: page_pool: create hooks for
+ custom page providers
+Message-ID: <ZjH1QaSSQ98mw158@infradead.org>
+References: <20240403002053.2376017-1-almasrymina@google.com>
+ <20240403002053.2376017-3-almasrymina@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: IA1PR12MB6163:EE_|DM4PR12MB9071:EE_
-X-MS-Office365-Filtering-Correlation-Id: 340797cf-a6dc-4e41-67d3-08dc69b3d907
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230031|376005|1800799015|7416005|366007;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?rtAiv6vGr7CQ4g6kVOM5pPOzh3gKt0mMaiAAcM6a7kINtwTzPTJEu+CGUDuN?=
- =?us-ascii?Q?LMoCs9k6CAcbhAylOf8TEAzQMEJcNXuFiSzbvsljZWV2541y57BPCE05x+sC?=
- =?us-ascii?Q?jp+iCkZDJ4uLXUAx0TCictb6ILWPIh8nILiaOGDTruKljifwG1mhPYHrb1BP?=
- =?us-ascii?Q?IiRWg2qwHa0/eJWxIrNicoOWwyTO2tfVG5U+rwjOy3Z8mHkonGjnflKUsSnA?=
- =?us-ascii?Q?/dMkSRnTjH0qMxooIT1Dv392JDGVidXDWWot7GxSG7wXEhn/YIwt2Hv+JbeI?=
- =?us-ascii?Q?cB9ylcORezt2o7p82/3p8tNMUNU+FFFw5NnoasnckDLt5KFvCVIw65VvTFvN?=
- =?us-ascii?Q?QDKPCjst4DMaKlxumabBRSk6yks7rEFP5htmEV53ZIfZpBpEPLrYH1BRAryl?=
- =?us-ascii?Q?70DaXKuM9bUBlxIS9O0DSAajeZE1F1BqyhTto+AE5oSKdbjS025USvHlUdb1?=
- =?us-ascii?Q?QH1KKvqpoV2QaQ1mabOg05E+Y/gjm816yhJqZ1CBJHaZyli9xvNLBp00M8qL?=
- =?us-ascii?Q?WYdoBB8btRkDlAdaOevU2c8i9GSYzIBHbvQjTKmYr+bRp0AMnhZyc+htTNyM?=
- =?us-ascii?Q?8Oy1rxLw9fO/5yGNqBthLE+SV2h7AAd9lAhkWnRtipmsbjMd92Ob4aX4+EbK?=
- =?us-ascii?Q?75vW0yNfXMYCeTRZexGn29dNYsi9kJYY0R+H6qjHOjIu21oGOqaH1riEB443?=
- =?us-ascii?Q?trV5SwqjlK8mpJu6D27LKbmjMUKaoJksNC2CRX7Y1NZIyGPEg+p1CVuiYF5y?=
- =?us-ascii?Q?ZOVS8ppPDbYRaxoW4yUhbtHgiUi5xlIemzmhL8SXw833Ewb+Ag2m4/6HV4ZL?=
- =?us-ascii?Q?bNTDo1LmRIUhp7jxvjdBZqBQJq7+adCa7kbzc3ljDxP2wjzQ+V2u0EY9yB7W?=
- =?us-ascii?Q?voRdv5cb2XvUBHSmA7k136fuzpMeUK8VGIeQILf4WU+gi6jKipjkfUVm2xfc?=
- =?us-ascii?Q?kINr8Iv3KABZnSR0W5cBeEfOLSTk2FnrqGn71J7aKbym1/jxFzyYWVxmYUM2?=
- =?us-ascii?Q?0oM7mlAi8RcEga4USSENDbNtgUnrvAtHI0YM5oCnRYB0CDueGx4ftQb+XVo5?=
- =?us-ascii?Q?qTK6YVyzVUtCR6okHfL9qp8A52Kk+gTBgdps+ozbzn+RrjCqSkP0SgO5UFPf?=
- =?us-ascii?Q?f+3vDnIRwF28b0hatpe6VNsc3kwPLFbOUBgwPZvzZ7Me75EwkpaXgOW72g3O?=
- =?us-ascii?Q?+D6RYCEPjtYjrxKKmCgVz7oyuM09SLFZnNlYJuEAW48PjYLrNqGi7BqlixzD?=
- =?us-ascii?Q?peBuT9VYOgpuKvXG2lgs6rYeV6YZA5b/SV8h7uknaA=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR12MB6163.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(1800799015)(7416005)(366007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?eMQI/qSR3p4GxTjzW457Vyjko9JYJJk8Sffw5A7AsM20iFHweGYis+GtBcuD?=
- =?us-ascii?Q?7klKfW/OvWZlbBJKBpsdhMNzTENFwRqbQh6mUZc31sJfd1VvxNjVXclMIm2X?=
- =?us-ascii?Q?sre53Jdh8tAKmpxL/Uf8aTtA1akVRqp/9rF2yqpND7EcH7yxXrHFprgf2jnl?=
- =?us-ascii?Q?25K+F4NKfW3Tq6x/geOACPVoNeNGvFOzrrn9QgredgdbBvNSJzPDCAwNkNv9?=
- =?us-ascii?Q?jgdIS9OcJKakpPYKwDR+Qy/NANo2/9D00XJymE88i79GZ9JQjqN50zF5lzPO?=
- =?us-ascii?Q?MyM9KtS5BgnW4LrNq59Gpg2Gj3vrHW5v5jYKVnADck72DVSkLAagS5DzrnBI?=
- =?us-ascii?Q?jIxz/bP2XK22oXC2IBukWBezin/woUmZkV9IKQQjtTpWfM/voF9YkOxbRdin?=
- =?us-ascii?Q?elLFT1YqmUAU/jJVBoanjj5xs6fhH692EERTG7pqb2qSs2kfQ7LQkTjlBtWH?=
- =?us-ascii?Q?3OJn9Kl0707C7WVAPyn7fblFF3BLwvQqFoFN6MWYDSXlbIlQs3rbl82JMuNR?=
- =?us-ascii?Q?g/ylT2qWHdDpzKTU3L6fBdm0FLApZVJb9TfGZGvRn3Y7rMQHSBK2/womf0D/?=
- =?us-ascii?Q?CxFd21G4gfV1diLQjZdQlLnm4Q9WLKQnSw0uBlCgpRi0tax4/EZMcNzoCI6C?=
- =?us-ascii?Q?KswZA7HDFmMwpy1OotvlM/f4+9naCm33FXGs29/M/AkmmltHnWb6OrbxoCbS?=
- =?us-ascii?Q?uHkDaK0ivckcmKvQpEz9tBDSaVGP/65UvAvr+mLNvSBYoigSaDLKZBw0CJjt?=
- =?us-ascii?Q?4d+ibwpFpXx9Byq/WI0j6zaeptPS4SuUiVb6s2syrRSOl2EmjsyfDfky6zU9?=
- =?us-ascii?Q?m5AxjYMIJFMZx6S4Z0Q+9W8tp7139726sMsi+WYs2FNz6RE1/yVsIhsGSt4b?=
- =?us-ascii?Q?IG29ai/dolnXmxIwmBCV2/bQr1rq5Foj+i51OQO3ti8dw+EMUfa7c9NAFmxv?=
- =?us-ascii?Q?thh3H220D5fvaS7OSGuzhaqB85d5OwPQvGiUD1/34bzUkPlkS1rHnalz8MT/?=
- =?us-ascii?Q?uxN15ZUW2xj5EyXdhU0ZoFi4q904MHlL1SonJaJk+6e5fpHSgniug4fEbgHL?=
- =?us-ascii?Q?o6GbtG4uhnlCf+LWlt/NUgsOWbHZrTetEnY/9Wujif39xbs+fOSzKijKJ2l0?=
- =?us-ascii?Q?MiLVEN0+uGeHcLiqziP4p+bJFU/LjoHgBmfJahmsO4+c0jPANi8Y4yyAzOps?=
- =?us-ascii?Q?OWUPmLmGatXRg3WUussAWQiXGySUIemN6w1mrz2MQNAF4LT/I4gtEoqqbBFM?=
- =?us-ascii?Q?HEcatW+2ysL6VKqlzZPNH3GouVNb7aSrCv1d3DlJJmuACblF+MmPPDBAxdbp?=
- =?us-ascii?Q?jeIj47dHMB01bJx7N+PxthlEfVouodo5D8+0oC1h4FyhPf7Acewamo45BtR1?=
- =?us-ascii?Q?rlYoFTm8lYMjH7PRMJZwO7rTOS2lUlOEklOGuzqnDP8BbgzvqphfmnooY7r6?=
- =?us-ascii?Q?3PoVqCKMGWMYLPEfcYzM+nogupDL4FTrM8Fkg16LMDu8cDitnsQhWpMqXU6Y?=
- =?us-ascii?Q?LdPBw5riy42ZFB+GIcBVkge2f7SDqWXW8lzTnR2NOyYg5UdiY/ClQRzxFiaS?=
- =?us-ascii?Q?DmECkIxuAP0i+X5ZiXZ4EyVbchL8MiN2pIi5TIJ4?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 340797cf-a6dc-4e41-67d3-08dc69b3d907
-X-MS-Exchange-CrossTenant-AuthSource: CY5PR12MB6179.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 May 2024 07:53:56.0847
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: po0bdkXovr+M9paw/Rvck9eUZkC2niScOSmyvbueoFME5jAEZJ7g2HVvePuZa/C8X7zM6yfY40rSoNu903Hrvw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB9071
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240403002053.2376017-3-almasrymina@google.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Tue, Apr 30, 2024 at 01:03:02PM -0700, Jakub Kicinski wrote:
-> On Tue, 30 Apr 2024 18:11:18 +0000 Danielle Ratson wrote:
-> > > Do we want to blast it to all listeners or treat it as an async reply?
-> > > We can save the seq and portid of the original requester and use reply, I
-> > > think.  
-> > 
-> > I am sorry, I am not sure I understood what you meant here... it
-> > should be an async reply, but not sure I understood your suggestion.
-> > 
-> > Can you explain please?
-> 
-> Make sure you have read the netlink intro, it should help fill in some
-> gaps I won't explicitly cover:
-> https://docs.kernel.org/next/userspace-api/netlink/intro.html
-> 
-> "True" notifications will have pid = 0 and seq = 0, while replies to
-> commands have those fields populated based on the request.
-> 
-> pid identifies the socket where the message should be delivered.
-> ethnl_multicast() assumes that it's zero (since it's designed to work
-> for notifications) and sends the message to all sockets subscribed to 
-> a multicast / notification group (ETHNL_MCGRP_MONITOR).
-> 
-> So that's the background. What you're doing isn't incorrect but I think
-> it'd be better if we didn't use the multicast group here, and sent the
-> messages as a reply - just to the socket which requested the flashing.
-> Still asynchronously, we just need to save the right pid and seq to use.
-> 
-> Two reasons for this:
->  1) convenience, the user space socket won't have to subscribe to 
->     the multicast group
->  2) the multicast group is really intended for notifying about
->     _configuration changes_ done to the system. If there is a daemon
->     listening on that group, there's a very high chance it won't care
->     about progress of the flashing. Maybe we can send a single
->     notification that flashing has been completed but not "progress
->     updates"
-> 
-> I think it should work.
+Still NAK to creating aⅺbitrary hooks here.  This should be a page or
+dmabuf pool and not an indirect call abstraction allowing random
+crap to hook into it.
 
-We can try to use unicast, but the current design is influenced by
-devlink firmware flash (see __devlink_flash_update_notify()) and ethtool
-cable testing (see ethnl_cable_test_started() and
-ethnl_cable_test_finished()), both of which use multicast notifications
-although the latter does not update about progress.
-
-Do you want us to try the unicast approach or be consistent with the
-above examples?
 
