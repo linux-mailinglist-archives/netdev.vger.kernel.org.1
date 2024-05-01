@@ -1,143 +1,122 @@
-Return-Path: <netdev+bounces-92745-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92746-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57A4C8B8893
-	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 12:27:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B1E08B88AC
+	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 12:38:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 94B3CB224B4
-	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 10:27:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 84BD3B22268
+	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 10:38:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AD335337D;
-	Wed,  1 May 2024 10:27:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABF7753E2B;
+	Wed,  1 May 2024 10:38:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KaUl7cuP"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WzRkTH4z"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ua1-f42.google.com (mail-ua1-f42.google.com [209.85.222.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D36752F7A;
-	Wed,  1 May 2024 10:27:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02A9733CD1
+	for <netdev@vger.kernel.org>; Wed,  1 May 2024 10:38:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714559221; cv=none; b=ViuywQm/4NeItE6DMLLWeWn1cQp3G3Xv/15KXCPFN1Ip2dLGzpO1Vt+5/vP3juu0UVMQl4d3Ci/7zUhHbXgh0v68nTG9OOSfOyWgjOoo6JJP7Z6wSb1jEiLkMM465ix7atut/Xqbe45gnjLSdhottN+5Y7zhNT7AkK2KFpSgbVg=
+	t=1714559906; cv=none; b=J4LCt/3oK9QGrm3ciESVSs2fSZ32HaEE3yDl4+0XvbFYUR5CS2Kmxw180Jyx7ueLsZkd+qI2TlHoI5tQyi/U/HDuMzG2WG3iwug36iAlhJ1nfIUK7FJBdrVJMB3e2c/RhWgcbd4P64UJQ/oWZwqjh28hLJ6MPfpeG793ix6DZt4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714559221; c=relaxed/simple;
-	bh=M4wufcTQBXyVeKT46DPsFVpUs/kdB9wcJel9lehVPUU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=anOHr/pzs/+6lT436ejozdjMGRLGDE5IB+qAPRRWP2bKljHAc9/w/zLnwxMJOTAE1mMgj53DYTSDEGwGxYV2WLrQZroedVM7MhgWjjB+uebvVuHcbmK5k61B4PEQgcu36BbvlcUi5k8tf7y7FKkOtwJl8slEXQ7h++oo8njx5mQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KaUl7cuP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 500EFC113CC;
-	Wed,  1 May 2024 10:26:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714559220;
-	bh=M4wufcTQBXyVeKT46DPsFVpUs/kdB9wcJel9lehVPUU=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=KaUl7cuPXOa0P7cu7Ewrh3TZlVWoRKBC+ihhQF4EbrTl4S0aiHnorUI7wzK9GvjaD
-	 cF9TDmsXsl53RByL+NapCcX1lRiHKFnkzKuW7sVeCpXNNd4zvkry5d61MOLy33BMxh
-	 /j18ATO9wKL+7gaVOozdFXln3i4mwg6pmFzhZIIfApURqGDfOebg+oPxOZjFQA4IfB
-	 cEZUzjeNQQeFHAFH68RUaCOppa5ojasPY5zrrKsVHg+9792hlRFIpZthvzQLt+1vaC
-	 yHDD1iYqXjpdIlYTYoS7rwfefkGjoMvE4p+bMO/X2o6NOpxxuh9soOmwMsvGkifdja
-	 2qli/F3KOYosw==
-Message-ID: <8ce66e56-7f41-4f2d-ac10-1328784a51af@kernel.org>
-Date: Wed, 1 May 2024 12:26:52 +0200
+	s=arc-20240116; t=1714559906; c=relaxed/simple;
+	bh=Vm0Nh0YwH2dMlOS72W8akU7dlqKus8e0Xtt0wq2E2jc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=BRFvonrP1QPPWflkAFIUOv3/CF6rmoqzw+ZREuJ9uXl+/1NaBSpuMQLjiGbSZCVcH66yJKmcGCjMNnyqIXi391lwXBkNCa3aBdYsNjAXwvPSHySKOf36ETUS/ohzDVJeRJEsPpBKcPKaktOd8oFZ9TfaD8v+yvTMVDlSURj8ark=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=WzRkTH4z; arc=none smtp.client-ip=209.85.222.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ua1-f42.google.com with SMTP id a1e0cc1a2514c-7f18331b308so514832241.0
+        for <netdev@vger.kernel.org>; Wed, 01 May 2024 03:38:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1714559904; x=1715164704; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=Vm0Nh0YwH2dMlOS72W8akU7dlqKus8e0Xtt0wq2E2jc=;
+        b=WzRkTH4zMcpHW9Lk79IKi+N6vNE/giKFu7o2tmUWr2g0C8zBo/eJb2cxnl55dDgVMJ
+         Z6RafypCQytBQG/uwQ/MS6CNfRUjXlYz+GuZU6dS5sl0vf4XFTgh6t2BpBplQyTQkpuy
+         GrSSKehsOyT/YNijQXtubWUR+NE+u0dkp1IRUsDAkyDZrdeQR4gUsoyVwpPBP7qImIKE
+         aHegSooKPtrUS/v1epdQz78I/9Cp1lCn/DOSd+zI+iXlwCrymQcsDsOSunWy07QEXBbg
+         zZjAXTY1kg+WYBA20lYYSaVCnfFEkbGBIR2BMX9wIzgaLw+6Lwscj7y4Fqo/RwGQsuH6
+         H+dQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714559904; x=1715164704;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Vm0Nh0YwH2dMlOS72W8akU7dlqKus8e0Xtt0wq2E2jc=;
+        b=o+X0NTZXwtD/dhj9XAUEWBnGX/kowQM9yei4jDu8o5lB5R+1Wearu17pQCOGAnZtw9
+         2t89wSJUomhaQStLaxPGlHLHVOxwcO6aI6hTRwmNLa41wXyTIHqCsKNutT/543SGq+TR
+         tPY2v7MWTH6ZqGBv3pkOxNMA1C4VDpRYXgYAMTVp6SEEZGQ8PV8gnobrXnx+01IM1LrI
+         BRpwIZZtC8KoqIYJnbf3Lq0+DYrzikq9Igv7N/KLykdWM/lCnLKWIIhdnfTDinXlsF3U
+         U3AZExlHkp6SMUXXscaQRrNN+8b6imhKp44uxoMk8UEy6gtOQyOADwXAyyf8WhdcJxxp
+         kg2A==
+X-Forwarded-Encrypted: i=1; AJvYcCXUS3Ajl90vVlSgyfhjeHq/NpSudzy4Y7LG1i44pKqagK1eQYt+490wBzL3N1l9V8wK5sqryF6amwn7F8vle8ui8RUvNi2V
+X-Gm-Message-State: AOJu0YyfNI1MoLyn7qTxpxIadoyHr7+Ix0r9M+P0KNspfHfNvCP+9XKk
+	Y1q9o7sCw8oTFf356btvDqaNNc/zKcoZFV4FwpVKykIFbuJawwGmO7QEAC3opnakmH5KdQQTZ7I
+	QlLDyMbsLElbNy7NhrljtwhZ1uclCF9g3lhsKDg==
+X-Google-Smtp-Source: AGHT+IEGNKX8lh7a27bETLjVFTE4scF+aivuBemZA7t4rVdGAWmtak3q31SYiLOpMzcf30IiB9w/UQ4JjVpSVqploDg=
+X-Received: by 2002:a05:6122:2501:b0:4c8:8d45:5325 with SMTP id
+ cl1-20020a056122250100b004c88d455325mr2337396vkb.7.1714559903797; Wed, 01 May
+ 2024 03:38:23 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] dt-bindings: net: ti: icssg_prueth: Add
- documentation for PA_STATS support
-To: MD Danish Anwar <danishanwar@ti.com>, Conor Dooley <conor+dt@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Rob Herring <robh@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
- Eric Dumazet <edumazet@google.com>, "David S. Miller" <davem@davemloft.net>
-Cc: linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
- netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org, srk@ti.com,
- Vignesh Raghavendra <vigneshr@ti.com>, r-gunasekaran@ti.com,
- Roger Quadros <rogerq@kernel.org>
-References: <20240430122403.1562769-1-danishanwar@ti.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 fv0=
-In-Reply-To: <20240430122403.1562769-1-danishanwar@ti.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <2aa1ca0c0a3aa0acc15925c666c777a4b5de553c.1714496886.git.dcaratti@redhat.com>
+ <ZjIY3hkW8dYRPzSI@shredder>
+In-Reply-To: <ZjIY3hkW8dYRPzSI@shredder>
+From: Naresh Kamboju <naresh.kamboju@linaro.org>
+Date: Wed, 1 May 2024 16:08:12 +0530
+Message-ID: <CA+G9fYsZ6ZNxyhkVq=7UV8W3BxOpD7w-_5==ZERN8=my0ij=Tg@mail.gmail.com>
+Subject: Re: [PATCH net-next] net/sched: unregister lockdep keys in
+ qdisc_create/qdisc_alloc error path
+To: Ido Schimmel <idosch@idosch.org>
+Cc: Davide Caratti <dcaratti@redhat.com>, Jamal Hadi Salim <jhs@mojatatu.com>, 
+	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On 30/04/2024 14:24, MD Danish Anwar wrote:
-> Add documentation for ti,pa-stats property which is syscon regmap for
-> PA_STATS register. This will be used to dump statistics maintained by
-> ICSSG firmware.
-> 
-> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
-> ---
->  Documentation/devicetree/bindings/net/ti,icssg-prueth.yaml | 6 ++++++
->  1 file changed, 6 insertions(+)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/ti,icssg-prueth.yaml b/Documentation/devicetree/bindings/net/ti,icssg-prueth.yaml
-> index e253fa786092..abf372f7191b 100644
-> --- a/Documentation/devicetree/bindings/net/ti,icssg-prueth.yaml
-> +++ b/Documentation/devicetree/bindings/net/ti,icssg-prueth.yaml
-> @@ -55,6 +55,11 @@ properties:
->      description:
->        phandle to MII_RT module's syscon regmap
->  
-> +  ti,pa-stats:
-> +    $ref: /schemas/types.yaml#/definitions/phandle
-> +    description:
-> +      phandle to PA_STATS module's syscon regmap
+On Wed, 1 May 2024 at 15:56, Ido Schimmel <idosch@idosch.org> wrote:
+>
+> On Tue, Apr 30, 2024 at 07:11:13PM +0200, Davide Caratti wrote:
+> > Naresh and Eric report several errors (corrupted elements in the dynamic
+> > key hash list), when running tdc.py or syzbot. The error path of
+> > qdisc_alloc() and qdisc_create() frees the qdisc memory, but it forgets
+> > to unregister the lockdep key, thus causing use-after-free like the
+> > following one:
+>
+> [...]
+>
+> > Fix this ensuring that lockdep_unregister_key() is called before the
+> > qdisc struct is freed, also in the error path of qdisc_create() and
+> > qdisc_alloc().
+> >
+> > Fixes: af0cb3fa3f9e ("net/sched: fix false lockdep warning on qdisc root lock")
+> > Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
+> > Closes: https://lore.kernel.org/netdev/20240429221706.1492418-1-naresh.kamboju@linaro.org/
+> > CC: Naresh Kamboju <naresh.kamboju@linaro.org>
+> > CC: Eric Dumazet <edumazet@google.com>
+> > Signed-off-by: Davide Caratti <dcaratti@redhat.com>
+>
+> Reviewed-by: Ido Schimmel <idosch@nvidia.com>
 
-One register needed? Then use phandle-array syntax - see examples.
-Explain in description the purpose of this register in the context of
-*this* device.
+Tested-by: Naresh Kamboju <naresh.kamboju@linaro.org>
 
-Best regards,
-Krzysztof
+I have applied this patch and tested.
 
+>
+> We've also hit the issue on two of our machines running debug kernels. I
+> started a run with the fix on both and will report tomorrow morning (not
+> saying you should wait).
+
+- Naresh
 
