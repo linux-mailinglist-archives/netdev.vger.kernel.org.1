@@ -1,145 +1,162 @@
-Return-Path: <netdev+bounces-92705-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92706-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD5B78B857B
-	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 08:02:00 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id F10E08B857C
+	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 08:03:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 27032B225D1
-	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 06:01:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 873221F21C94
+	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 06:03:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0989F4AEC8;
-	Wed,  1 May 2024 06:01:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VUsJVz66"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A19F14AEFE;
+	Wed,  1 May 2024 06:03:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D6224C602
-	for <netdev@vger.kernel.org>; Wed,  1 May 2024 06:01:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [52.237.72.81])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F7F24AEF0;
+	Wed,  1 May 2024 06:02:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.237.72.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714543297; cv=none; b=UeEtM99NsZr7llELgqiSI53+5Mg0j1jT0SmwHUMs+FF128mln88Mt1BBRQKZSCMx5buzWgzyk0/0hayVYht/f2mlGeENs3h+mpqSTNFC7rRqRnJ9uA+7OqoCJGYF2klimpEM0eWPC/JVhPCHfvMSt0mKqfkR22EVS7Oota/LCGE=
+	t=1714543380; cv=none; b=awL1VTOOi+g/aRKjXjbVMUNzQC3q263O1OjEEzi4BdxQs0IXcUJR312OXtl2UDR2Neq6pCPS5cldVlle3Ydz1qSYzImZdkeOkLKQRDyX1mhFLPN+aamp35Whw+fv15cVR2Lla9e6MTJpBUevl+8Xtix0AhJ1wiJBUQy53DcOx10=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714543297; c=relaxed/simple;
-	bh=826e6puMm6zzTrxffD62gEQ3vdQCaEKJUlUGOq1Xpv4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NDo4lBltxOKQLZL8AHcsZ2KHZZ9GyjukH/GP7EvPxV/yeoxXCvuqQiCNjJsMbME82Lj7WjXDEwBthgzsT/fPUFInpSBvo6TKdDmB6TgTPq4SpVQC+9NtPOR62PTzALYPo62nnxP04LfzilAEUKEsuyYbcqSG+m8ieIlFAtQWTv4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VUsJVz66; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1714543292;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ACs9fP8UeUOFIH6gYeB8LpBxm1NZNbq1XOuqsdPyK04=;
-	b=VUsJVz66FwJd9U+AMSpbgf7Q+vIwK8kqw7qlAzBjnAANtVxiXS20matif/ZbGm7iGQYLGy
-	1e2O0a8Oe521u6Y7XZqyZWzcarmb/xzDDkz9DBTQbbhBo97wBCVxdi+TucOQVXibGECzny
-	327rRWAGO2mUz8bEiE3HGY7hoOJQs/c=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-582-p0PQSjyWPU2ZFADzZDJqFA-1; Wed, 01 May 2024 02:01:29 -0400
-X-MC-Unique: p0PQSjyWPU2ZFADzZDJqFA-1
-Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-a57bf8ae2fcso388272866b.3
-        for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 23:01:27 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714543287; x=1715148087;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ACs9fP8UeUOFIH6gYeB8LpBxm1NZNbq1XOuqsdPyK04=;
-        b=pwI6dPY5+jk5NLy2nTB/ufg2gUrWqmkuRaw4Xa+1eArqWOyOoH35xrWar3vd2GQJzJ
-         REOg0fGzW4KeGxjFrhX9x24mwRWLBi1dmiCYSnAOe1/L90eNpD+sCX29NUfWGy64SP6F
-         sczSbDaLXH8A41nENDUL6i9uAaeXfFgZrNJrSU35YJJEt+rJU85HOAV1nvKSE2GjXOMu
-         09GfGQejEwN56ZoDegzcP1koyh3Efrw6Bi3w9/K0IwXJvggU5rSXNo745emJ4dj3Fgok
-         HG3o7pMI/soNfVjP1V4OWi5LuUniA/aQjB0Ks5zgvtk6j/oZ07/34VLgxGboRTqjm7h4
-         jN8A==
-X-Forwarded-Encrypted: i=1; AJvYcCWYgRtSLKx9WaZTXCBkzfi5Ow7qa0Z6Ky5OPVbzEIGzA+wTzgc9abcstEWtlNLgVbtClAsxC8wlD1wvaItKJEPt1KJczuPX
-X-Gm-Message-State: AOJu0YxjqQjggDRTF7riEAUWa0p2inc4Zcp1soMd/2rsua1CCzzW06uA
-	jGq4tqmHQpXJd1ubLenrHhlzZydtLOVkJmSgjFTDOu0sasAjFCNEiHjqAR9Ab4hhwXLOvTV0OGV
-	resjHBonVDKdOr6fZGfsYg9Xi84K2/DCd565U3+FAqD7y0WlA6f4Pnw==
-X-Received: by 2002:a17:906:e219:b0:a58:f186:192 with SMTP id gf25-20020a170906e21900b00a58f1860192mr1224413ejb.0.1714543286635;
-        Tue, 30 Apr 2024 23:01:26 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHSlMxEoUZ88OBzUnW9OSy6mbDeqVmGiKA+13uWDb7mOt6quE44mzfAWkhW9+s6sFw1/mZ2+A==
-X-Received: by 2002:a17:906:e219:b0:a58:f186:192 with SMTP id gf25-20020a170906e21900b00a58f1860192mr1224363ejb.0.1714543285807;
-        Tue, 30 Apr 2024 23:01:25 -0700 (PDT)
-Received: from redhat.com ([2a0d:6fc7:346:6a42:bb79:449b:3f0b:a228])
-        by smtp.gmail.com with ESMTPSA id e20-20020a170906249400b00a5910978816sm2187459ejb.121.2024.04.30.23.01.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Apr 2024 23:01:25 -0700 (PDT)
-Date: Wed, 1 May 2024 02:01:20 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Hillf Danton <hdanton@sina.com>
-Cc: Mike Christie <michael.christie@oracle.com>,
-	Edward Adam Davis <eadavis@qq.com>,
-	syzbot+98edc2df894917b3431f@syzkaller.appspotmail.com,
-	jasowang@redhat.com, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	syzkaller-bugs@googlegroups.com, virtualization@lists.linux.dev
-Subject: Re: [PATCH next] vhost_task: after freeing vhost_task it should not
- be accessed in vhost_task_fn
-Message-ID: <20240501020057-mutt-send-email-mst@kernel.org>
-References: <b959b82a-510f-45c0-9e06-acf526c2f4a1@oracle.com>
- <20240501001544.1606-1-hdanton@sina.com>
+	s=arc-20240116; t=1714543380; c=relaxed/simple;
+	bh=NsSHWAOnJLPmfESyYmOLz4+6u3ckmWGYVWl6cypFpRA=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=LU44NqzI+swHCwq+KsEvEoIgLSdbplx7CUlgSi9uESLH3V7EAAWXkKfyX8UJbjsMoztSwkUwXKWzJwh9qPQt01QdamngFzc4lEa6hcFYRSjkw9zFmo8W8MNtmo0PIfQi4FqjBy/crqQvVS0q01hFqTgXLFs97PNnydEz+qK+7yI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn; spf=pass smtp.mailfrom=zju.edu.cn; arc=none smtp.client-ip=52.237.72.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
+Received: from ubuntu.localdomain (unknown [221.192.181.32])
+	by mail-app3 (Coremail) with SMTP id cC_KCgAHK+7w2jFmSZ6tAQ--.16749S2;
+	Wed, 01 May 2024 14:02:27 +0800 (CST)
+From: Duoming Zhou <duoming@zju.edu.cn>
+To: linux-hams@vger.kernel.org
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	pabeni@redhat.com,
+	kuba@kernel.org,
+	edumazet@google.com,
+	davem@davemloft.net,
+	jreuter@yaina.de,
+	dan.carpenter@linaro.org,
+	lars@oddbit.com,
+	Duoming Zhou <duoming@zju.edu.cn>
+Subject: [PATCH net] ax25: Fix refcount leak issues of ax25_dev
+Date: Wed,  1 May 2024 14:02:18 +0800
+Message-Id: <20240501060218.32898-1-duoming@zju.edu.cn>
+X-Mailer: git-send-email 2.17.1
+X-CM-TRANSID:cC_KCgAHK+7w2jFmSZ6tAQ--.16749S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxZrWfGF45AFWfCFyDJw47urg_yoW5Ww1rpF
+	WY9F45Ar97Jr1xJr4DG34xWr1UZryjqw4kAry5ZF1Ikw13X3s8Jr18KryUJryUJrWfJF18
+	Xw1DWr4DZF4kuaUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9E14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
+	Y2ka0xkIwI1lc7CjxVAaw2AFwI0_Jw0_GFylc2xSY4AK67AK6r47MxAIw28IcxkI7VAKI4
+	8JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xv
+	wVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjx
+	v20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20E
+	Y4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267
+	AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUjmiiDUUUUU==
+X-CM-SenderInfo: qssqjiasttq6lmxovvfxof0/1tbiAwUHAWYw9x0FNgA7s0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240501001544.1606-1-hdanton@sina.com>
 
-On Wed, May 01, 2024 at 08:15:44AM +0800, Hillf Danton wrote:
-> On Tue, Apr 30, 2024 at 11:23:04AM -0500, Mike Christie wrote:
-> > On 4/30/24 8:05 AM, Edward Adam Davis wrote:
-> > >  static int vhost_task_fn(void *data)
-> > >  {
-> > >  	struct vhost_task *vtsk = data;
-> > > @@ -51,7 +51,7 @@ static int vhost_task_fn(void *data)
-> > >  			schedule();
-> > >  	}
-> > >  
-> > > -	mutex_lock(&vtsk->exit_mutex);
-> > > +	mutex_lock(&exit_mutex);
-> > >  	/*
-> > >  	 * If a vhost_task_stop and SIGKILL race, we can ignore the SIGKILL.
-> > >  	 * When the vhost layer has called vhost_task_stop it's already stopped
-> > > @@ -62,7 +62,7 @@ static int vhost_task_fn(void *data)
-> > >  		vtsk->handle_sigkill(vtsk->data);
-> > >  	}
-> > >  	complete(&vtsk->exited);
-> > > -	mutex_unlock(&vtsk->exit_mutex);
-> > > +	mutex_unlock(&exit_mutex);
-> > >  
-> > 
-> > Edward, thanks for the patch. I think though I just needed to swap the
-> > order of the calls above.
-> > 
-> > Instead of:
-> > 
-> > complete(&vtsk->exited);
-> > mutex_unlock(&vtsk->exit_mutex);
-> > 
-> > it should have been:
-> > 
-> > mutex_unlock(&vtsk->exit_mutex);
-> > complete(&vtsk->exited);
-> 
-> JFYI Edward did it [1]
-> 
-> [1] https://lore.kernel.org/lkml/tencent_546DA49414E876EEBECF2C78D26D242EE50A@qq.com/
+There are two scenarios that might cause refcount leak
+issues of ax25_dev.
 
-and then it failed testing.
+Scenario one:
 
-> > 
-> > If my analysis is correct, then Michael do you want me to resubmit a
-> > patch on top of your vhost branch or resubmit the entire patchset?
+The refcount of ax25_dev potentially increase more
+than once in ax25_addr_ax25dev(), which will cause
+memory leak.
+
+In order to fix the above issue, only increase the
+refcount of ax25_dev once, when the res is not null.
+
+Scenario two:
+
+The original code sets the refcount of ax25_dev to 1
+in the initial stage and then increase the refcount
+when the ax25_dev is added to the ax25_dev_list. As a
+result, the refcount of ax25_dev is 2. But when the
+device is shutting down. The ax25_dev_device_down()
+drops the refcount once or twice depending on if we
+goto unlock_put or not, which will cause memory leak.
+
+In order to mitigate the above issues, only increase
+the refcount of ax25_dev when the ax25_dev is added
+to the ax25_dev_list and decrease the refcount of
+ax25_dev after it is removed from the ax25_dev_list.
+
+What's more, the ax25_dev should not be deallocated
+directly by kfree() in ax25_dev_free(), replace it
+with ax25_dev_put() instead.
+
+Fixes: d01ffb9eee4a ("ax25: add refcount in ax25_dev to avoid UAF bugs")
+Reported by: Dan Carpenter <dan.carpenter@linaro.org>
+Signed-off-by: Duoming Zhou <duoming@zju.edu.cn>
+---
+ net/ax25/ax25_dev.c | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
+
+diff --git a/net/ax25/ax25_dev.c b/net/ax25/ax25_dev.c
+index 282ec581c07..0e6dd98d3fa 100644
+--- a/net/ax25/ax25_dev.c
++++ b/net/ax25/ax25_dev.c
+@@ -37,8 +37,9 @@ ax25_dev *ax25_addr_ax25dev(ax25_address *addr)
+ 	for (ax25_dev = ax25_dev_list; ax25_dev != NULL; ax25_dev = ax25_dev->next)
+ 		if (ax25cmp(addr, (const ax25_address *)ax25_dev->dev->dev_addr) == 0) {
+ 			res = ax25_dev;
+-			ax25_dev_hold(ax25_dev);
+ 		}
++	if (res)
++		ax25_dev_hold(res);
+ 	spin_unlock_bh(&ax25_dev_lock);
+ 
+ 	return res;
+@@ -58,7 +59,6 @@ void ax25_dev_device_up(struct net_device *dev)
+ 		return;
+ 	}
+ 
+-	refcount_set(&ax25_dev->refcount, 1);
+ 	dev->ax25_ptr     = ax25_dev;
+ 	ax25_dev->dev     = dev;
+ 	netdev_hold(dev, &ax25_dev->dev_tracker, GFP_KERNEL);
+@@ -88,7 +88,7 @@ void ax25_dev_device_up(struct net_device *dev)
+ 	ax25_dev->next = ax25_dev_list;
+ 	ax25_dev_list  = ax25_dev;
+ 	spin_unlock_bh(&ax25_dev_lock);
+-	ax25_dev_hold(ax25_dev);
++	refcount_set(&ax25_dev->refcount, 1);
+ 
+ 	ax25_register_dev_sysctl(ax25_dev);
+ }
+@@ -135,7 +135,6 @@ void ax25_dev_device_down(struct net_device *dev)
+ 
+ unlock_put:
+ 	spin_unlock_bh(&ax25_dev_lock);
+-	ax25_dev_put(ax25_dev);
+ 	dev->ax25_ptr = NULL;
+ 	netdev_put(dev, &ax25_dev->dev_tracker);
+ 	ax25_dev_put(ax25_dev);
+@@ -208,7 +207,7 @@ void __exit ax25_dev_free(void)
+ 		s        = ax25_dev;
+ 		netdev_put(ax25_dev->dev, &ax25_dev->dev_tracker);
+ 		ax25_dev = ax25_dev->next;
+-		kfree(s);
++		ax25_dev_put(s);
+ 	}
+ 	ax25_dev_list = NULL;
+ 	spin_unlock_bh(&ax25_dev_lock);
+-- 
+2.17.1
 
 
