@@ -1,107 +1,84 @@
-Return-Path: <netdev+bounces-92782-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92783-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0F458B8D79
-	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 17:48:47 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC99B8B8D86
+	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 17:57:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8719F281A8B
-	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 15:48:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BA383B210FE
+	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 15:57:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98A2F12FF70;
-	Wed,  1 May 2024 15:48:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98DE912FF6B;
+	Wed,  1 May 2024 15:57:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ii/rOyYx"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Teu73MUk"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FC8212FB39
-	for <netdev@vger.kernel.org>; Wed,  1 May 2024 15:48:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B82012FB28;
+	Wed,  1 May 2024 15:57:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714578514; cv=none; b=bLu8HQuVpKtVO4s5qcZLLD+mgbvAdYl1MP8o1EaBVcBFATOa9YMuhNrfi9i5eKGTwByta7D1ADQshDY8mx4O0PfyN+V/EFZzGhBao+hiSDNaweRPQgFJn91bxLPhPickbDfdG/g7yMW2AjK1W67iNFcj7huqscYrLbF5y6xGNQE=
+	t=1714579031; cv=none; b=GvI8s1MUfTiJCBxVgkzVFp78AWffdOKiB7CjYO+ApJwuypHzr2qSIYNUz90yX8BFzz4BjdXytDab7Rbez1b6Id752h6c86SF+L7fZQHUyU/W+lWSgu9VADHjU8+7IVevb2l4sLMFORzeJjjWSuWWy+0576io+ytKun/k7Sho2Yk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714578514; c=relaxed/simple;
-	bh=ep9gRD8mGOXCtjRdooKCCClREdkKGq/7TcmThE40S2k=;
+	s=arc-20240116; t=1714579031; c=relaxed/simple;
+	bh=ckoWfyyPNvCGxi2fVomdJaaX3vET2oCk2vilFXck1oc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HInBbWQCMiMFOF+77pVO/jfHKxyDq1vKHcLUOm/QAyYST026an7CGmLytsp8xYW1tjhXTd7Qn/A1esrQ5HFKOPrXFcei/VHl4gD4SiGkW4JvAReJx/Cs4CpiVRjRjh9x2Ny/NcjSxL9TRJaRtuTZk9Zl9FGF4rHm3LfOtNR7q/0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ii/rOyYx; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1714578512;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9vXPnuPC4TTKf1aPUT/9gMUEiWKzRf5rqJKHhBZKq84=;
-	b=ii/rOyYx/PXPv/8uFsVS8N4KfOoBSyJQD+1xY6oywdabS/RBrh9ngROXqEjLzd41bovZfc
-	7DvOGjJAY86ZqTo8QYygpgZnkdlLS4mzZLs/Ym/+KEXwa1sZCwQ2ydq49ttS5UZG2RSTi6
-	9+k8lK4M4kUG/nk8jPMnTcFZQVPNOhA=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-389-Olba8qnfP6KTEHiuK_4A2w-1; Wed, 01 May 2024 11:48:30 -0400
-X-MC-Unique: Olba8qnfP6KTEHiuK_4A2w-1
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-a5563ef10d4so437327966b.2
-        for <netdev@vger.kernel.org>; Wed, 01 May 2024 08:48:30 -0700 (PDT)
+	 Content-Type:Content-Disposition:In-Reply-To; b=Mve1SLSzeXTPC6pHk5seRXGehaXPv9DGJ2/fKdOkwYfdruv1M3Fa3oEOIKiuA0foLOT+4EjJve6YawkvT8n1voSvtBWkCwWadlpAJvTZ6IJmm2x1cPo1vmpEXR7mXSls/1LVIfTUnb2Li2PE5Saz18yV14LoJojhNxI3NE4IGhI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Teu73MUk; arc=none smtp.client-ip=209.85.216.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-2b370e63d96so79687a91.3;
+        Wed, 01 May 2024 08:57:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1714579029; x=1715183829; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=JzfY/kmW53uOWAjNU/h5BVe0MuVfIdc+r+3hv3BH8NA=;
+        b=Teu73MUkjYaEKcNVW9NY23lU4vyeAKML5RMpZHGJGbl11WFR/s/ItVK+/rVuvX/DM6
+         DfEM6GQHctpsaEbS410C4VpWumWCMCCIWNJ2rNXsdzW4DgY2V8TTR/B5bDHQKAHfVMIi
+         gCTBhO2N2Mqpj3m9Wv2FkOxQIUyBI85PalVwYfaC1Ku/g92Ll0rd5agVvxxUuECha7pd
+         kHkXuWHPcD86RPeyqQLpZ4UyGimJn8iefblg0XCWmIZetTpncELrkPt+AIj+UYnCzOI1
+         4lbeiXIAYhM4X2OlWZO13/q0esvN0Ixrwc6Pb0mmfP5fmg/zxUxI6E9QFHTAjGcPUMG0
+         QODw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714578509; x=1715183309;
+        d=1e100.net; s=20230601; t=1714579029; x=1715183829;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=9vXPnuPC4TTKf1aPUT/9gMUEiWKzRf5rqJKHhBZKq84=;
-        b=iKRG440mQLoSEm2HZE/btLWy81GFFN1p+HkLZHmnFvE9xgFY+mHc0YCOPmj3UVQvO6
-         RLL69arMyYnv6g7Ih514kN5NOl3+XFq/TWjIeq3j0BNBVzPDCfUbT0OvWwwWj4bYJf14
-         Ce6xmMxK6TYTf4UlASyL9j+Ot1UYvrhOy0k5KdLfzW36QNnNKg8SzfM9T2b9SilsnZer
-         /8AncZDWmRNpiJhpdpfEiPHBISo863EbH/QbtCaFzr0wgYXqhBRMW3QM+mkpHUMMyPj+
-         3guOqbkstXRPQQTwwJWZuvtw7+VxwNFZOguZvGeUU7EALU9GAvt5G8WZBG+zi/r/xySe
-         KjKA==
-X-Forwarded-Encrypted: i=1; AJvYcCWtDB5vHpPnwXMShw36XOuhFpmos3xwvy9GpzqSWpSWvENEdKwiR5CxfTEnky2Ge5AKMMl8V5IIOuOFSVf7w70rPs3ZCwiF
-X-Gm-Message-State: AOJu0YxZWERb5PGFtXDaX3p9hrnL66XBToMp+zUYeWNsaVm1bzAWxqn5
-	dHQhO88H21sQSbkODHQ8m7kBxsA2g31Bfx0j5ISVNXVlJAZB02kP/PSc+pXJQdyVuYpgmDxZxM6
-	VxypICE/MElRoNx2AlSfMTooTxXfspk/V1RdP9U63yxyVENej4FN2/A==
-X-Received: by 2002:a17:906:5d2:b0:a58:e4dc:ad99 with SMTP id t18-20020a17090605d200b00a58e4dcad99mr1916532ejt.2.1714578509556;
-        Wed, 01 May 2024 08:48:29 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHPkX5jNP9njQFhCTsNr5Jxg9lBydsGfLtvu6aP6rVyCQCFHRXL0OAvf21MC7R4anBI/wEV3Q==
-X-Received: by 2002:a17:906:5d2:b0:a58:e4dc:ad99 with SMTP id t18-20020a17090605d200b00a58e4dcad99mr1916493ejt.2.1714578508989;
-        Wed, 01 May 2024 08:48:28 -0700 (PDT)
-Received: from redhat.com ([2a0d:6fc7:346:6a42:bb79:449b:3f0b:a228])
-        by smtp.gmail.com with ESMTPSA id i9-20020a170906090900b00a55b05c4598sm12447242ejd.133.2024.05.01.08.48.25
+        bh=JzfY/kmW53uOWAjNU/h5BVe0MuVfIdc+r+3hv3BH8NA=;
+        b=xUveGThBhfwoTKZbCVW6oOq+LLJTQDYex01rGxllUdT1WcxX+QE1uVyzhSn9VlGs19
+         f7ipKuobHN5HKn1UNH9PwhvhN32AC5AXGFgPuK8XSNHABzFQ/hdlXz/hRY5PrOgE8UpV
+         LWHv90HQXDEiwMB29BFmYq1hn3Ybf+1FfDGaOQjQ4L5e3rXGML2BgMY6zkCebNvrkJM7
+         aKMQ6sgKsXtcGs20PqhRRjHRNtzzD3f21R8VCdBDxQvTwdJAcfOtVWjDT5HU1AiPz02a
+         H9E3c9afqZYuSPEPR0JW7xq7yoMvih42M09BgLr2a3Mwe5rxe5T80cmEU6pqpYTpQTMe
+         bkLg==
+X-Forwarded-Encrypted: i=1; AJvYcCUYZqg0799HBlHwYq+fl+ACQJWQzpBoIJOwLGm+rA969SG0mp6RNi/mKddZRs0BHEOcmIejH9Ez9IC0ysWUK1T8Ip7Ptk5qEl2w9IOHuvbRkjRgDHJ/CNwbrxB7UHhclbmOcKnY
+X-Gm-Message-State: AOJu0Yxnig631ozZhXIBlmTEkQJ7c+6St043aX+JHsvrNOknhl4SLZw4
+	0yG06HVFPtseCYqgyrnln5ZZpbMM9bn7HXmgZL/rq4LzCulsB8uX
+X-Google-Smtp-Source: AGHT+IEqUo1eBvHR/WvPzsLh02ckKC0kjNX4dU4g0A0KwEIj4AgPLsyI8oM8EjDjFw9PvnKEhB/wtg==
+X-Received: by 2002:a17:902:db0e:b0:1e7:b7da:842 with SMTP id m14-20020a170902db0e00b001e7b7da0842mr3016504plx.2.1714579029330;
+        Wed, 01 May 2024 08:57:09 -0700 (PDT)
+Received: from visitorckw-System-Product-Name ([140.113.216.168])
+        by smtp.gmail.com with ESMTPSA id h9-20020a170902f54900b001ebd7bdaaffsm5820761plf.288.2024.05.01.08.57.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 May 2024 08:48:28 -0700 (PDT)
-Date: Wed, 1 May 2024 11:48:23 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Heng Qi <hengqi@linux.alibaba.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, kernel test robot <lkp@intel.com>,
-	oe-kbuild-all@lists.linux.dev,
-	"David S . Miller" <davem@davemloft.net>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
-	Jason Wang <jasowang@redhat.com>, Brett Creeley <bcreeley@amd.com>,
-	Ratheesh Kannoth <rkannoth@marvell.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Tal Gilboa <talgi@nvidia.com>, Jonathan Corbet <corbet@lwn.net>,
-	linux-doc@vger.kernel.org,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Paul Greenwalt <paul.greenwalt@intel.com>,
-	Ahmed Zaki <ahmed.zaki@intel.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Kory Maincent <kory.maincent@bootlin.com>,
-	Andrew Lunn <andrew@lunn.ch>, justinstitt@google.com,
-	netdev@vger.kernel.org, virtualization@lists.linux.dev
-Subject: Re: [PATCH net-next v11 2/4] ethtool: provide customized dim profile
- management
-Message-ID: <20240501114754-mutt-send-email-mst@kernel.org>
-References: <20240430173136.15807-1-hengqi@linux.alibaba.com>
- <20240430173136.15807-3-hengqi@linux.alibaba.com>
- <202405011004.Rkw6IrSl-lkp@intel.com>
- <1714538736.2472136-1-hengqi@linux.alibaba.com>
- <20240501074420.1b5e5e69@kernel.org>
- <1714576307.2126026-2-hengqi@linux.alibaba.com>
+        Wed, 01 May 2024 08:57:08 -0700 (PDT)
+Date: Wed, 1 May 2024 23:57:05 +0800
+From: Kuan-Wei Chiu <visitorckw@gmail.com>
+To: Shi-Sheng Yang <fourcolor4c@gmail.com>,
+	Shi-Sheng Yang <james1qaz2wsx12qw@gmail.com>
+Cc: Simon Horman <horms@kernel.org>, matttbe@kernel.org,
+	martineau@kernel.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, geliang@kernel.org,
+	netdev@vger.kernel.org, mptcp@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] mptcp: subflow.c: fix typo
+Message-ID: <ZjJmUcfDioUzX2Gg@visitorckw-System-Product-Name>
+References: <20240429225033.3920874-1-james1qaz2wsx12qw@gmail.com>
+ <20240430180057.GB2575892@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -110,38 +87,52 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1714576307.2126026-2-hengqi@linux.alibaba.com>
+In-Reply-To: <20240430180057.GB2575892@kernel.org>
 
-On Wed, May 01, 2024 at 11:11:47PM +0800, Heng Qi wrote:
-> On Wed, 1 May 2024 07:44:20 -0700, Jakub Kicinski <kuba@kernel.org> wrote:
-> > On Wed, 1 May 2024 12:45:36 +0800 Heng Qi wrote:
-> > > >    net/ethtool/coalesce.c: At top level:  
-> > >  [...]  
-> > > >      446 | static int ethnl_update_profile(struct net_device *dev,
-> > > >          |            ^~~~~~~~~~~~~~~~~~~~  
-> > >  [...]  
-> > > >      151 | static int coalesce_put_profile(struct sk_buff *skb, u16 attr_type,
-> > > >          |            ^~~~~~~~~~~~~~~~~~~~
-> > > >   
-> > > 
-> > > This is a known minor issue, to reduce the use of 'IS_ENABLED(CONFIG_DIMLIB)'
-> > > mentioned in v10. Since the calls of ethnl_update_profile() and
-> > > coalesce_put_profile() will only occur when IS_ENABLED(CONFIG_DIMLIB) returns
-> > > true, the robot's warning can be ignored the code is safe.
-> > > 
-> > > All NIPA test cases running on my local pass successfully on V11.
-> > > 
-> > > Alternatively, I remake the series to have IS_ENABLED(CONFIG_DIMLIB) back,
-> > > up to Kuba (and others). :)
+On Tue, Apr 30, 2024 at 07:00:57PM +0100, Simon Horman wrote:
+> On Tue, Apr 30, 2024 at 06:50:33AM +0800, Shi-Sheng Yang wrote:
+> > Replace 'greceful' with 'graceful'.
 > > 
-> > You should remove the ifdef around the member in struct net_device.
-> > It's too much code complication to save one pointer in the struct.
+> > Signed-off-by: Shi-Sheng Yang <james1qaz2wsx12qw@gmail.com>
 > 
-> Makes sense.
+> Hi Shi-Sheng Yang,
 > 
-> Thanks.
+> Elsewhere in the same file 'earlier' is mispelt as 'eariler'.
+> Could you consider fixing that too?
+> 
+> Better still, could you consider running codespell over
+> net/mptcp/ and fixing (the non false-positives) that it flags?
+> 
+> If you do repost then I think an appropriate prefix
+> would be 'mctp: ' rather than 'mctp: subflow.c ',
+> as this follows the pattern in git history.
+> 
+> And I think the target tree should be net-next.
+> That is, the patch should be based on net-next and
+> it should be designated in the subject.
+> 
+> e.g. Subject: [PATCH v2 net-next] mptcp: fix typos in comments
+> 
+> Lastly, please keep in mind that 24h should elapse
+> before posting a new version.
+> 
+> Link: https://docs.kernel.org/process/maintainer-netdev.html
+> 
+> ...
+>
 
-if you really want to you can add a comment
- /* only used if IS_ENABLED(CONFIG_DIMLIB) */
+Hi Shi-Sheng,
 
+I also noticed that the email you sent and the email from SoB are not
+the same, which causes checkpatch.pl to complain about the following
+warning:
+
+WARNING: From:/Signed-off-by: email address mismatch: 'From: Shi-ShengYang fourcolor4c@gmail.com' != 'Signed-off-by: Shi-Sheng Yang james1qaz2wsx12qw@gmail.com'
+
+total: 0 errors, 1 warning, 0 checks, 8 lines checked
+
+Could you please address this issue in the next version as well?
+
+Regards,
+Kuan-Wei
 
