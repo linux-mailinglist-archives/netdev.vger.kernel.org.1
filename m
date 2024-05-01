@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-92680-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92679-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3C4B8B83FE
-	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 03:40:38 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 146938B83FF
+	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 03:40:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D13F71C2252F
-	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 01:40:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5FB03B21071
+	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 01:40:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EA8F53A9;
-	Wed,  1 May 2024 01:40:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2E404A39;
+	Wed,  1 May 2024 01:40:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VQXX9uTr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cPdA2TD5"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AA934C7D
-	for <netdev@vger.kernel.org>; Wed,  1 May 2024 01:40:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8F114400;
+	Wed,  1 May 2024 01:40:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714527632; cv=none; b=IJ4KgeGaJ/EHZpldxV+puA+LEiHxpPjwdulcuAAK7j/e2AwU/9H3LkINVQuFFmWqd5il2eSdYYQX2IAetIhE2XQJYmNczQ+IaYT2e2U/Qwx13I2UrlKXfxXiWWVf3Qzm3ZhEtKsqFChTfd7PRE0ogrysDd3Uw3XTzVBssVb3tp0=
+	t=1714527631; cv=none; b=VQLgxZLSAsqGgLBtisuu2ZD4Mor6H9Vx0DDNWsaGfGccRS0cEcE9QCfCdaEDcrm206vUgnJu+Or6g/9mvwUrUiEYbWTteWcoK+poz5U29/9ZWIDi1t7tLECOASsYWKWP+RVwpHOGy8IBLcXfCvSPY/tejWwi9GmrBEWMVGSeNoo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714527632; c=relaxed/simple;
-	bh=PGngSpJRnL8fFhEx89ydRpN19uNAXuPv/xMutCyNgOg=;
+	s=arc-20240116; t=1714527631; c=relaxed/simple;
+	bh=ptTyktK7GZ8036WknfUkFHQgCjEBOJqYQcJNwsQO2Qs=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=nHKdCK7lYyz0VSvdmGa+LHS9IJ+psRTQJpFO0gKUBv9gL0fbmSGSDdZegN5Z9Zv4UfcvetaLP3gOFt7JUPXfxCLALEAbGqDBmY112R16QEvGalK0r1lqPcpJv8JTXELLvKqmZGVtqOjYc836jVkTvGwUOwUoRU9JDfRDQL/ME6M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VQXX9uTr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 94C39C4AF19;
+	 In-Reply-To:To:Cc; b=kZyuyeDRL8vN/WU6dX1J4UkBkg8MLTuFZm8iUEgin9M9xAEO45ig+MHjAvLNcxV2w9joOlr7g2/yqJtrLozAqt43dwe++a0eBf9rETqVCkiHw9NYWcga7XFXj91JutJzR9ffxJcI9p3wC3ugtzOJyMdlGlAKILwPVYLEstTgw9Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cPdA2TD5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 87B03C32789;
 	Wed,  1 May 2024 01:40:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1714527631;
-	bh=PGngSpJRnL8fFhEx89ydRpN19uNAXuPv/xMutCyNgOg=;
+	bh=ptTyktK7GZ8036WknfUkFHQgCjEBOJqYQcJNwsQO2Qs=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=VQXX9uTrcS4RqBz2xUimcd11tm9vsqpmGFgJpMJCzZBsVNTNnhtHf42x5d5Q4d63v
-	 Zhy3dpINinjTChpOwOFsKqcPvu9aHkuyapSXFUPnfd9HfWtvyfgECy6gJzLqJ1/DZc
-	 t/6ZlHS9OufhJXd1WEO8faW6MqpDACyYp4t2fTXut21JG6QdhEXFxGd8sIAh+3xSme
-	 6BcIx3a8rXS/IkfDrAoYPbXf8njSpTLR0LiVzSOZkwXrPAfZU+9Yhy3Ax4NEYK1yaB
-	 zO/Qsb7GjBvCZpQS95hmmpUE5mVPiQOqijGQwwjfFJeYRv6+3c5vZZOzNQ8c/y6uCZ
-	 1s+M50aUDD4cQ==
+	b=cPdA2TD5rEfPxQh/uqJAMywR0GOOeMohIEJDl2O+MSNJu8DW2WYcctByxya5HW4YD
+	 R+fFCLq3qcMF1lTeTovMvb3mY2bqZ/T9S2nHf2KqRl5mZJArg5OwTjfAn1tcR/kHZ4
+	 WVhXq51sqbO9v712rwaT/+NM2WLsXMF4w8ecyoA6PnczyzefX3hCS9hcr3nBAZLhD2
+	 xwZ0wQ06lIBAuAIH+WUfl33y+0JrV0F6h7zpGrFbGHvgSuFbxaGcyuRUoQm6JOf5vY
+	 7QpTQ4shWh/alyoZBSHlqaq1td2hoNJCJXOGYtZ7g1fioZaCPnmNTBHDAu0pGxrJ4q
+	 bFzScjCDDgZlA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 7FFF9C43443;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 72818C43616;
 	Wed,  1 May 2024 01:40:31 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,39 +52,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] cxgb4: Properly lock TX queue for the selftest.
+Subject: Re: [PATCH v2] rxrpc: Fix using alignmask being zero for
+ __page_frag_alloc_align()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171452763152.16260.2017250381831802167.git-patchwork-notify@kernel.org>
+ <171452763146.16260.12414739867671113540.git-patchwork-notify@kernel.org>
 Date: Wed, 01 May 2024 01:40:31 +0000
-References: <20240429091147.YWAaal4v@linutronix.de>
-In-Reply-To: <20240429091147.YWAaal4v@linutronix.de>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: netdev@vger.kernel.org, jwyatt@redhat.com, rajur@chelsio.com,
- jlelli@redhat.com, williams@redhat.com, lgoncalv@redhat.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- tglx@linutronix.de
+References: <20240428111640.27306-1-linyunsheng@huawei.com>
+In-Reply-To: <20240428111640.27306-1-linyunsheng@huawei.com>
+To: Yunsheng Lin <linyunsheng@huawei.com>
+Cc: dhowells@redhat.com, marc.dionne@auristor.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ alexander.duyck@gmail.com, linux-afs@lists.infradead.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 29 Apr 2024 11:11:47 +0200 you wrote:
-> The selftest for the driver sends a dummy packet and checks if the
-> packet will be received properly as it should be. The regular TX path
-> and the selftest can use the same network queue so locking is required
-> and was missing in the selftest path. This was addressed in the commit
-> cited below.
-> Unfortunately locking the TX queue requires BH to be disabled which is
-> not the case in selftest path which is invoked in process context.
-> Lockdep should be complaining about this.
+On Sun, 28 Apr 2024 19:16:38 +0800 you wrote:
+> rxrpc_alloc_data_txbuf() may be called with data_align being
+> zero in none_alloc_txbuf() and rxkad_alloc_txbuf(), data_align
+> is supposed to be an order-based alignment value, but zero is
+> not a valid order-based alignment value, and '~(data_align - 1)'
+> doesn't result in a valid mask-based alignment value for
+> __page_frag_alloc_align().
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] cxgb4: Properly lock TX queue for the selftest.
-    https://git.kernel.org/netdev/net/c/9067eccdd784
+  - [v2] rxrpc: Fix using alignmask being zero for __page_frag_alloc_align()
+    https://git.kernel.org/netdev/net/c/9f8eeea1643c
 
 You are awesome, thank you!
 -- 
