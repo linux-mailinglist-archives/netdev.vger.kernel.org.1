@@ -1,527 +1,457 @@
-Return-Path: <netdev+bounces-92731-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92733-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D19E48B879D
-	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 11:25:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 332758B87B5
+	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 11:30:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F32B21C2152A
-	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 09:25:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B62121F212EC
+	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 09:30:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20E7E50A9D;
-	Wed,  1 May 2024 09:25:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F42D52F6F;
+	Wed,  1 May 2024 09:30:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="egLdHRxY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ehO7+oA8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB5204F898;
-	Wed,  1 May 2024 09:25:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 267D9502AC;
+	Wed,  1 May 2024 09:30:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714555508; cv=none; b=M6v8CZNskQ+rBDxu50LgCiRFW5jbsknKoBAQdpm/KSz5nfKMsr798d6F5ymEg7EzdRssss8SZM/SOPEkPT7AAOO1S7PZk4CsfGghVw5fVz+lrYtqvB3wVq7U14aWPQJr6Tj00agZOXWOs2n5dgyd0AjFpCU7vWSURMHTF3QNEDY=
+	t=1714555809; cv=none; b=pigoKpnH5BWB/MdrLdVazV1SAsJ7Sab42FedulYN0zxdBJ8O5GlgKsYB6nePXG7sVBHmj9hXSMzFbzz0M2hoYt5KxKC5czTX0kZ5f9OiTHRrZAHZXrMYFUnjr3zBgtWHy/Q0wX5wEzvOnodqEa2bIA2WJ1aKE4LKUHCFWER7StA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714555508; c=relaxed/simple;
-	bh=4VFbzCFBxWb2PGzLuUg2FvxCGZnk5h713KQ73Rh2Uek=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Q7t67aD9luKwqJ7OeY+BBxdDWrZSpgkssWONwzc4AJQmDy5ataAsyftxpCGnCQC9MdSJHks5VTTkZbmxH7eopVejcbkLCjl8zk4hwFC1IZbz4YZnWx0TgDq3iRwAV71OBqVr2V/5Lhhy7PEKPKkZl47GxdGftUl/vkRPwNxN+7M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=egLdHRxY; arc=none smtp.client-ip=209.85.218.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a5872b74c44so745575566b.3;
-        Wed, 01 May 2024 02:25:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1714555503; x=1715160303; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/4bmK+LvBN8rYiao5qrhdSSk79xwg2CMrJHbC4y4SSI=;
-        b=egLdHRxY0Lmr2RThX7QXObTqWYykxDatawh6yzUIAIInHADYLHTDnM+n6iqRywKRuH
-         XJnVRHklZrqvBDLO1jr/6QR7xRHxPT01cimUH3UMUwq40m4NFeFDQ2A6lcmKChLBbrwn
-         KYVI+50tu3ompiG1vImIz1XczAj3CEfvf10vq62nQh/K0hO6I8b09H9YF3bkvFSNvUCx
-         sW+4PvOx+54sU0WpXomOYW7W4u80tnONQMz0u6zS1CWZJQjRmJP73V/ia5ocWIHZ4sFO
-         bMPo+lMwUBmDJMx/Z2mJlnmgYwCNXk5sn1b6dhnYreR/0Cfx3wCPakTgVy3LEA8oT2l/
-         G8yg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714555503; x=1715160303;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/4bmK+LvBN8rYiao5qrhdSSk79xwg2CMrJHbC4y4SSI=;
-        b=X36l/+Xmg6w5fUMIj6VGCGCDTHXEMgJ7MDjqx1s7u+mgSq+qUU1c+zyDOHdP9QnBYa
-         9M9DGWdc6ro3wy1jt0UkwLiZoUqcZKDdGDu7YkigqJfv8WIYiQGzSxOli2EYGE30XGbm
-         9KvonyS5a5AT/kcmzZWibVVXwgyd0a2Un/Ydifhb5D6R7CtZXt2ldovvp6PQ+1opguRL
-         YGU/7YJtg8Tx3B1ubKhr3m5ljMal179vxRURM2cvgZiqJP6v9yASR4BuBLdvCPeRLTmj
-         a0RY/BcpqnEVvV7UtxI4A/YB2wKayfW/gyP7Wrd/ySNDowIaWehJDVOjZkjqFhJLWHFD
-         WTWA==
-X-Forwarded-Encrypted: i=1; AJvYcCXBh+Td8B63DDweyl7piKZUhO4+KFl93xllEuzcTfdjhByfadf8nADcm79XLF3OC6RxszE2uVswASHN8+ksWj494ocbT5N8VIUQdK9O+CHaGU2/KE3yXjOsaaF9fF/9WSRlhUUC/ZsA
-X-Gm-Message-State: AOJu0YyxuRdvuZHJPlGgNbtDPivQuGsKcEQatJ5d0ahJHyD/9HzELwjb
-	ETRFQOAn3cj05lHmWv0Ehdn3IFE85nc/ubGhNnQlS69A4Tk232Xf
-X-Google-Smtp-Source: AGHT+IEmGWW1NEhnCcHCm2nv4kIkziOnm5cw7jAbT6qEEiMep4qr/6phRX2iPk1iwWlUDffgpbKDQA==
-X-Received: by 2002:a17:906:3a91:b0:a58:e71d:d24 with SMTP id y17-20020a1709063a9100b00a58e71d0d24mr1323327ejd.12.1714555502897;
-        Wed, 01 May 2024 02:25:02 -0700 (PDT)
-Received: from fedora.fritz.box (host-95-248-171-25.retail.telecomitalia.it. [95.248.171.25])
-        by smtp.gmail.com with ESMTPSA id z6-20020a170906434600b00a518c69c4e3sm16023678ejm.23.2024.05.01.02.25.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 May 2024 02:25:02 -0700 (PDT)
-From: Francesco Valla <valla.francesco@gmail.com>
-To: Oliver Hartkopp <socketcan@hartkopp.net>,
-	Marc Kleine-Budde <mkl@pengutronix.de>,
-	linux-can@vger.kernel.org
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Simon Horman <horms@kernel.org>,
-	Bagas Sanjaya <bagasdotme@gmail.com>,
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
-	fabio@redaril.me,
-	Francesco Valla <valla.francesco@gmail.com>
-Subject: [PATCH] Documentation: networking: document ISO 15765-2
-Date: Wed,  1 May 2024 11:24:13 +0200
-Message-ID: <20240501092413.414700-2-valla.francesco@gmail.com>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20240501092413.414700-1-valla.francesco@gmail.com>
-References: <20240501092413.414700-1-valla.francesco@gmail.com>
+	s=arc-20240116; t=1714555809; c=relaxed/simple;
+	bh=U+fp0NCvRQA/VQfDZyEv4EVJJSOhTrhYe3rvwmsw39I=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=GiJBd5BzU0f7aBSb3kgradM43wbIqGqWMqRn0xUIjWMYFMs/+pAxXwxl7qlDqQjCLFLL7+LSF9sX0LU5D5GA/UGOyStomHKPqOuvxj3fxiCX8/u3nlw56tkubmulHk1Te//W1+LDrK56P2DwHW33Asu2qSXSb6gBk3DMdbQGEyA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ehO7+oA8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 93733C4AF14;
+	Wed,  1 May 2024 09:30:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714555808;
+	bh=U+fp0NCvRQA/VQfDZyEv4EVJJSOhTrhYe3rvwmsw39I=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=ehO7+oA8MnpQv3d2J4ICWhiZ9CCsFF7SSQbMX02LcF80fsd77pg0ap1TF81Ov0Iwe
+	 uYTVfC8p3+LmxMdWOlRQrtyyoeDYoRnhFZm5kxLnkS5oqt9zqaYzN4/pAV+lMUjlnr
+	 7yLDX4ubxJnPFEJcWVaQqDu6q61WuM+pdyivcXAbchDmPLxAWrdoB9gqfBFiAidUTP
+	 5Qxl5fa3IAintKxe/MiL0IjxNCNJM7HIKErRu7q/6WaUsJmvLrSz/pn1mrh/QOfw7M
+	 bNhowCOIOmiH9D+OhWkrJjzPWXJks4iC33QMzibU+z7Gd3zvM5/04c+gEN65bedXWs
+	 C+cWGVfQ6ysYA==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A31BC4345F;
+	Wed,  1 May 2024 09:30:08 +0000 (UTC)
+From: Joel Granados via B4 Relay <devnull+j.granados.samsung.com@kernel.org>
+Subject: [PATCH net-next v6 0/8] sysctl: Remove sentinel elements from
+ networking
+Date: Wed, 01 May 2024 11:29:24 +0200
+Message-Id: <20240501-jag-sysctl_remset_net-v6-0-370b702b6b4a@samsung.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAHULMmYC/3XO3WqEMBAF4FdZct0UZ/Kj2au+RylLNKObUrWYV
+ HZZfPdOpVCLeDmcmW/OQySaIiVxPj3ERHNMcRx4sE8n0Vz90JGMgWeBBepCAch338l0T03+uEz
+ UJ8qXgbIMHHrwTgVbC779nKiNt9V9FT8LA92yeOPkGlMep/v6cIY1/7X1gT2DLKT3aGutA7rgX
+ pLv09fQPTdjv5ozbhysjhxkx2DjWh8cl233jvpzNOCRo9gBgKoMoBoE2Dt646A5cjQ7jipsXWX
+ Ksgx7x2wde+QYdkjVgK3lWt7+d5Zl+QZSV2YR5gEAAA==
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Alexander Aring <alex.aring@gmail.com>, 
+ Stefan Schmidt <stefan@datenfreihafen.org>, 
+ Miquel Raynal <miquel.raynal@bootlin.com>, David Ahern <dsahern@kernel.org>, 
+ Steffen Klassert <steffen.klassert@secunet.com>, 
+ Herbert Xu <herbert@gondor.apana.org.au>, 
+ Matthieu Baerts <matttbe@kernel.org>, Mat Martineau <martineau@kernel.org>, 
+ Geliang Tang <geliang@kernel.org>, Ralf Baechle <ralf@linux-mips.org>, 
+ Remi Denis-Courmont <courmisch@gmail.com>, 
+ Allison Henderson <allison.henderson@oracle.com>, 
+ David Howells <dhowells@redhat.com>, Marc Dionne <marc.dionne@auristor.com>, 
+ Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, 
+ Xin Long <lucien.xin@gmail.com>, Wenjia Zhang <wenjia@linux.ibm.com>, 
+ Jan Karcher <jaka@linux.ibm.com>, "D. Wythe" <alibuda@linux.alibaba.com>, 
+ Tony Lu <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>, 
+ Trond Myklebust <trond.myklebust@hammerspace.com>, 
+ Anna Schumaker <anna@kernel.org>, Chuck Lever <chuck.lever@oracle.com>, 
+ Jeff Layton <jlayton@kernel.org>, Neil Brown <neilb@suse.de>, 
+ Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>, 
+ Tom Talpey <tom@talpey.com>, Jon Maloy <jmaloy@redhat.com>, 
+ Ying Xue <ying.xue@windriver.com>, Martin Schiller <ms@dev.tdt.de>, 
+ Pablo Neira Ayuso <pablo@netfilter.org>, 
+ Jozsef Kadlecsik <kadlec@netfilter.org>, Florian Westphal <fw@strlen.de>, 
+ Roopa Prabhu <roopa@nvidia.com>, Nikolay Aleksandrov <razor@blackwall.org>, 
+ Simon Horman <horms@verge.net.au>, Julian Anastasov <ja@ssi.bg>, 
+ Joerg Reuter <jreuter@yaina.de>, Luis Chamberlain <mcgrof@kernel.org>, 
+ Kees Cook <keescook@chromium.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ dccp@vger.kernel.org, linux-wpan@vger.kernel.org, mptcp@lists.linux.dev, 
+ linux-hams@vger.kernel.org, linux-rdma@vger.kernel.org, 
+ rds-devel@oss.oracle.com, linux-afs@lists.infradead.org, 
+ linux-sctp@vger.kernel.org, linux-s390@vger.kernel.org, 
+ linux-nfs@vger.kernel.org, tipc-discussion@lists.sourceforge.net, 
+ linux-x25@vger.kernel.org, netfilter-devel@vger.kernel.org, 
+ coreteam@netfilter.org, bridge@lists.linux.dev, lvs-devel@vger.kernel.org, 
+ Joel Granados <j.granados@samsung.com>
+X-Mailer: b4 0.13-dev-2d940
+X-Developer-Signature: v=1; a=openpgp-sha256; l=16255;
+ i=j.granados@samsung.com; h=from:subject:message-id;
+ bh=Ex95kiaNjDMI8AmLp4Ar2dajO1Rh4yJWTrLmopWKeYk=;
+ b=owJ4nAHtARL+kA0DAAoBupfNUreWQU8ByyZiAGYyC5rzgGzYYniA6SrIUBpx2xHAvTry3olsf
+ Wfn7GEbR7HWxYkBswQAAQoAHRYhBK5HCVcl5jElzssnkLqXzVK3lkFPBQJmMguaAAoJELqXzVK3
+ lkFPsWAMAI9T5jTMI27oz0wvNz1D23W9kQXS2RO6sp3hRRdvDHA4rIQ9AgBHF8ScWGI9tGGPBot
+ D2Y7/mqU1fNhFu2nxlxiDC0KNKDduXrGakmNfdXdCJ7/4mNl07LYOdWl/XSSOp0AJT99mcVbwpb
+ 4P1F9Ot3d81A6NuOijNGkSj0zYNeDQPquGfvZ0Y146myxafru5VE5ygye1d3g3LWdSNEYgGkTZ3
+ xCM05PUlaMLXVKcS01m6FP1RfXD4ycJWPFYhNFa/Mp3qs8JHYkFLoNCtYmfhNcM3CDXqnz1SVoi
+ M+IcqGgbVZrNT+DK69xcb/sDmq+4EWwg5UhH0SNzIXENlfyIZnyJ7bcKnwH/kU09gRuWXib9+I2
+ pvuCPWu9/PHQkiWog8nofDO6I83YQK1ZOTLC3MufkKz53nHtIl9UJF5F2EOakhPImsYmDy1FZ43
+ +b4C6kndWlvvqQZ+pZO+zRr5vUWeGfNUx4wZ3WQmGXuyBJZbUOrJvZ9kV6A5Itjhn1QstdFvmF5
+ 7M=
+X-Developer-Key: i=j.granados@samsung.com; a=openpgp;
+ fpr=F1F8E46D30F0F6C4A45FF4465895FAAC338C6E77
+X-Endpoint-Received: by B4 Relay for j.granados@samsung.com/default with
+ auth_id=70
+X-Original-From: Joel Granados <j.granados@samsung.com>
+Reply-To: j.granados@samsung.com
 
-Document basic concepts, APIs and behaviour of the ISO 15675-2 (ISO-TP)
-CAN stack.
+From: Joel Granados <j.granados@samsung.com>
 
-Signed-off-by: Francesco Valla <valla.francesco@gmail.com>
-Reviewed-by: Bagas Sanjaya <bagasdotme@gmail.com>
-Reviewed-by: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
+What?
+These commits remove the sentinel element (last empty element) from the
+sysctl arrays of all the files under the "net/" directory that register
+a sysctl array. The merging of the preparation patches [4] to mainline
+allows us to just remove sentinel elements without changing behavior.
+This is safe because the sysctl registration code (register_sysctl() and
+friends) use the array size in addition to checking for a sentinel [1].
+
+Why?
+By removing the sysctl sentinel elements we avoid kernel bloat as
+ctl_table arrays get moved out of kernel/sysctl.c into their own
+respective subsystems. This move was started long ago to avoid merge
+conflicts; the sentinel removal bit came after Mathew Wilcox suggested
+it to avoid bloating the kernel by one element as arrays moved out. This
+patchset will reduce the overall build time size of the kernel and run
+time memory bloat by about ~64 bytes per declared ctl_table array (more
+info here [5]).
+
+When are we done?
+There are 4 patchest (25 commits [2]) that are still outstanding to
+completely remove the sentinels: files under "net/" (this patchset),
+files under "kernel/" dir, misc dirs (files under mm/ security/ and
+others) and the final set that removes the unneeded check for ->procname
+== NULL.
+
+Testing:
+* Ran sysctl selftests (./tools/testing/selftests/sysctl/sysctl.sh)
+* Ran this through 0-day with no errors or warnings
+
+Savings in vmlinux:
+  A total of 64 bytes per sentinel is saved after removal; I measured in
+  x86_64 to give an idea of the aggregated savings. The actual savings
+  will depend on individual kernel configuration.
+    * bloat-o-meter
+        - The "yesall" config saves 3976 bytes (bloat-o-meter output [6])
+        - A reduced config [3] saves 1263 bytes (bloat-o-meter output [7])
+
+Savings in allocated memory:
+  None in this set but will occur when the superfluous allocations are
+  removed from proc_sysctl.c. I include it here for context. The
+  estimated savings during boot for config [3] are 6272 bytes. See [8]
+  for how to measure it.
+
+Comments/feedback greatly appreciated
+
+Changes in v6:
+- Rebased onto net-next/main.
+- Besides re-running my cocci scripts, I ran a new find script [9].
+  Found 0 hits in net/
+- Moved "i" variable declaraction out of for() in sysctl_core_net_init
+- Removed forgotten sentinel in mpls_table
+- Removed CONFIG_AX25_DAMA_SLAVE guard from net/ax25/ax25_ds_timer.c. It
+  is not needed because that file is compiled only when
+  CONFIG_AX25_DAMA_SLAVE is set.
+- When traversing smc_table, stop on ARRAY_SIZE instead of ARRAY_SIZE-1.
+- Link to v5: https://lore.kernel.org/r/20240426-jag-sysctl_remset_net-v5-0-e3b12f6111a6@samsung.com
+
+Changes in v5:
+- Added net files with additional variable to my test .config so the
+  typo can be caught next time.
+- Fixed typo tabel_size -> table_size
+- Link to v4: https://lore.kernel.org/r/20240425-jag-sysctl_remset_net-v4-0-9e82f985777d@samsung.com
+
+Changes in v4:
+- Keep reverse xmas tree order when introducing new variables
+- Use a table_size variable to keep the value of ARRAY_SIZE
+- Separated the original "networking: Remove the now superfluous
+  sentinel elements from ctl_table arra" into smaller commits to ease
+  review
+- Merged x.25 and ax.25 commits together.
+- Removed any SOB from the commits that were changed
+- Link to v3: https://lore.kernel.org/r/20240412-jag-sysctl_remset_net-v3-0-11187d13c211@samsung.com
+
+Changes in v3:
+- Reworkded ax.25
+  - Added a BUILD_BUG_ON for the ax.25 commit
+  - Added a CONFIG_AX25_DAMA_SLAVE guard where needed
+- Link to v2: https://lore.kernel.org/r/20240328-jag-sysctl_remset_net-v2-0-52c9fad9a1af@samsung.com
+
+Changes in v2:
+- Rebased to v6.9-rc1
+- Removed unneeded comment from sysctl_net_ax25.c
+- Link to v1: https://lore.kernel.org/r/20240314-jag-sysctl_remset_net-v1-0-aa26b44d29d9@samsung.com
+
+Best
+Joel
+
+[1] https://lore.kernel.org/all/20230809105006.1198165-1-j.granados@samsung.com/
+[2] https://git.kernel.org/pub/scm/linux/kernel/git/joel.granados/linux.git/tag/?h=sysctl_remove_empty_elem_v5
+[3] https://gist.github.com/Joelgranados/feaca7af5537156ca9b73aeaec093171
+[4] https://lore.kernel.org/all/ZO5Yx5JFogGi%2FcBo@bombadil.infradead.org/
+
+[5]
+Links Related to the ctl_table sentinel removal:
+* Good summaries from Luis:
+  https://lore.kernel.org/all/ZO5Yx5JFogGi%2FcBo@bombadil.infradead.org/
+  https://lore.kernel.org/all/ZMFizKFkVxUFtSqa@bombadil.infradead.org/
+* Patches adjusting sysctl register calls:
+  https://lore.kernel.org/all/20230302204612.782387-1-mcgrof@kernel.org/
+  https://lore.kernel.org/all/20230302202826.776286-1-mcgrof@kernel.org/
+* Discussions about expectations and approach
+  https://lore.kernel.org/all/20230321130908.6972-1-frank.li@vivo.com
+  https://lore.kernel.org/all/20220220060626.15885-1-tangmeng@uniontech.com
+
+[6]
+add/remove: 0/1 grow/shrink: 2/67 up/down: 76/-4052 (-3976)
+Function                                     old     new   delta
+llc_sysctl_init                              306     377     +71
+nf_log_net_init                              866     871      +5
+sysctl_core_net_init                         375     366      -9
+lowpan_frags_init_net                        618     598     -20
+ip_vs_control_net_init_sysctl               2446    2422     -24
+sysctl_route_net_init                        521     493     -28
+__addrconf_sysctl_register                   678     650     -28
+xfrm_sysctl_init                             405     374     -31
+mpls_net_init                                367     334     -33
+sctp_sysctl_net_register                     386     346     -40
+__ip_vs_lblcr_init                           546     501     -45
+__ip_vs_lblc_init                            546     501     -45
+neigh_sysctl_register                       1011     958     -53
+mpls_dev_sysctl_register                     475     419     -56
+ipv6_route_sysctl_init                       450     394     -56
+xs_tunables_table                            448     384     -64
+xr_tunables_table                            448     384     -64
+xfrm_table                                   320     256     -64
+xfrm6_policy_table                           128      64     -64
+xfrm4_policy_table                           128      64     -64
+x25_table                                    448     384     -64
+vs_vars                                     1984    1920     -64
+unix_table                                   128      64     -64
+tipc_table                                   448     384     -64
+svcrdma_parm_table                           832     768     -64
+smc_table                                    512     448     -64
+sctp_table                                   256     192     -64
+sctp_net_table                              2304    2240     -64
+rxrpc_sysctl_table                           704     640     -64
+rose_table                                   704     640     -64
+rds_tcp_sysctl_table                         192     128     -64
+rds_sysctl_rds_table                         384     320     -64
+rds_ib_sysctl_table                          384     320     -64
+phonet_table                                 128      64     -64
+nr_table                                     832     768     -64
+nf_log_sysctl_table                          768     704     -64
+nf_log_sysctl_ftable                         128      64     -64
+nf_ct_sysctl_table                          3200    3136     -64
+nf_ct_netfilter_table                        128      64     -64
+nf_ct_frag6_sysctl_table                     256     192     -64
+netns_core_table                             320     256     -64
+net_core_table                              2176    2112     -64
+neigh_sysctl_template                       1416    1352     -64
+mptcp_sysctl_table                           576     512     -64
+mpls_dev_table                               128      64     -64
+lowpan_frags_ns_ctl_table                    256     192     -64
+lowpan_frags_ctl_table                       128      64     -64
+llc_station_table                             64       -     -64
+llc2_timeout_table                           320     256     -64
+ipv6_table_template                         1344    1280     -64
+ipv6_route_table_template                    768     704     -64
+ipv6_rotable                                 320     256     -64
+ipv6_icmp_table_template                     448     384     -64
+ipv4_table                                  1024     960     -64
+ipv4_route_table                             832     768     -64
+ipv4_route_netns_table                       320     256     -64
+ipv4_net_table                              7552    7488     -64
+ip6_frags_ns_ctl_table                       256     192     -64
+ip6_frags_ctl_table                          128      64     -64
+ip4_frags_ns_ctl_table                       320     256     -64
+ip4_frags_ctl_table                          128      64     -64
+devinet_sysctl                              2184    2120     -64
+debug_table                                  384     320     -64
+dccp_default_table                           576     512     -64
+ctl_forward_entry                            128      64     -64
+brnf_table                                   448     384     -64
+ax25_param_table                             960     896     -64
+atalk_table                                  320     256     -64
+addrconf_sysctl                             3904    3840     -64
+vs_vars_table                                256     128    -128
+Total: Before=440631035, After=440627059, chg -0.00%
+
+[7]
+add/remove: 0/0 grow/shrink: 1/22 up/down: 8/-1263 (-1255)
+Function                                     old     new   delta
+sysctl_route_net_init                        189     197      +8
+__addrconf_sysctl_register                   306     294     -12
+ipv6_route_sysctl_init                       201     185     -16
+neigh_sysctl_register                        385     366     -19
+unix_table                                   128      64     -64
+netns_core_table                             256     192     -64
+net_core_table                              1664    1600     -64
+neigh_sysctl_template                       1416    1352     -64
+ipv6_table_template                         1344    1280     -64
+ipv6_route_table_template                    768     704     -64
+ipv6_rotable                                 192     128     -64
+ipv6_icmp_table_template                     448     384     -64
+ipv4_table                                   768     704     -64
+ipv4_route_table                             832     768     -64
+ipv4_route_netns_table                       320     256     -64
+ipv4_net_table                              7040    6976     -64
+ip6_frags_ns_ctl_table                       256     192     -64
+ip6_frags_ctl_table                          128      64     -64
+ip4_frags_ns_ctl_table                       320     256     -64
+ip4_frags_ctl_table                          128      64     -64
+devinet_sysctl                              2184    2120     -64
+ctl_forward_entry                            128      64     -64
+addrconf_sysctl                             3392    3328     -64
+Total: Before=8523801, After=8522546, chg -0.01%
+
+[8]
+To measure the in memory savings apply this on top of this patchset.
+
+"
+diff --git i/fs/proc/proc_sysctl.c w/fs/proc/proc_sysctl.c
+index 37cde0efee57..896c498600e8 100644
+--- i/fs/proc/proc_sysctl.c
++++ w/fs/proc/proc_sysctl.c
+@@ -966,6 +966,7 @@ static struct ctl_dir *new_dir(struct ctl_table_set *set,
+        table[0].procname = new_name;
+        table[0].mode = S_IFDIR|S_IRUGO|S_IXUGO;
+        init_header(&new->header, set->dir.header.root, set, node, table, 1);
++       printk("%ld sysctl saved mem kzalloc\n", sizeof(struct ctl_table));
+
+        return new;
+ }
+@@ -1189,6 +1190,7 @@ static struct ctl_table_header *new_links(struct ctl_dir *dir, s>
+                link_name += len;
+                link++;
+        }
++       printk("%ld sysctl saved mem kzalloc\n", sizeof(struct ctl_table));
+        init_header(links, dir->header.root, dir->header.set, node, link_table,
+                    head->ctl_table_size);
+        links->nreg = nr_entries;
+"
+and then run the following bash script in the kernel:
+
+```
+	accum=0
+	for n in $(dmesg | grep kzalloc | awk '{print $3}') ; do
+	    accum=$(calc "$accum + $n")
+	done
+	echo $accum
+```
+
+[9]
+```
+	#!/usr/bin/gawk -f
+
+	BEGINFILE {
+	  RS=","
+	  has_struct = 0
+	}
+
+	/(static )?(const )?struct ctl_table/ {
+	  has_struct = 1
+	}
+
+	has_struct && /^(\n)?[\t ]*{(\n)*[\t ]*}/ {
+	  print "Filename : " FILENAME ", Record Number : " FNR
+	}
+```
+
+Signed-off-by: Joel Granados <j.granados@samsung.com>
+
+--
+
 ---
- Documentation/networking/index.rst      |   1 +
- Documentation/networking/iso15765-2.rst | 386 ++++++++++++++++++++++++
- MAINTAINERS                             |   1 +
- 3 files changed, 388 insertions(+)
- create mode 100644 Documentation/networking/iso15765-2.rst
+---
+Joel Granados (8):
+      net: Remove the now superfluous sentinel elements from ctl_table array
+      net: ipv{6,4}: Remove the now superfluous sentinel elements from ctl_table array
+      net: rds: Remove the now superfluous sentinel elements from ctl_table array
+      net: sunrpc: Remove the now superfluous sentinel elements from ctl_table array
+      net: Remove ctl_table sentinel elements from several networking subsystems
+      netfilter: Remove the now superfluous sentinel elements from ctl_table array
+      appletalk: Remove the now superfluous sentinel elements from ctl_table array
+      ax.25: x.25: Remove the now superfluous sentinel elements from ctl_table array
 
-diff --git a/Documentation/networking/index.rst b/Documentation/networking/index.rst
-index 473d72c36d61..bbd9bf537793 100644
---- a/Documentation/networking/index.rst
-+++ b/Documentation/networking/index.rst
-@@ -19,6 +19,7 @@ Contents:
-    caif/index
-    ethtool-netlink
-    ieee802154
-+   iso15765-2
-    j1939
-    kapi
-    msg_zerocopy
-diff --git a/Documentation/networking/iso15765-2.rst b/Documentation/networking/iso15765-2.rst
-new file mode 100644
-index 000000000000..0e9d96074178
---- /dev/null
-+++ b/Documentation/networking/iso15765-2.rst
-@@ -0,0 +1,386 @@
-+.. SPDX-License-Identifier: (GPL-2.0 OR BSD-3-Clause)
-+
-+====================
-+ISO 15765-2 (ISO-TP)
-+====================
-+
-+Overview
-+========
-+
-+ISO 15765-2, also known as ISO-TP, is a transport protocol specifically defined
-+for diagnostic communication on CAN. It is widely used in the automotive
-+industry, for example as the transport protocol for UDSonCAN (ISO 14229-3) or
-+emission-related diagnostic services (ISO 15031-5).
-+
-+ISO-TP can be used both on CAN CC (aka Classical CAN) and CAN FD (CAN with
-+Flexible Datarate) based networks. It is also designed to be compatible with a
-+CAN network using SAE J1939 as data link layer (however, this is not a
-+requirement).
-+
-+Specifications used
-+-------------------
-+
-+* ISO 15765-2:2024 : Road vehicles - Diagnostic communication over Controller
-+  Area Network (DoCAN). Part 2: Transport protocol and network layer services.
-+
-+Addressing
-+----------
-+
-+In its simplest form, ISO-TP is based on two kinds of addressing modes for the
-+nodes connected to the same network:
-+
-+* physical addressing is implemented by two node-specific addresses and is used
-+  in 1-to-1 communication.
-+
-+* functional addressing is implemented by one node-specific address and is used
-+  in 1-to-N communication.
-+
-+Three different addressing formats can be employed:
-+
-+* "normal" : each address is represented simply by a CAN ID.
-+
-+* "extended": each address is represented by a CAN ID plus the first byte of
-+  the CAN payload; both the CAN ID and the byte inside the payload shall be
-+  different between two addresses.
-+
-+* "mixed": each address is represented by a CAN ID plus the first byte of
-+  the CAN payload; the CAN ID is different between two addresses, but the
-+  additional byte is the same.
-+
-+Transport protocol and associated frame types
-+---------------------------------------------
-+
-+When transmitting data using the ISO-TP protocol, the payload can either fit
-+inside one single CAN message or not, also considering the overhead the protocol
-+is generating and the optional extended addressing. In the first case, the data
-+is transmitted at once using a so-called Single Frame (SF). In the second case,
-+ISO-TP defines a multi-frame protocol, in which the sender provides (through a
-+First Frame - FF) the PDU length which is to be transmitted and also asks for a
-+Flow Control (FC) frame, which provides the maximum supported size of a macro
-+data block (``blocksize``) and the minimum time between the single CAN messages
-+composing such block (``stmin``). Once this information has been received, the
-+sender starts to send frames containing fragments of the data payload (called
-+Consecutive Frames - CF), stopping after every ``blocksize``-sized block to wait
-+confirmation from the receiver which should then send another Flow Control
-+frame to inform the sender about its availability to receive more data.
-+
-+How to Use ISO-TP
-+=================
-+
-+As with others CAN protocols, the ISO-TP stack support is built into the
-+Linux network subsystem for the CAN bus, aka. Linux-CAN or SocketCAN, and
-+thus follows the same socket API.
-+
-+Creation and basic usage of an ISO-TP socket
-+--------------------------------------------
-+
-+To use the ISO-TP stack, ``#include <linux/can/isotp.h>`` shall be used. A
-+socket can then be created using the ``PF_CAN`` protocol family, the
-+``SOCK_DGRAM`` type (as the underlying protocol is datagram-based by design)
-+and the ``CAN_ISOTP`` protocol:
-+
-+.. code-block:: C
-+
-+    s = socket(PF_CAN, SOCK_DGRAM, CAN_ISOTP);
-+
-+After the socket has been successfully created, ``bind(2)`` shall be called to
-+bind the socket to the desired CAN interface; to do so:
-+
-+* a TX CAN ID shall be specified as part of the sockaddr supplied to the call
-+  itself.
-+
-+* a RX CAN ID shall also be specified, unless broadcast flags have been set
-+  through socket option (explained below).
-+
-+Once bound to an interface, the socket can be read from and written to using
-+the usual ``read(2)`` and ``write(2)`` system calls, as well as ``send(2)``,
-+``sendmsg(2)``, ``recv(2)`` and ``recvmsg(2)``.
-+Unlike the CAN_RAW socket API, only the ISO-TP data field (the actual payload)
-+is sent and received by the userspace application using these calls. The address
-+information and the protocol information are automatically filled by the ISO-TP
-+stack using the configuration supplied during socket creation. In the same way,
-+the stack will use the transport mechanism when required (i.e., when the size
-+of the data payload exceeds the MTU of the underlying CAN bus).
-+
-+The sockaddr structure used for SocketCAN has extensions for use with ISO-TP,
-+as specified below:
-+
-+.. code-block:: C
-+
-+    struct sockaddr_can {
-+        sa_family_t can_family;
-+        int         can_ifindex;
-+        union {
-+            struct { canid_t rx_id, tx_id; } tp;
-+        ...
-+        } can_addr;
-+    }
-+
-+* ``can_family`` and ``can_ifindex`` serve the same purpose as for other
-+  SocketCAN sockets.
-+
-+* ``can_addr.tp.rx_id`` specifies the receive (RX) CAN ID and will be used as
-+  a RX filter.
-+
-+* ``can_addr.tp.tx_id`` specifies the transmit (TX) CAN ID
-+
-+ISO-TP socket options
-+---------------------
-+
-+When creating an ISO-TP socket, reasonable defaults are set. Some options can
-+be modified with ``setsockopt(2)`` and/or read back with ``getsockopt(2)``.
-+
-+General options
-+~~~~~~~~~~~~~~~
-+
-+General socket options can be passed using the ``CAN_ISOTP_OPTS`` optname:
-+
-+.. code-block:: C
-+
-+    struct can_isotp_options opts;
-+    ret = setsockopt(s, SOL_CAN_ISOTP, CAN_ISOTP_OPTS, &opts, sizeof(opts))
-+
-+where the ``can_isotp_options`` structure has the following contents:
-+
-+.. code-block:: C
-+
-+    struct can_isotp_options {
-+        u32 flags;
-+        u32 frame_txtime;
-+        u8  ext_address;
-+        u8  txpad_content;
-+        u8  rxpad_content;
-+        u8  rx_ext_address;
-+    };
-+
-+* ``flags``: modifiers to be applied to the default behaviour of the ISO-TP
-+  stack. Following flags are available:
-+
-+  * ``CAN_ISOTP_LISTEN_MODE``: listen only (do not send FC frames); normally
-+    used as a testing feature.
-+
-+  * ``CAN_ISOTP_EXTEND_ADDR``: use the byte specified in ``ext_address`` as an
-+    additional address component. This enables the "mixed" addressing format if
-+    used alone, or the "extended" addressing format if used in conjunction with
-+    ``CAN_ISOTP_RX_EXT_ADDR``.
-+
-+  * ``CAN_ISOTP_TX_PADDING``: enable padding for transmitted frames, using
-+    ``txpad_content`` as value for the padding bytes.
-+
-+  * ``CAN_ISOTP_RX_PADDING``: enable padding for the received frames, using
-+    ``rxpad_content`` as value for the padding bytes.
-+
-+  * ``CAN_ISOTP_CHK_PAD_LEN``: check for correct padding length on the received
-+    frames.
-+
-+  * ``CAN_ISOTP_CHK_PAD_DATA``: check padding bytes on the received frames
-+    against ``rxpad_content``; if ``CAN_ISOTP_RX_PADDING`` is not specified,
-+    this flag is ignored.
-+
-+  * ``CAN_ISOTP_HALF_DUPLEX``: force ISO-TP socket in half duplex mode
-+    (that is, transport mechanism can only be incoming or outgoing at the same
-+    time, not both).
-+
-+  * ``CAN_ISOTP_FORCE_TXSTMIN``: ignore stmin from received FC; normally
-+    used as a testing feature.
-+
-+  * ``CAN_ISOTP_FORCE_RXSTMIN``: ignore CFs depending on rx stmin; normally
-+    used as a testing feature.
-+
-+  * ``CAN_ISOTP_RX_EXT_ADDR``: use ``rx_ext_address`` instead of ``ext_address``
-+    as extended addressing byte on the reception path. If used in conjunction
-+    with ``CAN_ISOTP_EXTEND_ADDR``, this flag effectively enables the "extended"
-+    addressing format.
-+
-+  * ``CAN_ISOTP_WAIT_TX_DONE``: wait until the frame is sent before returning
-+    from ``write(2)`` and ``send(2)`` calls (i.e., blocking write operations).
-+
-+  * ``CAN_ISOTP_SF_BROADCAST``: use 1-to-N functional addressing (cannot be
-+    specified alongside ``CAN_ISOTP_CF_BROADCAST``).
-+
-+  * ``CAN_ISOTP_CF_BROADCAST``: use 1-to-N transmission without flow control
-+    (cannot be specified alongside ``CAN_ISOTP_SF_BROADCAST``).
-+    NOTE: this is not covered by the ISO 15765-2 standard.
-+
-+  * ``CAN_ISOTP_DYN_FC_PARMS``: enable dynamic update of flow control
-+    parameters.
-+
-+* ``frame_txtime``: frame transmission time (defined as N_As/N_Ar inside the
-+  ISO standard); if ``0``, the default (or the last set value) is used.
-+  To set the transmission time to ``0``, the ``CAN_ISOTP_FRAME_TXTIME_ZERO``
-+  macro (equal to 0xFFFFFFFF) shall be used.
-+
-+* ``ext_address``: extended addressing byte, used if the
-+  ``CAN_ISOTP_EXTEND_ADDR`` flag is specified.
-+
-+* ``txpad_content``: byte used as padding value for transmitted frames.
-+
-+* ``rxpad_content``: byte used as padding value for received frames.
-+
-+* ``rx_ext_address``: extended addressing byte for the reception path, used if
-+  the ``CAN_ISOTP_RX_EXT_ADDR`` flag is specified.
-+
-+Flow Control options
-+~~~~~~~~~~~~~~~~~~~~
-+
-+Flow Control (FC) options can be passed using the ``CAN_ISOTP_RECV_FC`` optname
-+to provide the communication parameters for receiving ISO-TP PDUs.
-+
-+.. code-block:: C
-+
-+    struct can_isotp_fc_options fc_opts;
-+    ret = setsockopt(s, SOL_CAN_ISOTP, CAN_ISOTP_RECV_FC, &fc_opts, sizeof(fc_opts));
-+
-+where the ``can_isotp_fc_options`` structure has the following contents:
-+
-+.. code-block:: C
-+
-+    struct can_isotp_options {
-+        u8 bs;
-+        u8 stmin;
-+        u8 wftmax;
-+    };
-+
-+* ``bs``: blocksize provided in flow control frames.
-+
-+* ``stmin``: minimum separation time provided in flow control frames; can
-+  have the following values (others are reserved):
-+
-+  * 0x00 - 0x7F : 0 - 127 ms
-+
-+  * 0xF1 - 0xF9 : 100 us - 900 us
-+
-+* ``wftmax``: maximum number of wait frames provided in flow control frames.
-+
-+Link Layer options
-+~~~~~~~~~~~~~~~~~~
-+
-+Link Layer (LL) options can be passed using the ``CAN_ISOTP_LL_OPTS`` optname:
-+
-+.. code-block:: C
-+
-+    struct can_isotp_ll_options ll_opts;
-+    ret = setsockopt(s, SOL_CAN_ISOTP, CAN_ISOTP_LL_OPTS, &ll_opts, sizeof(ll_opts));
-+
-+where the ``can_isotp_ll_options`` structure has the following contents:
-+
-+.. code-block:: C
-+
-+    struct can_isotp_ll_options {
-+        u8 mtu;
-+        u8 tx_dl;
-+        u8 tx_flags;
-+    };
-+
-+* ``mtu``: generated and accepted CAN frame type, can be equal to ``CAN_MTU``
-+  for classical CAN frames or ``CANFD_MTU`` for CAN FD frames.
-+
-+* ``tx_dl``: maximum payload length for transmitted frames, can have one value
-+  among: 8, 12, 16, 20, 24, 32, 48, 64. Values above 8 only apply to CAN FD
-+  traffic (i.e.: ``mtu = CANFD_MTU``).
-+
-+* ``tx_flags``: flags set into ``struct canfd_frame.flags`` at frame creation.
-+  Only applies to CAN FD traffic (i.e.: ``mtu = CANFD_MTU``).
-+
-+Transmission stmin
-+~~~~~~~~~~~~~~~~~~
-+
-+The transmission minimum separation time (stmin) can be forced using the
-+``CAN_ISOTP_TX_STMIN`` optname and providing an stmin value in microseconds as
-+a 32bit unsigned integer; this will overwrite the value sent by the receiver in
-+flow control frames:
-+
-+.. code-block:: C
-+
-+    uint32_t stmin;
-+    ret = setsockopt(s, SOL_CAN_ISOTP, CAN_ISOTP_TX_STMIN, &stmin, sizeof(stmin));
-+
-+Reception stmin
-+~~~~~~~~~~~~~~~
-+
-+The reception minimum separation time (stmin) can be forced using the
-+``CAN_ISOTP_RX_STMIN`` optname and providing an stmin value in microseconds as
-+a 32bit unsigned integer; received Consecutive Frames (CF) which timestamps
-+differ less than this value will be ignored:
-+
-+.. code-block:: C
-+
-+    uint32_t stmin;
-+    ret = setsockopt(s, SOL_CAN_ISOTP, CAN_ISOTP_RX_STMIN, &stmin, sizeof(stmin));
-+
-+Multi-frame transport support
-+-----------------------------
-+
-+The ISO-TP stack contained inside the Linux kernel supports the multi-frame
-+transport mechanism defined by the standard, with the following constraints:
-+
-+* the maximum size of a PDU is defined by a module parameter, with an hard
-+  limit imposed at build time.
-+
-+* when a transmission is in progress, subsequent calls to ``write(2)`` will
-+  block, while calls to ``send(2)`` will either block or fail depending on the
-+  presence of the ``MSG_DONTWAIT`` flag.
-+
-+* no support is present for sending "wait frames": whether a PDU can be fully
-+  received or not is decided when the First Frame is received.
-+
-+Errors
-+------
-+
-+Following errors are reported to userspace:
-+
-+RX path errors
-+~~~~~~~~~~~~~~
-+
-+============ ===============================================================
-+-ETIMEDOUT   timeout of data reception
-+-EILSEQ      sequence number mismatch during a multi-frame reception
-+-EBADMSG     data reception with wrong padding
-+============ ===============================================================
-+
-+TX path errors
-+~~~~~~~~~~~~~~
-+
-+========== =================================================================
-+-ECOMM     flow control reception timeout
-+-EMSGSIZE  flow control reception overflow
-+-EBADMSG   flow control reception with wrong layout/padding
-+========== =================================================================
-+
-+Examples
-+========
-+
-+Basic node example
-+------------------
-+
-+Following example implements a node using "normal" physical addressing, with
-+RX ID equal to 0x18DAF142 and a TX ID equal to 0x18DA42F1. All options are left
-+to their default.
-+
-+.. code-block:: C
-+
-+  int s;
-+  struct sockaddr_can addr;
-+  int ret;
-+
-+  s = socket(PF_CAN, SOCK_DGRAM, CAN_ISOTP);
-+  if (s < 0)
-+      exit(1);
-+
-+  addr.can_family = AF_CAN;
-+  addr.can_ifindex = if_nametoindex("can0");
-+  addr.tp.tx_id = 0x18DA42F1 | CAN_EFF_FLAG;
-+  addr.tp.rx_id = 0x18DAF142 | CAN_EFF_FLAG;
-+
-+  ret = bind(s, (struct sockaddr *)&addr, sizeof(addr));
-+  if (ret < 0)
-+      exit(1);
-+
-+  /* Data can now be received using read(s, ...) and sent using write(s, ...) */
-+
-+Additional examples
-+-------------------
-+
-+More complete (and complex) examples can be found inside the ``isotp*`` userland
-+tools, distributed as part of the ``can-utils`` utilities at:
-+https://github.com/linux-can/can-utils
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 62b1a16b791b..e768c4ed349d 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -4695,6 +4695,7 @@ W:	https://github.com/linux-can
- T:	git git://git.kernel.org/pub/scm/linux/kernel/git/mkl/linux-can.git
- T:	git git://git.kernel.org/pub/scm/linux/kernel/git/mkl/linux-can-next.git
- F:	Documentation/networking/can.rst
-+F:	Documentation/networking/iso15765-2.rst
- F:	include/linux/can/can-ml.h
- F:	include/linux/can/core.h
- F:	include/linux/can/skb.h
+ include/net/ax25.h                      |  2 ++
+ net/appletalk/sysctl_net_atalk.c        |  1 -
+ net/ax25/ax25_dev.c                     |  3 +++
+ net/ax25/ax25_ds_timer.c                |  1 +
+ net/ax25/sysctl_net_ax25.c              |  3 +--
+ net/bridge/br_netfilter_hooks.c         |  1 -
+ net/core/neighbour.c                    |  5 +----
+ net/core/sysctl_net_core.c              | 13 ++++++-------
+ net/dccp/sysctl.c                       |  2 --
+ net/ieee802154/6lowpan/reassembly.c     |  6 +-----
+ net/ipv4/devinet.c                      |  5 ++---
+ net/ipv4/ip_fragment.c                  |  2 --
+ net/ipv4/route.c                        |  8 ++------
+ net/ipv4/sysctl_net_ipv4.c              |  7 +++----
+ net/ipv4/xfrm4_policy.c                 |  1 -
+ net/ipv6/addrconf.c                     |  8 +++-----
+ net/ipv6/icmp.c                         |  1 -
+ net/ipv6/netfilter/nf_conntrack_reasm.c |  1 -
+ net/ipv6/reassembly.c                   |  2 --
+ net/ipv6/route.c                        |  5 -----
+ net/ipv6/sysctl_net_ipv6.c              |  8 +++-----
+ net/ipv6/xfrm6_policy.c                 |  1 -
+ net/llc/sysctl_net_llc.c                |  8 ++------
+ net/mpls/af_mpls.c                      | 13 ++++++-------
+ net/mptcp/ctrl.c                        |  1 -
+ net/netfilter/ipvs/ip_vs_ctl.c          |  5 +----
+ net/netfilter/ipvs/ip_vs_lblc.c         |  5 +----
+ net/netfilter/ipvs/ip_vs_lblcr.c        |  5 +----
+ net/netfilter/nf_conntrack_standalone.c |  6 +-----
+ net/netfilter/nf_log.c                  |  3 +--
+ net/netrom/sysctl_net_netrom.c          |  1 -
+ net/phonet/sysctl.c                     |  1 -
+ net/rds/ib_sysctl.c                     |  1 -
+ net/rds/sysctl.c                        |  1 -
+ net/rds/tcp.c                           |  1 -
+ net/rose/sysctl_net_rose.c              |  1 -
+ net/rxrpc/sysctl.c                      |  1 -
+ net/sctp/sysctl.c                       | 10 +++-------
+ net/smc/smc_sysctl.c                    |  6 +++---
+ net/sunrpc/sysctl.c                     |  1 -
+ net/sunrpc/xprtrdma/svc_rdma.c          |  1 -
+ net/sunrpc/xprtrdma/transport.c         |  1 -
+ net/sunrpc/xprtsock.c                   |  1 -
+ net/tipc/sysctl.c                       |  1 -
+ net/unix/sysctl_net_unix.c              |  1 -
+ net/x25/sysctl_net_x25.c                |  1 -
+ net/xfrm/xfrm_sysctl.c                  |  5 +----
+ 47 files changed, 48 insertions(+), 119 deletions(-)
+---
+base-commit: c2e6a872bde9912f1a7579639c5ca3adf1003916
+change-id: 20240311-jag-sysctl_remset_net-d403a1a93d6b
+
+Best regards,
 -- 
-2.44.0
+Joel Granados <j.granados@samsung.com>
+
 
 
