@@ -1,170 +1,77 @@
-Return-Path: <netdev+bounces-92718-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92719-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DDE478B865E
-	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 09:49:16 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C9508B866B
+	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 09:51:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 93B81282C24
-	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 07:49:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7B95AB22888
+	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 07:51:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A49DE4D58A;
-	Wed,  1 May 2024 07:49:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NzocMZC3"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58F744F5EA;
+	Wed,  1 May 2024 07:51:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail114-241.sinamail.sina.com.cn (mail114-241.sinamail.sina.com.cn [218.30.114.241])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E26A94D9EF
-	for <netdev@vger.kernel.org>; Wed,  1 May 2024 07:48:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D8864E1B3
+	for <netdev@vger.kernel.org>; Wed,  1 May 2024 07:50:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=218.30.114.241
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714549741; cv=none; b=sc6wjHJr1zaxTRe3KKdwptMO07aCN1n3xPIyfMRuiDngAq8FcQYOIGqn0fdTaBJF/cliCUUxueckQ3f706j5NG/QDFzokAnDO1mZzVGT4bnwGm9GGw/WTeS3ZJCHKyWas/cgExvcZxwok3FzOlCX/OWX3GY+3blErRtnhZ6uiCs=
+	t=1714549862; cv=none; b=COgK35KRbuz7PxO1bcaa2kVPtJcXIWA0oKYqDRXmDTEbkgwgRGCk97J2SaOrSNSBay4a87LEYxT+dRx4JER6s0L93JbnYLGLJusA6fj9hQGofJzCd74fZcIT6BXAB2HWImELnAKUhE1BJmagbHHLBsKYH7LoaUs/9E4GL49Kv/I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714549741; c=relaxed/simple;
-	bh=cGwK526R503ldDm/CriBnxuRBeqaMR26khdz4eVoYoA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gblzRqUhBvG1ScnQ7m79PC8RRN0xg4v3KwC+9PjVpTnXxcXDQqRGcPrqWT8FEPYwXegtqbhTjNgZ2HjRY+XRZQu4ro5nGY27iUK5q08gfbLB8LJJPU5+Gf+fNi2zEMkp8Kj0xkI3Fx8Qm3b6vpyejOm8rf2jipvsNDYlt5daRoY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NzocMZC3; arc=none smtp.client-ip=209.85.208.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-57225322312so8643154a12.1
-        for <netdev@vger.kernel.org>; Wed, 01 May 2024 00:48:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1714549738; x=1715154538; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=S6caJNuoOcbTF2A8XjASgel2eyoPHbRLJ4yhUwfPsJg=;
-        b=NzocMZC3LreJ+QmatL3XEJtLc8PzGFznZ0sz+0GfTNbScnK/PxRu8ef65Wqi8hYvzB
-         8My69b2QfPtaP6pxCVV8py2hvmq+VmCKDfw9FPmh5YMcY6adIx9yNR3NRr7bkbqi1sqH
-         WPV+jki4lhuqOse9FO0dy4eNEBu1A9TpbhQQQ2sjDBeIDU+z40BZxryqE0P3cb6BSiku
-         RljMJj9ql1TwhirXFqoxtGUyhanUUWqoPjh/PEsrokBH0f8xm6iEeY4JqxmQwHy89/aq
-         U268mnYY8F0dERU4enxZdbnb6Pt984WwXhKu4eMzpxs0RBqGFTopzOxWndrExrwd7yTR
-         Ibdw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714549738; x=1715154538;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=S6caJNuoOcbTF2A8XjASgel2eyoPHbRLJ4yhUwfPsJg=;
-        b=IhaQA/ZyA1V/mPOXtz02+hlgWkZFPRSYsLb1Nrhy7dMWsyWuwMp3UGcaLaDyqb+yBZ
-         zvaeK5p3okVfaEc3uxkAB9C3v52V1rOrt/VcFcsgQIO+zJDv+QPNqSvy5gR13ybfr6mj
-         3PglYRAbC+UpAE7Bpm85Ow4uw4mMyY+JbjcLm8F6PrPQcsOhyyW7tPnFc4pYxDWmLwft
-         1uZUf7O7AcbH3Et3nMPEQTiQhCpTCEzCQ5KR8TaEvKn3E15u9Ljs1FgiKWWSOwF8wEhW
-         eZdIW1bzfMmeTlp4glx7mVqq8X96fc/A3az6CqZPh60Dqnc3HBIHFyv9ikKIfHuQwoR3
-         GLbQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUp2PWNiuHdOeYuRtJ8Svq1+vKcKJzBlODFBlb+hPL/7wx1X85YeQ51GOOcZky+uvdTkmJzH0Joj66qKzVY8aXljgOeRNaN
-X-Gm-Message-State: AOJu0YxECQHIj2Nq2XBF7mj3UcKjbKNDxUIq7LpwsUJautXLEGi35tYe
-	/Lkij5k3O4D9NpKlSAf6XOQioCiNqur1BjRELLbmkDIVEWojAgxWOmdRAX7l6khwG8i2OIeX10x
-	tkd/jBKdivWwKpw6ZGMo+S0aerdH9XihPLPP7
-X-Google-Smtp-Source: AGHT+IGhlKIspORV3UsoMFDJbaiFzOQH7V8xn49DkcxHrG8vlrT1eYyx0WJBZ3CEo2IQKHYAlSXX53YHVqq5Mgwl4Sc=
-X-Received: by 2002:a17:906:52c1:b0:a55:5ddd:e5f6 with SMTP id
- w1-20020a17090652c100b00a555ddde5f6mr1398294ejn.28.1714549737800; Wed, 01 May
- 2024 00:48:57 -0700 (PDT)
+	s=arc-20240116; t=1714549862; c=relaxed/simple;
+	bh=Nvscq/NT9/+j/DykFVg7/tQ7d07STWFJVXZA2SanBcQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=tjbVYXaxPCuk/4DLa5ruhmlcLqe6RCIZsBdiFrFpKMvncnx90vMMWZn0JVspPbp8xfbUemssb82orWFHyYKqeYi/8XgTXJQEzZI7hPoZqk8892QR3qcwDQy5cptjliZ6HbpmLRTFBOCuIQ3CVG+40I91aMQev20e5WWQlliL5LE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sina.com; spf=pass smtp.mailfrom=sina.com; arc=none smtp.client-ip=218.30.114.241
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sina.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
+X-SMAIL-HELO: localhost.localdomain
+Received: from unknown (HELO localhost.localdomain)([116.24.11.115])
+	by sina.com (172.16.235.24) with ESMTP
+	id 6631F45C00003840; Wed, 1 May 2024 15:50:54 +0800 (CST)
+X-Sender: hdanton@sina.com
+X-Auth-ID: hdanton@sina.com
+Authentication-Results: sina.com;
+	 spf=none smtp.mailfrom=hdanton@sina.com;
+	 dkim=none header.i=none;
+	 dmarc=none action=none header.from=hdanton@sina.com
+X-SMAIL-MID: 99969545089450
+X-SMAIL-UIID: 6B92299AF328438ABAD25F19B01E92F2-20240501-155054-1
+From: Hillf Danton <hdanton@sina.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Mike Christie <michael.christie@oracle.com>,
+	Edward Adam Davis <eadavis@qq.com>,
+	syzbot+98edc2df894917b3431f@syzkaller.appspotmail.com,
+	jasowang@redhat.com,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	syzkaller-bugs@googlegroups.com,
+	virtualization@lists.linux.dev
+Subject: Re: [PATCH next] vhost_task: after freeing vhost_task it should not be accessed in vhost_task_fn
+Date: Wed,  1 May 2024 15:50:57 +0800
+Message-Id: <20240501075057.1670-1-hdanton@sina.com>
+In-Reply-To: <20240501020057-mutt-send-email-mst@kernel.org>
+References: <b959b82a-510f-45c0-9e06-acf526c2f4a1@oracle.com> <20240501001544.1606-1-hdanton@sina.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240424165646.1625690-2-dtatulea@nvidia.com> <4ba023709249e11d97c78a98ac7db3b37f419960.camel@nvidia.com>
- <CAHS8izMbAJHatnM6SvsZVLPY+N7LgGJg03pSdNfSRFCufGh9Zg@mail.gmail.com>
- <4c20b500c2ed615aba424c0f3c7a79f5f5a04171.camel@nvidia.com>
- <20240426160557.51de91f9@kernel.org> <c307a3086d255d1dfed22284f500aa9fb70f11a3.camel@nvidia.com>
- <7a5a1d74040052afc8cc6cc5c2700fdf2e836b0c.camel@nvidia.com>
-In-Reply-To: <7a5a1d74040052afc8cc6cc5c2700fdf2e836b0c.camel@nvidia.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Wed, 1 May 2024 00:48:43 -0700
-Message-ID: <CAHS8izOsFqiSiS4Z-E-jfD70aogNp5Bcyt7Rk8xFoR2TcDjz=g@mail.gmail.com>
-Subject: Re: [RFC PATCH] net: Fix one page_pool page leak from skb_frag_unref
-To: Dragos Tatulea <dtatulea@nvidia.com>
-Cc: "kuba@kernel.org" <kuba@kernel.org>, "davem@davemloft.net" <davem@davemloft.net>, 
-	"ilias.apalodimas@linaro.org" <ilias.apalodimas@linaro.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"jacob.e.keller@intel.com" <jacob.e.keller@intel.com>, "pabeni@redhat.com" <pabeni@redhat.com>, 
-	Jianbo Liu <jianbol@nvidia.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"edumazet@google.com" <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Tue, Apr 30, 2024 at 11:20=E2=80=AFPM Dragos Tatulea <dtatulea@nvidia.co=
-m> wrote:
->
-> On Mon, 2024-04-29 at 09:39 +0200, Dragos Tatulea wrote:
-> > On Fri, 2024-04-26 at 16:05 -0700, Jakub Kicinski wrote:
-> > > On Thu, 25 Apr 2024 08:17:28 +0000 Dragos Tatulea wrote:
-> > > > >  The unref path always dropped a regular page
-> > > > > ref, thanks to this commit as you point out:
-> > > > >
-> > > > > https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.gi=
-t/commit/?id=3D2cc3aeb5ecccec0d266813172fcd82b4b5fa5803
-> > > > >
-> > > > > AFAICT the correct fix is to actually revert commit 2cc3aeb5eccc
-> > > > > ("skbuff: Fix a potential race while recycling page_pool packets"=
-).
-> > > > > The reason is that now that skb_frag_ref() can grab page-pool ref=
-s, we
-> > > > > don't need to make sure there is only 1 SKB that triggers the rec=
-ycle
-> > > > > path anymore. All the skb and its clones can obtain page-pool ref=
-s,
-> > > > > and in the unref path we drop the page-pool refs. page_pool_put_p=
-age()
-> > > > > detects correctly that the last page-pool ref is put and recycles=
- the
-> > > > > page only then.
-> > > > >
-> > > > I don't think this is a good way forward. For example, skb->pp_recy=
-cle is used
-> > > > as a hint in skb_gro_receive to avoid coalescing skbs with differen=
-t pp_recycle
-> > > > flag states. This could interfere with that.
-> > >
-> > > That's a bit speculative, right? The simple invariant we are trying t=
-o
-> > > hold is that if skb->pp_recycle && skb_frag_is_pp(skb, i) then the
-> > > reference skb is holding on that frag is a pp reference, not page
-> > > reference.
-> > >
-> > Yes, it was a speculative statement. After re-reading it and the code o=
-f
-> > skb_gro_receive() it makes less sense now.
-> >
-> > Mina's suggestion to revert commit 2cc3aeb5eccc ("skbuff: Fix a potenti=
-al race
-> > while recycling page_pool packets") seems less scary now. I just hope w=
-e don't
-> > bump into too many scenarios similar to the ipsec one...
-> >
-> > > skb_gro_receive() needs to maintain that invariant, if it doesn't
-> > > we need to fix it..
-> > >
-> >
-> Gentle ping. Not sure how to proceed with this:
->
-> 1) Revert commit 2cc3aeb5eccc
-> ("skbuff: Fix a potential race while recycling page_pool packets"). I tes=
-ted
-> this btw and it works (for this specific scenario).
->
-> 2) Revert Mina's commit a580ea994fd3 ("net: mirror skb frag ref/unref hel=
-pers")
-> for now.
->
+On Wed, 1 May 2024 02:01:20 -0400 Michael S. Tsirkin <mst@redhat.com>
+> 
+> and then it failed testing.
+> 
+So did my patch [1] but then the reason was spotted [2,3]
 
-I vote for #1, and IIUC Jakub's feedback, he seems to prefer this as
-well. If we continue to run into edge cases after the revert of #1, I
-think we may want to do #2 and I can look to reland it with the kunit
-tests that Jakub suggested that reproduce these edge cases.
-
-I can upload #1 in the morning if there are no objections. I don't see
-any regressions with #1 but I was never able to repo this issue.
-
---=20
-Thanks,
-Mina
+[1] https://lore.kernel.org/lkml/20240430110209.4310-1-hdanton@sina.com/
+[2] https://lore.kernel.org/lkml/20240430225005.4368-1-hdanton@sina.com/
+[3] https://lore.kernel.org/lkml/000000000000a7f8470617589ff2@google.com/
 
