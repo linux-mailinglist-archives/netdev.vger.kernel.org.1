@@ -1,180 +1,251 @@
-Return-Path: <netdev+bounces-92801-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92804-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 215CF8B8E8A
-	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 18:52:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 557F18B8E9A
+	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 18:56:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8B1461F21932
-	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 16:52:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 789561C21D73
+	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 16:56:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4716EF9FE;
-	Wed,  1 May 2024 16:52:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="FX2Fsw+1"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B16E14A81;
+	Wed,  1 May 2024 16:56:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A1C78F6D
-	for <netdev@vger.kernel.org>; Wed,  1 May 2024 16:52:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=72.21.196.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49591168BD;
+	Wed,  1 May 2024 16:56:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714582372; cv=none; b=ucEoUGuHWphZX8v8k6RxnWNrcaYfsMjNnyBR325K91uENdz0Owtjb08I9Rk2QF0ZNLxFvcH0f+2OFC/ZqD18J2xod6eMdnIQomJCuZ1pUmiTHEn3lupZEsiAGDLqxUaD7CjV1LShKAoc8NoR9rNEw6jrgl0Tjpf6uywWKapTIys=
+	t=1714582568; cv=none; b=lRnzSlGEXzYFBXUAVarqV2yhRApp3CktdYSxASDIYXfDtRYBvDhFk82DgIWpH9CCPffJYAEIzBqrq4WbcHgOa205kXidW763v/Tq9myyp4nAHS+L5uAZaLYiwWHBzylUN2XVYvEpLmesnSB0OkOsE+xAq1CFgPr8HIaPhlwdi3s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714582372; c=relaxed/simple;
-	bh=S04fZjyneDJce/2QZdg8QeuAR4tA/wdhOqS5LeslyEU=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jjZM9LMYk6UNmLirhptFZUoFWTywRrXvaT9N2s3BRvp5sUpZFpTV1yUeTbQUbvqARQyFyTf7eqYYWZ0fpL6Vc0WB6FkXJmD/ulVXohAtN2Hx1yoOcdXDeqk20ISKGtKrQSBoxwBpTTwQKpDvLYJxwDbyWU5yq97qLohVML3Y5HA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=FX2Fsw+1; arc=none smtp.client-ip=72.21.196.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1714582371; x=1746118371;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=6B4prwjx9+Bb4U+zZEM1sbVLh5fbXznfDQsi0glBveA=;
-  b=FX2Fsw+1tszTbTixIa4goikEG87ZpIH6n9Ix/TZjr3CbSJMlqdVD+/lL
-   lfYc8bWyT8clI4XFXQspYrmxPGk5qgNVNfXd1TxYin8Agp5IHrHFdUNuG
-   nvKCkyOMuBGtgL7aBi59ecYxaytl7QVzoiRr6qhJxMM5vhNB7+fYNARTV
-   8=;
-X-IronPort-AV: E=Sophos;i="6.07,245,1708387200"; 
-   d="scan'208";a="398413857"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 May 2024 16:52:47 +0000
-Received: from EX19MTAUWB002.ant.amazon.com [10.0.21.151:3609]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.35.127:2525] with esmtp (Farcaster)
- id 509c11da-c8ab-4bee-8d34-b6798d150786; Wed, 1 May 2024 16:52:46 +0000 (UTC)
-X-Farcaster-Flow-ID: 509c11da-c8ab-4bee-8d34-b6798d150786
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Wed, 1 May 2024 16:52:44 +0000
-Received: from 88665a182662.ant.amazon.com (10.106.101.44) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.28;
- Wed, 1 May 2024 16:52:42 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <edumazet@google.com>
-CC: <anderson@allelesecurity.com>, <kuniyu@amazon.com>,
-	<netdev@vger.kernel.org>
-Subject: Re: use-after-free warnings in tcp_v4_connect() due to inet_twsk_hashdance() inserting the object into ehash table without initializing its reference counter
-Date: Wed, 1 May 2024 09:52:33 -0700
-Message-ID: <20240501165233.24657-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <CANn89iJk5RJR=ex6t3-hzpo=08_+RMQJD5NL3-RzTyK_FutAMQ@mail.gmail.com>
-References: <CANn89iJk5RJR=ex6t3-hzpo=08_+RMQJD5NL3-RzTyK_FutAMQ@mail.gmail.com>
+	s=arc-20240116; t=1714582568; c=relaxed/simple;
+	bh=TcDzC1URqfIGLzJLPDLTzwckLUr9NbwS3Ma6ukNQrZY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kIEIG7G4vgMk0xr7k30lt2IoqX7+m+xFgDOApSRuxPvEeKe2/MZ3J3uyfSkd8iA9zaJOUn0D8uMaPtGyUGKQ6PHbNBlopbj8vw1Rg18Cxo8PsLVPk8F794WUI2dhp0ajh09biTKUlgKx83P/HxIit+5aEiItCdXkv7dKNcPuD+o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-56e56ee8d5cso8981039a12.2;
+        Wed, 01 May 2024 09:56:06 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714582564; x=1715187364;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=SZyGPQjH8Nh0r2HrUHxBLid/Ouu1r0VmzmfrZnEPyNs=;
+        b=R8o6HvZCcCP2SyIJF4k6fpRr1tlsoP+AhXrIeupjmRFZbnOx7tZqQtNWME6TXoTEsg
+         6MS5wnaJfJbMsEFg/X2pQVwvwPGXjSsptHWXDq7cGxtuPV4kvtU+7l6zRGMLT1Ny7lQu
+         1wBkjJyQNq9YkjA45vUoG4aPd5z0FHAeSjQMTFfTuMGaFhYsFx033KJhWjrdaRVwWbyy
+         cz4FTz4ckHEBjxQTwjy39U1YdSjwb91ESB50c3xq7Vb9qWDD6c7qakp7bO2zePvPq9zo
+         peNyuQOlHv9z6oIcFvCvn/Csrlx93X8pXp8LGyOBfGRl3okFQH92eovrXDqmj9lKypPF
+         LFlg==
+X-Forwarded-Encrypted: i=1; AJvYcCXJ/c6EP+1kPDhotGI+1t/7fKAqi3pu88Q5SxrFyD+kMq51G82PV4BCTvcevVm7c2dzIrGcvJawDQvbVpOyR5o5Da7/rYrWJNicwA9F5dT66vxEQ5FNILn/VasLn/VIwv8kT+T8gRIZmviHgsg=
+X-Gm-Message-State: AOJu0YytyKgzXDngrZpJRTTlWjx/nJ8P83OZfzzq0PBzXubTt4jaRhEq
+	9qCZVw70B3KP/m3oeB+jgiNy8xGj77PImYpCYs+D3pcVnNa4dTzn
+X-Google-Smtp-Source: AGHT+IFiNeAXFLvqrJqj/JpJnaQ1VuTj5HIQczid62EJDQa/xpeqnynka7fbVfl2mZvp0wxYEEevxA==
+X-Received: by 2002:a50:8adb:0:b0:572:42ac:9b19 with SMTP id k27-20020a508adb000000b0057242ac9b19mr2532186edk.0.1714582564313;
+        Wed, 01 May 2024 09:56:04 -0700 (PDT)
+Received: from localhost (fwdproxy-lla-005.fbsv.net. [2a03:2880:30ff:5::face:b00c])
+        by smtp.gmail.com with ESMTPSA id 15-20020a508e0f000000b005726e5e8765sm5205429edw.3.2024.05.01.09.56.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 01 May 2024 09:56:03 -0700 (PDT)
+From: Breno Leitao <leitao@debian.org>
+To: Miri Korenblit <miriam.rachel.korenblit@intel.com>,
+	Kalle Valo <kvalo@kernel.org>
+Cc: netdev@vger.kernel.org,
+	Kees Cook <keescook@chromium.org>,
+	Johannes Berg <johannes.berg@intel.com>,
+	Gregory Greenman <gregory.greenman@intel.com>,
+	Alon Giladi <alon.giladi@intel.com>,
+	Emmanuel Grumbach <emmanuel.grumbach@intel.com>,
+	Anjaneyulu <pagadala.yesu.anjaneyulu@intel.com>,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	Avraham Stern <avraham.stern@intel.com>,
+	linux-wireless@vger.kernel.org (open list:INTEL WIRELESS WIFI LINK (iwlwifi)),
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH wireless-next v2] wifi: iwlwifi: pcie: allocate dummy net_device dynamically
+Date: Wed,  1 May 2024 09:54:04 -0700
+Message-ID: <20240501165417.3406039-1-leitao@debian.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: EX19D036UWB001.ant.amazon.com (10.13.139.133) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 1 May 2024 08:56:51 +0200
-> On Wed, May 1, 2024 at 2:22 AM Kuniyuki Iwashima <kuniyu@amazon.com> wrote:
-> >
-> > +cc Eric
-> >
-> > From: Anderson Nascimento <anderson@allelesecurity.com>
-> > Date: Tue, 30 Apr 2024 19:00:34 -0300
-> > > Hello,
-> >
-> > Hi,
-> >
-> > Thanks for the detailed report.
-> >
-> > >
-> > > There is a bug in inet_twsk_hashdance(). This function inserts a
-> > > time-wait socket in the established hash table without initializing the
-> > > object's reference counter, as seen below. The reference counter
-> > > initialization is done after the object is added to the established hash
-> > > table and the lock is released. Because of this, a sock_hold() in
-> > > tcp_twsk_unique() and other operations on the object trigger warnings
-> > > from the reference counter saturation mechanism. The warnings can also
-> > > be seen below. They were triggered on Fedora 39 Linux kernel v6.8.
-> > >
-> > > The bug is triggered via a connect() system call on a TCP socket,
-> > > reaching __inet_check_established() and then passing the time-wait
-> > > socket to tcp_twsk_unique(). Other operations are also performed on the
-> > > time-wait socket in __inet_check_established() before its reference
-> > > counter is initialized correctly by inet_twsk_hashdance(). The fix seems
-> > > to be to move the reference counter initialization inside the lock,
-> >
-> > or use refcount_inc_not_zero() and give up on reusing the port
-> > under the race ?
-> >
-> > ---8<---
-> > diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-> > index 0427deca3e0e..637f4965326d 100644
-> > --- a/net/ipv4/tcp_ipv4.c
-> > +++ b/net/ipv4/tcp_ipv4.c
-> > @@ -175,8 +175,13 @@ int tcp_twsk_unique(struct sock *sk, struct sock *sktw, void *twp)
-> >                         tp->rx_opt.ts_recent       = tcptw->tw_ts_recent;
-> >                         tp->rx_opt.ts_recent_stamp = tcptw->tw_ts_recent_stamp;
-> >                 }
-> > -               sock_hold(sktw);
-> > -               return 1;
-> > +
-> > +               /* Here, sk_refcnt could be 0 because inet_twsk_hashdance() puts
-> > +                * twsk into ehash and releases the bucket lock *before* setting
-> > +                * sk_refcnt.  Then, give up on reusing the port.
-> > +                */
-> > +               if (likely(refcount_inc_not_zero(&sktw->sk_refcnt)))
-> > +                       return 1;
-> >         }
-> >
-> 
-> Thanks for CC me.
-> 
-> Nice analysis from Anderson ! Have you found this with a fuzzer ?
-> 
-> This patch would avoid the refcount splat, but would leave side
-> effects on tp, I am too lazy to double check them.
+struct net_device shouldn't be embedded into any structure, instead,
+the owner should use the priv space to embed their state into net_device.
 
-Ah exactly :)
+Embedding net_device into structures prohibits the usage of flexible
+arrays in the net_device structure. For more details, see the discussion
+at [1].
 
-> 
-> Incidentally, I think we have to annotate data-races on
-> tcptw->tw_ts_recent and  tcptw->tw_ts_recent_stamp
-> 
-> Perhaps something like this instead ?
+Un-embed the net_device from struct iwl_trans_pcie by converting it
+into a pointer. Then use the leverage alloc_netdev() to allocate the
+net_device object at iwl_trans_pcie_alloc.
 
-This looks good to me.
+The private data of net_device becomes a pointer for the struct
+iwl_trans_pcie, so, it is easy to get back to the iwl_trans_pcie parent
+given the net_device object.
 
-> 
-> diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-> index 0427deca3e0eb9239558aa124a41a1525df62a04..f1e3707d0b33180a270e6d3662d4cf17a4f72bb8
-> 100644
-> --- a/net/ipv4/tcp_ipv4.c
-> +++ b/net/ipv4/tcp_ipv4.c
-> @@ -155,6 +155,10 @@ int tcp_twsk_unique(struct sock *sk, struct sock
-> *sktw, void *twp)
->         if (tcptw->tw_ts_recent_stamp &&
->             (!twp || (reuse && time_after32(ktime_get_seconds(),
->                                             tcptw->tw_ts_recent_stamp)))) {
-> +
-> +               if (!refcount_inc_not_zero(&sktw->sk_refcnt))
-> +                       return 0;
-> +
->                 /* In case of repair and re-using TIME-WAIT sockets we still
->                  * want to be sure that it is safe as above but honor the
->                  * sequence numbers and time stamps set as part of the repair
-> @@ -175,7 +179,6 @@ int tcp_twsk_unique(struct sock *sk, struct sock
-> *sktw, void *twp)
->                         tp->rx_opt.ts_recent       = tcptw->tw_ts_recent;
->                         tp->rx_opt.ts_recent_stamp = tcptw->tw_ts_recent_stamp;
->                 }
-> -               sock_hold(sktw);
->                 return 1;
->         }
-> 
+[1] https://lore.kernel.org/all/20240229225910.79e224cf@kernel.org/
+
+Reviewed-by: Kees Cook <keescook@chromium.org>
+Signed-off-by: Breno Leitao <leitao@debian.org>
+---
+Changelog:
+
+v2:
+ * replaced the alloc_netdev() with the proper dummy allocator
+   alloc_netdev_dummy().
+
+v1:
+ * https://lore.kernel.org/all/20240307174843.1719130-1-leitao@debian.org/
+
+---
+ .../wireless/intel/iwlwifi/pcie/internal.h    |  2 +-
+ drivers/net/wireless/intel/iwlwifi/pcie/rx.c  | 11 +++++---
+ .../net/wireless/intel/iwlwifi/pcie/trans.c   | 27 ++++++++++++-------
+ 3 files changed, 27 insertions(+), 13 deletions(-)
+
+
+PS: This is compiled-tested only due to lack of hardware.
+
+diff --git a/drivers/net/wireless/intel/iwlwifi/pcie/internal.h b/drivers/net/wireless/intel/iwlwifi/pcie/internal.h
+index 7805a42948af..a7eebe400b5b 100644
+--- a/drivers/net/wireless/intel/iwlwifi/pcie/internal.h
++++ b/drivers/net/wireless/intel/iwlwifi/pcie/internal.h
+@@ -386,7 +386,7 @@ struct iwl_trans_pcie {
+ 	dma_addr_t iml_dma_addr;
+ 	struct iwl_trans *trans;
+ 
+-	struct net_device napi_dev;
++	struct net_device *napi_dev;
+ 
+ 	/* INT ICT Table */
+ 	__le32 *ict_tbl;
+diff --git a/drivers/net/wireless/intel/iwlwifi/pcie/rx.c b/drivers/net/wireless/intel/iwlwifi/pcie/rx.c
+index 9c2461ba13c5..984d7bcd381f 100644
+--- a/drivers/net/wireless/intel/iwlwifi/pcie/rx.c
++++ b/drivers/net/wireless/intel/iwlwifi/pcie/rx.c
+@@ -1000,6 +1000,11 @@ void iwl_pcie_rx_init_rxb_lists(struct iwl_rxq *rxq)
+ 
+ static int iwl_pcie_rx_handle(struct iwl_trans *trans, int queue, int budget);
+ 
++static inline struct iwl_trans_pcie *iwl_netdev_to_trans_pcie(struct net_device *dev)
++{
++	return *(struct iwl_trans_pcie **)netdev_priv(dev);
++}
++
+ static int iwl_pcie_napi_poll(struct napi_struct *napi, int budget)
+ {
+ 	struct iwl_rxq *rxq = container_of(napi, struct iwl_rxq, napi);
+@@ -1007,7 +1012,7 @@ static int iwl_pcie_napi_poll(struct napi_struct *napi, int budget)
+ 	struct iwl_trans *trans;
+ 	int ret;
+ 
+-	trans_pcie = container_of(napi->dev, struct iwl_trans_pcie, napi_dev);
++	trans_pcie = iwl_netdev_to_trans_pcie(napi->dev);
+ 	trans = trans_pcie->trans;
+ 
+ 	ret = iwl_pcie_rx_handle(trans, rxq->id, budget);
+@@ -1034,7 +1039,7 @@ static int iwl_pcie_napi_poll_msix(struct napi_struct *napi, int budget)
+ 	struct iwl_trans *trans;
+ 	int ret;
+ 
+-	trans_pcie = container_of(napi->dev, struct iwl_trans_pcie, napi_dev);
++	trans_pcie = iwl_netdev_to_trans_pcie(napi->dev);
+ 	trans = trans_pcie->trans;
+ 
+ 	ret = iwl_pcie_rx_handle(trans, rxq->id, budget);
+@@ -1131,7 +1136,7 @@ static int _iwl_pcie_rx_init(struct iwl_trans *trans)
+ 			if (trans_pcie->msix_enabled)
+ 				poll = iwl_pcie_napi_poll_msix;
+ 
+-			netif_napi_add(&trans_pcie->napi_dev, &rxq->napi,
++			netif_napi_add(trans_pcie->napi_dev, &rxq->napi,
+ 				       poll);
+ 			napi_enable(&rxq->napi);
+ 		}
+diff --git a/drivers/net/wireless/intel/iwlwifi/pcie/trans.c b/drivers/net/wireless/intel/iwlwifi/pcie/trans.c
+index 6c76b2dd6878..d5a887b3a4bb 100644
+--- a/drivers/net/wireless/intel/iwlwifi/pcie/trans.c
++++ b/drivers/net/wireless/intel/iwlwifi/pcie/trans.c
+@@ -1986,13 +1986,6 @@ static void iwl_trans_pcie_configure(struct iwl_trans *trans,
+ 	trans->command_groups = trans_cfg->command_groups;
+ 	trans->command_groups_size = trans_cfg->command_groups_size;
+ 
+-	/* Initialize NAPI here - it should be before registering to mac80211
+-	 * in the opmode but after the HW struct is allocated.
+-	 * As this function may be called again in some corner cases don't
+-	 * do anything if NAPI was already initialized.
+-	 */
+-	if (trans_pcie->napi_dev.reg_state != NETREG_DUMMY)
+-		init_dummy_netdev(&trans_pcie->napi_dev);
+ 
+ 	trans_pcie->fw_reset_handshake = trans_cfg->fw_reset_handshake;
+ }
+@@ -2074,6 +2067,8 @@ void iwl_trans_pcie_free(struct iwl_trans *trans)
+ 		iwl_pcie_free_ict(trans);
+ 	}
+ 
++	free_netdev(trans_pcie->napi_dev);
++
+ 	iwl_pcie_free_invalid_tx_cmd(trans);
+ 
+ 	iwl_pcie_free_fw_monitor(trans);
+@@ -3594,7 +3589,7 @@ struct iwl_trans *iwl_trans_pcie_alloc(struct pci_dev *pdev,
+ 			       const struct pci_device_id *ent,
+ 			       const struct iwl_cfg_trans_params *cfg_trans)
+ {
+-	struct iwl_trans_pcie *trans_pcie;
++	struct iwl_trans_pcie *trans_pcie, **priv;
+ 	struct iwl_trans *trans;
+ 	int ret, addr_size;
+ 	const struct iwl_trans_ops *ops = &trans_ops_pcie_gen2;
+@@ -3623,6 +3618,18 @@ struct iwl_trans *iwl_trans_pcie_alloc(struct pci_dev *pdev,
+ 
+ 	trans_pcie = IWL_TRANS_GET_PCIE_TRANS(trans);
+ 
++	/* Initialize NAPI here - it should be before registering to mac80211
++	 * in the opmode but after the HW struct is allocated.
++	 */
++	trans_pcie->napi_dev = alloc_netdev_dummy(sizeof(struct iwl_trans_pcie *));
++	if (!trans_pcie->napi_dev) {
++		ret = -ENOMEM;
++		goto out_free_trans;
++	}
++	/* The private struct in netdev is a pointer to struct iwl_trans_pcie */
++	priv = netdev_priv(trans_pcie->napi_dev);
++	*priv = trans_pcie;
++
+ 	trans_pcie->trans = trans;
+ 	trans_pcie->opmode_down = true;
+ 	spin_lock_init(&trans_pcie->irq_lock);
+@@ -3637,7 +3644,7 @@ struct iwl_trans *iwl_trans_pcie_alloc(struct pci_dev *pdev,
+ 						   WQ_HIGHPRI | WQ_UNBOUND, 0);
+ 	if (!trans_pcie->rba.alloc_wq) {
+ 		ret = -ENOMEM;
+-		goto out_free_trans;
++		goto out_free_ndev;
+ 	}
+ 	INIT_WORK(&trans_pcie->rba.rx_alloc, iwl_pcie_rx_allocator_work);
+ 
+@@ -3757,6 +3764,8 @@ struct iwl_trans *iwl_trans_pcie_alloc(struct pci_dev *pdev,
+ 	iwl_pcie_free_ict(trans);
+ out_no_pci:
+ 	destroy_workqueue(trans_pcie->rba.alloc_wq);
++out_free_ndev:
++	free_netdev(trans_pcie->napi_dev);
+ out_free_trans:
+ 	iwl_trans_free(trans);
+ 	return ERR_PTR(ret);
+-- 
+2.43.0
+
 
