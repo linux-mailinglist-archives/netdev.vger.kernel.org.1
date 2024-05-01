@@ -1,83 +1,83 @@
-Return-Path: <netdev+bounces-92710-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92711-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E445E8B85A4
-	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 08:41:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B99AE8B85AD
+	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 08:48:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 133C11C21846
-	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 06:41:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7533E2839E0
+	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 06:48:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D61E229CF7;
-	Wed,  1 May 2024 06:41:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3431F48CDD;
+	Wed,  1 May 2024 06:48:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZRTMETOg"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i0UzUaT+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f182.google.com (mail-oi1-f182.google.com [209.85.167.182])
+Received: from mail-oo1-f46.google.com (mail-oo1-f46.google.com [209.85.161.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F5232628C
-	for <netdev@vger.kernel.org>; Wed,  1 May 2024 06:41:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 963E331A60
+	for <netdev@vger.kernel.org>; Wed,  1 May 2024 06:48:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714545698; cv=none; b=gNutH0nRdzRVKGAjKa1mOUSIhxxmxhHPinejoe3qs8n/aiF+bqcu4UjcQC1MGcCqyFSh+A+HWmpGSlp9/9LujfW2Q/29cNV0TCkpBvdwQuGNvsVyrAf3j9EaG6qF71x9yvwgkY1/X+v+IB7Z49NYwnQ9gnX0ETUCTwCvBvh1/jg=
+	t=1714546116; cv=none; b=C0M/EgYAV0jJlQ7sI+Q/djpg4RJGaNhWSgvdUKQnLuiQQ2s09U0ggiYqmuazw3DwFRJEPCIK22YT1Bx5uOh5IbluEl0W9SStFaCwhvN3yR25yMBdPPiFBZaKdHSMMZ+rbxYjOGsj4tzgBxxJcbZX4WeBoII0twKZtV3FB2giRZo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714545698; c=relaxed/simple;
-	bh=PlnMElZK6br76oHvMwqt7GLHJvIxgKorT1eqTKID5a0=;
+	s=arc-20240116; t=1714546116; c=relaxed/simple;
+	bh=YmSx92Ymgsk1uA29WwdG5jmpfLtYR2XT5kImnNzNb/k=;
 	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=id+oAn5et+yW12j/fDDE6uk4GLUTbQ+q+aFD3QUj/EQkh8MzRZF9NWBU+ZGLP4URZyFMLl/wl08DN0g9DFKeCmfJlUQjxvZjXJibqjtUIbM7N5UP01kvorSfpoVdVK1+6cUZKV1p6YMVId6GeDCMDtaL4WXbs2Neju75UtpHKdg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZRTMETOg; arc=none smtp.client-ip=209.85.167.182
+	 Mime-Version:Content-Type; b=LaT8vztbv4QJDP09aybmXKEa62OTu36SMFTnkJJVEfKqRGElfoZprBNsOjJ6vYsDpz1KDayT4F9jHGV1F/Pvmcn5SeemhO67fsw3ORBMZJ6MqYkIZiUszyHgN/2EQj59jDxqgp6f7xwZ4bpcU9QkqT8FLkc59p2DbqHPYzCjil8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i0UzUaT+; arc=none smtp.client-ip=209.85.161.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f182.google.com with SMTP id 5614622812f47-3c73b33383bso587531b6e.2
-        for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 23:41:37 -0700 (PDT)
+Received: by mail-oo1-f46.google.com with SMTP id 006d021491bc7-5afbcf21abdso539668eaf.1
+        for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 23:48:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1714545696; x=1715150496; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1714546113; x=1715150913; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to:from
          :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=T47aoYAIR7f92gk4QGHd2b5qSxJv1DPgAn45LG/w9gA=;
-        b=ZRTMETOge8RxnkusmzdkBHx3fpa1iVgs5BSTST2rHtDSLLiXJnsPA2Bq3+2zS4Y7Fd
-         HldIDf0L7BASdQ31zNzN6sxkpjxhDFY5EEDjzMKSVyFn1nUWvECBPuOC29Ui5DOFP65M
-         KhIL3o6KEX3Iq+uYRFzLUEndaQcAGok8EMz7HNHiBCr+KTuK7efWilByopqFPb+DL1jA
-         uPluwFaTAj+Pavuw/VTh0dO+GUk8L/ohyfrpn/eK7OOWR6yFhw67bR1OzKXhdX/tcK8P
-         5lLUz18URjUlHlwC83pDAMwMfwxuuhPCNZuu3mnivQ1jCNICo3bAZhBGN16X6PBxhKXL
-         d+VA==
+        bh=KwLoiI9qseNxIY8lHNGQaHIDD609lW6rFY/tCNm+L7k=;
+        b=i0UzUaT+Uh7ZiPoDkoykRcC85kCdLqaurJiDx/JZ1iO5v1S5jQG6UFpZBRXguUe5vR
+         K76f6oHP4ED+b+E5Z/vYOWq+QUfP8t86SjlUqleQJMIIx5ABcyP8vKV6aetK2z1jwNx0
+         7CDatCh+hua49C7QDW7vrEmS3EfpQO1hslVzsrvwTqobpt+F/kMRW1RvUcy5lyMODHLd
+         rUJVK5Z/bn85Ek8ODbXpxmCJiQsbfxV85eNDk4yBsY0w3XUp6A+kanvzhKzKBRQU3kbt
+         99OLVcppDvtwpRWYpMRvok6I1olPlHZUjbjA6pa6xSywH/VDNbjdbJbvfGoQlhicStRp
+         PY8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714545696; x=1715150496;
+        d=1e100.net; s=20230601; t=1714546113; x=1715150913;
         h=content-transfer-encoding:mime-version:references:in-reply-to:from
          :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=T47aoYAIR7f92gk4QGHd2b5qSxJv1DPgAn45LG/w9gA=;
-        b=hvWbY59Z7VFJeOQzXfrhdGQV2qGYPEa+AMEUQIOKyNRZk7zRycl4Meao2HARD7eOA8
-         o1finVeMMMf0i1SJZvaJ3qPdlulGXjs28jB1hmImH5VQpV769mR3pk+fyqA2ta0804Nl
-         b3s9ya1zCo4l1pX4aPiKAXNhYw4jSxmS8z3aFNJ3oJyBRvkra+5vu66kb9caxu9dOaxP
-         40Ldy1Q28gIe1tlL9ZnrEb/NADCjxB8kgwUpLfuHwoTNCdRV7eKd0LOOlOgGRqgFTgE6
-         ont1tarw7U11d4wR8Mv2LF/lBrGXmj3yGQnPBKuGChefxrZ9G/A17RjhMmKcadAfqjaq
-         hCzg==
-X-Forwarded-Encrypted: i=1; AJvYcCU+7tajXa3gJFJiMQFI/MvKlxZUTFdgNFyt1lTfPPgynkifX73EQo+tcVcPi40ioYJTChXei4SGryAm1suS2DgO1IjVKLfB
-X-Gm-Message-State: AOJu0Yw4Gks/zFDokee/nl9HSP6+Njt2mwPOkU/lKGYZfnFElWvDtRzb
-	c0/Jom0cuBpbppWYahJXneR67NYY0fgF5VT+JHQUIOXR3HKL0mxa
-X-Google-Smtp-Source: AGHT+IEqP50rxqgoSogInMjScCUMTP6TG9acgIMeU3KJQ3wVG6EPSRPhCdofEFdds7EWIF+tJRujXA==
-X-Received: by 2002:a05:6808:200d:b0:3c8:4de7:6736 with SMTP id q13-20020a056808200d00b003c84de76736mr1991319oiw.4.1714545696335;
-        Tue, 30 Apr 2024 23:41:36 -0700 (PDT)
+        bh=KwLoiI9qseNxIY8lHNGQaHIDD609lW6rFY/tCNm+L7k=;
+        b=eMXmJE790dO3+tPvGneEtgLT0ugHHM0jF9da+S9JWhmQCp70Z48XlmijeU6/62fubJ
+         /VYu3QoeFcU7CBQM8tsxiFV3nRQY98lODJ4RMNbeC3y+TMZ3sTWUC+xNVHEGcnRxRrCA
+         s9awTVm0AR+wgtj4ifo2VtIqUbpJphHFOngBBWMTUg4rV0E7kISOJLmNu7UDKoQB9od8
+         ZAeLgNQ6ZG+2d6G4jd1FsN6CKxdRrXRfWU+McEKQyzfSn42cVwMweGmKaONBuagazkzY
+         fel0TQ/t3q2PqlYOFPnAYdIhux216ZN/sMhk7z1RyqTc3DyPLeDMG9Y6vIoEBOOd68mT
+         5Xvg==
+X-Forwarded-Encrypted: i=1; AJvYcCXtC7belmy56ddPKH5GSaUSotX+di+vEIdcKvWZVCODfjjF9DK58zI+/ZwjDwrqepjrn7Zjwx+u0lteHP0gTOwWCOGQRMoL
+X-Gm-Message-State: AOJu0Yy4Ul+hrQS+d8JqLdKxxuz/sEv+YtpfQK7GbOPgtt7nNwaTA25r
+	y3dasVH5QC/j1v5mQhDOCIkvSj3FdzeZ9YQ0GZUGiZfNsYCRTuAs
+X-Google-Smtp-Source: AGHT+IF81JIHfWk+HiXDbysWke5n1a7iTkx5WwuSty7qN7hpxsPtnDhYVjkbZJLkNhCd2VtgQMAzBA==
+X-Received: by 2002:a05:6358:88b:b0:186:6e58:d81d with SMTP id m11-20020a056358088b00b001866e58d81dmr2056387rwj.3.1714546113490;
+        Tue, 30 Apr 2024 23:48:33 -0700 (PDT)
 Received: from localhost (p4300206-ipxg22801hodogaya.kanagawa.ocn.ne.jp. [153.172.224.206])
-        by smtp.gmail.com with ESMTPSA id ga23-20020a056a00621700b006e7243bbd35sm22818795pfb.172.2024.04.30.23.41.34
+        by smtp.gmail.com with ESMTPSA id r30-20020a638f5e000000b005f7f51967e9sm20441931pgn.27.2024.04.30.23.48.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Apr 2024 23:41:36 -0700 (PDT)
-Date: Wed, 01 May 2024 15:41:32 +0900 (JST)
-Message-Id: <20240501.154132.1306102883120815828.fujita.tomonori@gmail.com>
+        Tue, 30 Apr 2024 23:48:33 -0700 (PDT)
+Date: Wed, 01 May 2024 15:48:29 +0900 (JST)
+Message-Id: <20240501.154829.686841422238557872.fujita.tomonori@gmail.com>
 To: andrew@lunn.ch
 Cc: fujita.tomonori@gmail.com, netdev@vger.kernel.org, jiri@resnulli.us,
  horms@kernel.org
-Subject: Re: [PATCH net-next v3 6/6] net: tn40xx: add PHYLIB support
+Subject: Re: [PATCH net-next v3 3/6] net: tn40xx: add basic Tx handling
 From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-In-Reply-To: <9ec24d8f-62c4-4894-866a-b4ac448aaa9b@lunn.ch>
+In-Reply-To: <c2b5177c-3782-44fb-b7b0-d3ca610af1b8@lunn.ch>
 References: <20240429043827.44407-1-fujita.tomonori@gmail.com>
-	<20240429043827.44407-7-fujita.tomonori@gmail.com>
-	<9ec24d8f-62c4-4894-866a-b4ac448aaa9b@lunn.ch>
+	<20240429043827.44407-4-fujita.tomonori@gmail.com>
+	<c2b5177c-3782-44fb-b7b0-d3ca610af1b8@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -89,72 +89,51 @@ Content-Transfer-Encoding: 7bit
 
 Hi,
 
-On Tue, 30 Apr 2024 22:58:17 +0200
+On Tue, 30 Apr 2024 22:40:47 +0200
 Andrew Lunn <andrew@lunn.ch> wrote:
 
-> On Mon, Apr 29, 2024 at 01:38:27PM +0900, FUJITA Tomonori wrote:
->> This patch adds supports for multiple PHY hardware with PHYLIB. The
->> adapters with TN40xx chips use multiple PHY hardware; AMCC QT2025, TI
->> TLK10232, Aqrate AQR105, and Marvell 88X3120, 88X3310, and MV88E2010.
->> 
->> For now, the PCI ID table of this driver enables adapters using only
->> QT2025 PHY. I've tested this driver and the QT2025 PHY driver with
->> Edimax EN-9320 10G adapter.
->> 
->> Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
->> ---
->>  drivers/net/ethernet/tehuti/Kconfig    |  2 +
->>  drivers/net/ethernet/tehuti/Makefile   |  2 +-
->>  drivers/net/ethernet/tehuti/tn40.c     | 34 +++++++++++---
->>  drivers/net/ethernet/tehuti/tn40.h     |  7 +++
->>  drivers/net/ethernet/tehuti/tn40_phy.c | 61 ++++++++++++++++++++++++++
->>  5 files changed, 99 insertions(+), 7 deletions(-)
->>  create mode 100644 drivers/net/ethernet/tehuti/tn40_phy.c
->> 
->> diff --git a/drivers/net/ethernet/tehuti/Kconfig b/drivers/net/ethernet/tehuti/Kconfig
->> index 4198fd59e42e..94fda9fd4cc0 100644
->> --- a/drivers/net/ethernet/tehuti/Kconfig
->> +++ b/drivers/net/ethernet/tehuti/Kconfig
->> @@ -27,6 +27,8 @@ config TEHUTI_TN40
->>  	tristate "Tehuti Networks TN40xx 10G Ethernet adapters"
->>  	depends on PCI
->>  	select FW_LOADER
->> +	select PHYLIB
->> +	select PHYLINK
+>> --- a/drivers/net/ethernet/tehuti/tn40.c
+>> +++ b/drivers/net/ethernet/tehuti/tn40.c
+>> @@ -3,10 +3,1177 @@
+>>  
+>> +static inline void tn40_do_tx_db_ptr_next(struct tn40_txdb *db,
+>> +					  struct tn40_tx_map **pptr)
 > 
-> You don't need both. PHYLINK will pull in PHYLIB.
+> inline functions are not liked in .c files. Leave it to the compiler
+> to decide.
+
+My bad, I should have found the warnings on this in patchwork before.
+
+
+>> +{
+>> +	++*pptr;
+>> +	if (unlikely(*pptr == db->end))
+>> +		*pptr = db->start;
+>> +}
+>> +
+>> +static inline void tn40_tx_db_inc_rptr(struct tn40_txdb *db)
+>> +{
+>> +	tn40_do_tx_db_ptr_next(db, &db->rptr);
+>> +}
+>> +
+>> +static inline void tn40_tx_db_inc_wptr(struct tn40_txdb *db)
+>> +{
+>> +	tn40_do_tx_db_ptr_next(db, &db->wptr);
+>> +}
+> 
+> Functions like this are likely to be inlined even without the keyword.
+> Please look through all the code and remove the inline keyword from .c
+> files. They are O.K. in headers, so long as they are static inline.
 
 Fixed.
 
->> @@ -1179,21 +1179,25 @@ static void tn40_link_changed(struct tn40_priv *priv)
->>  	u32 link = tn40_read_reg(priv,
->>  				 TN40_REG_MAC_LNK_STAT) & TN40_MAC_LINK_STAT;
->>  	if (!link) {
->> -		if (netif_carrier_ok(priv->ndev) && priv->link)
->> +		if (netif_carrier_ok(priv->ndev) && priv->link) {
->>  			netif_stop_queue(priv->ndev);
->> +			phylink_mac_change(priv->phylink, false);
->> +		}
->>  
->>  		priv->link = 0;
->>  		if (priv->link_loop_cnt++ > TN40_LINK_LOOP_MAX) {
->>  			/* MAC reset */
->>  			tn40_set_link_speed(priv, 0);
->> +			tn40_set_link_speed(priv, priv->phydev->speed);
-> 
-> You should not be references priv->phydev if you are using
-> phylink. When phylink is managing an SFP, there might not be a phydev.
-> phylink will tell you the speed when it calls your tn40_mac_config()
-> callback.
-> 
-> I suggest you read the documentation in include/linux/phylink.h
-> because this is very wrong.
 
-Understood. I fixed the code not to use priv->phydev (except for
-phylink_connect_phy).
+>> +/* netdev tx queue len for Luxor. The default value is 1000.
+>> + * ifconfig eth1 txqueuelen 3000 - to change it at runtime.
+>> + */
+>> +#define TN40_NDEV_TXQ_LEN 3000
+> 
+> This comment does not seem to match the #define?
 
-Looks like phylink.h recommends using mac_link_up() over mac_config()
-to get the link speed. So tn40_link_up() stores the speed in tn40_priv
-for tn40_link_changed(). I also tried mac_config() but state->speed
-isn't initialized properly.
+Looks like so. I changed TN40_NDEV_TXQ_LEN to 1000.
 
