@@ -1,101 +1,93 @@
-Return-Path: <netdev+bounces-92812-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92813-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E15E18B8F25
-	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 19:43:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0EC618B8F2C
+	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 19:44:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 19BC41C2130A
-	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 17:43:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6C48D283852
+	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 17:44:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6677312FF8F;
-	Wed,  1 May 2024 17:43:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08D4C130AD9;
+	Wed,  1 May 2024 17:44:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="eUPQZn5d"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="HjUViFaA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-9106.amazon.com (smtp-fw-9106.amazon.com [207.171.188.206])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF5A4182DF
-	for <netdev@vger.kernel.org>; Wed,  1 May 2024 17:43:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C4C3130487
+	for <netdev@vger.kernel.org>; Wed,  1 May 2024 17:44:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714585426; cv=none; b=HQDunCNCXqZrat2THRCUk+uRGUV1vx6JvbAlYKDvnynt7UUTNey2lh1WsxsO9EWMT6M6QW0enGQbrHlZjeFvGj2sPZTo4Q7poGXTyjfTwwNUUBll6if8uG+FW5teLSz8CuME9tbcqvi/f5DJvROYiNTYcKVvhSQNaWZhSEYtezk=
+	t=1714585467; cv=none; b=jRFSLjb2IzgLCv0CAcsMWBf+ugMafFiuJ5WBkpp6P7rxOvkygZcvzNblCvW0dAa4yZEmaL5PShhnS77paPu3XrMTxx5EAz9/ombqaAdJGdsw+M4b7Lclb/gt/5ohzEjgudwC8+UpfqcrfGhZ6ehpYJ76xFdnON/e1dF85HpM9hc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714585426; c=relaxed/simple;
-	bh=3bmTWYwRFWLcqerdJa5XqE+bQEiJYPRaVhoVBhWPBHU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Y0NpOkiYpduRQWO0Z5VLh9U7h5DWENM8ZTzO2aw32GLWapSy3IvoGIT4nC7xJUpJRTIL5/3DHrXcYofUYdXGVUNOkSwT0E+qjRAWzg53DphxsWWEkDWniTkE9RpH3aOlhTy7rNUq+CA3kaoW3pq9Tpl/PEBLGy3ABZxfsRDMhcQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=eUPQZn5d; arc=none smtp.client-ip=209.85.167.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-51ef64d04b3so520671e87.3
-        for <netdev@vger.kernel.org>; Wed, 01 May 2024 10:43:44 -0700 (PDT)
+	s=arc-20240116; t=1714585467; c=relaxed/simple;
+	bh=+jyiZfeDwRUopuXx+laeRcnHhvIH25Y903wg1qnk78s=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=KdzIm6Lr2LfqxqRoZJGdhHBihgr21nkgWi6WFwEvGt8N52mU1JGclBvyYKcbeWQgedKeVEvMi8iZHDNctL2HFBQcUDPlqevNFcuTVkgW/3E/naj/5vFo1aBaILpyo3IHJAwWZSul2GEXKOTHwgfMCdRzuPAFmx3G6FNIz5Ab6VU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=HjUViFaA; arc=none smtp.client-ip=207.171.188.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1714585423; x=1715190223; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=3bmTWYwRFWLcqerdJa5XqE+bQEiJYPRaVhoVBhWPBHU=;
-        b=eUPQZn5d7TaEoJSsjp25jtx5rg24DhMR4W3IErzep++MHMNOXuhjd6NvpVSKMnfD9h
-         rQKPXgZ2yTuLdTi/CfX5xCCDONQ1KaJ+r9cGfA6qQ8pI85hP878bIKTIGHLL54QUYtWj
-         7XbaotcFIBR9yID2Wt88+uenUlqXW4gZDVseFiShCE4ZXLFJ/hDMhuI9PjzQcFqBMv8W
-         jS6Ip9nsARfaCXNYnA2jTOt/8HH85VLcUIZkc4+KF6kFYLKyyqDPAOwEx6OWHS2AGP4P
-         s2CSq71js5XPP7h9FndO1C62XnEn0OwanCYV8LkX1SndpoQhSlEhy+fJiynNzHg+PL62
-         RXkA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714585423; x=1715190223;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3bmTWYwRFWLcqerdJa5XqE+bQEiJYPRaVhoVBhWPBHU=;
-        b=gfyUmrE6oaAcgDhqBB1kg0zHASDOZFsoTF3VqQb/RsA2p1UgM7TPFUmUTX4/egOPJJ
-         E9DTT+4dFKG35iNwd3yGJ75gp2Z1jAVPcBk+WCRkRLj4pxncl4ubGZPfE9yjaV6qbyS+
-         Fw691AR8imost3sr/cCzpaIsqqI1FfnhI780V7x8aBKqhz4plflOompoV/15GQtX47Ik
-         dMNDCGOuUvpaJlQjC4W1oXeU5+Y2yKqa0WC4DhR8SAO1jhFkZFGtznjcyy1QGbyAuQQT
-         t6hXL60QoWSYIteFWTonK5/o/9U/J5SOfwczU7lRf8dK5hGjz4WuFUojPai7NxbGyzKn
-         d3DA==
-X-Forwarded-Encrypted: i=1; AJvYcCXj2pPmsAkNWmBtauZy2i2bm9V7qdU1TTBlW2MDn5kFBJU2u2TJD7Juj0LGFh0KK+qa5BYU+FuIkYeY1qclbReh5VWQgydG
-X-Gm-Message-State: AOJu0YxG+PL888nk7yn/hBb3uykqffRjyXGaJZu1NDtthe0nX0AXDeWo
-	CsabF01p53UNjfrdDICRI0VK+kmIeNUvkA8axXs0l3RpX0YwgWVTHrrpNcVPUXk=
-X-Google-Smtp-Source: AGHT+IEfCIWUVgqYXG41TceguPXTQ+LH1imEyNeUiPyIb+1mgoogJOusr6dty/3f0bMhz+BELrLJZQ==
-X-Received: by 2002:ac2:48a1:0:b0:51d:9e17:29f0 with SMTP id u1-20020ac248a1000000b0051d9e1729f0mr2326819lfg.24.1714585422462;
-        Wed, 01 May 2024 10:43:42 -0700 (PDT)
-Received: from localhost ([102.222.70.76])
-        by smtp.gmail.com with ESMTPSA id c15-20020a056512238f00b0051c76aff880sm2212482lfv.43.2024.05.01.10.43.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 May 2024 10:43:42 -0700 (PDT)
-Date: Wed, 1 May 2024 20:43:37 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Duoming Zhou <duoming@zju.edu.cn>
-Cc: linux-hams@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, pabeni@redhat.com, kuba@kernel.org,
-	edumazet@google.com, davem@davemloft.net, jreuter@yaina.de,
-	lars@oddbit.com, Miroslav Skoric <skoric@uns.ac.rs>
-Subject: Re: [PATCH net] ax25: Fix refcount leak issues of ax25_dev
-Message-ID: <7fcfdc9a-e3f3-49a1-9373-39b5ad745799@moroto.mountain>
-References: <20240501060218.32898-1-duoming@zju.edu.cn>
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1714585466; x=1746121466;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=HZXrSp7ZU0ulx0HiDCasbiZMOchJY6SmXssMy9xDJQw=;
+  b=HjUViFaArPnnBxWcljolRW1fWumNe5ttskecmwmFkUh3trmoNRxjMZVx
+   zHhiFQBS3Tt4peBnH7mmMlnGlksdxf+PlAnp1f3Yyy4y5lgO96CR6Ah1A
+   or8tCp86YHw/8JKuq1cEgMu0VxjYyVxI7lOcguo51Ai7po3ufoW4CbILP
+   A=;
+X-IronPort-AV: E=Sophos;i="6.07,245,1708387200"; 
+   d="scan'208";a="722801573"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-9106.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 May 2024 17:44:20 +0000
+Received: from EX19MTAUWA001.ant.amazon.com [10.0.7.35:6727]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.58.142:2525] with esmtp (Farcaster)
+ id 370236e8-9687-415c-aa8b-d868a1403eaa; Wed, 1 May 2024 17:44:20 +0000 (UTC)
+X-Farcaster-Flow-ID: 370236e8-9687-415c-aa8b-d868a1403eaa
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA001.ant.amazon.com (10.250.64.218) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Wed, 1 May 2024 17:44:19 +0000
+Received: from 88665a182662.ant.amazon.com (10.106.101.44) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.28;
+ Wed, 1 May 2024 17:44:17 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <edumazet@google.com>
+CC: <anderson@allelesecurity.com>, <kuniyu@amazon.com>,
+	<netdev@vger.kernel.org>
+Subject: Re: use-after-free warnings in tcp_v4_connect() due to inet_twsk_hashdance() inserting the object into ehash table without initializing its reference counter
+Date: Wed, 1 May 2024 10:44:08 -0700
+Message-ID: <20240501174408.29678-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <CANn89iLSg8dwgbY6jAKUFyg7SbCcbmWOby3+evN3-5ONrMWEZw@mail.gmail.com>
+References: <CANn89iLSg8dwgbY6jAKUFyg7SbCcbmWOby3+evN3-5ONrMWEZw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240501060218.32898-1-duoming@zju.edu.cn>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: EX19D036UWB004.ant.amazon.com (10.13.139.170) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-I'm always happy to take credit for stuff but the Reported by should go
-to Lars and Miroslav.
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 1 May 2024 19:01:35 +0200
+> On Wed, May 1, 2024 at 6:52 PM Kuniyuki Iwashima <kuniyu@amazon.com> wrote:
+> >
+> > This looks good to me.
+> >
+> 
+> Is it ok if you submit an official patch ? This is getting late here in France.
 
-Reported-by: Lars Kellogg-Stedman <lars@oddbit.com>
-Reported-by: Miroslav Skoric <skoric@uns.ac.rs>
+Sure thing, will do.
 
-Lars, could you test this please and let us know if it helps?
-
-regards,
-dan carpenter
-
-
+Thanks!
 
