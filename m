@@ -1,72 +1,73 @@
-Return-Path: <netdev+bounces-92724-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92725-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 710798B86BE
-	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 10:06:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CF118B86DA
+	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 10:28:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3143B285016
-	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 08:06:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1B3111F2394B
+	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 08:28:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F25D34D9FB;
-	Wed,  1 May 2024 08:06:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF3AE50281;
+	Wed,  1 May 2024 08:28:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PFTvxtIO"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iAuj5UpH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E1D94CE1F;
-	Wed,  1 May 2024 08:06:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EDED4F20C;
+	Wed,  1 May 2024 08:28:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714550790; cv=none; b=dSO4gdKf1X21uS8pmsdkbCSWCjD7vHMEhlD0WnzcrV6aBKcrEuGqeEVwWEwO6GtL4JYVXex4l2dz/1wvW21E+m1rYXsfEWLdMkuw7Ge/ohNkY4XCLUKP0/+ciFFl4mntma6gmySuc+zS8s3bKIQC95TFi55NvcZMeK+kUIC9cAw=
+	t=1714552109; cv=none; b=sX52FUhe9OKBT907LwkkSuZ2clb/T9WDUopDfJCKEhvju1Z+VtQfbLVKGJL+7poD8C/89mc67VZOYdKVruesztilguQGx5LA/9vNlQcmVwmDOX5K54UXiIcazpdkGyv4aYEyvkDoqkaXTZEW8MHdZS/pAeD4llghA+xKj7nPgaM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714550790; c=relaxed/simple;
-	bh=bBUMYKOIs+2HO77T75AUFFXxEW/yRcAvXE2lRdkSTHs=;
+	s=arc-20240116; t=1714552109; c=relaxed/simple;
+	bh=56AxXogpxFKhh8f1HjGkA7OqFSCTJhvPZmPtVivTpdc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RxNiNAyRb7+FxUmtSkvD2CpG8pg2P7skiMsfGnPQ+JQm6eYaxX9Abog3sG6av82GOVOqnH28iQXr256N5Hl9Yna58JnNE5kicUM9Nro3nHZHkPXs0iVQITbA2lqCAw1kWXrJIUOwR+jX9+GHCRW8xvQcsewtUG9uS55YOg4RT+s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PFTvxtIO; arc=none smtp.client-ip=192.198.163.17
+	 Content-Type:Content-Disposition:In-Reply-To; b=pzNvO7z/yHp7BwnycCDIx+uWEpC0XV6L6m/AYQzqBLWnO07NHx2k2LlCkkgr7Fvy4aiKuSl9Q4BhLrlZJIHR5kiJG5lQLW/yoD8sx0W71j918t/VhxAKShz4gUA8AqwdKllwxUgH9GxVC0qgInTuajgsw1q5gIGrePgyBKVUOxU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iAuj5UpH; arc=none smtp.client-ip=198.175.65.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1714550788; x=1746086788;
+  t=1714552108; x=1746088108;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=bBUMYKOIs+2HO77T75AUFFXxEW/yRcAvXE2lRdkSTHs=;
-  b=PFTvxtIOSHHuxNXX3JPS3ydkaRzQr04j/D2Kjlu4ZOXAQzEidE+ItZrA
-   D+jXl63W4MKEl4gErigxY55DVrgKF5lUODxlZXlsUwddKgxfSuvIZWC1I
-   txq9KlfSqcUFJtA9nqmrNoasHiwV6KrsU08CzwYTwGIeykR4txRfAU0Gx
-   0eADglhOe1230yvoVvsfJSUWZ+sT6bcm/bAuxkotWit5JISvesdzJ5vIE
-   dCMJAposl2RRz8uppI7waD0hKRNtyFW+zRUzeuDnYr1yQ1oFWWNV4BQjr
-   mCAQ73brZGNbb4Vgm7VBspjTKJquZ0a4eHluWfHd6gx13S7FwZ9IdjQcs
+  bh=56AxXogpxFKhh8f1HjGkA7OqFSCTJhvPZmPtVivTpdc=;
+  b=iAuj5UpHK8GWGdGELrh4/J8NnCKEJkKS/aU0lo2jeeIuS9O5RYwo2ok0
+   gO5z1jPSWXbCjy5MCglZRhNH9aD6vjw1Y/Jk3g/EFfviEgXDGylB06F2F
+   JdtKvlANQcNkCU8nXggePpMCINn4FaikjRaaY61leGqvlOCy7BV0OfsY1
+   nhN21/QpP15IDztNXUKJpkRblusfOYWz2/clxwDiR+U+IqDX8S8sV/KPV
+   ATHytSEtH0scj1W9Vlqa0482i0h+guSfB8ikn3Cqn0eqpOSGCmcD9CsZ0
+   FFDF2nY0D9cA4eB+zG1WKhTyuOyk/YrBJlu+L7swxkA3k4ukRf3vpnpKg
    A==;
-X-CSE-ConnectionGUID: AZ+sxXHCSDue+ndMqVijcg==
-X-CSE-MsgGUID: KcniQESJQqibmlFWAQD/1Q==
-X-IronPort-AV: E=McAfee;i="6600,9927,11060"; a="10154652"
+X-CSE-ConnectionGUID: T/W9RQ0DTeufo3OZ46YEBw==
+X-CSE-MsgGUID: qB3QKYdlStGy0SMk7oCJLw==
+X-IronPort-AV: E=McAfee;i="6600,9927,11060"; a="14055932"
 X-IronPort-AV: E=Sophos;i="6.07,244,1708416000"; 
-   d="scan'208";a="10154652"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 May 2024 01:06:27 -0700
-X-CSE-ConnectionGUID: TgjaYgiSQkCSG0FRiHRLbA==
-X-CSE-MsgGUID: 3JREX7qqQnO29AfEg4P5Xg==
+   d="scan'208";a="14055932"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 May 2024 01:28:27 -0700
+X-CSE-ConnectionGUID: hvc6ldjUT2ajfHjFR9pZFA==
+X-CSE-MsgGUID: NQQhXkt5QWG/nOARfEMwHQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,244,1708416000"; 
-   d="scan'208";a="26725211"
+   d="scan'208";a="31335521"
 Received: from lkp-server01.sh.intel.com (HELO e434dd42e5a1) ([10.239.97.150])
-  by fmviesa007.fm.intel.com with ESMTP; 01 May 2024 01:06:21 -0700
+  by fmviesa004.fm.intel.com with ESMTP; 01 May 2024 01:28:22 -0700
 Received: from kbuild by e434dd42e5a1 with local (Exim 4.96)
 	(envelope-from <lkp@intel.com>)
-	id 1s24yo-0009D8-2B;
-	Wed, 01 May 2024 08:06:18 +0000
-Date: Wed, 1 May 2024 16:06:15 +0800
+	id 1s25K7-0009EE-0y;
+	Wed, 01 May 2024 08:28:19 +0000
+Date: Wed, 1 May 2024 16:27:25 +0800
 From: kernel test robot <lkp@intel.com>
 To: Heng Qi <hengqi@linux.alibaba.com>, netdev@vger.kernel.org,
 	virtualization@lists.linux.dev
-Cc: oe-kbuild-all@lists.linux.dev, Jakub Kicinski <kuba@kernel.org>,
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	Jakub Kicinski <kuba@kernel.org>,
 	"David S . Miller" <davem@davemloft.net>,
 	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
 	Jason Wang <jasowang@redhat.com>,
@@ -86,7 +87,7 @@ Cc: oe-kbuild-all@lists.linux.dev, Jakub Kicinski <kuba@kernel.org>,
 	Andrew Lunn <andrew@lunn.ch>, justinstitt@google.com
 Subject: Re: [PATCH net-next v11 2/4] ethtool: provide customized dim profile
  management
-Message-ID: <202405011418.EYj7bgrd-lkp@intel.com>
+Message-ID: <202405011500.J5qSgquf-lkp@intel.com>
 References: <20240430173136.15807-3-hengqi@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -108,28 +109,116 @@ url:    https://github.com/intel-lab-lkp/linux/commits/Heng-Qi/linux-dim-move-us
 base:   net-next/main
 patch link:    https://lore.kernel.org/r/20240430173136.15807-3-hengqi%40linux.alibaba.com
 patch subject: [PATCH net-next v11 2/4] ethtool: provide customized dim profile management
-config: openrisc-defconfig (https://download.01.org/0day-ci/archive/20240501/202405011418.EYj7bgrd-lkp@intel.com/config)
-compiler: or1k-linux-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240501/202405011418.EYj7bgrd-lkp@intel.com/reproduce)
+config: um-allmodconfig (https://download.01.org/0day-ci/archive/20240501/202405011500.J5qSgquf-lkp@intel.com/config)
+compiler: clang version 19.0.0git (https://github.com/llvm/llvm-project 37ae4ad0eef338776c7e2cffb3896153d43dcd90)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240501/202405011500.J5qSgquf-lkp@intel.com/reproduce)
 
 If you fix the issue in a separate patch/commit (i.e. not just a new version of
 the same patch/commit), kindly add following tags
 | Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202405011418.EYj7bgrd-lkp@intel.com/
+| Closes: https://lore.kernel.org/oe-kbuild-all/202405011500.J5qSgquf-lkp@intel.com/
 
 All errors (new ones prefixed by >>):
 
-   net/ethtool/coalesce.c: In function 'ethnl_update_profile':
->> net/ethtool/coalesce.c:453:46: error: 'struct net_device' has no member named 'irq_moder'
+   In file included from net/ethtool/coalesce.c:3:
+   In file included from include/linux/dim.h:12:
+   In file included from include/linux/netdevice.h:38:
+   In file included from include/net/net_namespace.h:43:
+   In file included from include/linux/skbuff.h:17:
+   In file included from include/linux/bvec.h:10:
+   In file included from include/linux/highmem.h:8:
+   In file included from include/linux/cacheflush.h:5:
+   In file included from arch/um/include/asm/cacheflush.h:4:
+   In file included from arch/um/include/asm/tlbflush.h:9:
+   In file included from include/linux/mm.h:2208:
+   include/linux/vmstat.h:522:36: warning: arithmetic between different enumeration types ('enum node_stat_item' and 'enum lru_list') [-Wenum-enum-conversion]
+     522 |         return node_stat_name(NR_LRU_BASE + lru) + 3; // skip "nr_"
+         |                               ~~~~~~~~~~~ ^ ~~~
+   In file included from net/ethtool/coalesce.c:3:
+   In file included from include/linux/dim.h:12:
+   In file included from include/linux/netdevice.h:38:
+   In file included from include/net/net_namespace.h:43:
+   In file included from include/linux/skbuff.h:17:
+   In file included from include/linux/bvec.h:10:
+   In file included from include/linux/highmem.h:12:
+   In file included from include/linux/hardirq.h:11:
+   In file included from arch/um/include/asm/hardirq.h:5:
+   In file included from include/asm-generic/hardirq.h:17:
+   In file included from include/linux/irq.h:20:
+   In file included from include/linux/io.h:13:
+   In file included from arch/um/include/asm/io.h:24:
+   include/asm-generic/io.h:547:31: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     547 |         val = __raw_readb(PCI_IOBASE + addr);
+         |                           ~~~~~~~~~~ ^
+   include/asm-generic/io.h:560:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     560 |         val = __le16_to_cpu((__le16 __force)__raw_readw(PCI_IOBASE + addr));
+         |                                                         ~~~~~~~~~~ ^
+   include/uapi/linux/byteorder/little_endian.h:37:51: note: expanded from macro '__le16_to_cpu'
+      37 | #define __le16_to_cpu(x) ((__force __u16)(__le16)(x))
+         |                                                   ^
+   In file included from net/ethtool/coalesce.c:3:
+   In file included from include/linux/dim.h:12:
+   In file included from include/linux/netdevice.h:38:
+   In file included from include/net/net_namespace.h:43:
+   In file included from include/linux/skbuff.h:17:
+   In file included from include/linux/bvec.h:10:
+   In file included from include/linux/highmem.h:12:
+   In file included from include/linux/hardirq.h:11:
+   In file included from arch/um/include/asm/hardirq.h:5:
+   In file included from include/asm-generic/hardirq.h:17:
+   In file included from include/linux/irq.h:20:
+   In file included from include/linux/io.h:13:
+   In file included from arch/um/include/asm/io.h:24:
+   include/asm-generic/io.h:573:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     573 |         val = __le32_to_cpu((__le32 __force)__raw_readl(PCI_IOBASE + addr));
+         |                                                         ~~~~~~~~~~ ^
+   include/uapi/linux/byteorder/little_endian.h:35:51: note: expanded from macro '__le32_to_cpu'
+      35 | #define __le32_to_cpu(x) ((__force __u32)(__le32)(x))
+         |                                                   ^
+   In file included from net/ethtool/coalesce.c:3:
+   In file included from include/linux/dim.h:12:
+   In file included from include/linux/netdevice.h:38:
+   In file included from include/net/net_namespace.h:43:
+   In file included from include/linux/skbuff.h:17:
+   In file included from include/linux/bvec.h:10:
+   In file included from include/linux/highmem.h:12:
+   In file included from include/linux/hardirq.h:11:
+   In file included from arch/um/include/asm/hardirq.h:5:
+   In file included from include/asm-generic/hardirq.h:17:
+   In file included from include/linux/irq.h:20:
+   In file included from include/linux/io.h:13:
+   In file included from arch/um/include/asm/io.h:24:
+   include/asm-generic/io.h:584:33: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     584 |         __raw_writeb(value, PCI_IOBASE + addr);
+         |                             ~~~~~~~~~~ ^
+   include/asm-generic/io.h:594:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     594 |         __raw_writew((u16 __force)cpu_to_le16(value), PCI_IOBASE + addr);
+         |                                                       ~~~~~~~~~~ ^
+   include/asm-generic/io.h:604:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     604 |         __raw_writel((u32 __force)cpu_to_le32(value), PCI_IOBASE + addr);
+         |                                                       ~~~~~~~~~~ ^
+   include/asm-generic/io.h:692:20: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     692 |         readsb(PCI_IOBASE + addr, buffer, count);
+         |                ~~~~~~~~~~ ^
+   include/asm-generic/io.h:700:20: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     700 |         readsw(PCI_IOBASE + addr, buffer, count);
+         |                ~~~~~~~~~~ ^
+   include/asm-generic/io.h:708:20: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     708 |         readsl(PCI_IOBASE + addr, buffer, count);
+         |                ~~~~~~~~~~ ^
+   include/asm-generic/io.h:717:21: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     717 |         writesb(PCI_IOBASE + addr, buffer, count);
+         |                 ~~~~~~~~~~ ^
+   include/asm-generic/io.h:726:21: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     726 |         writesw(PCI_IOBASE + addr, buffer, count);
+         |                 ~~~~~~~~~~ ^
+   include/asm-generic/io.h:735:21: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     735 |         writesl(PCI_IOBASE + addr, buffer, count);
+         |                 ~~~~~~~~~~ ^
+>> net/ethtool/coalesce.c:453:41: error: no member named 'irq_moder' in 'struct net_device'
      453 |         struct dim_irq_moder *irq_moder = dev->irq_moder;
-         |                                              ^~
-   net/ethtool/coalesce.c: At top level:
-   net/ethtool/coalesce.c:446:12: warning: 'ethnl_update_profile' defined but not used [-Wunused-function]
-     446 | static int ethnl_update_profile(struct net_device *dev,
-         |            ^~~~~~~~~~~~~~~~~~~~
-   net/ethtool/coalesce.c:151:12: warning: 'coalesce_put_profile' defined but not used [-Wunused-function]
-     151 | static int coalesce_put_profile(struct sk_buff *skb, u16 attr_type,
-         |            ^~~~~~~~~~~~~~~~~~~~
+         |                                           ~~~  ^
+   13 warnings and 1 error generated.
 
 
 vim +453 net/ethtool/coalesce.c
