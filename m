@@ -1,112 +1,119 @@
-Return-Path: <netdev+bounces-92743-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92744-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87CBE8B8860
-	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 12:10:50 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 856DB8B8892
+	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 12:26:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B3CE91C231A9
-	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 10:10:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A1C4FB22364
+	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 10:26:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADE4050A66;
-	Wed,  1 May 2024 10:10:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D37B52F62;
+	Wed,  1 May 2024 10:26:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fuAvOe75"
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="dRYJefUI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fout7-smtp.messagingengine.com (fout7-smtp.messagingengine.com [103.168.172.150])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88C3A502B2
-	for <netdev@vger.kernel.org>; Wed,  1 May 2024 10:10:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D39E50A87
+	for <netdev@vger.kernel.org>; Wed,  1 May 2024 10:26:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.150
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714558247; cv=none; b=WG9QbznYdNPueNTm7LDTjRcOZDbPEZyGWlXTL6YbCj9tmjzbQqDK8yXplrwziwsXZUDOuWPiocIGsyxeMLd9Ylh8YVcdIbSXHB5rIuzhN1zfOQYyKu9BjF/IWshyWvx7Ziefjmoa1hxySjfEh7TAjkXU+xky/VbycYy7s5aGVvI=
+	t=1714559210; cv=none; b=sKaHk1f5/34b0s5gHXM07XkV36UmMIAlClLS8hDc4EV/cMnqW8/8TSsA97Cp1C9L6VNfq8CaXKhf10xp67v2YiVWCvD33iW2XdR/qeVhKPYHDWFi6dnJcbLl70YSDVHchSCVR3Uh7IieekW+7SRBiYwl2IB+y0lLZbfBfPgafX0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714558247; c=relaxed/simple;
-	bh=JtSyd7g4+Jtz1B3iI7NjqV+kh4fx8eViP4BIghgi424=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OLQVsc28AEwbvppY/SSciY3THVR+w+u0gTwTG8Hj3PtkDwZ0zZhgLQdXeNu5j/MKd6L9NYDwzYc172rOmOFcLUjtgaSFcSr3SNN4Ciru4MyLlzf+xNgCZB7QPO7m9aQgyS4pBoZToUM3gXc9WVgd7wgjErZ9rdC3vcsyAUCrJSY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fuAvOe75; arc=none smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-41b48daaaf4so43725e9.0
-        for <netdev@vger.kernel.org>; Wed, 01 May 2024 03:10:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1714558244; x=1715163044; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JtSyd7g4+Jtz1B3iI7NjqV+kh4fx8eViP4BIghgi424=;
-        b=fuAvOe75V9Ymh4h9YpPG/AXh5NVO7kROWHeCt0cmeJi5WtrQV4BicZob1DbJFwSy4V
-         uQ01dKnk13NKJTCOe2T7xl3CRmI2OijgffrYyH2U9LDE1+0edu9aNw6j9MWxmWYCxqU3
-         dJchytjbt1jNTUo6bpdIGt60zzU2h0zUQUuoV5hVrOGe/dXhPCfMydKgd411BqXiNS5P
-         6cBGzQV+hm0hTrPw62enlZIR2pd+Ovjmd161PerujJs9JU7pDGBLhTbDNZHpiAEhEod2
-         n61kYC8gpUsCjaUQAsn/pN4DCDNY2/rRtp7UvB7rI5loMxBJQ8hofGWtBhY+dt4+gwTX
-         hfcQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714558244; x=1715163044;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=JtSyd7g4+Jtz1B3iI7NjqV+kh4fx8eViP4BIghgi424=;
-        b=e6d260ggpj+v9MKXionn+NEBBJF5SEwE0VKgTwtkTX5RcgJG0EstJSpZfpJ7knE+2k
-         Uk0a9jHuH8RufIqMMCbEML9IyW1/Hrbx6P27GW8D/S6GQFNt6245HyEGirHczpR0saXO
-         eELIUfnoa+bkvb0DTrNkj0QULl+TPpgCeCup6qAtk2+dNe/d+cfA4awaUpTZt/q4WEnx
-         qqmT2+4TAle/208Sr2sRKm7z9WWmoA2+uK8W+etSxWtP0gVSRh06c9H6wvTdfUQUE1bO
-         OK5YRtPulsTe2Yoq3KgCuPp86G8JoWYytdS1TwXLgEnTpUrq0N3cO6+RxzWe0ykvRKGf
-         axBw==
-X-Forwarded-Encrypted: i=1; AJvYcCWMpdF4TzusJ5TK4gTcpeAanGLIH56DURI8rfDqqJOyxBqFE/E02XqP9zfSxo9pHQAoUhDarLgVie3sr5xVuWlhig/1hgKm
-X-Gm-Message-State: AOJu0Yz4H2JfabKARSbpBXVh+7HHht2u/E/uoE+mX11J1MotZj7lJ0a8
-	I3mVp7CbyVFzXOnUC3rKGcAfI91lY8ncYPC2epnISSDM/nOGHB2C/1bwDCC1K0ss7z6AT4XlAdb
-	0xUiRwfAqjoedNGkd3TkKxarojWCj0DOt/v+b
-X-Google-Smtp-Source: AGHT+IHQS3yuesZZtZzWaIichEY/R/lr0LDHmlp+qEqzVBllxP7SotxY4UT0InZ0ezFgWFMgAUTTVyms5+Me3CJvUsg=
-X-Received: by 2002:a05:600c:1c8b:b0:418:f219:6f4a with SMTP id
- k11-20020a05600c1c8b00b00418f2196f4amr163605wms.4.1714558243524; Wed, 01 May
- 2024 03:10:43 -0700 (PDT)
+	s=arc-20240116; t=1714559210; c=relaxed/simple;
+	bh=aKK2BleNQrwIDWmlVoya1ufH8h9bCfsMn9G2FuchbUU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EBlYXJXWOPgTQXFLCNLtCQhSZfOdpSRgXJSKA2FtsYfnPBW26R3/eTRxGMbEHE/mKAOM5JHlQG0RuzxjQo+fV9P0DD9SoxbeCGV95J4e2tfjSrTamvY2GErfjI5xlIDlUu/sNXaAiQQDWWyShOvYXXq/LHDqLJwSYq484FUP4/4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=dRYJefUI; arc=none smtp.client-ip=103.168.172.150
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
+Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
+	by mailfout.nyi.internal (Postfix) with ESMTP id 9802A1380140;
+	Wed,  1 May 2024 06:26:47 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute6.internal (MEProxy); Wed, 01 May 2024 06:26:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+	fm3; t=1714559207; x=1714645607; bh=soL9MLSiLsU1pc8mZTNMqxQacrWN
+	RB3W523uGKlElyQ=; b=dRYJefUIQXf7IZE3jGODtZEHz0xQFDcS3rMGryLh3uqr
+	eWfcEIkAIf9xXl0Zq9iCeCW0FuMQ/A3XZKmEuR8cPD91hgFwx3sihkfYAOq23+tf
+	08vXyo6BslE4zX9jMeOPf6NsWtMeq0ISclSfe8v5h0jkc1oaOrCvtIxD0kamEPsm
+	KONrnY1JBErf0U16smayndlS9g9+uuFzAg1emR0s2QTAN69kUqfFwpQwvh7ZBcNR
+	kd1IqMywizMpNFYK7RXz/cN2QO742b2K/gtbOo5OdBpkrKYYdjpoq1WzwSxokJrW
+	htZq+Pd0kcNlCSB3bTyXepPtcuKkWVHp3DytgRbqtQ==
+X-ME-Sender: <xms:5hgyZhbFR9an_BwLbaxjvnC8P1_iUi_M229-xGBGiANoK6ufybdDhQ>
+    <xme:5hgyZobK3sMmjP8NEhijGmO-5IuJDFCyAgMDDQCiQPU-ylezidIk3AT2t4MVUcRNR
+    xg9bXR4Ik5P4XQ>
+X-ME-Received: <xmr:5hgyZj_3uG6LlvE3Pkc2GN61bkQaOm5RlX0amZKaSEoPO6p44XHceFecrBYp>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrvdduhedgieeiucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtvdenucfhrhhomhepkfguohcu
+    ufgthhhimhhmvghluceoihguohhstghhsehiughoshgthhdrohhrgheqnecuggftrfgrth
+    htvghrnhephefhtdejvdeiffefudduvdffgeetieeigeeugfduffdvffdtfeehieejtdfh
+    jeeknecuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucevlhhushhtvghrufhiiigvpe
+    dtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehiughoshgthhesihguohhstghhrdhorhhg
+X-ME-Proxy: <xmx:5hgyZvpL2yfxHvED9xygbVDGfnLuo47hzWXcgS0PnXtRZCHgGPyc7A>
+    <xmx:5xgyZsq5XRGM_kainP8tmGnzn-vleNLNbYMLExkMqf-tN4WAWnqEmA>
+    <xmx:5xgyZlQz8oxlAJTUW2bEYo_P2aGWavHEiDFRmQFCyA6kItnDgmALJw>
+    <xmx:5xgyZkrkSjkRnFKtxWR2RooPx_WkqG-52GaSy9kMVd3vxq0jPAAzRg>
+    <xmx:5xgyZj1fox-DvCectwFCVe6pZeZFwu8PHmdG2LeVc_lmEzBKPN_SB0hc>
+Feedback-ID: i494840e7:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 1 May 2024 06:26:46 -0400 (EDT)
+Date: Wed, 1 May 2024 13:26:38 +0300
+From: Ido Schimmel <idosch@idosch.org>
+To: Davide Caratti <dcaratti@redhat.com>
+Cc: Jamal Hadi Salim <jhs@mojatatu.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Naresh Kamboju <naresh.kamboju@linaro.org>, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next] net/sched: unregister lockdep keys in
+ qdisc_create/qdisc_alloc error path
+Message-ID: <ZjIY3hkW8dYRPzSI@shredder>
+References: <2aa1ca0c0a3aa0acc15925c666c777a4b5de553c.1714496886.git.dcaratti@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <1239c8db54efec341dd6455c77e0380f58923a3c.1714495737.git.gnault@redhat.com>
- <ZjITTeK_BhGbGGjp@shredder>
-In-Reply-To: <ZjITTeK_BhGbGGjp@shredder>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 1 May 2024 12:10:30 +0200
-Message-ID: <CANn89iJ5Ro3Q51YOM2mT1rgwfKiwq6UWtRCMkADsfiTF-=P8kg@mail.gmail.com>
-Subject: Re: [PATCH net] vxlan: Pull inner IP header in vxlan_rcv().
-To: Ido Schimmel <idosch@nvidia.com>
-Cc: Guillaume Nault <gnault@redhat.com>, David Miller <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-	Amit Cohen <amcohen@nvidia.com>, Petr Machata <petrm@nvidia.com>, 
-	Nikolay Aleksandrov <razor@blackwall.org>, Jiri Benc <jbenc@redhat.com>, Breno Leitao <leitao@debian.org>, 
-	Stephen Hemminger <stephen@networkplumber.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2aa1ca0c0a3aa0acc15925c666c777a4b5de553c.1714496886.git.dcaratti@redhat.com>
 
-On Wed, May 1, 2024 at 12:03=E2=80=AFPM Ido Schimmel <idosch@nvidia.com> wr=
-ote:
->
-> On Tue, Apr 30, 2024 at 06:50:13PM +0200, Guillaume Nault wrote:
-> > Ensure the inner IP header is part of skb's linear data before reading
-> > its ECN bits. Otherwise we might read garbage.
-> > One symptom is the system erroneously logging errors like
-> > "vxlan: non-ECT from xxx.xxx.xxx.xxx with TOS=3Dxxxx".
-> >
-> > Similar bugs have been fixed in geneve, ip_tunnel and ip6_tunnel (see
-> > commit 1ca1ba465e55 ("geneve: make sure to pull inner header in
-> > geneve_rx()") for example). So let's reuse the same code structure for
-> > consistency. Maybe we'll can add a common helper in the future.
-> >
-> > Fixes: d342894c5d2f ("vxlan: virtual extensible lan")
-> > Signed-off-by: Guillaume Nault <gnault@redhat.com>
->
-> Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+On Tue, Apr 30, 2024 at 07:11:13PM +0200, Davide Caratti wrote:
+> Naresh and Eric report several errors (corrupted elements in the dynamic
+> key hash list), when running tdc.py or syzbot. The error path of
+> qdisc_alloc() and qdisc_create() frees the qdisc memory, but it forgets
+> to unregister the lockdep key, thus causing use-after-free like the
+> following one:
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+[...]
 
-Thanks !
+> Fix this ensuring that lockdep_unregister_key() is called before the
+> qdisc struct is freed, also in the error path of qdisc_create() and
+> qdisc_alloc().
+> 
+> Fixes: af0cb3fa3f9e ("net/sched: fix false lockdep warning on qdisc root lock")
+> Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
+> Closes: https://lore.kernel.org/netdev/20240429221706.1492418-1-naresh.kamboju@linaro.org/
+> CC: Naresh Kamboju <naresh.kamboju@linaro.org>
+> CC: Eric Dumazet <edumazet@google.com>
+> Signed-off-by: Davide Caratti <dcaratti@redhat.com>
+
+Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+
+We've also hit the issue on two of our machines running debug kernels. I
+started a run with the fix on both and will report tomorrow morning (not
+saying you should wait).
 
