@@ -1,88 +1,179 @@
-Return-Path: <netdev+bounces-92803-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92805-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CE7B8B8E96
-	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 18:56:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5BABF8B8EAC
+	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 19:01:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BAE31B20A4D
-	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 16:56:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1238B28279B
+	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 17:01:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F90A14006;
-	Wed,  1 May 2024 16:56:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44A9013FF6;
+	Wed,  1 May 2024 17:01:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MSRxgjH8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0A5911CBD
-	for <netdev@vger.kernel.org>; Wed,  1 May 2024 16:56:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.69
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0DDFFBEA
+	for <netdev@vger.kernel.org>; Wed,  1 May 2024 17:01:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714582566; cv=none; b=S2AMGAOp/1GYY6SulMsGh7gRtM++LME+ll7+VrLfiqQibswYHcAIkU6Bmbxs55Nfgt+7/H8yhz+tRLEgHhM4p24Q+5sJormDV2qRYjDI9xu02vdcfADb4D+b9oDOHeoQq692OGPpBBO2w88cjIkObT6Nj+WT2NihdGVWanqzI2M=
+	t=1714582872; cv=none; b=mCKeHVhqUsnmhY84LGpUfxb8KEJjNiW+60tGIuZPwNYOcsmr8G3n9+49blxgp9PeWtNXb0nnKsQjmlaGeiDQtFVIe/4Wmoktidt7yBXb7tD/EYrp7uvkeZ9/TQNSsP7+SaHY50UFlWG8AeBsAG7f5/rmhghgorSM8nByU3HNDfg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714582566; c=relaxed/simple;
-	bh=1XZHi0YzBLS47mbettJ83dDPGL16uhOqOK1tJN4dlpw=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=Z+y/EA18J6u89HXxiaux52nLbh+Qr3eqPdrG+AdXu4BemL0j8ASJWmuD/+wxJySMDngqbYRCrfVabRYkGUgQQuxM5C/4BiMnV70bv6JJo3wb9T/41ezUdMQ/FKuUWzLIQJ6uvudiRluleLAgLxshMOgc1Ras5W4Oywbr2qO8VOE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.69
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-7def44d6078so723739f.1
-        for <netdev@vger.kernel.org>; Wed, 01 May 2024 09:56:04 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714582564; x=1715187364;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zL5zLFLZ9/A+euis3e08Nm55+lvX3+T3wPrxtwGnFpQ=;
-        b=K+dH2GtnHLs4xHm7fJTa2idhjqBLIzifGnXVkfcA+bNIU1lPx7tUZemapL2L7a7A7F
-         S5xN9bWtMJ7wxO8r/8tjdTm8v/2UmSETTvEm9xk//Ga6jE3HCT+dDG2VLUAbYmlJgQuQ
-         0u1VZGDany7JqcaUY4MFIERXkIykpy/Y8uBqLN9tJKGRWtP/KLFLH2vErBpFAvS7J/ia
-         AqXN6n0KakzzO2EspKO+Gl/mH0nH08KVqYGfWBN3MiEKc5mk66zsJovRgC16bn+iQERC
-         sYK6EIcaSszzHi7HbFmUdS4Np1krVl1FRocz7MnWxMABc/RGEVdjqNZMy00f7xp9PxMG
-         KC4g==
-X-Forwarded-Encrypted: i=1; AJvYcCV4oMso7fhJCZs66wr9+rG6YWZSSpc66wBY3iCs+wIsNFLb3ZGNAK3cMSWFQr+CZXUPP9OSLf5spiCD+q8O1IbbFxjHSInb
-X-Gm-Message-State: AOJu0YwlXoboe5slEv87QQ+VEXmSdCJuWNgxAY8WHGI+wxkSnF0LnDUy
-	eFlIzvZ15nYiunYbOh82X/BFLhO8O70k3/hnGnT+DlCSZZvtwGiqMT8VoHFHjSLVOzm+EfzzSzL
-	Y/MXIpXSGV8jkw5ZlalTZNq/O8LdWvQitGc1JYopfZsYNXyoMVybSKo8=
-X-Google-Smtp-Source: AGHT+IEBjXreViAye+0kXgWGM8QAOQnK+EHu2cHJMy66fdP74jLwDb6XfrE99WN2U9+ggleDVkBLcX+2gumyBDoVt+kvePoHzc8o
+	s=arc-20240116; t=1714582872; c=relaxed/simple;
+	bh=5x+R/tulRuIaS8VcnMqYfEwZKfLlmJE83wErUp3TIJI=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=MVcrr9yntdUnEvy6ZhosskAk0xhypjJFmaXR+dlvpUj4vImK6nTU+oaqHTwT5a79lVrrw6hjlLGClix13ypAYUSF92VflRX+C63lkOCAHxAMp6YT4vkGlpPRtUI7q4qOC30ZX94ApLMVemj1Bso/bmOQQdZfPdkXRC45SPpHSSI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MSRxgjH8; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1714582869;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=pbBAwD6JC5VL1ukHU3KFqlt1QekHLcO5vtkGzyQGBMM=;
+	b=MSRxgjH8KQNJt6sQg2HXSn/6qaVMrp4UTkCQsEZ66b7kd1lmeiKL+uH0Z71Q6hDiBaJzCH
+	aGt7t68XSylcdsr8TvCfIBT9szDAZ4msy4RGS22FOvpRPSI4AcKJwBeUc+is388te6XMdC
+	wP2aCuyyF7RuGXkFFggKymffsIGqceI=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-209-jValeIcOO1Sva0kNIIWiZg-1; Wed, 01 May 2024 13:01:07 -0400
+X-MC-Unique: jValeIcOO1Sva0kNIIWiZg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 014948948A6;
+	Wed,  1 May 2024 17:01:04 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.22])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 512842166B31;
+	Wed,  1 May 2024 17:01:00 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <20240430140056.261997-15-dhowells@redhat.com>
+References: <20240430140056.261997-15-dhowells@redhat.com> <20240430140056.261997-1-dhowells@redhat.com>
+To: Christian Brauner <christian@brauner.io>
+Cc: dhowells@redhat.com, Jeff Layton <jlayton@kernel.org>,
+    Gao Xiang <hsiangkao@linux.alibaba.com>,
+    Dominique Martinet <asmadeus@codewreck.org>,
+    Matthew Wilcox <willy@infradead.org>,
+    Steve French <smfrench@gmail.com>,
+    Marc Dionne <marc.dionne@auristor.com>,
+    Paulo Alcantara <pc@manguebit.com>,
+    Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+    Eric Van Hensbergen <ericvh@kernel.org>,
+    Ilya Dryomov <idryomov@gmail.com>, netfs@lists.linux.dev,
+    linux-cachefs@redhat.com, linux-afs@lists.infradead.org,
+    linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
+    ceph-devel@vger.kernel.org, v9fs@lists.linux.dev,
+    linux-erofs@lists.ozlabs.org, linux-fsdevel@vger.kernel.org,
+    linux-mm@kvack.org, netdev@vger.kernel.org,
+    linux-kernel@vger.kernel.org, Latchesar Ionkov <lucho@ionkov.net>,
+    Christian Schoenebeck <linux_oss@crudebyte.com>
+Subject: Re: [PATCH v2 14/22] netfs: New writeback implementation
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:8684:b0:487:5dce:65ab with SMTP id
- iv4-20020a056638868400b004875dce65abmr6872jab.0.1714582564003; Wed, 01 May
- 2024 09:56:04 -0700 (PDT)
-Date: Wed, 01 May 2024 09:56:03 -0700
-In-Reply-To: <20240501121200-mutt-send-email-mst@kernel.org>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000aa73d50617675ca3@google.com>
-Subject: Re: [syzbot] [net?] [virt?] [kvm?] KASAN: slab-use-after-free Read in vhost_task_fn
-From: syzbot <syzbot+98edc2df894917b3431f@syzkaller.appspotmail.com>
-To: jasowang@redhat.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	michael.christie@oracle.com, mst@redhat.com, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com, virtualization@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <458059.1714582859.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 01 May 2024 18:00:59 +0100
+Message-ID: <458060.1714582859@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
 
-Hello,
+This needs the attached change.  It needs to allow for netfs_perform_write=
+()
+changing i_size whilst we're doing writeback.  The issue is that i_size is
+cached in the netfs_io_request struct (as that's what we're going to tell =
+the
+server the new i_size should be), but we're not updating this properly if
+i_size moves between us creating the request and us deciding to write out =
+the
+folio in which i_size was when we created the request.
 
-syzbot has tested the proposed patch and the reproducer did not trigger any issue:
+This can lead to the folio_zero_segment() that can be seen in the patch be=
+low
+clearing the wrong amount of the final page - assuming it's still the fina=
+l
+page.
 
-Reported-and-tested-by: syzbot+98edc2df894917b3431f@syzkaller.appspotmail.com
+David
+---
+diff --git a/fs/netfs/write_issue.c b/fs/netfs/write_issue.c
+index 69c50f4cbf41..e190043bc0da 100644
+--- a/fs/netfs/write_issue.c
++++ b/fs/netfs/write_issue.c
+@@ -315,13 +315,19 @@ static int netfs_write_folio(struct netfs_io_request=
+ *wreq,
+ 	struct netfs_group *fgroup; /* TODO: Use this with ceph */
+ 	struct netfs_folio *finfo;
+ 	size_t fsize =3D folio_size(folio), flen =3D fsize, foff =3D 0;
+-	loff_t fpos =3D folio_pos(folio);
++	loff_t fpos =3D folio_pos(folio), i_size;
+ 	bool to_eof =3D false, streamw =3D false;
+ 	bool debug =3D false;
+ =
 
-Tested on:
+ 	_enter("");
+ =
 
-commit:         f138e94c KASAN: slab-use-after-free Read in vhost_task..
-git tree:       https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git
-console output: https://syzkaller.appspot.com/x/log.txt?x=10a152a7180000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=3714fc09f933e505
-dashboard link: https://syzkaller.appspot.com/bug?extid=98edc2df894917b3431f
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+-	if (fpos >=3D wreq->i_size) {
++	/* netfs_perform_write() may shift i_size around the page or from out
++	 * of the page to beyond it, but cannot move i_size into or through the
++	 * page since we have it locked.
++	 */
++	i_size =3D i_size_read(wreq->inode);
++
++	if (fpos >=3D i_size) {
+ 		/* mmap beyond eof. */
+ 		_debug("beyond eof");
+ 		folio_start_writeback(folio);
+@@ -332,6 +338,9 @@ static int netfs_write_folio(struct netfs_io_request *=
+wreq,
+ 		return 0;
+ 	}
+ =
 
-Note: no patches were applied.
-Note: testing is done by a robot and is best-effort only.
++	if (fpos + fsize > wreq->i_size)
++		wreq->i_size =3D i_size;
++
+ 	fgroup =3D netfs_folio_group(folio);
+ 	finfo =3D netfs_folio_info(folio);
+ 	if (finfo) {
+@@ -342,14 +351,14 @@ static int netfs_write_folio(struct netfs_io_request=
+ *wreq,
+ =
+
+ 	if (wreq->origin =3D=3D NETFS_WRITETHROUGH) {
+ 		to_eof =3D false;
+-		if (flen > wreq->i_size - fpos)
+-			flen =3D wreq->i_size - fpos;
+-	} else if (flen > wreq->i_size - fpos) {
+-		flen =3D wreq->i_size - fpos;
++		if (flen > i_size - fpos)
++			flen =3D i_size - fpos;
++	} else if (flen > i_size - fpos) {
++		flen =3D i_size - fpos;
+ 		if (!streamw)
+ 			folio_zero_segment(folio, flen, fsize);
+ 		to_eof =3D true;
+-	} else if (flen =3D=3D wreq->i_size - fpos) {
++	} else if (flen =3D=3D i_size - fpos) {
+ 		to_eof =3D true;
+ 	}
+ 	flen -=3D foff;
+
 
