@@ -1,59 +1,87 @@
-Return-Path: <netdev+bounces-92795-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92796-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2CD48B8DC6
-	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 18:09:13 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1D808B8DD0
+	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 18:13:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EF933B246C5
-	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 16:09:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 77C811F21F99
+	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 16:13:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5365D12FF78;
-	Wed,  1 May 2024 16:08:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 523DE130484;
+	Wed,  1 May 2024 16:12:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Y6RCaAGM"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YlgVTqgA"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C53C712F37C
-	for <netdev@vger.kernel.org>; Wed,  1 May 2024 16:08:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E74D212FF70
+	for <netdev@vger.kernel.org>; Wed,  1 May 2024 16:12:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714579733; cv=none; b=KZA+g5BvV+2/7E8Fvayu5Z+2RjtPAPn2ZBKG+NUqriFc1xFZ4MasvIIO3/SUsP5iCWatZNJ9oKEnVnHmtUqn58rFqLWStkm/veUroP5kERwXNqhQ9w0saIp+qpeH0G16zWexkYXNKE3lKkLSVAyvEgTbPAIRKt3nrxfVVlRnEFU=
+	t=1714579978; cv=none; b=msU3CMOuOB2zkgLa1Cu+dOxnzaE2tD1toFWJ6HhNzbGKmhpyBh6+SDn43fkC5QmU6ZdvXJM6j2+OH+N2ixIE2fcScHOZMP1Oqx7pDx29cyjMhP1hm0rIOZJjuD3eTR0osdZDrZ23atGSOONF1XnJ7dsIZGervSVI14TugiPD2IU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714579733; c=relaxed/simple;
-	bh=+VEadbv+bcletex4ZU3F70vDHElyd0EyvsjfsK+uSck=;
+	s=arc-20240116; t=1714579978; c=relaxed/simple;
+	bh=hrRDPH5KmWRr+9x1RV6ps3o4KFAfIeKcj/QXwk73n2Y=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BKMYEu32ov9b2fiMVbaw1vFxpgnGrPQpn+wJ7uheyKcNOcI/aqTezZsVunZeR9GK2cNa9Hgq2qcZAtrqaJ9UUJUJFw9PjWlJx6dPvQBscvMgrY85Fv+RIImFM1znPCrlHvUkgm11LXClkg0zO0rjLr510h5dwJQPXOf7Q94pIus=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Y6RCaAGM; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=mA3Njj1fxRUT2Fs0JeXa7R5oyh9TdjrdV+s1GXEqvn0=; b=Y6RCaAGMGIw5uDbgwrwxmuUIz5
-	rlzGTC3wu/ad3O3/pDMU8EFRcL7zP572VjE5WWKb2BdR0z9j0vyB8Ww7Mu77iVmox6A57QJGea4MT
-	M0Llrs2dimW8bZ5Im0M2CR3zK5MaOcGiUfyheJCNnGTDciJaR2J0oVVLBye6+ttANEx8=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1s2CVk-00EREo-EX; Wed, 01 May 2024 18:08:48 +0200
-Date: Wed, 1 May 2024 18:08:48 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org,
-	jiri@resnulli.us, horms@kernel.org
-Subject: Re: [PATCH net-next v3 4/6] net: tn40xx: add basic Rx handling
-Message-ID: <1cbbc4df-fdf8-4ef2-b332-bf3334e9d2b9@lunn.ch>
-References: <20240429043827.44407-1-fujita.tomonori@gmail.com>
- <20240429043827.44407-5-fujita.tomonori@gmail.com>
- <20240429202713.05a1d8fc@kernel.org>
- <20240501.151616.1646623450396319799.fujita.tomonori@gmail.com>
- <20240501063405.442e0225@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=IGG+vW4XYv1il8ZcF0ZakbiYqI8i9twnt3f0Zm/vvB4OysJum1TGXT38V5fGkAYARZDf1OzGkzOrsVDschRx53ZdnpMeyJu46vtQv/WIU+gMKTQtTf8TpMFckeBrAX4fHv25qgjEfa2iGrWtUphd2t5QMkZDfPOUT7dwDy8fQrA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YlgVTqgA; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1714579975;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hrRDPH5KmWRr+9x1RV6ps3o4KFAfIeKcj/QXwk73n2Y=;
+	b=YlgVTqgAsfsalY/s5N01BofuEkinquxeGyCsRykx/HuFxMG3iyFuKUG4xuJ2nWUQFIX/Yq
+	prnFnh6GtR5m3aESpFdZfPX6xZbwXbeNOq0Jd47yjEv6F9aY4KcOnSMm7sTimQp3sXtZYD
+	baNp1rKK0hHXqh2bsOEWZXwoZpl6quY=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-408-gUA7A8uiP1ys8v4Xt3sdTA-1; Wed, 01 May 2024 12:12:54 -0400
+X-MC-Unique: gUA7A8uiP1ys8v4Xt3sdTA-1
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-418a673c191so29882005e9.0
+        for <netdev@vger.kernel.org>; Wed, 01 May 2024 09:12:54 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714579973; x=1715184773;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hrRDPH5KmWRr+9x1RV6ps3o4KFAfIeKcj/QXwk73n2Y=;
+        b=jn9CILrO9VSSCW4vIh3n0les3O9s/ydHcwiSDKDsPRrONz+PEzBgRd/i8PtZtp9689
+         f3NwLJlONn1HLhQpxwslj/TUKKYoi0O/NgNllXHvsgMRL5EPghQIbPAyg/P0Caiz2WPt
+         VJ05w4beg8+iv9H1D3DcXzFXnOg5E3XV/xQsK9q15Pw6g4aJKfSmmv/ubOT81zLg/flm
+         LxdwkURV90+gLpjLAj2zdNBjxnvEjlQElPAujuNDnqBaL64FP243uoM1/gPrr/MjLoPj
+         q5DfztSnd4jkV/QbEGi2PkCwqg0TImta5GKHWG6jPphDGwg/A2W/4M7FPES7RG9teR46
+         nn2A==
+X-Forwarded-Encrypted: i=1; AJvYcCUZdsPgZOD9KfffOp+IAY5r3xG21mLiWEcv+5G9n5kz1e8ezLPNtCUOz5tTTN8VPioXfV0aAHaI1nInXln2fWV9cuyLVMjf
+X-Gm-Message-State: AOJu0YzAY5CUnkcjQnWs6j4DFsETBLaIHo2tOW3n5iLXMwr927KHwkvk
+	+Pi+g4Y5npq4WdXYULH61ap+fhfDCzcF87U0eQBWv5WS3vCgEMiR0agdT839OgH7tOu0AFH6a35
+	Vd7lEHmiVLyMVPM2drmWnFbeQ7YooU2ZNIPDqcRnq8GQtYaL1FUsjzA==
+X-Received: by 2002:a05:600c:3552:b0:41a:be63:afbc with SMTP id i18-20020a05600c355200b0041abe63afbcmr1920319wmq.28.1714579973242;
+        Wed, 01 May 2024 09:12:53 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFM9eMgnWpKr6MeblXMaPo1/itIFX2oETmSIeau52sprOYTLIeHS2zSDJpwo+oNvlucm1N6qQ==
+X-Received: by 2002:a05:600c:3552:b0:41a:be63:afbc with SMTP id i18-20020a05600c355200b0041abe63afbcmr1920294wmq.28.1714579972623;
+        Wed, 01 May 2024 09:12:52 -0700 (PDT)
+Received: from redhat.com ([2a0d:6fc7:346:6a42:bb79:449b:3f0b:a228])
+        by smtp.gmail.com with ESMTPSA id l27-20020a05600c1d1b00b0041c5151dc1csm2639208wms.29.2024.05.01.09.12.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 01 May 2024 09:12:52 -0700 (PDT)
+Date: Wed, 1 May 2024 12:12:48 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: syzbot <syzbot+98edc2df894917b3431f@syzkaller.appspotmail.com>
+Cc: jasowang@redhat.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+	michael.christie@oracle.com, netdev@vger.kernel.org,
+	syzkaller-bugs@googlegroups.com, virtualization@lists.linux.dev
+Subject: Re: [syzbot] [net?] [virt?] [kvm?] KASAN: slab-use-after-free Read
+ in vhost_task_fn
+Message-ID: <20240501121200-mutt-send-email-mst@kernel.org>
+References: <000000000000a9613006174c1c4c@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,34 +90,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240501063405.442e0225@kernel.org>
+In-Reply-To: <000000000000a9613006174c1c4c@google.com>
 
-On Wed, May 01, 2024 at 06:34:05AM -0700, Jakub Kicinski wrote:
-> On Wed, 01 May 2024 15:16:16 +0900 (JST) FUJITA Tomonori wrote:
-> > > drivers/net/ethernet/tehuti/tn40.c:318:37: warning: cast to pointer from integer of different size [-Wint-to-pointer-cast]
-> > >   318 |                            dm->off, (void *)dm->dma);
-> > >       |                                     ^  
-> > 
-> > My bad. Fixed. I should have found this warning in patchwork before.
-> 
-> No you shouldn't have. The patchwork warnings are for maintainers, 
-> it's not a public CI.
-
-Expanding on that a bit. Its not a secret patchwork shows some CI
-results. What we don't want is developers posting 1/2 baked patches to
-the list in order that the CI picks them up and tests them. Hence the
-"not a public CI".
-
-We expect developers do their own mechanical build testing before
-posting patches. Build with W=1 C=1 etc. Build a couple of different
-architectures, ideally a 32 and a 64 bit. Build the documentation,
-etc.
-
-Reviewer and maintainer time is limited. So ideally we want the
-developer to do the mechanical work, leaving the reviewers to
-concentrate on things which cannot be reviewed mechanically, like
-architecture, logic bugs, conforming to the processes.
-
-     Andrew
+#syz test https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git f138e94c1f0dbeae721917694fb2203446a68ea9
 
 
