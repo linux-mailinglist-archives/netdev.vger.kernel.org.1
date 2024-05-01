@@ -1,511 +1,209 @@
-Return-Path: <netdev+bounces-92668-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92669-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 281008B83AE
-	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 02:22:28 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6164B8B83B8
+	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 02:31:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DC9CC285186
-	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 00:22:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5E81EB2271B
+	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 00:31:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67200819;
-	Wed,  1 May 2024 00:22:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9609F646;
+	Wed,  1 May 2024 00:31:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="Eq2CXtJu"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="ZGgGHXyM"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F99B37E
-	for <netdev@vger.kernel.org>; Wed,  1 May 2024 00:22:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3545A20
+	for <netdev@vger.kernel.org>; Wed,  1 May 2024 00:31:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714522946; cv=none; b=SDv056oeGV8KP/c5OMHhynBp3DJCtnodYVSZarrQVY+ZJhJSwUur2Vvb/gyL1X0Gy4dJOIdSoC7B7cYkXabJLVhsYiTZ0VAjuyw/Clao5dFqBvzDCfO/P2fSFDBZxJlzUeS3y704XND+R7knRPaIdgj6tKUVlVc/JbZM2YItcXU=
+	t=1714523500; cv=none; b=LhABZhXcSVPZbsZ5gc6YXXqdXr0P266l0TBIzDVOOLZ35BXuLdD2fY0+DGRMa713P1IKKTclzO9rEBm2IdHsPZgmbX+DD9q7gw3pcA9E6wlm+QD2IGEOuFNaXXnzjbQNzmTBsJtewsZqzaWTVq+PugKjXqwUBYMGSU+BjnLlle0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714522946; c=relaxed/simple;
-	bh=eX+SK1d9qlXoEf2C9edCUoZ4EOssS2zaBDPW3WrzgrE=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Vxyau4VzCFM3UYe/F0uTESUfL6k4T1WaS4Wx7YESKttOvQqnBOxIqZH79bQDRupctQ9CUib2L6ASuFnHSyvalCTwHW/e+P5/vyyp39tCSB3VWkudg9xFp4OTn0EXwz4q8HY8v+VZAYBn5wZqzMcWFD4nKCSTp4NgzrANiGtdhsI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=Eq2CXtJu; arc=none smtp.client-ip=99.78.197.220
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1714523500; c=relaxed/simple;
+	bh=rcsLSZ+eBDj4vBfweoknjgV4SBCGj+MWVXc/mGb1iPs=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=HlezHJK4CuJ43C96VZjlSqMhEWfrrfrmqTjPmlDFXtdoVFFLZSD/6VAGUs2Bw99ado6NkRpXo0xYXIF9ALOELs1yhve54drxbvp7thsj7h4hs7f39th61Mo/wIc8XVMoWXov+OEjDgAec5ADznfSyHomfrzKWYvK6tIZGB5Xy/U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=ZGgGHXyM; arc=none smtp.client-ip=209.85.128.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-61df496df01so8294907b3.3
+        for <netdev@vger.kernel.org>; Tue, 30 Apr 2024 17:31:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1714522944; x=1746058944;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=91bn9C4FXm2FwyjyCUJBmfaF+DHPiG7gPDFtGEI/H28=;
-  b=Eq2CXtJuQFw6xzaDAfarSJ4xNin5BBkfFjYvczqW5uxg0qCmgYQkA+mS
-   AEoHzbMIojnvxxQqFYP+2cj5ous8lYTjEGZXbz2YOdRgqUZmZ9LW0mvfo
-   3HHd6RnGpJU1R9IumabtRggcA3Ma3Q6UD9gONf7CB+GswpNdEsCa3tZxi
-   I=;
-X-IronPort-AV: E=Sophos;i="6.07,243,1708387200"; 
-   d="scan'208";a="85848147"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 May 2024 00:22:22 +0000
-Received: from EX19MTAUWC001.ant.amazon.com [10.0.7.35:59163]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.58.142:2525] with esmtp (Farcaster)
- id 120c5ff6-0829-4c9e-bdc9-159785706af5; Wed, 1 May 2024 00:22:22 +0000 (UTC)
-X-Farcaster-Flow-ID: 120c5ff6-0829-4c9e-bdc9-159785706af5
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Wed, 1 May 2024 00:22:21 +0000
-Received: from 88665a182662.ant.amazon.com (10.187.171.42) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Wed, 1 May 2024 00:22:20 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <anderson@allelesecurity.com>
-CC: <netdev@vger.kernel.org>, <edumazet@google.com>, <kuniyu@amazon.com>
-Subject: Re: use-after-free warnings in tcp_v4_connect() due to inet_twsk_hashdance() inserting the object into ehash table without initializing its reference counter
-Date: Tue, 30 Apr 2024 17:22:12 -0700
-Message-ID: <20240501002212.20110-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <37a477a6-d39e-486b-9577-3463f655a6b7@allelesecurity.com>
-References: <37a477a6-d39e-486b-9577-3463f655a6b7@allelesecurity.com>
+        d=broadcom.com; s=google; t=1714523498; x=1715128298; darn=vger.kernel.org;
+        h=mime-version:message-id:date:subject:cc:to:from:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=e9DTY0R+bk660Wo0XwbxvEI7Q8MRa5f+m1M874f5FcM=;
+        b=ZGgGHXyMPWN09v977h0TgwddEP4Dlc0Rt851UI5J87S9pdHy94p9neKsWd17QoeRYg
+         XhVGbGDEGCyyGsEnJU+BgNQDbk9PJV152+0PqFHa4bfabPAh5qsOAIeA8KfnxTiuggTA
+         XWnx4zcWVFReIe0cwDvQ7STPhAP6lkNTdKKwk=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714523498; x=1715128298;
+        h=mime-version:message-id:date:subject:cc:to:from:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=e9DTY0R+bk660Wo0XwbxvEI7Q8MRa5f+m1M874f5FcM=;
+        b=gxqE4nYlbHcS+FSqn0d80KeM9g3pIGg9dmoMKhInAEemuiutasLx/ksA85JmdwcxJQ
+         IVG08PrDzN4sEJUQhDiz1e50kcHuOoTdNUzdRQHVY7ocwwPimT269FsHvreYDf2Oi1dA
+         t8N0RZRixu8WiKVJWFux/NICg5JklI+td/u2+7/g3Z/NDxhhlYnpDHxGWFvFRD4ckXEn
+         26YRw/J7iYFYbLf/WHWYY94AYdwd3bSBUU3I30Udah1uIS0l0v2vmLQcML64uczDXdgr
+         jHjCSfN8zW/hD6iC6ZK06uj9V4Ak1qthHeuZk2EXp1ZgVrIs9pqB4AL8oeJ5TVNF9bv7
+         2EyA==
+X-Gm-Message-State: AOJu0YxjHSquBKqyrq9i5CkdcC4Khv0uKN3a6CroGmB3SiKeHfLY9dJJ
+	yxINjMW/hP1fDZNmqH5GUhDMiyQxCnFVgpBKR5cnNza8AxoaIoIdaDiMYElgoA==
+X-Google-Smtp-Source: AGHT+IELzIzJ46Qe7c1tx60gDSJm9771URgITnMa8QjHy0Yo8aYTyhXr6ucSdEQ9DsCsk8wnWzn+xA==
+X-Received: by 2002:a81:ac51:0:b0:61b:3364:32db with SMTP id z17-20020a81ac51000000b0061b336432dbmr1078676ywj.36.1714523497465;
+        Tue, 30 Apr 2024 17:31:37 -0700 (PDT)
+Received: from lvnvda5233.lvn.broadcom.net ([192.19.161.250])
+        by smtp.gmail.com with ESMTPSA id f15-20020ac8470f000000b0043a7cb47069sm4337935qtp.9.2024.04.30.17.31.36
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 30 Apr 2024 17:31:37 -0700 (PDT)
+From: Michael Chan <michael.chan@broadcom.com>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	andrew.gospodarek@broadcom.com
+Subject: [PATCH net-next v2 0/6] bnxt_en: Updates for net-next
+Date: Tue, 30 Apr 2024 17:30:50 -0700
+Message-Id: <20240501003056.100607-1-michael.chan@broadcom.com>
+X-Mailer: git-send-email 2.32.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="0000000000000feb530617599c9c"
+
+--0000000000000feb530617599c9c
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D041UWB004.ant.amazon.com (10.13.139.143) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-+cc Eric
+The first patch converts the sw_stats field in the completion
+ring structure to a pointer.  This allows the group of
+completion rings using the same MSIX to share the same sw_stats
+structure.  Prior to this, the correct completion ring must be
+used to count packets.
 
-From: Anderson Nascimento <anderson@allelesecurity.com>
-Date: Tue, 30 Apr 2024 19:00:34 -0300
-> Hello,
+The next four patches remove the RTNL lock when calling the RoCE
+driver for asynchronous stop and start during error recovery and
+firmware reset.  The RTNL ilock is replaced with a private mutex
+used to synchronize RoCE register, unregister, stop, and start.
 
-Hi,
+The last patch adds VF PCI IDs for the 5760X chips.
 
-Thanks for the detailed report.
+v2: Dropped patch #1 from v1.  Will work with David to get that
+patch in separately.
 
-> 
-> There is a bug in inet_twsk_hashdance(). This function inserts a 
-> time-wait socket in the established hash table without initializing the 
-> object's reference counter, as seen below. The reference counter 
-> initialization is done after the object is added to the established hash 
-> table and the lock is released. Because of this, a sock_hold() in 
-> tcp_twsk_unique() and other operations on the object trigger warnings 
-> from the reference counter saturation mechanism. The warnings can also 
-> be seen below. They were triggered on Fedora 39 Linux kernel v6.8.
-> 
-> The bug is triggered via a connect() system call on a TCP socket, 
-> reaching __inet_check_established() and then passing the time-wait 
-> socket to tcp_twsk_unique(). Other operations are also performed on the 
-> time-wait socket in __inet_check_established() before its reference 
-> counter is initialized correctly by inet_twsk_hashdance(). The fix seems 
-> to be to move the reference counter initialization inside the lock,
+Ajit Khaparde (1):
+  bnxt_en: Add VF PCI ID for 5760X (P7) chips
 
-or use refcount_inc_not_zero() and give up on reusing the port
-under the race ?
+Edwin Peer (1):
+  bnxt_en: share NQ ring sw_stats memory with subrings
 
----8<---
-diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-index 0427deca3e0e..637f4965326d 100644
---- a/net/ipv4/tcp_ipv4.c
-+++ b/net/ipv4/tcp_ipv4.c
-@@ -175,8 +175,13 @@ int tcp_twsk_unique(struct sock *sk, struct sock *sktw, void *twp)
- 			tp->rx_opt.ts_recent	   = tcptw->tw_ts_recent;
- 			tp->rx_opt.ts_recent_stamp = tcptw->tw_ts_recent_stamp;
- 		}
--		sock_hold(sktw);
--		return 1;
-+
-+		/* Here, sk_refcnt could be 0 because inet_twsk_hashdance() puts
-+		 * twsk into ehash and releases the bucket lock *before* setting
-+		 * sk_refcnt.  Then, give up on reusing the port.
-+		 */
-+		if (likely(refcount_inc_not_zero(&sktw->sk_refcnt)))
-+			return 1;
- 	}
- 
- 	return 0;
----8<---
+Kalesh AP (3):
+  bnxt_en: Don't support offline self test when RoCE driver is loaded
+  bnxt_en: Add a mutex to synchronize ULP operations
+  bnxt_en: Optimize recovery path ULP locking in the driver
+
+Michael Chan (1):
+  bnxt_en: Don't call ULP_STOP/ULP_START during L2 reset
+
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 119 ++++++++++--------
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h     |   4 +-
+ .../net/ethernet/broadcom/bnxt/bnxt_devlink.c |   7 +-
+ .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c |  15 ++-
+ drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c |  20 ++-
+ drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.h |   3 +
+ 6 files changed, 107 insertions(+), 61 deletions(-)
+
+-- 
+2.30.1
 
 
+--0000000000000feb530617599c9c
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
 
-> but 
-> as I didn't test it, I can't confirm it.
-> 
-> The bug seems to be introduced by commit ec94c269 ("
-> tcp/dccp: avoid one atomic operation for timewait hashdance").
-> 
-> 100 void inet_twsk_hashdance(struct inet_timewait_sock *tw, struct sock *sk,
-> 101                            struct inet_hashinfo *hashinfo)
-> 102 {
-> 103         const struct inet_sock *inet = inet_sk(sk);
-> 104         const struct inet_connection_sock *icsk = inet_csk(sk);
-> 105         struct inet_ehash_bucket *ehead = 
-> inet_ehash_bucket(hashinfo, sk->sk_hash);
-> 106         spinlock_t *lock = inet_ehash_lockp(hashinfo, sk->sk_hash);
-> 107         struct inet_bind_hashbucket *bhead, *bhead2;
-> ...
-> 129
-> 130         spin_lock(lock);
-> 131
-> 132         inet_twsk_add_node_rcu(tw, &ehead->chain);
-> 133
-> 134         /* Step 3: Remove SK from hash chain */
-> 135         if (__sk_nulls_del_node_init_rcu(sk))
-> 136                 sock_prot_inuse_add(sock_net(sk), sk->sk_prot, -1);
-> 137
-> 138         spin_unlock(lock);
-> ...
-> 149         refcount_set(&tw->tw_refcnt, 3);
-> 150 }
-> 
-> 538 static int __inet_check_established(struct inet_timewait_death_row 
-> *death_row,
-> 539                                     struct sock *sk, __u16 lport,
-> 540                                     struct inet_timewait_sock **twp)
-> 541 {
-> 542         struct inet_hashinfo *hinfo = death_row->hashinfo;
-> 543         struct inet_sock *inet = inet_sk(sk);
-> 544         __be32 daddr = inet->inet_rcv_saddr;
-> 545         __be32 saddr = inet->inet_daddr;
-> 546         int dif = sk->sk_bound_dev_if;
-> 547         struct net *net = sock_net(sk);
-> 548         int sdif = l3mdev_master_ifindex_by_index(net, dif);
-> 549         INET_ADDR_COOKIE(acookie, saddr, daddr);
-> 550         const __portpair ports = 
-> INET_COMBINED_PORTS(inet->inet_dport, lport);
-> 551         unsigned int hash = inet_ehashfn(net, daddr, lport,
-> 552                                          saddr, inet->inet_dport);
-> 553         struct inet_ehash_bucket *head = inet_ehash_bucket(hinfo, hash);
-> 554         spinlock_t *lock = inet_ehash_lockp(hinfo, hash);
-> 555         struct sock *sk2;
-> 556         const struct hlist_nulls_node *node;
-> 557         struct inet_timewait_sock *tw = NULL;
-> 558
-> 559         spin_lock(lock);
-> 560
-> 561         sk_nulls_for_each(sk2, node, &head->chain) {
-> 562                 if (sk2->sk_hash != hash)
-> 563                         continue;
-> 564
-> 565                 if (likely(inet_match(net, sk2, acookie, ports, dif, 
-> sdif))) {
-> 566                         if (sk2->sk_state == TCP_TIME_WAIT) {
-> 567                                 tw = inet_twsk(sk2);
-> 568                                 if (twsk_unique(sk, sk2, twp))
-> 569                                         break;
-> 570                         }
-> 571                         goto not_unique;
-> 572                 }
-> 573         }
-> ...
-> 
-> 23 static inline int twsk_unique(struct sock *sk, struct sock *sktw, 
-> void *twp)
-> 24 {
-> 25         if (sk->sk_prot->twsk_prot->twsk_unique != NULL)
-> 26                 return sk->sk_prot->twsk_prot->twsk_unique(sk, sktw, 
-> twp);
-> 27         return 0;
-> 28 }
-> 
-> 110 int tcp_twsk_unique(struct sock *sk, struct sock *sktw, void *twp)
-> 111 {
-> 112         int reuse = READ_ONCE(sock_net(sk)->ipv4.sysctl_tcp_tw_reuse);
-> 113         const struct inet_timewait_sock *tw = inet_twsk(sktw);
-> 114         const struct tcp_timewait_sock *tcptw = tcp_twsk(sktw);
-> 115         struct tcp_sock *tp = tcp_sk(sk);
-> 116
-> ...
-> 154         if (tcptw->tw_ts_recent_stamp &&
-> 155             (!twp || (reuse && time_after32(ktime_get_seconds(),
-> 156 tcptw->tw_ts_recent_stamp)))) {
-> ...
-> 168                 if (likely(!tp->repair)) {
-> ...
-> 176                 }
-> 177                 sock_hold(sktw);
-> 178                 return 1;
-> 179         }
-> 180
-> 181         return 0;
-> 182 }
-> 
-> [433522.338983] ------------[ cut here ]------------
-> [433522.339033] refcount_t: addition on 0; use-after-free.
-> [433522.339706] WARNING: CPU: 0 PID: 1039313 at lib/refcount.c:25 
-> refcount_warn_saturate+0xe5/0x110
-> [433522.340028] Modules linked in: binfmt_misc nft_fib_inet nft_fib_ipv4 
-> nft_fib_ipv6 nft_fib nft_reject_inet nf_reject_ipv4 nf_reject_ipv6 
-> nft_reject nft_ct nft_chain_nat nf_nat nf_conntrack nf_defrag_ipv6 
-> nf_defrag_ipv4 rfkill nf_tables nfnetlink qrtr vsock_loopback 
-> vmw_vsock_virtio_transport_common vmw_vsock_vmci_transport vsock 
-> intel_rapl_msr intel_rapl_common intel_uncore_frequency_common 
-> intel_pmc_core snd_ens1371 intel_vsec pmt_telemetry snd_ac97_codec 
-> pmt_class rapl gameport vmw_balloon snd_rawmidi snd_seq_device sunrpc 
-> ac97_bus snd_pcm snd_timer snd soundcore vfat fat vmw_vmci i2c_piix4 
-> joydev loop zram xfs crct10dif_pclmul crc32_pclmul crc32c_intel nvme 
-> polyval_clmulni polyval_generic nvme_core ghash_clmulni_intel vmwgfx 
-> sha512_ssse3 sha256_ssse3 sha1_ssse3 vmxnet3 nvme_auth drm_ttm_helper 
-> ttm ata_generic pata_acpi serio_raw scsi_dh_rdac scsi_dh_emc 
-> scsi_dh_alua fuse dm_multipath
-> [433522.340141] CPU: 0 PID: 1039313 Comm: trigger Not tainted 
-> 6.8.6-200.fc39.x86_64 #1
-> [433522.340170] Hardware name: VMware, Inc. VMware20,1/440BX Desktop 
-> Reference Platform, BIOS VMW201.00V.21805430.B64.2305221830 05/22/2023
-> [433522.340172] RIP: 0010:refcount_warn_saturate+0xe5/0x110
-> [433522.340179] Code: 42 8e ff 0f 0b c3 cc cc cc cc 80 3d aa 13 ea 01 00 
-> 0f 85 5e ff ff ff 48 c7 c7 f8 8e b7 82 c6 05 96 13 ea 01 01 e8 7b 42 8e 
-> ff <0f> 0b c3 cc cc cc cc 48 c7 c7 50 8f b7 82 c6 05 7a 13 ea 01 01 e8
-> [433522.340182] RSP: 0018:ffffc90006b43b60 EFLAGS: 00010282
-> [433522.340185] RAX: 0000000000000000 RBX: ffff888009bb3ef0 RCX: 
-> 0000000000000027
-> [433522.340213] RDX: ffff88807be218c8 RSI: 0000000000000001 RDI: 
-> ffff88807be218c0
-> [433522.340215] RBP: 0000000000069d70 R08: 0000000000000000 R09: 
-> ffffc90006b439f0
-> [433522.340217] R10: ffffc90006b439e8 R11: 0000000000000003 R12: 
-> ffff8880029ede84
-> [433522.340219] R13: 0000000000004e20 R14: ffffffff84356dc0 R15: 
-> ffff888009bb3ef0
-> [433522.340221] FS:  00007f62c10926c0(0000) GS:ffff88807be00000(0000) 
-> knlGS:0000000000000000
-> [433522.340224] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [433522.340226] CR2: 0000000020ccb000 CR3: 000000004628c005 CR4: 
-> 0000000000f70ef0
-> [433522.340276] PKRU: 55555554
-> [433522.340278] Call Trace:
-> [433522.340282]  <TASK>
-> [433522.340307]  ? refcount_warn_saturate+0xe5/0x110
-> [433522.340313]  ? __warn+0x81/0x130
-> [433522.340462]  ? refcount_warn_saturate+0xe5/0x110
-> [433522.340492]  ? report_bug+0x171/0x1a0
-> [433522.340723]  ? refcount_warn_saturate+0xe5/0x110
-> [433522.340731]  ? handle_bug+0x3c/0x80
-> [433522.340781]  ? exc_invalid_op+0x17/0x70
-> [433522.340785]  ? asm_exc_invalid_op+0x1a/0x20
-> [433522.340838]  ? refcount_warn_saturate+0xe5/0x110
-> [433522.340843]  tcp_twsk_unique+0x186/0x190
-> [433522.340945]  __inet_check_established+0x176/0x2d0
-> [433522.340974]  __inet_hash_connect+0x74/0x7d0
-> [433522.340980]  ? __pfx___inet_check_established+0x10/0x10
-> [433522.340983]  tcp_v4_connect+0x278/0x530
-> [433522.340989]  __inet_stream_connect+0x10f/0x3d0
-> [433522.341019]  inet_stream_connect+0x3a/0x60
-> [433522.341024]  __sys_connect+0xa8/0xd0
-> [433522.341186]  __x64_sys_connect+0x18/0x20
-> [433522.341190]  do_syscall_64+0x83/0x170
-> [433522.341195]  ? __count_memcg_events+0x4d/0xc0
-> [433522.341334]  ? count_memcg_events.constprop.0+0x1a/0x30
-> [433522.341385]  ? handle_mm_fault+0xa2/0x360
-> [433522.341412]  ? do_user_addr_fault+0x304/0x670
-> [433522.341442]  ? clear_bhb_loop+0x55/0xb0
-> [433522.341446]  ? clear_bhb_loop+0x55/0xb0
-> [433522.341449]  ? clear_bhb_loop+0x55/0xb0
-> [433522.341453]  entry_SYSCALL_64_after_hwframe+0x78/0x80
-> [433522.341458] RIP: 0033:0x7f62c11a885d
-> [433522.341685] Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 90 f3 0f 1e fa 
-> 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 
-> 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d a3 45 0c 00 f7 d8 64 89 01 48
-> [433522.341688] RSP: 002b:00007f62c1091e58 EFLAGS: 00000296 ORIG_RAX: 
-> 000000000000002a
-> [433522.341691] RAX: ffffffffffffffda RBX: 0000000020ccb004 RCX: 
-> 00007f62c11a885d
-> [433522.341693] RDX: 0000000000000010 RSI: 0000000020ccb000 RDI: 
-> 0000000000000003
-> [433522.341695] RBP: 00007f62c1091e90 R08: 0000000000000000 R09: 
-> 0000000000000000
-> [433522.341696] R10: 0000000000000000 R11: 0000000000000296 R12: 
-> 00007f62c10926c0
-> [433522.341698] R13: ffffffffffffff88 R14: 0000000000000000 R15: 
-> 00007ffe237885b0
-> [433522.341702]  </TASK>
-> [433522.341703] ---[ end trace 0000000000000000 ]---
-> [433522.341709] ------------[ cut here ]------------
-> [433522.341710] refcount_t: underflow; use-after-free.
-> [433522.341720] WARNING: CPU: 0 PID: 1039313 at lib/refcount.c:28 
-> refcount_warn_saturate+0xbe/0x110
-> [433522.341727] Modules linked in: binfmt_misc nft_fib_inet nft_fib_ipv4 
-> nft_fib_ipv6 nft_fib nft_reject_inet nf_reject_ipv4 nf_reject_ipv6 
-> nft_reject nft_ct nft_chain_nat nf_nat nf_conntrack nf_defrag_ipv6 
-> nf_defrag_ipv4 rfkill nf_tables nfnetlink qrtr vsock_loopback 
-> vmw_vsock_virtio_transport_common vmw_vsock_vmci_transport vsock 
-> intel_rapl_msr intel_rapl_common intel_uncore_frequency_common 
-> intel_pmc_core snd_ens1371 intel_vsec pmt_telemetry snd_ac97_codec 
-> pmt_class rapl gameport vmw_balloon snd_rawmidi snd_seq_device sunrpc 
-> ac97_bus snd_pcm snd_timer snd soundcore vfat fat vmw_vmci i2c_piix4 
-> joydev loop zram xfs crct10dif_pclmul crc32_pclmul crc32c_intel nvme 
-> polyval_clmulni polyval_generic nvme_core ghash_clmulni_intel vmwgfx 
-> sha512_ssse3 sha256_ssse3 sha1_ssse3 vmxnet3 nvme_auth drm_ttm_helper 
-> ttm ata_generic pata_acpi serio_raw scsi_dh_rdac scsi_dh_emc 
-> scsi_dh_alua fuse dm_multipath
-> [433522.341820] CPU: 0 PID: 1039313 Comm: trigger Tainted: G        W 
->      6.8.6-200.fc39.x86_64 #1
-> [433522.341823] Hardware name: VMware, Inc. VMware20,1/440BX Desktop 
-> Reference Platform, BIOS VMW201.00V.21805430.B64.2305221830 05/22/2023
-> [433522.341825] RIP: 0010:refcount_warn_saturate+0xbe/0x110
-> [433522.341829] Code: 01 01 e8 c5 42 8e ff 0f 0b c3 cc cc cc cc 80 3d cc 
-> 13 ea 01 00 75 85 48 c7 c7 28 8f b7 82 c6 05 bc 13 ea 01 01 e8 a2 42 8e 
-> ff <0f> 0b c3 cc cc cc cc 80 3d aa 13 ea 01 00 0f 85 5e ff ff ff 48 c7
-> [433522.341831] RSP: 0018:ffffc90006b43b80 EFLAGS: 00010282
-> [433522.341834] RAX: 0000000000000000 RBX: 0000000000004e20 RCX: 
-> 0000000000000027
-> [433522.341836] RDX: ffff88807be218c8 RSI: 0000000000000001 RDI: 
-> ffff88807be218c0
-> [433522.341837] RBP: ffff888009a640c0 R08: 0000000000000000 R09: 
-> ffffc90006b43a10
-> [433522.341839] R10: ffffc90006b43a08 R11: 0000000000000003 R12: 
-> ffff8880029ede84
-> [433522.341840] R13: 000000000000204e R14: ffffffff84356dc0 R15: 
-> ffff888009bb3ef0
-> [433522.341842] FS:  00007f62c10926c0(0000) GS:ffff88807be00000(0000) 
-> knlGS:0000000000000000
-> [433522.341844] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [433522.341846] CR2: 0000000020ccb000 CR3: 000000004628c005 CR4: 
-> 0000000000f70ef0
-> [433522.341886] PKRU: 55555554
-> [433522.341887] Call Trace:
-> [433522.341889]  <TASK>
-> [433522.341890]  ? refcount_warn_saturate+0xbe/0x110
-> [433522.341894]  ? __warn+0x81/0x130
-> [433522.341899]  ? refcount_warn_saturate+0xbe/0x110
-> [433522.341903]  ? report_bug+0x171/0x1a0
-> [433522.341907]  ? console_unlock+0x78/0x120
-> [433522.341977]  ? handle_bug+0x3c/0x80
-> [433522.341981]  ? exc_invalid_op+0x17/0x70
-> [433522.342007]  ? asm_exc_invalid_op+0x1a/0x20
-> [433522.342011]  ? refcount_warn_saturate+0xbe/0x110
-> [433522.342015]  __inet_check_established+0x24d/0x2d0
-> [433522.342019]  __inet_hash_connect+0x74/0x7d0
-> [433522.342023]  ? __pfx___inet_check_established+0x10/0x10
-> [433522.342026]  tcp_v4_connect+0x278/0x530
-> [433522.342031]  __inet_stream_connect+0x10f/0x3d0
-> [433522.342035]  inet_stream_connect+0x3a/0x60
-> [433522.342039]  __sys_connect+0xa8/0xd0
-> [433522.342044]  __x64_sys_connect+0x18/0x20
-> [433522.342048]  do_syscall_64+0x83/0x170
-> [433522.342051]  ? __count_memcg_events+0x4d/0xc0
-> [433522.342054]  ? count_memcg_events.constprop.0+0x1a/0x30
-> [433522.342058]  ? handle_mm_fault+0xa2/0x360
-> [433522.342060]  ? do_user_addr_fault+0x304/0x670
-> [433522.342065]  ? clear_bhb_loop+0x55/0xb0
-> [433522.342068]  ? clear_bhb_loop+0x55/0xb0
-> [433522.342071]  ? clear_bhb_loop+0x55/0xb0
-> [433522.342074]  entry_SYSCALL_64_after_hwframe+0x78/0x80
-> [433522.342077] RIP: 0033:0x7f62c11a885d
-> [433522.342083] Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 90 f3 0f 1e fa 
-> 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 
-> 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d a3 45 0c 00 f7 d8 64 89 01 48
-> [433522.342085] RSP: 002b:00007f62c1091e58 EFLAGS: 00000296 ORIG_RAX: 
-> 000000000000002a
-> [433522.342087] RAX: ffffffffffffffda RBX: 0000000020ccb004 RCX: 
-> 00007f62c11a885d
-> [433522.342089] RDX: 0000000000000010 RSI: 0000000020ccb000 RDI: 
-> 0000000000000003
-> [433522.342091] RBP: 00007f62c1091e90 R08: 0000000000000000 R09: 
-> 0000000000000000
-> [433522.342092] R10: 0000000000000000 R11: 0000000000000296 R12: 
-> 00007f62c10926c0
-> [433522.342093] R13: ffffffffffffff88 R14: 0000000000000000 R15: 
-> 00007ffe237885b0
-> [433522.342096]  </TASK>
-> [433522.342097] ---[ end trace 0000000000000000 ]---
-> [435060.554199] ------------[ cut here ]------------
-> [435060.554243] refcount_t: decrement hit 0; leaking memory.
-> [435060.554261] WARNING: CPU: 2 PID: 879478 at lib/refcount.c:31 
-> refcount_warn_saturate+0xff/0x110
-> [435060.554278] Modules linked in: binfmt_misc nft_fib_inet nft_fib_ipv4 
-> nft_fib_ipv6 nft_fib nft_reject_inet nf_reject_ipv4 nf_reject_ipv6 
-> nft_reject nft_ct nft_chain_nat nf_nat nf_conntrack nf_defrag_ipv6 
-> nf_defrag_ipv4 rfkill nf_tables nfnetlink qrtr vsock_loopback 
-> vmw_vsock_virtio_transport_common vmw_vsock_vmci_transport vsock 
-> intel_rapl_msr intel_rapl_common intel_uncore_frequency_common 
-> intel_pmc_core snd_ens1371 intel_vsec pmt_telemetry snd_ac97_codec 
-> pmt_class rapl gameport vmw_balloon snd_rawmidi snd_seq_device sunrpc 
-> ac97_bus snd_pcm snd_timer snd soundcore vfat fat vmw_vmci i2c_piix4 
-> joydev loop zram xfs crct10dif_pclmul crc32_pclmul crc32c_intel nvme 
-> polyval_clmulni polyval_generic nvme_core ghash_clmulni_intel vmwgfx 
-> sha512_ssse3 sha256_ssse3 sha1_ssse3 vmxnet3 nvme_auth drm_ttm_helper 
-> ttm ata_generic pata_acpi serio_raw scsi_dh_rdac scsi_dh_emc 
-> scsi_dh_alua fuse dm_multipath
-> [435060.554426] CPU: 2 PID: 879478 Comm: trigger Tainted: G        W 
->    6.8.6-200.fc39.x86_64 #1
-> [435060.554431] Hardware name: VMware, Inc. VMware20,1/440BX Desktop 
-> Reference Platform, BIOS VMW201.00V.21805430.B64.2305221830 05/22/2023
-> [435060.554433] RIP: 0010:refcount_warn_saturate+0xff/0x110
-> [435060.554439] Code: f8 8e b7 82 c6 05 96 13 ea 01 01 e8 7b 42 8e ff 0f 
-> 0b c3 cc cc cc cc 48 c7 c7 50 8f b7 82 c6 05 7a 13 ea 01 01 e8 61 42 8e 
-> ff <0f> 0b c3 cc cc cc cc 66 2e 0f 1f 84 00 00 00 00 00 90 90 90 90 90
-> [435060.554442] RSP: 0018:ffffc90005e2bb50 EFLAGS: 00010286
-> [435060.554445] RAX: 0000000000000000 RBX: 0000000000004e20 RCX: 
-> 0000000000000027
-> [435060.554448] RDX: ffff88807bea18c8 RSI: 0000000000000001 RDI: 
-> ffff88807bea18c0
-> [435060.554450] RBP: ffff8880274d9bc0 R08: 0000000000000000 R09: 
-> ffffc90005e2b9e0
-> [435060.554451] R10: ffffc90005e2b9d8 R11: 0000000000000003 R12: 
-> ffff8880029ede84
-> [435060.554453] R13: 000000000000204e R14: ffffffff84356dc0 R15: 
-> ffff888009bb2738
-> [435060.554456] FS:  00007f102ab566c0(0000) GS:ffff88807be80000(0000) 
-> knlGS:0000000000000000
-> [435060.554458] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [435060.554460] CR2: 0000000020ccb000 CR3: 000000004e184003 CR4: 
-> 0000000000f70ef0
-> [435060.554601] PKRU: 55555554
-> [435060.554603] Call Trace:
-> [435060.554607]  <TASK>
-> [435060.554608]  ? refcount_warn_saturate+0xff/0x110
-> [435060.554614]  ? __warn+0x81/0x130
-> [435060.554625]  ? refcount_warn_saturate+0xff/0x110
-> [435060.554630]  ? report_bug+0x171/0x1a0
-> [435060.554638]  ? console_unlock+0x78/0x120
-> [435060.554670]  ? handle_bug+0x3c/0x80
-> [435060.554676]  ? exc_invalid_op+0x17/0x70
-> [435060.554682]  ? asm_exc_invalid_op+0x1a/0x20
-> [435060.554694]  ? refcount_warn_saturate+0xff/0x110
-> [435060.554699]  __inet_check_established+0x29b/0x2d0
-> [435060.554707]  __inet_hash_connect+0x74/0x7d0
-> [435060.554712]  ? __pfx___inet_check_established+0x10/0x10
-> [435060.554716]  tcp_v4_connect+0x278/0x530
-> [435060.554723]  __inet_stream_connect+0x10f/0x3d0
-> [435060.554729]  inet_stream_connect+0x3a/0x60
-> [435060.554734]  __sys_connect+0xa8/0xd0
-> [435060.554744]  __x64_sys_connect+0x18/0x20
-> [435060.554748]  do_syscall_64+0x83/0x170
-> [435060.554752]  ? __switch_to_asm+0x3e/0x70
-> [435060.554826]  ? finish_task_switch.isra.0+0x94/0x2f0
-> [435060.554835]  ? __schedule+0x3f4/0x1530
-> [435060.554865]  ? __count_memcg_events+0x4d/0xc0
-> [435060.554871]  ? __rseq_handle_notify_resume+0xa9/0x4f0
-> [435060.554946]  ? count_memcg_events.constprop.0+0x1a/0x30
-> [435060.554953]  ? switch_fpu_return+0x50/0xe0
-> [435060.555065]  ? clear_bhb_loop+0x55/0xb0
-> [435060.555070]  ? clear_bhb_loop+0x55/0xb0
-> [435060.555073]  ? clear_bhb_loop+0x55/0xb0
-> [435060.555077]  entry_SYSCALL_64_after_hwframe+0x78/0x80
-> [435060.555082] RIP: 0033:0x7f102ac6c85d
-> [435060.555141] Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 90 f3 0f 1e fa 
-> 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 
-> 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d a3 45 0c 00 f7 d8 64 89 01 48
-> [435060.555143] RSP: 002b:00007f102ab55e58 EFLAGS: 00000296 ORIG_RAX: 
-> 000000000000002a
-> [435060.555147] RAX: ffffffffffffffda RBX: 0000000020ccb004 RCX: 
-> 00007f102ac6c85d
-> [435060.555149] RDX: 0000000000000010 RSI: 0000000020ccb000 RDI: 
-> 0000000000000003
-> [435060.555151] RBP: 00007f102ab55e90 R08: 0000000000000000 R09: 
-> 0000000000000000
-> [435060.555153] R10: 0000000000000000 R11: 0000000000000296 R12: 
-> 00007f102ab566c0
-> [435060.555154] R13: ffffffffffffff88 R14: 0000000000000000 R15: 
-> 00007ffc83d0fa70
-> [435060.555158]  </TASK>
-> [435060.555160] ---[ end trace 0000000000000000 ]---
-> 
-> -- 
-> Anderson Nascimento
+MIIQbQYJKoZIhvcNAQcCoIIQXjCCEFoCAQExDzANBglghkgBZQMEAgEFADALBgkqhkiG9w0BBwGg
+gg3EMIIFDTCCA/WgAwIBAgIQeEqpED+lv77edQixNJMdADANBgkqhkiG9w0BAQsFADBMMSAwHgYD
+VQQLExdHbG9iYWxTaWduIFJvb3QgQ0EgLSBSMzETMBEGA1UEChMKR2xvYmFsU2lnbjETMBEGA1UE
+AxMKR2xvYmFsU2lnbjAeFw0yMDA5MTYwMDAwMDBaFw0yODA5MTYwMDAwMDBaMFsxCzAJBgNVBAYT
+AkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBS
+MyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA
+vbCmXCcsbZ/a0fRIQMBxp4gJnnyeneFYpEtNydrZZ+GeKSMdHiDgXD1UnRSIudKo+moQ6YlCOu4t
+rVWO/EiXfYnK7zeop26ry1RpKtogB7/O115zultAz64ydQYLe+a1e/czkALg3sgTcOOcFZTXk38e
+aqsXsipoX1vsNurqPtnC27TWsA7pk4uKXscFjkeUE8JZu9BDKaswZygxBOPBQBwrA5+20Wxlk6k1
+e6EKaaNaNZUy30q3ArEf30ZDpXyfCtiXnupjSK8WU2cK4qsEtj09JS4+mhi0CTCrCnXAzum3tgcH
+cHRg0prcSzzEUDQWoFxyuqwiwhHu3sPQNmFOMwIDAQABo4IB2jCCAdYwDgYDVR0PAQH/BAQDAgGG
+MGAGA1UdJQRZMFcGCCsGAQUFBwMCBggrBgEFBQcDBAYKKwYBBAGCNxQCAgYKKwYBBAGCNwoDBAYJ
+KwYBBAGCNxUGBgorBgEEAYI3CgMMBggrBgEFBQcDBwYIKwYBBQUHAxEwEgYDVR0TAQH/BAgwBgEB
+/wIBADAdBgNVHQ4EFgQUljPR5lgXWzR1ioFWZNW+SN6hj88wHwYDVR0jBBgwFoAUj/BLf6guRSSu
+TVD6Y5qL3uLdG7wwegYIKwYBBQUHAQEEbjBsMC0GCCsGAQUFBzABhiFodHRwOi8vb2NzcC5nbG9i
+YWxzaWduLmNvbS9yb290cjMwOwYIKwYBBQUHMAKGL2h0dHA6Ly9zZWN1cmUuZ2xvYmFsc2lnbi5j
+b20vY2FjZXJ0L3Jvb3QtcjMuY3J0MDYGA1UdHwQvMC0wK6ApoCeGJWh0dHA6Ly9jcmwuZ2xvYmFs
+c2lnbi5jb20vcm9vdC1yMy5jcmwwWgYDVR0gBFMwUTALBgkrBgEEAaAyASgwQgYKKwYBBAGgMgEo
+CjA0MDIGCCsGAQUFBwIBFiZodHRwczovL3d3dy5nbG9iYWxzaWduLmNvbS9yZXBvc2l0b3J5LzAN
+BgkqhkiG9w0BAQsFAAOCAQEAdAXk/XCnDeAOd9nNEUvWPxblOQ/5o/q6OIeTYvoEvUUi2qHUOtbf
+jBGdTptFsXXe4RgjVF9b6DuizgYfy+cILmvi5hfk3Iq8MAZsgtW+A/otQsJvK2wRatLE61RbzkX8
+9/OXEZ1zT7t/q2RiJqzpvV8NChxIj+P7WTtepPm9AIj0Keue+gS2qvzAZAY34ZZeRHgA7g5O4TPJ
+/oTd+4rgiU++wLDlcZYd/slFkaT3xg4qWDepEMjT4T1qFOQIL+ijUArYS4owpPg9NISTKa1qqKWJ
+jFoyms0d0GwOniIIbBvhI2MJ7BSY9MYtWVT5jJO3tsVHwj4cp92CSFuGwunFMzCCA18wggJHoAMC
+AQICCwQAAAAAASFYUwiiMA0GCSqGSIb3DQEBCwUAMEwxIDAeBgNVBAsTF0dsb2JhbFNpZ24gUm9v
+dCBDQSAtIFIzMRMwEQYDVQQKEwpHbG9iYWxTaWduMRMwEQYDVQQDEwpHbG9iYWxTaWduMB4XDTA5
+MDMxODEwMDAwMFoXDTI5MDMxODEwMDAwMFowTDEgMB4GA1UECxMXR2xvYmFsU2lnbiBSb290IENB
+IC0gUjMxEzARBgNVBAoTCkdsb2JhbFNpZ24xEzARBgNVBAMTCkdsb2JhbFNpZ24wggEiMA0GCSqG
+SIb3DQEBAQUAA4IBDwAwggEKAoIBAQDMJXaQeQZ4Ihb1wIO2hMoonv0FdhHFrYhy/EYCQ8eyip0E
+XyTLLkvhYIJG4VKrDIFHcGzdZNHr9SyjD4I9DCuul9e2FIYQebs7E4B3jAjhSdJqYi8fXvqWaN+J
+J5U4nwbXPsnLJlkNc96wyOkmDoMVxu9bi9IEYMpJpij2aTv2y8gokeWdimFXN6x0FNx04Druci8u
+nPvQu7/1PQDhBjPogiuuU6Y6FnOM3UEOIDrAtKeh6bJPkC4yYOlXy7kEkmho5TgmYHWyn3f/kRTv
+riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
+QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
+UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
+M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
+Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
+14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
+a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
+XzCCBUwwggQ0oAMCAQICDF5AaMOe0cZvaJpCQjANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
+RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
+UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAwODIxMzhaFw0yNTA5MTAwODIxMzhaMIGO
+MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
+BgNVBAoTDUJyb2FkY29tIEluYy4xFTATBgNVBAMTDE1pY2hhZWwgQ2hhbjEoMCYGCSqGSIb3DQEJ
+ARYZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoC
+ggEBALhEmG7egFWvPKcrDxuNhNcn2oHauIHc8AzGhPyJxU4S6ZUjHM/psoNo5XxlMSRpYE7g7vLx
+J4NBefU36XTEWVzbEkAuOSuJTuJkm98JE3+wjeO+aQTbNF3mG2iAe0AZbAWyqFxZulWitE8U2tIC
+9mttDjSN/wbltcwuti7P57RuR+WyZstDlPJqUMm1rJTbgDqkF2pnvufc4US2iexnfjGopunLvioc
+OnaLEot1MoQO7BIe5S9H4AcCEXXcrJJiAtMCl47ARpyHmvQFQFFTrHgUYEd9V+9bOzY7MBIGSV1N
+/JfsT1sZw6HT0lJkSQefhPGpBniAob62DJP3qr11tu8CAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
+AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
+c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
+AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
+TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
+bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
+L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
+BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
+HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQU31rAyTdZweIF0tJTFYwfOv2w
+L4QwDQYJKoZIhvcNAQELBQADggEBACcuyaGmk0NSZ7Kio7O7WSZ0j0f9xXcBnLbJvQXFYM7JI5uS
+kw5ozATEN5gfmNIe0AHzqwoYjAf3x8Dv2w7HgyrxWdpjTKQFv5jojxa3A5LVuM8mhPGZfR/L5jSk
+5xc3llsKqrWI4ov4JyW79p0E99gfPA6Waixoavxvv1CZBQ4Stu7N660kTu9sJrACf20E+hdKLoiU
+hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
+E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
+aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
+EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIH28hkV2dse9vDoQBaDYtUO1pOe+qVw/
+CEmk3pg4kcKFMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDUw
+MTAwMzEzOFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
+ATANBgkqhkiG9w0BAQEFAASCAQBmUZbBV90rEyfW9HIC8+R1jdFZ5gOZsjWo0SoHuAZMMkcsxGID
+teX4ROudkfeOXDJ6JcEAs0ciqYkI177VDf5sFRs3C/tJidb94i7mfBuPBSztGRkh6tRYZu0egfp7
+TiedEkzdNMCbM7fL4e5Q7xAiIMtfTEsHezsfBW6HI0s5NbFnC9zNxX47HDDBtiXoQbwF/v9GDlCP
+zbFxY4OmJ7TCZvRGqKQt+u1BkeNiFCAsW+kd1yp1lcvETsB8oszt97RJrvPoeasFO/RpVyfFuQqD
+IeicIVmO9i2h5jbt+AECeK2p3D9Ze1quWjpwA2HJRHzMku1lYbXeQNlmAdy3X/4Y
+--0000000000000feb530617599c9c--
 
