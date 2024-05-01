@@ -1,197 +1,88 @@
-Return-Path: <netdev+bounces-92802-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92803-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A98BF8B8E95
-	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 18:56:02 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CE7B8B8E96
+	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 18:56:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 35D921F245EC
-	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 16:56:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BAE31B20A4D
+	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 16:56:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 082FF11CBD;
-	Wed,  1 May 2024 16:55:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="KGz9gy3/"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F90A14006;
+	Wed,  1 May 2024 16:56:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-9106.amazon.com (smtp-fw-9106.amazon.com [207.171.188.206])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91106DDAB
-	for <netdev@vger.kernel.org>; Wed,  1 May 2024 16:55:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.206
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0A5911CBD
+	for <netdev@vger.kernel.org>; Wed,  1 May 2024 16:56:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.69
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714582557; cv=none; b=Ow9oWQqObhCM9YM2HE3xcdJMer+RKru8DJJhi6F1fw6ev1H5H4jTsMXKZ67GNdbYzQDzDNAzKwKYrgzaIwqwkIhbDe+tBY9P4OMEJG5V4SbhiMbM0qc0NQkePTD7wX2uUx3JTEVQCLIzLqxmVvIxIhVRo9HO+zgpsTSopSAtmXo=
+	t=1714582566; cv=none; b=S2AMGAOp/1GYY6SulMsGh7gRtM++LME+ll7+VrLfiqQibswYHcAIkU6Bmbxs55Nfgt+7/H8yhz+tRLEgHhM4p24Q+5sJormDV2qRYjDI9xu02vdcfADb4D+b9oDOHeoQq692OGPpBBO2w88cjIkObT6Nj+WT2NihdGVWanqzI2M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714582557; c=relaxed/simple;
-	bh=itp1ydTG4w4D3nb8/7bxb9wTam7D33gJ/Lbl1BVEAPA=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=m5esXTFs2IOgdRisPy3zRcNTPUh996QxuEc9OqFAJaLDMHLtGLWJjyjvKeyvBA6ZOEhRiJ3LpY/cfxZg+VG3rGxs9urrXNo+Ou8lSdXSzVWizIANgsQIsBOU2Xpoqp6wd8fi692uuXdbu+wXx+V8QYhDd6rtQ5OXMNW3P3+1q9M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=KGz9gy3/; arc=none smtp.client-ip=207.171.188.206
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1714582557; x=1746118557;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=lhNljRPOzYvRX3XU7p76yj4fs7iYZ6efTlzLU4zgIRM=;
-  b=KGz9gy3/QI0tg7jGi9J+noUDsfhqDrsE6v1xAtVz3F1biQnQ7FDIhXKH
-   5KE2g2xL/zQksFJ/bwwYgUpDkYeDPX+wqJ0caEouCJz4VTugvjoMD1NHu
-   qY6fx+tzy1uzwuT3L/V72srt3ACi8OCamD+Sgk5qdcLYOBWRD8VDHKZ1A
-   A=;
-X-IronPort-AV: E=Sophos;i="6.07,245,1708387200"; 
-   d="scan'208";a="722791113"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-9106.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 May 2024 16:55:50 +0000
-Received: from EX19MTAUWB002.ant.amazon.com [10.0.21.151:5903]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.23.7:2525] with esmtp (Farcaster)
- id 1c7bae78-f8c4-425b-88b9-06ca9a8bd5ae; Wed, 1 May 2024 16:55:49 +0000 (UTC)
-X-Farcaster-Flow-ID: 1c7bae78-f8c4-425b-88b9-06ca9a8bd5ae
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Wed, 1 May 2024 16:55:44 +0000
-Received: from 88665a182662.ant.amazon.com (10.106.101.44) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Wed, 1 May 2024 16:55:41 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <rao.shoaib@oracle.com>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<kuniyu@amazon.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>
-Subject: Re: [PATCH net v4] af_unix: Read with MSG_PEEK loops if the first unread byte is OOB
-Date: Wed, 1 May 2024 09:55:33 -0700
-Message-ID: <20240501165533.24953-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <ZjCozXP/DBt/C8WZ@shoaib-laptop>
-References: <ZjCozXP/DBt/C8WZ@shoaib-laptop>
+	s=arc-20240116; t=1714582566; c=relaxed/simple;
+	bh=1XZHi0YzBLS47mbettJ83dDPGL16uhOqOK1tJN4dlpw=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=Z+y/EA18J6u89HXxiaux52nLbh+Qr3eqPdrG+AdXu4BemL0j8ASJWmuD/+wxJySMDngqbYRCrfVabRYkGUgQQuxM5C/4BiMnV70bv6JJo3wb9T/41ezUdMQ/FKuUWzLIQJ6uvudiRluleLAgLxshMOgc1Ras5W4Oywbr2qO8VOE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-7def44d6078so723739f.1
+        for <netdev@vger.kernel.org>; Wed, 01 May 2024 09:56:04 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714582564; x=1715187364;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=zL5zLFLZ9/A+euis3e08Nm55+lvX3+T3wPrxtwGnFpQ=;
+        b=K+dH2GtnHLs4xHm7fJTa2idhjqBLIzifGnXVkfcA+bNIU1lPx7tUZemapL2L7a7A7F
+         S5xN9bWtMJ7wxO8r/8tjdTm8v/2UmSETTvEm9xk//Ga6jE3HCT+dDG2VLUAbYmlJgQuQ
+         0u1VZGDany7JqcaUY4MFIERXkIykpy/Y8uBqLN9tJKGRWtP/KLFLH2vErBpFAvS7J/ia
+         AqXN6n0KakzzO2EspKO+Gl/mH0nH08KVqYGfWBN3MiEKc5mk66zsJovRgC16bn+iQERC
+         sYK6EIcaSszzHi7HbFmUdS4Np1krVl1FRocz7MnWxMABc/RGEVdjqNZMy00f7xp9PxMG
+         KC4g==
+X-Forwarded-Encrypted: i=1; AJvYcCV4oMso7fhJCZs66wr9+rG6YWZSSpc66wBY3iCs+wIsNFLb3ZGNAK3cMSWFQr+CZXUPP9OSLf5spiCD+q8O1IbbFxjHSInb
+X-Gm-Message-State: AOJu0YwlXoboe5slEv87QQ+VEXmSdCJuWNgxAY8WHGI+wxkSnF0LnDUy
+	eFlIzvZ15nYiunYbOh82X/BFLhO8O70k3/hnGnT+DlCSZZvtwGiqMT8VoHFHjSLVOzm+EfzzSzL
+	Y/MXIpXSGV8jkw5ZlalTZNq/O8LdWvQitGc1JYopfZsYNXyoMVybSKo8=
+X-Google-Smtp-Source: AGHT+IEBjXreViAye+0kXgWGM8QAOQnK+EHu2cHJMy66fdP74jLwDb6XfrE99WN2U9+ggleDVkBLcX+2gumyBDoVt+kvePoHzc8o
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D038UWC004.ant.amazon.com (10.13.139.229) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+X-Received: by 2002:a05:6638:8684:b0:487:5dce:65ab with SMTP id
+ iv4-20020a056638868400b004875dce65abmr6872jab.0.1714582564003; Wed, 01 May
+ 2024 09:56:04 -0700 (PDT)
+Date: Wed, 01 May 2024 09:56:03 -0700
+In-Reply-To: <20240501121200-mutt-send-email-mst@kernel.org>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000aa73d50617675ca3@google.com>
+Subject: Re: [syzbot] [net?] [virt?] [kvm?] KASAN: slab-use-after-free Read in vhost_task_fn
+From: syzbot <syzbot+98edc2df894917b3431f@syzkaller.appspotmail.com>
+To: jasowang@redhat.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	michael.christie@oracle.com, mst@redhat.com, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com, virtualization@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-From: Rao Shoaib <Rao.Shoaib@oracle.com>
-Date: Tue, 30 Apr 2024 01:16:13 -0700
-> Read with MSG_PEEK flag loops if the first byte to read is an OOB byte.
-> commit 22dd70eb2c3d ("af_unix: Don't peek OOB data without MSG_OOB.")
-> addresses the loop issue but does not address the issue that no data
-> beyond OOB byte can be read.
-> 
-> >>> from socket import *
-> >>> c1, c2 = socketpair(AF_UNIX, SOCK_STREAM)
-> >>> c1.send(b'a', MSG_OOB)
-> 1
-> >>> c1.send(b'b')
-> 1
-> >>> c2.recv(1, MSG_PEEK | MSG_DONTWAIT)
-> b'b'
-> 
-> Fixes: 314001f0bf92 ("af_unix: Add OOB support")
-> Signed-off-by: Rao Shoaib <Rao.Shoaib@oracle.com>
-> ---
->  net/unix/af_unix.c | 25 +++++++++++++------------
->  1 file changed, 13 insertions(+), 12 deletions(-)
-> 
-> diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-> index 9a6ad5974dff..e88ec8744329 100644
-> --- a/net/unix/af_unix.c
-> +++ b/net/unix/af_unix.c
-> @@ -2658,19 +2658,19 @@ static struct sk_buff *manage_oob(struct sk_buff *skb, struct sock *sk,
->  		if (skb == u->oob_skb) {
->  			if (copied) {
->  				skb = NULL;
-> -			} else if (sock_flag(sk, SOCK_URGINLINE)) {
-> -				if (!(flags & MSG_PEEK)) {
-> +			} else if (!(flags & MSG_PEEK)) {
-> +				if (sock_flag(sk, SOCK_URGINLINE)) {
->  					WRITE_ONCE(u->oob_skb, NULL);
->  					consume_skb(skb);
-> +				} else {
-> +					skb_unlink(skb, &sk->sk_receive_queue);
-> +					WRITE_ONCE(u->oob_skb, NULL);
-> +					if (!WARN_ON_ONCE(skb_unref(skb)))
-> +						kfree_skb(skb);
-> +					skb = skb_peek(&sk->sk_receive_queue);
->  				}
-> -			} else if (flags & MSG_PEEK) {
-> -				skb = NULL;
-> -			} else {
-> -				skb_unlink(skb, &sk->sk_receive_queue);
-> -				WRITE_ONCE(u->oob_skb, NULL);
-> -				if (!WARN_ON_ONCE(skb_unref(skb)))
-> -					kfree_skb(skb);
-> -				skb = skb_peek(&sk->sk_receive_queue);
-> +			} else if (!sock_flag(sk, SOCK_URGINLINE)) {
-> +				skb = skb_peek_next(skb, &sk->sk_receive_queue);
+Hello,
 
-My last comment for v3 was about this line.
-https://lore.kernel.org/netdev/20240424013921.16819-1-kuniyu@amazon.com/
+syzbot has tested the proposed patch and the reproducer did not trigger any issue:
 
-Here, (flags & MSG_PEEK) is true, and if skb_peek_next() returns NULL,
+Reported-and-tested-by: syzbot+98edc2df894917b3431f@syzkaller.appspotmail.com
 
+Tested on:
 
->  			}
->  		}
->  	}
-> @@ -2747,9 +2747,10 @@ static int unix_stream_read_generic(struct unix_stream_read_state *state,
->  #if IS_ENABLED(CONFIG_AF_UNIX_OOB)
->  		if (skb) {
->  			skb = manage_oob(skb, sk, flags, copied);
-> -			if (!skb && copied) {
-> +			if (!skb) {
->  				unix_state_unlock(sk);
-> -				break;
-> +				if (copied || (flags & MSG_PEEK))
-> +					break;
+commit:         f138e94c KASAN: slab-use-after-free Read in vhost_task..
+git tree:       https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git
+console output: https://syzkaller.appspot.com/x/log.txt?x=10a152a7180000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=3714fc09f933e505
+dashboard link: https://syzkaller.appspot.com/bug?extid=98edc2df894917b3431f
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
 
-we will bail out the loop due to this change.
-
-However, no data is copied here, so whether we break or not
-should depend on MSG_DONTWAIT, which is handled in the following
-`if (skb == NULL)` block.
-
-In the example below, TCP socket is blocked because there is
-no data to receive and MSG_DONTWAIT is not specified.  And this
-is unblocked when normal data arrives.
-
-  ---8<---
-  >>> from socket import *
-  >>> 
-  >>> s = socket()
-  >>> s.listen()
-  >>> 
-  >>> c1 = socket()
-  >>> c1.connect(s.getsockname())
-  >>> 
-  >>> c2, _ = s.accept()
-  >>> 
-  >>> c1.send(b'a', MSG_OOB)
-  1
-  >>> c2.recv(1, MSG_PEEK)
-  ^C
-  ---8<---
-
-But with your patch, AF_UNIX socket is not blocked even without
-MSG_DONTWAIT.
-
-  ---8<---
-  >>> from socket import *
-  >>> 
-  >>> c1, c2 = socketpair(AF_UNIX, SOCK_STREAM, 0)
-  >>> c1.send(b'a', MSG_OOB)
-  1
-  >>> c2.recv(1, MSG_PEEK)
-  b''
-  ---8<---
-
-That's why I said the change in unix_stream_read_generic() is not
-needed.
+Note: no patches were applied.
+Note: testing is done by a robot and is best-effort only.
 
