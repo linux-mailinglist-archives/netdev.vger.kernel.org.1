@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-92747-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92748-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C85C8B88C7
-	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 12:50:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B637C8B88C8
+	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 12:50:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3E1E41C20EEF
-	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 10:50:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4BCBD2868DC
+	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 10:50:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E8C4548EF;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 699E055E5C;
 	Wed,  1 May 2024 10:50:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OKfYCWvJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="naYtIrMB"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E795D4F881;
-	Wed,  1 May 2024 10:50:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4648554FB8
+	for <netdev@vger.kernel.org>; Wed,  1 May 2024 10:50:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714560631; cv=none; b=PTtHTKq/al3QEUVTUkJKTRD1wqD1ptBemjzCeZyNjtJ/lcqC0qlhQn74AVSl18z1rVnz//D/NxhDob2g37gfJRZkv+s0trxM4f/vfuJNhMBLar/TnWiRxVu+6ffUeRfVlv2/e89hXImQ2uR9cptBnXvZOqCnOtM8SSdhWxfBn8A=
+	t=1714560631; cv=none; b=hH1DHjqGtd0vb0tq+wZ4hfHOIqmKGiQOvijBmZUbHIsycZDvpEBqIY4jQZ/ZtwxfwR2dlDQl1nNT9dCQuQYK/E8kfxPLneQcUhlCQjmdS933SPI9eDe/c8wi3O8FUhPmeN5xqeCMRnqMS225PZhrkY+QgiRDRw37uHnLsOvwleA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1714560631; c=relaxed/simple;
-	bh=8kr5swjIrmpuZqLn9YgE4N/D/7JMs35Yyh27MQY1WbI=;
+	bh=M5ClWJXxv3ZHwS6vznIA28QB7G0kkVO2SCmlVIb6HLA=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=QgmpBOgHRNfWMqqbCoZGOWxHVjJnXnsQZ+1P35BoshHFirLrwCRqts8DBnP1mPkjlQ7JiKTWuALSerMC19mUIpk6o9aWBSJkR/V/EW16gP8iYurZbQAEUTVHhndHLqxWI9crYuTMoz3DvxSzQEl1nkf3bpucRzE+lPPuVQ+EjQ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OKfYCWvJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 7A432C32789;
+	 In-Reply-To:To:Cc; b=MHqsZc8p/sMjNF/DvJ1JexgNlDIy7oNcWF9yIQnY7l4SSTU/rqE12+by5u5k8e+BJCE8WOssXSgCK+Zko8P7I0iCbhdBdSSFmQ7fRcFtKe39mK1ZjGnxFE5iUB99eaFWZ0ImCf1LhKh2SZEq8+/i8IU/fXY7NN4nP4R7Dqe/zWA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=naYtIrMB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id C6441C4AF48;
 	Wed,  1 May 2024 10:50:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1714560630;
-	bh=8kr5swjIrmpuZqLn9YgE4N/D/7JMs35Yyh27MQY1WbI=;
+	bh=M5ClWJXxv3ZHwS6vznIA28QB7G0kkVO2SCmlVIb6HLA=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=OKfYCWvJaS/KyTLnxvtj3deNdOlk1BBIYp+2j+JTDilhu72UmWiICgmak3mnRMhY5
-	 kPhf6N8u/jO+nyxkB30fTJB3rEIGyZRb4HeNcfx/z1X70BO+5sVYLG8VIap2EvDdo5
-	 ZZOAnPzL+2P9pX1Idat3DT0HKwJU5HqXtGXp8w+HY6OLkjkG1aqR09t0BS6NRgEfvC
-	 q855kWzzgHkfKtmb8cD7FFf0UsUVKj+KscvZE2Jik3CuT4HP31ZpUTbEEUm8Pdn4YV
-	 ORL/PQCvSE2quXlld0a8jTwN9VOgBP2vlF73UzaXt8awy2YVbuJ3/5XS4dZ7aNOhIE
-	 xDtSAl1jXFEeQ==
+	b=naYtIrMBYGFphnRq4sogTRoy3+ptR7ULN8Ck7wek1xUMM36Z/dtl7yiI1vYnvwKgu
+	 3LXF/VE2kNw04rQSIoAhXbb5/ILJIwzEc37LoXlmy3bhV/r50SyUtvkh/vYXnKsvy+
+	 Z7LooGmrK0s6O5dVcq+PshaJ3RbFJRYJn8efxrwkEZTCmMArRuUjOywR/d6j7Uce2E
+	 BNoK2gEwsXLx0oRRdj8dceN73+XtKddBlK6JMZcRgTZf7NBQrf+3QABJCs+n5Wt8sp
+	 8+R2eNGs+ZMTICVYhlA6ZsHzLuUAgIp90R7ov8F6S6VCKgSdJZHANMTQjQ/XMKmTra
+	 ulb8B2QDaYrLA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 65ABBC433E9;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id BC9A9C43616;
 	Wed,  1 May 2024 10:50:30 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,40 +52,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 1/2] net: bridge: fix multicast-to-unicast with fraglist
- GSO
+Subject: Re: [PATCH net-next] ipv6: anycast: use call_rcu_hurry() in aca_put()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171456063041.15428.922923783539409951.git-patchwork-notify@kernel.org>
+ <171456063076.15428.16544432079445394876.git-patchwork-notify@kernel.org>
 Date: Wed, 01 May 2024 10:50:30 +0000
-References: <20240427182420.24673-1-nbd@nbd.name>
-In-Reply-To: <20240427182420.24673-1-nbd@nbd.name>
-To: Felix Fietkau <nbd@nbd.name>
-Cc: netdev@vger.kernel.org, roopa@nvidia.com, razor@blackwall.org,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- linus.luessing@c0d3.blue, bridge@lists.linux.dev,
- linux-kernel@vger.kernel.org
+References: <20240429183643.2029108-1-edumazet@google.com>
+In-Reply-To: <20240429183643.2029108-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ dsahern@kernel.org, netdev@vger.kernel.org, eric.dumazet@gmail.com
 
 Hello:
 
-This series was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Sat, 27 Apr 2024 20:24:18 +0200 you wrote:
-> Calling skb_copy on a SKB_GSO_FRAGLIST skb is not valid, since it returns
-> an invalid linearized skb. This code only needs to change the ethernet
-> header, so pskb_copy is the right function to call here.
+On Mon, 29 Apr 2024 18:36:43 +0000 you wrote:
+> This is a followup of commit b5327b9a300e ("ipv6: use
+> call_rcu_hurry() in fib6_info_release()").
 > 
-> Fixes: 6db6f0eae605 ("bridge: multicast to unicast")
-> Signed-off-by: Felix Fietkau <nbd@nbd.name>
+> I had another pmtu.sh failure, and found another lazy
+> call_rcu() causing this failure.
+> 
+> aca_free_rcu() calls fib6_info_release() which releases
+> devices references.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,1/2] net: bridge: fix multicast-to-unicast with fraglist GSO
-    https://git.kernel.org/netdev/net/c/59c878cbcdd8
-  - [net,2/2] net: core: reject skb_copy(_expand) for fraglist GSO skbs
-    https://git.kernel.org/netdev/net/c/d091e579b864
+  - [net-next] ipv6: anycast: use call_rcu_hurry() in aca_put()
+    https://git.kernel.org/netdev/net-next/c/fff6e6accdb7
 
 You are awesome, thank you!
 -- 
