@@ -1,126 +1,104 @@
-Return-Path: <netdev+bounces-92700-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92702-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 411F78B8534
-	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 07:04:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 454A78B8560
+	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 07:41:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6E3471C21C9C
-	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 05:04:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 767801C21E45
+	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 05:41:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3914A3E48C;
-	Wed,  1 May 2024 05:04:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0E364AEC1;
+	Wed,  1 May 2024 05:41:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=faucet.nz header.i=@faucet.nz header.b="qNM2WUAc"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="VoxZFK9q"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.forwardemail.net (smtp.forwardemail.net [149.28.215.223])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from madrid.collaboradmins.com (madrid.collaboradmins.com [46.235.227.194])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E04244361
-	for <netdev@vger.kernel.org>; Wed,  1 May 2024 05:04:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=149.28.215.223
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C93DD210EE;
+	Wed,  1 May 2024 05:41:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.227.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714539859; cv=none; b=UxoAsMLGTyj5AcBv6WPzM5QfZmL5qOMInStTL4LUfiSOpWpBsGvVmBQnO8scZx1OUlyOg0JF5r4h8hnbtmYR1gff+cnwC4xkyaLQ8xVcBvthN3le5sxXSugRP+yUsHG+VTeV2cvyY3clT6+dxEmqaNrXvVnjgunCgh6IDGfs6xY=
+	t=1714542089; cv=none; b=f6PfGum+fNGWGvlvarjEOMD9OYq34iIHXb7n64jYgsIlfdx8VUiwGTxoud9VTRU81aXy0rQGv9/vEDR1PWJwNNmTgh2lcgM4hW/N+InRHAg0/JnD6tohlFifGklk1Mh/hA/YiSQ/JawmsflerL2Zf1KSh4saPoPDZhUGHqcedBM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714539859; c=relaxed/simple;
-	bh=bwiq97hl0ulqMWBNQjmyB2B12PjF7UwQ9e34FplS5vI=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=bNfE4nAqYTSZPyChGx/3PrlEjY2W8Mpw8oeLqL3ixZse7d0tgVEJBLCJk6XfwsYu2uYfYt/BJBSHe2aWQo5rmSsjbqGwgLjtqqOxD4b3YnU9YWWB20x+8gMgZUI2+mrBHNLsOZha58HNDwRTvfRBJeCT7avbj5chdy5/hyxxto4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=faucet.nz; spf=pass smtp.mailfrom=fe-bounces.faucet.nz; dkim=pass (1024-bit key) header.d=faucet.nz header.i=@faucet.nz header.b=qNM2WUAc; arc=none smtp.client-ip=149.28.215.223
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=faucet.nz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fe-bounces.faucet.nz
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=faucet.nz;
- h=Content-Transfer-Encoding: MIME-Version: References: In-Reply-To:
- Message-Id: Date: Subject: Cc: To: From; q=dns/txt; s=fe-4ed8c67516;
- t=1714539842; bh=RsrIq7/ZvC8loumi0io1jOngwJSiw32p9ZnpvFMQJ4o=;
- b=qNM2WUAc04iwfGRh77R6k6MWdN/xaaYZUpHqLLMLm7vfH6dzrzrL63SG/IMRRyVrs+Ky5xAAy
- 9zVBsRixF7DV4Xwza+O64bAM5mQYOzwZzsyZ03jQdPorEmSZREaVlRFmnvMwRkQAGAoraEk3z9G
- FJHrSUOs45rvYeH4l7atJWw=
-From: Brad Cowie <brad@faucet.nz>
-To: martin.lau@linux.dev
-Cc: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, brad@faucet.nz,
- coreteam@netfilter.org, daniel@iogearbox.net, davem@davemloft.net,
- john.fastabend@gmail.com, jolsa@kernel.org, kuba@kernel.org,
- lorenzo@kernel.org, memxor@gmail.com, netdev@vger.kernel.org,
- netfilter-devel@vger.kernel.org, pabeni@redhat.com, pablo@netfilter.org,
- sdf@google.com, song@kernel.org
-Subject: Re: [PATCH bpf-next v2 2/2] selftests/bpf: Update tests for new ct zone opts for nf_conntrack kfuncs
-Date: Wed,  1 May 2024 17:03:21 +1200
-Message-Id: <20240501050321.157531-1-brad@faucet.nz>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <288b0d96-d5a8-4d81-9302-32b0d414a983@linux.dev>
-References: <288b0d96-d5a8-4d81-9302-32b0d414a983@linux.dev>
+	s=arc-20240116; t=1714542089; c=relaxed/simple;
+	bh=HZgy8IynNapACv9oqb7dNMwXQ5pxb+tDS7GOLDQaU8o=;
+	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=IpE9ejLQ7AYdidPWsqf0eah61pg0tMCXTRaAwDKd149QBBgHSndCN5ZRhn7Wir7348+wapKIvv07Hc9WSId78pFVGFbRlJ/r8V2skK+5J+C3MecSm1ssmVncEnQGNUdYk3S8vZjOdxYIiJ1K/dnsO9tQvzczSukHY2FGvYOBnck=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=VoxZFK9q; arc=none smtp.client-ip=46.235.227.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1714542085;
+	bh=HZgy8IynNapACv9oqb7dNMwXQ5pxb+tDS7GOLDQaU8o=;
+	h=Date:Cc:Subject:To:References:From:In-Reply-To:From;
+	b=VoxZFK9qLekCXwHSd1rQlfp3fMPjFnhg+jfer/8H6urzJOMThKTlcnbS6GVIqPlgZ
+	 QENMzmko43a4exh06hZBx6x/acdAvj0Qr9aPvpcG46Yn2/ZWwGGSzs3OfJRfgGE6r1
+	 v47+WFKIf/UE+2dF4efYNFmGTOT/qvbq/JmWtAKuZNzYzFuRqJ5UHc2M4zPH5bJyxp
+	 qKKMzTGDKM5uCi0IiE5HouQpb33naR85FmbG9tHF61PAEmgd6EPDLQXnNkN0thVsrb
+	 7tnS5k0et7b+Qh0kTui1r5K3doVyMP6o1pjBp5PvJTV12azppWlUpD0zfl2bLlSZkI
+	 SizxKDIue6jvw==
+Received: from [10.193.1.1] (broslavsky.collaboradmins.com [68.183.210.73])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: usama.anjum)
+	by madrid.collaboradmins.com (Postfix) with ESMTPSA id 5A4D437814A4;
+	Wed,  1 May 2024 05:40:14 +0000 (UTC)
+Message-ID: <be921714-b684-401e-a89a-8256df5fcb86@collabora.com>
+Date: Wed, 1 May 2024 10:40:47 +0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Report-Abuse-To: abuse@forwardemail.net
-X-Report-Abuse: abuse@forwardemail.net
-X-Complaints-To: abuse@forwardemail.net
-X-ForwardEmail-Version: 0.4.40
-X-ForwardEmail-Sender: rfc822; brad@faucet.nz, smtp.forwardemail.net,
- 149.28.215.223
-X-ForwardEmail-ID: 6631cd401fff278fe661f725
+User-Agent: Mozilla Thunderbird
+Cc: Muhammad Usama Anjum <usama.anjum@collabora.com>, shuah@kernel.org,
+ Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
+ Jiri Kosina <jikos@kernel.org>, Benjamin Tissoires <bentiss@kernel.org>,
+ Sean Christopherson <seanjc@google.com>, Paolo Bonzini
+ <pbonzini@redhat.com>, Bongsu Jeon <bongsu.jeon@samsung.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Alexandre Belloni <alexandre.belloni@bootlin.com>,
+ Jarkko Sakkinen <jarkko@kernel.org>,
+ Dave Hansen <dave.hansen@linux.intel.com>,
+ Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, kernel-team@android.com,
+ linux-sound@vger.kernel.org, linux-input@vger.kernel.org,
+ kvm@vger.kernel.org, netdev@vger.kernel.org, linux-rtc@vger.kernel.org,
+ linux-sgx@vger.kernel.org
+Subject: Re: [PATCH v1 00/10] Define _GNU_SOURCE for sources using
+To: Mark Brown <broonie@kernel.org>, Edward Liaw <edliaw@google.com>
+References: <20240430235057.1351993-1-edliaw@google.com>
+ <ZjGiGq-_kUVht63m@finisterre.sirena.org.uk>
+Content-Language: en-US
+From: Muhammad Usama Anjum <usama.anjum@collabora.com>
+In-Reply-To: <ZjGiGq-_kUVht63m@finisterre.sirena.org.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, 26 Apr 2024 at 11:34, Martin KaFai Lau <martin.lau@linux.dev> wrote:
-> On 4/23/24 8:00 PM, Brad Cowie wrote:
-> >   } __attribute__((preserve_access_index));
-> >   
-> >   struct nf_conn *bpf_xdp_ct_alloc(struct xdp_md *, struct bpf_sock_tuple *, u32,
-> > @@ -84,16 +90,6 @@ nf_ct_test(struct nf_conn *(*lookup_fn)(void *, struct bpf_sock_tuple *, u32,
-> >   	else
-> >   		test_einval_bpf_tuple = opts_def.error;
-> >   
-> > -	opts_def.reserved[0] = 1;
-> > -	ct = lookup_fn(ctx, &bpf_tuple, sizeof(bpf_tuple.ipv4), &opts_def,
-> > -		       sizeof(opts_def));
-> > -	opts_def.reserved[0] = 0;
-> > -	opts_def.l4proto = IPPROTO_TCP;
-> > -	if (ct)
-> > -		bpf_ct_release(ct);
-> > -	else
-> > -		test_einval_reserved = opts_def.error;
-> > -
-> >   	opts_def.netns_id = -2;
-> >   	ct = lookup_fn(ctx, &bpf_tuple, sizeof(bpf_tuple.ipv4), &opts_def,
-> >   		       sizeof(opts_def));
-> > @@ -220,10 +216,77 @@ nf_ct_test(struct nf_conn *(*lookup_fn)(void *, struct bpf_sock_tuple *, u32,
-> >   	}
-> >   }
-> >   
-> > +static __always_inline void
-> > +nf_ct_zone_id_test(struct nf_conn *(*lookup_fn)(void *, struct bpf_sock_tuple *, u32,
-> > +						struct bpf_ct_opts___local *, u32),
-> > +		   struct nf_conn *(*alloc_fn)(void *, struct bpf_sock_tuple *, u32,
-> > +					       struct bpf_ct_opts___local *, u32),
-> > +		   void *ctx)
-> > +{
-> > +	struct bpf_ct_opts___local opts_def = { .l4proto = IPPROTO_TCP, .netns_id = -1 };
-> > +	struct bpf_sock_tuple bpf_tuple;
-> > +	struct nf_conn *ct;
-> > +
-> > +	__builtin_memset(&bpf_tuple, 0, sizeof(bpf_tuple.ipv4));
-> > +
-> > +	bpf_tuple.ipv4.saddr = bpf_get_prandom_u32(); /* src IP */
-> > +	bpf_tuple.ipv4.daddr = bpf_get_prandom_u32(); /* dst IP */
-> > +	bpf_tuple.ipv4.sport = bpf_get_prandom_u32(); /* src port */
-> > +	bpf_tuple.ipv4.dport = bpf_get_prandom_u32(); /* dst port */
-> > +
-> > +	/* use non-default ct zone */
-> > +	opts_def.ct_zone_id = 10;
->
-> Can the ct_zone_flags and ct_zone_dir be tested also?
+Thanks for the fixes.
 
-I have added an additional test for ct_zone_dir, this will be included
-in my v3 patchset.
+On 5/1/24 6:59 AM, Mark Brown wrote:
+> On Tue, Apr 30, 2024 at 11:50:09PM +0000, Edward Liaw wrote:
+>> 809216233555 ("selftests/harness: remove use of LINE_MAX") introduced
+>> asprintf into kselftest_harness.h, which is a GNU extension and needs
+>> _GNU_SOURCE to either be defined prior to including headers or with the
+>> -D_GNU_SOURCE flag passed to the compiler.
+> 
+> This seems like something that should be handled centrally rather than
+> having to go round and audit the users every time some update is made.
+The easiest way I could think of is to add -D_GNU_SOURCE to KHDR_HEADERS
+definition in tools/testing/selftests/Makefile. It wouldn't be obvious from
+KHDR_HEADERS name that there could be other flags in it as well though.
 
-While writing a test for ct_zone_flags, I realised this option is not
-used for the conntrack functions that the bpf ct helper functions call,
-nf_conntrack_alloc() and nf_conntrack_find_get(), it is only used by
-nf_conntrack_in(), so I will remove ct_zone_flags from my v3 patchset.
+
+-- 
+BR,
+Muhammad Usama Anjum
 
