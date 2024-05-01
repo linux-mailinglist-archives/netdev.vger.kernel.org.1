@@ -1,186 +1,134 @@
-Return-Path: <netdev+bounces-92838-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92839-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86B328B9116
-	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 23:32:13 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A0DB8B912F
+	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 23:54:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 81868B218AE
-	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 21:32:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DF5531F22CC9
+	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 21:54:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC419161936;
-	Wed,  1 May 2024 21:32:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3F81165FC4;
+	Wed,  1 May 2024 21:54:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="gRlD7Re2"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jveuSoGy"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f47.google.com (mail-oa1-f47.google.com [209.85.160.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EB8BD52F
-	for <netdev@vger.kernel.org>; Wed,  1 May 2024 21:32:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=72.21.196.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 509954F898;
+	Wed,  1 May 2024 21:54:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714599125; cv=none; b=Wzh5rlEzMDtdMlJuihvQO4jQK55NGyo7d4SznLaRY7iZXUgGwfx5WhkdBAGJs6enudBBFPpZ/xbfT08GuWKu+295qUREaiVYBVOFKeWWF2xkEnEf/Dn0euJoUL9Nnt7StuLG9sAI/6M++oWvRY3DJFv4RqhFO8It41jLWVkEI38=
+	t=1714600488; cv=none; b=c1t5WmeF3fB4L9Nlj+x0Y2XOvfusGhQnUR5I7oZ1Y+QHYWwp0PBUCd0hyProjR8viehc4tq8C7o/3z2HyouHFn4YKfKxRzI+xFpJ7n6yCYrcm4U1c99sMNIL9P08V3HJUZDJxdSXytqG3MHZEPvHZIb3cimfzLL+idbMrdydMZI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714599125; c=relaxed/simple;
-	bh=B7pXh31bq6pdp+tp70UPfkiDLB5xGOEHax1SsvWMpgg=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=KQHCtur8A2sKFNWHndLw0zNgrfyljOjkSTr0R0lF61E7QbYOa30BDal2ajitU+eH607OnX7J2XUdlti2qMkZfhsn0I2SabBI0QaW4SzDGom7teQYxHihKUtcwnkDQPy2Nq/7n2quZN0fKUrp4IjpSNCuhuFzYFvLcWXgl5r36wc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=gRlD7Re2; arc=none smtp.client-ip=72.21.196.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1714600488; c=relaxed/simple;
+	bh=vb9in9s6Q1Mtnu2Ihn9CCHnWHAXkzsDtiAI+wblForU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jiEDZWFhtU1yCt7+ADFqATAYVM8iQxq6a6tqBI5mNrLyKz7eMtK3Mk/wm6ZTY1OlRa4DcDCargg7vRFFoBDMB5/+8R9kI9PNWE3XQQZzkVrPyJN1GVDq83tzdzQmI6wxXdvGa0CTfK+wvNAr0T/00Ga3lzrCob60+72JR7eDE+o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jveuSoGy; arc=none smtp.client-ip=209.85.160.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oa1-f47.google.com with SMTP id 586e51a60fabf-233f389a61eso3750055fac.3;
+        Wed, 01 May 2024 14:54:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1714599124; x=1746135124;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=LyWx/ep85+C1UfoyP4Exzo2XI2vFrjCJ/QwsxKsdSg0=;
-  b=gRlD7Re2yMI0092Ka7XWoheNo8aWenmTt+RPn8/51pHyffIILrjIpWBb
-   b1Ex7G8swUnPVFcX6L5kH8uR1iQJXVtoKwtFveQw+xN44KsclNF6ydHb0
-   Z/qrY+WYWkTrrk/o5R4F8aTdeje8bevtB3SpGTEAsJsq0365T2XfRkdgl
-   M=;
-X-IronPort-AV: E=Sophos;i="6.07,246,1708387200"; 
-   d="scan'208";a="398462156"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 May 2024 21:32:02 +0000
-Received: from EX19MTAUWA001.ant.amazon.com [10.0.7.35:14515]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.51.46:2525] with esmtp (Farcaster)
- id d076a9f7-ea50-4752-87e3-140d281115e5; Wed, 1 May 2024 21:32:00 +0000 (UTC)
-X-Farcaster-Flow-ID: d076a9f7-ea50-4752-87e3-140d281115e5
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA001.ant.amazon.com (10.250.64.204) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Wed, 1 May 2024 21:32:00 +0000
-Received: from 88665a182662.ant.amazon.com (10.106.101.44) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.28;
- Wed, 1 May 2024 21:31:57 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, David Ahern <dsahern@kernel.org>
-CC: Anderson Nascimento <anderson@allelesecurity.com>, Kuniyuki Iwashima
-	<kuniyu@amazon.com>, Kuniyuki Iwashima <kuni1840@gmail.com>,
-	<netdev@vger.kernel.org>
-Subject: [PATCH v1 net] tcp: Use refcount_inc_not_zero() in tcp_twsk_unique().
-Date: Wed, 1 May 2024 14:31:45 -0700
-Message-ID: <20240501213145.62261-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
+        d=gmail.com; s=20230601; t=1714600485; x=1715205285; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=cnvecM6tvfavb6wTS4XHWVRtX0gJEo2oQRcyz49gnfg=;
+        b=jveuSoGy4trzx4kMouwUt5dL4OhObevY6vSufVP3R6v7LJofNionI/YiV1AuGLi9ly
+         xk/kV6KuH/IhwNw9QhjtY3BXls+Cw890vWqR3aZ47YxgzAhkR+m7/qSDW7DxgAIYidbf
+         PRWmbV1AoLQ32gVsMbXr9NZDqSkxfSoJjbK//RpHePtRXvlXBEhEKaP3+3n9RIt8v8/r
+         toMhDIdHCielMwRkmDGiq/Hw1MkA1+mmbtHcDm6VgcgBiczeDk9qKDkwsbE5YUsPF0Gk
+         Fft65vsq/bnYXLPkOf6AJIUpAp0VeAqhUi7nQk+TVfaANkwkbXjctvGqlH/u4T09LIk/
+         psWQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714600485; x=1715205285;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=cnvecM6tvfavb6wTS4XHWVRtX0gJEo2oQRcyz49gnfg=;
+        b=RIMrBBntJ+0iQear6b5chsXU+izNJneoh8NXhv+RPjfekQENUDcc5+SGxokO78U84r
+         hViyPA3J9aawhTz6ad1GEYpatTNuzRU2wVPr3k1l+IP8LGA89SXEKuY8Qv76vm4cu2xw
+         vr8pYqtFnwl8FQVu5pErv8fyAQ0+j7kKRNUafzJhaTh86k6axownlhJfGWorwnpTwMQ7
+         wQAKmmZdgMs9w3VWR49KmPWtfdZxp5KQoJSH8/a28pey8lOO0Xh+z9coBzJqVmZ8SPzO
+         Z+Ac422vAmeg/8emLfdOwvh8ULSL+5FniTkfFZT9pqBn/65nzDDhcD3w6IPRafew+NsI
+         +6dw==
+X-Forwarded-Encrypted: i=1; AJvYcCXxzOCeUXV/6/WhgwVMT3JD0eSs579jnndSmiJ8rBdnbv4a8SloU0TBXE0b11aM8Lu7QToeD1JOgrQU/aE0zjqgBVf8aCYpQkoLRS+AJ5YZBulYMBZ0j1TINYHbZdADdbpq4Vlimji0
+X-Gm-Message-State: AOJu0YxRlmKG8JS7YfmbHQuUB0lhJ4fV9O2qqLITqtwiqpaT/p10UJQn
+	aDtsxrQHoxdlHHi5wgELLU5QAn/GUska/pzJgFSXB9kmp2EooOxN
+X-Google-Smtp-Source: AGHT+IF8BlRUoALXfW94X/abjm9dkiv3mju5tMrDxGRlU8xO58yd2zEjCeXyeTuZ8mod5xDmpMwsRw==
+X-Received: by 2002:a05:6871:5389:b0:23b:34e9:9772 with SMTP id hy9-20020a056871538900b0023b34e99772mr284357oac.39.1714600485178;
+        Wed, 01 May 2024 14:54:45 -0700 (PDT)
+Received: from ?IPV6:2600:1700:6cf8:1240:22b9:2301:860f:eff6? ([2600:1700:6cf8:1240:22b9:2301:860f:eff6])
+        by smtp.gmail.com with ESMTPSA id bw3-20020a0568300dc300b006ee5b409f23sm978168otb.22.2024.05.01.14.54.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 01 May 2024 14:54:44 -0700 (PDT)
+Message-ID: <e27fc683-29e2-4a35-b43e-2679b6d0592f@gmail.com>
+Date: Wed, 1 May 2024 14:54:42 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D035UWA002.ant.amazon.com (10.13.139.60) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 bpf-next 2/6] selftests/bpf: Implement socket kfuncs
+ for bpf_testmod
+To: Jordan Rife <jrife@google.com>, Martin KaFai Lau <martin.lau@linux.dev>
+Cc: bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ netdev@vger.kernel.org, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
+ Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+ Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>,
+ Shuah Khan <shuah@kernel.org>, Kui-Feng Lee <thinker.li@gmail.com>,
+ Artem Savkov <asavkov@redhat.com>, Dave Marchevsky <davemarchevsky@fb.com>,
+ Menglong Dong <imagedong@tencent.com>, Daniel Xu <dxu@dxuuu.xyz>,
+ David Vernet <void@manifault.com>, Daan De Meyer <daan.j.demeyer@gmail.com>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+References: <20240412165230.2009746-1-jrife@google.com>
+ <20240412165230.2009746-3-jrife@google.com>
+ <65b2f4a3-bd8e-495b-adca-1e7adce5301d@linux.dev>
+ <CADKFtnRYnJG0dk53erhuEK8Ew148nuTRwFgbUxkV6LRZQ=y+Hw@mail.gmail.com>
+Content-Language: en-US
+From: Kui-Feng Lee <sinquersw@gmail.com>
+In-Reply-To: <CADKFtnRYnJG0dk53erhuEK8Ew148nuTRwFgbUxkV6LRZQ=y+Hw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Anderson Nascimento reported a use-after-free splat in tcp_twsk_unique()
-with nice analysis.
 
-Since commit ec94c2696f0b ("tcp/dccp: avoid one atomic operation for
-timewait hashdance"), inet_twsk_hashdance() sets TIME-WAIT socket's
-sk_refcnt after putting it into ehash and releasing the bucket lock.
 
-Thus, there is a small race window where other threads could try to
-reuse the port during connect() and call sock_hold() in tcp_twsk_unique()
-for the TIME-WAIT socket with zero refcnt.
+On 4/17/24 09:59, Jordan Rife wrote:
+>> nit. Can "struct sockaddr_storage addr;" be directly used instead of a char array?
+> When using "struct sockaddr_storage addr;" directly, the BPF program
+> fails to load with the following error message.
+> 
+>> libbpf: prog 'kernel_connect': BPF program load failed: Invalid argument
+>> libbpf: prog 'kernel_connect': -- BEGIN PROG LOAD LOG --
+>> 0: R1=ctx() R10=fp0
+>> ; return bpf_kfunc_call_kernel_connect(args); @ sock_addr_kern.c:26
+>> 0: (85) call bpf_kfunc_call_kernel_connect#99994
+>> arg#0 pointer type STRUCT addr_args must point to scalar, or struct with scalar
+>> processed 1 insns (limit 1000000) max_states_per_insn 0 total_states 0 peak_states 0 mark_read 0
+>> -- END PROG LOAD LOG --
+>> libbpf: prog 'kernel_connect': failed to load: -22
+>> libbpf: failed to load object 'sock_addr_kern'
+>> libbpf: failed to load BPF skeleton 'sock_addr_kern': -22
+>> load_sock_addr_kern:FAIL:skel unexpected error: -22
+>> test_sock_addr:FAIL:load_sock_addr_kern unexpected error: -1 (errno 22)
+>> #288 sock_addr:FAIL
 
-If that happens, the refcnt taken by tcp_twsk_unique() is overwritten
-and sock_put() will cause underflow, triggering a real use-after-free
-somewhere else.
+I just looked into the definition of struct __kernel_sockaddr_sotrage
+and the change log of this type. It has a pointer in it, causing this
+error. According to the commit log, the pointer is there to fix an
+alignment issue. I am curious if we can replace the pointer with
+intptr_t to fix this error.
 
-To avoid the use-after-free, we need to use refcount_inc_not_zero() in
-tcp_twsk_unique() and give up on reusing the port if it returns false.
-
-[0]:
-refcount_t: addition on 0; use-after-free.
-WARNING: CPU: 0 PID: 1039313 at lib/refcount.c:25 refcount_warn_saturate+0xe5/0x110
-CPU: 0 PID: 1039313 Comm: trigger Not tainted 6.8.6-200.fc39.x86_64 #1
-Hardware name: VMware, Inc. VMware20,1/440BX Desktop Reference Platform, BIOS VMW201.00V.21805430.B64.2305221830 05/22/2023
-RIP: 0010:refcount_warn_saturate+0xe5/0x110
-Code: 42 8e ff 0f 0b c3 cc cc cc cc 80 3d aa 13 ea 01 00 0f 85 5e ff ff ff 48 c7 c7 f8 8e b7 82 c6 05 96 13 ea 01 01 e8 7b 42 8e ff <0f> 0b c3 cc cc cc cc 48 c7 c7 50 8f b7 82 c6 05 7a 13 ea 01 01 e8
-RSP: 0018:ffffc90006b43b60 EFLAGS: 00010282
-RAX: 0000000000000000 RBX: ffff888009bb3ef0 RCX: 0000000000000027
-RDX: ffff88807be218c8 RSI: 0000000000000001 RDI: ffff88807be218c0
-RBP: 0000000000069d70 R08: 0000000000000000 R09: ffffc90006b439f0
-R10: ffffc90006b439e8 R11: 0000000000000003 R12: ffff8880029ede84
-R13: 0000000000004e20 R14: ffffffff84356dc0 R15: ffff888009bb3ef0
-FS:  00007f62c10926c0(0000) GS:ffff88807be00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000020ccb000 CR3: 000000004628c005 CR4: 0000000000f70ef0
-PKRU: 55555554
-Call Trace:
- <TASK>
- ? refcount_warn_saturate+0xe5/0x110
- ? __warn+0x81/0x130
- ? refcount_warn_saturate+0xe5/0x110
- ? report_bug+0x171/0x1a0
- ? refcount_warn_saturate+0xe5/0x110
- ? handle_bug+0x3c/0x80
- ? exc_invalid_op+0x17/0x70
- ? asm_exc_invalid_op+0x1a/0x20
- ? refcount_warn_saturate+0xe5/0x110
- tcp_twsk_unique+0x186/0x190
- __inet_check_established+0x176/0x2d0
- __inet_hash_connect+0x74/0x7d0
- ? __pfx___inet_check_established+0x10/0x10
- tcp_v4_connect+0x278/0x530
- __inet_stream_connect+0x10f/0x3d0
- inet_stream_connect+0x3a/0x60
- __sys_connect+0xa8/0xd0
- __x64_sys_connect+0x18/0x20
- do_syscall_64+0x83/0x170
- entry_SYSCALL_64_after_hwframe+0x78/0x80
-RIP: 0033:0x7f62c11a885d
-Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 90 f3 0f 1e fa 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d a3 45 0c 00 f7 d8 64 89 01 48
-RSP: 002b:00007f62c1091e58 EFLAGS: 00000296 ORIG_RAX: 000000000000002a
-RAX: ffffffffffffffda RBX: 0000000020ccb004 RCX: 00007f62c11a885d
-RDX: 0000000000000010 RSI: 0000000020ccb000 RDI: 0000000000000003
-RBP: 00007f62c1091e90 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000296 R12: 00007f62c10926c0
-R13: ffffffffffffff88 R14: 0000000000000000 R15: 00007ffe237885b0
- </TASK>
-
-Fixes: ec94c2696f0b ("tcp/dccp: avoid one atomic operation for timewait hashdance")
-Reported-by: Anderson Nascimento <anderson@allelesecurity.com>
-Closes: https://lore.kernel.org/netdev/37a477a6-d39e-486b-9577-3463f655a6b7@allelesecurity.com/
-Suggested-by: Eric Dumazet <edumazet@google.com>
-Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
----
- net/ipv4/tcp_ipv4.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
-
-diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-index a22ee5838751..e0cef75f85fb 100644
---- a/net/ipv4/tcp_ipv4.c
-+++ b/net/ipv4/tcp_ipv4.c
-@@ -154,6 +154,12 @@ int tcp_twsk_unique(struct sock *sk, struct sock *sktw, void *twp)
- 	if (tcptw->tw_ts_recent_stamp &&
- 	    (!twp || (reuse && time_after32(ktime_get_seconds(),
- 					    tcptw->tw_ts_recent_stamp)))) {
-+		/* inet_twsk_hashdance() sets sk_refcnt after putting twsk
-+		 * and releasing the bucket lock.
-+		 */
-+		if (unlikely(!refcount_inc_not_zero(&sktw->sk_refcnt)))
-+			return 0;
-+
- 		/* In case of repair and re-using TIME-WAIT sockets we still
- 		 * want to be sure that it is safe as above but honor the
- 		 * sequence numbers and time stamps set as part of the repair
-@@ -174,7 +180,7 @@ int tcp_twsk_unique(struct sock *sk, struct sock *sktw, void *twp)
- 			tp->rx_opt.ts_recent	   = tcptw->tw_ts_recent;
- 			tp->rx_opt.ts_recent_stamp = tcptw->tw_ts_recent_stamp;
- 		}
--		sock_hold(sktw);
-+
- 		return 1;
- 	}
- 
--- 
-2.30.2
-
+Of course, this should not block this patch set.
 
