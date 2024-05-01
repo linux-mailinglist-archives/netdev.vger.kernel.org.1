@@ -1,177 +1,129 @@
-Return-Path: <netdev+bounces-92814-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92815-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 843638B8F62
-	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 20:07:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F9DC8B8F71
+	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 20:16:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EB1F21F21CC6
-	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 18:07:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C4DA31F21499
+	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 18:16:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E5CC1474A8;
-	Wed,  1 May 2024 18:07:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E089F146D5F;
+	Wed,  1 May 2024 18:16:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Dk+vzRmv"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gYKo6iSn"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f49.google.com (mail-ot1-f49.google.com [209.85.210.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45D08146D5F;
-	Wed,  1 May 2024 18:07:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6304432C85
+	for <netdev@vger.kernel.org>; Wed,  1 May 2024 18:16:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714586821; cv=none; b=nYn9qfyeufFnhZ3P7uHoT2zf+KeMLlsdwIY9GjZMvgqqbFVQOLJTCr0ASPgmRnZHj+48+Se+C5WDlxio5eaqk2DZFroYMJVgL+t4xGIhon81ZSctSMZ9Hw6vzdQvDdAXWezNlpe6fp696rFefQZ6D4J2VrvRR0HLs0THuF9ghKA=
+	t=1714587404; cv=none; b=h8hIXgdi+F2KI3yII7fgUC64MrP5MJ26BPMiqLiCNHGEf8yIcGgXL1PGt+dIVCTRolq2aGt/EXZc3ez4S6Jaj9lrCFfWMsW9VyYYzySEoQr1DifxdFVhaesqHWweF/HiKSgpW3CGcF97HTSLFAOKvZw3ko6bfXJbHKa5wXRAU4M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714586821; c=relaxed/simple;
-	bh=BJj8XRO5iS4yosKp1oeBCQudQrPdTkzhVtktCTqHKMQ=;
+	s=arc-20240116; t=1714587404; c=relaxed/simple;
+	bh=um3QI+jS2eRa0Wi7aE0atVKG7SKSi6QmpIMsI9TiMbA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=m1bXIBQAf2F7PkihtGKYvcOTxAzlaw0TIpNL2/ZMaK+LPJOlUu6cUOOfK1YhQTeRCJDna/c9RHWzGcK1iUGk36szbib/Z1nIeCGT2ZBxZzMY7gQ93vIzlOf/ir4tEmxz3vzCVT/8uQaVxiHvgbIUvEVLgJpzJ8EiDjHH1S+SevU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Dk+vzRmv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B22E4C072AA;
-	Wed,  1 May 2024 18:06:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714586821;
-	bh=BJj8XRO5iS4yosKp1oeBCQudQrPdTkzhVtktCTqHKMQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Dk+vzRmv7vSAmXs8P2KRjcS9eTNnTb/bNDycB0r8nq4Gzv1uDHbdh2Qba3g/z0sGw
-	 SosEWbFauf8T0O+s6CIKTHCH3je+C3Aui9xbu3rPFt9/A29Lc5djFWqvv9Z2O+qWqF
-	 ypGBq+YH+lqg5WdDsukt/8kwFu9V0rjyDh57A460ZcfKn0RMq7blkgt2Xxz8ZUNezc
-	 6U+xMnN6hZBKKurqHqBBdeftGoLvMzyw4n05CbQUYbk0TVLlG43eF9Jri0koGC8aAu
-	 UmTYnKXJe4xDtfqOlXXxNjPWTFAqF+OZfS95NeiWpXhuicmv+ChhwWzAtlRfbg1/2x
-	 +vui3Mppohsgw==
-Date: Wed, 1 May 2024 19:06:56 +0100
-From: Simon Horman <horms@kernel.org>
-To: Geetha sowjanya <gakula@marvell.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kuba@kernel.org,
-	davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
-	sgoutham@marvell.com, sbhatta@marvell.com, hkelam@marvell.com,
-	Dan Carpenter <dan.carpenter@linaro.org>
-Subject: Re: [net-next PATCH v3 3/9] octeontx2-pf: Create representor netdev
-Message-ID: <20240501180656.GX2575892@kernel.org>
-References: <20240428105312.9731-1-gakula@marvell.com>
- <20240428105312.9731-4-gakula@marvell.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=J6+vaIRCxkCL2C8ZMEyWxXT1DjYnINkkBFFgfwK9AoHy9NGrrdS5h7b9qJPH9zqqaXOkX3imtlVRhjTr8ZJWyiQ2vpqcxBFEhSB77LugWhu21hKmI5nd5l6ziEUy8BJsCkdIN4klDAvtntibFhvEHwfD7r0otD2WtmJcAvgSQyk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gYKo6iSn; arc=none smtp.client-ip=209.85.210.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ot1-f49.google.com with SMTP id 46e09a7af769-6ef6ef5c5faso1008447a34.3
+        for <netdev@vger.kernel.org>; Wed, 01 May 2024 11:16:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1714587402; x=1715192202; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=h07FLRwiamUXF7mmKRoLxadvWj3yvk6Y3EfSpj1/B9U=;
+        b=gYKo6iSnd6sisJNgMWQLkhgX+8HU3LeJzzyQxGyZGmLavPCLIJNZzRCWBYjrjUD45T
+         nx6pRElvf3Mg0FXOpT+7LbJjTsOXF3MJEntOn71TGk+iJbUSFKBdjldt8wYuhKW7BFxp
+         Wjv8j8MLVuaWIvio6OPwawtXbTZRUvpU+WyAgYpY3oTV6ct4dCStfaoroEr/qhG5wh0e
+         KvC+1hajBYpfetusJmUBsHPigZJCPiuLHBABzT9H6qGIjRlql11n7xBQPst9Bf6qH6zC
+         gxirJjNHG7W+fCiMgEvigP4YIwwzr8uMllYOJig5bo36XJKvTbd9uFiI89/7coAEPzUN
+         bf7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714587402; x=1715192202;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=h07FLRwiamUXF7mmKRoLxadvWj3yvk6Y3EfSpj1/B9U=;
+        b=tgCHMbX+dBKK3OGLQ894wo/YLVCo4oNJO58LaQF3Y4sTM5FQVF2nGIWXt3TeAUyynA
+         Xcvg3zxZVN+hFsxrA08bh541jTwtwdGSV+ycKrXsSe9CXYv1RR0W+tmIT/VlcP1UiGZ+
+         sZ8iJ35JBD9F61xMU5job5KelWqQ4DA/8zMs3XITtfr5rF3O2pKoObZsETvvGLIqsTCv
+         e4xrx1vyeC50J3eNBoOq3vw/YZY/x0K7B6Ko9bGqfmgUmSBAs72tSdJJTA5k5tLnGm74
+         +djvPD4TmZXit6Jmjfsr6+CTL9MrSPF9LQCSMm37LFz4V8HPPGqBK+fkBcXuYHinkXvm
+         mdmg==
+X-Forwarded-Encrypted: i=1; AJvYcCWzISOOyxLbHRLY7+t8i3II3fx0MHhWYpLOex3Z119hl9eX7Suecsfq3dQQ0Oa55NLIkZjvYXXUESrAH/W7lZIkkSVqpIcr
+X-Gm-Message-State: AOJu0YxVeKWACnqHbPEZm6SkvsEV/hNdoWZI5YxKNaM3MSMUzVAZQzXv
+	rNpBFROXf0pdf0tORPkCPMryZ/+RT+nfsOVRo8xFLqsTkclF/fop
+X-Google-Smtp-Source: AGHT+IE1+sOI98iQqkK1I1qG0QYLtfPeq+B9BbPlq8q3xsrAoJJNXVGYw2Hj4WWIyl3IEKNHZGwrUw==
+X-Received: by 2002:a05:6830:25c3:b0:6ee:6675:fb47 with SMTP id d3-20020a05683025c300b006ee6675fb47mr4112010otu.0.1714587402357;
+        Wed, 01 May 2024 11:16:42 -0700 (PDT)
+Received: from localhost (24-122-67-147.resi.cgocable.ca. [24.122.67.147])
+        by smtp.gmail.com with ESMTPSA id u5-20020a05620a022500b0078f13d368f3sm12058890qkm.95.2024.05.01.11.16.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 01 May 2024 11:16:41 -0700 (PDT)
+Date: Wed, 1 May 2024 14:16:41 -0400
+From: Benjamin Poirier <benjamin.poirier@gmail.com>
+To: Shane Miller <gshanemiller6@gmail.com>
+Cc: Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org
+Subject: Re: SR-IOV + switchdev + vlan + Mellanox: Cannot ping
+Message-ID: <ZjKHCTe9j4tAg7yp@f4>
+References: <CAFtQo5D8D861XjUuznfdBAJxYP1wCaf_L482OuyN4BnNazM1eg@mail.gmail.com>
+ <ZizS4MlZcIE0KoHq@nanopsycho>
+ <CAFtQo5BxQR56e5PNFQoRXNHOfssPZNdTDMEFpHFVS07FPpKCKg@mail.gmail.com>
+ <Zi-Epjj3eiznjEyQ@nanopsycho>
+ <CAFtQo5B5oveWMr9PoUEmFnsbxwjQbxtHDcFpsUg646=Z__fJtw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240428105312.9731-4-gakula@marvell.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAFtQo5B5oveWMr9PoUEmFnsbxwjQbxtHDcFpsUg646=Z__fJtw@mail.gmail.com>
 
-+ Dan Carpenter
-
-On Sun, Apr 28, 2024 at 04:23:06PM +0530, Geetha sowjanya wrote:
-> Adds initial devlink support to set/get the switchdev mode.
-> Representor netdevs are created for each rvu devices when
-> the switch mode is set to 'switchdev'. These netdevs are
-> be used to control and configure VFs.
+On 2024-04-30 17:29 -0400, Shane Miller wrote:
+> On Mon, Apr 29, 2024 at 7:29 AM Jiri Pirko <jiri@resnulli.us> wrote:
+> > Nope. Think of it as another switch inside the NIC that connects VFs and
+> > uplink port. You have representors that represent the switch port. Each
+> > representor has counter part VF. You have to configure the forwarding
+> > between the representor, similar to switch ports. In switch, there is
+> > also no default forwarding.
 > 
-> Signed-off-by: Geetha sowjanya <gakula@marvell.com>
+> The salient phrase is "forward between the representor". You seem to
+> be saying to forward ARP packets from the uplink port (ieth3 e.g.
+> the NIC that was virtualized) to a port representer (ieth3r0)? Are those
+> the correct endpoints?
+> 
+> Second, what UNIX tool do I use to forward? As far as I can tell, the
+> correct methodology is to first create a bridge:
+> 
+>     ip link add name br0 type bridge
+>     ip link set br0 up
+> 
 
-Hi Geetha,
+I recently learned about this too and here is what I noted down:
 
-Some minor feedback from my side.
+In switchdev mode, two netdevs are created for each VF:
+1) port representor (PR)
+	`ethtool -i` shows "driver: mlx5e_rep"
+	sysfs device/ is the PF
+	`devlink port` shows "flavour pcivf"
+2) actual VF
+	driver: mlx5_core
+	sysfs device/ is unique
+	`devlink port` shows "flavour virtual"
 
-...
-
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/rep.c b/drivers/net/ethernet/marvell/octeontx2/nic/rep.c
-
-...
-
-> +int rvu_rep_create(struct otx2_nic *priv, struct netlink_ext_ack *extack)
-> +{
-> +	int rep_cnt = priv->rep_cnt;
-> +	struct net_device *ndev;
-> +	struct rep_dev *rep;
-> +	int rep_id, err;
-> +	u16 pcifunc;
-> +
-> +	priv->reps = devm_kcalloc(priv->dev, rep_cnt, sizeof(struct rep_dev), GFP_KERNEL);
-
-It looks like the size argument should be sizeof(struct rep_dev *)
-or sizeof(*priv->reps).
-
-Flagged by Coccinelle.
-
-Please consider limiting lines in Networking code to 80 columns wide
-where it can be achieved without too much bother.
-
-> +	if (!priv->reps)
-> +		return -ENOMEM;
-> +
-> +	for (rep_id = 0; rep_id < rep_cnt; rep_id++) {
-> +		ndev = alloc_etherdev(sizeof(*rep));
-> +		if (!ndev) {
-> +			NL_SET_ERR_MSG_FMT_MOD(extack, "PFVF representor:%d creation failed\n",
-> +					       rep_id);
-> +			err = -ENOMEM;
-> +			goto exit;
-> +		}
-> +
-> +		rep = netdev_priv(ndev);
-> +		priv->reps[rep_id] = rep;
-> +		rep->mdev = priv;
-> +		rep->netdev = ndev;
-> +		rep->rep_id = rep_id;
-> +
-> +		ndev->min_mtu = OTX2_MIN_MTU;
-> +		ndev->max_mtu = priv->hw.max_mtu;
-> +		pcifunc = priv->rep_pf_map[rep_id];
-> +		rep->pcifunc = pcifunc;
-> +
-> +		snprintf(ndev->name, sizeof(ndev->name), "r%dp%d", rep_id,
-> +			 rvu_get_pf(pcifunc));
-> +
-> +		eth_hw_addr_random(ndev);
-> +		err = register_netdev(ndev);
-> +		if (err) {
-> +			NL_SET_ERR_MSG_MOD(extack, "PFVF reprentator registration failed\n");
-
-I don't think the string passed to NL_SET_ERR_MSG_MOD needs a trailing '\n'.
-I'm unsure if this also applies to NL_SET_ERR_MSG_FMT_MOD or not.
-
-Flagged by Coccinelle.
-
-
-The current ndev appears to be leaked here,
-as it does not appear to be covered by the unwind loop below.
-
-I think this can be resolved using:
-
-			free_netdev(ndev);
-
-> +			goto exit;
-> +		}
-> +	}
-> +	err = rvu_rep_napi_init(priv, extack);
-> +	if (err)
-> +		goto exit;
-
-Even with the above fixed, Smatch complains that:
-
-.../rep.c:180 rvu_rep_create() warn: 'ndev' from alloc_etherdev_mqs() not released on lines: 180.
-.../rep.c:180 rvu_rep_create() warn: 'ndev' from register_netdev() not released on lines: 180.
-
-Where line 180 is the very last line of the funciton: return err;
-
-I think this is triggered by the error handling above.
-However, I also think it is a false positive.
-I've CCed Dan Carpenter as I'd value a second opinion on this one.
-
-> +
-> +	return 0;
-> +exit:
-> +	while (--rep_id >= 0) {
-> +		rep = priv->reps[rep_id];
-> +		unregister_netdev(rep->netdev);
-> +		free_netdev(rep->netdev);
-> +	}
-> +	return err;
-> +}
-
-...
+In order to be able to pass traffic, the PR must be added into a bridge
+with the PF:
+ip link add br0 up type bridge
+ip link set dev eth2 up master br0  # PF
+ip link set dev eth4 up master br0  # PR
 
