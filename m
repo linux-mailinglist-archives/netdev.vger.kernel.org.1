@@ -1,188 +1,123 @@
-Return-Path: <netdev+bounces-92756-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92757-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3144D8B8B13
-	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 15:22:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 243468B8B1E
+	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 15:24:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 12FACB21003
-	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 13:22:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D43B6283381
+	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 13:24:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BA7512E1D1;
-	Wed,  1 May 2024 13:22:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DD3712E1E0;
+	Wed,  1 May 2024 13:24:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="z4PSvnZZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [207.211.30.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFBA512DDB3
-	for <netdev@vger.kernel.org>; Wed,  1 May 2024 13:22:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.211.30.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF31312DDBD
+	for <netdev@vger.kernel.org>; Wed,  1 May 2024 13:24:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714569742; cv=none; b=jRglBZo11cG56x9VLMY0ycRew3vh047ZIz37sEPU3ygVXm03Daep0RHKmucP/olINiSjjH5E0BCFsK5lvJfocnM7Z6UHX02hbfY68oHB3D2d5b2YjvrBGjuV2ewnVbREgKxW0oTO1VsirVxnMHfyuhIoTlwxscoq4Nxk0zmrPjc=
+	t=1714569880; cv=none; b=YuZ7kbb5xCMy6N3zjpuoFdacO1ZmNQUuLjJm5pniYHFh0lLHERghYx2Rvuun8eaKYZoQWEALWAZvdCzvwGw4N+uY7hO0YBimNcy9uUTo/dOUAKB5tAfhL2MaCxbNFoGmPOSWvfJhwHGd9M4OHdMUJZSR/bJTTJXUVJim0LPWYLI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714569742; c=relaxed/simple;
-	bh=O7JO15oFlg0r8J5T1b4P/Wv3XRMRsBPXIWx+J1QfkW4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 In-Reply-To:Content-Type:Content-Disposition; b=Ilwa58a9zgA1nGCid27/D7nA89eziTZynl30oOMM2ZaacQ8uTk7EZ89vVXz2W/wckhpIlFChrhtNnfBwAMSdv0WPRaDT9ht53LjxMejRPo/iVkEkAYQw9uVn9Az13dTtKNjXVl4xGnIykz2ukLkLiq5pZaG09T0ddRg6xW5zPv4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=none smtp.mailfrom=queasysnail.net; arc=none smtp.client-ip=207.211.30.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=queasysnail.net
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-629-juZYqNPBOfmJiuipiVGNpQ-1; Wed, 01 May 2024 09:22:17 -0400
-X-MC-Unique: juZYqNPBOfmJiuipiVGNpQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9CCA8810431;
-	Wed,  1 May 2024 13:22:16 +0000 (UTC)
-Received: from hog (unknown [10.39.193.137])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 52B561121312;
-	Wed,  1 May 2024 13:22:08 +0000 (UTC)
-Date: Wed, 1 May 2024 15:22:08 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: j.granados@samsung.com
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexander Aring <alex.aring@gmail.com>,
-	Stefan Schmidt <stefan@datenfreihafen.org>,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	David Ahern <dsahern@kernel.org>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Matthieu Baerts <matttbe@kernel.org>,
-	Mat Martineau <martineau@kernel.org>,
-	Geliang Tang <geliang@kernel.org>,
-	Remi Denis-Courmont <courmisch@gmail.com>,
-	Allison Henderson <allison.henderson@oracle.com>,
-	David Howells <dhowells@redhat.com>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
-	Xin Long <lucien.xin@gmail.com>,
-	Wenjia Zhang <wenjia@linux.ibm.com>,
-	Jan Karcher <jaka@linux.ibm.com>,
-	"D. Wythe" <alibuda@linux.alibaba.com>,
-	Tony Lu <tonylu@linux.alibaba.com>,
-	Wen Gu <guwen@linux.alibaba.com>,
-	Trond Myklebust <trond.myklebust@hammerspace.com>,
-	Anna Schumaker <anna@kernel.org>,
-	Chuck Lever <chuck.lever@oracle.com>,
-	Jeff Layton <jlayton@kernel.org>, Neil Brown <neilb@suse.de>,
-	Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>,
-	Tom Talpey <tom@talpey.com>, Jon Maloy <jmaloy@redhat.com>,
-	Ying Xue <ying.xue@windriver.com>, Martin Schiller <ms@dev.tdt.de>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Florian Westphal <fw@strlen.de>, Roopa Prabhu <roopa@nvidia.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Simon Horman <horms@verge.net.au>, Julian Anastasov <ja@ssi.bg>,
-	Joerg Reuter <jreuter@yaina.de>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Kees Cook <keescook@chromium.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, dccp@vger.kernel.org,
-	linux-wpan@vger.kernel.org, mptcp@lists.linux.dev,
-	linux-hams@vger.kernel.org, linux-rdma@vger.kernel.org,
-	rds-devel@oss.oracle.com, linux-afs@lists.infradead.org,
-	linux-sctp@vger.kernel.org, linux-s390@vger.kernel.org,
-	linux-nfs@vger.kernel.org, tipc-discussion@lists.sourceforge.net,
-	linux-x25@vger.kernel.org, netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org, bridge@lists.linux.dev,
-	lvs-devel@vger.kernel.org
-Subject: Re: [PATCH net-next v6 0/8] sysctl: Remove sentinel elements from
- networking
-Message-ID: <ZjJCANEjFK890VCA@hog>
-References: <20240501-jag-sysctl_remset_net-v6-0-370b702b6b4a@samsung.com>
+	s=arc-20240116; t=1714569880; c=relaxed/simple;
+	bh=krrfckqjbeQlFLb67v3IVek4EQvt8apnoVfcRYoUsg8=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=FdaJrMpq6NmKkHaxP2OKJwo+WSx6uThUoxQuBlmnvqOBxwYMgDEZOuJnzeul9LJ9xf3XkEPXUL78OyYSSc7Ra+5R/YGyG4harsSdblhrpeLhFgpr9xZZMaLvBTO9ivaMR1fTDCRfmhLHDg5630nNGUur59aeJbuymhzomFBbhNI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=z4PSvnZZ; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2a473ba0632so7960124a91.0
+        for <netdev@vger.kernel.org>; Wed, 01 May 2024 06:24:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1714569878; x=1715174678; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=4j6TmQ6ZgTGCAdIqQxwPqCx/nTzh+QyhXiuMiXZrc1A=;
+        b=z4PSvnZZow+6cwPT+0ewrIkZ1zd7BDzLa+B4BwRbWfQeul8nzOsi19rm0gzFJB29a5
+         X1qrmI4UmTxNrE8laFdrt5n0s1LOcdAQUyN8KlFjksLa19gdfLjN9rdxS7rkHH6wHmSx
+         Dt6vno8vuOBbKIVaNd/ZSN209Qkb/aM/VBPR0OgIPrRnR7/vkHGp68RZbNptbw41mTFa
+         3d043BKnXcNsJkhd/u6ytclKWj9RxAZpUPm0bNkT0+lSbw6W9UH6MMOoIsVtz9Jxpx/l
+         0NrMuyLM5KyCds8FWf26I6GWndEOa1VsaXVD1/lqiTKKSTp/prHyQE9HYEcdSmd7GLiI
+         2DfQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714569878; x=1715174678;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=4j6TmQ6ZgTGCAdIqQxwPqCx/nTzh+QyhXiuMiXZrc1A=;
+        b=q/wlygnHspgggrJv+B3H+0syZ2HHoGj0caXTCIcM56Ge8Y5ohIYsgD6IenXJpgnvqM
+         yyyQ1VIQd3oYm3hO7hDijMauvIQjcExzzURhIMpP7m8CiJ1q/e9nEp5tBdCqpOCl9sKz
+         rWklUIztxq7FQDBAOcYE8sRauIB37pnU8qK3wv2rEaaYv72lNuZTjXeFUYsd/5J+8mC2
+         DP6xsGeOCqseTAVZBG8j4TEi1YKXhYpYsX+qMZAM36YWXlJWWPob3MOMgMp5ntpB1ev5
+         6oT5PI27AYv4gfp6mXMRwdSpN4BkkknQsuSgJvV6yCo8lAgZ6h4BcSP9eTYJDYo86HMK
+         S2vA==
+X-Forwarded-Encrypted: i=1; AJvYcCU7pvW5L563EI+U8Q+CR/EvrRe7vmMNdekwgg7yw1kenVi2IH/q/DXUtoo97ZB04tz9xiCI6uYJ0WHjzE6oUJpUvnj3BWjp
+X-Gm-Message-State: AOJu0YzSFho40a8X0TssxBKKyg7XdnMP0m0cW1V6abe43995ddMfjXbP
+	NxFOBJ7KhkCNnIBDVImJvzJvxOlF6fmUgSVJaVyoQR3Kqr/klb+pW/IeZ3pL/XrJd1tfJukJNK/
+	yMg==
+X-Google-Smtp-Source: AGHT+IF3937EXGaxRuC2iwKEsqWkwYndGF2ruoyJWYYFvQeb8jNS6z1A7kQ93TL3uURuwu8bhUtDSRxNorw=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:90b:b0f:b0:2b0:14bf:3f45 with SMTP id
+ bf15-20020a17090b0b0f00b002b014bf3f45mr7454pjb.0.1714569878155; Wed, 01 May
+ 2024 06:24:38 -0700 (PDT)
+Date: Wed, 1 May 2024 06:24:36 -0700
+In-Reply-To: <ZjGiGq-_kUVht63m@finisterre.sirena.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <20240501-jag-sysctl_remset_net-v6-0-370b702b6b4a@samsung.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: queasysnail.net
-Content-Type: text/plain; charset=UTF-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+References: <20240430235057.1351993-1-edliaw@google.com> <ZjGiGq-_kUVht63m@finisterre.sirena.org.uk>
+Message-ID: <ZjJClMYEIyGEo37e@google.com>
+Subject: Re: [PATCH v1 00/10] Define _GNU_SOURCE for sources using
+From: Sean Christopherson <seanjc@google.com>
+To: Mark Brown <broonie@kernel.org>
+Cc: Edward Liaw <edliaw@google.com>, shuah@kernel.org, Jaroslav Kysela <perex@perex.cz>, 
+	Takashi Iwai <tiwai@suse.com>, Jiri Kosina <jikos@kernel.org>, 
+	Benjamin Tissoires <bentiss@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Bongsu Jeon <bongsu.jeon@samsung.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Alexandre Belloni <alexandre.belloni@bootlin.com>, Jarkko Sakkinen <jarkko@kernel.org>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, Andrew Morton <akpm@linux-foundation.org>, 
+	Muhammad Usama Anjum <usama.anjum@collabora.com>, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, kernel-team@android.com, 
+	linux-sound@vger.kernel.org, linux-input@vger.kernel.org, kvm@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-rtc@vger.kernel.org, linux-sgx@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-2024-05-01, 11:29:24 +0200, Joel Granados via B4 Relay wrote:
-> From: Joel Granados <j.granados@samsung.com>
->=20
-> What?
-> These commits remove the sentinel element (last empty element) from the
-> sysctl arrays of all the files under the "net/" directory that register
-> a sysctl array. The merging of the preparation patches [4] to mainline
-> allows us to just remove sentinel elements without changing behavior.
-> This is safe because the sysctl registration code (register_sysctl() and
-> friends) use the array size in addition to checking for a sentinel [1].
->=20
-> Why?
-> By removing the sysctl sentinel elements we avoid kernel bloat as
-> ctl_table arrays get moved out of kernel/sysctl.c into their own
-> respective subsystems. This move was started long ago to avoid merge
-> conflicts; the sentinel removal bit came after Mathew Wilcox suggested
-> it to avoid bloating the kernel by one element as arrays moved out. This
-> patchset will reduce the overall build time size of the kernel and run
-> time memory bloat by about ~64 bytes per declared ctl_table array (more
-> info here [5]).
->=20
-> When are we done?
-> There are 4 patchest (25 commits [2]) that are still outstanding to
-> completely remove the sentinels: files under "net/" (this patchset),
-> files under "kernel/" dir, misc dirs (files under mm/ security/ and
-> others) and the final set that removes the unneeded check for ->procname
-> =3D=3D NULL.
->=20
-> Testing:
-> * Ran sysctl selftests (./tools/testing/selftests/sysctl/sysctl.sh)
-> * Ran this through 0-day with no errors or warnings
->=20
-> Savings in vmlinux:
->   A total of 64 bytes per sentinel is saved after removal; I measured in
->   x86_64 to give an idea of the aggregated savings. The actual savings
->   will depend on individual kernel configuration.
->     * bloat-o-meter
->         - The "yesall" config saves 3976 bytes (bloat-o-meter output [6])
->         - A reduced config [3] saves 1263 bytes (bloat-o-meter output [7]=
-)
->=20
-> Savings in allocated memory:
->   None in this set but will occur when the superfluous allocations are
->   removed from proc_sysctl.c. I include it here for context. The
->   estimated savings during boot for config [3] are 6272 bytes. See [8]
->   for how to measure it.
->=20
-> Comments/feedback greatly appreciated
->=20
-> Changes in v6:
-> - Rebased onto net-next/main.
-> - Besides re-running my cocci scripts, I ran a new find script [9].
->   Found 0 hits in net/
-> - Moved "i" variable declaraction out of for() in sysctl_core_net_init
-> - Removed forgotten sentinel in mpls_table
-> - Removed CONFIG_AX25_DAMA_SLAVE guard from net/ax25/ax25_ds_timer.c. It
->   is not needed because that file is compiled only when
->   CONFIG_AX25_DAMA_SLAVE is set.
-> - When traversing smc_table, stop on ARRAY_SIZE instead of ARRAY_SIZE-1.
-> - Link to v5: https://lore.kernel.org/r/20240426-jag-sysctl_remset_net-v5=
--0-e3b12f6111a6@samsung.com
+On Wed, May 01, 2024, Mark Brown wrote:
+> On Tue, Apr 30, 2024 at 11:50:09PM +0000, Edward Liaw wrote:
+> > 809216233555 ("selftests/harness: remove use of LINE_MAX") introduced
+> > asprintf into kselftest_harness.h, which is a GNU extension and needs
+> > _GNU_SOURCE to either be defined prior to including headers or with the
+> > -D_GNU_SOURCE flag passed to the compiler.
+> 
+> This seems like something that should be handled centrally rather than
+> having to go round and audit the users every time some update is made.
 
-I pointed out a few tiny details in the ax25 patch but either way, the
-series looks good to me. Thanks!
++1.
 
-Series:
-Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
+And if for some reason unilaterally defining _GNU_SOURCE in
+tools/testing/selftests/lib.mk isn't an option, we should at least have
+kselftest_harness.h assert instead of making a futile attempt to provide its own
+definition, e.g.
 
-Note that you could have kept the ack/reviewed-by on patch 4 since it
-was not modified. Jeff and Chuck, your reviews got lost in the repost.
-
---=20
-Sabrina
-
+diff --git a/tools/testing/selftests/kselftest_harness.h b/tools/testing/selftests/kselftest_harness.h
+index 4fd735e48ee7..6741b4f20f25 100644
+--- a/tools/testing/selftests/kselftest_harness.h
++++ b/tools/testing/selftests/kselftest_harness.h
+@@ -51,7 +51,7 @@
+ #define __KSELFTEST_HARNESS_H
+ 
+ #ifndef _GNU_SOURCE
+-#define _GNU_SOURCE
++static_assert(0, "Using the kselftests harness requires building with _GNU_SOURCE");
+ #endif
+ #include <asm/types.h>
+ #include <ctype.h>
 
