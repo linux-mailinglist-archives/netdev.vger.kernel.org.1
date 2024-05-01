@@ -1,109 +1,160 @@
-Return-Path: <netdev+bounces-92810-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92811-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F4668B8F14
-	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 19:34:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CB2F8B8F1E
+	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 19:38:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E8624B228BD
-	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 17:34:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AC8881C20FEF
+	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 17:38:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 446CB12FB34;
-	Wed,  1 May 2024 17:34:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 590BC12FF75;
+	Wed,  1 May 2024 17:38:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="iJMAy+Tz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FG482jE1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.web.de (mout.web.de [217.72.192.78])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C580F17C9B;
-	Wed,  1 May 2024 17:34:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.72.192.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 262C5D2FE;
+	Wed,  1 May 2024 17:38:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714584863; cv=none; b=eZ3RaD36qRbhoDE9z8UqnQ8yCgxIEKvZHhqKHklxijIzPAlLSzVdZCA0uJg2lbJzM424z8eXEKBUTbQBmVweSK+oe5weeUX+o1QkZLSSW3xEQZuiVrtx6TqcKjYYP+UPzEZWdT2f8G5dP0lqjBIomApLaKiCBkCTn2DD+pBvvWQ=
+	t=1714585109; cv=none; b=hBk2z4MA3JWM4s9SPx9gD1wB+k3oOIF838svJx7zBs7ci2c0h0vzOkCe+zll1l/GZ2tndh3qjRk2MNMEfhACMp2I7kiw5zAiXZNBufq5lxZxxmqCejxKSR9T3NZxRRYYXp7vpkwjgHdIYEu0JGYW5+nsyzT6akqMdv4A3KKBOtA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714584863; c=relaxed/simple;
-	bh=yOqewtbEvLvJUxLkGDrjVjmDrRj+y1aLBrnh6oYMjJs=;
-	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
-	 In-Reply-To:Content-Type; b=cyaUkpVKvJWeUvq1uUtpXF5kuItWiuwWYvyradSULex7nFuOTpOqmOStSIUb7QnEv5GI4YQbUxPkOI7jugL7dVKB93tzxy6hiuoh3KhQmuVHSnsMXjrJms9ld6ofk5DJRwZ46A0hiYNs+czyjeCKrBDQzBDPLi6bMZvlxhiKYAE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=iJMAy+Tz; arc=none smtp.client-ip=217.72.192.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
-	s=s29768273; t=1714584823; x=1715189623; i=markus.elfring@web.de;
-	bh=gO4YnLVa8TvAJ1FCzBqXMrZgFrD5LQKEdYPyOsmQK/o=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:References:
-	 Subject:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:
-	 cc:content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=iJMAy+TzxT006XpYKO2wp5st01dt40T4i5pLswwAwPKv6RGEI/y/A9m91YMhyLH3
-	 jhP8L4FYkaS92Rd3Y1qIBRI41GdJPFLxny1ZQfInnK58p1P+PKq9jO0UCX+kdj5WW
-	 anziNI9yiIPwACZdRPkTjyYiDUgNCm+VLBi/kXm/qhoMn35fS8qxvu56FhO5+5ulH
-	 h0eRR8cl++sGNIVvYKrhW97GQ77gABWAqFNm6LhILUDA45Husf4JoFQpInqCoWUCR
-	 DWC376lhFfDhCZIqRFznkFk4D/twW34pBqLkXFgJat96senvKLStxeq9+MzIXPoGG
-	 CrlU5ikr+cEivmWejQ==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.21] ([94.31.85.95]) by smtp.web.de (mrweb105
- [213.165.67.124]) with ESMTPSA (Nemesis) id 1MIya8-1sLOaD2zUY-00L183; Wed, 01
- May 2024 19:33:43 +0200
-Message-ID: <b73a1728-cd92-468f-ba1d-c384de382979@web.de>
-Date: Wed, 1 May 2024 19:33:38 +0200
+	s=arc-20240116; t=1714585109; c=relaxed/simple;
+	bh=3Rom1K33gLjGc5KMu7YOMHTB0qLyXpnfXozkAEwXuwQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=PKd7GUJiMxZwD9EtP178mmOwafAs8acex0vuvItmIA2xOvSSHmWCXODQqCbzHtp5IdRS5hGP++HP5v2a2s/ohYHksgV9LNPzJFNql/MZhmGG/XLU66BfuIauZ+06/gfc+rRRl6eJrcL1mBD8DVOYJCnRq3l//RRNp02yaW6MSN4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FG482jE1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5EA32C072AA;
+	Wed,  1 May 2024 17:38:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714585108;
+	bh=3Rom1K33gLjGc5KMu7YOMHTB0qLyXpnfXozkAEwXuwQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:From;
+	b=FG482jE1b23MALPQTleYDyQE1i/V2NpJTWpzv1GQrZKsSaSchZfte6XfXHrUIstsY
+	 wWdvHyKMw9fx5FUqlBzhSH8osTQZvwTaZrGrt0Xn7ftNu8Xnk9lGJlz2dzCPMB9qoz
+	 KALX3k6b91XTBT3kA1wPdPZM1m66uA/qOBn4jLCr8YaiQvQ9BXxjfR5pprRftIrhrw
+	 /9yJKII93CaytSG1/TarbiJyKVzIxg351HGh1Dn0Eh9JPrh8emJM5tohPnWbTgYddS
+	 MVvWkLicm8OIZWsV8yNLVsfkfG/AJ0uL+iysVuZKcIktl/Ty/JJRX7tSvQs9GmjmOW
+	 nh95iuzB5VEsA==
+Date: Wed, 1 May 2024 12:38:26 -0500
+From: Bjorn Helgaas <helgaas@kernel.org>
+To: Herve Codina <herve.codina@bootlin.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Lee Jones <lee@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+	Horatiu Vultur <horatiu.vultur@microchip.com>,
+	UNGLinuxDriver@microchip.com, Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Saravana Kannan <saravanak@google.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Lars Povlsen <lars.povlsen@microchip.com>,
+	Steen Hegelund <Steen.Hegelund@microchip.com>,
+	Daniel Machon <daniel.machon@microchip.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
+	netdev@vger.kernel.org, linux-pci@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Allan Nielsen <allan.nielsen@microchip.com>,
+	Luca Ceresoli <luca.ceresoli@bootlin.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH 15/17] pci: of_property: Add the interrupt-controller
+ property in PCI device nodes
+Message-ID: <20240501173826.GA808463@bhelgaas>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-To: Duoming Zhou <duoming@zju.edu.cn>, linux-hams@vger.kernel.org,
- netdev@vger.kernel.org, kernel-janitors@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, =?UTF-8?Q?J=C3=B6rg_Reuter?=
- <jreuter@yaina.de>, Paolo Abeni <pabeni@redhat.com>
-Cc: LKML <linux-kernel@vger.kernel.org>,
- Dan Carpenter <dan.carpenter@linaro.org>, lars@oddbit.com
-References: <20240501060218.32898-1-duoming@zju.edu.cn>
-Subject: Re: [PATCH net] ax25: Fix refcount leak issues of ax25_dev
-Content-Language: en-GB
-From: Markus Elfring <Markus.Elfring@web.de>
-In-Reply-To: <20240501060218.32898-1-duoming@zju.edu.cn>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:Q0QhNBaMa5wsLnpEh01pGkGo+xGa7Cmhxz5H6RrtyyM1UCtb266
- MENHUAJ3pjNkyy7z2g0p8IuP6RBVGWJIA/pbToaMAfyjmwna3i46gliOoy9sYp7BEqPikOf
- Owi/C0JaBSl1f2Xv2n9jLOkN8ujhQzNDiDa0JGw93LfvF8uP0+/X/Ojmnr5kz2IpKV8Pf+M
- SCbvIAUuckYK4DHfqnSCA==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:tombYyYfHGc=;q0SvgptX4FfL0yXKTtYa0WBtWaL
- A0PVcly7GxD4W6LEDLzOQrmouOVs+GoOSoMqvFHXz9WjrnD8LVD7qGKkt7kkwaBlVU0tzD6sX
- 2zBfGPrzZJ8WlDS+iDQcT2D5pnyR3tPMm+4W1wIq90CC+KbOgCASnDyLfU64DcDfTvRzgxbyf
- KM6t3SLRS0FCbDZXMzXdmsUBEMc+NRZ8mOd7eFsNr5ndYCLwURnKfiOtCll5yU2cW9AibrDcz
- vakM4GBfK5+w+CW+QmDkFNvLhY5WQ8ebRsvFIcYWS2UorylJnQrydy+xJB7APvSDC3rpj6Jki
- dnrBvKvyrMxvPn69mAEuoNl4E6bLxbCUFmCh/jlw+pyt68JZia44FP3lmuy6XRTBjQDK1OCQx
- Gbhl3M2f0FSnQY8DNpttxHaTXmK5WmMRe3x3fVJZPq9fpFHL3/Z7hEOrjVENvNW6tIkQW7aaY
- Eko/oIOG9DceyF3zaTEU4Rmcl6U8CfEgb1NW9+a9BY5hv9j6SpAAv+4vjch4S8W/ub1JPeu/X
- d1H4Ym34Uzow6OjiT9CM2pgs1TTbdn6SMvFsJJwNZrPPLZi1IAlK9PmkYHo3Z2FNdQfXZtZCo
- dR44WvI+U2cwRJN9RDJcVQA4RtUk7iB7SqhYhtLfBrlLyiVM8N5P2eg6ggLbYaL3206UDlSjO
- 1+eYdzoX9qCj0P3blbfhxYTUESzW3QSraskFtVVp8jpCQdHhX/1WQXfU9X1JkufMG7GnPvWUn
- d8PsgEz1wuyqGxJstqlB2+/cKtkshFBxAsGVnyyZz9mgY4RQ65WA9In4dQwxJJc3gIiMekNpw
- UKuo+YMTq7c5E30nme3YSe/wUZpEFGXRI1Ki79eTZCaWo=
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240430083730.134918-16-herve.codina@bootlin.com>
 
-=E2=80=A6
-> In order to mitigate the above issues, only increase
-> the refcount of ax25_dev when the ax25_dev is added
-> to the ax25_dev_list and decrease the refcount of
-> ax25_dev after it is removed from the ax25_dev_list.
-=E2=80=A6
+In subject: s/pci:/PCI:/ to match history. s/Add the/Add/ for brevity.
 
-* I suggest to use more than 53 characters in lines of such a change descr=
-iption.
+On Tue, Apr 30, 2024 at 10:37:24AM +0200, Herve Codina wrote:
+> PCI devices and bridges DT nodes created during the PCI scan are created
+> with the interrupt-map property set to handle interrupts.
+> 
+> In order to set this interrupt-map property at a specific level, a
+> phandle to the parent interrupt controller is needed.
+> On systems that are not fully described by a device-tree, the parent
+> interrupt controller may be unavailable (i.e. not described by the
+> device-tree).
 
-* Can it be nicer to mention also the term =E2=80=9Creference counting=E2=
-=80=9D for
-  an improved commit message?
+Rewrap into one paragraph or add blank line to separate paragraphs.
 
-Regards,
-Markus
+> As mentioned in the [1], avoiding the use of the interrupt-map property
+> and considering a PCI device as an interrupt controller itself avoid the
+> use of a parent interrupt phandle.
+> 
+> In that case, the PCI device itself as an interrupt controller is
+> responsible for routing the interrupts described in the device-tree
+> world (DT overlay) to the PCI interrupts.
+> 
+> Add the 'interrupt-controller' property in the PCI device DT node.
+> 
+> [1]: https://lore.kernel.org/lkml/CAL_Jsq+je7+9ATR=B6jXHjEJHjn24vQFs4Tvi9=vhDeK9n42Aw@mail.gmail.com/
+> 
+> Signed-off-by: Herve Codina <herve.codina@bootlin.com>
+> ---
+>  drivers/pci/of_property.c | 24 ++++++++++++++++++++++++
+>  1 file changed, 24 insertions(+)
+> 
+> diff --git a/drivers/pci/of_property.c b/drivers/pci/of_property.c
+> index c2c7334152bc..9f8b940029ed 100644
+> --- a/drivers/pci/of_property.c
+> +++ b/drivers/pci/of_property.c
+> @@ -183,6 +183,26 @@ static int of_pci_prop_interrupts(struct pci_dev *pdev,
+>  	return of_changeset_add_prop_u32(ocs, np, "interrupts", (u32)pin);
+>  }
+>  
+> +static int of_pci_prop_intr_ctrl(struct pci_dev *pdev, struct of_changeset *ocs,
+> +				 struct device_node *np)
+> +{
+> +	int ret;
+> +	u8 pin;
+> +
+> +	ret = pci_read_config_byte(pdev, PCI_INTERRUPT_PIN, &pin);
+> +	if (ret != 0)
+> +		return ret;
+> +
+> +	if (!pin)
+> +		return 0;
+> +
+> +	ret = of_changeset_add_prop_u32(ocs, np, "#interrupt-cells", 1);
+> +	if (ret)
+> +		return ret;
+> +
+> +	return of_changeset_add_prop_bool(ocs, np, "interrupt-controller");
+> +}
+> +
+>  static int of_pci_prop_intr_map(struct pci_dev *pdev, struct of_changeset *ocs,
+>  				struct device_node *np)
+>  {
+> @@ -334,6 +354,10 @@ int of_pci_add_properties(struct pci_dev *pdev, struct of_changeset *ocs,
+>  		ret = of_pci_prop_intr_map(pdev, ocs, np);
+>  		if (ret)
+>  			return ret;
+> +	} else {
+> +		ret = of_pci_prop_intr_ctrl(pdev, ocs, np);
+> +		if (ret)
+> +			return ret;
+>  	}
+>  
+>  	ret = of_pci_prop_ranges(pdev, ocs, np);
+> -- 
+> 2.44.0
+> 
 
