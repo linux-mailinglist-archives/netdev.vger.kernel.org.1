@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-92679-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92683-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 146938B83FF
-	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 03:40:39 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8AFC98B8412
+	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 03:50:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5FB03B21071
-	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 01:40:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3A0481F230A9
+	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 01:50:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2E404A39;
-	Wed,  1 May 2024 01:40:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8604363C7;
+	Wed,  1 May 2024 01:50:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cPdA2TD5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i6JP1Wja"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8F114400;
-	Wed,  1 May 2024 01:40:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56744522A
+	for <netdev@vger.kernel.org>; Wed,  1 May 2024 01:50:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714527631; cv=none; b=VQLgxZLSAsqGgLBtisuu2ZD4Mor6H9Vx0DDNWsaGfGccRS0cEcE9QCfCdaEDcrm206vUgnJu+Or6g/9mvwUrUiEYbWTteWcoK+poz5U29/9ZWIDi1t7tLECOASsYWKWP+RVwpHOGy8IBLcXfCvSPY/tejWwi9GmrBEWMVGSeNoo=
+	t=1714528230; cv=none; b=NC97mkx2n+3rJuo19q1G7Am53R9oNcI/GRuu/P4G/OEcU7uYfNHUVsc7FIMpN+hFt6LZfUWcQlts4YvHGR/YA4nceFJKPhfa4Zcn/2ZTBDQhQpgsK+eNFoV74w4gaxFxMcJZrJ6cE6mHOOm5z71SNX/OuExehaF8qVXRVgf9/Es=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714527631; c=relaxed/simple;
-	bh=ptTyktK7GZ8036WknfUkFHQgCjEBOJqYQcJNwsQO2Qs=;
+	s=arc-20240116; t=1714528230; c=relaxed/simple;
+	bh=M+Qx5FN9HOLbZ/WKW7GJi5c/Qs0pnNYq52TwwTeosZY=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=kZyuyeDRL8vN/WU6dX1J4UkBkg8MLTuFZm8iUEgin9M9xAEO45ig+MHjAvLNcxV2w9joOlr7g2/yqJtrLozAqt43dwe++a0eBf9rETqVCkiHw9NYWcga7XFXj91JutJzR9ffxJcI9p3wC3ugtzOJyMdlGlAKILwPVYLEstTgw9Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cPdA2TD5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 87B03C32789;
-	Wed,  1 May 2024 01:40:31 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=Ss7BKU6M++6KR+4/COZg33lJmt2/5waxWnds3ZrP0rAeH8waMioNCqpzjVXLJMwGgJT+1ILLzc4d7HxnzxJ4wCnuUlImuHTiOkm1+N0xhZtZSSZf2vvMF6EWsqw3a/lD2kaPiZoTPKmkpx1iTQvg1XrAnGQSMHOCMGaijkxJfmM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i6JP1Wja; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id C854EC4AF48;
+	Wed,  1 May 2024 01:50:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714527631;
-	bh=ptTyktK7GZ8036WknfUkFHQgCjEBOJqYQcJNwsQO2Qs=;
+	s=k20201202; t=1714528229;
+	bh=M+Qx5FN9HOLbZ/WKW7GJi5c/Qs0pnNYq52TwwTeosZY=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=cPdA2TD5rEfPxQh/uqJAMywR0GOOeMohIEJDl2O+MSNJu8DW2WYcctByxya5HW4YD
-	 R+fFCLq3qcMF1lTeTovMvb3mY2bqZ/T9S2nHf2KqRl5mZJArg5OwTjfAn1tcR/kHZ4
-	 WVhXq51sqbO9v712rwaT/+NM2WLsXMF4w8ecyoA6PnczyzefX3hCS9hcr3nBAZLhD2
-	 xwZ0wQ06lIBAuAIH+WUfl33y+0JrV0F6h7zpGrFbGHvgSuFbxaGcyuRUoQm6JOf5vY
-	 7QpTQ4shWh/alyoZBSHlqaq1td2hoNJCJXOGYtZ7g1fioZaCPnmNTBHDAu0pGxrJ4q
-	 bFzScjCDDgZlA==
+	b=i6JP1Wja26HkUr+l5ot+pXPywk2fKvSmpAUDO09anyd1ljNFn9YKdvvm8FPjZOaGG
+	 62ap8/ncb9Fsg0IZMakc2ukwgQ3SwRAjGH3QFm7e+hA5xaYqGCRUu+Dg1vLkWKfOBo
+	 UgvIxzhC30YNTvtCSG5tCBHUE7VWF7Lr/rUSPjvtUrVCuMyLGFccw6ILkqieUL2ogd
+	 6MbUMGAP2c2A+toge/aK1ME3YgVJI3ILTgxgQH9XXygYN48ucyMEouubY7IZMt3m8i
+	 TM7RxEaqTok3DVZJr1pdU8a1aqJL6WgsSoX+DvFgdukIlmwo0WCT2hDSyio3PaFoDT
+	 6R2B1jhJjXyvA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 72818C43616;
-	Wed,  1 May 2024 01:40:31 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id BCC74C433E9;
+	Wed,  1 May 2024 01:50:29 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,38 +52,35 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2] rxrpc: Fix using alignmask being zero for
- __page_frag_alloc_align()
+Subject: Re: [PATCH net-next] inet: introduce dst_rtable() helper
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171452763146.16260.12414739867671113540.git-patchwork-notify@kernel.org>
-Date: Wed, 01 May 2024 01:40:31 +0000
-References: <20240428111640.27306-1-linyunsheng@huawei.com>
-In-Reply-To: <20240428111640.27306-1-linyunsheng@huawei.com>
-To: Yunsheng Lin <linyunsheng@huawei.com>
-Cc: dhowells@redhat.com, marc.dionne@auristor.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- alexander.duyck@gmail.com, linux-afs@lists.infradead.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+ <171452822977.22205.12940447951912192234.git-patchwork-notify@kernel.org>
+Date: Wed, 01 May 2024 01:50:29 +0000
+References: <20240429133009.1227754-1-edumazet@google.com>
+In-Reply-To: <20240429133009.1227754-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ dsahern@kernel.org, netdev@vger.kernel.org, eric.dumazet@gmail.com
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Sun, 28 Apr 2024 19:16:38 +0800 you wrote:
-> rxrpc_alloc_data_txbuf() may be called with data_align being
-> zero in none_alloc_txbuf() and rxkad_alloc_txbuf(), data_align
-> is supposed to be an order-based alignment value, but zero is
-> not a valid order-based alignment value, and '~(data_align - 1)'
-> doesn't result in a valid mask-based alignment value for
-> __page_frag_alloc_align().
+On Mon, 29 Apr 2024 13:30:09 +0000 you wrote:
+> I added dst_rt6_info() in commit
+> e8dfd42c17fa ("ipv6: introduce dst_rt6_info() helper")
+> 
+> This patch does a similar change for IPv4.
+> 
+> Instead of (struct rtable *)dst casts, we can use :
 > 
 > [...]
 
 Here is the summary with links:
-  - [v2] rxrpc: Fix using alignmask being zero for __page_frag_alloc_align()
-    https://git.kernel.org/netdev/net/c/9f8eeea1643c
+  - [net-next] inet: introduce dst_rtable() helper
+    https://git.kernel.org/netdev/net-next/c/05d6d492097c
 
 You are awesome, thank you!
 -- 
