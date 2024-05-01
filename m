@@ -1,462 +1,349 @@
-Return-Path: <netdev+bounces-92771-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92772-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B626C8B8C6A
-	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 17:03:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E5098B8C71
+	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 17:06:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 435361F2106D
-	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 15:03:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 46C382815AF
+	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 15:06:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FAF812F378;
-	Wed,  1 May 2024 15:03:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90E3A12F37C;
+	Wed,  1 May 2024 15:06:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="CZhMs9Jj"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OUS7XWhb"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR01-HE1-obe.outbound.protection.outlook.com (mail-he1eur01olkn2049.outbound.protection.outlook.com [40.92.65.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1863414012;
-	Wed,  1 May 2024 15:03:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.65.49
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714575792; cv=fail; b=CjVKijBTY0lJELBPSYYkvkhJAMtYghpe4Esbk14XIiHgjZCvWoVl6m0fL1UthIUft0U1zP3A2fdltAK70MHto0yEiFPKE8fsdBBLZj1na6r1ExRtrzVERDNB5PpZK/RAnhWu6sUlAyZAUlMxAUZllCZkvvruuTy9CHrJLmP5L1E=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714575792; c=relaxed/simple;
-	bh=eVXzdoMcT+TqaoVvW3d4nVdGFEiqhR7p6zj7CoeSZnU=;
-	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=YLBgElVXMETJBSXPqfhZkhEP5Hl4rlnzdpPRnhdCYfx5DnhskW/g05Vjok8awTnmHy1QQAVytoNKANofTauvm9XMA97sUYbvyjJU4PsV8gEwMN3Hf6g743qP1qGddTFP+rN+K95MPFK5zYC2KQzo6LS6RhEBf0gNkKJh3PRwB7E=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=CZhMs9Jj; arc=fail smtp.client-ip=40.92.65.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=H946XqrOSWkmqrRcHQrc5Yx4VE4w46pECfQsuPTXlf6+4ENJJk4/DmhJKE7vo4sueOJ6atLQO6zvcOBJ7/3+GwlTdwO+3yAuRzyJ/+20AntFiWyaCsKjLG/GyyllkqH2Y6eImqfHr8s/ex8ipailaG9biapQ0FDcpCiN9jE7xvFAy6sChs0wSadRgxGGolYG3ZBJt56kWTF+3So+cj/Coacd/6/xNchFeTVNbZ3n5YrD96DPJQ/7uZZt8duI2uFFLb35tWeLTYiiBUMvEFWnzr5QsOja6NkMTkwZWTVWECz1IJAn9e52rtTDjL2hPQrIjq7BDyuNNiwaAa9Y6nwKdw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=bQnpgDZbgfR03GHCw1uuEcglzZ0kuvsUMlWln8jcunU=;
- b=jFMPICxp62oMiD9hXS5vH3Y7By14DLV/8oMBXRDSUC1QHDT6SpKM5MT4Qj4YQjbvUlKxhqdzyo1oSB5duPCAay6bWTFZ6zAeIxpmc471lCp0nCmHlZjr6VkekxfTZwQTwse2z7ovltOhVbZz92eQZqojVMHYH1/0TL0fSSRxJzYPtcgI5HhfrlNcVOpykDcWN0e5ZHMrs7n/E+pMMPhI8qIboOFUgnCNhe6bSPCAmtxeNWUJh4xjecUsTiBZLtG2k25tGi6aX3h3V5fFheYZ5JuUx2Kzqrr+53ADoeoNU5nlpDDy4U6TP/7vCkH7moo99XwgQGIyOXe/7dC1LJMrpg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=bQnpgDZbgfR03GHCw1uuEcglzZ0kuvsUMlWln8jcunU=;
- b=CZhMs9JjzfHx4ufVWE+4RFCmfryYxQmMkJzgltfNwWKvIUOy6vzi+/5gFYDbMLfwENsdvnAi+g3GE/6ml0kZfrhM0EhVszmFaNaFFO4ft3b3FOEmHiES//WKkKsWACwiIcRJhf7PA2mtuyEASLO2l1kWXpkEZ8vBPiDOjrftQ47HSIl6b66LfI6C+e9VjLQItsvZ+ZH7TEnQgOTES9MG1lYIuLIZK0s+i9AH16T2ctX1XTdwmXvDrOYLLRtyq/JDMjxs3x/0EGPzIVgpkVya9gTFYKqarhq3AFjE/PNh8VdnaOz1YUkkXgEs1Jt+hI1MOxOforSsSiOe5mb24JufxA==
-Received: from AS8PR02MB7237.eurprd02.prod.outlook.com (2603:10a6:20b:3f1::10)
- by DB8PR02MB5801.eurprd02.prod.outlook.com (2603:10a6:10:115::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7519.36; Wed, 1 May
- 2024 15:03:06 +0000
-Received: from AS8PR02MB7237.eurprd02.prod.outlook.com
- ([fe80::409b:1407:979b:f658]) by AS8PR02MB7237.eurprd02.prod.outlook.com
- ([fe80::409b:1407:979b:f658%5]) with mapi id 15.20.7519.035; Wed, 1 May 2024
- 15:03:06 +0000
-From: Erick Archer <erick.archer@outlook.com>
-To: Marek Lindner <mareklindner@neomailbox.ch>,
-	Simon Wunderlich <sw@simonwunderlich.de>,
-	Antonio Quartulli <a@unstable.cc>,
-	Sven Eckelmann <sven@narfation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>,
-	Kees Cook <keescook@chromium.org>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>
-Cc: Erick Archer <erick.archer@outlook.com>,
-	b.a.t.m.a.n@lists.open-mesh.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-hardening@vger.kernel.org,
-	llvm@lists.linux.dev
-Subject: [PATCH v3] batman-adv: Add flex array to struct batadv_tvlv_tt_data
-Date: Wed,  1 May 2024 17:02:42 +0200
-Message-ID:
- <AS8PR02MB72371F89D188B047410B755E8B192@AS8PR02MB7237.eurprd02.prod.outlook.com>
-X-Mailer: git-send-email 2.25.1
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-TMN: [mQzIvD4x4eK5gb4bGWB6c6X6fYFrffUG]
-X-ClientProxiedBy: MA4P292CA0001.ESPP292.PROD.OUTLOOK.COM
- (2603:10a6:250:2d::20) To AS8PR02MB7237.eurprd02.prod.outlook.com
- (2603:10a6:20b:3f1::10)
-X-Microsoft-Original-Message-ID:
- <20240501150242.16159-1-erick.archer@outlook.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0D751F176
+	for <netdev@vger.kernel.org>; Wed,  1 May 2024 15:06:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1714575977; cv=none; b=f3wt+ey8HUegP3GGhx89BHkiCTA4b+5lDm/+YJr7XyY2BOQcwwyO5drw8OVYCbD6S4TaxtjnbtwP2S8byzoR4D51m7CYyY2J4kd9N3Ok7LLkKQmc5iXIqSWGdX5s3lARVimrQzS6YhSGUGcXGYUKtaAGNk+QFWx+2FgYmDjhkH4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1714575977; c=relaxed/simple;
+	bh=guct/nIvs52wbGMo/0gdXtH/sMaIOnNOV287mpX6xMU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=sENI3tXKvs+tfsP1GjBHlBnO4yozz0EyO2ZigOuppsIHXr9W4649NY3m1sQMrDu2GNoD9W4JaYgUzaB88BYAvVMRKNDYFHMzY5jKfg/nIKHQOSB5Smd/v4xv2gDBzVeuGlGtBo4BJ6cka2s1zo3/t6AezwwCcnJDezMr6ocHHd0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OUS7XWhb; arc=none smtp.client-ip=209.85.208.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-572aad902baso1343a12.0
+        for <netdev@vger.kernel.org>; Wed, 01 May 2024 08:06:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1714575974; x=1715180774; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RG6cIszogylDndqYVzO0atWyZ6Q82DP/0ycA6kQw5xo=;
+        b=OUS7XWhboARnQ7Gk2nF+/BGKlYw76dnyBJXcqrpI/kh+v4Rp1T/LB2YxW5BBnk9AoD
+         8guiWcgnUiAjJi4TqsXHw7Xg7y4qfJKOxVt9rRGukd7vTce2dyPIIsQ669k39RCHhQ5c
+         fQNFb6nxURWNZ6HJ3+I4ouW9M0whP24K72YouXk2vFAyCNQDiE42KpTuniAiiUZBIQU7
+         /Uo8K2KUFKtyyoYxPHZwhYy1JAxMOflOIonnGap+1XY5DW6z4K67tcK5qt55D+AlV6m6
+         84XxDiGBWKh1hkbn+eWWRjsaeJka49n+b69ndTGxsLitVp4kSrn7VW8h1TzO++F9hwMd
+         nAyQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714575974; x=1715180774;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=RG6cIszogylDndqYVzO0atWyZ6Q82DP/0ycA6kQw5xo=;
+        b=SfOX9ewm50VYDbT9Vd1qhgMxGOUxXDLLmNXIkIcjDEP6G6FkCrmjW7rSrASUtur3GK
+         /yQ/4WmACL0fvjUXZxpR0PBHoG7Ld/7LxoCTklTSaKlZe9tDGgeurIKOMyX6QDh4r6yX
+         eM/Q9Z/GaEpJ6jBXEmjKLtaFq/ORku56GNH4Z+YT6k9C4k3dN/rhTSIgzVOg1bRn5A6B
+         49PDcxFrRkR6QRJh7RHNkWYSi76OjpDP+IcB/LWroMVPwMSc/lMwUj30nq18upCQhsEm
+         ZzBpMYV6OXbmF9ILgbngeN+DSJ2/5ISR3aflgakgbHF9wkuPOzOADPWp+9U+XYjgMWSC
+         oR3w==
+X-Gm-Message-State: AOJu0YwFq7iz5gr/y/q0erFE+KYBrAE4T6nT0dibIHwCP6YTvd3dUNVu
+	iKJJ2VsmiLy8J1kyU8GD7sSeSFNTRrr33ckbDleGVtwJ/7gvkw2nLRtxGA5O9Bi9b77ahcGnF/8
+	c2VYdYjC9f6MZ9GHMLCw5YJblbgUl52iDt0qT
+X-Google-Smtp-Source: AGHT+IHnF5qSOqepmxO0mX9bf4IEfXbOO5mVRtyIJPFvSnnJDnfaaYAxxy+dRkGgBTJ4Div9lEqS0eulxpRROVt1NS4=
+X-Received: by 2002:aa7:d759:0:b0:572:a33d:437f with SMTP id
+ a25-20020aa7d759000000b00572a33d437fmr211384eds.2.1714575973713; Wed, 01 May
+ 2024 08:06:13 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AS8PR02MB7237:EE_|DB8PR02MB5801:EE_
-X-MS-Office365-Filtering-Correlation-Id: b31d4515-5949-45aa-0c3e-08dc69efce84
-X-Microsoft-Antispam:
-	BCL:0;ARA:14566002|461199019|1602099003|440099019|3412199016|1710799017;
-X-Microsoft-Antispam-Message-Info:
-	qFAcOOK4bRThDdtlyobiamSTHLyW+FLuC30yakUSw9HdhgvQvirTtPtfDrlGWNGSLYR83kL1lHrVluIvkXdbrYqT88HGCA7LTgP55GEcotFIYF44kOkCRLwnlGUv6O1RADAUCpFo7tesXPJcvdpW+bB4/UDo3s05puEF6Y51rB76HF2uD1aqKSlcJk25c21e1snHCVOvGCe0BUiCtipb6YAIA7AWymhj+rKYLariXuaGNBSiejn/WWniDc0GaIu8H5NE7oCX5Y5vwOO1we2BQtrZkDHmazPSQBYMLuQLbAhcIu5KE7S0lfRJZFnJq3RL1WkSMq2P1xhu7uyGdy9ok+Nbfa8oGaCupmGxjPrNMGZwFktMC2SuPe+pGB4y2YOSgThTXS2GKudTDy0+y+xaYfZQX+H91kaatWe7V3nM4CWdP2vStG+4shQaIwpjrqNTqjpg7J5MhmtsKgJtsiiMbZwnkriGTWfseEuqRixwVOf5vJKM4TDvqxEOiPY+obf0L1/i7C5r7PVdmY2lloOaqzkOoDDcPerYJpEZvehqaIJOns8oj9oQUXOpX624yh8vos9tRKMXuxV+CmklObdka2wSiBci2glXi1B9IQ59bDGUI2qmzhGKEfEEJFnQPYLYBD5YhsV6ElPsjVYgVBgcM4sdKLkvdHGvsVPVzw8zwOHk7RMjNKW8V7yMSIOT78gT8rtxq4JDbVwoCq/uriF3cQ==
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?1HX5x6Tm2g7aOt0oAVbxlxn7WTlXGMcPHE4uR4a42YFIVtgg7shT+GMWRBr9?=
- =?us-ascii?Q?Q5uYw4uh6mKqBBjHApjcs/pJvg5HT1pLMPffeefJc0NlywEXgS8LGkdht+qk?=
- =?us-ascii?Q?CRavqeBizdPPLLg7MowUwcZr3OogNiGhShPU/960tKNdchpKKxDRPXson2Eh?=
- =?us-ascii?Q?eHbTdCjMPqKPEIIqhZuChpFWtSjEdZQgXPJcK3zZiNovuRBz0Ohs1vCxA7ge?=
- =?us-ascii?Q?AhKako/bm3mFWos5wW3WD0WGa6+mG+1Q2Z7zY2GbuIkttf1qUwx8rcB0179B?=
- =?us-ascii?Q?v6llwX9LaRa/DCCudnLCwL6D7D3hYxIVA553maF/zgokgXqJLcFjjeNeCEhu?=
- =?us-ascii?Q?KJrEOt0nzTRFvYb50yUoIxy2BPGjepf85EXLei7nrenJBhetOt+Zox1+Z0zl?=
- =?us-ascii?Q?TDXtcMsYFshZYk+zXA/J/U7wshoDFI51i66FquBWHeEqvEh+ynZixDvA5hIj?=
- =?us-ascii?Q?ah4td+f1DO1t2VxqS6GqobgppqcuR5nXcrU78/dwcGP4A5vKTnhRHA4CU2w5?=
- =?us-ascii?Q?v7RX7dPFHsTfJcv1aQQclvNLt8Ka/egaSrurY6bP/2NAoV4w8NGTo34ifUnV?=
- =?us-ascii?Q?5VamI1Kc+vrptoM1FTYPQiT4YBhxspqVxFRrRJwJM8kvfz/DIZc3VplGIjeq?=
- =?us-ascii?Q?Bk4MpXHU0C+ac8cSIXz4/ZXMdaQBVSuryO0dB8pjduPn9tbKaHAdR330tHL4?=
- =?us-ascii?Q?byDBv7tVoKkM2NchBujy/wPu+cmVgZBrT4EgJ+aE2sxAGsesSwNlbTr072Pw?=
- =?us-ascii?Q?nU0y4MdPtsK7D/9IoD2rJT5nzl0Pl+iaQXeXLwB6ueh0lmKrZE3pTEtSduJD?=
- =?us-ascii?Q?JZ6VHINihZdYv8pPSyUFgEOwdLZuTEzeMiA2BG1MRm4R88Cd7UZlWXfXhRBw?=
- =?us-ascii?Q?S/2BNzqaDf1GM4fOdmA1ZjDtFziLxsOiCS9EeRLcr7NiOjahn5I83M1ojXs5?=
- =?us-ascii?Q?uVZkb4m8GNtrRWhMga3iIqKOLTNAFLRdZtsIIF0oIWaKl4Ywo/uwysj0vbtG?=
- =?us-ascii?Q?j8eMqVoqoX7I++etBYc0kgG5UVHWvm8YFZUDFWDasgobEJiVMi5iLzpWJ5M/?=
- =?us-ascii?Q?1p2d2QHA2dVQqY+IeFvwSuq1Bn+1gpIShlyT4KLv/9IXQfrH9k56vm6ysu5T?=
- =?us-ascii?Q?zlkAR9rf24yLXf5/AsyMOER2GU4Da2eFYomvp6N9rIoMHynLHA8t7yOk7/qR?=
- =?us-ascii?Q?QJUp2FvWjGMaGW8w/xgXUJDxcOchnhfOVy0S4yqE4leUp6KsRielSP5G5aAl?=
- =?us-ascii?Q?Eaq2h8yegGUjocLL5Wlz?=
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b31d4515-5949-45aa-0c3e-08dc69efce84
-X-MS-Exchange-CrossTenant-AuthSource: AS8PR02MB7237.eurprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 May 2024 15:03:06.5703
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
-	00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR02MB5801
+References: <20240430084253.3272177-1-cascardo@igalia.com> <CANn89iJpp7AA=bb_BnYFskWVjf61hd1AgPmU-4ZGOUZQhsYgJA@mail.gmail.com>
+ <ZjD5qm3mxdY/iebH@quatroqueijos.cascardo.eti.br>
+In-Reply-To: <ZjD5qm3mxdY/iebH@quatroqueijos.cascardo.eti.br>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 1 May 2024 17:05:59 +0200
+Message-ID: <CANn89iK0nCQFgA_2UaN4857fQKip0tsraCEQGhF=h8RJKKJnPw@mail.gmail.com>
+Subject: Re: [PATCH] net: fix out-of-bounds access in ops_init
+To: Thadeu Lima de Souza Cascardo <cascardo@igalia.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, kernel-dev@igalia.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The "struct batadv_tvlv_tt_data" uses a dynamically sized set of
-trailing elements. Specifically, it uses an array of structures of type
-"batadv_tvlv_tt_vlan_data". So, use the preferred way in the kernel
-declaring a flexible array [1].
+On Tue, Apr 30, 2024 at 4:01=E2=80=AFPM Thadeu Lima de Souza Cascardo
+<cascardo@igalia.com> wrote:
+>
+> On Tue, Apr 30, 2024 at 11:13:51AM +0200, Eric Dumazet wrote:
+> > On Tue, Apr 30, 2024 at 10:43=E2=80=AFAM Thadeu Lima de Souza Cascardo
+> > <cascardo@igalia.com> wrote:
+> > >
+> > > net_alloc_generic is called by net_alloc, which is called without any
+> > > locking. It reads max_gen_ptrs, which is changed under pernet_ops_rws=
+em. It
+> > > is read twice, first to allocate an array, then to set s.len, which i=
+s
+> > > later used to limit the bounds of the array access.
+> > >
+> > > It is possible that the array is allocated and another thread is
+> > > registering a new pernet ops, increments max_gen_ptrs, which is then =
+used
+> > > to set s.len with a larger than allocated length for the variable arr=
+ay.
+> > >
+> > > Fix it by delaying the allocation to setup_net, which is always calle=
+d
+> > > under pernet_ops_rwsem, and is called right after net_alloc.
+> > >
+> > > Signed-off-by: Thadeu Lima de Souza Cascardo <cascardo@igalia.com>
+> >
+> > Good catch !
+> >
+> > Could you provide a Fixes: tag ?
+> >
+>
+> Sorry I didn't include it at first. That would be:
+>
+> Fixes: 073862ba5d24 ("netns: fix net_alloc_generic()")
+>
+> > Have you considered reading max_gen_ptrs once in net_alloc_generic() ?
+> > This would make the patch a little less complicated.
+> >
+>
+> It would look like this "v2" below.
+>
+> One of the things that may have crossed my mind is that in case of a race=
+, and
+> max_gen_ptrs is incremented before setup_net is called, it would have to =
+be
+> reallocated anyway. Though this would be uncommon, that gave me the idea =
+to
+> implement the solution as I submitted. It seemed easier to get right, ins=
+tead
+> of messing around the memory model. :-)
+>
+> But even if there is a race and we get the value wrong, setup_net will
+> reallocate it, so it should all be fine as long as we use the same value =
+for
+> the generic_size calculation and s.len.
+>
+> And when I read commit 073862ba5d24 ("netns: fix net_alloc_generic()"), i=
+t
+> presented one possible issue with my first solution: in case a net_init
+> call triggers access to a net ptr that has not been allocated, it may cau=
+se
+> an issue. Thought I noticed later fixes in caif that may be related to
+> this: it should not be possible to a subsystem to try to access its net p=
+tr
+> if it has not been initialized yet. And ops_init will only be called when
+> there is enough room in struct net_generic, that is, net_assign_generic h=
+as
+> been called.
+>
+> The only problem is that I cannot easily test that this fixes the issue. =
+My
+> tests for the first version involved adding a delay between the two reads
+> of max_gen_ptrs and checking they were the same while forcing its
+> increment.
+>
+> This has been observed in the field, though, with a KASAN splat:
+>
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> BUG: KASAN: slab-out-of-bounds in ops_init (/mnt/host/source/src/third_pa=
+rty/kernel/v5.15/net/core/net_namespace.c:0 /mnt/host/source/src/third_part=
+y/kernel/v5.15/net/core/net_namespace.c:129)
+> Write of size 8 at addr ffff888131bd25b8 by task imageloader/4373
+>
+> CPU: 0 PID: 4373 Comm: imageloader Tainted: G     U            5.15.148-l=
+ockdep-21779-gb0a9bfb0a013 #1 db9ffbffbb2de989c984242ceea60881c9a62dd6
+> Hardware name: Google Uldren/Uldren, BIOS Google_Uldren.15217.439.0 01/08=
+/2024
+> Call Trace:
+> <TASK>
+> dump_stack_lvl (/mnt/host/source/src/third_party/kernel/v5.15/lib/dump_st=
+ack.c:107 (discriminator 2))
+> print_address_description (/mnt/host/source/src/third_party/kernel/v5.15/=
+mm/kasan/report.c:240 (discriminator 6))
+> kasan_report (/mnt/host/source/src/third_party/kernel/v5.15/mm/kasan/repo=
+rt.c:426 (discriminator 6) /mnt/host/source/src/third_party/kernel/v5.15/mm=
+/kasan/report.c:442)
+> ops_init (/mnt/host/source/src/third_party/kernel/v5.15/net/core/net_name=
+space.c:0 /mnt/host/source/src/third_party/kernel/v5.15/net/core/net_namesp=
+ace.c:129)
+> setup_net (/mnt/host/source/src/third_party/kernel/v5.15/net/core/net_nam=
+espace.c:329)
+> copy_net_ns (/mnt/host/source/src/third_party/kernel/v5.15/net/core/net_n=
+amespace.c:473)
+> create_new_namespaces (/mnt/host/source/src/third_party/kernel/v5.15/kern=
+el/nsproxy.c:110)
+> unshare_nsproxy_namespaces (/mnt/host/source/src/third_party/kernel/v5.15=
+/kernel/nsproxy.c:226 (discriminator 2))
+> ksys_unshare (/mnt/host/source/src/third_party/kernel/v5.15/kernel/fork.c=
+:3116)
+> __x64_sys_unshare (/mnt/host/source/src/third_party/kernel/v5.15/kernel/f=
+ork.c:3190 /mnt/host/source/src/third_party/kernel/v5.15/kernel/fork.c:3188=
+ /mnt/host/source/src/third_party/kernel/v5.15/kernel/fork.c:3188)
+> do_syscall_64 (/mnt/host/source/src/third_party/kernel/v5.15/arch/x86/ent=
+ry/common.c:55 /mnt/host/source/src/third_party/kernel/v5.15/arch/x86/entry=
+/common.c:93)
+> entry_SYSCALL_64_after_hwframe (/mnt/host/source/src/third_party/kernel/v=
+5.15/arch/x86/entry/entry_64.S:118)
+> RIP: 0033:0x7a7494514457
+> Code: 73 01 c3 48 8b 0d c1 a9 0b 00 f7 d8 64 89 01 48 83 c8 ff c3 66 2e 0=
+f 1f 84 00 00 00 00 00 0f 1f 44 00 00 b8 10 01 00 00 0f 05 <48> 3d 01 f0 ff=
+ ff 73 01 c3 48 8b 0d 91 a9 0b 00 f7 d8 64 89 01 48
+> All code
+> =3D=3D=3D=3D=3D=3D=3D=3D
+>
+> Code starting with the faulting instruction
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> RSP: 002b:00007fff243cde08 EFLAGS: 00000206 ORIG_RAX: 0000000000000110
+> RAX: ffffffffffffffda RBX: 0000599532577fe0 RCX: 00007a7494514457
+> RDX: 0000000000000000 RSI: 00007a7494a0f38d RDI: 0000000040000000
+> RBP: 00007fff243cdea0 R08: 0000000000000000 R09: 0000599532578a00
+> R10: 0000000000044000 R11: 0000000000000206 R12: 00007fff243ce190
+> R13: 00005995325748f0 R14: 0000000000000000 R15: 00007fff243ce221
+> </TASK>
+>
+> Allocated by task 4373:
+> stack_trace_save (/mnt/host/source/src/third_party/kernel/v5.15/kernel/st=
+acktrace.c:123)
+> kasan_save_stack (/mnt/host/source/src/third_party/kernel/v5.15/mm/kasan/=
+common.c:39)
+> __kasan_kmalloc (/mnt/host/source/src/third_party/kernel/v5.15/mm/kasan/c=
+ommon.c:46 /mnt/host/source/src/third_party/kernel/v5.15/mm/kasan/common.c:=
+434 /mnt/host/source/src/third_party/kernel/v5.15/mm/kasan/common.c:513 /mn=
+t/host/source/src/third_party/kernel/v5.15/mm/kasan/common.c:522)
+> __kmalloc (/mnt/host/source/src/third_party/kernel/v5.15/include/linux/ka=
+san.h:264 /mnt/host/source/src/third_party/kernel/v5.15/mm/slub.c:4407)
+> copy_net_ns (/mnt/host/source/src/third_party/kernel/v5.15/net/core/net_n=
+amespace.c:75 /mnt/host/source/src/third_party/kernel/v5.15/net/core/net_na=
+mespace.c:401 /mnt/host/source/src/third_party/kernel/v5.15/net/core/net_na=
+mespace.c:460)
+> create_new_namespaces (/mnt/host/source/src/third_party/kernel/v5.15/kern=
+el/nsproxy.c:110)
+> unshare_nsproxy_namespaces (/mnt/host/source/src/third_party/kernel/v5.15=
+/kernel/nsproxy.c:226 (discriminator 2))
+> ksys_unshare (/mnt/host/source/src/third_party/kernel/v5.15/kernel/fork.c=
+:3116)
+> __x64_sys_unshare (/mnt/host/source/src/third_party/kernel/v5.15/kernel/f=
+ork.c:3190 /mnt/host/source/src/third_party/kernel/v5.15/kernel/fork.c:3188=
+ /mnt/host/source/src/third_party/kernel/v5.15/kernel/fork.c:3188)
+> do_syscall_64 (/mnt/host/source/src/third_party/kernel/v5.15/arch/x86/ent=
+ry/common.c:55 /mnt/host/source/src/third_party/kernel/v5.15/arch/x86/entry=
+/common.c:93)
+> entry_SYSCALL_64_after_hwframe (/mnt/host/source/src/third_party/kernel/v=
+5.15/arch/x86/entry/entry_64.S:118)
+>
+> The buggy address belongs to the object at ffff888131bd2500
+> which belongs to the cache kmalloc-192 of size 192
+> The buggy address is located 184 bytes inside of
+> 192-byte region [ffff888131bd2500, ffff888131bd25c0)
+> The buggy address belongs to the page:
+> page:000000009a3f4539 refcount:1 mapcount:0 mapping:0000000000000000 inde=
+x:0x0 pfn:0x131bd2
+> flags: 0x8000000000000200(slab|zone=3D2)
+> raw: 8000000000000200 0000000000000000 dead000000000122 ffff888100043000
+> raw: 0000000000000000 0000000000100010 00000001ffffffff 0000000000000000
+> page dumped because: kasan: bad access detected
+>
+> Memory state around the buggy address:
+> ffff888131bd2480: fb fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
+> ffff888131bd2500: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+> >ffff888131bd2580: 00 00 00 00 00 00 00 fc fc fc fc fc fc fc fc fc
+> ^
+> ffff888131bd2600: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+> ffff888131bd2680: 00 00 00 00 00 00 00 00 fc fc fc fc fc fc fc fc
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>
+>
+> From 32bb3d9ac830410cc5f8228580f2e2b9e6307069 Mon Sep 17 00:00:00 2001
+> From: Thadeu Lima de Souza Cascardo <cascardo@igalia.com>
+> Date: Mon, 29 Apr 2024 11:56:44 -0300
+> Subject: [PATCH] net: fix out-of-bounds access in ops_init
+>
+> net_alloc_generic is called by net_alloc, which is called without any
+> locking. It reads max_gen_ptrs, which is changed under pernet_ops_rwsem. =
+It
+> is read twice, first to allocate an array, then to set s.len, which is
+> later used to limit the bounds of the array access.
+>
+> It is possible that the array is allocated and another thread is
+> registering a new pernet ops, increments max_gen_ptrs, which is then used
+> to set s.len with a larger than allocated length for the variable array.
+>
+> Fix it by reading max_gen_ptrs only once in net_alloc_generic. If
+> max_gen_ptrs is later incremented, it will be caught in net_assign_generi=
+c.
+>
+> Signed-off-by: Thadeu Lima de Souza Cascardo <cascardo@igalia.com>
+> Fixes: 073862ba5d24 ("netns: fix net_alloc_generic()")
+> ---
+>  net/core/net_namespace.c | 13 ++++++++++---
+>  1 file changed, 10 insertions(+), 3 deletions(-)
+>
+> diff --git a/net/core/net_namespace.c b/net/core/net_namespace.c
+> index f0540c557515..4a4f0f87ee36 100644
+> --- a/net/core/net_namespace.c
+> +++ b/net/core/net_namespace.c
+> @@ -70,11 +70,13 @@ DEFINE_COOKIE(net_cookie);
+>  static struct net_generic *net_alloc_generic(void)
+>  {
+>         struct net_generic *ng;
+> -       unsigned int generic_size =3D offsetof(struct net_generic, ptr[ma=
+x_gen_ptrs]);
+> +       unsigned int generic_size;
+> +       unsigned int gen_ptrs =3D READ_ONCE(max_gen_ptrs);
+> +       generic_size =3D offsetof(struct net_generic, ptr[gen_ptrs]);
+>
+>         ng =3D kzalloc(generic_size, GFP_KERNEL);
+>         if (ng)
+> -               ng->s.len =3D max_gen_ptrs;
+> +               ng->s.len =3D gen_ptrs;
+>
+>         return ng;
+>  }
+> @@ -1307,7 +1309,12 @@ static int register_pernet_operations(struct list_=
+head *list,
+>                 if (error < 0)
+>                         return error;
+>                 *ops->id =3D error;
+> -               max_gen_ptrs =3D max(max_gen_ptrs, *ops->id + 1);
+> +               /*
+> +                * This does not require READ_ONCE as writers will take
+> +                * pernet_ops_rwsem. But WRITE_ONCE is needed to protect
+> +                * net_alloc_generic.
+> +                */
+> +               WRITE_ONCE(max_gen_ptrs, max(max_gen_ptrs, *ops->id + 1))=
+;
+>         }
+>         error =3D __register_pernet_operations(list, ops);
+>         if (error) {
+> --
+> 2.34.1
+>
 
-At the same time, prepare for the coming implementation by GCC and Clang
-of the __counted_by attribute. Flexible array members annotated with
-__counted_by can have their accesses bounds-checked at run-time via
-CONFIG_UBSAN_BOUNDS (for array indexing) and CONFIG_FORTIFY_SOURCE (for
-strcpy/memcpy-family functions). In this case, it is important to note
-that the attribute used is specifically __counted_by_be since variable
-"num_vlan" is of type __be16.
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
-The following change to the "batadv_tt_tvlv_ogm_handler_v1" function:
+I think you have to post this patch in the conventional way, so that
+patchwork can catch up.
 
--	tt_vlan = (struct batadv_tvlv_tt_vlan_data *)(tt_data + 1);
--	tt_change = (struct batadv_tvlv_tt_change *)(tt_vlan + num_vlan);
-
-+	tt_change = (struct batadv_tvlv_tt_change *)((void *)tt_data
-+						     + flex_size);
-
-is intended to prevent the compiler from generating an "out-of-bounds"
-notification due to the __counted_by attribute. The compiler can do a
-pointer calculation using the vlan_data flexible array memory, or in
-other words, this may be calculated as an array offset, since it is the
-same as:
-
-        &tt_data->vlan_data[num_vlan]
-
-Therefore, we go past the end of the array. In other "multiple trailing
-flexible array" situations, this has been solved by addressing from the
-base pointer, since the compiler either knows the full allocation size
-or it knows nothing about it (this case, since it came from a "void *"
-function argument).
-
-The order in which the structure batadv_tvlv_tt_data and the structure
-batadv_tvlv_tt_vlan_data are defined must be swap to avoid an incomplete
-type error.
-
-Also, avoid the open-coded arithmetic in memory allocator functions [2]
-using the "struct_size" macro and use the "flex_array_size" helper to
-clarify some calculations, when possible.
-
-Moreover, the new structure member also allow us to avoid the open-coded
-arithmetic on pointers in some situations. Take advantage of this.
-
-This code was detected with the help of Coccinelle, and audited and
-modified manually.
-
-Link: https://www.kernel.org/doc/html/next/process/deprecated.html#zero-length-and-one-element-arrays [1]
-Link: https://www.kernel.org/doc/html/next/process/deprecated.html#open-coded-arithmetic-in-allocator-arguments [2]
-Signed-off-by: Erick Archer <erick.archer@outlook.com>
----
-Changes in v2:
-- Add the #include of <linux/overflow.h> for the "flex_array_size"
-  helper (Sven Eckelmann).
-- Add the "ntohs" function to the "flex_array_size" helper removed
-  by mistake during the conversion (Sven Eckelmann).
-- Add the "__counted_by_be" attribute.
-
-Changes in v3:
-- Address from the base pointer tt_data to avoid an "out-of-bounds"
-  notification (Kees Cook).
-- Update the commit message to explain the new change.
-
-Previous versions:
-v1 -> https://lore.kernel.org/linux-hardening/AS8PR02MB7237987BF9DFCA030B330F658B3E2@AS8PR02MB7237.eurprd02.prod.outlook.com/
-v2 -> https://lore.kernel.org/linux-hardening/AS8PR02MB723756E3D1366C4E8FCD14BF8B162@AS8PR02MB7237.eurprd02.prod.outlook.com/
-
-Hi,
-
-The Coccinelle script used to detect this code pattern is the following:
-
-virtual report
-
-@rule1@
-type t1;
-type t2;
-identifier i0;
-identifier i1;
-identifier i2;
-identifier ALLOC =~ "kmalloc|kzalloc|kmalloc_node|kzalloc_node|vmalloc|vzalloc|kvmalloc|kvzalloc";
-position p1;
-@@
-
-i0 = sizeof(t1) + sizeof(t2) * i1;
-...
-i2 = ALLOC@p1(..., i0, ...);
-
-@script:python depends on report@
-p1 << rule1.p1;
-@@
-
-msg = "WARNING: verify allocation on line %s" % (p1[0].line)
-coccilib.report.print_report(p1[0],msg)
-
-Regards,
-Erick
----
- include/uapi/linux/batadv_packet.h | 28 +++++++++--------
- net/batman-adv/translation-table.c | 49 ++++++++++++------------------
- 2 files changed, 35 insertions(+), 42 deletions(-)
-
-diff --git a/include/uapi/linux/batadv_packet.h b/include/uapi/linux/batadv_packet.h
-index 6e25753015df..dfbe30536995 100644
---- a/include/uapi/linux/batadv_packet.h
-+++ b/include/uapi/linux/batadv_packet.h
-@@ -592,19 +592,6 @@ struct batadv_tvlv_gateway_data {
- 	__be32 bandwidth_up;
- };
- 
--/**
-- * struct batadv_tvlv_tt_data - tt data propagated through the tt tvlv container
-- * @flags: translation table flags (see batadv_tt_data_flags)
-- * @ttvn: translation table version number
-- * @num_vlan: number of announced VLANs. In the TVLV this struct is followed by
-- *  one batadv_tvlv_tt_vlan_data object per announced vlan
-- */
--struct batadv_tvlv_tt_data {
--	__u8   flags;
--	__u8   ttvn;
--	__be16 num_vlan;
--};
--
- /**
-  * struct batadv_tvlv_tt_vlan_data - vlan specific tt data propagated through
-  *  the tt tvlv container
-@@ -618,6 +605,21 @@ struct batadv_tvlv_tt_vlan_data {
- 	__u16  reserved;
- };
- 
-+/**
-+ * struct batadv_tvlv_tt_data - tt data propagated through the tt tvlv container
-+ * @flags: translation table flags (see batadv_tt_data_flags)
-+ * @ttvn: translation table version number
-+ * @num_vlan: number of announced VLANs. In the TVLV this struct is followed by
-+ *  one batadv_tvlv_tt_vlan_data object per announced vlan
-+ * @vlan_data: array of batadv_tvlv_tt_vlan_data objects
-+ */
-+struct batadv_tvlv_tt_data {
-+	__u8   flags;
-+	__u8   ttvn;
-+	__be16 num_vlan;
-+	struct batadv_tvlv_tt_vlan_data vlan_data[] __counted_by_be(num_vlan);
-+};
-+
- /**
-  * struct batadv_tvlv_tt_change - translation table diff data
-  * @flags: status indicators concerning the non-mesh client (see
-diff --git a/net/batman-adv/translation-table.c b/net/batman-adv/translation-table.c
-index b21ff3c36b07..b44c382226a1 100644
---- a/net/batman-adv/translation-table.c
-+++ b/net/batman-adv/translation-table.c
-@@ -28,6 +28,7 @@
- #include <linux/net.h>
- #include <linux/netdevice.h>
- #include <linux/netlink.h>
-+#include <linux/overflow.h>
- #include <linux/rculist.h>
- #include <linux/rcupdate.h>
- #include <linux/skbuff.h>
-@@ -815,8 +816,7 @@ batadv_tt_prepare_tvlv_global_data(struct batadv_orig_node *orig_node,
- 		num_entries += atomic_read(&vlan->tt.num_entries);
- 	}
- 
--	change_offset = sizeof(**tt_data);
--	change_offset += num_vlan * sizeof(*tt_vlan);
-+	change_offset = struct_size(*tt_data, vlan_data, num_vlan);
- 
- 	/* if tt_len is negative, allocate the space needed by the full table */
- 	if (*tt_len < 0)
-@@ -835,7 +835,7 @@ batadv_tt_prepare_tvlv_global_data(struct batadv_orig_node *orig_node,
- 	(*tt_data)->ttvn = atomic_read(&orig_node->last_ttvn);
- 	(*tt_data)->num_vlan = htons(num_vlan);
- 
--	tt_vlan = (struct batadv_tvlv_tt_vlan_data *)(*tt_data + 1);
-+	tt_vlan = (*tt_data)->vlan_data;
- 	hlist_for_each_entry(vlan, &orig_node->vlan_list, list) {
- 		tt_vlan->vid = htons(vlan->vid);
- 		tt_vlan->crc = htonl(vlan->tt.crc);
-@@ -895,8 +895,7 @@ batadv_tt_prepare_tvlv_local_data(struct batadv_priv *bat_priv,
- 		total_entries += vlan_entries;
- 	}
- 
--	change_offset = sizeof(**tt_data);
--	change_offset += num_vlan * sizeof(*tt_vlan);
-+	change_offset = struct_size(*tt_data, vlan_data, num_vlan);
- 
- 	/* if tt_len is negative, allocate the space needed by the full table */
- 	if (*tt_len < 0)
-@@ -915,7 +914,7 @@ batadv_tt_prepare_tvlv_local_data(struct batadv_priv *bat_priv,
- 	(*tt_data)->ttvn = atomic_read(&bat_priv->tt.vn);
- 	(*tt_data)->num_vlan = htons(num_vlan);
- 
--	tt_vlan = (struct batadv_tvlv_tt_vlan_data *)(*tt_data + 1);
-+	tt_vlan = (*tt_data)->vlan_data;
- 	hlist_for_each_entry(vlan, &bat_priv->softif_vlan_list, list) {
- 		vlan_entries = atomic_read(&vlan->tt.num_entries);
- 		if (vlan_entries < 1)
-@@ -2875,7 +2874,6 @@ static bool batadv_send_tt_request(struct batadv_priv *bat_priv,
- {
- 	struct batadv_tvlv_tt_data *tvlv_tt_data = NULL;
- 	struct batadv_tt_req_node *tt_req_node = NULL;
--	struct batadv_tvlv_tt_vlan_data *tt_vlan_req;
- 	struct batadv_hard_iface *primary_if;
- 	bool ret = false;
- 	int i, size;
-@@ -2891,7 +2889,7 @@ static bool batadv_send_tt_request(struct batadv_priv *bat_priv,
- 	if (!tt_req_node)
- 		goto out;
- 
--	size = sizeof(*tvlv_tt_data) + sizeof(*tt_vlan_req) * num_vlan;
-+	size = struct_size(tvlv_tt_data, vlan_data, num_vlan);
- 	tvlv_tt_data = kzalloc(size, GFP_ATOMIC);
- 	if (!tvlv_tt_data)
- 		goto out;
-@@ -2903,12 +2901,10 @@ static bool batadv_send_tt_request(struct batadv_priv *bat_priv,
- 	/* send all the CRCs within the request. This is needed by intermediate
- 	 * nodes to ensure they have the correct table before replying
- 	 */
--	tt_vlan_req = (struct batadv_tvlv_tt_vlan_data *)(tvlv_tt_data + 1);
- 	for (i = 0; i < num_vlan; i++) {
--		tt_vlan_req->vid = tt_vlan->vid;
--		tt_vlan_req->crc = tt_vlan->crc;
-+		tvlv_tt_data->vlan_data[i].vid = tt_vlan->vid;
-+		tvlv_tt_data->vlan_data[i].crc = tt_vlan->crc;
- 
--		tt_vlan_req++;
- 		tt_vlan++;
- 	}
- 
-@@ -2960,7 +2956,6 @@ static bool batadv_send_other_tt_response(struct batadv_priv *bat_priv,
- 	struct batadv_orig_node *res_dst_orig_node = NULL;
- 	struct batadv_tvlv_tt_change *tt_change;
- 	struct batadv_tvlv_tt_data *tvlv_tt_data = NULL;
--	struct batadv_tvlv_tt_vlan_data *tt_vlan;
- 	bool ret = false, full_table;
- 	u8 orig_ttvn, req_ttvn;
- 	u16 tvlv_len;
-@@ -2983,10 +2978,9 @@ static bool batadv_send_other_tt_response(struct batadv_priv *bat_priv,
- 	orig_ttvn = (u8)atomic_read(&req_dst_orig_node->last_ttvn);
- 	req_ttvn = tt_data->ttvn;
- 
--	tt_vlan = (struct batadv_tvlv_tt_vlan_data *)(tt_data + 1);
- 	/* this node doesn't have the requested data */
- 	if (orig_ttvn != req_ttvn ||
--	    !batadv_tt_global_check_crc(req_dst_orig_node, tt_vlan,
-+	    !batadv_tt_global_check_crc(req_dst_orig_node, tt_data->vlan_data,
- 					ntohs(tt_data->num_vlan)))
- 		goto out;
- 
-@@ -3329,7 +3323,6 @@ static void batadv_handle_tt_response(struct batadv_priv *bat_priv,
- 	struct batadv_orig_node *orig_node = NULL;
- 	struct batadv_tvlv_tt_change *tt_change;
- 	u8 *tvlv_ptr = (u8 *)tt_data;
--	u16 change_offset;
- 
- 	batadv_dbg(BATADV_DBG_TT, bat_priv,
- 		   "Received TT_RESPONSE from %pM for ttvn %d t_size: %d [%c]\n",
-@@ -3342,10 +3335,7 @@ static void batadv_handle_tt_response(struct batadv_priv *bat_priv,
- 
- 	spin_lock_bh(&orig_node->tt_lock);
- 
--	change_offset = sizeof(struct batadv_tvlv_tt_vlan_data);
--	change_offset *= ntohs(tt_data->num_vlan);
--	change_offset += sizeof(*tt_data);
--	tvlv_ptr += change_offset;
-+	tvlv_ptr += struct_size(tt_data, vlan_data, ntohs(tt_data->num_vlan));
- 
- 	tt_change = (struct batadv_tvlv_tt_change *)tvlv_ptr;
- 	if (tt_data->flags & BATADV_TT_FULL_TABLE) {
-@@ -3944,10 +3934,10 @@ static void batadv_tt_tvlv_ogm_handler_v1(struct batadv_priv *bat_priv,
- 					  u8 flags, void *tvlv_value,
- 					  u16 tvlv_value_len)
- {
--	struct batadv_tvlv_tt_vlan_data *tt_vlan;
- 	struct batadv_tvlv_tt_change *tt_change;
- 	struct batadv_tvlv_tt_data *tt_data;
- 	u16 num_entries, num_vlan;
-+	size_t flex_size;
- 
- 	if (tvlv_value_len < sizeof(*tt_data))
- 		return;
-@@ -3957,17 +3947,18 @@ static void batadv_tt_tvlv_ogm_handler_v1(struct batadv_priv *bat_priv,
- 
- 	num_vlan = ntohs(tt_data->num_vlan);
- 
--	if (tvlv_value_len < sizeof(*tt_vlan) * num_vlan)
-+	flex_size = flex_array_size(tt_data, vlan_data, num_vlan);
-+	if (tvlv_value_len < flex_size)
- 		return;
- 
--	tt_vlan = (struct batadv_tvlv_tt_vlan_data *)(tt_data + 1);
--	tt_change = (struct batadv_tvlv_tt_change *)(tt_vlan + num_vlan);
--	tvlv_value_len -= sizeof(*tt_vlan) * num_vlan;
-+	tt_change = (struct batadv_tvlv_tt_change *)((void *)tt_data
-+						     + flex_size);
-+	tvlv_value_len -= flex_size;
- 
- 	num_entries = batadv_tt_entries(tvlv_value_len);
- 
--	batadv_tt_update_orig(bat_priv, orig, tt_vlan, num_vlan, tt_change,
--			      num_entries, tt_data->ttvn);
-+	batadv_tt_update_orig(bat_priv, orig, tt_data->vlan_data, num_vlan,
-+			      tt_change, num_entries, tt_data->ttvn);
- }
- 
- /**
-@@ -3998,8 +3989,8 @@ static int batadv_tt_tvlv_unicast_handler_v1(struct batadv_priv *bat_priv,
- 	tt_data = tvlv_value;
- 	tvlv_value_len -= sizeof(*tt_data);
- 
--	tt_vlan_len = sizeof(struct batadv_tvlv_tt_vlan_data);
--	tt_vlan_len *= ntohs(tt_data->num_vlan);
-+	tt_vlan_len = flex_array_size(tt_data, vlan_data,
-+				      ntohs(tt_data->num_vlan));
- 
- 	if (tvlv_value_len < tt_vlan_len)
- 		return NET_RX_SUCCESS;
--- 
-2.25.1
-
+Thanks.
 
