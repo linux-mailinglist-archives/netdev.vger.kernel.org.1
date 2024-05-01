@@ -1,148 +1,150 @@
-Return-Path: <netdev+bounces-92842-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92843-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C3708B918F
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 00:11:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A13798B9191
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 00:12:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4323C1C235BB
-	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 22:11:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DB48F1C22F70
+	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 22:12:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EEA4165FCD;
-	Wed,  1 May 2024 22:11:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57B7F165FD0;
+	Wed,  1 May 2024 22:12:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="BN+LYUb5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gCXCc3OC"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-184.mta1.migadu.com (out-184.mta1.migadu.com [95.215.58.184])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA090165FCA
-	for <netdev@vger.kernel.org>; Wed,  1 May 2024 22:11:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C6851C68D;
+	Wed,  1 May 2024 22:12:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714601483; cv=none; b=eT3WD1bBSktUUbqWfzgLaa7hZI/QhkNuaiT5lwPxYtEOjO9GdIM330XrWAVWBsan6v1nyDT2aWVZalPJASZECYJu3HLOL+x/j8Fb00N+BhTsTV+xBQv1JXxyG6HQp5NZHSa+kqKDnUmkf4WGqEV7nWt8WxgpnU/XPGEUy3rxPWU=
+	t=1714601573; cv=none; b=SdOfJG0MkdfcU9mdjZr5yQ4djdPneAPSq5NDGcLlze2mM976v+5Xs2rAEh/aVimFSbKVUsdIk8V42NugTD96mhkqW7z2pZmG78XddDQbiNuR4bS8Qs/mdTf+Gs7+mXa0drP9HavvxOBEtKWgfSGmL1+zPRQELcTebSUPXJeLLRs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714601483; c=relaxed/simple;
-	bh=mIJlBSZdyKIvENC8XczJFKTy5wuRWt3B+ZgNrKdjlJE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bCbLYLhdRcSKxfB/sjH5OAoUPTIfKj/DMN7cD7uHHk/sQwLwXHceLJE7WA05deasCVLm4ndhMV/DlYH1wxeUDu3elznoNzsM+opx1NnOx8TCbLD0HsHuhJ+/eCaNfIvWa3r4vLNYx0illJGwnDsFBUF5MbRRHr2n1Ib3KmIcdkA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=BN+LYUb5; arc=none smtp.client-ip=95.215.58.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <f3721e87-10dc-46d7-86b1-432d8afa4b21@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1714601478;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rGW3yDHopUvbdT8k5H063AAugiRm6wOVHCvilw2wUW0=;
-	b=BN+LYUb5O8VnwZrZyQbvc12jesTJVCflel+oYDFTQ4vHJVvS9X4XzZT0u6XEGUY65Txu8W
-	I8IjAkDuOkjycm/eK/e16I6cLyzRfKOtsE1vjTIkDChPJJFYUEqdpXfEkPAWJJomW5zgod
-	a6TVep454qqHA94hmzQTgBtwY3QFbe0=
-Date: Wed, 1 May 2024 15:11:09 -0700
+	s=arc-20240116; t=1714601573; c=relaxed/simple;
+	bh=Ug3FQ7I2qR/RHww0ckNHp2CA4CIPVdT90yjcPc5ds/c=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=fnKuljarPxaeFXl3MREWE5BraBP+1XLccCiTFKz5MyjfJrc2hkf/ScRIE85Yle3O6IkzVGYoSWRchAFosdOa2wud4u20CO8OAy87eBBo3NPQNErgP6Hvp46So45BXT43Z2j4xSsJRIISV38YG6SDBmmbfocG226694vdSU9NjJk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gCXCc3OC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C65BC072AA;
+	Wed,  1 May 2024 22:12:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714601572;
+	bh=Ug3FQ7I2qR/RHww0ckNHp2CA4CIPVdT90yjcPc5ds/c=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=gCXCc3OCNyr6+i3h4YTHs9KepSLe6n7aIrtfRjc0yAHqvWeildSuL6MWAYA37i3C5
+	 jRrpQ4zd2eq/p/dpUQkoUYs52Cn4Im+Z+AogwoRh5jxXZityH0Y+8q0v8n0q9b7DsY
+	 JwtpslpDaQW0EehLBq5b435NxyKJe9XNoOg0CeAv+a/YK+jgnMNt5+UwLD66pAQsYv
+	 zMguRGrKKHK6EXaZpRSLWSsDhBTpdvXviFQsLg4/kbtTmDW+iUngl31YDx0HIiBfiR
+	 QMCDcKJz3jXFJJPPTw+X30RCnZC95AFPy88KOwNmF9fciBSSTWyTvN7hCtwCslDzqA
+	 QYxNlRWvDDdYg==
+Date: Wed, 1 May 2024 15:12:51 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Praveen Kumar Kannoju <praveen.kannoju@oracle.com>
+Cc: jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us,
+ davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ rajesh.sivaramasubramaniom@oracle.com, rama.nichanamatlu@oracle.com,
+ manjunath.b.patil@oracle.com
+Subject: Re: [PATCH RFC] net/sched: adjust device watchdog timer to detect
+ stopped queue at right time
+Message-ID: <20240501151251.2eccb4d0@kernel.org>
+In-Reply-To: <20240430140010.5005-1-praveen.kannoju@oracle.com>
+References: <20240430140010.5005-1-praveen.kannoju@oracle.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next v2 1/2] net: netfilter: Make ct zone opts
- configurable for bpf ct helpers
-To: Brad Cowie <brad@faucet.nz>
-Cc: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org,
- coreteam@netfilter.org, daniel@iogearbox.net, davem@davemloft.net,
- john.fastabend@gmail.com, jolsa@kernel.org, kuba@kernel.org,
- lorenzo@kernel.org, memxor@gmail.com, netdev@vger.kernel.org,
- netfilter-devel@vger.kernel.org, pabeni@redhat.com, pablo@netfilter.org,
- sdf@google.com, song@kernel.org
-References: <463c8ea7-08cf-412e-bb31-6fbb15b4df8b@linux.dev>
- <20240501045931.157041-1-brad@faucet.nz>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <20240501045931.157041-1-brad@faucet.nz>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
 
-On 4/30/24 9:59 PM, Brad Cowie wrote:
-> On Fri, 26 Apr 2024 at 11:27, Martin KaFai Lau <martin.lau@linux.dev> wrote:
->> On 4/23/24 8:00 PM, Brad Cowie wrote:
->>>    };
->>>
->>>    static int bpf_nf_ct_tuple_parse(struct bpf_sock_tuple *bpf_tuple,
->>> @@ -104,11 +107,13 @@ __bpf_nf_ct_alloc_entry(struct net *net, struct bpf_sock_tuple *bpf_tuple,
->>>    			u32 timeout)
->>>    {
->>>    	struct nf_conntrack_tuple otuple, rtuple;
->>> +	struct nf_conntrack_zone ct_zone;
->>>    	struct nf_conn *ct;
->>>    	int err;
->>>
->>> -	if (!opts || !bpf_tuple || opts->reserved[0] || opts->reserved[1] ||
->>> -	    opts_len != NF_BPF_CT_OPTS_SZ)
->>> +	if (!opts || !bpf_tuple)
->>> +		return ERR_PTR(-EINVAL);
->>> +	if (!(opts_len == NF_BPF_CT_OPTS_SZ || opts_len == NF_BPF_CT_OPTS_OLD_SZ))
->>>    		return ERR_PTR(-EINVAL);
->>>
->>>    	if (unlikely(opts->netns_id < BPF_F_CURRENT_NETNS))
->>> @@ -130,7 +135,16 @@ __bpf_nf_ct_alloc_entry(struct net *net, struct bpf_sock_tuple *bpf_tuple,
->>>    			return ERR_PTR(-ENONET);
->>>    	}
->>>
->>> -	ct = nf_conntrack_alloc(net, &nf_ct_zone_dflt, &otuple, &rtuple,
->>> +	if (opts_len == NF_BPF_CT_OPTS_SZ) {
->>> +		if (opts->ct_zone_dir == 0)
->>
->> I don't know the details about the dir in ct_zone, so a question: a 0
->> ct_zone_dir is invalid and can be reused to mean NF_CT_DEFAULT_ZONE_DIR?
+On Tue, 30 Apr 2024 19:30:10 +0530 Praveen Kumar Kannoju wrote:
+> Applications are sensitive to long network latency, particularly
+> heartbeat monitoring ones. Longer the tx timeout recovery higher the
+> risk with such applications on a production machines. This patch
+> remedies, yet honoring device set tx timeout.
 > 
-> ct_zone_dir is a bitmask that can have two different bits set,
-> NF_CT_ZONE_DIR_ORIG (1) and NF_CT_ZONE_DIR_REPL (2).
-> 
-> The comparison function nf_ct_zone_matches_dir() in nf_conntrack_zones.h
-> checks if ct_zone_dir & (1 << ip_conntrack_dir dir). ip_conntrack_dir
-> has two possible values IP_CT_DIR_ORIGINAL (0) and IP_CT_DIR_REPLY (1).
-> 
-> If ct_zone_dir has a value of 0, this makes nf_ct_zone_matches_dir()
-> always return false which makes nf_ct_zone_id() always return
-> NF_CT_DEFAULT_ZONE_ID instead of the specified ct zone id.
-> 
-> I chose to override ct_zone_dir here and set NF_CT_DEFAULT_ZONE_DIR (3),
-> to make the behaviour more obvious when a user calls the bpf ct helper
-> kfuncs while only setting ct_zone_id but not ct_zone_dir.
+> Modify watchdog next timeout to be shorter than the device specified.
+> Compute the next timeout be equal to device watchdog timeout less the
+> how long ago queue stop had been done. At next watchdog timeout tx
+> timeout handler is called into if still in stopped state. Either called
+> or not called, restore the watchdog timeout back to device specified.
 
-Ok. make sense.
+Idea makes sense, some comments on the code below.
 
-> 
->>> +			opts->ct_zone_dir = NF_CT_DEFAULT_ZONE_DIR;
->>> +		nf_ct_zone_init(&ct_zone,
->>> +				opts->ct_zone_id, opts->ct_zone_dir, opts->ct_zone_flags);
->>> +	} else {
->>
->> Better enforce "ct_zone_id == 0" also instead of ignoring it.
-> 
-> Could I ask for clarification here, do you mean changing this
-> else statement to:
-> 
-> +	} else if (opts->ct_zone_id == 0) {
-> 
-> Or should I be setting opts->ct_zone_id = 0 inside the else block?
+> diff --git a/net/sched/sch_generic.c b/net/sched/sch_generic.c
+> index 4a2c763e2d11..64e31f8b4ac1 100644
+> --- a/net/sched/sch_generic.c
+> +++ b/net/sched/sch_generic.c
+> @@ -506,18 +506,25 @@ static void dev_watchdog(struct timer_list *t)
+>  			unsigned int timedout_ms = 0;
+>  			unsigned int i;
+>  			unsigned long trans_start;
+> +			unsigned long next_check = 0;
+> +			unsigned long current_jiffies;
+>  
+>  			for (i = 0; i < dev->num_tx_queues; i++) {
+>  				struct netdev_queue *txq;
+> +				current_jiffies = jiffies;
 
-Testing non zero inside the else and return error instead of silently ignoring 
-it and then use nf_ct_zone_dflt:
+Not sure why you save current jiffies.
 
-	} else {
-		if (opts->ct_zone_id)
-			/* don't ignore the opts->ct_zone_id */
-			return ERR_PTR(-EINVAL);
-		
-		ct_zone = nf_ct_zone_dflt;
-	}
+>  				txq = netdev_get_tx_queue(dev, i);
+>  				trans_start = READ_ONCE(txq->trans_start);
+> -				if (netif_xmit_stopped(txq) &&
+> -				    time_after(jiffies, (trans_start +
+> -							 dev->watchdog_timeo))) {
+> -					timedout_ms = jiffies_to_msecs(jiffies - trans_start);
+> -					atomic_long_inc(&txq->trans_timeout);
+> -					break;
+> +				if (netif_xmit_stopped(txq)) {
 
+please use continue instead of adding another indentation level
+
+> +					if (time_after(current_jiffies, (trans_start +
+
+wrap at 80 characters
+
+> +								   dev->watchdog_timeo))) {
+> +						timedout_ms = jiffies_to_msecs(current_jiffies -
+> +										trans_start);
+> +						atomic_long_inc(&txq->trans_timeout);
+> +						break;
+> +					}
+> +					next_check = trans_start + dev->watchdog_timeo -
+> +									current_jiffies;
+
+this will give us "next_check" for last queue. Let's instead find the
+oldest trans_start in the loop. Do:
+
+		unsigned long oldest_start = jiffies;
+
+then in the loop:
+
+		oldest_start = min(...)
+
+>  				}
+>  			}
+>  
+> @@ -530,9 +537,11 @@ static void dev_watchdog(struct timer_list *t)
+>  				dev->netdev_ops->ndo_tx_timeout(dev, i);
+>  				netif_unfreeze_queues(dev);
+>  			}
+> +			if (!next_check)
+> +				next_check = dev->watchdog_timeo;
+>  			if (!mod_timer(&dev->watchdog_timer,
+>  				       round_jiffies(jiffies +
+> -						     dev->watchdog_timeo)))
+> +						     next_check)))
+
+then here you just need to swap jiffies for oldest_start
+
+>  				release = false;
+>  		}
+>  	}
 
 
