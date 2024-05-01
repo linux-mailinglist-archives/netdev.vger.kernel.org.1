@@ -1,155 +1,303 @@
-Return-Path: <netdev+bounces-92764-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92765-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72F4A8B8B8C
-	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 15:59:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 545C78B8BA3
+	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 16:04:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A491C1C2228C
-	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 13:59:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 464EB1C20D85
+	for <lists+netdev@lfdr.de>; Wed,  1 May 2024 14:04:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FCAE12EBE8;
-	Wed,  1 May 2024 13:59:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11BBF12E1E0;
+	Wed,  1 May 2024 14:04:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sCbrUaES"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kGoT5ZR4"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC09212C490;
-	Wed,  1 May 2024 13:59:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE39D2581;
+	Wed,  1 May 2024 14:04:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714571957; cv=none; b=J3nv4JNhCH3zr/s7JdeCsI2Z5LuWf1arbxDg7Qyw7WRs8NW/s+Ms+ZHv1rgylDWWOPIEg7X1kQ0Ich2HQzQ+nboY35WZXfcQc7sKgsxTfa8x/5sXx2f+pVpQnKr9XRTaacybTZNig9nm+QFiRTEg5LGAeJjQFINFafgtD1bON2E=
+	t=1714572257; cv=none; b=OtJETqkbfqfu85DKZTmc8wRg+YWgS+41kYgeH30p72+KZufL0w5MmJQR62wyxW+KKi7gnXr5cd0UhcA9RWX3JE50fqHM1w2S0VKrWARNbVJTlaRyJkpuxfVS2JEeksedMid3d7jH0Ioiw7vFGPcoLautAXSUbXtiZKCmv43vuII=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714571957; c=relaxed/simple;
-	bh=Fi4PvMRZrF9DXNpSOwwia/BblzTiRO6iyf1z/eVq1XU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NbchjvG3iRoD7tZsVbSHBC2VDA1pFY2cj3SWAp5gw7+QlIJJAkkhCxOyXperwsUU5+WmLLsJDxONdC8ykFbY6y9qB9qCS+FG6ugqs8QH6pC8ieafJ/cFNzvbEp2j2Hhzi3kO26lzjrgh3dVTN/naxrWwGNw4DCa+GCEq30m/AXM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sCbrUaES; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B3C7C072AA;
-	Wed,  1 May 2024 13:59:02 +0000 (UTC)
+	s=arc-20240116; t=1714572257; c=relaxed/simple;
+	bh=5nytjxuE5wqjo2pAzbCDQ+HlyJo5Br8femhSNJ2Epcs=;
+	h=Subject:From:To:Cc:Date:Message-ID:MIME-Version:Content-Type; b=IIqF8gcFXU+eToiz1Bn3UCDAlqVKNKMLmJXWF4pOP4MVEJFpFM1BAnIapD3rdrAz+wmtYVCUrm/qGujvuqMi35jIboN/88ev8MdiZ2unAJUI3FQqGoDBYnn4X9/XqhiibQyIDWoQiTQ7xN98Ka6uvWQDtMHwevgBRpPTnfcygJo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kGoT5ZR4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69E74C072AA;
+	Wed,  1 May 2024 14:04:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714571956;
-	bh=Fi4PvMRZrF9DXNpSOwwia/BblzTiRO6iyf1z/eVq1XU=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=sCbrUaESax+zNwmTNdY7otL0UFOQLPT1tCLvxhS1E2UCWFKHW4CFOG8eHXGAPEzYV
-	 K59HSeGnESqWuVyypeDsfjxCGIwlrkTiIB8RtlSIeODJISpG+bjrjqgUZTNnVYoXFo
-	 0nAjOD3kay/wsGxmwOPaAc5VD0eUhuiBlauj3Z2WQisvO7reiDxOn7qiXguQyswbXz
-	 eGzZQLUgdh76hRrtTEFJVQdEHnMA2UjgtwHVl2z9L4Tsb3ZTSE/wBE57PdTiTs8Ocp
-	 FhNUI+PSuIOyAwwjpVUsbAi1uNR+QWMI+7HqtFjSwPStPFYwbkZKYGKHcbZk0YZOQW
-	 CZlqUKG4oenXA==
-Message-ID: <779b9542-4170-483a-af54-ca0dd471f774@kernel.org>
-Date: Wed, 1 May 2024 15:58:59 +0200
+	s=k20201202; t=1714572256;
+	bh=5nytjxuE5wqjo2pAzbCDQ+HlyJo5Br8femhSNJ2Epcs=;
+	h=Subject:From:To:Cc:Date:From;
+	b=kGoT5ZR4AhjQ6KuePiZvqNLVorbZP9YzjtrP1ot8Mx4uMOjbrUj7GUyD5/SyHoGM+
+	 o08uj94zXcOdNHRBbXsEIzAOVAFkq+v0TejMBAu42xSzdaj7a3Lt9HdpC4tU5aIqdB
+	 6I2bfP5FeeyhnbI2QNQlkuP6ip0eI1/6EmhpD7xixXAw1kVz3aL+Kenc8maQY3g7JX
+	 VxzkGIcumbDFBFbewwG63Ur0B1uJml7oTqPx1TRBD0N8gwj/1fa39Leeiji56/gPCy
+	 rxZAB5Ovmw34yGYgQ59mA5KEc68DVxU3Yq8+PWCHCYyThGWM2DpbCsPiNGvH3ZMSr2
+	 +Xew2Zpvcbydg==
+Subject: [PATCH v1] cgroup/rstat: add cgroup_rstat_cpu_lock helpers and
+ tracepoints
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+To: tj@kernel.org, hannes@cmpxchg.org, lizefan.x@bytedance.com,
+ cgroups@vger.kernel.org, yosryahmed@google.com, longman@redhat.com
+Cc: Jesper Dangaard Brouer <hawk@kernel.org>, netdev@vger.kernel.org,
+ linux-mm@kvack.org, shakeel.butt@linux.dev, kernel-team@cloudflare.com,
+ Arnaldo Carvalho de Melo <acme@kernel.org>,
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Date: Wed, 01 May 2024 16:04:11 +0200
+Message-ID: <171457225108.4159924.12821205549807669839.stgit@firesoul>
+User-Agent: StGit/1.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH net-next v8 07/14] page_pool: devmem support
-To: Jens Axboe <axboe@kernel.dk>, Mina Almasry <almasrymina@google.com>
-Cc: David Wei <dw@davidwei.uk>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-alpha@vger.kernel.org, linux-mips@vger.kernel.org,
- linux-parisc@vger.kernel.org, sparclinux@vger.kernel.org,
- linux-trace-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
- bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Jonathan Corbet <corbet@lwn.net>,
- Richard Henderson <richard.henderson@linaro.org>,
- Ivan Kokshaysky <ink@jurassic.park.msu.ru>, Matt Turner
- <mattst88@gmail.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
- "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
- Helge Deller <deller@gmx.de>, Andreas Larsson <andreas@gaisler.com>,
- Ilias Apalodimas <ilias.apalodimas@linaro.org>,
- Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu
- <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
- Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
- Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
- <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Steffen Klassert
- <steffen.klassert@secunet.com>, Herbert Xu <herbert@gondor.apana.org.au>,
- David Ahern <dsahern@kernel.org>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Shuah Khan <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>,
- =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
- Amritha Nambiar <amritha.nambiar@intel.com>,
- Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
- Alexander Mikhalitsyn <alexander@mihalicyn.com>,
- Kaiyuan Zhang <kaiyuanz@google.com>, Christian Brauner <brauner@kernel.org>,
- Simon Horman <horms@kernel.org>, David Howells <dhowells@redhat.com>,
- Florian Westphal <fw@strlen.de>, Yunsheng Lin <linyunsheng@huawei.com>,
- Kuniyuki Iwashima <kuniyu@amazon.com>,
- Arseniy Krasnov <avkrasnov@salutedevices.com>,
- Aleksander Lobakin <aleksander.lobakin@intel.com>,
- Michael Lass <bevan@bi-co.net>, Jiri Pirko <jiri@resnulli.us>,
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
- Lorenzo Bianconi <lorenzo@kernel.org>,
- Richard Gobert <richardbgobert@gmail.com>,
- Sridhar Samudrala <sridhar.samudrala@intel.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
- Johannes Berg <johannes.berg@intel.com>, Abel Wu <wuyun.abel@bytedance.com>,
- Breno Leitao <leitao@debian.org>, Pavel Begunkov <asml.silence@gmail.com>,
- Jason Gunthorpe <jgg@ziepe.ca>, Shailend Chand <shailend@google.com>,
- Harshitha Ramamurthy <hramamurthy@google.com>,
- Shakeel Butt <shakeel.butt@linux.dev>, Jeroen de Borst
- <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>,
- linux-mm@kvack.org, Matthew Wilcox <willy@infradead.org>
-References: <20240403002053.2376017-1-almasrymina@google.com>
- <20240403002053.2376017-8-almasrymina@google.com>
- <8357256a-f0e9-4640-8fec-23341fc607db@davidwei.uk>
- <CAHS8izPeYryoLdCAQdGQU-wn7YVdtuofVKNvRFjFjhqTDsT7zA@mail.gmail.com>
- <aafbbf09-a33d-4e73-99c8-9ddab5910657@kernel.dk>
- <CAHS8izMKLYATo6g3xkj_thFo3whCfq6LSoex5s0m5XZd-U7SVQ@mail.gmail.com>
- <11f52113-7b67-4b45-ba1d-29b070050cec@kernel.dk>
-Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <11f52113-7b67-4b45-ba1d-29b070050cec@kernel.dk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
 
+This closely resembles helpers added for the global cgroup_rstat_lock in
+commit fc29e04ae1ad ("cgroup/rstat: add cgroup_rstat_lock helpers and
+tracepoints"). This is for the per CPU lock cgroup_rstat_cpu_lock.
+
+Based on production workloads, we observe the fast-path "update" function
+cgroup_rstat_updated() is invoked around 3 million times per sec, while the
+"flush" function cgroup_rstat_flush_locked(), walking each possible CPU,
+can see periodic spikes of 700 invocations/sec.
+
+For this reason, the tracepoints are split into normal and fastpath
+versions for this per-CPU lock. Making it feasible for production to
+continuously monitor the non-fastpath tracepoint to detect lock contention
+issues. The reason for monitoring is that lock disables IRQs which can
+disturb e.g. softirq processing on the local CPUs involved. When the
+global cgroup_rstat_lock stops disabling IRQs (e.g converted to a mutex),
+this per CPU lock becomes the next bottleneck that can introduce latency
+variations.
+
+A practical bpftrace script for monitoring contention latency:
+
+ bpftrace -e '
+   tracepoint:cgroup:cgroup_rstat_cpu_lock_contended {
+     @start[tid]=nsecs; @cnt[probe]=count()}
+   tracepoint:cgroup:cgroup_rstat_cpu_locked {
+     if (args->contended) {
+       @wait_ns=hist(nsecs-@start[tid]); delete(@start[tid]);}
+     @cnt[probe]=count()}
+   interval:s:1 {time("%H:%M:%S "); print(@wait_ns); print(@cnt); clear(@cnt);}'
+
+Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
+---
+ include/trace/events/cgroup.h |   56 +++++++++++++++++++++++++++++----
+ kernel/cgroup/rstat.c         |   70 ++++++++++++++++++++++++++++++++++-------
+ 2 files changed, 108 insertions(+), 18 deletions(-)
+
+diff --git a/include/trace/events/cgroup.h b/include/trace/events/cgroup.h
+index 13f375800135..0b95865a90f3 100644
+--- a/include/trace/events/cgroup.h
++++ b/include/trace/events/cgroup.h
+@@ -206,15 +206,15 @@ DEFINE_EVENT(cgroup_event, cgroup_notify_frozen,
+ 
+ DECLARE_EVENT_CLASS(cgroup_rstat,
+ 
+-	TP_PROTO(struct cgroup *cgrp, int cpu_in_loop, bool contended),
++	TP_PROTO(struct cgroup *cgrp, int cpu, bool contended),
+ 
+-	TP_ARGS(cgrp, cpu_in_loop, contended),
++	TP_ARGS(cgrp, cpu, contended),
+ 
+ 	TP_STRUCT__entry(
+ 		__field(	int,		root			)
+ 		__field(	int,		level			)
+ 		__field(	u64,		id			)
+-		__field(	int,		cpu_in_loop		)
++		__field(	int,		cpu			)
+ 		__field(	bool,		contended		)
+ 	),
+ 
+@@ -222,15 +222,16 @@ DECLARE_EVENT_CLASS(cgroup_rstat,
+ 		__entry->root = cgrp->root->hierarchy_id;
+ 		__entry->id = cgroup_id(cgrp);
+ 		__entry->level = cgrp->level;
+-		__entry->cpu_in_loop = cpu_in_loop;
++		__entry->cpu = cpu;
+ 		__entry->contended = contended;
+ 	),
+ 
+-	TP_printk("root=%d id=%llu level=%d cpu_in_loop=%d lock contended:%d",
++	TP_printk("root=%d id=%llu level=%d cpu=%d lock contended:%d",
+ 		  __entry->root, __entry->id, __entry->level,
+-		  __entry->cpu_in_loop, __entry->contended)
++		  __entry->cpu, __entry->contended)
+ );
+ 
++/* Related to global: cgroup_rstat_lock */
+ DEFINE_EVENT(cgroup_rstat, cgroup_rstat_lock_contended,
+ 
+ 	TP_PROTO(struct cgroup *cgrp, int cpu, bool contended),
+@@ -252,6 +253,49 @@ DEFINE_EVENT(cgroup_rstat, cgroup_rstat_unlock,
+ 	TP_ARGS(cgrp, cpu, contended)
+ );
+ 
++/* Related to per CPU: cgroup_rstat_cpu_lock */
++DEFINE_EVENT(cgroup_rstat, cgroup_rstat_cpu_lock_contended,
++
++	TP_PROTO(struct cgroup *cgrp, int cpu, bool contended),
++
++	TP_ARGS(cgrp, cpu, contended)
++);
++
++DEFINE_EVENT(cgroup_rstat, cgroup_rstat_cpu_lock_contended_fastpath,
++
++	TP_PROTO(struct cgroup *cgrp, int cpu, bool contended),
++
++	TP_ARGS(cgrp, cpu, contended)
++);
++
++DEFINE_EVENT(cgroup_rstat, cgroup_rstat_cpu_locked,
++
++	TP_PROTO(struct cgroup *cgrp, int cpu, bool contended),
++
++	TP_ARGS(cgrp, cpu, contended)
++);
++
++DEFINE_EVENT(cgroup_rstat, cgroup_rstat_cpu_locked_fastpath,
++
++	TP_PROTO(struct cgroup *cgrp, int cpu, bool contended),
++
++	TP_ARGS(cgrp, cpu, contended)
++);
++
++DEFINE_EVENT(cgroup_rstat, cgroup_rstat_cpu_unlock,
++
++	TP_PROTO(struct cgroup *cgrp, int cpu, bool contended),
++
++	TP_ARGS(cgrp, cpu, contended)
++);
++
++DEFINE_EVENT(cgroup_rstat, cgroup_rstat_cpu_unlock_fastpath,
++
++	TP_PROTO(struct cgroup *cgrp, int cpu, bool contended),
++
++	TP_ARGS(cgrp, cpu, contended)
++);
++
+ #endif /* _TRACE_CGROUP_H */
+ 
+ /* This part must be outside protection */
+diff --git a/kernel/cgroup/rstat.c b/kernel/cgroup/rstat.c
+index 52e3b0ed1cee..fb8b49437573 100644
+--- a/kernel/cgroup/rstat.c
++++ b/kernel/cgroup/rstat.c
+@@ -19,6 +19,60 @@ static struct cgroup_rstat_cpu *cgroup_rstat_cpu(struct cgroup *cgrp, int cpu)
+ 	return per_cpu_ptr(cgrp->rstat_cpu, cpu);
+ }
+ 
++/*
++ * Helper functions for rstat per CPU lock (cgroup_rstat_cpu_lock).
++ *
++ * This makes it easier to diagnose locking issues and contention in
++ * production environments. The parameter @fast_path determine the
++ * tracepoints being added, allowing us to diagnose "flush" related
++ * operations without handling high-frequency fast-path "update" events.
++ */
++static __always_inline
++unsigned long _cgroup_rstat_cpu_lock(raw_spinlock_t *cpu_lock, int cpu,
++				     struct cgroup *cgrp, const bool fast_path)
++{
++	unsigned long flags;
++	bool contended;
++
++	/*
++	 * The _irqsave() is needed because cgroup_rstat_lock is
++	 * spinlock_t which is a sleeping lock on PREEMPT_RT. Acquiring
++	 * this lock with the _irq() suffix only disables interrupts on
++	 * a non-PREEMPT_RT kernel. The raw_spinlock_t below disables
++	 * interrupts on both configurations. The _irqsave() ensures
++	 * that interrupts are always disabled and later restored.
++	 */
++	contended = !raw_spin_trylock_irqsave(cpu_lock, flags);
++	if (contended) {
++		if (fast_path)
++			trace_cgroup_rstat_cpu_lock_contended_fastpath(cgrp, cpu, contended);
++		else
++			trace_cgroup_rstat_cpu_lock_contended(cgrp, cpu, contended);
++
++		raw_spin_lock_irqsave(cpu_lock, flags);
++	}
++
++	if (fast_path)
++		trace_cgroup_rstat_cpu_locked_fastpath(cgrp, cpu, contended);
++	else
++		trace_cgroup_rstat_cpu_locked(cgrp, cpu, contended);
++
++	return flags;
++}
++
++static __always_inline
++void _cgroup_rstat_cpu_unlock(raw_spinlock_t *cpu_lock, int cpu,
++			      struct cgroup *cgrp, unsigned long flags,
++			      const bool fast_path)
++{
++	if (fast_path)
++		trace_cgroup_rstat_cpu_unlock_fastpath(cgrp, cpu, false);
++	else
++		trace_cgroup_rstat_cpu_unlock(cgrp, cpu, false);
++
++	raw_spin_unlock_irqrestore(cpu_lock, flags);
++}
++
+ /**
+  * cgroup_rstat_updated - keep track of updated rstat_cpu
+  * @cgrp: target cgroup
+@@ -44,7 +98,7 @@ __bpf_kfunc void cgroup_rstat_updated(struct cgroup *cgrp, int cpu)
+ 	if (data_race(cgroup_rstat_cpu(cgrp, cpu)->updated_next))
+ 		return;
+ 
+-	raw_spin_lock_irqsave(cpu_lock, flags);
++	flags = _cgroup_rstat_cpu_lock(cpu_lock, cpu, cgrp, true);
+ 
+ 	/* put @cgrp and all ancestors on the corresponding updated lists */
+ 	while (true) {
+@@ -72,7 +126,7 @@ __bpf_kfunc void cgroup_rstat_updated(struct cgroup *cgrp, int cpu)
+ 		cgrp = parent;
+ 	}
+ 
+-	raw_spin_unlock_irqrestore(cpu_lock, flags);
++	_cgroup_rstat_cpu_unlock(cpu_lock, cpu, cgrp, flags, true);
+ }
+ 
+ /**
+@@ -153,15 +207,7 @@ static struct cgroup *cgroup_rstat_updated_list(struct cgroup *root, int cpu)
+ 	struct cgroup *head = NULL, *parent, *child;
+ 	unsigned long flags;
+ 
+-	/*
+-	 * The _irqsave() is needed because cgroup_rstat_lock is
+-	 * spinlock_t which is a sleeping lock on PREEMPT_RT. Acquiring
+-	 * this lock with the _irq() suffix only disables interrupts on
+-	 * a non-PREEMPT_RT kernel. The raw_spinlock_t below disables
+-	 * interrupts on both configurations. The _irqsave() ensures
+-	 * that interrupts are always disabled and later restored.
+-	 */
+-	raw_spin_lock_irqsave(cpu_lock, flags);
++	flags = _cgroup_rstat_cpu_lock(cpu_lock, cpu, root, false);
+ 
+ 	/* Return NULL if this subtree is not on-list */
+ 	if (!rstatc->updated_next)
+@@ -198,7 +244,7 @@ static struct cgroup *cgroup_rstat_updated_list(struct cgroup *root, int cpu)
+ 	if (child != root)
+ 		head = cgroup_rstat_push_children(head, child, cpu);
+ unlock_ret:
+-	raw_spin_unlock_irqrestore(cpu_lock, flags);
++	_cgroup_rstat_cpu_unlock(cpu_lock, cpu, root, flags, false);
+ 	return head;
+ }
+ 
 
 
-On 30/04/2024 20.55, Jens Axboe wrote:
-> On 4/30/24 12:29 PM, Mina Almasry wrote:
->> On Tue, Apr 30, 2024 at 6:46?AM Jens Axboe<axboe@kernel.dk>  wrote:
-[...]
->>> In general, attempting to hide overhead behind config options is always
->>> a losing proposition. It merely serves to say "look, if these things
->>> aren't enabled, the overhead isn't there", while distros blindly enable
->>> pretty much everything and then you're back where you started.
->>>
->> The history there is that this check adds 1 cycle regression to the
->> page_pool fast path benchmark. The regression last I measured is 8->9
->> cycles, so in % wise it's a quite significant 12.5% (more details in
->> the cover letter[1]). I doubt I can do much better than that to be
->> honest.
->
-> I'm all for cycle counting, and do it myself too, but is that even
-> measurable in anything that isn't a super targeted microbenchmark? Or
-> even in that?
-
-The reason for page_pool fast path being critical is that it is used for 
-the XDP_DROP use-case.
-E.g on Mellanox mlx5 driver we see 24 Mpps XDP_DROP, which is approx 42 
-nanosec per packet. Adding 9 nanosec will reduce this to 19.6 Mpps.
-
-   1/(42+9)*10^9 = 19607843
-
---Jesper
-
-p.s. Upstreaming my PP microbenchmark[1] is still at the bottom of my 
-todo-list.
-  [1] 
-https://github.com/netoptimizer/prototype-kernel/blob/master/kernel/lib/bench_page_pool_simple.c
 
