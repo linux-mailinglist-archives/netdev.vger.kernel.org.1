@@ -1,173 +1,183 @@
-Return-Path: <netdev+bounces-93014-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93015-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB66A8B9A67
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 14:02:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CBAD8B9A81
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 14:13:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 89FB3286C6A
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 12:02:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8AA311F21FC4
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 12:13:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E674271747;
-	Thu,  2 May 2024 12:02:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 321857CF25;
+	Thu,  2 May 2024 12:12:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S1gJ4OIp"
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="bAB/Edq8"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66F6F6E617
-	for <netdev@vger.kernel.org>; Thu,  2 May 2024 12:02:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77C3617984
+	for <netdev@vger.kernel.org>; Thu,  2 May 2024 12:12:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714651356; cv=none; b=lMX4GmJuVDy8jVqL+4x2MiiGFh2AhB/iK60v0PIECG4o9oKPxgosriVLRv+TZXOkDYoiFmPHutUYfA14koyft2UktmGGGFtZ4FMU+A0286pkRMr2+nfv0s1uGu0GHjrxEM2i1FBduq9w9c4pXUBjr9/BFDAEkUi2U5w3pc9j6yg=
+	t=1714651977; cv=none; b=sS9Y5HvOiSy0rYb6IG2PHy5d3JXTJhzCAJFhuPtAMY4C/HxQO91uJdFkSEsfl3dwvSrmlIqTTDSHfg4Ao9hhJsVmmr3pqpzpMHDNhq3VyFMKQ7hPQYjW7sh+mCc8cuI9M0u0RJ5RPjriPnUYwmZYUNLA5cOmAeDulxVCBsAjC2Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714651356; c=relaxed/simple;
-	bh=5LCtxE1foP4p42pbTXYapXqnE7N4+pBu402ePprtg7k=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=TlJztRjYQpFk8bcdxrtFFF8CWx1RKhOqFoE7AnEBK1Vi6KO/a+dykVSdyM48wTo9IUWMI+mkZkBVfzoDpMOCHpLYuj+3TjT5MWRaZ6XZNb3RWdR1q034HPTv8tYwxw3ifmZtLjdtJVdvymJtRcQ6ndwzDAYrNwg+aoD1P95Dzkc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=S1gJ4OIp; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1714651354;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=XfXBI1UCEocbU9bnKa0OdkUDyFRe6Bw2+hz1Q8popRQ=;
-	b=S1gJ4OIpsY/cYbkBBlE3L1xQktd4SwWzRnW538cPkf8n6GIk7AdJ3iib6RT2J9KVD4Jrwk
-	gt+dhpKU3uYAWZO+u8D979LXwDKOYXImLgIQ/ANQlD9qNp7IHhcodzbIRgwAFNRggd9fYC
-	D16B1J25sMaD5O4KV1MoBnGXOtudobo=
-Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com
- [209.85.208.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-454-zMp08yA1Md-a4egeHTasRw-1; Thu, 02 May 2024 08:02:33 -0400
-X-MC-Unique: zMp08yA1Md-a4egeHTasRw-1
-Received: by mail-lj1-f198.google.com with SMTP id 38308e7fff4ca-2d8647f923fso12193891fa.0
-        for <netdev@vger.kernel.org>; Thu, 02 May 2024 05:02:33 -0700 (PDT)
+	s=arc-20240116; t=1714651977; c=relaxed/simple;
+	bh=U0+9t/DUTI7wv+JhYa4+yvPwHRkQr5ZuSHZ6s20Plk4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=I3UtLhsvLM9o2Cec+9b3fFG8rz/oBm3v1wmJtcqX+Fv2eaB8Z/WGADrx2+pzB0XrfwZOgtJKOgbvQpRXeRFcUTwls6mzuUq/3mAJ7S7bWJZZgPiFGbNoGx4Z5YljNglczJcOeJH/LC9B8dUiiiFrQtro7Hu7RXVHjxYQBP/6O0M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=bAB/Edq8; arc=none smtp.client-ip=209.85.208.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-572c65cea55so195217a12.0
+        for <netdev@vger.kernel.org>; Thu, 02 May 2024 05:12:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1714651974; x=1715256774; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=672JpQGQxN2adDtGURkG6O93oWu5Ah9pxezBGrFTATk=;
+        b=bAB/Edq82jw0GDpMTAoGjUX/tIU1rWtbBmRWpckZNd2ZUZdYo0opynVSn8aCykSQjp
+         mbH6FOJs9mGQKRFdCc5cLn0OXcrpAZTy6OY91bJ0UL2XMkZaTLBR2/P9eMv2ihtQ56iF
+         1cB6UA5/VnVTPrkHA+9Fx8J2SFEzrETV5f3lkdAA5uvYf3Cm5LXx7MJ2IJGnUk04c2tV
+         u5Sl/ACh8p70Qky96Gohp2SvcHnMM2QaWBkG5a/+bmPRYeAD4HjmzkPoR86TnVybGT4O
+         f6nctDOy+HX2L4rmBpA5rAwXWG/fxYqGeXIT1HbYDy8lwVqK4igdCEUQMCnJHwWTSXpo
+         E06w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714651352; x=1715256152;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
+        d=1e100.net; s=20230601; t=1714651974; x=1715256774;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XfXBI1UCEocbU9bnKa0OdkUDyFRe6Bw2+hz1Q8popRQ=;
-        b=n4huBBz/kRlY2A3KORjY1MnTQPUwtjG5/sAjEUCbJzZABD7NOKH/amaT6CGv4hp/ta
-         6zKLIcqLPDBmoFPlE2/vTqsZ3c7xb5F41jxu1HOkUrCm+GnClI9n6s9wiWS9VYCtpML4
-         h4RuXw6Q+WAiC8cY0CoMrQfCkgkVXosD2eRBVRyD9ys9HK4zB9flUM0kvxp3LaG/cXI7
-         FRpTuXdkDFc8OabH0a7zntHT4FO9PI0T2tpXa8M+lMNrbrdBiQ6zmEF3MaX4z/vmuUhF
-         Q3pZ6iVZHD1jeh17JHqoP/XUaJ0BBDz4VOQ6VGztF3hTdHnBm7JjfcY+gb1X5CwvvA9+
-         DTpg==
-X-Forwarded-Encrypted: i=1; AJvYcCXVRgKjMCrizMa3js581KlKOlLF1wsw5ojEcha7cZdRswUmS2to6whNiGyCb4o6MRrADvBMprte+5fleNuUtYj41lMfVYNn
-X-Gm-Message-State: AOJu0Yx7kUVVkF5lyJjA57s0jualkx4TISxM92ajs3ckaMltVyeTTvwO
-	z7SosQRMhitQ2UmrlfIaPU51QRIcB5B/K0g/8+6uq3N10J7jhhWozBgb/RTMaq0qKBkBjqI4K4B
-	+xxZXyWkfhzP2bN0YvYCTQAbI41yZ0r+VVGur6+z8YGgyZ2cTMC56Ng==
-X-Received: by 2002:a2e:8005:0:b0:2d8:5d78:d4f5 with SMTP id j5-20020a2e8005000000b002d85d78d4f5mr3230876ljg.4.1714651351578;
-        Thu, 02 May 2024 05:02:31 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHcPqJzAlwciurUryFPLth5j5uUrvMbzyjCr5B9NBxCGEVa+xdAr7J6OIi068BtXjl2HFtRKw==
-X-Received: by 2002:a2e:8005:0:b0:2d8:5d78:d4f5 with SMTP id j5-20020a2e8005000000b002d85d78d4f5mr3230841ljg.4.1714651351085;
-        Thu, 02 May 2024 05:02:31 -0700 (PDT)
-Received: from gerbillo.redhat.com ([2a0d:3344:1b52:6510::f71])
-        by smtp.gmail.com with ESMTPSA id l3-20020a05600c4f0300b0041b43d2d745sm1735008wmq.7.2024.05.02.05.02.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 May 2024 05:02:30 -0700 (PDT)
-Message-ID: <cc9eae8f17e3e0ad142c9efa3fe5dff7afe2554c.camel@redhat.com>
-Subject: Re: [PATCH net-next v5] net: ti: icssg_prueth: add TAPRIO offload
- support
-From: Paolo Abeni <pabeni@redhat.com>
-To: MD Danish Anwar <danishanwar@ti.com>, Dan Carpenter
- <dan.carpenter@linaro.org>, Andrew Lunn <andrew@lunn.ch>, Jan Kiszka
- <jan.kiszka@siemens.com>, Simon Horman <horms@kernel.org>, Niklas Schnelle
- <schnelle@linux.ibm.com>, Randy Dunlap <rdunlap@infradead.org>, Diogo Ivo
- <diogo.ivo@siemens.com>, Wolfram Sang <wsa+renesas@sang-engineering.com>, 
- Vignesh Raghavendra <vigneshr@ti.com>, Richard Cochran
- <richardcochran@gmail.com>, Roger Quadros <rogerq@kernel.org>, Jakub
- Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, "David S.
- Miller" <davem@davemloft.net>
-Cc: linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, srk@ti.com, r-gunasekaran@ti.com, Roger
- Quadros <rogerq@ti.com>, Vinicius Costa Gomes <vinicius.gomes@intel.com>,
- Vladimir Oltean <vladimir.oltean@nxp.com>
-Date: Thu, 02 May 2024 14:02:28 +0200
-In-Reply-To: <74be4e2e25644e0b65ac1894ccb9c2d0971bb643.camel@redhat.com>
-References: <20240429103022.808161-1-danishanwar@ti.com>
-	 <74be4e2e25644e0b65ac1894ccb9c2d0971bb643.camel@redhat.com>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
+        bh=672JpQGQxN2adDtGURkG6O93oWu5Ah9pxezBGrFTATk=;
+        b=q/ieK5isprdgVgScwMzQ4sUOvIWnwQWPjF6bneR3DahiW+qXrBDyLgFnaqjm4HZnrD
+         zQIqbEVrKbpze7BAhJp/kY+WyVCWaISh7X9RUmIZ8qTlej58+BVpmJYp2XqreZVIDJa7
+         7jTN2xFKUDoS99MNyUrRMSslEjO5QWngZkxNjKaHRwxdcbY0U+5LsuBiU6J7p8iihXJO
+         yIZIA7MVRs8ZJCx78+1aZFBfrQ9zau8Sxp6H+nUpEGznTHwBveQO1etFBFsdeA6+wsw1
+         bcNNkdI3j2vqvpPs51fwrpuk/XQSR112v2kF64wt1lX6ddqdLxUlwKYkkEomZuewLExz
+         Hi+Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWZUxt5PkNXj2ARviwBiAoiM2N6AD3wZ/rt8vEYP1hnXcQfgYP/BWjpgQP54/B7gOEoK6APayjile35l1LDIXpaEWBjSnDR
+X-Gm-Message-State: AOJu0YzMePexTK9WYliZFjtB3wOq7EaKZOG1Oio8K5UJekyXkxjPrfal
+	zPtdjJ1nT6ykT6f9jsNsZ7wezobxAVg/iQgXyv6isyIOk8UbcEwU8PrmcxcUaSU=
+X-Google-Smtp-Source: AGHT+IGBveCIDdwRLjqeRHzu8Xwq+nwSoG7CgDOi9YvahOmP7DijvF4W2bSeOpwFts4MR/jGuXktPw==
+X-Received: by 2002:a50:d613:0:b0:572:a198:49ca with SMTP id x19-20020a50d613000000b00572a19849camr1953208edi.20.1714651973540;
+        Thu, 02 May 2024 05:12:53 -0700 (PDT)
+Received: from [192.168.0.161] ([62.73.69.208])
+        by smtp.gmail.com with ESMTPSA id t17-20020a05640203d100b00572c15aba54sm465190edw.17.2024.05.02.05.12.52
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 02 May 2024 05:12:53 -0700 (PDT)
+Message-ID: <431e1af1-6043-4e3e-bc3b-5998ec366de7@blackwall.org>
+Date: Thu, 2 May 2024 15:12:51 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC net-next 00/10] MC Flood disable and snooping
+To: Joseph Huang <joseph.huang.2024@gmail.com>,
+ Vladimir Oltean <olteanv@gmail.com>
+Cc: Joseph Huang <Joseph.Huang@garmin.com>, netdev@vger.kernel.org,
+ Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Roopa Prabhu <roopa@nvidia.com>, =?UTF-8?Q?Linus_L=C3=BCssing?=
+ <linus.luessing@c0d3.blue>, linux-kernel@vger.kernel.org,
+ bridge@lists.linux.dev
+References: <20240402174348.wosc37adyub5o7xu@skbuf>
+ <a8968719-a63b-4969-a971-173c010d708f@blackwall.org>
+ <20240402204600.5ep4xlzrhleqzw7k@skbuf>
+ <065b803f-14a9-4013-8f11-712bb8d54848@blackwall.org>
+ <804b7bf3-1b29-42c4-be42-4c23f1355aaf@gmail.com>
+ <20240405102033.vjkkoc3wy2i3vdvg@skbuf>
+ <935c18c1-7736-416c-b5c5-13ca42035b1f@blackwall.org>
+ <651c87fc-1f21-4153-bade-2dad048eecbd@gmail.com>
+ <20240405211502.q5gfwcwyhkm6w7xy@skbuf>
+ <1f385946-84d0-499c-9bf6-90ef65918356@gmail.com>
+ <20240430012159.rmllu5s5gcdepjnc@skbuf>
+ <b90caf5f-fa1e-41e6-a7c2-5af042b0828e@gmail.com>
+Content-Language: en-US
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <b90caf5f-fa1e-41e6-a7c2-5af042b0828e@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Thu, 2024-05-02 at 13:59 +0200, Paolo Abeni wrote:
-> On Mon, 2024-04-29 at 16:00 +0530, MD Danish Anwar wrote:
-> > +static int emac_taprio_replace(struct net_device *ndev,
-> > +			       struct tc_taprio_qopt_offload *taprio)
-> > +{
-> > +	struct prueth_emac *emac =3D netdev_priv(ndev);
-> > +	struct tc_taprio_qopt_offload *est_new;
-> > +	int ret;
-> > +
-> > +	if (taprio->cycle_time_extension) {
-> > +		NL_SET_ERR_MSG_MOD(taprio->extack, "Cycle time extension not support=
-ed");
-> > +		return -EOPNOTSUPP;
-> > +	}
-> > +
-> > +	if (taprio->cycle_time < TAS_MIN_CYCLE_TIME) {
-> > +		NL_SET_ERR_MSG_FMT_MOD(taprio->extack, "cycle_time %llu is less than=
- min supported cycle_time %d",
-> > +				       taprio->cycle_time, TAS_MIN_CYCLE_TIME);
-> > +		return -EINVAL;
-> > +	}
-> > +
-> > +	if (taprio->num_entries > TAS_MAX_CMD_LISTS) {
-> > +		NL_SET_ERR_MSG_FMT_MOD(taprio->extack, "num_entries %lu is more than=
- max supported entries %d",
-> > +				       taprio->num_entries, TAS_MAX_CMD_LISTS);
-> > +		return -EINVAL;
-> > +	}
-> > +
-> > +	if (emac->qos.tas.taprio_admin)
-> > +		devm_kfree(&ndev->dev, emac->qos.tas.taprio_admin);
->=20
-> it looks like 'qos.tas.taprio_admin' is initialized from
-> taprio_offload_get(), so it should be free with taprio_offload_free(),
-> right?
->=20
-> > +
-> > +	est_new =3D devm_kzalloc(&ndev->dev,
-> > +			       struct_size(est_new, entries, taprio->num_entries),
-> > +			       GFP_KERNEL);
-> > +	if (!est_new)
-> > +		return -ENOMEM;
->=20
-> Why are you allocating 'est_new'? it looks like it's not used
-> anywhere?!?=20
->=20
-> > +
-> > +	emac->qos.tas.taprio_admin =3D taprio_offload_get(taprio);
-> > +	ret =3D tas_update_oper_list(emac);
-> > +	if (ret)
-> > +		return ret;
->=20
-> Should the above clear 'taprio_admin' on error, as well?=20
+On 30/04/2024 20:01, Joseph Huang wrote:
+> On 4/29/2024 9:21 PM, Vladimir Oltean wrote:
+>> On Mon, Apr 29, 2024 at 04:14:03PM -0400, Joseph Huang wrote:
+>>> How about the following syntax? I think it satisfies all the "not breaking
+>>> existing behavior" requirements (new option defaults to off, and missing
+>>> user space netlink attributes does not change the existing behavior):
+>>>
+>>> mcast_flood off
+>>>    all off
+>>> mcast_flood off mcast_flood_rfc4541 off
+>>>    all off
+>>> mcast_flood off mcast_flood_rfc4541 on
+>>>    224.0.0.X and ff02::1 on, the rest off
+>>> mcast_flood on
+>>>    all on
+>>> mcast_flood on mcast_flood_rfc4541 off
+>>>    all on (mcast_flood on overrides mcast_flood_rfc4541)
+>>> mcast_flood on mcast_flood_rfc4541 on
+>>>    all on
+>>> mcast_flood_rfc4541 off
+>>>    invalid (mcast_flood_rfc4541 is only valid if mcast_flood [on | off] is
+>>> specified first)
+>>> mcast_flood_rfc4541 on
+>>>    invalid (mcast_flood_rfc4541 is only valid if mcast_flood [on | off] is
+>>> specified first)
+>>
+>> A bridge port defaults to having BR_MCAST_FLOOD set - see new_nbp().
+>> Netlink attributes are only there to _change_ the state of properties in
+>> the kernel. They don't need to be specified by user space if there's
+>> nothing to be changed. "Only valid if another netlink attribute comes
+>> first" makes no sense. You can alter 2 bridge port flags as part of the
+>> same netlink message, or as part of different netlink messages (sent
+>> over sockets of other processes).
+>>
+>>>
+>>> Think of mcast_flood_rfc4541 like a pet door if you will.
+>>
+>> Ultimately, as far as I see it, both the OR-based and the AND-based UAPI
+>> addition could be made to work in a way that's perhaps similarly backwards
+>> compatible. It needs to be worked out with the bridge maintainers. Given
+>> that I'm not doing great with my spare time, I will take a back seat on
+>> that.
+> 
+> Nik, do you have any objection to the following proposal?
+> 
+> mcast_flood ->          default/    off         on
+> (existing flag)         missing     (specified/ (specified/
+>                         (on)        nlmsg)      nlmsg)
+> 
+> mcast_flood_rfc4541
+> (proposed new flag)
+>      |
+>      v
+> default/                flood all   no flood    flood all
+> missing
+> (off)
+> 
+> off                     flood all   no flood    flood all
+> (specified/nlmsg)
+> 
+> on                      flood all   flood 4541  flood all
+> (specified/nlmsg)                   ^^^^^^^^^^
+>                                     only behavior change
+> 
+> 
+> Basically the attributes are OR'ed together to form the final flooding decision.
+> 
+> 
 
-Side note: the patch itself is rather big, I guess it would be better
-split it. You can make a small series putting the the struct definition
-move in a separate patch.=20
+Looks good to me. Please make use of the boolopt uapi to avoid adding new
+nl attributes.
 
 Thanks,
+ Nik
 
-Paolo
 
 
