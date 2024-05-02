@@ -1,126 +1,137 @@
-Return-Path: <netdev+bounces-93076-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93077-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D8ED8B9F14
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 18:57:59 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6ED68B9F17
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 18:59:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3ADEC1F23768
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 16:57:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 11BE5B21C3B
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 16:59:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46EC115E80E;
-	Thu,  2 May 2024 16:57:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0D0516F90F;
+	Thu,  2 May 2024 16:58:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="Cy6OGxhJ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yhZoXX6/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 865C015CD67
-	for <netdev@vger.kernel.org>; Thu,  2 May 2024 16:57:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 178CA16D327
+	for <netdev@vger.kernel.org>; Thu,  2 May 2024 16:58:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714669076; cv=none; b=gXcGsD/0+Lxsy3nxeASWgS+Zc6H8mO6pXgXGYDIhCofeN/ZU3bw6oueJmK8u1iPFM0EbJyEUYJyMnnyH0cG/ze7vTdWX0XN+RIei++JmjQCjmYNpZ3jGDJMpkJA7ChIEfOKk3+Jo7jwS4fV0NzS+yufAThnOHlEIyHsTvrc+jMQ=
+	t=1714669135; cv=none; b=XUzqkhXNa83718WggELGyy+E6dNhwxlu6qjBhpyMIrzhpcnKPfKRCSfdmRNs+YGiZpnn4cwn/Qy8vSRMKKiwSf7Eii/WRI7r8PMgMHgc07xO9CbDFJzdNCnhyKjlfGVGyQnPs3KMxEABijQwo/scobOTDeErrer7begvcFdhpVM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714669076; c=relaxed/simple;
-	bh=ydYmE9K6fN62hXvgfe1ng3MEZlIUiq6jNerHCTwmRgs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TqYDH0qDr2yzG5DKf4+p1TWr56npskfq4XVMMdZzM0kGbSsH0vz22+S0qCZTAXzquAEVb7OLY3Hl0vse6XefwIETpOAGcBuVyaoWot76yMGvBqKIYhIx43XC75jXynEaAxmQ/Oss/KigytK3TlHHojPgw56Dr2ETeqxTSiQMu2g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=Cy6OGxhJ; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-41c7ac73fddso40051385e9.3
-        for <netdev@vger.kernel.org>; Thu, 02 May 2024 09:57:53 -0700 (PDT)
+	s=arc-20240116; t=1714669135; c=relaxed/simple;
+	bh=ie1KPSOz4FrYOwrrKo7ciPrcoe7jbZBI83i3BRSUY28=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=SDkEu/m2yLOaeLIhgLkbuIkxH6b6ZnXkC34zHiQ0IlKno9h+5IPDcZLVp5oz4f7GezfJRhjghLT4Btfy0LkWEGTAWNDVEoA3ye8PtI0+LMia0/0rLtua5INmwo8UWPdWHo/3KLWpyN8aisQjrOgfWbvSEJvYMIUW45GqYb0iXcU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yhZoXX6/; arc=none smtp.client-ip=209.85.218.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a5557e3ebcaso367694966b.1
+        for <netdev@vger.kernel.org>; Thu, 02 May 2024 09:58:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1714669072; x=1715273872; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=qWxJ3pzDUTp/0WbBmFNqHX87fVAcfBpz2ZIjTjgDpsQ=;
-        b=Cy6OGxhJDcwPawoSIa9e7/517hIQQJiyF7sE1AN3V8uaSr75SaWriu9epQgIuKws3Q
-         IUCwu/48qgyTHWn5IVItdev4QYxMow1G25PZQrnaA27+HJnPPpIQOV/qhxwUrfr+uLmy
-         NSLbAeLSVOpW6evLEbCp+3SjDXKAJWK1zxdxpMCuTuidMvqLrFL2cvMbYi9GpZy+5Dua
-         uRecVBQavduIfWkUx4DOxnBA/WDtzVsTeYJXXen+PfP74UVdMoRAzx6AmyDdpEetAQBA
-         n5oSYj2X833jVO5NlLIT1zlx+drzWmsIqYnaogKxQocuUTCteB8ROp6TXgQtbk5T9VNF
-         HXBg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714669072; x=1715273872;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1714669132; x=1715273932; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=qWxJ3pzDUTp/0WbBmFNqHX87fVAcfBpz2ZIjTjgDpsQ=;
-        b=mSIyjYf7vq5vCaf7F6auor6yT9RTFfvZVhFDT62QuNov1wTOSPHPzwC23UMNgDnpv5
-         702f2wd1Bot7Y/lvEtSSBzlOV0ip5QMH5lbWriuXsdpUSDmN/L1/H6X9dQ+sIgZJmvIt
-         B76yCoSlB2CTHrRP8QaExdiv9Ekb/vbIOg5M5VNnJUYIAR1BHJxjRbdTMsTZh5kt80h6
-         NQV8kcq9ZQ0CU+v013hxXemZgGr6rkLaLOecon3Fvry/2E2wwr2mmsPD1C51cVowCfz9
-         3pAFrnZwg1ajPbm0B0cAp1cCo/MaeN9igJ2QlMftSY+zDQ0sJJ8ZL7zkGFskYrZ6qkE4
-         42GA==
-X-Forwarded-Encrypted: i=1; AJvYcCVYMLgKgA41wF2pmn2x3ZndQd5Bic1AP3CJh1jhc/p+s7aNspZp3C57eBJeOaCB1PCg3BwGdV1ZKT5VsrrmKKvLnMykhrtA
-X-Gm-Message-State: AOJu0YxO2rGtyUJirUxr9PN1uDpPkc2lSiYnSFYsHi8MHiOfQifO0kUl
-	ol/H4IH4Is9w3P6CSEBe766Y8PI3SbrdwisS+WNhVVClQMLo0Kywg5dxdnDbCkw=
-X-Google-Smtp-Source: AGHT+IHbP35CSdOpF9RfJAHKAKM6VXcYNXABFRukm2sgAdxnsksZgxomd1inU141os/Rw/FaHOjW+A==
-X-Received: by 2002:a05:600c:1c2a:b0:41c:503:9ae4 with SMTP id j42-20020a05600c1c2a00b0041c05039ae4mr270345wms.25.1714669071475;
-        Thu, 02 May 2024 09:57:51 -0700 (PDT)
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id z1-20020a5d4d01000000b0034dfa33e8d1sm1666151wrt.52.2024.05.02.09.57.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 May 2024 09:57:50 -0700 (PDT)
-Date: Thu, 2 May 2024 18:57:46 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, donald.hunter@gmail.com,
-	alessandromarcolini99@gmail.com
-Subject: Re: [PATCH net-next] tools: ynl: add --list-ops and --list-msgs to
- CLI
-Message-ID: <ZjPGCrqDQHW-n1Gi@nanopsycho.orion>
-References: <20240502164043.2130184-1-kuba@kernel.org>
+        bh=INqzaWaUz55i16qaUTBnal/q/AGeXCeOSHiT7C6b5pA=;
+        b=yhZoXX6/NGXYijx3yWQLflQ6nyvd0OjUwthdK/9NnUTjYvHTyKPDrj3fiZFtVIPmxc
+         LTWkrtblm/N5oxQlFFh86ew51lMU5VzcbrwSVDWHIm6Y1giml5l5dZd4I3MAnyd6Ln00
+         uqF+nCctPpArHBHJTdxNPh37usrKDPppNUpMxKjDuqIOqCP6Hm4eOAKbcaFaGkLsPqqj
+         B+lsSAuClINX7SnU2mmmQDyTcQincxT2Flf+zkizKNVfdoRy0SJ4dNOM23dTu/qkcXIq
+         nl7dZ/07oTYBZL+0yenYqj+yS6cflFVi33MXbZ05DM3B3QZJhxWZKatoNkaKndmhYiTe
+         qqwg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714669132; x=1715273932;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=INqzaWaUz55i16qaUTBnal/q/AGeXCeOSHiT7C6b5pA=;
+        b=sFwxPE+QIOSd1SuoELG1NUA+mji/QRdp/tNynsw43U61Ey8GH1AbZrtE3jwDLJvymw
+         4ii/25/AfcgRbw5MJVbx1E5MGsA+ebDJwWuPdalXfGIgJxFz4m346S2XsvMEbvz2xwpx
+         Dj94xIAsOKib+331SGeqE9GdsJAErHRtg2qXW5MGmTh4+vlp4qZlpiwpqY+iUo0gb0U9
+         gp5wAs2Nz/VP+1grcWat7LCzBsPjgfGLGzidb7z4hV11jigHXjPXSqd5jSAMIBcaZn63
+         XMSc3R3XPj4XGUpyTewnqk+YjZvxQHuYowh0swgJ/iD69Va6OBzXsYGHBxYEHkeW0XVx
+         fjGA==
+X-Gm-Message-State: AOJu0Yw6h3I/OCfHDipB7j2VQc32ppXdL4zzbA3Ol+Z5cSxwT/TCSzKL
+	75Pj8wSkOL63mCfh6CvVWGXuHxkGCeqZa1JP3Mq1YgLvFobycZBwdauzUchFWuOiwJrKZq1V8JL
+	5cEX5OaP+HOKpT1J5gGU0+LE57BBNwyqRTj4/
+X-Google-Smtp-Source: AGHT+IF0JAymuzlHhqw7f3h76M7jfcUvC4KNDoLdYbLMpSEE50zN5SwVQOWQa/sNV/1tj5GgWGP8HqhX8Bi0c43/mC4=
+X-Received: by 2002:a17:906:1398:b0:a55:ab13:5471 with SMTP id
+ f24-20020a170906139800b00a55ab135471mr294222ejc.13.1714669132071; Thu, 02 May
+ 2024 09:58:52 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240502164043.2130184-1-kuba@kernel.org>
+References: <20240430010732.666512-1-dw@davidwei.uk> <20240430010732.666512-2-dw@davidwei.uk>
+ <CAHS8izOsZ+nWBRNGgWvT46GsX6BC+bWPkpQgRCb8WY-Bi26SZA@mail.gmail.com> <80adf4dc-6bfd-4bef-a11b-c2f9ef362a2d@davidwei.uk>
+In-Reply-To: <80adf4dc-6bfd-4bef-a11b-c2f9ef362a2d@davidwei.uk>
+From: Mina Almasry <almasrymina@google.com>
+Date: Thu, 2 May 2024 09:58:40 -0700
+Message-ID: <CAHS8izP8M2GtAuCNb-8uzwbdxgLs8VRy=p2-1KNXa_4mqf-PmQ@mail.gmail.com>
+Subject: Re: [RFC PATCH net-next v1 1/3] queue_api: define queue api
+To: David Wei <dw@davidwei.uk>
+Cc: netdev@vger.kernel.org, Michael Chan <michael.chan@broadcom.com>, 
+	Pavan Chebbi <pavan.chebbi@broadcom.com>, 
+	Andy Gospodarek <andrew.gospodarek@broadcom.com>, Shailend Chand <shailend@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Thu, May 02, 2024 at 06:40:43PM CEST, kuba@kernel.org wrote:
->I often forget the exact naming of ops and have to look at
->the spec to find it. Add support for listing the operations:
+On Wed, May 1, 2024 at 6:00=E2=80=AFPM David Wei <dw@davidwei.uk> wrote:
 >
->  $ ./cli.py --spec .../netdev.yaml --list-ops
->  dev-get  [ do, dump ]
->  page-pool-get  [ do, dump ]
->  page-pool-stats-get  [ do, dump ]
->  queue-get  [ do, dump ]
->  napi-get  [ do, dump ]
->  qstats-get  [ dump ]
+> On 2024-04-30 11:00 am, Mina Almasry wrote:
+> >
+> > Sorry, I think we raced a bit, we updated our interface definition
+> > based on your/Jakub's feedback to expose the size of the struct for
+> > core to allocate, so it looks like this for us now:
+> >
+> > +struct netdev_queue_mgmt_ops {
+> > +       size_t                  ndo_queue_mem_size;
+> > +       int                     (*ndo_queue_mem_alloc)(struct net_devic=
+e *dev,
+> > +                                                      void *per_queue_=
+mem,
+> > +                                                      int idx);
+> > +       void                    (*ndo_queue_mem_free)(struct net_device=
+ *dev,
+> > +                                                     void *per_queue_m=
+em);
+> > +       int                     (*ndo_queue_start)(struct net_device *d=
+ev,
+> > +                                                  void *per_queue_mem,
+> > +                                                  int idx);
+> > +       int                     (*ndo_queue_stop)(struct net_device *de=
+v,
+> > +                                                 void *per_queue_mem,
+> > +                                                 int idx);
+> > +};
+> > +
+> >
+> > The idea is that ndo_queue_mem_size is the size of the memory
+> > per_queue_mem points to.
 >
->For completeness also support listing all ops (including
->notifications:
+> Thanks, I'll update this.
 >
->  # ./cli.py --spec .../netdev.yaml --list-msgs
->  dev-get  [ dump, do ]
->  dev-add-ntf  [ notify ]
->  dev-del-ntf  [ notify ]
->  dev-change-ntf  [ notify ]
->  page-pool-get  [ dump, do ]
->  page-pool-add-ntf  [ notify ]
->  page-pool-del-ntf  [ notify ]
->  page-pool-change-ntf  [ notify ]
->  page-pool-stats-get  [ dump, do ]
->  queue-get  [ dump, do ]
->  napi-get  [ dump, do ]
->  qstats-get  [ dump ]
+> No race, I'm just working on the bnxt side at the same time because I
+> need feedback from Broadcom. Hope you don't mind whichever one merges
+> first. Full credit is given to you on the queue API + netdev queue reset
+> function.
 >
->Use double space after the name for slightly easier to read
->output.
->
->Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-Had that on my todo list :) Thanks!
+Thanks! No concerns from me on what gets merged first. By 'raced' I
+just meant that we were incorporating your feedback while you were
+working on the older version :D
 
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+--=20
+Thanks,
+Mina
 
