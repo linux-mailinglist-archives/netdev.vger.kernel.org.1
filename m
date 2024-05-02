@@ -1,131 +1,84 @@
-Return-Path: <netdev+bounces-93019-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93020-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A74C8B9AD6
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 14:27:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 161848B9ADC
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 14:29:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E0743280FEC
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 12:27:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 47E481C21566
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 12:29:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 410D27E10B;
-	Thu,  2 May 2024 12:27:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EC7C7C09E;
+	Thu,  2 May 2024 12:29:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="bNgfbgJ/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jsFHLyGR"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B8CD60EC3;
-	Thu,  2 May 2024 12:26:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFAD61CD39
+	for <netdev@vger.kernel.org>; Thu,  2 May 2024 12:29:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714652822; cv=none; b=Cuiv//5KgYD7FN+t/yJ4pflfAn+Ggsgxcn+FjuIdff/WCWrziT3G8/oxqYA40TQXkHXFBgOunr2qX6UY3HLVALnwx0NlrSRj3EQtZEIM/rz+mzrwLLSD4PsvlAftGS9PBnDgpndbDmtL5DagErxlqmi9w8yL/84335re/h+77nw=
+	t=1714652967; cv=none; b=FKtCMK0+ADW54luVWJ3/09tKOfdx/HiScuwjclhagK+/erxncta9kKDMlywjTkF5WignZNobLR5btkpKfVWPtRYyLKC3oqnv6p+ZRbzFsCBQYuWGndVCPw07bTvHN+WpuF+qtZn9yQcMonnInfn3afEmykSZb8lEzmdkdPys6BU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714652822; c=relaxed/simple;
-	bh=ubGsjiWQHWPaEZ1fQ7tqbi/KKjuYjwt1nMnswlvWugU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uov5vh5jFYoqs8EK8zA5Opdx/tacbpzt/Fjb5/SuudlVEyxy7ACdvzQ/v41TbVxvCy9UmraDZ3YzHn8jNa8Pw+GlabMQEggq+CwN9EKoKdUoyEtqhnV/xK1DBl1iMbpq7eC6xExuLjvleeuETqQ2SYw5QP1cOFPeEpTgz1z+S7A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=bNgfbgJ/; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=gVITxXoUTVKTfjI6S12QFG1wv1DAg8EEN4Ngn7R7v5M=; b=bNgfbgJ/L9jRQ2A93jsYogUi+N
-	kWVgx9OUBoOTsJoCcLnAlM6XDTuqJr5/b2Qg5GAYLGF2BXEZ/MWrDQvuHcnTqN2csm1keEMrEAtix
-	pmaiapgE22GVw3XeCstUGB1Oe/srzXlYSK/M8u46dgZAzc8c2vtsOE9QQyf662Yasyis=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1s2VWG-00EVEN-M8; Thu, 02 May 2024 14:26:36 +0200
-Date: Thu, 2 May 2024 14:26:36 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Conor Dooley <conor.dooley@microchip.com>
-Cc: Herve Codina <herve.codina@bootlin.com>,
-	Thomas Gleixner <tglx@linutronix.de>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Lee Jones <lee@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
-	Horatiu Vultur <horatiu.vultur@microchip.com>,
-	UNGLinuxDriver@microchip.com,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Saravana Kannan <saravanak@google.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Lars Povlsen <lars.povlsen@microchip.com>,
-	Steen Hegelund <Steen.Hegelund@microchip.com>,
-	Daniel Machon <daniel.machon@microchip.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
-	netdev@vger.kernel.org, linux-pci@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Allan Nielsen <allan.nielsen@microchip.com>,
-	Luca Ceresoli <luca.ceresoli@bootlin.com>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH 06/17] dt-bindings: net: mscc-miim: Add resets property
-Message-ID: <4f9fd16b-773d-40e7-86d8-db19e2f6da16@lunn.ch>
-References: <20240430083730.134918-1-herve.codina@bootlin.com>
- <20240430083730.134918-7-herve.codina@bootlin.com>
- <5d899584-38ed-4eee-9ba5-befdedbc5734@lunn.ch>
- <20240430174023.4d15a8a4@bootlin.com>
- <2b01ed8a-1169-4928-952e-1645935aca2f@lunn.ch>
- <20240502115043.37a1a33a@bootlin.com>
- <20240502-petted-dork-20eb02e5a8e3@wendy>
+	s=arc-20240116; t=1714652967; c=relaxed/simple;
+	bh=hHAzsJjZ7ihWWLNkAshgqQuvzJEG6FNOnGY5lRZdVZg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=K38og7ccGXP0w+L6M41LQtQOcxGySoj1Eo/13m9vwEdJYNQvuZhz4cBKCZ12JO6RS+Xxs72n/FBygxvMhKu4AEo4hCulhYfOke9A8J/Xy4lTlwmmjDeb20j1sze5GuB4M9D46rCnGDN01vb3rKmeL+93EBAtgQJdMmNVivqG1AE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jsFHLyGR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36058C113CC;
+	Thu,  2 May 2024 12:29:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714652966;
+	bh=hHAzsJjZ7ihWWLNkAshgqQuvzJEG6FNOnGY5lRZdVZg=;
+	h=From:To:Cc:Subject:Date:From;
+	b=jsFHLyGRxDzxe8pP0121VqEd82HMROhXfLhxLwM2mXWAjeSTPYBJ+3A3NGYYV6S/E
+	 zwmj1GiKsKTm7SKRLkOT04imZkOFlrb6B2baA8ZfPWcvkCNdnM1VYY2bwzaKZjHjWt
+	 qU1L7H3i3JOEZ+0VyYdvJVdYhAJvPiqY7pWRnvfk4bRc2Pvle+mzqtrntCI4ygN1Oq
+	 IoIyeLoWSVQpH0aV65WLNHTfIrLesz/5sgnUx0aTZTTxG9R3NQbbreWMi+fbD5ZlJD
+	 ZDRuyFeoizCO55wsflqs/xOxh3i3xHnrvGWjZp4QfBbLspgvF/VoMFteOIZYJB5Vp9
+	 vVQverzAlKKoQ==
+From: =?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>
+To: netdev@vger.kernel.org,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>
+Cc: =?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>
+Subject: [PATCH net-next v2 0/2] Fix changing DSA conduit
+Date: Thu,  2 May 2024 14:29:20 +0200
+Message-ID: <20240502122922.28139-1-kabel@kernel.org>
+X-Mailer: git-send-email 2.43.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240502-petted-dork-20eb02e5a8e3@wendy>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Thu, May 02, 2024 at 11:31:00AM +0100, Conor Dooley wrote:
-> On Thu, May 02, 2024 at 11:50:43AM +0200, Herve Codina wrote:
-> > Hi Andrew,
-> > 
-> > On Tue, 30 Apr 2024 18:31:46 +0200
-> > Andrew Lunn <andrew@lunn.ch> wrote:
-> > 
-> > > > We have the same construction with the pinctrl driver used in the LAN966x
-> > > >   Documentation/devicetree/bindings/pinctrl/mscc,ocelot-pinctrl.yaml
-> > > > 
-> > > > The reset name is 'switch' in the pinctrl binding.
-> > > > I can use the same description here as the one present in the pinctrl binding:
-> > > >   description: Optional shared switch reset.
-> > > > and keep 'switch' as reset name here (consistent with pinctrl reset name).
-> > > > 
-> > > > What do you think about that ?  
-> > > 
-> > > It would be good to document what it is shared with. So it seems to be
-> > > the switch itself, pinctl and MDIO? Anything else?
-> > > 
-> > 
-> > To be honest, I know that the GPIO controller (microchip,sparx5-sgpio) is
-> > impacted but I don't know if anything else is impacted by this reset.
-> > I can update the description with:
-> >   description:
-> >     Optional shared switch reset.
-> >     This reset is shared with at least pinctrl, GPIO, MDIO and the switch
-> >     itself.
-> > 
-> > Does it sound better ?
-> 
-> $dayjob hat off, bindings hat on: If you don't know, can we get someone
-> from Microchip (there's some and a list in CC) to figure it out?
+This series fixes an issue in the DSA code related to host interface UC
+address installed into port FDB and port conduit address database when
+live-changing port conduit.
 
-That is probably a good idea, there is potential for hard to find bugs
-here, when a device gets an unexpected reset. Change the order things
-probe, or an unexpected EPRODE_DEFER could be interesting.
+The first patch refactores/deduplicates the installation/uninstallation
+of the interface's MAC address and the second patch fixes the issue.
 
-       Andrew
+Cover letter for v1:
+  https://patchwork.kernel.org/project/netdevbpf/cover/20240429163627.16031-1-kabel@kernel.org/
+
+Marek Behún (2):
+  net: dsa: deduplicate code adding / deleting the port address to fdb
+  net: dsa: update the unicast MAC address when changing conduit
+
+ net/dsa/port.c | 40 +++++++++++++++++++++
+ net/dsa/user.c | 97 ++++++++++++++++++++++++--------------------------
+ net/dsa/user.h |  2 ++
+ 3 files changed, 89 insertions(+), 50 deletions(-)
+
+-- 
+2.43.2
+
 
