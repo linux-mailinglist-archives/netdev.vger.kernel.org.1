@@ -1,97 +1,106 @@
-Return-Path: <netdev+bounces-93140-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93153-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27C258BA427
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 01:40:35 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6433B8BA4F1
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 03:36:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5909B1C214A8
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 23:40:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7FF15B22849
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 01:36:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01E751581F4;
-	Thu,  2 May 2024 23:40:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QzJ1QVPC"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B4ECDDC0;
+	Fri,  3 May 2024 01:36:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from 13.mo582.mail-out.ovh.net (13.mo582.mail-out.ovh.net [188.165.56.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9E8515689E;
-	Thu,  2 May 2024 23:40:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79B978F47
+	for <netdev@vger.kernel.org>; Fri,  3 May 2024 01:36:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=188.165.56.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714693230; cv=none; b=gjqG9OpTZu03SUX1GzilE2vNNum1NB1s8R1Z0yTggWCFIEOJ7e8HxlomKPS70CwPhZq6pJmHvesgVINlhdCuvY/92f1AJpxudPRchGcceliWtyxlwXMoz5aqOGtaLOCNfnjiJH72+O1Xv3rjRJ/4hDJfS1uNTdsSD4nXTxdyryM=
+	t=1714700196; cv=none; b=UPeMIIph7wJs8GxoGr5f2RyIgsslfqbsMDx5kTSSnT6uGnW0X2eLRxrzBuQKRKtpTG+G8wFoDwLLgwJOaStbVyztrlnrCdcqjrNXn6I4baeMCQYGjbRwhyo0lR4Wzv6HxLnLOoFc+5VLC879k2Ue9rogTKymR+NYEiZYSPiQ7Ps=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714693230; c=relaxed/simple;
-	bh=bTARC5f2XCsgfxPdClMLWk+PAT6Rftj89iMCX9lwFug=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=W6ebanTOMGwzv9i4rN5QCDAdu/jjbmQYFqpKmQ2N/owkuKkFXRsvHxBOFhdYWJ0HNZyktEzLIu979BKg17VT0ggMhZr1zbUU9f9sXuQcXMfPnguMwnz2gRFszYEWtE76HrYNfF8gnxhs9rO/WY7JVLYPfC9GPzgTbFKw3/mHy9s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QzJ1QVPC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 494A9C32789;
-	Thu,  2 May 2024 23:40:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714693230;
-	bh=bTARC5f2XCsgfxPdClMLWk+PAT6Rftj89iMCX9lwFug=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=QzJ1QVPCe9NLGUwZc3nsSBcEfGW9sKtSNKGaAmU95WDHNDJL8ee9Jtic69KisWD3A
-	 BtsBOvFx98A0LOy9Sp0ZhBLTZatpo8yc2ELJ4jjkUtL2ICokwo19pnYV8MlyrXM7ep
-	 btBaTRqos4fh7n49vIOH2Dxb4kdau4RnB+KC4An9h1VYxNOG2R2qgbdQkDfL9j/VC8
-	 LvgdHWYRfWM6HMhaSMpGQfmoxYoqBSpORApW1vaayiqfW9iTD+Dtp6bqHDr1V0n2in
-	 Nk7rZmr7DUiv64vnTQt4rezMjujwxU8NNbyTFtECmQ9paJCYCAcNNc09UjMeAfvh0A
-	 qLB72qCDXW/vA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 39070C43337;
-	Thu,  2 May 2024 23:40:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1714700196; c=relaxed/simple;
+	bh=O9dHTfqdUKYqYcEkVxGpE1PpwlajnvKSe2uB3eZESzc=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=rBaHn3psVE2rWXUVBLt32cz2wFKSaZg2xUU+z0OjRjo88V19M/mEIyk2tIM1T2JeAbETxkzH6YRmrXPK3P7zhrayqYX6w2EsWKY4qyOiIiB7XUmPlR0DwfvgwcoM1hSSdvS5v7NxxbWDaskFLnxG4T0Zkl+rfydYIVo0J5/lINU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=etezian.org; arc=none smtp.client-ip=188.165.56.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=etezian.org
+Received: from director3.ghost.mail-out.ovh.net (unknown [10.108.2.235])
+	by mo582.mail-out.ovh.net (Postfix) with ESMTP id 4VVqPg4vtvz1H2L
+	for <netdev@vger.kernel.org>; Thu,  2 May 2024 23:09:11 +0000 (UTC)
+Received: from ghost-submission-6684bf9d7b-b6h52 (unknown [10.108.42.39])
+	by director3.ghost.mail-out.ovh.net (Postfix) with ESMTPS id A17F91FDF8;
+	Thu,  2 May 2024 23:09:06 +0000 (UTC)
+Received: from etezian.org ([37.59.142.105])
+	by ghost-submission-6684bf9d7b-b6h52 with ESMTPSA
+	id 8ifaEBIdNGZnZx8AitxrAg
+	(envelope-from <andi@etezian.org>); Thu, 02 May 2024 23:09:06 +0000
+Authentication-Results:garm.ovh; auth=pass (GARM-105G006ccf2312c-b8e8-4f3e-a551-11cf7daafa4c,
+                    C3C300A9F266149161DCD69BC7DE92F4F10D7925) smtp.auth=andi@etezian.org
+X-OVh-ClientIp:89.217.109.169
+From: Andi Shyti <andi.shyti@kernel.org>
+To: linux-kernel@vger.kernel.org, 
+ Florian Fainelli <florian.fainelli@broadcom.com>
+Cc: Jarkko Nikula <jarkko.nikula@linux.intel.com>, 
+ Andy Shevchenko <andriy.shevchenko@linux.intel.com>, 
+ Mika Westerberg <mika.westerberg@linux.intel.com>, 
+ Jan Dabros <jsd@semihalf.com>, Lee Jones <lee@kernel.org>, 
+ Jiawen Wu <jiawenwu@trustnetic.com>, 
+ Mengyuan Lou <mengyuanlou@net-swift.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Maciej Fijalkowski <maciej.fijalkowski@intel.com>, 
+ Andrew Lunn <andrew@lunn.ch>, Duanqiang Wen <duanqiangwen@net-swift.com>, 
+ linux-i2c@vger.kernel.org, netdev@vger.kernel.org
+In-Reply-To: <20240425214438.2100534-1-florian.fainelli@broadcom.com>
+References: <20240425214438.2100534-1-florian.fainelli@broadcom.com>
+Subject: Re: (subset) [PATCH v3 0/5] Define i2c_designware in a header file
+Message-Id: <171469134545.1016503.10207141192762647093.b4-ty@kernel.org>
+Date: Fri, 03 May 2024 01:09:05 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v3 0/3] Add new args into tcp_congestion_ops'
- cong_control
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171469323022.18467.15980884788609184083.git-patchwork-notify@kernel.org>
-Date: Thu, 02 May 2024 23:40:30 +0000
-References: <20240502042318.801932-1-miaxu@meta.com>
-In-Reply-To: <20240502042318.801932-1-miaxu@meta.com>
-To: Miao Xu <miaxu@meta.com>
-Cc: edumazet@google.com, davem@davemloft.net, kuba@kernel.org,
- pabeni@redhat.com, dsahern@kernel.org, kafai@meta.com,
- netdev@vger.kernel.org, bpf@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.13.0
+X-Ovh-Tracer-Id: 2096144151853337100
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedvledrvdduledgudekucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvvegjfhfukfffgggtgffosehtjeertdertdejnecuhfhrohhmpeetnhguihcuufhhhihtihcuoegrnhguihdrshhhhihtiheskhgvrhhnvghlrdhorhhgqeenucggtffrrghtthgvrhhnpeffteehudffvdfhudfgffdugfejjeduheehgeefgeeuhfeiuefghffgueffvdfgfeenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecukfhppeduvdejrddtrddtrddupdekledrvddujedruddtledrudeiledpfeejrdehledrudegvddruddtheenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpeduvdejrddtrddtrddupdhmrghilhhfrhhomheprghnughisegvthgviihirghnrdhorhhgpdhnsggprhgtphhtthhopedupdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdfovfetjfhoshhtpehmohehkedvpdhmohguvgepshhmthhpohhuth
 
-Hello:
+Hi
 
-This series was applied to bpf/bpf-next.git (master)
-by Martin KaFai Lau <martin.lau@kernel.org>:
-
-On Wed, 1 May 2024 21:23:15 -0700 you wrote:
-> This patchset attempts to add two new arguments into the hookpoint
-> cong_control in tcp_congestion_ops. The new arguments are inherited
-> from the caller tcp_cong_control and can be used by any bpf cc prog
-> that implements its own logic inside this hookpoint.
+On Thu, 25 Apr 2024 14:44:33 -0700, Florian Fainelli wrote:
+> This patch series depends upon the following two patches being applied:
 > 
-> Please review. Thanks a lot!
+> https://lore.kernel.org/all/20240422084109.3201-1-duanqiangwen@net-swift.com/
+> https://lore.kernel.org/all/20240422084109.3201-2-duanqiangwen@net-swift.com/
+> 
+> There is no reason why each driver should have to repeat the
+> "i2c_designware" string all over the place, because when that happens we
+> see the reverts like the above being necessary.
 > 
 > [...]
 
-Here is the summary with links:
-  - [net-next,v3,1/3] tcp: Add new args for cong_control in tcp_congestion_ops
-    https://git.kernel.org/bpf/bpf-next/c/57bfc7605ca5
-  - [net-next,v3,2/3] bpf: tcp: Allow to write tp->snd_cwnd_stamp in bpf_tcp_ca
-    https://git.kernel.org/bpf/bpf-next/c/0325cbd21e3c
-  - [net-next,v3,3/3] selftests/bpf: Add test for the use of new args in cong_control
-    https://git.kernel.org/bpf/bpf-next/c/96c3490d6423
+Applied to i2c/i2c-host on
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+git://git.kernel.org/pub/scm/linux/kernel/git/andi.shyti/linux.git
 
+Thank you,
+Andi
+
+Patches applied
+===============
+[1/5] i2c: designware: Replace MODULE_ALIAS() with MODULE_DEVICE_TABLE()
+      commit: 91647e64f0f5677ace84165dc25dc99579147b8f
+[2/5] i2c: designware: Create shared header hosting driver name
+      commit: 856cd5f13de7cebca44db5ff4bc2ca73490dd8d7
 
 
