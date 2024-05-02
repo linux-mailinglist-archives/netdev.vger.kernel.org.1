@@ -1,297 +1,178 @@
-Return-Path: <netdev+bounces-93008-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93009-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 716BB8B99F2
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 13:24:16 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54B418B9A10
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 13:30:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B1F841F23F4A
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 11:24:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5FCCAB20995
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 11:30:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 603EF6311D;
-	Thu,  2 May 2024 11:24:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E95A627E2;
+	Thu,  2 May 2024 11:30:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FuZziewm"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ahr4CfjQ"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C7E360DCF
-	for <netdev@vger.kernel.org>; Thu,  2 May 2024 11:24:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F26E42044
+	for <netdev@vger.kernel.org>; Thu,  2 May 2024 11:30:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714649049; cv=none; b=hCLlPdib3KAfEOUd7+gzkhcDzs8fpDWBLqlS2/lg9Hjah4MnftVFYtBYmEvv7uyuQtS8oZxEIindvFU1LR0jEwRWibL42thnx39zRKyq0uQyCAHq2BJuNyO7/QKY0fAVxEkLMZWr4QZu0cpw8uDL9irvBstzRMuBPulRmem479o=
+	t=1714649435; cv=none; b=OFY0ZmzBs6qASH2puNBRv5G2vR1SRO1Tx62dh2JBUIs3nN36yl5nVXL7wNZik7PeumN9fdp38VcakyOXOqYS/oQblRAs0PpCW1eZVgK4DEJ2tV7IKJy6VHp3A+ETnGK8PBYgWLhHNMDyTFMRXWRWiQP8dFttHM++8b9la/X0eYg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714649049; c=relaxed/simple;
-	bh=3BsYr5GY8+DN1Cqhi1SWPVOenkTI4gCJ/13mNvl0t5o=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=qnXKhbT77839N7z8bwjezNN+b2qkzhZspPPueaUxdZdYM6Fgsrel+PJjg0/aZ3vMJrljS4iF0DbhhyPlsmCcrxR/W/hSvSRQDI8VSVon5eRm07Nraq64dEZPGU6TnIOy+EKGlGtgM265EGvWO/OjLnT54PWuhkckHzIev1J9Db4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FuZziewm; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1714649435; c=relaxed/simple;
+	bh=+FFhrC4HjHF1MMyPVQHp7n3mauOwtIVUUY0xolNeibM=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=iYCxahayTEU54vTws3a0bwdD7bASqLig9A7N6CEjIHLtjEl/OmQZcij1FOX6n4lvGshyj9TJ5MffE+5dtNcWivswhz9dsTELZUMyClTLimumm+ihCsgvZW0WMprak5Y7742DuCA3FPXoTfojEfuGDbpyGbQvLj5BIIkVENNTZmc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ahr4CfjQ; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1714649045;
+	s=mimecast20190719; t=1714649432;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=Av/id9hmBlLg4KcvyaywN2IiF2o6K3QcgBvIFp2NqD8=;
-	b=FuZziewmdxF/zO4wA6URLuoJZtmBpCagq4qO4bhCE876Ho/pTjwGaSg8QQAUKdSeEKEqfk
-	i4lk/BtQDrsOd4ayTKiqmJGihEBlynIHk6yWovSw3uxrclLTTf4joUAyOl48nxRd+Gme7a
-	dCoHAGFLUAbRNC4QJ+TomlKyY4CNcWQ=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-75-VMh_fc6bNTerj3KxOP3BNQ-1; Thu,
- 02 May 2024 07:24:02 -0400
-X-MC-Unique: VMh_fc6bNTerj3KxOP3BNQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B1B24299E750;
-	Thu,  2 May 2024 11:24:01 +0000 (UTC)
-Received: from gerbillo.redhat.com (unknown [10.45.224.148])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 7D0D7202450D;
-	Thu,  2 May 2024 11:24:00 +0000 (UTC)
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=5Y3vWTHjjhtO1jbHBZN8nWFXDT/PbGcaFek8+0s53CA=;
+	b=ahr4CfjQMrE5KyowpCWbSupjg6f/r63wUr9C+jI9DIf9byPxrBuGDWTq/YpdTzbPiwAbeb
+	NStVpwbl5hQZDVNtv64wv69Hx78phRrfigsR8XwGiYWNeTGRo0hppUDlNjLfTNpxj5iqND
+	gkhCH7PbIYTGMwzBBo5nxVKu7asAWXY=
+Received: from mail-lf1-f72.google.com (mail-lf1-f72.google.com
+ [209.85.167.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-621-8MIH8o-ZPcCS3GS73yXFYA-1; Thu, 02 May 2024 07:30:30 -0400
+X-MC-Unique: 8MIH8o-ZPcCS3GS73yXFYA-1
+Received: by mail-lf1-f72.google.com with SMTP id 2adb3069b0e04-51d2e894428so510678e87.0
+        for <netdev@vger.kernel.org>; Thu, 02 May 2024 04:30:30 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714649429; x=1715254229;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=5Y3vWTHjjhtO1jbHBZN8nWFXDT/PbGcaFek8+0s53CA=;
+        b=fJS/I3ti5CsSKxWmMD+LNhBk4DePU9A2a/lUfVHk45kvMQ13HysXYNRyJCJs/klfDi
+         CxrDB+t9iBwWGztNFPbTQfywzKjIcWLJIOwqFKp8E+zlimuva0z6LAj965cbSKeaGRqE
+         2OKd+bUwA0YS70yYjD86DcFFNqzgl1w/jpylCExznp5XwIBYwZm5e/w7EG6NcKyXE9DU
+         ykF4H8blEEfbVUEkSj77IiGePxE1O/OpI5LdpTwq/3uL5dlcAMtPzqcVePTf9wAyGkpV
+         25R51lmDS5vEU1S5jfYwUgSauJLB67WTGt+eZmT4RslzaTQX05yM6BxvnztfvmyfgpHT
+         3DEw==
+X-Forwarded-Encrypted: i=1; AJvYcCUyOzgIeON3i5BJEyOzPWFyTOe4PNaEohHR0fNaS9Ll1ocrCLJK/eJTaPbwg5SRB/gOZdhRH8XLCRpzitMg/I+4B4GmWcMH
+X-Gm-Message-State: AOJu0Yx3V53cVho1cWaWbHl+GgfyKf5wnYnXIKFYrF1jXj/P6TfMQ5qY
+	55eg3prb0g3mNzxR8qbr88x19AWp5D5Q65E8Zoz+uzmuD5Bwwv3nmh8rRFAOSFUDW/VXr3mVNlq
+	Yayl5Mc+3sbILxVt0syk77gR0NUimyKLMz22+Pb95eIxJvs+BEKHKIg==
+X-Received: by 2002:a2e:8186:0:b0:2dd:374d:724e with SMTP id e6-20020a2e8186000000b002dd374d724emr3321458ljg.1.1714649428989;
+        Thu, 02 May 2024 04:30:28 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFcdnbdQ9KyzURBWyekprZS5+zkmk56gC9X7/WH2UeT+fkyLByPmnxLXI4IS00kw/9l4mSm6Q==
+X-Received: by 2002:a2e:8186:0:b0:2dd:374d:724e with SMTP id e6-20020a2e8186000000b002dd374d724emr3321430ljg.1.1714649428491;
+        Thu, 02 May 2024 04:30:28 -0700 (PDT)
+Received: from gerbillo.redhat.com ([2a0d:3344:1b52:6510:426c:715f:ad06:c489])
+        by smtp.gmail.com with ESMTPSA id o31-20020a05600c511f00b0041b4c293f75sm1633939wms.13.2024.05.02.04.30.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 May 2024 04:30:27 -0700 (PDT)
+Message-ID: <b3e2ea3cc3c3a4c8be831a837bc23d40e3395dfe.camel@redhat.com>
+Subject: Re: [PATCH net-next v2] net/mlx5e: flower: check for unsupported
+ control flags
 From: Paolo Abeni <pabeni@redhat.com>
-To: torvalds@linux-foundation.org
-Cc: kuba@kernel.org,
-	davem@davemloft.net,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [GIT PULL] Networking for v6.9-rc7
-Date: Thu,  2 May 2024 13:23:26 +0200
-Message-ID: <20240502112326.34463-1-pabeni@redhat.com>
+To: Tariq Toukan <ttoukan.linux@gmail.com>, =?ISO-8859-1?Q?Asbj=F8rn?=
+	Sloth =?ISO-8859-1?Q?T=F8nnesen?=
+	 <ast@fiberby.net>, netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Saeed
+ Mahameed <saeedm@nvidia.com>,  Tariq Toukan <tariqt@nvidia.com>, Leon
+ Romanovsky <leon@kernel.org>, Jianbo Liu <jianbol@nvidia.com>
+Date: Thu, 02 May 2024 13:30:26 +0200
+In-Reply-To: <25a4890f-8b6f-4fb3-970f-b022b7ad5be8@gmail.com>
+References: <20240422152728.175677-1-ast@fiberby.net>
+	 <25a4890f-8b6f-4fb3-970f-b022b7ad5be8@gmail.com>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.4
 
-Hi Linus!
+On Tue, 2024-04-30 at 08:15 +0300, Tariq Toukan wrote:
+>=20
+> On 22/04/2024 18:27, Asbj=C3=B8rn Sloth T=C3=B8nnesen wrote:
+> > Use flow_rule_is_supp_control_flags() to reject filters
+> > with unsupported control flags.
+> >=20
+> > In case any unsupported control flags are masked,
+> > flow_rule_is_supp_control_flags() sets a NL extended
+> > error message, and we return -EOPNOTSUPP.
+> >=20
+> > Remove FLOW_DIS_FIRST_FRAG specific error message,
+> > and treat it as any other unsupported control flag.
+> >=20
+> > Only compile-tested.
+> >=20
+> > Signed-off-by: Asbj=C3=B8rn Sloth T=C3=B8nnesen <ast@fiberby.net>
+> > ---
+> >=20
+> > Changelog:
+> >=20
+> > v2:
+> > - remove existing FLOW_DIS_FIRST_FRAG "support" (requested by Jianbo)
+> >=20
+> > v1: https://lore.kernel.org/netdev/20240417135110.99900-1-ast@fiberby.n=
+et/
+> >=20
+> >   drivers/net/ethernet/mellanox/mlx5/core/en_tc.c | 10 ++++------
+> >   1 file changed, 4 insertions(+), 6 deletions(-)
+> >=20
+> > diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c b/drivers/=
+net/ethernet/mellanox/mlx5/core/en_tc.c
+> > index aeb32cb27182..30673292e15f 100644
+> > --- a/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
+> > +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
+> > @@ -2801,12 +2801,6 @@ static int __parse_cls_flower(struct mlx5e_priv =
+*priv,
+> >   		flow_rule_match_control(rule, &match);
+> >   		addr_type =3D match.key->addr_type;
+> >  =20
+> > -		/* the HW doesn't support frag first/later */
+> > -		if (match.mask->flags & FLOW_DIS_FIRST_FRAG) {
+> > -			NL_SET_ERR_MSG_MOD(extack, "Match on frag first/later is not suppor=
+ted");
+> > -			return -EOPNOTSUPP;
+> > -		}
+> > -
+> >   		if (match.mask->flags & FLOW_DIS_IS_FRAGMENT) {
+> >   			MLX5_SET(fte_match_set_lyr_2_4, headers_c, frag, 1);
+> >   			MLX5_SET(fte_match_set_lyr_2_4, headers_v, frag,
+> > @@ -2819,6 +2813,10 @@ static int __parse_cls_flower(struct mlx5e_priv =
+*priv,
+> >   			else
+> >   				*match_level =3D MLX5_MATCH_L3;
+> >   		}
+> > +
+> > +		if (!flow_rule_is_supp_control_flags(FLOW_DIS_IS_FRAGMENT,
+> > +						     match.mask->flags, extack))
+> > +			return -EOPNOTSUPP;
+> >   	}
+> >  =20
+> >   	if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_BASIC)) {
+>=20
+> Acked-by: Tariq Toukan <tariqt@nvidia.com>
 
-The following changes since commit 52afb15e9d9a021ab6eec923a087ec9f518cb713:
+@Tariq/@Saeed: do you want to take this patch towards your tree and
+send or do you prefer we merge it directly? I tend to read the above
+ack as the 2nd option, but given this is only build tested I guess the
+first would be better...
 
-  Merge tag 'net-6.9-rc6' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2024-04-25 11:19:38 -0700)
+Thanks,
 
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.9-rc7
-
-for you to fetch changes up to 78cfe547607a83de60cd25304fa2422777634712:
-
-  MAINTAINERS: mark MYRICOM MYRI-10G as Orphan (2024-05-02 11:24:03 +0200)
-
-----------------------------------------------------------------
-Including fixes from bpf.
-
-Relatively calm week, likely due to public holiday in most places.
-No known outstanding regressions.
-
-Current release - regressions:
-
-  - rxrpc: fix wrong alignmask in __page_frag_alloc_align()
-
-  - eth: e1000e: change usleep_range to udelay in PHY mdic access
-
-Previous releases - regressions:
-
-  - gro: fix udp bad offset in socket lookup
-
-  - bpf: fix incorrect runtime stat for arm64
-
-  - tipc: fix UAF in error path
-
-  - netfs: fix a potential infinite loop in extract_user_to_sg()
-
-  - eth: ice: ensure the copied buf is NUL terminated
-
-  - eth: qeth: fix kernel panic after setting hsuid
-
-Previous releases - always broken:
-
-  - bpf:
-    - verifier: prevent userspace memory access
-    - xdp: use flags field to disambiguate broadcast redirect
-
-  - bridge: fix multicast-to-unicast with fraglist GSO
-
-  - mptcp: ensure snd_nxt is properly initialized on connect
-
-  - nsh: fix outer header access in nsh_gso_segment().
-
-  - eth: bcmgenet: fix racing registers access
-
-  - eth: vxlan: fix stats counters.
-
-Misc:
-
-  - a bunch of MAINTAINERS file updates
-
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-
-----------------------------------------------------------------
-Alexandra Winter (1):
-      s390/qeth: Fix kernel panic after setting hsuid
-
-Alexei Starovoitov (1):
-      Merge branch 'bpf-prevent-userspace-memory-access'
-
-Andrii Nakryiko (1):
-      bpf, kconfig: Fix DEBUG_INFO_BTF_MODULES Kconfig definition
-
-Anton Protopopov (1):
-      bpf: Fix a verifier verbose message
-
-Asbjørn Sloth Tønnesen (4):
-      net: qede: sanitize 'rc' in qede_add_tc_flower_fltr()
-      net: qede: use return from qede_parse_flow_attr() for flower
-      net: qede: use return from qede_parse_flow_attr() for flow_spec
-      net: qede: use return from qede_parse_actions()
-
-Björn Töpel (1):
-      MAINTAINERS: bpf: Add Lehui and Puranjay as riscv64 reviewers
-
-Bui Quang Minh (3):
-      ice: ensure the copied buf is NUL terminated
-      bna: ensure the copied buf is NUL terminated
-      octeontx2-af: avoid off-by-one read from userspace
-
-David Bauer (1):
-      net l2tp: drop flow hash on forward
-
-David Howells (1):
-      Fix a potential infinite loop in extract_user_to_sg()
-
-David S. Miller (3):
-      Merge branch 'bcmgenet-protect-contended-accesses'
-      Merge branch 'qed-error-codes'
-      Merge branch 'vxlan-stats'
-
-Doug Berger (3):
-      net: bcmgenet: synchronize EXT_RGMII_OOB_CTRL access
-      net: bcmgenet: synchronize use of bcmgenet_set_rx_mode()
-      net: bcmgenet: synchronize UMAC_CMD access
-
-Felix Fietkau (2):
-      net: bridge: fix multicast-to-unicast with fraglist GSO
-      net: core: reject skb_copy(_expand) for fraglist GSO skbs
-
-Guillaume Nault (3):
-      vxlan: Fix racy device stats updates.
-      vxlan: Add missing VNI filter counter update in arp_reduce().
-      vxlan: Pull inner IP header in vxlan_rcv().
-
-Jakub Kicinski (5):
-      Merge branch 'ensure-the-copied-buf-is-nul-terminated'
-      Merge tag 'for-netdev' of https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf
-      MAINTAINERS: add an explicit entry for YNL
-      MAINTAINERS: remove Ariel Elior
-      MAINTAINERS: mark MYRICOM MYRI-10G as Orphan
-
-Jason Xing (1):
-      bpf, skmsg: Fix NULL pointer dereference in sk_psock_skb_ingress_enqueue
-
-Jeffrey Altman (1):
-      rxrpc: Clients must accept conn from any address
-
-Kuniyuki Iwashima (1):
-      nsh: Restore skb->{protocol,data,mac_header} for outer header in nsh_gso_segment().
-
-Marek Behún (1):
-      net: dsa: mv88e6xxx: Fix number of databases for 88E6141 / 88E6341
-
-Paolo Abeni (3):
-      mptcp: ensure snd_nxt is properly initialized on connect
-      tipc: fix UAF in error path
-      Merge branch 'net-gro-add-flush-flush_id-checks-and-fix-wrong-offset-in-udp'
-
-Puranjay Mohan (5):
-      MAINTAINERS: Update email address for Puranjay Mohan
-      arm32, bpf: Reimplement sign-extension mov instruction
-      bpf: verifier: prevent userspace memory access
-      bpf, x86: Fix PROBE_MEM runtime load check
-      selftests/bpf: Test PROBE_MEM of VSYSCALL_ADDR on x86-64
-
-Richard Gobert (2):
-      net: gro: fix udp bad offset in socket lookup by adding {inner_}network_offset to napi_gro_cb
-      net: gro: add flush check in udp_gro_receive_segment
-
-Sebastian Andrzej Siewior (1):
-      cxgb4: Properly lock TX queue for the selftest.
-
-Shigeru Yoshida (1):
-      ipv4: Fix uninit-value access in __ip_make_skb()
-
-Toke Høiland-Jørgensen (1):
-      xdp: use flags field to disambiguate broadcast redirect
-
-Vitaly Lifshits (1):
-      e1000e: change usleep_range to udelay in PHY mdic access
-
-Xin Long (1):
-      tipc: fix a possible memleak in tipc_buf_append
-
-Xu Kuohai (2):
-      bpf, arm64: Fix incorrect runtime stats
-      riscv, bpf: Fix incorrect runtime stats
-
-Yunsheng Lin (1):
-      rxrpc: Fix using alignmask being zero for __page_frag_alloc_align()
-
- .mailmap                                           |  1 +
- MAINTAINERS                                        | 22 +++++---
- arch/arm/net/bpf_jit_32.c                          | 56 ++++++++++++++-----
- arch/arm64/net/bpf_jit_comp.c                      |  6 +--
- arch/riscv/net/bpf_jit_comp64.c                    |  6 +--
- arch/x86/net/bpf_jit_comp.c                        | 63 +++++++++++-----------
- drivers/net/dsa/mv88e6xxx/chip.c                   |  4 +-
- drivers/net/ethernet/broadcom/genet/bcmgenet.c     | 16 +++++-
- drivers/net/ethernet/broadcom/genet/bcmgenet.h     |  4 +-
- drivers/net/ethernet/broadcom/genet/bcmgenet_wol.c |  8 ++-
- drivers/net/ethernet/broadcom/genet/bcmmii.c       |  6 ++-
- drivers/net/ethernet/brocade/bna/bnad_debugfs.c    |  4 +-
- drivers/net/ethernet/chelsio/cxgb4/sge.c           |  6 +--
- drivers/net/ethernet/intel/e1000e/phy.c            |  8 +--
- drivers/net/ethernet/intel/ice/ice_debugfs.c       |  8 +--
- .../ethernet/marvell/octeontx2/af/rvu_debugfs.c    |  4 +-
- drivers/net/ethernet/qlogic/qede/qede_filter.c     | 14 ++---
- drivers/net/vxlan/vxlan_core.c                     | 49 +++++++++++------
- drivers/s390/net/qeth_core_main.c                  | 61 ++++++++++-----------
- include/linux/filter.h                             |  1 +
- include/linux/skmsg.h                              |  2 +
- include/net/gro.h                                  |  9 ++++
- kernel/bpf/core.c                                  |  9 ++++
- kernel/bpf/verifier.c                              | 33 +++++++++++-
- lib/Kconfig.debug                                  |  5 +-
- lib/scatterlist.c                                  |  2 +-
- net/8021q/vlan_core.c                              |  2 +
- net/bridge/br_forward.c                            |  2 +-
- net/core/filter.c                                  | 42 +++++++++++----
- net/core/gro.c                                     |  1 +
- net/core/skbuff.c                                  | 27 +++++++---
- net/core/skmsg.c                                   |  5 +-
- net/ipv4/af_inet.c                                 |  1 +
- net/ipv4/ip_output.c                               |  2 +-
- net/ipv4/raw.c                                     |  3 ++
- net/ipv4/udp.c                                     |  3 +-
- net/ipv4/udp_offload.c                             | 15 +++++-
- net/ipv6/ip6_offload.c                             |  1 +
- net/ipv6/udp.c                                     |  3 +-
- net/ipv6/udp_offload.c                             |  3 +-
- net/l2tp/l2tp_eth.c                                |  3 ++
- net/mptcp/protocol.c                               |  3 ++
- net/nsh/nsh.c                                      | 14 ++---
- net/rxrpc/conn_object.c                            |  9 +---
- net/rxrpc/insecure.c                               |  2 +-
- net/rxrpc/rxkad.c                                  |  2 +-
- net/rxrpc/txbuf.c                                  | 10 ++--
- net/tipc/msg.c                                     |  8 ++-
- .../selftests/bpf/bpf_testmod/bpf_testmod.c        |  3 ++
- 49 files changed, 378 insertions(+), 193 deletions(-)
+Paolo
 
 
