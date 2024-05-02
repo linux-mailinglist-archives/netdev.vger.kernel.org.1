@@ -1,140 +1,151 @@
-Return-Path: <netdev+bounces-93026-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93027-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CB4E8B9B7E
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 15:20:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF6E68B9B86
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 15:22:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4DC24B20F7C
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 13:20:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1CD641C2109B
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 13:22:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 559D2C8F3;
-	Thu,  2 May 2024 13:20:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84BFF84A4C;
+	Thu,  2 May 2024 13:22:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="MxtNZwP0"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="CKT2s9Xl"
 X-Original-To: netdev@vger.kernel.org
-Received: from fanzine2.igalia.com (fanzine.igalia.com [178.60.130.6])
+Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66BBD824AB;
-	Thu,  2 May 2024 13:20:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.60.130.6
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61A42C8F3;
+	Thu,  2 May 2024 13:22:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714656029; cv=none; b=PYrjzvhYJrJYhrs8WEOfXza79R+ZPd2NouhBrloWA8l/pdw6U+0WjEIvRv1LpzOxpZrOTpihk58oDWzMzZfAY+LYg1fzrUDXq4Fkg1kbiazMBt/CjGU9NRJfTVKwCOBOhTZcyzjwbGjCltXsTqSOzU8eGxJndhYWxWHYbYoTsvA=
+	t=1714656144; cv=none; b=Dgo5sXMuPJBtJ1r9pOcPUSaOAN/HCyHkfVNVqbxKlCcaYB0iOrY0KN9Ra3i8NwD0cqP79XhsMGbEzec0W7KgGHoWhEsVhf5lstZKZ16+gz+rJW3VtKYGRILPM31iI1JHnAFxwiOPAs/WO80QpghVRsXH0rs+wjIs9X9zo2HGwuM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714656029; c=relaxed/simple;
-	bh=3uHsgWZTrL/IXcpPKrV8afjNRpKD9N10PimzAu5WZ40=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Srl7ilJHZBm1f+xzBi0M1LHpsznqF7gf2njXVFZmDkewu47huIa7cCnFEMVVWN+kTbO4gKdIQ6u0H+9/4S+f96BG4J81G4bckCUi8aXBTwE01ycRJEESIa8qxPYSpW126VE1UZtCCztAMbuFMYQy0bpbCxSpvhA35sdOI+uVKl4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com; spf=pass smtp.mailfrom=igalia.com; dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b=MxtNZwP0; arc=none smtp.client-ip=178.60.130.6
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=igalia.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
-	s=20170329; h=Content-Transfer-Encoding:MIME-Version:Message-Id:Date:Subject:
-	Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:Content-Description:
-	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
-	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=/VaCqMDL7p2NjINVVUIkM6kvbFvFFu2XNtolIuWclck=; b=MxtNZwP0MaJhFLB2Sekgvr1mHs
-	ijlFM8yBRxvZvEXbZDBztwj0cnPDISW3Rehl28INZauHzWuPgDhfENHo3zNvN+dp+2c1fBx8HfF9m
-	i4tUd2RMIvWWAG7n+ZVCangnlGpB/5jXucciFOEyIi/yvcgcP9i8vOwiCWW928LPIDzAdTTVjy7VV
-	jregaE+JYxXbmHVlhKnEER0a+ciPXvsvZ4NOUbx0IyG0UhM28GHksSxho4YuqN8gccUt78xYYVmRX
-	G9oOXF5TlInwc/5bb4AUhzO6/n2ICcsVHWZbQDIAmPzEyykqiGS0+3lgWuy+ILDPVLXCgVOq5M/5P
-	zfogWTvg==;
-Received: from 179-125-75-252-dinamico.pombonet.net.br ([179.125.75.252] helo=quatroqueijos.lan)
-	by fanzine2.igalia.com with esmtpsa 
-	(Cipher TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256) (Exim)
-	id 1s2WMG-002zu5-MV; Thu, 02 May 2024 15:20:20 +0200
-From: Thadeu Lima de Souza Cascardo <cascardo@igalia.com>
-To: netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1714656144; c=relaxed/simple;
+	bh=90uiPCOml9cuv02qcxvScdAgGt3XGm+ofdWR9z4E6EA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kqmgvl5D7KaevkzE6ihQuttd7U/PiNIrJw13ub/x2grlhJEbmDWzUnBwWXwvhqhQku48sm2OTBlUtThttwZBBv4Pkilt3JPXYbak66RfgqaN0XBqoKYu6a2x9hl2Gph4eHaf3/HFLmxiz2INvpn3Y347ZBdFG1T/ztKwcuAzfws=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=CKT2s9Xl; arc=none smtp.client-ip=217.70.183.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 1DA9DE0005;
+	Thu,  2 May 2024 13:22:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1714656132;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ORq0qiQpLZgKtWOoETilQNGiO5BJ+bL1ZtI++EWsyfQ=;
+	b=CKT2s9XlZ2gUQpEw6SkCR/ZoPZ9xIE5ic3HXncXsBrKZs8aLGI0ARdIlZtlfMc6C18Atgx
+	rPSqWwiKS3NjaJ65OzI7abb+hdhYKE5Q6nTapPJWYPUvtfbZBkvqrxHVa/L3M/Bz4duSzy
+	kkCpiR/SU4YH2V+vcRuDVS0PZEmMIiclqnhBbKZarrm78LOnAWa8h3YvOD/rbvl/NZIyO5
+	iakFdnBJDcc9iBevW1bB713zU8pQlNuL/lVxSMPSO7fKSZ7ImuGd71XTYn4Mfz6IH0LsYn
+	m/b5yb/NeRQEIRkmLU3sFIcXl0poRXFbXgZf44p9BO0DXj5WiQxVwLQZHM4pDA==
+Date: Thu, 2 May 2024 15:22:09 +0200
+From: Alexandre Belloni <alexandre.belloni@bootlin.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Conor Dooley <conor.dooley@microchip.com>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Thomas Gleixner <tglx@linutronix.de>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>,
-	kernel-dev@igalia.com,
-	stable@vger.kernel.org,
-	Thadeu Lima de Souza Cascardo <cascardo@igalia.com>
-Subject: [PATCH net v3] net: fix out-of-bounds access in ops_init
-Date: Thu,  2 May 2024 10:20:06 -0300
-Message-Id: <20240502132006.3430840-1-cascardo@igalia.com>
-X-Mailer: git-send-email 2.34.1
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Lee Jones <lee@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+	Horatiu Vultur <horatiu.vultur@microchip.com>,
+	UNGLinuxDriver@microchip.com,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Saravana Kannan <saravanak@google.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Lars Povlsen <lars.povlsen@microchip.com>,
+	Steen Hegelund <Steen.Hegelund@microchip.com>,
+	Daniel Machon <daniel.machon@microchip.com>,
+	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
+	netdev@vger.kernel.org, linux-pci@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Allan Nielsen <allan.nielsen@microchip.com>,
+	Luca Ceresoli <luca.ceresoli@bootlin.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH 06/17] dt-bindings: net: mscc-miim: Add resets property
+Message-ID: <202405021322091c565595@mail.local>
+References: <20240430083730.134918-1-herve.codina@bootlin.com>
+ <20240430083730.134918-7-herve.codina@bootlin.com>
+ <5d899584-38ed-4eee-9ba5-befdedbc5734@lunn.ch>
+ <20240430174023.4d15a8a4@bootlin.com>
+ <2b01ed8a-1169-4928-952e-1645935aca2f@lunn.ch>
+ <20240502115043.37a1a33a@bootlin.com>
+ <20240502-petted-dork-20eb02e5a8e3@wendy>
+ <4f9fd16b-773d-40e7-86d8-db19e2f6da16@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4f9fd16b-773d-40e7-86d8-db19e2f6da16@lunn.ch>
+X-GND-Sasl: alexandre.belloni@bootlin.com
 
-net_alloc_generic is called by net_alloc, which is called without any
-locking. It reads max_gen_ptrs, which is changed under pernet_ops_rwsem. It
-is read twice, first to allocate an array, then to set s.len, which is
-later used to limit the bounds of the array access.
+On 02/05/2024 14:26:36+0200, Andrew Lunn wrote:
+> On Thu, May 02, 2024 at 11:31:00AM +0100, Conor Dooley wrote:
+> > On Thu, May 02, 2024 at 11:50:43AM +0200, Herve Codina wrote:
+> > > Hi Andrew,
+> > > 
+> > > On Tue, 30 Apr 2024 18:31:46 +0200
+> > > Andrew Lunn <andrew@lunn.ch> wrote:
+> > > 
+> > > > > We have the same construction with the pinctrl driver used in the LAN966x
+> > > > >   Documentation/devicetree/bindings/pinctrl/mscc,ocelot-pinctrl.yaml
+> > > > > 
+> > > > > The reset name is 'switch' in the pinctrl binding.
+> > > > > I can use the same description here as the one present in the pinctrl binding:
+> > > > >   description: Optional shared switch reset.
+> > > > > and keep 'switch' as reset name here (consistent with pinctrl reset name).
+> > > > > 
+> > > > > What do you think about that ?  
+> > > > 
+> > > > It would be good to document what it is shared with. So it seems to be
+> > > > the switch itself, pinctl and MDIO? Anything else?
+> > > > 
+> > > 
+> > > To be honest, I know that the GPIO controller (microchip,sparx5-sgpio) is
+> > > impacted but I don't know if anything else is impacted by this reset.
+> > > I can update the description with:
+> > >   description:
+> > >     Optional shared switch reset.
+> > >     This reset is shared with at least pinctrl, GPIO, MDIO and the switch
+> > >     itself.
+> > > 
+> > > Does it sound better ?
+> > 
+> > $dayjob hat off, bindings hat on: If you don't know, can we get someone
+> > from Microchip (there's some and a list in CC) to figure it out?
+> 
+> That is probably a good idea, there is potential for hard to find bugs
+> here, when a device gets an unexpected reset. Change the order things
+> probe, or an unexpected EPRODE_DEFER could be interesting.
+> 
 
-It is possible that the array is allocated and another thread is
-registering a new pernet ops, increments max_gen_ptrs, which is then used
-to set s.len with a larger than allocated length for the variable array.
 
-Fix it by reading max_gen_ptrs only once in net_alloc_generic. If
-max_gen_ptrs is later incremented, it will be caught in net_assign_generic.
+The datasheet states:
+"The VCore system comprises all the blocks attached to the VCore Shared
+Bus (SBA), including the PCIe, DDR, frame DMA, SI slave, and MIIM slave
+blocks. The device includes all the blocks attached to the Switch Core
+Register Bus (CSR) including the VRAP slave. For more information about
+the VCore System blocks, see Figure 5-1."
 
-Signed-off-by: Thadeu Lima de Souza Cascardo <cascardo@igalia.com>
-Fixes: 073862ba5d24 ("netns: fix net_alloc_generic()")
-Reviewed-by: Eric Dumazet <edumazet@google.com>
-Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: stable@vger.kernel.org
----
-v3:
-  - Use reverse xmas order in local variable declaration.
-  - Use netdev multi-line comment style.
-  - Target to net tree.
-  - Cc stable.
-v2:
-  - Instead of delaying struct net_generic allocation to setup_net,
-    read max_gen_ptrs only once.
-v1: https://lore.kernel.org/netdev/20240430084253.3272177-1-cascardo@igalia.com/
----
- net/core/net_namespace.c | 13 ++++++++++---
- 1 file changed, 10 insertions(+), 3 deletions(-)
+However, the reset driver protects the VCORE itself by setting bit 5.
+Everything else is going to be reset.
 
-diff --git a/net/core/net_namespace.c b/net/core/net_namespace.c
-index f0540c557515..9d690d32da33 100644
---- a/net/core/net_namespace.c
-+++ b/net/core/net_namespace.c
-@@ -69,12 +69,15 @@ DEFINE_COOKIE(net_cookie);
- 
- static struct net_generic *net_alloc_generic(void)
- {
-+	unsigned int gen_ptrs = READ_ONCE(max_gen_ptrs);
-+	unsigned int generic_size;
- 	struct net_generic *ng;
--	unsigned int generic_size = offsetof(struct net_generic, ptr[max_gen_ptrs]);
-+
-+	generic_size = offsetof(struct net_generic, ptr[gen_ptrs]);
- 
- 	ng = kzalloc(generic_size, GFP_KERNEL);
- 	if (ng)
--		ng->s.len = max_gen_ptrs;
-+		ng->s.len = gen_ptrs;
- 
- 	return ng;
- }
-@@ -1307,7 +1310,11 @@ static int register_pernet_operations(struct list_head *list,
- 		if (error < 0)
- 			return error;
- 		*ops->id = error;
--		max_gen_ptrs = max(max_gen_ptrs, *ops->id + 1);
-+		/* This does not require READ_ONCE as writers already hold
-+		 * pernet_ops_rwsem. But WRITE_ONCE is needed to protect
-+		 * net_alloc_generic.
-+		 */
-+		WRITE_ONCE(max_gen_ptrs, max(max_gen_ptrs, *ops->id + 1));
- 	}
- 	error = __register_pernet_operations(list, ops);
- 	if (error) {
 -- 
-2.34.1
-
+Alexandre Belloni, co-owner and COO, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
 
