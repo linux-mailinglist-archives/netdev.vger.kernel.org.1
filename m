@@ -1,106 +1,193 @@
-Return-Path: <netdev+bounces-92904-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92905-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14A4D8B9429
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 07:16:47 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 580B68B943A
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 07:27:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 90D8F283C8A
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 05:16:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 85CF2B20CB0
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 05:27:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D29E1F947;
-	Thu,  2 May 2024 05:16:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F359200C1;
+	Thu,  2 May 2024 05:27:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="n/Ltc0lD"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=fritzc.com header.i=@fritzc.com header.b="UJCR0hkD"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from fritzc.com (mail.fritzc.com [213.160.72.247])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 388E51CD2D;
-	Thu,  2 May 2024 05:16:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49ADA1CA81;
+	Thu,  2 May 2024 05:27:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.160.72.247
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714627002; cv=none; b=edb/Cv1wXeNNTZ5bC060iIywMgVkZ7JzoRNaPOqG1WOCqYVCgLfKUJu2JTL7JuNgjmSD/uN71i7jPoS0St6TRKpjP6rgT5LvggI6Lm0+uMCiuhg8CGS5ktBswy8hEeEXVL6MzR4T0ChHsrQtSkjiojI0eEwVePUjKzqJ9eJtpr0=
+	t=1714627648; cv=none; b=iLcYAgyqKNARERkmNTbUyqIDaH+BuWG3/qBza3c+9n7Xaj/9enKurOEvBphOQ50cnP3gfPDv7te4CHpu0DZWzXi6PD7tMkslQ9yJp1sy35tlw+T3EDOPVQVmlKgJIp/v3UG+VH9MsWTRvkfiLns2QU9CUXfcDwAg7mAZw+zkg14=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714627002; c=relaxed/simple;
-	bh=GNnjqZhf/EV01EZnYcWASg64MdiAwmf42mW2YxPHaxQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bJULcu1GPv2e1JBoddK7ypsOtl4ROr4Utgwme/I1sz6QMOtTSGL+gShFOjHGD0gqy9+lMWU7rKOkyQcB+1Va5xxRChjpH650qmzS19XmIXMEwM/HWA0pUPXkConh8iH1XihGb8AYQAsfsLwgpHb5My+s/S+Xr6oH3rQI7dmI3Gs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=n/Ltc0lD; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21E0AC116B1;
-	Thu,  2 May 2024 05:16:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1714627001;
-	bh=GNnjqZhf/EV01EZnYcWASg64MdiAwmf42mW2YxPHaxQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=n/Ltc0lD8MMsd8O5/eh5TXW5PZfHqV9KLBuGZjvo6R33tnWxmR+z/9MP9vxHhVA8g
-	 I0Wa4wzsBa1ovQutKDic9hDFfKsLPZSJsDrckBwC3qf6PTKLtPZpAqGya4gSrdJjID
-	 nbnaK7T9VUNHG5/UR2ke8Z67NS06BZpI+25yQt8Y=
-Date: Thu, 2 May 2024 07:16:37 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Rengarajan S <rengarajan.s@microchip.com>
-Cc: woojung.huh@microchip.com, UNGLinuxDriver@microchip.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-usb@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v1] lan78xx: Fix crash with multiple device attach
-Message-ID: <2024050224-robust-ramble-7a56@gregkh>
-References: <20240502045748.37627-1-rengarajan.s@microchip.com>
+	s=arc-20240116; t=1714627648; c=relaxed/simple;
+	bh=ftHzH9qvJa3de0MGd82tHpZ8K22GEeMdMaS34WhIAiU=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=hbdwWQwKTsF4fTdG1OiijVO42PWmTK8b0MmHYNoZiY0/u2k5jHRsr1Z3dOC422mv6JJge7kyCvfiY1wQGnP5DzgAAvY8hSzNmL+FCY8oX9+O4lRV2WLDdbmjokS2i0HZgp6FS8eGjTq0D2qm/jlg9oqPNtNzC+9mQViPvCVIfJc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hexdev.de; spf=pass smtp.mailfrom=hexdev.de; dkim=pass (1024-bit key) header.d=fritzc.com header.i=@fritzc.com header.b=UJCR0hkD; arc=none smtp.client-ip=213.160.72.247
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hexdev.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hexdev.de
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=fritzc.com;
+	s=dkim; h=Content-Transfer-Encoding:MIME-Version:Content-Type:References:
+	In-Reply-To:Date:Cc:To:Reply-To:From:Subject:Message-ID:Sender:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=iw9sb5bPm/obi3rgls3+3/4K0A0MuMZb4NR+Kz+bqj0=; b=UJCR0hkDNdfxATyaw5BU3n50vf
+	LphM+CQi668+Gn1auChFaligiaHZoThnzPncO/8TioOmvKhqkIbAUNFTdT1TKvKfRy38ufnVVwoiR
+	JqIZea/fWsEufV4vr/rJVO7A54QkB8nM0dT8OVu7PSUMrMKyl2x5N6JeMPXdnkc8eb6A=;
+Received: from 127.0.0.1
+	by fritzc.com with esmtpsa (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim latest)
+	(envelope-from <christoph.fritz@hexdev.de>)
+	id 1s2OyD-001YZ2-2d;
+	Thu, 02 May 2024 07:27:02 +0200
+Message-ID: <77d0b2c62aad02c7c6f291676673b672ab35528a.camel@hexdev.de>
+Subject: Re: [PATCH 05/11] dt-bindings: net: can: Add serdev LIN bus dt
+ bindings
+From: Christoph Fritz <christoph.fritz@hexdev.de>
+Reply-To: christoph.fritz@hexdev.de
+To: Krzysztof Kozlowski <krzk@kernel.org>, Oliver Hartkopp
+ <socketcan@hartkopp.net>, Marc Kleine-Budde <mkl@pengutronix.de>, Vincent
+ Mailhol <mailhol.vincent@wanadoo.fr>, "David S . Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
+ <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Jiri Kosina <jikos@kernel.org>, Benjamin Tissoires
+ <bentiss@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Jiri
+ Slaby <jirislaby@kernel.org>
+Cc: Andreas Lauser <andreas.lauser@mercedes-benz.com>, Jonathan Corbet
+	 <corbet@lwn.net>, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-input@vger.kernel.org, 
+	linux-serial@vger.kernel.org
+Date: Thu, 02 May 2024 07:26:59 +0200
+In-Reply-To: <784d78a8-3809-4a53-a9f2-7d9682b82c58@kernel.org>
+References: <20240422065114.3185505-1-christoph.fritz@hexdev.de>
+	 <20240422065114.3185505-6-christoph.fritz@hexdev.de>
+	 <784d78a8-3809-4a53-a9f2-7d9682b82c58@kernel.org>
+Organization: hexDEV GmbH
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.46.4-2 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240502045748.37627-1-rengarajan.s@microchip.com>
+Content-Transfer-Encoding: 7bit
 
-On Thu, May 02, 2024 at 10:27:48AM +0530, Rengarajan S wrote:
-> After the first device(MAC + PHY) is attached, the corresponding
-> fixup gets registered and before it is unregistered next device
-> is attached causing the dev pointer of second device to be NULL.
-> Fixed the issue with multiple PHY attach by unregistering PHY
-> at the end of probe. Removed the unregistration during phy_init
-> since the handling has been taken care in probe.
+Hello Krzysztof,
+
+ thanks for your feedback, please see my answers below.
+
+On Mon, 2024-04-22 at 09:54 +0200, Krzysztof Kozlowski wrote:
+> On 22/04/2024 08:51, Christoph Fritz wrote:
+> > Add documentation of device tree bindings for serdev UART LIN-Bus
+> > devices equipped with LIN transceivers.
 > 
-> Fixes: 89b36fb5e532 ("lan78xx: Lan7801 Support for Fixed PHY")
-> Signed-off-by: Rengarajan S <rengarajan.s@microchip.com>
-> ---
+> A nit, subject: drop second/last, redundant "dt bindings". The
+> "dt-bindings" prefix is already stating that these are bindings.
+> See also:
+> https://elixir.bootlin.com/linux/v6.7-rc8/source/Documentation/devicetree/bindings/submitting-patches.rst#L18
+
+OK
+
 > 
->  drivers/net/usb/lan78xx.c | 16 +++++++++-------
->  1 file changed, 9 insertions(+), 7 deletions(-)
+> > 
+> > Signed-off-by: Christoph Fritz <christoph.fritz@hexdev.de>
+> > ---
+> >  .../bindings/net/can/linux,lin-serdev.yaml    | 29 +++++++++++++++++++
+> >  1 file changed, 29 insertions(+)
+> >  create mode 100644 Documentation/devicetree/bindings/net/can/linux,lin-serdev.yaml
+> > 
+> > diff --git a/Documentation/devicetree/bindings/net/can/linux,lin-serdev.yaml b/Documentation/devicetree/bindings/net/can/linux,lin-serdev.yaml
+> > new file mode 100644
+> > index 0000000000000..cb4e932ff249c
+> > --- /dev/null
+> > +++ b/Documentation/devicetree/bindings/net/can/linux,lin-serdev.yaml
+> > @@ -0,0 +1,29 @@
+> > +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> > +%YAML 1.2
+> > +---
+> > +$id: http://devicetree.org/schemas/net/can/linux,lin-serdev.yaml#
+> > +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> > +
+> > +title: Linux serdev LIN-Bus Support
 > 
+> This looks like Linux binding, but we expect here description of hardware.
 
-Hi,
+OK
 
-This is the friendly patch-bot of Greg Kroah-Hartman.  You have sent him
-a patch that has triggered this response.  He used to manually respond
-to these common problems, but in order to save his sanity (he kept
-writing the same thing over and over, yet to different people), I was
-created.  Hopefully you will not take offence and will fix the problem
-in your patch and resubmit it so that it can be accepted into the Linux
-kernel tree.
 
-You are receiving this message because of the following common error(s)
-as indicated below:
+> > +
+> > +description: |
+> > +  LIN-Bus support for UART devices equipped with LIN transceivers,
+> > +  utilizing the Serial Device Bus (serdev) interface.
+> 
+> serdev is Linux thingy, AFAIR. Please describe the hardware.
 
-- You have marked a patch with a "Fixes:" tag for a commit that is in an
-  older released kernel, yet you do not have a cc: stable line in the
-  signed-off-by area at all, which means that the patch will not be
-  applied to any older kernel releases.  To properly fix this, please
-  follow the documented rules in the
-  Documentation/process/stable-kernel-rules.rst file for how to resolve
-  this.
+OK, in v2 it will get changed to:
 
-If you wish to discuss this problem further, or you have questions about
-how to resolve this issue, please feel free to respond to this email and
-Greg will reply once he has dug out from the pending patches received
-from other developers.
+"""
+LIN transceiver, mostly hard-wired to a serial device, used for
+communication on a LIN bus.
+"""
 
-thanks,
+> 
+> > +
+> > +  For more details on an adapter, visit: https://hexdev.de/hexlin#tty
+> > +
+> > +properties:
+> > +  compatible:
+> > +    const: linux,lin-serdev
+> 
+> Feels confusing. Your link describes real hardware, but you wrote
+> bindings for software construct.
+> 
+> If you add this to DT, then it is hard-wired on the board, right?
 
-greg k-h's patch email bot
+Yes, it is hard-wired.
+
+>  If so, how this could be a software construct?
+
+It's not, but fairly generic, that's why I used 'linux,lin-serdev' as
+compatible string. In v2 I'll change it to 'hexdev,lin-serdev'.
+
+> > +
+> > +required:
+> > +  - compatible
+> > +
+> > +examples:
+> > +  - |
+> > +    &uart2 {
+> 
+> & does not make much sense here. I think you wanted it to be serial bus,
+> so serial.
+
+OK
+
+> 
+> > +      status = "okay";
+> 
+> Drop, it was not disabled anywhere.
+
+OK
+
+> 
+> 
+> > +      linbus {
+> > +        compatible = "linux,lin-serdev";
+> > +      };
+> > +    };
+
+Let me address these points, fix warnings from dt_binding_check and
+reroll in v2.
+
+Thanks
+  -- Christoph
+
 
