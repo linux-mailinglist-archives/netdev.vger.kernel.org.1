@@ -1,234 +1,131 @@
-Return-Path: <netdev+bounces-93047-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93048-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64F2A8B9D04
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 17:03:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E89498B9D2C
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 17:17:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E7E5C1F21E68
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 15:03:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A4C64282EEA
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 15:17:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8694156F41;
-	Thu,  2 May 2024 15:03:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B31E715B12F;
+	Thu,  2 May 2024 15:15:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jjwYpEbc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jQILxscN"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f49.google.com (mail-qv1-f49.google.com [209.85.219.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BB70154C15;
-	Thu,  2 May 2024 15:03:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 233F015B121
+	for <netdev@vger.kernel.org>; Thu,  2 May 2024 15:15:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714662195; cv=none; b=jVEBvp6970Jq51+TNhzgc+WIrwqoDmZjjnWpahu3bkpe+MYdTfn7BJqgPw9YsgddWDGw/+LeEOuF9Cn7I5OXlJpoVDcL4P1VwySGY1yC3ebkFcWsujoKZsBZr9c4RmDsEoKSG/tNgWByoIWKN6dFa9v4r0wutI0g9293Sokipfs=
+	t=1714662951; cv=none; b=hKvcSxVf9dZd+83z5XHTD4P5co4HNxiQCg77o/Q/nzR/wRa+XVsY08n0dbL85A81Dm74kpNvv+KaIlnQzVZRWrU+oWra+75sXlbP+EEbEyfcvXmHgfKHRpj+Elp54aeb3v9NXzQeBXb92ab2c9Zu1Xy+QhdQS/hTL4CQ7KGCmW8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714662195; c=relaxed/simple;
-	bh=0/D/3orQyLIxlrLlfuPBXHhZ+OC7Ep+EQJbm8XOpe94=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=FKyJwYtzQIylCBfo15O5uSDSBZHUGjO0TMZTCHyiNfLy4Eun8PxFZY2YeDHDSd00zJqxu1b9LLrIPW/YXnKS3pVHcnVbQc7nXmzkMKWPJbsj5ysmM8L7028D233GCdV8kIIJ5E7vJgxG5jRwgdGK912AeUo8iqAMYLF7OWTuYjc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jjwYpEbc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1DF93C4AF1A;
-	Thu,  2 May 2024 15:03:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714662195;
-	bh=0/D/3orQyLIxlrLlfuPBXHhZ+OC7Ep+EQJbm8XOpe94=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=jjwYpEbcYKt++DFA3dEJjELaJbghgGFNOT+1SqU5w4Ca/kIOSW5LPC508Wr6JW/xJ
-	 Qa13mKDjvobwhq0k6cMrL/nnqDdFnupgocDVebKuEZLkaU4Gv/cPPWVNGGJd7BUsf2
-	 rQ3TBTSTVSN4iI+AJz5VYKUdCDKbNFTWKWZ/67h6SE6EgByvybpC28MJAYOY+rKKS4
-	 wTS+R45kjV9v5Cfv9ZWZphP5JsOAySEUlPuzW+2glyBQdMz9wYnn+FsjMgdkGmAp7x
-	 Z12AlZ4VnLdCJTa/+73roWWbwI5aC3wYHifh0xhurp+0ZvQQCq/zdkBhk3pLt3bvu5
-	 8E1Qj87U+mn8w==
-Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-2e1fa824504so9252041fa.0;
-        Thu, 02 May 2024 08:03:15 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCUkqbzfXUGL8b9ZwHC02XOZOLpZGAbnb6MOOVX5EFQeI3gUuOInjPV3Q3PW/RWUYOqCQy5/zzfXQiCw2dJvmtwxQipatSJnvir0DFyCLBkXBrp9p8/LX2XxRgphtsVNJQU8J+Sq6BgT1fIsBcPxqoME21+TXfqN/kCFxioDa0t6VLOL4uKT7Zg55/beI1hFKx34R7J7FPxb3yKc0x6NEGqdAhG9OYPGoN3/f9Qdog9rl+q0KlDRAjF4
-X-Gm-Message-State: AOJu0YzW8CEups6a96c+SOkL+RuUhLdUF076wHFRW2p6drN9jkLlq/dG
-	pxdKhUCOFXKutWKvOxBAf7uzv4FwhzyxT74EGmWqDvXXetZWcXhJuH2Yfc8Q4eQsZT2pOHAcQ0C
-	2yxZo4NaycUgDcLq9lOQWtenq1A==
-X-Google-Smtp-Source: AGHT+IGES7kDbfk0VUx7WlN+rqE+2KtZ3O8wqcOG/0tlTyJbKym9ll1q8hr3CrUhSN2mTjRc2qgzAnvzqQtLGFf5DGo=
-X-Received: by 2002:a2e:9ccc:0:b0:2e1:e795:3f81 with SMTP id
- g12-20020a2e9ccc000000b002e1e7953f81mr1275404ljj.44.1714662193358; Thu, 02
- May 2024 08:03:13 -0700 (PDT)
+	s=arc-20240116; t=1714662951; c=relaxed/simple;
+	bh=JlTUUiHevTXw/hebNrKMCm5Tx+aVo9rledCnaIiL+8Q=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=Yy/UX636PL11o7IlpYWs5AimCNQVpd9r6S293fdYcWQdP4w+21WXdrIeGGvtDGsk+UFhO6B1TEp0CsfM/TDxEtTBOXQqQ9gv/GcoXuGJaeJdRsVY2kM4QT3PcAlg9VlXODPaqkoUDuomnvlp0GgrzM29wHCm3CMwhj7EO23iSsM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jQILxscN; arc=none smtp.client-ip=209.85.219.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f49.google.com with SMTP id 6a1803df08f44-69b5ece41dfso32593216d6.2
+        for <netdev@vger.kernel.org>; Thu, 02 May 2024 08:15:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1714662949; x=1715267749; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=aq+4ohb/iZ/uObPNthuWUi/W5Wh7VEBKDTGjjvxBauk=;
+        b=jQILxscNHw6G7Lxt1qf45n+3hZMDe6Fn3zLNFG6w1dO5TUtuqOmg1NIIR8jf7FcfX3
+         BkuLZMAFHHwh2H3S3eKo9Mt4Ww4yERkkxEgMrXFqo++QobLjiZOI736Z0gUDvsQ05ZKi
+         uzVUQYflJTYJMReq+x+ADHmvCUOMY+ST3HteWBleFcRUXbos9ze+jt94QD5Yaolpk4PY
+         u9gQmLBDgKkx0+LaKkLN27UwoVZgFrxnvPZHA8MEh2AN8wsXqJwUJFc2qAABzG6vd4zA
+         enU0b55A0YSNshrcB2l7h+ia6+4maENEIYisZXQiCRepY1DAYc7uTCvup+8V8lry/K5w
+         yMXg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714662949; x=1715267749;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=aq+4ohb/iZ/uObPNthuWUi/W5Wh7VEBKDTGjjvxBauk=;
+        b=UOm/6p2hG6R2nAT0bu8Fsp1u9Pz/TIAqkwlgsYlyDcsikOVetG46h0o1IXQkcTElDU
+         OJx4qrEBxj1dPPTvvPEVmgLJA21khzHcsNdzaTgtKk5XZdOvEUrHEPufxysa7SltLO0L
+         VydCtNFepUXMlUluiCECoWw1dS+ebn1XMekNJf4o4nCiB2hUEs5Cv9850Cf4g7MsxZe6
+         ea2/mNCKtIESy1TeRC7HA/1OUuqoFy1nEjm1LcZ9feILfv8Xq9X/qFAuQnnVgotgoSUT
+         O3+38inaikJhUZmPYre+m9mL7OaVcDV+MWHdaMxMWYGLLWkDjtGL0AQ7Wy44Dg4q3nNo
+         X1uQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXMAOGM7Izy+XV7EiX7Vu3Lf3ST14lB6eMcQgjOvmFBUXGp1eaC84kdQXCBeIXP77Xauvu7+RylrWPNllvqtoU9G0e7UMgA
+X-Gm-Message-State: AOJu0YzeWCtjy5tpQiWyibQPjZVIc2m0jRjzT+XI9WTTEarkx5zd90dl
+	uOEe7DeRCTUDCVzGFk/3PuenFHhkLjcb1uAPteBt4EjIhQdk2OQR
+X-Google-Smtp-Source: AGHT+IEUkOzJJVcMjfk4x+jWvKxdu7NuZlOHa+8Wcp4inomZG92ymZG01krR+BS1Rwcc6tOcs6tfPQ==
+X-Received: by 2002:a05:6214:212c:b0:6a0:cbeb:c5c0 with SMTP id r12-20020a056214212c00b006a0cbebc5c0mr7962451qvc.55.1714662948958;
+        Thu, 02 May 2024 08:15:48 -0700 (PDT)
+Received: from localhost (164.146.150.34.bc.googleusercontent.com. [34.150.146.164])
+        by smtp.gmail.com with ESMTPSA id r10-20020a0cf60a000000b0069b61f8c0a1sm423348qvm.42.2024.05.02.08.15.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 May 2024 08:15:48 -0700 (PDT)
+Date: Thu, 02 May 2024 11:15:48 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Shailend Chand <shailend@google.com>, 
+ netdev@vger.kernel.org
+Cc: almasrymina@google.com, 
+ davem@davemloft.net, 
+ edumazet@google.com, 
+ hramamurthy@google.com, 
+ jeroendb@google.com, 
+ kuba@kernel.org, 
+ pabeni@redhat.com, 
+ pkaligineedi@google.com, 
+ rushilg@google.com, 
+ willemb@google.com, 
+ ziweixiao@google.com, 
+ Shailend Chand <shailend@google.com>
+Message-ID: <6633ae24535a9_39851d29434@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20240501232549.1327174-1-shailend@google.com>
+References: <20240501232549.1327174-1-shailend@google.com>
+Subject: Re: [PATCH net-next v2 00/10] gve: Implement queue api
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20240502075534.882628-1-christoph.fritz@hexdev.de>
- <20240502075534.882628-7-christoph.fritz@hexdev.de> <171464227142.1356329.4931419696225319861.robh@kernel.org>
- <48c55b05dae4628d4e811178bfd5e855ac93ee77.camel@hexdev.de>
-In-Reply-To: <48c55b05dae4628d4e811178bfd5e855ac93ee77.camel@hexdev.de>
-From: Rob Herring <robh@kernel.org>
-Date: Thu, 2 May 2024 10:03:01 -0500
-X-Gmail-Original-Message-ID: <CAL_JsqK0__mzwNHuq4enJ3uvQTNWGYyk=TGYnnFX8kLDoGuNeQ@mail.gmail.com>
-Message-ID: <CAL_JsqK0__mzwNHuq4enJ3uvQTNWGYyk=TGYnnFX8kLDoGuNeQ@mail.gmail.com>
-Subject: Re: [PATCH v2 06/12] dt-bindings: net/can: Add serial (serdev) LIN adapter
-To: christoph.fritz@hexdev.de
-Cc: Krzysztof Kozlowski <krzk+dt@kernel.org>, Sebastian Reichel <sre@kernel.org>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, linux-serial@vger.kernel.org, 
-	Linus Walleij <linus.walleij@linaro.org>, Jiri Kosina <jikos@kernel.org>, 
-	Jiri Slaby <jirislaby@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Andreas Lauser <andreas.lauser@mercedes-benz.com>, Marc Kleine-Budde <mkl@pengutronix.de>, 
-	Benjamin Tissoires <bentiss@kernel.org>, devicetree@vger.kernel.org, 
-	Eric Dumazet <edumazet@google.com>, Jonathan Corbet <corbet@lwn.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>, Paolo Abeni <pabeni@redhat.com>, 
-	linux-can@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-input@vger.kernel.org, Pavel Pisa <pisa@cmp.felk.cvut.cz>, 
-	Oliver Hartkopp <socketcan@hartkopp.net>, "David S . Miller" <davem@davemloft.net>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, May 2, 2024 at 6:03=E2=80=AFAM Christoph Fritz
-<christoph.fritz@hexdev.de> wrote:
->
-> On Thu, 2024-05-02 at 04:31 -0500, Rob Herring (Arm) wrote:
-> > On Thu, 02 May 2024 09:55:28 +0200, Christoph Fritz wrote:
-> > > This patch adds dt-bindings for serial LIN bus adapters. These adapte=
-rs are
-> > > basically just LIN transceivers that get hard-wired with serial devic=
-es.
-> > >
-> > > Signed-off-by: Christoph Fritz <christoph.fritz@hexdev.de>
-> > > ---
-> > >  .../bindings/net/can/hexdev,lin-serdev.yaml   | 32 +++++++++++++++++=
-++
-> > >  1 file changed, 32 insertions(+)
-> > >  create mode 100644 Documentation/devicetree/bindings/net/can/hexdev,=
-lin-serdev.yaml
-> > >
-> >
-> > My bot found errors running 'make dt_binding_check' on your patch:
-> >
-> > yamllint warnings/errors:
-> >
-> > dtschema/dtc warnings/errors:
-> > Documentation/devicetree/bindings/net/can/hexdev,lin-serdev.example.dtb=
-: /example-0/serial/linbus: failed to match any schema with compatible: ['l=
-inux,lin-serdev']
->
-> Yes, that's obviously still false and will be fixed in v3.
->
-> >
-> > doc reference errors (make refcheckdocs):
-> >
-> > See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/2024=
-0502075534.882628-7-christoph.fritz@hexdev.de
-> >
-> > The base for the series is generally the latest rc1. A different depend=
-ency
-> > should be noted in *this* patch.
-> >
-> > If you already ran 'make dt_binding_check' and didn't see the above
-> > error(s), then make sure 'yamllint' is installed and dt-schema is up to
-> > date:
-> >
-> > pip3 install dtschema --upgrade
-> >
-> > Please check and re-submit after running the above command yourself. No=
-te
-> > that DT_SCHEMA_FILES can be set to your schema file to speed up checkin=
-g
-> > your schema. However, it must be unset to test all examples with your s=
-chema.
-> >
->
-> I'm wondering why my local run of dt_binding_check does not catch this:
->
-> $ pip3 install dtschema --upgrade
-> Requirement already satisfied: dtschema in ./venv/lib/python3.11/site-pac=
-kages (2024.4)
-> Requirement already satisfied: ruamel.yaml>0.15.69 in ./venv/lib/python3.=
-11/site-packages (from dtschema) (0.18.6)
-> Requirement already satisfied: jsonschema<4.18,>=3D4.1.2 in ./venv/lib/py=
-thon3.11/site-packages (from dtschema) (4.17.3)
-> Requirement already satisfied: rfc3987 in ./venv/lib/python3.11/site-pack=
-ages (from dtschema) (1.3.8)
-> Requirement already satisfied: pylibfdt in ./venv/lib/python3.11/site-pac=
-kages (from dtschema) (1.7.0.post1)
-> Requirement already satisfied: attrs>=3D17.4.0 in ./venv/lib/python3.11/s=
-ite-packages (from jsonschema<4.18,>=3D4.1.2->dtschema) (23.2.0)
-> Requirement already satisfied: pyrsistent!=3D0.17.0,!=3D0.17.1,!=3D0.17.2=
-,>=3D0.14.0 in ./venv/lib/python3.11/site-packages (from jsonschema<4.18,>=
-=3D4.1.2->dtschema) (0.20.0)
-> Requirement already satisfied: ruamel.yaml.clib>=3D0.2.7 in ./venv/lib/py=
-thon3.11/site-packages (from ruamel.yaml>0.15.69->dtschema) (0.2.8)
->
-> $ git diff
-> diff --git a/Documentation/devicetree/bindings/net/can/hexdev,lin-serdev.=
-yaml b/Documentation/devicetree/bindings/net/can/hexdev,lin-serdev.yaml
-> index c178eb9be1391..385cbe132258d 100644
-> --- a/Documentation/devicetree/bindings/net/can/hexdev,lin-serdev.yaml
-> +++ b/Documentation/devicetree/bindings/net/can/hexdev,lin-serdev.yaml
-> @@ -27,6 +27,6 @@ examples:
->    - |
->      serial {
->          linbus {
-> -            compatible =3D "hexdev,lin-serdev";
-> +            compatible =3D "linux,lin-serdev";
->          };
->      };
->
-> $ make dt_binding_check DT_SCHEMA_FILES=3DDocumentation/devicetree/bindin=
-gs/net/can/hexdev,lin-serdev.yaml
->   HOSTCC  scripts/basic/fixdep
->   HOSTCC  scripts/dtc/dtc.o
->   HOSTCC  scripts/dtc/flattree.o
->   HOSTCC  scripts/dtc/fstree.o
->   HOSTCC  scripts/dtc/data.o
->   HOSTCC  scripts/dtc/livetree.o
->   HOSTCC  scripts/dtc/treesource.o
->   HOSTCC  scripts/dtc/srcpos.o
->   HOSTCC  scripts/dtc/checks.o
->   HOSTCC  scripts/dtc/util.o
->   LEX     scripts/dtc/dtc-lexer.lex.c
->   YACC    scripts/dtc/dtc-parser.tab.[ch]
->   HOSTCC  scripts/dtc/dtc-lexer.lex.o
->   HOSTCC  scripts/dtc/dtc-parser.tab.o
->   HOSTLD  scripts/dtc/dtc
->   HOSTCC  scripts/dtc/libfdt/fdt.o
->   HOSTCC  scripts/dtc/libfdt/fdt_ro.o
->   HOSTCC  scripts/dtc/libfdt/fdt_wip.o
->   HOSTCC  scripts/dtc/libfdt/fdt_sw.o
->   HOSTCC  scripts/dtc/libfdt/fdt_rw.o
->   HOSTCC  scripts/dtc/libfdt/fdt_strerror.o
->   HOSTCC  scripts/dtc/libfdt/fdt_empty_tree.o
->   HOSTCC  scripts/dtc/libfdt/fdt_addresses.o
->   HOSTCC  scripts/dtc/libfdt/fdt_overlay.o
->   HOSTCC  scripts/dtc/fdtoverlay.o
->   HOSTLD  scripts/dtc/fdtoverlay
->   LINT    Documentation/devicetree/bindings
->   CHKDT   Documentation/devicetree/bindings/processed-schema.json
->   SCHEMA  Documentation/devicetree/bindings/processed-schema.json
-> /home/ch/linux/Documentation/devicetree/bindings/pci/brcm,stb-pcie.yaml: =
-ignoring, error in schema: properties: brcm,tperst-clk-ms: type
-> /home/ch/linux/Documentation/devicetree/bindings/hwmon/microchip,emc2305.=
-yaml: ignoring, error in schema: properties: emcs205,max-state: description
->   DTEX    Documentation/devicetree/bindings/net/can/hexdev,lin-serdev.exa=
-mple.dts
->   DTC_CHK Documentation/devicetree/bindings/net/can/hexdev,lin-serdev.exa=
-mple.dtb
->
-> Any ideas?
->
-> I'm using a python venv here, maybe this is related?
+Shailend Chand wrote:
+> Following the discussion on
+> https://patchwork.kernel.org/project/linux-media/patch/20240305020153.2787423-2-almasrymina@google.com/,
+> the queue api defined by Mina is implemented for gve.
+> 
+> The first patch is just Mina's introduction of the api. The rest of the
+> patches make surgical changes in gve to enable it to work correctly with
+> only a subset of queues present (thus far it had assumed that either all
+> queues are up or all are down). The final patch has the api
+> implementation.
+> 
+> Changes since v1: clang warning fixes, kdoc warning fix, and addressed
+> review comments.
+> 
+> Mina Almasry (1):
+>   queue_api: define queue api
+> 
+> Shailend Chand (9):
+>   gve: Make the GQ RX free queue funcs idempotent
+>   gve: Add adminq funcs to add/remove a single Rx queue
+>   gve: Make gve_turn(up|down) ignore stopped queues
+>   gve: Make gve_turnup work for nonempty queues
+>   gve: Avoid rescheduling napi if on wrong cpu
+>   gve: Reset Rx ring state in the ring-stop funcs
+>   gve: Account for stopped queues when reading NIC stats
+>   gve: Alloc and free QPLs with the rings
+>   gve: Implement queue api
 
-No. There are 2 possibilities. What kernel version are you on? This
-check is enabled with the '-m' option on dt-validate which was only
-recently (6.9) enabled by default for the bindings. You can enable it
-with 'DT_CHECKER_FLAGS=3D"-m"'. The other possibility is I noticed that
-the flag has an interaction with DT_SCHEMA_FILES in that we don't set
-the flag by default if DT_SCHEMA_FILES is set. (If you explicitly set
-DT_CHECKER_FLAGS in the newer kernels it should still give the
-warning.)  I think we don't enable it because you would get false
-positives if your example has compatible strings not documented within
-the schema you are testing. I need to double check that as how the
-tools work in this regard has evolved. In any case, DT_SCHEMA_FILES is
-a shortcut and it is always possible your changes can introduce
-warnings in other examples, so ultimately "make dt_binding_check" has
-to be run without DT_SCHEMA_FILES set.
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 
-Rob
+That QPLS alloc reorg is a great simplification. Nice bonus.
 
