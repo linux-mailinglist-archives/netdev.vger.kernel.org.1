@@ -1,80 +1,106 @@
-Return-Path: <netdev+bounces-93110-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93111-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 926298BA136
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 22:00:55 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C9D68BA13F
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 22:01:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4C0252842CA
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 20:00:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B6744B21193
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 20:01:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 718D91802C5;
-	Thu,  2 May 2024 20:00:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99939180A76;
+	Thu,  2 May 2024 20:01:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DQx5ssaY"
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="Xu2xQqpE"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mout.web.de (mout.web.de [212.227.15.3])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A28C1802BF
-	for <netdev@vger.kernel.org>; Thu,  2 May 2024 20:00:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B7661802BE;
+	Thu,  2 May 2024 20:01:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.3
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714680051; cv=none; b=tC3I/TJOa8lrh9rbdBO72j2jh/etduR+cUrdAXi/abIBvf7621ou0FBYA6OEnyCEQnGWE9BGkqm2imT9MpsFOZ2cEywis9WsGjRGDtjVv1K3qN37ULakoudmWJ2KQNRdMFV1hA9B35AkYL/FXe9W2H2YCLWqSM7l2ijz2wd6Is0=
+	t=1714680095; cv=none; b=m/V8HIFnGFc2AlzjL0VJm3nlTWDP1N2jA9VZRvUsYnh30u5uBTPhtTAY0Q0j3NdDO3AiKHTEyV9fEq0ofHt4kQqNS8vygK/G5pH2M29CrpZy4itqs4EjBbScV85igkgQzEgzf2/0EUTBMRvVoxmPjJm7zXPUvbrgPCLM/o5QNtg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714680051; c=relaxed/simple;
-	bh=EKnSSn/byRe7FzO1Hjae/gt+i3LHDiGM8Y5G2lt8frk=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type; b=tjGpuSUa+iDLEfwyPFQ8JZDKrrj13v++gCXsnbJyc2tN2Wn4ftMywPa7N/oCRHnU0u3vaiQC91m0Wvee3XXWfHqsTGseDREthDgCQ8+3tsD2nHQJ+r9bonfqnOK+eFuHcFbaeyDBRqFGP6yUIqvx46lmI+Nqh1k11uQiubygN1I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DQx5ssaY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B5732C113CC;
-	Thu,  2 May 2024 20:00:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714680050;
-	bh=EKnSSn/byRe7FzO1Hjae/gt+i3LHDiGM8Y5G2lt8frk=;
-	h=Date:From:To:Subject:From;
-	b=DQx5ssaYQfCwmBacGGhQSsWxnAwzjwDgqnKKHc/NhzzbWH5qmKSCS6685YdcEkiZj
-	 ryGkoPpKD2NWARE8VBvByrmg8PZduyQKotQx8BlgLO+p/MrUtvWe1Y4uNyE7Ca3gek
-	 YY+W5lGWr0/+Zb50aSKS0GHv+CaA84FBhDrRS9M86PkfNoYXzgvh0axF4cEQXKKVEb
-	 RmVKpHVy9mls9JV8nhW3nIEYow4yT9HgXGqmmRnjQvqgp1IdfdXEadUQpclXj+I5rX
-	 d8ccMqG6HfVemiYXodGf5QhfNcvgMyxN+VXnoLaoYi15ZFVp1sC3kW993j4JWWWeez
-	 XH0xokZMMGSGw==
-Date: Thu, 2 May 2024 13:00:49 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Taehee Yoo <ap420073@gmail.com>, netdev@vger.kernel.org
-Subject: [TEST] amt.sh crashes smcrouted
-Message-ID: <20240502130049.46be401e@kernel.org>
+	s=arc-20240116; t=1714680095; c=relaxed/simple;
+	bh=EM9PQ0+jpznznKXXf9DM0GjqB6Lbm2/vk2ex+XeL0sw=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
+	 In-Reply-To:Content-Type; b=MKeic+HqBM5lLz0EO88zKiODorer3hP1E+X/iP8oafc2wR1LNd8ZYe82G/GNLXKaQ/b8gL4YhT5DVdvTDMChSqaB7kJBdAG/kwmeOP1Z88u2emzAUQnas5G70UmjtSrX18c+2kPOD2uq1voBD2ERvNsaSz2wyUEPkeHuU9ohjkI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=Xu2xQqpE; arc=none smtp.client-ip=212.227.15.3
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
+	s=s29768273; t=1714680065; x=1715284865; i=markus.elfring@web.de;
+	bh=EM9PQ0+jpznznKXXf9DM0GjqB6Lbm2/vk2ex+XeL0sw=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:References:
+	 Subject:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:
+	 cc:content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=Xu2xQqpEWCvUFCbbW0roNkMalj80dV3TYsg0xyiKFP/JnQYofxDKQ4Nkv/iFpcaT
+	 /+N5UUT1wn+5rhDlk2emkj3qhf283y/kN0cja5LFmNGISFk0cxGgKisrZPDKHWcxG
+	 7PNZaEW+4D/krASG8hil4VBsfQX01qZoyhrY/LhKuM1cwUQRh1Vhf9yaitPo7bHHt
+	 OE5hWg4w+VcRseB/2UNCZOSbxiBkGmuvlP2+YsKHEZlXIxbQ6b9dUnYG0lMH9u63H
+	 JbuK7Bay9IYV8R7YrJJUazCE64+fZLgQ1N7RJBpO/97yS7Zy/FT8TfWpm5d6WwZbk
+	 DuoGw3mFmW1zX6UZSA==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.21] ([94.31.83.95]) by smtp.web.de (mrweb005
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 1Mx0N5-1sqBGl3q8p-01319C; Thu, 02
+ May 2024 22:01:04 +0200
+Message-ID: <068b6038-d784-451b-b43b-41b94c24fb29@web.de>
+Date: Thu, 2 May 2024 22:01:00 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+To: Duoming Zhou <duoming@zju.edu.cn>, linux-hams@vger.kernel.org,
+ netdev@vger.kernel.org, kernel-janitors@vger.kernel.org,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, =?UTF-8?Q?J=C3=B6rg_Reuter?=
+ <jreuter@yaina.de>, Paolo Abeni <pabeni@redhat.com>
+Cc: LKML <linux-kernel@vger.kernel.org>,
+ Dan Carpenter <dan.carpenter@linaro.org>,
+ Lars Kellogg-Stedman <lars@oddbit.com>
+References: <cover.1714660565.git.duoming@zju.edu.cn>
+Subject: Re: [PATCH net 0/2] ax25: fix reference counting issue of ax25_dev
+Content-Language: en-GB
+From: Markus Elfring <Markus.Elfring@web.de>
+In-Reply-To: <cover.1714660565.git.duoming@zju.edu.cn>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-Provags-ID: V03:K1:mvbvX8/mivlMFaAOxEjDeoSrVy3J7goo3lJNTbo3VA2LZdwh5O0
+ 6y0nBDxB48mgLVjPdzWMBrmCgLJ9yDEl3HLkYS2IepAhtnMLc2ocQogu9oPp3mkTwgtCJdo
+ KdkG6PTkS7YPrP4x/RCmQgs2lRfW9rnm7hZlniNr5pfSv3+B6AoanvPUDF9WZFVECuyQQqe
+ tFVP0+JVRPUK8LiqtFHEw==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:JBpLSAZ04ic=;LgKLxYkfMEg6PdZW/tP4hxW9kYL
+ miSii5dpI48R17cNPTXQswm4nIUlSIs/JFJHlBlaAKj3Bc8VEdHH1JJZ+S1x5tFBDdOhbuOhG
+ s+pAUetGdKFCSbIjrtzzMsxYaAfiAuEsQh+enKuObKstyVyd1Aveb9sPa0MvDICxCIqVv2G4i
+ FpuYkU8O7jGbpwzAs+QmKkINKkdsxH3KfVnJ89Wr7bRHf9x9/vL+UTFLJKSxpqqcJwplli4Wb
+ E3Y0yyq0SODl2LEX5F3v97mGoUE48GadH5R4VcQHwjmmHos9QakEa3J4Bfbh40Xfjma6gLkMB
+ oETiO1zqIiUxkL3F7ZTtWMs9gybsIaCBORiK5QcCUCz87IqpedMJDMnDLWs5/RIb5wpJ2v0fh
+ 2oLktCqJG6loroEazfLkIw52J0sbwZKcaQ5n1iHd42z8f4fOfIW5zcQcE4qpto6lzJq44MkZK
+ CUwmNCwbPSZRCYuJG+P/F7ggtWm7uvyGWgZkYAAaNjmphFBgZq8BlBQFrgEwwYc8AbMKfKIT6
+ dsP6XXpnx0anbsFnhPi3nnlDQ5AccCPB5z6nxIUS8HnFLJ6xX63I1NPHIQ6R1E60rNFKMPhiA
+ L32auVtE2AixCKZVWJLIAFEoeLevPu6ex2dPb1bNKnkWGCsicIR0je9NXofgH2zdAlUitFjFk
+ zx+YaCBl6TrfPnOBIZj0xsjDRj+1W8S/5vIItMV2tkwKM/NTBCN+57IJ4izF4xE8rJbNeFFEg
+ 0ezIxXlEmaC7IXlWzPc7aM2AP9DHcxTriq/yAMv603EBkLLA8533w0B7KUAIwmFEmnWGLKviK
+ DIKr28TIKwCZgdDfwuDCPchNyxHm53cwq5PsLH2UmmTf0=
 
-Hi Taehee Yoo!
+> The first patch changes kfree in ax25_dev_free to ax25_dev_free,
 
-We started running amt tests in the netdev CI, and it looks like it
-hangs - or at least it doesn't produce any output for long enough
-for the test runner to think it hung.
+I find this description confusing.
+Would you like to refer to a ax25_dev_put() call?
 
-While looking at the logs, however, I see:
 
-[    3.361660] smcrouted[294]: segfault at 7fff480c95f3 ip 00000000004034e4 sp 00007fff480b9410 error 6 in smcrouted[402000+a000] likely on CPU 3 (core 3, socket 0)
-[    3.361812] Code: 74 24 38 89 ef e8 4c 33 00 00 44 0f b7 f8 66 39 84 24 e2 01 00 00 75 09 45 85 ed 0f 85 ed 01 00 00 48 8b 44 24 38 0f b6 40 33 <42> 88 84 3c e4 01 00 00 48 8b 3b 48 8d 54 24 38 48 8d 74 24 50 e8
+> because the ax25_dev is managed by reference counting.
 
-https://netdev-3.bots.linux.dev/vmksft-net/results/577882/4-amt-sh/
+How do you think about to link also to previous change approaches?
 
-So I think the cause may be a bug in smcroute.
-
-We use smcroute build from latest git
-# cd smcroute/
-# git log -1 --oneline
-cd25930 .github: use same CFLAGS for both configure runs
-# smcroute -v
-SMCRoute v2.5.6
-
-Could you check if you can repro this crash?
+Regards,
+Markus
 
