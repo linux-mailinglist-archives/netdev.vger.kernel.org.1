@@ -1,115 +1,120 @@
-Return-Path: <netdev+bounces-92917-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92918-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D228C8B9520
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 09:18:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 439748B956C
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 09:41:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 712E81F21DF3
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 07:18:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D78911F2222B
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 07:41:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83E61219E0;
-	Thu,  2 May 2024 07:17:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 354B8224F2;
+	Thu,  2 May 2024 07:41:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gN+fT53I"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QOPykL09"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52EF72032D;
-	Thu,  2 May 2024 07:17:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89D3221A0B
+	for <netdev@vger.kernel.org>; Thu,  2 May 2024 07:41:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714634279; cv=none; b=sgaDy/vYPD9y9YEdpBaVqON1hXWY6ktlRtIjgLMBbRbntAWHWpGl1ECy9+J1Ly0s/bXgEEtY0abSXy4Z13LtpkbTiuOApq4D4dFd5ZCWW/ACYTmRa3EWZy9wZXh3luCa/iuot6ceSxHVsW4Vby9SzvEeDzY7GcCAV28kslQvTTg=
+	t=1714635699; cv=none; b=APEu8VudaKZvTaXTTnEJgkSHKckrzsb4ClLsIXMRJi25xlk2VbCfsET7kkre/VVOHJ4NRaCkhwb6UxBy0UH3GExelC231UsPUd3SeKCaXSvQ/37rPcOWHbKUpeu35cULh5GrNk/vVkQ3xHynEFdMT+6fXShFjmVwus1ynMjthEo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714634279; c=relaxed/simple;
-	bh=GKVkaZSZdTJ1ZSoNC/bu+eyVkUGbSrKVfeyYCZywwhI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UwJk2RL9E8cV0kqjL345xvbDJcH6erC0JQHo+gCNGnhCzd/TBHkDsXsc6W7pWx6aDvxzo1LaQIFI/9x+nFlS1wI4g2ldev8UJSPkMNJuMkrA6OkyIWE+e/rfjsvAmKLz5WJG/M6tceIaPieUZVwaizvb6XtUBKxE8iRGNTycWgg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gN+fT53I; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE876C116B1;
-	Thu,  2 May 2024 07:17:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714634278;
-	bh=GKVkaZSZdTJ1ZSoNC/bu+eyVkUGbSrKVfeyYCZywwhI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=gN+fT53IhX0Um7069irc19JXE58aEy2S2UWaqUw+4RquL2cNYVSw8NnDyNSt+/yq7
-	 F/AtBIjOL8QdKS/SJfK4wb2Tiqlv1kA7W+itZZQhzAVXQUF1jZ87+a97p6yyfbYSmp
-	 SEm8GU845LER13PopJEqEJ5PJ92kgATndYi7/Rr4zDNQLNktsjc+UhLttMDOs5BB91
-	 sCyGQRhYzZ0hztg6Y4tuZooxP5raHEqzAZkuxJbw4zjaMfDDwH4t96tX2vbkZnc5Ez
-	 ceZ5q+HJhFxrFicUxbTUqEb65vWKu0YAZthBK/bXmC3WV7HH+hguLDZhWXzbFSWwsi
-	 EHQL/Tyom4JSw==
-Date: Thu, 2 May 2024 08:17:51 +0100
-From: Lee Jones <lee@kernel.org>
-To: Florian Fainelli <florian.fainelli@broadcom.com>
-Cc: Andy Shevchenko <andy.shevchenko@gmail.com>,
-	linux-kernel@vger.kernel.org,
-	Jarkko Nikula <jarkko.nikula@linux.intel.com>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Mika Westerberg <mika.westerberg@linux.intel.com>,
-	Jan Dabros <jsd@semihalf.com>, Andi Shyti <andi.shyti@kernel.org>,
-	Jiawen Wu <jiawenwu@trustnetic.com>,
-	Mengyuan Lou <mengyuanlou@net-swift.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Duanqiang Wen <duanqiangwen@net-swift.com>,
-	"open list:SYNOPSYS DESIGNWARE I2C DRIVER" <linux-i2c@vger.kernel.org>,
-	"open list:WANGXUN ETHERNET DRIVER" <netdev@vger.kernel.org>
-Subject: Re: [PATCH 2/4] mfd: intel-lpss: Utilize i2c-designware.h
-Message-ID: <20240502071751.GA5338@google.com>
-References: <20240423233622.1494708-1-florian.fainelli@broadcom.com>
- <20240423233622.1494708-3-florian.fainelli@broadcom.com>
- <ZihLhl8eLC1ntJZK@surfacebook.localdomain>
- <1d1467d1-b57b-4cc6-a995-4068d6741a73@broadcom.com>
+	s=arc-20240116; t=1714635699; c=relaxed/simple;
+	bh=CV4cfa2c8EMFmCYMTH/lmrbEzknrxdfD0O54OpokceM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=KNDTvbFezjmY0S83y9WBzarQaY6fYU+0pSfAlzHtc21q506AkbjknyyrMBaOqCe285qZGJt0TAJy7tdnz98TBh4Rs3cxvieYiIiIRPzItLj4BePLjfB1PSxancZUALdoIwTfld/xh3R/ZmvmOHrIf4cAQWARa+IE3+OXNGArAAE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QOPykL09; arc=none smtp.client-ip=209.85.208.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-5724736770cso5289a12.1
+        for <netdev@vger.kernel.org>; Thu, 02 May 2024 00:41:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1714635696; x=1715240496; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CV4cfa2c8EMFmCYMTH/lmrbEzknrxdfD0O54OpokceM=;
+        b=QOPykL09iAVLCKvgp6na88Qk6n9y4CbdtNNv4ufbzIl8etYuNvISrWQ5jKUNnyudT6
+         8BHMSWIiL3OSmdpp4TRnMzXDbcSA9olyeATMn8U1hC0s5fZDBADypQCYF96brEc1lCs3
+         o1Yt9X+TkiKBsSzE49rtrQLd9m7vlpI/17qDZw1TGtiQp9xTSuOEoLMZsMPdO6oD9OtZ
+         k5rxp6hDrvz6qe4xgNsT5hE2PsYUhg6xQplTw6Ul9PBLh1fXdTAap6NgDXcBQOLV1wqF
+         pXbidPdXfxrzx/rHbQ2TkVuJHOFcnPDIEEoZXo03OUzbLHyW0WNCzU9EDnOlCmSr4FFj
+         axZg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714635696; x=1715240496;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=CV4cfa2c8EMFmCYMTH/lmrbEzknrxdfD0O54OpokceM=;
+        b=FHD7MxZDZXA9fkgjQX29zjw+6J/b1zMGaTFX6GkTNQDU2ybtUnpwJGXPiSjzDo2ETi
+         V2m79nmuFWP5OwR+4+5KeeqwGKWnwpYnKmLEI93KzONEHKGDqC4wYMGhf2MStszLpLky
+         Jjz9PsJUy2saafmPWCOS+sXGiyKzmbBpxIW50UbzQfhLmL56RlAWPt5aeugWPSqOyBWj
+         Q6AvoeLCfqkwUv4FRBCPqjlMktq15TWUVdwLscrgYv9bnFyxcpjX5YWzaCGJKk3lHeNP
+         fZoV1ZZqtKVyxMNdTAfVaqitRWGu/hec+L0FIh3a4X3/yQ8d/wh3JujFGft63GjHf7+H
+         D+Gw==
+X-Forwarded-Encrypted: i=1; AJvYcCXM0GxMf6E6RYX58hY06QyelC/PDzqsVPicH3//Hu8LroQmIoiOy1+JBAWazioDQjbzM1D3vTp8j+mHzgoIhd6qYLECCrWX
+X-Gm-Message-State: AOJu0YxesOSCyJ+HdsAuFrEIjAuWhVVFp49Lp4dpcjKkTxQuBfLZsziB
+	2LOSwyM9GaBMQ9dtGx0JKBjkrWXSfl7x4mNSFC9ZQYh/T5HfImd3Tey/oRGTZmK45/Lm5djau/t
+	jcZfyVFWdsKYb7rUYUtmOIGvcMp+MlANJpTu4
+X-Google-Smtp-Source: AGHT+IHEAdG1LfYqwb2l5V62E1dx46Al+tJT3V7Fgf9XyViitIVcqArPzUPly5iuK/iUUNN6Mq93tjK06T053q6Zz+I=
+X-Received: by 2002:aa7:df0d:0:b0:572:7d63:d7ee with SMTP id
+ 4fb4d7f45d1cf-572bba0be07mr153019a12.4.1714635695622; Thu, 02 May 2024
+ 00:41:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <1d1467d1-b57b-4cc6-a995-4068d6741a73@broadcom.com>
+References: <20240501213145.62261-1-kuniyu@amazon.com>
+In-Reply-To: <20240501213145.62261-1-kuniyu@amazon.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 2 May 2024 09:41:22 +0200
+Message-ID: <CANn89iJhhUqg-jgvwNz6QFHWjC7GbC87q3HcudmMPYx_gxHc2w@mail.gmail.com>
+Subject: Re: [PATCH v1 net] tcp: Use refcount_inc_not_zero() in tcp_twsk_unique().
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>, 
+	Anderson Nascimento <anderson@allelesecurity.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, 23 Apr 2024, Florian Fainelli wrote:
+On Wed, May 1, 2024 at 11:32=E2=80=AFPM Kuniyuki Iwashima <kuniyu@amazon.co=
+m> wrote:
+>
+> Anderson Nascimento reported a use-after-free splat in tcp_twsk_unique()
+> with nice analysis.
+>
+> Since commit ec94c2696f0b ("tcp/dccp: avoid one atomic operation for
+> timewait hashdance"), inet_twsk_hashdance() sets TIME-WAIT socket's
+> sk_refcnt after putting it into ehash and releasing the bucket lock.
+>
+> Thus, there is a small race window where other threads could try to
+> reuse the port during connect() and call sock_hold() in tcp_twsk_unique()
+> for the TIME-WAIT socket with zero refcnt.
+>
+> If that happens, the refcnt taken by tcp_twsk_unique() is overwritten
+> and sock_put() will cause underflow, triggering a real use-after-free
+> somewhere else.
+>
+> To avoid the use-after-free, we need to use refcount_inc_not_zero() in
+> tcp_twsk_unique() and give up on reusing the port if it returns false.
+>
+...
+> Fixes: ec94c2696f0b ("tcp/dccp: avoid one atomic operation for timewait h=
+ashdance")
+> Reported-by: Anderson Nascimento <anderson@allelesecurity.com>
+> Closes: https://lore.kernel.org/netdev/37a477a6-d39e-486b-9577-3463f655a6=
+b7@allelesecurity.com/
+> Suggested-by: Eric Dumazet <edumazet@google.com>
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
-> 
-> 
-> On 4/23/2024 5:00 PM, Andy Shevchenko wrote:
-> > Tue, Apr 23, 2024 at 04:36:20PM -0700, Florian Fainelli kirjoitti:
-> > > Rather than open code the i2c_designware string, utilize the newly
-> > > defined constant in i2c-designware.h.
-> > 
-> > ...
-> > 
-> > >   static const struct mfd_cell intel_lpss_i2c_cell = {
-> > > -	.name = "i2c_designware",
-> > > +	.name = I2C_DESIGNWARE_NAME,
-> > >   	.num_resources = ARRAY_SIZE(intel_lpss_dev_resources),
-> > >   	.resources = intel_lpss_dev_resources,
-> > >   };
-> > 
-> > We have tons of drivers that are using explicit naming, why is this case
-> > special?
-> > 
-> 
-> It is not special, just one of the 3 cases outside of drivers/i2c/busses
-> that reference a driver living under drivers/i2c/busses, as I replied in the
-> cover letter, this is a contract between the various device drivers and
-> their users, so we should have a central place where it is defined, not
-> repeated.
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
-I have always held the opinion that replacing user-facing strings with
-defines harms debugability, since grepping becomes a multi-stage
-process, often with ambiguous results (in the case of multiple
-definitions with the same name.  Please keep the string in-place.
-
--- 
-Lee Jones [李琼斯]
+Thanks
 
