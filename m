@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-92880-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92881-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 913A08B9357
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 04:20:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 889F58B935A
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 04:20:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BCA711C21CB7
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 02:20:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 44E2E2842B0
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 02:20:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 015F917997;
-	Thu,  2 May 2024 02:20:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD3BF171BB;
+	Thu,  2 May 2024 02:20:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R0PCbwie"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l5dHo+Tw"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAAD010A24;
-	Thu,  2 May 2024 02:20:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9428919470;
+	Thu,  2 May 2024 02:20:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714616430; cv=none; b=JfKM8XEd9dyjNF38qSfMCmMsR6+Wf6kpf0MwHVEDx8+wQPlNBEH4vQA7yJWBYZkD0x42SRBaUDG4ezlInfCPRrXSOoxDH2eMXGCpS5BwVA+71Qpkx51ka8Qg9txFFP+OxviX7JwsRDmCnrPbsdZxadvoaS6mmnuYhai5aU4xpdw=
+	t=1714616432; cv=none; b=IaXjgIlgSPoIn3BZgfd7bFEnu4WtGuzv73ZvzIodfa+aLK8Y7bf9vNzSqXweaFlQRXHEa1OaE5/UU22P5HpRQkNY9Oz2cxjjBIc/gWD8tC1HiXvj7C5DSKMqmYehio7Y9yzfkWXIvcgg7vxUEEFPBs7fNTZXfLwazQbcjzvqlCk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714616430; c=relaxed/simple;
-	bh=EpoeCQTekKXnxryqY7Nzpu0h6u1MO41g+Il26PnqdeY=;
+	s=arc-20240116; t=1714616432; c=relaxed/simple;
+	bh=Tpqy/To3eyNk6Zv/KuSecwywYBWSoGoV2InmXgvO8aQ=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=LBjADU4AIPLM51D2KhBaJMnMjT/CKqspGiXBm7y6xD3VoAX4LHAkQAoi4xUzKP55klKZ57X6buihQesgIB8tms4zpMXH2Imc5VV1PM/0Aqz6w3TQtLdra4zHPIAefigvqrWRcpx9z+YgMDXdzcZccADc4vOBo2le0K2clUwpopw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R0PCbwie; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 43603C4AF18;
-	Thu,  2 May 2024 02:20:30 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=NSiESpSeqUz41C+hBuC9J3UwyBWtKCP/0zq7s8IBuxVo+3Eh99FCpIo5Ue8dkfSyX2YfoWuetRU/vvL9th0r7MQhvkI6/e7WH+3ne/2x7FMUvKAUKagPi9CUiQ23jeU/ffYgJ8vqKBwrReweZ9Vt1qpFZHvhmOCs676zsfNodVE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l5dHo+Tw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 907C1C4AF51;
+	Thu,  2 May 2024 02:20:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714616430;
-	bh=EpoeCQTekKXnxryqY7Nzpu0h6u1MO41g+Il26PnqdeY=;
+	s=k20201202; t=1714616431;
+	bh=Tpqy/To3eyNk6Zv/KuSecwywYBWSoGoV2InmXgvO8aQ=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=R0PCbwiezEwfAQs3OcDMsSu/2qCVoqDZpikeuRO4h/PEU2AXrUddtrFNINXISHbhi
-	 osbQpdTaCp4FvKmn3BhB3kl7HQpLnDXoeNqbfM6UZcEA2IqmtQhQLKy4RuaQhjrmZF
-	 vjFzgaV5USq0QQtt2XNcwMRaX78fOcUf1tO01SBU7+48OG4Clcld1vHhvy70cCgkD+
-	 6E6ElgKE1pm7ycMIFROplfYR+EULWN7PUcQR+8RfheKFRxAG2s/+7J5OazEG8InQpe
-	 L6jlLDDwwIqpC5U7pLs9f15Zw99Ua9++VygGgjh0hucfLpVT4ZX5FR21ixQEMJoLF2
-	 R2D0mOiqLyztA==
+	b=l5dHo+TwXp0UdhsBiqx32LvZNAn6PZlhF/edgBIwUHtEy7Oxb7Ye0SkDX+Lho1XQq
+	 /AN13G8s2ZzjMEDaBZIu/H0OSlQ4xuUBqZOghSIU1EAGoR0ffTa1OUS7YcG7npmpao
+	 GP87msYPrfLFJbSarfHoyhMPWw11EBoVgR5vdl8qIxH2t5Wi/hQRUk9rIuJ3SIT7f1
+	 lG3k7A0wiEcz8yz1osYbhPdiFw+cfOZpmtOiIZZg8CYMj/LHlt3BzvAqq6WEyiKjyO
+	 clEHVwDm/H+FDNu2bAMikrdAsydUrU+0BUwPJv7qIIGilpY81FTaC63eMDA6D1rA0D
+	 RT3xx5/m1NHLg==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 2C9E6C43444;
-	Thu,  2 May 2024 02:20:30 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 84793C43444;
+	Thu,  2 May 2024 02:20:31 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,37 +52,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] tipc: fix UAF in error path
+Subject: Re: [PATCH net-next v3 0/2] net: dsa: adjust_link removal
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171461643017.4262.9641718304447428848.git-patchwork-notify@kernel.org>
-Date: Thu, 02 May 2024 02:20:30 +0000
-References: <752f1ccf762223d109845365d07f55414058e5a3.1714484273.git.pabeni@redhat.com>
-In-Reply-To: <752f1ccf762223d109845365d07f55414058e5a3.1714484273.git.pabeni@redhat.com>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, jmaloy@redhat.com, ying.xue@windriver.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- tipc-discussion@lists.sourceforge.net, lxin@redhat.com,
- stable@vger.kernel.org, zdi-disclosures@trendmicro.com
+ <171461643153.4262.10712563951125097802.git-patchwork-notify@kernel.org>
+Date: Thu, 02 May 2024 02:20:31 +0000
+References: <20240430164816.2400606-1-florian.fainelli@broadcom.com>
+In-Reply-To: <20240430164816.2400606-1-florian.fainelli@broadcom.com>
+To: Florian Fainelli <florian.fainelli@broadcom.com>
+Cc: netdev@vger.kernel.org, andrew@lunn.ch, f.fainelli@gmail.com,
+ olteanv@gmail.com, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, linux@armlinux.org.uk, linux-kernel@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 30 Apr 2024 15:53:37 +0200 you wrote:
-> Sam Page (sam4k) working with Trend Micro Zero Day Initiative reported
-> a UAF in the tipc_buf_append() error path:
+On Tue, 30 Apr 2024 09:48:14 -0700 you wrote:
+> Now that the last in-tree driver (b53) has been converted to PHYLINK, we
+> can get rid of all of code that catered to working with drivers
+> implementing only PHYLIB's adjust_link callback.
 > 
-> BUG: KASAN: slab-use-after-free in kfree_skb_list_reason+0x47e/0x4c0
-> linux/net/core/skbuff.c:1183
-> Read of size 8 at addr ffff88804d2a7c80 by task poc/8034
+> Changes in v3:
+> 
+> - removed additional code in dsa_port_phylink_mac_link_down pertaining
+>   to the phy_device reference
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] tipc: fix UAF in error path
-    https://git.kernel.org/netdev/net/c/080cbb890286
+  - [net-next,v3,1/2] net: dsa: Remove fixed_link_update member
+    https://git.kernel.org/netdev/net-next/c/ad3e1287c6f3
+  - [net-next,v3,2/2] net: dsa: Remove adjust_link paths
+    https://git.kernel.org/netdev/net-next/c/8a021a863a7d
 
 You are awesome, thank you!
 -- 
