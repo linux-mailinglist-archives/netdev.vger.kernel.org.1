@@ -1,113 +1,191 @@
-Return-Path: <netdev+bounces-93002-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93003-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 657228B9998
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 13:02:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4882D8B999F
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 13:04:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A0419B22201
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 11:02:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5B64CB21D06
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 11:04:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22DE95FBB7;
-	Thu,  2 May 2024 11:02:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9FD85FDB3;
+	Thu,  2 May 2024 11:04:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="GuUHJE+x"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=fritzc.com header.i=@fritzc.com header.b="w8Daq/DZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
+Received: from fritzc.com (mail.fritzc.com [213.160.72.247])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E94E5EE78
-	for <netdev@vger.kernel.org>; Thu,  2 May 2024 11:02:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A20B58228;
+	Thu,  2 May 2024 11:03:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.160.72.247
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714647743; cv=none; b=pjTVL/0F8lz4jz8pEFeGXYte4XKnmxkLbJegrVHyJ8aJifzRnbHV8/L+9/arIgpEBji7D+oVspxM5/P/w2ok0zS/AbFbdx2hqJjpdEBh0o2+wlE5Dk5/rJ0KrJbJAzmh3/026h8sJLopLRVfq0h6dOw+/nAPXzOSvaQdXWs4yU4=
+	t=1714647840; cv=none; b=q1F56w+w4iF8Di2jTjNtNGawUbLFCzHWvdyrQo5V+/CXTZgUfLuhOiPndAh4hXx6odZ7vOnP2mdBSkjMc/tAWUK9beF1sEgBg9XYnxwABRe2FX2ybDpvQ1MmT9Y7x6sqopQBDTJaj5vSgQQnrGWtkzBwSDlMNI0GB+yR9989yj4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714647743; c=relaxed/simple;
-	bh=WjKKxg91sicVt/c3J8YItgH8LNilkFiIzFDH4F1itOk=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sa7qpzDSe+fpTSPIoUui2vlkFEwGKo3u5mxz073o+iA+YBuNKHhvo5EtGBQOxmdsR/YEbSXH3OQ2Z3jW9UVe66BF/cu70HVCqiSUQN+w/Bu0QHohYV3RD38jJHmwrGtISQUiGhAcmWal1RcerSCZ5dYHDYmrWiqerzSOM3Ae9yE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=GuUHJE+x; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id AA1C1207CA;
-	Thu,  2 May 2024 13:02:17 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from a.mx.secunet.com ([127.0.0.1])
-	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id zMVFOeEp731m; Thu,  2 May 2024 13:02:12 +0200 (CEST)
-Received: from mailout1.secunet.com (mailout1.secunet.com [62.96.220.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id CFC5A206B0;
-	Thu,  2 May 2024 13:02:12 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com CFC5A206B0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1714647732;
-	bh=EQsQLHg5ZsPxcQdz0AiPwq4Y1l0DQUXvvPjZvx8k4MI=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
-	b=GuUHJE+xQqCY27UsX+nHXot+fvsHoEJ5MxNG8wBrUbTDAAbqAm4Zak1f/cGptYxy7
-	 M70NyyFzm+TsPDJ3LaNC0vAgftRZM5sEWKJQpff/ZkPnMwoBefxkINe4dMm8Skzmr3
-	 iujaVtH8VDuMBhnJZYpO4yrMSvQqJj7juEcGxEI+gQj4uuzY4L79ER7lqwdPO7MRTY
-	 CVOiyDodWGc0O2kPKze9LIkzZFkyHcQ42JvT1y/0RpsoxCfnX694hkc/ZY2lY2GBeh
-	 sa2RYrRbH+/pznLyg85X8Mpuy3u4E7Zwwfdca5YJnVwwx/do6n6MrQN/td1BoN5Djl
-	 DxUTLONXGu80w==
-Received: from cas-essen-01.secunet.de (unknown [10.53.40.201])
-	by mailout1.secunet.com (Postfix) with ESMTP id C20A880004A;
-	Thu,  2 May 2024 13:02:12 +0200 (CEST)
-Received: from mbx-essen-02.secunet.de (10.53.40.198) by
- cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Thu, 2 May 2024 13:02:12 +0200
-Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
- (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Thu, 2 May
- 2024 13:02:12 +0200
-Received: by gauss2.secunet.de (Postfix, from userid 1000)
-	id E7470318406D; Thu,  2 May 2024 13:02:11 +0200 (CEST)
-Date: Thu, 2 May 2024 13:02:11 +0200
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: Paolo Abeni <pabeni@redhat.com>
-CC: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>, <netdev@vger.kernel.org>
-Subject: Re: [PATCH 0/3] pull request (net): ipsec 2024-05-02
-Message-ID: <ZjNys2taG8NXTsJa@gauss3.secunet.de>
-References: <20240502084838.2269355-1-steffen.klassert@secunet.com>
- <eb382c9e23b169250079ef96ec94de77918a6a0c.camel@redhat.com>
+	s=arc-20240116; t=1714647840; c=relaxed/simple;
+	bh=fBAaoFlZfEYbgWcR99nmTfqssQTQgju1ZEXTW9eeSuA=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=iQI3vas9qkDFJfRGSikZQw2Y5z51xB9e3ZsunS9aojhByCeAyFnrH8o0iACSeP+ntx05oXmTB7ZteG5FwHoWudAw/iXOQ+XLFesRwB63R+PB5QTuEN+zo9vF+fqhPnNadP1tr3/nfw9A6WdBmn8U/KT8dZAn/dBH8AHyu3JSNoM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hexdev.de; spf=pass smtp.mailfrom=hexdev.de; dkim=pass (1024-bit key) header.d=fritzc.com header.i=@fritzc.com header.b=w8Daq/DZ; arc=none smtp.client-ip=213.160.72.247
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hexdev.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hexdev.de
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=fritzc.com;
+	s=dkim; h=Content-Transfer-Encoding:MIME-Version:Content-Type:References:
+	In-Reply-To:Date:Cc:To:Reply-To:From:Subject:Message-ID:Sender:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=xrJZEtQCkguErjBYfgKPVVDWS0LKbQlBAZ4XgRsohl4=; b=w8Daq/DZymap2DLm1CeW8Nw4I5
+	j+RVpAvi3xizokSsLbEw6qsCi2BiEen1O7JWqsLMoZjR4P8OX+LC554+ib4cTAeBLrLC0WZIwJnPf
+	cYvUWLR5yY88z44C/H4/D/JjkM8Y27hHNhfN1aYOWxCA0ibj/54xsTQrxABJ6g9NFbss=;
+Received: from 127.0.0.1
+	by fritzc.com with esmtpsa (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim latest)
+	(envelope-from <christoph.fritz@hexdev.de>)
+	id 1s2UE3-001Z33-21;
+	Thu, 02 May 2024 13:03:44 +0200
+Message-ID: <48c55b05dae4628d4e811178bfd5e855ac93ee77.camel@hexdev.de>
+Subject: Re: [PATCH v2 06/12] dt-bindings: net/can: Add serial (serdev) LIN
+ adapter
+From: Christoph Fritz <christoph.fritz@hexdev.de>
+Reply-To: christoph.fritz@hexdev.de
+To: "Rob Herring (Arm)" <robh@kernel.org>
+Cc: Krzysztof Kozlowski <krzk+dt@kernel.org>, Sebastian Reichel
+ <sre@kernel.org>,  Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ linux-serial@vger.kernel.org, Linus Walleij <linus.walleij@linaro.org>, 
+ Jiri Kosina <jikos@kernel.org>, Jiri Slaby <jirislaby@kernel.org>, Conor
+ Dooley <conor+dt@kernel.org>,  Andreas Lauser
+ <andreas.lauser@mercedes-benz.com>, Marc Kleine-Budde <mkl@pengutronix.de>,
+ Benjamin Tissoires <bentiss@kernel.org>, devicetree@vger.kernel.org, Eric
+ Dumazet <edumazet@google.com>, Jonathan Corbet <corbet@lwn.net>, Jakub
+ Kicinski <kuba@kernel.org>, Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
+ Paolo Abeni <pabeni@redhat.com>, linux-can@vger.kernel.org,
+ netdev@vger.kernel.org,  linux-input@vger.kernel.org, Pavel Pisa
+ <pisa@cmp.felk.cvut.cz>, Oliver Hartkopp <socketcan@hartkopp.net>, "David S
+ . Miller" <davem@davemloft.net>
+Date: Thu, 02 May 2024 13:03:42 +0200
+In-Reply-To: <171464227142.1356329.4931419696225319861.robh@kernel.org>
+References: <20240502075534.882628-1-christoph.fritz@hexdev.de>
+	 <20240502075534.882628-7-christoph.fritz@hexdev.de>
+	 <171464227142.1356329.4931419696225319861.robh@kernel.org>
+Organization: hexDEV GmbH
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.46.4-2 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <eb382c9e23b169250079ef96ec94de77918a6a0c.camel@redhat.com>
-X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
- mbx-essen-02.secunet.de (10.53.40.198)
-X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
+Content-Transfer-Encoding: 7bit
 
-On Thu, May 02, 2024 at 12:53:43PM +0200, Paolo Abeni wrote:
-> On Thu, 2024-05-02 at 10:48 +0200, Steffen Klassert wrote:
-> > 1) Fix an error pointer dereference in xfrm_in_fwd_icmp.
-> >    From Antony Antony.
+On Thu, 2024-05-02 at 04:31 -0500, Rob Herring (Arm) wrote:
+> On Thu, 02 May 2024 09:55:28 +0200, Christoph Fritz wrote:
+> > This patch adds dt-bindings for serial LIN bus adapters. These adapters are
+> > basically just LIN transceivers that get hard-wired with serial devices.
 > > 
-> > 2) Preserve vlan tags for ESP transport mode software GRO.
-> >    From Paul Davey.
+> > Signed-off-by: Christoph Fritz <christoph.fritz@hexdev.de>
+> > ---
+> >  .../bindings/net/can/hexdev,lin-serdev.yaml   | 32 +++++++++++++++++++
+> >  1 file changed, 32 insertions(+)
+> >  create mode 100644 Documentation/devicetree/bindings/net/can/hexdev,lin-serdev.yaml
 > > 
-> > 3) Fix a spelling mistake in an uapi xfrm.h comment.
-> >    From Anotny Antony.
-> > 
-> > Please pull or let me know if there are problems.
 > 
-> This landed in my inbox after I almost finalized today's net PR, so
-> these fixes will not enter it, they will reach Liuns' tree next week.
+> My bot found errors running 'make dt_binding_check' on your patch:
 > 
-> I hope it's not a big deal.
+> yamllint warnings/errors:
+> 
+> dtschema/dtc warnings/errors:
+> Documentation/devicetree/bindings/net/can/hexdev,lin-serdev.example.dtb: /example-0/serial/linbus: failed to match any schema with compatible: ['linux,lin-serdev']
 
-I'm OK with that.
+Yes, that's obviously still false and will be fixed in v3.
 
-Thanks!
+> 
+> doc reference errors (make refcheckdocs):
+> 
+> See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20240502075534.882628-7-christoph.fritz@hexdev.de
+> 
+> The base for the series is generally the latest rc1. A different dependency
+> should be noted in *this* patch.
+> 
+> If you already ran 'make dt_binding_check' and didn't see the above
+> error(s), then make sure 'yamllint' is installed and dt-schema is up to
+> date:
+> 
+> pip3 install dtschema --upgrade
+> 
+> Please check and re-submit after running the above command yourself. Note
+> that DT_SCHEMA_FILES can be set to your schema file to speed up checking
+> your schema. However, it must be unset to test all examples with your schema.
+> 
+
+I'm wondering why my local run of dt_binding_check does not catch this:
+
+$ pip3 install dtschema --upgrade
+Requirement already satisfied: dtschema in ./venv/lib/python3.11/site-packages (2024.4)
+Requirement already satisfied: ruamel.yaml>0.15.69 in ./venv/lib/python3.11/site-packages (from dtschema) (0.18.6)
+Requirement already satisfied: jsonschema<4.18,>=4.1.2 in ./venv/lib/python3.11/site-packages (from dtschema) (4.17.3)
+Requirement already satisfied: rfc3987 in ./venv/lib/python3.11/site-packages (from dtschema) (1.3.8)
+Requirement already satisfied: pylibfdt in ./venv/lib/python3.11/site-packages (from dtschema) (1.7.0.post1)
+Requirement already satisfied: attrs>=17.4.0 in ./venv/lib/python3.11/site-packages (from jsonschema<4.18,>=4.1.2->dtschema) (23.2.0)
+Requirement already satisfied: pyrsistent!=0.17.0,!=0.17.1,!=0.17.2,>=0.14.0 in ./venv/lib/python3.11/site-packages (from jsonschema<4.18,>=4.1.2->dtschema) (0.20.0)
+Requirement already satisfied: ruamel.yaml.clib>=0.2.7 in ./venv/lib/python3.11/site-packages (from ruamel.yaml>0.15.69->dtschema) (0.2.8)
+
+$ git diff
+diff --git a/Documentation/devicetree/bindings/net/can/hexdev,lin-serdev.yaml b/Documentation/devicetree/bindings/net/can/hexdev,lin-serdev.yaml
+index c178eb9be1391..385cbe132258d 100644
+--- a/Documentation/devicetree/bindings/net/can/hexdev,lin-serdev.yaml
++++ b/Documentation/devicetree/bindings/net/can/hexdev,lin-serdev.yaml
+@@ -27,6 +27,6 @@ examples:
+   - |
+     serial {
+         linbus {
+-            compatible = "hexdev,lin-serdev";
++            compatible = "linux,lin-serdev";
+         };
+     };
+
+$ make dt_binding_check DT_SCHEMA_FILES=Documentation/devicetree/bindings/net/can/hexdev,lin-serdev.yaml
+  HOSTCC  scripts/basic/fixdep
+  HOSTCC  scripts/dtc/dtc.o
+  HOSTCC  scripts/dtc/flattree.o
+  HOSTCC  scripts/dtc/fstree.o
+  HOSTCC  scripts/dtc/data.o
+  HOSTCC  scripts/dtc/livetree.o
+  HOSTCC  scripts/dtc/treesource.o
+  HOSTCC  scripts/dtc/srcpos.o
+  HOSTCC  scripts/dtc/checks.o
+  HOSTCC  scripts/dtc/util.o
+  LEX     scripts/dtc/dtc-lexer.lex.c
+  YACC    scripts/dtc/dtc-parser.tab.[ch]
+  HOSTCC  scripts/dtc/dtc-lexer.lex.o
+  HOSTCC  scripts/dtc/dtc-parser.tab.o
+  HOSTLD  scripts/dtc/dtc
+  HOSTCC  scripts/dtc/libfdt/fdt.o
+  HOSTCC  scripts/dtc/libfdt/fdt_ro.o
+  HOSTCC  scripts/dtc/libfdt/fdt_wip.o
+  HOSTCC  scripts/dtc/libfdt/fdt_sw.o
+  HOSTCC  scripts/dtc/libfdt/fdt_rw.o
+  HOSTCC  scripts/dtc/libfdt/fdt_strerror.o
+  HOSTCC  scripts/dtc/libfdt/fdt_empty_tree.o
+  HOSTCC  scripts/dtc/libfdt/fdt_addresses.o
+  HOSTCC  scripts/dtc/libfdt/fdt_overlay.o
+  HOSTCC  scripts/dtc/fdtoverlay.o
+  HOSTLD  scripts/dtc/fdtoverlay
+  LINT    Documentation/devicetree/bindings
+  CHKDT   Documentation/devicetree/bindings/processed-schema.json
+  SCHEMA  Documentation/devicetree/bindings/processed-schema.json
+/home/ch/linux/Documentation/devicetree/bindings/pci/brcm,stb-pcie.yaml: ignoring, error in schema: properties: brcm,tperst-clk-ms: type
+/home/ch/linux/Documentation/devicetree/bindings/hwmon/microchip,emc2305.yaml: ignoring, error in schema: properties: emcs205,max-state: description
+  DTEX    Documentation/devicetree/bindings/net/can/hexdev,lin-serdev.example.dts
+  DTC_CHK Documentation/devicetree/bindings/net/can/hexdev,lin-serdev.example.dtb
+
+Any ideas?
+
+I'm using a python venv here, maybe this is related?
+
+Thanks
+  -- Christoph
 
