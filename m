@@ -1,79 +1,65 @@
-Return-Path: <netdev+bounces-93025-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93026-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B8798B9AFF
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 14:39:06 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CB4E8B9B7E
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 15:20:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EC66F286897
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 12:39:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4DC24B20F7C
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 13:20:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C1F87CF3A;
-	Thu,  2 May 2024 12:39:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 559D2C8F3;
+	Thu,  2 May 2024 13:20:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OHY0BSt3"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="MxtNZwP0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from fanzine2.igalia.com (fanzine.igalia.com [178.60.130.6])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6185662171;
-	Thu,  2 May 2024 12:38:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66BBD824AB;
+	Thu,  2 May 2024 13:20:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.60.130.6
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714653541; cv=none; b=mTYZ61nTxi5PCEElNaJY4/U11wbAGf6tnGPSOncqZn/37Uf7HMBCoCz3h8wJ6aq87qb/bohvoZS2zZB2zpzn+bKoIqhP6BqnFo1siQCdOjf1JixUuB249aqj2rmcwzMmOwDGu+97UhA7KiEaU98P+3ynRPQRkccdFe/Uc3DsOHE=
+	t=1714656029; cv=none; b=PYrjzvhYJrJYhrs8WEOfXza79R+ZPd2NouhBrloWA8l/pdw6U+0WjEIvRv1LpzOxpZrOTpihk58oDWzMzZfAY+LYg1fzrUDXq4Fkg1kbiazMBt/CjGU9NRJfTVKwCOBOhTZcyzjwbGjCltXsTqSOzU8eGxJndhYWxWHYbYoTsvA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714653541; c=relaxed/simple;
-	bh=oDcRiPW3R8/rc8oPvXX15ddS2eU2agTCmVL3kfXdKHQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SHY46GcrPE73hacA/Z26f7THyrrogWut7RS5YeTsep6Zspud9gi3yOoEye6EBECF2uLzmGzU36s5KBpb8Iq3UxNHYDV9SC9sc1OcJaVzDJHpkFIolvzdNsUln9qbF3psAFreQg/5Al6Z95bmsNN/KdO1hEWWPc/MO4nf8T6bdBw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OHY0BSt3; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1714653538; x=1746189538;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=oDcRiPW3R8/rc8oPvXX15ddS2eU2agTCmVL3kfXdKHQ=;
-  b=OHY0BSt3rvkRg/7yXsq9PU4OcQYk+uYWU7lEQ03Rn/OV4//cOO6gSrK2
-   xgG1iSUIZrV2doWq5U+F5RZYs1LPQBzlY/CemjT5QErTAH0uPFbKRqnbn
-   8XVowZ6SedJiSAV7trh21QlUVFSIT1P/eRpacUu74gEzqUymEv9mwSFcG
-   Gx8rDWOM6mTqH5saYUlUpMjBSw7pKNk2FHUfjoFrIt5tVQysAZYl8aTKd
-   /rOrwrLr6XWeFOLTonISvM0/ztQ7hZpDw1xokrJQrEKksLtyaDIFJuHkJ
-   arHf1Dmr+6VC0wmKLoz8QRNuN6FDE967Z3lh0yWdZ/jG09/O9jDFUOytS
-   g==;
-X-CSE-ConnectionGUID: Usvmq1+XTOiV+oUXlv8jsQ==
-X-CSE-MsgGUID: 2eWlZNfTQNCyjJi8KOj8jA==
-X-IronPort-AV: E=McAfee;i="6600,9927,11061"; a="21831222"
-X-IronPort-AV: E=Sophos;i="6.07,247,1708416000"; 
-   d="scan'208";a="21831222"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 May 2024 05:38:57 -0700
-X-CSE-ConnectionGUID: GVfqGcjjS42MzhEwiWbN9Q==
-X-CSE-MsgGUID: YM54t4dfTLat4O0HTk9EEg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,247,1708416000"; 
-   d="scan'208";a="31908012"
-Received: from black.fi.intel.com ([10.237.72.28])
-  by orviesa004.jf.intel.com with ESMTP; 02 May 2024 05:38:56 -0700
-Received: by black.fi.intel.com (Postfix, from userid 1003)
-	id 18FE221A; Thu,  2 May 2024 15:38:55 +0300 (EEST)
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	linux-can@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Marc Kleine-Budde <mkl@pengutronix.de>,
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
-	"David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1714656029; c=relaxed/simple;
+	bh=3uHsgWZTrL/IXcpPKrV8afjNRpKD9N10PimzAu5WZ40=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Srl7ilJHZBm1f+xzBi0M1LHpsznqF7gf2njXVFZmDkewu47huIa7cCnFEMVVWN+kTbO4gKdIQ6u0H+9/4S+f96BG4J81G4bckCUi8aXBTwE01ycRJEESIa8qxPYSpW126VE1UZtCCztAMbuFMYQy0bpbCxSpvhA35sdOI+uVKl4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com; spf=pass smtp.mailfrom=igalia.com; dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b=MxtNZwP0; arc=none smtp.client-ip=178.60.130.6
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=igalia.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
+	s=20170329; h=Content-Transfer-Encoding:MIME-Version:Message-Id:Date:Subject:
+	Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:Content-Description:
+	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=/VaCqMDL7p2NjINVVUIkM6kvbFvFFu2XNtolIuWclck=; b=MxtNZwP0MaJhFLB2Sekgvr1mHs
+	ijlFM8yBRxvZvEXbZDBztwj0cnPDISW3Rehl28INZauHzWuPgDhfENHo3zNvN+dp+2c1fBx8HfF9m
+	i4tUd2RMIvWWAG7n+ZVCangnlGpB/5jXucciFOEyIi/yvcgcP9i8vOwiCWW928LPIDzAdTTVjy7VV
+	jregaE+JYxXbmHVlhKnEER0a+ciPXvsvZ4NOUbx0IyG0UhM28GHksSxho4YuqN8gccUt78xYYVmRX
+	G9oOXF5TlInwc/5bb4AUhzO6/n2ICcsVHWZbQDIAmPzEyykqiGS0+3lgWuy+ILDPVLXCgVOq5M/5P
+	zfogWTvg==;
+Received: from 179-125-75-252-dinamico.pombonet.net.br ([179.125.75.252] helo=quatroqueijos.lan)
+	by fanzine2.igalia.com with esmtpsa 
+	(Cipher TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256) (Exim)
+	id 1s2WMG-002zu5-MV; Thu, 02 May 2024 15:20:20 +0200
+From: Thadeu Lima de Souza Cascardo <cascardo@igalia.com>
+To: netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next v1 1/1] can: sja1000: plx_pci: Reuse predefined CTI subvendor ID
-Date: Thu,  2 May 2024 15:38:52 +0300
-Message-ID: <20240502123852.2631577-1-andriy.shevchenko@linux.intel.com>
-X-Mailer: git-send-email 2.43.0.rc1.1336.g36b5255a03ac
+	Paolo Abeni <pabeni@redhat.com>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>,
+	kernel-dev@igalia.com,
+	stable@vger.kernel.org,
+	Thadeu Lima de Souza Cascardo <cascardo@igalia.com>
+Subject: [PATCH net v3] net: fix out-of-bounds access in ops_init
+Date: Thu,  2 May 2024 10:20:06 -0300
+Message-Id: <20240502132006.3430840-1-cascardo@igalia.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,35 +68,73 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-There is predefined PCI_SUBVENDOR_ID_CONNECT_TECH, use it in the driver.
+net_alloc_generic is called by net_alloc, which is called without any
+locking. It reads max_gen_ptrs, which is changed under pernet_ops_rwsem. It
+is read twice, first to allocate an array, then to set s.len, which is
+later used to limit the bounds of the array access.
 
-Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+It is possible that the array is allocated and another thread is
+registering a new pernet ops, increments max_gen_ptrs, which is then used
+to set s.len with a larger than allocated length for the variable array.
+
+Fix it by reading max_gen_ptrs only once in net_alloc_generic. If
+max_gen_ptrs is later incremented, it will be caught in net_assign_generic.
+
+Signed-off-by: Thadeu Lima de Souza Cascardo <cascardo@igalia.com>
+Fixes: 073862ba5d24 ("netns: fix net_alloc_generic()")
+Reviewed-by: Eric Dumazet <edumazet@google.com>
+Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: stable@vger.kernel.org
 ---
- drivers/net/can/sja1000/plx_pci.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+v3:
+  - Use reverse xmas order in local variable declaration.
+  - Use netdev multi-line comment style.
+  - Target to net tree.
+  - Cc stable.
+v2:
+  - Instead of delaying struct net_generic allocation to setup_net,
+    read max_gen_ptrs only once.
+v1: https://lore.kernel.org/netdev/20240430084253.3272177-1-cascardo@igalia.com/
+---
+ net/core/net_namespace.c | 13 ++++++++++---
+ 1 file changed, 10 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/net/can/sja1000/plx_pci.c b/drivers/net/can/sja1000/plx_pci.c
-index 5de1ebb0c6f0..67e5316c6372 100644
---- a/drivers/net/can/sja1000/plx_pci.c
-+++ b/drivers/net/can/sja1000/plx_pci.c
-@@ -122,7 +122,6 @@ struct plx_pci_card {
- #define TEWS_PCI_VENDOR_ID		0x1498
- #define TEWS_PCI_DEVICE_ID_TMPC810	0x032A
+diff --git a/net/core/net_namespace.c b/net/core/net_namespace.c
+index f0540c557515..9d690d32da33 100644
+--- a/net/core/net_namespace.c
++++ b/net/core/net_namespace.c
+@@ -69,12 +69,15 @@ DEFINE_COOKIE(net_cookie);
  
--#define CTI_PCI_VENDOR_ID		0x12c4
- #define CTI_PCI_DEVICE_ID_CRG001	0x0900
+ static struct net_generic *net_alloc_generic(void)
+ {
++	unsigned int gen_ptrs = READ_ONCE(max_gen_ptrs);
++	unsigned int generic_size;
+ 	struct net_generic *ng;
+-	unsigned int generic_size = offsetof(struct net_generic, ptr[max_gen_ptrs]);
++
++	generic_size = offsetof(struct net_generic, ptr[gen_ptrs]);
  
- #define MOXA_PCI_VENDOR_ID		0x1393
-@@ -358,7 +357,7 @@ static const struct pci_device_id plx_pci_tbl[] = {
- 	{
- 		/* Connect Tech Inc. CANpro/104-Plus Opto (CRG001) card */
- 		PCI_VENDOR_ID_PLX, PCI_DEVICE_ID_PLX_9030,
--		CTI_PCI_VENDOR_ID, CTI_PCI_DEVICE_ID_CRG001,
-+		PCI_SUBVENDOR_ID_CONNECT_TECH, CTI_PCI_DEVICE_ID_CRG001,
- 		0, 0,
- 		(kernel_ulong_t)&plx_pci_card_info_cti
- 	},
+ 	ng = kzalloc(generic_size, GFP_KERNEL);
+ 	if (ng)
+-		ng->s.len = max_gen_ptrs;
++		ng->s.len = gen_ptrs;
+ 
+ 	return ng;
+ }
+@@ -1307,7 +1310,11 @@ static int register_pernet_operations(struct list_head *list,
+ 		if (error < 0)
+ 			return error;
+ 		*ops->id = error;
+-		max_gen_ptrs = max(max_gen_ptrs, *ops->id + 1);
++		/* This does not require READ_ONCE as writers already hold
++		 * pernet_ops_rwsem. But WRITE_ONCE is needed to protect
++		 * net_alloc_generic.
++		 */
++		WRITE_ONCE(max_gen_ptrs, max(max_gen_ptrs, *ops->id + 1));
+ 	}
+ 	error = __register_pernet_operations(list, ops);
+ 	if (error) {
 -- 
-2.43.0.rc1.1336.g36b5255a03ac
+2.34.1
 
 
