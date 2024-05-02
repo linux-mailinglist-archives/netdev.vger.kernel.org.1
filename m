@@ -1,185 +1,96 @@
-Return-Path: <netdev+bounces-93033-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93034-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 069A48B9C20
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 16:14:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 242F68B9C30
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 16:20:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DD703B220A0
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 14:14:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 343B5B21376
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 14:20:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CB0B13C694;
-	Thu,  2 May 2024 14:14:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9777313C69B;
+	Thu,  2 May 2024 14:20:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="So0Vbqp8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="diBVwjFV"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35E2E12DDBF;
-	Thu,  2 May 2024 14:14:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73FE883A1D
+	for <netdev@vger.kernel.org>; Thu,  2 May 2024 14:20:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714659273; cv=none; b=M8t0HqaTTI7Q9jYelJxl7p985XRFD7fs5dtxp4BBhVYZAAPcX3GNY4lVzMy/ZarOy1sUPxIVZBBBON7vzWMLlZZdlnFR9qkzevOG8TQsZdCey4cOnylPcexSGCB28SACLptQ9wBvpXDWMO2sriQWDKdZ1TBNAQsmF4s8zsYJ0qA=
+	t=1714659634; cv=none; b=Ho3EYQ4O3ej428rQA9i/HN5uojCAoUx4BmKQsr5ncW6HxmIrjyopSKZlcj2IaSlpn6CNXgshIX+AoO/ah7ncCBkZB6yud2Ufkv/ZTusN4IvjedmA6Y1tINEW2xpkQPP5h8G86guPf1D5jkOyitCz+5hMRYMTFSPPtn8O/P4hwDE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714659273; c=relaxed/simple;
-	bh=TqGPQfv5cuk6T1XGFYZfEGJtd5vUUufArvfOG8WA+bE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OTjh5RkpDKChZZJSIlo4tyFuFJVglEqEWwngo8pAR91R4NQS4bbJEGjoG/G7Qp/UA5J1pTxSrIw5An6h/jpNrkehecOYsUKN+vR0Xw7lNsSftPgwf2uixhMEDg0wV1p42njWs5Lu9bTI6lX+dzx9JIbAw4dkcwuu54xp0jhNZjk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=So0Vbqp8; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=/l18ESN+CGYoapWjh3HxNbj/XMovUs4b0G9wlX7P+3c=; b=So0Vbqp8qMueIWyjz6YJtlM1lU
-	uelnWzp88m6gGS1Ft8TAqTi9Uvcl8S++BJwu/q32Dg0hY4s7wu4LEta3rzw+c5dJWn5zvPANXk136
-	92zAq5NIYe+7xgaba3TMoKYW+9AgYRT2ygHgD0p9SqX+M4PFAzOjtlk/gENIOiVQf0iDihkoOG42q
-	UHQe79XI7teRc+uS1bQ+v0H82YTwr1LoTPpnanstLiz9QAZ0+UE5OOy21zXvhwapdRTA6aK5VP3bd
-	g1HfOqnaB7OVWuV+6K3NtAvyth+YsQfSI4lUbLds2In47jjJptrbdyGw9zJ3KSAfGjshM4ltqKjFt
-	8DYE8VdA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:60508)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1s2XCQ-0007N8-1b;
-	Thu, 02 May 2024 15:14:14 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1s2XCP-0003i3-J2; Thu, 02 May 2024 15:14:13 +0100
-Date: Thu, 2 May 2024 15:14:13 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Stefan Eichenberger <eichest@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
-	lxu@maxlinear.com, hkallweit1@gmail.com, michael@walle.cc,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 2/2] net: phy: mxl-gpy: add new device tree property
- to disable SGMII autoneg
-Message-ID: <ZjOftdnoToSSsVJ1@shell.armlinux.org.uk>
-References: <Zikd+GxuwMRC+5Ae@shell.armlinux.org.uk>
- <Zikrv5UOWvSGjgcv@eichest-laptop>
- <ZilLz8f6vQQCg4NB@shell.armlinux.org.uk>
- <Zio9g9+wsFX39Vkx@eichest-laptop>
- <ZippHJrnvzXsTiK4@shell.armlinux.org.uk>
- <Zip8Hd/ozP3R8ASS@eichest-laptop>
- <ZiqFOko7zFjfTdz4@shell.armlinux.org.uk>
- <ZiqUB0lwgw7vIozG@eichest-laptop>
- <Ziq5+gRXGmqt9bXM@shell.armlinux.org.uk>
- <ZjOYuP5ypnH8GJWd@eichest-laptop>
+	s=arc-20240116; t=1714659634; c=relaxed/simple;
+	bh=afdzYhJwFXxyFnhITq3oNSXbTqa5JUfcwN3OYlF6iW8=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=WlcgD2QLd+y0ZyzYsAFUr1lNdQq9p5T/cP+Pv2NfUa/V0+m/JAvZmBuRgJ/2dy4RsypYs8KlKud4spBn47wH5aeUh/K2bshlrvPRbEjZ3Bf48EhksHCpmrnWFDHICVA2HOBVMSfEeSCoR2JCh61/9r8inTNy2AuBIJS4obl2dsE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=diBVwjFV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 1ACE9C32789;
+	Thu,  2 May 2024 14:20:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714659634;
+	bh=afdzYhJwFXxyFnhITq3oNSXbTqa5JUfcwN3OYlF6iW8=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=diBVwjFVBe4ly/B2BQViMloE/+bnAuoAIE+MDa1+aWJ7geeM0a7CxJxWdrwaNRcx9
+	 Rzyco3xJ5Z8isX7LI66Xj7+T5qH3tIPZHZ14JBaFDXi3/afwc35+ZGo8HKwyMiSr57
+	 aTRZdKSI0xtbLdajydmFV22KDGrnYh1/8iS6yRMGtiyiklbP2gvxUbqc6rQCqwJHtJ
+	 z5GJHnOfTNmqkPhNXgV18DhGO/9oHWs1OztrhvcVYEshA3bZea3AQctIFlKKQxBMI8
+	 Fu7ch4ZyquylZCPouIYAtnXI+9K4NMcS7Lnk6dpqKjvdrqEoPac0t/grNizia6mwqQ
+	 PngmAnRTuNXnw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 00ABBC4333B;
+	Thu,  2 May 2024 14:20:34 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZjOYuP5ypnH8GJWd@eichest-laptop>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] net/sched: unregister lockdep keys in
+ qdisc_create/qdisc_alloc error path
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171465963399.28830.8599915114515835353.git-patchwork-notify@kernel.org>
+Date: Thu, 02 May 2024 14:20:33 +0000
+References: <2aa1ca0c0a3aa0acc15925c666c777a4b5de553c.1714496886.git.dcaratti@redhat.com>
+In-Reply-To: <2aa1ca0c0a3aa0acc15925c666c777a4b5de553c.1714496886.git.dcaratti@redhat.com>
+To: Davide Caratti <dcaratti@redhat.com>
+Cc: jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ naresh.kamboju@linaro.org, netdev@vger.kernel.org
 
-On Thu, May 02, 2024 at 03:44:24PM +0200, Stefan Eichenberger wrote:
-> Hi Russell,
+Hello:
+
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Tue, 30 Apr 2024 19:11:13 +0200 you wrote:
+> Naresh and Eric report several errors (corrupted elements in the dynamic
+> key hash list), when running tdc.py or syzbot. The error path of
+> qdisc_alloc() and qdisc_create() frees the qdisc memory, but it forgets
+> to unregister the lockdep key, thus causing use-after-free like the
+> following one:
 > 
-> Sorry for the late reply but I wanted to give you some update after
-> testing with the latest version of your patches on net-queue.
-
-I've also been randomly distracted, and I've been meaning to ping you
-to test some of the updates.
-
-http://git.armlinux.org.uk/cgit/linux-arm.git/log/?h=net-queue
-
-The current set begins with:
-
-"net: sfp-bus: constify link_modes to sfp_select_interface()" which is
-now in net-next, then the patches between and including:
-
-"net: phylink: validate sfp_select_interface() returned interface" to
-"net: phylink: clean up phylink_resolve()"
-
-That should get enough together for the PCS "neg" mode to be consistent
-with what the MAC driver sees.
-
-The remaining bits that I still need to sort out is the contents of
-phylink_pcs_neg_mode() for the 802.3z mode with PHY, and also working
-out some way of handling the SGMII case where the PHY and PCS disagree
-(one only supporting inband the other not supporting inband.)
-
-I'm not sure when I'll be able to get to that - things are getting
-fairly chaotic again, meaning I have again less time to spend on
-mainline... and I'd like to take some vacation time very soon (I really
-need some time off!)
-
-> I think I see the problem you are describing.
+>  ==================================================================
+>  BUG: KASAN: slab-use-after-free in lockdep_register_key+0x5f2/0x700
+>  Read of size 8 at addr ffff88811236f2a8 by task ip/7925
 > 
-> When the driver starts it will negotiate MLO_AN_PHY based on the
-> capabilities of the PHY and of the PCS. However when I switch to 1GBit/s
-> it should switch to MLO_AN_INBAND but this does not work. Here the
-> output of phylink:
+> [...]
 
-I'm designing this to work the other way - inband being able to fall
-back to PHY (out of band) mode rather than PHY mode being able to fall
-forwards to inband mode.
+Here is the summary with links:
+  - [net-next] net/sched: unregister lockdep keys in qdisc_create/qdisc_alloc error path
+    https://git.kernel.org/netdev/net-next/c/86735b57c905
 
-> The problem is that the PCS continues to be in phy mode but the PHY
-> driver currently only supports LINK_INBAND_ENABLE and SGMII for 1GBit/s.
-> 
-> What I'm wondering is if it wouldn't make sense to adapt the phy driver
-> to support MLO_AN_PHY in SGMII/1000BASE-X mode.
-
-PHYs have no idea about MLO_AN_xxx at all, neither should they. This
-is not part of phylib's API, and I don't think PHYs should ever know
-about MLO_AN_xxx stuff (which is something purely between phylink and
-the MAC driver.) The structure here is:
-
-      MAC            PCS                   PHY
-       ^              ^                    ^ ^-----.
-       v              v                    v       |
-   MAC driver <-> PCS driver <-------> PHY driver  |
-       ^           ^                    ^          |
-       |           |                    |          |
-  MLO_AN_xxx  PHYLINK_PCS_NEG_xxx       |          |
-       `           '                    |          |
-        \         /                     v          |
-          phylink <----------------> phylib <------'
-
-MLO_AN_xxx is far beyond the PHY, and more or less defines the overall
-"system" operating mode. PHYLINK_PCS_NEG_xxx defines the properties
-used for the PCS link to the next device towards the media. This is
-more of relevance to what the PHY should be using on its MAC-facing
-interface.
-
-> Currently the mxl-gpy phy driver can only support:
-> 10/100/1000 MBit/s: SGMII with MLO_AN_INBAND
-> 2500MBit/s          2500Base-X with MLO_AN_PHY
-> 
-> However, the PHY would also support the following mode:
-> 10/100/1000 MBit/s: SGMII with MLO_AN_PHY
-
-The problem with this is some PHYs will not pass data _unless_ their
-SGMII control frame to the PCS has been acknowledged by the PCS - in
-other words, inband has to be used. However, that can be coped with,
-because such a PHY driver should be saying that it only supports
-LINK_INBAND_ENABLE in SGMII mode... and firmware must tell phylink
-that it wants to use inband mode (as that's exactly what firmware
-must do today in this situation.)
-
-> I just don't know how the PHY driver could know about what it should
-> configure.
-
-Currently, I haven't added an interface to cope with the case where
-a PHY says LINK_INBAND_ENABLE | LINK_INBAND_DISABLE to allow it to be
-configured in that case... that's something that will eventually be
-needed.
-
+You are awesome, thank you!
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
