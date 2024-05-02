@@ -1,191 +1,117 @@
-Return-Path: <netdev+bounces-93003-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93004-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4882D8B999F
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 13:04:10 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 058C18B99D1
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 13:13:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5B64CB21D06
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 11:04:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3F5BAB20DF7
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 11:13:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9FD85FDB3;
-	Thu,  2 May 2024 11:04:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A69760BBF;
+	Thu,  2 May 2024 11:13:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=fritzc.com header.i=@fritzc.com header.b="w8Daq/DZ"
+	dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b="LMwzycgt";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b="ZX2MdgFB"
 X-Original-To: netdev@vger.kernel.org
-Received: from fritzc.com (mail.fritzc.com [213.160.72.247])
+Received: from mx1.tq-group.com (mx1.tq-group.com [93.104.207.81])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A20B58228;
-	Thu,  2 May 2024 11:03:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.160.72.247
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE6525EE78;
+	Thu,  2 May 2024 11:13:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.104.207.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714647840; cv=none; b=q1F56w+w4iF8Di2jTjNtNGawUbLFCzHWvdyrQo5V+/CXTZgUfLuhOiPndAh4hXx6odZ7vOnP2mdBSkjMc/tAWUK9beF1sEgBg9XYnxwABRe2FX2ybDpvQ1MmT9Y7x6sqopQBDTJaj5vSgQQnrGWtkzBwSDlMNI0GB+yR9989yj4=
+	t=1714648416; cv=none; b=Cp94ht9zYdgjDMYowRPECSddPuu0E9UT+4makhMaDR6t4oBZl1+8X+fO4IbCIVLITPtdZoKb8OE1R0TneSMlS+PZx48siY8fLFY+mkXh+bvjUKb29jCtf9bsViOjew3F5B0tEgf7K9YDExDLHrKoq13anSDYrIxYgIbD6c1xHaE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714647840; c=relaxed/simple;
-	bh=fBAaoFlZfEYbgWcR99nmTfqssQTQgju1ZEXTW9eeSuA=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=iQI3vas9qkDFJfRGSikZQw2Y5z51xB9e3ZsunS9aojhByCeAyFnrH8o0iACSeP+ntx05oXmTB7ZteG5FwHoWudAw/iXOQ+XLFesRwB63R+PB5QTuEN+zo9vF+fqhPnNadP1tr3/nfw9A6WdBmn8U/KT8dZAn/dBH8AHyu3JSNoM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hexdev.de; spf=pass smtp.mailfrom=hexdev.de; dkim=pass (1024-bit key) header.d=fritzc.com header.i=@fritzc.com header.b=w8Daq/DZ; arc=none smtp.client-ip=213.160.72.247
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hexdev.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hexdev.de
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=fritzc.com;
-	s=dkim; h=Content-Transfer-Encoding:MIME-Version:Content-Type:References:
-	In-Reply-To:Date:Cc:To:Reply-To:From:Subject:Message-ID:Sender:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=xrJZEtQCkguErjBYfgKPVVDWS0LKbQlBAZ4XgRsohl4=; b=w8Daq/DZymap2DLm1CeW8Nw4I5
-	j+RVpAvi3xizokSsLbEw6qsCi2BiEen1O7JWqsLMoZjR4P8OX+LC554+ib4cTAeBLrLC0WZIwJnPf
-	cYvUWLR5yY88z44C/H4/D/JjkM8Y27hHNhfN1aYOWxCA0ibj/54xsTQrxABJ6g9NFbss=;
-Received: from 127.0.0.1
-	by fritzc.com with esmtpsa (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim latest)
-	(envelope-from <christoph.fritz@hexdev.de>)
-	id 1s2UE3-001Z33-21;
-	Thu, 02 May 2024 13:03:44 +0200
-Message-ID: <48c55b05dae4628d4e811178bfd5e855ac93ee77.camel@hexdev.de>
-Subject: Re: [PATCH v2 06/12] dt-bindings: net/can: Add serial (serdev) LIN
- adapter
-From: Christoph Fritz <christoph.fritz@hexdev.de>
-Reply-To: christoph.fritz@hexdev.de
-To: "Rob Herring (Arm)" <robh@kernel.org>
-Cc: Krzysztof Kozlowski <krzk+dt@kernel.org>, Sebastian Reichel
- <sre@kernel.org>,  Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- linux-serial@vger.kernel.org, Linus Walleij <linus.walleij@linaro.org>, 
- Jiri Kosina <jikos@kernel.org>, Jiri Slaby <jirislaby@kernel.org>, Conor
- Dooley <conor+dt@kernel.org>,  Andreas Lauser
- <andreas.lauser@mercedes-benz.com>, Marc Kleine-Budde <mkl@pengutronix.de>,
- Benjamin Tissoires <bentiss@kernel.org>, devicetree@vger.kernel.org, Eric
- Dumazet <edumazet@google.com>, Jonathan Corbet <corbet@lwn.net>, Jakub
- Kicinski <kuba@kernel.org>, Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
- Paolo Abeni <pabeni@redhat.com>, linux-can@vger.kernel.org,
- netdev@vger.kernel.org,  linux-input@vger.kernel.org, Pavel Pisa
- <pisa@cmp.felk.cvut.cz>, Oliver Hartkopp <socketcan@hartkopp.net>, "David S
- . Miller" <davem@davemloft.net>
-Date: Thu, 02 May 2024 13:03:42 +0200
-In-Reply-To: <171464227142.1356329.4931419696225319861.robh@kernel.org>
-References: <20240502075534.882628-1-christoph.fritz@hexdev.de>
-	 <20240502075534.882628-7-christoph.fritz@hexdev.de>
-	 <171464227142.1356329.4931419696225319861.robh@kernel.org>
-Organization: hexDEV GmbH
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.46.4-2 
+	s=arc-20240116; t=1714648416; c=relaxed/simple;
+	bh=aEuGJn6C2hjQqBv7yfjTEeMXV7bZQW48JcGE/PzMBbo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=bFJ5JtWPC+SdUF8duL2mAKW0Mfzs1sH2KbBqP0f2ga0Bu4J53MAT4l0/LGaVk8uCJEr+RaNyz8U48+DkyLAnmF1dcoDkHfzY+BEt0QfOCdImM/dNyTOgVcr18mk2IwFYNm3zFGLl82CLX7ih56Zh06hQiOFwniTH4LrfxWODBh0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com; spf=pass smtp.mailfrom=ew.tq-group.com; dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b=LMwzycgt; dkim=fail (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b=ZX2MdgFB reason="key not found in DNS"; arc=none smtp.client-ip=93.104.207.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ew.tq-group.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
+  t=1714648412; x=1746184412;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=53pHXiAdsvwKPhY16IoTwzigk+Wig4043dPMtgU7Yoo=;
+  b=LMwzycgt317JxrgboHiAf8R11hnLgIE+F+68MQiDmBir68ISPVrdvFdH
+   JsedkKMqktReXqVoN4jg1qTWhFAHH2Aldm9J6LSP7p3XBCS3TpXqbdkv2
+   NXBvAIzNWJJifL/Zcgo3c7O+Yk9qaS5BayrYxgtUsBRO5o3zRbJgkMK5k
+   XQR5dpt+pBi6HtJQXaXo0mz2WSUk1/BXcHuUPO7XqsaTbrKWHveZYtSQR
+   GAZq01YXe3tVggb7IbEzmeXkjOjovE/lto5DcDpKhpZY+/bq2oHi2mpVq
+   PtunXFKfW74Dl4qxHH6FLtm/8UErOX85G9iJPbvsAq9+YboN8lybeD1Sw
+   A==;
+X-IronPort-AV: E=Sophos;i="6.07,247,1708383600"; 
+   d="scan'208";a="36716023"
+Received: from vmailcow01.tq-net.de ([10.150.86.48])
+  by mx1.tq-group.com with ESMTP; 02 May 2024 13:13:23 +0200
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id A3D7816E1FA;
+	Thu,  2 May 2024 13:13:17 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ew.tq-group.com;
+	s=dkim; t=1714648399;
+	h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding; bh=53pHXiAdsvwKPhY16IoTwzigk+Wig4043dPMtgU7Yoo=;
+	b=ZX2MdgFBttEkrDWIv8wZMczVxO4zmIWtUCopSkPQLieGUlyXH0uvTCzBUgfq1VfnBZhe/f
+	Bm+evIUDxSke0tB22HU+Rp+l8ERNQPtHWHukwNdjqgxjyNasLX42jC7PRnWVAuj7z82JAj
+	tKyEJmQuBLhLNEdxJqJC1rTWS2M+FFjuPPGaYO0A0TpiA/+PZAkh6CkQk9upCcpAAbATL4
+	cMci5I3NK439pVgKsK+FHk43s+utYkZph8lUZ7koq6iJiEPASNeFrzm9U2MJKE8h8rERLJ
+	0AOsIWldHXH3su9cbPzYTkARDLsTTb0VdWOsCWVQdY99Uhr0cOzTsEEG0c1jdg==
+From: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux@ew.tq-group.com,
+	Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+Subject: [PATCH net-next v2 1/2] net: phy: marvell: constify marvell_hw_stats
+Date: Thu,  2 May 2024 13:13:00 +0200
+Message-ID: <24d7a2f39e0c4c94466e8ad43228fdd798053f3a.1714643285.git.matthias.schiffer@ew.tq-group.com>
+X-Mailer: git-send-email 2.43.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Last-TLS-Session-Version: TLSv1.3
 
-On Thu, 2024-05-02 at 04:31 -0500, Rob Herring (Arm) wrote:
-> On Thu, 02 May 2024 09:55:28 +0200, Christoph Fritz wrote:
-> > This patch adds dt-bindings for serial LIN bus adapters. These adapters are
-> > basically just LIN transceivers that get hard-wired with serial devices.
-> > 
-> > Signed-off-by: Christoph Fritz <christoph.fritz@hexdev.de>
-> > ---
-> >  .../bindings/net/can/hexdev,lin-serdev.yaml   | 32 +++++++++++++++++++
-> >  1 file changed, 32 insertions(+)
-> >  create mode 100644 Documentation/devicetree/bindings/net/can/hexdev,lin-serdev.yaml
-> > 
-> 
-> My bot found errors running 'make dt_binding_check' on your patch:
-> 
-> yamllint warnings/errors:
-> 
-> dtschema/dtc warnings/errors:
-> Documentation/devicetree/bindings/net/can/hexdev,lin-serdev.example.dtb: /example-0/serial/linbus: failed to match any schema with compatible: ['linux,lin-serdev']
+The list of stat registers is read-only, so we can declare it as const.
 
-Yes, that's obviously still false and will be fixed in v3.
+Signed-off-by: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+---
 
-> 
-> doc reference errors (make refcheckdocs):
-> 
-> See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20240502075534.882628-7-christoph.fritz@hexdev.de
-> 
-> The base for the series is generally the latest rc1. A different dependency
-> should be noted in *this* patch.
-> 
-> If you already ran 'make dt_binding_check' and didn't see the above
-> error(s), then make sure 'yamllint' is installed and dt-schema is up to
-> date:
-> 
-> pip3 install dtschema --upgrade
-> 
-> Please check and re-submit after running the above command yourself. Note
-> that DT_SCHEMA_FILES can be set to your schema file to speed up checking
-> your schema. However, it must be unset to test all examples with your schema.
-> 
+v2: New patch
 
-I'm wondering why my local run of dt_binding_check does not catch this:
+ drivers/net/phy/marvell.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-$ pip3 install dtschema --upgrade
-Requirement already satisfied: dtschema in ./venv/lib/python3.11/site-packages (2024.4)
-Requirement already satisfied: ruamel.yaml>0.15.69 in ./venv/lib/python3.11/site-packages (from dtschema) (0.18.6)
-Requirement already satisfied: jsonschema<4.18,>=4.1.2 in ./venv/lib/python3.11/site-packages (from dtschema) (4.17.3)
-Requirement already satisfied: rfc3987 in ./venv/lib/python3.11/site-packages (from dtschema) (1.3.8)
-Requirement already satisfied: pylibfdt in ./venv/lib/python3.11/site-packages (from dtschema) (1.7.0.post1)
-Requirement already satisfied: attrs>=17.4.0 in ./venv/lib/python3.11/site-packages (from jsonschema<4.18,>=4.1.2->dtschema) (23.2.0)
-Requirement already satisfied: pyrsistent!=0.17.0,!=0.17.1,!=0.17.2,>=0.14.0 in ./venv/lib/python3.11/site-packages (from jsonschema<4.18,>=4.1.2->dtschema) (0.20.0)
-Requirement already satisfied: ruamel.yaml.clib>=0.2.7 in ./venv/lib/python3.11/site-packages (from ruamel.yaml>0.15.69->dtschema) (0.2.8)
+diff --git a/drivers/net/phy/marvell.c b/drivers/net/phy/marvell.c
+index 860dc4001d415..a57ad53cd09cb 100644
+--- a/drivers/net/phy/marvell.c
++++ b/drivers/net/phy/marvell.c
+@@ -313,7 +313,7 @@ struct marvell_hw_stat {
+ 	u8 bits;
+ };
+ 
+-static struct marvell_hw_stat marvell_hw_stats[] = {
++static const struct marvell_hw_stat marvell_hw_stats[] = {
+ 	{ "phy_receive_errors_copper", 0, 21, 16},
+ 	{ "phy_idle_errors", 0, 10, 8 },
+ 	{ "phy_receive_errors_fiber", 1, 21, 16},
+-- 
+TQ-Systems GmbH | Mühlstraße 2, Gut Delling | 82229 Seefeld, Germany
+Amtsgericht München, HRB 105018
+Geschäftsführer: Detlef Schneider, Rüdiger Stahl, Stefan Schneider
+https://www.tq-group.com/
 
-$ git diff
-diff --git a/Documentation/devicetree/bindings/net/can/hexdev,lin-serdev.yaml b/Documentation/devicetree/bindings/net/can/hexdev,lin-serdev.yaml
-index c178eb9be1391..385cbe132258d 100644
---- a/Documentation/devicetree/bindings/net/can/hexdev,lin-serdev.yaml
-+++ b/Documentation/devicetree/bindings/net/can/hexdev,lin-serdev.yaml
-@@ -27,6 +27,6 @@ examples:
-   - |
-     serial {
-         linbus {
--            compatible = "hexdev,lin-serdev";
-+            compatible = "linux,lin-serdev";
-         };
-     };
-
-$ make dt_binding_check DT_SCHEMA_FILES=Documentation/devicetree/bindings/net/can/hexdev,lin-serdev.yaml
-  HOSTCC  scripts/basic/fixdep
-  HOSTCC  scripts/dtc/dtc.o
-  HOSTCC  scripts/dtc/flattree.o
-  HOSTCC  scripts/dtc/fstree.o
-  HOSTCC  scripts/dtc/data.o
-  HOSTCC  scripts/dtc/livetree.o
-  HOSTCC  scripts/dtc/treesource.o
-  HOSTCC  scripts/dtc/srcpos.o
-  HOSTCC  scripts/dtc/checks.o
-  HOSTCC  scripts/dtc/util.o
-  LEX     scripts/dtc/dtc-lexer.lex.c
-  YACC    scripts/dtc/dtc-parser.tab.[ch]
-  HOSTCC  scripts/dtc/dtc-lexer.lex.o
-  HOSTCC  scripts/dtc/dtc-parser.tab.o
-  HOSTLD  scripts/dtc/dtc
-  HOSTCC  scripts/dtc/libfdt/fdt.o
-  HOSTCC  scripts/dtc/libfdt/fdt_ro.o
-  HOSTCC  scripts/dtc/libfdt/fdt_wip.o
-  HOSTCC  scripts/dtc/libfdt/fdt_sw.o
-  HOSTCC  scripts/dtc/libfdt/fdt_rw.o
-  HOSTCC  scripts/dtc/libfdt/fdt_strerror.o
-  HOSTCC  scripts/dtc/libfdt/fdt_empty_tree.o
-  HOSTCC  scripts/dtc/libfdt/fdt_addresses.o
-  HOSTCC  scripts/dtc/libfdt/fdt_overlay.o
-  HOSTCC  scripts/dtc/fdtoverlay.o
-  HOSTLD  scripts/dtc/fdtoverlay
-  LINT    Documentation/devicetree/bindings
-  CHKDT   Documentation/devicetree/bindings/processed-schema.json
-  SCHEMA  Documentation/devicetree/bindings/processed-schema.json
-/home/ch/linux/Documentation/devicetree/bindings/pci/brcm,stb-pcie.yaml: ignoring, error in schema: properties: brcm,tperst-clk-ms: type
-/home/ch/linux/Documentation/devicetree/bindings/hwmon/microchip,emc2305.yaml: ignoring, error in schema: properties: emcs205,max-state: description
-  DTEX    Documentation/devicetree/bindings/net/can/hexdev,lin-serdev.example.dts
-  DTC_CHK Documentation/devicetree/bindings/net/can/hexdev,lin-serdev.example.dtb
-
-Any ideas?
-
-I'm using a python venv here, maybe this is related?
-
-Thanks
-  -- Christoph
 
