@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-93071-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93072-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C862C8B9EC0
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 18:39:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 050E08B9EC1
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 18:39:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7E50A281FF3
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 16:39:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AF992281F4B
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 16:39:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EBAC168B17;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8AEF16D32C;
 	Thu,  2 May 2024 16:39:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="qtXZaYYo"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="JtbDK/Fi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 620561E894
-	for <netdev@vger.kernel.org>; Thu,  2 May 2024 16:39:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43A7815E5A1
+	for <netdev@vger.kernel.org>; Thu,  2 May 2024 16:39:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714667973; cv=none; b=K6UsJ32gb8lt6o+bF468UURzrY4hdnxzbVQuKifixfx7yx8LCTOorPOq/jhK4+hfA8tKRVqbJeOPogtyDr8hB+bhry9KoLk+W1DsHg5zvJhs1sT9wnJAeDHdaH72N5aTTrFeuQmuyZ8N8S053OF9yGLgAPPpAVzdRg/d8dXVWs8=
+	t=1714667974; cv=none; b=Tc41gHBVMUuh5Ohxgad8CWV07wvVm50ifFh5fHpymKqe5gtiKtLy1ouIuHs8aobWIgc4mGDkS+hDrD/JLhkY5woITf7xQcmQsAdq34fPHYXh8vZFwYlg7y6QGLXb9plo3aprXs/z95oRdVd9JeF30NMpD3GKxL1+GdsCfgbAmZ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714667973; c=relaxed/simple;
-	bh=+FX3lp0bD/05Vq+i1ACF9Oo2Kab8ddgwHl13u4qq3JU=;
+	s=arc-20240116; t=1714667974; c=relaxed/simple;
+	bh=ON/MH5ojawv5201fqa/16BOtIzz0SosZ+xsld1be3K8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=HQjvcCpgiAujt+7yjO4qtNpRhGsCV+wVtVJecoSzHUUUxD36L0R/Y87aC4m1HzNhM6BGkwbDOUMGEWkP76MomdU/ZR0T+PLEmFBdYEHcLFj/T/Q6hw6Xr8bxdeXMJeW0qsOF6qvxOpRjk81ZA2I5YqOqvKLb62pdsRtWKI1vZ1Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=qtXZaYYo; arc=none smtp.client-ip=209.85.210.179
+	 MIME-Version; b=QJd7+BDYygDxNIgbG0muH5kNOv2YxbIqHNwxrIPOTn3JvtC2SJqwdp2h7Hc+61W58onc2cHc8HCAZFl59YjHu2fOqkO7zJf1edC9xRoMAmwioxuJkdC5TCU68bZcdPdO2P4U1nPpGgNRMh9NTnwsKQhcmf4wO5ZXsYPJMRCB7T8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=JtbDK/Fi; arc=none smtp.client-ip=209.85.216.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-6f26588dd5eso6948994b3a.0
-        for <netdev@vger.kernel.org>; Thu, 02 May 2024 09:39:32 -0700 (PDT)
+Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-2b3c711dfd3so597516a91.2
+        for <netdev@vger.kernel.org>; Thu, 02 May 2024 09:39:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1714667971; x=1715272771; darn=vger.kernel.org;
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1714667972; x=1715272772; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=3h4zQ+CJbIiuiPowMrNgCNlz328V8jesHO8fZ4bH37U=;
-        b=qtXZaYYooYrXon5kBjQuKJCB0fnhQS+TcBaS7gWQoizUjcR2MfA4mnIafMcIHJZb81
-         8Tzf+062GHKxbsOtsACOi7UhsEXTeRBm3RzLHoykyiETuR44yG58C/9hVTaKSIQ87bB8
-         ajx5dSATWyvHi7gegx6Eiod9glOJlvFQvXSA2e2S664gGKkVTcJxwAuc2V71yPMmeHOV
-         1r0h5/rTNjfzxoppkDO+nxXf8abrDWB4BuSiGn5AHQgktqJW3oo9rgrapIUeNEF2D41l
-         xzb9WSK+rJAMeFC91Bqq9IdaXg7qTBms9RcqgI7XFwB/l5DBmkVJBMdJ/4uMKxj2f5/0
-         Tq0g==
+        bh=tcbiOSruuHd0h56qePNOk6APfRPoDfrP8AyXT9PO0w0=;
+        b=JtbDK/Fi4dJk0kw1N9mbOjidEXQtmu89fMvv9oqKO1BF+E8MBcSgsihXMG9lpzGCx+
+         g2wrVFy5mu0HSdrIBNx3mFHpcn5Q5Thzs5JQ4a7i+tEQS7iaKzH1idFdDCl78rl25Ln1
+         rmiwsAzEToqeLWwYsVJncJape/LHONB9uTuShguVH+Jb+tbixYoYvXNsks7FrcYW1An0
+         GYd57pVW39PJP/psHkpuHdhtcPtwo8EUZDNeShHcYSNkEBi43zJZtCw0OjsNShCD9109
+         9tSGlV91HxLU7Tl+GACH8sDAYoReiqCJYMIrXDPxZRDNWE9POpRT3rgwijMPyG5bn7ta
+         f2Zg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714667971; x=1715272771;
+        d=1e100.net; s=20230601; t=1714667972; x=1715272772;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=3h4zQ+CJbIiuiPowMrNgCNlz328V8jesHO8fZ4bH37U=;
-        b=ksXMNa7bMVXMTauMQcwM9dh+1aemHRsuoOScCXr5v4JK93N9hw2sBEqNaHmbAG/ypI
-         PsCqkkWD0Vsuchvan5jQcw1Vb2GlC0yF3V/mqzohlT35CgMkJCeX/cbtXvcEIOlVNFRe
-         h/khmG/iy19TOVkOhn5u3LY5U0fDdPb+fqL+d6LA/RFrmqicetWOyGTxDOSh3OLqdWMv
-         CxvhMUH8r9UQujpIaUR9+n8W18pwdLlt33TiPS2hYWcPAWDrcR27sBOiOGna5E8JtLW7
-         4un6zJD2aW99zX4c+uX1ycS8Gq9b3qx8BJMryv7Ifn74KFZ0vVu++IdzsihQurnXB09Z
-         Z6Yw==
-X-Gm-Message-State: AOJu0YwzBI1KSJZaZNNi92+0B++KAGlxcifSLNhOCqTYat0Y1scDgahh
-	YdiVX6kgGOIFi+vrsYmz7fz059MzsChCtUfGfy9scf5mHAIdP/XZ4qi+HyAP+PNKFgNJEWqzD6S
-	Z
-X-Google-Smtp-Source: AGHT+IGutgRQww1HgqqZKR5MEBUE17Ffyv25obFkb5wHPVrGdHeA0GcPhktAV1lHt2HuUM0fPudrRw==
-X-Received: by 2002:a17:902:7797:b0:1ec:77e5:2d6f with SMTP id o23-20020a170902779700b001ec77e52d6fmr181291pll.59.1714667971245;
-        Thu, 02 May 2024 09:39:31 -0700 (PDT)
-Received: from localhost (fwdproxy-prn-001.fbsv.net. [2a03:2880:ff:1::face:b00c])
-        by smtp.gmail.com with ESMTPSA id x10-20020a170902ec8a00b001eb3dae7ef1sm1524157plg.16.2024.05.02.09.39.30
+        bh=tcbiOSruuHd0h56qePNOk6APfRPoDfrP8AyXT9PO0w0=;
+        b=uFa7LxUrbZaiUNWPQA14dv4FZwHq0Bdp8xcMYqcxtOjwmLfH3PZL1rytpl1cF0Er3p
+         IzLPQwdx6z2WgA49Bi8GshanzB8Dqu/hX7Iv4qZGM3F+ZWvDwHMplMqio0A7O4Irj6Pi
+         oPn/p8nUcKfXawVArha2pxisxnLQhM6U/oUi2hLCY2bq5Cd/KXDRwNFk8+iT4zEhCDBO
+         d5TVWByvH1nUdsuuBftaQhNMffqJTwPiyVVridDfngOS8lGz5HpXCBIOLPjqFNsX4mJ6
+         d1qrzF8FPZH8eoI8Jbbd/v6EQh4zYXzvmeeEMCDvSgj/Lxr+lR9RN/UVU1srMaQBqce6
+         ju+A==
+X-Gm-Message-State: AOJu0YzqjKrUiTvYRbaRR06iFEly3UetqBAFaeNRzfekaX1lv2U9uCTg
+	5YhgBHhkfTyLowvbMXalFevm0Kj7BQkfsHJnBHg8WVNAawN42wbWcaB7Gxs1GCsTT/ZHb3EXis6
+	+
+X-Google-Smtp-Source: AGHT+IHw8felvpfgJ9vkYVg0hbsVc13vgIjp6l1+DBh6A7ooXK3gfsZSnxydx+c/NbIPCRaV6WTs9w==
+X-Received: by 2002:a17:90a:4083:b0:2ab:a825:ae5 with SMTP id l3-20020a17090a408300b002aba8250ae5mr336123pjg.22.1714667972263;
+        Thu, 02 May 2024 09:39:32 -0700 (PDT)
+Received: from localhost (fwdproxy-prn-007.fbsv.net. [2a03:2880:ff:7::face:b00c])
+        by smtp.gmail.com with ESMTPSA id bg20-20020a17090b0d9400b002b297a49713sm3367614pjb.45.2024.05.02.09.39.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 May 2024 09:39:30 -0700 (PDT)
+        Thu, 02 May 2024 09:39:31 -0700 (PDT)
 From: David Wei <dw@davidwei.uk>
 To: netdev@vger.kernel.org
 Cc: Jakub Kicinski <kuba@kernel.org>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next v4 1/2] netdevsim: add NAPI support
-Date: Thu,  2 May 2024 09:39:27 -0700
-Message-ID: <20240502163928.2478033-2-dw@davidwei.uk>
+Subject: [PATCH net-next v4 2/2] net: selftest: add test for netdev netlink queue-get API
+Date: Thu,  2 May 2024 09:39:28 -0700
+Message-ID: <20240502163928.2478033-3-dw@davidwei.uk>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240502163928.2478033-1-dw@davidwei.uk>
 References: <20240502163928.2478033-1-dw@davidwei.uk>
@@ -87,342 +87,188 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add NAPI support to netdevim, similar to veth.
+Add a selftest for netdev generic netlink. For now there is only a
+single test that exercises the `queue-get` API.
 
-* Add a nsim_rq rx queue structure to hold a NAPI instance and a skb
-  queue.
-* During xmit, store the skb in the peer skb queue and schedule NAPI.
-* During napi_poll(), drain the skb queue and pass up the stack.
-* Add assoc between rxq and NAPI instance using netif_queue_set_napi().
+The test works with netdevsim by default or with a real device by
+setting NETIF.
+
+Add a timeout param to cmd() since ethtool -L can take a long time on
+real devices.
 
 Signed-off-by: David Wei <dw@davidwei.uk>
 ---
- drivers/net/netdevsim/netdev.c    | 209 ++++++++++++++++++++++++++++--
- drivers/net/netdevsim/netdevsim.h |   8 +-
- 2 files changed, 205 insertions(+), 12 deletions(-)
+ tools/testing/selftests/drivers/net/Makefile  |  1 +
+ .../selftests/drivers/net/lib/py/env.py       |  6 +-
+ tools/testing/selftests/drivers/net/queues.py | 66 +++++++++++++++++++
+ tools/testing/selftests/net/lib/py/nsim.py    |  4 +-
+ tools/testing/selftests/net/lib/py/utils.py   |  8 +--
+ 5 files changed, 77 insertions(+), 8 deletions(-)
+ create mode 100755 tools/testing/selftests/drivers/net/queues.py
 
-diff --git a/drivers/net/netdevsim/netdev.c b/drivers/net/netdevsim/netdev.c
-index d127856f8f36..193887c072ca 100644
---- a/drivers/net/netdevsim/netdev.c
-+++ b/drivers/net/netdevsim/netdev.c
-@@ -28,11 +28,33 @@
+diff --git a/tools/testing/selftests/drivers/net/Makefile b/tools/testing/selftests/drivers/net/Makefile
+index 754ec643768a..e54f382bcb02 100644
+--- a/tools/testing/selftests/drivers/net/Makefile
++++ b/tools/testing/selftests/drivers/net/Makefile
+@@ -4,6 +4,7 @@ TEST_INCLUDES := $(wildcard lib/py/*.py)
  
- #include "netdevsim.h"
+ TEST_PROGS := \
+ 	ping.py \
++	queues.py \
+ 	stats.py \
+ # end of TEST_PROGS
  
-+#define NSIM_RING_SIZE		256
-+
-+static int nsim_napi_rx(struct nsim_rq *rq, struct sk_buff *skb)
-+{
-+	if (skb_queue_len(&rq->skb_queue) > NSIM_RING_SIZE) {
-+		dev_kfree_skb_any(skb);
-+		return NET_RX_DROP;
-+	}
-+
-+	skb_queue_tail(&rq->skb_queue, skb);
-+	return NET_RX_SUCCESS;
-+}
-+
-+static int nsim_forward_skb(struct net_device *dev, struct sk_buff *skb,
-+			    struct nsim_rq *rq)
-+{
-+	return __dev_forward_skb(dev, skb) ?: nsim_napi_rx(rq, skb);
-+}
-+
- static netdev_tx_t nsim_start_xmit(struct sk_buff *skb, struct net_device *dev)
- {
- 	struct netdevsim *ns = netdev_priv(dev);
-+	struct net_device *peer_dev;
- 	unsigned int len = skb->len;
- 	struct netdevsim *peer_ns;
-+	struct nsim_rq *rq;
-+	int rxq;
+diff --git a/tools/testing/selftests/drivers/net/lib/py/env.py b/tools/testing/selftests/drivers/net/lib/py/env.py
+index 5c8f695b2536..edcedd7bffab 100644
+--- a/tools/testing/selftests/drivers/net/lib/py/env.py
++++ b/tools/testing/selftests/drivers/net/lib/py/env.py
+@@ -36,7 +36,7 @@ class NetDrvEnv:
+     """
+     Class for a single NIC / host env, with no remote end
+     """
+-    def __init__(self, src_path):
++    def __init__(self, src_path, **kwargs):
+         self._ns = None
  
- 	rcu_read_lock();
- 	if (!nsim_ipsec_tx(ns, skb))
-@@ -42,10 +64,18 @@ static netdev_tx_t nsim_start_xmit(struct sk_buff *skb, struct net_device *dev)
- 	if (!peer_ns)
- 		goto out_drop_free;
+         self.env = _load_env_file(src_path)
+@@ -44,11 +44,13 @@ class NetDrvEnv:
+         if 'NETIF' in self.env:
+             self.dev = ip("link show dev " + self.env['NETIF'], json=True)[0]
+         else:
+-            self._ns = NetdevSimDev()
++            self._ns = NetdevSimDev(**kwargs)
+             self.dev = self._ns.nsims[0].dev
+         self.ifindex = self.dev['ifindex']
  
-+	peer_dev = peer_ns->netdev;
-+	rxq = skb_get_queue_mapping(skb);
-+	if (rxq >= peer_dev->num_rx_queues)
-+		rxq = rxq % peer_dev->num_rx_queues;
-+	rq = &peer_ns->rq[rxq];
+     def __enter__(self):
++        ip(f"link set dev {self.dev['ifname']} up")
 +
- 	skb_tx_timestamp(skb);
--	if (unlikely(dev_forward_skb(peer_ns->netdev, skb) == NET_RX_DROP))
-+	if (unlikely(nsim_forward_skb(peer_dev, skb, rq) == NET_RX_DROP))
- 		goto out_drop_cnt;
+         return self
  
-+	napi_schedule(&rq->napi);
+     def __exit__(self, ex_type, ex_value, ex_tb):
+diff --git a/tools/testing/selftests/drivers/net/queues.py b/tools/testing/selftests/drivers/net/queues.py
+new file mode 100755
+index 000000000000..30f29096e27c
+--- /dev/null
++++ b/tools/testing/selftests/drivers/net/queues.py
+@@ -0,0 +1,66 @@
++#!/usr/bin/env python3
++# SPDX-License-Identifier: GPL-2.0
 +
- 	rcu_read_unlock();
- 	u64_stats_update_begin(&ns->syncp);
- 	ns->tx_packets++;
-@@ -300,25 +330,146 @@ static int nsim_get_iflink(const struct net_device *dev)
- 	return iflink;
- }
++from lib.py import ksft_run, ksft_exit, ksft_eq, KsftSkipEx
++from lib.py import EthtoolFamily, NetdevFamily
++from lib.py import NetDrvEnv
++from lib.py import cmd
++import glob
++
++
++def sys_get_queues(ifname) -> int:
++    folders = glob.glob(f'/sys/class/net/{ifname}/queues/rx-*')
++    return len(folders)
++
++
++def nl_get_queues(cfg, nl):
++    queues = nl.queue_get({'ifindex': cfg.ifindex}, dump=True)
++    if queues:
++        return len([q for q in queues if q['type'] == 'rx'])
++    return None
++
++
++def get_queues(cfg, nl) -> None:
++    queues = nl_get_queues(cfg, nl)
++    if not queues:
++        raise KsftSkipEx('queue-get not supported by device')
++
++    expected = sys_get_queues(cfg.dev['ifname'])
++    ksft_eq(queues, expected)
++
++
++def addremove_queues(cfg, nl) -> None:
++    queues = nl_get_queues(cfg, nl)
++    if not queues:
++        raise KsftSkipEx('queue-get not supported by device')
++
++    curr_queues = sys_get_queues(cfg.dev['ifname'])
++    if curr_queues == 1:
++        raise KsftSkipEx('cannot decrement queue: already at 1')
++
++    netnl = EthtoolFamily()
++    channels = netnl.channels_get({'header': {'dev-index': cfg.ifindex}})
++    if channels['combined-count'] == 0:
++        rx_type = 'rx'
++    else:
++        rx_type = 'combined'
++
++    expected = curr_queues - 1
++    cmd(f"ethtool -L {cfg.dev['ifname']} {rx_type} {expected}", timeout=10)
++    queues = nl_get_queues(cfg, nl)
++    ksft_eq(queues, expected)
++
++    expected = curr_queues
++    cmd(f"ethtool -L {cfg.dev['ifname']} {rx_type} {expected}", timeout=10)
++    queues = nl_get_queues(cfg, nl)
++    ksft_eq(queues, expected)
++
++
++def main() -> None:
++    with NetDrvEnv(__file__, queue_count=3) as cfg:
++        ksft_run([get_queues, addremove_queues], args=(cfg, NetdevFamily()))
++    ksft_exit()
++
++
++if __name__ == "__main__":
++    main()
+diff --git a/tools/testing/selftests/net/lib/py/nsim.py b/tools/testing/selftests/net/lib/py/nsim.py
+index 06896cdf7c18..f571a8b3139b 100644
+--- a/tools/testing/selftests/net/lib/py/nsim.py
++++ b/tools/testing/selftests/net/lib/py/nsim.py
+@@ -49,7 +49,7 @@ class NetdevSimDev:
+         with open(fullpath, "w") as f:
+             f.write(val)
  
-+static int nsim_rcv(struct nsim_rq *rq, int budget)
-+{
-+	struct sk_buff *skb;
-+	int i;
-+
-+	for (i = 0; i < budget; i++) {
-+		if (skb_queue_empty(&rq->skb_queue))
-+			break;
-+
-+		skb = skb_dequeue(&rq->skb_queue);
-+		netif_receive_skb(skb);
-+	}
-+
-+	return i;
-+}
-+
-+static int nsim_poll(struct napi_struct *napi, int budget)
-+{
-+	struct nsim_rq *rq = container_of(napi, struct nsim_rq, napi);
-+	int done;
-+
-+	done = nsim_rcv(rq, budget);
-+	napi_complete(napi);
-+
-+	return done;
-+}
-+
-+static int nsim_create_page_pool(struct nsim_rq *rq)
-+{
-+	struct page_pool_params p = {
-+		.order = 0,
-+		.pool_size = NSIM_RING_SIZE,
-+		.nid = NUMA_NO_NODE,
-+		.dev = &rq->napi.dev->dev,
-+		.napi = &rq->napi,
-+		.dma_dir = DMA_BIDIRECTIONAL,
-+		.netdev = rq->napi.dev,
-+	};
-+
-+	rq->page_pool = page_pool_create(&p);
-+	if (IS_ERR(rq->page_pool)) {
-+		int err = PTR_ERR(rq->page_pool);
-+
-+		rq->page_pool = NULL;
-+		return err;
-+	}
-+	return 0;
-+}
-+
-+static int nsim_init_napi(struct netdevsim *ns)
-+{
-+	struct net_device *dev = ns->netdev;
-+	struct nsim_rq *rq;
-+	int err, i;
-+
-+	for (i = 0; i < dev->num_rx_queues; i++) {
-+		rq = &ns->rq[i];
-+
-+		netif_napi_add(dev, &rq->napi, nsim_poll);
-+	}
-+
-+	for (i = 0; i < dev->num_rx_queues; i++) {
-+		rq = &ns->rq[i];
-+
-+		err = nsim_create_page_pool(rq);
-+		if (err)
-+			goto err_pp_destroy;
-+	}
-+
-+	return 0;
-+
-+err_pp_destroy:
-+	while (i--) {
-+		page_pool_destroy(ns->rq[i].page_pool);
-+		ns->rq[i].page_pool = NULL;
-+	}
-+
-+	for (i = 0; i < dev->num_rx_queues; i++)
-+		__netif_napi_del(&ns->rq[i].napi);
-+
-+	return err;
-+}
-+
-+static void nsim_enable_napi(struct netdevsim *ns)
-+{
-+	struct net_device *dev = ns->netdev;
-+	int i;
-+
-+	for (i = 0; i < dev->num_rx_queues; i++) {
-+		struct nsim_rq *rq = &ns->rq[i];
-+
-+		netif_queue_set_napi(dev, i, NETDEV_QUEUE_TYPE_RX, &rq->napi);
-+		napi_enable(&rq->napi);
-+	}
-+}
-+
- static int nsim_open(struct net_device *dev)
- {
- 	struct netdevsim *ns = netdev_priv(dev);
--	struct page_pool_params pp = { 0 };
-+	int err;
+-    def __init__(self, port_count=1, ns=None):
++    def __init__(self, port_count=1, queue_count=1, ns=None):
+         # nsim will spawn in init_net, we'll set to actual ns once we switch it there
+         self.ns = None
  
--	pp.pool_size = 128;
--	pp.dev = &dev->dev;
--	pp.dma_dir = DMA_BIDIRECTIONAL;
--	pp.netdev = dev;
-+	err = nsim_init_napi(ns);
-+	if (err)
-+		return err;
+@@ -59,7 +59,7 @@ class NetdevSimDev:
+         addr = random.randrange(1 << 15)
+         while True:
+             try:
+-                self.ctrl_write("new_device", "%u %u" % (addr, port_count))
++                self.ctrl_write("new_device", "%u %u %u" % (addr, port_count, queue_count))
+             except OSError as e:
+                 if e.errno == errno.ENOSPC:
+                     addr = random.randrange(1 << 15)
+diff --git a/tools/testing/selftests/net/lib/py/utils.py b/tools/testing/selftests/net/lib/py/utils.py
+index b57d467afd0f..0916d175f332 100644
+--- a/tools/testing/selftests/net/lib/py/utils.py
++++ b/tools/testing/selftests/net/lib/py/utils.py
+@@ -8,7 +8,7 @@ import time
  
--	ns->pp = page_pool_create(&pp);
--	return PTR_ERR_OR_ZERO(ns->pp);
-+	nsim_enable_napi(ns);
-+
-+	return 0;
-+}
-+
-+static void nsim_del_napi(struct netdevsim *ns)
-+{
-+	struct net_device *dev = ns->netdev;
-+	int i;
-+
-+	for (i = 0; i < dev->num_rx_queues; i++) {
-+		struct nsim_rq *rq = &ns->rq[i];
-+
-+		napi_disable(&rq->napi);
-+		__netif_napi_del(&rq->napi);
-+	}
-+	synchronize_net();
-+
-+	for (i = 0; i < dev->num_rx_queues; i++) {
-+		page_pool_destroy(ns->rq[i].page_pool);
-+		ns->rq[i].page_pool = NULL;
-+	}
- }
  
- static int nsim_stop(struct net_device *dev)
- {
- 	struct netdevsim *ns = netdev_priv(dev);
-+	struct netdevsim *peer;
-+
-+	netif_carrier_off(dev);
-+	peer = rtnl_dereference(ns->peer);
-+	if (peer)
-+		netif_carrier_off(peer->netdev);
+ class cmd:
+-    def __init__(self, comm, shell=True, fail=True, ns=None, background=False, host=None):
++    def __init__(self, comm, shell=True, fail=True, ns=None, background=False, host=None, timeout=5):
+         if ns:
+             comm = f'ip netns exec {ns} ' + comm
  
--	page_pool_destroy(ns->pp);
-+	nsim_del_napi(ns);
+@@ -23,12 +23,12 @@ class cmd:
+             self.proc = subprocess.Popen(comm, shell=shell, stdout=subprocess.PIPE,
+                                          stderr=subprocess.PIPE)
+         if not background:
+-            self.process(terminate=False, fail=fail)
++            self.process(terminate=False, fail=fail, timeout=timeout)
  
- 	return 0;
- }
-@@ -437,7 +588,7 @@ nsim_pp_hold_write(struct file *file, const char __user *data,
- 	if (!netif_running(ns->netdev) && val) {
- 		ret = -ENETDOWN;
- 	} else if (val) {
--		ns->page = page_pool_dev_alloc_pages(ns->pp);
-+		ns->page = page_pool_dev_alloc_pages(ns->rq[0].page_pool);
- 		if (!ns->page)
- 			ret = -ENOMEM;
- 	} else {
-@@ -477,6 +628,35 @@ static void nsim_setup(struct net_device *dev)
- 	dev->xdp_features = NETDEV_XDP_ACT_HW_OFFLOAD;
- }
- 
-+static int nsim_queue_init(struct netdevsim *ns)
-+{
-+	struct net_device *dev = ns->netdev;
-+	int i;
-+
-+	ns->rq = kvcalloc(dev->num_rx_queues, sizeof(*ns->rq),
-+			  GFP_KERNEL_ACCOUNT | __GFP_RETRY_MAYFAIL);
-+	if (!ns->rq)
-+		return -ENOMEM;
-+
-+	for (i = 0; i < dev->num_rx_queues; i++)
-+		skb_queue_head_init(&ns->rq[i].skb_queue);
-+
-+	return 0;
-+}
-+
-+static void nsim_queue_free(struct netdevsim *ns)
-+{
-+	struct net_device *dev = ns->netdev;
-+	int i;
-+
-+	for (i = 0; i < dev->num_rx_queues; i++)
-+		skb_queue_purge_reason(&ns->rq[i].skb_queue,
-+				       SKB_DROP_REASON_QUEUE_PURGE);
-+
-+	kvfree(ns->rq);
-+	ns->rq = NULL;
-+}
-+
- static int nsim_init_netdevsim(struct netdevsim *ns)
- {
- 	struct mock_phc *phc;
-@@ -495,10 +675,14 @@ static int nsim_init_netdevsim(struct netdevsim *ns)
- 		goto err_phc_destroy;
- 
- 	rtnl_lock();
--	err = nsim_bpf_init(ns);
-+	err = nsim_queue_init(ns);
- 	if (err)
- 		goto err_utn_destroy;
- 
-+	err = nsim_bpf_init(ns);
-+	if (err)
-+		goto err_rq_destroy;
-+
- 	nsim_macsec_init(ns);
- 	nsim_ipsec_init(ns);
- 
-@@ -512,6 +696,8 @@ static int nsim_init_netdevsim(struct netdevsim *ns)
- 	nsim_ipsec_teardown(ns);
- 	nsim_macsec_teardown(ns);
- 	nsim_bpf_uninit(ns);
-+err_rq_destroy:
-+	nsim_queue_free(ns);
- err_utn_destroy:
- 	rtnl_unlock();
- 	nsim_udp_tunnels_info_destroy(ns->netdev);
-@@ -593,6 +779,7 @@ void nsim_destroy(struct netdevsim *ns)
- 		nsim_macsec_teardown(ns);
- 		nsim_ipsec_teardown(ns);
- 		nsim_bpf_uninit(ns);
-+		nsim_queue_free(ns);
- 	}
- 	rtnl_unlock();
- 	if (nsim_dev_port_is_pf(ns->nsim_dev_port))
-diff --git a/drivers/net/netdevsim/netdevsim.h b/drivers/net/netdevsim/netdevsim.h
-index 7664ab823e29..bf02efa10956 100644
---- a/drivers/net/netdevsim/netdevsim.h
-+++ b/drivers/net/netdevsim/netdevsim.h
-@@ -90,11 +90,18 @@ struct nsim_ethtool {
- 	struct ethtool_fecparam fec;
- };
- 
-+struct nsim_rq {
-+	struct napi_struct napi;
-+	struct sk_buff_head skb_queue;
-+	struct page_pool *page_pool;
-+};
-+
- struct netdevsim {
- 	struct net_device *netdev;
- 	struct nsim_dev *nsim_dev;
- 	struct nsim_dev_port *nsim_dev_port;
- 	struct mock_phc *phc;
-+	struct nsim_rq *rq;
- 
- 	u64 tx_packets;
- 	u64 tx_bytes;
-@@ -125,7 +132,6 @@ struct netdevsim {
- 		struct debugfs_u32_array dfs_ports[2];
- 	} udp_ports;
- 
--	struct page_pool *pp;
- 	struct page *page;
- 	struct dentry *pp_dfs;
- 
+-    def process(self, terminate=True, fail=None):
++    def process(self, terminate=True, fail=None, timeout=5):
+         if terminate:
+             self.proc.terminate()
+-        stdout, stderr = self.proc.communicate(timeout=5)
++        stdout, stderr = self.proc.communicate(timeout)
+         self.stdout = stdout.decode("utf-8")
+         self.stderr = stderr.decode("utf-8")
+         self.proc.stdout.close()
 -- 
 2.43.0
 
