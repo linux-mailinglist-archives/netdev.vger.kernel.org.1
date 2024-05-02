@@ -1,106 +1,109 @@
-Return-Path: <netdev+bounces-93061-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93068-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 013D28B9E22
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 18:04:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AEA188B9E81
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 18:25:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B1037286652
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 16:04:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6B4CD284AEE
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 16:25:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67D5C15E1F6;
-	Thu,  2 May 2024 16:03:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3E5915B559;
+	Thu,  2 May 2024 16:25:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bJhfJIcJ"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=paloaltonetworks.com header.i=@paloaltonetworks.com header.b="GMKQkT08"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-00169c01.pphosted.com (mx0a-00169c01.pphosted.com [67.231.148.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDF0815D5BE
-	for <netdev@vger.kernel.org>; Thu,  2 May 2024 16:03:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D20F815CD40
+	for <netdev@vger.kernel.org>; Thu,  2 May 2024 16:25:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714665834; cv=none; b=hPXZKtUGZdFjF9kDSlRnJiX5XvrtlAaUiZAZwz10zw0c1UA+q5xJdHfsbkBCcF5CXYp27Qq9/YDCDf0RK112Pu5IVH+wSRNSmXFLNUgqyyGrNxaTjK79MC/XLIhiqBSXM9BfAaRUz0d73LlcxLughHbbwWrmNSCcOTuTZK5Ll7s=
+	t=1714667107; cv=none; b=s8KtNJgt82ZN67kQm4AciMFwFw/sgpIwYrjAkLT9IHA8K76Mj6lDCJN3q1C7eTFe93LaXyi68FAkq1/o0c71iLoWgfUYYRd7lzwcIIGlK6aEMVlSqdJvGI8MfFHpbOuqvMxG1KdxFJungipitslNNDpUo1oqBLJ5q8DUFTL/++I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714665834; c=relaxed/simple;
-	bh=1e82K3Ua6k4IUiosWcJpsPWipzQfQxYKyxwgm1RKcz0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=O14RFYtd73M6F9klblBbIKwjwOIEKK0UPGIISlokYuEdJP+FUkJuvjTc6AcBsjWJ+/VwOlB7vBGg5TP7qL77xf2I5PTMjl1jR+6K87VGBxEEppK/+MXj7e9gyldDzF3+veEoXGv+wfsW+L0sqQ6YJ7rthi7lq+W0k0Hb8KOvSic=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bJhfJIcJ; arc=none smtp.client-ip=209.85.208.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-572afdee2a8so7368a12.0
-        for <netdev@vger.kernel.org>; Thu, 02 May 2024 09:03:52 -0700 (PDT)
+	s=arc-20240116; t=1714667107; c=relaxed/simple;
+	bh=mUvgMqaJ60A8brdvJl3yWx+HCM674YlQqgjYokl7iyI=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=S6OYETybKxp2z8GWKJhJwGVQEGAxgqCXarq8LEzQp419GJVQxqJ0JfMBl5oxGztBZHORnMen3P80qcmlg05zFT/+6RtmXkWVQxgDNJKnOIqF51oXZzGTqvzx+nRYl9gRT/c9iu0RCQKrt6ZRG1KeMxpdRVirDd5+QoBkzOu1W7I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=paloaltonetworks.com; spf=pass smtp.mailfrom=paloaltonetworks.com; dkim=fail (0-bit key) header.d=paloaltonetworks.com header.i=@paloaltonetworks.com header.b=GMKQkT08 reason="key not found in DNS"; arc=none smtp.client-ip=67.231.148.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=paloaltonetworks.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paloaltonetworks.com
+Received: from pps.filterd (m0281123.ppops.net [127.0.0.1])
+	by mx0b-00169c01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 442BQHbf005239;
+	Thu, 2 May 2024 09:01:10 -0700
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0b-00169c01.pphosted.com (PPS) with ESMTPS id 3xu34tm9h3-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 02 May 2024 09:01:10 -0700 (PDT)
+Received: from m0281123.ppops.net (m0281123.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 442G19Mu002569;
+	Thu, 2 May 2024 09:01:09 -0700
+Received: from webmail.paloaltonetworks.com (webmail.paloaltonetworks.com [199.167.52.51] (may be forged))
+	by mx0b-00169c01.pphosted.com (PPS) with ESMTPS id 3xu34tm9gw-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 02 May 2024 09:01:09 -0700 (PDT)
+Received: from localhost.localdomain (unknown [10.47.128.233])
+	by webmail.paloaltonetworks.com (Postfix) with ESMTPA id F25FB7F5CE;
+	Thu,  2 May 2024 09:01:06 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 webmail.paloaltonetworks.com F25FB7F5CE
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1714665831; x=1715270631; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1e82K3Ua6k4IUiosWcJpsPWipzQfQxYKyxwgm1RKcz0=;
-        b=bJhfJIcJijEVDVdEklX9IZarORf59HwVcEIF1cuer3TYXmOwKg+GhwRiATv48YrRBj
-         bJgrAyZ11OdqVqi8x1jxKvXIUS2tiB1SDvap8Ivcdfmve22r2FaMITKysBzF89nrrIpI
-         SBgDQdwCFh07CW6Odx1uZ3wFgPJIbbWO8rI68zGBy9zRVvFqsYkqjjYs2oN2jqhftNfo
-         yZX1FF+bDTdvbj/hF8diOfv4aCmwfLBj39kRpX8BO/AlAnyQx1gOeJflqcDCa+vuFl4e
-         6S/JlDFn+IjJFDhoWEAL7P0Jk8+MUeUQGQlx+Y+9s/jZFR2ToqK3Ftw+26Ek2z+l6ubO
-         /VkA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714665831; x=1715270631;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1e82K3Ua6k4IUiosWcJpsPWipzQfQxYKyxwgm1RKcz0=;
-        b=Q6IYzizySI0ZSerWh3qh52IIrxRIVLLnPQetBCokHXIIGgHOn9tTQaI6x+R2MW2PbT
-         bf9m0PxJTUXiIJfaLG8/34j+kbQtayO9WYdvBwr/K7lQTTh2hNSwEFEfpdvZOBrq6nvd
-         AiT3skM0xqNnsxuqU28eMk0WDwJFGEzPFp1b3KY7swPEUDMo6rA6NiKZSksHyjeZKZkV
-         rcKg3att5l/y5VrQUsYz+kj8xvJZSR5LmHMb3tgTAVXBFabqf3PuJdFPEgnYPXcq/kub
-         qK74A8fLhUh+YrAF2ehQ9q8VXtFq2J5V6MLRJoKdFE78zeISelMeXvVAZgCSoTeDLWe7
-         vJYg==
-X-Forwarded-Encrypted: i=1; AJvYcCWfk3EzzWXeGMAcZEbLHvrjXuz1PYFVZKak1wHO6/14kVIwi+7LISGVIIA5aEVIrTIBh/zOR82CHctLzhQPFg3PWk5S91UF
-X-Gm-Message-State: AOJu0YwsqTmL+FsFkP7uZPwvUzUuiqDzS+aMTozTJ2Y5nOPg0I3dsazc
-	kiEFBQuCP6hoVkJyU4nG7xRPNFmWIEdoOfl/BVhF6B5hPykHqsXKevGwmxiB89o5HWhGmliMRxI
-	vnRKDWc2OSNSz8HDTbsfn1duxIKD9uA6YnMWw
-X-Google-Smtp-Source: AGHT+IGiOCHLERSdspuoVfuSNJY+R3Yo9cPLAvytq3MVmvBd/qZK7spNwOC8TPHEZNAGm/OReIBgVqJsEmoaAeENAp8=
-X-Received: by 2002:aa7:c6d1:0:b0:572:7c06:9c0 with SMTP id
- 4fb4d7f45d1cf-572bb3e9f13mr261417a12.0.1714665830800; Thu, 02 May 2024
- 09:03:50 -0700 (PDT)
+	d=paloaltonetworks.com; s=mail; t=1714665668;
+	bh=q72EdBxkSW6srP86SETdwliTd4Nie4IqxsOE7zkLRjU=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=GMKQkT08wQgufhAkmO7UujLXtStDoSLmcp4leD0jP2R7Tgiw4WvIsEVM8GvGvN5xQ
+	 TyQiBRBPce3vjVDNVjGNuZEI+ULdcho9BATf+CYpksVrR9ixBj1w6W5PvV/3IohoTA
+	 1tEv/7FibefqjJV2XjaGNXxu4m7wQmtrNG/404ow=
+From: Roded Zats <rzats@paloaltonetworks.com>
+To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com
+Cc: orcohen@paloaltonetworks.com, rzats@paloaltonetworks.com,
+        netdev@vger.kernel.org
+Subject: [PATCH net] rtnetlink: Correct nested IFLA_VF_VLAN_LIST attribute validation
+Date: Thu,  2 May 2024 18:57:51 +0300
+Message-Id: <20240502155751.75705-1-rzats@paloaltonetworks.com>
+X-Mailer: git-send-email 2.39.3 (Apple Git-146)
+In-Reply-To: <20240502064226.633cd9de@kernel.org>
+References: <20240502064226.633cd9de@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240502113748.1622637-1-edumazet@google.com> <20240502113748.1622637-2-edumazet@google.com>
- <d09f8831-293e-45ec-93fb-6feab25d47f2@kernel.org>
-In-Reply-To: <d09f8831-293e-45ec-93fb-6feab25d47f2@kernel.org>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 2 May 2024 18:03:39 +0200
-Message-ID: <CANn89iKPSp9_bZAZpFM4biEg7vFXxMmY2nQfEmTfLsiHGdBTxg@mail.gmail.com>
-Subject: Re: [PATCH net-next 1/2] rtnetlink: change rtnl_stats_dump() return value
-To: David Ahern <dsahern@kernel.org>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Ido Schimmel <idosch@nvidia.com>, Jiri Pirko <jiri@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Thu, May 2, 2024 at 5:59=E2=80=AFPM David Ahern <dsahern@kernel.org> wro=
-te:
->
-> On 5/2/24 5:37 AM, Eric Dumazet wrote:
-> > By returning 0 (or an error) instead of skb->len,
-> > we allow NLMSG_DONE to be appended to the current
-> > skb at the end of a dump, saving a couple of recvmsg()
-> > system calls.
->
-> any concern that a patch similar to:
-> https://lore.kernel.org/netdev/20240411180202.399246-1-kuba@kernel.org/
-> will be needed again here?
+Each attribute inside a nested IFLA_VF_VLAN_LIST is assumed to be a
+struct ifla_vf_vlan_info so the size of such attribute needs to be at least
+of sizeof(struct ifla_vf_vlan_info) which is 14 bytes.
+The current size validation in do_setvfinfo is against NLA_HDRLEN (4 bytes)
+which is less than sizeof(struct ifla_vf_vlan_info) so this validation
+is not enough and a too small attribute might be cast to a
+struct ifla_vf_vlan_info, this might result in an out of bands
+read access when accessing the saved (casted) entry in ivvl.
 
-This has been discussed, Jakub answer was :
+Fixes: 79aab093a0b5 ("net: Update API for VF vlan protocol 802.1ad support")
+Signed-off-by: Roded Zats <rzats@paloaltonetworks.com>
+---
+ net/core/rtnetlink.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-https://lore.kernel.org/netdev/20240411115748.05faa636@kernel.org/
+diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
+index a3d7847ce69d..8ba6a4e4be26 100644
+--- a/net/core/rtnetlink.c
++++ b/net/core/rtnetlink.c
+@@ -2530,7 +2530,7 @@ static int do_setvfinfo(struct net_device *dev, struct nlattr **tb)
+ 
+ 		nla_for_each_nested(attr, tb[IFLA_VF_VLAN_LIST], rem) {
+ 			if (nla_type(attr) != IFLA_VF_VLAN_INFO ||
+-			    nla_len(attr) < NLA_HDRLEN) {
++			    nla_len(attr) < sizeof(struct ifla_vf_vlan_info)) {
+ 				return -EINVAL;
+ 			}
+ 			if (len >= MAX_VLAN_LIST_LEN)
+-- 
+2.39.3 (Apple Git-146)
 
-So the plan is to change functions until a regression is reported.
 
