@@ -1,87 +1,93 @@
-Return-Path: <netdev+bounces-92870-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92871-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E7348B9325
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 03:38:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27AD18B9326
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 03:39:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6C9C0B21789
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 01:38:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4B5961C20E70
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 01:39:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0267112E6D;
-	Thu,  2 May 2024 01:38:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 217B212E5B;
+	Thu,  2 May 2024 01:39:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qi6wer8x"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E7V5baW/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
+Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 585D712B93;
-	Thu,  2 May 2024 01:38:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EE0D29A0
+	for <netdev@vger.kernel.org>; Thu,  2 May 2024 01:39:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714613907; cv=none; b=MeXA/1SxgIzPdcklfhTzMpapxLF+uKmEt/CfnmF4Jqo96t0lbfVk0oAn/x2rl71N15G//Ty/RlMf1nMNnjt6aJbPADGAB9TLFo7ApsPkKfhwW4jjjLTpuZP9Lf4EBvs2eKoDAbfnHL44mQ7rG6kigL6EJjP7uaEx1zOK5X9Txwc=
+	t=1714613947; cv=none; b=bWpY2m6qhuOKWHFQTF265c9/dzWi/qEwZNADLaUI7NeVdk8vTv6tfJZpmMF4AQV0wCC9URYs9WT5oDK4y+xwVVCmsKdTuMBcj24d0H2iFGtI3cs05bLEIoHQzrMs4i+xyPL3uz7mPVUeLPccDRtZqxCQgvgsl2cc3p2vgJu5nFo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714613907; c=relaxed/simple;
-	bh=JZR8JM6/C6y1TrN5e2I5URm0lIdHoKbjEBvNWqk3K/E=;
+	s=arc-20240116; t=1714613947; c=relaxed/simple;
+	bh=QOHy7iUBu+bYJl0K6y1X7ia69mD2bfV+wooIWt3AnRY=;
 	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=NKx71jxJa6O5/j1hSLQPc9CwcorEGe3nfwOs9fqL/n3yWP3V0yYYF9C5UiwcufGzvRbGLxONIJGI/X6V9rnWl75wTrZfkPA0CyRFZ8nwCk3hKowXIKn2vjvz60hOZ0eS3M488P7QrmZKDScSM8qG0by7cfqiexOWb+QxEmoqzHg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Qi6wer8x; arc=none smtp.client-ip=209.85.219.45
+	 Mime-Version:Content-Type; b=rA9mTOc0thV7cXT0zww6gjfza8f5vOZD7fO0XgPrNsLSZanDKVzuLQCweoB1GbOCTiy4+en+7kf8oMocH04pv0AGebpNYSgwJLvdl7ayi0ufoxtt62IRToAOSd8fYooHcSuZWA4q+FGqn09qPFhHlKClZJqcp1+sfbGk0BQ2+L8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=E7V5baW/; arc=none smtp.client-ip=209.85.219.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f45.google.com with SMTP id 6a1803df08f44-6a0c8fb3540so13216526d6.1;
-        Wed, 01 May 2024 18:38:26 -0700 (PDT)
+Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-6a0a7cf89deso23701286d6.0
+        for <netdev@vger.kernel.org>; Wed, 01 May 2024 18:39:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1714613905; x=1715218705; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1714613944; x=1715218744; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=IPICephXaLessvRUUOJzNei7ZEdzmTmcsaiNIs+7jPU=;
-        b=Qi6wer8xBZNKcoQ30G9/XFpiYmo6DEdcTSnvcq48WBTD4KNxpqJvJIGICy2Ez3J2aC
-         gb9uZdjxA29Uc0rs3EcCYVANdzNXez8wAZg5KRSStgHCNUVR45JORyG5vldBQp2hweyX
-         R6gF/ibI3BrZ9AzYxihHS3esRiXZguz4BCDco9Z+yNgJgE7j1NESe675zWTqQPo8iado
-         rhFii8WRbVhwZ/WYYFlBXBKbBbZQDVNiL/LV3jgDPd/A62mY9JuVDGziTJFdmnnNWaXL
-         M54GBm/YN31i3HpwupCZQ8/U7YIZh4SZ3f2GAMA6TBOnFlvThZ5g5sndYmBGY5urkL1y
-         jrhw==
+        bh=7XmgoGThuarzyNd32NYUffgMgDjvQQPf1chjUYx35z4=;
+        b=E7V5baW/t8uPie1bk1pQ4IzIxQMTZdS3RVpXOyCq0TP3UH5DfHsuXmWCHxH6HCAIav
+         oVqPdL3OWTUFecYSgDV73UfvuI2o5u0lHzrWoO/iNH4S8K2sGZ89vQvASK/E0SkEeZR/
+         oK6q1CG1Sokt9hVc6payCaKHCbAYCtXmHnoIxfpv45m/5a3xhZfOIn+/K4tuKADPq2MA
+         3GqHn0GYCkiW8sPWLyTlosIeYTELj6FHR8X9VXQjJPkTK5NrzWwzhBGTc1O89Zhjvj7c
+         4cF72fP3Jm7GLziG8eZHsMOUp4sO9M5rpZCpiwFm1sz54YgAOXF36/TLTYruIZWe3lsr
+         D+Nw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714613905; x=1715218705;
+        d=1e100.net; s=20230601; t=1714613944; x=1715218744;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=IPICephXaLessvRUUOJzNei7ZEdzmTmcsaiNIs+7jPU=;
-        b=IKxFjMFpnaDfo4Yrff31uZckW2lUWlH5E8779u4v2y8/PEBfSKDse6uC5IZ3qR4cm1
-         jPmMgCj3IFqJlS4Jt25fYfb7dOmo/FsdiEuZkBYYmj36ATDBl4TQrYIZ0ub1ldbBSUHR
-         wZa6hXgglMzET02YQ+hSEz4Riv6IumVJ5WXL2y+Fe2BwW8wJRc+0Yh9xkq1UlBeam3WC
-         VfVd9HHRWAXcY/g0iO8hdvdVCO5fK1PiTBpbroUgcuOvsvQcqxTQXBMnT3KR1DPX5cAz
-         eBWyxocyjjZlfgEJhFmcp0CB+yGrZdD0KVS8EcYszLZppRusbqHFbHfYuXIVWnS2k74c
-         okGA==
-X-Forwarded-Encrypted: i=1; AJvYcCWidTt75c9DYemLJT+u6YeyTLNPKP6SyDzbjdsgJ1zF3jax6dVeObZmH94ctAaFVkFmBsoZMrgjB2rVProltHK00RRfcLcrsJ9xXZBCnwTJ
-X-Gm-Message-State: AOJu0Ywsin8Ut85Pn/zYrw6/kmHlaJt1YA9PvlZFzmZwcdJYDdcT5aF1
-	z0NcgAKZYnO3Yo7qo8dKzocH+M06lQUPOag0bloC0b+YeB0OSabk
-X-Google-Smtp-Source: AGHT+IHc/WBlt4xLMZIilRMl3XLXh+FH1kMFD2daVXfU18KycM6xVRUFkxcLjemx6wroLvNKWjUEZQ==
-X-Received: by 2002:ad4:5f86:0:b0:6a0:a4db:b297 with SMTP id jp6-20020ad45f86000000b006a0a4dbb297mr2347760qvb.23.1714613905145;
-        Wed, 01 May 2024 18:38:25 -0700 (PDT)
+        bh=7XmgoGThuarzyNd32NYUffgMgDjvQQPf1chjUYx35z4=;
+        b=OoLEtq1r9tLqm6jbLAIFBS0Fqn5H3NcUiGjE8YbdNlbjhLOw0Hf9aZcXlffgESvAV/
+         suDMQRCYjC1CupaT8cjRelJpSMryb4AZfwvfd2VhpsyS+uAQIXbM0YJmtu+jTp62H05p
+         GTQGPRjpdAtjDEpdI06GjhZEtSNtMEV2NDdDjYc5klnEy7OHiVmNMI3+yZ9awEf0X8+D
+         /gMMRa7tVocwI3Jn6Hc9VwHUXfJKflAvTT5YHhM6mR3kpm2VVvb//l0Wg+4E3MoRx/ZT
+         0/vxC58jrVw+X3nwGz4DwuOp0z3/VjzqPmQDgUSrAsHjGI5Gi80wjxweEfQx+cdi3XJP
+         5hjg==
+X-Gm-Message-State: AOJu0Yw5aAr0mlnxvgYa4TefFTtwUjQEGtjj09WsJHyjKn9dPCLL2EmD
+	Wh8fxskymPUB12g63AemXY8/aOO3Rq2BHcEYl96dpEsA63bLONu9
+X-Google-Smtp-Source: AGHT+IH6jwub9qjWLn/9Pj1vThxyqtw1yfAK+E3Pj5nO8xEAX2Jr8PoYX6LQGihlkq0Dmq51reGUrQ==
+X-Received: by 2002:a05:6214:5098:b0:6a0:c903:7226 with SMTP id kk24-20020a056214509800b006a0c9037226mr5225415qvb.34.1714613944445;
+        Wed, 01 May 2024 18:39:04 -0700 (PDT)
 Received: from localhost (164.146.150.34.bc.googleusercontent.com. [34.150.146.164])
-        by smtp.gmail.com with ESMTPSA id o2-20020a0cecc2000000b006a0ddff6523sm2061213qvq.1.2024.05.01.18.38.24
+        by smtp.gmail.com with ESMTPSA id y7-20020a056214016700b006a0e8c1d7a5sm1571504qvs.120.2024.05.01.18.39.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 May 2024 18:38:24 -0700 (PDT)
-Date: Wed, 01 May 2024 21:38:24 -0400
+        Wed, 01 May 2024 18:39:04 -0700 (PDT)
+Date: Wed, 01 May 2024 21:39:03 -0400
 From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>, 
+To: Shailend Chand <shailend@google.com>, 
  Willem de Bruijn <willemdebruijn.kernel@gmail.com>
 Cc: netdev@vger.kernel.org, 
+ almasrymina@google.com, 
  davem@davemloft.net, 
  edumazet@google.com, 
+ hramamurthy@google.com, 
+ jeroendb@google.com, 
+ kuba@kernel.org, 
  pabeni@redhat.com, 
- linux-kselftest@vger.kernel.org, 
- Willem de Bruijn <willemb@google.com>
-Message-ID: <6632ee9092206_37f3af294a7@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20240501180657.3eb1ef99@kernel.org>
-References: <20240501185432.3593168-1-willemdebruijn.kernel@gmail.com>
- <20240501180657.3eb1ef99@kernel.org>
-Subject: Re: [PATCH net-next] selftests: drv-net: add checksum tests
+ pkaligineedi@google.com, 
+ willemb@google.com
+Message-ID: <6632eeb7ee528_37f3af2946e@willemb.c.googlers.com.notmuch>
+In-Reply-To: <CANLc=autx-MmR+Sm40QaNsJ3sit2RuD=J8=cLHZK-PrtYVRxwg@mail.gmail.com>
+References: <20240430231420.699177-1-shailend@google.com>
+ <20240430231420.699177-4-shailend@google.com>
+ <663248a7b3624_36251a294d7@willemb.c.googlers.com.notmuch>
+ <CANLc=autx-MmR+Sm40QaNsJ3sit2RuD=J8=cLHZK-PrtYVRxwg@mail.gmail.com>
+Subject: Re: [PATCH net-next 03/10] gve: Add adminq funcs to add/remove a
+ single Rx queue
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -90,105 +96,105 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 Content-Type: text/plain;
  charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 
-Jakub Kicinski wrote:
-> Great! I run it on a couple of older machines. 
-> 
-> mlx5:
-> 
-> TAP version 13
-> 1..1
-> # timeout set to 0
-> # selftests: drivers/net/hw: csum.py
-> # KTAP version 1
-> # 1..12
-> # ok 1 csum.ipv4_rx_tcp # SKIP Test requires IPv4 connectivity
-> # ok 2 csum.ipv4_rx_tcp_invalid # SKIP Test requires IPv4 connectivity
-> # ok 3 csum.ipv4_rx_udp # SKIP Test requires IPv4 connectivity
-> # ok 4 csum.ipv4_rx_udp_invalid # SKIP Test requires IPv4 connectivity
-> # ok 5 csum.ipv4_tx_udp_csum_offload # SKIP Test requires IPv4 connectivity
-> # ok 6 csum.ipv4_tx_udp_zero_checksum # SKIP Test requires IPv4 connectivity
-> # ok 7 csum.ipv6_rx_tcp
-> # ok 8 csum.ipv6_rx_tcp_invalid
-> # ok 9 csum.ipv6_rx_udp
-> # ok 10 csum.ipv6_rx_udp_invalid
-> # ok 11 csum.ipv6_tx_udp_csum_offload
-> # ok 12 csum.ipv6_tx_udp_zero_checksum
-> # # Totals: pass:6 fail:0 xfail:0 xpass:0 skip:6 error:0
-> ok 1 selftests: drivers/net/hw: csum.py
-> 
-> bnxt:
-> 
-> TAP version 13
-> 1..1
-> # timeout set to 0
-> # selftests: drivers/net/hw: csum.py
-> # KTAP version 1
-> # 1..12
-> # ok 1 csum.ipv4_rx_tcp # SKIP Test requires IPv4 connectivity
-> # ok 2 csum.ipv4_rx_tcp_invalid # SKIP Test requires IPv4 connectivity
-> # ok 3 csum.ipv4_rx_udp # SKIP Test requires IPv4 connectivity
-> # ok 4 csum.ipv4_rx_udp_invalid # SKIP Test requires IPv4 connectivity
-> # ok 5 csum.ipv4_tx_udp_csum_offload # SKIP Test requires IPv4 connectivity
-> # ok 6 csum.ipv4_tx_udp_zero_checksum # SKIP Test requires IPv4 connectivity
-> # ok 7 csum.ipv6_rx_tcp
-> # ok 8 csum.ipv6_rx_tcp_invalid
-> # ok 9 csum.ipv6_rx_udp
-> # ok 10 csum.ipv6_rx_udp_invalid
-> # ok 11 csum.ipv6_tx_udp_csum_offload # SKIP Test requires tx checksum offload on eth0
-> # ok 12 csum.ipv6_tx_udp_zero_checksum # SKIP Test requires tx checksum offload on eth0
-> # # Totals: pass:4 fail:0 xfail:0 xpass:0 skip:8 error:0
-> ok 1 selftests: drivers/net/hw: csum.py
+Shailend Chand wrote:
+> On Wed, May 1, 2024 at 6:50=E2=80=AFAM Willem de Bruijn
+> <willemdebruijn.kernel@gmail.com> wrote:
+> >
+> > Shailend Chand wrote:
+> > > This allows for implementing future ndo hooks that act on a single
+> > > queue.
+> > >
+> > > Tested-by: Mina Almasry <almasrymina@google.com>
+> > > Reviewed-by: Praveen Kaligineedi <pkaligineedi@google.com>
+> > > Reviewed-by: Harshitha Ramamurthy <hramamurthy@google.com>
+> > > Signed-off-by: Shailend Chand <shailend@google.com>
+> >
+> > > +static int gve_adminq_create_rx_queue(struct gve_priv *priv, u32 q=
+ueue_index)
+> > > +{
+> > > +     union gve_adminq_command cmd;
+> > > +
+> > > +     gve_adminq_get_create_rx_queue_cmd(priv, &cmd, queue_index);
+> > >       return gve_adminq_issue_cmd(priv, &cmd);
+> > >  }
+> > >
+> > > +int gve_adminq_create_single_rx_queue(struct gve_priv *priv, u32 q=
+ueue_index)
+> > > +{
+> > > +     union gve_adminq_command cmd;
+> > > +
+> > > +     gve_adminq_get_create_rx_queue_cmd(priv, &cmd, queue_index);
+> > > +     return gve_adminq_execute_cmd(priv, &cmd);
+> > > +}
+> > > +
+> > >  int gve_adminq_create_rx_queues(struct gve_priv *priv, u32 num_que=
+ues)
+> > >  {
+> > >       int err;
+> > > @@ -727,17 +742,22 @@ int gve_adminq_destroy_tx_queues(struct gve_p=
+riv *priv, u32 start_id, u32 num_qu
+> > >       return gve_adminq_kick_and_wait(priv);
+> > >  }
+> > >
+> > > +static void gve_adminq_make_destroy_rx_queue_cmd(union gve_adminq_=
+command *cmd,
+> > > +                                              u32 queue_index)
+> > > +{
+> > > +     memset(cmd, 0, sizeof(*cmd));
+> > > +     cmd->opcode =3D cpu_to_be32(GVE_ADMINQ_DESTROY_RX_QUEUE);
+> > > +     cmd->destroy_rx_queue =3D (struct gve_adminq_destroy_rx_queue=
+) {
+> > > +             .queue_id =3D cpu_to_be32(queue_index),
+> > > +     };
+> > > +}
+> > > +
+> > >  static int gve_adminq_destroy_rx_queue(struct gve_priv *priv, u32 =
+queue_index)
+> > >  {
+> > >       union gve_adminq_command cmd;
+> > >       int err;
+> > >
+> > > -     memset(&cmd, 0, sizeof(cmd));
+> > > -     cmd.opcode =3D cpu_to_be32(GVE_ADMINQ_DESTROY_RX_QUEUE);
+> > > -     cmd.destroy_rx_queue =3D (struct gve_adminq_destroy_rx_queue)=
+ {
+> > > -             .queue_id =3D cpu_to_be32(queue_index),
+> > > -     };
+> > > -
+> > > +     gve_adminq_make_destroy_rx_queue_cmd(&cmd, queue_index);
+> > >       err =3D gve_adminq_issue_cmd(priv, &cmd);
+> > >       if (err)
+> > >               return err;
+> > > @@ -745,6 +765,19 @@ static int gve_adminq_destroy_rx_queue(struct =
+gve_priv *priv, u32 queue_index)
+> > >       return 0;
+> > >  }
+> > >
+> > > +int gve_adminq_destroy_single_rx_queue(struct gve_priv *priv, u32 =
+queue_index)
+> > > +{
+> > > +     union gve_adminq_command cmd;
+> > > +     int err;
+> > > +
+> > > +     gve_adminq_make_destroy_rx_queue_cmd(&cmd, queue_index);
+> > > +     err =3D gve_adminq_execute_cmd(priv, &cmd);
+> > > +     if (err)
+> > > +             return err;
+> > > +
+> > > +     return 0;
+> > > +}
+> >
+> > This is identical to gve_adminq_destroy_rx_queue, bar for removing th=
+e
+> > file scope?
+> >
+> > Same for gve_adminq_create_rx_queue.
+> =
 
-Nice, thanks for testing!
+> One doesn't immediately ring the doorbell, added a comment in v2
+> clarifying this.
 
-> On Wed,  1 May 2024 14:51:34 -0400 Willem de Bruijn wrote:
-> > Run tools/testing/selftest/net/csum.c as part of drv-net.
-> > This binary covers multiple scenarios, based on arguments given,
-> > for both IPv4 and IPv6:
-> 
-> The use of csum.c is the only real concern I have. Could you move it to
-> net/lib? I made net/lib into an automatically included target in commit
-> b86761ff6374 ("selftests: net: add scaffolding for Netlink tests in Python").
-> 
-> It has a makefile like any selftest directory, so you should be able to
-> do a simple move and minor path adjustments.
-> 
-> Without this if someone builds and deploys just the drivers/net{,/hw}
-> targets the csum binary won't be there :( We could auto-include all of
-> net but using the lib target felt a little cleaner.
-
-Can do.
-
-A few more may be in scope eventually: toeplitz, udpgso_bench, gro,
-so_txtime. Move them on a case-by-case basis?
- 
-> > - Accept UDP correct checksum
-> > - Detect UDP invalid checksum
-> > - Accept TCP correct checksum
-> > - Detect TCP invalid checksum
-> > 
-> > - Transmit UDP: basic checksum offload
-> > - Transmit UDP: zero checksum conversion
-> > 
-> > The test direction is reversed between receive and transmit tests, so
-> > that the NIC under test is always the local machine.
-> > 
-> > In total this adds up to 12 testcases, with more to follow. For
-> > conciseness, I replaced individual functions with a function factory.
-> > It saves a lot of boilerplate, but is a little harder to follow, so
-> > partially here as a point for discussion.
-> 
-> LGTM, FWIW, but let's hear if anyone feels it's too magical.
-> 
-> > Warning that for now transmit errors are not detected, as for those
-> > the receiver runs remotely and failures with bkg are ignored.
-> 
-> Should I send a fix for that?
-
-Please do. I did not grasp your suggestion well enough to take a
-stab. I may have already spotted the zero conversion test returning
-success, while explicit logging of the stderr output shows otherwise.
-
+Thanks! I clearly totally missed the issue vs execute distinction.
 
