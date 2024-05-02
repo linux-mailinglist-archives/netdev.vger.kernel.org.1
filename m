@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-93034-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93035-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 242F68B9C30
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 16:20:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D8F78B9C2F
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 16:20:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 343B5B21376
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 29305282770
 	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 14:20:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9777313C69B;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 977B413C69C;
 	Thu,  2 May 2024 14:20:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="diBVwjFV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="soYttnjj"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73FE883A1D
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7403413C687
 	for <netdev@vger.kernel.org>; Thu,  2 May 2024 14:20:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714659634; cv=none; b=Ho3EYQ4O3ej428rQA9i/HN5uojCAoUx4BmKQsr5ncW6HxmIrjyopSKZlcj2IaSlpn6CNXgshIX+AoO/ah7ncCBkZB6yud2Ufkv/ZTusN4IvjedmA6Y1tINEW2xpkQPP5h8G86guPf1D5jkOyitCz+5hMRYMTFSPPtn8O/P4hwDE=
+	t=1714659634; cv=none; b=NQVx7cUwG8jrJEoLKvGWlesOn67vBD472iJubq51LzyFsg61HU+VWlo1nS6ACSMYUBU6+1TkJBRkzBNf/4QwrL5MQ7mx2cQEoQtkxpKNKBpe8XeTvDSqRxR0WZhWfvM5iswvvlQTrsuwdLA9GjAsIJsGKCqHlM/B6ThprmAFM0c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1714659634; c=relaxed/simple;
-	bh=afdzYhJwFXxyFnhITq3oNSXbTqa5JUfcwN3OYlF6iW8=;
+	bh=xtk7RswArOXHNDcFgtUJG/1dveYQdYYp0OBzH1X5Jbs=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=WlcgD2QLd+y0ZyzYsAFUr1lNdQq9p5T/cP+Pv2NfUa/V0+m/JAvZmBuRgJ/2dy4RsypYs8KlKud4spBn47wH5aeUh/K2bshlrvPRbEjZ3Bf48EhksHCpmrnWFDHICVA2HOBVMSfEeSCoR2JCh61/9r8inTNy2AuBIJS4obl2dsE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=diBVwjFV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 1ACE9C32789;
+	 In-Reply-To:To:Cc; b=hpYI6p229ZHpZku6ixxuaAqykmHQHZpJ0csJAvj4GRWIWidNyoQMl2M5wzcyiOMQIaiKqOOkBRYmleXaO1o5zE3fM4UpyH1VFo7TA4oW+D5+SA4RYkgMejLzqigmTzLNdRoAS9zOSxZPD43kupuQCCD7DnHtOqfn3bKgOis9bi0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=soYttnjj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 08721C4AF14;
 	Thu,  2 May 2024 14:20:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1714659634;
-	bh=afdzYhJwFXxyFnhITq3oNSXbTqa5JUfcwN3OYlF6iW8=;
+	bh=xtk7RswArOXHNDcFgtUJG/1dveYQdYYp0OBzH1X5Jbs=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=diBVwjFVBe4ly/B2BQViMloE/+bnAuoAIE+MDa1+aWJ7geeM0a7CxJxWdrwaNRcx9
-	 Rzyco3xJ5Z8isX7LI66Xj7+T5qH3tIPZHZ14JBaFDXi3/afwc35+ZGo8HKwyMiSr57
-	 aTRZdKSI0xtbLdajydmFV22KDGrnYh1/8iS6yRMGtiyiklbP2gvxUbqc6rQCqwJHtJ
-	 z5GJHnOfTNmqkPhNXgV18DhGO/9oHWs1OztrhvcVYEshA3bZea3AQctIFlKKQxBMI8
-	 Fu7ch4ZyquylZCPouIYAtnXI+9K4NMcS7Lnk6dpqKjvdrqEoPac0t/grNizia6mwqQ
-	 PngmAnRTuNXnw==
+	b=soYttnjjKXRLTbjxjq7ajE8n1qm452cdKG0r/SSg8KS93xwwpOKIdHfpxZ1bQKVMl
+	 ZxUjJ+hF4crmc+CXujTIepeuIj5OqcN5xcQNRCerBFVKKaOhyOd+//OeVTz1DjViiW
+	 d663whEYwVg1UKWWr4KzR0pe0zos9+4Qg4EISiARcaMicGXmNkgFvajVp+G03qS2KO
+	 nU1uDxzAElLy27iJPv6SEilqUHmc0PqKs7Pw4sm7jw0BATjvfRF4lTHjcztKfQFE51
+	 1KuF90zfbSQdpv7ocKAsmm2PWoBpcdUlAsM55ujP1rKu/HyoBisL/f5IgP8TkDrZxf
+	 WilemlO0nfRVw==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 00ABBC4333B;
-	Thu,  2 May 2024 14:20:34 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id EB361C4333C;
+	Thu,  2 May 2024 14:20:33 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,40 +52,56 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net/sched: unregister lockdep keys in
- qdisc_create/qdisc_alloc error path
+Subject: Re: [PATCH net-next 0/7][pull request] i40e: cleanups & refactors
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171465963399.28830.8599915114515835353.git-patchwork-notify@kernel.org>
+ <171465963395.28830.15157646433345358918.git-patchwork-notify@kernel.org>
 Date: Thu, 02 May 2024 14:20:33 +0000
-References: <2aa1ca0c0a3aa0acc15925c666c777a4b5de553c.1714496886.git.dcaratti@redhat.com>
-In-Reply-To: <2aa1ca0c0a3aa0acc15925c666c777a4b5de553c.1714496886.git.dcaratti@redhat.com>
-To: Davide Caratti <dcaratti@redhat.com>
-Cc: jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- naresh.kamboju@linaro.org, netdev@vger.kernel.org
+References: <20240430180639.1938515-1-anthony.l.nguyen@intel.com>
+In-Reply-To: <20240430180639.1938515-1-anthony.l.nguyen@intel.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, netdev@vger.kernel.org, ivecera@redhat.com
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+This series was applied to netdev/net-next.git (main)
+by Tony Nguyen <anthony.l.nguyen@intel.com>:
 
-On Tue, 30 Apr 2024 19:11:13 +0200 you wrote:
-> Naresh and Eric report several errors (corrupted elements in the dynamic
-> key hash list), when running tdc.py or syzbot. The error path of
-> qdisc_alloc() and qdisc_create() frees the qdisc memory, but it forgets
-> to unregister the lockdep key, thus causing use-after-free like the
-> following one:
+On Tue, 30 Apr 2024 11:06:30 -0700 you wrote:
+> Ivan Vecera says:
 > 
->  ==================================================================
->  BUG: KASAN: slab-use-after-free in lockdep_register_key+0x5f2/0x700
->  Read of size 8 at addr ffff88811236f2a8 by task ip/7925
+> This series do following:
+> Patch 1 - Removes write-only flags field from i40e_veb structure and
+>           from i40e_veb_setup() parameters
+> Patch 2 - Refactors parameter of i40e_notify_client_of_l2_param_changes()
+>           and i40e_notify_client_of_netdev_close()
+> Patch 3 - Refactors parameter of i40e_detect_recover_hung()
+> Patch 4 - Adds helper i40e_pf_get_main_vsi() to get main VSI and uses it
+>           in existing code
+> Patch 5 - Consolidates checks whether given VSI is the main one
+> Patch 6 - Adds helper i40e_pf_get_main_veb() to get main VEB and uses it
+>           in existing code
+> Patch 7 - Adds helper i40e_vsi_reconfig_tc() to reconfigure TC for
+>           particular and uses it to replace existing open-coded pieces
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next] net/sched: unregister lockdep keys in qdisc_create/qdisc_alloc error path
-    https://git.kernel.org/netdev/net-next/c/86735b57c905
+  - [net-next,1/7] i40e: Remove flags field from i40e_veb
+    https://git.kernel.org/netdev/net-next/c/b92379dc94c1
+  - [net-next,2/7] i40e: Refactor argument of several client notification functions
+    https://git.kernel.org/netdev/net-next/c/54c4664e48ee
+  - [net-next,3/7] i40e: Refactor argument of i40e_detect_recover_hung()
+    https://git.kernel.org/netdev/net-next/c/7033ada04e33
+  - [net-next,4/7] i40e: Add helper to access main VSI
+    https://git.kernel.org/netdev/net-next/c/43f4466ca91d
+  - [net-next,5/7] i40e: Consolidate checks whether given VSI is main
+    https://git.kernel.org/netdev/net-next/c/6c8e355ea5fc
+  - [net-next,6/7] i40e: Add helper to access main VEB
+    https://git.kernel.org/netdev/net-next/c/5509fc9e3ab6
+  - [net-next,7/7] i40e: Add and use helper to reconfigure TC for given VSI
+    https://git.kernel.org/netdev/net-next/c/29385de33956
 
 You are awesome, thank you!
 -- 
