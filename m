@@ -1,57 +1,83 @@
-Return-Path: <netdev+bounces-93106-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93107-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFFCD8BA0DA
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 21:01:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 524188BA0E2
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 21:10:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D6C50B22990
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 19:01:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7796A1C20D91
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 19:10:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7276915FD17;
-	Thu,  2 May 2024 19:01:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15A4D15FD1E;
+	Thu,  2 May 2024 19:10:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=oddbit.com header.i=@oddbit.com header.b="nNIoF+Hp"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A9+RWtmm"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp94.ord1d.emailsrvr.com (smtp94.ord1d.emailsrvr.com [184.106.54.94])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C00CC15FD0B
-	for <netdev@vger.kernel.org>; Thu,  2 May 2024 19:01:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=184.106.54.94
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2595D59B56
+	for <netdev@vger.kernel.org>; Thu,  2 May 2024 19:10:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714676508; cv=none; b=TjPke/dfAxLxNvOzMZDvLteZPHQVZKr1r7yx3Ai20O6R1VAXszgjzeFerxMaSPsD5kpdzZBrmu/6B5n/bi2yIm1Fm0v76pLAcItsQkyLd/jR9MHA/Q1Xaru3updfLza+b9W+D6FX1lEOZAInQbzF+Uh3ZtgRUZ4EIGSaLPwwXns=
+	t=1714677018; cv=none; b=oBijcPz/K6P8vTO/jtRK5PIjXZEwLht/3+sVkX8EMjW86+FMm8cbPKdpezkSF7A+It8xz92oTNiEXLQoug7+A+37g6PyYS7mixMdHg3BbWtyKUo3/THxJ87j9nLjwVAmyqL/Q3qXwKHVjrBOZyZNYVSlDO+AirSwYnR14dPUYRA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714676508; c=relaxed/simple;
-	bh=10QgoifWZIHsQYM4viNQAebY5RXKGshG/GWxuIdO2XE=;
+	s=arc-20240116; t=1714677018; c=relaxed/simple;
+	bh=xvV8wCpkQWDOheSGpJEOVnBn0wzT94mPfIIw59SsR/U=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hhEMVJlAKkax8JWPrWnqzPqttN/00P0FOBkQly4Xda6f/c1Qo/udpnlFlMVExUMU4lY22DuJxEmOjoDotlnSXkpH5Y4weAKl/kN68GdnxSqD7F7jMfF+e51gnmR6pkAfd2q+EvBKuLeMB3/J59RiYsfXcBADSiJwjb5lubPO0fk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=oddbit.com; spf=pass smtp.mailfrom=oddbit.com; dkim=pass (1024-bit key) header.d=oddbit.com header.i=@oddbit.com header.b=nNIoF+Hp; arc=none smtp.client-ip=184.106.54.94
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=oddbit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oddbit.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=oddbit.com;
-	s=20180920-g2b7aziw; t=1714676144;
-	bh=10QgoifWZIHsQYM4viNQAebY5RXKGshG/GWxuIdO2XE=;
-	h=Date:From:To:Subject:From;
-	b=nNIoF+HpJuRzKWliHOsw5wu6Gr3MXa5Rpj3/WR6MgGkBJ4z711YkWhyGirF8Oo48M
-	 E+7h678BXuClR2SEgnSh3fNeSjD8ej2qZjY3VGLQaFV25TaDRcvZO1OFH1VF+e2ilk
-	 5EPFMVC1wd5658USB6b7Rf96TsCGN91btGmOJu/A=
-X-Auth-ID: lars@oddbit.com
-Received: by smtp20.relay.ord1d.emailsrvr.com (Authenticated sender: lars-AT-oddbit.com) with ESMTPSA id 7B978C026F;
-	Thu,  2 May 2024 14:55:43 -0400 (EDT)
-Date: Thu, 2 May 2024 14:55:43 -0400
-From: Lars Kellogg-Stedman <lars@oddbit.com>
-To: Duoming Zhou <duoming@zju.edu.cn>
-Cc: linux-hams@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, jreuter@yaina.de, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, dan.carpenter@linaro.org
-Subject: Re: [PATCH net 2/2] ax25: fix potential reference counting leak in
- ax25_addr_ax25dev
-Message-ID: <vvk5silsu6nvu3dpdeffk2vjocijebkevqvub7erd4sorvnllt@7yyjmrczbatf>
-References: <cover.1714660565.git.duoming@zju.edu.cn>
- <cb44ea91c0b7084079c3086d6d75e7984505cec7.1714660565.git.duoming@zju.edu.cn>
+	 Content-Type:Content-Disposition:In-Reply-To; b=lVZeYRhhEHAe9Yv9i8/UvDRsqmqKTdg/L9A8HIzsNSH6cxodZ009OhFVrTMfxptmj56JeNPf89Qz1mqtdJcKn80z3nUrZ9Sfn4vAnQjEe/Hbt4tYvZVta6M34kM+GuGvKpb8WaxzEU753I1VieG0Xjwq1Ow6hjBcoZoYqn/qVeQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=A9+RWtmm; arc=none smtp.client-ip=209.85.167.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-51f12ccff5eso1573919e87.1
+        for <netdev@vger.kernel.org>; Thu, 02 May 2024 12:10:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1714677014; x=1715281814; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZE/rc0O7BeqDEIfD36mqBed9qLVkgr6xORfkhay9ud0=;
+        b=A9+RWtmmHF1GfA5IOtNhcQN5yBMluIFHBiKCqubUkuJO+4KeIQ7D74rv+eqGmXB/eG
+         C1e+Sz7hxeXXItUSwB5IPjQ95CD7HMtlBfcaUenaW5i7NaC17c3kssT2qmh8Cqs8o1y8
+         xSO06oi4TNn8npreHR8CZ1HOVAKEk8adbuBxfPUDggGTzt+0gf7hRU4fgNR5nzkusFHc
+         9aCxKx90yFZC17VEKPTJKrPq7iXz91bBGSx6C92XzJOBbuKPSXY7oX9+FCi5yZQp9DmN
+         0PSibkIMOKwL+4a28cbMKEiJ3RI1fBwIb8y3iAA0Csjkl3Uba3qMVS4LLrqPVqy7mpsV
+         CJmg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714677014; x=1715281814;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZE/rc0O7BeqDEIfD36mqBed9qLVkgr6xORfkhay9ud0=;
+        b=Gl4OGr05sY4b9gj/yyI/2ulezSi0GJ1/sU6mfk5DnnSjf6hPufXe3S79bRQyvD2RrR
+         fqrPkFEa7g4yaqip5dznZUO1wGLiOr57GMcgknFwu06KXvUOzwZISL7XOxcCDtWn8MQ8
+         pZMaL5bfke9rUAiN4stRl/GM30KVR3ogCMp8sZvuNJFbj77AAv9EtagmlcvncnNXOA43
+         BSFqH8j87/u7lFi2dkZJR6Rwdt3MOAwsplt//wJpkfAFXSle6C+6gHNhXvAztTiWYUG6
+         wTTvkEniXmXjtrYGGCIkSeYzE9KVIiSbRVvnXpr5p2UJYsGcTVVpo+Bu1ui7RkLF6CN+
+         zYpQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVcjiELjZq5zgQv9QCH5dKSTmy9FOqUXh2TGWZkfOfSYylmRgqIDdJOiyOW7OYWFJrOdqy0IJa8Qbf3RW79fNTI5HZeS368
+X-Gm-Message-State: AOJu0YxxFJJoemEsn1wFUWbYHSk/cEewtGqtvxPnid0iYbtsBA4bZQ4C
+	X/JtWv5dwgqyLYkQPFOWTd8nrgDP9w1c9TwemlkygsB/dkWVAJbK
+X-Google-Smtp-Source: AGHT+IGYsbkBLYaTX7FpP/Wovx7h6zx8sHDewMI7lcW0mbI50N/X5vidsnjR1N3W8CTNXuD5KsLNQA==
+X-Received: by 2002:a05:6512:2039:b0:519:6e94:9b4d with SMTP id s25-20020a056512203900b005196e949b4dmr380632lfs.48.1714677013897;
+        Thu, 02 May 2024 12:10:13 -0700 (PDT)
+Received: from mobilestation ([178.176.56.174])
+        by smtp.gmail.com with ESMTPSA id h2-20020a19ca42000000b005189964a79dsm274578lfj.172.2024.05.02.12.10.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 May 2024 12:10:13 -0700 (PDT)
+Date: Thu, 2 May 2024 22:10:10 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: Yanteng Si <siyanteng@loongson.cn>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com, 
+	alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com, 
+	chenhuacai@kernel.org, linux@armlinux.org.uk, guyinggang@loongson.cn, 
+	netdev@vger.kernel.org, chris.chenfeiyang@gmail.com, siyanteng01@gmail.com
+Subject: Re: [PATCH net-next v12 01/15] net: stmmac: Move the atds flag to
+ the stmmac_dma_cfg structure
+Message-ID: <3yllm6pibimhkuorn3djjn7wtvsvgsf4metobfhsrlnekettly@6lnq6fyac72a>
+References: <cover.1714046812.git.siyanteng@loongson.cn>
+ <3f9089bae8391d1263ef9c2b7a7c09de56308387.1714046812.git.siyanteng@loongson.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,90 +86,182 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <cb44ea91c0b7084079c3086d6d75e7984505cec7.1714660565.git.duoming@zju.edu.cn>
-X-Classification-ID: 17c51de0-41ab-40c1-8817-f4243cb35e3a-1-1
+In-Reply-To: <3f9089bae8391d1263ef9c2b7a7c09de56308387.1714046812.git.siyanteng@loongson.cn>
 
-On Thu, May 02, 2024 at 10:43:38PM +0800, Duoming Zhou wrote:
-> The reference counting of ax25_dev potentially increase more
-> than once in ax25_addr_ax25dev(), which will cause memory leak.
+On Thu, Apr 25, 2024 at 09:01:54PM +0800, Yanteng Si wrote:
+> Alternate Descriptor Size (ATDS) is a part of the DMA-configs together
+> with the PBL, ALL, AEME, etc so the structure is the most suitable
+> place for it.
 
-With this patch applied, I see a kernel panic as soon as something binds
-an ax.25 socket (e.g., starting ax25d):
+The better description would be:
 
-BUG: kernel NULL pointer dereference, address: 0000000000000098
-#PF: supervisor write access in kernel mode
-#PF: error_code(0x0002) - not-present page
-PGD 0 P4D 0
-Oops: 0002 [#1] SMP PTI
-CPU: 0 PID: 111 Comm: ax25d Not tainted 6.9.0-rc6-ax25+ #69
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.3-2.fc40 04/01/2014
-RIP: 0010:ax25_addr_ax25dev+0x5b/0xb0
-Code: 8b 43 08 4c 89 ef 48 8b b0 d0 03 00 00 e8 6d fb ff ff 85 c0 4c 0f 44 e3 48 8b 1b 48 85 db 75 df 4d 85 e4 74 19 b8 01 00 00 00 <f0> 0f c1 04 25 98 00 00 00 85 c0 74 21 8d 50 01 09 c2 78 2b 48 c7
-RSP: 0018:ffffc90000463e00 EFLAGS: 00010282
-RAX: 0000000000000001 RBX: 0000000000000000 RCX: 0000000000000000
-RDX: 0000000000000000 RSI: ffff888101a5f728 RDI: ffffc90000463e6a
-RBP: ffffc90000463e18 R08: ffffc90000463e68 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000000 R12: ffff888101523e40
-R13: ffffc90000463e6a R14: ffff88810111f200 R15: ffff8881004e4e00
-FS:  00007fb6a6d93b08(0000) GS:ffff88813bc00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000000000098 CR3: 0000000101bb4000 CR4: 00000000000006b0
-Call Trace:
- <TASK>
- ? show_regs.part.0+0x22/0x30
- ? __die+0x5b/0x99
- ? page_fault_oops+0xae/0x220
- ? search_extable+0x2e/0x40
- ? ax25_addr_ax25dev+0x5b/0xb0
- ? kernelmode_fixup_or_oops+0x9f/0x120
- ? __bad_area_nosemaphore+0x15f/0x1a0
- ? bad_area_nosemaphore+0x16/0x20
- ? exc_page_fault+0x2a8/0x6e0
- ? asm_exc_page_fault+0x2b/0x30
- ? ax25_addr_ax25dev+0x5b/0xb0
- ax25_bind+0x14c/0x260
- __sys_bind+0xc0/0xf0
- ? alloc_file_pseudo+0xae/0xe0
- __x64_sys_bind+0x1c/0x30
- x64_sys_call+0xfe3/0x1d00
- do_syscall_64+0x55/0x120
- entry_SYSCALL_64_after_hwframe+0x76/0x7e
-RIP: 0033:0x7fb6a6d2cfa4
-Code: 00 00 00 ba 01 00 00 00 0f 05 80 e7 08 74 c3 eb b0 48 83 ec 08 89 d2 48 63 ff 45 31 d2 45 31 c0 45 31 c9 b8 31 00 00 00 0f 05 <48> 89 c7 e8 da 3f fe ff 48 83 c4 08 c3 48 83 ec 10 48 89 f0 89 d1
-RSP: 002b:00007ffc1a5c7670 EFLAGS: 00000246 ORIG_RAX: 0000000000000031
-RAX: ffffffffffffffda RBX: 00007ffc1a5c7799 RCX: 00007fb6a6d2cfa4
-RDX: 0000000000000048 RSI: 00007ffc1a5c7750 RDI: 0000000000000005
-RBP: 00007fb6a6d94a80 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 00007fb6a6cebca0
-R13: 0000000000000048 R14: 0000561ff9f9e776 R15: 00007ffc1a5c8b00
- </TASK>
-CR2: 0000000000000098
----[ end trace 0000000000000000 ]---
-RIP: 0010:ax25_addr_ax25dev+0x5b/0xb0
-Code: 8b 43 08 4c 89 ef 48 8b b0 d0 03 00 00 e8 6d fb ff ff 85 c0 4c 0f 44 e3 48 8b 1b 48 85 db 75 df 4d 85 e4 74 19 b8 01 00 00 00 <f0> 0f c1 04 25 98 00 00 00 85 c0 74 21 8d 50 01 09 c2 78 2b 48 c7
-RSP: 0018:ffffc90000463e00 EFLAGS: 00010282
-RAX: 0000000000000001 RBX: 0000000000000000 RCX: 0000000000000000
-RDX: 0000000000000000 RSI: ffff888101a5f728 RDI: ffffc90000463e6a
-RBP: ffffc90000463e18 R08: ffffc90000463e68 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000000 R12: ffff888101523e40
-R13: ffffc90000463e6a R14: ffff88810111f200 R15: ffff8881004e4e00
-FS:  00007fb6a6d93b08(0000) GS:ffff88813bc00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000000000098 CR3: 0000000101bb4000 CR4: 00000000000006b0
-Kernel panic - not syncing: Fatal exception in interrupt
-Kernel Offset: disabled
----[ end Kernel panic - not syncing: Fatal exception in interrupt ]---
+"ATDS (Alternate Descriptor Size) is a part of the DMA Bus Mode configs
+(together with PBL, ALL, EME, etc) of the DW GMAC controllers. Seeing
+it's not changed at runtime but is activated as long as the IP-core
+has it supported (at least due to the Type 2 Full Checksum Offload
+Engine feature), move the respective parameter from the
+stmmac_dma_ops::init() callback argument to the stmmac_dma_cfg
+structure, which already have the rest of the DMA-related configs
+defined.
 
-My kernel tree looks like this:
+Besides the being added in the next commit DW GMAC multi-channels
+support will require to add the stmmac_dma_ops::init_chan() callback
+and have the ATDS flag set/cleared for each channel in there. Having
+the atds-flag in the stmmac_dma_cfg structure will make the parameter
+accessible from stmmac_dma_ops::init_chan() callback too."
 
-d32d77d2b4a (HEAD -> ham-patches) ax25: fix potential reference counting leak in ax25_addr_ax25dev
-742ab0da09d ax25: change kfree in ax25_dev_free to ax25_dev_free
-e6357cafe3e ax25: fix reference counting issue of ax25_dev
-0106679839f (origin/master, origin/HEAD, master) Merge tag 'regulator-fix-v6.9-rc6' of git://git.kernel.org/pub/scm/linux/kernel/git/broonieer
+Other than that the change looks good. Thanks.
 
-I don't see the kernel panic if I discard the top patch.
+Reviewed-by: Serge Semin <fancer.lancer@gmail.com>
 
--- 
-Lars Kellogg-Stedman <lars@oddbit.com> | larsks @ {irc,twitter,github}
-http://blog.oddbit.com/                | N1LKS
+-Serge(y)
+
+> 
+> Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
+> Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
+> Signed-off-by: Yanteng Si <siyanteng@loongson.cn>
+> ---
+>  drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c   | 2 +-
+>  drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c | 4 ++--
+>  drivers/net/ethernet/stmicro/stmmac/dwmac100_dma.c  | 2 +-
+>  drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.c    | 2 +-
+>  drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c  | 2 +-
+>  drivers/net/ethernet/stmicro/stmmac/hwif.h          | 3 +--
+>  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c   | 5 ++---
+>  include/linux/stmmac.h                              | 1 +
+>  8 files changed, 10 insertions(+), 11 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
+> index e1b761dcfa1d..d87079016952 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
+> @@ -299,7 +299,7 @@ static int sun8i_dwmac_dma_reset(void __iomem *ioaddr)
+>   * Called from stmmac via stmmac_dma_ops->init
+>   */
+>  static void sun8i_dwmac_dma_init(void __iomem *ioaddr,
+> -				 struct stmmac_dma_cfg *dma_cfg, int atds)
+> +				 struct stmmac_dma_cfg *dma_cfg)
+>  {
+>  	writel(EMAC_RX_INT | EMAC_TX_INT, ioaddr + EMAC_INT_EN);
+>  	writel(0x1FFFFFF, ioaddr + EMAC_INT_STA);
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c b/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
+> index daf79cdbd3ec..bb82ee9b855f 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
+> @@ -71,7 +71,7 @@ static void dwmac1000_dma_axi(void __iomem *ioaddr, struct stmmac_axi *axi)
+>  }
+>  
+>  static void dwmac1000_dma_init(void __iomem *ioaddr,
+> -			       struct stmmac_dma_cfg *dma_cfg, int atds)
+> +			       struct stmmac_dma_cfg *dma_cfg)
+>  {
+>  	u32 value = readl(ioaddr + DMA_BUS_MODE);
+>  	int txpbl = dma_cfg->txpbl ?: dma_cfg->pbl;
+> @@ -98,7 +98,7 @@ static void dwmac1000_dma_init(void __iomem *ioaddr,
+>  	if (dma_cfg->mixed_burst)
+>  		value |= DMA_BUS_MODE_MB;
+>  
+> -	if (atds)
+> +	if (dma_cfg->atds)
+>  		value |= DMA_BUS_MODE_ATDS;
+>  
+>  	if (dma_cfg->aal)
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac100_dma.c b/drivers/net/ethernet/stmicro/stmmac/dwmac100_dma.c
+> index dea270f60cc3..f861babc06f9 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac100_dma.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac100_dma.c
+> @@ -19,7 +19,7 @@
+>  #include "dwmac_dma.h"
+>  
+>  static void dwmac100_dma_init(void __iomem *ioaddr,
+> -			      struct stmmac_dma_cfg *dma_cfg, int atds)
+> +			      struct stmmac_dma_cfg *dma_cfg)
+>  {
+>  	/* Enable Application Access by writing to DMA CSR0 */
+>  	writel(DMA_BUS_MODE_DEFAULT | (dma_cfg->pbl << DMA_BUS_MODE_PBL_SHIFT),
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.c b/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.c
+> index 84d3a8551b03..e0165358c4ac 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.c
+> @@ -153,7 +153,7 @@ static void dwmac410_dma_init_channel(struct stmmac_priv *priv,
+>  }
+>  
+>  static void dwmac4_dma_init(void __iomem *ioaddr,
+> -			    struct stmmac_dma_cfg *dma_cfg, int atds)
+> +			    struct stmmac_dma_cfg *dma_cfg)
+>  {
+>  	u32 value = readl(ioaddr + DMA_SYS_BUS_MODE);
+>  
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
+> index dd2ab6185c40..7840bc403788 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
+> @@ -20,7 +20,7 @@ static int dwxgmac2_dma_reset(void __iomem *ioaddr)
+>  }
+>  
+>  static void dwxgmac2_dma_init(void __iomem *ioaddr,
+> -			      struct stmmac_dma_cfg *dma_cfg, int atds)
+> +			      struct stmmac_dma_cfg *dma_cfg)
+>  {
+>  	u32 value = readl(ioaddr + XGMAC_DMA_SYSBUS_MODE);
+>  
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/hwif.h b/drivers/net/ethernet/stmicro/stmmac/hwif.h
+> index 90384db228b5..413441eb6ea0 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/hwif.h
+> +++ b/drivers/net/ethernet/stmicro/stmmac/hwif.h
+> @@ -175,8 +175,7 @@ struct dma_features;
+>  struct stmmac_dma_ops {
+>  	/* DMA core initialization */
+>  	int (*reset)(void __iomem *ioaddr);
+> -	void (*init)(void __iomem *ioaddr, struct stmmac_dma_cfg *dma_cfg,
+> -		     int atds);
+> +	void (*init)(void __iomem *ioaddr, struct stmmac_dma_cfg *dma_cfg);
+>  	void (*init_chan)(struct stmmac_priv *priv, void __iomem *ioaddr,
+>  			  struct stmmac_dma_cfg *dma_cfg, u32 chan);
+>  	void (*init_rx_chan)(struct stmmac_priv *priv, void __iomem *ioaddr,
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> index 59bf83904b62..188514ca6c47 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> @@ -3006,7 +3006,6 @@ static int stmmac_init_dma_engine(struct stmmac_priv *priv)
+>  	struct stmmac_rx_queue *rx_q;
+>  	struct stmmac_tx_queue *tx_q;
+>  	u32 chan = 0;
+> -	int atds = 0;
+>  	int ret = 0;
+>  
+>  	if (!priv->plat->dma_cfg || !priv->plat->dma_cfg->pbl) {
+> @@ -3015,7 +3014,7 @@ static int stmmac_init_dma_engine(struct stmmac_priv *priv)
+>  	}
+>  
+>  	if (priv->extend_desc && (priv->mode == STMMAC_RING_MODE))
+> -		atds = 1;
+> +		priv->plat->dma_cfg->atds = 1;
+>  
+>  	ret = stmmac_reset(priv, priv->ioaddr);
+>  	if (ret) {
+> @@ -3024,7 +3023,7 @@ static int stmmac_init_dma_engine(struct stmmac_priv *priv)
+>  	}
+>  
+>  	/* DMA Configuration */
+> -	stmmac_dma_init(priv, priv->ioaddr, priv->plat->dma_cfg, atds);
+> +	stmmac_dma_init(priv, priv->ioaddr, priv->plat->dma_cfg);
+>  
+>  	if (priv->plat->axi)
+>  		stmmac_axi(priv, priv->ioaddr, priv->plat->axi);
+> diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
+> index dfa1828cd756..1b54b84a6785 100644
+> --- a/include/linux/stmmac.h
+> +++ b/include/linux/stmmac.h
+> @@ -100,6 +100,7 @@ struct stmmac_dma_cfg {
+>  	bool eame;
+>  	bool multi_msi_en;
+>  	bool dche;
+> +	bool atds;
+>  };
+>  
+>  #define AXI_BLEN	7
+> -- 
+> 2.31.4
+> 
 
