@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-92876-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92877-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 937A08B934C
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 04:10:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B3C418B9351
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 04:14:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C3FD21C2153F
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 02:10:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CB6501C21974
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 02:14:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D169171BB;
-	Thu,  2 May 2024 02:10:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AFC217571;
+	Thu,  2 May 2024 02:14:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fEwDVHr4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DqO+sfLm"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C6DC10A24;
-	Thu,  2 May 2024 02:10:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60ABF2C9D;
+	Thu,  2 May 2024 02:14:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714615819; cv=none; b=BZZnDqNkkfjYbbc7xZBfqTyF3ciQSUwyzDsL9DVMZnP5irNTNV4nNaIDDuGuQsPOv3rUko9tdaz+v5YoUwEQOjJ/0NZcnTaHBr4Uhc5GsK1ArLHPxVOYTgBh4/EvC84bwHlfNSBqh95Ifi0mhQ03GyCLs6dY1SnEI28MauCf1c0=
+	t=1714616050; cv=none; b=sJbXN4zIepXjrjISbW0AdW9iFF1L35vg7aGPvqG39KfWyDYuhKJcrsXnLYXsvYoppDxBllrTbzuKObn56rx5eJLYY+/GBL3xVOUNNjgN+66HfaJnt91JmPSQR2YJsH9CTjkbklIcDskDi66ScoYZxmRXEEa4Lk5XrwKopCEfkqY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714615819; c=relaxed/simple;
-	bh=UwkbNJ/LhEqQDshzKbZr9srvN+VwiPAypEJ5b7aSen0=;
+	s=arc-20240116; t=1714616050; c=relaxed/simple;
+	bh=TlbegFKMMlrkIU8WC7jdVp30LiHli2gqp41ZScKawDk=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Orf9YucxefwtnJeOJxkxHBHj7GUAZ1KhDpmOmh62LAKbuOYwyQp1+BT9ROER6qqr51mxHVXLX60CQ3QdMrjGEUKjqAfOZ1CToO/gjeCo2pt7fiMcq/pXxBC9McfwUpxeelCRS+sTDfeiIKTF9EbVFWbr57sOQ+ggoTVC13ccOwk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fEwDVHr4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A0FFC072AA;
-	Thu,  2 May 2024 02:10:17 +0000 (UTC)
+	 MIME-Version:Content-Type; b=QLfUH679u0+b7Dz6hz3ANXvE81szz4WSksqVUUnLvlQQ4kIlOByGlCT94XZoscw7Gmw94OGc9ri890ESumZhLbY2ZulE+kwPWNU88DZXFYSFfCK6ci1nO+jbxa8RxOwM1E7VaFAbQU7hFSV0jwwWHzw3obl8QYGUuVskqjSvra8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DqO+sfLm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6221C072AA;
+	Thu,  2 May 2024 02:14:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714615818;
-	bh=UwkbNJ/LhEqQDshzKbZr9srvN+VwiPAypEJ5b7aSen0=;
+	s=k20201202; t=1714616049;
+	bh=TlbegFKMMlrkIU8WC7jdVp30LiHli2gqp41ZScKawDk=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=fEwDVHr4+Ss+Eh04xyBCaN8FBaK72OHECX0VAB9ibAy8X3pmCSx8ak9Xxf2qZy1nW
-	 Yh5wtqCh4h8DSUD8wr4I+l90PHvY8VLVOzAEsgzTbmqiX0/pCfTLK/pSOT/13aHIen
-	 NHRSQMnDSGzaseIyCd6EY266KB+ziaYK5JN0lPCqgyBfVtfEKoeF/EhsAj3au3IbVy
-	 rEStbASdHIy5Ptm6jxJXiF4JIN6kmHI2SQHUDmPxGMZgbWPAWXeWahnsD4WMgNfpHr
-	 iX8si+GSgLfPxRR9GUKWR9GWYLcIK3MQuMXh8+9IB/IaP29iu81CoVlVkiwA+Bly2x
-	 oTvPnQKJBEj0A==
-Date: Wed, 1 May 2024 19:10:16 -0700
+	b=DqO+sfLmWT4c6a/a1eJXdFMz3CEkweSG1uQc3wC+EOUt2ayAthYDhK3UDekzfzYLR
+	 NGZpAMUuSEsFwvIr+JmjERuXpRMbs0mfIQs5hIbzFTz/B/DadztdAUr/KTh437wgAE
+	 0RnNxM1p8jgNMzkQUewlJc6pf+73OCNJqFf064tr5G285zYSpUBU1TbNcB0DsQHgoV
+	 TjDV8cAs1goSoRfSfgWFWPCTw1rz4rZpJ7kVs4Ncyhzs9GYm1NbbbRp1jeiwGKAqPA
+	 1E6+MKQEu4SVA8TUM9T7E6de18kMXiCkTUTlxIv9oIWG6gl5i4uGBuDVzW5qGiFKl8
+	 REFebrG6P+qzw==
+Date: Wed, 1 May 2024 19:14:07 -0700
 From: Jakub Kicinski <kuba@kernel.org>
 To: Kory Maincent <kory.maincent@bootlin.com>
 Cc: Florian Fainelli <florian.fainelli@broadcom.com>, Broadcom internal
@@ -60,54 +60,35 @@ Cc: Florian Fainelli <florian.fainelli@broadcom.com>, Broadcom internal
  <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
  linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, Maxime Chevallier
  <maxime.chevallier@bootlin.com>, Rahul Rameshbabu <rrameshbabu@nvidia.com>
-Subject: Re: [PATCH net-next v12 09/13] net: Add the possibility to support
- a selected hwtstamp in netdevice
-Message-ID: <20240501191016.52b5c92f@kernel.org>
-In-Reply-To: <20240430-feature_ptp_netnext-v12-9-2c5f24b6a914@bootlin.com>
+Subject: Re: [PATCH net-next v12 13/13] netlink: specs: tsinfo: Enhance
+ netlink attributes and add a set command
+Message-ID: <20240501191407.5661aca0@kernel.org>
+In-Reply-To: <20240430-feature_ptp_netnext-v12-13-2c5f24b6a914@bootlin.com>
 References: <20240430-feature_ptp_netnext-v12-0-2c5f24b6a914@bootlin.com>
-	<20240430-feature_ptp_netnext-v12-9-2c5f24b6a914@bootlin.com>
+	<20240430-feature_ptp_netnext-v12-13-2c5f24b6a914@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, 30 Apr 2024 17:49:52 +0200 Kory Maincent wrote:
->  static inline void hwtstamp_config_to_kernel(struct kernel_hwtstamp_config *kernel_cfg,
-> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-> index f0e4572cdad5..f6333b8a630d 100644
-> --- a/include/linux/netdevice.h
-> +++ b/include/linux/netdevice.h
-> @@ -46,6 +46,7 @@
->  #include <uapi/linux/if_bonding.h>
->  #include <uapi/linux/pkt_cls.h>
->  #include <uapi/linux/netdev.h>
-> +#include <linux/net_tstamp.h>
->  #include <linux/hashtable.h>
->  #include <linux/rbtree.h>
->  #include <net/net_trackers.h>
-> @@ -2026,6 +2027,8 @@ enum netdev_reg_state {
->   *	@dpll_pin: Pointer to the SyncE source pin of a DPLL subsystem,
->   *		   where the clock is recovered.
->   *
-> + *	@hwtstamp: Tracks which PTP performs hardware packet time stamping.
-> + *
->   *	FIXME: cleanup struct net_device such that network protocol info
->   *	moves out.
->   */
-> @@ -2400,6 +2403,8 @@ struct net_device {
->  	/** @page_pools: page pools created for this netdevice */
->  	struct hlist_head	page_pools;
->  #endif
-> +
-> +	struct hwtstamp_provider	*hwtstamp;
->  };
->  #define to_net_dev(d) container_of(d, struct net_device, dev)
+On Tue, 30 Apr 2024 17:49:56 +0200 Kory Maincent wrote:
+> +      -
+> +        name: hwtst-provider
+> +        type: nest
+> +        nested-attributes: tsinfo-hwtst-provider
+> +      -
+> +        name: hwtst-flags
+> +        type: u32
 
-Please avoid adding includes to netdevice.h.
-IDK if you have more dependencies in later patches but for a pointer
-member you don't even need a forward declaration, let alone include.
+C code is unhappy about the naming here vs what the actual C enums
+are called (make -C tools/net/ynl)
+
+You can keep the shorter names if very strongly prefer (=F0=9F=99=82=E2=80=
+=8D=E2=86=94=EF=B8=8F) but then
+you need to give C code gen hints about naming:
+https://docs.kernel.org/next/userspace-api/netlink/c-code-gen.html
 
