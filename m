@@ -1,105 +1,183 @@
-Return-Path: <netdev+bounces-93090-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93103-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83AE88BA047
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 20:28:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BAD598BA098
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 20:35:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 00DE12817D3
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 18:28:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 75C69284C4D
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 18:35:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9436C17334D;
-	Thu,  2 May 2024 18:28:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E55BA174EC8;
+	Thu,  2 May 2024 18:35:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="NEcyZKX1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CD9D17167B
-	for <netdev@vger.kernel.org>; Thu,  2 May 2024 18:28:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C114E155350
+	for <netdev@vger.kernel.org>; Thu,  2 May 2024 18:35:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714674498; cv=none; b=Z12k+LWVhWyf/YFWKrovIWiE7fOdO06pGZ+A9DB9MAt8MrTFx4w2U/OtvdQwzq86BXgIL/lTjggM8ItHJzd30dEfcAMsq6LngnQv82rQi+cM/LABWu/JGMI6rd+kFRn7RP3tbaU6Fy2QLhgaBKBii7/oeEUTqo0rAQylF33Tn2w=
+	t=1714674907; cv=none; b=JO3S86A2yS3U/ErZAb4A/p9TGd7WVw2J1AJKHk8KmO8Ck+m06xlrsD3ezVk7KJGHd8thQoCd5hm/mx3/k9Oqv7UG2IWb/UqGzcToKzynvm595sJ9YVDyukn+yIRqx3H19dSHAiyFftcQ/FVmkAOUZJXN+MBFj1u3Y2l2iDgIjq0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714674498; c=relaxed/simple;
-	bh=UzKx2uEzqgslDAiwUDJyVu5c/uy6CYD26vc1Ic3/26A=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=BCH7xy9zpHEG+Na9hcAXHgk2hwpF2bMYaYVg8vVKNJqYNFbJ+lA/GGol6TSBifcBQWxipWgaHHU/mHSxEXdCUfJbvBZEC+R9r6hSQmgXaKlXcmqf1AYYHzQ8yFlxBDHhYZgUeB1B+UEnfx6Vxr2LPT2OyuqBZEQQaP4vwaV5gAo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-7dee81b7e97so234231839f.3
-        for <netdev@vger.kernel.org>; Thu, 02 May 2024 11:28:16 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714674496; x=1715279296;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UzKx2uEzqgslDAiwUDJyVu5c/uy6CYD26vc1Ic3/26A=;
-        b=Vd8I2QivoJcMED2kMTb1ebwlCNGrRwXZi6yr0ZzhdE924b6qS7FJh1FRqfkX8BvvJU
-         JuCV3TgpUOsBuKt8S9lpzndaZFQUfSEpXYI+r3qQDwzLrQ8TDU3xIbycWPOD1GnKVc9U
-         72rfzGmtYpSYzmeDzmfHc/4zhXiDB1WlpyH5BtilQJq4qxCzAuaAvQrA2H/pzXdVP87H
-         YhN/AL6fED/OBKUiN6y+X9US0xmlVLaY7VtYGLLK6bSSmNMvXU/vXdKl6yE7JN30EU5q
-         hEfPEV5Ogb7EDJbq3+a9jbNYDsYwCgaGrRZykUWm6ThR28d25UvexIvTtUaPwp8fnl3H
-         CE7Q==
-X-Forwarded-Encrypted: i=1; AJvYcCU5J9Wjvr808EW7l+bF73hq1JMhqeNdMlLb6czdKiADH/5YBzq6dwBTaVzOVq0W9E8/eWdXkqlVJ9nC5twMXKeG6SC+3UlJ
-X-Gm-Message-State: AOJu0YxC9yD0pLw6ii2AjzJPynGEsuO5mygRrjyUygLuwGE8OfaPA1k/
-	zbSK8HRkPXKVzjEl5flLKNZ7pUF/I9BxVOZc1ZFI438nJjlDFB0JHB/GUIQ7UIlikU7dyU0GxNQ
-	n0b099kmUvg+C1/WHX+dh6Zyt6JOpnoWCHpEABjXQpjDw1CkbFWK99KE=
-X-Google-Smtp-Source: AGHT+IHfvdUjCK5ourMvNUp/Sz8U8WrMGbVCskwFzb4UA2DWIV0LaNKUHAeAIsAIRgbjYbC4dLWbSyCtWhY+2ftEEIG8pt9kXk+H
+	s=arc-20240116; t=1714674907; c=relaxed/simple;
+	bh=VdtLlLuJUR1Knd37f5dxLNMQEdlww7HPfOhL0BqYFmo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JHNBA1hATg1G4B2K3VFBNeaLQ4df7fm4QwlViPDk+TPENZTFeq16gS59Jq17KsAT11FVejGJcLLmm1N5QTNp7lw97SWFBtwEiikyJgjRWhwj6Zie3tCSlteZN6lADgm7W7AHcGpPmlTlJo39/yrA5Q9FCqiFyyD+KN3XWbeC0nQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=NEcyZKX1; arc=none smtp.client-ip=85.214.62.61
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Received: from tr.lan (ip-86-49-120-218.bb.vodafone.cz [86.49.120.218])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+	(No client certificate requested)
+	(Authenticated sender: marex@denx.de)
+	by phobos.denx.de (Postfix) with ESMTPSA id 1943D87DB1;
+	Thu,  2 May 2024 20:34:57 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+	s=phobos-20191101; t=1714674897;
+	bh=oBoFdzt0itbZ1FValzlk4sW818G9z7bta32ObbYkzeE=;
+	h=From:To:Cc:Subject:Date:From;
+	b=NEcyZKX1+IHetHmRgjgynAtVjq5QFersv1Vf2dMsbQhySjkW200eXW2obLTgFUuoe
+	 L1LQAEibcOvaVRUu4x4Cczk1aiL8kPvH0kjiitFSq8VS15M3Er1//GmJTb46qvK+Tm
+	 Cx2YOazjSUakL20g45NDfQc9uQPjV1LHJrqnsSCZrjTgdUc9PSHn9sTe734FEDtsRH
+	 rzNP5I0aj9QMk83reDxaaLdlFMqPZjifImLWNn701HWWqvK2zQFSQbUFQ00HOFL99N
+	 LdPGrYUdZ89Hmnl7dJa/opqnun7bwAtlnMpvZxcPdmz76Xzfcwdo+O047yy74He7FU
+	 gwZlqwa0EwT6Q==
+From: Marek Vasut <marex@denx.de>
+To: netdev@vger.kernel.org
+Cc: Marek Vasut <marex@denx.de>,
+	Ronald Wahl <ronald.wahl@raritan.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>
+Subject: [net,PATCH v3] net: ks8851: Queue RX packets in IRQ handler instead of disabling BHs
+Date: Thu,  2 May 2024 20:32:59 +0200
+Message-ID: <20240502183436.117117-1-marex@denx.de>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:4387:b0:487:591e:6df3 with SMTP id
- bo7-20020a056638438700b00487591e6df3mr5738jab.2.1714674496327; Thu, 02 May
- 2024 11:28:16 -0700 (PDT)
-Date: Thu, 02 May 2024 11:28:16 -0700
-In-Reply-To: <000000000000a62351060e363bdc@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000042648f06177cc40e@google.com>
-Subject: Re: [syzbot] memory leak in ___neigh_create (2)
-From: syzbot <syzbot+42cfec52b6508887bbe8@syzkaller.appspotmail.com>
-To: alexander.mikhalitsyn@virtuozzo.com, davem@davemloft.net, den@openvz.org, 
-	dsahern@kernel.org, edumazet@google.com, f.fainelli@gmail.com, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	nogikh@google.com, pabeni@redhat.com, razor@blackwall.org, 
-	syzkaller-bugs@googlegroups.com, thomas.zeitlhofer+lkml@ze-it.at, 
-	thomas.zeitlhofer@ze-it.at, wangyuweihx@gmail.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
 
-This bug is marked as fixed by commit:
-net: stop syzbot
+Currently the driver uses local_bh_disable()/local_bh_enable() in its
+IRQ handler to avoid triggering net_rx_action() softirq on exit from
+netif_rx(). The net_rx_action() could trigger this driver .start_xmit
+callback, which is protected by the same lock as the IRQ handler, so
+calling the .start_xmit from netif_rx() from the IRQ handler critical
+section protected by the lock could lead to an attempt to claim the
+already claimed lock, and a hang.
 
-But I can't find it in the tested trees[1] for more than 90 days.
-Is it a correct commit? Please update it by replying:
+The local_bh_disable()/local_bh_enable() approach works only in case
+the IRQ handler is protected by a spinlock, but does not work if the
+IRQ handler is protected by mutex, i.e. this works for KS8851 with
+Parallel bus interface, but not for KS8851 with SPI bus interface.
 
-#syz fix: exact-commit-title
+Remove the BH manipulation and instead of calling netif_rx() inside
+the IRQ handler code protected by the lock, queue all the received
+SKBs in the IRQ handler into a queue first, and once the IRQ handler
+exits the critical section protected by the lock, dequeue all the
+queued SKBs and push them all into netif_rx(). At this point, it is
+safe to trigger the net_rx_action() softirq, since the netif_rx()
+call is outside of the lock that protects the IRQ handler.
 
-Until then the bug is still considered open and new crashes with
-the same signature are ignored.
-
-Kernel: Linux
-Dashboard link: https://syzkaller.appspot.com/bug?extid=42cfec52b6508887bbe8
-
+Fixes: be0384bf599c ("net: ks8851: Handle softirqs at the end of IRQ thread to fix hang")
+Tested-by: Ronald Wahl <ronald.wahl@raritan.com> # KS8851 SPI
+Signed-off-by: Marek Vasut <marex@denx.de>
 ---
-[1] I expect the commit to be present in:
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: Ronald Wahl <ronald.wahl@raritan.com>
+Cc: Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org
+---
+V2: - Add TB from Ronald
+    - Operate private skb queue without locking as suggested by Eric
+V3: - Put the RX queue on stack
+    - Only set up the RX queue if there is RX IRQ
+    - Update the netif_rx while loop per upstream feedback
+---
+Note: This is basically what Jakub originally suggested in
+      https://patchwork.kernel.org/project/netdevbpf/patch/20240331142353.93792-2-marex@denx.de/#25785606
+---
+ drivers/net/ethernet/micrel/ks8851_common.c | 16 ++++++++++------
+ 1 file changed, 10 insertions(+), 6 deletions(-)
 
-1. for-kernelci branch of
-git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git
+diff --git a/drivers/net/ethernet/micrel/ks8851_common.c b/drivers/net/ethernet/micrel/ks8851_common.c
+index d4cdf3d4f5525..502518cdb4618 100644
+--- a/drivers/net/ethernet/micrel/ks8851_common.c
++++ b/drivers/net/ethernet/micrel/ks8851_common.c
+@@ -234,12 +234,13 @@ static void ks8851_dbg_dumpkkt(struct ks8851_net *ks, u8 *rxpkt)
+ /**
+  * ks8851_rx_pkts - receive packets from the host
+  * @ks: The device information.
++ * @rxq: Queue of packets received in this function.
+  *
+  * This is called from the IRQ work queue when the system detects that there
+  * are packets in the receive queue. Find out how many packets there are and
+  * read them from the FIFO.
+  */
+-static void ks8851_rx_pkts(struct ks8851_net *ks)
++static void ks8851_rx_pkts(struct ks8851_net *ks, struct sk_buff_head *rxq)
+ {
+ 	struct sk_buff *skb;
+ 	unsigned rxfc;
+@@ -299,7 +300,7 @@ static void ks8851_rx_pkts(struct ks8851_net *ks)
+ 					ks8851_dbg_dumpkkt(ks, rxpkt);
+ 
+ 				skb->protocol = eth_type_trans(skb, ks->netdev);
+-				__netif_rx(skb);
++				__skb_queue_tail(rxq, skb);
+ 
+ 				ks->netdev->stats.rx_packets++;
+ 				ks->netdev->stats.rx_bytes += rxlen;
+@@ -326,11 +327,11 @@ static void ks8851_rx_pkts(struct ks8851_net *ks)
+ static irqreturn_t ks8851_irq(int irq, void *_ks)
+ {
+ 	struct ks8851_net *ks = _ks;
++	struct sk_buff_head rxq;
+ 	unsigned handled = 0;
+ 	unsigned long flags;
+ 	unsigned int status;
+-
+-	local_bh_disable();
++	struct sk_buff *skb;
+ 
+ 	ks8851_lock(ks, &flags);
+ 
+@@ -384,7 +385,8 @@ static irqreturn_t ks8851_irq(int irq, void *_ks)
+ 		 * from the device so do not bother masking just the RX
+ 		 * from the device. */
+ 
+-		ks8851_rx_pkts(ks);
++		__skb_queue_head_init(&rxq);
++		ks8851_rx_pkts(ks, &rxq);
+ 	}
+ 
+ 	/* if something stopped the rx process, probably due to wanting
+@@ -408,7 +410,9 @@ static irqreturn_t ks8851_irq(int irq, void *_ks)
+ 	if (status & IRQ_LCI)
+ 		mii_check_link(&ks->mii);
+ 
+-	local_bh_enable();
++	if (status & IRQ_RXI)
++		while ((skb = __skb_dequeue(&rxq)))
++			netif_rx(skb);
+ 
+ 	return IRQ_HANDLED;
+ }
+-- 
+2.43.0
 
-2. master branch of
-git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git
-
-3. master branch of
-git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git
-
-4. main branch of
-git://git.kernel.org/pub/scm/linux/kernel/git/davem/net-next.git
-
-The full list of 9 trees can be found at
-https://syzkaller.appspot.com/upstream/repos
 
