@@ -1,309 +1,297 @@
-Return-Path: <netdev+bounces-93007-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93008-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D193A8B99EF
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 13:23:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 716BB8B99F2
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 13:24:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 45C331F21371
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 11:23:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B1F841F23F4A
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 11:24:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3388360DE9;
-	Thu,  2 May 2024 11:23:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 603EF6311D;
+	Thu,  2 May 2024 11:24:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FtDSvKi3"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FuZziewm"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AF6F5F874;
-	Thu,  2 May 2024 11:23:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C7E360DCF
+	for <netdev@vger.kernel.org>; Thu,  2 May 2024 11:24:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714649011; cv=none; b=bKpAHVoO7Kl8dAjPF+uXpFod8cMeVlGoUxIvTWPqzfX00r3UXHHlWvbD8mijDlW7gTnCQ1dQ2WPJWvlKe+PItSKkUUfw3+vcCPG6r9cGpK5xkjk4chpHwscK5sv5TxvhL7Px3DL1ThkY5vkKb6SjKoT8TtUVx8VJA4BewVr4yZQ=
+	t=1714649049; cv=none; b=hCLlPdib3KAfEOUd7+gzkhcDzs8fpDWBLqlS2/lg9Hjah4MnftVFYtBYmEvv7uyuQtS8oZxEIindvFU1LR0jEwRWibL42thnx39zRKyq0uQyCAHq2BJuNyO7/QKY0fAVxEkLMZWr4QZu0cpw8uDL9irvBstzRMuBPulRmem479o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714649011; c=relaxed/simple;
-	bh=1HYYKmaehmUJTYfPblH1ZzZDaUzqvFPL0HY7RckRNz0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ELWVUkJCKOqSpq55aofD7MXObHTA0DMzUbrQXGCkqlYSKhQh1Wkq8bFyjSfuvp9Yi6iFEKQb1keWEK4uf65WtHuZzB1fWk7Ir50aYnmu0Z5fQWAAew8TNLR+/ygC0y/QtNo62SeXA4Km4c/PWWVM1bG+/okXb9Y98EgtIsjBTEk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FtDSvKi3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5AC31C113CC;
-	Thu,  2 May 2024 11:23:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714649010;
-	bh=1HYYKmaehmUJTYfPblH1ZzZDaUzqvFPL0HY7RckRNz0=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=FtDSvKi35eOK7h3zhFGUlGuDLl+h0JpDbMsZcSA6SPQ03vTzrZSL48lQYqtqpK8/e
-	 rrTsyAEq6qmg0YEnFmjMr7VJb1T9HuVXWsPuesU35ws+KKdXh6cXshzxufTVSNBMXp
-	 vbj2KyZNcY9LcU4iJ7tbuUadt+wDRGQMevFXU0N3UaFtH7Rh0poIGjiJXp7LtRe8nj
-	 71ZhJvCm+PpjOVECZkvYbh0R1qoQWdQwnMv6hjmI3UA6itwrSDEtHhDJGiU2gSDWFI
-	 Fi6dgVOAGIb7B9/Kemdn1Q2hv3Hdj1QM+5RPNti+Ux0HrGo+wMBpcU3YmPFbHFw/vG
-	 GYzsrRM/m4wdA==
-Message-ID: <b74c4e6b-82cc-4b26-b817-0b36fbfcc2bd@kernel.org>
-Date: Thu, 2 May 2024 13:23:26 +0200
+	s=arc-20240116; t=1714649049; c=relaxed/simple;
+	bh=3BsYr5GY8+DN1Cqhi1SWPVOenkTI4gCJ/13mNvl0t5o=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=qnXKhbT77839N7z8bwjezNN+b2qkzhZspPPueaUxdZdYM6Fgsrel+PJjg0/aZ3vMJrljS4iF0DbhhyPlsmCcrxR/W/hSvSRQDI8VSVon5eRm07Nraq64dEZPGU6TnIOy+EKGlGtgM265EGvWO/OjLnT54PWuhkckHzIev1J9Db4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FuZziewm; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1714649045;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=Av/id9hmBlLg4KcvyaywN2IiF2o6K3QcgBvIFp2NqD8=;
+	b=FuZziewmdxF/zO4wA6URLuoJZtmBpCagq4qO4bhCE876Ho/pTjwGaSg8QQAUKdSeEKEqfk
+	i4lk/BtQDrsOd4ayTKiqmJGihEBlynIHk6yWovSw3uxrclLTTf4joUAyOl48nxRd+Gme7a
+	dCoHAGFLUAbRNC4QJ+TomlKyY4CNcWQ=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-75-VMh_fc6bNTerj3KxOP3BNQ-1; Thu,
+ 02 May 2024 07:24:02 -0400
+X-MC-Unique: VMh_fc6bNTerj3KxOP3BNQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B1B24299E750;
+	Thu,  2 May 2024 11:24:01 +0000 (UTC)
+Received: from gerbillo.redhat.com (unknown [10.45.224.148])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 7D0D7202450D;
+	Thu,  2 May 2024 11:24:00 +0000 (UTC)
+From: Paolo Abeni <pabeni@redhat.com>
+To: torvalds@linux-foundation.org
+Cc: kuba@kernel.org,
+	davem@davemloft.net,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [GIT PULL] Networking for v6.9-rc7
+Date: Thu,  2 May 2024 13:23:26 +0200
+Message-ID: <20240502112326.34463-1-pabeni@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1] cgroup/rstat: add cgroup_rstat_cpu_lock helpers and
- tracepoints
-To: Waiman Long <longman@redhat.com>, tj@kernel.org, hannes@cmpxchg.org,
- lizefan.x@bytedance.com, cgroups@vger.kernel.org, yosryahmed@google.com
-Cc: netdev@vger.kernel.org, linux-mm@kvack.org, shakeel.butt@linux.dev,
- kernel-team@cloudflare.com, Arnaldo Carvalho de Melo <acme@kernel.org>,
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-References: <171457225108.4159924.12821205549807669839.stgit@firesoul>
- <30d64e25-561a-41c6-ab95-f0820248e9b6@redhat.com>
- <4a680b80-b296-4466-895a-13239b982c85@kernel.org>
- <203fdb35-f4cf-4754-9709-3c024eecade9@redhat.com>
-Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <203fdb35-f4cf-4754-9709-3c024eecade9@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.4
 
+Hi Linus!
 
+The following changes since commit 52afb15e9d9a021ab6eec923a087ec9f518cb713:
 
-On 01/05/2024 20.41, Waiman Long wrote:
-> On 5/1/24 13:22, Jesper Dangaard Brouer wrote:
->>
->>
->> On 01/05/2024 16.24, Waiman Long wrote:
->>> On 5/1/24 10:04, Jesper Dangaard Brouer wrote:
->>>> This closely resembles helpers added for the global 
->>>> cgroup_rstat_lock in
->>>> commit fc29e04ae1ad ("cgroup/rstat: add cgroup_rstat_lock helpers and
->>>> tracepoints"). This is for the per CPU lock cgroup_rstat_cpu_lock.
->>>>
->>>> Based on production workloads, we observe the fast-path "update" 
->>>> function
->>>> cgroup_rstat_updated() is invoked around 3 million times per sec, 
->>>> while the
->>>> "flush" function cgroup_rstat_flush_locked(), walking each possible 
->>>> CPU,
->>>> can see periodic spikes of 700 invocations/sec.
->>>>
->>>> For this reason, the tracepoints are split into normal and fastpath
->>>> versions for this per-CPU lock. Making it feasible for production to
->>>> continuously monitor the non-fastpath tracepoint to detect lock 
->>>> contention
->>>> issues. The reason for monitoring is that lock disables IRQs which can
->>>> disturb e.g. softirq processing on the local CPUs involved. When the
->>>> global cgroup_rstat_lock stops disabling IRQs (e.g converted to a 
->>>> mutex),
->>>> this per CPU lock becomes the next bottleneck that can introduce 
->>>> latency
->>>> variations.
->>>>
->>>> A practical bpftrace script for monitoring contention latency:
->>>>
->>>>   bpftrace -e '
->>>>     tracepoint:cgroup:cgroup_rstat_cpu_lock_contended {
->>>>       @start[tid]=nsecs; @cnt[probe]=count()}
->>>>     tracepoint:cgroup:cgroup_rstat_cpu_locked {
->>>>       if (args->contended) {
->>>>         @wait_ns=hist(nsecs-@start[tid]); delete(@start[tid]);}
->>>>       @cnt[probe]=count()}
->>>>     interval:s:1 {time("%H:%M:%S "); print(@wait_ns); print(@cnt); 
->>>> clear(@cnt);}'
->>>
->>> This is a per-cpu lock. So the only possible contention involves only 
->>> 2 CPUs - a local CPU invoking cgroup_rstat_updated(). A flusher CPU 
->>> doing cgroup_rstat_flush_locked() calling into 
->>> cgroup_rstat_updated_list(). With recent commits to reduce the percpu 
->>> lock hold time, I doubt lock contention on the percpu lock will have 
->>> a great impact on latency. 
->>
->> I do appriciate your recent changes to reduce the percpu lock hold time.
->> These tracepoints allow me to measure and differentiate the percpu lock
->> hold time vs. the flush time.
->>
->> In production (using [1]) I'm seeing "Long lock-hold time" [L100] e.g.
->> upto 29 ms, which is time spend after obtaining the lock (runtime under
->> lock).  I was expecting to see "High Lock-contention wait" [L82] which
->> is the time waiting for obtaining the lock.
->>
->> This is why I'm adding these tracepoints, as they allow me to digg
->> deeper, to understand where this high runtime variations originate from.
->>
->>
->> Data:
->>
->>  16:52:09 Long lock-hold time: 14950 usec (14 ms) on CPU:34 comm:kswapd4
->>  16:52:09 Long lock-hold time: 14821 usec (14 ms) on CPU:34 comm:kswapd4
->>  16:52:09 Long lock-hold time: 11299 usec (11 ms) on CPU:98 comm:kswapd4
->>  16:52:09 Long lock-hold time: 17237 usec (17 ms) on CPU:113 comm:kswapd6
->>  16:52:09 Long lock-hold time: 29000 usec (29 ms) on CPU:36 
->> comm:kworker/u261:12
-> That lock hold time is much higher than I would have expected.
->>  16:52:09 time elapsed: 80 sec (interval = 1 sec)
->>   Flushes(5033) 294/interval (avg 62/sec)
->>   Locks(53374) 1748/interval (avg 667/sec)
->>   Yields(48341) 1454/interval (avg 604/sec)
->>   Contended(48104) 1450/interval (avg 601/sec)
->>
->>
->>> So do we really need such an elaborate scheme to monitor this? BTW, 
->>> the additional code will also add to the worst case latency.
->>
->> Hmm, I designed this code to have minimal impact, as tracepoints are
->> no-ops until activated.  I really doubt this code will change the 
->> latency.
->>
->>
->> [1] 
->> https://github.com/xdp-project/xdp-project/blob/master/areas/latency/cgroup_rstat_tracepoint.bt
->>
->> [L100] 
->> https://github.com/xdp-project/xdp-project/blob/master/areas/latency/cgroup_rstat_tracepoint.bt#L100
->>
->> [L82] 
->> https://github.com/xdp-project/xdp-project/blob/master/areas/latency/cgroup_rstat_tracepoint.bt#L82
->>
->>>>
->>>> Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
->>
->> More data, the histogram of time spend under the lock have some strange
->> variation issues with a group in 4ms to 65ms area. Investigating what
->> can be causeing this... which next step depend in these tracepoints.
->>
->> @lock_cnt: 759146
->>
->> @locked_ns:
->> [1K, 2K)             499 |      |
->> [2K, 4K)          206928 
->> |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@|
->> [4K, 8K)          147904 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@      |
->> [8K, 16K)          64453 |@@@@@@@@@@@@@@@@      |
->> [16K, 32K)        135467 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ |
->> [32K, 64K)         75943 |@@@@@@@@@@@@@@@@@@@      |
->> [64K, 128K)        38359 |@@@@@@@@@      |
->> [128K, 256K)       46597 |@@@@@@@@@@@      |
->> [256K, 512K)       32466 |@@@@@@@@      |
->> [512K, 1M)          3945 |      |
->> [1M, 2M)             642 |      |
->> [2M, 4M)             750 |      |
->> [4M, 8M)            1932 |      |
->> [8M, 16M)           2114 |      |
->> [16M, 32M)          1039 |      |
->> [32M, 64M)           108 |      |
->>
->>
->>
->>
->>>> ---
->>>>   include/trace/events/cgroup.h |   56 
->>>> +++++++++++++++++++++++++++++----
->>>>   kernel/cgroup/rstat.c         |   70 
->>>> ++++++++++++++++++++++++++++++++++-------
->>>>   2 files changed, 108 insertions(+), 18 deletions(-)
->>>>
->>>> diff --git a/include/trace/events/cgroup.h 
->>>> b/include/trace/events/cgroup.h
->>>> index 13f375800135..0b95865a90f3 100644
->>>> --- a/include/trace/events/cgroup.h
-[...]
->>>> +++ b/include/trace/events/cgroup.h >>>> +DEFINE_EVENT(cgroup_rstat, cgroup_rstat_cpu_unlock_fastpath,
->>>> +
->>>> +    TP_PROTO(struct cgroup *cgrp, int cpu, bool contended),
->>>> +
->>>> +    TP_ARGS(cgrp, cpu, contended)
->>>> +);
->>>> +
->>>>   #endif /* _TRACE_CGROUP_H */
->>>>   /* This part must be outside protection */
->>>> diff --git a/kernel/cgroup/rstat.c b/kernel/cgroup/rstat.c
->>>> index 52e3b0ed1cee..fb8b49437573 100644
->>>> --- a/kernel/cgroup/rstat.c
->>>> +++ b/kernel/cgroup/rstat.c
->>>> @@ -19,6 +19,60 @@ static struct cgroup_rstat_cpu 
->>>> *cgroup_rstat_cpu(struct cgroup *cgrp, int cpu)
->>>>       return per_cpu_ptr(cgrp->rstat_cpu, cpu);
->>>>   }
->>>> +/*
->>>> + * Helper functions for rstat per CPU lock (cgroup_rstat_cpu_lock).
->>>> + *
->>>> + * This makes it easier to diagnose locking issues and contention in
->>>> + * production environments. The parameter @fast_path determine the
->>>> + * tracepoints being added, allowing us to diagnose "flush" related
->>>> + * operations without handling high-frequency fast-path "update" 
->>>> events.
->>>> + */
->>>> +static __always_inline
->>>> +unsigned long _cgroup_rstat_cpu_lock(raw_spinlock_t *cpu_lock, int 
->>>> cpu,
->>>> +                     struct cgroup *cgrp, const bool fast_path)
->>>> +{
->>>> +    unsigned long flags;
->>>> +    bool contended;
->>>> +
->>>> +    /*
->>>> +     * The _irqsave() is needed because cgroup_rstat_lock is
->>>> +     * spinlock_t which is a sleeping lock on PREEMPT_RT. Acquiring
->>>> +     * this lock with the _irq() suffix only disables interrupts on
->>>> +     * a non-PREEMPT_RT kernel. The raw_spinlock_t below disables
->>>> +     * interrupts on both configurations. The _irqsave() ensures
->>>> +     * that interrupts are always disabled and later restored.
->>>> +     */
->>>> +    contended = !raw_spin_trylock_irqsave(cpu_lock, flags);
->>>> +    if (contended) {
->>>> +        if (fast_path)
->>>> + trace_cgroup_rstat_cpu_lock_contended_fastpath(cgrp, cpu, contended);
->>>> +        else
->>>> +            trace_cgroup_rstat_cpu_lock_contended(cgrp, cpu, 
->>>> contended);
->>>> +
->>>> +        raw_spin_lock_irqsave(cpu_lock, flags);
-> 
-> Could you do a local_irq_save() before calling trace_cgroup*() and 
-> raw_spin_lock()? Would that help in eliminating this high lock hold time?
-> 
+  Merge tag 'net-6.9-rc6' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2024-04-25 11:19:38 -0700)
 
-Nope it will not eliminating high lock *hold* time, because the hold
-start timestamp is first taken *AFTER* obtaining the lock.
+are available in the Git repository at:
 
-It could help the contended "wait-time" measurement, but my prod
-measurements show this isn't an issues.
+  git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.9-rc7
 
-> You can also do a local_irq_save() first before the trylock. That will 
-> eliminate the duplicated irq_restore() and irq_save() when there is 
-> contention.
+for you to fetch changes up to 78cfe547607a83de60cd25304fa2422777634712:
 
-I wrote the code like this on purpose ;-)
-My issue with this code/lock is it cause latency issues for softirq 
-NET_RX. So, when I detect a "contended" lock event, I do want a 
-irq_restore() as that will allow networking/do_softirq() to run before I 
-start waiting for the lock (with IRQ disabled).
+  MAINTAINERS: mark MYRICOM MYRI-10G as Orphan (2024-05-02 11:24:03 +0200)
 
+----------------------------------------------------------------
+Including fixes from bpf.
 
-> If not, there may be NMIs mixed in.
-> 
+Relatively calm week, likely due to public holiday in most places.
+No known outstanding regressions.
 
-NMIs are definitely on my list of things to investigate.
-These AMD CPUs also have other types of interrupts that needs a close look.
+Current release - regressions:
 
-The easier explaination is that the lock isn't "yielded" on every cycle
-through the for each CPU loop.
+  - rxrpc: fix wrong alignmask in __page_frag_alloc_align()
 
-Lets look at the data I provided above:
+  - eth: e1000e: change usleep_range to udelay in PHY mdic access
 
- >>   Flushes(5033) 294/interval (avg 62/sec)
- >>   Locks(53374) 1748/interval (avg 667/sec)
- >>   Yields(48341) 1454/interval (avg 604/sec)
- >>   Contended(48104) 1450/interval (avg 601/sec)
+Previous releases - regressions:
 
-In this 1 second sample, we have 294 flushes, and more yields 1454,
-great but the factor is not 128 (num-of-CPUs) but closer to 5.  Thus, on
-average we hold the lock for (128/5) 25.6 CPUs-walks.
+  - gro: fix udp bad offset in socket lookup
 
-We have spoken about releasing the lock on for_each CPU before... it
-will likely solve this long hold time, but IMHO a mutex is still the
-better solution.
+  - bpf: fix incorrect runtime stat for arm64
 
---Jesper
+  - tipc: fix UAF in error path
+
+  - netfs: fix a potential infinite loop in extract_user_to_sg()
+
+  - eth: ice: ensure the copied buf is NUL terminated
+
+  - eth: qeth: fix kernel panic after setting hsuid
+
+Previous releases - always broken:
+
+  - bpf:
+    - verifier: prevent userspace memory access
+    - xdp: use flags field to disambiguate broadcast redirect
+
+  - bridge: fix multicast-to-unicast with fraglist GSO
+
+  - mptcp: ensure snd_nxt is properly initialized on connect
+
+  - nsh: fix outer header access in nsh_gso_segment().
+
+  - eth: bcmgenet: fix racing registers access
+
+  - eth: vxlan: fix stats counters.
+
+Misc:
+
+  - a bunch of MAINTAINERS file updates
+
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+
+----------------------------------------------------------------
+Alexandra Winter (1):
+      s390/qeth: Fix kernel panic after setting hsuid
+
+Alexei Starovoitov (1):
+      Merge branch 'bpf-prevent-userspace-memory-access'
+
+Andrii Nakryiko (1):
+      bpf, kconfig: Fix DEBUG_INFO_BTF_MODULES Kconfig definition
+
+Anton Protopopov (1):
+      bpf: Fix a verifier verbose message
+
+Asbjørn Sloth Tønnesen (4):
+      net: qede: sanitize 'rc' in qede_add_tc_flower_fltr()
+      net: qede: use return from qede_parse_flow_attr() for flower
+      net: qede: use return from qede_parse_flow_attr() for flow_spec
+      net: qede: use return from qede_parse_actions()
+
+Björn Töpel (1):
+      MAINTAINERS: bpf: Add Lehui and Puranjay as riscv64 reviewers
+
+Bui Quang Minh (3):
+      ice: ensure the copied buf is NUL terminated
+      bna: ensure the copied buf is NUL terminated
+      octeontx2-af: avoid off-by-one read from userspace
+
+David Bauer (1):
+      net l2tp: drop flow hash on forward
+
+David Howells (1):
+      Fix a potential infinite loop in extract_user_to_sg()
+
+David S. Miller (3):
+      Merge branch 'bcmgenet-protect-contended-accesses'
+      Merge branch 'qed-error-codes'
+      Merge branch 'vxlan-stats'
+
+Doug Berger (3):
+      net: bcmgenet: synchronize EXT_RGMII_OOB_CTRL access
+      net: bcmgenet: synchronize use of bcmgenet_set_rx_mode()
+      net: bcmgenet: synchronize UMAC_CMD access
+
+Felix Fietkau (2):
+      net: bridge: fix multicast-to-unicast with fraglist GSO
+      net: core: reject skb_copy(_expand) for fraglist GSO skbs
+
+Guillaume Nault (3):
+      vxlan: Fix racy device stats updates.
+      vxlan: Add missing VNI filter counter update in arp_reduce().
+      vxlan: Pull inner IP header in vxlan_rcv().
+
+Jakub Kicinski (5):
+      Merge branch 'ensure-the-copied-buf-is-nul-terminated'
+      Merge tag 'for-netdev' of https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf
+      MAINTAINERS: add an explicit entry for YNL
+      MAINTAINERS: remove Ariel Elior
+      MAINTAINERS: mark MYRICOM MYRI-10G as Orphan
+
+Jason Xing (1):
+      bpf, skmsg: Fix NULL pointer dereference in sk_psock_skb_ingress_enqueue
+
+Jeffrey Altman (1):
+      rxrpc: Clients must accept conn from any address
+
+Kuniyuki Iwashima (1):
+      nsh: Restore skb->{protocol,data,mac_header} for outer header in nsh_gso_segment().
+
+Marek Behún (1):
+      net: dsa: mv88e6xxx: Fix number of databases for 88E6141 / 88E6341
+
+Paolo Abeni (3):
+      mptcp: ensure snd_nxt is properly initialized on connect
+      tipc: fix UAF in error path
+      Merge branch 'net-gro-add-flush-flush_id-checks-and-fix-wrong-offset-in-udp'
+
+Puranjay Mohan (5):
+      MAINTAINERS: Update email address for Puranjay Mohan
+      arm32, bpf: Reimplement sign-extension mov instruction
+      bpf: verifier: prevent userspace memory access
+      bpf, x86: Fix PROBE_MEM runtime load check
+      selftests/bpf: Test PROBE_MEM of VSYSCALL_ADDR on x86-64
+
+Richard Gobert (2):
+      net: gro: fix udp bad offset in socket lookup by adding {inner_}network_offset to napi_gro_cb
+      net: gro: add flush check in udp_gro_receive_segment
+
+Sebastian Andrzej Siewior (1):
+      cxgb4: Properly lock TX queue for the selftest.
+
+Shigeru Yoshida (1):
+      ipv4: Fix uninit-value access in __ip_make_skb()
+
+Toke Høiland-Jørgensen (1):
+      xdp: use flags field to disambiguate broadcast redirect
+
+Vitaly Lifshits (1):
+      e1000e: change usleep_range to udelay in PHY mdic access
+
+Xin Long (1):
+      tipc: fix a possible memleak in tipc_buf_append
+
+Xu Kuohai (2):
+      bpf, arm64: Fix incorrect runtime stats
+      riscv, bpf: Fix incorrect runtime stats
+
+Yunsheng Lin (1):
+      rxrpc: Fix using alignmask being zero for __page_frag_alloc_align()
+
+ .mailmap                                           |  1 +
+ MAINTAINERS                                        | 22 +++++---
+ arch/arm/net/bpf_jit_32.c                          | 56 ++++++++++++++-----
+ arch/arm64/net/bpf_jit_comp.c                      |  6 +--
+ arch/riscv/net/bpf_jit_comp64.c                    |  6 +--
+ arch/x86/net/bpf_jit_comp.c                        | 63 +++++++++++-----------
+ drivers/net/dsa/mv88e6xxx/chip.c                   |  4 +-
+ drivers/net/ethernet/broadcom/genet/bcmgenet.c     | 16 +++++-
+ drivers/net/ethernet/broadcom/genet/bcmgenet.h     |  4 +-
+ drivers/net/ethernet/broadcom/genet/bcmgenet_wol.c |  8 ++-
+ drivers/net/ethernet/broadcom/genet/bcmmii.c       |  6 ++-
+ drivers/net/ethernet/brocade/bna/bnad_debugfs.c    |  4 +-
+ drivers/net/ethernet/chelsio/cxgb4/sge.c           |  6 +--
+ drivers/net/ethernet/intel/e1000e/phy.c            |  8 +--
+ drivers/net/ethernet/intel/ice/ice_debugfs.c       |  8 +--
+ .../ethernet/marvell/octeontx2/af/rvu_debugfs.c    |  4 +-
+ drivers/net/ethernet/qlogic/qede/qede_filter.c     | 14 ++---
+ drivers/net/vxlan/vxlan_core.c                     | 49 +++++++++++------
+ drivers/s390/net/qeth_core_main.c                  | 61 ++++++++++-----------
+ include/linux/filter.h                             |  1 +
+ include/linux/skmsg.h                              |  2 +
+ include/net/gro.h                                  |  9 ++++
+ kernel/bpf/core.c                                  |  9 ++++
+ kernel/bpf/verifier.c                              | 33 +++++++++++-
+ lib/Kconfig.debug                                  |  5 +-
+ lib/scatterlist.c                                  |  2 +-
+ net/8021q/vlan_core.c                              |  2 +
+ net/bridge/br_forward.c                            |  2 +-
+ net/core/filter.c                                  | 42 +++++++++++----
+ net/core/gro.c                                     |  1 +
+ net/core/skbuff.c                                  | 27 +++++++---
+ net/core/skmsg.c                                   |  5 +-
+ net/ipv4/af_inet.c                                 |  1 +
+ net/ipv4/ip_output.c                               |  2 +-
+ net/ipv4/raw.c                                     |  3 ++
+ net/ipv4/udp.c                                     |  3 +-
+ net/ipv4/udp_offload.c                             | 15 +++++-
+ net/ipv6/ip6_offload.c                             |  1 +
+ net/ipv6/udp.c                                     |  3 +-
+ net/ipv6/udp_offload.c                             |  3 +-
+ net/l2tp/l2tp_eth.c                                |  3 ++
+ net/mptcp/protocol.c                               |  3 ++
+ net/nsh/nsh.c                                      | 14 ++---
+ net/rxrpc/conn_object.c                            |  9 +---
+ net/rxrpc/insecure.c                               |  2 +-
+ net/rxrpc/rxkad.c                                  |  2 +-
+ net/rxrpc/txbuf.c                                  | 10 ++--
+ net/tipc/msg.c                                     |  8 ++-
+ .../selftests/bpf/bpf_testmod/bpf_testmod.c        |  3 ++
+ 49 files changed, 378 insertions(+), 193 deletions(-)
+
 
