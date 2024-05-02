@@ -1,128 +1,171 @@
-Return-Path: <netdev+bounces-93056-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93057-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5ABA8B9DC0
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 17:48:15 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5A338B9DC5
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 17:50:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D6DC71C216DE
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 15:48:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2A63DB20B11
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 15:50:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7925C15B567;
-	Thu,  2 May 2024 15:48:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DaWTB9xc"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B79C15B56C;
+	Thu,  2 May 2024 15:49:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24A372B9AC;
-	Thu,  2 May 2024 15:48:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8404F15574D;
+	Thu,  2 May 2024 15:49:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714664891; cv=none; b=tNtHmU+4PnOrF756zJQLhV+V8VSOKTXaJ973aAAXTR4rkZNOnpNZOwx2QDddtGNursPRp6SCMjMk+0bybghBUPouJKo9Z6+1HozyFMLIcU6sMFv9dV2q1q5icU6GqYIvYcD3j2E+ecBNzCa1ryXR3ERRCmvlVwAz7sdCt1WS/0Q=
+	t=1714664995; cv=none; b=Uhhq/N5Mi2gu+ej/Be2c+qVoTAVgpPf/xNVgRFsxWqWYyQxJvjuB6n+W+56G8rwFZXWQaJ3mpRnVR74QUnjq0VNiyvdooJJ2lTMj/Rl2QJfKJAhUzzEBZj9pEb8kPm4O6ibCVNQiBCXzh7e7fynKYsvXoJfYoPtnEp2QqFh1llE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714664891; c=relaxed/simple;
-	bh=qbKd3LLCI57a+tE0ERwDo29E4IaS4mh82bdDEQ7k2N8=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=TwiyC+PoOcplLed8eZmrLosHfSGE2uUvHE3hbSU63pgu28MAlUDcHlRhA5MhIx3Ie1yZKOgGVT7SDrPcpKyrzS30iEbm4a15x75NgNqjUna6GMUI9V57fCgrVOAzGs2q7pa1B+liN6oi9FqWz+/bpAdZVUAmLh4KvRpnUV1KThU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DaWTB9xc; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-1eab16c8d83so66498265ad.3;
-        Thu, 02 May 2024 08:48:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1714664888; x=1715269688; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=aTAQjbijSTWQEIaV5ybn91TeLBRSNY5y14qQhGJREA4=;
-        b=DaWTB9xcMnxlwKwvdCUk952Ugr6rbPu95alzA/vT2ifYRHZ1uqk32eZxb9zRRg3TE0
-         i/sv2cVgT5pDHKU0k98n9isADdTpBGq/UHZOL6Nbtp1fT8qQK8jgIoW8LWkr3WBVWP0a
-         50M3hWSDNcBfMJSzG3AIp7WZztY/raBKqezr5B9MwhMr/ZQzikIb8G5y72FDDc6XoTzx
-         6zOOOmNX6ASJAtU0WKQiqtc8xv3q/C6hVIgHe7c6pSsYTYlzsnCxxEq3AlFi0t1KXJdJ
-         0zZCaRUqZrWxw1QVZf22eoyZLuL3B9M8qEta11IbSA1AtPlrOuE7HnMObnGIqqbJYljU
-         wjfg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714664888; x=1715269688;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=aTAQjbijSTWQEIaV5ybn91TeLBRSNY5y14qQhGJREA4=;
-        b=nSuTtFTAE16/E+hmdol21fDsHHWTS9XRL0odZNXraKsSUKtiIbC+dVxGfR7Oi/miPh
-         80NQ84SvMVzDi/KN9mo56V99PzMQb8kAdP3Hz9xYGMOFn8DC7vwXObKJk3rx0RTUpaKE
-         pFSczpGABgwz6UAayOdB6q9f/N/S7jwtaxqdVyy9SZEwbvSvU5a1zSiqGhU8A8vni/j+
-         /3MvWoX0c7bytpML2P2zO+O1jZfDlwI5M7+vgETytPHuhPojpHneHo+rZACADgkiZcJi
-         pbshm1L/TaHzwn9LzrhDbzFmgdAlvtraRYKUwpWG4NbcChNH09laKY1fiyjJbujK8w3m
-         zCFA==
-X-Forwarded-Encrypted: i=1; AJvYcCWDAXfGBUnl/sG4+M1iRKhM1YoXXaFeWXWUokeZ8x/deLUQIoHhg0oNGzTOzo1pj6imcj5Re2GOWRCHd2eowEDUWGCOFIcihfU3FZ0XDxyZGMEvnzDqZ80GITJWVyuyGSCTdBH/
-X-Gm-Message-State: AOJu0Yyjz9T7nfzLEdlGFacqu4aqWl47hTARhzPGcRRjbDKvHhek4qOI
-	JIiw5ZK0GgzOLwA1HR/wRnbAy8tsj+wJptLb3ODc8mU05AafhicjrEU5gUaP
-X-Google-Smtp-Source: AGHT+IHFKR+2377FgewQ5mX0wr3nAgIqcgoXRyZhHHK8o9Fxa/Hv0+zZZzctwgGBp5i17PRvQ2SUVQ==
-X-Received: by 2002:a17:902:b706:b0:1e4:346e:74d8 with SMTP id d6-20020a170902b70600b001e4346e74d8mr19930pls.61.1714664888380;
-        Thu, 02 May 2024 08:48:08 -0700 (PDT)
-Received: from fourcolor-Home.. ([203.121.254.74])
-        by smtp.gmail.com with ESMTPSA id jv13-20020a170903058d00b001eb5a81f688sm1456502plb.221.2024.05.02.08.48.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 May 2024 08:48:08 -0700 (PDT)
-From: Shi-Sheng Yang <fourcolor4c@gmail.com>
-To: matttbe@kernel.org,
-	martineau@kernel.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: geliang@kernel.org,
-	netdev@vger.kernel.org,
-	mptcp@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	Shi-Sheng Yang <fourcolor4c@gmail.com>
-Subject: [PATCH] [PATCH v2 net-next] mptcp: fix typos in comments
-Date: Thu,  2 May 2024 23:47:40 +0800
-Message-Id: <20240502154740.249839-1-fourcolor4c@gmail.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1714664995; c=relaxed/simple;
+	bh=lSLQE7weTxnVqPnhv28TxjpfYwfoIlf4YwWxqRNzmeg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=BwdR4yj6phaQLQz2Aujrw4SBXz1tHs1YnIBHamjd9+3Rupucc8g0eK7ql+LAKPDm5q/lAxAHlZz4VsDBcMk5ZVpQF+//eBUXfX5Kz/e7idlxFI3aFIQAckAXEutb+oXW3+7jN5s+hF1qITdg3leZBMX5DIVcRtIme041n9h3x3o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 458BD2F4;
+	Thu,  2 May 2024 08:50:17 -0700 (PDT)
+Received: from [10.1.196.40] (e121345-lin.cambridge.arm.com [10.1.196.40])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D6C993F793;
+	Thu,  2 May 2024 08:49:49 -0700 (PDT)
+Message-ID: <ac0a09f2-5f05-4317-a1cf-b7135791c639@arm.com>
+Date: Thu, 2 May 2024 16:49:48 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v4 6/7] page_pool: check for DMA sync shortcut
+ earlier
+To: Alexander Lobakin <aleksander.lobakin@intel.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>,
+ Marek Szyprowski <m.szyprowski@samsung.com>, Joerg Roedel <joro@8bytes.org>,
+ Will Deacon <will@kernel.org>, "Rafael J. Wysocki" <rafael@kernel.org>,
+ Magnus Karlsson <magnus.karlsson@intel.com>,
+ nex.sw.ncis.osdt.itp.upstreaming@intel.com, bpf@vger.kernel.org,
+ netdev@vger.kernel.org, iommu@lists.linux.dev, linux-kernel@vger.kernel.org
+References: <20240423135832.2271696-1-aleksander.lobakin@intel.com>
+ <20240423135832.2271696-7-aleksander.lobakin@intel.com>
+ <81df4e0f-07f3-40f6-8d71-ffad791ab611@intel.com>
+From: Robin Murphy <robin.murphy@arm.com>
+Content-Language: en-GB
+In-Reply-To: <81df4e0f-07f3-40f6-8d71-ffad791ab611@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-This patch fixes the spelling mistakes in comments.
-The changes were generated using codespell and reviewed manually.
+On 24/04/2024 9:52 am, Alexander Lobakin wrote:
+> From: Alexander Lobakin <aleksander.lobakin@intel.com>
+> Date: Tue, 23 Apr 2024 15:58:31 +0200
+> 
+>> We can save a couple more function calls in the Page Pool code if we
+>> check for dma_need_sync() earlier, just when we test pp->p.dma_sync.
+>> Move both these checks into an inline wrapper and call the PP wrapper
+>> over the generic DMA sync function only when both are true.
+>> You can't cache the result of dma_need_sync() in &page_pool, as it may
+>> change anytime if an SWIOTLB buffer is allocated or mapped.
+>>
+>> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+>> ---
+>>   net/core/page_pool.c | 31 +++++++++++++++++--------------
+>>   1 file changed, 17 insertions(+), 14 deletions(-)
+>>
+>> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+>> index 6cf26a68fa91..87319c6365e0 100644
+>> --- a/net/core/page_pool.c
+>> +++ b/net/core/page_pool.c
+>> @@ -398,16 +398,24 @@ static struct page *__page_pool_get_cached(struct page_pool *pool)
+>>   	return page;
+>>   }
+>>   
+>> -static void page_pool_dma_sync_for_device(const struct page_pool *pool,
+>> -					  const struct page *page,
+>> -					  unsigned int dma_sync_size)
+>> +static void __page_pool_dma_sync_for_device(const struct page_pool *pool,
+>> +					    const struct page *page,
+>> +					    u32 dma_sync_size)
+>>   {
+>>   	dma_addr_t dma_addr = page_pool_get_dma_addr(page);
+>>   
+>>   	dma_sync_size = min(dma_sync_size, pool->p.max_len);
+>> -	dma_sync_single_range_for_device(pool->p.dev, dma_addr,
+>> -					 pool->p.offset, dma_sync_size,
+>> -					 pool->p.dma_dir);
+>> +	__dma_sync_single_for_device(pool->p.dev, dma_addr + pool->p.offset,
+>> +				     dma_sync_size, pool->p.dma_dir);
+> 
+> Breh, this breaks builds on !DMA_NEED_SYNC systems, as this function
+> isn't defined there, and my CI didn't catch it in time... I'll ifdef
+> this in the next spin after some reviews for this one.
 
-eariler -> earlier
-greceful -> graceful
+Hmm, the way things have ended up, do we even need this change? (Other
+than factoring out the pool->dma_sync check, which is clearly nice)
 
-Signed-off-by: Shi-Sheng Yang <fourcolor4c@gmail.com>
----
- net/mptcp/subflow.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Since __page_pool_dma_sync_for_device() is never called directly, the
+flow we always get is:
 
-diff --git a/net/mptcp/subflow.c b/net/mptcp/subflow.c
-index 97ec44d1df30..0ac8d4850751 100644
---- a/net/mptcp/subflow.c
-+++ b/net/mptcp/subflow.c
-@@ -911,7 +911,7 @@ static struct sock *subflow_syn_recv_sock(const struct sock *sk,
- 	}
- 
- 	/* check for expected invariant - should never trigger, just help
--	 * catching eariler subtle bugs
-+	 * catching earlier subtle bugs
- 	 */
- 	WARN_ON_ONCE(child && *own_req && tcp_sk(child)->is_mptcp &&
- 		     (!mptcp_subflow_ctx(child) ||
-@@ -1259,7 +1259,7 @@ static void mptcp_subflow_fail(struct mptcp_sock *msk, struct sock *ssk)
- 	struct mptcp_subflow_context *subflow = mptcp_subflow_ctx(ssk);
- 	unsigned long fail_tout;
- 
--	/* greceful failure can happen only on the MPC subflow */
-+	/* graceful failure can happen only on the MPC subflow */
- 	if (WARN_ON_ONCE(ssk != READ_ONCE(msk->first)))
- 		return;
- 
--- 
-2.34.1
+page_pool_dma_sync_for_device()
+     dma_dev_need_sync()
+         __page_pool_dma_sync_for_device()
+             ... // a handful of trivial arithmetic
+             __dma_sync_single_for_device()
 
+i.e. still effectively the same order of
+"if (dma_dev_need_sync()) __dma_sync()" invocations as if we'd just used
+the standard dma_sync(), so referencing the unwrapped internals only
+spreads it out a bit more for no real benefit. As an experiment I tried
+the diff below on top, effectively undoing this problematic part, and it
+doesn't seem to make any appreciable difference in a before-and-after
+comparison of the object code, at least for my arm64 build.
+
+Thanks,
+Robin.
+
+----->8-----
+diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+index 27f3b6db800e..b8ab7d4ca229 100644
+--- a/net/core/page_pool.c
++++ b/net/core/page_pool.c
+@@ -398,24 +398,20 @@ static struct page *__page_pool_get_cached(struct page_pool *pool)
+  	return page;
+  }
+  
+-static void __page_pool_dma_sync_for_device(const struct page_pool *pool,
+-					    const struct page *page,
+-					    u32 dma_sync_size)
+-{
+-	dma_addr_t dma_addr = page_pool_get_dma_addr(page);
+-
+-	dma_sync_size = min(dma_sync_size, pool->p.max_len);
+-	__dma_sync_single_for_device(pool->p.dev, dma_addr + pool->p.offset,
+-				     dma_sync_size, pool->p.dma_dir);
+-}
+-
+  static __always_inline void
+  page_pool_dma_sync_for_device(const struct page_pool *pool,
+  			      const struct page *page,
+  			      u32 dma_sync_size)
+  {
+-	if (pool->dma_sync && dma_dev_need_sync(pool->p.dev))
+-		__page_pool_dma_sync_for_device(pool, page, dma_sync_size);
++	dma_addr_t dma_addr = page_pool_get_dma_addr(page);
++
++	if (!pool->dma_sync)
++		return;
++
++	dma_sync_size = min(dma_sync_size, pool->p.max_len);
++	dma_sync_single_range_for_device(pool->p.dev, dma_addr,
++					 pool->p.offset, dma_sync_size,
++					 pool->p.dma_dir);
+  }
+  
+  static bool page_pool_dma_map(struct page_pool *pool, struct page *page)
 
