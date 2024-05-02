@@ -1,120 +1,114 @@
-Return-Path: <netdev+bounces-92983-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92984-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43AF48B9815
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 11:51:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56F008B9859
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 12:02:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F09A71F24652
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 09:51:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 53AF11C2367F
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 10:02:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E345455C3A;
-	Thu,  2 May 2024 09:51:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3864656B85;
+	Thu,  2 May 2024 10:00:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Jd3w0RFf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gY5wmHPm"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C43E414286;
-	Thu,  2 May 2024 09:51:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0976D5676F;
+	Thu,  2 May 2024 10:00:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714643463; cv=none; b=qR+MJePCnoYEadEeznukCFfc+cARmr/Y1LQeyvHlpwLXTFZYRDi3I/CQu5C7xMnykx13ylkkDzhTTopNqyP8nxcJLQGxhRSipHOefY0ZVLRLi2i8BIbKca3Bk9w25uV05WCSBBqJwvzUoHPr6CbTBpmpEQM80PfqMLq1Ul7VBBk=
+	t=1714644013; cv=none; b=bpLE96tveE+mMjXjcFsCA+y7NZ6ecnusL9oIJN784G6BKBck8/v8zrQ5IUQkahOjGPKuiT7EdGa9TSfOer3VQdUO6NrhaPY0MokO6xvQ/Yjk4ZRP4AWuH7YqcuzYepgWo0YSyAtpYk33XRj7CqcZHj4rColpPKOPKZ9VB2JQt4A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714643463; c=relaxed/simple;
-	bh=BAFP/ofSa+AEwTY25adE8qwMB+9ibYQI/GHdkMUufIQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=d9ZQxHujyre4JNCSlhlXvom0JqmNzZp5vXPng34EXdDfifq8QacItHo1V/TvrtNdANPp8d8iBWDXIaN7rpQTWiZWY2rAi9IM2TilQTmhYJTiiDfH/4x2BtQSeZOB4PA/9Z5aEZudPQg5MLEEEQkxiNaXBdIsGDIRAQGNbCm9SkY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Jd3w0RFf; arc=none smtp.client-ip=217.70.183.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id C38B9C0009;
-	Thu,  2 May 2024 09:50:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1714643453;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=61+EepSzB2Xshk8/s0Q2YxSx5UzzAr0zhhrwm9xlmf4=;
-	b=Jd3w0RFfaXI6YAgvOAyWxHBzF+vjVQCLYETaT9/W0kFojht3mdm7JCaRdaNV6lKeEInGXH
-	EECIQsIrCq8D+zccHu5xleCHIZ4Faeuj3/EJMxdvTrGicWFrpXP8lLZD7fJITyOy1L29MH
-	bUy7IFKHz9P5FEd9XpmRSUdxbkz6dGgc5iYE5REU5Qchv9X6uBYrXDaxQL7W7DPwLnJ6ZX
-	HhmFUJl6xqQt9sftzhFhvh5fI+Pdk3dW+8iEK+mE+wmZdNNcMwjCOraOp23mtCBaXVEV4B
-	SD7qzmtrCO8Qk2SbucLBJKVwAW2lVILqtq+uMC0R/xQogM8tJhcRa2Z0KtTvrQ==
-Date: Thu, 2 May 2024 11:50:43 +0200
-From: Herve Codina <herve.codina@bootlin.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Thomas Gleixner <tglx@linutronix.de>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Lee Jones <lee@kernel.org>, Arnd Bergmann
- <arnd@arndb.de>, Horatiu Vultur <horatiu.vultur@microchip.com>,
- UNGLinuxDriver@microchip.com, Heiner Kallweit <hkallweit1@gmail.com>,
- Russell King <linux@armlinux.org.uk>, Saravana Kannan
- <saravanak@google.com>, Bjorn Helgaas <bhelgaas@google.com>, Philipp Zabel
- <p.zabel@pengutronix.de>, Lars Povlsen <lars.povlsen@microchip.com>, Steen
- Hegelund <Steen.Hegelund@microchip.com>, Daniel Machon
- <daniel.machon@microchip.com>, Alexandre Belloni
- <alexandre.belloni@bootlin.com>, linux-kernel@vger.kernel.org,
- devicetree@vger.kernel.org, netdev@vger.kernel.org,
- linux-pci@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Allan
- Nielsen <allan.nielsen@microchip.com>, Luca Ceresoli
- <luca.ceresoli@bootlin.com>, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH 06/17] dt-bindings: net: mscc-miim: Add resets property
-Message-ID: <20240502115043.37a1a33a@bootlin.com>
-In-Reply-To: <2b01ed8a-1169-4928-952e-1645935aca2f@lunn.ch>
-References: <20240430083730.134918-1-herve.codina@bootlin.com>
-	<20240430083730.134918-7-herve.codina@bootlin.com>
-	<5d899584-38ed-4eee-9ba5-befdedbc5734@lunn.ch>
-	<20240430174023.4d15a8a4@bootlin.com>
-	<2b01ed8a-1169-4928-952e-1645935aca2f@lunn.ch>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1714644013; c=relaxed/simple;
+	bh=htKiubxGZ19836bcnvnjwCBea7ZpQE+zL7IN1ToMNkM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iK/UMAQjRR273TCmdYCLOQyu6XWWcxmHd4FqYYd09RW/7/YBcfLEoxBYAzDyV5+3bqU3qUcXJHsU9Oj1RyFQbXCIo7/LeRJx3gQErSpH/FTm0fweDKUNC48tYAHDu84MRN1xj67QeVTN5nJF+WxH8rIPJhCty8+B14MQduBQKKE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gY5wmHPm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D1A9C113CC;
+	Thu,  2 May 2024 10:00:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714644012;
+	bh=htKiubxGZ19836bcnvnjwCBea7ZpQE+zL7IN1ToMNkM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=gY5wmHPmIq/ogWfrSyBfa7PQpRCTHpwKmP0tgGjLQOE3rKwzQewgxGgwoVpxvoGxw
+	 8pWnrrkHRBBtMFlOBDsDuAKKSalqx2fQ8oXXHbciNfp1KkZ/dh9TOwlDBpWO2ChKUS
+	 hxwqKBd6Epex7XZ/He6fEDMl+DhIIeVCtTxtsyw46sVgvRyHd0eyVRAF3z/IlZ7idr
+	 SVqQnicPYaw2gM08BctkvMi0HJOr/0xXP5ntwVbGmLR+6mHuDPuLlofC6uTPYHbFJH
+	 7jF/Ck9IWRhbabsvH5Kqa0nNJJeHLdMGIjFSjEIbJ6SmTrIwP012smiMZQY5QqweSr
+	 oSQk8f0hrurmQ==
+Date: Thu, 2 May 2024 11:00:06 +0100
+From: Lee Jones <lee@kernel.org>
+To: Florian Fainelli <florian.fainelli@broadcom.com>
+Cc: linux-kernel@vger.kernel.org,
+	Jarkko Nikula <jarkko.nikula@linux.intel.com>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Mika Westerberg <mika.westerberg@linux.intel.com>,
+	Jan Dabros <jsd@semihalf.com>, Andi Shyti <andi.shyti@kernel.org>,
+	Jiawen Wu <jiawenwu@trustnetic.com>,
+	Mengyuan Lou <mengyuanlou@net-swift.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Duanqiang Wen <duanqiangwen@net-swift.com>,
+	"open list:SYNOPSYS DESIGNWARE I2C DRIVER" <linux-i2c@vger.kernel.org>,
+	"open list:WANGXUN ETHERNET DRIVER" <netdev@vger.kernel.org>
+Subject: Re: [PATCH v2 2/4] mfd: intel-lpss: Utilize i2c-designware.h
+Message-ID: <20240502100006.GQ5338@google.com>
+References: <20240425002642.2053657-1-florian.fainelli@broadcom.com>
+ <20240425002642.2053657-3-florian.fainelli@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-GND-Sasl: herve.codina@bootlin.com
+In-Reply-To: <20240425002642.2053657-3-florian.fainelli@broadcom.com>
 
-Hi Andrew,
+On Wed, 24 Apr 2024, Florian Fainelli wrote:
 
-On Tue, 30 Apr 2024 18:31:46 +0200
-Andrew Lunn <andrew@lunn.ch> wrote:
-
-> > We have the same construction with the pinctrl driver used in the LAN966x
-> >   Documentation/devicetree/bindings/pinctrl/mscc,ocelot-pinctrl.yaml
-> > 
-> > The reset name is 'switch' in the pinctrl binding.
-> > I can use the same description here as the one present in the pinctrl binding:
-> >   description: Optional shared switch reset.
-> > and keep 'switch' as reset name here (consistent with pinctrl reset name).
-> > 
-> > What do you think about that ?  
+> Rather than open code the i2c_designware string, utilize the newly
+> defined constant in i2c-designware.h.
 > 
-> It would be good to document what it is shared with. So it seems to be
-> the switch itself, pinctl and MDIO? Anything else?
+> Signed-off-by: Florian Fainelli <florian.fainelli@broadcom.com>
+> ---
+>  drivers/mfd/intel-lpss.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 > 
+> diff --git a/drivers/mfd/intel-lpss.c b/drivers/mfd/intel-lpss.c
+> index 2a9018112dfc..551560beff7b 100644
+> --- a/drivers/mfd/intel-lpss.c
+> +++ b/drivers/mfd/intel-lpss.c
+> @@ -24,6 +24,7 @@
+>  #include <linux/ioport.h>
+>  #include <linux/mfd/core.h>
+>  #include <linux/module.h>
+> +#include <linux/platform_data/i2c-designware.h>
+>  #include <linux/pm.h>
+>  #include <linux/pm_qos.h>
+>  #include <linux/pm_runtime.h>
+> @@ -116,7 +117,7 @@ static const struct mfd_cell intel_lpss_idma64_cell = {
+>  };
+>  
+>  static const struct mfd_cell intel_lpss_i2c_cell = {
+> -	.name = "i2c_designware",
+> +	.name = I2C_DESIGNWARE_NAME,
+>  	.num_resources = ARRAY_SIZE(intel_lpss_dev_resources),
+>  	.resources = intel_lpss_dev_resources,
 
-To be honest, I know that the GPIO controller (microchip,sparx5-sgpio) is
-impacted but I don't know if anything else is impacted by this reset.
-I can update the description with:
-  description:
-    Optional shared switch reset.
-    This reset is shared with at least pinctrl, GPIO, MDIO and the switch
-    itself.
+I explained why I don't like this in v1 this morning.
 
-Does it sound better ?
+Please take a look.
 
-Best regards
-Hervé
+-- 
+Lee Jones [李琼斯]
 
