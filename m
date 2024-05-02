@@ -1,110 +1,116 @@
-Return-Path: <netdev+bounces-92913-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92914-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75BE68B94F2
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 09:00:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 732438B94F5
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 09:01:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2B5F71F21393
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 07:00:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2FE6B28224B
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 07:01:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A0F91CAB7;
-	Thu,  2 May 2024 07:00:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F13BD1CD3D;
+	Thu,  2 May 2024 07:01:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="h6Bwnlie"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MUz/HEQD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A15E1527BD
-	for <netdev@vger.kernel.org>; Thu,  2 May 2024 07:00:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51E581CAB8
+	for <netdev@vger.kernel.org>; Thu,  2 May 2024 07:01:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714633226; cv=none; b=Kn79VwHsCCsDIcHjy4PpXUmt0Y9qjYqXwlPb6+wxv5wlUC2qSfUMmsU26yqbHKGnLOzwm/vPPquMA689pH0ri5pQuil1kZPgZgM3CcR2+eIgvaEikuHtrTV8qBcx1MBWr1cyj/3g7wf7mshT8rR3cjuZTvp1DOacsz3QBXBtQJ0=
+	t=1714633270; cv=none; b=K0uDxSZAMFQlkJMk8xIkhDY9ZmGdJ0O6DPKQX8oln+uPj5hWYNnFienKeLE/Wgfwq2GKLHCIjlYkjD70U5afFdNjhDbwBODndfXRdoFUfp2Y1C4DZJqQIagEEPl2fEBtEStbBBrNt819HHz4wUgQnGbdIInt0006Bs9swW3KmJY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714633226; c=relaxed/simple;
-	bh=XtdJpWx3DQWHhoNN2IO2/VKN26SpTdALv3eG+kmd9TE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=IDNHPSKEM5SgVSoNGyXIqzMuvEcfK0obfWntO2y7gAaMo6YHXfvhle3WA7Y6HuVrNeKhrptd8hU0cIWYrJlq4PwjOTf70uKrC9U/JpQpkApM0Icb4clRjxtAOZFbzrYYIdm57zYjVbKe0hCBfKCJ6PdzHVtKGDBA+ZPt8lS1xbw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=h6Bwnlie; arc=none smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1714633225; x=1746169225;
-  h=message-id:date:mime-version:subject:to:references:from:
-   in-reply-to:content-transfer-encoding;
-  bh=XtdJpWx3DQWHhoNN2IO2/VKN26SpTdALv3eG+kmd9TE=;
-  b=h6Bwnliexw5bQJWsWydLIE3QrcKYnQLRfklutt9vC0d6Jv3hY9beZ9ch
-   FwZMoGfhVfjE8a/PeFHb9ijDHNjdS4H7xniSIcibZRUdwQ+ocLvav4iTb
-   NxB78aHV5bTNDUKxDLPXH7E3fXSA5o+g9/Mhooq959qRLjBePJEWn4yRK
-   8M+Nur1kCqHizCw/wrii+S0lOWipTiaR4Nggz/f2D610kRF5mGma4EYoc
-   XVFRQyYEymMKm7Efy6p3+m1ZEV+aGNUE+/gAoKMtzsWRbbvAAwyUDVrgf
-   E7ru4GWdiB1ri73UtNFe6P3CYcdSNpcLtZpNWWH+3LXGL2/gah1fD4Xyq
-   Q==;
-X-CSE-ConnectionGUID: OPW/A8D3TVShExnavUGndQ==
-X-CSE-MsgGUID: 1D4wazRvTDmtkUU+39qAAw==
-X-IronPort-AV: E=McAfee;i="6600,9927,11061"; a="14190997"
-X-IronPort-AV: E=Sophos;i="6.07,247,1708416000"; 
-   d="scan'208";a="14190997"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 May 2024 00:00:24 -0700
-X-CSE-ConnectionGUID: wbeC7JhYQ5eG/oN0tvO1iQ==
-X-CSE-MsgGUID: ez3i0D7YSz2UmqxIYZcTnw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,247,1708416000"; 
-   d="scan'208";a="27036344"
-Received: from unknown (HELO [10.12.48.215]) ([10.12.48.215])
-  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 May 2024 00:00:21 -0700
-Message-ID: <cb3e9c4b-a4eb-4ed5-b0aa-ec614076b6e6@linux.intel.com>
-Date: Thu, 2 May 2024 10:00:07 +0300
+	s=arc-20240116; t=1714633270; c=relaxed/simple;
+	bh=vR/vR3KeKWogJ1nIbprfh0Pi5nYPDFEvYQrVJRHP80Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gulX+CCnQP4s+REOixbg7rrjIuWuMoxNaxhUO+eZUAOJT2PdsfiBGKeV9uAjobXwkBJmrFYY42JNMyQi6Fmx+eOqhAi3djzDgNy98Cc7g5ifKeseSwHJmdzsFdk6qwTqShlqeLRHc70UG6P2OM8rPFmaCzm+7emLM4KLfNHMALA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=MUz/HEQD; arc=none smtp.client-ip=209.85.167.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-51f3a49ff7dso178671e87.2
+        for <netdev@vger.kernel.org>; Thu, 02 May 2024 00:01:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1714633267; x=1715238067; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=zn0AU37unUAGgQKpTRiKCU79v6Wbl71XirUxH47D8f0=;
+        b=MUz/HEQD1WvFMfu54NsNAkQaOdAOrwfWtLoVBnDXTnkytZ9dEs1Ks3m72VkzX5ohvK
+         QhOwdaRwmz+kDefE2Iu9SittJHzGfFzwpD4maLLYc1c3sYD4QidexStZtSkDr+/IB9Dg
+         AGhWm6wPPMVzl+EhfwvSZ5Wktwhm73y/Zx+CL4M3fCOuLnHQ7vWIw1C9bzv2cRTB+h3x
+         szAP1vtP7nJceabWJi8ShCcloRvdsxqu9WqoLoM3nYAQexRQVXdmXYKB/fbcn1atSZSK
+         dn4UKP/Otdg4hWXa7gsu6NsQFaeY6s8Dmyo+VWOx5QoppW+r4DK4HKZAZOaQYHWVwo90
+         +G5w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714633267; x=1715238067;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zn0AU37unUAGgQKpTRiKCU79v6Wbl71XirUxH47D8f0=;
+        b=oUKgZ2+cnwgXekKLMQsrgw6dP4QmzFfY+PWxoSBIkJJGDpbLBUh8FPLg/+XmHdklgI
+         mXD32KmOkHyFwj8ddaWsOuqwn22CUyJ7CPgXphmuwRoGXCqRxront1PvX5tx1dRm1aX/
+         JS6dA+3/qO7EwIHMtYrZfYVom2oll1aAq50gNgK88uHOcCFNGzsSbF8BuvsG816qX2Cx
+         zPIylPBTn2Lj2haR2D+8AqxKfO+tfWTLjtVBLhZrpLuNRgweHn8JIVxwmiaP1X3DhiE6
+         GHNI2YuMhszWhdKM9igFlIlmIHSqCzRyfdkc4bYn6dUd4//HTiN9CY5Ge961gaPYSe5c
+         hlQg==
+X-Forwarded-Encrypted: i=1; AJvYcCVIRSaSAxlwyrc2alpgJkm116f2FAnpCKmUf7bX8SQ7uL1U43lHo2FxOSJdl+Fv3poO1KUxBcxgfWJUM/KcDJ4ndhwQSvDO
+X-Gm-Message-State: AOJu0Ywz6wRs59HIYGD/pdB+6tGdn1J+Qht/A5ehk7N25bUpBelPZ07o
+	Xyo4ieK+t/J//FvID0/moIyRccKWs1v3k+6cjme0Rd3XIWYVFJeZ0Gxzpv+3aWM=
+X-Google-Smtp-Source: AGHT+IEY2IStjAYtQ4PUx622viAZrRaV8Lyf1OfIMJOgU6WmIX9KqxxOfijFDA+nn+IyTmy6maWflw==
+X-Received: by 2002:a05:6512:3ca7:b0:51a:cafd:3872 with SMTP id h39-20020a0565123ca700b0051acafd3872mr3624984lfv.3.1714633267220;
+        Thu, 02 May 2024 00:01:07 -0700 (PDT)
+Received: from localhost ([102.222.70.76])
+        by smtp.gmail.com with ESMTPSA id g4-20020a056512118400b00516dc765e00sm65046lfr.7.2024.05.02.00.01.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 May 2024 00:01:06 -0700 (PDT)
+Date: Thu, 2 May 2024 10:01:02 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Simon Horman <horms@kernel.org>
+Cc: Geetha sowjanya <gakula@marvell.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kuba@kernel.org, davem@davemloft.net,
+	pabeni@redhat.com, edumazet@google.com, sgoutham@marvell.com,
+	sbhatta@marvell.com, hkelam@marvell.com
+Subject: Re: [net-next PATCH v3 3/9] octeontx2-pf: Create representor netdev
+Message-ID: <054bf59a-7123-4d97-a0c1-0fd8ca271b2d@moroto.mountain>
+References: <20240428105312.9731-1-gakula@marvell.com>
+ <20240428105312.9731-4-gakula@marvell.com>
+ <20240501180656.GX2575892@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH] e1000e: move force SMBUS near the end
- of enable_ulp function
-To: Hui Wang <hui.wang@canonical.com>, intel-wired-lan@lists.osuosl.org,
- netdev@vger.kernel.org, jesse.brandeburg@intel.com,
- anthony.l.nguyen@intel.com, vitaly.lifshits@intel.com,
- dima.ruinskiy@intel.com
-References: <20240413092743.1548310-1-hui.wang@canonical.com>
-Content-Language: en-US
-From: "naamax.meir" <naamax.meir@linux.intel.com>
-In-Reply-To: <20240413092743.1548310-1-hui.wang@canonical.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240501180656.GX2575892@kernel.org>
 
-On 4/13/2024 12:27, Hui Wang wrote:
-> The commit 861e8086029e ("e1000e: move force SMBUS from enable ulp
-> function to avoid PHY loss issue") introduces a regression on
-> CH_MTP_I219_LM18 (PCIID: 0x8086550A). Without this commit, the
-> ethernet works well after suspend and resume, but after applying the
-> commit, the ethernet couldn't work anymore after the resume and the
-> dmesg shows that the NIC Link changes to 10Mbps (1000Mbps originally):
-> [   43.305084] e1000e 0000:00:1f.6 enp0s31f6: NIC Link is Up 10 Mbps Full Duplex, Flow Control: Rx/Tx
+On Wed, May 01, 2024 at 07:06:56PM +0100, Simon Horman wrote:
+> > +			goto exit;
+> > +		}
+> > +	}
+> > +	err = rvu_rep_napi_init(priv, extack);
+> > +	if (err)
+> > +		goto exit;
 > 
-> Without the commit, the force SMBUS code will not be executed if
-> "return 0" or "goto out" is executed in the enable_ulp(), and in my
-> case, the "goto out" is executed since FWSM_FW_VALID is set. But after
-> applying the commit, the force SMBUS code will be ran unconditionally.
+> Even with the above fixed, Smatch complains that:
 > 
-> Here move the force SMBUS code back to enable_ulp() and put it
-> immediate ahead of hw->phy.ops.release(hw), this could allow the
-> longest settling time as possible for interface in this function and
-> doesn't change the original code logic.
+> .../rep.c:180 rvu_rep_create() warn: 'ndev' from alloc_etherdev_mqs() not released on lines: 180.
+> .../rep.c:180 rvu_rep_create() warn: 'ndev' from register_netdev() not released on lines: 180.
 > 
-> Fixes: 861e8086029e ("e1000e: move force SMBUS from enable ulp function to avoid PHY loss issue")
-> Signed-off-by: Hui Wang <hui.wang@canonical.com>
-> ---
->   drivers/net/ethernet/intel/e1000e/ich8lan.c | 19 +++++++++++++++++++
->   drivers/net/ethernet/intel/e1000e/netdev.c  | 18 ------------------
->   2 files changed, 19 insertions(+), 18 deletions(-)
+> Where line 180 is the very last line of the funciton: return err;
+> 
+> I think this is triggered by the error handling above.
+> However, I also think it is a false positive.
+> I've CCed Dan Carpenter as I'd value a second opinion on this one.
+> 
 
-Tested-by: Naama Meir <naamax.meir@linux.intel.com>
+Yeah.  It's a false positive.
+
+regards,
+dan carpenter
+
 
