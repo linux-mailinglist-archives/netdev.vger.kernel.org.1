@@ -1,106 +1,95 @@
-Return-Path: <netdev+bounces-93111-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93117-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C9D68BA13F
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 22:01:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0547B8BA1F4
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 23:12:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B6744B21193
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 20:01:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B459D283D34
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 21:12:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99939180A76;
-	Thu,  2 May 2024 20:01:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="Xu2xQqpE"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51C5B181CF3;
+	Thu,  2 May 2024 21:10:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.web.de (mout.web.de [212.227.15.3])
+Received: from 14.mo550.mail-out.ovh.net (14.mo550.mail-out.ovh.net [178.32.97.215])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B7661802BE;
-	Thu,  2 May 2024 20:01:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 709211802DF
+	for <netdev@vger.kernel.org>; Thu,  2 May 2024 21:10:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.32.97.215
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714680095; cv=none; b=m/V8HIFnGFc2AlzjL0VJm3nlTWDP1N2jA9VZRvUsYnh30u5uBTPhtTAY0Q0j3NdDO3AiKHTEyV9fEq0ofHt4kQqNS8vygK/G5pH2M29CrpZy4itqs4EjBbScV85igkgQzEgzf2/0EUTBMRvVoxmPjJm7zXPUvbrgPCLM/o5QNtg=
+	t=1714684208; cv=none; b=nImqLkeuZViVaEPD1cXTcr9i08Vhcser+1fIBHadgaXYHihHgPzyliVMgIPFH/kS9fptomMr8Wv5enQ/hjEgvQ+BAJb/IUdLP9M71hkKIjnQ8iGBIOBqgU6OvSNK1oWUuVxRId+RcrbGThfM24cUx1gHbqdjFv1qLN12GigT84g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714680095; c=relaxed/simple;
-	bh=EM9PQ0+jpznznKXXf9DM0GjqB6Lbm2/vk2ex+XeL0sw=;
-	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
-	 In-Reply-To:Content-Type; b=MKeic+HqBM5lLz0EO88zKiODorer3hP1E+X/iP8oafc2wR1LNd8ZYe82G/GNLXKaQ/b8gL4YhT5DVdvTDMChSqaB7kJBdAG/kwmeOP1Z88u2emzAUQnas5G70UmjtSrX18c+2kPOD2uq1voBD2ERvNsaSz2wyUEPkeHuU9ohjkI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=Xu2xQqpE; arc=none smtp.client-ip=212.227.15.3
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
-	s=s29768273; t=1714680065; x=1715284865; i=markus.elfring@web.de;
-	bh=EM9PQ0+jpznznKXXf9DM0GjqB6Lbm2/vk2ex+XeL0sw=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:References:
-	 Subject:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:
-	 cc:content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=Xu2xQqpEWCvUFCbbW0roNkMalj80dV3TYsg0xyiKFP/JnQYofxDKQ4Nkv/iFpcaT
-	 /+N5UUT1wn+5rhDlk2emkj3qhf283y/kN0cja5LFmNGISFk0cxGgKisrZPDKHWcxG
-	 7PNZaEW+4D/krASG8hil4VBsfQX01qZoyhrY/LhKuM1cwUQRh1Vhf9yaitPo7bHHt
-	 OE5hWg4w+VcRseB/2UNCZOSbxiBkGmuvlP2+YsKHEZlXIxbQ6b9dUnYG0lMH9u63H
-	 JbuK7Bay9IYV8R7YrJJUazCE64+fZLgQ1N7RJBpO/97yS7Zy/FT8TfWpm5d6WwZbk
-	 DuoGw3mFmW1zX6UZSA==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.21] ([94.31.83.95]) by smtp.web.de (mrweb005
- [213.165.67.108]) with ESMTPSA (Nemesis) id 1Mx0N5-1sqBGl3q8p-01319C; Thu, 02
- May 2024 22:01:04 +0200
-Message-ID: <068b6038-d784-451b-b43b-41b94c24fb29@web.de>
-Date: Thu, 2 May 2024 22:01:00 +0200
+	s=arc-20240116; t=1714684208; c=relaxed/simple;
+	bh=cTgo7+aJHE2nk0H3p70xZ3in3pAFKIAry1eHjn17NxI=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=GtcZFtPlDDQk1k7I2m0lt2Xy/wwcEEMftQwq8Dh/Z0k3IAm7076NiznY5zJUdSdaqs0xp1f/Wy3QilzBtM8VhgeELJUL+mRcY9/tsmbzf2gE/W7Vxg9ouJyAv6ehkD6valYztBtRA7mmLm6+Ve8pNMGyf9Nggx84xN7FDy77F0c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=remlab.net; spf=pass smtp.mailfrom=remlab.net; arc=none smtp.client-ip=178.32.97.215
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=remlab.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=remlab.net
+Received: from director6.ghost.mail-out.ovh.net (unknown [10.108.9.136])
+	by mo550.mail-out.ovh.net (Postfix) with ESMTP id 4VVgz02Rybz1SPm
+	for <netdev@vger.kernel.org>; Thu,  2 May 2024 17:34:04 +0000 (UTC)
+Received: from ghost-submission-6684bf9d7b-p7ckt (unknown [10.110.178.33])
+	by director6.ghost.mail-out.ovh.net (Postfix) with ESMTPS id 6EB1C1FEA0;
+	Thu,  2 May 2024 17:34:03 +0000 (UTC)
+Received: from courmont.net ([37.59.142.101])
+	by ghost-submission-6684bf9d7b-p7ckt with ESMTPSA
+	id dyinD4vOM2ZHjxwAIsjhUQ
+	(envelope-from <remi@remlab.net>); Thu, 02 May 2024 17:34:03 +0000
+Authentication-Results:garm.ovh; auth=pass (GARM-101G0043524cd45-1f4c-45d8-8bf1-a314cbbc3aae,
+                    BC5FE781039FBFCEAF078843559696CA6964CA31) smtp.auth=postmaster@courmont.net
+X-OVh-ClientIp:87.92.194.88
+From: =?ISO-8859-1?Q?R=E9mi?= Denis-Courmont <remi@remlab.net>
+To: "David S . Miller" <davem@davemloft.net>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Eric Dumazet <edumazet@google.com>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com,
+ Eric Dumazet <edumazet@google.com>, Remi Denis-Courmont <courmisch@gmail.com>
+Subject: Re: [PATCH net] phonet: fix rtm_phonet_notify() skb allocation
+Date: Thu, 02 May 2024 20:34:00 +0300
+Message-ID: <5716887.zLmFTfJpZe@basile.remlab.net>
+Organization: Remlab
+In-Reply-To: <20240502161700.1804476-1-edumazet@google.com>
+References: <20240502161700.1804476-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-To: Duoming Zhou <duoming@zju.edu.cn>, linux-hams@vger.kernel.org,
- netdev@vger.kernel.org, kernel-janitors@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, =?UTF-8?Q?J=C3=B6rg_Reuter?=
- <jreuter@yaina.de>, Paolo Abeni <pabeni@redhat.com>
-Cc: LKML <linux-kernel@vger.kernel.org>,
- Dan Carpenter <dan.carpenter@linaro.org>,
- Lars Kellogg-Stedman <lars@oddbit.com>
-References: <cover.1714660565.git.duoming@zju.edu.cn>
-Subject: Re: [PATCH net 0/2] ax25: fix reference counting issue of ax25_dev
-Content-Language: en-GB
-From: Markus Elfring <Markus.Elfring@web.de>
-In-Reply-To: <cover.1714660565.git.duoming@zju.edu.cn>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Provags-ID: V03:K1:mvbvX8/mivlMFaAOxEjDeoSrVy3J7goo3lJNTbo3VA2LZdwh5O0
- 6y0nBDxB48mgLVjPdzWMBrmCgLJ9yDEl3HLkYS2IepAhtnMLc2ocQogu9oPp3mkTwgtCJdo
- KdkG6PTkS7YPrP4x/RCmQgs2lRfW9rnm7hZlniNr5pfSv3+B6AoanvPUDF9WZFVECuyQQqe
- tFVP0+JVRPUK8LiqtFHEw==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:JBpLSAZ04ic=;LgKLxYkfMEg6PdZW/tP4hxW9kYL
- miSii5dpI48R17cNPTXQswm4nIUlSIs/JFJHlBlaAKj3Bc8VEdHH1JJZ+S1x5tFBDdOhbuOhG
- s+pAUetGdKFCSbIjrtzzMsxYaAfiAuEsQh+enKuObKstyVyd1Aveb9sPa0MvDICxCIqVv2G4i
- FpuYkU8O7jGbpwzAs+QmKkINKkdsxH3KfVnJ89Wr7bRHf9x9/vL+UTFLJKSxpqqcJwplli4Wb
- E3Y0yyq0SODl2LEX5F3v97mGoUE48GadH5R4VcQHwjmmHos9QakEa3J4Bfbh40Xfjma6gLkMB
- oETiO1zqIiUxkL3F7ZTtWMs9gybsIaCBORiK5QcCUCz87IqpedMJDMnDLWs5/RIb5wpJ2v0fh
- 2oLktCqJG6loroEazfLkIw52J0sbwZKcaQ5n1iHd42z8f4fOfIW5zcQcE4qpto6lzJq44MkZK
- CUwmNCwbPSZRCYuJG+P/F7ggtWm7uvyGWgZkYAAaNjmphFBgZq8BlBQFrgEwwYc8AbMKfKIT6
- dsP6XXpnx0anbsFnhPi3nnlDQ5AccCPB5z6nxIUS8HnFLJ6xX63I1NPHIQ6R1E60rNFKMPhiA
- L32auVtE2AixCKZVWJLIAFEoeLevPu6ex2dPb1bNKnkWGCsicIR0je9NXofgH2zdAlUitFjFk
- zx+YaCBl6TrfPnOBIZj0xsjDRj+1W8S/5vIItMV2tkwKM/NTBCN+57IJ4izF4xE8rJbNeFFEg
- 0ezIxXlEmaC7IXlWzPc7aM2AP9DHcxTriq/yAMv603EBkLLA8533w0B7KUAIwmFEmnWGLKviK
- DIKr28TIKwCZgdDfwuDCPchNyxHm53cwq5PsLH2UmmTf0=
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="UTF-8"
+X-Ovh-Tracer-Id: 14883270870731594014
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedvledrvddukedgudduiecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhvfevufffkfhojghfggfgtgesthhqredttddtjeenucfhrhhomheptformhhiucffvghnihhsqdevohhurhhmohhnthcuoehrvghmihesrhgvmhhlrggsrdhnvghtqeenucggtffrrghtthgvrhhnpeeuhfegfeefvdefueetleefffduuedvjeefheduueekieeltdetueetueeugfevffenucffohhmrghinheprhgvmhhlrggsrdhnvghtnecukfhppeduvdejrddtrddtrddupdekjedrledvrdduleegrdekkedpfeejrdehledrudegvddruddtudenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpeduvdejrddtrddtrddupdhmrghilhhfrhhomheprhgvmhhisehrvghmlhgrsgdrnhgvthdpnhgspghrtghpthhtohepuddprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdpoffvtefjohhsthepmhhoheehtddpmhhouggvpehsmhhtphhouhht
 
-> The first patch changes kfree in ax25_dev_free to ax25_dev_free,
+Le torstaina 2. toukokuuta 2024, 19.17.00 EEST Eric Dumazet a =C3=A9crit :
+> fill_route() stores three components in the skb:
+>=20
+> - struct rtmsg
+> - RTA_DST (u8)
+> - RTA_OIF (u32)
+>=20
+> Therefore, rtm_phonet_notify() should use
+>=20
+> NLMSG_ALIGN(sizeof(struct rtmsg)) +
+> nla_total_size(1) +
+> nla_total_size(4)
+>=20
+> Fixes: f062f41d0657 ("Phonet: routing table Netlink interface")
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Cc: Remi Denis-Courmont <courmisch@gmail.com>
 
-I find this description confusing.
-Would you like to refer to a ax25_dev_put() call?
+Acked-by: R=C3=A9mi Denis-Courmont <courmisch@gmail.com>
+
+=2D-=20
+R=C3=A9mi Denis-Courmont
+http://www.remlab.net/
 
 
-> because the ax25_dev is managed by reference counting.
 
-How do you think about to link also to previous change approaches?
-
-Regards,
-Markus
 
