@@ -1,136 +1,105 @@
-Return-Path: <netdev+bounces-93102-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93090-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C89B18BA085
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 20:30:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83AE88BA047
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 20:28:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 062681C22068
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 18:30:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 00DE12817D3
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 18:28:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 143A0184139;
-	Thu,  2 May 2024 18:29:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=fritzc.com header.i=@fritzc.com header.b="vnXQ9fsb"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9436C17334D;
+	Thu,  2 May 2024 18:28:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from fritzc.com (mail.fritzc.com [213.160.72.247])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E0CD181D09;
-	Thu,  2 May 2024 18:29:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.160.72.247
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CD9D17167B
+	for <netdev@vger.kernel.org>; Thu,  2 May 2024 18:28:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714674555; cv=none; b=bzPn42zd5YfjUxMOO7zTihtjomIBYIH/6IBGzAPxILnUsPDI2bv/STPX3B3qxNKJ7fjC20jgyLIu5/xjHQ8vSuTgttA9r+HzdEU7PYKkAGX/yTTTd5JYcYFxETeK01D7iBTl9OqdMq0/N8LJ3a8hli7OcnhXAyTOTphjHWAVGTM=
+	t=1714674498; cv=none; b=Z12k+LWVhWyf/YFWKrovIWiE7fOdO06pGZ+A9DB9MAt8MrTFx4w2U/OtvdQwzq86BXgIL/lTjggM8ItHJzd30dEfcAMsq6LngnQv82rQi+cM/LABWu/JGMI6rd+kFRn7RP3tbaU6Fy2QLhgaBKBii7/oeEUTqo0rAQylF33Tn2w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714674555; c=relaxed/simple;
-	bh=bMBvt+Lny9gltUtFkgHUIDgYVSPlUfopJMIv+FezAFI=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=TQTM49sML4A2tNk9ZE8fj5akA9Jx6toLem/srBG8cIVWwy+OX1OSagh1kMwPJmkuLfm2FTdBdRxH0i6I6wUv4Xh4803pkMV4JriBZvUAivTny+Vs08MpPA59xOq0r1gThDhGFnXaQY5DRJuIQMULqzmMP4l93aoHmpkVxqvW+cc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hexdev.de; spf=pass smtp.mailfrom=hexdev.de; dkim=pass (1024-bit key) header.d=fritzc.com header.i=@fritzc.com header.b=vnXQ9fsb; arc=none smtp.client-ip=213.160.72.247
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hexdev.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hexdev.de
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=fritzc.com;
-	s=dkim; h=Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:
-	Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=7E5q+Jclu2EnfpQbseAxE8rYQRfjMaRwwerkW79IgBU=; b=vnXQ9fsbyaYSGCfe9LMRKQ1jKF
-	V57IwJD8gNhVezB5jBY21dzZu66qDGvTuvdJC9VS4Sg5RPIcDB6n6OYlS2N64+r3YRKbOAWFMdrNk
-	lxNacJHg2A1a4wR9VyNIDFHCZab6wt8gL2t6ByYj6vbBeQTCWEbODojN8I/XpwYyvbFw=;
-Received: from 127.0.0.1
-	by fritzc.com with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim latest)
-	(envelope-from <christoph.fritz@hexdev.de>)
-	id 1s2bB3-001ZbZ-33;
-	Thu, 02 May 2024 20:29:06 +0200
-From: Christoph Fritz <christoph.fritz@hexdev.de>
-To: Jiri Slaby <jirislaby@kernel.org>,
-	Oliver Hartkopp <socketcan@hartkopp.net>,
-	Marc Kleine-Budde <mkl@pengutronix.de>,
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Jiri Kosina <jikos@kernel.org>,
-	Benjamin Tissoires <bentiss@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Sebastian Reichel <sre@kernel.org>,
-	Linus Walleij <linus.walleij@linaro.org>
-Cc: Andreas Lauser <andreas.lauser@mercedes-benz.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Pavel Pisa <pisa@cmp.felk.cvut.cz>,
-	linux-can@vger.kernel.org,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-input@vger.kernel.org,
-	linux-serial@vger.kernel.org
-Subject: [PATCH v3 11/11] HID: hexLIN: Implement ability to update lin mode
-Date: Thu,  2 May 2024 20:28:04 +0200
-Message-Id: <20240502182804.145926-12-christoph.fritz@hexdev.de>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240502182804.145926-1-christoph.fritz@hexdev.de>
-References: <20240502182804.145926-1-christoph.fritz@hexdev.de>
+	s=arc-20240116; t=1714674498; c=relaxed/simple;
+	bh=UzKx2uEzqgslDAiwUDJyVu5c/uy6CYD26vc1Ic3/26A=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=BCH7xy9zpHEG+Na9hcAXHgk2hwpF2bMYaYVg8vVKNJqYNFbJ+lA/GGol6TSBifcBQWxipWgaHHU/mHSxEXdCUfJbvBZEC+R9r6hSQmgXaKlXcmqf1AYYHzQ8yFlxBDHhYZgUeB1B+UEnfx6Vxr2LPT2OyuqBZEQQaP4vwaV5gAo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-7dee81b7e97so234231839f.3
+        for <netdev@vger.kernel.org>; Thu, 02 May 2024 11:28:16 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714674496; x=1715279296;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=UzKx2uEzqgslDAiwUDJyVu5c/uy6CYD26vc1Ic3/26A=;
+        b=Vd8I2QivoJcMED2kMTb1ebwlCNGrRwXZi6yr0ZzhdE924b6qS7FJh1FRqfkX8BvvJU
+         JuCV3TgpUOsBuKt8S9lpzndaZFQUfSEpXYI+r3qQDwzLrQ8TDU3xIbycWPOD1GnKVc9U
+         72rfzGmtYpSYzmeDzmfHc/4zhXiDB1WlpyH5BtilQJq4qxCzAuaAvQrA2H/pzXdVP87H
+         YhN/AL6fED/OBKUiN6y+X9US0xmlVLaY7VtYGLLK6bSSmNMvXU/vXdKl6yE7JN30EU5q
+         hEfPEV5Ogb7EDJbq3+a9jbNYDsYwCgaGrRZykUWm6ThR28d25UvexIvTtUaPwp8fnl3H
+         CE7Q==
+X-Forwarded-Encrypted: i=1; AJvYcCU5J9Wjvr808EW7l+bF73hq1JMhqeNdMlLb6czdKiADH/5YBzq6dwBTaVzOVq0W9E8/eWdXkqlVJ9nC5twMXKeG6SC+3UlJ
+X-Gm-Message-State: AOJu0YxC9yD0pLw6ii2AjzJPynGEsuO5mygRrjyUygLuwGE8OfaPA1k/
+	zbSK8HRkPXKVzjEl5flLKNZ7pUF/I9BxVOZc1ZFI438nJjlDFB0JHB/GUIQ7UIlikU7dyU0GxNQ
+	n0b099kmUvg+C1/WHX+dh6Zyt6JOpnoWCHpEABjXQpjDw1CkbFWK99KE=
+X-Google-Smtp-Source: AGHT+IHfvdUjCK5ourMvNUp/Sz8U8WrMGbVCskwFzb4UA2DWIV0LaNKUHAeAIsAIRgbjYbC4dLWbSyCtWhY+2ftEEIG8pt9kXk+H
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6638:4387:b0:487:591e:6df3 with SMTP id
+ bo7-20020a056638438700b00487591e6df3mr5738jab.2.1714674496327; Thu, 02 May
+ 2024 11:28:16 -0700 (PDT)
+Date: Thu, 02 May 2024 11:28:16 -0700
+In-Reply-To: <000000000000a62351060e363bdc@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000042648f06177cc40e@google.com>
+Subject: Re: [syzbot] memory leak in ___neigh_create (2)
+From: syzbot <syzbot+42cfec52b6508887bbe8@syzkaller.appspotmail.com>
+To: alexander.mikhalitsyn@virtuozzo.com, davem@davemloft.net, den@openvz.org, 
+	dsahern@kernel.org, edumazet@google.com, f.fainelli@gmail.com, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	nogikh@google.com, pabeni@redhat.com, razor@blackwall.org, 
+	syzkaller-bugs@googlegroups.com, thomas.zeitlhofer+lkml@ze-it.at, 
+	thomas.zeitlhofer@ze-it.at, wangyuweihx@gmail.com
+Content-Type: text/plain; charset="UTF-8"
 
-This patch enhances the hexLIN driver by implementing the newly
-introduced update_lin_mode() callback.  So that either commander or
-responder mode can be configured on this hardware.
+This bug is marked as fixed by commit:
+net: stop syzbot
 
-Signed-off-by: Christoph Fritz <christoph.fritz@hexdev.de>
+But I can't find it in the tested trees[1] for more than 90 days.
+Is it a correct commit? Please update it by replying:
+
+#syz fix: exact-commit-title
+
+Until then the bug is still considered open and new crashes with
+the same signature are ignored.
+
+Kernel: Linux
+Dashboard link: https://syzkaller.appspot.com/bug?extid=42cfec52b6508887bbe8
+
 ---
- drivers/hid/hid-hexdev-hexlin.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+[1] I expect the commit to be present in:
 
-diff --git a/drivers/hid/hid-hexdev-hexlin.c b/drivers/hid/hid-hexdev-hexlin.c
-index 1ddc1e00ab2da..1723b272138ba 100644
---- a/drivers/hid/hid-hexdev-hexlin.c
-+++ b/drivers/hid/hid-hexdev-hexlin.c
-@@ -180,6 +180,8 @@ HEXLIN_GET_CMD(get_baudrate, HEXLIN_GET_BAUDRATE)
- 	}
- 
- HEXLIN_VAL_CMD(send_break, HEXLIN_SEND_BREAK, hexlin_val8_req, u8)
-+HEXLIN_VAL_CMD(set_mode_controller, HEXLIN_SET_MODE_CONTROLLER, hexlin_val8_req,
-+	       bool)
- 
- static int hexlin_queue_frames_insert(struct hexlin_priv_data *priv,
- 				      const u8 *raw_data, int sz)
-@@ -346,6 +348,14 @@ static int hexlin_ldo_tx(struct lin_device *ldev,
- 	return ret;
- }
- 
-+static int  hexlin_update_lin_mode(struct lin_device *ldev, enum lin_mode lm)
-+{
-+	struct hid_device *hdev = to_hid_device(ldev->dev);
-+	struct hexlin_priv_data *priv = hid_get_drvdata(hdev);
-+
-+	return hexlin_set_mode_controller(priv, lm == LINBUS_COMMANDER);
-+}
-+
- static int hexlin_update_bitrate(struct lin_device *ldev, u16 bitrate)
- {
- 	struct hid_device *hdev = to_hid_device(ldev->dev);
-@@ -417,6 +427,7 @@ static const struct lin_device_ops hexlin_ldo = {
- 	.ldo_open = hexlin_open,
- 	.ldo_stop = hexlin_stop,
- 	.ldo_tx = hexlin_ldo_tx,
-+	.update_lin_mode = hexlin_update_lin_mode,
- 	.update_bitrate = hexlin_update_bitrate,
- 	.get_responder_answer = hexlin_get_responder_answer,
- 	.update_responder_answer = hexlin_update_resp_answer,
--- 
-2.39.2
+1. for-kernelci branch of
+git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git
 
+2. master branch of
+git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git
+
+3. master branch of
+git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git
+
+4. main branch of
+git://git.kernel.org/pub/scm/linux/kernel/git/davem/net-next.git
+
+The full list of 9 trees can be found at
+https://syzkaller.appspot.com/upstream/repos
 
