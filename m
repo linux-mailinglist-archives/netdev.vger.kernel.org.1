@@ -1,57 +1,94 @@
-Return-Path: <netdev+bounces-93044-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93045-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B44E8B9CDD
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 16:52:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75F2E8B9CEC
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 16:57:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BE9BE1F22733
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 14:52:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3425228C1A3
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 14:57:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DB5915359C;
-	Thu,  2 May 2024 14:51:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73C08153833;
+	Thu,  2 May 2024 14:57:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="1uyuAgb+"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="kOUi18yF"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B7DF153800;
-	Thu,  2 May 2024 14:51:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25052153563
+	for <netdev@vger.kernel.org>; Thu,  2 May 2024 14:57:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714661519; cv=none; b=jpYp8hsEXWE106RXpXDuoE/ucDRnUROg7Sx210bkPUdZdzePQrnEwsN8pcV1krRZBjwSJ9pDk8L3RvBXCB05jGPSM9WTVK2MErwpI05maaUPvRFHm6YZ742OioEAGw13OXRlDQjO/HtXq6MJ5zjuBH7342dJBykdSRzp39ISGF8=
+	t=1714661825; cv=none; b=dIi+t7zmV88+CMkrofS0z19hIX6RXnv8RcOGwjOCAb7vLJulkbkWV3N35rzFfPqHDkXPrEbDSbAGpvuYPZDrYnd0MsWxfx0v7mHHnbm/KJN2FQEoLTwJP2BQOzfdJdPLB6Y3AptIfLAmlA+F0TDKAarqRwWugDoh1MpEWi+WDBM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714661519; c=relaxed/simple;
-	bh=ST+TZwgCd+nDZ5M4t+lR71k82ZcVIF/RLDpS5hQosys=;
+	s=arc-20240116; t=1714661825; c=relaxed/simple;
+	bh=NH4QIZCd1e7ll0ytLJZvsXtnpe6W+YknkMOUe2chw/U=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FM50GH5O4tWO9fiEb2Hl3dt5996+6F6Q/6pIFZhJ3ia8OnB+lUwczmKcSx8ORo4Q+0osZxTIKsuihjHGWUJqI1TRpdyf5b0GiJDrZM8hEcmvA+H8UhDDeUve267xDEiLUzjrj63tNX45hvEw2XaRCgL7DlwTbGlg9XUcKP9/dJI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=1uyuAgb+; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=wqpw/ZGaL/K9oEQyWGG2tvRSaK0AjAGtY128e8n64RA=; b=1uyuAgb+/pJTNrSUOf1oUcENk7
-	ITwsmNWDdS3RtL8SIsOZYzw+yZLbG7Oy864GiNT/xw3Od71t43ADVsmYwBq/PlYJttybj1eeY8oqj
-	0urYbiEHdWsb96/i5cu9N38WdiX+80nYJ2MO7edPMvqMBzowpcb7VW9JSNDJD3qnsnmU=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1s2Xmg-00EVgP-Fq; Thu, 02 May 2024 16:51:42 +0200
-Date: Thu, 2 May 2024 16:51:42 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
-Cc: netdev@vger.kernel.org, lxu@maxlinear.com, hkallweit1@gmail.com,
-	linux@armlinux.org.uk, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, linux-kernel@vger.kernel.org,
-	UNGLinuxDriver@microchip.com
-Subject: Re: [PATCH net-next] net: phy: add wol config options in phy device
-Message-ID: <7fe419b2-fc73-4584-ae12-e9e313d229c3@lunn.ch>
-References: <20240430050635.46319-1-Raju.Lakkaraju@microchip.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=k5MrC2oXWwELZ2woIZRMC01IIXRcSK2jPfoA7ZctAA+lWBOUd7U/Tnm5ApS1Q/2bHsLtU4sgSq5cIGRwswkTT15TQJ6y7qJPV6zgACP1lwoX9q8ACtAenTOrHgKMot3MgL/36/Rd2ELQtw07dLfBztf0lVj2tmeBtTgqTws+jnQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=kOUi18yF; arc=none smtp.client-ip=209.85.210.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-6ed627829e6so9393168b3a.1
+        for <netdev@vger.kernel.org>; Thu, 02 May 2024 07:57:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1714661823; x=1715266623; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=CQ8b7bzfCx6EpLlIeYt5D5YIUVdmKAgE9Z3grYfPDDo=;
+        b=kOUi18yFJznxD0I7D2bkIZ7g/Dz5s7ufRd99GwsVKDDJ/1k+Iz8WyCULX0lfMSNvoT
+         N/HMqCqJr8xQsdqdS8JzRgFSHfLSqGXlrDFq2HYc1VTvBTvH7JQ2KGDiYJ69ZGa1xpv7
+         V8Ut/VQq+OdKe0cQfjViVvID918nnmV699qGc=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714661823; x=1715266623;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CQ8b7bzfCx6EpLlIeYt5D5YIUVdmKAgE9Z3grYfPDDo=;
+        b=QmDYs9okTceNFemogK4PWRTfLMJZRYF31uMTkdG5UGwgEPR0BImS2hX5HXX+QtoOz1
+         nSNALYKlc1Pp7s2K+bUUP51yHLMM6MUg/ijkic5fe6MmKEFEAC1yaWxCtfziujiQNsGu
+         ZjAHcglqdvs8cZ4M5yEgkTm2Arei2/B3RRqs/Unjju1weZf3EXcHH/M72pcnLLvgdB1C
+         4NwuEOyqCYqJ1QYA+XZxq7Eoix8oWioHh5sxQPTUkp8ybgFJxg2mwFS1ngyO/TkwJXdw
+         TUDoJyrC9ncZ3p61/gXTXyAVCFKSLOPoRvIVSifYmaZAqOFnATVDZqgBlfP6/WGu8N22
+         +lTg==
+X-Forwarded-Encrypted: i=1; AJvYcCVD9tZ9t4FqXP2tpcMExJznaFPCZBuTSRimKjz0VSkV+4hfh1q/RaiRGl7vhqSGBemFeZQ2agtEAYJ3ZnBwJiL9EzEFMM4q
+X-Gm-Message-State: AOJu0Yy/RlFPiSL5gzT87rP1P9A80x7/nWj7O72DknRmOPit+Drmil0A
+	tez4lspACMRJI+GLoK1VJzK6Dlraq36YaF/5QpJ+Qu9Gmi9EgWi0TrVZKkLtNw==
+X-Google-Smtp-Source: AGHT+IEY8rfhYcGUjn6fkFZDVe5VtFVRmGTt2Y2qKWiykKokE+sE6ybt9GlDY7wg6G8EAaWAzHcprw==
+X-Received: by 2002:a05:6a20:5b22:b0:1aa:411d:a8e with SMTP id kl34-20020a056a205b2200b001aa411d0a8emr5633798pzb.62.1714661823495;
+        Thu, 02 May 2024 07:57:03 -0700 (PDT)
+Received: from www.outflux.net ([198.0.35.241])
+        by smtp.gmail.com with ESMTPSA id cb5-20020a056a02070500b0061236221eeesm1175970pgb.21.2024.05.02.07.57.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 May 2024 07:57:03 -0700 (PDT)
+Date: Thu, 2 May 2024 07:57:02 -0700
+From: Kees Cook <keescook@chromium.org>
+To: David Howells <dhowells@redhat.com>
+Cc: Mark Rutland <mark.rutland@arm.com>, Will Deacon <will@kernel.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Boqun Feng <boqun.feng@gmail.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>, Jakub Kicinski <kuba@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	"Paul E. McKenney" <paulmck@kernel.org>,
+	Uros Bizjak <ubizjak@gmail.com>, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-arch@vger.kernel.org,
+	netdev@vger.kernel.org, linux-hardening@vger.kernel.org
+Subject: Re: [PATCH 1/4] locking/atomic/x86: Silence intentional wrapping
+ addition
+Message-ID: <202405020755.0101DBCB@keescook>
+References: <20240424191740.3088894-1-keescook@chromium.org>
+ <20240424191225.work.780-kees@kernel.org>
+ <2100617.1714117250@warthog.procyon.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,69 +97,22 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240430050635.46319-1-Raju.Lakkaraju@microchip.com>
+In-Reply-To: <2100617.1714117250@warthog.procyon.org.uk>
 
-On Tue, Apr 30, 2024 at 10:36:35AM +0530, Raju Lakkaraju wrote:
-> Introduce a new member named 'wolopts' to the 'phy_device' structure to
-> store the user-specified Wake-on-LAN (WOL) settings. Update this member
-> within the phy driver's 'set_wol()' function whenever the WOL configuration
-> is modified by the user.
+On Fri, Apr 26, 2024 at 08:40:50AM +0100, David Howells wrote:
+> Kees Cook <keescook@chromium.org> wrote:
 > 
-> Currently, when the system resumes from sleep, the 'phy_init_hw()' function
-> resets the PHY's configuration and interrupts, which leads to problems upon
-> subsequent WOL attempts. By retaining the desired WOL settings in 'wolopts',
-> we can ensure that the PHY's WOL configuration is correctly reapplied
-> through 'phy_ethtool_set_wol()' before a system suspend, thereby resolving
-> the issue
-
-Sorry it took a white to review this.
-
+> > -	return i + xadd(&v->counter, i);
+> > +	return wrapping_add(int, i, xadd(&v->counter, i));
 > 
-> Signed-off-by: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
-> ---
->  drivers/net/phy/mxl-gpy.c    | 5 +++++
->  drivers/net/phy/phy_device.c | 5 +++++
->  include/linux/phy.h          | 2 ++
->  3 files changed, 12 insertions(+)
+> Ewww.  Can't you just mark the variable as wrapping in some way, either by:
 > 
-> diff --git a/drivers/net/phy/mxl-gpy.c b/drivers/net/phy/mxl-gpy.c
-> index b2d36a3a96f1..6edb29a1d77e 100644
-> --- a/drivers/net/phy/mxl-gpy.c
-> +++ b/drivers/net/phy/mxl-gpy.c
-> @@ -680,6 +680,7 @@ static int gpy_set_wol(struct phy_device *phydev,
->  	struct net_device *attach_dev = phydev->attached_dev;
->  	int ret;
->  
-> +	phydev->wolopts = 0;
+> 	unsigned int __cyclic counter;
 
-Is this specific to mlx-gpy?
+Yeah, that's the plan now. Justin is currently working on the "wraps"
+attribute for Clang:
+https://github.com/llvm/llvm-project/pull/86618
 
-You should be trying to solve the problem for all PHYs which support
-WoL. So i expect the core to be doing most of the work. In fact, i
-don't think there is any need for driver specific code.
-
-phy_ethtool_set_wol() can set phydev->wolopts after calling
-phydev->drv->set_wol(). If it returns an error, including -ENOTSUPP,
-set phydev->wolopts to 0, otherwise set it to wolopts.
-
-> @@ -2038,6 +2038,11 @@ int phy_suspend(struct phy_device *phydev)
->  	if (phydev->suspended)
->  		return 0;
->  
-> +	if (phydev->wolopts) {
-> +		wol.wolopts = phydev->wolopts;
-> +		phy_ethtool_set_wol(phydev, &wol);
-> +	}
-
-Why on suspend? I would expect it to be on resume, after the PHY has
-been reset.
-
-I also think you need to save sopass[] in phydev, since some PHYs
-support WAKE_MAGICSECURE. Just because mlx-gpy does not need the
-password does not mean we should ignore it in general. I also think it
-is safe to store in memory. Its is not a highly confidential
-password. I would not be too surprised if some PHYs have the registers
-read/write rather than write only.
-
-	Andrew
+-- 
+Kees Cook
 
