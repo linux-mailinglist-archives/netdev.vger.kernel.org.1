@@ -1,156 +1,240 @@
-Return-Path: <netdev+bounces-92998-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92999-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA5F58B98F2
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 12:38:13 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF6FD8B9941
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 12:45:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9C80D282838
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 10:38:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E2CCEB24B35
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 10:45:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D82E658AA7;
-	Thu,  2 May 2024 10:38:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FCD87E579;
+	Thu,  2 May 2024 10:41:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=fritzc.com header.i=@fritzc.com header.b="DDqJ6uWX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.188.207])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 348C456B7B
-	for <netdev@vger.kernel.org>; Thu,  2 May 2024 10:38:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.188.207
+Received: from fritzc.com (mail.fritzc.com [213.160.72.247])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D00B75C60D;
+	Thu,  2 May 2024 10:41:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.160.72.247
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714646290; cv=none; b=FFfmL/lET6MsFyOd2QQ5gTkwhq+W82ofRvDrqAjhKvxSLlPaHRDX8EBgMxa0+TFGJea04zDbik6oljrTvgIG66JfZx2y04WER6SpxrfTiK6GKq1UZRpul+xBSuo+8A6geypD98snea+JNFyHjE8q3DokrJu/HF/ezT+YpW9ILV0=
+	t=1714646489; cv=none; b=p7NCMXWlmc5l0TFrYKn+wubv2Ejxjf2gB+Vibr7l3DcS6HmuslFNApJELT9tGHKnbQxVb2wPZaXZslUYqThG+JE2qigiOQgRv0/uEQJnyUjz/hzWxqa73qvQEsogUoK/38lNjYY9AyXnGfwuHfKHXl87keEKxZjvbaROgbhTt14=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714646290; c=relaxed/simple;
-	bh=G7HDwJcRiZk8ewFWdi1Eesxkdxi68ddMf8U/ITO9tes=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dk/CFm8FlS8cpW1ViGl+/b5KxNyP/mfS26qWCPsj9cjCQB4nhXDcWKmojc/DZeE2FLpfHT+fRZRO3dQrET9ebuKcba8PIJ1W3HchDIe+LAAG/jxl2KOgj5PxGzBIGBvNPtrF+QrM1ce3z9m4xt6os5JUnInTfQ+tNpyJaRk7JP0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; arc=none smtp.client-ip=217.70.188.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-Date: Thu, 2 May 2024 12:38:04 +0200
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, laforge@osmocom.org,
-	pespin@sysmocom.de, osmith@sysmocom.de, kuba@kernel.org,
-	pabeni@redhat.com, edumazet@google.com, fw@strlen.de
-Subject: Re: [PATCH net-next 04/12] gtp: add IPv6 support
-Message-ID: <ZjNtDEJFDgSjWanp@calendula>
-References: <20240425105138.1361098-1-pablo@netfilter.org>
- <20240425105138.1361098-5-pablo@netfilter.org>
- <20240426204101.GE516117@kernel.org>
+	s=arc-20240116; t=1714646489; c=relaxed/simple;
+	bh=OqJ+yIymupM8os2NNtWYxIDzuic0X9q0L/FNYuyp6NQ=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=uLMzAxtLt+XgVp7LFnWf5hoRuWfyErgdq8swm6k7gHfjkR89a/h3/NHt3aCbf1SfVPE1PBNdB9ebzucGDriCB96KoLTxrFGONftbxkio4RiaF77sFvRHJr9A3j4dKCT/K1x45lPYu+tdLnEnMKsX/hHzvQqYyf0IZTqg3mJLIUU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hexdev.de; spf=pass smtp.mailfrom=hexdev.de; dkim=pass (1024-bit key) header.d=fritzc.com header.i=@fritzc.com header.b=DDqJ6uWX; arc=none smtp.client-ip=213.160.72.247
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hexdev.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hexdev.de
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=fritzc.com;
+	s=dkim; h=Content-Transfer-Encoding:MIME-Version:Content-Type:References:
+	In-Reply-To:Date:Cc:To:Reply-To:From:Subject:Message-ID:Sender:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=4UUHAno7rypybrcQtRJnCbtjDnm2b3MTrzNRoHFFT+4=; b=DDqJ6uWXnxC+eCkZQ7gN9aIjkb
+	o+Ouhe7Rg91OXbK1/odgrwOFaA6dXxRBbs6uy+CzYzxCFJteto934oK/rKoev1Ntg9s9p+GYVVzIC
+	VfVAcwv8kpe+bOYZDEa5Jb6VBisVxPmFjJQH2n9IxGJJcuvjxi7NH887u+P62++5sogo=;
+Received: from 127.0.0.1
+	by fritzc.com with esmtpsa (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim latest)
+	(envelope-from <christoph.fritz@hexdev.de>)
+	id 1s2TsE-001Z1U-1D;
+	Thu, 02 May 2024 12:41:11 +0200
+Message-ID: <2ab875b8216dd32d0d1e495a52a20c02a40e3e5d.camel@hexdev.de>
+Subject: Re: [PATCH v2 02/12] HID: hexLIN: Add support for USB LIN bus
+ adapter
+From: Christoph Fritz <christoph.fritz@hexdev.de>
+Reply-To: christoph.fritz@hexdev.de
+To: Jiri Slaby <jirislaby@kernel.org>
+Cc: Oliver Hartkopp <socketcan@hartkopp.net>, Marc Kleine-Budde
+ <mkl@pengutronix.de>, Vincent Mailhol <mailhol.vincent@wanadoo.fr>, "David
+ S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>, Rob
+ Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,  Conor
+ Dooley <conor+dt@kernel.org>, Jiri Kosina <jikos@kernel.org>, Benjamin
+ Tissoires <bentiss@kernel.org>,  Greg Kroah-Hartman
+ <gregkh@linuxfoundation.org>, Sebastian Reichel <sre@kernel.org>, Linus
+ Walleij <linus.walleij@linaro.org>, Andreas Lauser
+ <andreas.lauser@mercedes-benz.com>,  Jonathan Corbet <corbet@lwn.net>,
+ Pavel Pisa <pisa@cmp.felk.cvut.cz>, linux-can@vger.kernel.org, 
+ netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-input@vger.kernel.org,  linux-serial@vger.kernel.org
+Date: Thu, 02 May 2024 12:41:07 +0200
+In-Reply-To: <acf0251e-41b9-410d-a663-ff6c34d2bc3e@kernel.org>
+References: <20240502075534.882628-1-christoph.fritz@hexdev.de>
+	 <20240502075534.882628-3-christoph.fritz@hexdev.de>
+	 <acf0251e-41b9-410d-a663-ff6c34d2bc3e@kernel.org>
+Organization: hexDEV GmbH
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.46.4-2 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240426204101.GE516117@kernel.org>
+Content-Transfer-Encoding: 7bit
 
-Hi Simon,
-
-On Fri, Apr 26, 2024 at 09:41:01PM +0100, Simon Horman wrote:
-> On Thu, Apr 25, 2024 at 12:51:30PM +0200, Pablo Neira Ayuso wrote:
-[...]
-> > @@ -131,6 +134,11 @@ static inline u32 ipv4_hashfn(__be32 ip)
-> >  	return jhash_1word((__force u32)ip, gtp_h_initval);
-> >  }
-> >  
-> > +static inline u32 ipv6_hashfn(const struct in6_addr *ip6)
-> > +{
-> > +	return jhash(ip6, sizeof(*ip6), gtp_h_initval);
-> > +}
-> > +
-> 
-> Hi Pablo,
-> 
-> I'm would naively expect that the compiler can work out if this needs to
-> be inline.
-
-I will remove inline, I saw the warnings from patchwork on this too
-after my v2.
-
-> >  /* Resolve a PDP context structure based on the 64bit TID. */
-> >  static struct pdp_ctx *gtp0_pdp_find(struct gtp_dev *gtp, u64 tid)
-> >  {
-> 
+On Thu, 2024-05-02 at 10:30 +0200, Jiri Slaby wrote:
+> On 02. 05. 24, 9:55, Christoph Fritz wrote:
+> > This patch introduces driver support for the hexLIN USB LIN bus adapter,
+> > enabling LIN communication over USB for both controller and responder
+> > modes. The driver interfaces with the CAN_LIN framework for userland
+> > connectivity.
+> > 
+> > For more details on the adapter, visit: https://hexdev.de/hexlin/
+> > 
+> > Tested-by: Andreas Lauser <andreas.lauser@mercedes-benz.com>
+> > Signed-off-by: Christoph Fritz <christoph.fritz@hexdev.de>
 > ...
-> 
-> > @@ -878,6 +951,20 @@ static inline void gtp_set_pktinfo_ipv4(struct gtp_pktinfo *pktinfo,
-> >  	pktinfo->dev	= dev;
-> >  }
-> >  
-> > +static inline void gtp_set_pktinfo_ipv6(struct gtp_pktinfo *pktinfo,
-> > +					struct sock *sk, struct ipv6hdr *ip6h,
-> > +					struct pdp_ctx *pctx, struct rt6_info *rt6,
-> > +					struct flowi6 *fl6,
-> > +					struct net_device *dev)
+> > --- /dev/null
+> > +++ b/drivers/hid/hid-hexdev-hexlin.c
+> > @@ -0,0 +1,630 @@
+> ...
+> > +static int hexlin_stop(struct lin_device *ldev)
 > > +{
-> > +	pktinfo->sk	= sk;
-> > +	pktinfo->ip6h	= ip6h;
-> > +	pktinfo->pctx	= pctx;
-> > +	pktinfo->rt6	= rt6;
-> > +	pktinfo->fl6	= *fl6;
-> > +	pktinfo->dev	= dev;
+> > +	struct hid_device *hdev = to_hid_device(ldev->dev);
+> > +	struct hexlin_priv_data *priv = hid_get_drvdata(hdev);
+> > +
+> > +	hid_hw_close(hdev);
+> > +
+> > +	priv->is_error = true;
+> > +	complete(&priv->wait_in_report);
+> > +
+> > +	mutex_lock(&priv->tx_lock);
+> > +	mutex_unlock(&priv->tx_lock);
+> 
+> This is a weird way to implement a completion. It looks like you need 
+> another one.
+
+They are not necessary, even more so when I can drop the
+mutex_destroy() below.
+
+> 
+> > +	return 0;
+> > +}
+> ...> +static int hexlin_probe(struct hid_device *hdev,
+> > +			const struct hid_device_id *id)
+> > +{
+> > +	struct hexlin_priv_data *priv;
+> > +	int ret;
+> > +
+> > +	priv = devm_kzalloc(&hdev->dev, sizeof(*priv), GFP_KERNEL);
+> > +	if (!priv)
+> > +		return -ENOMEM;
+> > +
+> > +	priv->hid_dev = hdev;
+> > +	hid_set_drvdata(hdev, priv);
+> > +
+> > +	mutex_init(&priv->tx_lock);
+> > +
+> > +	ret = hid_parse(hdev);
+> > +	if (ret) {
+> > +		hid_err(hdev, "hid parse failed with %d\n", ret);
+> > +		goto fail_and_free;
+> > +	}
+> > +
+> > +	ret = hid_hw_start(hdev, HID_CONNECT_DRIVER);
+> > +	if (ret) {
+> > +		hid_err(hdev, "hid hw start failed with %d\n", ret);
+> > +		goto fail_and_stop;
+> > +	}
+> > +
+> > +	ret = hid_hw_open(hdev);
+> > +	if (ret) {
+> > +		hid_err(hdev, "hid hw open failed with %d\n", ret);
+> > +		goto fail_and_close;
+> > +	}
+> > +
+> > +	init_completion(&priv->wait_in_report);
+> > +
+> > +	hid_device_io_start(hdev);
+> > +
+> > +	ret = init_hw(priv);
+> > +	if (ret)
+> > +		goto fail_and_close;
+> > +
+> > +	priv->ldev = register_lin(&hdev->dev, &hexlin_ldo);
+> > +	if (IS_ERR_OR_NULL(priv->ldev)) {
+> > +		ret = PTR_ERR(priv->ldev);
+> > +		goto fail_and_close;
+> > +	}
+> > +
+> > +	hid_hw_close(hdev);
+> > +
+> > +	hid_info(hdev, "hexLIN (fw-version: %u) probed\n", priv->fw_version);
+> > +
+> > +	return 0;
+> > +
+> > +fail_and_close:
+> > +	hid_hw_close(hdev);
+> > +fail_and_stop:
+> > +	hid_hw_stop(hdev);
+> > +fail_and_free:
+> > +	mutex_destroy(&priv->tx_lock);
+> > +	return ret;
+> > +}
+> > +
+> > +static void hexlin_remove(struct hid_device *hdev)
+> > +{
+> > +	struct hexlin_priv_data *priv = hid_get_drvdata(hdev);
+> > +
+> > +	unregister_lin(priv->ldev);
+> > +	hid_hw_stop(hdev);
+> > +	mutex_destroy(&priv->tx_lock);
+> 
+> It is unusual to destroy a mutex. Why do you do that?
+> 
+
+Just for code clarity and it should help if someone wants to use
+CONFIG_DEBUG_MUTEXES.
+
+To be able to drop the lock/unlock from above, I could add the
+lock/unlock here or just drop the mutex_destroy() completely.
+
+I'll just drop it in upcoming v3.
+
+> > +}
+> ...
+> > +static int __init hexlin_init(void)
+> > +{
+> > +	return hid_register_driver(&hexlin_driver);
+> > +}
+> > +
+> > +static void __exit hexlin_exit(void)
+> > +{
+> > +	hid_unregister_driver(&hexlin_driver);
 > > +}
 > 
-> Here too.
-
-OK.
-
-> > @@ -1441,7 +1736,14 @@ static struct pdp_ctx *gtp_pdp_add(struct gtp_dev *gtp, struct sock *sk,
-> >  		if (!pctx)
-> >  			pctx = pctx_tid;
-> >  
-> > -		ipv4_pdp_fill(pctx, info);
-> > +		switch (pctx->af) {
-> > +		case AF_INET:
-> > +			ipv4_pdp_fill(pctx, info);
-> > +			break;
-> > +		case AF_INET6:
-> > +			ipv6_pdp_fill(pctx, info);
-> > +			break;
-> > +		}
-> >  
-> >  		if (pctx->gtp_version == GTP_V0)
-> >  			netdev_dbg(dev, "GTPv0-U: update tunnel id = %llx (pdp %p)\n",
-> 
-> The code just before the following hunk is:
-> 
-> 	pctx = kmalloc(sizeof(*pctx), GFP_ATOMIC);
-> 	if (pctx == NULL)
-> 		return ERR_PTR(-ENOMEM);
 > 
 > 
-> > @@ -1461,7 +1763,24 @@ static struct pdp_ctx *gtp_pdp_add(struct gtp_dev *gtp, struct sock *sk,
-> >  	sock_hold(sk);
-> >  	pctx->sk = sk;
-> >  	pctx->dev = gtp->dev;
-> > -	ipv4_pdp_fill(pctx, info);
-> > +	pctx->af = family;
 > > +
-> > +	switch (pctx->af) {
-> > +	case AF_INET:
-> > +		if (!info->attrs[GTPA_MS_ADDRESS] ||
-> > +		    !info->attrs[GTPA_PEER_ADDRESS])
-> > +			return ERR_PTR(-EINVAL);
+> > +/*
+> > + * When compiled into the kernel, initialize after the hid bus.
+> > + */
+> > +late_initcall(hexlin_init);
 > 
-> So this appears to leak pctx.
+> Hmm, why not module_init() then? (And module_hid_driver().)
 
-Good catch.
+Looking at the other hid drivers and testing with just
 
+module_hid_driver(hexlin_driver)
+
+works here fine for compiled into the kernel and as a module.
+
+> 
+> > +module_exit(hexlin_exit);
 > > +
-> > +		ipv4_pdp_fill(pctx, info);
-> > +		break;
-> > +	case AF_INET6:
-> > +		if (!info->attrs[GTPA_MS_ADDR6] ||
-> > +		    !info->attrs[GTPA_PEER_ADDR6])
-> > +			return ERR_PTR(-EINVAL);
-> 
-> Likewise here.
-> 
-> Flagged by Smatch.
+> > +MODULE_LICENSE("GPL");
+> > +MODULE_AUTHOR("Christoph Fritz <christoph.fritz@hexdev.de>");
+> > +MODULE_DESCRIPTION("LIN bus driver for hexLIN USB adapter");
 
-Thanks Simon.
+Thanks
+  -- Christoph
 
