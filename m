@@ -1,352 +1,270 @@
-Return-Path: <netdev+bounces-93088-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93089-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4717A8BA032
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 20:19:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64F0D8BA037
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 20:20:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BE7751F244C1
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 18:19:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1B145283E70
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 18:20:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 419A9173343;
-	Thu,  2 May 2024 18:19:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7F8117333C;
+	Thu,  2 May 2024 18:20:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IF7WjM9E"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=fritzc.com header.i=@fritzc.com header.b="oDSpHg5X"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from fritzc.com (mail.fritzc.com [213.160.72.247])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A607171669
-	for <netdev@vger.kernel.org>; Thu,  2 May 2024 18:19:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00D4D171669;
+	Thu,  2 May 2024 18:20:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.160.72.247
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714673979; cv=none; b=QS4qBhR1NxjERN3W1cdkRsm2kflefcw1e6Rdz7OOfQX/esO0/Y6qEUiRnebHFRLgy/FzARZCtzu6xcUOL7i9kdYIaWqBvD83Lt4jpyDHr8nShUe65KYEluhQs5AWuGnmsA7h4+8BgR3TVHaqJoIaY5caQ4iukz1ZPjCDwRA+GTI=
+	t=1714674004; cv=none; b=s0mrBJOmd2y61NeTWn0Ruyx8Zu1m7s3npGXcXjzKhwpVXCOqXrcBsZcruz1er809HOmICSMwHF63iY1deTazc0jq6pu6FVSfDVI406SCSO+hl/fM/xZVbXrvimDqyaSTX0h5PofE3/PQ3+YcfcXtFsOgX5+ZHdRRPYwloyH/4So=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714673979; c=relaxed/simple;
-	bh=FVJ7vfCTJwGq3jDK4KfKUeM6xx93L8RCNs/1ER2m6vQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LY1kgkWS6yF13hySYEKDrYHN5T8ojcIZ7L45Z7iptCI+dYWhEveCWlsqiXJbmbOw4e56XbEXKdYtadcSa/pMdrmTUzkQZL49qcyexz0BcBQfNj7g00Rmc418R2aa4ZHDp3O8ftNrwZ94N8HLgzhD0q/S1j4/bVlJdr1shyILCyY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IF7WjM9E; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1714673976;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0l8kwx3289sYt/Wq9EsGPIn1tQUXrDTbf+6JFzZpBzE=;
-	b=IF7WjM9EF6GJQVYPCBZOsEIqAsLuOBrzNsflSx48r2cw116Oc0Q/wTbpDh+H6QBYp5fW0d
-	MAsR4qPVO1RinUDd//0JDNfaeL6gCS8/XD79LYb2tIZpyZ+k8FIa89GMqxSLcUO46Sh8Du
-	f9FbESIJoKpTLtVgDCL+HAQ24KCXLLE=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-48-xZg9DsNAMR6Kg35WrOoX8A-1; Thu,
- 02 May 2024 14:19:32 -0400
-X-MC-Unique: xZg9DsNAMR6Kg35WrOoX8A-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2F79D1C05AA3;
-	Thu,  2 May 2024 18:19:32 +0000 (UTC)
-Received: from [10.22.18.59] (unknown [10.22.18.59])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 2AE0540D1E3;
-	Thu,  2 May 2024 18:19:31 +0000 (UTC)
-Message-ID: <b161e21f-9d66-4aac-8cc1-83ed75f14025@redhat.com>
-Date: Thu, 2 May 2024 14:19:30 -0400
+	s=arc-20240116; t=1714674004; c=relaxed/simple;
+	bh=DkDZ0BO2Nq2CclwEjcWx28N5dvPWqQoQyz/ra0jAc6o=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=SAbSrr3lSytH9jH62cf3ee+iFBsrj0SrnK6PoT+bvdHq8/+sXUyjksShnWnMVrqUZiWK4Vq/n6hq7tzT1u/SYuUKicjMHGXdj8B4c7oSkV2F5Mhuf5cxRqFA4oDT/zxqP8oJXZANlUe0AXbO7pNonUc9UnQ2faTrIihhUotpo34=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hexdev.de; spf=pass smtp.mailfrom=hexdev.de; dkim=pass (1024-bit key) header.d=fritzc.com header.i=@fritzc.com header.b=oDSpHg5X; arc=none smtp.client-ip=213.160.72.247
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hexdev.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hexdev.de
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=fritzc.com;
+	s=dkim; h=Content-Transfer-Encoding:MIME-Version:Content-Type:References:
+	In-Reply-To:Date:Cc:To:Reply-To:From:Subject:Message-ID:Sender:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=yGgKhs0asb1Y2UFT7ihSdsoF/Rm6jsqksB68r4YXvWE=; b=oDSpHg5X2es8aMHxNsxiUoUGVt
+	fPSG/h6J+tNXV9K0vQPdUbbfbMvw8txbZtZaUFOkszJaoj/vMXh1CB1dDhuft34SzDYFX4HoUILay
+	w4e1mJL5CCXYxmqaFrQULwU9a5MZc4YT43oWwIG4qox8XbP0WNQNMmFTbBqI8UumLwPo=;
+Received: from 127.0.0.1
+	by fritzc.com with esmtpsa (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim latest)
+	(envelope-from <christoph.fritz@hexdev.de>)
+	id 1s2b26-001ZZf-0X;
+	Thu, 02 May 2024 20:19:50 +0200
+Message-ID: <1359a0e5024445d0e2bc1c8659094c35dc85c090.camel@hexdev.de>
+Subject: Re: [PATCH v2 07/12] can: Add support for serdev LIN adapters
+From: Christoph Fritz <christoph.fritz@hexdev.de>
+Reply-To: christoph.fritz@hexdev.de
+To: Jiri Slaby <jirislaby@kernel.org>
+Cc: Oliver Hartkopp <socketcan@hartkopp.net>, Marc Kleine-Budde
+ <mkl@pengutronix.de>, Vincent Mailhol <mailhol.vincent@wanadoo.fr>, "David
+ S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>, Rob
+ Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,  Conor
+ Dooley <conor+dt@kernel.org>, Jiri Kosina <jikos@kernel.org>, Benjamin
+ Tissoires <bentiss@kernel.org>,  Greg Kroah-Hartman
+ <gregkh@linuxfoundation.org>, Sebastian Reichel <sre@kernel.org>, Linus
+ Walleij <linus.walleij@linaro.org>, Andreas Lauser
+ <andreas.lauser@mercedes-benz.com>,  Jonathan Corbet <corbet@lwn.net>,
+ Pavel Pisa <pisa@cmp.felk.cvut.cz>, linux-can@vger.kernel.org, 
+ netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-input@vger.kernel.org,  linux-serial@vger.kernel.org
+Date: Thu, 02 May 2024 20:19:48 +0200
+In-Reply-To: <6ae3c1af-4368-4a3e-bfb5-366080048dac@kernel.org>
+References: <20240502075534.882628-1-christoph.fritz@hexdev.de>
+	 <20240502075534.882628-8-christoph.fritz@hexdev.de>
+	 <6ae3c1af-4368-4a3e-bfb5-366080048dac@kernel.org>
+Organization: hexDEV GmbH
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.46.4-2 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1] cgroup/rstat: add cgroup_rstat_cpu_lock helpers and
- tracepoints
-To: Jesper Dangaard Brouer <hawk@kernel.org>, tj@kernel.org,
- hannes@cmpxchg.org, lizefan.x@bytedance.com, cgroups@vger.kernel.org,
- yosryahmed@google.com
-Cc: netdev@vger.kernel.org, linux-mm@kvack.org, shakeel.butt@linux.dev,
- kernel-team@cloudflare.com, Arnaldo Carvalho de Melo <acme@kernel.org>,
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-References: <171457225108.4159924.12821205549807669839.stgit@firesoul>
- <30d64e25-561a-41c6-ab95-f0820248e9b6@redhat.com>
- <4a680b80-b296-4466-895a-13239b982c85@kernel.org>
- <203fdb35-f4cf-4754-9709-3c024eecade9@redhat.com>
- <b74c4e6b-82cc-4b26-b817-0b36fbfcc2bd@kernel.org>
-Content-Language: en-US
-From: Waiman Long <longman@redhat.com>
-In-Reply-To: <b74c4e6b-82cc-4b26-b817-0b36fbfcc2bd@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.10
+Content-Transfer-Encoding: 7bit
 
-On 5/2/24 07:23, Jesper Dangaard Brouer wrote:
->
->
-> On 01/05/2024 20.41, Waiman Long wrote:
->> On 5/1/24 13:22, Jesper Dangaard Brouer wrote:
->>>
->>>
->>> On 01/05/2024 16.24, Waiman Long wrote:
->>>> On 5/1/24 10:04, Jesper Dangaard Brouer wrote:
->>>>> This closely resembles helpers added for the global 
->>>>> cgroup_rstat_lock in
->>>>> commit fc29e04ae1ad ("cgroup/rstat: add cgroup_rstat_lock helpers and
->>>>> tracepoints"). This is for the per CPU lock cgroup_rstat_cpu_lock.
->>>>>
->>>>> Based on production workloads, we observe the fast-path "update" 
->>>>> function
->>>>> cgroup_rstat_updated() is invoked around 3 million times per sec, 
->>>>> while the
->>>>> "flush" function cgroup_rstat_flush_locked(), walking each 
->>>>> possible CPU,
->>>>> can see periodic spikes of 700 invocations/sec.
->>>>>
->>>>> For this reason, the tracepoints are split into normal and fastpath
->>>>> versions for this per-CPU lock. Making it feasible for production to
->>>>> continuously monitor the non-fastpath tracepoint to detect lock 
->>>>> contention
->>>>> issues. The reason for monitoring is that lock disables IRQs which 
->>>>> can
->>>>> disturb e.g. softirq processing on the local CPUs involved. When the
->>>>> global cgroup_rstat_lock stops disabling IRQs (e.g converted to a 
->>>>> mutex),
->>>>> this per CPU lock becomes the next bottleneck that can introduce 
->>>>> latency
->>>>> variations.
->>>>>
->>>>> A practical bpftrace script for monitoring contention latency:
->>>>>
->>>>>   bpftrace -e '
->>>>>     tracepoint:cgroup:cgroup_rstat_cpu_lock_contended {
->>>>>       @start[tid]=nsecs; @cnt[probe]=count()}
->>>>>     tracepoint:cgroup:cgroup_rstat_cpu_locked {
->>>>>       if (args->contended) {
->>>>>         @wait_ns=hist(nsecs-@start[tid]); delete(@start[tid]);}
->>>>>       @cnt[probe]=count()}
->>>>>     interval:s:1 {time("%H:%M:%S "); print(@wait_ns); print(@cnt); 
->>>>> clear(@cnt);}'
->>>>
->>>> This is a per-cpu lock. So the only possible contention involves 
->>>> only 2 CPUs - a local CPU invoking cgroup_rstat_updated(). A 
->>>> flusher CPU doing cgroup_rstat_flush_locked() calling into 
->>>> cgroup_rstat_updated_list(). With recent commits to reduce the 
->>>> percpu lock hold time, I doubt lock contention on the percpu lock 
->>>> will have a great impact on latency. 
->>>
->>> I do appriciate your recent changes to reduce the percpu lock hold 
->>> time.
->>> These tracepoints allow me to measure and differentiate the percpu lock
->>> hold time vs. the flush time.
->>>
->>> In production (using [1]) I'm seeing "Long lock-hold time" [L100] e.g.
->>> upto 29 ms, which is time spend after obtaining the lock (runtime under
->>> lock).  I was expecting to see "High Lock-contention wait" [L82] which
->>> is the time waiting for obtaining the lock.
->>>
->>> This is why I'm adding these tracepoints, as they allow me to digg
->>> deeper, to understand where this high runtime variations originate 
->>> from.
->>>
->>>
->>> Data:
->>>
->>>  16:52:09 Long lock-hold time: 14950 usec (14 ms) on CPU:34 
->>> comm:kswapd4
->>>  16:52:09 Long lock-hold time: 14821 usec (14 ms) on CPU:34 
->>> comm:kswapd4
->>>  16:52:09 Long lock-hold time: 11299 usec (11 ms) on CPU:98 
->>> comm:kswapd4
->>>  16:52:09 Long lock-hold time: 17237 usec (17 ms) on CPU:113 
->>> comm:kswapd6
->>>  16:52:09 Long lock-hold time: 29000 usec (29 ms) on CPU:36 
->>> comm:kworker/u261:12
->> That lock hold time is much higher than I would have expected.
->>>  16:52:09 time elapsed: 80 sec (interval = 1 sec)
->>>   Flushes(5033) 294/interval (avg 62/sec)
->>>   Locks(53374) 1748/interval (avg 667/sec)
->>>   Yields(48341) 1454/interval (avg 604/sec)
->>>   Contended(48104) 1450/interval (avg 601/sec)
->>>
->>>
->>>> So do we really need such an elaborate scheme to monitor this? BTW, 
->>>> the additional code will also add to the worst case latency.
->>>
->>> Hmm, I designed this code to have minimal impact, as tracepoints are
->>> no-ops until activated.  I really doubt this code will change the 
->>> latency.
->>>
->>>
->>> [1] 
->>> https://github.com/xdp-project/xdp-project/blob/master/areas/latency/cgroup_rstat_tracepoint.bt
->>>
->>> [L100] 
->>> https://github.com/xdp-project/xdp-project/blob/master/areas/latency/cgroup_rstat_tracepoint.bt#L100
->>>
->>> [L82] 
->>> https://github.com/xdp-project/xdp-project/blob/master/areas/latency/cgroup_rstat_tracepoint.bt#L82
->>>
->>>>>
->>>>> Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
->>>
->>> More data, the histogram of time spend under the lock have some strange
->>> variation issues with a group in 4ms to 65ms area. Investigating what
->>> can be causeing this... which next step depend in these tracepoints.
->>>
->>> @lock_cnt: 759146
->>>
->>> @locked_ns:
->>> [1K, 2K)             499 |      |
->>> [2K, 4K)          206928 
->>> |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@|
->>> [4K, 8K)          147904 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@      |
->>> [8K, 16K)          64453 |@@@@@@@@@@@@@@@@      |
->>> [16K, 32K)        135467 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ |
->>> [32K, 64K)         75943 |@@@@@@@@@@@@@@@@@@@      |
->>> [64K, 128K)        38359 |@@@@@@@@@      |
->>> [128K, 256K)       46597 |@@@@@@@@@@@      |
->>> [256K, 512K)       32466 |@@@@@@@@      |
->>> [512K, 1M)          3945 |      |
->>> [1M, 2M)             642 |      |
->>> [2M, 4M)             750 |      |
->>> [4M, 8M)            1932 |      |
->>> [8M, 16M)           2114 |      |
->>> [16M, 32M)          1039 |      |
->>> [32M, 64M)           108 |      |
->>>
->>>
->>>
->>>
->>>>> ---
->>>>>   include/trace/events/cgroup.h |   56 
->>>>> +++++++++++++++++++++++++++++----
->>>>>   kernel/cgroup/rstat.c         |   70 
->>>>> ++++++++++++++++++++++++++++++++++-------
->>>>>   2 files changed, 108 insertions(+), 18 deletions(-)
->>>>>
->>>>> diff --git a/include/trace/events/cgroup.h 
->>>>> b/include/trace/events/cgroup.h
->>>>> index 13f375800135..0b95865a90f3 100644
->>>>> --- a/include/trace/events/cgroup.h
-> [...]
->>>>> +++ b/include/trace/events/cgroup.h >>>> 
->>>>> +DEFINE_EVENT(cgroup_rstat, cgroup_rstat_cpu_unlock_fastpath,
->>>>> +
->>>>> +    TP_PROTO(struct cgroup *cgrp, int cpu, bool contended),
->>>>> +
->>>>> +    TP_ARGS(cgrp, cpu, contended)
->>>>> +);
->>>>> +
->>>>>   #endif /* _TRACE_CGROUP_H */
->>>>>   /* This part must be outside protection */
->>>>> diff --git a/kernel/cgroup/rstat.c b/kernel/cgroup/rstat.c
->>>>> index 52e3b0ed1cee..fb8b49437573 100644
->>>>> --- a/kernel/cgroup/rstat.c
->>>>> +++ b/kernel/cgroup/rstat.c
->>>>> @@ -19,6 +19,60 @@ static struct cgroup_rstat_cpu 
->>>>> *cgroup_rstat_cpu(struct cgroup *cgrp, int cpu)
->>>>>       return per_cpu_ptr(cgrp->rstat_cpu, cpu);
->>>>>   }
->>>>> +/*
->>>>> + * Helper functions for rstat per CPU lock (cgroup_rstat_cpu_lock).
->>>>> + *
->>>>> + * This makes it easier to diagnose locking issues and contention in
->>>>> + * production environments. The parameter @fast_path determine the
->>>>> + * tracepoints being added, allowing us to diagnose "flush" related
->>>>> + * operations without handling high-frequency fast-path "update" 
->>>>> events.
->>>>> + */
->>>>> +static __always_inline
->>>>> +unsigned long _cgroup_rstat_cpu_lock(raw_spinlock_t *cpu_lock, 
->>>>> int cpu,
->>>>> +                     struct cgroup *cgrp, const bool fast_path)
->>>>> +{
->>>>> +    unsigned long flags;
->>>>> +    bool contended;
->>>>> +
->>>>> +    /*
->>>>> +     * The _irqsave() is needed because cgroup_rstat_lock is
->>>>> +     * spinlock_t which is a sleeping lock on PREEMPT_RT. Acquiring
->>>>> +     * this lock with the _irq() suffix only disables interrupts on
->>>>> +     * a non-PREEMPT_RT kernel. The raw_spinlock_t below disables
->>>>> +     * interrupts on both configurations. The _irqsave() ensures
->>>>> +     * that interrupts are always disabled and later restored.
->>>>> +     */
->>>>> +    contended = !raw_spin_trylock_irqsave(cpu_lock, flags);
->>>>> +    if (contended) {
->>>>> +        if (fast_path)
->>>>> + trace_cgroup_rstat_cpu_lock_contended_fastpath(cgrp, cpu, 
->>>>> contended);
->>>>> +        else
->>>>> +            trace_cgroup_rstat_cpu_lock_contended(cgrp, cpu, 
->>>>> contended);
->>>>> +
->>>>> +        raw_spin_lock_irqsave(cpu_lock, flags);
->>
->> Could you do a local_irq_save() before calling trace_cgroup*() and 
->> raw_spin_lock()? Would that help in eliminating this high lock hold 
->> time?
->>
->
-> Nope it will not eliminating high lock *hold* time, because the hold
-> start timestamp is first taken *AFTER* obtaining the lock.
->
-> It could help the contended "wait-time" measurement, but my prod
-> measurements show this isn't an issues.
+On Thu, 2024-05-02 at 10:44 +0200, Jiri Slaby wrote:
+> On 02. 05. 24, 9:55, Christoph Fritz wrote:
+> > This commit introduces LIN-Bus support for UART devices equipped with
+> > LIN transceivers, utilizing the Serial Device Bus (serdev) interface.
+> > 
+> > For more details on an adapter, visit: https://hexdev.de/hexlin#tty
+> ...
+> > --- /dev/null
+> > +++ b/drivers/net/can/lin-serdev.c
+> > @@ -0,0 +1,514 @@
+> > +// SPDX-License-Identifier: GPL-2.0+
+> > +/* Copyright (C) 2024 hexDEV GmbH - https://hexdev.de */
+> > +
+> > +#include <linux/module.h>
+> > +#include <linux/wait.h>
+> > +#include <linux/init.h>
+> > +#include <linux/errno.h>
+> > +#include <linux/string.h>
+> > +#include <linux/kernel.h>
+> 
+> What do you need kernel.h for? You should explicitly require what you 
+> need (you apparently do), so kernel.h should not be needed.
 
-Right.
+OK
 
+> 
+> > +#include <net/lin.h>
+> > +#include <linux/of.h>
+> > +#include <linux/serdev.h>
+> > +#include <linux/slab.h>
+> > +#include <linux/kfifo.h>
+> > +#include <linux/workqueue.h>
+> > +#include <linux/tty.h>
+> 
+> Might be eaier to maintain if you sort them.
 
->
->> You can also do a local_irq_save() first before the trylock. That 
->> will eliminate the duplicated irq_restore() and irq_save() when there 
->> is contention.
->
-> I wrote the code like this on purpose ;-)
-> My issue with this code/lock is it cause latency issues for softirq 
-> NET_RX. So, when I detect a "contended" lock event, I do want a 
-> irq_restore() as that will allow networking/do_softirq() to run before 
-> I start waiting for the lock (with IRQ disabled).
->
-Assuming the time taken by the tracing code is negligible, we are 
-talking about disabling IRQ almost immediate after enabling it. The 
-trylock time should be relatively short so the additional delay due to 
-irq disabled for the whole period is insignificant.
->
->> If not, there may be NMIs mixed in.
->>
->
-> NMIs are definitely on my list of things to investigate.
-> These AMD CPUs also have other types of interrupts that needs a close 
-> look.
->
-> The easier explaination is that the lock isn't "yielded" on every cycle
-> through the for each CPU loop.
->
-> Lets look at the data I provided above:
->
-> >>   Flushes(5033) 294/interval (avg 62/sec)
-> >>   Locks(53374) 1748/interval (avg 667/sec)
-> >>   Yields(48341) 1454/interval (avg 604/sec)
-> >>   Contended(48104) 1450/interval (avg 601/sec)
->
-> In this 1 second sample, we have 294 flushes, and more yields 1454,
-> great but the factor is not 128 (num-of-CPUs) but closer to 5. Thus, on
-> average we hold the lock for (128/5) 25.6 CPUs-walks.
->
-> We have spoken about releasing the lock on for_each CPU before... it
-> will likely solve this long hold time, but IMHO a mutex is still the
-> better solution.
+OK, hid driver gets also sorted
 
-I may have mistakenly thinking the lock hold time refers to just the 
-cpu_lock. Your reported times here are about the cgroup_rstat_lock. 
-Right? If so, the numbers make sense to me.
+> 
+> > +#define LINSER_SAMPLES_PER_CHAR		10
+> > +#define LINSER_TX_BUFFER_SIZE		11
+> > +#define LINSER_RX_FIFO_SIZE		256
+> > +#define LINSER_PARSE_BUFFER		24
+> > +
+> > +struct linser_rx {
+> > +	u8 data;
+> > +	u8 flag;
+> > +};
+> > +
+> > +enum linser_rx_status {
+> > +	NEED_MORE = -1,
+> > +	MODE_OK = 0,
+> > +	NEED_FORCE,
+> > +};
+> > +
+> > +struct linser_priv {
+> > +	struct lin_device *lin_dev;
+> > +	struct serdev_device *serdev;
+> > +	DECLARE_KFIFO_PTR(rx_fifo, struct linser_rx);
+> > +	struct delayed_work rx_work;
+> > +	ulong break_usleep_min;
+> > +	ulong break_usleep_max;
+> > +	ulong post_break_usleep_min;
+> > +	ulong post_break_usleep_max;
+> > +	ulong force_timeout_jfs;
+> 
+> The same as for uint :)
 
-Cheers,
-Longman
+OK
 
+> 
+> > +	struct lin_responder_answer respond_answ[LIN_NUM_IDS];
+> > +	struct mutex resp_lock; /* protects respond_answ */
+> > +	bool is_stopped;
+> > +};
+> ...
+> > +static void linser_derive_timings(struct linser_priv *priv, u16 bitrate)
+> > +{
+> > +	unsigned long break_baud = (bitrate * 2) / 3;
+> > +	unsigned long timeout_us;
+> > +
+> 
+> Are those 1000000UL USEC_PER_SEC?
+
+yes
+
+> 
+> > +	priv->break_usleep_min = (1000000UL * LINSER_SAMPLES_PER_CHAR) /
+> > +				 break_baud;
+> > +	priv->break_usleep_max = priv->break_usleep_min + 50;
+> > +	priv->post_break_usleep_min = (1000000UL * 1 /* 1 bit */) / break_baud;
+> > +	priv->post_break_usleep_max = priv->post_break_usleep_min + 30;
+> > +
+> > +	timeout_us = DIV_ROUND_CLOSEST(1000000UL * 256 /* bit */, bitrate);
+> > +	priv->force_timeout_jfs = usecs_to_jiffies(timeout_us);
+> > +}
+> ...
+> > +static bool linser_tx_frame_as_responder(struct linser_priv *priv, u8 id)
+> > +{
+> > +	struct lin_responder_answer *answ = &priv->respond_answ[id];
+> > +	struct serdev_device *serdev = priv->serdev;
+> > +	u8 buf[LINSER_TX_BUFFER_SIZE];
+> > +	u8 checksum, count, n;
+> > +	ssize_t write_len;
+> > +
+> > +	mutex_lock(&priv->resp_lock);
+> > +
+> > +	if (!answ->is_active)
+> > +		goto unlock_and_exit_false;
+> > +
+> > +	if (answ->is_event_frame) {
+> > +		struct lin_responder_answer *e_answ;
+> > +
+> > +		e_answ = &priv->respond_answ[answ->event_associated_id];
+> > +		n = min(e_answ->lf.len, LIN_MAX_DLEN);
+> > +		if (memcmp(answ->lf.data, e_answ->lf.data, n) != 0) {
+> > +			memcpy(answ->lf.data, e_answ->lf.data, n);
+> > +			checksum = lin_get_checksum(LIN_FORM_PID(answ->lf.lin_id),
+> > +						    n, e_answ->lf.data,
+> > +						    answ->lf.checksum_mode);
+> > +			answ = e_answ;
+> > +		} else {
+> > +			goto unlock_and_exit_false;
+> 
+> Can't you simply use guard(mutex) above and avoid the error-prone 
+> gotos/cleanup completely?
+
+OK
+
+> 
+> > +		}
+> > +	} else {
+> > +		checksum = answ->lf.checksum;
+> > +	}
+> > +
+> > +	count = min(answ->lf.len, LIN_MAX_DLEN);
+> > +	memcpy(&buf[0], answ->lf.data, count);
+> > +	buf[count] = checksum;
+> > +
+> > +	mutex_unlock(&priv->resp_lock);
+> > +
+> > +	write_len = serdev_device_write(serdev, buf, count + 1, 0);
+> > +	if (write_len < count + 1)
+> > +		return false;
+> > +
+> > +	serdev_device_wait_until_sent(serdev, 0);
+> > +
+> > +	return true;
+> > +
+> > +unlock_and_exit_false:
+> > +	mutex_unlock(&priv->resp_lock);
+> > +	return false;
+> > +}
+> > +
+> > +static void linser_pop_fifo(struct linser_priv *priv, size_t n)
+> > +{
+> > +	struct serdev_device *serdev = priv->serdev;
+> > +	struct linser_rx dummy;
+> > +	size_t ret, i;
+> > +
+> > +	for (i = 0; i < n; i++) {
+> > +		ret = kfifo_out(&priv->rx_fifo, &dummy, 1);
+> 
+> Does kfifo_skip() not work for records? (I added it recently for serial.)
+
+Using kfifo_skip() greatly simplifies this function and it works for
+records (uses __kfifo_skip_r), tests are successful.
+
+Maybe the comment in kfifo.h could be made more clear from:
+
+ "kfifo_skip - skip output data"
+to
+ "kfifo_skip - skip the next fifo record"
+
+> 
+> > +		if (ret != 1) {
+> > +			dev_err(&serdev->dev, "Failed to pop from FIFO\n");
+> > +			break;
+> > +		}
+> > +	}
+> > +}
+> 
+
+Let me address these points and reroll in v3.
+
+Thanks
+  -- Christoph
 
