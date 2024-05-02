@@ -1,111 +1,100 @@
-Return-Path: <netdev+bounces-93137-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93139-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B66B58BA419
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 01:37:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C46C08BA425
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 01:39:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E71151C23165
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 23:37:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7FAE32825BC
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 23:39:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A63E54762;
-	Thu,  2 May 2024 23:36:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73564153827;
+	Thu,  2 May 2024 23:39:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="oo2UZqqe"
 X-Original-To: netdev@vger.kernel.org
-Received: from sgoci-sdnproxy-4.icoremail.net (sgoci-sdnproxy-4.icoremail.net [129.150.39.64])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A8CB4CDE0;
-	Thu,  2 May 2024 23:36:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.150.39.64
+Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC18757C99
+	for <netdev@vger.kernel.org>; Thu,  2 May 2024 23:39:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714693011; cv=none; b=MivoRU4yCbYSxIcokDEVmGkspRBUL7iDZSgVoOt24rncZfX84Dmc6zS0ak0TSBCreY+MdXzU4aJ1Bu6ETh6TpKM2mVe8YKlVm2fnW3oyFkDggt2c5Cjzk8SMiOXhrv1mrYMoAOUP5WnovRYV8tx8ZGBmne0xzXhEae4BSFGtLPU=
+	t=1714693161; cv=none; b=qQ6lVAUe4eQQEq99LKiq3gXGIUsIMJ3+CbQwkT7adfpwDFEyiktcItrmJWJhAoBHEgUuBpJN2tIb9VNpe+IzhTPqFTy+TPctJqPwzkDCDZ+84+l5Dz0DVHw8gh61y3sc4OsvKP0M1jg6XQU1lTD55259HjzQGLNSfueAvghXEF4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714693011; c=relaxed/simple;
-	bh=Fjn0sWcJSSpaNhOq3cT/DmSa0Heykx1LsFKm4zCLDGg=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 In-Reply-To:References; b=hgvwzWqroqzZSiaMC8XvKoOQ6C3yhymT39WQplQouS3jU61UfnZHN2n3GGhq9/19ZJrwXVXg0bxlztKtQlz8YwHopYs4fxTFcMNIxQrOLqcCbi3QJq3ND3IB3MW22NE7FM9RVZHac+GP+od6DnDhffxxEgIVwMePLHHEZM7HcXE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn; spf=pass smtp.mailfrom=zju.edu.cn; arc=none smtp.client-ip=129.150.39.64
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
-Received: from ubuntu.localdomain (unknown [221.192.179.227])
-	by mail-app2 (Coremail) with SMTP id by_KCgC3ZqZwIzRm7PwDAA--.6463S4;
-	Fri, 03 May 2024 07:36:26 +0800 (CST)
-From: Duoming Zhou <duoming@zju.edu.cn>
-To: netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	linux-hams@vger.kernel.org,
-	pabeni@redhat.com,
-	kuba@kernel.org,
-	edumazet@google.com,
-	davem@davemloft.net,
-	jreuter@yaina.de,
-	horms@kernel.org,
-	Markus.Elfring@web.de,
-	dan.carpenter@linaro.org,
-	lars@oddbit.com,
-	Duoming Zhou <duoming@zju.edu.cn>
-Subject: [PATCH net v2 2/2] ax25: fix potential reference counting leak in ax25_addr_ax25dev
-Date: Fri,  3 May 2024 07:36:16 +0800
-Message-Id: <74e840d98f2bfc79c6059993b2fc1ed3888faba4.1714690906.git.duoming@zju.edu.cn>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <cover.1714690906.git.duoming@zju.edu.cn>
-References: <cover.1714690906.git.duoming@zju.edu.cn>
-In-Reply-To: <cover.1714690906.git.duoming@zju.edu.cn>
-References: <cover.1714690906.git.duoming@zju.edu.cn>
-X-CM-TRANSID:by_KCgC3ZqZwIzRm7PwDAA--.6463S4
-X-Coremail-Antispam: 1UD129KBjvdXoW7GrWrAF18GFyrZw17XF45GFg_yoWDZFc_ua
-	s7ury7Ww1DJr1jkw1rXF48Jry7Zw1vgwn7Ar1ayFZ7trWYqa47JrWkJwn8XFyUWFy7Cr4S
-	qF1rGrW3Cw4SkjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUbl8FF20E14v26rWj6s0DM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUXwA2048vs2IY02
-	0Ec7CjxVAFwI0_Xr0E3s1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xv
-	wVC0I7IYx2IY67AKxVW5JVW7JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVWxJVW8Jr1l84
-	ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1le2I2
-	62IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcV
-	AFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG
-	0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka0xkIwI
-	1lc7CjxVAaw2AFwI0_Jw0_GFylc2xSY4AK67AK6FWl42xK82IYc2Ij64vIr41l4c8EcI0E
-	c7CjxVAaw2AFwI0_Jw0_GFyl4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxV
-	WUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI
-	7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r
-	4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI
-	42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUbE_MUUUUU
-X-CM-SenderInfo: qssqjiasttq6lmxovvfxof0/1tbiAwUJAWYztgkCSgAMsg
+	s=arc-20240116; t=1714693161; c=relaxed/simple;
+	bh=GK9xI1MmSlOzhapTknrbKNCbWi3Zk586qJQBqrNAhDM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=udb9UOSwvhErgT5WsK1d9ILrPREf01sm4U32BmzvAJ9DILSr3d7ufDgCtb/+uH01KLbQmOqhjeZSXDyfetPVftlbFNtNVgFnOPkId8jh0R1vb3bHOF3+xbcw4CKvgV+MlR7kScpfNBwoY+x7crUa3/d60P8oltUsrbjKt0gaFQQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=oo2UZqqe; arc=none smtp.client-ip=95.215.58.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <dc051219-5da9-4de9-87fc-82db4c870c3e@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1714693155;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7+OYu68/VM5ElvGQT9jeiRSgGoDTW9xL8fqocP25lQo=;
+	b=oo2UZqqeSiMX7jWWokh3AhyW36QZ46ZcR0gmtWbMcYw+86bzvQjDGiMgD0zQoecdwbgCMH
+	3HRDKRdJg+8FRvBe1od249uuJEmlwX7MVbHdwi4tkaDgrq8CiQEJSBWU34w+yVqN3jOCF+
+	T3pQN/PHnJu8cUjxHgBhfoDobOQiBe4=
+Date: Thu, 2 May 2024 16:39:07 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Subject: Re: [PATCH net-next v3 3/3] selftests/bpf: Add test for the use of
+ new args in cong_control
+To: Miao Xu <miaxu@meta.com>
+Cc: Eric Dumazet <edumazet@google.com>, "David S . Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>,
+ Martin Lau <kafai@meta.com>, netdev@vger.kernel.org, bpf@vger.kernel.org
+References: <20240502042318.801932-1-miaxu@meta.com>
+ <20240502042318.801932-4-miaxu@meta.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <20240502042318.801932-4-miaxu@meta.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-The reference counting of ax25_dev potentially increase more
-than once in ax25_addr_ax25dev(), which will cause memory leak.
+On 5/1/24 9:23 PM, Miao Xu wrote:
+> This patch adds a selftest to show the usage of the new arguments in
+> cong_control. For simplicity's sake, the testing example reuses cubic's
+> kernel functions.
+> ---
+> Changes in v3:
+> * Renamed the selftest file and the bpf struct_ops' name.
+> * Minor changes such as removing unused comments.
+> 
+> Changes in v2:
+> * Added highlights to explain major differences between the bpf program
+> and tcp_cubic.c.
+> * bpf_tcp_helpers.h should not be further extended, so remove the
+>    dependency on this file. Use vmlinux.h instead.
+> * Minor changes such as indentation.
+> 
+> Signed-off-by: Miao Xu <miaxu@meta.com>
+> ---
+>   .../selftests/bpf/progs/bpf_cc_cubic.c        | 206 ++++++++++++++++++
 
-In order to fix the above issue, only increase the reference
-counting of ax25_dev once, when the res is not null.
+I just noticed that the bpf_cc_cubic is not run by the test_progs. I have added 
+a test to prog_tests/bpf_tcp_ca.c to do that.
 
-Fixes: d01ffb9eee4a ("ax25: add refcount in ax25_dev to avoid UAF bugs")
-Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
-Signed-off-by: Duoming Zhou <duoming@zju.edu.cn>
----
- net/ax25/ax25_dev.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+I also fixed up your SOB.
 
-diff --git a/net/ax25/ax25_dev.c b/net/ax25/ax25_dev.c
-index 07723095c60..7c2ea7309b0 100644
---- a/net/ax25/ax25_dev.c
-+++ b/net/ax25/ax25_dev.c
-@@ -37,8 +37,9 @@ ax25_dev *ax25_addr_ax25dev(ax25_address *addr)
- 	for (ax25_dev = ax25_dev_list; ax25_dev != NULL; ax25_dev = ax25_dev->next)
- 		if (ax25cmp(addr, (const ax25_address *)ax25_dev->dev->dev_addr) == 0) {
- 			res = ax25_dev;
--			ax25_dev_hold(ax25_dev);
- 		}
-+	if (res)
-+		ax25_dev_hold(res);
- 	spin_unlock_bh(&ax25_dev_lock);
- 
- 	return res;
--- 
-2.17.1
+Applied. Thanks.
+
+>   .../selftests/bpf/progs/bpf_tracing_net.h     |  10 +
+>   2 files changed, 216 insertions(+)
+>   create mode 100644 tools/testing/selftests/bpf/progs/bpf_cc_cubic.c
 
 
