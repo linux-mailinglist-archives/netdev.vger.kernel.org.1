@@ -1,174 +1,109 @@
-Return-Path: <netdev+bounces-92958-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92959-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13D088B9751
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 11:13:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37FD88B9760
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 11:16:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4CF4BB24019
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 09:13:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9F93B281379
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 09:16:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BFF255E73;
-	Thu,  2 May 2024 09:12:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14A2D53379;
+	Thu,  2 May 2024 09:16:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="j2KimVi8"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="VlFbWNta"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F5DA55C3C
-	for <netdev@vger.kernel.org>; Thu,  2 May 2024 09:12:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.122
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52364524D4;
+	Thu,  2 May 2024 09:16:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714641149; cv=none; b=r5rYNFl9vcyiqp30AZkTYyO8eKa+beNybgQDnLhPeXHCgetaCAMbqyB/XNwzr5STeGV8JBNxri/RUrpq6u/moghOpOrfUGSsJFOK2vk+o3bhmAKSf8FqZKjUZ9cXjoPe1thQTz9K5GYho6BHb+v27Xn7IbLu8hOXcC3GSgkRp7M=
+	t=1714641387; cv=none; b=UVIl49wCeM72CAUPVSD5cJwdz3T01f8mwdmO2r+c/U606WIHP8GEh2vJa6r4/Ij3g9K/qQ/UMvs/e9nQbghhf7lG6Bm3jlg442dOLaRBMcXI/SUC5mwVZ8VG95vw0DmeSDoTIQhqjmOCVV/eqOdS5LllRVKVvYKdH7AFEI/55RQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714641149; c=relaxed/simple;
-	bh=iCsG9zIwH2BrnZHdToN6vszkvwqpcmcTi8Z4M/RCado=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Cz0I45PPhfaB12FGRFHoqF1bCDOeRrHqKLZn5YAzqVvSalD0ZQZgq0vGBAg6XWcf28qwVheVBPNrQuOBjZLKvVco1so5e7iSXgDm/qZBo+0PyDA6oT1E/jT37a4NkSkzcMJnlWNz5TKQD3nJ8rQwDRad7eGav7jpqsrf7hcYnJg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=j2KimVi8; arc=none smtp.client-ip=185.125.188.122
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
-Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com [209.85.214.199])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id CA775411E9
-	for <netdev@vger.kernel.org>; Thu,  2 May 2024 09:12:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1714641138;
-	bh=AgYbELQ6gtIAnsZhwql/Vj7FiSMAsbvYTgHu1HlyF0U=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version;
-	b=j2KimVi8S8taska1W+0x9oHYugfawfjhqGM+8nVC48X22wMqPfdXM2x40616Sluki
-	 A9fZepNwMNC6SZCn1o6P08CCiCz5WeB/MGFxmEogBSRjuDy3Ad/r3gngCyT2rohnqW
-	 7osEJqn7Y2c8mVkupznIyb31RDpmqterArtQdqN92PyLzkwcP0Kiyj6NY7+moZLclW
-	 922ULOCHboSxcnHhMNvq2n4IiCk4rwgBTWna28Bs7dbcwYfdvkUvoK84eZ4zDe+pF5
-	 aFOI0xqZCkXJwzYTyXHB5revwkMgGOvtSilrRinE7L9C4/Ooo2L4D6YAhou8qdS1s9
-	 W8tcFdt0dEkRA==
-Received: by mail-pl1-f199.google.com with SMTP id d9443c01a7336-1e278ebfea1so85618485ad.0
-        for <netdev@vger.kernel.org>; Thu, 02 May 2024 02:12:18 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714641137; x=1715245937;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=AgYbELQ6gtIAnsZhwql/Vj7FiSMAsbvYTgHu1HlyF0U=;
-        b=OPU/kZqyLOtPhfKKNBa5+piZYDgKJmNMG+9f+EfWj+XfsWD9gf2Jp8Nmt66u5Pl2kD
-         Wz3Vm4/2N4NDalwycc0RvNvEnpbSVmdlbcNQG+BqCc8dVa3k0MyEMeJ4WVNKD4PyvbbM
-         Jg13CL3AKTyxk2EKZo+R9dlKHaVakg4jB8BqnXmTsK3iBUWHXJYjVgD1FoMiQkjStueX
-         Ub/aZqbrw4NlgPu0HcE/nOnbKPfKrjA0YEYcuFXZwH1vvTRG/OtxckV+k6BcoYeSRjyT
-         SDrQkZYnbDbAFGwcmkU7D4OCoSc2WPKNdH1KOnn/xL3MkInHhS0WkmCY5ZXaPuZS16wk
-         OHEQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW4SlFoEzjcF4mBHZpLqDSS171XQXjBqAB65hAudWqcLB4W2WwEkvdDvahIwedeJRQnRqOqnydnjr2x+h3fWyBotgXXMK/s
-X-Gm-Message-State: AOJu0Ywv410VEzX1vV+EOCTc9w0FvdihmMaDIE2L+9pYPezSeaYXMk7M
-	m8wBS3HF1n2mOYcaU4J6Qf4eOub5iKg4+gypL6niSPO4+TT3G9kpFnfn6rVkSP5RaXqF3hMmaHs
-	eSKCXW83vkfV6vduvRoAGTS3waO4/aDV93BeVS76vlq7XzHRABJQAasjtoaLN71OdXXac1g==
-X-Received: by 2002:a17:903:2312:b0:1e3:dfdc:6972 with SMTP id d18-20020a170903231200b001e3dfdc6972mr6747435plh.9.1714641137320;
-        Thu, 02 May 2024 02:12:17 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGw1zAhwq5ZdDzzQKMd8+CBt/+8GW9Y3OXsgWotH06aOH7F9NJd6OIBnq5uXNr+zk5WDR2eEQ==
-X-Received: by 2002:a17:903:2312:b0:1e3:dfdc:6972 with SMTP id d18-20020a170903231200b001e3dfdc6972mr6747417plh.9.1714641136990;
-        Thu, 02 May 2024 02:12:16 -0700 (PDT)
-Received: from rickywu0421-ThinkPad-X1-Carbon-Gen-11.. (2001-b400-e239-aa6a-7bb4-902b-1963-242d.emome-ip6.hinet.net. [2001:b400:e239:aa6a:7bb4:902b:1963:242d])
-        by smtp.gmail.com with ESMTPSA id lc7-20020a170902fa8700b001e3e081dea1sm804157plb.0.2024.05.02.02.12.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 May 2024 02:12:16 -0700 (PDT)
-From: Ricky Wu <en-wei.wu@canonical.com>
-To: jesse.brandeburg@intel.co
-Cc: anthony.l.nguyen@intel.com,
-	intel-wired-lan@lists.osuosl.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	rickywu0421@gmail.com,
-	en-wei.wu@canonical.com
-Subject: [PATCH] e1000e: fix link fluctuations problem
-Date: Thu,  2 May 2024 17:12:15 +0800
-Message-Id: <20240502091215.13068-1-en-wei.wu@canonical.com>
-X-Mailer: git-send-email 2.40.1
+	s=arc-20240116; t=1714641387; c=relaxed/simple;
+	bh=XpgtUboWUY4K6D8ln7r4Kd9Dv08JhYX+E7YkIpI3eo4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oyt4LOdExWE8Avd3+POYrvR/y0GPC41Z3W2GKnpRx7elJRued7kdvymIH7Stm/BTpVxMK4/wC5vDe/lCQyb4eM9dX1cv6wXNxvkoWq6zNETorC5GgVsIa552EqPiQJyBN3rhsfMohRXOFo69hCi7e4z11/92ieJQmCg70T8H18E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=VlFbWNta; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=zdfrErG2WKK57Kqg0tDJeJKezf1hsqRf679zsJ01Sx8=; b=VlFbWNta+BWffxnbEWRjYv+8ar
+	0mSAZEi/5K7GE5WmbbDT+r4ARA9iQeFFKkzCACPe/gwvSf/LmUcAlJNX/ZoW8bwgnYR9QDAGNKCRl
+	LzUKo6XjLhjBfyI4SmA0ITYpIXJydjEMOIR5DsW+FpCgValTn4WKP1/mCF21xbM9WHcwZgrRyRpU3
+	FiEPtEuWLxgIvsZuc6BZmNuqB9C27xGU6sZ+HHCefx17Ax1NXRdpTkAdW+Lul7YwDGf4y9Ll5M8Pf
+	tKmEV2OKo3OjFdHTXGjEEinxeVzjqku1MmncoJ0aeBuJXe50y5tEKJEF/VvmaENEvgQqxyQgc0DNI
+	6DxwtawA==;
+Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
+	by casper.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1s2SY5-00000001KYe-3aFr;
+	Thu, 02 May 2024 09:16:18 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+	id 82B8B30057A; Thu,  2 May 2024 11:16:17 +0200 (CEST)
+Date: Thu, 2 May 2024 11:16:17 +0200
+From: Peter Zijlstra <peterz@infradead.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Tobias Huschle <huschle@linux.ibm.com>,
+	Luis Machado <luis.machado@arm.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Abel Wu <wuyun.abel@bytedance.com>,
+	Linux Kernel <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
+	virtualization@lists.linux.dev, netdev@vger.kernel.org,
+	nd <nd@arm.com>, borntraeger@linux.ibm.com,
+	Ingo Molnar <mingo@kernel.org>,
+	Mike Galbraith <umgwanakikbuti@gmail.com>
+Subject: Re: EEVDF/vhost regression (bisected to 86bfbb7ce4f6 sched/fair: Add
+ lag based placement)
+Message-ID: <20240502091617.GZ30852@noisy.programming.kicks-ass.net>
+References: <73123.124031407552500165@us-mta-156.us.mimecast.lan>
+ <20240314110649-mutt-send-email-mst@kernel.org>
+ <84704.124031504335801509@us-mta-515.us.mimecast.lan>
+ <20240315062839-mutt-send-email-mst@kernel.org>
+ <b3fd680c675208370fc4560bb3b4d5b8@linux.ibm.com>
+ <20240319042829-mutt-send-email-mst@kernel.org>
+ <4808eab5fc5c85f12fe7d923de697a78@linux.ibm.com>
+ <ZjDM3SsZ3NkZuphP@DESKTOP-2CCOB1S.>
+ <20240501105151.GG40213@noisy.programming.kicks-ass.net>
+ <20240501112830-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240501112830-mutt-send-email-mst@kernel.org>
 
-As described in https://bugzilla.kernel.org/show_bug.cgi?id=218642,
-some e1000e NIC reports link up -> link down -> link up when hog-plugging
-the Ethernet cable.
+On Wed, May 01, 2024 at 11:31:02AM -0400, Michael S. Tsirkin wrote:
+> On Wed, May 01, 2024 at 12:51:51PM +0200, Peter Zijlstra wrote:
 
-The problem is because the unstable behavior of Link Status bit in
-PHY Status Register of some e1000e NIC. When we re-plug the cable,
-the e1000e_phy_has_link_generic() (called after the Link-Status-Changed
-interrupt) has read this bit with 1->0->1 (1=link up, 0=link down)
-and e1000e reports it to net device layer respectively.
+> > I'm still wondering why exactly it is imperative for t2 to preempt t1.
+> > Is there some unexpressed serialization / spin-waiting ?
+> 
+> 
+> I am not sure but I think the point is that t2 is a kworker. It is
+> much cheaper to run it right now when we are already in the kernel
+> than return to userspace, let it run for a bit then interrupt it
+> and then run t2.
+> Right, Tobias?
 
-This patch solves the problem by passing polling delays on
-e1000e_phy_has_link_generic() so that it will not get the unstable
-states of Link Status bit.
+So that is fundamentally a consequence of using a kworker.
 
-Also, the sleep codes in e1000e_phy_has_link_generic() only take
-effect when error occurs reading the MII register. Moving these codes
-forward to the beginning of the loop so that the polling delays passed
-into this function can take effect on any situation.
+So I tried to have a quick peek at vhost to figure out why you're using
+kworkers... but no luck :/
 
-Signed-off-by: Ricky Wu <en-wei.wu@canonical.com>
----
- drivers/net/ethernet/intel/e1000e/ich8lan.c |  5 ++++-
- drivers/net/ethernet/intel/e1000e/phy.c     | 10 ++++++----
- 2 files changed, 10 insertions(+), 5 deletions(-)
+Also, when I look at drivers/vhost/ it seems to implement it's own
+worker and not use normal workqueues or even kthread_worker. Did we
+really need yet another copy of all that?
 
-diff --git a/drivers/net/ethernet/intel/e1000e/ich8lan.c b/drivers/net/ethernet/intel/e1000e/ich8lan.c
-index f9e94be36e97..c462aa6e6dee 100644
---- a/drivers/net/ethernet/intel/e1000e/ich8lan.c
-+++ b/drivers/net/ethernet/intel/e1000e/ich8lan.c
-@@ -1427,8 +1427,11 @@ static s32 e1000_check_for_copper_link_ich8lan(struct e1000_hw *hw)
- 	/* First we want to see if the MII Status Register reports
- 	 * link.  If so, then we want to get the current speed/duplex
- 	 * of the PHY.
-+	 * Some PHYs have link fluctuations with the instability of
-+	 * Link Status bit (BMSR_LSTATUS) in MII Status Register.
-+	 * Increase the iteration times and delay solves the problem.
- 	 */
--	ret_val = e1000e_phy_has_link_generic(hw, 1, 0, &link);
-+	ret_val = e1000e_phy_has_link_generic(hw, COPPER_LINK_UP_LIMIT, 100000, &link);
- 	if (ret_val)
- 		goto out;
- 
-diff --git a/drivers/net/ethernet/intel/e1000e/phy.c b/drivers/net/ethernet/intel/e1000e/phy.c
-index 93544f1cc2a5..ef056363d721 100644
---- a/drivers/net/ethernet/intel/e1000e/phy.c
-+++ b/drivers/net/ethernet/intel/e1000e/phy.c
-@@ -1776,7 +1776,13 @@ s32 e1000e_phy_has_link_generic(struct e1000_hw *hw, u32 iterations,
- 	u16 i, phy_status;
- 
- 	*success = false;
-+
- 	for (i = 0; i < iterations; i++) {
-+		if (usec_interval >= 1000)
-+			msleep(usec_interval / 1000);
-+		else
-+			udelay(usec_interval);
-+
- 		/* Some PHYs require the MII_BMSR register to be read
- 		 * twice due to the link bit being sticky.  No harm doing
- 		 * it across the board.
-@@ -1799,10 +1805,6 @@ s32 e1000e_phy_has_link_generic(struct e1000_hw *hw, u32 iterations,
- 			*success = true;
- 			break;
- 		}
--		if (usec_interval >= 1000)
--			msleep(usec_interval / 1000);
--		else
--			udelay(usec_interval);
- 	}
- 
- 	return ret_val;
--- 
-2.40.1
-
+Anyway, I tried to have a quick look at the code, but I can't seem to
+get a handle on what and why it's doing things.
 
