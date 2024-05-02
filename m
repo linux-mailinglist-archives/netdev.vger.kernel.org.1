@@ -1,97 +1,90 @@
-Return-Path: <netdev+bounces-92874-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92875-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8678B8B9334
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 03:50:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 374EA8B9349
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 04:09:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B73E91C2142A
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 01:50:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DEF9B1F2330B
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 02:09:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 268E114F98;
-	Thu,  2 May 2024 01:50:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3A7F134D1;
+	Thu,  2 May 2024 02:09:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NIVINzy3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZAFgY1D+"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3B2F134D1;
-	Thu,  2 May 2024 01:50:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C69D817543;
+	Thu,  2 May 2024 02:09:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714614634; cv=none; b=DaTN0/ctwD5N+UGyikiDxUXZ7cNj2vfl+vKPi3UWmIu/0NzIfNK9deeRvDLTH7aaZc3kbPhykunBzf0VMlcZi2J+8crO2lekx+72RL4LjiK4u/PlMwUm/9/753OR3w6klLGg06tXyC3XiqFHtCDQkzpAjgCIP0cuReJTBg6dI7M=
+	t=1714615768; cv=none; b=NQfEhpZUjAIu6SdG125JvirmYc64qAjqfo5zZubWKIG/ckHmwLtz1aRFw3lYsPFDdtRDgANEadOfVE3H3/S3lS4gCJD1LEwNMmVWxtyzfjA4NSh1k154i4fdIkU/RNoQ0GTFf7Bl5b21HMGwUfp4o9AJs9GHhuZKAbv/KFMez74=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714614634; c=relaxed/simple;
-	bh=UqJyOCfUOQaamn1XOe5aPpuJ96nuGK2MkwC3U20TSVU=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=V7P60zTQj5sFZjp4ApFl4i4xONyBnk/PSieqR4LdKD/kNcfS91Ciz5CFw6pIhqdO97qfUOLXbF5dSQ3WdGTP0ulzkR1CRLBU2LMo1LT1eFqHW64idqLY8OU0hL+isHCgwOF1lVtXf4VnkgXOiDelUD6QTGtIWBwMrC+hmy67yTE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NIVINzy3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 67CB6C4AF18;
-	Thu,  2 May 2024 01:50:33 +0000 (UTC)
+	s=arc-20240116; t=1714615768; c=relaxed/simple;
+	bh=gdObBBGhWXQFFeenVvWJpJgDsGdn/fzETCpIOEIRmGw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=qc01+DICC4A73KQ3FrAaTajaF+JqTDSfTVjb3qfExNLUIlYssPpn5SinnR70aoqCdf6UtEDkqxcZ+Jgpf3QxvadbLzc6Ght3IaKHPcCmvm8YgQzSZmvVsPxMKaFoc4Y6mMsjt/7EETjrDQTnAAN0aQLwWLh7ByT3AO3/pwiAkrw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZAFgY1D+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06F37C072AA;
+	Thu,  2 May 2024 02:09:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714614633;
-	bh=UqJyOCfUOQaamn1XOe5aPpuJ96nuGK2MkwC3U20TSVU=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=NIVINzy3hG9s+sSJaz05jpkC3br03/TPTbIKfPIu6Ch8TPj31vQ2wPOXOj5G8wlQ3
-	 tY20uEZoGIWPZxFmPjPmdTphE9xuP16i+LszcWE51h0t/aVOvWhatv1scvTd8pCWLJ
-	 uz8dHMYDEYvAs050sd97pYvuqg3fura7XEe9v3adLtIBAvOgA9QN8/Tf56GhzI6Qk7
-	 +pLkp6R+A5ACpGZ9zhez5v+5ZEHSgNOhnKsc/XII+Oigs8z++KAzQuzZ0MSOI28JOp
-	 BcqNUWORNlkssqX9xs9gbE4rO6yoGzW7nV6XdE+SaYSUtGDIGdal/vn/lo36e2of/W
-	 p1q6wK9gVcEgg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4FBA5C43440;
-	Thu,  2 May 2024 01:50:33 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1714615768;
+	bh=gdObBBGhWXQFFeenVvWJpJgDsGdn/fzETCpIOEIRmGw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ZAFgY1D+Weh0f6lq5gzwdcChgv7XcXWC1iYIYuBiTjHqaOQGQQJ5DGbQNrY7z7xFF
+	 CMCSU/o+kgffMwYcA2qHXG9J6X8qBviZpPv8d9N0PijN+wrRKatNnjXy+nTK8CKEkK
+	 /xsIZU50NxCz5Knwrm2XoiwmWVS5UNNJkHiqwWbL9Lo3tm9K/k3SRccBbZsxP4xwTp
+	 y4F25ymE/QiZayIcbP80ve/OAe7HZmzh1UZowscUaO19f92h3ofdbY7UzIHJGOd12U
+	 0inOGPT/vADwCHTOJZnK4pQgnHsk69rjrdb6z3gQNaiMfEw3TtvhI+8dvLTjf4Ymf5
+	 nxHe2ZEIfW4qg==
+Date: Wed, 1 May 2024 19:09:25 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: Florian Fainelli <florian.fainelli@broadcom.com>, Broadcom internal
+ kernel review list <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn
+ <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Richard
+ Cochran <richardcochran@gmail.com>, Radu Pirea
+ <radu-nicolae.pirea@oss.nxp.com>, Jay Vosburgh <j.vosburgh@gmail.com>, Andy
+ Gospodarek <andy@greyhouse.net>, Nicolas Ferre
+ <nicolas.ferre@microchip.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Jonathan Corbet
+ <corbet@lwn.net>, Horatiu Vultur <horatiu.vultur@microchip.com>,
+ UNGLinuxDriver@microchip.com, Simon Horman <horms@kernel.org>, Vladimir
+ Oltean <vladimir.oltean@nxp.com>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, Maxime Chevallier
+ <maxime.chevallier@bootlin.com>, Rahul Rameshbabu <rrameshbabu@nvidia.com>,
+ Willem de Bruijn <willemb@google.com>, Alexandra Winter
+ <wintera@linux.ibm.com>
+Subject: Re: [PATCH net-next v12 00/13] net: Make timestamping selectable
+Message-ID: <20240501190925.34c76ada@kernel.org>
+In-Reply-To: <20240430-feature_ptp_netnext-v12-0-2c5f24b6a914@bootlin.com>
+References: <20240430-feature_ptp_netnext-v12-0-2c5f24b6a914@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v3] net: ti: icssg_prueth: Add SW TX / RX Coalescing
- based on hrtimers
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171461463332.22196.9443088195151767378.git-patchwork-notify@kernel.org>
-Date: Thu, 02 May 2024 01:50:33 +0000
-References: <20240430120634.1558998-1-danishanwar@ti.com>
-In-Reply-To: <20240430120634.1558998-1-danishanwar@ti.com>
-To: MD Danish Anwar <danishanwar@ti.com>
-Cc: dan.carpenter@linaro.org, hkallweit1@gmail.com, andrew@lunn.ch,
- jan.kiszka@siemens.com, diogo.ivo@siemens.com, pabeni@redhat.com,
- kuba@kernel.org, edumazet@google.com, davem@davemloft.net,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, srk@ti.com, vigneshr@ti.com,
- r-gunasekaran@ti.com, rogerq@kernel.org, horms@kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Tue, 30 Apr 2024 17:36:34 +0530 you wrote:
-> Add SW IRQ coalescing based on hrtimers for RX and TX data path for ICSSG
-> driver, which can be enabled by ethtool commands:
+On Tue, 30 Apr 2024 17:49:43 +0200 Kory Maincent wrote:
+> Up until now, there was no way to let the user select the hardware
+> PTP provider at which time stamping occurs. The stack assumed that PHY time
+> stamping is always preferred, but some MAC/PHY combinations were buggy.
 > 
-> - RX coalescing
->   ethtool -C eth1 rx-usecs 50
-> 
-> - TX coalescing can be enabled per TX queue
-> 
-> [...]
+> This series updates the default MAC/PHY default timestamping and aims to
+> allow the user to select the desired hwtstamp provider administratively.
 
-Here is the summary with links:
-  - [net-next,v3] net: ti: icssg_prueth: Add SW TX / RX Coalescing based on hrtimers
-    https://git.kernel.org/netdev/net-next/c/dcb3fba6fa34
-
-You are awesome, thank you!
+Looks like there's a linking problem starting with patch 9. On a quick
+look the functions from a module are now called by build-in code.
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
