@@ -1,74 +1,71 @@
-Return-Path: <netdev+bounces-93065-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93066-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C08DB8B9E56
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 18:18:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 327988B9E5F
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 18:19:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7BCF32812A1
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 16:18:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 55D011C20BC1
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 16:19:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD1FD15CD52;
-	Thu,  2 May 2024 16:17:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90D8915D5A6;
+	Thu,  2 May 2024 16:19:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VKPx0IAX"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Tx/rzdJp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
+Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C2C115AAC5;
-	Thu,  2 May 2024 16:17:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16FEB1586D5
+	for <netdev@vger.kernel.org>; Thu,  2 May 2024 16:19:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714666677; cv=none; b=PT42rjsGbK8thiLKF9XPVyj5/6aMcxx6RKeX2BxNErT0WPsf699Kf2NdDSrEVRdnrSGXTK9Cx3dWDSZTRMZbcR5FfoIUN4/tFMmQqW9I0vCAWiF8rP9A7rfhcY2K8VLrzHpRC+GXSuWB3W1L4dR0PvpKF/z5lzaFE2ISGJwK9TQ=
+	t=1714666789; cv=none; b=DoSqmn67cB9gL2F6oavvMU0W90G7q9qNXRuDiPR5u2LOkrcYuD+OUyZAYf9WDDryn8MOMAPBxGdbpF6gBOGHdgz6LQAUr2ljNauMYsO77R/FwoB8Xe/kffVz8a8PEU+LDNc6T5NayMWAvKvQ4iJ99FMF+yMybAv1I7fpdZDmld8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714666677; c=relaxed/simple;
-	bh=cEqIGGUyVWa5uxNpPVM2vlHH+QFDKcLa0PlJSOtG4gU=;
+	s=arc-20240116; t=1714666789; c=relaxed/simple;
+	bh=HtYK7mWaa2UOsK9bjyVy6waqwPyO7X+/JtTr5mVurvY=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cLHtmhnb+2INY9B33xfZ7hVS9gWe8wURmdOi2QetaP45ryfsN1MyNSBBKgg+jL9LHsWwzI+2vo8vrSzwEjZhvqp+TuYrGK3T+uARg1MB2bFkVtBg027xgau2Mwf105zKjBs0G9v9cd1AebNelY5xqvNnCzxF9mh1ut5hxwcBZwc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VKPx0IAX; arc=none smtp.client-ip=209.85.160.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-43ab76cac73so18814711cf.1;
-        Thu, 02 May 2024 09:17:56 -0700 (PDT)
+	 In-Reply-To:Content-Type; b=k1ePZ1kka8gEu9+lunSRQrfSKq+oRZzmz8rwM708wytxLKnvPwta8tnFIAI/E1tqWw6TEMtG19UcHvbrck0VeFYaZF1eNmJEeE8HnCbBB8SSEQV2VN9sx2c4A1xu2h67jZ0BSYHCpAEhfX5m969fy6hDlXR79I2kQ2qJOCMjop4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Tx/rzdJp; arc=none smtp.client-ip=209.85.222.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-78efd1a0022so625443185a.3
+        for <netdev@vger.kernel.org>; Thu, 02 May 2024 09:19:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1714666675; x=1715271475; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Hwmfa5sTy1LCzxS1SPAnXHSisXva6F6NFOUkMwsGAas=;
-        b=VKPx0IAX39Qu/jaeSYuFo7KRJidp7IcSFsieByhcOGlcXDtAqZbP46iXpR1Pi4fJev
-         ZibVAuy7NwTPLKhmin4hGpYZ5FwtaEpdPa7JEsBwZxir2LrPbjvFdUSAZiJO/3dfSaYe
-         bKhhU+v69SPo7P8qhCqBPlLo9vJihbEiXUh2f+L0NQ5zftvqoy5Ne/wr6go9uY/rL4j8
-         CzInVkzGv9Y6ul0HFPznR2RDhkJ3nHYivGsKbShhQ1fkTrIEihF4f4gPSPWA87KkfN6g
-         tKN28rD9JZTed3kYXazpmYe7t6zzR6j2mJ7Gef2tEAw4Cc5Mx/ALk4sEfuVdt3uzxB17
-         9fFA==
+        d=broadcom.com; s=google; t=1714666787; x=1715271587; darn=vger.kernel.org;
+        h=in-reply-to:autocrypt:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=vs6IgguiaPj2IdRxKEtLcaB7iYYa0Dsd2qiLyYkUedg=;
+        b=Tx/rzdJpXw1jprOx5TtlS9h+RNOuc6ajtUhDwsTE7xgn6BUU44kOueLb7gaA2B0QQX
+         YKqXsYtogQIETA/DDouWGoIVXTSrrli61Qw9dwYg5iBS3H/SkIA7v/zGvfoJNtdluN3m
+         4U1q+CutKRTVuGdkqPSQdwvkCHv5eSgxmEngw=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714666675; x=1715271475;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Hwmfa5sTy1LCzxS1SPAnXHSisXva6F6NFOUkMwsGAas=;
-        b=K8TtBTvZ37Z5JjsB82mievtWLeirHk7szPI9u0/JpHxuZmJMm/bj7+UBMI3B1E35ah
-         dtPQFARipXUgt4tiqdgPFKF4SGtA70z3u+8znqPHgrXFM42kOwsTQPcUPspxh4EOuhUx
-         KNe/mFw57SgSyp0vt339gOT7MixfABFGj2JJo9gWPMydwbjmUgOhYV2reVckLchjJSRW
-         +jmCSKB9aZNkFdtMubLC//1KPUC7UQY3ozE/pV0Ibojl5FV6vyh8PHSXAzyz/qvEbTj0
-         E1OMzulC3tDR4uvclZoD/Nzxl/s+wEOEHWplVUF1mlEMJ7Gm3x1AOe+zeeGAgedoRV+5
-         Iz2g==
-X-Forwarded-Encrypted: i=1; AJvYcCW7RrWUkDySa+1wEh/9OF8E0dstu1WNd2i17Z8n4QVOLD9UAavJG/viAIxfDMEBIhoE31ptCmHPKsNQ+uesh2wyimg3QkBWUv/2ykkXA+x2y7rAtDgwsYCPuFoNwbBzUZiprqHz
-X-Gm-Message-State: AOJu0YzkfeyowJKN97BRc+wpd2AX4uPOmVGeVgUQnnvHa+OHhXZA4ySG
-	3tcI1AX+aPUlW/mpm125t4RjOWEhBY9usLmo/Jn64/dSiwg/ge4q
-X-Google-Smtp-Source: AGHT+IHVpjt/qWtZUSVgTGVvYKD4PNYjKYrkUC7bpjfvPHhKWtoYG5E+fJlmEBKh3GJdkHgb0jOp4g==
-X-Received: by 2002:ac8:578b:0:b0:439:b523:46e4 with SMTP id v11-20020ac8578b000000b00439b52346e4mr379194qta.32.1714666675133;
-        Thu, 02 May 2024 09:17:55 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1714666787; x=1715271587;
+        h=in-reply-to:autocrypt:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=vs6IgguiaPj2IdRxKEtLcaB7iYYa0Dsd2qiLyYkUedg=;
+        b=jwZnDo0BKSV/XAypN91/QwhmNSBwC8SfZSDIikmySnXm05uxWc65qxMOWDX3hZoxb9
+         7D1vw7dWB72cEVXmAt+FVvGjl7dfVvemJC4YkFkroXcDiR6IHuCYPnFSB7kz4gx0FdE3
+         UP4OOlnMwE+GDW77Vq/eMQSvwGNh0M8XQSthpgPemX+xFG4x9CpuKRJMiEzI3uCVNum3
+         iuP4G51Yg0T7cvFXpainjwIg/2t45Lc9JthLYA9yyvRX9ps3X2EYX+SK9BhZRia1Ia3B
+         pna829E/TGRWTsjTXsFstTFlxUCWPMzZnh4FEabDNt7ukFAc3bPCvKeB556E0oKXNCAx
+         Gqeg==
+X-Forwarded-Encrypted: i=1; AJvYcCVg+qwUtunRAq3XpHr6ACBGNUvkTrpaRrc5HLYUGpr87hU6ldL7ZI0l2J3Sy0DqkGDShm7hpit8f6SmtBL44zAg9nmkpRex
+X-Gm-Message-State: AOJu0Yz0hgCp8s6fVefJfwcEngBWjh61Hv6znTn/vSnzDTdon8bim+hB
+	hl6tyVOYBaDKnEuE21FMB6oK51kGi7Amp5ThQ+sjHR9EKe7dH7Tib57npocCvQ==
+X-Google-Smtp-Source: AGHT+IGd9M1sW3Jr1RlVyiquYXD+OUNXzLgdoV47mduhQHwZjDhBdZMIX5Atw3S52GDqLI+47VIz0g==
+X-Received: by 2002:ae9:e910:0:b0:78a:51f7:e90d with SMTP id x16-20020ae9e910000000b0078a51f7e90dmr45670qkf.56.1714666786939;
+        Thu, 02 May 2024 09:19:46 -0700 (PDT)
 Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.googlemail.com with ESMTPSA id hj6-20020a05622a620600b00436440fd8bfsm604940qtb.3.2024.05.02.09.17.52
+        by smtp.gmail.com with ESMTPSA id t26-20020a05620a005a00b00790f69a0583sm480933qkt.5.2024.05.02.09.19.43
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 02 May 2024 09:17:54 -0700 (PDT)
-Message-ID: <50f96c9d-5ca1-471b-bc6d-a901a8d5b37c@gmail.com>
-Date: Thu, 2 May 2024 09:17:51 -0700
+        Thu, 02 May 2024 09:19:46 -0700 (PDT)
+Message-ID: <6646b690-7b05-4a0e-a524-375b389ad591@broadcom.com>
+Date: Thu, 2 May 2024 09:19:42 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,88 +73,191 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net: phy: add wol config options in phy device
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>,
- Andrew Lunn <andrew@lunn.ch>
-Cc: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>, netdev@vger.kernel.org,
- lxu@maxlinear.com, hkallweit1@gmail.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- linux-kernel@vger.kernel.org, UNGLinuxDriver@microchip.com
-References: <20240430050635.46319-1-Raju.Lakkaraju@microchip.com>
- <7fe419b2-fc73-4584-ae12-e9e313d229c3@lunn.ch>
- <ZjO4VrYR+FCGMMSp@shell.armlinux.org.uk>
+Subject: Re: [PATCH 2/4] mfd: intel-lpss: Utilize i2c-designware.h
+To: Lee Jones <lee@kernel.org>
+Cc: Andy Shevchenko <andy.shevchenko@gmail.com>,
+ linux-kernel@vger.kernel.org, Jarkko Nikula <jarkko.nikula@linux.intel.com>,
+ Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+ Mika Westerberg <mika.westerberg@linux.intel.com>,
+ Jan Dabros <jsd@semihalf.com>, Andi Shyti <andi.shyti@kernel.org>,
+ Jiawen Wu <jiawenwu@trustnetic.com>, Mengyuan Lou
+ <mengyuanlou@net-swift.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+ Andrew Lunn <andrew@lunn.ch>, Duanqiang Wen <duanqiangwen@net-swift.com>,
+ "open list:SYNOPSYS DESIGNWARE I2C DRIVER" <linux-i2c@vger.kernel.org>,
+ "open list:WANGXUN ETHERNET DRIVER" <netdev@vger.kernel.org>
+References: <20240423233622.1494708-1-florian.fainelli@broadcom.com>
+ <20240423233622.1494708-3-florian.fainelli@broadcom.com>
+ <ZihLhl8eLC1ntJZK@surfacebook.localdomain>
+ <1d1467d1-b57b-4cc6-a995-4068d6741a73@broadcom.com>
+ <20240502071751.GA5338@google.com>
+From: Florian Fainelli <florian.fainelli@broadcom.com>
+Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
+ xsBNBFPAG8ABCAC3EO02urEwipgbUNJ1r6oI2Vr/+uE389lSEShN2PmL3MVnzhViSAtrYxeT
+ M0Txqn1tOWoIc4QUl6Ggqf5KP6FoRkCrgMMTnUAINsINYXK+3OLe7HjP10h2jDRX4Ajs4Ghs
+ JrZOBru6rH0YrgAhr6O5gG7NE1jhly+EsOa2MpwOiXO4DE/YKZGuVe6Bh87WqmILs9KvnNrQ
+ PcycQnYKTVpqE95d4M824M5cuRB6D1GrYovCsjA9uxo22kPdOoQRAu5gBBn3AdtALFyQj9DQ
+ KQuc39/i/Kt6XLZ/RsBc6qLs+p+JnEuPJngTSfWvzGjpx0nkwCMi4yBb+xk7Hki4kEslABEB
+ AAHNMEZsb3JpYW4gRmFpbmVsbGkgPGZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tPsLB
+ IQQQAQgAywUCZWl41AUJI+Jo+hcKAAG/SMv+fS3xUQWa0NryPuoRGjsA3SAUAAAAAAAWAAFr
+ ZXktdXNhZ2UtbWFza0BwZ3AuY29tjDAUgAAAAAAgAAdwcmVmZXJyZWQtZW1haWwtZW5jb2Rp
+ bmdAcGdwLmNvbXBncG1pbWUICwkIBwMCAQoFF4AAAAAZGGxkYXA6Ly9rZXlzLmJyb2FkY29t
+ Lm5ldAUbAwAAAAMWAgEFHgEAAAAEFQgJChYhBNXZKpfnkVze1+R8aIExtcQpvGagAAoJEIEx
+ tcQpvGagWPEH/2l0DNr9QkTwJUxOoP9wgHfmVhqc0ZlDsBFv91I3BbhGKI5UATbipKNqG13Z
+ TsBrJHcrnCqnTRS+8n9/myOF0ng2A4YT0EJnayzHugXm+hrkO5O9UEPJ8a+0553VqyoFhHqA
+ zjxj8fUu1px5cbb4R9G4UAySqyeLLeqnYLCKb4+GklGSBGsLMYvLmIDNYlkhMdnnzsSUAS61
+ WJYW6jjnzMwuKJ0ZHv7xZvSHyhIsFRiYiEs44kiYjbUUMcXor/uLEuTIazGrE3MahuGdjpT2
+ IOjoMiTsbMc0yfhHp6G/2E769oDXMVxCCbMVpA+LUtVIQEA+8Zr6mX0Yk4nDS7OiBlvOwE0E
+ U8AbwQEIAKxr71oqe+0+MYCc7WafWEcpQHFUwvYLcdBoOnmJPxDwDRpvU5LhqSPvk/yJdh9k
+ 4xUDQu3rm1qIW2I9Puk5n/Jz/lZsqGw8T13DKyu8eMcvaA/irm9lX9El27DPHy/0qsxmxVmU
+ pu9y9S+BmaMb2CM9IuyxMWEl9ruWFS2jAWh/R8CrdnL6+zLk60R7XGzmSJqF09vYNlJ6Bdbs
+ MWDXkYWWP5Ub1ZJGNJQ4qT7g8IN0qXxzLQsmz6tbgLMEHYBGx80bBF8AkdThd6SLhreCN7Uh
+ IR/5NXGqotAZao2xlDpJLuOMQtoH9WVNuuxQQZHVd8if+yp6yRJ5DAmIUt5CCPcAEQEAAcLB
+ gQQYAQIBKwUCU8AbwgUbDAAAAMBdIAQZAQgABgUCU8AbwQAKCRCTYAaomC8PVQ0VCACWk3n+
+ obFABEp5Rg6Qvspi9kWXcwCcfZV41OIYWhXMoc57ssjCand5noZi8bKg0bxw4qsg+9cNgZ3P
+ N/DFWcNKcAT3Z2/4fTnJqdJS//YcEhlr8uGs+ZWFcqAPbteFCM4dGDRruo69IrHfyyQGx16s
+ CcFlrN8vD066RKevFepb/ml7eYEdN5SRALyEdQMKeCSf3mectdoECEqdF/MWpfWIYQ1hEfdm
+ C2Kztm+h3Nkt9ZQLqc3wsPJZmbD9T0c9Rphfypgw/SfTf2/CHoYVkKqwUIzI59itl5Lze+R5
+ wDByhWHx2Ud2R7SudmT9XK1e0x7W7a5z11Q6vrzuED5nQvkhAAoJEIExtcQpvGagugcIAJd5
+ EYe6KM6Y6RvI6TvHp+QgbU5dxvjqSiSvam0Ms3QrLidCtantcGT2Wz/2PlbZqkoJxMQc40rb
+ fXa4xQSvJYj0GWpadrDJUvUu3LEsunDCxdWrmbmwGRKqZraV2oG7YEddmDqOe0Xm/NxeSobc
+ MIlnaE6V0U8f5zNHB7Y46yJjjYT/Ds1TJo3pvwevDWPvv6rdBeV07D9s43frUS6xYd1uFxHC
+ 7dZYWJjZmyUf5evr1W1gCgwLXG0PEi9n3qmz1lelQ8lSocmvxBKtMbX/OKhAfuP/iIwnTsww
+ 95A2SaPiQZA51NywV8OFgsN0ITl2PlZ4Tp9hHERDe6nQCsNI/Us=
+In-Reply-To: <20240502071751.GA5338@google.com>
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="000000000000c3c18306177af8d8"
+
+--000000000000c3c18306177af8d8
 Content-Language: en-US
-From: Florian Fainelli <f.fainelli@gmail.com>
-In-Reply-To: <ZjO4VrYR+FCGMMSp@shell.armlinux.org.uk>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 5/2/24 08:59, Russell King (Oracle) wrote:
-> On Thu, May 02, 2024 at 04:51:42PM +0200, Andrew Lunn wrote:
->> On Tue, Apr 30, 2024 at 10:36:35AM +0530, Raju Lakkaraju wrote:
->>> Introduce a new member named 'wolopts' to the 'phy_device' structure to
->>> store the user-specified Wake-on-LAN (WOL) settings. Update this member
->>> within the phy driver's 'set_wol()' function whenever the WOL configuration
->>> is modified by the user.
->>>
->>> Currently, when the system resumes from sleep, the 'phy_init_hw()' function
->>> resets the PHY's configuration and interrupts, which leads to problems upon
->>> subsequent WOL attempts. By retaining the desired WOL settings in 'wolopts',
->>> we can ensure that the PHY's WOL configuration is correctly reapplied
->>> through 'phy_ethtool_set_wol()' before a system suspend, thereby resolving
->>> the issue
->>
->> Sorry it took a white to review this.
->>
->>>
->>> Signed-off-by: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
->>> ---
->>>   drivers/net/phy/mxl-gpy.c    | 5 +++++
->>>   drivers/net/phy/phy_device.c | 5 +++++
->>>   include/linux/phy.h          | 2 ++
->>>   3 files changed, 12 insertions(+)
->>>
->>> diff --git a/drivers/net/phy/mxl-gpy.c b/drivers/net/phy/mxl-gpy.c
->>> index b2d36a3a96f1..6edb29a1d77e 100644
->>> --- a/drivers/net/phy/mxl-gpy.c
->>> +++ b/drivers/net/phy/mxl-gpy.c
->>> @@ -680,6 +680,7 @@ static int gpy_set_wol(struct phy_device *phydev,
->>>   	struct net_device *attach_dev = phydev->attached_dev;
->>>   	int ret;
->>>   
->>> +	phydev->wolopts = 0;
->>
->> Is this specific to mlx-gpy?
->>
->> You should be trying to solve the problem for all PHYs which support
->> WoL. So i expect the core to be doing most of the work. In fact, i
->> don't think there is any need for driver specific code.
+On 5/2/24 00:17, Lee Jones wrote:
+> On Tue, 23 Apr 2024, Florian Fainelli wrote:
 > 
-> It would be good to hear exactly why its necessary for phylib to track
-> this state, and why the PHY isn't retaining it.
-
-Agreed. I contemplated doing something similar while adding support for 
-Wake-on-LAN to the Broadcom PHY driver, but eventually convinced myself 
-this was not necessary as the hardware was capable of retaining the 
-wake-up event, and that the PHY driver *must* be able to charge the PHY 
-device for wake-up purposes, even on a cold boot.
-
+>>
+>>
+>> On 4/23/2024 5:00 PM, Andy Shevchenko wrote:
+>>> Tue, Apr 23, 2024 at 04:36:20PM -0700, Florian Fainelli kirjoitti:
+>>>> Rather than open code the i2c_designware string, utilize the newly
+>>>> defined constant in i2c-designware.h.
+>>>
+>>> ...
+>>>
+>>>>    static const struct mfd_cell intel_lpss_i2c_cell = {
+>>>> -	.name = "i2c_designware",
+>>>> +	.name = I2C_DESIGNWARE_NAME,
+>>>>    	.num_resources = ARRAY_SIZE(intel_lpss_dev_resources),
+>>>>    	.resources = intel_lpss_dev_resources,
+>>>>    };
+>>>
+>>> We have tons of drivers that are using explicit naming, why is this case
+>>> special?
+>>>
+>>
+>> It is not special, just one of the 3 cases outside of drivers/i2c/busses
+>> that reference a driver living under drivers/i2c/busses, as I replied in the
+>> cover letter, this is a contract between the various device drivers and
+>> their users, so we should have a central place where it is defined, not
+>> repeated.
 > 
-> I suspect this may have something to do with resets - the PHY being
-> hardware reset when coming out of resume (resulting in all state
-> being lost.) What's resetting it would also be good to track down
-> (as in hardware, firmware, or the kernel.)
-> 
+> I have always held the opinion that replacing user-facing strings with
+> defines harms debugability, since grepping becomes a multi-stage
+> process, often with ambiguous results (in the case of multiple
+> definitions with the same name.  Please keep the string in-place.
 
-Since it is possible to override the soft_reset callback called by 
-phy_init_hw(), I would be inclined to make this a driver specific 
-solution by doing something like:
-
-mxl_gphy_soft_reset(...)
-	/* Save WoL status */
-	priv->wol_enabled = ...
-	return genphy_soft_reset()
+I am not buying into that argument and the fact that Duangiang was able 
+to trip over the lack of an explicit contract between drivers seems like 
+a bigger obstacle than doing a multi-stage grep. Anyway, I have no skin 
+in this game, I just don't like seeing repetition and not stating 
+contracts between drivers more explicitly.
 -- 
 Florian
 
+
+--000000000000c3c18306177af8d8
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
+
+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
+riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
+QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
+UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
+M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
+Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
+14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
+a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
+XzCCBVgwggRAoAMCAQICDBP8P9hKRVySg3Qv5DANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
+RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
+UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAxMjE4MTFaFw0yNTA5MTAxMjE4MTFaMIGW
+MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
+BgNVBAoTDUJyb2FkY29tIEluYy4xGTAXBgNVBAMTEEZsb3JpYW4gRmFpbmVsbGkxLDAqBgkqhkiG
+9w0BCQEWHWZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tMIIBIjANBgkqhkiG9w0BAQEFAAOC
+AQ8AMIIBCgKCAQEA+oi3jMmHltY4LMUy8Up5+1zjd1iSgUBXhwCJLj1GJQF+GwP8InemBbk5rjlC
+UwbQDeIlOfb8xGqHoQFGSW8p9V1XUw+cthISLkycex0AJ09ufePshLZygRLREU0H4ecNPMejxCte
+KdtB4COST4uhBkUCo9BSy1gkl8DJ8j/BQ1KNUx6oYe0CntRag+EnHv9TM9BeXBBLfmMRnWNhvOSk
+nSmRX0J3d9/G2A3FIC6WY2XnLW7eAZCQPa1Tz3n2B5BGOxwqhwKLGLNu2SRCPHwOdD6e0drURF7/
+Vax85/EqkVnFNlfxtZhS0ugx5gn2pta7bTdBm1IG4TX+A3B1G57rVwIDAQABo4IB3jCCAdowDgYD
+VR0PAQH/BAQDAgWgMIGjBggrBgEFBQcBAQSBljCBkzBOBggrBgEFBQcwAoZCaHR0cDovL3NlY3Vy
+ZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAuY3J0MEEG
+CCsGAQUFBzABhjVodHRwOi8vb2NzcC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWdu
+MmNhMjAyMDBNBgNVHSAERjBEMEIGCisGAQQBoDIBKAowNDAyBggrBgEFBQcCARYmaHR0cHM6Ly93
+d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIwADBJBgNVHR8EQjBAMD6gPKA6
+hjhodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNy
+bDAoBgNVHREEITAfgR1mbG9yaWFuLmZhaW5lbGxpQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggr
+BgEFBQcDBDAfBgNVHSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQUUwwfJ6/F
+KL0fRdVROal/Lp4lAF0wDQYJKoZIhvcNAQELBQADggEBAKBgfteDc1mChZjKBY4xAplC6uXGyBrZ
+kNGap1mHJ+JngGzZCz+dDiHRQKGpXLxkHX0BvEDZLW6LGOJ83ImrW38YMOo3ZYnCYNHA9qDOakiw
+2s1RH00JOkO5SkYdwCHj4DB9B7KEnLatJtD8MBorvt+QxTuSh4ze96Jz3kEIoHMvwGFkgObWblsc
+3/YcLBmCgaWpZ3Ksev1vJPr5n8riG3/N4on8gO5qinmmr9Y7vGeuf5dmZrYMbnb+yCBalkUmZQwY
+NxADYvcRBA0ySL6sZpj8BIIhWiXiuusuBmt2Mak2eEv0xDbovE6Z6hYyl/ZnRadbgK/ClgbY3w+O
+AfUXEZ0xggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52
+LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwT
+/D/YSkVckoN0L+QwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIOQPRsAPlgj6STyw
+jJLFDY3yPhaLGsml6YYpTtFjZzuRMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcN
+AQkFMQ8XDTI0MDUwMjE2MTk0N1owaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZI
+AWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEH
+MAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQD1TRSyrXlK3HTscr6DsL8qsuE5JFIxnuyM
+OUX89bVZ6lJUV1R4CqN6ffu+ckc8ho3TxllGu5oOfzkqLCW3gblvd/XR6AsZN4ynEYZbNjJJ9FJX
+d0FTWfywvmabdZgFJwzZNZCgaOLXEgMzfG2WiKA0iXyEblqjcERlBBFoVlXECK0koPR77V+qqo3A
+cbpFS0tfYcetkkanjxG6BXgEEpnnfVQRFXNtMK51emg0UyDzJGsDjZgieMuE3oA8BjV1nZa+2XEJ
+pWUuoZAvPO8msyhayegNxTj+cH7AVi6+71KqPgKYM7nMmL8jAzYkLc6JSK6fUAdqpP4kJm4MNcdO
+9GLm
+--000000000000c3c18306177af8d8--
 
