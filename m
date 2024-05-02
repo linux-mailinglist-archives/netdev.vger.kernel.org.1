@@ -1,155 +1,136 @@
-Return-Path: <netdev+bounces-93073-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93074-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18BB28B9EC6
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 18:41:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17BAB8B9EC7
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 18:42:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AA2691F2110E
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 16:41:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 422B01C224D4
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 16:42:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6497015E5A9;
-	Thu,  2 May 2024 16:40:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 716E515E7F6;
+	Thu,  2 May 2024 16:42:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W2pgjOIJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TRjOtlaG"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FA9B15381F
-	for <netdev@vger.kernel.org>; Thu,  2 May 2024 16:40:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4481928FC;
+	Thu,  2 May 2024 16:42:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714668053; cv=none; b=kcKvIBEhoIkPWzqTmBwjZtrsA/609vBE8KXLXNpaLekIh/5DEz0NdhYBfPzNiFp2LlCvGL51qGD2qI8w/MKHtPp+DRnC9B+31uVEQPBxD/rHVl6DW+gFDCbU/Mqu5TcAA5j/y+OzvWXrzogl0kSOmIBX2MeCYilQ3oOZL2zsMjI=
+	t=1714668172; cv=none; b=Indq6ERGFZufeRx+7fKN/LVrnGQDPiiGSTGzhAdlsXIePIUCQYGJKHVzR8YID/SD8q+MTk/GiVqtG2oH9b0AFIbfyz2TRQ685AfwyhZtXhzH3iI27yFYmrcQAgWtA0xTus8aoB5ID2IBNgPEa6jXKU3C72wS1v8SoliLodUW7lA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714668053; c=relaxed/simple;
-	bh=Z1TyWhfBAPx5vrBG5YIWXpyzDtK3FBu92kbArQtZF0Y=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=d9bZu34ibirYQqeu4j/auQ6iwugl6TL892H6EmdJ6ZkU57004CGwB1CHRLnT5oM+dklmYmY44JKCOaV8zt/ZjkFo2T3p8gQTzIfAJGwEWf97eL1I9dShK5AGud9aU8s0X5j6+erd0B9V0Tqu6yBa2WDVTwqZxOZXzRq/Bu0vMM8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W2pgjOIJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 98703C113CC;
-	Thu,  2 May 2024 16:40:52 +0000 (UTC)
+	s=arc-20240116; t=1714668172; c=relaxed/simple;
+	bh=cj5bYAt98fbHNpOz6Lk3FAQsG3zOEVkQQT9pOnQDzFE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=V8895zxvNclFezriu1CEhxGdL+QF/MnQ1z7aoRPzYHMI9lIsOvNHvxDlHfUo00mqngwazPU+aWL0pjcumvUV72rGLNAFYQkX9PX8+sjEBBBidXLaXIUE+f+3fzDI4GB2vjZ2qQtt9Ei2jluHJbOLpIuGfhVhNgGrM94h1QrdVsI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TRjOtlaG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA074C32789;
+	Thu,  2 May 2024 16:42:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714668053;
-	bh=Z1TyWhfBAPx5vrBG5YIWXpyzDtK3FBu92kbArQtZF0Y=;
-	h=From:To:Cc:Subject:Date:From;
-	b=W2pgjOIJQOaF5OoIBdRP1onrKBHbATuxCiVc1INVsJqNWe9DmBWF8vV+iJZoGAoz3
-	 IKstgp/ACAqv39n2/L/1A5KVPmOVFHHqrho4f4P6Edy6SwMIQ8rH9V1SgtzHKzNZaq
-	 XhaeX6srlNt24wtdRFiycP1djx4Y9al7ucYAtsvizk81q5yP0YI5OFivE91Z6Ah6hH
-	 LTaJS3HkLDEG9gYjYKpZtBzaUXY6I8XahPyWXiqwzEtVhOA5Ngb0/0rPwnQ4w1FEFt
-	 id0TQcd+lN99UidWjcnraYvRBANQyqzA4kyXYx+rp0H6X/qgXJIN0JUzszR/lzMuKH
-	 ws20tShn5xjVQ==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	Jakub Kicinski <kuba@kernel.org>,
-	donald.hunter@gmail.com,
-	jiri@resnulli.us,
-	alessandromarcolini99@gmail.com
-Subject: [PATCH net-next] tools: ynl: add --list-ops and --list-msgs to CLI
-Date: Thu,  2 May 2024 09:40:43 -0700
-Message-ID: <20240502164043.2130184-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.44.0
+	s=k20201202; t=1714668171;
+	bh=cj5bYAt98fbHNpOz6Lk3FAQsG3zOEVkQQT9pOnQDzFE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=TRjOtlaGF85tupGTKMBErbPBlfCZuvG+Nh2mzE7TWe4Bt5pvoN7vV2n6UboqGVGKH
+	 eqEK7yZtuGkH4lj5/US2yL9YCV10cJgn+Z4NEBngdaonz5aLmJ2kdKyVrnbtC0WgXd
+	 +glMCl04Yw4Rt4hfOoQTUCc/lSIDy6LCnIA432+0wAxrjVHFooZxsg+kXa18YQCOL3
+	 BDrCR54yV2qZj5B90JJ+UL1uk/HlQUgwTLRyzIMkpt2V/FbiS+u5Pw7WUDSw0ZhD+1
+	 vofVfAIvFf8n/BTeDKSM7GcPlT/lIqptFrtrfjM1qPWFd8lg1UiJvG/RmINGiEzty6
+	 XnMZzUYpA+pSw==
+Date: Thu, 2 May 2024 17:42:44 +0100
+From: Lee Jones <lee@kernel.org>
+To: Florian Fainelli <florian.fainelli@broadcom.com>
+Cc: Andy Shevchenko <andy.shevchenko@gmail.com>,
+	linux-kernel@vger.kernel.org,
+	Jarkko Nikula <jarkko.nikula@linux.intel.com>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Mika Westerberg <mika.westerberg@linux.intel.com>,
+	Jan Dabros <jsd@semihalf.com>, Andi Shyti <andi.shyti@kernel.org>,
+	Jiawen Wu <jiawenwu@trustnetic.com>,
+	Mengyuan Lou <mengyuanlou@net-swift.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Duanqiang Wen <duanqiangwen@net-swift.com>,
+	"open list:SYNOPSYS DESIGNWARE I2C DRIVER" <linux-i2c@vger.kernel.org>,
+	"open list:WANGXUN ETHERNET DRIVER" <netdev@vger.kernel.org>
+Subject: Re: [PATCH 2/4] mfd: intel-lpss: Utilize i2c-designware.h
+Message-ID: <20240502164244.GA1200070@google.com>
+References: <20240423233622.1494708-1-florian.fainelli@broadcom.com>
+ <20240423233622.1494708-3-florian.fainelli@broadcom.com>
+ <ZihLhl8eLC1ntJZK@surfacebook.localdomain>
+ <1d1467d1-b57b-4cc6-a995-4068d6741a73@broadcom.com>
+ <20240502071751.GA5338@google.com>
+ <6646b690-7b05-4a0e-a524-375b389ad591@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <6646b690-7b05-4a0e-a524-375b389ad591@broadcom.com>
 
-I often forget the exact naming of ops and have to look at
-the spec to find it. Add support for listing the operations:
+On Thu, 02 May 2024, Florian Fainelli wrote:
 
-  $ ./cli.py --spec .../netdev.yaml --list-ops
-  dev-get  [ do, dump ]
-  page-pool-get  [ do, dump ]
-  page-pool-stats-get  [ do, dump ]
-  queue-get  [ do, dump ]
-  napi-get  [ do, dump ]
-  qstats-get  [ dump ]
+> On 5/2/24 00:17, Lee Jones wrote:
+> > On Tue, 23 Apr 2024, Florian Fainelli wrote:
+> > 
+> > > 
+> > > 
+> > > On 4/23/2024 5:00 PM, Andy Shevchenko wrote:
+> > > > Tue, Apr 23, 2024 at 04:36:20PM -0700, Florian Fainelli kirjoitti:
+> > > > > Rather than open code the i2c_designware string, utilize the newly
+> > > > > defined constant in i2c-designware.h.
+> > > > 
+> > > > ...
+> > > > 
+> > > > >    static const struct mfd_cell intel_lpss_i2c_cell = {
+> > > > > -	.name = "i2c_designware",
+> > > > > +	.name = I2C_DESIGNWARE_NAME,
+> > > > >    	.num_resources = ARRAY_SIZE(intel_lpss_dev_resources),
+> > > > >    	.resources = intel_lpss_dev_resources,
+> > > > >    };
+> > > > 
+> > > > We have tons of drivers that are using explicit naming, why is this case
+> > > > special?
+> > > > 
+> > > 
+> > > It is not special, just one of the 3 cases outside of drivers/i2c/busses
+> > > that reference a driver living under drivers/i2c/busses, as I replied in the
+> > > cover letter, this is a contract between the various device drivers and
+> > > their users, so we should have a central place where it is defined, not
+> > > repeated.
+> > 
+> > I have always held the opinion that replacing user-facing strings with
+> > defines harms debugability, since grepping becomes a multi-stage
+> > process, often with ambiguous results (in the case of multiple
+> > definitions with the same name.  Please keep the string in-place.
+> 
+> I am not buying into that argument and the fact that Duangiang was able to
+> trip over the lack of an explicit contract between drivers seems like a
+> bigger obstacle than doing a multi-stage grep. Anyway, I have no skin in
+> this game, I just don't like seeing repetition and not stating contracts
+> between drivers more explicitly.
 
-For completeness also support listing all ops (including
-notifications:
+Good thing no one is asking you to buy into it then. :)
 
-  # ./cli.py --spec .../netdev.yaml --list-msgs
-  dev-get  [ dump, do ]
-  dev-add-ntf  [ notify ]
-  dev-del-ntf  [ notify ]
-  dev-change-ntf  [ notify ]
-  page-pool-get  [ dump, do ]
-  page-pool-add-ntf  [ notify ]
-  page-pool-del-ntf  [ notify ]
-  page-pool-change-ntf  [ notify ]
-  page-pool-stats-get  [ dump, do ]
-  queue-get  [ dump, do ]
-  napi-get  [ dump, do ]
-  qstats-get  [ dump ]
+I'm not sure how or if the code that failed to match was tested or what
+went wrong exactly and I'm pleased that the bug was caught and fixed.
 
-Use double space after the name for slightly easier to read
-output.
+However, swapping out matching strings with a define is a regression
+from a development perspective.  One which I've felt the pain of
+personally in the past.  I've pushed back on it before and I'm pushing
+back again.  We're not swapping out matching strings for defines.
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-CC: donald.hunter@gmail.com
-CC: jiri@resnulli.us
-CC: alessandromarcolini99@gmail.com
----
- tools/net/ynl/cli.py        | 9 +++++++++
- tools/net/ynl/lib/nlspec.py | 2 ++
- 2 files changed, 11 insertions(+)
-
-diff --git a/tools/net/ynl/cli.py b/tools/net/ynl/cli.py
-index 058926d69ef0..b8481f401376 100755
---- a/tools/net/ynl/cli.py
-+++ b/tools/net/ynl/cli.py
-@@ -40,6 +40,8 @@ from lib import YnlFamily, Netlink, NlError
-     group.add_argument('--multi', dest='multi', nargs=2, action='append',
-                        metavar=('DO-OPERATION', 'JSON_TEXT'), type=str)
-     group.add_argument('--dump', dest='dump', metavar='DUMP-OPERATION', type=str)
-+    group.add_argument('--list-ops', action='store_true')
-+    group.add_argument('--list-msgs', action='store_true')
- 
-     parser.add_argument('--sleep', dest='sleep', type=int)
-     parser.add_argument('--subscribe', dest='ntf', type=str)
-@@ -81,6 +83,13 @@ from lib import YnlFamily, Netlink, NlError
-     if args.sleep:
-         time.sleep(args.sleep)
- 
-+    if args.list_ops:
-+        for op_name, op in ynl.ops.items():
-+            print(op_name, " [", ", ".join(op.modes), "]")
-+    if args.list_msgs:
-+        for op_name, op in ynl.msgs.items():
-+            print(op_name, " [", ", ".join(op.modes), "]")
-+
-     try:
-         if args.do:
-             reply = ynl.do(args.do, attrs, args.flags)
-diff --git a/tools/net/ynl/lib/nlspec.py b/tools/net/ynl/lib/nlspec.py
-index 6d08ab9e213f..b6d6f8aef423 100644
---- a/tools/net/ynl/lib/nlspec.py
-+++ b/tools/net/ynl/lib/nlspec.py
-@@ -335,6 +335,7 @@ jsonschema = None
- 
-         req_value       numerical ID when serialized, user -> kernel
-         rsp_value       numerical ID when serialized, user <- kernel
-+        modes           supported operation modes (do, dump, event etc.)
-         is_call         bool, whether the operation is a call
-         is_async        bool, whether the operation is a notification
-         is_resv         bool, whether the operation does not exist (it's just a reserved ID)
-@@ -350,6 +351,7 @@ jsonschema = None
-         self.req_value = req_value
-         self.rsp_value = rsp_value
- 
-+        self.modes = yaml.keys() & {'do', 'dump', 'event', 'notify'}
-         self.is_call = 'do' in yaml or 'dump' in yaml
-         self.is_async = 'notify' in yaml or 'event' in yaml
-         self.is_resv = not self.is_async and not self.is_call
 -- 
-2.44.0
-
+Lee Jones [李琼斯]
 
