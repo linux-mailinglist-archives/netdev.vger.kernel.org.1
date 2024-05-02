@@ -1,73 +1,119 @@
-Return-Path: <netdev+bounces-92884-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92885-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0FF88B937F
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 04:56:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CAD3C8B93D5
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 06:23:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 40CE01F220AF
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 02:56:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 086CE1C2170F
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 04:23:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD16317C73;
-	Thu,  2 May 2024 02:56:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FB761BF3B;
+	Thu,  2 May 2024 04:23:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iRvkM+uR"
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="RaHOUhGC"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8681717997
-	for <netdev@vger.kernel.org>; Thu,  2 May 2024 02:56:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA76E1B7E9
+	for <netdev@vger.kernel.org>; Thu,  2 May 2024 04:23:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714618603; cv=none; b=mWbvLFhTE9GMBT6eT8MXN21faiou/fV10Pspzdr2/9UV6eeyyffxh24siPkHRC17/5Jaqb0s0xBemq2ainflaKiDHgzjp6fbshgb/A1jrSsUCMTJN3Z+ICg3CtHcf8R9rfrCijPba9+L0aMsAgAIdM3EMGSPxCylMPP/0Y10weU=
+	t=1714623830; cv=none; b=EBtICs0rqdB5gzDPyz+vfk8elv7WSat1upIhXjl2guQPjDYcSXaxo+uN0HPtJ0FQDiohK+DHvhCdz2KStHmQH5FxuL9q+0rXw3bqO/joKN2YbHBdN273ElkOx6BEUjOO9AnmRHOXzAUgYXM/+lq6wQh3ke+X0ijI7cJ4nvSUgnA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714618603; c=relaxed/simple;
-	bh=P8hMAABtlFQeTmsU8WprlRKllUGsHGavPf2ebU3rFnM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WO91iUKB8x3gJAvjv+RU0ThguXcmChdm9qJEfTqNbUsMgLQJ98dwEHO52LVB9a4Doxm5oUrM1E+6gfTVQNxqA0/Oa4H7vk510brfemoYkx01GpOlTLongkbJMjQxn8kEjaVWILC68N85iVFS++HbgydLFh+WI+JBk3xFs7VhN/0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iRvkM+uR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62A3EC072AA;
-	Thu,  2 May 2024 02:56:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714618602;
-	bh=P8hMAABtlFQeTmsU8WprlRKllUGsHGavPf2ebU3rFnM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=iRvkM+uRi0975xd9p92Oupp1FsrOTbBMjUgud9G1EoB/xeNFOJj83keGmkvdtANz2
-	 phj+IJM7KX4DvkB1kTWpnQksBygxlHoziREY/GEunUJ/EnViOeoy8/aTmCKla+NiuI
-	 vaY60bShQRXQZfTicb3/SdajZjBlBcf5EwRjWr7ZdnOMSQwPnAAyoDhB5IqCT+rwc0
-	 4CZDvDiIndpDQpS27rtSxtdw2bYhpC9mvUmxohzBLiG3HSzRrZZVJm9H6jeuoCHhlM
-	 nA3pU3qV+8u1tsBHoqyBsj7mAEQOScSaGd6yzgBkrOy8YmxK2qr4kS+wlM6K4/m2Jc
-	 nVd7MpYQRZp3A==
-Date: Wed, 1 May 2024 19:56:41 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
- netdev@vger.kernel.org, Ngai-Mint Kwan <ngai-mint.kwan@intel.com>, Mateusz
- Polchlopek <mateusz.polchlopek@intel.com>, Pawel Chmielewski
- <pawel.chmielewski@intel.com>, Simon Horman <horms@kernel.org>, Dawid
- Osuchowski <dawid.osuchowski@linux.intel.com>, Pucha Himasekhar Reddy
- <himasekharx.reddy.pucha@intel.com>
-Subject: Re: [PATCH net] ice: Do not get coalesce settings while in reset
-Message-ID: <20240501195641.1e606747@kernel.org>
-In-Reply-To: <20240430181434.1942751-1-anthony.l.nguyen@intel.com>
-References: <20240430181434.1942751-1-anthony.l.nguyen@intel.com>
+	s=arc-20240116; t=1714623830; c=relaxed/simple;
+	bh=9loqrPzqZAxVOaUc4oopSnUKFBSd2uYPXYpzR5q9FAU=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=VOWR3F3cACaLL3lioJttQvw3GQo09Wc/55Ghbh+CBUl0odW0x6S+qhtADhsM92OoGDzUSVhyvtXJSqRnQ31HfAAPNCaAitki7qhASj68bpXiQYgxfEbCOboEX5oMohsyOCwQVFxhwlmZYyw0Y86lnSmL0iP+VJZcp3XCq6EmHiU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=RaHOUhGC; arc=none smtp.client-ip=67.231.145.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+Received: from pps.filterd (m0148461.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 441Mjqpn010650
+	for <netdev@vger.kernel.org>; Wed, 1 May 2024 21:23:48 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding :
+ content-type; s=s2048-2021-q4;
+ bh=TO1PSaKRd633vyRFurgOUtsTs/4pfrreyOBxMprrjDI=;
+ b=RaHOUhGCOTO8nhlHvVCSpuaHMR5lCZLS4e+R/PZeKQ4I1ZN+gUov+ya/75UAXUArk/NS
+ EaxiAWRKzD/7+g+SlTF+y0BSZfTx0TEuZVMmhyQb/MMW1M56JoLDi8o2ZEkvzM7edDIT
+ 3tteickO2quAFXRaFBuP/OnzrD1nOGy7Wmp0FyYBYK5ttG+/N9e/BoBtcdPS5PgKWtPq
+ sDEenRUJ/i7qROB47WQIfPGD577rzdkPz2kSuzXcTmALh/tF9Ur5CF8b5QoPusG26KLH
+ 2ZmfuYWkOktnzYsivXOIp8AGiSIfI7hL3WATUReMTIWcMVeKO+BQ2sc9WTki1i5laUoj 7g== 
+Received: from mail.thefacebook.com ([163.114.132.120])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3xuxtmhhjt-7
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Wed, 01 May 2024 21:23:47 -0700
+Received: from twshared53332.38.frc1.facebook.com (2620:10d:c085:108::8) by
+ mail.thefacebook.com (2620:10d:c085:11d::8) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 2 May 2024 04:23:45 +0000
+Received: by devvm15954.vll0.facebook.com (Postfix, from userid 420730)
+	id 53D20CB261CF; Wed,  1 May 2024 21:23:30 -0700 (PDT)
+From: Miao Xu <miaxu@meta.com>
+To: Eric Dumazet <edumazet@google.com>,
+        "David S . Miller"
+	<davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>,
+        David Ahern <dsahern@kernel.org>, Martin Lau
+	<kafai@meta.com>
+CC: <netdev@vger.kernel.org>, <bpf@vger.kernel.org>, Miao Xu <miaxu@meta.com>
+Subject: [PATCH net-next v3 0/3] Add new args into tcp_congestion_ops' cong_control
+Date: Wed, 1 May 2024 21:23:15 -0700
+Message-ID: <20240502042318.801932-1-miaxu@meta.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
+X-FB-Internal: Safe
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: pn6bw19EhwcCCs-2OjmGRLuu5aqIyvHI
+X-Proofpoint-GUID: pn6bw19EhwcCCs-2OjmGRLuu5aqIyvHI
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1011,Hydra:6.0.650,FMLib:17.11.176.26
+ definitions=2024-05-01_16,2024-04-30_01,2023-05-22_02
 
-On Tue, 30 Apr 2024 11:14:32 -0700 Tony Nguyen wrote:
-> Getting coalesce settings while reset is in progress can cause NULL
-> pointer deference bug.
-> If under reset, abort get coalesce for ethtool.
+This patchset attempts to add two new arguments into the hookpoint
+cong_control in tcp_congestion_ops. The new arguments are inherited
+from the caller tcp_cong_control and can be used by any bpf cc prog
+that implements its own logic inside this hookpoint.
 
-Did you not add locks around reset to allow waiting instead of returning
--EBUSY to user space? I feel like we've been over this...
+Please review. Thanks a lot!
+
+Changelog
+=3D=3D=3D=3D=3D
+v2->v3:
+  - Fixed the broken selftest caused by the new arguments.
+  - Renamed the selftest file name and bpf prog name.
+
+v1->v2:
+  - Split the patchset into 3 separate patches.
+  - Added highlights in the selftest prog.
+  - Removed the dependency on bpf_tcp_helpers.h.
+
+Miao Xu (3):
+  tcp: Add new args for cong_control in tcp_congestion_ops
+  bpf: tcp: Allow to write tp->snd_cwnd_stamp in bpf_tcp_ca
+  selftests/bpf: Add test for the use of new args in cong_control
+
+ include/net/tcp.h                             |   2 +-
+ net/ipv4/bpf_tcp_ca.c                         |   6 +-
+ net/ipv4/tcp_bbr.c                            |   2 +-
+ net/ipv4/tcp_input.c                          |   2 +-
+ .../selftests/bpf/progs/bpf_cc_cubic.c        | 206 ++++++++++++++++++
+ .../selftests/bpf/progs/bpf_tracing_net.h     |  10 +
+ .../selftests/bpf/progs/tcp_ca_kfunc.c        |   6 +-
+ 7 files changed, 227 insertions(+), 7 deletions(-)
+ create mode 100644 tools/testing/selftests/bpf/progs/bpf_cc_cubic.c
+
+--=20
+2.43.0
+
 
