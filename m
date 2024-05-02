@@ -1,74 +1,74 @@
-Return-Path: <netdev+bounces-92910-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92911-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 684348B94E0
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 08:50:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D4978B94E8
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 08:55:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 995671C2165B
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 06:50:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CB5A1282F1A
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 06:55:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FC68224D7;
-	Thu,  2 May 2024 06:50:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85E9F1CAB7;
+	Thu,  2 May 2024 06:55:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="Z0eNvovy"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="vz6l/MTM"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E79B20B28;
-	Thu,  2 May 2024 06:50:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86B49182DB;
+	Thu,  2 May 2024 06:55:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714632647; cv=none; b=Yr/QEdwH7/Wm+PnBDNOVnVGD+tgMfcXBNDAcA6OiFAWdvYSWef+LnMPojnFDiNqOzHxyNaFsTrQ+kdkjbxZtpojgFpD09OiVhu4TO7IQxDyjgeGpzq7ANt/2GxpXwdbebLvWRuWxnAHWu72t6P5iauQMsE/o0lCcatGNSGsg6ik=
+	t=1714632914; cv=none; b=d2LatIl6Y3HHnDQ6JCG850vZ9FwDVILgdmSx2ZeSJNIUbanqYQyF70eVMhIIcnsRKw3nLMhrT2fvXVz4zxGIrkFZSXyKlLrqWh0mLxyeWRzKU2CWaI8rhZnzjvKZgyAL18+h7wZRf2qcGhiaHqT+7SFQ93+H4142YCb09HfDrks=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714632647; c=relaxed/simple;
-	bh=0KtAjG/lQgOLJAFTu2txRbylcS7quAOoyaCIXOphnRE=;
+	s=arc-20240116; t=1714632914; c=relaxed/simple;
+	bh=BhqFl8BuZ3euYmoACL97M4SnkmaSYCl8501Nsks10AA=;
 	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=C/B9IIiXw0VVNoHmQvUGsI09fc9zIWoNESl44ohwzB2/uEhfg3DZYviPGn/B2eetYvFrZGhA/s1CKk7yFhCkHKHVdHbUgNVda1tfMHCQhmYQsbOpwdxGm8NnX6Me7ktvtspV8HpTz9yI0ndxyEc9kVojHJEFCYrVoMnRnKORdis=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=Z0eNvovy; arc=none smtp.client-ip=68.232.154.123
+	 Content-Type:Content-Disposition:In-Reply-To; b=dWG1OfI5deIiJSRU/LuoGR2pncP8EJzg54QFeDrKNhutfm8CkXttFaqXiGkfDoeXMIh8iLhaVj+BgsfknijzdVPsNuw2iNEPoLrUZqEUGv5sGQErDjJkQR76NpKvI5XQqFK3eRoNe7qKScMnvsrhj75mMCO/gvAwvRRKrwqnOL0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=vz6l/MTM; arc=none smtp.client-ip=68.232.153.233
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1714632644; x=1746168644;
+  t=1714632912; x=1746168912;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=0KtAjG/lQgOLJAFTu2txRbylcS7quAOoyaCIXOphnRE=;
-  b=Z0eNvovyAvOCOfS0HzQfpKk4ZPbZylmdysCXcxOM4BOuO9Ad0LmqoTiu
-   4D9fwicoPC3IZav15cfStLivb3/x5qJlgZ8hxpJnwxo6qd13LE08v6tRs
-   guA83ORm2jiI0KPhYvkwps1xLgDGPrFvpzGSR4Cf10xCz8C+SI8W2UNd1
-   c9hwdxH9TPm+RtSyLFo3rSvswosSbzWdWDg/KPPZLSEtkSl6J1aftmJIZ
-   aHOsVaoGu0+PtYdlcgWxjM6T++QzsYA+Gs2yQSGcPzefFowKXfZlGNc+D
-   2C0dByk9IA0zPHc1Vsjon0CbJDY2n8NfGb1KkI7sE8YEMSSVkION9KCk5
-   A==;
-X-CSE-ConnectionGUID: i2nnprOWT+as/Z9/JQ0dlg==
-X-CSE-MsgGUID: uhYcgmjHQaO4Rf4DNJeUmg==
+  bh=BhqFl8BuZ3euYmoACL97M4SnkmaSYCl8501Nsks10AA=;
+  b=vz6l/MTMuaUXS6rf/2IRX/h63m1aFUKBM24q+oypIAl/JwwIQglEq8+/
+   Qt6oD+mywsOtKJl+kcA1LfgppOKyOZn0uoa8HCZCp6Gl9sZkgZnNCSed5
+   ZWMpGtNnYfdZEmv1SvrN5DCT3F6WLrDTrrFJT7ATkroJfS/SzhFb1ZTjn
+   zmGSVwdrgDe7anErj8XJ8OJNWFy1SIbBCGNRC2mpciDx+hYlCDsmGzV1u
+   TVWvB7dF9hvr6er6FNk6CicjwaYK5DkfBnBqT7MWSNasF6/oIBP/M2dRo
+   B06GlI3D6+yfRhmvJyWn0huE3u6wj6pNPgddaiLg17lwcA7NQNwL3Fs9S
+   Q==;
+X-CSE-ConnectionGUID: CclnGGeKRxutdmWHu/ey6w==
+X-CSE-MsgGUID: 7RHeIliVT2O8u2pwWghytg==
 X-IronPort-AV: E=Sophos;i="6.07,247,1708412400"; 
-   d="scan'208";a="23940607"
+   d="scan'208";a="254178193"
 X-Amp-Result: SKIPPED(no attachment in message)
 Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa2.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 01 May 2024 23:50:43 -0700
-Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
+  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 01 May 2024 23:55:09 -0700
+Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
  chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Wed, 1 May 2024 23:49:47 -0700
-Received: from localhost (10.10.85.11) by chn-vm-ex03.mchp-main.com
- (10.10.85.151) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
- Transport; Wed, 1 May 2024 23:49:47 -0700
-Date: Thu, 2 May 2024 08:49:46 +0200
+ 15.1.2507.35; Wed, 1 May 2024 23:54:54 -0700
+Received: from localhost (10.10.85.11) by chn-vm-ex04.mchp-main.com
+ (10.10.85.152) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
+ Transport; Wed, 1 May 2024 23:54:54 -0700
+Date: Thu, 2 May 2024 08:54:54 +0200
 From: Horatiu Vultur <horatiu.vultur@microchip.com>
 To: Min Li <lnimi@hotmail.com>
 CC: <richardcochran@gmail.com>, <lee@kernel.org>,
 	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>, Min Li
 	<min.li.xe@renesas.com>
-Subject: Re: [PATCH net-next v7 3/5] ptp: clockmatrix: dco input-to-output
- delay is 20 FOD cycles + 8ns
-Message-ID: <20240502064946.yc6v7xadwkfldbsw@DEN-DL-M31836.microchip.com>
+Subject: Re: [PATCH net-next v7 4/5] ptp: clockmatrix: Fix caps.max_adj to
+ reflect DPLL_MAX_FREQ_OFFSET[MAX_FFO]
+Message-ID: <20240502065454.vn3rcfovwysqvbub@DEN-DL-M31836.microchip.com>
 References: <20240501160324.27514-1-lnimi@hotmail.com>
- <LV3P220MB12024CB984967E4AC05A1E13A0192@LV3P220MB1202.NAMP220.PROD.OUTLOOK.COM>
+ <LV3P220MB12026BB3CBA7FCE8480438FBA0192@LV3P220MB1202.NAMP220.PROD.OUTLOOK.COM>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,52 +77,45 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Disposition: inline
-In-Reply-To: <LV3P220MB12024CB984967E4AC05A1E13A0192@LV3P220MB1202.NAMP220.PROD.OUTLOOK.COM>
+In-Reply-To: <LV3P220MB12026BB3CBA7FCE8480438FBA0192@LV3P220MB1202.NAMP220.PROD.OUTLOOK.COM>
 
 The 05/01/2024 12:03, Min Li wrote:
 
 Hi Min Li,
 
-> 
-> From: Min Li <min.li.xe@renesas.com>
-> 
-> Set dco input-to-output delay is 20 FOD cycles + 8ns
+Maybe the entire patch should target net instead of net-next. As this is
+fixing an issue.
 
-Can you explain why you are doing this change in the commit message?
-Is this a fix or just improvement?
+> @@ -2285,6 +2301,10 @@ static int idtcm_enable_channel(struct idtcm *idtcm, u32 index)
+>                 ppd->chan = index;
+>         }
+> 
+> +       err = initialize_max_adj(channel);
+> +       if (err)
+> +               return err;
+> +
+>         err = initialize_dco_operating_mode(channel);
+>         if (err)
+>                 return err;
+> @@ -2437,8 +2457,13 @@ static int idtcm_probe(struct platform_device *pdev)
+> 
+>         err = idtcm_load_firmware(idtcm, &pdev->dev);
+> 
+> -       if (err)
+> +       if (err) {
+> +               if (err == -ENOENT) {
+> +                       mutex_unlock(idtcm->lock);
+> +                       return -EPROBE_DEFER;
+> +               }
+>                 dev_warn(idtcm->dev, "loading firmware failed with %d", err);
+> +       }
+> 
+>         wait_for_chip_ready(idtcm);
+> 
 
-> 
-> Signed-off-by: Min Li <min.li.xe@renesas.com>
-> ---
->  drivers/ptp/ptp_clockmatrix.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/ptp/ptp_clockmatrix.c b/drivers/ptp/ptp_clockmatrix.c
-> index d069b6e451ef..21f3a2c179f5 100644
-> --- a/drivers/ptp/ptp_clockmatrix.c
-> +++ b/drivers/ptp/ptp_clockmatrix.c
-> @@ -2165,7 +2165,7 @@ static int configure_channel_pll(struct idtcm_channel *channel)
-> 
->  /*
->   * Compensate for the PTP DCO input-to-output delay.
-> - * This delay is 18 FOD cycles.
-> + * This delay is 20 FOD cycles + 8ns.
->   */
->  static u32 idtcm_get_dco_delay(struct idtcm_channel *channel)
->  {
-> @@ -2196,7 +2196,7 @@ static u32 idtcm_get_dco_delay(struct idtcm_channel *channel)
->         fodFreq = (u32)div_u64(m, n);
-> 
->         if (fodFreq >= 500000000)
-> -               return (u32)div_u64(18 * (u64)NSEC_PER_SEC, fodFreq);
-> +               return (u32)div_u64(20 * (u64)NSEC_PER_SEC, fodFreq) + 8;
-> 
->         return 0;
->  }
-> --
-> 2.39.2
-> 
-> 
+Also this change should be in a separate patch as this doesn't have
+anything to do with caps.max_adj but it is releasing the lock in case
+firmware fails to be loaded.
 
 -- 
 /Horatiu
