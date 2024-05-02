@@ -1,137 +1,205 @@
-Return-Path: <netdev+bounces-92919-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92923-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 433248B959E
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 09:51:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D3418B95B8
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 09:56:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 747761C211BD
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 07:51:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3075A1C208A8
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 07:56:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6135724B5B;
-	Thu,  2 May 2024 07:51:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A4F42D047;
+	Thu,  2 May 2024 07:56:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="O4kmKZzR"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=fritzc.com header.i=@fritzc.com header.b="oYfZsp15"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fritzc.com (mail.fritzc.com [213.160.72.247])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B10EC21106
-	for <netdev@vger.kernel.org>; Thu,  2 May 2024 07:51:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6737022F00;
+	Thu,  2 May 2024 07:56:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.160.72.247
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714636300; cv=none; b=cJtkR+WxguHFgRNTBkkJrvRay+k45/JNgCgttETKGtxEsnLb8KhnIrBIpoyFkl6zvDGGNsZ93spQ28udARxG1HxDDdRl69ASYc4ZKCCgR6B7G+OTQQtk7xl8+OyoavTDqsr+RffUKPxCTmiFD9VHTX2d2x+MROlJyHly8KB5YeI=
+	t=1714636608; cv=none; b=CrGOnKMYgX4OFG9ZFOBoHv3mBzV2Oea7W4NiPREqfRc0P5zexw7jixy1iKwXcPrV/Hg9drc8d9nRT9wFMmdzid3cCOM/dMtNmBWxsfHT+ygSDyIlxHwDmHWZBHM84HRhycQqrTJ5SdmbZ2pNbX2xqGIoXYYJCF1z2f9QElKgMeU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714636300; c=relaxed/simple;
-	bh=kYoS0DMOZ9opD4qUEZZ81bljlubz2EYYFhlTXUUBuBw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=tY/bf1ORr1esF37ma33JmdvWjKvsKJlWM55a7ODpGsc+ZulLVQWfADN92Cua2p2Wjk0se7V7uMd199xT8CGwDsukigi2aBm+RqxMWELFRdwpL0jO/Hxj3oghfRWGDjHiprGA+J660naelqCkfy30ezocPcaRKxO0SHDbnG9xnJ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=O4kmKZzR; arc=none smtp.client-ip=209.85.167.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
-Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-516d3a470d5so9516865e87.3
-        for <netdev@vger.kernel.org>; Thu, 02 May 2024 00:51:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1714636296; x=1715241096; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=juAuSH1JPhY7PWUJ70Ld08vmAUyCp8zbapAQIba/lj4=;
-        b=O4kmKZzR8W/uAJ8Z6XHT1oeyyWTlxcDK34bqXY55c4d/mGW0oMTgyfyj2PjlTnVJbt
-         y9ALVA7H0rKFaJjtF1Ip9N1+GfPUxwk/loFEWbCpv1mO1F6QDrtQ70BqOYPQvFVmy0om
-         rGs8tjRGTfszA35ZYV7Piz7seQGv5Af7Y1Yxo=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714636296; x=1715241096;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=juAuSH1JPhY7PWUJ70Ld08vmAUyCp8zbapAQIba/lj4=;
-        b=xC9MQwIKXR5MncBdDkYiExPF8d6UIfqnW81P3Hh3diaC9g5XVSd3sehRZvKvNyxlak
-         qe7hN2vQyNK7phaLYFizuDbAJpLbjjT6VFJTpxtnjx06j/VJxYb1PsKItZKApCqJ8KNA
-         TSDQim5BqM+aBzcGVcF3bKKb4RtYmwwn9yDs8AN16qUKz8hDvcvBtOBc2RbI8M3I9PTy
-         pkoJjG2SlP3I6Rf7o7gUbEr3mpkQDe3ILqKwM9udEhAzdVTtEHCbd7Za4UCx513CxSQU
-         UAY+lEdSojYcK4pSqEIwM4kJDYE/AsqQcKrZyfbq3usHV6cPoBkVZk42JQuo4+c4ppJs
-         i8Hg==
-X-Forwarded-Encrypted: i=1; AJvYcCW7JTg3xZfc6i8+/UPP4LfwI/Nwq/30PJ4oKzIKU/Ux/ZguSWuLeQazzRBSAhb6aB8CEQ7QLihSlhGZGxXFF4hjVMoIfmvu
-X-Gm-Message-State: AOJu0YxRwA0pPI4EA0lQGnoijkGnDkatTQn0omyf2QxhiEArn0T8YDIx
-	TPIko+XFh4DiYEjDwWfFL5Y+yfKg+5WSemP/+T5dZ5NcoBVMZIPAEC7JeNCm7j1jxln5xVMjUpD
-	gN4iNaGsiyB+3Lyb8TYsmetD+PGmHmOqcgW92
-X-Google-Smtp-Source: AGHT+IEAVYn1Zg5pB/+HWCfbuXWxOWUqPfY3srDAkAXrE3zW+4aKcPJ8YB092/ynCkhEGaNCe+bioePdFycOCNiVjR0=
-X-Received: by 2002:a05:6512:3108:b0:51e:12e2:2a1b with SMTP id
- n8-20020a056512310800b0051e12e22a1bmr714499lfb.41.1714636295807; Thu, 02 May
- 2024 00:51:35 -0700 (PDT)
+	s=arc-20240116; t=1714636608; c=relaxed/simple;
+	bh=2WqGKQ7sG8p73RSus7aIVmhwSeFbo1dJFynMHU4XsCM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=k66bvFTXsjSmTpR4WdsHedd/Qy3ZC7VH1OogWbgJt5OxgkY4RzmJP+8l2rclCCDX29Qy3vgb7/Gt5QDaMn2izJuuHfACCgG7vPq49T8z7FqyVTTSeWMZwD/Ha98LxhGyRPVoGk/T3uLCghFC0u3xqoUmrL2Eeb+iJ1Q8pu61DvM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hexdev.de; spf=pass smtp.mailfrom=hexdev.de; dkim=pass (1024-bit key) header.d=fritzc.com header.i=@fritzc.com header.b=oYfZsp15; arc=none smtp.client-ip=213.160.72.247
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hexdev.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hexdev.de
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=fritzc.com;
+	s=dkim; h=Content-Transfer-Encoding:MIME-Version:Message-Id:Date:Subject:Cc:
+	To:From:Sender:Reply-To:Content-Type:Content-ID:Content-Description:
+	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=wmXI9SDDcGadnI214+SdOevHMDtTo6rucZNKCeRvzpk=; b=oYfZsp15mxUZFdVM6E3jOK7cWl
+	m6nPQsl5pARRwdtVpwmk3JgNPxqNKcsBmQJxaXq4mxBgNtNQhUY69/xcU42QoC8y0z3z35EVQKujU
+	Us3oE9YbTjd0omigLAy/zW3JvsN+sC7czGE2GHrvbajU2R0Cg51qEtZNGx4SJEoUMo/U=;
+Received: from 127.0.0.1
+	by fritzc.com with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim latest)
+	(envelope-from <christoph.fritz@hexdev.de>)
+	id 1s2RIs-001Yg7-22;
+	Thu, 02 May 2024 09:56:31 +0200
+From: Christoph Fritz <christoph.fritz@hexdev.de>
+To: Oliver Hartkopp <socketcan@hartkopp.net>,
+	Marc Kleine-Budde <mkl@pengutronix.de>,
+	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Jiri Kosina <jikos@kernel.org>,
+	Benjamin Tissoires <bentiss@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Jiri Slaby <jirislaby@kernel.org>,
+	Sebastian Reichel <sre@kernel.org>,
+	Linus Walleij <linus.walleij@linaro.org>
+Cc: Andreas Lauser <andreas.lauser@mercedes-benz.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Pavel Pisa <pisa@cmp.felk.cvut.cz>,
+	linux-can@vger.kernel.org,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-input@vger.kernel.org,
+	linux-serial@vger.kernel.org
+Subject: [PATCH v2 00/12] LIN Bus support for Linux
+Date: Thu,  2 May 2024 09:55:22 +0200
+Message-Id: <20240502075534.882628-1-christoph.fritz@hexdev.de>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240412073046.1192744-1-wenst@chromium.org> <20240412073046.1192744-2-wenst@chromium.org>
- <171322232789.252337.16326980700188367647.robh@kernel.org>
-In-Reply-To: <171322232789.252337.16326980700188367647.robh@kernel.org>
-From: Chen-Yu Tsai <wenst@chromium.org>
-Date: Thu, 2 May 2024 15:51:24 +0800
-Message-ID: <CAGXv+5GroxzyUSQZNW-r9xt6Sgy+EGv3+08Htbb_ZcSRvaBR0Q@mail.gmail.com>
-Subject: Re: [PATCH v3 1/2] dt-bindings: net: bluetooth: Add MediaTek MT7921S
- SDIO Bluetooth
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: devicetree@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
-	netdev@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	linux-mediatek@lists.infradead.org, Conor Dooley <conor+dt@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Tue, Apr 16, 2024 at 7:05=E2=80=AFAM Rob Herring <robh@kernel.org> wrote=
-:
-> On Fri, 12 Apr 2024 15:30:42 +0800, Chen-Yu Tsai wrote:
-> > The MediaTek MT7921S is a WiFi/Bluetooth combo chip that works over
-> > SDIO. WiFi and Bluetooth are separate SDIO functions within the chip.
-> > While the Bluetooth SDIO function is fully discoverable, the chip has
-> > a pin that can reset just the Bluetooth core, as opposed to the full
-> > chip. This should be described in the device tree.
-> >
-> > Add a device tree binding for the Bluetooth SDIO function of the MT7921=
-S
-> > specifically to document the reset line. This binding is based on the M=
-MC
-> > controller binding, which specifies one device node per SDIO function.
-> >
-> > Cc: Sean Wang <sean.wang@mediatek.com>
-> > Signed-off-by: Chen-Yu Tsai <wenst@chromium.org>
-> > ---
-> > Changes since v2:
-> > - Expand description and commit message to clearly state that WiFi and
-> >   Bluetooth are separate SDIO functions, and that each function should
-> >   be a separate device node, as specified by the MMC binding.
-> > - Change 'additionalProperties' to 'unevaluatedProperties'
-> > - Add missing separating new line
-> > - s/ot/to/
-> >
-> > Angelo's reviewed-by was not picked up due to the above changes.
-> >
-> > Changes since v1:
-> > - Reworded descriptions
-> > - Moved binding maintainer section before description
-> > - Added missing reference to bluetooth-controller.yaml
-> > - Added missing GPIO header to example
-> > ---
-> >  .../bluetooth/mediatek,mt7921s-bluetooth.yaml | 55 +++++++++++++++++++
-> >  MAINTAINERS                                   |  1 +
-> >  2 files changed, 56 insertions(+)
-> >  create mode 100644 Documentation/devicetree/bindings/net/bluetooth/med=
-iatek,mt7921s-bluetooth.yaml
-> >
->
-> Reviewed-by: Rob Herring <robh@kernel.org>
+This series is introducing basic Local Interconnect Network (LIN) (ISO
+17987) [0] support to the Linux kernel, along with two drivers that make
+use of it: An advanced USB adapter and a lightweight serdev driver (for
+UARTs equipped with a LIN transceiver).
 
-Luiz, could you pick up this patch?
+The LIN bus is common in the automotive industry for connecting
+low-level devices like side mirrors, seats, ambient lights, etc.
 
-The other one is already merged in the MediaTek tree.
+The LIN bus is a lower-cost bus system with a subset of features of CAN.
+Its earlier specification (before ISO) is publicly accessible [1].
 
+This series of patches follows up on a discussion initiated by an RFC
+patch series [2].
 
-Thanks!
-ChenYu
+The core of this series is the first patch, which implements the CAN_LIN
+glue driver. It basically utilizes the CAN interface on one side and
+for device drivers on the other side it creates a rx() function and
+several callbacks.
+
+This approach is non-invasive, as LIN frames (nearly identical to CAN
+frames) are just treated as a special case of CAN frames. This approach
+eliminates the need for a separate API for LIN, allowing the use of
+existing CAN tools, including the CAN broadcast manager.
+
+For the responder part of LIN, when a device responds to a controller
+request, it can reply on up to LIN its 64 possible IDs (0...63) with a
+maximum of 8 bytes payload.  The response must be sent relatively
+quickly, so offloading is used (which is used by most devices anyway).
+Devices that do not support offloading (like the lightweight serdev)
+handle the list of responses in the driver on a best-effort basis.
+
+The CAN broadcast manager (bcm) makes a good interface for the LIN
+userland interface, bcm is therefore enhanced to handle the
+configuration of these offload RX frames, so that the device can handle
+the response on its own.  As a basic alternative, a sysfs file per LIN
+identifier gets also introduced.
+
+The USB device driver for the hexLIN [3] adapter uses the HID protocol
+and is located in the drivers/hid directory. Which is a bit uncommon for
+a CAN device, but this is a LIN device and mainly a hid driver (and all
+hid drivers go into drivers/hid).
+
+The other driver, the UART lin-serdev driver requires support for break
+detection, this is addressed by two serdev patches.
+
+The lin-serdev driver has been tested on an ARM SoC, on its uart
+(uart-pl011) an adapter board (hexLIN-tty [4]) has been used.  As a
+sidenote, in that tty serial driver (amba-pl011.c) it was necessary to
+disable DMA_ENGINE to accurately detect breaks [5].
+
+The functions for generating LIN-Breaks and checksums, originally from
+a line discipline driver named sllin [6], have been adopted into the
+lin-serdev driver.
+
+To make use of the LIN mode configuration (commander or responder)
+option, a patch for iproute2 [7] has been made.
+
+The lin-utils [8] provide userland tools for reference, testing, and
+evaluation. These utilities are currently separate but may potentially
+be integrated into can-utils in the future.
+
+[0]: https://en.wikipedia.org/wiki/Local_Interconnect_Network
+[1]: https://www.lin-cia.org/fileadmin/microsites/lin-cia.org/resources/documents/LIN_2.2A.pdf
+[2]: https://lwn.net/Articles/916049/
+[3]: https://hexdev.de/hexlin
+[4]: https://hexdev.de/hexlin#tty
+[5]: https://github.com/raspberrypi/linux/issues/5985
+[6]: https://github.com/lin-bus/linux-lin/blob/master/sllin/sllin.c
+[7]: https://github.com/ch-f/iproute2/tree/lin-feature
+[8]: https://github.com/ch-f/lin-utils
+
+Changes in v2:
+ - add open/stop functions to also address teardown issues
+ - adapt dt-bindings description and add hexdev
+ - use 'unsigned int' instead of 'uint'
+ - add and adapt macros
+ - address review comments
+
+Christoph Fritz (12):
+  can: Add LIN bus as CAN abstraction
+  HID: hexLIN: Add support for USB LIN bus adapter
+  tty: serdev: Add flag buffer aware receive_buf_fp()
+  tty: serdev: Add method to enable break flags
+  dt-bindings: vendor-prefixes: Add hexDEV
+  dt-bindings: net/can: Add serial (serdev) LIN adapter
+  can: Add support for serdev LIN adapters
+  can: lin: Add special frame id for rx offload config
+  can: bcm: Add LIN answer offloading for responder mode
+  can: lin: Handle rx offload config frames
+  can: lin: Support setting LIN mode
+  HID: hexLIN: Implement ability to update lin mode
+
+ .../bindings/net/can/hexdev,lin-serdev.yaml   |  32 +
+ .../devicetree/bindings/vendor-prefixes.yaml  |   2 +
+ drivers/hid/Kconfig                           |  19 +
+ drivers/hid/Makefile                          |   1 +
+ drivers/hid/hid-hexdev-hexlin.c               | 641 ++++++++++++++++++
+ drivers/hid/hid-ids.h                         |   1 +
+ drivers/hid/hid-quirks.c                      |   3 +
+ drivers/net/can/Kconfig                       |  26 +
+ drivers/net/can/Makefile                      |   2 +
+ drivers/net/can/lin-serdev.c                  | 514 ++++++++++++++
+ drivers/net/can/lin.c                         | 562 +++++++++++++++
+ drivers/tty/serdev/core.c                     |  11 +
+ drivers/tty/serdev/serdev-ttyport.c           |  19 +-
+ include/linux/serdev.h                        |  19 +-
+ include/net/lin.h                             |  99 +++
+ include/uapi/linux/can/bcm.h                  |   5 +-
+ include/uapi/linux/can/netlink.h              |   2 +
+ net/can/bcm.c                                 |  74 +-
+ 18 files changed, 2026 insertions(+), 6 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/net/can/hexdev,lin-serdev.yaml
+ create mode 100644 drivers/hid/hid-hexdev-hexlin.c
+ create mode 100644 drivers/net/can/lin-serdev.c
+ create mode 100644 drivers/net/can/lin.c
+ create mode 100644 include/net/lin.h
+
+-- 
+2.39.2
+
 
