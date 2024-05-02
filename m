@@ -1,283 +1,246 @@
-Return-Path: <netdev+bounces-93086-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93087-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFC338BA007
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 20:08:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03A748BA023
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 20:15:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DFD571C21FBB
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 18:08:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2690E1C2217B
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 18:15:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 225C0171E64;
-	Thu,  2 May 2024 18:08:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e9xNMoph"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9744C172BCC;
+	Thu,  2 May 2024 18:15:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f173.google.com (mail-il1-f173.google.com [209.85.166.173])
+Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 753BD16FF58;
-	Thu,  2 May 2024 18:08:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D843A172BD9
+	for <netdev@vger.kernel.org>; Thu,  2 May 2024 18:15:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.71
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714673309; cv=none; b=hREh0qO16XkS9ACIMGGew1gPaNXzzQUaHv9fEqJRKrct5TPn02X9fK8kpyBKt+NxRPpOANcyC+SolwMvl5v91jC4dgtTUp0QpTy8th+B+lqx/+7eEU0Y4AJrmxyToUHliEGZG0mdweE8QjSAZVViTK/tMQpLCVADLMP89eYVDvM=
+	t=1714673727; cv=none; b=VCH5wrFW9s9FIPJMzj79U+KnCbra7mQTEql8oWcffyqMIXtTjwtH1oZIWzqWY7ZEcsc4LmcSVEmpxFUMQgy+CfDwjrE8UWVzlSbpe2FAYX2SDTgOxrzrNypW0Qf3gwMv7GK1UXw/2aqDI9N/0mDpwHj7jQlkiWSC37bKdd5iXJk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714673309; c=relaxed/simple;
-	bh=+NYX/Uk8aRS4lwimLUm5uzcNKTLy7VTBDsYnd0X/Y/c=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Esg60y1d0yQFH1VMSZqpDfiVdXNGc03kayLCnVAcnis8HMJqu8/YNotJbJUaqAlPO+JaisJCchNxaJzNV+9EruA7KXQCrtNqmz62/iv8kU7jHzF3TMqRJSAU0Cl/1tBZnaI6XfNoI02zyeTyXytFYj1eBubgnboXdQmKCCN6s5c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e9xNMoph; arc=none smtp.client-ip=209.85.166.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f173.google.com with SMTP id e9e14a558f8ab-36bff60429cso33698735ab.2;
-        Thu, 02 May 2024 11:08:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1714673306; x=1715278106; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lrMykqractpqdToGF/WwG3h/uxArSE3bzswfGx8XcQ0=;
-        b=e9xNMoph/TUd6pg8v63jiODfW0YM8Jv6fO2UGo4bQoujUP5QqnFf/uVmJbf+SSbS96
-         2ft3veqoQw5+A60MPM1a4lVDpCtbHhPt38/mHAZSDBsIgDxZZxm8Coc6xpy4ge6RSAEn
-         kPBwjzfV7oYMta2LQ5GP5HV32kQNLHLVs0Pnn7ePOIZPMROMbkhB49nmu345EMOVYeRa
-         Awdh+OQKw2RvfLnNIduEV3fABiTAHbBV9fZwilA1JSEoVJUuY6hhGUjRBPTto5o573+n
-         ebSsM4XxQrBmp0TgeR5ATB4I1eLoHRO9mmmejTs2yznqgrO8npiRqWFI+J1M3W4iUBgJ
-         gNKw==
+	s=arc-20240116; t=1714673727; c=relaxed/simple;
+	bh=B+AEgSrImoxMG3JNPasALH1NU4yOSbtYW7dTITD570A=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=iqF/e2a5N+GPFDAwERzZ1x648pTeyCd+U4SLN4cPHUQex9BPZbxC/apF9B0fdhGvZ8hzBI9mX6cM3uVXYRkKdJ+m1ZeZh/ixJY/GH3Z7IKzcm449/TB2d3WRyTjsb9jYxXNWJQ2NzfkNygeCYByIxpIJcP2NrDBaWJ+bw7tv0Cw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-7d9fde69c43so809400739f.1
+        for <netdev@vger.kernel.org>; Thu, 02 May 2024 11:15:25 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714673306; x=1715278106;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=lrMykqractpqdToGF/WwG3h/uxArSE3bzswfGx8XcQ0=;
-        b=DtYojtD70iox9KYzAZHW6C4iGzvuO5dR/1myTWqvu7qwIyUa2PDMdn629m2HiO61ig
-         cCHVupD0AZ2vV81KCoptEOxBLqNdZEqp5paJ+KDsK76Dlx+AJ+FGpStbuplATGjvhWdx
-         UIBIOaCf44SGxWJz7tyqr+eJSFwdXxcQKIwzHTzV9iqY/VRm7BxqXBn9eDKHSh0K5P8V
-         z4hSU/AmMlrUJ9g7PbrbotZjXui1nVU4dwOcy7OwLDr5/+ZwoLng8wytVwYmb76LlAVa
-         DoRcA+CHmWB/5poi1q4QFylxF6LBrcH6v1xRHmn/7wJQjgzPqaM3IKGOKo5gMkNmMVpZ
-         90Mw==
-X-Forwarded-Encrypted: i=1; AJvYcCXf88JFLvx2yQNq6nrW7Eqv5iDvxMu1iAyGoBsiq+ypUyZxbjFHPyny0w+mwpiNWvbS6xCUCywj/P3v8wtxOtfZwlV4Z6BUoT2OOQ==
-X-Gm-Message-State: AOJu0YwCWs3Rby4qEOj5DqP0HL2zDh1JriyfB3NNPMan56XuxKdp7Sw6
-	ofUaR/Dknc9OidYCCORSvfCmutGuucAMDDelmh5jDA14XncmcbtwU6+Aia1A3pVPU2W4P/la2yv
-	8N4/koDV11RoPV+x7vlZ6IfhNFCE=
-X-Google-Smtp-Source: AGHT+IEwoAxePWWCTH3+v1pt5QpmbhG3wbojT/iCBAucg6ZbQpy54bSQMW3VV1hrgqQ8h+TTlTyGvZTR8cEj+HooTBk=
-X-Received: by 2002:a05:6e02:174b:b0:36a:3c07:9caf with SMTP id
- y11-20020a056e02174b00b0036a3c079cafmr542345ill.30.1714673306455; Thu, 02 May
- 2024 11:08:26 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1714673725; x=1715278525;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=rkV1hvBTUEVgIZeAIO5qPy+bLhfXMGCLMSOvL4R+62w=;
+        b=NnwoqytrYEE+dF0lY411OC03Kyju/cttZGPk2dBZuUzvjS1sATZI9XhDs/JLOT98rY
+         rmhU0sRuHDcJEe77l4DXEqrBpbXg+Jz45lob06DTPFJuO7YcWlYnPT+HpYh/14dn8PcF
+         8sZzxouPukt6LehXhtlQnajlJ5CjS/j0DDcsd4cVS5evo0DTlClwXSB0xhlqZ4hor6Uk
+         zEUqBLDd4Htn6iRIS4SQcQuKiBox0g6j5N6b0Yb+kL2ozZ7wJQ1sGxnNHsztb9zBLNk5
+         o0gT9EKQkvBQkpVQUawOdqUu4tDXjVBufFekiuhx5bj1u+jnmBKBLSGGacDk/AbTbd1I
+         MdzA==
+X-Forwarded-Encrypted: i=1; AJvYcCVTHqD/RDBl9oGLF/FZoHcPwVARik6y/MoicaqphFPAMlu/bxPcq3/Cecbef2dyN9Q29ISS8a39JoVEd7xCPKZAhgQS2f+M
+X-Gm-Message-State: AOJu0Yxl2Z5+UBBdJRgMKdxyZiGI8Rc082wDKVWnF9EQ2sSKIZ8Gxebn
+	WtBqQP0fXTXlHAPFAkxXXv0VPsL3No+gaCHOuQma0k68tEny39nlcqL67W0Y3eHFdRV57Z9K2Qe
+	EXFAQ7dOpBJ50H141K+zYw5B4FuCgtBbKwk1BZZKMqL3WelazT8eCCWs=
+X-Google-Smtp-Source: AGHT+IHMCTmGWmSW2YdsLMh0GsH6rDyactqBacyaXMAcHpU000fVC7Czu0WNrx3/o8e2jNHKLGzZ1jU2DGIwaUSNqRgQdSWKN5O9
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1710173427.git.lucien.xin@gmail.com> <74d5db09-6b5c-4054-b9d3-542f34769083@samba.org>
- <CADvbK_dzVcDKsJ9RN9oc0K1Jwd+kYjxgE6q=ioRbVGhJx7Qznw@mail.gmail.com>
- <f427b422-6cfc-45ac-88eb-3e7694168b63@samba.org> <CADvbK_cA-RCLiUUWkyNsS=4OhkWrUWb68QLg28yO2=8PqNuGBQ@mail.gmail.com>
- <438496a6-7f90-403d-9558-4a813e842540@samba.org> <CADvbK_fkbOnhKL+Rb+pp+NF+VzppOQ68c=nk_6MSNjM_dxpCoQ@mail.gmail.com>
- <1456b69c-4ffd-4a08-b120-6a00abf1eb05@samba.org> <CADvbK_cQRpyzHG4UUOzfgmqLndvpx5Cd+d59rrqGRp0ic3PyxA@mail.gmail.com>
- <95922a2f-07a1-4555-acd2-c745e59bcb8e@samba.org> <CADvbK_eR4++HbR_RncjV9N__M-uTHtmqcC+_Of1RKVw7Uqf9Cw@mail.gmail.com>
- <CADvbK_dEWNNA_i1maRk4cmAB_uk4G4x0eZfZbrVX=zJ+2H9o_A@mail.gmail.com>
- <dc3815af-5b46-452b-8bcc-30a0934740a2@samba.org> <CADvbK_e__qpCa44uF+J2Z+2Lhb2suktTNT+CeQayk_uhckVYqQ@mail.gmail.com>
- <2365b657-bea4-4527-9fce-ad11c690bde3@samba.org>
-In-Reply-To: <2365b657-bea4-4527-9fce-ad11c690bde3@samba.org>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Thu, 2 May 2024 14:08:14 -0400
-Message-ID: <CADvbK_f-WCKp-_NJYOL=j__kxpFuXraFLst3=aPn6BOvX=o+Qg@mail.gmail.com>
-Subject: Re: [RFC PATCH net-next 0/5] net: In-kernel QUIC implementation with
- Userspace handshake
-To: Stefan Metzmacher <metze@samba.org>
-Cc: network dev <netdev@vger.kernel.org>, davem@davemloft.net, kuba@kernel.org, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Steve French <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>, 
-	Chuck Lever III <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, 
-	Sabrina Dubroca <sd@queasysnail.net>, Tyler Fanelli <tfanelli@redhat.com>, 
-	Pengtao He <hepengtao@xiaomi.com>, 
-	"linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>, 
-	Samba Technical <samba-technical@lists.samba.org>
+X-Received: by 2002:a05:6638:9412:b0:487:8899:de17 with SMTP id
+ ky18-20020a056638941200b004878899de17mr17269jab.3.1714673725114; Thu, 02 May
+ 2024 11:15:25 -0700 (PDT)
+Date: Thu, 02 May 2024 11:15:25 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000004a9b3506177c96d5@google.com>
+Subject: [syzbot] [netfilter?] WARNING: suspicious RCU usage in br_mst_set_state
+From: syzbot <syzbot+fa04eb8a56fd923fc5d8@syzkaller.appspotmail.com>
+To: kadlec@netfilter.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	netfilter-devel@vger.kernel.org, pablo@netfilter.org, 
+	syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Mon, Apr 29, 2024 at 11:20=E2=80=AFAM Stefan Metzmacher <metze@samba.org=
-> wrote:
->
-> Hi Xin Long,
->
-> >>
-> > Just confirmed from other ebpf experts, there are no in-kernel interfac=
-es
-> > for loading and interacting with BPF maps/programs(other than from BPF =
-itself).
-> >
-> > It seems that we have to do this match in QUIC stack. In the latest QUI=
-C
-> > code, I added quic_packet_get_alpn(), a 59-line function, to parse ALPN=
-s
-> > and then it will search for the listen sock with these ALPNs in
-> > quic_sock_lookup().
-> >
-> > I introduced 'alpn_match' module param, and it can be enabled when load=
-ing
-> > the module QUIC by:
-> >
-> >    # modprobe quic alpn_match=3D1
-> >
-> > You can test it by tests/sample_test in the latest code:
-> >
-> >    Start 3 servers:
-> >
-> >      # ./sample_test server 0.0.0.0 1234 \
-> >          ./keys/server-key.pem ./keys/server-cert.pem smbd
-> >      # ./sample_test server 0.0.0.0 1234 \
-> >          ./keys/server-key.pem ./keys/server-cert.pem h3
-> >      # ./sample_test server 0.0.0.0 1234 \
-> >          ./keys/server-key.pem ./keys/server-cert.pem ksmbd
-> >
-> >    Try to connect on clients with:
-> >
-> >      # ./sample_test client 127.0.0.1 1234 ksmbd
-> >      # ./sample_test client 127.0.0.1 1234 smbd
-> >      # ./sample_test client 127.0.0.1 1234 h3
-> >
-> >    to see if the corresponding server responds.
-> >
-> > There might be some concerns but it's also a useful feature that can no=
-t
-> > be implemented in userland QUICs. The commit is here:
-> >
-> > https://github.com/lxin/quic/commit/de82f8135f4e9196b503b4ab5b359d88f2b=
-2097f
-> >
-> > Please check if this is enough for SMB applications.
->
-> It look great thanks!
->
-> > Note as a listen socket is now identified by [address + port + ALPN] wh=
-en
-> > alpn_match=3D1, this feature does NOT require SO_REUSEPORT socket optio=
-n to
-> > be set, unless one wants multiple sockets to listen to
-> > the same [address + port + ALPN].
->
-> I'd argue that this should be the default and be required before listen()
-> or maybe before bind(), so that it can return EADDRINUSE. As EADDRINUSE s=
-hould only
-> happen for servers it might be useful to have a QUIC_SOCKOPT_LISTEN_ALPN =
-instead of
-> QUIC_SOCKOPT_ALPN. As QUIC_SOCKOPT_ALPN on a client socket should not gen=
-erate let
-> bind() care about the alpn value at all.
-The latest patches have made it always do alpn_match in kernel, and also
-support multiple ALPNs(split by ',' when setting it via sockopt) on both
-server and client side. Feel free to check.
+Hello,
 
-Note that:
-1. As you expected, setsockopt(QUIC_SOCKOPT_ALPN) must be called before
-   listen(), and it will return EADDRINUSE if there's a socket already
-   listening to the same IP + PORT + ALPN.
+syzbot found the following issue on:
 
-2. ALPN bind/match is a *listening* sockets thing, so it checks ALPN only
-   when adding listening sockets in quic_hash(), and it does ALPN only
-   when looking up listening sockets in quic_sock_lookup().
+HEAD commit:    e67572cd2204 Linux 6.9-rc6
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=16ec5c40980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=d2f00edef461175
+dashboard link: https://syzkaller.appspot.com/bug?extid=fa04eb8a56fd923fc5d8
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
 
-   By setting ALPNs in client sockets it will ONLY pack these ALPNs into
-   the Client Initial Packet when starting connecting, no bind/match for
-   these regular sockets, as these sockets can be found by 4-tuple or
-   a source_connection_id. bind() doesn't need to care about ALPN for
-   client/regular socket either.
+Unfortunately, I don't have any reproducer for this issue yet.
 
-   So it's fine to use QUIC_SOCKOPT_ALPN sockopt for both listen and
-   regular/client sockets, as in kernel it acts differently on ALPNs
-   for listening and regular sockets. (sorry for confusing, I could
-   have moved created another hashtable for listening sockets)
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/7ece3eebb82c/disk-e67572cd.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/81b1e26c57c9/vmlinux-e67572cd.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/be9561f066e4/bzImage-e67572cd.xz
 
-   In other word, a listen socket is identified by
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+fa04eb8a56fd923fc5d8@syzkaller.appspotmail.com
 
-        local_ip + local_port + ALPN(s)
+=============================
+WARNING: suspicious RCU usage
+6.9.0-rc6-syzkaller #0 Not tainted
+-----------------------------
+net/bridge/br_private.h:1599 suspicious rcu_dereference_protected() usage!
 
-   while a regular socket (represents a quic connection) is identified by:
+other info that might help us debug this:
 
-       local_ip + local_port + remote_ip + remote_port
 
-   or any of those
+rcu_scheduler_active = 2, debug_locks = 1
+10 locks held by syz-executor.1/8017:
+ #0: ffffffff8e3df430 (dup_mmap_sem){.+.+}-{0:0}, at: dup_mmap kernel/fork.c:637 [inline]
+ #0: ffffffff8e3df430 (dup_mmap_sem){.+.+}-{0:0}, at: dup_mm kernel/fork.c:1688 [inline]
+ #0: ffffffff8e3df430 (dup_mmap_sem){.+.+}-{0:0}, at: copy_mm+0x275/0x2180 kernel/fork.c:1737
+ #1: ffff888078cbea20 (&mm->mmap_lock){++++}-{3:3}, at: mmap_write_lock_killable include/linux/mmap_lock.h:124 [inline]
+ #1: ffff888078cbea20 (&mm->mmap_lock){++++}-{3:3}, at: dup_mmap kernel/fork.c:638 [inline]
+ #1: ffff888078cbea20 (&mm->mmap_lock){++++}-{3:3}, at: dup_mm kernel/fork.c:1688 [inline]
+ #1: ffff888078cbea20 (&mm->mmap_lock){++++}-{3:3}, at: copy_mm+0x295/0x2180 kernel/fork.c:1737
+ #2: ffff88806a945720 (&mm->mmap_lock/1){+.+.}-{3:3}, at: mmap_write_lock_nested include/linux/mmap_lock.h:115 [inline]
+ #2: ffff88806a945720 (&mm->mmap_lock/1){+.+.}-{3:3}, at: dup_mmap kernel/fork.c:647 [inline]
+ #2: ffff88806a945720 (&mm->mmap_lock/1){+.+.}-{3:3}, at: dup_mm kernel/fork.c:1688 [inline]
+ #2: ffff88806a945720 (&mm->mmap_lock/1){+.+.}-{3:3}, at: copy_mm+0x3d1/0x2180 kernel/fork.c:1737
+ #3: ffffffff8e334da0 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:329 [inline]
+ #3: ffffffff8e334da0 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:781 [inline]
+ #3: ffffffff8e334da0 (rcu_read_lock){....}-{1:2}, at: __pte_offset_map+0x82/0x380 mm/pgtable-generic.c:285
+ #4: ffff88802db9a798 (ptlock_ptr(ptdesc)#2){+.+.}-{2:2}, at: spin_lock include/linux/spinlock.h:351 [inline]
+ #4: ffff88802db9a798 (ptlock_ptr(ptdesc)#2){+.+.}-{2:2}, at: __pte_offset_map_lock+0x1ba/0x300 mm/pgtable-generic.c:373
+ #5: ffffffff8e334da0 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:329 [inline]
+ #5: ffffffff8e334da0 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:781 [inline]
+ #5: ffffffff8e334da0 (rcu_read_lock){....}-{1:2}, at: __pte_offset_map+0x82/0x380 mm/pgtable-generic.c:285
+ #6: ffff8880298631f8 (ptlock_ptr(ptdesc)#2/1){+.+.}-{2:2}, at: copy_pte_range mm/memory.c:1103 [inline]
+ #6: ffff8880298631f8 (ptlock_ptr(ptdesc)#2/1){+.+.}-{2:2}, at: copy_pmd_range mm/memory.c:1238 [inline]
+ #6: ffff8880298631f8 (ptlock_ptr(ptdesc)#2/1){+.+.}-{2:2}, at: copy_pud_range mm/memory.c:1275 [inline]
+ #6: ffff8880298631f8 (ptlock_ptr(ptdesc)#2/1){+.+.}-{2:2}, at: copy_p4d_range mm/memory.c:1299 [inline]
+ #6: ffff8880298631f8 (ptlock_ptr(ptdesc)#2/1){+.+.}-{2:2}, at: copy_page_range+0x11c7/0x5b00 mm/memory.c:1397
+ #7: ffffffff8e334d20 (rcu_read_lock_sched){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:329 [inline]
+ #7: ffffffff8e334d20 (rcu_read_lock_sched){....}-{1:2}, at: rcu_read_lock_sched include/linux/rcupdate.h:873 [inline]
+ #7: ffffffff8e334d20 (rcu_read_lock_sched){....}-{1:2}, at: pfn_valid+0xf6/0x440 include/linux/mmzone.h:2019
+ #8: ffffc90000a08c00 ((&p->forward_delay_timer)){+.-.}-{0:0}, at: call_timer_fn+0xc0/0x650 kernel/time/timer.c:1790
+ #9: ffff88807b56ccb8 (&br->lock){+.-.}-{2:2}, at: spin_lock include/linux/spinlock.h:351 [inline]
+ #9: ffff88807b56ccb8 (&br->lock){+.-.}-{2:2}, at: br_forward_delay_timer_expired+0x50/0x440 net/bridge/br_stp_timer.c:86
 
-       source_connection_ids.
+stack backtrace:
+CPU: 1 PID: 8017 Comm: syz-executor.1 Not tainted 6.9.0-rc6-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
+Call Trace:
+ <IRQ>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0x241/0x360 lib/dump_stack.c:114
+ lockdep_rcu_suspicious+0x221/0x340 kernel/locking/lockdep.c:6712
+ nbp_vlan_group net/bridge/br_private.h:1599 [inline]
+ br_mst_set_state+0x1ea/0x650 net/bridge/br_mst.c:105
+ br_set_state+0x28a/0x7b0 net/bridge/br_stp.c:47
+ br_forward_delay_timer_expired+0x176/0x440 net/bridge/br_stp_timer.c:88
+ call_timer_fn+0x18e/0x650 kernel/time/timer.c:1793
+ expire_timers kernel/time/timer.c:1844 [inline]
+ __run_timers kernel/time/timer.c:2418 [inline]
+ __run_timer_base+0x66a/0x8e0 kernel/time/timer.c:2429
+ run_timer_base kernel/time/timer.c:2438 [inline]
+ run_timer_softirq+0xb7/0x170 kernel/time/timer.c:2448
+ __do_softirq+0x2c6/0x980 kernel/softirq.c:554
+ invoke_softirq kernel/softirq.c:428 [inline]
+ __irq_exit_rcu+0xf2/0x1c0 kernel/softirq.c:633
+ irq_exit_rcu+0x9/0x30 kernel/softirq.c:645
+ instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1043 [inline]
+ sysvec_apic_timer_interrupt+0xa6/0xc0 arch/x86/kernel/apic/apic.c:1043
+ </IRQ>
+ <TASK>
+ asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:702
+RIP: 0010:lock_acquire+0x264/0x550 kernel/locking/lockdep.c:5758
+Code: 2b 00 74 08 4c 89 f7 e8 ba d1 84 00 f6 44 24 61 02 0f 85 85 01 00 00 41 f7 c7 00 02 00 00 74 01 fb 48 c7 44 24 40 0e 36 e0 45 <4b> c7 44 25 00 00 00 00 00 43 c7 44 25 09 00 00 00 00 43 c7 44 25
+RSP: 0018:ffffc90013657100 EFLAGS: 00000206
+RAX: 0000000000000001 RBX: 1ffff920026cae2c RCX: 0000000000000001
+RDX: dffffc0000000000 RSI: ffffffff8bcaca00 RDI: ffffffff8c1eaa60
+RBP: ffffc90013657260 R08: ffffffff92efe507 R09: 1ffffffff25dfca0
+R10: dffffc0000000000 R11: fffffbfff25dfca1 R12: 1ffff920026cae28
+R13: dffffc0000000000 R14: ffffc90013657160 R15: 0000000000000246
+ rcu_lock_acquire include/linux/rcupdate.h:329 [inline]
+ rcu_read_lock_sched include/linux/rcupdate.h:873 [inline]
+ pfn_valid+0x113/0x440 include/linux/mmzone.h:2019
+ page_table_check_set+0x25/0x700 mm/page_table_check.c:105
+ __page_table_check_ptes_set+0x220/0x280 mm/page_table_check.c:196
+ page_table_check_ptes_set include/linux/page_table_check.h:74 [inline]
+ set_ptes include/linux/pgtable.h:267 [inline]
+ __copy_present_ptes mm/memory.c:953 [inline]
+ copy_present_ptes mm/memory.c:1036 [inline]
+ copy_pte_range mm/memory.c:1151 [inline]
+ copy_pmd_range mm/memory.c:1238 [inline]
+ copy_pud_range mm/memory.c:1275 [inline]
+ copy_p4d_range mm/memory.c:1299 [inline]
+ copy_page_range+0x3d98/0x5b00 mm/memory.c:1397
+ dup_mmap kernel/fork.c:751 [inline]
+ dup_mm kernel/fork.c:1688 [inline]
+ copy_mm+0x1321/0x2180 kernel/fork.c:1737
+ copy_process+0x187a/0x3df0 kernel/fork.c:2390
+ kernel_clone+0x223/0x870 kernel/fork.c:2797
+ __do_sys_clone kernel/fork.c:2940 [inline]
+ __se_sys_clone kernel/fork.c:2924 [inline]
+ __x64_sys_clone+0x258/0x2a0 kernel/fork.c:2924
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf5/0x240 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7ff5bc07aed3
+Code: 1f 84 00 00 00 00 00 64 48 8b 04 25 10 00 00 00 45 31 c0 31 d2 31 f6 bf 11 00 20 01 4c 8d 90 d0 02 00 00 b8 38 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 35 89 c2 85 c0 75 2c 64 48 8b 04 25 10 00 00
+RSP: 002b:00007ffd2ed6ec68 EFLAGS: 00000246 ORIG_RAX: 0000000000000038
+RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007ff5bc07aed3
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000001200011
+RBP: 0000000000000001 R08: 0000000000000000 R09: 0000000000000000
+R10: 00005555798ad750 R11: 0000000000000246 R12: 0000000000000000
+R13: 0000000000000000 R14: 0000000000000001 R15: 0000000000000001
+ </TASK>
+bridge0: port 1(bridge_slave_0) entered learning state
+bridge0: port 2(bridge_slave_1) entered learning state
+----------------
+Code disassembly (best guess):
+   0:	2b 00                	sub    (%rax),%eax
+   2:	74 08                	je     0xc
+   4:	4c 89 f7             	mov    %r14,%rdi
+   7:	e8 ba d1 84 00       	call   0x84d1c6
+   c:	f6 44 24 61 02       	testb  $0x2,0x61(%rsp)
+  11:	0f 85 85 01 00 00    	jne    0x19c
+  17:	41 f7 c7 00 02 00 00 	test   $0x200,%r15d
+  1e:	74 01                	je     0x21
+  20:	fb                   	sti
+  21:	48 c7 44 24 40 0e 36 	movq   $0x45e0360e,0x40(%rsp)
+  28:	e0 45
+* 2a:	4b c7 44 25 00 00 00 	movq   $0x0,0x0(%r13,%r12,1) <-- trapping instruction
+  31:	00 00
+  33:	43 c7 44 25 09 00 00 	movl   $0x0,0x9(%r13,%r12,1)
+  3a:	00 00
+  3c:	43                   	rex.XB
+  3d:	c7                   	.byte 0xc7
+  3e:	44                   	rex.R
+  3f:	25                   	.byte 0x25
 
-3. SO_REUSEPORT is still applied to do some load balance between multiple
-   processes listening to the same IP + PORT + ALPN, like:
 
-   on server:
-   process A: skA =3D listen(127.0.0.1:1234:smbd)
-   process B: skB =3D listen(127.0.0.1:1234:smbd)
-   process C: skC =3D listen(127.0.0.1:1234:smbd)
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-   on client:
-   connect(127.0.0.1:1234:smbd)
-   connect(127.0.0.1:1234:smbd)
-   ...
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-   on server it will select the sk among (skA, skB and skC) based on the
-   source address + port in the request from client.
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
-4. Not sure if multiple ALPNs support are useful to you, here is some
-   example about how it works:
-   - Without SO_REUSEPORT set:
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
 
-     On server:
-     process A: skA =3D listen(127.0.0.1:1234:smbd,h3,ksmbd)
-     process B: skB =3D listen(127.0.0.1:1234:smbd,h3,ksmbd)
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
 
-     listen() in process B fails and returns EADDRINUSE.
-
-   - with SO_REUSEPORT set:
-
-     On server:
-     process A: skA =3D listen(127.0.0.1:1234:smbd,h3,ksmbd)
-     process B: skB =3D listen(127.0.0.1:1234:smbd,h3,ksmbd)
-
-     listen() in process B works.
-
-   - with or without SO_REUSEPORT set:
-
-     On server:
-     process A: skA =3D listen(127.0.0.1:1234:h3,ksmbd)
-     process B: skB =3D listen(127.0.0.1:1234:h3,smbd).
-     (there's overlap on ALPN list but not exact the same ALPNs)
-
-     listen() in process B fails and returns EADDRINUSE.
-
-   - the match priority for multiple ALPNs is based on the order on the
-     client ALPN list:
-
-     On server:
-     process A: skA =3D listen(127.0.0.1:1234:smbd)
-     process B: skB =3D listen(127.0.0.1:1234:h3)
-     process C: skC =3D listen(127.0.0.1:1234:ksmbd)
-
-     On client:
-     process X: skX =3D connect(27.0.0.1:1234:h3,ksmbd,smbd)
-
-     skB will be the one selected to accept the connection, as h3 is the
-     1st ALPN on the client ALPN list 'h3,ksmbd,smbd'.
-
->
-> For listens on tcp you also need to specify an explicit port (at least in=
- order
-> to be useful).
->
-> And it would mean that all application would use it and not block other a=
-pplications
-> from using an explicit alpn.
->
-> Also an module parameter for this means the administrator would have to t=
-ake care
-> of it, which means it might be unuseable if loaded with it.
-Agree, already dropped this param.
-
->
-> I hope to find some time in the next weeks to play with this.
-> Should be relatively trivial create a prototype for samba's smbd.
-Sounds Cool!
-
-Thanks.
+If you want to undo deduplication, reply with:
+#syz undup
 
