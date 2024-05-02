@@ -1,129 +1,234 @@
-Return-Path: <netdev+bounces-93046-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93047-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A14E8B9CF9
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 17:00:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64F2A8B9D04
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 17:03:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9B4971C22837
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 15:00:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E7E5C1F21E68
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 15:03:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 727391553B4;
-	Thu,  2 May 2024 15:00:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8694156F41;
+	Thu,  2 May 2024 15:03:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="mJlV47bB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jjwYpEbc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F784155347
-	for <netdev@vger.kernel.org>; Thu,  2 May 2024 15:00:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BB70154C15;
+	Thu,  2 May 2024 15:03:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714662048; cv=none; b=aZRn3ZAmtq/Um6JxbAZ2e3BFYZDiHQH5XL9c4hR02L839rLqqwtOpyMTji5JMkDs0YwtCeVlvq/MU5IJ1J27Xl30uenZW25YXa9J9yU7dGqM+2NMhgIpW6XRl8sUbK/L6A2KZ7NJAxmsfcvEGhfAAsneiwF5Ad/Z/nMONzSc8/I=
+	t=1714662195; cv=none; b=jVEBvp6970Jq51+TNhzgc+WIrwqoDmZjjnWpahu3bkpe+MYdTfn7BJqgPw9YsgddWDGw/+LeEOuF9Cn7I5OXlJpoVDcL4P1VwySGY1yC3ebkFcWsujoKZsBZr9c4RmDsEoKSG/tNgWByoIWKN6dFa9v4r0wutI0g9293Sokipfs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714662048; c=relaxed/simple;
-	bh=IXZ0XVHyeLiV27rkSUTUlGzkN9VnLtKzOMVCMNoC/O8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=o1QNqbtQkJtKvEYb3WggMB94SxhoVTADC8ueojNM+UOSOQLWnCGbJpIfmRrFm9qWXtU5uDN9VQimYYBZN4Dn8bIzdzwFK00MF65NjJf97eyUgVIVsVmz1VgaIKpEhewqQku+0P1wdBEDPyIgmAi4J/u66qAJB3UmN4JAtZFP1sY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=mJlV47bB; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-1e5715a9ebdso67546265ad.2
-        for <netdev@vger.kernel.org>; Thu, 02 May 2024 08:00:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1714662046; x=1715266846; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=fgw/gW1T+dxXdhkHqh35xpW27WxDl5iViGaENoxdrdU=;
-        b=mJlV47bBZG2YpQPx3If6bekdR7ovyeFR1tJ+caocLpyOOupx0y407Lln1O91HmQPGH
-         6gwqpC+LiTNn5Tg00r2fcYuE63Se2aZ80gp/ulaDtAHplyw7n7xuEUqoNxqhxFCuSQI8
-         ZTeRK9oKJ5+GsOVLw/dQcHrXxUP40u1BYRhws=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714662046; x=1715266846;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fgw/gW1T+dxXdhkHqh35xpW27WxDl5iViGaENoxdrdU=;
-        b=Tmyavz3/lReg1QZ0KgHy/oXV/hZEenHnxHWGLlt+ezWmflocBFLTG8p/x3JkNBvYKw
-         85Gc/NLqfeDHepszm7HlC1ObE7C2eKpPzd+rJnwNrvn1fXAge/RtfA/FAAay9efAKFE/
-         SXpvAB/JFZ45VDywpT6cDwEH6BRMkFLJNf4I+KDaI4VX5qlDNKbXe65LF9ZEwwj3ziJi
-         CJJx/XPWDBWAtuW7s0OUMWdUMfyetjE1hYwCwLYPaINGS4B1wklfs8LaHS6WxPPvLiYo
-         bFs0c7fGzftdfpz5AqotPMg8ATtK3+0SGda7a/VTPYG+KwQRhtd9SvKmf5id9K3+Lb2N
-         GmMg==
-X-Forwarded-Encrypted: i=1; AJvYcCUeYBAMAiBYTZyfEWXBJzzvvLRPvIBAoQ0zu4yZwWY4NIie9OyjQ47wE5XFpOV+KhBrtK1jGRtI2IK3vGiUeqY6WfthzuuJ
-X-Gm-Message-State: AOJu0Yx4SQCBW2s/WjYuMY+Tdb942wNoEiuHe7lfd988UR8GKFRIvVC/
-	bgOgXE7Eb83TA0Gb4mYdHhT80FPPLjhODtkO2LCztQI8sX04e9+5B3j7iW/Thg==
-X-Google-Smtp-Source: AGHT+IH29bay7toIy+Kv6yjDc1RgVK2wZSKXsZ9Gj+t64lyFsqoM5DD3wZ30/iSnTvCH8VXfcondMw==
-X-Received: by 2002:a17:902:ab95:b0:1eb:551f:99b2 with SMTP id f21-20020a170902ab9500b001eb551f99b2mr5093641plr.65.1714662046285;
-        Thu, 02 May 2024 08:00:46 -0700 (PDT)
-Received: from www.outflux.net ([198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id jc15-20020a17090325cf00b001ece59458fbsm1376105plb.286.2024.05.02.08.00.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 May 2024 08:00:45 -0700 (PDT)
-Date: Thu, 2 May 2024 08:00:45 -0700
-From: Kees Cook <keescook@chromium.org>
-To: Will Deacon <will@kernel.org>
-Cc: Mark Rutland <mark.rutland@arm.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Boqun Feng <boqun.feng@gmail.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	linux-arm-kernel@lists.infradead.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	"H. Peter Anvin" <hpa@zytor.com>, Arnd Bergmann <arnd@arndb.de>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	"Paul E. McKenney" <paulmck@kernel.org>,
-	Uros Bizjak <ubizjak@gmail.com>, linux-kernel@vger.kernel.org,
-	x86@kernel.org, linux-arch@vger.kernel.org, netdev@vger.kernel.org,
-	linux-hardening@vger.kernel.org
-Subject: Re: [PATCH 2/4] arm64: atomics: lse: Silence intentional wrapping
- addition
-Message-ID: <202405020759.55CD47C@keescook>
-References: <20240424191225.work.780-kees@kernel.org>
- <20240424191740.3088894-2-keescook@chromium.org>
- <20240502112127.GA17013@willie-the-truck>
+	s=arc-20240116; t=1714662195; c=relaxed/simple;
+	bh=0/D/3orQyLIxlrLlfuPBXHhZ+OC7Ep+EQJbm8XOpe94=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=FKyJwYtzQIylCBfo15O5uSDSBZHUGjO0TMZTCHyiNfLy4Eun8PxFZY2YeDHDSd00zJqxu1b9LLrIPW/YXnKS3pVHcnVbQc7nXmzkMKWPJbsj5ysmM8L7028D233GCdV8kIIJ5E7vJgxG5jRwgdGK912AeUo8iqAMYLF7OWTuYjc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jjwYpEbc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1DF93C4AF1A;
+	Thu,  2 May 2024 15:03:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714662195;
+	bh=0/D/3orQyLIxlrLlfuPBXHhZ+OC7Ep+EQJbm8XOpe94=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=jjwYpEbcYKt++DFA3dEJjELaJbghgGFNOT+1SqU5w4Ca/kIOSW5LPC508Wr6JW/xJ
+	 Qa13mKDjvobwhq0k6cMrL/nnqDdFnupgocDVebKuEZLkaU4Gv/cPPWVNGGJd7BUsf2
+	 rQ3TBTSTVSN4iI+AJz5VYKUdCDKbNFTWKWZ/67h6SE6EgByvybpC28MJAYOY+rKKS4
+	 wTS+R45kjV9v5Cfv9ZWZphP5JsOAySEUlPuzW+2glyBQdMz9wYnn+FsjMgdkGmAp7x
+	 Z12AlZ4VnLdCJTa/+73roWWbwI5aC3wYHifh0xhurp+0ZvQQCq/zdkBhk3pLt3bvu5
+	 8E1Qj87U+mn8w==
+Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-2e1fa824504so9252041fa.0;
+        Thu, 02 May 2024 08:03:15 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCUkqbzfXUGL8b9ZwHC02XOZOLpZGAbnb6MOOVX5EFQeI3gUuOInjPV3Q3PW/RWUYOqCQy5/zzfXQiCw2dJvmtwxQipatSJnvir0DFyCLBkXBrp9p8/LX2XxRgphtsVNJQU8J+Sq6BgT1fIsBcPxqoME21+TXfqN/kCFxioDa0t6VLOL4uKT7Zg55/beI1hFKx34R7J7FPxb3yKc0x6NEGqdAhG9OYPGoN3/f9Qdog9rl+q0KlDRAjF4
+X-Gm-Message-State: AOJu0YzW8CEups6a96c+SOkL+RuUhLdUF076wHFRW2p6drN9jkLlq/dG
+	pxdKhUCOFXKutWKvOxBAf7uzv4FwhzyxT74EGmWqDvXXetZWcXhJuH2Yfc8Q4eQsZT2pOHAcQ0C
+	2yxZo4NaycUgDcLq9lOQWtenq1A==
+X-Google-Smtp-Source: AGHT+IGES7kDbfk0VUx7WlN+rqE+2KtZ3O8wqcOG/0tlTyJbKym9ll1q8hr3CrUhSN2mTjRc2qgzAnvzqQtLGFf5DGo=
+X-Received: by 2002:a2e:9ccc:0:b0:2e1:e795:3f81 with SMTP id
+ g12-20020a2e9ccc000000b002e1e7953f81mr1275404ljj.44.1714662193358; Thu, 02
+ May 2024 08:03:13 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240502112127.GA17013@willie-the-truck>
+References: <20240502075534.882628-1-christoph.fritz@hexdev.de>
+ <20240502075534.882628-7-christoph.fritz@hexdev.de> <171464227142.1356329.4931419696225319861.robh@kernel.org>
+ <48c55b05dae4628d4e811178bfd5e855ac93ee77.camel@hexdev.de>
+In-Reply-To: <48c55b05dae4628d4e811178bfd5e855ac93ee77.camel@hexdev.de>
+From: Rob Herring <robh@kernel.org>
+Date: Thu, 2 May 2024 10:03:01 -0500
+X-Gmail-Original-Message-ID: <CAL_JsqK0__mzwNHuq4enJ3uvQTNWGYyk=TGYnnFX8kLDoGuNeQ@mail.gmail.com>
+Message-ID: <CAL_JsqK0__mzwNHuq4enJ3uvQTNWGYyk=TGYnnFX8kLDoGuNeQ@mail.gmail.com>
+Subject: Re: [PATCH v2 06/12] dt-bindings: net/can: Add serial (serdev) LIN adapter
+To: christoph.fritz@hexdev.de
+Cc: Krzysztof Kozlowski <krzk+dt@kernel.org>, Sebastian Reichel <sre@kernel.org>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, linux-serial@vger.kernel.org, 
+	Linus Walleij <linus.walleij@linaro.org>, Jiri Kosina <jikos@kernel.org>, 
+	Jiri Slaby <jirislaby@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Andreas Lauser <andreas.lauser@mercedes-benz.com>, Marc Kleine-Budde <mkl@pengutronix.de>, 
+	Benjamin Tissoires <bentiss@kernel.org>, devicetree@vger.kernel.org, 
+	Eric Dumazet <edumazet@google.com>, Jonathan Corbet <corbet@lwn.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Vincent Mailhol <mailhol.vincent@wanadoo.fr>, Paolo Abeni <pabeni@redhat.com>, 
+	linux-can@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-input@vger.kernel.org, Pavel Pisa <pisa@cmp.felk.cvut.cz>, 
+	Oliver Hartkopp <socketcan@hartkopp.net>, "David S . Miller" <davem@davemloft.net>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, May 02, 2024 at 12:21:28PM +0100, Will Deacon wrote:
-> On Wed, Apr 24, 2024 at 12:17:35PM -0700, Kees Cook wrote:
-> > Annotate atomic_add_return() and atomic_sub_return() to avoid signed
-> > overflow instrumentation. They are expected to wrap around.
-> > 
-> > Signed-off-by: Kees Cook <keescook@chromium.org>
-> > ---
-> > Cc: Will Deacon <will@kernel.org>
-> > Cc: Peter Zijlstra <peterz@infradead.org>
-> > Cc: Boqun Feng <boqun.feng@gmail.com>
-> > Cc: Mark Rutland <mark.rutland@arm.com>
-> > Cc: Catalin Marinas <catalin.marinas@arm.com>
-> > Cc: linux-arm-kernel@lists.infradead.org
-> > ---
-> >  arch/arm64/include/asm/atomic_lse.h | 10 ++++++----
-> >  1 file changed, 6 insertions(+), 4 deletions(-)
-> 
-> How come the ll/sc routines (in atomic_ll_sc.h) don't need the same
-> treatment? If that's just an oversight, then maybe it's better to
-> instrument the higher-level wrappers in asm/atomic.h?
+On Thu, May 2, 2024 at 6:03=E2=80=AFAM Christoph Fritz
+<christoph.fritz@hexdev.de> wrote:
+>
+> On Thu, 2024-05-02 at 04:31 -0500, Rob Herring (Arm) wrote:
+> > On Thu, 02 May 2024 09:55:28 +0200, Christoph Fritz wrote:
+> > > This patch adds dt-bindings for serial LIN bus adapters. These adapte=
+rs are
+> > > basically just LIN transceivers that get hard-wired with serial devic=
+es.
+> > >
+> > > Signed-off-by: Christoph Fritz <christoph.fritz@hexdev.de>
+> > > ---
+> > >  .../bindings/net/can/hexdev,lin-serdev.yaml   | 32 +++++++++++++++++=
+++
+> > >  1 file changed, 32 insertions(+)
+> > >  create mode 100644 Documentation/devicetree/bindings/net/can/hexdev,=
+lin-serdev.yaml
+> > >
+> >
+> > My bot found errors running 'make dt_binding_check' on your patch:
+> >
+> > yamllint warnings/errors:
+> >
+> > dtschema/dtc warnings/errors:
+> > Documentation/devicetree/bindings/net/can/hexdev,lin-serdev.example.dtb=
+: /example-0/serial/linbus: failed to match any schema with compatible: ['l=
+inux,lin-serdev']
+>
+> Yes, that's obviously still false and will be fixed in v3.
+>
+> >
+> > doc reference errors (make refcheckdocs):
+> >
+> > See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/2024=
+0502075534.882628-7-christoph.fritz@hexdev.de
+> >
+> > The base for the series is generally the latest rc1. A different depend=
+ency
+> > should be noted in *this* patch.
+> >
+> > If you already ran 'make dt_binding_check' and didn't see the above
+> > error(s), then make sure 'yamllint' is installed and dt-schema is up to
+> > date:
+> >
+> > pip3 install dtschema --upgrade
+> >
+> > Please check and re-submit after running the above command yourself. No=
+te
+> > that DT_SCHEMA_FILES can be set to your schema file to speed up checkin=
+g
+> > your schema. However, it must be unset to test all examples with your s=
+chema.
+> >
+>
+> I'm wondering why my local run of dt_binding_check does not catch this:
+>
+> $ pip3 install dtschema --upgrade
+> Requirement already satisfied: dtschema in ./venv/lib/python3.11/site-pac=
+kages (2024.4)
+> Requirement already satisfied: ruamel.yaml>0.15.69 in ./venv/lib/python3.=
+11/site-packages (from dtschema) (0.18.6)
+> Requirement already satisfied: jsonschema<4.18,>=3D4.1.2 in ./venv/lib/py=
+thon3.11/site-packages (from dtschema) (4.17.3)
+> Requirement already satisfied: rfc3987 in ./venv/lib/python3.11/site-pack=
+ages (from dtschema) (1.3.8)
+> Requirement already satisfied: pylibfdt in ./venv/lib/python3.11/site-pac=
+kages (from dtschema) (1.7.0.post1)
+> Requirement already satisfied: attrs>=3D17.4.0 in ./venv/lib/python3.11/s=
+ite-packages (from jsonschema<4.18,>=3D4.1.2->dtschema) (23.2.0)
+> Requirement already satisfied: pyrsistent!=3D0.17.0,!=3D0.17.1,!=3D0.17.2=
+,>=3D0.14.0 in ./venv/lib/python3.11/site-packages (from jsonschema<4.18,>=
+=3D4.1.2->dtschema) (0.20.0)
+> Requirement already satisfied: ruamel.yaml.clib>=3D0.2.7 in ./venv/lib/py=
+thon3.11/site-packages (from ruamel.yaml>0.15.69->dtschema) (0.2.8)
+>
+> $ git diff
+> diff --git a/Documentation/devicetree/bindings/net/can/hexdev,lin-serdev.=
+yaml b/Documentation/devicetree/bindings/net/can/hexdev,lin-serdev.yaml
+> index c178eb9be1391..385cbe132258d 100644
+> --- a/Documentation/devicetree/bindings/net/can/hexdev,lin-serdev.yaml
+> +++ b/Documentation/devicetree/bindings/net/can/hexdev,lin-serdev.yaml
+> @@ -27,6 +27,6 @@ examples:
+>    - |
+>      serial {
+>          linbus {
+> -            compatible =3D "hexdev,lin-serdev";
+> +            compatible =3D "linux,lin-serdev";
+>          };
+>      };
+>
+> $ make dt_binding_check DT_SCHEMA_FILES=3DDocumentation/devicetree/bindin=
+gs/net/can/hexdev,lin-serdev.yaml
+>   HOSTCC  scripts/basic/fixdep
+>   HOSTCC  scripts/dtc/dtc.o
+>   HOSTCC  scripts/dtc/flattree.o
+>   HOSTCC  scripts/dtc/fstree.o
+>   HOSTCC  scripts/dtc/data.o
+>   HOSTCC  scripts/dtc/livetree.o
+>   HOSTCC  scripts/dtc/treesource.o
+>   HOSTCC  scripts/dtc/srcpos.o
+>   HOSTCC  scripts/dtc/checks.o
+>   HOSTCC  scripts/dtc/util.o
+>   LEX     scripts/dtc/dtc-lexer.lex.c
+>   YACC    scripts/dtc/dtc-parser.tab.[ch]
+>   HOSTCC  scripts/dtc/dtc-lexer.lex.o
+>   HOSTCC  scripts/dtc/dtc-parser.tab.o
+>   HOSTLD  scripts/dtc/dtc
+>   HOSTCC  scripts/dtc/libfdt/fdt.o
+>   HOSTCC  scripts/dtc/libfdt/fdt_ro.o
+>   HOSTCC  scripts/dtc/libfdt/fdt_wip.o
+>   HOSTCC  scripts/dtc/libfdt/fdt_sw.o
+>   HOSTCC  scripts/dtc/libfdt/fdt_rw.o
+>   HOSTCC  scripts/dtc/libfdt/fdt_strerror.o
+>   HOSTCC  scripts/dtc/libfdt/fdt_empty_tree.o
+>   HOSTCC  scripts/dtc/libfdt/fdt_addresses.o
+>   HOSTCC  scripts/dtc/libfdt/fdt_overlay.o
+>   HOSTCC  scripts/dtc/fdtoverlay.o
+>   HOSTLD  scripts/dtc/fdtoverlay
+>   LINT    Documentation/devicetree/bindings
+>   CHKDT   Documentation/devicetree/bindings/processed-schema.json
+>   SCHEMA  Documentation/devicetree/bindings/processed-schema.json
+> /home/ch/linux/Documentation/devicetree/bindings/pci/brcm,stb-pcie.yaml: =
+ignoring, error in schema: properties: brcm,tperst-clk-ms: type
+> /home/ch/linux/Documentation/devicetree/bindings/hwmon/microchip,emc2305.=
+yaml: ignoring, error in schema: properties: emcs205,max-state: description
+>   DTEX    Documentation/devicetree/bindings/net/can/hexdev,lin-serdev.exa=
+mple.dts
+>   DTC_CHK Documentation/devicetree/bindings/net/can/hexdev,lin-serdev.exa=
+mple.dtb
+>
+> Any ideas?
+>
+> I'm using a python venv here, maybe this is related?
 
-Those are all written in asm, so there's no open-coded C arithmetic that
-the sanitizers will notice. All is well there! :)
+No. There are 2 possibilities. What kernel version are you on? This
+check is enabled with the '-m' option on dt-validate which was only
+recently (6.9) enabled by default for the bindings. You can enable it
+with 'DT_CHECKER_FLAGS=3D"-m"'. The other possibility is I noticed that
+the flag has an interaction with DT_SCHEMA_FILES in that we don't set
+the flag by default if DT_SCHEMA_FILES is set. (If you explicitly set
+DT_CHECKER_FLAGS in the newer kernels it should still give the
+warning.)  I think we don't enable it because you would get false
+positives if your example has compatible strings not documented within
+the schema you are testing. I need to double check that as how the
+tools work in this regard has evolved. In any case, DT_SCHEMA_FILES is
+a shortcut and it is always possible your changes can introduce
+warnings in other examples, so ultimately "make dt_binding_check" has
+to be run without DT_SCHEMA_FILES set.
 
--- 
-Kees Cook
+Rob
 
