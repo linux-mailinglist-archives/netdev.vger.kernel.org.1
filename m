@@ -1,109 +1,103 @@
-Return-Path: <netdev+bounces-93042-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93043-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15A2B8B9CC8
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 16:49:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC1208B9CD7
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 16:50:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C589D2874EF
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 14:49:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 28EC51C22BED
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 14:50:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1016015E7FA;
-	Thu,  2 May 2024 14:46:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B39C6153819;
+	Thu,  2 May 2024 14:50:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VwDde+BR"
 X-Original-To: netdev@vger.kernel.org
-Received: from zg8tmja2lje4os4yms4ymjma.icoremail.net (zg8tmja2lje4os4yms4ymjma.icoremail.net [206.189.21.223])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC71815B148;
-	Thu,  2 May 2024 14:46:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=206.189.21.223
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8240B153800;
+	Thu,  2 May 2024 14:50:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714661209; cv=none; b=fHDbngFDABVJBFGeRi0nS2hIw0KDu4HdAqMsOQmQi/byElr7op6aQ/XBXthWlcoNavVDesmTYsnRYsotFtuHsf9j6rrJ7R52ix+xcwDB4OWgcj0gYXwWxVSZJhwEg6NktObjxcZfxlkx1AmbSvjZtrb8b/YSEMXl563Hkzgqgxg=
+	t=1714661433; cv=none; b=jpLkXoBs9qnPUGwJL7QNIidXg7kkX6RN/krguHK5P25DLMd3hb8QLJk7sZqtr+IfszimTqB8Bc0I+j4nLNkGWB6fcoMThi67dm3OjlyxlwfNq9oTv7EQCID/hNZ9OELizeyxJJzbiSFWg4hmc4OkRSek1bRZMrP/uRjjcT+idEU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714661209; c=relaxed/simple;
-	bh=EhzWsTWACEjCUnlwxHyfabgFLKuatNS81iZvkVCsVyM=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 In-Reply-To:References; b=elYo9coXkeKauVObgcGoR/AtJOVzoOSEMNdQ7Dvg3ngMyEbaRx6/JbwiGlS/yQ/UXykf3uApbr6jzlBytZ4P29W+Ary/J9+2mAWGfyv8i+yuYe17sE1yhqiZi9IyoIkuU+Sbv0XrkUh4UwoOqnEpHG2JbZhrjNcnvoP6cKhAWTc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn; spf=pass smtp.mailfrom=zju.edu.cn; arc=none smtp.client-ip=206.189.21.223
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
-Received: from ubuntu.localdomain (unknown [221.192.181.50])
-	by mail-app2 (Coremail) with SMTP id by_KCgA3L4GZpjNmnigDAg--.28S4;
-	Thu, 02 May 2024 22:44:51 +0800 (CST)
-From: Duoming Zhou <duoming@zju.edu.cn>
-To: linux-hams@vger.kernel.org
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	jreuter@yaina.de,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	dan.carpenter@linaro.org,
-	Duoming Zhou <duoming@zju.edu.cn>
-Subject: [PATCH net 2/2] ax25: fix potential reference counting leak in ax25_addr_ax25dev
-Date: Thu,  2 May 2024 22:43:38 +0800
-Message-Id: <cb44ea91c0b7084079c3086d6d75e7984505cec7.1714660565.git.duoming@zju.edu.cn>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <cover.1714660565.git.duoming@zju.edu.cn>
-References: <cover.1714660565.git.duoming@zju.edu.cn>
-In-Reply-To: <cover.1714660565.git.duoming@zju.edu.cn>
-References: <cover.1714660565.git.duoming@zju.edu.cn>
-X-CM-TRANSID:by_KCgA3L4GZpjNmnigDAg--.28S4
-X-Coremail-Antispam: 1UD129KBjvdXoW7GrWrAF18GFyrZw17XF45GFg_yoWDurb_uF
-	97ury7Ww1DJr1UCw1rXF48Jry7Zw10gwnrJr1ayFZ7trW5ta47JrWkJw1UXr1UXa47Cr4F
-	qF1rGrW3Aw4IkjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUblkFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUXwA2048vs2IY02
-	0Ec7CjxVAFwI0_Gr0_Xr1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xv
-	wVC0I7IYx2IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UM2
-	8EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0DM2AI
-	xVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20x
-	vE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xv
-	r2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxan2IY04
-	v7MxkF7I0En4kS14v26r1q6r43MxkIecxEwVAFwVW5XwCF04k20xvY0x0EwIxGrwCF54CY
-	xVCY1x0262kKe7AKxVWUtVW8ZwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14
-	v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkG
-	c2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI
-	0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4U
-	MIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUwAwsUUU
-	UU=
-X-CM-SenderInfo: qssqjiasttq6lmxovvfxof0/1tbiAwIJAWYySJ0M6ABgsM
+	s=arc-20240116; t=1714661433; c=relaxed/simple;
+	bh=VLCdT8S8RHn0J5m1d4S8joxMLvrBRQKRrINYgfmKubA=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Yi4G9lIoQ2zJ/QTk5uJb4OGRKphSaFjlq/53bnf+YGZJ5PF5Du87ougX8Mmai4AP8LSepP13S8xjeaMYEoimuGp9Pwr/nObWPzz5///DiRaK2jks7vwegdCy6wCIYRjkSSQWoowrzbG1c16aiB3sCuJSmFfoHfLYAA0sOvJz+Vk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VwDde+BR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 21E65C4AF14;
+	Thu,  2 May 2024 14:50:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714661433;
+	bh=VLCdT8S8RHn0J5m1d4S8joxMLvrBRQKRrINYgfmKubA=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=VwDde+BRMnQvir5Tx8KN74Mo3z9lrZG+Q1cUDRAAdnxbR9bpwHEHWfP9YKhwnVE7e
+	 qKgp1hAwOKtleGVsUjiLAhIXRg6xSdXINvfnc7IVqYKEmhnLOVY5Ky8IG2buan2y7A
+	 chBN/rm527LAuKkPsNMJCP/lHEm0ZnMbvQI1Zn4ChPPv+86gmeDL7OWPvfzUR8g7Lm
+	 3Ja4oyTe6k4qndhm6ys0a8sQekapqPS+l/Wz5q9XqRFWa470pUrcotMN1xMidcG3SE
+	 KHpYlVuRcyI1AtjxZOErGrofdGv5HnbJfgM5JaC7AL4+uoiLKuXhG6khUBr7VNpsHX
+	 TC2k7QWM2yvNw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 0916CC4333B;
+	Thu,  2 May 2024 14:50:33 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v3 0/2] bluetooth: mt7921s: Add binding and fixup existing dts
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <171466143303.15417.16267391359658685037.git-patchwork-notify@kernel.org>
+Date: Thu, 02 May 2024 14:50:33 +0000
+References: <20240412073046.1192744-1-wenst@chromium.org>
+In-Reply-To: <20240412073046.1192744-1-wenst@chromium.org>
+To: Chen-Yu Tsai <wenst@chromium.org>
+Cc: marcel@holtmann.org, luiz.dentz@gmail.com, robh+dt@kernel.org,
+ krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+ matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com,
+ sean.wang@mediatek.com, linux-bluetooth@vger.kernel.org,
+ netdev@vger.kernel.org, linux-mediatek@lists.infradead.org,
+ devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org
 
-The reference counting of ax25_dev potentially increase more
-than once in ax25_addr_ax25dev(), which will cause memory leak.
+Hello:
 
-In order to fix the above issue, only increase the reference
-counting of ax25_dev once, when the res is not null.
+This series was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-Fixes: d01ffb9eee4a ("ax25: add refcount in ax25_dev to avoid UAF bugs")
-Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
-Signed-off-by: Duoming Zhou <duoming@zju.edu.cn>
----
- net/ax25/ax25_dev.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+On Fri, 12 Apr 2024 15:30:41 +0800 you wrote:
+> Hi everyone,
+> 
+> This is v3 of my MT7921S Bluetooth binding series.
+> 
+> Changes since v2:
+> - Expand description and commit message to clearly state that WiFi and
+>   Bluetooth are separate SDIO functions, and that each function should
+>   be a separate device node, as specified by the MMC binding.
+> - Change 'additionalProperties' to 'unevaluatedProperties'
+> - Add missing separating new line
+> - s/ot/to/
+> 
+> [...]
 
-diff --git a/net/ax25/ax25_dev.c b/net/ax25/ax25_dev.c
-index 07723095c60..945af92a7b6 100644
---- a/net/ax25/ax25_dev.c
-+++ b/net/ax25/ax25_dev.c
-@@ -37,8 +37,9 @@ ax25_dev *ax25_addr_ax25dev(ax25_address *addr)
- 	for (ax25_dev = ax25_dev_list; ax25_dev != NULL; ax25_dev = ax25_dev->next)
- 		if (ax25cmp(addr, (const ax25_address *)ax25_dev->dev->dev_addr) == 0) {
- 			res = ax25_dev;
--			ax25_dev_hold(ax25_dev);
- 		}
-+	if (res)
-+		ax25_dev_hold(ax25_dev);
- 	spin_unlock_bh(&ax25_dev_lock);
- 
- 	return res;
+Here is the summary with links:
+  - [v3,1/2] dt-bindings: net: bluetooth: Add MediaTek MT7921S SDIO Bluetooth
+    https://git.kernel.org/bluetooth/bluetooth-next/c/556511c33388
+  - [v3,2/2] arm64: dts: mediatek: mt8183-pico6: Fix bluetooth node
+    https://git.kernel.org/bluetooth/bluetooth-next/c/f90ac18d01cd
+
+You are awesome, thank you!
 -- 
-2.17.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
