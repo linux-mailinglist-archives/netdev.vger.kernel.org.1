@@ -1,247 +1,422 @@
-Return-Path: <netdev+bounces-93118-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93120-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9615C8BA1F5
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 23:12:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8DD068BA229
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 23:20:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B957C1C21B44
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 21:12:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 43A79280EED
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 21:20:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2444E181304;
-	Thu,  2 May 2024 21:10:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7625180A81;
+	Thu,  2 May 2024 21:20:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="smkmEQwG"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="umNpCyoq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73906180A81
-	for <netdev@vger.kernel.org>; Thu,  2 May 2024 21:10:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1576117556B
+	for <netdev@vger.kernel.org>; Thu,  2 May 2024 21:20:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714684255; cv=none; b=A8NmDMbfWttGqUE/pbQOJd44uUqFeSUUsprmNN7+INvYJBowb9lhilFQhyUIJXX647m/YdjOIyQDlYkz9sPjPnnPrJ87fCHzS083HH/HgCaLMfmNjSeFUXZuzyRgltJ4t+UirEDYYoroBnn90JldqkIk5fSVch2a/DagGaozWUM=
+	t=1714684825; cv=none; b=FUQXJQuCQ5yPNW4oJ/GR/lIKMAK5b7gCEk2GdXwUARPAWc3e/MFoXB0Ab/xQrQQ4v9+updCtA6jQqOTRsDL9jcnJrZT7LbhO+bTPci0/+cDXmvPqFhCJGWJztez0B9LEUpxFQcF1uukiN9ToX4E7wv0rRPpafXnpfeZ8yap8OTU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714684255; c=relaxed/simple;
-	bh=krIDpfVlHokKADsy8ABlAejvV7EDi/6npSNZcWjvN14=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=oRm0ubVbFKkv6+7ndhYC7SU9uSRtA2+VuCLEG8abCNKBpB8+bxrHLp5FJkysW1sXAk81ZYQVH9L3liHgFw9x7Kfo1FFtMByo3k/wlvDm/TEYH+pAPvZ1ohL2RQrdxHZ1UB03Kl6Oe4+x+9T+nbIL5KFzhDha9Rcqtr7cXUb0lHM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--maheshb.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=smkmEQwG; arc=none smtp.client-ip=209.85.219.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--maheshb.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-de60cd96bf3so5303096276.0
-        for <netdev@vger.kernel.org>; Thu, 02 May 2024 14:10:53 -0700 (PDT)
+	s=arc-20240116; t=1714684825; c=relaxed/simple;
+	bh=hUK2jEvBw2kxTtt5wE8bcezHoXk73oM3myWEjpqNG0M=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=PQDqxZSaLaHJjOhji7QYTgXU2ogTAjCECIaC1OWmujzii55mxkDzFRiFm4b1QoEV3VcbE0wjCZIMmNeKOuVzUQL7hvCp5Rv07y+BTxLLZZR0r1wIE9D9QKl7RNy9O6UnHkANHm5q+9LQYC/1e+adxMVhOf/FmMaKmts55dOFKnk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=umNpCyoq; arc=none smtp.client-ip=209.85.210.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-6ed04c91c46so8072847b3a.0
+        for <netdev@vger.kernel.org>; Thu, 02 May 2024 14:20:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1714684252; x=1715289052; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=7oLpaeNuXcZtTtnpYpGqVfNwLvB3vnuoJ7noH+4jhl8=;
-        b=smkmEQwG4wQ25pMEDSQZoVvHq4nZFI4KfFxV7XdeiARTHfX+FRtx9ai9g4Keiz3/jP
-         S8qZ/qtf1PKednapdQJKbtKda6LNGtgyPH8XvUMypdGKqL5SFY1G0FOQZ9/kkb9N4swM
-         YGmEDP2ilfps+kQIAvaMrXILdlnAGeGIcXGMk5deVSxtaqf39b5PtAQtk12uB6qNIYjF
-         0U+8NpeLvdDtdqfmT/HSisB16Skv4nSsMVZbMyHGzWGTBCsfCLvNDBTnLoJXCKSWwlh5
-         XGMs1DMtzF2gmmQW3lCjjB70GCYeE9tB+jHkFpXidoiZ4n0lL/kYrjupyisJ7lVvVfBs
-         ug9Q==
+        d=fastly.com; s=google; t=1714684823; x=1715289623; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=hncUOQWmqOGUoLNpyAkBcgErvZ7+mEaS4U5aue9YWcM=;
+        b=umNpCyoqHVGI6XeLlEZ8nq1iz+ZzMIXo5P6P8yrOPVYliH8+oVk4DFXSYGz2BcSPt4
+         SzXQMDFGZOHsRag+WCIy1TnCPdkem+/kM7t+NDSkTrMGLmOGSxxrqB3zi5wTIOXK/KCW
+         iILDp1SPtAfn3F/QNLzoywcyr5K6dGQo1yNu8=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714684252; x=1715289052;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=7oLpaeNuXcZtTtnpYpGqVfNwLvB3vnuoJ7noH+4jhl8=;
-        b=ZFj34xRngfi81ECKISLAJfQzyTguBPYpQLPX+OQC1aCGavKroJ+kh+ZMGCRjYE9lip
-         aFHpBhL3dVo+Ukntl2zqzV+C3eSqGS/kzVHjr/Dq+mIw1b7HppF2RiJDrdJUz9AEmQqf
-         GnXuZbbUZIgkQ0HVZY5zIbrd3tdD6E5J+zHtCEPf9NE19ivmLOHODO7ske4ai2J7W2if
-         p3pHQpnNCF1Y6QuQ1/A7F4bHc3KQsjnnC1CS6qC6kOW9+0AofvzsSZFZ2fl0lzsKREGy
-         QBt1WigdTbAphiJ1zPrWW/LTNdzVwYPE4xKf3dj5h06TykcYdXB1KSXUBOHHLkIeDNi8
-         mjPA==
-X-Gm-Message-State: AOJu0Yza1S+KLzGlUtLh7ITDhFEchOBq/NRkrNt1q1Qzn5y64u7Z9Hoy
-	UmjrjS+N6pod+x7PRMC8TIVp/ANLBLxsocXCuPfisLpJWe0qo11bHyiC0q7I5whDNOkxDD7xPVC
-	rhfhBz8TT1dZF2+Sm+1IIp7TyUbQSaqnK3aeGLZgJs5aqmVB52fUXexbV92lf3dEJS3ZsrhIl9u
-	4ZsSTPDPOuP0A0V/h0CnVSsnGL0+c2zocoE6lSnw==
-X-Google-Smtp-Source: AGHT+IHiJeFJiz4vngM3WfTr5yZzY5ViWNwfjpxSlWiQz8BQkKUHngOgc/DpXbyyrPpBCPv6QpoQtjrCjlJC
-X-Received: from coldfire.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:2b7a])
- (user=maheshb job=sendgmr) by 2002:a05:6902:1505:b0:de5:9ecc:46b6 with SMTP
- id q5-20020a056902150500b00de59ecc46b6mr301723ybu.6.1714684252381; Thu, 02
- May 2024 14:10:52 -0700 (PDT)
-Date: Thu,  2 May 2024 14:10:47 -0700
+        d=1e100.net; s=20230601; t=1714684823; x=1715289623;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hncUOQWmqOGUoLNpyAkBcgErvZ7+mEaS4U5aue9YWcM=;
+        b=JhN3Ck/PY0531tVGazddIPDEiD7GEMzvmxKFVoHZD9mZUlYZOEVGPxGbinQErx3r59
+         9dWuba/IzKOSdMwK1HLo/bOC6RMaX8tAHMYEOi8GH/N01HS8eFc3bUMHaWEzotoEzn6a
+         ljhGhGt6625CNIVDnftr0di63R5BmLrxdCaGegIApqud37eEbzYVHraCcLUouMFg39Ye
+         bTXWxbw5deuGEbVnHS7AUjfgKV2QUt1odmQgawhADyBgC+g908n4IWGf96Ed8tmEAszA
+         6iqRIT63uAdOQJlPTKNExI+TV6jJKrb5fQwIsF7OyACw3uHHyBx5otJwYf0U7Us2WRwN
+         sFUw==
+X-Forwarded-Encrypted: i=1; AJvYcCWy9HzfbFZJk0iHx7v4BweRK57ovnDFuBhC/HqkDOctjguPhsHYACosG/Ukyu74uu5/wipMcJLtyVQpJjm0EJ+K+909gmVD
+X-Gm-Message-State: AOJu0Yx3PTJai8jdWDvqkHRCo67r2pxAifOXrjLFIbAtR3puv6Gj2MjK
+	zDVEjx5CxZHfzt/GjX9hgaxaMApJcIkpIvP5cdO+QWiHLzGkUyfdj79sK7FbzuA=
+X-Google-Smtp-Source: AGHT+IEOJcD/NH5H4od1kl2Rjccz0Lt0ltHz/eAsoHtVB7pUoFxr0/GN18Mkn7U4wk0bAkqyOA22cA==
+X-Received: by 2002:a05:6a20:ba1:b0:1aa:bde:8c78 with SMTP id i33-20020a056a200ba100b001aa0bde8c78mr915178pzh.54.1714684823412;
+        Thu, 02 May 2024 14:20:23 -0700 (PDT)
+Received: from localhost.localdomain ([2620:11a:c019:0:65e:3115:2f58:c5fd])
+        by smtp.gmail.com with ESMTPSA id ld16-20020a170902fad000b001e4344a7601sm1806712plb.42.2024.05.02.14.20.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 May 2024 14:20:22 -0700 (PDT)
+From: Joe Damato <jdamato@fastly.com>
+To: linux-kselftest@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: nalramli@fastly.com,
+	Joe Damato <jdamato@fastly.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Shuah Khan <shuah@kernel.org>
+Subject: [PATCH net-next] selftest: epoll_busy_poll: epoll busy poll tests
+Date: Thu,  2 May 2024 21:20:11 +0000
+Message-Id: <20240502212013.274758-1-jdamato@fastly.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.45.0.rc1.225.g2a3ae87e7f-goog
-Message-ID: <20240502211047.2240237-1-maheshb@google.com>
-Subject: [PATCHv4 net-next] ptp/ioctl: support MONOTONIC_RAW timestamps for PTP_SYS_OFFSET_EXTENDED
-From: Mahesh Bandewar <maheshb@google.com>
-To: Netdev <netdev@vger.kernel.org>, Linux <linux-kernel@vger.kernel.org>, 
-	David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, Richard Cochran <richardcochran@gmail.com>, 
-	Arnd Bergmann <arnd@arndb.de>, Sagi Maimon <maimon.sagi@gmail.com>
-Cc: Jonathan Corbet <corbet@lwn.net>, John Stultz <jstultz@google.com>, 
-	Mahesh Bandewar <mahesh@bandewar.net>, Mahesh Bandewar <maheshb@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-The ability to read the PHC (Physical Hardware Clock) alongside
-multiple system clocks is currently dependent on the specific
-hardware architecture. This limitation restricts the use of
-PTP_SYS_OFFSET_PRECISE to certain hardware configurations.
+Add a simple test for the epoll busy poll ioctls.
 
-The generic soultion which would work across all architectures
-is to read the PHC along with the latency to perform PHC-read as
-offered by PTP_SYS_OFFSET_EXTENDED which provides pre and post
-timestamps.  However, these timestamps are currently limited
-to the CLOCK_REALTIME timebase. Since CLOCK_REALTIME is affected
-by NTP (or similar time synchronization services), it can
-experience significant jumps forward or backward. This hinders
-the precise latency measurements that PTP_SYS_OFFSET_EXTENDED
-is designed to provide.
+This test ensures that the ioctls have the expected return codes and
+that the kernel properly gets and sets epoll busy poll parameters.
 
-This problem could be addressed by supporting MONOTONIC_RAW
-timestamps within PTP_SYS_OFFSET_EXTENDED. Unlike CLOCK_REALTIME
-or CLOCK_MONOTONIC, the MONOTONIC_RAW timebase is unaffected
-by NTP adjustments.
+The test can be expanded in the future to do real busy polling (provided
+another machine to act as the client is available).
 
-This enhancement can be implemented by utilizing one of the three
-reserved words within the PTP_SYS_OFFSET_EXTENDED struct to pass
-the clock-id for timestamps.  The current behavior aligns with
-clock-id for CLOCK_REALTIME timebase (value of 0), ensuring
-backward compatibility of the UAPI.
+To run the test (use -s for "simple" test):
 
-Signed-off-by: Mahesh Bandewar <maheshb@google.com>
+./epoll_busy_poll -s
+
+On success, nothing is written to stdout/stderr and the exit code is 0.
+
+Signed-off-by: Joe Damato <jdamato@fastly.com>
 ---
-v1 -> v2
-   * Code-style fixes.
-v2 -> v3
-   * Reword commit log
-   * Fix the compilation issue by using __kernel_clockid instead of clockid_t
-     which has kernel only scope.
-v3 -> v4
-   * Typo/comment fixes.
+ tools/testing/selftests/net/.gitignore        |   1 +
+ tools/testing/selftests/net/Makefile          |   1 +
+ tools/testing/selftests/net/epoll_busy_poll.c | 279 ++++++++++++++++++
+ 3 files changed, 281 insertions(+)
+ create mode 100644 tools/testing/selftests/net/epoll_busy_poll.c
 
- drivers/ptp/ptp_chardev.c        |  7 +++++--
- include/linux/ptp_clock_kernel.h | 30 ++++++++++++++++++++++++++----
- include/uapi/linux/ptp_clock.h   | 27 +++++++++++++++++++++------
- 3 files changed, 52 insertions(+), 12 deletions(-)
-
-diff --git a/drivers/ptp/ptp_chardev.c b/drivers/ptp/ptp_chardev.c
-index 7513018c9f9a..c109109c9e8e 100644
---- a/drivers/ptp/ptp_chardev.c
-+++ b/drivers/ptp/ptp_chardev.c
-@@ -358,11 +358,14 @@ long ptp_ioctl(struct posix_clock_context *pccontext, unsigned int cmd,
- 			extoff = NULL;
- 			break;
- 		}
--		if (extoff->n_samples > PTP_MAX_SAMPLES
--		    || extoff->rsv[0] || extoff->rsv[1] || extoff->rsv[2]) {
-+		if (extoff->n_samples > PTP_MAX_SAMPLES ||
-+		    extoff->rsv[0] || extoff->rsv[1] ||
-+		    (extoff->clockid != CLOCK_REALTIME &&
-+		     extoff->clockid != CLOCK_MONOTONIC_RAW)) {
- 			err = -EINVAL;
- 			break;
- 		}
-+		sts.clockid = extoff->clockid;
- 		for (i = 0; i < extoff->n_samples; i++) {
- 			err = ptp->info->gettimex64(ptp->info, &ts, &sts);
- 			if (err)
-diff --git a/include/linux/ptp_clock_kernel.h b/include/linux/ptp_clock_kernel.h
-index 6e4b8206c7d0..74ded5f95d95 100644
---- a/include/linux/ptp_clock_kernel.h
-+++ b/include/linux/ptp_clock_kernel.h
-@@ -47,10 +47,12 @@ struct system_device_crosststamp;
-  * struct ptp_system_timestamp - system time corresponding to a PHC timestamp
-  * @pre_ts: system timestamp before capturing PHC
-  * @post_ts: system timestamp after capturing PHC
-+ * @clockid: clock-base used for capturing the system timestamps
-  */
- struct ptp_system_timestamp {
- 	struct timespec64 pre_ts;
- 	struct timespec64 post_ts;
-+	clockid_t clockid;
- };
- 
- /**
-@@ -457,14 +459,34 @@ static inline ktime_t ptp_convert_timestamp(const ktime_t *hwtstamp,
- 
- static inline void ptp_read_system_prets(struct ptp_system_timestamp *sts)
- {
--	if (sts)
--		ktime_get_real_ts64(&sts->pre_ts);
-+	if (sts) {
-+		switch (sts->clockid) {
-+		case CLOCK_REALTIME:
-+			ktime_get_real_ts64(&sts->pre_ts);
-+			break;
-+		case CLOCK_MONOTONIC_RAW:
-+			ktime_get_raw_ts64(&sts->pre_ts);
-+			break;
-+		default:
-+			break;
-+		}
-+	}
- }
- 
- static inline void ptp_read_system_postts(struct ptp_system_timestamp *sts)
- {
--	if (sts)
--		ktime_get_real_ts64(&sts->post_ts);
-+	if (sts) {
-+		switch (sts->clockid) {
-+		case CLOCK_REALTIME:
-+			ktime_get_real_ts64(&sts->post_ts);
-+			break;
-+		case CLOCK_MONOTONIC_RAW:
-+			ktime_get_raw_ts64(&sts->post_ts);
-+			break;
-+		default:
-+			break;
-+		}
-+	}
- }
- 
- #endif
-diff --git a/include/uapi/linux/ptp_clock.h b/include/uapi/linux/ptp_clock.h
-index 053b40d642de..5e3d70fbc499 100644
---- a/include/uapi/linux/ptp_clock.h
-+++ b/include/uapi/linux/ptp_clock.h
-@@ -155,13 +155,28 @@ struct ptp_sys_offset {
- 	struct ptp_clock_time ts[2 * PTP_MAX_SAMPLES + 1];
- };
- 
-+/*
-+ * ptp_sys_offset_extended - data structure for IOCTL operation
-+ *			     PTP_SYS_OFFSET_EXTENDED
+diff --git a/tools/testing/selftests/net/.gitignore b/tools/testing/selftests/net/.gitignore
+index d996a0ab0765..777cfd027076 100644
+--- a/tools/testing/selftests/net/.gitignore
++++ b/tools/testing/selftests/net/.gitignore
+@@ -5,6 +5,7 @@ bind_wildcard
+ csum
+ cmsg_sender
+ diag_uid
++epoll_busy_poll
+ fin_ack_lat
+ gro
+ hwtstamp_config
+diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
+index 5befca249452..c83c5d9c1ad9 100644
+--- a/tools/testing/selftests/net/Makefile
++++ b/tools/testing/selftests/net/Makefile
+@@ -84,6 +84,7 @@ TEST_GEN_FILES += sctp_hello
+ TEST_GEN_FILES += csum
+ TEST_GEN_FILES += ip_local_port_range
+ TEST_GEN_FILES += bind_wildcard
++TEST_GEN_FILES += epoll_busy_poll
+ TEST_PROGS += test_vxlan_mdb.sh
+ TEST_PROGS += test_bridge_neigh_suppress.sh
+ TEST_PROGS += test_vxlan_nolocalbypass.sh
+diff --git a/tools/testing/selftests/net/epoll_busy_poll.c b/tools/testing/selftests/net/epoll_busy_poll.c
+new file mode 100644
+index 000000000000..3066a41a2acb
+--- /dev/null
++++ b/tools/testing/selftests/net/epoll_busy_poll.c
+@@ -0,0 +1,279 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/* Basic per-epoll context busy poll test.
 + *
-+ * @n_samples:	Desired number of measurements.
-+ * @clockid:	clockid of a clock-base used for pre/post timestamps.
-+ * @rsv:	Reserved for future use.
-+ * @ts:		Array of samples in the form [pre-TS, PHC, post-TS]. The
-+ *		kernel provides @n_samples.
-+ *
-+ * History:
-+ * v1: Initial implementation.
-+ *
-+ * v2: Use the first word of the reserved-field for @clockid. That's
-+ *     backward compatible since v1 expects all three reserved words
-+ *     (@rsv[3]) to be 0 while the clockid (first word in v2) for
-+ *     CLOCK_REALTIME is '0'.
++ * Only tests the ioctls, but should be expanded to test two connected hosts in
++ * the future
 + */
- struct ptp_sys_offset_extended {
--	unsigned int n_samples; /* Desired number of measurements. */
--	unsigned int rsv[3];    /* Reserved for future use. */
--	/*
--	 * Array of [system, phc, system] time stamps. The kernel will provide
--	 * 3*n_samples time stamps.
--	 */
-+	unsigned int n_samples;
-+	__kernel_clockid_t clockid;
-+	unsigned int rsv[2];
- 	struct ptp_clock_time ts[PTP_MAX_SAMPLES][3];
- };
- 
++
++#define _GNU_SOURCE
++
++#include <error.h>
++#include <errno.h>
++#include <inttypes.h>
++#include <limits.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <unistd.h>
++
++#include <sys/epoll.h>
++#include <sys/ioctl.h>
++#include <sys/socket.h>
++
++/* if the headers haven't been updated, we need to define some things */
++#if !defined(EPOLL_IOC_TYPE)
++struct epoll_params {
++	uint32_t busy_poll_usecs;
++	uint16_t busy_poll_budget;
++	uint8_t prefer_busy_poll;
++
++	/* pad the struct to a multiple of 64bits */
++	uint8_t __pad;
++};
++
++#define EPOLL_IOC_TYPE 0x8A
++#define EPIOCSPARAMS _IOW(EPOLL_IOC_TYPE, 0x01, struct epoll_params)
++#define EPIOCGPARAMS _IOR(EPOLL_IOC_TYPE, 0x02, struct epoll_params)
++#endif
++
++enum epoll_test_types {
++	TEST_UNDEFINED = -1,
++	TEST_SIMPLE = 0,
++};
++
++static enum epoll_test_types test_type = TEST_UNDEFINED;
++
++static void usage(const char *filepath)
++{
++	error(1, 0, "Usage: %s [options]", filepath);
++}
++
++static void parse_opts(int argc, char **argv)
++{
++	int c;
++
++	while ((c = getopt(argc, argv, "s")) != -1) {
++		switch (c) {
++		case 's':
++			test_type = TEST_SIMPLE;
++			break;
++		}
++	}
++
++	if (optind != argc)
++		usage(argv[0]);
++}
++
++static void do_simple_test_get_params(int fd)
++{
++	/* begin by getting the epoll params from the kernel
++	 *
++	 * the default should be default and all fields should be zero'd by the
++	 * kernel, so set params fields to garbage to test this.
++	 */
++	struct epoll_params *invalid_params;
++	struct epoll_params params;
++	int ret = 0;
++
++	params.busy_poll_usecs = 0xff;
++	params.busy_poll_budget = 0xff;
++	params.prefer_busy_poll = 1;
++	params.__pad = 0xf;
++
++	if (ioctl(fd, EPIOCGPARAMS, &params) != 0)
++		error(1, errno, "ioctl EPIOCGPARAMS");
++
++	if (params.busy_poll_usecs != 0)
++		error(1, 0, "EPIOCGPARAMS busy_poll_usecs should have been 0");
++
++	if (params.busy_poll_budget != 0)
++		error(1, 0, "EPIOCGPARAMS busy_poll_budget should have been 0");
++
++	if (params.prefer_busy_poll != 0)
++		error(1, 0, "EPIOCGPARAMS prefer_busy_poll should have been 0");
++
++	if (params.__pad != 0)
++		error(1, 0, "EPIOCGPARAMS __pad should have been 0");
++
++	invalid_params = (struct epoll_params *)0xdeadbeef;
++	ret = ioctl(fd, EPIOCGPARAMS, invalid_params);
++	if (ret != -1)
++		error(1, 0, "EPIOCGPARAMS should error with invalid params");
++
++	if (errno != EFAULT)
++		error(1, 0,
++		      "EPIOCGPARAMS with invalid params should set errno to EFAULT");
++}
++
++static void do_simple_test_set_invalid(int fd)
++{
++	/* Set some unacceptable values and check for error */
++	struct epoll_params *invalid_params;
++	struct epoll_params params;
++	int ret;
++
++	memset(&params, 0, sizeof(struct epoll_params));
++
++	params.__pad = 1;
++
++	ret = ioctl(fd, EPIOCSPARAMS, &params);
++
++	if (ret != -1)
++		error(1, 0, "EPIOCSPARAMS with non-zero __pad should error");
++
++	if (errno != EINVAL)
++		error(1, 0, "EPIOCSPARAMS with non-zero __pad errno should be EINVAL");
++
++	params.__pad = 0;
++	params.busy_poll_usecs = (unsigned int)INT_MAX + 1;
++
++	ret = ioctl(fd, EPIOCSPARAMS, &params);
++
++	if (ret != -1)
++		error(1, 0, "EPIOCSPARAMS should error busy_poll_usecs > S32_MAX");
++
++	if (errno != EINVAL)
++		error(1, 0, "EPIOCSPARAMS with busy_poll_usecs > S32_MAX, errno should be EINVAL");
++
++	params.__pad = 0;
++	params.busy_poll_usecs = 32;
++	params.prefer_busy_poll = 2;
++
++	ret = ioctl(fd, EPIOCSPARAMS, &params);
++
++	if (ret != -1)
++		error(1, 0, "EPIOCSPARAMS should error prefer_busy_poll > 1");
++
++	if (errno != EINVAL)
++		error(1, 0, "EPIOCSPARAMS with prefer_busy_poll > 1 errno should be EINVAL");
++
++	params.__pad = 0;
++	params.busy_poll_usecs = 32;
++	params.prefer_busy_poll = 1;
++	params.busy_poll_budget = 65535;
++
++	ret = ioctl(fd, EPIOCSPARAMS, &params);
++
++	if (ret != -1)
++		error(1, 0, "EPIOCSPARAMS should error busy_poll_budget > NAPI_POLL_WEIGHT");
++
++	if (errno != EPERM)
++		error(1, 0,
++		      "EPIOCSPARAMS with busy_poll_budget > NAPI_POLL_WEIGHT (without CAP_NET_ADMIN) errno should be EPERM");
++
++	invalid_params = (struct epoll_params *)0xdeadbeef;
++	ret = ioctl(fd, EPIOCSPARAMS, invalid_params);
++
++	if (ret != -1)
++		error(1, 0, "EPIOCSPARAMS should error when epoll_params is invalid");
++
++	if (errno != EFAULT)
++		error(1, 0, "EPIOCSPARAMS should set errno to EFAULT when epoll_params is invalid");
++}
++
++static void do_simple_test_set_and_get_valid(int fd)
++{
++	struct epoll_params params;
++	int ret;
++
++	memset(&params, 0, sizeof(struct epoll_params));
++
++	params.busy_poll_usecs = 25;
++	params.busy_poll_budget = 16;
++	params.prefer_busy_poll = 1;
++
++	ret = ioctl(fd, EPIOCSPARAMS, &params);
++
++	if (ret != 0)
++		error(1, errno, "EPIOCSPARAMS with valid params should not error");
++
++	/* check that the kernel returns the same values back */
++
++	memset(&params, 0, sizeof(struct epoll_params));
++
++	ret = ioctl(fd, EPIOCGPARAMS, &params);
++
++	if (ret != 0)
++		error(1, errno, "EPIOCGPARAMS should not error");
++
++	if (params.busy_poll_usecs != 25 ||
++	    params.busy_poll_budget != 16 ||
++	    params.prefer_busy_poll != 1 ||
++	    params.__pad != 0)
++		error(1, 0, "EPIOCGPARAMS returned incorrect values");
++}
++
++static void do_simple_test_invalid_fd(void)
++{
++	struct epoll_params params;
++	int ret;
++	int fd;
++
++	fd = socket(AF_UNIX, SOCK_DGRAM, 0);
++
++	if (fd == -1)
++		error(1, errno, "creating unix socket");
++
++	ret = ioctl(fd, EPIOCGPARAMS, &params);
++
++	if (ret != -1)
++		error(1, 0, "EPIOCGPARAMS on invalid epoll FD should error");
++
++	if (errno != ENOTTY)
++		error(1, 0, "EPIOCGPARAMS on invalid epoll FD should set errno to ENOTTY");
++
++	memset(&params, 0, sizeof(struct epoll_params));
++
++	ret = ioctl(fd, EPIOCSPARAMS, &params);
++
++	if (ret != -1)
++		error(1, 0, "EPIOCSPARAMS on invalid epoll FD should error");
++
++	if (errno != ENOTTY)
++		error(1, 0, "EPIOCSPARAMS on invalid epoll FD should set errno to ENOTTY");
++}
++
++static void do_simple_test_invalid_ioctl(int fd)
++{
++	struct epoll_params params;
++	int invalid_ioctl = EPIOCGPARAMS + 10;
++	int ret;
++
++	ret = ioctl(fd, invalid_ioctl, &params);
++
++	if (ret != -1)
++		error(1, 0, "invalid ioctl should return error");
++
++	if (errno != EINVAL)
++		error(1, 0, "invalid ioctl should set errno to EINVAL");
++}
++
++static void do_simple_test(void)
++{
++	int fd;
++
++	fd = epoll_create1(0);
++	if (fd == -1)
++		error(1, errno, "epoll_create");
++
++	do_simple_test_invalid_fd();
++	do_simple_test_invalid_ioctl(fd);
++	do_simple_test_get_params(fd);
++	do_simple_test_set_invalid(fd);
++	do_simple_test_set_and_get_valid(fd);
++
++	if (close(fd))
++		error(1, errno, "close");
++}
++
++int main(int argc, char **argv)
++{
++	parse_opts(argc, argv);
++
++	if (test_type == TEST_SIMPLE)
++		do_simple_test();
++	else
++		error(1, 0, "unknown test type: %d", test_type);
++
++	return 0;
++}
 -- 
-2.45.0.rc1.225.g2a3ae87e7f-goog
+2.25.1
 
 
