@@ -1,90 +1,120 @@
-Return-Path: <netdev+bounces-92982-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92983-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B85CB8B97E3
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 11:37:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43AF48B9815
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 11:51:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E8FC51C2302E
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 09:37:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F09A71F24652
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 09:51:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3222D56459;
-	Thu,  2 May 2024 09:37:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E345455C3A;
+	Thu,  2 May 2024 09:51:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jTXtqf5e"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Jd3w0RFf"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EF9A56457
-	for <netdev@vger.kernel.org>; Thu,  2 May 2024 09:37:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C43E414286;
+	Thu,  2 May 2024 09:51:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714642654; cv=none; b=lfP46zy4ry+GNNyvVIw3IaexAPUx2CFv0nNRKlyVQOnCnkNPPuI3aHNRNzcz3sf48lcYzrjj/rmNfNsZuscfLyXSyAaCTPRk1eZZhc27vNoCEhvo9bq6BA7EMxE6AT0FjuI1M01bjgWklh8NlXUI+LN1jX/AAOhuAT37w+rSb8o=
+	t=1714643463; cv=none; b=qR+MJePCnoYEadEeznukCFfc+cARmr/Y1LQeyvHlpwLXTFZYRDi3I/CQu5C7xMnykx13ylkkDzhTTopNqyP8nxcJLQGxhRSipHOefY0ZVLRLi2i8BIbKca3Bk9w25uV05WCSBBqJwvzUoHPr6CbTBpmpEQM80PfqMLq1Ul7VBBk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714642654; c=relaxed/simple;
-	bh=ogXqEfvOUAsshk8BXgnHZO89kIVI3jmM/KizswVY4PY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sQXq33tKtxk0D9Hi+V1TzpsXlioFCyWqtMQfq3XI54jlLGB1kr5kFsAyIdNDfe03u8B/VhtqhhJg7U+jzlVqq4LYTPw7rtRmLMrWYf2lB0HB0wBxVzPhRUA2CpAH74BlhFvw7vNmFF4TqGQGfNIk3CKmv34kjmWHpH0KjITQ20s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jTXtqf5e; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E07DBC116B1;
-	Thu,  2 May 2024 09:37:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714642653;
-	bh=ogXqEfvOUAsshk8BXgnHZO89kIVI3jmM/KizswVY4PY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=jTXtqf5edOasdD96ANiW+G1YlJqJHWCpuaPNr75PwBVPpRtb2uomiyqMeBhXt778p
-	 60pj+6FRNHlZKk8BqUs0p7t7CaNjINTPXMY37uup/kEU5rcgtkCh1wYMIfqYnHnZQL
-	 8TV/DQiT+21qm461DJZO6XBSxhMQt7SGJdhDYD2ArbCEdFl1/7qRw0a4VezdFi+T/M
-	 u2qgG46qdc3sYglJty92/q6piP1ZFCi+CqRJs9xDCQsj6obi3E8aPhl8sUlKd7QZYs
-	 TmoI9hZP5jsQeIZWVq7+Et2dMeas13Ex30i7GZUdnr+03KDMXNZT/z3JaBYKbdD1/j
-	 27kPHxJT8cLqw==
-Date: Thu, 2 May 2024 10:37:27 +0100
-From: Simon Horman <horms@kernel.org>
-To: Michael Chan <michael.chan@broadcom.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, andrew.gospodarek@broadcom.com,
-	Edwin Peer <edwin.peer@broadcom.com>
-Subject: Re: [PATCH net-next v2 1/6] bnxt_en: share NQ ring sw_stats memory
- with subrings
-Message-ID: <20240502093727.GE2821784@kernel.org>
-References: <20240501003056.100607-1-michael.chan@broadcom.com>
- <20240501003056.100607-2-michael.chan@broadcom.com>
+	s=arc-20240116; t=1714643463; c=relaxed/simple;
+	bh=BAFP/ofSa+AEwTY25adE8qwMB+9ibYQI/GHdkMUufIQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=d9ZQxHujyre4JNCSlhlXvom0JqmNzZp5vXPng34EXdDfifq8QacItHo1V/TvrtNdANPp8d8iBWDXIaN7rpQTWiZWY2rAi9IM2TilQTmhYJTiiDfH/4x2BtQSeZOB4PA/9Z5aEZudPQg5MLEEEQkxiNaXBdIsGDIRAQGNbCm9SkY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Jd3w0RFf; arc=none smtp.client-ip=217.70.183.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id C38B9C0009;
+	Thu,  2 May 2024 09:50:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1714643453;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=61+EepSzB2Xshk8/s0Q2YxSx5UzzAr0zhhrwm9xlmf4=;
+	b=Jd3w0RFfaXI6YAgvOAyWxHBzF+vjVQCLYETaT9/W0kFojht3mdm7JCaRdaNV6lKeEInGXH
+	EECIQsIrCq8D+zccHu5xleCHIZ4Faeuj3/EJMxdvTrGicWFrpXP8lLZD7fJITyOy1L29MH
+	bUy7IFKHz9P5FEd9XpmRSUdxbkz6dGgc5iYE5REU5Qchv9X6uBYrXDaxQL7W7DPwLnJ6ZX
+	HhmFUJl6xqQt9sftzhFhvh5fI+Pdk3dW+8iEK+mE+wmZdNNcMwjCOraOp23mtCBaXVEV4B
+	SD7qzmtrCO8Qk2SbucLBJKVwAW2lVILqtq+uMC0R/xQogM8tJhcRa2Z0KtTvrQ==
+Date: Thu, 2 May 2024 11:50:43 +0200
+From: Herve Codina <herve.codina@bootlin.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Thomas Gleixner <tglx@linutronix.de>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Lee Jones <lee@kernel.org>, Arnd Bergmann
+ <arnd@arndb.de>, Horatiu Vultur <horatiu.vultur@microchip.com>,
+ UNGLinuxDriver@microchip.com, Heiner Kallweit <hkallweit1@gmail.com>,
+ Russell King <linux@armlinux.org.uk>, Saravana Kannan
+ <saravanak@google.com>, Bjorn Helgaas <bhelgaas@google.com>, Philipp Zabel
+ <p.zabel@pengutronix.de>, Lars Povlsen <lars.povlsen@microchip.com>, Steen
+ Hegelund <Steen.Hegelund@microchip.com>, Daniel Machon
+ <daniel.machon@microchip.com>, Alexandre Belloni
+ <alexandre.belloni@bootlin.com>, linux-kernel@vger.kernel.org,
+ devicetree@vger.kernel.org, netdev@vger.kernel.org,
+ linux-pci@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Allan
+ Nielsen <allan.nielsen@microchip.com>, Luca Ceresoli
+ <luca.ceresoli@bootlin.com>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH 06/17] dt-bindings: net: mscc-miim: Add resets property
+Message-ID: <20240502115043.37a1a33a@bootlin.com>
+In-Reply-To: <2b01ed8a-1169-4928-952e-1645935aca2f@lunn.ch>
+References: <20240430083730.134918-1-herve.codina@bootlin.com>
+	<20240430083730.134918-7-herve.codina@bootlin.com>
+	<5d899584-38ed-4eee-9ba5-befdedbc5734@lunn.ch>
+	<20240430174023.4d15a8a4@bootlin.com>
+	<2b01ed8a-1169-4928-952e-1645935aca2f@lunn.ch>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240501003056.100607-2-michael.chan@broadcom.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: herve.codina@bootlin.com
 
-On Tue, Apr 30, 2024 at 05:30:51PM -0700, Michael Chan wrote:
-> From: Edwin Peer <edwin.peer@broadcom.com>
-> 
-> On P5_PLUS chips and later, the NQ rings have subrings for RX and TX
-> completions respectively. These subrings are passed to the poll
-> function instead of the base NQ, but each ring carries its own
-> copy of the software ring statistics.
-> 
-> For stats to be conveniently accessible in __bnxt_poll_work(), the
-> statistics memory should either be shared between the NQ and its
-> subrings or the subrings need to be included in the ethtool stats
-> aggregation logic. This patch opts for the former, because it's more
-> efficient and less confusing having the software statistics for a
-> ring exist in a single place.
-> 
-> Before this patch, the counter will not be displayed if the "wrong"
-> cpr->sw_stats was used to increment a counter.
-> 
-> Link: https://lore.kernel.org/netdev/CACKFLikEhVAJA+osD7UjQNotdGte+fth7zOy7yDdLkTyFk9Pyw@mail.gmail.com/
-> Signed-off-by: Edwin Peer <edwin.peer@broadcom.com>
-> Signed-off-by: Michael Chan <michael.chan@broadcom.com>
+Hi Andrew,
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+On Tue, 30 Apr 2024 18:31:46 +0200
+Andrew Lunn <andrew@lunn.ch> wrote:
 
+> > We have the same construction with the pinctrl driver used in the LAN966x
+> >   Documentation/devicetree/bindings/pinctrl/mscc,ocelot-pinctrl.yaml
+> > 
+> > The reset name is 'switch' in the pinctrl binding.
+> > I can use the same description here as the one present in the pinctrl binding:
+> >   description: Optional shared switch reset.
+> > and keep 'switch' as reset name here (consistent with pinctrl reset name).
+> > 
+> > What do you think about that ?  
+> 
+> It would be good to document what it is shared with. So it seems to be
+> the switch itself, pinctl and MDIO? Anything else?
+> 
 
+To be honest, I know that the GPIO controller (microchip,sparx5-sgpio) is
+impacted but I don't know if anything else is impacted by this reset.
+I can update the description with:
+  description:
+    Optional shared switch reset.
+    This reset is shared with at least pinctrl, GPIO, MDIO and the switch
+    itself.
+
+Does it sound better ?
+
+Best regards
+Hervé
 
