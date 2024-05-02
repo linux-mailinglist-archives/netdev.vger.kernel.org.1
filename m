@@ -1,168 +1,149 @@
-Return-Path: <netdev+bounces-93104-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93106-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D90F88BA0AF
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 20:42:39 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BFFCD8BA0DA
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 21:01:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5973B282DD4
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 18:42:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D6C50B22990
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 19:01:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0D53175551;
-	Thu,  2 May 2024 18:42:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7276915FD17;
+	Thu,  2 May 2024 19:01:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="l+USzdVq"
+	dkim=pass (1024-bit key) header.d=oddbit.com header.i=@oddbit.com header.b="nNIoF+Hp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp94.ord1d.emailsrvr.com (smtp94.ord1d.emailsrvr.com [184.106.54.94])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AC2F174EE1
-	for <netdev@vger.kernel.org>; Thu,  2 May 2024 18:42:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C00CC15FD0B
+	for <netdev@vger.kernel.org>; Thu,  2 May 2024 19:01:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=184.106.54.94
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714675354; cv=none; b=mbd+uQFZQuIwcRqtgxAbE1DU7nAQQa+aNM9/ysxXWRUiQ+VVXQNj68nzezYvE31qqgNoWTbwVzuoyhzkD2lccVuJvnC4H+7opW0rIRaseYbC4LKCHEUf+2bgyauf0zZPPfThJRsIypqXqQUbjRRfQBPmmE3u2J1G2BJoU11lVUM=
+	t=1714676508; cv=none; b=TjPke/dfAxLxNvOzMZDvLteZPHQVZKr1r7yx3Ai20O6R1VAXszgjzeFerxMaSPsD5kpdzZBrmu/6B5n/bi2yIm1Fm0v76pLAcItsQkyLd/jR9MHA/Q1Xaru3updfLza+b9W+D6FX1lEOZAInQbzF+Uh3ZtgRUZ4EIGSaLPwwXns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714675354; c=relaxed/simple;
-	bh=59QNG/Fcdv//9QvB/0RdoOXOz5ROmoADNEG4/Gm8CuQ=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=tq/N7QiNbvrH8NKNWm38DR8lnSkZia5tTJ/NjWNzSUdWYd7EQpM5YV3tyGiVvVYeWkg1e2ipdPAcIZ77KM2nFaV4EFVdOBr/QgCuzPAXuKnELi7N1VikQlKNLE4zJZQvHNuBN3ANkfVPWHTjndgIY6UimWi5/TaegIT/IjmxXB0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=l+USzdVq; arc=none smtp.client-ip=209.85.128.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-61be26af113so71673877b3.1
-        for <netdev@vger.kernel.org>; Thu, 02 May 2024 11:42:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1714675351; x=1715280151; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=t31mAKL3MVI73H8d10/Dy6FPLDKutGkgKKAS3ur0XE4=;
-        b=l+USzdVqZlqZu89NOkiwFTd3GZJJllpTnKFlfjV44dI5XixFe6Or1Ioql9ZYm9Q8dM
-         tiJCp5x+i4UDRQNzeFMt3XFxq79i6YWKLC/4VuSSUo7UvSZ52zGJd2pe883yYzxbhUuN
-         M6eOsqdI47S9YLa64aljOFJRZnXDX9rMJBvKGwdFP/X+xzNTqG6V2mbXeHdNxx7zxKKk
-         ZnL7QSFh57oSwhhVCN78pV6JxwWRtPvmwNNUbHL7eNqz02JVjv4Nqdt2EprsiZdXCh+G
-         qiigLFG1cdeMQK1Qcv8txpbTM31l+NN7zvzxezEdAZyIK1nnOHiVMQ7fig6zs4NYfrRb
-         w1JA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714675351; x=1715280151;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=t31mAKL3MVI73H8d10/Dy6FPLDKutGkgKKAS3ur0XE4=;
-        b=w+yv5DZCXrmndE4ZzzHFjWmZtoaXx/bhix1dlUriT3A+J2kDTYlPB+ExaylaGuChwy
-         zMcPuClc/5pjSCPshH8/aW0sRPG7DWhEzmLvzeI5hjVTkH3SvGcmjokuPcn7d80Bg5Tp
-         mAgxWtNlfuM/4q4GF/QvBD+JuVZ2eWUSWRrKz8SUebwPVuiTqESfjBhzsj5WxTWbea3U
-         Cgz36LIPqRbmTHbXD0SRlJ1N+kdi5RhEwAk6H2MT+4+V9YRQDVhuUD8oGAzV2bEIP9uw
-         yJBfPBtfH4tcnrs7fWElpxc7NhllyTZ0d6mLGQuMkMRb7MlMHn4JqXNHWkWnfey0woeB
-         UHkg==
-X-Forwarded-Encrypted: i=1; AJvYcCUnaNLsnWAGKH3uF5Us53+fiHmLKxMfcncENRY+gdtsLkvWoA1SbvmSR7SEzcW+5LpQV4td0vEtDgX0XGdMOjLEtP8PTiCg
-X-Gm-Message-State: AOJu0YzDmFK4vdHFwel/+aRapAt4W2toOEbFJUB5LeHPkRCpPSbpBKs/
-	zqu9yuDimtvuXqNPM5LvOQrVGzV/pNI6sl3irqBi/FjPz60blKqNoh1A3792Il9EC/gMsONykNs
-	F/w==
-X-Google-Smtp-Source: AGHT+IFBB1Beu8kFSHdljseQZRBecifx8xInIHMu6JSSudvsQzMMMF/EjATwyWk141WOZGSUx1DvI7X1g7A=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:2b07:b0:de4:64c4:d90c with SMTP id
- fi7-20020a0569022b0700b00de464c4d90cmr93847ybb.12.1714675351296; Thu, 02 May
- 2024 11:42:31 -0700 (PDT)
-Date: Thu, 2 May 2024 11:42:29 -0700
-In-Reply-To: <20240305.phohPh8saa4i@digikod.net>
+	s=arc-20240116; t=1714676508; c=relaxed/simple;
+	bh=10QgoifWZIHsQYM4viNQAebY5RXKGshG/GWxuIdO2XE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hhEMVJlAKkax8JWPrWnqzPqttN/00P0FOBkQly4Xda6f/c1Qo/udpnlFlMVExUMU4lY22DuJxEmOjoDotlnSXkpH5Y4weAKl/kN68GdnxSqD7F7jMfF+e51gnmR6pkAfd2q+EvBKuLeMB3/J59RiYsfXcBADSiJwjb5lubPO0fk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=oddbit.com; spf=pass smtp.mailfrom=oddbit.com; dkim=pass (1024-bit key) header.d=oddbit.com header.i=@oddbit.com header.b=nNIoF+Hp; arc=none smtp.client-ip=184.106.54.94
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=oddbit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oddbit.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=oddbit.com;
+	s=20180920-g2b7aziw; t=1714676144;
+	bh=10QgoifWZIHsQYM4viNQAebY5RXKGshG/GWxuIdO2XE=;
+	h=Date:From:To:Subject:From;
+	b=nNIoF+HpJuRzKWliHOsw5wu6Gr3MXa5Rpj3/WR6MgGkBJ4z711YkWhyGirF8Oo48M
+	 E+7h678BXuClR2SEgnSh3fNeSjD8ej2qZjY3VGLQaFV25TaDRcvZO1OFH1VF+e2ilk
+	 5EPFMVC1wd5658USB6b7Rf96TsCGN91btGmOJu/A=
+X-Auth-ID: lars@oddbit.com
+Received: by smtp20.relay.ord1d.emailsrvr.com (Authenticated sender: lars-AT-oddbit.com) with ESMTPSA id 7B978C026F;
+	Thu,  2 May 2024 14:55:43 -0400 (EDT)
+Date: Thu, 2 May 2024 14:55:43 -0400
+From: Lars Kellogg-Stedman <lars@oddbit.com>
+To: Duoming Zhou <duoming@zju.edu.cn>
+Cc: linux-hams@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, jreuter@yaina.de, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, dan.carpenter@linaro.org
+Subject: Re: [PATCH net 2/2] ax25: fix potential reference counting leak in
+ ax25_addr_ax25dev
+Message-ID: <vvk5silsu6nvu3dpdeffk2vjocijebkevqvub7erd4sorvnllt@7yyjmrczbatf>
+References: <cover.1714660565.git.duoming@zju.edu.cn>
+ <cb44ea91c0b7084079c3086d6d75e7984505cec7.1714660565.git.duoming@zju.edu.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240229005920.2407409-1-kuba@kernel.org> <05f7bf89-04a5-4b65-bf59-c19456aeb1f0@sirena.org.uk>
- <20240304150411.6a9bd50b@kernel.org> <202403041512.402C08D@keescook>
- <20240304153902.30cd2edd@kernel.org> <202403050141.C8B1317C9@keescook> <20240305.phohPh8saa4i@digikod.net>
-Message-ID: <ZjPelW6-AbtYvslu@google.com>
-Subject: Re: [PATCH v4 00/12] selftests: kselftest_harness: support using xfail
-From: Sean Christopherson <seanjc@google.com>
-To: "=?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?=" <mic@digikod.net>
-Cc: Kees Cook <keescook@chromium.org>, Jakub Kicinski <kuba@kernel.org>, 
-	Mark Brown <broonie@kernel.org>, davem@davemloft.net, netdev@vger.kernel.org, 
-	edumazet@google.com, pabeni@redhat.com, shuah@kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-security-module@vger.kernel.org, 
-	jakub@cloudflare.com, kvm@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <cb44ea91c0b7084079c3086d6d75e7984505cec7.1714660565.git.duoming@zju.edu.cn>
+X-Classification-ID: 17c51de0-41ab-40c1-8817-f4243cb35e3a-1-1
 
-+kvm
+On Thu, May 02, 2024 at 10:43:38PM +0800, Duoming Zhou wrote:
+> The reference counting of ax25_dev potentially increase more
+> than once in ax25_addr_ax25dev(), which will cause memory leak.
 
-On Tue, Mar 05, 2024, Micka=C3=ABl Sala=C3=BCn wrote:
-> On Tue, Mar 05, 2024 at 01:43:14AM -0800, Kees Cook wrote:
-> > On Mon, Mar 04, 2024 at 03:39:02PM -0800, Jakub Kicinski wrote:
-> > > On Mon, 4 Mar 2024 15:14:04 -0800 Kees Cook wrote:
-> > > > > Ugh, I'm guessing vfork() "eats" the signal, IOW grandchild signa=
-ls,
-> > > > > child exits? vfork() and signals.. I'd rather leave to Kees || Mi=
-ckael. =20
-> > > >=20
-> > > > Oh no, that does seem bad. Since Micka=C3=ABl is also seeing weird =
-issues,
-> > > > can we drop the vfork changes for now?
-> > >=20
-> > > Seems doable, but won't be a simple revert. "drop" means we'd need=20
-> > > to bring ->step back. More or less go back to v3.
-> >=20
-> > I think we have to -- other CIs are now showing the most of seccomp
-> > failing now. (And I can confirm this now -- I had only tested seccomp
-> > on earlier versions of the series.)
->=20
-> Sorry for the trouble, I found and fixed the vfork issues.
+With this patch applied, I see a kernel panic as soon as something binds
+an ax.25 socket (e.g., starting ax25d):
 
-Heh, you found and fixed _some of_ the vfork issues.  This whole mess compl=
-etely
-breaks existing tests that use TEST_F() and exit() with non-zero values to
-indicate failure, including failures that occur during FIXTURE_SETUP().
+BUG: kernel NULL pointer dereference, address: 0000000000000098
+#PF: supervisor write access in kernel mode
+#PF: error_code(0x0002) - not-present page
+PGD 0 P4D 0
+Oops: 0002 [#1] SMP PTI
+CPU: 0 PID: 111 Comm: ax25d Not tainted 6.9.0-rc6-ax25+ #69
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.3-2.fc40 04/01/2014
+RIP: 0010:ax25_addr_ax25dev+0x5b/0xb0
+Code: 8b 43 08 4c 89 ef 48 8b b0 d0 03 00 00 e8 6d fb ff ff 85 c0 4c 0f 44 e3 48 8b 1b 48 85 db 75 df 4d 85 e4 74 19 b8 01 00 00 00 <f0> 0f c1 04 25 98 00 00 00 85 c0 74 21 8d 50 01 09 c2 78 2b 48 c7
+RSP: 0018:ffffc90000463e00 EFLAGS: 00010282
+RAX: 0000000000000001 RBX: 0000000000000000 RCX: 0000000000000000
+RDX: 0000000000000000 RSI: ffff888101a5f728 RDI: ffffc90000463e6a
+RBP: ffffc90000463e18 R08: ffffc90000463e68 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000000 R12: ffff888101523e40
+R13: ffffc90000463e6a R14: ffff88810111f200 R15: ffff8881004e4e00
+FS:  00007fb6a6d93b08(0000) GS:ffff88813bc00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000000000098 CR3: 0000000101bb4000 CR4: 00000000000006b0
+Call Trace:
+ <TASK>
+ ? show_regs.part.0+0x22/0x30
+ ? __die+0x5b/0x99
+ ? page_fault_oops+0xae/0x220
+ ? search_extable+0x2e/0x40
+ ? ax25_addr_ax25dev+0x5b/0xb0
+ ? kernelmode_fixup_or_oops+0x9f/0x120
+ ? __bad_area_nosemaphore+0x15f/0x1a0
+ ? bad_area_nosemaphore+0x16/0x20
+ ? exc_page_fault+0x2a8/0x6e0
+ ? asm_exc_page_fault+0x2b/0x30
+ ? ax25_addr_ax25dev+0x5b/0xb0
+ ax25_bind+0x14c/0x260
+ __sys_bind+0xc0/0xf0
+ ? alloc_file_pseudo+0xae/0xe0
+ __x64_sys_bind+0x1c/0x30
+ x64_sys_call+0xfe3/0x1d00
+ do_syscall_64+0x55/0x120
+ entry_SYSCALL_64_after_hwframe+0x76/0x7e
+RIP: 0033:0x7fb6a6d2cfa4
+Code: 00 00 00 ba 01 00 00 00 0f 05 80 e7 08 74 c3 eb b0 48 83 ec 08 89 d2 48 63 ff 45 31 d2 45 31 c0 45 31 c9 b8 31 00 00 00 0f 05 <48> 89 c7 e8 da 3f fe ff 48 83 c4 08 c3 48 83 ec 10 48 89 f0 89 d1
+RSP: 002b:00007ffc1a5c7670 EFLAGS: 00000246 ORIG_RAX: 0000000000000031
+RAX: ffffffffffffffda RBX: 00007ffc1a5c7799 RCX: 00007fb6a6d2cfa4
+RDX: 0000000000000048 RSI: 00007ffc1a5c7750 RDI: 0000000000000005
+RBP: 00007fb6a6d94a80 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 00007fb6a6cebca0
+R13: 0000000000000048 R14: 0000561ff9f9e776 R15: 00007ffc1a5c8b00
+ </TASK>
+CR2: 0000000000000098
+---[ end trace 0000000000000000 ]---
+RIP: 0010:ax25_addr_ax25dev+0x5b/0xb0
+Code: 8b 43 08 4c 89 ef 48 8b b0 d0 03 00 00 e8 6d fb ff ff 85 c0 4c 0f 44 e3 48 8b 1b 48 85 db 75 df 4d 85 e4 74 19 b8 01 00 00 00 <f0> 0f c1 04 25 98 00 00 00 85 c0 74 21 8d 50 01 09 c2 78 2b 48 c7
+RSP: 0018:ffffc90000463e00 EFLAGS: 00010282
+RAX: 0000000000000001 RBX: 0000000000000000 RCX: 0000000000000000
+RDX: 0000000000000000 RSI: ffff888101a5f728 RDI: ffffc90000463e6a
+RBP: ffffc90000463e18 R08: ffffc90000463e68 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000000 R12: ffff888101523e40
+R13: ffffc90000463e6a R14: ffff88810111f200 R15: ffff8881004e4e00
+FS:  00007fb6a6d93b08(0000) GS:ffff88813bc00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000000000098 CR3: 0000000101bb4000 CR4: 00000000000006b0
+Kernel panic - not syncing: Fatal exception in interrupt
+Kernel Offset: disabled
+---[ end Kernel panic - not syncing: Fatal exception in interrupt ]---
 
-E.g. all of the KVM selftests that use KVM_ONE_VCPU_TEST() are broken and w=
-ill
-always show all tests as passing.
+My kernel tree looks like this:
 
-The below gets things working for KVM selftests again, but (a) I have no id=
-ea if
-it's a complete fix, (b) I don't know if it will break other users of the h=
-arness,
-and (c) I don't understand why spawning a grandchild is the default behavio=
-r, i.e.
-why usage that has zero need of separating teardown from setup+run is subje=
-cted to
-the complexity of the handful of tests that do.
+d32d77d2b4a (HEAD -> ham-patches) ax25: fix potential reference counting leak in ax25_addr_ax25dev
+742ab0da09d ax25: change kfree in ax25_dev_free to ax25_dev_free
+e6357cafe3e ax25: fix reference counting issue of ax25_dev
+0106679839f (origin/master, origin/HEAD, master) Merge tag 'regulator-fix-v6.9-rc6' of git://git.kernel.org/pub/scm/linux/kernel/git/broonieer
 
-diff --git a/tools/testing/selftests/kselftest_harness.h b/tools/testing/se=
-lftests/kselftest_harness.h
-index 4fd735e48ee7..24e95828976f 100644
---- a/tools/testing/selftests/kselftest_harness.h
-+++ b/tools/testing/selftests/kselftest_harness.h
-@@ -391,7 +391,7 @@
-                                fixture_name##_setup(_metadata, &self, vari=
-ant->data); \
-                                /* Let setup failure terminate early. */ \
-                                if (_metadata->exit_code) \
--                                       _exit(0); \
-+                                       _exit(_metadata->exit_code); \
-                                _metadata->setup_completed =3D true; \
-                                fixture_name##_##test_name(_metadata, &self=
-, variant->data); \
-                        } else if (child < 0 || child !=3D waitpid(child, &=
-status, 0)) { \
-@@ -406,8 +406,10 @@
-                } \
-                if (_metadata->setup_completed && _metadata->teardown_paren=
-t) \
-                        fixture_name##_teardown(_metadata, &self, variant->=
-data); \
--               if (!WIFEXITED(status) && WIFSIGNALED(status)) \
--                       /* Forward signal to __wait_for_test(). */ \
-+               /* Forward exit codes and signals to __wait_for_test(). */ =
-\
-+               if (WIFEXITED(status)) \
-+                       _exit(WEXITSTATUS(status)); \
-+               else if (WIFSIGNALED(status)) \
-                        kill(getpid(), WTERMSIG(status)); \
-                __test_check_assert(_metadata); \
-        } \
+I don't see the kernel panic if I discard the top patch.
+
+-- 
+Lars Kellogg-Stedman <lars@oddbit.com> | larsks @ {irc,twitter,github}
+http://blog.oddbit.com/                | N1LKS
 
