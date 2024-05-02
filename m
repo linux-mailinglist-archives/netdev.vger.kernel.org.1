@@ -1,115 +1,90 @@
-Return-Path: <netdev+bounces-92981-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92982-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 540108B97C2
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 11:31:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B85CB8B97E3
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 11:37:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0F6282869EE
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 09:31:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E8FC51C2302E
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 09:37:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7771B5490A;
-	Thu,  2 May 2024 09:31:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3222D56459;
+	Thu,  2 May 2024 09:37:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PQ/rCVqO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jTXtqf5e"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DECC535BF;
-	Thu,  2 May 2024 09:31:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EF9A56457
+	for <netdev@vger.kernel.org>; Thu,  2 May 2024 09:37:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714642273; cv=none; b=e4Rxsj+Fk13SILg/i7ovr/5p/idcxI7WPvmqXOQkpvbHvGC4kRaflfGwy3N/Jl61ZcDZqKbKe7NYsd5qT9eVLVRkYo11/nuYZxqQpbWv5lsX5mkI4ZGCPULmBmhFSpgl1+FLMV22nFVB4ZMYH47tixSArKB8PJeUE24zVSS40Pk=
+	t=1714642654; cv=none; b=lfP46zy4ry+GNNyvVIw3IaexAPUx2CFv0nNRKlyVQOnCnkNPPuI3aHNRNzcz3sf48lcYzrjj/rmNfNsZuscfLyXSyAaCTPRk1eZZhc27vNoCEhvo9bq6BA7EMxE6AT0FjuI1M01bjgWklh8NlXUI+LN1jX/AAOhuAT37w+rSb8o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714642273; c=relaxed/simple;
-	bh=nxJJn2KewqMIkJ3dMF9ZpNtiUYcYj+4rxjpVDnMCCH4=;
-	h=Date:Content-Type:MIME-Version:From:To:Cc:In-Reply-To:References:
-	 Message-Id:Subject; b=Ewp+thh4GWusv7hevUrvELQLHBLuSqURrKEKsKf4C7H4FdRJJIrK9FPu8TeHY5Uj3lzi+Wq/SUQkiWOA0OFF6Lbc+ZO7Pey4fI4hdm4ybmXYS5qXzf50RFLOK6YMmNNFd1cNJpP3ZmBgs2/YdriqWnBat+uPQ85hH6W8lvE63ME=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PQ/rCVqO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9CD2AC113CC;
-	Thu,  2 May 2024 09:31:12 +0000 (UTC)
+	s=arc-20240116; t=1714642654; c=relaxed/simple;
+	bh=ogXqEfvOUAsshk8BXgnHZO89kIVI3jmM/KizswVY4PY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sQXq33tKtxk0D9Hi+V1TzpsXlioFCyWqtMQfq3XI54jlLGB1kr5kFsAyIdNDfe03u8B/VhtqhhJg7U+jzlVqq4LYTPw7rtRmLMrWYf2lB0HB0wBxVzPhRUA2CpAH74BlhFvw7vNmFF4TqGQGfNIk3CKmv34kjmWHpH0KjITQ20s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jTXtqf5e; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E07DBC116B1;
+	Thu,  2 May 2024 09:37:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714642272;
-	bh=nxJJn2KewqMIkJ3dMF9ZpNtiUYcYj+4rxjpVDnMCCH4=;
-	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
-	b=PQ/rCVqONlYul6a7Vey4ZpsZNR/8RHzWfdCsO0OjVsN++uyuidq/GnK7jFsjk8jRt
-	 6GYrk20mqMEzqCeniofiDenRPQsr43EJTz7LpOAXqonFCzL9/nzdyJBy9DBA//tjt+
-	 7hu4b2CMF8bmkqi3naK0gZSAKurPzKecyIuo95xxZE3z3M4cENY6f05TgTgvFhr//w
-	 VEm+BzvNqOAPMaxafKctqMturibXSvjuLbR8Bb7Pn/CAhJw6vc+5ZKi3al9GhAwZKs
-	 dKM/uarhG9uUE6yY5fLINmUezz7y8T+Dm8M9+YRDImItM9bLcw2Txf3MQPpTT+p1Nn
-	 p+4roxajhRGdQ==
-Date: Thu, 02 May 2024 04:31:11 -0500
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+	s=k20201202; t=1714642653;
+	bh=ogXqEfvOUAsshk8BXgnHZO89kIVI3jmM/KizswVY4PY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=jTXtqf5edOasdD96ANiW+G1YlJqJHWCpuaPNr75PwBVPpRtb2uomiyqMeBhXt778p
+	 60pj+6FRNHlZKk8BqUs0p7t7CaNjINTPXMY37uup/kEU5rcgtkCh1wYMIfqYnHnZQL
+	 8TV/DQiT+21qm461DJZO6XBSxhMQt7SGJdhDYD2ArbCEdFl1/7qRw0a4VezdFi+T/M
+	 u2qgG46qdc3sYglJty92/q6piP1ZFCi+CqRJs9xDCQsj6obi3E8aPhl8sUlKd7QZYs
+	 TmoI9hZP5jsQeIZWVq7+Et2dMeas13Ex30i7GZUdnr+03KDMXNZT/z3JaBYKbdD1/j
+	 27kPHxJT8cLqw==
+Date: Thu, 2 May 2024 10:37:27 +0100
+From: Simon Horman <horms@kernel.org>
+To: Michael Chan <michael.chan@broadcom.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, andrew.gospodarek@broadcom.com,
+	Edwin Peer <edwin.peer@broadcom.com>
+Subject: Re: [PATCH net-next v2 1/6] bnxt_en: share NQ ring sw_stats memory
+ with subrings
+Message-ID: <20240502093727.GE2821784@kernel.org>
+References: <20240501003056.100607-1-michael.chan@broadcom.com>
+ <20240501003056.100607-2-michael.chan@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: "Rob Herring (Arm)" <robh@kernel.org>
-To: Christoph Fritz <christoph.fritz@hexdev.de>
-Cc: Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Sebastian Reichel <sre@kernel.org>, 
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
- linux-serial@vger.kernel.org, Linus Walleij <linus.walleij@linaro.org>, 
- Jiri Kosina <jikos@kernel.org>, Jiri Slaby <jirislaby@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>, 
- Andreas Lauser <andreas.lauser@mercedes-benz.com>, 
- Marc Kleine-Budde <mkl@pengutronix.de>, 
- Benjamin Tissoires <bentiss@kernel.org>, devicetree@vger.kernel.org, 
- Eric Dumazet <edumazet@google.com>, Jonathan Corbet <corbet@lwn.net>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
- Paolo Abeni <pabeni@redhat.com>, linux-can@vger.kernel.org, 
- netdev@vger.kernel.org, linux-input@vger.kernel.org, 
- Pavel Pisa <pisa@cmp.felk.cvut.cz>, 
- Oliver Hartkopp <socketcan@hartkopp.net>, 
- "David S . Miller" <davem@davemloft.net>
-In-Reply-To: <20240502075534.882628-7-christoph.fritz@hexdev.de>
-References: <20240502075534.882628-1-christoph.fritz@hexdev.de>
- <20240502075534.882628-7-christoph.fritz@hexdev.de>
-Message-Id: <171464227142.1356329.4931419696225319861.robh@kernel.org>
-Subject: Re: [PATCH v2 06/12] dt-bindings: net/can: Add serial (serdev) LIN
- adapter
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240501003056.100607-2-michael.chan@broadcom.com>
 
-
-On Thu, 02 May 2024 09:55:28 +0200, Christoph Fritz wrote:
-> This patch adds dt-bindings for serial LIN bus adapters. These adapters are
-> basically just LIN transceivers that get hard-wired with serial devices.
+On Tue, Apr 30, 2024 at 05:30:51PM -0700, Michael Chan wrote:
+> From: Edwin Peer <edwin.peer@broadcom.com>
 > 
-> Signed-off-by: Christoph Fritz <christoph.fritz@hexdev.de>
-> ---
->  .../bindings/net/can/hexdev,lin-serdev.yaml   | 32 +++++++++++++++++++
->  1 file changed, 32 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/net/can/hexdev,lin-serdev.yaml
+> On P5_PLUS chips and later, the NQ rings have subrings for RX and TX
+> completions respectively. These subrings are passed to the poll
+> function instead of the base NQ, but each ring carries its own
+> copy of the software ring statistics.
 > 
+> For stats to be conveniently accessible in __bnxt_poll_work(), the
+> statistics memory should either be shared between the NQ and its
+> subrings or the subrings need to be included in the ethtool stats
+> aggregation logic. This patch opts for the former, because it's more
+> efficient and less confusing having the software statistics for a
+> ring exist in a single place.
+> 
+> Before this patch, the counter will not be displayed if the "wrong"
+> cpr->sw_stats was used to increment a counter.
+> 
+> Link: https://lore.kernel.org/netdev/CACKFLikEhVAJA+osD7UjQNotdGte+fth7zOy7yDdLkTyFk9Pyw@mail.gmail.com/
+> Signed-off-by: Edwin Peer <edwin.peer@broadcom.com>
+> Signed-off-by: Michael Chan <michael.chan@broadcom.com>
 
-My bot found errors running 'make dt_binding_check' on your patch:
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-yamllint warnings/errors:
-
-dtschema/dtc warnings/errors:
-Documentation/devicetree/bindings/net/can/hexdev,lin-serdev.example.dtb: /example-0/serial/linbus: failed to match any schema with compatible: ['linux,lin-serdev']
-
-doc reference errors (make refcheckdocs):
-
-See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20240502075534.882628-7-christoph.fritz@hexdev.de
-
-The base for the series is generally the latest rc1. A different dependency
-should be noted in *this* patch.
-
-If you already ran 'make dt_binding_check' and didn't see the above
-error(s), then make sure 'yamllint' is installed and dt-schema is up to
-date:
-
-pip3 install dtschema --upgrade
-
-Please check and re-submit after running the above command yourself. Note
-that DT_SCHEMA_FILES can be set to your schema file to speed up checking
-your schema. However, it must be unset to test all examples with your schema.
 
 
