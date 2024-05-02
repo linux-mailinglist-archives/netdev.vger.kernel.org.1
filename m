@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-92873-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92874-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FE258B9333
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 03:50:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8678B8B9334
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 03:50:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CC972283C74
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 01:50:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B73E91C2142A
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 01:50:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEE4314A8E;
-	Thu,  2 May 2024 01:50:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 268E114F98;
+	Thu,  2 May 2024 01:50:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z7UTN+xO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NIVINzy3"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA47912B77
-	for <netdev@vger.kernel.org>; Thu,  2 May 2024 01:50:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3B2F134D1;
+	Thu,  2 May 2024 01:50:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714614633; cv=none; b=Cwc3x7vZMmj0eyOCTdeCJQ2dMSYV6QjcPoD8pH7BR9Vwj1a2Fr1zGjcRU4xzV9q8oShz2d3Fl+CDTh6i7xWoIVUFJvYLNez3aR/BbJveHesrZEZbRzHgj90h75rovYB/5t5FR0tfqd0bbQpRZWZ46rt5r7w2IqicpXJdzyLIrzk=
+	t=1714614634; cv=none; b=DaTN0/ctwD5N+UGyikiDxUXZ7cNj2vfl+vKPi3UWmIu/0NzIfNK9deeRvDLTH7aaZc3kbPhykunBzf0VMlcZi2J+8crO2lekx+72RL4LjiK4u/PlMwUm/9/753OR3w6klLGg06tXyC3XiqFHtCDQkzpAjgCIP0cuReJTBg6dI7M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714614633; c=relaxed/simple;
-	bh=wqK+mPFax3qX+80rptQvln8wdBzDts7Ert3cuQ4xYJI=;
+	s=arc-20240116; t=1714614634; c=relaxed/simple;
+	bh=UqJyOCfUOQaamn1XOe5aPpuJ96nuGK2MkwC3U20TSVU=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=t3ubxYU+IKuM1/r5MHEbN2L2tMIGdTk7i9Oate+qbXeWrBWrEJFT3ihnRIPMKPRD7ccVfwqLETLcsot6R+RA2Nwby5R3a7QpaCxTWLfRZfsm0aIhCwq4mKO1x+LwXNRorzXkcwGadyypKk3favYgmvgbuTO1rOMDHMZ5/4x3VMk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z7UTN+xO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 58350C4AF14;
+	 In-Reply-To:To:Cc; b=V7P60zTQj5sFZjp4ApFl4i4xONyBnk/PSieqR4LdKD/kNcfS91Ciz5CFw6pIhqdO97qfUOLXbF5dSQ3WdGTP0ulzkR1CRLBU2LMo1LT1eFqHW64idqLY8OU0hL+isHCgwOF1lVtXf4VnkgXOiDelUD6QTGtIWBwMrC+hmy67yTE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NIVINzy3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 67CB6C4AF18;
 	Thu,  2 May 2024 01:50:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1714614633;
-	bh=wqK+mPFax3qX+80rptQvln8wdBzDts7Ert3cuQ4xYJI=;
+	bh=UqJyOCfUOQaamn1XOe5aPpuJ96nuGK2MkwC3U20TSVU=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Z7UTN+xOBrDyL50ykwUadbV0BITRy1HLKb0hZ2AqC0v6oSL9K8V66VH7A9G7Yrjnb
-	 oY1Qmh/q4We/diIMwYnOLh77pEBO98sq8nPi+26VvhyUr56B8rYcVlII+E2sMl1exo
-	 u4dKtb/InM8TGgBx7cOVM9sbhLcjXLbCejbiIdzAnkieP+vY9IbNIb5bVGgpeXxAPh
-	 twCqLYRfP4xgP5sPpZ21ZOuxTnkGQyJjLtSbkX11JcL8HYlKk+FqalZ17zWdUSCDtk
-	 yXJzk+KwTQVrNCvEunKhzth/0qFCJfpCl9o8r2+e6+KDQJLZSczWM4/9K1gMNRE7JS
-	 LqKoGhObI20oQ==
+	b=NIVINzy3hG9s+sSJaz05jpkC3br03/TPTbIKfPIu6Ch8TPj31vQ2wPOXOj5G8wlQ3
+	 tY20uEZoGIWPZxFmPjPmdTphE9xuP16i+LszcWE51h0t/aVOvWhatv1scvTd8pCWLJ
+	 uz8dHMYDEYvAs050sd97pYvuqg3fura7XEe9v3adLtIBAvOgA9QN8/Tf56GhzI6Qk7
+	 +pLkp6R+A5ACpGZ9zhez5v+5ZEHSgNOhnKsc/XII+Oigs8z++KAzQuzZ0MSOI28JOp
+	 BcqNUWORNlkssqX9xs9gbE4rO6yoGzW7nV6XdE+SaYSUtGDIGdal/vn/lo36e2of/W
+	 p1q6wK9gVcEgg==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 45B9AC43444;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4FBA5C43440;
 	Thu,  2 May 2024 01:50:33 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,49 +52,41 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v3 net-next 0/7] arp: Random clean up and RCU conversion for
- ioctl(SIOCGARP).
+Subject: Re: [PATCH net-next v3] net: ti: icssg_prueth: Add SW TX / RX Coalescing
+ based on hrtimers
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171461463328.22196.7504103955047263310.git-patchwork-notify@kernel.org>
+ <171461463332.22196.9443088195151767378.git-patchwork-notify@kernel.org>
 Date: Thu, 02 May 2024 01:50:33 +0000
-References: <20240430015813.71143-1-kuniyu@amazon.com>
-In-Reply-To: <20240430015813.71143-1-kuniyu@amazon.com>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, kuni1840@gmail.com,
- netdev@vger.kernel.org
+References: <20240430120634.1558998-1-danishanwar@ti.com>
+In-Reply-To: <20240430120634.1558998-1-danishanwar@ti.com>
+To: MD Danish Anwar <danishanwar@ti.com>
+Cc: dan.carpenter@linaro.org, hkallweit1@gmail.com, andrew@lunn.ch,
+ jan.kiszka@siemens.com, diogo.ivo@siemens.com, pabeni@redhat.com,
+ kuba@kernel.org, edumazet@google.com, davem@davemloft.net,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, srk@ti.com, vigneshr@ti.com,
+ r-gunasekaran@ti.com, rogerq@kernel.org, horms@kernel.org
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 29 Apr 2024 18:58:06 -0700 you wrote:
-> arp_ioctl() holds rtnl_lock() regardless of cmd (SIOCDARP, SIOCSARP,
-> and SIOCGARP) to get net_device by __dev_get_by_name() and copy
-> dev->name safely.
+On Tue, 30 Apr 2024 17:36:34 +0530 you wrote:
+> Add SW IRQ coalescing based on hrtimers for RX and TX data path for ICSSG
+> driver, which can be enabled by ethtool commands:
 > 
-> In the SIOCGARP path, arp_req_get() calls neigh_lookup(), which looks
-> up a neighbour entry under RCU.
+> - RX coalescing
+>   ethtool -C eth1 rx-usecs 50
+> 
+> - TX coalescing can be enabled per TX queue
 > 
 > [...]
 
 Here is the summary with links:
-  - [v3,net-next,1/7] arp: Move ATF_COM setting in arp_req_set().
-    https://git.kernel.org/netdev/net-next/c/42033d0cfc86
-  - [v3,net-next,2/7] arp: Validate netmask earlier for SIOCDARP and SIOCSARP in arp_ioctl().
-    https://git.kernel.org/netdev/net-next/c/0592367424bb
-  - [v3,net-next,3/7] arp: Factorise ip_route_output() call in arp_req_set() and arp_req_delete().
-    https://git.kernel.org/netdev/net-next/c/f8696133f6aa
-  - [v3,net-next,4/7] arp: Remove a nest in arp_req_get().
-    https://git.kernel.org/netdev/net-next/c/51e9ba48d487
-  - [v3,net-next,5/7] arp: Get dev after calling arp_req_(delete|set|get)().
-    https://git.kernel.org/netdev/net-next/c/a428bfc77a4d
-  - [v3,net-next,6/7] net: Protect dev->name by seqlock.
-    https://git.kernel.org/netdev/net-next/c/0840556e5a3a
-  - [v3,net-next,7/7] arp: Convert ioctl(SIOCGARP) to RCU.
-    https://git.kernel.org/netdev/net-next/c/bf4ea58874df
+  - [net-next,v3] net: ti: icssg_prueth: Add SW TX / RX Coalescing based on hrtimers
+    https://git.kernel.org/netdev/net-next/c/dcb3fba6fa34
 
 You are awesome, thank you!
 -- 
