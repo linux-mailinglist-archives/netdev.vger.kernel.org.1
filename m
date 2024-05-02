@@ -1,422 +1,204 @@
-Return-Path: <netdev+bounces-93120-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93121-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8DD068BA229
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 23:20:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D7098BA236
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 23:26:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 43A79280EED
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 21:20:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 804421C20F72
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 21:26:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7625180A81;
-	Thu,  2 May 2024 21:20:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DA26181B9A;
+	Thu,  2 May 2024 21:26:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="umNpCyoq"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QhqRAMZ7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1576117556B
-	for <netdev@vger.kernel.org>; Thu,  2 May 2024 21:20:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 995821802AC;
+	Thu,  2 May 2024 21:26:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714684825; cv=none; b=FUQXJQuCQ5yPNW4oJ/GR/lIKMAK5b7gCEk2GdXwUARPAWc3e/MFoXB0Ab/xQrQQ4v9+updCtA6jQqOTRsDL9jcnJrZT7LbhO+bTPci0/+cDXmvPqFhCJGWJztez0B9LEUpxFQcF1uukiN9ToX4E7wv0rRPpafXnpfeZ8yap8OTU=
+	t=1714685179; cv=none; b=F06EJokKvcF6zqUfVYLX5xeIWCAiIzOiSLendA5faiwhlAGd1EKSfhnFpDNxw3CXWhw0i7OD7z7INMa1Vw/yicEx1IAiUaWHj5rCkBLA+WBfP+Sx3U1uMhKcBA/iUFRHGXPvjkJ+Tc16QPtaTBOmQJ5zAZM6EPT5Unn7Kqnv1bU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714684825; c=relaxed/simple;
-	bh=hUK2jEvBw2kxTtt5wE8bcezHoXk73oM3myWEjpqNG0M=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=PQDqxZSaLaHJjOhji7QYTgXU2ogTAjCECIaC1OWmujzii55mxkDzFRiFm4b1QoEV3VcbE0wjCZIMmNeKOuVzUQL7hvCp5Rv07y+BTxLLZZR0r1wIE9D9QKl7RNy9O6UnHkANHm5q+9LQYC/1e+adxMVhOf/FmMaKmts55dOFKnk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=umNpCyoq; arc=none smtp.client-ip=209.85.210.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-6ed04c91c46so8072847b3a.0
-        for <netdev@vger.kernel.org>; Thu, 02 May 2024 14:20:23 -0700 (PDT)
+	s=arc-20240116; t=1714685179; c=relaxed/simple;
+	bh=SyYOWZZG048c51JaV/kv91NhpeoEJdnZstAiYLX9hXA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pOpNICvo9U1z9KhgvmYSpiM2Sebm7+K66KqgpfFACuhLbVQXInzDJBtkJ9CUDTvYHS9nF2XrJALvZCCVqUV5tbHHUfYjXHRlXoS3HU8k0YAFGm57ERH9zwovrHW227vi2tYOX5H3nEetiTROtD8O6NaVxn+JaTgy4ME3QNalcgY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QhqRAMZ7; arc=none smtp.client-ip=209.85.167.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-51f60817e34so875666e87.2;
+        Thu, 02 May 2024 14:26:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1714684823; x=1715289623; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=hncUOQWmqOGUoLNpyAkBcgErvZ7+mEaS4U5aue9YWcM=;
-        b=umNpCyoqHVGI6XeLlEZ8nq1iz+ZzMIXo5P6P8yrOPVYliH8+oVk4DFXSYGz2BcSPt4
-         SzXQMDFGZOHsRag+WCIy1TnCPdkem+/kM7t+NDSkTrMGLmOGSxxrqB3zi5wTIOXK/KCW
-         iILDp1SPtAfn3F/QNLzoywcyr5K6dGQo1yNu8=
+        d=gmail.com; s=20230601; t=1714685176; x=1715289976; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=C1gB8YjsPz4rQpEmCzwrb8+wB0LWmO1Pmfg0vfLQCl8=;
+        b=QhqRAMZ7bqHiiOwjeGHbLE9lhi3mc41LcWVHn09zBDv/pNxCdbHVzncnhuVUqQIcD7
+         l/iyDm5FVv59VQZNrjN2MIbpMfuuu8In9Ayt2X5X4G2cfsnhxszt1PsEdrZd9GfMaMN8
+         uTzkn47dou5TMBGys0ovJQrFQX7t3MvGBwbpkpyPC0oy2kdRE1KC5XZI/HcSKUSta+En
+         EPXePLpCojd5TvGIVVehbs+hBbtSEH9hxf96yKWatjavAB0veNI1advTbjdy/L6+bKRM
+         G3pKkYibigUv/R5Ye3f4cKJtGKYxs6YGHK3snyp/22Y865Q4Lok8CAev72hjOjmMxEMs
+         uwUg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714684823; x=1715289623;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=hncUOQWmqOGUoLNpyAkBcgErvZ7+mEaS4U5aue9YWcM=;
-        b=JhN3Ck/PY0531tVGazddIPDEiD7GEMzvmxKFVoHZD9mZUlYZOEVGPxGbinQErx3r59
-         9dWuba/IzKOSdMwK1HLo/bOC6RMaX8tAHMYEOi8GH/N01HS8eFc3bUMHaWEzotoEzn6a
-         ljhGhGt6625CNIVDnftr0di63R5BmLrxdCaGegIApqud37eEbzYVHraCcLUouMFg39Ye
-         bTXWxbw5deuGEbVnHS7AUjfgKV2QUt1odmQgawhADyBgC+g908n4IWGf96Ed8tmEAszA
-         6iqRIT63uAdOQJlPTKNExI+TV6jJKrb5fQwIsF7OyACw3uHHyBx5otJwYf0U7Us2WRwN
-         sFUw==
-X-Forwarded-Encrypted: i=1; AJvYcCWy9HzfbFZJk0iHx7v4BweRK57ovnDFuBhC/HqkDOctjguPhsHYACosG/Ukyu74uu5/wipMcJLtyVQpJjm0EJ+K+909gmVD
-X-Gm-Message-State: AOJu0Yx3PTJai8jdWDvqkHRCo67r2pxAifOXrjLFIbAtR3puv6Gj2MjK
-	zDVEjx5CxZHfzt/GjX9hgaxaMApJcIkpIvP5cdO+QWiHLzGkUyfdj79sK7FbzuA=
-X-Google-Smtp-Source: AGHT+IEOJcD/NH5H4od1kl2Rjccz0Lt0ltHz/eAsoHtVB7pUoFxr0/GN18Mkn7U4wk0bAkqyOA22cA==
-X-Received: by 2002:a05:6a20:ba1:b0:1aa:bde:8c78 with SMTP id i33-20020a056a200ba100b001aa0bde8c78mr915178pzh.54.1714684823412;
-        Thu, 02 May 2024 14:20:23 -0700 (PDT)
-Received: from localhost.localdomain ([2620:11a:c019:0:65e:3115:2f58:c5fd])
-        by smtp.gmail.com with ESMTPSA id ld16-20020a170902fad000b001e4344a7601sm1806712plb.42.2024.05.02.14.20.22
+        d=1e100.net; s=20230601; t=1714685176; x=1715289976;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=C1gB8YjsPz4rQpEmCzwrb8+wB0LWmO1Pmfg0vfLQCl8=;
+        b=WDTiuAN+rmm5TyrsEJ2XQ4olgdIe7NeTZw0NJeQjX6bLK4caApeB4y9JWvi3dA6HpW
+         8TQNdZISOcsHrXO0YkKcvUM8tE+L63Iv0LcxHsUPKXJ35FC2xKidNEx449IWU2f2JTvy
+         Vp0fDs8eg/xHu++P+cpR/aviU4tCOCbmofVm4La+Qvj3KplhHyTkNcv23vlUeqvTSmoy
+         susl3WKHARQgoxtBQx3fOIpT7iiuyS8TYjK/q6E+9rAZqdKhy3nUQyyBb2pKrg3oo+r8
+         /AmT45V0BHJ9fyu5r9fPfJgQosjEXILl+mAYR+Rb0kpHZ+SxRFnVRozHq7TaGDJJcrWM
+         67yw==
+X-Forwarded-Encrypted: i=1; AJvYcCVkST4hEVo190JeUykDqZtX2gbLsI+qUusOkqvBY3sSCtDUk8f4MHDkkiAVb3WwA33jUOHiO/3N7KH8pnJGT0RsmbmYkOkj
+X-Gm-Message-State: AOJu0YyytA63YRYtE1yA+PJzA3LhFu0NR1NMtHY4H3Gro37mOGGgOsFz
+	5CkuwPKMLvs/oRAxldGpCloZcAVhnqyrMoo3GB3lT9/ke3nJLz0Y
+X-Google-Smtp-Source: AGHT+IGAOdvGGIhOITqF96Naz8xBqcBwgssy/49bKxqTCGIDKIoeJMyFV6DuUxugWQXBUhdk06ALbg==
+X-Received: by 2002:a19:5219:0:b0:51c:b8ec:c46f with SMTP id m25-20020a195219000000b0051cb8ecc46fmr584721lfb.22.1714685175418;
+        Thu, 02 May 2024 14:26:15 -0700 (PDT)
+Received: from mobilestation ([95.79.182.53])
+        by smtp.gmail.com with ESMTPSA id p25-20020ac246d9000000b0051b41844048sm301735lfo.285.2024.05.02.14.26.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 May 2024 14:20:22 -0700 (PDT)
-From: Joe Damato <jdamato@fastly.com>
-To: linux-kselftest@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: nalramli@fastly.com,
-	Joe Damato <jdamato@fastly.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>
-Subject: [PATCH net-next] selftest: epoll_busy_poll: epoll busy poll tests
-Date: Thu,  2 May 2024 21:20:11 +0000
-Message-Id: <20240502212013.274758-1-jdamato@fastly.com>
-X-Mailer: git-send-email 2.25.1
+        Thu, 02 May 2024 14:26:14 -0700 (PDT)
+Date: Fri, 3 May 2024 00:26:12 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: Andrew Halaney <ahalaney@redhat.com>, 
+	"Russell King (Oracle)" <linux@armlinux.org.uk>, Andrew Lunn <andrew@lunn.ch>
+Cc: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org, alexandre.torgue@foss.st.com, 
+	joabreu@synopsys.com, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, mcoquelin.stm32@gmail.com, hkallweit1@gmail.com
+Subject: Re: racing ndo_open()/phylink*connect() with phy_probe()
+Message-ID: <7723d4l2kqgrez3yfauvp2ueu6awbizkrq4otqpsqpytzp45q2@rju2nxmqu4ew>
+References: <uz66kbjbxieof6vkliuwgpzhlrbcmeb2f5aeuourw2vqcoc4hv@2adpvba3zszx>
+ <ZjFl4rql0UgsHp97@shell.armlinux.org.uk>
+ <ykdqxnky7shebbhtucoiokbews2be5bml6raqafsfn4x6bp6h3@nqsn6akpajvp>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ykdqxnky7shebbhtucoiokbews2be5bml6raqafsfn4x6bp6h3@nqsn6akpajvp>
 
-Add a simple test for the epoll busy poll ioctls.
+Hi all
 
-This test ensures that the ioctls have the expected return codes and
-that the kernel properly gets and sets epoll busy poll parameters.
+On Thu, May 02, 2024 at 12:43:27PM -0500, Andrew Halaney wrote:
+> On Tue, Apr 30, 2024 at 10:42:58PM +0100, Russell King (Oracle) wrote:
+> > On Tue, Apr 30, 2024 at 04:02:19PM -0500, Andrew Halaney wrote:
+> > > Basically, NetworkManager is setting both interfaces to up, and end1's
+> > > phy doesn't seem to be ready when ndo_open() runs, returning
+> > > -ENODEV in phylink_fwnode_phy_connect() and bubbling that back up. This doesn't
+> > 
+> > Let's get something clear - you're attributing phylink to this, but this
+> > is not the case. phylink doesn't deal directly with PHYs, it makes use
+> > of phylib for that, and merely passes back to its caller whatever status
+> > it gets from phylib. It's also not fair to attribute this to phylib as
+> > we will see later...
+> 
+> Sorry for the delay, I wanted to try and test with some extra logs in
+> the legit setup (not my "simulate via EPROBE_DEFER delays" approach)
+> which is tedious with the initramfs (plus I wasted time failing to
+> ftrace some stuff :P) to reconvince me of old notes. Thanks for the
+> explanation above on the nuances between phylink and phylib, I really
+> appreciate it.
+> 
+> > 
+> > There are a few reasons for phylink_fwnode_phy_connect() would return
+> > -ENODEV:
+> > 
+> > 1) fwnode_get_phy_node() (a phylib function) returning an error,
+> > basically meaning the phy node isn't found. This would be a persistent
+> > error, so unlikely to be your issue.
+> > 
+> > 2) fwnode_phy_find_device() (another phylib function) not finding the
+> > PHY device corresponding to the fwnode returned by the above on the
+> > MDIO bus. This is possible if the PHY has not been detected on the
+> > MDIO bus, but I suspect this is not the cause of your issue.
+> 
+> So I think we're in this case. I added some extra logs to see which
+> of the cases we were hitting, as well as some extra logs in phy creation
+> code etc to come to that conclusion:
+> 
+>     # end1 probe start (and finish)
+>     [    1.424099] qcom-ethqos 23000000.ethernet: Adding to iommu group 2
+>     ...
+>     [    1.431267] qcom-ethqos 23000000.ethernet: Using 40/40 bits DMA host/device width
+> 
+>     # end0 probe start
+>     [    1.440517] qcom-ethqos 23040000.ethernet: Adding to iommu group 3
+>     ...
+>     [    1.443502] qcom-ethqos 23040000.ethernet: Using 40/40 bits DMA host/device width
+> 
+>     # end0 starts making the mdio bus, and phy devices
+>     [    1.443537] qcom-ethqos 23040000.ethernet: Before of_mdiobus_reg
+> 
+>     # create phy at addr 0x8, end0's phy
+>     [    1.450118] Starting phy_create_device for addr: 8
+> 
+>     # NetworkManager up'ed end1! and again. But the device we're needing
+>     # (0xa) isn't created yet
+>     [    1.459743] qcom-ethqos 23000000.ethernet end1: Register MEM_TYPE_PAGE_POOL RxQ-0
+>     ...
+>     [    1.465168] Failed at fwnode_phy_find_device
+>     [    1.465174] qcom-ethqos 23000000.ethernet end1: __stmmac_open: Cannot attach to PHY (error: -19)
+>     [    1.473687] qcom-ethqos 23000000.ethernet end1: Register MEM_TYPE_PAGE_POOL RxQ-0
+>     ...
+>     [    1.477637] Failed at fwnode_phy_find_device
+>     [    1.477643] qcom-ethqos 23000000.ethernet end1: __stmmac_open: Cannot attach to PHY (error: -19)
+> 
+>     # device created for 0x8, probe it
+>     [    1.531617] Ending phy_create_device for addr: 8
+>     [    1.627462] Marvell 88E1510 stmmac-0:08: Starting probe
+>     [    1.627644] hwmon hwmon0: temp1_input not attached to any thermal zone
+>     [    1.627650] Marvell 88E1510 stmmac-0:08: Ending probe
+> 
+>     # device created for 0xa, probe it
+>     [    1.628992] Starting phy_create_device for addr: a
+>     [    1.632615] Ending phy_create_device for addr: a
+>     [    1.731552] Marvell 88E1510 stmmac-0:0a: Starting probe
+>     [    1.731732] hwmon hwmon1: temp1_input not attached to any thermal zone
+>     [    1.731738] Marvell 88E1510 stmmac-0:0a: Ending probe
+> 
+>     # end0 is done probing now
+>     [    1.732804] qcom-ethqos 23040000.ethernet: After of_mdiobus_reg
+>     [    1.820725] qcom-ethqos 23040000.ethernet end0: renamed from eth0
+> 
+>     # NetworkManager up's end0
+>     [    1.851805] qcom-ethqos 23040000.ethernet end0: Register MEM_TYPE_PAGE_POOL RxQ-0
+>     ...
+>     [    1.914980] qcom-ethqos 23040000.ethernet end0: PHY [stmmac-0:08] driver [Marvell 88E1510] (irq=233)
+>     ...
+>     [    1.939432] qcom-ethqos 23040000.ethernet end0: configuring for phy/sgmii link mode
+>     ...
+>     [    4.451765] qcom-ethqos 23040000.ethernet end0: Link is Up - 1Gbps/Full - flow control rx/tx
+> 
+> So end1 is up'ed before end0 can finish making its mdio bus / phy
+> devices, and therefore we fail to find it. I can easily simulate this
+> situation as well by -EPROBE_DEFER'ing end0 for say 10 seconds.
 
-The test can be expanded in the future to do real busy polling (provided
-another machine to act as the client is available).
+AFAICS the problem is in the race between the end0 and end1 device
+probes. Right?
+If so then can't the order be fixed by adding the links between the
+OF-devices?  As it's already done for various phandle-based references
+like "clocks", "gpios", "phys", etc?
 
-To run the test (use -s for "simple" test):
+* Before this topic was raised I had thought it was working for any
+phandle-based dependencies, but apparently it wasn't and the
+supplier/consumer linkage was supposed to be implemented for each
+particular case. The "phy-handle" property lacks that feature support
+(see drivers/of/property.c:of_supplier_bindings and
+of_fwnode_add_links() for details).
 
-./epoll_busy_poll -s
+-Serge(y)
 
-On success, nothing is written to stdout/stderr and the exit code is 0.
-
-Signed-off-by: Joe Damato <jdamato@fastly.com>
----
- tools/testing/selftests/net/.gitignore        |   1 +
- tools/testing/selftests/net/Makefile          |   1 +
- tools/testing/selftests/net/epoll_busy_poll.c | 279 ++++++++++++++++++
- 3 files changed, 281 insertions(+)
- create mode 100644 tools/testing/selftests/net/epoll_busy_poll.c
-
-diff --git a/tools/testing/selftests/net/.gitignore b/tools/testing/selftests/net/.gitignore
-index d996a0ab0765..777cfd027076 100644
---- a/tools/testing/selftests/net/.gitignore
-+++ b/tools/testing/selftests/net/.gitignore
-@@ -5,6 +5,7 @@ bind_wildcard
- csum
- cmsg_sender
- diag_uid
-+epoll_busy_poll
- fin_ack_lat
- gro
- hwtstamp_config
-diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
-index 5befca249452..c83c5d9c1ad9 100644
---- a/tools/testing/selftests/net/Makefile
-+++ b/tools/testing/selftests/net/Makefile
-@@ -84,6 +84,7 @@ TEST_GEN_FILES += sctp_hello
- TEST_GEN_FILES += csum
- TEST_GEN_FILES += ip_local_port_range
- TEST_GEN_FILES += bind_wildcard
-+TEST_GEN_FILES += epoll_busy_poll
- TEST_PROGS += test_vxlan_mdb.sh
- TEST_PROGS += test_bridge_neigh_suppress.sh
- TEST_PROGS += test_vxlan_nolocalbypass.sh
-diff --git a/tools/testing/selftests/net/epoll_busy_poll.c b/tools/testing/selftests/net/epoll_busy_poll.c
-new file mode 100644
-index 000000000000..3066a41a2acb
---- /dev/null
-+++ b/tools/testing/selftests/net/epoll_busy_poll.c
-@@ -0,0 +1,279 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/* Basic per-epoll context busy poll test.
-+ *
-+ * Only tests the ioctls, but should be expanded to test two connected hosts in
-+ * the future
-+ */
-+
-+#define _GNU_SOURCE
-+
-+#include <error.h>
-+#include <errno.h>
-+#include <inttypes.h>
-+#include <limits.h>
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <string.h>
-+#include <unistd.h>
-+
-+#include <sys/epoll.h>
-+#include <sys/ioctl.h>
-+#include <sys/socket.h>
-+
-+/* if the headers haven't been updated, we need to define some things */
-+#if !defined(EPOLL_IOC_TYPE)
-+struct epoll_params {
-+	uint32_t busy_poll_usecs;
-+	uint16_t busy_poll_budget;
-+	uint8_t prefer_busy_poll;
-+
-+	/* pad the struct to a multiple of 64bits */
-+	uint8_t __pad;
-+};
-+
-+#define EPOLL_IOC_TYPE 0x8A
-+#define EPIOCSPARAMS _IOW(EPOLL_IOC_TYPE, 0x01, struct epoll_params)
-+#define EPIOCGPARAMS _IOR(EPOLL_IOC_TYPE, 0x02, struct epoll_params)
-+#endif
-+
-+enum epoll_test_types {
-+	TEST_UNDEFINED = -1,
-+	TEST_SIMPLE = 0,
-+};
-+
-+static enum epoll_test_types test_type = TEST_UNDEFINED;
-+
-+static void usage(const char *filepath)
-+{
-+	error(1, 0, "Usage: %s [options]", filepath);
-+}
-+
-+static void parse_opts(int argc, char **argv)
-+{
-+	int c;
-+
-+	while ((c = getopt(argc, argv, "s")) != -1) {
-+		switch (c) {
-+		case 's':
-+			test_type = TEST_SIMPLE;
-+			break;
-+		}
-+	}
-+
-+	if (optind != argc)
-+		usage(argv[0]);
-+}
-+
-+static void do_simple_test_get_params(int fd)
-+{
-+	/* begin by getting the epoll params from the kernel
-+	 *
-+	 * the default should be default and all fields should be zero'd by the
-+	 * kernel, so set params fields to garbage to test this.
-+	 */
-+	struct epoll_params *invalid_params;
-+	struct epoll_params params;
-+	int ret = 0;
-+
-+	params.busy_poll_usecs = 0xff;
-+	params.busy_poll_budget = 0xff;
-+	params.prefer_busy_poll = 1;
-+	params.__pad = 0xf;
-+
-+	if (ioctl(fd, EPIOCGPARAMS, &params) != 0)
-+		error(1, errno, "ioctl EPIOCGPARAMS");
-+
-+	if (params.busy_poll_usecs != 0)
-+		error(1, 0, "EPIOCGPARAMS busy_poll_usecs should have been 0");
-+
-+	if (params.busy_poll_budget != 0)
-+		error(1, 0, "EPIOCGPARAMS busy_poll_budget should have been 0");
-+
-+	if (params.prefer_busy_poll != 0)
-+		error(1, 0, "EPIOCGPARAMS prefer_busy_poll should have been 0");
-+
-+	if (params.__pad != 0)
-+		error(1, 0, "EPIOCGPARAMS __pad should have been 0");
-+
-+	invalid_params = (struct epoll_params *)0xdeadbeef;
-+	ret = ioctl(fd, EPIOCGPARAMS, invalid_params);
-+	if (ret != -1)
-+		error(1, 0, "EPIOCGPARAMS should error with invalid params");
-+
-+	if (errno != EFAULT)
-+		error(1, 0,
-+		      "EPIOCGPARAMS with invalid params should set errno to EFAULT");
-+}
-+
-+static void do_simple_test_set_invalid(int fd)
-+{
-+	/* Set some unacceptable values and check for error */
-+	struct epoll_params *invalid_params;
-+	struct epoll_params params;
-+	int ret;
-+
-+	memset(&params, 0, sizeof(struct epoll_params));
-+
-+	params.__pad = 1;
-+
-+	ret = ioctl(fd, EPIOCSPARAMS, &params);
-+
-+	if (ret != -1)
-+		error(1, 0, "EPIOCSPARAMS with non-zero __pad should error");
-+
-+	if (errno != EINVAL)
-+		error(1, 0, "EPIOCSPARAMS with non-zero __pad errno should be EINVAL");
-+
-+	params.__pad = 0;
-+	params.busy_poll_usecs = (unsigned int)INT_MAX + 1;
-+
-+	ret = ioctl(fd, EPIOCSPARAMS, &params);
-+
-+	if (ret != -1)
-+		error(1, 0, "EPIOCSPARAMS should error busy_poll_usecs > S32_MAX");
-+
-+	if (errno != EINVAL)
-+		error(1, 0, "EPIOCSPARAMS with busy_poll_usecs > S32_MAX, errno should be EINVAL");
-+
-+	params.__pad = 0;
-+	params.busy_poll_usecs = 32;
-+	params.prefer_busy_poll = 2;
-+
-+	ret = ioctl(fd, EPIOCSPARAMS, &params);
-+
-+	if (ret != -1)
-+		error(1, 0, "EPIOCSPARAMS should error prefer_busy_poll > 1");
-+
-+	if (errno != EINVAL)
-+		error(1, 0, "EPIOCSPARAMS with prefer_busy_poll > 1 errno should be EINVAL");
-+
-+	params.__pad = 0;
-+	params.busy_poll_usecs = 32;
-+	params.prefer_busy_poll = 1;
-+	params.busy_poll_budget = 65535;
-+
-+	ret = ioctl(fd, EPIOCSPARAMS, &params);
-+
-+	if (ret != -1)
-+		error(1, 0, "EPIOCSPARAMS should error busy_poll_budget > NAPI_POLL_WEIGHT");
-+
-+	if (errno != EPERM)
-+		error(1, 0,
-+		      "EPIOCSPARAMS with busy_poll_budget > NAPI_POLL_WEIGHT (without CAP_NET_ADMIN) errno should be EPERM");
-+
-+	invalid_params = (struct epoll_params *)0xdeadbeef;
-+	ret = ioctl(fd, EPIOCSPARAMS, invalid_params);
-+
-+	if (ret != -1)
-+		error(1, 0, "EPIOCSPARAMS should error when epoll_params is invalid");
-+
-+	if (errno != EFAULT)
-+		error(1, 0, "EPIOCSPARAMS should set errno to EFAULT when epoll_params is invalid");
-+}
-+
-+static void do_simple_test_set_and_get_valid(int fd)
-+{
-+	struct epoll_params params;
-+	int ret;
-+
-+	memset(&params, 0, sizeof(struct epoll_params));
-+
-+	params.busy_poll_usecs = 25;
-+	params.busy_poll_budget = 16;
-+	params.prefer_busy_poll = 1;
-+
-+	ret = ioctl(fd, EPIOCSPARAMS, &params);
-+
-+	if (ret != 0)
-+		error(1, errno, "EPIOCSPARAMS with valid params should not error");
-+
-+	/* check that the kernel returns the same values back */
-+
-+	memset(&params, 0, sizeof(struct epoll_params));
-+
-+	ret = ioctl(fd, EPIOCGPARAMS, &params);
-+
-+	if (ret != 0)
-+		error(1, errno, "EPIOCGPARAMS should not error");
-+
-+	if (params.busy_poll_usecs != 25 ||
-+	    params.busy_poll_budget != 16 ||
-+	    params.prefer_busy_poll != 1 ||
-+	    params.__pad != 0)
-+		error(1, 0, "EPIOCGPARAMS returned incorrect values");
-+}
-+
-+static void do_simple_test_invalid_fd(void)
-+{
-+	struct epoll_params params;
-+	int ret;
-+	int fd;
-+
-+	fd = socket(AF_UNIX, SOCK_DGRAM, 0);
-+
-+	if (fd == -1)
-+		error(1, errno, "creating unix socket");
-+
-+	ret = ioctl(fd, EPIOCGPARAMS, &params);
-+
-+	if (ret != -1)
-+		error(1, 0, "EPIOCGPARAMS on invalid epoll FD should error");
-+
-+	if (errno != ENOTTY)
-+		error(1, 0, "EPIOCGPARAMS on invalid epoll FD should set errno to ENOTTY");
-+
-+	memset(&params, 0, sizeof(struct epoll_params));
-+
-+	ret = ioctl(fd, EPIOCSPARAMS, &params);
-+
-+	if (ret != -1)
-+		error(1, 0, "EPIOCSPARAMS on invalid epoll FD should error");
-+
-+	if (errno != ENOTTY)
-+		error(1, 0, "EPIOCSPARAMS on invalid epoll FD should set errno to ENOTTY");
-+}
-+
-+static void do_simple_test_invalid_ioctl(int fd)
-+{
-+	struct epoll_params params;
-+	int invalid_ioctl = EPIOCGPARAMS + 10;
-+	int ret;
-+
-+	ret = ioctl(fd, invalid_ioctl, &params);
-+
-+	if (ret != -1)
-+		error(1, 0, "invalid ioctl should return error");
-+
-+	if (errno != EINVAL)
-+		error(1, 0, "invalid ioctl should set errno to EINVAL");
-+}
-+
-+static void do_simple_test(void)
-+{
-+	int fd;
-+
-+	fd = epoll_create1(0);
-+	if (fd == -1)
-+		error(1, errno, "epoll_create");
-+
-+	do_simple_test_invalid_fd();
-+	do_simple_test_invalid_ioctl(fd);
-+	do_simple_test_get_params(fd);
-+	do_simple_test_set_invalid(fd);
-+	do_simple_test_set_and_get_valid(fd);
-+
-+	if (close(fd))
-+		error(1, errno, "close");
-+}
-+
-+int main(int argc, char **argv)
-+{
-+	parse_opts(argc, argv);
-+
-+	if (test_type == TEST_SIMPLE)
-+		do_simple_test();
-+	else
-+		error(1, 0, "unknown test type: %d", test_type);
-+
-+	return 0;
-+}
--- 
-2.25.1
-
+> [...]
 
