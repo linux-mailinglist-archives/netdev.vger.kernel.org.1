@@ -1,123 +1,126 @@
-Return-Path: <netdev+bounces-92903-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92902-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11DE28B9418
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 07:04:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F7168B9417
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 07:04:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C0E32283606
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 05:04:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 44B5A1C20D7F
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 05:04:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A30D71CD39;
-	Thu,  2 May 2024 05:04:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC7F21CAB0;
+	Thu,  2 May 2024 05:04:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="AP7KFdSq"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="OB8Xs4Cw"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64D8029A0;
-	Thu,  2 May 2024 05:04:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9CF1182DB
+	for <netdev@vger.kernel.org>; Thu,  2 May 2024 05:04:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714626290; cv=none; b=fK3CTIrQt7aQGkjDkO/RnIWJF+bIr+YAEGB/pTKkHlFavlYQXBsuBj771NkefrS35NaHXNmvHe4Bpc/EYEXU0KMtjf2lwLiD8v/vEmJkDmuhItX/+UIbd413pJ+jCvBG+b+FuDQdndovhObmGdyFJRZnc5QsEXwxVBhb+m6AJ98=
+	t=1714626243; cv=none; b=QUpCSLIEC9+eHwsSuOZm4cTa5oKRJTNQ3XQ112FuZkBm5wYrT79JFsBEd7jdGMIMeTKionC5IlMVX/LC8dwz5jslY4ROr57j4RvGnxTWn0X/5h6hUwsS8AFd/Q5W9v8IDdbRUmMI4bK2W08M96NaN396BYeOWeZoKTauzE/DzZk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714626290; c=relaxed/simple;
-	bh=T0bJ9f3B82LY+xAMn+qJU/gURZEvWNZXvg8QNzKqKbo=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ayP4I8RDFhOmrFXiBJRwdqw3rXFTeE3CupaG5gE4DE/+F9Yj8yiNDudXJORUL403BfV0vWkNQsK2XK5aFW1b/5Ev/Z0TgYchNgFPNX83NQRrlu2fysT/Y5nDhH/S+WwjDymfx69AaBrRbZ9cCEToEq+lqXcBtc76GVv0ypKyI5E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=AP7KFdSq; arc=none smtp.client-ip=68.232.154.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1714626288; x=1746162288;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=T0bJ9f3B82LY+xAMn+qJU/gURZEvWNZXvg8QNzKqKbo=;
-  b=AP7KFdSqUM1pfZnGc6vGltehxhn7381aY3Y91BAvFJ3m6Z0d8lKZ8Ar5
-   koZDzbd2ugSvQ1KQbokINeifmWwkiIzqDoTFAhYrVUuNnAy3iV9g/VpFa
-   eqmxmA3fiVujHT+DjTJenIV86ti/m05qwq7Q9hLdCoTm92YQxFpM8F/s/
-   7B19x/XRJhJVnnxZPPceXfIBbC1/poDT9ybQZyd6MAbc07kk6QbF3n84G
-   arBW/xGitP8vRt6FaUSotY7WJHfVRmSQeSGSeioGpudjyrBwLIPLhg0Xj
-   mHjF1m6bynIP4ID5xa4q9shC0bofIaX/JRnWyywkiZpLgl/RVdGCY789K
-   g==;
-X-CSE-ConnectionGUID: xcYhx9FVQj+dINQhEIwqNA==
-X-CSE-MsgGUID: RbhUzTQ2TaCsK+d9AS+NDQ==
-X-IronPort-AV: E=Sophos;i="6.07,247,1708412400"; 
-   d="scan'208";a="190689575"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 01 May 2024 22:04:41 -0700
-Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Wed, 1 May 2024 22:04:17 -0700
-Received: from che-ld-unglab06.microchip.com (10.10.85.11) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server id
- 15.1.2507.35 via Frontend Transport; Wed, 1 May 2024 22:04:14 -0700
-From: Rengarajan S <rengarajan.s@microchip.com>
-To: <bryan.whitehead@microchip.com>, <UNGLinuxDriver@microchip.com>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <richardcochran@gmail.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-CC: <rengarajan.s@microchip.com>
-Subject: [PATCH net-next v1] net: microchip: lan743x: Reduce PTP timeout on HW failure
-Date: Thu, 2 May 2024 10:33:00 +0530
-Message-ID: <20240502050300.38689-1-rengarajan.s@microchip.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1714626243; c=relaxed/simple;
+	bh=2a65XCBBO5xFO4WB9xyZN5QunMn5xhTlNhifx5FcK6g=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=WazIBqpyYIj0le2GH/ZRMJZjVAwdveuADPJHHIEmsFSleHT1LrWkvDTEQ5GQmf/wMnMYP6TIFtTlGVZsZG0eej8/ll4d2XEjwtBBqWK7xAK+1Dgao/GeQtA+t/9Ul3WaPlnh9AWr+SyrI87A4TXHqYAkVRPtzHuvijI4ZOWGyms=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=OB8Xs4Cw; arc=none smtp.client-ip=209.85.210.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
+Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-6ecff9df447so7220344b3a.1
+        for <netdev@vger.kernel.org>; Wed, 01 May 2024 22:04:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1714626242; x=1715231042; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=SNkuZfAEvXW3ZRRe5v+FkgwHvjFOWNg8gq366HCjhfU=;
+        b=OB8Xs4CwXlgf72ZdtUKKGH5A2H4k7tbmccgGqVHGvr6Fv2G8wXqv5C2AI/b8RNZmBq
+         9Rm8/a9Us8eDwdAEFGoBLZQqXGSZ+5MkD0b1dmU5CthON5Gq3HO0SrQxKeNPAgmNR8Ld
+         eyjVYWFPKnJj2eEuE0892mZsgQpJi0sOwoXRLUdLxNyKeZ+9BRVUztiNY1vjVSGL4CKZ
+         QTbYPz5WV2erdtLULFySJIMX5dJ+D2/oTQH16B0jIDf+/9osbgEvpzpMtq3/lzEhVLjz
+         uNRc7qJKd8ctWrtVLJowHwnk/j+q5O+h3CMyqLmK459XBu3w0Z8XVZuIapGAONUO+o97
+         MAtg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714626242; x=1715231042;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=SNkuZfAEvXW3ZRRe5v+FkgwHvjFOWNg8gq366HCjhfU=;
+        b=pTGJcF5fq7a/UM2x71Om0sVclvdTUdFEWN3APH/MRJdRjQkZEUU6ZMELTLszi1W4nz
+         s5/AOgoHPzjXJ1M7l2ekOAN3WV3Eid44MCWSej0FIwXBqgpKaD9YBdVkZGa4dEO8rSPB
+         b/6ORrhkoI2yonv7Qs+GRuAR/uB4PwC02a/uAQHhP5OpbgsYnUb10xQLTAAUYqg0VWWW
+         OS75lbNM/Lr3vF1tqv86Ou0eG686GhMHZ4Q2+U89shrmPd0uBFXP5PiYrpb1+CT7sgNl
+         Dx34e5YwJwaa4h61lNxDx2tK5qSZ9d1cTPSJjLRpi6PySWDyvFDDl3hgdi4EqrZHln8y
+         hBcQ==
+X-Gm-Message-State: AOJu0YwwUTiDkolRQ2GsC3AmEGHos7kIVVuyJfAfZ3ai3yOo2LbTT8Uy
+	U4ZC4DTfKqt1xsC1pV1A2wdSdRq2kcXtzMzDztqGp5Bls1SaFJLJqdAOzrear24=
+X-Google-Smtp-Source: AGHT+IEACvZzvobkhTimV0IHshAupVVf9d3FL2TJ16Ws3OzVienkZ78xtZIN1czANw+tkfEdZLXImQ==
+X-Received: by 2002:a05:6a20:7348:b0:1a9:5b3f:f139 with SMTP id v8-20020a056a20734800b001a95b3ff139mr6494617pzc.25.1714626241946;
+        Wed, 01 May 2024 22:04:01 -0700 (PDT)
+Received: from [192.168.1.4] (174-21-160-85.tukw.qwest.net. [174.21.160.85])
+        by smtp.gmail.com with ESMTPSA id a20-20020aa780d4000000b006e64ddfa71asm293530pfn.170.2024.05.01.22.04.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 01 May 2024 22:04:01 -0700 (PDT)
+Message-ID: <e3ea5234-c196-4cb7-a0c6-4859c9c2931f@davidwei.uk>
+Date: Wed, 1 May 2024 22:04:00 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 2/2] net: selftest: add test for netdev
+ netlink queue-get API
+Content-Language: en-GB
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, Willem de Bruijn
+ <willemdebruijn.kernel@gmail.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
+References: <20240424023624.2320033-1-dw@davidwei.uk>
+ <20240424023624.2320033-3-dw@davidwei.uk>
+ <20240425185124.7d9456e1@kernel.org>
+From: David Wei <dw@davidwei.uk>
+In-Reply-To: <20240425185124.7d9456e1@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-The PTP_CMD_CTL is a self clearing register which controls the PTP clock
-values. In the current implementation driver waits for a duration of 20
-sec in case of HW failure to clear the PTP_CMD_CTL register bit. This
-timeout of 20 sec is very long to recognize a HW failure, as it is
-typically cleared in one clock(<16ns). Hence reducing the timeout to 1 sec
-would be sufficient to conclude if there is any HW failure observed. The
-usleep_range will sleep somewhere between 1 msec to 20 msec for each
-iteration. By setting the PTP_CMD_CTL_TIMEOUT_CNT to 50 the max timeout
-is extended to 1 sec.
+On 2024-04-25 6:51 pm, Jakub Kicinski wrote:
+> On Tue, 23 Apr 2024 19:36:24 -0700 David Wei wrote:
+>> +    try:
+>> +        expected = curr_queues - 1
+>> +        cmd(f"ethtool -L {cfg.dev['ifname']} {rx_type} {expected}", timeout=10)
+>> +        queues = nl_get_queues(cfg, nl)
+>> +        if not queues:
+>> +            raise KsftSkipEx('queue-get not supported by device')
+>> +        ksft_eq(queues, expected)
+>> +
+>> +        expected = curr_queues
+>> +        cmd(f"ethtool -L {cfg.dev['ifname']} {rx_type} {expected}", timeout=10)
+>> +        queues = nl_get_queues(cfg, nl)
+>> +        ksft_eq(queues, expected)
+>> +    except Exception as ex:
+>> +        raise KsftSkipEx(ex)
+> 
+> 
+> Why convert all exceptions to skip? Don't we want the test to go red
+> if something is off?
 
-Signed-off-by: Rengarajan S <rengarajan.s@microchip.com>
----
- drivers/net/ethernet/microchip/lan743x_ptp.c | 2 +-
- drivers/net/ethernet/microchip/lan743x_ptp.h | 1 +
- 2 files changed, 2 insertions(+), 1 deletion(-)
+I wanted to separate ethtool -L failures from test failures, but looking
+at this code I'm swalling all exceptions here, sorry.
 
-diff --git a/drivers/net/ethernet/microchip/lan743x_ptp.c b/drivers/net/ethernet/microchip/lan743x_ptp.c
-index 2801f08bf1c9..f8e840fd62cd 100644
---- a/drivers/net/ethernet/microchip/lan743x_ptp.c
-+++ b/drivers/net/ethernet/microchip/lan743x_ptp.c
-@@ -58,7 +58,7 @@ int lan743x_gpio_init(struct lan743x_adapter *adapter)
- static void lan743x_ptp_wait_till_cmd_done(struct lan743x_adapter *adapter,
- 					   u32 bit_mask)
- {
--	int timeout = 1000;
-+	int timeout = PTP_CMD_CTL_TIMEOUT_CNT;
- 	u32 data = 0;
- 
- 	while (timeout &&
-diff --git a/drivers/net/ethernet/microchip/lan743x_ptp.h b/drivers/net/ethernet/microchip/lan743x_ptp.h
-index e26d4eff7133..0d29914cd460 100644
---- a/drivers/net/ethernet/microchip/lan743x_ptp.h
-+++ b/drivers/net/ethernet/microchip/lan743x_ptp.h
-@@ -21,6 +21,7 @@
- #define LAN743X_PTP_N_EXTTS		4
- #define LAN743X_PTP_N_PPS		0
- #define PCI11X1X_PTP_IO_MAX_CHANNELS	8
-+#define PTP_CMD_CTL_TIMEOUT_CNT		50
- 
- struct lan743x_adapter;
- 
--- 
-2.25.1
+> 
+>> +def main() -> None:
+>> +    with NetDrvEnv(__file__, queue_count=3) as cfg:
+>> +        ksft_run([get_queues, addremove_queues], args=(cfg, NetdevFamily()))
+> 
+> gotta call ksft_exit() at the end explicitly. It's a bit annoying, 
+> I know :S
 
+Ah, I didn't know. Will address in next version.
 
