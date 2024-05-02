@@ -1,111 +1,271 @@
-Return-Path: <netdev+bounces-92921-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92931-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C39458B95AE
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 09:56:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 842EC8B95DD
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 09:58:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7F507281EA1
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 07:56:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 356471F2252A
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 07:58:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D93D200A0;
-	Thu,  2 May 2024 07:56:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 766324F205;
+	Thu,  2 May 2024 07:56:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="BCsUqPhv"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bB1+ngLp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
+Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A2792032D
-	for <netdev@vger.kernel.org>; Thu,  2 May 2024 07:56:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B389540BE3
+	for <netdev@vger.kernel.org>; Thu,  2 May 2024 07:56:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714636580; cv=none; b=CbUWxx9D7aNV859O761XTXRHDnAaWe/6XFpoFWBqvlZtuwOXfyl2pu/iCunc9cc6g+XZdcBU9WI5L25PMCM/66sjLcqG5oC2XBACTFVuOFFBAPLGJggG8MKvWTMxyHhQD2qIvDKIS2efsNYRsCOtQAYpmvdD2j6YXmSYIXTCK2U=
+	t=1714636612; cv=none; b=b11FnN3SOqmKdR5mgRkc+e0jR/ZmIQT1uTvFPtFsnKfWqKZWhe1Ec20JRwJWboYlhZLU0Fnwe49mtw9H2zGOXSuzS5+cNRjhP1fvZo0GHkSUIgGjbMZlwPYBYoNpmTB1VHh2lBVLTG8d4IpYHNjQ6+3r+hK46GfMheUfr5qT06E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714636580; c=relaxed/simple;
-	bh=NfISg+YrVXDbcn1kXVX/Y3A4p1fJVBoY4nQ5b3GMklY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=W2PEC7rz2jX/A4l1KIJWbERNpfaJOF4iZ/6uutdxlz4LeUWS0S2Dymedg8/RQolMPPYxLbK1VJdHt/Ar0AM4DKSOajwwOT/lvUZQBIxUoo/ASLHN3PNjgFav3Haz/RfSO6ssZdkqiUM98Lc+HavZ/wVQgtVQBea9H1AktjpoCCE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=BCsUqPhv; arc=none smtp.client-ip=209.85.208.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
-Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2e01d666c88so48928731fa.2
-        for <netdev@vger.kernel.org>; Thu, 02 May 2024 00:56:18 -0700 (PDT)
+	s=arc-20240116; t=1714636612; c=relaxed/simple;
+	bh=7yHUReQVpBbuF59WgVxqcgBxLTriwnNY9V4A/86EQqc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mDAHSUdNYS0UIy5+VRjj82KIDDOi4auNTIre6RG1PvEMxyySfRIjkH/T9IAN1z9oJL9koKuzt91WcBmDJshnRZ5rQ306TkdX2ngnkiS139ntiGbXR+NxvEdqXxBbOT42012SLkk1EXpwd57aNFdvjBCK4wDC+X/Pgf94xI3NXGo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=bB1+ngLp; arc=none smtp.client-ip=209.85.208.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-2dd615b6c44so85241321fa.0
+        for <netdev@vger.kernel.org>; Thu, 02 May 2024 00:56:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=6wind.com; s=google; t=1714636576; x=1715241376; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=TPaHHHwqSCEB+HgAZAFP6AxqHAr1mYzEbxQSN9ry+8I=;
-        b=BCsUqPhvkrW3DPuEZJrqgqbu8BrpRSOeCSNgztOJ3TtMUT0Qd+9nBFte0anmwfJiaY
-         owyOxvj5cHXh3F5ycEd+jNxJW6oUfARLinQO3RYfUF6TDRd/QC+TfuwoS+aatf4dRypS
-         YqpmiSBIwXvwJr50hEHQRe0swjIRhH/6Wdphr4OwsgBeQidIzVbcuR5k4ZUvEeCev17x
-         79tSzfItdrJBTWOx2EPOQcbXlZ0XQ9xARsoTz/wSPCJc/aZXbkWQuGbQskdgqJc7P6TW
-         A9Lr0iqQhimqYZwjZtw8cXG6e/dL+LdWoAwDLEI4sP+ikIGcYZXRH9zBAjuYVTwzRCaB
-         0E9Q==
+        d=linaro.org; s=google; t=1714636608; x=1715241408; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=O2K7W10bUuhGIOY6LbVf5zRLSo3TolQftZm0XAlBBVE=;
+        b=bB1+ngLpOKsPIRqtatn9z6eQOKUuH9HVr/KcdiVq2B7vZlxpt4Fqun7SlolesZ8EKm
+         B3ca1BFa1E8AWUTzmaIwLdBTAQSXmalLTbq1qUYNxyxiKsDUXLnqHOdYPlgVdujbfRDq
+         W/r3F5ryoOUc61zYz8rwGUT78EYJ2PKW0bX5uqWeezqEWxH1BJt7o4ufcFBwXX9VKvne
+         9RvVftDfTxt3XmDMrUjh6tyNmeIxD2A6dRtTEVUGpLea1+e2aDpx8ZsbPwSzBVnytqYl
+         H4oB0vlrTYgRMaNZIAMogRMPrPd7VOwzMBTEaQG8LUNciIOY+haPxQ//DerOsV47gkbR
+         Byag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714636576; x=1715241376;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=TPaHHHwqSCEB+HgAZAFP6AxqHAr1mYzEbxQSN9ry+8I=;
-        b=hi/DYMSN7y6vAZZCo6RTDIUTry93nFcFATy+cnaZ34A74owA95KQsCQkkI0B3K47ub
-         3xf1vJCX4WrVtPhMKT+oK0BF8nujfM+c62O8xIrw8QecqA/4HK3/M9QUTPvZbkZibzLt
-         QeaDvAnIi+HfpgQfkt90vE8AseaDhLq0Uo3Nv8CScEMPGqXt+4c7m0++MIOGoMVa2WZS
-         GRIuT4vEJ8t53qnaK6sRFHABEj/DDwzJzWxIJJd+IPWiTIqY1YFJ+dGrYsrPAsyDnJBv
-         9rhXNrzrOevs5mlpfblnLt0R5LNsm4YqPyNeNA0BS+p8uVAUjEV2Vhj1llLKLa5LC7ou
-         3wPg==
-X-Forwarded-Encrypted: i=1; AJvYcCXv9Vt27NwrwsaateI/zcR9YPorfJ3aVHsM+QqLpEeeptos9wkwsw/dPPAo7cX6ysbkhr3whf1waABMKpXZTismSkmK9RCd
-X-Gm-Message-State: AOJu0Yz5KDAl98wm4jUb8bxZwkpDQG4gx7HgTo6jgICSF/467rUOdLa7
-	lBKeJFDh4a0A/s+ci1meB47dG6iQLMT5OHh2s7AFGtmTHDFEsz13BJrr5tO9oQU=
-X-Google-Smtp-Source: AGHT+IEjlLmfMq7lDR41h9MvEUAUS0eHSkqoVPyGDOywalZ78dwxBIq/HgHsuZpWvSwDNugnJmILbw==
-X-Received: by 2002:a2e:a98b:0:b0:2dc:9b50:eabb with SMTP id x11-20020a2ea98b000000b002dc9b50eabbmr3594715ljq.4.1714636576715;
-        Thu, 02 May 2024 00:56:16 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:b41:c160:bb06:acc8:dbc1:95b8? ([2a01:e0a:b41:c160:bb06:acc8:dbc1:95b8])
-        by smtp.gmail.com with ESMTPSA id x13-20020a2e9c8d000000b002d69b9a6513sm84092lji.48.2024.05.02.00.56.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 02 May 2024 00:56:16 -0700 (PDT)
-Message-ID: <8d4a5423-b700-478c-bb94-39c4d5345473@6wind.com>
-Date: Thu, 2 May 2024 09:56:14 +0200
+        d=1e100.net; s=20230601; t=1714636608; x=1715241408;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=O2K7W10bUuhGIOY6LbVf5zRLSo3TolQftZm0XAlBBVE=;
+        b=Y2wRcNe0KbCkMmMwJ4caIRFPk9dMCBEDCrOtFvNDGfEl1fui/+w4R8P/NkN3HxWE2r
+         oOswc77QiIhnn3kfiYQy2d37Adw3NCVitSEIS7HNfXsCq9EgVQd60yCvhvP7FaoRGpMM
+         HWXLsWVs/5nA9QgjBVpBsZl/vh3KvZjxlwK7jdf2QIyTrulVBNILed7BIfr0ENGu6B8p
+         DnEvY2BL+nl3q4l8BheK5mAgsrbfTQcJ4ukHJ1om2edMNw8eKUzLaR2IgKDqnIftExLo
+         2WIDf/qp5Ryit3dcdlwqA1c8rT/qIOoC3ynhnvzu+9tKWmUVq/YFgE2RBiwsVUSZ0cVJ
+         g3Lg==
+X-Forwarded-Encrypted: i=1; AJvYcCV0gVDpysnWT/GO4h9L/SI/165DUIrLKk4m1+GabvjtEGtP8dWY2cTh6N4oqIBQHxUnB45gbwmt/A956igj8Yma6AwLQ62C
+X-Gm-Message-State: AOJu0YwPwTUGg6Ssw+dgwWLF5p14p+amLcraYvT7YRUlhjDYECBx/1lF
+	re5Uba+z1t+2m6txfhCmv7GrxGF5XPXgWD9hE9f8ZiTN/r6Zis/C3Rl7zEP3rtU=
+X-Google-Smtp-Source: AGHT+IG4eu72+9YmFm7RNA3TZngr6D6gFdgVwSM5kAeMoCWbd4wSkocjjJm4rpizJdh+aX/XE/7fyA==
+X-Received: by 2002:a2e:3201:0:b0:2df:6cb8:c92f with SMTP id y1-20020a2e3201000000b002df6cb8c92fmr2508931ljy.23.1714636607767;
+        Thu, 02 May 2024 00:56:47 -0700 (PDT)
+Received: from localhost ([102.222.70.76])
+        by smtp.gmail.com with ESMTPSA id z11-20020a2e884b000000b002d816c0500asm85707ljj.118.2024.05.02.00.56.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 May 2024 00:56:47 -0700 (PDT)
+Date: Thu, 2 May 2024 10:56:43 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: duoming@zju.edu.cn
+Cc: linux-hams@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, pabeni@redhat.com, kuba@kernel.org,
+	edumazet@google.com, davem@davemloft.net, jreuter@yaina.de,
+	lars@oddbit.com, Miroslav Skoric <skoric@uns.ac.rs>
+Subject: Re: [PATCH net] ax25: Fix refcount leak issues of ax25_dev
+Message-ID: <8767454a-2d5a-4c6d-b887-440047c9bc5b@moroto.mountain>
+References: <20240501060218.32898-1-duoming@zju.edu.cn>
+ <7fcfdc9a-e3f3-49a1-9373-39b5ad745799@moroto.mountain>
+ <1402dfc8.20a4b.18f37963e87.Coremail.duoming@zju.edu.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: nicolas.dichtel@6wind.com
-Subject: Re: [PATCH ipsec-next v14 3/4] xfrm: Add dir validation to "in" data
- path lookup
-To: antony.antony@secunet.com, Steffen Klassert
- <steffen.klassert@secunet.com>, Herbert Xu <herbert@gondor.apana.org.au>,
- netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, devel@linux-ipsec.org,
- Leon Romanovsky <leon@kernel.org>, Eyal Birger <eyal.birger@gmail.com>,
- Sabrina Dubroca <sd@queasysnail.net>
-References: <cover.1714460330.git.antony.antony@secunet.com>
- <d03d08d9bbf0feef6ba2ea7cca12588298af1c0d.1714460330.git.antony.antony@secunet.com>
-From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Content-Language: en-US
-Organization: 6WIND
-In-Reply-To: <d03d08d9bbf0feef6ba2ea7cca12588298af1c0d.1714460330.git.antony.antony@secunet.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1402dfc8.20a4b.18f37963e87.Coremail.duoming@zju.edu.cn>
 
-Le 30/04/2024 à 09:09, Antony Antony a écrit :
-> Introduces validation for the x->dir attribute within the XFRM input
-> data lookup path. If the configured direction does not match the
-> expected direction, input, increment the XfrmInStateDirError counter
-> and drop the packet to ensure data integrity and correct flow handling.
+On Thu, May 02, 2024 at 12:35:44PM +0800, duoming@zju.edu.cn wrote:
+> On Wed, 1 May 2024 20:43:37 +0300 Dan Carpenter wrote:
+> > I'm always happy to take credit for stuff but the Reported by should go
+> > to Lars and Miroslav.
+> > 
+> > Reported-by: Lars Kellogg-Stedman <lars@oddbit.com>
+> > Reported-by: Miroslav Skoric <skoric@uns.ac.rs>
 > 
-> grep -vw 0 /proc/net/xfrm_stat
-> XfrmInStateDirError     	1
+> This patch is not related with the problem raised by Lars Kellogg-Stedman
+> and Miroslav Skoric, it only solves the reference counting leak issues of
+> ax25_dev in ax25_addr_ax25dev() and ax25_dev_device_down(). So I think
+> there is no need to change the "Reported by" label.
 > 
-> Signed-off-by: Antony Antony <antony.antony@secunet.com>
-Reviewed-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+
+Ah...  I was really hoping it was related to the other bugs.
+
+Okay, what about we separate this into different patches one for each
+bug?  The changes to ax25_addr_ax25dev() and ax25_dev_free() are
+obvious and could go in as-is but as two separate patches.
+
+The changes to ax25_dev_device_up/down() are more subtle.
+
+The ax25_dev_list stuff is frustrating.  It would be so much easier if
+it were a normal list and you could just do:
+
+        /*
+         *      Remove any packet forwarding that points to this device.
+         */
+        list_for_each_entry(s, ax25_dev_list, list) {
+                if (s->forward == dev)
+                        s->forward = NULL;
+        }
+
+        list_for_each_entry(s, ax25_dev_list, list) {
+                if (s == ax25_dev) {
+                        list_del(s);
+                        free_net = true;
+                        break;
+                }
+        }
+
+        spin_unlock_bh(&ax25_dev_lock);
+        dev->ax25_ptr = NULL;
+        if (free_net)
+                netdev_put(dev, &ax25_dev->dev_tracker);
+        ax25_dev_put(ax25_dev);
+}
+
+Why do we call netdev_put() on that one path?  Btw, here is an untested
+conversion to lists...
+
+regards,
+dan carpenter
+
+diff --git a/include/net/ax25.h b/include/net/ax25.h
+index 0d939e5aee4e..c2a85fd3f5ea 100644
+--- a/include/net/ax25.h
++++ b/include/net/ax25.h
+@@ -216,7 +216,7 @@ typedef struct {
+ struct ctl_table;
+ 
+ typedef struct ax25_dev {
+-	struct ax25_dev		*next;
++	struct list_head	list;
+ 
+ 	struct net_device	*dev;
+ 	netdevice_tracker	dev_tracker;
+@@ -330,7 +330,6 @@ int ax25_addr_size(const ax25_digi *);
+ void ax25_digi_invert(const ax25_digi *, ax25_digi *);
+ 
+ /* ax25_dev.c */
+-extern ax25_dev *ax25_dev_list;
+ extern spinlock_t ax25_dev_lock;
+ 
+ #if IS_ENABLED(CONFIG_AX25)
+diff --git a/net/ax25/ax25_dev.c b/net/ax25/ax25_dev.c
+index 282ec581c072..b632af38f1e1 100644
+--- a/net/ax25/ax25_dev.c
++++ b/net/ax25/ax25_dev.c
+@@ -22,11 +22,12 @@
+ #include <net/sock.h>
+ #include <linux/uaccess.h>
+ #include <linux/fcntl.h>
++#include <linux/list.h>
+ #include <linux/mm.h>
+ #include <linux/interrupt.h>
+ #include <linux/init.h>
+ 
+-ax25_dev *ax25_dev_list;
++static struct list_head ax25_dev_list;
+ DEFINE_SPINLOCK(ax25_dev_lock);
+ 
+ ax25_dev *ax25_addr_ax25dev(ax25_address *addr)
+@@ -34,11 +35,12 @@ ax25_dev *ax25_addr_ax25dev(ax25_address *addr)
+ 	ax25_dev *ax25_dev, *res = NULL;
+ 
+ 	spin_lock_bh(&ax25_dev_lock);
+-	for (ax25_dev = ax25_dev_list; ax25_dev != NULL; ax25_dev = ax25_dev->next)
++	list_for_each_entry(ax25_dev, &ax25_dev_list, list) {
+ 		if (ax25cmp(addr, (const ax25_address *)ax25_dev->dev->dev_addr) == 0) {
+ 			res = ax25_dev;
+ 			ax25_dev_hold(ax25_dev);
+ 		}
++	}
+ 	spin_unlock_bh(&ax25_dev_lock);
+ 
+ 	return res;
+@@ -52,6 +54,10 @@ void ax25_dev_device_up(struct net_device *dev)
+ {
+ 	ax25_dev *ax25_dev;
+ 
++	// FIXME: do call this in probe or something
++	if (!ax25_dev_list.next)
++		INIT_LIST_HEAD(&ax25_dev_list);
++
+ 	ax25_dev = kzalloc(sizeof(*ax25_dev), GFP_KERNEL);
+ 	if (!ax25_dev) {
+ 		printk(KERN_ERR "AX.25: ax25_dev_device_up - out of memory\n");
+@@ -85,8 +91,7 @@ void ax25_dev_device_up(struct net_device *dev)
+ #endif
+ 
+ 	spin_lock_bh(&ax25_dev_lock);
+-	ax25_dev->next = ax25_dev_list;
+-	ax25_dev_list  = ax25_dev;
++	list_add(&ax25_dev->list, &ax25_dev_list);
+ 	spin_unlock_bh(&ax25_dev_lock);
+ 	ax25_dev_hold(ax25_dev);
+ 
+@@ -111,23 +116,18 @@ void ax25_dev_device_down(struct net_device *dev)
+ 	/*
+ 	 *	Remove any packet forwarding that points to this device.
+ 	 */
+-	for (s = ax25_dev_list; s != NULL; s = s->next)
++	list_for_each_entry(s, &ax25_dev_list, list) {
+ 		if (s->forward == dev)
+ 			s->forward = NULL;
+-
+-	if ((s = ax25_dev_list) == ax25_dev) {
+-		ax25_dev_list = s->next;
+-		goto unlock_put;
+ 	}
+ 
+-	while (s != NULL && s->next != NULL) {
+-		if (s->next == ax25_dev) {
+-			s->next = ax25_dev->next;
++	list_for_each_entry(s, &ax25_dev_list, list) {
++		if (s == ax25_dev) {
++			list_del(&s->list);
+ 			goto unlock_put;
+ 		}
+-
+-		s = s->next;
+ 	}
++
+ 	spin_unlock_bh(&ax25_dev_lock);
+ 	dev->ax25_ptr = NULL;
+ 	ax25_dev_put(ax25_dev);
+@@ -200,16 +200,13 @@ struct net_device *ax25_fwd_dev(struct net_device *dev)
+  */
+ void __exit ax25_dev_free(void)
+ {
+-	ax25_dev *s, *ax25_dev;
++	ax25_dev *s, *n;
+ 
+ 	spin_lock_bh(&ax25_dev_lock);
+-	ax25_dev = ax25_dev_list;
+-	while (ax25_dev != NULL) {
+-		s        = ax25_dev;
+-		netdev_put(ax25_dev->dev, &ax25_dev->dev_tracker);
+-		ax25_dev = ax25_dev->next;
++	list_for_each_entry_safe(s, n, &ax25_dev_list, list) {
++		netdev_put(s->dev, &s->dev_tracker);
++		list_del(&s->list);
+ 		kfree(s);
+ 	}
+-	ax25_dev_list = NULL;
+ 	spin_unlock_bh(&ax25_dev_lock);
+ }
+
+
 
