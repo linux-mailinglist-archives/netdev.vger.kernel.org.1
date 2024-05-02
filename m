@@ -1,288 +1,102 @@
-Return-Path: <netdev+bounces-93005-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93006-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 554EA8B99D3
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 13:13:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9253A8B99EC
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 13:21:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DB5DE1F244C7
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 11:13:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4CE8E284C81
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 11:21:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B05FD69959;
-	Thu,  2 May 2024 11:13:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA06D6217D;
+	Thu,  2 May 2024 11:21:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b="Lv6Dd1me";
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b="Z6yB1jkl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oEKEViO8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.tq-group.com (mx1.tq-group.com [93.104.207.81])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9736460EC3;
-	Thu,  2 May 2024 11:13:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.104.207.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71A14605CE;
+	Thu,  2 May 2024 11:21:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714648419; cv=none; b=pJ6eUgBmIlBdaQjuWUkqLnPZqKjYp42DM8X7VKIPmakifJMdTTntqyDuhBs5Kc2BIGlhZng0i/awKJcDh7ucnZGY99ZUjRSNX8lHVxhBxGzh6LB8rjWfa+VPW3FuOYZp4VLoe+8VveOLaz7REA8XVXvP5VnNs9UPCKW9GuwWvy0=
+	t=1714648897; cv=none; b=XZqnYYs7K7c79g1FjMzyhuhLWLBwFAT4CsP84mbbr8ffifYBGDwdUogyUNXzF44secsfRWLQcbv08BmNVQH6Hgsp2bu9z1v9Wb4tegXZ0QmdNwxO+Xf9aKOJgwm+Gro8nvqjTU/ON4TWHVduiguMkqpjbx0VA92pasgd956FFbs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714648419; c=relaxed/simple;
-	bh=OuTZQ+/7rHsfObb2tcsr6PhBaUTl/GxqVfAea4AyiKs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Sz55d7FN6vxTDSAkYKCkd5d0jAMh9mHyOl051BTbPKRo021pIhDi44RHfPcfjT8oeBy3pG6iKrEfDT4XEfI1MI/LyUCrVvDE0JC5LdNIA+jvNeRC6G30DYCZK6UxBkVvb4YwNS5iIWp/qh0BTNUbN7Hi9CNKiL4kqg9tygPxsG4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com; spf=pass smtp.mailfrom=ew.tq-group.com; dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b=Lv6Dd1me; dkim=fail (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b=Z6yB1jkl reason="key not found in DNS"; arc=none smtp.client-ip=93.104.207.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ew.tq-group.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
-  t=1714648417; x=1746184417;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=EYtuRdh8pSDk+rK8KTdLUhNcAPcSyIqHES/cKzkJCnk=;
-  b=Lv6Dd1mew4kZbbt2KhjoYldQ+yh9LPH+bDhh87afF+itTKaA3UyPRQub
-   5mLkjjTR13jFVArrlSp7peHp36nEzsAnvMg0wtCpeooYBJDnN0OqQAbkf
-   KKLbWFdBa7qW8i+kAX/o4XpUYWx1UQOZaGeWdovV2ihdsjZHohqrx/aiE
-   SgkSxEYIrKwpn03zpC4ZKc12XO8RvqLADR4TKZeDVBQ3vcu/kYRL3W6Tj
-   gctl1154evv2gml6YL3EnncmA0b4T4t9ZgI0W53ciG7S2KqO1kPi63uai
-   Sy2neiuqjLeH5Z0R0poQPrKSdZLVSsVlDmFZ1KlpHjfNq/RPCeqe1GEA+
-   A==;
-X-IronPort-AV: E=Sophos;i="6.07,247,1708383600"; 
-   d="scan'208";a="36716026"
-Received: from vmailcow01.tq-net.de ([10.150.86.48])
-  by mx1.tq-group.com with ESMTP; 02 May 2024 13:13:27 +0200
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 67BF816FBF2;
-	Thu,  2 May 2024 13:13:23 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ew.tq-group.com;
-	s=dkim; t=1714648403;
-	h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=EYtuRdh8pSDk+rK8KTdLUhNcAPcSyIqHES/cKzkJCnk=;
-	b=Z6yB1jkl/iBJ/L7Att+STUaQ+znAcm6NG3YMu4F4dv07wLKNE1tfpttE9q2ShwISx/TQ9K
-	ydEhiy7h3O1EGlyhK0R45OcNULQawSuk3H23Zc1mPqaf0GlPDIxBcg6sww8ukjMEibN6FS
-	gKf3e8XthMDuVB1x+6pjwdBqSqYbCPwolCmMgUX/5OrUU0hAfHlbYrtZfGkho+U8UXAV77
-	tNrPMTKSTa+wb4/8/2MUUnnlsGgQBkAzkTuwrbRa1Ldjr5e7HebsH5AIAyWiYRxoa0MeKl
-	T18C1jYppvGe8bwHkJyv9Qjr+A2xlrUwRenmJp00qJ6oC1WNbYzPIXjIP5bBhQ==
-From: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
+	s=arc-20240116; t=1714648897; c=relaxed/simple;
+	bh=0ln9TXID18gsJMnDENXiItJGRtQ3Til5tzw9qOWE/sc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ri+CVDNOo1jI28yXf34FJsPTKbqHucNCdUMUiLDmKTHJDkNL5PPBTBecK6+U7+gX33oBiHUSCTSikj047KAEaKvykKOrXHuYHx1xlyTIZ9POiA8dY9zNWZYPfrRdAkthpZJJUGMFD2NhQPQXGLcMyVUMqLIKzRVnC41+Yft4tPk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oEKEViO8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 307A2C4AF18;
+	Thu,  2 May 2024 11:21:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714648897;
+	bh=0ln9TXID18gsJMnDENXiItJGRtQ3Til5tzw9qOWE/sc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=oEKEViO8AxOjXR6iIdgwCu7M9Gy8KOg7xF4nyGPC+Q6kiqWHLioCWc+TKN1O1xGFU
+	 R5r916favQUmXsHYwF3hhP1H4QIqQhlQ5wBll2sEvQCjHIUs30q9p6EEUJISyRnuoX
+	 PHUjcgdQN9lWXGwzx/xhDdXqpWVdoLEkQ1youg+dV29CHaL49sDwtdB0b1hRj6Eg69
+	 lcXC8doU0yUE99/DKUCyscpgTShpcBrE9CN7lHget3Yx3haAYwZdFxiJdtAF84yIlo
+	 C6EgORkHpFEimOrGiEho7ncdyeWM6rlP3wOVXAEfpup/tHM7MZKMUzUJzKk2OPSgFw
+	 Ug3evdCl5UR1w==
+Date: Thu, 2 May 2024 12:21:28 +0100
+From: Will Deacon <will@kernel.org>
+To: Kees Cook <keescook@chromium.org>
+Cc: Mark Rutland <mark.rutland@arm.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Boqun Feng <boqun.feng@gmail.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	linux-arm-kernel@lists.infradead.org,
 	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux@ew.tq-group.com,
-	Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
-Subject: [PATCH net-next v2 2/2] net: phy: marvell: add support for MV88E6250 family internal PHYs
-Date: Thu,  2 May 2024 13:13:01 +0200
-Message-ID: <0695f699cd942e6e06da9d30daeedfd47785bc01.1714643285.git.matthias.schiffer@ew.tq-group.com>
-X-Mailer: git-send-email 2.43.2
-In-Reply-To: <24d7a2f39e0c4c94466e8ad43228fdd798053f3a.1714643285.git.matthias.schiffer@ew.tq-group.com>
-References: <24d7a2f39e0c4c94466e8ad43228fdd798053f3a.1714643285.git.matthias.schiffer@ew.tq-group.com>
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	"H. Peter Anvin" <hpa@zytor.com>, Arnd Bergmann <arnd@arndb.de>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	"Paul E. McKenney" <paulmck@kernel.org>,
+	Uros Bizjak <ubizjak@gmail.com>, linux-kernel@vger.kernel.org,
+	x86@kernel.org, linux-arch@vger.kernel.org, netdev@vger.kernel.org,
+	linux-hardening@vger.kernel.org
+Subject: Re: [PATCH 2/4] arm64: atomics: lse: Silence intentional wrapping
+ addition
+Message-ID: <20240502112127.GA17013@willie-the-truck>
+References: <20240424191225.work.780-kees@kernel.org>
+ <20240424191740.3088894-2-keescook@chromium.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240424191740.3088894-2-keescook@chromium.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-The embedded PHYs of the 88E6250 family switches are very basic - they
-do not even have an Extended Address / Page register.
+On Wed, Apr 24, 2024 at 12:17:35PM -0700, Kees Cook wrote:
+> Annotate atomic_add_return() and atomic_sub_return() to avoid signed
+> overflow instrumentation. They are expected to wrap around.
+> 
+> Signed-off-by: Kees Cook <keescook@chromium.org>
+> ---
+> Cc: Will Deacon <will@kernel.org>
+> Cc: Peter Zijlstra <peterz@infradead.org>
+> Cc: Boqun Feng <boqun.feng@gmail.com>
+> Cc: Mark Rutland <mark.rutland@arm.com>
+> Cc: Catalin Marinas <catalin.marinas@arm.com>
+> Cc: linux-arm-kernel@lists.infradead.org
+> ---
+>  arch/arm64/include/asm/atomic_lse.h | 10 ++++++----
+>  1 file changed, 6 insertions(+), 4 deletions(-)
 
-This adds support for the PHYs to the driver to set up PHY interrupts
-and retrieve error stats. To deal with PHYs without a page register,
-"simple" variants of all stat handling functions are introduced.
+How come the ll/sc routines (in atomic_ll_sc.h) don't need the same
+treatment? If that's just an oversight, then maybe it's better to
+instrument the higher-level wrappers in asm/atomic.h?
 
-The code should work with all 88E6250 family switches (6250/6220/6071/
-6070/6020). The PHY ID 0x01410db0 was read from a 88E6020, under the
-assumption that all switches of this family use the same ID. The spec
-only lists the prefix 0x01410c00 and leaves the last 10 bits as reserved,
-but that seems too unspecific to be useful, as it would cover several
-existing PHY IDs already supported by the driver; therefore, the ID read
-from the actual hardware is used.
-
-Signed-off-by: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
----
-
-v2:
-
-- Change the PHY ID define name to MARVELL_PHY_ID_88E6250_FAMILY
-- Introduce a full separate set of stat functions for PHYs without a page
-  register. The functions are renamed to "simple", as they are likely
-  usable for other integrated PHYs without pages in the future.
-
- drivers/net/phy/marvell.c   | 81 ++++++++++++++++++++++++++++++++++++-
- include/linux/marvell_phy.h |  2 +
- 2 files changed, 82 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/phy/marvell.c b/drivers/net/phy/marvell.c
-index a57ad53cd09cb..9964bf3dea2fb 100644
---- a/drivers/net/phy/marvell.c
-+++ b/drivers/net/phy/marvell.c
-@@ -301,6 +301,7 @@
- #define LPA_PAUSE_ASYM_FIBER	0x100
- 
- #define NB_FIBER_STATS	1
-+#define NB_STAT_MAX	3
- 
- MODULE_DESCRIPTION("Marvell PHY driver");
- MODULE_AUTHOR("Andy Fleming");
-@@ -319,6 +320,23 @@ static const struct marvell_hw_stat marvell_hw_stats[] = {
- 	{ "phy_receive_errors_fiber", 1, 21, 16},
- };
- 
-+static_assert(ARRAY_SIZE(marvell_hw_stats) <= NB_STAT_MAX);
-+
-+/* "simple" stat list + corresponding marvell_get_*_simple functions are used
-+ * on PHYs without a page register
-+ */
-+struct marvell_hw_stat_simple {
-+	const char *string;
-+	u8 reg;
-+	u8 bits;
-+};
-+
-+static const struct marvell_hw_stat_simple marvell_hw_stats_simple[] = {
-+	{ "phy_receive_errors", 21, 16},
-+};
-+
-+static_assert(ARRAY_SIZE(marvell_hw_stats_simple) <= NB_STAT_MAX);
-+
- enum {
- 	M88E3082_VCT_OFF,
- 	M88E3082_VCT_PHASE1,
-@@ -326,7 +344,7 @@ enum {
- };
- 
- struct marvell_priv {
--	u64 stats[ARRAY_SIZE(marvell_hw_stats)];
-+	u64 stats[NB_STAT_MAX];
- 	char *hwmon_name;
- 	struct device *hwmon_dev;
- 	bool cable_test_tdr;
-@@ -1978,6 +1996,11 @@ static int marvell_get_sset_count(struct phy_device *phydev)
- 		return ARRAY_SIZE(marvell_hw_stats) - NB_FIBER_STATS;
- }
- 
-+static int marvell_get_sset_count_simple(struct phy_device *phydev)
-+{
-+	return ARRAY_SIZE(marvell_hw_stats_simple);
-+}
-+
- static void marvell_get_strings(struct phy_device *phydev, u8 *data)
- {
- 	int count = marvell_get_sset_count(phydev);
-@@ -1989,6 +2012,17 @@ static void marvell_get_strings(struct phy_device *phydev, u8 *data)
- 	}
- }
- 
-+static void marvell_get_strings_simple(struct phy_device *phydev, u8 *data)
-+{
-+	int count = marvell_get_sset_count_simple(phydev);
-+	int i;
-+
-+	for (i = 0; i < count; i++) {
-+		strscpy(data + i * ETH_GSTRING_LEN,
-+			marvell_hw_stats_simple[i].string, ETH_GSTRING_LEN);
-+	}
-+}
-+
- static u64 marvell_get_stat(struct phy_device *phydev, int i)
- {
- 	struct marvell_hw_stat stat = marvell_hw_stats[i];
-@@ -2008,6 +2042,25 @@ static u64 marvell_get_stat(struct phy_device *phydev, int i)
- 	return ret;
- }
- 
-+static u64 marvell_get_stat_simple(struct phy_device *phydev, int i)
-+{
-+	struct marvell_hw_stat_simple stat = marvell_hw_stats_simple[i];
-+	struct marvell_priv *priv = phydev->priv;
-+	int val;
-+	u64 ret;
-+
-+	val = phy_read(phydev, stat.reg);
-+	if (val < 0) {
-+		ret = U64_MAX;
-+	} else {
-+		val = val & ((1 << stat.bits) - 1);
-+		priv->stats[i] += val;
-+		ret = priv->stats[i];
-+	}
-+
-+	return ret;
-+}
-+
- static void marvell_get_stats(struct phy_device *phydev,
- 			      struct ethtool_stats *stats, u64 *data)
- {
-@@ -2018,6 +2071,16 @@ static void marvell_get_stats(struct phy_device *phydev,
- 		data[i] = marvell_get_stat(phydev, i);
- }
- 
-+static void marvell_get_stats_simple(struct phy_device *phydev,
-+				     struct ethtool_stats *stats, u64 *data)
-+{
-+	int count = marvell_get_sset_count_simple(phydev);
-+	int i;
-+
-+	for (i = 0; i < count; i++)
-+		data[i] = marvell_get_stat_simple(phydev, i);
-+}
-+
- static int m88e1510_loopback(struct phy_device *phydev, bool enable)
- {
- 	int err;
-@@ -3924,6 +3987,21 @@ static struct phy_driver marvell_drivers[] = {
- 		.get_strings = marvell_get_strings,
- 		.get_stats = marvell_get_stats,
- 	},
-+	{
-+		.phy_id = MARVELL_PHY_ID_88E6250_FAMILY,
-+		.phy_id_mask = MARVELL_PHY_ID_MASK,
-+		.name = "Marvell 88E6250 Family",
-+		/* PHY_BASIC_FEATURES */
-+		.probe = marvell_probe,
-+		.aneg_done = marvell_aneg_done,
-+		.config_intr = marvell_config_intr,
-+		.handle_interrupt = marvell_handle_interrupt,
-+		.resume = genphy_resume,
-+		.suspend = genphy_suspend,
-+		.get_sset_count = marvell_get_sset_count_simple,
-+		.get_strings = marvell_get_strings_simple,
-+		.get_stats = marvell_get_stats_simple,
-+	},
- 	{
- 		.phy_id = MARVELL_PHY_ID_88E6341_FAMILY,
- 		.phy_id_mask = MARVELL_PHY_ID_MASK,
-@@ -4072,6 +4150,7 @@ static struct mdio_device_id __maybe_unused marvell_tbl[] = {
- 	{ MARVELL_PHY_ID_88E1540, MARVELL_PHY_ID_MASK },
- 	{ MARVELL_PHY_ID_88E1545, MARVELL_PHY_ID_MASK },
- 	{ MARVELL_PHY_ID_88E3016, MARVELL_PHY_ID_MASK },
-+	{ MARVELL_PHY_ID_88E6250_FAMILY, MARVELL_PHY_ID_MASK },
- 	{ MARVELL_PHY_ID_88E6341_FAMILY, MARVELL_PHY_ID_MASK },
- 	{ MARVELL_PHY_ID_88E6390_FAMILY, MARVELL_PHY_ID_MASK },
- 	{ MARVELL_PHY_ID_88E6393_FAMILY, MARVELL_PHY_ID_MASK },
-diff --git a/include/linux/marvell_phy.h b/include/linux/marvell_phy.h
-index 88254f9aec2b2..b1fbe4118414a 100644
---- a/include/linux/marvell_phy.h
-+++ b/include/linux/marvell_phy.h
-@@ -32,6 +32,8 @@
- /* Marvel 88E1111 in Finisar SFP module with modified PHY ID */
- #define MARVELL_PHY_ID_88E1111_FINISAR	0x01ff0cc0
- 
-+/* ID from 88E6020, assumed to be the same for the whole 6250 family */
-+#define MARVELL_PHY_ID_88E6250_FAMILY	0x01410db0
- /* These Ethernet switch families contain embedded PHYs, but they do
-  * not have a model ID. So the switch driver traps reads to the ID2
-  * register and returns the switch family ID
--- 
-TQ-Systems GmbH | Mühlstraße 2, Gut Delling | 82229 Seefeld, Germany
-Amtsgericht München, HRB 105018
-Geschäftsführer: Detlef Schneider, Rüdiger Stahl, Stefan Schneider
-https://www.tq-group.com/
-
+Will
 
