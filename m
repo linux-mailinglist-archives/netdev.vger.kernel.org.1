@@ -1,73 +1,73 @@
-Return-Path: <netdev+bounces-92866-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92867-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1FD68B92FF
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 03:00:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id EDD188B9302
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 03:04:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CDF05B20AAB
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 01:00:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7C8F01F223C6
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 01:04:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D294101D5;
-	Thu,  2 May 2024 01:00:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32D9D10A19;
+	Thu,  2 May 2024 01:04:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="BWBxn2b8"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="Gh9RdDpL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 977C3611E
-	for <netdev@vger.kernel.org>; Thu,  2 May 2024 01:00:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B87BC29A0
+	for <netdev@vger.kernel.org>; Thu,  2 May 2024 01:04:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714611622; cv=none; b=EZL3S+yKBle76upJqshTFH7ifaRH69O0JSczg9y3XG5x+3WCXg8VwpH3WO0UeMaMFPJeLPU8r+P6+3C3+0AiH6yMT7Lrs+ELE5jsTTErA1bQLV7OFS+x4UNCWNrQJQuoj5fklKa/4/9hBVjW+4U81sf8nzj3LirlYdhzqzPfcDg=
+	t=1714611865; cv=none; b=SJ8FoUBCVD65geYLYcxudVYiuUn8XovRcwxQg+yjq0uqp03sN1Eijc8LuvVvdrxcODGEShatXvtf8uqDrvVBQTOQmdg+zsw1zQ/Ft8OzrKE3dRIfouryjV4BPWdgGgI9jrDngAHWjpyVzQ23ma2Jlo1rNKI2Nk0ETEsnW58UGiY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714611622; c=relaxed/simple;
-	bh=jKawsEeVw7whucsie2c9Hc41uL1z+KkFo+ymR1TPv5w=;
+	s=arc-20240116; t=1714611865; c=relaxed/simple;
+	bh=NbjgfLoYkk8RuyMZtJqYRq87qDam9hykwLcH780MlHs=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=aP6TeK4TdAsDuPxkPSonWI4kSNR7T7mKA3mFNTYahLxlArJQqzn8u3SwqH9YtL6oz+SofM6hfXSIU+BcDcGd8aWa5V6GDkzBs5wo0u2B+AR6tXmiNwd5K6V1qScwETOZvyehCLiMojYWUwqHU17P6ZlZTpyhlzSpbH95G9WfqVo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=BWBxn2b8; arc=none smtp.client-ip=209.85.214.176
+	 In-Reply-To:Content-Type; b=ashSC6oRvZmEczmPJ9HevmNPjQ0xGAJNRDjCY7VoRNRkUt//w51/q/8SmAUbq56jEiu6dp7B4kw8SQhEMnR8PvMzLU7CBLtXUCkVbxeFRIRbCj9YZ3+A68A2TBpKK+cXU9acGKCX++Fq9J7y0TzcQyX5q+DbLx3PgGV2fLqKYfE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=Gh9RdDpL; arc=none smtp.client-ip=209.85.214.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-1e83a2a4f2cso48696425ad.1
-        for <netdev@vger.kernel.org>; Wed, 01 May 2024 18:00:20 -0700 (PDT)
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-1eb66b6953cso41017465ad.2
+        for <netdev@vger.kernel.org>; Wed, 01 May 2024 18:04:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1714611620; x=1715216420; darn=vger.kernel.org;
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1714611863; x=1715216663; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=BjNPBSw6n2u5d05726enHTt7JomDvuTD2xvd2dYi3gw=;
-        b=BWBxn2b8P4A2fSTV/EWcpH/z7drufbDsmUZX7xH7L2+0eQFpXT/374FQ78Kh3uSkMa
-         wB7v4tj9jA00AI3BIUFkAe4JC7SXvjXZ8P6Mdn6Uvi4dvqweA/KfZZFew7ex4EMNeuDI
-         EWMyhb8TRkaboSjW+OxHpIcXBmNBdaubNdKWEaSdJZ4+H8eopFaQpPeuJA6C/vHHTQPo
-         WGgxEvB46FqbUmjC2zK+2AV6LJimpaxQAerZlEBicjNz6umGsR8ex/rgGCSoHb9QG/Y+
-         spPO0SjDPLex0g3nu2js8CfMWAn5qjuWNLYKBSylR5+100SDKss9TkBei0jbnJHzS75a
-         EMSw==
+        bh=Z28IInCM5UtOlJTtExeF9xgcpy7CTuS3M0sUxTvjLVs=;
+        b=Gh9RdDpLvYG30lbqH30S6V+1JLlWmV9mKA1D3FomkHXabjvsw1irnPfTM8SDHhREYM
+         JmuBFAi9BcvpeVPpRLwM2ga9Jzshrituq5wlcrxXDq6J/koMU8k4ag13iyO9Q0Qoj7in
+         IOkWkiyZbfXP0Ulx5aJvYBzCphg5D1mC1N7fr24EMpWz7FXvVXYXb9M00bmRmapDHtHv
+         NgTRu1OXIpqUVD1J2bxTgoIMYPX22DPv0XhjKHuClmaZ5mOqMkJLpTUpKuCSUxrH9/qh
+         G+7pJILc48NjOVOGhF54KcLJhi3425slOE3hiunkR/lv5J5Bm1Aa3vZzIDbCN4X/xPLG
+         KIIg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714611620; x=1715216420;
+        d=1e100.net; s=20230601; t=1714611863; x=1715216663;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=BjNPBSw6n2u5d05726enHTt7JomDvuTD2xvd2dYi3gw=;
-        b=v4HV0vXxDDGthX4eMcusYESH1UKG+BxcwZtcPaPt7kIT8eGqEKvB/b5qlScaiQbQS1
-         SwQgsKte40gXHEAZ2B+sVRnAvJeEsZ0FyCkMW7BYn6g7tSu160GY+wSKPoz5SeQDkEe5
-         ngza6DVJ6924Meqoo9JT5FVmGhKl53V9mrhfx5P8/oIujc5pCqiGQ7oPC1ACLM1ISRtM
-         yOiDXjGWyzItF1AJsZjwavx24sAAMH1JbB/oVxbjCUctxcaFM8Jwof+8nNHoeI2VqXxN
-         n+XuC/TMXfUJ5RbGPY2jqGFjtSohSp7/3kU0nB2ooEiwGjyCufYgebc0C7ssPXSwHO/i
-         7ozA==
-X-Gm-Message-State: AOJu0Yz//7RuAGhdndp1L8/5mloH70IW3I8uSTdY5sBPfs6wMRvnz0DM
-	pMIwdFT+Mh4WSgixO5ktz7IJjQyUkwAFpets2rB3YqmnBX9mMJ6toel1ergMef4=
-X-Google-Smtp-Source: AGHT+IEhyUHWo2ctAs6y2hCgX5gMhE6/8pTkfJUDk1SEPtJ/JbHoRkk8J9F29muxf0mcrvIaUSft2g==
-X-Received: by 2002:a17:902:fc46:b0:1e9:2d03:7c5d with SMTP id me6-20020a170902fc4600b001e92d037c5dmr549507plb.47.1714611618230;
-        Wed, 01 May 2024 18:00:18 -0700 (PDT)
+        bh=Z28IInCM5UtOlJTtExeF9xgcpy7CTuS3M0sUxTvjLVs=;
+        b=fXPFNNd8TMJJjGeoGLpDEiY4CHU74mCZkWlOVu8cKa85RA2uGxYN71U7Lw2FSa2H1I
+         hIjwrQZZLFX+TCwR42H3Wh6rhuYA/kaZIcQihDGJRwRBZkbXhJLgZ70Q5kgBwQ74whxg
+         zDH/AD7JluhJOMR1fFtimtQ+7LsQsPInukJBU6c7WTV9C+IHURlo0SvfyP5aGm3zJ4vm
+         mTLBGhvrtt4MHCjasIGJl+RMJpAXxnqIt+++iN9uuQi1w3AU5c5dbLT4pzMKa3b/CjeC
+         LVCjGnTGeDnM5xqmu6E+KYwI+WA06vkUxwKkb+qxWJFwCVF4732N4Pn39cZuht/btYBA
+         Ip1g==
+X-Gm-Message-State: AOJu0YyFnvLmqcup3zd/zyp4jC+nf+a/W5O6KVb0xApIxvFbeMyQ2ksV
+	XcFxzgMkzZnacJ0GSZMEirh02pIrRYkb5PyVexD/1iSHPNEJCx9Rw3HmnLUdOcU=
+X-Google-Smtp-Source: AGHT+IHYcOJwuR7EjYPAvwrvXHA2bsbGPNxxzaE4WP078UtFkdmtygoya/oH2cdMphnlM60WGyiPtw==
+X-Received: by 2002:a17:902:ea10:b0:1e4:24cc:e020 with SMTP id s16-20020a170902ea1000b001e424cce020mr4731457plg.67.1714611862874;
+        Wed, 01 May 2024 18:04:22 -0700 (PDT)
 Received: from [192.168.1.4] (174-21-160-85.tukw.qwest.net. [174.21.160.85])
-        by smtp.gmail.com with ESMTPSA id q4-20020a17090311c400b001eab3ba79f2sm12414616plh.35.2024.05.01.18.00.17
+        by smtp.gmail.com with ESMTPSA id b18-20020a170903229200b001eb2e6b14e0sm9665110plh.126.2024.05.01.18.04.22
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 01 May 2024 18:00:17 -0700 (PDT)
-Message-ID: <80adf4dc-6bfd-4bef-a11b-c2f9ef362a2d@davidwei.uk>
-Date: Wed, 1 May 2024 18:00:16 -0700
+        Wed, 01 May 2024 18:04:22 -0700 (PDT)
+Message-ID: <5f81eccd-bc14-47a5-bc65-b159c79ce422@davidwei.uk>
+Date: Wed, 1 May 2024 18:04:21 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,7 +75,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH net-next v1 1/3] queue_api: define queue api
+Subject: Re: [RFC PATCH net-next v1 3/3] netdev: add netdev_rx_queue_restart()
 Content-Language: en-GB
 To: Mina Almasry <almasrymina@google.com>
 Cc: netdev@vger.kernel.org, Michael Chan <michael.chan@broadcom.com>,
@@ -85,119 +85,152 @@ Cc: netdev@vger.kernel.org, Michael Chan <michael.chan@broadcom.com>,
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
  Paolo Abeni <pabeni@redhat.com>
 References: <20240430010732.666512-1-dw@davidwei.uk>
- <20240430010732.666512-2-dw@davidwei.uk>
- <CAHS8izOsZ+nWBRNGgWvT46GsX6BC+bWPkpQgRCb8WY-Bi26SZA@mail.gmail.com>
+ <20240430010732.666512-4-dw@davidwei.uk>
+ <CAHS8izM-0gxGQYMOpKzr-Z-oogtzoKA9UJjqDUt2jkmh2sywig@mail.gmail.com>
 From: David Wei <dw@davidwei.uk>
-In-Reply-To: <CAHS8izOsZ+nWBRNGgWvT46GsX6BC+bWPkpQgRCb8WY-Bi26SZA@mail.gmail.com>
+In-Reply-To: <CAHS8izM-0gxGQYMOpKzr-Z-oogtzoKA9UJjqDUt2jkmh2sywig@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-On 2024-04-30 11:00 am, Mina Almasry wrote:
+On 2024-04-30 11:15 am, Mina Almasry wrote:
 > On Mon, Apr 29, 2024 at 6:07 PM David Wei <dw@davidwei.uk> wrote:
 >>
 >> From: Mina Almasry <almasrymina@google.com>
 >>
->> This API enables the net stack to reset the queues used for devmem TCP.
+>> Add netdev_rx_queue_restart() function to netdev_rx_queue.h. This is
+>> taken from Mina's work in [1] with a slight modification of taking
+>> rtnl_lock() during the queue stop and start ops.
 >>
->> Signed-off-by: Mina Almasry <almasrymina@google.com>
+>> For bnxt specifically, if the firmware doesn't support
+>> BNXT_RST_RING_SP_EVENT, then ndo_queue_stop() returns -EOPNOTSUPP and
+>> the whole restart fails. Unlike bnxt_rx_ring_reset(), there is no
+>> attempt to reset the whole device.
+>>
+>> [1]: https://lore.kernel.org/linux-kernel/20240403002053.2376017-6-almasrymina@google.com/#t
+>>
 >> Signed-off-by: David Wei <dw@davidwei.uk>
 >> ---
->>  include/linux/netdevice.h   |  3 +++
->>  include/net/netdev_queues.h | 27 +++++++++++++++++++++++++++
->>  2 files changed, 30 insertions(+)
+>>  include/net/netdev_rx_queue.h |  3 ++
+>>  net/core/Makefile             |  1 +
+>>  net/core/netdev_rx_queue.c    | 58 +++++++++++++++++++++++++++++++++++
+>>  3 files changed, 62 insertions(+)
+>>  create mode 100644 net/core/netdev_rx_queue.c
 >>
->> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
->> index f849e7d110ed..6a58ec73c5e8 100644
->> --- a/include/linux/netdevice.h
->> +++ b/include/linux/netdevice.h
->> @@ -1957,6 +1957,7 @@ enum netdev_reg_state {
->>   *     @sysfs_rx_queue_group:  Space for optional per-rx queue attributes
->>   *     @rtnl_link_ops: Rtnl_link_ops
->>   *     @stat_ops:      Optional ops for queue-aware statistics
->> + *     @queue_mgmt_ops:        Optional ops for queue management
->>   *
->>   *     @gso_max_size:  Maximum size of generic segmentation offload
->>   *     @tso_max_size:  Device (as in HW) limit on the max TSO request size
->> @@ -2340,6 +2341,8 @@ struct net_device {
->>
->>         const struct netdev_stat_ops *stat_ops;
->>
->> +       const struct netdev_queue_mgmt_ops *queue_mgmt_ops;
+>> diff --git a/include/net/netdev_rx_queue.h b/include/net/netdev_rx_queue.h
+>> index aa1716fb0e53..e78ca52d67fb 100644
+>> --- a/include/net/netdev_rx_queue.h
+>> +++ b/include/net/netdev_rx_queue.h
+>> @@ -54,4 +54,7 @@ get_netdev_rx_queue_index(struct netdev_rx_queue *queue)
+>>         return index;
+>>  }
+>>  #endif
 >> +
->>         /* for setting kernel sock attribute on TCP connection setup */
->>  #define GSO_MAX_SEGS           65535u
->>  #define GSO_LEGACY_MAX_SIZE    65536u
->> diff --git a/include/net/netdev_queues.h b/include/net/netdev_queues.h
->> index 1ec408585373..337df0860ae6 100644
->> --- a/include/net/netdev_queues.h
->> +++ b/include/net/netdev_queues.h
->> @@ -60,6 +60,33 @@ struct netdev_stat_ops {
->>                                struct netdev_queue_stats_tx *tx);
->>  };
+>> +int netdev_rx_queue_restart(struct net_device *dev, unsigned int rxq);
+>> +
+>>  #endif
+>> diff --git a/net/core/Makefile b/net/core/Makefile
+>> index 21d6fbc7e884..f2aa63c167a3 100644
+>> --- a/net/core/Makefile
+>> +++ b/net/core/Makefile
+>> @@ -19,6 +19,7 @@ obj-$(CONFIG_NETDEV_ADDR_LIST_TEST) += dev_addr_lists_test.o
 >>
->> +/**
->> + * struct netdev_queue_mgmt_ops - netdev ops for queue management
->> + *
->> + * @ndo_queue_mem_alloc: Allocate memory for an RX queue. The memory returned
->> + *                      in the form of a void* can be passed to
->> + *                      ndo_queue_mem_free() for freeing or to ndo_queue_start
->> + *                      to create an RX queue with this memory.
->> + *
->> + * @ndo_queue_mem_free:        Free memory from an RX queue.
->> + *
->> + * @ndo_queue_start:   Start an RX queue at the specified index.
->> + *
->> + * @ndo_queue_stop:    Stop the RX queue at the specified index.
->> + */
->> +struct netdev_queue_mgmt_ops {
->> +       void *                  (*ndo_queue_mem_alloc)(struct net_device *dev,
->> +                                                      int idx);
->> +       void                    (*ndo_queue_mem_free)(struct net_device *dev,
->> +                                                     void *queue_mem);
->> +       int                     (*ndo_queue_start)(struct net_device *dev,
->> +                                                  int idx,
->> +                                                  void *queue_mem);
->> +       int                     (*ndo_queue_stop)(struct net_device *dev,
->> +                                                 int idx,
->> +                                                 void **out_queue_mem);
->> +};
+>>  obj-y += net-sysfs.o
+>>  obj-y += hotdata.o
+>> +obj-y += netdev_rx_queue.o
+>>  obj-$(CONFIG_PAGE_POOL) += page_pool.o page_pool_user.o
+>>  obj-$(CONFIG_PROC_FS) += net-procfs.o
+>>  obj-$(CONFIG_NET_PKTGEN) += pktgen.o
+>> diff --git a/net/core/netdev_rx_queue.c b/net/core/netdev_rx_queue.c
+>> new file mode 100644
+>> index 000000000000..9633fb36f6d1
+>> --- /dev/null
+>> +++ b/net/core/netdev_rx_queue.c
+>> @@ -0,0 +1,58 @@
+>> +/* SPDX-License-Identifier: GPL-2.0 */
+>> +
+>> +#include <linux/netdevice.h>
+>> +#include <net/netdev_queues.h>
+>> +#include <net/netdev_rx_queue.h>
+>> +
+>> +int netdev_rx_queue_restart(struct net_device *dev, unsigned int rxq)
+>> +{
+>> +       void *new_mem;
+>> +       void *old_mem;
+>> +       int err;
+>> +
+>> +       if (!dev->queue_mgmt_ops->ndo_queue_stop ||
+>> +           !dev->queue_mgmt_ops->ndo_queue_mem_free ||
+>> +           !dev->queue_mgmt_ops->ndo_queue_mem_alloc ||
+>> +           !dev->queue_mgmt_ops->ndo_queue_start)
+>> +               return -EOPNOTSUPP;
+>> +
+>> +       new_mem = dev->queue_mgmt_ops->ndo_queue_mem_alloc(dev, rxq);
+>> +       if (!new_mem)
+>> +               return -ENOMEM;
+>> +
+>> +       rtnl_lock();
 > 
-> Sorry, I think we raced a bit, we updated our interface definition
-> based on your/Jakub's feedback to expose the size of the struct for
-> core to allocate, so it looks like this for us now:
+> FWIW in my case this function is called from a netlink API which
+> already has rtnl_lock, so maybe a check of rtnl_is_locked is good here
+> rather than a relock.
 > 
-> +struct netdev_queue_mgmt_ops {
-> +       size_t                  ndo_queue_mem_size;
-> +       int                     (*ndo_queue_mem_alloc)(struct net_device *dev,
-> +                                                      void *per_queue_mem,
-> +                                                      int idx);
-> +       void                    (*ndo_queue_mem_free)(struct net_device *dev,
-> +                                                     void *per_queue_mem);
-> +       int                     (*ndo_queue_start)(struct net_device *dev,
-> +                                                  void *per_queue_mem,
-> +                                                  int idx);
-> +       int                     (*ndo_queue_stop)(struct net_device *dev,
-> +                                                 void *per_queue_mem,
-> +                                                 int idx);
-> +};
-> +
+>> +       err = dev->queue_mgmt_ops->ndo_queue_stop(dev, rxq, &old_mem);
+>> +       if (err)
+>> +               goto err_free_new_mem;
+>> +
+>> +       err = dev->queue_mgmt_ops->ndo_queue_start(dev, rxq, new_mem);
+>> +       if (err)
+>> +               goto err_start_queue;
+>> +       rtnl_unlock();
+>> +
+>> +       dev->queue_mgmt_ops->ndo_queue_mem_free(dev, old_mem);
+>> +
+>> +       return 0;
+>> +
+>> +err_start_queue:
+>> +       /* Restarting the queue with old_mem should be successful as we haven't
+>> +        * changed any of the queue configuration, and there is not much we can
+>> +        * do to recover from a failure here.
+>> +        *
+>> +        * WARN if the we fail to recover the old rx queue, and at least free
+>> +        * old_mem so we don't also leak that.
+>> +        */
+>> +       if (dev->queue_mgmt_ops->ndo_queue_start(dev, rxq, old_mem)) {
+>> +               WARN(1,
+>> +                    "Failed to restart old queue in error path. RX queue %d may be unhealthy.",
+>> +                    rxq);
+>> +               dev->queue_mgmt_ops->ndo_queue_mem_free(dev, &old_mem);
+>> +       }
+>> +
+>> +err_free_new_mem:
+>> +       dev->queue_mgmt_ops->ndo_queue_mem_free(dev, new_mem);
+>> +       rtnl_unlock();
+>> +
+>> +       return err;
+>> +}
+>> +EXPORT_SYMBOL_GPL(netdev_rx_queue_restart);
 > 
-> The idea is that ndo_queue_mem_size is the size of the memory
-> per_queue_mem points to.
+> Does stuff outside of core need this? I don't think so, right? I think
+> you can drop EXPORT_SYMBOL_GPL.
 
-Thanks, I'll update this.
+Not sure, we intend to call this from within io_uring. Does that require
+exporting or not?
 
-No race, I'm just working on the bnxt side at the same time because I
-need feedback from Broadcom. Hope you don't mind whichever one merges
-first. Full credit is given to you on the queue API + netdev queue reset
-function.
+Later on I'll want to add something like
+netdev_rx_queue_set_memory_provider() which then calls
+netdev_rx_queue_restart(). When that happens I can remove the
+EXPORT_SYMBOL_GPL.
 
 > 
-> The rest of the functions are slightly modified to allow core to
-> allocate the memory and pass in the pointer for the driver to fill
-> in/us. I think Shailend is close to posting the patches, let us know
-> if you see any issues.
+> At that point the compiler may complain about an unused function, I
+> think, so maybe  __attribute__((unused)) would help there.
+> 
+> I also think it's fine for this patch series to only add the ndos and
+> to leave it to the devmem series to introduce this function, but I'm
+> fine either way.
 > 
 
-Great, I'll take a look when it is posted.
+I'd like to agree on the netdev public API and merge alongside the queue
+api changes, separate to TCP devmem. Then that's one fewer deps between
+our main patchsets.
 
