@@ -1,122 +1,98 @@
-Return-Path: <netdev+bounces-92961-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92966-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7340C8B976E
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 11:19:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F3FA8B9781
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 11:21:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6DAD8285836
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 09:19:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF6C42874B6
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 09:21:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BBF5537F5;
-	Thu,  2 May 2024 09:19:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9FE653E22;
+	Thu,  2 May 2024 09:20:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HvIsmP1n"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tkhKLdhj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40AA3537E7;
-	Thu,  2 May 2024 09:19:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98A7D51C5C;
+	Thu,  2 May 2024 09:20:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714641570; cv=none; b=bLJ3O1TuKH4wnsnsxYtfDbU6SbhNJsiiLBEuelrOt04twNjkW863+/zxVZYAbtRO2tkF1nuXpU0YfaZ0hivYk44+sdyE+pZJ6u/XAAqcQXyHUaFUgqd5MxA567UlwvcDul0XtjLJ294DjJVWmSQkmNez4VXvkpJbI65NSl4jVBM=
+	t=1714641632; cv=none; b=dYjDVn2U2pxYsp92X6r5bkbwmHoOiz6rZMv0d7T4gkb7w5zewDDYE6jSdL5gAivAyBd3CFafJPKtxG/yrYlpVpm8VIJuaL+hc2fpcIyyGA6ZfWAilnobmCt6bYnCvOYKGBjv6kTJzI6qGUN7JSzSm6rOO/jVACoW3+nnqVQin+Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714641570; c=relaxed/simple;
-	bh=icDwQ3NnzKzaEU0fVTxo5GzqH06fgDy1OdNdLXdTKSs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QdWhqdEIJvBBnMiY/5lLjIY1xz/+lu4lk56hvpyS0RKDX+sG9OTPw2uK/UhlKDjVb1HBEjGt4waoizby+6rRRDEJ/KkBRnEKLkvgydEtVg3L7eu8jiAtTssN41KOMxj5Gd15hkBu8/YkfYKer9Qq+pCWsINzB14WfHOgF/x687U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HvIsmP1n; arc=none smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1714641568; x=1746177568;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=icDwQ3NnzKzaEU0fVTxo5GzqH06fgDy1OdNdLXdTKSs=;
-  b=HvIsmP1nTrGur4ZIaFDLV3LC9ozEtWHmcZgGHdFVc2UsKVZPNY7vmH1y
-   rWnK1xKk12+dz5GDwd09JzAiCUNjA1IoNQj9RUTJu93uj50V71UXYpZ4L
-   MOcidFFtIG4uwvCdTzgmR6BK4DKpeuN9BpLopR/4XG14jHS7VkZTvKU4q
-   oLgfwh3YFdushsjcam1fdKawmCAJ7Ex/NikInpW1X2hjyZim3fXdiMZ2i
-   0Tyrvz8ekLEJdDa31CsnxRWZxLUOrcNDDC/gZF/M0QWn971m9TzL+GVRG
-   wM1FNfg4HiVyIabyTjPZagDldbtGGcAyE4sWeHYlJC2KlJQ96sep2KOiE
-   g==;
-X-CSE-ConnectionGUID: oAArqpbjSVWiACZUqe2UkQ==
-X-CSE-MsgGUID: yqFoPueoQGSXeWlGALX2iQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11061"; a="10273887"
-X-IronPort-AV: E=Sophos;i="6.07,247,1708416000"; 
-   d="scan'208";a="10273887"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 May 2024 02:19:27 -0700
-X-CSE-ConnectionGUID: clc1dKztSw6SpXtD+ktJoA==
-X-CSE-MsgGUID: i52VyOUxS2C9j0vRnbabvg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,247,1708416000"; 
-   d="scan'208";a="27179198"
-Received: from ehlflashnuc2.fi.intel.com (HELO [10.237.72.57]) ([10.237.72.57])
-  by fmviesa006.fm.intel.com with ESMTP; 02 May 2024 02:19:23 -0700
-Message-ID: <fdbf6547-7e6d-408d-8ed8-13e449de181d@linux.intel.com>
-Date: Thu, 2 May 2024 12:19:22 +0300
+	s=arc-20240116; t=1714641632; c=relaxed/simple;
+	bh=lHYbtV4vdHeUwnG3ppsQrzBHZPrjq6ArtI4mJoHPxkY=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=BoJrgo7Slvfrl/tGx50auh/IRA2gcfztRVpphuDZEjjXklgqsif8LfjH7Vz0gCM3JHIe50Mz03UasUnhJQWLdyxXsakiNXCcCoxxlBymWAI3vgLHZXdfdh83XFeif1+WEOxFoAAjHnoZQr/fsBpubpRUl0hoQAM55fkQwxCQTXk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tkhKLdhj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 172A2C32789;
+	Thu,  2 May 2024 09:20:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714641632;
+	bh=lHYbtV4vdHeUwnG3ppsQrzBHZPrjq6ArtI4mJoHPxkY=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=tkhKLdhjinVTxybvPTcsJ9dMKZK/z/Nrfme+nG3EXn9t10WOfMfq8BIbWywaLcA+Y
+	 2P37FLB8zXZ0aSCtBbV//Hqtm7TfZZEEaz3cZNX+e5IShm/1zKrIifXrtncZvfPEbz
+	 0AjbKKk4l8FHMQ4ndBYS6LFl1z2JKeCnnm/7wSi5INl4QKbi2oKp1jxjrhEruUB+GP
+	 Ab3HozklZLIm8llYaPRAwK7cIdhxCApJGwKHsZfxYlCRXZ4w//3JBGXftK8XjcASrf
+	 jQ6FvPDywMc3EyPVtLT8smuKHsr6BHUg64BGXWHVHt/4vhczbvk/OAWjW65eIwPJTj
+	 6qHiZmNrsj79A==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id F0A87C43336;
+	Thu,  2 May 2024 09:20:31 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 4/5] mfd: intel_quark_i2c_gpio: Utilize
- i2c-designware.h
-To: Andi Shyti <andi.shyti@kernel.org>,
- Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
- linux-kernel@vger.kernel.org,
- Mika Westerberg <mika.westerberg@linux.intel.com>,
- Jan Dabros <jsd@semihalf.com>, Lee Jones <lee@kernel.org>,
- Jiawen Wu <jiawenwu@trustnetic.com>, Mengyuan Lou
- <mengyuanlou@net-swift.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
- Andrew Lunn <andrew@lunn.ch>, Duanqiang Wen <duanqiangwen@net-swift.com>,
- "open list:SYNOPSYS DESIGNWARE I2C DRIVER" <linux-i2c@vger.kernel.org>,
- "open list:WANGXUN ETHERNET DRIVER" <netdev@vger.kernel.org>
-References: <20240425214438.2100534-1-florian.fainelli@broadcom.com>
- <20240425214438.2100534-5-florian.fainelli@broadcom.com>
- <Ziu6gDOqhEYQNhcH@smile.fi.intel.com>
- <fidbc7locp32lypdui67crj3qkj3nbcp5vpxcnlxrdmme2sn4c@npdan5ncxxog>
-Content-Language: en-US
-From: Jarkko Nikula <jarkko.nikula@linux.intel.com>
-In-Reply-To: <fidbc7locp32lypdui67crj3qkj3nbcp5vpxcnlxrdmme2sn4c@npdan5ncxxog>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v4 0/2] net: gro: add flush/flush_id checks and fix wrong
+ offset in udp
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171464163198.15356.9947080323509993851.git-patchwork-notify@kernel.org>
+Date: Thu, 02 May 2024 09:20:31 +0000
+References: <20240430143555.126083-1-richardbgobert@gmail.com>
+In-Reply-To: <20240430143555.126083-1-richardbgobert@gmail.com>
+To: Richard Gobert <richardbgobert@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, dsahern@kernel.org, willemdebruijn.kernel@gmail.com,
+ alobakin@pm.me, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On 4/30/24 12:36 PM, Andi Shyti wrote:
-> Hi Andy,
+Hello:
+
+This series was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Tue, 30 Apr 2024 16:35:53 +0200 you wrote:
+> This series fixes a bug in the complete phase of UDP in GRO, in which
+> socket lookup fails due to using network_header when parsing encapsulated
+> packets. The fix is to add network_offset and inner_network_offset to
+> napi_gro_cb and use these offsets for socket lookup.
 > 
-> On Fri, Apr 26, 2024 at 05:30:24PM +0300, Andy Shevchenko wrote:
->> On Thu, Apr 25, 2024 at 02:44:37PM -0700, Florian Fainelli wrote:
->>> Rather than open code the i2c_designware string, utilize the newly
->>> defined constant in i2c-designware.h.
->>
->> Acked-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
->>
->> P.S>
->> Note, my tags for MFD patches does not imply that I agree on the general idea
->> of this series, it's just in case if it will be approved by the respective
->> maintainers (I²C / MFD / etc).
+> In addition p->flush/flush_id should be checked in all UDP flows. The
+> same logic from tcp_gro_receive is applied for all flows in
+> udp_gro_receive_segment. This prevents packets with mismatching network
+> headers (flush/flush_id turned on) from merging in UDP GRO.
 > 
-> I waited a bit to see if more comments were coming.
-> 
-Well I had doubts about the idea will it help maintaining code or do the 
-opposite but didn't receive a reply from the patch author:
+> [...]
 
-https://lore.kernel.org/linux-i2c/62e58960-f568-459d-8690-0c9c608a4d9f@linux.intel.com/
+Here is the summary with links:
+  - [net,v4,1/2] net: gro: fix udp bad offset in socket lookup by adding {inner_}network_offset to napi_gro_cb
+    https://git.kernel.org/netdev/net/c/5ef31ea5d053
+  - [net,v4,2/2] net: gro: add flush check in udp_gro_receive_segment
+    https://git.kernel.org/netdev/net/c/5babae777c61
 
-Also Lee Jones have similar concerns:
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-https://lore.kernel.org/linux-i2c/20240502071751.GA5338@google.com/
 
 
