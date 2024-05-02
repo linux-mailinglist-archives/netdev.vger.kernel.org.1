@@ -1,109 +1,79 @@
-Return-Path: <netdev+bounces-93068-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93062-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AEA188B9E81
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 18:25:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D1608B9E2E
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 18:08:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6B4CD284AEE
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 16:25:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9EEF21C22C53
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 16:08:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3E5915B559;
-	Thu,  2 May 2024 16:25:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F70515D5A8;
+	Thu,  2 May 2024 16:08:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=paloaltonetworks.com header.i=@paloaltonetworks.com header.b="GMKQkT08"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X6Jbt+4T"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-00169c01.pphosted.com (mx0a-00169c01.pphosted.com [67.231.148.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D20F815CD40
-	for <netdev@vger.kernel.org>; Thu,  2 May 2024 16:25:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7880B15AAC5;
+	Thu,  2 May 2024 16:08:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714667107; cv=none; b=s8KtNJgt82ZN67kQm4AciMFwFw/sgpIwYrjAkLT9IHA8K76Mj6lDCJN3q1C7eTFe93LaXyi68FAkq1/o0c71iLoWgfUYYRd7lzwcIIGlK6aEMVlSqdJvGI8MfFHpbOuqvMxG1KdxFJungipitslNNDpUo1oqBLJ5q8DUFTL/++I=
+	t=1714666081; cv=none; b=rTig2DP8fC1+qhSWRmKGWueUkcOD8sBuS/x34iS0oRARJ5aSXHbBsOTVJHYjgCxtQdihpWF9a30O97rXt1ZJC+07LHRj2bH5/enqIljcgC497nXeonbQRG1FeZ/pjp3hA5LqgLAlUwqqJvu+6RidqENmjo7IiuevmIJXAaxU31o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714667107; c=relaxed/simple;
-	bh=mUvgMqaJ60A8brdvJl3yWx+HCM674YlQqgjYokl7iyI=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=S6OYETybKxp2z8GWKJhJwGVQEGAxgqCXarq8LEzQp419GJVQxqJ0JfMBl5oxGztBZHORnMen3P80qcmlg05zFT/+6RtmXkWVQxgDNJKnOIqF51oXZzGTqvzx+nRYl9gRT/c9iu0RCQKrt6ZRG1KeMxpdRVirDd5+QoBkzOu1W7I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=paloaltonetworks.com; spf=pass smtp.mailfrom=paloaltonetworks.com; dkim=fail (0-bit key) header.d=paloaltonetworks.com header.i=@paloaltonetworks.com header.b=GMKQkT08 reason="key not found in DNS"; arc=none smtp.client-ip=67.231.148.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=paloaltonetworks.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paloaltonetworks.com
-Received: from pps.filterd (m0281123.ppops.net [127.0.0.1])
-	by mx0b-00169c01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 442BQHbf005239;
-	Thu, 2 May 2024 09:01:10 -0700
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0b-00169c01.pphosted.com (PPS) with ESMTPS id 3xu34tm9h3-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 02 May 2024 09:01:10 -0700 (PDT)
-Received: from m0281123.ppops.net (m0281123.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 442G19Mu002569;
-	Thu, 2 May 2024 09:01:09 -0700
-Received: from webmail.paloaltonetworks.com (webmail.paloaltonetworks.com [199.167.52.51] (may be forged))
-	by mx0b-00169c01.pphosted.com (PPS) with ESMTPS id 3xu34tm9gw-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 02 May 2024 09:01:09 -0700 (PDT)
-Received: from localhost.localdomain (unknown [10.47.128.233])
-	by webmail.paloaltonetworks.com (Postfix) with ESMTPA id F25FB7F5CE;
-	Thu,  2 May 2024 09:01:06 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 webmail.paloaltonetworks.com F25FB7F5CE
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=paloaltonetworks.com; s=mail; t=1714665668;
-	bh=q72EdBxkSW6srP86SETdwliTd4Nie4IqxsOE7zkLRjU=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=GMKQkT08wQgufhAkmO7UujLXtStDoSLmcp4leD0jP2R7Tgiw4WvIsEVM8GvGvN5xQ
-	 TyQiBRBPce3vjVDNVjGNuZEI+ULdcho9BATf+CYpksVrR9ixBj1w6W5PvV/3IohoTA
-	 1tEv/7FibefqjJV2XjaGNXxu4m7wQmtrNG/404ow=
-From: Roded Zats <rzats@paloaltonetworks.com>
-To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-        pabeni@redhat.com
-Cc: orcohen@paloaltonetworks.com, rzats@paloaltonetworks.com,
-        netdev@vger.kernel.org
-Subject: [PATCH net] rtnetlink: Correct nested IFLA_VF_VLAN_LIST attribute validation
-Date: Thu,  2 May 2024 18:57:51 +0300
-Message-Id: <20240502155751.75705-1-rzats@paloaltonetworks.com>
-X-Mailer: git-send-email 2.39.3 (Apple Git-146)
-In-Reply-To: <20240502064226.633cd9de@kernel.org>
-References: <20240502064226.633cd9de@kernel.org>
+	s=arc-20240116; t=1714666081; c=relaxed/simple;
+	bh=ZTrEJzmJG0Qibm5qnkZNxiOBAVOeOGiADzyzLnfBoBw=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=gR0JkzA1xxlnPKIajLkYCTmbE8AMEoQTsthCnEvfATGJ6pKRH4FmBqncvpVyiTljr0FEgnDwi+GIy/5vSnusjPPesPpvkNiJ8kABlgcgA7iigICf8aSumXMQz2/IoMDLJpsJgW1bFgy07fODJ+MPz/4IcDwk7KLC7/GnAoyRFdI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X6Jbt+4T; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 52E6CC4AF14;
+	Thu,  2 May 2024 16:08:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714666081;
+	bh=ZTrEJzmJG0Qibm5qnkZNxiOBAVOeOGiADzyzLnfBoBw=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=X6Jbt+4TpcVk+EBvGTn6Ujow322PTlPvgDs5wwMmVkf+rRQ0khgCt+rGm4Cvj7vGu
+	 amqC4WnWPolpxUfbw8c9gxTNPJsxdryb/wx8DyfhqfF89tLHxVC/J2NVs0qJhfbBBP
+	 cpd+S71UBkR4vg5xePWtjCZ9Tys/wknY/8V5OhpkaYvVvptUQzjC18hu6lEBH6H+Sw
+	 nD2ZtN8olh1E1Jl4jmBvgF8SRL6tCd1UhzULrzQaV/dYbuY6Qbawtzszk9dzrgu3sL
+	 kW8KlnkTeUf3u/2gdmXUKN5AeM0fKNv/OCG0rlAK/ue+rpcfLs638+NHzEacco+sKK
+	 byGt9p5IiOZdw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 43259C43443;
+	Thu,  2 May 2024 16:08:01 +0000 (UTC)
+Subject: Re: [GIT PULL] Networking for v6.9-rc7
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <20240502112326.34463-1-pabeni@redhat.com>
+References: <20240502112326.34463-1-pabeni@redhat.com>
+X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20240502112326.34463-1-pabeni@redhat.com>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.9-rc7
+X-PR-Tracked-Commit-Id: 78cfe547607a83de60cd25304fa2422777634712
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 545c494465d24b10a4370545ba213c0916f70b95
+Message-Id: <171466608127.26603.8291380975724582922.pr-tracker-bot@kernel.org>
+Date: Thu, 02 May 2024 16:08:01 +0000
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: torvalds@linux-foundation.org, kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-Each attribute inside a nested IFLA_VF_VLAN_LIST is assumed to be a
-struct ifla_vf_vlan_info so the size of such attribute needs to be at least
-of sizeof(struct ifla_vf_vlan_info) which is 14 bytes.
-The current size validation in do_setvfinfo is against NLA_HDRLEN (4 bytes)
-which is less than sizeof(struct ifla_vf_vlan_info) so this validation
-is not enough and a too small attribute might be cast to a
-struct ifla_vf_vlan_info, this might result in an out of bands
-read access when accessing the saved (casted) entry in ivvl.
+The pull request you sent on Thu,  2 May 2024 13:23:26 +0200:
 
-Fixes: 79aab093a0b5 ("net: Update API for VF vlan protocol 802.1ad support")
-Signed-off-by: Roded Zats <rzats@paloaltonetworks.com>
----
- net/core/rtnetlink.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.9-rc7
 
-diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
-index a3d7847ce69d..8ba6a4e4be26 100644
---- a/net/core/rtnetlink.c
-+++ b/net/core/rtnetlink.c
-@@ -2530,7 +2530,7 @@ static int do_setvfinfo(struct net_device *dev, struct nlattr **tb)
- 
- 		nla_for_each_nested(attr, tb[IFLA_VF_VLAN_LIST], rem) {
- 			if (nla_type(attr) != IFLA_VF_VLAN_INFO ||
--			    nla_len(attr) < NLA_HDRLEN) {
-+			    nla_len(attr) < sizeof(struct ifla_vf_vlan_info)) {
- 				return -EINVAL;
- 			}
- 			if (len >= MAX_VLAN_LIST_LEN)
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/545c494465d24b10a4370545ba213c0916f70b95
+
+Thank you!
+
 -- 
-2.39.3 (Apple Git-146)
-
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
 
