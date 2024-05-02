@@ -1,149 +1,92 @@
-Return-Path: <netdev+bounces-93135-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93136-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9EC58BA3E0
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 01:20:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 22A888BA416
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 01:36:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B99841C22D90
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 23:20:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B853B1F2385C
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 23:36:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5BC81CD2A;
-	Thu,  2 May 2024 23:20:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F0DB502A5;
+	Thu,  2 May 2024 23:36:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from sonata.ens-lyon.org (domu-toccata.ens-lyon.fr [140.77.166.138])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4EDE57C91;
-	Thu,  2 May 2024 23:20:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=140.77.166.138
+Received: from sgoci-sdnproxy-4.icoremail.net (sgoci-sdnproxy-4.icoremail.net [129.150.39.64])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 109DB4CDE0;
+	Thu,  2 May 2024 23:36:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.150.39.64
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714692029; cv=none; b=f4DblNArMWx6Lt60PsB1GO3ndxM2/evMozKR4C8ertqABezdOGFQNuGiHzdgfI1EYLyAaMlwSGNaR/kPOySORJW9gjwUh+uEj4FVAjN5RLPZSaVAt+d0PZAQbp8bp9ErXNDni2gHW0WUoGaLDaVSc3EnNQNb3isU3jHwH2VaHFY=
+	t=1714693005; cv=none; b=U0w3F40v/2k84btsXcJzeO8ArJ95Jj3/7J8bUo28i2X+DPI0/h9r6/nUL4Q5MRhsikr9SmQvJDzFnrytKkg6Vmo/tcp2h5eE2/d2FMib/Ras3Dm5ssq3LxXz22xteJVY/WB8AzgLYGycXr2EtlTYHef5CzzFgF0qW8xpr9onR/I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714692029; c=relaxed/simple;
-	bh=qSzC0oiYTVV82GdoLnMNIv8MQ1QTk/aV9rcuITMmS/Y=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SIXPU1LY8lQAITeSOKn3nGw5vPBLVEoZ8d09Zjb1zDXe0GXiNs9uXnodTgXY6MSDgy90XuqIm+CvYxUaiwggbjcSmTmgaFNxfmDUASdIw1R//Xg2MSE1oNoegcU4A3sVM7X12PutOFwwDILnTCFk4nznxoL2igoXC2Oi9sVwF0M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ens-lyon.org; spf=pass smtp.mailfrom=bounce.ens-lyon.org; arc=none smtp.client-ip=140.77.166.138
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ens-lyon.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bounce.ens-lyon.org
-Received: from localhost (localhost [127.0.0.1])
-	by sonata.ens-lyon.org (Postfix) with ESMTP id F1358A0361;
-	Fri,  3 May 2024 01:14:19 +0200 (CEST)
-Received: from sonata.ens-lyon.org ([127.0.0.1])
-	by localhost (sonata.ens-lyon.org [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id plRL_BNJxDKg; Fri,  3 May 2024 01:14:19 +0200 (CEST)
-Received: from begin (aamiens-653-1-111-57.w83-192.abo.wanadoo.fr [83.192.234.57])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by sonata.ens-lyon.org (Postfix) with ESMTPSA id C8A42A0360;
-	Fri,  3 May 2024 01:14:19 +0200 (CEST)
-Received: from samy by begin with local (Exim 4.97)
-	(envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1s2fd5-0000000CJFV-15bS;
-	Fri, 03 May 2024 01:14:19 +0200
-From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-To: Tom Parkin <tparkin@katalix.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	James Chapman <jchapman@katalix.com>
-Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH] l2tp: Support several sockets with same IP/port quadruple
-Date: Fri,  3 May 2024 01:14:18 +0200
-Message-ID: <20240502231418.2933925-1-samuel.thibault@ens-lyon.org>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1714693005; c=relaxed/simple;
+	bh=jBKOsSBivqS7F+fVGIJGAZ4bcnWxyd5ZWWtsFuLVYH4=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=Ez5ZAGZs7ChpB9hX6vx65YXVx3XbK/cOAvShxNafchra1/TObLNNgQygfBiac08uf8P9VZipGQbI/yFfyfAX5yZaG/9UD9wVvgMR+Kt2w4ZN7VL1wqNIKO+NSxl68PTlaDJ3kcU+34nESZrjep4B2frIyESTaLy97kOLf6LfS28=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn; spf=pass smtp.mailfrom=zju.edu.cn; arc=none smtp.client-ip=129.150.39.64
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
+Received: from ubuntu.localdomain (unknown [221.192.179.227])
+	by mail-app2 (Coremail) with SMTP id by_KCgC3ZqZwIzRm7PwDAA--.6463S2;
+	Fri, 03 May 2024 07:36:20 +0800 (CST)
+From: Duoming Zhou <duoming@zju.edu.cn>
+To: netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	linux-hams@vger.kernel.org,
+	pabeni@redhat.com,
+	kuba@kernel.org,
+	edumazet@google.com,
+	davem@davemloft.net,
+	jreuter@yaina.de,
+	horms@kernel.org,
+	Markus.Elfring@web.de,
+	dan.carpenter@linaro.org,
+	lars@oddbit.com,
+	Duoming Zhou <duoming@zju.edu.cn>
+Subject: [PATCH net v2 0/2] ax25: fix reference counting issue of ax25_dev
+Date: Fri,  3 May 2024 07:36:14 +0800
+Message-Id: <cover.1714690906.git.duoming@zju.edu.cn>
+X-Mailer: git-send-email 2.17.1
+X-CM-TRANSID:by_KCgC3ZqZwIzRm7PwDAA--.6463S2
+X-Coremail-Antispam: 1UD129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
+	VFW2AGmfu7bjvjm3AaLaJ3UjIYCTnIWjp_UUUYX7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E
+	6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28Cjx
+	kF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW5JVW7JwA2z4x0Y4vE2Ix0cI8I
+	cVCY1x0267AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aV
+	CY1x0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAq
+	x4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6x
+	CaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwAC
+	I402YVCY1x02628vn2kIc2xKxwCY02Avz4vE14v_uwCF04k20xvY0x0EwIxGrwCF54CYxV
+	CY1x0262kKe7AKxVWUtVW8ZwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v2
+	6r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2
+	Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_
+	Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMI
+	IF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUFJP_UUUUU
+	=
+X-CM-SenderInfo: qssqjiasttq6lmxovvfxof0/1tbiAwUJAWYztgkCSgAIsk
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-Some l2tp providers will use 1701 as origin port and open several
-tunnels for the same origin and target. On the Linux side, this
-may mean opening several sockets, but then trafic will go to only
-one of them, losing the trafic for the tunnel of the other socket
-(or leaving it up to userland, consuming a lot of cpu%).
+The first patch changes kfree in ax25_dev_free to ax25_dev_put,
+because the ax25_dev is managed by reference counting.
 
-This can also happen when the l2tp provider uses a cluster, and
-load-balancing happens to migrate from one origin IP to another one,
-for which a socket was already established. Managing reassigning
-tunnels from one socket to another would be very hairy for userland.
+The second patch fixes potential reference counting leak issue
+in ax25_addr_ax25dev.
 
-Lastly, as documented in l2tpconfig(1), as client it may be necessary
-to use 1701 as origin port for odd firewalls reasons, which could
-prevent from establishing several tunnels to a l2tp server, for the
-same reason: trafic would get only on one of the two sockets.
+You can see the former discussion in the following link:
+https://lore.kernel.org/netdev/20240501060218.32898-1-duoming@zju.edu.cn/
 
-With the V2 protocol it is however easy to route trafic to the proper
-tunnel, by looking up the tunnel number in the network namespace. This
-fixes the three cases altogether.
+Duoming Zhou (2):
+  ax25: change kfree in ax25_dev_free to ax25_dev_free
+  ax25: fix potential reference counting leak in ax25_addr_ax25dev
 
-Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
----
- net/l2tp/l2tp_core.c | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
+ net/ax25/ax25_dev.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/net/l2tp/l2tp_core.c b/net/l2tp/l2tp_core.c
-index 8d21ff25f160..128f1146c135 100644
---- a/net/l2tp/l2tp_core.c
-+++ b/net/l2tp/l2tp_core.c
-@@ -794,6 +794,7 @@ static void l2tp_session_queue_purge(struct l2tp_session *session)
- static int l2tp_udp_recv_core(struct l2tp_tunnel *tunnel, struct sk_buff *skb)
- {
- 	struct l2tp_session *session = NULL;
-+	struct l2tp_tunnel *orig_tunnel = tunnel;
- 	unsigned char *ptr, *optr;
- 	u16 hdrflags;
- 	u32 tunnel_id, session_id;
-@@ -845,6 +846,20 @@ static int l2tp_udp_recv_core(struct l2tp_tunnel *tunnel, struct sk_buff *skb)
- 		/* Extract tunnel and session ID */
- 		tunnel_id = ntohs(*(__be16 *)ptr);
- 		ptr += 2;
-+
-+		if (tunnel_id != tunnel->tunnel_id && tunnel->l2tp_net) {
-+			/* We are receiving trafic for another tunnel, probably
-+			 * because we have several tunnels between the same
-+			 * IP/port quadruple, look it up.
-+			 */
-+			struct l2tp_tunnel *alt_tunnel;
-+
-+			alt_tunnel = l2tp_tunnel_get(tunnel->l2tp_net, tunnel_id);
-+			if (!alt_tunnel)
-+				goto pass;
-+			tunnel = alt_tunnel;
-+		}
-+
- 		session_id = ntohs(*(__be16 *)ptr);
- 		ptr += 2;
- 	} else {
-@@ -875,6 +890,9 @@ static int l2tp_udp_recv_core(struct l2tp_tunnel *tunnel, struct sk_buff *skb)
- 	l2tp_recv_common(session, skb, ptr, optr, hdrflags, length);
- 	l2tp_session_dec_refcount(session);
- 
-+	if (tunnel != orig_tunnel)
-+		l2tp_tunnel_dec_refcount(tunnel);
-+
- 	return 0;
- 
- invalid:
-@@ -884,6 +902,9 @@ static int l2tp_udp_recv_core(struct l2tp_tunnel *tunnel, struct sk_buff *skb)
- 	/* Put UDP header back */
- 	__skb_push(skb, sizeof(struct udphdr));
- 
-+	if (tunnel != orig_tunnel)
-+		l2tp_tunnel_dec_refcount(tunnel);
-+
- 	return 1;
- }
- 
 -- 
-2.43.0
+2.17.1
 
 
