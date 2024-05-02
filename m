@@ -1,60 +1,58 @@
-Return-Path: <netdev+bounces-92988-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92989-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD3968B9878
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 12:07:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF9C58B987C
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 12:08:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7F226281165
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 10:07:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6BFED283B6F
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 10:08:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 074725677C;
-	Thu,  2 May 2024 10:07:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A54356B76;
+	Thu,  2 May 2024 10:07:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FhIHIPbr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="swsVCt/b"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7A7A42AAB
-	for <netdev@vger.kernel.org>; Thu,  2 May 2024 10:07:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 360B24DA1B
+	for <netdev@vger.kernel.org>; Thu,  2 May 2024 10:07:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714644444; cv=none; b=j/BiYWy7G/zwdjPTw7QKPnjXYlOuNmGVQCj5kVg+spgR16puQeWG7we23ChLdipMsGyAdFZqLuaID6VmYrrejP6Nx0WZaje/mtpy9JSCP/3yLbiAPLo5BS5DL/sHZnQwS9va/b0pRo8Y/BIbasic6JgLn0RbWclxDjvtAL1uW58=
+	t=1714644479; cv=none; b=HU8MyAlBr3u4OxMT9fY36m1NHAXD9vdmp5ddiseGgID6EUpbBrUxg0SDgc3n6t+2rufuuM25OaR9fCRrWN9nmm6rOpPqCV/nO3bzxevwhP4kAfUX2thyiip+8AyJu2BVcLX19WkoRUhaKieX1sUgU/S5os/vogN+pCr+Q0SnaZ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714644444; c=relaxed/simple;
-	bh=L/AENLsmoC5DefF05/SUjZQjoJJG9u0ysZASg/GiNbU=;
+	s=arc-20240116; t=1714644479; c=relaxed/simple;
+	bh=DbIDTlfALD5Ib8Gf7sf8OqFvtuNq2jCMQ5CPjSBWDTA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=r1Xp1xkd2v68S9FdXmwPocPRruXCyfYQ4XKjPKQEcSyxCNN5/wEtykugBD2lfYV3jC8uY1eec6SPR48H8m2qanPacKNPqcs93T62SGY82faZyhenx2DPAldzBIz0kEjoW+27P1uSlm9u/dIb7xan0YuiFRgNTbPULHLCB6EZM2k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FhIHIPbr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 41B0DC113CC;
-	Thu,  2 May 2024 10:07:22 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=QlFCh+OEKAg8vQgB9V4FqCsiQStrQ6KmPP0o/HOmfZOKl8tFrNaxWk4/BI2gs2quI59TOeX3YqmFgBgIAPRU5X/BoT8czREuLRJlefcCDYUvzedOck6QWXpib8zXYcSy1cvGOZRvdKfkSI5Wcsjj/dOYafw57mdubPAwij6YkHk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=swsVCt/b; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 410B2C113CC;
+	Thu,  2 May 2024 10:07:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714644444;
-	bh=L/AENLsmoC5DefF05/SUjZQjoJJG9u0ysZASg/GiNbU=;
+	s=k20201202; t=1714644478;
+	bh=DbIDTlfALD5Ib8Gf7sf8OqFvtuNq2jCMQ5CPjSBWDTA=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=FhIHIPbrkn5of7ojkv+WpNvtr26Xz5XrI1HxTn+niRPTklj8mVPPyx4TzCZ0M3/He
-	 9yuC6c2i98crENMzPMcxMwLwG8i1x7WNd3dEkmUoiopYIqN3DeNYV8JO4DmiKG5hUG
-	 vf4NT5hBmSDQI5je3hWIA7kJVtxOgrKnfUDZ8v6UyQfzUCloRApHiWp36Y8AIlwK+q
-	 TLjP8Wu/FYNJuLSxw7zyBMoa808XQjSHpaL720U1d2RGOj+S7c4LFV6xW+NWMx/E5k
-	 fDANfRqTuwF+OXZHwUW1EBadBVxQkOXjLMqCCxlxF5wWTNpbE9TyQC+DalivdgV/Ig
-	 wIgcyqlRw9Lzw==
-Date: Thu, 2 May 2024 11:07:19 +0100
+	b=swsVCt/b1KzrT9qkfmvZeF6luSdx964I9ZYBh3TV4s4JpgKG+l80+9GSPqTKxvOka
+	 9/8rPlz31xY1HX3zoQhplxZKEU/4CVQZGQuLHHytQDL0AvoJCbo8K/KL4ZjUpQiGZ6
+	 bJHFg1mulzHURoWgrrwQ4wPt7zWRCWl7E1wc3XpkRGby6OdE9gcTy/Jqo+lLhYo2vX
+	 J4v/yMs4oEDQ4+3dLCTU7pxRxaU5ZNosQ5wfLK8D0WjZ0Uavk5kE5nl1zGkmGESD1V
+	 lX4hrzM+IEtbqxsWiCYQtc0lmSdVQKS6uPEGOhJxrlaEofTWxRx57CHgyDgbb7ZxIE
+	 iyoq/ff211PEg==
+Date: Thu, 2 May 2024 11:07:53 +0100
 From: Simon Horman <horms@kernel.org>
 To: Michael Chan <michael.chan@broadcom.com>
 Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
 	kuba@kernel.org, pabeni@redhat.com, andrew.gospodarek@broadcom.com,
-	Kalesh AP <kalesh-anakkur.purayil@broadcom.com>,
-	Selvin Thyparampil Xavier <selvin.xavier@broadcom.com>,
-	Vikas Gupta <vikas.gupta@broadcom.com>,
-	Pavan Chebbi <pavan.chebbi@broadcom.com>
-Subject: Re: [PATCH net-next v2 5/6] bnxt_en: Optimize recovery path ULP
- locking in the driver
-Message-ID: <20240502100719.GI2821784@kernel.org>
+	Ajit Khaparde <ajit.khaparde@broadcom.com>,
+	Selvin Thyparampil Xavier <selvin.xavier@broadcom.com>
+Subject: Re: [PATCH net-next v2 6/6] bnxt_en: Add VF PCI ID for 5760X (P7)
+ chips
+Message-ID: <20240502100753.GJ2821784@kernel.org>
 References: <20240501003056.100607-1-michael.chan@broadcom.com>
- <20240501003056.100607-6-michael.chan@broadcom.com>
+ <20240501003056.100607-7-michael.chan@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,83 +61,19 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240501003056.100607-6-michael.chan@broadcom.com>
+In-Reply-To: <20240501003056.100607-7-michael.chan@broadcom.com>
 
-On Tue, Apr 30, 2024 at 05:30:55PM -0700, Michael Chan wrote:
-> From: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
+On Tue, Apr 30, 2024 at 05:30:56PM -0700, Michael Chan wrote:
+> From: Ajit Khaparde <ajit.khaparde@broadcom.com>
 > 
-> In the error recovery path (AER, firmware recovery, etc), the
-> driver notifies the RoCE driver via ULP_STOP before the reset
-> and via ULP_START after the reset, all under RTNL_LOCK.  The
-> RoCE driver can take a long time if there are a lot of QPs to
-> destroy, so it is not ideal to hold the global RTNL lock.
-> 
-> Rely on the new en_dev_lock mutex instead for ULP_STOP and
-> ULP_START.  For the most part, we move the ULP_STOP call before
-> we take the RTNL lock and move the ULP_START after RTNL unlock.
-> Note that SRIOV re-enablement must be done after ULP_START
-> or RoCE on the VFs will not resume properly after reset.
-> 
-> The one scenario in bnxt_hwrm_if_change() where the RTNL lock
-> is already taken in the .ndo_open() context requires the ULP
-> restart to be deferred to the bnxt_sp_task() workqueue.
+> No driver logic changes are required to support the VFs, so just add
+> the VF PCI ID.
 > 
 > Reviewed-by: Selvin Thyparampil Xavier <selvin.xavier@broadcom.com>
-> Reviewed-by: Vikas Gupta <vikas.gupta@broadcom.com>
-> Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
-> Signed-off-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
+> Signed-off-by: Ajit Khaparde <ajit.khaparde@broadcom.com>
 > Signed-off-by: Michael Chan <michael.chan@broadcom.com>
 
 Reviewed-by: Simon Horman <horms@kernel.org>
-
-> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.c
-> index d9ea6fa23923..4cb0fabf977e 100644
-> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.c
-> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.c
-> @@ -437,18 +437,20 @@ static int bnxt_dl_reload_down(struct devlink *dl, bool netns_change,
->  
->  	switch (action) {
->  	case DEVLINK_RELOAD_ACTION_DRIVER_REINIT: {
-> +		bnxt_ulp_stop(bp);
->  		rtnl_lock();
->  		if (bnxt_sriov_cfg(bp)) {
->  			NL_SET_ERR_MSG_MOD(extack,
->  					   "reload is unsupported while VFs are allocated or being configured");
->  			rtnl_unlock();
-> +			bnxt_ulp_start(bp, 0);
->  			return -EOPNOTSUPP;
->  		}
->  		if (bp->dev->reg_state == NETREG_UNREGISTERED) {
->  			rtnl_unlock();
-> +			bnxt_ulp_start(bp, 0);
->  			return -ENODEV;
-
-Hi Selvin, Michael, all,
-
-FWIIW, I would have used a goto to unwind this and the previous error.
-No need to need to respin because of this.
-
->  		}
-> -		bnxt_ulp_stop(bp);
->  		if (netif_running(bp->dev))
->  			bnxt_close_nic(bp, true, true);
->  		bnxt_vf_reps_free(bp);
-> @@ -516,7 +518,6 @@ static int bnxt_dl_reload_up(struct devlink *dl, enum devlink_reload_action acti
->  		bnxt_vf_reps_alloc(bp);
->  		if (netif_running(bp->dev))
->  			rc = bnxt_open_nic(bp, true, true);
-> -		bnxt_ulp_start(bp, rc);
->  		if (!rc) {
->  			bnxt_reenable_sriov(bp);
->  			bnxt_ptp_reapply_pps(bp);
-> @@ -570,6 +571,8 @@ static int bnxt_dl_reload_up(struct devlink *dl, enum devlink_reload_action acti
->  		dev_close(bp->dev);
->  	}
->  	rtnl_unlock();
-> +	if (action == DEVLINK_RELOAD_ACTION_DRIVER_REINIT)
-> +		bnxt_ulp_start(bp, rc);
->  	return rc;
->  }
 
 
 
