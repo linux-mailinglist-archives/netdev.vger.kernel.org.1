@@ -1,132 +1,76 @@
-Return-Path: <netdev+bounces-92863-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-92864-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A09BC8B92A6
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 02:03:36 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CFC858B92DD
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 02:39:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 085CA282580
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 00:03:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 14F55B22324
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 00:39:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7591E802;
-	Thu,  2 May 2024 00:03:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC38710F4;
+	Thu,  2 May 2024 00:39:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="kp8qZs/i";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="eJnJ1sG7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hWf6D9aj"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 981287F6;
-	Thu,  2 May 2024 00:03:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81A8B12E40;
+	Thu,  2 May 2024 00:39:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714608211; cv=none; b=qASusfLfIuwtCQMSWZzrrcfGvXieCX0rJ2YF6uz5TPSAj+BBuL5+ahSWempTx+UHIMAKdMdjhPKFm7kX0DLykPh0BtGKoAAL6f+Jgwn0Gad8D/3/tYGhwH7Zc7FLhQHVGKL8l+dp5BBWe+WEkUEK9rX3nmfPQqtX5zJ8tjH7XH8=
+	t=1714610351; cv=none; b=OpQ/JF6CT+Qu38s6YJrduPqKwxNJfRTxRI1n7NtQeOZnK8TUcCsZDHwWlc2L8o9VRL3JI5MC5n4CyGI6gDz5B5v2pfvhPbO0rhAM9BtNfJ20SMJzFLcMIoqsjHa+gUU4SYjZ/TX5+WY4sHMkgssgxLGq9q0TncXv7WV7YVNoZ7Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714608211; c=relaxed/simple;
-	bh=1sKkjFU96N7WQ/Alcm0gt69fbHMFNm4H/4w/Y1PgO/w=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=DAp1tqmf3A25MfsbZLvqTFbnDlGFC1qtajQfDCyJsrg+Mq0M/KkpBJkCwgqaT/9TuVGDkHkva0mKV/k1i9HvYS9+PaxWnae0k35+ufqZaYgVH2zfCxRnxp3BMrYEUvOBqZsMrNlVEjrBoOayAc9jJsUDpS5gRr0znpAGU6Vn6ZA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=kp8qZs/i; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=eJnJ1sG7; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1714608202;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=J4jzCGoAK5gYl8hpdgidkPo+bYHUWqSGYg+U6RVV820=;
-	b=kp8qZs/i/NeO7qfmBU3pkT3RZ2CP7BAPeXs2WILS38escNUt21sBZ8FPt9ISkTZMM1JnR6
-	TgNk6LX4GPGmIA3aABXnoLlisukSiyZLBGOfl9+ZyZG8xd5tZi1u0ZfCtQYEsTt49JcA6D
-	/j1jfLobwICqaaUuO0qwuXKQWrwKtycYAnQiFIY/OnKMOiAMmicgsLedA4tCzQ9pJVQg2q
-	/jJlTqpyywNqqyW2lPvaXtcslXk0bDS5bYetRkwKaPskN/jBFFOuJ7iAFQkZe1yIPql96x
-	xmckFM53fcT+6ESd0DZF6IQleqJCg5Gd/Yvdf5WZNgIOpKeiGq2fRauCZzbHAA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1714608202;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=J4jzCGoAK5gYl8hpdgidkPo+bYHUWqSGYg+U6RVV820=;
-	b=eJnJ1sG70pSoKYDNmnIMoXYuvS14n1rytkredEJDGF5uaJOItsoLTMSzHeQnrN6W6lovD5
-	k+88/oJHU9x5qUBw==
-To: Herve Codina <herve.codina@bootlin.com>, Herve Codina
- <herve.codina@bootlin.com>, Rob Herring <robh@kernel.org>, Krzysztof
- Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Lee
- Jones <lee@kernel.org>, Arnd Bergmann <arnd@arndb.de>, Horatiu Vultur
- <horatiu.vultur@microchip.com>, UNGLinuxDriver@microchip.com, Andrew Lunn
- <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, Saravana Kannan <saravanak@google.com>, Bjorn
- Helgaas <bhelgaas@google.com>, Philipp Zabel <p.zabel@pengutronix.de>,
- Lars Povlsen <lars.povlsen@microchip.com>, Steen Hegelund
- <Steen.Hegelund@microchip.com>, Daniel Machon
- <daniel.machon@microchip.com>, Alexandre Belloni
- <alexandre.belloni@bootlin.com>
-Cc: linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
- netdev@vger.kernel.org, linux-pci@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, Allan Nielsen
- <allan.nielsen@microchip.com>, Steen Hegelund
- <steen.hegelund@microchip.com>, Luca Ceresoli <luca.ceresoli@bootlin.com>,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH 10/17] irqdomain: Add missing parameter descriptions in
- docs
-In-Reply-To: <20240430083730.134918-11-herve.codina@bootlin.com>
-References: <20240430083730.134918-1-herve.codina@bootlin.com>
- <20240430083730.134918-11-herve.codina@bootlin.com>
-Date: Thu, 02 May 2024 02:03:17 +0200
-Message-ID: <87cyq5rsfu.ffs@tglx>
+	s=arc-20240116; t=1714610351; c=relaxed/simple;
+	bh=Z9VX1f1FC95GMs7ZfpvcoQfILXoK5owTzy1b0L6NINA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=VQRzYCS+9JDIoRhFJHi2KefCEySF10KnyruQKPD9GlNQMPmd7xc107tndsmANIiBCqHsL8Pcnmp7KM/t2Ty4lRNHRW21mbWRqiYKt6+hcLp6im+hNo4rWMw0QcBI/BDJtwukSU+ElU6AlU+YvZPYdvK9hg5X3CpR92wDNo+pxiY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hWf6D9aj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA81AC072AA;
+	Thu,  2 May 2024 00:39:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714610351;
+	bh=Z9VX1f1FC95GMs7ZfpvcoQfILXoK5owTzy1b0L6NINA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=hWf6D9aj3JEwmqdjyhZg++cqIJqbk9FeDJxgkwhqsD+O91/wewmFEjy2PAlyBHeIC
+	 roo6VnRY8tD0goY8Py8JIM2EwANm9Dv/b7g2DlgBf2LROAC99SlMOZJPHXi3F1FxGt
+	 bRxnM5lhfnmc4rRrgot8Y9LfRpQoRcLAFjekTzuKgNiOAYdMw1CNkIMlY7W1WkcUBq
+	 XdHY52Mv88KlQTGA1vUqAyl4sq0uxTZfMiEg0LISG5XYTEw42HHSsL416ixfM4msTy
+	 PixK79X90PMKC/9voqQIFMnEryfC/Ch4NgHGiCB05iw9a8GRaNad1ryMt0JELrI84O
+	 p9ka5JISicmFw==
+Date: Wed, 1 May 2024 17:39:09 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: Miao Xu <miaxu@meta.com>, Eric Dumazet <edumazet@google.com>, "David S .
+ Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, David Ahern
+ <dsahern@kernel.org>, Martin Lau <kafai@meta.com>, netdev@vger.kernel.org,
+ bpf@vger.kernel.org
+Subject: Re: [PATCH net-next v2 3/3] Add test for the use of new args in
+ cong_control
+Message-ID: <20240501173909.3b7d3138@kernel.org>
+In-Reply-To: <a9aa6df0-b6ee-4512-acbe-7e30c98bba25@linux.dev>
+References: <20240501074338.362361-1-miaxu@meta.com>
+	<20240501074338.362361-3-miaxu@meta.com>
+	<a9aa6df0-b6ee-4512-acbe-7e30c98bba25@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, Apr 30 2024 at 10:37, Herve Codina wrote:
->  /**
->   * irq_domain_xlate_onecell() - Generic xlate for direct one cell bindings
-> + * @d: IRQ domain involved in the translation
+On Wed, 1 May 2024 13:19:38 -0700 Martin KaFai Lau wrote:
+> On 5/1/24 12:43 AM, Miao Xu wrote:
+> > This patch adds a selftest to show the usage of the new arguments in
+> > cong_control. For simplicity's sake, the testing example reuses cubic's
+> > kernel functions.  
+> 
+> Jakub, is it ok to target the set for the bpf-next?
 
-Please write out 'Interrupt domain'
-
-> + * @ctrlr: the DT node for the device whose interrupt we're translating
-
-Device tree node. And we are not translating anything.
-
-> + * @intspec: the interrupt specifier data from the DT
-> + * @intsize: the number of entries in @intspec
-> + * @out_hwirq: pointer at which to write the hwirq number
-
-Pointer to starage for the hardware interrupt number
-
-> + * @out_type: pointer at which to write the interrupt type
-
-...
-
-Please align these in tabular fashion:
-
-+ * @d:         Interrupt domain involved in the translation
-+ * @ctrlr:     The device tree node for the device whose interrupt is translated
-+ * @intspec:   The interrupt specifier data from the device tree
-+ * @intsize:   The number of entries in @intspec
-+ * @out_hwirq: Pointer to storage for the hardware interrupt number
-+ * @out_type:  Pointer to storage for the interrupt type
-
-
->  /**
->   * irq_domain_translate_onecell() - Generic translate for direct one cell
->   * bindings
-> + * @d: IRQ domain involved in the translation
-> + * @fwspec: FW interrupt specifier to translate
-
-Firmware interrupt specifier
-
-Thanks,
-
-        tglx
+SGTM!
 
