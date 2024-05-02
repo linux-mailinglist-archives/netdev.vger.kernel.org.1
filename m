@@ -1,119 +1,99 @@
-Return-Path: <netdev+bounces-93023-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93024-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 199078B9AFB
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 14:38:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48E828B9AFC
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 14:38:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4A6181C21667
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 12:38:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F3A9C1F23E54
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 12:38:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47A0541C60;
-	Thu,  2 May 2024 12:38:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="oMDQsSqw"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96B3762171;
+	Thu,  2 May 2024 12:38:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14B921CAB8
-	for <netdev@vger.kernel.org>; Thu,  2 May 2024 12:38:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3302753E27
+	for <netdev@vger.kernel.org>; Thu,  2 May 2024 12:38:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714653495; cv=none; b=kn2VKIitkhGw3bZoBmpgmiwbJlmTnyNKZMPstb7o2Tpd81Iu4abSKVLgQbZQU3SyjQbYmhk9MZ9FgYgF8voGxcqIeEwJPMEosFah+KIeBHluY7EHwGUUb2+3QIu24duWwXSJ4w/25HnU3tIGizOC0wgO4LK0erwpi8BICR4wuD8=
+	t=1714653507; cv=none; b=mZVAcmHDrOpwgoFBMwqiK4KpTVa67nXsZIuxULI80H3TjJvwYVYjs4TWghbn9vd0wylYTpL3J5TragSlDQVs7PVGbEubIte8pJqawJBdnMII5cDPVKDq+gwqF7+3jPQQ3kOXWRQhM+n2dhJShUyibey234h9Y8FSGvbfg0AU8XE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714653495; c=relaxed/simple;
-	bh=b03xhHlf8eHUI4kFfwDlk9U9pqh+wseed2O16UJzMXw=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EFyCjNoyQq6+Bvtg+LbcJjTJRy65pIn3yhIPfHE65Tx9jngEPAn0gbkQgdjjiSIlVV+/mZSdTiIn9QwtasvP4OSddlzBQPV28uo3R6eYFmR1mFuhzyowy+f3eq9i3l69T3bEmB+8jZ+4QNelO7a60wHi3/QAdf5GTXgdNQ6//tI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=oMDQsSqw; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id 9FBA9207FD;
-	Thu,  2 May 2024 14:38:09 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from a.mx.secunet.com ([127.0.0.1])
-	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Cx08afG5CH6d; Thu,  2 May 2024 14:38:08 +0200 (CEST)
-Received: from mailout1.secunet.com (mailout1.secunet.com [62.96.220.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id 686382082B;
-	Thu,  2 May 2024 14:38:06 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 686382082B
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1714653486;
-	bh=E4uCCdG+V1vUKFQMQDconOLLaYAtGSVstIArGnXLlN8=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
-	b=oMDQsSqwdEVQqwOqkhu+T2mDRS2a7e7E0mbQGP4F5ZjXGo1um1YCUqL6Cbwu7a6Pq
-	 JLd8tZ6vl8DfiHOrsZB9gVtsYPl5PjRFy9HewL8xVM0u+1ALlBFnp0DFV1M06KpdKp
-	 gBSlNa1B3LLklmrMfkP2ASrV6aElg45Tx+O6PJr648MpOjTDNhYd5bCk+JhHYbugVL
-	 Vdmf5+v3NrrxhD1zZZuiERkXjmbaCvwb+bWasSMODMT+4Ylw2t2l64MmEtFeyFLclN
-	 JofilnoMnR0APVKvBVOR9YDwyZpyVAPOdfqRfi2nqqxEENq4mEbv9A3e6mKn+sQkMV
-	 TmocfQhq8jhCw==
-Received: from cas-essen-01.secunet.de (unknown [10.53.40.201])
-	by mailout1.secunet.com (Postfix) with ESMTP id 58A5D80004A;
-	Thu,  2 May 2024 14:38:06 +0200 (CEST)
-Received: from mbx-essen-02.secunet.de (10.53.40.198) by
- cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Thu, 2 May 2024 14:38:06 +0200
-Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
- (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Thu, 2 May
- 2024 14:38:05 +0200
-Received: by gauss2.secunet.de (Postfix, from userid 1000)
-	id 8D5E131820A5; Thu,  2 May 2024 14:38:05 +0200 (CEST)
-Date: Thu, 2 May 2024 14:38:05 +0200
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: Antony Antony <antony@phenome.org>
-CC: <netdev@vger.kernel.org>, <devel@linux-ipsec.org>, Paul Wouters
-	<paul@nohats.ca>, Antony Antony <antony.antony@secunet.com>, Tobias Brunner
-	<tobias@strongswan.org>, Daniel Xu <dxu@dxuuu.xyz>
-Subject: Re: [PATCH ipsec-next 0/3] Add support for per cpu xfrm states.
-Message-ID: <ZjOJLXIQS23nkaW8@gauss3.secunet.de>
-References: <20240412060553.3483630-1-steffen.klassert@secunet.com>
- <ZjOFCQLjufp5ua0M@Antony2201.local>
+	s=arc-20240116; t=1714653507; c=relaxed/simple;
+	bh=D2nNSFE0GzhFOBu5BVbzRL/gL4zvbHJrs8eRk+GfaAs=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=jS7CymljQ2Royav4p2twVKnSxjMRmXo0UjtYyrmBA+3ZYodYvmhhKqQk0eXsnGHr8BxZ4q+f23Fs7J7eVmRD5sZvF1NSqSgZIdtwqcKntxMoGLy58gCYV06T/a+B39W2t//0D/EKuKjeqaPRedmP+IM0aiFkz1SXBdd/FwPYQXw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-7d9d0936d6aso889329739f.0
+        for <netdev@vger.kernel.org>; Thu, 02 May 2024 05:38:26 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714653505; x=1715258305;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=F/8KyUbi4Pj7yz3Rv0CBXW74l59ObuU0YwVCbxEM8D0=;
+        b=Mx1QO8csRCWL4QIGPczbQGXSIheSn3E0RPpNkI3VnMgYrK48B8Rs661vx8CMDn7sJ0
+         UaljaVtj+E/oSjKjcntrSrrWPSeTLD2GiCTklLxR9Ya9saKPRQw92k6YU5DRkMKh+yU1
+         +wJE43w/BYkzOHkz/x5lnPAqiwqOCUpeTiKN0OJWaZ1MXZXLnZ8vra294NrUCBLPzQ/D
+         96jCz6hYlnHVA7n7Sh96IwplP4oWRshR6CWXEchrlY1bmDlP6fbm4Zs6kr7F58zGGfC9
+         /0x2ylzS9koDf6B0oSqTTcUP5ds+HZN+ILFxu8I7Ymp3rJtjWH2FmEy522HHcAdPivQj
+         +nKg==
+X-Forwarded-Encrypted: i=1; AJvYcCWsL3U61J71B/8C/OWwSW5xdScdSYzp5qMNlTqNQ8iv0YFpNXdQ+6z/BhtxiWnC13rO296FCG9rOyGsV9ihrM7s47b6NUpW
+X-Gm-Message-State: AOJu0YwkqwXTeCIaGIshkOFXSONWB2CeCCM8wODNQ3ins7/x0TGNN7EM
+	k/tWVsBvtoITFEcuRuDoaqp/HqZhTyIa3woaye2eys7uQZf8ASCLx/KIVKt3V2rZH9s36DKgdPb
+	51GA/XOJK3+cG7PZitxHhMo6/Y7nAcS7Ho50jcCTRIjBV+uPsuF2krGc=
+X-Google-Smtp-Source: AGHT+IEizWOs2nvSEGGx8eJbCmEYpesqO999HC9/7yfeOUOjG3N8S5stcbzSboBiOmCGDOvdbP1z7jEJgbHslwXpAQAPvtUEDpdv
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <ZjOFCQLjufp5ua0M@Antony2201.local>
-X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
- mbx-essen-02.secunet.de (10.53.40.198)
-X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
+X-Received: by 2002:a05:6638:8c1a:b0:488:1050:6a2f with SMTP id
+ jl26-20020a0566388c1a00b0048810506a2fmr26697jab.5.1714653505498; Thu, 02 May
+ 2024 05:38:25 -0700 (PDT)
+Date: Thu, 02 May 2024 05:38:25 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000001bc267061777e143@google.com>
+Subject: [syzbot] Monthly wireguard report (May 2024)
+From: syzbot <syzbot+listc4826f4184213affe703@syzkaller.appspotmail.com>
+To: Jason@zx2c4.com, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com, wireguard@lists.zx2c4.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, May 02, 2024 at 02:20:25PM +0200, Antony Antony wrote:
-> 
-> On Fri, Apr 12, 2024 at 08:05:50AM +0200, Steffen Klassert via Devel wrote:
-> > Add support for per cpu xfrm states.
-> > 
-> > This patchset implements the xfrm part of per cpu SAs as specified in:
-> > 
-> > https://datatracker.ietf.org/doc/draft-ietf-ipsecme-multi-sa-performance/
-> > 
-> > Patch 1 adds the cpu as a lookup key and config option to to generate
-> > acquire messages for each cpu.
-> > 
-> > Patch 2 caches outbound states at the policy.
-> > 
-> > Patch 3 caches inbound states on a new percpu state cache.
-> > 
-> > Please review and test.
-> 
-> Hi Steffen,
-> 
-> I tried xfrm-pcpu-v8 branch, and get these kernel splats. I think it happens 
-> of the pervious version too. This kernel build has  KASAN enabled.
+Hello wireguard maintainers/developers,
 
-I've introduced this in v8 when I replaced get_cpu by smp_processor_id.
-I'll fix this when I rebase next time.
+This is a 31-day syzbot report for the wireguard subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/wireguard
 
+During the period, 2 new issues were detected and 0 were fixed.
+In total, 4 issues are still open and 16 have been fixed so far.
+
+Some of the still happening issues:
+
+Ref Crashes Repro Title
+<1> 939     No    KCSAN: data-race in wg_packet_send_staged_packets / wg_packet_send_staged_packets (3)
+                  https://syzkaller.appspot.com/bug?extid=6ba34f16b98fe40daef1
+<2> 1       No    WARNING in __kthread_bind_mask (2)
+                  https://syzkaller.appspot.com/bug?extid=36466e0ea21862240631
+<3> 1       No    WARNING in wg_packet_send_staged_packets
+                  https://syzkaller.appspot.com/bug?extid=c369d311130fba58211b
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
+
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
 
