@@ -1,179 +1,185 @@
-Return-Path: <netdev+bounces-93032-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93033-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 795218B9BE0
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 15:49:23 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 069A48B9C20
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 16:14:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2F5422844C0
-	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 13:49:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DD703B220A0
+	for <lists+netdev@lfdr.de>; Thu,  2 May 2024 14:14:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F46E13C687;
-	Thu,  2 May 2024 13:49:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CB0B13C694;
+	Thu,  2 May 2024 14:14:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RoKsyae2"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="So0Vbqp8"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99EAD13C676
-	for <netdev@vger.kernel.org>; Thu,  2 May 2024 13:49:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35E2E12DDBF;
+	Thu,  2 May 2024 14:14:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714657755; cv=none; b=ZiakKTA+XHUOK7vVgsFxO8tDNrWeYlT7nyfZsEc8fHyi9FFlXb3mXC5/k5QwSGQanRiApuDcenXrEuOZS0Uprkqm9hGNJ0BUrSa6Qj7VuQN9JsKvB+qpNHR0+qp/JIwpnWRw/prpG5IX54pFnOHXXW93/+/MczLxAvRclE+jTK4=
+	t=1714659273; cv=none; b=M8t0HqaTTI7Q9jYelJxl7p985XRFD7fs5dtxp4BBhVYZAAPcX3GNY4lVzMy/ZarOy1sUPxIVZBBBON7vzWMLlZZdlnFR9qkzevOG8TQsZdCey4cOnylPcexSGCB28SACLptQ9wBvpXDWMO2sriQWDKdZ1TBNAQsmF4s8zsYJ0qA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714657755; c=relaxed/simple;
-	bh=vVxLL8i98iBhBYnoNcpafxJISu1Z50Oip9xF6rNOG88=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=QzDoUPENyEjjz5DvhbAxXzEqu3R/XS76lXvFbWKK0idDA96FkTF4ZT5Vgo23ksMEIyijhsqelKLEu53lToODpp8/5tYZFSNtEtBTGTEz6iiXSSGj0GCDLXSuDNNxbLjHxzHSr4bVhCNN3MBHvttp5VZCjDOAmPzrsK1pThaqmsw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RoKsyae2; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1714657752;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=cwbiTB0Bb8e4LKusQ22V8ARx4WRfXXPLK23Z4+9kwOg=;
-	b=RoKsyae28D9LZ5FHqkCvljBgP1wQ0873M/uRkOeor0ehoivCm/6lgCfNnBwx83NRiGyed/
-	cOWwfbbmykScNkKG8w/eDj52uaWNGa4cMCcWt9oHF9fUTtFVctF+1KmAAf09DV+d5rLqrq
-	5tWzxDTO+16lN3b/dk7HyUuD3thM9+s=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-604-49Fw9r7kNPm6zDjRLb53vQ-1; Thu, 02 May 2024 09:49:11 -0400
-X-MC-Unique: 49Fw9r7kNPm6zDjRLb53vQ-1
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-34d9467c5f9so413278f8f.2
-        for <netdev@vger.kernel.org>; Thu, 02 May 2024 06:49:08 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714657747; x=1715262547;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cwbiTB0Bb8e4LKusQ22V8ARx4WRfXXPLK23Z4+9kwOg=;
-        b=t/Qi2anIpJZuKnKVJ6ElIwuqW6Gr4GyGviMDo0XmWBP8SyekMpSMlhboFTt3HzZh6z
-         EvQdvGIoJfdRKyRTOYgkST1QmTSclS7SywhGyiZozIC8Zhi7KMHyCYF91khnRaWuc3rs
-         1TLf+RQqtMrZNsxaV2rVuue9/vaa5//a6CLd31/hqiaQ5Lpx7zFNDj0AXDgmRpI8jck7
-         T6bHpJLNWA8CKk8lKj4no4KsV8IdrTRxcoIHqHM4Kd3pMEXM/qQXC8XUawg2cGaGg+Zn
-         +niCn1TZjbnN9FDkXibDOiMiHA79kEQji+848ECefP2oPVFPu5ze5Y/Sv1udepJ9s+qN
-         qOVw==
-X-Forwarded-Encrypted: i=1; AJvYcCVPjcWQbIhTASF0OhT5Wg8HmJ+U5lHNpfOAwKSVUldNy3BsQP3c17bMAYadnp70UEPtmQNdVh9XDG2ODXGu3SKph7/vUNYI
-X-Gm-Message-State: AOJu0YyJaHryjSJSB+QisAgF8v1bQxH49yPWRhoCAPxBm5s7PZwUny04
-	QkOnEsoPU0590qKQxsZo65FmWhlHfQEgMsvNJbJbRaXZkgf0DvbICQGVhveGTxW2QpkiOvR4r3y
-	gHhOuSqYXzUE580k1iKrzgfDmkz37p5XktjOxyY5Io9SHEzS9Z3fyrQ==
-X-Received: by 2002:adf:f8c8:0:b0:34d:8ccf:c9ce with SMTP id f8-20020adff8c8000000b0034d8ccfc9cemr3569981wrq.5.1714657747125;
-        Thu, 02 May 2024 06:49:07 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IExXQgZwvu7kgwOrg+G5EcVKbU2rvv0h+Ze7J9NkQbmU2l7DmurhqKAeG+mgk4f1QSK0MZSKA==
-X-Received: by 2002:adf:f8c8:0:b0:34d:8ccf:c9ce with SMTP id f8-20020adff8c8000000b0034d8ccfc9cemr3569963wrq.5.1714657746675;
-        Thu, 02 May 2024 06:49:06 -0700 (PDT)
-Received: from gerbillo.redhat.com ([2a0d:3344:1b52:6510::f71])
-        by smtp.gmail.com with ESMTPSA id y10-20020a5d620a000000b0034ddb760da2sm1325231wru.79.2024.05.02.06.49.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 May 2024 06:49:06 -0700 (PDT)
-Message-ID: <d28a2bea1c7bb28dd1870116ddbdba78cf3817a4.camel@redhat.com>
-Subject: Re: [PATCH net-next] net: phy: add wol config options in phy device
-From: Paolo Abeni <pabeni@redhat.com>
-To: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>, netdev@vger.kernel.org
-Cc: lxu@maxlinear.com, andrew@lunn.ch, hkallweit1@gmail.com, 
- linux@armlinux.org.uk, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org,  linux-kernel@vger.kernel.org, UNGLinuxDriver@microchip.com
-Date: Thu, 02 May 2024 15:49:04 +0200
-In-Reply-To: <20240430050635.46319-1-Raju.Lakkaraju@microchip.com>
-References: <20240430050635.46319-1-Raju.Lakkaraju@microchip.com>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
+	s=arc-20240116; t=1714659273; c=relaxed/simple;
+	bh=TqGPQfv5cuk6T1XGFYZfEGJtd5vUUufArvfOG8WA+bE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OTjh5RkpDKChZZJSIlo4tyFuFJVglEqEWwngo8pAR91R4NQS4bbJEGjoG/G7Qp/UA5J1pTxSrIw5An6h/jpNrkehecOYsUKN+vR0Xw7lNsSftPgwf2uixhMEDg0wV1p42njWs5Lu9bTI6lX+dzx9JIbAw4dkcwuu54xp0jhNZjk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=So0Vbqp8; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=/l18ESN+CGYoapWjh3HxNbj/XMovUs4b0G9wlX7P+3c=; b=So0Vbqp8qMueIWyjz6YJtlM1lU
+	uelnWzp88m6gGS1Ft8TAqTi9Uvcl8S++BJwu/q32Dg0hY4s7wu4LEta3rzw+c5dJWn5zvPANXk136
+	92zAq5NIYe+7xgaba3TMoKYW+9AgYRT2ygHgD0p9SqX+M4PFAzOjtlk/gENIOiVQf0iDihkoOG42q
+	UHQe79XI7teRc+uS1bQ+v0H82YTwr1LoTPpnanstLiz9QAZ0+UE5OOy21zXvhwapdRTA6aK5VP3bd
+	g1HfOqnaB7OVWuV+6K3NtAvyth+YsQfSI4lUbLds2In47jjJptrbdyGw9zJ3KSAfGjshM4ltqKjFt
+	8DYE8VdA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:60508)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1s2XCQ-0007N8-1b;
+	Thu, 02 May 2024 15:14:14 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1s2XCP-0003i3-J2; Thu, 02 May 2024 15:14:13 +0100
+Date: Thu, 2 May 2024 15:14:13 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Stefan Eichenberger <eichest@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+	lxu@maxlinear.com, hkallweit1@gmail.com, michael@walle.cc,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 2/2] net: phy: mxl-gpy: add new device tree property
+ to disable SGMII autoneg
+Message-ID: <ZjOftdnoToSSsVJ1@shell.armlinux.org.uk>
+References: <Zikd+GxuwMRC+5Ae@shell.armlinux.org.uk>
+ <Zikrv5UOWvSGjgcv@eichest-laptop>
+ <ZilLz8f6vQQCg4NB@shell.armlinux.org.uk>
+ <Zio9g9+wsFX39Vkx@eichest-laptop>
+ <ZippHJrnvzXsTiK4@shell.armlinux.org.uk>
+ <Zip8Hd/ozP3R8ASS@eichest-laptop>
+ <ZiqFOko7zFjfTdz4@shell.armlinux.org.uk>
+ <ZiqUB0lwgw7vIozG@eichest-laptop>
+ <Ziq5+gRXGmqt9bXM@shell.armlinux.org.uk>
+ <ZjOYuP5ypnH8GJWd@eichest-laptop>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZjOYuP5ypnH8GJWd@eichest-laptop>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Tue, 2024-04-30 at 10:36 +0530, Raju Lakkaraju wrote:
-> Introduce a new member named 'wolopts' to the 'phy_device' structure to
-> store the user-specified Wake-on-LAN (WOL) settings. Update this member
-> within the phy driver's 'set_wol()' function whenever the WOL configurati=
-on
-> is modified by the user.
->=20
-> Currently, when the system resumes from sleep, the 'phy_init_hw()' functi=
-on
-> resets the PHY's configuration and interrupts, which leads to problems up=
-on
-> subsequent WOL attempts. By retaining the desired WOL settings in 'wolopt=
-s',
-> we can ensure that the PHY's WOL configuration is correctly reapplied
-> through 'phy_ethtool_set_wol()' before a system suspend, thereby resolvin=
-g
-> the issue
->=20
-> Signed-off-by: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
-> ---
->  drivers/net/phy/mxl-gpy.c    | 5 +++++
->  drivers/net/phy/phy_device.c | 5 +++++
->  include/linux/phy.h          | 2 ++
->  3 files changed, 12 insertions(+)
->=20
-> diff --git a/drivers/net/phy/mxl-gpy.c b/drivers/net/phy/mxl-gpy.c
-> index b2d36a3a96f1..6edb29a1d77e 100644
-> --- a/drivers/net/phy/mxl-gpy.c
-> +++ b/drivers/net/phy/mxl-gpy.c
-> @@ -680,6 +680,7 @@ static int gpy_set_wol(struct phy_device *phydev,
->  	struct net_device *attach_dev =3D phydev->attached_dev;
->  	int ret;
-> =20
-> +	phydev->wolopts =3D 0;
->  	if (wol->wolopts & WAKE_MAGIC) {
->  		/* MAC address - Byte0:Byte1:Byte2:Byte3:Byte4:Byte5
->  		 * VPSPEC2_WOL_AD45 =3D Byte0:Byte1
-> @@ -725,6 +726,8 @@ static int gpy_set_wol(struct phy_device *phydev,
->  		ret =3D phy_read(phydev, PHY_ISTAT);
->  		if (ret < 0)
->  			return ret;
-> +
-> +		phydev->wolopts |=3D WAKE_MAGIC;
+On Thu, May 02, 2024 at 03:44:24PM +0200, Stefan Eichenberger wrote:
+> Hi Russell,
+> 
+> Sorry for the late reply but I wanted to give you some update after
+> testing with the latest version of your patches on net-queue.
 
-I'm wondering if 'phydev->wolopts' could/should be handled in the
-common code.
+I've also been randomly distracted, and I've been meaning to ping you
+to test some of the updates.
 
->  	} else {
->  		/* Disable magic packet matching */
->  		ret =3D phy_clear_bits_mmd(phydev, MDIO_MMD_VEND2,
-> @@ -748,6 +751,8 @@ static int gpy_set_wol(struct phy_device *phydev,
->  		if (ret & (PHY_IMASK_MASK & ~PHY_IMASK_LSTC))
->  			phy_trigger_machine(phydev);
-> =20
-> +		phydev->wolopts |=3D WAKE_PHY;
-> +
->  		return 0;
->  	}
-> =20
-> diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
-> index 616bd7ba46cb..9740f08ad98e 100644
-> --- a/drivers/net/phy/phy_device.c
-> +++ b/drivers/net/phy/phy_device.c
-> @@ -2038,6 +2038,11 @@ int phy_suspend(struct phy_device *phydev)
->  	if (phydev->suspended)
->  		return 0;
-> =20
-> +	if (phydev->wolopts) {
-> +		wol.wolopts =3D phydev->wolopts;
-> +		phy_ethtool_set_wol(phydev, &wol);
+http://git.armlinux.org.uk/cgit/linux-arm.git/log/?h=net-queue
 
-The above will fail when the phy does not provide wol operations -
-should never happen when 'wolopts !=3D 0', but possibly worth catching
-the error?
+The current set begins with:
 
-Thanks,
+"net: sfp-bus: constify link_modes to sfp_select_interface()" which is
+now in net-next, then the patches between and including:
 
-Paolo
+"net: phylink: validate sfp_select_interface() returned interface" to
+"net: phylink: clean up phylink_resolve()"
 
+That should get enough together for the PCS "neg" mode to be consistent
+with what the MAC driver sees.
+
+The remaining bits that I still need to sort out is the contents of
+phylink_pcs_neg_mode() for the 802.3z mode with PHY, and also working
+out some way of handling the SGMII case where the PHY and PCS disagree
+(one only supporting inband the other not supporting inband.)
+
+I'm not sure when I'll be able to get to that - things are getting
+fairly chaotic again, meaning I have again less time to spend on
+mainline... and I'd like to take some vacation time very soon (I really
+need some time off!)
+
+> I think I see the problem you are describing.
+> 
+> When the driver starts it will negotiate MLO_AN_PHY based on the
+> capabilities of the PHY and of the PCS. However when I switch to 1GBit/s
+> it should switch to MLO_AN_INBAND but this does not work. Here the
+> output of phylink:
+
+I'm designing this to work the other way - inband being able to fall
+back to PHY (out of band) mode rather than PHY mode being able to fall
+forwards to inband mode.
+
+> The problem is that the PCS continues to be in phy mode but the PHY
+> driver currently only supports LINK_INBAND_ENABLE and SGMII for 1GBit/s.
+> 
+> What I'm wondering is if it wouldn't make sense to adapt the phy driver
+> to support MLO_AN_PHY in SGMII/1000BASE-X mode.
+
+PHYs have no idea about MLO_AN_xxx at all, neither should they. This
+is not part of phylib's API, and I don't think PHYs should ever know
+about MLO_AN_xxx stuff (which is something purely between phylink and
+the MAC driver.) The structure here is:
+
+      MAC            PCS                   PHY
+       ^              ^                    ^ ^-----.
+       v              v                    v       |
+   MAC driver <-> PCS driver <-------> PHY driver  |
+       ^           ^                    ^          |
+       |           |                    |          |
+  MLO_AN_xxx  PHYLINK_PCS_NEG_xxx       |          |
+       `           '                    |          |
+        \         /                     v          |
+          phylink <----------------> phylib <------'
+
+MLO_AN_xxx is far beyond the PHY, and more or less defines the overall
+"system" operating mode. PHYLINK_PCS_NEG_xxx defines the properties
+used for the PCS link to the next device towards the media. This is
+more of relevance to what the PHY should be using on its MAC-facing
+interface.
+
+> Currently the mxl-gpy phy driver can only support:
+> 10/100/1000 MBit/s: SGMII with MLO_AN_INBAND
+> 2500MBit/s          2500Base-X with MLO_AN_PHY
+> 
+> However, the PHY would also support the following mode:
+> 10/100/1000 MBit/s: SGMII with MLO_AN_PHY
+
+The problem with this is some PHYs will not pass data _unless_ their
+SGMII control frame to the PCS has been acknowledged by the PCS - in
+other words, inband has to be used. However, that can be coped with,
+because such a PHY driver should be saying that it only supports
+LINK_INBAND_ENABLE in SGMII mode... and firmware must tell phylink
+that it wants to use inband mode (as that's exactly what firmware
+must do today in this situation.)
+
+> I just don't know how the PHY driver could know about what it should
+> configure.
+
+Currently, I haven't added an interface to cope with the case where
+a PHY says LINK_INBAND_ENABLE | LINK_INBAND_DISABLE to allow it to be
+configured in that case... that's something that will eventually be
+needed.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
