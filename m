@@ -1,188 +1,122 @@
-Return-Path: <netdev+bounces-93146-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93147-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1C818BA492
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 02:33:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 22A018BA4AD
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 02:46:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2E7141C22BD1
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 00:33:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9DE5228554F
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 00:46:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E81ED8C05;
-	Fri,  3 May 2024 00:32:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7122BBA53;
+	Fri,  3 May 2024 00:46:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nuJXEBmS"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 536F88BEF;
-	Fri,  3 May 2024 00:32:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AF358F47;
+	Fri,  3 May 2024 00:46:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714696373; cv=none; b=GtIQFkqZAbFDJa9+1c7uOU9lofq+4WnNY0mo+sOPVf2Pvh6R8KlLMlV+HicqB0UAnDppysVD7RB3nYcKvyrT47kRtzq372hfKJFe6VMUExIO5YPJ+wQcty5lDEEqsm8z6G2HJuOcCsMkJAX1LEPwROID4sEZCkukF2T+n/v6Z30=
+	t=1714697180; cv=none; b=DB2UoNhrTU+GYxwuw0yMc+ZGIbhneoDtcVpt12HbMm6e3db/C428LwQXs7exk7mAv8mnJg4QBL3qBoVw1A3d9xDP+QivuvxhxR7A3KXxsgYD+rGGvGhWjJf+TwuLQfQ7zrxInjWziUTPf+yizzS3DRurjpOITFO9/c53D59Sckc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714696373; c=relaxed/simple;
-	bh=SdCVeQJiT79EaxLVKjj2UoRsmDFDMTaLPUOwkaQzVCY=;
-	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NGvANPvyKhZ0J9cNPB5JMexrsSpqBrhqq0ab2OzSCodRkub5Ccn47k8xVZvIsUbroaHLz2hp6zZbjtWEDiaok42Ot31HNvY12FTPkywfM107AJw/4vzpUmdzu7MK4S4XsJVFX6LTtzYQwSQa0yFNkbVMVdXnEqqNojG3TfTvosw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.97.1)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1s2gqz-000000005JV-39Cy;
-	Fri, 03 May 2024 00:32:45 +0000
-Date: Fri, 3 May 2024 01:32:42 +0100
-From: Daniel Golle <daniel@makrotopia.org>
-To: Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>,
-	Mark Lee <Mark-MC.Lee@mediatek.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: [PATCH net 2/2] net: ethernet: mediatek: use QDMA instead of ADMAv2
- on MT7981 and MT7986
-Message-ID: <7815c0e3300563ec1d5a15d2080931461c5b2a9a.1714696206.git.daniel@makrotopia.org>
-References: <5f5d8880a9ec6339688828d6f33bc95e99c16d81.1714696206.git.daniel@makrotopia.org>
+	s=arc-20240116; t=1714697180; c=relaxed/simple;
+	bh=9gGS1WG9kjKboRFG4NTZO/zmtlJ0e+MxlRzL2OlV38I=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=GOXbW70/qGXkIE6fjjnINXeJXTYGmLkZ54jziH5eS3lv3B3O0+KYIxQKcF6fU/hq9IU94cM7K0DxLbvVFHuSULKzBYfGWuhRnmsXyNBuFtVxeCaVnDjGPRi97bgH8wkBRWKg19EQ6ke2dlHBQXbl3ztQIiQExYO3/Al2OED/G/I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nuJXEBmS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 25AD0C113CC;
+	Fri,  3 May 2024 00:46:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714697179;
+	bh=9gGS1WG9kjKboRFG4NTZO/zmtlJ0e+MxlRzL2OlV38I=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=nuJXEBmS1uju/RFoF2dhT0/QOueo7ZN4MJCLLrX8Zapl5GRBEqosYoepz9/nLuk3W
+	 qwUBAwe0bqZ3SGXmk6IOrqIgPsDMMtNz9ryQpLWKJv+X3CmfDNbo5ZsC8inItzzgdR
+	 4BKbWj6RxCLaTj8Fksa30xeEeG89gLXHERzVi6KSF0x1iZMjPgMv8fssR7mEpCLp27
+	 erwH3OUbTeI+5Gdil9h1/QKpXphcKFutAfhYzwNtPf/gPTPPt22TkLTyEhtFymUGVP
+	 pcf6ZIXo5VxrDNPSpv47yJK3IYhLDonXfy1pPyuUxeAnweG693V85unAv2cKXT8kJ+
+	 VASU61CmuyhIQ==
+Date: Thu, 2 May 2024 17:46:18 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Mina Almasry <almasrymina@google.com>
+Cc: Dragos Tatulea <dtatulea@nvidia.com>, "davem@davemloft.net"
+ <davem@davemloft.net>, "pabeni@redhat.com" <pabeni@redhat.com>,
+ "ilias.apalodimas@linaro.org" <ilias.apalodimas@linaro.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "jacob.e.keller@intel.com" <jacob.e.keller@intel.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>, Jianbo Liu
+ <jianbol@nvidia.com>, "edumazet@google.com" <edumazet@google.com>
+Subject: Re: [RFC PATCH] net: Fix one page_pool page leak from
+ skb_frag_unref
+Message-ID: <20240502174618.47c28727@kernel.org>
+In-Reply-To: <CAHS8izPBhZ1USvSoDdR-Xwg3jNL5ppRXTzc3FEM9gjx6B1fJAw@mail.gmail.com>
+References: <20240424165646.1625690-2-dtatulea@nvidia.com>
+	<4ba023709249e11d97c78a98ac7db3b37f419960.camel@nvidia.com>
+	<CAHS8izMbAJHatnM6SvsZVLPY+N7LgGJg03pSdNfSRFCufGh9Zg@mail.gmail.com>
+	<4c20b500c2ed615aba424c0f3c7a79f5f5a04171.camel@nvidia.com>
+	<CAHS8izPkRJyLctmyj+Ppc5j3Qq5O1u3aPe5h9mnFNHDU2OxA=A@mail.gmail.com>
+	<20240426160859.0d85908e@kernel.org>
+	<CAHS8izNs-LV=6FE39sjF3V7qVfveOsOAOJ_X62TSzWpvamsS0Q@mail.gmail.com>
+	<20240429080022.214a9df9@kernel.org>
+	<CAHS8izPBhZ1USvSoDdR-Xwg3jNL5ppRXTzc3FEM9gjx6B1fJAw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5f5d8880a9ec6339688828d6f33bc95e99c16d81.1714696206.git.daniel@makrotopia.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-ADMA is plagued by RX hangs which can't easily detected and happen upon
-receival of a corrupted package.
-Use QDMA just like on netsys v1 which is also still present and usable, and
-doesn't suffer from that problem.
+On Thu, 2 May 2024 13:08:23 -0700 Mina Almasry wrote:
+> OK, this is where I'm not sure anymore. The diff you're replying to
+> attempts to enforce the invariant: "if anyone wants a reference on an
+> skb_frag, skb_frag_ref will be a pp ref on pp frags
+> (is_pp_page==true), and page refs on non-pp frags
+> (is_pp_page==false)".
+> 
+> Additionally the page doesn't transition from pp to non-pp and vice
+> versa while anyone is holding a pp ref, because
+> page_pool_set_pp_info() is called right after the page is obtained
+> from the buddy allocator (before released from the page pool) and
+> page_pool_clear_pp_info() is called only after all the pp refs are
+> dropped.
+> 
+> So:
+> 
+> 1. We know the caller has a ref (otherwise get_page() wouldn't be safe
+> in the non-pp case).
+> 2. We know that the page has not transitioned from pp to non-pp or
+> vice versa since the caller obtained the ref (from code inspection, pp
 
-Fixes: 197c9e9b17b11 ("net: ethernet: mtk_eth_soc: introduce support for mt7986 chipset")
-Co-developed-by: Lorenzo Bianconi <lorenzo@kernel.org>
-Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
-Signed-off-by: Daniel Golle <daniel@makrotopia.org>
----
- drivers/net/ethernet/mediatek/mtk_eth_soc.c | 46 ++++++++++-----------
- 1 file changed, 23 insertions(+), 23 deletions(-)
+How do we know that?
 
-diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.c b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-index 3eefb735ce19..d7d73295f0dc 100644
---- a/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-+++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-@@ -110,16 +110,16 @@ static const struct mtk_reg_map mt7986_reg_map = {
- 	.tx_irq_mask		= 0x461c,
- 	.tx_irq_status		= 0x4618,
- 	.pdma = {
--		.rx_ptr		= 0x6100,
--		.rx_cnt_cfg	= 0x6104,
--		.pcrx_ptr	= 0x6108,
--		.glo_cfg	= 0x6204,
--		.rst_idx	= 0x6208,
--		.delay_irq	= 0x620c,
--		.irq_status	= 0x6220,
--		.irq_mask	= 0x6228,
--		.adma_rx_dbg0	= 0x6238,
--		.int_grp	= 0x6250,
-+		.rx_ptr		= 0x4100,
-+		.rx_cnt_cfg	= 0x4104,
-+		.pcrx_ptr	= 0x4108,
-+		.glo_cfg	= 0x4204,
-+		.rst_idx	= 0x4208,
-+		.delay_irq	= 0x420c,
-+		.irq_status	= 0x4220,
-+		.irq_mask	= 0x4228,
-+		.adma_rx_dbg0	= 0x4238,
-+		.int_grp	= 0x4250,
- 	},
- 	.qdma = {
- 		.qtx_cfg	= 0x4400,
-@@ -1107,7 +1107,7 @@ static bool mtk_rx_get_desc(struct mtk_eth *eth, struct mtk_rx_dma_v2 *rxd,
- 	rxd->rxd1 = READ_ONCE(dma_rxd->rxd1);
- 	rxd->rxd3 = READ_ONCE(dma_rxd->rxd3);
- 	rxd->rxd4 = READ_ONCE(dma_rxd->rxd4);
--	if (mtk_is_netsys_v2_or_greater(eth)) {
-+	if (mtk_is_netsys_v3_or_greater(eth)) {
- 		rxd->rxd5 = READ_ONCE(dma_rxd->rxd5);
- 		rxd->rxd6 = READ_ONCE(dma_rxd->rxd6);
- 	}
-@@ -2028,7 +2028,7 @@ static int mtk_poll_rx(struct napi_struct *napi, int budget,
- 			break;
- 
- 		/* find out which mac the packet come from. values start at 1 */
--		if (mtk_is_netsys_v2_or_greater(eth)) {
-+		if (mtk_is_netsys_v3_or_greater(eth)) {
- 			u32 val = RX_DMA_GET_SPORT_V2(trxd.rxd5);
- 
- 			switch (val) {
-@@ -2140,7 +2140,7 @@ static int mtk_poll_rx(struct napi_struct *napi, int budget,
- 		skb->dev = netdev;
- 		bytes += skb->len;
- 
--		if (mtk_is_netsys_v2_or_greater(eth)) {
-+		if (mtk_is_netsys_v3_or_greater(eth)) {
- 			reason = FIELD_GET(MTK_RXD5_PPE_CPU_REASON, trxd.rxd5);
- 			hash = trxd.rxd5 & MTK_RXD5_FOE_ENTRY;
- 			if (hash != MTK_RXD5_FOE_ENTRY)
-@@ -2690,7 +2690,7 @@ static int mtk_rx_alloc(struct mtk_eth *eth, int ring_no, int rx_flag)
- 
- 		rxd->rxd3 = 0;
- 		rxd->rxd4 = 0;
--		if (mtk_is_netsys_v2_or_greater(eth)) {
-+		if (mtk_is_netsys_v3_or_greater(eth)) {
- 			rxd->rxd5 = 0;
- 			rxd->rxd6 = 0;
- 			rxd->rxd7 = 0;
-@@ -3893,7 +3893,7 @@ static int mtk_hw_init(struct mtk_eth *eth, bool reset)
- 	else
- 		mtk_hw_reset(eth);
- 
--	if (mtk_is_netsys_v2_or_greater(eth)) {
-+	if (mtk_is_netsys_v3_or_greater(eth)) {
- 		/* Set FE to PDMAv2 if necessary */
- 		val = mtk_r32(eth, MTK_FE_GLO_MISC);
- 		mtk_w32(eth,  val | BIT(4), MTK_FE_GLO_MISC);
-@@ -5169,11 +5169,11 @@ static const struct mtk_soc_data mt7981_data = {
- 		.dma_len_offset = 8,
- 	},
- 	.rx = {
--		.desc_size = sizeof(struct mtk_rx_dma_v2),
--		.irq_done_mask = MTK_RX_DONE_INT_V2,
-+		.desc_size = sizeof(struct mtk_rx_dma),
-+		.irq_done_mask = MTK_RX_DONE_INT,
- 		.dma_l4_valid = RX_DMA_L4_VALID_V2,
--		.dma_max_len = MTK_TX_DMA_BUF_LEN_V2,
--		.dma_len_offset = 8,
-+		.dma_max_len = MTK_TX_DMA_BUF_LEN,
-+		.dma_len_offset = 16,
- 	},
- };
- 
-@@ -5195,11 +5195,11 @@ static const struct mtk_soc_data mt7986_data = {
- 		.dma_len_offset = 8,
- 	},
- 	.rx = {
--		.desc_size = sizeof(struct mtk_rx_dma_v2),
--		.irq_done_mask = MTK_RX_DONE_INT_V2,
-+		.desc_size = sizeof(struct mtk_rx_dma),
-+		.irq_done_mask = MTK_RX_DONE_INT,
- 		.dma_l4_valid = RX_DMA_L4_VALID_V2,
--		.dma_max_len = MTK_TX_DMA_BUF_LEN_V2,
--		.dma_len_offset = 8,
-+		.dma_max_len = MTK_TX_DMA_BUF_LEN,
-+		.dma_len_offset = 16,
- 	},
- };
- 
--- 
-2.45.0
+> info is not changed until all the refs are dropped for pp pages).
+> 3. AFAICT, it follows that if the page is pp, then the caller has a pp
+> ref, and if the page is non-pp, then the caller has a page ref.
+
+If that's true we have nothing to worry about.
+
+> 4. So, if is_pp_page==true, then the caller has a pp ref, then
+> napi_pp_get_page() should be concurrently safe.
+> 
+> AFAICT the only way my mental model is broken is if there is code
+> doing a raw get_page() rather than a skb_frag_ref() in core net stack.
+
+Not just. We also get pages fed from the outside, which may be PP pages.
+Right now it'd be okay because "from outside" pages would end up in Tx.
+Tx always allocates skbs with ->pp_recycle = 0, so we'll hold full refs.
+
+> I would like to get rid of these call sites if they exist. They would
+> not interact well with devmem I think (but could be made to work with
+> some effort).
+
+Maybe if we convert more code to operate on netmem_ref it will become
+clearer where raw pages get fed in, and therefore were we have to be
+very careful?
 
