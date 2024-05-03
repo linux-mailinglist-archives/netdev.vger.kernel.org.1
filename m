@@ -1,120 +1,128 @@
-Return-Path: <netdev+bounces-93252-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93253-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF3768BAC02
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 14:00:12 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D1338BAC0B
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 14:03:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EFF6B1C21BC1
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 12:00:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AAF8BB224E6
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 12:03:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86D9215219F;
-	Fri,  3 May 2024 12:00:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ZtirVIsK"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19409152DE0;
+	Fri,  3 May 2024 12:03:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8DDD14F9F9;
-	Fri,  3 May 2024 12:00:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABB662AF1A
+	for <netdev@vger.kernel.org>; Fri,  3 May 2024 12:03:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.69
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714737609; cv=none; b=CwhgXhHskuCO+uIhonAw6yURQrcuuqHsZzRneW5xnHaral3JOQ9fgXT5N8G1DkqAuyBfw1q40m5KgHJSAO2DKdljZemQynLOu6kQYRDWmL+SM4Eaj/UxZ7UxySlDGURCKmuIc8jffTGjsJ5OtCdbqT2KHWlequjCaX/kLdDAElE=
+	t=1714737785; cv=none; b=Q31SutU8yJ223AsfMvElZq1sXME/nraNkhi09tojqH9WMGzbkHJ3LIgAbWZZQeSt09EH6mbUhwP1z9potQw7i62+aJa2zf+jF6epY4yN+y21wgn4V3ZYWBlk6FSL4zAD6NXPfrOAsx6+VSV7STCce7ZeYxUbuRYjnPXq2EvlUNI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714737609; c=relaxed/simple;
-	bh=7LmhktS6u3Iwhbb36bRy5n7kXHjFejvVHfTey4yNvns=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KFey786s7+NvuzpE6c70hWR4fDzWgXSdDvlsvjCw7gwTRMKOyh10mnbkfzEmO1Ic93EIzI58kqpHEc79a4hyAEALC4kc/FjpIETAGq5tmwfKPWxWVVIKb/ikyuwOwPdPyhn8M8bolVyM4zWuX0bVKvJuBTmdA6iin7ZUoxPzz6o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ZtirVIsK; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=3NPrbtUhHTLw5GFQKfpOgz03Eo6EbkYCxwv51hwLt40=; b=ZtirVIsK183q63ycUbDU4dcB6M
-	DAFbTBclzS+1SxL5+FQ15AI+s1jb/xR18iTpnFP+XMI3OP5N5dAaAxVHejQWISyRZBc1DiRoFqxM+
-	fFAtOCMqM5Z3iDbboV/ea1CHbXzGbEzGKAToqddIBaBnktEweBB3GVlKSrDWgMcTLQHk=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1s2rZw-00EZL8-Qp; Fri, 03 May 2024 13:59:52 +0200
-Date: Fri, 3 May 2024 13:59:52 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Niklas =?iso-8859-1?Q?S=F6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-Cc: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org
-Subject: Re: [net-next] net: ethernet: rtsn: Add support for Renesas
- Ethernet-TSN
-Message-ID: <e3ce12b0-fb5d-49d7-a529-9ea7392b80ca@lunn.ch>
-References: <20240414135937.1139611-1-niklas.soderlund+renesas@ragnatech.se>
- <5fd25c58-b421-4ec0-8b4f-24f86f054a44@lunn.ch>
- <20240503102006.GI3927860@ragnatech.se>
+	s=arc-20240116; t=1714737785; c=relaxed/simple;
+	bh=Tfvgm57rWXZCvAHQ95gWX30+ZUQFE+tqBAMhScTVX3w=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=rIoq8wrNv0SVz105YggAdClMoMhq6zdEyBNJrXyHTzf+tE0xMR5eaJ2369q5aMYukuCQ+Q37I9GY/nS0PaEpeWFnahNgNends5GZBLucepG/RIHyFS4OXvOtGLDzGFclFy6I/7mmxFJ6N/ydSQwykPGdjZZcOcxFL7qP4vmfbV8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-7dd8cd201d6so974272939f.0
+        for <netdev@vger.kernel.org>; Fri, 03 May 2024 05:03:03 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714737783; x=1715342583;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=lvhlXVMsZVy7ILT0OQqr82SnKRy1BHg9zJFIo9acu94=;
+        b=TZ898xvft9NuNYfM2Deuwg6GkwRBHTE9+D++Ctynl9g165MIvJv5fwaIz6Rg5U4DBA
+         eWR96M1FfRhn7e8T0iEMbm8rtYvK1xsRebC8tKGbpA78+bHopAyfFlN7PNLPiPpmPh8S
+         n6BdjcO2YFQe37lMgfyKkcnt+hrzlrGOGUa29Na1XU9bsDYxR/pmyxb6XelfkZ/HnYp5
+         abfRlvalHHBFXxndOatzIWcOs75qYAuyGyWzoGec6ig8P0LjVsnh0XOIsU15x33RFshE
+         LlNY8dhurHhf2gM5LwqF+OS5wmSIyfEsQ49YEEswQxc6RqbYrQbQJbVyCdqymDB6Bgjq
+         CjSQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWG83QOs4lxurBpTYMn6uTCzQozHd9ecWFuELyDOTWoJURBZAFVZVAMEVI4pALzqL+d4M8mwamaVEosc3U3cB/8yyznfKoP
+X-Gm-Message-State: AOJu0Yxjuyq3uFJRx851qdIfQG/3Ddqu62bCRmxClVxf+mCElDdNSfQH
+	V1irfs8EDnfutprDKbDgRVJuO5XO2wUQf1BZOWAgR/lPuOcdwG7n/9X/Hw+rqeBlQ26fC/6lYZ2
+	N4ETE/nwCviGpQgy5a0by5m3qGSG8WWlBiHG04P72gR6R49+0MvTSrjM=
+X-Google-Smtp-Source: AGHT+IEtTVd6O4AIGhQyZgRT0GRSHJD9Y5CeDMPPLQ7yiKBLaNMFSNFBPqcBur1fJS4nTGl8YMbrnRgOYLZVhyQPzg+977qwj9+h
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240503102006.GI3927860@ragnatech.se>
+X-Received: by 2002:a05:6602:3f8b:b0:7de:e175:fd2d with SMTP id
+ fb11-20020a0566023f8b00b007dee175fd2dmr106870iob.3.1714737783003; Fri, 03 May
+ 2024 05:03:03 -0700 (PDT)
+Date: Fri, 03 May 2024 05:03:02 -0700
+In-Reply-To: <20240503091844.1161175-1-luyun@kylinos.cn>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000706ce506178b80a2@google.com>
+Subject: Re: [syzbot] [kasan?] [mm?] INFO: rcu detected stall in __run_timer_base
+From: syzbot <syzbot+1acbadd9f48eeeacda29@syzkaller.appspotmail.com>
+To: linux-kernel@vger.kernel.org, luyun@kylinos.cn, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-> > > +static int rtsn_mii_register(struct rtsn_private *priv)
-> > > +{
-> > > +	struct platform_device *pdev = priv->pdev;
-> > > +	struct device *dev = &pdev->dev;
-> > > +	struct device_node *mdio_node;
-> > > +	struct mii_bus *mii;
-> > > +	int ret;
-> > > +
-> > > +	mii = mdiobus_alloc();
-> > > +	if (!mii)
-> > > +		return -ENOMEM;
-> > > +
-> > > +	mdio_node = of_get_child_by_name(dev->of_node, "mdio");
-> > > +	if (!mdio_node) {
-> > > +		ret = -ENODEV;
-> > > +		goto out_free_bus;
-> > > +	};
-> > > +
-> > > +	mii->name = "rtsn_mii";
-> > > +	sprintf(mii->id, "%s-%x", pdev->name, pdev->id);
-> > > +	mii->priv = priv;
-> > > +	mii->read = rtsn_mii_read;
-> > > +	mii->write = rtsn_mii_write;
-> > > +	mii->read_c45 = rtsn_mii_read_c45;
-> > > +	mii->write_c45 = rtsn_mii_write_c45;
-> > 
-> > Just leave these two empty, and the core will do C45 over C22 for you.
-> 
-> Does this not require the bus to be created/allocated with an 
-> implementation that support this, for example mdio_i2c_alloc() or 
-> alloc_mdio_bitbang()?  This bus is allocated with mdiobus_alloc() which 
-> do not implement this. Removing the C45 functions here result in 
-> __mdiobus_c45_read() returning -EOPNOTSUPP as bus->read_c45 is not set.
+Hello,
 
-phy_read_mmd():
-  __phy_read_mmd():
-      mmd_phy_read():
+syzbot has tested the proposed patch but the reproducer is still triggering an issue:
+UBSAN: array-index-out-of-bounds in ktime_mono_to_any
 
-So is is_c45 is true?
+------------[ cut here ]------------
+UBSAN: array-index-out-of-bounds in kernel/time/timekeeping.c:927:20
+index 3 is out of range for type 'ktime_t *[3]' (aka 'long long *[3]')
+CPU: 0 PID: 5514 Comm: syz-executor.0 Not tainted 6.9.0-rc6-syzkaller-00131-gf03359bca01b-dirty #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0x241/0x360 lib/dump_stack.c:114
+ ubsan_epilogue lib/ubsan.c:231 [inline]
+ __ubsan_handle_out_of_bounds+0x121/0x150 lib/ubsan.c:429
+ ktime_mono_to_any+0xf7/0x100 kernel/time/timekeeping.c:927
+ taprio_get_offset net/sched/sch_taprio.c:178 [inline]
+ taprio_get_start_time+0xf6/0x2a0 net/sched/sch_taprio.c:1232
+ taprio_change+0x30c5/0x42d0 net/sched/sch_taprio.c:1963
+ taprio_init+0x9da/0xc80 net/sched/sch_taprio.c:2135
+ qdisc_create+0x9d6/0x1190 net/sched/sch_api.c:1355
+ tc_modify_qdisc+0xa26/0x1e40 net/sched/sch_api.c:1776
+ rtnetlink_rcv_msg+0x89d/0x10d0 net/core/rtnetlink.c:6595
+ netlink_rcv_skb+0x1e5/0x430 net/netlink/af_netlink.c:2559
+ netlink_unicast_kernel net/netlink/af_netlink.c:1335 [inline]
+ netlink_unicast+0x7ec/0x980 net/netlink/af_netlink.c:1361
+ netlink_sendmsg+0x8e1/0xcb0 net/netlink/af_netlink.c:1905
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ __sock_sendmsg+0x223/0x270 net/socket.c:745
+ ____sys_sendmsg+0x525/0x7d0 net/socket.c:2584
+ ___sys_sendmsg net/socket.c:2638 [inline]
+ __sys_sendmsg+0x2b0/0x3a0 net/socket.c:2667
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf5/0x240 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7fca4dc7de69
+Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 e1 20 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fca4e9720c8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007fca4ddabf80 RCX: 00007fca4dc7de69
+RDX: 0000000000000000 RSI: 00000000200007c0 RDI: 0000000000000004
+RBP: 00007fca4dcca47a R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 000000000000000b R14: 00007fca4ddabf80 R15: 00007fffc66d5928
+ </TASK>
+---[ end trace ]---
 
-I would expect it to be false, so that it then uses
 
-	mmd_phy_indirect(bus, phy_addr, devad, regnum);
-	/* Write the data into MMD's selected register */
-	return __mdiobus_write(bus, phy_addr, MII_MMD_DATA, val);
+Tested on:
 
-which is C45 over C22.
+commit:         f03359bc Merge tag 'for-6.9-rc6-tag' of git://git.kern..
+git tree:       https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git master
+console output: https://syzkaller.appspot.com/x/log.txt?x=17aef62f180000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=38cdad974684e704
+dashboard link: https://syzkaller.appspot.com/bug?extid=1acbadd9f48eeeacda29
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+patch:          https://syzkaller.appspot.com/x/patch.diff?x=1665ecc0980000
 
-If is_c45 is true, what is setting it true?
-
-      Andrew
 
