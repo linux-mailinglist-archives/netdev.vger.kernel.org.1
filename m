@@ -1,136 +1,125 @@
-Return-Path: <netdev+bounces-93318-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93322-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67C678BB2FD
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 20:25:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C5698BB31B
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 20:30:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8B3CDB2237E
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 18:25:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BAADE281F21
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 18:30:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2967157E86;
-	Fri,  3 May 2024 18:22:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1971B15887C;
+	Fri,  3 May 2024 18:30:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IghObs9a"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="Ppu7nfIu";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="7wdPy5A+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37DB31552FE
-	for <netdev@vger.kernel.org>; Fri,  3 May 2024 18:22:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E019139D19;
+	Fri,  3 May 2024 18:30:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714760523; cv=none; b=HUtkxrV96qJLbuL9hOFa9H2RKVJ/+mCB98y8S3JaqiQ3410m3Ch2Y9TiydlJapoo2DqAKwGZEChBH9iscdIjgS02LxLEr+Z0p6pn65IMKtQU/miCvsbSisg8Btct9LWSphzzn0NyDirgP8P77u7/IERPNjDBz33oDuCbjPnZTyQ=
+	t=1714761009; cv=none; b=uMrDA2RwUJjZwFKYdbRuQR3gSRMP/Rq8nh7MG8Qs+s2cgD2AiM/rjBfEi4dWPACgwUtwQy3Tp1194uLQM2zA19crG308+ff5hCmO47HvBcuEsjX5dI3IDgcCz75fRQmwww4hJHPyFDL9T1cEe9IpZKCnpdGI8G6kbVzmk8/8+CU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714760523; c=relaxed/simple;
-	bh=nm7CSw+eklSwGG1xoezV37RRMBIUAqkFOWel9pGPPtA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=X4ar4qlrf07yiWHoJnrEW/jzP6FbZOERY7CBD5cagzYANTg3tY0Uhq6DlyKUa/YB9349HIM7Z+aSf8BPn1y3bsYwAnR1ay6FRtAG5hc8kRGfGDMsrZrQRwDKYB0xwjCvzQx27mBc2htrwvmRRYdY3QhrZSCa1KAi4YEBgKcmIYo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IghObs9a; arc=none smtp.client-ip=209.85.167.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-51f8211c588so1154177e87.0
-        for <netdev@vger.kernel.org>; Fri, 03 May 2024 11:22:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1714760520; x=1715365320; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=P5wr2BsnoIzuUJWHwNQi6KC107tzXGiigwRha3BHCDI=;
-        b=IghObs9awm3KbCAhdzqWSoUV1lBrt9CY1JH54xxO3kPwCyvRT/T0Kn3UZ+jgAutS2u
-         yD3hY4kQ6Id+xiNBxJY8CT86IzXHZDMHENGvXG1AlsKDAexflHFpdcbGCCYkUDs0tkDb
-         MYhftaH4+FHDQvjKDfLoROwlLHsDN6BobG+a8wbdzqRenx/Jg8GVyYSRDffz9vDutZXY
-         JRvVUtLLgeLMvZw4hQ82S/cbkaD42ypomjuxrMtiIrH6oObAJrblrhWhhMq2lGdVV/ea
-         CJn1H6Dmcxf/MzvT7Ugd9hSYwNiQQB1BHDVaXi+1eu7krKK7MRqW9d6to0uVZASj0apc
-         qbzQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714760520; x=1715365320;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=P5wr2BsnoIzuUJWHwNQi6KC107tzXGiigwRha3BHCDI=;
-        b=DnIYO29QfKNm/5trXAPgzftt5j7ACrbwCE2tZa8PP6Vjz2UiLDcAwx/2K7Qr9qPToa
-         CVzisueD4DSYUODV+IHnT26AUB6z8j3rhshgh2fPKMNOcc713SsBkXwSWhPvG44kqgWT
-         ZXN0ndUuuOviArQ/rdN77p/ii4ximZ87kxuRN/tYX77eYJSzZUcaeLhaij41k6h3ncU4
-         ClDMglY9ZD54qYPMguAYC7el8sjrrLNiqQUUBGnRo7mhP83+Ae8+BwplRUNZTrnOa0EZ
-         CtQB0KKAHDrBrEw+WjsFH/QIyxY8ZLZsPP9ih2EoLXNlWXq+xiQNA0e/cJJ1IP21WgZ/
-         8AVw==
-X-Forwarded-Encrypted: i=1; AJvYcCWUA5m8GCJBNXsVonjAq8RebZTMCtnDKznSI8Ts4QUwQ+jEhiHXo4LnzOPqsovb//tjeqE4bJpfzpdLuBFFH8OTBxGVqDQX
-X-Gm-Message-State: AOJu0YyunlAKOzeOSOUXZl3yNNUN0lRDMM0bBCO8t0iZI0xddkj3v+4/
-	mmMEPqfIDMzko5kSyHpICbNiY4KOJoB9yuhiVrFXJQLjgbEC98K9
-X-Google-Smtp-Source: AGHT+IHVa5+i4saOyGGzjYJczF64l+jJL5LHfy45+d6PMy4L0R7fd6IkUszCfdYBld9RInnZQPSVCA==
-X-Received: by 2002:a05:6512:1583:b0:519:2a88:add6 with SMTP id bp3-20020a056512158300b005192a88add6mr2744815lfb.55.1714760520077;
-        Fri, 03 May 2024 11:22:00 -0700 (PDT)
-Received: from mobilestation ([178.176.56.174])
-        by smtp.gmail.com with ESMTPSA id bi5-20020a0565120e8500b0051cb300265dsm602620lfb.109.2024.05.03.11.21.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 May 2024 11:21:59 -0700 (PDT)
-Date: Fri, 3 May 2024 21:21:56 +0300
-From: Serge Semin <fancer.lancer@gmail.com>
-To: Yanteng Si <siyanteng@loongson.cn>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com, 
-	alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com, 
-	chenhuacai@kernel.org, linux@armlinux.org.uk, guyinggang@loongson.cn, 
-	netdev@vger.kernel.org, chris.chenfeiyang@gmail.com, siyanteng01@gmail.com
-Subject: Re: [PATCH net-next v12 07/15] net: stmmac: dwmac-loongson: Add ref
- and ptp clocks for Loongson
-Message-ID: <26kbmvputkbfuz7zdfa2wblsgz5sn6iwucwscswwrpbu7ttwmj@3btn75ewpdwi>
-References: <cover.1714046812.git.siyanteng@loongson.cn>
- <aa9e291e181017146f88238cdeec9f18759915c3.1714046812.git.siyanteng@loongson.cn>
+	s=arc-20240116; t=1714761009; c=relaxed/simple;
+	bh=74/0AKsnF9vBQRTv+86J/6a3kei1SXSM/rCzTC9ygsM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=XaKTO6F7DpTUYHIzz/8x2e4xgO2y9ty4cr3B3xgti59wbZzUqzqA8swqAwQLimcQ8fDfuO/5Dl740SipJu6+36iyF6Sa0Ud3+0KzTJmKVSfnSgcpDgFqslkPw2C7fUh8LgnS9ROp10OECPJJ/Kmr1w/52RyryK4rbJc1sjwGFaU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=Ppu7nfIu; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=7wdPy5A+; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1714761005;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=+L2OHtZGBVAI0AzBMGBr/lDGosDbMk0Ei6sq1IBWuVc=;
+	b=Ppu7nfIusKN+1NEBP9Cj+ylvfFl2Rr2yfx6sxiesPdeDuTzk2ge/+lzj8delQEA83Y9WPb
+	2GUeBYsZd2VD4hp4h0lsUlo6IYtBxI9nMCyKW0z46IJg0wjqOXuJPPebbKoa1q7k1+4eOK
+	dByO+YeuD1daiokAvKf2cZ/zvPRJkcLIp+QBQt5fr8FTTOsXAlmQyCCW1ZKsr5e5kgOlLh
+	lL77tEPZD0Mtuzp8JXI6LnK+q3Re7/LhVEgqOWojN8ULEPXwobn6S6/qG+9PNE2K/6PUzO
+	nlAD+PBmSiO3igZAFknGs0fwxL81P0CWYHDfPhWPGGY8O7wLtnla2rCtCA1laA==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1714761005;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=+L2OHtZGBVAI0AzBMGBr/lDGosDbMk0Ei6sq1IBWuVc=;
+	b=7wdPy5A+jZsO+4HaU3i8bJJIZjAXBJH0k7XSH/fFPG85io9JfzgW6FEV+YtX7UgQDwjRcC
+	JBXUYRUDC0SP6vCA==
+To: linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Boqun Feng <boqun.feng@gmail.com>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Waiman Long <longman@redhat.com>,
+	Will Deacon <will@kernel.org>
+Subject: [PATCH v2 net-next 00/15] locking: Introduce nested-BH locking.
+Date: Fri,  3 May 2024 20:25:04 +0200
+Message-ID: <20240503182957.1042122-1-bigeasy@linutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aa9e291e181017146f88238cdeec9f18759915c3.1714046812.git.siyanteng@loongson.cn>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-> [PATCH net-next v12 07/15] net: stmmac: dwmac-loongson: Add ref and ptp clocks for Loongson
+Disabling bottoms halves acts as per-CPU BKL. On PREEMPT_RT code within
+local_bh_disable() section remains preemtible. As a result high prior
+tasks (or threaded interrupts) will be blocked by lower-prio task (or
+threaded interrupts) which are long running which includes softirq
+sections.
 
-s/ptp/PTP
+The proposed way out is to introduce explicit per-CPU locks for
+resources which are protected by local_bh_disable() and use those only
+on PREEMPT_RT so there is no additional overhead for !PREEMPT_RT builds.
 
-Mentioning Loongson is redundant. Just:
+The series introduces the infrastructure and converts large parts of
+networking which is largest stake holder here. Once this done the
+per-CPU lock from local_bh_disable() on PREEMPT_RT can be lifted.
 
-net: stmmac: dwmac-loongson: Init ref and PTP clocks rate
+v1=E2=80=A6v2 https://lore.kernel.org/all/20231215171020.687342-1-bigeasy@l=
+inutronix.de/:
+- Jakub complained about touching networking drivers to make the
+  additional locking work. Alexei complained about the additional
+  locking within the XDP/eBFP case.
+  This led to a change in how the per-CPU variables are accessed for the
+  XDP/eBPF case. On PREEMPT_RT the variables are now stored on stack and
+  the task pointer to the structure is saved in the task_struct while
+  keeping every for !RT unchanged. This was proposed as a RFC in
+  	v1: https://lore.kernel.org/all/20240213145923.2552753-1-bigeasy@linutro=
+nix.de/
 
-On Thu, Apr 25, 2024 at 09:06:10PM +0800, Yanteng Si wrote:
-> The ref/ptp clock of gmac(amd gnet) is 125000000.
+  and then updated
 
-What about a log like this?
+        v2: https://lore.kernel.org/all/20240229183109.646865-1-bigeasy@lin=
+utronix.de/
+	  - Renamed the container struct from xdp_storage to bpf_net_context.
+            Suggested by Toke H=C3=B8iland-J=C3=B8rgensen.
+	  - Use the container struct also on !PREEMPT_RT builds. Store the
+	    pointer to the on-stack struct in a per-CPU variable. Suggested by
+            Toke H=C3=B8iland-J=C3=B8rgensen.
 
-"Reference and PTP clocks rate of the Loongson GMAC devices is 125MHz.
-(So is in the GNET devices which support is about to be added.) Set
-the respective plat_stmmacenet_data field up in accordance with that
-so to have the coalesce command and timestamping work correctly."
+  This reduces the initial queue from 24 to 15 patches.
 
--Serge(y)
+- There were complains about the scoped_guard() which shifts the whole
+  block and makes it harder to review because the whole gets removed and
+  added again. The usage has been replaced with local_lock_nested_bh()+
+  its unlock counterpart.
 
-> 
-> Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
-> Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
-> Signed-off-by: Yanteng Si <siyanteng@loongson.cn>
-> ---
->  drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c | 3 +++
->  1 file changed, 3 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-> index 904e288d0be0..9f208f84c1e7 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-> @@ -32,6 +32,9 @@ static void loongson_default_data(struct plat_stmmacenet_data *plat)
->  	/* Disable RX queues routing by default */
->  	plat->rx_queues_cfg[0].pkt_route = 0x0;
->  
-> +	plat->clk_ref_rate = 125000000;
-> +	plat->clk_ptp_rate = 125000000;
-> +
->  	/* Default to phy auto-detection */
->  	plat->phy_addr = -1;
->  
-> -- 
-> 2.31.4
-> 
+Sebastian
+
 
