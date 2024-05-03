@@ -1,124 +1,144 @@
-Return-Path: <netdev+bounces-93220-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93221-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05D1A8BAA97
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 12:18:41 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A431E8BAA9B
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 12:18:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B68DE2844DC
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 10:18:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D8B3DB21943
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 10:18:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BDCC14F9EC;
-	Fri,  3 May 2024 10:18:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10BC215098B;
+	Fri,  3 May 2024 10:18:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GlGL3H5i"
+	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="qsp5u4qo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B4BC14F9F8
-	for <netdev@vger.kernel.org>; Fri,  3 May 2024 10:18:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74DD714F9F8
+	for <netdev@vger.kernel.org>; Fri,  3 May 2024 10:18:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.122
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714731513; cv=none; b=T862I0I+ZAon5o4KlyuNacFG31MCd1o4cMy1yfMbgjLQ9tkwiLIVKpUils9TQtuBjgc1U2qbySt32XKJik9FNZPkh7qDKZzHHVMISRSr6O26MRR9yu/FxCrjJS1L/y9ngS2rHtbp6AdS0NT4sVj4S9jJ00hb6OpHmK4nLKipbUs=
+	t=1714731523; cv=none; b=VF6KceP2k9Tbt4ezdZoSLjPpyyQW9T21+bKHbwfmyGw1tftP6HMzGVa42oZVbwAACaTtN+jvQAdtMs7k/qF2zYhNEJfWMwimaU2kYjNvbDH+2g3twq1YKwMfLbbPvCvnJkSRdzm4XJ51t2Jw/LVEhdr1BUrJrJ+hGJk8C5hvho4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714731513; c=relaxed/simple;
-	bh=z1RM2AZucoVbpGD+yIbTGTAe9/SCauSVk5ykbcLAGSA=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
-	 MIME-Version:Content-Type; b=ChKXR4aa0ggk/7S5BcB/5PQ8cn0GihKcUjU9yHjichkkbX+GGMRxSJA0MYOqokFIQDWhUO6CAL5ZW+SnsB7oPdpljpboJwVzc68K13WuKhhAn/2Xlb2Yah5u26NLgYwj0QPl8NOQImmWGmOy4uVC3WpQOCZUox5sFq/HlPECWtQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GlGL3H5i; arc=none smtp.client-ip=209.85.128.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-41a1d88723bso63935915e9.0
-        for <netdev@vger.kernel.org>; Fri, 03 May 2024 03:18:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1714731509; x=1715336309; darn=vger.kernel.org;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=OfDHb85z1DkjQut1/Jkb3/MNWNmze9D3fbDna+xKi0U=;
-        b=GlGL3H5iqErnGL8RIrJfskkJB/r5OFhJ2pgfzpEQaZggMfnwQxi1OAA4FGF8diSjlw
-         gUTtV0nAoLPIUs273I8M7D/VmAl1vgfTzPRZYGa5TxL+57ThP9brh2+4Y3IT9TzrvBl5
-         NiNd4I3b6+CLj3Ddnv5h1zsRmOW8KLmG1lWarjzztkKyn9WoYEbDFo6eb+vy4UVASyIk
-         Ie1S5RSHoD6pmf8OJ8G/lITW9HSb+ZZ7+0ckYYjbKI93CWjC7ECk+KoxMZiogDDPFEfn
-         HAoOtGY6mir2mdEsQQEAmL087/4cjjMlaMiVr23jvN4oFv3gsC5E9iP2GsuQX+IUKdU6
-         c/wg==
+	s=arc-20240116; t=1714731523; c=relaxed/simple;
+	bh=DElX5LUe3OoaRwas6ikDj3cSBM05kNwuPrdkFmiH1nw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=X/ayBoXcRUZt+5fbVG8XJl8BC4EPSMbKj0xYtu3vW8IDDRwxZf9wF2N+z1vLOvl4SPXVtC44i10aq8MQxqZCwKZaphN77fpjreBFmI6Ll5XXBzXB0wURPrPkM+7PqyH0tAKjaqvTdDbjHLk4Ol80zIXptD6Vqa+gS5eCgp/AoCA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=qsp5u4qo; arc=none smtp.client-ip=185.125.188.122
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
+Received: from mail-pg1-f197.google.com (mail-pg1-f197.google.com [209.85.215.197])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 95A8F3F722
+	for <netdev@vger.kernel.org>; Fri,  3 May 2024 10:18:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20210705; t=1714731511;
+	bh=jjRe6xajUkbmK1YsugK7qDg3PV7FRVVruktd97oIQNA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version;
+	b=qsp5u4qoEiTXPzjm7pS8SBRwo6eS5tk7WAYtJXJ4ObCsP4ZUUujGhPOPNHBJotopI
+	 EbgG7y+MLr3BJQCHD6ehegLqF12nnIqjPpVd21uzq1N/Nla0FR7jemlpA30kwl4hLe
+	 YyL+eqQYoM3eQm9K7plYQtOZgb0TuO0LE9TsvkhMBnw3ycryu1M3p1lpH8jieKDSro
+	 KuLd2SlSCb9G7yH+KEcpnohSTFIlLqOF2JwBzNy+nTx3Ie0/U0VQFRKeodQZqp8C9C
+	 1PO/nKl7wq1+pPM8Qo45V4rvy21JWr/5rZ9MHwQFHK2ygxZfdQMCPFLH36LRxRq75D
+	 R/F9F87IRFSEA==
+Received: by mail-pg1-f197.google.com with SMTP id 41be03b00d2f7-5cfd6ba1c11so8530744a12.0
+        for <netdev@vger.kernel.org>; Fri, 03 May 2024 03:18:31 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714731509; x=1715336309;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OfDHb85z1DkjQut1/Jkb3/MNWNmze9D3fbDna+xKi0U=;
-        b=oHU0NGo4dZPKxBe2XmRJpJD5SlpoGE5RwhpwC/+Z6lsOBz4FQWHv/5ehPrTDHyv3ZL
-         d7J4+tOcR2PyzMOu01tnkWRL12ZgaonHda3yYlwmiPziYg5SEU5vfS+ZlNRs7eCoFYJM
-         Iw5GLllBMNH7df6uTxE8yfecG1qZtfZ3Q5aSk5tP2cklt5n7X5obldQ4x5m8LnXmxfja
-         goIPxl0jUlP9XSBz7oVq8vD0GplydpMC8upaHn63GbXTZ/gK5qoCEHFbQEnsaKlMuUEm
-         jCSR2qdK+2HYIjVlVyWzfkhQZ/myANTgDg1BxxK6eSCo+7iom2WNIVdOLCxoT0F5oxVp
-         LJTw==
-X-Forwarded-Encrypted: i=1; AJvYcCUO6Jr402+6utgs7BDtjNXQjOzjLMIzrRHDiIukKuB/KS2f1rl1xgF97D9faiZAKau35SMFe3eh8uaEBf2FwrWDjJNWsW0W
-X-Gm-Message-State: AOJu0YycFLg5jzuQEZN2XlZE0NxjCP685MAygHe+zyAxrgybKU917l+1
-	tqyBgtICPpD7dcfMyJZS31/vLdOqT6lMxbYLisRLVJjWNmv8OjGn
-X-Google-Smtp-Source: AGHT+IFn/a+JbV+fmYeO4uz5kTvn0QJoj8eNQrHf6DtE9kSJvghDTmF/ocsCkcTBsPaAqruu7Y4kVw==
-X-Received: by 2002:a05:600c:1912:b0:41b:fbec:a53a with SMTP id j18-20020a05600c191200b0041bfbeca53amr1801986wmq.16.1714731509441;
+        d=1e100.net; s=20230601; t=1714731510; x=1715336310;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=jjRe6xajUkbmK1YsugK7qDg3PV7FRVVruktd97oIQNA=;
+        b=mtVi8ii3RGqA7lat9Uklqj3gQpskx2D0fL65gyh+twydTaOcpMspUlRocJ6Pcw6DVi
+         pYZwYiAhe2VfCw0AHQSWcSEI59zGo04/zgaV+lKcSpQbA2ByuHgVJ62CTTSixy2Dg2pc
+         OqXh0AWOD6U/YAmUhaNr3Ta3xN5hw2Dt2rmN6iXUxfBKeRNO1Xaiv4zOuG6KZ+UfPuhP
+         5J4wT0lL40Cagon2rUVltwWsV1i2G60Zr/fsRFrHVvvuyAu0LPGH1SIxVEdEcaVHviWZ
+         9OSq2H9j9vKIAhsTN70u3lvwo5qnNYJ0P4LDrTZPAo3IQykeqEEAMKOcrDzH12lE7bLG
+         vD8g==
+X-Forwarded-Encrypted: i=1; AJvYcCU2KkNZPyJ3d6rLgvmIx1TLVB6cnfTXKom/5K95sXI3wmfywRveYixoRyk/56fsC/cQqa4sop/MGVddAJKGauy9TM8nX0IM
+X-Gm-Message-State: AOJu0Yz+rWzEq8vZuNFLBOTfYsbM6XuigudCqcWCI5y2HpZ7myyVuR8S
+	nIWcrHWmB9HjtgHIcXu+FbaTz0mZTK5V9QzfGXezCvwSrkOw8bqDG/v11JdBPGRQHjkrSVEIPlb
+	RSdBah8Y43o4Yv8t+ytkc5kd/q7/vBkiafmgiq/uzXhuCPPrvSL9FvX6sbNz7e8mh5+Avtg==
+X-Received: by 2002:a05:6a21:33a6:b0:1ac:4272:5f88 with SMTP id yy38-20020a056a2133a600b001ac42725f88mr2589345pzb.17.1714731510169;
+        Fri, 03 May 2024 03:18:30 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGJIBpRvU4F9VMM0s2VJG699R/KuRERA+E2lxptDmXVTDVYDFnjQPQXw+wlQEB0fPnDSPcQrA==
+X-Received: by 2002:a05:6a21:33a6:b0:1ac:4272:5f88 with SMTP id yy38-20020a056a2133a600b001ac42725f88mr2589323pzb.17.1714731509849;
         Fri, 03 May 2024 03:18:29 -0700 (PDT)
-Received: from imac ([2a02:8010:60a0:0:fd6b:a058:1d70:6e1a])
-        by smtp.gmail.com with ESMTPSA id l27-20020a05600c1d1b00b0041c5151dc1csm8875588wms.29.2024.05.03.03.18.28
+Received: from rickywu0421-ThinkPad-X1-Carbon-Gen-11.. (2001-b400-e23f-5745-953d-200f-4ef8-798c.emome-ip6.hinet.net. [2001:b400:e23f:5745:953d:200f:4ef8:798c])
+        by smtp.gmail.com with ESMTPSA id p23-20020a1709027ed700b001ec379d8167sm2926259plb.115.2024.05.03.03.18.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 May 2024 03:18:28 -0700 (PDT)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net,  netdev@vger.kernel.org,  edumazet@google.com,
-  pabeni@redhat.com,  jiri@resnulli.us,  alessandromarcolini99@gmail.com
-Subject: Re: [PATCH net-next] tools: ynl: add --list-ops and --list-msgs to CLI
-In-Reply-To: <20240502164043.2130184-1-kuba@kernel.org> (Jakub Kicinski's
-	message of "Thu, 2 May 2024 09:40:43 -0700")
-Date: Fri, 03 May 2024 11:17:37 +0100
-Message-ID: <m2fruzfbcu.fsf@gmail.com>
-References: <20240502164043.2130184-1-kuba@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+        Fri, 03 May 2024 03:18:29 -0700 (PDT)
+From: Ricky Wu <en-wei.wu@canonical.com>
+To: jesse.brandeburg@intel.com
+Cc: anthony.l.nguyen@intel.com,
+	intel-wired-lan@lists.osuosl.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	rickywu0421@gmail.com,
+	en-wei.wu@canonical.com
+Subject: [PATCH v2 1/2] e1000e: let the sleep codes run every time
+Date: Fri,  3 May 2024 18:18:24 +0800
+Message-Id: <20240503101824.32717-1-en-wei.wu@canonical.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
 
-Jakub Kicinski <kuba@kernel.org> writes:
+Originally, the sleep codes being moved forward only
+ran if we met some conditions (e.g. BMSR_LSTATUS bit
+not set in phy_status). Moving these sleep codes forward
+makes the usec_interval take effect every time.
 
-> I often forget the exact naming of ops and have to look at
-> the spec to find it. Add support for listing the operations:
->
->   $ ./cli.py --spec .../netdev.yaml --list-ops
->   dev-get  [ do, dump ]
->   page-pool-get  [ do, dump ]
->   page-pool-stats-get  [ do, dump ]
->   queue-get  [ do, dump ]
->   napi-get  [ do, dump ]
->   qstats-get  [ dump ]
->
-> For completeness also support listing all ops (including
-> notifications:
->
->   # ./cli.py --spec .../netdev.yaml --list-msgs
->   dev-get  [ dump, do ]
->   dev-add-ntf  [ notify ]
->   dev-del-ntf  [ notify ]
->   dev-change-ntf  [ notify ]
->   page-pool-get  [ dump, do ]
->   page-pool-add-ntf  [ notify ]
->   page-pool-del-ntf  [ notify ]
->   page-pool-change-ntf  [ notify ]
->   page-pool-stats-get  [ dump, do ]
->   queue-get  [ dump, do ]
->   napi-get  [ dump, do ]
->   qstats-get  [ dump ]
->
-> Use double space after the name for slightly easier to read
-> output.
->
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Ricky Wu <en-wei.wu@canonical.com>
+---
 
-Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
+In v2:
+* Split the sleep codes into this patch
+
+ drivers/net/ethernet/intel/e1000e/phy.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/e1000e/phy.c b/drivers/net/ethernet/intel/e1000e/phy.c
+index 93544f1cc2a5..4a58d56679c9 100644
+--- a/drivers/net/ethernet/intel/e1000e/phy.c
++++ b/drivers/net/ethernet/intel/e1000e/phy.c
+@@ -1777,6 +1777,11 @@ s32 e1000e_phy_has_link_generic(struct e1000_hw *hw, u32 iterations,
+ 
+ 	*success = false;
+ 	for (i = 0; i < iterations; i++) {
++		if (usec_interval >= 1000)
++			msleep(usec_interval / 1000);
++		else
++			udelay(usec_interval);
++
+ 		/* Some PHYs require the MII_BMSR register to be read
+ 		 * twice due to the link bit being sticky.  No harm doing
+ 		 * it across the board.
+@@ -1799,10 +1804,6 @@ s32 e1000e_phy_has_link_generic(struct e1000_hw *hw, u32 iterations,
+ 			*success = true;
+ 			break;
+ 		}
+-		if (usec_interval >= 1000)
+-			msleep(usec_interval / 1000);
+-		else
+-			udelay(usec_interval);
+ 	}
+ 
+ 	return ret_val;
+-- 
+2.40.1
+
 
