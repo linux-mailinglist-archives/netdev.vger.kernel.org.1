@@ -1,102 +1,109 @@
-Return-Path: <netdev+bounces-93185-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93187-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 468FC8BA706
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 08:29:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E14208BA713
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 08:30:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DBFF01F2229B
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 06:29:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1E9EC1C213A4
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 06:30:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F222513A3E0;
-	Fri,  3 May 2024 06:28:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05DBB13C837;
+	Fri,  3 May 2024 06:30:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="NcaAekJg"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="R1RheQyS"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0B18282E5;
-	Fri,  3 May 2024 06:28:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 416A413C80E;
+	Fri,  3 May 2024 06:30:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714717719; cv=none; b=PNn4x9RuruXKX+5k6NU2OVHF+Q8ArpGr9AfuT01Se5fYvS19Tq0R7bJ7W6+L/MA51UO8mjGEYccsuaUopMWqkJ8ZsDVoq/UZpU8P9sZijB1/Bxs9vymAxrwSr/JKkUIpdRFa4Kn6nYrzQU+y52n4G3NI9LBJ6LllJE+xAaoBsQU=
+	t=1714717846; cv=none; b=T9RLIR0foADTLFKbcxsi+bBwxn5iKdsCFJbH2CNJVmqd1+xdoTWxY5B74h4DC1CpyvSLdtsWzX+ZwmSvdaBOftFPpAXBoibuBRnIT+Fv45zQp92ZxC+KGJJZvw448D85o4RBc63VgFkIX56dBtPoNsB1aGlU7FS4TC/1Igvp/1w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714717719; c=relaxed/simple;
-	bh=iwh0xdjQBV1rMvWbejzBiO4Cm2ywVaCYNNzkgwWts0w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aAMVmS2i5YpKJj9UQNUFpQIeJFgEU2tWSIkbdzO9USO/Rsidq3me3LmryOGh8+UOoGDMoFGOCRsptUXt2uSpEuq6NXoq5wJEHtP6ejAqynbV8iMv9UXdjBoAK6pmEDRHAFXWP39NnI6KBI7/TG7a31Mxh83pRMswPXX5YHST4ws=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=NcaAekJg; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81384C116B1;
-	Fri,  3 May 2024 06:28:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1714717719;
-	bh=iwh0xdjQBV1rMvWbejzBiO4Cm2ywVaCYNNzkgwWts0w=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=NcaAekJgFy/ub8u/nLZ43cpp8Z3hWZWdQJNtfEPSpLSHsnvRSQ9P2dsYcsi2Sx3U8
-	 CejoBqkoLSP0CHcFIXFqRGIfGEh9EsoSht2sb4QO3J1miDQbbWotJ+RuP0Zh+yExe7
-	 oFcis4z/7AVU8HlLSG5M0ZW6I2pSvaISQO5obSak=
-Date: Fri, 3 May 2024 08:28:36 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Krishna Kurapati PSSNV <quic_kriskura@quicinc.com>
-Cc: kernel test robot <lkp@intel.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Linux Memory Management List <linux-mm@kvack.org>,
-	amd-gfx@lists.freedesktop.org, devicetree@vger.kernel.org,
-	dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
-	intel-xe@lists.freedesktop.org, linux-arch@vger.kernel.org,
-	linux-usb@vger.kernel.org, netdev@vger.kernel.org,
-	nouveau@lists.freedesktop.org
-Subject: Re: [linux-next:master] BUILD REGRESSION
- 9c6ecb3cb6e20c4fd7997047213ba0efcf9ada1a
-Message-ID: <2024050314-knelt-sandpaper-3884@gregkh>
-References: <202405030439.AH8NR0Mg-lkp@intel.com>
- <2024050342-slashing-froth-bcf9@gregkh>
- <d7f7cfae-78d5-41aa-aaf9-0d558cdfcbea@quicinc.com>
+	s=arc-20240116; t=1714717846; c=relaxed/simple;
+	bh=OGytbaGZ3Wgv/PEeqHKETkObg95MQZWxeyNdTqdfkb4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qJ+X24gZjdPcfjofFz3DaIIA6oGT4VKgWf5N9CapHbATtG0+lU+tktFpxagWjpAJkCGiqVfCrqY+RzOSvP1X/XpqWzfhztx48JA2aAK4V94dWcElxVwfUhSKxvrgBq0iyIEe+HLh0uPqxwcfkuqWXpt2AWXNxvJBzZm8/ZLwzbQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=R1RheQyS; arc=none smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1714717845; x=1746253845;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=OGytbaGZ3Wgv/PEeqHKETkObg95MQZWxeyNdTqdfkb4=;
+  b=R1RheQySZ3KQg8Q3C+9ZS1dJ54AaSnRU5wu3a7mN1MVVm5YruTDmuUtj
+   PQ5dKOa0aA4F9L6Jt6AYDXS942FkCaCByztx49UiWzTsj/+l7ZvvIlnKi
+   uJi4O4nEz8GyOKaSxLWIiwL/knEZoCGrux1ypWe7bmyWAitoU9JGhY7J+
+   DYdgMktIyc5YemRQSt4k1NKoxsTp0LOXLOzUJpeT56G5Udo9habafg9WD
+   CP/kluPcIdiz600TaZh1Uf/phy7a91kJWTOekGbcyg5G91czhvVkuTKex
+   sHXO7sYbzImsoYyQTqfswTsdZkXCNjWdbo5BP7T6GPz326FPA3Ex3HjM/
+   Q==;
+X-CSE-ConnectionGUID: HZqbkALYSSqIRpU//7yJ4A==
+X-CSE-MsgGUID: 3gYepjL0SB6EF2ArWsKeRA==
+X-IronPort-AV: E=McAfee;i="6600,9927,11062"; a="14335492"
+X-IronPort-AV: E=Sophos;i="6.07,247,1708416000"; 
+   d="scan'208";a="14335492"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 May 2024 23:30:45 -0700
+X-CSE-ConnectionGUID: y+pMYLqdR3uOOz17AYYqRQ==
+X-CSE-MsgGUID: CdOzF9ZYT7eUkV465PA83Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,247,1708416000"; 
+   d="scan'208";a="27340287"
+Received: from ehlflashnuc2.fi.intel.com (HELO [10.237.72.57]) ([10.237.72.57])
+  by fmviesa009.fm.intel.com with ESMTP; 02 May 2024 23:30:40 -0700
+Message-ID: <ae872161-d725-4604-9d03-a36a426d0d1b@linux.intel.com>
+Date: Fri, 3 May 2024 09:30:39 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d7f7cfae-78d5-41aa-aaf9-0d558cdfcbea@quicinc.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: (subset) [PATCH v3 0/5] Define i2c_designware in a header file
+To: Andi Shyti <andi.shyti@kernel.org>, linux-kernel@vger.kernel.org,
+ Florian Fainelli <florian.fainelli@broadcom.com>
+Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+ Mika Westerberg <mika.westerberg@linux.intel.com>,
+ Jan Dabros <jsd@semihalf.com>, Lee Jones <lee@kernel.org>,
+ Jiawen Wu <jiawenwu@trustnetic.com>, Mengyuan Lou
+ <mengyuanlou@net-swift.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+ Andrew Lunn <andrew@lunn.ch>, Duanqiang Wen <duanqiangwen@net-swift.com>,
+ linux-i2c@vger.kernel.org, netdev@vger.kernel.org
+References: <20240425214438.2100534-1-florian.fainelli@broadcom.com>
+ <171469134545.1016503.10207141192762647093.b4-ty@kernel.org>
+Content-Language: en-US
+From: Jarkko Nikula <jarkko.nikula@linux.intel.com>
+In-Reply-To: <171469134545.1016503.10207141192762647093.b4-ty@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, May 03, 2024 at 11:30:50AM +0530, Krishna Kurapati PSSNV wrote:
-> 
-> 
-> On 5/3/2024 10:42 AM, Greg KH wrote:
-> > Ok, I'm getting tired of seeing these for the USB portion of the tree,
-> > so I went to look for:
-> > 
-> > On Fri, May 03, 2024 at 04:44:42AM +0800, kernel test robot wrote:
-> > > |-- arc-randconfig-002-20240503
-> > > |   `-- drivers-usb-dwc3-core.c:warning:variable-hw_mode-set-but-not-used
-> > 
-> > This warning (same for all arches), but can't seem to find it anywhere.
-> > 
-> > Any hints as to where it would be?
-> > 
-> 
-> Hi Greg,
-> 
->  I think the hw_mode was not removed in hs_phy_setup and left unused.
-> 
->  Thinh reported the same when there was a merge conflict into linux next
-> (that the hw_mode variable was removed in ss_phy_setup and should be removed
-> in hs_phy_setup as well):
-> 
-> https://lore.kernel.org/all/20240426213923.tyeddub4xszypeju@synopsys.com/
-> 
->  Perhaps that was missed ?
+Hi Andi
 
-Must have been.  I need it in a format that it can be applied in (a
-2-way diff can't apply...)
-
-thanks,
-
-greg k-h
+On 5/3/24 2:09 AM, Andi Shyti wrote:
+> Applied to i2c/i2c-host on
+> 
+> git://git.kernel.org/pub/scm/linux/kernel/git/andi.shyti/linux.git
+> 
+> Thank you,
+> Andi
+> 
+> Patches applied
+> ===============
+> [1/5] i2c: designware: Replace MODULE_ALIAS() with MODULE_DEVICE_TABLE()
+>        commit: 91647e64f0f5677ace84165dc25dc99579147b8f
+> [2/5] i2c: designware: Create shared header hosting driver name
+>        commit: 856cd5f13de7cebca44db5ff4bc2ca73490dd8d7
+> 
+Was the second patch applied accidentally?
 
