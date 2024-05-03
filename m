@@ -1,242 +1,167 @@
-Return-Path: <netdev+bounces-93286-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93287-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A6888BAE8C
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 16:09:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A99F88BAEA6
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 16:17:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 42FDA28305A
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 14:09:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C23B51C218DC
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 14:17:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DDAD154C0C;
-	Fri,  3 May 2024 14:09:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 711F1154C03;
+	Fri,  3 May 2024 14:17:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b="KM4XIarb"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ADcoalrC"
 X-Original-To: netdev@vger.kernel.org
-Received: from todd.t-8ch.de (todd.t-8ch.de [159.69.126.157])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50F1415444E;
-	Fri,  3 May 2024 14:09:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.69.126.157
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F9F915358B
+	for <netdev@vger.kernel.org>; Fri,  3 May 2024 14:17:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714745385; cv=none; b=mUVWfdVt0zYaR0o2/SbDplsl3eIToZqAKv+V/l2tox9igjNvNhu+YAjaf2+P4MUCwHgCM+BXRW1fvxmc2bckq1D2TW1uElLHlBiRqqtsP58W8hwu+a4nok4u5MmGUqCX33zQUrnNGkxMWqHUh7iJNJ2B2nvMqmI1lDR6LBR4Pxs=
+	t=1714745840; cv=none; b=dZKK30Cn5mCmt3OmtwXNEMb36IEud3HJKUfO7Vn49k7wdNhLjPAooLM2wUkSoYYwEG5mdg7oP8I9tG+bcqL7jwsk19djfABk/jwdZ3hYytlQ5T+dtjeEEKBQWSmErPt+MNhKJx0AGws5XDwualKpjd9ixW4OEMMcOolxagEu+1U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714745385; c=relaxed/simple;
-	bh=+fi7fUfomErHHAmvDww2p/WTBqGy/yFZDfIKZxnytjc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CCdPlKyCDCaJhJaOwA2p1JSxq4VuaZLqvkDZ1bf5bPxs0s+fVuu+J0ErRRJkTUSueX9Ozh8KROPOdICNpBkkA0BfOXwwJ1uBH/IrSLWigC6wpebd33UiFahRV/Z+4aHBbfG/UsiIoZw2Vs6tTQ0nRUb/EjIJuxDYXdq9/FKLSJ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=weissschuh.net; spf=pass smtp.mailfrom=weissschuh.net; dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b=KM4XIarb; arc=none smtp.client-ip=159.69.126.157
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=weissschuh.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=weissschuh.net
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=weissschuh.net;
-	s=mail; t=1714745381;
-	bh=+fi7fUfomErHHAmvDww2p/WTBqGy/yFZDfIKZxnytjc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=KM4XIarbWLiqP+rTdHhYP4ADp2FfBPZJESIvebE/x46r3wpaPNaKYYJ8DjRuiR4XK
-	 lgnUuJtE42KneR0ACxiqLQ5uJD/S7BK84VwhVwYe9egEdoAzvtQwKV4FeMNTpP6GjL
-	 22eK/o3npUywdzgLbvtpx7d4AZBFjdzVsbPnc49I=
-Date: Fri, 3 May 2024 16:09:40 +0200
-From: Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <linux@weissschuh.net>
-To: Joel Granados <j.granados@samsung.com>
-Cc: Luis Chamberlain <mcgrof@kernel.org>, 
-	Kees Cook <keescook@chromium.org>, Eric Dumazet <edumazet@google.com>, 
-	Dave Chinner <david@fromorbit.com>, linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-riscv@lists.infradead.org, linux-mm@kvack.org, linux-security-module@vger.kernel.org, 
-	bpf@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, linux-xfs@vger.kernel.org, 
-	linux-trace-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org, 
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org, kexec@lists.infradead.org, 
-	linux-hardening@vger.kernel.org, bridge@lists.linux.dev, lvs-devel@vger.kernel.org, 
-	linux-rdma@vger.kernel.org, rds-devel@oss.oracle.com, linux-sctp@vger.kernel.org, 
-	linux-nfs@vger.kernel.org, apparmor@lists.ubuntu.com
-Subject: Re: [PATCH v3 00/11] sysctl: treewide: constify ctl_table argument
- of sysctl handlers
-Message-ID: <4cda5d2d-dd92-44ef-9e7b-7b780ec795ab@t-8ch.de>
-References: <CGME20240423075608eucas1p265e7c90f3efd6995cb240b3d2688b803@eucas1p2.samsung.com>
- <20240423-sysctl-const-handler-v3-0-e0beccb836e2@weissschuh.net>
- <20240503090332.irkiwn73dgznjflz@joelS2.panther.com>
+	s=arc-20240116; t=1714745840; c=relaxed/simple;
+	bh=Tw2mHGCJBZondqE0Nbp48iklfjoW+xXMxK0fvzgsi4M=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=nzwFA8I6uqEAXFUIFLkt+stU5euvdkfnzKP6IG20fj5ob42mIxACD5Nc8d0E/3mPIq5CiGP8bICVzGcRE6XU08N9lQugOp842kAz5LYuxaqUcNG7fGc1hEpGcYHU5hQYCU7Ijf0RC01Mc6LR5BJVNEY92D5M0jcmyvN8lKYvpws=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ADcoalrC; arc=none smtp.client-ip=209.85.214.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-1ed057cc183so17678445ad.2
+        for <netdev@vger.kernel.org>; Fri, 03 May 2024 07:17:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1714745838; x=1715350638; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=euaWG2d1xrAd5eW72Lhyga6K2ICgPg5ZdZZkZnwoCG8=;
+        b=ADcoalrCktZfm9wwMo8gYx9SYC7zLL5WOagtw8vpTsMTMkDbDzwn95quOU8z6A+z1U
+         w3TcXHWTbmcVuYw4tep1j7zpQqyxRgG8Zmy0i2amxcPEcPB7me4Miuzh4DLRxlcMO7nQ
+         ueorGKQaj4HmY+AFj9YvipJgTu56gqJsy1E8TAj6ATM2MT3SuR07pTfXyVj/cJtQwsjW
+         djpTznxnz05V/o6pRcmmqjoJ8q/lYDziFUKM1xTnYnGKW4ptJbezWxRVqvNt80w0JtSa
+         Mm/qsQFB/dc0+ut/dR1mnRuPDNfp+8HOB7OmHUIUiB4DZ2kYIsguNl3LjkgyyeyNAudn
+         J87w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714745838; x=1715350638;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=euaWG2d1xrAd5eW72Lhyga6K2ICgPg5ZdZZkZnwoCG8=;
+        b=KsDax7YwigR1hnytRNvu3/7M+8AYxBoeSbSV2fbzXaOmPx8CwgEaa7nfhCjL53w10D
+         3p7KnW3yV7O6AsmdkCSAWrCLy3mvXZKr1ds+cpYkMI+Ug48WRAjGP0qju1SsU0SGYEax
+         68Gf/7mLaPV5hUZIEo0VzUKmP7zTFanh65GTzzyYjZtnkclVorhG6Ir1gUg7oSoVZHjO
+         hxNNreZSXE1ZyoN6301vTs5b4T/lYgupVmLkRRiqVNeuEPIP+xilJY+TJNpQsxbo8w7C
+         hX73ncJgji9h+SPO+qtLy2x0Mu+rLzSBYXfDwX+Val18HUz1B2e2PccqYylsdWwkUxCS
+         vXFg==
+X-Forwarded-Encrypted: i=1; AJvYcCX4wb015s/VjoMObVaJpmPMAi47xhHpkYmheGZo/JJhM2gXLWTweWpcy9zFXSLktuscBhqDZCpqdX/uF7h3I4PSxuMGP2U2
+X-Gm-Message-State: AOJu0YwNpS4398Yc/LPFs7C5J8+gFpToyEVdRoVxESdPDgdl6TFjQ5bc
+	Ybqf9C8YFQ5onEkfd+i5bjZvrqZzruUs2i6b1TMLnCcJuLt4PP7bEYsaUdn3gq6C5WqJPxw9vn8
+	iUg==
+X-Google-Smtp-Source: AGHT+IFXmNX8BI/5OInh9uFJfx5hH/VOCZeejP86ugVK83ToSLHsemrYMRjQmBhAQcz5sMlxtgdDcmPXGNw=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:902:d2d0:b0:1e2:97f1:87c0 with SMTP id
+ n16-20020a170902d2d000b001e297f187c0mr247114plc.1.1714745838315; Fri, 03 May
+ 2024 07:17:18 -0700 (PDT)
+Date: Fri, 3 May 2024 07:17:16 -0700
+In-Reply-To: <20240503105820.300927-11-mic@digikod.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240503090332.irkiwn73dgznjflz@joelS2.panther.com>
+Mime-Version: 1.0
+References: <20240503105820.300927-1-mic@digikod.net> <20240503105820.300927-11-mic@digikod.net>
+Message-ID: <ZjTx7BYvbrqFSNuH@google.com>
+Subject: Re: [PATCH v5 10/10] selftests/harness: Handle TEST_F()'s explicit
+ exit codes
+From: Sean Christopherson <seanjc@google.com>
+To: "=?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?=" <mic@digikod.net>
+Cc: Christian Brauner <brauner@kernel.org>, Jakub Kicinski <kuba@kernel.org>, 
+	Kees Cook <keescook@chromium.org>, Mark Brown <broonie@kernel.org>, 
+	Shengyu Li <shengyu.li.evgeny@gmail.com>, Shuah Khan <shuah@kernel.org>, 
+	"David S . Miller" <davem@davemloft.net>, "=?utf-8?Q?G=C3=BCnther?= Noack" <gnoack@google.com>, Will Drewry <wad@chromium.org>, 
+	kernel test robot <oliver.sang@intel.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hey Joel,
+On Fri, May 03, 2024, Micka=C3=ABl Sala=C3=BCn wrote:
+> If TEST_F() explicitly calls exit(code) with code different than 0, then
+> _metadata->exit_code is set to this code (e.g. KVM_ONE_VCPU_TEST()).  We
+> need to keep in mind that _metadata->exit_code can be KSFT_SKIP while
+> the process exit code is 0.
+>=20
+> Initial patch written by Sean Christopherson [1].
 
-On 2024-05-03 11:03:32+0000, Joel Granados wrote:
-> Here is my feedback for your outstanding constification patches [1] and [2].
+Heh, my pseudo patch barely has any relevance at this point.  How about rep=
+lacing
+that with:
 
-Thanks!
+  Reported-by: Sean Christopherson <seanjc@google.com>
+  Closes: https://lore.kernel.org/r/ZjPelW6-AbtYvslu@google.com
 
-> # You need to split the patch
-> The answer that you got from Jakub in the network subsystem is very clear and
-> baring a change of heart from the network folks, this will go in as but as a
-> split patchset. Please split it considering the following:
-> 1. Create a different patchset for drivers/,  fs/, kernel/, net, and a
->    miscellaneous that includes whatever does not fit into the others.
-> 2. Consider that this might take several releases.
-> 3. Consider the following sufix for the interim function name "_const". Like in
->    kfree_const. Please not "_new".
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: Kees Cook <keescook@chromium.org>
+> Cc: Mark Brown <broonie@kernel.org>
+> Cc: Sean Christopherson <seanjc@google.com>
+> Cc: Shuah Khan <shuah@kernel.org>
+> Cc: Will Drewry <wad@chromium.org>
+> Link: https://lore.kernel.org/r/ZjPelW6-AbtYvslu@google.com [1]
+> Fixes: 0710a1a73fb4 ("selftests/harness: Merge TEST_F_FORK() into TEST_F(=
+)")
+> Signed-off-by: Micka=C3=ABl Sala=C3=BCn <mic@digikod.net>
+> Link: https://lore.kernel.org/r/20240503105820.300927-11-mic@digikod.net
+> ---
+>=20
+> Changes since v4:
+> * Check abort status when the grandchild exited.
+> * Keep the _exit(0) calls because _metadata->exit_code is always
+>   checked.
+> * Only set _metadata->exit_code to WEXITSTATUS() if it is not zero.
+>=20
+> Changes since v3:
+> * New patch mainly from Sean Christopherson.
+> ---
+>  tools/testing/selftests/kselftest_harness.h | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/tools/testing/selftests/kselftest_harness.h b/tools/testing/=
+selftests/kselftest_harness.h
+> index eb25f7c11949..7612bf09c5f8 100644
+> --- a/tools/testing/selftests/kselftest_harness.h
+> +++ b/tools/testing/selftests/kselftest_harness.h
+> @@ -462,9 +462,13 @@ static inline pid_t clone3_vfork(void)
+>  		munmap(teardown, sizeof(*teardown)); \
+>  		if (self && fixture_name##_teardown_parent) \
+>  			munmap(self, sizeof(*self)); \
+> -		if (!WIFEXITED(status) && WIFSIGNALED(status)) \
+> +		if (WIFEXITED(status)) { \
+> +			if (WEXITSTATUS(status)) \
+> +				_metadata->exit_code =3D WEXITSTATUS(status); \
 
-Ack. "_new" was an intentionally unacceptable placeholder.
+Ah, IIUC, this works because __run_test() effectively forwards the exit_cod=
+e?
 
-> 4. Please publish the final result somewhere. This is important so someone can
->    take over in case you need to stop.
+	} else if (t->pid =3D=3D 0) {
+		setpgrp();
+		t->fn(t, variant);
+		_exit(t->exit_code);
+	}
 
-Will do. Both for each single series and a combination of all of them.
+Tested-by: Sean Christopherson <seanjc@google.com>
 
-> 5. Consistently mention the motivation in your cover letters. I specify more
->    further down in "#Motivation".
-> 6. Also mention that this is part of a bigger effort (like you did in your
->    original cover letters). I would include [3,4,5,6]
-> 7. Include a way to show what made it into .rodata. I specify more further down
->    in "#Show the move".
-> 
-> # Motivation
-> As I read it, the motivation for these constification efforts are:
-> 1. It provides increased safety: Having things in .rodata section reduces the
->    attack surface. This is especially relevant for structures that have function
->    pointers (like ctl_table); having these in .rodata means that these pointers
->    always point to the "intended" function and cannot be changed.
-> 2. Compiler optimizations: This was just a comment in the patchsets that I have
->    mentioned ([3,4,5]). Do you know what optimizations specifically? Does it
->    have to do with enhancing locality for the data in .rodata? Do you have other
->    specific optimizations in mind?
-
-I don't know about anything that would make it faster.
-It's more about safety and transmission of intent to API users,
-especially callback implementers.
-
-> 3. Readability: because it is easier to know up-front that data is not supposed
->    to change or its obvious that a function is re-entrant. Actually a lot of the
->    readability reasons is about knowing things "up-front".
-> As we move forward with the constification in sysctl, please include a more
-> detailed motivation in all your cover letters. This helps maintainers (that
-> don't have the context) understand what you are trying to do. It does not need
-> to be my three points, but it should be more than just "put things into
-> .rodata". Please tell me if I have missed anything in the motivation.
-
-Will do.
-
-> # Show the move
-> I created [8] because there is no easy way to validate which objects made it
-> into .rodata. I ran [8] for your Dec 2nd patcheset [7] and there are less in
-> .rodata than I expected (the results are in [9]) Why is that? Is it something
-> that has not been posted to the lists yet? 
-
-Constifying the APIs only *allows* the actual table to be constified
-themselves.
-Then each table definition will have to be touched and "const" added.
-
-See patches 17 and 18 in [7] for two examples.
-
-Some tables in net/ are already "const" as the static definitions are
-never registered themselves but only their copies are.
-
-This seems to explain your findings.
-
-> Best
-
-Thanks!
-
-> [1] https://lore.kernel.org/all/20240423-sysctl-const-handler-v3-0-e0beccb836e2@weissschuh.net/
-> [2] https://lore.kernel.org/all/20240418-sysctl-const-table-arg-v2-1-4012abc31311@weissschuh.net
-> [3] [PATCH v2 00/14] ASoC: Constify local snd_sof_dsp_ops
->     https://lore.kernel.org/all/20240426-n-const-ops-var-v2-0-e553fe67ae82@kernel.org
-> [4] [PATCH v2 00/19] backlight: Constify lcd_ops
->     https://lore.kernel.org/all/20240424-video-backlight-lcd-ops-v2-0-1aaa82b07bc6@kernel.org
-> [5] [PATCH 1/4] iommu: constify pointer to bus_type
->     https://lore.kernel.org/all/20240216144027.185959-1-krzysztof.kozlowski@linaro.org
-> [6] [PATCH 00/29] const xattr tables
->     https://lore.kernel.org/all/20230930050033.41174-1-wedsonaf@gmail.com
-> [7] https://lore.kernel.org/all/20231204-const-sysctl-v2-0-7a5060b11447@weissschuh.net/
-> 
-> [8]
-
-[snip]
-
-> [9]
->     section: .rodata                obj_name : kern_table
->     section: .rodata                obj_name : sysctl_mount_point
->     section: .rodata                obj_name : addrconf_sysctl
->     section: .rodata                obj_name : ax25_param_table
->     section: .rodata                obj_name : mpls_table
->     section: .rodata                obj_name : mpls_dev_table
->     section: .data          obj_name : sld_sysctls
->     section: .data          obj_name : kern_panic_table
->     section: .data          obj_name : kern_exit_table
->     section: .data          obj_name : vm_table
->     section: .data          obj_name : signal_debug_table
->     section: .data          obj_name : usermodehelper_table
->     section: .data          obj_name : kern_reboot_table
->     section: .data          obj_name : user_table
->     section: .bss           obj_name : sched_core_sysctls
->     section: .data          obj_name : sched_fair_sysctls
->     section: .data          obj_name : sched_rt_sysctls
->     section: .data          obj_name : sched_dl_sysctls
->     section: .data          obj_name : printk_sysctls
->     section: .data          obj_name : pid_ns_ctl_table_vm
->     section: .data          obj_name : seccomp_sysctl_table
->     section: .data          obj_name : uts_kern_table
->     section: .data          obj_name : vm_oom_kill_table
->     section: .data          obj_name : vm_page_writeback_sysctls
->     section: .data          obj_name : page_alloc_sysctl_table
->     section: .data          obj_name : hugetlb_table
->     section: .data          obj_name : fs_stat_sysctls
->     section: .data          obj_name : fs_exec_sysctls
->     section: .data          obj_name : fs_pipe_sysctls
->     section: .data          obj_name : namei_sysctls
->     section: .data          obj_name : fs_dcache_sysctls
->     section: .data          obj_name : inodes_sysctls
->     section: .data          obj_name : fs_namespace_sysctls
->     section: .data          obj_name : dnotify_sysctls
->     section: .data          obj_name : inotify_table
->     section: .data          obj_name : epoll_table
->     section: .data          obj_name : aio_sysctls
->     section: .data          obj_name : locks_sysctls
->     section: .data          obj_name : coredump_sysctls
->     section: .data          obj_name : fs_shared_sysctls
->     section: .data          obj_name : fs_dqstats_table
->     section: .data          obj_name : root_table
->     section: .data          obj_name : pty_table
->     section: .data          obj_name : xfs_table
->     section: .data          obj_name : ipc_sysctls
->     section: .data          obj_name : key_sysctls
->     section: .data          obj_name : kernel_io_uring_disabled_table
->     section: .data          obj_name : tty_table
->     section: .data          obj_name : random_table
->     section: .data          obj_name : scsi_table
->     section: .data          obj_name : iwcm_ctl_table
->     section: .data          obj_name : net_core_table
->     section: .data          obj_name : netns_core_table
->     section: .bss           obj_name : nf_log_sysctl_table
->     section: .data          obj_name : nf_log_sysctl_ftable
->     section: .data          obj_name : vs_vars
->     section: .data          obj_name : vs_vars_table
->     section: .data          obj_name : ipv4_route_netns_table
->     section: .data          obj_name : ipv4_route_table
->     section: .data          obj_name : ip4_frags_ns_ctl_table
->     section: .data          obj_name : ip4_frags_ctl_table
->     section: .data          obj_name : ctl_forward_entry
->     section: .data          obj_name : ipv4_table
->     section: .data          obj_name : ipv4_net_table
->     section: .data          obj_name : unix_table
->     section: .data          obj_name : ipv6_route_table_template
->     section: .data          obj_name : ipv6_icmp_table_template
->     section: .data          obj_name : ip6_frags_ns_ctl_table
->     section: .data          obj_name : ip6_frags_ctl_table
->     section: .data          obj_name : ipv6_table_template
->     section: .data          obj_name : ipv6_rotable
->     section: .data          obj_name : sctp_net_table
->     section: .data          obj_name : sctp_table
->     section: .data          obj_name : smc_table
->     section: .data          obj_name : lowpan_frags_ns_ctl_table
->     section: .data          obj_name : lowpan_frags_ctl_table
+> +		} else if (WIFSIGNALED(status)) { \
+>  			/* Forward signal to __wait_for_test(). */ \
+>  			kill(getpid(), WTERMSIG(status)); \
+> +		} \
+>  		__test_check_assert(_metadata); \
+>  	} \
+>  	static void __attribute__((constructor)) \
+> --=20
+> 2.45.0
+>=20
 
