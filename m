@@ -1,174 +1,106 @@
-Return-Path: <netdev+bounces-93250-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93251-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96B158BABB3
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 13:36:39 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7712D8BABB5
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 13:38:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5214C283AE3
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 11:36:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2AFFA1F21DAD
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 11:38:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C64D0152535;
-	Fri,  3 May 2024 11:36:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 097F915219D;
+	Fri,  3 May 2024 11:38:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=katalix.com header.i=@katalix.com header.b="aL242Nno"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XizIh0rW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.katalix.com (mail.katalix.com [3.9.82.81])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E59BCC2E9
-	for <netdev@vger.kernel.org>; Fri,  3 May 2024 11:36:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=3.9.82.81
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 721F41E898
+	for <netdev@vger.kernel.org>; Fri,  3 May 2024 11:38:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714736183; cv=none; b=r7TQVIBwp82DaPl7WD2dZXwut/l7/yh1dV2vpFj9TFVn+2K3UyTK0964KZzJ5wQKBDYTpwl6FXBb19rRtk5tSwjGdYHyY/BaHttXP+EN3WBwaFNnEF9DgToRjXNu0xHz5wRwBgAppI//4KUfMOD1vy7g0PRlgBcr1/MVEOyvbZg=
+	t=1714736287; cv=none; b=ejZzw/RaxkYVbqTOuzFAt7eBWNoLvQZPCrpUlPdSWOUIvzWUNBOKIu7Aq0imEcyyJWbxTJSKFTcIiXqdHRyf8CKmdKXbzCOak+zYcblvyAFQWkvHXzL6W/km39uNBI2ET+7Z/oo9X2lGx7ewQ641svS6J9V5pol4m/oP4fnhYq4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714736183; c=relaxed/simple;
-	bh=QIzZPTSqoyoSUu2mc2IX8mGO+0q4QX5mx2657041zaw=;
-	h=Message-ID:Date:MIME-Version:To:Cc:References:From:Subject:
-	 In-Reply-To:Content-Type; b=eQ0Up5NdJZC41Jvt4Fv3Lik3r9vGcot/nJRVy7xpdi2YvmQwA313LnqQ4EtsmAMJMbXXNhF0oY+tYVhfkSJYC8GovP3PKhCbP6dNuXe2U/hofC2c5+xpUTKUXo/DnGlR06k9Y4UIojG8YI+gesxQP+YVIC0mdX3t0PjSsKdq4y8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=katalix.com; spf=pass smtp.mailfrom=katalix.com; dkim=pass (2048-bit key) header.d=katalix.com header.i=@katalix.com header.b=aL242Nno; arc=none smtp.client-ip=3.9.82.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=katalix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=katalix.com
-Received: from [IPV6:2a02:8010:6359:2:f8c1:ac3:4d22:e947] (unknown [IPv6:2a02:8010:6359:2:f8c1:ac3:4d22:e947])
-	(Authenticated sender: james)
-	by mail.katalix.com (Postfix) with ESMTPSA id C06347D8BA;
-	Fri,  3 May 2024 12:36:14 +0100 (BST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=katalix.com; s=mail;
-	t=1714736174; bh=QIzZPTSqoyoSUu2mc2IX8mGO+0q4QX5mx2657041zaw=;
-	h=Message-ID:Date:MIME-Version:To:Cc:References:From:Subject:
-	 In-Reply-To:From;
-	z=Message-ID:=20<ea4ddddc-719c-673e-7646-8f89cd341e7b@katalix.com>|
-	 Date:=20Fri,=203=20May=202024=2012:36:14=20+0100|MIME-Version:=201
-	 .0|To:=20Samuel=20Thibault=20<samuel.thibault@ens-lyon.org>,=0D=0A
-	 =20Tom=20Parkin=20<tparkin@katalix.com>,=20Eric=20Dumazet=20<eduma
-	 zet@google.com>,=0D=0A=20Jakub=20Kicinski=20<kuba@kernel.org>,=20P
-	 aolo=20Abeni=20<pabeni@redhat.com>|Cc:=20netdev@vger.kernel.org|Re
-	 ferences:=20<20240502231418.2933925-1-samuel.thibault@ens-lyon.org
-	 >|From:=20James=20Chapman=20<jchapman@katalix.com>|Subject:=20Re:=
-	 20[PATCH]=20l2tp:=20Support=20several=20sockets=20with=20same=20IP
-	 /port=20quadruple|In-Reply-To:=20<20240502231418.2933925-1-samuel.
-	 thibault@ens-lyon.org>;
-	b=aL242Nno0V0j0aK2xvNnJnxk5NADTpZkZMhjlAbeLdZBFPHyYNHy4SrnSeLqMlJng
-	 aXD9Hd770ao7srDMjcAVNthME1Mhqhlj6yvKCfn8FsvfVmC/c+lB9CAc8ksjw00QDL
-	 s4AwAfspRaM2YjAzGGzXyOJqO1QGVjqmytfpRspD8m5U9r9PeEFERYbLJXSafand+h
-	 nZ1DfY31HDgw6zzLcGkBYfuhtH5FsUm3QCKPHpS30SMTDPLscehj1NpnNEER033ykb
-	 MnwFMVP0e8HrsIaRlbP56Fa8aQEsrg7rSwZePymTkT63V4lAMhZnnIqPGF4Vf6BEzU
-	 fcFe7pFJ8e18Q==
-Message-ID: <ea4ddddc-719c-673e-7646-8f89cd341e7b@katalix.com>
-Date: Fri, 3 May 2024 12:36:14 +0100
+	s=arc-20240116; t=1714736287; c=relaxed/simple;
+	bh=2mFwIyJjhlyZVBLu3QUcc225c9YGrTsjtcIlVVK9h4w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dOajeLaAffWkdt2vBcJsmW1g1FjpSBy3ZD+xbbRNgLpoqlldJw/5V5RiO8wtEKy6LHK7+Zn+Ukm7kscaxCpRtSIJTNo3+caIPk4h1hQAiQgz3hrSyvqL1VCM6jzD8KvUJRVfPK4Fr9UQyKnrcWlwVPokVtDZF2r0V3jyJNXyY4k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=XizIh0rW; arc=none smtp.client-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-41b79451153so56109145e9.2
+        for <netdev@vger.kernel.org>; Fri, 03 May 2024 04:38:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1714736285; x=1715341085; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=MLQCofPdnJ63uOr5tDqjn2YZWUonrylBn211XOLOE44=;
+        b=XizIh0rWMaGtGbkF5dUoT3wX2ZbEhrBEWDLxu3KA74Dk8WkpGgqsXSvlCyRaq/SPnt
+         d2cpaOkZSUR/Y6M8KTAo4H4nFmQBQNbghTM3aHNeGjZYm/A+OvMbDdBviW1gMr+zoZT4
+         MrSlqRIu1K4zbOHpHU4ThYpHfSzncy1vqlKvwNL3RMTzk92J7lMrPl+hU3kDn34AFaXz
+         FF0Y29A3ouZjpLFvDHwHbVseEbC1RZLgYQXisZjmhqSh9NMmQsmbtt1q/65KFVfZffml
+         xalTMZ40rCcRN3QURAgeb5tt8CkVZmJprGW/5YBwD+glgRqaCWeU7m070tevUbfVwk5V
+         iqhw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714736285; x=1715341085;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MLQCofPdnJ63uOr5tDqjn2YZWUonrylBn211XOLOE44=;
+        b=BP1/u4qUaoZj2xdsAkurMPpQPnC71qThhs+mmIF6F67koGZvNxCJkZWiviLKngSJ+X
+         6GgZU7awsM+AZbdH7wGihm1jNmAGHNXjFuenesmmaMxa5+E4fUdzv9dqfBGQSykvyU70
+         jfEIxK6s50WbUiN0bA5m1iMC9dYT9ZuH0d6Viou1cCOK20MpaB5OG2ZCnDy26PB6aSFe
+         ekl5TMK2ztQN8QZFnROwyhiu+c258rM3FHuKXM9/JH8qYrrC0moWbG5V5J/JwS/b8eg2
+         YT1gtC/OGMv3wNMwdbk7vFcUFscjl1BZYBc8tdDgQfRicHB2RLUO96Bq0+KJPlkERNZo
+         tpKg==
+X-Forwarded-Encrypted: i=1; AJvYcCVq2wslQv3YUk9YspEQ2TTpJ+ITvtnp4ONHAO7oqWQzs6dii7FbUY7m8ko4P8aHeEljjYHviCJMQSDIu3EIdiLPHqX6V2Bs
+X-Gm-Message-State: AOJu0YxQyvifNZ9CFnS8uFmbH6UHf7T2Wprmq+10HYRcB0I+zs9RK1rF
+	M8m9Zd1G2YqHQcQij0KoivIAoUn89x0R0JHh5YSt/kTOBxMrpbx/Nm4pPHMJJCI=
+X-Google-Smtp-Source: AGHT+IEUFq74MPGIgnW3XCqkUsaInfSWPvUq0gwS1ToGTdl+wAiuIT9mb9JtsW4g2vBgPQlcLO6dgw==
+X-Received: by 2002:a05:600c:4fc3:b0:41a:ff7d:2473 with SMTP id o3-20020a05600c4fc300b0041aff7d2473mr1857856wmq.4.1714736284563;
+        Fri, 03 May 2024 04:38:04 -0700 (PDT)
+Received: from localhost ([102.222.70.76])
+        by smtp.gmail.com with ESMTPSA id u21-20020a05600c139500b004190d7126c0sm9131680wmf.38.2024.05.03.04.38.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 03 May 2024 04:38:04 -0700 (PDT)
+Date: Fri, 3 May 2024 14:38:00 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Markus Elfring <Markus.Elfring@web.de>
+Cc: Duoming Zhou <duoming@zju.edu.cn>, linux-hams@vger.kernel.org,
+	netdev@vger.kernel.org, kernel-janitors@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	=?iso-8859-1?Q?J=F6rg?= Reuter <jreuter@yaina.de>,
+	Paolo Abeni <pabeni@redhat.com>,
+	LKML <linux-kernel@vger.kernel.org>,
+	Lars Kellogg-Stedman <lars@oddbit.com>,
+	Simon Horman <horms@kernel.org>
+Subject: Re: [PATCH net v2 2/2] ax25: fix potential reference counting leak
+ in ax25_addr_ax25dev
+Message-ID: <e471ec93-6182-4af0-9584-a35e2680c66d@moroto.mountain>
+References: <cover.1714690906.git.duoming@zju.edu.cn>
+ <74e840d98f2bfc79c6059993b2fc1ed3888faba4.1714690906.git.duoming@zju.edu.cn>
+ <6eac7fc4-9ade-41bb-a861-d7f339b388f6@web.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Content-Language: en-US
-To: Samuel Thibault <samuel.thibault@ens-lyon.org>,
- Tom Parkin <tparkin@katalix.com>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org
-References: <20240502231418.2933925-1-samuel.thibault@ens-lyon.org>
-From: James Chapman <jchapman@katalix.com>
-Organization: Katalix Systems Ltd
-Subject: Re: [PATCH] l2tp: Support several sockets with same IP/port quadruple
-In-Reply-To: <20240502231418.2933925-1-samuel.thibault@ens-lyon.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6eac7fc4-9ade-41bb-a861-d7f339b388f6@web.de>
 
-On 03/05/2024 00:14, Samuel Thibault wrote:
-> Some l2tp providers will use 1701 as origin port and open several
-> tunnels for the same origin and target. On the Linux side, this
-> may mean opening several sockets, but then trafic will go to only
-> one of them, losing the trafic for the tunnel of the other socket
-> (or leaving it up to userland, consuming a lot of cpu%).
->
-> This can also happen when the l2tp provider uses a cluster, and
-> load-balancing happens to migrate from one origin IP to another one,
-> for which a socket was already established. Managing reassigning
-> tunnels from one socket to another would be very hairy for userland.
->
-> Lastly, as documented in l2tpconfig(1), as client it may be necessary
-> to use 1701 as origin port for odd firewalls reasons, which could
-> prevent from establishing several tunnels to a l2tp server, for the
-> same reason: trafic would get only on one of the two sockets.
->
-> With the V2 protocol it is however easy to route trafic to the proper
-> tunnel, by looking up the tunnel number in the network namespace. This
-> fixes the three cases altogether.
+Yeah, it's true that we should delete the curly braces around the if
+block.  Otherwise checkpatch.pl -f will complain.
 
-Hi Samuel,
+The commit message is fine as-is.  Please stop nit-picking.
 
-Thanks for working on this.
-
-I'm currently working on changes that address this for both L2TPv2 and 
-L2TPv3 which will avoid separate tunnel and session lookups in the 
-datapath. However, my changes aren't ready yet; I hope to post them in a 
-week or so.
-
-Please find comments on your patch inline below.
-
-> Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
-> ---
->   net/l2tp/l2tp_core.c | 21 +++++++++++++++++++++
->   1 file changed, 21 insertions(+)
->
-> diff --git a/net/l2tp/l2tp_core.c b/net/l2tp/l2tp_core.c
-> index 8d21ff25f160..128f1146c135 100644
-> --- a/net/l2tp/l2tp_core.c
-> +++ b/net/l2tp/l2tp_core.c
-> @@ -794,6 +794,7 @@ static void l2tp_session_queue_purge(struct l2tp_session *session)
->   static int l2tp_udp_recv_core(struct l2tp_tunnel *tunnel, struct sk_buff *skb)
->   {
->   	struct l2tp_session *session = NULL;
-> +	struct l2tp_tunnel *orig_tunnel = tunnel;
->   	unsigned char *ptr, *optr;
->   	u16 hdrflags;
->   	u32 tunnel_id, session_id;
-> @@ -845,6 +846,20 @@ static int l2tp_udp_recv_core(struct l2tp_tunnel *tunnel, struct sk_buff *skb)
->   		/* Extract tunnel and session ID */
->   		tunnel_id = ntohs(*(__be16 *)ptr);
->   		ptr += 2;
-> +
-> +		if (tunnel_id != tunnel->tunnel_id && tunnel->l2tp_net) {
-Can tunnel->l2tp_net be NULL?
-> +			/* We are receiving trafic for another tunnel, probably
-> +			 * because we have several tunnels between the same
-> +			 * IP/port quadruple, look it up.
-> +			 */
-> +			struct l2tp_tunnel *alt_tunnel;
-> +
-> +			alt_tunnel = l2tp_tunnel_get(tunnel->l2tp_net, tunnel_id);
-This misses a check that alt_tunnel's protocol version matches the 
-header. Move the existing header version check to after this fragment?
-> +			if (!alt_tunnel)
-> +				goto pass;
-> +			tunnel = alt_tunnel;
-> +		}
-> +
->   		session_id = ntohs(*(__be16 *)ptr);
->   		ptr += 2;
->   	} else {
-> @@ -875,6 +890,9 @@ static int l2tp_udp_recv_core(struct l2tp_tunnel *tunnel, struct sk_buff *skb)
->   	l2tp_recv_common(session, skb, ptr, optr, hdrflags, length);
->   	l2tp_session_dec_refcount(session);
->   
-> +	if (tunnel != orig_tunnel)
-> +		l2tp_tunnel_dec_refcount(tunnel);
-> +
->   	return 0;
->   
->   invalid:
-> @@ -884,6 +902,9 @@ static int l2tp_udp_recv_core(struct l2tp_tunnel *tunnel, struct sk_buff *skb)
->   	/* Put UDP header back */
->   	__skb_push(skb, sizeof(struct udphdr));
->   
-> +	if (tunnel != orig_tunnel)
-> +		l2tp_tunnel_dec_refcount(tunnel);
-> +
->   	return 1;
->   }
->   
+regards,
+dan carpenter
 
 
