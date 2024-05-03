@@ -1,143 +1,273 @@
-Return-Path: <netdev+bounces-93313-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93312-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37C5F8BB22A
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 20:08:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A6218BB228
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 20:08:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E855E2826E2
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 18:08:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 116642818E5
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 18:08:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 943B715821F;
-	Fri,  3 May 2024 18:08:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D6CA15820C;
+	Fri,  3 May 2024 18:08:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="Nm2drleW"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CAdShHaI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 378B715820E;
-	Fri,  3 May 2024 18:08:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 521FD1BF24
+	for <netdev@vger.kernel.org>; Fri,  3 May 2024 18:08:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714759707; cv=none; b=F5yQUq6QIznQlENvf1pEm1TTgg8XOvqjuAez80178ExRpUNNlfDDeQt3XVZoE1shcamvLwEcCns9GT+j6AXABMsbMEYmjHzBhFDLoY1gtG9xe7TDzFharg1/XDNPVuKPQzUB7I7hrV6jN49o031EGwWapNPSE8e3mvdE0SJTTZA=
+	t=1714759705; cv=none; b=gTiB7DuIKo/yl28q3mavVHpXRFI9+9Zvhx+QLNadDb7XfqThsQUi+QQggW1vf5t3TB8JDRkAIWsB4ZIg3hi0WdTNibFzVTWm67KpSc8X9lZNCyw9KUZUI0E4CSeJGa26gLypAU4obN0+dC2UI/8uoSsfeRrSWbd/coWJWXcTjqc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714759707; c=relaxed/simple;
-	bh=lpjffUs0KsD4f1OIdu+oOs418PzFZ7RJRguA69+8Ufg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pyN/TCJki3tQVdoIVIe8kfqiqyaHcXkpDIJRvVQwV6DtJfVus5H4IP8Fesb6PWdi8Lq7CiwmG7+030zTTHZ2wbewvtF8G5xx02D7RVlMbVNyMEcXf17wApE1OeE1OIceZFc7N5NMBSny7oikuzpre3ByjHDb8/Vw+ShhiZuMNkE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=Nm2drleW; arc=none smtp.client-ip=193.104.135.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
-Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
-	by mail1.fiberby.net (Postfix) with ESMTPSA id C234D600A2;
-	Fri,  3 May 2024 18:08:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
-	s=202008; t=1714759701;
-	bh=lpjffUs0KsD4f1OIdu+oOs418PzFZ7RJRguA69+8Ufg=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Nm2drleWzUli4rPVRzHIxWXPNsM1P7Lh/mZEVcqcpPgnUhoWJdBr/p0F7y3LbVz+a
-	 4T3o8u8ds+dMOu9SiMtVXNN6U1M/8dna+PH56Vj/GFcwvHK5HmU8BAxhDVnR0/pfg3
-	 77htbJMnUJyvVyvAKBaAgzTaohiq+SZDxHhec75OsZ2QVs+MOxOZTBCwCG/yknxwT6
-	 xwemhYv+LxkMeCbLbtVa3UO/P+L0/M+1foLt37LqEcfu4p4YZG/99PZ+hHWt/1M+/2
-	 sqVqoRuDnKJMkAkDzHfP3hf2Zj6pDZmpquWoDm3YwcjjXAP3UbzdzYu8qDDqhXssLG
-	 5uQpZiVHj2voQ==
-Received: from [127.0.0.1] (localhost [127.0.0.1])
-	by x201s (Postfix) with ESMTP id 5823420146D;
-	Fri, 03 May 2024 18:08:04 +0000 (UTC)
-Message-ID: <80089193-33e8-4601-bdbc-71d10ff1ab58@fiberby.net>
-Date: Fri, 3 May 2024 18:08:04 +0000
+	s=arc-20240116; t=1714759705; c=relaxed/simple;
+	bh=k0cZVmW0r/OQh7284heE5kjeti8omy7OxmAn/y6XxlE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Yq+vqDSw6qr2RwmFGBozLzKCa3cQap8GioDWAkgwYkIsYxA5+5Vqe9s4revltgPqyihEKqmLunBZCEy4Kfc1GI/+3Ee+3veK1H8OZ1pxcS3aWv/mq0seGZpnnnUiFmMgkNISUdLmq+lOps0/2SW7I8WO9IA5iRx2s+WuNu9s30Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CAdShHaI; arc=none smtp.client-ip=209.85.167.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-51fb14816f6so818435e87.0
+        for <netdev@vger.kernel.org>; Fri, 03 May 2024 11:08:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1714759701; x=1715364501; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=VrzBRKrwlaLKjmnKE0p/O+Dhcgp4pyeofgboWhgqrYA=;
+        b=CAdShHaIez8x7FaSFhbb+qV5Eqrb9s72s57E6WnmWMQPRgw/U/ifmAQXUHNREC3WCa
+         Q6L9r6TLELstBb4ZXyTl1sYjx4RxhPYqyfNg0o44WQqfycpEl480YAC1YieF8khk+gAP
+         YUJVWEqkddlaBjK00rZeSSpJxR9Waw8/xDTNy4VR3wW5q1L4/h4MsDscsDufuSyDmXaA
+         B2JwQWXBCK4kHAhYUaxBope6ZL0zwTjpuYajmQw3S7kU48hsz9PO80K972wC8HS15yR4
+         04+/bl9WfJoQqzV6GiehczdLtuf4ssPrs9BUKK0YdOwRjgF1Em5ZFRXlL8PWl1g9qqsw
+         40/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714759701; x=1715364501;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VrzBRKrwlaLKjmnKE0p/O+Dhcgp4pyeofgboWhgqrYA=;
+        b=KRLZn2HXqv+6o78NsuKl2MykngHTbSWT2ph1pOznukC1N3PtyB/eHM2eW+98MzGgis
+         /j32wsqI6IxvNw7d8RiT76ciDq9yeYqTnzPFzBT79mdpytGgzJeFxImU2GY17jmp1sMu
+         m8R07D2XxTgNTpziJlDTz3EFkPE7yP+edv1MI+TyCm9YQIHrLTHUGAdhC/Yh2TFD8Mvv
+         fcfr1Sw+RVRQcAvBE4tnVZuuNj+jNR2XuHuXUQXmIDEdx7yKOYwsrTncT/w2le2IZlpi
+         88WDYeBJCKBmozQs0+VHFnVgTWqhF8xUyxn6vAeomPA513SbAvvALdzsmllqY93aIkXL
+         O+NQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXUhX8M6xLDtvJq/f07BUh9sEEPpGF5rADoP20HfwKGTT2AhpY4MzcJji5X4dHxvSBijijhog4D6QaAiE8vQ2GDbMaVGFmi
+X-Gm-Message-State: AOJu0YzNAPolpQOZ9/6nYpkiYTkWWrs4sXtEIGH5Usy/oWszTR3j8pZU
+	fJxyTzzLYTbsfjX5TLYVpJVhfVuP2jAW55gtsK0mKZdTQJRxiQkH
+X-Google-Smtp-Source: AGHT+IHcoSxK+2i1rLgy94/Z9r6s1NxM1alm5uihTJzLFqD564kM0I/I6oloiZDzWOt8OdA7S+hQwQ==
+X-Received: by 2002:a05:6512:368d:b0:51e:fa8c:47cc with SMTP id d13-20020a056512368d00b0051efa8c47ccmr2510024lfs.30.1714759701130;
+        Fri, 03 May 2024 11:08:21 -0700 (PDT)
+Received: from mobilestation ([178.176.56.174])
+        by smtp.gmail.com with ESMTPSA id m19-20020a0565120a9300b0051f2738ba04sm599804lfu.254.2024.05.03.11.08.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 03 May 2024 11:08:20 -0700 (PDT)
+Date: Fri, 3 May 2024 21:08:17 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: Yanteng Si <siyanteng@loongson.cn>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com, 
+	alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com, 
+	chenhuacai@kernel.org, linux@armlinux.org.uk, guyinggang@loongson.cn, 
+	netdev@vger.kernel.org, chris.chenfeiyang@gmail.com, siyanteng01@gmail.com
+Subject: Re: [PATCH net-next v12 06/15] net: stmmac: dwmac-loongson: Split up
+ the platform data initialization
+Message-ID: <arxxtmtifgus4qfai5nkemg46l5ql5ptqfodnflqpf2eenfj57@4x4h3vmcuw5x>
+References: <cover.1714046812.git.siyanteng@loongson.cn>
+ <e0ea692698171f9c69b80a70607a55805d249c4a.1714046812.git.siyanteng@loongson.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next] ice: flower: validate control
- flags
-To: "Buvaneswaran, Sujai" <sujai.buvaneswaran@intel.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- Eric Dumazet <edumazet@google.com>,
- "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- "David S. Miller" <davem@davemloft.net>,
- "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
-References: <20240416144331.15336-1-ast@fiberby.net>
- <PH0PR11MB50139E3BE2709C5BE7F4AC78961F2@PH0PR11MB5013.namprd11.prod.outlook.com>
-Content-Language: en-US
-From: =?UTF-8?Q?Asbj=C3=B8rn_Sloth_T=C3=B8nnesen?= <ast@fiberby.net>
-In-Reply-To: <PH0PR11MB50139E3BE2709C5BE7F4AC78961F2@PH0PR11MB5013.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e0ea692698171f9c69b80a70607a55805d249c4a.1714046812.git.siyanteng@loongson.cn>
 
-Hi Sujai,
+> [PATCH net-next v12 06/15] net: stmmac: dwmac-loongson: Split up the platform data initialization
 
-On 5/3/24 5:57 AM, Buvaneswaran, Sujai wrote:
->> -----Original Message-----
->> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of
->> Asbjørn Sloth Tønnesen
->> Sent: Tuesday, April 16, 2024 8:14 PM
->> To: intel-wired-lan@lists.osuosl.org
->> Cc: netdev@vger.kernel.org; linux-kernel@vger.kernel.org; Eric Dumazet
->> <edumazet@google.com>; Nguyen, Anthony L
->> <anthony.l.nguyen@intel.com>; Asbjørn Sloth Tønnesen <ast@fiberby.net>;
->> Jakub Kicinski <kuba@kernel.org>; Paolo Abeni <pabeni@redhat.com>;
->> David S. Miller <davem@davemloft.net>
->> Subject: [Intel-wired-lan] [PATCH iwl-next] ice: flower: validate control flags
->>
->> This driver currently doesn't support any control flags.
->>
->> Use flow_rule_has_control_flags() to check for control flags, such as can be
->> set through `tc flower ... ip_flags frag`.
->>
->> In case any control flags are masked, flow_rule_has_control_flags() sets a NL
->> extended error message, and we return -EOPNOTSUPP.
->>
->> Only compile-tested.
->>
->> Signed-off-by: Asbjørn Sloth Tønnesen <ast@fiberby.net>
->> ---
->>   drivers/net/ethernet/intel/ice/ice_tc_lib.c | 4 ++++
->>   1 file changed, 4 insertions(+)
->>
+Please convert the subject to being more specific, like this:
+
+net: stmmac: dwmac-loongson: Detach GMAC-specific platform data init
+
+On Thu, Apr 25, 2024 at 09:04:37PM +0800, Yanteng Si wrote:
+> Based on IP core classification, loongson has two types of network
+
+What is the real company name? At least start the name with the
+capital letter.
+* everywhere 
+
+> devices: GMAC and GNET. GMAC's ip_core id is 0x35/0x37, while GNET's
+> ip_core id is 0x37/0x10.
+
+s/ip_core/IP-core
+
+Once again the IP-core ID isn't _hex_, but a number of the format:
+"v+Major.Minor"
+so use the _real_ IP-core version number everywhere. Note mentioning
+that some of your GNET device has the GMAC_VERSION.SNPSVER hardwired
+to 0x10 is completely redundant in this and many other context. The
+only place where it's relevant is the patch(es) where you have the
+Snps ID override.
+
 > 
-> Hi,
+> Device tables:
 > 
-> I have tested this patch in upstream kernel - 6.9.0-rc5+ and observing no effect while adding tc flow rule with control flags.
-> 'Not supported' error is not shown while adding the below tc rule.
+
+> device    type    pci_id    snps_id    channel
+> ls2k1000  gmac    7a03      0x35/0x37   1
+> ls7a1000  gmac    7a03      0x35/0x37   1
+> ls2k2000  gnet    7a13      0x10        8
+> ls7a2000  gnet    7a13      0x37        1
+
+s/gmac/GMAC
+s/gnet/GNET
+s/pci_id/PCI Dev ID
+s/snsp_id/Synopys Version
+s/channels/DMA-channels
+s/ls2k/LS2K
+s/ls7a/LS7A
+
+* everywhere
+
 > 
-> [root@cbl-mariner ~]# tc qdisc add dev ens5f0np0 ingress
-> [root@cbl-mariner ~]#
-> [root@cbl-mariner ~]# tc filter add dev ens5f0np0 ingress protocol ip flower ip_flags frag/firstfrag action drop
+> The GMAC device only has a MAC chip inside and needs an
+> external PHY chip;
+> 
+> To later distinguish 8-channel gnet devices from single-channel
+> gnet/gmac devices, move rx_queues_to_use loongson_default_data
+> to loongson_dwmac_probe(). Also move mac_interface to
+> loongson_default_data().
 
-Thank you for testing!
+Again. This is only a part of the reason why you need this change.
+The main reason is to provide the two-leveled platform data init
+functions: fist one is the common method initializing the data common
+for both GMAC and GNET, second one is the device-specific data
+initializer.
 
-I think the issue you are observing, is because you are missing "skip_sw":
-tc filter add dev ens5f0np0 ingress protocol ip flower skip_sw \
-	ip_flags frag/firstfrag action drop
+To sum up I would change the commit log to something like this:
 
-Without skip_sw, then the hardware offload is opportunistic,
-and therefore the error in hardware offloading doesn't bubble
-through to user space.
+"Loongson delivers two types of the network devices: Loongson GMAC and
+Loongson GNET in the framework of four CPU/Chipsets revisions:
 
-Without skip_sw, you should still be able to observe a change in
-`tc filter show dev ens5f0np0 ingress`. Without the patch you
-should see "in_hw", and with it you should see "not_in_hw".
+   Chip             Network  PCI Dev ID   Synopys Version   DMA-channel
+LS2K1000 CPU         GMAC      0x7a03       v3.50a/v3.73a        1
+LS7A1000 Chipset     GMAC      0x7a03       v3.50a/v3.73a        1
+LS2K2000 CPU         GNET      0x7a13          v3.73a            8
+LS7A2000 Chipset     GNET      0x7a13          v3.73a            1
 
-With skip_sw, then the error in hardware offloading causes
-the tc command to fail, with the -EOPNOTSUPP error and
-associated extended Netlink error message.
+The driver currently supports the chips with the Loongson GMAC network
+device. As a preparation before adding the Loongson GNET support
+detach the Loongson GMAC-specific platform data initializations to the
+loongson_gmac_data() method and preserve the common settings in the
+loongson_default_data().
 
-Also see Ido's testing for mlxsw in this other thread:
-https://lore.kernel.org/netdev/ZiABPNMbOOYGiHCq@shredder/#t
+While at it drop the return value statement from the
+loongson_default_data() method as redundant."
 
--- 
-Best regards
-Asbjørn Sloth Tønnesen
-Network Engineer
-Fiberby - AS42541
+> 
+> Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
+> Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
+> Signed-off-by: Yanteng Si <siyanteng@loongson.cn>
+> ---
+>  .../ethernet/stmicro/stmmac/dwmac-loongson.c  | 20 ++++++++++++-------
+>  1 file changed, 13 insertions(+), 7 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+> index 4e0838db4259..904e288d0be0 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+> @@ -11,22 +11,20 @@
+>  
+>  #define PCI_DEVICE_ID_LOONGSON_GMAC	0x7a03
+>  
+> -static int loongson_default_data(struct plat_stmmacenet_data *plat)
+> +static void loongson_default_data(struct plat_stmmacenet_data *plat)
+>  {
+>  	plat->clk_csr = 2;	/* clk_csr_i = 20-35MHz & MDC = clk_csr_i/16 */
+>  	plat->has_gmac = 1;
+>  	plat->force_sf_dma_mode = 1;
+>  
+
+> +	plat->mac_interface = PHY_INTERFACE_MODE_GMII;
+> +
+
+I double-checked this part in my HW and in the databooks. DW GMAC with
+_RGMII_ PHY-interfaces can't be equipped with a PCS (STMMAC driver is
+wrong in considering otherwise at least in the Auto-negotiation part).
+PCS is only available for the RTI, RTBI and SGMII interfaces.
+
+You can double-check that by checking out the DMA_HW_FEATURE.PCSSEL
+flag state. I'll be surprised if it's set in your case. If it isn't
+then either drop the plat_stmmacenet_data::mac_interface
+initialization or (as Russell suggested) initialize it with
+PHY_INTERFACE_MODE_NA. But do that in a separate pre-requisite patch!
+
+>  	/* Set default value for unicast filter entries */
+>  	plat->unicast_filter_entries = 1;
+>  
+>  	/* Set the maxmtu to a default of JUMBO_LEN */
+>  	plat->maxmtu = JUMBO_LEN;
+>  
+> -	/* Set default number of RX and TX queues to use */
+> -	plat->tx_queues_to_use = 1;
+> -	plat->rx_queues_to_use = 1;
+> -
+>  	/* Disable Priority config by default */
+>  	plat->tx_queues_cfg[0].use_prio = false;
+>  	plat->rx_queues_cfg[0].use_prio = false;
+> @@ -41,6 +39,12 @@ static int loongson_default_data(struct plat_stmmacenet_data *plat)
+>  	plat->dma_cfg->pblx8 = true;
+>  
+>  	plat->multicast_filter_bins = 256;
+> +}
+> +
+> +static int loongson_gmac_data(struct plat_stmmacenet_data *plat)
+> +{
+> +	loongson_default_data(plat);
+> +
+>  	return 0;
+>  }
+>  
+> @@ -109,11 +113,10 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
+>  	}
+>  
+>  	plat->phy_interface = phy_mode;
+> -	plat->mac_interface = PHY_INTERFACE_MODE_GMII;
+>  
+>  	pci_set_master(pdev);
+>  
+> -	loongson_default_data(plat);
+> +	loongson_gmac_data(plat);
+>  	pci_enable_msi(pdev);
+>  	memset(&res, 0, sizeof(res));
+>  	res.addr = pcim_iomap_table(pdev)[0];
+> @@ -138,6 +141,9 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
+>  		goto err_disable_msi;
+>  	}
+>  
+
+> +	plat->tx_queues_to_use = 1;
+> +	plat->rx_queues_to_use = 1;
+> +
+
+You can freely move this to loongson_gmac_data() method. And then, in
+the patch adding the GNET-support, you'll be able to provide these fields
+initialization in the loongson_gnet_data() method together with the
+plat->tx_queues_cfg[*].coe_unsupported flag init. Thus the probe()
+method will get to be smaller and easier to read, and the
+loongson_*_data() method will be more coherent.
+
+-Serge(y)
+
+>  	ret = stmmac_dvr_probe(&pdev->dev, plat, &res);
+>  	if (ret)
+>  		goto err_disable_msi;
+> -- 
+> 2.31.4
+> 
 
