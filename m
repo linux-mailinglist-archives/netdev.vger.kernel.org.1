@@ -1,106 +1,117 @@
-Return-Path: <netdev+bounces-93248-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93249-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2B3A8BAB70
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 13:14:09 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87F268BAB9A
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 13:33:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F2C6A1C218A8
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 11:14:08 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B7FDBB20F57
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 11:33:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3A991527BD;
-	Fri,  3 May 2024 11:13:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CA2015219B;
+	Fri,  3 May 2024 11:33:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aX6+khFg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
+Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02338152501;
-	Fri,  3 May 2024 11:13:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6707DC2E9
+	for <netdev@vger.kernel.org>; Fri,  3 May 2024 11:33:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714734830; cv=none; b=cZGEA8NCrTqVFam/+elrJO0OPqQf6a8nq55Vtxmot4ycIupQANBG4KSWxpJGQ1CMH76doCT+vVKwPqvP48rVafGOqvpfHnYIjeIqFSTdY25iGLW5Rg4k6JzGOp/BD61lUE2pFKmgqTs2R6Gr6N1E8yKGQ+JDrLXlE7SOse8P2pA=
+	t=1714736008; cv=none; b=jFNDtrWIF5AavmrkTqAQjEvjP8zwMAcQ7dH5a7ljXiCugq1g1oTX9UfbjZXEsHk8fF2BLYXX2KTlUocAggJeS8cdMJ3TKYQ6xW7bpwxB717zVzs830lPl/kB3Xmy9gLo8yFH4e6QtxJaCQeZGxO14NP/GTnqIgMsZm/w6X4z6qM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714734830; c=relaxed/simple;
-	bh=cBAnSrJnc6T/6zNafgNMQ/ABTJTYXNZjAnbvdO0IzV4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=AyQXtvUVq8qHynWkZKVY6zsgUcNO6zJrlTIm6y89vCq9zflS4vAFafQVTlNeIQ6mDeCRkzLbzM4VntU6IMp3BET7ZO/sYReynqgR9wdki33s31bLrNfQ8uW0P6bm9G9azv2GXauz2mxOSku7LaaaRIjw2G4r56fruya6NP3y82c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.167.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-51f2ebbd8a7so1966521e87.2;
-        Fri, 03 May 2024 04:13:48 -0700 (PDT)
+	s=arc-20240116; t=1714736008; c=relaxed/simple;
+	bh=jdNr9HzoVl94UbxT5ZLc4/b71AkBZCNGvQPd4k/6VVY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Pv3zrTK6qo8VSEX9CFL76E4pdAQQS45yYiEqEt6GBW/ysmHzOjX8wFSWDulOB3rrI/kyvsq9sRVEUluieB2C1GiH7PxOB+9tB05T4V/nXfXhbxiqQwop4H458dtodUO4hVok/tAQmslbHTc5K8arvzoYw743TpTAbGApRR1bMxw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=aX6+khFg; arc=none smtp.client-ip=209.85.221.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-34c8592b8dbso5689574f8f.3
+        for <netdev@vger.kernel.org>; Fri, 03 May 2024 04:33:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1714736006; x=1715340806; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=mYKYS9o1+tjlc9KHGfIXM8/wUGmn4enyO6luvWTQQAI=;
+        b=aX6+khFgh+CeP33k/2ejGxcRvPrNgJBxbG1aQEw2jM/euYyG+FT81Q8MnnLk2hBGQP
+         xacVrsvA3gmt4KGrKNQxuZLmG/+Rp+AG1hAyjz7bt4/O9sVgw9JRj8y8+TFK3pkqUkUP
+         B054UUt4JAOmxsRgSTBYO9JZf5SKjlj+dUH41heBFrYyXp0hR263qYTJhuFeohzokVFl
+         FUn+MkNI9ctzQ0f0CxBGuCaYVFVFsD6I7HOUpb8DHNxcpfCA+jaLaWQgnKJGJpAMKdkW
+         86I4SYjtQuc3DIComMMvkOMtk6YPwXNKvu8nq4TKwQvgoULL98G8u60suGsmN1urIzIh
+         4eaw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714734827; x=1715339627;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=tXrwZ21nOmfdZ6s+4+0+abMwpM7qqm9U6gzSaZhDUoA=;
-        b=Dzh+BpxDheC1SNa7XXwl2lsVtWMX65BPqD+x6nf6mVCFPTR9SRwihNDg8dcUgg45Rb
-         61YgcMNwp2bp9oaqvdx3i1u9jjcQ+t1n3+uHR2nU7kJjVx7cfrSjtL4TGxvofhrF+A+Q
-         S5Yf+nkSiEV53czVsVjppruE0EeePheKWFpe5xfoqrvmvNaEpYCtmVBzgdWScTT78Qgi
-         4faQRhzrbCLUc6ysRlKxXhkXu3v3BhNFIcqP2SrCCZA4IPry1C8o55BgEAeMZ7h8MUhB
-         9zNH6Xq3rKtU9JxL4t1s5Z7z7+jbZ6hT7Hj1eDSU3vhxxIqvnUu1tn/fOYF1dkbp+Pxo
-         vHyg==
-X-Forwarded-Encrypted: i=1; AJvYcCVaZg+BnO/USJdDRvyhW3y1gNWbFoFI1OaBqKJFzFmvDJYhIWXBxmusvM0zfOaFJHZJ8fYt2I7lmbePfbAVY0X63HLTzM37opuxxK10lJ+yAlNcJN0ddMsAck/Y96+wdSXPTJcnvLM3MA==
-X-Gm-Message-State: AOJu0YxypucTGQxncBI2lpqJFaT7+w33vj0bXppgJJm0G/5/fUGgItot
-	61XVq/mEDn3BFxszyKD9QbQF3lnR4sqsfa5yO25bg1Dw1YKsBm1Whe2I5Q==
-X-Google-Smtp-Source: AGHT+IEUl31PUP0o+zgIUWrcD8hHrz20gaWcHnLIVz23yLtxDK3jNpocByejvyBLY2zoBc9JYNu23A==
-X-Received: by 2002:ac2:4e98:0:b0:51d:497e:83d6 with SMTP id o24-20020ac24e98000000b0051d497e83d6mr1550812lfr.20.1714734826772;
-        Fri, 03 May 2024 04:13:46 -0700 (PDT)
-Received: from localhost (fwdproxy-lla-117.fbsv.net. [2a03:2880:30ff:75::face:b00c])
-        by smtp.gmail.com with ESMTPSA id kt14-20020a170906aace00b00a5995900bd7sm441878ejb.192.2024.05.03.04.13.46
+        d=1e100.net; s=20230601; t=1714736006; x=1715340806;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mYKYS9o1+tjlc9KHGfIXM8/wUGmn4enyO6luvWTQQAI=;
+        b=pIAD+oGydxMx4r9hWeHWmAop91xP7MLN8k5K3gHMKvnifBjlozgkDXMq38Cq4aWHH6
+         9CH4DN83b1VMDU4UmOAY30wlCEU8uxMr0psZX/Jk/YpHW/aXv9FflLh0OdwuRrIpekSl
+         DzTokV4IZf0HYMzEtXF28PSalcP3X52umjQbIAqxcr/ctYGRjh/k1L15jE8MAn8LGNMl
+         jgKqu4DWJEbAbRNX3GCHma7w8RqHslFyRkjJTxmnZhT2z/7c+xsNOEo53BVpFfWwfWff
+         JAH94wMwYa8BQrbQOJhr3E6yPyn3l7kbP7jB6IM50V1dVnr3Xwqn91sNhy0bdz28O90a
+         IfEQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXzllPwfKEtN+FvZ9J7+NmwAfFpOkKUuwrnhmt2FFgHj3aVpPyey4TwAG94pXacrDs6nostS2Uw9ykeWniuz6FFz83aVwyc
+X-Gm-Message-State: AOJu0YySTqTbqV4JcG8BAEgWcc02MvU/rEvoWz7rH81EIGRn7kjydJaw
+	gmtjHi3B8sAdDCy9zJP6/UrggBlLzYPpjaHaVr9QjOaOfSsOIDaJXYrFjMw8XH8=
+X-Google-Smtp-Source: AGHT+IHFM8Y9OVCT1J9cntIkypVbedCqaexA3eFHwjLabOtU69YxG+ZsibaJ11feF8n/Zsf4r27DdQ==
+X-Received: by 2002:a5d:4f8f:0:b0:34d:7fbb:e93b with SMTP id d15-20020a5d4f8f000000b0034d7fbbe93bmr1833665wru.14.1714736005539;
+        Fri, 03 May 2024 04:33:25 -0700 (PDT)
+Received: from localhost ([102.222.70.76])
+        by smtp.gmail.com with ESMTPSA id p13-20020a056000018d00b0034e229a7d5bsm3576100wrx.7.2024.05.03.04.33.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 May 2024 04:13:46 -0700 (PDT)
-From: Breno Leitao <leitao@debian.org>
-To: Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>,
-	Leon Romanovsky <leon@kernel.org>
-Cc: netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org (open list:HFI1 DRIVER),
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net-next 2/2] IB/hfi1: Remove generic .ndo_get_stats64
-Date: Fri,  3 May 2024 04:13:32 -0700
-Message-ID: <20240503111333.552360-2-leitao@debian.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240503111333.552360-1-leitao@debian.org>
-References: <20240503111333.552360-1-leitao@debian.org>
+        Fri, 03 May 2024 04:33:24 -0700 (PDT)
+Date: Fri, 3 May 2024 14:33:20 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Markus Elfring <Markus.Elfring@web.de>
+Cc: Duoming Zhou <duoming@zju.edu.cn>, linux-hams@vger.kernel.org,
+	netdev@vger.kernel.org, kernel-janitors@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	=?iso-8859-1?Q?J=F6rg?= Reuter <jreuter@yaina.de>,
+	Paolo Abeni <pabeni@redhat.com>,
+	LKML <linux-kernel@vger.kernel.org>,
+	Lars Kellogg-Stedman <lars@oddbit.com>
+Subject: Re: [PATCH net v2 1/2] ax25: change kfree in ax25_dev_free to
+ ax25_dev_free
+Message-ID: <4ec281f4-f7f8-436c-af0e-c8410ba79139@moroto.mountain>
+References: <cover.1714690906.git.duoming@zju.edu.cn>
+ <81bc171fb2246201236c341e9b7d799f509d7dd4.1714690906.git.duoming@zju.edu.cn>
+ <89f07a73-90c6-4a81-9cec-7a1b7d61ea6b@web.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <89f07a73-90c6-4a81-9cec-7a1b7d61ea6b@web.de>
 
-Commit 3e2f544dd8a33 ("net: get stats64 if device if driver is
-configured") moved the callback to dev_get_tstats64() to net core, so,
-unless the driver is doing some custom stats collection, it does not
-need to set .ndo_get_stats64.
+On Fri, May 03, 2024 at 07:36:54AM +0200, Markus Elfring wrote:
+> > The ax25_dev is managed by reference counting, so it should not be
+> > deallocated directly by kfree() in ax25_dev_free(), replace it with
+> > ax25_dev_put() instead.
+> 
+> You repeated a wording mistake in the summary phrase from a previous cover letter.
 
-Since this driver is now relying in NETDEV_PCPU_STAT_TSTATS, then, it
-doesn't need to set the dev_get_tstats64() generic .ndo_get_stats64
-function pointer.
+Yeah.  That's true.  The subject should be changed to:
 
-Signed-off-by: Breno Leitao <leitao@debian.org>
----
- drivers/infiniband/hw/hfi1/ipoib_main.c | 1 -
- 1 file changed, 1 deletion(-)
+Subject: [PATCH] ax25: change kfree() in ax25_dev_free() to ax25_dev_put()
 
-diff --git a/drivers/infiniband/hw/hfi1/ipoib_main.c b/drivers/infiniband/hw/hfi1/ipoib_main.c
-index 59c6e55f4119..7c9d5203002b 100644
---- a/drivers/infiniband/hw/hfi1/ipoib_main.c
-+++ b/drivers/infiniband/hw/hfi1/ipoib_main.c
-@@ -96,7 +96,6 @@ static const struct net_device_ops hfi1_ipoib_netdev_ops = {
- 	.ndo_uninit       = hfi1_ipoib_dev_uninit,
- 	.ndo_open         = hfi1_ipoib_dev_open,
- 	.ndo_stop         = hfi1_ipoib_dev_stop,
--	.ndo_get_stats64  = dev_get_tstats64,
- };
- 
- static int hfi1_ipoib_mcast_attach(struct net_device *dev,
--- 
-2.43.0
+Another option would be:
+
+Subject: [PATCH] ax25: use ax25_dev_put() in ax25_dev_free()
+
+Otherwise the commit message is okay as-is.
+
+regards,
+dan carpenter
 
 
