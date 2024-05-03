@@ -1,131 +1,106 @@
-Return-Path: <netdev+bounces-93352-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93354-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 893548BB475
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 22:01:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C46608BB490
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 22:14:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C3787B20DDF
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 20:01:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CB3381C22F17
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 20:14:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3360158D69;
-	Fri,  3 May 2024 20:01:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66206158A07;
+	Fri,  3 May 2024 20:14:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AnqBxSL+"
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="kJOUuEZZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72D62158A11;
-	Fri,  3 May 2024 20:01:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB4F41509AB
+	for <netdev@vger.kernel.org>; Fri,  3 May 2024 20:14:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714766488; cv=none; b=bHnPttwz4RRVK5vIX2o/U0XoAWCZOSGDefMqp3ztqlbUL5XK0OSSvy/TE29e1o+4DyK2ppK1K2S2uZlwt4pH/MuE7CssFqhHvjFeX6tj14GKlgvqAOA/uie0E0E2XKl76GZ+Ht6Rl+iArNmhobKazNuPCRGKEgYeZ/l0rHFppoU=
+	t=1714767258; cv=none; b=fUcCBYb6iFHg5sxihzT+3iqi9ZDZRH8wMov7iJeZF20BkH++jkcrrIj8rJXelunYVowM2teMR6YTQq+LxCHHGOKHTCv3H1DqRn8T/VVmHpOeTIChGUoGeIsWN3ZvVlKzRufIsON4uK/vXhMhTZa04aZl5H8nJ93a5BjxMF8rr6Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714766488; c=relaxed/simple;
-	bh=hPEqob8cQJS3NsWU5XrkHHRjPy8+sKpmtawBRZMffhY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AldxR5ytgbN1bnXqVXDViA9wVoSC3APZyW3YadirQ8Evr+gkYX5HtNufjsHYxJUUc/gqg0n33GvLvq/4CQwV3azkWdGLYYQr7VnXLsMS7mUMyyJWsPTA1CRNIQqE+2bxG0pJ0hcoQ2y2htQvo+sRBtERcuo+lwa2CeQfFLgXItA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AnqBxSL+; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-1ecddf96313so305225ad.2;
-        Fri, 03 May 2024 13:01:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1714766486; x=1715371286; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=YfhSmmcDj/a2edtCK/DxZRFrA53blVaphRlpcsRhEhE=;
-        b=AnqBxSL+BLK16BMSaHSKj8qWclghvs0r2FyDIaLu+6AqNKlSGdtq25qT7ySlPjefNj
-         G/oPM8UkQ4CH6FQii/RITGXnBjPC8xffH8D+V0fLP+OrQKBavfZBZMbdod5d2VfvcXV+
-         x+m8k8yYms6f4esyGb4kGqOe5TS9WAPax2Yv9ap9v/qY9HOEwdCsZyFIV7P1AmjMmHOo
-         0TOmLUSgirbr7fRZgKwfW2iO/IOfcn1TUQl5yeugnhoWwAe14Wvtt2M2g+rKU7oq+xG/
-         c52B0W+iq4Q8c7BZ5i+dSfUU0YoeAGR1qD1RCh3fYpdt4RBQ3b9saX9eBn/bK3Dm5Tc+
-         QG3g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714766486; x=1715371286;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=YfhSmmcDj/a2edtCK/DxZRFrA53blVaphRlpcsRhEhE=;
-        b=FQWn+9ENWLzmrf8wp6j1V4wyKlpKNqHqpzW95EQTaykZEnJlE3YpmBHf1f3Kc4dvy7
-         fne2dhRI8ceYZKSVfr30SxKfOPGVhTku1DmFJgOL81HXkZ6T4G5oE4zqspv4lrTJPYqF
-         Ar+x9o1aQGFMNzuIOCCoWQm33IHhCXUgnGHJNR2pMHxjeyUuo8JWFDJFRP3iQjia3zoq
-         TMVW5RmY8ZlAPNC4G6dU6AxDaHOPqUuhtpdbE/oB8wBqs16TADukqg9StQGY7weiJHeR
-         ZDZ1WyaU30KM8UMj5/i5ZrEQcGaulLzGIoNSGmJ0xbkrHAFFEP9NOu0dzhN9Gi2g1ado
-         QuqA==
-X-Forwarded-Encrypted: i=1; AJvYcCWjXUYI/yQdInxyluHjS7RK0ViRl88nlvVWt98NYLsyYl7AzOQw6rUbc1UGoXyxRFmp1SAxSge9D0On9HVbRR1jLWnHMdvH/m1sq2wfxf0ZSsm035fpch2uoc2NGPndjHa/5XPe
-X-Gm-Message-State: AOJu0Yw0aKeMzHEUFGAm7cnKKruCFY5MeLtA+1Ji7livMs3pU1brIt5I
-	drsrawZ0r7Copz10R6eDSctccfMZuD7lJqWcYkyo9kO94AhCwuzf
-X-Google-Smtp-Source: AGHT+IGKbgsuBPLYBmLsJqbPT/EtMURV5XOK+N4g06YiOkmBh4jZi0qc3MZ408O+YCIxq/IZiy539g==
-X-Received: by 2002:a17:902:b186:b0:1e2:9066:4a8b with SMTP id s6-20020a170902b18600b001e290664a8bmr4052338plr.26.1714766485707;
-        Fri, 03 May 2024 13:01:25 -0700 (PDT)
-Received: from frhdebian.corp.toradex.com ([201.82.41.210])
-        by smtp.gmail.com with ESMTPSA id x21-20020a170902ea9500b001e510b3e807sm3595205plb.263.2024.05.03.13.01.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 May 2024 13:01:25 -0700 (PDT)
-From: Hiago De Franco <hiagofranco@gmail.com>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Sean Anderson <sean.anderson@linux.dev>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Hiago De Franco <hiago.franco@toradex.com>
-Subject: [PATCH] net: ethernet: ti: am65-cpsw-nuss: create platform device for port nodes
-Date: Fri,  3 May 2024 17:00:38 -0300
-Message-ID: <20240503200038.573669-1-hiagofranco@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1714767258; c=relaxed/simple;
+	bh=Qcg7eflHIxQk4jSI9NFTGP/XGw/RF+ah22Oriae+9CY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fWlWdl7+2YPL1mAH2oCz/xIjDDPDVWvc0t+FPD/j8p6/Z15re4y1DcMY6uOW4iSS7avXQhlMoWxuiPR5ZHc/xDH55XLhp5Msp1dIJb3JLidtrjjxnePeEb7rdpmle8atw9arcXzgDxgK5DdfhzifpTgh7+fvU4KEGMIQjBS3nLo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=kJOUuEZZ; arc=none smtp.client-ip=85.214.62.61
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Received: from [127.0.0.1] (p578adb1c.dip0.t-ipconnect.de [87.138.219.28])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits))
+	(No client certificate requested)
+	(Authenticated sender: marex@denx.de)
+	by phobos.denx.de (Postfix) with ESMTPSA id 6F97088BE9;
+	Fri,  3 May 2024 22:14:08 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+	s=phobos-20191101; t=1714767249;
+	bh=TzDQkNze3oblg3xgeptY0oYZlZZTBgW+bzQqgvlFZTY=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=kJOUuEZZp5HCVjcfTz8uQBW792LxI78qIM8G1nAO5gJwXhUMdZuJbeiJEc8ewMmwa
+	 4vHkI6CTbW7fiLI2ULe+h0MPaObo0kbERPszZiCfEtO3FHHwd+pVFaYDTAbTT706k/
+	 z40lpK27XGpkwjQzvB1X07ABR+rUZaKeN3KPeXn50L0qMkqLPxQOYGNQYf7Pa1Q94D
+	 wWLlyqt9HpTYyJS31iAdh1LTr8z4s8oQZ6M2hHBxNeGM3/TbXjvWPmannDNIqhEvdv
+	 K/KHBr+l9kXvNMtjBLgCRvnRGMNCMAvcEU5+Z1VP8IYE0WbZXGI1tIrR25ab5yTkHe
+	 DyGunUgFHwIrA==
+Message-ID: <8de19188-577e-4e74-89c9-82755d0423fa@denx.de>
+Date: Fri, 3 May 2024 22:03:34 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net,PATCH v3] net: ks8851: Queue RX packets in IRQ handler
+ instead of disabling BHs
+To: Eric Dumazet <edumazet@google.com>
+Cc: netdev@vger.kernel.org, Ronald Wahl <ronald.wahl@raritan.com>,
+ "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+References: <20240502183436.117117-1-marex@denx.de>
+ <CANn89iJvQnjSm0wCQVyX+Q3VKSEHB1c=RVr11dSLoRUMPG-BzA@mail.gmail.com>
+Content-Language: en-US
+From: Marek Vasut <marex@denx.de>
+In-Reply-To: <CANn89iJvQnjSm0wCQVyX+Q3VKSEHB1c=RVr11dSLoRUMPG-BzA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
 
-From: Hiago De Franco <hiago.franco@toradex.com>
+On 5/3/24 9:08 AM, Eric Dumazet wrote:
+> On Thu, May 2, 2024 at 8:34 PM Marek Vasut <marex@denx.de> wrote:
+>>
+>> Currently the driver uses local_bh_disable()/local_bh_enable() in its
+>> IRQ handler to avoid triggering net_rx_action() softirq on exit from
+>> netif_rx(). The net_rx_action() could trigger this driver .start_xmit
+>> callback, which is protected by the same lock as the IRQ handler, so
+>> calling the .start_xmit from netif_rx() from the IRQ handler critical
+>> section protected by the lock could lead to an attempt to claim the
+>> already claimed lock, and a hang.
+>>
+>> The local_bh_disable()/local_bh_enable() approach works only in case
+>> the IRQ handler is protected by a spinlock, but does not work if the
+>> IRQ handler is protected by mutex, i.e. this works for KS8851 with
+>> Parallel bus interface, but not for KS8851 with SPI bus interface.
+>>
+>> Remove the BH manipulation and instead of calling netif_rx() inside
+>> the IRQ handler code protected by the lock, queue all the received
+>> SKBs in the IRQ handler into a queue first, and once the IRQ handler
+>> exits the critical section protected by the lock, dequeue all the
+>> queued SKBs and push them all into netif_rx(). At this point, it is
+>> safe to trigger the net_rx_action() softirq, since the netif_rx()
+>> call is outside of the lock that protects the IRQ handler.
+>>
+>> Fixes: be0384bf599c ("net: ks8851: Handle softirqs at the end of IRQ thread to fix hang")
+>> Tested-by: Ronald Wahl <ronald.wahl@raritan.com> # KS8851 SPI
+>> Signed-off-by: Marek Vasut <marex@denx.de>
+> 
+> Reviewed-by: Eric Dumazet <edumazet@google.com>
 
-After this change, an 'of_node' link from '/sys/devices/platform' to
-'/sys/firmware/devicetree' will be created. The 'ethernet-ports' device
-allows multiple netdevs to have the exact same parent device, e.g. port@x
-netdevs are child nodes of ethernet-ports.
-
-When ethernet aliases are used (e.g. 'ethernet0 = &cpsw_port1' and
-'ethernet1 = &cpsw_port2') in the device tree, without an of_node
-device exposed to the userspace, it is not possible to determine where
-exactly the alias is pointing to.
-
-As an example, this is essential for applications like systemd, which rely
-on the of_node information to identify and manage Ethernet devices
-using device tree aliases introduced in the v251 naming scheme.
-
-Signed-off-by: Hiago De Franco <hiago.franco@toradex.com>
----
- drivers/net/ethernet/ti/am65-cpsw-nuss.c | 7 +++++++
- 1 file changed, 7 insertions(+)
-
-diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-index 1d00e21808c1..f74915f56fa2 100644
---- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-+++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-@@ -2091,6 +2091,13 @@ static int am65_cpsw_nuss_init_slave_ports(struct am65_cpsw_common *common)
- 		if (strcmp(port_np->name, "port"))
- 			continue;
- 
-+		if (!of_platform_device_create(port_np, NULL, NULL)) {
-+			dev_err(dev, "%pOF error creating port platform device\n",
-+				port_np);
-+			ret = -ENODEV;
-+			goto of_node_put;
-+		}
-+
- 		ret = of_property_read_u32(port_np, "reg", &port_id);
- 		if (ret < 0) {
- 			dev_err(dev, "%pOF error reading port_id %d\n",
--- 
-2.43.0
-
+Thank you and Jakub for your help with this.
 
