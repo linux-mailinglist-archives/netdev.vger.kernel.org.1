@@ -1,155 +1,150 @@
-Return-Path: <netdev+bounces-93193-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93198-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DEEB08BA81C
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 09:54:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F0BA8BA8B9
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 10:28:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 960FD1F21F72
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 07:54:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D398D283197
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 08:28:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AC62147C7E;
-	Fri,  3 May 2024 07:54:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA2A314D446;
+	Fri,  3 May 2024 08:27:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="PhtnMo/9"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="glp9Kmxu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E784412B89;
-	Fri,  3 May 2024 07:54:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A22314A094
+	for <netdev@vger.kernel.org>; Fri,  3 May 2024 08:27:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714722842; cv=none; b=RRqzgAV8uhzAAj4Fmt2kmSf4aheCDPtA4LYZN1DjhN78akeTrmSrsaHks3etKag36MLFJREzO62a9ruJqrU+vYk0Cln1YJhR2NNwmac3FIbYm9MV+o4ay0U0w2skZQtCRrzkpRFdh/UPBoMP0f+RNw2BG5VW5egjGWd32Xo+p38=
+	t=1714724868; cv=none; b=OC3L2W1d6V6JdhvK9QzBYOScEOxyO3qDvEeEDG46Xo+T08H/Q6iKn7515d9Y+fv2XJwF5JpBHnZaA2z9nnZjRX7+E1i2G8TfXAUHl9s/U+hH7lRTQa/wsKYDfgJnxj3WtwLXjI5E+xFTn2OoDOeOZR8EEAN2ZUyIzt2/qPrAkkk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714722842; c=relaxed/simple;
-	bh=RFadj7DhVRsYigha3zV68omh5cD+jF7AeI0l5uplGs8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=SfVWAyaOWrik6src80C0XyP7Kwxr+tVWrmm86ylDdUXx3SIkvVDWLSXueObpurYIXAaZAE8WTxMRL6EwO3qRL50BDxFJai8btXfd+xklT3eR2p+KaWsnXfMl3v3Gfd/LSRKz3z74pmzuv0dE+tHthzTtEgNdc/kGBP2vKX7/EmU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=PhtnMo/9; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4436srbR030347;
-	Fri, 3 May 2024 07:53:52 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=
-	qcppdkim1; bh=3mzdCXxXwnn8uCG5UnxaKBkw7nHf6ws+H3ixiga1rf4=; b=Ph
-	tnMo/9H5defEBpAiWaXHCbfUbzlzPihxbRvIm/T1sckITy/l1zp8nVhHfFwjUHgQ
-	s5Ug37+Kxp/aa2QvM69pIrTfcgt1LpxtwPKFoqhois04amUWjupw9meo8Ak1aio4
-	7mLNa2NpGTBtdJNJYexesOmg41tnxkXCqelUU+XoiLwLDG1rF9T5KLjq6qKWtc9A
-	cl0zL08qZd5bbsS7WHpW56EZZyJd4oqgwEVL7jykzyNXL2Sms8cA2A5Lf9zH8xTK
-	frQMAdINzapOmJ9BvugUip3a1p1h79ZtWP4VOgbFlIWvca95yy14y/YODvEDLSP6
-	h2DsazBpJweCZsLjmBAQ==
-Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3xvu2n833h-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 03 May 2024 07:53:51 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA01.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 4437rpdi000345
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 3 May 2024 07:53:51 GMT
-Received: from [10.216.13.234] (10.80.80.8) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Fri, 3 May 2024
- 00:53:46 -0700
-Message-ID: <a0daf2d5-4c72-4d96-a8d4-b15adb7252d5@quicinc.com>
-Date: Fri, 3 May 2024 13:23:43 +0530
+	s=arc-20240116; t=1714724868; c=relaxed/simple;
+	bh=o2WKBSQbJSQJew5ixe76lsEdRNmZ+XY4JSaYn7yJ2CE=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=YK/L/+FrJ8oh4F3M8m5FVBERG7QQBRAu28w7i49xLnaDwiaoHi9LhP1JMdJokQ4Mz5aPgpHs6Q389UeSi9UmlH49+xJIkfPBKuAfgVy1/VIzTLn6SDc4nLQbX0eP7j+h8HPIBxE8ElGYHxlunv7yHoleaXIQ42jgWtTVdrZ5Gpg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=glp9Kmxu; arc=none smtp.client-ip=62.96.220.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
+Received: from localhost (localhost [127.0.0.1])
+	by a.mx.secunet.com (Postfix) with ESMTP id 15BAB2076B;
+	Fri,  3 May 2024 10:27:38 +0200 (CEST)
+X-Virus-Scanned: by secunet
+Received: from a.mx.secunet.com ([127.0.0.1])
+	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id bDVwYUkH4Mmb; Fri,  3 May 2024 10:27:37 +0200 (CEST)
+Received: from mailout1.secunet.com (mailout1.secunet.com [62.96.220.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by a.mx.secunet.com (Postfix) with ESMTPS id 1EBE72083F;
+	Fri,  3 May 2024 10:27:37 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 1EBE72083F
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
+	s=202301; t=1714724857;
+	bh=DTXZEPvLtWrBkfjFgwZm3rhfaJZlo/jwztZuVifXXto=;
+	h=From:To:CC:Subject:Date:From;
+	b=glp9Kmxuk1TVoUddwtfl541oMrexfH2Z0kD/HG6l4Xe8Oughynb8Bi4Nk5hub4MSC
+	 yuXFkk5VcoH69qEsOuGxLj7X9wyrHsP+J8v94mdDi6hjdGc3UpDO9xbboj9Z6UNjzx
+	 qVIf7aZQC8xI+pjlSZlOONPWXB2HN9t0GrdDrMEDtsgu4AtpLttAYgW6M5Ft+pk4Gq
+	 BTKklmrN89yYYlGQR6OvyuA2Kp2uRn3/NlfQk8zg1suZIe0atsD+QwDEigw0qeaZA/
+	 kwLXFJaRN5zH34/71vE8MCZnAFMUD6zrRbNb5eNMbKfZtXQWEWdo8L9K9t7TLj7lRP
+	 iVnmqiCaPprnQ==
+Received: from cas-essen-02.secunet.de (unknown [10.53.40.202])
+	by mailout1.secunet.com (Postfix) with ESMTP id 11F0280004A;
+	Fri,  3 May 2024 10:27:37 +0200 (CEST)
+Received: from mbx-essen-02.secunet.de (10.53.40.198) by
+ cas-essen-02.secunet.de (10.53.40.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Fri, 3 May 2024 10:27:36 +0200
+Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
+ (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Fri, 3 May
+ 2024 10:27:36 +0200
+Received: by gauss2.secunet.de (Postfix, from userid 1000)
+	id 09F1B318406D; Fri,  3 May 2024 10:27:36 +0200 (CEST)
+From: Steffen Klassert <steffen.klassert@secunet.com>
+To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
+CC: Herbert Xu <herbert@gondor.apana.org.au>, Steffen Klassert
+	<steffen.klassert@secunet.com>, <netdev@vger.kernel.org>
+Subject: [PATCH 0/5] pull request (net-next): ipsec-next 2024-05-03
+Date: Fri, 3 May 2024 10:27:26 +0200
+Message-ID: <20240503082732.2835810-1-steffen.klassert@secunet.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [linux-next:master] BUILD REGRESSION
- 9c6ecb3cb6e20c4fd7997047213ba0efcf9ada1a
-To: Greg KH <gregkh@linuxfoundation.org>
-CC: kernel test robot <lkp@intel.com>,
-        Andrew Morton
-	<akpm@linux-foundation.org>,
-        Linux Memory Management List
-	<linux-mm@kvack.org>,
-        <amd-gfx@lists.freedesktop.org>, <devicetree@vger.kernel.org>,
-        <dri-devel@lists.freedesktop.org>, <intel-gfx@lists.freedesktop.org>,
-        <intel-xe@lists.freedesktop.org>, <linux-arch@vger.kernel.org>,
-        <linux-usb@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <nouveau@lists.freedesktop.org>
-References: <202405030439.AH8NR0Mg-lkp@intel.com>
- <2024050342-slashing-froth-bcf9@gregkh>
- <d7f7cfae-78d5-41aa-aaf9-0d558cdfcbea@quicinc.com>
- <2024050314-knelt-sandpaper-3884@gregkh>
-Content-Language: en-US
-From: Krishna Kurapati PSSNV <quic_kriskura@quicinc.com>
-In-Reply-To: <2024050314-knelt-sandpaper-3884@gregkh>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: on9lyQf9xcE0l1itpmxGZT4JopeFAuC6
-X-Proofpoint-ORIG-GUID: on9lyQf9xcE0l1itpmxGZT4JopeFAuC6
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1011,Hydra:6.0.650,FMLib:17.11.176.26
- definitions=2024-05-03_04,2024-05-03_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- lowpriorityscore=0 adultscore=0 spamscore=0 phishscore=0 mlxlogscore=707
- priorityscore=1501 malwarescore=0 suspectscore=0 clxscore=1015 bulkscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2404010003 definitions=main-2405030055
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
+ mbx-essen-02.secunet.de (10.53.40.198)
+X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
 
+1) Remove Obsolete UDP_ENCAP_ESPINUDP_NON_IKE Support.
+   This was defined by an early version of an IETF draft
+   that did not make it to a standard.
 
+2) Introduce direction attribute for xfrm states.
+   xfrm states have a direction, a stsate can be used
+   either for input or output packet processing.
+   Add a direction to xfrm states to make it clear
+   for what a xfrm state is used.
 
-On 5/3/2024 11:58 AM, Greg KH wrote:
-> On Fri, May 03, 2024 at 11:30:50AM +0530, Krishna Kurapati PSSNV wrote:
->>
->>
->> On 5/3/2024 10:42 AM, Greg KH wrote:
->>> Ok, I'm getting tired of seeing these for the USB portion of the tree,
->>> so I went to look for:
->>>
->>> On Fri, May 03, 2024 at 04:44:42AM +0800, kernel test robot wrote:
->>>> |-- arc-randconfig-002-20240503
->>>> |   `-- drivers-usb-dwc3-core.c:warning:variable-hw_mode-set-but-not-used
->>>
->>> This warning (same for all arches), but can't seem to find it anywhere.
->>>
->>> Any hints as to where it would be?
->>>
->>
->> Hi Greg,
->>
->>   I think the hw_mode was not removed in hs_phy_setup and left unused.
->>
->>   Thinh reported the same when there was a merge conflict into linux next
->> (that the hw_mode variable was removed in ss_phy_setup and should be removed
->> in hs_phy_setup as well):
->>
->> https://lore.kernel.org/all/20240426213923.tyeddub4xszypeju@synopsys.com/
->>
->>   Perhaps that was missed ?
-> 
-> Must have been.  I need it in a format that it can be applied in (a
-> 2-way diff can't apply...)
-> 
+All patches from Antony Antony.
 
-I just checked it with W=1 and it is causing the issue:
+Please pull or let me know if there are problems.
 
-/local/mnt/workspace/krishna/linux-next/skales_test/skales/kernel/drivers/usb/dwc3/core.c: 
-In function 'dwc3_hs_phy_setup':
-/local/mnt/workspace/krishna/linux-next/skales_test/skales/kernel/drivers/usb/dwc3/core.c:679:15: 
-warning: variable 'hw_mode' set but not used [-Wunused-but-set-variable]
-   unsigned int hw_mode;
-                ^
+Thanks!
 
-I can send a patch to fix it up. Also, just wanted to confirm if  I skip 
-the fixes and CC tags as the main patch wasn't yet merged into any 
-stable trees ?
+The following changes since commit 267e31750ae89f845cfe7df8f577b19482d9ef9b:
 
-Regards,
-Krishna,
+  Merge branch 'phy-listing-link_topology-tracking' (2024-04-06 18:25:15 +0100)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/klassert/ipsec-next.git tags/ipsec-next-2024-05-03
+
+for you to fetch changes up to dcf280ea0aad87e70ef1646d579d11f8a52f8b67:
+
+  Merge remote branch 'xfrm: Introduce direction attribute for SA' (2024-05-02 10:05:11 +0200)
+
+----------------------------------------------------------------
+ipsec-next-2024-05-03
+
+----------------------------------------------------------------
+Antony Antony (5):
+      udpencap: Remove Obsolete UDP_ENCAP_ESPINUDP_NON_IKE Support
+      xfrm: Add Direction to the SA in or out
+      xfrm: Add dir validation to "out" data path lookup
+      xfrm: Add dir validation to "in" data path lookup
+      xfrm: Restrict SA direction attribute to specific netlink message types
+
+Steffen Klassert (1):
+      Merge remote branch 'xfrm: Introduce direction attribute for SA'
+
+ Documentation/networking/xfrm_proc.rst |   6 ++
+ include/net/xfrm.h                     |   1 +
+ include/uapi/linux/snmp.h              |   2 +
+ include/uapi/linux/udp.h               |   2 +-
+ include/uapi/linux/xfrm.h              |   6 ++
+ net/ipv4/esp4.c                        |  12 ---
+ net/ipv4/udp.c                         |   2 -
+ net/ipv4/xfrm4_input.c                 |  13 ---
+ net/ipv6/esp6.c                        |  12 ---
+ net/ipv6/xfrm6_input.c                 |  20 ++--
+ net/xfrm/xfrm_compat.c                 |   7 +-
+ net/xfrm/xfrm_device.c                 |   6 ++
+ net/xfrm/xfrm_input.c                  |  11 +++
+ net/xfrm/xfrm_policy.c                 |   6 ++
+ net/xfrm/xfrm_proc.c                   |   2 +
+ net/xfrm/xfrm_replay.c                 |   3 +-
+ net/xfrm/xfrm_state.c                  |   8 ++
+ net/xfrm/xfrm_user.c                   | 162 +++++++++++++++++++++++++++++++--
+ 18 files changed, 219 insertions(+), 62 deletions(-)
 
