@@ -1,43 +1,56 @@
-Return-Path: <netdev+bounces-93174-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93175-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22A498BA6A8
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 07:35:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CD0AA8BA6AE
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 07:38:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 909061F22A18
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 05:35:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6E0391F22B81
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 05:38:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19457139597;
-	Fri,  3 May 2024 05:34:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C26C13959D;
+	Fri,  3 May 2024 05:37:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="UA4S3TaY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from mout.web.de (mout.web.de [212.227.17.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EBEA13959A;
-	Fri,  3 May 2024 05:34:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8151139586;
+	Fri,  3 May 2024 05:37:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714714497; cv=none; b=s0ejMJh+xAm3qvftBUOqnrI3qi2Dwy3yj5neeyPkDm6nMRjNiWA58g3szj8bJXU9mFTGPpVPwWR1gbqMbytAbLkH7bY9bTFLBitFNsZ6jICNPLFVNHqyCBMIvi4xFcihIyvugPpkUlAENzbZtmSPqspf+d9VZy5fjb/gcqOfY5k=
+	t=1714714677; cv=none; b=o15nY1mSzNvRBDhe4at7eDdD3h7Np2cl/wU+GYgyAsc0xIg20xlG1AUuPCNg192b81cIr4aPCt8rVzg5kOgqv+wPuxu3lEAh8M9qt2/gfyu9jDjJdudLqEEqF3fvUTtNupnF2M0518uXLn9C0oSuxliWHokTI2ug9cFu6QhWIMU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714714497; c=relaxed/simple;
-	bh=Rf7BNULsIILDBBx8Kx5UFYUTpLCCGsnOd4XtYj0Uwjs=;
+	s=arc-20240116; t=1714714677; c=relaxed/simple;
+	bh=22yr4JE/Jesym0pYV5K2emmGFHkQz07wrwb3qp9PgFU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=o9jZbsAsuruHqDBvCxAV8j9h6C8zGwE6tHfkrMktzhIp9FkkS5xY1JcJjXl39FUo/sHefq0oOHGoBLXpr4o3ZqnJNl7BpxwMboGLqjTb3+vmHJxC4VrCr/dgNS6M+xU14mN3Jzvxglj+KggDROLEv4ye1eiNOpNfvK5W7U8pVws=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [10.50.1.206] (unknown [89.187.201.15])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id EAB1361E5FE35;
-	Fri,  3 May 2024 07:34:02 +0200 (CEST)
-Message-ID: <4bd85100-0f3d-4e38-973c-e6938f304dde@molgen.mpg.de>
-Date: Fri, 3 May 2024 07:33:58 +0200
+	 In-Reply-To:Content-Type; b=dEclMAPT1y0ffXZ1gOV1w9y2mrQET2LyoUyc18wpgr5Sqz1bNiSvZxLDXu6hSIwHl843p0QwK2yMJz4XFkog0rGA4DrL1VTOPbWOb4tLAInefl5vfhMUpDx/JnTL+B7K379hcW5qOdGEcCCarviA7pUN54xUurN2SOsfddz3LPw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=UA4S3TaY; arc=none smtp.client-ip=212.227.17.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
+	s=s29768273; t=1714714637; x=1715319437; i=markus.elfring@web.de;
+	bh=oOtFA4UEkaQZQ1lTyzIvZngv43cOzODmoGwEEoq2la4=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
+	 References:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding:cc:content-transfer-encoding:
+	 content-type:date:from:message-id:mime-version:reply-to:subject:
+	 to;
+	b=UA4S3TaYm4fRVdRmIks5BAWnJ36HE8fL6gRMNBP1/4h8s2lU6CXaDyZN3lCn0Bxo
+	 NVVnv4RIlko/++PSFnDgBojyeWZDMnN+o43ONQhGcCyn80EX1kpGL8MKNRlMhTDuu
+	 Hs+ez28oExk9Xl/SdqWxrtmIDd+OkGNmT1oy6HQFffHKVOomXFbDKwJrJcju6zz5B
+	 hUJT4qKeI4ofidzSAzpIq1oBPYdKEimln8NY0TWopIQlU0HbmpuMUJaRohxATlO9i
+	 5e4zn2kh+4WkbKOhKSxP7jpJFAFcTOCJt37q7/1pM5qFK5Euis4tC94cW8nFf2ggF
+	 6GUf6FeqxQo7y8h8ag==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.21] ([94.31.83.95]) by smtp.web.de (mrweb105
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 1Mtgyj-1svYaA1Y5P-00tWSo; Fri, 03
+ May 2024 07:37:17 +0200
+Message-ID: <89f07a73-90c6-4a81-9cec-7a1b7d61ea6b@web.de>
+Date: Fri, 3 May 2024 07:36:54 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -45,120 +58,63 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH] e1000e: fix link fluctuations problem
-To: Ricky Wu <en-wei.wu@canonical.com>
-Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>, netdev@vger.kernel.org,
- rickywu0421@gmail.com, linux-kernel@vger.kernel.org, edumazet@google.com,
- intel-wired-lan@lists.osuosl.org, kuba@kernel.org,
- anthony.l.nguyen@intel.com, pabeni@redhat.com, davem@davemloft.net
-References: <20240502091215.13068-1-en-wei.wu@canonical.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20240502091215.13068-1-en-wei.wu@canonical.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v2 1/2] ax25: change kfree in ax25_dev_free to
+ ax25_dev_free
+To: Duoming Zhou <duoming@zju.edu.cn>, linux-hams@vger.kernel.org,
+ netdev@vger.kernel.org, kernel-janitors@vger.kernel.org,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, =?UTF-8?Q?J=C3=B6rg_Reuter?=
+ <jreuter@yaina.de>, Paolo Abeni <pabeni@redhat.com>
+Cc: LKML <linux-kernel@vger.kernel.org>,
+ Dan Carpenter <dan.carpenter@linaro.org>,
+ Lars Kellogg-Stedman <lars@oddbit.com>
+References: <cover.1714690906.git.duoming@zju.edu.cn>
+ <81bc171fb2246201236c341e9b7d799f509d7dd4.1714690906.git.duoming@zju.edu.cn>
+Content-Language: en-GB
+From: Markus Elfring <Markus.Elfring@web.de>
+In-Reply-To: <81bc171fb2246201236c341e9b7d799f509d7dd4.1714690906.git.duoming@zju.edu.cn>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:2G4b2DUHON8LbQ7M64u0z49A9zJHgVDnju2Aqmpy+hZ13onF16L
+ sUDbvo4qvAYISGBFqGCsTU3N6O86PdtaaXMeK9RLunLpO9KNAUzZIEQ7xOVPio92bAvq2WW
+ q7vlrz8WDaWhSKjM7qGOfl3GyXux1j9nWjNxh1gdpb5f9VwzbvEI8njH8Hsu/lZt+Mbpj8V
+ FSFQy3YaJf6NOocuiSYJQ==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:ovAlsWP0Fnk=;Hkpc6Yy9FQkb8E3PpAoQFb7as34
+ Y5fLGMAzq1qZcLpDOxNRg9Wv5zMb8nCATTX6gNCr17IrLB2o+zFVBWLlRGbWXpUGsbWBhVTAY
+ GIF1VqPPp+gVgRnCfbqHFfkoTFhOkzgYjr/ZgOWBXfGmTOs+rQ37O3+A72cRepC5GOpLg04jg
+ rCebK03XkioB3Diei/anLqhLBhCO8HdngrWek16fFcwrv8TlGTu6mVP9WrUrtfa+ZCbuysC81
+ btJ8n/PynSPb6dHmSaKjh2FDZaMebDlPKUGlD2GnJUPBt9RzpNcgX0p4j9T+OdlhtsRqjHm79
+ omn6IaxUyob46islDe4+TopceN9b3MGCSEW8P3svY47pdYa4mO8O0by4WSAjCdCrCHDolficm
+ MxTmSFl9srWH4CkVLWMkB6dcdvaZ51scUfScAykEV/Ayi+qWxHiyg+T8vkLpbCQYUhNuDJLPP
+ N5mYpKUueQ86VT/Djgi3RhSzyBcRJjHZYmSr/hd7N14sBtENl0KGpRpYrITljKFMky0vetULi
+ 7M3Jzn8uUAnCEAO+8CU+wkbgInoFpTOE3hqOqgDK3rUwtN6EdBQjZFw1mxm5IqUeWYfTCCviI
+ 5My6Dq/c99aMM8tsm9Abo6/HlAtnocqhugeP7N6hh7VOfy/53dhE5Vt56pYob2B82MSDf52FA
+ wa9CTxlVAebKIP1uabewjuZ4LXuiGbGp3XAImMAxk3FqZ6blRYSwHKSeBQu6FZhTb3ekiAmsp
+ efgFDA+8uD+GisXm9T8cMOCYBqFnwQ4FZKtccGyF/AE8hald8Wpfee+NzMDyhHZQShKeJp0HA
+ 76EhGX8mEHw2H93+4VE1DH37YQPNmLSO6AxxXnkZxRF9p2jW7/6U3xDtf5j2paIVxb
 
-[Fix address jesse.brandeburg@intel.co*m*]
+> The ax25_dev is managed by reference counting, so it should not be
+> deallocated directly by kfree() in ax25_dev_free(), replace it with
+> ax25_dev_put() instead.
+
+You repeated a wording mistake in the summary phrase from a previous cover=
+ letter.
+Please avoid confusion about desired code replacements.
+How do you think about to append parentheses to involved function names?
 
 
-Dear Ricky,
+Would you find the following change description a bit nicer?
+
+   The object =E2=80=9Cax25_dev=E2=80=9D is managed by reference counting.
+   Thus it should not be directly released by a kfree() call in ax25_dev_f=
+ree().
+   Replace it with a ax25_dev_put() call instead.
 
 
-Thank you for your patch.
+Would you like to extend patch version descriptions (or changelogs) accord=
+ingly?
 
-
-Am 02.05.24 um 11:12 schrieb Ricky Wu:
-> As described in https://bugzilla.kernel.org/show_bug.cgi?id=218642,
-> some e1000e NIC reports link up -> link down -> link up when hog-plugging
-
-Do you mean ho*t*-plugging?
-
-> the Ethernet cable.
-> 
-> The problem is because the unstable behavior of Link Status bit in
-> PHY Status Register of some e1000e NIC. When we re-plug the cable,
-> the e1000e_phy_has_link_generic() (called after the Link-Status-Changed
-> interrupt) has read this bit with 1->0->1 (1=link up, 0=link down)
-> and e1000e reports it to net device layer respectively.
-
-Wow. I guess this was “fun” to debug. Could you please document, what 
-NICs you saw this, and if it is documented in any datasheet/errata?
-
-> This patch solves the problem by passing polling delays on
-> e1000e_phy_has_link_generic() so that it will not get the unstable
-> states of Link Status bit.
-
-Does this have any downsides on systems with non-buggy hardware?
-
-> Also, the sleep codes in e1000e_phy_has_link_generic() only take
-> effect when error occurs reading the MII register. Moving these codes
-> forward to the beginning of the loop so that the polling delays passed
-> into this function can take effect on any situation.
-
-Could you please split this hunk into a separate patch?
-
-Should it Fixes: tag be added?
-
-Are there any other  public bug reports and discussions you could reference?
-
-Link: https://bugzilla.kernel.org/show_bug.cgi?id=218642
-
-> Signed-off-by: Ricky Wu <en-wei.wu@canonical.com>
-> ---
->   drivers/net/ethernet/intel/e1000e/ich8lan.c |  5 ++++-
->   drivers/net/ethernet/intel/e1000e/phy.c     | 10 ++++++----
->   2 files changed, 10 insertions(+), 5 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/e1000e/ich8lan.c b/drivers/net/ethernet/intel/e1000e/ich8lan.c
-> index f9e94be36e97..c462aa6e6dee 100644
-> --- a/drivers/net/ethernet/intel/e1000e/ich8lan.c
-> +++ b/drivers/net/ethernet/intel/e1000e/ich8lan.c
-> @@ -1427,8 +1427,11 @@ static s32 e1000_check_for_copper_link_ich8lan(struct e1000_hw *hw)
->   	/* First we want to see if the MII Status Register reports
->   	 * link.  If so, then we want to get the current speed/duplex
->   	 * of the PHY.
-> +	 * Some PHYs have link fluctuations with the instability of
-> +	 * Link Status bit (BMSR_LSTATUS) in MII Status Register.
-> +	 * Increase the iteration times and delay solves the problem.
-
-Increas*ing*?
-
->   	 */
-> -	ret_val = e1000e_phy_has_link_generic(hw, 1, 0, &link);
-> +	ret_val = e1000e_phy_has_link_generic(hw, COPPER_LINK_UP_LIMIT, 100000, &link);
-
-Could you please document how 100000 was chosen?
-
->   	if (ret_val)
->   		goto out;
->   
-> diff --git a/drivers/net/ethernet/intel/e1000e/phy.c b/drivers/net/ethernet/intel/e1000e/phy.c
-> index 93544f1cc2a5..ef056363d721 100644
-> --- a/drivers/net/ethernet/intel/e1000e/phy.c
-> +++ b/drivers/net/ethernet/intel/e1000e/phy.c
-> @@ -1776,7 +1776,13 @@ s32 e1000e_phy_has_link_generic(struct e1000_hw *hw, u32 iterations,
->   	u16 i, phy_status;
->   
->   	*success = false;
-> +
->   	for (i = 0; i < iterations; i++) {
-> +		if (usec_interval >= 1000)
-> +			msleep(usec_interval / 1000);
-> +		else
-> +			udelay(usec_interval);
-> +
->   		/* Some PHYs require the MII_BMSR register to be read
->   		 * twice due to the link bit being sticky.  No harm doing
->   		 * it across the board.
-> @@ -1799,10 +1805,6 @@ s32 e1000e_phy_has_link_generic(struct e1000_hw *hw, u32 iterations,
->   			*success = true;
->   			break;
->   		}
-> -		if (usec_interval >= 1000)
-> -			msleep(usec_interval / 1000);
-> -		else
-> -			udelay(usec_interval);
->   	}
->   
->   	return ret_val;
+Regards,
+Markus
 
