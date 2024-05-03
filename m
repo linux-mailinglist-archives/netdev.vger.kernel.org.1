@@ -1,119 +1,152 @@
-Return-Path: <netdev+bounces-93205-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93206-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2DC488BA934
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 10:48:13 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 069788BA93A
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 10:50:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D90EC2817C8
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 08:48:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 41636B210DA
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 08:50:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C938C14A601;
-	Fri,  3 May 2024 08:48:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B51F1465B5;
+	Fri,  3 May 2024 08:50:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="YY49NBns"
+	dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b="MaEwLsR2";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="LXpduzK5"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A86414A0A2;
-	Fri,  3 May 2024 08:48:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from fhigh8-smtp.messagingengine.com (fhigh8-smtp.messagingengine.com [103.168.172.159])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ACC379CD;
+	Fri,  3 May 2024 08:50:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.159
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714726088; cv=none; b=J1JRKpzRPYEoFlNqhuHCRMTPIWDa0JK9O1YZdvV2WdPRlU4O+jfnlB6u3RAH+u5R4Xdnl/fhQUuTqc9Kdh0yo9m/6YityvZXmJIdTZvybuz20umBATeLZUq8BynMMXyf3nSG5Rt8c3R7UwTAsq5ukm+FolWniz0GR115d6IQDKc=
+	t=1714726235; cv=none; b=irqOVGul/uaYP+sxAktUMS289jO43Bptsfn9GiuB9dvU0jt9hjhQrhsOSrIsZ9gt5WLu0RO/oHV+EgsWAlVbWvTff9+OpS0gIt8FtNL8cRNTPLloJfCFb2QLkXeKZtjXoZLemTsrfnZ3c7ecffxDPdkQOb5du+DI4g72BVQ8/m8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714726088; c=relaxed/simple;
-	bh=Etxg/YHMDKlpBP32lFDLlbJbSn/TfzZAQBVqlraiDDQ=;
+	s=arc-20240116; t=1714726235; c=relaxed/simple;
+	bh=B5s9Jk+/x6jSelp/LHfg+HBZm7VnwyFuIXtkYlnwJYg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oDIVzWHAQKYZAJWj1DmMeVmFm/CeZhby4KgK05SK3rxfKlSJS3Qw2ROjRyTKhlOnL9O8lXraCeUEo84indLQOdOgbrU5IekS0y54NHGS6KYVAzdaeJ7MUHHOEoBcfGEGIl5ZXRjgHHdlJ9l1dmPpoBmTdLFQcZPrLa1oD2VLfqY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=YY49NBns; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1134)
-	id C9B0220B2C80; Fri,  3 May 2024 01:48:06 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com C9B0220B2C80
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1714726086;
-	bh=i7337QBeIGytOvVKmvrACz56gMsVGvMlwWZTi53xsLE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=YY49NBnsr3733U23ONC3HeNSrFWhcfqJUUOhGmt7SF2sx8ELfV27k8uB3Qh4zpyy7
-	 2m9l5urjC7tt5mvzIANbyq/jaTnKqxyjdnawdBUZQMA37FuLWSRSTiBvoS2EOzcrXj
-	 bSmPiBcruCWnyQzZzPTBlcfeHLRZylpxj25fi7GQ=
-Date: Fri, 3 May 2024 01:48:06 -0700
-From: Shradha Gupta <shradhagupta@linux.microsoft.com>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: "David S. Miller" <davem@davemloft.net>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=fC6LY534VwZEX0oUMzpcQ88I+vGwAoR5q2yC6zQ2xAXyj37IacnMC+RUN1o4Pmh+6AEJ7iM3twX48/7szs/VF3PsOjUMkoakkzCdRUV8vLKtAWZuNi0zaM2L1/lUOPl8OLTnmKcQJtJxaU0YhDD35l4XQ2es9tMFbAg32zvrt20=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se; spf=pass smtp.mailfrom=ragnatech.se; dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b=MaEwLsR2; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=LXpduzK5; arc=none smtp.client-ip=103.168.172.159
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ragnatech.se
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+	by mailfhigh.nyi.internal (Postfix) with ESMTP id C6FFB1140197;
+	Fri,  3 May 2024 04:50:29 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute5.internal (MEProxy); Fri, 03 May 2024 04:50:29 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ragnatech.se; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm2; t=1714726229;
+	 x=1714812629; bh=4F4Rdkqm7UslI+ESUP+/52ZmCMFB6KZpSmoKNx1SG/k=; b=
+	MaEwLsR2XmH708YsYaOEgT0MTRjRznab/LQZN3Ta2oyC8cQF4yXbwLcfzuxPjWra
+	X0npsEMWuJlNz9KI6p/3GA9Eo0mFYhYJ08OfJlqVWxziCOpjxem7wVOuasfONre+
+	37YeGwMPW/70v7Wj3DLN8nWiK9ikSShWc0TzHDE+LvH3MsgCRv/CVgwYhdNiJlZs
+	sQx+WgmMPqkny+Pm97t30EAF8ONdk8TQA0YmgE3wD9sJLMVU3xIL24BsSsAq3IDj
+	/HuoGs6vwGniBjP/q8qNkmN6+UzvtHqkcpzhfXIMWOXknil+oIIFyB06C1XVAjmC
+	im9ALDr91f6PPyrs2i0sXw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1714726229; x=
+	1714812629; bh=4F4Rdkqm7UslI+ESUP+/52ZmCMFB6KZpSmoKNx1SG/k=; b=L
+	XpduzK5wBQGaiRYKS17XoAvJ41ZFkjxW6zAHL4lj1SZrGRSaxpkLQRt8nYB9P2/o
+	uCe0F9v9RuAE3ddyFgiYWywO5gUGTR2nJ29DeBQHWIiLfhOsYhZdNq4sXWYi40nh
+	Am+5fF8DH0VrFYcO8zh1f+ZM9ppuRh1IJY2lar8EZwWjw5RMvzIKVwXH/zdYj8ZJ
+	dSc9FQhBBAdA4W8pCfnvNgqOhyZ4f9R+tSeAdFCTYh/hNh2yzcml7rd6GB7pa/aS
+	j7ct7F5PsVDTwKE/Dk22ealxpjJMFrDcNInHzPipgd2OiUTPSxdI5QsW+XygDzvU
+	GpziDOBnyR14V8ULzoERw==
+X-ME-Sender: <xms:VaU0ZrDQmojy_F5FUzcVe0PlhPQEe94964yDDT-xqQ_4-ueKKurVxQ>
+    <xme:VaU0ZhgXn4vr4SeDOp4spd1WdgrF_YTxumZx0OT7XIi4UThD887Vovim9hvrDTygg
+    gnkT7hH5CKj5itg6q4>
+X-ME-Received: <xmr:VaU0Zmm9_HIo7N_FG3fD_DPFzDcSY86iCcNDG2vUfWbZuRdrBRrZoyncr_QE7OiZzOxFV0uohEbfs1PxnSUugeLPwAgqlmw>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrvddvtddgtdejucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepfffhvfevuffkfhggtggugfgjsehtkeertddttdejnecuhfhrohhmpefpihhk
+    lhgrshcuufpnuggvrhhluhhnugcuoehnihhklhgrshdrshhouggvrhhluhhnugdorhgvnh
+    gvshgrshesrhgrghhnrghtvggthhdrshgvqeenucggtffrrghtthgvrhhnpeefhfellefh
+    ffejgfefudfggeejlefhveehieekhfeulefgtdefueehffdtvdelieenucevlhhushhtvg
+    hrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehnihhklhgrshdrshhouggv
+    rhhluhhnugdorhgvnhgvshgrshesrhgrghhnrghtvggthhdrshgv
+X-ME-Proxy: <xmx:VaU0ZtxnePf1yVJPgjycl2lwgaZVCc7TRXGMHTSG8Pacrn_WcDb11A>
+    <xmx:VaU0ZgSlp06aDHeRByimrcS462yzwwqKecXevMk5Q8asrYhXwOuQ9w>
+    <xmx:VaU0ZgZ3OTSqrTMw9P-TntnX6pObBCOVlCh1UcNYNMJeFLfzFaG_zQ>
+    <xmx:VaU0ZhSjjD32CRBhozWGrsuzfY1l7uRYPIYz-ETHtqTTqlYmpGT-sg>
+    <xmx:VaU0Zp83J3POwczAs23FgbVudjsKCWPtSMqX-8xGv5fMXMneOawZmgvI>
+Feedback-ID: i80c9496c:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 3 May 2024 04:50:28 -0400 (EDT)
+Date: Fri, 3 May 2024 10:50:26 +0200
+From: Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+To: Arnd Bergmann <arnd@arndb.de>, Simon Horman <horms@kernel.org>
+Cc: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+	"David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Johannes Berg <johannes.berg@intel.com>,
-	Breno Leitao <leitao@debian.org>, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, "K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Long Li <longli@microsoft.com>,
-	Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>,
-	Konstantin Taranov <kotaranov@microsoft.com>,
-	Yury Norov <yury.norov@gmail.com>, linux-hyperv@vger.kernel.org,
-	shradhagupta@microsoft.com
-Subject: Re: [PATCH net-next v2 0/2] Add sysfs attributes for MANA
-Message-ID: <20240503084806.GA1248@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-References: <1713954774-29953-1-git-send-email-shradhagupta@linux.microsoft.com>
- <ZikbpoXWmcQrBP3V@nanopsycho>
- <20240430053138.GA6429@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+	Netdev <netdev@vger.kernel.org>,
+	Linux-Renesas <linux-renesas-soc@vger.kernel.org>
+Subject: Re: [net-next] net: ethernet: rtsn: Add support for Renesas
+ Ethernet-TSN
+Message-ID: <20240503085026.GH3927860@ragnatech.se>
+References: <20240414135937.1139611-1-niklas.soderlund+renesas@ragnatech.se>
+ <20240418183207.GL3975545@kernel.org>
+ <7c8d6791-ea36-45fd-be07-df789263890f@app.fastmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240430053138.GA6429@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <7c8d6791-ea36-45fd-be07-df789263890f@app.fastmail.com>
 
-On Mon, Apr 29, 2024 at 10:31:38PM -0700, Shradha Gupta wrote:
-> On Wed, Apr 24, 2024 at 04:48:06PM +0200, Jiri Pirko wrote:
-> > Wed, Apr 24, 2024 at 12:32:54PM CEST, shradhagupta@linux.microsoft.com wrote:
-> > >These patches include adding sysfs attributes for improving
-> > >debuggability on MANA devices.
-> > >
-> > >The first patch consists on max_mtu, min_mtu attributes that are
-> > >implemented generically for all devices
-> > >
-> > >The second patch has mana specific attributes max_num_msix and num_ports
-> > 
-> > 1) you implement only max, min is never implemented, no point
-> > introducing it.
-> Sure. I had added it for the sake of completeness.
-> > 2) having driver implement sysfs entry feels *very wrong*, don't do that
-> > 3) why DEVLINK_PARAM_GENERIC_ID_MSIX_VEC_PER_PF_MAX
-> >    and DEVLINK_PARAM_GENERIC_ID_MSIX_VEC_PER_PF_MIN
-> >    Are not what you want?
-> Thanks for pointing this out. We are still evaluating if this devlink param
-> could be used for our usecase where we only need a read-only msix value for VF.
-> We keep the thread updated.
-The attribute that we want is per VF msix max. This is per PF and would not be
-the right one for our use case.
-Do you have any other recommendations/suggestions around this?
+Hi Arnd and Simon,
 
-Regards,
-Shradha.
-> > 
-> > >
-> > >Shradha Gupta (2):
-> > >  net: Add sysfs atttributes for max_mtu min_mtu
-> > >  net: mana: Add new device attributes for mana
-> > >
-> > > Documentation/ABI/testing/sysfs-class-net     | 16 ++++++++++
-> > > .../net/ethernet/microsoft/mana/gdma_main.c   | 32 +++++++++++++++++++
-> > > net/core/net-sysfs.c                          |  4 +++
-> > > 3 files changed, 52 insertions(+)
-> > >
-> > >-- 
-> > >2.34.1
-> > >
-> > >
+Thanks for your comments.
+
+On 2024-04-18 21:03:51 +0200, Arnd Bergmann wrote:
+> On Thu, Apr 18, 2024, at 20:32, Simon Horman wrote:
+> >
+> > Hi Niklas,
+> >
+> > I think that the use of __iowbm() means that this will not
+> > compile for many architectures: grep indicates it
+> > is only defined for arm, arm64, and arc.
+> >
+> > Perhaps COMPILE_TEST should be qualified somehow?
+> 
+> 
+> >> +	/* Re-enable TX/RX interrupts */
+> >> +	spin_lock_irqsave(&priv->lock, flags);
+> >> +	rtsn_ctrl_data_irq(priv, true);
+> >> +	__iowmb();
+> >> +	spin_unlock_irqrestore(&priv->lock, flags);
+> 
+> I think this needs a comment anyway: what is this trying
+> to serialize?
+> 
+> The arm64 __iowmb() usually tries to ensure that a memory
+> write to a coherent buffer is complete before a following
+> writel() is sent to the bus, but this one appears to be
+> after the writel() where it has no effect because the
+> transaction may still be in flight on the bus after it
+> has left the store buffer.
+
+Indeed, this is a leftover from development. Thanks for catching it, 
+will drop for v2.
+
+> 
+>       Arnd
+
+-- 
+Kind Regards,
+Niklas Söderlund
 
