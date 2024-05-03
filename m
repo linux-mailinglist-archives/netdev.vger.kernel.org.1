@@ -1,117 +1,174 @@
-Return-Path: <netdev+bounces-93249-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93250-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87F268BAB9A
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 13:33:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96B158BABB3
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 13:36:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B7FDBB20F57
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 11:33:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5214C283AE3
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 11:36:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CA2015219B;
-	Fri,  3 May 2024 11:33:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C64D0152535;
+	Fri,  3 May 2024 11:36:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aX6+khFg"
+	dkim=pass (2048-bit key) header.d=katalix.com header.i=@katalix.com header.b="aL242Nno"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6707DC2E9
-	for <netdev@vger.kernel.org>; Fri,  3 May 2024 11:33:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
+Received: from mail.katalix.com (mail.katalix.com [3.9.82.81])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E59BCC2E9
+	for <netdev@vger.kernel.org>; Fri,  3 May 2024 11:36:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=3.9.82.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714736008; cv=none; b=jFNDtrWIF5AavmrkTqAQjEvjP8zwMAcQ7dH5a7ljXiCugq1g1oTX9UfbjZXEsHk8fF2BLYXX2KTlUocAggJeS8cdMJ3TKYQ6xW7bpwxB717zVzs830lPl/kB3Xmy9gLo8yFH4e6QtxJaCQeZGxO14NP/GTnqIgMsZm/w6X4z6qM=
+	t=1714736183; cv=none; b=r7TQVIBwp82DaPl7WD2dZXwut/l7/yh1dV2vpFj9TFVn+2K3UyTK0964KZzJ5wQKBDYTpwl6FXBb19rRtk5tSwjGdYHyY/BaHttXP+EN3WBwaFNnEF9DgToRjXNu0xHz5wRwBgAppI//4KUfMOD1vy7g0PRlgBcr1/MVEOyvbZg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714736008; c=relaxed/simple;
-	bh=jdNr9HzoVl94UbxT5ZLc4/b71AkBZCNGvQPd4k/6VVY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Pv3zrTK6qo8VSEX9CFL76E4pdAQQS45yYiEqEt6GBW/ysmHzOjX8wFSWDulOB3rrI/kyvsq9sRVEUluieB2C1GiH7PxOB+9tB05T4V/nXfXhbxiqQwop4H458dtodUO4hVok/tAQmslbHTc5K8arvzoYw743TpTAbGApRR1bMxw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=aX6+khFg; arc=none smtp.client-ip=209.85.221.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-34c8592b8dbso5689574f8f.3
-        for <netdev@vger.kernel.org>; Fri, 03 May 2024 04:33:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1714736006; x=1715340806; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=mYKYS9o1+tjlc9KHGfIXM8/wUGmn4enyO6luvWTQQAI=;
-        b=aX6+khFgh+CeP33k/2ejGxcRvPrNgJBxbG1aQEw2jM/euYyG+FT81Q8MnnLk2hBGQP
-         xacVrsvA3gmt4KGrKNQxuZLmG/+Rp+AG1hAyjz7bt4/O9sVgw9JRj8y8+TFK3pkqUkUP
-         B054UUt4JAOmxsRgSTBYO9JZf5SKjlj+dUH41heBFrYyXp0hR263qYTJhuFeohzokVFl
-         FUn+MkNI9ctzQ0f0CxBGuCaYVFVFsD6I7HOUpb8DHNxcpfCA+jaLaWQgnKJGJpAMKdkW
-         86I4SYjtQuc3DIComMMvkOMtk6YPwXNKvu8nq4TKwQvgoULL98G8u60suGsmN1urIzIh
-         4eaw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714736006; x=1715340806;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mYKYS9o1+tjlc9KHGfIXM8/wUGmn4enyO6luvWTQQAI=;
-        b=pIAD+oGydxMx4r9hWeHWmAop91xP7MLN8k5K3gHMKvnifBjlozgkDXMq38Cq4aWHH6
-         9CH4DN83b1VMDU4UmOAY30wlCEU8uxMr0psZX/Jk/YpHW/aXv9FflLh0OdwuRrIpekSl
-         DzTokV4IZf0HYMzEtXF28PSalcP3X52umjQbIAqxcr/ctYGRjh/k1L15jE8MAn8LGNMl
-         jgKqu4DWJEbAbRNX3GCHma7w8RqHslFyRkjJTxmnZhT2z/7c+xsNOEo53BVpFfWwfWff
-         JAH94wMwYa8BQrbQOJhr3E6yPyn3l7kbP7jB6IM50V1dVnr3Xwqn91sNhy0bdz28O90a
-         IfEQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXzllPwfKEtN+FvZ9J7+NmwAfFpOkKUuwrnhmt2FFgHj3aVpPyey4TwAG94pXacrDs6nostS2Uw9ykeWniuz6FFz83aVwyc
-X-Gm-Message-State: AOJu0YySTqTbqV4JcG8BAEgWcc02MvU/rEvoWz7rH81EIGRn7kjydJaw
-	gmtjHi3B8sAdDCy9zJP6/UrggBlLzYPpjaHaVr9QjOaOfSsOIDaJXYrFjMw8XH8=
-X-Google-Smtp-Source: AGHT+IHFM8Y9OVCT1J9cntIkypVbedCqaexA3eFHwjLabOtU69YxG+ZsibaJ11feF8n/Zsf4r27DdQ==
-X-Received: by 2002:a5d:4f8f:0:b0:34d:7fbb:e93b with SMTP id d15-20020a5d4f8f000000b0034d7fbbe93bmr1833665wru.14.1714736005539;
-        Fri, 03 May 2024 04:33:25 -0700 (PDT)
-Received: from localhost ([102.222.70.76])
-        by smtp.gmail.com with ESMTPSA id p13-20020a056000018d00b0034e229a7d5bsm3576100wrx.7.2024.05.03.04.33.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 May 2024 04:33:24 -0700 (PDT)
-Date: Fri, 3 May 2024 14:33:20 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Markus Elfring <Markus.Elfring@web.de>
-Cc: Duoming Zhou <duoming@zju.edu.cn>, linux-hams@vger.kernel.org,
-	netdev@vger.kernel.org, kernel-janitors@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	=?iso-8859-1?Q?J=F6rg?= Reuter <jreuter@yaina.de>,
-	Paolo Abeni <pabeni@redhat.com>,
-	LKML <linux-kernel@vger.kernel.org>,
-	Lars Kellogg-Stedman <lars@oddbit.com>
-Subject: Re: [PATCH net v2 1/2] ax25: change kfree in ax25_dev_free to
- ax25_dev_free
-Message-ID: <4ec281f4-f7f8-436c-af0e-c8410ba79139@moroto.mountain>
-References: <cover.1714690906.git.duoming@zju.edu.cn>
- <81bc171fb2246201236c341e9b7d799f509d7dd4.1714690906.git.duoming@zju.edu.cn>
- <89f07a73-90c6-4a81-9cec-7a1b7d61ea6b@web.de>
+	s=arc-20240116; t=1714736183; c=relaxed/simple;
+	bh=QIzZPTSqoyoSUu2mc2IX8mGO+0q4QX5mx2657041zaw=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:From:Subject:
+	 In-Reply-To:Content-Type; b=eQ0Up5NdJZC41Jvt4Fv3Lik3r9vGcot/nJRVy7xpdi2YvmQwA313LnqQ4EtsmAMJMbXXNhF0oY+tYVhfkSJYC8GovP3PKhCbP6dNuXe2U/hofC2c5+xpUTKUXo/DnGlR06k9Y4UIojG8YI+gesxQP+YVIC0mdX3t0PjSsKdq4y8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=katalix.com; spf=pass smtp.mailfrom=katalix.com; dkim=pass (2048-bit key) header.d=katalix.com header.i=@katalix.com header.b=aL242Nno; arc=none smtp.client-ip=3.9.82.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=katalix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=katalix.com
+Received: from [IPV6:2a02:8010:6359:2:f8c1:ac3:4d22:e947] (unknown [IPv6:2a02:8010:6359:2:f8c1:ac3:4d22:e947])
+	(Authenticated sender: james)
+	by mail.katalix.com (Postfix) with ESMTPSA id C06347D8BA;
+	Fri,  3 May 2024 12:36:14 +0100 (BST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=katalix.com; s=mail;
+	t=1714736174; bh=QIzZPTSqoyoSUu2mc2IX8mGO+0q4QX5mx2657041zaw=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:From:Subject:
+	 In-Reply-To:From;
+	z=Message-ID:=20<ea4ddddc-719c-673e-7646-8f89cd341e7b@katalix.com>|
+	 Date:=20Fri,=203=20May=202024=2012:36:14=20+0100|MIME-Version:=201
+	 .0|To:=20Samuel=20Thibault=20<samuel.thibault@ens-lyon.org>,=0D=0A
+	 =20Tom=20Parkin=20<tparkin@katalix.com>,=20Eric=20Dumazet=20<eduma
+	 zet@google.com>,=0D=0A=20Jakub=20Kicinski=20<kuba@kernel.org>,=20P
+	 aolo=20Abeni=20<pabeni@redhat.com>|Cc:=20netdev@vger.kernel.org|Re
+	 ferences:=20<20240502231418.2933925-1-samuel.thibault@ens-lyon.org
+	 >|From:=20James=20Chapman=20<jchapman@katalix.com>|Subject:=20Re:=
+	 20[PATCH]=20l2tp:=20Support=20several=20sockets=20with=20same=20IP
+	 /port=20quadruple|In-Reply-To:=20<20240502231418.2933925-1-samuel.
+	 thibault@ens-lyon.org>;
+	b=aL242Nno0V0j0aK2xvNnJnxk5NADTpZkZMhjlAbeLdZBFPHyYNHy4SrnSeLqMlJng
+	 aXD9Hd770ao7srDMjcAVNthME1Mhqhlj6yvKCfn8FsvfVmC/c+lB9CAc8ksjw00QDL
+	 s4AwAfspRaM2YjAzGGzXyOJqO1QGVjqmytfpRspD8m5U9r9PeEFERYbLJXSafand+h
+	 nZ1DfY31HDgw6zzLcGkBYfuhtH5FsUm3QCKPHpS30SMTDPLscehj1NpnNEER033ykb
+	 MnwFMVP0e8HrsIaRlbP56Fa8aQEsrg7rSwZePymTkT63V4lAMhZnnIqPGF4Vf6BEzU
+	 fcFe7pFJ8e18Q==
+Message-ID: <ea4ddddc-719c-673e-7646-8f89cd341e7b@katalix.com>
+Date: Fri, 3 May 2024 12:36:14 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <89f07a73-90c6-4a81-9cec-7a1b7d61ea6b@web.de>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Content-Language: en-US
+To: Samuel Thibault <samuel.thibault@ens-lyon.org>,
+ Tom Parkin <tparkin@katalix.com>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org
+References: <20240502231418.2933925-1-samuel.thibault@ens-lyon.org>
+From: James Chapman <jchapman@katalix.com>
+Organization: Katalix Systems Ltd
+Subject: Re: [PATCH] l2tp: Support several sockets with same IP/port quadruple
+In-Reply-To: <20240502231418.2933925-1-samuel.thibault@ens-lyon.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, May 03, 2024 at 07:36:54AM +0200, Markus Elfring wrote:
-> > The ax25_dev is managed by reference counting, so it should not be
-> > deallocated directly by kfree() in ax25_dev_free(), replace it with
-> > ax25_dev_put() instead.
-> 
-> You repeated a wording mistake in the summary phrase from a previous cover letter.
+On 03/05/2024 00:14, Samuel Thibault wrote:
+> Some l2tp providers will use 1701 as origin port and open several
+> tunnels for the same origin and target. On the Linux side, this
+> may mean opening several sockets, but then trafic will go to only
+> one of them, losing the trafic for the tunnel of the other socket
+> (or leaving it up to userland, consuming a lot of cpu%).
+>
+> This can also happen when the l2tp provider uses a cluster, and
+> load-balancing happens to migrate from one origin IP to another one,
+> for which a socket was already established. Managing reassigning
+> tunnels from one socket to another would be very hairy for userland.
+>
+> Lastly, as documented in l2tpconfig(1), as client it may be necessary
+> to use 1701 as origin port for odd firewalls reasons, which could
+> prevent from establishing several tunnels to a l2tp server, for the
+> same reason: trafic would get only on one of the two sockets.
+>
+> With the V2 protocol it is however easy to route trafic to the proper
+> tunnel, by looking up the tunnel number in the network namespace. This
+> fixes the three cases altogether.
 
-Yeah.  That's true.  The subject should be changed to:
+Hi Samuel,
 
-Subject: [PATCH] ax25: change kfree() in ax25_dev_free() to ax25_dev_put()
+Thanks for working on this.
 
-Another option would be:
+I'm currently working on changes that address this for both L2TPv2 and 
+L2TPv3 which will avoid separate tunnel and session lookups in the 
+datapath. However, my changes aren't ready yet; I hope to post them in a 
+week or so.
 
-Subject: [PATCH] ax25: use ax25_dev_put() in ax25_dev_free()
+Please find comments on your patch inline below.
 
-Otherwise the commit message is okay as-is.
-
-regards,
-dan carpenter
+> Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
+> ---
+>   net/l2tp/l2tp_core.c | 21 +++++++++++++++++++++
+>   1 file changed, 21 insertions(+)
+>
+> diff --git a/net/l2tp/l2tp_core.c b/net/l2tp/l2tp_core.c
+> index 8d21ff25f160..128f1146c135 100644
+> --- a/net/l2tp/l2tp_core.c
+> +++ b/net/l2tp/l2tp_core.c
+> @@ -794,6 +794,7 @@ static void l2tp_session_queue_purge(struct l2tp_session *session)
+>   static int l2tp_udp_recv_core(struct l2tp_tunnel *tunnel, struct sk_buff *skb)
+>   {
+>   	struct l2tp_session *session = NULL;
+> +	struct l2tp_tunnel *orig_tunnel = tunnel;
+>   	unsigned char *ptr, *optr;
+>   	u16 hdrflags;
+>   	u32 tunnel_id, session_id;
+> @@ -845,6 +846,20 @@ static int l2tp_udp_recv_core(struct l2tp_tunnel *tunnel, struct sk_buff *skb)
+>   		/* Extract tunnel and session ID */
+>   		tunnel_id = ntohs(*(__be16 *)ptr);
+>   		ptr += 2;
+> +
+> +		if (tunnel_id != tunnel->tunnel_id && tunnel->l2tp_net) {
+Can tunnel->l2tp_net be NULL?
+> +			/* We are receiving trafic for another tunnel, probably
+> +			 * because we have several tunnels between the same
+> +			 * IP/port quadruple, look it up.
+> +			 */
+> +			struct l2tp_tunnel *alt_tunnel;
+> +
+> +			alt_tunnel = l2tp_tunnel_get(tunnel->l2tp_net, tunnel_id);
+This misses a check that alt_tunnel's protocol version matches the 
+header. Move the existing header version check to after this fragment?
+> +			if (!alt_tunnel)
+> +				goto pass;
+> +			tunnel = alt_tunnel;
+> +		}
+> +
+>   		session_id = ntohs(*(__be16 *)ptr);
+>   		ptr += 2;
+>   	} else {
+> @@ -875,6 +890,9 @@ static int l2tp_udp_recv_core(struct l2tp_tunnel *tunnel, struct sk_buff *skb)
+>   	l2tp_recv_common(session, skb, ptr, optr, hdrflags, length);
+>   	l2tp_session_dec_refcount(session);
+>   
+> +	if (tunnel != orig_tunnel)
+> +		l2tp_tunnel_dec_refcount(tunnel);
+> +
+>   	return 0;
+>   
+>   invalid:
+> @@ -884,6 +902,9 @@ static int l2tp_udp_recv_core(struct l2tp_tunnel *tunnel, struct sk_buff *skb)
+>   	/* Put UDP header back */
+>   	__skb_push(skb, sizeof(struct udphdr));
+>   
+> +	if (tunnel != orig_tunnel)
+> +		l2tp_tunnel_dec_refcount(tunnel);
+> +
+>   	return 1;
+>   }
+>   
 
 
