@@ -1,100 +1,83 @@
-Return-Path: <netdev+bounces-93152-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93148-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 336028BA4F0
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 03:35:15 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id ECCE88BA4AF
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 02:49:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BE0E21F22EE5
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 01:35:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 465D2B211C4
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 00:49:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 480F7DDC0;
-	Fri,  3 May 2024 01:35:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EDB6BE4F;
+	Fri,  3 May 2024 00:49:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="sj4Ds6Rt"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HD4+HVCK"
 X-Original-To: netdev@vger.kernel.org
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E075E8F47
-	for <netdev@vger.kernel.org>; Fri,  3 May 2024 01:35:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 099E28F47
+	for <netdev@vger.kernel.org>; Fri,  3 May 2024 00:49:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714700111; cv=none; b=JRz5sCT/dqyxXW5ivGEIPkH9IdtrjFUton2N0a9rOfDI46lyfn+Ooeb5e6FqQzHc3x5Ke0L24csk7+ScEFd3j5AmtZ7owyVn7mV3gmR71SKXVfaBJJV/VcK9eFwuF1LP0k72NEKLXHQMmw9D8LE9UpFms4CfXZHzVGalI69Fex0=
+	t=1714697356; cv=none; b=t+Wu9bIBkG4KkMYgPTjdm5z/eLhKj9ctYxoT3MmC59zUkB7byuRGCyhMMTnuyPsdGgrHB1ldU0rfKlGoZQ55o92/YpeHbaUbVxAiBqr4z84k7oX+txQmdEFzTSP3ufyc4E/Ybt6p6nULX7kfl/nCldFU03hU2674IgfoGs648vo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714700111; c=relaxed/simple;
-	bh=chZsNMrhJXmyK1K058MWsuP+ZJXH+HJDh37GOwngCyc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jvSYbwePc269HxFFVirN20eVOpoW7SS2fdmzAZP6Pw5SOkgJ4ryMxzLfZLOuEhVu0de1j4OZlfMpTUwQxq6+dQZy3BpIwGLBb4+h4A7+Pw1lpFYmHlDonOAPwh+mh2I21qPMOzZYobzzzNDKlYOeBeMonqBiwC4u9/X6m7haK9E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=sj4Ds6Rt; arc=none smtp.client-ip=85.214.62.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from [127.0.0.1] (p578adb1c.dip0.t-ipconnect.de [87.138.219.28])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits))
-	(No client certificate requested)
-	(Authenticated sender: marex@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id 05E61882D0;
-	Fri,  3 May 2024 03:35:04 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1714700106;
-	bh=lRMYB608pHOQXaroRp+MnXD7SNgMYXh4kgpmuAotReU=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=sj4Ds6RtjmU3x8OKabJ/q3FfNh8kQELK6WkANoGVv0apZCMCZL+tGSbAfZaS7T5DM
-	 8vTtaueMLABvCrJc3Lxxi26W18/ugd5oYNO8H70xiW6IgtX+Iyk+ro11sOcb+JDuAX
-	 ETFapHY8RDy3Ctv60PXqHEhuWrhkwJukIdn7f3ejrVrsNshfRndFxedAAyhXK3IqY1
-	 okPqaYMtmwBd8A8HGJvlO+d3Q/LHnILTjB8CRVT6s1LPVOdiploE3UIAmm2F+MrSUo
-	 lufkaM0SFksVGtmDpD4exdcuUsxuz/1skpvFQkYkTdQMeNV+/CrWqjS5DM87CuYbBW
-	 KsNFpMkmVpKrw==
-Message-ID: <86a14471-4bda-471d-ab08-90d4ccd0802d@denx.de>
-Date: Fri, 3 May 2024 02:47:23 +0200
+	s=arc-20240116; t=1714697356; c=relaxed/simple;
+	bh=Zd1GLK0pt/tfBpdKR+mzXZu7FH1vyVIlPN6QNXNUqH4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=I4t5r12dhqifHSXocHhc7fY9pl9Pd8DIubCBiCdrY6zSqAz6ZI7cOGeySCQdCXcoRGlLLmmhRdVGrepoPCPhcOgRW3ogoQlysEe/XTIy/lPreWu3od9aDYLMnXBmR20MK3uO554TgJTDGP3BfDfTB+oT5wdbKJJSCYpLRxLiQBY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HD4+HVCK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4427C113CC;
+	Fri,  3 May 2024 00:49:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714697355;
+	bh=Zd1GLK0pt/tfBpdKR+mzXZu7FH1vyVIlPN6QNXNUqH4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=HD4+HVCKQfR625rDpxsoBk25Hfu89jY40IpHpDkKIN9WcYca+RIMGD6K3TSscJ8Z1
+	 QTyDJpufGGfCzcsC4aUAV6G8wAMGThaWd1nI4ipY9MEZa1MQHEBzZZseGuQZ9p4WyO
+	 sAT/lXdZqRhzMekWQJ9Ak2GpXaEdNP523JKq7Fhmm6xj5SS3JPx21LyZD5IZRGH2ss
+	 9OwbbqScaQvUU+QPI1vYeLuy3uEq1qDjgikonW0YgU/c0dIP3x+ak/3yjgtP3fZlxy
+	 TIHp+g8Fwex2NaR7/10IXwUnk7VnvudnoSb5AuQWo9xzMkMh7x0VUcxbn5MZNm79oz
+	 yDD42rx+7JSPA==
+Date: Thu, 2 May 2024 17:49:13 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Mina Almasry <almasrymina@google.com>
+Cc: David Wei <dw@davidwei.uk>, netdev@vger.kernel.org, Michael Chan
+ <michael.chan@broadcom.com>, Pavan Chebbi <pavan.chebbi@broadcom.com>, Andy
+ Gospodarek <andrew.gospodarek@broadcom.com>, Shailend Chand
+ <shailend@google.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [RFC PATCH net-next v1 3/3] netdev: add
+ netdev_rx_queue_restart()
+Message-ID: <20240502174913.380dcc38@kernel.org>
+In-Reply-To: <20240502172241.363ba5a0@kernel.org>
+References: <20240430010732.666512-1-dw@davidwei.uk>
+	<20240430010732.666512-4-dw@davidwei.uk>
+	<CAHS8izM-0gxGQYMOpKzr-Z-oogtzoKA9UJjqDUt2jkmh2sywig@mail.gmail.com>
+	<5f81eccd-bc14-47a5-bc65-b159c79ce422@davidwei.uk>
+	<CAHS8izMzakPfORQ9FX8nh0u0V7awtjUufswCc0Gf3fxxXWX0WA@mail.gmail.com>
+	<20240502172241.363ba5a0@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [net,PATCH v2] net: ks8851: Queue RX packets in IRQ handler
- instead of disabling BHs
-To: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, Ronald Wahl <ronald.wahl@raritan.com>,
- "David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>
-References: <20240430194401.118950-1-marex@denx.de>
- <20240430191042.05aad656@kernel.org>
- <CANn89iLKQjD1bxbirwtvzxsfOa-i2qRTGHYH_8_8O-xCusypQQ@mail.gmail.com>
-Content-Language: en-US
-From: Marek Vasut <marex@denx.de>
-In-Reply-To: <CANn89iLKQjD1bxbirwtvzxsfOa-i2qRTGHYH_8_8O-xCusypQQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On 5/1/24 4:39 AM, Eric Dumazet wrote:
-> On Wed, May 1, 2024 at 4:10 AM Jakub Kicinski <kuba@kernel.org> wrote:
->>
->> On Tue, 30 Apr 2024 21:43:34 +0200 Marek Vasut wrote:
->>> diff --git a/drivers/net/ethernet/micrel/ks8851.h b/drivers/net/ethernet/micrel/ks8851.h
->>> index 31f75b4a67fd7..f311074ea13bc 100644
->>> --- a/drivers/net/ethernet/micrel/ks8851.h
->>> +++ b/drivers/net/ethernet/micrel/ks8851.h
->>> @@ -399,6 +399,7 @@ struct ks8851_net {
->>>
->>>        struct work_struct      rxctrl_work;
->>>
->>> +     struct sk_buff_head     rxq;
->>>        struct sk_buff_head     txq;
->>>        unsigned int            queued_len;
->>
->> One more round, sorry, this structure has a kdoc, please fill in
->> the description for the new member.
+On Thu, 2 May 2024 17:22:41 -0700 Jakub Kicinski wrote:
+> On Thu, 2 May 2024 09:46:46 -0700 Mina Almasry wrote:
+> > Sorry, I think if we don't need the EXPORT, then I think don't export
+> > in the first place. Removing an EXPORT is, AFAIU, tricky. Because if
+> > something is exported and then you unexport it could break an out of
+> > tree module/driver that developed a dependency on it. Not sure how
+> > much of a concern it really is.  
 > 
-> Alternative is to use a local (automatic variable on the stack) struct
-> sk_buff_head,
-> no need for permanent storage in struct ks8851_net
+> FWIW don't worry about out of tree code, it's not a concern.
 
-I think that's even better, done in V3 + addressed feedback from Jakub.
+That said (looking at the other thread), if there's no in-tree
+user, it's actually incorrect to add an export.
 
