@@ -1,416 +1,185 @@
-Return-Path: <netdev+bounces-93282-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93284-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36BFF8BAE51
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 16:00:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1E548BAE6C
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 16:05:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A367C1F23CDB
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 14:00:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DA1711C20BA5
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 14:05:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3CFA154438;
-	Fri,  3 May 2024 14:00:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE13215444E;
+	Fri,  3 May 2024 14:05:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RAMaPJIL"
+	dkim=pass (1024-bit key) header.d=renesas.com header.i=@renesas.com header.b="YKWapt7L"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from JPN01-TYC-obe.outbound.protection.outlook.com (mail-tycjpn01on2049.outbound.protection.outlook.com [40.107.114.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AB491DA21;
-	Fri,  3 May 2024 14:00:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714744824; cv=none; b=No9mKEXu1X34k6SiOMmw7GKTQivHTTOMwyme3fL0hcBk5aAVEREWLKLHCXCH9EowKkJ1mKP1WON0FHzDLXHSty0whCT1rvZeyMC1zsXAYWps8HdiwsA1S3hrbcUbxg9e2cEmiIw+UxacfA/a2fUrISC3BOkRt2QaL163zFiKYx8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714744824; c=relaxed/simple;
-	bh=aS2uAv9X6Zc/3BctlZfdTk0ZG9kIlAlXXhSJB+5t7d4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=AuG6XSXmj74Cz80725pBfT3VMMZSCoydpAB9Y0cxoNwYL5HhHy2URA/H7Xam6CYgEddCuSrlCXkL1Jk1nEXG2b9guif5PKLfC9JDZ2UVERyVy7ZICs4uvWKPK2k0A5X1Wx/pSlRL5/4w/abW+MgEJeWp/5TY+fVlOHE0KAXxQrU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RAMaPJIL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CFB4FC116B1;
-	Fri,  3 May 2024 14:00:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714744824;
-	bh=aS2uAv9X6Zc/3BctlZfdTk0ZG9kIlAlXXhSJB+5t7d4=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=RAMaPJILLb1sTw4cxy/gjDEZscWal2EwRMu5FMpOl3U0qXlPKgnJx5jYttLfnyMxP
-	 DUMjRcxhDr5lSdKJtwSMz8QbpVBm32FvpubhNVs+/r0SLQW/zvjmti5/RK3odCpRAp
-	 rSNnQpTiJ+dkPPCIf08zOiuvAaZwEKE+u62oyiObtctmG2wHFPoL0/oOqEUnbQvLLI
-	 vIXRyDTnr3HF7yF7z5177RPXm1tKyo1MR0tW3gS8M0wPjp0hdR+3UlqZPUROYRrITO
-	 9GmfLXV3r/X4pOA9zHMnNxSRsEJyOWlzltNBY3+7nsShVDt1fBNUphRTzi5HKbD/54
-	 dflIhC4LCsGdA==
-Message-ID: <42a6d218-206b-4f87-a8fa-ef42d107fb23@kernel.org>
-Date: Fri, 3 May 2024 16:00:20 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9203154441;
+	Fri,  3 May 2024 14:05:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.114.49
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1714745107; cv=fail; b=Vp9vG1b1lvqdCQ4KUa2lILYpzitjIYZsernEJk+K684J+OLIRCGMx6D3OV3e+f6tHxxPoDsJAAdDZIG/KWMy+ba8vNOHjr0Xz0cLRxi70aLHIuohN9qFxfN9wDpf9rwztxNtXVjsCi1lcK2sIylXOJdtZ2wFLC0LhtP+P5XT0Fk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1714745107; c=relaxed/simple;
+	bh=fedJ7PoHQIcpql1yWOmZeriq0U+j55OSumqmFT0z1Ls=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=lAmr7hT71/HDrGkOudRFAfvG0wB9XadcgoH3Aylgn8jD/FbseF8GAHATY3jQM2s+mJuCZeMcwXRcBSFhIrPyYXxiCQAZ2dpaM96yV8eSwoLHEkmC0y18nyewt1vC4OpbvwT0C85GhQEPq6XXvN0H8hGM1m+PzAz8G83LtWMBeyc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=renesas.com; spf=pass smtp.mailfrom=renesas.com; dkim=pass (1024-bit key) header.d=renesas.com header.i=@renesas.com header.b=YKWapt7L; arc=fail smtp.client-ip=40.107.114.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=renesas.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=renesas.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=U4CeAMFgfPJapOF6R3wtN+kJcz+OjPM4slO06svfetJ0nDnKNLvnKuEjMbGrvkZL9HKBVim3Vj8/NWxZlryL2nWMtJ6iAnNJNLubLUJfFthkJ81g9eV5utBVS9xeOnjvG+rzrtftE8gXrQEuM2i2J1657Xmnx/Dopd17kLj0JCpeNGWjXNz2fPu84j38ZTxQyP81qkZ5di1Refes2gavTi7YOo+iH9spkdgLb/NUaDoEf2DnD2KRZ6rCemLyJe1XuwO6wMw5KSb0JsNxIvPBP1cwqhlI2qaNjvSd1qBjdARUuanxG9bIREEsc5/YlRa0fjiFx4zexWWezLjdYVAp8g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=fedJ7PoHQIcpql1yWOmZeriq0U+j55OSumqmFT0z1Ls=;
+ b=RiRcgFDl7lWdekhaRBQl55wQySmEqKOLYg59gsiijDicTbMtK2Qo1MoVAf6l4SLvDYOGvVfrSvzZok5SKMoDbx19AvnO0KtMCgyb2BY9kr8VCI0SW6o/EXsgnJ2+spgFwKCcGExT4TUlMQzrpMR3nr+TcIj22Yc/6PlrxVePsxkX5SEg1uEd/kVBViefAjteNHhljiY0TA9kRyHn520tdb46eTGJy92pgWMjsEpL9sSw0PngHV65vDxdzGUTNXjL08dLry4tjRag+Y8nZaC8Wjm+IpFAJ+a/icz4P8gFyqXN84j/ir4E3ABDKrlfPRdXINmmVPKiz51pqEj9bwfZeg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=renesas.com; dmarc=pass action=none header.from=renesas.com;
+ dkim=pass header.d=renesas.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=renesas.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=fedJ7PoHQIcpql1yWOmZeriq0U+j55OSumqmFT0z1Ls=;
+ b=YKWapt7L1JV0U1RAlp5w+Kq1C7PfXcNLz998pCzOeJKsdNUyIsFMbuT3/rAAXWi4+TDVTX8iOto9R/YH+aa8caSst7R4PyoudsAe8WKCfQauSqlN5Dm66Hzanr5Z+pxbNeBTcHaKPk/kZlf1miJHdxE3S+V7k8HxQyHBJ70DVeU=
+Received: from OS3PR01MB6593.jpnprd01.prod.outlook.com (2603:1096:604:101::7)
+ by OSAPR01MB7398.jpnprd01.prod.outlook.com (2603:1096:604:143::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.29; Fri, 3 May
+ 2024 14:05:01 +0000
+Received: from OS3PR01MB6593.jpnprd01.prod.outlook.com
+ ([fe80::68a6:2f99:8ab8:5c64]) by OS3PR01MB6593.jpnprd01.prod.outlook.com
+ ([fe80::68a6:2f99:8ab8:5c64%6]) with mapi id 15.20.7544.029; Fri, 3 May 2024
+ 14:04:51 +0000
+From: Min Li <min.li.xe@renesas.com>
+To: Horatiu Vultur <horatiu.vultur@microchip.com>, Min Li <lnimi@hotmail.com>
+CC: "richardcochran@gmail.com" <richardcochran@gmail.com>, "lee@kernel.org"
+	<lee@kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>
+Subject: RE: [PATCH net-next v7 3/5] ptp: clockmatrix: dco input-to-output
+ delay is 20 FOD cycles + 8ns
+Thread-Topic: [PATCH net-next v7 3/5] ptp: clockmatrix: dco input-to-output
+ delay is 20 FOD cycles + 8ns
+Thread-Index: AQHam+EqyUtERyeP2kCIQ39721AzALGDghQAgAILFYA=
+Date: Fri, 3 May 2024 14:04:51 +0000
+Message-ID:
+ <OS3PR01MB6593F03D7D184848625300B9BA1F2@OS3PR01MB6593.jpnprd01.prod.outlook.com>
+References: <20240501160324.27514-1-lnimi@hotmail.com>
+ <LV3P220MB12024CB984967E4AC05A1E13A0192@LV3P220MB1202.NAMP220.PROD.OUTLOOK.COM>
+ <20240502064946.yc6v7xadwkfldbsw@DEN-DL-M31836.microchip.com>
+In-Reply-To: <20240502064946.yc6v7xadwkfldbsw@DEN-DL-M31836.microchip.com>
+Accept-Language: en-CA, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=renesas.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: OS3PR01MB6593:EE_|OSAPR01MB7398:EE_
+x-ms-office365-filtering-correlation-id: 948cf67b-c917-4302-e60a-08dc6b7a006c
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230031|1800799015|366007|376005|38070700009;
+x-microsoft-antispam-message-info:
+ =?utf-8?B?cFFhUjRaajZXUlZHYTUyNGJKR0dmTktPUCtHQ2pzSGR3WUxqb3k0ZzU3Q0pF?=
+ =?utf-8?B?dDNTaGNwbjdPWHFTSE8zN2djTUpMTUh0N3dsR3ZzYStuSFZseXZLV29RQ2p2?=
+ =?utf-8?B?MzJJc1RqSjZYMDN6TmcyVzZNKzlMZmEwZnRQSXV2d0lTZ0pTeFdGL0RJZGhp?=
+ =?utf-8?B?allMZ2hrMVdpRlZyVFR1SlFTQy8yQURxV0huWnAxa2VGandRY1F3V0lmMXMz?=
+ =?utf-8?B?UVhjejlZL1F4MzBJRFNIUkxKaWl2aEdsVXJ4dVJEZVRLcm1qM3ZHQi8vTEVo?=
+ =?utf-8?B?UGFZRjRTbzZoUlRjajVxWVpLVGtYNHQ0cXBVczNqTTBXekx3VndvdVY1c1V3?=
+ =?utf-8?B?OEp0Mmo1eGdjQUgwSXhGNWVlMlh4U2FIREVKYUVYV3BEMHBjZnNUSUZSbDY3?=
+ =?utf-8?B?a3c0TjZGRDNYVk40QW0zU3N0Yk45cGVCZ25sdGtEMWFhVU5tNFpPWTlGeTZ0?=
+ =?utf-8?B?ejJ0RURraTZtOFVNaUg1MkFMOWswQml2Nlg3Lzk2bC8reE4rNGFPVFQyYVlx?=
+ =?utf-8?B?L29ZUzBsaXc5ZG0wbFhWMUU3TjFQZStsSWZ5WHA5TllrbmUrSTM1SVRWT3hH?=
+ =?utf-8?B?dUFlcStSOENRclllaUdOOGllUWh4OEVObWZyZEJGRXVLTXQxcUlYbGxoeVVU?=
+ =?utf-8?B?QWxhd3N2LzBtd3lzN01RNHhlRkR1Zjl3VCtlMnBTT21VQ05xdWtybjBvVGIz?=
+ =?utf-8?B?K1d3QWNCQzg3clluNGZLRkZscEdTUjltREYzRzliWHREMENDdmhKM3d3dmpZ?=
+ =?utf-8?B?Qi9rNnVpNmpuRHU5dWltU0lOT3U3UGtiV29xVSsybUszaDUzK0wwTllCRE5K?=
+ =?utf-8?B?RldOVndpQnMyRWdhNDRQdGdEZ2E5ZjF5M0NHY2JmU00rcjJHSE10RXZoZ0tx?=
+ =?utf-8?B?Nm1yWXhWYi9tY2xMenVKZlNvWkFGbHNJdUJXSFQ3c0J1clVKYzZXc0x1eUJh?=
+ =?utf-8?B?L3JaMGZQUndYNnV4eEFTOVRXZmFIYVYxSHE0WENLbGtOTkFmU3lYQTJpWnRC?=
+ =?utf-8?B?OHd0dFlLVEtVMEM3eTZWbXJHajFzMys3R1dXY2d1QXE1Nzc0STRYTVlQcFVy?=
+ =?utf-8?B?MEN2dDZxWThFaFluRUlZbmJOZ1ZGdmNKK0NGTXR3anFnTkl2Y1VqMzdwcU5N?=
+ =?utf-8?B?QW9ROVZubGxYZFdmdm1SZUprQzdjdm1vL3Bma25PeDA4ajdEOXZZdk1qeXh3?=
+ =?utf-8?B?SG02L1BDK29wTHhlWjMwNzExRi9qTFBhUHYwRWE3N2ViWUk3VmpsdXJlczEz?=
+ =?utf-8?B?V1hkd3YwbWdrVVY0MjhlRmoxL2diZ3RRUXJIR2NBc0JsS0hrOFVwOTNpSUUx?=
+ =?utf-8?B?UWVBZWRkYjE0NkhPUzgycWJOS0RBZ2ZvNVVxN2w5WGdsV2I4UFd2RFpZVTA4?=
+ =?utf-8?B?WUJ5YWNyUDlBUTd2OVg5V1BWZTBKRGljSmZWWGVLUkwwQUxqNlpCcFMwUHJj?=
+ =?utf-8?B?UG1ybXFaU2tFZkMzeGVCdzNLZ3Q4Q0FwdEJOZ1lrRW9xY1FPNUR6d1l6YTlP?=
+ =?utf-8?B?ZFF2R1p0bVNYMTIvbUZuZkxuOHcwcjB2Rjk5Qk1EaFNQR0RwdGZZQ0tTRy9t?=
+ =?utf-8?B?OGxBOW5uMWZGcjNlalkwdFZmQ2ZBcER2djVBc0RYK29hN05EaiswRWptSmhp?=
+ =?utf-8?B?TCtXRTZBR2JOUmV0Y09TV2tTVGI0a2tYVW5md25VSzJodkNZMHFtYko3bGxy?=
+ =?utf-8?B?UlVyRjBwZyt6b2hSam9Ya3BmSnhMQlRtSllZdVlHSy8rQVBFc1JuQjZNS0N5?=
+ =?utf-8?B?dExDRS94UGQ3bjg1N1U2aGcraFc4WHBzb0RTMEY0RitmRnI5SDluNWUvdXVQ?=
+ =?utf-8?B?U1ptWUR6bnNnL0JOeHI0dz09?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:OS3PR01MB6593.jpnprd01.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(366007)(376005)(38070700009);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?R2NaVW5EeVcrWEU3U043MGg1M3FCdWlmRVRoT1RLMmRIZzd5WWROV2NYRklR?=
+ =?utf-8?B?WlA2aWF3QjZWeGFGUDF3cWZabkVCOVRSM2FwS3JrS3ZsVnR3bWVHdGpGV0Qw?=
+ =?utf-8?B?TWcxVERkc2RHSExUYm1UTnlVVDRNM05WQ2Fuc01QRUtnb2F1SUcxYkRDeSt1?=
+ =?utf-8?B?c25QZnowWndEZVp0RXhDbTBEQVhiNFQ5cEpqWnY2MC9FbjVmaEtoR2xZVXJp?=
+ =?utf-8?B?c2ZNWFdPN0tXNjRTK1Y4UlIvaFB5MDVEVGFsK2ZFL0RucFFoN1REZk9UU3RY?=
+ =?utf-8?B?RnQvSzZLMVl5RTJZbE9uaS9KczdGU0hBWVI3aHJ3UEd5MllkVGlmbmlhUHZy?=
+ =?utf-8?B?VVlxWklHUDlKY1NqSnd1RjM2ZHBDQTJGejhXcERsSFFyWW1Fb0FDeWt3NTg1?=
+ =?utf-8?B?Y0RVS29mVGFyN1dacVBwc1lSTDVFaVBOMFBUTE01dy9RQkJZSWhHQk9ySE8w?=
+ =?utf-8?B?VnZsRzlyRURPbGp2T3RJZHpFTFJFdVcrZ3pFQlkrWkRSL2JlVU93Ym9lUU55?=
+ =?utf-8?B?UHp6bTZDUzRPZWpDVi9mLytrREZnK01ieTA3TkFHcUhqdWlnNFlPdUhOYjZ1?=
+ =?utf-8?B?UHR2ZzhKbWh3YXZ1b2ZwckJOa1dSODVyNUs2WHdxbmpLaXJERTZxMzFlbncy?=
+ =?utf-8?B?NVRtZVpHNDgrSVNZbGh1UjlucVpJb2ZqMW1zeVRoTkZTRjlXWXc0NCtaVGJP?=
+ =?utf-8?B?NWRMdEZTbXJXMWp3bHZia0NJaVo1ckRCdTVhbFF4K3o5dXN1RGlxd3FaNFQ5?=
+ =?utf-8?B?NVRTdk55QUZxcDdEcXpNeVI0elpaZTdiNlJ1TzBpZGNtRUhTSkhuM3EyOGhz?=
+ =?utf-8?B?U3pWTWJnMXp6ZE5JUGlRKzFQOTludW50WDZlSjQ5V1VVZGdHN0o3Z1ZEZUJG?=
+ =?utf-8?B?N0V1dTFMZjF3dkN5RDJDQ20rK0RIWm1HR3lwUktXclZtWm1DZjM5T0UzcjVx?=
+ =?utf-8?B?dUR5NE5pM2ZXV000WG5hcXZQa1I2ZytwbkdaTysvSUF3VEp0enRBS2JNazgy?=
+ =?utf-8?B?RkkreEdzUCtIZEpKeXRjOFcrTjRFZmZVbjJjU2d0L2JhZnZva0NTdnlwYWh5?=
+ =?utf-8?B?UW9lakUweWNodVpyVVhZV3EyOEJRL0VEa2crSHgrOWRnYTgxTXZrbDdjdjFX?=
+ =?utf-8?B?dkFac25SUmVJbS91cUcxWTNoQVlwTlR3RURlRTRMMUVkNlRLODZWQTVsSG5z?=
+ =?utf-8?B?bkdZWUFad2d0ajJWY0hCUm1IWmRsUTljV2loeUl6WityemVScDgxYk5Jejl3?=
+ =?utf-8?B?OG9vR2JjZXd0M1BGWVRGcjdPSjJ0Y3BrN004TU9sdEJlWEhyaDRhNnBOYUdM?=
+ =?utf-8?B?MTFSTWtSYi9JaW4wQ0VuVFVhMEYvNnVSVVhVMksxVHVwWVdQQk5qdHk0NXBv?=
+ =?utf-8?B?clJYdkNzei8zR1dLZ3A2N0dURVV5WkJERVBJRlI4Vkgyb1J4R3ZwM1h3VEJY?=
+ =?utf-8?B?VExPV3hnamdOMGJ4V3d1dmVWU0UrditYZjRDRDFqNmtyVWFSR2lFNDhZUi9o?=
+ =?utf-8?B?OG04RkdzUk0vYTBwbnVPNHRnSHY5cDE2MG1pNHNXd3hKL3cwUHRLbGdsbGl1?=
+ =?utf-8?B?dDBFZUllK3d0UDNOcCtHMzcxNjMxMm1ic1RVcGVsZ3Vwd2NldVpNcFRxN3FC?=
+ =?utf-8?B?bkRWQTJDU0hYVWxXUERxS01pZ3JjT1EvYXBHTml6cERlOXlGSFVWb1gxSGJi?=
+ =?utf-8?B?d2hSbytHSHlvL3B0TjhNQU5KVkY4bWdrT28vekZPek1JR0JQdi85Rk0wVjlh?=
+ =?utf-8?B?VGhZVXM5OTd0cG0xTWlwSUZ6anpVZWFDN0lPbENsRlNhbXI1UW1BZzdrcnBn?=
+ =?utf-8?B?eHczM2ZNNitzVTZTMnZMRG1vNSsxRXRyelEzQ2o0aUxocC9HeXBtanVxdGw4?=
+ =?utf-8?B?NTlxdDA0cmNUUEMxQXdEVnZHOVRmb2xLdlFMdEFBVVVudGVqNEF5NkozUURW?=
+ =?utf-8?B?WDVOUUdQRnU0MnJya1BKS0t0bHJOZTF4aWNkUnJZbjVLQnA1STgvdExqUldX?=
+ =?utf-8?B?K01MTjIxQ1BQSlFJWXMvRUtyYWgwYU1lMFg0eWhPWW9LWHBPSkphMnRBTzlz?=
+ =?utf-8?B?cUpUVzJsQU4xZkVxajk1QmRxMENCYXB5NGZXNkpRSUEvZ2JLakFTUE5zZHk3?=
+ =?utf-8?Q?vYR6yYnF0faxHx+zTLHD7q+4T?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1] cgroup/rstat: add cgroup_rstat_cpu_lock helpers and
- tracepoints
-To: Waiman Long <longman@redhat.com>, tj@kernel.org, hannes@cmpxchg.org,
- lizefan.x@bytedance.com, cgroups@vger.kernel.org, yosryahmed@google.com
-Cc: netdev@vger.kernel.org, linux-mm@kvack.org, shakeel.butt@linux.dev,
- kernel-team@cloudflare.com, Arnaldo Carvalho de Melo <acme@kernel.org>,
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-References: <171457225108.4159924.12821205549807669839.stgit@firesoul>
- <30d64e25-561a-41c6-ab95-f0820248e9b6@redhat.com>
- <4a680b80-b296-4466-895a-13239b982c85@kernel.org>
- <203fdb35-f4cf-4754-9709-3c024eecade9@redhat.com>
- <b74c4e6b-82cc-4b26-b817-0b36fbfcc2bd@kernel.org>
- <b161e21f-9d66-4aac-8cc1-83ed75f14025@redhat.com>
-Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <b161e21f-9d66-4aac-8cc1-83ed75f14025@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: renesas.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: OS3PR01MB6593.jpnprd01.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 948cf67b-c917-4302-e60a-08dc6b7a006c
+X-MS-Exchange-CrossTenant-originalarrivaltime: 03 May 2024 14:04:51.6538
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 53d82571-da19-47e4-9cb4-625a166a4a2a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: X399xgIACUENu/q4Wdl2Eg63MSny3Qrld3oQ+bqnxOKc8uXbliYZICHikHiXFRJ6mpSa3jj1EG+8yEg/X2uSzQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: OSAPR01MB7398
 
-
-
-On 02/05/2024 20.19, Waiman Long wrote:
-> On 5/2/24 07:23, Jesper Dangaard Brouer wrote:
->>
->>
->> On 01/05/2024 20.41, Waiman Long wrote:
->>> On 5/1/24 13:22, Jesper Dangaard Brouer wrote:
->>>>
->>>>
->>>> On 01/05/2024 16.24, Waiman Long wrote:
->>>>> On 5/1/24 10:04, Jesper Dangaard Brouer wrote:
->>>>>> This closely resembles helpers added for the global 
->>>>>> cgroup_rstat_lock in
->>>>>> commit fc29e04ae1ad ("cgroup/rstat: add cgroup_rstat_lock helpers and
->>>>>> tracepoints"). This is for the per CPU lock cgroup_rstat_cpu_lock.
->>>>>>
->>>>>> Based on production workloads, we observe the fast-path "update" 
->>>>>> function
->>>>>> cgroup_rstat_updated() is invoked around 3 million times per sec, 
->>>>>> while the
->>>>>> "flush" function cgroup_rstat_flush_locked(), walking each 
->>>>>> possible CPU,
->>>>>> can see periodic spikes of 700 invocations/sec.
->>>>>>
->>>>>> For this reason, the tracepoints are split into normal and fastpath
->>>>>> versions for this per-CPU lock. Making it feasible for production to
->>>>>> continuously monitor the non-fastpath tracepoint to detect lock 
->>>>>> contention
->>>>>> issues. The reason for monitoring is that lock disables IRQs which 
->>>>>> can
->>>>>> disturb e.g. softirq processing on the local CPUs involved. When the
->>>>>> global cgroup_rstat_lock stops disabling IRQs (e.g converted to a 
->>>>>> mutex),
->>>>>> this per CPU lock becomes the next bottleneck that can introduce 
->>>>>> latency
->>>>>> variations.
->>>>>>
->>>>>> A practical bpftrace script for monitoring contention latency:
->>>>>>
->>>>>>   bpftrace -e '
->>>>>>     tracepoint:cgroup:cgroup_rstat_cpu_lock_contended {
->>>>>>       @start[tid]=nsecs; @cnt[probe]=count()}
->>>>>>     tracepoint:cgroup:cgroup_rstat_cpu_locked {
->>>>>>       if (args->contended) {
->>>>>>         @wait_ns=hist(nsecs-@start[tid]); delete(@start[tid]);}
->>>>>>       @cnt[probe]=count()}
->>>>>>     interval:s:1 {time("%H:%M:%S "); print(@wait_ns); print(@cnt); 
->>>>>> clear(@cnt);}'
->>>>>
->>>>> This is a per-cpu lock. So the only possible contention involves 
->>>>> only 2 CPUs - a local CPU invoking cgroup_rstat_updated(). A 
->>>>> flusher CPU doing cgroup_rstat_flush_locked() calling into 
->>>>> cgroup_rstat_updated_list(). With recent commits to reduce the 
->>>>> percpu lock hold time, I doubt lock contention on the percpu lock 
->>>>> will have a great impact on latency. 
->>>>
->>>> I do appriciate your recent changes to reduce the percpu lock hold 
->>>> time.
->>>> These tracepoints allow me to measure and differentiate the percpu lock
->>>> hold time vs. the flush time.
->>>>
->>>> In production (using [1]) I'm seeing "Long lock-hold time" [L100] e.g.
->>>> upto 29 ms, which is time spend after obtaining the lock (runtime under
->>>> lock).  I was expecting to see "High Lock-contention wait" [L82] which
->>>> is the time waiting for obtaining the lock.
->>>>
->>>> This is why I'm adding these tracepoints, as they allow me to digg
->>>> deeper, to understand where this high runtime variations originate 
->>>> from.
->>>>
->>>>
->>>> Data:
->>>>
->>>>  16:52:09 Long lock-hold time: 14950 usec (14 ms) on CPU:34 
->>>> comm:kswapd4
->>>>  16:52:09 Long lock-hold time: 14821 usec (14 ms) on CPU:34 
->>>> comm:kswapd4
->>>>  16:52:09 Long lock-hold time: 11299 usec (11 ms) on CPU:98 
->>>> comm:kswapd4
->>>>  16:52:09 Long lock-hold time: 17237 usec (17 ms) on CPU:113 
->>>> comm:kswapd6
->>>>  16:52:09 Long lock-hold time: 29000 usec (29 ms) on CPU:36 
->>>> comm:kworker/u261:12
->>> That lock hold time is much higher than I would have expected.
->>>>  16:52:09 time elapsed: 80 sec (interval = 1 sec)
->>>>   Flushes(5033) 294/interval (avg 62/sec)
->>>>   Locks(53374) 1748/interval (avg 667/sec)
->>>>   Yields(48341) 1454/interval (avg 604/sec)
->>>>   Contended(48104) 1450/interval (avg 601/sec)
->>>>
->>>>
->>>>> So do we really need such an elaborate scheme to monitor this? BTW, 
->>>>> the additional code will also add to the worst case latency.
->>>>
->>>> Hmm, I designed this code to have minimal impact, as tracepoints are
->>>> no-ops until activated.  I really doubt this code will change the 
->>>> latency.
->>>>
->>>>
->>>> [1] 
->>>> https://github.com/xdp-project/xdp-project/blob/master/areas/latency/cgroup_rstat_tracepoint.bt
->>>>
->>>> [L100] 
->>>> https://github.com/xdp-project/xdp-project/blob/master/areas/latency/cgroup_rstat_tracepoint.bt#L100
->>>>
->>>> [L82] 
->>>> https://github.com/xdp-project/xdp-project/blob/master/areas/latency/cgroup_rstat_tracepoint.bt#L82
->>>>
->>>>>>
->>>>>> Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
->>>>
->>>> More data, the histogram of time spend under the lock have some strange
->>>> variation issues with a group in 4ms to 65ms area. Investigating what
->>>> can be causeing this... which next step depend in these tracepoints.
->>>>
->>>> @lock_cnt: 759146
->>>>
->>>> @locked_ns:
->>>> [1K, 2K)             499 |      |
->>>> [2K, 4K)          206928 
->>>> |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@|
->>>> [4K, 8K)          147904 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@      |
->>>> [8K, 16K)          64453 |@@@@@@@@@@@@@@@@      |
->>>> [16K, 32K)        135467 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ |
->>>> [32K, 64K)         75943 |@@@@@@@@@@@@@@@@@@@      |
->>>> [64K, 128K)        38359 |@@@@@@@@@      |
->>>> [128K, 256K)       46597 |@@@@@@@@@@@      |
->>>> [256K, 512K)       32466 |@@@@@@@@      |
->>>> [512K, 1M)          3945 |      |
->>>> [1M, 2M)             642 |      |
->>>> [2M, 4M)             750 |      |
->>>> [4M, 8M)            1932 |      |
->>>> [8M, 16M)           2114 |      |
->>>> [16M, 32M)          1039 |      |
->>>> [32M, 64M)           108 |      |
->>>>
->>>>
->>>>
->>>>
->>>>>> ---
->>>>>>   include/trace/events/cgroup.h |   56 
->>>>>> +++++++++++++++++++++++++++++----
->>>>>>   kernel/cgroup/rstat.c         |   70 
->>>>>> ++++++++++++++++++++++++++++++++++-------
->>>>>>   2 files changed, 108 insertions(+), 18 deletions(-)
->>>>>>
->>>>>> diff --git a/include/trace/events/cgroup.h 
->>>>>> b/include/trace/events/cgroup.h
->>>>>> index 13f375800135..0b95865a90f3 100644
->>>>>> --- a/include/trace/events/cgroup.h
->> [...]
->>>>>> +++ b/include/trace/events/cgroup.h >>>> 
->>>>>> +DEFINE_EVENT(cgroup_rstat, cgroup_rstat_cpu_unlock_fastpath,
->>>>>> +
->>>>>> +    TP_PROTO(struct cgroup *cgrp, int cpu, bool contended),
->>>>>> +
->>>>>> +    TP_ARGS(cgrp, cpu, contended)
->>>>>> +);
->>>>>> +
->>>>>>   #endif /* _TRACE_CGROUP_H */
->>>>>>   /* This part must be outside protection */
->>>>>> diff --git a/kernel/cgroup/rstat.c b/kernel/cgroup/rstat.c
->>>>>> index 52e3b0ed1cee..fb8b49437573 100644
->>>>>> --- a/kernel/cgroup/rstat.c
->>>>>> +++ b/kernel/cgroup/rstat.c
->>>>>> @@ -19,6 +19,60 @@ static struct cgroup_rstat_cpu 
->>>>>> *cgroup_rstat_cpu(struct cgroup *cgrp, int cpu)
->>>>>>       return per_cpu_ptr(cgrp->rstat_cpu, cpu);
->>>>>>   }
->>>>>> +/*
->>>>>> + * Helper functions for rstat per CPU lock (cgroup_rstat_cpu_lock).
->>>>>> + *
->>>>>> + * This makes it easier to diagnose locking issues and contention in
->>>>>> + * production environments. The parameter @fast_path determine the
->>>>>> + * tracepoints being added, allowing us to diagnose "flush" related
->>>>>> + * operations without handling high-frequency fast-path "update" 
->>>>>> events.
->>>>>> + */
->>>>>> +static __always_inline
->>>>>> +unsigned long _cgroup_rstat_cpu_lock(raw_spinlock_t *cpu_lock, 
->>>>>> int cpu,
->>>>>> +                     struct cgroup *cgrp, const bool fast_path)
->>>>>> +{
->>>>>> +    unsigned long flags;
->>>>>> +    bool contended;
->>>>>> +
->>>>>> +    /*
->>>>>> +     * The _irqsave() is needed because cgroup_rstat_lock is
->>>>>> +     * spinlock_t which is a sleeping lock on PREEMPT_RT. Acquiring
->>>>>> +     * this lock with the _irq() suffix only disables interrupts on
->>>>>> +     * a non-PREEMPT_RT kernel. The raw_spinlock_t below disables
->>>>>> +     * interrupts on both configurations. The _irqsave() ensures
->>>>>> +     * that interrupts are always disabled and later restored.
->>>>>> +     */
->>>>>> +    contended = !raw_spin_trylock_irqsave(cpu_lock, flags);
->>>>>> +    if (contended) {
->>>>>> +        if (fast_path)
->>>>>> + trace_cgroup_rstat_cpu_lock_contended_fastpath(cgrp, cpu, 
->>>>>> contended);
->>>>>> +        else
->>>>>> +            trace_cgroup_rstat_cpu_lock_contended(cgrp, cpu, 
->>>>>> contended);
->>>>>> +
->>>>>> +        raw_spin_lock_irqsave(cpu_lock, flags);
->>>
->>> Could you do a local_irq_save() before calling trace_cgroup*() and 
->>> raw_spin_lock()? Would that help in eliminating this high lock hold 
->>> time?
->>>
->>
->> Nope it will not eliminating high lock *hold* time, because the hold
->> start timestamp is first taken *AFTER* obtaining the lock.
->>
->> It could help the contended "wait-time" measurement, but my prod
->> measurements show this isn't an issues.
-> 
-> Right.
-> 
-> 
->>
->>> You can also do a local_irq_save() first before the trylock. That 
->>> will eliminate the duplicated irq_restore() and irq_save() when there 
->>> is contention.
->>
->> I wrote the code like this on purpose ;-)
->> My issue with this code/lock is it cause latency issues for softirq 
->> NET_RX. So, when I detect a "contended" lock event, I do want a 
->> irq_restore() as that will allow networking/do_softirq() to run before 
->> I start waiting for the lock (with IRQ disabled).
->>
-> Assuming the time taken by the tracing code is negligible, we are 
-> talking about disabling IRQ almost immediate after enabling it. The 
-> trylock time should be relatively short so the additional delay due to 
-> irq disabled for the whole period is insignificant.
->>
->>> If not, there may be NMIs mixed in.
->>>
->>
->> NMIs are definitely on my list of things to investigate.
->> These AMD CPUs also have other types of interrupts that needs a close 
->> look.
->>
->> The easier explaination is that the lock isn't "yielded" on every cycle
->> through the for each CPU loop.
->>
->> Lets look at the data I provided above:
->>
->> >>   Flushes(5033) 294/interval (avg 62/sec)
->> >>   Locks(53374) 1748/interval (avg 667/sec)
->> >>   Yields(48341) 1454/interval (avg 604/sec)
->> >>   Contended(48104) 1450/interval (avg 601/sec)
->>
->> In this 1 second sample, we have 294 flushes, and more yields 1454,
->> great but the factor is not 128 (num-of-CPUs) but closer to 5. Thus, on
->> average we hold the lock for (128/5) 25.6 CPUs-walks.
->>
->> We have spoken about releasing the lock on for_each CPU before... it
->> will likely solve this long hold time, but IMHO a mutex is still the
->> better solution.
-> 
-> I may have mistakenly thinking the lock hold time refers to just the 
-> cpu_lock. Your reported times here are about the cgroup_rstat_lock. 
-> Right? If so, the numbers make sense to me.
-> 
-
-True, my reported number here are about the cgroup_rstat_lock.
-Glad to hear, we are more aligned then :-)
-
-Given I just got some prod machines online with this patch
-cgroup_rstat_cpu_lock tracepoints, I can give you some early results,
-about hold-time for the cgroup_rstat_cpu_lock.
-
- From this oneliner bpftrace commands:
-
-   sudo bpftrace -e '
-          tracepoint:cgroup:cgroup_rstat_cpu_lock_contended {
-            @start[tid]=nsecs; @cnt[probe]=count()}
-          tracepoint:cgroup:cgroup_rstat_cpu_locked {
-            $now=nsecs;
-            if (args->contended) {
-              @wait_per_cpu_ns=hist($now-@start[tid]); delete(@start[tid]);}
-            @cnt[probe]=count(); @locked[tid]=$now}
-          tracepoint:cgroup:cgroup_rstat_cpu_unlock {
-            $now=nsecs;
-            @locked_per_cpu_ns=hist($now-@locked[tid]); 
-delete(@locked[tid]);
-            @cnt[probe]=count()}
-          interval:s:1 {time("%H:%M:%S "); print(@wait_per_cpu_ns);
-            print(@locked_per_cpu_ns); print(@cnt); clear(@cnt);}'
-
-Results from one 1 sec period:
-
-13:39:55 @wait_per_cpu_ns:
-[512, 1K)              3 | 
-      |
-[1K, 2K)              12 |@ 
-      |
-[2K, 4K)             390 
-|@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@|
-[4K, 8K)              70 |@@@@@@@@@ 
-      |
-[8K, 16K)             24 |@@@ 
-      |
-[16K, 32K)           183 |@@@@@@@@@@@@@@@@@@@@@@@@ 
-      |
-[32K, 64K)            11 |@ 
-      |
-
-@locked_per_cpu_ns:
-[256, 512)         75592 |@ 
-      |
-[512, 1K)        2537357 
-|@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@|
-[1K, 2K)          528615 |@@@@@@@@@@ 
-      |
-[2K, 4K)          168519 |@@@ 
-      |
-[4K, 8K)          162039 |@@@ 
-      |
-[8K, 16K)         100730 |@@ 
-      |
-[16K, 32K)         42276 | 
-      |
-[32K, 64K)          1423 | 
-      |
-[64K, 128K)           89 | 
-      |
-
-  @cnt[tracepoint:cgroup:cgroup_rstat_cpu_lock_contended]: 3 /sec
-  @cnt[tracepoint:cgroup:cgroup_rstat_cpu_unlock]: 3200  /sec
-  @cnt[tracepoint:cgroup:cgroup_rstat_cpu_locked]: 3200  /sec
-
-
-So, we see "flush-code-path" per-CPU-holding @locked_per_cpu_ns isn't
-exceeding 128 usec.
-
-My latency requirements, to avoid RX-queue overflow, with 1024 slots,
-running at 25 Gbit/s, is 27.6 usec with small packets, and 500 usec
-(0.5ms) with MTU size packets.  This is very close to my latency
-requirements.
-
---Jesper
-
+PiANCj4gQ2FuIHlvdSBleHBsYWluIHdoeSB5b3UgYXJlIGRvaW5nIHRoaXMgY2hhbmdlIGluIHRo
+ZSBjb21taXQgbWVzc2FnZT8NCj4gSXMgdGhpcyBhIGZpeCBvciBqdXN0IGltcHJvdmVtZW50Pw0K
+PiANCg0KVGhpcyBpcyBhIGZpeCBidXQgdGhlIGZpcnN0IHBhdGNoIG9mIHRoZSBzZXJpZXMgaXMg
+YW4gaW1wcm92ZW1lbnQuIEJ1dCB0aGV5IGhhdmUNCmNvZGUgZGVwZW5kZW5jeSBzbyBJIGFtIHN1
+Ym1pdHRpbmcgdGhlbSB0b2dldGhlciB0byBhdm9pZCB0aGUgaGFzc2xlDQoNCk1pbg0K
 
