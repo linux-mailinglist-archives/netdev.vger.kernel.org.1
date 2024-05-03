@@ -1,157 +1,110 @@
-Return-Path: <netdev+bounces-93340-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93341-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 395848BB3CA
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 21:18:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D74E8BB3D2
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 21:21:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C3F871F256F6
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 19:18:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3EA5D1C23749
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 19:21:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A748156F2A;
-	Fri,  3 May 2024 19:18:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC1E713B593;
+	Fri,  3 May 2024 19:21:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="V2BxOp6Z"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BIiaSYH5"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4F8B12F391
-	for <netdev@vger.kernel.org>; Fri,  3 May 2024 19:18:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 325C0158869
+	for <netdev@vger.kernel.org>; Fri,  3 May 2024 19:21:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714763902; cv=none; b=RnoY2tHrLEv4K9q07kJXdUqNJXcA5vzJRF0FjsHOa31acnIF9jikFopBlvqByuPwuFY6uABFV3H+edOHkK/XPtW5Uy34ndepT9+ih7tYgmppLWO7cZD6MxzpfC/ZNhzt9vzAnBHsU5Ynm/sIB3inZ2CO/JFAcz1s+ibZJnpgEEU=
+	t=1714764063; cv=none; b=g7zt3jjVmy/+1lW/Kl2y7CBFXbNgp+vDdEMiTZtokzDz2DrOg0UA7KVMJ5ha+2CuUeYe47ZvB/MtA2ika+JjMCKM2f7hocLnrHiAlO9zau+ia858xoqokXOjS8UJ8NpyOLgdcwnOV27x9tVv6/jMho/YO5sMkRO/TG9XBhQNZdU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714763902; c=relaxed/simple;
-	bh=VBe/SOv0mwQ5XI5qY/WFjxdIHLqFgILCJ6ieyL0XOQU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WdtPgbEEu6IptdBoKxYCy1PsXv4Be+Nx2XCSqts5ZzvW7KW3A/1iTAK9uLVXMIr0CcbOIhF9+q53srRNHZYeFZpYYxcNTjQ18PJ1iCF9RybI/J+fR/SY5d7GuTwZfl5EX9z+r9pywJQUyUgxUWMWdNodT86PyX+q33IhS3KogBI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=V2BxOp6Z; arc=none smtp.client-ip=95.215.58.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Fri, 3 May 2024 12:18:13 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1714763898;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mckXklrCvW8qW39pcWOiZpvvEZSd/ILPXQUzKCJtjD8=;
-	b=V2BxOp6ZWWszRo+ezP4vqmUAsMOz43rjBG7TStVGd9+e9l5CVUB72pTp2yzXXpYNsQFFw0
-	TS5ChN5xanrZZE1bD+BTlQyWWZU7A7d81b5Qq8cXa0yyZ+PgE1QMWIT7EHDnAdzyOOyk7g
-	pa3WaVWrgo12UH9Fc5kOuLDUaSj54aM=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Shakeel Butt <shakeel.butt@linux.dev>
-To: Jesper Dangaard Brouer <hawk@kernel.org>
-Cc: Waiman Long <longman@redhat.com>, tj@kernel.org, hannes@cmpxchg.org, 
-	lizefan.x@bytedance.com, cgroups@vger.kernel.org, yosryahmed@google.com, 
-	netdev@vger.kernel.org, linux-mm@kvack.org, kernel-team@cloudflare.com, 
-	Arnaldo Carvalho de Melo <acme@kernel.org>, Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Subject: Re: [PATCH v1] cgroup/rstat: add cgroup_rstat_cpu_lock helpers and
- tracepoints
-Message-ID: <4gdfgo3njmej7a42x6x6x4b6tm267xmrfwedis4mq7f4mypfc7@4egtwzrfqkhp>
-References: <171457225108.4159924.12821205549807669839.stgit@firesoul>
- <30d64e25-561a-41c6-ab95-f0820248e9b6@redhat.com>
- <4a680b80-b296-4466-895a-13239b982c85@kernel.org>
- <203fdb35-f4cf-4754-9709-3c024eecade9@redhat.com>
- <b74c4e6b-82cc-4b26-b817-0b36fbfcc2bd@kernel.org>
- <b161e21f-9d66-4aac-8cc1-83ed75f14025@redhat.com>
- <42a6d218-206b-4f87-a8fa-ef42d107fb23@kernel.org>
+	s=arc-20240116; t=1714764063; c=relaxed/simple;
+	bh=08QSpIQGWlXwXEj8sMt2oa0+Bq6ox+P7MmCeaSF9vVU=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=SnTkn00VZNhR1hoSldIwPzVg9QNIIBjxy7RkS+9yYFv7CPuCF0QjUihUCZ+z/syezWzYi0gEyKAjfYm2ANSVk3VCPEiq1A4b2QPUGyNXS4Pz4ThHMKCcWUCdp7W1mNRdtIjUbFs1i8M9LuK38t7+wPiLCRUNEG9l6VIH/uTbKUg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BIiaSYH5; arc=none smtp.client-ip=209.85.219.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-ddaf165a8d9so63196276.1
+        for <netdev@vger.kernel.org>; Fri, 03 May 2024 12:21:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1714764061; x=1715368861; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=vL7nhaiIYQuczdw6GlYf6veqmTY5SNAmlevhZLtLprU=;
+        b=BIiaSYH5qfK61v1772hq0wn/Ss15qQ9AxjJc10VNVKtHalUgEMzaIugDE8JR45WoVQ
+         ZFyoCjz47gaeLlwVHa9vfuxLEnlbK4115iXut8/MHUxk+uZu7FvwmPE4ZRNF+wE8prXx
+         Kv6SMCKncKpNGeCpoRpdPZ5h/8ngV8ghzVzSzCiAbmk4EPoks/Q7/5CULWeVkk3TcJyN
+         ta93IFfro2KhdHzfA2fYvqjNz9R+jOkRnrzkpFhSA6epBmzgy7fCrX7dk+zwaACO4kjv
+         5AzThDgJI1g0tajl1GBH6JjgL8WlnrN0MPyAZc5swvsQS5D2GS8xDxhwRgBG1AXE/HH6
+         8b3Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714764061; x=1715368861;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=vL7nhaiIYQuczdw6GlYf6veqmTY5SNAmlevhZLtLprU=;
+        b=FnKEI9G2dpATrFfISVz8XAgw18YAUI9fsJuRlYnQpKRl4STcLRzJiDMEPEGRDQPfJK
+         5TaI4VOFqQTtiY0sQZffCjMWRNoST04qhjOIiJ/tpviGi1xfjs9qsQ7o19jK3DLUoJHu
+         b6sltD27pc/OW+ralNPt2tKxlCQ3zdO4AV7f4qtisQSx3Wrvn5yMOPpehyrdWq9cGYL6
+         qmnZIwXF1eP1b/Le2fBsqEDJqA4elPA1cDr/2X663sNlRug5GdBl2YSiGB3KyL+gbPv9
+         MxZzXcF0vF5RPqtj4ncOA0cyT2X2pt+apcQTOhNgwNXO+rtD+eUJifGJzqypM3+N2Ej2
+         OmIg==
+X-Gm-Message-State: AOJu0YyjKgpt5jpvj+op8OL7W/sP5FtQ9o9BiTV2YfiAr8EUez0KF+Tk
+	LlHrtr5UYClJjMyjkx8cjAjOyY6T2j6uFVceKAsde5FpPq+RwA6D9j5sDuJcvCeyXRm84dktfJd
+	Xlp0bpcDysw==
+X-Google-Smtp-Source: AGHT+IG5EO1Vh9MUWFZloqdPuG+aiW82WrmmqZirqD53DCyniMqRzvI54mI62Wb58V8Z13wAqPXNkVeiy9rxkg==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a05:6902:2b07:b0:de4:64c4:d90c with SMTP
+ id fi7-20020a0569022b0700b00de464c4d90cmr503825ybb.12.1714764061229; Fri, 03
+ May 2024 12:21:01 -0700 (PDT)
+Date: Fri,  3 May 2024 19:20:51 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <42a6d218-206b-4f87-a8fa-ef42d107fb23@kernel.org>
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.45.0.rc1.225.g2a3ae87e7f-goog
+Message-ID: <20240503192059.3884225-1-edumazet@google.com>
+Subject: [PATCH net-next 0/8] rtnetlink: more rcu conversions for rtnl_fill_ifinfo()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, May 03, 2024 at 04:00:20PM +0200, Jesper Dangaard Brouer wrote:
-> 
-> 
-[...]
-> > 
-> > I may have mistakenly thinking the lock hold time refers to just the
-> > cpu_lock. Your reported times here are about the cgroup_rstat_lock.
-> > Right? If so, the numbers make sense to me.
-> > 
-> 
-> True, my reported number here are about the cgroup_rstat_lock.
-> Glad to hear, we are more aligned then :-)
-> 
-> Given I just got some prod machines online with this patch
-> cgroup_rstat_cpu_lock tracepoints, I can give you some early results,
-> about hold-time for the cgroup_rstat_cpu_lock.
+We want to no longer rely on RTNL for "ip link show" command.
 
-Oh you have already shared the preliminary data.
+This is a long road, this series takes care of some parts.
 
-> 
-> From this oneliner bpftrace commands:
-> 
->   sudo bpftrace -e '
->          tracepoint:cgroup:cgroup_rstat_cpu_lock_contended {
->            @start[tid]=nsecs; @cnt[probe]=count()}
->          tracepoint:cgroup:cgroup_rstat_cpu_locked {
->            $now=nsecs;
->            if (args->contended) {
->              @wait_per_cpu_ns=hist($now-@start[tid]); delete(@start[tid]);}
->            @cnt[probe]=count(); @locked[tid]=$now}
->          tracepoint:cgroup:cgroup_rstat_cpu_unlock {
->            $now=nsecs;
->            @locked_per_cpu_ns=hist($now-@locked[tid]); delete(@locked[tid]);
->            @cnt[probe]=count()}
->          interval:s:1 {time("%H:%M:%S "); print(@wait_per_cpu_ns);
->            print(@locked_per_cpu_ns); print(@cnt); clear(@cnt);}'
-> 
-> Results from one 1 sec period:
-> 
-> 13:39:55 @wait_per_cpu_ns:
-> [512, 1K)              3 |      |
-> [1K, 2K)              12 |@      |
-> [2K, 4K)             390
-> |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@|
-> [4K, 8K)              70 |@@@@@@@@@      |
-> [8K, 16K)             24 |@@@      |
-> [16K, 32K)           183 |@@@@@@@@@@@@@@@@@@@@@@@@      |
-> [32K, 64K)            11 |@      |
-> 
-> @locked_per_cpu_ns:
-> [256, 512)         75592 |@      |
-> [512, 1K)        2537357
-> |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@|
-> [1K, 2K)          528615 |@@@@@@@@@@      |
-> [2K, 4K)          168519 |@@@      |
-> [4K, 8K)          162039 |@@@      |
-> [8K, 16K)         100730 |@@      |
-> [16K, 32K)         42276 |      |
-> [32K, 64K)          1423 |      |
-> [64K, 128K)           89 |      |
-> 
->  @cnt[tracepoint:cgroup:cgroup_rstat_cpu_lock_contended]: 3 /sec
->  @cnt[tracepoint:cgroup:cgroup_rstat_cpu_unlock]: 3200  /sec
->  @cnt[tracepoint:cgroup:cgroup_rstat_cpu_locked]: 3200  /sec
-> 
-> 
-> So, we see "flush-code-path" per-CPU-holding @locked_per_cpu_ns isn't
-> exceeding 128 usec.
+Eric Dumazet (8):
+  rtnetlink: do not depend on RTNL for IFLA_QDISC output
+  rtnetlink: do not depend on RTNL for IFLA_IFNAME output
+  rtnetlink: do not depend on RTNL for IFLA_TXQLEN output
+  net: write once on dev->allmulti and dev->promiscuity
+  rtnetlink: do not depend on RTNL for many attributes
+  rtnetlink: do not depend on RTNL in rtnl_fill_proto_down()
+  rtnetlink: do not depend on RTNL in rtnl_xdp_prog_skb()
+  rtnetlink: allow rtnl_fill_link_netnsid() to run under RCU protection
 
-Hmm 128 usec is actually unexpectedly high. How does the cgroup
-hierarchy on your system looks like? How many cgroups have actual
-workloads running? Can the network softirqs run on any cpus or smaller
-set of cpus? I am assuming these softirqs are processing packets from
-any or all cgroups and thus have larger cgroup update tree. I wonder if
-you comment out MEMCG_SOCK stat update and still see the same holding
-time.
+ drivers/net/ppp/ppp_generic.c  |  2 +-
+ drivers/net/vxlan/vxlan_core.c |  2 +-
+ net/core/dev.c                 | 51 ++++++++++---------
+ net/core/rtnetlink.c           | 90 ++++++++++++++++++++--------------
+ net/ipv4/ip_tunnel.c           |  2 +-
+ net/ipv6/ip6_tunnel.c          |  2 +-
+ net/sched/sch_api.c            |  2 +-
+ net/sched/sch_teql.c           |  2 +-
+ net/xfrm/xfrm_interface_core.c |  2 +-
+ 9 files changed, 89 insertions(+), 66 deletions(-)
 
-> 
-> My latency requirements, to avoid RX-queue overflow, with 1024 slots,
-> running at 25 Gbit/s, is 27.6 usec with small packets, and 500 usec
-> (0.5ms) with MTU size packets.  This is very close to my latency
-> requirements.
-> 
-> --Jesper
-> 
+-- 
+2.45.0.rc1.225.g2a3ae87e7f-goog
+
 
