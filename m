@@ -1,137 +1,112 @@
-Return-Path: <netdev+bounces-93314-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93316-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3656C8BB234
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 20:11:37 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3EA138BB298
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 20:18:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7A947B214EB
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 18:11:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5ED2FB22355
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 18:18:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76CC21586CB;
-	Fri,  3 May 2024 18:11:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85CB315A490;
+	Fri,  3 May 2024 18:15:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="oiMT1nYh"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="KW6IMd9+"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CD791586C9
-	for <netdev@vger.kernel.org>; Fri,  3 May 2024 18:11:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E689159917;
+	Fri,  3 May 2024 18:15:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714759889; cv=none; b=RY4dTOPIE+o0HSUtp7GM75tYf5TPbRgSHXGEx+T0ejtNhVnXOeeKQZx1d/2BYOF77QB1eIkIZO7gtJcQUr/fWDzmXAmcwPdf5O64gXPWYgV+JSgUL/MWp8pbQgX782ycBzjarwV/W/XzMFp5F0Amy8QmrGXzNAW1YaEuWS2FISo=
+	t=1714760135; cv=none; b=lP3f9sttOqMThDHk1rUqwxug8/Vwk48ijcOgXWqLsj9dR79aGVM+Rp1JbX1jki9313etvGUNnOB08VhDFJzYPTsc4wUZJ8wYedBOIlYGLzjrC0ZpktbBuV8Vgg5MU1XW8jyfQo56qOTmOVwjwkLvap4Rza2DcWJ1/8Q6SgG+7oo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714759889; c=relaxed/simple;
-	bh=jGxTWoogKeVyYlJFXyLyWyKyLbBEDvZfmLstshTOD2M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZLhPiVlZDTSUm1+UtelL1MpNoyL2NoW/jilsPVP6gI6T2j4Lci8ya4Y/txlrjCAqeABNXxtNK0h4mL6dq06RnG6fB0wLMvDlR9BBrXkS5tCxlGPD2OIbDtgTI0R1hYLu7ULd0KMjMn3ierMi0p26bINWCOHkghexqXIlByl2jDw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=oiMT1nYh; arc=none smtp.client-ip=91.218.175.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Fri, 3 May 2024 11:11:20 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1714759885;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=v43bZUtmgn/Fa1lECh+eb1qKS1YLdkiy2ArNZeurJLk=;
-	b=oiMT1nYh62rxDYQnwrF57dx5GghIQOtDjIqKfWRkmQH3x2e7AosUA3Y7zwhMyvYdveFFQ/
-	IzfGaEUD0xtJ3vsnWclQvbASZgdji3FWoQxrHEqqbYyDftzz5yNC6qwMtIxhkTSlDWBfHQ
-	K2/tiY0enRpvq2UUgKQIf6jJuFDRqSA=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Shakeel Butt <shakeel.butt@linux.dev>
-To: Jesper Dangaard Brouer <hawk@kernel.org>
-Cc: Waiman Long <longman@redhat.com>, tj@kernel.org, hannes@cmpxchg.org, 
-	lizefan.x@bytedance.com, cgroups@vger.kernel.org, yosryahmed@google.com, 
-	netdev@vger.kernel.org, linux-mm@kvack.org, kernel-team@cloudflare.com, 
-	Arnaldo Carvalho de Melo <acme@kernel.org>, Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Subject: Re: [PATCH v1] cgroup/rstat: add cgroup_rstat_cpu_lock helpers and
- tracepoints
-Message-ID: <mw4bi6x5tx7rjgswp3ibd5wvnveqjlh3k3v6l3hor52pyejff2@x6ypubxztw4d>
-References: <171457225108.4159924.12821205549807669839.stgit@firesoul>
- <30d64e25-561a-41c6-ab95-f0820248e9b6@redhat.com>
- <4a680b80-b296-4466-895a-13239b982c85@kernel.org>
- <4m3x4rtztwxctwlq2pdorgbv2hblylnuc2haz7ni4ti52n57xi@utxkr5ripqp2>
- <c5a79618-8c64-4e7b-aeed-69aeecb1590d@kernel.org>
+	s=arc-20240116; t=1714760135; c=relaxed/simple;
+	bh=gC91puxF9bCBGnM87pjs20PlVnLjpNHbVWNQN08evE8=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=IpWvmtAtRFqk1L6HbRQCLwOM6HMYHeCV9IcO7QmOb83RSnRGzCkbFXt8LomwkVWtbcusN2wq7QZKAOv28gYYgR7xfEjEqwZ48s8mRgRK7yKMpT1EbQHpiWe1WUWy/kgLeEjd2QznqGMiQSCH48G4LgIycOUUnGIeSar4lHNzWNU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=KW6IMd9+; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: from rrs24-12-35.corp.microsoft.com (unknown [131.107.8.16])
+	by linux.microsoft.com (Postfix) with ESMTPSA id D3303207DBD3;
+	Fri,  3 May 2024 11:15:33 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com D3303207DBD3
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1714760134;
+	bh=Dy1Jw8CZeBBYgzGDboQvNQwvd3u5jjbq+/Q2SUyLVQs=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=KW6IMd9+PwnVkZ9IHJTR+zK/i8z2yhk04L1ZiPrGgrow9VqUHqPZhv0c8c9wBkux0
+	 EWQGMLdA6WATX7penNxD0Z5wFTa6AnSpJXGwc2ovIsRVp62uExs0lWGv5woysGr2c5
+	 fHRsi71mWUh8RCthZR7kj7ETOmwl+qfi+EysKjLo=
+From: Easwar Hariharan <eahariha@linux.microsoft.com>
+To: Edward Cree <ecree.xilinx@gmail.com>,
+	Martin Habets <habetsm.xilinx@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Easwar Hariharan <eahariha@linux.microsoft.com>,
+	netdev@vger.kernel.org (open list:SFC NETWORK DRIVER),
+	linux-net-drivers@amd.com (open list:SFC NETWORK DRIVER),
+	linux-kernel@vger.kernel.org (open list)
+Cc: Wolfram Sang <wsa+renesas@sang-engineering.com>,
+	amd-gfx@lists.freedesktop.org (open list:RADEON and AMDGPU DRM DRIVERS),
+	dri-devel@lists.freedesktop.org (open list:DRM DRIVERS),
+	linux-kernel@vger.kernel.org (open list),
+	intel-gfx@lists.freedesktop.org (open list:INTEL DRM DISPLAY FOR XE AND I915 DRIVERS),
+	intel-xe@lists.freedesktop.org (open list:INTEL DRM DISPLAY FOR XE AND I915 DRIVERS),
+	nouveau@lists.freedesktop.org (open list:DRM DRIVER FOR NVIDIA GEFORCE/QUADRO GPUS),
+	linux-i2c@vger.kernel.org (open list:I2C SUBSYSTEM HOST DRIVERS),
+	linux-media@vger.kernel.org (open list:BTTV VIDEO4LINUX DRIVER),
+	linux-fbdev@vger.kernel.org (open list:FRAMEBUFFER LAYER)
+Subject: [PATCH v2 10/12] sfc: falcon: Make I2C terminology more inclusive
+Date: Fri,  3 May 2024 18:13:31 +0000
+Message-Id: <20240503181333.2336999-11-eahariha@linux.microsoft.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20240503181333.2336999-1-eahariha@linux.microsoft.com>
+References: <20240503181333.2336999-1-eahariha@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c5a79618-8c64-4e7b-aeed-69aeecb1590d@kernel.org>
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
 
-On Fri, May 03, 2024 at 02:58:56PM +0200, Jesper Dangaard Brouer wrote:
-> 
-> 
-> On 02/05/2024 21.44, Shakeel Butt wrote:
-> > On Wed, May 01, 2024 at 07:22:26PM +0200, Jesper Dangaard Brouer wrote:
-> > > 
-> > [...]
-> > > 
-> > > More data, the histogram of time spend under the lock have some strange
-> > > variation issues with a group in 4ms to 65ms area. Investigating what
-> > > can be causeing this... which next step depend in these tracepoints.
-> > > 
-> > > @lock_cnt: 759146
-> > > 
-> > > @locked_ns:
-> > > [1K, 2K)             499 |      |
-> > > [2K, 4K)          206928
-> > > |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@|
-> > > [4K, 8K)          147904 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@      |
-> > > [8K, 16K)          64453 |@@@@@@@@@@@@@@@@      |
-> > > [16K, 32K)        135467 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@      |
-> > > [32K, 64K)         75943 |@@@@@@@@@@@@@@@@@@@      |
-> > > [64K, 128K)        38359 |@@@@@@@@@      |
-> > > [128K, 256K)       46597 |@@@@@@@@@@@      |
-> > > [256K, 512K)       32466 |@@@@@@@@      |
-> > > [512K, 1M)          3945 |      |
-> > > [1M, 2M)             642 |      |
-> > > [2M, 4M)             750 |      |
-> > > [4M, 8M)            1932 |      |
-> > > [8M, 16M)           2114 |      |
-> > > [16M, 32M)          1039 |      |
-> > > [32M, 64M)           108 |      |
-> > > 
-> > 
-> > Am I understanding correctly that 1K is 1 microsecond and 1M is 1
-> > millisecond?
-> 
-> Correct.
-> 
-> > Is it possible to further divide this table into update
-> > side and flush side?
-> > 
-> 
-> This is *only* flush side.
-> 
-> You question indicate, that we are talking past each-other ;-)
-> 
-> Measurements above is with (recently) accepted tracepoints (e.g. not the
-> proposed tracepoints in this patch).  I'm arguing with existing
-> tracepoint that I'm seeing this data, and arguing I need per-CPU
-> tracepoints to dig deeper into this (as proposed in this patch).
+I2C v7, SMBus 3.2, and I3C 1.1.1 specifications have replaced "master/slave"
+with more appropriate terms. Inspired by and following on to Wolfram's
+series to fix drivers/i2c/[1], fix the terminology for users of
+I2C_ALGOBIT bitbanging interface, now that the approved verbiage exists
+in the specification.
 
-Ah my mistake, I just assumed that the data shown is with the given
-patchset.
+Compile tested, no functionality changes intended
 
-> 
-> The "update side" can only be measured once we apply this patch.
-> 
-> This morning I got 6 prod machines booted with new kernels, that contain
-> this proposed per-CPU lock tracepoint patch.  And 3 of these machines have
-> the Mutex lock change also.  No data to share yet...
-> 
+[1]: https://lore.kernel.org/all/20240322132619.6389-1-wsa+renesas@sang-engineering.com/
 
-Eagerly waiting for the results. Also I don't have any concerns with
-these new traces.
+Reviewed-by: Martin Habets <habetsm.xilinx@gmail.com>
+Reviewed-by: Simon Horman <horms@kernel.org>
+Signed-off-by: Easwar Hariharan <eahariha@linux.microsoft.com>
+---
+ drivers/net/ethernet/sfc/falcon/falcon.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> --Jesper
+diff --git a/drivers/net/ethernet/sfc/falcon/falcon.c b/drivers/net/ethernet/sfc/falcon/falcon.c
+index 7a1c9337081b..36114ce88034 100644
+--- a/drivers/net/ethernet/sfc/falcon/falcon.c
++++ b/drivers/net/ethernet/sfc/falcon/falcon.c
+@@ -367,7 +367,7 @@ static const struct i2c_algo_bit_data falcon_i2c_bit_operations = {
+ 	.getsda		= falcon_getsda,
+ 	.getscl		= falcon_getscl,
+ 	.udelay		= 5,
+-	/* Wait up to 50 ms for slave to let us pull SCL high */
++	/* Wait up to 50 ms for target to let us pull SCL high */
+ 	.timeout	= DIV_ROUND_UP(HZ, 20),
+ };
+ 
+-- 
+2.34.1
+
 
