@@ -1,152 +1,180 @@
-Return-Path: <netdev+bounces-93206-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93207-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 069788BA93A
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 10:50:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3E568BA940
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 10:53:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 41636B210DA
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 08:50:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9F193281057
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 08:53:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B51F1465B5;
-	Fri,  3 May 2024 08:50:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3F0114A4E9;
+	Fri,  3 May 2024 08:53:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b="MaEwLsR2";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="LXpduzK5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bPaIg6UZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh8-smtp.messagingengine.com (fhigh8-smtp.messagingengine.com [103.168.172.159])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ACC379CD;
-	Fri,  3 May 2024 08:50:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.159
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9D4614A0AC;
+	Fri,  3 May 2024 08:53:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714726235; cv=none; b=irqOVGul/uaYP+sxAktUMS289jO43Bptsfn9GiuB9dvU0jt9hjhQrhsOSrIsZ9gt5WLu0RO/oHV+EgsWAlVbWvTff9+OpS0gIt8FtNL8cRNTPLloJfCFb2QLkXeKZtjXoZLemTsrfnZ3c7ecffxDPdkQOb5du+DI4g72BVQ8/m8=
+	t=1714726382; cv=none; b=VsPlNLlK3GSrY/FLcsoqXvCVnU+ia7MOQVIGR1JWkjlbpYvoUWtxOc/6dfShKdUPAghcu3jsCj983owhFx6Jyi6g025btlKF80ng97FSeoEztU57Eef/9o7D+gbVY6QWCp6yGADSxy1Y8sMhLXNSMOfqCKu3mmu7zLfJyY6xWoM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714726235; c=relaxed/simple;
-	bh=B5s9Jk+/x6jSelp/LHfg+HBZm7VnwyFuIXtkYlnwJYg=;
+	s=arc-20240116; t=1714726382; c=relaxed/simple;
+	bh=UidPnR0rZN2K/R4rjDZjFLcQrMT3kKQ/ZzUwZ/or2iI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fC6LY534VwZEX0oUMzpcQ88I+vGwAoR5q2yC6zQ2xAXyj37IacnMC+RUN1o4Pmh+6AEJ7iM3twX48/7szs/VF3PsOjUMkoakkzCdRUV8vLKtAWZuNi0zaM2L1/lUOPl8OLTnmKcQJtJxaU0YhDD35l4XQ2es9tMFbAg32zvrt20=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se; spf=pass smtp.mailfrom=ragnatech.se; dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b=MaEwLsR2; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=LXpduzK5; arc=none smtp.client-ip=103.168.172.159
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ragnatech.se
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-	by mailfhigh.nyi.internal (Postfix) with ESMTP id C6FFB1140197;
-	Fri,  3 May 2024 04:50:29 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute5.internal (MEProxy); Fri, 03 May 2024 04:50:29 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ragnatech.se; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm2; t=1714726229;
-	 x=1714812629; bh=4F4Rdkqm7UslI+ESUP+/52ZmCMFB6KZpSmoKNx1SG/k=; b=
-	MaEwLsR2XmH708YsYaOEgT0MTRjRznab/LQZN3Ta2oyC8cQF4yXbwLcfzuxPjWra
-	X0npsEMWuJlNz9KI6p/3GA9Eo0mFYhYJ08OfJlqVWxziCOpjxem7wVOuasfONre+
-	37YeGwMPW/70v7Wj3DLN8nWiK9ikSShWc0TzHDE+LvH3MsgCRv/CVgwYhdNiJlZs
-	sQx+WgmMPqkny+Pm97t30EAF8ONdk8TQA0YmgE3wD9sJLMVU3xIL24BsSsAq3IDj
-	/HuoGs6vwGniBjP/q8qNkmN6+UzvtHqkcpzhfXIMWOXknil+oIIFyB06C1XVAjmC
-	im9ALDr91f6PPyrs2i0sXw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1714726229; x=
-	1714812629; bh=4F4Rdkqm7UslI+ESUP+/52ZmCMFB6KZpSmoKNx1SG/k=; b=L
-	XpduzK5wBQGaiRYKS17XoAvJ41ZFkjxW6zAHL4lj1SZrGRSaxpkLQRt8nYB9P2/o
-	uCe0F9v9RuAE3ddyFgiYWywO5gUGTR2nJ29DeBQHWIiLfhOsYhZdNq4sXWYi40nh
-	Am+5fF8DH0VrFYcO8zh1f+ZM9ppuRh1IJY2lar8EZwWjw5RMvzIKVwXH/zdYj8ZJ
-	dSc9FQhBBAdA4W8pCfnvNgqOhyZ4f9R+tSeAdFCTYh/hNh2yzcml7rd6GB7pa/aS
-	j7ct7F5PsVDTwKE/Dk22ealxpjJMFrDcNInHzPipgd2OiUTPSxdI5QsW+XygDzvU
-	GpziDOBnyR14V8ULzoERw==
-X-ME-Sender: <xms:VaU0ZrDQmojy_F5FUzcVe0PlhPQEe94964yDDT-xqQ_4-ueKKurVxQ>
-    <xme:VaU0ZhgXn4vr4SeDOp4spd1WdgrF_YTxumZx0OT7XIi4UThD887Vovim9hvrDTygg
-    gnkT7hH5CKj5itg6q4>
-X-ME-Received: <xmr:VaU0Zmm9_HIo7N_FG3fD_DPFzDcSY86iCcNDG2vUfWbZuRdrBRrZoyncr_QE7OiZzOxFV0uohEbfs1PxnSUugeLPwAgqlmw>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrvddvtddgtdejucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepfffhvfevuffkfhggtggugfgjsehtkeertddttdejnecuhfhrohhmpefpihhk
-    lhgrshcuufpnuggvrhhluhhnugcuoehnihhklhgrshdrshhouggvrhhluhhnugdorhgvnh
-    gvshgrshesrhgrghhnrghtvggthhdrshgvqeenucggtffrrghtthgvrhhnpeefhfellefh
-    ffejgfefudfggeejlefhveehieekhfeulefgtdefueehffdtvdelieenucevlhhushhtvg
-    hrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehnihhklhgrshdrshhouggv
-    rhhluhhnugdorhgvnhgvshgrshesrhgrghhnrghtvggthhdrshgv
-X-ME-Proxy: <xmx:VaU0ZtxnePf1yVJPgjycl2lwgaZVCc7TRXGMHTSG8Pacrn_WcDb11A>
-    <xmx:VaU0ZgSlp06aDHeRByimrcS462yzwwqKecXevMk5Q8asrYhXwOuQ9w>
-    <xmx:VaU0ZgZ3OTSqrTMw9P-TntnX6pObBCOVlCh1UcNYNMJeFLfzFaG_zQ>
-    <xmx:VaU0ZhSjjD32CRBhozWGrsuzfY1l7uRYPIYz-ETHtqTTqlYmpGT-sg>
-    <xmx:VaU0Zp83J3POwczAs23FgbVudjsKCWPtSMqX-8xGv5fMXMneOawZmgvI>
-Feedback-ID: i80c9496c:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 3 May 2024 04:50:28 -0400 (EDT)
-Date: Fri, 3 May 2024 10:50:26 +0200
-From: Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-To: Arnd Bergmann <arnd@arndb.de>, Simon Horman <horms@kernel.org>
-Cc: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Netdev <netdev@vger.kernel.org>,
-	Linux-Renesas <linux-renesas-soc@vger.kernel.org>
-Subject: Re: [net-next] net: ethernet: rtsn: Add support for Renesas
- Ethernet-TSN
-Message-ID: <20240503085026.GH3927860@ragnatech.se>
-References: <20240414135937.1139611-1-niklas.soderlund+renesas@ragnatech.se>
- <20240418183207.GL3975545@kernel.org>
- <7c8d6791-ea36-45fd-be07-df789263890f@app.fastmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=XPv8tKKZJrHyxOXnW0P5eMgCy1gAOhp5Ajsb5qN8ErI7u3GOEcJfAfo3XvbNs2XYfFx8aaiE0/nmHsX5EPQWdylQJAf0bcKv6qjWL+mcH7gljjdznLRX2id8qYowMYYBgvmH7C5x/bD2pS9uEtfS7DACVX4Nw8XXFMQMsU+KWww=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bPaIg6UZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3A9DC4AF14;
+	Fri,  3 May 2024 08:52:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714726382;
+	bh=UidPnR0rZN2K/R4rjDZjFLcQrMT3kKQ/ZzUwZ/or2iI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=bPaIg6UZhFQ1HZ3WfD4Xd8CSyroUAqyrJGFyf/7lZxCPdBqetBjPKu9Qrd7f8zJug
+	 dW9qnAMYhRLDAeHYRsCinw8l8B6sF0ObxuPnfOMdRSOxjBpDw5/VZD8Grom8uMUyk/
+	 ZQT89izhefWhqa38DQcutRBxptbBdC/nkqcyqHE+ScrkMKCRdIXPEPRMLtoXbhPtfb
+	 WoJLw/jC08qjO52jzKRHYfbtn7P4TwH4vworE9RD/oX5o0W4wvjcM9qqX3UlRJ+4WW
+	 PmqoU4epC6pZxObjUd5QyGckAMU/abVC5t1NUkAl4I2Uwva96LYjSzLE/kJfxdR0vg
+	 LSwTJ6cu3ZVpg==
+Date: Fri, 3 May 2024 09:52:57 +0100
+From: Simon Horman <horms@kernel.org>
+To: Justin Lai <justinlai0215@realtek.com>
+Cc: kuba@kernel.org, davem@davemloft.net, edumazet@google.com,
+	pabeni@redhat.com, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, andrew@lunn.ch, jiri@resnulli.us,
+	pkshih@realtek.com, larry.chiu@realtek.com
+Subject: Re: [PATCH net-next v17 02/13] rtase: Implement the .ndo_open
+ function
+Message-ID: <20240503085257.GM2821784@kernel.org>
+References: <20240502091847.65181-1-justinlai0215@realtek.com>
+ <20240502091847.65181-3-justinlai0215@realtek.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <7c8d6791-ea36-45fd-be07-df789263890f@app.fastmail.com>
+In-Reply-To: <20240502091847.65181-3-justinlai0215@realtek.com>
 
-Hi Arnd and Simon,
-
-Thanks for your comments.
-
-On 2024-04-18 21:03:51 +0200, Arnd Bergmann wrote:
-> On Thu, Apr 18, 2024, at 20:32, Simon Horman wrote:
-> >
-> > Hi Niklas,
-> >
-> > I think that the use of __iowbm() means that this will not
-> > compile for many architectures: grep indicates it
-> > is only defined for arm, arm64, and arc.
-> >
-> > Perhaps COMPILE_TEST should be qualified somehow?
+On Thu, May 02, 2024 at 05:18:36PM +0800, Justin Lai wrote:
+> Implement the .ndo_open function to set default hardware settings
+> and initialize the descriptor ring and interrupts. Among them,
+> when requesting irq, because the first group of interrupts needs to
+> process more events, the overall structure will be different from
+> other groups of interrupts, so it needs to be processed separately.
 > 
-> 
-> >> +	/* Re-enable TX/RX interrupts */
-> >> +	spin_lock_irqsave(&priv->lock, flags);
-> >> +	rtsn_ctrl_data_irq(priv, true);
-> >> +	__iowmb();
-> >> +	spin_unlock_irqrestore(&priv->lock, flags);
-> 
-> I think this needs a comment anyway: what is this trying
-> to serialize?
-> 
-> The arm64 __iowmb() usually tries to ensure that a memory
-> write to a coherent buffer is complete before a following
-> writel() is sent to the bus, but this one appears to be
-> after the writel() where it has no effect because the
-> transaction may still be in flight on the bus after it
-> has left the store buffer.
+> Signed-off-by: Justin Lai <justinlai0215@realtek.com>
 
-Indeed, this is a leftover from development. Thanks for catching it, 
-will drop for v2.
+Hi Justin,
 
+some minor feedback from my side.
+
+> ---
+>  .../net/ethernet/realtek/rtase/rtase_main.c   | 419 ++++++++++++++++++
+>  1 file changed, 419 insertions(+)
 > 
->       Arnd
+> diff --git a/drivers/net/ethernet/realtek/rtase/rtase_main.c b/drivers/net/ethernet/realtek/rtase/rtase_main.c
+> index 5ddb5f7abfe9..b286aac1eedc 100644
+> --- a/drivers/net/ethernet/realtek/rtase/rtase_main.c
+> +++ b/drivers/net/ethernet/realtek/rtase/rtase_main.c
+> @@ -130,6 +130,293 @@ static u32 rtase_r32(const struct rtase_private *tp, u16 reg)
+>  	return readl(tp->mmio_addr + reg);
+>  }
+>  
+> +static void rtase_set_rxbufsize(struct rtase_private *tp)
+> +{
+> +	tp->rx_buf_sz = RTASE_RX_BUF_SIZE;
+> +}
 
--- 
-Kind Regards,
-Niklas Söderlund
+I'm a big fan of helpers, but maybe it's better to just open-code this one
+as it is trivial and seems to only be used once.
+
+...
+
+> +static int rtase_open(struct net_device *dev)
+> +{
+> +	struct rtase_private *tp = netdev_priv(dev);
+> +	struct rtase_int_vector *ivec = &tp->int_vector[0];
+> +	const struct pci_dev *pdev = tp->pdev;
+> +	u16 i, j;
+> +	int ret;
+
+nit: please use reverse xmas tree order - longest line to shortest -
+     for local variable declarations in new Networking code.
+
+> +
+> +	rtase_set_rxbufsize(tp);
+> +
+> +	ret = rtase_alloc_desc(tp);
+> +	if (ret)
+> +		goto err_free_all_allocated_mem;
+> +
+> +	ret = rtase_init_ring(dev);
+> +	if (ret)
+> +		goto err_free_all_allocated_mem;
+> +
+> +	rtase_hw_config(dev);
+> +
+> +	if (tp->sw_flag & RTASE_SWF_MSIX_ENABLED) {
+> +		ret = request_irq(ivec->irq, rtase_interrupt, 0,
+> +				  dev->name, ivec);
+> +		if (ret)
+> +			goto err_free_all_allocated_irq;
+
+This goto jumps to code that relies on i to set the bounds on a loop.
+However, i is not initialised here. Perhaps it should be set to 1?
+
+Flagged by Smatch, and clang-18 W=1 builds.
+
+> +
+> +		/* request other interrupts to handle multiqueue */
+> +		for (i = 1; i < tp->int_nums; i++) {
+> +			ivec = &tp->int_vector[i];
+> +			snprintf(ivec->name, sizeof(ivec->name), "%s_int%i", tp->dev->name, i);
+
+nit: This line could trivially be split into two lines,
+     each less than 80 columns wide.
+
+> +			ret = request_irq(ivec->irq, rtase_q_interrupt, 0,
+> +					  ivec->name, ivec);
+> +			if (ret)
+> +				goto err_free_all_allocated_irq;
+> +		}
+> +	} else {
+> +		ret = request_irq(pdev->irq, rtase_interrupt, 0, dev->name,
+> +				  ivec);
+> +		if (ret)
+> +			goto err_free_all_allocated_mem;
+> +	}
+> +
+> +	rtase_hw_start(dev);
+> +
+> +	for (i = 0; i < tp->int_nums; i++) {
+> +		ivec = &tp->int_vector[i];
+> +		napi_enable(&ivec->napi);
+> +	}
+> +
+> +	netif_carrier_on(dev);
+> +	netif_wake_queue(dev);
+> +
+> +	return 0;
+> +
+> +err_free_all_allocated_irq:
+> +	for (j = 0; j < i; j++)
+> +		free_irq(tp->int_vector[j].irq, &tp->int_vector[j]);
+> +
+> +err_free_all_allocated_mem:
+> +	rtase_free_desc(tp);
+> +
+> +	return ret;
+> +}
+
+...
 
