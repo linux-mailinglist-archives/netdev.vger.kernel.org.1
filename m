@@ -1,106 +1,143 @@
-Return-Path: <netdev+bounces-93279-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93280-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58D6D8BADD6
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 15:39:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D48B98BADF4
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 15:44:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1724B1F233CE
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 13:39:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0B6A61C20F72
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 13:44:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38632153BCA;
-	Fri,  3 May 2024 13:39:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA998153BCB;
+	Fri,  3 May 2024 13:44:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="hj4XE+y7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HpDhu2At"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.web.de (mout.web.de [212.227.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96FA515098B;
-	Fri,  3 May 2024 13:39:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3328915358D
+	for <netdev@vger.kernel.org>; Fri,  3 May 2024 13:44:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714743574; cv=none; b=ew0nzqYHbLHUpKp6h7sYjYEHtlvnLNVXSXtQOkvxi2bodL9Qq4nYyk60n6cjefDqW/HYxU1rVoogzoxORG4v8DOcBRUIkLVXjg45DfgeY5biUn76uXlwxu5/TyDGKV9J0+1ar2E+1+T1xsXAsdNsgj9eLvYPh6FpwLE3rwHPh58=
+	t=1714743844; cv=none; b=eD2kjbjcmWak27YM9MitFeUiyWVfsp527hsZ+A6Tzv2L/59V13ww/i6YZGPw0lPM1vlxCnnUhecEn4kvTzv3gVnN4wE2Ue2erQLFtohO+ITR/EZGMJmsY03qzsxxGEukNrYRHaGdIsDOtl+nsGbYATbwO41i1LeX0250H8E+6lw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714743574; c=relaxed/simple;
-	bh=wo0QU62gAcbFwDG11bIh1nXKjLRrclnV6zmqslwIfeA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=oWZ5b2Ycr492zhS+w6YM/19dR/X4BfEYyf5Hm42HO1cYXCs9If/tp84rGFjL9jYn4/wDLG6rTo2nM1MNir4uN6wOcTxwSonMHO6CBfObf9EQX1q8Iw9B+KD22UsYYDJdn6s90KgcbGWuxR7ISNVYaGtchhRAUGYnrgwd9gEIpNc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=hj4XE+y7; arc=none smtp.client-ip=212.227.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
-	s=s29768273; t=1714743543; x=1715348343; i=markus.elfring@web.de;
-	bh=IGI0qz3dQ+k6A0uofqhrJJ6evY2iyX3SxlzugUF9+xc=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
-	 References:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding:cc:content-transfer-encoding:
-	 content-type:date:from:message-id:mime-version:reply-to:subject:
-	 to;
-	b=hj4XE+y7o7C/GGnH6feTPHHSTb5ZeeZanw9AfycUnW3EUCwkR9guSftjaySEEAzk
-	 fSXVjDe/uWDzNfRp8vul2zb7alMn0argtyLEmTfwEh1oPtPJBpdcVt298qcJ9FgW8
-	 cyshmHA71QySuJre0VUCQQddtsVcDPBUK1UhTtBpmpjvrC0/WoSlNbaS+So5zgNNP
-	 3a9nYJw5JJm1I2cr9YIQ1MgQflHV70N864pHxhzow92e+iGY9CP/f2exD1nu5FePm
-	 BDE5mVCzCAtzS04DXMzKW48ENt+uF/Q9r18EiZ9MZAbututpUi+Rd73brFBEgE6LZ
-	 MfOkqjtNPjoqHjrbBw==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.21] ([94.31.83.95]) by smtp.web.de (mrweb105
- [213.165.67.124]) with ESMTPSA (Nemesis) id 1MMGuC-1sJsHI3kNK-00Hhez; Fri, 03
- May 2024 15:39:02 +0200
-Message-ID: <86a187fc-f5c1-4dd2-b04f-4bb645312778@web.de>
-Date: Fri, 3 May 2024 15:39:00 +0200
+	s=arc-20240116; t=1714743844; c=relaxed/simple;
+	bh=/PO70+zYBQns0nMX2KpQcb3dK+f8ps+iAGqItinz3z4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kGSpq9zOSGoYjZLpjKMSavX9IwkT02knhBsAHgnzSIU21+kf91+MZ3zKGGvYxmLo2XWDiQQNtk9Z8LncBaayoWSbWrZ72Qo1FmY30Y3J3KrUtATdOH/ov6Y9Qi/Nt69CGfm0s9B/2fQTWQzQ7DoQftnR9JTA49IPVATlms6lJlA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HpDhu2At; arc=none smtp.client-ip=209.85.167.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-51f74fa2a82so1079059e87.0
+        for <netdev@vger.kernel.org>; Fri, 03 May 2024 06:44:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1714743841; x=1715348641; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=cdoofNTFCQTWbwZ1YOxaQiJWmkmzp9JJYJt8fvb4y74=;
+        b=HpDhu2AtmzAZlqglcPpMBKvSXBIg8T/px/uITuA4p8M0XYecbFHHRLxdhoICxXpyvd
+         tl7hCUkwd0HEu/Zj7q/ZAnl39CVLWmV7sB0hC6NkmHRDmeSzbcaTBrukEBTaXXon6cts
+         TU4ogMrhVtOupCB+RWPCIO4qMXk8X8ITx7TTU0QV8bH/7/ekf1VrHARbuUXghNw3p0em
+         D+Q+HjGq/InCrQrzx/YaaYoy20eUNjWrGuzPSyVRdYPdNwahxESPWVG9TndvaX0uYPGJ
+         ID6Xr1JoPR0I55wYq/5McIQTdHPS/F2um/1pxu/zUCufCPeTsv3UeK24TnE4VXRoTxCF
+         b7yQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714743841; x=1715348641;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cdoofNTFCQTWbwZ1YOxaQiJWmkmzp9JJYJt8fvb4y74=;
+        b=CUuep7fazZmUvPS/dPaowpdzSdRcno5FMBknY6kHq5yX/RDi/m7RdUF5GDJUi+0nl+
+         XjwpZvyBeWIvD7NJHgkuWGdYbMyrCZoJgSMTa333C5CBBUYHo1K1helPcIxSrfMM4GbM
+         FDLW6Goiouc0ITx2EgXD+Gf1qHezxJA1cGpkEInMS7p/fQ47RZJZxQ8tR1fsPMn7/aV5
+         Z2dJFJ57VjImnqdkw8ytVBkFhK7RLHW7yAGgUOnFb9TYOu+P8iq+sr12AH4q1fOkcfhp
+         hjavbUJSzV0NYBw4TKH4PVIXHwcSWnxITb6nr195Cnf/FlvGqEBReuU52iuw/fCxaBQq
+         YMxQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXFau0SJM8hKyMfSwkkgslI7O4ksj77/bDO0nTsYx8VKDK4xMWRQhKSD+CcZJhgToDnz8H2GUyUeU737fdekgg5UmvSSCRr
+X-Gm-Message-State: AOJu0YzFWJwAbhMZJzAhw1FWZ3h/z6iaHvo2BmuxAI6+SiKiCX8fey91
+	KrXrpSheRWT9eHLW4fpVFsz4bWezixkywYXfGqnS6Xgip0dY5irl
+X-Google-Smtp-Source: AGHT+IGnNAw0f780I76ZxCeqnHwDer12gyK4ciZWfbbfmAhJZYRNDBopz18se8NLo4XWTvNn66AD9g==
+X-Received: by 2002:a19:ac48:0:b0:51e:e754:27dd with SMTP id r8-20020a19ac48000000b0051ee75427ddmr2178030lfc.41.1714743841073;
+        Fri, 03 May 2024 06:44:01 -0700 (PDT)
+Received: from mobilestation ([178.176.56.174])
+        by smtp.gmail.com with ESMTPSA id n6-20020ac242c6000000b0051b402a3809sm540435lfl.307.2024.05.03.06.44.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 03 May 2024 06:44:00 -0700 (PDT)
+Date: Fri, 3 May 2024 16:43:57 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: Yanteng Si <siyanteng@loongson.cn>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com, 
+	alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com, 
+	chenhuacai@kernel.org, linux@armlinux.org.uk, guyinggang@loongson.cn, 
+	netdev@vger.kernel.org, chris.chenfeiyang@gmail.com, siyanteng01@gmail.com
+Subject: Re: [PATCH net-next v12 05/15] net: stmmac: dwmac-loongson: Use
+ PCI_DEVICE_DATA() macro for device identification
+Message-ID: <xh34h5zd3f4hjjpafsg2i6uzeigxjb7g6zwbybgvkgmydw6ouy@ueeozv6lottf>
+References: <cover.1714046812.git.siyanteng@loongson.cn>
+ <46cd3872bef7854dbdb3cc41161a65147f4a7e2c.1714046812.git.siyanteng@loongson.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [v2 2/2] ax25: fix potential reference counting leak in
- ax25_addr_ax25dev
-To: Dan Carpenter <dan.carpenter@linaro.org>,
- Duoming Zhou <duoming@zju.edu.cn>, linux-hams@vger.kernel.org,
- netdev@vger.kernel.org, kernel-janitors@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- =?UTF-8?Q?J=C3=B6rg_Reuter?= <jreuter@yaina.de>,
- Paolo Abeni <pabeni@redhat.com>, LKML <linux-kernel@vger.kernel.org>,
- Lars Kellogg-Stedman <lars@oddbit.com>, Simon Horman <horms@kernel.org>
-References: <cover.1714690906.git.duoming@zju.edu.cn>
- <74e840d98f2bfc79c6059993b2fc1ed3888faba4.1714690906.git.duoming@zju.edu.cn>
- <6eac7fc4-9ade-41bb-a861-d7f339b388f6@web.de>
- <e471ec93-6182-4af0-9584-a35e2680c66d@moroto.mountain>
-Content-Language: en-GB
-From: Markus Elfring <Markus.Elfring@web.de>
-In-Reply-To: <e471ec93-6182-4af0-9584-a35e2680c66d@moroto.mountain>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Provags-ID: V03:K1:nd2DQJfArES+9w/0Cx8G6oyBYfgMbxDGGon9AdjSeBibAva6QhB
- ARFO7Opz/0DOWAqwFPikyiG6wRJU6a27FBubqwGweudrWiVWgh0G1PB+0zqr5b8trETu5xR
- p+ps/e8YWVJpqEhsnFR/yKVxF04WJBy6rn0HH4rI4xTEnQAMHc4Jd7xOdjUvO0vSWNLNoE3
- PQZdAjTASvjJe9nbGpr8g==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:YAgKMjnV/vk=;4QojFnJh2CxI5YSQZDmt8TFAuzI
- rYqA6sJ9XCNZBMDMtBkxGEyU6IBAg6pZmUET1sWt+pC5ezTEyfdX2+xZpS5N4XNqTZtzDY88j
- VQDAytfii7sqz/WR22PwdqgKtl3M6SQZrpWwbwT0SfrH0lhNO9pT958hO81fnz/DMJrkyR06+
- tuTcHsU4SKQQATUs5qAZ/0JR3Tbwv4mscPfreVywrj+QVs0Ix8M6vELNRfZuR9QHNT5IsbUXM
- 2l/5jmK9p/vYatVx0ly9ak2atfkfZVmGL0/WQ+XIJMnC7xqiOa9FT02KKylFihiBe/BWnIKj/
- Y1X6JaaDDiQV6ITk9uJj9Ttrdl4Ji0E2gicEVh2nKBM+triopNoUOWKSZLbN5kiejtbuVZ0UY
- Cv+/a+B8o5/9D2bUO5jo18MN/6pd84xmaI/YT06ctX8tGNlb+EXwLZZmo3lWo90U4xE+ptWZS
- 4fHa8mj7XSXTW+K4tb73f6f5u2+dFCPB3Umi7KJqoCl0/lLxv89/drW2VuJjX8TvJyu6u0HK+
- /A4gGQ8oEFYSaSXQff6c1/MbfFst7Bnyb8B/bFVxeTl62EDtbOeBw9oDPofqtvHi0XPRFllfN
- FL5PxLoB3y6/9bNe8pajVU3kaKpZSE9SW+nD/FtQv0enD4bpxkksPCmOJqiw63/BQT7J9S1BF
- WFT+zRfjeBJs4dGMr4iXpTbN8wAc7XIu8FuAQaoclx90SAW3osOoV8lxUvMiAFcX9VXkpfGtA
- BN4zHuZruPPVnZOUMGdo/6qSQtsiPYuC3djzI/4rsXPcNGvQgGSGBLZZt/wxtiWusrFENxOe1
- 9UHhkjC+oV8JqlyNBi/YCykMa0rZ+ufUGiV9G2qqekLGYXsMzZs0bQEQnIz3TjZsID
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <46cd3872bef7854dbdb3cc41161a65147f4a7e2c.1714046812.git.siyanteng@loongson.cn>
 
-> The commit message is fine as-is.  Please stop nit-picking.
+On Thu, Apr 25, 2024 at 09:04:36PM +0800, Yanteng Si wrote:
+> Just use PCI_DEVICE_DATA() macro for device identification,
+> No changes to function functionality.
 
-I dare to point recurring improvement possibilities out.
-I became curious if the change acceptance will ever grow accordingly.
+Some more verbose commit log:
 
-Regards,
-Markus
+"For the readability sake convert the hard-coded Loongson GMAC PCI ID to
+the respective macro and use the PCI_DEVICE_DATA() macro-function to
+create the pci_device_id array entry. The later change will be
+specifically useful in order to assign the device-specific data for the
+currently supported device and for about to be added Loongson GNET
+controller."
+
+Other than that the change looks good:
+
+Reviewed-by: Serge Semin <fancer.lancer@gmail.com>
+
+-Serge(y)
+
+> 
+> Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
+> Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
+> Signed-off-by: Yanteng Si <siyanteng@loongson.cn>
+> ---
+>  drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+> index 19906ea67636..4e0838db4259 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+> @@ -9,6 +9,8 @@
+>  #include <linux/of_irq.h>
+>  #include "stmmac.h"
+>  
+> +#define PCI_DEVICE_ID_LOONGSON_GMAC	0x7a03
+> +
+>  static int loongson_default_data(struct plat_stmmacenet_data *plat)
+>  {
+>  	plat->clk_csr = 2;	/* clk_csr_i = 20-35MHz & MDC = clk_csr_i/16 */
+> @@ -210,7 +212,7 @@ static SIMPLE_DEV_PM_OPS(loongson_dwmac_pm_ops, loongson_dwmac_suspend,
+>  			 loongson_dwmac_resume);
+>  
+>  static const struct pci_device_id loongson_dwmac_id_table[] = {
+> -	{ PCI_VDEVICE(LOONGSON, 0x7a03) },
+> +	{ PCI_DEVICE_DATA(LOONGSON, GMAC, NULL) },
+>  	{}
+>  };
+>  MODULE_DEVICE_TABLE(pci, loongson_dwmac_id_table);
+> -- 
+> 2.31.4
+> 
 
