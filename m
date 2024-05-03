@@ -1,98 +1,95 @@
-Return-Path: <netdev+bounces-93151-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93157-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CB7F8BA4E0
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 03:25:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D44D88BA4F6
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 03:40:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CEC161F22EC9
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 01:25:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8A50E1F2172B
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 01:40:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10D89C8E9;
-	Fri,  3 May 2024 01:25:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97930101F2;
+	Fri,  3 May 2024 01:40:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="G3iSQ0lF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F+/SUTZA"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C31D88C05;
-	Fri,  3 May 2024 01:25:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69396E556;
+	Fri,  3 May 2024 01:40:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714699536; cv=none; b=oGPzLPDTZdlBdp6xJsEBJhF4+3lCrSrSCTPDevqS4yqzPSGXlWKHaXDVrFtK5UBh+iK06Gxi9GOHpdoy5aOsPGEoQfJu2nLhpzVG0GlFk3Skg/7JS8aztkFDVAIjvTzACybXurKBBwSZaUlvOgiHay5/SJ5YTFWuOOp0/JrhRis=
+	t=1714700429; cv=none; b=JgJdnbRYhnTMebZfuvxWE2+vnf6jXBL+4SE1jvKaPGd6oQQEp6JNN6KIqQNvk9+gFNXanQBYvAdMX7C4SaQXjaDpyhL7DE7H+XjpLRQVdUUvB+F3X2KwmG/TOIqmQJ+Dv2O3olMEHxQDaQvg5PlO4SxjnZHcGrvtbBUEjMVLx68=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714699536; c=relaxed/simple;
-	bh=S+1vg85RtNFRN/JDYIDaIn7QFx/jLQ9h75TpWJA8Dmo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=E/rwt5hfObvWkMZ+K5/Lk21RerIAN28VLy3QYEwAVBZN97o4UJU9JOPlTbjO57pNsOztEg5b8XeqQyvgL3VWpL77VFX9Je4/Adx1qbaKbQoG5MZVnuPlP4e38SKAtPxBezjvzguonQpai5ZHpspIslvpqnI1qt8yXgBH2ZbHdlE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=G3iSQ0lF; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=rPaJqqgEDySEy7m0HaNo8dsnzSm/N9I0/G6a8VXE0NA=; b=G3iSQ0lFTzjf7q24aBd4DutcCh
-	T7kJxoiU3WKIB80JHJI3irt9WQKmxOhjdzoDfpb1kplsX6x8CRVvBdYVCm7rKGNsWTztVazbf9QXv
-	nmKnOScH08h+7b7DiICyFQ1R01l/AP5sNmk3VxIrMRkUptPWYJUWcnACbcQErotrnPxM=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1s2hfr-00EXRq-Rh; Fri, 03 May 2024 03:25:19 +0200
-Date: Fri, 3 May 2024 03:25:19 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Serge Semin <fancer.lancer@gmail.com>
-Cc: Andrew Halaney <ahalaney@redhat.com>,
-	"Russell King (Oracle)" <linux@armlinux.org.uk>,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org,
-	alexandre.torgue@foss.st.com, joabreu@synopsys.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, mcoquelin.stm32@gmail.com, hkallweit1@gmail.com
-Subject: Re: racing ndo_open()/phylink*connect() with phy_probe()
-Message-ID: <25d1164e-0ac2-4311-ad27-aa536dca3882@lunn.ch>
-References: <uz66kbjbxieof6vkliuwgpzhlrbcmeb2f5aeuourw2vqcoc4hv@2adpvba3zszx>
- <ZjFl4rql0UgsHp97@shell.armlinux.org.uk>
- <ykdqxnky7shebbhtucoiokbews2be5bml6raqafsfn4x6bp6h3@nqsn6akpajvp>
- <7723d4l2kqgrez3yfauvp2ueu6awbizkrq4otqpsqpytzp45q2@rju2nxmqu4ew>
+	s=arc-20240116; t=1714700429; c=relaxed/simple;
+	bh=APb8kPNe4Hg1SPW8kYNVM5C42jOxnKGFjcGj9GeVUdw=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=CbfJCxElx3SLc1lK815DOaeCW7JbQoINpyfyWjZNNUuwoB8LLXNK8KOIB9dzAFwxhxRPHmnI/7kjJMPJhhYtT+y5t6/zWL3huKha4hFLCfC3e3h1Fmzpuj3Fg+gy6vbIcH3gp4KcjrKxQx1Wp9kszP5affY7UKYsAhaBJKltvT8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F+/SUTZA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 1132BC4AF1C;
+	Fri,  3 May 2024 01:40:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714700429;
+	bh=APb8kPNe4Hg1SPW8kYNVM5C42jOxnKGFjcGj9GeVUdw=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=F+/SUTZAUlmmE5JAdyzW7f/nVZlsiR6zLrhUmNbcPI2goVXR3moqhcYu+G8akZ0iT
+	 Z41T1PiT/WVO0Tbe+TOi9tkcs4D3/m2DwSMdwHV1KjwCKzOopoodnirjLVfdXVyNfJ
+	 pkBpC61CSQWs5+ZlkbJ/8jwrbKvksco6COy3xgzwv5URemyL5JWO3R0/dy6LNS3g/W
+	 x94R9U5cOS/dTJBYuccn6MjFWd1NUwClV/1jsBIi8REBnYozYjypMDep4ykBCwNM8j
+	 bdV2AmecaK3yXZEN+V2JuHZKaSxcEybPo9Cga6dE6BgvwBcrNKUdF+pKkiBNk2YtYI
+	 uO0wIN5122uJg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id ED771C4333E;
+	Fri,  3 May 2024 01:40:28 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7723d4l2kqgrez3yfauvp2ueu6awbizkrq4otqpsqpytzp45q2@rju2nxmqu4ew>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH RESEND net-next v5] IB/hfi1: allocate dummy net_device
+ dynamically
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171470042896.13840.3413595720317631413.git-patchwork-notify@kernel.org>
+Date: Fri, 03 May 2024 01:40:28 +0000
+References: <20240430162213.746492-1-leitao@debian.org>
+In-Reply-To: <20240430162213.746492-1-leitao@debian.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: kuba@kernel.org, davem@davemloft.net, pabeni@redhat.com,
+ edumazet@google.com, dennis.dalessandro@cornelisnetworks.com, jgg@ziepe.ca,
+ leon@kernel.org, netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
-> AFAICS the problem is in the race between the end0 and end1 device
-> probes. Right?
-> If so then can't the order be fixed by adding the links between the
-> OF-devices?  As it's already done for various phandle-based references
-> like "clocks", "gpios", "phys", etc?
+Hello:
 
-It gets tricky because an MDIO bus master device is often a sub device
-of an Ethernet MAC driver. Typically how it works is that a MAC driver
-probes. Part way through the probe it creates an MDIO bus driver,
-which enumerates the MDIO bus and creates the PHYs. Later in the MAC
-driver probe, or maybe when the MAC driver is opened, it follows the
-phy-handle to a PHY on its own MDIO bus.
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-If you were to say it cannot probe the MAC driver until the MDIO bus
-driver is created and the PHYs created, you never get anywhere,
-because it is the act of probing the MAC driver which creates the PHYs
-which fulfils the phandle.
+On Tue, 30 Apr 2024 09:22:11 -0700 you wrote:
+> Embedding net_device into structures prohibits the usage of flexible
+> arrays in the net_device structure. For more details, see the discussion
+> at [1].
+> 
+> Un-embed the net_device from struct hfi1_netdev_rx by converting it
+> into a pointer. Then use the leverage alloc_netdev() to allocate the
+> net_device object at hfi1_alloc_rx().
+> 
+> [...]
 
-You would need to differentiate between a phandle pointing deeper into
-the same branch of a DT tree, or pointing to a different branch of a
-DT tree. If it is deeper within the same branch, you need to probe in
-order to make progress. If it points to a different branch you need to
-defer until that sub-branch has successfully probed. And if you get
-two branches which are mutually dependent on each other, probe and
-hope EPROBE_DEFER solves it.
+Here is the summary with links:
+  - [RESEND,net-next,v5] IB/hfi1: allocate dummy net_device dynamically
+    https://git.kernel.org/netdev/net-next/c/1c8f43f477d9
 
-	Andrew
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
