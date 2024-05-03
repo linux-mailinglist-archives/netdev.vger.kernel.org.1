@@ -1,187 +1,242 @@
-Return-Path: <netdev+bounces-93285-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93286-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A2158BAE74
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 16:07:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A6888BAE8C
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 16:09:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C9883282A7E
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 14:07:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 42FDA28305A
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 14:09:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12A4B154427;
-	Fri,  3 May 2024 14:07:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DDAD154C0C;
+	Fri,  3 May 2024 14:09:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=renesas.com header.i=@renesas.com header.b="foliLGxl"
+	dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b="KM4XIarb"
 X-Original-To: netdev@vger.kernel.org
-Received: from JPN01-TYC-obe.outbound.protection.outlook.com (mail-tycjpn01on2063.outbound.protection.outlook.com [40.107.114.63])
+Received: from todd.t-8ch.de (todd.t-8ch.de [159.69.126.157])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD2F414265;
-	Fri,  3 May 2024 14:07:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.114.63
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714745223; cv=fail; b=nIvvp1RqvISZ9hO5aa7SieXgQ2ttitnHnb2nhQExhi0w/3WsHsTaXeRSrB3PVROqGNsZlGwpB7wz1zsh+xYATJnhlC9mkgTK2V7sO3Ihdee1heRG4+qXrCuNI9iqzdXg/uqWeV6YzZRc2c2Kmh7ITViMeK/4Ie5wp0TFY9AP1bo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714745223; c=relaxed/simple;
-	bh=LNABuFP3gY2kHjKMmkz/VagSqKiLmBhz8/ApRvLhTfM=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=aghc+WoVfuod8wgpm153dHkalv9a+fhRKINRIltaxFJunCgPsppIqhWD2ZB/34onWI/20+Fm7K3+mNoyqgZ7I7Womy98P1yCzpdQ6YPg3DI0m3T/mku1QkTXi65PHQYvdZOWodyjcCK4/2Mth7b66sVcyPMVT/dXm1rW0rbXu+w=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=renesas.com; spf=pass smtp.mailfrom=renesas.com; dkim=pass (1024-bit key) header.d=renesas.com header.i=@renesas.com header.b=foliLGxl; arc=fail smtp.client-ip=40.107.114.63
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=renesas.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=renesas.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=UKy/C5bDxxEB/G32Pgl8RSiJUdvWU4aGLMG1Fr/r88RTtdpoNq0LxNSYC1F/0DfZFaqqC2IEoq3V8JavGykEXgeDXtmLNJ5RYOQAVmvKdblP1hFKftXOlHFfd3WHKHkdV4qVhyMP4StGTL76e3jsLZQue6+shtnKjI+s6VJ+hSpBLDjJhn2MLGcwdFTI+9nmgn4YUy7LK09HCdBx46Y4r+dDE0GQwWlaOn+z5DWomllZNRUqftMDO6lvmIfnYcqFAt7cpz8E7xoUvRYHrTUPQdcJUbAC2cv6Jw5y0PE4gmCPwPTRYmyFMzoibRAXJQtFX3dm8tUhJphzGCBQTSoY8A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=LNABuFP3gY2kHjKMmkz/VagSqKiLmBhz8/ApRvLhTfM=;
- b=TectxcqX0ZiCPgmA8Mjji9LbFkuMxlE7L2lgjkQcvj3AZ71ILvRjPxRr3TWCn9S1ejKDIlcN4NpYL3wkmRm2s3tmN5oYpBph6/KZcwEzaiG7jyGie1kk5jTjYWrQ34yGbmm9O3uJPrP0Z2Vhmp5tEiJibDqgE8H4vCOAjWtBeDuxL1oKMwU6DpCO/OkxjsQGz3h59FP+XswlBkSRPKNPMZpC2DJI8vb4Dwmj1I3BqkY6Omkv3ksx/ATDHBZMOq5T3U7m9yp5RaZkoPCEDkuYkGmoDQuhTZCIDmEqDYmKq7MYUdcarmtJDfhGBPgBewanskc//p1hlceIBRSW+5+/9g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=renesas.com; dmarc=pass action=none header.from=renesas.com;
- dkim=pass header.d=renesas.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=renesas.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=LNABuFP3gY2kHjKMmkz/VagSqKiLmBhz8/ApRvLhTfM=;
- b=foliLGxlj7/CjNid98rIpyjBEuj1S4qm2OaVcPfWwH6numlcaA81GuXacclsfvCNAZH4ijM8XTeM8bWhkNucIHShSrZRaYYG6AcrfxwkMBn3CsbNrPF0C8InJ5hZgmb1I9yw8JiYVD5fHeT/ByxFYeR0WTOpuXOvnJlRMRmHd0o=
-Received: from OS3PR01MB6593.jpnprd01.prod.outlook.com (2603:1096:604:101::7)
- by OSAPR01MB7398.jpnprd01.prod.outlook.com (2603:1096:604:143::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.29; Fri, 3 May
- 2024 14:06:58 +0000
-Received: from OS3PR01MB6593.jpnprd01.prod.outlook.com
- ([fe80::68a6:2f99:8ab8:5c64]) by OS3PR01MB6593.jpnprd01.prod.outlook.com
- ([fe80::68a6:2f99:8ab8:5c64%6]) with mapi id 15.20.7544.029; Fri, 3 May 2024
- 14:06:58 +0000
-From: Min Li <min.li.xe@renesas.com>
-To: Horatiu Vultur <horatiu.vultur@microchip.com>, Min Li <lnimi@hotmail.com>
-CC: "richardcochran@gmail.com" <richardcochran@gmail.com>, "lee@kernel.org"
-	<lee@kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>
-Subject: RE: [PATCH net-next v7 0/5] ptp: clockmatrix: support 32-bit address
- space
-Thread-Topic: [PATCH net-next v7 0/5] ptp: clockmatrix: support 32-bit address
- space
-Thread-Index: AQHam+EpYL1RQj6Pd0e+bs+IQUzeF7GDhIwAgAIJmoA=
-Date: Fri, 3 May 2024 14:06:58 +0000
-Message-ID:
- <OS3PR01MB6593F02ADBA0D036A49B7F64BA1F2@OS3PR01MB6593.jpnprd01.prod.outlook.com>
-References:
- <LV3P220MB12026032F3316F557415AD9FA0192@LV3P220MB1202.NAMP220.PROD.OUTLOOK.COM>
- <20240502065836.a6xfpqsxm3vocxwe@DEN-DL-M31836.microchip.com>
-In-Reply-To: <20240502065836.a6xfpqsxm3vocxwe@DEN-DL-M31836.microchip.com>
-Accept-Language: en-CA, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=renesas.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: OS3PR01MB6593:EE_|OSAPR01MB7398:EE_
-x-ms-office365-filtering-correlation-id: b494590a-1300-4074-d1a2-08dc6b7a4c1d
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230031|1800799015|366007|376005|38070700009;
-x-microsoft-antispam-message-info:
- =?utf-8?B?b0NxS0RPZUNxRTRlMWkweEwvaUxZNElOQXE0TEtQYmdmSU03S3NMWk9uRUd0?=
- =?utf-8?B?eFBzaG1JUllqUXo0V01MSDVQdVVDc2hhYnFncnY1SnhlbElua2JyOFBJVFYv?=
- =?utf-8?B?L3gzcWtRdWZZSzVWQ1RNOXpTOEVZQWhqSFZLdFJGME0wMDBRRWg0a2o1dWFw?=
- =?utf-8?B?Zk1xMTloS3V3SFJCbTk1ZUh0T0FkSGVlOEliU0tGTk43UnQ3UDkybG9TL1ps?=
- =?utf-8?B?TGxsZVNmL1dkM0w0MGlvejlVTjErZkZpNDNkUE1pVUVLWjJiM3ZJcXZVUHpW?=
- =?utf-8?B?Q205MVA0VWNRaVpNU1JsN25qZy9pTXUyVE5MMVFWOHRwcE9VTWZJSEx3V09P?=
- =?utf-8?B?T3IvczZaeEdWaDBvYkhBeFFtSWIrci8rSVNTenEyd0FHdDZIcmRXL1NURFRa?=
- =?utf-8?B?aE1naEgyMDFGSWhDb3lKamFjKzcvVktkOXYyUkpDNXJvc01CM2Y3WWVCZ3JC?=
- =?utf-8?B?RU9HSTduMHV1RkNoRU1tTDVvSHd3a3BQblFjemJtV0lIQ3pFaU9hT1B2TGdq?=
- =?utf-8?B?T1lYbyt4Mmh3eHA0OStYTjc4ZDBxRE1TMTNWQkVWWjRuSDZGT0tPQUV3UVZk?=
- =?utf-8?B?cE5LYitPRExyMTNyWWh1YllMY3JoVDlVUmVZZlZwYnJSNzJmRjFrakhHc2Zh?=
- =?utf-8?B?SksrdTR5OE1NNGFJbm02cHdvKzRJNTF6NFJ1QUFVTUZOOU9ORUlRaVhrRjht?=
- =?utf-8?B?aFhtVUkwQURwQU1qcjk3SHJiWTVIaTFNanNOYUFiQWJMenVOWDVkVWpramRz?=
- =?utf-8?B?amZHVVd0ZEpaRW1YaEZkemF2bys0WWhxak1LV1dXVkoxTVA5djVOdC8zYS9y?=
- =?utf-8?B?a1QvUjB5dWdoclVBWFl0MVpndFJHN1RCWTlXbVlCcXd5UWVhOGxpZDlBQnhR?=
- =?utf-8?B?SnJtNW04Ni9hSVdjTS9yNWV0VVFZc0FreWd4WlNTT1lLdWtsWXM4T2taM3o5?=
- =?utf-8?B?ZUFsMFdxK3pOOWpGbitBeHhoeTlpWmduZFV3MnVrb0VzUmtjeG5NRkRnMVZO?=
- =?utf-8?B?N2xqVWkzVjVWcmFzci9Ja0g3RUdWMldqMTJrK2Zhbm9oYVRrbGt6anZDUU9p?=
- =?utf-8?B?Mms1bElZWjBPZVc3RFZTeTJWZGlIMmg4VUx6SHBIZkx2RnZ5R3pnbVVoVnN5?=
- =?utf-8?B?dGpGT2hQaDMzb1NVZHlWRk1ETDAySXIwcm9POVV2czF1MXU3UTJSVTBmWHBV?=
- =?utf-8?B?VHpQVDMxUnhzOHlxNVMwSmNlNDJtZTRUeXRSZUthOU4xMWNvQ3NtTFZKY2Rz?=
- =?utf-8?B?YXdwY2hkUUZyVXJHYzlTS0M4bzdSWUVWVDFUTmpWcmNvRHdhUlZUSFlMMlh2?=
- =?utf-8?B?SzJuNlZLT0NGSU9pWVJTMHdwcjAwSjBvLzg4SldjZ2RObk1UNnpoOTVIYmxq?=
- =?utf-8?B?M0w2N1Y1WmtYWHpyVVlJZFlabWZpRjNnTWlsbGE4WlhDU3pLSmpsQjB6eFJx?=
- =?utf-8?B?RWhyMEVtZzZ4Wnp3UDRHUjZoQXd6M2J2L1kxdnlkU2c4ak9ZRjZENzJpWmwx?=
- =?utf-8?B?YlVPZHZscUpIMmdXaXJTMTN2ajFBNllFUHpCd2tNRWZlM25kWHR1L043aGVs?=
- =?utf-8?B?Rno4MmFGRm5Fd1BlUWNZaUVtazFMODRwL3NFbkRFUnl2andFcDl3VERXVDZB?=
- =?utf-8?B?QzVWSzFRSU4rTmpHNjZCblBFNnBmU1c0a0lBWHg3Uzc3SVZPbjVoK1FURjFC?=
- =?utf-8?B?dzg1cklSUEpnSGpSWVdzc1I0Rkg1dnNCSHBaMit2THNmYnFmcXpkUnhzRlFW?=
- =?utf-8?B?U1RpSmpjMTlOVmVxdlVXTElyUmloL3RSUnFYQUMrdnNDdjlWM3hFWC9ycTZ6?=
- =?utf-8?B?TzI2WXFudkxqc3ljY2Y4dz09?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:OS3PR01MB6593.jpnprd01.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(366007)(376005)(38070700009);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?U2MwR2U3MDRodzFoVTFtTWs3bzlkMktqK1lDd2tmZ0FXQVRiUitHSTJSZTgy?=
- =?utf-8?B?OEY5aThoN3NKQ3lRMGI1aTJ2SmhBU0JGOXRlU2lZWk85bWp0WDVLdk4xNlNI?=
- =?utf-8?B?MVNQL21TTEVZNVBYbHdna2FSY2lPNUN1MXYrdGxrVXYyOFdWU2Z1Qmp1Q1BM?=
- =?utf-8?B?akhFQTROTjhKa2hGSzdZTGNqNHdicDNlYjVjTEt5bGdrN0FkNmRKQlFHYWNh?=
- =?utf-8?B?bGxERGlWdzFXajk3dEJiejdNZU02bms0OVpUQUtVU3pYT0RLOENSYlhtRmVi?=
- =?utf-8?B?dVJCUC9UR3piZEtDQTNVN3N6UHdjZ0F6UkFkK3VhVlVMY0Rmb09zQ1Buc1Uv?=
- =?utf-8?B?ZEU3RFdXRHltbzB4NXRialZYVU96Y3hTNmhwa2p1WGtJV1ZqbE5YZ3hVSVB0?=
- =?utf-8?B?Z04yR0R1WWhLNXNIdXhhL292MmZsYnljbGxPVWl6bXkxc0F4K1o5M0gxS3F2?=
- =?utf-8?B?WUNQMS85SzNUNWgwR0pZaGhKUjI4ZFdJU0J2ZHZmZC92QlM1d2drZStHTE01?=
- =?utf-8?B?b0h3K2JsYll1QStzQlN4YmFYdDVsdzBhN1ByeGpUSWl1QXFxNHVva1U2MlQz?=
- =?utf-8?B?QXF0N2ZyRUIwa1d0bGN6QVBsSnYzUGxTaXJTa2RRbnVLbUpSSUEySmowQk9B?=
- =?utf-8?B?Y1RuWFZwR2Jaa1VLT28vdzFNTnorWjRzeDRZakpEcFlBTVY5UDgyVktNckhv?=
- =?utf-8?B?OU5wRmE2aDYyb1RWNDB1eWdJMXhkUlpwc2NNNVhwNkZwc0tSa2g3bXdlbUQw?=
- =?utf-8?B?bnNvTG56ZjdSbHRCTllhTjludEFzVjFOWGF0WmkwZHAzSEN6RmtDOWtxdTRn?=
- =?utf-8?B?N2hId2p4N0RGRTZTbUJsTTJQMTQ5MzVaWTFKU1FBVDZHcFBHbjdSeEZiWjJB?=
- =?utf-8?B?SDVsUHNqTFpBTEFMNWs4SU5Jd0NXTjRSeDJLVDV0Y3FTVWs1SDRBVFp6Yk1M?=
- =?utf-8?B?QnpRc0ovbUF5RG5YbTNWK0hZMXNjT3RpaFdGVGhGZlFoelRWajMwVDJHTnlx?=
- =?utf-8?B?UWV4M3ZtL1UwMlNlVmJ4ZHNZSDFydjRPVnhHcGkyNTg0YzZUK2JHNTlEV1py?=
- =?utf-8?B?RXBwdHZsUVRVbEJHeW9xK0kwUFlJdlpvYVI2cnpiK2J1RktUK0dTNFJla3VE?=
- =?utf-8?B?YkExQ3E5blVVRUY1RldDRTZNSFRWdXlhRGhSdjFBS0w3eXB4NzJWVWVPdlBp?=
- =?utf-8?B?SUN5QlZyNnpDTkgvaFFCUlB4Vnl2MU4wenR0Z1RmbjVOeXpkc1RBd0JZR0tT?=
- =?utf-8?B?VHpOcEh4SkxaakcrVDhnRzNUNTY3N0hKajJlUFdMb09IQjBWbjNNdVhxelRE?=
- =?utf-8?B?SXBNaGRUZWhWSHNyU3p1QkdCNUFrQnFZTFNjRE9RNzFKRi80YTFHdGFoUS9p?=
- =?utf-8?B?Rm9WTWYzdW1rbkhIT0ZrOUM4ak5pL21uZ3J1RVltaURvWEJKZmFzeUcyTzJi?=
- =?utf-8?B?bXF0YVdvQy9CcnRPS1hpY0c5OHk0RVQwVlpNb0w2SGw2Y3pwYUVqcDJnVm0z?=
- =?utf-8?B?RE9YMDdCYW1VbzFkZnp2RzBpemxIbmpkNjFNcUwwOXRENklodHFQUmJtYlF2?=
- =?utf-8?B?SmxCNFFxYjB2bVhGYVZqV09zdnBTUGZjL0ZaUzlIRzBCNHpNSVNCN080RjB3?=
- =?utf-8?B?Q0diRk1kUlBNWFlwU2QrUkxhWnFXS2IwR20xUHZKZzZpaTllZmsxNlBvRFJa?=
- =?utf-8?B?Y0l3aHlsQzRFbzBPOVBzWVpCem9SSkVia3Z0TGFBR1hWMzFmekVVeW9OWXI5?=
- =?utf-8?B?RGpqS3RFN0FaWENnSzU2aHNDR1B6dzlEdGhIWlhPWUpJZVVQaWxscHFjZHJN?=
- =?utf-8?B?dE1vcDZ1UkZicHlsRk54K3lHSzBBOHRvTUxOdzFINERTcCtSQ3pUcEMrMWpY?=
- =?utf-8?B?bjJFcDF3ZmdJZ280czkvU0J0RzZkVWF0d2JoMkxiNFJmeEc5c0dvMzlPT0Rk?=
- =?utf-8?B?MWVabDU2OGFxNDFISTdNU25Gdk9rMEFiNjhQdDIrMEk5TEtiSzltUVFtcnV4?=
- =?utf-8?B?ZXRnb1NXQkJndUhOQTlBN0ZsU3hvYVFSY2hqNHVXczlnN2JpWWhnZW5CaVNz?=
- =?utf-8?B?Ykt4SkxJMVhtQ0h5S1FqODRBWmxXeEUxS09hUW1MWFJhZGI5VDM3QnRnYXlO?=
- =?utf-8?Q?KY300aLd7ysYnh7P9gW5sphrZ?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50F1415444E;
+	Fri,  3 May 2024 14:09:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.69.126.157
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1714745385; cv=none; b=mUVWfdVt0zYaR0o2/SbDplsl3eIToZqAKv+V/l2tox9igjNvNhu+YAjaf2+P4MUCwHgCM+BXRW1fvxmc2bckq1D2TW1uElLHlBiRqqtsP58W8hwu+a4nok4u5MmGUqCX33zQUrnNGkxMWqHUh7iJNJ2B2nvMqmI1lDR6LBR4Pxs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1714745385; c=relaxed/simple;
+	bh=+fi7fUfomErHHAmvDww2p/WTBqGy/yFZDfIKZxnytjc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CCdPlKyCDCaJhJaOwA2p1JSxq4VuaZLqvkDZ1bf5bPxs0s+fVuu+J0ErRRJkTUSueX9Ozh8KROPOdICNpBkkA0BfOXwwJ1uBH/IrSLWigC6wpebd33UiFahRV/Z+4aHBbfG/UsiIoZw2Vs6tTQ0nRUb/EjIJuxDYXdq9/FKLSJ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=weissschuh.net; spf=pass smtp.mailfrom=weissschuh.net; dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b=KM4XIarb; arc=none smtp.client-ip=159.69.126.157
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=weissschuh.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=weissschuh.net
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=weissschuh.net;
+	s=mail; t=1714745381;
+	bh=+fi7fUfomErHHAmvDww2p/WTBqGy/yFZDfIKZxnytjc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=KM4XIarbWLiqP+rTdHhYP4ADp2FfBPZJESIvebE/x46r3wpaPNaKYYJ8DjRuiR4XK
+	 lgnUuJtE42KneR0ACxiqLQ5uJD/S7BK84VwhVwYe9egEdoAzvtQwKV4FeMNTpP6GjL
+	 22eK/o3npUywdzgLbvtpx7d4AZBFjdzVsbPnc49I=
+Date: Fri, 3 May 2024 16:09:40 +0200
+From: Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <linux@weissschuh.net>
+To: Joel Granados <j.granados@samsung.com>
+Cc: Luis Chamberlain <mcgrof@kernel.org>, 
+	Kees Cook <keescook@chromium.org>, Eric Dumazet <edumazet@google.com>, 
+	Dave Chinner <david@fromorbit.com>, linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-riscv@lists.infradead.org, linux-mm@kvack.org, linux-security-module@vger.kernel.org, 
+	bpf@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, linux-xfs@vger.kernel.org, 
+	linux-trace-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org, 
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org, kexec@lists.infradead.org, 
+	linux-hardening@vger.kernel.org, bridge@lists.linux.dev, lvs-devel@vger.kernel.org, 
+	linux-rdma@vger.kernel.org, rds-devel@oss.oracle.com, linux-sctp@vger.kernel.org, 
+	linux-nfs@vger.kernel.org, apparmor@lists.ubuntu.com
+Subject: Re: [PATCH v3 00/11] sysctl: treewide: constify ctl_table argument
+ of sysctl handlers
+Message-ID: <4cda5d2d-dd92-44ef-9e7b-7b780ec795ab@t-8ch.de>
+References: <CGME20240423075608eucas1p265e7c90f3efd6995cb240b3d2688b803@eucas1p2.samsung.com>
+ <20240423-sysctl-const-handler-v3-0-e0beccb836e2@weissschuh.net>
+ <20240503090332.irkiwn73dgznjflz@joelS2.panther.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: renesas.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: OS3PR01MB6593.jpnprd01.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b494590a-1300-4074-d1a2-08dc6b7a4c1d
-X-MS-Exchange-CrossTenant-originalarrivaltime: 03 May 2024 14:06:58.6867
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 53d82571-da19-47e4-9cb4-625a166a4a2a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 3CAw4/603YSmx13cjjxRKd3thm8T+GUq7Tb336EHitjo7sV0tDau9+zTpqHXrL4ZXWPEt02TQjLJPK+RR6hzDA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: OSAPR01MB7398
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240503090332.irkiwn73dgznjflz@joelS2.panther.com>
 
-PiANCj4gSSBjYW4gc2VlIHRoYXQgbm93IHlvdSBhcmUgYXQgdmVyc2lvbiA3LCBpdCB3b3VsZCBi
-ZSBuaWNlIHRvIGhhdmUga2VwdCBhbg0KPiBoaXN0b3J5IG9mIGNoYW5nZXMgYmV0d2VlbiBlYWNo
-IHZlcnNpb24gb2YgeW91ciBwYXRjaCBzZXJpZXMgc28gb3RoZXINCj4gcGVvcGxlIGNhbiBzZWUg
-d2hhdCBoYXMgYmVlbiBjaGFuZ2VkIGJldHdlZW4gdmVyc2lvbnMuIE1heWJlIHlvdSBjYW4NCj4g
-ZG8gaXQgZnJvbSBub3cgb24uDQo+IA0KDQpIaSBIb3JhdGl1DQoNClRoYW5rcyBmb3IgeW91ciBy
-ZXZpZXcuIEkga2VwdCBoaXN0b3J5IGluIFtQQVRDSCAxLzVdIGluc3RlYWQgb2YgY292ZXItbGV0
-dGVyLiBJDQpXaWxsIHJlbWVtYmVyIHRvIHVzZSBjb3Zlci1sZXR0ZXIgbGF0ZXIgb24uDQo=
+Hey Joel,
+
+On 2024-05-03 11:03:32+0000, Joel Granados wrote:
+> Here is my feedback for your outstanding constification patches [1] and [2].
+
+Thanks!
+
+> # You need to split the patch
+> The answer that you got from Jakub in the network subsystem is very clear and
+> baring a change of heart from the network folks, this will go in as but as a
+> split patchset. Please split it considering the following:
+> 1. Create a different patchset for drivers/,  fs/, kernel/, net, and a
+>    miscellaneous that includes whatever does not fit into the others.
+> 2. Consider that this might take several releases.
+> 3. Consider the following sufix for the interim function name "_const". Like in
+>    kfree_const. Please not "_new".
+
+Ack. "_new" was an intentionally unacceptable placeholder.
+
+> 4. Please publish the final result somewhere. This is important so someone can
+>    take over in case you need to stop.
+
+Will do. Both for each single series and a combination of all of them.
+
+> 5. Consistently mention the motivation in your cover letters. I specify more
+>    further down in "#Motivation".
+> 6. Also mention that this is part of a bigger effort (like you did in your
+>    original cover letters). I would include [3,4,5,6]
+> 7. Include a way to show what made it into .rodata. I specify more further down
+>    in "#Show the move".
+> 
+> # Motivation
+> As I read it, the motivation for these constification efforts are:
+> 1. It provides increased safety: Having things in .rodata section reduces the
+>    attack surface. This is especially relevant for structures that have function
+>    pointers (like ctl_table); having these in .rodata means that these pointers
+>    always point to the "intended" function and cannot be changed.
+> 2. Compiler optimizations: This was just a comment in the patchsets that I have
+>    mentioned ([3,4,5]). Do you know what optimizations specifically? Does it
+>    have to do with enhancing locality for the data in .rodata? Do you have other
+>    specific optimizations in mind?
+
+I don't know about anything that would make it faster.
+It's more about safety and transmission of intent to API users,
+especially callback implementers.
+
+> 3. Readability: because it is easier to know up-front that data is not supposed
+>    to change or its obvious that a function is re-entrant. Actually a lot of the
+>    readability reasons is about knowing things "up-front".
+> As we move forward with the constification in sysctl, please include a more
+> detailed motivation in all your cover letters. This helps maintainers (that
+> don't have the context) understand what you are trying to do. It does not need
+> to be my three points, but it should be more than just "put things into
+> .rodata". Please tell me if I have missed anything in the motivation.
+
+Will do.
+
+> # Show the move
+> I created [8] because there is no easy way to validate which objects made it
+> into .rodata. I ran [8] for your Dec 2nd patcheset [7] and there are less in
+> .rodata than I expected (the results are in [9]) Why is that? Is it something
+> that has not been posted to the lists yet? 
+
+Constifying the APIs only *allows* the actual table to be constified
+themselves.
+Then each table definition will have to be touched and "const" added.
+
+See patches 17 and 18 in [7] for two examples.
+
+Some tables in net/ are already "const" as the static definitions are
+never registered themselves but only their copies are.
+
+This seems to explain your findings.
+
+> Best
+
+Thanks!
+
+> [1] https://lore.kernel.org/all/20240423-sysctl-const-handler-v3-0-e0beccb836e2@weissschuh.net/
+> [2] https://lore.kernel.org/all/20240418-sysctl-const-table-arg-v2-1-4012abc31311@weissschuh.net
+> [3] [PATCH v2 00/14] ASoC: Constify local snd_sof_dsp_ops
+>     https://lore.kernel.org/all/20240426-n-const-ops-var-v2-0-e553fe67ae82@kernel.org
+> [4] [PATCH v2 00/19] backlight: Constify lcd_ops
+>     https://lore.kernel.org/all/20240424-video-backlight-lcd-ops-v2-0-1aaa82b07bc6@kernel.org
+> [5] [PATCH 1/4] iommu: constify pointer to bus_type
+>     https://lore.kernel.org/all/20240216144027.185959-1-krzysztof.kozlowski@linaro.org
+> [6] [PATCH 00/29] const xattr tables
+>     https://lore.kernel.org/all/20230930050033.41174-1-wedsonaf@gmail.com
+> [7] https://lore.kernel.org/all/20231204-const-sysctl-v2-0-7a5060b11447@weissschuh.net/
+> 
+> [8]
+
+[snip]
+
+> [9]
+>     section: .rodata                obj_name : kern_table
+>     section: .rodata                obj_name : sysctl_mount_point
+>     section: .rodata                obj_name : addrconf_sysctl
+>     section: .rodata                obj_name : ax25_param_table
+>     section: .rodata                obj_name : mpls_table
+>     section: .rodata                obj_name : mpls_dev_table
+>     section: .data          obj_name : sld_sysctls
+>     section: .data          obj_name : kern_panic_table
+>     section: .data          obj_name : kern_exit_table
+>     section: .data          obj_name : vm_table
+>     section: .data          obj_name : signal_debug_table
+>     section: .data          obj_name : usermodehelper_table
+>     section: .data          obj_name : kern_reboot_table
+>     section: .data          obj_name : user_table
+>     section: .bss           obj_name : sched_core_sysctls
+>     section: .data          obj_name : sched_fair_sysctls
+>     section: .data          obj_name : sched_rt_sysctls
+>     section: .data          obj_name : sched_dl_sysctls
+>     section: .data          obj_name : printk_sysctls
+>     section: .data          obj_name : pid_ns_ctl_table_vm
+>     section: .data          obj_name : seccomp_sysctl_table
+>     section: .data          obj_name : uts_kern_table
+>     section: .data          obj_name : vm_oom_kill_table
+>     section: .data          obj_name : vm_page_writeback_sysctls
+>     section: .data          obj_name : page_alloc_sysctl_table
+>     section: .data          obj_name : hugetlb_table
+>     section: .data          obj_name : fs_stat_sysctls
+>     section: .data          obj_name : fs_exec_sysctls
+>     section: .data          obj_name : fs_pipe_sysctls
+>     section: .data          obj_name : namei_sysctls
+>     section: .data          obj_name : fs_dcache_sysctls
+>     section: .data          obj_name : inodes_sysctls
+>     section: .data          obj_name : fs_namespace_sysctls
+>     section: .data          obj_name : dnotify_sysctls
+>     section: .data          obj_name : inotify_table
+>     section: .data          obj_name : epoll_table
+>     section: .data          obj_name : aio_sysctls
+>     section: .data          obj_name : locks_sysctls
+>     section: .data          obj_name : coredump_sysctls
+>     section: .data          obj_name : fs_shared_sysctls
+>     section: .data          obj_name : fs_dqstats_table
+>     section: .data          obj_name : root_table
+>     section: .data          obj_name : pty_table
+>     section: .data          obj_name : xfs_table
+>     section: .data          obj_name : ipc_sysctls
+>     section: .data          obj_name : key_sysctls
+>     section: .data          obj_name : kernel_io_uring_disabled_table
+>     section: .data          obj_name : tty_table
+>     section: .data          obj_name : random_table
+>     section: .data          obj_name : scsi_table
+>     section: .data          obj_name : iwcm_ctl_table
+>     section: .data          obj_name : net_core_table
+>     section: .data          obj_name : netns_core_table
+>     section: .bss           obj_name : nf_log_sysctl_table
+>     section: .data          obj_name : nf_log_sysctl_ftable
+>     section: .data          obj_name : vs_vars
+>     section: .data          obj_name : vs_vars_table
+>     section: .data          obj_name : ipv4_route_netns_table
+>     section: .data          obj_name : ipv4_route_table
+>     section: .data          obj_name : ip4_frags_ns_ctl_table
+>     section: .data          obj_name : ip4_frags_ctl_table
+>     section: .data          obj_name : ctl_forward_entry
+>     section: .data          obj_name : ipv4_table
+>     section: .data          obj_name : ipv4_net_table
+>     section: .data          obj_name : unix_table
+>     section: .data          obj_name : ipv6_route_table_template
+>     section: .data          obj_name : ipv6_icmp_table_template
+>     section: .data          obj_name : ip6_frags_ns_ctl_table
+>     section: .data          obj_name : ip6_frags_ctl_table
+>     section: .data          obj_name : ipv6_table_template
+>     section: .data          obj_name : ipv6_rotable
+>     section: .data          obj_name : sctp_net_table
+>     section: .data          obj_name : sctp_table
+>     section: .data          obj_name : smc_table
+>     section: .data          obj_name : lowpan_frags_ns_ctl_table
+>     section: .data          obj_name : lowpan_frags_ctl_table
 
