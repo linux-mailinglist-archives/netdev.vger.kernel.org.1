@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-93383-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93384-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B68198BB716
-	for <lists+netdev@lfdr.de>; Sat,  4 May 2024 00:32:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB1C88BB79E
+	for <lists+netdev@lfdr.de>; Sat,  4 May 2024 00:40:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D94251C20CB0
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 22:32:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9138F1F2575C
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 22:40:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CEFD5CDE6;
-	Fri,  3 May 2024 22:32:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB971824AC;
+	Fri,  3 May 2024 22:32:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="BwB1aI5y"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="r2CaK2gF"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52002.amazon.com (smtp-fw-52002.amazon.com [52.119.213.150])
+Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 997C5290F
-	for <netdev@vger.kernel.org>; Fri,  3 May 2024 22:32:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.150
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31068137749
+	for <netdev@vger.kernel.org>; Fri,  3 May 2024 22:32:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.184.29
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714775551; cv=none; b=QvoJfggkSgN+cC27+y19K7QODVlWJzndsmShxKdcg2tsBwRMcLqZiLmuM2pfAnjze218SSPTJEvp7xcDjNxlYZ9pEeD7C7Vfb53VDC2XLlWmMxmO06e+4h20mSgNpfTC+bWBTK5Mp29Ceu64eDzGyv78yDik6Y3xYoaDssV69Y8=
+	t=1714775578; cv=none; b=u9sIxsR+ITPd7SZsqTEM0jUaf3HFr9lxX6n22mXW5jsVYd4k+Yrf7OzgL62XamoNA+cuRKhb0eOhYN1XYGh5oq8/Qh7Cnc5z7JfWI4WF5MCZ7zUpG57UiwLYIvbj3v6xZxrKu0y2/BNTVTxxQSzfbFYKZb3d/GzNoBxdXr8ynZs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714775551; c=relaxed/simple;
-	bh=68jEzkxLIir83oGSB9RS/2TTjim1XB6frA/leiPlURQ=;
+	s=arc-20240116; t=1714775578; c=relaxed/simple;
+	bh=kFAiNMew9eE5IO6wYhpGJqrCtW1OtcqF03jNP9Hkonc=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=F74J/7g1c5POdNsUTaSNAp4A85LheibvlbCzM7sqlQQX602UZ2sfXKW5nEI7WqDHoPurjI2jV5V+K6rPe6ag6M6JTMNbzymS/MVxTreh24iucqwpLPR95oRorDLjhyQiVGyLrvIyL0KSeIHul9HZnnzeT9GCeWV6on48pcBUZGs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=BwB1aI5y; arc=none smtp.client-ip=52.119.213.150
+	 MIME-Version:Content-Type; b=uWqVcErWrUqNbtumu8GMUZXf6ITH/2VxbgN5BwsoJrbYrDkXO/b3oHATWtd++Pjvf+nYibC/I9SHEcZCrtxHT51zThpVb96JIMTIv4n2xu/tv0n5Gf0wAfJ8Mry67y12CmKuOkm5ufEU5sm6bCONSG7lKGsXy+o2W03VSD52txk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=r2CaK2gF; arc=none smtp.client-ip=207.171.184.29
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1714775550; x=1746311550;
+  t=1714775577; x=1746311577;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=3Bdg3MzvrsoNG9rOHa0+yM6/qrkHrO8W/nDfkAcnnzk=;
-  b=BwB1aI5ySCaKRu4RQO/CbcOGPVj5ALz4x6n0HwNZG03qMjcEBcPFgA8H
-   kAoehUPOGA2xOhAvEJd5NsP3rEyQ/f9BYxPTfj62SX7XLHwxW/5dzZAGo
-   nsO9aDeuBOT44W1i1DlZz/wMFPToESlmTf5W7TaRZYU5tCBFEzOUm2MnC
-   0=;
+  bh=9PXod9CnmezhySErZOmJWIDiqtplhQZNHyrxRmDfD3I=;
+  b=r2CaK2gFjnTRsEc75ZyS21FjgB5P5M/NNQgi8o7DXlKGEmu7Vb8FcX4R
+   m4UEYF24XnFHVNK1Wg/bM+FBBykI02ligvWcdLLBDJWuLGKTzfONOSCOh
+   8qqDw7t5+O44QYeXaN0+lr7eC5ReJen6AnMAa98gW1qnmJgz2W46wo1fb
+   E=;
 X-IronPort-AV: E=Sophos;i="6.07,252,1708387200"; 
-   d="scan'208";a="630825643"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52002.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 May 2024 22:32:27 +0000
-Received: from EX19MTAUWB001.ant.amazon.com [10.0.38.20:39401]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.23.7:2525] with esmtp (Farcaster)
- id f505cff7-f9c1-44ab-b3b7-9af5e92a6fc0; Fri, 3 May 2024 22:32:26 +0000 (UTC)
-X-Farcaster-Flow-ID: f505cff7-f9c1-44ab-b3b7-9af5e92a6fc0
+   d="scan'208";a="416766960"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
+  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 May 2024 22:32:50 +0000
+Received: from EX19MTAUWC001.ant.amazon.com [10.0.38.20:9422]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.58.142:2525] with esmtp (Farcaster)
+ id 6e063397-e104-4e88-8933-7dbc2a2b14bc; Fri, 3 May 2024 22:32:50 +0000 (UTC)
+X-Farcaster-Flow-ID: 6e063397-e104-4e88-8933-7dbc2a2b14bc
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Fri, 3 May 2024 22:32:26 +0000
+ 15.2.1258.28; Fri, 3 May 2024 22:32:50 +0000
 Received: from 88665a182662.ant.amazon.com (10.187.170.24) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.28;
- Fri, 3 May 2024 22:32:23 +0000
+ Fri, 3 May 2024 22:32:47 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
 	<pabeni@redhat.com>
 CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
 	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v1 net-next 1/6] af_unix: Add dead flag to struct scm_fp_list.
-Date: Fri, 3 May 2024 15:31:45 -0700
-Message-ID: <20240503223150.6035-2-kuniyu@amazon.com>
+Subject: [PATCH v1 net-next 2/6] af_unix: Save the number of loops in inflight graph.
+Date: Fri, 3 May 2024 15:31:46 -0700
+Message-ID: <20240503223150.6035-3-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20240503223150.6035-1-kuniyu@amazon.com>
 References: <20240503223150.6035-1-kuniyu@amazon.com>
@@ -77,108 +77,92 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D045UWA002.ant.amazon.com (10.13.139.12) To
+X-ClientProxiedBy: EX19D036UWC003.ant.amazon.com (10.13.139.214) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-Commit 1af2dface5d2 ("af_unix: Don't access successor in unix_del_edges()
-during GC.") fixed use-after-free by avoid accessing edge->successor while
-GC is in progress.
+unix_walk_scc_fast() calls unix_scc_cyclic() for every SCC so that we
+can make unix_graph_maybe_cyclic false when all SCC are cleaned up.
 
-However, there could be a small race window where another process could
-call unix_del_edges() while gc_in_progress is true and __skb_queue_purge()
-is on the way.
+If we count the number of loops in the graph during Tarjan's algorithm,
+we need not call unix_scc_cyclic() in unix_walk_scc_fast().
 
-So, we cannot rely on gc_in_progress and need another marker per struct
-scm_fp_list which indicates if the skb is garbage-collected.
+Instead, we can just decrement the number when calling unix_collect_skb()
+and update unix_graph_maybe_cyclic based on the count.
 
-This patch adds dead flag in struct scm_fp_list and set it true before
-calling __skb_queue_purge() in __unix_gc().
-
-Fixes: 1af2dface5d2 ("af_unix: Don't access successor in unix_del_edges() during GC.")
 Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 ---
- include/net/scm.h  |  1 +
- net/core/scm.c     |  1 +
- net/unix/garbage.c | 14 ++++++++++----
- 3 files changed, 12 insertions(+), 4 deletions(-)
+ net/unix/garbage.c | 19 +++++++++++--------
+ 1 file changed, 11 insertions(+), 8 deletions(-)
 
-diff --git a/include/net/scm.h b/include/net/scm.h
-index bbc5527809d1..0d35c7c77a74 100644
---- a/include/net/scm.h
-+++ b/include/net/scm.h
-@@ -33,6 +33,7 @@ struct scm_fp_list {
- 	short			max;
- #ifdef CONFIG_UNIX
- 	bool			inflight;
-+	bool			dead;
- 	struct list_head	vertices;
- 	struct unix_edge	*edges;
- #endif
-diff --git a/net/core/scm.c b/net/core/scm.c
-index 5763f3320358..4f6a14babe5a 100644
---- a/net/core/scm.c
-+++ b/net/core/scm.c
-@@ -91,6 +91,7 @@ static int scm_fp_copy(struct cmsghdr *cmsg, struct scm_fp_list **fplp)
- 		fpl->user = NULL;
- #if IS_ENABLED(CONFIG_UNIX)
- 		fpl->inflight = false;
-+		fpl->dead = false;
- 		fpl->edges = NULL;
- 		INIT_LIST_HEAD(&fpl->vertices);
- #endif
 diff --git a/net/unix/garbage.c b/net/unix/garbage.c
-index d76450133e4f..1f8b8cdfcdc8 100644
+index 1f8b8cdfcdc8..7ffb80dd422c 100644
 --- a/net/unix/garbage.c
 +++ b/net/unix/garbage.c
-@@ -158,13 +158,11 @@ static void unix_add_edge(struct scm_fp_list *fpl, struct unix_edge *edge)
- 	unix_update_graph(unix_edge_successor(edge));
- }
+@@ -405,6 +405,7 @@ static bool unix_scc_cyclic(struct list_head *scc)
  
--static bool gc_in_progress;
--
- static void unix_del_edge(struct scm_fp_list *fpl, struct unix_edge *edge)
- {
- 	struct unix_vertex *vertex = edge->predecessor->vertex;
+ static LIST_HEAD(unix_visited_vertices);
+ static unsigned long unix_vertex_grouped_index = UNIX_VERTEX_INDEX_MARK2;
++static unsigned long unix_graph_circles;
  
--	if (!gc_in_progress)
-+	if (!fpl->dead)
- 		unix_update_graph(unix_edge_successor(edge));
+ static void __unix_walk_scc(struct unix_vertex *vertex, unsigned long *last_index,
+ 			    struct sk_buff_head *hitlist)
+@@ -494,8 +495,8 @@ static void __unix_walk_scc(struct unix_vertex *vertex, unsigned long *last_inde
  
- 	list_del(&edge->vertex_entry);
-@@ -240,7 +238,7 @@ void unix_del_edges(struct scm_fp_list *fpl)
- 		unix_del_edge(fpl, edge);
- 	} while (i < fpl->count_unix);
+ 		if (scc_dead)
+ 			unix_collect_skb(&scc, hitlist);
+-		else if (!unix_graph_maybe_cyclic)
+-			unix_graph_maybe_cyclic = unix_scc_cyclic(&scc);
++		else if (unix_scc_cyclic(&scc))
++			unix_graph_circles++;
  
--	if (!gc_in_progress) {
-+	if (!fpl->dead) {
- 		receiver = fpl->edges[0].successor;
- 		receiver->scm_stat.nr_unix_fds -= fpl->count_unix;
+ 		list_del(&scc);
  	}
-@@ -559,9 +557,12 @@ static void unix_walk_scc_fast(struct sk_buff_head *hitlist)
+@@ -509,7 +510,7 @@ static void unix_walk_scc(struct sk_buff_head *hitlist)
+ {
+ 	unsigned long last_index = UNIX_VERTEX_INDEX_START;
+ 
+-	unix_graph_maybe_cyclic = false;
++	unix_graph_circles = 0;
+ 
+ 	/* Visit every vertex exactly once.
+ 	 * __unix_walk_scc() moves visited vertices to unix_visited_vertices.
+@@ -524,13 +525,12 @@ static void unix_walk_scc(struct sk_buff_head *hitlist)
  	list_replace_init(&unix_visited_vertices, &unix_unvisited_vertices);
+ 	swap(unix_vertex_unvisited_index, unix_vertex_grouped_index);
+ 
++	unix_graph_maybe_cyclic = !!unix_graph_circles;
+ 	unix_graph_grouped = true;
  }
  
-+static bool gc_in_progress;
-+
- static void __unix_gc(struct work_struct *work)
+ static void unix_walk_scc_fast(struct sk_buff_head *hitlist)
  {
- 	struct sk_buff_head hitlist;
-+	struct sk_buff *skb;
+-	unix_graph_maybe_cyclic = false;
+-
+ 	while (!list_empty(&unix_unvisited_vertices)) {
+ 		struct unix_vertex *vertex;
+ 		struct list_head scc;
+@@ -546,15 +546,18 @@ static void unix_walk_scc_fast(struct sk_buff_head *hitlist)
+ 				scc_dead = unix_vertex_dead(vertex);
+ 		}
  
- 	spin_lock(&unix_gc_lock);
+-		if (scc_dead)
++		if (scc_dead) {
+ 			unix_collect_skb(&scc, hitlist);
+-		else if (!unix_graph_maybe_cyclic)
+-			unix_graph_maybe_cyclic = unix_scc_cyclic(&scc);
++			unix_graph_circles--;
++		}
  
-@@ -579,6 +580,11 @@ static void __unix_gc(struct work_struct *work)
+ 		list_del(&scc);
+ 	}
  
- 	spin_unlock(&unix_gc_lock);
- 
-+	skb_queue_walk(&hitlist, skb) {
-+		if (UNIXCB(skb).fp)
-+			UNIXCB(skb).fp->dead = true;
-+	}
+ 	list_replace_init(&unix_visited_vertices, &unix_unvisited_vertices);
 +
- 	__skb_queue_purge(&hitlist);
- skip_gc:
- 	WRITE_ONCE(gc_in_progress, false);
++	if (!unix_graph_circles)
++		unix_graph_maybe_cyclic = false;
+ }
+ 
+ static bool gc_in_progress;
 -- 
 2.30.2
 
