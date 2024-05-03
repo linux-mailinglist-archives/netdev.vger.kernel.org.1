@@ -1,83 +1,63 @@
-Return-Path: <netdev+bounces-93339-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93340-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31B188BB365
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 20:43:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 395848BB3CA
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 21:18:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5446C1C20EC5
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 18:43:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C3F871F256F6
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 19:18:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 652BE175BE;
-	Fri,  3 May 2024 18:43:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A748156F2A;
+	Fri,  3 May 2024 19:18:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="ePikg0wS"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="V2BxOp6Z"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 801E517C64
-	for <netdev@vger.kernel.org>; Fri,  3 May 2024 18:43:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4F8B12F391
+	for <netdev@vger.kernel.org>; Fri,  3 May 2024 19:18:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714761813; cv=none; b=IW87+lino7K2aJnXRDlZ+pi3KvOep8hW5Xbl6LRjvkYm9ITUIS6fUDlIz//D94mVMoTb5fhZiAaSico9ttjFAuZMS8IU+SJfkeQEw1GvD2P48pyJ/nLdYr8QywlIRWIcFmcJsbDv7G9u+tAQGNPT7dPmADhopwDrzWk2lLRiVYQ=
+	t=1714763902; cv=none; b=RnoY2tHrLEv4K9q07kJXdUqNJXcA5vzJRF0FjsHOa31acnIF9jikFopBlvqByuPwuFY6uABFV3H+edOHkK/XPtW5Uy34ndepT9+ih7tYgmppLWO7cZD6MxzpfC/ZNhzt9vzAnBHsU5Ynm/sIB3inZ2CO/JFAcz1s+ibZJnpgEEU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714761813; c=relaxed/simple;
-	bh=PcHI2mXSjOY4NXtmW1TqHHOIJEHPiSVx2p/CZ40zV8M=;
+	s=arc-20240116; t=1714763902; c=relaxed/simple;
+	bh=VBe/SOv0mwQ5XI5qY/WFjxdIHLqFgILCJ6ieyL0XOQU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SLklfyzDU/vZgVW7AY+702urNRMWkPry6ey6E73zlPxULYnMUHtlc2O8FKpoYzrPM4SysZZ828FZy6qu/hgm30GHnQ2bz6S279zzwfSolRN3CQ8uOn50qn+s06d79AAU8ODUCazUm0t+Q1xgMbkDbWRc5wXkhKbrVaa+wcroVNQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=ePikg0wS; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-1ecff927a45so18212085ad.0
-        for <netdev@vger.kernel.org>; Fri, 03 May 2024 11:43:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1714761811; x=1715366611; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=FFXylIM8Lgjr0fl64+mxvP0VZact2yQlaPnfxj1/4U0=;
-        b=ePikg0wS7nTpjPmUR9Wbw6vKzXEnI/bGfNsx6oJ7FIjeCLMXrduM8RQj+wa/5iCWUZ
-         I9qpk0rwSPpR/1riJIpwK/BXbbp4QM//XGQKS6TaaddmJOG0VIOmkSRyqOdNixS7QFW2
-         9C7kyvoyJI4gZJyD9NIIW2aPH0ae0WsAfVdNo=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714761811; x=1715366611;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FFXylIM8Lgjr0fl64+mxvP0VZact2yQlaPnfxj1/4U0=;
-        b=E/xQ2POE4Z/pJXYvtwh+nclgbZ14zNnEZ2uq+TLRwLYLuJzlTlH281vg/BVGL045e7
-         40G0xG0U3HJjd1/9LqhyCKne9gTb56nOa8/EP6zxdvBBgeSXhiLXKwm6ICBTyoGAtn+W
-         DzKjnD4uvD8r3ktdRZIgY1GzQFdZi/UYJSQAbAXE41IzicCMxsFvYR+8HZ/gL4TT2FfO
-         +DkKyBJNp8DWNK6bO9hwLb+xVVdajTgFZqzo308aa7jeGAzBx6/QAIk/OMCrVPMJwQ81
-         MohX6Qd3QgRls0DBNJiX1xGDW6NCCh0O+LQFPOBmqmvlPZfXbhEAt6AbNksn9Gt49/mz
-         0UHw==
-X-Forwarded-Encrypted: i=1; AJvYcCUdrip2vuJTJS8Ilor+U75qUD+0GdhmXjMslKvJG8dCPz/Gtz3y8Jk/XsojSZ4HUfr9liFRWXkSSclRGjM4ByFlHdVELvWl
-X-Gm-Message-State: AOJu0YyLGEEkiKlW2H6mINjmdDq/zLQQmo1OEZOnKMCMt43eRfRteffn
-	CN1nGXF6SqeMwn6MS8bfs+xgnQPst4ks6ZrqJ/eUUad4uuNuTviRX0STrLqS1E0HRdYVlAqeFCS
-	jQqo=
-X-Google-Smtp-Source: AGHT+IELQNadSxtn2qD7K4UmKbShRX1xBPsnrbEvAT1ulySbjcsBh1/3r1nD5X/Dflgo+e9sRpoYKA==
-X-Received: by 2002:a17:902:7612:b0:1e6:622c:7bb4 with SMTP id k18-20020a170902761200b001e6622c7bb4mr3161044pll.19.1714761810756;
-        Fri, 03 May 2024 11:43:30 -0700 (PDT)
-Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id 2-20020a170902ee4200b001ecc9a92e1csm3562096plo.267.2024.05.03.11.43.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 May 2024 11:43:30 -0700 (PDT)
-Date: Fri, 3 May 2024 11:43:27 -0700
-From: Joe Damato <jdamato@fastly.com>
-To: Zhu Yanjun <zyjzyj2000@gmail.com>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, tariqt@nvidia.com,
-	saeedm@nvidia.com, gal@nvidia.com, nalramli@fastly.com,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Leon Romanovsky <leon@kernel.org>,
-	"open list:MELLANOX MLX5 core VPI driver" <linux-rdma@vger.kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next 0/1] mlx5: Add netdev-genl queue stats
-Message-ID: <ZjUwT_1SA9tF952c@LQ3V64L9R2>
-References: <20240503022549.49852-1-jdamato@fastly.com>
- <c3f4f1a4-303d-4d57-ae83-ed52e5a08f69@linux.dev>
+	 Content-Type:Content-Disposition:In-Reply-To; b=WdtPgbEEu6IptdBoKxYCy1PsXv4Be+Nx2XCSqts5ZzvW7KW3A/1iTAK9uLVXMIr0CcbOIhF9+q53srRNHZYeFZpYYxcNTjQ18PJ1iCF9RybI/J+fR/SY5d7GuTwZfl5EX9z+r9pywJQUyUgxUWMWdNodT86PyX+q33IhS3KogBI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=V2BxOp6Z; arc=none smtp.client-ip=95.215.58.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Fri, 3 May 2024 12:18:13 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1714763898;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mckXklrCvW8qW39pcWOiZpvvEZSd/ILPXQUzKCJtjD8=;
+	b=V2BxOp6ZWWszRo+ezP4vqmUAsMOz43rjBG7TStVGd9+e9l5CVUB72pTp2yzXXpYNsQFFw0
+	TS5ChN5xanrZZE1bD+BTlQyWWZU7A7d81b5Qq8cXa0yyZ+PgE1QMWIT7EHDnAdzyOOyk7g
+	pa3WaVWrgo12UH9Fc5kOuLDUaSj54aM=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Shakeel Butt <shakeel.butt@linux.dev>
+To: Jesper Dangaard Brouer <hawk@kernel.org>
+Cc: Waiman Long <longman@redhat.com>, tj@kernel.org, hannes@cmpxchg.org, 
+	lizefan.x@bytedance.com, cgroups@vger.kernel.org, yosryahmed@google.com, 
+	netdev@vger.kernel.org, linux-mm@kvack.org, kernel-team@cloudflare.com, 
+	Arnaldo Carvalho de Melo <acme@kernel.org>, Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Subject: Re: [PATCH v1] cgroup/rstat: add cgroup_rstat_cpu_lock helpers and
+ tracepoints
+Message-ID: <4gdfgo3njmej7a42x6x6x4b6tm267xmrfwedis4mq7f4mypfc7@4egtwzrfqkhp>
+References: <171457225108.4159924.12821205549807669839.stgit@firesoul>
+ <30d64e25-561a-41c6-ab95-f0820248e9b6@redhat.com>
+ <4a680b80-b296-4466-895a-13239b982c85@kernel.org>
+ <203fdb35-f4cf-4754-9709-3c024eecade9@redhat.com>
+ <b74c4e6b-82cc-4b26-b817-0b36fbfcc2bd@kernel.org>
+ <b161e21f-9d66-4aac-8cc1-83ed75f14025@redhat.com>
+ <42a6d218-206b-4f87-a8fa-ef42d107fb23@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,155 +66,92 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <c3f4f1a4-303d-4d57-ae83-ed52e5a08f69@linux.dev>
+In-Reply-To: <42a6d218-206b-4f87-a8fa-ef42d107fb23@kernel.org>
+X-Migadu-Flow: FLOW_OUT
 
-On Fri, May 03, 2024 at 12:55:41PM +0200, Zhu Yanjun wrote:
-> On 03.05.24 04:25, Joe Damato wrote:
-> > Hi:
-> > 
-> > This is only 1 patch, so I know a cover letter isn't necessary, but it
-> > seems there are a few things to mention.
-> > 
-> > This change adds support for the per queue netdev-genl API to mlx5,
-> > which seems to output stats:
-> > 
-> > ./cli.py --spec ../../../Documentation/netlink/specs/netdev.yaml \
-> >           --dump qstats-get --json '{"scope": "queue"}'
-> > 
-> > ...snip
-> >   {'ifindex': 7,
-> >    'queue-id': 28,
-> >    'queue-type': 'tx',
-> >    'tx-bytes': 399462,
-> >    'tx-packets': 3311},
-> > ...snip
+On Fri, May 03, 2024 at 04:00:20PM +0200, Jesper Dangaard Brouer wrote:
 > 
-> Ethtool -S ethx can get the above information
-> "
-> ...
->      tx-0.packets: 2094
->      tx-0.bytes: 294141
->      rx-0.packets: 2200
->      rx-0.bytes: 267673
-> ...
-> "
 > 
+[...]
 > > 
-> > I've tried to use the tooling suggested to verify that the per queue
-> > stats match the rtnl stats by doing this:
+> > I may have mistakenly thinking the lock hold time refers to just the
+> > cpu_lock. Your reported times here are about the cgroup_rstat_lock.
+> > Right? If so, the numbers make sense to me.
 > > 
-> >    NETIF=eth0 tools/testing/selftests/drivers/net/stats.py
-> > 
-> > And the tool outputs that there is a failure:
-> > 
-> >    # Exception| Exception: Qstats are lower, fetched later
-> >    not ok 3 stats.pkt_byte_sum
 > 
-> With ethtool, does the above problem still occur?
+> True, my reported number here are about the cgroup_rstat_lock.
+> Glad to hear, we are more aligned then :-)
+> 
+> Given I just got some prod machines online with this patch
+> cgroup_rstat_cpu_lock tracepoints, I can give you some early results,
+> about hold-time for the cgroup_rstat_cpu_lock.
 
-Thanks for the suggestion, with ethtool it seems correct using the same
-logic as the test, I understand correctly.
+Oh you have already shared the preliminary data.
 
-The failing test fetches rtnl first then qstats, but sees lower qstats - the
-test expects qstats to be equal or higher since they are read later. In order to
-reproduce this with ethtool, I'd need to fetch with ethtool first and then
-fetch qstats and compare.
+> 
+> From this oneliner bpftrace commands:
+> 
+>   sudo bpftrace -e '
+>          tracepoint:cgroup:cgroup_rstat_cpu_lock_contended {
+>            @start[tid]=nsecs; @cnt[probe]=count()}
+>          tracepoint:cgroup:cgroup_rstat_cpu_locked {
+>            $now=nsecs;
+>            if (args->contended) {
+>              @wait_per_cpu_ns=hist($now-@start[tid]); delete(@start[tid]);}
+>            @cnt[probe]=count(); @locked[tid]=$now}
+>          tracepoint:cgroup:cgroup_rstat_cpu_unlock {
+>            $now=nsecs;
+>            @locked_per_cpu_ns=hist($now-@locked[tid]); delete(@locked[tid]);
+>            @cnt[probe]=count()}
+>          interval:s:1 {time("%H:%M:%S "); print(@wait_per_cpu_ns);
+>            print(@locked_per_cpu_ns); print(@cnt); clear(@cnt);}'
+> 
+> Results from one 1 sec period:
+> 
+> 13:39:55 @wait_per_cpu_ns:
+> [512, 1K)              3 |      |
+> [1K, 2K)              12 |@      |
+> [2K, 4K)             390
+> |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@|
+> [4K, 8K)              70 |@@@@@@@@@      |
+> [8K, 16K)             24 |@@@      |
+> [16K, 32K)           183 |@@@@@@@@@@@@@@@@@@@@@@@@      |
+> [32K, 64K)            11 |@      |
+> 
+> @locked_per_cpu_ns:
+> [256, 512)         75592 |@      |
+> [512, 1K)        2537357
+> |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@|
+> [1K, 2K)          528615 |@@@@@@@@@@      |
+> [2K, 4K)          168519 |@@@      |
+> [4K, 8K)          162039 |@@@      |
+> [8K, 16K)         100730 |@@      |
+> [16K, 32K)         42276 |      |
+> [32K, 64K)          1423 |      |
+> [64K, 128K)           89 |      |
+> 
+>  @cnt[tracepoint:cgroup:cgroup_rstat_cpu_lock_contended]: 3 /sec
+>  @cnt[tracepoint:cgroup:cgroup_rstat_cpu_unlock]: 3200  /sec
+>  @cnt[tracepoint:cgroup:cgroup_rstat_cpu_locked]: 3200  /sec
+> 
+> 
+> So, we see "flush-code-path" per-CPU-holding @locked_per_cpu_ns isn't
+> exceeding 128 usec.
 
-A correct output would show equal or higher stats from qstats than ethtool
-because there is minor delay in running the commands.
+Hmm 128 usec is actually unexpectedly high. How does the cgroup
+hierarchy on your system looks like? How many cgroups have actual
+workloads running? Can the network softirqs run on any cpus or smaller
+set of cpus? I am assuming these softirqs are processing packets from
+any or all cgroups and thus have larger cgroup update tree. I wonder if
+you comment out MEMCG_SOCK stat update and still see the same holding
+time.
 
-Here's a quick example using ethtool of what I get (note that in the output of
-cli.py the bytes are printed before the packets):
-
-$ ethtool -S eth0 | egrep '(rx[0-3]_(bytes|packets))' && \
-  echo "======" && \
-  ./cli.py --spec ../../../Documentation/netlink/specs/netdev.yaml \
-           --dump qstats-get --json '{"scope": "queue", "ifindex": 7}' \
-  |  egrep '(rx-(packets|bytes))'
-
-     rx0_packets: 10799916
-     rx0_bytes: 4949724904
-     rx1_packets: 26170804
-     rx1_bytes: 12694250232
-     rx2_packets: 11901885
-     rx2_bytes: 5593129387
-     rx3_packets: 13219784
-     rx3_bytes: 6151431963
-======
-  'rx-bytes': 4949927222,
-  'rx-packets': 10800354},
-  'rx-bytes': 12694488803,
-  'rx-packets': 26171309},
-  'rx-bytes': 5593321247,
-  'rx-packets': 11902360},
-  'rx-bytes': 6151735533,
-  'rx-packets': 13220389},
-
-
-So you can see that the numbers "look right", the qstats (collected by cli.py)
-are collected later and are slightly larger, as expected:
-
-rx0_packets from ethtool: 10799916
-rx0_packets from cli.py:  10800354
-
-rx0_bytes from ethtool: 4949724904
-rx0_bytes from cli.py:  4949927222
-
-So this looks correct to me and in this case I'd be more inclinded to assume
-that RTNL on mlx5 is "overcounting" because:
-
-1. it includes the PTP stats that I don't include in my qstats, and/or
-2. some other reason I don't understand
-
-> > 
-> > The other tests all pass (including stats.qstat_by_ifindex).
-> > 
-> > This appears to mean that the netdev-genl queue stats have lower numbers
-> > than the rtnl stats even though the rtnl stats are fetched first. I
-> > added some debugging and found that both rx and tx bytes and packets are
-> > slightly lower.
-> > 
-> > The only explanations I can think of for this are:
-> > 
-> > 1. tx_ptp_opened and rx_ptp_opened are both true, in which case
-> >     mlx5e_fold_sw_stats64 adds bytes and packets to the rtnl struct and
-> >     might account for the difference. I skip this case in my
-> >     implementation, so that could certainly explain it.
-> > 2. Maybe I'm just misunderstanding how stats aggregation works in mlx5,
-> >     and that's why the numbers are slightly off?
-> > 
-> > It appears that the driver uses a workqueue to queue stats updates which
-> > happen periodically.
-> > 
-> >   0. the driver occasionally calls queue_work on the update_stats_work
-> >      workqueue.
-> >   1. This eventually calls MLX5E_DECLARE_STATS_GRP_OP_UPDATE_STATS(sw),
-> >      in drivers/net/ethernet/mellanox/mlx5/core/en_stats.c, which appears
-> >      to begin by first memsetting the internal stats struct where stats are
-> >      aggregated to zero. This would mean, I think, the get_base_stats
-> >      netdev-genl API implementation that I have is correct: simply set
-> >      everything to 0.... otherwise we'd end up double counting in the
-> >      netdev-genl RX and TX handlers.
-> >   2. Next, each of the stats helpers are called to collect stats into the
-> >      freshly 0'd internal struct (for example:
-> >      mlx5e_stats_grp_sw_update_stats_rq_stats).
-> > 
-> > That seems to be how stats are aggregated, which would suggest that if I
-> > simply .... do what I'm doing in this change the numbers should line up.
-> > 
-> > But they don't and its either because of PTP or because I am
-> > misunderstanding/doing something wrong.
-> > 
-> > Maybe the MLNX folks can suggest a hint?
-> > 
-> > Thanks,
-> > Joe
-> > 
-> > Joe Damato (1):
-> >    net/mlx5e: Add per queue netdev-genl stats
-> > 
-> >   .../net/ethernet/mellanox/mlx5/core/en_main.c | 68 +++++++++++++++++++
-> >   1 file changed, 68 insertions(+)
-> > 
+> 
+> My latency requirements, to avoid RX-queue overflow, with 1024 slots,
+> running at 25 Gbit/s, is 27.6 usec with small packets, and 500 usec
+> (0.5ms) with MTU size packets.  This is very close to my latency
+> requirements.
+> 
+> --Jesper
 > 
 
