@@ -1,56 +1,60 @@
-Return-Path: <netdev+bounces-93191-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93190-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A75D8BA7E6
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 09:36:47 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0AFF38BA7D5
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 09:32:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6F87EB220D7
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 07:36:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 94BB31F21C1F
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 07:32:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F47D1474C3;
-	Fri,  3 May 2024 07:36:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="ZV92GoCD"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDF6B146D4D;
+	Fri,  3 May 2024 07:31:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.web.de (mout.web.de [212.227.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CC5D139D12;
-	Fri,  3 May 2024 07:36:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA6F9139CF1
+	for <netdev@vger.kernel.org>; Fri,  3 May 2024 07:31:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714721795; cv=none; b=VxFK8KAkx8Guki0LofM695QO7+BRTIuvUGURf5001hc2yDiexvCrxzjzYV3TD5R5EwLpe4UM1UoLTBj0OFGaeBL3i7D3yWlyYtW7iu22LtXK9wVwuhMIv+F3L4wscSW5CXcmF8zWsDXIYt8WncLEABE4e8RdmMPAKeft6d1crDY=
+	t=1714721519; cv=none; b=rQ/JVt91ZX5rcb7/jG6DuMg0pOf4oSDAfh8yk/uv1dJlGxJ4HpaOJw1CNjIi7VO4z8PiYUEJmODGpDbe5jFKXB5VPAB6UVsC2Nvcqp/ECNSX7+JVc0JncdRfGh6OH9TN96/XJM5IjTZEoiHAVWztBXmlLluQBACE89s1bdiJaQA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714721795; c=relaxed/simple;
-	bh=7KoCLlZBSOFASgSu6MYjnBmP3h1VL0xbXZBQuWHgi5U=;
+	s=arc-20240116; t=1714721519; c=relaxed/simple;
+	bh=hdNk2tAeOcskB24GgAyRK6QxNDUEzF2JkjsDIaLQ0Lw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=B4p9yA2hSnt+XixkVLMGnX/Otdu6eLNFRGOEpr5ZkXhHDLmKqbmb8fzVfgtZjZDYykSdFl0Pb8LBuuSAoUR+fsvO4tedyUeZWK9sXr8w5G968qj5L69rHKV5ygE/sa/aAzQ8OhS05AcrBAHlD+mRGBdamElP6DzLEBlDR0SfYxY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=ZV92GoCD; arc=none smtp.client-ip=212.227.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
-	s=s29768273; t=1714721789; x=1715326589; i=markus.elfring@web.de;
-	bh=tTc56wSSVJv4iZDOZUEc20yuwRleSTjh1lHhSpz3Qng=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
-	 References:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding:cc:content-transfer-encoding:
-	 content-type:date:from:message-id:mime-version:reply-to:subject:
-	 to;
-	b=ZV92GoCDhbobZP4TPyEUBx8zDd41Ia5ocGweYzqZ6eV6ITNBiodnpQuAftw+umMn
-	 Megw/dceTCuiMpWGfbBW+M4UzNCwsHrQ3Q7DqVCZQEav2z6JoJCO2VF3EYoiK9xas
-	 niyH1SKv4nX69HKarMxLThK7k9JhaKRm/kYiEYhlNiEioG8B5MQqhPO/vfxmhJRAf
-	 pJDyJ0rp61GvRFcNscB1DP/TwG1SvBPy6JjdS+gPwmX/pWzzf0W4bSbB0mDEfpV9J
-	 PCKzZY1V2CD/jaV7y3pIiQy/ImIuJ72ZtlqJ9+SMgPUdlCFwUKDWBPYwRAunc8DTS
-	 1DTfFM+XTdxItegOeQ==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.21] ([94.31.83.95]) by smtp.web.de (mrweb105
- [213.165.67.124]) with ESMTPSA (Nemesis) id 1MnpGi-1sRQga3uzi-00prNa; Fri, 03
- May 2024 09:30:35 +0200
-Message-ID: <6eac7fc4-9ade-41bb-a861-d7f339b388f6@web.de>
-Date: Fri, 3 May 2024 09:30:33 +0200
+	 In-Reply-To:Content-Type; b=pSWn+h5hNL8rA5u0/YlwpRP/z41uRpJw3OhkwPWqnI09ymZv2hcvv4hbpo5e8KWtLrq3T3kYh2UoNtRve5YAxVpP971yiNC1zZwgTBwZEsutErE46srE2TOf0cFYNQMLho4zmPv7po3UDXSDfrxmnp3OG1BA0tbnWazZq2rIC08=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2e1e8c880ffso3763261fa.2
+        for <netdev@vger.kernel.org>; Fri, 03 May 2024 00:31:57 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714721516; x=1715326316;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=mLjZ4XBNoYrG2AfbHtnwrbcCvSNKrmnJot9LbQr1gQA=;
+        b=WHaX8E+S64+rxE9SO4k2bGVSGGqcvq2k5X5LOWHUmbRlCqPMvjckPrvCPTKGpwK+1z
+         M+nS4/vjpkIqbdINXFvNzzLHYRSw07kwBqKlANxA0BXHZ0OA/djpsXg659huo2BozVga
+         E5hXK852VecwQUDDtI7b7FVGHXirP16KDCA7c4JwJQvmcV1ljvvG2z0SscVdyWfVadE6
+         ldSrPSn5I53vRp7VmvKfyBkOFUSnkcEoU6p9NPp2/9QvzLS11ZJzadJCZCM7DvhTObG3
+         W+uqkJZcV6JEoR4LyswefCtwfjv+xuSml4WG0tHtf3S+UITFhSxCMAcUtGGbtciO8qn6
+         tZfA==
+X-Forwarded-Encrypted: i=1; AJvYcCUiFCiYLEFx/UC7uW/GXrj8f9wfcCg/Y8g1F/b1SLP0cvIEEj1oJ6jj1FehYRjH1+XWzu/KbvAkmAGQdxJFu5uYnaSLvZ8p
+X-Gm-Message-State: AOJu0YxKj3ZxSIyViRwK/UBaO0LJM0pp6EifCzkSOP3uPe1E4Pu6YyjQ
+	pX2TNdXvzzMngJS105ICp3U0YJmi1LJX3TZ2fq73tkxAabDKdi06
+X-Google-Smtp-Source: AGHT+IEEbbGP4318UVGteGjHsF5YUKEwa1jSIC9b8Ajd7I4cQyPZMFhGIFgNLu7U70PFB+9PBRW1JA==
+X-Received: by 2002:a19:ca4d:0:b0:513:ec32:aa89 with SMTP id h13-20020a19ca4d000000b00513ec32aa89mr1323536lfj.2.1714721515704;
+        Fri, 03 May 2024 00:31:55 -0700 (PDT)
+Received: from [10.100.102.67] (85.65.192.64.dynamic.barak-online.net. [85.65.192.64])
+        by smtp.gmail.com with ESMTPSA id k7-20020a7bc407000000b0041674bf7d4csm8285498wmi.48.2024.05.03.00.31.52
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 03 May 2024 00:31:55 -0700 (PDT)
+Message-ID: <29655a73-5d4c-4773-a425-e16628b8ba7a@grimberg.me>
+Date: Fri, 3 May 2024 10:31:50 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -58,72 +62,81 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2 2/2] ax25: fix potential reference counting leak in
- ax25_addr_ax25dev
-To: Duoming Zhou <duoming@zju.edu.cn>, linux-hams@vger.kernel.org,
- netdev@vger.kernel.org, kernel-janitors@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, =?UTF-8?Q?J=C3=B6rg_Reuter?=
- <jreuter@yaina.de>, Paolo Abeni <pabeni@redhat.com>
-Cc: LKML <linux-kernel@vger.kernel.org>,
- Dan Carpenter <dan.carpenter@linaro.org>,
- Lars Kellogg-Stedman <lars@oddbit.com>, Simon Horman <horms@kernel.org>
-References: <cover.1714690906.git.duoming@zju.edu.cn>
- <74e840d98f2bfc79c6059993b2fc1ed3888faba4.1714690906.git.duoming@zju.edu.cn>
-Content-Language: en-GB
-From: Markus Elfring <Markus.Elfring@web.de>
-In-Reply-To: <74e840d98f2bfc79c6059993b2fc1ed3888faba4.1714690906.git.duoming@zju.edu.cn>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:fyEaMnRrnNvXcfnnCsy95pUZQYP6d4iTVya14Y35u0lKhfCNXWH
- sjb6AoMx6a27q2adKg/1eQDvJH4aHEKwGTLhXARxvdWUG1+Ud1cPRv7HqZNzk315/VCUaBH
- B91xSUcToLX2iOdINlQXl363NaB6E3QUXOI/4HnkqX0auYxz3xCuwBUdF71kTsNpqYfz5Hp
- e6E4An+24Z58olqplCVMA==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:Y5nGvnd2AQM=;6gXhRfyb2lyixwSuZj9IZk9twB1
- yaS9x+tAjWeLsKgigaBdAMOnu7CQw9oTJ2zLqZzkiyOP93jpx8cEar+yIs+dxrqcsgfB9aosE
- TXs57fmqKJU7fzaMVBHMn48VfyoDNoGm4JXXNUObpIjxwUP2vaADn52hsKhpzfwTZf18Sg33d
- sTJrmZinGVUs86bSXIZdnnXfAz4pBzYRYNLF8ogyhm8otvbZnOJXp4raC/Mqe5Xau2s3TmLdX
- 5NhB38usJFQvpfw1eXfsZ0JQFpTLF+tAufKwC9YFosWeUcaFRkipcQ43AqcHlt6WP/JEL61tB
- /qTDumEVGpBo8JoFZD2pg6lthpteWyUMSJClT0PpGcHtNCTxMlpKqLw8q7Eva9Bxx5XFSAjrv
- y6OHMlhfBfyE4hjg8hzQLzEsoYHErPm2TC3cQ5MbGREywOdM1aXA29ForvQWt4gdpHJz7pcvb
- ecVIhgUHcgiMq9lSVL/D304oh7c/oAolEZNrEnvqyv0Xd5kuXEJgPwkiKB7YMhYXupOQqc5js
- qqGXnyx7jrPGmTjpinQ3p0XR+/qK3RbQ7esOGW/xrtJQHONuvlywwU8yKfZsghYWfQvN8+JjL
- kd00PZFFPQcA0aoVCELJr1Mw5fm3FFZkAepmqRpl8N8698N6pFmr1V5f0yj3thkkiGBoInDQF
- Spo/BwBp15xl2dw3tlwNwJYENun6rFshOOGJ9O+t9f1RpiFFzWKQF7njcdk5tw076WtggnUP9
- IRRvHGzQnPdgnICzHlhw08snhc7/fqRihSFDEkNy6vCk6RyfU3XQ1FizJePmev87v7NAENo8m
- YEJ3671Am7umulyDXa5HwHHvLhZm5sGy9VVemku8REUBnD630OOdxqeyYLk94bFJ4r
-
-How do you think about to append parentheses to the function name
-in the summary phrase?
+Subject: Re: [PATCH v24 01/20] net: Introduce direct data placement tcp
+ offload
+To: Aurelien Aptel <aaptel@nvidia.com>, linux-nvme@lists.infradead.org,
+ netdev@vger.kernel.org, hch@lst.de, kbusch@kernel.org, axboe@fb.com,
+ chaitanyak@nvidia.com, davem@davemloft.net, kuba@kernel.org
+Cc: Boris Pismenny <borisp@nvidia.com>, aurelien.aptel@gmail.com,
+ smalin@nvidia.com, malin1024@gmail.com, ogerlitz@nvidia.com,
+ yorayz@nvidia.com, galshalom@nvidia.com, mgurtovoy@nvidia.com,
+ edumazet@google.com, pabeni@redhat.com, dsahern@kernel.org, ast@kernel.org,
+ jacob.e.keller@intel.com
+References: <20240404123717.11857-1-aaptel@nvidia.com>
+ <20240404123717.11857-2-aaptel@nvidia.com>
+ <3ab22e14-35eb-473e-a821-6dbddea96254@grimberg.me>
+ <253o79wr3lh.fsf@mtr-vdi-124.i-did-not-set--mail-host-address--so-tickle-me>
+ <9a38f4db-bff5-4f0f-ac54-6ac23f748441@grimberg.me>
+ <253le4wqu4a.fsf@nvidia.com>
+ <2d4f4468-343a-4706-8469-56990c287dba@grimberg.me>
+ <253frv0r8yc.fsf@nvidia.com>
+Content-Language: en-US
+From: Sagi Grimberg <sagi@grimberg.me>
+In-Reply-To: <253frv0r8yc.fsf@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
 
-> The reference counting of ax25_dev potentially increase more
-> than once in ax25_addr_ax25dev(), which will cause memory leak.
+
+On 5/2/24 10:04, Aurelien Aptel wrote:
+> Sagi Grimberg <sagi@grimberg.me> writes:
+>> Well, you cannot rely on the fact that the application will be pinned to a
+>> specific cpu core. That may be the case by accident, but you must not and
+>> cannot assume it.
+> Just to be clear, any CPU can read from the socket and benefit from the
+> offload but there will be an extra cost if the queue CPU is different
+> from the offload CPU. We use cfg->io_cpu as a hint.
+
+Understood. It is usually the case as io threads are not aligned to the 
+rss steering rules (unless
+arfs is used).
+
 >
-> In order to fix the above issue, only increase the reference
-> counting of ax25_dev once, when the res is not null.
+>> Even today, nvme-tcp has an option to run from an unbound wq context,
+>> where queue->io_cpu is set to WORK_CPU_UNBOUND. What are you going to
+>> do there?
+> When the CPU is not bound to a specific core, we will most likely always
+> have CPU misalignment and the extra cost that goes with it.
 
-Would you find the following change description a bit nicer?
+Yes, as done today.
 
-   The reference counter of the object =E2=80=9Cax25_dev=E2=80=9D can be i=
-ncreased multiple times
-   in ax25_addr_ax25dev(). This will cause a memory leak so far.
+>
+> But when it is bound, which is still the default common case, we will
+> benefit from the alignment. To not lose that benefit for the default
+> most common case, we would like to keep cfg->io_cpu.
 
-   Thus move a needed function call behind a for loop
-   and increase the reference counter only when the local variable =E2=80=
-=9Cres=E2=80=9D
-   is not a null pointer.
+Well, this explanation is much more reasonable. Setting .affinity_hint 
+argument
+seems like a proper argument to the interface and nvme-tcp can set it to 
+queue->io_cpu.
 
+>
+> Could you clarify what are the advantages of running unbounded queues,
+> or to handle RX on a different cpu than the current io_cpu?
 
-=E2=80=A6
-> +++ b/net/ax25/ax25_dev.c
-> @@ -37,8 +37,9 @@ ax25_dev *ax25_addr_ax25dev(ax25_address *addr)
-=E2=80=A6
+See the discussion related to the patch from Li Feng:
+https://lore.kernel.org/lkml/20230413062339.2454616-1-fengli@smartx.com/
 
-Would you like to omit curly brackets in the affected function implementat=
-ion?
+>
+>> nvme-tcp may handle rx side directly from .data_ready() in the future, what
+>> will the offload do in that case?
+> It is not clear to us what the benefit of handling rx in .data_ready()
+> will achieve. From our experiment, ->sk_data_ready() is called either
+> from queue->io_cpu, or sk->sk_incoming_cpu. Unless you enable aRFS,
+> sk_incoming_cpu will be constant for the whole connection. Can you
+> clarify would handling RX from data_ready() provide?
 
-Regards,
-Markus
+Save the context switching to a kthread from softirq, can reduce latency 
+substantially
+for some workloads.
 
