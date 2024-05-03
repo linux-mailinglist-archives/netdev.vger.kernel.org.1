@@ -1,78 +1,173 @@
-Return-Path: <netdev+bounces-93142-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93143-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC9618BA47E
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 02:22:49 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 88B348BA485
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 02:23:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F0867B23CB5
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 00:22:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F3A791F2387E
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 00:23:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB3E3368;
-	Fri,  3 May 2024 00:22:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hfXy89FR"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 871A02119;
+	Fri,  3 May 2024 00:23:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp.dudau.co.uk (dliviu.plus.com [80.229.23.120])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7A02360
-	for <netdev@vger.kernel.org>; Fri,  3 May 2024 00:22:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E6E4360;
+	Fri,  3 May 2024 00:23:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.229.23.120
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714695763; cv=none; b=dp5W5npEAOMasAbEC4nBparFVWk5nRdkUQ6nAZTZw1qEzVCSBFxE8Fo9eJCpiXHqC1n8VxRKweZEtKfYmBbcJO9KN/eP2eClTT8n5/lfJ7iPzXvp6GNOV7vTO5Djv5IKQ5lcIE0WfxO9eprt2xyA/BSRVK57eQ2V7tpukoKV2D4=
+	t=1714695817; cv=none; b=nx8Pv0en90vJz6ruNNSqPjun4k4S82bLCxN3fIX/bLk/SQruCrLL7WND5xo1CvnXP/ULUUqxiOnvq0mr9DQP4pO9Av/JEdyDr+TRdEEg+njg7G7FjMrdXcHHOJ/8Let8Q61GIM1k+U3qkphCo7b0kDdKcNvPU5KEfPJrKFzOkNA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714695763; c=relaxed/simple;
-	bh=8q9HvUtKUiQyMn3xs3ba1qE8fJsyY84+ny8joN9BcWU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bbKvweVWgYOrCn+UuBdXFDjPO8oOSOhikqmbvXVBOAhzM7dvddB1meCZAbFi/OpskeLvsyaa8zd34p9LU/5GruGMMDWg8R7mTgYmMg1x0KwA0ZVlehrkHOAcWcU+a+d0SKqI2JduRN4+jgOl1KNLb8hB74Fzj4AFRPI+Wji80/k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hfXy89FR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B178CC113CC;
-	Fri,  3 May 2024 00:22:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714695763;
-	bh=8q9HvUtKUiQyMn3xs3ba1qE8fJsyY84+ny8joN9BcWU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=hfXy89FRtI5aw38Edc3oY7Te054W7zbDdVTmNHCecNdPoXVTYbgHr9iQWMh3/j6rJ
-	 YEkpu3rGaSXR2IdEmXcHVNil1fkGQZZO1uCArVXl4y3BtG4F0HSw1KdYU6aZ1FvOQ0
-	 Bt6fLJQg9S26jWhCINrWIca4bnLZ0reRBifq3qoS54K4hMMF5L6ie4LEmTHLwxlLwx
-	 8ss6a+ahxXrdLdguxRSJCgybBp82knqJPfmkBaEDEystPLpUnKYc6y/Ygsy5rYH+8X
-	 a93ihwYJZnEhrCuUW82/mRd4dcsFMG5XqDxgviDsfzhXqWe5QFvk0gYcDDt3Nxzztu
-	 Mlz7FvxSNlikg==
-Date: Thu, 2 May 2024 17:22:41 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Mina Almasry <almasrymina@google.com>
-Cc: David Wei <dw@davidwei.uk>, netdev@vger.kernel.org, Michael Chan
- <michael.chan@broadcom.com>, Pavan Chebbi <pavan.chebbi@broadcom.com>, Andy
- Gospodarek <andrew.gospodarek@broadcom.com>, Shailend Chand
- <shailend@google.com>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [RFC PATCH net-next v1 3/3] netdev: add
- netdev_rx_queue_restart()
-Message-ID: <20240502172241.363ba5a0@kernel.org>
-In-Reply-To: <CAHS8izMzakPfORQ9FX8nh0u0V7awtjUufswCc0Gf3fxxXWX0WA@mail.gmail.com>
-References: <20240430010732.666512-1-dw@davidwei.uk>
-	<20240430010732.666512-4-dw@davidwei.uk>
-	<CAHS8izM-0gxGQYMOpKzr-Z-oogtzoKA9UJjqDUt2jkmh2sywig@mail.gmail.com>
-	<5f81eccd-bc14-47a5-bc65-b159c79ce422@davidwei.uk>
-	<CAHS8izMzakPfORQ9FX8nh0u0V7awtjUufswCc0Gf3fxxXWX0WA@mail.gmail.com>
+	s=arc-20240116; t=1714695817; c=relaxed/simple;
+	bh=zXsI9Vt8xojfZb8+rMlItNS5EVhzZ+FhYOA1HEqzzu4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JMaUrENzdSruJ0S5WJAym5QSzwNRfGFkoNs5F+G7890rjlR3Dyf6VEduGNA1b+c5hBcPitNyu4sktiF9h9OzAGr8emQjgy/9URkeZr0l+h4NU838xYrJd+9SiT1ax0zzhfTbuVi35yV/KdoQsTLWEyz/6oSVqxBLNhIY/jJ1nDI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dudau.co.uk; spf=pass smtp.mailfrom=dudau.co.uk; arc=none smtp.client-ip=80.229.23.120
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dudau.co.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dudau.co.uk
+Received: from mail.dudau.co.uk (bart.dudau.co.uk [192.168.14.2])
+	by smtp.dudau.co.uk (Postfix) with SMTP id 2D79141D12F0;
+	Fri, 03 May 2024 01:23:31 +0100 (BST)
+Received: by mail.dudau.co.uk (sSMTP sendmail emulation); Fri, 03 May 2024 01:23:31 +0100
+Date: Fri, 3 May 2024 01:23:30 +0100
+From: Liviu Dudau <liviu@dudau.co.uk>
+To: Luis Chamberlain <mcgrof@kernel.org>
+Cc: Mike Rapoport <rppt@kernel.org>, linux-kernel@vger.kernel.org,
+	Alexandre Ghiti <alexghiti@rivosinc.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	=?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	"David S. Miller" <davem@davemloft.net>,
+	Dinh Nguyen <dinguyen@kernel.org>,
+	Donald Dutile <ddutile@redhat.com>,
+	Eric Chanudet <echanude@redhat.com>,
+	Heiko Carstens <hca@linux.ibm.com>, Helge Deller <deller@gmx.de>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	Kent Overstreet <kent.overstreet@linux.dev>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nadav Amit <nadav.amit@gmail.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+	Rick Edgecombe <rick.p.edgecombe@intel.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Sam Ravnborg <sam@ravnborg.org>, Song Liu <song@kernel.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+	Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
+	bpf@vger.kernel.org, linux-arch@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
+	linux-mm@kvack.org, linux-modules@vger.kernel.org,
+	linux-parisc@vger.kernel.org, linux-riscv@lists.infradead.org,
+	linux-s390@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org, loongarch@lists.linux.dev,
+	netdev@vger.kernel.org, sparclinux@vger.kernel.org, x86@kernel.org
+Subject: Re: [PATCH v7 00/16] mm: jit/text allocator
+Message-ID: <ZjQuggSFcO8FXSd2@bart.dudau.co.uk>
+References: <20240429121620.1186447-1-rppt@kernel.org>
+ <Zi_K4K-j-VB_WI4i@bombadil.infradead.org>
+ <ZjQYvOYgURx9/+d0@bart.dudau.co.uk>
+ <ZjQcmcA0sNH7jfD7@bombadil.infradead.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <ZjQcmcA0sNH7jfD7@bombadil.infradead.org>
 
-On Thu, 2 May 2024 09:46:46 -0700 Mina Almasry wrote:
-> Sorry, I think if we don't need the EXPORT, then I think don't export
-> in the first place. Removing an EXPORT is, AFAIU, tricky. Because if
-> something is exported and then you unexport it could break an out of
-> tree module/driver that developed a dependency on it. Not sure how
-> much of a concern it really is.
+On Thu, May 02, 2024 at 04:07:05PM -0700, Luis Chamberlain wrote:
+> On Thu, May 02, 2024 at 11:50:36PM +0100, Liviu Dudau wrote:
+> > On Mon, Apr 29, 2024 at 09:29:20AM -0700, Luis Chamberlain wrote:
+> > > On Mon, Apr 29, 2024 at 03:16:04PM +0300, Mike Rapoport wrote:
+> > > > From: "Mike Rapoport (IBM)" <rppt@kernel.org>
+> > > > 
+> > > > Hi,
+> > > > 
+> > > > The patches are also available in git:
+> > > > https://git.kernel.org/pub/scm/linux/kernel/git/rppt/linux.git/log/?h=execmem/v7
+> > > > 
+> > > > v7 changes:
+> > > > * define MODULE_{VADDR,END} for riscv32 to fix the build and avoid
+> > > >   #ifdefs in a function body
+> > > > * add Acks, thanks everybody
+> > > 
+> > > Thanks, I've pushed this to modules-next for further exposure / testing.
+> > > Given the status of testing so far with prior revisions, in that only a
+> > > few issues were found and that those were fixed, and the status of
+> > > reviews, this just might be ripe for v6.10.
+> > 
+> > Looks like there is still some work needed. I've picked up next-20240501
+> > and on arch/mips with CONFIG_MODULE_COMPRESS_XZ=y and CONFIG_MODULE_DECOMPRESS=y
+> > I fail to load any module:
+> > 
+> > # modprobe rfkill
+> > [11746.539090] Invalid ELF header magic: != ELF
+> > [11746.587149] execmem: unable to allocate memory
+> > modprobe: can't load module rfkill (kernel/net/rfkill/rfkill.ko.xz): Out of memory
+> > 
+> > The (hopefully) relevant parts of my .config:
+> 
+> Thanks for the report! Any chance we can get you to try a bisection? I
+> think it should take 2-3 test boots. To help reduce scope you try modules-next:
+> 
+> https://git.kernel.org/pub/scm/linux/kernel/git/mcgrof/linux.git/log/?h=modules-next
+> 
+> Then can you check by resetting your tree to commmit 3fbe6c2f820a76 (mm:
+> introduce execmem_alloc() and execmem_free()"). I suspect that should
+> boot, so your bad commit would be the tip 3c2c250cb3a5fbb ("bpf: remove
+> CONFIG_BPF_JIT dependency on CONFIG_MODULES of").
+> 
+> That gives us only a few commits to bisect:
+> 
+> git log --oneline 3fbe6c2f820a76bc36d5546bda85832f57c8fce2..
+> 3c2c250cb3a5 (HEAD -> modules-next, korg/modules-next) bpf: remove CONFIG_BPF_JIT dependency on CONFIG_MODULES of
+> 11e8e65cce5c kprobes: remove dependency on CONFIG_MODULES
+> e10cbc38697b powerpc: use CONFIG_EXECMEM instead of CONFIG_MODULES where appropriate
+> 4da3d38f24c5 x86/ftrace: enable dynamic ftrace without CONFIG_MODULES
+> 13ae3d74ee70 arch: make execmem setup available regardless of CONFIG_MODULES
+> 460bbbc70a47 powerpc: extend execmem_params for kprobes allocations
+> e1a14069b5b4 arm64: extend execmem_info for generated code allocations
+> 971e181c6585 riscv: extend execmem_params for generated code allocations
+> 0fa276f26721 mm/execmem, arch: convert remaining overrides of module_alloc to execmem
+> 022cef244287 mm/execmem, arch: convert simple overrides of module_alloc to execmem
+> 
+> With 2-3 boots we should be to tell which is the bad commit.
 
-FWIW don't worry about out of tree code, it's not a concern.
+Looks like 0fa276f26721 is the first bad commit.
+
+$ git bisect log
+# bad: [3c2c250cb3a5fbbccc4a4ff4c9354c54af91f02c] bpf: remove CONFIG_BPF_JIT dependency on CONFIG_MODULES of
+# good: [3fbe6c2f820a76bc36d5546bda85832f57c8fce2] mm: introduce execmem_alloc() and execmem_free()
+git bisect start '3c2c250cb3a5' '3fbe6c2f820a76'
+# bad: [460bbbc70a47e929b1936ca68979f3b79f168fc6] powerpc: extend execmem_params for kprobes allocations
+git bisect bad 460bbbc70a47e929b1936ca68979f3b79f168fc6
+# bad: [0fa276f26721e0ffc2ae9c7cf67dcc005b43c67e] mm/execmem, arch: convert remaining overrides of module_alloc to execmem
+git bisect bad 0fa276f26721e0ffc2ae9c7cf67dcc005b43c67e
+# good: [022cef2442870db738a366d3b7a636040c081859] mm/execmem, arch: convert simple overrides of module_alloc to execmem
+git bisect good 022cef2442870db738a366d3b7a636040c081859
+# first bad commit: [0fa276f26721e0ffc2ae9c7cf67dcc005b43c67e] mm/execmem, arch: convert remaining overrides of module_alloc to execmem
+
+Maybe MIPS also needs a ARCH_WANTS_EXECMEM_LATE?
+
+Best regards,
+Liviu
+
+> 
+>   Luis
+> 
+
+-- 
+Everyone who uses computers frequently has had, from time to time,
+a mad desire to attack the precocious abacus with an axe.
+       	   	      	     	  -- John D. Clark, Ignition!
 
