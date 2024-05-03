@@ -1,122 +1,100 @@
-Return-Path: <netdev+bounces-93147-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93152-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22A018BA4AD
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 02:46:25 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 336028BA4F0
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 03:35:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9DE5228554F
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 00:46:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BE0E21F22EE5
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 01:35:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7122BBA53;
-	Fri,  3 May 2024 00:46:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 480F7DDC0;
+	Fri,  3 May 2024 01:35:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nuJXEBmS"
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="sj4Ds6Rt"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AF358F47;
-	Fri,  3 May 2024 00:46:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E075E8F47
+	for <netdev@vger.kernel.org>; Fri,  3 May 2024 01:35:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714697180; cv=none; b=DB2UoNhrTU+GYxwuw0yMc+ZGIbhneoDtcVpt12HbMm6e3db/C428LwQXs7exk7mAv8mnJg4QBL3qBoVw1A3d9xDP+QivuvxhxR7A3KXxsgYD+rGGvGhWjJf+TwuLQfQ7zrxInjWziUTPf+yizzS3DRurjpOITFO9/c53D59Sckc=
+	t=1714700111; cv=none; b=JRz5sCT/dqyxXW5ivGEIPkH9IdtrjFUton2N0a9rOfDI46lyfn+Ooeb5e6FqQzHc3x5Ke0L24csk7+ScEFd3j5AmtZ7owyVn7mV3gmR71SKXVfaBJJV/VcK9eFwuF1LP0k72NEKLXHQMmw9D8LE9UpFms4CfXZHzVGalI69Fex0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714697180; c=relaxed/simple;
-	bh=9gGS1WG9kjKboRFG4NTZO/zmtlJ0e+MxlRzL2OlV38I=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GOXbW70/qGXkIE6fjjnINXeJXTYGmLkZ54jziH5eS3lv3B3O0+KYIxQKcF6fU/hq9IU94cM7K0DxLbvVFHuSULKzBYfGWuhRnmsXyNBuFtVxeCaVnDjGPRi97bgH8wkBRWKg19EQ6ke2dlHBQXbl3ztQIiQExYO3/Al2OED/G/I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nuJXEBmS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 25AD0C113CC;
-	Fri,  3 May 2024 00:46:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714697179;
-	bh=9gGS1WG9kjKboRFG4NTZO/zmtlJ0e+MxlRzL2OlV38I=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=nuJXEBmS1uju/RFoF2dhT0/QOueo7ZN4MJCLLrX8Zapl5GRBEqosYoepz9/nLuk3W
-	 qwUBAwe0bqZ3SGXmk6IOrqIgPsDMMtNz9ryQpLWKJv+X3CmfDNbo5ZsC8inItzzgdR
-	 4BKbWj6RxCLaTj8Fksa30xeEeG89gLXHERzVi6KSF0x1iZMjPgMv8fssR7mEpCLp27
-	 erwH3OUbTeI+5Gdil9h1/QKpXphcKFutAfhYzwNtPf/gPTPPt22TkLTyEhtFymUGVP
-	 pcf6ZIXo5VxrDNPSpv47yJK3IYhLDonXfy1pPyuUxeAnweG693V85unAv2cKXT8kJ+
-	 VASU61CmuyhIQ==
-Date: Thu, 2 May 2024 17:46:18 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Mina Almasry <almasrymina@google.com>
-Cc: Dragos Tatulea <dtatulea@nvidia.com>, "davem@davemloft.net"
- <davem@davemloft.net>, "pabeni@redhat.com" <pabeni@redhat.com>,
- "ilias.apalodimas@linaro.org" <ilias.apalodimas@linaro.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "jacob.e.keller@intel.com" <jacob.e.keller@intel.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>, Jianbo Liu
- <jianbol@nvidia.com>, "edumazet@google.com" <edumazet@google.com>
-Subject: Re: [RFC PATCH] net: Fix one page_pool page leak from
- skb_frag_unref
-Message-ID: <20240502174618.47c28727@kernel.org>
-In-Reply-To: <CAHS8izPBhZ1USvSoDdR-Xwg3jNL5ppRXTzc3FEM9gjx6B1fJAw@mail.gmail.com>
-References: <20240424165646.1625690-2-dtatulea@nvidia.com>
-	<4ba023709249e11d97c78a98ac7db3b37f419960.camel@nvidia.com>
-	<CAHS8izMbAJHatnM6SvsZVLPY+N7LgGJg03pSdNfSRFCufGh9Zg@mail.gmail.com>
-	<4c20b500c2ed615aba424c0f3c7a79f5f5a04171.camel@nvidia.com>
-	<CAHS8izPkRJyLctmyj+Ppc5j3Qq5O1u3aPe5h9mnFNHDU2OxA=A@mail.gmail.com>
-	<20240426160859.0d85908e@kernel.org>
-	<CAHS8izNs-LV=6FE39sjF3V7qVfveOsOAOJ_X62TSzWpvamsS0Q@mail.gmail.com>
-	<20240429080022.214a9df9@kernel.org>
-	<CAHS8izPBhZ1USvSoDdR-Xwg3jNL5ppRXTzc3FEM9gjx6B1fJAw@mail.gmail.com>
+	s=arc-20240116; t=1714700111; c=relaxed/simple;
+	bh=chZsNMrhJXmyK1K058MWsuP+ZJXH+HJDh37GOwngCyc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jvSYbwePc269HxFFVirN20eVOpoW7SS2fdmzAZP6Pw5SOkgJ4ryMxzLfZLOuEhVu0de1j4OZlfMpTUwQxq6+dQZy3BpIwGLBb4+h4A7+Pw1lpFYmHlDonOAPwh+mh2I21qPMOzZYobzzzNDKlYOeBeMonqBiwC4u9/X6m7haK9E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=sj4Ds6Rt; arc=none smtp.client-ip=85.214.62.61
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Received: from [127.0.0.1] (p578adb1c.dip0.t-ipconnect.de [87.138.219.28])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits))
+	(No client certificate requested)
+	(Authenticated sender: marex@denx.de)
+	by phobos.denx.de (Postfix) with ESMTPSA id 05E61882D0;
+	Fri,  3 May 2024 03:35:04 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+	s=phobos-20191101; t=1714700106;
+	bh=lRMYB608pHOQXaroRp+MnXD7SNgMYXh4kgpmuAotReU=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=sj4Ds6RtjmU3x8OKabJ/q3FfNh8kQELK6WkANoGVv0apZCMCZL+tGSbAfZaS7T5DM
+	 8vTtaueMLABvCrJc3Lxxi26W18/ugd5oYNO8H70xiW6IgtX+Iyk+ro11sOcb+JDuAX
+	 ETFapHY8RDy3Ctv60PXqHEhuWrhkwJukIdn7f3ejrVrsNshfRndFxedAAyhXK3IqY1
+	 okPqaYMtmwBd8A8HGJvlO+d3Q/LHnILTjB8CRVT6s1LPVOdiploE3UIAmm2F+MrSUo
+	 lufkaM0SFksVGtmDpD4exdcuUsxuz/1skpvFQkYkTdQMeNV+/CrWqjS5DM87CuYbBW
+	 KsNFpMkmVpKrw==
+Message-ID: <86a14471-4bda-471d-ab08-90d4ccd0802d@denx.de>
+Date: Fri, 3 May 2024 02:47:23 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net,PATCH v2] net: ks8851: Queue RX packets in IRQ handler
+ instead of disabling BHs
+To: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, Ronald Wahl <ronald.wahl@raritan.com>,
+ "David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>
+References: <20240430194401.118950-1-marex@denx.de>
+ <20240430191042.05aad656@kernel.org>
+ <CANn89iLKQjD1bxbirwtvzxsfOa-i2qRTGHYH_8_8O-xCusypQQ@mail.gmail.com>
+Content-Language: en-US
+From: Marek Vasut <marex@denx.de>
+In-Reply-To: <CANn89iLKQjD1bxbirwtvzxsfOa-i2qRTGHYH_8_8O-xCusypQQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
 
-On Thu, 2 May 2024 13:08:23 -0700 Mina Almasry wrote:
-> OK, this is where I'm not sure anymore. The diff you're replying to
-> attempts to enforce the invariant: "if anyone wants a reference on an
-> skb_frag, skb_frag_ref will be a pp ref on pp frags
-> (is_pp_page==true), and page refs on non-pp frags
-> (is_pp_page==false)".
+On 5/1/24 4:39 AM, Eric Dumazet wrote:
+> On Wed, May 1, 2024 at 4:10 AM Jakub Kicinski <kuba@kernel.org> wrote:
+>>
+>> On Tue, 30 Apr 2024 21:43:34 +0200 Marek Vasut wrote:
+>>> diff --git a/drivers/net/ethernet/micrel/ks8851.h b/drivers/net/ethernet/micrel/ks8851.h
+>>> index 31f75b4a67fd7..f311074ea13bc 100644
+>>> --- a/drivers/net/ethernet/micrel/ks8851.h
+>>> +++ b/drivers/net/ethernet/micrel/ks8851.h
+>>> @@ -399,6 +399,7 @@ struct ks8851_net {
+>>>
+>>>        struct work_struct      rxctrl_work;
+>>>
+>>> +     struct sk_buff_head     rxq;
+>>>        struct sk_buff_head     txq;
+>>>        unsigned int            queued_len;
+>>
+>> One more round, sorry, this structure has a kdoc, please fill in
+>> the description for the new member.
 > 
-> Additionally the page doesn't transition from pp to non-pp and vice
-> versa while anyone is holding a pp ref, because
-> page_pool_set_pp_info() is called right after the page is obtained
-> from the buddy allocator (before released from the page pool) and
-> page_pool_clear_pp_info() is called only after all the pp refs are
-> dropped.
-> 
-> So:
-> 
-> 1. We know the caller has a ref (otherwise get_page() wouldn't be safe
-> in the non-pp case).
-> 2. We know that the page has not transitioned from pp to non-pp or
-> vice versa since the caller obtained the ref (from code inspection, pp
+> Alternative is to use a local (automatic variable on the stack) struct
+> sk_buff_head,
+> no need for permanent storage in struct ks8851_net
 
-How do we know that?
-
-> info is not changed until all the refs are dropped for pp pages).
-> 3. AFAICT, it follows that if the page is pp, then the caller has a pp
-> ref, and if the page is non-pp, then the caller has a page ref.
-
-If that's true we have nothing to worry about.
-
-> 4. So, if is_pp_page==true, then the caller has a pp ref, then
-> napi_pp_get_page() should be concurrently safe.
-> 
-> AFAICT the only way my mental model is broken is if there is code
-> doing a raw get_page() rather than a skb_frag_ref() in core net stack.
-
-Not just. We also get pages fed from the outside, which may be PP pages.
-Right now it'd be okay because "from outside" pages would end up in Tx.
-Tx always allocates skbs with ->pp_recycle = 0, so we'll hold full refs.
-
-> I would like to get rid of these call sites if they exist. They would
-> not interact well with devmem I think (but could be made to work with
-> some effort).
-
-Maybe if we convert more code to operate on netmem_ref it will become
-clearer where raw pages get fed in, and therefore were we have to be
-very careful?
+I think that's even better, done in V3 + addressed feedback from Jakub.
 
