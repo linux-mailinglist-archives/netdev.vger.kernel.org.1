@@ -1,201 +1,192 @@
-Return-Path: <netdev+bounces-93214-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93215-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8F848BA9F0
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 11:33:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E66D8BA9FF
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 11:40:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F2051B20A67
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 09:33:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 06DDA2827C1
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 09:40:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8A4914F121;
-	Fri,  3 May 2024 09:33:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F060114F134;
+	Fri,  3 May 2024 09:40:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LzTvZuSm"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="pL50x3O3"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1A061367;
-	Fri,  3 May 2024 09:33:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADE5714F113;
+	Fri,  3 May 2024 09:40:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714728816; cv=none; b=Qrj49COi5Jk+T0C5RKYJkGkzaSFu0gkxuRO9skPkmhDNFil3hSlyKe6NdochGIuw7Za2Aezw18R5iXaPloSlf//mPcZwej/DNzbB0QLXTTvCJCJVO9no6vX+0aaWgF++4DiM0rL7vGfZLuvvmZNXP/4zWBr74yqGthKDxTcawic=
+	t=1714729250; cv=none; b=BXX1IgMpQ6hPJj3ll9ZbMN1IklOOn6FlVK7Zq1HkC6j8bOCjxadHExP4nJxga6s5YAaOkwROU9t+tH3UpWh6Wyw0x7BPvB++jrxVeG47pW6CUyurhQkx/1wFZ0sPPc8I8CEOljmq4yqmeXsNKvb7Y5JQ6dLHS28lCUumm/aX9c0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714728816; c=relaxed/simple;
-	bh=v/51Kvqf2YPc7OkiFmKvzSlAQA/mzLPnt8TJCh81qMI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IA5pJlNgc4Ba2p06c9nymK5Yi6i3W+d1FoQqrUrgKRoDPSpXgDXavFbb6eFx2OQJKflk3nG7F/PMbTRXwRCS+T0jJj6l7FrqvYtb0aAF/mXpfrwFpIb0oWkxujeIXRLw5vebLyJ1zgxCEXx2P1NCu7zx2lUKMdqRfkRNCJaJdqk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LzTvZuSm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D3AF1C116B1;
-	Fri,  3 May 2024 09:33:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714728816;
-	bh=v/51Kvqf2YPc7OkiFmKvzSlAQA/mzLPnt8TJCh81qMI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=LzTvZuSm/5PtavQI3wADx0KGUxs+kUgPcYMDKFHBS8l75cmt3Sy/V2D0G4j0VPRgs
-	 sl4l7q9XzHK35l2cBE3PIQoa/5zCMicO7R3xH2ljQpKA0AXiP6ITfGzNCrLzr8snOY
-	 llgCbhaMr8sEdG+jVUcQNX2I4kfvCcnnimTS3jiA3ZkuWIsmE4Xaq+m8yzxRm3KH9y
-	 rCoUMGBu4fgPUbBUts14/BPUZjhjBWD4G7YdfYUV9oE5mUC5kpkYDHAP5WOHXV4XKL
-	 F8MdOA899tm1w0tvtnwvMeL86xSSo25hcUKOAyLwCz+vIBWB7n6kXqlx4ULrkeLxEH
-	 RAPClPUZzw2/w==
-Date: Fri, 3 May 2024 10:33:31 +0100
-From: Simon Horman <horms@kernel.org>
-To: Justin Lai <justinlai0215@realtek.com>
-Cc: kuba@kernel.org, davem@davemloft.net, edumazet@google.com,
-	pabeni@redhat.com, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, andrew@lunn.ch, jiri@resnulli.us,
-	pkshih@realtek.com, larry.chiu@realtek.com
-Subject: Re: [PATCH net-next v17 01/13] rtase: Add pci table supported in
- this module
-Message-ID: <20240503093331.GN2821784@kernel.org>
-References: <20240502091847.65181-1-justinlai0215@realtek.com>
- <20240502091847.65181-2-justinlai0215@realtek.com>
+	s=arc-20240116; t=1714729250; c=relaxed/simple;
+	bh=f+L7mTCSRybSvFROrdfW8LntJl7i3UmEP3ZMl7K/m44=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ykrtpk6eimBrgGkJLEOAhodCHbKTJmrpLFpMXJRgZv1pyrE4hzR60yqj6HLKSiMOtk9JAGuh78X6NTpQWrZf8Anf9nSxa8RZHnpWJhGVx0T1Hj3+19V2HHtUs3ydfiEWJEQAIKPCHsdI+2sRl+HczWwSuE0c2iE+ZVO5bgvyomA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=pL50x3O3; arc=none smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1714729248; x=1746265248;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=f+L7mTCSRybSvFROrdfW8LntJl7i3UmEP3ZMl7K/m44=;
+  b=pL50x3O38MeafsyrA5XGyHle6VIB3e2j+SsDQTsQ3N/92aE4FnDp2f39
+   PF/oichL6NflgE6qU4EH7Lb5nQEhPIaDiSVjIdBZwT4pBtcOYZr44tgem
+   liTa05JLH7DllEgzvR7FoVE0mZzKp+oEJ80cKoXVQc+Q/Rm+8Xo/QcmVe
+   dGf+rJCettdjt0zzNhoTVStDHH0jYHAG7w+SCwaL+Ji1b8NIJDGFfc3mK
+   5UMbB0avfWEAfJ3UdbmmovbfgNYD7Ft21SWWyld8GJ3T/C8MHr+4ieYc3
+   134ZmrXsfBGWnYgwJmDbb/Hpx3ZpPEfB6T2N7MxrWAyvA/w5o2vhc2R8H
+   A==;
+X-CSE-ConnectionGUID: bbg/IDqlTRajfoIJVPCGSg==
+X-CSE-MsgGUID: JYFz59PQRziij8+7tAJupQ==
+X-IronPort-AV: E=Sophos;i="6.07,251,1708412400"; 
+   d="scan'208";a="24058447"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa2.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 03 May 2024 02:40:47 -0700
+Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Fri, 3 May 2024 02:39:56 -0700
+Received: from localhost (10.10.85.11) by chn-vm-ex02.mchp-main.com
+ (10.10.85.144) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
+ Transport; Fri, 3 May 2024 02:39:56 -0700
+Date: Fri, 3 May 2024 15:07:34 +0530
+From: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
+To: Andrew Lunn <andrew@lunn.ch>
+CC: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>, <netdev@vger.kernel.org>,
+	<lxu@maxlinear.com>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <linux-kernel@vger.kernel.org>,
+	<UNGLinuxDriver@microchip.com>
+Subject: Re: [PATCH net-next] net: phy: add wol config options in phy device
+Message-ID: <ZjSwXghk/lsT6Ndo@HYD-DK-UNGSW21.microchip.com>
+References: <20240430050635.46319-1-Raju.Lakkaraju@microchip.com>
+ <7fe419b2-fc73-4584-ae12-e9e313d229c3@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="utf-8"
 Content-Disposition: inline
-In-Reply-To: <20240502091847.65181-2-justinlai0215@realtek.com>
+In-Reply-To: <7fe419b2-fc73-4584-ae12-e9e313d229c3@lunn.ch>
 
-On Thu, May 02, 2024 at 05:18:35PM +0800, Justin Lai wrote:
-> Add pci table supported in this module, and implement pci_driver function
-> to initialize this driver, remove this driver, or shutdown this driver.
+Hi Andrew,
+
+Thank you for review comments.
+
+The 05/02/2024 16:51, Andrew Lunn wrote:
+> EXTERNAL EMAIL: Do not click links or open attachments unless you know the content is safe
 > 
-> Signed-off-by: Justin Lai <justinlai0215@realtek.com>
+> On Tue, Apr 30, 2024 at 10:36:35AM +0530, Raju Lakkaraju wrote:
+> > Introduce a new member named 'wolopts' to the 'phy_device' structure to
+> > store the user-specified Wake-on-LAN (WOL) settings. Update this member
+> > within the phy driver's 'set_wol()' function whenever the WOL configuration
+> > is modified by the user.
+> >
+> > Currently, when the system resumes from sleep, the 'phy_init_hw()' function
+> > resets the PHY's configuration and interrupts, which leads to problems upon
+> > subsequent WOL attempts. By retaining the desired WOL settings in 'wolopts',
+> > we can ensure that the PHY's WOL configuration is correctly reapplied
+> > through 'phy_ethtool_set_wol()' before a system suspend, thereby resolving
+> > the issue
+> 
+> Sorry it took a white to review this.
+> 
 
-...
+Based on your review comments, I will update this.
 
-> diff --git a/drivers/net/ethernet/realtek/rtase/rtase_main.c b/drivers/net/ethernet/realtek/rtase/rtase_main.c
-> new file mode 100644
-> index 000000000000..5ddb5f7abfe9
-> --- /dev/null
-> +++ b/drivers/net/ethernet/realtek/rtase/rtase_main.c
-> @@ -0,0 +1,618 @@
-> +// SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause
-> +/*
-> + *  rtase is the Linux device driver released for Realtek Automotive Switch
-> + *  controllers with PCI-Express interface.
-> + *
-> + *  Copyright(c) 2023 Realtek Semiconductor Corp.
-> + *
-> + *  Below is a simplified block diagram of the chip and its relevant interfaces.
-> + *
-> + *               *************************
-> + *               *                       *
-> + *               *  CPU network device   *
-> + *               *                       *
-> + *               *   +-------------+     *
-> + *               *   |  PCIE Host  |     *
-> + *               ***********++************
-> + *                          ||
-> + *                         PCIE
-> + *                          ||
-> + *      ********************++**********************
-> + *      *            | PCIE Endpoint |             *
-> + *      *            +---------------+             *
-> + *      *                | GMAC |                  *
-> + *      *                +--++--+  Realtek         *
-> + *      *                   ||     RTL90xx Series  *
-> + *      *                   ||                     *
-> + *      *     +-------------++----------------+    *
-> + *      *     |           | MAC |             |    *
-> + *      *     |           +-----+             |    *
-> + *      *     |                               |    *
-> + *      *     |     Ethernet Switch Core      |    *
-> + *      *     |                               |    *
-> + *      *     |   +-----+           +-----+   |    *
-> + *      *     |   | MAC |...........| MAC |   |    *
-> + *      *     +---+-----+-----------+-----+---+    *
-> + *      *         | PHY |...........| PHY |        *
-> + *      *         +--++-+           +--++-+        *
-> + *      *************||****************||***********
+> >
+> > Signed-off-by: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
+> > ---
+> >  drivers/net/phy/mxl-gpy.c    | 5 +++++
+> >  drivers/net/phy/phy_device.c | 5 +++++
+> >  include/linux/phy.h          | 2 ++
+> >  3 files changed, 12 insertions(+)
+> >
+> > diff --git a/drivers/net/phy/mxl-gpy.c b/drivers/net/phy/mxl-gpy.c
+> > index b2d36a3a96f1..6edb29a1d77e 100644
+> > --- a/drivers/net/phy/mxl-gpy.c
+> > +++ b/drivers/net/phy/mxl-gpy.c
+> > @@ -680,6 +680,7 @@ static int gpy_set_wol(struct phy_device *phydev,
+> >       struct net_device *attach_dev = phydev->attached_dev;
+> >       int ret;
+> >
+> > +     phydev->wolopts = 0;
+> 
+> Is this specific to mlx-gpy?
+> 
 
-Thanks for the diagram, I like it a lot :)
+Currently I have GPY211C PHY along with PCI11414 chip hardware. That's reason
+I add these changes for GPY211C PHY.
+I test the changes on my board.
 
-> + *
-> + *  The block of the Realtek RTL90xx series is our entire chip architecture,
-> + *  the GMAC is connected to the switch core, and there is no PHY in between.
-> + *  In addition, this driver is mainly used to control GMAC, but does not
-> + *  control the switch core, so it is not the same as DSA.
-> + */
+> You should be trying to solve the problem for all PHYs which support
+> WoL. So i expect the core to be doing most of the work. In fact, i
+> don't think there is any need for driver specific code.
 
-...
+Ok. I will change.
 
-> +static int rtase_alloc_msix(struct pci_dev *pdev, struct rtase_private *tp)
-> +{
-> +	int ret;
-> +	u16 i;
-> +
-> +	memset(tp->msix_entry, 0x0, RTASE_NUM_MSIX * sizeof(struct msix_entry));
-> +
-> +	for (i = 0; i < RTASE_NUM_MSIX; i++)
-> +		tp->msix_entry[i].entry = i;
-> +
-> +	ret = pci_enable_msix_exact(pdev, tp->msix_entry, tp->int_nums);
-> +	if (!ret) {
+> 
+> phy_ethtool_set_wol() can set phydev->wolopts after calling
+> phydev->drv->set_wol(). If it returns an error, including -ENOTSUPP,
+> set phydev->wolopts to 0, otherwise set it to wolopts.
+> 
 
-In Linux Networking code it is an idiomatic practice to keep
-handle errors in branches and use the main path of execution
-for the non error path.
+Ok.
+One quick question.
+some of the options (ex. WAKE_PHY, WAKE_MAGIC etc) support on PHY and other
+options (ex. WAKE_UCAST, WAKE_MAGICSECURE etc) on MAC of Ethernet device.
 
-In this case I think that would look a bit like this:
+Suppose, user configure the combination (i.e. wol gu) option,
+Is PHY flag should hold combination option or only PHY supported option ?
+Ex:
+$ sudo ethtool -s enp5s0 wol gu
 
-	ret = pci_enable_msix_exact(pdev, tp->msix_entry, tp->int_nums);
-	if (ret)
-		return ret;
+Output of phydev's wolopts flag values should be 0x00000022 or 0x00000020 ?
+In this case, PHY support WAKE_MAGIC and MAC support WAKE_UCAST
 
-	...
+Anyhow, even phy's wolopts holds the user configuration value, get_wol( )
+function read from PHY register and display only "g" 
 
-	return 0;
+> > @@ -2038,6 +2038,11 @@ int phy_suspend(struct phy_device *phydev)
+> >       if (phydev->suspended)
+> >               return 0;
+> >
+> > +     if (phydev->wolopts) {
+> > +             wol.wolopts = phydev->wolopts;
+> > +             phy_ethtool_set_wol(phydev, &wol);
+> > +     }
+> 
+> Why on suspend? I would expect it to be on resume, after the PHY has
+> been reset.
 
-> +
-> +		for (i = 0; i < tp->int_nums; i++)
-> +			tp->int_vector[i].irq = pci_irq_vector(pdev, i);
+Ok. I will change.
+May be in phy_init_hw( ) function is better place to re-config the WOL
 
-pci_irq_vector() can fail, should that be handled here?
+> 
+> I also think you need to save sopass[] in phydev, since some PHYs
+> support WAKE_MAGICSECURE. Just because mlx-gpy does not need the
+> password does not mean we should ignore it in general. I also think it
+> is safe to store in memory. Its is not a highly confidential
+> password. I would not be too surprised if some PHYs have the registers
+> read/write rather than write only.
 
-> +	}
-> +
-> +	return ret;
-> +}
-> +
-> +static int rtase_alloc_interrupt(struct pci_dev *pdev,
-> +				 struct rtase_private *tp)
-> +{
-> +	int ret;
-> +
-> +	ret = rtase_alloc_msix(pdev, tp);
-> +	if (ret) {
-> +		ret = pci_enable_msi(pdev);
-> +		if (ret)
-> +			dev_err(&pdev->dev,
-> +				"unable to alloc interrupt.(MSI)\n");
+Ok. I will add sopass[] also.
 
-If an error occurs then it is a good practice to unwind resource
-allocations made within the context of this function call, as this
-leads to more symmetric unwind paths in callers.
+> 
+>         Andrew
 
-In this case I think any resources consumed by rtase_alloc_msix()
-should be released if pci_enable_msi fails. Probably using
-a goto label is appropriate here.
-
-Likewise, I suggest that similar logic applies to errors within
-rtase_alloc_msix().
-
-> +		else
-> +			tp->sw_flag |= RTASE_SWF_MSI_ENABLED;
-> +	} else {
-> +		tp->sw_flag |= RTASE_SWF_MSIX_ENABLED;
-> +	}
-> +
-> +	return ret;
-> +}
-
-...
+-- 
+Thanks,                                                                         
+Raju
 
