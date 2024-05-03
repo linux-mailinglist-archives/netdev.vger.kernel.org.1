@@ -1,43 +1,43 @@
-Return-Path: <netdev+bounces-93361-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93362-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 256788BB4CB
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 22:25:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DD668BB4CE
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 22:25:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A447B1F264F2
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 20:25:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ED340286A69
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 20:25:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 605011591EB;
-	Fri,  3 May 2024 20:25:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27EC5159209;
+	Fri,  3 May 2024 20:25:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="uZGlmNmN"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="CbY3QYaq"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2050.outbound.protection.outlook.com [40.107.220.50])
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2069.outbound.protection.outlook.com [40.107.236.69])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A712F158D9D
-	for <netdev@vger.kernel.org>; Fri,  3 May 2024 20:25:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F4A2158DC0
+	for <netdev@vger.kernel.org>; Fri,  3 May 2024 20:25:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.69
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714767914; cv=fail; b=uJAAIiYW9m6x8LO7gsdTidtjFeNFIW1mJvICDXMJS/379QsGsRPlwz+7gJSQZYvVY4hckGAzqi/zmBzgD6rxj1k+37z60haZL9ahkZ/CNJ1DoLhCeJLeIj9KPlvCq1yDc8UQv0ypfipXtOQ+0PSIKNQd59uVkK7t8qn4J8OICQw=
+	t=1714767918; cv=fail; b=sAkJ4ANEB4qpAQCJOfidFMP0Mn/IL6qzgYAOEvRAfvYvWusUoMv6yTUeOfJke6rRe/dUEKHaSQ0NhXFVwOxQDiAg2m+iYFoXfGjIHoc/5m/8rMW2qtbaSd6yzSL592S5lSUEHxC3gf3QIl1ipS+SXXsje6Ev9d8Rdka87wzvgnI=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714767914; c=relaxed/simple;
-	bh=20scjcxqKg6UwodT1G4a0xGYvpRZAJm3L7HeSJ1G7vk=;
+	s=arc-20240116; t=1714767918; c=relaxed/simple;
+	bh=0Ts2WNzVC8WO5gSsjMbGsZrTBumQhTX/cnFj/kGG160=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=S4VZT6GbnH/4emrlHq4rpQ2+gM14ZHxhlY/BIcj3Kh/81w54wSV2ve/d4tX54RCn8cNeW4rcg9BGYfuClEND9EYxWWsAxItMO52qbZUZLHy4bA8qdZGBrhB9U8LSqHWyRtBGNAW8FcLsd3F/mVIYnLk5iiqjNQIHyNG8ertRZvU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=uZGlmNmN; arc=fail smtp.client-ip=40.107.220.50
+	 MIME-Version:Content-Type; b=D7MdTFmHvIwrhb/SZP9+TpGGZBWB1sRfoFWjh8Wvg8TEmm0APBc+hHTwAjvXA6hnm5o4u3h3vy4cDSikIETAQ68pMtxr3S6KtUkvbEbrB/eQMDQYo0F0vrgbwDdf6tBPw8f84obd5hKQAyf7RkIG5I9T9we1iXnlDQCEETC+kas=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=CbY3QYaq; arc=fail smtp.client-ip=40.107.236.69
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=hd/fZfOmbFWSFeNu0KhDzg70qiEZ4IYWU/fL90BaZ6/4a0r5XDQ5RNEoRDczrdoTbLLzlaZeQSxY9cvyNDmX5orHSXxZJTVft9hJkYZnq3qrGl+TSk6OVqEwOsuz3PIY1dkfS9VeRSkRkg/V+U8hdImyg1ogGbNa0//zIzORXXyfDucYSTktFZ+sR3BhpdKPkuPEByvoOzCPY3NGC6VP04EoHK7ZdDNE2OzqPARciMkcv2qGKhes83lGYQ3vNap52ir+UJPx9ww4/rNTSkev8O3QeQ7TdjcYBUnJPIsvuQf1cursIcQXixsN1PSq/kh1vMqI0YYgiDE0QdYY4MXdrg==
+ b=FAYqaQk6eOJozdsT8igQC3NRBkG0RLQBoibK6ubskyVmpYI6bp7FBJCXMyVDqQ8My0LJuFKK1ifUm5KDCRoms3t3kdeafBq/M/jjrR5ThVk0uIpEHg1ebF08BkaS237Nt+mLGt2CeU+4NcBao12PwQ9xcWHu7TclhaH3qwII6CGR0hP2GLM0vsQywinFEcYGLEJk5jJd6pd3yDGg/P36jijfK4j8u5f0phgmEuExcFs4s1L9naP1icegykxKcf1pVodxmS7UkqC4MQDS7aoKNP6n8aMJr5+Gh0uAh8aBMm0ij8OmQ+G5VVtDMD7UxEKWzMWFxfEeGitmbcHTL4q59A==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=5xHR1GTHlfgmFu/rKfdmXEmKE+lNJ964tSnqFVzqD+w=;
- b=IhLdpi85wO9jLhSVn8jKhkMDyQpaWgFuZDnTtjPr/ICfsdPDNy/qX/rup56t9EqyPcaQkP+g6sLFBsrXi+Pyec2FtPI40939MInN6DcXx910sr3zBVmtU8dPsAzDbXsP0BZnexITlMt//nhBtEsCjneQYRDdSNo8DoWiNEBDXjHMriyduK1H8U09pDPU3XTv2qnluCbeS0LTvczbkVOe+dFcuPgpHILPVFuu6Vl+aX/NHE6EVaJgW0aF5gufF9tAfdTroIfsZ4ZewL8bPxXp8PNBBOr6mvfT3v+yVRzDRI6rJAMDRWsqSfAZH795/jvXcZRBaoqHbFrobbVfv/YGDQ==
+ bh=ICKA/sJ1pDK6Be1rmZXVmAgMOusoM/v6AkqMs6trNsk=;
+ b=cnXzZtEuW8NDR3CxZDzkhJWEipz6fAESzMiJJ3L7o/RgYTdox+270KPYfjlgpxcJzBXj/spmIFjk/cZMMCVnNQJYsy37msjpIkFmiV8acFur/6oraPI3i6NoYQOx448Jh3PeEQ3IM/z22JhY4jjnG2OA/6ELSAXzvPBPt4d9r6l92AUmbogz5PDr1CyEsXXoL7i7Ur4mTLwlGUFIJ2Nt9oVVEHX282LMmqzucpsChWpeS9ca3sTU5KXLyWy2EZdtuaEIc8V7F29kMCgvk615jdyiFXjuBb1A4H0hD9ovIv6eQHQntYbBJRbu6+WS7eiT2AfalWolZ+jR1ok+U2AI3Q==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  216.228.118.232) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
@@ -45,17 +45,18 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5xHR1GTHlfgmFu/rKfdmXEmKE+lNJ964tSnqFVzqD+w=;
- b=uZGlmNmNF6EQY07UePF121brM1p/ZHiBR2x4KJU+TfqTnQwCsJ/AGEMdRMv/JwXqrlc9M7cdo9sK1UTnVUeI9DDh211fniDaKemOqpeRbPMtLr5Z0zY2HxSR7U8e0XnutjYXg3GqoKHxlRtUvIdWo4F3s601L1D3MY6bJX35OPsNuB1yDmVQyZYmS8ZBDcKAjcud8NmbohzAN+6wCUehp3yCWrCsrKGZK70syNK4jGskokLC7S5qftWOe5YJCybAyMqjCquT1FarhWvxMVdgaKeDmhu5fI7hmoYKpKjcukobeGPtIbeyfxCQMQUAJR4xgHcMja9V6PnRg+bNGSbrgw==
-Received: from PH0PR07CA0035.namprd07.prod.outlook.com (2603:10b6:510:e::10)
- by DS0PR12MB8344.namprd12.prod.outlook.com (2603:10b6:8:fe::7) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7519.34; Fri, 3 May 2024 20:25:08 +0000
+ bh=ICKA/sJ1pDK6Be1rmZXVmAgMOusoM/v6AkqMs6trNsk=;
+ b=CbY3QYaq8z0jl2neayspLCXBgyCETqxAAlFXipq1iw6SxLc25G/XgStwvBiJz6ipNhG1U1XBefVber50U/6fji0COFmjDCEOQRzvowWzXINGYnL6Hk+5J56z2CQjC5ad2jgR2p/R6JTm5/q6x9lUb5URM02O1ms620rdv37KsvECNt3jgLNbPIooEjgkCPiAOiQX6LusJrKUE41NEbrxjrRw1d0KtzSIPR9zMzJneYt8PNLUlrrsvYOdbmKcSPXs+B1Qp4YfY25XC6EQatc9Hrg1huEsaDmaX87oEgzil9uTQd2Ow+Q/Kk4Lr5LKoJ5sZUPslUVnxUBOQ0iWMay9Iw==
+Received: from PH0PR07CA0044.namprd07.prod.outlook.com (2603:10b6:510:e::19)
+ by PH7PR12MB8593.namprd12.prod.outlook.com (2603:10b6:510:1b1::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.30; Fri, 3 May
+ 2024 20:25:09 +0000
 Received: from SN1PEPF00036F40.namprd05.prod.outlook.com
- (2603:10b6:510:e:cafe::7b) by PH0PR07CA0035.outlook.office365.com
- (2603:10b6:510:e::10) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.29 via Frontend
- Transport; Fri, 3 May 2024 20:25:07 +0000
+ (2603:10b6:510:e:cafe::82) by PH0PR07CA0044.outlook.office365.com
+ (2603:10b6:510:e::19) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.30 via Frontend
+ Transport; Fri, 3 May 2024 20:25:09 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
@@ -65,27 +66,27 @@ Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
 Received: from mail.nvidia.com (216.228.118.232) by
  SN1PEPF00036F40.mail.protection.outlook.com (10.167.248.24) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7544.18 via Frontend Transport; Fri, 3 May 2024 20:25:07 +0000
+ 15.20.7544.18 via Frontend Transport; Fri, 3 May 2024 20:25:09 +0000
 Received: from drhqmail201.nvidia.com (10.126.190.180) by mail.nvidia.com
  (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Fri, 3 May 2024
- 13:24:55 -0700
+ 13:24:56 -0700
 Received: from drhqmail202.nvidia.com (10.126.190.181) by
  drhqmail201.nvidia.com (10.126.190.180) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Fri, 3 May 2024 13:24:55 -0700
+ 15.2.1544.4; Fri, 3 May 2024 13:24:56 -0700
 Received: from vdi.nvidia.com (10.127.8.11) by mail.nvidia.com
  (10.126.190.181) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Fri, 3 May 2024 13:24:54 -0700
+ Transport; Fri, 3 May 2024 13:24:55 -0700
 From: Daniel Jurgens <danielj@nvidia.com>
 To: <netdev@vger.kernel.org>
 CC: <mst@redhat.com>, <jasowang@redhat.com>, <xuanzhuo@linux.alibaba.com>,
 	<virtualization@lists.linux.dev>, <davem@davemloft.net>,
 	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
 	<jiri@nvidia.com>, Daniel Jurgens <danielj@nvidia.com>
-Subject: [PATCH net-next v6 5/6] virtio_net: Add a lock for per queue RX coalesce
-Date: Fri, 3 May 2024 23:24:44 +0300
-Message-ID: <20240503202445.1415560-6-danielj@nvidia.com>
+Subject: [PATCH net-next v6 6/6] virtio_net: Remove rtnl lock protection of command buffers
+Date: Fri, 3 May 2024 23:24:45 +0300
+Message-ID: <20240503202445.1415560-7-danielj@nvidia.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20240503202445.1415560-1-danielj@nvidia.com>
 References: <20240503202445.1415560-1-danielj@nvidia.com>
@@ -100,234 +101,141 @@ Content-Type: text/plain
 X-NV-OnPremToCloud: ExternallySecured
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN1PEPF00036F40:EE_|DS0PR12MB8344:EE_
-X-MS-Office365-Filtering-Correlation-Id: 00e5cc57-20f6-42c3-ac8e-08dc6baf1fba
+X-MS-TrafficTypeDiagnostic: SN1PEPF00036F40:EE_|PH7PR12MB8593:EE_
+X-MS-Office365-Filtering-Correlation-Id: 983360f0-fa89-4da9-b5a8-08dc6baf20c5
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230031|36860700004|1800799015|376005;
+X-Microsoft-Antispam: BCL:0;ARA:13230031|36860700004|376005|1800799015;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?krw1j1bPLG1hU0Ve5EwV45zlEPLINJTS3Xx7WZbyP7rp4qKQoyxvgxGtM4rb?=
- =?us-ascii?Q?64yNIlzDyQZxiUEmHckLFjo4SKxmXL03DRLvn2lzfu1ofWfI/+J4dbO0gAjF?=
- =?us-ascii?Q?ex4fi+CpZhZdJ+bus5NDZYt4GT+g2EpMe0tH59C1FPp4CpSVL9P2YPI9yqDe?=
- =?us-ascii?Q?V19TvK6HDgowCKq/nAchVd8dHt13C7ATRSJMeiWL3SU1SawLWxlB05cmNfau?=
- =?us-ascii?Q?iaImom0jViDh5nirKlp2roXJ+IDxwlpxsTESEfE4120D+wR4uG+T1xo/apGe?=
- =?us-ascii?Q?O8X/yHxWhGzi9NSLTn2j17UMNealMl+jIQRYFchpIk4wvPxP/r44KO121617?=
- =?us-ascii?Q?9RDEX9iRmiX1r4sLwury3OeXjcd0/zXtYlp0hmr0vW5ladr438q8VbKiKUHQ?=
- =?us-ascii?Q?CFlYYKjRVFvijfn77ATy7UziDeHkf4UQjEc2jXfDQZJpLu7X0rYoGQ9ylVuT?=
- =?us-ascii?Q?7oVFylUibzwlcfqObjhzhI9n6fe6Y8bwQbwF3roSd+D3GtJ08/SuokvCpbKE?=
- =?us-ascii?Q?Sn/xF07C6zgR2Q03O2DY1met4edOyJa8sUsAtKe0Mr3rxa1psSJ2Yomep2I9?=
- =?us-ascii?Q?/to7A/jYClHCrkknhztwTQRQH4JgLbnRg0Glz+o4jETehXHmGWfVG7YCPow8?=
- =?us-ascii?Q?vTgMOc84+yrFCjsaseYsLMVHaYd2DY8XRwTCNEJbV5zfKcCnkgZyj7gjfieM?=
- =?us-ascii?Q?U019GWPY1mAcqWSpEL/7rNCx/iUyqMpW/AzEcOU3sz/y++JKxNI0SkxHI3Se?=
- =?us-ascii?Q?vG/gwLjwgbYoCz5hBDT6vPgQTAn3AKpTdIqlBWJ/ns0GIputAcH24gaBSQ4w?=
- =?us-ascii?Q?7dYl3KdaWSHXY85ssy7aHh4+ViqZ2v0MmAXQAVnHP10TnEAbmrQsgPyvI0+N?=
- =?us-ascii?Q?MpHVgfCXwI18cy9QIcxb3tYVazM1FPtxv15huo7q5DSwg5L1O6MQpC3zXVTk?=
- =?us-ascii?Q?EymYJIHEf2FYypMsPWjLmn3UFKtaq09/E9lN9lX6liF7kPzHEU4KLCNQDePW?=
- =?us-ascii?Q?rEqbVj5LVVh7G6ZGSP/rsrcK2quSRrwErM6kWDQaZsquJoqMYw5gCZWxXxUr?=
- =?us-ascii?Q?zZAyy7qJlgAbGBqHA9rdE89/+Z71VhoCOOIE46HWqcp8yiuI8mkKo0UFn8zW?=
- =?us-ascii?Q?CNe2Lw9HMWgVjy4WRYXl/xO+YCW5VH4CmkLeWbJYbMqrODzlPnrg49h6fC4c?=
- =?us-ascii?Q?qX8+XyWbzLpNVuk8yF/qc8MCffTahVwSKnBBpZ1utPaNByCWUQd32sEvconH?=
- =?us-ascii?Q?N7DruirHhjC0rwzuKlv7s83ZmFaB6l98yVI/sDZLYOMUZ2j4Mu1APgjCY18C?=
- =?us-ascii?Q?0DcXX8K6XmF+PXSeCNSqkDIvyvOuJ+Rzc3DW4TGnRL5Vng5OaoTlat/VFnMO?=
- =?us-ascii?Q?Z+FQNIwSxLxZUfzO4odaS/yvV6S7?=
+	=?us-ascii?Q?vSd83jbahmPwusISXnWxqnoSHSLLMV2QXPjjoPYUGNT9VLDMK0K7+N8FPDA5?=
+ =?us-ascii?Q?Sk9Kn8zu0mxsAT2UgUzBqyNorzXTTw8WfDv0Wl0sNKu4wBfxb1vRPO7WE/qw?=
+ =?us-ascii?Q?9VAhI+93IwalOCcBxC7eAnzQ0YglmXwOi3leceE1EOPeIRsb0FRHTEoEpxoC?=
+ =?us-ascii?Q?Q/wDQJa09NeD7oTWYgzqYaQLX6vR09a56j5iRbE5S5t4nqTmsaQ7kB4SMrb7?=
+ =?us-ascii?Q?U5ceHc/Wd/ijetCL6YILdp/XjhiFe48A/KSixebG9Jf3UMpFwE7WS9jda2rG?=
+ =?us-ascii?Q?JGxcETyX0GjsUT2QriZdpxShPep2Vh7/MAOBb+OI1Qr7OcrckG66ddEGl3oN?=
+ =?us-ascii?Q?xFOeFTDKuJvv9vYZa90DTNh/BmETi0KAGGmtKBWxa8LkntGrSB/CDyzFfiJP?=
+ =?us-ascii?Q?3jei+48NgveAH0BKb22NHCFL5ifpOsHsg3ZiOjet5gGeErQ37H2qY+9j1SpA?=
+ =?us-ascii?Q?8VGhcsRxuLPDkLUk4+IZlxfMWf2GTNU7u4+cgxA51A6+RaAzFTHIXxcJgGpp?=
+ =?us-ascii?Q?8FAGMCKcH9WAkbYZHluIm4X+56lCKlHpm0N7kiRL24tfGS/ZB57PBV73Zn8M?=
+ =?us-ascii?Q?ankCyOlO9FDsj0P4keU6mXk8Uy++skh7wftE6WfFQgcqFg+tV4edwv/sUUEO?=
+ =?us-ascii?Q?40J938gBUm6m+MSNdi8ASysoXGzdn7TkUZSgCZu+PsWhiY6EDZBbHh8xEYL3?=
+ =?us-ascii?Q?Bw36Ky8HRWwEaGSFJUfxA18TpWuaH7kQdEgm6zzIyEmFJev6ewNEY62k4FTN?=
+ =?us-ascii?Q?H8heLfdANlbk2uCgHUjPdSwnV2JkU5sHMq+OAGK0lFgjdg3vnLcMrYy2yeMe?=
+ =?us-ascii?Q?+8WyToFr9Y96+vXgYo+LNfGgUJ30v3pxxoDyatOKMgqZnY/XuW8kIGbEdrFu?=
+ =?us-ascii?Q?BD2kfd2YFIH57qHv9nZk+hlYPEjcApJ1YnrMlm/tYBAvwlMKO/Z93mrrVgro?=
+ =?us-ascii?Q?aPfv3xYDol1/3JGqIyFsXgO81JugP4g0UB1w8p3z5RLK16hP4scji02oLWgI?=
+ =?us-ascii?Q?DzOo2FNU8YQQF8imsew2Ew++QbQ/hyWRpHTje7KAqc3gY8sk3d7YaZbTALSh?=
+ =?us-ascii?Q?nQu5HYgVbEvyrrKF5WR5DXdBf8qMEBcghe3dya43NE4nZxGMSXVw0M3w/Oxr?=
+ =?us-ascii?Q?rfJeS3KJmuuDHOU+PAlAJjmOrZPBZ3JWQhpCN953sYOcG0iQjionH5wPS+Rv?=
+ =?us-ascii?Q?8CF/fm6bK5H4Oulmyew4naE8RkW6YDkpHQ6lvVdiVrxZhOUPfaXiNjy00LJG?=
+ =?us-ascii?Q?gHnD17aJr+ASMG4S+SVyDpA3eylD2sDbbY0iKIUrSsVwTShZGHxjAPz/cGvM?=
+ =?us-ascii?Q?emyrvlTVWjF9vT5D+CkSPgMT3wJcXVESvDunMbB3dDp/SaKLA9OCVFJQ56NG?=
+ =?us-ascii?Q?kvHT3quNRaRhvJwiCx/yoY+vRjfI?=
 X-Forefront-Antispam-Report:
-	CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230031)(36860700004)(1800799015)(376005);DIR:OUT;SFP:1101;
+	CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230031)(36860700004)(376005)(1800799015);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 May 2024 20:25:07.4606
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 May 2024 20:25:09.2107
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 00e5cc57-20f6-42c3-ac8e-08dc6baf1fba
+X-MS-Exchange-CrossTenant-Network-Message-Id: 983360f0-fa89-4da9-b5a8-08dc6baf20c5
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
 	SN1PEPF00036F40.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB8344
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB8593
 
-Once the RTNL locking around the control buffer is removed there can be
-contention on the per queue RX interrupt coalescing data. Use a mutex
-per queue. A mutex is required because virtnet_send_command can sleep.
+The rtnl lock is no longer needed to protect the control buffer and
+command VQ.
 
 Signed-off-by: Daniel Jurgens <danielj@nvidia.com>
+Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 ---
- drivers/net/virtio_net.c | 53 +++++++++++++++++++++++++++++++---------
- 1 file changed, 41 insertions(+), 12 deletions(-)
+ drivers/net/virtio_net.c | 24 ++++--------------------
+ 1 file changed, 4 insertions(+), 20 deletions(-)
 
 diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index 386ded936bf1..a7cbfa7f5311 100644
+index a7cbfa7f5311..218a446c4c27 100644
 --- a/drivers/net/virtio_net.c
 +++ b/drivers/net/virtio_net.c
-@@ -312,6 +312,9 @@ struct receive_queue {
- 	/* Is dynamic interrupt moderation enabled? */
- 	bool dim_enabled;
+@@ -2824,14 +2824,12 @@ static void virtnet_stats(struct net_device *dev,
  
-+	/* Used to protect dim_enabled and inter_coal */
-+	struct mutex dim_lock;
-+
- 	/* Dynamic Interrupt Moderation */
- 	struct dim dim;
- 
-@@ -2365,6 +2368,10 @@ static int virtnet_poll(struct napi_struct *napi, int budget)
- 	/* Out of packets? */
- 	if (received < budget) {
- 		napi_complete = virtqueue_napi_complete(napi, rq->vq, received);
-+		/* Intentionally not taking dim_lock here. This may result in a
-+		 * spurious net_dim call. But if that happens virtnet_rx_dim_work
-+		 * will not act on the scheduled work.
-+		 */
- 		if (napi_complete && rq->dim_enabled)
- 			virtnet_rx_dim_update(vi, rq);
- 	}
-@@ -3247,9 +3254,11 @@ static int virtnet_set_ringparam(struct net_device *dev,
- 				return err;
- 
- 			/* The reason is same as the transmit virtqueue reset */
-+			mutex_lock(&vi->rq[i].dim_lock);
- 			err = virtnet_send_rx_ctrl_coal_vq_cmd(vi, i,
- 							       vi->intr_coal_rx.max_usecs,
- 							       vi->intr_coal_rx.max_packets);
-+			mutex_unlock(&vi->rq[i].dim_lock);
- 			if (err)
- 				return err;
- 		}
-@@ -4255,6 +4264,7 @@ static int virtnet_send_rx_notf_coal_cmds(struct virtnet_info *vi,
- 	struct virtio_net_ctrl_coal_rx *coal_rx __free(kfree) = NULL;
- 	bool rx_ctrl_dim_on = !!ec->use_adaptive_rx_coalesce;
- 	struct scatterlist sgs_rx;
-+	int ret = 0;
- 	int i;
- 
- 	if (rx_ctrl_dim_on && !virtio_has_feature(vi->vdev, VIRTIO_NET_F_VQ_NOTF_COAL))
-@@ -4264,16 +4274,22 @@ static int virtnet_send_rx_notf_coal_cmds(struct virtnet_info *vi,
- 			       ec->rx_max_coalesced_frames != vi->intr_coal_rx.max_packets))
- 		return -EINVAL;
- 
-+	/* Acquire all queues dim_locks */
-+	for (i = 0; i < vi->max_queue_pairs; i++)
-+		mutex_lock(&vi->rq[i].dim_lock);
-+
- 	if (rx_ctrl_dim_on && !vi->rx_dim_enabled) {
- 		vi->rx_dim_enabled = true;
- 		for (i = 0; i < vi->max_queue_pairs; i++)
- 			vi->rq[i].dim_enabled = true;
--		return 0;
-+		goto unlock;
- 	}
- 
- 	coal_rx = kzalloc(sizeof(*coal_rx), GFP_KERNEL);
--	if (!coal_rx)
--		return -ENOMEM;
-+	if (!coal_rx) {
-+		ret = -ENOMEM;
-+		goto unlock;
-+	}
- 
- 	if (!rx_ctrl_dim_on && vi->rx_dim_enabled) {
- 		vi->rx_dim_enabled = false;
-@@ -4291,8 +4307,10 @@ static int virtnet_send_rx_notf_coal_cmds(struct virtnet_info *vi,
- 
- 	if (!virtnet_send_command(vi, VIRTIO_NET_CTRL_NOTF_COAL,
- 				  VIRTIO_NET_CTRL_NOTF_COAL_RX_SET,
--				  &sgs_rx))
--		return -EINVAL;
-+				  &sgs_rx)) {
-+		ret = -EINVAL;
-+		goto unlock;
-+	}
- 
- 	vi->intr_coal_rx.max_usecs = ec->rx_coalesce_usecs;
- 	vi->intr_coal_rx.max_packets = ec->rx_max_coalesced_frames;
-@@ -4300,8 +4318,11 @@ static int virtnet_send_rx_notf_coal_cmds(struct virtnet_info *vi,
- 		vi->rq[i].intr_coal.max_usecs = ec->rx_coalesce_usecs;
- 		vi->rq[i].intr_coal.max_packets = ec->rx_max_coalesced_frames;
- 	}
-+unlock:
-+	for (i = vi->max_queue_pairs - 1; i >= 0; i--)
-+		mutex_unlock(&vi->rq[i].dim_lock);
- 
--	return 0;
-+	return ret;
- }
- 
- static int virtnet_send_notf_coal_cmds(struct virtnet_info *vi,
-@@ -4325,19 +4346,24 @@ static int virtnet_send_rx_notf_coal_vq_cmds(struct virtnet_info *vi,
- 					     u16 queue)
+ static void virtnet_ack_link_announce(struct virtnet_info *vi)
  {
- 	bool rx_ctrl_dim_on = !!ec->use_adaptive_rx_coalesce;
--	bool cur_rx_dim = vi->rq[queue].dim_enabled;
- 	u32 max_usecs, max_packets;
-+	bool cur_rx_dim;
- 	int err;
- 
-+	mutex_lock(&vi->rq[queue].dim_lock);
-+	cur_rx_dim = vi->rq[queue].dim_enabled;
- 	max_usecs = vi->rq[queue].intr_coal.max_usecs;
- 	max_packets = vi->rq[queue].intr_coal.max_packets;
- 
- 	if (rx_ctrl_dim_on && (ec->rx_coalesce_usecs != max_usecs ||
--			       ec->rx_max_coalesced_frames != max_packets))
-+			       ec->rx_max_coalesced_frames != max_packets)) {
-+		mutex_unlock(&vi->rq[queue].dim_lock);
- 		return -EINVAL;
-+	}
- 
- 	if (rx_ctrl_dim_on && !cur_rx_dim) {
- 		vi->rq[queue].dim_enabled = true;
-+		mutex_unlock(&vi->rq[queue].dim_lock);
- 		return 0;
- 	}
- 
-@@ -4350,10 +4376,8 @@ static int virtnet_send_rx_notf_coal_vq_cmds(struct virtnet_info *vi,
- 	err = virtnet_send_rx_ctrl_coal_vq_cmd(vi, queue,
- 					       ec->rx_coalesce_usecs,
- 					       ec->rx_max_coalesced_frames);
--	if (err)
--		return err;
--
--	return 0;
-+	mutex_unlock(&vi->rq[queue].dim_lock);
-+	return err;
+-	rtnl_lock();
+ 	if (!virtnet_send_command(vi, VIRTIO_NET_CTRL_ANNOUNCE,
+ 				  VIRTIO_NET_CTRL_ANNOUNCE_ACK, NULL))
+ 		dev_warn(&vi->dev->dev, "Failed to ack link announce.\n");
+-	rtnl_unlock();
  }
  
- static int virtnet_send_notf_coal_vq_cmds(struct virtnet_info *vi,
-@@ -4390,6 +4414,7 @@ static void virtnet_rx_dim_work(struct work_struct *work)
+-static int _virtnet_set_queues(struct virtnet_info *vi, u16 queue_pairs)
++static int virtnet_set_queues(struct virtnet_info *vi, u16 queue_pairs)
+ {
+ 	struct virtio_net_ctrl_mq *mq __free(kfree) = NULL;
+ 	struct scatterlist sg;
+@@ -2862,16 +2860,6 @@ static int _virtnet_set_queues(struct virtnet_info *vi, u16 queue_pairs)
+ 	return 0;
+ }
  
+-static int virtnet_set_queues(struct virtnet_info *vi, u16 queue_pairs)
+-{
+-	int err;
+-
+-	rtnl_lock();
+-	err = _virtnet_set_queues(vi, queue_pairs);
+-	rtnl_unlock();
+-	return err;
+-}
+-
+ static int virtnet_close(struct net_device *dev)
+ {
+ 	u8 *promisc_allmulti  __free(kfree) = NULL;
+@@ -3477,7 +3465,7 @@ static int virtnet_set_channels(struct net_device *dev,
+ 		return -EINVAL;
+ 
+ 	cpus_read_lock();
+-	err = _virtnet_set_queues(vi, queue_pairs);
++	err = virtnet_set_queues(vi, queue_pairs);
+ 	if (err) {
+ 		cpus_read_unlock();
+ 		goto err;
+@@ -4409,9 +4397,6 @@ static void virtnet_rx_dim_work(struct work_struct *work)
+ 	struct dim_cq_moder update_moder;
+ 	int qnum, err;
+ 
+-	if (!rtnl_trylock())
+-		return;
+-
  	qnum = rq - vi->rq;
  
-+	mutex_lock(&rq->dim_lock);
- 	if (!rq->dim_enabled)
- 		goto out;
- 
-@@ -4405,6 +4430,7 @@ static void virtnet_rx_dim_work(struct work_struct *work)
- 		dim->state = DIM_START_MEASURE;
+ 	mutex_lock(&rq->dim_lock);
+@@ -4431,7 +4416,6 @@ static void virtnet_rx_dim_work(struct work_struct *work)
  	}
  out:
-+	mutex_unlock(&rq->dim_lock);
- 	rtnl_unlock();
+ 	mutex_unlock(&rq->dim_lock);
+-	rtnl_unlock();
  }
  
-@@ -4543,11 +4569,13 @@ static int virtnet_get_per_queue_coalesce(struct net_device *dev,
- 		return -EINVAL;
- 
- 	if (virtio_has_feature(vi->vdev, VIRTIO_NET_F_VQ_NOTF_COAL)) {
-+		mutex_lock(&vi->rq[queue].dim_lock);
- 		ec->rx_coalesce_usecs = vi->rq[queue].intr_coal.max_usecs;
- 		ec->tx_coalesce_usecs = vi->sq[queue].intr_coal.max_usecs;
- 		ec->tx_max_coalesced_frames = vi->sq[queue].intr_coal.max_packets;
- 		ec->rx_max_coalesced_frames = vi->rq[queue].intr_coal.max_packets;
- 		ec->use_adaptive_rx_coalesce = vi->rq[queue].dim_enabled;
-+		mutex_unlock(&vi->rq[queue].dim_lock);
- 	} else {
- 		ec->rx_max_coalesced_frames = 1;
- 
-@@ -5377,6 +5405,7 @@ static int virtnet_alloc_queues(struct virtnet_info *vi)
- 
- 		u64_stats_init(&vi->rq[i].stats.syncp);
- 		u64_stats_init(&vi->sq[i].stats.syncp);
-+		mutex_init(&vi->rq[i].dim_lock);
+ static int virtnet_coal_params_supported(struct ethtool_coalesce *ec)
+@@ -4989,7 +4973,7 @@ static int virtnet_xdp_set(struct net_device *dev, struct bpf_prog *prog,
+ 		synchronize_net();
  	}
  
- 	return 0;
+-	err = _virtnet_set_queues(vi, curr_qp + xdp_qp);
++	err = virtnet_set_queues(vi, curr_qp + xdp_qp);
+ 	if (err)
+ 		goto err;
+ 	netif_set_real_num_rx_queues(dev, curr_qp + xdp_qp);
+@@ -5855,7 +5839,7 @@ static int virtnet_probe(struct virtio_device *vdev)
+ 
+ 	virtio_device_ready(vdev);
+ 
+-	_virtnet_set_queues(vi, vi->curr_queue_pairs);
++	virtnet_set_queues(vi, vi->curr_queue_pairs);
+ 
+ 	/* a random MAC address has been assigned, notify the device.
+ 	 * We don't fail probe if VIRTIO_NET_F_CTRL_MAC_ADDR is not there
 -- 
 2.44.0
 
