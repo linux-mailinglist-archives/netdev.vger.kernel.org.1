@@ -1,160 +1,140 @@
-Return-Path: <netdev+bounces-93309-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93310-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40A058BB185
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 19:13:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64E978BB193
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 19:15:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AAB701F22D41
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 17:13:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1ADD21F22BD0
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 17:15:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA7A9157E62;
-	Fri,  3 May 2024 17:12:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8507157A74;
+	Fri,  3 May 2024 17:15:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X5bpwIbT"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SAHHNHyI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8161178276;
-	Fri,  3 May 2024 17:12:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95B5E157A49;
+	Fri,  3 May 2024 17:15:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714756376; cv=none; b=XQJZ7DdZOTrRF3bKGrIX1qYQUU8KU/EuFomh4w8l2w/66gz1nTlfHd+7NN0HYUJ8m8H2bbNf1pDgheT8BrmQMxQDHKAdOP3+LmXbZ5E/jJ1uBw5FL0K5SFWfnQTvt/Yk5jlX1SJbih5+S2x7ZqlTb4jB+/IEfimr409sp9quFxY=
+	t=1714756550; cv=none; b=d7Pq0ONtUEy52kDPXFBSao2UxP/WQjDfg8JyPJqA4GYAEURwo/hs2Mpd3flVIsVOQQBegVjpnkE5NvxEqSHVU2bauq6KJXD5l6BBJHafeDNGeUwnJuHxsbcR6kpgyOz8cTo9GqJ/0gcZUK3jtAbEeiWsW1ImsM68PpThZ3/KTz4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714756376; c=relaxed/simple;
-	bh=j1AlBmA8EvR89RnAFEz1pY/E0yUi35JufxzFz9CJ0aY=;
+	s=arc-20240116; t=1714756550; c=relaxed/simple;
+	bh=nmzk+rIi5lhP+mMY1lgQk4NZ9UnrTXzds4LWmy2mArY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OUX9lwRAnq5roOimv/F4oVYdZpCiQHClY+XGwmFLsU/bwUi5rl2wMD/qMsGzPVA6qQVtKxYE6Gz6jZQLpyu1Ng4hHl6CoZOGi5QRul2jpODX2bFTT7Simjn2/X0NmT42+Yefv77TbaOf+TPXHdLl3qaTFIxn2DhZrErynryWa9w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X5bpwIbT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69D46C116B1;
-	Fri,  3 May 2024 17:12:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714756376;
-	bh=j1AlBmA8EvR89RnAFEz1pY/E0yUi35JufxzFz9CJ0aY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=X5bpwIbT9mTSo+G1s5jqROstAZvjypQL7s6c2tLAQ7VbQitlkGrEhRbNW/j3ZsJMW
-	 zUud7VDAvN8lABU9AdCzSkl+VkSpWYl9DzDDXQK/+2ShanKw/XNteSUI+KGIIqXFS3
-	 UhRXda6SJsIgb5vtEP8M8LqEMCzijTSLy+j0paxRCh+FntKRbvJqb7p+VnVDslz+9E
-	 RPsN6jOcDc+d9yTqHLREDlVmSP9VCYug1ZuqQcH6oXuSc3SYeF1+WdGtbnSIJe4eWy
-	 cIn8Qs8Lg6N08dMOqCuNO1eXfM/akKJ5ayzKHHR0HlRSpR9iVAvFnXPjbwNIpvg/U8
-	 Gq6m0tOCYYiPg==
-Date: Fri, 3 May 2024 18:12:49 +0100
-From: Conor Dooley <conor@kernel.org>
-To: Christoph Fritz <christoph.fritz@hexdev.de>
-Cc: Jiri Slaby <jirislaby@kernel.org>,
-	Oliver Hartkopp <socketcan@hartkopp.net>,
-	Marc Kleine-Budde <mkl@pengutronix.de>,
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Jiri Kosina <jikos@kernel.org>,
-	Benjamin Tissoires <bentiss@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Sebastian Reichel <sre@kernel.org>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Andreas Lauser <andreas.lauser@mercedes-benz.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Pavel Pisa <pisa@cmp.felk.cvut.cz>, linux-can@vger.kernel.org,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-input@vger.kernel.org, linux-serial@vger.kernel.org
-Subject: Re: [PATCH v3 06/11] dt-bindings: net/can: Add serial (serdev) LIN
- adapter
-Message-ID: <20240503-fading-extruding-2105bbd8b479@spud>
-References: <20240502182804.145926-1-christoph.fritz@hexdev.de>
- <20240502182804.145926-7-christoph.fritz@hexdev.de>
+	 Content-Type:Content-Disposition:In-Reply-To; b=FUGAjmE+d0N8Czg4C393akXybd2ZBHO6obs3gHZPWiLxhh+nYE/RTwDqw9c5Tg15LFBzSQrZacqqzQ+N1BfwVcRKsFJZAsUkus4vABkcSbGhzqNgU6/o01ZL7QQVTdsh29kNbb/VbJQ5/Z/5Okc4o2vxjIu/XLoR0HVpVkCsO8M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SAHHNHyI; arc=none smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1714756549; x=1746292549;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=nmzk+rIi5lhP+mMY1lgQk4NZ9UnrTXzds4LWmy2mArY=;
+  b=SAHHNHyIUPctz3+Q4BOz3lipk9rGbqFKusJFUgQ6o+4VBC37kNSQSlX+
+   nU1v8MohxetSYODNq2K2nSKnPsGT2Vx+VPoph3d8O+OMPd9w1/vm4MGpG
+   6bQfTQP39uoxLITVdTFnHJJo/LPZCXI3bC9WuWNzmsgjFvE4mQAirtQwu
+   dJGtMEOgi3bLojsAhfiV0MQzvspOJjb3qyraifK3LZg14mEJM+SLo2PKc
+   0fx4NlCoUC+0J5tnrYLnM/lmZ5VzNb0WkMnFjHePqabWpt78rYvpZzHl8
+   lMzkQFQ/wsBJS3v7tzPxLrO84DXFgmY4DuhYNXanFALzvdvuxAo6HPABy
+   A==;
+X-CSE-ConnectionGUID: 2HBnTOLGQ96jx51nNFt4IA==
+X-CSE-MsgGUID: dce0ttkiQcCdWt8vRnXoWQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11063"; a="10499676"
+X-IronPort-AV: E=Sophos;i="6.07,251,1708416000"; 
+   d="scan'208";a="10499676"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 May 2024 10:15:48 -0700
+X-CSE-ConnectionGUID: KdVxzLLHRbG1FAlcm1gMAg==
+X-CSE-MsgGUID: jzsi3S87SGqKEJo5T5+tCw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,251,1708416000"; 
+   d="scan'208";a="32185685"
+Received: from lkp-server01.sh.intel.com (HELO e434dd42e5a1) ([10.239.97.150])
+  by orviesa003.jf.intel.com with ESMTP; 03 May 2024 10:15:44 -0700
+Received: from kbuild by e434dd42e5a1 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1s2wVZ-000Bw0-2e;
+	Fri, 03 May 2024 17:15:41 +0000
+Date: Sat, 4 May 2024 01:14:57 +0800
+From: kernel test robot <lkp@intel.com>
+To: Shay Drory <shayd@nvidia.com>, netdev@vger.kernel.org,
+	pabeni@redhat.com, davem@davemloft.net, kuba@kernel.org,
+	edumazet@google.com, gregkh@linuxfoundation.org,
+	david.m.ertman@intel.com
+Cc: oe-kbuild-all@lists.linux.dev, rafael@kernel.org, ira.weiny@intel.com,
+	linux-rdma@vger.kernel.org, leon@kernel.org, tariqt@nvidia.com,
+	Shay Drory <shayd@nvidia.com>, Parav Pandit <parav@nvidia.com>
+Subject: Re: [PATCH 1/2] driver core: auxiliary bus: show auxiliary device
+ IRQs
+Message-ID: <202405040108.NWUaSJgz-lkp@intel.com>
+References: <20240503043104.381938-2-shayd@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="wALyyOjqkAbb5csW"
-Content-Disposition: inline
-In-Reply-To: <20240502182804.145926-7-christoph.fritz@hexdev.de>
-
-
---wALyyOjqkAbb5csW
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20240503043104.381938-2-shayd@nvidia.com>
 
-On Thu, May 02, 2024 at 08:27:59PM +0200, Christoph Fritz wrote:
-> Add dt-bindings for serial LIN bus adapters. These adapters are
-> basically just LIN transceivers that are hard-wired to serial devices.
->=20
-> Signed-off-by: Christoph Fritz <christoph.fritz@hexdev.de>
-> ---
->  .../bindings/net/can/hexdev,lin-serdev.yaml   | 32 +++++++++++++++++++
->  1 file changed, 32 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/net/can/hexdev,lin-=
-serdev.yaml
->=20
-> diff --git a/Documentation/devicetree/bindings/net/can/hexdev,lin-serdev.=
-yaml b/Documentation/devicetree/bindings/net/can/hexdev,lin-serdev.yaml
-> new file mode 100644
-> index 0000000000000..c178eb9be1391
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/net/can/hexdev,lin-serdev.yaml
-> @@ -0,0 +1,32 @@
-> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/net/can/hexdev,lin-serdev.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: Serial LIN Adapter
-> +
-> +description:
-> +  LIN transceiver, mostly hard-wired to a serial device, used for commun=
-ication
-> +  on a LIN bus.
-> +  For more details on an adapter, visit <https://hexdev.de/hexlin#tty>.
-> +
-> +maintainers:
-> +  - Christoph Fritz <christoph.fritz@hexdev.de>
-> +
-> +properties:
-> +  compatible:
-> +    const: hexdev,lin-serdev
+Hi Shay,
 
-Maybe I've just missed something on earlier versions that I didn't
-read, but the name of the device on the website you link is "hexLIN",
-so why is "lin-serdev" used here instead?
+kernel test robot noticed the following build warnings:
 
-> +
-> +required:
-> +  - compatible
-> +
-> +additionalProperties: false
-> +
-> +examples:
-> +  - |
-> +    serial {
-> +        linbus {
-> +            compatible =3D "hexdev,lin-serdev";
-> +        };
-> +    };
-> --=20
-> 2.39.2
->=20
+[auto build test WARNING on driver-core/driver-core-testing]
+[also build test WARNING on driver-core/driver-core-next driver-core/driver-core-linus net/main net-next/main linus/master v6.9-rc6 next-20240503]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
---wALyyOjqkAbb5csW
-Content-Type: application/pgp-signature; name="signature.asc"
+url:    https://github.com/intel-lab-lkp/linux/commits/Shay-Drory/driver-core-auxiliary-bus-show-auxiliary-device-IRQs/20240503-123319
+base:   driver-core/driver-core-testing
+patch link:    https://lore.kernel.org/r/20240503043104.381938-2-shayd%40nvidia.com
+patch subject: [PATCH 1/2] driver core: auxiliary bus: show auxiliary device IRQs
+config: s390-randconfig-r081-20240503 (https://download.01.org/0day-ci/archive/20240504/202405040108.NWUaSJgz-lkp@intel.com/config)
+compiler: s390-linux-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240504/202405040108.NWUaSJgz-lkp@intel.com/reproduce)
 
------BEGIN PGP SIGNATURE-----
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202405040108.NWUaSJgz-lkp@intel.com/
 
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZjUbEQAKCRB4tDGHoIJi
-0swqAQCF8l5qprfFPZ6cZ7vHJYmcFVMucGf+WHsQS/KyE583BwEAv8DFN0XXp2jS
-E0yi6lEyzextMZsTck5ziHMgFfOMZAk=
-=6TI4
------END PGP SIGNATURE-----
+All warnings (new ones prefixed by >>):
 
---wALyyOjqkAbb5csW--
+>> drivers/base/auxiliary.c:182: warning: This comment starts with '/**', but isn't a kernel-doc comment. Refer Documentation/doc-guide/kernel-doc.rst
+    * Auxiliary devices can share IRQs. Expose to user whether the provided IRQ is
+
+
+vim +182 drivers/base/auxiliary.c
+
+   180	
+   181	/**
+ > 182	 * Auxiliary devices can share IRQs. Expose to user whether the provided IRQ is
+   183	 * shared or exclusive.
+   184	 */
+   185	static ssize_t auxiliary_irq_mode_show(struct device *dev,
+   186					       struct device_attribute *attr, char *buf)
+   187	{
+   188		struct auxiliary_irq_info *info =
+   189			container_of(attr, struct auxiliary_irq_info, sysfs_attr);
+   190	
+   191		if (refcount_read(xa_load(&irqs, info->irq)) > 1)
+   192			return sysfs_emit(buf, "%s\n", "shared");
+   193		else
+   194			return sysfs_emit(buf, "%s\n", "exclusive");
+   195	}
+   196	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
