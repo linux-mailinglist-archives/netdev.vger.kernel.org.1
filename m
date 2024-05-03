@@ -1,110 +1,97 @@
-Return-Path: <netdev+bounces-93350-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93351-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B849B8BB40F
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 21:32:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD1598BB468
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 21:58:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E98071C23CDC
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 19:32:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 92157285D7B
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 19:58:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B50C815A497;
-	Fri,  3 May 2024 19:29:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UuhBR78h"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56304158D67;
+	Fri,  3 May 2024 19:58:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BFA9158D6E;
-	Fri,  3 May 2024 19:29:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF2AD158877
+	for <netdev@vger.kernel.org>; Fri,  3 May 2024 19:58:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.69
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714764596; cv=none; b=ldxY8BYhZM6s78uTvGgFc5ImpWgVQcv3qI818hWVTA0pCMIjF5EaGZMyMKBlOnLjjh1X6mFBejuvTIpUE+A5vqU/etLyLmHGfjHvDGeK95FcUXKE88LWMDQTHqlttWRcMSiO1aRZqOzBqz0rtsZIGn9jqHm45TOv93L7NmqnEeA=
+	t=1714766287; cv=none; b=XYc8PgUnTbLzhs3pmlN8VXSJpAgLGGlZZRjAX7V7b0A7EjNVf2RmGsx9owP2r5g7QK9bUYtiY9xb76OLdN/4ILS+TxYxKalfacgfxs4gxwoIVYIKEFHPRxi5j/RFBKZZ0q+fCMa+dBQGOi0K0HjYYk5XWSUvlZj76nL4IjF2J5g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714764596; c=relaxed/simple;
-	bh=m5MhwZYrQf56wlUh3xaqPGaPzrokLuXzfFsOkWQE3Do=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=T7g0YT7nQ4eGjZPmf8d2ol+LhNM0bhGLSdYLvHBH08LzVTXhl3elJ1f2MAMo66LkcQumenONoQII85drlfTTRTmnD4wDRMKKgof/EiPWTJELr9HMbGAlt2uqWtDOoNuFPy6ioJqiEywJrAYeP5q/tPtXjIYQo6TtuCsyOYQ2yP8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UuhBR78h; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AB83DC4AF14;
-	Fri,  3 May 2024 19:29:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714764596;
-	bh=m5MhwZYrQf56wlUh3xaqPGaPzrokLuXzfFsOkWQE3Do=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=UuhBR78hPJyqGFp6vzkoJDmIZDhaza2rV4Hf7qKYFFLUYwtifnoMM1BGjNKs71tSG
-	 L9gUVYfSzUS65LahDPjaF1FJGUJH9KM3SQOL8W9Zr61QeqwwmNKUERjO7h+oHpliNW
-	 IaBS/LA7gX2wZaCUtsZw0g6Kpr++ZdZwYBsMNIZyfgZUV5OGpitEJiyWq6F/lu/K8P
-	 8AhQaCCINk+BWGBwfsz1CMLxTr9Z3e1RhRBehnzXA5CH7+5nZpzrKS0VFeyusCPqdx
-	 eYphMjVpmvAgewpYhgZmdS7LuE1XiC7TQtwtV34/VfT/8TiCeTmXoBZC//NiKv32v/
-	 YbisTCPt+22SQ==
-Date: Fri, 3 May 2024 12:29:54 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Praveen Kannoju <praveen.kannoju@oracle.com>
-Cc: "jhs@mojatatu.com" <jhs@mojatatu.com>, "xiyou.wangcong@gmail.com"
- <xiyou.wangcong@gmail.com>, "jiri@resnulli.us" <jiri@resnulli.us>,
- "davem@davemloft.net" <davem@davemloft.net>, "netdev@vger.kernel.org"
- <netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
- <linux-kernel@vger.kernel.org>, Rajesh Sivaramasubramaniom
- <rajesh.sivaramasubramaniom@oracle.com>, Rama Nichanamatlu
- <rama.nichanamatlu@oracle.com>, Manjunath Patil
- <manjunath.b.patil@oracle.com>
-Subject: Re: [PATCH RFC] net/sched: adjust device watchdog timer to detect
- stopped queue at right time
-Message-ID: <20240503122954.58bee752@kernel.org>
-In-Reply-To: <SA1PR10MB644567B49D44BA641CF63E828C1F2@SA1PR10MB6445.namprd10.prod.outlook.com>
-References: <20240430140010.5005-1-praveen.kannoju@oracle.com>
-	<20240501151251.2eccb4d0@kernel.org>
-	<SA1PR10MB644567B49D44BA641CF63E828C1F2@SA1PR10MB6445.namprd10.prod.outlook.com>
+	s=arc-20240116; t=1714766287; c=relaxed/simple;
+	bh=GxOghFVCZOu1BSfEKDJHdFXujzxM0Vhi46jNlkXNViI=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=BdYUY7uVstJMo52McjZW/4HhywUgjcq8ybKYqdjbm4F5WmqgXrR7AauhGnl0kf05qv+uHRnof60yJF2H53ZyWx5tfpLiHAs8Xx3013tjOq82Powpg9yZ5tBEAdnK5g8msmym25vcAm1hi2DDLAIh/NEWXLvybCo/KphMy2kjDh8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-7ded5e00bf0so5450139f.0
+        for <netdev@vger.kernel.org>; Fri, 03 May 2024 12:58:05 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714766285; x=1715371085;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=pwVY/fyH1gQuGakUUTvfCy/Q1T0f0xT1xNncswAUms0=;
+        b=DkLl9Esded/vpRQo82KUCCBCUKxHUnB8n6OpR4+FzRY158WJCWPxzxCD3p5Y8A5DU8
+         kFWqaGaAefPDMOmOpK8QsNpFkO53XofxC/HwVkkPhOihw8yG5zMu+nawkr+Oa7U+zMaY
+         C3lN+FRAMXt8h2jNp658DFA2zotTsbPL+jcKymN5ew4Seig0FggngG1XVUoQZkQFnFtN
+         ncQ0Ko1UE++J9wxC/k5emDFT1zDC5koxwQJPxSBsmJ6l6EMGh4VO91KtzSzF5uCkqxJt
+         Zk4UfawLzfiQ6jMo5l1yXNQLZHTdlxfpAdvxzaul30kD0m/tmL26+oI0TW8UyMW0nCBR
+         Seog==
+X-Forwarded-Encrypted: i=1; AJvYcCUz5twE3QgMMh4zwTmoefTJ4sShyvj2c4SZTikC1omOS1QSZykCEc14N3OKU6Ph+U+l+Z/WCp6U3iL2ZlRiSB0KhbhoDWYc
+X-Gm-Message-State: AOJu0Yw9coVo/yW7y8wQeHetS6ReJj116MW1Zs4hJR9vaJ7utcb1sFFK
+	iOrlUNPkG/+2N5iwAD7Prb0vV+sVqxZLoU4J+e9ST1IQr1tjrqK5+CuAdqY6wac0VE6Zjrz7zuF
+	G7McRLKgjLcTnU/psEZCNikMOQ6pDcU5rklaibmRevh6UphPg8LT/Dn4=
+X-Google-Smtp-Source: AGHT+IFsKhYlfy6o3M/ol0YgBhmeqITegGAPVwX3qSt2L72wwyPU5neB1NYYig825a03FvrKiVlSZ/AuOfzjIlZAaX292wXvouR3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a05:6e02:218d:b0:36c:307b:7f08 with SMTP id
+ j13-20020a056e02218d00b0036c307b7f08mr196694ila.0.1714766283713; Fri, 03 May
+ 2024 12:58:03 -0700 (PDT)
+Date: Fri, 03 May 2024 12:58:03 -0700
+In-Reply-To: <00000000000022a23c061604edb3@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000036c3d90617922353@google.com>
+Subject: Re: [syzbot] [kasan?] [mm?] INFO: rcu detected stall in __run_timer_base
+From: syzbot <syzbot+1acbadd9f48eeeacda29@syzkaller.appspotmail.com>
+To: akpm@linux-foundation.org, brauner@kernel.org, davem@davemloft.net, 
+	dvyukov@google.com, elver@google.com, glider@google.com, hdanton@sina.com, 
+	jhs@mojatatu.com, kasan-dev@googlegroups.com, keescook@chromium.org, 
+	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-mm@kvack.org, luyun@kylinos.cn, netdev@vger.kernel.org, 
+	pctammela@mojatatu.com, syzkaller-bugs@googlegroups.com, victor@mojatatu.com, 
+	viro@zeniv.linux.org.uk, vladimir.oltean@nxp.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, 3 May 2024 14:28:13 +0000 Praveen Kannoju wrote:
-> > >  				txq = netdev_get_tx_queue(dev, i);
-> > >  				trans_start = READ_ONCE(txq->trans_start);
-> > > -				if (netif_xmit_stopped(txq) &&
-> > > -				    time_after(jiffies, (trans_start +
-> > > -							 dev->watchdog_timeo))) {
-> > > -					timedout_ms = jiffies_to_msecs(jiffies - trans_start);
-> > > -					atomic_long_inc(&txq->trans_timeout);
-> > > -					break;
-> > > +				if (netif_xmit_stopped(txq)) {  
-> > 
-> > please use continue instead of adding another indentation level  
-> 
-> We need to take decision on whether to break out of loop or modify "oldest_start" only when
-> Queue is stopped. Hence one more level of indentation is needed. Can you please elaborate
-> on using "continue" in existing condition instead of adding a new indentation level.
+syzbot has bisected this issue to:
 
-If the queue is not stopped, continue. Split the condition into
-multiple ifs.
+commit da71714e359b64bd7aab3bd56ec53f307f058133
+Author: Jamal Hadi Salim <jhs@mojatatu.com>
+Date:   Tue Aug 22 10:12:31 2023 +0000
 
-> > > +								   dev->watchdog_timeo))) {
-> > > +						timedout_ms = jiffies_to_msecs(current_jiffies -
-> > > +										trans_start);
-> > > +						atomic_long_inc(&txq->trans_timeout);
-> > > +						break;
-> > > +					}
-> > > +					next_check = trans_start + dev->watchdog_timeo -
-> > > +									current_jiffies;  
-> > 
-> > this will give us "next_check" for last queue. Let's instead find the oldest trans_start in the loop. Do:
-> > 
-> > 		unsigned long oldest_start = jiffies;
-> > 
-> > then in the loop:
-> > 
-> > 		oldest_start = min(...)
+    net/sched: fix a qdisc modification with ambiguous command request
 
-BTW, the min() I suggested here needs to be a if (time_after(...)),
-we can't use bare min() to compare jiffies, because they may wrap.
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=13b9b317180000
+start commit:   fe46a7dd189e Merge tag 'sound-6.9-rc1' of git://git.kernel..
+git tree:       upstream
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=1079b317180000
+console output: https://syzkaller.appspot.com/x/log.txt?x=17b9b317180000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=fe78468a74fdc3b7
+dashboard link: https://syzkaller.appspot.com/bug?extid=1acbadd9f48eeeacda29
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16435913180000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=111600cb180000
+
+Reported-by: syzbot+1acbadd9f48eeeacda29@syzkaller.appspotmail.com
+Fixes: da71714e359b ("net/sched: fix a qdisc modification with ambiguous command request")
+
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
