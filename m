@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-93157-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93154-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D44D88BA4F6
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 03:40:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 199418BA4F4
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 03:40:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8A50E1F2172B
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 01:40:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A6ADA2847FD
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 01:40:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97930101F2;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 860FDF4E2;
 	Fri,  3 May 2024 01:40:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F+/SUTZA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AunAIK2Y"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69396E556;
-	Fri,  3 May 2024 01:40:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 620E6CA7D
+	for <netdev@vger.kernel.org>; Fri,  3 May 2024 01:40:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714700429; cv=none; b=JgJdnbRYhnTMebZfuvxWE2+vnf6jXBL+4SE1jvKaPGd6oQQEp6JNN6KIqQNvk9+gFNXanQBYvAdMX7C4SaQXjaDpyhL7DE7H+XjpLRQVdUUvB+F3X2KwmG/TOIqmQJ+Dv2O3olMEHxQDaQvg5PlO4SxjnZHcGrvtbBUEjMVLx68=
+	t=1714700429; cv=none; b=b64QJJIeq3T7+pdFALaekcJ6LkweNWTLCTt2EOMElzuc2AemUMo2SoI0s0xnpfs/v9k6aXDLRWWDn+m66ont4iWlbMjDEDMqm9jVXl6hHwp9fXfLduWE17aMJ4sEAyfa00FtJt+zBYldzbPe9IqbyqBorJKYjPt5hzYfpYT1SJ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1714700429; c=relaxed/simple;
-	bh=APb8kPNe4Hg1SPW8kYNVM5C42jOxnKGFjcGj9GeVUdw=;
+	bh=qi82nY3X6Z2B6UAdNKNr8Yenqw6ox/QtLkt4GnbAgkY=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=CbfJCxElx3SLc1lK815DOaeCW7JbQoINpyfyWjZNNUuwoB8LLXNK8KOIB9dzAFwxhxRPHmnI/7kjJMPJhhYtT+y5t6/zWL3huKha4hFLCfC3e3h1Fmzpuj3Fg+gy6vbIcH3gp4KcjrKxQx1Wp9kszP5affY7UKYsAhaBJKltvT8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F+/SUTZA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 1132BC4AF1C;
-	Fri,  3 May 2024 01:40:29 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=G0pZYVzZ1OoIFSvgpTwp3yI23k2ow1TWtu8xzSjZ76HYE0lum4EaYywXg20GZ9IMSpC5x7vhklQaLxyYJ3rEPQOE/CcLAGsOW4KgvvfVkFdIkSI6DLkXq8AJLf/ClSS1MQNCwGlRH7AY3QTzahvvEENlK2IFIKeOCXRhA4cfwsc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AunAIK2Y; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id E36EBC32789;
+	Fri,  3 May 2024 01:40:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714700429;
-	bh=APb8kPNe4Hg1SPW8kYNVM5C42jOxnKGFjcGj9GeVUdw=;
+	s=k20201202; t=1714700428;
+	bh=qi82nY3X6Z2B6UAdNKNr8Yenqw6ox/QtLkt4GnbAgkY=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=F+/SUTZAUlmmE5JAdyzW7f/nVZlsiR6zLrhUmNbcPI2goVXR3moqhcYu+G8akZ0iT
-	 Z41T1PiT/WVO0Tbe+TOi9tkcs4D3/m2DwSMdwHV1KjwCKzOopoodnirjLVfdXVyNfJ
-	 pkBpC61CSQWs5+ZlkbJ/8jwrbKvksco6COy3xgzwv5URemyL5JWO3R0/dy6LNS3g/W
-	 x94R9U5cOS/dTJBYuccn6MjFWd1NUwClV/1jsBIi8REBnYozYjypMDep4ykBCwNM8j
-	 bdV2AmecaK3yXZEN+V2JuHZKaSxcEybPo9Cga6dE6BgvwBcrNKUdF+pKkiBNk2YtYI
-	 uO0wIN5122uJg==
+	b=AunAIK2YrIdooT7gl4uHciRDbiZgYvTdOC7HN1P84PKZmfullrSeooz312njqon+/
+	 TYghJULY/LvofFERQbM7Dw05MRlur3kILPMpEEHnXi5lTFcd969W7J4bMuAy7FYJ+n
+	 Z6or/OvTxBH7pGLGT4LSwdP7dKhvEzfoPAUgBMGEYLvljJzuMxWzU1lDuwQpn114/z
+	 azFeJSv3kcSNtajmwsbhMPilQ1gPEUxd8F0Qwxcs9OBzclh+zJWfhffIqg4nT9v/kv
+	 E4edfsydOspH7hTpf1e7dJQkXNd5+brMn1RdJmaq9b08gJWtYqESzFc6BeiI8aPM1Z
+	 PegpebRjnyUoA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id ED771C4333E;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D281FC43335;
 	Fri,  3 May 2024 01:40:28 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,39 +52,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH RESEND net-next v5] IB/hfi1: allocate dummy net_device
- dynamically
+Subject: Re: [PATCH net-next] selftests: net: py: check process exit code in bkg()
+ and background cmd()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171470042896.13840.3413595720317631413.git-patchwork-notify@kernel.org>
+ <171470042885.13840.9993944325508444516.git-patchwork-notify@kernel.org>
 Date: Fri, 03 May 2024 01:40:28 +0000
-References: <20240430162213.746492-1-leitao@debian.org>
-In-Reply-To: <20240430162213.746492-1-leitao@debian.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: kuba@kernel.org, davem@davemloft.net, pabeni@redhat.com,
- edumazet@google.com, dennis.dalessandro@cornelisnetworks.com, jgg@ziepe.ca,
- leon@kernel.org, netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-kernel@vger.kernel.org
+References: <20240502025325.1924923-1-kuba@kernel.org>
+In-Reply-To: <20240502025325.1924923-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, willemb@google.com
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 30 Apr 2024 09:22:11 -0700 you wrote:
-> Embedding net_device into structures prohibits the usage of flexible
-> arrays in the net_device structure. For more details, see the discussion
-> at [1].
+On Wed,  1 May 2024 19:53:25 -0700 you wrote:
+> We're a bit too loose with error checking for background
+> processes. cmd() completely ignores the fail argument
+> passed to the constructor if background is True.
+> Default to checking for errors if process is not terminated
+> explicitly. Caller can override with True / False.
 > 
-> Un-embed the net_device from struct hfi1_netdev_rx by converting it
-> into a pointer. Then use the leverage alloc_netdev() to allocate the
-> net_device object at hfi1_alloc_rx().
+> For bkg() the processing step is called magically by __exit__
+> so record the value passed in the constructor.
 > 
 > [...]
 
 Here is the summary with links:
-  - [RESEND,net-next,v5] IB/hfi1: allocate dummy net_device dynamically
-    https://git.kernel.org/netdev/net-next/c/1c8f43f477d9
+  - [net-next] selftests: net: py: check process exit code in bkg() and background cmd()
+    https://git.kernel.org/netdev/net-next/c/e1bb5e65de83
 
 You are awesome, thank you!
 -- 
