@@ -1,95 +1,82 @@
-Return-Path: <netdev+bounces-93362-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93363-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4DD668BB4CE
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 22:25:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE51F8BB4D0
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 22:25:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ED340286A69
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 20:25:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 09E8A1C23114
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 20:25:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27EC5159209;
-	Fri,  3 May 2024 20:25:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A734159218;
+	Fri,  3 May 2024 20:25:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="CbY3QYaq"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b4/LqMqf"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2069.outbound.protection.outlook.com [40.107.236.69])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f42.google.com (mail-ot1-f42.google.com [209.85.210.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F4A2158DC0
-	for <netdev@vger.kernel.org>; Fri,  3 May 2024 20:25:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.69
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714767918; cv=fail; b=sAkJ4ANEB4qpAQCJOfidFMP0Mn/IL6qzgYAOEvRAfvYvWusUoMv6yTUeOfJke6rRe/dUEKHaSQ0NhXFVwOxQDiAg2m+iYFoXfGjIHoc/5m/8rMW2qtbaSd6yzSL592S5lSUEHxC3gf3QIl1ipS+SXXsje6Ev9d8Rdka87wzvgnI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714767918; c=relaxed/simple;
-	bh=0Ts2WNzVC8WO5gSsjMbGsZrTBumQhTX/cnFj/kGG160=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=D7MdTFmHvIwrhb/SZP9+TpGGZBWB1sRfoFWjh8Wvg8TEmm0APBc+hHTwAjvXA6hnm5o4u3h3vy4cDSikIETAQ68pMtxr3S6KtUkvbEbrB/eQMDQYo0F0vrgbwDdf6tBPw8f84obd5hKQAyf7RkIG5I9T9we1iXnlDQCEETC+kas=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=CbY3QYaq; arc=fail smtp.client-ip=40.107.236.69
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=FAYqaQk6eOJozdsT8igQC3NRBkG0RLQBoibK6ubskyVmpYI6bp7FBJCXMyVDqQ8My0LJuFKK1ifUm5KDCRoms3t3kdeafBq/M/jjrR5ThVk0uIpEHg1ebF08BkaS237Nt+mLGt2CeU+4NcBao12PwQ9xcWHu7TclhaH3qwII6CGR0hP2GLM0vsQywinFEcYGLEJk5jJd6pd3yDGg/P36jijfK4j8u5f0phgmEuExcFs4s1L9naP1icegykxKcf1pVodxmS7UkqC4MQDS7aoKNP6n8aMJr5+Gh0uAh8aBMm0ij8OmQ+G5VVtDMD7UxEKWzMWFxfEeGitmbcHTL4q59A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ICKA/sJ1pDK6Be1rmZXVmAgMOusoM/v6AkqMs6trNsk=;
- b=cnXzZtEuW8NDR3CxZDzkhJWEipz6fAESzMiJJ3L7o/RgYTdox+270KPYfjlgpxcJzBXj/spmIFjk/cZMMCVnNQJYsy37msjpIkFmiV8acFur/6oraPI3i6NoYQOx448Jh3PeEQ3IM/z22JhY4jjnG2OA/6ELSAXzvPBPt4d9r6l92AUmbogz5PDr1CyEsXXoL7i7Ur4mTLwlGUFIJ2Nt9oVVEHX282LMmqzucpsChWpeS9ca3sTU5KXLyWy2EZdtuaEIc8V7F29kMCgvk615jdyiFXjuBb1A4H0hD9ovIv6eQHQntYbBJRbu6+WS7eiT2AfalWolZ+jR1ok+U2AI3Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.118.232) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ICKA/sJ1pDK6Be1rmZXVmAgMOusoM/v6AkqMs6trNsk=;
- b=CbY3QYaq8z0jl2neayspLCXBgyCETqxAAlFXipq1iw6SxLc25G/XgStwvBiJz6ipNhG1U1XBefVber50U/6fji0COFmjDCEOQRzvowWzXINGYnL6Hk+5J56z2CQjC5ad2jgR2p/R6JTm5/q6x9lUb5URM02O1ms620rdv37KsvECNt3jgLNbPIooEjgkCPiAOiQX6LusJrKUE41NEbrxjrRw1d0KtzSIPR9zMzJneYt8PNLUlrrsvYOdbmKcSPXs+B1Qp4YfY25XC6EQatc9Hrg1huEsaDmaX87oEgzil9uTQd2Ow+Q/Kk4Lr5LKoJ5sZUPslUVnxUBOQ0iWMay9Iw==
-Received: from PH0PR07CA0044.namprd07.prod.outlook.com (2603:10b6:510:e::19)
- by PH7PR12MB8593.namprd12.prod.outlook.com (2603:10b6:510:1b1::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.30; Fri, 3 May
- 2024 20:25:09 +0000
-Received: from SN1PEPF00036F40.namprd05.prod.outlook.com
- (2603:10b6:510:e:cafe::82) by PH0PR07CA0044.outlook.office365.com
- (2603:10b6:510:e::19) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.30 via Frontend
- Transport; Fri, 3 May 2024 20:25:09 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.118.232 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.118.232) by
- SN1PEPF00036F40.mail.protection.outlook.com (10.167.248.24) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7544.18 via Frontend Transport; Fri, 3 May 2024 20:25:09 +0000
-Received: from drhqmail201.nvidia.com (10.126.190.180) by mail.nvidia.com
- (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Fri, 3 May 2024
- 13:24:56 -0700
-Received: from drhqmail202.nvidia.com (10.126.190.181) by
- drhqmail201.nvidia.com (10.126.190.180) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Fri, 3 May 2024 13:24:56 -0700
-Received: from vdi.nvidia.com (10.127.8.11) by mail.nvidia.com
- (10.126.190.181) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Fri, 3 May 2024 13:24:55 -0700
-From: Daniel Jurgens <danielj@nvidia.com>
-To: <netdev@vger.kernel.org>
-CC: <mst@redhat.com>, <jasowang@redhat.com>, <xuanzhuo@linux.alibaba.com>,
-	<virtualization@lists.linux.dev>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<jiri@nvidia.com>, Daniel Jurgens <danielj@nvidia.com>
-Subject: [PATCH net-next v6 6/6] virtio_net: Remove rtnl lock protection of command buffers
-Date: Fri, 3 May 2024 23:24:45 +0300
-Message-ID: <20240503202445.1415560-7-danielj@nvidia.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20240503202445.1415560-1-danielj@nvidia.com>
-References: <20240503202445.1415560-1-danielj@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54089158D6C;
+	Fri,  3 May 2024 20:25:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.42
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1714767919; cv=none; b=pbq5mE9Oq6fscPJ8/qpd64H9rnBWxo7F8Sq4hCMZuOCcAd4WTyIkjC5/AjlnSl9WWnvr7/fBD2lo57OdiGlNR3fljJfEFUgmI03j99B10lSw8jFlA/PQ9iIQVufNMuIkGAxK2h8/cpI2whVEPZHxFc50YGZHVy7xz68A2uYBIHA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1714767919; c=relaxed/simple;
+	bh=i0C5xpWD5f2z/IYxX3nNRhYxI2NXVo00ssiCrH00ejU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jC7RWnL1gFtXiWBQOlYs5DCEF+uUNyONpio/CmUyFBDYWChI4IDlcwCBQM6qli2psC3Dn5iI0Yzhh1ytwF4h6J0HiHO8z6ZiLvnpwYbkJEfo9uW2UsLjAhCoY5aYOD977+07fS9uiafbMba0DuUu+4S2mIOh+bd65/nepRAlLxk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=b4/LqMqf; arc=none smtp.client-ip=209.85.210.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ot1-f42.google.com with SMTP id 46e09a7af769-6ee266e2999so28115a34.2;
+        Fri, 03 May 2024 13:25:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1714767916; x=1715372716; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=GoBSzwJr6dBy8LeIYFsSYiftBkef0PBvl0Rps45KpJ0=;
+        b=b4/LqMqf06B9ubElI0qioWHWUDa+v9zRw1hUgkEPwKr6tGyh4u7/+Y9sPk5Cmp71ME
+         IqiGyrnVea1FQjMwWjiUvy21x1gXYTmRNKwJO1KdlXkbLm3sfRfNaGxdOW7EAfHmS+Sq
+         zyXX5Vc7/8HtgTrllY+2ul8z0dGAZxEsxXWa8rfWBFParpBCXLU/8jet24Oby5jw9ESl
+         PJETPALGRuHlxWuLrJ4Piv7TSJw8Y76NZ4SV0kRIjy/QMqhPJbE2T5HN8gkysseUy84X
+         HLnvJXvBnynRrFrBVwVynlGuJxEBw99rnjJEjK7QzXZXz6GMtFBcKcgiozBsFt30/wzT
+         17YQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714767916; x=1715372716;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=GoBSzwJr6dBy8LeIYFsSYiftBkef0PBvl0Rps45KpJ0=;
+        b=WtRndQbSXl+yEyKyI+TeNl8TGFalkPSgx0FMqOI7+qK0pMO51QD/4BIKTmlGrW3ufs
+         Rg5S7paG3DbICLtiQtMPVDXhknUgBegpPV98Msw0IvFVjwJsMBvj8pThp4c4cCeUE8tZ
+         ea72OJRpLeuGP5e+rtN8jMlGkD6NvonwloziXYx7LUMs4M+NNUNguxsNiBFrg2uMVEqa
+         GqO5cDnWM+dg6haopldGHbDSpuJCEbbWnIFMsusd3/q9QfpPYMCnELeQOGZSoGXyAGCz
+         ke355rlutYgeEjsBb7BVHgH46dd1Nf1NGrjKMOT87xViJDpAYI//NgmgwV9Iovt/x1B+
+         ys0A==
+X-Forwarded-Encrypted: i=1; AJvYcCX2lU6EgW20PRd0mzasar1O83AkJjX6ZU4eqWmjeczZvUCp2Xmgt6Z7UIB1e8msHiBmwCDZPKrqImPep0BWSbWSkAwwA9YPZR066q7oj5iW
+X-Gm-Message-State: AOJu0YzvgWqaxpZiVhqD24/uhgXyB0aS+sT+TPSsu2h4Hvio5/NhAFHq
+	nLiu6uj5mauXLC6eOA9s9eoDO2pAanHUKjQziOewq5sJShRqVkeuAqCaOw==
+X-Google-Smtp-Source: AGHT+IEEn5HB1dWLopB8IqW/ss5GWkMtvHuTbuQiBF1VE+R57i1wK2a9qmw05eyHpr5q1oZiTVHF4w==
+X-Received: by 2002:a9d:3e4c:0:b0:6eb:7c52:fd19 with SMTP id h12-20020a9d3e4c000000b006eb7c52fd19mr4146101otg.16.1714767916222;
+        Fri, 03 May 2024 13:25:16 -0700 (PDT)
+Received: from willemb.c.googlers.com.com (164.146.150.34.bc.googleusercontent.com. [34.150.146.164])
+        by smtp.gmail.com with ESMTPSA id oq32-20020a05620a612000b007907d4bbeccsm1517932qkn.43.2024.05.03.13.25.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 03 May 2024 13:25:15 -0700 (PDT)
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	linux-kselftest@vger.kernel.org,
+	Willem de Bruijn <willemb@google.com>
+Subject: [PATCH net-next v2] selftests: drv-net: add checksum tests
+Date: Fri,  3 May 2024 16:24:49 -0400
+Message-ID: <20240503202511.4044515-1-willemdebruijn.kernel@gmail.com>
+X-Mailer: git-send-email 2.45.0.rc1.225.g2a3ae87e7f-goog
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -97,146 +84,262 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN1PEPF00036F40:EE_|PH7PR12MB8593:EE_
-X-MS-Office365-Filtering-Correlation-Id: 983360f0-fa89-4da9-b5a8-08dc6baf20c5
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230031|36860700004|376005|1800799015;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?vSd83jbahmPwusISXnWxqnoSHSLLMV2QXPjjoPYUGNT9VLDMK0K7+N8FPDA5?=
- =?us-ascii?Q?Sk9Kn8zu0mxsAT2UgUzBqyNorzXTTw8WfDv0Wl0sNKu4wBfxb1vRPO7WE/qw?=
- =?us-ascii?Q?9VAhI+93IwalOCcBxC7eAnzQ0YglmXwOi3leceE1EOPeIRsb0FRHTEoEpxoC?=
- =?us-ascii?Q?Q/wDQJa09NeD7oTWYgzqYaQLX6vR09a56j5iRbE5S5t4nqTmsaQ7kB4SMrb7?=
- =?us-ascii?Q?U5ceHc/Wd/ijetCL6YILdp/XjhiFe48A/KSixebG9Jf3UMpFwE7WS9jda2rG?=
- =?us-ascii?Q?JGxcETyX0GjsUT2QriZdpxShPep2Vh7/MAOBb+OI1Qr7OcrckG66ddEGl3oN?=
- =?us-ascii?Q?xFOeFTDKuJvv9vYZa90DTNh/BmETi0KAGGmtKBWxa8LkntGrSB/CDyzFfiJP?=
- =?us-ascii?Q?3jei+48NgveAH0BKb22NHCFL5ifpOsHsg3ZiOjet5gGeErQ37H2qY+9j1SpA?=
- =?us-ascii?Q?8VGhcsRxuLPDkLUk4+IZlxfMWf2GTNU7u4+cgxA51A6+RaAzFTHIXxcJgGpp?=
- =?us-ascii?Q?8FAGMCKcH9WAkbYZHluIm4X+56lCKlHpm0N7kiRL24tfGS/ZB57PBV73Zn8M?=
- =?us-ascii?Q?ankCyOlO9FDsj0P4keU6mXk8Uy++skh7wftE6WfFQgcqFg+tV4edwv/sUUEO?=
- =?us-ascii?Q?40J938gBUm6m+MSNdi8ASysoXGzdn7TkUZSgCZu+PsWhiY6EDZBbHh8xEYL3?=
- =?us-ascii?Q?Bw36Ky8HRWwEaGSFJUfxA18TpWuaH7kQdEgm6zzIyEmFJev6ewNEY62k4FTN?=
- =?us-ascii?Q?H8heLfdANlbk2uCgHUjPdSwnV2JkU5sHMq+OAGK0lFgjdg3vnLcMrYy2yeMe?=
- =?us-ascii?Q?+8WyToFr9Y96+vXgYo+LNfGgUJ30v3pxxoDyatOKMgqZnY/XuW8kIGbEdrFu?=
- =?us-ascii?Q?BD2kfd2YFIH57qHv9nZk+hlYPEjcApJ1YnrMlm/tYBAvwlMKO/Z93mrrVgro?=
- =?us-ascii?Q?aPfv3xYDol1/3JGqIyFsXgO81JugP4g0UB1w8p3z5RLK16hP4scji02oLWgI?=
- =?us-ascii?Q?DzOo2FNU8YQQF8imsew2Ew++QbQ/hyWRpHTje7KAqc3gY8sk3d7YaZbTALSh?=
- =?us-ascii?Q?nQu5HYgVbEvyrrKF5WR5DXdBf8qMEBcghe3dya43NE4nZxGMSXVw0M3w/Oxr?=
- =?us-ascii?Q?rfJeS3KJmuuDHOU+PAlAJjmOrZPBZ3JWQhpCN953sYOcG0iQjionH5wPS+Rv?=
- =?us-ascii?Q?8CF/fm6bK5H4Oulmyew4naE8RkW6YDkpHQ6lvVdiVrxZhOUPfaXiNjy00LJG?=
- =?us-ascii?Q?gHnD17aJr+ASMG4S+SVyDpA3eylD2sDbbY0iKIUrSsVwTShZGHxjAPz/cGvM?=
- =?us-ascii?Q?emyrvlTVWjF9vT5D+CkSPgMT3wJcXVESvDunMbB3dDp/SaKLA9OCVFJQ56NG?=
- =?us-ascii?Q?kvHT3quNRaRhvJwiCx/yoY+vRjfI?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230031)(36860700004)(376005)(1800799015);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 May 2024 20:25:09.2107
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 983360f0-fa89-4da9-b5a8-08dc6baf20c5
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SN1PEPF00036F40.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB8593
 
-The rtnl lock is no longer needed to protect the control buffer and
-command VQ.
+From: Willem de Bruijn <willemb@google.com>
 
-Signed-off-by: Daniel Jurgens <danielj@nvidia.com>
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+Run tools/testing/selftest/net/csum.c as part of drv-net.
+This binary covers multiple scenarios, based on arguments given,
+for both IPv4 and IPv6:
+
+- Accept UDP correct checksum
+- Detect UDP invalid checksum
+- Accept TCP correct checksum
+- Detect TCP invalid checksum
+
+- Transmit UDP: basic checksum offload
+- Transmit UDP: zero checksum conversion
+
+The test direction is reversed between receive and transmit tests, so
+that the NIC under test is always the local machine.
+
+In total this adds up to 12 testcases, with more to follow. For
+conciseness, I replaced individual functions with a function factory.
+
+Also detect hardware offload feature availability using Ethtool
+netlink and skip tests when either feature is off. This need may be
+common for offload feature tests and eventually deserving of a thin
+wrapper in lib.py.
+
+Missing are the PF_PACKET based send tests ('-P'). These use
+virtio_net_hdr to program hardware checksum offload. Which requires
+looking up the local MAC address and (harder) the MAC of the next hop.
+I'll have to give it some though how to do that robustly and where
+that code would belong.
+
+Tested:
+
+        make -C tools/testing/selftests/ \
+                TARGETS="drivers/net drivers/net/hw" \
+                install INSTALL_PATH=/tmp/ksft
+        cd /tmp/ksft
+
+	sudo NETIF=ens4 REMOTE_TYPE=ssh \
+		REMOTE_ARGS="root@10.40.0.2" \
+		LOCAL_V4="10.40.0.1"
+		REMOTE_V4="10.40.0.2" \
+		./run_kselftest.sh -t drivers/net/hw:csum.py
+
+Signed-off-by: Willem de Bruijn <willemb@google.com>
+
 ---
- drivers/net/virtio_net.c | 24 ++++--------------------
- 1 file changed, 4 insertions(+), 20 deletions(-)
 
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index a7cbfa7f5311..218a446c4c27 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -2824,14 +2824,12 @@ static void virtnet_stats(struct net_device *dev,
+Changes
+  - v1->v2
+      - remove dependency on tools/testing/selftests/net: move csum
+      - remove test output from git commit message:
+        has noisy (expected) failures on test platform after bkg changes
+---
+ .../testing/selftests/drivers/net/hw/Makefile |   1 +
+ .../testing/selftests/drivers/net/hw/csum.py  | 114 ++++++++++++++++++
+ tools/testing/selftests/net/.gitignore        |   1 -
+ tools/testing/selftests/net/Makefile          |   1 -
+ tools/testing/selftests/net/lib/.gitignore    |   2 +
+ tools/testing/selftests/net/lib/Makefile      |   7 ++
+ tools/testing/selftests/net/{ => lib}/csum.c  |   0
+ 7 files changed, 124 insertions(+), 2 deletions(-)
+ create mode 100755 tools/testing/selftests/drivers/net/hw/csum.py
+ create mode 100644 tools/testing/selftests/net/lib/.gitignore
+ rename tools/testing/selftests/net/{ => lib}/csum.c (100%)
+
+diff --git a/tools/testing/selftests/drivers/net/hw/Makefile b/tools/testing/selftests/drivers/net/hw/Makefile
+index 1dd732855d76..4933d045ab66 100644
+--- a/tools/testing/selftests/drivers/net/hw/Makefile
++++ b/tools/testing/selftests/drivers/net/hw/Makefile
+@@ -1,6 +1,7 @@
+ # SPDX-License-Identifier: GPL-2.0+ OR MIT
  
- static void virtnet_ack_link_announce(struct virtnet_info *vi)
- {
--	rtnl_lock();
- 	if (!virtnet_send_command(vi, VIRTIO_NET_CTRL_ANNOUNCE,
- 				  VIRTIO_NET_CTRL_ANNOUNCE_ACK, NULL))
- 		dev_warn(&vi->dev->dev, "Failed to ack link announce.\n");
--	rtnl_unlock();
- }
+ TEST_PROGS = \
++	csum.py \
+ 	devlink_port_split.py \
+ 	ethtool.sh \
+ 	ethtool_extended_state.sh \
+diff --git a/tools/testing/selftests/drivers/net/hw/csum.py b/tools/testing/selftests/drivers/net/hw/csum.py
+new file mode 100755
+index 000000000000..7e3a955fc426
+--- /dev/null
++++ b/tools/testing/selftests/drivers/net/hw/csum.py
+@@ -0,0 +1,114 @@
++#!/usr/bin/env python3
++# SPDX-License-Identifier: GPL-2.0
++
++"""Run the tools/testing/selftests/net/csum testsuite."""
++
++from os import path
++
++from lib.py import ksft_run, ksft_exit, KsftSkipEx
++from lib.py import EthtoolFamily, NetDrvEpEnv
++from lib.py import bkg, cmd, wait_port_listen
++
++def test_receive(cfg, ipv4=False, extra_args=None):
++    """Test local nic checksum receive. Remote host sends crafted packets."""
++    if not cfg.have_rx_csum:
++        raise KsftSkipEx(f"Test requires rx checksum offload on {cfg.ifname}")
++
++    if ipv4:
++        ip_args = f"-4 -S {cfg.remote_v4} -D {cfg.v4}"
++    else:
++        ip_args = f"-6 -S {cfg.remote_v6} -D {cfg.v6}"
++
++    rx_cmd = f"{cfg.bin_local} -i {cfg.ifname} -n 100 {ip_args} -r 1 -R {extra_args}"
++    tx_cmd = f"{cfg.bin_remote} -i {cfg.ifname} -n 100 {ip_args} -r 1 -T {extra_args}"
++
++    with bkg(rx_cmd, exit_wait=True):
++        wait_port_listen(34000, proto='udp')
++        cmd(tx_cmd, host=cfg.remote)
++
++
++def test_transmit(cfg, ipv4=False, extra_args=None):
++    """Test local nic checksum transmit. Remote host verifies packets."""
++    if not cfg.have_tx_csum:
++        raise KsftSkipEx(f"Test requires tx checksum offload on {cfg.ifname}")
++
++    if ipv4:
++        ip_args = f"-4 -S {cfg.v4} -D {cfg.remote_v4}"
++    else:
++        ip_args = f"-6 -S {cfg.v6} -D {cfg.remote_v6}"
++
++    # Cannot randomize input when calculating zero checksum
++    if extra_args != "-U -Z":
++        extra_args += " -r 1"
++
++    rx_cmd = f"{cfg.bin_remote} -i {cfg.ifname} -L 1 -n 100 {ip_args} -R {extra_args}"
++    tx_cmd = f"{cfg.bin_local} -i {cfg.ifname} -L 1 -n 100 {ip_args} -T {extra_args}"
++
++    with bkg(rx_cmd, host=cfg.remote, exit_wait=True):
++        wait_port_listen(34000, proto='udp', host=cfg.remote)
++        cmd(tx_cmd)
++
++
++def test_builder(name, cfg, ipv4=False, tx=False, extra_args=""):
++    """Construct specific tests from the common template.
++
++       Most tests follow the same basic pattern, differing only in
++       Direction of the test and optional flags passed to csum."""
++    def f(cfg):
++        if ipv4:
++            cfg.require_v4()
++        else:
++            cfg.require_v6()
++
++        if tx:
++            test_transmit(cfg, ipv4, extra_args)
++        else:
++            test_receive(cfg, ipv4, extra_args)
++
++    if ipv4:
++        f.__name__ = "ipv4_" + name
++    else:
++        f.__name__ = "ipv6_" + name
++    return f
++
++
++def check_nic_features(cfg) -> None:
++    """Test whether Tx and Rx checksum offload are enabled.
++
++       If the device under test has either off, then skip the relevant tests."""
++    cfg.have_tx_csum = False
++    cfg.have_rx_csum = False
++
++    ethnl = EthtoolFamily()
++    features = ethnl.features_get({"header": {"dev-index": cfg.ifindex}})
++    for f in features["active"]["bits"]["bit"]:
++        if f["name"] == "tx-checksum-ip-generic":
++            cfg.have_tx_csum = True
++        elif f["name"] == "rx-checksum":
++            cfg.have_rx_csum = True
++
++
++def main() -> None:
++    with NetDrvEpEnv(__file__, nsim_test=False) as cfg:
++        check_nic_features(cfg)
++
++        cfg.bin_local = path.abspath(path.dirname(__file__) + "/../../../net/lib/csum")
++        cfg.bin_remote = cfg.remote.deploy(cfg.bin_local)
++
++        cases = []
++        for ipv4 in [True, False]:
++            cases.append(test_builder("rx_tcp", cfg, ipv4, False, "-t"))
++            cases.append(test_builder("rx_tcp_invalid", cfg, ipv4, False, "-t -E"))
++
++            cases.append(test_builder("rx_udp", cfg, ipv4, False, ""))
++            cases.append(test_builder("rx_udp_invalid", cfg, ipv4, False, "-E"))
++
++            cases.append(test_builder("tx_udp_csum_offload", cfg, ipv4, True, "-U"))
++            cases.append(test_builder("tx_udp_zero_checksum", cfg, ipv4, True, "-U -Z"))
++
++        ksft_run(cases=cases, args=(cfg, ))
++    ksft_exit()
++
++
++if __name__ == "__main__":
++    main()
+diff --git a/tools/testing/selftests/net/.gitignore b/tools/testing/selftests/net/.gitignore
+index d996a0ab0765..74ae1068229c 100644
+--- a/tools/testing/selftests/net/.gitignore
++++ b/tools/testing/selftests/net/.gitignore
+@@ -2,7 +2,6 @@
+ bind_bhash
+ bind_timewait
+ bind_wildcard
+-csum
+ cmsg_sender
+ diag_uid
+ fin_ack_lat
+diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
+index 5befca249452..052c21438dc4 100644
+--- a/tools/testing/selftests/net/Makefile
++++ b/tools/testing/selftests/net/Makefile
+@@ -81,7 +81,6 @@ TEST_PROGS += test_ingress_egress_chaining.sh
+ TEST_GEN_PROGS += so_incoming_cpu
+ TEST_PROGS += sctp_vrf.sh
+ TEST_GEN_FILES += sctp_hello
+-TEST_GEN_FILES += csum
+ TEST_GEN_FILES += ip_local_port_range
+ TEST_GEN_FILES += bind_wildcard
+ TEST_PROGS += test_vxlan_mdb.sh
+diff --git a/tools/testing/selftests/net/lib/.gitignore b/tools/testing/selftests/net/lib/.gitignore
+new file mode 100644
+index 000000000000..1ebc6187f421
+--- /dev/null
++++ b/tools/testing/selftests/net/lib/.gitignore
+@@ -0,0 +1,2 @@
++# SPDX-License-Identifier: GPL-2.0-only
++csum
+diff --git a/tools/testing/selftests/net/lib/Makefile b/tools/testing/selftests/net/lib/Makefile
+index 48557e6250dd..82c3264b115e 100644
+--- a/tools/testing/selftests/net/lib/Makefile
++++ b/tools/testing/selftests/net/lib/Makefile
+@@ -1,8 +1,15 @@
+ # SPDX-License-Identifier: GPL-2.0
  
--static int _virtnet_set_queues(struct virtnet_info *vi, u16 queue_pairs)
-+static int virtnet_set_queues(struct virtnet_info *vi, u16 queue_pairs)
- {
- 	struct virtio_net_ctrl_mq *mq __free(kfree) = NULL;
- 	struct scatterlist sg;
-@@ -2862,16 +2860,6 @@ static int _virtnet_set_queues(struct virtnet_info *vi, u16 queue_pairs)
- 	return 0;
- }
++CFLAGS =  -Wall -Wl,--no-as-needed -O2 -g
++CFLAGS += -I../../../../../usr/include/ $(KHDR_INCLUDES)
++# Additional include paths needed by kselftest.h
++CFLAGS += -I../../
++
+ TEST_FILES := ../../../../../Documentation/netlink/specs
+ TEST_FILES += ../../../../net/ynl
  
--static int virtnet_set_queues(struct virtnet_info *vi, u16 queue_pairs)
--{
--	int err;
--
--	rtnl_lock();
--	err = _virtnet_set_queues(vi, queue_pairs);
--	rtnl_unlock();
--	return err;
--}
--
- static int virtnet_close(struct net_device *dev)
- {
- 	u8 *promisc_allmulti  __free(kfree) = NULL;
-@@ -3477,7 +3465,7 @@ static int virtnet_set_channels(struct net_device *dev,
- 		return -EINVAL;
++TEST_GEN_FILES += csum
++
+ TEST_INCLUDES := $(wildcard py/*.py)
  
- 	cpus_read_lock();
--	err = _virtnet_set_queues(vi, queue_pairs);
-+	err = virtnet_set_queues(vi, queue_pairs);
- 	if (err) {
- 		cpus_read_unlock();
- 		goto err;
-@@ -4409,9 +4397,6 @@ static void virtnet_rx_dim_work(struct work_struct *work)
- 	struct dim_cq_moder update_moder;
- 	int qnum, err;
- 
--	if (!rtnl_trylock())
--		return;
--
- 	qnum = rq - vi->rq;
- 
- 	mutex_lock(&rq->dim_lock);
-@@ -4431,7 +4416,6 @@ static void virtnet_rx_dim_work(struct work_struct *work)
- 	}
- out:
- 	mutex_unlock(&rq->dim_lock);
--	rtnl_unlock();
- }
- 
- static int virtnet_coal_params_supported(struct ethtool_coalesce *ec)
-@@ -4989,7 +4973,7 @@ static int virtnet_xdp_set(struct net_device *dev, struct bpf_prog *prog,
- 		synchronize_net();
- 	}
- 
--	err = _virtnet_set_queues(vi, curr_qp + xdp_qp);
-+	err = virtnet_set_queues(vi, curr_qp + xdp_qp);
- 	if (err)
- 		goto err;
- 	netif_set_real_num_rx_queues(dev, curr_qp + xdp_qp);
-@@ -5855,7 +5839,7 @@ static int virtnet_probe(struct virtio_device *vdev)
- 
- 	virtio_device_ready(vdev);
- 
--	_virtnet_set_queues(vi, vi->curr_queue_pairs);
-+	virtnet_set_queues(vi, vi->curr_queue_pairs);
- 
- 	/* a random MAC address has been assigned, notify the device.
- 	 * We don't fail probe if VIRTIO_NET_F_CTRL_MAC_ADDR is not there
+ include ../../lib.mk
+diff --git a/tools/testing/selftests/net/csum.c b/tools/testing/selftests/net/lib/csum.c
+similarity index 100%
+rename from tools/testing/selftests/net/csum.c
+rename to tools/testing/selftests/net/lib/csum.c
 -- 
-2.44.0
+2.45.0.rc1.225.g2a3ae87e7f-goog
 
 
