@@ -1,92 +1,153 @@
-Return-Path: <netdev+bounces-93261-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93260-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15B0D8BAD2B
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 15:09:28 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12B3D8BAD23
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 15:06:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 463F71C208DA
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 13:09:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 053BAB2098F
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 13:06:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29B24153833;
-	Fri,  3 May 2024 13:09:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76690152E17;
+	Fri,  3 May 2024 13:06:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (4096-bit key) header.d=ycharbi.fr header.i=@ycharbi.fr header.b="opUPuwgM"
+	dkim=pass (1024-bit key) header.d=ssi.bg header.i=@ssi.bg header.b="YWJ7hn1K"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ycharbi.fr (mail.ycharbi.fr [45.83.229.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mg.ssi.bg (mg.ssi.bg [193.238.174.37])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 138B015358B
-	for <netdev@vger.kernel.org>; Fri,  3 May 2024 13:09:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.83.229.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EED714267;
+	Fri,  3 May 2024 13:06:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.238.174.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714741756; cv=none; b=LLWEVgKUI62KH7zvh6zdRP9n6Av+oqZkNxLND+q92tdRFnKSsUEKYgkTY4LUAJxyTXmW4IXI5NRc72NsNi2ME6MeyoBzveILgL4mURm24Q/vOJ0GD1N7dB74bXCOIN+K9iFXJzE1B6m6S3JH+wGtBBh2cU04imbVRHew0QVwdlA=
+	t=1714741610; cv=none; b=QhIqr96/yqK3nTtq8JhGwHLRZ5gnp69NRnVK9qJKQLC6DJd4B5pxEUmySXWU3qi+a5yD9GzkZd6Rq9f9+NRnF2j/+Am7cm/f6rTNZ4W1H8V3Awtc5FU7oajrEA8rXOvVGnVmjvgXCk9WosEOgp45cw+7f03RlEI8dN6j4DlWwzE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714741756; c=relaxed/simple;
-	bh=MEqUzqDW/TOiMz20Ph7/o+xIaZvFQabwFkxkR6vHIjQ=;
-	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
-	 In-Reply-To:Content-Type; b=l0oSVq0M9RzALgHpzqjnvSAXlSquxRvNiOKf7RM20TVr1dy53klDl/28ZQG7Ox546yzMl7DG8pjO4urEcBGC52uxFjSncjDKcOpg0YHeoZaWpGXJHITocwO3CaUuphxA3Im8wcyqtlqMlBvk0pu8nnkBW8Ke4AcKRwYg+Ic1bIs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ycharbi.fr; spf=pass smtp.mailfrom=ycharbi.fr; dkim=pass (4096-bit key) header.d=ycharbi.fr header.i=@ycharbi.fr header.b=opUPuwgM; arc=none smtp.client-ip=45.83.229.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ycharbi.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ycharbi.fr
-Message-ID: <bf100765-5930-4dd5-9004-aaf7e9f2eaa2@ycharbi.fr>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ycharbi.fr; s=mail;
-	t=1714741261; bh=MEqUzqDW/TOiMz20Ph7/o+xIaZvFQabwFkxkR6vHIjQ=;
-	h=Date:To:Cc:References:Subject:From:In-Reply-To:List-Unsubscribe:
-	 From;
-	b=opUPuwgMYTXpG0KaSvmWRuzl4+ua604kWLHy8R4cAHjCS3IDTPcwjFLkAxSIEOUv6
-	 QYAH6AdjSI4lkqHNN0NjBYLFkRYdDEGusO7GnqSXCpwRu9VU67S2pMv0v79Y9XkBSE
-	 wLGzPpCERbqeVFV5aex9yG8Cv5V+OOOHNT+M4f9E51tZwuRVt06XjlQznUcyR2R3XX
-	 Q2Wi76yVLBYzu58ptALokOyhS7l056QqVvczjxdaJVXzIN5a6+nEuXfqlyGUhb4MQr
-	 PlLUcBF8wPlV3SqL97V6C4OnS9Z+XrA88UM9c/ZM/Nwho08PSDQ/rrftRwZ9CDtWSG
-	 JtyB58yq0Hrcg/SeNRu217/jaQyakwuh7/gIk0AIEYRg5IxDazntccxQb8MdLTR/H/
-	 ErXEnui+gE+ZCcQXUlsMW0IzmQG2rln1kDwAyet2oPgSs4PAp3nVk63SJahmwHhAXw
-	 GlH004LpK2Jve/e3rINPnswjT9X8RzG+g8FA0ms41opRgOFok0bPA9xXOmLFFLceWO
-	 /EW4oX5cI58nkt34MrMAAyoIeg1FDetF0YyecOzvr4EJy2RDqexPitr2LcgIHtAOOf
-	 Z+t9Gunjws0cnGppEahUmMrpnt36zO7BFTpg4cBY/nsCEV8JuhGBipgtW13lLlpNjj
-	 WzG3DowCqmt+M9xDisJoIlB8=
-Date: Fri, 3 May 2024 15:01:00 +0200
+	s=arc-20240116; t=1714741610; c=relaxed/simple;
+	bh=0kB9KsGXFOQAn9WaIfuv4jbNZroARw33YyK+RAm3BLQ=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=iBBw6vIIOdz1kARuHAGuu1Sy9o31forUoWfRPngd4ALGP1ZoCyUnJIxBEuYCnoGlhg1zBhQEeg1UCc5czjuUXm6AbWWeEAMLVh57OSqQKCBVNJR00r5aJj2ZbLitRhL49UoVMnGM0GMCCnWSTgD1MS8iHBoZqPkXO8hcLx4T0S8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ssi.bg; spf=pass smtp.mailfrom=ssi.bg; dkim=pass (1024-bit key) header.d=ssi.bg header.i=@ssi.bg header.b=YWJ7hn1K; arc=none smtp.client-ip=193.238.174.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ssi.bg
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ssi.bg
+Received: from mg.ssi.bg (localhost [127.0.0.1])
+	by mg.ssi.bg (Proxmox) with ESMTP id 88119A436;
+	Fri,  3 May 2024 16:06:39 +0300 (EEST)
+Received: from ink.ssi.bg (ink.ssi.bg [193.238.174.40])
+	by mg.ssi.bg (Proxmox) with ESMTPS;
+	Fri,  3 May 2024 16:06:38 +0300 (EEST)
+Received: from ja.ssi.bg (unknown [213.16.62.126])
+	by ink.ssi.bg (Postfix) with ESMTPSA id 3FFEA9003F2;
+	Fri,  3 May 2024 16:06:34 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=ssi.bg; s=ink;
+	t=1714741595; bh=0kB9KsGXFOQAn9WaIfuv4jbNZroARw33YyK+RAm3BLQ=;
+	h=Date:From:To:cc:Subject:In-Reply-To:References;
+	b=YWJ7hn1KFeLK3QcqPYFmkp0qdYuCvHjowC85pPDI6on/BDmmgNSTJV89+IcfPESoG
+	 pJso8GkiQ5c5wg5bPOuYW0fqAQLzoayqDo29LIAzn5ISYIXM1Fbdiu3UJRu/Qd1RPK
+	 EsDjDXG22jH0l8/7xId8pnT1nKHR3U4tigsLV8aM=
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by ja.ssi.bg (8.17.1/8.17.1) with ESMTP id 443D6Od9049696;
+	Fri, 3 May 2024 16:06:25 +0300
+Date: Fri, 3 May 2024 16:06:24 +0300 (EEST)
+From: Julian Anastasov <ja@ssi.bg>
+To: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
+cc: horms@verge.net.au, netdev@vger.kernel.org, lvs-devel@vger.kernel.org,
+        netfilter-devel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?Q?St=C3=A9phane_Graber?= <stgraber@stgraber.org>,
+        Christian Brauner <brauner@kernel.org>,
+        Pablo Neira Ayuso <pablo@netfilter.org>,
+        Jozsef Kadlecsik <kadlec@netfilter.org>,
+        Florian Westphal <fw@strlen.de>
+Subject: Re: [PATCH net-next v3 2/2] ipvs: allow some sysctls in non-init
+ user namespaces
+In-Reply-To: <20240418145743.248109-2-aleksandr.mikhalitsyn@canonical.com>
+Message-ID: <8e70d6d3-6852-7b84-81b3-5d1a798f224f@ssi.bg>
+References: <20240418145743.248109-1-aleksandr.mikhalitsyn@canonical.com> <20240418145743.248109-2-aleksandr.mikhalitsyn@canonical.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-To: kernel.org-fo5k2w@ycharbi.fr
-Cc: anthony.l.nguyen@intel.com, intel-wired-lan@lists.osuosl.org,
- jesse.brandeburg@intel.com, netdev@vger.kernel.org,
- debian-kernel@lists.debian.org
-References: <8267673cce94022974bcf35b2bf0f6545105d03e@ycharbi.fr>
-Subject: Re: Non-functional ixgbe driver between Intel X553 chipset and Cisco
- switch via kernel >=6.1 under Debian
-Content-Language: fr
-From: kernel.org-fo5k2w@ycharbi.fr
-In-Reply-To: <8267673cce94022974bcf35b2bf0f6545105d03e@ycharbi.fr>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Report: 
-	* -1.0 ALL_TRUSTED Passed through trusted hosts only via SMTP
-	* -0.1 DKIM_VALID_AU Message has a valid DKIM or DK signature from
-	*      author's domain
-	*  0.1 DKIM_SIGNED Message has a DKIM or DK signature, not necessarily
-	*       valid
-	* -0.1 DKIM_VALID_EF Message has a valid DKIM or DK signature from
-	*      envelope-from domain
-	* -0.1 DKIM_VALID Message has at least one valid DKIM or DK signature
+Content-Type: multipart/mixed; boundary="-1463811672-1490811829-1714741586=:48180"
 
-Hello,
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-I have not yet received a reply from you. This problem is blocking many 
-users and is a major handicap when using Intel network cards with X553 
-chips.
+---1463811672-1490811829-1714741586=:48180
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 
-I'm always available to carry out any tests you may consider useful for 
-resolving this ixgbe driver bug in Linux kernels > 6.0.
 
-As a reminder, here is the link to my original message:
-https://lore.kernel.org/all/8267673cce94022974bcf35b2bf0f6545105d03e@ycharbi.fr/
+	Hello,
 
-Best regards.
+On Thu, 18 Apr 2024, Alexander Mikhalitsyn wrote:
+
+> Let's make all IPVS sysctls writtable even when
+> network namespace is owned by non-initial user namespace.
+> 
+> Let's make a few sysctls to be read-only for non-privileged users:
+> - sync_qlen_max
+> - sync_sock_size
+> - run_estimation
+> - est_cpulist
+> - est_nice
+> 
+> I'm trying to be conservative with this to prevent
+> introducing any security issues in there. Maybe,
+> we can allow more sysctls to be writable, but let's
+> do this on-demand and when we see real use-case.
+> 
+> This patch is motivated by user request in the LXC
+> project [1]. Having this can help with running some
+> Kubernetes [2] or Docker Swarm [3] workloads inside the system
+> containers.
+> 
+> Link: https://github.com/lxc/lxc/issues/4278 [1]
+> Link: https://github.com/kubernetes/kubernetes/blob/b722d017a34b300a2284b890448e5a605f21d01e/pkg/proxy/ipvs/proxier.go#L103 [2]
+> Link: https://github.com/moby/libnetwork/blob/3797618f9a38372e8107d8c06f6ae199e1133ae8/osl/namespace_linux.go#L682 [3]
+> 
+> Cc: Stéphane Graber <stgraber@stgraber.org>
+> Cc: Christian Brauner <brauner@kernel.org>
+> Cc: Julian Anastasov <ja@ssi.bg>
+> Cc: Simon Horman <horms@verge.net.au>
+> Cc: Pablo Neira Ayuso <pablo@netfilter.org>
+> Cc: Jozsef Kadlecsik <kadlec@netfilter.org>
+> Cc: Florian Westphal <fw@strlen.de>
+> Signed-off-by: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
+> ---
+>  net/netfilter/ipvs/ip_vs_ctl.c | 21 +++++++++++++++------
+>  1 file changed, 15 insertions(+), 6 deletions(-)
+> 
+> diff --git a/net/netfilter/ipvs/ip_vs_ctl.c b/net/netfilter/ipvs/ip_vs_ctl.c
+> index 32be24f0d4e4..c3ba71aa2654 100644
+> --- a/net/netfilter/ipvs/ip_vs_ctl.c
+> +++ b/net/netfilter/ipvs/ip_vs_ctl.c
+
+...
+
+> @@ -4284,12 +4285,6 @@ static int __net_init ip_vs_control_net_init_sysctl(struct netns_ipvs *ipvs)
+>  		tbl = kmemdup(vs_vars, sizeof(vs_vars), GFP_KERNEL);
+>  		if (tbl == NULL)
+>  			return -ENOMEM;
+> -
+> -		/* Don't export sysctls to unprivileged users */
+> -		if (net->user_ns != &init_user_ns) {
+> -			tbl[0].procname = NULL;
+> -			ctl_table_size = 0;
+> -		}
+>  	} else
+>  		tbl = vs_vars;
+>  	/* Initialize sysctl defaults */
+
+	Sorry but you have to send v4 because above if-block was
+changed with net-next commit 635470eb0aa7 from today...
+
+Regards
+
+--
+Julian Anastasov <ja@ssi.bg>
+---1463811672-1490811829-1714741586=:48180--
+
 
