@@ -1,75 +1,50 @@
-Return-Path: <netdev+bounces-93298-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93299-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 593FD8BAF6E
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 17:09:29 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7621F8BAFA5
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 17:20:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EE1601F2324C
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 15:09:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8BB47B2111A
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 15:20:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C76FA156666;
-	Fri,  3 May 2024 15:08:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3ED34D9FD;
+	Fri,  3 May 2024 15:20:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Fw6b2kQJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qm2Q8RYo"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61660155359
-	for <netdev@vger.kernel.org>; Fri,  3 May 2024 15:08:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABEB4A955;
+	Fri,  3 May 2024 15:20:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714748891; cv=none; b=AECzh6Ip5wk/ZvOXLDNKXz6pajxWwTkViO3zV7R0u7Yqu9EkRQVREMxBD1lMkwecigQaOx4WRxRq3Dv7duQbe3LkoGkw0VHoTtuW6zPUBGZKMqAfJHuU2H1F84UFIRqDVjg8Xxg26pw9TJbarDgofqEHjtA8N7lHmtqAAfOXtKY=
+	t=1714749628; cv=none; b=rl8eqPQmYRfiI92772ccnlb0bVL9ssCUPgyuWorJgfs1JYoH3MnXN6QA4GgufYs+6udpNWsAATE9sXg69+9Gfw1JuPrTjFKXDRZDi+sIw0PLYMJsmwI8LPxL+1GgGHSIhLgSBPQ6pf8audOJtBS56Xit+urJn8dvHDGogwptdkk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714748891; c=relaxed/simple;
-	bh=DuTNKRrHMhyGQpIg62Kb5bTSXicrmNuhWjlQllGZmro=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=uvpCft342PICHXHk3hbd/oYSXIT0Hb2GrHM1TG3OktxotSYLa52Ojp6IR9eTHmWMEaHuoaOJsVt8FFNrW0HAJ062DJ28oTFEGMrpprIelgpazUCV26vx66FCVdXJTuWqtDGqSdPKBa3990DLObKRTmdxrG90j5NsWO16Hg2eZ68=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Fw6b2kQJ; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1714748888;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=q81tRT2uTaTBxg18TEDOYg+MWHfHGT+jbt/JaKsoXVk=;
-	b=Fw6b2kQJN0CgBijeNi7s16gsDBq5wvlv6CeO243dUTLvRkaFXEeaYWujroTw9QkOUvkD5B
-	NoSxYUdSMP9Sb6GLxvDJRf9ZWD1/yay+qEX+oLHKfeQqnH/stkWFEacqDibclJsrGnc053
-	VnWWiu7GQ6S2/9QZwRLJia1wVTVcTFw=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-122-0qgMMmr8MaW5Z7uHMQr8Gw-1; Fri,
- 03 May 2024 11:08:05 -0400
-X-MC-Unique: 0qgMMmr8MaW5Z7uHMQr8Gw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B96EC380009F;
-	Fri,  3 May 2024 15:08:04 +0000 (UTC)
-Received: from warthog.procyon.org.com (unknown [10.42.28.22])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id A4FB0200A3BB;
-	Fri,  3 May 2024 15:08:03 +0000 (UTC)
-From: David Howells <dhowells@redhat.com>
-To: netdev@vger.kernel.org
-Cc: David Howells <dhowells@redhat.com>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-afs@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net 5/5] rxrpc: Request an ACK on impending Tx stall
-Date: Fri,  3 May 2024 16:07:43 +0100
-Message-ID: <20240503150749.1001323-6-dhowells@redhat.com>
-In-Reply-To: <20240503150749.1001323-1-dhowells@redhat.com>
-References: <20240503150749.1001323-1-dhowells@redhat.com>
+	s=arc-20240116; t=1714749628; c=relaxed/simple;
+	bh=99vnTIpgfp2UODuk9ex+yfRHusyD8Psew4U7hb/tsyc=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=UNsn8bl6yA1WTa1aEYcrR9LylJonl+nYe1Hp6mfPdVUX+9sQrEhtIayhQqjnL1OoNcQRolr4sLtC3Ug+5YrpIi+6Sa5k7RVO5x5UH0GThdNJ22IJ5UBG85VWToXVG50XKt9EbEui6mUqVEtyQsNlO0nsY1lVMHgChb5Ou300CJs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qm2Q8RYo; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 2CD0BC32789;
+	Fri,  3 May 2024 15:20:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714749628;
+	bh=99vnTIpgfp2UODuk9ex+yfRHusyD8Psew4U7hb/tsyc=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=qm2Q8RYoixjRDBOJu3k+Pksnz8MLfS/RK1OoaHSFuNpVGuQ44En3gy6gdXROqfObh
+	 1bOp1qjPiO72vPwKAQm1KnK/5DCIM55UkXNwhoFlxXj2wv2SXaC4nl//ffjAUc3LjS
+	 aK1hZ7K5dVhi0PO2+ww/P/ypQ8hN4c11o/7zRP6eHbm77Lz7JdNjTTEv8NVZZ+lV2U
+	 H1Q/v+5yb0q7IEtxLbWtlzjgyQJKiRFfsEas4tKxLMBT/bmZSZpJtGyqMOKw5hIP8P
+	 BT6YISVghOObmhKQYc0jw7uuSRzgoFtKAhURROrEUnrtxi+Ly+zLy1lx0xxw0VHmp2
+	 l/Z4IfSkEnLaQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 18F10C433A2;
+	Fri,  3 May 2024 15:20:28 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,83 +52,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.4
+Subject: Re: [PATCH iproute2-next 0/2] Extend rdmatool to print driver QPs too
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171474962809.564.7254054203723498127.git-patchwork-notify@kernel.org>
+Date: Fri, 03 May 2024 15:20:28 +0000
+References: <cover.1714472040.git.leonro@nvidia.com>
+In-Reply-To: <cover.1714472040.git.leonro@nvidia.com>
+To: Leon Romanovsky <leon@kernel.org>
+Cc: dsahern@gmail.com, leonro@nvidia.com, cmeiohas@nvidia.com, jgg@nvidia.com,
+ netdev@vger.kernel.org, linux-rdma@vger.kernel.org
 
-Set the REQUEST-ACK flag on the DATA packet we're about to send if we're
-about to stall transmission because the app layer isn't keeping up
-supplying us with data to transmit.
+Hello:
 
-Fixes: 17926a79320a ("[AF_RXRPC]: Provide secure RxRPC sockets for use by userspace and kernel both")
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Marc Dionne <marc.dionne@auristor.com>
-cc: "David S. Miller" <davem@davemloft.net>
-cc: Eric Dumazet <edumazet@google.com>
-cc: Jakub Kicinski <kuba@kernel.org>
-cc: Paolo Abeni <pabeni@redhat.com>
-cc: linux-afs@lists.infradead.org
-cc: netdev@vger.kernel.org
----
- include/trace/events/rxrpc.h | 1 +
- net/rxrpc/ar-internal.h      | 2 +-
- net/rxrpc/output.c           | 2 ++
- net/rxrpc/proc.c             | 5 +++--
- 4 files changed, 7 insertions(+), 3 deletions(-)
+This series was applied to iproute2/iproute2-next.git (main)
+by David Ahern <dsahern@kernel.org>:
 
-diff --git a/include/trace/events/rxrpc.h b/include/trace/events/rxrpc.h
-index 7b6c1db53401..dca9f4759dcb 100644
---- a/include/trace/events/rxrpc.h
-+++ b/include/trace/events/rxrpc.h
-@@ -449,6 +449,7 @@
- 
- #define rxrpc_req_ack_traces \
- 	EM(rxrpc_reqack_ack_lost,		"ACK-LOST  ")	\
-+	EM(rxrpc_reqack_app_stall,		"APP-STALL ")	\
- 	EM(rxrpc_reqack_more_rtt,		"MORE-RTT  ")	\
- 	EM(rxrpc_reqack_no_srv_last,		"NO-SRVLAST")	\
- 	EM(rxrpc_reqack_old_rtt,		"OLD-RTT   ")	\
-diff --git a/net/rxrpc/ar-internal.h b/net/rxrpc/ar-internal.h
-index c11a6043c8f2..08de24658f4f 100644
---- a/net/rxrpc/ar-internal.h
-+++ b/net/rxrpc/ar-internal.h
-@@ -110,7 +110,7 @@ struct rxrpc_net {
- 	atomic_t		stat_tx_acks[256];
- 	atomic_t		stat_rx_acks[256];
- 
--	atomic_t		stat_why_req_ack[7];
-+	atomic_t		stat_why_req_ack[8];
- 
- 	atomic_t		stat_io_loop;
- };
-diff --git a/net/rxrpc/output.c b/net/rxrpc/output.c
-index 4ebd0bd40a02..32626ff377e1 100644
---- a/net/rxrpc/output.c
-+++ b/net/rxrpc/output.c
-@@ -372,6 +372,8 @@ static void rxrpc_prepare_data_subpacket(struct rxrpc_call *call, struct rxrpc_t
- 		why = rxrpc_reqack_more_rtt;
- 	else if (ktime_before(ktime_add_ms(call->peer->rtt_last_req, 1000), ktime_get_real()))
- 		why = rxrpc_reqack_old_rtt;
-+	else if (!more && !last)
-+		why = rxrpc_reqack_app_stall;
- 	else
- 		goto dont_set_request_ack;
- 
-diff --git a/net/rxrpc/proc.c b/net/rxrpc/proc.c
-index 3b7e34dd4385..1bab7f5a7d0f 100644
---- a/net/rxrpc/proc.c
-+++ b/net/rxrpc/proc.c
-@@ -519,10 +519,11 @@ int rxrpc_stats_show(struct seq_file *seq, void *v)
- 		   atomic_read(&rxnet->stat_rx_acks[RXRPC_ACK_DELAY]),
- 		   atomic_read(&rxnet->stat_rx_acks[RXRPC_ACK_IDLE]));
- 	seq_printf(seq,
--		   "Why-Req-A: acklost=%u mrtt=%u ortt=%u\n",
-+		   "Why-Req-A: acklost=%u mrtt=%u ortt=%u stall=%u\n",
- 		   atomic_read(&rxnet->stat_why_req_ack[rxrpc_reqack_ack_lost]),
- 		   atomic_read(&rxnet->stat_why_req_ack[rxrpc_reqack_more_rtt]),
--		   atomic_read(&rxnet->stat_why_req_ack[rxrpc_reqack_old_rtt]));
-+		   atomic_read(&rxnet->stat_why_req_ack[rxrpc_reqack_old_rtt]),
-+		   atomic_read(&rxnet->stat_why_req_ack[rxrpc_reqack_app_stall]));
- 	seq_printf(seq,
- 		   "Why-Req-A: nolast=%u retx=%u slows=%u smtxw=%u\n",
- 		   atomic_read(&rxnet->stat_why_req_ack[rxrpc_reqack_no_srv_last]),
+On Tue, 30 Apr 2024 13:18:18 +0300 you wrote:
+> From: Leon Romanovsky <leonro@nvidia.com>
+> 
+> This series is complimentary to the kernel patches that exposed to the
+> userspace the driver-specific QPs.
+> 
+> https://lore.kernel.org/all/2607bb3ddec3cae3443c2ea19e9f700825d20a98.1713268997.git.leon@kernel.org
+> 
+> [...]
+
+Here is the summary with links:
+  - [iproute2-next,1/2] rdma: update uapi header
+    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=e459ea4392c4
+  - [iproute2-next,2/2] rdma: Add an option to display driver-specific QPs in the rdma tool
+    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=57d7a8fd904c
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
