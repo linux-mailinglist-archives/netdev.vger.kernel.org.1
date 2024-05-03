@@ -1,114 +1,134 @@
-Return-Path: <netdev+bounces-93245-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93246-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 156748BAB54
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 13:03:28 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5035F8BAB6A
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 13:12:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 58F21B2092B
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 11:03:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8B31EB20D05
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 11:12:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE2CF152179;
-	Fri,  3 May 2024 11:03:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BA7614F9DC;
+	Fri,  3 May 2024 11:12:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UGvnT+0N"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DYVi8YDL"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 827C01514F2;
-	Fri,  3 May 2024 11:03:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC0EA848A
+	for <netdev@vger.kernel.org>; Fri,  3 May 2024 11:12:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714734201; cv=none; b=aiXmoKWeevFEBfe5RN94n1Q8sCpvD++PVgwsWNafaeXsiyDHPHpvZTvuiViaN/taB6QxuTmGoERsJc/xiXQxb6+ojsfWhvI0LpytO/Kj6X+KCT6rmK8Px5hkgQvKBzEw8HHEKpZMa2Nfus1JTklVAoEMCMKUMc/rWlmpPS2wS6s=
+	t=1714734728; cv=none; b=C+kwhzWXVXRbQ2MOFDiKo7+GdH2gCOYL+0UXEdF3/AGG7i5mZaIANxjGsrI4R5xxWLHmuQXjX7xJkZhzZaPWT+7WTrMfegJ+Bv8wE0Qp0qe4SI1lCrV5BjgQLKpYp9J0cxvIB0hWeLUyqZUAPwN868DTlbwI8IILccIF9asOfGk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714734201; c=relaxed/simple;
-	bh=bjai94D8ZG/7k4vsWq8jbsVW1vR8F8gcG0Y6QhbQHNU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ohnpbaQ60GO5sTK+qgHW7YsJgdob7nv1ERwTxUPS+4sy2HYOT95Kqib5zSfd3CK7Djx2+FyRi13bxp7lEYrQUAOx7Pwh1ZsY3trsYPBnmW+AJjERfP/BP1dgZt/ig7ZX38ybShEVfF9EVP7PYELhIZfPmY2A+f9Tag0M9yADuI4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UGvnT+0N; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A24BCC116B1;
-	Fri,  3 May 2024 11:03:17 +0000 (UTC)
+	s=arc-20240116; t=1714734728; c=relaxed/simple;
+	bh=xPKJkZgoWqClfEEc7gqpgr9JGMhSdcFuVt0dZ1KVjnI=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=YTS5UXLLPgCL6dSfCk7JvsEQO6Icw/UEfqdE/R1K/zlwqLTVDTkrzVXZtl8Y7VspAbXD9z4jtkT+AXY2mdWH83ge5fRWR/OvVUmD6i0g9GAVcRqMekEaYK7jQtuKFfFy46dWMeSWs2D/RO2x/qHFgsGa8UMh6DaDIJrciy+gxvI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DYVi8YDL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21DE6C116B1;
+	Fri,  3 May 2024 11:12:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714734200;
-	bh=bjai94D8ZG/7k4vsWq8jbsVW1vR8F8gcG0Y6QhbQHNU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=UGvnT+0NKpCaOOeu4+jBqeTD/WA0si7aIg14X+f2zP6t4+V+NLS/UBfF/n/rpul6W
-	 prxRsFC5x+Qn6dNMetEszJ2YB8RDIsaj9i7hIBz+0zimd/s6RtZDuzXMVMHc5ooa3Z
-	 UjudKI9VMxoO25qDzFF0+Kt2uL7CL8cZ8m4yBpWpnDYsA5l4TWseQknZrMKSRgpLFm
-	 8Q+V8OfNtgX4p1GMQFJStVRD+zW2ALd8xQx9hh9d82a/9CBtYXLZUeDJNPJ3621LrH
-	 IuphtzfGXgVozFgAxPFMXB4E4oDmV19CYX1ZBZIGrdZ1eMXnxtGLzGQRhy9AzvY0fM
-	 WXrO1qAZmPTkQ==
-Date: Fri, 3 May 2024 12:03:15 +0100
+	s=k20201202; t=1714734728;
+	bh=xPKJkZgoWqClfEEc7gqpgr9JGMhSdcFuVt0dZ1KVjnI=;
+	h=From:Date:Subject:To:Cc:From;
+	b=DYVi8YDLkfk7pR6rR83c88FsrGNJQOPhP82dyvp29WqbVcwkLEc7lQZcXCds4PuOk
+	 QJi2a3yMsmb3fsiArJkmYgJZ4CH4+jGu2yQmjuk2M60EvGrLfHOhdzZnR8WTs0xtIc
+	 XEAhDxLJsJXxQ9/3igCRQv4vObQdA3tCezukYRfBXfQuYkaCgaDHSlYGfeMe1J41tO
+	 hw6DjoNUvTdDsu68NJg96DXHUEYcy7Dv/ZkJIxI17Y2p/nGiQE6nAqpwvg8gy7FQ2s
+	 +k505pxGfNiKHs1bFxOlKEVmohaXGBXyaQwGKsmTDDqTsJeMMoK+GNZ8q0X93H2kxb
+	 KWvz9IiNM6yBg==
 From: Simon Horman <horms@kernel.org>
-To: Justin Lai <justinlai0215@realtek.com>
-Cc: kuba@kernel.org, davem@davemloft.net, edumazet@google.com,
-	pabeni@redhat.com, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, andrew@lunn.ch, jiri@resnulli.us,
-	Ping-Ke Shih <pkshih@realtek.com>,
-	Larry Chiu <larry.chiu@realtek.com>
-Subject: Re: [PATCH net-next v17 02/13] rtase: Implement the .ndo_open
- function
-Message-ID: <20240503110315.GO2821784@kernel.org>
-References: <20240502091847.65181-1-justinlai0215@realtek.com>
- <20240502091847.65181-3-justinlai0215@realtek.com>
- <20240503085257.GM2821784@kernel.org>
- <3199bfed19ad4e0bb8ca868b6c46588a@realtek.com>
+Date: Fri, 03 May 2024 12:11:58 +0100
+Subject: [PATCH net-next v2] octeontx2-pf: Treat truncation of IRQ name as
+ an error
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3199bfed19ad4e0bb8ca868b6c46588a@realtek.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20240503-octeon2-pf-irq_name-truncation-v2-1-91099177b942@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAH3GNGYC/42NUQrCMBBEryL77UoSW0S/vIcUSdNNG9RN3cRSK
+ b27oSfwc3gz8xZIJIESXHYLCE0hhcglmP0O3GC5JwxdyWCUqVStNEaXKbLB0WOQ953tizDLh53
+ NZYqmrbx1Wh1LGcrJKOTDvAluwJSRac7QFDKElKN8N/OkN/6vZNKosfZtd/Lnti2q64OE6XmI0
+ kOzrusPTuQRyNcAAAA=
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Sunil Goutham <sgoutham@marvell.com>, 
+ Geetha sowjanya <gakula@marvell.com>, 
+ Subbaraya Sundeep <sbhatta@marvell.com>, 
+ Hariprasad Kelam <hkelam@marvell.com>, 
+ Dan Carpenter <dan.carpenter@linaro.org>, netdev@vger.kernel.org, 
+ Andrew Lunn <andrew@lunn.ch>
+X-Mailer: b4 0.12.3
 
-On Fri, May 03, 2024 at 10:19:05AM +0000, Justin Lai wrote:
-> > On Thu, May 02, 2024 at 05:18:36PM +0800, Justin Lai wrote:
-> > > Implement the .ndo_open function to set default hardware settings and
-> > > initialize the descriptor ring and interrupts. Among them, when
-> > > requesting irq, because the first group of interrupts needs to process
-> > > more events, the overall structure will be different from other groups
-> > > of interrupts, so it needs to be processed separately.
-> > >
-> > > Signed-off-by: Justin Lai <justinlai0215@realtek.com>
-> > 
-> > Hi Justin,
-> > 
-> > some minor feedback from my side.
-> > 
-> > > +static int rtase_open(struct net_device *dev) {
-> > > +     struct rtase_private *tp = netdev_priv(dev);
-> > > +     struct rtase_int_vector *ivec = &tp->int_vector[0];
-> > > +     const struct pci_dev *pdev = tp->pdev;
-> > > +     u16 i, j;
-> > > +     int ret;
-> > 
-> > nit: please use reverse xmas tree order - longest line to shortest -
-> >      for local variable declarations in new Networking code.
-> > 
-> Hi Simon,
-> This is partly because ivec needs to use tp for initialization,
-> so tp is placed in front of ivec, causing this situation.
+According to GCC, the constriction of irq_name in otx2_open()
+may, theoretically, be truncated.
 
-Thanks Justin,
+This patch takes the approach of treating such a situation as an error
+which it detects by making use of the return value of snprintf, which is
+the total number of bytes, excluding the trailing '\0', that would have
+been written.
 
-Understood.
+Based on the approach taken to a similar problem in
+commit 54b909436ede ("rtc: fix snprintf() checking in is_rtc_hctosys()")
 
-Had I noticed that I probably wouldn't have commented as I did above.
-But, FWIIW, in such cases my suggestion would be to separate the
-declaration from the assignment.
+Flagged by gcc-13 W=1 builds as:
 
-Something like this:
+.../otx2_pf.c:1933:58: warning: 'snprintf' output may be truncated before the last format character [-Wformat-truncation=]
+ 1933 |                 snprintf(irq_name, NAME_SIZE, "%s-rxtx-%d", pf->netdev->name,
+      |                                                          ^
+.../otx2_pf.c:1933:17: note: 'snprintf' output between 8 and 33 bytes into a destination of size 32
+ 1933 |                 snprintf(irq_name, NAME_SIZE, "%s-rxtx-%d", pf->netdev->name,
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ 1934 |                          qidx);
+      |                          ~~~~~
 
-	struct rtase_private *tp = netdev_priv(dev);
-	const struct pci_dev *pdev = tp->pdev;
-	struct rtase_int_vector *ivec;
-	u16 i, j;
-	int ret;
+Compile tested only.
 
-	ivec = &tp->int_vector[0];
+Tested-by: Geetha sowjanya <gakula@marvell.com>
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Signed-off-by: Simon Horman <horms@kernel.org>
+---
+Changes in v2:
+- Update patch description to correctly describe return value of
+  snprintf as excluding, rather than including, the trailing '\0'.
+  Thanks to Andrew Lunn
+- Collected tags from Geetha sowjanya and Andrew Lunn. Thanks!
+- Link to v1: https://lore.kernel.org/r/20240501-octeon2-pf-irq_name-truncation-v1-1-5fbd7f9bb305@kernel.org
+---
+ drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+index 6a44dacff508..14bccff0ee5c 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+@@ -1886,9 +1886,17 @@ int otx2_open(struct net_device *netdev)
+ 	vec = pf->hw.nix_msixoff + NIX_LF_CINT_VEC_START;
+ 	for (qidx = 0; qidx < pf->hw.cint_cnt; qidx++) {
+ 		irq_name = &pf->hw.irq_name[vec * NAME_SIZE];
++		int name_len;
+ 
+-		snprintf(irq_name, NAME_SIZE, "%s-rxtx-%d", pf->netdev->name,
+-			 qidx);
++		name_len = snprintf(irq_name, NAME_SIZE, "%s-rxtx-%d",
++				    pf->netdev->name, qidx);
++		if (name_len >= NAME_SIZE) {
++			dev_err(pf->dev,
++				"RVUPF%d: IRQ registration failed for CQ%d, irq name is too long\n",
++				rvu_get_pf(pf->pcifunc), qidx);
++			err = -EINVAL;
++			goto err_free_cints;
++		}
+ 
+ 		err = request_irq(pci_irq_vector(pf->pdev, vec),
+ 				  otx2_cq_intr_handler, 0, irq_name,
+
 
