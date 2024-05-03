@@ -1,124 +1,96 @@
-Return-Path: <netdev+bounces-93306-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93307-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C54798BB145
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 18:53:54 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92D8A8BB154
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 19:00:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C7797B21B93
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 16:53:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 474641F22CD0
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 17:00:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD86A157A42;
-	Fri,  3 May 2024 16:53:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 326FD157A5C;
+	Fri,  3 May 2024 17:00:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="3Gx8diy2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nMZOIjET"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16B1715748E
-	for <netdev@vger.kernel.org>; Fri,  3 May 2024 16:53:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02C68156241;
+	Fri,  3 May 2024 17:00:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714755227; cv=none; b=G/uE2euAcUk0yzph6dbPnnUUd2Hp1paU4Y6LgqwXwVwI/TBdGKqXBvWlhuEVNOnZo+hEnSTWNdVLZcvKBvr9ur+N1M9jmmvFlRK453hxDYKudiqFRJMOFBRr8zraQ5GDQXyvk5zAWEcgQtpR468lbMK6rYgjipEyNga0oC4X1oU=
+	t=1714755630; cv=none; b=EiLGsPfyn6WxPrp57kMw6WDX+qnw+gYb4lyVwaHLhPxXDKfTdlZfw5a3opyhN5Iroo9EXICgIda0BSxf3yM97VB5DBLpEaQ2agALcc96KtE/ULRAT0F9XDQ3fYvZ4qe71UORisgU0+Qfv7sjz5PbBd39L4nTppsC45a6IWj8Ct4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714755227; c=relaxed/simple;
-	bh=vnGKr2FU3VVj8cAyhqN9JGswO6gli0XknAZELBhdAb8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ti9Pba2wEjj+3jc/3/SHuX6h82SteNUycxeyozyO17/BSbFN7PgEgQZ9booY7h9YPQrkGhbyS6ZorQV8WPNy6X0WDfZwVUsap4bDb5WHjPYAytlJe/hCcPXInLFsXQAn0Og321WHO0bGVj6jghuemHf5Ej4Eu+pYaCrtgro+FeY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=3Gx8diy2; arc=none smtp.client-ip=209.85.218.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-a599c55055dso117207566b.0
-        for <netdev@vger.kernel.org>; Fri, 03 May 2024 09:53:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1714755224; x=1715360024; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=rIHt03EOBH0mo59DqWVyw7Ox3t025saq2PvgQLBWkgw=;
-        b=3Gx8diy2OyF3AvphxfQ3Gyhd0xsFfwNSqswTtMgJVYRZ1SflTXmvd8bG/j6M7x+Auv
-         7fsbqbDHPD+B68p1Rt8Nv4uH2p0qe8SIGhscDKIjsmZ9Wc0/+eZsW/LxiF/sKlbOs+gL
-         MXQV4jDkhJNrHY3ExnOr3JprsxQuB/KliXMtbLNpLQ1/HN3LUrO8WXflKkyh40m+r2WL
-         4G268+1whrYix/C/mPm0b4QaDWVQUbNnMLXNXg4rTvTIybRS091wuI3aC0BJpCYoV/Y3
-         jmmn/KHDrxdoyNN99TI47XgAdytUnQTtECBq3zxGAJM2qZ822E6VnyR9fQHF/jJbs/oJ
-         3h1w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714755224; x=1715360024;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=rIHt03EOBH0mo59DqWVyw7Ox3t025saq2PvgQLBWkgw=;
-        b=FumLtHD5JiSt/ASMUiz626YhERuuNCelYXCe8IG8vVwH1kkeDCspGwZPD9bn7sQn28
-         7IfoUo7lTqyVx+hWoHfo/To0rP/VfN43yACqyf8iCEzQztjnwxS+ikaQRv1mwbYs+To8
-         edcgPZx6CwjL41QBfLQha6J4k0K7xS7S8aSviQMOhhuIR7n84C+3aFZtPsBrsKXvSVxX
-         o+igqcar5Ok18Z/aXbMF39sipZi5aMH+9rVQ+GpLRmndzerwPX1psCpwvJjIwjkYfbjp
-         4Wwv/cIo/aw8oYmrapIS2tOhhpwUl50i2j+TPjBJ/9YSfdYigLOWfCm7rUUJ5oS2D0tc
-         b2rQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXfLIsnOJgrs2ky5TqrAPHwRGK2DtWDl9U10bYUVPdnzasOqImePRpoIuFDsQ+WYDutyticGjksPMgmvy0BvkwLBwe0m0Qa
-X-Gm-Message-State: AOJu0YxHpgNwB5y1aFetXvUb6i/k2Hr21TAmzv1KbGzkcz1YcGgbKqdY
-	7CsNvW+XycWR/HPQYDBcjdrow8GE7k3chnfp8EAmAh/87lmKp/DomAFLcfy7B0A=
-X-Google-Smtp-Source: AGHT+IFa/ft1jlFy2ot8l5mUGh9Kw0YzJWlbh4cIBd6wjz+CUBz8XcGvTel9fO6zotw85rYQkccN8g==
-X-Received: by 2002:a50:9982:0:b0:56e:2e6a:9eef with SMTP id m2-20020a509982000000b0056e2e6a9eefmr2092378edb.2.1714755224262;
-        Fri, 03 May 2024 09:53:44 -0700 (PDT)
-Received: from [192.168.0.245] ([62.73.69.208])
-        by smtp.gmail.com with ESMTPSA id ew11-20020a056402538b00b00572c060396esm1829528edb.78.2024.05.03.09.53.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 03 May 2024 09:53:43 -0700 (PDT)
-Message-ID: <d6f6f295-1f52-42db-9058-f69e4d188dce@blackwall.org>
-Date: Fri, 3 May 2024 19:53:41 +0300
+	s=arc-20240116; t=1714755630; c=relaxed/simple;
+	bh=xychJx0gxN4Wh8S2y7zpJJcG4VRsDR4oFVHA09yKLJk=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=I0ncFv7wWA2Mbk6Wip+ZNtRF0wjr+6wzQnv2/MHnnUsWcEggv7naSr5Ccui/wxKWGuHjw0H65EHQ37EPzFQSEFuWWIsJ7GhGkg/pQToI99FDNo7J6pQLKJElBvpqpW/Nq/ydEsUYExRTwVCoEp++jBrTr1EvbkRC3hmXkffs+Yg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nMZOIjET; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id D63E4C32789;
+	Fri,  3 May 2024 17:00:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714755629;
+	bh=xychJx0gxN4Wh8S2y7zpJJcG4VRsDR4oFVHA09yKLJk=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=nMZOIjETU2vsOVyocz0PBQzv5HUA2YyaxmmD2ZZB4A7xdwARk2yAvL7gDzvxOVFeC
+	 GUsVgAJVrHQ4x4kYBE2BRZRsZpItpxSKJEJXoQVwlNzMREgpNyX38bIHpHbg93dm2F
+	 eNAH8D07GetOl1JmbtWJ/MujvN5WBH8vdZI7iz2mqExZut1AeYVqfSmw7A89v1IUJe
+	 HCCaiChMg/MlU/ZQfysqAtavr0PeAEZ47XNIXqkxtk4rRXwJ0ummesJeRF4j3fEm/D
+	 YDv8cquoTYP22MHzhs/+cn6KJLbRJIUEGwrTHC7KtdD+plqfaoXfyFMeFTnw9qIju1
+	 hx5KWYbwKqklQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C0259C43336;
+	Fri,  3 May 2024 17:00:29 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v1] netlink: specs: Add missing bridge linkinfo attrs
-To: Donald Hunter <donald.hunter@gmail.com>, netdev@vger.kernel.org,
- Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Jiri Pirko <jiri@resnulli.us>, Jacob Keller <jacob.e.keller@intel.com>,
- Johannes Nixdorf <jnixdorf-oss@avm.de>, Ido Schimmel <idosch@nvidia.com>
-Cc: donald.hunter@redhat.com
-References: <20240503164304.87427-1-donald.hunter@gmail.com>
-Content-Language: en-US
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <20240503164304.87427-1-donald.hunter@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH][next] Bluetooth: hci_conn: Use __counted_by() and avoid
+ -Wfamnae warning
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <171475562977.29614.6298254643721435482.git-patchwork-notify@kernel.org>
+Date: Fri, 03 May 2024 17:00:29 +0000
+References: <ZjO9qCx10KUJbK6w@neat>
+In-Reply-To: <ZjO9qCx10KUJbK6w@neat>
+To: Gustavo A. R. Silva <gustavoars@kernel.org>
+Cc: marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
 
-On 03/05/2024 19:43, Donald Hunter wrote:
-> Attributes for FDB learned entries were added to the if_link netlink api
-> for bridge linkinfo but are missing from the rt_link.yaml spec. Add the
-> missing attributes to the spec.
-> 
-> Fixes: ddd1ad68826d ("net: bridge: Add netlink knobs for number / max learned FDB entries")
-> Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
-> ---
->  Documentation/netlink/specs/rt_link.yaml | 6 ++++++
->  1 file changed, 6 insertions(+)
-> 
-> diff --git a/Documentation/netlink/specs/rt_link.yaml b/Documentation/netlink/specs/rt_link.yaml
-> index 8e4d19adee8c..4e702ac8bf66 100644
-> --- a/Documentation/netlink/specs/rt_link.yaml
-> +++ b/Documentation/netlink/specs/rt_link.yaml
-> @@ -1144,6 +1144,12 @@ attribute-sets:
->        -
->          name: mcast-querier-state
->          type: binary
-> +      -
-> +        name: fdb-n-learned
-> +        type: u32
-> +      -
-> +        name: fdb-max-learned
-> +        type: u32
->    -
->      name: linkinfo-brport-attrs
->      name-prefix: ifla-brport-
+Hello:
 
-Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+
+On Thu, 2 May 2024 10:22:00 -0600 you wrote:
+> Prepare for the coming implementation by GCC and Clang of the
+> __counted_by attribute. Flexible array members annotated with
+> __counted_by can have their accesses bounds-checked at run-time
+> via CONFIG_UBSAN_BOUNDS (for array indexing) and CONFIG_FORTIFY_SOURCE
+> (for strcpy/memcpy-family functions).
+> 
+> Also, -Wflex-array-member-not-at-end is coming in GCC-14, and we are
+> getting ready to enable it globally.
+> 
+> [...]
+
+Here is the summary with links:
+  - [next] Bluetooth: hci_conn: Use __counted_by() and avoid -Wfamnae warning
+    https://git.kernel.org/bluetooth/bluetooth-next/c/6d18d5b03ee1
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
