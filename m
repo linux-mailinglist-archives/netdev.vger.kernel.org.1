@@ -1,134 +1,154 @@
-Return-Path: <netdev+bounces-93246-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93247-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5035F8BAB6A
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 13:12:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15AA58BAB6D
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 13:13:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8B31EB20D05
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 11:12:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C5D13283E41
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 11:13:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BA7614F9DC;
-	Fri,  3 May 2024 11:12:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DYVi8YDL"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7197F152179;
+	Fri,  3 May 2024 11:13:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC0EA848A
-	for <netdev@vger.kernel.org>; Fri,  3 May 2024 11:12:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9D6414F9D7;
+	Fri,  3 May 2024 11:13:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714734728; cv=none; b=C+kwhzWXVXRbQ2MOFDiKo7+GdH2gCOYL+0UXEdF3/AGG7i5mZaIANxjGsrI4R5xxWLHmuQXjX7xJkZhzZaPWT+7WTrMfegJ+Bv8wE0Qp0qe4SI1lCrV5BjgQLKpYp9J0cxvIB0hWeLUyqZUAPwN868DTlbwI8IILccIF9asOfGk=
+	t=1714734828; cv=none; b=Thk+MN3vOufXr8JV2FdIqymCNAWwBizWI/DRY7gA1682ytSyzs7eKKGc+l3Q7Qyy7iAssO50v1ncNSXUpwypJYu5pwC4PoVvp6eKy5f1h4/r2qNzROamNWZz4aZOcq61xAF9HgoYuQmD7T/i0Vg5JB/KgjUzY8/i6GEZ5iYiJR0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714734728; c=relaxed/simple;
-	bh=xPKJkZgoWqClfEEc7gqpgr9JGMhSdcFuVt0dZ1KVjnI=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=YTS5UXLLPgCL6dSfCk7JvsEQO6Icw/UEfqdE/R1K/zlwqLTVDTkrzVXZtl8Y7VspAbXD9z4jtkT+AXY2mdWH83ge5fRWR/OvVUmD6i0g9GAVcRqMekEaYK7jQtuKFfFy46dWMeSWs2D/RO2x/qHFgsGa8UMh6DaDIJrciy+gxvI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DYVi8YDL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21DE6C116B1;
-	Fri,  3 May 2024 11:12:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714734728;
-	bh=xPKJkZgoWqClfEEc7gqpgr9JGMhSdcFuVt0dZ1KVjnI=;
-	h=From:Date:Subject:To:Cc:From;
-	b=DYVi8YDLkfk7pR6rR83c88FsrGNJQOPhP82dyvp29WqbVcwkLEc7lQZcXCds4PuOk
-	 QJi2a3yMsmb3fsiArJkmYgJZ4CH4+jGu2yQmjuk2M60EvGrLfHOhdzZnR8WTs0xtIc
-	 XEAhDxLJsJXxQ9/3igCRQv4vObQdA3tCezukYRfBXfQuYkaCgaDHSlYGfeMe1J41tO
-	 hw6DjoNUvTdDsu68NJg96DXHUEYcy7Dv/ZkJIxI17Y2p/nGiQE6nAqpwvg8gy7FQ2s
-	 +k505pxGfNiKHs1bFxOlKEVmohaXGBXyaQwGKsmTDDqTsJeMMoK+GNZ8q0X93H2kxb
-	 KWvz9IiNM6yBg==
-From: Simon Horman <horms@kernel.org>
-Date: Fri, 03 May 2024 12:11:58 +0100
-Subject: [PATCH net-next v2] octeontx2-pf: Treat truncation of IRQ name as
- an error
+	s=arc-20240116; t=1714734828; c=relaxed/simple;
+	bh=eP7UrYAm+QXdT7GsbpqZgXK33rijqXS4hxtOIMaJM+8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cz11+Zu0d+6mzguD3s/+6LOiftL4wRuZ7jeOHxXsy6aQOBoKN7T+erG3SP4R5Hnnw+Uv1smdgu4ABUX/PsgkrAtOuSlHNvXwyGY+/9uKiYnZz36SeYsa9575j0Ies05SkSOrN6C1/gIzIHaGuhSmfI1isR+qm4ZR4US83M5n5tA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-a51a7d4466bso1088818866b.2;
+        Fri, 03 May 2024 04:13:46 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714734825; x=1715339625;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=fjeIuy9dzDTEtIZgB/dBWOi7o2OzXsFxxtGO6ENhPS8=;
+        b=vEWqM0QEokyGJAFxAtZNBfDp70qaIpf5jeJOwc4jaDIMLpEkhZHdI0KOUOnC6BcbDn
+         p+JKmNhgNvSvmuLKdkPKlCy30IAfmq5mMW7HlwxlmfIVb0PSyUmuEFbXcxidZpgMXnz9
+         va6SQIBHxD6FsqCHsvy1wcgsjskz9RRW0d1Mnyu7kVIUus+DydCqI4Oa4kuWxA4seFuf
+         6cUhl0+PGyQs9fF64BKqIrgGthstxDwi1pFH5furub4Oooeh1iJBZ/JnkSHySw1V0hg9
+         npByLoDBrNIUdYPubdw6k0prxR2IXl2bU9g27ftOYLW1SPxJGkwJXaJBNsNgHXywzVPY
+         5DlQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUiJf7CC4KdbDxhVzvJfAjsbhYBvxo9eKYHEt/WgG7hT/Y3UtYDMfNoj6+dD5aT179/bhod6UGte365Si9Qgq1aCgcPhBi0Dd89GMrEKinQms0BWbmgMxK8T8iOHHEtceV5OZsMjQbzHQ==
+X-Gm-Message-State: AOJu0YyVFz52F90oMCfNRqdwXRKno2jpoEJljPKEQ4kEuBUc9vTJhj0d
+	ZZuRzzkR6LKaSrt6Evvb82y7bk3VWSW+8G0genWm9n+ZWw6dqqnhBniLig==
+X-Google-Smtp-Source: AGHT+IHJxQZVhIx315d2eMT4ER2zN7KMg67+sDv4OXDn7eZIjMXdEpmX9lpfpSRhmextaA64KUwc/Q==
+X-Received: by 2002:a17:906:40ca:b0:a55:ac3d:5871 with SMTP id a10-20020a17090640ca00b00a55ac3d5871mr1312923ejk.77.1714734825020;
+        Fri, 03 May 2024 04:13:45 -0700 (PDT)
+Received: from localhost (fwdproxy-lla-003.fbsv.net. [2a03:2880:30ff:3::face:b00c])
+        by smtp.gmail.com with ESMTPSA id t24-20020a1709063e5800b00a58bcb55704sm1561929eji.165.2024.05.03.04.13.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 03 May 2024 04:13:44 -0700 (PDT)
+From: Breno Leitao <leitao@debian.org>
+To: Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Leon Romanovsky <leon@kernel.org>
+Cc: netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org (open list:HFI1 DRIVER),
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH net-next 1/2] IB/hfi1: Do not use custom stat allocator
+Date: Fri,  3 May 2024 04:13:31 -0700
+Message-ID: <20240503111333.552360-1-leitao@debian.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240503-octeon2-pf-irq_name-truncation-v2-1-91099177b942@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAH3GNGYC/42NUQrCMBBEryL77UoSW0S/vIcUSdNNG9RN3cRSK
- b27oSfwc3gz8xZIJIESXHYLCE0hhcglmP0O3GC5JwxdyWCUqVStNEaXKbLB0WOQ953tizDLh53
- NZYqmrbx1Wh1LGcrJKOTDvAluwJSRac7QFDKElKN8N/OkN/6vZNKosfZtd/Lnti2q64OE6XmI0
- kOzrusPTuQRyNcAAAA=
-To: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>
-Cc: Sunil Goutham <sgoutham@marvell.com>, 
- Geetha sowjanya <gakula@marvell.com>, 
- Subbaraya Sundeep <sbhatta@marvell.com>, 
- Hariprasad Kelam <hkelam@marvell.com>, 
- Dan Carpenter <dan.carpenter@linaro.org>, netdev@vger.kernel.org, 
- Andrew Lunn <andrew@lunn.ch>
-X-Mailer: b4 0.12.3
+Content-Transfer-Encoding: 8bit
 
-According to GCC, the constriction of irq_name in otx2_open()
-may, theoretically, be truncated.
+With commit 34d21de99cea9 ("net: Move {l,t,d}stats allocation to core and
+convert veth & vrf"), stats allocation could be done on net core
+instead of in this driver.
 
-This patch takes the approach of treating such a situation as an error
-which it detects by making use of the return value of snprintf, which is
-the total number of bytes, excluding the trailing '\0', that would have
-been written.
+With this new approach, the driver doesn't have to bother with error
+handling (allocation failure checking, making sure free happens in the
+right spot, etc). This is core responsibility now.
 
-Based on the approach taken to a similar problem in
-commit 54b909436ede ("rtc: fix snprintf() checking in is_rtc_hctosys()")
+Remove the allocation in the hfi1 driver and leverage the network
+core allocation instead.
 
-Flagged by gcc-13 W=1 builds as:
-
-.../otx2_pf.c:1933:58: warning: 'snprintf' output may be truncated before the last format character [-Wformat-truncation=]
- 1933 |                 snprintf(irq_name, NAME_SIZE, "%s-rxtx-%d", pf->netdev->name,
-      |                                                          ^
-.../otx2_pf.c:1933:17: note: 'snprintf' output between 8 and 33 bytes into a destination of size 32
- 1933 |                 snprintf(irq_name, NAME_SIZE, "%s-rxtx-%d", pf->netdev->name,
-      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- 1934 |                          qidx);
-      |                          ~~~~~
-
-Compile tested only.
-
-Tested-by: Geetha sowjanya <gakula@marvell.com>
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-Signed-off-by: Simon Horman <horms@kernel.org>
+Signed-off-by: Breno Leitao <leitao@debian.org>
 ---
-Changes in v2:
-- Update patch description to correctly describe return value of
-  snprintf as excluding, rather than including, the trailing '\0'.
-  Thanks to Andrew Lunn
-- Collected tags from Geetha sowjanya and Andrew Lunn. Thanks!
-- Link to v1: https://lore.kernel.org/r/20240501-octeon2-pf-irq_name-truncation-v1-1-5fbd7f9bb305@kernel.org
----
- drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
+ drivers/infiniband/hw/hfi1/ipoib_main.c | 19 +++----------------
+ 1 file changed, 3 insertions(+), 16 deletions(-)
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-index 6a44dacff508..14bccff0ee5c 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-@@ -1886,9 +1886,17 @@ int otx2_open(struct net_device *netdev)
- 	vec = pf->hw.nix_msixoff + NIX_LF_CINT_VEC_START;
- 	for (qidx = 0; qidx < pf->hw.cint_cnt; qidx++) {
- 		irq_name = &pf->hw.irq_name[vec * NAME_SIZE];
-+		int name_len;
+diff --git a/drivers/infiniband/hw/hfi1/ipoib_main.c b/drivers/infiniband/hw/hfi1/ipoib_main.c
+index 5d814afdf7f3..59c6e55f4119 100644
+--- a/drivers/infiniband/hw/hfi1/ipoib_main.c
++++ b/drivers/infiniband/hw/hfi1/ipoib_main.c
+@@ -21,36 +21,25 @@ static int hfi1_ipoib_dev_init(struct net_device *dev)
+ 	struct hfi1_ipoib_dev_priv *priv = hfi1_ipoib_priv(dev);
+ 	int ret;
  
--		snprintf(irq_name, NAME_SIZE, "%s-rxtx-%d", pf->netdev->name,
--			 qidx);
-+		name_len = snprintf(irq_name, NAME_SIZE, "%s-rxtx-%d",
-+				    pf->netdev->name, qidx);
-+		if (name_len >= NAME_SIZE) {
-+			dev_err(pf->dev,
-+				"RVUPF%d: IRQ registration failed for CQ%d, irq name is too long\n",
-+				rvu_get_pf(pf->pcifunc), qidx);
-+			err = -EINVAL;
-+			goto err_free_cints;
-+		}
+-	dev->tstats = netdev_alloc_pcpu_stats(struct pcpu_sw_netstats);
+-	if (!dev->tstats)
+-		return -ENOMEM;
+-
+ 	ret = priv->netdev_ops->ndo_init(dev);
+ 	if (ret)
+-		goto out_ret;
++		return ret;
  
- 		err = request_irq(pci_irq_vector(pf->pdev, vec),
- 				  otx2_cq_intr_handler, 0, irq_name,
+ 	ret = hfi1_netdev_add_data(priv->dd,
+ 				   qpn_from_mac(priv->netdev->dev_addr),
+ 				   dev);
+ 	if (ret < 0) {
+ 		priv->netdev_ops->ndo_uninit(dev);
+-		goto out_ret;
++		return ret;
+ 	}
+ 
+ 	return 0;
+-out_ret:
+-	free_percpu(dev->tstats);
+-	dev->tstats = NULL;
+-	return ret;
+ }
+ 
+ static void hfi1_ipoib_dev_uninit(struct net_device *dev)
+ {
+ 	struct hfi1_ipoib_dev_priv *priv = hfi1_ipoib_priv(dev);
+ 
+-	free_percpu(dev->tstats);
+-	dev->tstats = NULL;
+-
+ 	hfi1_netdev_remove_data(priv->dd, qpn_from_mac(priv->netdev->dev_addr));
+ 
+ 	priv->netdev_ops->ndo_uninit(dev);
+@@ -173,9 +162,6 @@ static void hfi1_ipoib_netdev_dtor(struct net_device *dev)
+ 
+ 	hfi1_ipoib_txreq_deinit(priv);
+ 	hfi1_ipoib_rxq_deinit(priv->netdev);
+-
+-	free_percpu(dev->tstats);
+-	dev->tstats = NULL;
+ }
+ 
+ static void hfi1_ipoib_set_id(struct net_device *dev, int id)
+@@ -234,6 +220,7 @@ static int hfi1_ipoib_setup_rn(struct ib_device *device,
+ 
+ 	netdev->priv_destructor = hfi1_ipoib_netdev_dtor;
+ 	netdev->needs_free_netdev = true;
++	netdev->pcpu_stat_type = NETDEV_PCPU_STAT_TSTATS;
+ 
+ 	return 0;
+ }
+-- 
+2.43.0
 
 
