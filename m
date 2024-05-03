@@ -1,89 +1,124 @@
-Return-Path: <netdev+bounces-93218-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93220-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FD308BAA7E
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 12:08:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05D1A8BAA97
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 12:18:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B0C7A1C21BA9
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 10:08:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B68DE2844DC
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 10:18:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2ADA14F9F2;
-	Fri,  3 May 2024 10:08:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BDCC14F9EC;
+	Fri,  3 May 2024 10:18:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GlGL3H5i"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D8AB1E493;
-	Fri,  3 May 2024 10:08:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B4BC14F9F8
+	for <netdev@vger.kernel.org>; Fri,  3 May 2024 10:18:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714730921; cv=none; b=IBWbeTZ/hCqVI94M70/hutp5TVgk4lSFZ8+9wHDykWAoi1OQkLI8pT8dN35sCPMaUEa6HQnaiHXua2pddtYWNHrBNuHXqk8PywTqsKoHzXLlOezZ2sSwZ0NLbP/XAI1q9o2fEdurhyr65TTcSVIXPeXDOg57kJ9PSFJOmc6kgDo=
+	t=1714731513; cv=none; b=T862I0I+ZAon5o4KlyuNacFG31MCd1o4cMy1yfMbgjLQ9tkwiLIVKpUils9TQtuBjgc1U2qbySt32XKJik9FNZPkh7qDKZzHHVMISRSr6O26MRR9yu/FxCrjJS1L/y9ngS2rHtbp6AdS0NT4sVj4S9jJ00hb6OpHmK4nLKipbUs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714730921; c=relaxed/simple;
-	bh=mhX5A1Y04AoRa49GFo8bG3cgSqc/Wl1fdNUEsXNzf4E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ka4fNzY3dA9i2L2U9zTnnJrH3Pi7VurpY74DyCGjBtufVy5k5ALSr4pifA2M8Pwg4/feVbQxBXzksUxZtJa8VlOI4/IOBRiV99/BO85H9AGBgsPvjoUxCAcujXmIBV6irj7ZAbWVwN0xF3MO3Ijb5Vy0Q2zehj6j76czXLbU4jI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+	s=arc-20240116; t=1714731513; c=relaxed/simple;
+	bh=z1RM2AZucoVbpGD+yIbTGTAe9/SCauSVk5ykbcLAGSA=;
+	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
+	 MIME-Version:Content-Type; b=ChKXR4aa0ggk/7S5BcB/5PQ8cn0GihKcUjU9yHjichkkbX+GGMRxSJA0MYOqokFIQDWhUO6CAL5ZW+SnsB7oPdpljpboJwVzc68K13WuKhhAn/2Xlb2Yah5u26NLgYwj0QPl8NOQImmWGmOy4uVC3WpQOCZUox5sFq/HlPECWtQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GlGL3H5i; arc=none smtp.client-ip=209.85.128.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a5544fd07easo1328280566b.0;
-        Fri, 03 May 2024 03:08:39 -0700 (PDT)
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-41a1d88723bso63935915e9.0
+        for <netdev@vger.kernel.org>; Fri, 03 May 2024 03:18:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1714731509; x=1715336309; darn=vger.kernel.org;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=OfDHb85z1DkjQut1/Jkb3/MNWNmze9D3fbDna+xKi0U=;
+        b=GlGL3H5iqErnGL8RIrJfskkJB/r5OFhJ2pgfzpEQaZggMfnwQxi1OAA4FGF8diSjlw
+         gUTtV0nAoLPIUs273I8M7D/VmAl1vgfTzPRZYGa5TxL+57ThP9brh2+4Y3IT9TzrvBl5
+         NiNd4I3b6+CLj3Ddnv5h1zsRmOW8KLmG1lWarjzztkKyn9WoYEbDFo6eb+vy4UVASyIk
+         Ie1S5RSHoD6pmf8OJ8G/lITW9HSb+ZZ7+0ckYYjbKI93CWjC7ECk+KoxMZiogDDPFEfn
+         HAoOtGY6mir2mdEsQQEAmL087/4cjjMlaMiVr23jvN4oFv3gsC5E9iP2GsuQX+IUKdU6
+         c/wg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714730918; x=1715335718;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20230601; t=1714731509; x=1715336309;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=yMpYjlBazhzpHCwuPFitIuy7d7NQaAnw9Mgkl9WFu48=;
-        b=dHhT1apQQNeFs5CrUTOQIBNszdKrHfDrGEbuN1rqMsPQLKuoyj6E67BdHJZXHHv/6A
-         lSUclcYLA86xj4s8e9UJN+vlzHIA0Hl9KR1fQMpdt2PG9oyYRNeLNuQPEJzyPl4qfLD8
-         ig3p7mOdl6FwcgCxuai3xtoC5Md7ayafA8z5eq4qvBRkl0tDbLuRkEb5qZv33JmNZFGn
-         nsVuRmn1zrE7KwcDedX9A8SFATHE8w1j+xmcq7SIV21RKb2/IEHuHJptbGI4snhYJ6kI
-         mrQt+664CQB3cYUgozZ+glKpb2uXYwM23hf7OEyb2BrYNoo0zuJZ2jD+Pv8bpS8FZqDA
-         qXqw==
-X-Forwarded-Encrypted: i=1; AJvYcCXqhRfd9ghDTOD5uMVVlFRDzAofyLmfz3eIVDFQzf7GPzdWEyNpeg9An5gnwgKMaoXiNNQR+vlvANUxJzjXgcnWs9bKl9toSrlB3+gunTld4oJKsoEZdLl6FV4+1lo5fMG7Bky0
-X-Gm-Message-State: AOJu0YxMlYWczKI1Y8M92yj5Mwvi01RGv86pl0ypUw2fjl7UCcKIG8YT
-	4jbGxB3WbZwTe8JSqGoO/PgKdJgy5YPSeghGuZ6DBMz9h4Za0ahD
-X-Google-Smtp-Source: AGHT+IETjDqpksWA62sq7sJNDTlrF9Ntfcd1ZnPt4IqNIOgywKI/vxRfwiriTzx0HR71qpTupgT8ng==
-X-Received: by 2002:a17:906:cb85:b0:a58:a721:3a61 with SMTP id mf5-20020a170906cb8500b00a58a7213a61mr1064303ejb.3.1714730918194;
-        Fri, 03 May 2024 03:08:38 -0700 (PDT)
-Received: from gmail.com (fwdproxy-lla-002.fbsv.net. [2a03:2880:30ff:2::face:b00c])
-        by smtp.gmail.com with ESMTPSA id n1-20020a1709062bc100b00a522fb5587esm1564769ejg.144.2024.05.03.03.08.37
+        bh=OfDHb85z1DkjQut1/Jkb3/MNWNmze9D3fbDna+xKi0U=;
+        b=oHU0NGo4dZPKxBe2XmRJpJD5SlpoGE5RwhpwC/+Z6lsOBz4FQWHv/5ehPrTDHyv3ZL
+         d7J4+tOcR2PyzMOu01tnkWRL12ZgaonHda3yYlwmiPziYg5SEU5vfS+ZlNRs7eCoFYJM
+         Iw5GLllBMNH7df6uTxE8yfecG1qZtfZ3Q5aSk5tP2cklt5n7X5obldQ4x5m8LnXmxfja
+         goIPxl0jUlP9XSBz7oVq8vD0GplydpMC8upaHn63GbXTZ/gK5qoCEHFbQEnsaKlMuUEm
+         jCSR2qdK+2HYIjVlVyWzfkhQZ/myANTgDg1BxxK6eSCo+7iom2WNIVdOLCxoT0F5oxVp
+         LJTw==
+X-Forwarded-Encrypted: i=1; AJvYcCUO6Jr402+6utgs7BDtjNXQjOzjLMIzrRHDiIukKuB/KS2f1rl1xgF97D9faiZAKau35SMFe3eh8uaEBf2FwrWDjJNWsW0W
+X-Gm-Message-State: AOJu0YycFLg5jzuQEZN2XlZE0NxjCP685MAygHe+zyAxrgybKU917l+1
+	tqyBgtICPpD7dcfMyJZS31/vLdOqT6lMxbYLisRLVJjWNmv8OjGn
+X-Google-Smtp-Source: AGHT+IFn/a+JbV+fmYeO4uz5kTvn0QJoj8eNQrHf6DtE9kSJvghDTmF/ocsCkcTBsPaAqruu7Y4kVw==
+X-Received: by 2002:a05:600c:1912:b0:41b:fbec:a53a with SMTP id j18-20020a05600c191200b0041bfbeca53amr1801986wmq.16.1714731509441;
+        Fri, 03 May 2024 03:18:29 -0700 (PDT)
+Received: from imac ([2a02:8010:60a0:0:fd6b:a058:1d70:6e1a])
+        by smtp.gmail.com with ESMTPSA id l27-20020a05600c1d1b00b0041c5151dc1csm8875588wms.29.2024.05.03.03.18.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 May 2024 03:08:37 -0700 (PDT)
-Date: Fri, 3 May 2024 03:08:35 -0700
-From: Breno Leitao <leitao@debian.org>
-To: linux@treblig.org
-Cc: 3chas3@gmail.com, linux-atm-general@lists.sourceforge.net,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] atm/fore200e: Delete unused 'fore200e_boards'
-Message-ID: <ZjS3o+EUp2VwfqK9@gmail.com>
-References: <20240503001822.183061-1-linux@treblig.org>
+        Fri, 03 May 2024 03:18:28 -0700 (PDT)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net,  netdev@vger.kernel.org,  edumazet@google.com,
+  pabeni@redhat.com,  jiri@resnulli.us,  alessandromarcolini99@gmail.com
+Subject: Re: [PATCH net-next] tools: ynl: add --list-ops and --list-msgs to CLI
+In-Reply-To: <20240502164043.2130184-1-kuba@kernel.org> (Jakub Kicinski's
+	message of "Thu, 2 May 2024 09:40:43 -0700")
+Date: Fri, 03 May 2024 11:17:37 +0100
+Message-ID: <m2fruzfbcu.fsf@gmail.com>
+References: <20240502164043.2130184-1-kuba@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240503001822.183061-1-linux@treblig.org>
+Content-Type: text/plain
 
-On Fri, May 03, 2024 at 01:18:22AM +0100, linux@treblig.org wrote:
-> From: "Dr. David Alan Gilbert" <linux@treblig.org>
-> 
-> This list looks like it's been unused since the OF conversion in
-> 2008 in
-> 
-> commit 826b6cfcd5d4 ("fore200e: Convert over to pure OF driver.")
-> 
-> This also means we can remove the 'entry' member for the list.
-> 
-> Build tested only.
-> 
-> Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
+Jakub Kicinski <kuba@kernel.org> writes:
 
-Reviewed-by: Breno Leitao <leitao@debian.org>
+> I often forget the exact naming of ops and have to look at
+> the spec to find it. Add support for listing the operations:
+>
+>   $ ./cli.py --spec .../netdev.yaml --list-ops
+>   dev-get  [ do, dump ]
+>   page-pool-get  [ do, dump ]
+>   page-pool-stats-get  [ do, dump ]
+>   queue-get  [ do, dump ]
+>   napi-get  [ do, dump ]
+>   qstats-get  [ dump ]
+>
+> For completeness also support listing all ops (including
+> notifications:
+>
+>   # ./cli.py --spec .../netdev.yaml --list-msgs
+>   dev-get  [ dump, do ]
+>   dev-add-ntf  [ notify ]
+>   dev-del-ntf  [ notify ]
+>   dev-change-ntf  [ notify ]
+>   page-pool-get  [ dump, do ]
+>   page-pool-add-ntf  [ notify ]
+>   page-pool-del-ntf  [ notify ]
+>   page-pool-change-ntf  [ notify ]
+>   page-pool-stats-get  [ dump, do ]
+>   queue-get  [ dump, do ]
+>   napi-get  [ dump, do ]
+>   qstats-get  [ dump ]
+>
+> Use double space after the name for slightly easier to read
+> output.
+>
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+
+Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
 
