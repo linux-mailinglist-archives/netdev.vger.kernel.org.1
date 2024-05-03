@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-93387-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93388-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A47E8BB7A2
-	for <lists+netdev@lfdr.de>; Sat,  4 May 2024 00:41:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C62D8BB7A3
+	for <lists+netdev@lfdr.de>; Sat,  4 May 2024 00:41:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 664BEB231C2
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 22:41:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 42654B21D4D
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 22:41:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0190586257;
-	Fri,  3 May 2024 22:34:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4E5277F08;
+	Fri,  3 May 2024 22:34:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="F1b8Fv8O"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="TjS/+F25"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
+Received: from smtp-fw-33001.amazon.com (smtp-fw-33001.amazon.com [207.171.190.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A3A884A4F
-	for <netdev@vger.kernel.org>; Fri,  3 May 2024 22:34:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31ECF84A52
+	for <netdev@vger.kernel.org>; Fri,  3 May 2024 22:34:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.190.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714775645; cv=none; b=Y6fRhaB5hYp3UF/kUaVlnxvwMVSdT84VliGhlUvGzzKp5uZTdYpbev4n27WOMznh5zf9twdk/CJqyWERynsZ3twVK7hhj2mI6mC6JROBs+BbHuJv1X9q6RpomNln3MHDaDhy65zDzmBlt5Km/zc1MuuhFcWywc2I2WfcBvjIVc8=
+	t=1714775670; cv=none; b=IQUlD48R/j7P+T3edHtil/idp4I1WaivPZhPYrD2jf8aYZGciigbhdbGUVyj14VYsjB6wIqEhqH6yaISFyJiTDp+CIdNwoFTjA0HRbPym2fozCgFt2O3tybjH70R6rUqczq17qbIdNKR58i4mXCE/6deytc3aZXKZGAi8hUbWQ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714775645; c=relaxed/simple;
-	bh=WK+B8Bs8viY4KE5Abjv3HZ5UGzlvDET0ffb+z7a2bNU=;
+	s=arc-20240116; t=1714775670; c=relaxed/simple;
+	bh=ZajLOb9jV4zmgIw2oL0s2pKlMKG8s7USQqyz1aBgkwk=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mWHe5KywHmLMzOjwqTYuxddT3FHc8eQtnIAQdvsHy6xL8gErKf00PjPemYQc0gAV9kRyvOH2hPkav3EGiI4ekPZCNR8c8jcXEsRTyAczMay4+C/xu33mOO22XDnn4K8nPJUs1i6z/GCeXrHOiporRD6WKFc0VmgON0rK7q6TIMw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=F1b8Fv8O; arc=none smtp.client-ip=99.78.197.218
+	 MIME-Version:Content-Type; b=kYlVtA1t+t6hA+a1BLqywjPn6JyTTlgzmpKDaKtZ6+Mwvtb+tLvAcBXYxJ0OyCuIj9TXSYqwAfPTSgywzW8AVZO8l3HGVcslbpMPViP7IwgEZ848/9Eu22FwSBDMfRx/xXMhSmTBcdZxkw8Y5RkeUAa1h5U9atjbkVlbXFZmlSE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=TjS/+F25; arc=none smtp.client-ip=207.171.190.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1714775645; x=1746311645;
+  t=1714775669; x=1746311669;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=RXYH5fpf0y+XFw/VidzK3Ry5kZgM04X4YWdxYb+d/ts=;
-  b=F1b8Fv8OU25WE0Pcx535CWYPkHaxIkmNf8zqYRYaj/Kx2idlCkkvQ0hn
-   OFJxoGHg0Xb9GU/ZuGyjAQH7iK7trA+48hxLEK62/qsROQuylGsqWpbu3
-   SneiKlMb2qVP0aHNJAvHyJIbjj/wIH78kNjE1hZE4ymre5xyGxGa5iioA
-   c=;
+  bh=8vQ+M0cbMKRhEiF1UmeexocvcoDcl1UjVusgW7tFfsg=;
+  b=TjS/+F25wbSALsuKc89RC1mA8buNP0/hqjJDMe7l1hUMGO3M6y5Mjnzg
+   9FB4u4VEBHX7vk19xPC/EyOqQy+vQyB7qeV7GgW2j4XnTb+WjyzSvREID
+   6jbKpny9/1y07xGkEgzAsosECgCgpWFLbFNSDuUxg4OFZbr+8zwny0lYw
+   E=;
 X-IronPort-AV: E=Sophos;i="6.07,252,1708387200"; 
-   d="scan'208";a="293892173"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 May 2024 22:34:03 +0000
-Received: from EX19MTAUWB001.ant.amazon.com [10.0.38.20:21792]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.12.153:2525] with esmtp (Farcaster)
- id 7ed52cd0-ad13-437f-b3ce-a13fd06b0614; Fri, 3 May 2024 22:34:02 +0000 (UTC)
-X-Farcaster-Flow-ID: 7ed52cd0-ad13-437f-b3ce-a13fd06b0614
+   d="scan'208";a="342642134"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-33001.sea14.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 May 2024 22:34:28 +0000
+Received: from EX19MTAUWC002.ant.amazon.com [10.0.21.151:22906]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.23.7:2525] with esmtp (Farcaster)
+ id 4f86ff23-c05b-4227-9912-c60a3abfbab8; Fri, 3 May 2024 22:34:26 +0000 (UTC)
+X-Farcaster-Flow-ID: 4f86ff23-c05b-4227-9912-c60a3abfbab8
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Fri, 3 May 2024 22:34:01 +0000
+ 15.2.1258.28; Fri, 3 May 2024 22:34:25 +0000
 Received: from 88665a182662.ant.amazon.com (10.187.170.24) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.28;
- Fri, 3 May 2024 22:33:59 +0000
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Fri, 3 May 2024 22:34:23 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
 	<pabeni@redhat.com>
 CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
 	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v1 net-next 5/6] af_unix: Schedule GC based on graph state during sendmsg().
-Date: Fri, 3 May 2024 15:31:49 -0700
-Message-ID: <20240503223150.6035-6-kuniyu@amazon.com>
+Subject: [PATCH v1 net-next 6/6] af_unix: Schedule GC only if loop exists during close().
+Date: Fri, 3 May 2024 15:31:50 -0700
+Message-ID: <20240503223150.6035-7-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20240503223150.6035-1-kuniyu@amazon.com>
 References: <20240503223150.6035-1-kuniyu@amazon.com>
@@ -77,120 +77,130 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D035UWB003.ant.amazon.com (10.13.138.85) To
+X-ClientProxiedBy: EX19D040UWB004.ant.amazon.com (10.13.138.91) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-The conventional test to trigger GC was based on the number of inflight
-sockets.
+If unix_tot_inflight is not 0 when AF_UNIX socket is close()d, GC is
+always scheduled.
 
-Now we have more reliable data indicating if the loop exists in the graph.
-
-When the graph state is
-
-  1. UNIX_GRAPH_NOT_CYCLIC, do not scheudle GC
-  2. UNIX_GRAPH_MAYBE_CYCLIC, schedule GC if unix_tot_inflight > 16384
-  3. UNIX_GRAPH_CYCLIC, schedule GC if unix_graph_circles > 1024
-
-1024 might sound much smaller than 16384, but if the number of loops
-is larger than 1024, there must be something wrong.
+However, we need not do so if we know no loop exists in the inflight
+graph.
 
 Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 ---
- net/unix/garbage.c | 44 ++++++++++++++++++++++++++++----------------
- 1 file changed, 28 insertions(+), 16 deletions(-)
+ include/net/af_unix.h |  3 +--
+ net/unix/af_unix.c    |  3 +--
+ net/unix/garbage.c    | 30 +++++++++++++++---------------
+ 3 files changed, 17 insertions(+), 19 deletions(-)
 
+diff --git a/include/net/af_unix.h b/include/net/af_unix.h
+index ebd1b3ca8906..1270b2c08b8f 100644
+--- a/include/net/af_unix.h
++++ b/include/net/af_unix.h
+@@ -17,13 +17,12 @@ static inline struct unix_sock *unix_get_socket(struct file *filp)
+ }
+ #endif
+ 
+-extern unsigned int unix_tot_inflight;
+ void unix_add_edges(struct scm_fp_list *fpl, struct unix_sock *receiver);
+ void unix_del_edges(struct scm_fp_list *fpl);
+ void unix_update_edges(struct unix_sock *receiver);
+ int unix_prepare_fpl(struct scm_fp_list *fpl);
+ void unix_destroy_fpl(struct scm_fp_list *fpl);
+-void unix_gc(void);
++void unix_schedule_gc(void);
+ 
+ struct unix_vertex {
+ 	struct list_head edges;
+diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+index 863058be35f3..b99f7170835e 100644
+--- a/net/unix/af_unix.c
++++ b/net/unix/af_unix.c
+@@ -677,8 +677,7 @@ static void unix_release_sock(struct sock *sk, int embrion)
+ 	 *	  What the above comment does talk about? --ANK(980817)
+ 	 */
+ 
+-	if (READ_ONCE(unix_tot_inflight))
+-		unix_gc();		/* Garbage collect fds */
++	unix_schedule_gc();
+ }
+ 
+ static void init_peercred(struct sock *sk)
 diff --git a/net/unix/garbage.c b/net/unix/garbage.c
-index 85c0500764d4..48cea3cf4a42 100644
+index 48cea3cf4a42..2cecbb97882c 100644
 --- a/net/unix/garbage.c
 +++ b/net/unix/garbage.c
-@@ -128,7 +128,7 @@ static void unix_update_graph(struct unix_vertex *vertex)
- 	if (!vertex)
+@@ -189,7 +189,7 @@ static void unix_free_vertices(struct scm_fp_list *fpl)
+ }
+ 
+ static DEFINE_SPINLOCK(unix_gc_lock);
+-unsigned int unix_tot_inflight;
++static unsigned int unix_tot_inflight;
+ 
+ void unix_add_edges(struct scm_fp_list *fpl, struct unix_sock *receiver)
+ {
+@@ -577,11 +577,6 @@ static void __unix_gc(struct work_struct *work)
+ 
+ 	spin_lock(&unix_gc_lock);
+ 
+-	if (unix_graph_state == UNIX_GRAPH_NOT_CYCLIC) {
+-		spin_unlock(&unix_gc_lock);
+-		goto skip_gc;
+-	}
+-
+ 	__skb_queue_head_init(&hitlist);
+ 
+ 	if (unix_graph_state == UNIX_GRAPH_CYCLIC)
+@@ -597,18 +592,12 @@ static void __unix_gc(struct work_struct *work)
+ 	}
+ 
+ 	__skb_queue_purge(&hitlist);
+-skip_gc:
++
+ 	WRITE_ONCE(gc_in_progress, false);
+ }
+ 
+ static DECLARE_WORK(unix_gc_work, __unix_gc);
+ 
+-void unix_gc(void)
+-{
+-	WRITE_ONCE(gc_in_progress, true);
+-	queue_work(system_unbound_wq, &unix_gc_work);
+-}
+-
+ #define UNIX_INFLIGHT_SANE_CIRCLES (1 << 10)
+ #define UNIX_INFLIGHT_SANE_SOCKETS (1 << 14)
+ #define UNIX_INFLIGHT_SANE_USER (SCM_MAX_FD * 8)
+@@ -621,6 +610,9 @@ static void __unix_schedule_gc(struct scm_fp_list *fpl)
+ 	if (graph_state == UNIX_GRAPH_NOT_CYCLIC)
  		return;
  
--	unix_graph_state = UNIX_GRAPH_MAYBE_CYCLIC;
-+	WRITE_ONCE(unix_graph_state, UNIX_GRAPH_MAYBE_CYCLIC);
- }
- 
- static LIST_HEAD(unix_unvisited_vertices);
-@@ -533,7 +533,8 @@ static void unix_walk_scc(struct sk_buff_head *hitlist)
- 	list_replace_init(&unix_visited_vertices, &unix_unvisited_vertices);
- 	swap(unix_vertex_unvisited_index, unix_vertex_grouped_index);
- 
--	unix_graph_state = unix_graph_circles ? UNIX_GRAPH_CYCLIC : UNIX_GRAPH_NOT_CYCLIC;
-+	WRITE_ONCE(unix_graph_state,
-+		   unix_graph_circles ? UNIX_GRAPH_CYCLIC : UNIX_GRAPH_NOT_CYCLIC);
- }
- 
- static void unix_walk_scc_fast(struct sk_buff_head *hitlist)
-@@ -555,7 +556,7 @@ static void unix_walk_scc_fast(struct sk_buff_head *hitlist)
- 
- 		if (scc_dead) {
- 			unix_collect_skb(&scc, hitlist);
--			unix_graph_circles--;
-+			WRITE_ONCE(unix_graph_circles, unix_graph_circles - 1);
- 		}
- 
- 		list_del(&scc);
-@@ -564,7 +565,7 @@ static void unix_walk_scc_fast(struct sk_buff_head *hitlist)
- 	list_replace_init(&unix_visited_vertices, &unix_unvisited_vertices);
- 
- 	if (!unix_graph_circles)
--		unix_graph_state = UNIX_GRAPH_NOT_CYCLIC;
-+		WRITE_ONCE(unix_graph_state, UNIX_GRAPH_NOT_CYCLIC);
- }
- 
- static bool gc_in_progress;
-@@ -608,27 +609,38 @@ void unix_gc(void)
- 	queue_work(system_unbound_wq, &unix_gc_work);
- }
- 
--#define UNIX_INFLIGHT_TRIGGER_GC 16000
-+#define UNIX_INFLIGHT_SANE_CIRCLES (1 << 10)
-+#define UNIX_INFLIGHT_SANE_SOCKETS (1 << 14)
- #define UNIX_INFLIGHT_SANE_USER (SCM_MAX_FD * 8)
- 
- static void __unix_schedule_gc(struct scm_fp_list *fpl)
- {
--	/* If number of inflight sockets is insane,
--	 * force a garbage collect right now.
--	 *
--	 * Paired with the WRITE_ONCE() in unix_inflight(),
--	 * unix_notinflight(), and __unix_gc().
-+	unsigned char graph_state = READ_ONCE(unix_graph_state);
-+	bool wait = false;
++	if (!fpl)
++		goto schedule;
 +
-+	if (graph_state == UNIX_GRAPH_NOT_CYCLIC)
-+		return;
-+
-+	/* If the number of inflight sockets or cyclic references
-+	 * is insane, schedule garbage collector if not running.
+ 	/* If the number of inflight sockets or cyclic references
+ 	 * is insane, schedule garbage collector if not running.
  	 */
--	if (READ_ONCE(unix_tot_inflight) > UNIX_INFLIGHT_TRIGGER_GC &&
--	    !READ_ONCE(gc_in_progress))
+@@ -638,9 +630,17 @@ static void __unix_schedule_gc(struct scm_fp_list *fpl)
+ 	if (READ_ONCE(fpl->user->unix_inflight) > UNIX_INFLIGHT_SANE_USER)
+ 		wait = true;
+ 
+-	if (!READ_ONCE(gc_in_progress))
 -		unix_gc();
-+	if (graph_state == UNIX_GRAPH_CYCLIC) {
-+		if (READ_ONCE(unix_graph_circles) < UNIX_INFLIGHT_SANE_CIRCLES)
-+			return;
-+	} else {
-+		if (READ_ONCE(unix_tot_inflight) < UNIX_INFLIGHT_SANE_SOCKETS)
-+			return;
++schedule:
++	if (!READ_ONCE(gc_in_progress)) {
++		WRITE_ONCE(gc_in_progress, true);
++		queue_work(system_unbound_wq, &unix_gc_work);
 +	}
  
- 	/* Penalise users who want to send AF_UNIX sockets
- 	 * but whose sockets have not been received yet.
- 	 */
--	if (READ_ONCE(fpl->user->unix_inflight) < UNIX_INFLIGHT_SANE_USER)
--		return;
-+	if (READ_ONCE(fpl->user->unix_inflight) > UNIX_INFLIGHT_SANE_USER)
-+		wait = true;
-+
-+	if (!READ_ONCE(gc_in_progress))
-+		unix_gc();
- 
--	if (READ_ONCE(gc_in_progress))
-+	if (wait)
+ 	if (wait)
  		flush_work(&unix_gc_work);
  }
++
++void unix_schedule_gc(void)
++{
++	__unix_schedule_gc(NULL);
++}
 -- 
 2.30.2
 
