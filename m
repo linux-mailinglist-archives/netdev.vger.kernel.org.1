@@ -1,514 +1,157 @@
-Return-Path: <netdev+bounces-93216-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93217-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC5F98BAA1A
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 11:44:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C550E8BAA76
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 12:05:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D8F1BB224F2
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 09:44:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 84CBB284878
+	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 10:04:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 448BC14F9CC;
-	Fri,  3 May 2024 09:43:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f6Dz4RDa"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7AC214F9FA;
+	Fri,  3 May 2024 10:04:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1AE214F134
-	for <netdev@vger.kernel.org>; Fri,  3 May 2024 09:43:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDCBE14F9E8;
+	Fri,  3 May 2024 10:04:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714729437; cv=none; b=MnY2HVkd+i+Dpiu7hNBSYrIToTr9hAE9P/yIEn3myJ6Rj68NC7P2m/wg+dZhrMl/pGOf+ZO3Q0vGTVlH1JLnzCjywDH682PJpgKEs7upuh0eEHOnqLg5NEDTDORvnhjBkqMAa206s0dRFu21Z3JlrnCdAUXEmHJZHfXiLXzAelM=
+	t=1714730693; cv=none; b=Eo4AddBY1VHJP8HPNfl9ThcGI+Ab68Lh5FBdzf1kgNkzVB5nCb8j6YFSP+Plyp9rlsO9mRgCxVrWsmsLTbqU7O+rf3HnefSMT/TznSPkWP9XTz3E6y/X1sTpKiFpTSsK4K/ClnwKDi6F9JMCCwwc1ILNiX9PWDTTOMQtw93xyxE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714729437; c=relaxed/simple;
-	bh=lJxzmuu1bFS3wx/ZflP92QkYs1r6odL4UVFyIzzAV2g=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LsEr3dko2RG/69U/uIjnf1uXQKIFgaFgINPuwDOiwfqo2//2uYYMuaXymQmWS7bNb8ai1QM6IIm3nceogHXrzSGEdUraMMc4QUPAbx8ICbB8ygNLkyml/kqvdXALb6etnRhjRM57ZdfkY8Jxg5G3eo62l0GeFNDvsbOEVndi8nA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=f6Dz4RDa; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1714729432;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QHNTro5D+vIIe9fiP9wi2QF3PY1y9XG9IVvIqGNQrhk=;
-	b=f6Dz4RDaiHi5Lhn1v60U//IG97Fr/bvcIx2poqhXmCqLcdJzp4tmsQSM2p6XdH9igLd570
-	NJxzGkTKjFv+Q266G0IpSVtEkbLQqPS/TCyhnncXhDmk7EaJzYP+8BmidPukVYmuh9T5a6
-	wciUqDA4gCpItt2cEDuX2pbiYZoVNds=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-225-Edg59XRUNr-R5gBWvu8FXA-1; Fri, 03 May 2024 05:43:51 -0400
-X-MC-Unique: Edg59XRUNr-R5gBWvu8FXA-1
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-a5986a5bc1dso40814566b.3
-        for <netdev@vger.kernel.org>; Fri, 03 May 2024 02:43:51 -0700 (PDT)
+	s=arc-20240116; t=1714730693; c=relaxed/simple;
+	bh=qACal944bQbWQEFiDpgDFJ/ewySer9S+1JK+mVUz6TM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eUZsDhIlM9GUDTUzpmmsVpuQYdxyxt1vILKzLAgYjUdIFVkYwzSTQ3yAB+eEjMkcFYffCkO3PhRWhVjgCttcO6RiCg2lmy+adRc9hg6CyFLY9tkPP/UFAvniER+S1TpuI5+ZviVVuXScD5LEofXE0ZPY/6nSeRR4dChAZkqjFog=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-56c5d05128dso24911a12.0;
+        Fri, 03 May 2024 03:04:51 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714729430; x=1715334230;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QHNTro5D+vIIe9fiP9wi2QF3PY1y9XG9IVvIqGNQrhk=;
-        b=cunUcq9wmP9U7C335zv735GOyHlKapooIq1Bep6WF7Z3SFtpaH5PbiijKX8Gww/bSS
-         GRo1A6MOq1tg1L1QjXxaS7RwSDX5lZxPUe8ZcrKO2h+BUZNLzhEshvG0VCev0N9bfZoH
-         4O/y9ENtwKI1CCYGNckxDyFsDa+etBExK8fmVPpG+697P+JzgpSwqnQ185du3jR7yWvJ
-         hvGTiDk/raVT0KClEkb8E89L/G8FYgW+JP4X6cX40fKZJNxVifs1KkDd1kUs1vjEgrty
-         VRQVmcYJSi0KAnEQwogoit6/KJ6MhVBQ3fHuAivXFbH2y3CnQl7HS4+A/8Y17xPgvwG6
-         qK2g==
-X-Gm-Message-State: AOJu0YzpJCxc1DhFHvM5i6L7bwv98B/1Ty3tTAVlHvMRZSC7R0EgSDvD
-	I4echGLacNFApUXNgptMm5tau+JDz+Zm+W59gu2gexHFnJVgNVf9bvbYZUp9i7lH02+WEvzFm7H
-	t3QnT/pd78L9GdNf2pgCGQjNMwhrDksUr2JseREogqegpWDop0SS8eA==
-X-Received: by 2002:a17:906:4aca:b0:a59:574d:8c5c with SMTP id u10-20020a1709064aca00b00a59574d8c5cmr1148952ejt.64.1714729430057;
-        Fri, 03 May 2024 02:43:50 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHEM9nZgzXgbemyPxcEFcTytqP/l3dvnuKmL4zLeLwxhfi7PGVoadPM1uBAXUD3zjQW7L9Z8Q==
-X-Received: by 2002:a17:906:4aca:b0:a59:574d:8c5c with SMTP id u10-20020a1709064aca00b00a59574d8c5cmr1148935ejt.64.1714729429471;
-        Fri, 03 May 2024 02:43:49 -0700 (PDT)
-Received: from [172.16.2.75] (5920ab7b.static.cust.trined.nl. [89.32.171.123])
-        by smtp.gmail.com with ESMTPSA id jy3-20020a170907762300b00a597cd2731bsm1001297ejc.80.2024.05.03.02.43.48
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 03 May 2024 02:43:48 -0700 (PDT)
-From: Eelco Chaudron <echaudro@redhat.com>
-To: Adrian Moreno <amorenoz@redhat.com>
-Cc: netdev@vger.kernel.org, aconole@redhat.com, horms@kernel.org,
- i.maximets@ovn.org, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Pravin B Shelar <pshelar@ovn.org>,
- Donald Hunter <donald.hunter@gmail.com>, linux-kernel@vger.kernel.org,
- dev@openvswitch.org
-Subject: Re: [PATCH net-next 6/8] net:openvswitch: add psample support
-Date: Fri, 03 May 2024 11:43:48 +0200
-X-Mailer: MailMate (1.14r6029)
-Message-ID: <72F692D6-621D-4E02-AAE2-AC63CC99FEBE@redhat.com>
-In-Reply-To: <20240424135109.3524355-7-amorenoz@redhat.com>
-References: <20240424135109.3524355-1-amorenoz@redhat.com>
- <20240424135109.3524355-7-amorenoz@redhat.com>
+        d=1e100.net; s=20230601; t=1714730690; x=1715335490;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=e8adb3W1BmkNUKKb1fEwqwjiASLtL+TBOu09daXzuP4=;
+        b=aiReQ8vB5dA/mUd5aKxEchvFSsVandyEDL8E/HdxlhIfEMS9oHwh+fwY3V0c9b6ScX
+         ZGPQNVpHzwsLy7dK+UTkS7gACCUd8Xj78WxOGoq87b1greYZp9FtKvZOuHnW21kKIZmb
+         doDa9yHZdPglgnaE/vOCSXk5QvzL5XZdbq/vNoiDp129HE1IxJbRRK+IQVe2kpF5zNar
+         787LKQWgFgKYDmIkQjwI6PgoPcX1oR8yxinmA88VkQjZ6pX6KxrbNqU5pXd4kNjZhYlF
+         8Ne+c9+Kep0cqsejhm1Kk2JOns1n+F7wreRzDPGOwHnoTzB4oVYCzmH+mK8VC3S2klYd
+         Ag5g==
+X-Forwarded-Encrypted: i=1; AJvYcCUnX33j7ThMgixgvsZk3ADrrsui7mSK68L961w1/dCKvdx5/a3xPn5Dp6sdq5p2kXHG8M4PWXpuBx/IcU/BJtLBCMEQkXLD1V6pb5D/BLutZ6knxXQNoFsnNkfDVylUDpRIQzmppsJv3vpJ1RY=
+X-Gm-Message-State: AOJu0YzI9sPFKpfp0yNxFiicIgMoesI3ewqTqEnr7pEApOeWu1oRJY4L
+	T2TEeMrtVDzsVehNEQ72n/w6Bn6QA0QEPH8QXK9qFyVLS8Te20z/EU1flQ==
+X-Google-Smtp-Source: AGHT+IFPf0CsqCaKdeCEgTGaKjbBlZc73fEjsXVrU0FhdVphBZ6Wbe4pceZhVttNvEkA48TuIAipCg==
+X-Received: by 2002:a50:9fa8:0:b0:56e:60d:9b16 with SMTP id c37-20020a509fa8000000b0056e060d9b16mr1350536edf.6.1714730689864;
+        Fri, 03 May 2024 03:04:49 -0700 (PDT)
+Received: from localhost (fwdproxy-lla-008.fbsv.net. [2a03:2880:30ff:8::face:b00c])
+        by smtp.gmail.com with ESMTPSA id q28-20020a50aa9c000000b00572469a7948sm1559882edc.45.2024.05.03.03.04.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 03 May 2024 03:04:49 -0700 (PDT)
+From: Breno Leitao <leitao@debian.org>
+To: Kalle Valo <kvalo@kernel.org>,
+	Jeff Johnson <jjohnson@kernel.org>
+Cc: netdev@vger.kernel.org,
+	linux-wireless@vger.kernel.org (open list:NETWORKING DRIVERS (WIRELESS)),
+	ath12k@lists.infradead.org (open list:QUALCOMM ATH12K WIRELESS DRIVER),
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH wireless-next] wifi: ath12k: allocate dummy net_device dynamically
+Date: Fri,  3 May 2024 03:04:39 -0700
+Message-ID: <20240503100440.6066-1-leitao@debian.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
+Embedding net_device into structures prohibits the usage of flexible
+arrays in the net_device structure. For more details, see the discussion
+at [1].
 
+Un-embed the net_device from struct ath12k_ext_irq_grp by converting it
+into a pointer. Then use the leverage alloc_netdev_dummy() to allocate
+the net_device object at ath12k_pci_ext_irq_config().
 
-On 24 Apr 2024, at 15:50, Adrian Moreno wrote:
+The free of the device occurs at ath12k_pci_free_ext_irq().
 
-> Add support for psample sampling via two new attributes to the
-> OVS_ACTION_ATTR_SAMPLE action.
->
-> OVS_SAMPLE_ATTR_PSAMPLE_GROUP used to pass an integer psample group_id.=
+[1] https://lore.kernel.org/all/20240229225910.79e224cf@kernel.org/
 
-> OVS_SAMPLE_ATTR_PSAMPLE_COOKIE used to pass a variable-length binary
-> cookie that will be forwared to psample.
->
-> The maximum length of the user-defined cookie is set to 16, same as
-> tc_cookie, to discourage using cookies that will not be offloadable.
->
-> In order to simplify the internal processing of the action and given th=
-e
-> maximum size of the cookie is relatively small, add both fields to the
-> internal-only struct sample_arg.
->
-> The presence of a group_id mandates that the action shall called the
-> psample module to multicast the packet with such group_id and the
-> user-provided cookie if present. This behavior is orthonogal to
-> also executing the nested actions if present.
->
-> Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
+This is *very* similar to the same changes in ath11k commit
+bca592ead82528b ("wifi: ath11k: allocate dummy net_device dynamically")
 
-This is not a full review yet. Just some comments, as I=E2=80=99m looking=
- at the user-space patch first and added similar comments.
+Signed-off-by: Breno Leitao <leitao@debian.org>
+---
+ drivers/net/wireless/ath/ath12k/core.h |  2 +-
+ drivers/net/wireless/ath/ath12k/pci.c  | 14 +++++++++++---
+ 2 files changed, 12 insertions(+), 4 deletions(-)
 
-I=E2=80=99ll do a proper review of this series once I=E2=80=99m done with=
- user-space part.
-
-//Eelco
-
-> ---
->  Documentation/netlink/specs/ovs_flow.yaml |  6 ++
->  include/uapi/linux/openvswitch.h          | 49 ++++++++++----
->  net/openvswitch/actions.c                 | 51 +++++++++++++--
->  net/openvswitch/flow_netlink.c            | 80 ++++++++++++++++++-----=
-
->  4 files changed, 153 insertions(+), 33 deletions(-)
->
-> diff --git a/Documentation/netlink/specs/ovs_flow.yaml b/Documentation/=
-netlink/specs/ovs_flow.yaml
-> index 4fdfc6b5cae9..5543c2937225 100644
-> --- a/Documentation/netlink/specs/ovs_flow.yaml
-> +++ b/Documentation/netlink/specs/ovs_flow.yaml
-> @@ -825,6 +825,12 @@ attribute-sets:
->          name: actions
->          type: nest
->          nested-attributes: action-attrs
-> +      -
-> +        name: psample_group
-> +        type: u32
-> +      -
-> +        name: psample_cookie
-> +        type: binary
->    -
->      name: userspace-attrs
->      enum-name: ovs-userspace-attr
-> diff --git a/include/uapi/linux/openvswitch.h b/include/uapi/linux/open=
-vswitch.h
-> index efc82c318fa2..e9cd6f3a952d 100644
-> --- a/include/uapi/linux/openvswitch.h
-> +++ b/include/uapi/linux/openvswitch.h
-> @@ -639,6 +639,7 @@ enum ovs_flow_attr {
->  #define OVS_UFID_F_OMIT_MASK     (1 << 1)
->  #define OVS_UFID_F_OMIT_ACTIONS  (1 << 2)
->
-> +#define OVS_PSAMPLE_COOKIE_MAX_SIZE 16
->  /**
->   * enum ovs_sample_attr - Attributes for %OVS_ACTION_ATTR_SAMPLE actio=
-n.
->   * @OVS_SAMPLE_ATTR_PROBABILITY: 32-bit fraction of packets to sample =
-with
-> @@ -646,15 +647,27 @@ enum ovs_flow_attr {
->   * %UINT32_MAX samples all packets and intermediate values sample inte=
-rmediate
->   * fractions of packets.
->   * @OVS_SAMPLE_ATTR_ACTIONS: Set of actions to execute in sampling eve=
-nt.
-> - * Actions are passed as nested attributes.
-> + * Actions are passed as nested attributes. Optional if
-> + * OVS_SAMPLE_ATTR_PSAMPLE_GROUP is set.
-> + * @OVS_SAMPLE_ATTR_PSAMPLE_GROUP: A 32-bit number to be used as psamp=
-le group.
-> + * Optional if OVS_SAMPLE_ATTR_ACTIONS is set.
-> + * @OVS_SAMPLE_ATTR_PSAMPLE_COOKIE: A variable-length binary cookie th=
-at, if
-> + * provided, will be copied to the psample cookie.
-
-As there is a limit of to the cookie should we mention it here?
-
->   *
-> - * Executes the specified actions with the given probability on a per-=
-packet
-> - * basis.
-> + * Either OVS_SAMPLE_ATTR_PSAMPLE_GROUP or OVS_SAMPLE_ATTR_ACTIONS mus=
-t be
-> + * specified.
-> + *
-> + * Executes the specified actions and/or sends the packet to psample
-> + * with the given probability on a per-packet basis.
->   */
->  enum ovs_sample_attr {
->  	OVS_SAMPLE_ATTR_UNSPEC,
-> -	OVS_SAMPLE_ATTR_PROBABILITY, /* u32 number */
-> -	OVS_SAMPLE_ATTR_ACTIONS,     /* Nested OVS_ACTION_ATTR_* attributes. =
-*/
-> +	OVS_SAMPLE_ATTR_PROBABILITY,	/* u32 number */
-> +	OVS_SAMPLE_ATTR_ACTIONS,	/* Nested OVS_ACTION_ATTR_
-
-Missing * after OVS_ACTION_ATTR_
-
-> +					 * attributes.
-> +					 */
-> +	OVS_SAMPLE_ATTR_PSAMPLE_GROUP,	/* u32 number */
-> +	OVS_SAMPLE_ATTR_PSAMPLE_COOKIE,	/* binary */
-
-As these are general sample options, I would not add the PSAMPLE referenc=
-e. Other data paths could use a different implementation. So I guess OVS_=
-SAMPLE_ATTR_GROUP_ID and OVS_SAMPLE_ATTR_COOKIE would be enough.
-
->  	__OVS_SAMPLE_ATTR_MAX,
->
->  #ifdef __KERNEL__
-> @@ -665,13 +678,27 @@ enum ovs_sample_attr {
->  #define OVS_SAMPLE_ATTR_MAX (__OVS_SAMPLE_ATTR_MAX - 1)
->
->  #ifdef __KERNEL__
-> +
-> +/* Definition for flags in struct sample_arg. */
-> +enum {
-> +	/* When set, actions in sample will not change the flows. */
-> +	OVS_SAMPLE_ARG_FLAG_EXEC =3D 1 << 0,
-> +	/* When set, the packet will be sent to psample. */
-> +	OVS_SAMPLE_ARG_FLAG_PSAMPLE =3D 1 << 1,
-> +};
-> +
->  struct sample_arg {
-> -	bool exec;                   /* When true, actions in sample will not=
-
-> -				      * change flow keys. False otherwise.
-> -				      */
-> -	u32  probability;            /* Same value as
-> -				      * 'OVS_SAMPLE_ATTR_PROBABILITY'.
-> -				      */
-
-
-Not sure if you can actually do this, you are changing a structure that i=
-s part of the UAPI. This change breaks backwards compatibility.
-
-
-> +	u16 flags;		/* Flags that modify the behavior of the
-> +				 * action. See SAMPLE_ARG_FLAG_*.
-> +				 */
-> +	u32  probability;       /* Same value as
-> +				 * 'OVS_SAMPLE_ATTR_PROBABILITY'.
-> +				 */
-> +	u32  group_id;		/* Same value as
-> +				 * 'OVS_SAMPLE_ATTR_PSAMPLE_GROUP'.
-> +				 */
-> +	u8  cookie_len;		/* Length of psample cookie. */
-> +	char cookie[OVS_PSAMPLE_COOKIE_MAX_SIZE]; /* psample cookie data. */
-
-Would it make sense for the cookie also to be u8?
-
->  };
->  #endif
->
-> diff --git a/net/openvswitch/actions.c b/net/openvswitch/actions.c
-> index 6fcd7e2ca81f..eb3166986fd2 100644
-> --- a/net/openvswitch/actions.c
-> +++ b/net/openvswitch/actions.c
-> @@ -24,6 +24,7 @@
->  #include <net/checksum.h>
->  #include <net/dsfield.h>
->  #include <net/mpls.h>
-> +#include <net/psample.h>
->  #include <net/sctp/checksum.h>
->
->  #include "datapath.h"
-> @@ -1025,6 +1026,34 @@ static int dec_ttl_exception_handler(struct data=
-path *dp, struct sk_buff *skb,
->  	return 0;
->  }
->
-> +static int ovs_psample_packet(struct datapath *dp, struct sw_flow_key =
-*key,
-> +			      const struct sample_arg *arg,
-> +			      struct sk_buff *skb)
-> +{
-> +	struct psample_group psample_group =3D {};
-> +	struct psample_metadata md =3D {};
-> +	struct vport *input_vport;
-> +	u32 rate;
-> +
-> +	psample_group.group_num =3D arg->group_id;
-> +	psample_group.net =3D ovs_dp_get_net(dp);
-> +
-> +	input_vport =3D ovs_vport_rcu(dp, key->phy.in_port);
-> +	if (!input_vport)
-> +		input_vport =3D ovs_vport_rcu(dp, OVSP_LOCAL);
-> +
-> +	md.in_ifindex =3D input_vport->dev->ifindex;
-> +	md.user_cookie =3D arg->cookie_len ? &arg->cookie[0] : NULL;
-> +	md.user_cookie_len =3D arg->cookie_len;
-> +	md.trunc_size =3D skb->len;
-> +
-> +	rate =3D arg->probability ? U32_MAX / arg->probability : 0;
-> +
-> +	psample_sample_packet(&psample_group, skb, rate, &md);
-
-Does this mean now the ovs module, now is dependent on the presence of ps=
-ample? I think we should only support sampling to psample if the module e=
-xists, else we should return an error. There might be distributions not i=
-ncluding psample by default.
-
-> +
-> +	return 0;
-> +}
-> +
->  /* When 'last' is true, sample() should always consume the 'skb'.
->   * Otherwise, sample() should keep 'skb' intact regardless what
->   * actions are executed within sample().
-> @@ -1033,11 +1062,12 @@ static int sample(struct datapath *dp, struct s=
-k_buff *skb,
->  		  struct sw_flow_key *key, const struct nlattr *attr,
->  		  bool last)
->  {
-> -	struct nlattr *actions;
-> +	const struct sample_arg *arg;
->  	struct nlattr *sample_arg;
->  	int rem =3D nla_len(attr);
-> -	const struct sample_arg *arg;
-> +	struct nlattr *actions;
->  	bool clone_flow_key;
-> +	int ret;
->
->  	/* The first action is always 'OVS_SAMPLE_ATTR_ARG'. */
->  	sample_arg =3D nla_data(attr);
-> @@ -1051,9 +1081,20 @@ static int sample(struct datapath *dp, struct sk=
-_buff *skb,
->  		return 0;
->  	}
->
-> -	clone_flow_key =3D !arg->exec;
-> -	return clone_execute(dp, skb, key, 0, actions, rem, last,
-> -			     clone_flow_key);
-> +	if (arg->flags & OVS_SAMPLE_ARG_FLAG_PSAMPLE) {
-> +		ret =3D ovs_psample_packet(dp, key, arg, skb);
-> +		if (ret)
-> +			return ret;
-> +	}
-> +
-> +	if (nla_ok(actions, rem)) {
-> +		clone_flow_key =3D !(arg->flags & OVS_SAMPLE_ARG_FLAG_EXEC);
-> +		ret =3D clone_execute(dp, skb, key, 0, actions, rem, last,
-> +				    clone_flow_key);
-> +	} else if (last) {
-> +		ovs_kfree_skb_reason(skb, OVS_DROP_LAST_ACTION);
-> +	}
-> +	return ret;
->  }
->
->  /* When 'last' is true, clone() should always consume the 'skb'.
-> diff --git a/net/openvswitch/flow_netlink.c b/net/openvswitch/flow_netl=
-ink.c
-> index f224d9bcea5e..1a348d3905fc 100644
-> --- a/net/openvswitch/flow_netlink.c
-> +++ b/net/openvswitch/flow_netlink.c
-> @@ -2561,6 +2561,9 @@ static int __ovs_nla_copy_actions(struct net *net=
-, const struct nlattr *attr,
->  				  u32 mpls_label_count, bool log,
->  				  u32 depth);
->
-> +static int copy_action(const struct nlattr *from,
-> +		       struct sw_flow_actions **sfa, bool log);
-> +
->  static int validate_and_copy_sample(struct net *net, const struct nlat=
-tr *attr,
->  				    const struct sw_flow_key *key,
->  				    struct sw_flow_actions **sfa,
-> @@ -2569,10 +2572,10 @@ static int validate_and_copy_sample(struct net =
-*net, const struct nlattr *attr,
->  				    u32 depth)
->  {
->  	const struct nlattr *attrs[OVS_SAMPLE_ATTR_MAX + 1];
-> -	const struct nlattr *probability, *actions;
-> +	const struct nlattr *probability, *actions, *group, *cookie;
-> +	struct sample_arg arg =3D {};
->  	const struct nlattr *a;
->  	int rem, start, err;
-> -	struct sample_arg arg;
->
->  	memset(attrs, 0, sizeof(attrs));
->  	nla_for_each_nested(a, attr, rem) {
-> @@ -2589,7 +2592,19 @@ static int validate_and_copy_sample(struct net *=
-net, const struct nlattr *attr,
->  		return -EINVAL;
->
->  	actions =3D attrs[OVS_SAMPLE_ATTR_ACTIONS];
-> -	if (!actions || (nla_len(actions) && nla_len(actions) < NLA_HDRLEN))
-> +	if (actions && (!nla_len(actions) || nla_len(actions) < NLA_HDRLEN))
-> +		return -EINVAL;
-> +
-> +	group =3D attrs[OVS_SAMPLE_ATTR_PSAMPLE_GROUP];
-> +	if (group && nla_len(group) !=3D sizeof(u32))
-> +		return -EINVAL;
-> +
-> +	cookie =3D attrs[OVS_SAMPLE_ATTR_PSAMPLE_COOKIE];
-> +	if (cookie &&
-> +	    (!group || nla_len(cookie) > OVS_PSAMPLE_COOKIE_MAX_SIZE))
-> +		return -EINVAL;
-> +
-> +	if (!group && !actions)
->  		return -EINVAL;
->
->  	/* validation done, copy sample action. */
-> @@ -2608,7 +2623,19 @@ static int validate_and_copy_sample(struct net *=
-net, const struct nlattr *attr,
->  	 * If the sample is the last action, it can always be excuted
->  	 * rather than deferred.
->  	 */
-> -	arg.exec =3D last || !actions_may_change_flow(actions);
-> +	if (actions && (last || !actions_may_change_flow(actions)))
-> +		arg.flags |=3D OVS_SAMPLE_ARG_FLAG_EXEC;
-> +
-> +	if (group) {
-> +		arg.flags |=3D OVS_SAMPLE_ARG_FLAG_PSAMPLE;
-> +		arg.group_id =3D nla_get_u32(group);
-> +	}
-> +
-> +	if (cookie) {
-> +		memcpy(&arg.cookie[0], nla_data(cookie), nla_len(cookie));
-> +		arg.cookie_len =3D nla_len(cookie);
-> +	}
-> +
->  	arg.probability =3D nla_get_u32(probability);
->
->  	err =3D ovs_nla_add_action(sfa, OVS_SAMPLE_ATTR_ARG, &arg, sizeof(arg=
-),
-> @@ -2616,12 +2643,13 @@ static int validate_and_copy_sample(struct net =
-*net, const struct nlattr *attr,
->  	if (err)
->  		return err;
->
-> -	err =3D __ovs_nla_copy_actions(net, actions, key, sfa,
-> -				     eth_type, vlan_tci, mpls_label_count, log,
-> -				     depth + 1);
-> -
-> -	if (err)
-> -		return err;
-> +	if (actions) {
-> +		err =3D __ovs_nla_copy_actions(net, actions, key, sfa,
-> +					     eth_type, vlan_tci,
-> +					     mpls_label_count, log, depth + 1);
-> +		if (err)
-> +			return err;
-> +	}
->
->  	add_nested_action_end(*sfa, start);
->
-> @@ -3553,20 +3581,38 @@ static int sample_action_to_attr(const struct n=
-lattr *attr,
->  		goto out;
->  	}
->
-> -	ac_start =3D nla_nest_start_noflag(skb, OVS_SAMPLE_ATTR_ACTIONS);
-> -	if (!ac_start) {
-> -		err =3D -EMSGSIZE;
-> -		goto out;
-> +	if (arg->flags & OVS_SAMPLE_ARG_FLAG_PSAMPLE) {
-> +		if (nla_put_u32(skb, OVS_SAMPLE_ATTR_PSAMPLE_GROUP,
-> +				arg->group_id)) {
-> +			err =3D -EMSGSIZE;
-> +			goto out;
-> +		}
-> +
-> +		if (arg->cookie_len &&
-> +		    nla_put(skb, OVS_SAMPLE_ATTR_PSAMPLE_COOKIE,
-> +			    arg->cookie_len, &arg->cookie[0])) {
-> +			err =3D -EMSGSIZE;
-> +			goto out;
-> +		}
->  	}
->
-> -	err =3D ovs_nla_put_actions(actions, rem, skb);
-> +	if (nla_ok(actions, rem)) {
-> +		ac_start =3D nla_nest_start_noflag(skb, OVS_SAMPLE_ATTR_ACTIONS);
-> +		if (!ac_start) {
-> +			err =3D -EMSGSIZE;
-> +			goto out;
-> +		}
-> +		err =3D ovs_nla_put_actions(actions, rem, skb);
-> +	}
->
->  out:
->  	if (err) {
-> -		nla_nest_cancel(skb, ac_start);
-> +		if (ac_start)
-> +			nla_nest_cancel(skb, ac_start);
->  		nla_nest_cancel(skb, start);
->  	} else {
-> -		nla_nest_end(skb, ac_start);
-> +		if (ac_start)
-> +			nla_nest_end(skb, ac_start);
->  		nla_nest_end(skb, start);
->  	}
->
-> -- =
-
-> 2.44.0
+diff --git a/drivers/net/wireless/ath/ath12k/core.h b/drivers/net/wireless/ath/ath12k/core.h
+index 97e5a0ccd233..71c67f47d0ad 100644
+--- a/drivers/net/wireless/ath/ath12k/core.h
++++ b/drivers/net/wireless/ath/ath12k/core.h
+@@ -144,7 +144,7 @@ struct ath12k_ext_irq_grp {
+ 	u32 grp_id;
+ 	u64 timestamp;
+ 	struct napi_struct napi;
+-	struct net_device napi_ndev;
++	struct net_device *napi_ndev;
+ };
+ 
+ struct ath12k_smbios_bdf {
+diff --git a/drivers/net/wireless/ath/ath12k/pci.c b/drivers/net/wireless/ath/ath12k/pci.c
+index 14954bc05144..322f0ad1b12d 100644
+--- a/drivers/net/wireless/ath/ath12k/pci.c
++++ b/drivers/net/wireless/ath/ath12k/pci.c
+@@ -350,6 +350,7 @@ static void ath12k_pci_free_ext_irq(struct ath12k_base *ab)
+ 			free_irq(ab->irq_num[irq_grp->irqs[j]], irq_grp);
+ 
+ 		netif_napi_del(&irq_grp->napi);
++		free_netdev(irq_grp->napi_ndev);
+ 	}
+ }
+ 
+@@ -560,7 +561,7 @@ static irqreturn_t ath12k_pci_ext_interrupt_handler(int irq, void *arg)
+ static int ath12k_pci_ext_irq_config(struct ath12k_base *ab)
+ {
+ 	struct ath12k_pci *ab_pci = ath12k_pci_priv(ab);
+-	int i, j, ret, num_vectors = 0;
++	int i, j, n, ret, num_vectors = 0;
+ 	u32 user_base_data = 0, base_vector = 0, base_idx;
+ 
+ 	base_idx = ATH12K_PCI_IRQ_CE0_OFFSET + CE_COUNT_MAX;
+@@ -577,8 +578,11 @@ static int ath12k_pci_ext_irq_config(struct ath12k_base *ab)
+ 
+ 		irq_grp->ab = ab;
+ 		irq_grp->grp_id = i;
+-		init_dummy_netdev(&irq_grp->napi_ndev);
+-		netif_napi_add(&irq_grp->napi_ndev, &irq_grp->napi,
++		irq_grp->napi_ndev = alloc_netdev_dummy(0);
++		if (!irq_grp->napi_ndev)
++			return -ENOMEM;
++
++		netif_napi_add(irq_grp->napi_ndev, &irq_grp->napi,
+ 			       ath12k_pci_ext_grp_napi_poll);
+ 
+ 		if (ab->hw_params->ring_mask->tx[i] ||
+@@ -611,6 +615,10 @@ static int ath12k_pci_ext_irq_config(struct ath12k_base *ab)
+ 			if (ret) {
+ 				ath12k_err(ab, "failed request irq %d: %d\n",
+ 					   vector, ret);
++				for (n = 0; n <= i; n++) {
++					irq_grp = &ab->ext_irq_grp[n];
++					free_netdev(irq_grp->napi_ndev);
++				}
+ 				return ret;
+ 			}
+ 		}
+-- 
+2.43.0
 
 
