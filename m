@@ -1,54 +1,56 @@
-Return-Path: <netdev+bounces-93438-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93439-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17B898BBC76
-	for <lists+netdev@lfdr.de>; Sat,  4 May 2024 16:37:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E70D8BBC83
+	for <lists+netdev@lfdr.de>; Sat,  4 May 2024 16:48:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BD4E61F21507
-	for <lists+netdev@lfdr.de>; Sat,  4 May 2024 14:37:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7B2AF282760
+	for <lists+netdev@lfdr.de>; Sat,  4 May 2024 14:48:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 068071DDC9;
-	Sat,  4 May 2024 14:37:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C10513BBEA;
+	Sat,  4 May 2024 14:48:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PFHlcG4/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OTjuRlls"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5B8122F00
-	for <netdev@vger.kernel.org>; Sat,  4 May 2024 14:37:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 914D057CAE;
+	Sat,  4 May 2024 14:48:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714833421; cv=none; b=NpbIk0LyDRVn+x+655GPEnmeVwEVZDCM7Df/obwFGg6mG3w8QFiS1NGVZf7MrUINMzQGMeDll5fPbhZGFUJGestn6V/yEqJuPQ1Xk1WTJsujbH/giuGMTqiMY2q9uZyIJ6X4D83IV96G9pUf/xzXQp6+/Jw9IPbjlAAlP9bHEgs=
+	t=1714834091; cv=none; b=rvJM2eUuypDmtNCQXd29CPVk6YMlZ64eiIxBvD+kEbac9Bb6NwZAdVvHhzTEQMRaZ71eQeKNM1s6vGJLrs7ic0l8Zvm0UZ4AhdFwga+lqjnOBVzWZSrzg5BJ9wxsPStMZV4Roq0MLqXm+amFieNg6pMAsmFV6ZCaq7Se5vx6JqM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714833421; c=relaxed/simple;
-	bh=bi39/4fhcKEeEBV7l/lkmaE1vbOYopca9R8qf6/aHfg=;
+	s=arc-20240116; t=1714834091; c=relaxed/simple;
+	bh=mnWhwHwbu6vfOBX72yPCmIu8TRUsTLMhnSRh1zYW2oA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ca1Kjx/SF+KeaGDeOdO8BpWmYszDmTk55j3TiQ6RVlwpeATfMGSzN7Er56kX+g7gYu+Hbb0YVQ37YOfP+l7zpLspsCEbWPWnEoXCY53V3ihSNt196t1K8xxR37fHjpCdMXUOhYnth8LrbkujMzbHGC1NYkHTFeablE6g6Fi+aOU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PFHlcG4/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3AF18C072AA;
-	Sat,  4 May 2024 14:37:00 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=Du03qjVmNx+xgVTQAjNfvR+Y/k3or+GlgO25NG0imYXEYZvNXEh4IPVvo1KiB9BDFs/Xd0aM3/PS0GtvcwwAz1sMG9liGoaQQI151e9Lnh1p17+bKc7VKc4oGW3tDD+iSnPiMhQ9yDq8/X1iwea1RAg+94KZYRslEYOrjzXpXA8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OTjuRlls; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A53C5C072AA;
+	Sat,  4 May 2024 14:48:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714833421;
-	bh=bi39/4fhcKEeEBV7l/lkmaE1vbOYopca9R8qf6/aHfg=;
+	s=k20201202; t=1714834091;
+	bh=mnWhwHwbu6vfOBX72yPCmIu8TRUsTLMhnSRh1zYW2oA=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=PFHlcG4/DxVnj9JLIyJYMYczujSE6pm5V1ZpHXoq5Ec0W5QWGR1fFzbvHlQBZTk1Q
-	 DQf23lNYNsYzYjVSC8R2sjDcJM6QUQLW3zakRLAZMmkHSdPT0iWtm3vvR36Q/HjF5J
-	 cYY0V768JRIwvXT/sS4OZT8g9PDiHfkH1xkfr7ha/2wLcQtTNxAswfzB2HF0oHYyFA
-	 h17eLPtPU5PXrx8o/W8EdeGJxSnSmHQTxRzU4W8wLizlSxCXtjaciYYfq6aP5dG4QH
-	 YLVzKp315N3GPhXqRE8J8bOfq05ViFI8UFn+0KwL2xvMUziVgrtIS3LgaKoPY4+QLo
-	 RUJYwiLwn416w==
-Date: Sat, 4 May 2024 15:36:57 +0100
+	b=OTjuRlls7beT4C4+N9maJy/KhaTRAZ/gauIYHdhqD3NUKTnYtw3OajltEC0pIT9Q3
+	 sl4023iOTIxTsQWPP1MfdWABYeqxAtKeMb8BmQ7GvvSCZfn4H1PHJbTtjmMk/B/U0Q
+	 u5Swrw/b1EPQMksmhSk1Z1ySi5ejMCMWkYebAvIRFDFb+kmuf8N/nXBKcjAM47uTv6
+	 g7U1Cd7URbGLeDlbjeTJCAey4964nkF5pi1KdumQDNlSOh3Xn4uDTasP9BJRBi8MHn
+	 Aw7HBhRiaQ8lC/1MFx2VgJYH4jBbNRgmHBKm59bNqc0JQBzWOFygzTNnlEm8op7jV0
+	 JaVqtxT17Rz0Q==
+Date: Sat, 4 May 2024 15:48:07 +0100
 From: Simon Horman <horms@kernel.org>
-To: Steffen Klassert <steffen.klassert@secunet.com>
-Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>, netdev@vger.kernel.org
-Subject: Re: [PATCH 0/5] pull request (net-next): ipsec-next 2024-05-03
-Message-ID: <20240504143657.GA2279@kernel.org>
-References: <20240503082732.2835810-1-steffen.klassert@secunet.com>
+To: Breno Leitao <leitao@debian.org>
+Cc: Kalle Valo <kvalo@kernel.org>, netdev@vger.kernel.org,
+	merez@codeaurora.org, quic_ailizaro@quicinc.com,
+	linux-wireless@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH wireless-next] wil6210: Do not use embedded netdev in
+ wil6210_priv
+Message-ID: <20240504144807.GB2279@kernel.org>
+References: <20240503103304.339489-1-leitao@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,31 +59,22 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240503082732.2835810-1-steffen.klassert@secunet.com>
+In-Reply-To: <20240503103304.339489-1-leitao@debian.org>
 
-On Fri, May 03, 2024 at 10:27:26AM +0200, Steffen Klassert wrote:
-> 1) Remove Obsolete UDP_ENCAP_ESPINUDP_NON_IKE Support.
->    This was defined by an early version of an IETF draft
->    that did not make it to a standard.
+On Fri, May 03, 2024 at 03:32:56AM -0700, Breno Leitao wrote:
+> Embedding net_device into structures prohibits the usage of flexible
+> arrays in the net_device structure. For more details, see the discussion
+> at [1].
 > 
-> 2) Introduce direction attribute for xfrm states.
->    xfrm states have a direction, a stsate can be used
->    either for input or output packet processing.
->    Add a direction to xfrm states to make it clear
->    for what a xfrm state is used.
+> Un-embed the net_device from struct wil6210_priv by converting it
+> into a pointer. Then use the leverage alloc_netdev_dummy() to allocate
+> the net_device object at wil_if_add(). The free of the device
+> occurs at wil_if_remove().
 > 
-> All patches from Antony Antony.
+> [1] https://lore.kernel.org/all/20240229225910.79e224cf@kernel.org/
 > 
-> Please pull or let me know if there are problems.
+> Signed-off-by: Breno Leitao <leitao@debian.org>
 
-Hi Steffen, all,
-
-This comment is not strictly related to this pull request
-and certainly not intended to impede progress of it towards upstream.
-
-However, while looking over it I noticed that Sparse flags a rather
-large number of warnings in xfrm code, mostly relating to __rcu annotations.
-I'm wondering if, at some point, these could be addressed somehow.
-
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
