@@ -1,63 +1,72 @@
-Return-Path: <netdev+bounces-93432-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93433-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03BCE8BBB63
-	for <lists+netdev@lfdr.de>; Sat,  4 May 2024 14:34:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A89408BBB97
+	for <lists+netdev@lfdr.de>; Sat,  4 May 2024 14:49:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EC3B71C20BDB
-	for <lists+netdev@lfdr.de>; Sat,  4 May 2024 12:34:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BC78E1C210BF
+	for <lists+netdev@lfdr.de>; Sat,  4 May 2024 12:49:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA0921CD3F;
-	Sat,  4 May 2024 12:34:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07CB922625;
+	Sat,  4 May 2024 12:49:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EU/y66aa"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qHG9jkQM"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 959BE17C66
-	for <netdev@vger.kernel.org>; Sat,  4 May 2024 12:34:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE65457CAE;
+	Sat,  4 May 2024 12:49:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714826078; cv=none; b=eg71mpWEIAqmaLVFsFfY72SS0hlwq+9nuo/W4RLTpIJP8b8FWPxZk9OPNd67Sg9/cZmpZpThISQDHjC9Hu40cQyYP8/IEC4BoJWi76EZXMNpwpKYkYzy1jxoFZrDX1zE/aqhFfQCnCl6tUtKRVINAJVN5RSNNR21LCK413yx09o=
+	t=1714826953; cv=none; b=a7z0WlrR1Xh65IevCnivXG1s3YKANifmKN+lh1v6Xjqp98pdohwkWvMXG8tfsp2ywLFpNZrBE9mWIt+2oVRvpKv1M/ihyktZjuDsvQSKnKz9nJXNO+wc0BTbgNHdRP2E5FYZ/iCv3vMQCe+PVJj2hiMMPQy4Oo6CGogJEiYwM38=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714826078; c=relaxed/simple;
-	bh=DHfMOjvQ1N3ZihKoa5hyI3psRu3FDg+jldsEdrSZkOk=;
+	s=arc-20240116; t=1714826953; c=relaxed/simple;
+	bh=L9wv45Em8bE+QdzHN+ZzOr0q0nVv0NR8uv/oDTyGCBI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KF85igo9yPIdCuTXa7n2AmSVuRLrhEclPaO2K6+Kmd28XNJPvHlKF8huLXxA3dJk1V79FRWTjW9QpocgJoLVcP0MwV5PCA7KyUFRPe98HXNiTJZpr+GICdlYIhaIpcQobEte6yefoCaaoaMg+iuUsucLw1Bu6hvS1f22FrMQWvc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EU/y66aa; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 09245C072AA;
-	Sat,  4 May 2024 12:34:34 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=FQqAFHLVvVZgety4BHDwKr+D/cf2ntOpCVb02k8jQVD9brWKxpopdM7Wd0ixpXHbE7L0i8EaZkItha4GYhZq9jVD/DNC81vBihPj+XUHjzKBaAk/90lJ7VobuoqA9qH1ayJTZ/mrBU18LbMRYO08CdbSWzFUQOcqaoAK3vEqJtI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qHG9jkQM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A776BC072AA;
+	Sat,  4 May 2024 12:49:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714826078;
-	bh=DHfMOjvQ1N3ZihKoa5hyI3psRu3FDg+jldsEdrSZkOk=;
+	s=k20201202; t=1714826953;
+	bh=L9wv45Em8bE+QdzHN+ZzOr0q0nVv0NR8uv/oDTyGCBI=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=EU/y66aawxD0re72QsWqLM3lYsq3emt9/L0w/Ab2mfQ2PKMBcGqrrTRY4vYGGoObE
-	 VGtL/xoB6f8V0acAnKQcCHYsULu7gfX106DjyXb1/T7ymqKu1y3hXWWWR7alRYslta
-	 5JP+9DQBeZepHoDcOgrlbnoTyIu0bQipLOj7p1V1wQne5dR0ldxR7mvlkUcRfwPy7t
-	 6kJBaSFWcDk5q14OZPhQuSE7bjFnGTk0BMRQDWSRMZJVruYIlAlSASB+CyWjevKFCK
-	 uKNNztaLZqyFVZjn97jD+NYltErRXf+q+dJd2rNAELnNRIDjweVldUK0fQqiTlFoOB
-	 Y9zYisy6bk0EA==
-Date: Sat, 4 May 2024 13:34:32 +0100
+	b=qHG9jkQM8K0a//HPJ659OF/sg3x4Wuq71cSamSewKjSphBYxQhNPBXcWA1P+i7qHl
+	 RY/B0okoLc6T6pcYjk+qTZKk7mzb4FI5vJbRxVYRcNzDvz3FEj04kmnFoDz4sqxhg7
+	 ODAW9OYTvoWEUjhMXW9DDCqAresjetRTpLGJFQ3bBEJKFu81t2k298cClSkhhxy1mn
+	 U75M1GcEXK0TSE9VRsxj5tBorA8ZCjAZgo5AHgOTiWyn7bKfCkTCgHyq7UCBKNQeeO
+	 fQUeN5XxZEo8yjOwS/gSpF4KI1vzoX4gf2e2crVyxQkJ6Iaxg4OXU1NUtlhJesJl+a
+	 7+a15hFbojwjQ==
+Date: Sat, 4 May 2024 13:49:04 +0100
 From: Simon Horman <horms@kernel.org>
-To: David Wei <dw@davidwei.uk>
-Cc: netdev@vger.kernel.org, Michael Chan <michael.chan@broadcom.com>,
-	Pavan Chebbi <pavan.chebbi@broadcom.com>,
-	Andy Gospodarek <andrew.gospodarek@broadcom.com>,
-	Adrian Alvarado <adrian.alvarado@broadcom.com>,
-	Mina Almasry <almasrymina@google.com>,
-	Shailend Chand <shailend@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [RFC PATCH net-next v2 7/9] bnxt: add helpers for allocating rx
- ring mem
-Message-ID: <20240504123432.GI3167983@kernel.org>
-References: <20240502045410.3524155-1-dw@davidwei.uk>
- <20240502045410.3524155-8-dw@davidwei.uk>
+To: Christoph Fritz <christoph.fritz@hexdev.de>
+Cc: Oliver Hartkopp <socketcan@hartkopp.net>,
+	Marc Kleine-Budde <mkl@pengutronix.de>,
+	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Jiri Kosina <jikos@kernel.org>,
+	Benjamin Tissoires <bentiss@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Jiri Slaby <jirislaby@kernel.org>,
+	Sebastian Reichel <sre@kernel.org>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Andreas Lauser <andreas.lauser@mercedes-benz.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Pavel Pisa <pisa@cmp.felk.cvut.cz>, linux-can@vger.kernel.org,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-input@vger.kernel.org, linux-serial@vger.kernel.org
+Subject: Re: [PATCH v2 01/12] can: Add LIN bus as CAN abstraction
+Message-ID: <20240504124904.GJ3167983@kernel.org>
+References: <20240502075534.882628-1-christoph.fritz@hexdev.de>
+ <20240502075534.882628-2-christoph.fritz@hexdev.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,59 +75,117 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240502045410.3524155-8-dw@davidwei.uk>
+In-Reply-To: <20240502075534.882628-2-christoph.fritz@hexdev.de>
 
-On Wed, May 01, 2024 at 09:54:08PM -0700, David Wei wrote:
-> Add several helper functions for allocating rx ring memory. These are
-> mostly taken from existing functions, but with unnecessary bits stripped
-> out such that only allocations are done.
+On Thu, May 02, 2024 at 09:55:23AM +0200, Christoph Fritz wrote:
+> This patch adds a LIN (local interconnect network) bus abstraction on
+> top of CAN.  It is a glue driver adapting CAN on one side while offering
+> LIN abstraction on the other side. So that upcoming LIN device drivers
+> can make use of it.
 > 
-> Signed-off-by: David Wei <dw@davidwei.uk>
-> ---
->  drivers/net/ethernet/broadcom/bnxt/bnxt.c | 87 +++++++++++++++++++++++
->  1 file changed, 87 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> index b0a8d14b7319..21c1a7cb70ab 100644
-> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> @@ -14845,6 +14845,93 @@ static const struct netdev_stat_ops bnxt_stat_ops = {
->  	.get_base_stats		= bnxt_get_base_stats,
->  };
->  
-> +static int __bnxt_alloc_rx_desc_ring(struct pci_dev *pdev, struct bnxt_ring_mem_info *rmem)
+> Tested-by: Andreas Lauser <andreas.lauser@mercedes-benz.com>
+> Signed-off-by: Christoph Fritz <christoph.fritz@hexdev.de>
+
+...
+
+> diff --git a/drivers/net/can/lin.c b/drivers/net/can/lin.c
+
+...
+
+> +struct lin_device *register_lin(struct device *dev,
+> +				const struct lin_device_ops *ldops)
 > +{
-> +	int i, rc;
+> +	struct net_device *ndev;
+> +	struct lin_device *ldev;
+> +	int ret;
 > +
-> +	for (i = 0; i < rmem->nr_pages; i++) {
-> +		rmem->pg_arr[i] = dma_alloc_coherent(&pdev->dev,
-> +						     rmem->page_size,
-> +						     &rmem->dma_arr[i],
-> +						     GFP_KERNEL);
-> +		if (!rmem->pg_arr[i]) {
-> +			rc = -ENOMEM;
-> +			goto err_free;
-> +		}
+> +	if (!ldops || !ldops->ldo_tx || !ldops->update_bitrate  ||
+> +	    !ldops->ldo_open || !ldops->ldo_stop) {
+> +		netdev_err(ndev, "missing mandatory lin_device_ops\n");
+
+Hi Christoph,
+
+The line above uses ndev, but ndev is not initialised
+until a few lines further down.
+
+Flagged by Smatch.
+
+> +		return ERR_PTR(-EINVAL);
 > +	}
 > +
-> +	return 0;
+> +	ndev = alloc_candev(sizeof(struct lin_device), 1);
+> +	if (!ndev)
+> +		return ERR_PTR(-ENOMEM);
 > +
-> +err_free:
-> +	while (i--) {
-> +		dma_free_coherent(&pdev->dev, rmem->page_size,
-> +				  rmem->pg_arr[i], rmem->dma_arr[i]);
-> +		rmem->pg_arr[i] = NULL;
+> +	ldev = netdev_priv(ndev);
+> +
+> +	ldev->ldev_ops = ldops;
+> +	ndev->netdev_ops = &lin_netdev_ops;
+> +	ndev->flags |= IFF_ECHO;
+> +	ndev->mtu = CANFD_MTU;
+> +	ldev->can.bittiming.bitrate = LIN_DEFAULT_BAUDRATE;
+> +	ldev->can.ctrlmode = CAN_CTRLMODE_LIN;
+> +	ldev->can.ctrlmode_supported = 0;
+> +	ldev->can.bitrate_const = lin_bitrate;
+> +	ldev->can.bitrate_const_cnt = ARRAY_SIZE(lin_bitrate);
+> +	ldev->can.do_set_bittiming = lin_set_bittiming;
+> +	ldev->ndev = ndev;
+> +	ldev->dev = dev;
+> +
+> +	SET_NETDEV_DEV(ndev, dev);
+> +
+> +	ret = lin_set_bittiming(ndev);
+> +	if (ret) {
+> +		netdev_err(ndev, "set bittiming failed\n");
+> +		goto exit_candev;
 > +	}
-> +	return rc;
+> +
+> +	ret = register_candev(ndev);
+> +	if (ret)
+> +		goto exit_candev;
+> +
+> +	ldev->lin_ids_kobj = kobject_create_and_add("lin_ids", &ndev->dev.kobj);
+> +	if (!ldev->lin_ids_kobj) {
+> +		netdev_err(ndev, "Failed to create sysfs directory\n");
+> +		ret = -ENOMEM;
+> +		goto exit_unreg;
+> +	}
+> +
+> +	ret = lin_create_sysfs_id_files(ndev);
+> +	if (ret) {
+> +		netdev_err(ndev, "Failed to create sysfs entry: %d\n", ret);
+> +		goto exit_kobj_put;
+> +	}
+> +
+> +	/* Using workqueue as tx over USB/SPI/... may sleep */
+> +	ldev->wq = alloc_workqueue(dev_name(dev), WQ_FREEZABLE | WQ_MEM_RECLAIM,
+> +				   0);
+> +	if (!ldev->wq)
+> +		goto exit_rm_files;
+
+The goto above will result in: return ERR_PTR(ret)
+But ret is 0 here. Should it be set to a negative error value?
+
+Also flagged by Smatch.
+
+> +
+> +	INIT_WORK(&ldev->tx_work, lin_tx_work_handler);
+> +
+> +	netdev_info(ndev, "LIN initialized.\n");
+> +
+> +	return ldev;
+> +
+> +exit_rm_files:
+> +	lin_remove_sysfs_id_files(ndev);
+> +exit_kobj_put:
+> +	kobject_put(ldev->lin_ids_kobj);
+> +exit_unreg:
+> +	unregister_candev(ndev);
+> +exit_candev:
+> +	free_candev(ndev);
+> +	return ERR_PTR(ret);
 > +}
-> +
-> +static int bnxt_alloc_rx_ring_struct(struct bnxt *bp, struct bnxt_ring_struct *ring)
+> +EXPORT_SYMBOL_GPL(register_lin);
 
-Hi David,
-
-W=1 builds fail because this and other functions introduced by
-this patch are unused. I agree that it is nice to split up changes
-into discrete patches. But in this case the change isn't really discrete.
-So perhaps it is best to add helper functions in the same patch
-where they are first used.
+...
 
