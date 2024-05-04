@@ -1,266 +1,215 @@
-Return-Path: <netdev+bounces-93449-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93450-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A1DC8BBD1D
-	for <lists+netdev@lfdr.de>; Sat,  4 May 2024 18:33:39 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3780E8BBD56
+	for <lists+netdev@lfdr.de>; Sat,  4 May 2024 19:09:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BCC191C20CC1
-	for <lists+netdev@lfdr.de>; Sat,  4 May 2024 16:33:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AE4A41F216AB
+	for <lists+netdev@lfdr.de>; Sat,  4 May 2024 17:09:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 704A83F9D2;
-	Sat,  4 May 2024 16:33:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DBB15A4E9;
+	Sat,  4 May 2024 17:08:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M+N16yS8"
+	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="hdBezUaa"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from EUR01-HE1-obe.outbound.protection.outlook.com (mail-he1eur01olkn2054.outbound.protection.outlook.com [40.92.65.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE7261D52D
-	for <netdev@vger.kernel.org>; Sat,  4 May 2024 16:33:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714840415; cv=none; b=N+1MwayFNqd81l15KgDLCEm0AF5+AltlpawTLe3LLhPVAqPBYHqc2XaW0YJ7pUXYcSdZCD1w0R8Y6h5EaUwOHTO8XdVnsSt2cCvzahCqUc7B1Ls/kNpJTsM42YbzBu2gQc0lzyI3EHrTWQQwXCl7ZXefKDn+D9ndl/y/JHH6kY8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714840415; c=relaxed/simple;
-	bh=YxjQbrbwLcDjk/JustMM9PO1FznydgKs0lDkqtvLUpo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Yp7r9oLFAWcpOeh6u0Z6wUoXy8InZu7J/qLwyWaJwXaTJzMPxHGUny3A1SytCUrY5gqMX5axeXGl+ScrdmqD66NmFR9WzoacZas9yZjUSJWW5mDDu/OH6/39NE3k9aj12asEydgzzYegp+sU5EwI49KU5DfJe9zNFJrL8WOFR2k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=M+N16yS8; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1714840412;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Z3dypqPXlAvUzD5Mu1WQB9bBe4CtLqMLj8PS/31o/pE=;
-	b=M+N16yS8rdvgQkTVrkaaTD9V5u9Ba+SclR6JqeBEjWRhe0x5ht8Ge5aVcFlyA6GoEFUk4K
-	ITy4gKw0Gm0sb4ezcGNK6MxpGoOVZsui6scP2JRq40og9fEsgRxJs70XPJNIJP5xHBU7Vp
-	OgmEKJXymDdL1Mpv/p0FmTcg+6bP3HY=
-Received: from mail-pl1-f197.google.com (mail-pl1-f197.google.com
- [209.85.214.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-659-KIcsF_vyOkCTmmL_12Mvtg-1; Sat, 04 May 2024 12:33:31 -0400
-X-MC-Unique: KIcsF_vyOkCTmmL_12Mvtg-1
-Received: by mail-pl1-f197.google.com with SMTP id d9443c01a7336-1e45572fb3fso7964485ad.0
-        for <netdev@vger.kernel.org>; Sat, 04 May 2024 09:33:30 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714840410; x=1715445210;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Z3dypqPXlAvUzD5Mu1WQB9bBe4CtLqMLj8PS/31o/pE=;
-        b=P+ZnSZs3h6OFluTqkWr4pKesaIl9RTUb/pfbH5aMfodMH92jbbu8l1tCuRiCj+46fj
-         pXhHvv3hLgM4hiIFJa446uCtj/DlOR8phC7KJHnukmoTLM5XCACd4FtcAzLzDtk/+gGm
-         qyp+s094/LcgUBlqbfQURgd5LZTUqf1oQY7rHDAt0cPQzoEsYgBvgsx7EQHZg2UZsZWe
-         8B7pSEb79g9su0tzvVn4cj4baWZCYXA6F6wgWY1EWr+bYOypjal/HpEHtxd3qztCtxD/
-         /mwjgCBFvjxB7kRwTgLezGn86gXmx0I2wPzRmEcCbOj0XkUL0L7XMCckQEH7r+N0Xf+8
-         gbSA==
-X-Forwarded-Encrypted: i=1; AJvYcCXWA96jIjT3KuaRfBOYG3ijgGV3yTQrXAO/XpB2rExeXqZ7Hv2cQF99Zz5glps1O9yvOwovTh/lzvRPGb/qitULnePcOqNR
-X-Gm-Message-State: AOJu0YxEsq0j/OeyMj7RpqlJo6dn4CEb+syf4UXlJVGAyyZ8M4PxidVx
-	UTLUPqUyymdeA8LDXscUWC8WzOIwfOoRME1VhURxRGjVwe9t8kLwPX6U7c6wCUg5BQu0ZqPlwVv
-	bqTWvn3fEzdFifr1OOvFQ2jqnJHp5YgL0ED+NjGx92BapN/hjAZD4AQ==
-X-Received: by 2002:a17:902:8f96:b0:1e2:6d57:c1bb with SMTP id z22-20020a1709028f9600b001e26d57c1bbmr5599259plo.21.1714840409958;
-        Sat, 04 May 2024 09:33:29 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGRfDPksZrRebZczxRNrO70cxZhz+xVuAXwMbEAYqjmga2NGbuOJKY60f8fe7WXoFiiCEAp4A==
-X-Received: by 2002:a17:902:8f96:b0:1e2:6d57:c1bb with SMTP id z22-20020a1709028f9600b001e26d57c1bbmr5599233plo.21.1714840409487;
-        Sat, 04 May 2024 09:33:29 -0700 (PDT)
-Received: from zeus ([240b:10:83a2:bd00:6e35:f2f5:2e21:ae3a])
-        by smtp.gmail.com with ESMTPSA id kz15-20020a170902f9cf00b001ec46958680sm5247285plb.71.2024.05.04.09.33.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 04 May 2024 09:33:28 -0700 (PDT)
-Date: Sun, 5 May 2024 01:33:24 +0900
-From: Ryosuke Yasuoka <ryasuoka@redhat.com>
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, syoshida@redhat.com,
-	syzbot+d7b4dc6cd50410152534@syzkaller.appspotmail.com
-Subject: Re: [PATCH net v3] nfc: nci: Fix uninit-value in nci_rx_work
-Message-ID: <ZjZjVGy0e9BxvtCK@zeus>
-References: <20240502082323.250739-1-ryasuoka@redhat.com>
- <b7c7fab7-07d5-4654-a903-473f0c6dd4aa@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 332CD1DDF5;
+	Sat,  4 May 2024 17:08:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.65.54
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1714842538; cv=fail; b=R6ckXVRwAz07t0s3fDvhN+8KOoPPGuACtFyPyF2AayY1d1RKvj4J7ve+MH9h485MhPmLj32C96ubZXLb3VgH+cRIzNpwLhWGSpjvZHzEddqpi2zUt3QoTtijrEudGnayw3nrOBl1hIsdxJcX85eiVMpJzf+GqYsZPs882pldx8o=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1714842538; c=relaxed/simple;
+	bh=MoeMOmfNN+q4Zk/jL8nH4mnTUTo9tz0BkC3htba9PUI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=LBGJP5W0o/bjD3E0DHhG3kh6114oYojLfuIMk8nDVOFFB06nQHtoS8TTzLu+8AvkWLuduNcyYN2ilI3TehCOD0mo9ZIltbHBskCu7TrVSAa9eyyaawXTqqW5MjIfGYafZNgMW/6b7/eO33RPZvyGkJDnR3pfbaj1tqJxDCvLGsM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=hdBezUaa; arc=fail smtp.client-ip=40.92.65.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=R3gpbNwlx6Km71646pwqF+4RxeBY1tFpGcMFGwHnyEfJcqhzgxlaZ4t/4ToYYdYksHYX9DDLg2AwokkyQVKQBfRpLaeu54e6gge4OeBMKND+NUQYBAC5H7/H0YoNyff7zV4tdTFtZXyQL+BRUXwYlke1PXJumZrCVLYfr+R8+uUzGKksryafPLMCJ5dyE+0BzHkAGvQIcHe//n7PfIXk+0GGuX8r/MUUwVyhpGJOyyOTvdIwXXnD/v6hXXSyMlgBTnWI7EVxqoNFQT07HV3IsnVLzcHhOdtuWIYSGluJ2Ei7PydnYq/C2bfcjecNmyJAB6qS9UTkyf1A5k5VauVufA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=cw8nzKpnOVpC5LmgD+kJADa5w994LoR5bUQd6sq39Mg=;
+ b=ktFF17cZIc+zTFmv4Dy40THJURLeMWe7uwWwuq77TiU+C/lXr91/Qaf0/xTiDEGmTrbX6Doc4vMpVGjeNZPzkXIiTnqBaD9AB19K1zDhnvNnPWcqrTnWwehywwbpDGgLYAheTMU+IYQskh89lb9DN6AucPAELzfpbFadl1v+Mbe6cMY4i2Dpl9bIJuBbGiQUzxsZzrZvrsuV6YBn2UAvsENRmVAK7GJu/4DY/s0Jihnq+DirmPCha8p7EI9hAslVlsj6ZQ5BAQmxis7oeGB3ElYbOxgFWbxZqqkMk4gen9H+X24jMERjnHpym/OTPiHr+YTjzkgvappc/LFu84zRAA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=cw8nzKpnOVpC5LmgD+kJADa5w994LoR5bUQd6sq39Mg=;
+ b=hdBezUaaNcdkP1o/PMekE0JV+A1y0opkJ1b4fccpMnkWDR0B5lP7oeBPSw7YaNPEWBvimXHQsh3BbHojC/m9Iif0uqE/P3oOApJyuJvFmrMhXVhPxknOwq9YyUiWHBvpRc2P8075yWI9J9BelXmQdXV7GMN7wPI+p3261yaljJ1sQFAc5qYDJtCMWMhjC1/kkJoLwVZOr1yA8kOdcF4wLqnt0lt3lYh/vh89HZmsYgRJxgEUBV0vcLeuz58mFEkOsPlnRdgKnixtdqLLuhZ4LLuQj80EbrWMqxfpfy5bt2FituOONxcdHJoWOLIm479p2M5r614VXD0aFIv9zGyTvg==
+Received: from AS8PR02MB7237.eurprd02.prod.outlook.com (2603:10a6:20b:3f1::10)
+ by DB5PR02MB10070.eurprd02.prod.outlook.com (2603:10a6:10:489::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.39; Sat, 4 May
+ 2024 17:08:52 +0000
+Received: from AS8PR02MB7237.eurprd02.prod.outlook.com
+ ([fe80::409b:1407:979b:f658]) by AS8PR02MB7237.eurprd02.prod.outlook.com
+ ([fe80::409b:1407:979b:f658%5]) with mapi id 15.20.7544.036; Sat, 4 May 2024
+ 17:08:52 +0000
+Date: Sat, 4 May 2024 19:08:39 +0200
+From: Erick Archer <erick.archer@outlook.com>
+To: Sven Eckelmann <sven@narfation.org>
+Cc: Marek Lindner <mareklindner@neomailbox.ch>,
+	Simon Wunderlich <sw@simonwunderlich.de>,
+	Antonio Quartulli <a@unstable.cc>,
+	"David S.  Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <ndesaulniers@google.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>,
+	Kees Cook <keescook@chromium.org>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	Erick Archer <erick.archer@outlook.com>,
+	b.a.t.m.a.n@lists.open-mesh.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, linux-hardening@vger.kernel.org,
+	llvm@lists.linux.dev,
+	Alexander Lobakin <aleksander.lobakin@intel.com>
+Subject: Re: [PATCH v3] batman-adv: Add flex array to struct
+ batadv_tvlv_tt_data
+Message-ID:
+ <AS8PR02MB723738E5107C240933E4E0F28B1E2@AS8PR02MB7237.eurprd02.prod.outlook.com>
+References: <AS8PR02MB72371F89D188B047410B755E8B192@AS8PR02MB7237.eurprd02.prod.outlook.com>
+ <3932737.ElGaqSPkdT@sven-l14>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3932737.ElGaqSPkdT@sven-l14>
+X-TMN: [QE19YAEU1vCHNCTe9yt0HLsdoXKNn/cq]
+X-ClientProxiedBy: MA2P292CA0026.ESPP292.PROD.OUTLOOK.COM (2603:10a6:250::12)
+ To AS8PR02MB7237.eurprd02.prod.outlook.com (2603:10a6:20b:3f1::10)
+X-Microsoft-Original-Message-ID: <20240504170839.GA3490@titan>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b7c7fab7-07d5-4654-a903-473f0c6dd4aa@kernel.org>
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AS8PR02MB7237:EE_|DB5PR02MB10070:EE_
+X-MS-Office365-Filtering-Correlation-Id: eae39119-7b43-47e7-6299-08dc6c5cdf00
+X-Microsoft-Antispam:
+	BCL:0;ARA:14566002|461199019|3412199016|440099019|1710799017;
+X-Microsoft-Antispam-Message-Info:
+	bEi1YuNpgg+gE7nmCzg7q83ItAooLKXjJ5ftGYwihf8eTxawv6f8HpLh5ojK4wipcDExPah6TJEa1M42YzGTnWcmbew8f2oPBtJbP9ULGQVtiNAkqdkWDhtSv+4/q8ZBWODGiDsmb7E+sVqgHOaCrGorPTUGwMgGPVaKr3ob42ojbNNf/Eq2tYTNWESCNTU7IVB1bR9SF4o+XoZ5LRZ5Mgxy3h9nwcvxTY/oxaveq30cqbp1WXLqFTyGdnEuB3pvaTOcZ9lrRCMlhCqmdDrDU1rX6oCm9makQbrITSJRWibbM4EeSvrc+YbqjYWEpBoxGOSSiFTsKu253WBwJnvMoEgmXiOkIjkbVyI3ZRgYgT+OsBX1tQgT2kj5SpraXxmA46vAwO/3s7p1/wJinpbyNg2VioeSmkY8bk7eH2wzAYFhAl2mnxgug9wD1z8eBX8MaNbSUvNF1BMuIcOqTw1kMD76UeBpCofteT0X82e+ukJB4w+mHDLxyThZIn3+xMkEBmskyvP5y3zo3877wCPSa1zkp5WcJCt/iuL6kGAMLoYg6FtDwUI1dLdLFG9YdC25QiAufAl+tMoG3YPGENpDPHSsYeXrlGxbK97ZNkW9uuncMTfeuHIEnGSbv3mbXI4P
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?A2KDuKhXzzvdnmZzLYMMcsvi/I5S+4bP8SbQ1VW0QwvaLR0w2u2BktHv+fyO?=
+ =?us-ascii?Q?nOHv7BC9vfFvoVKFQw9mdQypxQs90cqlDFkq4e3dCyGo3dazFjaWBEqQOkm3?=
+ =?us-ascii?Q?GUO93SuKhwlJBFhF+y6MeYozQz1oJtL7YuLkRWDeRN7Odk9cFKVEqqfHFSd8?=
+ =?us-ascii?Q?jbXDFc+xN6idVgode0wPmx6QWG1Vil+jAKY90WKpWqmZjHPFkEg5mv4DcwrZ?=
+ =?us-ascii?Q?Two1B4rC9rWF4wz58NTPo3Gtt6no9u+sUOTzs/H8wvOObS8l9OT88GdQboWu?=
+ =?us-ascii?Q?EHxD5iVpWRlZBMbSFbz+07VCi/NUbVoaSrvNoakSn4JU66OvZ5JWYkmRNFHd?=
+ =?us-ascii?Q?AkY2jDxL3GHCd3fm40RQSdnZqZtw+GX65C1uQqB0+mTjTLxw9TVgKSnIFIRJ?=
+ =?us-ascii?Q?ifAN4dHN/pkeRyktvtNL6VF2sg3l+5JKj5zNEnpR5MyqGJDYU9R11qGhTqGZ?=
+ =?us-ascii?Q?xQHdfu7fYgnMm0cKAX5VG6E0qqhwvsuKMKKkqpM6L28Tqk+Pxj1ZDybNQmJv?=
+ =?us-ascii?Q?lvH13KpqWyEKdjwO5DpBYzn765yrHpQf0ySscaYOoaiLikbBFe3jSbk5KY1S?=
+ =?us-ascii?Q?lGucH1zIc9mWiacg4Vq6/hJPmC5daXfMk1olIsnz+HtlwR/LbRZQ42d8JXld?=
+ =?us-ascii?Q?Z2O7c0tao8AZplvhy3vbYfk42Z5Fm7tSZX1VoxCst8wAArSwmKCbPkLThO21?=
+ =?us-ascii?Q?0zcQW1Pj6x1yxN2CFqEof8abEWh4cEw9NCIoO1T+b7fsEFE/y55CJgag+VGO?=
+ =?us-ascii?Q?ym8ukTm+m/8FhTlw4bhYhRZRFSDo3Jo2i/z/QQw7fiaCzuLznbm7VJe6lstw?=
+ =?us-ascii?Q?KZmlRv3GVmMw5D7SEMaHfAh744kdMRw4jJrq5jUcirL/WA8WLqowHqel9VSf?=
+ =?us-ascii?Q?qt4fjJQcLOmGDb0DLsa3zQ4mCYIrFJqrhoMBrkYYK8eLCb3UgBOc3SDjiFoW?=
+ =?us-ascii?Q?uqympyP2kLb2pTvcUq4l2wpe4lJwH/8Dog0xmHvjC/WpQtXJUAw34oDl01OH?=
+ =?us-ascii?Q?10+HHm3t+OSJx4pidCxvx77GftNrNQJqc705FZsxEuGGmSg0koQUewb1oM9r?=
+ =?us-ascii?Q?s4UszanKY1lCqp+oMoi2syf1w+06OFcmgqEuDFNq/zi34floNkysPviTcumE?=
+ =?us-ascii?Q?oH1BAlk5eEerRKlaklgnxpbCjmfpDgJsf4Yn6aQpUD2+cgmHCJBlCXR7qLIz?=
+ =?us-ascii?Q?NXNi8sqCBJHa/NAgKpEcLKjGJOX7906asBhwIVTcpYNh2mzmIRoTkoBv24Wr?=
+ =?us-ascii?Q?1ZevmYiV+OTJQy2tWouf?=
+X-OriginatorOrg: outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: eae39119-7b43-47e7-6299-08dc6c5cdf00
+X-MS-Exchange-CrossTenant-AuthSource: AS8PR02MB7237.eurprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 May 2024 17:08:52.2295
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
+	00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB5PR02MB10070
 
-On Fri, May 03, 2024 at 11:07:49AM +0200, Krzysztof Kozlowski wrote:
-> On 02/05/2024 10:22, Ryosuke Yasuoka wrote:
-> > syzbot reported the following uninit-value access issue [1]
-> > 
-> > nci_rx_work() parses received packet from ndev->rx_q. It should be
-> > validated header size, payload size and total packet size before
-> > processing the packet. If an invalid packet is detected, it should be
-> > silently discarded.
-> > 
-> > Fixes: d24b03535e5e ("nfc: nci: Fix uninit-value in nci_dev_up and nci_ntf_packet")
-> > Reported-and-tested-by: syzbot+d7b4dc6cd50410152534@syzkaller.appspotmail.com
-> > Closes: https://syzkaller.appspot.com/bug?extid=d7b4dc6cd50410152534 [1]
-> > Signed-off-by: Ryosuke Yasuoka <ryasuoka@redhat.com>
-> > ---
-> > 
-> > v3
-> > - As Simon pointed out, the valid packets will reach invalid_pkt_free
-> > and kfree_skb(skb) after being handled correctly in switch statement.
-> > It can lead to double free issues, which is not intended. So this patch
-> > uses "continue" instead of "break" in switch statement.
-> > 
-> > - In the current implementation, once zero payload size is detected, the
-> > for statement exits. It should continue processing subsequent packets. 
-> > So this patch just frees skb in invalid_pkt_free when the invalid 
-> > packets are detected.
-> > 
-> > v2
-> > https://lore.kernel.org/lkml/20240428134525.GW516117@kernel.org/T/
-> > 
-> > - The v1 patch only checked whether skb->len is zero. This patch also
-> >   checks header size, payload size and total packet size.
-> > 
-> > 
-> > v1
-> > https://lore.kernel.org/linux-kernel/CANn89iJrQevxPFLCj2P=U+XSisYD0jqrUQpa=zWMXTjj5+RriA@mail.gmail.com/T/
-> > 
-> > 
-> >  net/nfc/nci/core.c | 33 ++++++++++++++++++++++++---------
-> >  1 file changed, 24 insertions(+), 9 deletions(-)
-> > 
-> > diff --git a/net/nfc/nci/core.c b/net/nfc/nci/core.c
-> > index 0d26c8ec9993..e4f92a090022 100644
-> > --- a/net/nfc/nci/core.c
-> > +++ b/net/nfc/nci/core.c
-> > @@ -1463,6 +1463,16 @@ int nci_core_ntf_packet(struct nci_dev *ndev, __u16 opcode,
-> >  				 ndev->ops->n_core_ops);
-> >  }
-> >  
-> > +static bool nci_valid_size(struct sk_buff *skb, unsigned int header_size)
-> > +{
-> > +	if (skb->len < header_size ||
-> > +	    !nci_plen(skb->data) ||
-> > +	    skb->len < header_size + nci_plen(skb->data)) {
-> > +		return false;
-> > +	}
-> > +	return true;
-> > +}
-> > +
-> >  /* ---- NCI TX Data worker thread ---- */
-> >  
-> >  static void nci_tx_work(struct work_struct *work)
-> > @@ -1516,30 +1526,35 @@ static void nci_rx_work(struct work_struct *work)
-> >  		nfc_send_to_raw_sock(ndev->nfc_dev, skb,
-> >  				     RAW_PAYLOAD_NCI, NFC_DIRECTION_RX);
-> >  
-> > -		if (!nci_plen(skb->data)) {
-> > -			kfree_skb(skb);
-> > -			break;
-> > -		}
-> > +		if (!skb->len)
-> > +			goto invalid_pkt_free;
-> >  
-> >  		/* Process frame */
-> >  		switch (nci_mt(skb->data)) {
-> >  		case NCI_MT_RSP_PKT:
-> > +			if (!nci_valid_size(skb, NCI_CTRL_HDR_SIZE))
-> > +				goto invalid_pkt_free;
-> >  			nci_rsp_packet(ndev, skb);
-> > -			break;
-> > +			continue;
+Hi Sven,
+
+On Sat, May 04, 2024 at 11:35:38AM +0200, Sven Eckelmann wrote:
+> On Wednesday, 1 May 2024 17:02:42 CEST Erick Archer wrote:
+> > diff --git a/include/uapi/linux/batadv_packet.h b/include/uapi/linux/batadv_packet.h
+> > index 6e25753015df..dfbe30536995 100644
+> > --- a/include/uapi/linux/batadv_packet.h
+> > +++ b/include/uapi/linux/batadv_packet.h
+> [...]
+> > +/**
+> > + * struct batadv_tvlv_tt_data - tt data propagated through the tt tvlv container
+> > + * @flags: translation table flags (see batadv_tt_data_flags)
+> > + * @ttvn: translation table version number
+> > + * @num_vlan: number of announced VLANs. In the TVLV this struct is followed by
+> > + *  one batadv_tvlv_tt_vlan_data object per announced vlan
+> > + * @vlan_data: array of batadv_tvlv_tt_vlan_data objects
+> > + */
+> > +struct batadv_tvlv_tt_data {
+> > +       __u8   flags;
+> > +       __u8   ttvn;
+> > +       __be16 num_vlan;
+> > +       struct batadv_tvlv_tt_vlan_data vlan_data[] __counted_by_be(num_vlan);
+> > +};
 > 
-> I don't find this code readable.
+> Thanks for the updates. But I can't accept this at the moment because 
+> __counted_by_be is used in an uapi header without it being defined
+> include/uapi/linux/stddef.h (and this file is also not included in this 
+> header).
 > 
-> >  
-> >  		case NCI_MT_NTF_PKT:
-> > +			if (!nci_valid_size(skb, NCI_CTRL_HDR_SIZE))
-> > +				goto invalid_pkt_free;
-> >  			nci_ntf_packet(ndev, skb);
-> > -			break;
-> > +			continue;
-> >  
-> >  		case NCI_MT_DATA_PKT:
-> > +			if (!nci_valid_size(skb, NCI_DATA_HDR_SIZE))
-> > +				goto invalid_pkt_free;
-> >  			nci_rx_data_packet(ndev, skb);
-> > -			break;
-> > +			continue;
-> >  
-> >  		default:
-> >  			pr_err("unknown MT 0x%x\n", nci_mt(skb->data));
-> > -			kfree_skb(skb);
-> > -			break;
-> > +			goto invalid_pkt_free;
-> >  		}
-> > +invalid_pkt_free:
-> > +		kfree_skb(skb);
-> 
-> Why you cannot kfree in "default" and error cases? I don't think that
-> goto inside loop makes this code easier to follow.
+> See commit c8248faf3ca2 ("Compiler Attributes: counted_by: Adjust name and 
+> identifier expansion") as an example for the similar __counted_by macro.
 
-Thank you for your review, Krzysztof.
+If I understand correctly, the following changes are also needed because
+the annotated struct is defined in a "uapi" header. Sorry if it's a stupid
+question, but I'm new to these topics.
 
-Yes, we can write this without goto statement. But if we don't use goto
-statement, we have to call kfree_skb() and break in each switch
-statement like below.
+diff --git a/include/uapi/linux/batadv_packet.h b/include/uapi/linux/batadv_packet.h
+index 6e25753015df..41f39d7661c9 100644
+--- a/include/uapi/linux/batadv_packet.h
++++ b/include/uapi/linux/batadv_packet.h
+@@ -9,6 +9,7 @@
 
-	for (; (skb = skb_dequeue(&ndev->rx_q)); kcov_remote_stop()) {
-		kcov_remote_start_common(skb_get_kcov_handle(skb));
+ #include <asm/byteorder.h>
+ #include <linux/if_ether.h>
++#include <linux/stddef.h>
+ #include <linux/types.h>
 
-		/* Send copy to sniffer */
-		nfc_send_to_raw_sock(ndev->nfc_dev, skb,
-				     RAW_PAYLOAD_NCI, NFC_DIRECTION_RX);
+ /**
+diff --git a/include/uapi/linux/stddef.h b/include/uapi/linux/stddef.h
+index 2ec6f35cda32..58154117d9b0 100644
+--- a/include/uapi/linux/stddef.h
++++ b/include/uapi/linux/stddef.h
+@@ -55,4 +55,12 @@
+ #define __counted_by(m)
+ #endif
 
-		if (!skb->len) {
-			kfree_skb(skb);   <<<---
-			continue;   <<<---
-		}
++#ifndef __counted_by_le
++#define __counted_by_le(m)
++#endif
++
++#ifndef __counted_by_be
++#define __counted_by_be(m)
++#endif
++
+ #endif /* _UAPI_LINUX_STDDEF_H */
 
-		/* Process frame */
-		switch (nci_mt(skb->data)) {
-		case NCI_MT_RSP_PKT:
-			if (!nci_valid_size(skb, NCI_CTRL_HDR_SIZE)) {
-				kfree_skb(skb);   <<<---
-				break;   <<<---
-			}
-			nci_rsp_packet(ndev, skb);
-			break;
+If this is the right path, can these changes be merged into a
+single patch or is it better to add a previous patch to define
+__counted_by{le,be}?
 
-		case NCI_MT_NTF_PKT:
-			if (!nci_valid_size(skb, NCI_CTRL_HDR_SIZE)) {
-				kfree_skb(skb);   <<<---
-				break;   <<<---
-			}
-			nci_ntf_packet(ndev, skb);
-			break;
+Regards,
+Erick
 
-		case NCI_MT_DATA_PKT:
-			if (!nci_valid_size(skb, NCI_DATA_HDR_SIZE)) {
-				kfree_skb(skb);   <<<---
-				break;   <<<---
-			}
-			nci_rx_data_packet(ndev, skb);
-			break;
-
-		default:
-			pr_err("unknown MT 0x%x\n", nci_mt(skb->data));
-			kfree_skb(skb);   <<<---
-			break;   <<<---
-		}
-	}
-
-IMHO, using goto statement can avoid calling this statement repeatedly,
-and it might make these codes brief. I understand goto statement often
-makes codes complicated as you mention, So please let me know again if I
-should write these codes without goto. I'd like to respect your idea and
-I'm willing to send v4 patch.
-
-Thank you,
-Ryosuke
-
+> Kind regards,
+> 	Sven
 
