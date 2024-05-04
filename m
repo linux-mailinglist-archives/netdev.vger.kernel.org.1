@@ -1,173 +1,171 @@
-Return-Path: <netdev+bounces-93401-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93402-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12FE18BB885
-	for <lists+netdev@lfdr.de>; Sat,  4 May 2024 01:53:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A76AF8BB898
+	for <lists+netdev@lfdr.de>; Sat,  4 May 2024 02:06:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 81D0F1F24465
-	for <lists+netdev@lfdr.de>; Fri,  3 May 2024 23:53:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 09BAD1F23B82
+	for <lists+netdev@lfdr.de>; Sat,  4 May 2024 00:06:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 050E084DF1;
-	Fri,  3 May 2024 23:53:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27A087FF;
+	Sat,  4 May 2024 00:06:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="WqEWKVn3"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mDb8/mhD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 804AB59167
-	for <netdev@vger.kernel.org>; Fri,  3 May 2024 23:53:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1873336D;
+	Sat,  4 May 2024 00:06:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714780425; cv=none; b=ml/YYuVwdsZpyTReteg2n1kh+LSBSf99RU/LmFRshgopxenjc5rHTDWHNNAuNLMJ/f2F+PJhr5wVR5c2XoqMifKvmBvQ+EVHNhxXxscT695DbgW2XL5MtNZWIA2f2sKdQrSqowwlmwyOUmsjfNq/GYoGY2d9D0T6tvMNmL3PPx8=
+	t=1714781172; cv=none; b=m4ZHOtVXmchGmKYa2kjXC9L/rPQzKVHcMfd0hZowh2yncNIt5Pmyh+ZeQ4z4+UalEnOcCnm16To0ClBKzD0thFYCgjCLr3u+Z0rjGQrXb/R9MPTPkYRtQPbDKYPXfK39FRILP0fBppl4jAcfpbPskfLL3Fa6IrzGjy64SC9t908=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714780425; c=relaxed/simple;
-	bh=xhq22uzQmypOoVpCkNFBLHGOvrAtFOUR8wHYL+PkZa0=;
+	s=arc-20240116; t=1714781172; c=relaxed/simple;
+	bh=n2SZEuocUgy6py23Dq0fblkTnaWOTleAfvkXP/zWG4w=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LS3gmuGMGeiGAJvvi+xoqeagJi9PGPocEBTgpUtT/wyR4IRlbec5pmIHnunDkgseMF4xxjxsR/24BZQ/P2ND4SXyYaCs2JOEBKEDUJG9tT+3cnWna9HsZuCoZJsQDnecPs9/AYPxeLM+pbKnL/2jbQrgXqvGNJhws7EWg79jT4o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=WqEWKVn3; arc=none smtp.client-ip=209.85.215.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-5f80aa2d4a3so156055a12.0
-        for <netdev@vger.kernel.org>; Fri, 03 May 2024 16:53:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1714780424; x=1715385224; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=5avDtjhLdQj9IgYkItzDxuI0WthI0sSdax4HN8vbOzQ=;
-        b=WqEWKVn3W+NdCaa/KQbuSm0SpLbqAEwi3Ny5Lw+Vv/KPxNlz/dEFifveE+gVytI7i0
-         URRpdHFX1XyuxYGbbr7Ne3wjZCiG77EEuF1kbUvqGyNwef3Fz401LKepq1AqG+m4Dmys
-         LhE4gXaKxQ8bdlVSlHqwcLktjIyZhIDsH9VP0=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714780424; x=1715385224;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5avDtjhLdQj9IgYkItzDxuI0WthI0sSdax4HN8vbOzQ=;
-        b=W6jlpqPcMJd9154wJfRKpAYYgLrUks6SlkNhhkr5ehvgy51FRhBg5GBj93fhUEMr1h
-         lNHZZcu5VqlLco6MVp1ourJFHbfUNkpKN73g6H3g1ddlk/JOL12bQp+fTe284M3vdowz
-         dcFvqNA4r5YRAoTYiJnjBgTwtwi1HV3mM4JM4+RqITCiiG9rFcpL2zbo9C9m8TKx61kT
-         tY+Kb2jJ5f//C+SGAgi7nxBEVI1+6+qHW5hVFbbObbvHjQCROQexd8XESFwVdTNl5yKL
-         /AQrGQN70uhlLevMm0BDVznpx8IUEdkJgt0yYtd2xO+3CFSlyUsfQs5nBBbcPcDr9gCA
-         odzg==
-X-Forwarded-Encrypted: i=1; AJvYcCXUjPvgZPL2Xd1pSYEzACejRSIvjT/7XrVm1jGUjL/5y/spPwQpdDIkbYJFgaX+xdhyAefb2bLwNL0H1HORviAKO8umZ12d
-X-Gm-Message-State: AOJu0YyBstNEJIrrPcqYjtozigYrZ0wj+vJ2WAqQT0z/7cv8tHC7eTQO
-	UTkjHSSzcWDOmjYfB904iLAAVo6DzOfzkEBHldGJ54C8BIqEXaN75LRBoNgMNlw=
-X-Google-Smtp-Source: AGHT+IFs7xIHfqq9Lj6Fqlq3My9vl2wwYg+s9bmVBnuUhEqmAlP9X3ekQ4lmIBlGbrA0NaWexsKkag==
-X-Received: by 2002:a17:903:41cc:b0:1eb:49cb:bf70 with SMTP id u12-20020a17090341cc00b001eb49cbbf70mr5271667ple.62.1714780423773;
-        Fri, 03 May 2024 16:53:43 -0700 (PDT)
-Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id h8-20020a170902f54800b001ed6868e257sm765764plf.123.2024.05.03.16.53.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 May 2024 16:53:43 -0700 (PDT)
-Date: Fri, 3 May 2024 16:53:40 -0700
-From: Joe Damato <jdamato@fastly.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Zhu Yanjun <zyjzyj2000@gmail.com>, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, tariqt@nvidia.com, saeedm@nvidia.com,
-	gal@nvidia.com, nalramli@fastly.com,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	"open list:MELLANOX MLX5 core VPI driver" <linux-rdma@vger.kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next 0/1] mlx5: Add netdev-genl queue stats
-Message-ID: <ZjV5BG8JFGRBoKaz@LQ3V64L9R2>
-References: <20240503022549.49852-1-jdamato@fastly.com>
- <c3f4f1a4-303d-4d57-ae83-ed52e5a08f69@linux.dev>
- <ZjUwT_1SA9tF952c@LQ3V64L9R2>
- <20240503145808.4872fbb2@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZcbMGs+CXcvlw4hg2vub965fH5bnb0CQMOEXe0aVom5h+hIzTwnDOvfId5RMr87uQKjstAbfrg1he223o7Rvx6UgTEuLOHLNl2HEorDo4YPa36BVzQM3htXQWkZFrX7L+UOpwipdofLYj1R4l3LDcFJ414uvA8AEkVbwlxUzi1s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mDb8/mhD; arc=none smtp.client-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1714781169; x=1746317169;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=n2SZEuocUgy6py23Dq0fblkTnaWOTleAfvkXP/zWG4w=;
+  b=mDb8/mhDeQTzq1YyotxCVAuH4HUk8rnVAg93GOUceRH3wZYmtleLC+OX
+   HRd+Zdgzpuz60QbZUxaMsxd/rq3ItCC4mu968kOm+B3qLiEo9Q8ForWzQ
+   gxFvLPVx4ACyFJXp9oD6hF3qRt/JrSQV70XCehppwCsNz9wCCNJhAuRBa
+   HwvVWIHy8v3plbzk7unlYhuViN6ipyFxAjpAOQeYBop4K73TUMz12rBD3
+   3ttt/rJTqILVm7PJ8V/GdlQrosZaNz4QqvObqMmU7BQQzJ2+JvxTKQyq8
+   3yzi0WMUhydQ/IV7k8xpb8CNHVX0s0gUSLAoCLlZ54oErXpvmg5/f2DjR
+   A==;
+X-CSE-ConnectionGUID: kI8li5/RQxyFqC5vvpokng==
+X-CSE-MsgGUID: mC/DL4+pQ2Gcn8szgbM3yQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11063"; a="10484738"
+X-IronPort-AV: E=Sophos;i="6.07,252,1708416000"; 
+   d="scan'208";a="10484738"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 May 2024 17:06:08 -0700
+X-CSE-ConnectionGUID: p034Rb+aRSuA6Wp5F0QbcA==
+X-CSE-MsgGUID: GO5xY0pnR9+AFPmMFE9Y+Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,252,1708416000"; 
+   d="scan'208";a="65027667"
+Received: from lkp-server01.sh.intel.com (HELO e434dd42e5a1) ([10.239.97.150])
+  by orviesa001.jf.intel.com with ESMTP; 03 May 2024 17:06:06 -0700
+Received: from kbuild by e434dd42e5a1 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1s32uh-000CE0-0t;
+	Sat, 04 May 2024 00:06:03 +0000
+Date: Sat, 4 May 2024 08:05:22 +0800
+From: kernel test robot <lkp@intel.com>
+To: Kamil =?iso-8859-1?Q?Hor=E1k?= - 2N <kamilh@axis.com>,
+	florian.fainelli@broadcom.com,
+	bcm-kernel-feedback-list@broadcom.com, andrew@lunn.ch,
+	hkallweit1@gmail.com
+Cc: oe-kbuild-all@lists.linux.dev, kamilh@axis.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 3/3] net: phy: bcm-phy-lib: Implement BroadR-Reach
+ link modes
+Message-ID: <202405040748.9mCHwtzA-lkp@intel.com>
+References: <20240503083719.899312-4-kamilh@axis.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20240503145808.4872fbb2@kernel.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240503083719.899312-4-kamilh@axis.com>
 
-On Fri, May 03, 2024 at 02:58:08PM -0700, Jakub Kicinski wrote:
-> On Fri, 3 May 2024 11:43:27 -0700 Joe Damato wrote:
-> > 1. it includes the PTP stats that I don't include in my qstats, and/or
-> > 2. some other reason I don't understand
-> 
-> Can you add the PTP stats to the "base" values? 
-> I.e. inside mlx5e_get_base_stats()?
+Hi Kamil,
 
-I tried adding them to rx and tx and mlx5e_get_base_stats (similar to what
-mlx5e_fold_sw_stats64 does) and the test still fails.
+kernel test robot noticed the following build warnings:
 
-Maybe something about the rtnl stats are what's off here and the queue
-stats are fine?
+[auto build test WARNING on net/main]
+[also build test WARNING on net-next/main linus/master v6.9-rc6 next-20240503]
+[cannot apply to horms-ipvs/master]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-FWIW: I spoke with the Mellanox folks off list several weeks ago and they
-seemed to suggest skipping the PTP stats made the most sense.
+url:    https://github.com/intel-lab-lkp/linux/commits/Kamil-Hor-k-2N/net-phy-bcm54811-New-link-mode-for-BroadR-Reach/20240503-164308
+base:   net/main
+patch link:    https://lore.kernel.org/r/20240503083719.899312-4-kamilh%40axis.com
+patch subject: [PATCH v2 3/3] net: phy: bcm-phy-lib: Implement BroadR-Reach link modes
+config: powerpc-randconfig-r081-20240504 (https://download.01.org/0day-ci/archive/20240504/202405040748.9mCHwtzA-lkp@intel.com/config)
+compiler: clang version 19.0.0git (https://github.com/llvm/llvm-project 37ae4ad0eef338776c7e2cffb3896153d43dcd90)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240504/202405040748.9mCHwtzA-lkp@intel.com/reproduce)
 
-I think at that time I didn't really understand get_base_stats that well,
-so maybe we'd have come to a different conclusion then.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202405040748.9mCHwtzA-lkp@intel.com/
 
-FWIW, here's what I tried and the rtnl vs qstat test still failed in
-exactly the same way:
+All warnings (new ones prefixed by >>):
 
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-@@ -5337,10 +5337,25 @@ static void mlx5e_get_base_stats(struct net_device *dev,
-                rx->packets = 0;
-                rx->bytes = 0;
-                rx->alloc_fail = 0;
-+               if (priv->rx_ptp_opened) {
-+                       struct mlx5e_rq_stats *rq_stats = &priv->ptp_stats.rq;
-+                       rx->packets = rq_stats->packets;
-+                       rx->bytes = rq_stats->bytes;
-+               }
-        }
+   In file included from drivers/net/phy/broadcom.c:13:
+   In file included from drivers/net/phy/bcm-phy-lib.h:9:
+   In file included from include/linux/brcmphy.h:5:
+   In file included from include/linux/phy.h:16:
+   In file included from include/linux/ethtool.h:18:
+   In file included from include/linux/if_ether.h:19:
+   In file included from include/linux/skbuff.h:17:
+   In file included from include/linux/bvec.h:10:
+   In file included from include/linux/highmem.h:8:
+   In file included from include/linux/cacheflush.h:5:
+   In file included from arch/powerpc/include/asm/cacheflush.h:7:
+   In file included from include/linux/mm.h:2210:
+   include/linux/vmstat.h:522:36: warning: arithmetic between different enumeration types ('enum node_stat_item' and 'enum lru_list') [-Wenum-enum-conversion]
+     522 |         return node_stat_name(NR_LRU_BASE + lru) + 3; // skip "nr_"
+         |                               ~~~~~~~~~~~ ^ ~~~
+>> drivers/net/phy/broadcom.c:619:6: warning: variable 'ret' is used uninitialized whenever 'if' condition is false [-Wsometimes-uninitialized]
+     619 |         if (of_property_read_bool(np, "enet-phy-lane-swap")) {
+         |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   drivers/net/phy/broadcom.c:627:9: note: uninitialized use occurs here
+     627 |         return ret;
+         |                ^~~
+   drivers/net/phy/broadcom.c:619:2: note: remove the 'if' if its condition is always true
+     619 |         if (of_property_read_bool(np, "enet-phy-lane-swap")) {
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   drivers/net/phy/broadcom.c:614:9: note: initialize the variable 'ret' to silence this warning
+     614 |         int ret;
+         |                ^
+         |                 = 0
+   2 warnings generated.
 
-        tx->packets = 0;
-        tx->bytes = 0;
-+
-+       if (priv->tx_ptp_opened) {
-+               int i;
-+               for (i = 0; i < priv->max_opened_tc; i++) {
-+                       struct mlx5e_sq_stats *sq_stats = &priv->ptp_stats.sq[i];
-+
-+                       tx->packets    += sq_stats->packets;
-+                       tx->bytes      += sq_stats->bytes;
-+               }
-+       }
- }
 
-> We should probably touch up the kdoc a little bit, but it sounds like
-> the sort of thing which would fall into the realm of "misc delta"
-> values:
-> 
-> diff --git a/include/net/netdev_queues.h b/include/net/netdev_queues.h
-> index c7ac4539eafc..f5d9f3ad5b66 100644
-> --- a/include/net/netdev_queues.h
-> +++ b/include/net/netdev_queues.h
-> @@ -59,6 +59,8 @@ struct netdev_queue_stats_tx {
->   * statistics will not generally add up to the total number of events for
->   * the device. The @get_base_stats callback allows filling in the delta
->   * between events for currently live queues and overall device history.
-> + * @get_base_stats can also be used to report any miscellaneous packets
-> + * transferred outside of the main set of queues used by the networking stack.
->   * When the statistics for the entire device are queried, first @get_base_stats
->   * is issued to collect the delta, and then a series of per-queue callbacks.
->   * Only statistics which are set in @get_base_stats will be reported
-> 
-> 
-> SG?
+vim +619 drivers/net/phy/broadcom.c
 
-I think that sounds good and makes sense, yea. By that definition, then I
-should leave the PTP stats as shown above. If you agree, I'll add that
-to the v2.
+b0ed0bbfb3046e Kevin Lo         2020-05-16  610  
+f1e9c8e593d6ea Kamil Horák - 2N 2024-05-03  611  static int bcm5481x_config_delay_swap(struct phy_device *phydev)
+57bb7e222804c6 Anton Vorontsov  2008-03-04  612  {
+b14995ac2527b4 Jon Mason        2016-11-04  613  	struct device_node *np = phydev->mdio.dev.of_node;
+57bb7e222804c6 Anton Vorontsov  2008-03-04  614  	int ret;
+57bb7e222804c6 Anton Vorontsov  2008-03-04  615  
+f1e9c8e593d6ea Kamil Horák - 2N 2024-05-03  616  	/* Set up the delay. */
+042cb56478152b Tao Ren          2018-11-05  617  	bcm54xx_config_clock_delay(phydev);
+57bb7e222804c6 Anton Vorontsov  2008-03-04  618  
+b14995ac2527b4 Jon Mason        2016-11-04 @619  	if (of_property_read_bool(np, "enet-phy-lane-swap")) {
+b14995ac2527b4 Jon Mason        2016-11-04  620  		/* Lane Swap - Undocumented register...magic! */
+b14995ac2527b4 Jon Mason        2016-11-04  621  		ret = bcm_phy_write_exp(phydev, MII_BCM54XX_EXP_SEL_ER + 0x9,
+b14995ac2527b4 Jon Mason        2016-11-04  622  					0x11B);
+b14995ac2527b4 Jon Mason        2016-11-04  623  		if (ret < 0)
+b14995ac2527b4 Jon Mason        2016-11-04  624  			return ret;
+b14995ac2527b4 Jon Mason        2016-11-04  625  	}
+b14995ac2527b4 Jon Mason        2016-11-04  626  
+57bb7e222804c6 Anton Vorontsov  2008-03-04  627  	return ret;
+57bb7e222804c6 Anton Vorontsov  2008-03-04  628  }
+57bb7e222804c6 Anton Vorontsov  2008-03-04  629  
 
-I feel like I should probably wait before sending a v2 with PTP included in
-get_base_stats to see if the Mellanox folks have any hints about why rtnl
-!= queue stats on mlx5?
-
-What do you think?
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
