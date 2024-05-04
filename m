@@ -1,117 +1,129 @@
-Return-Path: <netdev+bounces-93447-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93448-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35CF88BBCB5
-	for <lists+netdev@lfdr.de>; Sat,  4 May 2024 17:31:55 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 224A48BBCF2
+	for <lists+netdev@lfdr.de>; Sat,  4 May 2024 18:00:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DB5EC1F21C24
-	for <lists+netdev@lfdr.de>; Sat,  4 May 2024 15:31:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 55304B20DEA
+	for <lists+netdev@lfdr.de>; Sat,  4 May 2024 16:00:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D24F3FB96;
-	Sat,  4 May 2024 15:31:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EB294EB52;
+	Sat,  4 May 2024 16:00:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U1+wXKsJ"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="hPvSedsp"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E01A39AF0;
-	Sat,  4 May 2024 15:31:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C764023767;
+	Sat,  4 May 2024 16:00:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714836710; cv=none; b=kGsCtaxrKWoO74TnsGzyD+kZI/GS9Rb+X+kTfOCJVM1vmruDdj6mLlJ2WPmpwZ3bXjbd/xhf4DfFmdITPzyO27eeIy+b4yTwrCEfgVlch8SM3noEfe0JjpnZjNRb9V/np3/3C1Wm5nxwo0846AcPteM6aF87bGT4WIhwSTDo7JM=
+	t=1714838406; cv=none; b=Uzc7a0VAWhd6mNEv8txU7+Tc/CHwBKmhM9Z/RMcwOqYy9qn701XIfeNlFj1bAr2IhqlKQ1cQonGLt5Ju9CEe91e549rr0Quhypb+FC4JBwGA0wDBL+tsjyR9gSr+FF0m1bi15iujyFntsemzzs7GCqXAJT9YkPnPEhSYfY7OWBw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714836710; c=relaxed/simple;
-	bh=jBU5Uk9ZV/k58g1mXZ+jsPR6WwfvODudSHq5ZSNDRY0=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=X1Q2BXvcVBh6GxfN3kw82VAeMU5E/UjasMncv4oWIYS2gtkDa3k2D3XX+lkS3zdCk6ew0pRNRRbnMS5awLu2r9Q/jKZLegOvKygYyH8nfR1ff9mCi8nK+DRza4gbwAShJ7bJYwtCAJ2UmHIwXiA7UhJKvDgMxTXrsEq4DAMyGJM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U1+wXKsJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE216C072AA;
-	Sat,  4 May 2024 15:31:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714836709;
-	bh=jBU5Uk9ZV/k58g1mXZ+jsPR6WwfvODudSHq5ZSNDRY0=;
-	h=From:Date:Subject:To:Cc:From;
-	b=U1+wXKsJsogfpRN4K8jwS1sHKHAkTlcs8rDHFjXc73KmHdxwPitv/seR67DSI3XI5
-	 n2RLRAa8P9UQ6y8FUaVC2fgYzkrVbiIoYDT9d+hFgWjEZIYtDj51LnSRJ6n8O+DZ9E
-	 3KDWWJ3qCD9objc5ZLU8AZWs3PIl43s4fqSrQyR6322FOssLHFGcrGlWpYKnX+1qJO
-	 hQyitYmBmMG9lkmBgi2N2osfntGhzkWvaefnsYamtcOl9pQ04IHPIV/n7McM44K4p7
-	 Xg9WjTOHTlPZkm2mdfKwTcsZAuCpqVQtXSWPPiylgIEPrid08Rgb7w9wU09e7rKkwq
-	 96FQK5AqqdSOw==
-From: Simon Horman <horms@kernel.org>
-Date: Sat, 04 May 2024 16:31:47 +0100
-Subject: [PATCH] ptp: clockmatrix: Start comments with '/*'
+	s=arc-20240116; t=1714838406; c=relaxed/simple;
+	bh=2CfHE6U1TpkNccPPQ+ztJD0Glq/+yNTjt96lxseYs9w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AFC2ixPzORGB+yeuuNlVAqLTKB6Jg8QMGKhRWTUlVuCWv2Tn3X3632Gry+Pu8V1XpBw869a9Lw981YKLIem/7QLRYHnJxCMFYhKx6r2e3f0afWBAhwglkn7Dir0xfPIFgFqYIH86xpQczT+szFXkpfy340n92oqro5Au6y/hdLg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=hPvSedsp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5D204C072AA;
+	Sat,  4 May 2024 16:00:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1714838405;
+	bh=2CfHE6U1TpkNccPPQ+ztJD0Glq/+yNTjt96lxseYs9w=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=hPvSedspztdtHSPN3XsMQ+YePzhvGV6PXZbpqNBYIQKQGzEhgcWZNr+okyglg99rQ
+	 0yEk8VpMdXRQp+bRoBPshGJKkBJSqqs6Rp8o4y26mTU8wBsCgnyuGVkEcjEOyi4wsW
+	 10UmPB7I7bt1NVTHNn/zWY6PsJR864PffTHSLVb4=
+Date: Sat, 4 May 2024 18:00:01 +0200
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Christoph Fritz <christoph.fritz@hexdev.de>
+Cc: Jiri Slaby <jirislaby@kernel.org>,
+	Oliver Hartkopp <socketcan@hartkopp.net>,
+	Marc Kleine-Budde <mkl@pengutronix.de>,
+	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Jiri Kosina <jikos@kernel.org>,
+	Benjamin Tissoires <bentiss@kernel.org>,
+	Sebastian Reichel <sre@kernel.org>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Andreas Lauser <andreas.lauser@mercedes-benz.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Pavel Pisa <pisa@cmp.felk.cvut.cz>, linux-can@vger.kernel.org,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-input@vger.kernel.org, linux-serial@vger.kernel.org
+Subject: Re: [PATCH v3 03/11] tty: serdev: Add flag buffer aware
+ receive_buf_fp()
+Message-ID: <2024050410-gigolo-giddily-97b6@gregkh>
+References: <20240502182804.145926-1-christoph.fritz@hexdev.de>
+ <20240502182804.145926-4-christoph.fritz@hexdev.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240504-clockmatrix-kernel-doc-v1-1-acb07a33bb17@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAOJUNmYC/x3MQQqDMBBA0avIrB2ImlDpVYqLMBntEJuUiYggu
- XtDl2/x/w2FVbjAs7tB+ZQiOTUMfQf09mljlNAMoxmtccYi7Znixx8qF0bWxDuGTPiw3g00T8G
- FGVr8VV7l+o9fS60/ND7kkWgAAAA=
-To: Lee Jones <lee@kernel.org>
-Cc: Richard Cochran <richardcochran@gmail.com>, 
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-X-Mailer: b4 0.12.3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240502182804.145926-4-christoph.fritz@hexdev.de>
 
-Several comments in idt8a340_reg.h start with '/**',
-which denotes the start of a Kernel doc,
-but are otherwise not Kernel docs.
+On Thu, May 02, 2024 at 08:27:56PM +0200, Christoph Fritz wrote:
+> This patch introduces an additional receive buffer callback variation
+> besides the already existing receive_buf(). This new callback function
+> also passes the flag buffer (TTY_NORMAL, TTY_BREAK, and friends).
+> 
+> If defined, this function gets prioritized and called instead of the
+> standard receive_buf().
+> 
+> An alternative approach could have been to enhance the receive_buf()
+> function and update all drivers that use it.
 
-Resolve this conflict by starting these comments with '/*' instead.
+Please, let's do that instead of adding random letters at the end of a
+function pointer :)
 
-Flagged by ./scripts/kernel-doc -none
+> Signed-off-by: Christoph Fritz <christoph.fritz@hexdev.de>
+> ---
+>  drivers/tty/serdev/serdev-ttyport.c |  2 +-
+>  include/linux/serdev.h              | 17 ++++++++++++++---
+>  2 files changed, 15 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/tty/serdev/serdev-ttyport.c b/drivers/tty/serdev/serdev-ttyport.c
+> index 3d7ae7fa50186..bb47691afdb21 100644
+> --- a/drivers/tty/serdev/serdev-ttyport.c
+> +++ b/drivers/tty/serdev/serdev-ttyport.c
+> @@ -32,7 +32,7 @@ static size_t ttyport_receive_buf(struct tty_port *port, const u8 *cp,
+>  	if (!test_bit(SERPORT_ACTIVE, &serport->flags))
+>  		return 0;
+>  
+> -	ret = serdev_controller_receive_buf(ctrl, cp, count);
+> +	ret = serdev_controller_receive_buf(ctrl, cp, fp, count);
+>  
+>  	dev_WARN_ONCE(&ctrl->dev, ret > count,
+>  				"receive_buf returns %zu (count = %zu)\n",
+> diff --git a/include/linux/serdev.h b/include/linux/serdev.h
+> index ff78efc1f60df..c6ef5a8988e07 100644
+> --- a/include/linux/serdev.h
+> +++ b/include/linux/serdev.h
+> @@ -23,11 +23,17 @@ struct serdev_device;
+>   * struct serdev_device_ops - Callback operations for a serdev device
+>   * @receive_buf:	Function called with data received from device;
+>   *			returns number of bytes accepted; may sleep.
+> + * @receive_buf_fp:	Function called with data and flag buffer received
+> + *			from device; If defined, this function gets called
+> + *			instead of @receive_buf;
+> + *			returns number of bytes accepted; may sleep.
 
-Signed-off-by: Simon Horman <horms@kernel.org>
----
- include/linux/mfd/idt8a340_reg.h | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+I don't remember waht "fp" means here, and you don't document it, so
+let's just have one recieve_buf() callback please.
 
-diff --git a/include/linux/mfd/idt8a340_reg.h b/include/linux/mfd/idt8a340_reg.h
-index 0c706085c205..53a222605526 100644
---- a/include/linux/mfd/idt8a340_reg.h
-+++ b/include/linux/mfd/idt8a340_reg.h
-@@ -61,7 +61,7 @@
- #define HW_Q8_CTRL_SPARE  (0xa7d4)
- #define HW_Q11_CTRL_SPARE (0xa7ec)
- 
--/**
-+/*
-  * Select FOD5 as sync_trigger for Q8 divider.
-  * Transition from logic zero to one
-  * sets trigger to sync Q8 divider.
-@@ -70,7 +70,7 @@
-  */
- #define Q9_TO_Q8_SYNC_TRIG  BIT(1)
- 
--/**
-+/*
-  * Enable FOD5 as driver for clock and sync for Q8 divider.
-  * Enable fanout buffer for FOD5.
-  *
-@@ -78,7 +78,7 @@
-  */
- #define Q9_TO_Q8_FANOUT_AND_CLOCK_SYNC_ENABLE_MASK  (BIT(0) | BIT(2))
- 
--/**
-+/*
-  * Select FOD6 as sync_trigger for Q11 divider.
-  * Transition from logic zero to one
-  * sets trigger to sync Q11 divider.
-@@ -87,7 +87,7 @@
-  */
- #define Q10_TO_Q11_SYNC_TRIG  BIT(1)
- 
--/**
-+/*
-  * Enable FOD6 as driver for clock and sync for Q11 divider.
-  * Enable fanout buffer for FOD6.
-  *
+thanks,
 
+greg k-h
 
