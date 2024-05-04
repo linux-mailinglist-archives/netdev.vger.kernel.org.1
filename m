@@ -1,79 +1,54 @@
-Return-Path: <netdev+bounces-93437-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93438-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFAF18BBC47
-	for <lists+netdev@lfdr.de>; Sat,  4 May 2024 15:40:45 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17B898BBC76
+	for <lists+netdev@lfdr.de>; Sat,  4 May 2024 16:37:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C7FD3B2136A
-	for <lists+netdev@lfdr.de>; Sat,  4 May 2024 13:40:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BD4E61F21507
+	for <lists+netdev@lfdr.de>; Sat,  4 May 2024 14:37:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0227D374F1;
-	Sat,  4 May 2024 13:40:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 068071DDC9;
+	Sat,  4 May 2024 14:37:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Oq3KtuiI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PFHlcG4/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A54E3717F;
-	Sat,  4 May 2024 13:40:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5B8122F00
+	for <netdev@vger.kernel.org>; Sat,  4 May 2024 14:37:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714830037; cv=none; b=dDU0tW/JzkNUsSCJ14yt0B9c9kiYQEq+VmKvapCTMHc686sMwk4mqksxzaJFHrddA5LyqNqvJyCv0nEQ+xiNYE/Ta09MShU9tcm69IFfcfT2NbG6fCZs/dgulEdOu0Of5Ftcprq4djZldEJdJ2PBGU6uq3mWVzVqWjobBIJ1rSI=
+	t=1714833421; cv=none; b=NpbIk0LyDRVn+x+655GPEnmeVwEVZDCM7Df/obwFGg6mG3w8QFiS1NGVZf7MrUINMzQGMeDll5fPbhZGFUJGestn6V/yEqJuPQ1Xk1WTJsujbH/giuGMTqiMY2q9uZyIJ6X4D83IV96G9pUf/xzXQp6+/Jw9IPbjlAAlP9bHEgs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714830037; c=relaxed/simple;
-	bh=t3FONzaDjqiT8WtMX9xx77TxQj428dRPexrHMx5m5n8=;
+	s=arc-20240116; t=1714833421; c=relaxed/simple;
+	bh=bi39/4fhcKEeEBV7l/lkmaE1vbOYopca9R8qf6/aHfg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=R2qlwHVN+GqVUIL1SbnoiG4Mw2bm8D9PKJ4Y1Xv7cRmQYRFb72jy3l92MFNiPuJVGaLYbgmZC9m+hkVPaQYAOLxCBaNXFyPHR3/w7tgfFo8jO0+QT8P6Fqa+vnqyop0Wc+AULDcJHSbFDgAODIHLhqXBKxdBKJUgGuL2ggMhQks=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Oq3KtuiI; arc=none smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1714830035; x=1746366035;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=t3FONzaDjqiT8WtMX9xx77TxQj428dRPexrHMx5m5n8=;
-  b=Oq3KtuiI7OwHNSIgYOC08lx497qK0FDIAgIfdbTitxQSQblPxsK35p4c
-   e5fHlR7WEaDI/7ZVfezPIXgszdseRu9Wjwlnyl1Coiaw0vpaAQlpbKHNA
-   eoAn103KQzpWLi3zGNmAOJq/7wgV3xs1y57RnQVOVbilx9yeojy29liC5
-   wfwe2p60uqLykDfwW7oa3sDRFE3iH4UQZOZ9dWBhKQ+NCgI3FTaNk9KUL
-   pgY2M+wU9H5xoFZVa0v2+FiBs94OKWNAr92JwcxBoHpwNRWxeq+f754CV
-   yW4CNkWmJZOiO6yQreEtMIOJFCU79kcaUPUDJxb+4IcpnZKfK507hIihP
-   w==;
-X-CSE-ConnectionGUID: +9fA2hlMTQiah1AaZAx5TA==
-X-CSE-MsgGUID: Mt/C8b6ZSf6OGW7dTlUopA==
-X-IronPort-AV: E=McAfee;i="6600,9927,11063"; a="10846180"
-X-IronPort-AV: E=Sophos;i="6.07,254,1708416000"; 
-   d="scan'208";a="10846180"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 May 2024 06:40:35 -0700
-X-CSE-ConnectionGUID: 9kMINrEcSMiLY7iXJfr8Dg==
-X-CSE-MsgGUID: qNN/0NVZQC+hOsLs1neCYw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,254,1708416000"; 
-   d="scan'208";a="27750226"
-Received: from lkp-server01.sh.intel.com (HELO e434dd42e5a1) ([10.239.97.150])
-  by fmviesa008.fm.intel.com with ESMTP; 04 May 2024 06:40:31 -0700
-Received: from kbuild by e434dd42e5a1 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1s3Fcr-000CoO-1l;
-	Sat, 04 May 2024 13:40:29 +0000
-Date: Sat, 4 May 2024 21:39:54 +0800
-From: kernel test robot <lkp@intel.com>
-To: Justin Lai <justinlai0215@realtek.com>, kuba@kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, davem@davemloft.net, edumazet@google.com,
-	pabeni@redhat.com, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, andrew@lunn.ch, jiri@resnulli.us,
-	pkshih@realtek.com, larry.chiu@realtek.com,
-	Justin Lai <justinlai0215@realtek.com>
-Subject: Re: [PATCH net-next v17 12/13] realtek: Update the Makefile and
- Kconfig in the realtek folder
-Message-ID: <202405042153.ugnyFsrz-lkp@intel.com>
-References: <20240502091847.65181-13-justinlai0215@realtek.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ca1Kjx/SF+KeaGDeOdO8BpWmYszDmTk55j3TiQ6RVlwpeATfMGSzN7Er56kX+g7gYu+Hbb0YVQ37YOfP+l7zpLspsCEbWPWnEoXCY53V3ihSNt196t1K8xxR37fHjpCdMXUOhYnth8LrbkujMzbHGC1NYkHTFeablE6g6Fi+aOU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PFHlcG4/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3AF18C072AA;
+	Sat,  4 May 2024 14:37:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714833421;
+	bh=bi39/4fhcKEeEBV7l/lkmaE1vbOYopca9R8qf6/aHfg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=PFHlcG4/DxVnj9JLIyJYMYczujSE6pm5V1ZpHXoq5Ec0W5QWGR1fFzbvHlQBZTk1Q
+	 DQf23lNYNsYzYjVSC8R2sjDcJM6QUQLW3zakRLAZMmkHSdPT0iWtm3vvR36Q/HjF5J
+	 cYY0V768JRIwvXT/sS4OZT8g9PDiHfkH1xkfr7ha/2wLcQtTNxAswfzB2HF0oHYyFA
+	 h17eLPtPU5PXrx8o/W8EdeGJxSnSmHQTxRzU4W8wLizlSxCXtjaciYYfq6aP5dG4QH
+	 YLVzKp315N3GPhXqRE8J8bOfq05ViFI8UFn+0KwL2xvMUziVgrtIS3LgaKoPY4+QLo
+	 RUJYwiLwn416w==
+Date: Sat, 4 May 2024 15:36:57 +0100
+From: Simon Horman <horms@kernel.org>
+To: Steffen Klassert <steffen.klassert@secunet.com>
+Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>, netdev@vger.kernel.org
+Subject: Re: [PATCH 0/5] pull request (net-next): ipsec-next 2024-05-03
+Message-ID: <20240504143657.GA2279@kernel.org>
+References: <20240503082732.2835810-1-steffen.klassert@secunet.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,47 +57,31 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240502091847.65181-13-justinlai0215@realtek.com>
+In-Reply-To: <20240503082732.2835810-1-steffen.klassert@secunet.com>
 
-Hi Justin,
+On Fri, May 03, 2024 at 10:27:26AM +0200, Steffen Klassert wrote:
+> 1) Remove Obsolete UDP_ENCAP_ESPINUDP_NON_IKE Support.
+>    This was defined by an early version of an IETF draft
+>    that did not make it to a standard.
+> 
+> 2) Introduce direction attribute for xfrm states.
+>    xfrm states have a direction, a stsate can be used
+>    either for input or output packet processing.
+>    Add a direction to xfrm states to make it clear
+>    for what a xfrm state is used.
+> 
+> All patches from Antony Antony.
+> 
+> Please pull or let me know if there are problems.
 
-kernel test robot noticed the following build errors:
+Hi Steffen, all,
 
-[auto build test ERROR on horms-ipvs/master]
-[cannot apply to net-next/main linus/master v6.9-rc6 next-20240503]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+This comment is not strictly related to this pull request
+and certainly not intended to impede progress of it towards upstream.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Justin-Lai/rtase-Add-pci-table-supported-in-this-module/20240502-172835
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/horms/ipvs.git master
-patch link:    https://lore.kernel.org/r/20240502091847.65181-13-justinlai0215%40realtek.com
-patch subject: [PATCH net-next v17 12/13] realtek: Update the Makefile and Kconfig in the realtek folder
-config: loongarch-allmodconfig (https://download.01.org/0day-ci/archive/20240504/202405042153.ugnyFsrz-lkp@intel.com/config)
-compiler: loongarch64-linux-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240504/202405042153.ugnyFsrz-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202405042153.ugnyFsrz-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
->> drivers/net/ethernet/realtek/rtase/rtase_main.c:67:10: fatal error: net/netdev_queues.h: No such file or directory
-      67 | #include <net/netdev_queues.h>
-         |          ^~~~~~~~~~~~~~~~~~~~~
-   compilation terminated.
+However, while looking over it I noticed that Sparse flags a rather
+large number of warnings in xfrm code, mostly relating to __rcu annotations.
+I'm wondering if, at some point, these could be addressed somehow.
 
 
-vim +67 drivers/net/ethernet/realtek/rtase/rtase_main.c
-
-6c114677e472d0 Justin Lai 2024-05-02 @67  #include <net/netdev_queues.h>
-6c114677e472d0 Justin Lai 2024-05-02  68  #include <net/page_pool/helpers.h>
-6c114677e472d0 Justin Lai 2024-05-02  69  #include <net/pkt_cls.h>
-6c114677e472d0 Justin Lai 2024-05-02  70  
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
 
