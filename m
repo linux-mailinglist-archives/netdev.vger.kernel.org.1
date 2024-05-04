@@ -1,147 +1,133 @@
-Return-Path: <netdev+bounces-93429-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93430-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA0858BBB28
-	for <lists+netdev@lfdr.de>; Sat,  4 May 2024 14:18:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E49438BBB2A
+	for <lists+netdev@lfdr.de>; Sat,  4 May 2024 14:20:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 58F67B208B2
-	for <lists+netdev@lfdr.de>; Sat,  4 May 2024 12:18:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A11A228116B
+	for <lists+netdev@lfdr.de>; Sat,  4 May 2024 12:20:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06330208C4;
-	Sat,  4 May 2024 12:18:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2561A20DC4;
+	Sat,  4 May 2024 12:20:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="i90fqYed"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="neL539ns"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B18220DC4
-	for <netdev@vger.kernel.org>; Sat,  4 May 2024 12:18:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01A441EF15
+	for <netdev@vger.kernel.org>; Sat,  4 May 2024 12:20:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714825124; cv=none; b=mjcRp3Wi8mytD14wYR5MtVGWKuR07b3OGdE5wyey+T3SYgdQNRK+iEpiSH1XXVTA9rmzvr0oM06HBSe1qjiN6uD09Xx82gPsXkQmmP3WPSoPvgKepsUwAakXMWEn+dvJugD/f6TMuDS6IQx5X+voxOZv10r2FM9kX7CxpLtYC5Q=
+	t=1714825214; cv=none; b=nQPXUV8NNaU6WTEBdx4/x8XdHB5GBtXpyjDvpz1hYZFrAs+3Upd9NUEujRWtcII0BwCmp9XbvINy5xDTKPOwlZ3VSEBSf5c4+YDmAqArGxlSDJjXIQwDwoCmYP0iPa3wT1Gw3QDGwb7jeWLnECFIaDk+MKoD4OVHHSb2X9amXyY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714825124; c=relaxed/simple;
-	bh=KvX+tMQC35r8Zw36jjxi/3yW/6yDNWHuAjrkLFnobVs=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=WmBaHBPtllExS1swBYFOvlBkav+nTTWZXqrQZsIDtKy3LKz70/Yl2SZuwvMw+SSqT26ylOTQ/07XgYoY3sbgrOndQsG4JF5VH+OJ1n1kRgjGJbmljovJFEl+o/jcoEfLH5Y5SPFDz+3cH1M1idk/Qx0tBValY2l0sgjzfA7pRTs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=i90fqYed; arc=none smtp.client-ip=209.85.208.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-2db6f5977e1so6748751fa.2
-        for <netdev@vger.kernel.org>; Sat, 04 May 2024 05:18:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1714825121; x=1715429921; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Z/7UJGubfMelKvbYDiZ/Mv2wY5bh+9xHKgfJKuvSMK4=;
-        b=i90fqYedibpTvviBchDodkq12U2OhNB/W7iLKyRNuxssS/Hq/N129zgAjj/clPE8C7
-         QqI4npdwuGmwB4p/ZNLbVNnHw8sLU773OO/B4PSKb2iG9PQPHpsxQEpRw+3QgCHCnmFq
-         KzoKAzX3AhjlgEhTv+DdvpQb6EsbXegSaJHxRuoaYWmVWha4MVpidQKmdku++zDx4pdy
-         mCEGj1MAgh91XyYVPXUjEmpDa6wHtxGzAuMtSVsARJniqvAxwM94EgbcNfRgqyI12NDd
-         61ap8tTw4eBOnF6j+5xiOhPjEKFzwI77Fh6c/vowCzbTZQaX4PLPPwrekhnJ/1tkM3ww
-         VGtA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714825121; x=1715429921;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:message-id:subject:cc:to:from:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Z/7UJGubfMelKvbYDiZ/Mv2wY5bh+9xHKgfJKuvSMK4=;
-        b=sD/QNBwEi/mdZj1Li9r0fybxirsvR09oqtuROAThbFN9RdyQ9JpYJKckxEuuhV72Nj
-         5B3EDcnfGAuUkRh6Wo0E7nDR2CA+36nE4K2SRCmZJjzk9BDnkfMF/O3QWMNMMt8yBmHE
-         hNHceRRPs6h7ROeRVhTXBXudWUW7l78m1ADyt5a4J6V3QF45wp/ezYC690uLrhFiO2r7
-         X8CJyPOwQ7tM2D3L3LQmk6jsVqN8JTIgJ8LLyirLPzRUjzPQArzbiPhATl4q94jXT3VE
-         ZJND0LaAV87JSXrzZ8ixNUXwzL0oYgTmBrI7IIhARjOWqqbEz3dhKrhfFiYD+cvPtTtO
-         t9aw==
-X-Forwarded-Encrypted: i=1; AJvYcCWzJ6PnlOfqhYGt6QPigsYsGNmNJLRAf0CIVafLXDo9D0RXWHXmj/fK2jDOmE4tpde1ZjBi1EAqpC4PZRmrmS+CmHDlRzFr
-X-Gm-Message-State: AOJu0YwCy+nAznuaF9LVvpnbQZsTEzEP/YbHLw+zELGuQADm23HOarPb
-	tu98himPIGFfhQZyEzTjfVkjCZgb18zWO9qUfFKEeY1DWWIqz94/MB/RZdefNy4=
-X-Google-Smtp-Source: AGHT+IEMl3/9+VdMxzxvYyxuTl4RsZq5GUNid+YtiRDPqktYL2gYS0YU1UFZkgLtuk9S3nLdXGTH9w==
-X-Received: by 2002:a05:651c:201c:b0:2dd:c9fc:c472 with SMTP id s28-20020a05651c201c00b002ddc9fcc472mr3128640ljo.26.1714825121362;
-        Sat, 04 May 2024 05:18:41 -0700 (PDT)
-Received: from localhost ([102.222.70.76])
-        by smtp.gmail.com with ESMTPSA id y12-20020a5d614c000000b0034dd3849eeasm6105031wrt.106.2024.05.04.05.18.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 04 May 2024 05:18:41 -0700 (PDT)
-Date: Sat, 4 May 2024 15:18:37 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: oe-kbuild@lists.linux.dev,
-	Kamil =?iso-8859-1?Q?Hor=E1k?= - 2N <kamilh@axis.com>,
-	florian.fainelli@broadcom.com,
-	bcm-kernel-feedback-list@broadcom.com, andrew@lunn.ch,
-	hkallweit1@gmail.com
-Cc: lkp@intel.com, oe-kbuild-all@lists.linux.dev, kamilh@axis.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 3/3] net: phy: bcm-phy-lib: Implement BroadR-Reach
- link modes
-Message-ID: <586a9bc8-aa2a-4312-8936-a10f18e1f9ce@moroto.mountain>
+	s=arc-20240116; t=1714825214; c=relaxed/simple;
+	bh=+VLjoeSEQPG89xCMocvv7YCtZoQa9mj0UTo5zfl6Bbo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kcYcz7+YXdV5kybrXlSGXCd17yKyly1yase2ZCwDfQRm7HV3+a2HoH0PzD5zJHKLMc4f4GxN88JqxxKtvJfeiGxFVmhEh2voYB0dj/1NMCx+48Cv1spluBimWWrQl1Cu70eFsx8ASKKU0Ht9yUMQUz4XmJkDwnVj2qbVaCYyy1s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=neL539ns; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB981C32789;
+	Sat,  4 May 2024 12:20:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714825213;
+	bh=+VLjoeSEQPG89xCMocvv7YCtZoQa9mj0UTo5zfl6Bbo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=neL539nsalU1qIiPFEOWXwl9NS9dXiXtnG+h7y/xhuJQ9tRnvz9epj70Z69Z3k4Bk
+	 mbLwpH+JXYXYrOdw2HA0fWO3Uoc6e9Xv14gfvEWOOBZd4pW+sbcUvqyROZEMmI/euM
+	 GzmPAAKlrZoctxvQRsLQy31tY/Tks40L/h/FfolSojg0IxJq5H5Z1RP9nHssHyHnXc
+	 2eepP+Rbo1mNyEua0UUEgVUj+WyiT9m7STOw/3LnKveH3gbLx/Ii9Cbqbjl312nB/r
+	 YmHZWizQzgzp9susGZeEV5skoUL252DxUoydi7onMzdkL7/ah/ECfaL56OEna9x2BQ
+	 9gR91zNcFtLHA==
+Date: Sat, 4 May 2024 13:20:07 +0100
+From: Simon Horman <horms@kernel.org>
+To: David Wei <dw@davidwei.uk>
+Cc: netdev@vger.kernel.org, Michael Chan <michael.chan@broadcom.com>,
+	Pavan Chebbi <pavan.chebbi@broadcom.com>,
+	Andy Gospodarek <andrew.gospodarek@broadcom.com>,
+	Adrian Alvarado <adrian.alvarado@broadcom.com>,
+	Mina Almasry <almasrymina@google.com>,
+	Shailend Chand <shailend@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [RFC PATCH net-next v2 3/9] netdev: add netdev_rx_queue_restart()
+Message-ID: <20240504122007.GG3167983@kernel.org>
+References: <20240502045410.3524155-1-dw@davidwei.uk>
+ <20240502045410.3524155-4-dw@davidwei.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240503083719.899312-4-kamilh@axis.com>
+In-Reply-To: <20240502045410.3524155-4-dw@davidwei.uk>
 
-Hi Kamil,
+On Wed, May 01, 2024 at 09:54:04PM -0700, David Wei wrote:
+> From: Mina Almasry <almasrymina@google.com>
+> 
+> Add netdev_rx_queue_restart() function to netdev_rx_queue.h. This is
+> taken from Mina's work in [1] with a slight modification of taking
+> rtnl_lock() during the queue stop and start ops.
+> 
+> For bnxt specifically, if the firmware doesn't support
+> BNXT_RST_RING_SP_EVENT, then ndo_queue_stop() returns -EOPNOTSUPP and
+> the whole restart fails. Unlike bnxt_rx_ring_reset(), there is no
+> attempt to reset the whole device.
+> 
+> [1]: https://lore.kernel.org/linux-kernel/20240403002053.2376017-6-almasrymina@google.com/#t
+> 
+> Signed-off-by: David Wei <dw@davidwei.uk>
 
-kernel test robot noticed the following build warnings:
+nit: Mina's From line is above, but there is no corresponding Signed-off-by
+     line here.
 
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+> ---
+>  include/net/netdev_rx_queue.h |  3 ++
+>  net/core/Makefile             |  1 +
+>  net/core/netdev_rx_queue.c    | 58 +++++++++++++++++++++++++++++++++++
+>  3 files changed, 62 insertions(+)
+>  create mode 100644 net/core/netdev_rx_queue.c
+> 
+> diff --git a/include/net/netdev_rx_queue.h b/include/net/netdev_rx_queue.h
+> index aa1716fb0e53..e78ca52d67fb 100644
+> --- a/include/net/netdev_rx_queue.h
+> +++ b/include/net/netdev_rx_queue.h
+> @@ -54,4 +54,7 @@ get_netdev_rx_queue_index(struct netdev_rx_queue *queue)
+>  	return index;
+>  }
+>  #endif
+> +
+> +int netdev_rx_queue_restart(struct net_device *dev, unsigned int rxq);
+> +
+>  #endif
+> diff --git a/net/core/Makefile b/net/core/Makefile
+> index 21d6fbc7e884..f2aa63c167a3 100644
+> --- a/net/core/Makefile
+> +++ b/net/core/Makefile
+> @@ -19,6 +19,7 @@ obj-$(CONFIG_NETDEV_ADDR_LIST_TEST) += dev_addr_lists_test.o
+>  
+>  obj-y += net-sysfs.o
+>  obj-y += hotdata.o
+> +obj-y += netdev_rx_queue.o
+>  obj-$(CONFIG_PAGE_POOL) += page_pool.o page_pool_user.o
+>  obj-$(CONFIG_PROC_FS) += net-procfs.o
+>  obj-$(CONFIG_NET_PKTGEN) += pktgen.o
+> diff --git a/net/core/netdev_rx_queue.c b/net/core/netdev_rx_queue.c
+> new file mode 100644
+> index 000000000000..9633fb36f6d1
+> --- /dev/null
+> +++ b/net/core/netdev_rx_queue.c
+> @@ -0,0 +1,58 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Kamil-Hor-k-2N/net-phy-bcm54811-New-link-mode-for-BroadR-Reach/20240503-164308
-base:   net/main
-patch link:    https://lore.kernel.org/r/20240503083719.899312-4-kamilh%40axis.com
-patch subject: [PATCH v2 3/3] net: phy: bcm-phy-lib: Implement BroadR-Reach link modes
-config: i386-randconfig-141-20240504 (https://download.01.org/0day-ci/archive/20240504/202405041037.sjZak003-lkp@intel.com/config)
-compiler: clang version 18.1.4 (https://github.com/llvm/llvm-project e6c3289804a67ea0bb6a86fadbe454dd93b8d855)
+nit: my understanding is that, as a .c file, the correct SPDX format is:
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
-| Closes: https://lore.kernel.org/r/202405041037.sjZak003-lkp@intel.com/
+// SPDX-License-Identifier: GPL-2.0
 
-smatch warnings:
-drivers/net/phy/broadcom.c:627 bcm5481x_config_delay_swap() error: uninitialized symbol 'ret'.
-drivers/net/phy/broadcom.c:1249 bcm_read_master_slave() error: uninitialized symbol 'cfg'.
-
-vim +/ret +627 drivers/net/phy/broadcom.c
-
-f1e9c8e593d6ea Kamil Horák - 2N 2024-05-03  611  static int bcm5481x_config_delay_swap(struct phy_device *phydev)
-57bb7e222804c6 Anton Vorontsov  2008-03-04  612  {
-b14995ac2527b4 Jon Mason        2016-11-04  613  	struct device_node *np = phydev->mdio.dev.of_node;
-57bb7e222804c6 Anton Vorontsov  2008-03-04  614  	int ret;
-57bb7e222804c6 Anton Vorontsov  2008-03-04  615  
-f1e9c8e593d6ea Kamil Horák - 2N 2024-05-03  616  	/* Set up the delay. */
-042cb56478152b Tao Ren          2018-11-05  617  	bcm54xx_config_clock_delay(phydev);
-57bb7e222804c6 Anton Vorontsov  2008-03-04  618  
-b14995ac2527b4 Jon Mason        2016-11-04  619  	if (of_property_read_bool(np, "enet-phy-lane-swap")) {
-b14995ac2527b4 Jon Mason        2016-11-04  620  		/* Lane Swap - Undocumented register...magic! */
-b14995ac2527b4 Jon Mason        2016-11-04  621  		ret = bcm_phy_write_exp(phydev, MII_BCM54XX_EXP_SEL_ER + 0x9,
-b14995ac2527b4 Jon Mason        2016-11-04  622  					0x11B);
-b14995ac2527b4 Jon Mason        2016-11-04  623  		if (ret < 0)
-b14995ac2527b4 Jon Mason        2016-11-04  624  			return ret;
-b14995ac2527b4 Jon Mason        2016-11-04  625  	}
-
-"ret" not initialized on else path.
-
-b14995ac2527b4 Jon Mason        2016-11-04  626  
-57bb7e222804c6 Anton Vorontsov  2008-03-04 @627  	return ret;
-
-Also "return 0;" is always better.
-
-57bb7e222804c6 Anton Vorontsov  2008-03-04  628  }
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
-
+...
 
