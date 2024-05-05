@@ -1,112 +1,125 @@
-Return-Path: <netdev+bounces-93540-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93541-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11A188BC33D
-	for <lists+netdev@lfdr.de>; Sun,  5 May 2024 21:33:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D1B458BC371
+	for <lists+netdev@lfdr.de>; Sun,  5 May 2024 22:09:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 43F661C20E03
-	for <lists+netdev@lfdr.de>; Sun,  5 May 2024 19:33:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0F3D91C204F8
+	for <lists+netdev@lfdr.de>; Sun,  5 May 2024 20:09:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 776DE6EB40;
-	Sun,  5 May 2024 19:33:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E3A26EB4D;
+	Sun,  5 May 2024 20:09:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="McWQbNDY"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="psmaQEc7"
 X-Original-To: netdev@vger.kernel.org
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F05A1E861;
-	Sun,  5 May 2024 19:33:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8BDD66B5E;
+	Sun,  5 May 2024 20:09:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714937625; cv=none; b=D3XbBtbWTpZeOGK+DrC1ZgO8s8053RdoJCIw9nmzw6rEwsR+2ghMuyCLelRqGqECFoDDNUVmRiFPBb9yWFkn6ke0jBA/zu8Ul/eQlWNXwMMQ7EA8xKVEKOUMWXZJE1P0iyZy6lTgflVEKIHm30FfOpbuueIZsOVePO8x8btmfDw=
+	t=1714939782; cv=none; b=MjqNax3ogeo4UoMjALs8UEgc4/zl0k6jGD0pcp02BgIBdp04xDO9amVyYZDkSd8Upbrir09RXTA8UHsE1SiQM/5UWtErJvZPwGpag7YFId/ju2hfpdInF6xRkdWaCGxMsCUwCuHySWbNyzCIxr+pbgimcBoQM6W7FKiFExX2iZI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714937625; c=relaxed/simple;
-	bh=FAa895ktb1uP1Vp93a9G7q8BSm2alQQQ6zACrN4BDCs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LLoxacyzy9oeAMGCyE+tnpKycRFnCKBJGPSofpNOp1GpHh1FentXLWmJTfeNzYKstObhv9K2Y4at5xfwo6P2jHgNEp1Y1vqpI+kQIkCJh+3nTEJtxSRS75HHmJwoOVz64Q8AWGnqg0zsMJtwqQlTpYxWryLmhp0Hsho5XjOCyJk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=McWQbNDY; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=ir7v3reFern2bMfdElsM96VZnzXzk0n4uUJTOAif+1Q=; b=McWQbNDYzuYXgpSXDP4LItZWas
-	c+G1yOfrbEspOzp1y83MmoVq+GjM65/lDs5ubikEffoKy6knBTT0Cnta994MJYbor6t7/xL39+xZY
-	ql5OkyzdVJnqVLsZA07ot1DBjiNfK/PRj32i+7icc4KxOKtjuizlh6PQ2yg/Gh2uW00MtWrZH+noT
-	DmGe+qrgLQzl+Vjiy6wLJXFRAfjYNsLD6oxZNRyY3G4+BY0/9l8y8NCR4bpLwA4zkQq+SpC8pRlQ7
-	1jq7R+FD/uXz6shSAQhD3+U1mfsV1BoTVZ/bSVu26krBG1rtN+CtsWnH1RZsq3KB14EYp0oR36XWz
-	2afx1NrA==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1s3hc8-0000000587A-2v0C;
-	Sun, 05 May 2024 19:33:36 +0000
-Date: Sun, 5 May 2024 12:33:36 -0700
-From: Luis Chamberlain <mcgrof@kernel.org>
-To: Mike Rapoport <rppt@kernel.org>
-Cc: linux-kernel@vger.kernel.org, Alexandre Ghiti <alexghiti@rivosinc.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	=?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	"David S. Miller" <davem@davemloft.net>,
-	Dinh Nguyen <dinguyen@kernel.org>,
-	Donald Dutile <ddutile@redhat.com>,
-	Eric Chanudet <echanude@redhat.com>,
-	Heiko Carstens <hca@linux.ibm.com>, Helge Deller <deller@gmx.de>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	Kent Overstreet <kent.overstreet@linux.dev>,
-	Liviu Dudau <liviu@dudau.co.uk>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nadav Amit <nadav.amit@gmail.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
-	Rick Edgecombe <rick.p.edgecombe@intel.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Sam Ravnborg <sam@ravnborg.org>, Song Liu <song@kernel.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-	Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
-	bpf@vger.kernel.org, linux-arch@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
-	linux-mm@kvack.org, linux-modules@vger.kernel.org,
-	linux-parisc@vger.kernel.org, linux-riscv@lists.infradead.org,
-	linux-s390@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, loongarch@lists.linux.dev,
-	netdev@vger.kernel.org, sparclinux@vger.kernel.org, x86@kernel.org
-Subject: Re: [PATCH RESEND v8 00/16] mm: jit/text allocator
-Message-ID: <ZjffEEsRIb8r0jG6@bombadil.infradead.org>
-References: <20240505160628.2323363-1-rppt@kernel.org>
+	s=arc-20240116; t=1714939782; c=relaxed/simple;
+	bh=l0Is6svymKjamH4uZS0/HWAPWOtqAeuFISJUmCiMhqg=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:To:CC; b=XV8wXfTNLUcLC5kfhbKYOrSGi2UQRAqWSurGnBKhcnDn3gzv0b6u7EZvoaCQxWQzTzo94R2UKWTmmEwfG11pIetqGA1NnOZ8upvDP7+wdgflXjlAWE3ocwEOHo6xxRCmyL5kDeo62PdcR1gNiLnKbXEzaDyvuXXaXwgoJTbvLLU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=psmaQEc7; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 445Jr06L007852;
+	Sun, 5 May 2024 20:09:33 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	from:date:subject:mime-version:content-type
+	:content-transfer-encoding:message-id:to:cc; s=qcppdkim1; bh=dhI
+	dUAuP7SIFps+tLvU0oNcUTcpH05sfx3iIi6J+ck8=; b=psmaQEc7B6frIL0kfKL
+	dvlIOCpSKTJBce8eljit4k6nxXXWS0eNqKQ76iFVhcsS4pNQYPYXhqZaiIr8Ec7m
+	rpl0OeJJ/P8k6UgBXEEtNk6wkSL5OL1mudziQ8V5ckSAt/s24BHRIpcXziJUtMo+
+	2q+mYfeijXnXXYNoSF/IrkaTbH55ju9l0hPM3A+l4xO0Yj0U2exoGnGfoCtYAso5
+	YmiVbadbg/m2uTNbBJo0PdKtRFnm7nyLtNTnucrF2JCs2kAJW2AJ45Y/ndZnQUSe
+	NhdBejozC1gsB3DwDTpRNQM1qENLe6i7sxxhWPXlWJPsUwoOz4GBnvY8WKeSuBOp
+	4eQ==
+Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3xwead21kc-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sun, 05 May 2024 20:09:33 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 445K9WjD020850
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sun, 5 May 2024 20:09:32 GMT
+Received: from [169.254.0.1] (10.49.16.6) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Sun, 5 May 2024
+ 13:09:32 -0700
+From: Jeff Johnson <quic_jjohnson@quicinc.com>
+Date: Sun, 5 May 2024 13:09:31 -0700
+Subject: [PATCH] net: dccp: Fix ccid2_rtt_estimator() kernel-doc
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240505160628.2323363-1-rppt@kernel.org>
-Sender: Luis Chamberlain <mcgrof@infradead.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-ID: <20240505-ccid2_rtt_estimator-kdoc-v1-1-09231fcb9145@quicinc.com>
+X-B4-Tracking: v=1; b=H4sIAHrnN2YC/x3M0QrCMAxA0V8ZeTZQ6+bEXxEZWZu6IGslKSKM/
+ bvVx/Nw7wbGKmxw7TZQfotJyQ3HQwdhofxglNgM3vneDW7AECT6SWud2KqsVIviM5aA46k/p4v
+ nkVKElr+Uk3z+69u9eSZjnJVyWH7Dlayywr5/AY1jhrWDAAAA
+To: "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni
+	<pabeni@redhat.com>
+CC: <dccp@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>,
+        Jeff Johnson <quic_jjohnson@quicinc.com>
+X-Mailer: b4 0.13.0
+X-ClientProxiedBy: nalasex01a.na.qualcomm.com (10.47.209.196) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: 3Fggkg7K3SlZPCBekCTKWIyMZGO0QxY5
+X-Proofpoint-ORIG-GUID: 3Fggkg7K3SlZPCBekCTKWIyMZGO0QxY5
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1011,Hydra:6.0.650,FMLib:17.11.176.26
+ definitions=2024-05-05_14,2024-05-03_02,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 mlxscore=0
+ lowpriorityscore=0 malwarescore=0 adultscore=0 priorityscore=1501
+ mlxlogscore=830 bulkscore=0 suspectscore=0 clxscore=1011 phishscore=0
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2404010003 definitions=main-2405050086
 
-On Sun, May 05, 2024 at 07:06:12PM +0300, Mike Rapoport wrote:
-> From: "Mike Rapoport (IBM)" <rppt@kernel.org>
-> 
-> Hi,
-> 
-> The patches are also available in git:
-> https://git.kernel.org/pub/scm/linux/kernel/git/rppt/linux.git/log/?h=execmem/v8
-> 
-> v8:
-> * fix intialization of default_execmem_info
+make C=1 reports:
 
-Thanks, applied and pushed to modules-next. If we find fixes, let's
-please just now have separate patches on top of this series.
+warning: Function parameter or struct member 'mrtt' not described in 'ccid2_rtt_estimator'
 
-  Luis
+So document the 'mrtt' parameter.
+
+Signed-off-by: Jeff Johnson <quic_jjohnson@quicinc.com>
+---
+ net/dccp/ccids/ccid2.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/net/dccp/ccids/ccid2.c b/net/dccp/ccids/ccid2.c
+index 4d9823d6dced..d6b30700af67 100644
+--- a/net/dccp/ccids/ccid2.c
++++ b/net/dccp/ccids/ccid2.c
+@@ -353,6 +353,7 @@ static void ccid2_hc_tx_packet_sent(struct sock *sk, unsigned int len)
+ /**
+  * ccid2_rtt_estimator - Sample RTT and compute RTO using RFC2988 algorithm
+  * @sk: socket to perform estimator on
++ * @mrtt: measured RTT
+  *
+  * This code is almost identical with TCP's tcp_rtt_estimator(), since
+  * - it has a higher sampling frequency (recommended by RFC 1323),
+
+---
+base-commit: 2c4d8e19cf060744a9db466ffbaea13ab37f25ca
+change-id: 20240505-ccid2_rtt_estimator-kdoc-7346f82e7afd
+
 
