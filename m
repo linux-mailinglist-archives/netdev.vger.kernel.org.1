@@ -1,124 +1,93 @@
-Return-Path: <netdev+bounces-93462-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93463-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E7748BBFD3
-	for <lists+netdev@lfdr.de>; Sun,  5 May 2024 10:43:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D81D78BBFE7
+	for <lists+netdev@lfdr.de>; Sun,  5 May 2024 11:08:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 769D5B210AE
-	for <lists+netdev@lfdr.de>; Sun,  5 May 2024 08:43:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1A2BEB20FD5
+	for <lists+netdev@lfdr.de>; Sun,  5 May 2024 09:08:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACF475CAC;
-	Sun,  5 May 2024 08:43:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="A+w0s+UT"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77D295CAC;
+	Sun,  5 May 2024 09:08:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 838AB3D76
-	for <netdev@vger.kernel.org>; Sun,  5 May 2024 08:43:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ED8A6FBF
+	for <netdev@vger.kernel.org>; Sun,  5 May 2024 09:08:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714898613; cv=none; b=q7y8Xm8ddwwFSYPqIVcvdHVBLE3MsQ2TEcti7dszvMu4wgapqs5TNRd0LahAvXUYyuTxrC+BgecRGzjTMS+CcyngYXt7I7djiDiFFAc88MyA+QuevoxQLxI7sMGorjdfkh0sN/OxZXyym/aODeR3GNwmhjFFz+5oCzAfu8wdtj8=
+	t=1714900084; cv=none; b=XPTYGTBKdPGssVOGtYoZh5G+7ppelu9ePNZAT6rsieIXBPsaFurG8pgPyJFnqxFp7OWFOWRl8+T2K5N7OjhZauYjzV1hZBEbOtf/2NMWekhbjizbTsOeZZfKpuiMV5niDGRuXiyuv4dl0YmCZ4awDfMH3JzExwSvvataEaV08oA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714898613; c=relaxed/simple;
-	bh=O5+bvmfdVExG/EAbmeNv3poRJsvTkXwcWhp3xSLMFw8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=u4TSYRwUIZ3pWtzVdnN+ZfIP5XNcW7t3CWC9nORWlYFZBefN3zfybeNDJ3O2hs1w3EzMp8ww+EFqS5Q5SlwPuVt/7CC1PRek+vXrsuYH9KNgrtHg2AFAXYS4beoswtGR9gHn6Caa7oRE84J9EaVJJwm7h+7cdrXHMogwE88J56c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=A+w0s+UT; arc=none smtp.client-ip=95.215.58.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <fe52e4b3-46ed-4bb4-842e-41121dc72bf0@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1714898608;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7IF0KGUJv0OyGtqZTBvYnl0RBdIjrhetfYgsEgyySGA=;
-	b=A+w0s+UTw1uue3nciBe6pn/siLmd6q6lNfMQNjnKV1tDRd6tmWlUBuS7vf69+L7n5KoMm8
-	ljUnE0Im1J6+SQUPGd1gRX6bKOQ08RqMrhcsmR11/QhKjC0WTzM9P8BFYJJ9mhk9fORLw7
-	vxONtRfVEoNR285ONg/Mo7HF/er0Yi4=
-Date: Sun, 5 May 2024 10:43:23 +0200
+	s=arc-20240116; t=1714900084; c=relaxed/simple;
+	bh=+kvNGsIf6cUqhl9egqdjJ1o07E9o3CD77g95IKWENsA=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=aolLKg4zJSwb5JRmZFpIX6OzEqkJbfDOYldmyhjc+8+R6ObA0DFeV3mtjeVWwiwtJMVxL1SVmGFxwCuMgEkrQvbCa/MMm0HwpnE+rt2c5kp9NFW0cciSlGrMJuJECo3/fyDslzgtBAG8U9Lr4KYDavfLX+0tWXgqurhl/7f0ymY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-36c74ef7261so14124275ab.3
+        for <netdev@vger.kernel.org>; Sun, 05 May 2024 02:08:02 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714900082; x=1715504882;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=rR9uYo4pUV9Ptwo8tFdHdWFFeBKlQtLIoXS25vEOSGs=;
+        b=OaZkRUjDZAj59FGugTcRWWBt6VBivdihpLJsIjMGIcsQkrMiELbMHuQ9UBKv22tOPw
+         Fup1hvO+G6QwgyChGlZKtl/hbr2Ry+Jt57UlGBF5Aglr8Grz377y5CKPnv9d69gIfkrF
+         rmiG1pHrJRUn3ykypIOAe8Q4cL71rvszL5NsBXhibz14SHqq6gi+7dpG0GOO/kNmKmbd
+         KMdtmghFLF5OSD0GN7hLWSNW230KoUH4SfS7j3d0rCnRt36lfhA6PaZh9eKf+fOFqKS8
+         XQOq+IkFjMejUTCtCqX72xitCF6zy81kpfGyf1zHf73IMMfV6QSYPhB/sEGNlVHQ5iTG
+         ujcw==
+X-Forwarded-Encrypted: i=1; AJvYcCXNqGYy2dzNzUW9C5owLLcaFXGGcLpjcqCNLafrRwORG9HqZXYGw7pxf1sToqjiGRTiUmHbO9dQSyuc05f/kF1LfVODqj9Z
+X-Gm-Message-State: AOJu0YxGHTfcOEZN0IhJ4rbg8nL5yLek0vdpUF63wB9casxKiVgED02k
+	YQ+/wPNaFdlMKD/hwJNt5V1em9MPNJ8/UGacqtVKfB8MTdg6sriCM4SrjjlLMPOdP1i0cgwQeBt
+	RxC6D2FN922KehVxSxQLDHgNAH/Q3RUGVUd5DEASUchnd3TLmy4mKgnA=
+X-Google-Smtp-Source: AGHT+IFWDqLnTzsRcrBxqd5SqG2JiVps/sd0xHJP5/WtobEL4if6t3mOAZ+eSHsaUwj1B9Z/mqsH4Khq2dJl5U+pVISPV2pV1l3P
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH 1/2] driver core: auxiliary bus: show auxiliary device
- IRQs
-To: kernel test robot <lkp@intel.com>, Shay Drory <shayd@nvidia.com>,
- netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
- kuba@kernel.org, edumazet@google.com, gregkh@linuxfoundation.org,
- david.m.ertman@intel.com
-Cc: oe-kbuild-all@lists.linux.dev, rafael@kernel.org, ira.weiny@intel.com,
- linux-rdma@vger.kernel.org, leon@kernel.org, tariqt@nvidia.com,
- Parav Pandit <parav@nvidia.com>
-References: <20240503043104.381938-2-shayd@nvidia.com>
- <202405040108.NWUaSJgz-lkp@intel.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Zhu Yanjun <yanjun.zhu@linux.dev>
-In-Reply-To: <202405040108.NWUaSJgz-lkp@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+X-Received: by 2002:a05:6e02:216e:b0:36c:4cc9:5923 with SMTP id
+ s14-20020a056e02216e00b0036c4cc95923mr405376ilv.2.1714900082343; Sun, 05 May
+ 2024 02:08:02 -0700 (PDT)
+Date: Sun, 05 May 2024 02:08:02 -0700
+In-Reply-To: <000000000000c430800614b93936@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000003bcdf30617b14ab6@google.com>
+Subject: Re: [syzbot] [net?] possible deadlock in hsr_dev_xmit (2)
+From: syzbot <syzbot+fbf74291c3b7e753b481@syzkaller.appspotmail.com>
+To: bigeasy@linutronix.de, davem@davemloft.net, edumazet@google.com, 
+	hdanton@sina.com, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-在 2024/5/3 19:14, kernel test robot 写道:
-> Hi Shay,
-> 
-> kernel test robot noticed the following build warnings:
-> 
-> [auto build test WARNING on driver-core/driver-core-testing]
-> [also build test WARNING on driver-core/driver-core-next driver-core/driver-core-linus net/main net-next/main linus/master v6.9-rc6 next-20240503]
-> [If your patch is applied to the wrong git tree, kindly drop us a note.
-> And when submitting patch, we suggest to use '--base' as documented in
-> https://git-scm.com/docs/git-format-patch#_base_tree_information]
-> 
-> url:    https://github.com/intel-lab-lkp/linux/commits/Shay-Drory/driver-core-auxiliary-bus-show-auxiliary-device-IRQs/20240503-123319
-> base:   driver-core/driver-core-testing
-> patch link:    https://lore.kernel.org/r/20240503043104.381938-2-shayd%40nvidia.com
-> patch subject: [PATCH 1/2] driver core: auxiliary bus: show auxiliary device IRQs
-> config: s390-randconfig-r081-20240503 (https://download.01.org/0day-ci/archive/20240504/202405040108.NWUaSJgz-lkp@intel.com/config)
-> compiler: s390-linux-gcc (GCC) 13.2.0
-> reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240504/202405040108.NWUaSJgz-lkp@intel.com/reproduce)
-> 
-> If you fix the issue in a separate patch/commit (i.e. not just a new version of
-> the same patch/commit), kindly add following tags
-> | Reported-by: kernel test robot <lkp@intel.com>
-> | Closes: https://lore.kernel.org/oe-kbuild-all/202405040108.NWUaSJgz-lkp@intel.com/
-> 
-> All warnings (new ones prefixed by >>):
-> 
->>> drivers/base/auxiliary.c:182: warning: This comment starts with '/**', but isn't a kernel-doc comment. Refer Documentation/doc-guide/kernel-doc.rst
->      * Auxiliary devices can share IRQs. Expose to user whether the provided IRQ is
-> 
-> 
-> vim +182 drivers/base/auxiliary.c
-> 
->     180	
->     181	/**
- From the above, "/**" should be "/*"?
+syzbot has bisected this issue to:
 
-Zhu Yanjun
->   > 182	 * Auxiliary devices can share IRQs. Expose to user whether the provided IRQ is
->     183	 * shared or exclusive.
->     184	 */
->     185	static ssize_t auxiliary_irq_mode_show(struct device *dev,
->     186					       struct device_attribute *attr, char *buf)
->     187	{
->     188		struct auxiliary_irq_info *info =
->     189			container_of(attr, struct auxiliary_irq_info, sysfs_attr);
->     190	
->     191		if (refcount_read(xa_load(&irqs, info->irq)) > 1)
->     192			return sysfs_emit(buf, "%s\n", "shared");
->     193		else
->     194			return sysfs_emit(buf, "%s\n", "exclusive");
->     195	}
->     196	
-> 
+commit 06afd2c31d338fa762548580c1bf088703dd1e03
+Author: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Date:   Tue Nov 29 16:48:12 2022 +0000
 
+    hsr: Synchronize sending frames to have always incremented outgoing seq nr.
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=133c15f8980000
+start commit:   5829614a7b3b Merge branch 'net-sysctl-sentinel'
+git tree:       net-next
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=10bc15f8980000
+console output: https://syzkaller.appspot.com/x/log.txt?x=173c15f8980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=7c70a227bc928e1b
+dashboard link: https://syzkaller.appspot.com/bug?extid=fbf74291c3b7e753b481
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=144d20e4980000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1532ab38980000
+
+Reported-by: syzbot+fbf74291c3b7e753b481@syzkaller.appspotmail.com
+Fixes: 06afd2c31d33 ("hsr: Synchronize sending frames to have always incremented outgoing seq nr.")
+
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
