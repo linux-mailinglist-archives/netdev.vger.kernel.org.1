@@ -1,153 +1,111 @@
-Return-Path: <netdev+bounces-93544-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93545-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55F698BC413
-	for <lists+netdev@lfdr.de>; Sun,  5 May 2024 23:53:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B00008BC464
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 00:01:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F27841F20F5E
-	for <lists+netdev@lfdr.de>; Sun,  5 May 2024 21:53:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 394B92812A8
+	for <lists+netdev@lfdr.de>; Sun,  5 May 2024 22:01:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83758136E16;
-	Sun,  5 May 2024 21:53:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6632136E20;
+	Sun,  5 May 2024 22:01:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cw9zNT0q"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="Ihum5M0n"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC7092D60A
-	for <netdev@vger.kernel.org>; Sun,  5 May 2024 21:53:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD69B6BB33;
+	Sun,  5 May 2024 22:01:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714946033; cv=none; b=Vdf4qGe4Wxtp19637j/zZOMh069+XWlaAMXxDZP6iatS/H6/P27bLGaqBWtswGRtG3lyr+SJQI0fy3kq6J2mjB+8KXCelBOhk8EQ+5Hj2d2jJyXkainkw3OkzZS+y+Lv/+ADtPmqNv2RxfOqDmgbIHcKUcz7DdX6Pl47U38GrqA=
+	t=1714946508; cv=none; b=N/dD/p+B4WTGTmPcwHJBP9Ybw9WEC+yUBkHuKPYKEhAq0wNmEWAwBgHrzEY+ewEli1ual4fXESDFAs4ObCpIxBO0xvmSRxWyVSC4eZkz9pa7NvyLO4i7yC+4pk5oWqk5e3nFXvaAnTgDqMuH8b35JsxXc2JgFZv6fIet5rWhsF8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714946033; c=relaxed/simple;
-	bh=l0EioHE7oAlSH3RrqJSRsv7ROcyIUn7ptm0DYJd/DUk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=i7S/1Ib8xt4pNeFpNUDJnvDO4IvcLEYaGPOpK8DXEIFPnQvMTOsdR9UBAfL4atup1JCSVMrEohbfy/g3o4y5V9Bn3CP404IR1aOkXhPDWi39YhSrKVgjXuFj3Dw1uOz9My/tiDG5OV+Q0FYWDPVkWK5YajoEt+mD0TdqUcX0tAc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cw9zNT0q; arc=none smtp.client-ip=209.85.167.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-518931f8d23so1238345e87.3
-        for <netdev@vger.kernel.org>; Sun, 05 May 2024 14:53:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1714946030; x=1715550830; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=CYCIhw1QBuel0uG+OWIloPGatsbLWT/hVoZRb96HjKA=;
-        b=cw9zNT0q0BpzAdiRuk5YKINM0mSDk+m9fsWzQbXvDy4Qi3jCaE7Tben/vVnSeKib20
-         Ve3Yh/w9MVqgQQHGMcUmd5IINKUOf4kocH9qH7CRlaF9Jueus5MREQqT5hGPCpIwRny4
-         h1ioWLeuJyejM3MVKIeY/iIFFWJFYJxHzM1YxziYwyzE4OKUJRc2RsAkbUS8C9d6bBQ9
-         amAzbPCa+QiPsU4IQuYudrBOYbU8IL7TCHBJqyU4bwBgZv5HmO75Rf2LTLAyqbaG4bnR
-         QRTS1BYgDoTd2VPCajRU2d4cINHAzZ7VWUxaUYKG1C0z6+dobMoj6lavPVITLnrjAmZX
-         /0Sw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714946030; x=1715550830;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CYCIhw1QBuel0uG+OWIloPGatsbLWT/hVoZRb96HjKA=;
-        b=CKAhbysif6LSWRYXO/y4tvsJGN9uZsn3bYm1EGE5XuCdaRhZhQZaUzAvQvOisxWhzi
-         GyoN2dKJMt5To1J7vJ8f/Y3e6Tx8jaeSssu9yALUniVmCJHGliO57Aphcpj7Y9AT2TtV
-         HbGgtYA6G0qxfkBwaOkamqom40+5kz/kZ0WqUP5L9BjSKOILkDJWsZku4kEXnPbX+bMj
-         XRclTUkLohTP4Z6hHcHJgGRxpV1pEu4OCrRkga3opBwI4FA5XziPX/yb9clelyAreMrN
-         zz1+u8iDFX/qjfB4BRgvu96vUZ+tDeFOHVvB0eNf4xDBBeA+OFQXEn2yfE+3hsLYxllv
-         +8Jw==
-X-Forwarded-Encrypted: i=1; AJvYcCW6GBMv3q2JbsDPWyMZ/0/tL/MeQixpIumZuc+4+gAj3/jhgAfKEoKM+pmLJqSvB10h+6o6/a4b2MMTgd/fx9mSG3hK5Bgt
-X-Gm-Message-State: AOJu0YyzXuQeRDb1N9ZNo3ZLZvD/vJ1BRJP9gcCAipHjUQK27Z2ZIm5N
-	ShdOVds+tpIQvANDkXlkqQg7HyftVBOpJ+tsKcXNUOsTsaCb3RNy
-X-Google-Smtp-Source: AGHT+IEW1t2lIMVr2VK3wAC+uzcQknzi0abg05n1cFlCEjVI0MWECVAE4uHBmOxf7Efmi3SHN+QfFg==
-X-Received: by 2002:ac2:43a7:0:b0:51c:348:3ba9 with SMTP id t7-20020ac243a7000000b0051c03483ba9mr5080299lfl.22.1714946029739;
-        Sun, 05 May 2024 14:53:49 -0700 (PDT)
-Received: from mobilestation ([95.79.182.53])
-        by smtp.gmail.com with ESMTPSA id h3-20020a056512054300b0051d94297380sm1370455lfl.241.2024.05.05.14.53.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 05 May 2024 14:53:49 -0700 (PDT)
-Date: Mon, 6 May 2024 00:53:47 +0300
-From: Serge Semin <fancer.lancer@gmail.com>
-To: Yanteng Si <siyanteng@loongson.cn>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com, 
-	alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com, 
-	chenhuacai@kernel.org, linux@armlinux.org.uk, guyinggang@loongson.cn, 
-	netdev@vger.kernel.org, chris.chenfeiyang@gmail.com, siyanteng01@gmail.com
-Subject: Re: [PATCH net-next v12 14/15] net: stmmac: dwmac-loongson: Move
- disable_force flag to _gnet_date
-Message-ID: <djycwp72pttsu6tnczzhgzncq77ljg7ugb4mvhi2sgqcirielg@uknifyazm3dt>
-References: <cover.1714046812.git.siyanteng@loongson.cn>
- <7235e4af89c169e79f0404a3dc953f1756bab196.1714046812.git.siyanteng@loongson.cn>
+	s=arc-20240116; t=1714946508; c=relaxed/simple;
+	bh=FrwPl+JWqc+HPObcFdxwqBrCB7UTUyGF3FS1XidQnag=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=jHTXehWm70YxffxE3wwbEkVX2JqLBIit0vw+ExxDNLKpMB+IBmM4CqFxngVkxuleP73qK1VMLDqcqh3tbuW3o56GpVMZrKLpjcvGDqatowhf6oneMRoEyhvgX7dRA86VAhOxGDRNKTIRp+VJEFI/7Fg8oSg1IYXq7YgwYwi5UKo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=Ihum5M0n; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1714946502;
+	bh=NpfiwcEN18GBXSxmdSKE4DjdgpjBIfIS84mKPHakvGk=;
+	h=Date:From:To:Cc:Subject:From;
+	b=Ihum5M0nqXhNqvrVloo6x50mBttQ22x4fMW5lePjDrJeZ1QduCenqJ56QFy7kBeI5
+	 63ApjCW5B/Gf+IfScqsohwA8VxIhZYbKVig0nETX/do6H+eRxbCM249vvcFqgk+KmP
+	 NCOe9V9s7XUttymWjMkee9baSGcPwRSNHO2tY1/J4FvmgUDnlPvn3tFyHTaEuux78i
+	 gybwsID1exxXBYaKZNe//1/gXtP2ucaNA0XUF3DrDc98+KdGD9ak4uOYLV/N0wWPzl
+	 RdryW8VV9Knaet1aaPV9V/JIjbnVPK7Clr/C1xzrv6zGgPDNrvLGas3PQ5GqMS7DUq
+	 DRJjj2xX+tIUQ==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4VXdmQ2HfMz4wcR;
+	Mon,  6 May 2024 08:01:40 +1000 (AEST)
+Date: Mon, 6 May 2024 08:01:38 +1000
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Johan Hovold <johan+linaro@kernel.org>, Luiz Augusto von Dentz
+ <luiz.von.dentz@intel.com>, Networking <netdev@vger.kernel.org>, Linux
+ Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>
+Subject: linux-next: Fixes tag needs some work in the net tree
+Message-ID: <20240506080138.2f57d906@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7235e4af89c169e79f0404a3dc953f1756bab196.1714046812.git.siyanteng@loongson.cn>
+Content-Type: multipart/signed; boundary="Sig_/c4uXEfQ9DHFdKnfEi_ApBE7";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-On Thu, Apr 25, 2024 at 09:11:37PM +0800, Yanteng Si wrote:
-> We've already introduced loongson_gnet_data(), so the
-> STMMAC_FLAG_DISABLE_FORCE_1000 should be take away from
-> loongson_dwmac_probe().
-> 
-> Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
-> Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
-> Signed-off-by: Yanteng Si <siyanteng@loongson.cn>
-> ---
->  .../net/ethernet/stmicro/stmmac/dwmac-loongson.c    | 13 ++++++-------
->  1 file changed, 6 insertions(+), 7 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-> index 68de90c44feb..dea02de030e6 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-> @@ -286,6 +286,12 @@ static int loongson_gnet_data(struct pci_dev *pdev,
->  	plat->mdio_bus_data->phy_mask = ~(u32)BIT(2);
->  	plat->fix_mac_speed = loongson_gnet_fix_speed;
->  
+--Sig_/c4uXEfQ9DHFdKnfEi_ApBE7
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-> +	/* GNET devices with dev revision 0x00 do not support manually
-> +	 * setting the speed to 1000.
-> +	 */
-> +	if (pdev->revision == 0x00)
-> +		plat->flags |= STMMAC_FLAG_DISABLE_FORCE_1000;
-> +
+Hi all,
 
-Just introduce the change above in the framework of the patch 
-[PATCH net-next v12 13/15] net: stmmac: dwmac-loongson: Add Loongson GNET support
-and ...
+In commit
 
->  	return 0;
->  }
->  
-> @@ -540,13 +546,6 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
->  		break;
->  	}
->  
+  40d442f969fb ("Bluetooth: qca: fix firmware check error path")
 
-> -	/* GNET devices with dev revision 0x00 do not support manually
-> -	 * setting the speed to 1000.
-> -	 */
-> -	if (pdev->device == PCI_DEVICE_ID_LOONGSON_GNET &&
-> -	    pdev->revision == 0x00)
-> -		plat->flags |= STMMAC_FLAG_DISABLE_FORCE_1000;
-> -
+Fixes tag
 
-... you won't to have this being undone. So this patch won't be even
-needed to be introduced.
+  Fixes: f905ae0be4b7 ("Bluetooth: qca: add missing firmware sanity checks")
 
-See my comment sent to
-[PATCH net-next v12 12/15] net: stmmac: dwmac-loongson: Fixed failure to set network speed to 1000.
+has these problem(s):
 
--Serge(y)
+  - Target SHA1 does not exist
 
->  	ret = stmmac_dvr_probe(&pdev->dev, plat, &res);
->  	if (ret)
->  		goto err_disable_device;
-> -- 
-> 2.31.4
-> 
+Maybe you meant
+
+Fixes: 2e4edfa1e2bd ("Bluetooth: qca: add missing firmware sanity checks")
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/c4uXEfQ9DHFdKnfEi_ApBE7
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmY4AcIACgkQAVBC80lX
+0Gw6Pwf/WotSkD5+J0QhhD5gLGgdPxGXRdJpBk80+UN2QBDqR6cSdEH8hT6QhWJG
+kbatPK7fWnWkzgHhQIepKxywUGuGYRd8cM/4TXhIRxJvdd5zRjwxTA/9NOXywLtR
+YJkvrlB62DRu5+p6piwMX2aggVqCfFSRHXm1jBKoJ0mHnaKqCuOKKlP7bt8G/nUH
+5oFCFFpciiqwFS7KFkak+3zDd3fUJSkptYcx/8HDK7297uzSa5Q78r3ExYOTwEn2
+hXunlN2IKGi+pWItygtTKt9XfRxspR6p1tYe63v3XZ/tds+be/SCkS+6l6BATq8N
+ZDphy5FHnvjsygeg14w+/UxeRZEzSg==
+=OoAo
+-----END PGP SIGNATURE-----
+
+--Sig_/c4uXEfQ9DHFdKnfEi_ApBE7--
 
