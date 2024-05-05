@@ -1,120 +1,114 @@
-Return-Path: <netdev+bounces-93536-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93537-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A2A88BC30F
-	for <lists+netdev@lfdr.de>; Sun,  5 May 2024 20:29:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34BEB8BC317
+	for <lists+netdev@lfdr.de>; Sun,  5 May 2024 20:43:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CEADC1F20F3F
-	for <lists+netdev@lfdr.de>; Sun,  5 May 2024 18:29:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5C3461C20A1B
+	for <lists+netdev@lfdr.de>; Sun,  5 May 2024 18:43:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 938F26BFA3;
-	Sun,  5 May 2024 18:29:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A602E3A1D7;
+	Sun,  5 May 2024 18:42:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="R0l1QcHP"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b="iTpVhqVh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+Received: from nbd.name (nbd.name [46.4.11.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 374CE1DFED;
-	Sun,  5 May 2024 18:29:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C28A225569;
+	Sun,  5 May 2024 18:42:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.4.11.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714933755; cv=none; b=T23qKoHyGyR18YONUZTwFfH7BsKiJDPJSY7Nbye9od35Q127VJ427Kmwk+ObtAaDGUBPqTYam9kjpapeJmNITLO2O4HXzRUCUempPxi5vtR+KcjOzAUDLSGKTX1atmLwYuWRylL5nJYDULM8iCtht9qQNVN5T2SrBQgFoaIVDgM=
+	t=1714934578; cv=none; b=rg37YGh0RZS6ewYRxc/FfSCnU+QC0FlxMSifZ6Mh6buL5s07/0wIcHP1VsXH60icLYdFD/t3fjt39RjG4BGGVm/+pfW793oHbAolCsTfzcVLQK1TRilXOVV1T2VcYd7kFhIxa+y4dad5o6oiWp4QyJr6xTipRUPShKWif+syAGI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714933755; c=relaxed/simple;
-	bh=kmr0tE/cFUeLPazltcKBsWdavSb2gYZMg29IrTBr15A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=REoQQIDXYz1gcnJh5MvEkyccEx5eA8tRR40U/uOU8xalNeaByMZz07xgyX2PYJ2danmnhUwZyk5bIdCkWXnMb0dULGIn+sWan20ZXj4MNhbeYVHxg/F7yDMTHWF0aN+DIWLuGo9NK9FiyJ1ULUGZvNH5gmRdBg9vbhUiREQ6By0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=R0l1QcHP; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 5AC9A40E024C;
-	Sun,  5 May 2024 18:29:04 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id T-3NwLK1gWyt; Sun,  5 May 2024 18:29:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1714933740; bh=2c3rsJd5+C9gOUqICAJkWhmVm4gYvJcQn1yN6aN3iuo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=R0l1QcHPcURtc+luuPBnrsq8jO1czQN5/BzhAxRPkLw36GkYIe8a519flkhX/PJP4
-	 JSG8xL7YZPfCL7hklEE8y2UdGecuylXI9rUVaRRK6jPPVjlWTkw+v2O7jVoGI1VeGX
-	 F3D9o7yELJP04bHX9q1ECpQwLDHdpw65XghukIJNfDYuJvO56DoExK2f7VDsFKUdJA
-	 hcfcwDAUmwp78SfTZrYtsJO9N676Vm+UVnEzZqgFH3DGGSDK6PGRARyFZz9CJKEMUk
-	 OnT+Qf3xjiQns4jKyL3KAvzB8GftOm3KGEc3yiNB9W07whKTmRClNOR4XnTTTO+OG1
-	 50ekC/avKv6+M3b78bfc6Id6vD2Iq2SlEln54H1Sg4BIOamC2yidcIDjsb32kLbJXy
-	 hqiF9ca5RU5Smg/3ugEj1STdtoYwj4lgUmvsxVVNhBK3PJbCOutXCyaKOhm4yy5Xoe
-	 1gPzWKeR+bJXtJyjbxQ2SwPYTfdv0rFnkDpaREAnt8J2R1NjvfNssf+CzPuE4ggfQ5
-	 OgwNDcIeMCk9KmNJD0xJjKBtX5svvHPY/Ci9RHqcFnKIryPkEacccnDRgsCiWz+els
-	 5uLzMLm6EGGDj8yDUA1h6bzlztrgLnUcMNCqIbe+TT7J0O9WPWBRhE3xzdqTYES9WK
-	 9l3IMFoVPT9iJN58SgHOlHWI=
-Received: from zn.tnic (pd953020b.dip0.t-ipconnect.de [217.83.2.11])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 6E30340E0187;
-	Sun,  5 May 2024 18:28:34 +0000 (UTC)
-Date: Sun, 5 May 2024 20:28:29 +0200
-From: Borislav Petkov <bp@alien8.de>
-To: Alexey Makhalov <alexey.makhalov@broadcom.com>
-Cc: linux-kernel@vger.kernel.org, virtualization@lists.linux.dev,
-	hpa@zytor.com, dave.hansen@linux.intel.com, mingo@redhat.com,
-	tglx@linutronix.de, x86@kernel.org, netdev@vger.kernel.org,
-	richardcochran@gmail.com, linux-input@vger.kernel.org,
-	dmitry.torokhov@gmail.com, zackr@vmware.com,
-	linux-graphics-maintainer@vmware.com, pv-drivers@vmware.com,
-	timothym@vmware.com, akaher@vmware.com,
-	dri-devel@lists.freedesktop.org, daniel@ffwll.ch, airlied@gmail.com,
-	tzimmermann@suse.de, mripard@kernel.org,
-	maarten.lankhorst@linux.intel.com, horms@kernel.org,
-	kirill.shutemov@linux.intel.com, Nadav Amit <nadav.amit@gmail.com>
-Subject: Re: [PATCH v9 2/8] x86/vmware: Move common macros to vmware.h
-Message-ID: <20240505182829.GBZjfPzeEijTsBUth5@fat_crate.local>
-References: <adcbfb9a-a4e1-4a32-b786-6c204d941e9f@broadcom.com>
- <20240424231407.14098-1-alexey.makhalov@broadcom.com>
- <20240424231407.14098-2-alexey.makhalov@broadcom.com>
+	s=arc-20240116; t=1714934578; c=relaxed/simple;
+	bh=G5DPjNlDALLX+7ggljBcHdccInr82HLwhv0mrQTkjU8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WZGNYtT6VlIyh9UI1w4I2eTVcA7F5Zq88bByl6XezlfNTHGldCzFEza/QC1cTCEJCcDhfmwctWNLlPoz0GZ5VaLAuhi5h/fZ9SCU8R9VE+O5BXjMXQpSRN4hIDDRvnVumWUbZY75gauUzrhDLa7z3BUHi9G1jCQyE3Qr2kdmV2A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nbd.name; spf=none smtp.mailfrom=nbd.name; dkim=pass (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b=iTpVhqVh; arc=none smtp.client-ip=46.4.11.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nbd.name
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=nbd.name
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=nbd.name;
+	s=20160729; h=Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject:
+	Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:Content-Description:
+	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=TxMEun4WM8Bf7pKsihOkB1y9YtAU4T5UBt+gopLdKEM=; b=iTpVhqVhUVT8ek+sNxcvaiUNL7
+	yNsO61wAYS3k1/h1DmckHZhWk06Lt/8el1NYSJQqB5nuD/IiACf8J2A8im6ZUv1XELAna2PUr0rpT
+	XEcsgaIc+YD9GWxM46tdz8zlIsgHQN6iB52ORQjVjBwGnfBWqNnWShoMUytWTkpIHym0=;
+Received: from p54ae9c93.dip0.t-ipconnect.de ([84.174.156.147] helo=localhost.localdomain)
+	by ds12 with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256
+	(Exim 4.96)
+	(envelope-from <nbd@nbd.name>)
+	id 1s3goq-00DAxa-0D;
+	Sun, 05 May 2024 20:42:40 +0200
+From: Felix Fietkau <nbd@nbd.name>
+To: netdev@vger.kernel.org,
+	Roopa Prabhu <roopa@nvidia.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: bridge@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net] net: bridge: fix corrupted ethernet header on multicast-to-unicast
+Date: Sun,  5 May 2024 20:42:38 +0200
+Message-ID: <20240505184239.15002-1-nbd@nbd.name>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240424231407.14098-2-alexey.makhalov@broadcom.com>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Apr 24, 2024 at 04:14:07PM -0700, Alexey Makhalov wrote:
-> +#define VMWARE_CMD_GETVERSION		10
-> +#define VMWARE_CMD_GETHZ		45
-> +#define VMWARE_CMD_GETVCPU_INFO		68
-> +#define VMWARE_CMD_STEALCLOCK		91
+The change from skb_copy to pskb_copy unfortunately changed the data
+copying to omit the ethernet header, since it was pulled before reaching
+this point. Fix this by calling __skb_push/pull around pskb_copy.
 
-Ok, what part in
+Fixes: 59c878cbcdd8 ("net: bridge: fix multicast-to-unicast with fraglist GSO")
+Signed-off-by: Felix Fietkau <nbd@nbd.name>
+---
+ net/bridge/br_forward.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-"* first patch: sole code movement, no changes whatsoever"
-
-wasn't clear?
-
-You're adding those macros above to a patch which claims that it does
-code movement only. Don't do that.
-
-Let me try again:
-
-* first patch: *ONLY* code movement. No new code, no new defines, no new
-functions, no nada! Only move code and do fixups so that it still builds
-like the export you're doing.
-
-* follow-on patches: other changes.
-
+diff --git a/net/bridge/br_forward.c b/net/bridge/br_forward.c
+index d7c35f55bd69..d97064d460dc 100644
+--- a/net/bridge/br_forward.c
++++ b/net/bridge/br_forward.c
+@@ -258,6 +258,7 @@ static void maybe_deliver_addr(struct net_bridge_port *p, struct sk_buff *skb,
+ {
+ 	struct net_device *dev = BR_INPUT_SKB_CB(skb)->brdev;
+ 	const unsigned char *src = eth_hdr(skb)->h_source;
++	struct sk_buff *nskb;
+ 
+ 	if (!should_deliver(p, skb))
+ 		return;
+@@ -266,12 +267,16 @@ static void maybe_deliver_addr(struct net_bridge_port *p, struct sk_buff *skb,
+ 	if (skb->dev == p->dev && ether_addr_equal(src, addr))
+ 		return;
+ 
+-	skb = pskb_copy(skb, GFP_ATOMIC);
+-	if (!skb) {
++	__skb_push(skb, ETH_HLEN);
++	nskb = pskb_copy(skb, GFP_ATOMIC);
++	__skb_pull(skb, ETH_HLEN);
++	if (!nskb) {
+ 		DEV_STATS_INC(dev, tx_dropped);
+ 		return;
+ 	}
+ 
++	skb = nskb;
++	__skb_pull(skb, ETH_HLEN);
+ 	if (!is_broadcast_ether_addr(addr))
+ 		memcpy(eth_hdr(skb)->h_dest, addr, ETH_ALEN);
+ 
 -- 
-Regards/Gruss,
-    Boris.
+2.44.0
 
-https://people.kernel.org/tglx/notes-about-netiquette
 
