@@ -1,131 +1,114 @@
-Return-Path: <netdev+bounces-93469-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93470-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C74B48BC054
-	for <lists+netdev@lfdr.de>; Sun,  5 May 2024 14:14:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 34A018BC092
+	for <lists+netdev@lfdr.de>; Sun,  5 May 2024 15:40:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 605EC281834
-	for <lists+netdev@lfdr.de>; Sun,  5 May 2024 12:14:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BDFC52817EB
+	for <lists+netdev@lfdr.de>; Sun,  5 May 2024 13:40:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E780182AE;
-	Sun,  5 May 2024 12:14:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A47691BC5C;
+	Sun,  5 May 2024 13:40:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EGnV3Asv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oxdMDLXK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11A192033E
-	for <netdev@vger.kernel.org>; Sun,  5 May 2024 12:14:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DF9C847C
+	for <netdev@vger.kernel.org>; Sun,  5 May 2024 13:40:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714911247; cv=none; b=VLUH07XT1uMvY0oiWXgoIbtkgeMROtynusKEyNFUQVoICkD4lK0apxJwMqkqXlJrEs8oPmCBTuHOHP4mRHdydK37uxwqfFEXnvlvdz0u9boea6lRvovHsLtvhuzaK988hmALpHBZOrkaHAa3mEU5z1shelWb+aEjMgzp5KlGAHY=
+	t=1714916429; cv=none; b=GJb8hN6em26gB98JAoFZxgYOlYuIavzJoQkhoUO0qivjxsjagJa03Zg1tRPFsn3DVYRuFrH/qi3dc/CZ9MX8yYqnpudHdub9KGk37Iky230fvY5hUqcU5oqIcJgZ8prQoV7ofBJiZhM/J4GphHVRUETs0Meu9PjgeAXoTXfgr8k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714911247; c=relaxed/simple;
-	bh=WxQQo1msbFJvJ7KTn5oWNe7ihO28HBPUVv3OailyNQA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Nd2hdByxSd44AcJ/fvZ7uo/yksCxdwTCVoRa4YNG6AKwvMRVzmTS6CK9VGvVxxzzkIbtfPVSmlQxPMMNkLyCBbPdsn0GvADBJ/GvUYv0xmjHwkZ1jvmuG97s1giWGGyLE+mM7OH7KZAxRfo4jw6XwJW0LPuB6fEEl24HaedHEO8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EGnV3Asv; arc=none smtp.client-ip=209.85.218.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-a599af16934so228532866b.1
-        for <netdev@vger.kernel.org>; Sun, 05 May 2024 05:14:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1714911240; x=1715516040; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lIq2aKoB/QFJgNRUAiXNZ4dj37szD872mrmhb6FK284=;
-        b=EGnV3Asvxtf9fNumb/tzhcII63qlg2b78jELK59elTi+urEh8yL2B+c02sdO58VrtY
-         9IpoQPQmGVZM0dSefuTo1mtsuyfGusgnKGYvt5eOHuU4c7ruPqfaFcKUYg04GAMqbsBN
-         qZyp42z/wD7XP+zwovSvJIMjnRJO9PJ0bgnTJScafTV5XO4Ejr3IBgmBKzLKKGQRUF+x
-         E0tiBINu45Ziw+GGKfeIMDBDnGShi5MNgw5IJ2wy6Dx8EQZVhH6E4V9PCCb2d4yJ1fAc
-         x0ee1rnkmLYFxxnXgGDtsYoUgVqWkJps8qKqE+MxeARR9XELqWWtAi+YX7jVGERU+SrN
-         VZHA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714911240; x=1715516040;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=lIq2aKoB/QFJgNRUAiXNZ4dj37szD872mrmhb6FK284=;
-        b=BkreC9eYTIvVAYZ4bb5wNUs1+lJyEUp18S7knQ3zK29uzw8/2MJocn6OIRRR7ILhSM
-         l5dPc/tAiXf4KhGRrfV+K/jRGOG9SPCLtywTGeYsDtnJO2A2PH4gV4yTV7G86DMqzfER
-         C6f5ywIrPy24LbwKVx0hq3wrHECIVpnB3BKY7W9tWV3sJWV36W3NeHT3juKJp+iIwL9y
-         YEfTlgsLaXu5rf7FbfuDPAMQVm4xuXymz8Vcf+HgWzZseRFPKezXRTRx0SoTG1YFWNXj
-         fQ9ENvLKSswCl0mLD4vr4h0cafrcVfavTkKMZkDqL8QAzmt2oumULvvr1PqrBO15ivZ6
-         l3dg==
-X-Gm-Message-State: AOJu0YzhWUo9Lwhu8JWKekPjd95ZU3OgtEpRca/+O+zi0mU3nJxfpKRm
-	cK6XXLj9GWqaYtNRhISl+N8W5BukAr7KTOJ/w0CxRLEtRlYL0JWzw2amE+WYB2rg4BaFe0ci8cl
-	8ii4a04OvNws8vhPaKTfrX2A8kcA=
-X-Google-Smtp-Source: AGHT+IEiI/41aIMuLWPWdpyxFaB+cXNqALu6zyzHYrdj2ZSCmBdrvoube3y0jU3N7pMvh/n+nJek2XCuvS7DxwkQ2zg=
-X-Received: by 2002:a50:ab4f:0:b0:56f:e585:2388 with SMTP id
- t15-20020a50ab4f000000b0056fe5852388mr4799674edc.36.1714911240210; Sun, 05
- May 2024 05:14:00 -0700 (PDT)
+	s=arc-20240116; t=1714916429; c=relaxed/simple;
+	bh=sSxitplGFqNjh8N52IplEoFTCDOinmD/xyRf1KU0QLk=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=P6mWHp/xjeRJku6lBN8j+1EdqbMWt46ync3CutxdK7/3MHJL1ZyosqYbbANBfcr+awn6iPHL9J0gYZ4L3lef7OIB7zV6VUn76EnW96sOZ7fCA6QKLn0VLpRQv7W1fDBpyR91EJuSZDbQa8hg6pj4DZ+quSO1DiR229cm0oNdpA0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oxdMDLXK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 0BF2FC4AF18;
+	Sun,  5 May 2024 13:40:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714916429;
+	bh=sSxitplGFqNjh8N52IplEoFTCDOinmD/xyRf1KU0QLk=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=oxdMDLXK/rnHBySsJ1vSkBTKwM4bODQKbZiEXOG70TWmznmmlwa+YO/pq7Wg7d6nr
+	 CRWlhcJExFw694PQdnAXjsVj5a6wuC3U/tgcuhMXJMLXVaPoc7eI6oBRyia2husyMh
+	 9jx97KXuYsUkAvmFTBljc5YgWVIJN5nHza7aaQeBnStZ9oDEsv38tppmry0pDnrd1K
+	 p6c4AYzjKXSKC0WB7M7qYPXOVYf51ZVuNY+3NQf62Erg8grlICkJhXV1YZJkzg+0nL
+	 +lYSVXutnRfgiKpvhQzeg1ITPRgspqIc4kl48MN5H/N6iug/Doq6d24XSoX4d2s1MX
+	 1T8yBUar9Fbpg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id EE34FC43444;
+	Sun,  5 May 2024 13:40:28 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240502130049.46be401e@kernel.org>
-In-Reply-To: <20240502130049.46be401e@kernel.org>
-From: Taehee Yoo <ap420073@gmail.com>
-Date: Sun, 5 May 2024 21:13:48 +0900
-Message-ID: <CAMArcTWUusDHes9AWeJLeFMZMUVe+A=8DOVZ8WjwfAmA=dyesA@mail.gmail.com>
-Subject: Re: [TEST] amt.sh crashes smcrouted
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v2 00/10] gve: Implement queue api
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171491642897.19257.15217395970936349981.git-patchwork-notify@kernel.org>
+Date: Sun, 05 May 2024 13:40:28 +0000
+References: <20240501232549.1327174-1-shailend@google.com>
+In-Reply-To: <20240501232549.1327174-1-shailend@google.com>
+To: Shailend Chand <shailend@google.com>
+Cc: netdev@vger.kernel.org, almasrymina@google.com, davem@davemloft.net,
+ edumazet@google.com, hramamurthy@google.com, jeroendb@google.com,
+ kuba@kernel.org, pabeni@redhat.com, pkaligineedi@google.com,
+ rushilg@google.com, willemb@google.com, ziweixiao@google.com
 
-On Fri, May 3, 2024 at 5:00=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wro=
-te:
->
+Hello:
 
-Hi Jakub,
-Thanks a lot for the report!
+This series was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-> Hi Taehee Yoo!
->
-> We started running amt tests in the netdev CI, and it looks like it
-> hangs - or at least it doesn't produce any output for long enough
-> for the test runner to think it hung.
->
-> While looking at the logs, however, I see:
->
-> [    3.361660] smcrouted[294]: segfault at 7fff480c95f3 ip 00000000004034=
-e4 sp 00007fff480b9410 error 6 in smcrouted[402000+a000] likely on CPU 3 (c=
-ore 3, socket 0)
-> [    3.361812] Code: 74 24 38 89 ef e8 4c 33 00 00 44 0f b7 f8 66 39 84 2=
-4 e2 01 00 00 75 09 45 85 ed 0f 85 ed 01 00 00 48 8b 44 24 38 0f b6 40 33 <=
-42> 88 84 3c e4 01 00 00 48 8b 3b 48 8d 54 24 38 48 8d 74 24 50 e8
->
-> https://netdev-3.bots.linux.dev/vmksft-net/results/577882/4-amt-sh/
->
-> So I think the cause may be a bug in smcroute.
->
-> We use smcroute build from latest git
-> # cd smcroute/
-> # git log -1 --oneline
-> cd25930 .github: use same CFLAGS for both configure runs
-> # smcroute -v
-> SMCRoute v2.5.6
->
-> Could you check if you can repro this crash?
+On Wed,  1 May 2024 23:25:39 +0000 you wrote:
+> Following the discussion on
+> https://patchwork.kernel.org/project/linux-media/patch/20240305020153.2787423-2-almasrymina@google.com/,
+> the queue api defined by Mina is implemented for gve.
+> 
+> The first patch is just Mina's introduction of the api. The rest of the
+> patches make surgical changes in gve to enable it to work correctly with
+> only a subset of queues present (thus far it had assumed that either all
+> queues are up or all are down). The final patch has the api
+> implementation.
+> 
+> [...]
 
-I tried to reproduce the latest version of the smcrouted crash,
-but I couldn't reproduce it.
-I'm sure this crash is the reason for the failure of your case.
-But the real bug of this phenomenon is the amt.sh doesn't have timeout logi=
-c.
-If the smcrouted did crash or it couldn't finish in time something in it,
-it should print FAIL and then quit this test, but it waits forever.
+Here is the summary with links:
+  - [net-next,v2,01/10] queue_api: define queue api
+    https://git.kernel.org/netdev/net-next/c/087b24de5c82
+  - [net-next,v2,02/10] gve: Make the GQ RX free queue funcs idempotent
+    https://git.kernel.org/netdev/net-next/c/dcecfcf21bd1
+  - [net-next,v2,03/10] gve: Add adminq funcs to add/remove a single Rx queue
+    https://git.kernel.org/netdev/net-next/c/242f30fe692e
+  - [net-next,v2,04/10] gve: Make gve_turn(up|down) ignore stopped queues
+    https://git.kernel.org/netdev/net-next/c/5abc37bdcbc5
+  - [net-next,v2,05/10] gve: Make gve_turnup work for nonempty queues
+    https://git.kernel.org/netdev/net-next/c/864616d97a45
+  - [net-next,v2,06/10] gve: Avoid rescheduling napi if on wrong cpu
+    https://git.kernel.org/netdev/net-next/c/9a5e0776d11f
+  - [net-next,v2,07/10] gve: Reset Rx ring state in the ring-stop funcs
+    https://git.kernel.org/netdev/net-next/c/770f52d5a0ed
+  - [net-next,v2,08/10] gve: Account for stopped queues when reading NIC stats
+    https://git.kernel.org/netdev/net-next/c/af9bcf910b1f
+  - [net-next,v2,09/10] gve: Alloc and free QPLs with the rings
+    https://git.kernel.org/netdev/net-next/c/ee24284e2a10
+  - [net-next,v2,10/10] gve: Implement queue api
+    (no matching commit)
 
-I will send a patch for it.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Thank you so much for taking care of it.
-Taehee Yoo
+
 
