@@ -1,107 +1,113 @@
-Return-Path: <netdev+bounces-93465-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93466-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 759D78BC013
-	for <lists+netdev@lfdr.de>; Sun,  5 May 2024 12:37:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 291978BC02B
+	for <lists+netdev@lfdr.de>; Sun,  5 May 2024 13:01:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 35D4B1F21298
-	for <lists+netdev@lfdr.de>; Sun,  5 May 2024 10:37:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D932D281998
+	for <lists+netdev@lfdr.de>; Sun,  5 May 2024 11:01:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B44F11181;
-	Sun,  5 May 2024 10:37:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D58761802E;
+	Sun,  5 May 2024 11:01:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14695566A;
-	Sun,  5 May 2024 10:37:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0DAC12B6C
+	for <netdev@vger.kernel.org>; Sun,  5 May 2024 11:01:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714905457; cv=none; b=nV0VKWXgvvc/oOTYKmClgse46pvMmvdQNbOcUzENDGg42yxUozYDohdca3aq934i/HU0IG11OM1OZT74zyKaf3QWwwCrAoT0hVmlKcyDpmBt/azqCFwWkaXKoAvP3sI40Kkc6OKcyF0y4JgIE+31c80FtTcHiDvvqIMeAI0UkTw=
+	t=1714906896; cv=none; b=UYraVmQ2oKLqWAx2vQJHgfiYiIl6ipDKiux4pYuCj/dy4/0pF1jVCGLB3wnzKmVedAkjYuHv2YmbRp54nJmQOLxkqey3LSv4eWI24ZDvTuoAQusujrIHvrv+mNiA1pPUepXh8GatZgjlv31S81LHK3T6vq72Gbc5ggtBIFjRp7M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714905457; c=relaxed/simple;
-	bh=4dGJOao/e2udAoNy0XvUDEsCmbPxU6hDszjW6HEIw/w=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LdsEBJ8jDYiOvQuN3B7ZTN8EVoxpx6VgUtdo1NBs5pl82Zn0uzmhd+GcbGjShok69juG4PyJuSnfH+1H/m2m+gl3RauNoF4i4HQOedpmVdSO/sS8WUBo7w+WRh7oZ1Dhs4h1CUqeIRh+whAP+dmWpn2xn2PQrkId1eOfHB0/lwU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
-Received: from fsav414.sakura.ne.jp (fsav414.sakura.ne.jp [133.242.250.113])
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 445AanF2024438;
-	Sun, 5 May 2024 19:36:49 +0900 (JST)
-	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Received: from www262.sakura.ne.jp (202.181.97.72)
- by fsav414.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav414.sakura.ne.jp);
- Sun, 05 May 2024 19:36:49 +0900 (JST)
-X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav414.sakura.ne.jp)
-Received: from [192.168.1.6] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
-	(authenticated bits=0)
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 445Aam07024433
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-	Sun, 5 May 2024 19:36:49 +0900 (JST)
-	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Message-ID: <6d10f829-5a0c-405a-b39a-d7266f3a1a0b@I-love.SAKURA.ne.jp>
-Date: Sun, 5 May 2024 19:36:49 +0900
+	s=arc-20240116; t=1714906896; c=relaxed/simple;
+	bh=/sq8W/RMqV5sJ5BxKF3BR/Rccp7w3Wrj4tY/YJgKiEU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=X9lkAUw2rpKOlPW+N9D2TjzwQTv/gTKa0hzkQkW98a6AFvo2UJxEx12mXAvvF+f6vf7E0J2Eo7e5Oi22YV82lJPcdPZVm/KAOhLF6p3TuxmGHr/buh24Su6u+yWCMXnH1bAHpNunyGJ+i6xjfDzibNcWop5ZV1QKYhfNbN7Gxwk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1s3ZcJ-00084C-9I; Sun, 05 May 2024 13:01:15 +0200
+Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1s3ZcF-00G42r-VK; Sun, 05 May 2024 13:01:12 +0200
+Received: from pengutronix.de (unknown [172.20.34.65])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 8D06C2C9C81;
+	Sun,  5 May 2024 11:01:11 +0000 (UTC)
+Date: Sun, 5 May 2024 13:01:09 +0200
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Cc: linux-can@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next v1 1/1] can: sja1000: plx_pci: Reuse predefined
+ CTI subvendor ID
+Message-ID: <20240505-micro-degu-of-memory-a8490f-mkl@pengutronix.de>
+References: <20240502123852.2631577-1-andriy.shevchenko@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: [PATCH] nfc: nci: Fix kcov check in nci_rx_work()
-To: Ryosuke Yasuoka <ryasuoka@redhat.com>, Jeremy Cline <jeremy@jcline.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-        "David S. Miller" <davem@davemloft.net>
-Cc: syzbot <syzbot+0438378d6f157baae1a2@syzkaller.appspotmail.com>,
-        edumazet@google.com, kuba@kernel.org, linux-kernel@vger.kernel.org,
-        linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
-        pabeni@redhat.com, syzkaller-bugs@googlegroups.com,
-        Aleksandr Nogikh <nogikh@google.com>,
-        Andrey Konovalov <andreyknvl@gmail.com>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        Dmitry Vyukov <dvyukov@google.com>
-References: <0000000000007b02500614b66e31@google.com>
- <550cc81a3dffd07ec1235dc32fd7bbde22d9bf57.camel@sipsolutions.net>
- <CA+fCnZe_fuT2y4ryFeb8A49k19MY3Nct79JCoGwQh0hjcq6bqA@mail.gmail.com>
-Content-Language: en-US
-From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-In-Reply-To: <CA+fCnZe_fuT2y4ryFeb8A49k19MY3Nct79JCoGwQh0hjcq6bqA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="oajw5gtxeutevdc3"
+Content-Disposition: inline
+In-Reply-To: <20240502123852.2631577-1-andriy.shevchenko@linux.intel.com>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Commit 7e8cdc97148c ("nfc: Add KCOV annotations") added
-kcov_remote_start_common()/kcov_remote_stop() pair into nci_rx_work(),
-with an assumption that kcov_remote_stop() is called upon continue of
-the for loop. But commit d24b03535e5e ("nfc: nci: Fix uninit-value in
-nci_dev_up and nci_ntf_packet") forgot to call kcov_remote_stop() before
-break of the for loop.
 
-Reported-by: syzbot <syzbot+0438378d6f157baae1a2@syzkaller.appspotmail.com>
-Closes: https://syzkaller.appspot.com/bug?extid=0438378d6f157baae1a2
-Fixes: d24b03535e5e ("nfc: nci: Fix uninit-value in nci_dev_up and nci_ntf_packet")
-Debugged-by: Andrey Konovalov <andreyknvl@gmail.com>
-Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
----
- net/nfc/nci/core.c | 1 +
- 1 file changed, 1 insertion(+)
+--oajw5gtxeutevdc3
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/net/nfc/nci/core.c b/net/nfc/nci/core.c
-index 0d26c8ec9993..b133dc55304c 100644
---- a/net/nfc/nci/core.c
-+++ b/net/nfc/nci/core.c
-@@ -1518,6 +1518,7 @@ static void nci_rx_work(struct work_struct *work)
- 
- 		if (!nci_plen(skb->data)) {
- 			kfree_skb(skb);
-+			kcov_remote_stop();
- 			break;
- 		}
- 
--- 
-2.34.1
+On 02.05.2024 15:38:52, Andy Shevchenko wrote:
+> There is predefined PCI_SUBVENDOR_ID_CONNECT_TECH, use it in the driver.
+>=20
+> Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 
+Applied to linx-can-next
+
+Thanks,
+Marc
+
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--oajw5gtxeutevdc3
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmY3ZvIACgkQKDiiPnot
+vG9c/Af/fTaOm84MFHU6/wh2K89RdBL6AfImnl2h9Cqm6yY2tYfdwEemADyIBSlU
+I32WQWfp4Jc3XqpCv1KdYKb84tz4Fhi5wlM+9IYaAKkrhIpaaR8s/aQ6L1LdSV9M
+zlLCrzj/7H3aZljYlK3GPIrvrUUqnzC1Zmj4ex/JBGFcGzROb250WgotPsRVlUWA
+ZAFxn5F1rCMmtIsrWseUx6SkjQUIiUqTxhTNZkGBTOHvqArJzPapOcIvRaoV4LsT
+MFte1B42C37JZ1QnnwrPjxRQgziAtLaqagmYrqmk30zn0+6zuEuVNS7/3ooqOS4G
+NxXIBImGV51zqtx30sYdMwhr+ujEvw==
+=1ldS
+-----END PGP SIGNATURE-----
+
+--oajw5gtxeutevdc3--
 
