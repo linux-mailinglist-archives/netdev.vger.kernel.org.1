@@ -1,188 +1,163 @@
-Return-Path: <netdev+bounces-93802-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93803-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1807F8BD3AA
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 19:10:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 945DF8BD3AF
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 19:11:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C0BC0285409
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 17:10:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4F55A2829D3
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 17:11:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA52B156F56;
-	Mon,  6 May 2024 17:10:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54BE0157463;
+	Mon,  6 May 2024 17:11:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=public-files.de header.i=frank-w@public-files.de header.b="gJ61EK3H"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RdPBQwlU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.gmx.net (mout.gmx.net [212.227.17.21])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62E551DA21;
-	Mon,  6 May 2024 17:10:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABC31156F38;
+	Mon,  6 May 2024 17:11:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715015432; cv=none; b=rR6mx94fRjhT3VcqylXtjXSfedIQTljKYvuHi7vqaxGDn1aNXqWwn2pOCnUKGMtTpZ/0d7iib6qsSeNRY4IqzLArMDJHGEN/o3KiB+T4kQA3EXQXvexVb6XwZhxM1uDfDirtcOmgQ7HT5ynla/ISYrWnCVdF0C8Pqe6hF4341RY=
+	t=1715015505; cv=none; b=Tgi09AAg0q01jvu51woce2rV9DvdYMBtEwNrWlGPayNGlJzfF0AMwanussWs5LWMJMIJttquD9elZ393OHgak9xFXdbpHbKPAsgXz1iR7mW66tYi9W/BY4ZdvPe8O2b6A6wTXgWKXax0Ef3oE78w+Ydi+zXk9zuYFW0Wg0yRcCg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715015432; c=relaxed/simple;
-	bh=nQ6A1G+YfyilvCrEbNSMZohi4VS6CsKNHby1nOKnoBw=;
-	h=MIME-Version:Message-ID:From:To:Cc:Subject:Content-Type:Date:
-	 In-Reply-To:References; b=eUUCpHl7342VOShLy+RaK7UypsFaR29NHDjfYmmkSEL6O2oJaZtNFOk20PZwH3pVcU9E81JH8JQ0ilMFPMhGMRZc8sBgAzbH5xCyrTmQNe8Bk1ivlfNrmIybo+GFbUt3esmGVnFjvC07xQZyhEOdyCNZmmhvMtPxXCSMqvUoskc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=public-files.de; spf=pass smtp.mailfrom=public-files.de; dkim=pass (2048-bit key) header.d=public-files.de header.i=frank-w@public-files.de header.b=gJ61EK3H; arc=none smtp.client-ip=212.227.17.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=public-files.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=public-files.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=public-files.de;
-	s=s31663417; t=1715015403; x=1715620203; i=frank-w@public-files.de;
-	bh=LJYIL0LCua5I7GyM9P2JXLRaCpX35/16NeySh6HEz6o=;
-	h=X-UI-Sender-Class:MIME-Version:Message-ID:From:To:Cc:Subject:
-	 Content-Type:Date:In-Reply-To:References:
-	 Content-Transfer-Encoding:cc:content-transfer-encoding:
-	 content-type:date:from:message-id:mime-version:reply-to:subject:
-	 to;
-	b=gJ61EK3HSaS0aZI9ASubAm20Wp3cx6GXxil8fV43mga0mAFkDsmIDUjNVPKPqyQf
-	 Y7ZILUyY6nLw9wU1wMWFS1PFsbcTjfCiPlB97xyw9oRzcYYghMaRVHpkchxRLZ+MV
-	 QO64+mziqBWEF4M4IpVlKnHczaVa8QsDOutyFZGOpDLhgNIIHaQrG3HpFUJIFcFtW
-	 rFocsDoMvyMIkhkhdjUjtzOoRVmouGHRNJ5sZN2pyqOhYAzTyL/BeyTAZmL66WInT
-	 QBzob+1YvWtadVt5PTBBX4P0VxAqSfa4wLRebyyVob/rAl0Qn119VPbXDQhuUtQsA
-	 liWTqm5vodISZ73ASA==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from [80.245.77.247] ([80.245.77.247]) by web-mail.gmx.net
- (3c-app-gmx-bap23.server.lan [172.19.172.93]) (via HTTP); Mon, 6 May 2024
- 19:10:02 +0200
+	s=arc-20240116; t=1715015505; c=relaxed/simple;
+	bh=LGFYdoQCzAi5HsZnju8zdzQ4E+Uk80WyqMqgG7ChIFw=;
+	h=From:Date:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=jEWSW+dvNp/qtFFDLYY8dFLUYtVHe9aaDnU+YSBgTxo50nF37K/Rszktpd1diH55dBCgzTRQ5ssir4gyW7Gq+aJcdRuLhtNk6qTskvr0DjGTP5wTpi6ETtHYIsm83w1CBmqCjm1R4HscuJIeFpmVjA0XlmvAlAwBiFIvHp/4U1E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RdPBQwlU; arc=none smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1715015503; x=1746551503;
+  h=from:date:to:cc:subject:in-reply-to:message-id:
+   references:mime-version;
+  bh=LGFYdoQCzAi5HsZnju8zdzQ4E+Uk80WyqMqgG7ChIFw=;
+  b=RdPBQwlUK5L48iqe7p/UIrNbq80RLAq/iJb8PD4UuJrWlXIwkSuCide2
+   HubxPGdTozSbwnEnjLE0XH+d/DhCzSYJI8m40UsA2QLDU2iO/EJt3zKuq
+   MIBi0JI8w12rIqGe3+yDamcBgkSQMkPH0HReOVh2++GyegUaaoYZkmH//
+   DCsOFMi8u/kThr0fM7i9dRCvc1LiNnq8kmneNvFMOpJTbfol7zRPgY+IF
+   YNZ6CyZCPp3JL03SK80ORNGfyvvXvb4gl0CBnfsR3D+g86HXPWWmjYZGy
+   CwuFrv9/TzPqdRkGp4wgrz/35tnPgKnR5wTpl1K8doNqHL7MkT77AdCNg
+   w==;
+X-CSE-ConnectionGUID: ozx6vS5XQKS3gZl0M72bqQ==
+X-CSE-MsgGUID: rCHn4wSYRdeU1GRf7KEsZQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11065"; a="10649736"
+X-IronPort-AV: E=Sophos;i="6.07,259,1708416000"; 
+   d="scan'208";a="10649736"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2024 10:11:42 -0700
+X-CSE-ConnectionGUID: tdGZxArMTJOh9yCIaQhkTA==
+X-CSE-MsgGUID: ufIanFWhRTi4J6CQpim4EA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,259,1708416000"; 
+   d="scan'208";a="28814581"
+Received: from ijarvine-desk1.ger.corp.intel.com (HELO localhost) ([10.245.247.68])
+  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2024 10:11:34 -0700
+From: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
+Date: Mon, 6 May 2024 20:11:30 +0300 (EEST)
+To: Christoph Fritz <christoph.fritz@hexdev.de>
+cc: Jiri Slaby <jirislaby@kernel.org>, 
+    Oliver Hartkopp <socketcan@hartkopp.net>, 
+    Marc Kleine-Budde <mkl@pengutronix.de>, 
+    Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
+    "David S . Miller" <davem@davemloft.net>, 
+    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+    Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+    Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+    Conor Dooley <conor+dt@kernel.org>, Jiri Kosina <jikos@kernel.org>, 
+    Benjamin Tissoires <bentiss@kernel.org>, 
+    Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+    Sebastian Reichel <sre@kernel.org>, 
+    Linus Walleij <linus.walleij@linaro.org>, 
+    Andreas Lauser <andreas.lauser@mercedes-benz.com>, 
+    Jonathan Corbet <corbet@lwn.net>, Pavel Pisa <pisa@cmp.felk.cvut.cz>, 
+    linux-can@vger.kernel.org, Netdev <netdev@vger.kernel.org>, 
+    devicetree@vger.kernel.org, linux-input@vger.kernel.org, 
+    linux-serial <linux-serial@vger.kernel.org>
+Subject: Re: [PATCH v3 09/11] can: lin: Handle rx offload config frames
+In-Reply-To: <20240502182804.145926-10-christoph.fritz@hexdev.de>
+Message-ID: <9cf35451-9d03-e487-c06b-580208ac3a3d@linux.intel.com>
+References: <20240502182804.145926-1-christoph.fritz@hexdev.de> <20240502182804.145926-10-christoph.fritz@hexdev.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <trinity-c7cd6e30-cb34-4405-9527-6e183179c302-1715015402906@3c-app-gmx-bap23>
-From: Frank Wunderlich <frank-w@public-files.de>
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: Frank Wunderlich <linux@fw-web.de>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley
- <conor+dt@kernel.org>, Michael Turquette <mturquette@baylibre.com>, Stephen
- Boyd <sboyd@kernel.org>, Pavel Machek <pavel@ucw.cz>, Lee Jones
- <lee@kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Eric
- Woudstra <ericwouds@gmail.com>, Tianling Shen <cnsztl@immortalwrt.org>,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-clk@vger.kernel.org, linux-leds@vger.kernel.org,
- netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org
-Subject: Aw: Re: [RFC v1 1/5] dt-bindings: leds: add led trigger netdev
-Content-Type: text/plain; charset=UTF-8
-Date: Mon, 6 May 2024 19:10:02 +0200
-Importance: normal
-Sensitivity: Normal
-In-Reply-To: <8e9fd4c9-f537-4413-b8c8-988b001b64c0@linaro.org>
-References: <20240505164549.65644-1-linux@fw-web.de>
- <20240505164549.65644-2-linux@fw-web.de>
- <8e9fd4c9-f537-4413-b8c8-988b001b64c0@linaro.org>
-X-UI-Message-Type: mail
-X-Priority: 3
-X-Provags-ID: V03:K1:yRoHSmlYbliSr60RvZ/khIxq1E6EyLOJH41wAY3Q/leEpoCx389vdror4fKSCp25ghFTm
- GMwxlI3pexIMgnV0dR1Vfjm1xbHoM7cWgG7ujE65mpiq8YFtCWcnacKC2SMfw5f4FnJ+plyt4Eg1
- sXc/a43oIPgvMX1agXXTcW/jhtU7ZDHTKGtlmg/95oPdctGctcuuugw0zBnmOlh5Mzdk+Q/1ZHld
- +V5YFDwz0kXK509qQTItQhKsSjgb44Eaxv0VFiUxLJnDI3jXnqYkC+1RFEcUUsZMmGZ2azAWd9RN
- yQ=
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:oA+GDCWG4pY=;FwAfG1QfD2P5ddgCezPknjt5fut
- O9rd4YXgF2vtgT1ezSDqbfmnqO0LJVH8lL1EjCEW/gfdWBglenGT5ONqYeY6tDSwpuHfKeRBr
- 99oWdvwEworRPcopiI7G9Fpq8Z1DIo/uHNV6LfxdDP0CuLsjyFciGvD92CRlueGYJ+VcE8lA0
- 03R2gTus5YPdDOaRwL8Ym5LED/oFAg1ztfCq/ziM4qina23/RrjSZcDJbiRa1CmqMSUieAcro
- 1Ke0vcD8xrPrSokeft7j3ei5Y76+vSTfeuB5XAU/uIVdL8J72VzyL2BmoN/LIcIfVA2Skgp56
- UAo54QmjW2NnQVGB0XnnTQEuyN2PUwFjXLmNJsGAUhnnTDzKGG7isfJjwWARvTPg0z+JqLisu
- cHFxz0TMUisCeXVfoQxBVG4TnUgBwzKD5c1HSTCHZnMHeZC+2d+mZCTJd5bEiWp5F0wEpO7hp
- EzV5DofsWov4ADAunGKXJOaxUnIpS42ApPoJ+pS5Sv2sS8ubT6BGx5fu1XCfKk67VOIDvttGz
- AzRPjX5XwBGDgCWv4sEILlvjyoRKR9FiG1cCzkJTv9Sab5l1HRclU9LFzPuCqS52gdVSQd1up
- CXYorKl4+KWOR3mz/Cis47bVXm137VXZX2zlLUduN2x44x8nTUoGTivqjzw86fNusaX8M7DHc
- GEsxu2a/cWR1qEitW+A4yxCkUmjXF1nAHhdCMrfBXyyoTIoAjdt7DPjph1tmIxE=
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
 
-Hi
+On Thu, 2 May 2024, Christoph Fritz wrote:
 
-> Gesendet: Montag, 06. Mai 2024 um 10:18 Uhr
-> Von: "Krzysztof Kozlowski" <krzysztof.kozlowski@linaro.org>
-> An: "Frank Wunderlich" <linux@fw-web.de>, "Rob Herring" <robh@kernel.org=
->, "Krzysztof Kozlowski" <krzysztof.kozlowski+dt@linaro.org>, "Conor Doole=
-y" <conor+dt@kernel.org>, "Michael Turquette" <mturquette@baylibre.com>, "=
-Stephen Boyd" <sboyd@kernel.org>, "Pavel Machek" <pavel@ucw.cz>, "Lee Jone=
-s" <lee@kernel.org>, "David S. Miller" <davem@davemloft.net>, "Eric Dumaze=
-t" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>, "Paolo Abeni=
-" <pabeni@redhat.com>, "Matthias Brugger" <matthias.bgg@gmail.com>, "Angel=
-oGioacchino Del Regno" <angelogioacchino.delregno@collabora.com>
-> Cc: "Frank Wunderlich" <frank-w@public-files.de>, "Eric Woudstra" <ericw=
-ouds@gmail.com>, "Tianling Shen" <cnsztl@immortalwrt.org>, devicetree@vger=
-.kernel.org, linux-kernel@vger.kernel.org, linux-clk@vger.kernel.org, linu=
-x-leds@vger.kernel.org, netdev@vger.kernel.org, linux-arm-kernel@lists.inf=
-radead.org, linux-mediatek@lists.infradead.org
-> Betreff: Re: [RFC v1 1/5] dt-bindings: leds: add led trigger netdev
->
-> On 05/05/2024 18:45, Frank Wunderlich wrote:
-> > From: Frank Wunderlich <frank-w@public-files.de>
-> >
-> > Add led trigger implemented with config-symbol LEDS_TRIGGER_NETDEV to
-> > binding.
-> >
-> > Signed-off-by: Frank Wunderlich <frank-w@public-files.de>
-> > ---
-> >  Documentation/devicetree/bindings/leds/common.yaml | 2 ++
-> >  1 file changed, 2 insertions(+)
-> >
-> > diff --git a/Documentation/devicetree/bindings/leds/common.yaml b/Docu=
-mentation/devicetree/bindings/leds/common.yaml
-> > index 8a3c2398b10c..bf9a101e4d42 100644
-> > --- a/Documentation/devicetree/bindings/leds/common.yaml
-> > +++ b/Documentation/devicetree/bindings/leds/common.yaml
-> > @@ -113,6 +113,8 @@ properties:
-> >              # LED indicates NAND memory activity (deprecated),
-> >              # in new implementations use "mtd"
-> >            - nand-disk
-> > +            # LED indicates network activity
-> > +          - netdev
->
-> "dev" is redundant (there is no flash-dev or usb-host-dev). Two network
-> interfaces are already provided, so your commit msg must provide
-> rationale why this is not enough and why this is useful/needed.
+> The CAN Broadcast Manager now has the capability to dispatch CANFD
+> frames marked with the id LINBUS_RXOFFLOAD_ID. This patch introduces
+> functionality to interpret these specific frames, enabling the
+> configuration of RX offloading within the LIN driver.
+> 
+> Signed-off-by: Christoph Fritz <christoph.fritz@hexdev.de>
+> ---
+>  drivers/net/can/lin.c | 29 +++++++++++++++++++++++++++++
+>  1 file changed, 29 insertions(+)
+> 
+> diff --git a/drivers/net/can/lin.c b/drivers/net/can/lin.c
+> index 95906003666fb..ee2ebea2c865f 100644
+> --- a/drivers/net/can/lin.c
+> +++ b/drivers/net/can/lin.c
+> @@ -194,6 +194,27 @@ static void lin_remove_sysfs_id_files(struct net_device *ndev)
+>  	}
+>  }
+>  
+> +static int lin_setup_rxoffload(struct lin_device *ldev,
+> +			       struct canfd_frame *cfd)
+> +{
+> +	struct lin_responder_answer answ;
+> +
+> +	if (!(cfd->flags & CANFD_FDF))
+> +		return -EMSGSIZE;
 
-i only see 1 network binding...and this is labeled/described with wlan and=
- phy
+This seems a bit odd error code.
 
-        # LED is triggered by WLAN activity
-      - pattern: "^phy[0-9]+tx$"
+> +	BUILD_BUG_ON(sizeof(struct lin_responder_answer) > sizeof(cfd->data));
+> +	memcpy(&answ, cfd->data, sizeof(struct lin_responder_answer));
 
-which second do you mean?
+2x sizeof(answ)
 
-btw. usb + disk has 3 trigger and "netdev" is already used in some dts, so=
- i thought adding the binding is a good idea
+> +
+> +	answ.lf.checksum_mode = (cfd->can_id & LIN_ENHANCED_CKSUM_FLAG) ?
+> +			LINBUS_ENHANCED : LINBUS_CLASSIC;
+> +
+> +	if (answ.lf.lin_id > LIN_ID_MASK ||
+> +	    answ.event_associated_id > LIN_ID_MASK)
+> +		return -EINVAL;
+> +
+> +	return ldev->ldev_ops->update_responder_answer(ldev, &answ);
+> +}
+> +
+>  static void lin_tx_work_handler(struct work_struct *ws)
+>  {
+>  	struct lin_device *ldev = container_of(ws, struct lin_device,
+> @@ -206,6 +227,14 @@ static void lin_tx_work_handler(struct work_struct *ws)
+>  	ldev->tx_busy = true;
+>  
+>  	cfd = (struct canfd_frame *)ldev->tx_skb->data;
+> +
+> +	if (cfd->can_id & LIN_RXOFFLOAD_DATA_FLAG) {
+> +		ret = lin_setup_rxoffload(ldev, cfd);
+> +		if (ret < 0)
+> +			netdev_err(ndev, "setting up rx failed %d\n", ret);
+> +		goto lin_tx_out;
+> +	}
+> +
+>  	lf.checksum_mode = (cfd->can_id & LIN_ENHANCED_CKSUM_FLAG) ?
+>  			   LINBUS_ENHANCED : LINBUS_CLASSIC;
+>  	lf.lin_id = cfd->can_id & LIN_ID_MASK;
+> 
 
-arch/arm/boot/dts/rockchip/rk3128-xpi-3128.dts:107:			 * linux,default-tri=
-gger =3D "netdev";
-arch/arm/boot/dts/nxp/imx/imx53-m53menlo.dts:52:			linux,default-trigger =
-=3D "netdev";
-arch/arm/boot/dts/intel/ixp/intel-ixp42x-dlink-dsm-g600.dts:51:			linux,de=
-fault-trigger =3D "netdev";
-arch/arm/boot/dts/intel/ixp/intel-ixp42x-iomega-nas100d.dts:39:			linux,de=
-fault-trigger =3D "netdev";
-arch/arm/boot/dts/ti/omap/am5729-beagleboneai.dts:138:			linux,default-tri=
-gger =3D "netdev";
-arch/arm/boot/dts/ti/omap/am335x-netcan-plus-1xx.dts:27:			linux,default-t=
-rigger =3D "netdev";
-arch/mips/boot/dts/ralink/gardena_smart_gateway_mt7688.dts:107:			linux,de=
-fault-trigger =3D "netdev";
-arch/mips/boot/dts/ralink/gardena_smart_gateway_mt7688.dts:113:			linux,de=
-fault-trigger =3D "netdev";
+-- 
+ i.
 
-first one has it as comment that not yet in binding and with not that it n=
-eeds to be set in userspace
-like Daniel stated in the dts patch (does not work for phys)...so i drop t=
-his patch and the property
-in the dts.
-
-> Best regards,
-> Krzysztof
-
-regards Frank
 
