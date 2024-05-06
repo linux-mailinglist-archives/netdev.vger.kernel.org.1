@@ -1,146 +1,159 @@
-Return-Path: <netdev+bounces-93613-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93614-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5406C8BC729
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 07:51:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A401F8BC73E
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 08:00:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8CDBFB20B90
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 05:51:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 03849280F38
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 06:00:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A076647F6B;
-	Mon,  6 May 2024 05:51:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7020F482D8;
+	Mon,  6 May 2024 06:00:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="hNVyQ5/H"
+	dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b="EHiCA22R";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b="Vtm39H5a"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+Received: from mx1.tq-group.com (mx1.tq-group.com [93.104.207.81])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E719545944;
-	Mon,  6 May 2024 05:51:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFA05446CF;
+	Mon,  6 May 2024 06:00:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.104.207.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714974708; cv=none; b=PS8yDlXhTiljO3ByUzdUrQcMs/zlJZsdc2BfmaNtTKTm9S6Nd8v1ETyjt1pd+gzwkfQMGuIaUFxpGzHw/OeL2maK/N7t67HOYIEvB6Vj78vqXVjcZW+qmpmlotBZTmDciou+RYh8HpNsleou9DcgsSysoTexo+bu+Q0jjC3FyJQ=
+	t=1714975208; cv=none; b=YTYgDhDraTr8nT7WRPXGYzo/4C9DglLyK9Dq5ujrEvPgtNbhnLAeswQmjfQlJPMcF8x/dExZHxPeNWMTE3pL2b6tco5H/K+4nfoSXgbfIAeSFKeC8nePst2fo3UpwCttwYIsxn9mo+DuXmYkHKsgk7UK/uWhcGoOHyFm4Iac2vs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714974708; c=relaxed/simple;
-	bh=qWuxR1mmdWJZycxMqZiN1bfoIP23U3q1cvktHbZ8yCY=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VSi5GvRvtE1a0eSgWTTSKlDY7+gxvRWuQI6d4hy3O4wuzAyflwNNJpPW8wam9erz8kt+T1CuvH19DIa7LuCGIf114MlQaaJ5KtOSXeAyTU1+cOg6kn2LdGFLg0ZpI2cCfHDVxhorZMmxADiF56VhCDAgY5rOkqB9v11EXCfYdv8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=hNVyQ5/H; arc=none smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 445NPcu5019500;
-	Sun, 5 May 2024 22:51:25 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	date:from:to:cc:subject:message-id:references:mime-version
-	:content-type:in-reply-to; s=pfpt0220; bh=0qDKAgjGvfAMrYimnj22hq
-	Df2zMN4qY/aEWHAZLcpIM=; b=hNVyQ5/HHE6Rt7BVnGkBd2vD/iSb6k/tWlqTA+
-	91MC7UcyBhb8HwzY5gfhU5YF9EqIb3xSvQuYZK4lEEUy9wClaa1DKRkKr5qWt26L
-	dKiCV+kImbOLwtA9GzaSCVgC65RqbsjH4RyCldKbSarg3yH9jV73DyL3F2L929Ow
-	xXs5afXOfqF7UZTybjIAxGWNRHG9nA3BpFNHxTF3QsSJ6SD5Hcwh0jWqS3MlQQiJ
-	4gCIKRKmqA79tKmqhlqSzBNorxZXYoe+uqqL4lyaOxeFIUuRwQFMRFSi89Ombsdj
-	Fp0WgJIFcrajeegVgrn3WediQNblsqmoZy8gF7ywiWm2WUsQ==
-Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3xwmhgbhc0-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sun, 05 May 2024 22:51:25 -0700 (PDT)
-Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
- DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Sun, 5 May 2024 22:51:24 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
- (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Sun, 5 May 2024 22:51:24 -0700
-Received: from maili.marvell.com (unknown [10.28.36.165])
-	by maili.marvell.com (Postfix) with SMTP id AD2673F7041;
-	Sun,  5 May 2024 22:51:20 -0700 (PDT)
-Date: Mon, 6 May 2024 11:21:19 +0530
-From: Ratheesh Kannoth <rkannoth@marvell.com>
-To: Wen Gu <guwen@linux.alibaba.com>
-CC: <wenjia@linux.ibm.com>, <jaka@linux.ibm.com>, <davem@davemloft.net>,
-        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-        <alibuda@linux.alibaba.com>, <tonylu@linux.alibaba.com>,
-        <linux-s390@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net] net/smc: fix netdev refcnt leak in
- smc_ib_find_route()
-Message-ID: <20240506055119.GA939370@maili.marvell.com>
-References: <20240506015439.108739-1-guwen@linux.alibaba.com>
+	s=arc-20240116; t=1714975208; c=relaxed/simple;
+	bh=KgXnKpGS7j1W3cutgX8wg9tLYZP638mj6jJLbZ5G8vc=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=CuEQdz22JXI2DJSx7KozMjFZb2yKWkMyH92eJpwBDaEFBNSe7St8dnYuDfv1AHA8Lzo/xqmfCyMAZnDOzMxvpCdM2sh8ayCOKcjeXf5G8m6EzgQKEyvJRVc8HhvsXS5/o19MtkrYpOoYTf/VO+3+eaDK1V4HgbulNVqZVGWKUP8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com; spf=pass smtp.mailfrom=ew.tq-group.com; dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b=EHiCA22R; dkim=fail (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b=Vtm39H5a reason="key not found in DNS"; arc=none smtp.client-ip=93.104.207.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ew.tq-group.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
+  t=1714975204; x=1746511204;
+  h=from:subject:date:message-id:mime-version:
+   content-transfer-encoding:to:cc;
+  bh=l3MdTi3j5rgN9hablWq4x9eXzyjzcKzMbwO6NXO+aaM=;
+  b=EHiCA22RU9a6TXMdsKwwIqJVsGtLy/nqR+iOqStrG+o992P/BkEGyyX8
+   AlTIA662U27S3PHqo3hudlvYXGL9vxzuF0onKdWGuKAnhix9e3IqAIqh7
+   eSYoVgRWaOM9wfNhAzegjh6ziZk8aDNPk+h0lRI0VAQoLW3w3334LDqrQ
+   gLnVuKjw3uu562s0en0eY3DeQPsNjznLGaTpq/d4BGQg3X7eJ52T18jii
+   c19JNp6d5xxLFiQf0u1X8Z9u96/uyf+BxLTolXKP4d0HR5GMoYjpaWBCp
+   JgwN4cyZh/AfVX/H1zb718Cafm6IHfxN2KYE7It9QUN2lwf+AUaJ9DQLX
+   w==;
+X-CSE-ConnectionGUID: +uTMB1GFQXmbfrsmdPDoVA==
+X-CSE-MsgGUID: OMx7XGLVRQq/x9s8/5GUDQ==
+X-IronPort-AV: E=Sophos;i="6.07,257,1708383600"; 
+   d="scan'208";a="36751415"
+Received: from vmailcow01.tq-net.de ([10.150.86.48])
+  by mx1.tq-group.com with ESMTP; 06 May 2024 07:59:55 +0200
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id B3BD9173BE6;
+	Mon,  6 May 2024 07:59:48 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ew.tq-group.com;
+	s=dkim; t=1714975190;
+	h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding; bh=l3MdTi3j5rgN9hablWq4x9eXzyjzcKzMbwO6NXO+aaM=;
+	b=Vtm39H5anoxbM1aUl+yWA8prXdExh6xoe229iwcpBplsba0xQz+fZERui+38S4ew+gBFiI
+	O25THqy0p+Oq8btgHkFC4cWbf1Ol3kb22FnSbF8EzRjDhhYOS2fSNH9DlJRLx+CGmGXFN2
+	uJVaQMQEdVoKF6u7itQctQSxaxWMuSObQPx00/2BbnWrEjBBXsP41qrwR/oYFjgxnOMmYB
+	xt9lOqQqVQYDudGuzR8wrwz0/+g6DxFyH3+4DmtU3gqg+uWcwLaDgmbUeRTx/w2e3y9Bj+
+	9NS7yyzxk/mQubr0Bjsb8xLntzq5N5OEAC4hKu65+5Q0Uo2/DUObcxAbZ+Y8jg==
+From: Gregor Herburger <gregor.herburger@ew.tq-group.com>
+Subject: [PATCH v2 0/6] can: mcp251xfd: add gpio functionality
+Date: Mon, 06 May 2024 07:59:42 +0200
+Message-Id: <20240506-mcp251xfd-gpio-feature-v2-0-615b16fa8789@ew.tq-group.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20240506015439.108739-1-guwen@linux.alibaba.com>
-X-Proofpoint-ORIG-GUID: sxacuzMeS6svxM1YrwHC2oC8Pva_seO1
-X-Proofpoint-GUID: sxacuzMeS6svxM1YrwHC2oC8Pva_seO1
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1011,Hydra:6.0.650,FMLib:17.11.176.26
- definitions=2024-05-06_02,2024-05-03_02,2023-05-22_02
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-B4-Tracking: v=1; b=H4sIAM5xOGYC/4WNOw6DMBAFr4JcZ5FtAflUuUdEYZY1bAE2NhAix
+ N3jcIGUM9Kbt4tIgSmKR7aLQCtHdmMCfckE9mbsCLhNLLTUhSzUFQb0ulSbbaHz7MCSmZdAoO9
+ GNbYy2JSFSGMfyPJ2hl914p7j7MLn/FnVz/5NrgokNCixUraVeJNPeufzBF1wi8/RDaI+juMLO
+ Dhl3sIAAAA=
+To: Marc Kleine-Budde <mkl@pengutronix.de>, 
+ Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>, 
+ Thomas Kopp <thomas.kopp@microchip.com>, 
+ Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Rob Herring <robh@kernel.org>, 
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
+ Conor Dooley <conor+dt@kernel.org>
+Cc: linux-can@vger.kernel.org, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, devicetree@vger.kernel.org, 
+ linux@ew.tq-group.com, gregor.herburger@ew.tq-group.com
+X-Mailer: b4 0.13.0
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1714975188; l=2584;
+ i=gregor.herburger@ew.tq-group.com; s=20230829; h=from:subject:message-id;
+ bh=KgXnKpGS7j1W3cutgX8wg9tLYZP638mj6jJLbZ5G8vc=;
+ b=7MCvY1oUqEGxOEz551MKsVGPD++UONYKxvQw8sMdfJLoFDcUcnb9IVLWW5VJUx17pEC7RdbSr
+ W0gcK9K3JooCnPXfEtdH/OrQn++G+vXjgMaBpr51GxzxdHDDkPv2hCX
+X-Developer-Key: i=gregor.herburger@ew.tq-group.com; a=ed25519;
+ pk=+eRxwX7ikXwazcRjlOjj2/tbDmfVZdDLoW+xLZbQ4h4=
+X-Last-TLS-Session-Version: TLSv1.3
 
-On 2024-05-06 at 07:24:39, Wen Gu (guwen@linux.alibaba.com) wrote:
-> A netdev refcnt leak issue was found when unregistering netdev after
-> using SMC. It can be reproduced as follows.
->
-> - run tests based on SMC.
-> - unregister the net device.
->
-> The following error message can be observed.
->
-> 'unregister_netdevice: waiting for ethx to become free. Usage count = x'
->
-> With CONFIG_NET_DEV_REFCNT_TRACKER set, more detailed error message can
-> be provided by refcount tracker:
->
->  unregister_netdevice: waiting for eth1 to become free. Usage count = 2
->  ref_tracker: eth%d@ffff9cabc3bf8548 has 1/1 users at
->       ___neigh_create+0x8e/0x420
->       neigh_event_ns+0x52/0xc0
->       arp_process+0x7c0/0x860
->       __netif_receive_skb_list_core+0x258/0x2c0
->       __netif_receive_skb_list+0xea/0x150
->       netif_receive_skb_list_internal+0xf2/0x1b0
->       napi_complete_done+0x73/0x1b0
->       mlx5e_napi_poll+0x161/0x5e0 [mlx5_core]
->       __napi_poll+0x2c/0x1c0
->       net_rx_action+0x2a7/0x380
->       __do_softirq+0xcd/0x2a7
->
-> It is because in smc_ib_find_route(), neigh_lookup() takes a netdev
-> refcnt but does not release. So fix it.
->
-> Fixes: e5c4744cfb59 ("net/smc: add SMC-Rv2 connection establishment")
-> Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
-> ---
->  net/smc/smc_ib.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/net/smc/smc_ib.c b/net/smc/smc_ib.c
-> index 97704a9e84c7..b431bd8a5172 100644
-> --- a/net/smc/smc_ib.c
-> +++ b/net/smc/smc_ib.c
-> @@ -210,10 +210,11 @@ int smc_ib_find_route(struct net *net, __be32 saddr, __be32 daddr,
->  		goto out;
->  	if (rt->rt_uses_gateway && rt->rt_gw_family != AF_INET)
-need to release it here as well ?
+Hi all,
 
->  		goto out;
-> -	neigh = rt->dst.ops->neigh_lookup(&rt->dst, NULL, &fl4.daddr);
-> +	neigh = dst_neigh_lookup(&rt->dst, &fl4.daddr);
->  	if (neigh) {
->  		memcpy(nexthop_mac, neigh->ha, ETH_ALEN);
->  		*uses_gateway = rt->rt_uses_gateway;
-> +		neigh_release(neigh);
->  		return 0;
->  	}
->  out:
-> --
-> 2.32.0.3.g01195cf9f
->
+The mcp251xfd allows two pins to be configured as GPIOs. This series
+adds support for this feature.
+
+The GPIO functionality is controlled with the IOCON register which has
+an erratum. The second patch is to work around this erratum. I am not
+sure if the place for the check and workaround in
+mcp251xfd_regmap_crc_write is correct or if the check could be bypassed
+with a direct call to mcp251xfd_regmap_crc_gather_write. If you have a
+better suggestion where to add the check please let me know.
+
+Patch 1-3 from https://lore.kernel.org/linux-can/20240429-mcp251xfd-runtime_pm-v1-0-c26a93a66544@pengutronix.de/
+Patch 4 is the fix/workaround for the aforementioned erratum
+Patch 5 adds the gpio support
+Patch 6 updates dt-binding
+
+---
+Changes in v2:
+- picked Marcs patches from https://lore.kernel.org/linux-can/20240429-mcp251xfd-runtime_pm-v1-0-c26a93a66544@pengutronix.de/
+- Drop regcache
+- Add pm_runtime in mcp251xfd_gpio_request/mcp251xfd_gpio_free
+- Implement mcp251xfd_gpio_get_multiple/mcp251xfd_gpio_set_multiple
+- Move check for rx_int/gpio conflict to mcp251xfd_gpio_request
+- Link to v1: https://lore.kernel.org/r/20240417-mcp251xfd-gpio-feature-v1-0-bc0c61fd0c80@ew.tq-group.com
+
+---
+Gregor Herburger (3):
+      can: mcp251xfd: mcp251xfd_regmap_crc_write(): workaround for errata 5
+      can: mcp251xfd: add gpio functionality
+      dt-bindings: can: mcp251xfd: add gpio-controller property
+
+Marc Kleine-Budde (3):
+      can: mcp251xfd: properly indent labels
+      can: mcp251xfd: move mcp251xfd_timestamp_start()/stop() into mcp251xfd_chip_start/stop()
+      can: mcp251xfd: move chip sleep mode into runtime pm
+
+ .../bindings/net/can/microchip,mcp251xfd.yaml      |   5 +
+ drivers/net/can/spi/mcp251xfd/mcp251xfd-core.c     | 310 +++++++++++++++++----
+ drivers/net/can/spi/mcp251xfd/mcp251xfd-dump.c     |   2 +-
+ drivers/net/can/spi/mcp251xfd/mcp251xfd-regmap.c   |  31 ++-
+ drivers/net/can/spi/mcp251xfd/mcp251xfd-tef.c      |   2 +-
+ .../net/can/spi/mcp251xfd/mcp251xfd-timestamp.c    |   7 +-
+ drivers/net/can/spi/mcp251xfd/mcp251xfd-tx.c       |   2 +-
+ drivers/net/can/spi/mcp251xfd/mcp251xfd.h          |   7 +
+ 8 files changed, 303 insertions(+), 63 deletions(-)
+---
+base-commit: 1fdad13606e104ff103ca19d2d660830cb36d43e
+change-id: 20240417-mcp251xfd-gpio-feature-29a1bf6acb54
+
+Best regards,
+-- 
+TQ-Systems GmbH | Mühlstraße 2, Gut Delling | 82229 Seefeld, Germany
+Amtsgericht München, HRB 105018
+Geschäftsführer: Detlef Schneider, Rüdiger Stahl, Stefan Schneider
+https://www.tq-group.com/
+
 
