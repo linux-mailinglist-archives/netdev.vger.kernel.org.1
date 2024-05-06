@@ -1,184 +1,152 @@
-Return-Path: <netdev+bounces-93813-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93814-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 621898BD43F
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 20:00:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F2988BD458
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 20:04:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 870C5B21920
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 18:00:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BE12F1C21973
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 18:04:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5CC91586F5;
-	Mon,  6 May 2024 18:00:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C99991586F5;
+	Mon,  6 May 2024 18:04:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YE0vQ+R6"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="TugZZ1HB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27C2C197;
-	Mon,  6 May 2024 18:00:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FA0E1586CD
+	for <netdev@vger.kernel.org>; Mon,  6 May 2024 18:04:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715018428; cv=none; b=LhHSIvYP+3a67Od1C391/Do7JFjwtDIUC3GZJzgcv0PYpZV7pYkt+Y7EswQTBWTXogqepgO9J+PnVCEIall/MjcmEF5ZeF4sMduvvYKFD34mKmkNCwCz7E0rkpBY8u+Xcxl6t0xq/pDz/FBl6VMoMBBD8yCbySIToQ9z0sI8kYo=
+	t=1715018666; cv=none; b=elVTR+w6M/1rf9YRAIPYvcPkYDb5ZXz7/YHJ9H2VdLj7zpg57t35rjAV3fTyg6QAAJARMY6KaPCT6P/OTSNw/n5fT50ZtV0S8B4p3KuFSomnKGBz2W//vahfAMbX3IjDmqo9Sbpl4tcywf4vWglU76LaTihhGg4bD6APAywLYAs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715018428; c=relaxed/simple;
-	bh=no6tilYKngaoTOqfGFWOgA/5oNjItKCJRl53C/eguWs=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=SflK/qCXpvhQZtf6wTN2tDm0BXbCyCV5AfbIN+seXLEKuDZepjOasmYlJejUjkAWZQ3AK8YQ/J7bzDHdr9BJRiAU8UW7XUofQJwUsklbN8EQNIpk+hcp4iY4LiWD5Wjtn0qnvrX733B9ti59IrvNxLyvPfs9PEadHmTIIn73XIM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YE0vQ+R6; arc=none smtp.client-ip=209.85.219.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f45.google.com with SMTP id 6a1803df08f44-69b5de48126so6386056d6.3;
-        Mon, 06 May 2024 11:00:26 -0700 (PDT)
+	s=arc-20240116; t=1715018666; c=relaxed/simple;
+	bh=cAhKDATngg5XYWtp3wm/gO2bAzCF+ksynWN1+HGqIgw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ank8FzavNSYdsqgZk9tlpdbh6t7O6JsYrDjVCXt89Gw+cVLyRX4HtrxvR3EH1qwi5YSaDth0ZzDGarUvrYl1pOnxLOmx0Zd+4C1aSX3XvJmNidtwOWzqJ720H4SGmmh+fbtG/pPrhSfYcun1VedsUeFlQpAST70QMqn+z3t9bZQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=TugZZ1HB; arc=none smtp.client-ip=209.85.210.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-6f489e64eb3so445976b3a.1
+        for <netdev@vger.kernel.org>; Mon, 06 May 2024 11:04:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715018426; x=1715623226; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ewxWon8y3EC8f5KNKIlRB63vgk6021CZpyEJEMa3QaQ=;
-        b=YE0vQ+R6b8+ln631z0TtxZkL1Hc1RORoY4+kXk8FURwK21zPa25F8JvJ8zqnt53rtK
-         gw3EvkB5iLLQiGvYeJTaSArvTf3sv3Rjt2aeti674KU0iyDw6IglO/nDFouh6e1Kow6h
-         c+qQwBR8VY13D86XMOFeH8i7lIM7VHLAJZgP/uyZXY6gO1v+pZsIpr3Q9HYUpESJr0Wm
-         rZYLikTE77RD1uyHASYnGmUDEd7mLSNjSD05bzyaB17eEXr3AXqLDBDxgWuJRzUE7+eq
-         QE9RXAqPB0GO322+dT8WSmtofjBxuJdUSHPWzmfFl7bU9bqsMpmBsUorPfzEYX6iIzmd
-         PBbA==
+        d=fastly.com; s=google; t=1715018664; x=1715623464; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=te4/Y4Ex1bU5Fl7piJ8mgbBAfhUkYcVHwGSxY1/VZ2Y=;
+        b=TugZZ1HBqBbqQJ0K9saySdstreGXiIszyp88wotUwvoyvynHcYwBlsink1K5vY5+vB
+         UViW3LprrUOoanxZz4WB+JNvqRb/eZNluV57t/dZMA0dSyZ3e1HgxBhnSdvDT79DOG7U
+         hiW9T5mqSVcklTiUifQHdYDYKtPfLnW7lAFhE=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715018426; x=1715623226;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=ewxWon8y3EC8f5KNKIlRB63vgk6021CZpyEJEMa3QaQ=;
-        b=WWiIWcSgiSmpwjm+EggzLxwtn3qXwQPYu6aqUPHmas1N19MOHcjPqbEzX1X2wxwUsE
-         iXg/9PwamYRkj65GYurSGpMeO2n1OT4ckeuDMAett6LegDJ8zztPtbFOQ40bSYQ30AuI
-         vQzXMnv96eWenNhU4lr+PxsPSd/xQ5g5LGmnsBy122cFMJdG6XmreIWjsTFMIjjMOOnZ
-         Qo/IhV6BKo02Zj7yv+aJrAK8x2qSa/RHB7O6mOmcgHIlC2REJtT/rbhMRKloTO1KxTWz
-         jp/VMfvH47mFOcxTn/DdLFJYBCmVTXl9hzxZv4A7ktBqpen3rVuiYOcKizmb6D3tLOLI
-         n+vw==
-X-Forwarded-Encrypted: i=1; AJvYcCUfD0366mWmWkicBUoCOMr1l+74+NHMSSfYuBMfZwD1xbiSP1VQMoxMatVuObq/DFtyInwpjMfhc12zn3fPUg3LtGciHgxsSemtdBcEubsOfWTJc0EmTVPquKmRXRzzY9UWJxSKUUkGn2KbkWHFXLP7JT3YpVCIV+vzO6l38tfzB3Sw1+en
-X-Gm-Message-State: AOJu0YxiXNso2uEDwj1kbZuHgnDup8G0nozOxzcNOQGKzh1JV+i9BlBA
-	mvI1f08b/VP3rhdqpAzOmG4f9r0gnDl6tk/VUwUGM2z7EkN5d/d2cneAZQ==
-X-Google-Smtp-Source: AGHT+IHwxi+MsesdxS51NMGdi8E37iQPGrsyCgG+iNUpxejrVgz1gYPJSIt1PiQCGOpKWPnlFwfCJg==
-X-Received: by 2002:a05:6214:19e8:b0:69b:17b2:df34 with SMTP id q8-20020a05621419e800b0069b17b2df34mr13732146qvc.63.1715018424782;
-        Mon, 06 May 2024 11:00:24 -0700 (PDT)
-Received: from localhost (164.146.150.34.bc.googleusercontent.com. [34.150.146.164])
-        by smtp.gmail.com with ESMTPSA id qb17-20020ad44711000000b006a0e585dc77sm3903456qvb.70.2024.05.06.11.00.24
+        d=1e100.net; s=20230601; t=1715018664; x=1715623464;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=te4/Y4Ex1bU5Fl7piJ8mgbBAfhUkYcVHwGSxY1/VZ2Y=;
+        b=LslFm7lJkCV7aDjAjVm+MMK91UGMh2svpDLVDenXIY7mP12DN7Z5RZEW1NUE/ySkgb
+         L42ULKPfyvu3R1vmMkovE0jiZ1yQUXAdKgzQ/o16KDChQnoNStuLDjfpeVd0sc6L903h
+         ri/YXhpuU7BcIGvT8rrHEWwhoAG3PfBiprph03GfI8eHwOqOwKwYgnmKWn5byti8DaFc
+         W6m/7sH7idYDbzUZPvSm+w4TZPrWD0rpOuzvBxLrpdTsI06VG+cLLpteTWjIlJm0G30s
+         jSK9A5ekJsdKJsh/83O03EPLV6CUmxVLTHn0ZHHHKtpamJMsFquGApamO4bBOVjfqzED
+         sj4A==
+X-Forwarded-Encrypted: i=1; AJvYcCVPGHKelECgERwHw8PZc9qo4PNud1RzkrxQ4DnS00PWeR6DMbq7mgtxx2w7v2wvhGn/V4dIoJi8Af8/rRKUnx+9nA5i7/qv
+X-Gm-Message-State: AOJu0YxoMdJ9NWY0e3wdH65wI+kyOcuBv+cyGCyzKsFP+oNKG7wP6hKv
+	TNQhZ0zYFrklPUqCFIm11TQlOTxNxaIoS6FizjeQ11jvebwwmyVv3UV74AgbVP8=
+X-Google-Smtp-Source: AGHT+IGwppSbySl31uGPw1FvJc3LjfLZLPlCmVQ1KC7Gq3CDOyzgBuo4ezyM24BqAPTlNNPjdcMqUA==
+X-Received: by 2002:a05:6a21:620:b0:1af:a4f7:cba1 with SMTP id ll32-20020a056a21062000b001afa4f7cba1mr4246826pzb.31.1715018664422;
+        Mon, 06 May 2024 11:04:24 -0700 (PDT)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id p28-20020a631e5c000000b005e438fe702dsm8248238pgm.65.2024.05.06.11.04.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 May 2024 11:00:24 -0700 (PDT)
-Date: Mon, 06 May 2024 14:00:24 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: John Hubbard <jhubbard@nvidia.com>, 
- Shuah Khan <shuah@kernel.org>, 
- richardbgobert@gmail.com
-Cc: "David S . Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Steffen Klassert <steffen.klassert@secunet.com>, 
- Herbert Xu <herbert@gondor.apana.org.au>, 
- =?UTF-8?B?QW5kcmVhcyBGw6RyYmVy?= <afaerber@suse.de>, 
- Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>, 
- Matthieu Baerts <matttbe@kernel.org>, 
- Mat Martineau <martineau@kernel.org>, 
- Geliang Tang <geliang@kernel.org>, 
- Pravin B Shelar <pshelar@ovn.org>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- Alexander Mikhalitsyn <alexander@mihalicyn.com>, 
- zhujun2 <zhujun2@cmss.chinamobile.com>, 
- Petr Machata <petrm@nvidia.com>, 
- Ido Schimmel <idosch@nvidia.com>, 
- Hangbin Liu <liuhangbin@gmail.com>, 
- Nikolay Aleksandrov <razor@blackwall.org>, 
- Benjamin Poirier <bpoirier@nvidia.com>, 
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>, 
- Dmitry Safonov <0x7f454c46@gmail.com>, 
- netdev@vger.kernel.org, 
- linux-arm-kernel@lists.infradead.org, 
- linux-actions@lists.infradead.org, 
- mptcp@lists.linux.dev, 
- dev@openvswitch.org, 
- Valentin Obst <kernel@valentinobst.de>, 
- linux-kselftest@vger.kernel.org, 
- LKML <linux-kernel@vger.kernel.org>, 
- llvm@lists.linux.dev, 
- John Hubbard <jhubbard@nvidia.com>
-Message-ID: <66391ab83771c_516de294d7@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20240505222639.70317-2-jhubbard@nvidia.com>
-References: <20240505222639.70317-1-jhubbard@nvidia.com>
- <20240505222639.70317-2-jhubbard@nvidia.com>
-Subject: Re: [PATCH 2/2] selftests/net: fix uninitialized variables
+        Mon, 06 May 2024 11:04:23 -0700 (PDT)
+Date: Mon, 6 May 2024 11:04:20 -0700
+From: Joe Damato <jdamato@fastly.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Zhu Yanjun <zyjzyj2000@gmail.com>, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, tariqt@nvidia.com, saeedm@nvidia.com,
+	gal@nvidia.com, nalramli@fastly.com,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	"open list:MELLANOX MLX5 core VPI driver" <linux-rdma@vger.kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next 0/1] mlx5: Add netdev-genl queue stats
+Message-ID: <ZjkbpLRyZ9h0U01_@LQ3V64L9R2>
+References: <20240503022549.49852-1-jdamato@fastly.com>
+ <c3f4f1a4-303d-4d57-ae83-ed52e5a08f69@linux.dev>
+ <ZjUwT_1SA9tF952c@LQ3V64L9R2>
+ <20240503145808.4872fbb2@kernel.org>
+ <ZjV5BG8JFGRBoKaz@LQ3V64L9R2>
+ <20240503173429.10402325@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240503173429.10402325@kernel.org>
 
-John Hubbard wrote:
-> When building with clang, via:
+On Fri, May 03, 2024 at 05:34:29PM -0700, Jakub Kicinski wrote:
+> On Fri, 3 May 2024 16:53:40 -0700 Joe Damato wrote:
+> > > diff --git a/include/net/netdev_queues.h b/include/net/netdev_queues.h
+> > > index c7ac4539eafc..f5d9f3ad5b66 100644
+> > > --- a/include/net/netdev_queues.h
+> > > +++ b/include/net/netdev_queues.h
+> > > @@ -59,6 +59,8 @@ struct netdev_queue_stats_tx {
+> > >   * statistics will not generally add up to the total number of events for
+> > >   * the device. The @get_base_stats callback allows filling in the delta
+> > >   * between events for currently live queues and overall device history.
+> > > + * @get_base_stats can also be used to report any miscellaneous packets
+> > > + * transferred outside of the main set of queues used by the networking stack.
+> > >   * When the statistics for the entire device are queried, first @get_base_stats
+> > >   * is issued to collect the delta, and then a series of per-queue callbacks.
+> > >   * Only statistics which are set in @get_base_stats will be reported
+> > > 
+> > > 
+> > > SG?  
+> > 
+> > I think that sounds good and makes sense, yea. By that definition, then I
+> > should leave the PTP stats as shown above. If you agree, I'll add that
+> > to the v2.
 > 
->     make LLVM=1 -C tools/testing/selftest
+> Yup, agreed.
 > 
-> ...clang warns about three variables that are not initialized in all
-> cases:
+> > I feel like I should probably wait before sending a v2 with PTP included in
+> > get_base_stats to see if the Mellanox folks have any hints about why rtnl
+> > != queue stats on mlx5?
+> > 
+> > What do you think?
 > 
-> 1) The opt_ipproto_off variable is used uninitialized if "testname" is
-> not "ip". This seems like an actual bug.
-> 
-> 2) The addr_len is used uninitialized, but only in the assert case,
->    which bails out, so this is harmless.
-> 
-> 3) The family variable in add_listener() is only used uninitialized in
->    the error case (neither IPv4 nor IPv6 is specified), so it's also
->    harmless.
-> 
-> Fix by initializing each variable.
-> 
-> Signed-off-by: John Hubbard <jhubbard@nvidia.com>
-> ---
->  tools/testing/selftests/net/gro.c                 | 3 ++-
->  tools/testing/selftests/net/ip_local_port_range.c | 2 +-
->  tools/testing/selftests/net/mptcp/pm_nl_ctl.c     | 2 +-
->  3 files changed, 4 insertions(+), 3 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/net/gro.c b/tools/testing/selftests/net/gro.c
-> index 353e1e867fbb..0eb61edaad83 100644
-> --- a/tools/testing/selftests/net/gro.c
-> +++ b/tools/testing/selftests/net/gro.c
-> @@ -110,7 +110,8 @@ static void setup_sock_filter(int fd)
->  	const int dport_off = tcp_offset + offsetof(struct tcphdr, dest);
->  	const int ethproto_off = offsetof(struct ethhdr, h_proto);
->  	int optlen = 0;
-> -	int ipproto_off, opt_ipproto_off;
-> +	int ipproto_off;
-> +	int opt_ipproto_off = 0;
+> Very odd, the code doesn't appear to be doing any magic :S Did you try
+> to print what the delta in values is? Does bringing the interface up and
+> down affect the size of it?
 
-This is only intended to be used in the case where the IP proto is not TCP:
+I booted the kernel which includes PTP stats in the base stats as you've
+suggested (as shown in the diff in this thread) and I've brought the
+interface down and back up:
 
-                        BPF_STMT(BPF_LD  + BPF_B   + BPF_ABS, ipproto_off),
-+                       BPF_JUMP(BPF_JMP + BPF_JEQ + BPF_K, IPPROTO_TCP, 2, 0),
-+                       BPF_STMT(BPF_LD  + BPF_B   + BPF_ABS, opt_ipproto_off),
-                        BPF_JUMP(BPF_JMP + BPF_JEQ + BPF_K, IPPROTO_TCP, 0, 5),
+$ sudo ip link set dev eth0 down
+$ sudo ip link set dev eth0 up
 
-In that case the test tries again at a different offset that accounts
-for optional IPv6 extension headers.
+Re ran the test script, which includes some mild debugging print out I
+added to show the delta for rx-packets (but I think all stats are off):
 
-This is indeed buggy, in that it might accidentally accept packets
-that should be dropped.
+  # Exception| Exception: Qstats are lower, fetched later
 
-Initializing to 0 compares against against the first byte of the
-Ethernet header. Which is an external argument to the test. So
-safest is to initialize opt_ipproto_off to ipproto_off and just
-repeat the previous check. Perhaps:
+key: rx-packets rstat: 1192281902 qstat: 1186755777
+key: rx-packets rstat: 1192281902 qstat: 1186755781
 
-@@ -118,6 +118,7 @@ static void setup_sock_filter(int fd)
-        else
-                next_off = offsetof(struct ipv6hdr, nexthdr);
-        ipproto_off = ETH_HLEN + next_off;
-+       opt_ipproto_off = ipproto_off;  /* overridden later if may have exthdrs */
+So qstat is lower by (1192281902 - 1186755781) = 5,526,121
+
+Not really sure why, but I'll take another look at the code this morning to
+see if I can figure out what's going on.
+
+I'm clearly doing something wrong or misunderstanding something about the
+accounting that will seem extremely obvious in retrospect.
 
