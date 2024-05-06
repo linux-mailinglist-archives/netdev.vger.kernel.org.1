@@ -1,125 +1,151 @@
-Return-Path: <netdev+bounces-93722-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93723-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 444428BCF82
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 15:55:56 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 793978BCF8E
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 16:00:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 612981C228A5
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 13:55:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BD5ECB214AB
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 14:00:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 610F2811F7;
-	Mon,  6 May 2024 13:55:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1DDF81205;
+	Mon,  6 May 2024 14:00:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0XA0ICa9"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="fChRnzLO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D84DC811E6
-	for <netdev@vger.kernel.org>; Mon,  6 May 2024 13:55:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E808015A5;
+	Mon,  6 May 2024 14:00:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715003751; cv=none; b=E9EqKydY/7PswXOjn9D8kum94EEcCRs3L+YBPZW7XTq81nqmuvNRSnnFtoR0zOrl9I4TITuKou1se84+Rp0SkHQoUfdm+CyGycop3ojqLRSbh5lkoKcW9LWrB+1R/ZsQshc3vEhcuXeBZ1wfIdB2NjK9ZLnZvgeqPWD+mT+QTkI=
+	t=1715004002; cv=none; b=huMIUbBXuK/27VDlVLatXQyv97mI2Y61ilB+9H5Z4RlH1SEIr49QMfZnBWhRouEi5FSatdLbs4121RfIxdgvV0q3TfEwyt85/PGtT1ZXg56zwGAHIQjzUw8CICXMgJ9KuK5SXagEezFFcabt7BCZa4Xd8AAR6Jd6rW2f1J/R2qk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715003751; c=relaxed/simple;
-	bh=1/+1gpC5SiUaqiBag3EG5uJaO0nuLI8By6Luh48RG2k=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=ZpD0aSsLZUZJIgfddaFm5ZLQ/FPmtMk1qaInjwmFZyIRJXfesfR7QP5OqpMqkDKOqoGHy3dtDuN6eXRtciPNhTa8OVrYy7FyOAVAnn6fge3yu2MhcnH0bc1vGs8yw/caql4Li2+5h+ojJpkNl84NsE46EWqM7l3AgFRz5ol1Lac=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0XA0ICa9; arc=none smtp.client-ip=209.85.219.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-ddaf165a8d9so3044932276.1
-        for <netdev@vger.kernel.org>; Mon, 06 May 2024 06:55:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1715003749; x=1715608549; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=SxcNP3ywioShrfPZ0tcZQrAjaXkGpEZX4O8+euhJTVg=;
-        b=0XA0ICa9yfATLYsdFkqr1JQsyXz+cJRkTsuWo4vOLthWLTBe1i4UiEdPi0tPHVLvFc
-         O8h/KZ5jMdhZDlQQ08N9gziZKBoDH9HGls+mSErI/30sjFqwvVYL2I/M0FSDPCZWjxhb
-         mbP+LrA8UnVTqGs0muSb3vHq1msoImorUkzq0zxGDm3B6/j8N01HDRo/7O0Qe33cyHvH
-         8IV1oIs+HzPc9ZOO19TPRWyF5+sWivJxdV68IyUDQlviUF4Mrmwgz2bVVz7BLqb1WaF+
-         2Bh3MNCkvUGaIgJrNTRssNcFzDQwQnavO/k3slzNh2T+ieKJj/FTV93U+5U4mbRD/VsZ
-         FBUQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715003749; x=1715608549;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=SxcNP3ywioShrfPZ0tcZQrAjaXkGpEZX4O8+euhJTVg=;
-        b=RVySY8F0PjriWGQXIUv57oA/07b5TRU5Q5CFx+8zNMxw3bQ51M8jQ2tNuwFVeMIWYC
-         rVbYQxGRrTDOW+DgBzXMB8vmc+o4ZT3i9Cq6GzSLIJYRx7pm6iUgINB1YOXv/WAgBOiE
-         VYdcl87yUNW4xXpywolQPEUI7WDNgCE5pCDpdPR1Qc4rcwU3WiRy24rJhoNzz4hZUmSb
-         q1ujlnoKLfNxGhxQjE4QMBG020oRnjjOpRkEzzU2RqC9SZ+vleTStURUd4fnSM5NkcOE
-         EH6rvGV7b4qOb5bqs/vUcotN+kXS2D+k8Osz+rrHTLS8YE9lsS8vD0Zd8q887xyADlYV
-         sLng==
-X-Gm-Message-State: AOJu0YyO1x/EN1cffN94uPU3O53ka5+3+prUhuOr/eLpr7mnxpqW+S95
-	yJUHM7ln4FEZAGZVGY6aINWX8BQ6/dntsl1TZJwHsgAbS0imDByt6soWZf7wzgX+UW7G8dOwm7m
-	i/GvkKpgHTg==
-X-Google-Smtp-Source: AGHT+IGyiNP18OXGzKlmERTYoqwqtQhO1R8Yha1ihyxL9C3g6DhVsMHNELONfoYKBEIVHivVxgTwdGQ6NTHSww==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:6902:1242:b0:de6:1603:2dd5 with SMTP
- id t2-20020a056902124200b00de616032dd5mr1353321ybu.9.1715003748841; Mon, 06
- May 2024 06:55:48 -0700 (PDT)
-Date: Mon,  6 May 2024 13:55:46 +0000
+	s=arc-20240116; t=1715004002; c=relaxed/simple;
+	bh=P7hzobG48OrQRhVmRGZvAghTx4JfPFToBDmjqFqNKpI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=FjngjOzOW/UegdXZxQvS9bIY6Mrq+kWlnyeAIilH++tXiK5MGLSt9yFQEg6CG/R6csedYUt1yz19woRn72Wis7vYQ1qA5a0NEFULS05Y/EKO2kBhqyQuPcCgXVPmP9ENCc8vGmWoqLeqDuc9N09owkhhVwRiHCprouk4cmOPxLw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=fChRnzLO; arc=none smtp.client-ip=205.220.177.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 446An4gF027863;
+	Mon, 6 May 2024 13:59:55 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding;
+ s=corp-2023-11-20; bh=l8vsB0YxVyOhCoOR1rq+CzGzcpNzExSdLNP82ssVmCM=;
+ b=fChRnzLOkEjRTcdNnI/XUZmQK/PfdYREMS5/ArjpCknWpCIJeTmNpY+G6XfeITRj1g4h
+ YwinRki+3j8GY0gsdLC7YMKpTuYzFSD8AqMmxPFSRTZH578/pgs/zyKRXGGpWZQUlrZH
+ NXTH4pexaNtzdTVl0Lpy7+vCTlIwYlvICQoiUbke23WKM4IwH6ABEc3uFfSfZ4tW9PZ5
+ hDD0mC86ajeTDc6e0Ger4Ha9So3FcHBTf4/IO93W6nfOrHgGp34iadfNm48/A0M8A92X
+ Lj761TyNkRDbTAg6F0F2iOzy5Nn60XpAw9UJPSTBo/esAoEtN3xB5WhYJQwkAQ8Nq/Oz lA== 
+Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3xwd2dtnaq-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 06 May 2024 13:59:55 +0000
+Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 446ChRM6014136;
+	Mon, 6 May 2024 13:59:54 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3xwbf61983-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 06 May 2024 13:59:54 +0000
+Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 446Dv4n5027456;
+	Mon, 6 May 2024 13:59:53 GMT
+Received: from pkannoju-vm.us.oracle.com (dhcp-10-191-206-220.vpn.oracle.com [10.191.206.220])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 3xwbf6195f-1;
+	Mon, 06 May 2024 13:59:53 +0000
+From: Praveen Kumar Kannoju <praveen.kannoju@oracle.com>
+To: jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us,
+        davem@davemloft.net, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc: rajesh.sivaramasubramaniom@oracle.com, rama.nichanamatlu@oracle.com,
+        manjunath.b.patil@oracle.com,
+        Praveen Kumar Kannoju <praveen.kannoju@oracle.com>
+Subject: [PATCH v2] net/sched: adjust device watchdog timer to detect stopped queue at right time
+Date: Mon,  6 May 2024 19:29:44 +0530
+Message-Id: <20240506135944.7753-1-praveen.kannoju@oracle.com>
+X-Mailer: git-send-email 2.31.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.45.0.rc1.225.g2a3ae87e7f-goog
-Message-ID: <20240506135546.3641185-1-edumazet@google.com>
-Subject: [PATCH net-next] usb: aqc111: stop lying about skb->truesize
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1011,Hydra:6.0.650,FMLib:17.11.176.26
+ definitions=2024-05-06_08,2024-05-06_02,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 suspectscore=0
+ mlxlogscore=999 bulkscore=0 mlxscore=0 adultscore=0 malwarescore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2404010000 definitions=main-2405060096
+X-Proofpoint-GUID: TJufH9kkmrhGtnz6M3se9SSQm5zh2ZI8
+X-Proofpoint-ORIG-GUID: TJufH9kkmrhGtnz6M3se9SSQm5zh2ZI8
 
-Some usb drivers try to set small skb->truesize and break
-core networking stacks.
+Applications are sensitive to long network latency, particularly
+heartbeat monitoring ones. Longer the tx timeout recovery higher the
+risk with such applications on a production machines. This patch
+remedies, yet honoring device set tx timeout.
 
-I replace one skb_clone() by an allocation of a fresh
-and small skb, to get minimally sized skbs, like we did
-in commit 1e2c61172342 ("net: cdc_ncm: reduce skb truesize
-in rx path") and 4ce62d5b2f7a ("net: usb: ax88179_178a:
-stop lying about skb->truesize")
+Modify watchdog next timeout to be shorter than the device specified.
+Compute the next timeout be equal to device watchdog timeout less the
+how long ago queue stop had been done. At next watchdog timeout tx
+timeout handler is called into if still in stopped state. Either called
+or not called, restore the watchdog timeout back to device specified.
 
-Fixes: 361459cd9642 ("net: usb: aqc111: Implement RX data path")
-Signed-off-by: Eric Dumazet <edumazet@google.com>
+Signed-off-by: Praveen Kumar Kannoju <praveen.kannoju@oracle.com>
 ---
- drivers/net/usb/aqc111.c | 8 +++-----
- 1 file changed, 3 insertions(+), 5 deletions(-)
+v2:
+  - Identify the oldest trans_start from all the queues and use it.
+v1: https://lore.kernel.org/netdev/20240430140010.5005-1-praveen.kannoju@oracle.com/
+---
+ net/sched/sch_generic.c | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/net/usb/aqc111.c b/drivers/net/usb/aqc111.c
-index 7b8afa589a53c457ef07878f207ddbaafa668c54..284375f662f1e03b68f12752c76d6f1081a09d9a 100644
---- a/drivers/net/usb/aqc111.c
-+++ b/drivers/net/usb/aqc111.c
-@@ -1141,17 +1141,15 @@ static int aqc111_rx_fixup(struct usbnet *dev, struct sk_buff *skb)
- 			continue;
+diff --git a/net/sched/sch_generic.c b/net/sched/sch_generic.c
+index 4a2c763e2d11..840b995c7233 100644
+--- a/net/sched/sch_generic.c
++++ b/net/sched/sch_generic.c
+@@ -506,19 +506,22 @@ static void dev_watchdog(struct timer_list *t)
+ 			unsigned int timedout_ms = 0;
+ 			unsigned int i;
+ 			unsigned long trans_start;
++			unsigned long oldest_start = jiffies;
+ 
+ 			for (i = 0; i < dev->num_tx_queues; i++) {
+ 				struct netdev_queue *txq;
+ 
+ 				txq = netdev_get_tx_queue(dev, i);
+ 				trans_start = READ_ONCE(txq->trans_start);
+-				if (netif_xmit_stopped(txq) &&
+-				    time_after(jiffies, (trans_start +
+-							 dev->watchdog_timeo))) {
++				if (!netif_xmit_stopped(txq))
++					continue;
++				if (time_after(jiffies, (trans_start + dev->watchdog_timeo))) {
+ 					timedout_ms = jiffies_to_msecs(jiffies - trans_start);
+ 					atomic_long_inc(&txq->trans_timeout);
+ 					break;
+ 				}
++				if (time_after(oldest_start, trans_start))
++					oldest_start = trans_start;
+ 			}
+ 
+ 			if (unlikely(timedout_ms)) {
+@@ -531,7 +534,7 @@ static void dev_watchdog(struct timer_list *t)
+ 				netif_unfreeze_queues(dev);
+ 			}
+ 			if (!mod_timer(&dev->watchdog_timer,
+-				       round_jiffies(jiffies +
++				       round_jiffies(oldest_start +
+ 						     dev->watchdog_timeo)))
+ 				release = false;
  		}
- 
--		/* Clone SKB */
--		new_skb = skb_clone(skb, GFP_ATOMIC);
-+		new_skb = netdev_alloc_skb_ip_align(dev->net, pkt_len);
- 
- 		if (!new_skb)
- 			goto err;
- 
--		new_skb->len = pkt_len;
-+		skb_put(new_skb, pkt_len);
-+		memcpy(new_skb->data, skb->data, pkt_len);
- 		skb_pull(new_skb, AQ_RX_HW_PAD);
--		skb_set_tail_pointer(new_skb, new_skb->len);
- 
--		new_skb->truesize = SKB_TRUESIZE(new_skb->len);
- 		if (aqc111_data->rx_checksum)
- 			aqc111_rx_checksum(new_skb, pkt_desc);
- 
 -- 
-2.45.0.rc1.225.g2a3ae87e7f-goog
+2.31.1
 
 
