@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-93632-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93633-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2D1F8BC87B
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 09:41:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 884058BC89A
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 09:50:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2F9421C208DD
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 07:41:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3CEF5282352
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 07:50:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43CBE6BFD4;
-	Mon,  6 May 2024 07:41:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA7DE140381;
+	Mon,  6 May 2024 07:50:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mpmPWi9h"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GAhmos70"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 139BD1EB36;
-	Mon,  6 May 2024 07:41:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACA536CDBF;
+	Mon,  6 May 2024 07:50:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714981269; cv=none; b=Z770BAeOuxSHyaLQWVYdlkqijVEl0zZNuBjF7GhNokBf0xl9wNs/xsei3DUZ7t1fKLKu5QSCOIXOYFADeIHrcCwoMonqOJFzlTYp8UTS7iB4Fj+83zIMGJgUD/bbwbpJ/k/waz8zsDLo0Zaxyte7t42VxL2gm1FmKX2CFwxF1ls=
+	t=1714981837; cv=none; b=FdlccD7eMWL+yhCeykByeZq4vxM/ZOAredtozWzc1aJ0HXt+S06vOe1c0WWyvXmgQJbLFjereWuoe2qXUwFgO8GRQoiCbz6EK+BN1o015agYQpi6Kl1NP8vkVO223e7X28/yP2e7xpXnTgyr7UsEK3BC9asZX+PIDoQLULZqEuQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714981269; c=relaxed/simple;
-	bh=cWCbxtV4WQnMqjKuIDGdVWPDNCxi3aEgGfVd4lI1HiE=;
+	s=arc-20240116; t=1714981837; c=relaxed/simple;
+	bh=HXInDPAgjaWxpnc2isb/l7/UETm/7etL+J7jmNAa9uQ=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cayKBwlAbNBsLty02PWXrmKeuYDGcdvch8VXqYINqRi/P5xNWbIWrwuxfU5Pm0Ev9MJ7OfmsBJwTcvWDU36O11s/W22mFzCLq+AhUsn8r9cR+UutiF9ARy/q+OkgE8XrTdyRqygDV+TjRTdD8FmoJIfsNHBj679tiqfpHEfks1c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mpmPWi9h; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4AF03C116B1;
-	Mon,  6 May 2024 07:41:06 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=r9PkxfUYnuZR70AYjsgeNhXhGEsa9jzvVZmM4vLIqzCyaVCugSso8rrXStDkZeb5CykwpFrmrBHwd4FkIJnIHTKnfvVlMPaicBsLm5XyalmnzUS0JUnZ1uJqBJ2gdrczCf0Y5n72Q+fNN6goD6SuD+qcT0snMUd5SWUloK3xjTk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GAhmos70; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5ECAC116B1;
+	Mon,  6 May 2024 07:50:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714981268;
-	bh=cWCbxtV4WQnMqjKuIDGdVWPDNCxi3aEgGfVd4lI1HiE=;
+	s=k20201202; t=1714981837;
+	bh=HXInDPAgjaWxpnc2isb/l7/UETm/7etL+J7jmNAa9uQ=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=mpmPWi9h2/xvLJLTFYWpd2YFomuFLQSn3VmzaifmWHnZCLtAwqm9vG8gv/f9fdVAo
-	 5eI8dDb89b5Q5sNW5dDK6hka1M2bcwOY9VjpOX/fSd5PBn0rV/1o4RK2tQD78uJOnO
-	 oEn7rgrIU3ZxEa6yA4Ez53hRPfCLPNhOvLVGayfho+Pgtg6qPMRrMRYqhP8Dsn9okO
-	 6V5I+eu1gp3fa0KX8xovlZT5OUSc2kMmZlUrols3uw5uQwAlabCNSNWu+qvxQCTwHh
-	 DJ2IMwCfl1u1N2+FBEkAU7yT4YgFGM9eJlOjwM8RxCDU5ozJ3ZPwfLaiHBz7RPo0RD
-	 4XwsjSNeq6ikQ==
-Message-ID: <f4e2a294-e4e2-4a03-a183-ee96cf97e5cf@kernel.org>
-Date: Mon, 6 May 2024 09:40:59 +0200
+	b=GAhmos70T8aOc5nA0O8mNi5Jfg3HC7YPIWsZAOR/be504ykJLaQlCrnxEqds9omkq
+	 gCwmqH1ibBmPBiU7fD3j2QiYyp6VaqLhtq8W+IgS9ukIHdPiCbfdzX2Ctu73IWpdfh
+	 6FTO4bGMz+VOOnBI8rUjhGBfxvTjffOLO73dRCCnF0dGpOok46j6bU7AgrMcHuE2Vw
+	 OAHT+SCyuDSMn1qqr7w0YnFgx9qtwtBsleMkNB8bsRbBRmumMX6KXpcMgAr8r7T3K9
+	 GlqpXCvCM3iSwMnC/pQuynlI7l/+PWiA2ZegAEU8nZBrXtMdyMbowbgY9J+mTPF/qq
+	 n9aXg28FlvGOg==
+Message-ID: <ff35f349-5036-4305-a352-fdef09326851@kernel.org>
+Date: Mon, 6 May 2024 09:49:14 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,13 +50,31 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH] [PATCH v2 net-next] mptcp: fix typos in comments
+Subject: Re: [PATCH 2/2] selftests/net: fix uninitialized variables
 Content-Language: en-GB
-To: Shi-Sheng Yang <fourcolor4c@gmail.com>, davem@davemloft.net,
- kuba@kernel.org, pabeni@redhat.com, Simon Horman <horms@kernel.org>
-Cc: geliang@kernel.org, netdev@vger.kernel.org, mptcp@lists.linux.dev,
- linux-kernel@vger.kernel.org, martineau@kernel.org, edumazet@google.com
-References: <20240502154740.249839-1-fourcolor4c@gmail.com>
+To: John Hubbard <jhubbard@nvidia.com>, Shuah Khan <shuah@kernel.org>
+Cc: "David S . Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Steffen Klassert <steffen.klassert@secunet.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>, =?UTF-8?Q?Andreas_F=C3=A4rber?=
+ <afaerber@suse.de>, Manivannan Sadhasivam
+ <manivannan.sadhasivam@linaro.org>, Mat Martineau <martineau@kernel.org>,
+ Geliang Tang <geliang@kernel.org>, Pravin B Shelar <pshelar@ovn.org>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Alexander Mikhalitsyn <alexander@mihalicyn.com>,
+ zhujun2 <zhujun2@cmss.chinamobile.com>, Petr Machata <petrm@nvidia.com>,
+ Ido Schimmel <idosch@nvidia.com>, Hangbin Liu <liuhangbin@gmail.com>,
+ Nikolay Aleksandrov <razor@blackwall.org>,
+ Benjamin Poirier <bpoirier@nvidia.com>,
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+ Dmitry Safonov <0x7f454c46@gmail.com>, netdev@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-actions@lists.infradead.org,
+ mptcp@lists.linux.dev, dev@openvswitch.org,
+ Valentin Obst <kernel@valentinobst.de>, linux-kselftest@vger.kernel.org,
+ LKML <linux-kernel@vger.kernel.org>, llvm@lists.linux.dev
+References: <20240505222639.70317-1-jhubbard@nvidia.com>
+ <20240505222639.70317-2-jhubbard@nvidia.com>
 From: Matthieu Baerts <matttbe@kernel.org>
 Autocrypt: addr=matttbe@kernel.org; keydata=
  xsFNBFXj+ekBEADxVr99p2guPcqHFeI/JcFxls6KibzyZD5TQTyfuYlzEp7C7A9swoK5iCvf
@@ -102,28 +120,43 @@ Autocrypt: addr=matttbe@kernel.org; keydata=
  JY6dglzGKnCi/zsmp2+1w559frz4+IC7j/igvJGX4KDDKUs0mlld8J2u2sBXv7CGxdzQoHaz
  lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
 Organization: NGI0 Core
-In-Reply-To: <20240502154740.249839-1-fourcolor4c@gmail.com>
+In-Reply-To: <20240505222639.70317-2-jhubbard@nvidia.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-Hi Shi-Sheng,
+Hi John,
 
-On 02/05/2024 17:47, Shi-Sheng Yang wrote:
-> This patch fixes the spelling mistakes in comments.
-> The changes were generated using codespell and reviewed manually.
+On 06/05/2024 00:26, John Hubbard wrote:
+> When building with clang, via:
 > 
-> eariler -> earlier
-> greceful -> graceful
+>     make LLVM=1 -C tools/testing/selftest
+> 
+> ...clang warns about three variables that are not initialized in all
+> cases:
+> 
+> 1) The opt_ipproto_off variable is used uninitialized if "testname" is
+> not "ip". This seems like an actual bug.
+> 
+> 2) The addr_len is used uninitialized, but only in the assert case,
+>    which bails out, so this is harmless.
+> 
+> 3) The family variable in add_listener() is only used uninitialized in
+>    the error case (neither IPv4 nor IPv6 is specified), so it's also
+>    harmless.
+> 
+> Fix by initializing each variable.
+> 
+> Signed-off-by: John Hubbard <jhubbard@nvidia.com>
+> ---
+>  tools/testing/selftests/net/gro.c                 | 3 ++-
+>  tools/testing/selftests/net/ip_local_port_range.c | 2 +-
+>  tools/testing/selftests/net/mptcp/pm_nl_ctl.c     | 2 +-
 
-Thank you for the fix, it looks good to me:
+Thank you for fixing these warnings!
+
+The modification in the MPTCP selftest directory looks good to me:
 
 Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
-
-@Simon: many thanks for the previous review!
-
-@Netdev maintainers: I think it is best to apply this patch -- and
-similar ones -- directly in the Netdev tree, no need to have it first in
-the MPTCP tree.
 
 Cheers,
 Matt
