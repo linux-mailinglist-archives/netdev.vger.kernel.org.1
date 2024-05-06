@@ -1,113 +1,85 @@
-Return-Path: <netdev+bounces-93716-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93717-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F3518BCED5
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 15:19:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F016D8BCEEB
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 15:28:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C0B4C1C21035
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 13:19:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2D52D1C22483
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 13:28:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 843187641E;
-	Mon,  6 May 2024 13:18:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E24EE763F0;
+	Mon,  6 May 2024 13:28:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GkxuhrZG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0B424EB45
-	for <netdev@vger.kernel.org>; Mon,  6 May 2024 13:18:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.69
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8E26FBF0;
+	Mon,  6 May 2024 13:28:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715001516; cv=none; b=oLRySz4/P2YRTg2NVHV+WCXq6rJVJWUq8ajD5/33J1T0AzTUm8cc3sNfk4oftmiK6qwVSNKT8ysPOv7qN2JG+xt1yIvBUqSu3EMkddLS+fu9PP/qfCaW7mD0KKx5O/XXFLWULJlI2NmZQ9HeBuya7I6xgNviIlQSp0JcACZoVrE=
+	t=1715002112; cv=none; b=cy5PwryP2ypYIbalqPKdiDHq4bIYeWOjXHWdQhSosVonPXJWBK71fTDh8cOFeP/CiWhA2wQowSmA/aHv6Okf0pDNP5IWJjbPxeoJ4N7VPB5ht6dL+WPWldTRI/PjmKwMSLqHww2R4x034XPRso3c+xBhWC3Py6lt8hcRD3rW/nw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715001516; c=relaxed/simple;
-	bh=c0Vge8iTB4Lpbpsuu3+m+8p+N7McCY3fFZYh0TSFI1k=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=qlnIkOXUN3WIimzicDAaSq2DvtsD1F5hf2d6Mks5FB8fo03no9I8n2MBbVpfOMiVnoTqiHf3WgLNDSTqAu3uW2MLVVpSvO8HzX9UmaFlIani2QAJJuDqjIoE+z9OCy/PEsFF0Nx9NbAVYe3JTFGc0BPNbswlPJm9HzyVKmFljkU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.69
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-7ded1e919d2so140394939f.1
-        for <netdev@vger.kernel.org>; Mon, 06 May 2024 06:18:34 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715001514; x=1715606314;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=sDXohloZ5MfuZXfB1DDbljelq8gj5pZm9laaAT/1VtU=;
-        b=wB54SyHjlvZM2W4VSzEHqKlKMr/GA/dC1plan8cJNE8fbJNBNt92rGt2tM+cxY34QM
-         9BBRJeOa5ZGAhOu61qUOmK7mBQwj+TQNAtzP4G5FFfQMde0Inqz/ocEvlIBlOX7GLF95
-         qMI3pzosuwzuG7GhD1GyX3VViDpF9aGnH6JppSLHUHvCjPbQCVcTcCsKFZZD1oxgIz+Y
-         efADf1qOshVbsmNeuNKYGdoywKO8yy3AHyEk65411vzfyho5nrzo1hTkBCKXnjjv6fh0
-         XIIt5Jr+bmh5PTnADDXjxP43K2XVNgppzl8Fxk9HQJC0+c0cjoet5+TeVLrOkFDMg7OO
-         d/bA==
-X-Forwarded-Encrypted: i=1; AJvYcCWkzyuD3l4U2qBTgM/Y1TY+Mo8pIHvvO7pG6WcRMxRBoxWuu3ezCY2ht4Et3gnYOiyWIjEaRI1pgq/Hb8JzlkJzIAMfNnJt
-X-Gm-Message-State: AOJu0YzvHymTo+glxsNJKFsTsn/zzBR6tdOHCNMm0uBWe1YnQ/NUOL/6
-	klApi9FzORvLhrB3j9plzeWjhj/ewesNcJYBW0uy9EaftQr+DYNnj8EPdrGrZSZHWGIw5pGQvDC
-	bZjSi6A4gadkXyqKjJAbTZ5tDqaLeKi2Wq/3cvepukSYtDytk5CqMews=
-X-Google-Smtp-Source: AGHT+IG8fqvQzKK0Ndvb55M8AEuR45mSb8N9eJk1/kfk+AJ8UD/zRmP3RQCdND34lbZorwZshYw4n9A2jtESUdb4TIuax8CXRf67
+	s=arc-20240116; t=1715002112; c=relaxed/simple;
+	bh=Dfx6pj9LKfRR9YIdXoepncaL1dO4lHXtJSDyAoINafM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=btEStOSjjkHeh8Lg96h1ognrPvEuuqMlTCt4HOG34H9iclcL/SjljhfhNoHqOpotEUJYx0Y+0ehpDrCa1scV34uWmg2RyLcJGLUJ6axB8vtKYPq67jM7wdpXLxGu/0BAKuwYenU3lmyV9uTZSi+RYK/LHf3eeejpUsHopz7zCoY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GkxuhrZG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF150C116B1;
+	Mon,  6 May 2024 13:28:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715002112;
+	bh=Dfx6pj9LKfRR9YIdXoepncaL1dO4lHXtJSDyAoINafM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=GkxuhrZGQVJLSfDkpLocfe5R5E1tI8vKz/2a4Tu4JBsfFKScBwVPbpRE72tbKz8ql
+	 wGim/nMHOAGKB8nZwXKinqrh7zuSELo8WxQ/ZHQjZXAlpIPFpvh+8vjWSHBNLwxvAn
+	 1CjUkBkrKOdi3B5wT6mnxbA4RCzK3Kgbn+vlfiSueoXJ2Ygahy4dv4/TFR3kfUDZjC
+	 UcxnbHkez1bEYAiYrjG5wY86iVvgCvvx/i9trMFVQvXpQHJaQ65rm45Rzwvs58DlqC
+	 fbFD4fNBoJfRX13VFpjwsvEe+QY/PtEk1DkRRazYaMcGgNPetohezcpXiw5tBtMCud
+	 WOzLXfb9KUdBw==
+Date: Mon, 6 May 2024 06:28:30 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Antony Antony <antony.antony@secunet.com>
+Cc: Steffen Klassert <steffen.klassert@secunet.com>,
+ <netdev@vger.kernel.org>, <linux-kselftest@vger.kernel.org>, "David S.
+ Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, "Herbert
+ Xu" <herbert@gondor.apana.org.au>, Shuah Khan <shuah@kernel.org>,
+ <devel@linux-ipsec.org>
+Subject: Re: [PATCH net-next v3 2/2] selftests/net: add ICMP unreachable
+ over IPsec tunnel
+Message-ID: <20240506062830.5d48ba48@kernel.org>
+In-Reply-To: <053f57d79058138d09a0e606c0500a40cb78596d.1714982035.git.antony.antony@secunet.com>
+References: <cover.1714982035.git.antony.antony@secunet.com>
+	<053f57d79058138d09a0e606c0500a40cb78596d.1714982035.git.antony.antony@secunet.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:8426:b0:488:6017:abb6 with SMTP id
- iq38-20020a056638842600b004886017abb6mr450659jab.2.1715001514173; Mon, 06 May
- 2024 06:18:34 -0700 (PDT)
-Date: Mon, 06 May 2024 06:18:34 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000000ab1040617c8e8da@google.com>
-Subject: [syzbot] Monthly wireless report (May 2024)
-From: syzbot <syzbot+list0eee01f891cd031c3139@syzkaller.appspotmail.com>
-To: linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello wireless maintainers/developers,
+On Mon, 6 May 2024 10:05:54 +0200 Antony Antony wrote:
+> Add IPsec tunnel, aka xfrm state, tests with ICMP flags enabled.
+> IPv4 and IPv6, unreachable tests over xfrm/IPsec tunnels,
+> xfrm SA with "flag icmp" set.
 
-This is a 31-day syzbot report for the wireless subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/wireless
+Doesn't seem to work:
 
-During the period, 2 new issues were detected and 0 were fixed.
-In total, 28 issues are still open and 124 have been fixed so far.
-
-Some of the still happening issues:
-
-Ref  Crashes Repro Title
-<1>  8381    Yes   WARNING in ieee80211_link_info_change_notify (2)
-                   https://syzkaller.appspot.com/bug?extid=de87c09cc7b964ea2e23
-<2>  7730    Yes   WARNING in __ieee80211_beacon_get
-                   https://syzkaller.appspot.com/bug?extid=18c783c5cf6a781e3e2c
-<3>  4438    Yes   WARNING in __cfg80211_ibss_joined (2)
-                   https://syzkaller.appspot.com/bug?extid=7f064ba1704c2466e36d
-<4>  3478    Yes   WARNING in ieee80211_rx_list
-                   https://syzkaller.appspot.com/bug?extid=8830db5d3593b5546d2e
-<5>  879     Yes   WARNING in ar5523_submit_rx_cmd/usb_submit_urb
-                   https://syzkaller.appspot.com/bug?extid=6101b0c732dea13ea55b
-<6>  774     Yes   WARNING in ieee80211_start_next_roc
-                   https://syzkaller.appspot.com/bug?extid=c3a167b5615df4ccd7fb
-<7>  79      Yes   WARNING in ieee80211_free_ack_frame (2)
-                   https://syzkaller.appspot.com/bug?extid=ac648b0525be1feba506
-<8>  10      Yes   INFO: task hung in reg_check_chans_work (6)
-                   https://syzkaller.appspot.com/bug?extid=b87c222546179f4513a7
-<9>  7       Yes   WARNING in drv_remove_interface
-                   https://syzkaller.appspot.com/bug?extid=2e5c1e55b9e5c28a3da7
-<10> 5       Yes   UBSAN: array-index-out-of-bounds in htc_issue_send
-                   https://syzkaller.appspot.com/bug?extid=93cbd5fbb85814306ba1
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
-
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
-
-You may send multiple commands in a single email message.
+# selftests: net: xfrm_state.sh
+# ./xfrm_state.sh: line 91: test_: command not found
+# TEST: unreachable_ipv4IPv6 unreachable from router r3           [ FAIL ]
+# ./xfrm_state.sh: line 91: test_: command not found
+# TEST: unreachable_gw_ipv6IPv6 unreachable from IPsec gateway s2 [ FAIL ]
+# ./xfrm_state.sh: line 91: test_: command not found
+# TEST: mtu_ipv6_r2IPv6 MTU exceeded from ESP router r2          [ FAIL ]
+# ./xfrm_state.sh: line 91: test_: command not found
+# TEST: mtu_ipv6_r3IPv6 MTU exceeded router r3                   [ FAIL ]
+not ok 1 selftests: net: xfrm_state.sh # exit=1
 
