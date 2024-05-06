@@ -1,169 +1,274 @@
-Return-Path: <netdev+bounces-93682-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93683-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B7A08BCB38
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 11:53:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E65B8BCB3F
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 11:54:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3CC3D1C2171E
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 09:53:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8C1591F2572D
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 09:54:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 017E1145FFF;
-	Mon,  6 May 2024 09:50:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7E61142E62;
+	Mon,  6 May 2024 09:51:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ijUDRax0"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16B781428EC
-	for <netdev@vger.kernel.org>; Mon,  6 May 2024 09:50:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A940142913;
+	Mon,  6 May 2024 09:51:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714989005; cv=none; b=YfrvqmoJlhclZAlCJvKD+0wuQi9+P2C88SF37q55acA3bFniiivSc+jqd6BIi33IAQ/NpivocWSQ4V/PBuSUFtVY/x4SLAOfbnezkJtxdlQ3AK+zbKxxZmFrOM7egk5W5dMuSxxMY9Ejfp4lLXA7/s46g5UbhcRHn9YBASbaaSI=
+	t=1714989117; cv=none; b=ZHjfN5Ndy/rjkqtSf8buvtVOU6PRKvPKsbQkCfvAMKU0EMyuW5/GRJC8VNcQEYvWObAlBGthxsaFt5cMwA4GA/A/BlKGPRlvtMBXDXNcgUNLVKZV9f+KdP1qhSeiAmubmhQXMtm9INZOsnm5CVFBYoMu/iiegj1fFNjUShfMxU4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714989005; c=relaxed/simple;
-	bh=oPf4OegCtMS1cWBo4Xy+sDkXlsyJ0PkLaXkNDQj9s1s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nMcVSIqiJ9A6nNpgq03JU1VX3b5E8kRcDYXbxv1Xv319mHY2ajx5bRe0AFaIbxzh9pzqYU+xPJhgeWc+6DHT259w3cK7tv4gE7JA39xCDNVRctWQJ5XTQ4m6rxIF9yOLSSkshII75R64IxAcT/Mu/hcLd4rzcwGWoq0exrDLHP4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1s3uyg-0004td-9s; Mon, 06 May 2024 11:49:46 +0200
-Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1s3uyf-00GEx7-Hn; Mon, 06 May 2024 11:49:45 +0200
-Received: from pengutronix.de (unknown [172.20.34.65])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 1C33F2CB420;
-	Mon, 06 May 2024 09:49:45 +0000 (UTC)
-Date: Mon, 6 May 2024 11:49:44 +0200
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Gregor Herburger <gregor.herburger@ew.tq-group.com>
-Cc: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>, 
-	Thomas Kopp <thomas.kopp@microchip.com>, Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, linux-can@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux@ew.tq-group.com
-Subject: Re: [PATCH v2 5/6] can: mcp251xfd: add gpio functionality
-Message-ID: <20240506-lean-strange-stork-3f7c67-mkl@pengutronix.de>
-References: <20240506-mcp251xfd-gpio-feature-v2-0-615b16fa8789@ew.tq-group.com>
- <20240506-mcp251xfd-gpio-feature-v2-5-615b16fa8789@ew.tq-group.com>
+	s=arc-20240116; t=1714989117; c=relaxed/simple;
+	bh=EqjP3m7uykjcyB/f6y24MqoFP7cN3H5kazDuBfsQ4+c=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=FsjICVXjftubt90oK9zDKGaz3mcX44/wg5sMughDxA7C62N/d/ilPN5MMrMUtovoOXtIc+Z9vassFHJcWBc2+BgmIpNhNhzltyt2UN3fecTN32N22andLRoF1u4m06MBtSh+Z4aXEeChTibw/+TOZ5Ja1AIg75SJvcHoPw2t2mk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ijUDRax0; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-41a72f3a20dso11332645e9.0;
+        Mon, 06 May 2024 02:51:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1714989114; x=1715593914; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:to:subject
+         :mime-version:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=a5lawwvvxgc/VZKdPAnqoKgJL757qCfC9o6ubXHOj+0=;
+        b=ijUDRax03nlc88DUHUbEJ25DBq5xuHGgWRDHe7v0LUaM94oZp0EDGe/FI4kTOT3HwI
+         UvHmcs86FCRZFzzSGOsoe39dPTN+Hpcxorn3ZkS2XcgGsbIVMOiCm2Sq3mxcQk5q4n4/
+         xUJvLbBLmQQPZ/UZt2hKH68mb/j2QbLqxMb7iYnddcu3fC0cPrj0UndwjxcWbpbG05F/
+         PEq8l+Os3PVPXL2wN8EVwI7dDdbhgtX5CS2rwoU5iC30rd44fm6xgaqc+IGGaHKx0lIt
+         CqYBY0xWq9zSTmCNFA3l3iTLznMzYeLB4ag9Y/31AU7M3dTq/jRF1q8mA+UzaKmA5lTQ
+         0fgA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714989114; x=1715593914;
+        h=content-transfer-encoding:in-reply-to:from:references:to:subject
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=a5lawwvvxgc/VZKdPAnqoKgJL757qCfC9o6ubXHOj+0=;
+        b=COefp4l25A/D326NpjnGLaZXOK5zAyG6IK2uEiF1w31FMlYJgl+WAkcxzVTY4t1FJW
+         j/7seZZeXQmJKfSUpsVhtIZ+/0WfpX6kBGn5arp4T9XF6Syc/US0RgQTiD7sK8Kd8GgZ
+         2/9wEucuU0mwq729DjoBESIGBUsYYeXek5AltuNJ6agZCwjAR2KcJNOp1w0tSSd06A0m
+         LruZwmYygG+cKlfjHjq0utnqVYyoXQSfSR2TGPIyuZ1knONGsy8lWprmeFWZ/2kv1OOe
+         PnzKvsw7S9zx4CAobz7FuymxNpjRUkEt2R7RVr4ISAZF2jrshbMvfSwWQyMQvWN3Qcm1
+         gepA==
+X-Forwarded-Encrypted: i=1; AJvYcCVCf8vk6slTi7VtdBGxgpvOtj/ySBV+rbAtK2KTWRO2oMuIhQStBDgjo9u9HDVq0zhWAy6l2E6yJLd4CJn54/SeLHgnwuZpdskoQ2/EmryYiGbnJUnruntxej93oW9LSjfRSU8bahYRGWgBzBOeeapYhkXCl0vRGyrehH06ch56T938RiUC
+X-Gm-Message-State: AOJu0Yzy33tePxytQODTEWi3/EbRjgv6/bs0+nTA3Gpq8DfgLI0AW5Vx
+	xuBfdoRgPna0B9vXiN0Ao5z1J8qGFFGIaQRBwlRrf9UF/3xG24yuK0IRPQ==
+X-Google-Smtp-Source: AGHT+IGAWuWiREqnEeRfMAFvOrd7cLm1v0RY/XfOQ7VR4+16ai775AJ7UrcrKVlhpl9/apO723+vOQ==
+X-Received: by 2002:a05:600c:138a:b0:41c:13f6:206d with SMTP id u10-20020a05600c138a00b0041c13f6206dmr7399586wmf.25.1714989114331;
+        Mon, 06 May 2024 02:51:54 -0700 (PDT)
+Received: from debian ([146.70.204.204])
+        by smtp.gmail.com with ESMTPSA id v6-20020a5d6106000000b0034d743eb8dfsm10258649wrt.29.2024.05.06.02.51.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 06 May 2024 02:51:54 -0700 (PDT)
+Message-ID: <761374d3-1c76-4dc2-a4cc-7bd693deb453@gmail.com>
+Date: Mon, 6 May 2024 11:51:28 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="w2lqxdcmcssatvzm"
-Content-Disposition: inline
-In-Reply-To: <20240506-mcp251xfd-gpio-feature-v2-5-615b16fa8789@ew.tq-group.com>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Subject: [PATCH net-next v8 3/3] selftests/net: add flush id selftests
+To: davem@davemloft.net, edumazet@google.com,
+ willemdebruijn.kernel@gmail.com, kuba@kernel.org, pabeni@redhat.com,
+ dsahern@kernel.org, alobakin@pm.me, shuah@kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org
+References: <20240506093550.128210-1-richardbgobert@gmail.com>
+From: Richard Gobert <richardbgobert@gmail.com>
+In-Reply-To: <20240506093550.128210-1-richardbgobert@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
+Added flush id selftests to test different cases where DF flag is set or
+unset and id value changes in the following packets. All cases where the
+packets should coalesce or should not coalesce are tested.
 
---w2lqxdcmcssatvzm
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: Richard Gobert <richardbgobert@gmail.com>
+---
+ tools/testing/selftests/net/gro.c | 147 ++++++++++++++++++++++++++++++
+ 1 file changed, 147 insertions(+)
 
-On 06.05.2024 07:59:47, Gregor Herburger wrote:
-> The mcp251xfd devices allow two pins to be configured as gpio. Add this
-> functionality to driver.
->=20
-> Signed-off-by: Gregor Herburger <gregor.herburger@ew.tq-group.com>
-> ---
->  drivers/net/can/spi/mcp251xfd/mcp251xfd-core.c | 173 +++++++++++++++++++=
-++++++
->  drivers/net/can/spi/mcp251xfd/mcp251xfd.h      |   6 +
->  2 files changed, 179 insertions(+)
->=20
-> diff --git a/drivers/net/can/spi/mcp251xfd/mcp251xfd-core.c b/drivers/net=
-/can/spi/mcp251xfd/mcp251xfd-core.c
-> index 4739ad80ef2a..de301f3a2f4e 100644
-> --- a/drivers/net/can/spi/mcp251xfd/mcp251xfd-core.c
-> +++ b/drivers/net/can/spi/mcp251xfd/mcp251xfd-core.c
-> @@ -16,6 +16,7 @@
->  #include <linux/bitfield.h>
->  #include <linux/clk.h>
->  #include <linux/device.h>
-> +#include <linux/gpio/driver.h>
->  #include <linux/mod_devicetable.h>
->  #include <linux/module.h>
->  #include <linux/pm_runtime.h>
-> @@ -1768,6 +1769,172 @@ static int mcp251xfd_register_check_rx_int(struct=
- mcp251xfd_priv *priv)
->  	return 0;
->  }
-> =20
-> +#ifdef CONFIG_GPIOLIB
-> +static const char * const mcp251xfd_gpio_names[] =3D {"GPIO0", "GPIO1"};
-> +
-> +static int mcp251xfd_gpio_request(struct gpio_chip *chip, unsigned int o=
-ffset)
-> +{
-> +	struct mcp251xfd_priv *priv =3D gpiochip_get_data(chip);
-> +	u32 pin_mask =3D MCP251XFD_REG_IOCON_PM0 << offset;
-> +	int ret;
-> +
-> +	if (priv->rx_int && offset =3D=3D 1) {
-> +		netdev_err(priv->ndev, "Can't use GPIO 1 with RX-INT!\n");
-> +		return -EINVAL;
-> +	}
-> +
-> +	ret =3D pm_runtime_resume_and_get(priv->ndev->dev.parent);
-> +	if (ret)
-> +		return ret;
-> +
-> +	return regmap_update_bits(priv->map_reg, MCP251XFD_REG_IOCON,
-> +				  pin_mask, pin_mask);
+diff --git a/tools/testing/selftests/net/gro.c b/tools/testing/selftests/net/gro.c
+index 353e1e867fbb..5dc7b539ccbf 100644
+--- a/tools/testing/selftests/net/gro.c
++++ b/tools/testing/selftests/net/gro.c
+@@ -617,6 +617,123 @@ static void add_ipv6_exthdr(void *buf, void *optpkt, __u8 exthdr_type, char *ext
+ 	iph->payload_len = htons(ntohs(iph->payload_len) + MIN_EXTHDR_SIZE);
+ }
+ 
++static void fix_ip4_checksum(struct iphdr *iph)
++{
++	iph->check = 0;
++	iph->check = checksum_fold(iph, sizeof(struct iphdr), 0);
++}
++
++static void send_flush_id_case(int fd, struct sockaddr_ll *daddr, int tcase)
++{
++	static char buf1[MAX_HDR_LEN + PAYLOAD_LEN];
++	static char buf2[MAX_HDR_LEN + PAYLOAD_LEN];
++	static char buf3[MAX_HDR_LEN + PAYLOAD_LEN];
++	bool send_three = false;
++	struct iphdr *iph1;
++	struct iphdr *iph2;
++	struct iphdr *iph3;
++
++	iph1 = (struct iphdr *)(buf1 + ETH_HLEN);
++	iph2 = (struct iphdr *)(buf2 + ETH_HLEN);
++	iph3 = (struct iphdr *)(buf3 + ETH_HLEN);
++
++	create_packet(buf1, 0, 0, PAYLOAD_LEN, 0);
++	create_packet(buf2, PAYLOAD_LEN, 0, PAYLOAD_LEN, 0);
++	create_packet(buf3, PAYLOAD_LEN * 2, 0, PAYLOAD_LEN, 0);
++
++	switch (tcase) {
++	case 0: /* DF=1, Incrementing - should coalesce */
++		iph1->frag_off |= htons(IP_DF);
++		iph1->id = htons(8);
++		fix_ip4_checksum(iph1);
++
++		iph2->frag_off |= htons(IP_DF);
++		iph2->id = htons(9);
++		fix_ip4_checksum(iph2);
++		break;
++
++	case 1: /* DF=1, Fixed - should coalesce */
++		iph1->frag_off |= htons(IP_DF);
++		iph1->id = htons(8);
++		fix_ip4_checksum(iph1);
++
++		iph2->frag_off |= htons(IP_DF);
++		iph2->id = htons(8);
++		fix_ip4_checksum(iph2);
++		break;
++
++	case 2: /* DF=0, Incrementing - should coalesce */
++		iph1->frag_off &= ~htons(IP_DF);
++		iph1->id = htons(8);
++		fix_ip4_checksum(iph1);
++
++		iph2->frag_off &= ~htons(IP_DF);
++		iph2->id = htons(9);
++		fix_ip4_checksum(iph2);
++		break;
++
++	case 3: /* DF=0, Fixed - should not coalesce */
++		iph1->frag_off &= ~htons(IP_DF);
++		iph1->id = htons(8);
++		fix_ip4_checksum(iph1);
++
++		iph2->frag_off &= ~htons(IP_DF);
++		iph2->id = htons(8);
++		fix_ip4_checksum(iph2);
++		break;
++
++	case 4: /* DF=1, two packets incrementing, and one fixed - should
++		 * coalesce only the first two packets
++		 */
++		iph1->frag_off |= htons(IP_DF);
++		iph1->id = htons(8);
++		fix_ip4_checksum(iph1);
++
++		iph2->frag_off |= htons(IP_DF);
++		iph2->id = htons(9);
++		fix_ip4_checksum(iph2);
++
++		iph3->frag_off |= htons(IP_DF);
++		iph3->id = htons(9);
++		fix_ip4_checksum(iph3);
++		send_three = true;
++		break;
++
++	case 5: /* DF=1, two packets fixed, and one incrementing - should
++		 * coalesce only the first two packets
++		 */
++		iph1->frag_off |= htons(IP_DF);
++		iph1->id = htons(8);
++		fix_ip4_checksum(iph1);
++
++		iph2->frag_off |= htons(IP_DF);
++		iph2->id = htons(8);
++		fix_ip4_checksum(iph2);
++
++		iph3->frag_off |= htons(IP_DF);
++		iph3->id = htons(9);
++		fix_ip4_checksum(iph3);
++		send_three = true;
++		break;
++	}
++
++	write_packet(fd, buf1, total_hdr_len + PAYLOAD_LEN, daddr);
++	write_packet(fd, buf2, total_hdr_len + PAYLOAD_LEN, daddr);
++
++	if (send_three)
++		write_packet(fd, buf3, total_hdr_len + PAYLOAD_LEN, daddr);
++}
++
++static void test_flush_id(int fd, struct sockaddr_ll *daddr, char *fin_pkt)
++{
++	for (int i = 0; i < 6; i++) {
++		sleep(1);
++		send_flush_id_case(fd, daddr, i);
++		sleep(1);
++		write_packet(fd, fin_pkt, total_hdr_len, daddr);
++	}
++}
++
+ static void send_ipv6_exthdr(int fd, struct sockaddr_ll *daddr, char *ext_data1, char *ext_data2)
+ {
+ 	static char buf[MAX_HDR_LEN + PAYLOAD_LEN];
+@@ -935,6 +1052,8 @@ static void gro_sender(void)
+ 			send_fragment4(txfd, &daddr);
+ 			sleep(1);
+ 			write_packet(txfd, fin_pkt, total_hdr_len, &daddr);
++
++			test_flush_id(txfd, &daddr, fin_pkt);
+ 		} else if (proto == PF_INET6) {
+ 			sleep(1);
+ 			send_fragment6(txfd, &daddr);
+@@ -1061,6 +1180,34 @@ static void gro_receiver(void)
+ 
+ 			printf("fragmented ip4 doesn't coalesce: ");
+ 			check_recv_pkts(rxfd, correct_payload, 2);
++
++			/* is_atomic checks */
++			printf("DF=1, Incrementing - should coalesce: ");
++			correct_payload[0] = PAYLOAD_LEN * 2;
++			check_recv_pkts(rxfd, correct_payload, 1);
++
++			printf("DF=1, Fixed - should coalesce: ");
++			correct_payload[0] = PAYLOAD_LEN * 2;
++			check_recv_pkts(rxfd, correct_payload, 1);
++
++			printf("DF=0, Incrementing - should coalesce: ");
++			correct_payload[0] = PAYLOAD_LEN * 2;
++			check_recv_pkts(rxfd, correct_payload, 1);
++
++			printf("DF=0, Fixed - should not coalesce: ");
++			correct_payload[0] = PAYLOAD_LEN;
++			correct_payload[1] = PAYLOAD_LEN;
++			check_recv_pkts(rxfd, correct_payload, 2);
++
++			printf("DF=1, 2 Incrementing and one fixed - should coalesce only first 2 packets: ");
++			correct_payload[0] = PAYLOAD_LEN * 2;
++			correct_payload[1] = PAYLOAD_LEN;
++			check_recv_pkts(rxfd, correct_payload, 2);
++
++			printf("DF=1, 2 Fixed and one incrementing - should coalesce only first 2 packets: ");
++			correct_payload[0] = PAYLOAD_LEN * 2;
++			correct_payload[1] = PAYLOAD_LEN;
++			check_recv_pkts(rxfd, correct_payload, 2);
+ 		} else if (proto == PF_INET6) {
+ 			/* GRO doesn't check for ipv6 hop limit when flushing.
+ 			 * Hence no corresponding test to the ipv4 case.
+-- 
+2.36.1
 
-The PM bits _should_ be 1 here, as it's the reset default.
-
-But you have to convert mcp251xfd_chip_rx_int_enable() and
-mcp251xfd_chip_rx_int_disable() to from regmap_write() to
-regmap_update_bits(). Please do this in a separate patch before adding
-the gpio support.
-
-> +}
-
-regards,
-Marc
-
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
-
---w2lqxdcmcssatvzm
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmY4p7UACgkQKDiiPnot
-vG81OQf/QSbhG3kPD4JlGrR+11bLquKuYWbKLIdlVl8Nbckg4zSuVnYznwyPUvFK
-VCpI/o0W7IqcPN9X8gxGue2as7rBtqyLkBqnQ2k5g4QMGH/8WPo6KIpeLjn9QTTF
-tbn80CiVjtKdyGVDH+NNlb/a5qCLil93lj3PKVAmkX0bIbYIDTigwfea0lC8TUvA
-dzHYAXfRsRQ/QtEv2IIxoTF8bK7jJbLruJhxyHjnp9qAKhSTENzAViuE9FZ15hXK
-Bdadbqz1wSSQ9Sphl43+PPAXRl7N1mUkSlDKUgM5aMyeuTuVIhK0dj2TAzre0spg
-+uQWde21p/FLn45ECXeuh2uYcGcFpA==
-=MRFK
------END PGP SIGNATURE-----
-
---w2lqxdcmcssatvzm--
 
