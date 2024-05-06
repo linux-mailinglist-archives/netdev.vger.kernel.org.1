@@ -1,308 +1,257 @@
-Return-Path: <netdev+bounces-93828-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93829-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AFB778BD511
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 21:00:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 37D968BD518
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 21:02:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 67DDD28158A
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 19:00:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E2B5F281528
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 19:02:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 967D1158DDF;
-	Mon,  6 May 2024 19:00:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 935E5158DC4;
+	Mon,  6 May 2024 19:02:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OeAxvAQp"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="r6PADBHC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f182.google.com (mail-oi1-f182.google.com [209.85.167.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2069.outbound.protection.outlook.com [40.107.243.69])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCD08158DD5;
-	Mon,  6 May 2024 19:00:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.182
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715022013; cv=none; b=WRmd7TTD/7k+Dkpp37m3S9SHHJa3fFNuEA5NnD7Mj1mgxBxc9DowM5ye4q/EHnnqz2BEUfP1U18gA/yLZOYMRfi5trYnq/u0nzVVkEZ6/uuV7Gl8+dVTcmoH6QAH1U2XnIBTEMybfzGXDv2l5by2m5T3J70ZRXoCnu1NSffqiAY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715022013; c=relaxed/simple;
-	bh=Euxs9KJIZ78yPcSwjEnEjjpolNGSmMSxOuzS39fMApw=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=gxS8sxH5uUbNERvJUpxWDag+DVNVP49QMQ5NNhpziyfZ2rooldAsxf8eaX/12AhMLA92ayQrLrPtzJC3XYy/5n1/1hsv6pA9UPMCu9u1b0QZDWIxQfkpYnMn/IqP9o6OTOYIRimxwR0pQtWoY8FhHVFfgJpJbAeSA8W7uug1V1E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OeAxvAQp; arc=none smtp.client-ip=209.85.167.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f182.google.com with SMTP id 5614622812f47-3c963880aecso795535b6e.3;
-        Mon, 06 May 2024 12:00:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715022011; x=1715626811; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=10T5rur33Yqm4wo0EFQIMeMbzR3ugz/vLCFUG/913qA=;
-        b=OeAxvAQpS0YniMgCoUR7YYDNOp0zS9aKqAPwAvr/cZ06DL+oy7ypZtDEe+RgZgYySC
-         bUhx4XMML2WQxLBjuv5UkVa/TZWIYqfHvD1XEezF+UPUDYZV0sEHCLmY37w959q6YnkN
-         iCioqbXs8nv28rxqyfAl4EndCnEExtUWqc6t15uMHum4q3aQCBn3kZHcgZHI5oGt9+Wm
-         bOClfzdTMOd/J0Iq0DmWXENHkOXosCsT3H8gI6s0XzMYRVTXELtxgU4AFN5ylsnLqVDX
-         r89PZI4a9yCtsCIiKYgcYLIC8FPnEZ2eOimZZWA4B3y225HavEveczTkQY6gs4xLLkkP
-         3YYA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715022011; x=1715626811;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=10T5rur33Yqm4wo0EFQIMeMbzR3ugz/vLCFUG/913qA=;
-        b=MeJLOqDXYW464WUF5nG/1iEVWgKeJzTciyjVPc/hRitysoO3mqR7kLkjQuLPQXN5nk
-         fzW/Sww+YsAAJvc3jGWt+36omiumajgV4gichR2Gi6Luy+s66DhKZ2Y+LDoSg509Q1fe
-         F7Uj7VmY7qC/1m7cSPic2sQMTStE2SaUzrNMCN94MK63pzONg+mmMXCIp+kaeXtsJKuz
-         9x0RXH1zcc4hEY2c5He07JRLz81ONXYGT6A62jjaWFvuiixEqNpEe4HhANuKdPC+Jjud
-         6zwxarYbRW6gIwqrUSCHhV2rQvMI/xktLW+ZSH83ppJgUHJMTcfV5M+dWagzA/E0z2G1
-         pTiA==
-X-Forwarded-Encrypted: i=1; AJvYcCVWOHIxEQ5v2zD84A1Mrgp10Ccv2RCMa2Rzb1keE8Y8Cfcj9MlLUu+/jnvBN+esqGyRFugGWw1XWcClStK7PufNAz2ybeSObX47i6v3RNm+2SCySdMaxg50XkVcRTa6z4Ty0nNpEZRtgZRMFC0i+EZzVCTbbTNG3Eo+
-X-Gm-Message-State: AOJu0YyoqZAwGKDhTLyeoXVmTU3gZVBauj5laTeHAXEGlhBwtOvcuJMD
-	y0Dq5ffqvVSDWVEJjAnkQzMnJCVdyW2z4gXVR3aGSyhApV7T5Fsa
-X-Google-Smtp-Source: AGHT+IH81W3pk5PMOmTI1vvKSy20nxCJhSKpPacLnEmZF16zekZuYD1rSSrd9+9/uqXptPu8aJqqWw==
-X-Received: by 2002:aca:d01:0:b0:3c9:6c3b:77a with SMTP id 1-20020aca0d01000000b003c96c3b077amr4420310oin.13.1715022010764;
-        Mon, 06 May 2024 12:00:10 -0700 (PDT)
-Received: from localhost (164.146.150.34.bc.googleusercontent.com. [34.150.146.164])
-        by smtp.gmail.com with ESMTPSA id x12-20020a0ceb8c000000b006a0f012fab9sm3982949qvo.52.2024.05.06.12.00.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 May 2024 12:00:10 -0700 (PDT)
-Date: Mon, 06 May 2024 15:00:10 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Abhishek Chauhan <quic_abchauha@quicinc.com>, 
- "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- Andrew Halaney <ahalaney@redhat.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- Martin KaFai Lau <martin.lau@kernel.org>, 
- Martin KaFai Lau <martin.lau@linux.dev>, 
- Daniel Borkmann <daniel@iogearbox.net>, 
- bpf <bpf@vger.kernel.org>
-Cc: kernel@quicinc.com
-Message-ID: <663928ba373e3_516de294d5@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20240504031331.2737365-3-quic_abchauha@quicinc.com>
-References: <20240504031331.2737365-1-quic_abchauha@quicinc.com>
- <20240504031331.2737365-3-quic_abchauha@quicinc.com>
-Subject: Re: [RFC PATCH bpf-next v6 2/3] net: Add additional bit to support
- clockid_t timestamp type
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 852B7158DB0;
+	Mon,  6 May 2024 19:02:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.69
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1715022144; cv=fail; b=SD3NdWsNu55OEVsS9beS15YvoYaXCVKHRwaOrROUTalfulaHVVRxXEg5BybagvvZNizRpdbOZHZE7im9DDTnLw3yzIAdSHhNh3svEbDiR8iNV0di7bW0F0QFjhGy7eoY7cnJ+bS68+xzM3B/n9cHYo6jaghvRgkht65nxtVqBJ0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1715022144; c=relaxed/simple;
+	bh=D6Y0YBQ3003El4EDgEpOTTWJKcePHE4KIGyNWtfE4y8=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=lZVzkFEL8aO6/AJRBDoJXhHIFi4e3uUGozn0RVc/r1MFbpd68Wib7B74tHpIToxyLbTlIDoEYGbxQ3K20Nuye45vPvBG+79WQ0ac3GQHe66bmTSMz/1GNDA0lRVCYgcyzKFOQW07cdPYN6BQeWU0UAopt7FXdHj8g96EjxFUmJU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=r6PADBHC; arc=fail smtp.client-ip=40.107.243.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=k2HaYNYTejmBNh5CFyI1++QsZbfOohRDVEyfC8lC0bNzlO4FzONKg6Rwy1cBsdpqY1ZOHZqbtr5/mXsPuXGmc51JHGENt8eCG5CY7LC0O+Uo44/a0LyXEZTxFBxzYlHyTmygXbBPizWxkG+6o9UjFLGTJJ6FooLPya2ZTQo37EwLc1nSaFpJjLsMEz3PDojmFDTJ1n4VYwgzbbly+zGO39HCXcRivk9rsLFB0Eo2Ne5itoL3OVbThnsuy8yJ9Y+Mcum3KPwrcC0WJ3kaJBr0HcHgX3sFmakzX++jfVCigRIcC4IAp+a9bbg5msbyXTYdx+KF1Ik7apRrhL5uIJMI/w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Vq0M87NzhO/Rv4P5a1urdnmGSGGLoAXkZGrXTiy37b8=;
+ b=n607H3mRcwrHA440j6iEGvm8axnCovDTkTRVLaD4f211DBIqZV+vhW5BuY6F4kx5RfE5HbZn2hnQ/NFPDZEIRxJr4L+lQk0g8oDGxT4/+SZ686HOEAjJ7/yYoIbeR+2rK/V8tuEGSrAK0Hq3x+vAMbmQa+VgDQZKwffWVfb9xGZ8e9sNNuyhC9XZmrng8QVSA+GPWyoU3E9qbOLmymsuVzvje6UsIW+F18uCuvOsJM9Gxl2P8FRextbJTdpU9xeFXgs9aGCCG+BQcciosMEhzBV2aMD04qQ7rctaW/baYeFFRL0Yjw8obmRa44l5ApBv/WW1tG7xmFksuv+kTnkuBg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Vq0M87NzhO/Rv4P5a1urdnmGSGGLoAXkZGrXTiy37b8=;
+ b=r6PADBHC/+vDr01UdqmuCp2GDZhcEAngn7k6El3B6StZLJcgCiva25eTUlHlE1hbKsXQyrV13pnftrxKHTD9zSTkNusCZ4cFyPVAaz4WZgpVwkzwWD1FCLr2xNpMDtuJnlc7Ns+dhPwTeJgCfBYs19tMzHdJ3CiCCfIS2LjugO4aD5rkCPzlRCkCys3P8Ci/o9B/USpH0tS8i3dIPn/AeYBHGC2KAZOajROtGjXkLl+/6YONM4tFgWDyrtr16GtU9ulD10x6N3yXknl9NQtuO7XQQa9UleAO4H9Ias8/EeL2WDNCEZS9t+RLYHktZT/TbOWgsPiMeLwTQ3cPFG6ANQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from BY5PR12MB4130.namprd12.prod.outlook.com (2603:10b6:a03:20b::16)
+ by MW4PR12MB6826.namprd12.prod.outlook.com (2603:10b6:303:20c::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.41; Mon, 6 May
+ 2024 19:02:15 +0000
+Received: from BY5PR12MB4130.namprd12.prod.outlook.com
+ ([fe80::2cf4:5198:354a:cd07]) by BY5PR12MB4130.namprd12.prod.outlook.com
+ ([fe80::2cf4:5198:354a:cd07%4]) with mapi id 15.20.7544.041; Mon, 6 May 2024
+ 19:02:15 +0000
+From: John Hubbard <jhubbard@nvidia.com>
+To: Shuah Khan <shuah@kernel.org>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	=?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>,
+	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
+	Matthieu Baerts <matttbe@kernel.org>,
+	Mat Martineau <martineau@kernel.org>,
+	Geliang Tang <geliang@kernel.org>,
+	Pravin B Shelar <pshelar@ovn.org>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Alexander Mikhalitsyn <alexander@mihalicyn.com>,
+	zhujun2 <zhujun2@cmss.chinamobile.com>,
+	Petr Machata <petrm@nvidia.com>,
+	Ido Schimmel <idosch@nvidia.com>,
+	Hangbin Liu <liuhangbin@gmail.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Benjamin Poirier <bpoirier@nvidia.com>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Dmitry Safonov <0x7f454c46@gmail.com>,
+	netdev@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-actions@lists.infradead.org,
+	mptcp@lists.linux.dev,
+	dev@openvswitch.org,
+	Valentin Obst <kernel@valentinobst.de>,
+	linux-kselftest@vger.kernel.org,
+	LKML <linux-kernel@vger.kernel.org>,
+	llvm@lists.linux.dev,
+	John Hubbard <jhubbard@nvidia.com>
+Subject: [PATCH v2] selftests/net: fix uninitialized variables
+Date: Mon,  6 May 2024 12:02:04 -0700
+Message-ID: <20240506190204.28497-1-jhubbard@nvidia.com>
+X-Mailer: git-send-email 2.45.0
+X-NVConfidentiality: public
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: BYAPR05CA0079.namprd05.prod.outlook.com
+ (2603:10b6:a03:e0::20) To BY5PR12MB4130.namprd12.prod.outlook.com
+ (2603:10b6:a03:20b::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BY5PR12MB4130:EE_|MW4PR12MB6826:EE_
+X-MS-Office365-Filtering-Correlation-Id: ee76813a-3484-4c53-d19d-08dc6dff0b21
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230031|7416005|1800799015|376005|366007;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?YhTRhNKXsoJ9JejY1P9hcabykamE0dREZkBbjsSIMP62T6sfBtBz4pi9A4Wg?=
+ =?us-ascii?Q?TIaarkw/5Y4HM2fMyfq9cAE0D8d7ZmXYIp9kOJ4wXYHAwjo9P2YUpoeSS1wt?=
+ =?us-ascii?Q?FnIza+badBf7ep3zO8iQkpwDq4ZV196YnsZbGxcA/W08SsZ2sbeFwoXbQvkm?=
+ =?us-ascii?Q?i4yHey0tTuzwsd1s4CWLb0cq0zdCLUZQ8DmY4cV4SGGYSyCc3YH+TKKZLBx4?=
+ =?us-ascii?Q?YGVgoWR1PR3XPiGCkf+iDJRp5tviuvVn96MnLyBDlilU75TOjIQqAgVTRmoZ?=
+ =?us-ascii?Q?m3pkfLzIhJY2+33k8WSbJMcSre/DwQJgVuRYHO+YTKFNwDgUHNk8617G29oq?=
+ =?us-ascii?Q?b89L59dPBRMdm8hweUMWN/b5Ragcna3I1HDwaRo7+rYegPkRsbR4xMCEdwUq?=
+ =?us-ascii?Q?ZqY2pbCJlnzOdoJAtQengyMHaAG8vpqob6n7dqkxhE3yAayq6MEHJmf2hdM7?=
+ =?us-ascii?Q?0/GO3SJ5NEeEnWroitpFey05oPJB16wm2ubNoJY/Bipajfvzuju9BkTjLgMu?=
+ =?us-ascii?Q?UPgFHpadpLteEbCDmrHS2d39C0S8utfQyrB+uSFtIJQFTMKQ6LA0ZLb+pKpR?=
+ =?us-ascii?Q?rZqkM8kok2a4RwCNDIBWD1VXO6W9dO5sAzB8WxrvQlutv6Fxwm32jVsImzgc?=
+ =?us-ascii?Q?WIvbnIN+m7JhD3CAHK620eLb9Xt/7XzXbAjlUOlHjRmdlOZSu07gd7VhYVtx?=
+ =?us-ascii?Q?SkVc0justT3al5U7+bDiP+XxuNEcsxRYP7wK6I0WEaSiwkjfPkTOqP2KXZYO?=
+ =?us-ascii?Q?JHgOWKYMZFawG0rAbtcrH0+xlg9SVvY6BkbwYbRZBKMOGjypROeqTDlmwaj4?=
+ =?us-ascii?Q?VzmRXSY1AA7YIFr4/Mz6m6+Emrn1Wy+jns6wrZ/0JYfk0EDH5YPWw2GRXNqD?=
+ =?us-ascii?Q?UNu7VEyFdOaXye4FnE8I66BbHViKn7mq4Ur4lNVC2DFDs0si0M8WizsoIcSE?=
+ =?us-ascii?Q?AQ6vyKOReLuR3UjBL9/Q0VqJ3vmlBrHv1Yu91GvXh6PoB6MEoBdTGRq/ZUG2?=
+ =?us-ascii?Q?GON7QGJ1rp8//XouvIjHambSd0cVR0sPl7FH80dr7hWnn7e2c2oSZkZ2qd2F?=
+ =?us-ascii?Q?v40lG5lMzOs7YsmlRDW5fREdLe9UqpH80FupEuKb4aEeaXB/P9SOt8jQEpzY?=
+ =?us-ascii?Q?krgIpHkRP3bAxO6/K8cjfVLb5WuQYnZk+CIQync1tzBpPmo42qbEWiR/euPa?=
+ =?us-ascii?Q?/m0OZehUkZa1GkSOo/bOqI+J8ESgl+mp5Cs+jM4DLZIBPmQWEXzuNP0x2jRs?=
+ =?us-ascii?Q?jG+59JFZ1rZk4cK9A/EXstKFM6aQgDjASF+JE7dC/g=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY5PR12MB4130.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7416005)(1800799015)(376005)(366007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?qzpRpBfjibkMgWeT74gnfFe/NRMdmYmkSmEJOl0DundnIw7JPekEpy7HtWge?=
+ =?us-ascii?Q?kSntY/R4sqW8PqMBpk2eQv7olZjTGjACfPtFKw08shmBgGkKOlPhf0NaSB3h?=
+ =?us-ascii?Q?DDSH/36hyvCL4CNdLBY+V+l5zCCQOFhOLs3xeOu2PR5/AEh5NC/XvSE7Ysn/?=
+ =?us-ascii?Q?lspcfwnN1LAZtXedaQv8OuW1Iwwpi/VEbKXBnvR0S9JmhmME5fN0XMt746O3?=
+ =?us-ascii?Q?eUyC30Z8Hdk4PRRAGnveHdBqPBop7MwTDNWfxZoFZ9MA93HQOjOoepxAQoJz?=
+ =?us-ascii?Q?d5Q1KdxdHSXtfT6WJRO0eUVXUbI/+NCPNj6TtcvsRlzA5jl1iZYrgrLXmQvy?=
+ =?us-ascii?Q?93KnNGMibJUmI9fhKiD8Zqmnt2dywAcxHa8F3TADj0SV7LIqX6WXh3+kySHn?=
+ =?us-ascii?Q?dnGfgIX0J8gXPxu2gR0GXlSXJXivtrU3zc7H0t/aMPiCDfrR3WpzBQ7E/DgD?=
+ =?us-ascii?Q?+4OcRU0b92RhhAu2UY9AO+4ln2Q5aFlQ9mo6B3zGqTwYoB1kURGULxmtw0Fg?=
+ =?us-ascii?Q?UEPiMZSNpwfspbJ3ZbeipPrwejhGvQ0dgJ858LqfyDBtDYy9xjgIMzHLXY0Z?=
+ =?us-ascii?Q?eBpvhJ2LDyzYIoj0kRB163Fef9nwPa5kic+88gB/drrbQR0V+7OrpyQEfvnx?=
+ =?us-ascii?Q?UIu/TA+sVmq0SN78jibV/zrSULhW19QaTz93grc4pyEfT2Ve15KgpqM7wUW8?=
+ =?us-ascii?Q?iF5HacHUXJVJbqB90x00KECIrBiA49ozKQs3Wmq5UqHlO+36jV40lFjNJX/A?=
+ =?us-ascii?Q?1053Y96Trmb7CjoIWgd7qh+OLE0q2U7ixHP9ytTg4UamWisyX/S5QJ1lz5ap?=
+ =?us-ascii?Q?oY1dCZ+9P7m252Id6uVR4ISoj2QjXktW/eOUpxV5lwKAUNhN+k216E2gkUJ0?=
+ =?us-ascii?Q?kCaNMGMQ4ikgVJpFtdfF45HBBwwftGf4SG7RLQl7iW5YMEHCyNPhClI0j46Y?=
+ =?us-ascii?Q?soZZTUK1mL2pJWqJNlLI9nyB6DQiPAUN3O3u32YMkEl0YJtlagSImfhijtVm?=
+ =?us-ascii?Q?D0GHqW3nEBRnx4rZ6Kzxd/wxqGxuqRzEs8TRjvtS18Ys+JBXRX3vHJrqiZGy?=
+ =?us-ascii?Q?7TJvw4EXbXwnFuaS0NvizAYfFtn8wxtvF5HDK07nAZQl/sJ09KcY/ex5g4RH?=
+ =?us-ascii?Q?KZ3YRqZIwQCj/mCjzPAzxuIF/XOSLDvBDQPqW137A3DKbKCfD+uIcPM3DgOU?=
+ =?us-ascii?Q?L5r3Z0oLYakbIDw+/5nvieYdfEbooAgGlM0shSSFohIxs1q3jITQDJe4ypW6?=
+ =?us-ascii?Q?hxWQw23CTJ1HVJiQhApOxR8APRcgtt1a6yxM55MrIf+J7zW44sXBogBo/L+i?=
+ =?us-ascii?Q?Ry6Etf4c7VcFhYxy5QndCzXr+FAqy+VW8xenlg4pG/3dzNph0BsZn6bv6nK8?=
+ =?us-ascii?Q?vq+CqqQkgg5BHrHPSc0NmyYxqlCsPm6kIeJJsHzlpOVfbjC9MlBLscpYhJ9n?=
+ =?us-ascii?Q?DW0fJ0l1uc9273No4ojwSmBzUe0iHuqEBiqMuHBag6kJM8KNC1BtFin4jGGF?=
+ =?us-ascii?Q?L8M6wLWS22vICHEqpLuRU/uxQ60Dj3+ZTKMnHquo+a1K/6YI0vB1uOEgP5OD?=
+ =?us-ascii?Q?6UN0DC9+BuM31ate6v/WpepkWbpGbljEw1HpUEnNXx51DUJBA6Lakjm4Uri3?=
+ =?us-ascii?Q?vA=3D=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ee76813a-3484-4c53-d19d-08dc6dff0b21
+X-MS-Exchange-CrossTenant-AuthSource: BY5PR12MB4130.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 May 2024 19:02:15.1725
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: rzddJ/OmsmtsPK4ktt4UchpGnqhTYrOfPRYB++pLQeg5cwVYqb3tCY6ntPdPo6t31fIE8ki0lA6NJPIPtrRWfQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB6826
 
-Abhishek Chauhan wrote:
-> tstamp_type is now set based on actual clockid_t compressed
-> into 2 bits.
-> 
-> To make the design scalable for future needs this commit bring in
-> the change to extend the tstamp_type:1 to tstamp_type:2 to support
-> other clockid_t timestamp.
-> 
-> We now support CLOCK_TAI as part of tstamp_type as part of this
-> commit with exisiting support CLOCK_MONOTONIC and CLOCK_REALTIME.
-> 
-> Link: https://lore.kernel.org/netdev/bc037db4-58bb-4861-ac31-a361a93841d3@linux.dev/
-> Signed-off-by: Abhishek Chauhan <quic_abchauha@quicinc.com>
-> ---
-> Changes since v5
-> - Took care of documentation comments of tstamp_type 
->   in skbuff.h as mentioned by Willem.
-> - Use of complete words instead of abbrevation in 
->   macro definitions as mentioned by Willem.
-> - Fixed indentation problems 
-> - Removed BPF_SKB_TSTAMP_UNSPEC and marked it 
->   Deprecated as documentation, and introduced 
->   BPF_SKB_CLOCK_REALTIME instead. 
-> - BUILD_BUG_ON for additional enums introduced.
-> - __ip_make_skb and ip6_make_skb now has 
->   tcp checks to mark tcp packet as mono tstamp base. 
-> - separated the selftests/bpf changes into another patch.
-> - Made changes as per Martin in selftest bpf code and 
->   tool/include/uapi/linux/bpf.h 
-> 
-> Changes since v4
-> - Made changes to BPF code in filter.c as per 
->   Martin's comments
-> - Minor fixes on comments given on documentation
->   from Willem in skbuff.h (removed obvious ones)
-> - Made changes to ctx_rewrite.c and test_tc_dtime.c
-> - test_tc_dtime.c i am not really sure if i took care 
->   of all the changes as i am not too familiar with 
->   the framework.
-> - Introduce common mask SKB_TSTAMP_TYPE_MASK instead
->   of multiple SKB mask.
-> - Optimisation on BPF code as suggested by Martin.
-> - Set default case to SKB_CLOCK_REALTME.  
-> 
-> Changes since v3
-> - Carefully reviewed BPF APIs and made changes in 
->   BPF code as well. 
-> - Re-used actual clockid_t values since skbuff.h 
->   indirectly includes uapi/linux/time.h
-> - Added CLOCK_TAI as part of the skb_set_delivery_time
->   handling instead of CLOCK_USER
-> - Added default in switch for unsupported and invalid 
->   timestamp with an WARN_ONCE
-> - All of the above comments were given by Willem  
-> - Made changes in filter.c as per Martin's comments
->   to handle invalid cases in bpf code with addition of
->   SKB_TAI_DELIVERY_TIME_MASK
-> 
-> Changes since v2
-> - Minor changes to commit subject
-> 
-> Changes since v1 
-> - identified additional changes in BPF framework.
-> - Bit shift in SKB_MONO_DELIVERY_TIME_MASK and TC_AT_INGRESS_MASK.
-> - Made changes in skb_set_delivery_time to keep changes similar to 
->   previous code for mono_delivery_time and just setting tstamp_type
->   bit 1 for userspace timestamp.
-> 
-> 
->  include/linux/skbuff.h   | 21 +++++++++++--------
->  include/uapi/linux/bpf.h | 15 +++++++++-----
->  net/core/filter.c        | 44 +++++++++++++++++++++++-----------------
->  net/ipv4/ip_output.c     |  5 ++++-
->  net/ipv4/raw.c           |  2 +-
->  net/ipv6/ip6_output.c    |  5 ++++-
->  net/ipv6/raw.c           |  2 +-
->  net/packet/af_packet.c   |  7 +++----
->  8 files changed, 61 insertions(+), 40 deletions(-)
-> 
-> diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-> index de3915e2bfdb..fe7d8dbef77e 100644
-> --- a/include/linux/skbuff.h
-> +++ b/include/linux/skbuff.h
-> @@ -709,6 +709,8 @@ typedef unsigned char *sk_buff_data_t;
->  enum skb_tstamp_type {
->  	SKB_CLOCK_REALTIME,
->  	SKB_CLOCK_MONOTONIC,
-> +	SKB_CLOCK_TAI,
-> +	__SKB_CLOCK_MAX = SKB_CLOCK_TAI,
->  };
->  
->  /**
-> @@ -829,8 +831,7 @@ enum skb_tstamp_type {
->   *	@decrypted: Decrypted SKB
->   *	@slow_gro: state present at GRO time, slower prepare step required
->   *	@tstamp_type: When set, skb->tstamp has the
-> - *		delivery_time in mono clock base Otherwise, the
-> - *		timestamp is considered real clock base.
-> + *		delivery_time clock base of skb->tstamp.
->   *	@napi_id: id of the NAPI struct this skb came from
->   *	@sender_cpu: (aka @napi_id) source CPU in XPS
->   *	@alloc_cpu: CPU which did the skb allocation.
-> @@ -958,7 +959,7 @@ struct sk_buff {
->  	/* private: */
->  	__u8			__mono_tc_offset[0];
->  	/* public: */
-> -	__u8			tstamp_type:1;	/* See skb_tstamp_type */
-> +	__u8			tstamp_type:2;	/* See skb_tstamp_type */
->  #ifdef CONFIG_NET_XGRESS
->  	__u8			tc_at_ingress:1;	/* See TC_AT_INGRESS_MASK */
->  	__u8			tc_skip_classify:1;
-> @@ -1088,15 +1089,16 @@ struct sk_buff {
->  #endif
->  #define PKT_TYPE_OFFSET		offsetof(struct sk_buff, __pkt_type_offset)
->  
-> -/* if you move tc_at_ingress or mono_delivery_time
-> +/* if you move tc_at_ingress or tstamp_type
->   * around, you also must adapt these constants.
->   */
->  #ifdef __BIG_ENDIAN_BITFIELD
-> -#define SKB_MONO_DELIVERY_TIME_MASK	(1 << 7)
-> -#define TC_AT_INGRESS_MASK		(1 << 6)
-> +#define SKB_TSTAMP_TYPE_MASK		(3 << 6)
-> +#define SKB_TSTAMP_TYPE_RSHIFT		(6)
-> +#define TC_AT_INGRESS_MASK		(1 << 5)
->  #else
-> -#define SKB_MONO_DELIVERY_TIME_MASK	(1 << 0)
-> -#define TC_AT_INGRESS_MASK		(1 << 1)
-> +#define SKB_TSTAMP_TYPE_MASK		(3)
-> +#define TC_AT_INGRESS_MASK		(1 << 2)
->  #endif
->  #define SKB_BF_MONO_TC_OFFSET		offsetof(struct sk_buff, __mono_tc_offset)
->  
-> @@ -4213,6 +4215,9 @@ static inline void skb_set_delivery_type_by_clockid(struct sk_buff *skb,
->  	case CLOCK_MONOTONIC:
->  		tstamp_type = SKB_CLOCK_MONOTONIC;
->  		break;
-> +	case CLOCK_TAI:
-> +		tstamp_type = SKB_CLOCK_TAI;
-> +		break;
->  	default:
->  		WARN_ON_ONCE(1);
->  		kt = 0;
-> diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
-> index 90706a47f6ff..25ea393cf084 100644
-> --- a/include/uapi/linux/bpf.h
-> +++ b/include/uapi/linux/bpf.h
-> @@ -6207,12 +6207,17 @@ union {					\
->  	__u64 :64;			\
->  } __attribute__((aligned(8)))
->  
-> +/* The enum used in skb->tstamp_type. It specifies the clock type
-> + * of the time stored in the skb->tstamp.
-> + */
->  enum {
-> -	BPF_SKB_TSTAMP_UNSPEC,
-> -	BPF_SKB_TSTAMP_DELIVERY_MONO,	/* tstamp has mono delivery time */
-> -	/* For any BPF_SKB_TSTAMP_* that the bpf prog cannot handle,
-> -	 * the bpf prog should handle it like BPF_SKB_TSTAMP_UNSPEC
-> -	 * and try to deduce it by ingress, egress or skb->sk->sk_clockid.
-> +	BPF_SKB_TSTAMP_UNSPEC = 0,		/* DEPRECATED */
-> +	BPF_SKB_TSTAMP_DELIVERY_MONO = 1,	/* DEPRECATED */
-> +	BPF_SKB_CLOCK_REALTIME = 0,
-> +	BPF_SKB_CLOCK_MONOTONIC = 1,
-> +	BPF_SKB_CLOCK_TAI = 2,
-> +	/* For any future BPF_SKB_CLOCK_* that the bpf prog cannot handle,
-> +	 * the bpf prog can try to deduce it by ingress/egress/skb->sk->sk_clockid.
->  	 */
->  };
->  
-> diff --git a/net/core/filter.c b/net/core/filter.c
-> index a3781a796da4..9f3df4a0d1ee 100644
-> --- a/net/core/filter.c
-> +++ b/net/core/filter.c
-> @@ -7726,16 +7726,20 @@ BPF_CALL_3(bpf_skb_set_tstamp, struct sk_buff *, skb,
->  		return -EOPNOTSUPP;
->  
->  	switch (tstamp_type) {
-> -	case BPF_SKB_TSTAMP_DELIVERY_MONO:
-> +	case BPF_SKB_CLOCK_MONOTONIC:
->  		if (!tstamp)
->  			return -EINVAL;
->  		skb->tstamp = tstamp;
->  		skb->tstamp_type = SKB_CLOCK_MONOTONIC;
->  		break;
-> -	case BPF_SKB_TSTAMP_UNSPEC:
-> -		if (tstamp)
-> +	case BPF_SKB_CLOCK_TAI:
-> +		if (!tstamp)
->  			return -EINVAL;
-> -		skb->tstamp = 0;
-> +		skb->tstamp = tstamp;
-> +		skb->tstamp_type = SKB_CLOCK_TAI;
-> +		break;
-> +	case BPF_SKB_CLOCK_REALTIME:
-> +		skb->tstamp = tstamp;
->  		skb->tstamp_type = SKB_CLOCK_REALTIME;
+When building with clang, via:
 
-Only since there is another reason to respin.
+    make LLVM=1 -C tools/testing/selftest
 
-The previous code did not do this, but let's order cases by their enum
-value, starting with realtime.
+...clang warns about three variables that are not initialized in all
+cases:
 
-Also in anticipation with possible future expansions.
+1) The opt_ipproto_off variable is used uninitialized if "testname" is
+not "ip". Willem de Bruijn pointed out that this is an actual bug, and
+suggested the fix that I'm using here (thanks!).
 
+2) The addr_len is used uninitialized, but only in the assert case,
+   which bails out, so this is harmless.
+
+3) The family variable in add_listener() is only used uninitialized in
+   the error case (neither IPv4 nor IPv6 is specified), so it's also
+   harmless.
+
+Fix by initializing each variable.
+
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Signed-off-by: John Hubbard <jhubbard@nvidia.com>
+---
+ tools/testing/selftests/net/gro.c                 | 3 +++
+ tools/testing/selftests/net/ip_local_port_range.c | 2 +-
+ tools/testing/selftests/net/mptcp/pm_nl_ctl.c     | 2 +-
+ 3 files changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/tools/testing/selftests/net/gro.c b/tools/testing/selftests/net/gro.c
+index 353e1e867fbb..6038b96ecee8 100644
+--- a/tools/testing/selftests/net/gro.c
++++ b/tools/testing/selftests/net/gro.c
+@@ -119,6 +119,9 @@ static void setup_sock_filter(int fd)
+ 		next_off = offsetof(struct ipv6hdr, nexthdr);
+ 	ipproto_off = ETH_HLEN + next_off;
+ 
++	/* Overridden later if exthdrs are used: */
++	opt_ipproto_off = ipproto_off;
++
+ 	if (strcmp(testname, "ip") == 0) {
+ 		if (proto == PF_INET)
+ 			optlen = sizeof(struct ip_timestamp);
+diff --git a/tools/testing/selftests/net/ip_local_port_range.c b/tools/testing/selftests/net/ip_local_port_range.c
+index 193b82745fd8..29451d2244b7 100644
+--- a/tools/testing/selftests/net/ip_local_port_range.c
++++ b/tools/testing/selftests/net/ip_local_port_range.c
+@@ -359,7 +359,7 @@ TEST_F(ip_local_port_range, late_bind)
+ 		struct sockaddr_in v4;
+ 		struct sockaddr_in6 v6;
+ 	} addr;
+-	socklen_t addr_len;
++	socklen_t addr_len = 0;
+ 	const int one = 1;
+ 	int fd, err;
+ 	__u32 range;
+diff --git a/tools/testing/selftests/net/mptcp/pm_nl_ctl.c b/tools/testing/selftests/net/mptcp/pm_nl_ctl.c
+index 7426a2cbd4a0..7ad5a59adff2 100644
+--- a/tools/testing/selftests/net/mptcp/pm_nl_ctl.c
++++ b/tools/testing/selftests/net/mptcp/pm_nl_ctl.c
+@@ -1276,7 +1276,7 @@ int add_listener(int argc, char *argv[])
+ 	struct sockaddr_storage addr;
+ 	struct sockaddr_in6 *a6;
+ 	struct sockaddr_in *a4;
+-	u_int16_t family;
++	u_int16_t family = AF_UNSPEC;
+ 	int enable = 1;
+ 	int sock;
+ 	int err;
+
+base-commit: f462ae0edd3703edd6f22fe41d336369c38b884b
+prerequisite-patch-id: b901ece2a5b78503e2fb5480f20e304d36a0ea27
+prerequisite-patch-id: e81ae5ca6c427dde802acd4c1442c82e170c251a
+-- 
+2.45.0
 
 
