@@ -1,77 +1,64 @@
-Return-Path: <netdev+bounces-93657-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93658-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74E478BCA0D
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 10:51:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 466578BCA25
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 10:59:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2E808282FC6
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 08:51:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 02F282832EF
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 08:59:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D4D81420C9;
-	Mon,  6 May 2024 08:51:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Hsj2PDJ4"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4553F1422A4;
+	Mon,  6 May 2024 08:59:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5976C1420B9
-	for <netdev@vger.kernel.org>; Mon,  6 May 2024 08:51:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 692041420B9;
+	Mon,  6 May 2024 08:59:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714985493; cv=none; b=eW/lqU0uzGGgpC7Clw0Xow3Ck/wQVFoyNUCeVYrzs3kc86xSCsnq0C8Nmsv/+UrL8NhFcYKjqrj0yeA7CLVpWQzkGM03imu5TwhtcGWN270LcIiHwehcprqfKA9lOKz4Bk/xYyr2yxBSw5jeCANlzynGKQrTA7ab1Pt9zIPpOCs=
+	t=1714985979; cv=none; b=oVHYNSplVGKgmMb1mA52sULnZbzOQXrNXgPRvvISdVUkebPXhaChi0eEpGcHzekOTLFZ50Bc2s5+M135mF4394mLwJz+b7bBcnYo91YMF8MYXFtelFXT2+JYLTX4hpo3DYlvH6oIYZ3E5v7QS+d7DzL10s5MOpdH1hZW+5S0Ddk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714985493; c=relaxed/simple;
-	bh=n077hml70tQrzUxJl7tu8jfzK0VqIgZ/7Ew1bmK5Y+A=;
+	s=arc-20240116; t=1714985979; c=relaxed/simple;
+	bh=Ip4PJGmssqUYDHs84SW1KF6dPBdDymkhSRWjUmFmSZw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kublFrc8zMrz8tK5AqsvJ7hMsn+pRvi6AI/qeeQSAMmUySnOIHtbOh1uf0mz+/PGXSi+2MHl6Xb8OtmiWKoGHnAIGD+ELpI46RPVu2r7PeT2kYkZ8jm+ft1XUbtm3FqVsMc+8SzFFAkqal7gRUi3PybbvIYiH2CGcG7WkAEXTug=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Hsj2PDJ4; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1714985492; x=1746521492;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=n077hml70tQrzUxJl7tu8jfzK0VqIgZ/7Ew1bmK5Y+A=;
-  b=Hsj2PDJ4z1FGgp+wNnceSzkdG0P0+UTkoBGTX04zODnF85miRCb7Nhsv
-   8BHATxI/Ud7IkexnU3RHn+e9x/9k0QMzkOTvtyEY9CmX8uylvUuL7HuA8
-   q1tKSQekcU4FU5f0uuQLQ8SN0/QhIAKaB6Mpg4mkqin/LxvFcQfX9vDsS
-   e7GYTaac7YryJibW78MWJa6+q0VqRFrq4ssuiNRO+Wb28ZhhYZqafAPtN
-   Nxy+hC94aDs+uq6BPB7Fwv2gowD/FDUvlR9nWJ9E4UJxevyCLLmssmuYN
-   HS6nlv5oRhR7p/e4MgCoIMsBMrN7JaeIRv6QLp6BgrYh/bK/kdGvYC5K8
-   A==;
-X-CSE-ConnectionGUID: GK/4xz7FSWyfWT9kiTCoXg==
-X-CSE-MsgGUID: bAKseya6QyGX56zSbtRCFA==
-X-IronPort-AV: E=McAfee;i="6600,9927,11064"; a="22130421"
-X-IronPort-AV: E=Sophos;i="6.07,257,1708416000"; 
-   d="scan'208";a="22130421"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2024 01:51:31 -0700
-X-CSE-ConnectionGUID: EB7Wb8sjSPqQumpTj1FBDw==
-X-CSE-MsgGUID: yR1fEpw9T4GvwxMk6MSwVQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,257,1708416000"; 
-   d="scan'208";a="32771649"
-Received: from unknown (HELO mev-dev) ([10.237.112.144])
-  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2024 01:51:28 -0700
-Date: Mon, 6 May 2024 10:50:53 +0200
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	jacob.e.keller@intel.com, michal.kubiak@intel.com,
-	maciej.fijalkowski@intel.com, sridhar.samudrala@intel.com,
-	przemyslaw.kitszel@intel.com, wojciech.drewek@intel.com,
-	pio.raczynski@gmail.com, jiri@nvidia.com,
-	mateusz.polchlopek@intel.com, shayd@nvidia.com
-Subject: Re: [iwl-next v1 3/4] ice: move VSI configuration outside repr setup
-Message-ID: <ZjiZ7Re63+aEtROE@mev-dev>
-References: <20240419171336.11617-1-michal.swiatkowski@linux.intel.com>
- <20240419171336.11617-4-michal.swiatkowski@linux.intel.com>
- <7003fe5e-4bb9-8335-6d3f-9edab0aa3570@intel.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=sXn3lELLSg7tTznhYzYiG246oD61Ppe9Kem6biZo/2gPpOQ3XglDnTHEKBGQvoGkbYqpHR/TkLkuvz+mCgmUkbh8aHCmTmK04FHy9h7wMFKj0EggjV+bT9oyg9m0jMne9+HyYWyIXKXAfxFBwhJniZg6OjFiDEL8gqqMgP/bX/s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.97.1)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1s3uC1-0000000057d-1grd;
+	Mon, 06 May 2024 08:59:29 +0000
+Date: Mon, 6 May 2024 09:59:25 +0100
+From: Daniel Golle <daniel@makrotopia.org>
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc: Frank Wunderlich <linux@fw-web.de>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Michael Turquette <mturquette@baylibre.com>,
+	Stephen Boyd <sboyd@kernel.org>, Pavel Machek <pavel@ucw.cz>,
+	Lee Jones <lee@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	devicetree@vger.kernel.org, Tianling Shen <cnsztl@immortalwrt.org>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-mediatek@lists.infradead.org,
+	linux-arm-kernel@lists.infradead.org,
+	Eric Woudstra <ericwouds@gmail.com>, linux-clk@vger.kernel.org,
+	linux-leds@vger.kernel.org
+Subject: Re: [RFC v1 1/5] dt-bindings: leds: add led trigger netdev
+Message-ID: <Zjib7STAHIikWnLp@makrotopia.org>
+References: <20240505164549.65644-1-linux@fw-web.de>
+ <20240505164549.65644-2-linux@fw-web.de>
+ <8e9fd4c9-f537-4413-b8c8-988b001b64c0@linaro.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,35 +67,42 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <7003fe5e-4bb9-8335-6d3f-9edab0aa3570@intel.com>
+In-Reply-To: <8e9fd4c9-f537-4413-b8c8-988b001b64c0@linaro.org>
 
-On Wed, Apr 24, 2024 at 02:08:11PM -0700, Tony Nguyen wrote:
+On Mon, May 06, 2024 at 10:18:09AM +0200, Krzysztof Kozlowski wrote:
+> On 05/05/2024 18:45, Frank Wunderlich wrote:
+> > From: Frank Wunderlich <frank-w@public-files.de>
+> > 
+> > Add led trigger implemented with config-symbol LEDS_TRIGGER_NETDEV to
+> > binding.
+> > 
+> > Signed-off-by: Frank Wunderlich <frank-w@public-files.de>
+> > ---
+> >  Documentation/devicetree/bindings/leds/common.yaml | 2 ++
+> >  1 file changed, 2 insertions(+)
+> > 
+> > diff --git a/Documentation/devicetree/bindings/leds/common.yaml b/Documentation/devicetree/bindings/leds/common.yaml
+> > index 8a3c2398b10c..bf9a101e4d42 100644
+> > --- a/Documentation/devicetree/bindings/leds/common.yaml
+> > +++ b/Documentation/devicetree/bindings/leds/common.yaml
+> > @@ -113,6 +113,8 @@ properties:
+> >              # LED indicates NAND memory activity (deprecated),
+> >              # in new implementations use "mtd"
+> >            - nand-disk
+> > +            # LED indicates network activity
+> > +          - netdev
 > 
-> 
-> On 4/19/2024 10:13 AM, Michal Swiatkowski wrote:
-> 
-> > +/**
-> > + * ice_eswitch_cfg_vsi - configure VSI to work in slow-path
-> > + * @vsi: VSI structure of representee
-> > + * @mac: representee MAC
-> 
-> Can you fix the kdoc for this?
-> 
-> > drivers/net/ethernet/intel/ice/ice_eswitch.c:140: warning: No description
-> found for return value of 'ice_eswitch_cfg_vsi'
-> 
-> Thanks,
-> Tony
-> 
+> "dev" is redundant (there is no flash-dev or usb-host-dev). Two network
+> interfaces are already provided, so your commit msg must provide
+> rationale why this is not enough and why this is useful/needed.
 
-I sent v2, sorry for late response, I was OOO.
+Also note that using 'netdev' assigned via DT via linux,default-trigger
+currently doesn't work well. This is because the assignment of the trigger
+from DT happens when the PHY is being attached initially, and that's
+**before** the network device is registered with Linux.
+As a result, LED event offloading is never used if done in this way.
 
-Thanks,
-Michal
-
-> > + */
-> > +int ice_eswitch_cfg_vsi(struct ice_vsi *vsi, const u8 *mac)
-> > +{
-> > +	int err;
-> > +
+I know that bindings and implementation are two different independent
+things, but yet I believe that adding bindings for a feature which doesn't
+really work would be misleading.
 
