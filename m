@@ -1,158 +1,194 @@
-Return-Path: <netdev+bounces-93711-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93709-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C26788BCE2E
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 14:40:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A49E8BCE03
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 14:34:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 73F68280946
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 12:40:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 153DE28029C
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 12:34:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DFF71DA23;
-	Mon,  6 May 2024 12:40:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ei09gRNs"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA6381C695;
+	Mon,  6 May 2024 12:34:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 723F41DA22;
-	Mon,  6 May 2024 12:40:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37FE018C19;
+	Mon,  6 May 2024 12:34:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714999204; cv=none; b=MTlhxaXxZchbQ3uPzDNrmMze8TV/OdQe5v9/egD0k/yfMb/kF2xjiDhagGLUF55UzlY4bZHiBquZe/D8OU74DjmX2ZWkpAL8fufpT8200QbvPbLMs0KLx3wXwGZxZIM6NWfp4P52mb/1AJj/0w296213RArg0f0bjptMn+65ZI4=
+	t=1714998844; cv=none; b=PSRMYV+ZLfKrbcvD7KgmYPwK2O84xwqm8Kj0m2rKkM0qp3Li+Ae5A0mvC218QH+V3lcdW4R3mm3u6caJp5MVzhWXqgaHeGsHmSjvB92HdNBop29UTR3PIcrFzxJB4Z5BrxAo/s2uu159nUenwPthWBaNnOX8IzHmL01JZRVdXYU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714999204; c=relaxed/simple;
-	bh=I0aEhq4nU2NqcfNEZMplKejLv864kLLf/BLQOapouH4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LtWsHb78gVwL4QvCznSte40LmO4oU+iHed08J2XQBqWOzrDLjHR+htaQRYmDMQYZJfio/DudAFLvP6PCh/0ZLsCmp7Ut+u7Zwoj7GJrPyPApIiT5bSGrSsgHaTCeCKv5Ob3zimFOT6kFSw3jdvbBsCS6bOtXRYtAFYTf1/oj0MI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ei09gRNs; arc=none smtp.client-ip=209.85.128.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-41ba1ba55e8so11243485e9.1;
-        Mon, 06 May 2024 05:40:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1714999201; x=1715604001; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=rxjJb/KzzXIFQHfzAUi7FnhbwHdNprYeBkYOQsJcPKk=;
-        b=ei09gRNspAdb2aqMI3I9Vj7edy3cn++1uV1LjRbzhzHNk2Autqa0iuz1Oed/stdicj
-         pBKCwURcFKjKYvcQ79G/pa+ZD603+7RRTY7WCouQ32FgvAB+krYoBovnbmHKqZSgKFcG
-         0JXwTQYwx5q7nK2Nh61yUDOvOFRTwHO2azzwHp4o/WWg05WByTyqMxwtQSa9vVOSN6gi
-         fGlM9LlMjkyW97fmtLg7oMFpdm0sSr2upJUMYqyPEBr63Hv0FVYrD07U+sbB1ww+8mft
-         3IccpIi0J2HEnPahGRJ8KdqgwF7wODikjdjKxqkpaXRRbW/hXlIOrS9Qp86DrkPRbWlT
-         XVzw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714999201; x=1715604001;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=rxjJb/KzzXIFQHfzAUi7FnhbwHdNprYeBkYOQsJcPKk=;
-        b=tX304PVVm0JKpPSHTt+bdVvPBRBuHyehdPwqkSKlz7sXTuqi5daV92EmARiGLka1Sy
-         wkQcYnG7dKIQ0WUtF+riTPRKrJPDt60CDiqZaj/TopWDa6o0r392enqy3IjN0geig0uV
-         J+SrSxmxhClX68LjNdzNp1sHzNR//4EZYkpZxcmVBZu7e2P9qaKIt7lYMOxCFnuWbpN8
-         KsKgJ2WT+PhbkelrXiNxMyZLz0yhzxeJohdagOoFvMFZP5M3U8uI8WoOcbCytUd0468E
-         XoITZTPwle7QHMCsSDpS0bLXAL3c6NEPw1Z46yvaEa1vKXHmKC/gQ+kS5xiuHWxxDg5R
-         d9og==
-X-Forwarded-Encrypted: i=1; AJvYcCUvsmOzSh6mv3E6/DkkzfqYUVEu2D/Bs9+k/mtLn025WnIXXGGToM4n+Ku52kdqpNK1vsH6hOF922WKLB4tS6urU2kQqs8eOICBJkzhQAblAfwQiOhOcKvapND5MqJXXZ/DJEH8
-X-Gm-Message-State: AOJu0Yzb1dxbOD4XdDHcE3wIRukcDwkYYkGCfViqt7kiAYLnwuder3oU
-	RWInOiUh6eGtVFgNgfjvl7ziYIUFPcoXGbJ+bAqaBjSEQVaAv6NO
-X-Google-Smtp-Source: AGHT+IFkCu+JtPeZm2GUtpMORrZzigCeL8aXT4N3/ncy5DZ8TaVMDuXbslHscLBHDWJBFqgIrb6ZgA==
-X-Received: by 2002:a05:600c:1c03:b0:41a:3868:d222 with SMTP id j3-20020a05600c1c0300b0041a3868d222mr7722487wms.0.1714999200464;
-        Mon, 06 May 2024 05:40:00 -0700 (PDT)
-Received: from localhost.localdomain (93-34-90-105.ip49.fastwebnet.it. [93.34.90.105])
-        by smtp.googlemail.com with ESMTPSA id g17-20020adfa491000000b0034de87e81c7sm10714865wrb.23.2024.05.06.05.39.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 May 2024 05:39:59 -0700 (PDT)
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Cc: Christian Marangi <ansuelsmth@gmail.com>
-Subject: [net-next PATCH] net: stmmac: dwmac-ipq806x: account for rgmii-txid/rxid/id phy-mode
-Date: Mon,  6 May 2024 14:32:46 +0200
-Message-ID: <20240506123248.17740-1-ansuelsmth@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1714998844; c=relaxed/simple;
+	bh=PgyTVlJCUcjAwmhhcUzIv+WBWnSQfv9IW0ppT4XeW48=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=nnCDjpMMdZxW73RM4xMEpAz+oubStnHKkGGnmrXXqdoMBFyt1tKKw/9uS56DJRj6IBEMzBe7/H3V4vy1+uRJwkxqQuaT+ULPjT/oQAxJtBhMO8mPzZuvAotlbk4pNjkSq4QCE7QRZHtfsP5NuDBIOR5Nvtl7yoNADHMWshZGD98=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.174])
+	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4VY13k4Gv5zNw6b;
+	Mon,  6 May 2024 20:31:14 +0800 (CST)
+Received: from dggpemm500005.china.huawei.com (unknown [7.185.36.74])
+	by mail.maildlp.com (Postfix) with ESMTPS id 3C073140134;
+	Mon,  6 May 2024 20:33:59 +0800 (CST)
+Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
+ (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Mon, 6 May
+ 2024 20:33:58 +0800
+Subject: Re: [PATCH net-next v2 09/15] mm: page_frag: reuse MSB of 'size'
+ field for pfmemalloc
+To: Alexander Duyck <alexander.duyck@gmail.com>
+CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Andrew Morton
+	<akpm@linux-foundation.org>, <linux-mm@kvack.org>
+References: <20240415131941.51153-1-linyunsheng@huawei.com>
+ <20240415131941.51153-10-linyunsheng@huawei.com>
+ <37d012438d4850c3d7090e784e09088d02a2780c.camel@gmail.com>
+ <8b7361c2-6f45-72e8-5aca-92e8a41a7e5e@huawei.com>
+ <17066b6a4f941eea3ef567767450b311096da22b.camel@gmail.com>
+ <c45fdd75-44be-82a6-8e47-42bbc5ee4795@huawei.com>
+ <efd21f1d-8c67-b060-5ad2-0d500fac2ba6@huawei.com>
+ <CAKgT0UfQWEkaWM_mfk=FhCErTL_ZS3RL6x3iMzPdEP3FD+9zZQ@mail.gmail.com>
+ <ceb36a97-31b5-62df-a216-8598210bbba8@huawei.com>
+ <CAKgT0Ufm0=1cmyRLcrcu1_FAAeBokj3rpFAXJvVxgARXSStAuA@mail.gmail.com>
+From: Yunsheng Lin <linyunsheng@huawei.com>
+Message-ID: <a208cde1-41f2-c838-0bd1-a37d58f2179b@huawei.com>
+Date: Mon, 6 May 2024 20:33:58 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.2.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+In-Reply-To: <CAKgT0Ufm0=1cmyRLcrcu1_FAAeBokj3rpFAXJvVxgARXSStAuA@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ dggpemm500005.china.huawei.com (7.185.36.74)
 
-Currently the ipq806x dwmac driver is almost always used attached to the
-CPU port of a switch and phy-mode was always set to "rgmii" or "sgmii".
+On 2024/4/30 22:54, Alexander Duyck wrote:
+> On Tue, Apr 30, 2024 at 5:06 AM Yunsheng Lin <linyunsheng@huawei.com> wrote:
+>>
+>> On 2024/4/29 22:49, Alexander Duyck wrote:
+>>
+>> ...
+>>
+>>>>>
+>>>>
+>>>> After considering a few different layouts for 'struct page_frag_cache',
+>>>> it seems the below is more optimized:
+>>>>
+>>>> struct page_frag_cache {
+>>>>         /* page address & pfmemalloc & order */
+>>>>         void *va;
+>>>
+>>> I see. So basically just pack the much smaller bitfields in here.
+>>>
+>>>>
+>>>> #if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE) && (BITS_PER_LONG <= 32)
+>>>>         u16 pagecnt_bias;
+>>>>         u16 size;
+>>>> #else
+>>>>         u32 pagecnt_bias;
+>>>>         u32 size;
+>>>> #endif
+>>>> }
+>>>>
+>>>> The lower bits of 'va' is or'ed with the page order & pfmemalloc instead
+>>>> of offset or pagecnt_bias, so that we don't have to add more checking
+>>>> for handling the problem of not having enough space for offset or
+>>>> pagecnt_bias for PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE and 32 bits system.
+>>>> And page address & pfmemalloc & order is unchanged for the same page
+>>>> in the same 'page_frag_cache' instance, it makes sense to fit them
+>>>> together.
+>>>>
+>>>> Also, it seems it is better to replace 'offset' with 'size', which indicates
+>>>> the remaining size for the cache in a 'page_frag_cache' instance, and we
+>>>> might be able to do a single 'size >= fragsz' checking for the case of cache
+>>>> being enough, which should be the fast path if we ensure size is zoro when
+>>>> 'va' == NULL.
+>>>
+>>> I'm not sure the rename to size is called for as it is going to be
+>>> confusing. Maybe something like "remaining"?
+>>
+>> Yes, using 'size' for that is a bit confusing.
+>> Beside the above 'remaining', by googling, it seems we may have below
+>> options too:
+>> 'residual','unused', 'surplus'
+>>
+>>>
+>>>> Something like below:
+>>>>
+>>>> #define PAGE_FRAG_CACHE_ORDER_MASK      GENMASK(1, 0)
+>>>> #define PAGE_FRAG_CACHE_PFMEMALLOC_BIT  BIT(2)
+>>>
+>>> The only downside is that it is ossifying things so that we can only
+>>
+>> There is 12 bits that is always useful, we can always extend ORDER_MASK
+>> to more bits if lager order number is needed.
+>>
+>>> ever do order 3 as the maximum cache size. It might be better to do a
+>>> full 8 bytes as on x86 it would just mean accessing the low end of a
+>>> 16b register. Then you can have pfmemalloc at bit 8.
+>>
+>> I am not sure I understand the above as it seems we may have below option:
+>> 1. Use somthing like the above ORDER_MASK and PFMEMALLOC_BIT.
+>> 2. Use bitfield as something like below:
+>>
+>> unsigned long va:20;---or 52 for 64bit system
+>> unsigned long pfmemalloc:1
+>> unsigned long order:11;
+>>
+>> Or is there a better idea in your mind?
+> 
+> All I was suggesting was to make the ORDER_MASK 8 bits. Doing that the
+> compiler can just store VA in a register such as RCX and instead of
+> having to bother with a mask it could then just use CL to access the
+> order. As far as the flag bits such as pfmemalloc the 4 bits starting
+> at 8 would make the most sense since it doesn't naturally align to
+> anything and would have to be masked anyway.
 
-Some device came up with a special configuration where the PHY is
-directly attached to the GMAC port and in those case phy-mode needs to
-be set to "rgmii-id" to make the PHY correctly work and receive packets.
+Ok.
 
-Since the driver supports only "rgmii" and "sgmii" mode, when "rgmii-id"
-(or variants) mode is set, the mode is rejected and probe fails.
+> 
+> Using a bitfield like you suggest would be problematic as the compiler
+> would assume a shift is needed so you would have to add a shift to
+> your code to offset it for accessing VA.
+> 
+>>>
+>>>> struct page_frag_cache {
+>>>>         /* page address & pfmemalloc & order */
+>>>>         void *va;
+>>>>
+>>>
+>>> When you start combining things like this we normally would convert va
+>>> to an unsigned long.
+>>
+>> Ack.
 
-Add support also for these phy-modes to correctly setup PHYs that requires
-delay applied to tx/rx.
+It seems it makes more sense to convert va to something like 'struct encoded_va'
+mirroring 'struct encoded_page' in below:
 
-Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
----
- drivers/net/ethernet/stmicro/stmmac/dwmac-ipq806x.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+https://elixir.bootlin.com/linux/v6.7-rc8/source/include/linux/mm_types.h#L222
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-ipq806x.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-ipq806x.c
-index 281687d7083b..4ba15873d5b1 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-ipq806x.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-ipq806x.c
-@@ -171,6 +171,9 @@ static int ipq806x_gmac_set_speed(struct ipq806x_gmac *gmac, unsigned int speed)
- 
- 	switch (gmac->phy_mode) {
- 	case PHY_INTERFACE_MODE_RGMII:
-+	case PHY_INTERFACE_MODE_RGMII_ID:
-+	case PHY_INTERFACE_MODE_RGMII_RXID:
-+	case PHY_INTERFACE_MODE_RGMII_TXID:
- 		div = get_clk_div_rgmii(gmac, speed);
- 		clk_bits = NSS_COMMON_CLK_GATE_RGMII_RX_EN(gmac->id) |
- 			   NSS_COMMON_CLK_GATE_RGMII_TX_EN(gmac->id);
-@@ -410,6 +413,9 @@ static int ipq806x_gmac_probe(struct platform_device *pdev)
- 	val |= NSS_COMMON_GMAC_CTL_CSYS_REQ;
- 	switch (gmac->phy_mode) {
- 	case PHY_INTERFACE_MODE_RGMII:
-+	case PHY_INTERFACE_MODE_RGMII_ID:
-+	case PHY_INTERFACE_MODE_RGMII_RXID:
-+	case PHY_INTERFACE_MODE_RGMII_TXID:
- 		val |= NSS_COMMON_GMAC_CTL_PHY_IFACE_SEL;
- 		break;
- 	case PHY_INTERFACE_MODE_SGMII:
-@@ -425,6 +431,9 @@ static int ipq806x_gmac_probe(struct platform_device *pdev)
- 	val &= ~(1 << NSS_COMMON_CLK_SRC_CTRL_OFFSET(gmac->id));
- 	switch (gmac->phy_mode) {
- 	case PHY_INTERFACE_MODE_RGMII:
-+	case PHY_INTERFACE_MODE_RGMII_ID:
-+	case PHY_INTERFACE_MODE_RGMII_RXID:
-+	case PHY_INTERFACE_MODE_RGMII_TXID:
- 		val |= NSS_COMMON_CLK_SRC_CTRL_RGMII(gmac->id) <<
- 			NSS_COMMON_CLK_SRC_CTRL_OFFSET(gmac->id);
- 		break;
-@@ -442,6 +451,9 @@ static int ipq806x_gmac_probe(struct platform_device *pdev)
- 	val |= NSS_COMMON_CLK_GATE_PTP_EN(gmac->id);
- 	switch (gmac->phy_mode) {
- 	case PHY_INTERFACE_MODE_RGMII:
-+	case PHY_INTERFACE_MODE_RGMII_ID:
-+	case PHY_INTERFACE_MODE_RGMII_RXID:
-+	case PHY_INTERFACE_MODE_RGMII_TXID:
- 		val |= NSS_COMMON_CLK_GATE_RGMII_RX_EN(gmac->id) |
- 			NSS_COMMON_CLK_GATE_RGMII_TX_EN(gmac->id);
- 		break;
--- 
-2.43.0
+>>
+>>>
+>>>> #if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE) && (BITS_PER_LONG <= 32)
+>>>>         u16 pagecnt_bias;
+>>>>         u16 size;
+>>>> #else
+>>>>         u32 pagecnt_bias;
+>>>>         u32 size;
+>>>> #endif
+>>>> };
+>>>>
+>>>>
 
 
