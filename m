@@ -1,112 +1,171 @@
-Return-Path: <netdev+bounces-93548-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93549-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D69118BC48A
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 00:32:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 282548BC4D6
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 02:29:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8C6CC1F217DE
-	for <lists+netdev@lfdr.de>; Sun,  5 May 2024 22:32:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D2F98280E7C
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 00:29:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 094AF13D53B;
-	Sun,  5 May 2024 22:31:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD1166138;
+	Mon,  6 May 2024 00:29:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Yn9xj0go"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="YJtQ3EPk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
+Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A46B113D525;
-	Sun,  5 May 2024 22:31:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EB41259C
+	for <netdev@vger.kernel.org>; Mon,  6 May 2024 00:29:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714948317; cv=none; b=k6CNHjUkUi0Kzn6v/O9+bqi87QYriyGqYG8nArf7uUh1/GN46X7m2h97E6pEAdIRSWgYHhIQNvtknCFP6+uaEboFSUYBqofAG16LUW0Fc1uTH4MKdEQcaPA7kC4eIxuQruq/5pm0zMYLD+t0fAy/M/D0fn3P8+A5Y+lumuZ4Y+M=
+	t=1714955363; cv=none; b=JaqGid/BgaEthMoB5W36pDgLnUC3pACclIPwy4bXGLgcafpIbG34Xj2O4of7hLo2vOAmp71DVFBDrKsrZ7Cj8etF3H6h6amKHmJt7t651p1ZuGuRyVoCuUAlOsLH4lV+x+J+KSt5qIjFMOFRFj2q1E5FmKfCn4fjCauwTD49b4k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714948317; c=relaxed/simple;
-	bh=miIswo+Px3jcF/rLqpKXWfg/6SjGfJWWn7gEvILTj3M=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=iaBC/yXda124jpZeyU5kO3iN+xm2IIZng/btcaIAVKnH9SyoZ85bsfGzk1yeh+VJECWaXzsYsnrvQwUMy2F0HW0hyvfbDudGoklY+pwpP9Iqk7XGlOEH7BHx/WwUn5IP8MS0PSdeZA+iQJEh/z+vZHiDqGheWt3pZ3n8VLdRXRg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Yn9xj0go; arc=none smtp.client-ip=209.85.215.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f172.google.com with SMTP id 41be03b00d2f7-618a2b12dbbso2536367a12.0;
-        Sun, 05 May 2024 15:31:56 -0700 (PDT)
+	s=arc-20240116; t=1714955363; c=relaxed/simple;
+	bh=7p83fI6SjhbSz9whdN8AjeYm5Iaq6UXmW/wjThWyv6k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=AAWjX8293zTbaAmEyft0kizg66fM9t2PYfgBojhot8AeYJu5rnPMVdXiJ25kOIMOc9lnV/Y2Kj9J+A/w4kUc/db6GW5oO+X0b+hzEU/LUbFku2KuhsqLo1Ht6YWtz1pUXhNFPzU7I8EfvZMqTByqdzeIUDu/7LYKQhq6vY/hofI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=YJtQ3EPk; arc=none smtp.client-ip=209.85.216.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
+Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-2b27eec1eb1so981765a91.0
+        for <netdev@vger.kernel.org>; Sun, 05 May 2024 17:29:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1714948316; x=1715553116; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=miIswo+Px3jcF/rLqpKXWfg/6SjGfJWWn7gEvILTj3M=;
-        b=Yn9xj0goWxy2Rn0pBVREpdERsZucb5VNKMQVIaLhQZoeSA7vv9QEt4wYGQUrUnpcQU
-         eiH+58ae3KmCppRjlsddeMw10OO4Pq23yleBqWutMmcNAeqgq5HurwJhCMppE+OwJd/y
-         HuOa/bp2OF7+3QKVR6bLcJ4VPe++Qdj6VQCP2CGNlyY9RT2q98nv/RNzOwqh2boXzV+F
-         ze1FkdZd5PO+/NE1gE2tu4iRxhS774YpAoA7rmry+YWH1uyUGYx8HXouzBRJAR+H8udo
-         P64LOvobKD6jsMHHXWM7tK7OxjVSLrDFYTgypDBioCLCi6uuBct8wIOKg6QRMlBsN16v
-         bOtA==
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1714955361; x=1715560161; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=sTixdwfAlIVssw/yTwe1uZ1trqj6K9Ho7zGTIsCsG3k=;
+        b=YJtQ3EPk7IxrNvgo8weclRLgIUIWkSOI2Uep1o1M/rk9e0dB+mVfcDL2Ra/RKgbRaV
+         4yD0nNAz17zHnC1JbqzasjATt3Y4kUqFfBfl4uDx/zyyAwmCgdWBqfnXG64JOZ3VVasD
+         TpWrwpoJPMZ1aCGn4xBszZrjTzvv5gHLPW4FLW7M2xKyeRN3dmeqwv7P7Qzj6PulULEp
+         iKKq9LW6PdJR11ebmc1NoRMdfQ6vYQYYHA7xQiZMqlhAGok5r3mf8gMd5KZKadxtoFqx
+         EMNG1nXwcBwffehAbXoAJ9b4BN0JZNUl2iEcpz1iMRyOz+EEFNblqZD7QukB/0M0HXcx
+         nJhA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714948316; x=1715553116;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=miIswo+Px3jcF/rLqpKXWfg/6SjGfJWWn7gEvILTj3M=;
-        b=kFP2REjhRHgx+349aGiYueIfXAeBDBYs0wbLkNv9sMUrbRliFvGZdTk9OUMpi1Pj0R
-         qtlKd30LFtmZTpohk39x8ANGxYMgIOx/f6NslGalUloH/xGTPBqde9NApDwcazVcFE2O
-         3o5Y4pJgmTJi6s38iERYi2VLOTX+09nufVeRFPS1lF5JizSkyljt2eSiO6GFtMYjBRzG
-         caZwTUmpr/Na/Enp98JoA0IPhU2XiMAff0VkQ6CaoNE+ZQ/VRso4apqI/pxDtaJrZjQ5
-         jrKV17CL0yF6yR9QjdfZPNWQdF7ul1TU5qb3pslbh4QuRnACVvBL6xgnHlSYejZxr4iI
-         GBfQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUYEOoxzOdSBmNg9/nQuTODA/NRtqaZqR9NLXkz731Ypey+eUE4GJcwPl/0Z3ziuc42dQtQRftPXkX3vJBub7IjDxRvqnePUP/RUIumcUD+eP6JMIBrH4O6ayZzaJSRtn0R7u6fP6yvLWLTJYW+l9bS74ZZbHTogGzYhDF9xEgiIYEs/i0=
-X-Gm-Message-State: AOJu0Yz8N2TF5dJUdoNGXpictKy/U/lwtQ4zOm2wGjEYvwg9qKMJj/sv
-	epfasDU3O4VlfMSbzG/2Osv6mtnJUDo37iZw8Nmyx6nrdS8tkamU9MufFv776R0MVJ650z/NQNz
-	KC+AadAcJHlWZd8oyadYKM4rFdec=
-X-Google-Smtp-Source: AGHT+IGqrVHmi1+NqoSaPMHW0v/eHPpK4TMvupqBWSgZDgOyk03VkDp9z2/h7/RU5PpOOYSmdeNgQGqaJ+8N8h1/w5w=
-X-Received: by 2002:a17:90a:68cb:b0:2b1:cf6a:848 with SMTP id
- q11-20020a17090a68cb00b002b1cf6a0848mr16558887pjj.7.1714948316045; Sun, 05
- May 2024 15:31:56 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1714955361; x=1715560161;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=sTixdwfAlIVssw/yTwe1uZ1trqj6K9Ho7zGTIsCsG3k=;
+        b=McW6xmzFgpwbDXtTuLuh/pUZj8T2c6UHZOtrTg4ISkqcIneHe4qr2aujAkUm0aBQuC
+         l29R5DLbbnAaiI+n9pI7LGhc6CdX70+kz5TV/WkJOL56vuMZbobHoohh4wEeLPBYAMe9
+         8xnjNp52EY9yGk/IVHJV5WgmqM4+dIigTy1tqs921H4uVzSNspZbEjLrrkqZ2iOfbgJi
+         5+WQDm55MDktvzS7cFvqvojV+nfROkaKKKfyTKpVHQOgCLDCck2rjyrvqB4ClxamrA6+
+         goQDiV113IqrzbEqbM9Qj1dk2CB4R4ta9jjJ1GiQy7h+AshxqrYCXC8Hhs2cPAPtIPon
+         oO3g==
+X-Forwarded-Encrypted: i=1; AJvYcCWfzdKiAOrqXRRoByFHVRoC8yI7jYDnifX7ek+I3x3MYdyDLtCq+o3Cy0H0mpZOUDJjnB4cOGoRhvPy8ro3adZaYAkk+j+T
+X-Gm-Message-State: AOJu0YxKtUZk1C1Yeq0UGGf3OHZ/TFMJ7G2eitE1j5jiEg+qIfBKGg2w
+	lCpX4/YuES7T4kuSVLTpA/Kb53WfxevZbsmu7OJl1IaQEl+pSDS5cb15Fj0ekss=
+X-Google-Smtp-Source: AGHT+IFapiyynwMzWBFC3qoHSlJe6Vp0gcSIQLTrnjL4T2m4HyoHAt77UaMOEYoyby7VMZX56YX6rQ==
+X-Received: by 2002:a17:90a:d30a:b0:2aa:c2ba:3758 with SMTP id p10-20020a17090ad30a00b002aac2ba3758mr8212757pju.42.1714955361360;
+        Sun, 05 May 2024 17:29:21 -0700 (PDT)
+Received: from [192.168.1.15] (174-21-160-85.tukw.qwest.net. [174.21.160.85])
+        by smtp.gmail.com with ESMTPSA id h4-20020a17090a710400b002b1314ba8c0sm8708252pjk.57.2024.05.05.17.29.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 05 May 2024 17:29:20 -0700 (PDT)
+Message-ID: <306cf793-6f96-4a22-aca0-53c0ccefc0a1@davidwei.uk>
+Date: Sun, 5 May 2024 17:29:18 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240411225331.274662-1-nells@linux.microsoft.com>
-In-Reply-To: <20240411225331.274662-1-nells@linux.microsoft.com>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Mon, 6 May 2024 00:30:32 +0200
-Message-ID: <CANiq72nXXgj9OsbFX2c4V2Df18Owphpv0DnoP8MCnAQV1AU=Uw@mail.gmail.com>
-Subject: Re: [PATCH] rust: remove unneeded `kernel::prelude` imports from doctests
-To: Nell Shamrell-Harrington <nells@linux.microsoft.com>
-Cc: ojeda@kernel.org, alex.gaynor@gmail.com, wedsonaf@gmail.com, 
-	boqun.feng@gmail.com, gary@garyguo.net, bjorn3_gh@protonmail.com, 
-	benno.lossin@proton.me, a.hindborg@samsung.com, aliceryhl@google.com, 
-	fujita.tomonori@gmail.com, tmgross@umich.edu, yakoyoku@gmail.com, 
-	kent.overstreet@gmail.com, matthew.brost@intel.com, kernel@valentinobst.de, 
-	netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH net-next v8 07/14] page_pool: devmem support
+Content-Language: en-GB
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-alpha@vger.kernel.org, linux-mips@vger.kernel.org,
+ linux-parisc@vger.kernel.org, sparclinux@vger.kernel.org,
+ linux-trace-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
+ bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Jonathan Corbet <corbet@lwn.net>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Ivan Kokshaysky <ink@jurassic.park.msu.ru>, Matt Turner
+ <mattst88@gmail.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+ "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
+ Helge Deller <deller@gmx.de>, Andreas Larsson <andreas@gaisler.com>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+ Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu
+ <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+ Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
+ Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
+ <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+ Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, Steffen Klassert
+ <steffen.klassert@secunet.com>, Herbert Xu <herbert@gondor.apana.org.au>,
+ David Ahern <dsahern@kernel.org>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Shuah Khan <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ Amritha Nambiar <amritha.nambiar@intel.com>,
+ Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+ Alexander Mikhalitsyn <alexander@mihalicyn.com>,
+ Kaiyuan Zhang <kaiyuanz@google.com>, Christian Brauner <brauner@kernel.org>,
+ Simon Horman <horms@kernel.org>, David Howells <dhowells@redhat.com>,
+ Florian Westphal <fw@strlen.de>, Yunsheng Lin <linyunsheng@huawei.com>,
+ Kuniyuki Iwashima <kuniyu@amazon.com>, Jens Axboe <axboe@kernel.dk>,
+ Arseniy Krasnov <avkrasnov@salutedevices.com>,
+ Aleksander Lobakin <aleksander.lobakin@intel.com>,
+ Michael Lass <bevan@bi-co.net>, Jiri Pirko <jiri@resnulli.us>,
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+ Lorenzo Bianconi <lorenzo@kernel.org>,
+ Richard Gobert <richardbgobert@gmail.com>,
+ Sridhar Samudrala <sridhar.samudrala@intel.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+ Johannes Berg <johannes.berg@intel.com>, Abel Wu <wuyun.abel@bytedance.com>,
+ Breno Leitao <leitao@debian.org>, Pavel Begunkov <asml.silence@gmail.com>,
+ Jason Gunthorpe <jgg@ziepe.ca>, Shailend Chand <shailend@google.com>,
+ Harshitha Ramamurthy <hramamurthy@google.com>,
+ Shakeel Butt <shakeel.butt@linux.dev>, Jeroen de Borst
+ <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>,
+ linux-mm@kvack.org, Matthew Wilcox <willy@infradead.org>
+References: <20240403002053.2376017-1-almasrymina@google.com>
+ <20240403002053.2376017-8-almasrymina@google.com>
+ <8357256a-f0e9-4640-8fec-23341fc607db@davidwei.uk>
+ <ZjH1hO8qJgOqNKub@infradead.org>
+From: David Wei <dw@davidwei.uk>
+In-Reply-To: <ZjH1hO8qJgOqNKub@infradead.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Apr 12, 2024 at 12:53=E2=80=AFAM Nell Shamrell-Harrington
-<nells@linux.microsoft.com> wrote:
->
-> Rust doctests implicitly include `kernel::prelude::*`.
->
-> Removes explicit `kernel::prelude` imports from doctests.
->
-> Suggested-by: Miguel Ojeda <ojeda@kernel.org>
-> Link: https://github.com/Rust-for-Linux/linux/issues/1064
-> Signed-off-by: Nell Shamrell-Harrington <nells@linux.microsoft.com>
+On 2024-05-01 00:55, Christoph Hellwig wrote:
+> On Fri, Apr 26, 2024 at 05:17:52PM -0700, David Wei wrote:
+>> On 2024-04-02 5:20 pm, Mina Almasry wrote:
+>>> @@ -69,20 +106,26 @@ net_iov_binding(const struct net_iov *niov)
+>>>   */
+>>>  typedef unsigned long __bitwise netmem_ref;
+>>>  
+>>> +static inline bool netmem_is_net_iov(const netmem_ref netmem)
+>>> +{
+>>> +#if defined(CONFIG_PAGE_POOL) && defined(CONFIG_DMA_SHARED_BUFFER)
+>>
+>> I am guessing you added this to try and speed up the fast path? It's
+>> overly restrictive for us since we do not need dmabuf necessarily. I
+>> spent a bit too much time wondering why things aren't working only to
+>> find this :(
+> 
+> So what else do you need?  I was assured last round that nothing but
+> dmabuf and potentially the huge page case (that really just is the page
+> provider) would get added.
 
-[ Add it back for `module_phy_driver`'s example since it is within a
-`mod`, and thus it cannot be removed. - Miguel ]
+I'm using userspace memory so having this gated behind
+CONFIG_DMA_SHARED_BUFFER doesn't make sense for us.
 
-Nell: please double-check the above is correct (I guess you didn't
-enable net/phy and thus didn't notice since it didn't get compiled?).
-
-Applied to `rust-next` -- thanks everyone!
-
-Cheers,
-Miguel
+> 
+>>
+> ---end quoted text---
 
