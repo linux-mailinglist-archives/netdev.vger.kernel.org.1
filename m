@@ -1,148 +1,141 @@
-Return-Path: <netdev+bounces-93808-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93809-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 708A88BD3F8
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 19:42:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C48808BD3FF
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 19:44:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D2CE0B22818
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 17:41:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7FAD0282BD8
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 17:44:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C92E157493;
-	Mon,  6 May 2024 17:41:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pTn1wpW/"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FD2F157A45;
+	Mon,  6 May 2024 17:44:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
+Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AECEA1F19A
-	for <netdev@vger.kernel.org>; Mon,  6 May 2024 17:41:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBA2E157499;
+	Mon,  6 May 2024 17:44:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715017315; cv=none; b=mzhkJ19KUKmOx1GcDXHpzi4cxLG4v1pw1sxtgPIO/20v/Q3B2KO5m2ggevfSNgdI5A4y3XyPIkcOycsFRS/JTOOOTeSmFYVoIjlXlO2hBaElHF1al7LF3sfaTiFiB2fmAkbCb1EFpNSZ1EvgaEieE7i3wbZsndBdr10WIFKnUgk=
+	t=1715017453; cv=none; b=XdASZ33QLuexj+kGNe25WznXyAbeYUJqiXIfEDG2XmU0tb4vVY2sA2pZd+vvXbC5DiHxWb01FUdjSHbkPbbaSs6ftnTvwK+dfOoHEH8/y27qJZl0jZk8VFm8iLllnYWTJblDNpghILNcSBaB2j0Uo4ZcJcTOu5/DX+PvOgGE1yk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715017315; c=relaxed/simple;
-	bh=nLJAILkalt6iefFfJPKdilxUb+O6Rn16iRrqaTmBNz4=;
+	s=arc-20240116; t=1715017453; c=relaxed/simple;
+	bh=c30XX7NvoV4VcckRnZbuzcL5VIyGxucgGGUkFlYpBEQ=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=kq4fM0IjVCGcmhhUyxFTk0OfT8cRnhWKYVSJNcNsHSsbkTnQeTpZvOfzlQEzp2HeJWGS7zHh8T+dcx66a+sNgZ1ithHeSG1BPIeMEUpbAKEnRAY0GF5eIP6Tr3OZYo/l2WW2C6+W6y9mDkk7ItVua8JSpTf9tfmy1Cb8E3vn0E0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pTn1wpW/; arc=none smtp.client-ip=209.85.215.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pg1-f172.google.com with SMTP id 41be03b00d2f7-5cdbc4334edso1029507a12.3
-        for <netdev@vger.kernel.org>; Mon, 06 May 2024 10:41:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1715017313; x=1715622113; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hDFGAztt/IhPfOe9B/RQdU+ZVEYUBbkKeWfaXW8xILs=;
-        b=pTn1wpW/+NXMEUn6/8N9uvGaft+uQZZfYcdUKwxXmQe7AAeOfRdcm51qmx0EnS7inF
-         9MXyoz5yBift0wry9RsW+HI6RbSeMg1zVNlT5utTGsatLZNJPQp5Yh6NBuob1DqeKXtR
-         fv99ZaoAv8tUDdSVsf9q5CmCS0+NKK84O/ahzrqpxpXTlBmHoZFOOgHIGVAH60uyfRaM
-         Qtu/AiSzqWgM0BXtufRxjYwXS9XtcT7TWmVoopP1JPIpjqsxJ+hgtIWLr3GwFhmrW665
-         lXujRiP0jhxoEHzV9CfK9/eVIJvxgLeeLUm464lCDoq+ttNt6y3mAvLHE0lv+0DkR+a7
-         Pywg==
+	 To:Cc:Content-Type; b=KGZCQGLZ8JKDhHvRwiPEpNMF72vk3J3pGItsiN+PfFnHyl1klIQBM0TS2DTZ8xGi5kAdfLHr4DQzBAmHaPJe+CplOZXcGJ6x+lVQ9M+cWZJtXVWaS6LV4+NqYJWLltFtKmEsaCHx+/0ADzFF7iUqdrYwNdRJRVB48thd/AXroGw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-6202ad4cae3so19832447b3.2;
+        Mon, 06 May 2024 10:44:09 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715017313; x=1715622113;
+        d=1e100.net; s=20230601; t=1715017448; x=1715622248;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=hDFGAztt/IhPfOe9B/RQdU+ZVEYUBbkKeWfaXW8xILs=;
-        b=ISOgt9uQRHwc4+U72+DMZb5NfYnfE7xmHbgsAZ9PjND7AudoR9XAnsArRQD/Vu36Gs
-         R4SW5SqZAtqIgFWwAQkayumo53ujqriYUACkdHIdwpWHklW668pW6xA1LnEICYSpLEru
-         Ke8ON/MTgsxrqtGvwwYJJ2JOEPBxUbXe/DMhlP7NsnGKwKYeSehW1KnOYoAu0rIwe/eN
-         7+ekPgFYdUDhqga8MiA+5Rd74qMQ4bGDOcrAHBQkHyZ7BFH0uPjUEnEvQDa9D7XLSz8Y
-         oiOmnGkI5gPoCgIkX96yshvznhGVbVe4JpzplN3l8a0r0mtDxC6ZoauZMswAmpOObZob
-         o+Gw==
-X-Gm-Message-State: AOJu0YzilVEJaWwndZ6YHUogwtkl70qvgJIRX+5kjViXOuogVKxnp9Jo
-	HIsGiBg58a2itsjgU6e04/tHqsrKrye4fB6DWg3zIM0q8jHgwQcQ1T15QOYY9PbTBmCtW+EznZS
-	LG+MbaK18/2jIOpSbQma3IuJqd+nba4rUG1Jr
-X-Google-Smtp-Source: AGHT+IHDOZO0UInyDE0EAJb104RYS2YQUC7CVwIx4Lb45xKW3gzX+3WBNH7OiYjcMqaIFm91bgotXjoqYS2IW0tKg6s=
-X-Received: by 2002:a17:90a:ca8c:b0:2b2:812e:1d8c with SMTP id
- y12-20020a17090aca8c00b002b2812e1d8cmr8759723pjt.2.1715017312563; Mon, 06 May
- 2024 10:41:52 -0700 (PDT)
+        bh=jNJqSJ4Rj3GMpFRsgXMo9e9pnssxfStf7+AxtszDick=;
+        b=uDlUi+VWqoR8U6OW2ovAK5wfiADq7Ply8Iu9CXVhT2Bkuxv7SKv7zQfwKHE5QLQMD3
+         X9mYieEl3Ez1CwSe2CXWieCwxpjeNnftgrW5QD97vIyWiq/8YtQMx0IY26+7eSL81Vh1
+         +gYSC+no/sxHekzOOOqEAmoGSTJbCT+Gb5FB4kNwjiwMzxpBdCWokjTorJs2q2YMdN9O
+         VuBrL48/0MUWWV3thhWXzTfBEk2Me08Gq23yQcQrMsUrbiuwEwujHFiaLS5shMurew/p
+         0RlPDiFrXIXLrVwYsrDU8iUNi9SmLPiE6GGtCuKyLzWnYXV+H092V/W6e3F4bwk65Kbd
+         1lSA==
+X-Forwarded-Encrypted: i=1; AJvYcCXlxitmJUDpZJsObd/+Bj3EoMb3bpWJLDMfXQFpWDCQE4ImO4izhY4zhi9yGS0cZCU7ksocvMJL//Yw5KQB6k0m7R6SgUwd+cNgXYqygFNd6ZF3pLwnrwu6gp8OM43EV4tQCtnvvl0h55k=
+X-Gm-Message-State: AOJu0Yxt5RXzCusLZWYx9bxGAW6/k9xYoiuF4Cshy0fkYBFFu3yvfmGM
+	xo3xirWn8ai3sWivl+PFMw7eW3R90kPqtvOmeoU6zQ5m5/BN0bJ8mPZh7D0c
+X-Google-Smtp-Source: AGHT+IFANWO3Z1dqKfePGv4unfKao93j9o3qYBq7/F27texzvV1EZW75BKoM9Imy7DeC0tbXjhDpFg==
+X-Received: by 2002:a0d:eaca:0:b0:617:d365:dc17 with SMTP id t193-20020a0deaca000000b00617d365dc17mr10406315ywe.26.1715017448490;
+        Mon, 06 May 2024 10:44:08 -0700 (PDT)
+Received: from mail-yb1-f173.google.com (mail-yb1-f173.google.com. [209.85.219.173])
+        by smtp.gmail.com with ESMTPSA id s20-20020a819f14000000b0061893c5bcf0sm2238896ywn.15.2024.05.06.10.44.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 06 May 2024 10:44:08 -0700 (PDT)
+Received: by mail-yb1-f173.google.com with SMTP id 3f1490d57ef6-dcc71031680so2295882276.2;
+        Mon, 06 May 2024 10:44:08 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCXWqX9dxvKVI6dQdMn/mb+vT0kQNY6aUB5ZnP7/xw85ktmEuRcK2FS30oEav/LI40e3oVTtz/xY4komQRc9MR3rvddW+IVZxJwHHbg9ATdmjA2InjxdRl4aSj1eV2SltfbIhyYNioXckvI=
+X-Received: by 2002:a25:df86:0:b0:de6:d19:837a with SMTP id
+ w128-20020a25df86000000b00de60d19837amr11652344ybg.34.1715017448152; Mon, 06
+ May 2024 10:44:08 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240501232549.1327174-1-shailend@google.com> <171491642897.19257.15217395970936349981.git-patchwork-notify@kernel.org>
-In-Reply-To: <171491642897.19257.15217395970936349981.git-patchwork-notify@kernel.org>
-From: Shailend Chand <shailend@google.com>
-Date: Mon, 6 May 2024 10:41:41 -0700
-Message-ID: <CANLc=autjsuVO3NLhfL6wBg3SH8u9SsWQGUn=oSHHVjhdnn38w@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 00/10] gve: Implement queue api
-To: davem@davemloft.net, kuba@kernel.org
-Cc: netdev@vger.kernel.org, almasrymina@google.com, edumazet@google.com, 
-	hramamurthy@google.com, jeroendb@google.com, pabeni@redhat.com, 
-	pkaligineedi@google.com, rushilg@google.com, willemb@google.com, 
-	ziweixiao@google.com
+References: <20240414135937.1139611-1-niklas.soderlund+renesas@ragnatech.se>
+ <5fd25c58-b421-4ec0-8b4f-24f86f054a44@lunn.ch> <20240503102006.GI3927860@ragnatech.se>
+ <e3ce12b0-fb5d-49d7-a529-9ea7392b80ca@lunn.ch> <20240503133033.GJ3927860@ragnatech.se>
+ <d5f6f31a-6ecc-48a9-a2ca-9d22fc6acb21@lunn.ch> <20240506140533.GD720810@ragnatech.se>
+In-Reply-To: <20240506140533.GD720810@ragnatech.se>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Mon, 6 May 2024 19:43:55 +0200
+X-Gmail-Original-Message-ID: <CAMuHMdXm1by7P3LV22v5fQyVo1dNOzjaB=1dcqwP7qM+MqOhtA@mail.gmail.com>
+Message-ID: <CAMuHMdXm1by7P3LV22v5fQyVo1dNOzjaB=1dcqwP7qM+MqOhtA@mail.gmail.com>
+Subject: Re: [net-next] net: ethernet: rtsn: Add support for Renesas Ethernet-TSN
+To: =?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+Cc: Andrew Lunn <andrew@lunn.ch>, Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+	linux-renesas-soc@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sun, May 5, 2024 at 6:40=E2=80=AFAM <patchwork-bot+netdevbpf@kernel.org>=
- wrote:
+Hi Niklas,
+
+On Mon, May 6, 2024 at 4:05=E2=80=AFPM Niklas S=C3=B6derlund
+<niklas.soderlund+renesas@ragnatech.se> wrote:
+> On 2024-05-06 03:51:45 +0200, Andrew Lunn wrote:
+> > What PHY is this? Does it have C22 registers? Can it be identified via
+> > C22 registers 2 and 3?
 >
-> Hello:
+> The PHY in question is mv88q2110 (drivers/net/phy/marvell-88q2xxx.c),
+> unfortunately I do not have a datasheet for it so I can't tell you much
+> about it.
 >
-> This series was applied to netdev/net-next.git (main)
-> by David S. Miller <davem@davemloft.net>:
+> <snip>
 >
-> On Wed,  1 May 2024 23:25:39 +0000 you wrote:
-> > Following the discussion on
-> > https://patchwork.kernel.org/project/linux-media/patch/20240305020153.2=
-787423-2-almasrymina@google.com/,
-> > the queue api defined by Mina is implemented for gve.
 > >
-> > The first patch is just Mina's introduction of the api. The rest of the
-> > patches make surgical changes in gve to enable it to work correctly wit=
-h
-> > only a subset of queues present (thus far it had assumed that either al=
-l
-> > queues are up or all are down). The final patch has the api
-> > implementation.
-> >
-> > [...]
+> > So i would drop the compatible. See if C22 is sufficient to get the
+> > correct driver loaded.
 >
-> Here is the summary with links:
->   - [net-next,v2,01/10] queue_api: define queue api
->     https://git.kernel.org/netdev/net-next/c/087b24de5c82
->   - [net-next,v2,02/10] gve: Make the GQ RX free queue funcs idempotent
->     https://git.kernel.org/netdev/net-next/c/dcecfcf21bd1
->   - [net-next,v2,03/10] gve: Add adminq funcs to add/remove a single Rx q=
-ueue
->     https://git.kernel.org/netdev/net-next/c/242f30fe692e
->   - [net-next,v2,04/10] gve: Make gve_turn(up|down) ignore stopped queues
->     https://git.kernel.org/netdev/net-next/c/5abc37bdcbc5
->   - [net-next,v2,05/10] gve: Make gve_turnup work for nonempty queues
->     https://git.kernel.org/netdev/net-next/c/864616d97a45
->   - [net-next,v2,06/10] gve: Avoid rescheduling napi if on wrong cpu
->     https://git.kernel.org/netdev/net-next/c/9a5e0776d11f
->   - [net-next,v2,07/10] gve: Reset Rx ring state in the ring-stop funcs
->     https://git.kernel.org/netdev/net-next/c/770f52d5a0ed
->   - [net-next,v2,08/10] gve: Account for stopped queues when reading NIC =
-stats
->     https://git.kernel.org/netdev/net-next/c/af9bcf910b1f
->   - [net-next,v2,09/10] gve: Alloc and free QPLs with the rings
->     https://git.kernel.org/netdev/net-next/c/ee24284e2a10
->   - [net-next,v2,10/10] gve: Implement queue api
->     (no matching commit)
+> - Remove C45 compatible; Remove C45 read/write in driver
+>
+>   The PHY is identified as "Generic PHY", and the correct PHY driver is
+>   not used. I can't test more than that as the generic PHY driver do not
+>   implement some quirks I need to get the link up.
+>
+> - Remove C45 compatible; Keep C45 read/write in driver
+>
+>   The correct PHY driver is used and everything works.
 
-The last patch of this patchset did not get applied:
-https://patchwork.kernel.org/project/netdevbpf/patch/20240430231420.699177-=
-11-shailend@google.com/,
-not sure why there is a "no matching commit" message.
+Does it still work after kexec, or after device unbind/rebind?
+According to [1], the PHY node has a reset-gpios property, so you may
+need to specify the exact PHY model to identify the PHY model at any
+time, regardless of the state of the PHY reset line.
 
+Perhaps that issue does not happen when using the mdio subnode, cfr. [3]?
 
->
-> You are awesome, thank you!
-> --
-> Deet-doot-dot, I am a bot.
-> https://korg.docs.kernel.org/patchwork/pwbot.html
->
->
+[1] https://lore.kernel.org/all/20240122160441.759620-3-niklas.soderlund+re=
+nesas@ragnatech.se/
+[2] 722d55f3a9bd810f ("arm64: dts: renesas: Add compatible properties
+to KSZ9031Ethernet PHYs")
+[3] 8da891720cd407ed ("dt-bindings: net: renesas,ethertsn: Create
+child-node for MDIO bus") in net-next (next-20240405 and later).
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
+.org
+
+In personal conversations with technical people, I call myself a hacker. Bu=
+t
+when I'm talking to journalists I just say "programmer" or something like t=
+hat.
+                                -- Linus Torvalds
 
