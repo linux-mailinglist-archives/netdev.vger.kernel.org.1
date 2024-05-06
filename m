@@ -1,172 +1,130 @@
-Return-Path: <netdev+bounces-93758-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93759-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 016498BD193
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 17:35:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0FEA8BD1A3
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 17:39:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AC5131F22E5D
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 15:35:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F23771C22183
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 15:39:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C7FC15535D;
-	Mon,  6 May 2024 15:35:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5C5515383A;
+	Mon,  6 May 2024 15:39:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UBK+H4rj"
+	dkim=pass (1024-bit key) header.d=kpnmail.nl header.i=@kpnmail.nl header.b="BEwZw+z+"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from ewsoutbound.kpnmail.nl (ewsoutbound.kpnmail.nl [195.121.94.167])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCB9A2F2C;
-	Mon,  6 May 2024 15:35:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1D7474C0D
+	for <netdev@vger.kernel.org>; Mon,  6 May 2024 15:39:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.121.94.167
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715009739; cv=none; b=PoNYYDnPGeeenW8N1p4XVTUqr+4IXYxKXN0YbdggvDroX84xje7IU50qxYOgX4wDA+5IHE7fHvnzlDMF0H0P7MYgvlNc3xw/whpFxUOOD8fDzv9Sv1O2zKAiIj9AVYeJ882yF7l3eq1F63q5DLPNB/6/Jx0EBy1DTU5UxaXkSvg=
+	t=1715009948; cv=none; b=sagMVL5oevK/6LH6D+kTa6xCG7vGX+j3Ea/6HBah1iz4Dd94ikpDI1sqhJk4DAaKYF3KY3YiJAQSy0/IZdYsJomfdlA+LdiYQGiUnFfo+BbyVbzrwax/KCpsRE2mjrJrEOM2Wrpj7CIxKng/332ZsdtIwYfNu2Szu62gZcfOca4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715009739; c=relaxed/simple;
-	bh=oGVCWQDYjNsdrnj+qazvX1umQxTGlOb3a+h86Rhs1gQ=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=WSbuGe9BuPTYDa88HjBrDSirHkfSro9NLhn8vCUCBXv6r0s8fSs0KO78/SaBJS2TPiVeqOJ/Pcv9G55g045cwcsGwOVW2r4vSJd97UuStNmrt4jThOnXms4Ny4EDKTswu4csh/RCe1/XUy9MqIFAZ7vNIIDI8Zpq68hWWszEEm4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UBK+H4rj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B830C116B1;
-	Mon,  6 May 2024 15:35:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715009738;
-	bh=oGVCWQDYjNsdrnj+qazvX1umQxTGlOb3a+h86Rhs1gQ=;
-	h=From:Date:Subject:To:Cc:From;
-	b=UBK+H4rjTdYc4zvgYsp9IejhkCGq4Szntf3sTdCy0GrJJ8jEXsKN82s5Q5zzliUUw
-	 xF2791yhISGMTtPJuJJZIhq3gFcig/GElOOTEwrfFU1Jli8I8eLloTM9byk37OKiLo
-	 vhhz8clfYcEk9g6mTo//XJuJ1cO4U4IjI894pU3LKmRAEdjgLWKyr4FLSIhdL4lTm3
-	 GKZxJfyDC++EfklCLRug0QtKTpgX2gExt5XVLNK8NMVk70/NVVaHsJjWXESUSJo2EM
-	 Z+1QSpJKj2wgJTvo9ejCdc9SYBedYlupcUx5HWcwaGo3FGCvM1QkWhdN9eaYgG1L1X
-	 QXqJomxAAIl3g==
-From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Date: Mon, 06 May 2024 17:35:28 +0200
-Subject: [PATCH net] mptcp: only allow set existing scheduler for
- net.mptcp.scheduler
+	s=arc-20240116; t=1715009948; c=relaxed/simple;
+	bh=DnxwuoRJdwU0EK8YzdxglEJVZl4zYMCJBJmNeCyRKZM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=T1pDVG6zU9SaOF8akSpnTz4nEWcVfPoxFkkm42JyflhmgtbJXj0N0p332z8KTNhChgoUWheFVNQ3J/vgAjS7R61gaauvEQwypLkvFUpfdPeszOzAFzV73t9/xRQIFhjSFPe91+Y3kKcRtCGxwfOVYuUIc1aUlL0Ty7H9M1XA7Iw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=phenome.org; spf=none smtp.mailfrom=phenome.org; dkim=pass (1024-bit key) header.d=kpnmail.nl header.i=@kpnmail.nl header.b=BEwZw+z+; arc=none smtp.client-ip=195.121.94.167
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=phenome.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=phenome.org
+X-KPN-MessageId: 98ec550c-0bbe-11ef-93a8-005056abbe64
+Received: from smtp.kpnmail.nl (unknown [10.31.155.37])
+	by ewsoutbound.so.kpn.org (Halon) with ESMTPS
+	id 98ec550c-0bbe-11ef-93a8-005056abbe64;
+	Mon, 06 May 2024 17:37:50 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=kpnmail.nl; s=kpnmail01;
+	h=content-type:mime-version:message-id:subject:to:from:date;
+	bh=QzxMfPdrMLsARpkjMh1WDjEpvWUOvqLCZoUmM/KqtcU=;
+	b=BEwZw+z+Y1U0/WX10QCZvrbdL2acrp0YUkDmaeb7ql1iZI5/ZbzR/7bUmc3vPrCI6TWCY/hmc1kUq
+	 SybcZjg/y7QgGEM6a7DJ6fwGFtrfeB+8/bTdsBitrGs7sEEiQVsHKiTOHP4pFMfIC4Zq01UPsq6zC+
+	 MRGlKcDHGCWXWKoM=
+X-KPN-MID: 33|W2NYngEXl0xLO1XPwqGEAMx6nwL7XDxAgHNJnX6mlnDudqQkmV5V448Uh6KWfDg
+ kCEA0T5LRj4+bXnV2BC1S9AIbrXJrDjXot/Y0KZSm6OE=
+X-KPN-VerifiedSender: No
+X-CMASSUN: 33|+RnBNADcfyOR1OrWqV101PniOZnmH6pArxf0AaHCVpILto3gR1DzXHYAuLMADGn
+ ekmQO8ZA43asfXDmF5TY3YA==
+Received: from Antony2201.local (213-10-186-43.fixed.kpn.net [213.10.186.43])
+	by smtp.xs4all.nl (Halon) with ESMTPSA
+	id 9b467a53-0bbe-11ef-8130-005056ab1411;
+	Mon, 06 May 2024 17:37:56 +0200 (CEST)
+Date: Mon, 6 May 2024 17:37:54 +0200
+From: Antony Antony <antony@phenome.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Antony Antony <antony.antony@secunet.com>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Shuah Khan <shuah@kernel.org>, devel@linux-ipsec.org
+Subject: Re: [PATCH net-next v3 2/2] selftests/net: add ICMP unreachable over
+ IPsec tunnel
+Message-ID: <Zjj5UsGuaGGBni2N@Antony2201.local>
+References: <cover.1714982035.git.antony.antony@secunet.com>
+ <053f57d79058138d09a0e606c0500a40cb78596d.1714982035.git.antony.antony@secunet.com>
+ <20240506062830.5d48ba48@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240506-upstream-net-20240506-mptcp-sched-exist-v1-1-2ed1529e521e@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAL/4OGYC/z2NywqDMBBFf0Vm3YEkbe3jV6SLNF51FqYhE0UQ/
- 72hiy7PhXPPToosUHo2O2WsovKJFeypoTD5OIKlr0zOuIu5mpaXpCXDzxxR+L/OqYTEGib0jE2
- 0cOvt+2HvN+fPjupbyhhk+5U6qi69juMLcDNVzH4AAAA=
-To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
- Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Gregory Detal <gregory.detal@gmail.com>, stable@vger.kernel.org, 
- "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2527; i=matttbe@kernel.org;
- h=from:subject:message-id; bh=0aZdfFi8skR4B7NuJvRMz6O7iszcw6HkWeXMMdh4f+c=;
- b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBmOPjH9GWsrQ6Maigio6WZQWiyEbCPrOs+g2gYZ
- BjZMHog7wWJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZjj4xwAKCRD2t4JPQmmg
- c0qyD/4k/KpuUjpD0HjQHOcfg/2jG9hTmpnqIxN4ug+hqg1rjDQNnQkf/VGV1TdXOQaiWtMn10l
- SpHnUXTHyKf50qDee1Ln6E0woxV1PtW/85n8AunmBGJ1jlaHjymv7ZznCdmL7R5PpKO3BA557Ln
- DRRpg9aB6NOMTgTNi+qq1WkvnoIPIwm/xZaY5QlyceX/K68Rmz7KQUSBWikKeH/3jD4TOZ5r3WC
- RwhrFUjKDI4+Y+sFt/aRWRlQ6KdaN5f22CZIMKcPp5am7FN1R1qLuWJvgvET4jtbz4M5GNen868
- hW5Ony8np6pE55wWex86PvWJgWgmczgq2R/cNrAicpL3yPLXo7V99efn6XWqqP5NUKLoFLBR6Cv
- EbR2BIgETHw4ofpxlKZ0cMutOxqX+SL7nUU36Cxl9q1VZCK2v2FDtWE72i0OFWaXSGXvjv2Rigc
- k0BIUDcTBdj4F8kAtaZtLPd4VKCtdHt9pyq35DOuq0AwE5ExwSIOF7I/CrgZJCWtJ7vjETyh+5B
- bNFnhBXx3kcEyfyMLWbZ9rSKA+gyWNdGWg4DRdf1nPOhOkBIAuNGW17CPos3xLmF1eR4UOnpuNT
- Atld84F0EFo6h/gqVsOSrxWTZYD1I7Ze/m3YP27gmA9qlJske8Bd/LC5sxysjWKy+s52pqyhf2J
- +dSfiB9bZbMkkHg==
-X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
- fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240506062830.5d48ba48@kernel.org>
 
-From: Gregory Detal <gregory.detal@gmail.com>
+Hi Jakub,
 
-The current behavior is to accept any strings as inputs, this results in
-an inconsistent result where an unexisting scheduler can be set:
+On Mon, May 06, 2024 at 06:28:30AM -0700, Jakub Kicinski via Devel wrote:
+> On Mon, 6 May 2024 10:05:54 +0200 Antony Antony wrote:
+> > Add IPsec tunnel, aka xfrm state, tests with ICMP flags enabled.
+> > IPv4 and IPv6, unreachable tests over xfrm/IPsec tunnels,
+> > xfrm SA with "flag icmp" set.
+> 
+> Doesn't seem to work:
 
-  # sysctl -w net.mptcp.scheduler=notdefault
-  net.mptcp.scheduler = notdefault
+thanks. I am looking into it. I notice two issues.
 
-This patch changes this behavior by checking for existing scheduler
-before accepting the input.
-
-Fixes: e3b2870b6d22 ("mptcp: add a new sysctl scheduler")
-Cc: stable@vger.kernel.org
-Signed-off-by: Gregory Detal <gregory.detal@gmail.com>
-Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
-Tested-by: Geliang Tang <geliang@kernel.org>
-Reviewed-by: Mat Martineau <martineau@kernel.org>
-Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
----
- net/mptcp/ctrl.c | 39 ++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 38 insertions(+), 1 deletion(-)
-
-diff --git a/net/mptcp/ctrl.c b/net/mptcp/ctrl.c
-index 13fe0748dde8..2963ba84e2ee 100644
---- a/net/mptcp/ctrl.c
-+++ b/net/mptcp/ctrl.c
-@@ -96,6 +96,43 @@ static void mptcp_pernet_set_defaults(struct mptcp_pernet *pernet)
- }
  
- #ifdef CONFIG_SYSCTL
-+static int mptcp_set_scheduler(const struct net *net, const char *name)
-+{
-+	struct mptcp_pernet *pernet = mptcp_get_pernet(net);
-+	struct mptcp_sched_ops *sched;
-+	int ret = 0;
-+
-+	rcu_read_lock();
-+	sched = mptcp_sched_find(name);
-+	if (sched)
-+		strscpy(pernet->scheduler, name, MPTCP_SCHED_NAME_MAX);
-+	else
-+		ret = -ENOENT;
-+	rcu_read_unlock();
-+
-+	return ret;
-+}
-+
-+static int proc_scheduler(struct ctl_table *ctl, int write,
-+			  void *buffer, size_t *lenp, loff_t *ppos)
-+{
-+	const struct net *net = current->nsproxy->net_ns;
-+	char val[MPTCP_SCHED_NAME_MAX];
-+	struct ctl_table tbl = {
-+		.data = val,
-+		.maxlen = MPTCP_SCHED_NAME_MAX,
-+	};
-+	int ret;
-+
-+	strscpy(val, mptcp_get_scheduler(net), MPTCP_SCHED_NAME_MAX);
-+
-+	ret = proc_dostring(&tbl, write, buffer, lenp, ppos);
-+	if (write && ret == 0)
-+		ret = mptcp_set_scheduler(net, val);
-+
-+	return ret;
-+}
-+
- static struct ctl_table mptcp_sysctl_table[] = {
- 	{
- 		.procname = "enabled",
-@@ -148,7 +185,7 @@ static struct ctl_table mptcp_sysctl_table[] = {
- 		.procname = "scheduler",
- 		.maxlen	= MPTCP_SCHED_NAME_MAX,
- 		.mode = 0644,
--		.proc_handler = proc_dostring,
-+		.proc_handler = proc_scheduler,
- 	},
- 	{
- 		.procname = "close_timeout",
+> # selftests: net: xfrm_state.sh
+> # ./xfrm_state.sh: line 91: test_: command not found
+> # TEST: unreachable_ipv4IPv6 unreachable from router r3           [ FAIL ]
 
----
-base-commit: a26ff37e624d12e28077e5b24d2b264f62764ad6
-change-id: 20240506-upstream-net-20240506-mptcp-sched-exist-6a1b91872a32
+This appears to be an error from the v2 run, which was sent yesterday.
+The v3 patch should have superseded it.
 
-Best regards,
--- 
-Matthieu Baerts (NGI0) <matttbe@kernel.org>
+The branch net-dev-testing/net-next-2024-05-06--12-00 contains the v2 patch.
+I wonder if net-dev testing recognized v3 patch.
 
+git diff net-next-2024-05-06--12-00 net-next-2024-05-06--03-00 ./tools/testing/selftests/net/xfrm_state.sh
+is missing the expected one line diff in  IFS.
+
+> # ./xfrm_state.sh: line 91: test_: command not found
+> # TEST: unreachable_gw_ipv6IPv6 unreachable from IPsec gateway s2 [ FAIL ]
+> # ./xfrm_state.sh: line 91: test_: command not found
+> # TEST: mtu_ipv6_r2IPv6 MTU exceeded from ESP router r2          [ FAIL ]
+> # ./xfrm_state.sh: line 91: test_: command not found
+> # TEST: mtu_ipv6_r3IPv6 MTU exceeded router r3                   [ FAIL ]
+> not ok 1 selftests: net: xfrm_state.sh # exit=1
+
+I suspect there is another another issue with 
+tools/testing/selftests/net/config . It does not appear to support nftables 
+match for ESP. Which this script assumes.
+
+# ip netns exec ns_r2-39oUmE nft add rule inet filter FORWARD counter ip protocol esp counter log accept
+#
+# Error: Could not process rule: No such file or directory
+# add rule inet filter FORWARD counter ip protocol esp counter log accept
+#               ^^^^^^
+
+I learning vng also. I will send v4 with change to config, then I hope the 
+test runner will pick up the latest patch.
+
+-antony
 
