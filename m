@@ -1,174 +1,86 @@
-Return-Path: <netdev+bounces-93830-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93831-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 334518BD51E
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 21:04:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2DE58BD540
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 21:14:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B49841F21DE4
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 19:04:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6E7BE2831CD
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 19:14:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36EF1158DC4;
-	Mon,  6 May 2024 19:04:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B48715821F;
+	Mon,  6 May 2024 19:14:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GPmSv+6l"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="R4mtImxl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f169.google.com (mail-oi1-f169.google.com [209.85.167.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B86064AECA;
-	Mon,  6 May 2024 19:04:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4960741C73;
+	Mon,  6 May 2024 19:14:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715022262; cv=none; b=WgjmmOiWFHV6rT13JHIj705Bv3+8ba5EHAqMH/U9vOtXQ1gnxGaJbo0NJTrJM0e2dwc831B63Bg4m5VUC46Tkd6Z/ViRGT4ddxn+rJpik/CgjXt4SlYh9Ablj5+/3YPgP+UoDBISv8AB+8TzvUOdnOpKYCjezXNdlOxnIsc5FCk=
+	t=1715022851; cv=none; b=u+qO7Ahco3NWcF58dLOZzycNykPMMhTg1D9PKLcRQJiUJIcnlS7UtQReM2udyj5V3HNDsPAOWDjO5zSpfwZRCdU+UwegtOyDCLKbJuKVDXTDcXInB6Zo2haTvOaF9E9xHDPrA6YLwwJsil6E5vFd9BM/NISkYj2OGGLKSJTplB0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715022262; c=relaxed/simple;
-	bh=ZBkZQJfG24VT0gMtEpunLMAC3DvYlEFcqF28aOs/ym0=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=FHWDUwnsgIezQsGqsh70gxYizyHWofr2D0BQKojBjgiKDckhX/RTkEZ32dk7MN22Li9zc9oJdIO+QD3REqEppiWKKeTg5MPWtaeplEyXq1PGU+KOKN0sNUa1ZzoQwNQXq59aBmh+B/ImNuhv3MaEYJ8qbO73zyfaOxELbyVEPAM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GPmSv+6l; arc=none smtp.client-ip=209.85.167.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f169.google.com with SMTP id 5614622812f47-3c956282db1so1403585b6e.3;
-        Mon, 06 May 2024 12:04:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715022260; x=1715627060; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=I2SKIsnNha+W0GLT3IWBOtCj1J+elwjzbYWssl7a500=;
-        b=GPmSv+6lVI0q7AvAZ3rXpE158iCrOIVi0wuGgXGiE4bHp+eNwH/oVz/AwKI8iwoRwp
-         e/f0JXezIpy5bKvoRZopUJpBqjadPnuBt2PXLOIKkNmf93NNG1HjWyYu3xAtMKjxOlRn
-         xKMlM7oeOX6JUE+ax6A7MUkXkIfdFiT0YccQM+x5V8RU1jaXjxmCc0iFpFAIKXo/hZ7X
-         xD2E7o9UD/GOsFaFeenntUpf9/AyMCOlVizI8FrKnNlFCVMN1nxvJMXDq3QdbNkI4dXj
-         iMT3VWDiPK/v77ewHfTl68z1XYoaRaxkXyAWLYFUIWdedcPsLFWuBsztqS8neAeVSCeK
-         g1Mg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715022260; x=1715627060;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=I2SKIsnNha+W0GLT3IWBOtCj1J+elwjzbYWssl7a500=;
-        b=QhqNzXsWT4JEm9uDyTl4QCz6cpRjKBPhj5kxfsxMlyjGZ8ChCyYYXezLl7SDw9w0Tr
-         gFaHxYBRDoeUIZGRi9Q+gKCHDWrVvq4aUoq5yQ7mFFGa00NZPpOVL909/dxZM/VgE/1q
-         JTeTBQRqnbs4w0p9ZXXGdWCGxzyjP9sTiKvhycVce4tCUfapnzyqT1fpN5ouPNKliOCC
-         XZ6dKkyRI969HVBkOYwRzrOJEjrS7j8MR7XuxR/Bjmx3JHLt/7NB5LDEVSTFkJMIv0CW
-         oMcduU0fJUei6ozbEi1JGSh65VpM8njLQXe37GIFlkMECI6n1Z0dlv22kxtd1wgNUUNx
-         gsbg==
-X-Forwarded-Encrypted: i=1; AJvYcCWTA7G4y/QJZUDEUGxMv99hwAJruGqvECELXyp5wb0UtWBk62xw51FlwqcIAXhYwJi+h7fIkcfzoCdS9L8/1lSMqp0W7U9R0UHeP7luseNkuGfksfPTSgzxvSyXgHJOGqdqhAkpbkLr+QfBHaSRE5pNPgQt8HUMcnDo
-X-Gm-Message-State: AOJu0Yxq2Y+dT0O6m+sgkT4CdeIAo4KR57uRI0g2CUwAuZ94xjab0LA8
-	9hfsP132NEOfSAHvT/8Ei1+hhK5I0wanKJf3/u++EDsS2blwTCMn1NO89A==
-X-Google-Smtp-Source: AGHT+IG+ItiPikNVgc60CKoxgDT2mczHR44xfpbOaKQ+c8xKiffqwj7KHe/G3zMInjuugVbY/pdMQg==
-X-Received: by 2002:a05:6808:1b24:b0:3c9:5c7c:89f6 with SMTP id bx36-20020a0568081b2400b003c95c7c89f6mr12848857oib.16.1715022259741;
-        Mon, 06 May 2024 12:04:19 -0700 (PDT)
-Received: from localhost (164.146.150.34.bc.googleusercontent.com. [34.150.146.164])
-        by smtp.gmail.com with ESMTPSA id j3-20020a056214032300b006a0e86b3f65sm3972744qvu.38.2024.05.06.12.04.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 May 2024 12:04:19 -0700 (PDT)
-Date: Mon, 06 May 2024 15:04:18 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Abhishek Chauhan <quic_abchauha@quicinc.com>, 
- "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- Andrew Halaney <ahalaney@redhat.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- Martin KaFai Lau <martin.lau@kernel.org>, 
- Martin KaFai Lau <martin.lau@linux.dev>, 
- Daniel Borkmann <daniel@iogearbox.net>, 
- bpf <bpf@vger.kernel.org>
-Cc: kernel@quicinc.com
-Message-ID: <663929b249143_516de2945@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20240504031331.2737365-4-quic_abchauha@quicinc.com>
-References: <20240504031331.2737365-1-quic_abchauha@quicinc.com>
- <20240504031331.2737365-4-quic_abchauha@quicinc.com>
-Subject: Re: [RFC PATCH bpf-next v6 3/3] selftests/bpf: Handle forwarding of
- UDP CLOCK_TAI packets
+	s=arc-20240116; t=1715022851; c=relaxed/simple;
+	bh=0Soa7mK2FI4eg37nhVqhYOgXnmVB2GfFZz1xbfp9hBk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ul+qcGpIlLCQGbVNvaOF33+4IXFO5/vVUUtmgXgtsn2dcrXgmMFnhXZR0epEOvz1vwA8BVcQqkx7bCAnDb7dtK4BwI5VlTzhQPQfCAOGGulV/gfGb86riHC9RO5HB6hf5ME6EBIDxkVeRliSFKllcjePYVoVjwFIAAFzD1xkKg4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=R4mtImxl; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=NQkm4zrvTG8w92cPIcnyxF5xsMLdgcY8QlK+K/AlrL0=; b=R4
+	mtImxlVp8dPABDHZLz4OZDKW0hN9tJXZ892K4PYfQLTxEiQLGVDcKsnMnIGLepc7E4VcExPe1ATFV
+	fTASwwOG+S1yyIIr6siKlRbfURSVbeib+b8E7+UfEq+3v+n7deJtenszOktrj7XuAi/H2Eh1YsoLv
+	Gsjcm717JuaXchs=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1s43mj-00En79-8J; Mon, 06 May 2024 21:14:01 +0200
+Date: Mon, 6 May 2024 21:14:01 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Kamil =?iso-8859-1?Q?Hor=E1k?= - 2N <kamilh@axis.com>
+Cc: florian.fainelli@broadcom.com, bcm-kernel-feedback-list@broadcom.com,
+	hkallweit1@gmail.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 1/3] net: phy: bcm54811: New link mode for BroadR-Reach
+Message-ID: <25798e60-d1cc-40ce-b081-80afdb182dd6@lunn.ch>
+References: <20240506144015.2409715-1-kamilh@axis.com>
+ <20240506144015.2409715-2-kamilh@axis.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240506144015.2409715-2-kamilh@axis.com>
 
-Abhishek Chauhan wrote:
-> With changes in the design to forward CLOCK_TAI in the skbuff
-> framework,  existing selftest framework needs modification
-> to handle forwarding of UDP packets with CLOCK_TAI as clockid.
-> 
-> Link: https://lore.kernel.org/netdev/bc037db4-58bb-4861-ac31-a361a93841d3@linux.dev/
-> Signed-off-by: Abhishek Chauhan <quic_abchauha@quicinc.com>
-> ---
->  tools/include/uapi/linux/bpf.h                | 15 ++++---
->  .../selftests/bpf/prog_tests/ctx_rewrite.c    | 10 +++--
->  .../selftests/bpf/prog_tests/tc_redirect.c    |  3 --
->  .../selftests/bpf/progs/test_tc_dtime.c       | 39 +++++++++----------
->  4 files changed, 34 insertions(+), 33 deletions(-)
-> 
-> diff --git a/tools/include/uapi/linux/bpf.h b/tools/include/uapi/linux/bpf.h
-> index 90706a47f6ff..25ea393cf084 100644
-> --- a/tools/include/uapi/linux/bpf.h
-> +++ b/tools/include/uapi/linux/bpf.h
-> @@ -6207,12 +6207,17 @@ union {					\
->  	__u64 :64;			\
->  } __attribute__((aligned(8)))
->  
-> +/* The enum used in skb->tstamp_type. It specifies the clock type
-> + * of the time stored in the skb->tstamp.
-> + */
->  enum {
-> -	BPF_SKB_TSTAMP_UNSPEC,
-> -	BPF_SKB_TSTAMP_DELIVERY_MONO,	/* tstamp has mono delivery time */
-> -	/* For any BPF_SKB_TSTAMP_* that the bpf prog cannot handle,
-> -	 * the bpf prog should handle it like BPF_SKB_TSTAMP_UNSPEC
-> -	 * and try to deduce it by ingress, egress or skb->sk->sk_clockid.
-> +	BPF_SKB_TSTAMP_UNSPEC = 0,		/* DEPRECATED */
-> +	BPF_SKB_TSTAMP_DELIVERY_MONO = 1,	/* DEPRECATED */
-> +	BPF_SKB_CLOCK_REALTIME = 0,
-> +	BPF_SKB_CLOCK_MONOTONIC = 1,
-> +	BPF_SKB_CLOCK_TAI = 2,
-> +	/* For any future BPF_SKB_CLOCK_* that the bpf prog cannot handle,
-> +	 * the bpf prog can try to deduce it by ingress/egress/skb->sk->sk_clockid.
->  	 */
->  };
->  
-> diff --git a/tools/testing/selftests/bpf/prog_tests/ctx_rewrite.c b/tools/testing/selftests/bpf/prog_tests/ctx_rewrite.c
-> index 3b7c57fe55a5..71940f4ef0fb 100644
-> --- a/tools/testing/selftests/bpf/prog_tests/ctx_rewrite.c
-> +++ b/tools/testing/selftests/bpf/prog_tests/ctx_rewrite.c
-> @@ -69,15 +69,17 @@ static struct test_case test_cases[] = {
->  	{
->  		N(SCHED_CLS, struct __sk_buff, tstamp),
->  		.read  = "r11 = *(u8 *)($ctx + sk_buff::__mono_tc_offset);"
-> -			 "w11 &= 3;"
-> -			 "if w11 != 0x3 goto pc+2;"
-> +			 "if w11 == 0x4 goto pc+1;"
-> +			 "goto pc+4;"
-> +			 "if w11 == 0x3 goto pc+1;"
-> +			 "goto pc+2;"
+On Mon, May 06, 2024 at 04:40:13PM +0200, Kamil Horák - 2N wrote:
+> Introduce new link modes necessary for the BroadR-Reach mode on
+> bcm5481x PHY by Broadcom and new PHY tunable to choose between
+> normal (IEEE) ethernet and BroadR-Reach modes of the PHY.
 
-Not an expert on this code, and I see that the existing code already
-has this below, but: isn't it odd and unnecessary to jump to an
-unconditional jump statement?
+I would of split this into two patches. The reason being, we need the
+new link mode. But do we need the tunable? Why don't i just use the
+link mode to select it?
 
->  			 "$dst = 0;"
->  			 "goto pc+1;"
->  			 "$dst = *(u64 *)($ctx + sk_buff::tstamp);",
->  		.write = "r11 = *(u8 *)($ctx + sk_buff::__mono_tc_offset);"
-> -			 "if w11 & 0x2 goto pc+1;"
-> +			 "if w11 & 0x4 goto pc+1;"
->  			 "goto pc+2;"
-> -			 "w11 &= -2;"
-> +			 "w11 &= -3;"
->  			 "*(u8 *)($ctx + sk_buff::__mono_tc_offset) = r11;"
->  			 "*(u64 *)($ctx + sk_buff::tstamp) = $src;",
->  	},
+ethtool -s eth42 advertise 1BR10
+
+Once you have split this up, you can explain the link mode patch in a
+bit more detail. That because the name does not fit 802.3, the normal
+macros cannot be used, so everything needs to be hand crafted.
+
+    Andrew
+
+---
+pw-bot: cr
 
