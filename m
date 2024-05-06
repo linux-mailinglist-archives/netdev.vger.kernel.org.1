@@ -1,154 +1,94 @@
-Return-Path: <netdev+bounces-93841-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93846-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFE2B8BD5BB
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 21:46:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF40F8BD5D2
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 21:49:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 81B6F1F218C2
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 19:46:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1CA7F1C20B62
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 19:49:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62AE715B54C;
-	Mon,  6 May 2024 19:45:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCC5A15CD6A;
+	Mon,  6 May 2024 19:45:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="DJA/6M38"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="HIkl+1ZF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBBCA15B122;
-	Mon,  6 May 2024 19:45:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 363DF15B993
+	for <netdev@vger.kernel.org>; Mon,  6 May 2024 19:45:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715024711; cv=none; b=PtsP3LwwVn/ewlZz7WwSqMmXVDCmCFWY6qB+CoJVDTquHxIH+JXRGb0nn8el3ua/oZ2odnXNoi7gTSsFyYCIHqMyKbOB8TL2mOEjFG4tk1NFWbvCPXqRFCZFLKu76AsUuBSmx7BeEH8yyxzW7SoZv3jALyYbh5xY+M+r4elYK2Y=
+	t=1715024749; cv=none; b=mInWDsbu754HGIdl0kYZnpCqsrqQ7gwMdxSxe3aNZbddZQ63S1DnnpEJnp8DUsHzTSl2jWHmEcp8AIAS717g02r+UkSRitv4+svbsoOGimZBiyi6lLvrhxHzXuOXC/j/hq22Y34UWQdkyoFDQsdMtdJ7orgHHgrU7V8GA9lCyok=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715024711; c=relaxed/simple;
-	bh=8we1prCctjwdaXUgYnpclnX4bIKNr83K4LXA485iABY=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=uG3W1KA8WncP5pzl7VELhNYeGmIN80x0b7o+lqm6mmzHyKl1XTEUvnK3TdmIVpGOJav6Tz6/6wLuYlZ6XXjsyE8N6tQ6+VJZfhM8f0TcdURyDmqdNr2EIFN3LnuMdP3r5scTzHkqemyoRlze5/B3nc2AtVG03LzD9KjQqfPunas=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=DJA/6M38; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 446JhE7S006590;
-	Mon, 6 May 2024 19:45:03 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=w7f3GppcRf21WKGCq9yibtFRa/ZnOdFa39UXqIdtoKU=;
- b=DJA/6M38lZK7qDeQbT5Ssi9788+WxIx8tcDT8UrtMM154PyIfqw+sZlP0VLriPWRNR+R
- WTXRCiQMQKl2g+ZS7Jan/kIt1kiIalLeDTUWcMB7r9fDcor4FwZwuN0Bs6UYwwtli+7T
- S85zHYCy98aHhqWBPUeMaGqo6ar6KDaHaPhLWjElbRvbsFT8qirzve5N3pf8hOVU8tfS
- +TGAgSMgkh47nG4AQLWrk7rdpKUXgVck6otGUC4q+kzj4rRJ2LqPr9nwRhAe+ERjT+AK
- nfIWLabQsVM5zGS+D8sRf6H0G8gT6B8V0dv0F4GcCLoEzpDQRW2yuVmw7R27awRwQVWE iw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xy5kmr04e-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 06 May 2024 19:45:03 +0000
-Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 446Jj2Cl009149;
-	Mon, 6 May 2024 19:45:02 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xy5kmr049-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 06 May 2024 19:45:02 +0000
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 446H3Nd6022444;
-	Mon, 6 May 2024 19:45:01 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3xx1jksj5q-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 06 May 2024 19:45:01 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 446Jiu7Z45547828
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 6 May 2024 19:44:58 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 6DC212004E;
-	Mon,  6 May 2024 19:44:56 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 30FD120067;
-	Mon,  6 May 2024 19:44:56 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Mon,  6 May 2024 19:44:56 +0000 (GMT)
-From: Heiko Carstens <hca@linux.ibm.com>
-To: Nathan Chancellor <nathan@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
-        Thomas Huth <thuth@redhat.com>,
-        Alexandra Winter <wintera@linux.ibm.com>,
-        Thorsten Winkler <twinkler@linux.ibm.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Jiri Slaby <jirislaby@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>, netdev@vger.kernel.org,
-        llvm@lists.linux.dev, patches@lists.linux.dev,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>
-Subject: [PATCH 6/6] s390/iucv: Unexport iucv_root
-Date: Mon,  6 May 2024 21:44:54 +0200
-Message-Id: <20240506194454.1160315-7-hca@linux.ibm.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20240506194454.1160315-1-hca@linux.ibm.com>
-References: <20240506194454.1160315-1-hca@linux.ibm.com>
+	s=arc-20240116; t=1715024749; c=relaxed/simple;
+	bh=lbijACQXQEIFD7n+SPLLEfRap5bsE4hpY11Z7y7ikRU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WZDoDt31/PMXvME49mF3PYacg4ZzW9Nl2VyRL8Gu1abh9JhGzpa6fl1NuWpJ4VbswOTRJeYZ1LpMwjAQOkaND37m+WooowNgdd7sAxUjeg6raG2pA8gAqn39b18EADtuIa6o5Xc8oMN8i44eAjKQ9tDHzGAvlPEdosdA8QKIPKc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=HIkl+1ZF; arc=none smtp.client-ip=91.218.175.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Mon, 6 May 2024 12:45:42 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1715024746;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=m8Yi4qyNfdzjVzdp5Kazo/gjP3lcaKnRlQW++lDgnuo=;
+	b=HIkl+1ZF+1+94HNPJyXD6Uip8vqEnrraN9iTj7qlY5GdlECVSarQLnutAtdAVGKWHPlMO/
+	uF+o1UVM038jWPB+LSQHPooKQC2/e+uJdVGb6rrx/hWJgJ6a2ISJ/3tw3yXY6NeEE1rKfN
+	85oRK/aAIitnSwkO8kuj5KxYRvMLdrQ=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Shakeel Butt <shakeel.butt@linux.dev>
+To: Ivan Babrou <ivan@cloudflare.com>
+Cc: Jesper Dangaard Brouer <hawk@kernel.org>, 
+	Waiman Long <longman@redhat.com>, tj@kernel.org, hannes@cmpxchg.org, lizefan.x@bytedance.com, 
+	cgroups@vger.kernel.org, yosryahmed@google.com, netdev@vger.kernel.org, 
+	linux-mm@kvack.org, kernel-team@cloudflare.com, 
+	Arnaldo Carvalho de Melo <acme@kernel.org>, Sebastian Andrzej Siewior <bigeasy@linutronix.de>, 
+	Daniel Dao <dqminh@cloudflare.com>, jr@cloudflare.com
+Subject: Re: [PATCH v1] cgroup/rstat: add cgroup_rstat_cpu_lock helpers and
+ tracepoints
+Message-ID: <lpvlaiauysfkwgzizvpzxx4kgzsfmy75xw6m24ziq6i6iruawr@j563n3a4bzrn>
+References: <30d64e25-561a-41c6-ab95-f0820248e9b6@redhat.com>
+ <4a680b80-b296-4466-895a-13239b982c85@kernel.org>
+ <203fdb35-f4cf-4754-9709-3c024eecade9@redhat.com>
+ <b74c4e6b-82cc-4b26-b817-0b36fbfcc2bd@kernel.org>
+ <b161e21f-9d66-4aac-8cc1-83ed75f14025@redhat.com>
+ <42a6d218-206b-4f87-a8fa-ef42d107fb23@kernel.org>
+ <4gdfgo3njmej7a42x6x6x4b6tm267xmrfwedis4mq7f4mypfc7@4egtwzrfqkhp>
+ <55854a94-681e-4142-9160-98b22fa64d61@kernel.org>
+ <mnakwztmiskni3k6ia5mynqfllb3dw5kicuv4wp4e4ituaezwt@2pzkuuqg6r3e>
+ <CABWYdi2pTg5Yc23XAV_ZLJepF42b8L3R5syhocDVJS-Po=ZYOA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 3f9n6fcI-d5kukff0yptGiX05QuXh7iW
-X-Proofpoint-GUID: ieBCS--FXtdlM5wZF388GejDYApfwOg0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.11.176.26
- definitions=2024-05-06_14,2024-05-06_02,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 impostorscore=0
- clxscore=1015 mlxlogscore=999 priorityscore=1501 malwarescore=0
- suspectscore=0 adultscore=0 mlxscore=0 bulkscore=0 phishscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2404010000 definitions=main-2405060142
+In-Reply-To: <CABWYdi2pTg5Yc23XAV_ZLJepF42b8L3R5syhocDVJS-Po=ZYOA@mail.gmail.com>
+X-Migadu-Flow: FLOW_OUT
 
-There is no user of iucv_root outside of the core IUCV code left.
-Therefore remove the EXPORT_SYMBOL.
+On Mon, May 06, 2024 at 09:28:41AM -0700, Ivan Babrou wrote:
+> On Mon, May 6, 2024 at 9:22 AM Shakeel Butt <shakeel.butt@linux.dev> wrote:
+[...]
+> >
+> > The reason I asked about MEMCG_SOCK was that it might be causing larger
+> > update trees (more cgroups) on CPUs processing the NET_RX.
+> 
+> We pass cgroup.memory=nosocket in the kernel cmdline:
+> 
+> * https://lore.kernel.org/lkml/CABWYdi0G7cyNFbndM-ELTDAR3x4Ngm0AehEp5aP0tfNkXUE+Uw@mail.gmail.com/
+> 
 
-Signed-off-by: Heiko Carstens <hca@linux.ibm.com>
----
- include/net/iucv/iucv.h | 1 -
- net/iucv/iucv.c         | 3 +--
- 2 files changed, 1 insertion(+), 3 deletions(-)
-
-diff --git a/include/net/iucv/iucv.h b/include/net/iucv/iucv.h
-index b3736e66fe1a..4d114e6d6d23 100644
---- a/include/net/iucv/iucv.h
-+++ b/include/net/iucv/iucv.h
-@@ -82,7 +82,6 @@ struct iucv_array {
- } __attribute__ ((aligned (8)));
- 
- extern const struct bus_type iucv_bus;
--extern struct device *iucv_root;
- 
- struct device_driver;
- 
-diff --git a/net/iucv/iucv.c b/net/iucv/iucv.c
-index 9db7c2c0ae72..2e61f19621ee 100644
---- a/net/iucv/iucv.c
-+++ b/net/iucv/iucv.c
-@@ -73,8 +73,7 @@ const struct bus_type iucv_bus = {
- };
- EXPORT_SYMBOL(iucv_bus);
- 
--struct device *iucv_root;
--EXPORT_SYMBOL(iucv_root);
-+static struct device *iucv_root;
- 
- static void iucv_release_device(struct device *device)
- {
--- 
-2.40.1
-
+Ah another thing we should fix for you folks. Is it possible to repro
+the issue on the latest linus tree and report back? I will be busy for
+next 2 weeks but will get back to this after that.
 
