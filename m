@@ -1,247 +1,183 @@
-Return-Path: <netdev+bounces-93804-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93805-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8CCB48BD3BD
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 19:20:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 851C58BD3C5
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 19:22:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 43B0928540D
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 17:20:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 251CF1F22372
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 17:22:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3866915746D;
-	Mon,  6 May 2024 17:20:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 805BF15746C;
+	Mon,  6 May 2024 17:22:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bfwxNr0i"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OmAVdzT0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 979CB157463;
-	Mon,  6 May 2024 17:20:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C5B215746B
+	for <netdev@vger.kernel.org>; Mon,  6 May 2024 17:22:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715016018; cv=none; b=gnBgBSvZEt7+OR72wdLT9X1WzVYufWeHpGBaBl9PzAicRUD6xuyHu+OEeQatEG3lyNdOHZVLfJzFs3umXeZLK2j/GndKqaRnbwTNLTJJbrtKeKsue/vi62rKUPbCoVJYiKIo6VjP+b99reUsYhP2vfoeCHYFXSyEth4JdPe/dOk=
+	t=1715016148; cv=none; b=oYi+Lq4iKgnAd4lk1gXTz1hvuUFz/KLIuu5YzPy2b3Jxg6n0R85N99Qub5B81UIuuaZqrfbGMfxTQzRIpPq1RlhzjbPZJGvYmxG4OIwfoKBINZdHR0ziBuohwpdoxlup7Z8/F7hOYATXG+Btjkkv6n1IdAMDkIvvClHKwIah+Bw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715016018; c=relaxed/simple;
-	bh=zTR4Fx+0VuqaciyKhhBIeFfsOGSgd7NnE83iq5V1HY8=;
-	h=Date:From:To:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=gDOC3M7Bxplk5x2HTmGR72CFBgs+HlIzKb2LSkbkAI15du4pzBjlFNUtJvpR18bpb8sOCWakKgZt5S0B9z9HF2UWPKELt85NBESLmkCAvXLRsnwIJbFLWm11dxCOrMc8LzvvVRukycRWhFhKA54wh0oEPIjEj1TfRc8t5e+HeEQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bfwxNr0i; arc=none smtp.client-ip=209.85.222.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-7928d2a03e8so171664685a.2;
-        Mon, 06 May 2024 10:20:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715016015; x=1715620815; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=D0y+XnyAvMNLz7GBeXTnyBjUN7V568BYArXNaTPpjqk=;
-        b=bfwxNr0ie7phfHeVvieJTXY40l2Irkism8J3ALFjV5WrR/exOV4Jv4nRQjLLpaLBZK
-         2KmPFCLchroJghso6lEqKf0zUyyZXci/UhO58z2cCI8tw4Aneg7RTllqv1nfIf8OUu6Z
-         NHFlRNeGg2jAZNpQH5VsfFpA8v8yr0GfqVHwrHDqr7ORdeSscEtOfdfo8BfyTWzpwQN/
-         +6WTu+uFQEJNGIvM1qc+2Sbm9EH1jq8bZoN4O1qGtCxyp135hCG/otW4uZTiLW7dqExZ
-         G3TnEnduE8RPUnMq2+deAlVg2YOlDSQmYR8u3AmmNHEMrl3iTZd3/Meno59cVJoqZsHR
-         P5+A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715016015; x=1715620815;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=D0y+XnyAvMNLz7GBeXTnyBjUN7V568BYArXNaTPpjqk=;
-        b=btUmnJ9HtQ+qZCgzjQmZ5Ugds22sukZ1fjCWBGtEP7FrjNV4YEYOxMnCsdpkBMDP9y
-         7j2veqpmtarD69jaY4vPhcxH5lApwSf7wisiotXyZkCuKTPcfozVGR0JFOL60R1F9fV1
-         MdaOhayLumV88QfdOfCJ7jzD61RtUultoEARVDvlJkxIgGVXzyWBSABunp1ZxIqTtb21
-         ldxpaDV9we0PCyIUQwgWWIJP6vTtzYmDQjqXIz6/iyAqqy8csC5fE+ArcV1pab30zDP1
-         A9hJq2WxkPHyTmqmRdYYzd+E6uWdFEj3ZORs/KLlpVFpAnndw9UetnakAuVO+8LsoBEc
-         M9xA==
-X-Forwarded-Encrypted: i=1; AJvYcCURtBQWIVwJdW09FIKN1fPA6Y9ezwTyRqRVi6BgnUsdp9oL3MmTsPV2HNuXWaSj6DoiYhgQnxrsEDXA9tqFq0Bp4L9vJDCjDkegVUn7Az1D1lSyGQHuh2O/jOcp4K+cZ86Yyck1N2httNoBDdUZFFVRpXcYNa02hR/0b78wysqDYRcyBIi9
-X-Gm-Message-State: AOJu0YwvZon4GpX5//KIus3k2PXfQX7U1iZSz4FPmJHTrlsy9cNjcbhy
-	a5aC9BAsAAW8pnun7rbuFaMIre95iMZtJPyrXSru/YJPOqLR9kXW
-X-Google-Smtp-Source: AGHT+IFvUdHjpr3BUQ8xBSgo+rN17aYkuc/zDYQVtz23p2qARAxsHGJL9+ZJ4GTwq2dY0hfaulgVgw==
-X-Received: by 2002:a05:620a:4493:b0:792:8448:8cbd with SMTP id x19-20020a05620a449300b0079284488cbdmr10610327qkp.26.1715016015267;
-        Mon, 06 May 2024 10:20:15 -0700 (PDT)
-Received: from localhost (164.146.150.34.bc.googleusercontent.com. [34.150.146.164])
-        by smtp.gmail.com with ESMTPSA id s6-20020a05620a0bc600b0078ede411c92sm4068185qki.27.2024.05.06.10.20.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 May 2024 10:20:14 -0700 (PDT)
-Date: Mon, 06 May 2024 13:20:14 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Richard Gobert <richardbgobert@gmail.com>, 
- davem@davemloft.net, 
- edumazet@google.com, 
- willemdebruijn.kernel@gmail.com, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- dsahern@kernel.org, 
- alobakin@pm.me, 
- shuah@kernel.org, 
- netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- linux-kselftest@vger.kernel.org, 
- alexander.duyck@gmail.com
-Message-ID: <6639114eab050_516de29444@willemb.c.googlers.com.notmuch>
-In-Reply-To: <1ed21e6d-7cbc-43e3-8933-fc40562b70b2@gmail.com>
-References: <20240506093550.128210-1-richardbgobert@gmail.com>
- <1ed21e6d-7cbc-43e3-8933-fc40562b70b2@gmail.com>
-Subject: Re: [PATCH net-next v8 2/3] net: gro: move L3 flush checks to
- tcp_gro_receive and udp_gro_receive_segment
+	s=arc-20240116; t=1715016148; c=relaxed/simple;
+	bh=w5JpTUVdVIj7MCsrwGonYzwPX/ONJ1gB76fRSwQSqZE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=EuV7a+UxtayJ7f4ILzCt0Eyn+hs1MJVg+hdL+tvUdZFYDj/SUVP3EhARikZGT2a84KoHbzsVigqXuVQKMgJBOv6lKWE6vO/I/eLjfKja+iQvGcRfBPkpTOpho4c/xfAhkJ0QREesUxrptZTNRQzAulUZh6PtbDo9t/xQNZJcdEI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OmAVdzT0; arc=none smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1715016146; x=1746552146;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=w5JpTUVdVIj7MCsrwGonYzwPX/ONJ1gB76fRSwQSqZE=;
+  b=OmAVdzT0/sMWyn2an3RCHoOITBoWEacu4B28wJ0J+/4QPh5w/QLwNN4F
+   Z6J/8PCyOfspYniWTEdxyw43DQBPXt1dR7jS/ist9qaHOWHIkCcRkPA+o
+   6XolJ35+ae4iNk2Z6dVRJUebWcgkyqbfoqR7S7n6e1hkjUeUcw0OAE8EG
+   RfAJDOoJGw3jXHd7plmE6YWuZ6zNXxue12ED/1MOTMQD0KV1+5nXAc0Im
+   xuZ5l7Z3fksbiLXj/ui3dqiGx/iFVtJ3GaafoZOdLI8tiNUARY8ngLNw3
+   BX5LY2DGVwflsVUyT+XOBCFC7zQSeJPEbVoUKqRdfsy2AtLqCE1W+g/LG
+   w==;
+X-CSE-ConnectionGUID: 32F52e50SXS3KpFvQ1Jcog==
+X-CSE-MsgGUID: ABgu/vKgRtq5LSIcur4jRA==
+X-IronPort-AV: E=McAfee;i="6600,9927,11065"; a="10898964"
+X-IronPort-AV: E=Sophos;i="6.07,259,1708416000"; 
+   d="scan'208";a="10898964"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2024 10:22:23 -0700
+X-CSE-ConnectionGUID: rm8tWeH8QZ+g7fVKpWGAug==
+X-CSE-MsgGUID: 05W8tn+gQSG3uQCkN3Smng==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,259,1708416000"; 
+   d="scan'208";a="28816508"
+Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
+  by orviesa008.jf.intel.com with ESMTP; 06 May 2024 10:22:23 -0700
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	netdev@vger.kernel.org
+Cc: Hui Wang <hui.wang@canonical.com>,
+	anthony.l.nguyen@intel.com,
+	sasha.neftin@intel.com,
+	dima.ruinskiy@intel.com,
+	Vitaly Lifshits <vitaly.lifshits@intel.com>,
+	Naama Meir <naamax.meir@linux.intel.com>
+Subject: [PATCH net] e1000e: move force SMBUS near the end of enable_ulp function
+Date: Mon,  6 May 2024 10:22:16 -0700
+Message-ID: <20240506172217.948756-1-anthony.l.nguyen@intel.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Richard Gobert wrote:
-> {inet,ipv6}_gro_receive functions perform flush checks (ttl, flags,
-> iph->id, ...) against all packets in a loop. These flush checks are used in
-> all merging UDP and TCP flows.
-> 
-> These checks need to be done only once and only against the found p skb,
-> since they only affect flush and not same_flow.
-> 
-> This patch leverages correct network header offsets from the cb for both
-> outer and inner network headers - allowing these checks to be done only
-> once, in tcp_gro_receive and udp_gro_receive_segment. As a result,
-> NAPI_GRO_CB(p)->flush is not used at all. In addition, flush_id checks are
-> more declarative and contained in inet_gro_flush, thus removing the need
-> for flush_id in napi_gro_cb.
-> 
-> This results in less parsing code for non-loop flush tests for TCP and UDP
-> flows.
-> 
-> To make sure results are not within noise range - I've made netfilter drop
-> all TCP packets, and measured CPU performance in GRO (in this case GRO is
-> responsible for about 50% of the CPU utilization).
-> 
-> perf top while replaying 64 parallel IP/TCP streams merging in GRO:
-> (gro_network_flush is compiled inline to tcp_gro_receive)
-> net-next:
->         6.94% [kernel] [k] inet_gro_receive
->         3.02% [kernel] [k] tcp_gro_receive
-> 
-> patch applied:
->         4.27% [kernel] [k] tcp_gro_receive
->         4.22% [kernel] [k] inet_gro_receive
-> 
-> perf top while replaying 64 parallel IP/IP/TCP streams merging in GRO (same
-> results for any encapsulation, in this case inet_gro_receive is top
-> offender in net-next)
-> net-next:
->         10.09% [kernel] [k] inet_gro_receive
->         2.08% [kernel] [k] tcp_gro_receive
-> 
-> patch applied:
->         6.97% [kernel] [k] inet_gro_receive
->         3.68% [kernel] [k] tcp_gro_receive
+From: Hui Wang <hui.wang@canonical.com>
 
-Thanks for getting the additional numbers. The savings are not huge.
+The commit 861e8086029e ("e1000e: move force SMBUS from enable ulp
+function to avoid PHY loss issue") introduces a regression on
+CH_MTP_I219_LM18 (PCIID: 0x8086550A). Without this commit, the
+ethernet works well after suspend and resume, but after applying the
+commit, the ethernet couldn't work anymore after the resume and the
+dmesg shows that the NIC Link changes to 10Mbps (1000Mbps originally):
+[   43.305084] e1000e 0000:00:1f.6 enp0s31f6: NIC Link is Up 10 Mbps Full Duplex, Flow Control: Rx/Tx
 
-But +1 on the change also because it simplifies this non-obvious
-logic. It makes sense to separate flow matching and flush logic.
+Without the commit, the force SMBUS code will not be executed if
+"return 0" or "goto out" is executed in the enable_ulp(), and in my
+case, the "goto out" is executed since FWSM_FW_VALID is set. But after
+applying the commit, the force SMBUS code will be ran unconditionally.
 
-Btw please include Alexander Duyck in the Cc: of this series. 
-> +static inline int inet_gro_flush(const struct iphdr *iph, const struct iphdr *iph2,
-> +				 struct sk_buff *p, bool outer)
-> +{
-> +	const u32 id = ntohl(*(__be32 *)&iph->id);
-> +	const u32 id2 = ntohl(*(__be32 *)&iph2->id);
-> +	const u16 flush_id = (id >> 16) - (id2 >> 16);
-> +	const u16 count = NAPI_GRO_CB(p)->count;
-> +	const u32 df = id & IP_DF;
-> +	u32 is_atomic;
-> +	int flush;
-> +
-> +	/* All fields must match except length and checksum. */
-> +	flush = (iph->ttl ^ iph2->ttl) | (iph->tos ^ iph2->tos) | (df ^ (id2 & IP_DF));
-> +
-> +	if (outer && df)
-> +		return flush;
+Here move the force SMBUS code back to enable_ulp() and put it
+immediate ahead of hw->phy.ops.release(hw), this could allow the
+longest settling time as possible for interface in this function and
+doesn't change the original code logic.
 
-Does the fixed id logic apply equally to inner and outer IPv4?
+Fixes: 861e8086029e ("e1000e: move force SMBUS from enable ulp function to avoid PHY loss issue")
+Signed-off-by: Hui Wang <hui.wang@canonical.com>
+Acked-by: Vitaly Lifshits <vitaly.lifshits@intel.com>
+Tested-by: Naama Meir <naamax.meir@linux.intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+---
+ drivers/net/ethernet/intel/e1000e/ich8lan.c | 19 +++++++++++++++++++
+ drivers/net/ethernet/intel/e1000e/netdev.c  | 18 ------------------
+ 2 files changed, 19 insertions(+), 18 deletions(-)
 
-> +
-> +	/* When we receive our second frame we can make a decision on if we
-> +	 * continue this flow as an atomic flow with a fixed ID or if we use
-> +	 * an incrementing ID.
-> +	 */
-> +	NAPI_GRO_CB(p)->is_atomic |= (count == 1 && df && flush_id == 0);
-> +	is_atomic = (df && NAPI_GRO_CB(p)->is_atomic) - 1;
-> +
-> +	return flush | (flush_id ^ (count & is_atomic));
+diff --git a/drivers/net/ethernet/intel/e1000e/ich8lan.c b/drivers/net/ethernet/intel/e1000e/ich8lan.c
+index f9e94be36e97..dd670cd87df2 100644
+--- a/drivers/net/ethernet/intel/e1000e/ich8lan.c
++++ b/drivers/net/ethernet/intel/e1000e/ich8lan.c
+@@ -1225,6 +1225,25 @@ s32 e1000_enable_ulp_lpt_lp(struct e1000_hw *hw, bool to_sx)
+ 	}
+ 
+ release:
++	/* Switching PHY interface always returns MDI error
++	 * so disable retry mechanism to avoid wasting time
++	 */
++	e1000e_disable_phy_retry(hw);
++
++	/* Force SMBus mode in PHY */
++	ret_val = e1000_read_phy_reg_hv_locked(hw, CV_SMB_CTRL, &phy_reg);
++	if (ret_val)
++		goto release;
++	phy_reg |= CV_SMB_CTRL_FORCE_SMBUS;
++	e1000_write_phy_reg_hv_locked(hw, CV_SMB_CTRL, phy_reg);
++
++	e1000e_enable_phy_retry(hw);
++
++	/* Force SMBus mode in MAC */
++	mac_reg = er32(CTRL_EXT);
++	mac_reg |= E1000_CTRL_EXT_FORCE_SMBUS;
++	ew32(CTRL_EXT, mac_reg);
++
+ 	hw->phy.ops.release(hw);
+ out:
+ 	if (ret_val)
+diff --git a/drivers/net/ethernet/intel/e1000e/netdev.c b/drivers/net/ethernet/intel/e1000e/netdev.c
+index 3692fce20195..cc8c531ec3df 100644
+--- a/drivers/net/ethernet/intel/e1000e/netdev.c
++++ b/drivers/net/ethernet/intel/e1000e/netdev.c
+@@ -6623,7 +6623,6 @@ static int __e1000_shutdown(struct pci_dev *pdev, bool runtime)
+ 	struct e1000_hw *hw = &adapter->hw;
+ 	u32 ctrl, ctrl_ext, rctl, status, wufc;
+ 	int retval = 0;
+-	u16 smb_ctrl;
+ 
+ 	/* Runtime suspend should only enable wakeup for link changes */
+ 	if (runtime)
+@@ -6697,23 +6696,6 @@ static int __e1000_shutdown(struct pci_dev *pdev, bool runtime)
+ 			if (retval)
+ 				return retval;
+ 		}
+-
+-		/* Force SMBUS to allow WOL */
+-		/* Switching PHY interface always returns MDI error
+-		 * so disable retry mechanism to avoid wasting time
+-		 */
+-		e1000e_disable_phy_retry(hw);
+-
+-		e1e_rphy(hw, CV_SMB_CTRL, &smb_ctrl);
+-		smb_ctrl |= CV_SMB_CTRL_FORCE_SMBUS;
+-		e1e_wphy(hw, CV_SMB_CTRL, smb_ctrl);
+-
+-		e1000e_enable_phy_retry(hw);
+-
+-		/* Force SMBus mode in MAC */
+-		ctrl_ext = er32(CTRL_EXT);
+-		ctrl_ext |= E1000_CTRL_EXT_FORCE_SMBUS;
+-		ew32(CTRL_EXT, ctrl_ext);
+ 	}
+ 
+ 	/* Ensure that the appropriate bits are set in LPI_CTRL
+-- 
+2.41.0
 
-This is a good time to consider making this logical more obvious.
-
-First off, the flush check can be part of the outer && df above, as
-flush is not modified after.
-
-Subjective, but I find the following more readable, and not worth
-saving a few branches.
-
-        if (count == 1 && df && !flush_id)
-                NAPI_GRO_CB(p)->is_atomic = true;
-
-	ip_fixedid_matches = NAPI_GRO_CB(p)->is_atomic ^ df;
-	ipid_offset_matches = ipid_offset - count;
-
-	return ip_fixedid_matches & ipid_offset_matches;
-
-Have to be a bit careful about types. Have not checked that in detail.
-
-And while nitpicking:
-ipid_offset may be a more descriptive variable name than flush_id, and
-ip_fixedid  than is_atomic. If changing those does not result in a lot
-of code churn.
-
-> +}
-> +
-> +static inline int ipv6_gro_flush(const struct ipv6hdr *iph, const struct ipv6hdr *iph2)
-> +{
-> +	/* <Version:4><Traffic_Class:8><Flow_Label:20> */
-> +	__be32 first_word = *(__be32 *)iph ^ *(__be32 *)iph2;
-> +
-> +	/* Flush if Traffic Class fields are different. */
-> +	return !!((first_word & htonl(0x0FF00000)) |
-> +		(__force __be32)(iph->hop_limit ^ iph2->hop_limit));
-> +}
-> +
-> +static inline int gro_network_flush(const void *th, const void *th2, struct sk_buff *p, int off)
-> +{
-> +	const bool encap_mark = NAPI_GRO_CB(p)->encap_mark;
-
-Is this correct when udp_gro_complete clears this for tunnels?
-
-> +	int flush = 0;
-> +	int i;
-> +
-> +	for (i = 0; i <= encap_mark; i++) {
-> +		const u16 diff = off - NAPI_GRO_CB(p)->network_offsets[i];
-> +		const void *nh = th - diff;
-> +		const void *nh2 = th2 - diff;
-> +
-> +		if (((struct iphdr *)nh)->version == 6)
-> +			flush |= ipv6_gro_flush(nh, nh2);
-> +		else
-> +			flush |= inet_gro_flush(nh, nh2, p, i != encap_mark);
-> +	}
-
-Maybe slightly better for branch prediction, and more obvious, if
-creating a helper function __gro_network_flush and calling
-
-    __gro_network_flush(th, th2, p, off - NAPI_GRO_CB(p)->network_offsets[0])
-    if (NAPI_GRO_CB(p)->encap_mark)
-            __gro_network_flush(th, th2, p, off - NAPI_GRO_CB(p)->network_offsets[1])
-
-> +
-> +	return flush;
-> +}
-> +
->  int skb_gro_receive(struct sk_buff *p, struct sk_buff *skb);
->  
 
