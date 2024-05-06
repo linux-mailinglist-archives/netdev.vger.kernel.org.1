@@ -1,251 +1,263 @@
-Return-Path: <netdev+bounces-93696-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93697-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 595FF8BCCDC
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 13:33:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 190868BCCE1
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 13:33:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7C7DF1C2115F
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 11:33:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C324F28383D
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 11:33:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19D8F142E9D;
-	Mon,  6 May 2024 11:33:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D83A2143864;
+	Mon,  6 May 2024 11:33:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0E874EB2B;
-	Mon,  6 May 2024 11:33:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CFFD143745;
+	Mon,  6 May 2024 11:33:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714995194; cv=none; b=nFrwexXyR/1QFac3Qde4p5hjHWmzO/+QI5sGDd8pn7CuL2ITMnLyoThyV/s87X4w6mP5r8+NTH8Zc3RxOvLxEIXivWS1UUKewT2Ag0ft+aODXENSpkih7MN2q6zstHm42yH1oLpq3YY6dYLwD5AX+cqq2ZbqB/m7ZpIVOyqIpx0=
+	t=1714995206; cv=none; b=BlmI2qWpZwu+/GYr+3wiR+mbMJHBB5jV9kY0dbeqkFqb3kq0JoMlWIWOdNHYmezZeSYMjqi3Qlttt5YwVMsC/lAG3Z/rdCcS6clGszLsMZ37w9+kliD/Jl4cZw2iVLTm64lat2izmKWT2hSRjKHYtudE+aEMD/DP+IiGpUCz8Tw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714995194; c=relaxed/simple;
-	bh=PIxogdcQO/DJOu/Ectik/7m3pQPCs86wpxCJ1na6reo=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=cjjTGp7c6He6DU2VN3Pd1UsKhMQpJ108e0MFdDQPhZ9Aoy2OIITGlCxwu9K05u04nqNmmwo3PVItseURUJqnTKhwRWt9DB3BSqWga4Zd2KBKZ1G5w7y+orc4uZ/ZtmUWQDsYGNKIRbS4sSfTA6qkW10uklYy8nT7zG91VLQb6oU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; arc=none smtp.client-ip=211.75.126.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=realtek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
-X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 446BWdXS22260556, This message is accepted by code: ctloc85258
-Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
-	by rtits2.realtek.com.tw (8.15.2/2.95/5.92) with ESMTPS id 446BWdXS22260556
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 6 May 2024 19:32:39 +0800
-Received: from RTEXMBS01.realtek.com.tw (172.21.6.94) by
- RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
+	s=arc-20240116; t=1714995206; c=relaxed/simple;
+	bh=Zb955aQvZD3I1Z0tkUp0Sjg98hLqr2WajKweb88oNbc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=p9DYgA9qNTJl95114K/v2RSqBNrqmGq5nOzGPkbsXvhax9tP+GBIaoHxwfWs4sPn8fo6SJqibeR+4aAKSZ2/nliJBrCusq2BGffaTPsq5wq5vGMeYhjKhPECxH+Vt4g2fNNVWgHPL9wb160ZJFPLTHpf37YxVe54uRBMKQlFXkQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.105])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4VXzj265QPzvRNT;
+	Mon,  6 May 2024 19:29:58 +0800 (CST)
+Received: from dggpeml500026.china.huawei.com (unknown [7.185.36.106])
+	by mail.maildlp.com (Postfix) with ESMTPS id 4267C1400D1;
+	Mon,  6 May 2024 19:33:01 +0800 (CST)
+Received: from [10.174.178.66] (10.174.178.66) by
+ dggpeml500026.china.huawei.com (7.185.36.106) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Mon, 6 May 2024 19:32:39 +0800
-Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXMBS01.realtek.com.tw (172.21.6.94) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Mon, 6 May 2024 19:32:39 +0800
-Received: from RTEXMBS04.realtek.com.tw ([fe80::1a1:9ae3:e313:52e7]) by
- RTEXMBS04.realtek.com.tw ([fe80::1a1:9ae3:e313:52e7%5]) with mapi id
- 15.01.2507.035; Mon, 6 May 2024 19:32:39 +0800
-From: Justin Lai <justinlai0215@realtek.com>
-To: Simon Horman <horms@kernel.org>
-CC: "kuba@kernel.org" <kuba@kernel.org>,
-        "davem@davemloft.net"
-	<davem@davemloft.net>,
-        "edumazet@google.com" <edumazet@google.com>,
-        "pabeni@redhat.com" <pabeni@redhat.com>,
-        "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>,
-        "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>,
-        "andrew@lunn.ch" <andrew@lunn.ch>,
-        "jiri@resnulli.us" <jiri@resnulli.us>,
-        Ping-Ke Shih <pkshih@realtek.com>, Larry Chiu <larry.chiu@realtek.com>
-Subject: RE: [PATCH net-next v17 01/13] rtase: Add pci table supported in this module
-Thread-Topic: [PATCH net-next v17 01/13] rtase: Add pci table supported in
- this module
-Thread-Index: AQHanHHPpu/0OXZUyEWgBGsNOMbxkLGEuuuAgAVa5UA=
-Date: Mon, 6 May 2024 11:32:38 +0000
-Message-ID: <14c200b4573b4a60af14b37861ca1727@realtek.com>
-References: <20240502091847.65181-1-justinlai0215@realtek.com>
- <20240502091847.65181-2-justinlai0215@realtek.com>
- <20240503093331.GN2821784@kernel.org>
-In-Reply-To: <20240503093331.GN2821784@kernel.org>
-Accept-Language: zh-TW, en-US
-Content-Language: zh-TW
-x-kse-serverinfo: RTEXMBS01.realtek.com.tw, 9
-x-kse-antispam-interceptor-info: fallback
-x-kse-antivirus-interceptor-info: fallback
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ 15.1.2507.35; Mon, 6 May 2024 19:33:00 +0800
+Message-ID: <d345b292-e5a1-a428-f5e1-74a6c0c390d9@huawei.com>
+Date: Mon, 6 May 2024 19:33:00 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-KSE-AntiSpam-Interceptor-Info: fallback
-X-KSE-ServerInfo: RTEXH36505.realtek.com.tw, 9
-X-KSE-AntiSpam-Interceptor-Info: fallback
-X-KSE-Antivirus-Interceptor-Info: fallback
-X-KSE-AntiSpam-Interceptor-Info: fallback
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.0.2
+Subject: Re: [question] when bonding with CX5 network card that support ROCE
+To: Zhu Yanjun <zyjzyj2000@gmail.com>, <saeedm@nvidia.com>,
+	<tariqt@nvidia.com>, <borisp@nvidia.com>, <shayd@nvidia.com>,
+	<msanalla@nvidia.com>, Rahul Rameshbabu <rrameshbabu@nvidia.com>,
+	<weizhang@nvidia.com>, <kliteyn@nvidia.com>, <erezsh@nvidia.com>,
+	<igozlan@nvidia.com>
+CC: netdev <netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>
+References: <756aaf3c-5a15-8d18-89d4-ea7380cf845d@huawei.com>
+ <7b0e61e1-8d50-4431-bd0a-6398c618a609@linux.dev>
+ <bb68fc32-9c6c-ceda-a961-f4fde72ce64d@huawei.com>
+ <6a285586-0a11-43be-a07a-5ba0b92d0ee6@gmail.com>
+From: shaozhengchao <shaozhengchao@huawei.com>
+In-Reply-To: <6a285586-0a11-43be-a07a-5ba0b92d0ee6@gmail.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ dggpeml500026.china.huawei.com (7.185.36.106)
 
->=20
->=20
-> On Thu, May 02, 2024 at 05:18:35PM +0800, Justin Lai wrote:
-> > Add pci table supported in this module, and implement pci_driver
-> > function to initialize this driver, remove this driver, or shutdown thi=
-s driver.
-> >
-> > Signed-off-by: Justin Lai <justinlai0215@realtek.com>
->=20
-> ...
->=20
-> > diff --git a/drivers/net/ethernet/realtek/rtase/rtase_main.c
-> > b/drivers/net/ethernet/realtek/rtase/rtase_main.c
-> > new file mode 100644
-> > index 000000000000..5ddb5f7abfe9
-> > --- /dev/null
-> > +++ b/drivers/net/ethernet/realtek/rtase/rtase_main.c
-> > @@ -0,0 +1,618 @@
-> > +// SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause
-> > +/*
-> > + *  rtase is the Linux device driver released for Realtek Automotive
-> > +Switch
-> > + *  controllers with PCI-Express interface.
-> > + *
-> > + *  Copyright(c) 2023 Realtek Semiconductor Corp.
-> > + *
-> > + *  Below is a simplified block diagram of the chip and its relevant
-> interfaces.
-> > + *
-> > + *               *************************
-> > + *               *                       *
-> > + *               *  CPU network device   *
-> > + *               *                       *
-> > + *               *   +-------------+     *
-> > + *               *   |  PCIE Host  |     *
-> > + *               ***********++************
-> > + *                          ||
-> > + *                         PCIE
-> > + *                          ||
-> > + *      ********************++**********************
-> > + *      *            | PCIE Endpoint |             *
-> > + *      *            +---------------+             *
-> > + *      *                | GMAC |                  *
-> > + *      *                +--++--+  Realtek         *
-> > + *      *                   ||     RTL90xx Series  *
-> > + *      *                   ||                     *
-> > + *      *     +-------------++----------------+    *
-> > + *      *     |           | MAC |             |    *
-> > + *      *     |           +-----+             |    *
-> > + *      *     |                               |    *
-> > + *      *     |     Ethernet Switch Core      |    *
-> > + *      *     |                               |    *
-> > + *      *     |   +-----+           +-----+   |    *
-> > + *      *     |   | MAC |...........| MAC |   |    *
-> > + *      *     +---+-----+-----------+-----+---+    *
-> > + *      *         | PHY |...........| PHY |        *
-> > + *      *         +--++-+           +--++-+        *
-> > + *      *************||****************||***********
->=20
-> Thanks for the diagram, I like it a lot :)
->=20
 
-Thank you for your like :)
-> > + *
-> > + *  The block of the Realtek RTL90xx series is our entire chip
-> > + architecture,
-> > + *  the GMAC is connected to the switch core, and there is no PHY in
-> between.
-> > + *  In addition, this driver is mainly used to control GMAC, but does
-> > + not
-> > + *  control the switch core, so it is not the same as DSA.
-> > + */
->=20
-> ...
->=20
-> > +static int rtase_alloc_msix(struct pci_dev *pdev, struct
-> > +rtase_private *tp) {
-> > +     int ret;
-> > +     u16 i;
-> > +
-> > +     memset(tp->msix_entry, 0x0, RTASE_NUM_MSIX * sizeof(struct
-> > + msix_entry));
-> > +
-> > +     for (i =3D 0; i < RTASE_NUM_MSIX; i++)
-> > +             tp->msix_entry[i].entry =3D i;
-> > +
-> > +     ret =3D pci_enable_msix_exact(pdev, tp->msix_entry, tp->int_nums)=
-;
-> > +     if (!ret) {
->=20
-> In Linux Networking code it is an idiomatic practice to keep handle error=
-s in
-> branches and use the main path of execution for the non error path.
->=20
-> In this case I think that would look a bit like this:
->=20
->         ret =3D pci_enable_msix_exact(pdev, tp->msix_entry, tp->int_nums)=
-;
->         if (ret)
->                 return ret;
->=20
->         ...
->=20
->         return 0;
->=20
-> > +
-> > +             for (i =3D 0; i < tp->int_nums; i++)
-> > +                     tp->int_vector[i].irq =3D pci_irq_vector(pdev, i)=
-;
->=20
-> pci_irq_vector() can fail, should that be handled here?
+Hi Yanjun:
+   Thank you for your reply. Are there any other restrictions on using
+ROCE on the CX5?
 
-Thank you for your feedback, I will confirm this part again.
->=20
-> > +     }
-> > +
-> > +     return ret;
-> > +}
-> > +
-> > +static int rtase_alloc_interrupt(struct pci_dev *pdev,
-> > +                              struct rtase_private *tp) {
-> > +     int ret;
-> > +
-> > +     ret =3D rtase_alloc_msix(pdev, tp);
-> > +     if (ret) {
-> > +             ret =3D pci_enable_msi(pdev);
-> > +             if (ret)
-> > +                     dev_err(&pdev->dev,
-> > +                             "unable to alloc interrupt.(MSI)\n");
->=20
-> If an error occurs then it is a good practice to unwind resource allocati=
-ons
-> made within the context of this function call, as this leads to more symm=
-etric
-> unwind paths in callers.
->=20
-> In this case I think any resources consumed by rtase_alloc_msix() should =
-be
-> released if pci_enable_msi fails. Probably using a goto label is appropri=
-ate
-> here.
->=20
-> Likewise, I suggest that similar logic applies to errors within
-> rtase_alloc_msix().
->=20
+Zhengchao Shao
 
-Since msi will be enabled only when msix enable fails, when pci_enable_msi =
-fails,
-there will be no problem of msix-related resources needing to be released,
-because the msix interrupt has not been successfully allocated.
-> > +             else
-> > +                     tp->sw_flag |=3D RTASE_SWF_MSI_ENABLED;
-> > +     } else {
-> > +             tp->sw_flag |=3D RTASE_SWF_MSIX_ENABLED;
-> > +     }
-> > +
-> > +     return ret;
-> > +}
->=20
-> ...
+On 2024/5/6 18:58, Zhu Yanjun wrote:
+> 
+> On 06.05.24 12:45, shaozhengchao wrote:
+>> Hi yanjun:
+>>   The following is the command output after the cat /proc/net/bonding
+>> /bond0 command is run:
+> 
+> If I remember it correctly, it seems that it is a rdma LAG and bonding 
+> problem.
+> 
+> Not sure if it is a known problem or not. Please contact your local 
+> support.
+> 
+> Zhu Yanjun
+> 
+>> [root@localhost ~]# cat /proc/net/bonding/bond0
+>> Ethernet Channel Bonding Driver: v5.10.0+
+>>
+>> Bonding Mode: IEEE 802.3ad Dynamic link aggregation
+>> Transmit Hash Policy: layer2 (0)
+>> MII Status: up
+>> MII Polling Interval (ms): 100
+>> Up Delay (ms): 0
+>> Down Delay (ms): 0
+>> Peer Notification Delay (ms): 0
+>>
+>> 802.3ad info
+>> LACP rate: slow
+>> Min links: 0
+>> Aggregator selection policy (ad_select): stable
+>> System priority: 65535
+>> System MAC address: f4:1d:6b:6f:3b:97
+>> Active Aggregator Info:
+>>         Aggregator ID: 2
+>>         Number of ports: 1
+>>         Actor Key: 23
+>>         Partner Key: 1
+>>         Partner Mac Address: 00:00:00:00:00:00
+>>
+>> Slave Interface: enp145s0f0
+>> MII Status: up
+>> Speed: 40000 Mbps
+>> Duplex: full
+>> Link Failure Count: 1
+>> Permanent HW addr: f4:1d:6b:6f:3b:97
+>> Slave queue ID: 0
+>> Aggregator ID: 1
+>> Actor Churn State: churned
+>> Partner Churn State: churned
+>> Actor Churned Count: 1
+>> Partner Churned Count: 2
+>> details actor lacp pdu:
+>>     system priority: 65535
+>>     system mac address: f4:1d:6b:6f:3b:97
+>>     port key: 23
+>>     port priority: 255
+>>     port number: 1
+>>     port state: 69
+>> details partner lacp pdu:
+>>     system priority: 65535
+>>     system mac address: 00:00:00:00:00:00
+>>     oper key: 1
+>>     port priority: 255
+>>     port number: 1
+>>     port state: 1
+>>
+>> Slave Interface: enp145s0f1
+>> MII Status: up
+>> Speed: 40000 Mbps
+>> Duplex: full
+>> Link Failure Count: 0
+>> Permanent HW addr: f4:1d:6b:6f:3b:98
+>> Slave queue ID: 0
+>> Aggregator ID: 2
+>> Actor Churn State: none
+>> Partner Churn State: churned
+>> Actor Churned Count: 0
+>> Partner Churned Count: 1
+>> details actor lacp pdu:
+>>     system priority: 65535
+>>     system mac address: f4:1d:6b:6f:3b:97
+>>     port key: 23
+>>     port priority: 255
+>>     port number: 2
+>>     port state: 77
+>> details partner lacp pdu:
+>>     system priority: 65535
+>>     system mac address: 00:00:00:00:00:00
+>>     oper key: 1
+>>     port priority: 255
+>>     port number: 1
+>>     port state: 1
+>>
+>> Thank you
+>> Zhengchao Shao
+>>
+>>
+>> On 2024/5/6 16:26, Zhu Yanjun wrote:
+>>> On 06.05.24 06:46, shaozhengchao wrote:
+>>>>
+>>>> When using the 5.10 kernel, I can find two IB devices using the 
+>>>> ibv_devinfo command.
+>>>> ----------------------------------
+>>>> [root@localhost ~]# lspci
+>>>> 91:00.0 Ethernet controller: Mellanox Technologies MT27800 Family 
+>>>> [ConnectX-5]
+>>>> 91:00.1 Ethernet controller: Mellanox Technologies MT27800 Family
+>>>> ----------------------------------
+>>>> [root@localhost ~]# ibv_devinfo
+>>>> hca_id: mlx5_0
+>>>>          transport:                      InfiniBand (0)
+>>>>          fw_ver:                         16.31.1014
+>>>>          node_guid:                      f41d:6b03:006f:4743
+>>>>          sys_image_guid:                 f41d:6b03:006f:4743
+>>>>          vendor_id:                      0x02c9
+>>>>          vendor_part_id:                 4119
+>>>>          hw_ver:                         0x0
+>>>>          board_id:                       HUA0000000004
+>>>>          phys_port_cnt:                  1
+>>>>                  port:   1
+>>>>                          state:                  PORT_ACTIVE (4)
+>>>>                          max_mtu:                4096 (5)
+>>>>                          active_mtu:             1024 (3)
+>>>>                          sm_lid:                 0
+>>>>                          port_lid:               0
+>>>>                          port_lmc:               0x00
+>>>>                          link_layer:             Ethernet
+>>>>
+>>>> hca_id: mlx5_1
+>>>>          transport:                      InfiniBand (0)
+>>>>          fw_ver:                         16.31.1014
+>>>>          node_guid:                      f41d:6b03:006f:4744
+>>>>          sys_image_guid:                 f41d:6b03:006f:4743
+>>>>          vendor_id:                      0x02c9
+>>>>          vendor_part_id:                 4119
+>>>>          hw_ver:                         0x0
+>>>>          board_id:                       HUA0000000004
+>>>>          phys_port_cnt:                  1
+>>>>                  port:   1
+>>>>                          state:                  PORT_ACTIVE (4)
+>>>>                          max_mtu:                4096 (5)
+>>>>                          active_mtu:             1024 (3)
+>>>>                          sm_lid:                 0
+>>>>                          port_lid:               0
+>>>>                          port_lmc:               0x00
+>>>>                          link_layer:             Ethernet
+>>>> ----------------------------------
+>>>> But after the two network ports are bonded, only one IB device is
+>>>> available, and only PF0 can be used.
+>>>> [root@localhost shaozhengchao]# ibv_devinfo
+>>>> hca_id: mlx5_bond_0
+>>>>          transport:                      InfiniBand (0)
+>>>>          fw_ver:                         16.31.1014
+>>>>          node_guid:                      f41d:6b03:006f:4743
+>>>>          sys_image_guid:                 f41d:6b03:006f:4743
+>>>>          vendor_id:                      0x02c9
+>>>>          vendor_part_id:                 4119
+>>>>          hw_ver:                         0x0
+>>>>          board_id:                       HUA0000000004
+>>>>          phys_port_cnt:                  1
+>>>>                  port:   1
+>>>>                          state:                  PORT_ACTIVE (4)
+>>>>                          max_mtu:                4096 (5)
+>>>>                          active_mtu:             1024 (3)
+>>>>                          sm_lid:                 0
+>>>>                          port_lid:               0
+>>>>                          port_lmc:               0x00
+>>>>                          link_layer:             Ethernet
+>>>>
+>>>> The current Linux mainline driver is the same.
+>>>>
+>>>> I found the comment ("If bonded, we do not add an IB device for PF1.")
+>>>> in the mlx5_lag_intf_add function of the 5.10 branch driver code.
+>>>
+>>> Not sure if rdma lag is enabled for this or not. /proc/net/bonding 
+>>> will provide more more details normally.
+>>>
+>>> Zhu Yanjun
+>>>
+>>>> This indicates that wthe the same NIC is used, only PF0 support 
+>>>> bonding?
+>>>> Are there any other constraints, when enable bonding with CX5?
+>>>>
+>>>> Thank you
+>>>> Zhengchao Shao
+>>>
 
