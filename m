@@ -1,129 +1,172 @@
-Return-Path: <netdev+bounces-93757-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93758-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 689EB8BD189
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 17:32:47 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 016498BD193
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 17:35:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 25221282BC1
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 15:32:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AC5131F22E5D
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 15:35:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 474CC155328;
-	Mon,  6 May 2024 15:32:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C7FC15535D;
+	Mon,  6 May 2024 15:35:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BD94jljK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UBK+H4rj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97B452F2C
-	for <netdev@vger.kernel.org>; Mon,  6 May 2024 15:32:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCB9A2F2C;
+	Mon,  6 May 2024 15:35:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715009564; cv=none; b=OqvRPx2e4fpZ20GoSWfFg9Jp+DgoKDCKHaqeGJ/1nWo1v1fjfpWtbcqk5xUVGRDI2iIbnonwI6Iot0D+hzSzTDw75xcsbh1WhCOW/i/1gqvBT9hS4bTwxvYkzMfoFDKli6ZKot5B1DZUMdcCRh9PaLX3gMdw8OzR/CZWmQZE2X4=
+	t=1715009739; cv=none; b=PoNYYDnPGeeenW8N1p4XVTUqr+4IXYxKXN0YbdggvDroX84xje7IU50qxYOgX4wDA+5IHE7fHvnzlDMF0H0P7MYgvlNc3xw/whpFxUOOD8fDzv9Sv1O2zKAiIj9AVYeJ882yF7l3eq1F63q5DLPNB/6/Jx0EBy1DTU5UxaXkSvg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715009564; c=relaxed/simple;
-	bh=1g9/UzO4DojBJepU43J1CZ5e5mfSJucwa+C7ZrcaPms=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mlt4LLwIz5RY7jcMZdC0fbX/osSIu+UHqA4lGYhmGwN2WvzHUbjclHRUOBzjpu/i+8h0tIS7A+v+UCFyIIEjdL6hf+P4bs63LeOwRkDuoK0BNOdwxhkgIPbB4JbZ79RBJoypNWPM3YVbon5KPhUNA4I+pM1DTlkR2N0JdqwbQFc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BD94jljK; arc=none smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1715009563; x=1746545563;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=1g9/UzO4DojBJepU43J1CZ5e5mfSJucwa+C7ZrcaPms=;
-  b=BD94jljKp5H8N0XE1G7pJroOOHipw0V9kNHn2oMEaHI5/Ad2PtdMme6M
-   VFgFvI84u6VCXXs8f7m8ilYPexfPLBGKVgNDCscVSmSG+mA2/KAmr4IqT
-   8NuQK5MrZHjZnvZBDidZRAG8EeAOYleyi3t+BLXSoOOAGwPZLubRm+5DO
-   SMU3ry1bLQVB0Sv6VPLQokjB0AXG75TJjqhqZ8A1TMtZwoZw2QlX+bdQP
-   aCFMkV6qUXtb0Vbf4BiAFr74ZHKklaW1vbpq9WuZFTQ3BB253yhmHl00z
-   D7m706kuUfO0SSQmvBwaBAbvOpHb2q/KXZmFGCWw5kXMajfRbDMcFO4ma
-   w==;
-X-CSE-ConnectionGUID: mIoIyorJQGmNBBQkgMp8Cg==
-X-CSE-MsgGUID: v57HmdUqQreHn/QZkcKUkw==
-X-IronPort-AV: E=McAfee;i="6600,9927,11065"; a="14543033"
-X-IronPort-AV: E=Sophos;i="6.07,258,1708416000"; 
-   d="scan'208";a="14543033"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2024 08:32:42 -0700
-X-CSE-ConnectionGUID: viwsUyFpSfyP81AsmVwn7w==
-X-CSE-MsgGUID: h+ZjToWiSS6GUL/hmLzsSQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,258,1708416000"; 
-   d="scan'208";a="28589981"
-Received: from unknown (HELO localhost.igk.intel.com) ([10.91.240.220])
-  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2024 08:32:40 -0700
-From: Dawid Osuchowski <dawid.osuchowski@linux.intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	Ngai-Mint Kwan <ngai-mint.kwan@intel.com>,
-	Mateusz Polchlopek <mateusz.polchlopek@intel.com>,
-	Pawel Chmielewski <pawel.chmielewski@intel.com>,
-	Simon Horman <horms@kernel.org>,
-	Dawid Osuchowski <dawid.osuchowski@linux.intel.com>
-Subject: [PATCH iwl-net v4] ice: Do not get coalesce settings while in reset
-Date: Mon,  6 May 2024 17:33:07 +0200
-Message-ID: <20240506153307.114104-1-dawid.osuchowski@linux.intel.com>
-X-Mailer: git-send-email 2.44.0
+	s=arc-20240116; t=1715009739; c=relaxed/simple;
+	bh=oGVCWQDYjNsdrnj+qazvX1umQxTGlOb3a+h86Rhs1gQ=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=WSbuGe9BuPTYDa88HjBrDSirHkfSro9NLhn8vCUCBXv6r0s8fSs0KO78/SaBJS2TPiVeqOJ/Pcv9G55g045cwcsGwOVW2r4vSJd97UuStNmrt4jThOnXms4Ny4EDKTswu4csh/RCe1/XUy9MqIFAZ7vNIIDI8Zpq68hWWszEEm4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UBK+H4rj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B830C116B1;
+	Mon,  6 May 2024 15:35:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715009738;
+	bh=oGVCWQDYjNsdrnj+qazvX1umQxTGlOb3a+h86Rhs1gQ=;
+	h=From:Date:Subject:To:Cc:From;
+	b=UBK+H4rjTdYc4zvgYsp9IejhkCGq4Szntf3sTdCy0GrJJ8jEXsKN82s5Q5zzliUUw
+	 xF2791yhISGMTtPJuJJZIhq3gFcig/GElOOTEwrfFU1Jli8I8eLloTM9byk37OKiLo
+	 vhhz8clfYcEk9g6mTo//XJuJ1cO4U4IjI894pU3LKmRAEdjgLWKyr4FLSIhdL4lTm3
+	 GKZxJfyDC++EfklCLRug0QtKTpgX2gExt5XVLNK8NMVk70/NVVaHsJjWXESUSJo2EM
+	 Z+1QSpJKj2wgJTvo9ejCdc9SYBedYlupcUx5HWcwaGo3FGCvM1QkWhdN9eaYgG1L1X
+	 QXqJomxAAIl3g==
+From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Date: Mon, 06 May 2024 17:35:28 +0200
+Subject: [PATCH net] mptcp: only allow set existing scheduler for
+ net.mptcp.scheduler
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20240506-upstream-net-20240506-mptcp-sched-exist-v1-1-2ed1529e521e@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAL/4OGYC/z2NywqDMBBFf0Vm3YEkbe3jV6SLNF51FqYhE0UQ/
+ 72hiy7PhXPPToosUHo2O2WsovKJFeypoTD5OIKlr0zOuIu5mpaXpCXDzxxR+L/OqYTEGib0jE2
+ 0cOvt+2HvN+fPjupbyhhk+5U6qi69juMLcDNVzH4AAAA=
+To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
+ Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Gregory Detal <gregory.detal@gmail.com>, stable@vger.kernel.org, 
+ "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+X-Mailer: b4 0.13.0
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2527; i=matttbe@kernel.org;
+ h=from:subject:message-id; bh=0aZdfFi8skR4B7NuJvRMz6O7iszcw6HkWeXMMdh4f+c=;
+ b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBmOPjH9GWsrQ6Maigio6WZQWiyEbCPrOs+g2gYZ
+ BjZMHog7wWJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZjj4xwAKCRD2t4JPQmmg
+ c0qyD/4k/KpuUjpD0HjQHOcfg/2jG9hTmpnqIxN4ug+hqg1rjDQNnQkf/VGV1TdXOQaiWtMn10l
+ SpHnUXTHyKf50qDee1Ln6E0woxV1PtW/85n8AunmBGJ1jlaHjymv7ZznCdmL7R5PpKO3BA557Ln
+ DRRpg9aB6NOMTgTNi+qq1WkvnoIPIwm/xZaY5QlyceX/K68Rmz7KQUSBWikKeH/3jD4TOZ5r3WC
+ RwhrFUjKDI4+Y+sFt/aRWRlQ6KdaN5f22CZIMKcPp5am7FN1R1qLuWJvgvET4jtbz4M5GNen868
+ hW5Ony8np6pE55wWex86PvWJgWgmczgq2R/cNrAicpL3yPLXo7V99efn6XWqqP5NUKLoFLBR6Cv
+ EbR2BIgETHw4ofpxlKZ0cMutOxqX+SL7nUU36Cxl9q1VZCK2v2FDtWE72i0OFWaXSGXvjv2Rigc
+ k0BIUDcTBdj4F8kAtaZtLPd4VKCtdHt9pyq35DOuq0AwE5ExwSIOF7I/CrgZJCWtJ7vjETyh+5B
+ bNFnhBXx3kcEyfyMLWbZ9rSKA+gyWNdGWg4DRdf1nPOhOkBIAuNGW17CPos3xLmF1eR4UOnpuNT
+ Atld84F0EFo6h/gqVsOSrxWTZYD1I7Ze/m3YP27gmA9qlJske8Bd/LC5sxysjWKy+s52pqyhf2J
+ +dSfiB9bZbMkkHg==
+X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
+ fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 
-From: Ngai-Mint Kwan <ngai-mint.kwan@intel.com>
+From: Gregory Detal <gregory.detal@gmail.com>
 
-Getting coalesce settings while reset is in progress can cause NULL
-pointer deference bug.
-If under reset, abort get coalesce for ethtool.
+The current behavior is to accept any strings as inputs, this results in
+an inconsistent result where an unexisting scheduler can be set:
 
-Fixes: 67fe64d78c43 ("ice: Implement getting and setting ethtool coalesce")
-Signed-off-by: Ngai-Mint Kwan <ngai-mint.kwan@intel.com>
-Reviewed-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-Signed-off-by: Pawel Chmielewski <pawel.chmielewski@intel.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Co-developed-by: Dawid Osuchowski <dawid.osuchowski@linux.intel.com>
-Signed-off-by: Dawid Osuchowski <dawid.osuchowski@linux.intel.com>
+  # sysctl -w net.mptcp.scheduler=notdefault
+  net.mptcp.scheduler = notdefault
+
+This patch changes this behavior by checking for existing scheduler
+before accepting the input.
+
+Fixes: e3b2870b6d22 ("mptcp: add a new sysctl scheduler")
+Cc: stable@vger.kernel.org
+Signed-off-by: Gregory Detal <gregory.detal@gmail.com>
+Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+Tested-by: Geliang Tang <geliang@kernel.org>
+Reviewed-by: Mat Martineau <martineau@kernel.org>
+Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
 ---
-Changes since v1:
-* Added "Fixes:" tag
-Changes since v2:
-* Rebased over current IWL net branch
-* Confirmed that the issue previously reported for this patch [1] by
-Himasekhar Reddy Pucha was caused by other, internally tracked issue
-Changes since v3:
-* Using ice_wait_for_reset() instead of returning -EBUSY 
+ net/mptcp/ctrl.c | 39 ++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 38 insertions(+), 1 deletion(-)
 
-[1] https://lore.kernel.org/netdev/BL0PR11MB3122D70ABDE6C2ACEE376073BD90A@BL0PR11MB3122.namprd11.prod.outlook.com/
+diff --git a/net/mptcp/ctrl.c b/net/mptcp/ctrl.c
+index 13fe0748dde8..2963ba84e2ee 100644
+--- a/net/mptcp/ctrl.c
++++ b/net/mptcp/ctrl.c
+@@ -96,6 +96,43 @@ static void mptcp_pernet_set_defaults(struct mptcp_pernet *pernet)
+ }
+ 
+ #ifdef CONFIG_SYSCTL
++static int mptcp_set_scheduler(const struct net *net, const char *name)
++{
++	struct mptcp_pernet *pernet = mptcp_get_pernet(net);
++	struct mptcp_sched_ops *sched;
++	int ret = 0;
++
++	rcu_read_lock();
++	sched = mptcp_sched_find(name);
++	if (sched)
++		strscpy(pernet->scheduler, name, MPTCP_SCHED_NAME_MAX);
++	else
++		ret = -ENOENT;
++	rcu_read_unlock();
++
++	return ret;
++}
++
++static int proc_scheduler(struct ctl_table *ctl, int write,
++			  void *buffer, size_t *lenp, loff_t *ppos)
++{
++	const struct net *net = current->nsproxy->net_ns;
++	char val[MPTCP_SCHED_NAME_MAX];
++	struct ctl_table tbl = {
++		.data = val,
++		.maxlen = MPTCP_SCHED_NAME_MAX,
++	};
++	int ret;
++
++	strscpy(val, mptcp_get_scheduler(net), MPTCP_SCHED_NAME_MAX);
++
++	ret = proc_dostring(&tbl, write, buffer, lenp, ppos);
++	if (write && ret == 0)
++		ret = mptcp_set_scheduler(net, val);
++
++	return ret;
++}
++
+ static struct ctl_table mptcp_sysctl_table[] = {
+ 	{
+ 		.procname = "enabled",
+@@ -148,7 +185,7 @@ static struct ctl_table mptcp_sysctl_table[] = {
+ 		.procname = "scheduler",
+ 		.maxlen	= MPTCP_SCHED_NAME_MAX,
+ 		.mode = 0644,
+-		.proc_handler = proc_dostring,
++		.proc_handler = proc_scheduler,
+ 	},
+ 	{
+ 		.procname = "close_timeout",
+
 ---
- drivers/net/ethernet/intel/ice/ice_ethtool.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+base-commit: a26ff37e624d12e28077e5b24d2b264f62764ad6
+change-id: 20240506-upstream-net-20240506-mptcp-sched-exist-6a1b91872a32
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.c b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-index d91f41f61bce..4ff16fd2eb94 100644
---- a/drivers/net/ethernet/intel/ice/ice_ethtool.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-@@ -3815,6 +3815,13 @@ __ice_get_coalesce(struct net_device *netdev, struct ethtool_coalesce *ec,
- 	struct ice_netdev_priv *np = netdev_priv(netdev);
- 	struct ice_vsi *vsi = np->vsi;
- 
-+	if (ice_is_reset_in_progress(vsi->back->state)) {
-+		int err = ice_wait_for_reset(vsi->back, 10 * HZ);
-+
-+		if (err)
-+			return err;
-+	}
-+
- 	if (q_num < 0)
- 		q_num = 0;
- 
+Best regards,
 -- 
-2.44.0
+Matthieu Baerts (NGI0) <matttbe@kernel.org>
 
 
