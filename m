@@ -1,75 +1,74 @@
-Return-Path: <netdev+bounces-93844-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93839-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B2338BD5C4
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 21:47:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1FB88BD5B7
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 21:46:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 877D8B22976
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 19:47:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 829361F21A3C
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 19:46:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC43815DBBC;
-	Mon,  6 May 2024 19:45:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25C7415B128;
+	Mon,  6 May 2024 19:45:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="m8vOlx5e"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="cx14Tv82"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33EFB15B12E;
-	Mon,  6 May 2024 19:45:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B18615B11F;
+	Mon,  6 May 2024 19:45:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715024712; cv=none; b=kFAjx+U+Zf0BNFNBKGtuc4D8kUq42GDuGP2mSjc5wToIOp4zjQlus/UdJsBtlV3exAD+3UmJkgC0kuG7iWROI733BIcDMjHPpOqZaQl+mNDS9TvJg93c0Xz4cV0nb1/IxhDWsjQD0/nkp6+2y1Tb10td+h1+GFiG3EN1GVHZ78w=
+	t=1715024710; cv=none; b=Tz7tqDVW6szs0BnVg91qtqmoSUjSr73ERIcMSsa9HOGvYzfbXl0cyoI/e5jv+sp7mW597pErwxfD92Y2Y2Iq2CFK0OLIkn50MbEi1u5Hq3Kcx5dvTII5MLiF23pXXBJWX804SS0Cqkm2ks5qTtYFC4wGIfBo0gLtYY+H8l+SKR0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715024712; c=relaxed/simple;
-	bh=IPEkwIxoEulrJ72TUcnrk2IFwrdAChz+rfxSTwedrfY=;
+	s=arc-20240116; t=1715024710; c=relaxed/simple;
+	bh=To7nYm2BMcnJH1PM2TepQnUOGwO5zfd2E4co20N0EZw=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=nF5XEbx1tMLw5rDe8iipNVfH2zSgjKnqVLMNxk4Dj1Ibc9+ZyQzj2UMCM2k5wCEqYfiL7Fa6i4ez+4HE1hSYrPEh83rv//ZFCsvm2UCn91xS3RS8U4jZwOgunu81PSRGbUjV2MFH5+glfEuSDepCQECoCEdla916dEhzhhACkpA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=m8vOlx5e; arc=none smtp.client-ip=148.163.156.1
+	 MIME-Version; b=kbxTrRB4xqsxoOSraTNiVp7Js8fChMY3Y4Fv2k/LpX03y/j1oE2zNtmKzj1X3Mp4IhKfvhsxwcipJT9zVCUjU7PZ5e4Ei3+CWaXuwSFgdudyVMW3W3tWyAtN2Adxx9+m0Xfy37M27MTvlqDAqrUpcxTDV17qp4pwX1t7PUMW2X4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=cx14Tv82; arc=none smtp.client-ip=148.163.158.5
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 446JgUp4019316;
-	Mon, 6 May 2024 19:45:03 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=Ss4WavEiatm1ir88BkwsnzQ07rzsa9F6DU8Ne8r2NDw=;
- b=m8vOlx5etgKVTxL0HvFNlx9/5mo7EfXu/NbfSNwZPBYMAffef9887EV/hqxFzAuoe6zQ
- VEb81paUtpekpIHppbvdAXmYxDpBIu81n72qvx9HWQsgr456y9BjfKdUUqETD4aoxQ2K
- WEcnPvvnm6R/+iWkXfEZsx8R6tlKCCZhonOzN801qxnuC+fmd6PWqWe480SrM4tcXNwF
- U+TX0yxuQMWCUAs3Gv+35PVrgh7mNmoOz3uHoyI2ehvbW3gQW7wNd1UYwxyY9Wofa2/j
- UKH9+CCFDDWtxnEO0RauYDbPJscbF41Pa8vZf2rOUIb2opB3fdB9lmF7HWSxiWFLILil OA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xy5kg805e-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 06 May 2024 19:45:03 +0000
-Received: from m0353728.ppops.net (m0353728.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 446Jj2Pk023400;
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 446JVkA1015673;
 	Mon, 6 May 2024 19:45:02 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xy5kg805a-1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : in-reply-to : references : content-transfer-encoding
+ : mime-version; s=pp1; bh=LXAHwdl927IN4K80jPkXY3UGJ+fhJ0QN817ePcUB7pk=;
+ b=cx14Tv82XA9evZpaOLkj0tyj96BJ/btliV41HEe85RxYXlfu0wG8eL2w2CSGLJ2pBphU
+ MnZ6jny2hnXOsD00PYZCBy5mKqdWzx0waIGOFIHpB+LURhb0avPyLWA8LrtEUooDoNPH
+ mBN9zypq58BEvRPjwLRDyCAN6Qhle4fzSHqsR8tZSA3GbA3DaPNffJqj+9JEWT8wrcHs
+ SG1M9IIbiHrxhpqLM+Ha26mdrAdzjTrCt5d1pLPOlvTM3zbs+zAuCPEorBGL3WZdXvcu
+ rWBf5nhOc46lkg/dwBYZh2swpp+DWWzAkEiFSRWzEJEqxd3E/iYjFP9lvOlGGFAooRyu Uw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xy55n0266-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
 	Mon, 06 May 2024 19:45:02 +0000
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 446J9SSD010584;
+Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 446Jj1iP003874;
 	Mon, 6 May 2024 19:45:01 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3xx0bp1vhq-1
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xy55n0261-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
 	Mon, 06 May 2024 19:45:01 +0000
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 446HPW8m013942;
+	Mon, 6 May 2024 19:45:00 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3xx222sf8k-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 06 May 2024 19:45:00 +0000
 Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 446JitEe57475558
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 446Jitev57344260
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
 	Mon, 6 May 2024 19:44:57 GMT
 Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 4281A20040;
+	by IMSVA (Postfix) with ESMTP id 78F442004F;
 	Mon,  6 May 2024 19:44:55 +0000 (GMT)
 Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 0F48C2004E;
+	by IMSVA (Postfix) with ESMTP id 474232004B;
 	Mon,  6 May 2024 19:44:55 +0000 (GMT)
 Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
 	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
@@ -88,105 +87,77 @@ Cc: linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
         llvm@lists.linux.dev, patches@lists.linux.dev,
         Sven Schnelle <svens@linux.ibm.com>,
         Christian Borntraeger <borntraeger@linux.ibm.com>
-Subject: [PATCH 1/6] s390/iucv: Provide iucv_alloc_device() / iucv_release_device()
-Date: Mon,  6 May 2024 21:44:49 +0200
-Message-Id: <20240506194454.1160315-2-hca@linux.ibm.com>
+Subject: [PATCH 2/6] s390/vmlogrdr: Make use of iucv_alloc_device()
+Date: Mon,  6 May 2024 21:44:50 +0200
+Message-Id: <20240506194454.1160315-3-hca@linux.ibm.com>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20240506194454.1160315-1-hca@linux.ibm.com>
 References: <20240506194454.1160315-1-hca@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: iN8eGfXipHWlKpcPp9Hiuqp-TqxyRNK8
+X-Proofpoint-GUID: LPeq1AJB9u4MlSaAAhRSZiqV2_FrgAXT
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: NI5UqJqy5yI21YRFMWhlVVdMDHGq3wxT
-X-Proofpoint-GUID: 3I0mMeMmdoUrsRpXqKpTJR846LFxVYfN
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.11.176.26
- definitions=2024-05-06_14,2024-05-06_02,2023-05-22_02
+ definitions=2024-05-06_13,2024-05-06_02,2023-05-22_02
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- spamscore=0 bulkscore=0 phishscore=0 malwarescore=0 suspectscore=0
- mlxscore=0 clxscore=1015 mlxlogscore=716 impostorscore=0
- priorityscore=1501 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2404010000 definitions=main-2405060142
+ malwarescore=0 suspectscore=0 bulkscore=0 adultscore=0 phishscore=0
+ spamscore=0 mlxscore=0 priorityscore=1501 clxscore=1011 mlxlogscore=999
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2404010000 definitions=main-2405060141
 
-Provide iucv_alloc_device() and iucv_release_device() helper functions,
-which can be used to deduplicate more or less identical IUCV device
-allocation and release code in four different drivers.
+Make use of iucv_alloc_device() to get rid of quite some code. In addition
+this also removes a cast to an incompatible function (clang W=1):
 
-Suggested-by: Arnd Bergmann <arnd@arndb.de>
+  drivers/s390/char/vmlogrdr.c:746:18: error: cast from 'void (*)(const void *)' to 'void (*)(struct device *)' converts to incompatible function type [-Werror,-Wcast-function-type-strict]
+    746 |                 dev->release = (void (*)(struct device *))kfree;
+        |                                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Reported-by: Nathan Chancellor <nathan@kernel.org>
+Closes: https://lore.kernel.org/r/20240417-s390-drivers-fix-cast-function-type-v1-1-fd048c9903b0@kernel.org
 Signed-off-by: Heiko Carstens <hca@linux.ibm.com>
 ---
- include/net/iucv/iucv.h |  6 ++++++
- net/iucv/iucv.c         | 35 +++++++++++++++++++++++++++++++++++
- 2 files changed, 41 insertions(+)
+ drivers/s390/char/vmlogrdr.c | 20 +++-----------------
+ 1 file changed, 3 insertions(+), 17 deletions(-)
 
-diff --git a/include/net/iucv/iucv.h b/include/net/iucv/iucv.h
-index 5cd7871127c9..b3736e66fe1a 100644
---- a/include/net/iucv/iucv.h
-+++ b/include/net/iucv/iucv.h
-@@ -84,6 +84,12 @@ struct iucv_array {
- extern const struct bus_type iucv_bus;
- extern struct device *iucv_root;
+diff --git a/drivers/s390/char/vmlogrdr.c b/drivers/s390/char/vmlogrdr.c
+index d7e408c8d0b8..c09e1e09fb66 100644
+--- a/drivers/s390/char/vmlogrdr.c
++++ b/drivers/s390/char/vmlogrdr.c
+@@ -728,23 +728,9 @@ static int vmlogrdr_register_device(struct vmlogrdr_priv_t *priv)
+ 	struct device *dev;
+ 	int ret;
  
-+struct device_driver;
-+
-+struct device *iucv_alloc_device(const struct attribute_group **attrs,
-+				 struct device_driver *driver, void *priv,
-+				 const char *fmt, ...) __printf(4, 5);
-+
- /*
-  * struct iucv_path
-  * pathid: 16 bit path identification
-diff --git a/net/iucv/iucv.c b/net/iucv/iucv.c
-index a4ab615ca3e3..9db7c2c0ae72 100644
---- a/net/iucv/iucv.c
-+++ b/net/iucv/iucv.c
-@@ -76,6 +76,41 @@ EXPORT_SYMBOL(iucv_bus);
- struct device *iucv_root;
- EXPORT_SYMBOL(iucv_root);
- 
-+static void iucv_release_device(struct device *device)
-+{
-+	kfree(device);
-+}
-+
-+struct device *iucv_alloc_device(const struct attribute_group **attrs,
-+				 struct device_driver *driver,
-+				 void *priv, const char *fmt, ...)
-+{
-+	struct device *dev;
-+	va_list vargs;
-+	int rc;
-+
-+	dev = kzalloc(sizeof(*dev), GFP_KERNEL);
+-	dev = kzalloc(sizeof(struct device), GFP_KERNEL);
+-	if (dev) {
+-		dev_set_name(dev, "%s", priv->internal_name);
+-		dev->bus = &iucv_bus;
+-		dev->parent = iucv_root;
+-		dev->driver = &vmlogrdr_driver;
+-		dev->groups = vmlogrdr_attr_groups;
+-		dev_set_drvdata(dev, priv);
+-		/*
+-		 * The release function could be called after the
+-		 * module has been unloaded. It's _only_ task is to
+-		 * free the struct. Therefore, we specify kfree()
+-		 * directly here. (Probably a little bit obfuscating
+-		 * but legitime ...).
+-		 */
+-		dev->release = (void (*)(struct device *))kfree;
+-	} else
++	dev = iucv_alloc_device(vmlogrdr_attr_groups, &vmlogrdr_driver,
++				priv, priv->internal_name);
 +	if (!dev)
-+		goto out_error;
-+	va_start(vargs, fmt);
-+	rc = dev_set_name(dev, fmt, vargs);
-+	va_end(vargs);
-+	if (rc)
-+		goto out_error;
-+	dev->bus = &iucv_bus;
-+	dev->parent = iucv_root;
-+	dev->driver = driver;
-+	dev->groups = attrs;
-+	dev->release = iucv_release_device;
-+	dev_set_drvdata(dev, priv);
-+	return dev;
-+
-+out_error:
-+	kfree(dev);
-+	return NULL;
-+}
-+EXPORT_SYMBOL(iucv_alloc_device);
-+
- static int iucv_available;
- 
- /* General IUCV interrupt structure */
+ 		return -ENOMEM;
+ 	ret = device_register(dev);
+ 	if (ret) {
 -- 
 2.40.1
 
