@@ -1,143 +1,178 @@
-Return-Path: <netdev+bounces-93778-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93779-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1596A8BD304
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 18:46:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4E668BD30A
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 18:47:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B5D3D284485
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 16:46:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E7B901C21086
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 16:47:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46BA7156962;
-	Mon,  6 May 2024 16:46:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B682F156C62;
+	Mon,  6 May 2024 16:47:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R0SKbmS9"
+	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="OrLwiqx8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA8E713DDD8;
-	Mon,  6 May 2024 16:46:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00A6825569
+	for <netdev@vger.kernel.org>; Mon,  6 May 2024 16:47:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715013982; cv=none; b=QU6++bH4LeUbcYwURinvmkcd7L3hrIVeRJe8sWUTGLw7eBcfWt+V4sRy857ynhtth4XobEWqfEI39j3EjngLt6CWdY36NHp5+KlIWh7rb7YUsYSkiSJz7Y4jHcLm7gZOzXVIhYMYMS1Swuk3W1jfrqjjpXj6KSjvavtgeorK8G0=
+	t=1715014035; cv=none; b=msJ3SFanOLHNzqQ9rmW93td48V2xXRGEbtpDfqfTe5zsD95SK/fZjWjNY3gR6PEz7ZNkZgoGaz0O5gtaWjg1tr0qW+TO5XNa4X2F8/gW5vsun+zGzI4YkZhfvE2pLSyDpVm9ObVFCw6DJKBjwTc9uHghVoiAWmxPGAS+lNmrBew=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715013982; c=relaxed/simple;
-	bh=GOY7uF74aXtTWOzHLTtpIX38L22Nw4vV7OVkQIRNXrY=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=CjPno55+1RrWJFkm6RbByiCPUGByfh5tRfQIk4JxNDDLc7H5Ag8rzsS7Wq+VQSd0+FlDV0Y6W5KmElRA72IxyhqPBaNeU+yCvPvj5Wve0FHJdGvPmQ7CpOThuzkXh44iNbeYVHpApb+9gaJUJmn18eAtaVi9lTfC6LSRsqbLo0c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R0SKbmS9; arc=none smtp.client-ip=209.85.219.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-69b50b8239fso21392856d6.0;
-        Mon, 06 May 2024 09:46:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715013980; x=1715618780; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rzTio4TEar79DkyEXWbqorclupsXYPTSGL7v/jrECRU=;
-        b=R0SKbmS9+RrK+17ALX/uTTzUIcJPqIkDgCsKfQ2KbzcuZ+MbzZOhI/OXXTNe92feOu
-         x9KwMqgRSkbg38Bi4REhmvekBVfBso7hZHOQzeVdHmjWHZfI7R6wbrwOJT4K5mv6Q1W5
-         oA7vPBUdpjlywN84koic/MFFsZz8zdlsmUII02hvJKfqeCyP5nCSkOuwS+QtkmFQznrO
-         3A3yjrOoctfM2hbld9/U5mFLO2S2SepWoYmUC9w72k9YNm97QDZ1/RYzlhgskirHIIYA
-         CtfvyWzVbmzv2YP39GBs/jLva2aAd7jfUyGkRw3VAv9BZRcF89JTGipm8PgMZMuyZNSU
-         Qd2Q==
+	s=arc-20240116; t=1715014035; c=relaxed/simple;
+	bh=ne0VrpciWO44fCdFNq8qPNWA+XkpPJ7XBbp6hOq5Wek=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ZmCMeweEijTmoZseKpvNk+yFw40T+/3BU9FyptjcNd/TII/0X6M/49y97kS2WYVNAKItGt7qlAB1v4vuZAsxYDCArT19Inb6/YI/T2kHMgPFmryZHzSLjIeCYb+9w0+1e2B8rRDXaY3yOAO3fmRkuBTLxC3CjyMCnR8uJBlbSe8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=OrLwiqx8; arc=none smtp.client-ip=185.125.188.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com [209.85.221.72])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id A04DE400F4
+	for <netdev@vger.kernel.org>; Mon,  6 May 2024 16:47:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20210705; t=1715014030;
+	bh=lBDhS1Ebaa+YuFiVFmddrCNWvRnay3hvunupCOY2htE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type;
+	b=OrLwiqx8fz94kRBAbeijfc3aGK/1bwl7b/OB1NYBfCryjSIH6fyzGHsWLfDh/ln/W
+	 nxodG9Ldh3C5v+mt7SQo9BgmT83Y+LDojortpb5+0wH/tEKoXKGXnoUSORBI0nTmWV
+	 BpcBq8rXmV+SjCfwKYo/wfvCbIm1pOnZrGkujoxfXxTOYeyuTiV+BZVnM1j2Hb97NX
+	 FyUhJjwU5E8gD4RMRSEwBaCP0YM4OkUVW6ps14kudm1gYz08Qm5RT+lxIKW3224bLG
+	 fRGXDzla/kMLLGcG8S2oPvF+FREV9hAfyS/pxPT6pL97DCy8hdBa5JrnmcXCn5W8ZJ
+	 D/hLX7RSbfl/Q==
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-349cafdc8f0so1213275f8f.1
+        for <netdev@vger.kernel.org>; Mon, 06 May 2024 09:47:10 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715013980; x=1715618780;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=rzTio4TEar79DkyEXWbqorclupsXYPTSGL7v/jrECRU=;
-        b=aTM/OUUsUBMN6mJtmwitWMKx3pkA/TC6DoNY0/wzFMefZXU/iRAmwbsnMlPJ240Bvv
-         OruDLxQtVgkTi//dF3526uRXJpi32GV4PnuW7O1A14MAY6zUOFfN0ioOJwEI1wLsAMbf
-         BpDhDEE6ooIXc+CARbAlD45+DZgw+KeQgvaqYync03FEK7Czd3Ts4/GRLVd6rJbpYa53
-         gJqDPIy5aP1KLl5We1bH1Ueaf+ujO/GxDku4bIK+8+C0N/LSg0eED08K3P7gkrf2UmMg
-         dmZ/yVUp1Ay2VveQfUpD7l6zPVVZJIY3cSIkVa3YBcfBGsAuYPtQOLbdKY9eJNPdvTHe
-         RfqA==
-X-Forwarded-Encrypted: i=1; AJvYcCVWdtOrE6J6fzEi30VSNe16hw9t0N5Q5HxgudOnn7LOtP2y7xBCHsW8l4gs0DBBilYKiXJXTozJv85C71zt9/NklGnzPptJL/fVY0wAOwymB/zkBl+SzHQnhYPhOpCT7/Kkp9/abFowJX4zu1XEvOEs60Tl18R8Bz/OXmXCxSjR87Obtpej
-X-Gm-Message-State: AOJu0YzaNg3HKgAugJXp+7qc7PmQkCSL8s6WWgZF0fHhQcBXiXYovpJq
-	bSSG7qZEMtxL9vkiyWNulQjzbQ72iJcu1x/W3xRoFdujtw8YEhkbdsFAWA==
-X-Google-Smtp-Source: AGHT+IE3xtdUWGdZUHh2WDdnuoZ14EOUNPk8DJIeSttgiBQGOaGlyoUoPStBZlUyVBxOrITd/5wEug==
-X-Received: by 2002:a05:6214:c84:b0:6a0:b3ec:9032 with SMTP id r4-20020a0562140c8400b006a0b3ec9032mr403317qvr.12.1715013979573;
-        Mon, 06 May 2024 09:46:19 -0700 (PDT)
-Received: from localhost (164.146.150.34.bc.googleusercontent.com. [34.150.146.164])
-        by smtp.gmail.com with ESMTPSA id l13-20020ad4408d000000b006a0ee5b6ee6sm3869966qvp.123.2024.05.06.09.46.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 May 2024 09:46:19 -0700 (PDT)
-Date: Mon, 06 May 2024 12:46:18 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Richard Gobert <richardbgobert@gmail.com>, 
- davem@davemloft.net, 
- edumazet@google.com, 
- willemdebruijn.kernel@gmail.com, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- dsahern@kernel.org, 
- alobakin@pm.me, 
- shuah@kernel.org, 
- netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- linux-kselftest@vger.kernel.org
-Cc: Richard Gobert <richardbgobert@gmail.com>
-Message-ID: <6639095ab4887_516de294d8@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20240506093550.128210-2-richardbgobert@gmail.com>
-References: <20240506093550.128210-1-richardbgobert@gmail.com>
- <20240506093550.128210-2-richardbgobert@gmail.com>
-Subject: Re: [PATCH net-next v8 1/3] net: gro: use cb instead of
- skb->network_header
+        d=1e100.net; s=20230601; t=1715014028; x=1715618828;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=lBDhS1Ebaa+YuFiVFmddrCNWvRnay3hvunupCOY2htE=;
+        b=JPvjkaR68uayyZUx0hsDDfhJ/2DALrJV1wdWo+w+W9qSdIn4BNGMj2VeIM2ui2JMBB
+         uuTfV6QghkXRiN23FD7qYW6fX3GE2+qgk2YpPe6X91I12hsqyuEES5S4SqbwQE62ITAP
+         N1cYF6wxekM0ZV66nUhOD3xi9T1vun/6LAuEGn7azr7dd6GtPmlYSf8KirfS9W1kIOCt
+         jJluAJeubPVIwjeXaOBxfPE3IceyXgF7ktvHNzsiVNGOqOXPH46R3jxgMwkNajleAGoP
+         7pPk9I90+IUtCvxV78p9oH9qfvCqUCKsYqMl0wNgHogBvSohTiUWqDsQ5CkIAe/1258q
+         QdHw==
+X-Gm-Message-State: AOJu0Yz7pbQ3b/RV26ItMQrTlB8FPH8fSG+e/YzyDCjsYDDMtExwedCu
+	KzZDqVZFdsIyO4Dz7sibgPA7eG+A1ETWaz3APtabc5KZtip94C0gdHkkHONwPuMB8A/2vSoQD8Z
+	lnorb1x1EReIqPUa2g4VWMinSIqY3px89npWea1MaFfIPGzv8NduET3ssasbWtnGUnng9XiYU/b
+	6uLrp3zmPI0Zh8dpHfokLw1bo3SL28RMQCSsM8E/HaQprK
+X-Received: by 2002:a5d:5445:0:b0:343:6b09:653c with SMTP id w5-20020a5d5445000000b003436b09653cmr9213438wrv.43.1715014028039;
+        Mon, 06 May 2024 09:47:08 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IELDM24XgpFlJfKqTrie0KzqLju4QkFgMrMwyxkhc8UujUz4TrH5RzyaUIOGAI1gDgrRnTn9pHTWWPlV8jlkw0=
+X-Received: by 2002:a5d:5445:0:b0:343:6b09:653c with SMTP id
+ w5-20020a5d5445000000b003436b09653cmr9213423wrv.43.1715014027737; Mon, 06 May
+ 2024 09:47:07 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+References: <20240503101824.32717-1-en-wei.wu@canonical.com> <7f533913-fba9-4a29-86a5-d3b32ac44632@intel.com>
+In-Reply-To: <7f533913-fba9-4a29-86a5-d3b32ac44632@intel.com>
+From: En-Wei WU <en-wei.wu@canonical.com>
+Date: Tue, 7 May 2024 00:46:56 +0800
+Message-ID: <CAMqyJG1Fyt1pZJqEjQN_kqXwfJ+HnqvW1PnAOEEpzoS9f37KBg@mail.gmail.com>
+Subject: Re: [Intel-wired-lan] [PATCH v2 1/2] e1000e: let the sleep codes run
+ every time
+To: Sasha Neftin <sasha.neftin@intel.com>
+Cc: netdev@vger.kernel.org, rickywu0421@gmail.com, 
+	linux-kernel@vger.kernel.org, edumazet@google.com, 
+	intel-wired-lan@lists.osuosl.org, kuba@kernel.org, anthony.l.nguyen@intel.com, 
+	pabeni@redhat.com, davem@davemloft.net, 
+	"Brandeburg, Jesse" <jesse.brandeburg@intel.com>, "Ruinskiy, Dima" <dima.ruinskiy@intel.com>, 
+	"Lifshits, Vitaly" <vitaly.lifshits@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Richard Gobert wrote:
-> This patch converts references of skb->network_header to napi_gro_cb's
-> network_offset and inner_network_offset.
-> 
-> Signed-off-by: Richard Gobert <richardbgobert@gmail.com>
-> ---
->  include/net/gro.h        | 9 +++++++--
->  net/ipv4/af_inet.c       | 4 ----
->  net/ipv4/tcp_offload.c   | 3 ++-
->  net/ipv6/ip6_offload.c   | 5 ++---
->  net/ipv6/tcpv6_offload.c | 3 ++-
->  5 files changed, 13 insertions(+), 11 deletions(-)
-> 
-> diff --git a/include/net/gro.h b/include/net/gro.h
-> index c1d4ca0463a1..1faff23b66e8 100644
-> --- a/include/net/gro.h
-> +++ b/include/net/gro.h
-> @@ -181,12 +181,17 @@ static inline void *skb_gro_header(struct sk_buff *skb, unsigned int hlen,
->  	return ptr;
->  }
->  
-> +static inline int skb_gro_network_offset(const struct sk_buff *skb)
-> +{
-> +	return NAPI_GRO_CB(skb)->network_offsets[NAPI_GRO_CB(skb)->encap_mark];
-> +}
-> +
+Thank you for your time.
 
-The fact that .._receive sets encap_mark, but .._complete must read
-encapsulation, due to the clear in udp_gro_complete, is non-obvious.
+Originally, sleep codes would only be executed if the first read fails
+or the link status that is read is down. Some circumstances like the
+[v2,2/2] "e1000e: fix link fluctuations problem" would need a delay
+before first reading/accessing the PHY IEEE register, so that it won't
+read the instability of the link status bit in the PHY status
+register.
 
-Can you add a comment to clarify this or rename this to
-skb_gro_receive_network_offset?
+I've realized that this approach isn't good enough since the purpose
+is only to fix the problem in another patch and it also changes the
+behavior.
 
->  static inline void *skb_gro_network_header(const struct sk_buff *skb)
->  {
->  	if (skb_gro_may_pull(skb, skb_gro_offset(skb)))
-> -		return skb_gro_header_fast(skb, skb_network_offset(skb));
-> +		return skb_gro_header_fast(skb, skb_gro_network_offset(skb));
->  
-> -	return skb_network_header(skb);
-> +	return skb->data + skb_gro_network_offset(skb);
->  }
+Here is the modification of the patch [v2,2/2] "e1000e: fix link
+fluctuations problem":
+--- a/drivers/net/ethernet/intel/e1000e/ich8lan.c
++++ b/drivers/net/ethernet/intel/e1000e/ich8lan.c
+@@ -1428,7 +1428,17 @@  static s32
+e1000_check_for_copper_link_ich8lan(struct e1000_hw *hw)
+- ret_val = e1000e_phy_has_link_generic(hw, 1, 0, &link);
+/* comments */
++ ret_val = e1000e_phy_has_link_generic(hw, COPPER_LINK_UP_LIMIT,
+100000, &link);
+
+Do you think we can just add a msleep/usleep_range in front of the
+e1000e_phy_has_link_generic() instead of modifying the sleep codes in
+e1000e_phy_has_link_generic()?
+
+Thanks.
+
+On Mon, 6 May 2024 at 23:53, Sasha Neftin <sasha.neftin@intel.com> wrote:
+>
+> On 03/05/2024 13:18, Ricky Wu wrote:
+> > Originally, the sleep codes being moved forward only
+> > ran if we met some conditions (e.g. BMSR_LSTATUS bit
+> > not set in phy_status). Moving these sleep codes forward
+> > makes the usec_interval take effect every time.
+> >
+> > Signed-off-by: Ricky Wu <en-wei.wu@canonical.com>
+> > ---
+> >
+> > In v2:
+> > * Split the sleep codes into this patch
+> >
+> >   drivers/net/ethernet/intel/e1000e/phy.c | 9 +++++----
+> >   1 file changed, 5 insertions(+), 4 deletions(-)
+> >
+> > diff --git a/drivers/net/ethernet/intel/e1000e/phy.c b/drivers/net/ethernet/intel/e1000e/phy.c
+> > index 93544f1cc2a5..4a58d56679c9 100644
+> > --- a/drivers/net/ethernet/intel/e1000e/phy.c
+> > +++ b/drivers/net/ethernet/intel/e1000e/phy.c
+> > @@ -1777,6 +1777,11 @@ s32 e1000e_phy_has_link_generic(struct e1000_hw *hw, u32 iterations,
+> >
+> >       *success = false;
+> >       for (i = 0; i < iterations; i++) {
+> > +             if (usec_interval >= 1000)
+> > +                     msleep(usec_interval / 1000);
+> > +             else
+> > +                     udelay(usec_interval);
+> > +
+>
+> I do not understand this approach. Why wait before first
+> reading/accessing the PHY IEEE register?
+>
+> For further discussion, I would like to introduce Dima Ruinskiy (architect)
+>
+> >               /* Some PHYs require the MII_BMSR register to be read
+> >                * twice due to the link bit being sticky.  No harm doing
+> >                * it across the board.
+> > @@ -1799,10 +1804,6 @@ s32 e1000e_phy_has_link_generic(struct e1000_hw *hw, u32 iterations,
+> >                       *success = true;
+> >                       break;
+> >               }
+> > -             if (usec_interval >= 1000)
+> > -                     msleep(usec_interval / 1000);
+> > -             else
+> > -                     udelay(usec_interval);
+> >       }
+> >
+> >       return ret_val;
+>
 
