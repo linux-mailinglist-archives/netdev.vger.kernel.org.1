@@ -1,141 +1,128 @@
-Return-Path: <netdev+bounces-93809-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93810-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C48808BD3FF
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 19:44:27 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 930BC8BD41F
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 19:50:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7FAD0282BD8
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 17:44:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3B9051F223DA
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 17:50:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FD2F157A45;
-	Mon,  6 May 2024 17:44:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 712161581FD;
+	Mon,  6 May 2024 17:50:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="UzMle71a"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay.smtp-ext.broadcom.com (relay.smtp-ext.broadcom.com [192.19.144.207])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBA2E157499;
-	Mon,  6 May 2024 17:44:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2618157E7A;
+	Mon,  6 May 2024 17:50:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.19.144.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715017453; cv=none; b=XdASZ33QLuexj+kGNe25WznXyAbeYUJqiXIfEDG2XmU0tb4vVY2sA2pZd+vvXbC5DiHxWb01FUdjSHbkPbbaSs6ftnTvwK+dfOoHEH8/y27qJZl0jZk8VFm8iLllnYWTJblDNpghILNcSBaB2j0Uo4ZcJcTOu5/DX+PvOgGE1yk=
+	t=1715017853; cv=none; b=fmR8z2Jub+W4/nOf4TpBa7VlnEBqFFsFKu2oVHnScQRZZo+ArvOKskV8U97WAwP6AwnqeZ2YX0AFk5qM8nWoe3GUsA+eMWuPVfQJmwlLjVNs160dqbUTenOseEe0yvNFCOGbYVR6VhJANC3v1dlO7+2iRwiwEATwD5SPOKwaokI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715017453; c=relaxed/simple;
-	bh=c30XX7NvoV4VcckRnZbuzcL5VIyGxucgGGUkFlYpBEQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=KGZCQGLZ8JKDhHvRwiPEpNMF72vk3J3pGItsiN+PfFnHyl1klIQBM0TS2DTZ8xGi5kAdfLHr4DQzBAmHaPJe+CplOZXcGJ6x+lVQ9M+cWZJtXVWaS6LV4+NqYJWLltFtKmEsaCHx+/0ADzFF7iUqdrYwNdRJRVB48thd/AXroGw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-6202ad4cae3so19832447b3.2;
-        Mon, 06 May 2024 10:44:09 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715017448; x=1715622248;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jNJqSJ4Rj3GMpFRsgXMo9e9pnssxfStf7+AxtszDick=;
-        b=uDlUi+VWqoR8U6OW2ovAK5wfiADq7Ply8Iu9CXVhT2Bkuxv7SKv7zQfwKHE5QLQMD3
-         X9mYieEl3Ez1CwSe2CXWieCwxpjeNnftgrW5QD97vIyWiq/8YtQMx0IY26+7eSL81Vh1
-         +gYSC+no/sxHekzOOOqEAmoGSTJbCT+Gb5FB4kNwjiwMzxpBdCWokjTorJs2q2YMdN9O
-         VuBrL48/0MUWWV3thhWXzTfBEk2Me08Gq23yQcQrMsUrbiuwEwujHFiaLS5shMurew/p
-         0RlPDiFrXIXLrVwYsrDU8iUNi9SmLPiE6GGtCuKyLzWnYXV+H092V/W6e3F4bwk65Kbd
-         1lSA==
-X-Forwarded-Encrypted: i=1; AJvYcCXlxitmJUDpZJsObd/+Bj3EoMb3bpWJLDMfXQFpWDCQE4ImO4izhY4zhi9yGS0cZCU7ksocvMJL//Yw5KQB6k0m7R6SgUwd+cNgXYqygFNd6ZF3pLwnrwu6gp8OM43EV4tQCtnvvl0h55k=
-X-Gm-Message-State: AOJu0Yxt5RXzCusLZWYx9bxGAW6/k9xYoiuF4Cshy0fkYBFFu3yvfmGM
-	xo3xirWn8ai3sWivl+PFMw7eW3R90kPqtvOmeoU6zQ5m5/BN0bJ8mPZh7D0c
-X-Google-Smtp-Source: AGHT+IFANWO3Z1dqKfePGv4unfKao93j9o3qYBq7/F27texzvV1EZW75BKoM9Imy7DeC0tbXjhDpFg==
-X-Received: by 2002:a0d:eaca:0:b0:617:d365:dc17 with SMTP id t193-20020a0deaca000000b00617d365dc17mr10406315ywe.26.1715017448490;
-        Mon, 06 May 2024 10:44:08 -0700 (PDT)
-Received: from mail-yb1-f173.google.com (mail-yb1-f173.google.com. [209.85.219.173])
-        by smtp.gmail.com with ESMTPSA id s20-20020a819f14000000b0061893c5bcf0sm2238896ywn.15.2024.05.06.10.44.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 06 May 2024 10:44:08 -0700 (PDT)
-Received: by mail-yb1-f173.google.com with SMTP id 3f1490d57ef6-dcc71031680so2295882276.2;
-        Mon, 06 May 2024 10:44:08 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCXWqX9dxvKVI6dQdMn/mb+vT0kQNY6aUB5ZnP7/xw85ktmEuRcK2FS30oEav/LI40e3oVTtz/xY4komQRc9MR3rvddW+IVZxJwHHbg9ATdmjA2InjxdRl4aSj1eV2SltfbIhyYNioXckvI=
-X-Received: by 2002:a25:df86:0:b0:de6:d19:837a with SMTP id
- w128-20020a25df86000000b00de60d19837amr11652344ybg.34.1715017448152; Mon, 06
- May 2024 10:44:08 -0700 (PDT)
+	s=arc-20240116; t=1715017853; c=relaxed/simple;
+	bh=v6pEqBJ5mDe9Geb1lnQ6KB6h8NCGbjd9XTgNlYMumZA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=c6Dd3/35lLOoKNfBixFpR99tE+fM2opdPrp34LuZTuz43rjoFftjoEkTEmcU8FGB2DCD8Ydx7SGjpLq4gQxNwC08JjhQEfvO83ZtCS9Ur6rztmeiknogaoZrCVPiQ/bxnBsCbD1rJ1pWzkUoXW4fV8QSMxEL0WrDZHxjSHRxdyk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=UzMle71a; arc=none smtp.client-ip=192.19.144.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: from mail-lvn-it-01.lvn.broadcom.net (mail-lvn-it-01.lvn.broadcom.net [10.36.132.253])
+	by relay.smtp-ext.broadcom.com (Postfix) with ESMTP id B460DC0000F1;
+	Mon,  6 May 2024 10:50:44 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 relay.smtp-ext.broadcom.com B460DC0000F1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=broadcom.com;
+	s=dkimrelay; t=1715017844;
+	bh=v6pEqBJ5mDe9Geb1lnQ6KB6h8NCGbjd9XTgNlYMumZA=;
+	h=From:To:Cc:Subject:Date:From;
+	b=UzMle71aRbs+gStauk6DVeYL6Te6an9ndMV4wnUqU8LlLEvtK38go+/N0lkkhR5KN
+	 kC6DC0iTQaAV3o8R15wfrO0CxMgwW7FWgkK3zrJtbt/XWrQ9N3CzccQvboq4Evo/IH
+	 Rv9141/2/8nZBOFfHbjgCFcgTLlj9Ct3UVKTDWTE=
+Received: from fainelli-desktop.igp.broadcom.net (fainelli-desktop.dhcp.broadcom.net [10.67.48.245])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mail-lvn-it-01.lvn.broadcom.net (Postfix) with ESMTPSA id B530718041CAC4;
+	Mon,  6 May 2024 10:50:42 -0700 (PDT)
+From: Florian Fainelli <florian.fainelli@broadcom.com>
+To: netdev@vger.kernel.org
+Cc: kuba@kernel.org,
+	jgg@nvidia.com,
+	leonro@nvidia.com,
+	horms@kernel.org,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Tal Gilboa <talgi@nvidia.com>,
+	linux-kernel@vger.kernel.org (open list:LIBRARY CODE)
+Subject: [PATCH net-next v2] lib: Allow for the DIM library to be modular
+Date: Mon,  6 May 2024 10:50:40 -0700
+Message-Id: <20240506175040.410446-1-florian.fainelli@broadcom.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240414135937.1139611-1-niklas.soderlund+renesas@ragnatech.se>
- <5fd25c58-b421-4ec0-8b4f-24f86f054a44@lunn.ch> <20240503102006.GI3927860@ragnatech.se>
- <e3ce12b0-fb5d-49d7-a529-9ea7392b80ca@lunn.ch> <20240503133033.GJ3927860@ragnatech.se>
- <d5f6f31a-6ecc-48a9-a2ca-9d22fc6acb21@lunn.ch> <20240506140533.GD720810@ragnatech.se>
-In-Reply-To: <20240506140533.GD720810@ragnatech.se>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Mon, 6 May 2024 19:43:55 +0200
-X-Gmail-Original-Message-ID: <CAMuHMdXm1by7P3LV22v5fQyVo1dNOzjaB=1dcqwP7qM+MqOhtA@mail.gmail.com>
-Message-ID: <CAMuHMdXm1by7P3LV22v5fQyVo1dNOzjaB=1dcqwP7qM+MqOhtA@mail.gmail.com>
-Subject: Re: [net-next] net: ethernet: rtsn: Add support for Renesas Ethernet-TSN
-To: =?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-Cc: Andrew Lunn <andrew@lunn.ch>, Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-	linux-renesas-soc@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi Niklas,
+Allow the Dynamic Interrupt Moderation (DIM) library to be built as a
+module. This is particularly useful in an Android GKI (Google Kernel
+Image) configuration where everything is built as a module, including
+Ethernet controller drivers. Having to build DIMLIB into the kernel
+image with potentially no user is wasteful.
 
-On Mon, May 6, 2024 at 4:05=E2=80=AFPM Niklas S=C3=B6derlund
-<niklas.soderlund+renesas@ragnatech.se> wrote:
-> On 2024-05-06 03:51:45 +0200, Andrew Lunn wrote:
-> > What PHY is this? Does it have C22 registers? Can it be identified via
-> > C22 registers 2 and 3?
->
-> The PHY in question is mv88q2110 (drivers/net/phy/marvell-88q2xxx.c),
-> unfortunately I do not have a datasheet for it so I can't tell you much
-> about it.
->
-> <snip>
->
-> >
-> > So i would drop the compatible. See if C22 is sufficient to get the
-> > correct driver loaded.
->
-> - Remove C45 compatible; Remove C45 read/write in driver
->
->   The PHY is identified as "Generic PHY", and the correct PHY driver is
->   not used. I can't test more than that as the generic PHY driver do not
->   implement some quirks I need to get the link up.
->
-> - Remove C45 compatible; Keep C45 read/write in driver
->
->   The correct PHY driver is used and everything works.
+Signed-off-by: Florian Fainelli <florian.fainelli@broadcom.com>
+---
+Changes in v2:
 
-Does it still work after kexec, or after device unbind/rebind?
-According to [1], the PHY node has a reset-gpios property, so you may
-need to specify the exact PHY model to identify the PHY model at any
-time, regardless of the state of the PHY reset line.
+- Added MODULE_DESCRIPTION()
 
-Perhaps that issue does not happen when using the mdio subnode, cfr. [3]?
+ lib/Kconfig      | 2 +-
+ lib/dim/Makefile | 4 ++--
+ lib/dim/dim.c    | 3 +++
+ 3 files changed, 6 insertions(+), 3 deletions(-)
 
-[1] https://lore.kernel.org/all/20240122160441.759620-3-niklas.soderlund+re=
-nesas@ragnatech.se/
-[2] 722d55f3a9bd810f ("arm64: dts: renesas: Add compatible properties
-to KSZ9031Ethernet PHYs")
-[3] 8da891720cd407ed ("dt-bindings: net: renesas,ethertsn: Create
-child-node for MDIO bus") in net-next (next-20240405 and later).
+diff --git a/lib/Kconfig b/lib/Kconfig
+index 4557bb8a5256..d33a268bc256 100644
+--- a/lib/Kconfig
++++ b/lib/Kconfig
+@@ -628,7 +628,7 @@ config SIGNATURE
+ 	  Implementation is done using GnuPG MPI library
+ 
+ config DIMLIB
+-	bool
++	tristate
+ 	help
+ 	  Dynamic Interrupt Moderation library.
+ 	  Implements an algorithm for dynamically changing CQ moderation values
+diff --git a/lib/dim/Makefile b/lib/dim/Makefile
+index 1d6858a108cb..c4cc4026c451 100644
+--- a/lib/dim/Makefile
++++ b/lib/dim/Makefile
+@@ -2,6 +2,6 @@
+ # DIM Dynamic Interrupt Moderation library
+ #
+ 
+-obj-$(CONFIG_DIMLIB) += dim.o
++obj-$(CONFIG_DIMLIB) += dimlib.o
+ 
+-dim-y := dim.o net_dim.o rdma_dim.o
++dimlib-objs := dim.o net_dim.o rdma_dim.o
+diff --git a/lib/dim/dim.c b/lib/dim/dim.c
+index e89aaf07bde5..83b65ac74d73 100644
+--- a/lib/dim/dim.c
++++ b/lib/dim/dim.c
+@@ -82,3 +82,6 @@ bool dim_calc_stats(struct dim_sample *start, struct dim_sample *end,
+ 	return true;
+ }
+ EXPORT_SYMBOL(dim_calc_stats);
++
++MODULE_DESCRIPTION("Dynamic Interrupt Moderation (DIM) library");
++MODULE_LICENSE("Dual BSD/GPL");
+-- 
+2.34.1
 
-Gr{oetje,eeting}s,
-
-                        Geert
-
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
-.org
-
-In personal conversations with technical people, I call myself a hacker. Bu=
-t
-when I'm talking to journalists I just say "programmer" or something like t=
-hat.
-                                -- Linus Torvalds
 
