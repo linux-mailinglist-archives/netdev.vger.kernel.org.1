@@ -1,103 +1,119 @@
-Return-Path: <netdev+bounces-93763-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93764-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 900978BD1E0
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 17:54:55 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 707CC8BD1F2
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 17:57:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C148C1C21051
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 15:54:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 105DD1F249D5
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 15:57:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED65A15573B;
-	Mon,  6 May 2024 15:54:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43CC0155737;
+	Mon,  6 May 2024 15:57:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="mvrt3j3G"
+	dkim=pass (1024-bit key) header.d=kpnmail.nl header.i=@kpnmail.nl header.b="o2fWO0P7"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E3884D58E;
-	Mon,  6 May 2024 15:54:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from ewsoutbound.kpnmail.nl (ewsoutbound.kpnmail.nl [195.121.94.167])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B56B9155A4F
+	for <netdev@vger.kernel.org>; Mon,  6 May 2024 15:57:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.121.94.167
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715010889; cv=none; b=MvwxsTvAqfAvjOGVU5S1rYcraHxc6e1DGhGRDsfSHo2fyPI/Shq3VkTStwhrmfAgu2EoTYBpGNBh/SSTOju+SkjWa7Z6g6tOHn0q/d9PvfSyfWCt3AwN7dlP5dwWM8GKcKV2QlLIq4BXzu08vGN+ZASen3Xy5SVPaEK6Wc4mz1g=
+	t=1715011049; cv=none; b=KoXM7le+zX7VEc0BhgdvIVH/cW8r9mkiqSfyTwYEDp8UMiqZKi7RG5NHJzDJtJyDOHJ6FZ6UaZ2Ogz6rwIH2z1EW5WmqA2q6BlYz+AhEWtdlVK40X/dzUrY/rY3NnGuXYHPyOMfxqnOmPnNEqL2HqbKT6TysUpiEjkPjs8FXmWg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715010889; c=relaxed/simple;
-	bh=Crd4eA01Q8OgQOfWxO/qZtC6JCLcKbyjrjCZcY6mXGU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JysOqIjg/0dsNB/NErDcqnBR86sgwCH8qFt7OV23M53goYWfzc6jCCn6u1Th37y7zjXDGreeZzAGjMawVxDA7J23tobv5p/Ze6Gdvq6bLTOuTMPHqm82ZH4bHXgjcko4rn8sgcp3C+bome6JZO52hrfWreF1JzNtJ8XprFzqfyw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=mvrt3j3G; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: from [100.65.96.57] (unknown [20.236.10.66])
-	by linux.microsoft.com (Postfix) with ESMTPSA id 63A2E20B2C82;
-	Mon,  6 May 2024 08:54:47 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 63A2E20B2C82
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1715010888;
-	bh=sn+I7ADMPSvGvZYIULHrdfmxmoEt29gcieDFLNGehhA=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=mvrt3j3GirQyL+zNWSUJPrkb94vYe3gRE3gFwpfF/00niIyl3fc+VRb5f4AxuoW6y
-	 kfky6VeELzBpCgzxTreaammrgxgd2SDXZvPOj7nLeVxJzxzGqiRR6ErGuzVari+m/L
-	 Ad5PQJ1lUdbhal6K44JEvCMsC3zo/UFAAL0Irirc=
-Message-ID: <82f5b8e3-45c4-4b59-bc96-4cee2b122e9a@linux.microsoft.com>
-Date: Mon, 6 May 2024 08:54:47 -0700
+	s=arc-20240116; t=1715011049; c=relaxed/simple;
+	bh=iiKrYKylxLJGKkdodAnRvX5ipn2c1qK7DHCqWXkLqMs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oKeqtlNZD8sqeWbTZvFdeuIfnWFxXZusWGW6uk/JZn0Z34bV8nGb3ekNMXIXuZ4/iWczOgg/6gGC3qPoWIfRXdjAZn3JYf732Mm/QT/tmSVZJkfnYodPD8gb1+pikyXV9ievOv00WPB3emzeLIOGDAc/Ult2BOWNiidDg3EyHwY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=phenome.org; spf=none smtp.mailfrom=phenome.org; dkim=pass (1024-bit key) header.d=kpnmail.nl header.i=@kpnmail.nl header.b=o2fWO0P7; arc=none smtp.client-ip=195.121.94.167
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=phenome.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=phenome.org
+X-KPN-MessageId: 517d0a94-0bc1-11ef-93a8-005056abbe64
+Received: from smtp.kpnmail.nl (unknown [10.31.155.39])
+	by ewsoutbound.so.kpn.org (Halon) with ESMTPS
+	id 517d0a94-0bc1-11ef-93a8-005056abbe64;
+	Mon, 06 May 2024 17:57:19 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=kpnmail.nl; s=kpnmail01;
+	h=content-type:mime-version:message-id:subject:to:from:date;
+	bh=RUHm1EWr1K/7L/9ocw0nmD0PbDFVhkil+phJ070GL4Q=;
+	b=o2fWO0P7FvqbEG/2cJ180+MP80HbMrtRuNbEML9KheS4F7idO9tbdqnWyUeem/9buafR2onUCZTz2
+	 YorC4i1exN684EXZdi+V/MYLmaRVqxYj1H4BbHYl0RS/fkXF3Sgi5WuQH5hrHaQ1aReh13drCBHt5k
+	 UZUGlF3aPjk10HL8=
+X-KPN-MID: 33|/Ph3iBiQzufTV4TSUee1KZp+q26aevXSrQGrnCyXEi8ZSlgUNTjH+xt/TX00Qj2
+ YUphs9Gquhk2zkw9fcqcXHazx/PX1p7W3bpmbRrNBtzI=
+X-KPN-VerifiedSender: No
+X-CMASSUN: 33|kNFyKwD6mBehpBEBTeKAMu+IAPoxC0+39Qm5wKamm0JqDcEu6s5sQcd7CJhaRz2
+ +VNFkBc2XQfM3lHNGIjGmRQ==
+Received: from Antony2201.local (213-10-186-43.fixed.kpn.net [213.10.186.43])
+	by smtp.xs4all.nl (Halon) with ESMTPSA
+	id 53dd6200-0bc1-11ef-8793-005056ab7447;
+	Mon, 06 May 2024 17:57:24 +0200 (CEST)
+Date: Mon, 6 May 2024 17:57:23 +0200
+From: Antony Antony <antony@phenome.org>
+To: Sabrina Dubroca <sd@queasysnail.net>
+Cc: Antony Antony <antony.antony@secunet.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Shuah Khan <shuah@kernel.org>, devel@linux-ipsec.org
+Subject: Re: [PATCH net-next v3 0/2] fix icmp error source address over xfrm
+ tunnel
+Message-ID: <Zjj94y2JW4uPg_Iz@Antony2201.local>
+References: <cover.1714982035.git.antony.antony@secunet.com>
+ <ZjjczzsSz6wwUHd5@hog>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 10/12] sfc: falcon: Make I2C terminology more inclusive
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Edward Cree <ecree.xilinx@gmail.com>,
- Martin Habets <habetsm.xilinx@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- "open list:SFC NETWORK DRIVER" <netdev@vger.kernel.org>,
- "open list:SFC NETWORK DRIVER" <linux-net-drivers@amd.com>,
- open list <linux-kernel@vger.kernel.org>,
- Wolfram Sang <wsa+renesas@sang-engineering.com>,
- "open list:RADEON and AMDGPU DRM DRIVERS" <amd-gfx@lists.freedesktop.org>,
- "open list:DRM DRIVERS" <dri-devel@lists.freedesktop.org>,
- "open list:INTEL DRM DISPLAY FOR XE AND I915 DRIVERS"
- <intel-gfx@lists.freedesktop.org>,
- "open list:INTEL DRM DISPLAY FOR XE AND I915 DRIVERS"
- <intel-xe@lists.freedesktop.org>,
- "open list:DRM DRIVER FOR NVIDIA GEFORCE/QUADRO GPUS"
- <nouveau@lists.freedesktop.org>,
- "open list:I2C SUBSYSTEM HOST DRIVERS" <linux-i2c@vger.kernel.org>,
- "open list:BTTV VIDEO4LINUX DRIVER" <linux-media@vger.kernel.org>,
- "open list:FRAMEBUFFER LAYER" <linux-fbdev@vger.kernel.org>
-References: <20240430173812.1423757-1-eahariha@linux.microsoft.com>
- <20240430173812.1423757-11-eahariha@linux.microsoft.com>
- <20240503151300.0f202c30@kernel.org>
-Content-Language: en-CA
-From: Easwar Hariharan <eahariha@linux.microsoft.com>
-In-Reply-To: <20240503151300.0f202c30@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZjjczzsSz6wwUHd5@hog>
 
-On 5/3/2024 3:13 PM, Jakub Kicinski wrote:
-> On Tue, 30 Apr 2024 17:38:09 +0000 Easwar Hariharan wrote:
->> I2C v7, SMBus 3.2, and I3C 1.1.1 specifications have replaced "master/slave"
->> with more appropriate terms. Inspired by and following on to Wolfram's
->> series to fix drivers/i2c/[1], fix the terminology for users of
->> I2C_ALGOBIT bitbanging interface, now that the approved verbiage exists
->> in the specification.
->>
->> Compile tested, no functionality changes intended
+Hi Sabrina,
+
+On Mon, May 06, 2024 at 03:36:15PM +0200, Sabrina Dubroca via Devel wrote:
+> 2024-05-06, 09:58:26 +0200, Antony Antony wrote:
+> > Hi,
+> > This fix, originally intended for XFRM/IPsec, has been recommended by
+> > Steffen Klassert to submit to the net tree.
+> > 
+> > The patch addresses a minor issue related to the IPv4 source address of
+> > ICMP error messages, which originated from an old 2011 commit:
+> > 
+> > 415b3334a21a ("icmp: Fix regression in nexthop resolution during replies.")
+> > 
+> > The omission of a "Fixes" tag  in the following commit is deliberate
+> > to prevent potential test failures and subsequent regression issues
+> > that may arise from backporting this patch all stable kerenels.
 > 
-> FWIW we're assuming someone (Wolfram?) will take all of these,
-> instead of area maintainers picking them individually.
-> Please let us know if that's incorrect.
+> What kind of regression do you expect? If there's a risk of
 
-I think, based on the trend in the v2 conversation[1], that's correct. If maintainers of
-other areas disagree, please chime in.
+For example, an old testing scripts with hardcoded source IP address assume
+that the "Unreachable response" will have the previous behavior. Such 
+testing script may trigger regression when this patch is backported.  
+Consequently, there may be discussions on whether this patch has broken the 
+10-year-old test scripts, which may be hard to fix.
 
-Thanks,
-Easwar
+> regression, I'm not sure net-next is that much "better" than net or
+> stable. If a user complains about the new behavior breaking their
+> setup, my understanding is that you would likely have to revert the
+> patch anyway, or at least add some way to toggle the behavior.
 
-[1] https://lore.kernel.org/all/20240503181333.2336999-1-eahariha@linux.microsoft.com/
+My hope is that if this patch is applied to net-next without a "Fixes" tag,
+users would fix their testing scripts properly. Additionally, another piece
+of the puzzle for a complete fix is "forwarding of ICMP Error messages" 
+patch that is in the kerenl 6.8, which is new feature and applied via 
+ipsec-next.
+
+-antony
 
