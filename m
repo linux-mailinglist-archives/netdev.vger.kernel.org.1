@@ -1,438 +1,247 @@
-Return-Path: <netdev+bounces-93800-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93801-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C48328BD3A1
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 19:08:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id ADA6D8BD3A5
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 19:09:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7B78B282AE6
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 17:08:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D0BD71C218B5
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 17:09:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75D9D15749D;
-	Mon,  6 May 2024 17:08:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA54B157461;
+	Mon,  6 May 2024 17:09:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FGIjymtC"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ml/O/thn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C9AB157473
-	for <netdev@vger.kernel.org>; Mon,  6 May 2024 17:08:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17B6C1DA21;
+	Mon,  6 May 2024 17:09:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715015319; cv=none; b=LsQfm/YQKaX9/N9wz0sgjP3kvSQU5CsOeidfAuSsByttNSk1cqxBJgq6BlYszkngYc5JaVDxs3Lk47sk/PGOxufsyDexkeATaCDKbQeyZUScvK1dszDqB+Z53FqJ1mufTsHOttRuUHXU4JiRg7BHw1fbfWEF+5ROn/WIn6yG66E=
+	t=1715015343; cv=none; b=TmtcS8RarlY+jwNod5NhTBPbfuhmeTHLu9dZy2S/7yF6oiFVEr861G1DhG3IarCvis7R1iqsKcqIl96e1hx6+c1hHp+iGlfDQhXOuvD35MQUVj+1DHtp5VK+Ve/jQinaec3IFtIw5KsKUZZrZXEsKKFdxDW9WCqeujOPAB4Qu40=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715015319; c=relaxed/simple;
-	bh=PbGOq+sqK4aZR4jEHoYhVczEXVyo46fxz2UyI/tjCy4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BWw5kNZrL2LNetGQ9Zei54XvB3xfSK/Ygo6SxvZHoGzwVm47gAyzyqyrQMlgBlp42UxHrJ9aB7Y7BBhnDYPZTsuIyJlk8pf/e6JO1COD3S0X+kc8Y5wjnGEfxujZFHXsS5Gp94ImM+AB5PnnSc3L5BIIDRb2Frqe0J2sUI45uaA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FGIjymtC; arc=none smtp.client-ip=198.175.65.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1715015343; c=relaxed/simple;
+	bh=MmVw+0F4SE674GI2t7dn2j9JYHc4Dcay+HL3ysgg0wc=;
+	h=From:Date:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=ZMCLjojx+zDBL5qlmleMwccmUgivWxZqVCvy6xffIfwN9Q1bp6x9IKAcIP8IYyuLAXkQofg7xAzQYpHJoWeWRJB+dyn7TFZnQJBHSjXKsmjDHKschH2+s/LBLDbWSS9KUBErFb8GUHhhgRet0fTO1rkT7xYd9YI9iSSeUF4t2S0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ml/O/thn; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1715015318; x=1746551318;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=PbGOq+sqK4aZR4jEHoYhVczEXVyo46fxz2UyI/tjCy4=;
-  b=FGIjymtC47xPXlHK9EtGhFgX13GjONImcZPDJCnHH1A5UbbePv4g/Q6L
-   c0MVO1c7rMxcuQ9Afns3qcT8Jbgrzm7JXGotlD+2x+TC5mQtndFFN8vdY
-   N06BrDUx6wEoUaVCd8zL7QpDiMEo76fqj72Edl31Tk98jQUZIQw7/eqN0
-   yjrqDKuOVFGl5CiWVyBWsGaelidCvBlqlRqVcO2osRQI3mefjJKtadZts
-   JyQNOrsAUlxd6+VpkAAEQua8ASj8qj8K2lUR5VFN0QtQueUN65/dn/46d
-   34bkuwBaERKCSGqD2Z07a+dnLo+rUUh8befHnzgc5ukNo0kJOTuGzS8X2
-   g==;
-X-CSE-ConnectionGUID: 1qwFNRX/SdOOZkme44cKLw==
-X-CSE-MsgGUID: uZF61B2cQW6hVwgu73oCOQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11065"; a="10896804"
+  t=1715015342; x=1746551342;
+  h=from:date:to:cc:subject:in-reply-to:message-id:
+   references:mime-version;
+  bh=MmVw+0F4SE674GI2t7dn2j9JYHc4Dcay+HL3ysgg0wc=;
+  b=ml/O/thnpoc1yef+b7qTLExpyooRUvzgKwr1yB8Yb7Y5/jb6t6rGeqvD
+   fLrgzPShYzkhnFr3n9PfJjZWJJzjwWJ6jj4KtUo7EFw6+65qAHqsZKupO
+   LTJlykVNCOdQyDaX4rEoUsY7okIZnac+jHsndM5WJsyXWpY9ZSoXJu0fi
+   sj4jTyTG4S9QHBnH8HDkphgElRYKprOC59RyxB/ioN+EDhRmxv7VjxH0M
+   nPBv1AljtAgTzdLpCqHrocgOBndVfyDcST3rMWpN+r4xhZnLiaz6AewnG
+   g9FGVCDS1HMpaJrVc87ItWqsFsxpS5TqvQjkvzl2bExeMbsvHhHqTrtMg
+   A==;
+X-CSE-ConnectionGUID: wfhmwwJ8RhOGcX0d3p7zuQ==
+X-CSE-MsgGUID: ou8Qm294Tl+9kRRyxP+EhA==
+X-IronPort-AV: E=McAfee;i="6600,9927,11065"; a="33279164"
 X-IronPort-AV: E=Sophos;i="6.07,259,1708416000"; 
-   d="scan'208";a="10896804"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2024 10:08:35 -0700
-X-CSE-ConnectionGUID: zhYOkJ9NRLehFuDjg57ZGA==
-X-CSE-MsgGUID: q+MAXApBQ5aPbWWf4O/H+w==
+   d="scan'208";a="33279164"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2024 10:09:02 -0700
+X-CSE-ConnectionGUID: m7t/2etwRMOlCDOwKfwv2w==
+X-CSE-MsgGUID: CDJL5THESt6i+Mr3mEIqjQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,259,1708416000"; 
-   d="scan'208";a="33037435"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by orviesa004.jf.intel.com with ESMTP; 06 May 2024 10:08:34 -0700
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	netdev@vger.kernel.org
-Cc: Mateusz Polchlopek <mateusz.polchlopek@intel.com>,
-	anthony.l.nguyen@intel.com,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Vaishnavi Tipireddy <vaishnavi.tipireddy@intel.com>,
-	Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>
-Subject: [PATCH net-next 4/4] ice: refactor struct ice_vsi_cfg_params to be inside of struct ice_vsi
-Date: Mon,  6 May 2024 10:08:25 -0700
-Message-ID: <20240506170827.948682-5-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20240506170827.948682-1-anthony.l.nguyen@intel.com>
-References: <20240506170827.948682-1-anthony.l.nguyen@intel.com>
+   d="scan'208";a="59085676"
+Received: from ijarvine-desk1.ger.corp.intel.com (HELO localhost) ([10.245.247.68])
+  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2024 10:08:54 -0700
+From: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
+Date: Mon, 6 May 2024 20:08:49 +0300 (EEST)
+To: Christoph Fritz <christoph.fritz@hexdev.de>
+cc: Jiri Slaby <jirislaby@kernel.org>, 
+    Oliver Hartkopp <socketcan@hartkopp.net>, 
+    Marc Kleine-Budde <mkl@pengutronix.de>, 
+    Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
+    "David S . Miller" <davem@davemloft.net>, 
+    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+    Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+    Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+    Conor Dooley <conor+dt@kernel.org>, Jiri Kosina <jikos@kernel.org>, 
+    Benjamin Tissoires <bentiss@kernel.org>, 
+    Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+    Sebastian Reichel <sre@kernel.org>, 
+    Linus Walleij <linus.walleij@linaro.org>, 
+    Andreas Lauser <andreas.lauser@mercedes-benz.com>, 
+    Jonathan Corbet <corbet@lwn.net>, Pavel Pisa <pisa@cmp.felk.cvut.cz>, 
+    linux-can@vger.kernel.org, Netdev <netdev@vger.kernel.org>, 
+    devicetree@vger.kernel.org, linux-input@vger.kernel.org, 
+    linux-serial <linux-serial@vger.kernel.org>
+Subject: Re: [PATCH v3 08/11] can: bcm: Add LIN answer offloading for responder
+ mode
+In-Reply-To: <20240502182804.145926-9-christoph.fritz@hexdev.de>
+Message-ID: <48a79803-0fc9-3931-08f1-4b26b4a9ae93@linux.intel.com>
+References: <20240502182804.145926-1-christoph.fritz@hexdev.de> <20240502182804.145926-9-christoph.fritz@hexdev.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
 
-From: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+On Thu, 2 May 2024, Christoph Fritz wrote:
 
-Refactor struct ice_vsi_cfg_params to be embedded into struct ice_vsi.
-Prior to that the members of the struct were scattered around ice_vsi,
-and were copy-pasted for purposes of reinit.
-Now we have struct handy, and it is easier to have something sticky
-in the flags field.
+> Enhance CAN broadcast manager with RX_LIN_SETUP and RX_LIN_DELETE
+> operations to setup automatic LIN frame responses in responder mode.
+> 
+> Additionally, the patch introduces the LIN_EVENT_FRAME flag to
+> setup event-triggered LIN frames.
+> 
+> Signed-off-by: Christoph Fritz <christoph.fritz@hexdev.de>
+> ---
+>  include/uapi/linux/can/bcm.h |  5 ++-
+>  net/can/bcm.c                | 74 +++++++++++++++++++++++++++++++++++-
+>  2 files changed, 77 insertions(+), 2 deletions(-)
+> 
+> diff --git a/include/uapi/linux/can/bcm.h b/include/uapi/linux/can/bcm.h
+> index f1e45f533a72c..c46268a114078 100644
+> --- a/include/uapi/linux/can/bcm.h
+> +++ b/include/uapi/linux/can/bcm.h
+> @@ -86,7 +86,9 @@ enum {
+>  	TX_EXPIRED,	/* notification on performed transmissions (count=0) */
+>  	RX_STATUS,	/* reply to RX_READ request */
+>  	RX_TIMEOUT,	/* cyclic message is absent */
+> -	RX_CHANGED	/* updated CAN frame (detected content change) */
+> +	RX_CHANGED,	/* updated CAN frame (detected content change) */
+> +	RX_LIN_SETUP,	/* create auto-response for LIN frame */
+> +	RX_LIN_DELETE,  /* remove auto-response for LIN frame */
+>  };
+>  
+>  #define SETTIMER            0x0001
+> @@ -101,5 +103,6 @@ enum {
+>  #define TX_RESET_MULTI_IDX  0x0200
+>  #define RX_RTR_FRAME        0x0400
+>  #define CAN_FD_FRAME        0x0800
+> +#define LIN_EVENT_FRAME     0x1000
+>  
+>  #endif /* !_UAPI_CAN_BCM_H */
+> diff --git a/net/can/bcm.c b/net/can/bcm.c
+> index 27d5fcf0eac9d..a717e594234d1 100644
+> --- a/net/can/bcm.c
+> +++ b/net/can/bcm.c
+> @@ -59,6 +59,7 @@
+>  #include <linux/can/bcm.h>
+>  #include <linux/slab.h>
+>  #include <net/sock.h>
+> +#include <net/lin.h>
+>  #include <net/net_namespace.h>
+>  
+>  /*
+> @@ -1330,6 +1331,59 @@ static int bcm_tx_send(struct msghdr *msg, int ifindex, struct sock *sk,
+>  	return cfsiz + MHSIZ;
+>  }
+>  
+> +static int bcm_lin_setup(struct bcm_msg_head *msg_head, struct msghdr *msg,
+> +			 int ifindex, struct sock *sk, int cfsiz, int is_active)
+> +{
+> +	struct lin_responder_answer answ;
+> +	struct net_device *dev;
+> +	struct sk_buff *skb;
+> +	struct canfd_frame cf;
+> +	netdevice_tracker tracker;
+> +	size_t sz;
+> +	int ret;
+> +
+> +	if (msg_head->nframes > 1)
+> +		return -EINVAL;
+> +
+> +	if (!(msg_head->flags & CAN_FD_FRAME))
+> +		return -EINVAL;
+> +
+> +	ret = memcpy_from_msg(&cf, msg, cfsiz);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	answ.lf.lin_id = cf.can_id & LIN_ID_MASK;
+> +	answ.is_active = is_active;
+> +	answ.is_event_frame = !!(msg_head->flags & LIN_EVENT_FRAME);
+> +	answ.event_associated_id = msg_head->can_id;
+> +	answ.lf.len = min(cf.len, LIN_MAX_DLEN);
+> +	memcpy(answ.lf.data, cf.data, answ.lf.len);
+> +	sz = min(sizeof(struct lin_responder_answer), sizeof(cf.data));
+> +	cf.can_id |= LIN_RXOFFLOAD_DATA_FLAG;
+> +	memcpy(cf.data, &answ, sz);
+> +
+> +	dev = netdev_get_by_index(sock_net(sk), ifindex, &tracker, GFP_KERNEL);
+> +	if (!dev)
+> +		return -ENODEV;
+> +
+> +	skb = alloc_skb(cfsiz + sizeof(struct can_skb_priv), gfp_any());
 
-Suggested-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Reviewed-by: Vaishnavi Tipireddy <vaishnavi.tipireddy@intel.com>
-Signed-off-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Contingent worker at Intel)
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
----
- .../net/ethernet/intel/ice/devlink/devlink.c  |  6 +--
- drivers/net/ethernet/intel/ice/ice.h          | 14 ++++---
- drivers/net/ethernet/intel/ice/ice_lib.c      | 33 ++++++----------
- drivers/net/ethernet/intel/ice/ice_lib.h      | 39 +------------------
- drivers/net/ethernet/intel/ice/ice_main.c     |  8 ++--
- drivers/net/ethernet/intel/ice/ice_sriov.c    |  2 +-
- drivers/net/ethernet/intel/ice/ice_vf_lib.c   |  8 ++--
- 7 files changed, 30 insertions(+), 80 deletions(-)
+You just called the other function with GFP_KERNEL and you now need 
+gfp_any(). Which is correct??
 
-diff --git a/drivers/net/ethernet/intel/ice/devlink/devlink.c b/drivers/net/ethernet/intel/ice/devlink/devlink.c
-index d191c5709899..c4b69655cdf5 100644
---- a/drivers/net/ethernet/intel/ice/devlink/devlink.c
-+++ b/drivers/net/ethernet/intel/ice/devlink/devlink.c
-@@ -1193,18 +1193,16 @@ static int ice_devlink_set_parent(struct devlink_rate *devlink_rate,
- static int ice_devlink_reinit_up(struct ice_pf *pf)
- {
- 	struct ice_vsi *vsi = ice_get_main_vsi(pf);
--	struct ice_vsi_cfg_params params;
- 	int err;
- 
- 	err = ice_init_dev(pf);
- 	if (err)
- 		return err;
- 
--	params = ice_vsi_to_params(vsi);
--	params.flags = ICE_VSI_FLAG_INIT;
-+	vsi->flags = ICE_VSI_FLAG_INIT;
- 
- 	rtnl_lock();
--	err = ice_vsi_cfg(vsi, &params);
-+	err = ice_vsi_cfg(vsi);
- 	rtnl_unlock();
- 	if (err)
- 		goto err_vsi_cfg;
-diff --git a/drivers/net/ethernet/intel/ice/ice.h b/drivers/net/ethernet/intel/ice/ice.h
-index 67a3236ab1fc..6ad8002b22e1 100644
---- a/drivers/net/ethernet/intel/ice/ice.h
-+++ b/drivers/net/ethernet/intel/ice/ice.h
-@@ -331,7 +331,6 @@ struct ice_vsi {
- 	struct net_device *netdev;
- 	struct ice_sw *vsw;		 /* switch this VSI is on */
- 	struct ice_pf *back;		 /* back pointer to PF */
--	struct ice_port_info *port_info; /* back pointer to port_info */
- 	struct ice_rx_ring **rx_rings;	 /* Rx ring array */
- 	struct ice_tx_ring **tx_rings;	 /* Tx ring array */
- 	struct ice_q_vector **q_vectors; /* q_vector array */
-@@ -349,12 +348,9 @@ struct ice_vsi {
- 	/* tell if only dynamic irq allocation is allowed */
- 	bool irq_dyn_alloc;
- 
--	enum ice_vsi_type type;
- 	u16 vsi_num;			/* HW (absolute) index of this VSI */
- 	u16 idx;			/* software index in pf->vsi[] */
- 
--	struct ice_vf *vf;		/* VF associated with this VSI */
--
- 	u16 num_gfltr;
- 	u16 num_bfltr;
- 
-@@ -446,12 +442,18 @@ struct ice_vsi {
- 	u8 old_numtc;
- 	u16 old_ena_tc;
- 
--	struct ice_channel *ch;
--
- 	/* setup back reference, to which aggregator node this VSI
- 	 * corresponds to
- 	 */
- 	struct ice_agg_node *agg_node;
-+
-+	struct_group_tagged(ice_vsi_cfg_params, params,
-+		struct ice_port_info *port_info; /* back pointer to port_info */
-+		struct ice_channel *ch; /* VSI's channel structure, may be NULL */
-+		struct ice_vf *vf; /* VF associated with this VSI, may be NULL */
-+		u32 flags; /* VSI flags used for rebuild and configuration */
-+		enum ice_vsi_type type; /* the type of the VSI */
-+	);
- } ____cacheline_internodealigned_in_smp;
- 
- /* struct that defines an interrupt vector */
-diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/ethernet/intel/ice/ice_lib.c
-index d06e7c82c433..5371e91f6bbb 100644
---- a/drivers/net/ethernet/intel/ice/ice_lib.c
-+++ b/drivers/net/ethernet/intel/ice/ice_lib.c
-@@ -2227,10 +2227,8 @@ static int ice_vsi_cfg_tc_lan(struct ice_pf *pf, struct ice_vsi *vsi)
- /**
-  * ice_vsi_cfg_def - configure default VSI based on the type
-  * @vsi: pointer to VSI
-- * @params: the parameters to configure this VSI with
-  */
--static int
--ice_vsi_cfg_def(struct ice_vsi *vsi, struct ice_vsi_cfg_params *params)
-+static int ice_vsi_cfg_def(struct ice_vsi *vsi)
- {
- 	struct device *dev = ice_pf_to_dev(vsi->back);
- 	struct ice_pf *pf = vsi->back;
-@@ -2238,7 +2236,7 @@ ice_vsi_cfg_def(struct ice_vsi *vsi, struct ice_vsi_cfg_params *params)
- 
- 	vsi->vsw = pf->first_sw;
- 
--	ret = ice_vsi_alloc_def(vsi, params->ch);
-+	ret = ice_vsi_alloc_def(vsi, vsi->ch);
- 	if (ret)
- 		return ret;
- 
-@@ -2263,7 +2261,7 @@ ice_vsi_cfg_def(struct ice_vsi *vsi, struct ice_vsi_cfg_params *params)
- 	ice_vsi_set_tc_cfg(vsi);
- 
- 	/* create the VSI */
--	ret = ice_vsi_init(vsi, params->flags);
-+	ret = ice_vsi_init(vsi, vsi->flags);
- 	if (ret)
- 		goto unroll_get_qs;
- 
-@@ -2383,23 +2381,16 @@ ice_vsi_cfg_def(struct ice_vsi *vsi, struct ice_vsi_cfg_params *params)
- /**
-  * ice_vsi_cfg - configure a previously allocated VSI
-  * @vsi: pointer to VSI
-- * @params: parameters used to configure this VSI
-  */
--int ice_vsi_cfg(struct ice_vsi *vsi, struct ice_vsi_cfg_params *params)
-+int ice_vsi_cfg(struct ice_vsi *vsi)
- {
- 	struct ice_pf *pf = vsi->back;
- 	int ret;
- 
--	if (WARN_ON(params->type == ICE_VSI_VF && !params->vf))
-+	if (WARN_ON(vsi->type == ICE_VSI_VF && !vsi->vf))
- 		return -EINVAL;
- 
--	vsi->type = params->type;
--	vsi->port_info = params->pi;
--
--	/* For VSIs which don't have a connected VF, this will be NULL */
--	vsi->vf = params->vf;
--
--	ret = ice_vsi_cfg_def(vsi, params);
-+	ret = ice_vsi_cfg_def(vsi);
- 	if (ret)
- 		return ret;
- 
-@@ -2485,7 +2476,7 @@ ice_vsi_setup(struct ice_pf *pf, struct ice_vsi_cfg_params *params)
- 	 * a port_info structure for it.
- 	 */
- 	if (WARN_ON(!(params->flags & ICE_VSI_FLAG_INIT)) ||
--	    WARN_ON(!params->pi))
-+	    WARN_ON(!params->port_info))
- 		return NULL;
- 
- 	vsi = ice_vsi_alloc(pf);
-@@ -2494,7 +2485,8 @@ ice_vsi_setup(struct ice_pf *pf, struct ice_vsi_cfg_params *params)
- 		return NULL;
- 	}
- 
--	ret = ice_vsi_cfg(vsi, params);
-+	vsi->params = *params;
-+	ret = ice_vsi_cfg(vsi);
- 	if (ret)
- 		goto err_vsi_cfg;
- 
-@@ -3041,7 +3033,6 @@ ice_vsi_realloc_stat_arrays(struct ice_vsi *vsi)
-  */
- int ice_vsi_rebuild(struct ice_vsi *vsi, u32 vsi_flags)
- {
--	struct ice_vsi_cfg_params params = {};
- 	struct ice_coalesce_stored *coalesce;
- 	int prev_num_q_vectors;
- 	struct ice_pf *pf;
-@@ -3050,9 +3041,7 @@ int ice_vsi_rebuild(struct ice_vsi *vsi, u32 vsi_flags)
- 	if (!vsi)
- 		return -EINVAL;
- 
--	params = ice_vsi_to_params(vsi);
--	params.flags = vsi_flags;
--
-+	vsi->flags = vsi_flags;
- 	pf = vsi->back;
- 	if (WARN_ON(vsi->type == ICE_VSI_VF && !vsi->vf))
- 		return -EINVAL;
-@@ -3062,7 +3051,7 @@ int ice_vsi_rebuild(struct ice_vsi *vsi, u32 vsi_flags)
- 		goto err_vsi_cfg;
- 
- 	ice_vsi_decfg(vsi);
--	ret = ice_vsi_cfg_def(vsi, &params);
-+	ret = ice_vsi_cfg_def(vsi);
- 	if (ret)
- 		goto err_vsi_cfg;
- 
-diff --git a/drivers/net/ethernet/intel/ice/ice_lib.h b/drivers/net/ethernet/intel/ice/ice_lib.h
-index 9cd23afe5f15..94ce8964dda6 100644
---- a/drivers/net/ethernet/intel/ice/ice_lib.h
-+++ b/drivers/net/ethernet/intel/ice/ice_lib.h
-@@ -11,43 +11,6 @@
- #define ICE_VSI_FLAG_INIT	BIT(0)
- #define ICE_VSI_FLAG_NO_INIT	0
- 
--/**
-- * struct ice_vsi_cfg_params - VSI configuration parameters
-- * @pi: pointer to the port_info instance for the VSI
-- * @ch: pointer to the channel structure for the VSI, may be NULL
-- * @vf: pointer to the VF associated with this VSI, may be NULL
-- * @type: the type of VSI to configure
-- * @flags: VSI flags used for rebuild and configuration
-- *
-- * Parameter structure used when configuring a new VSI.
-- */
--struct ice_vsi_cfg_params {
--	struct ice_port_info *pi;
--	struct ice_channel *ch;
--	struct ice_vf *vf;
--	enum ice_vsi_type type;
--	u32 flags;
--};
--
--/**
-- * ice_vsi_to_params - Get parameters for an existing VSI
-- * @vsi: the VSI to get parameters for
-- *
-- * Fill a parameter structure for reconfiguring a VSI with its current
-- * parameters, such as during a rebuild operation.
-- */
--static inline struct ice_vsi_cfg_params ice_vsi_to_params(struct ice_vsi *vsi)
--{
--	struct ice_vsi_cfg_params params = {};
--
--	params.pi = vsi->port_info;
--	params.ch = vsi->ch;
--	params.vf = vsi->vf;
--	params.type = vsi->type;
--
--	return params;
--}
--
- const char *ice_vsi_type_str(enum ice_vsi_type vsi_type);
- 
- bool ice_pf_state_is_nominal(struct ice_pf *pf);
-@@ -101,7 +64,7 @@ void ice_vsi_decfg(struct ice_vsi *vsi);
- void ice_dis_vsi(struct ice_vsi *vsi, bool locked);
- 
- int ice_vsi_rebuild(struct ice_vsi *vsi, u32 vsi_flags);
--int ice_vsi_cfg(struct ice_vsi *vsi, struct ice_vsi_cfg_params *params);
-+int ice_vsi_cfg(struct ice_vsi *vsi);
- 
- bool ice_is_reset_in_progress(unsigned long *state);
- int ice_wait_for_reset(struct ice_pf *pf, unsigned long timeout);
-diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index 8513deb266eb..01c32a785ea4 100644
---- a/drivers/net/ethernet/intel/ice/ice_main.c
-+++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -3685,7 +3685,7 @@ ice_pf_vsi_setup(struct ice_pf *pf, struct ice_port_info *pi)
- 	struct ice_vsi_cfg_params params = {};
- 
- 	params.type = ICE_VSI_PF;
--	params.pi = pi;
-+	params.port_info = pi;
- 	params.flags = ICE_VSI_FLAG_INIT;
- 
- 	return ice_vsi_setup(pf, &params);
-@@ -3698,7 +3698,7 @@ ice_chnl_vsi_setup(struct ice_pf *pf, struct ice_port_info *pi,
- 	struct ice_vsi_cfg_params params = {};
- 
- 	params.type = ICE_VSI_CHNL;
--	params.pi = pi;
-+	params.port_info = pi;
- 	params.ch = ch;
- 	params.flags = ICE_VSI_FLAG_INIT;
- 
-@@ -3719,7 +3719,7 @@ ice_ctrl_vsi_setup(struct ice_pf *pf, struct ice_port_info *pi)
- 	struct ice_vsi_cfg_params params = {};
- 
- 	params.type = ICE_VSI_CTRL;
--	params.pi = pi;
-+	params.port_info = pi;
- 	params.flags = ICE_VSI_FLAG_INIT;
- 
- 	return ice_vsi_setup(pf, &params);
-@@ -3739,7 +3739,7 @@ ice_lb_vsi_setup(struct ice_pf *pf, struct ice_port_info *pi)
- 	struct ice_vsi_cfg_params params = {};
- 
- 	params.type = ICE_VSI_LB;
--	params.pi = pi;
-+	params.port_info = pi;
- 	params.flags = ICE_VSI_FLAG_INIT;
- 
- 	return ice_vsi_setup(pf, &params);
-diff --git a/drivers/net/ethernet/intel/ice/ice_sriov.c b/drivers/net/ethernet/intel/ice/ice_sriov.c
-index a60dacf8942a..067712f4923f 100644
---- a/drivers/net/ethernet/intel/ice/ice_sriov.c
-+++ b/drivers/net/ethernet/intel/ice/ice_sriov.c
-@@ -225,7 +225,7 @@ static struct ice_vsi *ice_vf_vsi_setup(struct ice_vf *vf)
- 	struct ice_vsi *vsi;
- 
- 	params.type = ICE_VSI_VF;
--	params.pi = ice_vf_get_port_info(vf);
-+	params.port_info = ice_vf_get_port_info(vf);
- 	params.vf = vf;
- 	params.flags = ICE_VSI_FLAG_INIT;
- 
-diff --git a/drivers/net/ethernet/intel/ice/ice_vf_lib.c b/drivers/net/ethernet/intel/ice/ice_vf_lib.c
-index dab25d333bd1..48a8d462d76a 100644
---- a/drivers/net/ethernet/intel/ice/ice_vf_lib.c
-+++ b/drivers/net/ethernet/intel/ice/ice_vf_lib.c
-@@ -259,20 +259,18 @@ static void ice_vf_pre_vsi_rebuild(struct ice_vf *vf)
- int ice_vf_reconfig_vsi(struct ice_vf *vf)
- {
- 	struct ice_vsi *vsi = ice_get_vf_vsi(vf);
--	struct ice_vsi_cfg_params params = {};
- 	struct ice_pf *pf = vf->pf;
- 	int err;
- 
- 	if (WARN_ON(!vsi))
- 		return -EINVAL;
- 
--	params = ice_vsi_to_params(vsi);
--	params.flags = ICE_VSI_FLAG_NO_INIT;
-+	vsi->flags = ICE_VSI_FLAG_NO_INIT;
- 
- 	ice_vsi_decfg(vsi);
- 	ice_fltr_remove_all(vsi);
- 
--	err = ice_vsi_cfg(vsi, &params);
-+	err = ice_vsi_cfg(vsi);
- 	if (err) {
- 		dev_err(ice_pf_to_dev(pf),
- 			"Failed to reconfigure the VF%u's VSI, error %d\n",
-@@ -1243,7 +1241,7 @@ struct ice_vsi *ice_vf_ctrl_vsi_setup(struct ice_vf *vf)
- 	struct ice_vsi *vsi;
- 
- 	params.type = ICE_VSI_CTRL;
--	params.pi = ice_vf_get_port_info(vf);
-+	params.port_info = ice_vf_get_port_info(vf);
- 	params.vf = vf;
- 	params.flags = ICE_VSI_FLAG_INIT;
- 
+> +	if (!skb)
+> +		goto lin_out;
+> +
+> +	can_skb_reserve(skb);
+> +	can_skb_prv(skb)->ifindex = dev->ifindex;
+> +	can_skb_prv(skb)->skbcnt = 0;
+> +	skb_put_data(skb, &cf, cfsiz);
+> +
+> +	skb->dev = dev;
+> +	can_skb_set_owner(skb, sk);
+> +	ret = can_send(skb, 1); /* send with loopback */
+> +
+> +lin_out:
+> +	netdev_put(dev, &tracker);
+> +	return ret;
+> +}
+> +
+>  /*
+>   * bcm_sendmsg - process BCM commands (opcodes) from the userspace
+>   */
+> @@ -1429,12 +1483,30 @@ static int bcm_sendmsg(struct socket *sock, struct msghdr *msg, size_t size)
+>  
+>  	case TX_SEND:
+>  		/* we need exactly one CAN frame behind the msg head */
+> -		if ((msg_head.nframes != 1) || (size != cfsiz + MHSIZ))
+> +		if (msg_head.nframes != 1 || size != cfsiz + MHSIZ)
+
+Unrelated style fix, doesn't belong to this patch.
+
+>  			ret = -EINVAL;
+>  		else
+>  			ret = bcm_tx_send(msg, ifindex, sk, cfsiz);
+>  		break;
+>  
+> +	case RX_LIN_SETUP:
+> +		/* we need exactly one CAN frame behind the msg head */
+> +		if (msg_head.nframes != 1 || size != cfsiz + MHSIZ)
+> +			ret = -EINVAL;
+> +		else
+> +			ret = bcm_lin_setup(&msg_head, msg, ifindex, sk, cfsiz,
+> +					    1);
+> +		break;
+> +
+> +	case RX_LIN_DELETE:
+> +		/* we need exactly one CAN frame behind the msg head */
+> +		if (msg_head.nframes != 1 || size != cfsiz + MHSIZ)
+> +			ret = -EINVAL;
+> +		else
+> +			ret = bcm_lin_setup(&msg_head, msg, ifindex, sk, cfsiz,
+> +					    0);
+> +		break;
+> +
+>  	default:
+>  		ret = -EINVAL;
+>  		break;
+> 
+
 -- 
-2.41.0
+ i.
 
 
