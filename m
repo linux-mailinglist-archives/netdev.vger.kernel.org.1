@@ -1,68 +1,70 @@
-Return-Path: <netdev+bounces-93647-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93646-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A71F98BC989
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 10:26:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 639BA8BC987
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 10:26:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6213F280E94
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 08:26:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 85F811C2144A
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 08:26:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAFAD1419BC;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B15B1411FE;
 	Mon,  6 May 2024 08:26:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f78.google.com (mail-io1-f78.google.com [209.85.166.78])
+Received: from mail-io1-f79.google.com (mail-io1-f79.google.com [209.85.166.79])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64D051411F6
-	for <netdev@vger.kernel.org>; Mon,  6 May 2024 08:26:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 113DC1411F3
+	for <netdev@vger.kernel.org>; Mon,  6 May 2024 08:26:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.79
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714983985; cv=none; b=kSyKMUzNUmOUI6AYQ+dauKy73G1sHR370td2R1rU9wkPVDCZYLB809XrytFKOeqVap+oxFPs0FWI67p7ZZrvW8ttOU1yVBKd5lW3u+jwGHj02wkKLZr2FyBJXG/v+z/brbctjHeRTiQuGfWVw8TuAd8KR2emKlO4FrnmJg2MS5Y=
+	t=1714983985; cv=none; b=cI5xfHSxoF6qIsHryPpvDsuSQsJPPTBc0Vv6fdlQQ0p2M/5b3ZinabSHPDv+V5ansicJ7IcimPR7ZscNWrpHkFgWhETQmxas54otuP08+LmjFuj12TcFwuhoE/Ri4UF7n0mk67iv678bWVMnXYL1rZLa1/3ougRviAtM1x0gTHE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1714983985; c=relaxed/simple;
-	bh=1gnWL3AWkbByxKqcsyTl0Pn9NxYdIMlbdOu27yM+k7Q=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Dd7vIWebbNXrzq4fWDPM7ud+U4r43ggc33+iw/RpDrPQAR1El7pRMjM10u9WTGujgG5k0flrSwYIdxXK08Lmw/H/MTGwFREP7BDYLVB9VCJy6yTAwzbLzgNdB/26+qJRJjj4B3q/RETaIfVwUGO0gnTid6pBwz0Z5ycK2fUw23g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.78
+	bh=9DH8669XG/Ixy8wh+L2L+LtEHVqz9ke80uxBV0M0yyU=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=f2rbAUOSb97uyKR7DF/vFVhZOVolMCuKr2mgswtqogyxdsoDWIpJWUJ8//Kb5tL86W5/4iFc5kQBIxMADQsuVHE8vxtt7BDGQlqgMNjK+2Q97pzarNyW/IFN3qfHXb+GhNCL0oJbD9cpNZD+CZ9Psx/5hT3IorWYbFWgK/VUKK0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.79
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f78.google.com with SMTP id ca18e2360f4ac-7dab89699a8so211122039f.2
-        for <netdev@vger.kernel.org>; Mon, 06 May 2024 01:26:24 -0700 (PDT)
+Received: by mail-io1-f79.google.com with SMTP id ca18e2360f4ac-7dd8cd201d6so222415639f.0
+        for <netdev@vger.kernel.org>; Mon, 06 May 2024 01:26:23 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1714983983; x=1715588783;
         h=to:from:subject:message-id:date:mime-version:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=4oQYfjPoTswq9La2UDJTWDIy0E4GcKbv/iMKFV9nv4Y=;
-        b=s4X1MF7bs8hY5ZcbCjexXwORC3KgCLP2pGgR7kpI/Sze53Ep1hlIGo6CdoMJRTwcj8
-         YzVB5nchGQKHuNOKcA7o/GUTRA7PCpv9azqvtINqoWfCY9seae1SefyJsZiqZlnMd//4
-         zCstt6JeV78n8ctfXQG411nBNETdfahNtE65m77dqhxN99jMEoxcEJ+PBKa7Mz9ajcdQ
-         OFJYO0Sv/1sJlGqhAcI9LWKctr9CHj978lDnSx1QS7JRgFs4MZYN/CRbb6f4av9ThBMT
-         WyxM4FZhFreHZp5eowKfmvJ/JPOv6XVPiSismxYg0Z9H2BsICJAN2HLVQ2aVXdNwtTgx
-         ZLIw==
-X-Forwarded-Encrypted: i=1; AJvYcCXeHjUzGrGSgO9Xrtc0+IKUjrBco5p5r9GJDM232hBNCfd/21aJ++2MbupSF1j94A48BWZwTqcSkLig/LTYIEX1ucXxAxN+
-X-Gm-Message-State: AOJu0YxcwDh9pJ9fjsG6qyhux4Wl+rfXDQoKvMF32nPWqHrPxxeKS+jp
-	Hh2LzbHPhDVY5zhKB0RiLRiGaI38rX7r6CZuAjJDleOPd+8BhPH4VbJnc3YOwBF9MY6YwktGKsO
-	iFGlgR2dRJ9QcK3NjduJNWE92ZlYXCCwHsmY/dneHxPO37EscL23xiX0=
-X-Google-Smtp-Source: AGHT+IH0auiScA/jwdSBOyDC5Dqm3jkTillkPzY+x0oBjWx/wYwoXx2mSnERXRQoer2DfOhUl2EPNYhPfCZi/AFuVLc4sZCUfb6O
+        bh=L2xlgFBEnuKBvs1b/xq2ok0L7pUKU22p3gz9yez+dYI=;
+        b=FXdj+5WdB+1H1Xxtxi5DIu4Z9AkGDJ3NgynKweco3AgWC9NuRXp7u8Btm0NmsRpC5a
+         JXYkR/OQwTRiCq8EAN8C9W4mZAzISrLpLnlFpKR4KUvcDclH2nAqpbOqhU3l9oX1pk3D
+         fymTwszT8qZxa9289nXCzA00wgKLruZw3EbeAnP22n29kejjfHuQD5tayH1XjSpoMAXu
+         YaADNHWCLTCFI41F06oHMcO9cU7o6opBk04gR5g7N+uSngxRnzudHJofrarca/tWv7Wb
+         +UbWMzzs/aMOeIVYXCgEREgBdusUiWMs4bdVkEdCbELj1z+UztZlgSV05aNs1/BeLtck
+         V9kg==
+X-Forwarded-Encrypted: i=1; AJvYcCWAtLW/3KBw9FjHWggfiHlyc+SjPytfnTom8OaarYDEpuS9PBH5dHAiuMNl7hNPiPitRXemYCay9Z/Kz6YRp4ab/MlK83gk
+X-Gm-Message-State: AOJu0YwxImvG5SEq22wV6ScsFd6T/emxK01J7ntagudjgJPr4D2U5kvd
+	nuH2Dxzb2CG8E1jVCqiPCqX9utZaxKvX+uEp1VuP8vQMpYRNBQ8jbMjLqkKXrWXTL0sfihKKuz5
+	PvhoQw19NhnCuvCKHAsfek2uH5uqLXdPdsYFmMvdqUzvlTLVLF2ut8K8=
+X-Google-Smtp-Source: AGHT+IHQv0tSDZbVA33dBTBInuUMcIm0TDgZIdbPg037yGhhXbdcqEHJgGolzLQYL6h7JXmdlh7XCv6Kn7vbdpLB/ZPhFvS8cUuX
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a02:a412:0:b0:488:59cc:eb4c with SMTP id
- c18-20020a02a412000000b0048859cceb4cmr389030jal.3.1714983983599; Mon, 06 May
+X-Received: by 2002:a05:6638:4c85:b0:488:59cc:eb44 with SMTP id
+ do5-20020a0566384c8500b0048859cceb44mr409193jab.3.1714983983353; Mon, 06 May
  2024 01:26:23 -0700 (PDT)
 Date: Mon, 06 May 2024 01:26:23 -0700
 X-Google-Appengine-App-Id: s~syzkaller
 X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000235bec0617c4d391@google.com>
-Subject: [syzbot] [net?] KMSAN: uninit-value in cmsghdr_from_user_compat_to_kern
-From: syzbot <syzbot+bbafcc77279b6c156e52@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+Message-ID: <0000000000001fa3ce0617c4d3c1@google.com>
+Subject: [syzbot] [can?] WARNING in j1939_xtp_rx_rts (2)
+From: syzbot <syzbot+ce5405b9159db688fa37@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, kernel@pengutronix.de, 
+	kuba@kernel.org, linux-can@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	mkl@pengutronix.de, netdev@vger.kernel.org, o.rempel@pengutronix.de, 
+	pabeni@redhat.com, robin@protonic.nl, socketcan@hartkopp.net, 
 	syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
 
@@ -70,72 +72,112 @@ Hello,
 
 syzbot found the following issue on:
 
-HEAD commit:    7367539ad4b0 Merge tag 'cxl-fixes-6.9-rc7' of git://git.ke..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=1444078b180000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=bbf567496022057b
-dashboard link: https://syzkaller.appspot.com/bug?extid=bbafcc77279b6c156e52
+HEAD commit:    cdc74c9d06e7 Merge branch 'gve-queue-api'
+git tree:       net-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=17beea2f180000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=7c70a227bc928e1b
+dashboard link: https://syzkaller.appspot.com/bug?extid=ce5405b9159db688fa37
 compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-userspace arch: i386
 
 Unfortunately, I don't have any reproducer for this issue yet.
 
 Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/b037b3fdb412/disk-7367539a.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/715a45b086cb/vmlinux-7367539a.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/a13ab40a70b3/bzImage-7367539a.xz
+disk image: https://storage.googleapis.com/syzbot-assets/f0df1462721b/disk-cdc74c9d.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/7e5c38fb35eb/vmlinux-cdc74c9d.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/8b7652427355/bzImage-cdc74c9d.xz
 
 IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+bbafcc77279b6c156e52@syzkaller.appspotmail.com
+Reported-by: syzbot+ce5405b9159db688fa37@syzkaller.appspotmail.com
 
-=====================================================
-BUG: KMSAN: uninit-value in cmsghdr_from_user_compat_to_kern+0x568/0x10d0 net/compat.c:154
- cmsghdr_from_user_compat_to_kern+0x568/0x10d0 net/compat.c:154
- ____sys_sendmsg+0x222/0xb60 net/socket.c:2546
- __sys_sendmsg_sock+0x42/0x60 net/socket.c:2650
- io_sendmsg+0x47a/0x1020 io_uring/net.c:453
- io_issue_sqe+0x371/0x1150 io_uring/io_uring.c:1897
- io_wq_submit_work+0xa17/0xeb0 io_uring/io_uring.c:2006
- io_worker_handle_work+0xc3a/0x2050 io_uring/io-wq.c:596
- io_wq_worker+0x5a1/0x1370 io_uring/io-wq.c:649
- ret_from_fork+0x6d/0x90 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
-
-Uninit was stored to memory at:
- io_sendmsg+0x6a4/0x1020 io_uring/net.c:435
- io_issue_sqe+0x371/0x1150 io_uring/io_uring.c:1897
- io_wq_submit_work+0xa17/0xeb0 io_uring/io_uring.c:2006
- io_worker_handle_work+0xc3a/0x2050 io_uring/io-wq.c:596
- io_wq_worker+0x5a1/0x1370 io_uring/io-wq.c:649
- ret_from_fork+0x6d/0x90 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
-
-Uninit was created at:
- __alloc_pages+0x9d6/0xe70 mm/page_alloc.c:4598
- __alloc_pages_node include/linux/gfp.h:238 [inline]
- alloc_pages_node include/linux/gfp.h:261 [inline]
- alloc_slab_page mm/slub.c:2175 [inline]
- allocate_slab mm/slub.c:2338 [inline]
- new_slab+0x2de/0x1400 mm/slub.c:2391
- ___slab_alloc+0x1184/0x33d0 mm/slub.c:3525
- __kmem_cache_alloc_bulk mm/slub.c:4555 [inline]
- kmem_cache_alloc_bulk+0x503/0x13e0 mm/slub.c:4629
- __io_alloc_req_refill+0x248/0x780 io_uring/io_uring.c:1101
- io_alloc_req io_uring/io_uring.h:405 [inline]
- io_submit_sqes+0xaba/0x2fe0 io_uring/io_uring.c:2481
- __do_sys_io_uring_enter io_uring/io_uring.c:3668 [inline]
- __se_sys_io_uring_enter+0x407/0x4400 io_uring/io_uring.c:3603
- __ia32_sys_io_uring_enter+0x11d/0x1a0 io_uring/io_uring.c:3603
- ia32_sys_call+0x2c0/0x40a0 arch/x86/include/generated/asm/syscalls_32.h:427
- do_syscall_32_irqs_on arch/x86/entry/common.c:165 [inline]
- __do_fast_syscall_32+0xb4/0x120 arch/x86/entry/common.c:386
- do_fast_syscall_32+0x38/0x80 arch/x86/entry/common.c:411
- do_SYSENTER_32+0x1f/0x30 arch/x86/entry/common.c:449
- entry_SYSENTER_compat_after_hwframe+0x84/0x8e
-
-CPU: 1 PID: 20102 Comm: iou-wrk-20100 Tainted: G        W          6.9.0-rc6-syzkaller-00234-g7367539ad4b0 #0
+vxcan0: j1939_xtp_rx_abort_one: 0xffff888042069c00: 0x00000: (8) Duplicate sequence number (and software is not able to recover)
+vxcan0: j1939_xtp_rx_abort_one: 0xffff88804206a000: 0x00000: (8) Duplicate sequence number (and software is not able to recover)
+------------[ cut here ]------------
+WARNING: CPU: 1 PID: 11 at net/can/j1939/transport.c:1656 j1939_xtp_rx_rts_session_new net/can/j1939/transport.c:1656 [inline]
+WARNING: CPU: 1 PID: 11 at net/can/j1939/transport.c:1656 j1939_xtp_rx_rts+0x13db/0x1930 net/can/j1939/transport.c:1735
+Modules linked in:
+CPU: 1 PID: 11 Comm: kworker/u8:1 Not tainted 6.9.0-rc6-syzkaller-01478-gcdc74c9d06e7 #0
 Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
-=====================================================
+Workqueue: krdsd rds_connect_worker
+RIP: 0010:j1939_xtp_rx_rts_session_new net/can/j1939/transport.c:1656 [inline]
+RIP: 0010:j1939_xtp_rx_rts+0x13db/0x1930 net/can/j1939/transport.c:1735
+Code: e8 7a f6 8a f7 e9 d6 f1 ff ff 89 d9 80 e1 07 38 c1 0f 8c ea f1 ff ff 48 89 df e8 60 f6 8a f7 e9 dd f1 ff ff e8 06 fd 25 f7 90 <0f> 0b 90 e9 6d f2 ff ff 89 f9 80 e1 07 38 c1 0f 8c 51 ee ff ff 48
+RSP: 0018:ffffc90000a08640 EFLAGS: 00010246
+RAX: ffffffff8a702d7a RBX: 00000000fffffff5 RCX: ffff8880172abc00
+RDX: 0000000080000100 RSI: 00000000fffffff5 RDI: 0000000000000000
+RBP: ffffc90000a087a8 R08: ffffffff8a702aec R09: 1ffffffff25e80c6
+R10: dffffc0000000000 R11: fffffbfff25e80c7 R12: dffffc0000000000
+R13: ffff888042fab000 R14: 0000000000000014 R15: 00000000000007c6
+FS:  0000000000000000(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000000c000461144 CR3: 000000007cc42000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <IRQ>
+ j1939_tp_cmd_recv net/can/j1939/transport.c:2057 [inline]
+ j1939_tp_recv+0xb84/0x1050 net/can/j1939/transport.c:2144
+ j1939_can_recv+0x732/0xb20 net/can/j1939/main.c:112
+ deliver net/can/af_can.c:572 [inline]
+ can_rcv_filter+0x359/0x7f0 net/can/af_can.c:606
+ can_receive+0x327/0x480 net/can/af_can.c:663
+ can_rcv+0x144/0x260 net/can/af_can.c:687
+ __netif_receive_skb_one_core net/core/dev.c:5625 [inline]
+ __netif_receive_skb+0x2e0/0x650 net/core/dev.c:5739
+ process_backlog+0x391/0x7d0 net/core/dev.c:6068
+ __napi_poll+0xcb/0x490 net/core/dev.c:6722
+ napi_poll net/core/dev.c:6791 [inline]
+ net_rx_action+0x7bb/0x10a0 net/core/dev.c:6907
+ __do_softirq+0x2c6/0x980 kernel/softirq.c:554
+ invoke_softirq kernel/softirq.c:428 [inline]
+ __irq_exit_rcu+0xf2/0x1c0 kernel/softirq.c:633
+ irq_exit_rcu+0x9/0x30 kernel/softirq.c:645
+ instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1043 [inline]
+ sysvec_apic_timer_interrupt+0xa6/0xc0 arch/x86/kernel/apic/apic.c:1043
+ </IRQ>
+ <TASK>
+ asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:702
+RIP: 0010:security_socket_create+0x6e/0xb0 security/security.c:4374
+Code: 78 b8 97 fd 48 8b 1b 48 85 db 74 3b 48 8d 6b 18 48 89 e8 48 c1 e8 03 42 80 3c 30 00 74 08 48 89 ef e8 56 b8 97 fd 4c 8b 5d 00 <44> 89 ef 44 89 e6 44 89 fa 8b 4c 24 04 41 ff d3 66 90 85 c0 75 10
+RSP: 0018:ffffc90000107948 EFLAGS: 00000246
+RAX: 1ffffffff1bab1b8 RBX: ffffffff8dd58da8 RCX: ffff8880172abc00
+RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000000002
+RBP: ffffffff8dd58dc0 R08: ffffffff8948d77b R09: 0000000000000001
+R10: dffffc0000000000 R11: ffffffff846c8900 R12: 0000000000000001
+R13: 0000000000000002 R14: dffffc0000000000 R15: 0000000000000006
+ __sock_create+0xc9/0x920 net/socket.c:1526
+ rds_tcp_conn_path_connect+0x2bb/0xbc0
+ rds_connect_worker+0x1dd/0x2a0 net/rds/threads.c:176
+ process_one_work kernel/workqueue.c:3267 [inline]
+ process_scheduled_works+0xa10/0x17c0 kernel/workqueue.c:3348
+ worker_thread+0x86d/0xd70 kernel/workqueue.c:3429
+ kthread+0x2f0/0x390 kernel/kthread.c:388
+ ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+ </TASK>
+----------------
+Code disassembly (best guess):
+   0:	78 b8                	js     0xffffffba
+   2:	97                   	xchg   %eax,%edi
+   3:	fd                   	std
+   4:	48 8b 1b             	mov    (%rbx),%rbx
+   7:	48 85 db             	test   %rbx,%rbx
+   a:	74 3b                	je     0x47
+   c:	48 8d 6b 18          	lea    0x18(%rbx),%rbp
+  10:	48 89 e8             	mov    %rbp,%rax
+  13:	48 c1 e8 03          	shr    $0x3,%rax
+  17:	42 80 3c 30 00       	cmpb   $0x0,(%rax,%r14,1)
+  1c:	74 08                	je     0x26
+  1e:	48 89 ef             	mov    %rbp,%rdi
+  21:	e8 56 b8 97 fd       	call   0xfd97b87c
+  26:	4c 8b 5d 00          	mov    0x0(%rbp),%r11
+* 2a:	44 89 ef             	mov    %r13d,%edi <-- trapping instruction
+  2d:	44 89 e6             	mov    %r12d,%esi
+  30:	44 89 fa             	mov    %r15d,%edx
+  33:	8b 4c 24 04          	mov    0x4(%rsp),%ecx
+  37:	41 ff d3             	call   *%r11
+  3a:	66 90                	xchg   %ax,%ax
+  3c:	85 c0                	test   %eax,%eax
+  3e:	75 10                	jne    0x50
 
 
 ---
