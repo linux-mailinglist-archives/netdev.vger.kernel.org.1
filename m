@@ -1,204 +1,164 @@
-Return-Path: <netdev+bounces-93747-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93748-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84FFA8BD0B0
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 16:49:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C79D88BD0B5
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 16:50:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3B68A28C9E1
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 14:49:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8334D28D305
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 14:50:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D888415383A;
-	Mon,  6 May 2024 14:49:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4207615533A;
+	Mon,  6 May 2024 14:49:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TzngEn52"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CNa4ulzo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B3FB1534FD;
-	Mon,  6 May 2024 14:49:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9FA2155328
+	for <netdev@vger.kernel.org>; Mon,  6 May 2024 14:49:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715006983; cv=none; b=JKPU7ZlcvYihe850GQt3GlmzolbnFE31wmSQokGf/puxpr/apH4BIzoskYNqQoGuzeniod7I+fVvHvRWA3YHU8OHH0cDMo/fqyDE443N4rqe7VyKhd2LVq6gmJtqaLxfewsjbhTbJmvuVdYjUwNkxnuFA0tufMEIb+guNqNOzs0=
+	t=1715006990; cv=none; b=go65FcjJmyV2SFzV9NtMA8aVdKjmj1I2icROJ1YkthWM9lXMz+9w0gawVbz/xWDO5sFZUd2+WxyjhMF9HymsgElEOgd4L77kVhNySagcIJfrOUxDpwpWlFbCLJRgNxY1mHL9FFWsCwvo9VOXZ+C0l9YGPcDkIrrITwUxk8GsasA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715006983; c=relaxed/simple;
-	bh=ZK+XOL8bJQqTl71D+nNJPPuMVqC5lU22ILMhkVdpqXo=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=rCG5Gg+feWiCkH92ae51fMfd7sZkD8fPa8pWKtIuS4zpDoGnJsuIG+3AM+BuJqzQgQAaoU7BnvQTKhd1+3onuXOa+uVW6eAKSMdmSalDk1Dxv3KNSZkJSU+JB/mTpNLKUQYxgWe+udL2/iXh/Vhw/CufmHqurcvCQ4uAy6/7b7k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TzngEn52; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-41bab13ca4eso13294575e9.1;
-        Mon, 06 May 2024 07:49:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715006980; x=1715611780; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=HVbZDFfLK9GlBOKzZLEG1i0oNm4kAONQTZZJbg419As=;
-        b=TzngEn52o2M3Abb0R22xedesh8zKkNUqCaF1jrnrkfQxuNnckbk+cYLcFbsaoggrc0
-         hbYBsQ8KYaInU23NOGxOvlG77/AQWm5ZXvyo2EZ58aXnuY7seuN0jf82rvM6uSQifge1
-         l/9bbgPp7bD2+ev80wqLIew9wSV8GA9H8HNYQkzV2Mj6ME9bnrsq4TvEBG0g8vfNCP0y
-         LTcghxmkHs3d/efVsCnWw5X9ehEp7EnC53k1zGg99YHnjQaxlZdOsEpooPrPkZz43gam
-         McRX46pIpMoYi7D3eOl5NdNsCG4ECrIzDOzps/gifOgXqJJsJr6YUY7fyna9eQK0oFFW
-         FzaQ==
+	s=arc-20240116; t=1715006990; c=relaxed/simple;
+	bh=wFEAgz9DoEMtNEfhF2whHUgl+SQ1hbYNvw0LVwBJMHI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jy+Zl+7GiB+5s/Jsx9V98ORoB535uG6XBM860WW69+ohbN+1KWZu17IZtjgTTiA4K9dgBbj4P+Aei4jXNCxyDw1oiswDgZnoPdHkneKib/LdOE+izimieqYC3S0783G3Yw9rhS6zMKYnUdY32Z72sC6mPG8clrGeMzDBifr4TTc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CNa4ulzo; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1715006986;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ouwyK0typuZ1ow/pNC/Gp96v2+HGSiLFxZMM2D2vdpo=;
+	b=CNa4ulzob4zGYAef+WUviR82ooP2GI3SAAlGLeumVxP8iVsgZo0PnH6qclcQytIG3d2iVL
+	Kk0JBwo7OuBOCxO+8x7dY7WN9FO8Q5ltmz6p0VazMMo9YkbOLp+tUQU3vnFYocoS5SxxZR
+	FBkaZ8j1P8y+4EU0/iLRvzwE1Cjhx98=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-240-kXZFN4ONP4q1a8bX-L5DIQ-1; Mon, 06 May 2024 10:49:45 -0400
+X-MC-Unique: kXZFN4ONP4q1a8bX-L5DIQ-1
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-41e9feb655eso4831525e9.1
+        for <netdev@vger.kernel.org>; Mon, 06 May 2024 07:49:44 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715006980; x=1715611780;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=HVbZDFfLK9GlBOKzZLEG1i0oNm4kAONQTZZJbg419As=;
-        b=Umm1/xfFdSxH4AYGzDj5rXgHpZKNEoIWKRVWDG05gaxPDm4mj04J+FNHB8cOHriFg+
-         kjo7KpD+KOhSEse0ry8d/73xzYOI1FlwIbFjOgdbw0smewC8NAB/J8lfguBgL9/BBsFd
-         PO97y9MepNZazEBHHuUvfYz5ijjxNNOu5gDpD3Ze8x6MEWseB0ldFERjQ6BrRhldZkbM
-         VY4UQqje7BtW0yG/nEH05ZLVgNe+TWe8zOG6sJiSoZ0VNhEEwQDcglWjvRw7CQFvFU4V
-         2og3nivCDwstG/1YUm6zV/UD3KuDVLsosGc1G0hI5fi7hlj1QKOfQ3SgZQDeL1Umf8vS
-         QDZw==
-X-Forwarded-Encrypted: i=1; AJvYcCWcIlkkGa51eW8KzR+3fVpe/QN4fG+hWfaH53alUV5HXWKSf4o0NVJW6K8W7aglwXNzd2cOw4FA8kAuYHLWtKJ+bUAlFEFTqGhMjxx2O6X0rbukXafB2+2SUVJPL01U7L/vyy4Q1lFoMBWG2NrpHQH9bIeGv0nitEjZaDDRoSn2g7vDTwoKzJdz+WYEOeudDOyadudYYlHB
-X-Gm-Message-State: AOJu0YwuncSwB8UzBlMZVBJZtoVDAXFgQHg71tzUz+25MEsyzVVTAaZT
-	ZEplEhWuRyJsvQ8i9fa7LQTMmUCQqWcSH25odXPo/J8cWwx95R3T
-X-Google-Smtp-Source: AGHT+IGl7zXDr9leH/q9qrgTMzgAy+NEDD71IXcy8Lrko6LQCqNtY1rqNwlvt41J2VWHV4ujK6Ftiw==
-X-Received: by 2002:a05:600c:19cc:b0:41c:15d:98ac with SMTP id u12-20020a05600c19cc00b0041c015d98acmr8128552wmq.11.1715006979612;
-        Mon, 06 May 2024 07:49:39 -0700 (PDT)
-Received: from vitor-nb.. ([2001:8a0:e622:f700:5a5f:df46:89e1:5068])
-        by smtp.gmail.com with ESMTPSA id g19-20020a05600c311300b0041496734318sm20134756wmo.24.2024.05.06.07.49.38
+        d=1e100.net; s=20230601; t=1715006984; x=1715611784;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ouwyK0typuZ1ow/pNC/Gp96v2+HGSiLFxZMM2D2vdpo=;
+        b=qrQmbYYx3hnRwL0OHSdeVx1B3j3QzDsuvW3SH2KfwBRRy5wVmLRDLwDSA/uvnUQMkW
+         K2njpw8Ssbg3k7KRiGE93+9z1GGxkGaZYMRVDaACarGQV57Ii5YEyHPhg1M4yk+jQOW4
+         i9pFyRPsk6p0WPCTtFaALN7Opg6I0lg5f2KxpLvSIY1/c4P0OctaO35j9IYoqJwQHztT
+         yJFdf8y/vpeRmgS8jjKtmqxjhLJwhED0rvhnUAXZV7QlbJj4JH1A3Y+ezSZ/CbcxXMwX
+         Y6nkLSz1U15C1Gq8BnExlm8OaDy4WPGOhoNtNExyDzYaewX+kZNpv/y0d5Wx5VDfJBaV
+         dVSA==
+X-Forwarded-Encrypted: i=1; AJvYcCXOuDKQ29PwpuODfJiWdkF18hGC5CFOap5ItDpY/Z3k69YoXV3GaaPLO6uu2DQWzNJZKyGPX/4pCaDzx7aCTD1i5A46NXWI
+X-Gm-Message-State: AOJu0YwYBLymLGC0j3n9EF5ULL6VrdN/TvcvYQIcgtsXAlMobg8RqfQa
+	HZ1zRSvR9eI0vNGIC+eYtfEKeTB8eUyRtdqAPbLVEusNkKgHS4BYP+DrdLN2nlaySGz6OH7aGqu
+	NI/SYyfg/XhTOhggJlbHqO0QtvGisvSxwNQJiHptBPcRQpLJlF8dSww==
+X-Received: by 2002:a05:600c:4743:b0:41b:ca55:2e2c with SMTP id w3-20020a05600c474300b0041bca552e2cmr8502335wmo.17.1715006983673;
+        Mon, 06 May 2024 07:49:43 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFMEmpLMRChpFtoTgMDV3aoqDMFyufxEAAMjuwb6gH8jVd4UbrgetEx8t9mH1iRsKhjutk0Nw==
+X-Received: by 2002:a05:600c:4743:b0:41b:ca55:2e2c with SMTP id w3-20020a05600c474300b0041bca552e2cmr8502298wmo.17.1715006983060;
+        Mon, 06 May 2024 07:49:43 -0700 (PDT)
+Received: from localhost (net-93-151-202-124.cust.dsl.teletu.it. [93.151.202.124])
+        by smtp.gmail.com with ESMTPSA id cw1-20020a056000090100b0034dec80428asm10817755wrb.67.2024.05.06.07.49.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 May 2024 07:49:39 -0700 (PDT)
-From: Vitor Soares <ivitro@gmail.com>
-To: Marc Kleine-Budde <mkl@pengutronix.de>,
-	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
-	Thomas Kopp <thomas.kopp@microchip.com>,
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Vitor Soares <vitor.soares@toradex.com>,
-	linux-can@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ivitro@gmail.com,
-	stable@vger.kernel.org
-Subject: [PATCH v4] can: mcp251xfd: fix infinite loop when xmit fails
-Date: Mon,  6 May 2024 15:49:18 +0100
-Message-Id: <20240506144918.419536-1-ivitro@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        Mon, 06 May 2024 07:49:42 -0700 (PDT)
+Date: Mon, 6 May 2024 16:49:40 +0200
+From: Lorenzo Bianconi <lorenzo.bianconi@redhat.com>
+To: syzbot <syzbot+f534bd500d914e34b59e@syzkaller.appspotmail.com>
+Cc: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org,
+	daniel@iogearbox.net, davem@davemloft.net, edumazet@google.com,
+	hawk@kernel.org, john.fastabend@gmail.com, kuba@kernel.org,
+	linux-kernel@vger.kernel.org, lorenzo@kernel.org,
+	netdev@vger.kernel.org, pabeni@redhat.com,
+	syzkaller-bugs@googlegroups.com, toke@redhat.com
+Subject: Re: [syzbot] [bpf?] [net?] WARNING in __xdp_reg_mem_model
+Message-ID: <ZjjuBCk33QtxLrAm@lore-desk>
+References: <0000000000004cc3030616474b1e@google.com>
+ <000000000000ae301f0617a4a52c@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="vAieqiNxGUQydHCv"
+Content-Disposition: inline
+In-Reply-To: <000000000000ae301f0617a4a52c@google.com>
 
-From: Vitor Soares <vitor.soares@toradex.com>
 
-When the mcp251xfd_start_xmit() function fails, the driver stops
-processing messages, and the interrupt routine does not return,
-running indefinitely even after killing the running application.
+--vAieqiNxGUQydHCv
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Error messages:
-[  441.298819] mcp251xfd spi2.0 can0: ERROR in mcp251xfd_start_xmit: -16
-[  441.306498] mcp251xfd spi2.0 can0: Transmit Event FIFO buffer not empty. (seq=0x000017c7, tef_tail=0x000017cf, tef_head=0x000017d0, tx_head=0x000017d3).
-... and repeat forever.
+> syzbot has bisected this issue to:
+>=20
+> commit 2b0cfa6e49566c8fa6759734cf821aa6e8271a9e
+> Author: Lorenzo Bianconi <lorenzo@kernel.org>
+> Date:   Mon Feb 12 09:50:54 2024 +0000
+>=20
+>     net: add generic percpu page_pool allocator
+>=20
+> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=3D151860d498=
+0000
+> start commit:   f99c5f563c17 Merge tag 'nf-24-03-21' of git://git.kernel.=
+o..
+> git tree:       net
+> final oops:     https://syzkaller.appspot.com/x/report.txt?x=3D171860d498=
+0000
+> console output: https://syzkaller.appspot.com/x/log.txt?x=3D131860d4980000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=3D6fb1be60a193d=
+440
+> dashboard link: https://syzkaller.appspot.com/bug?extid=3Df534bd500d914e3=
+4b59e
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=3D17ac600b180=
+000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=3D1144b797180000
+>=20
+> Reported-by: syzbot+f534bd500d914e34b59e@syzkaller.appspotmail.com
+> Fixes: 2b0cfa6e4956 ("net: add generic percpu page_pool allocator")
+>=20
+> For information about bisection process see: https://goo.gl/tpsmEJ#bisect=
+ion
+>=20
 
-The issue can be triggered when multiple devices share the same
-SPI interface. And there is concurrent access to the bus.
+Looking at the code, the root cause of the issue is the WARN(1) in
+__xdp_reg_mem_model routine. __mem_id_init_hash_table() can fail just if rht
+allocation fails. Do we really need this WARN(1)? It has been introduced in=
+ the
+commit below:
 
-The problem occurs because tx_ring->head increments even if
-mcp251xfd_start_xmit() fails. Consequently, the driver skips one
-TX package while still expecting a response in
-mcp251xfd_handle_tefif_one().
+commit 8d5d88527587516bd58ff0f3810f07c38e65e2be
+Author: Jesper Dangaard Brouer <brouer@redhat.com>
+Date:   Tue Apr 17 16:46:12 2018 +0200
 
-This patch resolves the issue by decreasing tx_ring->head and removing
-the skb from the echo stack if mcp251xfd_start_xmit() fails.
-Consequently, the package is dropped not been possible to re-transmit.
+    xdp: rhashtable with allocator ID to pointer mapping
 
-Fixes: 55e5b97f003e ("can: mcp25xxfd: add driver for Microchip MCP25xxFD SPI CAN")
-Cc: stable@vger.kernel.org
-Signed-off-by: Vitor Soares <vitor.soares@toradex.com>
----
-With this approach, some packages get lost in concurrent SPI bus access
-due to can_put_echo_skb() being called before mcp251xfd_tx_obj_write().
-The can_put_echo_skb() calls can_create_echo_skb() that consumes the original skb
-resulting in a Kernel NULL pointer dereference error if return NETDEV_TX_BUSY on
-mcp251xfd_tx_obj_write() failure.
-A potential solution would be to change the code to use spi_sync(), which would
-wait for SPI bus to be unlocked. Any thoughts about this?
+Regards,
+Lorenzo
 
-V3->V4:
-  - Leave can_put_echo_skb() and stop the queue if needed, before mcp251xfd_tx_obj_write().
-  - Re-sync head and remove echo skb if mcp251xfd_tx_obj_write() fails.
-  - Revert -> return NETDEV_TX_BUSY if mcp251xfd_tx_obj_write() == -EBUSY.
+--vAieqiNxGUQydHCv
+Content-Type: application/pgp-signature; name="signature.asc"
 
-V2->V3:
-  - Add tx_dropped stats.
-  - netdev_sent_queue() only if can_put_echo_skb() succeed.
+-----BEGIN PGP SIGNATURE-----
 
-V1->V2:
-  - Return NETDEV_TX_BUSY if mcp251xfd_tx_obj_write() == -EBUSY.
-  - Rework the commit message to address the change above.
-  - Change can_put_echo_skb() to be called after mcp251xfd_tx_obj_write() succeed.
-    Otherwise, we get Kernel NULL pointer dereference error.
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZjjuBAAKCRA6cBh0uS2t
+rHE8AP9aiQe9PRxjbu8EA3OAzA4evmD4DeMhokGWsZjanPp69QD/Qr+N4crIXk/4
+h4vZ5Fo/cpxn4NjaaMLCYwTl/2NQ5Qw=
+=QBb4
+-----END PGP SIGNATURE-----
 
- drivers/net/can/spi/mcp251xfd/mcp251xfd-tx.c | 26 ++++++++++++++------
- 1 file changed, 18 insertions(+), 8 deletions(-)
-
-diff --git a/drivers/net/can/spi/mcp251xfd/mcp251xfd-tx.c b/drivers/net/can/spi/mcp251xfd/mcp251xfd-tx.c
-index 160528d3cc26..9909e23de7b9 100644
---- a/drivers/net/can/spi/mcp251xfd/mcp251xfd-tx.c
-+++ b/drivers/net/can/spi/mcp251xfd/mcp251xfd-tx.c
-@@ -166,11 +166,12 @@ netdev_tx_t mcp251xfd_start_xmit(struct sk_buff *skb,
- 				 struct net_device *ndev)
- {
- 	struct mcp251xfd_priv *priv = netdev_priv(ndev);
-+	struct net_device_stats *stats = &ndev->stats;
- 	struct mcp251xfd_tx_ring *tx_ring = priv->tx;
- 	struct mcp251xfd_tx_obj *tx_obj;
- 	unsigned int frame_len;
-+	int err, echo_err;
- 	u8 tx_head;
--	int err;
- 
- 	if (can_dev_dropped_skb(ndev, skb))
- 		return NETDEV_TX_OK;
-@@ -188,18 +189,27 @@ netdev_tx_t mcp251xfd_start_xmit(struct sk_buff *skb,
- 		netif_stop_queue(ndev);
- 
- 	frame_len = can_skb_get_frame_len(skb);
--	err = can_put_echo_skb(skb, ndev, tx_head, frame_len);
--	if (!err)
-+	echo_err = can_put_echo_skb(skb, ndev, tx_head, frame_len);
-+	if (!echo_err)
- 		netdev_sent_queue(priv->ndev, frame_len);
- 
- 	err = mcp251xfd_tx_obj_write(priv, tx_obj);
--	if (err)
--		goto out_err;
-+	if (err) {
-+		tx_ring->head--;
- 
--	return NETDEV_TX_OK;
-+		if (!echo_err) {
-+			can_free_echo_skb(ndev, tx_head, &frame_len);
-+			netdev_completed_queue(ndev, 1, frame_len);
-+		}
-+
-+		if (mcp251xfd_get_tx_free(tx_ring))
-+			netif_wake_queue(ndev);
- 
-- out_err:
--	netdev_err(priv->ndev, "ERROR in %s: %d\n", __func__, err);
-+		stats->tx_dropped++;
-+		if (net_ratelimit())
-+			netdev_err(priv->ndev,
-+				   "ERROR in %s: %d\n", __func__, err);
-+	}
- 
- 	return NETDEV_TX_OK;
- }
--- 
-2.34.1
+--vAieqiNxGUQydHCv--
 
 
