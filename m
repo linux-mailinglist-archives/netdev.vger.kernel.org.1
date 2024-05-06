@@ -1,118 +1,69 @@
-Return-Path: <netdev+bounces-93699-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93700-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8B678BCD2E
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 13:50:41 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C5808BCD2F
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 13:51:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 73F33283226
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 11:50:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 695ADB20C01
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 11:50:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D064E143745;
-	Mon,  6 May 2024 11:50:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F126014386E;
+	Mon,  6 May 2024 11:50:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC4BB142E87;
-	Mon,  6 May 2024 11:50:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB05D143861;
+	Mon,  6 May 2024 11:50:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714996236; cv=none; b=G29BHRSrFBHcglpMzpeVKr9gBT5hr83YY3u/Qhqmjsg6BxouR+iiylAStBov0vszyZaiBi6MgFHMomI4CV+Bz6wsCyWT7evLZLoIPVmYITMkcREZzfsjyfvsQvuLn6D5viv6cpb9WsShHwebI7OT776IkH4jOBMJjGLd3oqiAWA=
+	t=1714996251; cv=none; b=hwPaG0RmqgbBkzNx6pSyDx53UQwmR4EElWuAZWWneksr9dEkflGSHBaXDWzNyHKZoB5cCe1e7yAGNUKIV5hK33pB82ppK93yvADyZQTy3WW1b+EMinzQUYoc2DGlIMITQLzXW3Dj2HMxAx3+94SUmL0Yod65sJYihHtB3Ly33W8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714996236; c=relaxed/simple;
-	bh=y6cqDXl03vpDlI1WoQ3qF+Vekj9+MML61XpUT2jK0uI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pX3EZUxvyUvtFamczbbkoXHzN6wg1rN3L5dThzbCAMCZm6a6+9vHv8PWsCf4zt1z7j2Mw3K/MC0X50KZNgEYFCg3zdrA8jXbLXNRBVNJUxGzVkEYhxM4elUdc/PVvbpMYRwomWV0fiaCuih42o6c48/08NCEw1tf9CMcIabxPps=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=breakpoint.cc; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=breakpoint.cc
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@breakpoint.cc>)
-	id 1s3wrO-0003r1-NL; Mon, 06 May 2024 13:50:22 +0200
-From: Florian Westphal <fw@strlen.de>
-To: <netdev@vger.kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1714996251; c=relaxed/simple;
+	bh=UhB4HZ+P2YfvxSVM/QJ2ErvXSXngpikLOwkSKt9OKj8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Wv8LwRyhpw/xe0cNMxfRHB1ks77R/KyDKjThwTsUq9+uiEF/blMjWJYDyxB6UfBLsfmRTKC4NbfZ2f5RgiudE7kS+cyP0p74p6JLXHfAe+ho2KVNlZkkjReOlNFZtGRLFNMpckyvJG6296OCovWVThfakwBSTBsFWdfQjlIlMFo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 172A768AFE; Mon,  6 May 2024 13:50:44 +0200 (CEST)
+Date: Mon, 6 May 2024 13:50:43 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	<netfilter-devel@vger.kernel.org>,
-	pablo@netfilter.org
-Subject: [PATCH net-next] selftests: netfilter: conntrack_tcp_unreplied.sh: wait for initial connection attempt
-Date: Mon,  6 May 2024 13:43:16 +0200
-Message-ID: <20240506114320.12178-1-fw@strlen.de>
-X-Mailer: git-send-email 2.43.2
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Magnus Karlsson <magnus.karlsson@intel.com>,
+	nex.sw.ncis.osdt.itp.upstreaming@intel.com, bpf@vger.kernel.org,
+	netdev@vger.kernel.org, iommu@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v5 6/7] page_pool: check for DMA sync shortcut
+ earlier
+Message-ID: <20240506115043.GA28172@lst.de>
+References: <20240506094855.12944-1-aleksander.lobakin@intel.com> <20240506094855.12944-7-aleksander.lobakin@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240506094855.12944-7-aleksander.lobakin@intel.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-Netdev CI reports occasional failures with this test
-("ERROR: ns2-dX6bUE did not pick up tcp connection from peer").
+The first hunk here fails when trying to apply it to the 6.9-rc6
+based dma-mapping for-next tree.
 
-Add explicit busywait call until the initial connection attempt shows
-up in conntrack rather than a one-shot 'must exist' check.
-
-Signed-off-by: Florian Westphal <fw@strlen.de>
----
- .../net/netfilter/conntrack_tcp_unreplied.sh  | 25 +++++++++++++------
- 1 file changed, 18 insertions(+), 7 deletions(-)
-
-diff --git a/tools/testing/selftests/net/netfilter/conntrack_tcp_unreplied.sh b/tools/testing/selftests/net/netfilter/conntrack_tcp_unreplied.sh
-index 1f862c089028..121ea93c0178 100755
---- a/tools/testing/selftests/net/netfilter/conntrack_tcp_unreplied.sh
-+++ b/tools/testing/selftests/net/netfilter/conntrack_tcp_unreplied.sh
-@@ -106,6 +106,23 @@ ip netns exec "$ns1" bash -c 'for i in $(seq 1 $BUSYWAIT_TIMEOUT) ; do
- 	sleep 0.1
- 	done' &
- 
-+wait_for_attempt()
-+{
-+	count=$(ip netns exec "$ns2" conntrack -L -p tcp --dport 80 2>/dev/null | wc -l)
-+	if [ "$count" -gt 0 ]; then
-+		return 0
-+	fi
-+
-+	return 1
-+}
-+
-+# wait for conntrack to pick the new connection request up before loading
-+# the nat redirect rule.
-+if ! busywait "$BUSYWAIT_TIMEOUT" wait_for_attempt; then
-+	echo "ERROR: $ns2 did not pick up tcp connection from peer"
-+	exit 1
-+fi
-+
- ip netns exec "$ns2" nft -f - <<EOF
- table inet nat {
- 	chain prerouting {
-@@ -119,12 +136,6 @@ if [ $? -ne 0 ]; then
- 	exit 1
- fi
- 
--count=$(ip netns exec "$ns2" conntrack -L -p tcp --dport 80 2>/dev/null | wc -l)
--if [ "$count" -eq 0 ]; then
--	echo "ERROR: $ns2 did not pick up tcp connection from peer"
--	exit 1
--fi
--
- wait_for_redirect()
- {
- 	count=$(ip netns exec "$ns2" conntrack -L -p tcp --reply-port-src 8080 2>/dev/null | wc -l)
-@@ -136,7 +147,7 @@ wait_for_redirect()
- }
- echo "INFO: NAT redirect added in ns $ns2, waiting for $BUSYWAIT_TIMEOUT ms for nat to take effect"
- 
--busywait $BUSYWAIT_TIMEOUT wait_for_redirect
-+busywait "$BUSYWAIT_TIMEOUT" wait_for_redirect
- ret=$?
- 
- expect="packets 1 bytes 60"
--- 
-2.43.2
-
+Should I go ahead and just apply the first three patches?  Or do
+we need a shared branch with something?
 
