@@ -1,194 +1,96 @@
-Return-Path: <netdev+bounces-93660-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93661-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FCDD8BCA67
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 11:19:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4EA58BCA6E
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 11:20:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 14600B22B5E
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 09:19:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 01C7A1C21DC7
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 09:20:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 453FD142658;
-	Mon,  6 May 2024 09:19:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C0561422C8;
+	Mon,  6 May 2024 09:20:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="bia3kAVZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9449B1422C3
-	for <netdev@vger.kernel.org>; Mon,  6 May 2024 09:19:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACF091422AC;
+	Mon,  6 May 2024 09:20:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714987164; cv=none; b=hL4yUiP2Upk2zEY8cqaBe5BzvPD4bvp+wjJqMzphiJS6Gy0YxXlPXLeiPJh8BHEkXpfHTGBd6r5OvpKpgA2jHYmRocELRPu49+KnAcK5Sp6ZvyhBu6p273LC0OrLKH5gtDZYFlAmul6fIHvpX1buiPkEKMCyyv65FLcLFSLDB1w=
+	t=1714987238; cv=none; b=mqM+zGdxW2++J7mrOmVtEcNPDQfa19STGuONf3oBw80/6S3wH2+bpsOgOgjXNli3aFoauj8HzJSgcI+Z2dDaVwy4eILksW0XdnMzDnu6jKix5CPTPlbsVmrvow5qCOI1pkfuK22AdxgeakUm086DFvt221tEFInB8zAN2S4OVos=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714987164; c=relaxed/simple;
-	bh=4GJJvVcB67txL6x23xZi79tGkqfJu9ZkapJcsQpj8mc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=M7vPRTMFNyyaDDeP1I851Z9Nu7kGrsT2r3zEhDfY1MfL5UKXMqUCLuvmV4y+lcaWEef8JOCJPiOHStoBIUEFYp4AFHJNuPolYtos/Qm0ENftnCq51LnoJ1kTQ52i15r4HEC1gwBUNxuiM8YpT4bIpuj08wU4WatiPfKFpLAgprE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1s3uUt-0007aJ-6R; Mon, 06 May 2024 11:18:59 +0200
-Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1s3uUq-00GEqn-Vo; Mon, 06 May 2024 11:18:57 +0200
-Received: from pengutronix.de (unknown [172.20.34.65])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 861EF2CB3C7;
-	Mon, 06 May 2024 09:18:56 +0000 (UTC)
-Date: Mon, 6 May 2024 11:18:55 +0200
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Gregor Herburger <gregor.herburger@ew.tq-group.com>
-Cc: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>, 
-	Thomas Kopp <thomas.kopp@microchip.com>, Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, linux-can@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux@ew.tq-group.com
-Subject: Re: [PATCH v2 4/6] can: mcp251xfd: mcp251xfd_regmap_crc_write():
- workaround for errata 5
-Message-ID: <20240506-aromatic-dainty-orangutan-f8b57c-mkl@pengutronix.de>
-References: <20240506-mcp251xfd-gpio-feature-v2-0-615b16fa8789@ew.tq-group.com>
- <20240506-mcp251xfd-gpio-feature-v2-4-615b16fa8789@ew.tq-group.com>
+	s=arc-20240116; t=1714987238; c=relaxed/simple;
+	bh=PQytnEGjJh8JMaq9PKzKuAqWRJ/iFQlt/JLPHpUp8rA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=krvGlg9y0uCehSeG7iOjwN1ZtmeFwjEQpwRFXBIzcWlSYXdN6YVp2WFQdUfzWlejzqHIm053/19P+WYHlAGhT8Hng/rf3ymYZxKMp485/h/bDKYOd/ReevteRcf5x7gZJya9QErkqArglb5+5C+qK0JyxVuurdo4KdEXDFidsIg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=bia3kAVZ; arc=none smtp.client-ip=193.104.135.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
+Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
+	by mail1.fiberby.net (Postfix) with ESMTPSA id B0EC7600A2;
+	Mon,  6 May 2024 09:20:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
+	s=202008; t=1714987232;
+	bh=PQytnEGjJh8JMaq9PKzKuAqWRJ/iFQlt/JLPHpUp8rA=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=bia3kAVZKNL0yRW4zOVPbcm2km86aipI/gdtPm/xKmr9mQToz+ytRZFkNNHAaADBH
+	 3lZ9LZ84NBBST9D+D1WkQL58T9g8u39Ig6twwGyJCHxxGMoCcYEO/t5eH+WmuBbBim
+	 vtsqzpP6AQwrgRFG9hPA+WU1GV3Jkni4XSOXJv8n2iDsDrWXPthavHFKBojokDL4ku
+	 LSfY/nhKwfsqx5z2spvVTsGeJ91bUbw92uYp4LvTz3w7b9cVx7F+/GmZuQpr2+0QP2
+	 UPhh2T0Tjp9IuvsDrqVB81Ow6PDNiKn+dlAHcF+anhCOHDzwXpoeZykYZi4hd/CFUj
+	 ILfGjYezIjS3A==
+Received: from [127.0.0.1] (localhost [127.0.0.1])
+	by x201s (Postfix) with ESMTP id 00A5B20146D;
+	Mon, 06 May 2024 09:20:27 +0000 (UTC)
+Message-ID: <af4986b8-e868-4540-852f-7dba5e3196d8@fiberby.net>
+Date: Mon, 6 May 2024 09:20:27 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="ltjwktyxpf7yjkxq"
-Content-Disposition: inline
-In-Reply-To: <20240506-mcp251xfd-gpio-feature-v2-4-615b16fa8789@ew.tq-group.com>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next] iavf: flower: validate control
+ flags
+To: "Buvaneswaran, Sujai" <sujai.buvaneswaran@intel.com>,
+ "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ Eric Dumazet <edumazet@google.com>,
+ "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>
+References: <20240416144325.15319-1-ast@fiberby.net>
+ <PH0PR11MB501366480345AB20618700D1961C2@PH0PR11MB5013.namprd11.prod.outlook.com>
+Content-Language: en-US
+From: =?UTF-8?Q?Asbj=C3=B8rn_Sloth_T=C3=B8nnesen?= <ast@fiberby.net>
+In-Reply-To: <PH0PR11MB501366480345AB20618700D1961C2@PH0PR11MB5013.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
+Hi Sujai,
 
---ltjwktyxpf7yjkxq
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Thank you for testing.
 
-On 06.05.2024 07:59:46, Gregor Herburger wrote:
-> According to Errata DS80000789E 5 writing IOCON register using one SPI
-> write command clears LAT0/LAT1.
->=20
-> Errata Fix/Work Around suggests to write registers with single byte write
-> instructions. However, it seems that every write to the second byte
-> causes the overwrite of LAT0/LAT1.
->=20
-> Never write byte 2 of IOCON register to avoid clearing of LAT0/LAT1.
->=20
-> Signed-off-by: Gregor Herburger <gregor.herburger@ew.tq-group.com>
-> ---
->  drivers/net/can/spi/mcp251xfd/mcp251xfd-regmap.c | 29 ++++++++++++++++++=
-+++++-
->  1 file changed, 28 insertions(+), 1 deletion(-)
->=20
-> diff --git a/drivers/net/can/spi/mcp251xfd/mcp251xfd-regmap.c b/drivers/n=
-et/can/spi/mcp251xfd/mcp251xfd-regmap.c
-> index 65150e762007..43fcf7f50591 100644
-> --- a/drivers/net/can/spi/mcp251xfd/mcp251xfd-regmap.c
-> +++ b/drivers/net/can/spi/mcp251xfd/mcp251xfd-regmap.c
-> @@ -229,14 +229,41 @@ mcp251xfd_regmap_crc_gather_write(void *context,
->  	return spi_sync_transfer(spi, xfer, ARRAY_SIZE(xfer));
->  }
-> =20
-> +static int mcp251xfd_regmap_crc_write_iocon(void *context, const void *d=
-ata)
-> +{
-> +	u16 reg =3D MCP251XFD_REG_IOCON;
+On 5/6/24 5:30 AM, Buvaneswaran, Sujai wrote:
+> HW offload is not directly supported on the iavf VF interface. VF traffic can be offloaded only through VF port representor device which uses ice driver.
 
-const
+Again, there is a awful lot of flower code in iavf_main.c, if it's not supported.
 
-> +
-> +	/* Never write to bits 16..23 of IOCON register to avoid clearing of LA=
-T0/LAT1
-> +	 *
-> +	 * According to Errata DS80000789E 5 writing IOCON register using one
+Try with:
+ethtool -K $iface hw-tc-offload on
+tc qdisc add dev $iface ingress
+tc filter add dev $iface protocol ip parent ffff: prio 1 flower dst_mac 3c:fd:fe:a0:d6:70 ip_flags frag skip_sw hw_tc 1
 
-Just for completeness add "mcp2518fd" in front of Errata.
-
-> +	 * SPI write command clears LAT0/LAT1.
-> +	 *
-> +	 * Errata Fix/Work Around suggests to write registers with single byte
-> +	 * write instructions. However, it seems that the byte at 0xe06(IOCON[2=
-3:16])
-> +	 * is for read-only access and writing to it causes the clearing of LAT=
-0/LAT1.
-> +	 */
-> +
-> +	/* Write IOCON[15:0] */
-> +	mcp251xfd_regmap_crc_gather_write(context, &reg, 1, data, 2);
-> +	reg +=3D 3;
-> +	/* Write IOCON[31:24] */
-> +	mcp251xfd_regmap_crc_gather_write(context, &reg, 1, data + 3, 1);
-
-Please add error handling.
-
-> +
-> +	return 0;
-> +}
-> +
->  static int
->  mcp251xfd_regmap_crc_write(void *context,
->  			   const void *data, size_t count)
->  {
->  	const size_t data_offset =3D sizeof(__be16) +
->  		mcp251xfd_regmap_crc.pad_bits / BITS_PER_BYTE;
-> +	u16 reg =3D *(u16 *)data;
-> =20
-> -	return mcp251xfd_regmap_crc_gather_write(context,
-> +	if (reg =3D=3D MCP251XFD_REG_IOCON)
-> +		return mcp251xfd_regmap_crc_write_iocon(context, data + data_offset);
-
-Please also check that "count" is sizeof(__le32).
-
-> +	else
-> +		return mcp251xfd_regmap_crc_gather_write(context,
->  						 data, data_offset,
->  						 data + data_offset,
->  						 count - data_offset);
->=20
-
-Also add the workaround for the nocrc regmap.
-
-regards,
-Marc
-
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
-
---ltjwktyxpf7yjkxq
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmY4oHwACgkQKDiiPnot
-vG/7lQf9Gfl2kI2VZm5ZoPgK5CZ2Qq1vPDA1Z+z3fSaaONgwCW2gyer3aMONMZmP
-R/DMZNdouH6I3GvqCwSS+gxKTlZdciS4Kw3tIeS00EGeV7uquD6VHec5lXgDQ/hA
-CMZxZKu35QCqmos1uzPYkzJcleR5Kyq5zM9z9NP7Mykfa0UwmHoe8BqKZT50VrFx
-enu7bj5ABjai1ZJ7bFh0CebJNa2XZHD2VpUUZXQ8KllW+xgkm6HUNHPFGj3wLYbI
-1hBowLc2WoQkuZGO2WniYLNpg5UTOM4QnHCiznLwRWd8PwtsI7vKXOSHJxk94q42
-IOdRFpzeyJYyQ2x7c7CBK+z4rAnAkA==
-=4dqj
------END PGP SIGNATURE-----
-
---ltjwktyxpf7yjkxq--
+-- 
+Best regards
+Asbjørn Sloth Tønnesen
+Network Engineer
+Fiberby - AS42541
 
