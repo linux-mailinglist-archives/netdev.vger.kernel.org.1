@@ -1,139 +1,123 @@
-Return-Path: <netdev+bounces-93584-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93585-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A910C8BC59D
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 03:52:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19D6E8BC5A7
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 04:00:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4662A1F2109B
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 01:52:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BA9F12810A2
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 02:00:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33A023C062;
-	Mon,  6 May 2024 01:52:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CC603D387;
+	Mon,  6 May 2024 02:00:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="luFMec6S"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="RmF0hsN1"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from out30-97.freemail.mail.aliyun.com (out30-97.freemail.mail.aliyun.com [115.124.30.97])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A43F1381AA;
-	Mon,  6 May 2024 01:51:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C3322B9B8;
+	Mon,  6 May 2024 02:00:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.97
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714960320; cv=none; b=oOCWs6tSRA5NFQmBJNwXqjsO+LtSRVU1oSPJgEBbBACV3hIq4kc+SphK+b3PLKitZ9dEo2RsYiWJlV0YEUDRgsGd5b9lj13vSJioLVAE2/YJx2sJnBIM1LjBGgCsc4wzTRyOcIK/E9DvJdP/lyd7AlEjn8b/n6ek7T0RVVfhmOM=
+	t=1714960814; cv=none; b=Nig1PFCopJo+zg8iB1Q3vBecTFXqfT6+nCT6NmXhL66EhccIlAopDgGXWUpMfiXDuvK4VJcDkk/0CJYKDoM+Abi6RQsZakvb0apilq2Bl8ns3MhAsI+sh7avWjdsi6Lpa0owgl8ZCTAcrYCgKBinxOC4OaSVAtfJe5lzOskfoZU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714960320; c=relaxed/simple;
-	bh=cILhcHIG/J2JKRxDO3Mb/UsmQGpjMk53IAFVso++1V8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FeV8zuSijiDgDzXXVKq0Rgm/JtSRqYum12WWYtBgVmOixg4UmiUJbujSwF/+b4BekYs2LJt0AIVAPalIVi73uZwAjwD2SvyeYDQ0NdxfRS0C/C47X6UQ+uGu1To7fRHOH0eEzFbpb76Bjm7t947msO5E4W97WVgue2fv/aiRrig=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=luFMec6S; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=x2OPa1nocMpgym3iJPCUcyhuWo1hecf2fZOdbWsW0gc=; b=luFMec6SrbIveNPNk7gRhiOo+b
-	U9R8ZxrcNTIc8ASgzR5MKQR4HTTucDacunKshqEw+L08QjLJw+FyRNsRd18S5edVvHTgIDb9iiPTe
-	DzK215vF8CCnmPm2u8jqSckkL1h1zKnG/ts0h+Rjij135Wn0zy3gq4CxlUa7FXAS+HG8=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1s3nW5-00Ej0o-Bg; Mon, 06 May 2024 03:51:45 +0200
-Date: Mon, 6 May 2024 03:51:45 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Niklas =?iso-8859-1?Q?S=F6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-Cc: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org
-Subject: Re: [net-next] net: ethernet: rtsn: Add support for Renesas
- Ethernet-TSN
-Message-ID: <d5f6f31a-6ecc-48a9-a2ca-9d22fc6acb21@lunn.ch>
-References: <20240414135937.1139611-1-niklas.soderlund+renesas@ragnatech.se>
- <5fd25c58-b421-4ec0-8b4f-24f86f054a44@lunn.ch>
- <20240503102006.GI3927860@ragnatech.se>
- <e3ce12b0-fb5d-49d7-a529-9ea7392b80ca@lunn.ch>
- <20240503133033.GJ3927860@ragnatech.se>
+	s=arc-20240116; t=1714960814; c=relaxed/simple;
+	bh=jhTzXXT+FPjZQ5pztBbwg3De5ewUC261fLbR/SBmjRE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=LiwRMhVG4NRNPHv3jam7nHR01NYn7iYZJ35cF+++7/FKX5ggifwEuDvN6IcMSdm8n1FRxSBMhRo2z82u6g3IPefg0iQm+9T2M3yDOPBXVIWj4P6eJWooofKPS5Ae4v5ajPBcn4SMEIcW/v66cwE40h+XIKCAt+FBTDi2PMAEzGo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=RmF0hsN1; arc=none smtp.client-ip=115.124.30.97
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1714960803; h=From:To:Subject:Date:Message-Id:MIME-Version;
+	bh=0y3awyTCfvmpXhlQf3h9Gu7rJ+aU16KQIKj7W928+ms=;
+	b=RmF0hsN1vs16GKmTTl3fJNXSaA3WLy7j+xtGEZjPFNpQSA0n0vH5afXgAXryLO8NN36tipM7S/2Bcmyf+qYNh+FoAeKuYGt0KVyFAie4OQHT6bOP7f/gpxhDdOuw13tc9/SFCu8zfQskN6DXQ8HerYrG3bTwBeFA0Cdr3/2knrU=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R101e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037067110;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=12;SR=0;TI=SMTPD_---0W5pOKbi_1714960479;
+Received: from localhost(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0W5pOKbi_1714960479)
+          by smtp.aliyun-inc.com;
+          Mon, 06 May 2024 09:54:41 +0800
+From: Wen Gu <guwen@linux.alibaba.com>
+To: wenjia@linux.ibm.com,
+	jaka@linux.ibm.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: alibuda@linux.alibaba.com,
+	tonylu@linux.alibaba.com,
+	guwen@linux.alibaba.com,
+	linux-s390@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net] net/smc: fix netdev refcnt leak in smc_ib_find_route()
+Date: Mon,  6 May 2024 09:54:39 +0800
+Message-Id: <20240506015439.108739-1-guwen@linux.alibaba.com>
+X-Mailer: git-send-email 2.32.0.3.g01195cf9f
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240503133033.GJ3927860@ragnatech.se>
+Content-Transfer-Encoding: 8bit
 
-> > phy_read_mmd():
-> >   __phy_read_mmd():
-> >       mmd_phy_read():
-> > 
-> > So is is_c45 is true?
-> 
-> Not sure, I never get that far. The function __mdiobus_c45_read() is 
-> called directly from of_mdiobus_register() call-chain.
-> 
-> The call chain is:
-> 
->   rtsn_open()
->     of_mdiobus_register() <- This fails and RTSN can't talk to the PHY
->       __of_mdiobus_register()
->         __of_mdiobus_parse_phys()
->           of_mdiobus_register_phy()
->             fwnode_mdiobus_register_phy() <- See [1]
->               get_phy_device()
->                 get_phy_c45_ids()
->                   mdiobus_c45_read()
->                     __mdiobus_c45_read() <- Returns -EOPNOTSUPP [2]
-> 
-> 1. Here is_c45 is set as it checks the compatible value is checked.
-> 
->      is_c45 = fwnode_device_is_compatible(child, "ethernet-phy-ieee802.3-c45");
+A netdev refcnt leak issue was found when unregistering netdev after
+using SMC. It can be reproduced as follows.
 
-Ah, O.K.
+- run tests based on SMC.
+- unregister the net device.
 
-What PHY is this? Does it have C22 registers? Can it be identified via
-C22 registers 2 and 3?
+The following error message can be observed.
 
-I suspect we in falling into the cracks with what is_c45 means. And
-what ethernet-phy-ieee802.3-c45 means.
+'unregister_netdevice: waiting for ethx to become free. Usage count = x'
 
-is_c45 is a bad mis-mash of responds to C45 bus transfers and has C45
-registers.
+With CONFIG_NET_DEV_REFCNT_TRACKER set, more detailed error message can
+be provided by refcount tracker:
 
-Your MDIO bus master appears to be unable to perform C45 bus
-transfers. So you probably don't want is_c45 set, so that C45 over C22
-is performed. However, you are using ethernet-phy-ieee802.3-c45 which
-suggests to me the PHY has C45 registers.
+ unregister_netdevice: waiting for eth1 to become free. Usage count = 2
+ ref_tracker: eth%d@ffff9cabc3bf8548 has 1/1 users at
+      ___neigh_create+0x8e/0x420
+      neigh_event_ns+0x52/0xc0
+      arp_process+0x7c0/0x860
+      __netif_receive_skb_list_core+0x258/0x2c0
+      __netif_receive_skb_list+0xea/0x150
+      netif_receive_skb_list_internal+0xf2/0x1b0
+      napi_complete_done+0x73/0x1b0
+      mlx5e_napi_poll+0x161/0x5e0 [mlx5_core]
+      __napi_poll+0x2c/0x1c0
+      net_rx_action+0x2a7/0x380
+      __do_softirq+0xcd/0x2a7
 
-A PHY driver itself mostly does not care about is_c45. It knows the
-device has C45 registers and will use phy_read_mmd() to access
-them. If that uses C45 bus transfers or C45 over C22 is left to the
-core, based on is_c45.
+It is because in smc_ib_find_route(), neigh_lookup() takes a netdev
+refcnt but does not release. So fix it.
 
-Where it gets a little problematic is determining the correct driver
-for the PHY. By default it will look at registers 2 and 3 of C22. If
-it finds an usable ID, that will be used to load the driver. If there
-is no ID in C22 registers, and the MDIO bus supports C45 bus
-transfers, it will try the various places there can be IDs in the C45
-register space.
+Fixes: e5c4744cfb59 ("net/smc: add SMC-Rv2 connection establishment")
+Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
+---
+ net/smc/smc_ib.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-What the core will not do is use C45 over C22 to look for ID
-registers, because it has no idea what is actually there, and C45 over
-C22 means performing an write, which could destroy the configuration
-of something which is not a PHY, e.g. a switch, or a GPIO controller
-etc.
+diff --git a/net/smc/smc_ib.c b/net/smc/smc_ib.c
+index 97704a9e84c7..b431bd8a5172 100644
+--- a/net/smc/smc_ib.c
++++ b/net/smc/smc_ib.c
+@@ -210,10 +210,11 @@ int smc_ib_find_route(struct net *net, __be32 saddr, __be32 daddr,
+ 		goto out;
+ 	if (rt->rt_uses_gateway && rt->rt_gw_family != AF_INET)
+ 		goto out;
+-	neigh = rt->dst.ops->neigh_lookup(&rt->dst, NULL, &fl4.daddr);
++	neigh = dst_neigh_lookup(&rt->dst, &fl4.daddr);
+ 	if (neigh) {
+ 		memcpy(nexthop_mac, neigh->ha, ETH_ALEN);
+ 		*uses_gateway = rt->rt_uses_gateway;
++		neigh_release(neigh);
+ 		return 0;
+ 	}
+ out:
+-- 
+2.32.0.3.g01195cf9f
 
-However, by specifying "ethernet-phy-ieee802.3-c45", you have short
-cut the default, it goes direct to C45 bus transfers which your
-hardware cannot actually do.
-
-So i would drop the compatible. See if C22 is sufficient to get the
-correct driver loaded.
-
-	Andrew
 
