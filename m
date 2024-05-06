@@ -1,129 +1,180 @@
-Return-Path: <netdev+bounces-93739-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93741-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C35F58BD074
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 16:39:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C8608BD07D
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 16:41:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F1BB0B2114F
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 14:39:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AFE311C21902
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 14:41:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 301471534E5;
-	Mon,  6 May 2024 14:39:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCB791534FC;
+	Mon,  6 May 2024 14:41:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UV0jgXkC"
+	dkim=pass (1024-bit key) header.d=axis.com header.i=@axis.com header.b="D+SUhDG1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from EUR04-HE1-obe.outbound.protection.outlook.com (mail-he1eur04on2080.outbound.protection.outlook.com [40.107.7.80])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A92DF811FE
-	for <netdev@vger.kernel.org>; Mon,  6 May 2024 14:39:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715006383; cv=none; b=QKyVCxYjdAgE24wZmF0N6AFWpMWhxqZVRO31rQbHBE5v2XAt1HM6WRETErBxOqvScfhT3f2XVLCZIWdhomVJo/00Y65fVSwHsYqjdEC5lkrT382uSv1xq32GVww42zlbAkq4QrjsXvrMcxUjZbPBS9y9ds4a92LOO3FhjaAqZH8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715006383; c=relaxed/simple;
-	bh=HX4HJ17rUPKwmnDqUum3oNFhD/RZLT1GbLHnk4RahlM=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=oCtDhcDY0CVm8RXUg7cpjJ4mJJltExBBX6sMQj8HtET7tYNp6I1Av6RRlqExCtEYnsZHDOJJ4bL23mnpM6UianG1E98fTl2pz4+xHvxJlU2N3WZE7IzYyghJcUfWk8YB+iTOrUKG3pY5/+bcSryAVWvNVKG8EKv7ooJCpkPNO3o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UV0jgXkC; arc=none smtp.client-ip=209.85.219.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-de59ff8af0bso3040301276.2
-        for <netdev@vger.kernel.org>; Mon, 06 May 2024 07:39:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1715006380; x=1715611180; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=7puXbU/MeoB4y7uDUxX4C5/0n37QnPJGeNtzkvM6INU=;
-        b=UV0jgXkCfrcXFDbajuBbRjghyfgz9/7i09WukoaXTKifbgGEbOhc2pkdgNK3NurjhY
-         CdV2/1DpGS7aHurLSFwL2YbxGXWzM5Mca2ORpbUQy17jVIEZsE73nCXy+Ja7hOANK106
-         x5uNLMwgYstD5QQ0IHQ73Y5s9K+CFJlmyxqFSQtD6OhZdcG3mnr+o4CzzS+OAz7QQowA
-         FWaaUCoaeA8MNK+qdVU8hxRNIVa0D7n4ra4L+BLil/SjS7+EgxzAXUBzJlwyZjn9tqUB
-         ZWtA8sEPhze6GGnLVT4OhGgyJ1qtobBaECR25q/LhIbaggFnsfWdoTrXCks+1jIM/sfA
-         Duhw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715006380; x=1715611180;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=7puXbU/MeoB4y7uDUxX4C5/0n37QnPJGeNtzkvM6INU=;
-        b=jePeoBt395U4H9r15S/EkJhN24BexWoMApgAivEU3XrJG3Tx6+qGG5KMB0IGLUURtW
-         tq2qISVBLoPJa6JiKJZoZ7FrZQWQ//QMP1m7Nj3aMGxEqeqETlRTxXdepsWQEy1mZ7g+
-         +qXyZYYPB0K5DS1N9TtX/rPg0x8VKwTcuHDF0F5HVb0fK7VZPwK4B4rfaRVyvw7KzvfE
-         7c/uMAnwUbVKOp7B8j+YbDgdJoh2I76tFy8Z1BCumk1QVGiPoU19uboZGZauIU6TxmHt
-         H4Eljf1k4KiMaYFHY4P6glbKyf2MCrwqgF4hJPaszuikJbkorC7PxjYZbVCtPlbcNYd5
-         qh5g==
-X-Gm-Message-State: AOJu0YxSTbdr5L4ZSjK5kCMdGfSso3i4jRo/uAvcKNBCyl67hKyb/QRC
-	HpbdY60iJ3S5LvIolWjQvXQ9a44mDNmXUrA9yCKpZJFUMkUTLmkaK1KwsGxjtE5WX5unzv541Dh
-	CFoRAsxGf6Q==
-X-Google-Smtp-Source: AGHT+IEfD4pHZbhIiPZ8sG1iiRadnfmcmA9i+ig4Km8G6KGW3jJ+5GrYKDYIr3d+1Jj9l4AXpFXGZHG5VqkUIQ==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a25:d309:0:b0:de5:5be3:709f with SMTP id
- e9-20020a25d309000000b00de55be3709fmr1148782ybf.6.1715006380638; Mon, 06 May
- 2024 07:39:40 -0700 (PDT)
-Date: Mon,  6 May 2024 14:39:39 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C49AD13D2B5;
+	Mon,  6 May 2024 14:41:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.7.80
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1715006496; cv=fail; b=K0y3vme6NsdCFhjA1bP+pXs73ze8jdje4qgA5QwuTiN2odVzVm8L2Q5eEbwrzp01Voe//1oQMxgZ5GJcJq/2ioX3pqHO0G367PS56Gzxii/zGBdzVR3B76OtUi1S26dViXbaYPVQPvtW0jQqRTask6FdjHGQ8Yz8WH1K8rXvHQI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1715006496; c=relaxed/simple;
+	bh=VtXr092UlbS9qSPvCTznzcG7MHb5PuYqJvIkHrq1Lrw=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=JYu3wOo0yrCAXhmS8NcdkaBdrVUXgwzwYgxA8v3hFV/sX+zcVz3YxlXVp9cHiR0FLev5sHeTPVamhjmH2x41kxCpWqbLd8db63zLVaOj35spaM0uj7CA3YNSSwRZHJVZ50GXcsTKTPexxE6FWsXYsKhXH68bxwHPv3FDrIMOVRM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=axis.com; spf=pass smtp.mailfrom=2n.com; dkim=pass (1024-bit key) header.d=axis.com header.i=@axis.com header.b=D+SUhDG1; arc=fail smtp.client-ip=40.107.7.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=axis.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=2n.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=dIXBOHPGXOjEdsMuoUmZDG/RMK08oXFtHBqgvKMA97+59vxUUuSjeoWr+Qgk8NiiEO6EzOwl00S9kqi4kZ9EVbSZVqI3+QIlLcGQcluPaEGz40aenTD6Ds25IMy0sW17xwAiKOMoWau+a+BUVK6G73BOatIjyTaUbm2zRfq+XEz2dm0gguY1EUQ8g7OiPgUKEy+VehTbbHSQV34z+QfG45fp+fiPrsNcA81KorJwpYb/it12tpcIK6RzrjGszpy2KdKLN9hK2cXfhJQpOtrer06j3WrTfsupbUUzTIpfpadmXLjhCSjIIpdnIBK1Hwm/YWeCHIMPkBnlId9XqoAVRw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=esEuBF78dWh7jCOQeLpLvTi8NKTxafBM+zJwDMWqL4M=;
+ b=G9k1lalJAefoi5C3m55MVWpE0Lx4//4zpF8TsIWlY9idRYhQVbiy1TvW4c+W+Pyg/yDt7W067skpOQYj4UQTk2RlgfV4AhkDymH/3pYBVen7NBlWP5IAq5M6gG5hTZQsVexHKJ2ZPIWatNRl4Jc4Owl9pKIn2CI2NqFxOTN1CKUw2JExd0Rewk2CtOXeEXWKL50HSgYQo/ZZs+mFrKUqOQUnhSFM8PsZtoB6Nb5JUBcCXqgaJ1KO9lHKXgdgFw+HMQDzflLrOagAXeg9ax6x+HRpMwzmHL9KT3SacG33GlQkfeXOlGhV86DSVtV40Ulm9BAHP1Zvtjk0DLwBgUxeEQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 195.60.68.100) smtp.rcpttodomain=broadcom.com smtp.mailfrom=2n.com;
+ dmarc=fail (p=none sp=none pct=100) action=none header.from=axis.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=axis.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=esEuBF78dWh7jCOQeLpLvTi8NKTxafBM+zJwDMWqL4M=;
+ b=D+SUhDG1Q+UUVDlcC6EUXyNBdI7RvJOTDr3Qul1MCwrpEO++lmbTlrnebpEZq+IAFdJAu0ayp8w9Nk0CoPKOrFxEsrtz550Sea8xIw4Wnt+b/d2mBdr5cK9GCWDlcYvtuRdQFbBnsotbDxC4XF8KMMfDtj1+0e82IoM9Mb3U5hg=
+Received: from DU2PR04CA0230.eurprd04.prod.outlook.com (2603:10a6:10:2b1::25)
+ by PAWPR02MB10022.eurprd02.prod.outlook.com (2603:10a6:102:2e2::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.40; Mon, 6 May
+ 2024 14:41:30 +0000
+Received: from DU2PEPF00028D07.eurprd03.prod.outlook.com
+ (2603:10a6:10:2b1:cafe::93) by DU2PR04CA0230.outlook.office365.com
+ (2603:10a6:10:2b1::25) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.42 via Frontend
+ Transport; Mon, 6 May 2024 14:41:30 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 195.60.68.100)
+ smtp.mailfrom=2n.com; dkim=none (message not signed) header.d=none;dmarc=fail
+ action=none header.from=axis.com;
+Received-SPF: Pass (protection.outlook.com: domain of 2n.com designates
+ 195.60.68.100 as permitted sender) receiver=protection.outlook.com;
+ client-ip=195.60.68.100; helo=mail.axis.com; pr=C
+Received: from mail.axis.com (195.60.68.100) by
+ DU2PEPF00028D07.mail.protection.outlook.com (10.167.242.167) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.7544.18 via Frontend Transport; Mon, 6 May 2024 14:41:30 +0000
+Received: from pcczc3457tyd.2n.cz.axis.com (10.0.5.60) by se-mail01w.axis.com
+ (10.20.40.7) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Mon, 6 May
+ 2024 16:41:29 +0200
+From: =?UTF-8?q?Kamil=20Hor=C3=A1k=20-=202N?= <kamilh@axis.com>
+To: <florian.fainelli@broadcom.com>, <bcm-kernel-feedback-list@broadcom.com>,
+	<andrew@lunn.ch>, <hkallweit1@gmail.com>
+CC: <kamilh@axis.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: [PATCH v3 0/3] net: phy: bcm5481x: add support for BroadR-Reach mode
+Date: Mon, 6 May 2024 16:40:12 +0200
+Message-ID: <20240506144015.2409715-1-kamilh@axis.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.45.0.rc1.225.g2a3ae87e7f-goog
-Message-ID: <20240506143939.3673865-1-edumazet@google.com>
-Subject: [PATCH net-next] net: usb: sr9700: stop lying about skb->truesize
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: se-mail01w.axis.com (10.20.40.7) To se-mail01w.axis.com
+ (10.20.40.7)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DU2PEPF00028D07:EE_|PAWPR02MB10022:EE_
+X-MS-Office365-Filtering-Correlation-Id: 82c3441c-b779-42a0-9a77-08dc6dda9e5d
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230031|82310400017|1800799015|376005|36860700004;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?MEJXc1J2eXZaQUJxeUFqaTdpd2JkZ2NPOHlmaXFBbXRpVk5Sa1U1NDVIV1VF?=
+ =?utf-8?B?eW5CUUpkbUJ6SXFwWWtqeXltUTkxWVhIdHhhQ3ZaY1lLNWZPSUQzVko1NE5r?=
+ =?utf-8?B?YXoxbGFBNzlhTG9iNUorQ1RMUTVnMk12N0NvcUVZbFZWOFNkY0VpVWN2bU0w?=
+ =?utf-8?B?MGJZNVoyVmVLZWhnd09odEZoU2d3RUdGak93VWZyWHNZNnRPY0cwSFRoL0pw?=
+ =?utf-8?B?d0d4STlMWWVRZ3JlZU5LVnhJOUZMdFA4dDZkVkVTblRBeTF2clZYUUl0eXZ3?=
+ =?utf-8?B?TzJwNk5SU1E2R1NDNXMvVTAzMUI0aWkvRExEOFcwSFRoZ0ZuWGdVNzNVTU45?=
+ =?utf-8?B?OTViUkl1RWtrYlNUV1AxOHRYR0pITWpZMnViYlM3Z0dMUUZZUms1Qzh5dlY2?=
+ =?utf-8?B?RmxCdDk4UU5LRm85dHJqbU5PN0hBSFFwTEt2c3MxVFp5M2FZZ1BmYUpsT0FO?=
+ =?utf-8?B?bHB0dzdXcEc2UDlPZ3JKbjFoak9rWXgxOVh3ZVhlWkI5VmVlWW14MEVqOC9q?=
+ =?utf-8?B?SkVDcExYNG5vWXlLSkczREt1SEZLSi9oMnJpMUNidWpvZG0zMG0vdExSOFQ3?=
+ =?utf-8?B?YjR6dmh5ODQ5eVFCaXNHdFRyaWhhVDVUeEZnMTFGdlRoaVZpZ09aWm1KWEJs?=
+ =?utf-8?B?UjlTVW81T1JCVlZHTFFSUWtSMlozS1hxbUV5RllGdWRQSlc3WWhmU1VHODZ5?=
+ =?utf-8?B?ZmxOSWxpQUNUUEhKd1FZTjBSRkxxVmhCZFdqUHp4RGlmZ0Q5VERSK3dZWXNr?=
+ =?utf-8?B?MDgyaWRDS09KaUZGYWZJa1lrU2Z4YWFldzNZMFB3QXB5YnNMSm84QlNVZE9B?=
+ =?utf-8?B?YmRDVWRWcCtVUVJRMlBIOWc0SkJKcGhtMllRRGNzZ1M0cTllc252SDdZWFhv?=
+ =?utf-8?B?dktYbmNmcWx2TklkR2hIT3ZnZGlyVzdPcTNUelhwZE45WUF1dHQwRUt6Wmkx?=
+ =?utf-8?B?ck9GcnY0aXQxanZKNjFFUk02T1NXMm5BZFJXNEFRb3F0QTIwd3NySHZrRGxV?=
+ =?utf-8?B?eC92QXc0WVhIazIrVWQ4azhtUVJUYzV6OGd3b2ZPYm9JTVJNbXpHTEpIOEd1?=
+ =?utf-8?B?ZUdGdXhIb1lpYmljOWNJT3E5UkdzbGIxOUo1UDhjRjVPN1M2M3hKREo2U1Z6?=
+ =?utf-8?B?WEQxdG9VYXA0akM2UXp1c3FiTVoyandnL2tyUE5IL25LM0FiVmV6M0Q4T1F4?=
+ =?utf-8?B?ZXBWS2IyTE4ycnBlNmhZUjlqbDFLeW45WDlYM2ZGajFaNWJrSXlKVk9Wb0JN?=
+ =?utf-8?B?V0tEakRscTlBNEFOOThDNUFFY3NwOUNiSGplMGdRYjBJUHNNd1ZGaXIxMW1v?=
+ =?utf-8?B?VThlYm1RU3lmZGtFdm1KdkgvaWpVVGswMGd3M2lDdXZ5bEIyR3VTRUJCWlRF?=
+ =?utf-8?B?alBCUjZpSUtpVGNObGFqRFRScjdnZ0lya09XSUtuN1kwVDBGbU0rdFFmR1Ev?=
+ =?utf-8?B?UlBmZGlOV3RQbVRTWHpDYmI5d3VMYVFoOWlzOE95OGhOd2ZwYm96aTZicC9x?=
+ =?utf-8?B?VG5JOGFCV0h4U1M0Qi9OZU02dGFaMWVDd1Y4dmlmeXlPYnMvUkNVS2dJR0ZM?=
+ =?utf-8?B?Nmd1YXVQUmJSaklFZHpLb3dRWU5ZOXBMZHArZkpIRkJNeXNDaTF4N2FVMGJN?=
+ =?utf-8?B?QVBHSWZUR2pCSDB0V05UODc3MUd0cHFKeTc2UjZLZUEramxDWjVvUFdnOFdB?=
+ =?utf-8?B?RjJib2pOeVJjWGhKbktDN1lvOE0vaHQ2SlljdGRPNmJXcVVGOHRhclhadHdJ?=
+ =?utf-8?B?eURMSzVlK09EVW1NSUxhOTFKZStPbkdXQ2VRL2kvZzlKbEJ0TFVCTlN6UnBz?=
+ =?utf-8?B?MHAzVUEyZWRtanJ5ZGUyT1hMQkJGbmFkYWVBVGhKV3c4ZVdia1UwSjJ2aXdq?=
+ =?utf-8?Q?fbaNxpTDBwvvr?=
+X-Forefront-Antispam-Report:
+	CIP:195.60.68.100;CTRY:SE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.axis.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(82310400017)(1800799015)(376005)(36860700004);DIR:OUT;SFP:1101;
+X-OriginatorOrg: axis.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 May 2024 14:41:30.6219
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 82c3441c-b779-42a0-9a77-08dc6dda9e5d
+X-MS-Exchange-CrossTenant-Id: 78703d3c-b907-432f-b066-88f7af9ca3af
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=78703d3c-b907-432f-b066-88f7af9ca3af;Ip=[195.60.68.100];Helo=[mail.axis.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DU2PEPF00028D07.eurprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAWPR02MB10022
 
-Some usb drivers set small skb->truesize and break
-core networking stacks.
+PATCH 1 - Add the 1BR10 link mode and capability to switch to 
+   BroadR-Reach as a PHY tunable value
 
-In this patch, I removed one of the skb->truesize override.
+PATCH 2 - Add the definitions of LRE registers, necessary to use
+   BroadR-Reach modes on the BCM5481x PHY
 
-I also replaced one skb_clone() by an allocation of a fresh
-and small skb, to get minimally sized skbs, like we did
-in commit 1e2c61172342 ("net: cdc_ncm: reduce skb truesize
-in rx path") and 4ce62d5b2f7a ("net: usb: ax88179_178a:
-stop lying about skb->truesize")
+PATCH 3 - Implementation of the BroadR-Reach modes for the Broadcom
+   PHYs
 
-Fixes: c9b37458e956 ("USB2NET : SR9700 : One chip USB 1.1 USB2NET SR9700Device Driver Support")
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- drivers/net/usb/sr9700.c | 10 +++-------
- 1 file changed, 3 insertions(+), 7 deletions(-)
+Changes in v2:
+  - Divided into multiple patches, removed useless link modes
 
-diff --git a/drivers/net/usb/sr9700.c b/drivers/net/usb/sr9700.c
-index 3164451e1010cc80a67e2fddc89a9e59a6721cab..0a662e42ed96593cf20d4209af2bc64a74f307df 100644
---- a/drivers/net/usb/sr9700.c
-+++ b/drivers/net/usb/sr9700.c
-@@ -421,19 +421,15 @@ static int sr9700_rx_fixup(struct usbnet *dev, struct sk_buff *skb)
- 			skb_pull(skb, 3);
- 			skb->len = len;
- 			skb_set_tail_pointer(skb, len);
--			skb->truesize = len + sizeof(struct sk_buff);
- 			return 2;
- 		}
- 
--		/* skb_clone is used for address align */
--		sr_skb = skb_clone(skb, GFP_ATOMIC);
-+		sr_skb = netdev_alloc_skb_ip_align(dev->net, len);
- 		if (!sr_skb)
- 			return 0;
- 
--		sr_skb->len = len;
--		sr_skb->data = skb->data + 3;
--		skb_set_tail_pointer(sr_skb, len);
--		sr_skb->truesize = len + sizeof(struct sk_buff);
-+		skb_put(sr_skb, len);
-+		memcpy(sr_skb->data, skb->data + 3, len);
- 		usbnet_skb_return(dev, sr_skb);
- 
- 		skb_pull(skb, len + SR_RX_OVERHEAD);
+Changes in v3:
+  - Fixed uninitialized variable in bcm5481x_config_delay_swap function
+
+
+Kamil Horák - 2N (3):
+  net: phy: bcm54811: New link mode for BroadR-Reach
+  net: phy: bcm54811: Add LRE registers definitions
+  net: phy: bcm-phy-lib: Implement BroadR-Reach link modes
+
+ drivers/net/phy/bcm-phy-lib.c | 122 ++++++++++++
+ drivers/net/phy/bcm-phy-lib.h |   4 +
+ drivers/net/phy/broadcom.c    | 338 ++++++++++++++++++++++++++++++++--
+ drivers/net/phy/phy-core.c    |   9 +-
+ include/linux/brcmphy.h       |  91 ++++++++-
+ include/uapi/linux/ethtool.h  |   9 +-
+ net/ethtool/common.c          |   7 +
+ net/ethtool/ioctl.c           |   1 +
+ 8 files changed, 560 insertions(+), 21 deletions(-)
+
 -- 
-2.45.0.rc1.225.g2a3ae87e7f-goog
+2.39.2
 
 
