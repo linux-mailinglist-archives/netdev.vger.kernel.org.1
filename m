@@ -1,111 +1,134 @@
-Return-Path: <netdev+bounces-93630-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93631-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95FF38BC81C
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 09:07:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 944F48BC82C
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 09:16:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CF6DAB20FF7
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 07:07:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 51A812819FF
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 07:16:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAA2D5464A;
-	Mon,  6 May 2024 07:07:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89FA86BFD4;
+	Mon,  6 May 2024 07:16:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="j6S2vSVa"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="kPwn72Z4"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
+Received: from out30-101.freemail.mail.aliyun.com (out30-101.freemail.mail.aliyun.com [115.124.30.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90C92481B1;
-	Mon,  6 May 2024 07:07:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD74E67A1A;
+	Mon,  6 May 2024 07:16:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714979233; cv=none; b=IOoUWJoZINYDGvp18N/jKzq6cpt4/sbUsoaKVeINlhO3GUotQkwEYC3KaRdywoF8SwaNheP7rcywDVs8pK91r6FvW7iTToP44HvspW75toebdObU219BY6ArW13rmNtzlcEQR5+2E2qmfSb0WpcuzkLdjS71S48lR2x1LnU5ISQ=
+	t=1714979804; cv=none; b=WQEbQ84P4tQG2didv4L+p5fUQBjHS+mF8Pa3O0rTCsMOfiMj7LY6fUfF2Y1spMelGkR5tENgQ7+mtAgptm/hk3VxbKBZPyTLTCbpv5DAsBHLTUcK3MnAE53NrEr2TYzfqQ148dCdJm1zuICrAqy6EeDLWCRRW4Ryzoe+7QVbWU4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714979233; c=relaxed/simple;
-	bh=/ygl80MN8pFCAtka2vGNeRmQZQPFH5Tx21QOyhP/sdw=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=YTBrWNaU/b5DMWIjxKQ0Ne2fWH4AE5S9TlKWny2+qCeLqVv729IITLtH5H4apwKEF5AQomuy0XTK/bPlCEw1rsNlul9z6K1cqEAWvj1Wf+f1F60Rld7IKSjIgwsk6W873nNp8Y084bGZ1k5f1V4p2cjZUEEu+0Fgk/Kxl/YkpMs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=j6S2vSVa; arc=none smtp.client-ip=217.70.183.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 5B373C0009;
-	Mon,  6 May 2024 07:07:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1714979223;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mF3okb/zlCrXIKizMgfKu76xu/b0djUY7d04ZIvQ2SI=;
-	b=j6S2vSVa12Y36dfV8tSiSbHT3HtfhSkv0miIpTvodL/pMj702HSJQ9y/L1BrzHr+qwLXn6
-	v2ZyKVzBxVY7xGQtCTXTbWlD8rGppHUFKNmkECKa+Yf1VYBvrBLYTLoG7xuPT0nlDSFKTn
-	tQ7+PrQmjCcsQsxCuGd/N0KUPOwZG5vSd8hklW22nf0kovdubmuVt/SGy/3rbafk+S4FOJ
-	tzr3557EK3oB4tVti3Y4jis6NgO+W+RNz4aJ954fCkd/SayzGMqihFKlpTH/owBuA4AaJk
-	mFHMNUcOPz0toEn0zeYQqJcoHweorazXNAudn8zQUYj+d9aebS6A5a/Z6hztRg==
-Date: Mon, 6 May 2024 09:07:41 +0200 (CEST)
-From: Romain Gantois <romain.gantois@bootlin.com>
-To: Serge Semin <fancer.lancer@gmail.com>
-cc: Romain Gantois <romain.gantois@bootlin.com>, 
-    "David S. Miller" <davem@davemloft.net>, 
-    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-    Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-    Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
-    Conor Dooley <conor+dt@kernel.org>, 
-    Geert Uytterhoeven <geert+renesas@glider.be>, 
-    Magnus Damm <magnus.damm@gmail.com>, 
-    Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-    Jose Abreu <joabreu@synopsys.com>, 
-    Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
-    Russell King <linux@armlinux.org.uk>, 
-    =?ISO-8859-15?Q?Cl=E9ment_L=E9ger?= <clement.leger@bootlin.com>, 
-    Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org, 
-    devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-    linux-renesas-soc@vger.kernel.org, 
-    linux-stm32@st-md-mailman.stormreply.com, 
-    linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH net-next v5 2/7] net: stmmac: Add dedicated XPCS cleanup
- method
-In-Reply-To: <4wdcmcb2yxneynxtppestl6cp25z5xge3hfv7o47bxwpafn4cg@mtvc3ls2cxij>
-Message-ID: <ec3e6c1b-1a5e-f7c9-4782-bc8f01a67f5f@bootlin.com>
-References: <20240430-rzn1-gmac1-v5-0-62f65a84f418@bootlin.com> <20240430-rzn1-gmac1-v5-2-62f65a84f418@bootlin.com> <4wdcmcb2yxneynxtppestl6cp25z5xge3hfv7o47bxwpafn4cg@mtvc3ls2cxij>
+	s=arc-20240116; t=1714979804; c=relaxed/simple;
+	bh=Y8JxuvyKZOhfvd78F3vJoYA+MMwp35v1+bR6yUTz5RE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=FJjdzf1XoKF4FygUFtMprZB33Z5+mG0AnTIZMhj1Kp0n2mBjen9coImauhdxzj9JeHquEdSzEQM/yPqMV6cGa2zIvjRWNBQ6VF1Ts03GHnaDgzhECdO6MYhs4kaqlI/w6Cl8dG05+lP4y0QdigKWEafkGB45rwcDJQVPw9d5Eh8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=kPwn72Z4; arc=none smtp.client-ip=115.124.30.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1714979798; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=tO9ElOjebai/reO966Q+Ev5PG36wii1GIcjirNSadD0=;
+	b=kPwn72Z4FMwyzs+bc5oPu2IUIiYJD1cqn0T1b/h4iB+2flP+tckPeozupMonXZba54OVnmKpT52OZkRmJGFaUrXCDApFts81lACNlbnpf26q2OVvVh6vIJaL/Dx5vSOL/XD1HUtOmgqNtYhUOsJNhmgjhpkiM3xaTzypLvPv7jA=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R401e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037067111;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=12;SR=0;TI=SMTPD_---0W5ugHvr_1714979795;
+Received: from 30.221.130.10(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0W5ugHvr_1714979795)
+          by smtp.aliyun-inc.com;
+          Mon, 06 May 2024 15:16:37 +0800
+Message-ID: <d8a084e1-eae5-495f-b4c0-078800e7e611@linux.alibaba.com>
+Date: Mon, 6 May 2024 15:16:34 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-GND-Sasl: romain.gantois@bootlin.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net/smc: fix netdev refcnt leak in
+ smc_ib_find_route()
+To: Ratheesh Kannoth <rkannoth@marvell.com>
+Cc: wenjia@linux.ibm.com, jaka@linux.ibm.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
+ linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20240506015439.108739-1-guwen@linux.alibaba.com>
+ <20240506055119.GA939370@maili.marvell.com>
+From: Wen Gu <guwen@linux.alibaba.com>
+In-Reply-To: <20240506055119.GA939370@maili.marvell.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi Serge,
 
-On Fri, 3 May 2024, Serge Semin wrote:
 
+On 2024/5/6 13:51, Ratheesh Kannoth wrote:
+> On 2024-05-06 at 07:24:39, Wen Gu (guwen@linux.alibaba.com) wrote:
+>> A netdev refcnt leak issue was found when unregistering netdev after
+>> using SMC. It can be reproduced as follows.
+>>
+>> - run tests based on SMC.
+>> - unregister the net device.
+>>
+>> The following error message can be observed.
+>>
+>> 'unregister_netdevice: waiting for ethx to become free. Usage count = x'
+>>
+>> With CONFIG_NET_DEV_REFCNT_TRACKER set, more detailed error message can
+>> be provided by refcount tracker:
+>>
+>>   unregister_netdevice: waiting for eth1 to become free. Usage count = 2
+>>   ref_tracker: eth%d@ffff9cabc3bf8548 has 1/1 users at
+>>        ___neigh_create+0x8e/0x420
+>>        neigh_event_ns+0x52/0xc0
+>>        arp_process+0x7c0/0x860
+>>        __netif_receive_skb_list_core+0x258/0x2c0
+>>        __netif_receive_skb_list+0xea/0x150
+>>        netif_receive_skb_list_internal+0xf2/0x1b0
+>>        napi_complete_done+0x73/0x1b0
+>>        mlx5e_napi_poll+0x161/0x5e0 [mlx5_core]
+>>        __napi_poll+0x2c/0x1c0
+>>        net_rx_action+0x2a7/0x380
+>>        __do_softirq+0xcd/0x2a7
+>>
+>> It is because in smc_ib_find_route(), neigh_lookup() takes a netdev
+>> refcnt but does not release. So fix it.
+>>
+>> Fixes: e5c4744cfb59 ("net/smc: add SMC-Rv2 connection establishment")
+>> Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
+>> ---
+>>   net/smc/smc_ib.c | 3 ++-
+>>   1 file changed, 2 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/net/smc/smc_ib.c b/net/smc/smc_ib.c
+>> index 97704a9e84c7..b431bd8a5172 100644
+>> --- a/net/smc/smc_ib.c
+>> +++ b/net/smc/smc_ib.c
+>> @@ -210,10 +210,11 @@ int smc_ib_find_route(struct net *net, __be32 saddr, __be32 daddr,
+>>   		goto out;
+>>   	if (rt->rt_uses_gateway && rt->rt_gw_family != AF_INET)
+> need to release it here as well ?
 > 
-> > +void stmmac_pcs_clean(struct stmmac_priv *priv)
-> 
-> Ideally it would have been great to have the entire driver fixed to
-> accept the stmmac_priv pointer as the functions argument. But this
-> would be too tiresome. Anyway seeing the PCS-setup protagonist method
-> has the net_device pointer passed I would implement the same prototype
-> for the antagonist even though it would require an additional local
-> variable. That will make the MDIO and PCS local interface-functions
-> looking alike and as if unified. That is the reason of why I made
-> stmmac_xpcs_clean() accepting the net_device pointer. 
-> 
-> Alternatively both stmmac_pcs_setup() and stmmac_pcs_clean() could be
-> converted to just accepting a pointer to the stmmac_priv instance.
 
-I think that adapting stmmac_pcs_clean() to take a net_device struct would be 
-more appropriate since it's the simpler of the two methods. I'll implement this 
-in the next version.
+Do you mean call ip_rt_put() to release rt?
 
-Thanks,
+Yes, after investigating here, I agree that rt needs to be released as well. Thanks!
 
--- 
-Romain Gantois, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
+>>   		goto out;
+>> -	neigh = rt->dst.ops->neigh_lookup(&rt->dst, NULL, &fl4.daddr);
+>> +	neigh = dst_neigh_lookup(&rt->dst, &fl4.daddr);
+>>   	if (neigh) {
+>>   		memcpy(nexthop_mac, neigh->ha, ETH_ALEN);
+>>   		*uses_gateway = rt->rt_uses_gateway;
+>> +		neigh_release(neigh);
+>>   		return 0;
+>>   	}
+>>   out:
+>> --
+>> 2.32.0.3.g01195cf9f
+>>
 
