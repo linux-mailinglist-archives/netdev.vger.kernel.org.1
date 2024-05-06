@@ -1,214 +1,284 @@
-Return-Path: <netdev+bounces-93706-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93707-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3B0D8BCDEA
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 14:28:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FE2B8BCDF4
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 14:29:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C72821C23A5A
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 12:28:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C3CA91C2383F
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 12:29:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9827143C46;
-	Mon,  6 May 2024 12:28:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D857014431F;
+	Mon,  6 May 2024 12:29:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="clTcpFj0"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mY61CW2c"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2072.outbound.protection.outlook.com [40.107.102.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 356EE143888
-	for <netdev@vger.kernel.org>; Mon,  6 May 2024 12:28:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.102.72
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714998502; cv=fail; b=brm+NG7htKnos7ZkusUNVirYuRIz8bxQf4BjWBaAzkswUoklgTsZfCpLLnb+jFCIhIhrcrsEtTbIj3Y84hNy3hm38heVGnBl8qx9I6nWvWgBpcv9b1EKiX+83HoV9kfusOO5RkGIWOVSBBSAF+jGRWQf2k4BahVQJHr1ifFC/6o=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714998502; c=relaxed/simple;
-	bh=g3b3aCayQcadA5U+tSGUEka+W1gp66YVhASYNqqCd+Q=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 Content-Type:MIME-Version; b=hpUiHiF9DRUKZb+vBOo7yUIeyltk1mK1ePECHWfw/YLaGysebu3FCCECQoD/UOji4VVz0WE73w+GqStmgs8HcqxLhmP1HQHZXziKaxiuzX56ERyVn4o2qJ7bnm+iEzSZVhUXzbCknQYbx296Ly9Xv1CsWxiw3f0AgyBlsddFAAk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=clTcpFj0; arc=fail smtp.client-ip=40.107.102.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=a0FBtSbiynSoBEh7+s9UK1LciSJIOyh+EAvIGsf86Wy3eCi6R2T0k2d9TSjC1J/sciXk929oduV2EVDQeOWSTVhG5Yl19bgoyF8tIohY+WF2MrzatJg0+mt407gvK/au6C+wfCT4dRrcR4IoWGDDpfmsl9bob/ZqoxPR9IVUuFxRFrHcLvsbvvsHWiKbZyEkXSE3LVs+DcYDgjoA7Coo99gbWH2ZjpvhdiRP/Jxd8hePbaiIiQRHI7f65LvTQaeunwKv8IQkrp3BTMOM0GlX8/p/WjEv4oMiKt8NcuywrbTcMUI9vt9SmgfMJeooRBr92BlRQlCa59/fHtcogyPSyA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=cARjFm4dAPs0cL8Zs2E+ekrxcphDgk10Ml6qxh5wFjQ=;
- b=cQU9+qHft+Z9KF+HT1Dms49j6Q6kca186n0u/7BCuty5AZe+CozFJ3AQphi/svuvPSWbx0qLUEhbaEE+mgswdVLPNlMmy5vevSsCaIkD6bNhe7bAHmDjQ0C2gWMr0PNE+fFtYi2oO8HR8/dS/cRjxrnDp59MIECn2eTJCP3IoA32//eZF+VPAZzwRhJcK08BasCT9kEUBlsXLU/4mP8N4ab7GZaFNFrX4//cgfDcahKXMDBuyUrvIzc83LgAAaT97B+/WuG4W0gOn5Y2tVd7p2BE+luF+QGvitdswcTehkpXyLRuFbEFQS4eYxuUpdS8c7Or6/gQf6D79PxMHGo7kA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=cARjFm4dAPs0cL8Zs2E+ekrxcphDgk10Ml6qxh5wFjQ=;
- b=clTcpFj0OWK6RihWCCmEZBmxivOcf1/vIAiqfWhg604MvKD/tMfypoPCOmMJ9a2OObufqb50DauQGrpEB0sz5ZASy8V7MWEUYAL6kVt2jWiiEUYrk6GK73eE3BZu/T6prFJL93GQ3le/h5FAPi5noVN5/4YX0PWm7E2KM+ikvJKrgOD3oxhub/HuilPpuuLQ+yZNQX/BOxuAQnzEl/w09oii2W6q293T3thlMWrIpqEw1opaHpVXgR7OrfbJfKSnNYKdYGB4ohY1XJLlcVCxxrl1dZpsa2e1ZoExjdKaQpoCKG1GSZFBRonc472Cs0O34eszoKsFuiU572EWUl+nCg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from SJ1PR12MB6075.namprd12.prod.outlook.com (2603:10b6:a03:45e::8)
- by LV3PR12MB9188.namprd12.prod.outlook.com (2603:10b6:408:19b::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.42; Mon, 6 May
- 2024 12:28:16 +0000
-Received: from SJ1PR12MB6075.namprd12.prod.outlook.com
- ([fe80::3715:9750:b92c:7bee]) by SJ1PR12MB6075.namprd12.prod.outlook.com
- ([fe80::3715:9750:b92c:7bee%6]) with mapi id 15.20.7544.041; Mon, 6 May 2024
- 12:28:16 +0000
-From: Aurelien Aptel <aaptel@nvidia.com>
-To: Sagi Grimberg <sagi@grimberg.me>, linux-nvme@lists.infradead.org,
- netdev@vger.kernel.org, hch@lst.de, kbusch@kernel.org, axboe@fb.com,
- chaitanyak@nvidia.com, davem@davemloft.net, kuba@kernel.org
-Cc: Boris Pismenny <borisp@nvidia.com>, aurelien.aptel@gmail.com,
- smalin@nvidia.com, malin1024@gmail.com, ogerlitz@nvidia.com,
- yorayz@nvidia.com, galshalom@nvidia.com, mgurtovoy@nvidia.com,
- edumazet@google.com, pabeni@redhat.com, dsahern@kernel.org,
- ast@kernel.org, jacob.e.keller@intel.com
-Subject: Re: [PATCH v24 01/20] net: Introduce direct data placement tcp offload
-In-Reply-To: <29655a73-5d4c-4773-a425-e16628b8ba7a@grimberg.me>
-References: <20240404123717.11857-1-aaptel@nvidia.com>
- <20240404123717.11857-2-aaptel@nvidia.com>
- <3ab22e14-35eb-473e-a821-6dbddea96254@grimberg.me>
- <253o79wr3lh.fsf@mtr-vdi-124.i-did-not-set--mail-host-address--so-tickle-me>
- <9a38f4db-bff5-4f0f-ac54-6ac23f748441@grimberg.me>
- <253le4wqu4a.fsf@nvidia.com>
- <2d4f4468-343a-4706-8469-56990c287dba@grimberg.me>
- <253frv0r8yc.fsf@nvidia.com>
- <29655a73-5d4c-4773-a425-e16628b8ba7a@grimberg.me>
-Date: Mon, 06 May 2024 15:28:11 +0300
-Message-ID: <253a5l3qg4k.fsf@nvidia.com>
-Content-Type: text/plain
-X-ClientProxiedBy: FR3P281CA0151.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:a2::12) To SJ1PR12MB6075.namprd12.prod.outlook.com
- (2603:10b6:a03:45e::8)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7FE9143C50;
+	Mon,  6 May 2024 12:29:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1714998554; cv=none; b=MlPJY+3s3O37k12W8vk6lrtUe7LvDb7pMLAhjNK8e1xaOHl7R0AQeWDUUYp1trlEIyjRbulU1Yfv4fmtiSpNZHNdyCvn3teikCVEvOS/gRkeNC4F1Y6IEgp0l5rzFvdQenMf7H4i0Szn7SgPfdtMdLcDalknJXy4LYLc0Idh8Ik=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1714998554; c=relaxed/simple;
+	bh=sajSVbpQQVWfzjIjb2J4Yq7NAW+S1ejV3grweJRqLLI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hT/QsxJmDYztN3eNxwaQt5mHqQJSWsrFtDCIx2toDq9ufRu4+0H7B+ECjWxpfIIuf0IIAswOTZ0WQO2NSh+eKvbzf3ChNS5ckfH/zamsKzBEPbBGDJmt4cQOo6RvA4NMjNylduq4p67et4hwVtv2UFu9ruyMwzTL0lf/AXRnZ3I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mY61CW2c; arc=none smtp.client-ip=209.85.221.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-34da35cd01cso1747485f8f.2;
+        Mon, 06 May 2024 05:29:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1714998551; x=1715603351; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=DBfsNC19rPNR16qUNGOxKom5OYtxMKfBBimwIPACZsU=;
+        b=mY61CW2cKbJ4cNAl7w1xWGVCwo7iHOnEUshytSRE7AnLRhsEYXJZ+avSfxOPz088Y3
+         qARnuX1MmYdQAcmy5J++tT/G6dvLsdCHSuV56pz6Q0FuWaXolRSGKEZ4cqLaw6mDe8vC
+         x36aOBk5r74hsjwq63gNknPaglnInbyJjh4TMpPBCEJKX5R5gm0MF8wxRHX0ep7w0Wjn
+         AZZCoLGSQRCXYOwxz912TcxnPNMosSjX3JrgJ8RJtyqxTrtdaTV5nSThnvm6akFUagwe
+         zoP9bJlWjHa2RkFkraW+xUAHiXYhS35G3UNe4b2TDjYxCLV0ubT6l6q0tk9QshjYzC09
+         gINQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714998551; x=1715603351;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DBfsNC19rPNR16qUNGOxKom5OYtxMKfBBimwIPACZsU=;
+        b=GpHvT4zGPYoEzefzykIGl+qrJinGzjkU9nmWYBWXdOzpUar6uNtiMGpxlr8YGiHosR
+         Wz/COjUTlZI1mFpYVPhELzinxLCpwZkXxU9ORvJEQpij7zSMxqrXwyQpNviaY19BTDJW
+         087xqQE4dys2jZW1WPT3DybY4dRL/ZdWtdpiaT3TSZCE4ckPiY+ZsEvBUxunbt/E5Mca
+         caC5gv7xFTFByuhk1MrVFsMdoL/PqUWzVYMdXwSmhgMIC6KDp0zRfuziJRf39TdwcXRR
+         8a5tfO7dXD2t1AZs6MJvjHnEBxj0E5R6jvyC0J6dOQS5O9BgjK+mmFhO9gfkHAHBj1ZX
+         Mm5A==
+X-Forwarded-Encrypted: i=1; AJvYcCUxcZINJyilXzngy2KUwKVODu+B7kr5YEG/CLA3woc57SsFm89pDx6TVsV9P+Z0BDzAs99n/6v0gxnhKw/T0kCujUbDe1w3hWo8sNP40P2QExIOVFAAuieKmQc3pAmwCKdbtEhK2QcCa//tLidQokzmSzV1RzZwFEj8tuqNx/XYRQ==
+X-Gm-Message-State: AOJu0YyPWD396oY5Tf8XcwtBZDDPer1jKtE0A1Ykvy0qvMJ24DGQkbcG
+	swJpVR2P0ucYpKnGtTMDZw6vNOcqqF68ELy/pAq12HyLnZHE+ewV
+X-Google-Smtp-Source: AGHT+IH4vs2suWLEPsQrwp4kV7M90dNck7PxfG+1yQ451/pvKhK19o0/XcgDeD+Xz05jC5FqD8M+1w==
+X-Received: by 2002:adf:f7ce:0:b0:34c:def3:2f82 with SMTP id a14-20020adff7ce000000b0034cdef32f82mr8284909wrq.27.1714998550675;
+        Mon, 06 May 2024 05:29:10 -0700 (PDT)
+Received: from eichest-laptop ([2a02:168:af72:0:f8e4:2dcd:2c07:4d8e])
+        by smtp.gmail.com with ESMTPSA id i3-20020a5d6303000000b00347eb354b30sm10539322wru.84.2024.05.06.05.29.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 06 May 2024 05:29:09 -0700 (PDT)
+Date: Mon, 6 May 2024 14:29:08 +0200
+From: Stefan Eichenberger <eichest@gmail.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+	lxu@maxlinear.com, hkallweit1@gmail.com, michael@walle.cc,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 2/2] net: phy: mxl-gpy: add new device tree property
+ to disable SGMII autoneg
+Message-ID: <ZjjNFAB7cyXajH8a@eichest-laptop>
+References: <Zio9g9+wsFX39Vkx@eichest-laptop>
+ <ZippHJrnvzXsTiK4@shell.armlinux.org.uk>
+ <Zip8Hd/ozP3R8ASS@eichest-laptop>
+ <ZiqFOko7zFjfTdz4@shell.armlinux.org.uk>
+ <ZiqUB0lwgw7vIozG@eichest-laptop>
+ <Ziq5+gRXGmqt9bXM@shell.armlinux.org.uk>
+ <ZjOYuP5ypnH8GJWd@eichest-laptop>
+ <ZjOftdnoToSSsVJ1@shell.armlinux.org.uk>
+ <ZjUSaVqkmt7+ihTA@eichest-laptop>
+ <ZjVn/5KD72zKEcnK@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ1PR12MB6075:EE_|LV3PR12MB9188:EE_
-X-MS-Office365-Filtering-Correlation-Id: a4dfde02-df13-49a6-af91-08dc6dc800fe
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230031|7416005|1800799015|376005|366007;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?PFfy5c9s/U3CmhY6hBC1ESQB2VL4yZcn0NXAaLHIuu9Qz829MOJ7mdS3abTI?=
- =?us-ascii?Q?kzYYrKhJSiv2OYEWOwBmBemSGxDq2q0b6oY3RaXry73KGshdkFGs5Pcb6ttO?=
- =?us-ascii?Q?ROFBfJdmGIe9VjCDk8V46WC64kLeXix1HJUnnnhqTFROqJjK6ujjfG2fAUEY?=
- =?us-ascii?Q?dyNR8M2G/XhfSIVBX+MyWyjSjum1ybb4bd7rFJSXXwYdSefqbUfgY+dJNJoV?=
- =?us-ascii?Q?5jucxcYBzIw3R9h1s+xTp1pfmQg0eebaZln+fCf76EjaDULNOShcPUoS9ovr?=
- =?us-ascii?Q?GAEsyZGISef8uMKztPZzhbTTldMm8iIZuWkZkZgpx3M1n0gvGZWJvWbvTORL?=
- =?us-ascii?Q?0hE9rqfXsdpx0qXt03u7OA2juQMGI77Ibb87ik57gmYTB/e/iXWeKeVmGbMk?=
- =?us-ascii?Q?45hynQFESCYczsiYYOEahpoVkUFfp/zI8QQ6UYm6fIf1Y+eWVJmwWG+K7RJl?=
- =?us-ascii?Q?FssnlKJSCR0jp4Db2aoQzWv9Fx72+JE3P7VMyw4KN5WU+pZWAdg7XSr8PqJA?=
- =?us-ascii?Q?CCsJsnrLzv0KDMbuCugvwTrvK1Li7dWiJNkC7mMsQ+O1LkyX5FT5cyU4etyv?=
- =?us-ascii?Q?Ms3OC3TBJ6QA3/mTwQ1jQ0+aMfpVcbNLV8T2gU3idB1pcfO8DjqsaNMmqfy5?=
- =?us-ascii?Q?S1QHS9hAZIv8nTLDvPd5A51sKpjm+ne8orORprKyEhk8/Zo17lCFeRgi/KhH?=
- =?us-ascii?Q?Am6OspaeDnTze2mM9iY/0MmAh/C93gjEeDhtB3ifQBvPFzvqTybzNk/BtbCE?=
- =?us-ascii?Q?TsF7FXILxNJyO/ByOqXFYhbUdz2pIUjffsEKSXsRWVpLLTfcJ2WWGAid5ddG?=
- =?us-ascii?Q?LehtRzdjOQtjLPvIrIRJa9XowrjZZL3ENn19xs5gAq8eG7iIO8YLa/Cz8dtS?=
- =?us-ascii?Q?3FFw3SkSpyw2ccCeURvv1evpltAnniLv18zZ5g1+ltduTrRTYWkiTyEwgtGK?=
- =?us-ascii?Q?SbY1RhPHiMnVmJ1x0mZ+9CM5snyrCUIzpwyXV3uCmql0ONJG5vKNNY3zJaL/?=
- =?us-ascii?Q?GfIoZqcyYY6Dt01AEvEHD6mGQAN18SFj0NGo4qIUJUIgLyT+x7CshYvyWmBv?=
- =?us-ascii?Q?wcvNYqxcBTQSvsCPPv7oROHb95b+4sPgSVqMv/WzayZSBFXNSWdoqc1f93i0?=
- =?us-ascii?Q?68n3JlSnHvSGmb+Ou1fZBuMODa+k4sXVcVxN8MZ7Mv30G9h/g/yl9actgRlV?=
- =?us-ascii?Q?jKEM5+JivitNTSQk+PaQ5YgdIROINtr8pERwyZQjsIZ+xlGp1SjO5XBQEjXw?=
- =?us-ascii?Q?knApU41CCu9BXAB97KtdRln8ed0REHWGKKHitYOihA=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ1PR12MB6075.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7416005)(1800799015)(376005)(366007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?UAvRviZ4qhyJydZyxeAoodsgj9wFFz+osKNvSi6b2/7UF8cuXWLBauyc7LTk?=
- =?us-ascii?Q?s/tvLTU1e0uK9LSXbggvUjSaLQ60pAtd4RKIDxGEMCyiEYZjq4gowk+F0tIT?=
- =?us-ascii?Q?X4fqSIuhKconolPRLtTPFIL2k5/cOimxqtAYVarah4o6TnV2MYXuHUTQJl0K?=
- =?us-ascii?Q?ttbvWEdZdLgv1v2EQ/NPKra/tu0GGEznLOZozfT5+61ko9wHkVUkYJb0uWVf?=
- =?us-ascii?Q?8AXaqmP9vyeh7xwcjhPy4RAF7dC3MstSRTNKoY5ZFT8evjzFh3Kdow7usajM?=
- =?us-ascii?Q?wgGoAqf7LN9SAIjkjSB3QoQUspwS0cNjUHleFEGuJVbCCHAQIHws1edws6yN?=
- =?us-ascii?Q?Y50NF9JCgfRi2E0TW7kHsYpy93MyDMi7atuPsLN4FOFeD32B5+N53LFNDjnp?=
- =?us-ascii?Q?UZUKy2B0JDsrTqMQeAQBJMeEqQu3RJiwnHofenkHVR8LGYgCgJp4uh0EegMU?=
- =?us-ascii?Q?Lx6jhhD5Llu3HMHHWS3CazhXMZZ8ZuuF6pXtwpS5YHA/0qX7EevSx9OVgn1p?=
- =?us-ascii?Q?ZOlimTYPZNGSC2s61HRI6PtPXxs3CbdY+lR4/puLTknWw7CQIDmUBtdp8eUw?=
- =?us-ascii?Q?V3LqhFuFnTyj6UR27lIggS7bCNvgqJj7O6H9pEbP4n7RGBsjFhGhN1+1hqhs?=
- =?us-ascii?Q?Nknca4sNjDifAHa6k/2ceVDvOimDKJXq/4pfHxrgOra3BNHigvXyfkKqL174?=
- =?us-ascii?Q?9MBpHPwp/FN+8ImscLLALuo3LF+ZRUpONXuhkIZg0y/D17bXirAW75wUk9l8?=
- =?us-ascii?Q?y9/JVrryDJfmlm4henh1ci+jO59ikk9Q3JY6JPlzkZdwG8Ry7FBSKqUM90cG?=
- =?us-ascii?Q?/th/UXIIpNiMdhBDY6KGPEsylGvM8Jm09pFdO/eMyRkzyDHV8PrMElGt85C+?=
- =?us-ascii?Q?2R0YzC7GUzshIARzgLkuAjmqupEQrO7ZQMUC54u1xGY7AOK5ZQl1bXqH7alX?=
- =?us-ascii?Q?OjtTmb502HSg0bR69mRfK3DkxfysIUwyFr77ZTbdwKQbxrxvidJJgGuEUmBm?=
- =?us-ascii?Q?mqZ41BRdVL9d2gQdcH4iHENPmfZJ8nEoAazj/INcvyy9nesDATmuz2Lh7Ma9?=
- =?us-ascii?Q?ni+Mx1nqb/99gm/mEsKxjBC0+/zbzc6qWnxSoFu9JySlFeDnDYYESMliwMc2?=
- =?us-ascii?Q?x7EBmLWVydQS/ETl/1spr8R0K3kc99V0oW2o5nsMb15axSe9qGl+e/b2qXZm?=
- =?us-ascii?Q?fEQ9z8JYpE0cymaa0ys1scP9+BaF3nXD1KIRE98omcWr+HMmMcX0Cq/RVdbp?=
- =?us-ascii?Q?P4pOTS8W961ksFMuZxgKg1FxalmLaHAOpegKQ47HelwAmSCkBbLToF0X1x4R?=
- =?us-ascii?Q?xOUNdnF5oolaV9nWbyOPvhgkSJ4GO1tdsX/uxI0cILVSNEsIMQifBUBsjWMF?=
- =?us-ascii?Q?vdbmZSL1qP7EHid96FqLCIakBslMyRlwAhEKDN1Gna39W670DKhuPGNGAie2?=
- =?us-ascii?Q?B46MGVMz8LM+2pcxXq/ukV7OqyrMn7SDtb0d8AAnMSFCfKkxJVvovvRD+gBN?=
- =?us-ascii?Q?GMJFS5MG+Fwt1mL2Ff55KaYysHHy6OSF7B9kBHw99FheH2VNQyTE8kS604ex?=
- =?us-ascii?Q?SeWCI+Vl1c042PjWdLf9pciO3ZYgxzjEOk5oyU8+?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a4dfde02-df13-49a6-af91-08dc6dc800fe
-X-MS-Exchange-CrossTenant-AuthSource: SJ1PR12MB6075.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 May 2024 12:28:16.0267
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: LicWK9v8AAPQK2GdEfAaiVmq1wntjkO5Lv3D2yEji4WYs39UZPgcmSk9dt3mfBiOM9F/v6uNHmdnc8/ISfi0IA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR12MB9188
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZjVn/5KD72zKEcnK@shell.armlinux.org.uk>
 
-Sagi Grimberg <sagi@grimberg.me> writes:
-> Understood. It is usually the case as io threads are not aligned to the
-> rss steering rules (unless
-> arfs is used).
+On Fri, May 03, 2024 at 11:41:03PM +0100, Russell King (Oracle) wrote:
+> On Fri, May 03, 2024 at 06:35:53PM +0200, Stefan Eichenberger wrote:
+> > On Thu, May 02, 2024 at 03:14:13PM +0100, Russell King (Oracle) wrote:
+> > > On Thu, May 02, 2024 at 03:44:24PM +0200, Stefan Eichenberger wrote:
+> > > > Hi Russell,
+> > > > 
+> > > > Sorry for the late reply but I wanted to give you some update after
+> > > > testing with the latest version of your patches on net-queue.
+> > > 
+> > > I've also been randomly distracted, and I've been meaning to ping you
+> > > to test some of the updates.
+> > > 
+> > > http://git.armlinux.org.uk/cgit/linux-arm.git/log/?h=net-queue
+> > > 
+> > > The current set begins with:
+> > > 
+> > > "net: sfp-bus: constify link_modes to sfp_select_interface()" which is
+> > > now in net-next, then the patches between and including:
+> > > 
+> > > "net: phylink: validate sfp_select_interface() returned interface" to
+> > > "net: phylink: clean up phylink_resolve()"
+> > > 
+> > > That should get enough together for the PCS "neg" mode to be consistent
+> > > with what the MAC driver sees.
+> > > 
+> > > The remaining bits that I still need to sort out is the contents of
+> > > phylink_pcs_neg_mode() for the 802.3z mode with PHY, and also working
+> > > out some way of handling the SGMII case where the PHY and PCS disagree
+> > > (one only supporting inband the other not supporting inband.)
+> > > 
+> > > I'm not sure when I'll be able to get to that - things are getting
+> > > fairly chaotic again, meaning I have again less time to spend on
+> > > mainline... and I'd like to take some vacation time very soon (I really
+> > > need some time off!)
+> > 
+> > No problem, I'm also quite busy at the moment and I have the workaround
+> > to test the hardware, so it is nothing urgent for me.
+> > 
+> > > > I think I see the problem you are describing.
+> > > > 
+> > > > When the driver starts it will negotiate MLO_AN_PHY based on the
+> > > > capabilities of the PHY and of the PCS. However when I switch to 1GBit/s
+> > > > it should switch to MLO_AN_INBAND but this does not work. Here the
+> > > > output of phylink:
+> > > 
+> > > I'm designing this to work the other way - inband being able to fall
+> > > back to PHY (out of band) mode rather than PHY mode being able to fall
+> > > forwards to inband mode.
+> > 
+> > I tested again with 89e0a87ef79db9f3ce879e9d977429ba89ca8229 and I think
+> > in my setup the problem is that it doesn't fall back to PHY mode but
+> > takes it as default mode. Here what happens when I have the mxl-gpy PHY
+> > connected to a 1000 GBit/s port:
+> > [    9.331179] mvpp2 f2000000.ethernet eth1: Using firmware node mac address 00:51:82:11:22:02
+> > [   14.674836] mvpp2 f2000000.ethernet eth1: PHY f212a600.mdio-mii:11 doesn't supply possible interfaces
+> > [   14.674853] mvpp2 f2000000.ethernet eth1:  interface 2 (mii) rate match none supports 0-3,6,13-14
+> > [   14.674864] mvpp2 f2000000.ethernet eth1:  interface 4 (sgmii) rate match none supports 0-3,5-6,13-14
+> > [   14.674871] mvpp2 f2000000.ethernet eth1:  interface 9 (rgmii) rate match none supports 0-3,5-6,13-14
+> > [   14.674877] mvpp2 f2000000.ethernet eth1:  interface 10 (rgmii-id) rate match none supports 0-3,5-6,13-14
+> > [   14.674883] mvpp2 f2000000.ethernet eth1:  interface 11 (rgmii-rxid) rate match none supports 0-3,5-6,13-14
+> > [   14.674889] mvpp2 f2000000.ethernet eth1:  interface 12 (rgmii-txid) rate match none supports 0-3,5-6,13-14
+> > [   14.674895] mvpp2 f2000000.ethernet eth1:  interface 22 (1000base-x) rate match none supports 5-6,13-14
+> > [   14.674900] mvpp2 f2000000.ethernet eth1:  interface 23 (2500base-x) rate match none supports 6,13-14,47
+> > [   14.674907] mvpp2 f2000000.ethernet eth1: PHY [f212a600.mdio-mii:11] driver [Maxlinear Ethernet GPY215C] (irq=POLL)
+> > [   14.685444] mvpp2 f2000000.ethernet eth1: phy: 2500base-x setting supported 00,00000000,00008000,0000606f advertising 00,00000000,00008000,0000606f
+> > [   14.686635] mvpp2 f2000000.ethernet eth1: configuring for phy/2500base-x link mode
+> > [   14.694263] mvpp2 f2000000.ethernet eth1: major config, requested phy/2500base-x
+> 
+>                                                                        ^^^
+> 
+> You're still requesting (from firmware) for PHY mode, and phylink will
+> _always_ use out-of-band if firmware requests that.
+> 
+> > [   14.700402] mvpp2 f2000000.ethernet eth1: major config, active phy/outband/2500base-x
+> 
+> So it uses PHY mode for 2500base-X, which is correct.
+> 
+> > [   17.768370] mvpp2 f2000000.ethernet eth1: major config, requested phy/sgmii
+> 
+> Still requesting PHY mode with SGMII, which historically we've always
+> used out-of-band mode for, so we preserve that behaviour.
+> 
+> > [   17.774602] mvpp2 f2000000.ethernet eth1: firmware wants phy mode, but PHY requires inband
+> 
+> So we complain about it with an error, because it is wrong...
+> 
+> > [   17.782976] mvpp2 f2000000.ethernet eth1: major config, active phy/outband/sgmii
+> 
+> and we still try to use it (correctly, because that's what phylink
+> has always done in this case.)
+> 
+> As I tried to explain, there is fall-back from MLO_AN_INBAND to
+> MLO_AN_PHY, but there won't be fall-forward from MLO_AN_PHY to
+> MLO_AN_INBAND.
 
-The steering rule we add has 2 effects:
-1) steer the flow to the offload object on the HW
-2) provide CPU alignement with the io threads (Rx affinity similar to
-   aRFS)
+I still don't get it, sorry. So the mxl-gpy driver currently has two
+modes:
+2500 MBit/s -> PHY_INTERFACE_MODE_2500BASEX -> (0 no inband)
+1000 MBit/s -> PHY_INTERFACE_MODE_SGMII -> LINK_INBAND_ENABLE
+If I use this configureation it will not work because there is no
+fallback from MLO_AN_PHY to MLO_AN_INBAND.
 
-We understand point (2) might not be achieved with unbounded queue
-scenarios. That's fine.
+Now if I understand everyting correctly, this happens for 1000 MBit/s
+and SGMII because the firmware decides to use PHY mode. I modified
+the PHY driver to use 1000BASEX instead:
+2500 MBit/s -> PHY_INTERFACE_MODE_2500BASEX -> (0 no inband)
+1000 MBit/s -> PHY_INTERFACE_MODE_1000BASEX -> LINK_INBAND_ENABLE
+However, the same thing happens:
+[   14.635831] mvpp2 f2000000.ethernet eth1: PHY [f212a600.mdio-mii:11] driver [Maxlinear Ethernet GPY215C] (irq=POLL)
+[   14.646742] mvpp2 f2000000.ethernet eth1: phy: 2500base-x setting supported 00,00000000,00008000,0000606f advertising 00,00000000,00008000,0000606f
+[   14.647986] mvpp2 f2000000.ethernet eth1: configuring for phy/2500base-x link mode
+[   14.655784] mvpp2 f2000000.ethernet eth1: major config, requested phy/2500base-x
+[   14.663313] mvpp2 f2000000.ethernet eth1: major config, active phy/outband/2500base-x
+[   14.663323] mvpp2 f2000000.ethernet eth1: phylink_mac_config: mode=phy/2500base-x/none adv=00,00000000,00000000,00000000 pause=00
+[   14.666098] mvpp2 f2000000.ethernet eth1: phy link down 2500base-x/2.5Gbps/Full/none/rx/tx
+[   18.760959] mvpp2 f2000000.ethernet eth1: phy link up 2500base-x/2.5Gbps/Full/none/rx/tx
+[   18.760977] mvpp2 f2000000.ethernet eth1: pcs link up
+[   18.761211] mvpp2 f2000000.ethernet eth1: can LPI, EEE enabled, inactive
+[   18.761231] mvpp2 f2000000.ethernet eth1: Link is Up - 2.5Gbps/Full - flow control rx/tx
+[   70.983936] mvpp2 f2000000.ethernet eth1: phy link down 2500base-x/Unknown/Full/none/rx/tx
+[   70.983965] mvpp2 f2000000.ethernet eth1: deactivating EEE, was inactive
+[   70.984017] mvpp2 f2000000.ethernet eth1: pcs link down
+[   70.985000] mvpp2 f2000000.ethernet eth1: Link is Down
+[   74.057088] mvpp2 f2000000.ethernet eth1: phy link up 1000base-x/1Gbps/Full/none/rx/tx
+[   74.057109] mvpp2 f2000000.ethernet eth1: major config, requested phy/1000base-x
+[   74.063342] mvpp2 f2000000.ethernet eth1: firmware wants phy mode, but PHY requires inband
+[   74.071706] mvpp2 f2000000.ethernet eth1: major config, active phy/outband/1000base-x
+[   74.072902] mvpp2 f2000000.ethernet eth1: phylink_mac_config: mode=phy/1000base-x/none adv=00,00000000,00000000,00000000 pause=03
+[   74.072976] mvpp2 f2000000.ethernet eth1: pcs link up
+[   74.073225] mvpp2 f2000000.ethernet eth1: can LPI, EEE enabled, active
+[   74.073245] mvpp2 f2000000.ethernet eth1: enabling tx_lpi, timer 250us
+[   74.073279] mvpp2 f2000000.ethernet eth1: Link is Up - 1Gbps/Full - flow control rx/tx
 
->> But when it is bound, which is still the default common case, we will
->> benefit from the alignment. To not lose that benefit for the default
->> most common case, we would like to keep cfg->io_cpu.
->
-> Well, this explanation is much more reasonable. Setting .affinity_hint
-> argument
-> seems like a proper argument to the interface and nvme-tcp can set it to
-> queue->io_cpu.
+If I then request inband by setting managed = "in-band-status" in the
+device tree the logic will fail because there is not phydev and
+therefore the link will never be configured for phy mode (it falls back
+to "Legacy, so determine inband depending on the advertising bit"):
+[    9.299037] mvpp2 f2000000.ethernet eth1: Using firmware node mac address 00:51:82:11:22:02
+[   14.586343] mvpp2 f2000000.ethernet eth1: configuring for inband/2500base-x link mode
+[   14.595669] mvpp2 f2000000.ethernet eth1: major config, requested inband/2500base-x
+[   14.631876] mvpp2 f2000000.ethernet eth1: major config, active inband/inband/an-enabled/2500base-x
+[   14.631887] mvpp2 f2000000.ethernet eth1: phylink_mac_config: mode=inband/2500base-x/none adv=00,00000000,00008000,0000e240 pause=04
+[   14.633208] mvpp2 f2000000.ethernet eth1: pcs link up
+[   14.633241] mvpp2 f2000000.ethernet eth1: can LPI, EEE enabled, inactive
+[   14.633262] mvpp2 f2000000.ethernet eth1: Link is Up - 2.5Gbps/Full - flow control off
+[   60.713862] mvpp2 f2000000.ethernet eth1: pcs link down
+[   60.713947] mvpp2 f2000000.ethernet eth1: deactivating EEE, was inactive
+[   60.714978] mvpp2 f2000000.ethernet eth1: Link is Down
+[   60.720200] mvpp2 f2000000.ethernet eth1: pcs link up
+[   60.720586] mvpp2 f2000000.ethernet eth1: can LPI, EEE enabled, inactive
+[   60.720619] mvpp2 f2000000.ethernet eth1: Link is Up - 2.5Gbps/Full - flow control off
+[   63.012413] mvpp2 f2000000.ethernet eth1: pcs link down
+[   63.012444] mvpp2 f2000000.ethernet eth1: deactivating EEE, was inactive
+[   63.013480] mvpp2 f2000000.ethernet eth1: Link is Down
 
-Ok, we will rename cfg->io_cpu to ->affinity_hint.
+Or is there a way to configure the firmware to use inband by default but
+sill having a phydev device? 
 
->> Could you clarify what are the advantages of running unbounded queues,
->> or to handle RX on a different cpu than the current io_cpu?
->
-> See the discussion related to the patch from Li Feng:
-> https://lore.kernel.org/lkml/20230413062339.2454616-1-fengli@smartx.com/
+For me it is not entirely clear which scenario should work for the
+mxl-gpy in the end?
 
-Thanks. As said previously, we are fine with decreased perfs in this
-edge case.
+Scenario A:
+2500 MBit/s -> PHY_INTERFACE_MODE_2500BASEX -> (0 no inband)
+1000 MBit/s -> PHY_INTERFACE_MODE_SGMII -> LINK_INBAND_ENABLE
+Then I would need a way to tell that the default mode is inband but that
+there is still a phydev device available. Maybe this is possible and I
+simply don't know how to do it?
 
->>> nvme-tcp may handle rx side directly from .data_ready() in the future, what
->>> will the offload do in that case?
->> It is not clear to us what the benefit of handling rx in .data_ready()
->> will achieve. From our experiment, ->sk_data_ready() is called either
->> from queue->io_cpu, or sk->sk_incoming_cpu. Unless you enable aRFS,
->> sk_incoming_cpu will be constant for the whole connection. Can you
->> clarify would handling RX from data_ready() provide?
->
-> Save the context switching to a kthread from softirq, can reduce latency
-> substantially
-> for some workloads.
+Scenario B:
+2500 MBit/s -> PHY_INTERFACE_MODE_2500BASEX -> LINK_INBAND_DISABLE
+1000 MBit/s -> PHY_INTERFACE_MODE_1000BASEX -> LINK_INBAND_ENABLE
+Then the phylink logic should change the firmwares mode depending on the
+speed. Would this also work with 100MBit/s and 10MBit/s?
 
-Ok, thanks for the explanation. With bounded queues and steering the
-softirq CPU will be aligned with the offload CPU, so we think this is
-also OK.
+Scenario C (which I understand is not wanted):
+2500 MBit/s -> PHY_INTERFACE_MODE_2500BASEX -> (0 no inband)
+1000 MBit/s -> PHY_INTERFACE_MODE_SGMII -> (0 no inband)
+This would already work but would require me to change the phy driver
+and is not the desired behaviour anyways.
 
-Thanks
+Sorry for my confusion, regards,
+Stefan
+
 
