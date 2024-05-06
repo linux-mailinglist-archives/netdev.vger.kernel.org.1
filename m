@@ -1,181 +1,209 @@
-Return-Path: <netdev+bounces-93881-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93882-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 664F28BD809
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 01:10:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B040D8BD83C
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 01:41:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 60185B21BC3
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 23:10:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 359AB1F22016
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 23:41:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 161F513DDD6;
-	Mon,  6 May 2024 23:10:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C238C15B116;
+	Mon,  6 May 2024 23:41:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nFF/q6E/"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="fnXVY3V4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F1F51E492;
-	Mon,  6 May 2024 23:10:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 022601E885;
+	Mon,  6 May 2024 23:41:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715037003; cv=none; b=p3PvvQdHYLfBGQ4RK8RDYMRSGf9KY8v8p+dercix1asilymhWj/C0g795D85t8dNFJtmlTQygwCeMM40oxzCo8JQKBuZX0FJWt6No1KnueafZKIDK+0XCFLyuCEzm758AFR7PUVK3Y19Om4uifmD1lGZ5K+L1ZHe3KrECvjNPZ0=
+	t=1715038865; cv=none; b=gcInXOrV4+oKErQ4QkvyTsDCqHJsrvXWy9oSbT17PJ15fu5knGaYGc+gCuf3povpLKgIVHjOQxLnhbwGZ3JLrQmnYCvNtJEN6zb5k93cSDZmn80+irJ2ggj43XzqWGT/tWQg+NaAyfAnvV4/pA2TtadNjEm26T4Pjx1nj6zVpUQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715037003; c=relaxed/simple;
-	bh=jb6AoaZ4+1JJOP5y0uiexhZgPhIBpaMIIaYEadS16Q4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dq7d/ztGS7bwT+R6gunl+rpBaUKKlGmSa6F4pTPuShoYV5XwtRNedSihydA/WtCkmPNKQUxWdsw/Cdxj/MhRNrMMwUhpWJwvnlRQNa6LKl+NfBOhYrXmFbEfXaV9sPvCdGSyx1EELzeYyysKInyuw5C79161SC/c8tGZNsBhOLI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nFF/q6E/; arc=none smtp.client-ip=209.85.221.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-34db6a29a1eso1571042f8f.1;
-        Mon, 06 May 2024 16:10:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715037000; x=1715641800; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2djqDQE+yQ6VgjclssSW7VHfPd80JOhsReXmW/fEqXY=;
-        b=nFF/q6E/ncV3MYvnMC7xKGOyT/arhdI5FKJ2nO17qmvlhvec75Ip4UFkbelMBZm7u+
-         PBybAqvSwcZ9oDJ8hZ65h3OUtU6K6Tuy4OkIGMJU59xY9PCjEXwEAGoDPocnQ+odxFom
-         N4Er+uN2wFHGu3eg6asD6OXFTuW6yF4gNJU933BhbVd4uV4tZ6+URa8Jwqd66UlaKEXz
-         FEA2YE5NWTnaVcLhc7lKdA+UZIO5JJc7OE0mGh0wB5dw8+AOkZN8ljykJ0/x5DDTqv8I
-         +nfXwAZgQyqRLuTHKeUPhB9EQwjDvTRuBnfJV5zlxfON94q4okZL4aKm22KMg0a5rCoU
-         77jw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715037000; x=1715641800;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2djqDQE+yQ6VgjclssSW7VHfPd80JOhsReXmW/fEqXY=;
-        b=GaQdPszgEpeawo3JT8tP1hTAO04LdGbkLuwmnMF5k9+FiNe9ikF2g8dgHY/iTVaqn2
-         QExx9KJgqi2XrNYK6XUhBmP06jo4TO/obfKkG5vH2uOOp2yVDE2RseuD7jJ3P38Kfo12
-         i0dQiiYiCDYH3GOwV1MxmcUr5OTn9d/3fSRb6HrLwZOGIPj1NIBG4iys3BKAKJRNQPkc
-         Y39/1DsJlK+uTbiDY8KvJ6UBRY0qCl7H2VFQ78lnM1gP/R7I0Zybzh7ZdWbUIw/Z1JkM
-         /vRIsPAzucIrNmB+6lWg8cHZxeu5uZN7vE/mYLjODOoLbA++Vl7U2FmCkbw2/QTmOAJr
-         ZZ8g==
-X-Forwarded-Encrypted: i=1; AJvYcCUaK882yAs7A/4I5W3SbVLAoLMrcy0nHYyak7mj5O7c+Hbrqn7BR12EfPEQSsWKRxjwIMCvyCHopGjpmcLmkC9+xbXZAYCJ3bMDumqOZVVj10hfF8NzN6R3fnBS4w1/r1ghl/lQ0j3Hhzfzd0zYYg0lMoT0GILyGM4p
-X-Gm-Message-State: AOJu0YwXiLNQZKp11BEH1vJXozsm/o7CPlhnvv2FoznjxEQjEfl/rvpx
-	mvMI2t9aD2zKDuZ1LTi82ZFnvMkPgmXNk4+reoPZJUOCLjlrRmLpeynVvEPL3K2WgGrClApeLjU
-	9nEhgpMBIt8Ib/U5eE2pKEC6VAY4=
-X-Google-Smtp-Source: AGHT+IGxLV8o+I20/ACsrxFvjlgXJfW+QBAHlbBignGmLULqLzAKyI21XMdrf96e9JbOwJvccCh16JA6cXe8ZtJOOVs=
-X-Received: by 2002:adf:e60c:0:b0:34d:b993:fe6e with SMTP id
- p12-20020adfe60c000000b0034db993fe6emr8100162wrm.0.1715036999414; Mon, 06 May
- 2024 16:09:59 -0700 (PDT)
+	s=arc-20240116; t=1715038865; c=relaxed/simple;
+	bh=mqR6gz9gp6tJrQIcAxieaVjngKl4qs2DMsMrtXf5s1g=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:CC:References:
+	 In-Reply-To:Content-Type; b=TnVn6nckyZhsvjLFdKW643MwBqxS75lqlTR6H/AhJxx1qqF9EbXKpc8BGGCW1rTRDdFBIJEXchQ8eStAlPm8lzQKHeTpm5rRl/ozhfov3P8BCrWuPm4mv6AMfZJG6Jf97tQsEtxZpsKrHblSSWQsLvg4r5xxOKAYyykXsVo22QA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=fnXVY3V4; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 446NbpJI003979;
+	Mon, 6 May 2024 23:40:42 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	message-id:date:mime-version:subject:from:to:cc:references
+	:in-reply-to:content-type:content-transfer-encoding; s=
+	qcppdkim1; bh=IpjLrfB035u5+tHfJeAEmJfrrZpD/R9nfsWbDFifxOk=; b=fn
+	XVY3V4X54YEo/xZa01ZFO752F3zihAcuBCmFMIPsd0XD51Of+kYeAwQ9MuwXvKCU
+	TnZiyU47iEqs1+QUd0EuqMxd25H2/TMZEf06jclnSVW+E+Yl7LZOpvkIWxYnEzAq
+	xf+K8wlqf2sDIK6DLgGMKMSRT3F0Qea5HQqov4X6k+kle1U/J31Yc80024tlI4pf
+	Qrz1v85cyjfhFb26XkauKd1p4OTxBRjtjU0DCyOUkeS5ZFl2L1UEB+rty+Qjy+rk
+	FWQkbifNKV31opao7QZ3/msPx8DKHEiaL+HKQlOGkx7QJoFEvChnTV9xI3FbDFEy
+	Jsn6u/BbyT9Ay2ZvLvlQ==
+Received: from nasanppmta05.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3xxuthhqbu-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 06 May 2024 23:40:42 +0000 (GMT)
+Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
+	by NASANPPMTA05.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 446NefG0016395
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 6 May 2024 23:40:41 GMT
+Received: from [10.46.19.239] (10.80.80.8) by nasanex01a.na.qualcomm.com
+ (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Mon, 6 May 2024
+ 16:40:37 -0700
+Message-ID: <8a6e3ed0-186e-4248-98a0-c8b60341d3aa@quicinc.com>
+Date: Mon, 6 May 2024 16:40:37 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240503182957.1042122-1-bigeasy@linutronix.de>
- <20240503182957.1042122-15-bigeasy@linutronix.de> <87y18mohhp.fsf@toke.dk>
-In-Reply-To: <87y18mohhp.fsf@toke.dk>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Mon, 6 May 2024 16:09:47 -0700
-Message-ID: <CAADnVQJkiwaYXUo+LyKoV96VFFCFL0VY5Jgpuv_0oypksrnciA@mail.gmail.com>
-Subject: Re: [PATCH net-next 14/15] net: Reference bpf_redirect_info via
- task_struct on PREEMPT_RT.
-To: =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>
-Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>, LKML <linux-kernel@vger.kernel.org>, 
-	Network Development <netdev@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>, 
-	Boqun Feng <boqun.feng@gmail.com>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Eric Dumazet <edumazet@google.com>, Frederic Weisbecker <frederic@kernel.org>, 
-	Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@linutronix.de>, 
-	Waiman Long <longman@redhat.com>, Will Deacon <will@kernel.org>, 
-	Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>, 
-	Hao Luo <haoluo@google.com>, Jesper Dangaard Brouer <hawk@kernel.org>, Jiri Olsa <jolsa@kernel.org>, 
-	John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
-	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
-	Stanislav Fomichev <sdf@google.com>, Yonghong Song <yonghong.song@linux.dev>, bpf <bpf@vger.kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH bpf-next v6 3/3] selftests/bpf: Handle forwarding of
+ UDP CLOCK_TAI packets
+Content-Language: en-US
+From: "Abhishek Chauhan (ABC)" <quic_abchauha@quicinc.com>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, Andrew Halaney <ahalaney@redhat.com>,
+        "Martin
+ KaFai Lau" <martin.lau@kernel.org>,
+        Martin KaFai Lau <martin.lau@linux.dev>,
+        Daniel Borkmann <daniel@iogearbox.net>, bpf <bpf@vger.kernel.org>
+CC: <kernel@quicinc.com>
+References: <20240504031331.2737365-1-quic_abchauha@quicinc.com>
+ <20240504031331.2737365-4-quic_abchauha@quicinc.com>
+ <663929b249143_516de2945@willemb.c.googlers.com.notmuch>
+ <d613c5a6-5081-4760-8a86-db1107bdc207@quicinc.com>
+ <1480064d-1825-4438-9d30-bc47a694cc12@quicinc.com>
+In-Reply-To: <1480064d-1825-4438-9d30-bc47a694cc12@quicinc.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: przWdvP5rukM-nKm2AnRtDImBlIfUkjW
+X-Proofpoint-ORIG-GUID: przWdvP5rukM-nKm2AnRtDImBlIfUkjW
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.11.176.26
+ definitions=2024-05-06_17,2024-05-06_02,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 malwarescore=0
+ adultscore=0 mlxscore=0 bulkscore=0 lowpriorityscore=0 impostorscore=0
+ mlxlogscore=999 clxscore=1015 suspectscore=0 phishscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2404010003 definitions=main-2405060172
 
-On Mon, May 6, 2024 at 12:41=E2=80=AFPM Toke H=C3=B8iland-J=C3=B8rgensen <t=
-oke@redhat.com> wrote:
->
-> Sebastian Andrzej Siewior <bigeasy@linutronix.de> writes:
->
-> > The XDP redirect process is two staged:
-> > - bpf_prog_run_xdp() is invoked to run a eBPF program which inspects th=
-e
-> >   packet and makes decisions. While doing that, the per-CPU variable
-> >   bpf_redirect_info is used.
-> >
-> > - Afterwards xdp_do_redirect() is invoked and accesses bpf_redirect_inf=
-o
-> >   and it may also access other per-CPU variables like xskmap_flush_list=
-.
-> >
-> > At the very end of the NAPI callback, xdp_do_flush() is invoked which
-> > does not access bpf_redirect_info but will touch the individual per-CPU
-> > lists.
-> >
-> > The per-CPU variables are only used in the NAPI callback hence disablin=
-g
-> > bottom halves is the only protection mechanism. Users from preemptible
-> > context (like cpu_map_kthread_run()) explicitly disable bottom halves
-> > for protections reasons.
-> > Without locking in local_bh_disable() on PREEMPT_RT this data structure
-> > requires explicit locking.
-> >
-> > PREEMPT_RT has forced-threaded interrupts enabled and every
-> > NAPI-callback runs in a thread. If each thread has its own data
-> > structure then locking can be avoided.
-> >
-> > Create a struct bpf_net_context which contains struct bpf_redirect_info=
-.
-> > Define the variable on stack, use bpf_net_ctx_set() to save a pointer t=
-o
-> > it. Use the __free() annotation to automatically reset the pointer once
-> > function returns.
-> > The bpf_net_ctx_set() may nest. For instance a function can be used fro=
-m
-> > within NET_RX_SOFTIRQ/ net_rx_action which uses bpf_net_ctx_set() and
-> > NET_TX_SOFTIRQ which does not. Therefore only the first invocations
-> > updates the pointer.
-> > Use bpf_net_ctx_get_ri() as a wrapper to retrieve the current struct
-> > bpf_redirect_info.
-> >
-> > On PREEMPT_RT the pointer to bpf_net_context is saved task's
-> > task_struct. On non-PREEMPT_RT builds the pointer saved in a per-CPU
-> > variable (which is always NODE-local memory). Using always the
-> > bpf_net_context approach has the advantage that there is almost zero
-> > differences between PREEMPT_RT and non-PREEMPT_RT builds.
->
-> Did you ever manage to get any performance data to see if this has an
-> impact?
->
-> [...]
->
-> > +static inline struct bpf_net_context *bpf_net_ctx_get(void)
-> > +{
-> > +     struct bpf_net_context *bpf_net_ctx =3D this_cpu_read(bpf_net_con=
-text);
-> > +
-> > +     WARN_ON_ONCE(!bpf_net_ctx);
->
-> If we have this WARN...
->
-> > +static inline struct bpf_redirect_info *bpf_net_ctx_get_ri(void)
-> > +{
-> > +     struct bpf_net_context *bpf_net_ctx =3D bpf_net_ctx_get();
-> > +
-> > +     if (!bpf_net_ctx)
-> > +             return NULL;
->
-> ... do we really need all the NULL checks?
 
-Indeed.
-Let's drop all NULL checks, since they definitely add overhead.
-I'd also remove ifdef CONFIG_PREEMPT_RT and converge on single implementati=
-on:
-static inline struct bpf_net_context * bpf_net_ctx_get(void)
-{
- return current->bpf_net_context;
-}
+
+On 5/6/2024 1:54 PM, Abhishek Chauhan (ABC) wrote:
+> 
+> 
+> On 5/6/2024 1:50 PM, Abhishek Chauhan (ABC) wrote:
+>>
+>>
+>> On 5/6/2024 12:04 PM, Willem de Bruijn wrote:
+>>> Abhishek Chauhan wrote:
+>>>> With changes in the design to forward CLOCK_TAI in the skbuff
+>>>> framework,  existing selftest framework needs modification
+>>>> to handle forwarding of UDP packets with CLOCK_TAI as clockid.
+>>>>
+>>>> Link: https://lore.kernel.org/netdev/bc037db4-58bb-4861-ac31-a361a93841d3@linux.dev/
+>>>> Signed-off-by: Abhishek Chauhan <quic_abchauha@quicinc.com>
+>>>> ---
+>>>>  tools/include/uapi/linux/bpf.h                | 15 ++++---
+>>>>  .../selftests/bpf/prog_tests/ctx_rewrite.c    | 10 +++--
+>>>>  .../selftests/bpf/prog_tests/tc_redirect.c    |  3 --
+>>>>  .../selftests/bpf/progs/test_tc_dtime.c       | 39 +++++++++----------
+>>>>  4 files changed, 34 insertions(+), 33 deletions(-)
+>>>>
+>>>> diff --git a/tools/include/uapi/linux/bpf.h b/tools/include/uapi/linux/bpf.h
+>>>> index 90706a47f6ff..25ea393cf084 100644
+>>>> --- a/tools/include/uapi/linux/bpf.h
+>>>> +++ b/tools/include/uapi/linux/bpf.h
+>>>> @@ -6207,12 +6207,17 @@ union {					\
+>>>>  	__u64 :64;			\
+>>>>  } __attribute__((aligned(8)))
+>>>>  
+>>>> +/* The enum used in skb->tstamp_type. It specifies the clock type
+>>>> + * of the time stored in the skb->tstamp.
+>>>> + */
+>>>>  enum {
+>>>> -	BPF_SKB_TSTAMP_UNSPEC,
+>>>> -	BPF_SKB_TSTAMP_DELIVERY_MONO,	/* tstamp has mono delivery time */
+>>>> -	/* For any BPF_SKB_TSTAMP_* that the bpf prog cannot handle,
+>>>> -	 * the bpf prog should handle it like BPF_SKB_TSTAMP_UNSPEC
+>>>> -	 * and try to deduce it by ingress, egress or skb->sk->sk_clockid.
+>>>> +	BPF_SKB_TSTAMP_UNSPEC = 0,		/* DEPRECATED */
+>>>> +	BPF_SKB_TSTAMP_DELIVERY_MONO = 1,	/* DEPRECATED */
+>>>> +	BPF_SKB_CLOCK_REALTIME = 0,
+>>>> +	BPF_SKB_CLOCK_MONOTONIC = 1,
+>>>> +	BPF_SKB_CLOCK_TAI = 2,
+>>>> +	/* For any future BPF_SKB_CLOCK_* that the bpf prog cannot handle,
+>>>> +	 * the bpf prog can try to deduce it by ingress/egress/skb->sk->sk_clockid.
+>>>>  	 */
+>>>>  };
+>>>>  
+>>>> diff --git a/tools/testing/selftests/bpf/prog_tests/ctx_rewrite.c b/tools/testing/selftests/bpf/prog_tests/ctx_rewrite.c
+>>>> index 3b7c57fe55a5..71940f4ef0fb 100644
+>>>> --- a/tools/testing/selftests/bpf/prog_tests/ctx_rewrite.c
+>>>> +++ b/tools/testing/selftests/bpf/prog_tests/ctx_rewrite.c
+>>>> @@ -69,15 +69,17 @@ static struct test_case test_cases[] = {
+>>>>  	{
+>>>>  		N(SCHED_CLS, struct __sk_buff, tstamp),
+>>>>  		.read  = "r11 = *(u8 *)($ctx + sk_buff::__mono_tc_offset);"
+>>>> -			 "w11 &= 3;"
+>>>> -			 "if w11 != 0x3 goto pc+2;"
+>>>> +			 "if w11 == 0x4 goto pc+1;"
+>>>> +			 "goto pc+4;"
+>>>> +			 "if w11 == 0x3 goto pc+1;"
+>>>> +			 "goto pc+2;"
+>>>
+>>> Not an expert on this code, and I see that the existing code already
+>>> has this below, but: isn't it odd and unnecessary to jump to an
+>>> unconditional jump statement?
+>>>
+>> I am closely looking into your comment and i will evalute it(Martin can correct me 
+>> if the jumps are correct or not as i am new to BPF as well) but i found out that 
+>> JSET = "&" and not "==". So the above two ins has to change from -   
+>>
+>> "if w11 == 0x4 goto pc+1;" ==>(needs to be corrected to) "if w11 & 0x4 goto pc+1;" 
+>>  "if w11 == 0x3 goto pc+1;" ==> (needs to be correct to) "if w11 & 0x3 goto pc+1;"
+>>
+>>
+Willem, I looked at the jumps in the above code. They look correct to me. 
+Martin can check too if i am doing anything wrong here other than the JSET "&".
+
+Ideally pc(program counter) points to the next instruction. 
+
+			 "if w11 & 0x4 goto pc+1;"
+			 "goto pc+4;" 
+		[pc+0]	 "if w11 & 0x3 goto pc+1;" <== PC is going to be here 
+		[pc+1]	 "goto pc+2;"
+		[pc+2]	 "$dst = 0;"
+		[pc+3]	 "goto pc+1;"
+		[pc+4]	 "$dst = *(u64 *)($ctx + sk_buff::tstamp);", <== This is where the code is intended to jump to for "goto pc+4;"
+
+
+
+>>>>  			 "$dst = 0;"
+>>>>  			 "goto pc+1;"
+>>>>  			 "$dst = *(u64 *)($ctx + sk_buff::tstamp);",
+>>>>  		.write = "r11 = *(u8 *)($ctx + sk_buff::__mono_tc_offset);"
+>>>> -			 "if w11 & 0x2 goto pc+1;"
+>>>> +			 "if w11 & 0x4 goto pc+1;"
+>>>>  			 "goto pc+2;"
+>>>> -			 "w11 &= -2;"
+>>>> +			 "w11 &= -3;"
+
 
