@@ -1,74 +1,73 @@
-Return-Path: <netdev+bounces-93549-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93550-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 282548BC4D6
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 02:29:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6F568BC4E0
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 02:34:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D2F98280E7C
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 00:29:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9DA1928184F
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 00:34:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD1166138;
-	Mon,  6 May 2024 00:29:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1C721FB5;
+	Mon,  6 May 2024 00:34:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="YJtQ3EPk"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="KXy8eWhA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EB41259C
-	for <netdev@vger.kernel.org>; Mon,  6 May 2024 00:29:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9838E394
+	for <netdev@vger.kernel.org>; Mon,  6 May 2024 00:34:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714955363; cv=none; b=JaqGid/BgaEthMoB5W36pDgLnUC3pACclIPwy4bXGLgcafpIbG34Xj2O4of7hLo2vOAmp71DVFBDrKsrZ7Cj8etF3H6h6amKHmJt7t651p1ZuGuRyVoCuUAlOsLH4lV+x+J+KSt5qIjFMOFRFj2q1E5FmKfCn4fjCauwTD49b4k=
+	t=1714955673; cv=none; b=WJ4PEvsqEAT/03a/rX0Prgukvw6DowOcyd6yvKOW7X2jj+cKleon15407fYV/fSFJFlga3Vn/ipP4aL7f1UGTP5Ww8RJYeieKiEc/cxihKnX3FnfM1ZaeY3ZL+rcmt4mDg2Dlrlnj2QTE5UsW7LTdlashgXjcQgDsN5YFptxD4k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714955363; c=relaxed/simple;
-	bh=7p83fI6SjhbSz9whdN8AjeYm5Iaq6UXmW/wjThWyv6k=;
+	s=arc-20240116; t=1714955673; c=relaxed/simple;
+	bh=AChhY6Myt2pb74qJtHVyBe5JqImoAm33aR0NbEtiqYA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=AAWjX8293zTbaAmEyft0kizg66fM9t2PYfgBojhot8AeYJu5rnPMVdXiJ25kOIMOc9lnV/Y2Kj9J+A/w4kUc/db6GW5oO+X0b+hzEU/LUbFku2KuhsqLo1Ht6YWtz1pUXhNFPzU7I8EfvZMqTByqdzeIUDu/7LYKQhq6vY/hofI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=YJtQ3EPk; arc=none smtp.client-ip=209.85.216.46
+	 In-Reply-To:Content-Type; b=YFpMmc9g5jfXuq+uBTKojZsRhlLeBxWNo/qvCERsB4XeOuo6lP1XilgBbX9Wwvn+XceJZh9IxhAY9cWbPGmUYEQGlISwTSH7UkdoK6OjW3WzyjdDWIQv6y0S2U++m+wChxuAQsrU2ySexqny18uy17g/7D9P/vLKwC2p1H5mIsg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=KXy8eWhA; arc=none smtp.client-ip=209.85.214.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-2b27eec1eb1so981765a91.0
-        for <netdev@vger.kernel.org>; Sun, 05 May 2024 17:29:22 -0700 (PDT)
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-1e3ca546d40so8916375ad.3
+        for <netdev@vger.kernel.org>; Sun, 05 May 2024 17:34:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1714955361; x=1715560161; darn=vger.kernel.org;
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1714955672; x=1715560472; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=sTixdwfAlIVssw/yTwe1uZ1trqj6K9Ho7zGTIsCsG3k=;
-        b=YJtQ3EPk7IxrNvgo8weclRLgIUIWkSOI2Uep1o1M/rk9e0dB+mVfcDL2Ra/RKgbRaV
-         4yD0nNAz17zHnC1JbqzasjATt3Y4kUqFfBfl4uDx/zyyAwmCgdWBqfnXG64JOZ3VVasD
-         TpWrwpoJPMZ1aCGn4xBszZrjTzvv5gHLPW4FLW7M2xKyeRN3dmeqwv7P7Qzj6PulULEp
-         iKKq9LW6PdJR11ebmc1NoRMdfQ6vYQYYHA7xQiZMqlhAGok5r3mf8gMd5KZKadxtoFqx
-         EMNG1nXwcBwffehAbXoAJ9b4BN0JZNUl2iEcpz1iMRyOz+EEFNblqZD7QukB/0M0HXcx
-         nJhA==
+        bh=u+Cu/MT7DpQXuRb2kGF1GvRQ7Ne4HnhFHxyuoOlIMyk=;
+        b=KXy8eWhAZjJP0Hee9Grnlf3SYqkMMweA+LLsTnIPv7LK9yuvofgD7s/ZgScULL8G4a
+         fthPgtRdzldclN7DNCWIYMcJyAvvPjLBW/oUxXvABdUzGgnAVl5lp1qr2WNUNRTm8DXS
+         irZam093g/pmZLVMy5u1QhyVg86v1jF6jicz9OPzV01rgm7xCZiYUD8sTr4ncQl9kp0O
+         MTjpCCxrFCV4mpeXrDOrJxe4PKhk/QLs0H6K/BXx+huXUxK7t/7KkTy2m1C9FLBR3cU6
+         8WBYn3bcPS9zZMVnK9JdAYRnmlnsQjcMke0YivDnQpzSBGdEh5N5Fn8xma+rnnXCs4vN
+         DI5A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714955361; x=1715560161;
+        d=1e100.net; s=20230601; t=1714955672; x=1715560472;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=sTixdwfAlIVssw/yTwe1uZ1trqj6K9Ho7zGTIsCsG3k=;
-        b=McW6xmzFgpwbDXtTuLuh/pUZj8T2c6UHZOtrTg4ISkqcIneHe4qr2aujAkUm0aBQuC
-         l29R5DLbbnAaiI+n9pI7LGhc6CdX70+kz5TV/WkJOL56vuMZbobHoohh4wEeLPBYAMe9
-         8xnjNp52EY9yGk/IVHJV5WgmqM4+dIigTy1tqs921H4uVzSNspZbEjLrrkqZ2iOfbgJi
-         5+WQDm55MDktvzS7cFvqvojV+nfROkaKKKfyTKpVHQOgCLDCck2rjyrvqB4ClxamrA6+
-         goQDiV113IqrzbEqbM9Qj1dk2CB4R4ta9jjJ1GiQy7h+AshxqrYCXC8Hhs2cPAPtIPon
-         oO3g==
-X-Forwarded-Encrypted: i=1; AJvYcCWfzdKiAOrqXRRoByFHVRoC8yI7jYDnifX7ek+I3x3MYdyDLtCq+o3Cy0H0mpZOUDJjnB4cOGoRhvPy8ro3adZaYAkk+j+T
-X-Gm-Message-State: AOJu0YxKtUZk1C1Yeq0UGGf3OHZ/TFMJ7G2eitE1j5jiEg+qIfBKGg2w
-	lCpX4/YuES7T4kuSVLTpA/Kb53WfxevZbsmu7OJl1IaQEl+pSDS5cb15Fj0ekss=
-X-Google-Smtp-Source: AGHT+IFapiyynwMzWBFC3qoHSlJe6Vp0gcSIQLTrnjL4T2m4HyoHAt77UaMOEYoyby7VMZX56YX6rQ==
-X-Received: by 2002:a17:90a:d30a:b0:2aa:c2ba:3758 with SMTP id p10-20020a17090ad30a00b002aac2ba3758mr8212757pju.42.1714955361360;
-        Sun, 05 May 2024 17:29:21 -0700 (PDT)
+        bh=u+Cu/MT7DpQXuRb2kGF1GvRQ7Ne4HnhFHxyuoOlIMyk=;
+        b=Ietil0N6+5/qcP1H5jw+YfP9Uv9iGK4PExLzKkZcf8g+zlhBo4/rRhCpPU/tbtEkh3
+         07HOReaBMfjiuicfyIig2/KLyuUMnX3tC3PPnVBEEUzdmw5Y6qP36mvvzQSoJ3pcqeOZ
+         /FAJtTaQ80nwERmsIYRSb0hKeGFXcMUNgvio3NR3aLDiR/C+bYrNwMuJWR+djgxIxBYQ
+         hpzGXoatescWpzIy59ZUaqzH4BVf3iibL7od5xf+EoXvwwGY/s9YNaf40gi/OJ2SPEFB
+         uSt55b0CHNSvxw0/c6LCmDNOTtk9NCxognXqcQZSfWeYN0gGmkcUBxxj9IsfYs7ghRR0
+         BYiQ==
+X-Gm-Message-State: AOJu0Yzvezmz68EJY7mjM6xha/X/LcjNPCAkDti+23EpcPHND1qkXy+c
+	6I6d2zJhII1g38PqJjy8G97pEJhT6zHI4K27QF7nBXE7s3uEHnuxVJPybQjlv/I=
+X-Google-Smtp-Source: AGHT+IEbOa9bCGo2jWicKhu9CfyxIFpniJoiI9MMTA5hN3bQm3MkHBPRtVhbmfNFS7PjwvplGG/lVw==
+X-Received: by 2002:a17:902:f549:b0:1e3:c610:597d with SMTP id h9-20020a170902f54900b001e3c610597dmr11359574plf.60.1714955659760;
+        Sun, 05 May 2024 17:34:19 -0700 (PDT)
 Received: from [192.168.1.15] (174-21-160-85.tukw.qwest.net. [174.21.160.85])
-        by smtp.gmail.com with ESMTPSA id h4-20020a17090a710400b002b1314ba8c0sm8708252pjk.57.2024.05.05.17.29.19
+        by smtp.gmail.com with ESMTPSA id f9-20020a170902ce8900b001eceeaaad08sm7019238plg.5.2024.05.05.17.34.19
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 05 May 2024 17:29:20 -0700 (PDT)
-Message-ID: <306cf793-6f96-4a22-aca0-53c0ccefc0a1@davidwei.uk>
-Date: Sun, 5 May 2024 17:29:18 -0700
+        Sun, 05 May 2024 17:34:19 -0700 (PDT)
+Message-ID: <4f8df603-7385-4771-ab78-24e701eabee3@davidwei.uk>
+Date: Sun, 5 May 2024 17:34:18 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,96 +75,65 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH net-next v8 07/14] page_pool: devmem support
+Subject: Re: [RFC PATCH net-next v2 1/9] queue_api: define queue api
 Content-Language: en-GB
-To: Christoph Hellwig <hch@infradead.org>
-Cc: Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-alpha@vger.kernel.org, linux-mips@vger.kernel.org,
- linux-parisc@vger.kernel.org, sparclinux@vger.kernel.org,
- linux-trace-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
- bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Jonathan Corbet <corbet@lwn.net>,
- Richard Henderson <richard.henderson@linaro.org>,
- Ivan Kokshaysky <ink@jurassic.park.msu.ru>, Matt Turner
- <mattst88@gmail.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
- "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
- Helge Deller <deller@gmx.de>, Andreas Larsson <andreas@gaisler.com>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- Ilias Apalodimas <ilias.apalodimas@linaro.org>,
- Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu
- <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
- Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
- Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
- <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Steffen Klassert
- <steffen.klassert@secunet.com>, Herbert Xu <herbert@gondor.apana.org.au>,
- David Ahern <dsahern@kernel.org>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Shuah Khan <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>,
- =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
- Amritha Nambiar <amritha.nambiar@intel.com>,
- Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
- Alexander Mikhalitsyn <alexander@mihalicyn.com>,
- Kaiyuan Zhang <kaiyuanz@google.com>, Christian Brauner <brauner@kernel.org>,
- Simon Horman <horms@kernel.org>, David Howells <dhowells@redhat.com>,
- Florian Westphal <fw@strlen.de>, Yunsheng Lin <linyunsheng@huawei.com>,
- Kuniyuki Iwashima <kuniyu@amazon.com>, Jens Axboe <axboe@kernel.dk>,
- Arseniy Krasnov <avkrasnov@salutedevices.com>,
- Aleksander Lobakin <aleksander.lobakin@intel.com>,
- Michael Lass <bevan@bi-co.net>, Jiri Pirko <jiri@resnulli.us>,
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
- Lorenzo Bianconi <lorenzo@kernel.org>,
- Richard Gobert <richardbgobert@gmail.com>,
- Sridhar Samudrala <sridhar.samudrala@intel.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
- Johannes Berg <johannes.berg@intel.com>, Abel Wu <wuyun.abel@bytedance.com>,
- Breno Leitao <leitao@debian.org>, Pavel Begunkov <asml.silence@gmail.com>,
- Jason Gunthorpe <jgg@ziepe.ca>, Shailend Chand <shailend@google.com>,
- Harshitha Ramamurthy <hramamurthy@google.com>,
- Shakeel Butt <shakeel.butt@linux.dev>, Jeroen de Borst
- <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>,
- linux-mm@kvack.org, Matthew Wilcox <willy@infradead.org>
-References: <20240403002053.2376017-1-almasrymina@google.com>
- <20240403002053.2376017-8-almasrymina@google.com>
- <8357256a-f0e9-4640-8fec-23341fc607db@davidwei.uk>
- <ZjH1hO8qJgOqNKub@infradead.org>
+To: Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, Michael Chan <michael.chan@broadcom.com>,
+ Pavan Chebbi <pavan.chebbi@broadcom.com>,
+ Andy Gospodarek <andrew.gospodarek@broadcom.com>,
+ Adrian Alvarado <adrian.alvarado@broadcom.com>,
+ Mina Almasry <almasrymina@google.com>, Shailend Chand <shailend@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
+References: <20240502045410.3524155-1-dw@davidwei.uk>
+ <20240502045410.3524155-2-dw@davidwei.uk>
+ <20240504121154.GF3167983@kernel.org>
 From: David Wei <dw@davidwei.uk>
-In-Reply-To: <ZjH1hO8qJgOqNKub@infradead.org>
+In-Reply-To: <20240504121154.GF3167983@kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 2024-05-01 00:55, Christoph Hellwig wrote:
-> On Fri, Apr 26, 2024 at 05:17:52PM -0700, David Wei wrote:
->> On 2024-04-02 5:20 pm, Mina Almasry wrote:
->>> @@ -69,20 +106,26 @@ net_iov_binding(const struct net_iov *niov)
->>>   */
->>>  typedef unsigned long __bitwise netmem_ref;
->>>  
->>> +static inline bool netmem_is_net_iov(const netmem_ref netmem)
->>> +{
->>> +#if defined(CONFIG_PAGE_POOL) && defined(CONFIG_DMA_SHARED_BUFFER)
->>
->> I am guessing you added this to try and speed up the fast path? It's
->> overly restrictive for us since we do not need dmabuf necessarily. I
->> spent a bit too much time wondering why things aren't working only to
->> find this :(
-> 
-> So what else do you need?  I was assured last round that nothing but
-> dmabuf and potentially the huge page case (that really just is the page
-> provider) would get added.
+On 2024-05-04 05:11, Simon Horman wrote:
+> On Wed, May 01, 2024 at 09:54:02PM -0700, David Wei wrote:
+>> From: Mina Almasry <almasrymina@google.com>
 
-I'm using userspace memory so having this gated behind
-CONFIG_DMA_SHARED_BUFFER doesn't make sense for us.
+...
 
+>> +struct netdev_queue_mgmt_ops {
+>> +       void *                  (*ndo_queue_mem_alloc)(struct net_device *dev,
+>> +                                                      int idx);
+>> +       void                    (*ndo_queue_mem_free)(struct net_device *dev,
+>> +                                                     void *queue_mem);
+>> +       int                     (*ndo_queue_start)(struct net_device *dev,
+>> +                                                  int idx,
+>> +                                                  void *queue_mem);
+>> +       int                     (*ndo_queue_stop)(struct net_device *dev,
+>> +                                                 int idx,
+>> +                                                 void **out_queue_mem);
 > 
+> Nit: The indentation (before the return types) should use tabs rather than
+>      spaces. And I'm not sure I see the value of the large indentation after
+>      the return types. Basically, I suggest this:
+> 
+> 	void * (*ndo_queue_mem_alloc)(struct net_device *dev, int idx);
+> 	void   (*ndo_queue_mem_free)(struct net_device *dev, void *queue_mem);
+> 	int    (*ndo_queue_start)(struct net_device *dev, int idx,
+> 				  void *queue_mem);
+> 	int    (*ndo_queue_stop)(struct net_device *dev, int idx,
+> 				 void **out_queue_mem);
+> 
+
+Hi Simon, this patch came from Shailend and Mina which I applied to this
+patchset. We'll make sure it's formatted properly once we send a
+non-RFC. Thanks.
+
+>> +};
+>> +
+>>  /**
+>>   * DOC: Lockless queue stopping / waking helpers.
+>>   *
+>> -- 
+>> 2.43.0
 >>
-> ---end quoted text---
+>>
 
